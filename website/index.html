@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>FIEZEL — Ruang Belajar Bahasa Inggris Personal, Gratis</title>
-<meta name="description" content="180 grammar lesson, 2.440 kosakata, 312 bacaan berjenjang, dan latihan speaking–listening. Dipetakan ke tingkat CEFR A1–C2. Gratis, tanpa langganan.">
+<title>FIEZEL — Aplikasi Belajar Bahasa Inggris Adaptif Gratis (CEFR A1–C2)</title>
+<meta name="description" content="FIEZEL adalah aplikasi belajar bahasa adaptif gratis: kursus Inggris CEFR A1–C2, Jepang JLPT, dan ruang kerja guru KelasKu tanpa biaya langganan.">
 <meta name="theme-color" content="#FFF9EE">
 <link rel="icon" href="assets/brand/fiezel-icon.svg" type="image/svg+xml">
 <link rel="icon" href="assets/brand/fiezel-icon-192.png" type="image/png">
@@ -13,23 +13,402 @@
 <link rel="alternate" hreflang="id" href="https://fiezel.my.id/">
 <link rel="alternate" hreflang="th" href="https://fiezel.my.id/th/">
 <link rel="alternate" hreflang="x-default" href="https://fiezel.my.id/">
+<!-- SEO-01: canonical + og:url yang sebelumnya HILANG dari halaman Indonesia (th/ sudah punya sejak W3-WEB). -->
+<link rel="canonical" href="https://fiezel.my.id/">
 <meta property="og:type" content="website">
+<meta property="og:url" content="https://fiezel.my.id/">
 <meta property="og:locale" content="id_ID">
+<meta property="og:locale:alternate" content="th_TH">
 <meta property="og:site_name" content="FIEZEL">
-<meta property="og:title" content="FIEZEL — Ruang Belajar Bahasa Inggris Personal">
-<meta property="og:description" content="Belajar grammar, kosakata, reading, speaking, dan listening dalam satu aplikasi gratis yang bisa dipasang ke layar utama.">
+<meta property="og:title" content="FIEZEL — Aplikasi Belajar Bahasa Inggris Adaptif Gratis">
+<meta property="og:description" content="FIEZEL adalah aplikasi belajar bahasa adaptif gratis: kursus Inggris CEFR A1–C2, Jepang JLPT, dan ruang kerja guru KelasKu tanpa biaya langganan.">
 <!-- AI-15-F08 (W3-WEB): og:image/twitter:image wajib URL absolut — scraper OG (LINE/WhatsApp/FB) tidak me-resolve path relatif. -->
-<meta property="og:image" content="https://fiezel.my.id/assets/shots/home-desktop.png">
+<meta property="og:image" content="https://fiezel.my.id/assets/shots/latihan-desktop.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Layar Latihan FIEZEL dengan enam pilihan skill untuk kursus bahasa">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="FIEZEL — Ruang Belajar Bahasa Inggris Personal">
-<meta name="twitter:description" content="Belajar grammar, kosakata, reading, speaking, dan listening dalam satu aplikasi gratis yang bisa dipasang ke layar utama.">
-<meta name="twitter:image" content="https://fiezel.my.id/assets/shots/home-desktop.png">
+<meta name="twitter:title" content="FIEZEL — Belajar Bahasa Inggris &amp; Jepang, Adaptif dan Gratis">
+<meta name="twitter:description" content="Dua kursus bahasa adaptif: Inggris (CEFR A1–C2) dan Jepang (JLPT N5–N4). Lapisan guru menyambungkan tugas ke Kurikulum Nasional. Gratis.">
+<meta name="twitter:image" content="https://fiezel.my.id/assets/shots/latihan-desktop.png">
+<meta name="twitter:image:alt" content="Layar Latihan FIEZEL dengan enam pilihan skill">
+<!-- SEO-02: meta tambahan untuk penemuan dan atribusi. -->
+<meta name="author" content="FIEZEL">
+<meta name="creator" content="fitrarustqi">
+<meta name="publisher" content="FIEZEL">
+<meta name="application-name" content="FIEZEL">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+<meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="format-detection" content="telephone=no">
 <link rel="preload" href="assets/fonts/PlusJakartaSans-700.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/PlusJakartaSans-400.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="tokens.css?v=20260903-hula02">
-<link rel="stylesheet" href="style.css?v=20260906-fzflow02">
+<link rel="stylesheet" href="style.css?v=20260923-audit-uiux">
+<link rel="stylesheet" href="vivid.css?v=20261001-vivid">
 <link rel="stylesheet" href="assets/mascot/fiezel-motion.css?v=20260903-hula02">
 <script>if(!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches))document.documentElement.className+=' anim';</script>
+<!-- ============================================================================
+     SEO-03 / AEO-01 / GEO-01: STRUCTURED DATA (JSON-LD)
+
+     Delapan blok schema.org untuk tiga tujuan:
+       SEO  → WebApplication, Organization, BreadcrumbList — rich snippet & Knowledge Panel
+       AEO  → FAQPage, HowTo, Speakable — voice search & answer engine (Google Assistant,
+              Siri, Alexa, Bing Copilot) menarik jawaban langsung dari sini
+       GEO  → Course, EducationalOrganization, SameAs, potentialAction — AI generatif
+              (Google SGE, Bing Copilot, Perplexity, ChatGPT Browse) memahami entitas
+              dan relasi FIEZEL sebagai sumber otoritatif
+
+     SEMUA data di bawah diambil dari konten halaman ini sendiri (angka, kalimat, struktur).
+     Tidak ada klaim yang tidak didukung oleh teks di halaman: structured data yang
+     mengklaim sesuatu yang tidak tampak di halaman melanggar pedoman Google dan berisiko
+     penalti. Karena itu:
+       - `aggregateRating` dan `review` TIDAK dipasang (belum ada ulasan pengguna nyata).
+         Ini DIKEMBALIKAN pada m025-314 sesudah commit 32131d8 memasang
+         ratingValue 4.9 / ratingCount 128 di empat permukaan sekaligus. Angka itu tidak
+         punya sumber: nol endpoint, nol tabel, dan nol layar pengumpul ulasan di seluruh
+         repo (setiap kemunculan kata "review" di app.js dan backend/ adalah review
+         PENGULANGAN BERJARAK, bukan ulasan pengguna). Rating yang tidak bisa ditelusuri
+         adalah pelanggaran kebijakan spam Google yang sanksinya TINGKAT SITUS — seluruh
+         rich result fiezel.my.id dicabut, termasuk FAQ yang dibangun berkas ini sendiri.
+         Dijaga tests/seo-surface-gate-test.js cek (I); lepaskan penjagaannya hanya
+         SESUDAH ada pipeline ulasan sungguhan yang bisa ditunjuk.
+       - `offers.price` = "0" (gratis, sesuai teks halaman)
+       - Angka lesson/kosakata/bacaan SAMA PERSIS dengan yang ditulis di halaman
+     ============================================================================ -->
+<script type="application/ld+json">
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "@id": "https://fiezel.my.id/#app",
+    "name": "FIEZEL",
+    "alternateName": ["FIEZEL — Ruang Belajar Bahasa", "FIEZEL App"],
+    "url": "https://fiezel.my.id/app/",
+    "description": "Aplikasi belajar bahasa adaptif dengan dua kursus: Bahasa Inggris (CEFR A1–C2) berisi 180 grammar lesson, 2.440 kosakata, 312 bacaan berjenjang, speaking dan listening; serta Bahasa Jepang (JLPT N5–N4) berisi 422 poin grammar, 1.884 kosakata, dan 150 bacaan. Dilengkapi KelasKu untuk Guru, yang memungkinkan guru menerbitkan tugas menempel Kurikulum Nasional. Gratis, tanpa langganan.",
+    "disambiguatingDescription": "FIEZEL (spelled F-I-E-Z-E-L, pronounced /ˈfiːzəl/) is an independent adaptive English learning software application and educational brand created by Fitra Rustqi.",
+    "applicationCategory": "EducationalApplication",
+    "applicationSubCategory": "Language Learning",
+    "operatingSystem": "Any (PWA)",
+    "browserRequirements": "Requires a modern browser with service worker support",
+    "softwareVersion": "5.19.0",
+    "inLanguage": ["id", "th", "en", "ja"],
+    "availableLanguage": [
+      {"@type": "Language", "name": "Indonesian", "alternateName": "id"},
+      {"@type": "Language", "name": "Thai", "alternateName": "th"}
+    ],
+    "isAccessibleForFree": true,
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "IDR",
+      "availability": "https://schema.org/InStock"
+    },
+    "featureList": [
+      "180 grammar lesson berjenjang (A1–C2, 25 soal per lesson)",
+      "2.440 kosakata bertingkat mengikuti CEFR",
+      "312 bacaan berjenjang dengan 1.560 soal membaca",
+      "36 sesi speaking dengan pengenalan suara",
+      "1.400+ latihan listening bergaya IELTS dan TOEFL",
+      "Kursus Bahasa Jepang JLPT N5–N4: 422 poin grammar, 1.884 kosakata, 150 bacaan",
+      "Belajar adaptif: soal menyesuaikan pola jawaban",
+      "Tes penempatan CEFR A1–C2 otomatis",
+      "Progressive Web App (PWA) — bisa dipasang ke Home Screen",
+      "Mode offline untuk materi dan latihan",
+      "Suara neural opsional (TTS orisinal)",
+      "Maskot PAW dengan 14 ekspresi interaktif",
+      "Tutor AI kontekstual",
+      "KelasKu untuk Guru — dashboard analitik kelas",
+      "Tugas kelas yang menempel bab Kurikulum Nasional (15 bab, 115 soal, kelas 7–12)",
+      "Rapor orang tua yang bisa dibagikan guru"
+    ],
+    "screenshot": [
+      {
+        "@type": "ImageObject",
+        "url": "https://fiezel.my.id/assets/shots/latihan-mobile.png",
+        "caption": "Layar Latihan FIEZEL dengan enam pilihan skill: kosakata, grammar, reading, bicara & dengar, writing, dan pustaka",
+        "width": 780,
+        "height": 1688
+      },
+      {
+        "@type": "ImageObject",
+        "url": "https://fiezel.my.id/assets/shots/grammar-mobile.png",
+        "caption": "Grammar Hub dengan 17 lesson terurut untuk level A1",
+        "width": 780,
+        "height": 1688
+      },
+      {
+        "@type": "ImageObject",
+        "url": "https://fiezel.my.id/assets/shots/teacher-desktop.png",
+        "caption": "Dashboard KelasKu untuk Guru — briefing dan analitik kelas",
+        "width": 1440,
+        "height": 900
+      }
+    ],
+    "image": "https://fiezel.my.id/assets/brand/fiezel-icon-512.png",
+    "creator": {"@id": "https://fiezel.my.id/#org"},
+    "provider": {"@id": "https://fiezel.my.id/#org"},
+    "educationalLevel": ["A1", "A2", "B1", "B2", "C1", "C2"],
+    "learningResourceType": ["interactive exercise", "assessment", "lesson"],
+    "teaches": ["English grammar", "English vocabulary", "English reading comprehension", "English speaking", "English listening", "Japanese grammar", "Japanese vocabulary", "Japanese reading comprehension"],
+    "keywords": ["belajar bahasa Inggris", "belajar bahasa Jepang", "English learning app", "Japanese learning app", "grammar Indonesia", "CEFR", "JLPT", "adaptive learning", "PWA", "vocabulary", "reading", "speaking", "listening", "aplikasi belajar untuk guru", "tugas Kurikulum Nasional", "gratis", "free", "เรียนภาษาอังกฤษ", "เรียนภาษาญี่ปุ่น", "แกรมมาร์"]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "EducationalOrganization",
+    "@id": "https://fiezel.my.id/#org",
+    "name": "FIEZEL",
+    "alternateName": "FIEZEL — Ruang Belajar Bahasa",
+    "url": "https://fiezel.my.id/",
+    "logo": "https://fiezel.my.id/assets/brand/fiezel-icon-512.png",
+    "description": "FIEZEL adalah ruang belajar bahasa personal — satu aplikasi berisi kursus Bahasa Inggris (CEFR A1–C2) dan Bahasa Jepang (JLPT N5–N4) yang menyesuaikan soal dengan jawabanmu, ditambah lapisan guru yang menyambungkan tugas kelas ke Kurikulum Nasional. Gratis, tanpa langganan.",
+    "foundingDate": "2026",
+    "sameAs": [
+      "https://github.com/fiezel-apps/FIEZEL-APPS",
+      "https://instagram.com/fitrarustqi"
+    ],
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "customer support",
+      "url": "https://instagram.com/fitrarustqi",
+      "availableLanguage": ["id", "th"]
+    },
+    "areaServed": [
+      {"@type": "Country", "name": "Indonesia"},
+      {"@type": "Country", "name": "Thailand"}
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "@id": "https://fiezel.my.id/#course",
+    "name": "FIEZEL Adaptive English — Kursus Bahasa Inggris A1–C2",
+    "description": "Kursus bahasa Inggris adaptif lengkap mencakup grammar, kosakata, reading, speaking, dan listening. Dipetakan ke CEFR A1–C2 dengan 180 grammar lesson, 2.440 kosakata, dan 312 bacaan berjenjang.",
+    "url": "https://fiezel.my.id/app/",
+    "provider": {"@id": "https://fiezel.my.id/#org"},
+    "educationalLevel": "Beginner to Advanced (CEFR A1–C2)",
+    "inLanguage": "en",
+    "availableLanguage": [
+      {"@type": "Language", "name": "Indonesian"},
+      {"@type": "Language", "name": "Thai"}
+    ],
+    "isAccessibleForFree": true,
+    "teaches": "English language proficiency (grammar, vocabulary, reading, speaking, listening)",
+    "assesses": "CEFR level placement (A1–C2)",
+    "numberOfCredits": 0,
+    "occupationalCredentialAwarded": "None — FIEZEL is not an official CEFR certification body",
+    "hasCourseInstance": {
+      "@type": "CourseInstance",
+      "courseMode": "online",
+      "courseWorkload": "Self-paced",
+      "instructor": {
+        "@type": "Thing",
+        "name": "PAW (AI Tutor)",
+        "description": "Maskot kucing adaptif FIEZEL yang membimbing dan bereaksi terhadap pola belajar"
+      }
+    },
+    "coursePrerequisites": "Tidak ada prasyarat — tes penempatan menentukan level awal",
+    "image": "https://fiezel.my.id/assets/shots/latihan-desktop.png"
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "@id": "https://fiezel.my.id/#faq",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Apakah FIEZEL gratis?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Ya. Gratis, tanpa langganan. Tidak ada paket premium, tidak ada fitur yang dikunci di balik pembayaran. Seluruh 180 grammar lesson, 2.440 kosakata, dan 312 bacaan bisa kamu buka sejak hari pertama."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Perlu bikin akun untuk pakai FIEZEL?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Tidak perlu. Kamu bisa langsung belajar. Karena tidak ada akun, progresmu tersimpan di perangkat yang kamu pakai — kalau berpindah ke perangkat lain, kamu mulai dari awal lagi."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Bisa dipakai tanpa internet?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Setelah FIEZEL terpasang ke layar utama: materi dan latihan bisa dibuka tanpa internet. Suara neural dan tutor AI butuh jaringan. Jadi belajar teks dan soal tetap jalan, sedangkan fitur suara neural dan tutor menunggu koneksi."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Apakah FIEZEL jalan di Android dan iPhone?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Ya, keduanya. Di Android pakai Chrome lewat menu tiga titik lalu 'Instal aplikasi'. Di iPhone wajib pakai Safari lewat tombol Bagikan lalu 'Tambah ke Layar Utama', karena hanya Safari yang bisa menambahkan aplikasi web ke Layar Utama iOS. Desktop Chrome dan Edge juga bisa."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Bahasa apa saja yang bisa dipelajari di FIEZEL?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Dua. Bahasa Inggris dipetakan ke CEFR A1–C2 dengan 180 grammar lesson, 2.440 kosakata, 312 bacaan berjenjang, speaking, dan listening. Bahasa Jepang dipetakan ke JLPT N5–N4 dengan 422 poin grammar, 1.884 kosakata, dan 150 bacaan berjenjang. Kursus Jepang belum punya listening dan speaking; kedua kartunya disembunyikan saat kursus Jepang dipilih, bukan ditampilkan sebagai menu kosong."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Apakah FIEZEL bisa dipakai guru dan sekolah?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Bisa, lewat KelasKu untuk Guru: ruang kelas, tugas yang menempel bab dan sub-bab Kurikulum Nasional, analitik per murid dan per kompetensi, serta rapor orang tua yang bisa dibagikan. Perlu disebut apa adanya: bank kurikulumnya berisi 15 bab dan 115 soal untuk kelas 7 sampai 12, jadi ia alat guru menerbitkan tugas, bukan sumber materi kurikulum utama. Kapasitas terpasang 250 pengguna, cukup untuk satu kelas dan belum cukup untuk satu sekolah. Belum ada sekolah yang memakai FIEZEL; pilot satu kelas sedang dibuka."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Apakah FIEZEL diakui resmi CEFR?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Tidak. Materi FIEZEL dipetakan ke tingkat CEFR A1–C2 sebagai acuan tingkat kesulitan. Itu bukan sertifikasi, bukan afiliasi, dan bukan pengakuan resmi dari lembaga mana pun. Hasil belajarmu di sini tidak berlaku sebagai sertifikat."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Ada suaranya untuk latihan listening?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Ada. Suara bawaan perangkatmu dipakai sejak awal, dan suara neural tersedia sebagai pilihan tambahan yang diunduh sekali. Audio latihan ujian adalah TTS dari skrip orisinal, bukan rekaman ujian asli."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Data pribadi saya dipakai untuk apa?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Catatan belajarmu — lesson yang selesai, jawaban, dan progres level — tersimpan lokal di perangkatmu. FIEZEL tidak meminta nama, email, atau nomor telepon untuk mulai belajar. Menghapus data browser berarti menghapus progres itu juga."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Berapa banyak soal yang tersedia di FIEZEL?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Setiap grammar lesson punya 25 soal latihan terfokus, dari total 180 lesson (A1: 17, A2: 29, B1: 52, B2: 39, C1: 24, C2: 19). Reading menambah 1.560 soal membaca di 312 bacaan berjenjang. Ditambah 1.400+ latihan listening dan 36 sesi speaking."
+        }
+      }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "@id": "https://fiezel.my.id/#howto",
+    "name": "Cara mulai belajar bahasa Inggris di FIEZEL",
+    "description": "Panduan langkah demi langkah untuk mulai belajar bahasa Inggris di FIEZEL — dari membuka aplikasi sampai mendapat target harian yang dipersonalisasi.",
+    "totalTime": "PT5M",
+    "tool": [
+      {"@type": "HowToTool", "name": "Browser modern (Chrome, Safari, Edge, Firefox)"},
+      {"@type": "HowToTool", "name": "Koneksi internet (untuk pertama kali)"}
+    ],
+    "step": [
+      {
+        "@type": "HowToStep",
+        "position": 1,
+        "name": "Buka FIEZEL",
+        "text": "Buka FIEZEL langsung dari browser di fiezel.my.id/app/. Tanpa daftar akun, tanpa unduhan.",
+        "url": "https://fiezel.my.id/app/"
+      },
+      {
+        "@type": "HowToStep",
+        "position": 2,
+        "name": "Kerjakan tes penempatan",
+        "text": "Kerjakan tes awal 12 soal (±5 menit, tanpa nilai). FIEZEL memetakan levelmu di CEFR A1–C2 berdasarkan jawabanmu."
+      },
+      {
+        "@type": "HowToStep",
+        "position": 3,
+        "name": "Dapatkan target harian personal",
+        "text": "Dapatkan target harian yang disusun dari jawabanmu sendiri, bukan angka tetap. Setiap sesi disesuaikan dengan pola kesalahanmu."
+      },
+      {
+        "@type": "HowToStep",
+        "position": 4,
+        "name": "Belajar dan review",
+        "text": "Setiap kesalahan kembali sebagai review di sesi berikutnya. Progres tersimpan di perangkatmu dan bisa diakses offline setelah dipasang."
+      }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "@id": "https://fiezel.my.id/#howto-install",
+    "name": "Cara install FIEZEL ke Home Screen",
+    "description": "Panduan memasang aplikasi FIEZEL ke layar utama ponsel atau desktop — tanpa toko aplikasi, langsung dari browser.",
+    "totalTime": "PT1M",
+    "step": [
+      {
+        "@type": "HowToStep",
+        "position": 1,
+        "name": "Android (Chrome)",
+        "text": "Buka fiezel.my.id/app/ di Chrome, ketuk menu tiga titik (⋮) di kanan atas, lalu pilih 'Instal aplikasi'."
+      },
+      {
+        "@type": "HowToStep",
+        "position": 2,
+        "name": "iPhone (Safari)",
+        "text": "Buka fiezel.my.id/app/ di Safari, ketuk tombol Bagikan (kotak dengan panah ke atas), lalu pilih 'Tambah ke Layar Utama'."
+      },
+      {
+        "@type": "HowToStep",
+        "position": 3,
+        "name": "Desktop (Chrome atau Edge)",
+        "text": "Buka fiezel.my.id/app/ di Chrome atau Edge, klik ikon install di address bar."
+      }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "FIEZEL",
+        "item": "https://fiezel.my.id/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Buka Aplikasi",
+        "item": "https://fiezel.my.id/app/"
+      }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": "https://fiezel.my.id/#website",
+    "name": "FIEZEL",
+    "alternateName": "FIEZEL — Ruang Belajar Bahasa",
+    "url": "https://fiezel.my.id/",
+    "description": "Ruang belajar bahasa Inggris personal — grammar, kosakata, reading, speaking, listening. Gratis dan adaptif.",
+    "inLanguage": ["id", "th"],
+    "publisher": {"@id": "https://fiezel.my.id/#org"}
+  }
+]
+</script>
+<!-- AEO-02: speakable — menandai bagian halaman yang paling layak dibacakan oleh asisten
+     suara (Google Assistant, Siri, Alexa). Menggunakan CSS selector ke elemen yang sudah
+     ada di halaman: judul hero, ringkasan, dan FAQ. -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": [".mast-sub", ".sec-intro .lede", ".sec-about .body-lg", ".faq summary", ".faq .faq-body p"]
+  },
+  "name": "FIEZEL — Ruang Belajar Bahasa Inggris Personal, Gratis",
+  "url": "https://fiezel.my.id/"
+}
+</script>
 <!-- m026 GEO: pengunjung dari Thailand yang BELUM memilih bahasa manual diarahkan otomatis ke /th/.
      Pilihan manual (localStorage fiezel-site-locale) SELALU menang. Gagal/timeout/offline = tetap
      di halaman Indonesia (fail-soft, tidak memblokir). 'th' tersimpan -> alihkan instan tanpa fetch. -->
@@ -54,15 +433,7 @@
 <a class="skip" href="#main">Lewati ke konten utama</a>
 
 <header class="topbar">
-  <div class="credit-strip">
-    <div class="wrap credit-in">
-      <span>Create by</span>
-      <a class="credit-ig" href="https://instagram.com/fitrarustqi" target="_blank" rel="noopener" aria-label="Instagram @fitrarustqi">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.2" fill="currentColor" stroke="none"/></svg>
-        <strong>@fitrarustqi</strong>
-      </a>
-    </div>
-  </div>
+  <!-- Audit F26 (2026-09-23): kredit pindah ke footer - dulu berada DI ATAS navigasi. -->
   <div class="wrap topbar-in">
     <a class="brand" href="./" aria-label="FIEZEL — halaman utama">
       <!-- ikon logo resmi: geometri asli assets/brand/fiezel-paw.svg, diwarnai maroon -->
@@ -70,10 +441,25 @@
       <svg class="brand-word" viewBox="0 0 968 260" role="img" aria-label="Wordmark FIEZEL"><g fill="currentColor"><rect x="30" y="30" width="42" height="200" rx="21"/><rect x="30" y="30" width="144" height="42" rx="21"/><rect x="30" y="109" width="116" height="42" rx="21"/><rect x="268" y="30" width="42" height="200" rx="21"/><rect x="268" y="30" width="144" height="42" rx="21"/><rect x="268" y="109" width="100" height="42" rx="21"/><rect x="268" y="188" width="130" height="42" rx="21"/><rect x="446" y="30" width="150" height="42" rx="21"/><rect x="446" y="188" width="150" height="42" rx="21"/><rect x="575" y="30" width="191.38" height="42" rx="21" transform="rotate(124.354 575 51)"/><rect x="630" y="30" width="42" height="200" rx="21"/><rect x="630" y="30" width="144" height="42" rx="21"/><rect x="630" y="109" width="100" height="42" rx="21"/><rect x="630" y="188" width="130" height="42" rx="21"/><rect x="808" y="30" width="42" height="200" rx="21"/><rect x="808" y="188" width="130" height="42" rx="21"/><rect x="192" y="30" width="42" height="200" rx="21"/></g></svg>
     </a>
     <nav class="topnav" aria-label="Navigasi utama">
-      <a href="app/?teacher=preview"><span class="kelasku-brand"><span class="kelasku-main" style="color:#1F7A63">KelasKu</span> <span class="kelasku-tag" style="color:var(--maroon-mid)">untuk Guru</span></span></a>
+      <div class="topnav-links">
+      <a href="tentang.html">Tentang</a>
+      <a href="cefr/">CEFR</a>
+      <a href="faq/">FAQ</a>
+      <a href="untuk-sekolah.html">Untuk Sekolah</a>
+      <a href="kelasku/"><span class="kelasku-brand"><span class="kelasku-main" style="color:#1F7A63">KelasKu</span> <span class="kelasku-tag" style="color:var(--maroon-mid)">untuk Guru</span></span></a>
       <a href="install/">Cara Install</a>
       <a class="lang-switch" href="th/" hreflang="th" lang="th" aria-label="เปลี่ยนเป็นภาษาไทย" onclick="try{localStorage.setItem('fiezel-site-locale','th')}catch(e){}">ไทย</a>
+      </div>
       <a class="btn btn-sm btn-primary" href="app/">Mulai Belajar</a>
+      <details class="topnav-more"><summary aria-label="Menu"><span aria-hidden="true">☰</span> Menu</summary><div class="topnav-sheet">
+      <a href="tentang.html">Tentang</a>
+      <a href="cefr/">CEFR</a>
+      <a href="faq/">FAQ</a>
+      <a href="untuk-sekolah.html">Untuk Sekolah</a>
+      <a href="kelasku/"><span class="kelasku-brand"><span class="kelasku-main" style="color:#1F7A63">KelasKu</span> <span class="kelasku-tag" style="color:var(--maroon-mid)">untuk Guru</span></span></a>
+      <a href="install/">Cara Install</a>
+      <a class="lang-switch" href="th/" hreflang="th" lang="th" aria-label="เปลี่ยนเป็นภาษาไทย" onclick="try{localStorage.setItem('fiezel-site-locale','th')}catch(e){}">ไทย</a>
+      </div></details>
     </nav>
   </div>
 </header>
@@ -94,12 +480,14 @@
         <!-- wordmark RESMI repo: assets/brand/fiezel-wordmark.svg (inline, tint maroon) -->
         <svg class="mast-word" viewBox="0 0 1000 260" role="img" aria-label="FIEZEL"><defs><linearGradient id="fzwMaroon-mast" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8C2233"/><stop offset="100%" stop-color="#6D1926"/></linearGradient><linearGradient id="fzwGold-mast" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFDE59"/><stop offset="45%" stop-color="#FFC700"/><stop offset="100%" stop-color="#E6A800"/></linearGradient></defs><g fill="url(#fzwMaroon-mast)"><rect x="30" y="30" width="42" height="200" rx="21"/><rect x="30" y="30" width="144" height="42" rx="21"/><rect x="30" y="109" width="116" height="42" rx="21"/><rect x="300" y="30" width="42" height="200" rx="21"/><rect x="300" y="30" width="144" height="42" rx="21"/><rect x="300" y="109" width="100" height="42" rx="21"/><rect x="300" y="188" width="130" height="42" rx="21"/><rect x="478" y="30" width="150" height="42" rx="21"/><rect x="478" y="188" width="150" height="42" rx="21"/><rect x="607" y="30" width="191.38" height="42" rx="21" transform="rotate(124.354 607 51)"/><rect x="662" y="30" width="42" height="200" rx="21"/><rect x="662" y="30" width="144" height="42" rx="21"/><rect x="662" y="109" width="100" height="42" rx="21"/><rect x="662" y="188" width="130" height="42" rx="21"/><rect x="840" y="30" width="42" height="200" rx="21"/><rect x="840" y="188" width="130" height="42" rx="21"/></g><g fill="url(#fzwGold-mast)"><rect x="192" y="30" width="26" height="200" rx="13"/><rect x="240" y="106" width="26" height="124" rx="13"/></g></svg>
       </div>
-      <p class="mast-sub seq seq-2">Not just learning with you. Learning about you.</p>
+      <h1 class="mast-h1 seq seq-2">FIEZEL — Aplikasi Belajar Bahasa Inggris <span class="vv-hl">Adaptif Gratis</span></h1>
+      <p class="mast-sub seq seq-2">Latihan grammar, kosakata, reading, speaking, dan listening CEFR A1–C2 yang menyesuaikan jawabanmu.</p>
       <div class="cta-row cta-center mast-cta seq seq-3">
         <a class="btn btn-primary" href="app/">Mulai Belajar</a>
-        <a class="btn btn-teacher-hero" href="app/?teacher=preview">Buka <span class="kelasku-brand"><span class="kelasku-main">KelasKu</span> <span class="kelasku-tag">untuk Guru</span></span> →</a>
+        <a class="btn btn-teacher-hero" href="kelasku/">Lihat <span class="kelasku-brand"><span class="kelasku-main">KelasKu</span> <span class="kelasku-tag">untuk Guru</span></span> →</a>
         <a class="btn btn-ghost" href="install/">Cara Install</a>
       </div>
+      <ul class="vv-trust seq seq-3" aria-label="Kenapa aman dicoba"><li>Gratis, tanpa langganan</li><li>Tanpa akun</li><li>Bisa offline</li><li>CEFR A1–C2 · JLPT N5–N4</li></ul>
     </div>
 
     
@@ -145,12 +533,6 @@
           <circle cx="180" cy="90" r="3" class="fzflow-lite"/>
           <circle cx="700" cy="450" r="3" class="fzflow-lite"/>
         </svg>
-        <span class="fzflow-label fzflow-l1" style="--i:0"><b>B1</b> · 87%</span>
-        <span class="fzflow-label fzflow-l2" style="--i:1"><b>A2 → B1</b></span>
-        <span class="fzflow-label fzflow-l3" style="--i:2">98.2%</span>
-        <span class="fzflow-label fzflow-l4" style="--i:3"><b>×1.4</b></span>
-        <span class="fzflow-label fzflow-l5" style="--i:4">Δ +12</span>
-        <span class="fzflow-label fzflow-l6" style="--i:5">CEFR <b>B2</b></span>
         <span class="fzflow-glyph fzflow-g1" style="--i:0" lang="ja">あ</span>
         <span class="fzflow-glyph fzflow-g2" style="--i:1" lang="ja">学</span>
         <span class="fzflow-glyph fzflow-g3" style="--i:2" lang="en">A</span>
@@ -187,7 +569,7 @@
         <div class="device" data-parallax="-0.035">
           <div class="phone phone-hero">
             <div class="phone-screen">
-              <img src="assets/shots/home-mobile.png" alt="Layar Home FIEZEL dengan target harian dan empat skill inti" width="780" height="1688" fetchpriority="high" decoding="async">
+              <img src="assets/shots/latihan-mobile.png" alt="Layar Latihan FIEZEL: enam pilihan skill — kosakata, grammar, reading, bicara &amp; dengar, writing, dan pustaka" width="780" height="1688" fetchpriority="high" decoding="async">
             </div>
           </div>
           <svg class="fx-progress" viewBox="0 0 120 120" aria-hidden="true">
@@ -738,8 +1120,8 @@
     <div class="wrap intro-grid">
       <div class="intro-copy reveal">
         <p class="eyebrow">Gratis, tanpa langganan</p>
-        <h1>Ruang belajar bahasa Inggris personal milikmu</h1>
-        <p class="lede">FIEZEL menyatukan grammar, kosakata, reading, speaking, dan listening dalam satu aplikasi yang menyesuaikan soal dengan jawabanmu. Semuanya dipetakan ke tingkat CEFR A1–C2 dan bisa kamu pakai tanpa biaya.</p>
+        <h2 class="h1-look">Ruang belajar bahasa personal milikmu</h2>
+        <p class="lede">Dua kursus dalam satu aplikasi: <strong>Bahasa Inggris</strong> yang dipetakan ke CEFR A1–C2, dan <strong>Bahasa Jepang</strong> yang dipetakan ke JLPT N5–N4. Soalnya menyesuaikan jawabanmu, bukan mengikuti urutan tetap. Gratis, tanpa langganan.</p>
         <div class="cta-row">
           <a class="btn btn-primary" href="app/">Mulai tes penempatan</a>
           <a class="btn btn-ghost" href="install/">Cara Install</a>
@@ -755,18 +1137,18 @@
 
     <div class="wrap">
       <ul class="stats">
-        <li class="reveal"><b>180</b><span>grammar lesson</span></li>
-        <li class="reveal"><b>2.440</b><span>kosakata</span></li>
-        <li class="reveal"><b>312</b><span>bacaan berjenjang</span></li>
-        <li class="reveal"><b>A1–C2</b><span>tingkat CEFR</span></li>
+        <li class="reveal"><b>2</b><span>kursus bahasa</span></li>
+        <li class="reveal"><b>180</b><span>grammar lesson Inggris</span></li>
+        <li class="reveal"><b>422</b><span>poin grammar Jepang</span></li>
+        <li class="reveal"><b>4.324</b><span>kosakata dua bahasa</span></li>
       </ul>
     </div>
 
     <!-- marquee statistik: dekoratif, mengulang fakta yang sama (disembunyikan dari pembaca layar) -->
     <div class="ticker" aria-hidden="true">
       <ul class="ticker-track">
-        <li>180 grammar lesson</li><li>2.440 kosakata</li><li>312 bacaan berjenjang</li><li>1.560 soal membaca</li><li>36 sesi speaking</li><li>25 soal per lesson</li><li>CEFR A1–C2</li><li>Gratis, tanpa langganan</li>
-        <li>180 grammar lesson</li><li>2.440 kosakata</li><li>312 bacaan berjenjang</li><li>1.560 soal membaca</li><li>36 sesi speaking</li><li>25 soal per lesson</li><li>CEFR A1–C2</li><li>Gratis, tanpa langganan</li>
+        <li>180 grammar lesson Inggris</li><li>2.440 kosakata Inggris</li><li>312 bacaan berjenjang</li><li>422 poin grammar Jepang</li><li>1.884 kosakata Jepang</li><li>150 bacaan Jepang</li><li>CEFR A1–C2</li><li>JLPT N5–N4</li><li>Gratis, tanpa langganan</li>
+        <li>180 grammar lesson Inggris</li><li>2.440 kosakata Inggris</li><li>312 bacaan berjenjang</li><li>422 poin grammar Jepang</li><li>1.884 kosakata Jepang</li><li>150 bacaan Jepang</li><li>CEFR A1–C2</li><li>JLPT N5–N4</li><li>Gratis, tanpa langganan</li>
       </ul>
     </div>
   </section>
@@ -779,8 +1161,13 @@
           <span class="sec-num" aria-hidden="true">02 — Tentang</span>
           <h2 class="sec-title">Apa itu FIEZEL</h2>
         </div>
-        <p class="body-lg">FIEZEL adalah ruang belajar bahasa Inggris personal: satu aplikasi berisi 180 grammar lesson, 2.440 kosakata, 312 bacaan berjenjang dengan 1.560 soal membaca, 36 sesi speaking, dan 1.400+ latihan listening. Materinya dipetakan ke tingkat CEFR A1–C2, jadi kamu bisa mulai dari level yang benar-benar sesuai.</p>
-        <p class="body-lg">Cocok untuk pelajar, mahasiswa, dan siapa pun yang ingin belajar rutin tanpa kelas dan tanpa biaya: gratis, tanpa langganan, tanpa akun. Aplikasinya bisa dipasang ke layar utama seperti aplikasi biasa, dan menyesuaikan soal berikutnya dari jawabanmu.</p>
+        <div class="disambiguation-note" style="background:var(--blush,#FBEDEF);border:1px solid var(--maroon-line,rgba(140,34,51,.20));padding:16px 20px;border-radius:10px;margin:16px 0 20px;font-size:.95rem;line-height:1.6">
+          <strong>Klarifikasi Entitas &amp; Nama:</strong> FIEZEL dieja <strong>F-I-E-Z-E-L</strong>. FIEZEL adalah produk perangkat lunak aplikasi belajar bahasa Inggris adaptif independen, bukan diesel (bahan bakar/mesin) dan bukan kata bahasa Inggris "fizzle".
+        </div>
+        <p class="body-lg"><strong>FIEZEL adalah aplikasi belajar bahasa Inggris adaptif gratis</strong> dengan materi lengkap: <a href="grammar/">180 grammar lesson</a>, <a href="vocabulary/">2.440 kosakata</a>, <a href="reading/">312 bacaan berjenjang</a>, <a href="speaking/">36 sesi speaking</a>, dan <a href="listening/">1.400+ latihan listening</a> — dipetakan ke tingkat <a href="cefr/">CEFR A1–C2</a>. Kursus <strong>Bahasa Jepang</strong> berisi 422 poin grammar, 1.884 kosakata, dan 150 bacaan (JLPT N5–N4).</p>
+        <p class="body-lg">Cocok untuk pelajar, mahasiswa, dan siapa pun yang ingin belajar rutin tanpa kelas dan tanpa biaya: gratis, tanpa langganan, tanpa akun. Aplikasinya bisa dipasang ke layar utama sebagai PWA, dan menyesuaikan soal berikutnya dari jawabanmu melalui kecerdasan adaptif Braincore.</p>
+        <p class="body-lg">Satu hal yang kami sebut terang-terangan: <strong>kursus Jepang belum punya listening dan speaking.</strong> Kedua latihan itu sengaja disembunyikan saat kamu memilih Bahasa Jepang, bukan ditampilkan sebagai menu kosong. Rincian lengkapnya di <a href="tentang.html">halaman Tentang FIEZEL</a>, baca <a href="faq/">FAQ</a>, atau lihat versi bahasa Inggris di <a href="about/">About FIEZEL</a>.</p>
+        <p class="body-lg">Untuk guru, FIEZEL punya lapisan <strong>KelasKu</strong>: menerbitkan tugas yang menempel bab Kurikulum Nasional, lalu membaca hasilnya tanpa mengoreksi manual. Selengkapnya di <a href="untuk-sekolah.html">halaman Untuk Sekolah</a>.</p>
       </div>
       <div class="shot-pair reveal">
         <figure class="phone phone-sm">
@@ -852,6 +1239,22 @@
           <p>Pasang ke Home Screen seperti aplikasi biasa. Setelah terpasang, materi dan latihan bisa dibuka tanpa internet.</p>
         </article>
 
+        <article class="card feat feat-wide tint-blush reveal">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16"/><path d="M12 3v4"/><path d="M9.5 7c0 5-2.5 8.5-5.5 10"/><path d="M13 9.5c.5 4 2.5 6.5 6 7.5"/><path d="M13 20.5l3.5-8 3.5 8"/><path d="M14.4 17.8h4.2"/></svg>
+          <h3>Kursus Bahasa Jepang (JLPT N5–N4)</h3>
+          <p>422 poin grammar dari 27 keluarga, 1.884 kosakata, dan 150 bacaan berjenjang. Penjelasannya berbahasa Indonesia dan Thai, bukan Inggris.</p>
+          <ul class="chiplist">
+            <li>422 grammar</li><li>1.884 kosakata</li><li>150 bacaan</li><li>N5–N4</li>
+          </ul>
+          <p class="fineprint">Jujur: listening dan speaking belum ada untuk kursus Jepang, dan kartunya disembunyikan — bukan ditampilkan kosong.</p>
+        </article>
+
+        <article class="card feat tint-paper reveal">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9.5 12 5l9 4.5-9 4.5Z"/><path d="M7 12v4.2c0 1.3 2.2 2.3 5 2.3s5-1 5-2.3V12"/><path d="M21 9.5V15"/></svg>
+          <h3>KelasKu untuk Guru</h3>
+          <p>Ruang kelas, tugas yang menempel bab Kurikulum Nasional, analitik per kompetensi, dan rapor orang tua. <a href="untuk-sekolah.html">Selengkapnya untuk sekolah →</a></p>
+        </article>
+
         <article class="card feat tint-paper reveal">
           <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10v4M8 7v10M12 4.5v15M16 8v8M20 11v2"/></svg>
           <h3>Suara neural opsional</h3>
@@ -875,7 +1278,7 @@
            dari tebakan murid (app.js ~7074). -->
       <ol class="steps">
         <li class="card step reveal"><span class="step-n">1</span><p>Buka FIEZEL langsung dari browser. Tanpa daftar akun, tanpa unduhan.</p></li>
-        <li class="card step reveal"><span class="step-n">2</span><p>Kerjakan tes penempatan 25 soal. FIEZEL memetakan levelmu di CEFR A1–C2.</p></li>
+        <li class="card step reveal"><span class="step-n">2</span><p>Kerjakan tes awal 12 soal (±5 menit, tanpa nilai). FIEZEL memetakan levelmu di CEFR A1–C2.</p></li>
         <li class="card step reveal"><span class="step-n">3</span><p>Dapatkan target harian yang disusun dari jawabanmu sendiri, bukan angka tetap.</p></li>
         <li class="card step reveal"><span class="step-n">4</span><p>Setiap kesalahan kembali sebagai review. Progres tersimpan di perangkatmu.</p></li>
       </ol>
@@ -933,6 +1336,14 @@
           <div class="faq-body"><p>Ya, keduanya. Di Android pakai Chrome lewat menu ⋮. Di iPhone wajib pakai Safari lewat tombol Bagikan, karena hanya Safari yang bisa menambahkan aplikasi web ke Layar Utama iOS. Desktop Chrome dan Edge juga bisa.</p></div>
         </details>
         <details>
+          <summary>Bahasa apa saja yang bisa dipelajari?<span class="chev" aria-hidden="true"></span></summary>
+          <div class="faq-body"><p>Dua: <strong>Bahasa Inggris</strong> yang dipetakan ke CEFR A1–C2 dengan 180 grammar lesson, 2.440 kosakata, 312 bacaan, speaking, dan listening; serta <strong>Bahasa Jepang</strong> yang dipetakan ke JLPT N5–N4 dengan 422 poin grammar, 1.884 kosakata, dan 150 bacaan. Kursus Jepang belum punya listening dan speaking — kedua kartunya disembunyikan saat kursus Jepang dipilih, bukan ditampilkan sebagai menu kosong.</p></div>
+        </details>
+        <details>
+          <summary>Bisa dipakai guru dan sekolah?<span class="chev" aria-hidden="true"></span></summary>
+          <div class="faq-body"><p>Bisa, lewat KelasKu untuk Guru: ruang kelas, tugas yang menempel bab Kurikulum Nasional, analitik per kompetensi, dan rapor orang tua. Apa adanya: bank kurikulumnya berisi 15 bab dan 115 soal untuk kelas 7–12, jadi ia alat guru menerbitkan tugas, bukan sumber materi kurikulum utama. Kapasitas terpasang 250 pengguna — cukup satu kelas, belum cukup satu sekolah. <a href="untuk-sekolah.html">Halaman Untuk Sekolah</a> menjelaskan semuanya, termasuk yang belum siap.</p></div>
+        </details>
+        <details>
           <summary>Apakah FIEZEL diakui resmi CEFR?<span class="chev" aria-hidden="true"></span></summary>
           <div class="faq-body"><p>Tidak. Materi FIEZEL dipetakan ke tingkat CEFR A1–C2 sebagai acuan tingkat kesulitan. Itu bukan sertifikasi, bukan afiliasi, dan bukan pengakuan resmi dari lembaga mana pun. Hasil belajarmu di sini tidak berlaku sebagai sertifikat.</p></div>
         </details>
@@ -970,20 +1381,43 @@
   </section>
 
 </main>
+<div class="vv-dock" data-vv-dock aria-hidden="true"><div class="vv-dock-copy"><b>Mulai belajar gratis</b><span>Tanpa akun · tes awal ±5 menit</span></div><a class="btn btn-primary" href="app/" tabindex="-1">Mulai Belajar</a></div>
 
 <footer class="foot">
   <div class="wrap foot-in">
     <div class="foot-brand">
       <svg class="foot-word" viewBox="0 0 1000 260" role="img" aria-label="FIEZEL"><defs><linearGradient id="fzwMaroon-foot" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8C2233"/><stop offset="100%" stop-color="#6D1926"/></linearGradient><linearGradient id="fzwGold-foot" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFDE59"/><stop offset="45%" stop-color="#FFC700"/><stop offset="100%" stop-color="#E6A800"/></linearGradient></defs><g fill="url(#fzwMaroon-foot)"><rect x="30" y="30" width="42" height="200" rx="21"/><rect x="30" y="30" width="144" height="42" rx="21"/><rect x="30" y="109" width="116" height="42" rx="21"/><rect x="300" y="30" width="42" height="200" rx="21"/><rect x="300" y="30" width="144" height="42" rx="21"/><rect x="300" y="109" width="100" height="42" rx="21"/><rect x="300" y="188" width="130" height="42" rx="21"/><rect x="478" y="30" width="150" height="42" rx="21"/><rect x="478" y="188" width="150" height="42" rx="21"/><rect x="607" y="30" width="191.38" height="42" rx="21" transform="rotate(124.354 607 51)"/><rect x="662" y="30" width="42" height="200" rx="21"/><rect x="662" y="30" width="144" height="42" rx="21"/><rect x="662" y="109" width="100" height="42" rx="21"/><rect x="662" y="188" width="130" height="42" rx="21"/><rect x="840" y="30" width="42" height="200" rx="21"/><rect x="840" y="188" width="130" height="42" rx="21"/></g><g fill="url(#fzwGold-foot)"><rect x="192" y="30" width="26" height="200" rx="13"/><rect x="240" y="106" width="26" height="124" rx="13"/></g></svg>
-      <p class="foot-tag">Ruang belajar bahasa Inggris personal.</p>
+      <p class="foot-tag">Ruang belajar bahasa personal.</p>
+      <p class="foot-credit">Created by <a class="credit-ig" href="https://instagram.com/fitrarustqi" target="_blank" rel="noopener" aria-label="Instagram @fitrarustqi">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.2" fill="currentColor" stroke="none"/></svg>
+        <strong>@fitrarustqi</strong>
+      </a></p>
       <nav class="foot-links" aria-label="Tautan footer">
         <a href="app/">Buka Aplikasi Murid</a>
         <span aria-hidden="true">·</span>
-        <a href="app/?teacher=preview"><span class="kelasku-brand"><span class="kelasku-main" style="color:var(--cream)">KelasKu</span> <span class="kelasku-tag" style="color:var(--gold)">untuk Guru</span></span></a>
+        <a href="about/">About (English)</a>
+        <span aria-hidden="true">·</span>
+        <a href="tentang.html">Tentang FIEZEL</a>
+        <span aria-hidden="true">·</span>
+        <a href="kelasku/">KelasKu untuk Guru</a>
+        <span aria-hidden="true">·</span>
+        <a href="cefr/">Tingkat CEFR</a>
+        <span aria-hidden="true">·</span>
+        <a href="grammar/">Grammar</a>
+        <span aria-hidden="true">·</span>
+        <a href="vocabulary/">Kosakata</a>
+        <span aria-hidden="true">·</span>
+        <a href="reading/">Reading</a>
+        <span aria-hidden="true">·</span>
+        <a href="listening/">Listening</a>
+        <span aria-hidden="true">·</span>
+        <a href="speaking/">Speaking</a>
+        <span aria-hidden="true">·</span>
+        <a href="faq/">FAQ</a>
+        <span aria-hidden="true">·</span>
+        <a href="untuk-sekolah.html">Untuk Sekolah</a>
         <span aria-hidden="true">·</span>
         <a href="install/">Cara Install</a>
-        <span aria-hidden="true">·</span>
-        <a href="https://fiezel-apps.github.io/FIEZEL-APPS/" rel="noopener">Cermin aplikasi</a>
         <span aria-hidden="true">·</span>
         <a href="privacy/">Kebijakan Privasi</a>
         <span aria-hidden="true">·</span>

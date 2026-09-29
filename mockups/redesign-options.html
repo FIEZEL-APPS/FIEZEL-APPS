@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FIEZEL Redesign - 5 Pilihan Mockup Desain (Funfluent Style)</title>
+  <!-- Google Fonts: Gabarito, Plus Jakarta Sans, Fredoka -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Gabarito:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet" />
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      background: #F4EFE6;
+      color: #241A11;
+    }
+    .font-gabarito { font-family: 'Gabarito', sans-serif; }
+    .font-fredoka { font-family: 'Fredoka', sans-serif; }
+    .font-thai { font-family: 'Noto Sans Thai', 'Plus Jakarta Sans', sans-serif; }
+
+    /* Phone Mockup Frame */
+    .phone-frame {
+      width: 380px;
+      height: 780px;
+      border-radius: 46px;
+      box-shadow: 0 25px 60px -15px rgba(36, 26, 17, 0.28), 0 0 0 12px #1E1B18, 0 0 0 14px #3D3935;
+      overflow: hidden;
+      position: relative;
+      background: #FFF9EE;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Dynamic Island */
+    .dynamic-island {
+      width: 105px;
+      height: 26px;
+      background: #000;
+      border-radius: 20px;
+      margin: 10px auto 4px auto;
+      z-index: 50;
+      flex-shrink: 0;
+    }
+
+    /* Custom Scrollbar */
+    .screen-content::-webkit-scrollbar {
+      width: 4px;
+    }
+    .screen-content::-webkit-scrollbar-thumb {
+      background: rgba(36, 26, 17, 0.15);
+      border-radius: 4px;
+    }
+
+    /* Tactile 3D Buttons (Funfluent Style) */
+    .btn-tactile-yellow {
+      background: #FFBF32;
+      color: #462104;
+      border-bottom: 4px solid #D99B16;
+      border-radius: 18px;
+      font-weight: 700;
+      transition: all 0.1s ease;
+    }
+    .btn-tactile-yellow:active {
+      transform: translateY(2px);
+      border-bottom-width: 2px;
+    }
+
+    .btn-tactile-cyan {
+      background: #1EC6F2;
+      color: #072F45;
+      border-bottom: 4px solid #1495B8;
+      border-radius: 18px;
+      font-weight: 700;
+      transition: all 0.1s ease;
+    }
+    .btn-tactile-cyan:active {
+      transform: translateY(2px);
+      border-bottom-width: 2px;
+    }
+
+    .btn-tactile-green {
+      background: #529917;
+      color: #FFFFFF;
+      border-bottom: 4px solid #3A6F0F;
+      border-radius: 18px;
+      font-weight: 700;
+      transition: all 0.1s ease;
+    }
+    .btn-tactile-green:active {
+      transform: translateY(2px);
+      border-bottom-width: 2px;
+    }
+
+    /* Soft Claymorphism (Option 5) */
+    .clay-card {
+      background: #FFFFFF;
+      border-radius: 24px;
+      box-shadow: 0 10px 20px rgba(36, 26, 17, 0.05), inset 0 2px 4px rgba(255, 255, 255, 0.9);
+      border: 1.5px solid rgba(255, 255, 255, 0.7);
+    }
+    .clay-btn {
+      border-radius: 20px;
+      box-shadow: 0 6px 14px rgba(255, 191, 50, 0.35), inset 0 2px 3px rgba(255, 255, 255, 0.6);
+    }
+  </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+  <!-- Header Section -->
+  <header class="max-w-5xl w-full text-center mb-8">
+    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#FFBF32]/25 border border-[#FFBF32] text-[#462104] font-bold text-xs uppercase tracking-wider mb-3">
+      <i data-lucide="sparkles" class="w-4 h-4 text-[#D99B16]"></i>
+      Inspirasi: Funfluent by Orely Studio
+    </div>
+    <h1 class="text-3xl md:text-5xl font-black font-gabarito tracking-tight text-[#241A11]">
+      FIEZEL Redesign — 5 Pilihan Mockup Desain
+    </h1>
+    <p class="text-base md:text-lg text-[#5D5D5D] mt-2 max-w-2xl mx-auto font-medium">
+      Pilih salah satu dari 5 konsep desain di bawah ini untuk menjadi standar tampilan baru aplikasi FIEZEL (Auth, Dashboard, Kartu Belajar, & Kuis).
+    </p>
+
+    <!-- Global Toggles Bar -->
+    <div class="mt-6 flex flex-wrap items-center justify-center gap-3 bg-white/80 backdrop-blur-md p-2.5 rounded-2xl border border-[#241A11]/10 shadow-sm">
+      <span class="text-xs font-bold text-[#5D5D5D] uppercase tracking-wider px-2">Bahasa:</span>
+      <button onclick="setLang('id')" id="lang-id-btn" class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all bg-[#FFBF32] text-[#462104] shadow-sm">
+        🇮🇩 Bahasa Indonesia
+      </button>
+      <button onclick="setLang('th')" id="lang-th-btn" class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all bg-gray-100 text-[#5D5D5D] hover:bg-gray-200">
+        🇹🇭 ภาษาไทย (Thai)
+      </button>
+
+      <div class="h-5 w-px bg-gray-300 mx-1 hidden sm:block"></div>
+
+      <span class="text-xs font-bold text-[#5D5D5D] uppercase tracking-wider px-2">Layar Mockup:</span>
+      <button onclick="setScreen('auth')" id="screen-auth-btn" class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all bg-gray-100 text-[#5D5D5D] hover:bg-gray-200">
+        1. Welcome / Auth
+      </button>
+      <button onclick="setScreen('home')" id="screen-home-btn" class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all bg-[#241A11] text-white shadow-sm">
+        2. Home Dashboard
+      </button>
+      <button onclick="setScreen('quiz')" id="screen-quiz-btn" class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all bg-gray-100 text-[#5D5D5D] hover:bg-gray-200">
+        3. Kartu Belajar & Kuis
+      </button>
+    </div>
+  </header>
+
+  <!-- 5 Options Tab Bar -->
+  <div class="max-w-5xl w-full grid grid-cols-2 sm:grid-cols-5 gap-2 mb-8">
+    <button onclick="selectOption(1)" id="opt-tab-1" class="opt-tab p-3 rounded-2xl border-2 transition-all flex flex-col items-center text-center bg-white border-[#FFBF32] shadow-md">
+      <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-[#FFBF32]/20 text-[#462104] mb-1">Opsi 1</span>
+      <span class="font-gabarito font-bold text-sm text-[#241A11]">Pure Funfluent</span>
+      <span class="text-[11px] text-gray-500 font-medium">Chunky & Playful</span>
+    </button>
+    <button onclick="selectOption(2)" id="opt-tab-2" class="opt-tab p-3 rounded-2xl border-2 transition-all flex flex-col items-center text-center bg-white border-transparent hover:border-gray-200">
+      <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 mb-1">Opsi 2</span>
+      <span class="font-gabarito font-bold text-sm text-[#241A11]">Clean Editorial</span>
+      <span class="text-[11px] text-gray-500 font-medium">Modern & Rapi</span>
+    </button>
+    <button onclick="selectOption(3)" id="opt-tab-3" class="opt-tab p-3 rounded-2xl border-2 transition-all flex flex-col items-center text-center bg-white border-transparent hover:border-gray-200">
+      <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 mb-1">Opsi 3</span>
+      <span class="font-gabarito font-bold text-sm text-[#241A11]">Adventure Quest</span>
+      <span class="text-[11px] text-gray-500 font-medium">Storybook Alam</span>
+    </button>
+    <button onclick="selectOption(4)" id="opt-tab-4" class="opt-tab p-3 rounded-2xl border-2 transition-all flex flex-col items-center text-center bg-white border-transparent hover:border-gray-200">
+      <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 mb-1">Opsi 4</span>
+      <span class="font-gabarito font-bold text-sm text-[#241A11]">Arcade Bento</span>
+      <span class="text-[11px] text-gray-500 font-medium">Gamified & Streaks</span>
+    </button>
+    <button onclick="selectOption(5)" id="opt-tab-5" class="opt-tab p-3 rounded-2xl border-2 transition-all flex flex-col items-center text-center bg-white border-transparent hover:border-gray-200">
+      <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 mb-1">Opsi 5</span>
+      <span class="font-gabarito font-bold text-sm text-[#241A11]">Clay & Pastel</span>
+      <span class="text-[11px] text-gray-500 font-medium">Soft 3D Marshmallow</span>
+    </button>
+  </div>
+
+  <!-- Interactive Device Mockup Stage -->
+  <main class="w-full max-w-5xl flex flex-col lg:flex-row items-center justify-center gap-8 mb-12">
+    
+    <!-- Phone Mockup Container -->
+    <div class="phone-frame" id="phone-container">
+      <!-- Dynamic Island / Speaker Notch -->
+      <div class="dynamic-island"></div>
+
+      <!-- Phone Status Bar -->
+      <div class="px-6 py-1 flex items-center justify-between text-xs font-bold tracking-tight text-[#241A11] z-20 flex-shrink-0" id="phone-status-bar">
+        <span>9:41</span>
+        <div class="flex items-center gap-1.5">
+          <i data-lucide="signal" class="w-3.5 h-3.5"></i>
+          <i data-lucide="wifi" class="w-3.5 h-3.5"></i>
+          <i data-lucide="battery-charging" class="w-4 h-4"></i>
+        </div>
+      </div>
+
+      <!-- Screen Dynamic Content Body -->
+      <div class="screen-content flex-1 overflow-y-auto relative flex flex-col" id="screen-body">
+        <!-- Rendered via JavaScript -->
+      </div>
+
+      <!-- Bottom Nav (Rendered on Home / Quiz) -->
+      <div id="phone-bottom-nav" class="flex-shrink-0 z-30">
+        <!-- Rendered via JavaScript -->
+      </div>
+    </div>
+
+    <!-- Right Side: Details & Specs Card of Current Selected Option -->
+    <div class="w-full lg:w-[480px] bg-white rounded-3xl p-6 border border-[#241A11]/10 shadow-lg flex flex-col justify-between">
+      <div>
+        <div class="flex items-center justify-between mb-3">
+          <span id="badge-option-num" class="px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider bg-[#FFBF32]/25 text-[#462104]">
+            OPSI 1 DARI 5
+          </span>
+          <span class="text-xs font-bold text-emerald-700 bg-emerald-100 px-2.5 py-1 rounded-full flex items-center gap-1">
+            <i data-lucide="check" class="w-3 h-3"></i> Siap Diterapkan
+          </span>
+        </div>
+
+        <h2 id="spec-title" class="text-2xl font-black font-gabarito text-[#241A11]">
+          Opsi 1: Pure Funfluent Playful
+        </h2>
+        <p id="spec-desc" class="text-sm text-[#5D5D5D] mt-1.5 leading-relaxed font-medium">
+          Adaptasi langsung dari gaya Funfluent Orely Studio. Menghadirkan tombol 3D yang empuk (tactile press), kartu serba bulat dengan bayangan lembut, serta palet warna ceria kuning madu, hijau alpukat, dan biru langit.
+        </p>
+
+        <!-- Palette Preview -->
+        <div class="mt-5">
+          <span class="text-xs font-bold text-[#241A11] uppercase tracking-wider block mb-2">Palet Warna Utama:</span>
+          <div class="flex items-center gap-2" id="spec-colors">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <!-- Typography & Characteristics -->
+        <div class="mt-5 space-y-3">
+          <div class="p-3.5 rounded-2xl bg-[#FFF9EE] border border-[#241A11]/5 flex items-start gap-3">
+            <i data-lucide="type" class="w-5 h-5 text-[#FFBF32] mt-0.5"></i>
+            <div>
+              <div class="text-xs font-bold text-[#241A11]">Tipografi</div>
+              <div id="spec-font" class="text-xs text-[#5D5D5D] mt-0.5">Gabarito (Bold & Rounded) + Plus Jakarta Sans</div>
+            </div>
+          </div>
+          <div class="p-3.5 rounded-2xl bg-[#FFF9EE] border border-[#241A11]/5 flex items-start gap-3">
+            <i data-lucide="layers" class="w-5 h-5 text-[#529917] mt-0.5"></i>
+            <div>
+              <div class="text-xs font-bold text-[#241A11]">Bentuk Kartu & Tombol</div>
+              <div id="spec-card-style" class="text-xs text-[#5D5D5D] mt-0.5">Border radius 24px–28px, tombol 3D timbul dengan bayangan tebal di bawah.</div>
+            </div>
+          </div>
+          <div class="p-3.5 rounded-2xl bg-[#FFF9EE] border border-[#241A11]/5 flex items-start gap-3">
+            <i data-lucide="smile" class="w-5 h-5 text-[#1EC6F2] mt-0.5"></i>
+            <div>
+              <div class="text-xs font-bold text-[#241A11]">Karakter & Mood</div>
+              <div id="spec-mood" class="text-xs text-[#5D5D5D] mt-0.5">Sangat ramah anak & remaja SMP/SMA, seru, menghilangkan rasa takut belajar grammar.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Button to Choose -->
+      <div class="mt-6 pt-4 border-t border-gray-100">
+        <div class="text-xs text-center text-gray-500 mb-2 font-medium">
+          Ingin menggunakan gaya desain ini untuk seluruh aplikasi FIEZEL?
+        </div>
+        <button onclick="confirmSelection()" class="w-full py-3.5 px-6 rounded-2xl bg-[#241A11] text-white font-gabarito font-bold text-base hover:bg-black transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl active:scale-95">
+          <i data-lucide="check-circle" class="w-5 h-5 text-[#FFBF32]"></i>
+          PILIH OPSI INI UNTUK REDESIGN FIEZEL
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // State
+    let currentOption = 1;
+    let currentScreen = 'home'; // 'auth', 'home', 'quiz'
+    let currentLang = 'id'; // 'id', 'th'
+
+    // Mockup Data & Specs
+    const optionsData = {
+      1: {
+        name: "Pure Funfluent Playful",
+        desc: "Adaptasi langsung dari gaya Funfluent Orely Studio. Menghadirkan tombol 3D empuk (tactile press), kartu serba bulat dengan bayangan lembut, serta palet warna ceria kuning madu, hijau alpukat, dan biru langit.",
+        font: "Gabarito (Bold & Rounded) + Plus Jakarta Sans",
+        cardStyle: "Border-radius 26px, tombol 3D empuk dengan border bawah 4px, floating sticker badge.",
+        mood: "Sangat ceria, ramah untuk remaja SMP & SMA, menyenangkan seperti game petualangan.",
+        colors: ["#FFF7D3", "#FFBF32", "#529917", "#1EC6F2", "#462104"],
+        bgColor: "#FFFDF7",
+        textColor: "#462104",
+        accentYellow: "#FFBF32",
+        accentGreen: "#529917",
+        accentCyan: "#1EC6F2"
+      },
+      2: {
+        name: "Clean Modern Editorial",
+        desc: "Gaya Skandinavia yang bersih, elegan, dan lapang. Mengurangi elemen bermain yang berlebihan demi fokus belajar yang tajam, sangat cocok untuk siswa SMA & persiapan ujian.",
+        font: "Plus Jakarta Sans 700 + Gabarito Display",
+        cardStyle: "Kartu putih bersih dengan garis tepi tipis 1.5px (#EFECE6), tanpa bayangan berlebih, layout terstruktur.",
+        mood: "Modern, tenang, premium, mirip aplikasi edukasi high-end seperti Blinkist x Duolingo Max.",
+        colors: ["#FAFAF8", "#FFC700", "#162B08", "#529917", "#241A11"],
+        bgColor: "#FAFAF8",
+        textColor: "#241A11",
+        accentYellow: "#FFC700",
+        accentGreen: "#162B08",
+        accentCyan: "#529917"
+      },
+      3: {
+        name: "Adventure Quest Storybook",
+        desc: "Tema petualangan buku cerita bernuansa alam rimba seperti visual Funfluent utama. Header bertema rimbun hijau dengan kartu cerita berilustrasi.",
+        font: "Gabarito + Fredoka + Plus Jakarta Sans",
+        cardStyle: "Kartu bab cerita bertema lanskap, pita bintang prestasi, dan jalur petualangan meliuk.",
+        mood: "Imersif, eksploratif, membangun rasa ingin tahu seperti membaca buku dongeng interaktif.",
+        colors: ["#FFF9EE", "#162B08", "#FFBF32", "#E5F9CE", "#3A6F0F"],
+        bgColor: "#FFF9EE",
+        textColor: "#162B08",
+        accentYellow: "#FFBF32",
+        accentGreen: "#162B08",
+        accentCyan: "#3A6F0F"
+      },
+      4: {
+        name: "Arcade Bento Gamified",
+        desc: "Desain berenergi tinggi dengan layout Bento Grid modular. Menonjolkan streak api harian, status level, koin, dan badge akselerasi XP untuk memotivasi belajar setiap hari.",
+        font: "Gabarito ExtraBold + Plus Jakarta Sans 800",
+        cardStyle: "Kotak bento dengan sudut tajam membulat (20px), aksen neon kuning solar & cyan tajam, border kontras tinggi.",
+        mood: "Kompetitif, energik, memacu adrenalin belajar dengan pencapaian yang jelas.",
+        colors: ["#FFFFFF", "#FFC700", "#00D2FF", "#10B981", "#1B1418"],
+        bgColor: "#F8FAFC",
+        textColor: "#1B1418",
+        accentYellow: "#FFC700",
+        accentGreen: "#10B981",
+        accentCyan: "#00D2FF"
+      },
+      5: {
+        name: "Soft Clay & Pastel Marshmallow",
+        desc: "Desain Claymorphism lembut dengan bayangan dalam (inner soft highlight) yang empuk seperti bantal marshmallow. Sangat rileks dan ramah mata untuk sesi belajar lama.",
+        font: "Fredoka + Gabarito + Plus Jakarta Sans",
+        cardStyle: "Claymorphism empuk, bayangan dalam lembut putih susu, efek floating kaca frosted pada navbar.",
+        mood: "Hangat, santai, menenangkan, mengurangi kecemasan dalam belajar bahasa Inggris.",
+        colors: ["#FFF8E7", "#FFD680", "#BAF4FF", "#E5F9CE", "#462104"],
+        bgColor: "#FFF8E7",
+        textColor: "#462104",
+        accentYellow: "#FFD680",
+        accentGreen: "#E5F9CE",
+        accentCyan: "#BAF4FF"
+      }
+    };
+
+    // Translations Dictionary
+    const i18n = {
+      id: {
+        welcomeTitle: "Petualangan Belajar Bahasa Seru!",
+        welcomeSub: "Tingkatkan kecakapan bahasamu lewat cerita seru & tantangan adaptif setiap hari bersama FIEZEL.",
+        getStarted: "MULAI SEKARANG",
+        haveAccount: "SAYA SUDAH PUNYA AKUN",
+        greeting: "Halo, Riko! 👋",
+        subGreeting: "Siap lanjutkan petualangan hari ini?",
+        level: "Level 2",
+        coins: "28",
+        streak: "10 Hari",
+        dayChallenge: "10 dari 120 Hari",
+        booksRead: "14 Cerita",
+        studyTime: "40 Menit",
+        categoriesTitle: "Kategori Belajar",
+        catGrammar: "Tata Bahasa",
+        catReading: "Membaca",
+        catVocab: "Kosakata",
+        catSpeaking: "Berbicara",
+        continueTitle: "Lanjutkan Belajar",
+        lessonName: "Simple Present Tense • Pola Dasar",
+        startLesson: "Lanjut Belajar",
+        quizTitle: "Kuis Tata Bahasa",
+        quizQuestion: "Pilihlah bentuk kata kerja yang tepat untuk melengkapi kalimat berikut:",
+        quizSentence: "She _____ to the library every Wednesday afternoon.",
+        checkAnswer: "PERIKSA JAWABAN",
+        streakBanner: "🔥 10 Hari Beruntun! Kamu luar biasa!"
+      },
+      th: {
+        welcomeTitle: "การผจญภัยเรียนภาษาแสนสนุก!",
+        welcomeSub: "พัฒนาทักษะภาษาอังกฤษผ่านเรื่องราวและแบบฝึกหัดแสนสนุกได้ทุกวันกับ FIEZEL",
+        getStarted: "เริ่มต้นเรียนรู้",
+        haveAccount: "ฉันมีบัญชีอยู่แล้ว",
+        greeting: "สวัสดี, Riko! 👋",
+        subGreeting: "พร้อมเริ่มการผจญภัยวันนี้หรือยัง?",
+        level: "ระดับ 2",
+        coins: "28",
+        streak: "10 วัน",
+        dayChallenge: "10 จาก 120 วัน",
+        booksRead: "14 เรื่อง",
+        studyTime: "40 นาที",
+        categoriesTitle: "หมวดหมู่การเรียนรู้",
+        catGrammar: "ไวยากรณ์",
+        catReading: "การอ่าน",
+        catVocab: "คลังคำศัพท์",
+        catSpeaking: "การพูด",
+        continueTitle: "เรียนต่อจากที่ค้างไว้",
+        lessonName: "Simple Present Tense • พื้นฐาน",
+        startLesson: "เริ่มเรียนต่อ",
+        quizTitle: "แบบทดสอบไวยากรณ์",
+        quizQuestion: "เลือกคำกริยาที่ถูกต้องเพื่อเติมประโยคให้สมบูรณ์:",
+        quizSentence: "She _____ to the library every Wednesday afternoon.",
+        checkAnswer: "ตรวจสอบคำตอบ",
+        streakBanner: "🔥 ติดต่อกัน 10 วันแล้ว! เก่งมาก!"
+      }
+    };
+
+    function setLang(lang) {
+      currentLang = lang;
+      document.getElementById('lang-id-btn').className = lang === 'id' 
+        ? "px-3 py-1.5 rounded-xl text-xs font-bold transition-all bg-[#FFBF32] text-[#462104] shadow-sm"
+        : "px-3 py-1.5 rounded-xl text-xs font-bold transition-all bg-gray-100 text-[#5D5D5D] hover:bg-gray-200";
+      document.getElementById('lang-th-btn').className = lang === 'th'
+        ? "px-3 py-1.5 rounded-xl text-xs font-bold transition-all bg-[#FFBF32] text-[#462104] shadow-sm"
+        : "px-3 py-1.5 rounded-xl text-xs font-bold transition-all bg-gray-100 text-[#5D5D5D] hover:bg-gray-200";
+      renderScreen();
+    }
+
+    function setScreen(screen) {
+      currentScreen = screen;
+      ['auth', 'home', 'quiz'].forEach(s => {
+        const btn = document.getElementById(`screen-${s}-btn`);
+        if (s === screen) {
+          btn.className = "px-3 py-1.5 rounded-xl text-xs font-bold transition-all bg-[#241A11] text-white shadow-sm";
+        } else {
+          btn.className = "px-3 py-1.5 rounded-xl text-xs font-bold transition-all bg-gray-100 text-[#5D5D5D] hover:bg-gray-200";
+        }
+      });
+      renderScreen();
+    }
+
+    function selectOption(opt) {
+      currentOption = opt;
+      for (let i = 1; i <= 5; i++) {
+        const tab = document.getElementById(`opt-tab-${i}`);
+        if (i === opt) {
+          tab.className = "opt-tab p-3 rounded-2xl border-2 transition-all flex flex-col items-center text-center bg-white border-[#FFBF32] shadow-md scale-[1.02]";
+          tab.querySelector('span:first-child').className = "text-xs font-bold px-2 py-0.5 rounded-full bg-[#FFBF32]/25 text-[#462104] mb-1";
+        } else {
+          tab.className = "opt-tab p-3 rounded-2xl border-2 transition-all flex flex-col items-center text-center bg-white border-transparent hover:border-gray-200 opacity-80 hover:opacity-100";
+          tab.querySelector('span:first-child').className = "text-xs font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 mb-1";
+        }
+      }
+      updateSpecs();
+      renderScreen();
+    }
+
+    function updateSpecs() {
+      const data = optionsData[currentOption];
+      document.getElementById('badge-option-num').innerText = `OPSI ${currentOption} DARI 5`;
+      document.getElementById('spec-title').innerText = `Opsi ${currentOption}: ${data.name}`;
+      document.getElementById('spec-desc').innerText = data.desc;
+      document.getElementById('spec-font').innerText = data.font;
+      document.getElementById('spec-card-style').innerText = data.cardStyle;
+      document.getElementById('spec-mood').innerText = data.mood;
+
+      const colorsContainer = document.getElementById('spec-colors');
+      colorsContainer.innerHTML = data.colors.map(c => `
+        <div class="flex flex-col items-center gap-1">
+          <div class="w-9 h-9 rounded-xl shadow-sm border border-black/10" style="background: ${c}"></div>
+          <span class="text-[10px] font-mono text-gray-500">${c}</span>
+        </div>
+      `).join('');
+    }
+
+    function renderScreen() {
+      const body = document.getElementById('screen-body');
+      const bottomNav = document.getElementById('phone-bottom-nav');
+      const t = i18n[currentLang];
+      const opt = optionsData[currentOption];
+
+      // Update phone background
+      document.getElementById('phone-container').style.background = opt.bgColor;
+
+      if (currentScreen === 'auth') {
+        bottomNav.innerHTML = '';
+        renderAuthScreen(body, t, opt);
+      } else if (currentScreen === 'home') {
+        renderHomeScreen(body, t, opt);
+        renderBottomNav(bottomNav, opt, 'home');
+      } else if (currentScreen === 'quiz') {
+        renderQuizScreen(body, t, opt);
+        renderBottomNav(bottomNav, opt, 'learn');
+      }
+
+      lucide.createIcons();
+    }
+
+    function renderAuthScreen(container, t, opt) {
+      if (currentOption === 1) {
+        // Pure Funfluent Style
+        container.innerHTML = `
+          <div class="flex-1 flex flex-col justify-between p-6">
+            <!-- Top Logo & Mascot Art -->
+            <div class="text-center mt-3">
+              <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFBF32]/25 text-[#462104] font-gabarito font-bold text-xs tracking-wider mb-2">
+                🌟 FIEZEL LEARNING
+              </div>
+              <h2 class="text-3xl font-black font-gabarito tracking-tight text-[#462104]">FIEZEL</h2>
+            </div>
+
+            <!-- Illustration & Floating Pill Badges -->
+            <div class="relative my-4 flex items-center justify-center">
+              <div class="w-48 h-48 rounded-full bg-[#FFF7D3] border-4 border-white shadow-inner flex items-center justify-center relative">
+                <!-- Character Avatar -->
+                <div class="text-6xl animate-bounce" style="animation-duration: 2.5s;">🦊</div>
+                <!-- Floating Badges -->
+                <div class="absolute -top-2 -left-3 bg-white px-2.5 py-1 rounded-full shadow-md text-[11px] font-bold text-[#529917] flex items-center gap-1 border border-green-100">
+                  <span>🍃</span> Level 2
+                </div>
+                <div class="absolute -bottom-2 -right-3 bg-white px-2.5 py-1 rounded-full shadow-md text-[11px] font-bold text-[#FFBF32] flex items-center gap-1 border border-amber-100">
+                  <span>⭐</span> 40 Mins
+                </div>
+              </div>
+            </div>
+
+            <!-- Text & CTA -->
+            <div class="text-center">
+              <h3 class="text-2xl font-black font-gabarito text-[#462104] leading-tight mb-2">
+                ${t.welcomeTitle}
+              </h3>
+              <p class="text-xs text-[#5D5D5D] leading-relaxed mb-6 font-medium">
+                ${t.welcomeSub}
+              </p>
+
+              <button class="w-full py-3.5 btn-tactile-yellow text-sm tracking-wide mb-3 flex items-center justify-center gap-2">
+                <span>${t.getStarted}</span>
+                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+              </button>
+
+              <button class="w-full py-3 bg-white border-2 border-[#462104]/10 rounded-2xl text-xs font-bold text-[#462104] hover:bg-gray-50 transition-all">
+                ${t.haveAccount}
+              </button>
+            </div>
+          </div>
+        `;
+      } else if (currentOption === 2) {
+        // Clean Editorial
+        container.innerHTML = `
+          <div class="flex-1 flex flex-col justify-between p-6 bg-[#FAFAF8]">
+            <div class="pt-4">
+              <div class="font-gabarito font-black text-2xl tracking-tight text-[#241A11]">FIEZEL.</div>
+              <div class="w-8 h-1 bg-[#FFC700] rounded-full mt-1 mb-6"></div>
+              <h2 class="text-2xl font-bold font-gabarito tracking-tight text-[#241A11] leading-snug">
+                The smart way to learn English & Thai for students.
+              </h2>
+              <p class="text-xs text-gray-500 mt-2 leading-relaxed">
+                Adaptive mastery, intelligent micro-lessons, and curriculum designed for SMP/SMA.
+              </p>
+            </div>
+
+            <div class="my-6 p-5 rounded-2xl bg-white border border-[#EFECE6] shadow-sm">
+              <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-xl bg-[#FFF9EE] flex items-center justify-center text-2xl">📚</div>
+                <div>
+                  <div class="text-xs font-bold text-[#241A11]">Kurikulum Resmi</div>
+                  <div class="text-[11px] text-gray-500">Disesuaikan dengan tingkat kemahiranmu.</div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <button class="w-full py-3.5 rounded-xl bg-[#241A11] text-white font-bold text-xs tracking-wider mb-2.5 hover:bg-black">
+                ${t.getStarted}
+              </button>
+              <button class="w-full py-3 rounded-xl border border-gray-300 text-xs font-bold text-gray-700 hover:bg-gray-50">
+                ${t.haveAccount}
+              </button>
+            </div>
+          </div>
+        `;
+      } else if (currentOption === 3) {
+        // Adventure Storybook
+        container.innerHTML = `
+          <div class="flex-1 flex flex-col justify-between p-6 bg-gradient-to-b from-[#162B08] to-[#2B5412] text-white">
+            <div class="text-center pt-4">
+              <div class="text-xs uppercase tracking-widest font-bold text-[#FFBF32]">HUTAN ILMU</div>
+              <h2 class="text-3xl font-black font-gabarito mt-1">FIEZEL QUEST</h2>
+            </div>
+            <div class="text-center my-6">
+              <div class="w-40 h-40 mx-auto rounded-3xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-6xl shadow-2xl">
+                🧭
+              </div>
+              <div class="inline-block mt-4 px-3 py-1 rounded-full bg-[#FFBF32] text-[#162B08] font-bold text-xs">
+                Bab 1: Petualangan Dimulai
+              </div>
+            </div>
+            <div>
+              <p class="text-xs text-center text-white/80 mb-5 leading-relaxed">
+                Jelajahi pulau tata bahasa dan kosakata bersama Nusa & Mira.
+              </p>
+              <button class="w-full py-3.5 rounded-2xl bg-[#FFBF32] text-[#162B08] font-gabarito font-black text-sm tracking-wide shadow-lg mb-2">
+                ${t.getStarted}
+              </button>
+              <button class="w-full py-3 rounded-2xl bg-white/15 text-white font-bold text-xs hover:bg-white/25">
+                ${t.haveAccount}
+              </button>
+            </div>
+          </div>
+        `;
+      } else if (currentOption === 4) {
+        // Arcade Bento
+        container.innerHTML = `
+          <div class="flex-1 flex flex-col justify-between p-6 bg-[#F8FAFC]">
+            <div class="flex items-center justify-between pt-2">
+              <span class="font-black font-gabarito text-2xl tracking-tighter text-[#1B1418]">FIEZEL⚡</span>
+              <span class="px-2 py-0.5 rounded-md bg-[#FFC700] text-black font-extrabold text-[10px]">v2.5</span>
+            </div>
+            <div class="space-y-2.5 my-4">
+              <div class="p-4 rounded-2xl bg-white border-2 border-black/10 shadow-sm flex items-center justify-between">
+                <div>
+                  <div class="text-xs font-extrabold text-[#1B1418]">DAILY STREAK</div>
+                  <div class="text-lg font-black text-amber-500 font-gabarito">🔥 10 DAYS ON FIRE</div>
+                </div>
+                <div class="text-2xl">⚡</div>
+              </div>
+              <div class="p-4 rounded-2xl bg-white border-2 border-black/10 shadow-sm flex items-center justify-between">
+                <div>
+                  <div class="text-xs font-extrabold text-[#1B1418]">ACCURACY BOOST</div>
+                  <div class="text-lg font-black text-emerald-600 font-gabarito">92% RETENTION</div>
+                </div>
+                <div class="text-2xl">🎯</div>
+              </div>
+            </div>
+            <div>
+              <button class="w-full py-3.5 rounded-xl bg-[#FFC700] text-black font-black text-xs uppercase tracking-wider mb-2 shadow-[0_4px_0_#000] active:translate-y-1 active:shadow-none border-2 border-black">
+                ${t.getStarted}
+              </button>
+              <button class="w-full py-3 rounded-xl bg-white text-black font-bold text-xs border-2 border-black">
+                ${t.haveAccount}
+              </button>
+            </div>
+          </div>
+        `;
+      } else {
+        // Clay & Pastel
+        container.innerHTML = `
+          <div class="flex-1 flex flex-col justify-between p-6 bg-[#FFF8E7]">
+            <div class="text-center pt-3">
+              <span class="font-fredoka font-bold text-3xl text-[#462104]">fiezel☁️</span>
+            </div>
+            <div class="my-6 flex justify-center">
+              <div class="w-44 h-44 clay-card flex flex-col items-center justify-center relative p-4 text-center">
+                <span class="text-5xl mb-2">🐥</span>
+                <span class="font-fredoka font-bold text-sm text-[#462104]">Belajar Tanpa Stres</span>
+                <span class="text-[10px] text-gray-500">Lembut & Menyenangkan</span>
+              </div>
+            </div>
+            <div>
+              <button class="w-full py-3.5 clay-btn bg-[#FFD680] text-[#462104] font-fredoka font-bold text-sm mb-3">
+                ${t.getStarted}
+              </button>
+              <button class="w-full py-3 clay-card text-[#462104] font-fredoka font-semibold text-xs">
+                ${t.haveAccount}
+              </button>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    function renderHomeScreen(container, t, opt) {
+      container.innerHTML = `
+        <!-- Top App Bar with Level, Coins, and Lang -->
+        <div class="px-5 py-3 flex items-center justify-between sticky top-0 bg-white/90 backdrop-blur-md z-20 border-b border-[#241A11]/5">
+          <!-- Level Pill -->
+          <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E5F9CE] text-[#162B08] text-xs font-bold shadow-xs">
+            <span class="w-2 h-2 rounded-full bg-[#529917]"></span>
+            <span>${t.level}</span>
+          </div>
+
+          <!-- Coins Counter -->
+          <div class="flex items-center gap-1 px-3 py-1 rounded-full bg-[#FFF7D3] text-[#462104] text-xs font-bold">
+            <span class="text-amber-500">🪙</span>
+            <span>${t.coins}</span>
+          </div>
+
+          <!-- Language Selector -->
+          <div class="flex items-center gap-1 px-2.5 py-1 rounded-full bg-gray-100 text-gray-700 text-xs font-bold">
+            <span>${currentLang === 'id' ? '🇮🇩 ID' : '🇹🇭 TH'}</span>
+            <i data-lucide="chevron-down" class="w-3.5 h-3.5"></i>
+          </div>
+        </div>
+
+        <div class="p-5 space-y-4">
+          <!-- Hero Greeting with Mascot -->
+          <div class="p-4 rounded-3xl bg-white border border-[#241A11]/8 shadow-sm flex items-center justify-between relative overflow-hidden">
+            <div>
+              <h3 class="font-gabarito font-bold text-lg text-[#241A11]">${t.greeting}</h3>
+              <p class="text-xs text-gray-500 font-medium mt-0.5">${t.subGreeting}</p>
+              <!-- Daily Streak Chip -->
+              <div class="inline-flex items-center gap-1 mt-2.5 px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 text-[11px] font-bold border border-amber-200">
+                <span>🔥</span> ${t.streakBanner}
+              </div>
+            </div>
+            <div class="text-4xl pr-2">🦊</div>
+          </div>
+
+          <!-- So For Today Challenge Card (Funfluent style) -->
+          <div class="p-4 rounded-3xl bg-white border border-[#241A11]/8 shadow-sm">
+            <div class="flex items-center justify-between pb-3 border-b border-gray-100">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-xl bg-[#FFF7D3] flex items-center justify-center text-sm">📅</div>
+                <div>
+                  <div class="text-xs font-bold text-[#241A11]">${t.dayChallenge}</div>
+                  <div class="text-[10px] text-gray-400 font-medium">Tantangan Harian</div>
+                </div>
+              </div>
+              <span class="text-xs font-bold text-[#529917]">85%</span>
+            </div>
+            <div class="grid grid-cols-2 gap-3 pt-3">
+              <div class="flex items-center gap-2">
+                <span class="text-lg">📖</span>
+                <div>
+                  <div class="text-xs font-bold text-[#241A11]">${t.booksRead}</div>
+                  <div class="text-[10px] text-gray-400">Selesai Dibaca</div>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-lg">⏱️</span>
+                <div>
+                  <div class="text-xs font-bold text-[#241A11]">${t.studyTime}</div>
+                  <div class="text-[10px] text-gray-400">Waktu Belajar</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Category Circular Grid (Funfluent style) -->
+          <div>
+            <div class="flex items-center justify-between mb-3 px-1">
+              <h4 class="font-gabarito font-bold text-sm text-[#241A11]">${t.categoriesTitle}</h4>
+              <span class="text-xs font-bold text-[#FFBF32] cursor-pointer">Lihat Semua</span>
+            </div>
+            <div class="grid grid-cols-4 gap-2 text-center">
+              <div class="flex flex-col items-center gap-1.5 cursor-pointer group">
+                <div class="w-14 h-14 rounded-2xl bg-[#FFF7D3] border-2 border-[#FFBF32]/40 flex items-center justify-center text-2xl shadow-xs group-hover:scale-105 transition-transform">
+                  🧭
+                </div>
+                <span class="text-[11px] font-bold text-[#241A11]">${t.catGrammar}</span>
+              </div>
+              <div class="flex flex-col items-center gap-1.5 cursor-pointer group">
+                <div class="w-14 h-14 rounded-2xl bg-[#E5F9CE] border-2 border-[#529917]/40 flex items-center justify-center text-2xl shadow-xs group-hover:scale-105 transition-transform">
+                  📚
+                </div>
+                <span class="text-[11px] font-bold text-[#241A11]">${t.catReading}</span>
+              </div>
+              <div class="flex flex-col items-center gap-1.5 cursor-pointer group">
+                <div class="w-14 h-14 rounded-2xl bg-[#BAF4FF] border-2 border-[#1EC6F2]/40 flex items-center justify-center text-2xl shadow-xs group-hover:scale-105 transition-transform">
+                  🗂️
+                </div>
+                <span class="text-[11px] font-bold text-[#241A11]">${t.catVocab}</span>
+              </div>
+              <div class="flex flex-col items-center gap-1.5 cursor-pointer group">
+                <div class="w-14 h-14 rounded-2xl bg-amber-100 border-2 border-amber-300 flex items-center justify-center text-2xl shadow-xs group-hover:scale-105 transition-transform">
+                  🎙️
+                </div>
+                <span class="text-[11px] font-bold text-[#241A11]">${t.catSpeaking}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Continue Learning Card -->
+          <div class="p-4 rounded-3xl bg-gradient-to-r from-[#FFBF32] to-[#FFA500] text-[#462104] shadow-md relative overflow-hidden">
+            <div class="relative z-10">
+              <span class="px-2.5 py-0.5 rounded-full bg-white/30 text-[10px] font-extrabold uppercase tracking-wider">
+                ${t.continueTitle}
+              </span>
+              <h4 class="font-gabarito font-bold text-base mt-2 leading-tight">
+                ${t.lessonName}
+              </h4>
+              <div class="w-full bg-black/10 rounded-full h-2 mt-3 overflow-hidden">
+                <div class="bg-[#462104] h-2 rounded-full w-2/3"></div>
+              </div>
+              <button onclick="setScreen('quiz')" class="mt-3.5 px-4 py-2 rounded-xl bg-white text-[#462104] font-gabarito font-bold text-xs shadow-sm hover:bg-gray-50 flex items-center gap-1.5">
+                <span>${t.startLesson}</span>
+                <i data-lucide="play" class="w-3 h-3 fill-current"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderQuizScreen(container, t, opt) {
+      container.innerHTML = `
+        <!-- Quiz Header -->
+        <div class="px-5 py-3 flex items-center justify-between sticky top-0 bg-white/95 backdrop-blur-md z-20 border-b border-[#241A11]/5">
+          <button onclick="setScreen('home')" class="p-1.5 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200">
+            <i data-lucide="chevron-left" class="w-5 h-5"></i>
+          </button>
+          <div class="flex-1 mx-4">
+            <div class="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
+              <div class="bg-[#529917] h-2.5 rounded-full w-3/5 transition-all"></div>
+            </div>
+          </div>
+          <div class="text-xs font-bold text-[#529917] flex items-center gap-1">
+            <span>3/5</span>
+          </div>
+        </div>
+
+        <div class="p-5 flex-1 flex flex-col justify-between">
+          <div>
+            <!-- Question Badge -->
+            <div class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#FFF7D3] text-[#462104] text-[11px] font-bold mb-3">
+              <span>💡</span> ${t.quizTitle}
+            </div>
+
+            <!-- Question Text -->
+            <h3 class="text-sm font-medium text-gray-600 mb-2">
+              ${t.quizQuestion}
+            </h3>
+            <div class="p-4 rounded-2xl bg-white border-2 border-[#241A11]/10 shadow-xs mb-5">
+              <p class="font-gabarito font-bold text-base text-[#241A11] leading-relaxed">
+                "She <span class="px-2 py-0.5 border-b-2 border-[#FFBF32] text-[#FFBF32]">_____</span> to the library every Wednesday afternoon."
+              </p>
+            </div>
+
+            <!-- Options (Chunky Funfluent style) -->
+            <div class="space-y-2.5" id="quiz-options-group">
+              <div onclick="selectQuizOpt(this)" class="quiz-opt p-3.5 rounded-2xl bg-white border-2 border-gray-200 font-gabarito font-bold text-sm text-[#241A11] cursor-pointer hover:border-[#FFBF32] transition-all flex items-center justify-between">
+                <span>A. goes</span>
+                <span class="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center text-[10px] opt-check"></span>
+              </div>
+              <div onclick="selectQuizOpt(this)" class="quiz-opt p-3.5 rounded-2xl bg-white border-2 border-gray-200 font-gabarito font-bold text-sm text-[#241A11] cursor-pointer hover:border-[#FFBF32] transition-all flex items-center justify-between">
+                <span>B. go</span>
+                <span class="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center text-[10px] opt-check"></span>
+              </div>
+              <div onclick="selectQuizOpt(this)" class="quiz-opt p-3.5 rounded-2xl bg-white border-2 border-gray-200 font-gabarito font-bold text-sm text-[#241A11] cursor-pointer hover:border-[#FFBF32] transition-all flex items-center justify-between">
+                <span>C. going</span>
+                <span class="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center text-[10px] opt-check"></span>
+              </div>
+              <div onclick="selectQuizOpt(this)" class="quiz-opt p-3.5 rounded-2xl bg-white border-2 border-gray-200 font-gabarito font-bold text-sm text-[#241A11] cursor-pointer hover:border-[#FFBF32] transition-all flex items-center justify-between">
+                <span>D. went</span>
+                <span class="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center text-[10px] opt-check"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Check CTA -->
+          <div class="pt-4 mt-4 border-t border-gray-100">
+            <button onclick="checkAnswerFeedback()" id="btn-quiz-check" class="w-full py-3.5 btn-tactile-yellow text-sm tracking-wide flex items-center justify-center gap-2">
+              <i data-lucide="check-circle" class="w-4 h-4"></i>
+              <span>${t.checkAnswer}</span>
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function selectQuizOpt(el) {
+      document.querySelectorAll('.quiz-opt').forEach(opt => {
+        opt.className = "quiz-opt p-3.5 rounded-2xl bg-white border-2 border-gray-200 font-gabarito font-bold text-sm text-[#241A11] cursor-pointer hover:border-[#FFBF32] transition-all flex items-center justify-between";
+        opt.querySelector('.opt-check').innerHTML = '';
+        opt.querySelector('.opt-check').className = "w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center text-[10px] opt-check";
+      });
+      el.className = "quiz-opt p-3.5 rounded-2xl bg-[#FFF7D3] border-2 border-[#FFBF32] font-gabarito font-bold text-sm text-[#462104] cursor-pointer shadow-sm transition-all flex items-center justify-between";
+      const check = el.querySelector('.opt-check');
+      check.innerHTML = '✓';
+      check.className = "w-5 h-5 rounded-full bg-[#FFBF32] text-[#462104] font-bold flex items-center justify-center text-[11px] opt-check";
+    }
+
+    function checkAnswerFeedback() {
+      const selected = document.querySelector('.quiz-opt.border-\\[\\#FFBF32\\]');
+      if (!selected) {
+        alert("Pilih salah satu jawaban terlebih dahulu!");
+        return;
+      }
+      selected.className = "quiz-opt p-3.5 rounded-2xl bg-[#ECFDF5] border-2 border-[#10B981] font-gabarito font-bold text-sm text-[#065F46] cursor-pointer shadow-sm transition-all flex items-center justify-between";
+      const check = selected.querySelector('.opt-check');
+      check.className = "w-5 h-5 rounded-full bg-[#10B981] text-white font-bold flex items-center justify-center text-[11px] opt-check";
+      check.innerHTML = '✓';
+
+      const btn = document.getElementById('btn-quiz-check');
+      btn.className = "w-full py-3.5 btn-tactile-green text-sm tracking-wide flex items-center justify-center gap-2";
+      btn.innerHTML = `<span>🎉 Luar Biasa! Lanjut</span> <i data-lucide="arrow-right" class="w-4 h-4"></i>`;
+      lucide.createIcons();
+    }
+
+    function renderBottomNav(container, opt, activeTab) {
+      container.innerHTML = `
+        <div class="px-5 py-2.5 bg-white/95 backdrop-blur-xl border-t border-[#241A11]/10 flex items-center justify-around shadow-lg">
+          <button onclick="setScreen('home')" class="flex flex-col items-center gap-0.5 ${activeTab === 'home' ? 'text-[#FFBF32]' : 'text-gray-400'}">
+            <i data-lucide="home" class="w-5 h-5"></i>
+            <span class="text-[10px] font-bold">Beranda</span>
+          </button>
+          <button onclick="setScreen('home')" class="flex flex-col items-center gap-0.5 text-gray-400">
+            <i data-lucide="compass" class="w-5 h-5"></i>
+            <span class="text-[10px] font-bold">Jelajah</span>
+          </button>
+          <button onclick="setScreen('quiz')" class="flex flex-col items-center gap-0.5 ${activeTab === 'learn' ? 'text-[#FFBF32]' : 'text-gray-400'}">
+            <i data-lucide="book-open" class="w-5 h-5"></i>
+            <span class="text-[10px] font-bold">Belajar</span>
+          </button>
+          <button onclick="setScreen('home')" class="flex flex-col items-center gap-0.5 text-gray-400">
+            <i data-lucide="award" class="w-5 h-5"></i>
+            <span class="text-[10px] font-bold">Prestasi</span>
+          </button>
+          <button onclick="setScreen('home')" class="flex flex-col items-center gap-0.5 text-gray-400">
+            <i data-lucide="user" class="w-5 h-5"></i>
+            <span class="text-[10px] font-bold">Profil</span>
+          </button>
+        </div>
+      `;
+    }
+
+    function confirmSelection() {
+      const data = optionsData[currentOption];
+      alert(`Anda telah memilih:\n\nOPSI ${currentOption}: ${data.name}\n\nSilakan kembali ke chat dan konfirmasi pilihan ini untuk memulai implementasi penuh!`);
+    }
+
+    // Initialize
+    selectOption(1);
+  </script>
+</body>
+</html>

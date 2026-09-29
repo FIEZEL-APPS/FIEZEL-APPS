@@ -33,18 +33,180 @@
     } catch (_) { return false; }
   }
 
-  function t(k, fb) {
+  function t(k, fb, params) {
     /* FiezelI18n.t() mengembalikan KUNCINYA saat kalimatnya belum termuat. Mengembalikan
        itu apa adanya berarti guru membaca 'guru.tab-jurnal' di layarnya, padahal kalimat
        cadangannya sudah tertulis di pemanggil. Cadangan dipakai untuk DUA keadaan:
-       FiezelI18n tidak ada, dan kuncinya tidak terpecahkan. */
+       FiezelI18n tidak ada, dan kuncinya tidak terpecahkan.
+
+       `params` (m025-357) menyejajarkan tanda tangan ini dengan t() di
+       features/class-hub/fiezel-class-hub.js. Tanpa itu, kalimat berlubang seperti
+       'Sudah tersemai: {tp} tujuan pembelajaran' tercetak apa adanya — LENGKAP DENGAN
+       KURUNG KURAWALNYA — setiap kali cadangan dipakai, karena substitusi hanya terjadi
+       di dalam FiezelI18n. Substitusi diulang di sini supaya jalur cadangan dan jalur
+       terdaftar menghasilkan kalimat yang sama. */
     var s;
-    try { var I = (typeof self !== 'undefined' ? self : this).FiezelI18n; s = I && I.t ? I.t(k) : undefined; } catch (_) {}
-    return (s === undefined || s === k) ? (fb == null ? k : fb) : s;
+    try { var I = (typeof self !== 'undefined' ? self : this).FiezelI18n; s = I && I.t ? I.t(k, params) : undefined; } catch (_) {}
+    if (s === undefined || s === k) s = fb == null ? k : fb;
+    if (params) s = String(s).replace(/\{(\w+)\}/g, function (m, n) { return Object.prototype.hasOwnProperty.call(params, n) ? String(params[n]) : m; });
+    return s;
   }
   if (!root) return;
   var S = function () { return root.FiezelTeacherStore; };
-  var el = null, env = {}, st = null, ui = { modal: null, drawer: null, filter: '', insightSkill: 'past_tense', attDate: null, pick: {}, syncing: false }, syncTimer = null, chipTimer = null, visListener = null;
+  var el = null, env = {}, st = null, ui = { modal: null, drawer: null, filter: '', insightSkill: 'past_tense', attDate: null, pick: {}, syncing: false, curriculumSubject: 'MAT', curriculumGrade: 'ALL', curriculumTree: null, curriculumLoading: false, curriculumError: null, curriculumSeeded: null, seeding: false, seedStatus: null, seedStatusLoading: false, seedStatusError: null, seedBusy: '', bankDepth: null, bankDepthSubject: '', bankDepthLoading: false, bankDepthCapped: false }, syncTimer = null, chipTimer = null, visListener = null;
+
+  /* ---------------------------------------------------------------------------
+   * PILAR 1 · ISOLASI MATA PELAJARAN PER TOKEN GURU (Token-Based Subject Scope)
+   *
+   * Token guru (FiezelAccount.state()) membawa subjectId (+ gradeId). Seluruh
+   * dashboard dikunci ke lisensi itu:
+   *  - 1 mapel  -> dropdown disembunyikan, diganti badge; semua fitur tersaring.
+   *  - N mapel  -> dropdown HANYA berisi mapel berlisensi (acc.subjectIds).
+   *  - tanpa token -> perilaku lama (17 mapel), nol breaking change untuk demo.
+   *
+   * Bentuk multi-mapel yang didukung (salah satu cukup):
+   *   acc.subjectIds: ['IPA','MAT'] | acc.subjects: [...] | acc.subjectId: 'IPA'
+   * Grade: acc.gradeId ('SMP'/'SMA'/'SD') atau acc.grade. Dipakai untuk badge
+   * dan filter bab per kelas (Fase D = 7,8,9).
+   * Murni + fail-soft supaya bisa diuji di Node tanpa DOM.
+   * ------------------------------------------------------------------------- */
+  function teacherAccount() {
+    try { return (root.FiezelAccount && root.FiezelAccount.state && root.FiezelAccount.state()) || null; }
+    catch (_) { return null; }
+  }
+  function validSubjectId(id) {
+    if (!id) return null;
+    var v = String(id).trim().toUpperCase();
+    for (var i = 0; i < MAPEL_LIST.length; i++) if (MAPEL_LIST[i].id === v) return v;
+    return null;
+  }
+  function teacherSubjectScope() {
+    var acc = teacherAccount();
+    var licensed = [];
+    try {
+      if (acc) {
+        if (Array.isArray(acc.subjectIds)) licensed = acc.subjectIds.slice();
+        else if (Array.isArray(acc.subjects)) licensed = acc.subjects.slice();
+        else if (Array.isArray(acc.subject_ids)) licensed = acc.subject_ids.slice();
+        if (acc.subjectId) licensed.push(acc.subjectId);
+        if (acc.subject_id) licensed.push(acc.subject_id);
+      }
+    } catch (_) { licensed = []; }
+    licensed = licensed.map(validSubjectId).filter(Boolean);
+    /* dedup, pertahankan urutan lisensi */
+    var seen = {}, uniq = [];
+    licensed.forEach(function (x) { if (!seen[x]) { seen[x] = 1; uniq.push(x); } });
+    licensed = uniq;
+    var grade = null;
+    try {
+      if (acc) grade = acc.gradeId || acc.grade_id || acc.grade || null;
+      if (grade) grade = String(grade).trim().toUpperCase();
+      if (grade !== 'SMP' && grade !== 'SMA' && grade !== 'SD') {
+        if (grade === 'FASE D' || grade === 'FASE-D' || grade === 'D') grade = 'SMP';
+        else if (grade === 'FASE E' || grade === 'FASE F') grade = 'SMA';
+        else if (!grade) grade = null;
+        else grade = 'SMP';
+      }
+    } catch (_) { grade = null; }
+    if (!grade) grade = 'SMP';
+    if (!licensed.length) {
+      var cur = validSubjectId(ui.curriculumSubject) || validSubjectId(ui.assignSubject) || 'MAT';
+      return { subjects: MAPEL_LIST.map(function (m) { return m.id; }), active: cur, grade: grade, locked: false, multi: false };
+    }
+    var active = validSubjectId(ui.curriculumSubject) || validSubjectId(ui.assignSubject);
+    if (!active || licensed.indexOf(active) < 0) active = licensed[0];
+    return { subjects: licensed, active: active, grade: grade, locked: true, multi: licensed.length > 1 };
+  }
+  function scopeMapelList() {
+    var sc = teacherSubjectScope();
+    if (!sc.locked) return MAPEL_LIST.slice();
+    return MAPEL_LIST.filter(function (m) { return sc.subjects.indexOf(m.id) !== -1; });
+  }
+  function gradeKelasLabel(grade) {
+    if (grade === 'SMA') return t('guru.scope-kelas-sma', 'Kelas 10, 11, 12');
+    if (grade === 'SD') return t('guru.scope-kelas-sd', 'Kelas 1–6');
+    return t('guru.scope-kelas-smp', 'Kelas 7, 8, 9');
+  }
+  function subjectScopeBadge() {
+    var sc = teacherSubjectScope();
+    if (!sc.locked) return '';
+    var m = null;
+    for (var i = 0; i < MAPEL_LIST.length; i++) if (MAPEL_LIST[i].id === sc.active) m = MAPEL_LIST[i];
+    var nama = m ? m.name : sc.active;
+    return '<div class="tg-subject-scope" data-testid="tg-subject-scope-badge" role="status" aria-label="' + esc(nama + ' ' + sc.grade) + '">' +
+      icon('book-open') + '<span><b>' + esc(nama) + ' · ' + esc(sc.grade) + '</b><small>' + esc(gradeKelasLabel(sc.grade)) + '</small></span></div>';
+  }
+  /* Subjek sebuah tugas: sumber mapel > skill mapel > null (non-mapel/legacy). */
+  function assignmentSubject(a) {
+    try {
+      if (a && a.source && a.source.subjectId && validSubjectId(a.source.subjectId)) return validSubjectId(a.source.subjectId);
+      var sk = a && a.skills && a.skills[0] ? String(a.skills[0]).toUpperCase() : '';
+      if (validSubjectId(sk)) return sk;
+      /* skill turunannya berbentuk komp_ipa_d_7_... atau KOMP-IPA-... -> petik mapelnya */
+      if (sk.indexOf('KOMP') === 0) {
+        var m = sk.match(/KOMP[-_]([A-Z]{3})/);
+        if (m && validSubjectId(m[1])) return m[1];
+      }
+      if (sk.indexOf('Q-') === 0 || sk.indexOf('Q_') === 0) return null;
+    } catch (_) {}
+    return null;
+  }
+  function isAssignmentVisible(a, sc) {
+    if (!sc || !sc.locked) return true;
+    var sub = assignmentSubject(a);
+    if (!sub) return false;
+    return sc.subjects.indexOf(sub) !== -1;
+  }
+  /* Apakah sebuah skill analitik milik subjek berlisensi? Dipakai menyaring
+     heatmap/skill-map/miskonsepsi agar guru IPA tidak membaca Past Tense. */
+  function skillMatchesSubject(skill, sc) {
+    if (!sc || !sc.locked) return true;
+    var k = String(skill || '').toUpperCase();
+    for (var i = 0; i < sc.subjects.length; i++) {
+      var sub = sc.subjects[i];
+      if (k === sub) return true;
+      if (k.indexOf('KOMP_' + sub) === 0 || k.indexOf('KOMP-' + sub) === 0) return true;
+    }
+    return false;
+  }
+  /* Kelompok remedial/pengayaan otomatis per KKM (default 75%). Murni. */
+  function remedialGroups(c, kkm) {
+    var T = S(), out = { kkm: (kkm == null ? 0.75 : kkm), remedial: [], pengayaan: [], tuntas: [] };
+    if (!c || !c.students) return out;
+    var sc = null;
+    try { sc = teacherSubjectScope(); } catch (_) { sc = null; }
+    c.students.forEach(function (s) {
+      var v = null;
+      try {
+        if (sc && sc.locked) {
+          /* nilai mapel: rata-rata skill yang berlabel subjek aktif */
+          var vals = [];
+          (s.results || []).forEach(function (r) {
+            var k = String(r.skill || '').toUpperCase();
+            var milik = (k === sc.active) || k.indexOf('KOMP_' + sc.active) === 0 || k.indexOf('KOMP-' + sc.active) === 0;
+            if (milik && r.total) vals.push(r.correct / r.total);
+          });
+          v = vals.length ? vals.reduce(function (x, y) { return x + y; }, 0) / vals.length : T.overallAcc(s);
+        } else v = T.overallAcc(s);
+      } catch (_) { v = null; }
+      var row = { s: s, acc: v };
+      if (v == null) { out.tuntas.push(row); return; }
+      if (v < out.kkm) out.remedial.push(row);
+      else if (v >= 0.9) out.pengayaan.push(row);
+      else out.tuntas.push(row);
+    });
+    return out;
+  }
+  function rekapRows(c) {
+    var T = S(), sc = null;
+    try { sc = teacherSubjectScope(); } catch (_) {}
+    var mapel = (sc && sc.locked) ? sc.active : null;
+    return (c.students || []).map(function (s) {
+      var acc = T.overallAcc(s);
+      var status = acc == null ? t('guru.rekap-belum-ada', 'Belum ada nilai') : acc >= 0.75 ? 'Tuntas' : 'Remedial';
+      return { nama: s.name, akurasi: acc == null ? null : Math.round(acc * 100), status: status, mapel: mapel || (c.subject || ''), kehadiran: T.attendanceRate(s, 10) };
+    });
+  }
   /*
    * DUA detak, bukan satu. m025-261 menyatukan keduanya pada 3 detik dan itu merusak dua hal
    * sekaligus; m025-262 memisahkannya lagi.
@@ -62,12 +224,69 @@
    *    berkedip merah, dan syncFailStreak menanjak tanpa sebab nyata. Jarak amannya bukan
    *    selera: ia harus berada di atas lantai server, dengan marjin.
    */
+  var DEMO_CLASS_SIZE = 18;   /* dipakai kalimat ajakan; angka dan kalimat dipisah supaya terjemahannya tidak perlu ikut menghafal angkanya */
   var CHIP_TICK_MS = 1000;
   var SYNC_EVERY_MS = 10000;
   var syncFailStreak = 0;
   var pendingRender = false;
-  var NAV = [['hub', t('guru.nav-ruang-kelas', 'Ruang Kelas'), 'school'], ['briefing', t('guru.nav-ringkasan', 'Ringkasan Hari Ini'), 'sunrise'], ['classes', t('guru.tab-kelas-siswa', 'Kelas & Siswa'), 'users'], ['assignments', t('guru.tab-tugas-ujian', 'Tugas & Ujian'), 'clipboard-list'], ['insights', 'Analitik', 'activity'], ['comms', 'Komunikasi', 'megaphone'], ['journal', t('guru.tab-jurnal', 'Jurnal Guru'), 'notebook-pen']];
-  var TITLE = { hub: t('guru.judul-ruang-kelas', 'Ruang Kelas — guru, murid, dan hasil belajar dalam satu layar'), briefing: t('guru.judul-ringkasan', 'Ringkasan hari ini'), classes: t('guru.tab-kelas-siswa', 'Kelas & Siswa'), assignments: t('guru.tab-tugas-ujian', 'Tugas & Ujian'), insights: t('guru.judul-analitik', 'Analitik — siapa yang perlu dibantu'), comms: 'Komunikasi', journal: t('guru.tab-jurnal', 'Jurnal Guru'), settings: t('guru.tab-profil', 'Profil Guru') };
+  /* NAV dan TITLE dulu KONSTANTA lingkup modul, dan itu kebocoran bahasa yang paling
+     mahal di dasbor ini: keduanya dievaluasi SEKALI saat berkas diurai, sementara copy
+     Thai dimuat DINAMIS sesudahnya (features/i18n/fiezel-th-loader.js). Pada detik
+     keduanya dihitung, registry Thai masih kosong, t() jatuh ke cadangan Indonesia, dan
+     hasilnya membeku selamanya — copy Thai yang datang kemudian tidak pernah bisa
+     memperbaikinya karena nilainya sudah tersimpan.
+
+     Akibatnya kasatmata dan memalukan: seluruh sidebar guru tetap berbahasa Indonesia
+     di layar murid Thai, sementara judul yang dirender belakangan SUDAH berbahasa Thai —
+     satu layar, dua bahasa, berganti di tengah kalimat.
+
+     Perbaikannya bukan menambah terjemahan (ke-229 kuncinya SUDAH ada di id dan th),
+     melainkan menunda evaluasinya: keduanya kini fungsi yang dipanggil saat render.
+     JANGAN mengubahnya kembali menjadi konstanta. Dijaga
+     tests/teacher-i18n-lazy-test.js. */
+  /* Audit F25: SATU lapis navigasi. Dulu sidebar 7 butir ditambah 6 tab di dalam Ruang Kelas,
+     dengan tujuan tumpang tindih ("Kelas & Siswa" vs "Kelas Saya", "Tugas & Ujian" vs
+     "Tugas" + "Buat Tugas"). Kini tab hub disembunyikan di Ruang Guru dan tujuan yang unik
+     di hub (hasil per tugas, saran otomatis, kurikulum) menjadi butir sidebar biasa: elemen
+     keempat = tab hub yang dibuka. Setiap tujuan muncul tepat sekali. */
+  function navItems() {
+    var list = [
+      ['hub', t('guru.nav-ruang-kelas', 'Ruang Kelas'), 'school', 'kelas'],
+      ['briefing', t('guru.nav-ringkasan', 'Ringkasan Hari Ini'), 'sunrise'],
+      ['classes', t('guru.nav-siswa', 'Siswa'), 'users'],
+      ['assignments', t('guru.tab-tugas-ujian', 'Tugas & Ujian'), 'clipboard-list'],
+      ['hub', t('guru.nav-hasil-tugas', 'Hasil per tugas'), 'bar-chart-3', 'hasil'],
+      ['insights', t('guru.nav-analitik-kelas', 'Analitik kelas'), 'activity'],
+      ['hub', t('guru.nav-saran', 'Saran otomatis'), 'brain', 'braincore']
+    ];
+    try { if (konsolKurikulumSiap()) list.push(['hub', t('guru.nav-kurikulum', 'Kurikulum & Kompetensi'), 'compass', 'kurikulum']); } catch (_) {}
+    list.push(['comms', t('guru.nav-komunikasi', 'Komunikasi'), 'megaphone'], ['journal', t('guru.tab-jurnal', 'Jurnal Guru'), 'notebook-pen']);
+    return list;
+  }
+  function hubTab() {
+    try { return (root.FiezelClassHub && root.FiezelClassHub._teacherUi && root.FiezelClassHub._teacherUi().tab) || 'kelas'; } catch (_) { return 'kelas'; }
+  }
+  /** Butir nav aktif: view sama, dan untuk butir hub juga tab hubnya sama. Tab hub yang tidak
+   *  punya butir sendiri (tugas, buat) tetap menandai "Ruang Kelas". */
+  function navActive(n) {
+    if (st.view !== n[0]) return false;
+    if (n[0] !== 'hub') return true;
+    var tab = hubTab(), own = { hasil: 1, braincore: 1, kurikulum: 1 };
+    return own[tab] ? n[3] === tab : n[3] === 'kelas';
+  }
+  function navAttrs(n) {
+    return 'data-tg="view" data-view="' + n[0] + '"' + (n[3] ? ' data-hub-tab="' + n[3] + '"' : '') +
+      ' data-testid="tg-nav-' + n[0] + (n[3] && n[3] !== 'kelas' ? '-' + n[3] : '') + '"';
+  }
+  function viewTitles() {
+    return { hub: t('guru.judul-ruang-kelas', 'Ruang Kelas — guru, murid, dan hasil belajar dalam satu layar'), briefing: t('guru.judul-ringkasan', 'Ringkasan hari ini'), classes: t('guru.nav-siswa', 'Siswa'), assignments: t('guru.tab-tugas-ujian', 'Tugas & Ujian'), insights: t('guru.judul-analitik', 'Analitik — siapa yang perlu dibantu'), comms: t('guru.nav-komunikasi', 'Komunikasi'), journal: t('guru.tab-jurnal', 'Jurnal Guru'), settings: t('guru.tab-profil', 'Profil Guru'), curriculum: t('guru.nav-kurikulum', 'Kurikulum & Materi') };
+  }
+  /* Tanggal di kepala dasbor dulu dipaku 'id-ID', jadi murid Thai membaca
+     "SENIN, 21 SEPTEMBER" di atas judul berbahasa Thai. Locale-nya kini ikut i18n. */
+  function bcp47() {
+    try { var I = (typeof self !== 'undefined' ? self : this).FiezelI18n; if (I && I.getBcp47) return I.getBcp47() || 'id-ID'; } catch (_) {}
+    return 'id-ID';
+  }
 
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (m) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[m]; }); }
   function pct(v) { return S().pct(v); }
@@ -79,7 +298,16 @@
   /* Lembar akun hidup di app.js dan sudah dipasang di window. Ruang Guru memanggilnya
      lewat satu pintu ini supaya tidak ada dua salinan alur masuk. */
   function openAccount(mode) {
-    try { if (typeof root.openAccountSheet === 'function') { root.openAccountSheet(mode || 'login'); return true; } } catch (_) {}
+    try {
+      if (typeof root.openFiezelAuthModal === 'function') {
+        root.openFiezelAuthModal(mode || 'login');
+        return true;
+      }
+      if (typeof root.openAccountSheet === 'function') {
+        root.openAccountSheet(mode || 'login');
+        return true;
+      }
+    } catch (_) {}
     toast('Lembar akun belum siap — muat ulang aplikasi lalu coba lagi.');
     return false;
   }
@@ -93,6 +321,2295 @@
   function riskPill(r) { return '<span class="tg-pill is-' + r.level + '" title="' + esc(r.reasons.join(', ')) + '">' + (r.level === 'risiko' ? 'Berisiko' : r.level === 'pantau' ? 'Pantau' : 'Aman') + '</span>'; }
   function bar(v, cls) { return '<span class="tg-bar' + (cls ? ' ' + cls : '') + '"><i style="width:' + (v == null ? 0 : Math.round(v * 100)) + '%"></i></span>'; }
   function cell(v) { var t = v == null ? 'none' : v >= 0.75 ? 'hi' : v >= 0.5 ? 'mid' : 'lo'; return '<td class="tg-heat is-' + t + '">' + pct(v) + '</td>'; }
+
+  var MAPEL_LIST = [
+    { id: 'MAT', name: 'Matematika', grade: 'SD / SMP / SMA' },
+    { id: 'IND', name: 'Bahasa Indonesia', grade: 'SD / SMP / SMA' },
+    { id: 'ENG', name: 'Bahasa Inggris', grade: 'SD / SMP / SMA' },
+    { id: 'IPA', name: 'Ilmu Pengetahuan Alam (IPA)', grade: 'SD / SMP' },
+    { id: 'IPS', name: 'Ilmu Pengetahuan Sosial (IPS)', grade: 'SD / SMP' },
+    { id: 'INF', name: 'Informatika', grade: 'SMP / SMA' },
+    { id: 'PPK', name: 'Pendidikan Pancasila', grade: 'SD / SMP / SMA' },
+    { id: 'AGM', name: 'Pendidikan Agama & Budi Pekerti', grade: 'SD / SMP / SMA' },
+    { id: 'FIS', name: 'Fisika', grade: 'SMA' },
+    { id: 'KIM', name: 'Kimia', grade: 'SMA' },
+    { id: 'BIO', name: 'Biologi', grade: 'SMA' },
+    { id: 'EKO', name: 'Ekonomi', grade: 'SMA' },
+    { id: 'GEO', name: 'Geografi', grade: 'SMA' },
+    { id: 'SOS', name: 'Sosiologi', grade: 'SMA' },
+    { id: 'SEJ', name: 'Sejarah', grade: 'SMA' },
+    { id: 'PJK', name: 'PJOK', grade: 'SD / SMP / SMA' },
+    { id: 'SNB', name: 'Seni Budaya & Prakarya', grade: 'SD / SMP / SMA' }
+  ];
+
+  function mapelName(id) {
+    for (var i = 0; i < MAPEL_LIST.length; i++) {
+      if (MAPEL_LIST[i].id === id) return MAPEL_LIST[i].name;
+    }
+    return '';
+  }
+
+  var MAPEL_CATALOG = {
+    MAT: {
+      name: 'Matematika',
+      grade: 'SD / SMP / SMA',
+      competencies: [
+        { code: 'KOMP-MAT-D-7-BAB1-01', name: t('mapel_mat_c1_name', 'Bilangan Bulat'), materi: t('mapel_mat_c1_mat', 'Operasi Penjumlahan & Pengurangan Bilangan Bulat, Perkalian & Pembagian, Faktor & Kelipatan (KPK/FPB), Penerapan Kontekstual'), grade: 7 },
+        { code: 'KOMP-MAT-D-7-BAB2-01', name: t('mapel_mat_c2_name', 'Aljabar'), materi: t('mapel_mat_c2_mat', 'Unsur Bentuk Aljabar, Penjumlahan & Pengurangan Bentuk Aljabar, Perkalian & Pembagian Bentuk Aljabar, Pemodelan & Penyederhanaan'), grade: 7 },
+        { code: 'KOMP-MAT-D-7-BAB3-01', name: t('mapel_mat_c3_name', 'Rasio dan Proporsi'), materi: t('mapel_mat_c3_mat', 'Konsep Rasio & Perbandingan, Perbandingan Senilai & Berbalik Nilai, Skala Peta, Penerapan Kontekstual Kecepatan & Waktu'), grade: 7 },
+        { code: 'KOMP-MAT-D-7-BAB4-01', name: t('mapel_mat_c4_name', 'Bentuk Geometri dan Bangun Datar'), materi: t('mapel_mat_c4_mat', 'Sifat Garis & Sudut, Hubungan Antarsudut, Keliling & Luas Segitiga & Segi Empat (Persegi, Persegi Panjang, Jajar Genjang, Trapesium)'), grade: 7 },
+        { code: 'KOMP-MAT-D-7-BAB5-01', name: t('mapel_mat_c5_name', 'Bab 5: Kesebangunan dan Hubungan Antar Garis'), materi: t('mapel_mat_c5_mat', 'Hubungan Antar Garis & Sudut, Sudut Sejajar & Berpotongan, Konsep Kesebangunan & Kekongruenan Bangun Datar'), grade: 7 },
+        { code: 'KOMP-MAT-D-7-BAB6-01', name: t('mapel_mat_c6_name', 'Bab 6: Data dan Diagram'), materi: t('mapel_mat_c6_mat', 'Investigasi Statistika, Jenis-jenis Data, Penyajian Data (Diagram Batang, Diagram Lingkaran, Line Plot), Interpretasi dan Analisis Diagram'), grade: 7 },
+        { code: 'KOMP-MAT-D-8-BAB1-01', name: t('mapel_mat_c7_name', 'Teorema Pythagoras dan Lingkaran'), materi: t('mapel_mat_c7_mat', 'Teorema Pythagoras & Tripel Pythagoras, Penerapan Pythagoras, Keliling & Luas Lingkaran, Panjang Busur & Luas Juring'), grade: 8 }
+      ],
+      teachingBrief: {
+        summary: t('mapel_mat_tb_sum', 'Penguasaan konsep bilangan rasional, pemodelan aljabar, dan logika spasial geometri.'),
+        hook5Minutes: t('mapel_mat_tb_hook', 'Tunjukkan struk belanja minimarket atau tebak tanggal lahir dengan manipulasi aljabar sederhana.'),
+        boardFormula: t('mapel_mat_tb_board', 'x = (-b ± √(b² - 4ac)) / (2a) · Urutan operasi: Kabataku (Kali Bagi Tambah Kurang)'),
+        commonMisconceptions: [
+          { trap: t('mapel_mat_mc1_trap', 'Aturan tanda negatif'), pattern: t('mapel_mat_mc1_pat', 'Siswa mengira -a - b sama dengan -(a - b)'), fix: t('mapel_mat_mc1_fix', 'Gunakan garis bilangan atau analogi utang-piutang: utang 3 lalu utang 2 = utang 5 (-3 - 2 = -5)') }
+        ]
+      }
+    },
+    IND: {
+      name: 'Bahasa Indonesia',
+      grade: 'SD / SMP / SMA',
+      competencies: [
+        { code: 'KOMP-IND-D-7-BAB1-01', name: t('mapel_ind_c1_name', 'Bab 1: Jelajah Nusantara'), materi: t('mapel_ind_c1_mat', 'Mengakses Informasi & Menjelajah Keindahan Alam, Memahami Gaya & Isi Teks Deskripsi, Unsur Kebahasaan: Kata Berimbuhan meN- & Majas Personifikasi'), grade: 7 },
+        { code: 'KOMP-IND-D-7-BAB2-01', name: t('mapel_ind_c2_name', 'Bab 2: Kelana Cerita Unik'), materi: t('mapel_ind_c2_mat', 'Mengenal Puisi Rakyat (Pantun & Gurindam), Cerita Fantasi, Analisis Tokoh & Alur, Unsur Kebahasaan Teks Narasi'), grade: 7 },
+        { code: 'KOMP-IND-D-7-BAB3-01', name: t('mapel_ind_c3_name', 'Bab 3: Hal yang Baik bagi Tubuh'), materi: t('mapel_ind_c3_mat', 'Memahami Teks Prosedur Kesehatan & Olahraga, Struktur Teks Prosedur (Tujuan, Bahan, Langkah), Unsur Kebahasaan: Kalimat Imperatif & Kata Keterangan'), grade: 7 },
+        { code: 'KOMP-IND-D-7-BAB4-01', name: t('mapel_ind_c4_name', 'Bab 4: Aksi Nyata Pelindung Bumi'), materi: t('mapel_ind_c4_mat', 'Memahami Teks Berita Lingkungan, Unsur Berita 5W+1H (ADIKSIMBA), Struktur Berita (Kepala, Tubuh, Ekor), Membandingkan Media Cetak & Digital'), grade: 7 },
+        { code: 'KOMP-IND-D-7-BAB5-01', name: t('mapel_ind_c5_name', 'Bab V: Membuka Gerbang Dunia'), materi: t('mapel_ind_c5_mat', 'Membedah Buku Bergambar, Bagian-Bagian Buku (Cover, Daftar Isi, Ilustrasi), Merangkum Buku & Peta Pikiran, Menyajikan Teks Tanggapan dan Ragam Kalimat Tanggapan'), grade: 7 },
+        { code: 'KOMP-IND-D-7-BAB6-01', name: t('mapel_ind_c6_name', 'Bab VI: Sampaikan Melalui Surat'), materi: t('mapel_ind_c6_mat', 'Mengenal Surat Pribadi dan Surat Resmi, Unsur-Unsur dan Struktur Surat, Berkomunikasi Santun via Surat, Etika Komunikasi Digital di Ruang Bincang / Email'), grade: 7 },
+        { code: 'KOMP-IND-D-8-BAB1-01', name: t('mapel_ind_c7_name', 'Bab 1: Laporan Hasil Observasi'), materi: t('mapel_ind_c7_mat', 'Memahami Teks Laporan Hasil Observasi (LHO), Struktur Teks LHO (Pernyataan Umum, Deskripsi Bagian, Manfaat), Unsur Kebahasaan Teks LHO'), grade: 8 },
+        { code: 'KOMP-IND-D-8-BAB2-01', name: t('mapel_ind_c8_name', 'Bab 2: Iklan, Slogan, dan Poster'), materi: t('mapel_ind_c8_mat', 'Mengenal Iklan, Slogan, dan Poster, Ciri Bahasa Persuasif & Imperatif, Struktur Iklan Komersial & Layanan Masyarakat'), grade: 8 },
+        { code: 'KOMP-IND-D-8-BAB3-01', name: t('mapel_ind_c9_name', 'Bab 3: Artikel Ilmiah Populer'), materi: t('mapel_ind_c9_mat', 'Memahami Artikel Ilmiah Populer, Membedakan Fakta & Opini, Pengumpulan Data, Unsur Kebahasaan: Kata Denotatif & Konjungsi'), grade: 8 },
+        { code: 'KOMP-IND-D-8-BAB4-01', name: t('mapel_ind_c10_name', 'Bab 4: Teks Ulasan Karya Fiksi'), materi: t('mapel_ind_c10_mat', 'Memahami Teks Ulasan Novel & Cerpen, Struktur Teks Ulasan (Identitas, Orientasi, Sinopsis, Evaluasi), Unsur Kebahasaan Teks Ulasan'), grade: 8 },
+        { code: 'KOMP-IND-D-8-BAB5-01', name: t('mapel_ind_c11_name', 'Bab 5: Teks Drama'), materi: t('mapel_ind_c11_mat', 'Mengenal Pertunjukan & Naskah Drama, Unsur Intrinsik Drama (Tokoh, Dialog, Kramagung, Konflik), Pementasan Drama'), grade: 8 },
+        { code: 'KOMP-IND-D-8-BAB6-01', name: t('mapel_ind_c12_name', 'Bab VI: Menulis Teks Pidato'), materi: t('mapel_ind_c12_mat', 'Memahami Teks Pidato Persuasif, Struktur Teks Pidato (Salam Pembuka, Pendahuluan, Isi, Penutup), Kebahasaan Pidato (Kata Sapaan, Kalimat Persuasif, Kata Kerja Mental)'), grade: 8 }
+      ],
+      teachingBrief: {
+        summary: t('mapel_ind_tb_sum', 'Kemampuan literasi membaca kritis, penalaran logika argumen, dan sintesis wacana.'),
+        hook5Minutes: t('mapel_ind_tb_hook', 'Tampilkan satu judul berita sensasional: minta murid memisahkan mana fakta dan mana opini penulis.'),
+        boardFormula: t('mapel_ind_tb_board', 'Ide Pokok = Kalimat Utama; Fakta = Data empiris terverifikasi; Opini = Pandangan / kata sifat subjektif'),
+        commonMisconceptions: [
+          { trap: t('mapel_ind_mc1_trap', 'Tertukar fakta dan opini'), pattern: t('mapel_ind_mc1_pat', 'Siswa menganggap pernyataan tokoh penting otomatis selalu fakta'), fix: t('mapel_ind_mc1_fix', 'Uji dengan pertanyaan verifikasi: dapatkah dibuktikan dengan data terukur atau hanya penilaian?') }
+        ]
+      }
+    },
+    ENG: {
+      name: 'Bahasa Inggris',
+      grade: 'SD / SMP / SMA',
+      competencies: [
+        { code: 'KOMP-ENG-D-7-BAB1-01', name: t('mapel_eng_c1_name', 'Chapter 1: About Me'), materi: t('mapel_eng_c1_mat', 'Introducing Oneself and Others, Expressing Hobbies and Preferences, Describing People Physical Traits, Subject & Possessive Pronouns'), grade: 7 },
+        { code: 'KOMP-ENG-D-7-BAB2-01', name: t('mapel_eng_c2_name', 'Chapter 2: Culinary and Me'), materi: t('mapel_eng_c2_mat', 'Describing Foods & Drinks (Taste & Texture), Recipe Procedural Text Analysis, Imperative Verbs & Cooking Steps'), grade: 7 },
+        { code: 'KOMP-ENG-D-7-BAB3-01', name: t('mapel_eng_c3_name', 'Chapter 3: Home Sweet Home'), materi: t('mapel_eng_c3_mat', 'Rooms & Furniture in a House, Describing House Chores & Cleaning Activities, Prepositions of Place (in, on, under, next to), Rules and Abilities (can/can\'t)'), grade: 7 },
+        { code: 'KOMP-ENG-D-8-BAB1-01', name: t('mapel_eng_c4_name', 'Chapter 1: Celebrating Independence Day'), materi: t('mapel_eng_c4_mat', 'Describing Past Independence Day Events, Recount Text Structure, Simple Past Tense (Regular & Irregular Verbs), Past Time Connectors'), grade: 8 },
+        { code: 'KOMP-ENG-D-8-BAB2-01', name: t('mapel_eng_c5_name', 'Chapter 2: Kindness Begins with Me'), materi: t('mapel_eng_c5_mat', 'Reading Narrative Texts & Fables, Moral Values of Kindness, Narrative Structure (Orientation, Complication, Resolution), Direct & Indirect Speech'), grade: 8 },
+        { code: 'KOMP-ENG-D-8-BAB3-01', name: t('mapel_eng_c6_name', 'Chapter 3: Love Our World'), materi: t('mapel_eng_c6_mat', 'Environmental Conservation Texts, Reducing Plastic Waste, Procedural Posters & Tips, Imperative Expressions for Saving Water/Energy'), grade: 8 },
+        { code: 'KOMP-ENG-D-8-BAB4-01', name: t('mapel_eng_c7_name', 'Chapter 4: No Littering'), materi: t('mapel_eng_c7_mat', 'Recounting Waste Clean-Up Events, Waste Sorting & Management, Past Continuous Tense (was/were + v-ing), Environmental Action'), grade: 8 },
+        { code: 'KOMP-ENG-D-8-BAB5-01', name: t('mapel_eng_c8_name', 'Chapter 5: Embrace Yourself'), materi: t('mapel_eng_c8_mat', 'Describing Feelings and Personality Traits, Personal Recount Text, Self-Acceptance & Empathy, Encouraging Expressions'), grade: 8 },
+        { code: 'KOMP-ENG-D-9-BAB1-01', name: t('mapel_eng_c9_name', 'Chapter 1: Exploring Fauna of Indonesia'), materi: t('mapel_eng_c9_mat', 'Reading Report Texts on Indonesian Wildlife (Bekantan, Orangutan, Birds), Passive Voice in Science Context, Describing Animals Physical & Behavior'), grade: 9 },
+        { code: 'KOMP-ENG-D-9-BAB2-01', name: t('mapel_eng_c10_name', 'Chapter 2: Taking Care of Yourself'), materi: t('mapel_eng_c10_mat', 'Giving Advice & Suggestions (should/shouldn\'t), Expressing Agreement & Disagreement, Healthy Habits & Mental Health'), grade: 9 },
+        { code: 'KOMP-ENG-D-9-BAB3-01', name: t('mapel_eng_c11_name', 'Chapter 3: Journey to the Fantasy World'), materi: t('mapel_eng_c11_mat', 'Analyzing Fantasy Narrative Texts, Character & Plot Analysis, Indirect/Reported Speech in Stories, Moral Values in Literature'), grade: 9 },
+        { code: 'KOMP-ENG-D-9-BAB4-01', name: t('mapel_eng_c12_name', 'Chapter 4: Upcycling Used Materials'), materi: t('mapel_eng_c12_mat', 'Upcycling & Recycling Crafts Procedural Texts, Imperative Action Verbs, DIY Project Instructions, Environmental Sustainability'), grade: 9 },
+        { code: 'KOMP-ENG-D-9-BAB5-01', name: t('mapel_eng_c13_name', 'Chapter 5: Digital Life'), materi: t('mapel_eng_c13_mat', 'Digital Literacy & Online Safety, Analytical Exposition Texts, Expressing Arguments & Opinions, Cyber Etiquette'), grade: 9 }
+      ],
+      teachingBrief: {
+        summary: t('mapel_eng_tb_sum', 'Pengembangan kompetensi komunikatif lintas genre teks: deskripsi, recount, dan eksposisi analitis.'),
+        hook5Minutes: t('mapel_eng_tb_hook', 'Flash 3 foto situasi misterius di proyektor: minta siswa menduga apa yang terjadi kemarin menggunakan Simple Past.'),
+        boardFormula: t('mapel_eng_tb_board', 'Recount: Orientation ➔ Events ➔ Re-orientation; Simple Past: S + V2 / did not + V1'),
+        commonMisconceptions: [
+          { trap: t('mapel_eng_mc1_trap', 'Double past tense'), pattern: t('mapel_eng_mc1_pat', 'Siswa menulis did you went? atau he did not saw'), fix: t('mapel_eng_mc1_fix', 'Auxiliary did sudah menyerap bentuk lampau; kata kerja utama kembali ke bare infinitive (did you go?)') }
+        ]
+      }
+    },
+    IPA: {
+      name: 'Ilmu Pengetahuan Alam (IPA)',
+      grade: 'SD / SMP',
+      competencies: [
+        { code: 'KOMP-IPA-D-7-BAB1-01', name: t('mapel_ipa_c1_name', 'Hakikat Ilmu Sains dan Metode Ilmiah'), materi: t('mapel_ipa_c1_mat', 'Pengukuran besaran pokok dan turunan, konversi satuan SI, dan keselamatan laboratorium'), grade: 7 },
+        { code: 'KOMP-IPA-D-7-BAB2-01', name: t('mapel_ipa_c2_name', 'Zat dan Perubahannya'), materi: t('mapel_ipa_c2_mat', 'Wujud materi, wujud fisika-kimia, dan kerapatan massa jenis'), grade: 7 },
+        { code: 'KOMP-IPA-D-7-BAB3-01', name: t('mapel_ipa_c3_name', 'Suhu, Kalor, dan Pemuaian'), materi: t('mapel_ipa_c3_mat', 'Konsep suhu dan termometer, kalor dan perubahannya, serta pemuaian zat'), grade: 7 },
+        { code: 'KOMP-IPA-D-7-BAB4-01', name: t('mapel_ipa_c4_name', 'Gerak dan Gaya'), materi: t('mapel_ipa_c4_mat', 'Gerak lurus beraturan, gaya dan Hukum Newton, serta penerapannya'), grade: 7 },
+        { code: 'KOMP-IPA-D-7-BAB5-01', name: t('mapel_ipa_c5_name', 'Karakteristik dan Klasifikasi Makhluk Hidup'), materi: t('mapel_ipa_c5_mat', 'Kunci determinasi makhluk hidup, ciri-ciri kehidupan, dan taksonomi'), grade: 7 },
+        { code: 'KOMP-IPA-D-7-BAB6-01', name: t('mapel_ipa_c6_name', 'Ekologi dan Pelestarian Lingkungan'), materi: t('mapel_ipa_c6_mat', 'Interaksi antarkomponen ekosistem, rantai makanan, jaring-jaring makanan, dan konservasi alam'), grade: 7 },
+        { code: 'KOMP-IPA-D-7-BAB7-01', name: t('mapel_ipa_c7_name', 'Bumi dan Tata Surya'), materi: t('mapel_ipa_c7_mat', 'Sistem tata surya, rotasi dan revolusi bumi, fase bulan, dan struktur lapisan bumi'), grade: 7 },
+        { code: 'KOMP-IPA-D-8-BAB1-01', name: t('mapel_ipa_c8_name', 'Pengenalan Sel'), materi: t('mapel_ipa_c8_mat', 'Struktur & Fungsi Organel Sel, Perbedaan Sel Tumbuhan & Sel Hewan, Spesialisasi Sel & Penggunaan Mikroskop'), grade: 8 },
+        { code: 'KOMP-IPA-D-8-BAB2-01', name: t('mapel_ipa_c9_name', 'Struktur dan Fungsi Tubuh Makhluk Hidup'), materi: t('mapel_ipa_c9_mat', 'Sistem Pencernaan & Nutrisi, Sistem Peredaran Darah & Jantung, Sistem Pernapasan & Paru-paru, Sistem Ekskresi & Ginjal'), grade: 8 },
+        { code: 'KOMP-IPA-D-8-BAB3-01', name: t('mapel_ipa_c10_name', 'Usaha, Energi, dan Pesawat Sederhana'), materi: t('mapel_ipa_c10_mat', 'Konsep Usaha & Energi, Energi Kinetik & Potensial, Keuntungan Mekanis Pesawat Sederhana (Tuas, Katrol, Bidang Miring)'), grade: 8 },
+        { code: 'KOMP-IPA-D-8-BAB4-01', name: t('mapel_ipa_c11_name', 'Tekanan'), materi: t('mapel_ipa_c11_mat', 'Tekanan Zat Padat & Hidrostatis, Hukum Archimedes & Pascal, Tekanan Gas/Udara, Aplikasi pada Makhluk Hidup'), grade: 8 },
+        { code: 'KOMP-IPA-D-8-BAB5-01', name: t('mapel_ipa_c12_name', 'Getaran, Gelombang, dan Cahaya'), materi: t('mapel_ipa_c12_mat', 'Getaran & Frekuensi, Gelombang Transversal & Longitudinal, Gelombang Bunyi & Ekolokasi, Sifat Cahaya & Alat Optik'), grade: 8 },
+        { code: 'KOMP-IPA-D-8-BAB6-01', name: t('mapel_ipa_c13_name', 'Unsur, Senyawa, dan Campuran'), materi: t('mapel_ipa_c13_mat', 'Klasifikasi Materi (Unsur, Senyawa, Campuran), Larutan, Koloid & Suspensi, Metode Pemisahan Campuran (Filtrasi, Distilasi, Kromatografi)'), grade: 8 }
+      ],
+      teachingBrief: {
+        summary: t('mapel_ipa_tb_sum', 'Penyelidikan ilmiah empiris fenomena alam, organisasi materi kehidupan, dan konversi energi.'),
+        hook5Minutes: t('mapel_ipa_tb_hook', 'Tunjukkan balon yang digosokkan ke kain wol lalu menempel di dinding atau mengangkat potongan kertas.'),
+        boardFormula: t('mapel_ipa_tb_board', 'V = I · R; Besaran Pokok SI: Panjang (m), Massa (kg), Waktu (s), Suhu (K), Arus (A)'),
+        commonMisconceptions: [
+          { trap: t('mapel_ipa_mc1_trap', 'Massa tertukar dengan berat'), pattern: t('mapel_ipa_mc1_pat', 'Siswa mengira massa dan berat adalah besaran yang persis sama'), fix: t('mapel_ipa_mc1_fix', 'Massa (kg) adalah jumlah materi konstan di mana pun; berat (N) adalah gaya gravitasi yang berubah menurut lokasi') }
+        ]
+      }
+    },
+    IPS: {
+      name: 'Ilmu Pengetahuan Sosial (IPS)',
+      grade: 'SD / SMP',
+      competencies: [
+        { code: 'KOMP-IPS-D-7-BAB1-01', name: t('mapel_ips_c1_name', 'Tema 01: Keberadaan Diri dan Keluarga'), materi: t('mapel_ips_c1_mat', 'Mengenal Sejarah Keluarga & Silsilah, Pemahaman Lokasi pada Peta & Komponen Peta, Interaksi Sosial & Agen Sosialisasi, Pemenuhan Kebutuhan Manusia'), grade: 7 },
+        { code: 'KOMP-IPS-D-7-BAB2-01', name: t('mapel_ips_c2_name', 'Tema 02: Keberagaman Lingkungan Sekitar'), materi: t('mapel_ips_c2_mat', 'Proses Pembentukan Bumi & Masa Praaksara, Keberagaman Bentang Alam & Lingkungan, Interaksi Manusia & Konservasi SDA, Peran Lembaga Sosial & Ekonomi'), grade: 7 },
+        { code: 'KOMP-IPS-D-7-BAB3-01', name: t('mapel_ips_c3_name', 'Tema 03: Potensi Ekonomi Lingkungan'), materi: t('mapel_ips_c3_mat', 'Potensi Sumber Daya Alam (Hutan, Tambang, Laut), Kegiatan Ekonomi (Produksi, Distribusi, Konsumsi), Hukum Permintaan & Penawaran, Pasar & Peran Teknologi'), grade: 7 },
+        { code: 'KOMP-IPS-D-7-BAB4-01', name: t('mapel_ips_c4_name', 'Tema IV: Pemberdayaan Masyarakat'), materi: t('mapel_ips_c4_mat', 'Keanekaragaman Keragaman Etnis & Budaya Indonesia, Pemberdayaan Ekonomi Masyarakat, Literasi & Pengelolaan Keuangan Keluarga, Peran Komunitas Lokal'), grade: 7 },
+        { code: 'KOMP-IPS-D-8-BAB1-01', name: t('mapel_ips_c5_name', 'Tema 01: Kondisi Geografis dan Pelestarian Sumber Daya Alam'), materi: t('mapel_ips_c5_mat', 'Kondisi Geografis & Iklim Indonesia, Keragaman Flora & Fauna (Garis Wallace & Weber), Pelestarian Sumber Daya Alam, Potensi Maritim'), grade: 8 }
+      ],
+      teachingBrief: {
+        summary: t('mapel_ips_tb_sum', 'Kajian keterhubungan spasial, pranata sosial kemasyarakatan, dan dinamika perekonomian masyarakat.'),
+        hook5Minutes: t('mapel_ips_tb_hook', 'Minta murid memeriksa label asal baju atau sepatu yang mereka kenakan untuk membuktikan perdagangan antarwilayah.'),
+        boardFormula: t('mapel_ips_tb_board', 'Kebutuhan Tak Terbatas + Sumber Daya Terbatas = Kelangkaan (Scarcity) ➔ Menuntut Skala Prioritas'),
+        commonMisconceptions: [
+          { trap: t('mapel_ips_mc1_trap', 'Konsep kelangkaan ekonomi'), pattern: t('mapel_ips_mc1_pat', 'Mengira langka berarti barangnya hampir punah di muka bumi'), fix: t('mapel_ips_mc1_fix', 'Langka dalam ekonomi berarti jumlah yang diinginkan melampaui jumlah yang tersedia cuma-cuma tanpa pengorbanan') }
+        ]
+      }
+    },
+    INF: {
+      name: 'Informatika',
+      grade: 'SMP / SMA',
+      competencies: [
+        { code: 'KOMP-INF-D-7-BK-01', name: t('mapel_inf_c1_name', 'Berpikir Komputasional & 4 Pilar Problem Solving'), materi: t('mapel_inf_c1_mat', 'Dekomposisi, pengenalan pola, abstraksi, dan perancangan algoritma langkah terurut') },
+        { code: 'KOMP-INF-D-8-JKI-01', name: t('mapel_inf_c2_name', 'Jaringan Komputer, Topologi & Keamanan Internet'), materi: t('mapel_inf_c2_mat', 'Perbedaan LAN vs WAN, protokol data, enkripsi sederhana, dan etika privasi siber') },
+        { code: 'KOMP-INF-E-10-AP-01', name: t('mapel_inf_c3_name', 'Algoritma Pemrograman: Percabangan & Perulangan'), materi: t('mapel_inf_c3_mat', 'Penerapan variabel, percabangan if-else, dan loop for/while untuk pemecahan masalah') }
+      ],
+      teachingBrief: {
+        summary: t('mapel_inf_tb_sum', 'Fondasi berpikir komputasional logis, struktur data, dan rekayasa perangkat lunak dasar.'),
+        hook5Minutes: t('mapel_inf_tb_hook', 'Tantang murid memberikan instruksi membuat teh manis ke guru yang berperan sebagai robot yang harfiah.'),
+        boardFormula: t('mapel_inf_tb_board', 'Input ➔ Proses (Kondisi/Branch + Loop) ➔ Output; 4 Pilar: Dekomposisi, Pola, Abstraksi, Algoritma'),
+        commonMisconceptions: [
+          { trap: t('mapel_inf_mc1_trap', 'Sintaks disamakan dengan algoritma'), pattern: t('mapel_inf_mc1_pat', 'Siswa mengira menghafal kode bahasa pemrograman lebih penting daripada logika masalah'), fix: t('mapel_inf_mc1_fix', 'Rancang pseudocode dan diagram alir (flowchart) di kertas sebelum menulis satu baris sintaks apa pun') }
+        ]
+      }
+    },
+    PPK: {
+      name: 'Pendidikan Pancasila',
+      grade: 'SD / SMP / SMA',
+      competencies: [
+        { code: 'KOMP-PPK-D-7-PAN-01', name: t('mapel_ppk_c1_name', 'Penerapan Nilai Pancasila dalam Keseharian'), materi: t('mapel_ppk_c1_mat', 'Pengamalan sila-sila Pancasila di lingkungan keluarga, sekolah, dan masyarakat luas') },
+        { code: 'KOMP-PPK-D-8-UUD-01', name: t('mapel_ppk_c2_name', 'Konstitusi & Hierarki Peraturan Perundang-undangan'), materi: t('mapel_ppk_c2_mat', 'UUD NRI Tahun 1945 sebagai hukum dasar tertinggi dan tata urutan norma perundangan') },
+        { code: 'KOMP-PPK-E-10-NKRI-01', name: t('mapel_ppk_c3_name', 'Bhinneka Tunggal Ika & Penegakan Hak Warga Negara'), materi: t('mapel_ppk_c3_mat', 'Kesadaran bela negara, toleransi keberagaman ras/agama, dan jaminan HAM konstitusional') }
+      ],
+      teachingBrief: {
+        summary: t('mapel_ppk_tb_sum', 'Penghayatan ideologi Pancasila, ketaatan konstitusional, dan kebajikan kewargaan bernegara.'),
+        hook5Minutes: t('mapel_ppk_tb_hook', 'Diskusikan kasus nyata tentang musyawarah mufakat di pemilihan ketua kelas saat ada perbedaan suara yang ketat.'),
+        boardFormula: t('mapel_ppk_tb_board', 'Hierarki Hukum: UUD 1945 ➔ Ketetapan MPR ➔ UU / Perppu ➔ Peraturan Pemerintah ➔ Perpres ➔ Perda'),
+        commonMisconceptions: [
+          { trap: t('mapel_ppk_mc1_trap', 'Hak tanpa kewajiban'), pattern: t('mapel_ppk_mc1_pat', 'Siswa hanya menuntut pemenuhan hak tanpa menyadari kewajiban warga negara'), fix: t('mapel_ppk_mc1_fix', 'Hak asasi seorang warga negara dibatasi secara konstitusional oleh hak asasi orang lain di sekitarnya') }
+        ]
+      }
+    },
+    AGM: {
+      name: 'Pendidikan Agama & Budi Pekerti',
+      grade: 'SD / SMP / SMA',
+      competencies: [
+        { code: 'KOMP-AGM-D-7-AKL-01', name: t('mapel_agm_c1_name', 'Budi Pekerti Mulia & Kejujuran Diri'), materi: t('mapel_agm_c1_mat', 'Menerapkan integritas, amanah, dan rasa hormat kepada orang tua serta pendidik') },
+        { code: 'KOMP-AGM-D-8-KIT-01', name: t('mapel_agm_c2_name', 'Pemahaman Kitab Suci & Nilai Kasih Sayang'), materi: t('mapel_agm_c2_mat', 'Memaknai pesan suci dalam tindakan welas asih dan kepedulian sosial kaum rentan') },
+        { code: 'KOMP-AGM-E-10-TOL-01', name: t('mapel_agm_c3_name', 'Moderasi Beragama & Kerukunan Sesama'), materi: t('mapel_agm_c3_mat', 'Menjaga persaudaraan lintas iman, menolak ekstremisme, dan merawat kedamaian bangsa') }
+      ],
+      teachingBrief: {
+        summary: t('mapel_agm_tb_sum', 'Pembentukan karakter spiritual luhur, keteladanan moral, dan moderasi beragama inklusif.'),
+        hook5Minutes: t('mapel_agm_tb_hook', 'Dilema moral: kamu menemukan dompet berisi sejumlah uang dan obat darurat resep dokter tanpa identitas lain.'),
+        boardFormula: t('mapel_agm_tb_board', 'Integritas Spiritual = Selarasnya niat hati, ucapan lisan, dan amal perbuatan nyata dalam kebaikan'),
+        commonMisconceptions: [
+          { trap: t('mapel_agm_mc1_trap', 'Ritual terpisah dari budi pekerti'), pattern: t('mapel_agm_mc1_pat', 'Mengira kesalehan hanya diukur dari ritual ibadah tanpa memedulikan akhlak sesama'), fix: t('mapel_agm_mc1_fix', 'Budi pekerti luhur terhadap sesama dan lingkungan adalah tolok ukur utama kematangan spiritual') }
+        ]
+      }
+    },
+    FIS: {
+      name: 'Fisika',
+      grade: 'SMA',
+      competencies: [
+        { code: 'KOMP-FIS-E-10-KIN-01', name: t('mapel_fis_c1_name', 'Kinematika Gerak Lurus Beraturan & Berubah'), materi: t('mapel_fis_c1_mat', 'Analisis grafik v-t, s-t, kecepatan sesaat, dan percepatan tetap pada lintasan linier') },
+        { code: 'KOMP-FIS-F-11-DIN-01', name: t('mapel_fis_c2_name', 'Dinamika Gerak & Hukum Newton tentang Gaya'), materi: t('mapel_fis_c2_mat', 'Diagram gaya bebas, gaya gesek statis-kinetis, aksi-reaksi, dan hukum kelembaman') },
+        { code: 'KOMP-FIS-F-12-ELE-01', name: t('mapel_fis_c3_name', 'Medan Listrik, Potensial & Kapasitansi'), materi: t('mapel_fis_c3_mat', 'Hukum Coulomb, kuat medan elektrostatik, energi potensial listrik, dan rangkaian kapasitor') }
+      ],
+      teachingBrief: {
+        summary: t('mapel_fis_tb_sum', 'Model matematis perilaku materi, mekanika gerak alam semesta, dan interaksi gelombang-energi.'),
+        hook5Minutes: t('mapel_fis_tb_hook', 'Jatuhkan selembar kertas datar vs kertas yang diremas menjadi bola padat untuk mengamati efek hambatan udara.'),
+        boardFormula: t('mapel_fis_tb_board', 'vt = v0 + at · s = v0·t + ½at² · vt² = v0² + 2as · ΣF = m · a'),
+        commonMisconceptions: [
+          { trap: t('mapel_fis_mc1_trap', 'Gaya menopang gerak (Aristotelian)'), pattern: t('mapel_fis_mc1_pat', 'Siswa mengira benda membutuhkan dorongan gaya terus-menerus agar tetap bergerak maju'), fix: t('mapel_fis_mc1_fix', 'Hukum Newton I: Jika resultan gaya nol, benda bergerak akan terus bergerak dengan kecepatan tetap') }
+        ]
+      }
+    },
+    KIM: {
+      name: 'Kimia',
+      grade: 'SMA',
+      competencies: [
+        { code: 'KOMP-KIM-E-10-STR-01', name: t('mapel_kim_c1_name', 'Struktur Atom & Sistem Periodik Unsur'), materi: t('mapel_kim_c1_mat', 'Konfigurasi elektron mekanika kuantum, nomor massa, isotop, dan jari-jari periodik atom') },
+        { code: 'KOMP-KIM-F-11-STO-01', name: t('mapel_kim_c2_name', 'Stoikiometri & Konsep Mol Reaksi Kimia'), materi: t('mapel_kim_c2_mat', 'Penyetaraan reaksi, pereaksi pembatas, persen hasil, dan molaritas larutan') },
+        { code: 'KOMP-KIM-F-12-ASB-01', name: t('mapel_kim_c3_name', 'Keseimbangan Larutan Asam-Basa & pH Titrasi'), materi: t('mapel_kim_c3_mat', 'Teori Bronsted-Lowry, derajat disosiasi, larutan penyangga (buffer), dan titik ekivalen') }
+      ],
+      teachingBrief: {
+        summary: t('mapel_kim_tb_sum', 'Kajian komposisi zat submikroskopis, transformasi reaksi materi, dan kesetimbangan energetika.'),
+        hook5Minutes: t('mapel_kim_tb_hook', 'Reaksikan cuka dapur dengan soda kue di botol: gas CO2 yang dihasilkan akan meniup balon sendiri.'),
+        boardFormula: t('mapel_kim_tb_board', 'Mol (n) = massa / Mr · STP: V = n × 22,4 L · pH = -log[H+] · Buffer: [H+] = Ka × (mol asam / mol basa konjugasi)'),
+        commonMisconceptions: [
+          { trap: t('mapel_kim_mc1_trap', 'Mengubah angka indeks senyawa'), pattern: t('mapel_kim_mc1_pat', 'Siswa mengubah angka subskrip senyawa untuk menyetarakan jumlah atom reaksi'), fix: t('mapel_kim_mc1_fix', 'Indeks adalah identitas permanen zat kimia; hanya angka koefisien di depan molekul yang boleh disetel') }
+        ]
+      }
+    },
+    BIO: {
+      name: 'Biologi',
+      grade: 'SMA',
+      competencies: [
+        { code: 'KOMP-BIO-E-10-EKO-01', name: t('mapel_bio_c1_name', 'Keanekaragaman Hayati & Keseimbangan Ekosistem'), materi: t('mapel_bio_c1_mat', 'Jaring makanan, aliran energi piramida trofik, dan konservasi biodiversitas tropis') },
+        { code: 'KOMP-BIO-F-11-FIS-01', name: t('mapel_bio_c2_name', 'Fisiologi Tumbuhan & Sistem Peredaran Darah'), materi: t('mapel_bio_c2_mat', 'Reaksi terang-gelap fotosintesis, transpirasi xilem-floem, dan hemostasis kardiovaskular') },
+        { code: 'KOMP-BIO-F-12-GEN-01', name: t('mapel_bio_c3_name', 'Genetika Mendel, Sintesis Protein & Mutasi DNA'), materi: t('mapel_bio_c3_mat', 'Transkripsi mRNA, translasi kodon asam amino, serta persilangan monohibrid dan dihibrid') }
+      ],
+      teachingBrief: {
+        summary: t('mapel_bio_tb_sum', 'Sistem kehidupan hierarkis dari transkripsi genetika hingga keseimbangan ekologis biosfer.'),
+        hook5Minutes: t('mapel_bio_tb_hook', 'Mengapa daun tampak hijau tua di atas tetapi lebih pucat di sisi bawah? Diskusikan letak kloroplas palisade.'),
+        boardFormula: t('mapel_bio_tb_board', 'Fotosintesis: 6CO2 + 6H2O + Cahaya ➔ C6H12O6 + 6O2 · Monohibrid Mendel F2: Rasio Genotipe 1:2:1, Fenotipe 3:1'),
+        commonMisconceptions: [
+          { trap: t('mapel_bio_mc1_trap', 'Tumbuhan tidak berespirasi'), pattern: t('mapel_bio_mc1_pat', 'Siswa mengira tumbuhan hanya melakukan fotosintesis dan tidak bernapas mengambil oksigen'), fix: t('mapel_bio_mc1_fix', 'Tumbuhan berespirasi seluler terus-menerus selama 24 jam (siang dan malam) untuk menghasilkan ATP di mitokondria') }
+        ]
+      }
+    },
+    EKO: {
+      name: 'Ekonomi',
+      grade: 'SMA',
+      competencies: [
+        { code: 'KOMP-EKO-E-10-PAS-01', name: t('mapel_eko_c1_name', 'Keseimbangan Pasar: Kurva Permintaan & Penawaran'), materi: t('mapel_eko_c1_mat', 'Hukum permintaan-penawaran, elastisitas harga, dan penentuan titik ekuilibrium pasar') },
+        { code: 'KOMP-EKO-F-11-MON-01', name: t('mapel_eko_c2_name', 'Kebijakan Moneter, Fiskal & Pengendalian Inflasi'), materi: t('mapel_eko_c2_mat', 'Operasi pasar terbuka Bank Indonesia, suku bunga acuan, APBN belanja negara, dan daya beli') },
+        { code: 'KOMP-EKO-F-12-AKU-01', name: t('mapel_eko_c3_name', 'Persamaan Dasar Akuntansi & Laporan Keuangan'), materi: t('mapel_eko_c3_mat', 'Pencatatan debit-kredit transaksi, neraca saldo, jurnal penyesuaian, dan laba rugi') }
+      ],
+      teachingBrief: {
+        summary: t('mapel_eko_tb_sum', 'Alokasi sumber daya langka, stabilitas makroekonomi, dan akuntabilitas pelaporan keuangan.'),
+        hook5Minutes: t('mapel_eko_tb_hook', 'Diskusikan mengapa harga payung atau mantel hujan melonjak tinggi saat badai deras melanda terminal bus.'),
+        boardFormula: t('mapel_eko_tb_board', 'Qd = Qs (Titik Ekuilibrium) · Persamaan Akuntansi: Aset = Liabilitas (Kewajiban) + Ekuitas (Modal)'),
+        commonMisconceptions: [
+          { trap: t('mapel_eko_mc1_trap', 'Pergerakan kurva vs pergeseran kurva'), pattern: t('mapel_eko_mc1_pat', 'Menyamakan perubahan harga barang itu sendiri dengan perubahan faktor selera/pendapatan konsumen'), fix: t('mapel_eko_mc1_fix', 'Perubahan harga barang menggeser titik di sepanjang kurva; faktor pendapatan/tren menggeser posisi seluruh kurva') }
+        ]
+      }
+    },
+    GEO: {
+      name: 'Geografi',
+      grade: 'SMA',
+      competencies: [
+        { code: 'KOMP-GEO-E-10-PIG-01', name: t('mapel_geo_c1_name', 'Prinsip & Konsep Dasar Geografi Spasial'), materi: t('mapel_geo_c1_mat', '4 prinsip geografi, 10 konsep esensial geosfer, dan pendekatan spasial keruangan') },
+        { code: 'KOMP-GEO-F-11-LIT-01', name: t('mapel_geo_c2_name', 'Dinamika Litosfer & Mitigasi Gempa Vulkanik'), materi: t('mapel_geo_c2_mat', 'Pergerakan lempeng tektonik, siklus batuan, erosi pelapukan, dan jalur cincin api (Ring of Fire)') },
+        { code: 'KOMP-GEO-F-12-SIG-01', name: t('mapel_geo_c3_name', 'Penginderaan Jauh & Sistem Informasi Geografis'), materi: t('mapel_geo_c3_mat', 'Interpretasi citra satelit rona-tekstur, tumpang susun (overlay) peta tematik peruntukan lahan') }
+      ],
+      teachingBrief: {
+        summary: t('mapel_geo_tb_sum', 'Analisis fenomena geosfer multidimensi, keterkaitan ruang-lingkungan, dan ketahanan mitigasi bencana.'),
+        hook5Minutes: t('mapel_geo_tb_hook', 'Tampilkan citra satelit kota asal siswa di proyektor: amati mengapa permukiman terpusat di sepanjang bantaran sungai.'),
+        boardFormula: t('mapel_geo_tb_board', 'Skala Peta = Jarak pada Peta / Jarak Sebenarnya di Lapangan · 4 Prinsip: Distribusi, Interelasi, Deskripsi, Korologi'),
+        commonMisconceptions: [
+          { trap: t('mapel_geo_mc1_trap', 'Skala peta besar vs kecil'), pattern: t('mapel_geo_mc1_pat', 'Siswa mengira penyebut angka 1:1.000.000 adalah skala peta besar karena nominal angkanya besar'), fix: t('mapel_geo_mc1_fix', '1/1.000.000 adalah pecahan kecil (kurang mendalam); sebaliknya 1/5.000 adalah pecahan besar (tampak rinci)') }
+        ]
+      }
+    },
+    SOS: {
+      name: 'Sosiologi',
+      grade: 'SMA',
+      competencies: [
+        { code: 'KOMP-SOS-E-10-IND-01', name: t('mapel_sos_c1_name', 'Sosialisasi, Identitas Diri & Interaksi Kelompok'), materi: t('mapel_sos_c1_mat', 'Tahapan sosialisasi kepribadian, agen keluarga-sekolah-media, dan konformitas norma') },
+        { code: 'KOMP-SOS-F-11-KON-01', name: t('mapel_sos_c2_name', 'Konflik Sosial, Kekerasan & Resolusi Damai'), materi: t('mapel_sos_c2_mat', 'Sebab terjadinya friksi sosial, mediasi pihak ketiga, konsiliasi, dan transformasi damai') },
+        { code: 'KOMP-SOS-F-12-KET-01', name: t('mapel_sos_c3_name', 'Ketimpangan Sosial Komunitas & Transformasi Digital'), materi: t('mapel_sos_c3_mat', 'Stratifikasi kelas sosial, marginalisasi budaya lokal, dan kearifan masyarakat hadapi modernitas') }
+      ],
+      teachingBrief: {
+        summary: t('mapel_sos_tb_sum', 'Pemahaman sosiologis interaksi relasional, diferensiasi struktural, dan penyelesaian konflik beradab.'),
+        hook5Minutes: t('mapel_sos_tb_hook', 'Diskusikan tren gaya hidup viral di media sosial dan bagaimana tekanan teman sebaya (peer pressure) memengaruhinya.'),
+        boardFormula: t('mapel_sos_tb_board', 'Resolusi Sengketa: Mediasi (Pihak Ke-3 Netral Fasilitator) vs Arbitrasi (Pihak Ke-3 Pengambil Keputusan Mengikat)'),
+        commonMisconceptions: [
+          { trap: t('mapel_sos_mc1_trap', 'Konflik dianggap selalu merusak'), pattern: t('mapel_sos_mc1_pat', 'Menganggap setiap konflik sosial selalu destruktif dan wajib disingkirkan tanpa dikelola'), fix: t('mapel_sos_mc1_fix', 'Konflik sosial terkelola justru dapat memperjelas batas norma yang kabur dan mendorong reformasi konstruktif') }
+        ]
+      }
+    },
+    SEJ: {
+      name: 'Sejarah',
+      grade: 'SMA',
+      competencies: [
+        { code: 'KOMP-SEJ-E-10-MET-01', name: t('mapel_sej_c1_name', 'Metode Penelitian Sejarah & Kritik Sumber'), materi: t('mapel_sej_c1_mat', 'Heuristik jejak primer-sekunder, verifikasi autentisitas arsip, dan sintesis historiografi') },
+        { code: 'KOMP-SEJ-F-11-PER-01', name: t('mapel_sej_c2_name', 'Pergerakan Nasional & Proklamasi Kemerdekaan'), materi: t('mapel_sej_c2_mat', 'Lahirnya Budi Utomo, Sumpah Pemuda 1928, BPUPK-PPKI, dan peristiwa Rengasdengklok 1945') },
+        { code: 'KOMP-SEJ-F-12-DIN-01', name: t('mapel_sej_c3_name', 'Dinamika Demokrasi Parlementer & Terpimpin'), materi: t('mapel_sej_c3_mat', 'Pergantian kabinet, Konferensi Asia Afrika 1955, Dekrit Presiden 5 Juli 1959, dan politik mercusuar') }
+      ],
+      teachingBrief: {
+        summary: t('mapel_sej_tb_sum', 'Penalaran historis sebab-akibat lintas waktu, apresiasi perjuangan bangsa, dan kritik sumber primer.'),
+        hook5Minutes: t('mapel_sej_tb_hook', 'Tunjukkan foto teks proklamasi yang diketik Sayuti Melik: tanyakan bagaimana sejarawan memverifikasi keasliannya.'),
+        boardFormula: t('mapel_sej_tb_board', 'Tahap Metode Sejarah: Heuristik (Pencarian) ➔ Verifikasi (Kritik) ➔ Interpretasi (Penafsiran) ➔ Historiografi (Penulisan)'),
+        commonMisconceptions: [
+          { trap: t('mapel_sej_mc1_trap', 'Sejarah sebatas hafalan tahun'), pattern: t('mapel_sej_mc1_pat', 'Siswa berfokus menghafal tanggal tanpa memahami dialektika sebab-akibat peristiwa masa lalu'), fix: t('mapel_sej_mc1_fix', 'Fokuskan pembelajaran pada: faktor apa yang memicu peristiwa tersebut dan relevansinya bagi kehidupan masa kini') }
+        ]
+      }
+    },
+    PJK: {
+      name: 'PJOK',
+      grade: 'SD / SMP / SMA',
+      competencies: [
+        { code: 'KOMP-PJK-D-7-PER-01', name: t('mapel_pjk_c1_name', 'Keterampilan Gerak Spesifik Permainan Bola'), materi: t('mapel_pjk_c1_mat', 'Teknik passing, dribbling bola basket/voli, serta koordinasi gerak lokomotor dan manipulatif') },
+        { code: 'KOMP-PJK-D-8-KEB-01', name: t('mapel_pjk_c2_name', 'Latihan Kebugaran Jasmani & Daya Tahan Tubuh'), materi: t('mapel_pjk_c2_mat', 'Latihan interval aerobik, kekuatan otot push-up/sit-up, kelenturan sendi, dan indeks masa tubuh') },
+        { code: 'KOMP-PJK-E-10-POL-01', name: t('mapel_pjk_c3_name', 'Pola Hidup Sehat, Gizi Seimbang & P3K Dasar'), materi: t('mapel_pjk_c3_mat', 'Piramida gizi seimbang, bahaya narkoba/rokok, serta penanganan cedera sprain metode RICE') }
+      ],
+      teachingBrief: {
+        summary: t('mapel_pjk_tb_sum', 'Pembiasaan gerak aktif sportif, pemeliharaan kapasitas fisik, dan kebiasaan hidup sehat bugar.'),
+        hook5Minutes: t('mapel_pjk_tb_hook', 'Ajak semua siswa menghitung denyut nadi istirahat di pergelangan tangan mereka selama 15 detik sebelum berdiri.'),
+        boardFormula: t('mapel_pjk_tb_board', 'Denyut Nadi Maksimal (DNM) = 220 - Usia · Zona Latihan Kardio: 60% – 80% DNM · Cedera RICE: Rest, Ice, Compression, Elevation'),
+        commonMisconceptions: [
+          { trap: t('mapel_pjk_mc1_trap', 'Rasa nyeri berlebih tanda berhasil'), pattern: t('mapel_pjk_mc1_pat', 'Mengira latihan kebugaran baru dinilai bagus jika otot mengalami nyeri luar biasa keesokan harinya'), fix: t('mapel_pjk_mc1_fix', 'Kemajuan kebugaran diukur dari adaptasi daya tahan dan pemulihan denyut nadi yang cepat, bukan cedera otot berlebihan') }
+        ]
+      }
+    },
+    SNB: {
+      name: 'Seni Budaya & Prakarya',
+      grade: 'SD / SMP / SMA',
+      competencies: [
+        { code: 'KOMP-SNB-D-7-RUP-01', name: t('mapel_snb_c1_name', 'Unsur, Prinsip & Komposisi Seni Rupa Visual'), materi: t('mapel_snb_c1_mat', 'Eksplorasi garis, bidang, gradasi warna lingkaran primer-sekunder, serta perspektif benda') },
+        { code: 'KOMP-SNB-D-8-MUS-01', name: t('mapel_snb_c2_name', 'Apresiasi Musik Tradisional & Harmoni Melodi'), materi: t('mapel_snb_c2_mat', 'Tangga nada pentatonis nusantara, alat musik gamelan/angklung, dan teknik vokal unisono') },
+        { code: 'KOMP-SNB-E-10-KRA-01', name: t('mapel_snb_c3_name', 'Kriya Nusantara & Eksplorasi Desain Produk'), materi: t('mapel_snb_c3_mat', 'Rancang bangun kerajinan ramah lingkungan, motif batik nusantara, dan kemasan produk bernilai jual') }
+      ],
+      teachingBrief: {
+        summary: t('mapel_snb_tb_sum', 'Kepekaan estetis ragam budaya nusantara, kreativitas visual orisinal, dan apresiasi karya seni.'),
+        hook5Minutes: t('mapel_snb_tb_hook', 'Putar cuplikan nada ritmis instrumen gamelan bali vs jawa: minta murid mendengarkan perbedaan tempo dan suasananya.'),
+        boardFormula: t('mapel_snb_tb_board', 'Unsur Rupa: Titik ➔ Garis ➔ Bidang ➔ Bentuk ➔ Warna ➔ Tekstur ➔ Gelap-Terang ➔ Ruang'),
+        commonMisconceptions: [
+          { trap: t('mapel_snb_mc1_trap', 'Bakat seni mutlak alami'), pattern: t('mapel_snb_mc1_pat', 'Siswa merasa minder dan tidak bisa membuat karya seni karena tidak terlahir dengan bakat bawaan'), fix: t('mapel_snb_mc1_fix', 'Seni visual dan musik adalah keterampilan motorik dan bahasa ekspresi yang dapat dipelajari dengan teknik bertahap') }
+        ]
+      }
+    }
+  };
+
+  /* ---------------------------------------------------------------------------
+   * BANK SOAL FASE D (MAT / IPA / ENG) — isinya JSON, bukan literal di modul ini.
+   *
+   * Ketiga mapel ini punya bank berjenjang di content/mapel/: satu berkas Indonesia
+   * plus sidecar Thai dengan kunci yang sama persis. Naskah yang DILIHAT MURID lahir
+   * di sana, bukan di sini. Itu syarat dua-bahasa CLAUDE.md, dan juga satu-satunya
+   * cara gerbang bahasa bisa melihat naskahnya sama sekali — literal di dalam .js
+   * tidak pernah terbaca oleh satu pun sensus bahasa yang dimiliki repo ini.
+   *
+   * Pemuatannya punya dua jalur, dan KEDUANYA gagal lunak:
+   *   - Node (gerbang, perkakas): fs sinkron, deterministik, tanpa jaringan.
+   *   - Peramban: fetch sekali saat mount; hasilnya disimpan, lalu render diminta
+   *     ulang. Selama bank belum mendarat jawabannya adalah bank tidak ada, dan itu
+   *     berarti perilaku lama (templates di bawah) — bukan lemparan, bukan layar
+   *     kosong.
+   * 14 mapel lain tidak punya bank JSON; bagi mereka jalur ini selalu menjawab null
+   * dan tidak satu pun perilakunya berubah.
+   */
+  var MAPEL_BANK_SUBJECTS = ['MAT', 'IPA', 'ENG', 'IND', 'IPS'];
+  var mapelBankCache = {};
+  var mapelBankFetching = {};
+
+  function mapelBankFile(subjectId) { return 'mapel-' + String(subjectId).toLowerCase() + '-d.json'; }
+
+  /* Katalog kompetensi ikut bank begitu bank mendarat: satu sumber kebenaran, jadi
+     dropdown guru tidak bisa menawarkan kompetensi yang banknya tidak punya soalnya
+     — dan nama kompetensi yang sampai ke murid lewat judul tugas ikut punya kembaran
+     Thai, karena ia lahir di bank, bukan di sini. */
+  function adoptBankCompetencies(subjectId, bank) {
+    try {
+      var cat = MAPEL_CATALOG[subjectId];
+      if (!cat || !bank || !Array.isArray(bank.competencies) || !bank.competencies.length) return;
+      cat.competencies = bank.competencies.map(function (c) {
+        return { code: c.code, name: c.name, materi: c.materi, grade: c.grade, cpRef: c.cpRef };
+      });
+    } catch (_) {}
+  }
+
+  function mapelBank(subjectId) {
+    if (Object.prototype.hasOwnProperty.call(mapelBankCache, subjectId)) return mapelBankCache[subjectId];
+    if (MAPEL_BANK_SUBJECTS.indexOf(subjectId) < 0) { mapelBankCache[subjectId] = null; return null; }
+    var diNode = (typeof require === 'function' && typeof __dirname === 'string');
+    if (diNode) {
+      try {
+        var full = require('path').join(__dirname, '..', '..', 'content', 'mapel', mapelBankFile(subjectId));
+        var bank = JSON.parse(require('fs').readFileSync(full, 'utf8'));
+        mapelBankCache[subjectId] = bank;
+        adoptBankCompetencies(subjectId, bank);
+        return bank;
+      } catch (_) {
+        /* Di Node, berkas yang tidak terbaca berarti bank memang tidak ada. Jangan lanjut ke
+           fetch: alamat relatif tidak punya arti tanpa halaman, dan satu-satunya hasilnya
+           adalah lemparan yang harus ditangkap lagi. */
+        mapelBankCache[subjectId] = null;
+        return null;
+      }
+    }
+    if (!mapelBankFetching[subjectId] && typeof fetch === 'function') {
+      mapelBankFetching[subjectId] = true;
+      try {
+        fetch('content/mapel/' + mapelBankFile(subjectId), { credentials: 'same-origin' })
+          .then(function (r) { return r && r.ok ? r.json() : null; })
+          .then(function (bank) {
+            mapelBankCache[subjectId] = bank || null;
+            if (bank) { adoptBankCompetencies(subjectId, bank); try { render(); } catch (_) {} }
+          })
+          .catch(function () { mapelBankCache[subjectId] = null; });
+      } catch (_) { mapelBankCache[subjectId] = null; }
+    }
+    mapelBankCache[subjectId] = null;
+    return null;
+  }
+
+  /* Kolam soal disaring berjenjang: mapel -> kelas -> kompetensi. Kode kompetensi
+     sudah memuat kelasnya (KOMP-MAT-D-9-STA-01), jadi cocok-persis pada kode berarti
+     kelas ikut tersaring: dua kompetensi berbeda tidak pernah berbagi satu soal pun.
+
+     Yang paling penting ada di cabang `exact`. Kalau kompetensinya cocok tetapi
+     isinya lebih sedikit daripada yang diminta, sisanya dibiarkan KOSONG. Menambalnya
+     dari kolam mapel akan mengirim bab yang salah ke murid tanpa guru pernah tahu —
+     3 soal yang jujur lebih berguna daripada 8 soal yang separuhnya salah bab. */
+  function mapelPool(subjectId, compCode) {
+    var bank = mapelBank(subjectId);
+    if (!bank || !Array.isArray(bank.competencies)) return null;
+    var code = String(compCode == null ? '' : compCode);
+    for (var i = 0; i < bank.competencies.length; i++) {
+      if (bank.competencies[i].code === code) {
+        return { items: bank.competencies[i].items || [], exact: true };
+      }
+    }
+    /* Kode yang tidak dikenal — kosong, salah bentuk, atau milik fase lain — bukan
+       saringan, melainkan ketiadaan saringan. Kolamnya seluruh mapel, seperti dulu. */
+    var all = [];
+    for (var j = 0; j < bank.competencies.length; j++) {
+      var list = bank.competencies[j].items || [];
+      for (var k = 0; k < list.length; k++) all.push(list[k]);
+    }
+    return { items: all, exact: false };
+  }
+
+  /* Acak posisi opsi jawaban agar kunci tidak selalu di index 0.
+     Menerima objek soal { options[], answer, why?, distractorWhy? } dan mengembalikan
+     salinan dengan urutan options teracak serta answer, why & distractorWhy yang sudah
+     dipetakan ulang ke posisi barunya. */
+  function shuffleOptions(q, seed) {
+    var opts = q.options.slice();
+    var correctText = opts[q.answer];
+    var n = opts.length;
+    var s = seed || 1;
+    function rng() { s = (s * 1103515245 + 12345) & 0x7fffffff; return (s >>> 16) / 32768; }
+    for (var i = n - 1; i > 0; i--) {
+      var j = Math.floor(rng() * (i + 1));
+      var tmp = opts[i]; opts[i] = opts[j]; opts[j] = tmp;
+    }
+    var newAnswer = opts.indexOf(correctText);
+    var newWhy = {};
+    if (q.why) {
+      var oldExpl = q.why[q.answer] || q.why[String(q.answer)] || '';
+      if (oldExpl) newWhy[newAnswer] = oldExpl;
+    }
+    /* Peta miskonsepsi ikut berpindah. Kalau tidak, penjelasan pengecoh menempel pada
+       posisi yang isinya sudah berganti — diagnosis yang menunjuk jawaban yang salah
+       lebih buruk daripada tidak ada diagnosis sama sekali. */
+    var newDistractorWhy = null;
+    if (q.distractorWhy) {
+      newDistractorWhy = {};
+      for (var oi = 0; oi < q.options.length; oi++) {
+        if (oi === q.answer) continue;
+        var expl = q.distractorWhy[oi] || q.distractorWhy[String(oi)];
+        if (expl == null) continue;
+        var moved = opts.indexOf(q.options[oi]);
+        if (moved >= 0) newDistractorWhy[moved] = expl;
+      }
+    }
+    return { options: opts, answer: newAnswer, why: newWhy, distractorWhy: newDistractorWhy };
+  }
+
+  var MAPEL_TEMPLATES = {
+  MAT: [
+    {
+      prompt: 'Hasil dari operasi hitung campuran -15 + (-8) \u00d7 3 - (-20) adalah…',
+      options: ['-19', '-29', '-59', '29'],
+      answer: 0,
+      why: { 0: 'Kerjakan perkalian terlebih dahulu: (-8) \u00d7 3 = -24. Kemudian -15 + (-24) - (-20) = -39 + 20 = -19.' }
+    },
+    {
+      prompt: 'Sebuah resep membutuhkan perbandingan tepung dan gula 5 : 2. Jika digunakan 250 gram tepung, berapakah gram gula yang dibutuhkan?',
+      options: ['100 gram', '125 gram', '50 gram', '150 gram'],
+      answer: 0,
+      why: { 0: 'Gula = (2/5) \u00d7 250 gram = 100 gram.' }
+    },
+    {
+      prompt: 'Penyelesaian dari persamaan linear 3x - 7 = 2x + 5 adalah…',
+      options: ['x = 12', 'x = -2', 'x = 2', 'x = -12'],
+      answer: 0,
+      why: { 0: 'Pindahkan suku sejenis: 3x - 2x = 5 + 7 sehingga x = 12.' }
+    },
+    {
+      prompt: 'Sebuah segitiga memiliki panjang alas 14 cm dan tinggi 8 cm. Luas segitiga tersebut adalah…',
+      options: ['56 cm²', '112 cm²', '22 cm²', '48 cm²'],
+      answer: 0,
+      why: { 0: 'Luas segitiga = ½ \u00d7 alas \u00d7 tinggi = ½ \u00d7 14 \u00d7 8 = 56 cm².' }
+    },
+    {
+      prompt: 'Data nilai ulangan matematika: 7, 8, 6, 8, 9, 8, 7. Modus dari data tersebut adalah…',
+      options: ['8', '7', '7.5', '6'],
+      answer: 0,
+      why: { 0: 'Nilai 8 muncul paling banyak yaitu sebanyak 3 kali.' }
+    },
+    {
+      prompt: 'Keliling sebuah lingkaran yang memiliki diameter 28 cm (menggunakan π = 22/7) adalah…',
+      options: ['88 cm', '44 cm', '176 cm', '616 cm'],
+      answer: 0,
+      why: { 0: 'Keliling lingkaran = π \u00d7 d = (22/7) \u00d7 28 cm = 88 cm.' }
+    },
+    {
+      prompt: 'Hasil penyederhanaan dari operasi perpangkatan (2³ \u00d7 2⁴) : 2² adalah…',
+      options: ['2⁵ (32)', '2⁶ (64)', '2⁴ (16)', '2⁷ (128)'],
+      answer: 0,
+      why: { 0: 'Gunakan sifat eksponen: 2^(3+4-2) = 2⁵ = 32.' }
+    },
+    {
+      prompt: 'Sebuah dadu bermata 6 dilempar satu kali. Peluang munculnya mata dadu bilangan prima ganjil adalah…',
+      options: ['1/3', '1/2', '1/6', '2/3'],
+      answer: 0,
+      why: { 0: 'Bilangan prima ganjil pada dadu adalah {3, 5} berjumlah 2 dari 6 ruang sampel, sehingga peluangnya 2/6 = 1/3.' }
+    },
+    {
+      prompt: 'Diketahui rumus fungsi f(x) = 4x - 5. Nilai dari f(3) adalah…',
+      options: ['7', '12', '2', '-7'],
+      answer: 0,
+      why: { 0: 'Substitusi nilai x = 3 ke dalam fungsi: f(3) = 4(3) - 5 = 12 - 5 = 7.' }
+    },
+    {
+      prompt: 'Sebuah balok memiliki ukuran panjang 10 cm, lebar 6 cm, dan tinggi 4 cm. Volume bangun tersebut adalah…',
+      options: ['240 cm³', '120 cm³', '200 cm³', '480 cm³'],
+      answer: 0,
+      why: { 0: 'Volume balok dihitung dengan rumus panjang \u00d7 lebar \u00d7 tinggi = 10 \u00d7 6 \u00d7 4 = 240 cm³.' }
+    },
+    {
+      prompt: 'Himpunan penyelesaian dari pertidaksamaan 2x - 4 < 10 dengan x bilangan bulat positif adalah…',
+      options: ['{1, 2, 3, 4, 5, 6}', '{1, 2, 3, 4, 5, 6, 7}', '{0, 1, 2, 3, 4, 5, 6}', '{7, 8, 9, …}'],
+      answer: 0,
+      why: { 0: '2x < 14 menghasilkan x < 7. Bilangan bulat positif yang memenuhi adalah 1 sampai 6.' }
+    },
+    {
+      prompt: 'Bentuk sederhana dari pecahan aljabar (6x²y) / (2xy) adalah…',
+      options: ['3x', '3y', '3xy', '4x'],
+      answer: 0,
+      why: { 0: 'Bagilah koefisien dan variabel sejenis: (6/2) \u00d7 (x²/x) \u00d7 (y/y) = 3x.' }
+    },
+    {
+      prompt: 'Panjang sisi miring (hipotenusa) segitiga siku-siku yang memiliki sisi siku-siku 9 cm dan 12 cm adalah…',
+      options: ['15 cm', '21 cm', '144 cm', '13 cm'],
+      answer: 0,
+      why: { 0: 'Gunakan teorema Pythagoras: c = √(9² + 12²) = √(81 + 144) = √225 = 15 cm.' }
+    },
+    {
+      prompt: 'Gradien (kemiringan) dari garis lurus dengan persamaan y = 5x - 8 adalah…',
+      options: ['5', '-8', '-5', '8'],
+      answer: 0,
+      why: { 0: 'Pada persamaan garis y = mx + c, gradien m adalah koefisien dari x, yaitu 5.' }
+    },
+    {
+      prompt: 'Rata-rata hitung (mean) dari lima data: 12, 15, 18, 20, dan 25 adalah…',
+      options: ['18', '17.5', '19', '20'],
+      answer: 0,
+      why: { 0: 'Jumlahkan seluruh data lalu bagi dengan banyak data: (12 + 15 + 18 + 20 + 25) / 5 = 90 / 5 = 18.' }
+    }
+  ],
+  IPA: [
+    {
+      prompt: 'Bagian sel yang berfungsi sebagai pusat kendali seluruh aktivitas sel adalah…',
+      options: ['Nukleus (inti sel)', 'Mitokondria', 'Ribosom', 'Sitoplasma'],
+      answer: 0,
+      why: { 0: 'Nukleus mengandung materi genetik yang mengendalikan proses metabolisme dan pembelahan sel.' }
+    },
+    {
+      prompt: 'Peristiwa perpindahan kalor yang terjadi tanpa memerlukan zat perantara (medium) disebut…',
+      options: ['Radiasi', 'Konduksi', 'Konveksi', 'Evaporasi'],
+      answer: 0,
+      why: { 0: 'Radiasi adalah pancaran gelombang elektromagnetik seperti sinar matahari ke bumi.' }
+    },
+    {
+      prompt: 'Perubahan zat yang TIDAK menghasilkan zat baru dan dapat kembali ke wujud semula disebut…',
+      options: ['Perubahan fisika', 'Perubahan kimia', 'Pembusukan', 'Fermentasi'],
+      answer: 0,
+      why: { 0: 'Perubahan fisika hanya mengubah wujud atau bentuk (seperti es mencair) tanpa mengubah sifat kimia zat.' }
+    },
+    {
+      prompt: 'Dalam rantai makanan di sawah: Padi ➔ Belalang ➔ Katak ➔ Ular ➔ Elang. Organisme yang bertindak sebagai konsumen tingkat II adalah…',
+      options: ['Katak', 'Belalang', 'Padi', 'Ular'],
+      answer: 0,
+      why: { 0: 'Padi (produsen), Belalang (konsumen I), Katak (konsumen II), Ular (konsumen III).' }
+    },
+    {
+      prompt: 'Sebuah benda bermassa 2 kg ditarik dengan gaya 10 N di lantai licin. Percepatan yang dialami benda adalah…',
+      options: ['5 m/s²', '20 m/s²', '0.2 m/s²', '12 m/s²'],
+      answer: 0,
+      why: { 0: 'Berdasarkan Hukum II Newton: a = F / m = 10 N / 2 kg = 5 m/s².' }
+    },
+    {
+      prompt: 'Peristiwa pengikisan daratan pantai akibat hantaman energi gelombang air laut secara kontinu disebut…',
+      options: ['Abrasi pantai', 'Erosi angin (deflasi)', 'Sedimentasi delta', 'Korosi batuan'],
+      answer: 0,
+      why: { 0: 'Abrasi adalah proses pengikisan pantai oleh tenaga gelombang laut dan arus pasang surut.' }
+    },
+    {
+      prompt: 'Organ pada sistem ekskresi manusia yang berfungsi menyaring zat sisa metabolisme dari darah untuk membentuk urin adalah…',
+      options: ['Ginjal (ren)', 'Hati (hepar)', 'Paru-paru (pulmo)', 'Pankreas'],
+      answer: 0,
+      why: { 0: 'Nefron di dalam ginjal menyaring darah melalui proses filtrasi, reabsorpsi, dan augmentasi menghasilkan urin.' }
+    },
+    {
+      prompt: 'Bentuk interaksi simbiotik antara lebah madu dan bunga tanaman berbunga tergolong simbiosis…',
+      options: ['Mutualisme', 'Komensalisme', 'Parasitisme', 'Predasi'],
+      answer: 0,
+      why: { 0: 'Lebah memperoleh nektar madu sedangkan bunga terbantu dalam proses penyerbukan serbuk sari.' }
+    },
+    {
+      prompt: 'Enzim pencernaan di lambung yang berfungsi memecah protein menjadi pepton adalah…',
+      options: ['Pepsin', 'Ptialin (amilase)', 'Lipase', 'Tripsin'],
+      answer: 0,
+      why: { 0: 'Lambung menghasilkan pepsinogen yang diaktifkan oleh asam klorida (HCl) menjadi pepsin untuk memecah protein.' }
+    },
+    {
+      prompt: 'Planet dalam tata surya kita yang berukuran paling besar dan memiliki bintik merah raksasa adalah…',
+      options: ['Jupiter', 'Saturnus', 'Neptunus', 'Uranus'],
+      answer: 0,
+      why: { 0: 'Jupiter adalah planet gas raksasa terbesar dengan diameter lebih dari 140.000 km.' }
+    },
+    {
+      prompt: 'Sifat bayangan yang dibentuk oleh cermin datar pada jarak benda tertentu adalah…',
+      options: ['Maya, tegak, dan sama besar', 'Nyata, terbalik, dan diperbesar', 'Maya, terbalik, dan diperkecil', 'Nyata, tegak, dan sama besar'],
+      answer: 0,
+      why: { 0: 'Cermin datar selalu membentuk bayangan maya di belakang cermin yang tegak dan berukuran identik.' }
+    },
+    {
+      prompt: 'Proses pembentukan embun pada daun di pagi hari merupakan contoh peristiwa perubahan wujud…',
+      options: ['Mengembun (kondensasi gas menjadi cair)', 'Menyublim', 'Membeku', 'Menguap'],
+      answer: 0,
+      why: { 0: 'Uap air di udara mengalami pendinginan pada malam hari sehingga mengembun menjadi butiran air.' }
+    },
+    {
+      prompt: 'Zat hijau daun yang menangkap energi cahaya matahari dalam fotosintesis dinamakan…',
+      options: ['Klorofil', 'Karotenoid', 'Antosianin', 'Hemoglobin'],
+      answer: 0,
+      why: { 0: 'Klorofil menyerap spektrum cahaya biru dan merah untuk memicu reaksi kimia fotosintesis.' }
+    },
+    {
+      prompt: 'Alat perkembangbiakan generatif pada tumbuhan berbiji tertutup (Angiospermae) adalah…',
+      options: ['Bunga', 'Akar tunjang', 'Batang berkambium', 'Daun penumpu'],
+      answer: 0,
+      why: { 0: 'Bunga memiliki putik sebagai sel kelamin betina dan benang sari sebagai sel kelamin jantan.' }
+    },
+    {
+      prompt: 'Pemisahan campuran air dan pasir dapat dilakukan secara sederhana menggunakan metode…',
+      options: ['Penyaringan (filtrasi)', 'Kromatografi', 'Sublimasi', 'Distilasi'],
+      answer: 0,
+      why: { 0: 'Filtrasi memisahkan padatan pasir yang tidak larut dari cairan air berdasarkan ukuran partikel.' }
+    }
+  ],
+  IND: [
+    {
+      prompt: 'Ciri utama teks deskripsi yang membedakannya dari teks lain adalah…',
+      options: ['Menggambarkan objek secara terperinci dengan melibatkan pancaindra', 'Menceritakan urutan peristiwa berdasarkan konflik tokoh', 'Menjelaskan langkah kerja atau petunjuk praktis', 'Menyampaikan pendapat disertai argumen logis'],
+      answer: 0,
+      why: { 0: 'Teks deskripsi bertujuan membuat pembaca seolah melihat, mendengar, atau merasakan sendiri objek yang digambarkan.' }
+    },
+    {
+      prompt: 'Ide pokok suatu paragraf dapat ditemukan dengan cara…',
+      options: ['Menemukan kalimat utama yang memuat inti permasalahan paragraf', 'Membaca hanya kalimat terakhir pada setiap paragraf', 'Menghitung kata yang paling banyak diulang', 'Mencatat seluruh kalimat penjelas'],
+      answer: 0,
+      why: { 0: 'Ide pokok adalah gagasan inti yang biasanya tertuang dalam kalimat utama paragraf.' }
+    },
+    {
+      prompt: 'Penulisan kata depan "di" yang tepat terdapat pada kalimat…',
+      options: ['Siswa berkumpul di halaman sekolah sejak pagi.', 'Buku itu dibaca oleh siswa diperpustakaan.', 'Surat itu ditandatangani diruang kepala sekolah.', 'Mereka berdiskusi dimobil saat perjalanan.'],
+      answer: 0,
+      why: { 0: 'Kata depan "di" yang menunjukkan tempat ditulis terpisah: "di halaman".' }
+    },
+    {
+      prompt: 'Unsur intrinsik cerita yang menjadi penentu watak atau karakter tokoh cerita adalah…',
+      options: ['Penokohan (karakterisasi)', 'Alur (plot)', 'Latar (setting)', 'Amanat'],
+      answer: 0,
+      why: { 0: 'Penokohan adalah cara pengarang menggambarkan dan mengembangkan karakter tokoh dalam cerita.' }
+    },
+    {
+      prompt: 'Konjungsi yang menyatakan hubungan urutan waktu dalam teks prosedur adalah…',
+      options: ['Lalu, kemudian, setelah itu', 'Karena, sebab, oleh karena itu', 'Tetapi, melainkan, sedangkan', 'Jika, apabila, jikalau'],
+      answer: 0,
+      why: { 0: 'Konjungsi kronologis seperti lalu, kemudian, setelah itu menghubungkan tahapan prosedur secara teratur.' }
+    },
+    {
+      prompt: 'Antonim (lawan kata) yang paling tepat untuk kata "abstrak" adalah…',
+      options: ['Konkret (nyata berwujud)', 'Imajinatif', 'Teoretis', 'Kompleks'],
+      answer: 0,
+      why: { 0: 'Abstrak berarti tidak berwujud nyata; kebalikannya adalah konkret yang dapat diindra secara nyata.' }
+    },
+    {
+      prompt: 'Majas yang mengumpamakan benda mati seolah-olah bernyawa dan berperilaku seperti manusia ("Pena menari-nari di atas kertas") adalah majas…',
+      options: ['Personifikasi', 'Metafora', 'Hiperbola', 'Litotes'],
+      answer: 0,
+      why: { 0: 'Personifikasi melekatkan sifat-sifat insani atau perilaku manusiawi pada benda mati atau konsep abstrak.' }
+    },
+    {
+      prompt: 'Struktur teks eksposisi yang memuat simpulan dan penegasan kembali posisi atau tesis penulis disebut…',
+      options: ['Penegasan ulang (reiterasi)', 'Tesis awal', 'Rangkaian argumen pendukung', 'Orientasi naratif'],
+      answer: 0,
+      why: { 0: 'Penegasan ulang merangkum intisari argumen dan mempertegas sudut pandang penulis di akhir teks eksposisi.' }
+    },
+    {
+      prompt: 'Kata yang berkedudukan sebagai sinonim dari kata "eksklusif" adalah…',
+      options: ['Khusus (istimewa)', 'Universal', 'Terbuka luas', 'Seragam'],
+      answer: 0,
+      why: { 0: 'Eksklusif bermakna khusus, terpisah dari yang lain, atau diperuntukkan bagi kalangan terbatas.' }
+    },
+    {
+      prompt: 'Kalimat yang predikatnya memerlukan objek penderita diistilahkan sebagai kalimat…',
+      options: ['Transitif', 'Intransitif', 'Pasif semu', 'Nominal'],
+      answer: 0,
+      why: { 0: 'Verba transitif menuntut kehadiran nomina objek agar makna kalimat menjadi utuh.' }
+    },
+    {
+      prompt: 'Bagian awal pada teks narasi yang mengenalkan tokoh, latar waktu, dan latar tempat disebut…',
+      options: ['Orientasi cerita', 'Komplikasi puncak', 'Resolusi akhir', 'Koda pengingat'],
+      answer: 0,
+      why: { 0: 'Orientasi memberikan konteks awal cerita perihal siapa, di mana, dan kapan peristiwa bermula.' }
+    },
+    {
+      prompt: 'Ungkapan atau peribahasa "Bagai air di daun talas" memiliki makna kiasan…',
+      options: ['Pribadi yang tidak berpendirian tetap dan mudah goyah', 'Seseorang yang sangat hemat mengelola harta', 'Hubungan persahabatan yang kokoh', 'Kondisi lingkungan yang sangat tenang'],
+      answer: 0,
+      why: { 0: 'Air di daun talas selalu bergulir dan tidak menetap, mengibaratkan pendirian yang plin-plan.' }
+    },
+    {
+      prompt: 'Tanda baca yang tepat digunakan untuk memisahkan unsur-unsur dalam perincian atau pembilangan adalah…',
+      options: ['Tanda koma (,)', 'Tanda titik dua (:)', 'Tanda hubung (-)', 'Tanda titik koma (;)'],
+      answer: 0,
+      why: { 0: 'Tanda koma memisahkan butir-butir enumerasi di dalam suatu klausa.' }
+    },
+    {
+      prompt: 'Kalimat yang susunannya efektif dan memenuhi kaidah tata bahasa baku adalah…',
+      options: ['Semua siswa hadir tepat waktu di aula pertunjukan.', 'Bagi para hadirin dimohon berdiri dari kursi.', 'Siswa-siswa berkumpul bersama-sama di lapangan.', 'Untuk mempersingkat waktu, acara segera dimulai.'],
+      answer: 0,
+      why: { 0: 'Kalimat efektif menghindari pleonasme dan preposisi yang merusak fungsi subjek.' }
+    },
+    {
+      prompt: 'Langkah pertama yang esensial dalam menyusun teks ulasan atau resensi buku adalah…',
+      options: ['Membaca dan memahami isi karya secara menyeluruh', 'Menulis kritik tajam terhadap kekurangan penulis', 'Menentukan harga jual buku di pasaran', 'Merancang tata letak sampul buku'],
+      answer: 0,
+      why: { 0: 'Pemahaman komprehensif atas isi karya merupakan prasyarat mutlak sebelum memberi penilaian objektif.' }
+    }
+  ],
+  ENG: [
+    {
+      prompt: 'Choose the grammatically correct sentence in the Simple Past Tense:',
+      options: ['She visited the botanical garden yesterday.', 'She visit the botanical garden yesterday.', 'She is visiting the botanical garden yesterday.', 'She has visited the garden yesterday already.'],
+      answer: 0,
+      why: { 0: 'Simple past tense uses past verb form (visited) together with past time signal (yesterday).' }
+    },
+    {
+      prompt: '"The train ___ before we reached the platform." The most appropriate past perfect verb is:',
+      options: ['had departed', 'have departed', 'is departing', 'will depart'],
+      answer: 0,
+      why: { 0: 'Past perfect (had + V3) indicates an event completed prior to another past event.' }
+    },
+    {
+      prompt: 'The contextual synonym for the adjective "vast" is…',
+      options: ['Immense and wide', 'Extremely tiny', 'Rapidly moving', 'Narrow and tight'],
+      answer: 0,
+      why: { 0: '"Vast" describes an immense, expansive area or extent.' }
+    },
+    {
+      prompt: 'Identify the sentence with an accurate type 2 conditional structure:',
+      options: ['If I had a telescope, I would observe the lunar craters.', 'If I have a telescope, I would observe the craters.', 'If I had a telescope, I will observe the craters.', 'If I have a telescope, I observe the craters.'],
+      answer: 0,
+      why: { 0: 'Type 2 conditional uses: If + past simple, would + bare infinitive for hypothetical present.' }
+    },
+    {
+      prompt: 'The communicative purpose of an explanatory text is to…',
+      options: ['Explain the processes involved in the formation of natural phenomena', 'Persuade the audience on a debate proposition', 'Entertain readers with folklore fables', 'Provide step-by-step cooking instructions'],
+      answer: 0,
+      why: { 0: 'Explanation texts account for how or why natural or sociocultural phenomena occur.' }
+    },
+    {
+      prompt: '"The students are studying biology in the laboratory right now." The tense used in this sentence is…',
+      options: ['Present Continuous Tense', 'Simple Present Tense', 'Past Continuous Tense', 'Present Perfect Tense'],
+      answer: 0,
+      why: { 0: 'The pattern Subject + to be (are) + V-ing indicates an action happening at the moment of speaking.' }
+    },
+    {
+      prompt: 'Choose the sentence with an accurate passive voice structure:',
+      options: ['The research paper was written by the scholar.', 'The research paper wrote by the scholar.', 'The research paper was write by the scholar.', 'The scholar was written the research paper.'],
+      answer: 0,
+      why: { 0: 'Passive voice in past simple uses: Subject + was/were + Past Participle (written) + by agent.' }
+    },
+    {
+      prompt: 'The antonym of the adjective "mandatory" is…',
+      options: ['Optional', 'Obligatory', 'Compulsory', 'Strict'],
+      answer: 0,
+      why: { 0: 'Mandatory means required or obligatory; its opposite is optional (discretionary).' }
+    },
+    {
+      prompt: 'Which sentence correctly demonstrates the use of a comparative adjective?',
+      options: ['Titanium is denser than aluminum.', 'Titanium is more denser than aluminum.', 'Titanium is most dense than aluminum.', 'Titanium is as denser than aluminum.'],
+      answer: 0,
+      why: { 0: 'One-syllable adjectives form comparatives by adding -er (denser), not double comparatives.' }
+    },
+    {
+      prompt: 'The main communicative purpose of a procedure text (e.g., recipe or manual) is to…',
+      options: ['Describe how something is achieved through a sequence of steps', 'Entertain listeners with a dramatic myth', 'Argue against an economic proposition', 'Narrate personal biographical milestones'],
+      answer: 0,
+      why: { 0: 'Procedure texts instruct readers on how to accomplish a goal sequentially.' }
+    },
+    {
+      prompt: '"Neither the captain nor the sailors ___ aware of the coral reef." The grammatically correct verb is:',
+      options: ['were', 'was', 'is', 'has been'],
+      answer: 0,
+      why: { 0: 'With "neither... nor...", the verb agrees with the closer subject: "sailors" is plural, so "were" is used.' }
+    },
+    {
+      prompt: 'Identify the sentence that uses a relative pronoun appropriately:',
+      options: ['The scientist who discovered the vaccine was awarded a medal.', 'The scientist which discovered the vaccine was awarded a medal.', 'The scientist whose discovered the vaccine was awarded a medal.', 'The scientist whom discovered the vaccine was awarded a medal.'],
+      answer: 0,
+      why: { 0: '"Who" refers to people as the subject of the relative clause.' }
+    },
+    {
+      prompt: 'In an analytical exposition text, the opening paragraph where the author introduces the topic and point of view is called the…',
+      options: ['Thesis statement', 'Reiteration paragraph', 'Complication arc', 'Resolution step'],
+      answer: 0,
+      why: { 0: 'The thesis introduces the central topic and clearly states the writer position.' }
+    },
+    {
+      prompt: '"If it rains tomorrow, we ___ the outdoor excursion." Complete the first conditional clause:',
+      options: ['will postpone', 'postponed', 'would postpone', 'had postponed'],
+      answer: 0,
+      why: { 0: 'First conditional structure: If + present simple, will + bare infinitive for realistic future scenarios.' }
+    },
+    {
+      prompt: 'What is the idiom "once in a blue moon" commonly used to describe?',
+      options: ['An event that happens very rarely', 'A phenomenon occurring every evening', 'A scenario that is guaranteed to succeed', 'A chaotic and disorderly environment'],
+      answer: 0,
+      why: { 0: 'The phrase "once in a blue moon" refers metaphorically to very rare occurrences.' }
+    }
+  ],
+  IPS: [
+    {
+      prompt: 'Faktor pendorong utama berlangsungnya aktivitas perniagaan lintas negara (ekspor-impor) adalah…',
+      options: ['Disparitas ketersediaan komoditas dan kapabilitas teknologi antarbangsa', 'Keseragaman jenis tanaman bumi', 'Kesamaan bahasa pertuturan internasional', 'Ketidakhadiran pembatas perbatasan wilayah'],
+      answer: 0,
+      why: { 0: 'Perbedaan keunggulan komparatif alam dan teknologi mendorong pertukaran barang antarbangsa.' }
+    },
+    {
+      prompt: 'Organisasi kerja sama regional kawasan Asia Tenggara (ASEAN) diproklamasikan melalui…',
+      options: ['Deklarasi Bangkok 1967', 'Perjanjian Westphalia', 'Konferensi Meja Bundar', 'Perjanjian Linggajati'],
+      answer: 0,
+      why: { 0: 'Lima perwakilan negara menandatangani Deklarasi Bangkok pada 8 Agustus 1967.' }
+    },
+    {
+      prompt: 'Sikap bijak dalam menyongsong arus keterbukaan globalisasi budaya adalah…',
+      options: ['Menyaring budaya luar berlandaskan nilai kearifan lokal bangsa', 'Menolak seluruh kemajuan peradaban teknologi', 'Menghilangkan kesenian tradisional nusantara', 'Mengikuti seluruh tren tanpa pertimbangan adab'],
+      answer: 0,
+      why: { 0: 'Selektivitas berbasis nilai kearifan lokal memperkuat identitas budaya di era keterbukaan.' }
+    },
+    {
+      prompt: 'Lembaga perbankan pembangunan multilateral yang menyokong pendanaan proyek negara berkembang adalah…',
+      options: ['Bank Dunia (World Bank)', 'Palang Merah Internasional', 'Badan Meteorologi Global', 'Organisasi Buruh Sedunia'],
+      answer: 0,
+      why: { 0: 'World Bank mengalokasikan kredit investasi pembangunan infrastruktur dan pengentasan kemiskinan.' }
+    },
+    {
+      prompt: 'Bentuk kontribusi aktif diplomasi perdamaian Indonesia di bawah mandat PBB diwujudkan melalui…',
+      options: ['Penugasan Kontingen Pasukan Garuda ke wilayah konflik', 'Pemutusan hubungan konsuler antarnegara', 'Pemberian sanksi boikot sepihak', 'Penghentian bantuan kemanusiaan'],
+      answer: 0,
+      why: { 0: 'Kontingen Garuda aktif menjaga stabilitas wilayah pascakonflik di bawah panji perdamaian PBB.' }
+    },
+    {
+      prompt: 'Garis khayal yang memisahkan fauna tipe Asiatis dengan fauna tipe peralihan di kepulauan Nusantara adalah…',
+      options: ['Garis Wallace', 'Garis Weber', 'Garis Lydekker', 'Garis Khatulistiwa'],
+      answer: 0,
+      why: { 0: 'Garis Wallace membentang di antara Selat Makassar dan Selat Lombok membatasi fauna barat dan peralihan.' }
+    },
+    {
+      prompt: 'Bentuk interaksi sosial asosiatif yang berupa kerja bersama antara individu atau kelompok untuk mencapai tujuan bersama adalah…',
+      options: ['Kerja sama (kooperasi)', 'Persaingan (kompetisi)', 'Kontravensi', 'Pertentangan (konflik)'],
+      answer: 0,
+      why: { 0: 'Kerja sama adalah proses asosiatif di mana pihak-pihak berpadu tenaga menggapai sasaran bersama.' }
+    },
+    {
+      prompt: 'Peninggalan candi megah bercorak Buddha terbesar di Nusantara yang dibangun pada era Wangsa Syailendra adalah…',
+      options: ['Candi Borobudur', 'Candi Prambanan', 'Candi Mendut', 'Candi Penataran'],
+      answer: 0,
+      why: { 0: 'Borobudur dibangun sekitar abad ke-8 hingga ke-9 Masehi sebagai monumen suci Buddha Mahayana.' }
+    },
+    {
+      prompt: 'Kondisi di mana kebutuhan manusia tidak terbatas sementara sumber daya pemuasnya berjumlah terbatas diistilahkan sebagai…',
+      options: ['Kelangkaan (scarcity)', 'Kemakmuran mutlak', 'Kelebihan pasokan', 'Inflasi produksi'],
+      answer: 0,
+      why: { 0: 'Kelangkaan adalah problem inti ekonomi yang melahirkan keharusan menentukan pilihan prioritas.' }
+    },
+    {
+      prompt: 'Organisasi pergerakan nasional pertama di Hindia Belanda yang didirikan pada tanggal 20 Mei 1908 adalah…',
+      options: ['Budi Utomo', 'Sarekat Islam', 'Indische Partij', 'Perhimpunan Indonesia'],
+      answer: 0,
+      why: { 0: 'Budi Utomo diprakarsai oleh dr. Wahidin Soedirohoesodo dan didirikan oleh para pemuda STOVIA.' }
+    },
+    {
+      prompt: 'Lembaga sosial yang memiliki fungsi utama mentransmisikan pengetahuan, keterampilan hidup, dan pembentukan karakter terstruktur adalah…',
+      options: ['Lembaga pendidikan sekolah', 'Lembaga peradilan adat', 'Lembaga moneter perbankan', 'Lembaga pertahanan militer'],
+      answer: 0,
+      why: { 0: 'Pendidikan formal mengemban fungsi manifest sosialisasi nilai, ilmu, dan keahlian profesi.' }
+    },
+    {
+      prompt: 'Jenis angin muson yang berembus dari benua Australia menuju benua Asia serta memicu musim kemarau di Indonesia adalah…',
+      options: ['Angin Muson Timur (Tenggara)', 'Angin Muson Barat', 'Angin Fohn pegunungan', 'Angin Pasat Timur Laut'],
+      answer: 0,
+      why: { 0: 'Muson Timur bersifat kering karena melintasi gurun luas Australia sebelum tiba di kepulauan Indonesia.' }
+    },
+    {
+      prompt: 'Pelaku ekonomi yang berperan sebagai penyedia faktor produksi (tanah, tenaga, modal) dan sekaligus konsumen barang adalah…',
+      options: ['Rumah Tangga Konsumen (RTK)', 'Rumah Tangga Produsen (RTP)', 'Pemerintah pengatur', 'Masyarakat luar negeri'],
+      answer: 0,
+      why: { 0: 'RTK memiliki faktor produksi yang disewakan/dijual kepada produsen untuk memperoleh imbalan belanja.' }
+    },
+    {
+      prompt: 'Prasasti tertua peninggalan Kerajaan Kutai di Kalimantan Timur yang dipahatkan pada tiang batu bernama…',
+      options: ['Prasasti Yupa', 'Prasasti Ciaruteun', 'Prasasti Tugu', 'Prasasti Kedukan Bukit'],
+      answer: 0,
+      why: { 0: 'Tujuh prasasti Yupa bertarikh abad ke-5 Masehi ditulis dengan aksara Pallawa berbahasa Sanskerta.' }
+    },
+    {
+      prompt: 'Peristiwa pergeseran nilai-nilai tradisional menuju pola kehidupan berbasis efisiensi, rasionalitas, dan teknologi dinamakan…',
+      options: ['Modernisasi sosial', 'Etnosentrisme', 'Asimilasi paksa', 'Tradisionalisme'],
+      answer: 0,
+      why: { 0: 'Modernisasi mentransformasikan struktur sosial dan cara berpikir masyarakat ke arah yang lebih rasional.' }
+    }
+  ],
+  INF: [
+    {
+      prompt: 'Unit representasi data digital biner terkecil berharga 0 atau 1 pada komputasi dinamakan…',
+      options: ['Bit', 'Byte', 'Kilobyte', 'Hertz'],
+      answer: 0,
+      why: { 0: 'Bit (binary digit) merepresentasikan kondisi biner atomik pada elektronika digital.' }
+    },
+    {
+      prompt: 'Rangkaian instruksi terstruktur, terurut logis, dan terbatas untuk memecahkan suatu persoalan disebut…',
+      options: ['Algoritma komputasi', 'Bahasa perakitan semata', 'Komponen sirkuit keras', 'Protokol jaringan kabel'],
+      answer: 0,
+      why: { 0: 'Algoritma adalah rancangan langkah sistematis penyelesaian problem secara komputasional.' }
+    },
+    {
+      prompt: 'Konstruksi logika pemilihan alur kendali program berdasar parameter pengujian dinamakan…',
+      options: ['Percabangan kondisional (branching)', 'Pengulangan tanpa henti (loop)', 'Penugasan nilai (assignment)', 'Deklarasi pustaka modul'],
+      answer: 0,
+      why: { 0: 'Percabangan (if-else) mengarahkan cabang eksekusi kode sesuai terpenuhinya syarat.' }
+    },
+    {
+      prompt: 'Rekayasa sosial bermodus pesan umpan tiruan guna memancing data rahasia korban disebut…',
+      options: ['Phishing rekayasa siber', 'Denial of service', 'Enkripsi simetris', 'Kompilasi biner'],
+      answer: 0,
+      why: { 0: 'Phishing mengecoh pengguna melalui identitas palsu agar menyerahkan kredensial akun.' }
+    },
+    {
+      prompt: 'Empat pilar berpikir komputasional mencakup dekomposisi, abstraksi, pengenalan pola, serta…',
+      options: ['Perancangan algoritma terarah', 'Pemasangan sirkuit fisik', 'Penyambungan koneksi kabel', 'Pembelian lisensi sistem'],
+      answer: 0,
+      why: { 0: 'Dekomposisi, pola, abstraksi, dan algoritma membentuk empat pilar fondasi computational thinking.' }
+    },
+    {
+      prompt: 'Topologi jaringan komputer di mana seluruh simpul tersambung secara terpusat pada satu perangkat konsentrator (switch/hub) adalah…',
+      options: ['Topologi Star (Bintang)', 'Topologi Bus linier', 'Topologi Ring cincin', 'Topologi Mesh jala'],
+      answer: 0,
+      why: { 0: 'Topologi star menghubungkan setiap terminal secara langsung ke node pusat pengendali.' }
+    },
+    {
+      prompt: 'Struktur data linier yang menerapkan prinsip LIFO (Last In, First Out) dalam penataan elemennya adalah…',
+      options: ['Stack (Tumpukan)', 'Queue (Antrean)', 'Binary Tree', 'Grafik berarah'],
+      answer: 0,
+      why: { 0: 'Pada stack, elemen yang terakhir dimasukkan adalah elemen pertama yang akan dikeluarkan.' }
+    },
+    {
+      prompt: 'Perangkat keras komputer yang berfungsi sebagai otak pemroses komputasi utama untuk mengeksekusi instruksi program dinamakan…',
+      options: ['Central Processing Unit (CPU)', 'Hard Disk Drive', 'Power Supply Unit', 'Monitor grafis'],
+      answer: 0,
+      why: { 0: 'CPU melaksanakan operasi aritmetika, logika, pengendalian, dan masukan/keluaran data sistem.' }
+    },
+    {
+      prompt: 'Protokol komunikasi standar yang menyandikan (mengenkripsi) lalu lintas data antara peramban web dan server situs adalah…',
+      options: ['HTTPS', 'HTTP polos', 'FTP biasa', 'Telnet'],
+      answer: 0,
+      why: { 0: 'HTTPS menggunakan lapisan enkripsi TLS/SSL untuk mengamankan integritas dan kerahasiaan transmisi web.' }
+    },
+    {
+      prompt: 'Tipe data dasar dalam pemrograman yang hanya dapat bernilai benar (True) atau salah (False) dinamakan…',
+      options: ['Boolean', 'Integer bulat', 'String teks', 'Float desimal'],
+      answer: 0,
+      why: { 0: 'Tipe Boolean dinamai menurut matematikawan George Boole, merepresentasikan dua kondisi kebenaran biner.' }
+    },
+    {
+      prompt: 'Langkah berpikir komputasional yang memecah suatu persoalan rumit menjadi sub-persoalan yang lebih kecil dan tertata disebut…',
+      options: ['Dekomposisi masalah', 'Abstraksi selektif', 'Pengenalan pola umum', 'Generalisasi algoritma'],
+      answer: 0,
+      why: { 0: 'Dekomposisi mengurai tantangan kompleks agar dapat dianalisis dan diselesaikan bagian demi bagian.' }
+    },
+    {
+      prompt: 'Jenis memori komputer berkecepatan tinggi yang bersifat volatil (hilang saat daya listrik padam) adalah…',
+      options: ['Random Access Memory (RAM)', 'Read Only Memory (ROM)', 'Solid State Drive (SSD)', 'Flash drive USB'],
+      answer: 0,
+      why: { 0: 'RAM menyimpan instruksi kerja dan data aktif prosesor sementara perangkat dialiri daya listrik.' }
+    },
+    {
+      prompt: 'Simbol bangun datar pada diagram alir (flowchart) yang melambangkan pengambilan keputusan atau percabangan kondisi adalah…',
+      options: ['Belah ketupat (diamond)', 'Persegi panjang datar', 'Oval terminator', 'Jajar genjang miring'],
+      answer: 0,
+      why: { 0: 'Bentuk belah ketupat memuat ekspresi evaluasi ya/tidak untuk mencabangkan arah diagram alir.' }
+    },
+    {
+      prompt: 'Perangkat lunak jahat (malware) yang menyandera akses data korban dengan enkripsi lalu menuntut uang tebusan disebut…',
+      options: ['Ransomware', 'Adware promosi', 'Spyware pasif', 'Keylogger tombol'],
+      answer: 0,
+      why: { 0: 'Ransomware mengunci berkas dokumen pengguna hingga tebusan digital disetorkan kepada peretas.' }
+    },
+    {
+      prompt: 'Pemberian nomor alamat unik berbasis numerik pada setiap perangkat yang terhubung ke jaringan internet diistilahkan sebagai…',
+      options: ['Internet Protocol Address (IP Address)', 'Media Access Control (MAC)', 'Domain Name System (DNS)', 'Uniform Resource Locator (URL)'],
+      answer: 0,
+      why: { 0: 'Alamat IP mengidentifikasi perangkat secara spesifik untuk perutean paket informasi di jaringan global.' }
+    }
+  ],
+  PPK: [
+    {
+      prompt: 'Pancasila sebagai dasar falsafah negara menempatkan Ketuhanan Yang Maha Esa pada sila ke…',
+      options: ['Pertama', 'Kedua', 'Ketiga', 'Kelima'],
+      answer: 0,
+      why: { 0: 'Sila ke-1 menegaskan landasan moral ketuhanan bagi tatanan kenegaraan Indonesia.' }
+    },
+    {
+      prompt: 'Jaminan pemenuhan hak konstitusional warga negara atas pengajaran tercantum dalam UUD 1945 pada…',
+      options: ['Pasal 31 ayat 1', 'Pasal 27 ayat 2', 'Pasal 33 ayat 3', 'Pasal 36'],
+      answer: 0,
+      why: { 0: 'Pasal 31 ayat 1 menyatakan setiap warga negara berhak mendapat pendidikan.' }
+    },
+    {
+      prompt: 'Institusi audit negara yang independen dalam memeriksa pengelolaan keuangan kas negara adalah…',
+      options: ['Badan Pemeriksa Keuangan (BPK)', 'Mahkamah Konstitusi', 'Dewan Perwakilan Daerah', 'Komisi Yudisial'],
+      answer: 0,
+      why: { 0: 'BPK bertugas memeriksa pengelolaan dan tanggung jawab seputar keuangan negara.' }
+    },
+    {
+      prompt: 'Karakter persatuan serta kegotongroyongan dalam kemajemukan bangsa mencerminkan penghayatan sila ke…',
+      options: ['Ketiga (Persatuan Indonesia)', 'Pertama', 'Kedua', 'Keempat'],
+      answer: 0,
+      why: { 0: 'Sila ketiga menekankan integrasi nasional dan persatuan bangsa di atas perbedaan.' }
+    },
+    {
+      prompt: 'Kaidah pergaulan masyarakat yang memiliki sanksi pemaksa nyata berupa hukuman kurungan atau denda adalah…',
+      options: ['Norma hukum positif', 'Norma kesopanan', 'Norma kesusilaan internal', 'Kebiasaan informal'],
+      answer: 0,
+      why: { 0: 'Norma hukum ditegakkan oleh aparatur berwenang dengan sanksi tegas mengikat.' }
+    },
+    {
+      prompt: 'Semboyan "Bhinneka Tunggal Ika" yang menjadi pilar persatuan bangsa dipetik dari karya sastra Kitab Sutasoma karangan…',
+      options: ['Empu Tantular', 'Empu Prapanca', 'Empu Sedah', 'Empu Panuluh'],
+      answer: 0,
+      why: { 0: 'Kutipan pupuh 139 bait 5 Kitab Sutasoma dari zaman Majapahit menegaskan persatuan di tengah keberagaman.' }
+    },
+    {
+      prompt: 'Lembaga tinggi negara yang berwenang menguji undang-undang terhadap Undang-Undang Dasar 1945 (judicial review) adalah…',
+      options: ['Mahkamah Konstitusi (MK)', 'Mahkamah Agung (MA)', 'Komisi Yudisial (KY)', 'Kejaksaan Agung'],
+      answer: 0,
+      why: { 0: 'Mahkamah Konstitusi bertugas menegakkan supremasi konstitusi melalui pengujian materiel undang-undang.' }
+    },
+    {
+      prompt: 'Pengamalan nilai keadilan sosial bagi seluruh rakyat Indonesia tercermin melalui sikap…',
+      options: ['Menjaga keseimbangan hak sesama serta menghargai karya cipta orang lain', 'Mengutamakan kepentingan golongan pribadi di atas publik', 'Menutup ruang partisipasi musyawarah kelompok', 'Memaksakan kehendak opini dalam forum bersama'],
+      answer: 0,
+      why: { 0: 'Sila kelima menekankan pemerataan kebajikan sosial, apresiasi hak, dan penghapusan kesewenang-wenangan.' }
+    },
+    {
+      prompt: 'Hierarki tata urutan peraturan perundang-undangan tertinggi di Negara Kesatuan Republik Indonesia adalah…',
+      options: ['Undang-Undang Dasar Negara Republik Indonesia Tahun 1945', 'Ketetapan MPR', 'Peraturan Pemerintah Pengganti Undang-Undang', 'Peraturan Daerah Provinsi'],
+      answer: 0,
+      why: { 0: 'Berdasarkan UU No. 12 Tahun 2011, UUD 1945 merupakan hukum dasar tertulis tertinggi di Indonesia.' }
+    },
+    {
+      prompt: 'Asas kewarganegaraan yang menentukan status kebangsaan seseorang berdasarkan pertalian darah keturunan orang tuanya dinamakan…',
+      options: ['Ius Sanguinis', 'Ius Soli', 'Bipatride otomatis', 'Apatride terbuka'],
+      answer: 0,
+      why: { 0: 'Ius sanguinis (hak darah) menetapkan kewarganegaraan berpatokan pada garis asal keturunan orang tua.' }
+    },
+    {
+      prompt: 'Bentuk partisipasi aktif warga negara dalam upaya pertahanan dan keamanan lingkungan permukiman adalah…',
+      options: ['Melaksanakan ronda malam siskamling secara bergiliran', 'Menyerahkan pengamanan lingkungan hanya ke aparat', 'Menolak mengenali tetangga di sekitar tempat tinggal', 'Mendirikan barikade jalan sepihak tanpa izin'],
+      answer: 0,
+      why: { 0: 'Siskamling adalah wujud nyata bela negara lingkungan sipil yang memperkokoh ketenteraman bersama.' }
+    },
+    {
+      prompt: 'Sistem perwakilan legislatif di Indonesia yang beranggotakan wakil daerah provinsi nonpartai politik adalah…',
+      options: ['Dewan Perwakilan Daerah (DPD)', 'Dewan Perwakilan Rakyat (DPR)', 'Dewan Pertimbangan Presiden', 'Majelis Permusyawaratan Rakyat'],
+      answer: 0,
+      why: { 0: 'DPD memperjuangkan aspirasi dan kepentingan daerah otonom pada tingkat perumusan kebijakan pusat.' }
+    },
+    {
+      prompt: 'Sikap mengutamakan kepentingan bangsa di atas kepentingan pribadi dengan rela berkorban demi kedaulatan tanah air disebut…',
+      options: ['Patriotisme sejati', 'Etnosentrisme sempit', 'Chauvinisme ekstrem', 'Individualisme murni'],
+      answer: 0,
+      why: { 0: 'Patriotisme adalah jiwa kerelaan berkorban secara tulus demi kejayaan dan kehormatan bangsa.' }
+    },
+    {
+      prompt: 'Kewajiban asasi setiap warga negara yang termaktub secara eksplisit dalam Pasal 27 ayat 3 UUD 1945 berkaitan dengan…',
+      options: ['Ikut serta dalam upaya pembelaan negara', 'Membayar retribusi parkir daerah', 'Menempuh studi ke perguruan tinggi', 'Memiliki tabungan perbankan nasional'],
+      answer: 0,
+      why: { 0: 'Pasal 27 ayat 3 menetapkan hak dan kewajiban setiap warga negara ikut serta membela negara.' }
+    },
+    {
+      prompt: 'Lembaga mandiri yang berwenang mengusulkan pengangkatan hakim agung dan menegakkan martabat hakim di Indonesia adalah…',
+      options: ['Komisi Yudisial (KY)', 'Komisi Pemberantasan Korupsi (KPK)', 'Ombudsman Republik Indonesia', 'Lembaga Perlindungan Saksi'],
+      answer: 0,
+      why: { 0: 'Komisi Yudisial menjaga kehormatan, integritas etika, dan perilaku peradilan para hakim di Indonesia.' }
+    }
+  ],
+  AGM: [
+    {
+      prompt: 'Pondasi rukun iman dalam doktrin Islam beranggotakan keyakinan sebanyak…',
+      options: ['6 rukun keimanan', '5 rukun kewajiban', '10 rukun ketaatan', '4 rukun amalan'],
+      answer: 0,
+      why: { 0: 'Rukun Iman ada enam: kepada Allah, malaikat, kitab-kitab, rasul, hari kiamat, qada dan qadar.' }
+    },
+    {
+      prompt: 'Sikap moderasi beragama dalam bingkai kebinekaan diwujudkan dengan…',
+      options: ['Menghormati peribadatan sesama tanpa mencampuradukkan akidah', 'Memaksakan keyakinan pribadi kepada pihak lain', 'Menutup dialog antarwarga beriman', 'Mengabaikan nilai-nilai kebaikan universal'],
+      answer: 0,
+      why: { 0: 'Toleransi autentik menjunjung tinggi penghormatan timbal-balik tanpa kompromi teologis.' }
+    },
+    {
+      prompt: 'Sifat amanah, shiddiq, fathanah, dan tabligh merupakan teladan kepribadian yang tergolong…',
+      options: ['Akhlak mulia (mahmudah)', 'Sikap tercela (madzmumah)', 'Tradisi seremonial semata', 'Hukum mubah kasual'],
+      answer: 0,
+      why: { 0: 'Empat sifat kenabian tersebut merepresentasikan puncak integritas etika dan akhlak mulia.' }
+    },
+    {
+      prompt: 'Kitab Zabur menurut keyakinan samawi diwahyukan kepada nabi utusan…',
+      options: ['Nabi Daud a.s.', 'Nabi Musa a.s.', 'Nabi Isa a.s.', 'Nabi Ibrahim a.s.'],
+      answer: 0,
+      why: { 0: 'Zabur diwahyukan kepada Nabi Daud, Taurat kepada Musa, dan Injil kepada Isa.' }
+    },
+    {
+      prompt: 'Dimensi spiritual puasa mengajarkan kepekaan sosial berupa…',
+      options: ['Asah empati terhadap kaum papa serta latihan pengendalian hawa nafsu', 'Kebiasaan mengonsumsi makanan berlebihan saat petang', 'Menghentikan seluruh aktivitas produktivitas harian', 'Menghindari interaksi dengan lingkungan sekitar'],
+      answer: 0,
+      why: { 0: 'Rasa lapar membangkitkan solidaritas kemanusiaan dan kemandirian pengendalian diri.' }
+    },
+    {
+      prompt: 'Perilaku terpuji yang mencerminkan sikap rendah hati serta tidak memamerkan kelebihan diri diistilahkan sebagai…',
+      options: ['Tawaduk (rendah hati)', 'Takabur (sombong)', 'Riya pamer', 'Hasad dengki'],
+      answer: 0,
+      why: { 0: 'Tawaduk adalah sifat mulia di mana seseorang menyadari kelemahan diri di hadapan Sang Pencipta dan sesama.' }
+    },
+    {
+      prompt: 'Dalam ajaran agama Islam, zakat fitrah wajib ditunaikan oleh setiap muslim menjelang tibanya…',
+      options: ['Hari Raya Idul Fitri', 'Hari Raya Idul Adha', 'Peringatan Isra Mikraj', 'Tahun Baru Hijriah'],
+      answer: 0,
+      why: { 0: 'Zakat fitrah membersihkan jiwa orang yang berpuasa dan ditunaikan sebelum salat Idul Fitri.' }
+    },
+    {
+      prompt: 'Hukum perbuatan dalam fikih di mana pelakunya memperoleh pahala bila mengerjakan dan tidak berdosa bila meninggalkan adalah…',
+      options: ['Sunah (mustahab)', 'Wajib mutlak', 'Makruh', 'Haram qath’i'],
+      answer: 0,
+      why: { 0: 'Sunah adalah perbuatan yang dianjurkan pengerjaannya oleh syariat tanpa konsekuensi sanksi jika terlewat.' }
+    },
+    {
+      prompt: 'Nilai kasih sayang tanpa membedakan latar belakang sesama manusia merupakan pesan luhur dalam doktrin ajaran…',
+      options: ['Seluruh agama samawi dan tradisi kebajikan universal', 'Kelompok eksklusif tertutup semata', 'Aliran sekuler ekstrem', 'Doktrin individualisme material'],
+      answer: 0,
+      why: { 0: 'Prinsip belas kasih, kemanusiaan, dan kedamaian merupakan inti ajaran etika seluruh agama beradab.' }
+    },
+    {
+      prompt: 'Sikap berserah diri secara tulus kepada ketentuan Tuhan setelah berikhtiar secara optimal dinamakan…',
+      options: ['Tawakal', 'Pasrah tanpa usaha', 'Pesimisme fatalistik', 'Takabur diri'],
+      answer: 0,
+      why: { 0: 'Tawakal adalah menyandarkan hasil akhir ikhtiar kepada kehendak ilahi dengan hati yang tenang lapang.' }
+    },
+    {
+      prompt: 'Kitab suci yang diturunkan kepada Nabi Musa a.s. sebagai petunjuk bagi kaumnya adalah…',
+      options: ['Kitab Taurat', 'Kitab Injil', 'Kitab Al-Qur’an', 'Kitab Weda'],
+      answer: 0,
+      why: { 0: 'Taurat diwahyukan kepada Nabi Musa di Bukit Tursina memuat sepuluh perintah suci.' }
+    },
+    {
+      prompt: 'Konsep moderasi beragama menempatkan pemeluk agama untuk menolak dua kutub ekstrem, yaitu…',
+      options: ['Ekstremisme radikal di satu sisi dan liberalisme permisif di sisi lain', 'Ketaatan ibadah dan sedekah sosial', 'Kesalehan personal dan keteladanan budi pekerti', 'Studi kitab suci dan dialog antarwarga'],
+      answer: 0,
+      why: { 0: 'Moderasi (wasathiyah) mengambil jalan tengah yang adil dan berimbang di antara kekakuan dan kelalaian.' }
+    },
+    {
+      prompt: 'Tindakan meminta ampun dan menyesali kesalahan masa lalu dengan tekad tidak mengulanginya lagi diistilahkan sebagai…',
+      options: ['Tobat nasuha', 'Kafarat duniawi', 'Nazar bersyarat', 'Istisqa doa'],
+      answer: 0,
+      why: { 0: 'Tobat yang tulus (nasuha) mensyaratkan penyesalan mendalam, penghentian dosa, dan perbaikan perbuatan.' }
+    },
+    {
+      prompt: 'Menghormati orang tua dan pendidik serta bertutur kata santun kepada mereka merupakan wujud nyata dari pengamalan…',
+      options: ['Birrul walidain dan adab penuntut ilmu', 'Kewajiban seremonial kasual', 'Formalitas tata tertib sekolah', 'Tradisi simbolis tanpa makna'],
+      answer: 0,
+      why: { 0: 'Berbakti kepada orang tua dan memuliakan guru menempati derajat utama dalam tatanan moral beragama.' }
+    },
+    {
+      prompt: 'Pemberian sedekah atau derma secara sukarela kepada mereka yang membutuhkan dengan niat tulus dinamakan…',
+      options: ['Infaq dan sedekah jariyah', 'Riba komersial', 'Pajak bumi negara', 'Gharar transaksi'],
+      answer: 0,
+      why: { 0: 'Sedekah merupakan amalan filantropi sukarela yang mendatangkan kemaslahatan sosial berkelanjutan.' }
+    }
+  ],
+  FIS: [
+    {
+      prompt: 'Sebuah mobil melaju dengan kecepatan tetap 72 km/jam. Jarak tempuh dalam waktu 15 menit adalah…',
+      options: ['18 km', '10.8 km', '4.8 km', '36 km'],
+      answer: 0,
+      why: { 0: '72 km/jam = 72 \u00d7 (15/60) = 72 \u00d7 0.25 = 18 km.' }
+    },
+    {
+      prompt: 'Energi kinetik suatu benda bermassa 4 kg yang melaju dengan kelajuan 3 m/s adalah…',
+      options: ['18 J', '12 J', '36 J', '6 J'],
+      answer: 0,
+      why: { 0: 'Ek = ½ mv² = ½ \u00d7 4 \u00d7 9 = 18 Joule.' }
+    },
+    {
+      prompt: 'Kawat penghantar dialiri arus listrik 2 A selama 5 menit. Muatan listrik yang mengalir adalah…',
+      options: ['600 C', '10 C', '150 C', '2.5 C'],
+      answer: 0,
+      why: { 0: 'Q = I \u00d7 t = 2 A \u00d7 300 s = 600 Coulomb.' }
+    },
+    {
+      prompt: 'Gelombang bunyi tidak dapat merambat melalui media…',
+      options: ['Kondisi hampa udara (vakum)', 'Air laut', 'Batang besi', 'Udara bebas'],
+      answer: 0,
+      why: { 0: 'Bunyi memerlukan partikel medium untuk merambat; di ruang hampa tidak ada materi perantara.' }
+    },
+    {
+      prompt: 'Lensa cembung (konveks) digunakan untuk membantu penderita kelainan mata…',
+      options: ['Hipermetropi (rabun dekat)', 'Miopi (rabun jauh)', 'Astigmatisme (silinder)', 'Presbiopi total'],
+      answer: 0,
+      why: { 0: 'Hipermetropi dikoreksi dengan lensa cembung yang mengumpulkan berkas cahaya tepat di retina.' }
+    },
+    {
+      prompt: 'Besarnya tekanan hidrostatis pada kedalaman tertentu di dalam zat cair dipengaruhi secara langsung oleh…',
+      options: ['Massa jenis cairan, percepatan gravitasi, dan kedalaman posisi', 'Bentuk wadah penampung dan luas permukaan cairan', 'Suhu wadah penampung semata', 'Kelajuan aliran fluida di permukaan'],
+      answer: 0,
+      why: { 0: 'Tekanan hidrostatis dirumuskan P = ρ \u00d7 g \u00d7 h, bergantung pada massa jenis zat cair, gravitasi, dan kedalaman.' }
+    },
+    {
+      prompt: 'Suatu alat elektronik menyerap daya 110 Watt saat dihubungkan ke sumber tegangan 220 Volt. Kuat arus listrik yang mengalir adalah…',
+      options: ['0.5 Ampere', '2 Ampere', '24.2 Ampere', '0.2 Ampere'],
+      answer: 0,
+      why: { 0: 'Berdasarkan rumus daya listrik P = V \u00d7 I, maka I = P / V = 110 W / 220 V = 0.5 A.' }
+    },
+    {
+      prompt: 'Prinsip fisika yang menyatakan bahwa gaya apung ke atas pada benda tercelup sama dengan berat fluida yang dipindahkan adalah…',
+      options: ['Hukum Archimedes', 'Hukum Pascal', 'Hukum Boyle', 'Hukum Hooke'],
+      answer: 0,
+      why: { 0: 'Hukum Archimedes mendasari prinsip terapung, melayang, dan tenggelamnya benda dalam zat cair.' }
+    },
+    {
+      prompt: 'Sebuah benda dijatuhkan bebas tanpa kecepatan awal dari ketinggian 20 meter (g = 10 m/s²). Waktu yang dibutuhkan hingga menyentuh tanah adalah…',
+      options: ['2 detik', '4 detik', '1 detik', '10 detik'],
+      answer: 0,
+      why: { 0: 'Gunakan rumus gerak jatuh bebas: t = √(2h / g) = √(40 / 10) = √4 = 2 detik.' }
+    },
+    {
+      prompt: 'Hukum fisika yang menyatakan bahwa gaya aksi dan reaksi antara dua benda memiliki besar sama tetapi berlawanan arah adalah…',
+      options: ['Hukum III Newton', 'Hukum I Newton', 'Hukum II Newton', 'Hukum Gravitasi Universal'],
+      answer: 0,
+      why: { 0: 'F_aksi = -F_reaksi. Pasangan gaya terjadi pada dua benda berlainan dengan arah berlawanan.' }
+    },
+    {
+      prompt: 'Panjang gelombang sebuah gelombang yang merambat dengan kelajuan 340 m/s dan frekuensi 170 Hz adalah…',
+      options: ['2 meter', '0.5 meter', '510 meter', '57.800 meter'],
+      answer: 0,
+      why: { 0: 'Panjang gelombang λ = v / f = 340 m/s / 170 Hz = 2 meter.' }
+    },
+    {
+      prompt: 'Besarnya energi potensial gravitasi suatu benda seberat 5 kg yang berada pada ketinggian 6 meter (g = 10 m/s²) adalah…',
+      options: ['300 Joule', '30 Joule', '150 Joule', '60 Joule'],
+      answer: 0,
+      why: { 0: 'Ep = m \u00d7 g \u00d7 h = 5 kg \u00d7 10 m/s² \u00d7 6 m = 300 Joule.' }
+    },
+    {
+      prompt: 'Dua buah muatan listrik sejenis yang saling didekatkan akan mengalami interaksi gaya…',
+      options: ['Tolak-menolak sebanding kuadrat terbalik jarak', 'Tarik-menarik kuat', 'Tetap tanpa interaksi gaya', 'Menempel menyatu secara permanen'],
+      answer: 0,
+      why: { 0: 'Hukum Coulomb: muatan sejenis tolak-menolak sedangkan muatan tak sejenis tarik-menarik.' }
+    },
+    {
+      prompt: 'Hambatan pengganti dari tiga resistor identik masing-masing bernilai 6 Ohm yang dirangkai secara seri adalah…',
+      options: ['18 Ohm', '2 Ohm', '12 Ohm', '0.5 Ohm'],
+      answer: 0,
+      why: { 0: 'Rangkaian seri menjumlahkan nilai hambatan: R_total = 6 + 6 + 6 = 18 Ohm.' }
+    },
+    {
+      prompt: 'Peristiwa pembelokan arah rambat berkas cahaya saat melintasi batas dua medium dengan kerapatan optik berbeda dinamakan…',
+      options: ['Pembiasan (refraksi) gelombang', 'Pemantulan baur (difusi)', 'Polarisasi linier', 'Dispersi prisma'],
+      answer: 0,
+      why: { 0: 'Refraksi terjadi karena perubahan kecepatan rambat cahaya saat memasuki medium berkerapatan optik beda.' }
+    }
+  ],
+  KIM: [
+    {
+      prompt: 'Atom karbon memiliki nomor atom 6. Jumlah elektron pada kulit terluar atom karbon adalah…',
+      options: ['4', '2', '6', '8'],
+      answer: 0,
+      why: { 0: 'Konfigurasi elektron C: 2, 4. Kulit valensi memiliki 4 elektron.' }
+    },
+    {
+      prompt: 'Larutan dengan nilai pH = 3 tergolong larutan…',
+      options: ['Asam kuat', 'Basa kuat', 'Netral', 'Basa lemah'],
+      answer: 0,
+      why: { 0: 'Nilai pH < 7 menunjukkan sifat asam; pH 3 tergolong asam kuat.' }
+    },
+    {
+      prompt: 'Reaksi antara logam natrium (Na) dengan air (H₂O) menghasilkan…',
+      options: ['NaOH dan gas H₂', 'Na₂O dan gas O₂', 'NaCl dan gas H₂', 'NaOH dan gas O₂'],
+      answer: 0,
+      why: { 0: '2Na + 2H₂O → 2NaOH + H₂. Reaksi menghasilkan natrium hidroksida dan gas hidrogen.' }
+    },
+    {
+      prompt: 'Ikatan kimia yang terbentuk akibat penggunaan bersama pasangan elektron dinamakan…',
+      options: ['Ikatan kovalen', 'Ikatan ion', 'Ikatan logam', 'Ikatan hidrogen'],
+      answer: 0,
+      why: { 0: 'Ikatan kovalen terjadi ketika dua atom saling berbagi pasangan elektron valensi.' }
+    },
+    {
+      prompt: 'Unsur-unsur yang terletak dalam satu golongan pada tabel periodik memiliki kesamaan pada…',
+      options: ['Jumlah elektron valensi', 'Jumlah kulit atom', 'Massa atom relatif', 'Jumlah neutron inti'],
+      answer: 0,
+      why: { 0: 'Unsur segolongan memiliki jumlah elektron valensi sama sehingga sifat kimianya serupa.' }
+    },
+    {
+      prompt: 'Rumus molekul kimia yang menyatakan senyawa asam sulfat secara tepat adalah…',
+      options: ['H₂SO₄', 'HCl', 'HNO₃', 'H₃PO₄'],
+      answer: 0,
+      why: { 0: 'Asam sulfat tersusun atas dua kation hidrogen (H⁺) dan satu anion sulfat (SO₄²⁻) membentuk H₂SO₄.' }
+    },
+    {
+      prompt: 'Metode pemisahan komponen minyak bumi berdasarkan perbedaan titik didih fraksi-fraksinya dinamakan…',
+      options: ['Distilasi bertingkat (fraksionasi)', 'Kromatografi kertas', 'Kristalisasi penguapan', 'Filtrasi saringan halus'],
+      answer: 0,
+      why: { 0: 'Distilasi fraksionasi memisahkan hidrokarbon minyak mentah pada rentang suhu didih yang berbeda di menara distilasi.' }
+    },
+    {
+      prompt: 'Partikel dasar penyusun atom yang bermuatan listrik negatif dan bergerak mengitari inti atom adalah…',
+      options: ['Elektron', 'Proton', 'Neutron', 'Positron'],
+      answer: 0,
+      why: { 0: 'Elektron mengorbit inti atom pada tingkat-tingkat energi kulit atom dengan muatan negatif (-1).' }
+    },
+    {
+      prompt: 'Jumlah partikel dalam satu mol suatu zat menurut bilangan Avogadro adalah…',
+      options: ['6.02 \u00d7 10²³ partikel', '3.01 \u00d7 10²³ partikel', '1.20 \u00d7 10²⁴ partikel', '6.02 \u00d7 10²² partikel'],
+      answer: 0,
+      why: { 0: 'Tetapan Avogadro bernilai 6.022 \u00d7 10²³ partikel per mol zat.' }
+    },
+    {
+      prompt: 'Zat yang mempercepat laju suatu reaksi kimia tanpa mengalami perubahan kimia permanen pada akhir reaksi disebut…',
+      options: ['Katalisator (katalis)', 'Inhibitor reaksi', 'Indikator asam-basa', 'Presipitat endapan'],
+      answer: 0,
+      why: { 0: 'Katalis menurunkan energi aktivasi reaksi sehingga laju reaksi meningkat tanpa ikut terkonsumsi.' }
+    },
+    {
+      prompt: 'Reaksi pembakaran hidrokarbon sempurna dari gas metana (CH₄) di udara terbuka akan menghasilkan…',
+      options: ['Karbon dioksida (CO₂) dan uap air (H₂O)', 'Karbon monoksida (CO) dan jelaga', 'Gas hidrogen murni dan karbon', 'Gas klorin dan asam metanoat'],
+      answer: 0,
+      why: { 0: 'Reaksi: CH₄ + 2O₂ → CO₂ + 2H₂O melepaskan energi kalor secara eksotermik.' }
+    },
+    {
+      prompt: 'Larutan penyangga (buffer) memiliki sifat khas yang sangat penting dalam sistem biologi karena mampu…',
+      options: ['Mempertahankan derajat keasaman (pH) saat penambahan sedikit asam atau basa', 'Menaikkan titik didih pelarut secara drastis', 'Mengendapkan seluruh kation logam berat', 'Mengubah larutan asam pekat menjadi netral seketika'],
+      answer: 0,
+      why: { 0: 'Buffer meminimalkan fluktuasi pH melalui kesetimbangan asam lemah dan basa konjugasinya.' }
+    },
+    {
+      prompt: 'Unsur gas mulia (Golongan VIIIA) sangat stabil dan sukar bereaksi dengan zat lain karena memiliki…',
+      options: ['Konfigurasi elektron valensi penuh (oktet atau duplet)', 'Energi ionisasi yang sangat rendah', 'Afinitas elektron bernilai sangat positif', 'Jari-jari atom yang teramat besar'],
+      answer: 0,
+      why: { 0: 'Konfigurasi 8 elektron valensi (atau 2 pada Helium) memberikan kestabilan kimiawi maksimal.' }
+    },
+    {
+      prompt: 'Peristiwa pelepasan elektron oleh suatu atom atau ion dalam reaksi redoks diklasifikasikan sebagai…',
+      options: ['Reaksi oksidasi', 'Reaksi reduksi', 'Reaksi hidrolisis', 'Reaksi netralisasi'],
+      answer: 0,
+      why: { 0: 'Oksidasi didefinisikan sebagai peristiwa pelepasan elektron yang disertai kenaikan bilangan oksidasi.' }
+    },
+    {
+      prompt: 'Massa molekul relatif (Mr) dari senyawa air (H₂O) jika diketahui Ar H = 1 dan Ar O = 16 adalah…',
+      options: ['18 g/mol', '17 g/mol', '34 g/mol', '16 g/mol'],
+      answer: 0,
+      why: { 0: 'Mr H₂O = (2 \u00d7 Ar H) + (1 \u00d7 Ar O) = (2 \u00d7 1) + 16 = 18 g/mol.' }
+    }
+  ],
+  BIO: [
+    {
+      prompt: 'Proses fotosintesis pada tumbuhan berklorofil berlangsung di dalam organel…',
+      options: ['Kloroplas', 'Mitokondria', 'Ribosom', 'Lisosom'],
+      answer: 0,
+      why: { 0: 'Kloroplas mengandung klorofil penangkap foton cahaya untuk sintesis glukosa.' }
+    },
+    {
+      prompt: 'Hasil akhir hidrolisis protein pada saluran usus halus berupa…',
+      options: ['Asam amino', 'Glukosa', 'Asam lemak dan gliserol', 'Maltosa'],
+      answer: 0,
+      why: { 0: 'Protein dipecah oleh protease hingga menjadi molekul asam amino siap serap.' }
+    },
+    {
+      prompt: 'Penyakit defisiensi imun AIDS disebabkan oleh infeksi virus yang merusak sistem…',
+      options: ['Kekebalan tubuh (imun)', 'Pencernaan makanan', 'Pernapasan internal', 'Saraf pusat'],
+      answer: 0,
+      why: { 0: 'HIV menginfeksi limfosit T helper sehingga daya tahan tubuh inang melemah drastis.' }
+    },
+    {
+      prompt: 'Persilangan monohibrid dominan penuh antara genotipe Aa dengan sesamanya menghasilkan perbandingan fenotipe…',
+      options: ['3 dominan : 1 resesif', '1 dominan : 1 resesif', '2 dominan : 2 resesif', '4 dominan : 0 resesif'],
+      answer: 0,
+      why: { 0: 'Kombinasi Aa \u00d7 Aa menghasilkan AA, 2Aa, aa sehingga rasio fenotipe 3:1.' }
+    },
+    {
+      prompt: 'Kawasan hutan mangrove di garis pantai berperan penting untuk…',
+      options: ['Menahan abrasi gelombang dan habitat biota pesisir', 'Meningkatkan emisi karbon bebas', 'Memicu erosi tanah alluvial', 'Menekan keanekaragaman hayati'],
+      answer: 0,
+      why: { 0: 'Jaringan akar mangrove memecah energi ombak serta menjadi tempat pemijahan ikan.' }
+    },
+    {
+      prompt: 'Pembuluh darah utama yang mengalirkan darah kaya oksigen dari bilik kiri jantung menuju seluruh jaringan tubuh adalah…',
+      options: ['Aorta', 'Vena kava superior', 'Arteri pulmonalis', 'Vena pulmonalis'],
+      answer: 0,
+      why: { 0: 'Aorta adalah arteri terbesar yang menerima darah bertekanan tinggi dari ventrikel kiri untuk didistribusikan ke seluruh tubuh.' }
+    },
+    {
+      prompt: 'Fase pembelahan mitosis di mana benang spindel menata dan menarik kromosom berjejer tepat di bidang ekuator sel adalah…',
+      options: ['Metafase', 'Profase', 'Anafase', 'Telofase'],
+      answer: 0,
+      why: { 0: 'Pada metafase, kromosom terkondensasi maksimal dan berjejer teratur di lempeng metafase (bidang pembelahan).' }
+    },
+    {
+      prompt: 'Bagian saluran pencernaan manusia tempat terjadinya penyerapan (absorpsi) sari-sari makanan ke dalam peredaran darah adalah…',
+      options: ['Usus halus (ileum)', 'Lambung (ventrikulus)', 'Usus besar (kolon)', 'Kerongkongan (esofagus)'],
+      answer: 0,
+      why: { 0: 'Vili dan mikrovili pada dinding usus halus memperluas bidang penyerapan nutrisi makanan ke kapiler darah.' }
+    },
+    {
+      prompt: 'Organel bermembran ganda yang dijuluki "the powerhouse of cell" karena menghasilkan energi ATP adalah…',
+      options: ['Mitokondria', 'Badan Golgi', 'Retikulum endoplasma halus', 'Peroksisom'],
+      answer: 0,
+      why: { 0: 'Mitokondria melangsungkan fosforilasi oksidatif dan siklus Krebs untuk sintesis ATP.' }
+    },
+    {
+      prompt: 'Jaringan pengangkut pada tumbuhan yang berfungsi menyalurkan hasil fotosintesis dari daun ke seluruh tubuh adalah…',
+      options: ['Floem (pembuluh tapis)', 'Xilem (pembuluh kayu)', 'Kambium gabus', 'Epidermis pelindung'],
+      answer: 0,
+      why: { 0: 'Floem mentranslokasikan sukrosa dan nutrisi organik lain dari organ produsen ke organ konsumen.' }
+    },
+    {
+      prompt: 'Hormon yang disekresikan oleh sel beta pankreas untuk menurunkan konsentrasi glukosa dalam darah adalah…',
+      options: ['Insulin', 'Glukagon', 'Adrenalin', 'Tiroksin'],
+      answer: 0,
+      why: { 0: 'Insulin memfasilitasi penyerapan glukosa darah ke dalam sel otot dan hati untuk diubah menjadi glikogen.' }
+    },
+    {
+      prompt: 'Interaksi antara ikan badut (clownfish) dan anemon laut yang saling memberikan keuntungan tergolong…',
+      options: ['Simbiosis mutualisme', 'Simbiosis parasitisme', 'Simbiosis komensalisme', 'Simbiosis amensalisme'],
+      answer: 0,
+      why: { 0: 'Ikan badut terlindungi oleh tentakel anemon sementara anemon memperoleh sisa makanan dan dibersihkan dari parasit.' }
+    },
+    {
+      prompt: 'Basa nitrogen pirimidin yang hanya ditemukan pada molekul RNA dan menggantikan timin adalah…',
+      options: ['Urasil', 'Sitosin', 'Guanin', 'Adenin'],
+      answer: 0,
+      why: { 0: 'Pada untai tunggal RNA, urasil berpasangan komplementer dengan adenin menggantikan peran timin DNA.' }
+    },
+    {
+      prompt: 'Unit fungsional dan struktural terkecil pada ginjal manusia yang menyaring darah dinamakan…',
+      options: ['Nefron', 'Neuron sensorik', 'Alveolus kapiler', 'Lobulus hepatik'],
+      answer: 0,
+      why: { 0: 'Tiap ginjal tersusun atas sekitar satu juta nefron yang terdiri dari glomerulus dan tubulus renalis.' }
+    },
+    {
+      prompt: 'Proses pembentukan sperma (gamet jantan) di dalam tubulus seminiferus testis dinamakan…',
+      options: ['Spermatogenesis', 'Oogenesis sel telur', 'Fertilisasi internal', 'Metamorfosis sempurna'],
+      answer: 0,
+      why: { 0: 'Spermatogenesis menghasilkan spermatozoa fungsional melalui tahapan mitosis dan meiosis.' }
+    }
+  ],
+  EKO: [
+    {
+      prompt: 'Pengorbanan atas pilihan terbaik lain yang harus dilepaskan saat mengambil keputusan ekonomi disebut…',
+      options: ['Opportunity cost (biaya peluang)', 'Sunk cost', 'Biaya marginal', 'Biaya eksplisit'],
+      answer: 0,
+      why: { 0: 'Biaya peluang adalah nilai alternatif terbaik berikutnya yang dikorbankan.' }
+    },
+    {
+      prompt: 'Berdasarkan hukum permintaan, apabila harga suatu komoditas mengalami kenaikan maka kuantitas yang diminta akan…',
+      options: ['Mengalami penurunan (ceteris paribus)', 'Mengalami kenaikan pesat', 'Tetap tanpa fluktuasi', 'Tak terhingga jumlahnya'],
+      answer: 0,
+      why: { 0: 'Hukum permintaan berbanding terbalik: harga naik menyebabkan jumlah permintaan turun.' }
+    },
+    {
+      prompt: 'Kenaikan tingkat harga umum barang secara terus-menerus akibat kenaikan biaya input produksi dinamakan…',
+      options: ['Cost-push inflation', 'Demand-pull inflation', 'Deflasi musiman', 'Depresiasi modal'],
+      answer: 0,
+      why: { 0: 'Cost-push timbul ketika ongkos faktor produksi (upah/bahan mentah) melambung.' }
+    },
+    {
+      prompt: 'Otoritas moneter yang memiliki hak tunggal mencetak dan mengedarkan mata uang rupiah adalah…',
+      options: ['Bank Indonesia (BI)', 'Otoritas Jasa Keuangan (OJK)', 'Kementerian Keuangan RI', 'Lembaga Penjamin Simpanan'],
+      answer: 0,
+      why: { 0: 'Bank sentral (BI) memegang hak oktroi peredaran mata uang negara.' }
+    },
+    {
+      prompt: 'Karakteristik mendasar dari struktur pasar persaingan sempurna adalah…',
+      options: ['Jumlah penjual-pembeli melimpah dengan komoditas homogen', 'Hanya ada satu produsen tunggal pengendali pasar', 'Terdapat diferensiasi produk yang tajam', 'Rintangan masuk pasar sangat tinggi'],
+      answer: 0,
+      why: { 0: 'Pasar sempurna ditandai penjual banyak, produk serupa, dan kebebasan keluar-masuk.' }
+    },
+    {
+      prompt: 'Pajak yang beban pembayarannya tidak dapat dialihkan kepada pihak lain (seperti Pajak Penghasilan / PPh) tergolong sebagai…',
+      options: ['Pajak langsung', 'Pajak tidak langsung (PPN)', 'Pajak bea cukai', 'Retribusi daerah'],
+      answer: 0,
+      why: { 0: 'Pajak langsung dikenakan secara periodik kepada wajib pajak dan surat ketetapannya tidak dapat dilimpahkan ke pihak lain.' }
+    },
+    {
+      prompt: 'Suatu kondisi perekonomian di mana nilai ekspor barang dan jasa suatu negara melampaui total nilai impornya disebut…',
+      options: ['Neraca perdagangan surplus (aktif)', 'Neraca perdagangan defisit (pasif)', 'Stagflasi ekonomi', 'Devaluasi mata uang'],
+      answer: 0,
+      why: { 0: 'Surplus perdagangan terjadi saat penerimaan devisa dari ekspor lebih besar daripada devisa yang keluar untuk impor.' }
+    },
+    {
+      prompt: 'Faktor produksi turunan yang mencakup kemampuan seseorang mengorganisasi, memimpin, dan menanggung risiko usaha dinamakan…',
+      options: ['Kewirausahaan (entrepreneurship)', 'Tenaga kerja terdidik', 'Modal fisik barang', 'Sumber daya alam'],
+      answer: 0,
+      why: { 0: 'Kewirausahaan adalah keahlian manajerial memadukan faktor alam, tenaga kerja, dan modal secara produktif.' }
+    },
+    {
+      prompt: 'Keseimbangan pasar (ekuilibrium) tercapai ketika…',
+      options: ['Jumlah barang yang diminta konsumen sama dengan jumlah barang yang ditawarkan produsen', 'Pemerintah menetapkan batas pagu harga atas tertinggi', 'Seluruh produsen sepakat menurunkan nilai produksi komoditas', 'Laju inflasi nasional menyentuh angka nol persen'],
+      answer: 0,
+      why: { 0: 'Titik ekuilibrium (Qd = Qs) menentukan harga pasar stabil di mana tidak terjadi surplus maupun defisit barang.' }
+    },
+    {
+      prompt: 'Instrumen kebijakan moneter Bank Sentral berupa pembelian atau penjualan surat berharga negara dinamakan…',
+      options: ['Operasi pasar terbuka (open market operations)', 'Kebijakan diskonto suku bunga', 'Pemberlakuan cadangan kas minimum', 'Pemberian kredit selektif kreditur'],
+      answer: 0,
+      why: { 0: 'Bank Indonesia memperketat atau melonggarkan likuiditas uang beredar melalui jual-beli sertifikat berharga.' }
+    },
+    {
+      prompt: 'Sistem ekonomi di mana seluruh alokasi sumber daya dan keputusan produksi diatur secara terpusat oleh komando pemerintah adalah…',
+      options: ['Sistem ekonomi komando (sosialis terpusat)', 'Sistem ekonomi pasar bebas liberal', 'Sistem ekonomi tradisional subsisten', 'Sistem ekonomi barter kuno'],
+      answer: 0,
+      why: { 0: 'Dalam ekonomi terpimpin komando, negara memegang kendali kepemilikan alat produksi dan rencana distribusi.' }
+    },
+    {
+      prompt: 'Suatu pasar yang hanya dikuasai oleh segelintir perusahaan produsen besar (seperti industri semen atau telekomunikasi) disebut pasar…',
+      options: ['Oligopoli', 'Monopoli murni tunggal', 'Monopsoni pembeli', 'Persaingan monopolistik'],
+      answer: 0,
+      why: { 0: 'Pasar oligopoli dicirikan oleh sedikit pemain dominan yang keputusannya saling memengaruhi penetapan harga.' }
+    },
+    {
+      prompt: 'Konsep yang menyatakan total nilai moneter dari seluruh barang dan jasa akhir yang dihasilkan suatu negara dalam periode setahun adalah…',
+      options: ['Produk Domestik Bruto (PDB / GDP)', 'Pendapatan Per Kapita rata-rata', 'Neraca Pembayaran Internasional', 'Indeks Harga Konsumen (IHK)'],
+      answer: 0,
+      why: { 0: 'PDB mengukur output ekonomi bruto yang diproduksi di dalam batas teritorial suatu negara dalam satu tahun.' }
+    },
+    {
+      prompt: 'Elastisitas permintaan yang bernilai lebih dari satu (Ed > 1) menunjukkan bahwa permintaan barang bersifat…',
+      options: ['Elastis terhadap fluktuasi harga', 'Inelastis sempurna tanpa respons', 'Inelastis uniter proporsional', 'Inelastis moderat semata'],
+      answer: 0,
+      why: { 0: 'Ed > 1 berarti persentase perubahan kuantitas permintaan lebih besar daripada persentase perubahan harga.' }
+    },
+    {
+      prompt: 'Lembaga pengawas independen yang mengawasi seluruh aktivitas di sektor jasa perbankan, pasar modal, dan asuransi di Indonesia adalah…',
+      options: ['Otoritas Jasa Keuangan (OJK)', 'Kementerian Koordinator Perekonomian', 'Lembaga Penjamin Simpanan (LPS)', 'Badan Pusat Statistik (BPS)'],
+      answer: 0,
+      why: { 0: 'OJK dibentuk berlandaskan UU No. 21 Tahun 2011 untuk menyelenggarakan sistem pengawasan sektor jasa keuangan.' }
+    }
+  ],
+  GEO: [
+    {
+      prompt: 'Lapisan atmosfer terendah tempat berlangsungnya dinamika cuaca seperti hujan dan angin adalah…',
+      options: ['Troposfer', 'Stratosfer', 'Mesosfer', 'Termosfer'],
+      answer: 0,
+      why: { 0: 'Troposfer (0-12 km) menampung mayoritas massa udara dan uap air atmosfer bumi.' }
+    },
+    {
+      prompt: 'Proses pembentukan permukaan bumi yang dipicu oleh tenaga dari dalam kerak bumi disebut tenaga…',
+      options: ['Endogen', 'Eksogen', 'Pelapukan batuan', 'Sedimentasi fluviatil'],
+      answer: 0,
+      why: { 0: 'Tenaga endogen bersumber dari dinamika internal bumi mencakup tektonisme dan vulkanisme.' }
+    },
+    {
+      prompt: 'Secara geografis perairan, posisi kepulauan Indonesia diapit oleh dua samudra luas, yaitu…',
+      options: ['Samudra Hindia dan Samudra Pasifik', 'Samudra Atlantik dan Samudra Hindia', 'Samudra Arktik dan Samudra Pasifik', 'Samudra Atlantik dan Samudra Pasifik'],
+      answer: 0,
+      why: { 0: 'Indonesia berada di antara Samudra Hindia di selatan/barat dan Samudra Pasifik di timur.' }
+    },
+    {
+      prompt: 'Karakteristik tanah vulkanik (andosol) yang menjadikannya sangat produktif bagi bercocok tanam adalah…',
+      options: ['Kandungan mineral hara tinggi dari abu letusan gunung berapi', 'Tingginya kadar garam anorganik', 'Tersusun atas lempung kedap air', 'Kadar keasaman (pH) ekstrem'],
+      answer: 0,
+      why: { 0: 'Lapukan abu vulkanik kaya unsur hara fosfor, kalium, dan kalsium yang menyuburkan tanaman.' }
+    },
+    {
+      prompt: 'Lingkaran khayal khatulistiwa (garis ekuator) membagi bola bumi menjadi dua belahan pada garis lintang…',
+      options: ['0 derajat', '23.5 derajat LU', '90 derajat LS', '180 derajat bujur'],
+      answer: 0,
+      why: { 0: 'Garis ekuator berposisi tepat pada lintang nol derajat.' }
+    },
+    {
+      prompt: 'Peristiwa keluarnya magma pijar dari interior perut bumi ke permukaan dinamakan fenomena…',
+      options: ['Vulkanisme (erupsi gunung berapi)', 'Tektonisme lempeng patahan', 'Seisme gelombang gempa', 'Pelapukan batuan mekanis'],
+      answer: 0,
+      why: { 0: 'Vulkanisme mencakup intrusi magma ke litosfer dan ekstrusi lava menembus kepundan gunung berapi.' }
+    },
+    {
+      prompt: 'Prinsip dasar geografi yang memaparkan persebaran gejala geosfer di muka bumi secara tidak merata adalah prinsip…',
+      options: ['Distribusi (persebaran spasial)', 'Interelasi sebab-akibat', 'Deskripsi naratif', 'Korologi terpadu'],
+      answer: 0,
+      why: { 0: 'Prinsip distribusi menelaah fenomena alam dan manusia yang tersebar bervariasi di berbagai kawasan muka bumi.' }
+    },
+    {
+      prompt: 'Siklus hidrologi di mana air laut menguap, terbawa angin ke daratan, mengalami kondensasi menjadi hujan di pegunungan, lalu mengalir kembali ke laut disebut…',
+      options: ['Siklus hidrologi sedang', 'Siklus hidrologi pendek pantai', 'Siklus hidrologi panjang bersalju', 'Siklus transpirasi mikro'],
+      answer: 0,
+      why: { 0: 'Siklus sedang melibatkan adveksi awan ke wilayah daratan sebelum presipitasi air hujan terjadi.' }
+    },
+    {
+      prompt: 'Bentuk muka bumi hasil proses pengendapan material sedimen di muara aliran sungai yang bertemu laut tenang dinamakan…',
+      options: ['Delta sungai pesisir', 'Meander kelokan', 'Danau tapal kuda (oxbow lake)', 'Peneplain dataran tua'],
+      answer: 0,
+      why: { 0: 'Delta terbentuk saat arus sungai melambat di pertemuan muara laut sehingga sedimen mengendap berlipat.' }
+    },
+    {
+      prompt: 'Lapisan litosfer kerak benua tersusun dominan atas senyawa batuan silisium dan aluminium yang dikenal dengan istilah lapisan…',
+      options: ['Lapisan Sial (Silisium-Aluminium)', 'Lapisan Sima (Silisium-Magnesium)', 'Inti bumi dalam (Nife)', 'Astenosfer semi-cair'],
+      answer: 0,
+      why: { 0: 'Lapisan granitis kerak benua berkepadatan rendah didominasi mineral silika dan aluminium.' }
+    },
+    {
+      prompt: 'Tipe iklim menurut Wladimir Köppen yang ditandai hutan hujan tropis basah dengan curah hujan tinggi sepanjang tahun dikodekan dengan huruf…',
+      options: ['Af (Iklim hutan hujan tropis)', 'Aw (Iklim sabana tropis)', 'Cs (Iklim subtropis kering)', 'ET (Iklim tundra kutub)'],
+      answer: 0,
+      why: { 0: 'Kode Af mewakili zona tropis basah di mana tidak ada bulan kering berkepanjangan (curah > 60 mm per bulan).' }
+    },
+    {
+      prompt: 'Sistem Informasi Geografis (SIG) memanfaatkan perangkat lunak spasial guna mengolah data geografis berformat raster dan…',
+      options: ['Vektor (titik, garis, poligon)', 'Analog sketsa pensil', 'Koleksi audio gelombang', 'Transkrip teks wawancara'],
+      answer: 0,
+      why: { 0: 'Data vektor merepresentasikan kenampakan bumi ke dalam geometri titik (point), garis (polyline), dan poligon.' }
+    },
+    {
+      prompt: 'Fenomena anomali suhu perairan Samudra Pasifik timur yang memicu musim kemarau berkepanjangan dan kekeringan di Indonesia disebut…',
+      options: ['El Niño', 'La Niña basah', 'Dipole Mode positif murni', 'Monsun barat kuat'],
+      answer: 0,
+      why: { 0: 'El Niño memindahkan kolam air hangat ke Pasifik timur sehingga mengurangi pembentukan awan hujan di Indonesia.' }
+    },
+    {
+      prompt: 'Peta yang menggambarkan relief tinggi-rendahnya permukaan bumi menggunakan garis-garis kontur ketinggian dinamakan peta…',
+      options: ['Topografi', 'Korografi wilayah', 'Tematik persebaran penduduk', 'Kadaster bidang tanah'],
+      answer: 0,
+      why: { 0: 'Garis kontur topografi menghubungkan titik-titik lokasi di muka bumi yang memiliki elevasi ketinggian identik.' }
+    },
+    {
+      prompt: 'Zona laut berdasarkan kedalamannya yang berada pada rentang kedalaman 0 hingga 200 meter dan kaya akan keanekaragaman ikan adalah zona…',
+      options: ['Neritik (landas kontinen)', 'Litoral pasang-surut', 'Batial lereng benua', 'Abisal palung laut dalam'],
+      answer: 0,
+      why: { 0: 'Zona neritik masih terjangkau sinar matahari penuh sehingga fitoplankton berkembang biak subur menyokong ikan.' }
+    }
+  ],
+  SOS: [
+    {
+      prompt: 'Percampuran dua kebudayaan atau lebih yang menghasilkan kultur baru tanpa menghilangkan jati diri budaya asli disebut…',
+      options: ['Akulturasi kebudayaan', 'Asimilasi mutlak', 'Segregasi sosial', 'Ajudikasi norma'],
+      answer: 0,
+      why: { 0: 'Akulturasi memadukan kebudayaan berbeda dengan tetap mempertahankan unsur lama.' }
+    },
+    {
+      prompt: 'Menurut tipologi Max Weber, tindakan sosial yang berorientasi pada pencapaian target secara logis dan terukur disebut…',
+      options: ['Rasionalitas instrumental', 'Tindakan afektif emosional', 'Tindakan tradisionalis', 'Rasionalitas nilai'],
+      answer: 0,
+      why: { 0: 'Tindakan instrumental menimbang sarana dan tujuan secara rasional terhitung.' }
+    },
+    {
+      prompt: 'Sistem pelapisan sosial tertutup yang tidak memungkinkan mobilitas vertikal antarstrata dapat dijumpai pada…',
+      options: ['Sistem kasta tradisional', 'Masyarakat meritokratis modern', 'Struktur kelas industri', 'Komunitas birokrasi'],
+      answer: 0,
+      why: { 0: 'Sistem kasta menentukan status berdasarkan garis keturunan biologis tertutup.' }
+    },
+    {
+      prompt: 'Fungsi primer sosialisasi pertama dan penanaman afeksi bagi seorang individu diemban oleh institusi…',
+      options: ['Lembaga keluarga', 'Lembaga peradilan', 'Lembaga perbankan', 'Lembaga legislatif'],
+      answer: 0,
+      why: { 0: 'Keluarga merupakan wahana sosialisasi primer yang meletakkan fondasi kepribadian anak.' }
+    },
+    {
+      prompt: 'Perilaku warga yang menyimpang dari kaidah kepatutan serta dilakukan bersama-sama oleh suatu kelompok digolongkan sebagai…',
+      options: ['Penyimpangan kolektif', 'Penyimpangan individual', 'Penyimpangan situasional primer', 'Konformitas absolut'],
+      answer: 0,
+      why: { 0: 'Penyimpangan kelompok dilakukan secara kolektif dengan subkultur menyimpang bersama.' }
+    },
+    {
+      prompt: 'Proses peleburan dua kebudayaan atau lebih yang menghasilkan kebudayaan baru dengan memudarnya ciri khas budaya asal disebut…',
+      options: ['Asimilasi budaya', 'Akulturasi adaptif', 'Enkulturasi dini', 'Difusi unsur seni'],
+      answer: 0,
+      why: { 0: 'Asimilasi melenyapkan sekat perbedaan budaya asli menuju pembentukan identitas kultural seragam baru.' }
+    },
+    {
+      prompt: 'Penyelesaian konflik sosial dengan melibatkan pihak ketiga netral yang hanya bertindak sebagai fasilitator tanpa hak memutus dinamakan…',
+      options: ['Mediasi musyawarah', 'Arbitrase putusan mengikat', 'Ajudikasi meja hijau peradilan', 'Koersi tekanan fisik'],
+      answer: 0,
+      why: { 0: 'Mediator mendampingi proses dialog pihak bersengketa tanpa menetapkan vonis putusan hukum.' }
+    },
+    {
+      prompt: 'Perbedaan kedudukan sosial individu dalam masyarakat yang bersifat hierarkis dan bertingkat (berlapis) diistilahkan sebagai…',
+      options: ['Stratifikasi sosial', 'Diferensiasi sosial horizontal', 'Konsolidasi kelompok', 'Interseksi silang etnis'],
+      answer: 0,
+      why: { 0: 'Stratifikasi mengurutkan lapisan masyarakat secara vertikal berdasarkan kriteria kekayaan, kuasa, atau gelar.' }
+    },
+    {
+      prompt: 'Norma sosial yang memiliki daya pengikat paling kuat dan disertai sanksi adat resmi turun-temurun dinamakan…',
+      options: ['Custom (adat istiadat)', 'Usage (tata cara)', 'Folkways (kebiasaan)', 'Mores (tata kelakuan)'],
+      answer: 0,
+      why: { 0: 'Custom memiliki sanksi adat ketat yang ditegakkan secara turun-temurun oleh masyarakat pemangku adat.' }
+    },
+    {
+      prompt: 'Kelompok sosial primer yang ditandai oleh pergaulan akrab, intim, dan kerja sama tatap muka mendalam (menurut Charles H. Cooley) adalah…',
+      options: ['Keluarga inti dan sahabat dekat', 'Asosiasi serikat buruh industri', 'Perusahaan korporasi multinasional', 'Partai politik elektoral'],
+      answer: 0,
+      why: { 0: 'Primary group memiliki ikatan emosional hangat dan interaksi intim yang mendalam antaranggota.' }
+    },
+    {
+      prompt: 'Sikap mengagungkan kebudayaan kelompok sendiri secara berlebihan serta memandang rendah budaya masyarakat lain disebut…',
+      options: ['Etnosentrisme', 'Relativisme budaya inklusif', 'Pluralisme sosial', 'Multikulturalisme luas'],
+      answer: 0,
+      why: { 0: 'Etnosentrisme menilai kebiasaan etnis luar hanya berpatokan pada standar subyektif etnis pribadi.' }
+    },
+    {
+      prompt: 'Perpindahan status sosial seorang individu dari posisi rendah ke kedudukan sosial yang lebih terhormat dinamakan…',
+      options: ['Mobilitas sosial vertikal naik (social climbing)', 'Mobilitas sosial horizontal stabil', 'Mobilitas sosial vertikal turun', 'Mobilitas antargenerasi negatif'],
+      answer: 0,
+      why: { 0: 'Social climbing mencerminkan peningkatan derajat kelas profesi atau reputasi seseorang di struktur masyarakat.' }
+    },
+    {
+      prompt: 'Teori sosiologi yang memandang masyarakat bagaikan suatu organisme biologis dengan organ-organ fungsional yang saling melengkapi adalah…',
+      options: ['Teori Fungsionalisme Struktural', 'Teori Konflik Dialektis', 'Teori Interaksionisme Simbolik', 'Teori Pilihan Rasional'],
+      answer: 0,
+      why: { 0: 'Fungsionalisme menekankan integrasi, harmoni, dan stabilitas pranata sosial.' }
+    },
+    {
+      prompt: 'Kondisi di mana tatanan norma masyarakat mengalami kekaburan atau kehancuran pegangan moral akibat perubahan sosial cepat dinamakan…',
+      options: ['Anomi (normlessness)', 'Alienasi psikologis', 'Hedonisme konsumtif', 'Stagnasi budaya adat'],
+      answer: 0,
+      why: { 0: 'Istilah anomie diperkenalkan oleh Emile Durkheim untuk menggambarkan situasi tanpa panduan norma penuntun hidup.' }
+    },
+    {
+      prompt: 'Lembaga sosial tertua yang bertanggung jawab memberikan legitimasi pengesahan perkawinan dan transmisi garis keturunan adalah…',
+      options: ['Lembaga perkawinan keluarga', 'Lembaga perniagaan pasar', 'Lembaga kepolisian sipil', 'Lembaga federasi serikat'],
+      answer: 0,
+      why: { 0: 'Pranata perkawinan melegalkan hubungan ikatan biologis pria-wanita dan keberlanjutan regenerasi sosial.' }
+    }
+  ],
+  SEJ: [
+    {
+      prompt: 'Kedatuan Sriwijaya yang berkembang di Sumatra termasyhur sebagai kekuatan maritim dan sentra studi keagamaan pada kurun abad ke…',
+      options: ['7 hingga 13 Masehi', '2 hingga 4 Masehi', '15 hingga 17 Masehi', '19 hingga 20 Masehi'],
+      answer: 0,
+      why: { 0: 'Sriwijaya menguasai jalur Selat Malaka sejak abad ke-7 hingga surut sekitar abad ke-13.' }
+    },
+    {
+      prompt: 'Dwi-Tunggal yang membacakan naskah Proklamasi Kemerdekaan Indonesia pada 17 Agustus 1945 adalah…',
+      options: ['Ir. Soekarno dan Drs. Mohammad Hatta', 'Sutan Sjahrir dan Amir Sjarifuddin', 'Ki Hajar Dewantara dan Raden Saleh', 'Tan Malaka dan Chaerul Saleh'],
+      answer: 0,
+      why: { 0: 'Bung Karno dan Bung Hatta memproklamasikan kemerdekaan atas nama bangsa Indonesia.' }
+    },
+    {
+      prompt: 'Konsekuensi diplomatik Perjanjian Renville (1948) yang merugikan kedaulatan wilayah Republik Indonesia adalah…',
+      options: ['Pemberlakuan garis Van Mook yang memangkas wilayah kekuasaan RI', 'Penghapusan seluruh pasukan tentara nasional', 'Kewajiban melunasi biaya perang pihak sekutu', 'Pemberian kemerdekaan langsung tanpa syarat'],
+      answer: 0,
+      why: { 0: 'Garis demarkasi Van Mook mengisolasi wilayah RI menjadi kantong sempit di Jawa dan Sumatra.' }
+    },
+    {
+      prompt: 'Peristiwa bersejarah penjemputan tokoh bangsa ke Rengasdengklok oleh kelompok pemuda berlangsung pada tanggal…',
+      options: ['16 Agustus 1945', '17 Agustus 1945', '18 Agustus 1945', '15 Agustus 1945'],
+      answer: 0,
+      why: { 0: 'Tanggal 16 Agustus 1945 dini hari pemuda mengamankan Dwitunggal guna menjauhkan pengaruh luar.' }
+    },
+    {
+      prompt: 'Kebijakan tanam paksa (cultuurstelsel) di Hindia Belanda pada masa kolonial diprakarsai oleh…',
+      options: ['Johannes van den Bosch', 'Herman Willem Daendels', 'Thomas Stamford Raffles', 'Jan Pieterszoon Coen'],
+      answer: 0,
+      why: { 0: 'Gubernur Jenderal Van den Bosch memberlakukan tanam paksa pada tahun 1830.' }
+    },
+    {
+      prompt: 'Tahapan awal dalam metode penelitian sejarah yang berupa kegiatan menghimpun dan menelusuri jejak sumber sejarah disebut…',
+      options: ['Heuristik', 'Verifikasi kritik sumber', 'Interpretasi penafsiran', 'Historiografi penulisan'],
+      answer: 0,
+      why: { 0: 'Heuristik adalah langkah melacak arsip, dokumen, artefak, dan saksi sejarah di perpustakaan atau lapangan.' }
+    },
+    {
+      prompt: 'Sumpah Pemuda yang mengikrarkan satu tanah air, satu bangsa, dan satu bahasa persatuan diikrarkan pada tanggal…',
+      options: ['28 Oktober 1928', '20 Mei 1908', '17 Agustus 1945', '10 November 1945'],
+      answer: 0,
+      why: { 0: 'Kongres Pemuda II di Batavia melahirkan konsensus kebangsaan persatuan pemuda Nusantara.' }
+    },
+    {
+      prompt: 'Pemerintahan Republik Indonesia pernah memindahkan ibu kota negara dari Jakarta ke Yogyakarta pada era revolusi tahun…',
+      options: ['1946', '1948', '1950', '1945'],
+      answer: 0,
+      why: { 0: 'Pada 4 Januari 1946, ibu kota RI hijrah ke Yogyakarta demi keselamatan kepemimpinan nasional dari agresi NICA.' }
+    },
+    {
+      prompt: 'Peristiwa pertempuran heroik di Surabaya melawan tentara sekutu yang kemudian diperingati sebagai Hari Pahlawan berlangsung tanggal…',
+      options: ['10 November 1945', '1 Maret 1949', '5 Oktober 1945', '19 Desember 1948'],
+      answer: 0,
+      why: { 0: 'Arek-arek Surabaya dipimpin Bung Tomo mempertahankan kedaulatan kota dari gempuran ultimatum pasukan Inggris.' }
+    },
+    {
+      prompt: 'Konferensi Asia Afrika (KAA) yang melahirkan Dasasila Bandung diselenggarakan di Gedung Merdeka Bandung pada tahun…',
+      options: ['1955', '1950', '1961', '1949'],
+      answer: 0,
+      why: { 0: 'KAA berlangsung 18-24 April 1955 dihadiri 29 negara kawasan memelopori Gerakan Non-Blok dunia.' }
+    },
+    {
+      prompt: 'Kerajaan bercorak Islam pertama di kepulauan Nusantara yang berada di pesisir utara Aceh adalah Kesultanan…',
+      options: ['Samudera Pasai', 'Demak Bintoro', 'Banten Girang', 'Malaka Pesisir'],
+      answer: 0,
+      why: { 0: 'Samudera Pasai berkembang pesat sejak abad ke-13 Masehi dengan raja pertamanya Sultan Malik al-Saleh.' }
+    },
+    {
+      prompt: 'Sumpah Palapa yang bertekad menyatukan wilayah Nusantara di bawah panji Majapahit diucapkan oleh Mahapatih…',
+      options: ['Gajah Mada', 'Kebo Iwa', 'Arya Damar', 'Ranggalawe'],
+      answer: 0,
+      why: { 0: 'Patih Gajah Mada mengucapkan Sumpah Palapa saat dilantik menjadi Amangkubhumi Majapahit pada 1336 M.' }
+    },
+    {
+      prompt: 'Pemilihan Umum (Pemilu) demokratis pertama berskala nasional di Indonesia berhasil diselenggarakan pada masa kabinet…',
+      options: ['Kabinet Burhanuddin Harahap (1955)', 'Kabinet Wilopo', 'Kabinet Natsir', 'Kabinet Ali Sastroamidjojo I'],
+      answer: 0,
+      why: { 0: 'Pemilu 1955 memilih anggota DPR dan Konstituante berlangsung tertib di bawah kepemimpinan Perdana Menteri Burhanuddin.' }
+    },
+    {
+      prompt: 'Dokumen historis naskah Proklamasi Kemerdekaan Indonesia diketik rapi dengan mesin tik oleh tokoh pemuda bernama…',
+      options: ['Sayuti Melik', 'Sukarni Kartodiwirjo', 'B.M. Diah', 'Wikana pejuang'],
+      answer: 0,
+      why: { 0: 'Sayuti Melik mengetik naskah proklamasi setelah konsep tulisan tangan Bung Karno disepakati bersama.' }
+    },
+    {
+      prompt: 'Dekrit Presiden 5 Juli 1959 dikeluarkan oleh Presiden Soekarno untuk mengatasi kemacetan politik dengan keputusan utama…',
+      options: ['Memberlakukan kembali UUD 1945 dan membubarkan Konstituante', 'Membubarkan Kabinet Dwikora', 'Membentuk Front Nasional sepihak', 'Menetapkan manifesto politik baru'],
+      answer: 0,
+      why: { 0: 'Dekrit 5 Juli mengembalikan konstitusi UUD 1945 menggantikan UUDS 1950 untuk menstabilkan tatanan kenegaraan.' }
+    }
+  ],
+  PJK: [
+    {
+      prompt: 'Pukulan mula sebagai tanda dimulainya reli permainan bola voli disebut teknik…',
+      options: ['Servis (service) garis batas', 'Smes menukik tajam', 'Membendung (blocking)', 'Umpan lambung (set-up)'],
+      answer: 0,
+      why: { 0: 'Servis dilakukan dari petak belakang garis lapangan untuk membuka rangkaian reli permainan.' }
+    },
+    {
+      prompt: 'Metode pembinaan fisik yang paling efektif guna mengoptimalkan kapasitas aerobik jantung-paru adalah…',
+      options: ['Lari kontinu berjarak menengah (jogging)', 'Aktivitas beban berkali-kali tanpa jeda', 'Gerakan kelenturan statis tunggal', 'Gerak ketangkasan reaksi jari'],
+      answer: 0,
+      why: { 0: 'Aktivitas lari aerobik berdurasi melatih efisiensi serapan oksigen dan daya tahan kardiorespirasi.' }
+    },
+    {
+      prompt: 'Benda berbentuk silinder yang diestafetkan antaranggota pelari beregu dinamakan…',
+      options: ['Tongkat estafet (baton)', 'Peluru tolak lempar', 'Cakram putar', 'Lembing serat'],
+      answer: 0,
+      why: { 0: 'Tongkat baton berpindah tangan di zona pergantian antaranggota tim lari bersambung.' }
+    },
+    {
+      prompt: 'Aktivitas pengondisian pemanasan (warm-up) sebelum berolahraga esensial untuk…',
+      options: ['Menaikkan suhu jaringan otot dan meminimalkan cedera', 'Menurunkan curah peredaran darah', 'Membuat persendian kaku', 'Menghabiskan tenaga secara instan'],
+      answer: 0,
+      why: { 0: 'Pemanasan mempersiapkan elastisitas serat otot dan viskositas sendi menghadapi beban gerak.' }
+    },
+    {
+      prompt: 'Penerapan pola hidup aktif dan bugar mencakup keselarasan antara…',
+      options: ['Gerak jasmani teratur, asupan nutrisi proporsional, serta istirahat pemulihan', 'Olahraga intensitas berat tanpa kecukupan rehidrasi', 'Pola makan instan disertai minim gerak fisik', 'Waktu tidur seharian tanpa aktivitas tubuh'],
+      answer: 0,
+      why: { 0: 'Kebugaran holistik bertumpu pada sinergi aktivitas kinetik, gizi seimbang, dan istirahat cukup.' }
+    },
+    {
+      prompt: 'Teknik dasar menggiring bola dalam permainan bola basket dengan memantul-mantulkan bola ke lantai diistilahkan sebagai…',
+      options: ['Dribbling', 'Chest pass dada', 'Pivot tumpuan', 'Lay-up shoot'],
+      answer: 0,
+      why: { 0: 'Dribbling memantulkan bola secara berkesinambungan dengan satu tangan sambil bergerak melangkah.' }
+    },
+    {
+      prompt: 'Bentuk penanganan pertolongan pertama pada cedera pergelangan terkilir (sprain) menggunakan metode RICE, huruf "I" melambangkan…',
+      options: ['Ice (kompres es batu dingin)', 'Incline (menaikkan beban)', 'Intensity (menaikkan laju gerak)', 'Inaction (membiarkan cedera)'],
+      answer: 0,
+      why: { 0: 'RICE singkatan dari Rest, Ice, Compression, Elevation guna meredakan inflamasi pembengkakan jaringan.' }
+    },
+    {
+      prompt: 'Induk organisasi cabang olahraga sepak bola di wilayah Negara Kesatuan Republik Indonesia adalah…',
+      options: ['PSSI', 'PBVSI', 'Perbasi', 'PASI'],
+      answer: 0,
+      why: { 0: 'Persatuan Sepakbola Seluruh Indonesia (PSSI) didirikan di Yogyakarta pada 19 April 1930.' }
+    },
+    {
+      prompt: 'Nomor lari jarak pendek (sprint) dalam cabang olahraga atletik menggunakan jenis awalan berupa start…',
+      options: ['Start jongkok (crouch start)', 'Start berdiri tegak', 'Start melayang sambung', 'Start duduk rileks'],
+      answer: 0,
+      why: { 0: 'Start jongkok memanfaatkan balok tumpuan (starting block) untuk menghasilkan tolakan akselerasi maksimal.' }
+    },
+    {
+      prompt: 'Gaya renang yang gerakannya meniru kayuhan kaki katak membuka-menutup dengan lengan mendorong air secara bersamaan adalah…',
+      options: ['Gaya dada (breaststroke)', 'Gaya punggung terbalik', 'Gaya kupu-kupu lumba', 'Gaya bebas cepat'],
+      answer: 0,
+      why: { 0: 'Gaya dada mengandalkan dorongan serempak kedua kaki menendang melingkar menyerupai renang katak.' }
+    },
+    {
+      prompt: 'Aktivitas push-up secara bertahap dan teratur bermanfaat utama untuk melatih kekuatan serta daya tahan otot…',
+      options: ['Dada, bahu, dan trisep lengan', 'Betis dan jari kaki', 'Pinggang bawah semata', 'Leher bagian belakang'],
+      answer: 0,
+      why: { 0: 'Push-up membebani otot pektoralis mayor dada, deltoid anterior, serta trisep secara efektif.' }
+    },
+    {
+      prompt: 'Ukuran tinggi net putra pada pertandingan resmi bola voli internasional yang ditetapkan oleh FIVB adalah…',
+      options: ['2.43 meter', '2.24 meter', '2.15 meter', '2.50 meter'],
+      answer: 0,
+      why: { 0: 'Tinggi net voli putra adalah 2.43 meter, sedangkan net voli putri adalah 2.24 meter.' }
+    },
+    {
+      prompt: 'Gerakan melangkahkan kaki dan mengoper bola kepada kawan seregu dalam sepak bola menggunakan punggung kaki dinamakan teknik…',
+      options: ['Passing (umpan operan)', 'Heading sundulan kepala', 'Throw-in lemparan dalam', 'Tackling sapuan bola'],
+      answer: 0,
+      why: { 0: 'Passing akurat menjadi fondasi utama penguasaan bola dan taktik kerja sama tim di lapangan.' }
+    },
+    {
+      prompt: 'Kemampuan sendi dan otot tubuh untuk bergerak menempuh ruang gerak sendi seluas-luasnya tanpa menimbulkan cedera disebut…',
+      options: ['Kelenturan (fleksibilitas)', 'Kelincahan (agility)', 'Kecepatan sprint', 'Kekuatan dorong maksimal'],
+      answer: 0,
+      why: { 0: 'Fleksibilitas memungkinkan pergerakan sendi elastis optimal mengurangi risiko kekakuan otot.' }
+    },
+    {
+      prompt: 'Zat adiktif stimulan yang terkandung di dalam daun tembakau rokok serta memicu ketergantungan adalah…',
+      options: ['Nikotin', 'Kafein murni', 'Metanol pelarut', 'Glukosa buatan'],
+      answer: 0,
+      why: { 0: 'Nikotin merangsang pelepasan dopamin di otak yang menimbulkan adiksi fisik serta merusak pembuluh darah.' }
+    }
+  ],
+  SNB: [
+    {
+      prompt: 'Kualitas rabaan pada permukaan suatu karya seni (kasar, halus, berbutir) diistilahkan sebagai…',
+      options: ['Tekstur permukaan', 'Gradasi warna', 'Perspektif ruang', 'Proporsi anatomi'],
+      answer: 0,
+      why: { 0: 'Tekstur mendeskripsikan sifat permukaan suatu wujud benda yang dapat diindra visual atau taktil.' }
+    },
+    {
+      prompt: 'Koreografi Tari Saman yang mengutamakan keselarasan gerak tepuk dan dada berakar dari tradisi…',
+      options: ['Masyarakat Gayo, Aceh', 'Sunda, Jawa Barat', 'Minahasa, Sulawesi Utara', 'Dayak Kenyah, Kalimantan'],
+      answer: 0,
+      why: { 0: 'Tari Saman diciptakan oleh Syekh Saman dan dilestarikan oleh masyarakat Gayo, Aceh.' }
+    },
+    {
+      prompt: 'Instrumen ensambel tradisional Nusantara yang didominasi bilahan dan pencon perunggu berpukul adalah…',
+      options: ['Ansambel Gamelan', 'Instrumen Angklung', 'Petikan Sasando', 'Tiupan Saluang'],
+      answer: 0,
+      why: { 0: 'Gamelan menghimpun saron, bonang, kendang, dan gong bermaterial logam perunggu/besi.' }
+    },
+    {
+      prompt: 'Metode pembentukan benda keramik menggunakan bantuan meja putar berputar disebut teknik…',
+      options: ['Teknik putar (throwing method)', 'Teknik pilin melingkar (coiling)', 'Teknik lempengan datar (slab)', 'Teknik cetak tuang beku'],
+      answer: 0,
+      why: { 0: 'Meja putar memungkinkan pembentukan lempung secara sentris simetris menjadi wadah guci/vas.' }
+    },
+    {
+      prompt: 'Wujud karya seni rupa tiga dimensi yang memiliki dimensi panjang, lebar, dan volume kedalaman adalah…',
+      options: ['Karya seni patung dan instalasi', 'Lukisan kanvas cat minyak', 'Karya etsa grafis cetak datar', 'Sketsa pena dua dimensi'],
+      answer: 0,
+      why: { 0: 'Patung menempati ruang nyata tiga dimensi dan dapat dinikmati dari berbagai sudut pandang.' }
+    },
+    {
+      prompt: 'Tiga warna pokok (primer) yang tidak dapat dihasilkan dari percampuran corak warna lain adalah…',
+      options: ['Merah, kuning, dan biru', 'Hijau, oranye, dan ungu', 'Cokelat, abu-abu, dan hitam', 'Putih, nila, dan jingga'],
+      answer: 0,
+      why: { 0: 'Merah, kuning, dan biru merupakan warna dasar yang memadukan seluruh spektrum warna sekunder.' }
+    },
+    {
+      prompt: 'Alat musik gesek tradisional berdawai dua dari wilayah etnis Jawa dan Sunda dinamakan…',
+      options: ['Rebab gesek', 'Kecapi petik', 'Gambus senar', 'Siter bambu'],
+      answer: 0,
+      why: { 0: 'Rebab dimainkan dengan busur gesek penjalin benang mengiringi gending orkestrasi gamelan.' }
+    },
+    {
+      prompt: 'Karya seni batik yang proses pewarnaannya memanfaatkan perintang lilin malam panas dinamakan karya seni…',
+      options: ['Kriya tekstil batik lilin', 'Seni grafis sablon cetak', 'Anyaman rotan alami', 'Lukisan akrilik palet'],
+      answer: 0,
+      why: { 0: 'Batik tradisional Nusantara memanfaatkan canting dan cairan malam sebagai perintang serapan warna kain.' }
+    },
+    {
+      prompt: 'Prinsip penataan seni rupa yang memberikan kesan kesatuan utuh dan harmonis antarunsur visual disebut prinsip…',
+      options: ['Kesatuan (unity)', 'Kontras tajam', 'Irama berulang', 'Keseimbangan asimetris'],
+      answer: 0,
+      why: { 0: 'Unity memadukan garis, warna, dan komposisi agar tidak berdiri sendiri melainkan padu harmonis.' }
+    },
+    {
+      prompt: 'Alat musik tiup tradisional khas Minangkabau yang terbuat dari ruas bambu tipis dinamakan…',
+      options: ['Saluang', 'Kolintang kayu', 'Sasando pulau', 'Tifa tabung'],
+      answer: 0,
+      why: { 0: 'Saluang ditiup secara diagonal dengan teknik pernapasan melingkar terus-menerus.' }
+    },
+    {
+      prompt: 'Teknik melukis dengan sapuan kuas encer dan transparan pada media kertas menggunakan cat air dinamakan teknik…',
+      options: ['Akuarel', 'Plakat tebal pekat', 'Pointilis totol titik', 'Kolase tempelan bahan'],
+      answer: 0,
+      why: { 0: 'Akuarel memanfaatkan pigmen cat air dengan sapuan transparan tembus pandang.' }
+    },
+    {
+      prompt: 'Lagu daerah "Gundhul-Gundhul Pacul" yang sarat pitutur kepemimpinan berasal dari tradisi masyarakat…',
+      options: ['Jawa Tengah', 'Sumatera Barat', 'Kalimantan Selatan', 'Nusa Tenggara Timur'],
+      answer: 0,
+      why: { 0: 'Gundhul Pacul diciptakan oleh Sunan Kalijaga sebagai nasihat moral bagi para pemimpin bangsa.' }
+    },
+    {
+      prompt: 'Karya seni rupa yang dibuat dengan menempelkan potongan-potongan kertas, kain, atau kaca berpola di atas bidang datar dinamakan…',
+      options: ['Mosaik dan kolase', 'Sketsa karikatur', 'Pahat relief monumen', 'Cetakan etsa logam'],
+      answer: 0,
+      why: { 0: 'Mosaik merekatkan kepingan bahan keras beraneka rupa membentuk citra figuratif atau abstrak.' }
+    },
+    {
+      prompt: 'Tangga nada tradisional Nusantara yang hanya tersusun atas lima nada pokok dinamakan tangga nada…',
+      options: ['Pentatonis (slendro dan pelog)', 'Diatonis mayor ceria', 'Kromatis полуton', 'Diatonis minor sendu'],
+      answer: 0,
+      why: { 0: 'Sistem pentatonis melandasi laras gamelan Jawa, Bali, Sunda, serta orkestrasi tradisi Asia.' }
+    },
+    {
+      prompt: 'Fungsi karya seni rupa terapan (applied art) yang membedakannya dari seni murni (fine art) adalah…',
+      options: ['Mengutamakan fungsi praktis kegunaan dalam kehidupan sehari-hari', 'Hanya dinikmati keindahan estetisnya semata', 'Dibuat tanpa pertimbangan bahan material', 'Dipamerkan di galeri tertutup semata'],
+      answer: 0,
+      why: { 0: 'Seni terapan memadukan keindahan bentuk estetis dengan fungsi guna praktis pakai bagi pengguna.' }
+    }
+  ]
+  };
+
+  function getMapelQuestionsForCompetency(subjectId, compCode) {
+    var pool = mapelPool(subjectId, compCode);
+    if (pool && pool.items && pool.items.length) {
+      return { items: pool.items, exact: pool.exact, isBank: true };
+    }
+    var list = (MAPEL_TEMPLATES[subjectId] && MAPEL_TEMPLATES[subjectId].length) ? MAPEL_TEMPLATES[subjectId] : (MAPEL_TEMPLATES.MAT || []);
+    return { items: list, exact: false, isBank: false };
+  }
+
+  function synthesizeMapelQuestions(subjectId, compCode, compTitle, count) {
+    var num = Math.max(2, Math.min(20, Number(count) || 5));
+    var mName = mapelName(subjectId) || subjectId;
+    var topic = compTitle || (t('guru.materi', 'Materi') + ' ' + mName);
+    var items = [];
+    /* Bank Fase D kalau ada; kalau tidak, kolam literal template kurikulum bawaan */
+    var qData = getMapelQuestionsForCompetency(subjectId, compCode);
+    var baseList = qData.items;
+    if (!baseList.length) return items;
+    /* Kolam kompetensi dipotong jujur ketika permintaan melampaui isinya */
+    var take = qData.exact ? Math.min(num, baseList.length) : num;
+    /* Rotasi hanya pada kolam kompetensi */
+    var start = qData.exact ? Math.floor(Date.now() / 1000) % baseList.length : 0;
+    for (var i = 0; i < take; i++) {
+      var src = baseList[(start + i) % baseList.length];
+      var itemObj = {
+        id: 'q-' + subjectId.toLowerCase() + '-' + (i + 1) + '-' + Math.random().toString(36).slice(2, 6),
+        prompt: src.prompt,
+        options: src.options.slice(),
+        answer: src.answer,
+        skill: (compCode || subjectId || 'mat').toLowerCase().replace(/[^a-z0-9_]/g, '_').slice(0, 32),
+        context: topic,
+        why: Object.assign({}, src.why)
+      };
+      if (src.distractorWhy) itemObj.distractorWhy = Object.assign({}, src.distractorWhy);
+      /* Acak posisi opsi jawaban agar kunci tidak selalu di index 0 */
+      var shuffled = shuffleOptions(itemObj, (Date.now() % 997) + i * 31 + subjectId.charCodeAt(0));
+      itemObj.options = shuffled.options;
+      itemObj.answer = shuffled.answer;
+      itemObj.why = shuffled.why;
+      if (shuffled.distractorWhy) itemObj.distractorWhy = shuffled.distractorWhy;
+      items.push(itemObj);
+    }
+    return items;
+  }
+
+  function kelaskuBase() {
+    try {
+      var c = root.FIEZEL_CF_CONFIG || {};
+      if (c.enabled === false) return '';
+      return String(c.base || '').trim().replace(/\/$/, '');
+    } catch (_) { return ''; }
+  }
+
+  function apiWorker(path, opts) {
+    opts = opts || {};
+    var base = kelaskuBase();
+    if (!base) return Promise.reject(new Error(t('guru.err-koneksi-worker', 'Koneksi Worker belum siap.')));
+    var m = opts.method || (opts.body ? 'POST' : 'GET');
+    var headers = { 'Accept': 'application/json' };
+    if (opts.body && !(opts.body instanceof FormData)) headers['Content-Type'] = 'application/json';
+    return fetch(base + path, {
+      method: m,
+      credentials: 'include',
+      headers: headers,
+      body: opts.body ? (opts.body instanceof FormData ? opts.body : JSON.stringify(opts.body)) : undefined
+    }).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (data) {
+        if (!r.ok) {
+          var msg = (data && (data.error || data.message)) || ('Gagal (' + r.status + ')');
+          var err = new Error(msg);
+          err.status = r.status;
+          err.data = data;
+          throw err;
+        }
+        return data;
+      });
+    });
+  }
+
+
+  function isFzEngineValid(eng) {
+    return !!(
+      eng &&
+      typeof eng === 'object' &&
+      eng.curriculum &&
+      typeof eng.curriculum.tree === 'function' &&
+      eng.seed &&
+      typeof eng.seed.mapel === 'function' &&
+      typeof eng.seed.mapelStatus === 'function'
+    );
+  }
+
+  function ensureFzEngine() {
+    if (isFzEngineValid(root.FZEngine)) return Promise.resolve(root.FZEngine);
+    return new Promise(function (resolve, reject) {
+      var s = document.createElement('script');
+      var ver = root.FIEZEL_PAGE_BUILD || ('v' + Date.now());
+      s.src = './features/curriculum/fz-api.js?v=' + encodeURIComponent(ver);
+      s.onload = function () {
+        if (isFzEngineValid(root.FZEngine)) {
+          resolve(root.FZEngine);
+        } else {
+          reject(new Error(t('guru.err-fz-api-stale', 'Modul kurikulum di peramban belum mutakhir. Silakan muat ulang halaman.')));
+        }
+      };
+      s.onerror = function () {
+        reject(new Error(t('guru.err-muat-fz-api', 'Gagal memuat modul mesin kurikulum.')));
+      };
+      document.head.appendChild(s);
+    });
+  }
+
+  function loadCurriculumTree(subjectId) {
+    ui.curriculumLoading = true;
+    ui.curriculumError = null;
+    render();
+    ensureFzEngine().then(function (FZE) {
+      if (!isFzEngineValid(FZE)) {
+        throw new Error(t('guru.err-fz-api-stale', 'Modul kurikulum di peramban belum mutakhir. Silakan muat ulang halaman.'));
+      }
+      var sId = subjectId || ui.curriculumSubject || 'MAT';
+      var p = FZE.token() ? Promise.resolve() : FZE.login.kelasku().catch(function () {});
+      return p.then(function () {
+        return Promise.all([
+          FZE.curriculum.tree(sId),
+          FZE.seed.mapelStatus().catch(function () { return null; })
+        ]);
+      });
+    }).then(function (results) {
+      ui.curriculumTree = results[0] || [];
+      ui.curriculumSeeded = results[1];
+      ui.curriculumLoading = false;
+      render();
+    }).catch(function (err) {
+      ui.curriculumLoading = false;
+      ui.curriculumError = (err && err.message) || t('guru.err-muat-kurikulum', 'Gagal memuat kurikulum');
+      render();
+    });
+  }
+
+  function runSeedMapel() {
+    ui.seeding = true;
+    ui.seedBusy = 'mapel';
+    render();
+    ensureFzEngine().then(function (FZE) {
+      if (!isFzEngineValid(FZE)) {
+        throw new Error(t('guru.err-fz-api-stale', 'Modul kurikulum di peramban belum mutakhir. Silakan muat ulang halaman.'));
+      }
+      var p = FZE.token() ? Promise.resolve() : FZE.login.kelasku();
+      return p.then(function () {
+        return FZE.seed.mapel();
+      });
+    }).then(function (res) {
+      ui.seeding = false;
+      ui.seedBusy = '';
+      toast(t('guru.semai-mapel-sukses', 'Berhasil menyemai 17 mata pelajaran ke MongoDB!'));
+      /* Status penyemai dan kedalaman bank DIPAKSA dibaca ulang: keduanya baru saja
+         berubah di server, dan kartu yang masih menampilkan angka sebelum penyemaian
+         adalah kartu yang berbohong tepat pada detik guru paling memperhatikannya. */
+      loadSeedStatus(true);
+      loadBankDepth(ui.curriculumSubject, true);
+      loadCurriculumTree(ui.curriculumSubject);
+    }).catch(function (err) {
+      ui.seeding = false;
+      ui.seedBusy = '';
+      toast(t('guru.err-seeding', 'Gagal seeding: ') + ((err && err.message) || err));
+      render();
+    });
+  }
+
+  function runSeedEnglish() {
+    ui.seeding = true;
+    ui.seedBusy = 'english';
+    render();
+    ensureFzEngine().then(function (FZE) {
+      if (!isFzEngineValid(FZE)) {
+        throw new Error(t('guru.err-fz-api-stale', 'Modul kurikulum di peramban belum mutakhir. Silakan muat ulang halaman.'));
+      }
+      var p = FZE.token() ? Promise.resolve() : FZE.login.kelasku();
+      return p.then(function () {
+        return FZE.seed.english();
+      });
+    }).then(function (res) {
+      ui.seeding = false;
+      ui.seedBusy = '';
+      toast(t('guru.semai-english-sukses', 'Berhasil menyemai Bahasa Inggris ke MongoDB!'));
+      /* Status penyemai dan kedalaman bank DIPAKSA dibaca ulang: keduanya baru saja
+         berubah di server, dan kartu yang masih menampilkan angka sebelum penyemaian
+         adalah kartu yang berbohong tepat pada detik guru paling memperhatikannya. */
+      loadSeedStatus(true);
+      loadBankDepth(ui.curriculumSubject, true);
+      loadCurriculumTree(ui.curriculumSubject);
+    }).catch(function (err) {
+      ui.seeding = false;
+      ui.seedBusy = '';
+      toast(t('guru.err-seeding', 'Gagal seeding: ') + ((err && err.message) || err));
+      render();
+    });
+  }
+
+  function runSeedSoal() {
+    ui.seeding = true;
+    ui.seedBusy = 'soal';
+    render();
+    ensureFzEngine().then(function (FZE) {
+      if (!isFzEngineValid(FZE)) {
+        throw new Error(t('guru.err-fz-api-stale', 'Modul kurikulum di peramban belum mutakhir. Silakan muat ulang halaman.'));
+      }
+      var p = FZE.token() ? Promise.resolve() : FZE.login.kelasku();
+      return p.then(function () {
+        return FZE.seed.soal();
+      });
+    }).then(function (res) {
+      ui.seeding = false;
+      ui.seedBusy = '';
+      toast(t('guru.semai-soal-sukses', 'Berhasil menyemai Bank Soal ke MongoDB!'));
+      /* Status penyemai dan kedalaman bank DIPAKSA dibaca ulang: keduanya baru saja
+         berubah di server, dan kartu yang masih menampilkan angka sebelum penyemaian
+         adalah kartu yang berbohong tepat pada detik guru paling memperhatikannya. */
+      loadSeedStatus(true);
+      loadBankDepth(ui.curriculumSubject, true);
+      loadCurriculumTree(ui.curriculumSubject);
+    }).catch(function (err) {
+      ui.seeding = false;
+      ui.seedBusy = '';
+      toast(t('guru.err-seeding', 'Gagal seeding: ') + ((err && err.message) || err));
+      render();
+    });
+  }
+
 
   /*
    * DEMO GURU — DINYALAKAN ?teacher=preview, DI HOST MANA PUN TERMASUK PRODUKSI.
@@ -116,6 +2633,15 @@
    * Guru yang benar-benar sudah masuk tidak boleh terseret ke sini: kalau akunnya
    * berperan guru, demo dimatikan supaya papan aslinya yang tampil.
    */
+  /* Audit F28 (2026-09-23): tema Ruang Guru dimuat sesuai kebutuhan. Murid tidak lagi
+     mengunduh 72 KB CSS guru di pembukaan pertama; guru/demo memasangnya di sini sekali. */
+  function ensureCss() {
+    try {
+      var d = root.document; if (!d || d.getElementById('fzTeacherCss')) return true;
+      var l = d.createElement('link'); l.id = 'fzTeacherCss'; l.rel = 'stylesheet'; l.href = './features/teacher/teacher-shell.css';
+      (d.head || d.documentElement).appendChild(l); return true;
+    } catch (_) { return false; }
+  }
   function previewAllowed() {
     try {
       if (isTeacherRole()) return false;
@@ -127,6 +2653,16 @@
   function exitPreview() {
     try { sessionStorage.removeItem('fz-teacher-preview'); } catch (_) {}
     try { sessionStorage.removeItem('fiezel-teacher-v1-preview'); } catch (_) {}
+    try {
+      if (typeof location !== 'undefined' && typeof history !== 'undefined' && history.replaceState) {
+        var u = new URL(location.href);
+        if (u.searchParams.has('teacher')) {
+          u.searchParams.delete('teacher');
+          var clean = u.pathname + (u.search ? u.search : '') + (u.hash ? u.hash : '');
+          history.replaceState(null, (typeof document !== 'undefined' && document.title) || '', clean);
+        }
+      }
+    } catch (_) {}
     try { S().setPreview(false); } catch (_) {}
   }
 
@@ -227,7 +2763,7 @@
     }
     if (ui.syncing || !st.classes.length) return Promise.resolve();
     ui.syncing = true; syncingSince = Date.now();
-    if (quiet) paintSyncChip(); else render();   // sinkron manual = ketukan guru, jangan ditunda
+    paintSyncChip();
     var total = { ingested: 0, graded: 0, names: [], failed: 0, events: [] };
     return st.classes.reduce(function (p, c) { return p.then(function () { return T.syncClass(c).then(function (r) { if (r.ok) { total.ingested += r.ingested; total.graded += r.graded; total.names = total.names.concat(r.names || []); total.events = total.events.concat(r.events || []); } else total.failed++; }); }); }, Promise.resolve())
       .then(function () {
@@ -239,7 +2775,7 @@
         /* Render penuh hanya bila ronde ini benar-benar membawa sesuatu. Ronde kosong -
            yang mayoritas pada jeda 3 detik - cukup menyegarkan chipnya. */
         var berubah = total.ingested || total.graded || total.events.length;
-        if (!quiet) render(); else if (berubah) syncRender(); else paintSyncChip();
+        if (!quiet && busy()) { syncRender(); } else if (!quiet) render(); else if (berubah) syncRender(); else paintSyncChip();
         if (total.events.length) { var top = total.events.filter(function (e) { return e.kind === 'focus_exit'; })[0] || total.events.filter(function (e) { return e.kind === 'join_request'; })[0] || total.events.filter(function (e) { return e.kind === 'assignment_done'; })[0] || total.events[0]; toast(T.inboxText(top) + (total.events.length > 1 ? ' · +' + (total.events.length - 1) + ' kabar lain' : '')); }
         else if (total.ingested) toast(total.ingested + ' laporan murid masuk' + (total.graded ? ' · ' + total.graded + ' tugas dinilai otomatis' : '') + '.');
         else if (!quiet) toast(total.failed ? 'Sinkron gagal untuk ' + total.failed + ' kelas.' : 'Tersinkron — belum ada laporan baru.');
@@ -307,9 +2843,177 @@
     return '<button type="button" class="tg-chip tg-sync is-' + (ui.syncing ? 'busy' : L.state) + '" data-tg="sync" title="Sinkron laporan murid dari server" data-testid="tg-sync">' + icon(ui.syncing ? 'refresh-cw' : L.state === 'ok' ? 'cloud-check' : L.state === 'err' ? 'cloud-alert' : 'cloud') + '<span>' + esc(ui.syncing ? 'Menyinkron…' : L.text) + '</span></button>';
   }
 
+  function isTeacherRole() {
+    try {
+      var acc = (root.FiezelAccount && root.FiezelAccount.state && root.FiezelAccount.state()) || null;
+      if (acc && acc.role === 'teacher') return true;
+      if (root.FiezelAccount && root.FiezelAccount.isTeacher && root.FiezelAccount.isTeacher()) return true;
+      if (root.localStorage && root.localStorage.getItem('fz_teacher_mode') === '1') return true;
+      if (root.state && root.state.preferences && root.state.preferences.role === 'guru') return true;
+      if (!previewOn && st && st.teacher && st.teacher.name && st.teacher.name.trim() !== '' && st.teacher.name !== 'Bu Sari') return true;
+      return false;
+    } catch (_) { return false; }
+  }
+
+  function ensureTeacherClass() {
+    if (previewOn) return null;
+    var acc = (root.FiezelAccount && root.FiezelAccount.state && root.FiezelAccount.state()) || null;
+    var isTeacher = isTeacherRole() || (acc && acc.role === 'teacher') || (st && st.teacher && st.teacher.name && st.teacher.name.trim() !== '' && st.teacher.name !== 'Bu Sari');
+    if (!isTeacher) return null;
+
+    if (!Array.isArray(st.classes)) st.classes = [];
+
+    var sId = (acc && acc.subjectId) || ui.curriculumSubject || ui.assignSubject || 'MAT';
+    var gId = (acc && acc.gradeId) || 'SMP';
+    var inst = (acc && acc.institution) || (st.teacher && st.teacher.school) || '';
+    var mapelNames = (S() && S().MAPEL_NAMES) || {};
+    var subName = mapelNames[sId] || sId;
+    var code = (acc && acc.classCode && acc.classCode !== 'FZ-MERDEKA1') ? S().normalizeClassCode(acc.classCode) : '';
+    if (code === 'FZ-MERDEKA1' || (code && !/^FZ-[A-HJ-NP-Z2-9]{6}$/.test(code))) code = '';
+
+    if (!code) {
+      try {
+        var m = (typeof document !== 'undefined' && document.cookie) ? document.cookie.match(/(?:^|;\s*)fz_cls=([^;]+)/) : null;
+        if (m && m[1]) {
+          var cand = S().normalizeClassCode(decodeURIComponent(m[1]));
+          if (cand && cand !== 'FZ-MERDEKA1' && /^FZ-[A-HJ-NP-Z2-9]{6}$/.test(cand)) code = cand;
+        }
+      } catch (_) {}
+    }
+    if (!code) {
+      code = S().makeClassCode();
+    }
+
+    var modified = false;
+
+    // Bersihkan kelas yang tersimpan dengan kode FZ-MERDEKA1 atau kode bukan 6-char
+    st.classes.forEach(function (c) {
+      if (c.code === 'FZ-MERDEKA1' || (c.code && !/^FZ-[A-HJ-NP-Z2-9]{6}$/.test(c.code))) {
+        c.code = code || S().makeClassCode();
+        if (c.sync) c.sync.claimed = false;
+        modified = true;
+      }
+    });
+
+    // Sinkronkan data guru jika akun membawa profil baru
+    if (acc) {
+      if (acc.teacherName && (!st.teacher || st.teacher.name !== acc.teacherName)) {
+        if (!st.teacher) st.teacher = { name: '', school: '' };
+        st.teacher.name = acc.teacherName;
+        modified = true;
+      }
+      if (acc.institution && (!st.teacher || st.teacher.school !== acc.institution)) {
+        if (!st.teacher) st.teacher = { name: '', school: '' };
+        st.teacher.school = acc.institution;
+        modified = true;
+      }
+    }
+
+    // SELALU SINKRONKAN MAPEL PADA SEMUA KELAS GURU INI JIKA ADA SUBJECTID RESMI.
+    // AUDIT multi: lisensi N mapel TIDAK memaksa semua kelas ke mapel pertama —
+    // kelas MAT yang sah tetap MAT; hanya kelas di luar lisensi yang dikembalikan.
+    if (acc && st.classes.length) {
+      var __lic = [];
+      try {
+        if (Array.isArray(acc.subjectIds)) __lic = acc.subjectIds.slice();
+        else if (Array.isArray(acc.subjects)) __lic = acc.subjects.slice();
+        if (acc.subjectId) __lic.push(acc.subjectId);
+        if (acc.subject_id) __lic.push(acc.subject_id);
+      } catch (_) {}
+      __lic = __lic.map(function (x) { return String(x || '').trim().toUpperCase(); }).filter(function (x) { return !!x; });
+      var __seen = {}, __uniq = [];
+      __lic.forEach(function (x) { if (!__seen[x]) { __seen[x] = 1; __uniq.push(x); } });
+      __lic = __uniq;
+      if (__lic.length === 1) {
+        var officialSub = __lic[0];
+        var officialSubName = mapelNames[officialSub] || officialSub;
+        st.classes.forEach(function (c) {
+          var prefix = inst ? inst + ' — ' : (st.teacher && st.teacher.school ? st.teacher.school + ' — ' : '');
+          if (c.subject !== officialSub || (c.name && c.name.indexOf('Matematika') !== -1 && officialSub !== 'MAT')) {
+            c.subject = officialSub;
+            c.name = prefix + officialSubName;
+            if (gId === 'SMP' && (!c.level || c.level === 'A1' || c.level === 'A2' || c.level === 'B1' || c.level === 'B2')) {
+              c.level = 'Kelas 7';
+            }
+            modified = true;
+          }
+        });
+        if (ui.curriculumSubject !== officialSub) {
+          ui.curriculumSubject = officialSub;
+        }
+        if (ui.assignSubject !== officialSub) {
+          ui.assignSubject = officialSub;
+        }
+      } else if (__lic.length > 1) {
+        /* multi: perbaiki yang bocor saja, hormati yang sudah berlisensi */
+        st.classes.forEach(function (c) {
+          var cur = String(c.subject || '').toUpperCase();
+          if (__lic.indexOf(cur) < 0) {
+            c.subject = __lic[0];
+            modified = true;
+          }
+        });
+        if (__lic.indexOf(ui.curriculumSubject) < 0) ui.curriculumSubject = __lic[0];
+        if (__lic.indexOf(ui.assignSubject) < 0) ui.assignSubject = __lic[0];
+      }
+    }
+
+    var existing = st.classes.filter(function (c) {
+      return S().normalizeClassCode(c.code) === code;
+    })[0];
+
+    if (existing) {
+      st.activeClassId = existing.id;
+      st.onboarded = true;
+      if (!st.view || st.view === 'briefing') st.view = 'hub';
+      if (modified) persist();
+      return existing;
+    }
+
+    // Jika kelas tunggal sebelumnya belum punya murid dan merupakan kelas otomatis
+    if (st.classes.length === 1 && (!st.classes[0].students || !st.classes[0].students.length) && code) {
+      st.classes[0].code = code;
+      st.classes[0].subject = sId;
+      var pfx = inst ? inst + ' — ' : (st.teacher && st.teacher.school ? st.teacher.school + ' — ' : '');
+      st.classes[0].name = pfx + subName;
+      st.activeClassId = st.classes[0].id;
+      st.onboarded = true;
+      if (!st.view || st.view === 'briefing') st.view = 'hub';
+      persist();
+      return st.classes[0];
+    }
+
+    // Jika guru belum punya kelas sama sekali, buat kelas otomatis
+    if (!st.classes.length) {
+      if (st.deletedClassCodes && st.deletedClassCodes[code]) {
+        delete st.deletedClassCodes[code];
+      }
+      var clsTitle = (inst ? inst + ' — ' : '') + subName;
+      var newClsLvl = (gId === 'SMP') ? 'Kelas 7' : gId;
+      var newCls = S().newClass(clsTitle, newClsLvl, sId);
+      newCls.code = code;
+      st.classes.unshift(newCls);
+      st.activeClassId = newCls.id;
+      st.onboarded = true;
+      st.view = 'hub';
+      ui.curriculumSubject = sId;
+      ui.assignSubject = sId;
+      persist();
+      return newCls;
+    }
+
+    if (modified) persist();
+    return null;
+  }
+
   // ---- mount ------------------------------------------------------------------------------
   function mount(target, options) {
     el = target; env = options || {};
+    /* Bank Fase D dipanggil sedini mungkin dan TIDAK ditunggu: guru butuh beberapa
+       ketukan untuk sampai ke pembuat tugas, dan dalam rentang itu banknya sudah
+       mendarat. Kalau belum, pratinjau pertama memakai kolam lama lalu mengecat ulang
+       sendiri begitu bank tiba — tidak ada yang menunggu layar kosong. */
+    try { for (var bi = 0; bi < MAPEL_BANK_SUBJECTS.length; bi++) mapelBank(MAPEL_BANK_SUBJECTS[bi]); } catch (_) {}
     /* Urutannya penting: penyimpanan dialihkan SEBELUM load(), kalau tidak papan demo
        terisi dari data guru asli dan tulisan pertamanya mendarat di sana juga. */
     previewOn = previewAllowed();
@@ -328,39 +3032,111 @@
         S().save(st);
       } catch (_) { /* bank soal belum termuat: papan tetap terbuka, sekadar kosong */ }
     }
-    st.classes = st.classes.map(S().normalizeClass);
+    st.classes = (st.classes || []).map(S().normalizeClass);
+    try {
+      ensureTeacherClass();
+    } catch (_) {}
     if (!cls() && st.classes.length) st.activeClassId = st.classes[0].id;
     if (!st.classes.length && !st.onboarded) { st.view = 'briefing'; }
     // Kelas (class-hub) = landing default Ruang Guru: guru, murid, tugas, hasil, Braincore satu tempat.
     if (st.classes.length && (!st.view || st.view === 'briefing') && !st.hubSeen && root.FiezelClassHub) { st.view = 'hub'; st.hubSeen = true; }
     if (st.view === 'hub' && !root.FiezelClassHub) st.view = 'briefing';
+    /* MIGRASI VIEW 'curriculum' (m025-357). `st.view` ikut disimpan ke localStorage, jadi
+       guru yang menutup aplikasi di layar Kurikulum lama akan membukanya kembali di sana —
+       dan sejak panel itu pindah ke dalam hub, 'curriculum' bukan lagi view yang ada.
+       Tanpa baris ini render() jatuh ke views.briefing dan guru mendarat di layar yang
+       BUKAN yang ia tinggalkan, tanpa satu pun petunjuk ke mana perginya. Ia dibawa ke
+       tempat panelnya sekarang berada: hub, tab Kurikulum. */
+    if (st.view === 'curriculum') {
+      if (root.FiezelClassHub && konsolKurikulumSiap()) {
+        st.view = 'hub';
+        try { root.FiezelClassHub._teacherUi().tab = 'kurikulum'; } catch (_) {}
+      } else {
+        st.view = 'briefing';
+      }
+    }
+    ensureCss();
     document.body.classList.add('fz-teacher-mode');
     el.addEventListener('click', onClick); el.addEventListener('submit', onSubmit); el.addEventListener('change', onChange); el.addEventListener('input', onInput);
     document.addEventListener('keydown', onKey);
     render();
+    /* Panel kurikulum dimuat juga saat hub DIPASANG dengan tab itu sudah aktif — yaitu
+       sesudah migrasi view di atas, dan setiap kali guru kembali ke Ruang Guru sementara
+       tab terakhirnya Kurikulum. Tanpa ini, satu-satunya pemicu muat adalah KETUKAN pada
+       tabnya, sehingga guru yang mendarat langsung di sana menatap panel kosong permanen. */
+    try {
+      if (st.view === 'hub' && root.FiezelClassHub && root.FiezelClassHub._teacherUi &&
+          root.FiezelClassHub._teacherUi().tab === 'kurikulum') bukaPanelKurikulum();
+    } catch (_) {}
     startAutoSync();
+    // Sinkron daftar kelas dari server di latar belakang jika tersedia
+    try {
+      if (S() && typeof S().syncClassList === 'function' && !previewOn) {
+        S().syncClassList(st).then(function (res) {
+          if (res && res.ok && res.added > 0) {
+            render();
+          }
+        }).catch(function () {});
+      }
+    } catch (_) {}
   }
   function unmount() { stopAutoSync(); document.body.classList.remove('fz-teacher-mode'); document.removeEventListener('keydown', onKey); if (el) { el.removeEventListener('click', onClick); el.removeEventListener('submit', onSubmit); el.removeEventListener('change', onChange); el.removeEventListener('input', onInput); } el = null; ui.modal = null; ui.drawer = null; lastPaintKey = null; }
   function onKey(e) { if (e.key === 'Escape' && (ui.modal || ui.drawer || ui.inbox)) { ui.modal = null; ui.drawer = null; ui.inbox = false; render(); } }
-  function isTeacherRole() {
-    try {
-      return (root.FiezelAccount && root.FiezelAccount.isTeacher && root.FiezelAccount.isTeacher()) ||
-             (root.FiezelAccount && root.FiezelAccount.state && root.FiezelAccount.state() && root.FiezelAccount.state().role === 'teacher');
-    } catch (_) { return false; }
-  }
-  function exit() {
-    if (isTeacherRole()) {
-      if (confirm('Keluar dari akun guru?')) {
-        if (root.FiezelAccount && root.FiezelAccount.logout) {
-          root.FiezelAccount.logout().then(function () {
-            location.reload();
-          });
-        }
+  function performTeacherLogout() {
+    persist();
+    try { localStorage.removeItem('fz_teacher_mode'); } catch(_) {}
+    try { sessionStorage.removeItem('fz-teacher-preview'); } catch(_) {}
+    try { sessionStorage.removeItem('fiezel-teacher-v1-preview'); } catch(_) {}
+    exitPreview();
+    previewOn = false;
+    if (root.state && root.state.preferences) {
+      root.state.preferences.role = 'murid';
+      root.state.view = 'home';
+      try { root.save?.(); } catch(_) {}
+    }
+    unmount();
+
+    var doLogout = (root.FiezelAccount && root.FiezelAccount.logout)
+      ? root.FiezelAccount.logout()
+      : Promise.resolve();
+
+    return doLogout.finally(function () {
+      try { localStorage.removeItem('fz_teacher_mode'); } catch(_) {}
+      if (root.state && root.state.preferences) {
+        root.state.preferences.role = 'murid';
+        root.state.view = 'home';
+        try { root.save?.(); } catch(_) {}
       }
+      if (typeof root.go === 'function') {
+        root.go('home');
+      } else if (typeof root.render === 'function') {
+        root.render();
+      }
+      setTimeout(function () {
+        try {
+          if (typeof root.openFiezelAuthModal === 'function') {
+            root.openFiezelAuthModal('teacher');
+          } else if (typeof root.openAccountSheet === 'function') {
+            root.openAccountSheet('teacher');
+          }
+        } catch (_) {}
+      }, 150);
+    });
+  }
+  function exit(opts) {
+    if (isTeacherRole()) {
+      performTeacherLogout();
       return;
     }
     unmount();
-    if (env.exit) env.exit();
+    if (env.exit) {
+      env.exit(opts);
+    } else if (opts && opts.target === 'landing') {
+      try { location.href = '../#hero'; } catch (_) {}
+    } else {
+      if (typeof root.go === 'function') root.go('home');
+      else if (typeof root.render === 'function') root.render();
+    }
   }
 
   /*
@@ -371,16 +3147,63 @@
    * yang di-restart, bukan tata letak yang bergerak.
    */
   var lastPaintKey = null;
+  function captureActive(container) {
+    try {
+      var act = root.document ? root.document.activeElement : null;
+      if (act && container && container.contains(act) && /^(INPUT|TEXTAREA)$/i.test(act.tagName || '')) {
+        return { name: act.getAttribute('name'), testId: act.getAttribute('data-testid'), s: act.selectionStart, e: act.selectionEnd };
+      }
+    } catch (_) {}
+    return null;
+  }
+  function restoreActive(container, saved) {
+    if (!saved || (!saved.testId && !saved.name) || !container) return;
+    try {
+      var sel = saved.testId ? '[data-testid="' + saved.testId + '"]' : '[name="' + saved.name + '"]';
+      var r = container.querySelector(sel);
+      if (r) { r.focus(); if (r.setSelectionRange && saved.s != null) r.setSelectionRange(saved.s, saved.e); }
+    } catch (_) {}
+  }
   function render() {
     if (!el) return;
     pendingRender = false;
-    var c = cls();
+    if (!previewOn && isTeacherRole()) {
+      try {
+        var fresh = S().load();
+        if (fresh && Array.isArray(fresh.classes) && fresh.classes.length) {
+          st.classes = fresh.classes;
+          if (fresh.activeClassId) st.activeClassId = fresh.activeClassId;
+          if (fresh.teacher && fresh.teacher.name) st.teacher = fresh.teacher;
+        }
+      } catch (_) {}
+      try { ensureTeacherClass(); } catch (_) {}
+    }
+    var c = cls(), saved = captureActive(el);
     var key = (st.view || 'briefing') + '|' + (st.activeClassId || '') + '|' + (ui.modal ? ui.modal.kind : '') + '|' + (ui.drawer || '');
     var repaint = key === lastPaintKey;
     lastPaintKey = key;
-    el.innerHTML = '<div class="tg' + (repaint ? ' is-repaint' : '') + (previewOn ? ' is-demo' : '') + (ui.modal && ui.modal.kind === 'board' ? ' tg-board-open' : '') + '" data-testid="teacher-shell">' + demoBanner() + sidebar(c) + '<div class="tg-main">' + topbar(c) + '<div class="tg-content">' + (st.classes.length ? views[st.view || 'briefing'](c) : welcome()) + '</div></div>' + mobileNav() + drawer(c) + modal(c) + '</div>';
+    el.innerHTML = '<div class="tg' + (repaint ? ' is-repaint' : '') + (previewOn ? ' is-demo' : '') + (ui.modal && ui.modal.kind === 'board' ? ' tg-board-open' : '') + '" data-testid="teacher-shell">' + demoBanner() + sidebar(c) + '<div class="tg-main">' + topbar(c) + '<div class="tg-content">' + (st.classes.length || st.view === 'hub' || st.view === 'settings' ? (views[st.view] ? views[st.view](c) : views.briefing(c)) : welcome()) + '</div></div>' + mobileNav() + drawer(c) + modal(c) + '</div>';
     var hubEl = el.querySelector('#tgClassHub');
-    if (hubEl && root.FiezelClassHub) root.FiezelClassHub.mountTeacher(hubEl, { st: function () { return st; }, cls: cls, persist: persist, toast: toast, rerender: render });
+    /* Hub KelasKu menerima sistem kurikulum lewat env, bukan dengan menyalin mesinnya
+       (m025-357). Yang menyeberang hanya TIGA fungsi: penjaga, perender, dan pemicu muat.
+       FZEngine, alamat backend, dan seluruh keadaan muat tetap milik berkas ini, sehingga
+       hub tidak perlu tahu satu pun di antaranya — dan tombol di dalam panel tetap memakai
+       `data-tg`, yang memang sudah ditangani pengirim aksi shell ini karena #tgClassHub
+       berada di dalam DOM yang sama. */
+    var __scHub = null;
+    try { __scHub = teacherSubjectScope(); } catch (_) {}
+    if (hubEl && root.FiezelClassHub) root.FiezelClassHub.mountTeacher(hubEl, {
+      st: function () { return st; }, cls: cls, persist: persist, toast: toast, rerender: render,
+      scope: __scHub,
+      isAssignmentVisible: isAssignmentVisible,
+      skillMatchesSubject: skillMatchesSubject,
+      kurikulum: {
+        siap: konsolKurikulumSiap,
+        panel: kurikulumPanel,
+        buka: bukaPanelKurikulum
+      }
+    });
+    restoreActive(el, saved);
     if (env.afterRender) try { env.afterRender(); } catch (_) {}
     /* Autofokus hanya saat layarnya benar-benar berganti. Pada cat ulang ia akan merebut kursor
        dari tempat guru meletakkannya. */
@@ -410,26 +3233,33 @@
   // ---- kerangka ---------------------------------------------------------------------------
   function sidebar(c) {
     var teacherVerified = isTeacherRole();
-    var exitLabel = teacherVerified ? 'Keluar akun guru' : 'Ke mode murid';
+    var exitLabel = teacherVerified ? t('guru.keluar-akun', 'Keluar akun guru') : t('guru.ke-mode-murid', 'Ke mode murid');
     var exitAction = teacherVerified ? 'logout' : 'exit';
     return '<aside class="tg-side"><div class="tg-brand"><span class="tg-brand-mark">K</span><div class="kelasku-brand"><span class="kelasku-main">KelasKu</span> <span class="kelasku-tag">' + esc(t('guru.merek-tag', 'untuk Guru')) + '</span></div></div>' +
-      '<button type="button" class="tg-teacher" data-tg="view" data-view="settings" data-testid="tg-profile">' + icon('user-round') + '<div><b>' + esc(st.teacher.name || accountHandle() || 'Guru FIEZEL') + '</b><small>' + esc(st.teacher.school || 'Atur profil →') + '</small></div></button>' +
+      '<button type="button" class="tg-teacher" data-tg="view" data-view="settings" data-testid="tg-profile">' + icon('user-round') + '<div><b>' + esc(st.teacher.name || accountHandle() || t('guru.nama-default', 'Guru FIEZEL')) + '</b><small>' + esc(st.teacher.school || t('guru.atur-profil', 'Atur profil →')) + '</small></div></button>' +
       (st.classes.length ? '<label class="tg-class-switch">' + t('guru.kelas-aktif', 'Kelas aktif') + '<select data-tg-select="class" data-testid="tg-class-select">' + st.classes.map(function (k) { return '<option value="' + k.id + '"' + (c && k.id === c.id ? ' selected' : '') + '>' + esc(k.name) + '</option>'; }).join('') + '</select></label>' : '') +
-      '<nav class="tg-nav">' + NAV.map(function (n) { return '<button type="button" class="tg-nav-item' + (st.view === n[0] ? ' is-active' : '') + '" data-tg="view" data-view="' + n[0] + '" data-testid="tg-nav-' + n[0] + '">' + icon(n[2]) + '<span>' + n[1] + '</span></button>'; }).join('') + '</nav>' +
-      /* Pintu konsol kurikulum HANYA dibuka kalau benderanya menyala. Backend yang
-         melayaninya (/api/...) belum berjalan di produksi — diperiksa owner 7 Sep 2026,
-         404. Nama bendera yang salah ketik jatuh ke false, jadi kegagalannya menyembunyikan
-         pintu, bukan membukanya. Lihat alasan lengkap di fiezel-ux-flags.js. */
-      (konsolKurikulumSiap()
-        ? '<a class="tg-nav-item" href="./kurikulum.html" data-testid="tg-nav-curriculum">' + icon('library') + '<span>' + esc(t('guru.nav-kurikulum', 'Kurikulum & Kompetensi')) + '</span></a>'
-        : '') +
-      '<div class="tg-side-foot"><div class="tg-saved" title="Perkiraan waktu administrasi yang FIEZEL kerjakan untukmu">' + icon('hourglass') + '<div><small>' + esc(t('guru.waktu-hemat', 'Waktu administrasi yang dihemat')) + '</small><b>' + Math.round(st.savedMinutes || 0) + ' menit</b></div></div>' +
+      '<nav class="tg-nav">' + navItems().map(function (n) { return '<button type="button" class="tg-nav-item' + (navActive(n) ? ' is-active' : '') + '" ' + navAttrs(n) + (navActive(n) ? ' aria-current="page"' : '') + '>' + icon(n[2]) + '<span>' + n[1] + '</span></button>'; }).join('') + '</nav>' +
+      /* BUTIR NAV "Kurikulum & Kompetensi" DICABUT DARI SIDEBAR (m025-357, instruksi owner).
+         ===================================================================================
+         Ia dulu butir nav kedelapan yang membuka layar tersendiri, dan layar itu isinya
+         pohon kurikulum + satu kartu pintu keluar ke kurikulum.html. Jadi guru yang
+         menekannya meninggalkan dasbor KelasKu untuk sampai ke pekerjaan yang justru
+         paling dekat dengan kelasnya: menyemai bank, membaca kompetensi, dan membuat tugas
+         dari kompetensi itu.
+
+         Sistemnya tidak dibuang — ia PINDAH ke dalam dasbor KelasKu sebagai tab
+         "Kurikulum & Kompetensi" di hub Ruang Kelas (features/class-hub/fiezel-class-hub.js,
+         tab `kurikulum`). Penjaganya tetap konsolKurikulumSiap(), sekarang diteruskan lewat
+         env.kurikulum.siap() ke hub; lihat mountTeacher() di bawah. */
+      '<div class="tg-side-foot"><div class="tg-saved" title="' + esc(t('guru.waktu-hemat-tip', 'Perkiraan waktu administrasi yang FIEZEL kerjakan untukmu')) + '">' + icon('hourglass') + '<div><small>' + esc(t('guru.waktu-hemat', 'Waktu administrasi yang dihemat')) + '</small><b>' + esc(t('guru.n-menit', '{n} menit', { n: Math.round(st.savedMinutes || 0) })) + '</b></div></div>' +
       '<button type="button" class="tg-exit" data-tg="' + exitAction + '" data-testid="tg-exit">' + icon('log-out') + ' ' + exitLabel + '</button></div></aside>';
   }
   function topbar(c) {
     var d = new Date();
-    return '<header class="tg-top"><div><p class="tg-kicker">' + esc(d.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' })) + '</p><h1>' + esc(st.classes.length ? (TITLE[st.view] || t('guru.merek-penuh', 'KelasKu untuk Guru')) : t('guru.merek-penuh', 'KelasKu untuk Guru')) + '</h1></div>' +
-      '<div class="tg-top-actions">' + (c ? syncChip(c) + '<button type="button" class="tg-chip tg-code" data-tg="copy" data-text="' + esc(c.code) + '" title="Salin kode kelas" data-testid="tg-class-code">' + icon('hash') + '<span>' + esc(c.code) + '</span></button>' : '') + bell() + (c ? '<button type="button" class="tg-btn is-ghost" data-tg="modal" data-kind="board" data-testid="tg-open-board">' + icon('presentation') + '<span>Mode papan</span></button><button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="assign" data-testid="tg-quick-assign">' + icon('plus') + '<span>' + t('guru.tugas-baru', 'Tugas baru') + '</span></button>' : '') + '</div></header>' + inboxPanel();
+    var scope = '';
+    try { scope = subjectScopeBadge(); } catch (_) { scope = ''; }
+    return '<header class="tg-top"><div><p class="tg-kicker">' + esc(d.toLocaleDateString(bcp47(), { weekday: 'long', day: 'numeric', month: 'long' })) + '</p><h1>' + esc(st.classes.length ? ((st.view === 'hub' && ({ hasil: 1, braincore: 1, kurikulum: 1 })[hubTab()] ? (navItems().filter(function (n) { return navActive(n); })[0] || [])[1] : viewTitles()[st.view]) || t('guru.merek-penuh', 'KelasKu untuk Guru')) : t('guru.merek-penuh', 'KelasKu untuk Guru')) + '</h1>' + scope + '</div>' +
+      '<div class="tg-top-actions">' + (c ? syncChip(c) + '<button type="button" class="tg-chip tg-code" data-tg="copy" data-text="' + esc(c.code) + '" title="Salin kode kelas" data-testid="tg-class-code">' + icon('hash') + '<span>' + esc(c.code) + '</span></button>' : '') + bell() + (c ? '<button type="button" class="tg-btn is-ghost" data-tg="modal" data-kind="board" data-testid="tg-open-board">' + icon('presentation') + '<span>Mode papan</span></button>' + (st.view === 'assignments' ? '' : '<button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="assign" data-testid="tg-quick-assign">' + icon('plus') + '<span>' + t('guru.tugas-baru', 'Tugas baru') + '</span></button>') : '') + '</div></header>' + inboxPanel();
   }
   function bell() {
     var n = S().inboxUnread(st);
@@ -445,20 +3275,48 @@
         return '<li><button type="button" class="tg-inbox-item' + warn + (e.read ? '' : ' is-unread') + '" data-tg="inbox-open" data-id="' + esc(e.id) + '" data-testid="tg-inbox-' + esc(e.id) + '">' + icon(ic) + '<div><b>' + esc(T.inboxText(e)) + '</b><small>' + esc(T.fmtDate(e.at)) + ' · ' + esc(new Date(e.at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })) + '</small></div></button></li>';
       }).join('') + '</ul>' : '<p class="tg-empty">' + t('guru.belum-ada-kabar', 'Belum ada kabar. Saat murid selesai mengerjakan tugas yang kamu kirim, hasilnya muncul di sini otomatis.') + '</p>') + '</section>';
   }
-  function mobileNav() { return '<nav class="tg-mnav">' + NAV.map(function (n) { return '<button type="button" class="' + (st.view === n[0] ? 'is-active' : '') + '" data-tg="view" data-view="' + n[0] + '">' + icon(n[2]) + '<span>' + n[1].split(' ')[0] + '</span></button>'; }).join('') + '</nav>'; }
+  /* Audit F25 (2026-09-23): nav bawah ponsel dulu tujuh butir - terlalu padat untuk jempol.
+     Empat tujuan utama tetap di bar; sisanya masuk "Lainnya" (<details> native, tombolnya
+     memakai delegasi data-tg="view" yang sama). Sidebar desktop tidak berubah. */
+  function mobileNav() {
+    var items = navItems(), main = items.slice(0, 4), rest = items.slice(4);
+    var restActive = rest.some(function (n) { return navActive(n); });
+    return '<nav class="tg-mnav">' + main.map(function (n) {
+      return '<button type="button" class="' + (navActive(n) ? 'is-active' : '') + '" ' + navAttrs(n) + '>' + icon(n[2]) + '<span>' + n[1].split(' ')[0] + '</span></button>';
+    }).join('') +
+    (rest.length ? '<details class="tg-mnav-more' + (restActive ? ' is-active' : '') + '"><summary>' + icon('more-horizontal') + '<span>' + esc(t('guru.nav-lainnya', 'Lainnya')) + '</span></summary><div class="tg-mnav-sheet">' + rest.map(function (n) {
+      return '<button type="button" class="' + (navActive(n) ? 'is-active' : '') + '" ' + navAttrs(n) + '>' + icon(n[2]) + '<span>' + esc(n[1]) + '</span></button>';
+    }).join('') + '</div></details>' : '') +
+    /* Nav ponsel mengikuti sidebar: butir kurikulum dicabut dari sini juga (m025-357).
+       Menyisakannya berarti ponsel punya pintu ke view yang sudah tidak ada lagi. */
+    '</nav>';
+  }
 
   function welcome() {
-    return '<section class="tg-welcome" data-testid="tg-welcome"><p class="tg-kicker">Selamat datang</p><h2>' + t('guru.ruang-kerja-desc', 'Ruang kerja yang membaca kelasmu, lalu memberi tahu') + ' <em>siapa yang perlu disapa hari ini</em>.</h2>' +
-      '<p class="tg-lead">FIEZEL KelasKu untuk Guru mengubah data latihan murid menjadi tindakan: deteksi dini siswa tertinggal, kartu sapa personal 1 ketuk, laporan orang tua otomatis, kelompok belajar yang dipasangkan sendiri, dan tugas yang menilai dirinya sendiri.</p>' +
-      '<div class="tg-welcome-actions"><button type="button" class="tg-btn is-primary is-lg" data-tg="modal" data-kind="new-class" data-testid="tg-welcome-new-class">' + icon('plus') + ' ' + t('guru.buat-kelas-pertama', 'Buat kelas pertama') + '</button><button type="button" class="tg-btn is-ghost is-lg" data-tg="seed-demo" data-testid="tg-welcome-demo">' + icon('sparkles') + ' Coba dengan kelas contoh (18 siswa)</button></div>' +
-      '<ul class="tg-welcome-list"><li>' + icon('shield-check') + ' Data tetap di perangkatmu — tanpa jawaban mentah murid.</li><li>' + icon('timer') + ' Rata-rata guru menghemat 40+ menit/minggu untuk laporan & pesan.</li><li>' + icon('wifi-off') + ' Bekerja offline, cocok untuk sekolah dengan sinyal terbatas.</li></ul></section>';
+    /* Tujuh kalimat di panel ini dulu literal telanjang — tidak lewat t() sama sekali,
+       jadi tidak ada terjemahan yang bisa menggantikannya. Ia tetap berbahasa Indonesia
+       walau sidebar di sebelahnya sudah Thai: layar pertama yang dilihat guru Thai
+       adalah layar campur. Dijaga tests/teacher-i18n-lazy-test.js cek (D). */
+    return '<section class="tg-welcome" data-testid="tg-welcome"><p class="tg-kicker">' + esc(t('guru.selamat-datang', 'Selamat datang')) + '</p><h2>' + t('guru.ruang-kerja-desc', 'Ruang kerja yang membaca kelasmu, lalu memberi tahu') + ' <em>' + esc(t('guru.siapa-disapa', 'siapa yang perlu disapa hari ini')) + '</em>.</h2>' +
+      '<p class="tg-lead">' + esc(t('guru.welcome-lead', 'FIEZEL KelasKu untuk Guru mengubah data latihan murid menjadi tindakan: deteksi dini siswa tertinggal, kartu sapa personal 1 ketuk, laporan orang tua otomatis, kelompok belajar yang dipasangkan sendiri, dan tugas yang menilai dirinya sendiri.')) + '</p>' +
+      '<div class="tg-welcome-actions"><button type="button" class="tg-btn is-primary is-lg" data-tg="modal" data-kind="new-class" data-testid="tg-welcome-new-class">' + icon('plus') + ' ' + t('guru.buat-kelas-pertama', 'Buat kelas pertama') + '</button><button type="button" class="tg-btn is-ghost is-lg" data-tg="seed-demo" data-testid="tg-welcome-demo">' + icon('sparkles') + ' ' + esc(t('guru.coba-kelas-contoh', 'Coba dengan kelas contoh ({n} siswa)', { n: DEMO_CLASS_SIZE })) + '</button></div>' +
+      '<ul class="tg-welcome-list"><li>' + icon('shield-check') + ' ' + esc(t('guru.welcome-privasi', 'Data tetap di perangkatmu — tanpa jawaban mentah murid.')) + '</li><li>' + icon('timer') + ' ' + esc(t('guru.welcome-hemat', 'Rata-rata guru menghemat 40+ menit/minggu untuk laporan & pesan.')) + '</li><li>' + icon('wifi-off') + ' ' + esc(t('guru.welcome-offline', 'Bekerja offline, cocok untuk sekolah dengan sinyal terbatas.')) + '</li></ul></section>';
   }
 
   // ---- BRIEFING -----------------------------------------------------------------------------
   function briefing(c) {
     var T = S(), stt = T.classStats(c), greet = T.needsGreeting(c), ag = T.agenda(c), mis = T.misconceptions(c);
-    var kpi = [['Siswa aktif 7 hari', stt.active7 + '<small>/' + stt.total + '</small>', 'users', stt.total ? stt.active7 / stt.total : 0], ['Rata-rata akurasi', pct(stt.avgAcc), 'target', stt.avgAcc || 0], [t('guru.kpi-perlu-dibantu', 'Perlu dibantu'), (stt.atRisk + stt.watch) + '<small> siswa</small>', 'alert-triangle', stt.total ? (stt.atRisk + stt.watch) / stt.total : 0], [t('guru.tugas-berjalan', 'Tugas berjalan'), stt.openAssignments + '<small> tugas</small>', 'clipboard-list', null]];
-    return '<div class="tg-grid tg-grid-kpi">' + kpi.map(function (k, i) { return '<div class="tg-kpi tg-rise" style="--d:' + i * 60 + 'ms" data-testid="tg-kpi-' + i + '">' + icon(k[2]) + '<small>' + k[0] + '</small><b>' + k[1] + '</b>' + (k[3] != null ? bar(k[3], i === 2 ? 'is-warn' : '') : '') + '</div>'; }).join('') + '</div>' +
+    var __scB = null;
+    try { __scB = teacherSubjectScope(); } catch (_) {}
+    /* AUDIT: agenda & miskonsepsi mengikuti lisensi; badge tampil di atas. */
+    if (__scB && __scB.locked) {
+      ag = ag.filter(function (x) { return isAssignmentVisible(x.a, __scB); });
+      mis = mis.filter(function (m) { return skillMatchesSubject(m.skill, __scB); });
+    }
+    var scopeB = (__scB && __scB.locked) ? subjectScopeBadge() : '';
+    var openN = (__scB && __scB.locked) ? ag.length : stt.openAssignments;
+    var kpi = [['Siswa aktif 7 hari', stt.active7 + '<small>/' + stt.total + '</small>', 'users', stt.total ? stt.active7 / stt.total : 0], ['Rata-rata akurasi', pct(stt.avgAcc), 'target', stt.avgAcc || 0], [t('guru.kpi-perlu-dibantu', 'Perlu dibantu'), (stt.atRisk + stt.watch) + '<small> siswa</small>', 'alert-triangle', stt.total ? (stt.atRisk + stt.watch) / stt.total : 0], [t('guru.tugas-berjalan', 'Tugas berjalan'), openN + '<small> tugas</small>', 'clipboard-list', null]];
+    return scopeB + '<div class="tg-grid tg-grid-kpi">' + kpi.map(function (k, i) { return '<div class="tg-kpi tg-rise" style="--d:' + i * 60 + 'ms" data-testid="tg-kpi-' + i + '">' + icon(k[2]) + '<small>' + k[0] + '</small><b>' + k[1] + '</b>' + (k[3] != null ? bar(k[3], i === 2 ? 'is-warn' : '') : '') + '</div>'; }).join('') + '</div>' +
       '<div class="tg-grid tg-grid-2">' +
       '<section class="tg-card tg-rise" style="--d:200ms" data-testid="tg-greet-list"><div class="tg-card-head"><div><p class="tg-kicker">Deteksi dini</p><h3>Siapa yang perlu disapa hari ini</h3></div><span class="tg-count">' + greet.length + '</span></div>' +
       (greet.length ? '<ul class="tg-list">' + greet.slice(0, 6).map(function (x) { return '<li class="tg-row" data-testid="tg-greet-' + x.s.id + '">' + avatar(x.s) + '<div class="tg-row-body"><b>' + esc(x.s.name) + ' ' + riskPill(x.r) + '</b><small>' + esc(x.r.reasons.join(' · ') || 'perlu dipantau') + '</small><em>' + esc(x.r.action) + '</em></div><div class="tg-row-actions"><button type="button" class="tg-btn is-small is-primary" data-tg="modal" data-kind="greet" data-id="' + x.s.id + '" data-testid="tg-greet-btn-' + x.s.id + '">' + icon('message-circle-heart') + ' Kartu sapa</button><button type="button" class="tg-btn is-small is-ghost" data-tg="drawer" data-id="' + x.s.id + '">Detail</button></div></li>'; }).join('') + '</ul>' : '<p class="tg-empty">Semua siswa dalam kondisi aman. Nikmati kopimu ☕</p>') + '</section>' +
@@ -472,37 +3330,135 @@
   // ---- KELAS & SISWA -------------------------------------------------------------------------
   function classes(c) {
     var T = S(), q = ui.filter.toLowerCase(), list = c.students.filter(function (s) { return !q || s.name.toLowerCase().indexOf(q) !== -1; }).map(function (s) { return { s: s, r: T.risk(c, s) }; }).sort(function (a, b) { return b.r.score - a.r.score; });
-    return '<div class="tg-toolbar"><div class="tg-tabs">' + st.classes.map(function (k) { return '<button type="button" class="tg-tab' + (k.id === c.id ? ' is-active' : '') + '" data-tg="pick-class" data-id="' + k.id + '">' + esc(k.name) + '<small>' + k.students.length + '</small></button>'; }).join('') + '<button type="button" class="tg-tab is-add" data-tg="modal" data-kind="new-class" data-testid="tg-new-class">' + t('guru.kelas-tambah-btn', '+ Kelas') + '</button></div>' +
-      '<div class="tg-toolbar-actions"><label class="tg-search">' + icon('search') + '<input type="search" placeholder="' + t('guru.cari-siswa', 'Cari siswa…') + '" value="' + esc(ui.filter) + '" data-tg-input="filter" data-testid="tg-student-search"></label><button type="button" class="tg-btn is-ghost" data-tg="modal" data-kind="attendance" data-testid="tg-attendance">' + icon('check-square') + '<span>Absensi</span></button><button type="button" class="tg-btn is-ghost" data-tg="export-csv" data-testid="tg-export-csv">' + icon('download') + '<span>CSV</span></button><button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="add-students" data-testid="tg-add-students">' + icon('user-plus') + '<span>' + t('guru.tambah-siswa', 'Tambah siswa') + '</span></button></div></div>' +
-      '<section class="tg-card tg-class-meta"><div><p class="tg-kicker">' + esc(c.subject || 'English') + ' · Level ' + esc(c.level) + (c.demo ? ' · <span class="tg-demo">data contoh</span>' : '') + '</p><h3>' + esc(c.name) + '</h3><small>Kode kelas <b class="tg-mono">' + esc(c.code) + '</b> — murid mengetiknya saat onboarding; setiap selesai sesi, hasilnya dikirim ke server dan masuk ke sini otomatis. ' + (c.sync && c.sync.claimed ? '<span class="tg-ok">Kode terdaftar di server.</span>' : S().syncAvailable() === 'ok' ? '<span class="tg-muted">Kode belum terdaftar — tekan Sinkron.</span>' : '<span class="tg-muted">Tanpa akun guru, tempel kode hasil murid secara manual.</span>') + '</small></div><div class="tg-actions"><button type="button" class="tg-btn is-ghost is-small" data-tg="modal" data-kind="edit-class">' + icon('pencil') + ' ' + t('umum.ubah', 'Ubah') + '</button><button type="button" class="tg-btn is-danger is-small" data-tg="delete-class" data-testid="tg-delete-class">' + icon('trash-2') + ' ' + t('guru.hapus-kelas', 'Hapus kelas') + '</button></div></section>' +
+    var mapelNames = (T && T.MAPEL_NAMES) || {};
+    var __scCls = null;
+    try { __scCls = teacherSubjectScope(); } catch (_) {}
+    var __scopeNote = (__scCls && __scCls.locked) ? subjectScopeBadge() : '';
+    return __scopeNote + '<div class="tg-toolbar"><div class="tg-tabs">' + st.classes.map(function (k) { return '<button type="button" class="tg-tab' + (k.id === c.id ? ' is-active' : '') + '" data-tg="pick-class" data-id="' + k.id + '">' + esc(k.name) + '<small>' + k.students.length + '</small></button>'; }).join('') + '<button type="button" class="tg-tab is-add" data-tg="modal" data-kind="new-class" data-testid="tg-new-class">' + t('guru.kelas-tambah-btn', '+ Kelas') + '</button></div>' +
+      '<div class="tg-toolbar-actions"><label class="tg-search">' + icon('search') + '<input type="search" placeholder="' + t('guru.cari-siswa', 'Cari siswa…') + '" value="' + esc(ui.filter) + '" data-tg-input="filter" data-testid="tg-student-search" aria-label="' + esc(t('guru.cari-siswa', 'Cari siswa…')) + '"></label><button type="button" class="tg-btn is-ghost" data-tg="modal" data-kind="attendance" data-testid="tg-attendance">' + icon('check-square') + '<span>Absensi</span></button><button type="button" class="tg-btn is-ghost" data-tg="export-csv" data-testid="tg-export-csv">' + icon('download') + '<span>CSV</span></button><button type="button" class="tg-btn is-ghost" data-tg="export-rekap" data-testid="tg-export-rekap">' + icon('file-text') + '<span>' + t('guru.rekap-erapor', 'Rekap e-Rapor') + '</span></button><button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="add-students" data-testid="tg-add-students">' + icon('user-plus') + '<span>' + t('guru.tambah-siswa', 'Tambah siswa') + '</span></button></div></div>' +
+      '<section class="tg-card tg-class-meta"><div><p class="tg-kicker">' + esc(mapelNames[c.subject] || c.subject || 'English') + ' · Level ' + esc(c.level) + (c.demo ? ' · <span class="tg-demo">data contoh</span>' : '') + '</p><h3>' + esc(c.name) + '</h3>' +
+      (c.latestAnnouncement && c.latestAnnouncement.text ? '<p class="tg-latest-ann" style="margin:4px 0 8px;font-size:13px;color:var(--tg-text)">📢 <b>Pengumuman:</b> ' + esc(c.latestAnnouncement.text) + ' <small class="tg-muted">(' + esc(c.latestAnnouncement.teacher || 'Wali kelas') + (c.latestAnnouncement.at ? ' · ' + T.fmtDate(c.latestAnnouncement.at) : '') + ')</small></p>' : '') +
+      '<small>Kode kelas <b class="tg-mono">' + esc(c.code) + '</b> — ' + esc(t('guru.kode-kelas-jelas', 'murid mengetiknya saat onboarding; setiap selesai sesi, hasilnya dikirim ke server dan masuk ke sini otomatis.')) + ' ' + (c.sync && c.sync.claimed ? '<span class="tg-ok">Kode terdaftar di server.</span>' : S().syncAvailable() === 'ok' ? '<span class="tg-muted">Kode belum terdaftar — tekan Sinkron.</span>' : '<span class="tg-muted">Tanpa akun guru, tempel kode hasil murid secara manual.</span>') + '</small></div><div class="tg-actions"><button type="button" class="tg-btn is-ghost is-small" data-tg="modal" data-kind="edit-class">' + icon('pencil') + ' ' + t('umum.ubah', 'Ubah') + '</button><details class="tg-more"><summary class="tg-btn is-ghost is-small" aria-label="' + esc(t('guru.aksi-lain', 'Aksi lain')) + '">' + icon('more-horizontal') + '</summary><div class="tg-more-menu"><button type="button" class="tg-btn is-danger is-small" data-tg="delete-class" data-testid="tg-delete-class">' + icon('trash-2') + ' ' + t('guru.hapus-kelas', 'Hapus kelas') + '</button></div></details></div></section>' +
       (list.length ? '<div class="tg-table-wrap"><table class="tg-table" data-testid="tg-student-table"><thead><tr><th>Siswa</th><th>' + t('umum.status', 'Status') + '</th><th>Akurasi</th><th>Terakhir aktif</th><th>Kehadiran</th><th>' + t('umum.tugas', 'Tugas') + '</th><th></th></tr></thead><tbody>' +
         list.map(function (x) { var s = x.s, d = T.daysSince(s.lastActiveAt), att = T.attendanceRate(s, 10); return '<tr data-tg="drawer" data-id="' + s.id + '" data-testid="tg-student-row-' + s.id + '"><td><div class="tg-who">' + avatar(s) + '<div><b>' + esc(s.name) + '</b><small>' + (s.parentPhone ? icon('phone') + ' ortu tersimpan' : '<span class="tg-muted">belum ada kontak ortu</span>') + '</small></div></div></td><td>' + riskPill(x.r) + '</td><td><div class="tg-acc">' + bar(T.overallAcc(s)) + '<span>' + pct(T.overallAcc(s)) + '</span></div></td><td>' + (d == null ? '<span class="tg-muted">—</span>' : d === 0 ? 'Hari ini' : d + ' hari lalu') + '</td><td>' + (att == null ? '—' : Math.round(att * 100) + '%') + '</td><td>' + (x.r.pending ? x.r.pending + ' belum' + (x.r.late ? ' <strong class="tg-late">' + x.r.late + ' lewat</strong>' : '') : '<span class="tg-ok">beres</span>') + '</td><td class="tg-row-end">' + icon('chevron-right') + '</td></tr>'; }).join('') + '</tbody></table></div>' :
         '<section class="tg-card tg-center"><h3>' + t('guru.belum-ada-siswa', 'Belum ada siswa di kelas ini') + '</h3><p class="tg-muted">' + t('guru.tambah-nama-siswa', 'Tambah nama siswa (bisa tempel dari daftar absen), atau bagikan kode kelas') + ' <b>' + esc(c.code) + '</b> supaya hasil latihan murid masuk sendiri.</p><button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="add-students">' + icon('user-plus') + ' ' + t('guru.tambah-siswa', 'Tambah siswa') + '</button></section>');
   }
 
   // ---- TUGAS & UJIAN -------------------------------------------------------------------------
+  /* ===== SIKLUS TUGAS GURU (m025-365, audit KelasKu K2/T4) ==============================
+     Sampai build ini seluruh tugas guru hidup di satu daftar urut-buat: tugas minggu ini,
+     tugas yang tenggatnya lewat sebulan lalu, dan tugas percobaan bercampur, dan satu-satunya
+     cara merapikannya adalah tong sampah — hapus permanen lewat confirm(), tanpa jalan
+     kembali, dan TANPA menariknya dari HP murid yang sudah menerimanya.
+
+     Sekarang tiap tugas punya tempat: AKTIF (belum lewat tenggat), LEWAT TENGGAT (tinggal
+     ditagih atau diarsipkan), ARSIP (disimpan beserta hasil murid). Merapikan = mengarsipkan.
+     Menarik = membatalkan untuk murid yang belum mengerjakan (lewat server). Menghapus hanya
+     dari Arsip, dengan konfirmasi di tempat — bukan jendela confirm() yang dilewati jempol. */
+  function sudahDikirim(a) { return !!(a.sent && (a.sent.all || (a.sent.to && Object.keys(a.sent.to).length))); }
+  function tombolTarik(a) {
+    if (!sudahDikirim(a) || a.retractedAt) return '';
+    return '<button type="button" class="tg-btn is-small is-danger" data-tg="retract-assign" data-id="' + a.id + '" data-testid="tg-retract-' + a.id + '">' + icon('undo-2') + ' ' + esc(t('guru.siklus.tarik', 'Tarik dari murid')) + '</button>';
+  }
+  function barKonfirmasi(jenis, a) {
+    var tarik = jenis === 'tarik';
+    if ((tarik ? ui.confirmRetract : ui.confirmDelete) !== a.id) return '';
+    return '<div class="tg-confirm" role="alert" data-testid="tg-confirm-' + jenis + '-' + a.id + '"><p>' +
+      esc(tarik
+        ? t('guru.siklus.tarik-tanya', 'Tarik tugas ini dari murid? Yang belum mengerjakan tidak akan melihatnya lagi. Hasil yang sudah masuk tetap tersimpan.')
+        : t('guru.siklus.hapus-tanya', 'Hapus permanen? Tugas dan hasil murid untuk tugas ini hilang dari Ruang Guru dan tidak bisa dikembalikan.')) +
+      '</p><div class="tg-actions">' +
+        '<button type="button" class="tg-btn is-small is-danger" data-tg="' + (tarik ? 'retract-yes' : 'delete-yes') + '" data-id="' + a.id + '" data-testid="tg-' + (tarik ? 'retract' : 'delete') + '-yes-' + a.id + '"' + (ui.sending === a.id ? ' disabled' : '') + '>' +
+          esc(tarik ? t('guru.siklus.ya-tarik', 'Ya, tarik') : t('guru.siklus.ya-hapus', 'Ya, hapus permanen')) + '</button>' +
+        '<button type="button" class="tg-btn is-small is-ghost" data-tg="confirm-no" data-id="' + a.id + '">' + esc(t('guru.siklus.batal', 'Batal')) + '</button>' +
+      '</div></div>';
+  }
+  function kartuArsip(c, a) {
+    var T = S(), tgt = c.students.filter(function (s) { return T.targeted(a, s); }), done = tgt.filter(function (s) { return a.done && a.done[s.id]; });
+    var accs = done.map(function (s) { return a.done[s.id].acc; }).filter(function (v) { return v != null; }), avg = accs.length ? accs.reduce(function (x, y) { return x + y; }, 0) / accs.length : null;
+    var ket = a.retractedAt
+      ? t('guru.siklus.ditarik-pada', 'Ditarik dari murid · {tanggal}').replace('{tanggal}', T.fmtDate(a.retractedAt))
+      : t('guru.siklus.diarsip-pada', 'Diarsipkan · {tanggal}').replace('{tanggal}', T.fmtDate(a.archivedAt));
+    return '<article class="tg-card tg-assign is-archived" data-testid="tg-archived-' + a.id + '">' +
+      '<div class="tg-card-head"><div><p class="tg-kicker">' + icon(a.retractedAt ? 'undo-2' : 'archive') + ' ' + esc(ket) + '</p><h3>' + esc(a.title) + '</h3></div></div>' +
+      '<p class="tg-muted">' + esc(t('guru.siklus.ringkas-hasil', '{selesai}/{total} selesai').replace('{selesai}', done.length).replace('{total}', tgt.length)) + (avg != null ? ' · ' + pct(avg) : '') + (a.deadline ? ' · ' + esc(t('guru.siklus.tenggat', 'Tenggat {tanggal}').replace('{tanggal}', T.fmtDate(a.deadline + 'T00:00:00'))) : '') + '</p>' +
+      '<div class="tg-actions">' +
+        '<button type="button" class="tg-btn is-small is-ghost" data-tg="modal" data-kind="assign-detail" data-id="' + a.id + '">' + icon('list-checks') + ' ' + esc(t('guru.siklus.lihat-hasil', 'Lihat hasil')) + '</button>' +
+        '<button type="button" class="tg-btn is-small is-ghost" data-tg="unarchive-assign" data-id="' + a.id + '" data-testid="tg-unarchive-' + a.id + '">' + icon('undo-2') + ' ' + esc(t('guru.siklus.pulihkan', 'Pulihkan')) + '</button>' +
+        '<button type="button" class="tg-btn is-small is-danger" data-tg="delete-assign" data-id="' + a.id + '" data-testid="tg-delete-' + a.id + '">' + icon('trash-2') + ' ' + esc(t('guru.siklus.hapus', 'Hapus permanen')) + '</button>' +
+      '</div>' + barKonfirmasi('hapus', a) +
+    '</article>';
+  }
   function assignments(c) {
-    var T = S(), td = T.today(), list = (c.assignments || []).slice().sort(function (a, b) { return b.createdAt - a.createdAt; });
-    return '<div class="tg-toolbar"><p class="tg-lead-sm">' + t('guru.tugas-menilai-diri', 'Tugas yang menilai dirinya sendiri: kirim ke murid, tugasnya') + ' <b>langsung masuk notifikasi</b> di aplikasi mereka; setelah selesai, hasilnya kembali ke sini otomatis — tidak ada koreksi manual.</p><div class="tg-toolbar-actions"><button type="button" class="tg-btn is-ghost" data-tg="modal" data-kind="import-code" data-testid="tg-grade-code">' + icon('clipboard-paste') + '<span>Tempel kode hasil</span></button><button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="assign" data-testid="tg-new-assign">' + icon('plus') + '<span>' + t('guru.buat-tugas-ujian', 'Buat tugas / ujian') + '</span></button></div></div>' +
-      (list.length ? '<div class="tg-grid tg-grid-cards">' + list.map(function (a) {
+    var T = S(), td = T.today(), allList = (c.assignments || []).slice().sort(function (a, b) { return b.createdAt - a.createdAt; });
+    var sc = null;
+    try { sc = teacherSubjectScope(); } catch (_) { sc = null; }
+    var list = (sc && sc.locked) ? allList.filter(function (a) { return isAssignmentVisible(a, sc); }) : allList;
+    var scopeNote = (sc && sc.locked) ? subjectScopeBadge() : '';
+    var arsipL = list.filter(function (a) { return a.archivedAt; });
+    var lewatL = list.filter(function (a) { return !a.archivedAt && a.deadline && a.deadline < td; });
+    var aktifL = list.filter(function (a) { return !a.archivedAt && !(a.deadline && a.deadline < td); });
+    var tab = ['aktif', 'lewat', 'arsip'].indexOf(ui.asgTab) !== -1 ? ui.asgTab : 'aktif', lewatTab = tab === 'lewat';
+    var shown = tab === 'arsip' ? arsipL : lewatTab ? lewatL : aktifL;
+    var lifeTabs = '<div class="tg-tabs tg-life-tabs" role="tablist" aria-label="' + esc(t('guru.siklus.tab-aria', 'Status tugas')) + '" data-testid="tg-life-tabs">' +
+      [['aktif', t('guru.siklus.aktif', 'Aktif'), aktifL.length], ['lewat', t('guru.siklus.lewat', 'Lewat tenggat'), lewatL.length], ['arsip', t('guru.siklus.arsip', 'Arsip'), arsipL.length]].map(function (x) {
+        return '<button type="button" role="tab" aria-selected="' + (x[0] === tab ? 'true' : 'false') + '" class="tg-tab' + (x[0] === tab ? ' is-active' : '') + '" data-tg="asg-tab" data-tab="' + x[0] + '" data-testid="tg-life-' + x[0] + '">' + esc(x[1]) + ' <small>' + x[2] + '</small></button>';
+      }).join('') + '</div>';
+    var lifeNote = lewatTab && lewatL.length
+      ? '<div class="tg-life-note"><p class="tg-muted">' + esc(t('guru.siklus.lewat-catatan', 'Tenggatnya sudah lewat. Tagih yang belum, lalu arsipkan — hasil murid tetap tersimpan.')) + '</p><button type="button" class="tg-btn is-small is-ghost" data-tg="archive-all-late" data-testid="tg-archive-all-late">' + icon('archive') + ' ' + esc(t('guru.siklus.arsipkan-semua', 'Arsipkan semua ({n})').replace('{n}', lewatL.length)) + '</button></div>'
+      : tab === 'arsip' && arsipL.length
+        ? '<div class="tg-life-note"><p class="tg-muted">' + esc(t('guru.siklus.arsip-catatan', 'Arsip hanya merapikan daftar ini: hasil murid tetap tersimpan dan tugas bisa dipulihkan. Hapus permanen hanya dari sini.')) + '</p></div>'
+        : '';
+    return scopeNote + '<div class="tg-toolbar"><p class="tg-lead-sm">' + t('guru.tugas-menilai-diri', 'Tugas yang menilai dirinya sendiri: kirim ke murid, tugasnya') + ' <b>langsung masuk notifikasi</b> di aplikasi mereka; setelah selesai, hasilnya kembali ke sini otomatis — tidak ada koreksi manual.</p><div class="tg-toolbar-actions"><button type="button" class="tg-btn is-ghost" data-tg="modal" data-kind="import-code" data-testid="tg-grade-code">' + icon('clipboard-paste') + '<span>Tempel kode hasil</span></button><button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="assign" data-testid="tg-new-assign">' + icon('plus') + '<span>' + t('guru.buat-tugas-ujian', 'Buat tugas / ujian') + '</span></button></div></div>' +
+      lifeTabs + lifeNote +
+      (shown.length ? '<div class="tg-grid tg-grid-cards">' + shown.map(function (a) {
+        if (a.archivedAt) return kartuArsip(c, a);
         var tgt = c.students.filter(function (s) { return T.targeted(a, s); }), done = tgt.filter(function (s) { return a.done && a.done[s.id]; }), accs = done.map(function (s) { return a.done[s.id].acc; }).filter(function (v) { return v != null; }), avg = accs.length ? accs.reduce(function (x, y) { return x + y; }, 0) / accs.length : null;
         var late = a.deadline && a.deadline < td && done.length < tgt.length;
-        return '<article class="tg-card tg-assign' + (a.mode === 'ujian' ? ' is-exam' : '') + '" data-testid="tg-assign-' + a.id + '"><div class="tg-card-head"><div><p class="tg-kicker">' + (a.mode === 'ujian' ? icon('shield') + ' Ujian · ' + a.timer + ' mnt · acak' : icon('pencil-ruler') + ' Latihan · ' + a.minutes + ' mnt') + '</p><h3>' + esc(a.title) + '</h3></div><button type="button" class="tg-icon-btn" data-tg="delete-assign" data-id="' + a.id + '" aria-label="Hapus tugas">' + icon('trash-2') + '</button></div>' +
-          '<p class="tg-muted">' + a.skills.map(function (k) { return T.SKILL_LABEL[k]; }).join(' + ') + ' · ' + a.itemIds.length + ' soal · ' + (a.targets ? tgt.length + ' siswa terpilih' : 'seluruh kelas') + '</p>' +
-          '<div class="tg-progress"><div class="tg-progress-head"><span>' + done.length + '/' + tgt.length + ' selesai' + (avg != null ? ' · rata-rata ' + pct(avg) : '') + '</span><span class="' + (late ? 'tg-late' : '') + '">' + (a.deadline ? 'Tenggat ' + esc(a.deadline) + (late ? ' (lewat)' : '') : 'Tanpa tenggat') + '</span></div>' + bar(tgt.length ? done.length / tgt.length : 0, avg != null && avg < 0.5 ? 'is-warn' : '') + '</div>' +
-          '<div class="tg-actions"><button type="button" class="tg-btn is-small is-primary" data-tg="send-assign" data-id="' + a.id + '" data-testid="tg-send-all-' + a.id + '"' + (ui.sending === a.id ? ' disabled' : '') + '>' + icon('send') + (a.targets ? (a.sent && a.sent.all ? ' ' + t('guru.kirim-ulang-ke', 'Kirim ulang ke') + ' ' : ' ' + t('guru.kirim-ke', 'Kirim ke') + ' ') + tgt.length + ' murid terpilih' : (a.sent && a.sent.all ? ' ' + t('guru.kirim-ulang-semua', 'Kirim ulang ke semua') : ' ' + t('guru.kirim-semua-murid', 'Kirim ke semua murid'))) + '</button><button type="button" class="tg-btn is-small is-ghost" data-tg="modal" data-kind="share-assign" data-id="' + a.id + '" data-testid="tg-share-assign-' + a.id + '">' + icon('users') + ' ' + t('guru.pilih-murid-kode', 'Pilih murid / kode') + '</button><button type="button" class="tg-btn is-small is-ghost" data-tg="modal" data-kind="assign-detail" data-id="' + a.id + '">' + icon('list-checks') + ' Siapa yang belum</button></div>' + (a.sent && a.sent.all ? '<p class="tg-muted tg-sent-note">' + icon('check') + ' Terkirim ke semua murid ' + esc(T.fmtDate(a.sent.all)) + '</p>' : '') + '</article>';
-      }).join('') + '</div>' : '<section class="tg-card tg-center"><h3>' + t('guru.belum-ada-tugas', 'Belum ada tugas') + '</h3><p class="tg-muted">Buat tugas dari bank soal FIEZEL: pilih skill, jumlah soal, tenggat. Mode ujian mengacak urutan dan memberi timer.</p></section>');
+        var asgCode = T.assignmentCode(c, a);
+        var waMsgCard = '📢 *TUGAS FIEZEL: ' + a.title + '*\n' +
+          'Dari: ' + (st.teacher.name || 'Guru') + ' · ' + t('umum.kelas', 'Kelas') + ': ' + c.name + ' (' + c.code + ')\n' +
+          '📝 ' + a.itemIds.length + ' ' + t('umum.soal', 'Soal') + ' · ' + a.minutes + ' min' + (a.deadline ? ' · Tenggat: ' + a.deadline : '') + '\n\n' +
+          'Buka FIEZEL → KelasKu / Today Plan → tempel kode tugas ini:\n' + asgCode;
+        return '<article class="tg-card tg-assign' + (a.mode === 'ujian' ? ' is-exam' : '') + '" data-testid="tg-assign-' + a.id + '"><div class="tg-card-head"><div><p class="tg-kicker">' + (a.mode === 'ujian' ? icon('shield') + ' Ujian · ' + a.timer + ' mnt · acak' : icon('pencil-ruler') + ' Latihan · ' + a.minutes + ' mnt') + '</p><h3>' + esc(a.title) + '</h3></div><button type="button" class="tg-icon-btn" data-tg="archive-assign" data-id="' + a.id + '" aria-label="' + esc(t('guru.siklus.arsipkan', 'Arsipkan')) + '" title="' + esc(t('guru.siklus.arsipkan', 'Arsipkan')) + '" data-testid="tg-archive-' + a.id + '">' + icon('archive') + '</button></div>' +
+          '<p class="tg-muted">' + a.skills.map(function (k) { return mapelName(k) || T.SKILL_LABEL[k] || k; }).join(' + ') + ' · ' + a.itemIds.length + ' soal · ' + (a.targets ? tgt.length + ' siswa terpilih' : 'seluruh kelas') + '</p>' +
+          '<div class="tg-progress"><div class="tg-progress-head"><span>' + done.length + '/' + tgt.length + ' selesai' + (avg != null ? ' · rata-rata ' + pct(avg) : '') + '</span><span class="' + (late ? 'tg-late' : '') + '">' + (a.deadline ? esc(t('guru.siklus.tenggat', 'Tenggat {tanggal}').replace('{tanggal}', T.fmtDate(a.deadline + 'T00:00:00'))) + (late ? ' ' + esc(t('guru.siklus.lewat-kurung', '(lewat)')) : '') : esc(t('kelas.tanpa-tenggat', 'Tanpa tenggat'))) + '</span></div>' + bar(tgt.length ? done.length / tgt.length : 0, avg != null && avg < 0.5 ? 'is-warn' : '') + '</div>' +
+          '<div class="tg-actions">' + (lewatTab ? '' : '<button type="button" class="tg-btn is-small is-primary" data-tg="send-assign" data-id="' + a.id + '" data-testid="tg-send-all-' + a.id + '"' + (ui.sending === a.id ? ' disabled' : '') + '>' + icon('send') + (a.targets ? (a.sent && a.sent.all ? ' ' + t('guru.kirim-ulang-ke', 'Kirim ulang ke') + ' ' : ' ' + t('guru.kirim-ke', 'Kirim ke') + ' ') + tgt.length + ' murid terpilih' : (a.sent && a.sent.all ? ' ' + t('guru.kirim-ulang-semua', 'Kirim ulang ke semua') : ' ' + t('guru.kirim-semua-murid', 'Kirim ke semua murid'))) + '</button><a class="tg-btn is-small is-wa-ghost" target="_blank" rel="noopener" href="' + T.waLink('', waMsgCard) + '" data-testid="tg-card-wa-' + a.id + '">' + icon('message-circle') + ' ' + esc(t('guru.bagikan-wa-singkat', 'WhatsApp')) + '</a><button type="button" class="tg-btn is-small is-ghost" data-tg="copy" data-text="' + esc(asgCode) + '" data-testid="tg-card-copy-' + a.id + '">' + icon('copy') + ' ' + esc(t('guru.salin-kode-singkat', 'Salin Kode')) + '</button><button type="button" class="tg-btn is-small is-ghost" data-tg="modal" data-kind="share-assign" data-id="' + a.id + '" data-testid="tg-share-assign-' + a.id + '">' + icon('users') + ' ' + t('guru.pilih-murid-kode', 'Pilih murid / kode') + '</button>') + '<button type="button" class="tg-btn is-small is-ghost" data-tg="modal" data-kind="assign-detail" data-id="' + a.id + '">' + icon('list-checks') + ' ' + esc(t('guru.siapa-belum', 'Siapa yang belum')) + '</button>' + (lewatTab ? '<button type="button" class="tg-btn is-small is-ghost" data-tg="archive-assign" data-id="' + a.id + '">' + icon('archive') + ' ' + esc(t('guru.siklus.arsipkan', 'Arsipkan')) + '</button>' : '') + tombolTarik(a) + '</div>' + barKonfirmasi('tarik', a) + (a.sent && a.sent.all ? '<p class="tg-muted tg-sent-note">' + icon('check') + ' Terkirim ke semua murid ' + esc(T.fmtDate(a.sent.all)) + '</p>' : '') + '</article>';
+      }).join('') + '</div>' : '<section class="tg-card tg-center tg-empty-state" data-testid="tg-empty-assignments"><div class="tg-empty-ill" aria-hidden="true">' + icon('clipboard-list') + '</div><h3>' + t('guru.belum-ada-tugas', 'Belum ada tugas') + '</h3><p class="tg-muted">' + ((sc && sc.locked) ? esc(t('guru.belum-tugas-scope', 'Belum ada tugas {mapel} di kelas ini. Buat tugas pertama dari bab {mapel} — hanya butuh 1 menit.').replace('{mapel}', sc.active)) : 'Buat tugas dari bank soal FIEZEL: pilih skill, jumlah soal, tenggat. Mode ujian mengacak urutan dan memberi timer.') + '</p><button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="assign" data-testid="tg-empty-new-assign">' + icon('plus') + '<span>' + t('guru.buat-tugas-ujian', 'Buat tugas / ujian') + '</span></button></section>');
   }
 
   // ---- ANALITIK -------------------------------------------------------------------------------
   function insights(c) {
-    var T = S(), heat = T.heatmap(c), map = T.classSkillMap(c), groups = T.studyGroups(c, ui.insightSkill), mis = T.misconceptions(c);
-    if (!c.students.length) return '<section class="tg-card tg-center"><h3>' + t('guru.belum-data-analisis', 'Belum ada data untuk dianalisis') + '</h3><p class="tg-muted">' + t('guru.tambah-siswa-dulu', 'Tambah siswa atau tempel kode hasil latihan murid dulu.') + '</p></section>';
-    return '<div class="tg-grid tg-grid-skill">' + map.map(function (m, i) { return '<button type="button" class="tg-skill' + (ui.insightSkill === m.skill ? ' is-active' : '') + ' tg-rise" style="--d:' + i * 40 + 'ms" data-tg="insight-skill" data-skill="' + m.skill + '" data-testid="tg-skill-' + m.skill + '"><small>' + esc(m.label) + '</small><b>' + pct(m.acc) + '</b>' + bar(m.acc, m.acc != null && m.acc < 0.5 ? 'is-warn' : '') + '<em>' + (m.low ? m.low + ' siswa <50%' : m.acc == null ? 'belum ada data' : 'merata') + '</em></button>'; }).join('') + '</div>' +
-      '<section class="tg-card" data-testid="tg-heatmap"><div class="tg-card-head"><div><p class="tg-kicker">Peta panas</p><h3>Siswa × skill — sekali lihat, tahu siapa butuh apa</h3></div><small class="tg-legend"><span class="is-hi">≥75%</span><span class="is-mid">50–74%</span><span class="is-lo">&lt;50%</span></small></div>' +
-      '<div class="tg-table-wrap"><table class="tg-table tg-heat-table"><thead><tr><th>Siswa</th>' + T.SKILL_ORDER.map(function (k) { return '<th>' + esc(T.SKILL_LABEL[k]) + '</th>'; }).join('') + '<th>Risiko</th></tr></thead><tbody>' + heat.map(function (h) { return '<tr data-tg="drawer" data-id="' + h.s.id + '"><td><div class="tg-who">' + avatar(h.s) + '<b>' + esc(h.s.name) + '</b></div></td>' + h.cells.map(function (x) { return cell(x.acc); }).join('') + '<td>' + riskPill(h.risk) + '</td></tr>'; }).join('') + '</tbody></table></div></section>' +
+    var T = S(), heat = T.heatmap(c), map = T.classSkillMap(c), mis = T.misconceptions(c);
+    var activeList = T.activeSkills ? T.activeSkills(c) : T.SKILL_ORDER;
+    var sc = null;
+    try { sc = teacherSubjectScope(); } catch (_) { sc = null; }
+    /* AUDIT: analitik mengikuti lisensi — guru IPA tidak membaca Past Tense. */
+    if (sc && sc.locked) {
+      map = map.filter(function (m) { return skillMatchesSubject(m.skill, sc); });
+      activeList = activeList.filter(function (k) { return skillMatchesSubject(k, sc); });
+      mis = mis.filter(function (m) { return skillMatchesSubject(m.skill, sc); });
+      heat = heat.map(function (h) {
+        return { s: h.s, cells: h.cells.filter(function (x) { return skillMatchesSubject(x.skill, sc); }), risk: h.risk };
+      });
+    }
+    if (!ui.insightSkill || activeList.indexOf(ui.insightSkill) === -1) ui.insightSkill = activeList[0] || map[0] && map[0].skill || 'past_tense';
+    var groups = T.studyGroups(c, ui.insightSkill);
+    var scopeNote = (sc && sc.locked) ? subjectScopeBadge() : '';
+    if (!c.students.length) return scopeNote + '<section class="tg-card tg-center tg-empty-state" data-testid="tg-empty-insights"><div class="tg-empty-ill" aria-hidden="true">' + icon('activity') + '</div><h3>' + t('guru.belum-data-analisis', 'Belum ada data untuk dianalisis') + '</h3><p class="tg-muted">' + t('guru.tambah-siswa-dulu', 'Tambah siswa atau tempel kode hasil latihan murid dulu.') + '</p></section>';
+    if (sc && sc.locked && !map.length) return scopeNote + '<section class="tg-card tg-center tg-empty-state" data-testid="tg-empty-insights-scoped"><div class="tg-empty-ill" aria-hidden="true">' + icon('activity') + '</div><h3>' + esc(t('guru.belum-data-mapel', 'Belum ada data {mapel}').replace('{mapel}', sc.active)) + '</h3><p class="tg-muted">' + t('guru.tambah-tugas-mapel-dulu', 'Terbitkan tugas mapel Anda dulu — analitik lain disembunyikan agar tidak tercampur.') + '</p><button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="assign" data-testid="tg-empty-insights-assign">' + icon('plus') + '<span>' + t('guru.buat-tugas-ujian', 'Buat tugas / ujian') + '</span></button></section>';
+    var rem = null;
+    try { rem = remedialGroups(c, 0.75); } catch (_) { rem = { remedial: [], pengayaan: [] }; }
+    var remedialCard = '<section class="tg-card tg-remedial" data-testid="tg-remedial-auto"><div class="tg-card-head"><div><p class="tg-kicker">' + t('guru.remedial-otomatis', 'Remedial & pengayaan otomatis (KKM 75%)') + '</p><h3>' + t('guru.remedial-judul', 'Siapa remedial, siapa pengayaan') + '</h3></div><span class="tg-count">' + (rem.remedial.length + rem.pengayaan.length) + '</span></div>' +
       '<div class="tg-grid tg-grid-2">' +
-      '<section class="tg-card" data-testid="tg-groups"><div class="tg-card-head"><div><p class="tg-kicker">Kelompok belajar otomatis</p><h3>' + esc(T.SKILL_LABEL[ui.insightSkill]) + ' — tiap kelompok punya mentor</h3></div><button type="button" class="tg-btn is-small is-ghost" data-tg="copy-groups">' + icon('copy') + ' Salin</button></div><p class="tg-muted">Siswa yang kuat dipasangkan dengan yang lemah (peer tutoring). Menjelaskan ke teman adalah latihan terbaik untuk si mentor sendiri.</p>' +
+      '<div><h4>' + t('guru.remedial-perlu', 'Perlu remedial') + ' (' + rem.remedial.length + ')</h4>' + (rem.remedial.length ? '<ul class="tg-mini-list">' + rem.remedial.map(function (x) { return '<li>' + avatar(x.s, 'sm') + ' <span class="tg-grow">' + esc(x.s.name) + ' · ' + pct(x.acc) + '</span></li>'; }).join('') + '</ul><div class="tg-actions"><button type="button" class="tg-btn is-primary is-small" data-tg="modal" data-kind="assign" data-targets="' + esc(rem.remedial.map(function (x) { return x.s.id; }).join(',')) + '" data-testid="tg-remedial-create">' + icon('plus') + ' ' + t('guru.buat-remedial', 'Buat sesi remedial') + '</button></div>' : '<p class="tg-empty">' + t('guru.remedial-kosong', 'Nol siswa di bawah KKM. Pertahankan.') + '</p>') + '</div>' +
+      '<div><h4>' + t('guru.pengayaan-judul', 'Pengayaan (≥90%)') + ' (' + rem.pengayaan.length + ')</h4>' + (rem.pengayaan.length ? '<ul class="tg-mini-list">' + rem.pengayaan.map(function (x) { return '<li>' + avatar(x.s, 'sm') + ' <span class="tg-grow">' + esc(x.s.name) + ' · ' + pct(x.acc) + '</span></li>'; }).join('') + '</ul><div class="tg-actions"><button type="button" class="tg-btn is-ghost is-small" data-tg="modal" data-kind="assign" data-targets="' + esc(rem.pengayaan.map(function (x) { return x.s.id; }).join(',')) + '" data-testid="tg-enrich-create">' + icon('sparkles') + ' ' + t('guru.buat-pengayaan', 'Buat pengayaan') + '</button></div>' : '<p class="tg-empty">' + t('guru.pengayaan-kosong', 'Belum ada siswa ≥90%.') + '</p>') + '</div>' +
+      '</div></section>';
+    return scopeNote + remedialCard + '<div class="tg-grid tg-grid-skill">' + map.map(function (m, i) { return '<button type="button" class="tg-skill' + (ui.insightSkill === m.skill ? ' is-active' : '') + ' tg-rise" style="--d:' + i * 40 + 'ms" data-tg="insight-skill" data-skill="' + m.skill + '" data-testid="tg-skill-' + m.skill + '"><small>' + esc(m.label) + '</small><b>' + pct(m.acc) + '</b>' + bar(m.acc, m.acc != null && m.acc < 0.5 ? 'is-warn' : '') + '<em>' + (m.low ? m.low + ' siswa <50%' : m.acc == null ? 'belum ada data' : 'merata') + '</em></button>'; }).join('') + '</div>' +
+      '<section class="tg-card" data-testid="tg-heatmap"><div class="tg-card-head"><div><p class="tg-kicker">' + t('guru.peta-panas', 'Peta panas') + '</p><h3>' + t('guru.peta-judul', 'Siswa × skill — sekali lihat, tahu siapa butuh apa') + '</h3></div><small class="tg-legend"><span class="is-hi">≥75%</span><span class="is-mid">50–74%</span><span class="is-lo">&lt;50%</span></small></div>' +
+      '<div class="tg-table-wrap"><table class="tg-table tg-heat-table"><thead><tr><th>Siswa</th>' + activeList.map(function (k) { var lbl = T.SKILL_LABEL[k] || (k.indexOf('KOMP-') === 0 ? k.replace(/^KOMP-/, '') : k); return '<th>' + esc(lbl) + '</th>'; }).join('') + '<th>Risiko</th></tr></thead><tbody>' + heat.map(function (h) { return '<tr data-tg="drawer" data-id="' + h.s.id + '"><td><div class="tg-who">' + avatar(h.s) + '<b>' + esc(h.s.name) + '</b></div></td>' + h.cells.map(function (x) { return cell(x.acc); }).join('') + '<td>' + riskPill(h.risk) + '</td></tr>'; }).join('') + '</tbody></table></div></section>' +
+      '<div class="tg-grid tg-grid-2">' +
+      '<section class="tg-card" data-testid="tg-groups"><div class="tg-card-head"><div><p class="tg-kicker">' + esc(t('guru.kelompok-otomatis', 'Kelompok belajar otomatis')) + '</p><h3>' + esc(T.SKILL_LABEL[ui.insightSkill] || ui.insightSkill || '') + ' — ' + esc(t('guru.kelompok-mentor', 'tiap kelompok punya mentor')) + '</h3></div><button type="button" class="tg-btn is-small is-ghost" data-tg="copy-groups">' + icon('copy') + ' ' + esc(t('umum.salin', 'Salin')) + '</button></div><p class="tg-muted">' + esc(t('guru.kelompok-jelas', 'Siswa yang kuat dipasangkan dengan yang lemah (peer tutoring). Menjelaskan ke teman adalah latihan terbaik untuk si mentor sendiri.')) + '</p>' +
       (groups.length ? '<div class="tg-groups">' + groups.map(function (g) { return '<div class="tg-group"><b>Kelompok ' + g.no + '</b>' + g.members.map(function (m, i) { return '<div class="tg-group-row' + (i === 0 ? ' is-mentor' : '') + '">' + avatar(m.s, 'sm') + '<span>' + esc(m.s.name) + '</span><small>' + pct(m.acc) + (i === 0 ? ' · mentor' : '') + '</small></div>'; }).join('') + '</div>'; }).join('') + '</div>' : '<p class="tg-empty">' + t('guru.belum-data-skill', 'Belum ada data skill ini.') + '</p>') + '</section>' +
       '<section class="tg-card tg-card-ink"><p class="tg-kicker">Tiga miskonsepsi teratas</p>' + (mis.length ? '<ol class="tg-mis">' + mis.map(function (m) { return '<li><b>' + esc(m.label) + ' <span>' + pct(m.acc) + '</span></b><small>' + esc(m.pattern) + '</small><em>' + esc(m.objective) + '</em></li>'; }).join('') + '</ol><button type="button" class="tg-btn is-light is-small" data-tg="modal" data-kind="assign" data-skill="' + mis[0].skill + '">' + icon('plus') + ' ' + t('guru.buat-remedial', 'Buat sesi remedial') + ' ' + esc(mis[0].label) + '</button>' : '<p>' + t('umum.belum-ada-data', 'Belum ada data.') + '</p>') + '</section></div>';
   }
@@ -510,21 +3466,33 @@
   // ---- KOMUNIKASI ---------------------------------------------------------------------------------
   function comms(c) {
     var T = S(), ann = (c.announcements || []).slice().reverse(), greet = T.needsGreeting(c), withPhone = c.students.filter(function (s) { return s.parentPhone; });
-    return '<div class="tg-grid tg-grid-2">' +
-      '<div class="tg-stack"><section class="tg-card" data-testid="tg-announce"><div class="tg-card-head"><div><p class="tg-kicker">Pengumuman kelas</p><h3>Satu pesan, semua kanal</h3></div></div><form data-tg-form="announce" class="tg-form"><textarea name="text" rows="3" required placeholder="Contoh: Besok kuis Past Tense 10 soal, 15 menit. Bawa catatan penanda waktu!" data-testid="tg-announce-text"></textarea><div class="tg-actions"><button type="submit" class="tg-btn is-primary is-small" data-testid="tg-announce-submit">' + icon('megaphone') + ' ' + t('guru.simpan-salin', 'Simpan & salin') + '</button><button type="submit" class="tg-btn is-ghost is-small" name="wa" value="1">' + icon('message-circle') + ' ' + t('guru.kirim-whatsapp', 'Kirim via WhatsApp') + '</button></div></form>' +
+    var __scCo = null;
+    try { __scCo = teacherSubjectScope(); } catch (_) {}
+    var __noteCo = (__scCo && __scCo.locked) ? subjectScopeBadge() : '';
+    var __annPlaceholder = (__scCo && __scCo.locked)
+      ? 'Contoh: Besok latihan ' + (__scCo.active) + ' 10 soal, 15 menit. Siapkan catatan bab ini!'
+      : 'Contoh: Besok kuis Past Tense 10 soal, 15 menit. Bawa catatan penanda waktu!';
+    return __noteCo + '<div class="tg-grid tg-grid-2">' +
+      '<div class="tg-stack"><section class="tg-card" data-testid="tg-announce"><div class="tg-card-head"><div><p class="tg-kicker">' + t('guru.pengumuman-kelas', 'Pengumuman kelas') + '</p><h3>' + t('guru.satu-pesan-semua-kanal', 'Satu pesan, semua kanal') + '</h3></div></div><form data-tg-form="announce" class="tg-form"><textarea name="text" rows="3" required placeholder="' + esc(__annPlaceholder) + '" data-testid="tg-announce-text" aria-label="' + esc(t('guru.pengumuman-kelas', 'Pengumuman kelas')) + '"></textarea><div class="tg-actions"><button type="submit" class="tg-btn is-primary is-small" data-testid="tg-announce-submit">' + icon('megaphone') + ' ' + t('guru.simpan-salin', 'Simpan & salin') + '</button><button type="submit" class="tg-btn is-ghost" data-tg="wa" value="1">' + icon('message-circle') + ' ' + t('guru.kirim-whatsapp', 'Kirim via WhatsApp') + '</button></div></form>' +
       (ann.length ? '<ul class="tg-feed">' + ann.slice(0, 5).map(function (a) { return '<li><small>' + esc(T.fmtDate(a.at)) + '</small><p>' + esc(a.text) + '</p><button type="button" class="tg-link" data-tg="copy" data-text="' + esc(a.text) + '">Salin ulang</button></li>'; }).join('') + '</ul>' : '') + '</section>' +
-      '<section class="tg-card" data-testid="tg-parent-section"><div class="tg-card-head"><div><p class="tg-kicker">Laporan orang tua</p><h3>Rapor naratif otomatis</h3></div><span class="tg-count">' + c.students.length + '</span></div><p class="tg-muted">Bahasa hangat, berisi angka nyata, plus satu saran 5 menit yang bisa orang tua lakukan di rumah. ' + withPhone.length + ' siswa punya nomor ortu (kirim langsung via WhatsApp).</p>' +
+      '<section class="tg-card" data-testid="tg-parent-section"><div class="tg-card-head"><div><p class="tg-kicker">' + t('guru.laporan-ortu', 'Laporan orang tua') + '</p><h3>' + t('guru.rapor-naratif', 'Rapor naratif otomatis') + '</h3></div><span class="tg-count">' + c.students.length + '</span></div><p class="tg-muted">Bahasa hangat, berisi angka nyata, plus satu saran 5 menit yang bisa orang tua lakukan di rumah. ' + withPhone.length + ' siswa punya nomor ortu (kirim langsung via WhatsApp).</p>' +
       '<div class="tg-chips">' + c.students.map(function (s) { return '<button type="button" class="tg-chip' + (s.parentPhone ? ' has-phone' : '') + '" data-tg="modal" data-kind="parent" data-id="' + s.id + '" data-testid="tg-parent-' + s.id + '">' + esc(s.name) + (s.parentPhone ? ' ' + icon('phone') : '') + '</button>'; }).join('') + '</div>' +
       '<div class="tg-actions"><button type="button" class="tg-btn is-ghost is-small" data-tg="modal" data-kind="weekly-report">' + icon('file-text') + ' Laporan kelas mingguan</button><button type="button" class="tg-btn is-ghost is-small" data-tg="copy-all-parents">' + icon('copy') + ' Salin semua laporan</button></div></section></div>' +
-      '<section class="tg-card" data-testid="tg-greet-cards"><div class="tg-card-head"><div><p class="tg-kicker">Kartu sapa</p><h3>Pesan personal 1 ketuk</h3></div><span class="tg-count">' + greet.length + '</span></div><p class="tg-muted">Masalah klasik: guru tahu siapa yang mulai menjauh, tapi tak sempat menulis 30 pesan berbeda. FIEZEL menyusun pesan dari data tiap anak — kamu tinggal baca sekali dan kirim.</p>' +
+      '<section class="tg-card" data-testid="tg-greet-cards"><div class="tg-card-head"><div><p class="tg-kicker">' + t('guru.kartu-sapa', 'Kartu sapa') + '</p><h3>' + t('guru.pesan-personal', 'Pesan personal 1 ketuk') + '</h3></div><span class="tg-count">' + greet.length + '</span></div><p class="tg-muted">Masalah klasik: guru tahu siapa yang mulai menjauh, tapi tak sempat menulis 30 pesan berbeda. FIEZEL menyusun pesan dari data tiap anak — kamu tinggal baca sekali dan kirim.</p>' +
       (greet.length ? '<ul class="tg-list">' + greet.map(function (x) { return '<li class="tg-row">' + avatar(x.s) + '<div class="tg-row-body"><b>' + esc(x.s.name) + ' ' + riskPill(x.r) + '</b><small>' + esc(T.greetingCard(c, x.s, st.teacher)) + '</small></div><div class="tg-row-actions"><button type="button" class="tg-btn is-small is-primary" data-tg="modal" data-kind="greet" data-id="' + x.s.id + '">' + icon('send') + ' ' + t('umum.kirim', 'Kirim') + '</button></div></li>'; }).join('') + '</ul>' : '<p class="tg-empty">Semua siswa aman — kirimkan apresiasi lewat pengumuman.</p>') + '</section></div>';
   }
 
   // ---- JURNAL ------------------------------------------------------------------------------------
   function journal(c) {
     var T = S(), list = (c.journal || []).slice().reverse();
-    return '<div class="tg-grid tg-grid-2"><section class="tg-card" data-testid="tg-journal-form"><div class="tg-card-head"><div><p class="tg-kicker">Refleksi 60 detik</p><h3>Apa yang berhasil hari ini?</h3></div></div><p class="tg-muted">Guru hebat mencatat metode yang ampuh — tapi jarang ada tempatnya. Catatan di sini menempel ke siswa yang kamu tandai, dan muncul lagi saat kamu membuka profil mereka.</p>' +
-      '<form data-tg-form="journal" class="tg-form"><textarea name="text" rows="4" required placeholder="Contoh: Metode timeline di papan ampuh untuk yesterday/ago. Fikri masih tertukar verb 1/2." data-testid="tg-journal-text"></textarea><label class="tg-label">Tandai siswa (opsional)</label><div class="tg-chips tg-chips-select">' + c.students.map(function (s) { return '<label class="tg-chip is-check"><input type="checkbox" name="tags" value="' + s.id + '"><span>' + esc(s.name) + '</span></label>'; }).join('') + '</div><div class="tg-actions"><button type="submit" class="tg-btn is-primary is-small" data-testid="tg-journal-submit">' + icon('notebook-pen') + ' ' + t('guru.simpan-refleksi', 'Simpan refleksi') + '</button></div></form></section>' +
+    var __scJ = null;
+    try { __scJ = teacherSubjectScope(); } catch (_) {}
+    var __scopeJ = (__scJ && __scJ.locked) ? subjectScopeBadge() : '';
+    var __journalPlaceholder = (__scJ && __scJ.locked)
+      ? 'Contoh: Praktik mandiri konsep ' + (__scJ.active) + ' berjalan baik. Andi perlu latihan tambahan pemodelan.'
+      : 'Contoh: Metode timeline di papan ampuh untuk yesterday/ago. Fikri masih tertukar verb 1/2.';
+    return __scopeJ + '<div class="tg-grid tg-grid-2"><section class="tg-card" data-testid="tg-journal-form"><div class="tg-card-head"><div><p class="tg-kicker">' + t('guru.refleksi-60', 'Refleksi 60 detik') + '</p><h3>' + t('guru.apa-berhasil', 'Apa yang berhasil hari ini?') + '</h3></div></div><p class="tg-muted">Guru hebat mencatat metode yang ampuh — tapi jarang ada tempatnya. Catatan di sini menempel ke siswa yang kamu tandai, dan muncul lagi saat kamu membuka profil mereka.</p>' +
+      '<form data-tg-form="journal" class="tg-form"><textarea name="text" rows="4" required placeholder="' + esc(__journalPlaceholder) + '" data-testid="tg-journal-text" aria-label="' + esc(t('guru.refleksi-60', 'Refleksi 60 detik')) + '"></textarea><label class="tg-label">' + t('guru.tandai-siswa', 'Tandai siswa (opsional)') + '</label><div class="tg-chips tg-chips-select">' + c.students.map(function (s) { return '<label class="tg-chip is-check"><input type="checkbox" name="tags" value="' + s.id + '"><span>' + esc(s.name) + '</span></label>'; }).join('') + '</div><div class="tg-actions"><button type="submit" class="tg-btn is-primary is-small" data-testid="tg-journal-submit">' + icon('notebook-pen') + ' ' + t('guru.simpan-refleksi', 'Simpan refleksi') + '</button></div></form></section>' +
       '<section class="tg-card"><div class="tg-card-head"><div><p class="tg-kicker">' + t('umum.riwayat', 'Riwayat') + '</p><h3>Jurnal ' + esc(c.name) + '</h3></div><span class="tg-count">' + list.length + '</span></div>' + (list.length ? '<ul class="tg-feed">' + list.map(function (j) { return '<li><small>' + esc(T.fmtDate(j.at)) + (j.tags && j.tags.length ? ' · ' + j.tags.map(function (id) { var s = student(id); return s ? esc(s.name) : ''; }).filter(Boolean).join(', ') : '') + '</small><p>' + esc(j.text) + '</p></li>'; }).join('') + '</ul>' : '<p class="tg-empty">' + t('guru.belum-ada-catatan', 'Belum ada catatan.') + '</p>') + '</section></div>';
   }
   /* Kartu AKUN. Sebelum ini halaman ini hanya memuat profil LOKAL (nama & sekolah untuk
@@ -548,10 +3516,405 @@
     return '<section class="tg-card tg-narrow" data-testid="tg-account"><p class="tg-kicker">Akun</p><h3>' + (guru ? 'Akun guru aktif' : 'Akun') + '</h3>'
       + status + '<div class="tg-actions">' + actions + '</div></section>';
   }
+
+  /* PILAR 1 · penjepit scope untuk panel kurikulum: lisensi token memaksa
+     ui.curriculumSubject kembali ke mapel berlisensi sebelum panel membaca apa pun. */
+  try {
+    var __scPanel = teacherSubjectScope();
+    if (__scPanel && __scPanel.locked && __scPanel.subjects.indexOf(ui.curriculumSubject) < 0) {
+      ui.curriculumSubject = __scPanel.active;
+    }
+  } catch (_) {}
+  /* =====================================================================================
+     PANEL KURIKULUM & KOMPETENSI — DIRENDER DI DALAM DASBOR KELASKU (m025-357)
+     =====================================================================================
+     Dulu ini `curriculumView(c)`, isi dari butir nav kedelapan di sidebar Ruang Guru.
+     Butir nav itu dicabut atas instruksi owner (lihat sidebar() di atas) dan panelnya
+     dipasang sebagai tab di hub KelasKu, tempat guru sudah memegang kelasnya.
+
+     YANG BERUBAH BUKAN CUMA ALAMATNYA. Versi lama panel ini hanya bisa dua hal —
+     menggambar pohon kurikulum dan menawarkan satu pintu keluar ke kurikulum.html —
+     sementara tiga penanganan penyemai (`seed-english`, `seed-mapel`, `seed-soal`)
+     sudah terpasang di pengirim aksi berkas ini, lengkap dengan runSeedEnglish/
+     runSeedMapel/runSeedSoal. Tidak ada satu pun tombol di Ruang Guru yang mengirimkan
+     aksi itu: dicari di seluruh repo, pemanggilnya hanya ada di teacher-console.js,
+     yaitu di halaman yang lain. Jadi ~60 baris mesin penyemai duduk mati di sini.
+
+     Lebih buruk lagi, kalimat `guru.kurikulum-sumber-lokal` di bawah berkata kepada guru
+     "Tekan kartu penyemai agar papan ini terisi dari server KelasKu" — menunjuk kartu
+     yang tidak ada di layar itu. Layar yang menyuruh menekan sesuatu yang tidak ada
+     membuat guru mengira dirinya yang tidak becus mencari.
+
+     Panel ini menyalakan mesin yang sudah ada itu: tiga kartu penyemai, status dibaca
+     LEBIH DULU supaya tombolnya jujur (pola yang sama dengan kartuSemai() di konsol),
+     dan kalimat sumber-lokal kini menunjuk kartu yang benar-benar ada di layar yang sama.
+
+     Yang SENGAJA TIDAK dibawa ke sini: matriks cakupan per kelas. Ia menuntut
+     `class_id` milik backend kurikulum, sedangkan kelas di dasbor ini adalah kelas
+     KelasKu lokal. Tidak ada pemetaan jujur di antara keduanya (lihat bagian "Yang BELUM
+     selesai dari X4" di docs/handoffs/KELASKU-KURIKULUM-KOMPETENSI-HANDOFF.md), dan
+     mengarangnya berarti mengirim bukti palsu ke layar yang dipakai guru memutuskan siapa
+     yang perlu remedial. Cakupan per kelas tetap dikerjakan di konsol penuh, dan pintunya
+     ada di panel ini. */
+
+  var SEMAI_KARTU = [
+    { jenis: 'english', aksi: 'seed-english',
+      judul: function () { return t('guru.semai-english-judul', 'Kurikulum Bahasa Inggris Kelas 1–12'); },
+      ajakan: function () { return t('guru.semai-english-ajakan', 'Kurikulum Merdeka Bahasa Inggris lengkap Fase A–F: 72 tujuan pembelajaran, 144 kompetensi, plus materi ajar dan prasyarat antar kelas. Disemai sekali, lalu menjadi milik bank kurikulummu.'); } },
+    { jenis: 'mapel', aksi: 'seed-mapel',
+      judul: function () { return t('guru.semai-mapel-judul', 'Mata pelajaran lain — Kelas 1–12'); },
+      ajakan: function () { return t('guru.semai-mapel-ajakan', 'Tujuh belas mata pelajaran Fase A–F: Matematika, B. Indonesia, Pancasila, IPAS, IPA, IPS, Sejarah, Informatika, Fisika, Kimia, Biologi, Ekonomi, Sosiologi, Geografi, PJOK, Seni Budaya, Prakarya. 210 tujuan pembelajaran, 420 kompetensi, lengkap materi ajar dan prasyarat antar kelas.'); } },
+    { jenis: 'soal', aksi: 'seed-soal',
+      judul: function () { return t('guru.semai-soal-judul', 'Bank soal'); },
+      ajakan: function () { return t('guru.semai-soal-ajakan', 'Soal pilihan ganda berpembahasan, berpetunjuk, dan berpeta miskonsepsi — inilah yang membuat kompetensi bisa dilatih, bukan sekadar dilihat. Semai kurikulumnya lebih dulu.'); } }
+  ];
+
+  /* Status ketiga penyemai dibaca dalam SATU jalan, dan kegagalan satu kartu tidak
+     menjatuhkan dua lainnya (`.catch` per janji, bukan satu catch di ujung). Kartu yang
+     statusnya gagal dibaca mengatakan bahwa ia gagal dibaca — ia TIDAK jatuh ke
+     "belum tersemai", karena itu kalimat yang berbeda artinya dan guru bisa menekan
+     "Semai sekarang" atas bank yang sebenarnya sudah penuh. */
+  function loadSeedStatus(paksa) {
+    if (!konsolKurikulumSiap()) return;
+    if (ui.seedStatusLoading) return;
+    if (ui.seedStatus && !paksa) return;
+    ui.seedStatusLoading = true;
+    ui.seedStatusError = null;
+    ensureFzEngine().then(function (FZE) {
+      if (!isFzEngineValid(FZE)) throw new Error(t('guru.err-fz-api-stale', 'Modul kurikulum di peramban belum mutakhir. Silakan muat ulang halaman.'));
+      var gagal = function () { return 'ERR'; };
+      return Promise.all([
+        FZE.seed.englishStatus().catch(gagal),
+        FZE.seed.mapelStatus().catch(gagal),
+        FZE.seed.soalStatus().catch(gagal)
+      ]);
+    }).then(function (r) {
+      ui.seedStatus = { english: r[0], mapel: r[1], soal: r[2] };
+      ui.seedStatusLoading = false;
+      render();
+    }).catch(function (err) {
+      ui.seedStatusLoading = false;
+      ui.seedStatusError = (err && err.message) || t('guru.err-muat-kurikulum', 'Gagal memuat kurikulum');
+      render();
+    });
+  }
+
+  /* KEDALAMAN BANK PER KOMPETENSI. "Kompetensi" tanpa angka di belakangnya hanya kata:
+     guru tidak bisa tahu kompetensi mana yang benar-benar bisa dilatih hari ini dan mana
+     yang baru judul. Angka ini dihitung dari bank soal yang sama yang akan dipakai
+     tugasnya, jadi ia menjawab tepat pertanyaan itu.
+
+     BATAS 1000 DINYATAKAN, BUKAN DISEMBUNYIKAN. Kalau jawabannya menyentuh batas, panel
+     memasang penanda bahwa hitungannya terpotong halaman — angka yang terpotong diam-diam
+     akan membuat guru menyimpulkan kompetensi tertentu kosong padahal hanya tidak
+     terbawa. Pola penanda ini sama dengan `bank-capped-note` di konsol penuh. */
+  var BANK_DEPTH_LIMIT = 1000;
+  function loadBankDepth(subjectId, paksa) {
+    if (!konsolKurikulumSiap()) return;
+    var sId = subjectId || ui.curriculumSubject || 'MAT';
+    if (ui.bankDepthLoading) return;
+    if (ui.bankDepth && ui.bankDepthSubject === sId && !paksa) return;
+    ui.bankDepthLoading = true;
+    ensureFzEngine().then(function (FZE) {
+      if (!isFzEngineValid(FZE) || !FZE.questions || typeof FZE.questions.list !== 'function') {
+        throw new Error(t('guru.err-fz-api-stale', 'Modul kurikulum di peramban belum mutakhir. Silakan muat ulang halaman.'));
+      }
+      return FZE.questions.list({ subject_id: sId, limit: BANK_DEPTH_LIMIT });
+    }).then(function (rows) {
+      var peta = {};
+      var list = Array.isArray(rows) ? rows : [];
+      list.forEach(function (q) {
+        var k = q && q.competency_id;
+        if (!k) return;
+        peta[k] = (peta[k] || 0) + 1;
+      });
+      ui.bankDepth = peta;
+      ui.bankDepthSubject = sId;
+      ui.bankDepthCapped = list.length >= BANK_DEPTH_LIMIT;
+      ui.bankDepthLoading = false;
+      render();
+    }).catch(function () {
+      /* Kedalaman bank adalah HIASAN yang berguna, bukan syarat. Kalau ia gagal, pohon
+         kurikulum tetap terbaca dan tombol "Buat Tugas" tetap hidup; yang hilang hanya
+         angkanya. Karena itu kegagalannya tidak menjadi layar merah — ia menjadi peta
+         kosong, dan baris kompetensi tidak mencetak angka apa pun. */
+      ui.bankDepth = null;
+      ui.bankDepthSubject = sId;
+      ui.bankDepthCapped = false;
+      ui.bankDepthLoading = false;
+      render();
+    });
+  }
+
+  /* Satu pintu masuk yang dipanggil hub saat tab Kurikulum dibuka. Ia yang memutuskan
+     apa yang perlu diambil, supaya hub tidak perlu tahu apa pun tentang FZEngine. */
+  function bukaPanelKurikulum() {
+    if (!konsolKurikulumSiap()) return;
+    if (!ui.curriculumTree && !ui.curriculumLoading) loadCurriculumTree(ui.curriculumSubject || 'MAT');
+    loadSeedStatus(false);
+    loadBankDepth(ui.curriculumSubject || 'MAT', false);
+  }
+
+  function kartuSemai(d) {
+    var peta = ui.seedStatus || {};
+    var st = ui.seedStatus ? peta[d.jenis] : null;
+    var sibuk = ui.seedBusy === d.jenis;
+    var baris, sudah = false;
+    if (ui.seedStatusLoading || st === undefined || st === null) {
+      baris = esc(t('guru.semai-memeriksa', 'Memeriksa isi bank kurikulum…'));
+    } else if (st === 'ERR') {
+      baris = esc(t('guru.semai-status-gagal', 'Status bank ini gagal dibaca. Angka di bawah tidak diketahui — bukan berarti kosong.'));
+    } else if (st && st.seeded) {
+      sudah = true;
+      baris = d.jenis === 'soal'
+        ? esc(t('guru.semai-soal-sudah', 'Sudah tersemai: {n} soal, mencakup {k} dari {total} kompetensi.',
+            { n: st.from_this_seeder, k: st.competencies_with_questions, total: st.competencies_total }))
+        : esc(t('guru.semai-sudah', 'Sudah tersemai: {tp} tujuan pembelajaran, {komp} kompetensi, {materi} materi ajar.',
+            { tp: st.tp, komp: st.competencies, materi: st.materials }));
+    } else {
+      baris = esc(t('guru.semai-belum', 'Belum tersemai. Bank kurikulum masih berisi contoh demo saja.'));
+    }
+    return '<div class="tg-card tg-seed-card" data-testid="tg-' + d.aksi + '-card">' +
+      '<p class="tg-kicker">' + icon('sprout') + ' ' + esc(t('guru.semai-kicker', 'Bank kurikulum')) + '</p>' +
+      '<h4>' + esc(d.judul()) + '</h4>' +
+      '<p class="tg-muted tg-small">' + esc(d.ajakan()) + '</p>' +
+      '<p class="tg-seed-status" data-testid="tg-' + d.aksi + '-status">' + baris + '</p>' +
+      '<button type="button" class="tg-btn is-small ' + (sudah ? 'is-ghost' : 'is-primary') + '" data-tg="' + d.aksi + '" data-testid="tg-' + d.aksi + '-btn"' + (sibuk ? ' disabled' : '') + '>' +
+        icon('sprout') + ' ' + esc(sibuk
+          ? t('guru.semai-jalan', 'Sedang menyemai — butuh beberapa detik.')
+          : (sudah ? t('guru.semai-ulang', 'Semai ulang') : t('guru.semai-tombol', 'Semai sekarang'))) +
+      '</button>' +
+    '</div>';
+  }
+
+  function kurikulumPanel() {
+    /* Penjaga yang SAMA dengan pintu konsol. Hub sudah memeriksanya sebelum memasang
+       tabnya; pemeriksaan kedua di sini menjaga panel ini tetap mustahil tergambar tanpa
+       alamat backend, walau nanti ada pemanggil lain. */
+    if (!konsolKurikulumSiap()) return '';
+
+    var sId = ui.curriculumSubject || 'MAT';
+    var cat = MAPEL_CATALOG[sId] || MAPEL_CATALOG['MAT'];
+    var mItem = MAPEL_LIST.filter(function (x) { return x.id === sId; })[0] || { name: sId, grade: 'SD / SMP / SMA' };
+
+    /* PILAR 1 · pemilih mapel panel mengikuti lisensi token: single-mapel menjadi
+       badge terkunci, multi-mapel hanya berisi lisensi. */
+    var __scPk = null;
+    try { __scPk = teacherSubjectScope(); } catch (_) {}
+    var allowedList = (__scPk && __scPk.locked) ? scopeMapelList() : MAPEL_LIST;
+    var subjectPicker = '';
+    if (__scPk && __scPk.locked && !__scPk.multi) {
+      subjectPicker = '<div class="tg-subject-badge" data-testid="tg-curriculum-subject-badge" role="status">' +
+        icon('lock') + '<span><b>' + esc(mItem.id + ' — ' + mItem.name) + '</b><small>' + esc(__scPk.grade + ' · ' + gradeKelasLabel(__scPk.grade) + ' · ' + t('guru.scope-terkunci', 'Terkunci ke mapel Anda')) + '</small></span></div>';
+    } else {
+      subjectPicker = '<label class="tg-label-inline">' + t('guru.pilih-mapel', 'Pilih Mata Pelajaran') + ': ' +
+        '<select class="tg-select" data-tg-select="curriculum-subject" data-testid="tg-curriculum-subject-select" aria-label="' + esc(t('guru.pilih-mapel', 'Pilih Mata Pelajaran')) + '">' +
+          allowedList.map(function (m) {
+            return '<option value="' + m.id + '"' + (m.id === sId ? ' selected' : '') + '>' + esc(m.id + ' — ' + m.name + ' (' + m.grade + ')') + '</option>';
+          }).join('') +
+        '</select>' +
+      '</label>';
+    }
+
+    var kepala = '<div class="tg-kur-head">' +
+      '<p class="tg-kicker">' + icon('compass') + ' ' + esc(t('guru.nav-kurikulum', 'Kurikulum & Kompetensi')) + '</p>' +
+      '<h3>' + esc(t('guru.kurikulum-panel-judul', 'Kurikulum Merdeka, di dalam kelasmu')) + '</h3>' +
+      '<p class="tg-muted">' + esc(t('guru.kurikulum-panel-sub', 'Semai bank kurikulum, baca kompetensi beserta kedalaman banknya, lalu ubah satu kompetensi menjadi tugas atau ujian — tanpa meninggalkan KelasKu.')) + '</p>' +
+    '</div>';
+
+    var toolbar = '<div class="tg-curriculum-toolbar">' +
+      subjectScopeBadge() +
+      '<div class="tg-curriculum-actions">' +
+        subjectPicker +
+        '<button type="button" class="tg-btn is-ghost is-small" data-tg="refresh-curriculum">' + icon('rotate-cw') + ' <span>' + esc(t('umum.muat-ulang', 'Muat Ulang')) + '</span></button>' +
+      '</div>' +
+      '<div class="tg-seed-badge">' + icon('book-open') + ' <span><b>' + esc(mItem.name) + '</b> (' + esc(mItem.grade) + ') · ' + esc(t('guru.kurikulum-nasional', 'Kurikulum Nasional')) + '</span></div>' +
+    '</div>';
+
+    var kartuPenyemai = '<div class="tg-seed-grid" data-testid="tg-seed-grid">' +
+      SEMAI_KARTU.map(kartuSemai).filter(function (html, idx) {
+        if (__scPk && __scPk.locked && SEMAI_KARTU[idx].jenis === 'english' && __scPk.subjects.indexOf('ENG') < 0) return false;
+        return true;
+      }).join('') +
+      '</div>' +
+      (ui.seedStatusError
+        ? '<div class="tg-curriculum-source is-local" data-testid="tg-seed-error">' + icon('alert-triangle') + ' <span>' + esc(ui.seedStatusError) + '</span></div>'
+        : '');
+
+    /* PINTU KE KONSOL KURIKULUM & KOMPETENSI (m025-349, temuan X2).
+       ==========================================================================
+       kurikulum.html adalah permukaan kurikulum paling lengkap di repo ini: rekomendasi
+       mengajar harian, matriks cakupan per TP, learning graph, bank soal, blueprint
+       delapan jenis asesmen, draf narasi e-Rapor, tab Wali Kelas, dan Papan Kelas.
+       Panel ini sengaja TIDAK menirunya — ia membawa bagian yang tidak butuh `class_id`
+       backend kurikulum, dan menyerahkan sisanya lewat pintu ini.
+
+       Pintunya memang pernah sengaja ditutup: 7 September 2026 backend-nya menjawab 404,
+       dan pintu yang terbuka ke ruangan kosong lebih merugikan daripada fitur yang belum
+       ada (alasan lengkapnya di fiezel-ux-flags.js). Tapi yang menutup pintu itu adalah
+       ALAMAT BACKEND YANG KOSONG, dan alamat itu kini terisi — konsolKurikulumSiap() di
+       kepala berkas ini sudah menjadi syaratnya, dan syarat itulah yang memutuskan panel
+       ini boleh tampil sama sekali. Jadi menautkannya di sini tidak melonggarkan pagar
+       apa pun: ia memakai pagar yang sama. */
+    var pintuKonsol = konsolKurikulumSiap()
+      ? '<a class="tg-card tg-console-door" href="./kurikulum.html" data-testid="tg-curriculum-console-door">' +
+          '<span class="tg-console-door-icon">' + icon('compass') + '</span>' +
+          '<span class="tg-console-door-body">' +
+            '<b>' + esc(t('guru.konsol-kurikulum-judul', 'Buka Konsol Kurikulum & Kompetensi')) + '</b>' +
+            '<small>' + esc(t('guru.konsol-kurikulum-sub', 'Rekomendasi mengajar harian, matriks ketuntasan per tujuan pembelajaran, bank soal, kuis 1-klik, dan draf narasi e-Rapor.')) + '</small>' +
+          '</span>' +
+          icon('arrow-up-right') +
+        '</a>'
+      : '';
+
+    /* Kegagalan muat dinyatakan sebagai kegagalan, lengkap dengan jalan keluarnya.
+       Daftar kosong yang diam membuat guru menyimpulkan mapelnya memang belum ada. */
+    if (ui.curriculumError) {
+      return '<div class="tg-curriculum-wrap" data-testid="tg-curriculum-panel">' + kepala + toolbar +
+        '<div class="tg-card tg-center" data-testid="tg-curriculum-error">' +
+          '<p>' + icon('alert-triangle') + ' ' + esc(t('guru.kurikulum-gagal', 'Kurikulum gagal dimuat: {pesan}', { pesan: ui.curriculumError })) + '</p>' +
+          '<div class="tg-actions"><button type="button" class="tg-btn is-primary is-small" data-tg="refresh-curriculum" data-testid="tg-curriculum-retry">' + icon('rotate-cw') + ' ' + esc(t('umum.muat-ulang', 'Muat Ulang')) + '</button></div>' +
+        '</div>' + kartuPenyemai + pintuKonsol + '</div>';
+    }
+
+    var tree = ui.curriculumTree || [];
+    /* Prioritaskan bank kurikulum autentik buku siswa jika tersedia */
+    var sumberLokal = false;
+    var bBank = mapelBank(sId);
+    if (bBank && bBank.competencies && bBank.competencies.length) {
+      sumberLokal = true;
+      tree = bBank.competencies.map(function (cp) {
+        return {
+          type: 'competency',
+          code: cp.code,
+          name: cp.name,
+          description: cp.materi,
+          grade: cp.grade,
+          bloom_level: 'C3/C4'
+        };
+      });
+    } else if (!tree.length && cat && cat.competencies && cat.competencies.length) {
+      sumberLokal = true;
+      tree = cat.competencies.map(function (cp) {
+        return {
+          type: 'competency',
+          code: cp.code,
+          name: cp.name,
+          description: cp.materi,
+          grade: cp.grade,
+          bloom_level: 'C3/C4'
+        };
+      });
+    }
+
+    if (ui.curriculumLoading && !tree.length) {
+      return '<div class="tg-curriculum-wrap" data-testid="tg-curriculum-panel">' + kepala + toolbar + kartuPenyemai + pintuKonsol + '<div class="tg-card tg-center"><p class="tg-muted">' + icon('hourglass') + ' ' + t('guru.memuat-kurikulum-silabus', 'Memuat kurikulum & capaian pembelajaran…') + '</p></div></div>';
+    }
+
+    var depth = ui.bankDepth;
+    var depthCocok = !!depth && ui.bankDepthSubject === sId;
+
+    function bankPill(node) {
+      if (!depthCocok) return '';
+      /* SIMPUL TANPA ID TIDAK MENDAPAT PIL SAMA SEKALI (temuan gitar-bot, m025-357).
+         ==================================================================================
+         Pohon yang gagal dimuat jatuh ke katalog cadangan perangkat, dan simpul buatan
+         itu hanya membawa code/name/description/bloom_level — TIDAK ada `id`. Karena
+         kedalaman bank dicocokkan lewat node.id (alasannya tepat di bawah), setiap simpul
+         cadangan menghasilkan n = 0.
+
+         Tanpa baris ini, n = 0 itu tergambar sebagai pil merah "Bank soal kosong". Dan itu
+         BUKAN sekadar tidak berguna, ia BERBOHONG: ketiga penyemai berdiri sendiri-sendiri,
+         jadi guru bisa saja sudah menyemai bank soal (seed-soal) sementara kurikulum
+         mapelnya belum. Dalam keadaan itu `depth` terisi — `depthCocok` benar — tetapi
+         pohonnya datang dari katalog lokal, sehingga SELURUH kompetensi dicap banknya
+         kosong padahal banknya penuh. Guru yang percaya kepadanya akan menyemai ulang
+         tanpa perlu, atau melewati kompetensi yang sebenarnya siap dilatih.
+
+         Kode katalog lokal tidak akan pernah cocok dengan competency_id milik soal, jadi
+         tidak ada hitungan jujur yang bisa dibuat untuk simpul cadangan. Yang jujur adalah
+         DIAM: spanduk "Sumber: katalog cadangan perangkat" di atas sudah mengatakan kenap
+         layar ini tidak membawa angka. Ini persis kelas kebohongan yang T4 ada untuk
+         mencegahnya — dan versi pertama T4 sendiri melanggarnya. */
+      if (!node || !node.id) return '';
+      /* Dicari lewat ID SIMPUL, bukan kode. `competency_id` pada soal adalah id simpul
+         kurikulum (KOMP-…), sedangkan `code` dipakai bersama lintas mapel dan tingkat —
+         mencocokkan lewat code akan menempelkan soal mapel lain ke kompetensi ini. */
+      var n = depth[node.id] || 0;
+      if (!n) {
+        return '<span class="tg-bank-pill is-empty" data-testid="tg-bank-empty-' + esc(node.code || '') + '">' +
+          icon('circle-slash') + ' ' + esc(t('guru.kurikulum-kompetensi-kosong', 'Bank soal kosong')) + '</span>';
+      }
+      return '<span class="tg-bank-pill" data-testid="tg-bank-depth-' + esc(node.code || '') + '">' +
+        icon('layers') + ' ' + esc(t('guru.kurikulum-kompetensi-bank', '{n} soal di bank', { n: n })) + '</span>';
+    }
+
+    function renderNode(node) {
+      var nType = node.type || 'node';
+      var nTitle = esc(node.name || node.title || node.code || '');
+      var nCode = esc(node.code || '');
+      var nDesc = esc(node.description || node.materi || '');
+      var bloom = node.bloom_level ? ('<span class="tg-bloom-badge">' + esc(node.bloom_level) + '</span>') : '';
+      var children = node.children || [];
+
+      if (nType === 'competency') {
+        return '<div class="tg-comp-row" data-testid="tg-comp-' + nCode + '">' +
+          '<div class="tg-comp-info">' +
+            '<div class="tg-comp-head"><span class="tg-comp-code">' + nCode + '</span>' + bloom + '<b>' + nTitle + '</b>' + bankPill(node) + '</div>' +
+            (nDesc ? '<p class="tg-comp-desc">' + nDesc + '</p>' : '') +
+          '</div>' +
+          '<div class="tg-comp-actions">' +
+            '<button type="button" class="tg-btn is-primary is-small" data-tg="create-assign-from-comp" data-code="' + nCode + '" data-title="' + nTitle + '" data-desc="' + nDesc + '" data-mode="latihan" data-testid="tg-assign-comp-' + nCode + '">' +
+              icon('plus') + ' ' + t('guru.buat-tugas-dari-kompetensi', '+ Buat Tugas') +
+            '</button>' +
+            '<button type="button" class="tg-btn is-ghost is-small" data-tg="create-assign-from-comp" data-code="' + nCode + '" data-title="' + nTitle + '" data-desc="' + nDesc + '" data-mode="ujian" data-testid="tg-exam-comp-' + nCode + '">' +
+              icon('shield') + ' ' + t('guru.buat-ujian-dari-kompetensi', '+ Buat Ujian') +
+            '</button>' +
+          '</div>' +
+        '</div>';
+      }
+
+      if (nType === 'tp') {
+        return '<div class="tg-tp-item">' +
+          '<div class="tg-tp-head"><b>' + icon('target') + ' ' + nTitle + '</b><small>' + nCode + '</small></div>' +
+          (children.length ? ('<div class="tg-tp-children">' + children.map(renderNode).join('') + '</div>') : '') +
+        '</div>';
+      }
+
+      return '<div class="tg-curriculum-card">' +
+        '<div class="tg-curriculum-card-head"><h4>' + icon('bookmark') + ' ' + nTitle + '</h4><small>' + nCode + '</small></div>' +
+        (children.length ? ('<div class="tg-curriculum-card-body">' + children.map(renderNode).join('') + '</div>') : '') +
+      '</div>';
+    }
+
+    var pinSumber = sumberLokal
+      ? '<div class="tg-curriculum-source is-local" data-testid="tg-curriculum-source-local">' + icon('hard-drive') + ' <span>' +
+        esc(t('guru.kurikulum-sumber-lokal', 'Sumber: katalog cadangan perangkat — server belum menyemai kurikulum mapel ini. Tekan kartu penyemai agar papan ini terisi dari server KelasKu.')) +
+        '</span></div>'
+      : '<div class="tg-curriculum-source is-server" data-testid="tg-curriculum-source-server">' + icon('cloud') + ' <span>' +
+        esc(t('guru.kurikulum-sumber-server', 'Sumber: kurikulum dari server KelasKu.')) +
+        '</span></div>';
+
+    var pinBatas = (depthCocok && ui.bankDepthCapped)
+      ? '<div class="tg-curriculum-source is-local" data-testid="tg-bank-capped">' + icon('alert-triangle') + ' <span>' +
+        esc(t('guru.kurikulum-bank-terpotong', 'Hitungan soal per kompetensi dibaca dari {n} soal pertama — batas halaman, bukan jumlah seluruh bank. Kompetensi yang tertulis kosong bisa jadi hanya tidak terbawa.', { n: BANK_DEPTH_LIMIT })) +
+        '</span></div>'
+      : '';
+
+    /* Pohon yang benar-benar kosong berkata bahwa ia kosong, dan menunjuk kartu penyemai
+       yang ada di layar yang sama — bukan membiarkan guru menatap ruang putih. */
+    var isiPohon = tree.length
+      ? '<div class="tg-curriculum-tree">' + tree.map(renderNode).join('') + '</div>'
+      : '<div class="tg-card tg-center" data-testid="tg-curriculum-empty"><p class="tg-muted">' + icon('inbox') + ' ' +
+        esc(t('guru.kurikulum-pohon-kosong', 'Belum ada kompetensi untuk mata pelajaran ini di bank. Semai kurikulumnya lewat kartu di atas, lalu tekan Muat Ulang.')) + '</p></div>';
+
+    return '<div class="tg-curriculum-wrap" data-testid="tg-curriculum-panel">' + kepala + toolbar + kartuPenyemai + pintuKonsol + pinSumber + pinBatas + isiPohon + '</div>';
+  }
+
   function settings() {
     return accountCard() +
       '<section class="tg-card tg-narrow" data-testid="tg-settings"><p class="tg-kicker">Profil guru</p><h3>' + t('guru.nama-sekolah-ttd', 'Nama & sekolah dipakai di tanda tangan laporan') + '</h3><form data-tg-form="teacher" class="tg-form"><label class="tg-label">' + t('guru.nama-panggilan', 'Nama panggilan') + '<input name="name" value="' + esc(st.teacher.name) + '" placeholder="Bu Rina / Pak Dimas" maxlength="40" data-testid="tg-teacher-name"></label><label class="tg-label">Sekolah / lembaga<input name="school" value="' + esc(st.teacher.school) + '" placeholder="SMA Negeri 3 Bandung" maxlength="60" data-testid="tg-teacher-school"></label><div class="tg-actions"><button type="submit" class="tg-btn is-primary is-small" data-testid="tg-teacher-save">' + t('umum.simpan', 'Simpan') + '</button></div></form>' +
-      '<hr class="tg-hr"><p class="tg-kicker">Data</p><p class="tg-muted">' + t('guru.data-lokal-warn', 'Semua data KelasKu untuk Guru tersimpan di perangkat ini. Ekspor cadangan sebelum ganti perangkat.') + '</p><div class="tg-actions"><button type="button" class="tg-btn is-ghost is-small" data-tg="export-json">' + icon('download') + ' Ekspor cadangan</button><label class="tg-btn is-ghost is-small">' + icon('upload') + ' Pulihkan cadangan<input type="file" accept="application/json" hidden data-tg-file="import-json"></label><button type="button" class="tg-btn is-danger is-small" data-tg="reset-all" data-testid="tg-reset">' + icon('trash-2') + ' ' + t('guru.hapus-semua-data', 'Hapus semua data guru') + '</button></div></section>';
+      '<hr class="tg-hr"><p class="tg-kicker">Data</p><p class="tg-muted">' + t('guru.data-lokal-warn', 'Semua data KelasKu untuk Guru tersimpan di perangkat ini. Ekspor cadangan sebelum ganti perangkat.') + '</p><div class="tg-actions"><button type="button" class="tg-btn is-ghost is-small" data-tg="export-json">' + icon('download') + ' Ekspor cadangan</button><label class="tg-btn is-ghost is-small">' + icon('upload') + ' Pulihkan cadangan<input type="file" accept="application/json" hidden data-tg-file="import-json"></label><button type="button" class="tg-btn is-ghost is-small" data-tg="clear-all-classes" data-testid="tg-clear-classes">' + icon('trash-2') + ' Bersihkan semua kelas</button><button type="button" class="tg-btn is-danger is-small" data-tg="reset-all" data-testid="tg-reset">' + icon('trash-2') + ' ' + t('guru.hapus-semua-data', 'Hapus semua data guru') + '</button></div></section>';
   }
   var views = { hub: function () { return '<div id="tgClassHub" class="tg-hub-host"></div>'; }, briefing: briefing, classes: classes, assignments: assignments, insights: insights, comms: comms, journal: journal, settings: settings };
 
@@ -565,7 +3928,7 @@
     if (!rows.length) return '';
     return '<h4>Keluar layar saat mengerjakan</h4><ul class="tg-mini-list" data-testid="tg-focus-list">' + rows.map(function (r) {
       return '<li><span class="tg-focus is-' + T.focusLevel(r.f) + '">' + icon('eye-off') + ' ' + esc(T.focusLabel(r.f)) + '</span> ' + esc(r.a.title) + '</li>';
-    }).join('') + '</ul><p class="tg-muted tg-small">Terdeteksi berpindah dari layar FIEZEL saat sesi berjalan. Tanyakan dulu ke muridnya — bisa saja ia dipanggil atau sinyalnya putus.</p>';
+    }).join('') + '</ul><p class="tg-muted tg-small">' + esc(t('guru.proctor-catatan', 'Terdeteksi berpindah dari layar FIEZEL saat sesi berjalan. Tanyakan dulu ke muridnya — bisa saja ia dipanggil atau sinyalnya putus.')) + '</p>';
   }
   function drawer(c) {
     if (!ui.drawer || !c) return '';
@@ -575,7 +3938,7 @@
       '<div class="tg-drawer-head">' + avatar(s, 'lg') + '<div><h3>' + esc(s.name) + '</h3><p class="tg-muted">' + riskPill(r) + ' · ' + (r.inactiveDays == null ? 'belum aktif' : r.inactiveDays === 0 ? 'aktif hari ini' : r.inactiveDays + ' hari tidak belajar') + '</p></div><button type="button" class="tg-icon-btn" data-tg="close" aria-label="' + t('umum.tutup', 'Tutup') + '">' + icon('x') + '</button></div>' +
       '<div class="tg-drawer-body">' +
       '<div class="tg-action-box"><p class="tg-kicker">Tindakan yang disarankan</p><p>' + esc(r.action) + '</p><div class="tg-actions"><button type="button" class="tg-btn is-primary is-small" data-tg="modal" data-kind="greet" data-id="' + s.id + '">' + icon('message-circle-heart') + ' Kartu sapa</button><button type="button" class="tg-btn is-ghost is-small" data-tg="modal" data-kind="parent" data-id="' + s.id + '">' + icon('file-text') + ' Laporan ortu</button><button type="button" class="tg-btn is-ghost is-small" data-tg="modal" data-kind="assign" data-target="' + s.id + '"' + (r.weak ? ' data-skill="' + r.weak.skill + '"' : '') + '>' + icon('plus') + ' ' + t('guru.tugas-khusus', 'Tugas khusus') + '</button></div></div>' +
-      '<h4>Skill</h4><div class="tg-skill-rows">' + T.SKILL_ORDER.map(function (k) { var v = T.skillAcc(s, k); return '<div class="tg-skill-row"><span>' + esc(T.SKILL_LABEL[k]) + '</span>' + bar(v, v != null && v < 0.5 ? 'is-warn' : '') + '<b>' + pct(v) + '</b></div>'; }).join('') + '</div>' +
+      '<h4>Skill</h4><div class="tg-skill-rows">' + (T.activeSkills ? T.activeSkills(c, s) : T.SKILL_ORDER).map(function (k) { var v = T.skillAcc(s, k); var lbl = T.SKILL_LABEL[k] || (k.indexOf('KOMP-') === 0 ? k.replace(/^KOMP-/, '') : k); return '<div class="tg-skill-row"><span>' + esc(lbl) + '</span>' + bar(v, v != null && v < 0.5 ? 'is-warn' : '') + '<b>' + pct(v) + '</b></div>'; }).join('') + '</div>' +
       '<h4>Kehadiran 7 hari</h4><div class="tg-att-strip">' + att.map(function (a) { return '<span class="is-' + (a.v || 'none') + '" title="' + a.date + '">' + (a.v || '·') + '</span>'; }).join('') + '</div>' +
       focusPanel(c, s) +
       '<h4>' + t('umum.tugas', 'Tugas') + '</h4>' + (pend.length ? '<ul class="tg-mini-list">' + pend.map(function (p) { return '<li>' + esc(p.a.title) + (p.late ? ' <strong class="tg-late">lewat</strong>' : '') + ' <button type="button" class="tg-link" data-tg="mark-done" data-id="' + p.a.id + '" data-sid="' + s.id + '">tandai selesai</button></li>'; }).join('') + '</ul>' : '<p class="tg-muted">Semua tugas selesai.</p>') +
@@ -591,31 +3954,389 @@
     var m = ui.modal, T = S(), body = '', title = '', wide = false;
     if (m.kind === 'new-class' || m.kind === 'edit-class') {
       var e = m.kind === 'edit-class' ? c : null; title = e ? t('guru.ubah-kelas', 'Ubah kelas') : t('guru.kelas-baru', 'Kelas baru');
-      body = '<form data-tg-form="' + m.kind + '" class="tg-form"><label class="tg-label">' + t('guru.nama-kelas', 'Nama kelas') + '<input name="name" required maxlength="60" value="' + esc(e ? e.name : '') + '" placeholder="English A2 — Kelas 10A" data-autofocus data-testid="tg-class-name"></label><div class="tg-form-row"><label class="tg-label">Level<select name="level" data-testid="tg-class-level">' + ['A1', 'A2', 'B1', 'B2', 'C1'].map(function (l) { return '<option' + ((e ? e.level : 'A2') === l ? ' selected' : '') + '>' + l + '</option>'; }).join('') + '</select></label><label class="tg-label">Mata pelajaran<input name="subject" value="' + esc(e ? e.subject : 'English') + '" maxlength="40"></label></div><div class="tg-actions"><button type="submit" class="tg-btn is-primary" data-testid="tg-class-submit">' + (e ? t('umum.simpan', 'Simpan') : t('guru.buat-kelas', 'Buat kelas')) + '</button>' + (e ? '' : '<button type="button" class="tg-btn is-ghost" data-tg="seed-demo">Atau muat kelas contoh</button>') + '</div></form>';
+      /* AUDIT: input mapel bebas adalah lubang isolasi — guru IPA bisa mengetik MAT.
+         Saat terkunci: hidden + badge (single) atau select lisensi (multi). */
+      var __scCls2 = null;
+      try { __scCls2 = teacherSubjectScope(); } catch (_) {}
+      var __defSub = (e && e.subject) || (__scCls2 && __scCls2.locked ? __scCls2.active : 'English');
+      var __subField = '';
+      if (__scCls2 && __scCls2.locked && !__scCls2.multi) {
+        __subField = '<label class="tg-label">' + t('guru.pilih-mapel', 'Pilih Mata Pelajaran') + '<input type="hidden" name="subject" value="' + esc(__scCls2.active) + '"><div class="tg-subject-badge" data-testid="tg-class-subject-badge">' + icon('lock') + '<span><b>' + esc(__scCls2.active) + '</b></span></div></label>';
+      } else if (__scCls2 && __scCls2.locked) {
+        __subField = '<label class="tg-label">' + t('guru.pilih-mapel', 'Pilih Mata Pelajaran') + '<select name="subject" data-testid="tg-class-subject">' + __scCls2.subjects.map(function (sid) { return '<option value="' + sid + '"' + (__defSub === sid ? ' selected' : '') + '>' + esc(sid + ' — ' + mapelName(sid)) + '</option>'; }).join('') + '</select></label>';
+      } else {
+        __subField = '<label class="tg-label">Mata pelajaran<input name="subject" value="' + esc(__defSub) + '" maxlength="40"></label>';
+      }
+      var __isSMP = (__scCls2 && (__scCls2.grade === 'SMP' || __scCls2.locked));
+      var __levels = __isSMP ? ['Kelas 7', 'Kelas 8', 'Kelas 9', 'Fase D (SMP)'] : ['A1', 'A2', 'B1', 'B2', 'C1'];
+      var __defLvl = __isSMP ? 'Kelas 7' : 'A2';
+      var __curLvl = (e ? e.level : __defLvl);
+      var __clsPlaceholder = (__scCls2 && __scCls2.locked ? esc(__scCls2.active) + ' — ' + t('guru.placeholder-kelas-7a', 'Kelas 7A') : t('guru.placeholder-kelas-10a', 'English A2 — Kelas 10A'));
+      function __smpLevelsHelper() { t('guru.lvl-kelas-7', 'Kelas 7'); t('guru.lvl-kelas-8', 'Kelas 8'); t('guru.lvl-kelas-9', 'Kelas 9'); t('guru.lvl-fase-d', 'Fase D (SMP)'); }
+      body = '<form data-tg-form="' + m.kind + '" class="tg-form"><label class="tg-label">' + t('guru.nama-kelas', 'Nama kelas') + '<input name="name" required maxlength="60" value="' + esc(e ? e.name : '') + '" placeholder="' + __clsPlaceholder + '" data-autofocus data-testid="tg-class-name"></label><div class="tg-form-row"><label class="tg-label">Level<select name="level" data-testid="tg-class-level">' + __levels.map(function (l) { return '<option' + (__curLvl === l ? ' selected' : '') + '>' + l + '</option>'; }).join('') + '</select></label>' + __subField + '</div><label class="tg-label">Kode kelas (mis. FZ-QVQDHM)<input name="code" value="' + esc(e ? e.code : '') + '" placeholder="FZ-XXXXXX (otomatis atau gunakan kode sekolah)" maxlength="16"></label><div class="tg-actions"><button type="submit" class="tg-btn is-primary" data-testid="tg-class-submit">' + (e ? t('umum.simpan', 'Simpan') : t('guru.buat-kelas', 'Buat kelas')) + '</button>' + (e ? '' : '<button type="button" class="tg-btn is-ghost" data-tg="seed-demo">Atau muat kelas contoh</button>') + '</div></form>';
     } else if (m.kind === 'add-students') {
       title = t('guru.tambah-siswa', 'Tambah siswa');
-      body = '<form data-tg-form="add-students" class="tg-form"><label class="tg-label">' + t('guru.nama-siswa-baris', 'Nama siswa — satu per baris, atau tempel daftar absen') + '<textarea name="names" rows="6" required placeholder="1. Rina Kartika\n2. Dimas Prasetyo\nSari, Bagas, Nadia" data-autofocus data-testid="tg-add-names"></textarea></label><p class="tg-muted">Nomor urut dan nama belakang dibuang otomatis — FIEZEL hanya menyimpan nama depan.</p><div class="tg-actions"><button type="submit" class="tg-btn is-primary" data-testid="tg-add-submit">Tambahkan</button><button type="button" class="tg-btn is-ghost" data-tg="modal" data-kind="import-code">Punya kode hasil murid?</button></div></form>';
+      body = '<form data-tg-form="add-students" class="tg-form"><label class="tg-label">' + t('guru.nama-siswa-baris', 'Nama siswa — satu per baris, atau tempel daftar absen') + '<textarea name="names" rows="6" required placeholder="1. Rina Kartika\n2. Dimas Prasetyo\nSari, Bagas, Nadia" data-autofocus data-testid="tg-add-names"></textarea></label><p class="tg-muted">' + esc(t('guru.nama-depan-saja', 'Nomor urut dan nama belakang dibuang otomatis — FIEZEL hanya menyimpan nama depan.')) + '</p><div class="tg-actions"><button type="submit" class="tg-btn is-primary" data-testid="tg-add-submit">' + esc(t('umum.tambahkan', 'Tambahkan')) + '</button><button type="button" class="tg-btn is-ghost" data-tg="modal" data-kind="import-code">' + esc(t('guru.punya-kode-hasil', 'Punya kode hasil murid?')) + '</button></div></form>';
     } else if (m.kind === 'import-code') {
       title = 'Tempel kode hasil murid';
-      body = '<form data-tg-form="import-code" class="tg-form"><p class="tg-muted">' + t('guru.murid-menyalin', 'Murid menyalin') + ' <b>Kode hasil untuk tutor</b> dari Today Plan-nya (Peta → ringkasan). Kode hanya berisi nama depan + akurasi per skill. Tugas yang cocok otomatis dinilai selesai.</p><textarea name="code" rows="4" required placeholder="Tempel kode di sini…" data-autofocus data-testid="tg-import-code"></textarea>' + (m.error ? '<p class="tg-error">' + esc(m.error) + '</p>' : '') + '<div class="tg-actions"><button type="submit" class="tg-btn is-primary" data-testid="tg-import-submit">Masukkan ke ' + esc(c.name) + '</button></div></form>';
+      body = '<form data-tg-form="import-code" class="tg-form"><p class="tg-muted">' + t('guru.murid-menyalin', 'Murid menyalin') + ' <b>' + esc(t('guru.kode-hasil-tutor', 'Kode hasil untuk tutor')) + '</b> ' + esc(t('guru.impor-kode-jelas', 'dari Today Plan-nya (Peta → ringkasan). Kode hanya berisi nama depan + akurasi per skill. Tugas yang cocok otomatis dinilai selesai.')) + '</p><textarea name="code" rows="4" required placeholder="Tempel kode di sini…" data-autofocus data-testid="tg-import-code"></textarea>' + (m.error ? '<p class="tg-error">' + esc(m.error) + '</p>' : '') + '<div class="tg-actions"><button type="submit" class="tg-btn is-primary" data-testid="tg-import-submit">Masukkan ke ' + esc(c.name) + '</button></div></form>';
     } else if (m.kind === 'assign') {
       title = t('guru.buat-tugas-ujian', 'Buat tugas / ujian'); wide = true;
       var C = root.FiezelCurriculum;
-      var tab = ui.assignTab || 'curriculum';
+      var mapelAvailable = 0;
+      /* AUDIT: saat scope terkunci, tab Inggris & skill-cepat disembunyikan — keduanya
+         selalu ditolak guard saat terbit, jadi menampilkannya hanya jebakan UX. */
+      var __scTab = null;
+      try { __scTab = teacherSubjectScope(); } catch (_) {}
+      var tab = ui.assignTab || (m.tab || 'mapel');
+      if (__scTab && __scTab.locked && (tab === 'curriculum' || tab === 'skills')) tab = 'mapel';
       var curPhase = ui.curriculumPhase || (c && c.level === 'A1' ? 'fase_d' : c && (c.level === 'B1' || c.level === 'B2') ? 'fase_f' : 'fase_d');
       var phases = C ? C.getPhases() : [];
       var units = C ? C.getUnits({ phaseId: curPhase }) : [];
       var selUnitId = ui.curriculumUnitId || (units[0] ? units[0].id : null);
       var curUnit = C && selUnitId ? C.getUnit(selUnitId) : (units[0] || null);
       var skills = T.SKILL_ORDER.filter(function (k) { return k !== 'speaking'; }), pre = m.skill || 'past_tense', tgt = m.target ? [m.target] : [];
+      try {
+        if (m.targets && Array.isArray(m.targets) && m.targets.length) tgt = m.targets.slice();
+        else if (typeof m.targets === 'string' && m.targets) tgt = String(m.targets).split(',');
+      } catch (_) {}
 
-      var tabHeader = '<div class="tg-assign-tabs">' +
-        '<button type="button" class="tg-tab-btn' + (tab === 'curriculum' ? ' is-active' : '') + '" data-tg="assign-tab" data-tab="curriculum">' + icon('notebook-pen') + ' 📘 Kurikulum Sekolah (SMP & SMA)</button>' +
+      var tabHeader = (__scTab && __scTab.locked)
+        ? '<div class="tg-assign-tabs" data-testid="tg-assign-tabs-locked"><span class="tg-tab-btn is-active">' + icon('library') + ' 🏛️ ' + esc(t('guru.tab-kurikulum-nasional', 'Kurikulum Nasional (17 Mapel)')) + '</span></div>'
+        : '<div class="tg-assign-tabs">' +
+        '<button type="button" class="tg-tab-btn' + (tab === 'mapel' ? ' is-active' : '') + '" data-tg="assign-tab" data-tab="mapel">' + icon('library') + ' 🏛️ ' + esc(t('guru.tab-kurikulum-nasional', 'Kurikulum Nasional (17 Mapel)')) + '</button>' +
+        '<button type="button" class="tg-tab-btn' + (tab === 'curriculum' ? ' is-active' : '') + '" data-tg="assign-tab" data-tab="curriculum">' + icon('notebook-pen') + ' 📘 ' + esc(t('guru.tab-kurikulum-inggris', 'Bahasa Inggris (Kurmer)')) + '</button>' +
         '<button type="button" class="tg-tab-btn' + (tab === 'skills' ? ' is-active' : '') + '" data-tg="assign-tab" data-tab="skills">' + icon('sparkles') + ' ⚡ ' + esc(t('guru.tab-bank-cepat', 'Latihan cepat per skill (A2)')) + '</button>' +
         '</div>';
 
       var tabContent = '';
-      if (tab === 'curriculum' && C) {
+      if (tab === 'mapel') {
+        var __sc = null;
+        try { __sc = teacherSubjectScope(); } catch (_) { __sc = null; }
+        var __allowed = (__sc && __sc.locked) ? scopeMapelList() : MAPEL_LIST;
+        var curSId = m.subjectId || ui.assignSubject || ui.curriculumSubject || 'MAT';
+        if (__sc && __sc.locked && __sc.subjects.indexOf(curSId) < 0) curSId = __sc.active;
+        if (!validSubjectId(curSId)) curSId = (__sc && __sc.locked ? __sc.active : 'MAT');
+        var mCode = m.compCode || ui.assignCompCode || '';
+        var mTitle = m.compTitle || ui.assignCompTitle || '';
+        var catItem = MAPEL_CATALOG[curSId] || MAPEL_CATALOG['MAT'];
+
+        var comps = [];
+        var bBank = mapelBank(curSId);
+        if (bBank && Array.isArray(bBank.competencies) && bBank.competencies.length) {
+          comps = bBank.competencies.map(function (c) {
+            var cGrade = c.grade;
+            if (!cGrade && c.code) {
+              var gm = c.code.match(/-(\d+)-/);
+              if (gm) cGrade = parseInt(gm[1], 10);
+            }
+            return {
+              code: c.code,
+              name: c.name,
+              materi: c.materi || '',
+              grade: cGrade || 7,
+              cpRef: c.cpRef || ''
+            };
+          });
+        } else if (catItem && catItem.competencies && catItem.competencies.length) {
+          comps = catItem.competencies.map(function (c) {
+            var cGrade = c.grade;
+            if (!cGrade && c.code) {
+              var gm = c.code.match(/-(\d+)-/);
+              if (gm) cGrade = parseInt(gm[1], 10);
+            }
+            return {
+              code: c.code,
+              name: c.name,
+              materi: c.materi || '',
+              grade: cGrade || 7,
+              cpRef: c.cpRef || ''
+            };
+          });
+        } else if (ui.curriculumTree && ui.curriculumTree.length) {
+          (function walkTree(arr) {
+            if (!Array.isArray(arr)) return;
+            for (var i = 0; i < arr.length; i++) {
+              var nd = arr[i];
+              if (nd.type === 'competency') {
+                var cGrade = nd.grade;
+                if (!cGrade && nd.code) {
+                  var gm = nd.code.match(/-(\d+)-/);
+                  if (gm) cGrade = parseInt(gm[1], 10);
+                }
+                comps.push({
+                  code: nd.code || nd.id,
+                  name: nd.name || nd.title || '',
+                  materi: nd.description || nd.materi || '',
+                  grade: cGrade || 7,
+                  cpRef: nd.cpRef || ''
+                });
+              }
+              if (nd.children) walkTree(nd.children);
+            }
+          })(ui.curriculumTree);
+        }
+
+        /* Hitung nomor Bab (babNum) berurutan per jenjang kelas agar persis buku siswa */
+        var gradeBabCounts = {};
+        for (var cIdx = 0; cIdx < comps.length; cIdx++) {
+          var cg = comps[cIdx].grade || 7;
+          if (!gradeBabCounts[cg]) gradeBabCounts[cg] = 0;
+          gradeBabCounts[cg]++;
+          comps[cIdx].babNum = gradeBabCounts[cg];
+        }
+
+        var curGradeFilter = ui.assignGradeFilter;
+        if (!curGradeFilter) {
+          if (c && c.level) {
+            var lm = String(c.level).match(/(\d+)/);
+            if (lm) curGradeFilter = lm[1];
+          }
+          if (!curGradeFilter) curGradeFilter = 'all';
+        }
+        var availableGrades = [];
+        for (var gi = 0; gi < comps.length; gi++) {
+          var gr = comps[gi].grade || 7;
+          if (availableGrades.indexOf(gr) === -1) availableGrades.push(gr);
+        }
+        availableGrades.sort(function (a, b) { return a - b; });
+
+        var displayedComps = comps;
+        if (curGradeFilter !== 'all') {
+          var targetGrade = parseInt(curGradeFilter, 10);
+          displayedComps = comps.filter(function (c) { return c.grade === targetGrade; });
+          if (!displayedComps.length) displayedComps = comps;
+        }
+
+        if (!mCode && displayedComps.length) {
+          mCode = displayedComps[0].code;
+          mTitle = displayedComps[0].name;
+        }
+
+        var curCompObj = null;
+        for (var ci = 0; ci < comps.length; ci++) {
+          if (comps[ci].code === mCode || comps[ci].name === mTitle) {
+            curCompObj = comps[ci];
+            break;
+          }
+        }
+        if (!curCompObj && displayedComps.length) {
+          curCompObj = displayedComps[0];
+          mCode = curCompObj.code;
+          mTitle = curCompObj.name;
+        }
+        var curMateri = (curCompObj && curCompObj.materi) || '';
+        var curGrade = curCompObj ? (curCompObj.grade || 7) : 7;
+        var curBabNum = curCompObj ? (curCompObj.babNum || 1) : 1;
+
+        var qData = getMapelQuestionsForCompetency(curSId, mCode);
+        var allQItems = qData.items || [];
+        var totalAvailable = allQItems.length;
+        mapelAvailable = totalAvailable;
+
+        var subjectSelect = '';
+        if (__sc && __sc.locked && !__sc.multi) {
+          var __m = MAPEL_LIST.filter(function (x) { return x.id === curSId; })[0] || { id: curSId, name: curSId };
+          subjectSelect = '<input type="hidden" name="subject_id" value="' + esc(curSId) + '">' +
+            '<div class="tg-subject-badge" data-testid="tg-assign-subject-badge" role="status">' + icon('lock') + '<span><b>' + esc(__m.id + ' — ' + __m.name) + '</b><small>' + esc(__sc.grade + ' · ' + gradeKelasLabel(__sc.grade)) + '</small></span></div>';
+        } else {
+          subjectSelect = '<label class="tg-label">' + t('guru.pilih-mapel-tugas', 'Pilih Mata Pelajaran (17 Mapel)') +
+            '<select name="subject_id" data-tg-select="assign-subject" class="tg-select-unit" data-testid="tg-assign-subject-select" aria-label="' + esc(t('guru.pilih-mapel-tugas', 'Pilih Mata Pelajaran (17 Mapel)')) + '">' +
+              __allowed.map(function (mItem) {
+                return '<option value="' + mItem.id + '"' + (mItem.id === curSId ? ' selected' : '') + '>' + esc(mItem.id + ' — ' + mItem.name + ' (' + mItem.grade + ')') + '</option>';
+              }).join('') +
+            '</select></label>';
+        }
+
+        var chapterCardsHtml = '';
+        if (displayedComps.length) {
+          chapterCardsHtml = '<div class="tg-chapter-cards-grid">' +
+            displayedComps.map(function (cItem) {
+              var isSel = (cItem.code === mCode || cItem.name === mTitle);
+              var qCount = (getMapelQuestionsForCompetency(curSId, cItem.code).items || []).length;
+              return '<button type="button" class="tg-chapter-card' + (isSel ? ' is-active' : '') + '" data-tg="select-bab" data-code="' + esc(cItem.code) + '" data-title="' + esc(cItem.name) + '" data-testid="tg-assign-bab-card-' + cItem.babNum + '">' +
+                '<div class="tg-chap-top">' +
+                  '<span class="tg-chap-pill">📖 ' + esc(t('guru.bab-label', 'Bab')) + ' ' + cItem.babNum + '</span>' +
+                  '<span class="tg-chap-grade">' + esc(t('guru.kelas-label', 'Kelas')) + ' ' + cItem.grade + '</span>' +
+                '</div>' +
+                '<h5 class="tg-chap-title">' + esc(cItem.name) + '</h5>' +
+                '<div class="tg-chap-meta">' +
+                  '<span class="tg-chap-count">📚 ' + qCount + ' ' + esc(t('guru.soal-count', 'soal')) + '</span>' +
+                  (isSel ? '<span class="tg-chap-selected-pill">✓ ' + esc(t('guru.terpilih', 'Aktif')) + '</span>' : '') +
+                '</div>' +
+              '</button>';
+            }).join('') +
+          '</div>';
+        }
+
+        var gradeFilterHtml = '';
+        if (availableGrades.length > 1) {
+          gradeFilterHtml = '<div class="tg-grade-filter-row">' +
+            '<span class="tg-filter-label">' + esc(t('guru.jenjang-kelas-label', '🎯 Jenjang Kelas:')) + '</span>' +
+            '<button type="button" class="tg-grade-pill' + (curGradeFilter === 'all' ? ' is-active' : '') + '" data-tg="filter-grade" data-grade="all">' + esc(t('guru.semua-kelas', 'Semua Kelas')) + '</button>' +
+            availableGrades.map(function (gr) {
+              return '<button type="button" class="tg-grade-pill' + (curGradeFilter === String(gr) ? ' is-active' : '') + '" data-tg="filter-grade" data-grade="' + gr + '">' + esc(t('guru.kelas-label', 'Kelas')) + ' ' + gr + '</button>';
+            }).join('') +
+          '</div>';
+        }
+
+        var compSelectHtml = '';
+        if (comps.length) {
+          var groupedByGrade = {};
+          comps.forEach(function (c) {
+            var gKey = c.grade || 7;
+            if (!groupedByGrade[gKey]) groupedByGrade[gKey] = [];
+            groupedByGrade[gKey].push(c);
+          });
+
+          var optGroupsHtml = Object.keys(groupedByGrade).sort(function (a, b) { return Number(a) - Number(b); }).map(function (gKey) {
+            var groupItems = groupedByGrade[gKey];
+            var opts = groupItems.map(function (cItem) {
+              var isSel = (cItem.code === mCode || cItem.name === mTitle);
+              var qCount = (getMapelQuestionsForCompetency(curSId, cItem.code).items || []).length;
+              var label = '📖 ' + t('guru.bab-label', 'Bab') + ' ' + cItem.babNum + ': ' + cItem.name + ' (' + qCount + ' ' + t('guru.soal-count', 'soal') + ')';
+              return '<option value="' + esc(cItem.code) + '" data-title="' + esc(cItem.name) + '" data-materi="' + esc(cItem.materi || '') + '"' + (isSel ? ' selected' : '') + '>' +
+                esc(label) +
+              '</option>';
+            }).join('');
+            return '<optgroup label="📚 ' + esc(t('guru.kelas-label', 'Kelas')) + ' ' + gKey + ' SMP / Fase D">' + opts + '</optgroup>';
+          }).join('');
+
+          compSelectHtml = '<div class="tg-bab-section">' +
+            '<div class="tg-bab-header-row">' +
+              '<label class="tg-label">📖 <b>' + esc(t('guru.pilih-bab-buku-ajar', 'Pilih Bab Buku Ajar (Kurikulum Merdeka)')) + '</b></label>' +
+              gradeFilterHtml +
+            '</div>' +
+            chapterCardsHtml +
+            '<select name="comp_select" data-tg-select="assign-comp-select" class="tg-select-unit tg-bab-select" data-testid="tg-assign-comp-select">' +
+              optGroupsHtml +
+            '</select>' +
+          '</div>';
+        }
+
+        var compInputs = '<input type="hidden" name="comp_code" value="' + esc(mCode) + '" data-testid="tg-assign-comp-code">' +
+          '<input type="hidden" name="comp_title" value="' + esc(mTitle) + '" data-testid="tg-assign-comp-title">';
+
+        var subTopicsHtml = '';
+        if (curMateri) {
+          var rawSubs = curMateri.split(/,|;/).map(function (s) {
+            return s.trim().replace(/^(dan|serta)\s+/i, '');
+          }).filter(Boolean);
+
+          if (rawSubs.length) {
+            subTopicsHtml = '<div class="tg-subbab-box">' +
+              '<div class="tg-subbab-head">🎯 <b>' + esc(t('guru.subbab-topik-bab', 'Sub-bab & Indikator Materi di Bab Ini:')) + '</b></div>' +
+              '<div class="tg-subbab-list">' +
+                rawSubs.map(function (st, sIdx) {
+                  return '<div class="tg-subbab-item">' +
+                    '<span class="tg-subbab-badge">📌 ' + esc(t('guru.subbab-label', 'Sub-bab')) + ' ' + curBabNum + '.' + (sIdx + 1) + '</span>' +
+                    '<span class="tg-subbab-title">' + esc(st) + '</span>' +
+                  '</div>';
+                }).join('') +
+              '</div>' +
+            '</div>';
+          }
+        }
+
+        var topicSummaryCard = '<div class="tg-topic-summary-card">' +
+          '<div class="tg-topic-badge-row">' +
+            '<span class="tg-badge is-subject">' + esc(catItem ? catItem.name : curSId) + '</span>' +
+            '<span class="tg-badge is-grade">' + esc(t('guru.kelas-label', 'Kelas')) + ' ' + curGrade + '</span>' +
+            '<span class="tg-badge is-bab">📖 ' + esc(t('guru.bab-label', 'Bab')) + ' ' + curBabNum + '</span>' +
+            '<span class="tg-badge is-count">📚 ' + totalAvailable + ' ' + esc(t('guru.soal-tersedia-bab', 'Soal Siap Pakai di Bab Ini')) + '</span>' +
+          '</div>' +
+          '<h4 class="tg-topic-title">📖 ' + esc(t('guru.bab-label', 'Bab')) + ' ' + curBabNum + ': ' + esc(mTitle || (catItem ? catItem.name : curSId)) + '</h4>' +
+          subTopicsHtml +
+        '</div>';
+
+        var briefCard = '';
+        if (catItem && catItem.teachingBrief) {
+          var tb = catItem.teachingBrief;
+          briefCard = '<details class="tg-brief-accordion" data-testid="tg-mapel-brief">' +
+            '<summary class="tg-brief-summary-toggle">' +
+              '<span>💡 <b>' + esc(t('guru.panduan-mengajar-buka', 'Panduan Mengajar Guru & Miskonsepsi Siswa')) + '</b> <small class="tg-muted">(' + esc(t('guru.klik-buka-panduan', 'Apersepsi 5 Menit, Rumus & Trap Miskonsepsi')) + ')</small></span>' +
+              '<span class="tg-accordion-arrow">▼</span>' +
+            '</summary>' +
+            '<div class="tg-brief-card">' +
+              '<div class="tg-brief-head"><span class="tg-badge">💡 ' + esc(t('guru.panduan-mengajar', 'Panduan mengajar')) + '</span><h4>' + esc(catItem.name + (mTitle ? ' — ' + mTitle : '')) + '</h4><span class="tg-cefr-pill">' + esc(catItem.grade) + '</span></div>' +
+              '<p class="tg-brief-summary">' + esc(tb.summary) + '</p>' +
+              '<div class="tg-brief-grid">' +
+                '<div class="tg-brief-col"><b>' + esc(t('guru.apersepsi-5-menit', '🎤 Apersepsi 5 Menit (Hook Kelas):')) + '</b><p>' + esc(tb.hook5Minutes) + '</p></div>' +
+                '<div class="tg-brief-col"><b>' + esc(t('guru.papan-tulis-rumus', '📋 Rumus / Konsep Papan Tulis:')) + '</b><code>' + esc(tb.boardFormula) + '</code></div>' +
+              '</div>' +
+              (tb.commonMisconceptions && tb.commonMisconceptions.length ? '<div class="tg-brief-miscons"><b>' + esc(t('guru.top-miskonsepsi', '⚠️ Top Miskonsepsi Siswa:')) + '</b><ul>' + tb.commonMisconceptions.map(function (mc) { return '<li><b>' + esc(mc.trap) + ':</b> ' + esc(mc.pattern) + ' ➔ <em>' + esc(mc.fix) + '</em></li>'; }).join('') + '</ul></div>' : '') +
+            '</div></details>';
+        }
+
+        var qCardsHtml = allQItems.map(function (qItem, qIdx) {
+          var diff = qItem.difficulty || 'sedang';
+          var diffLabel = diff === 'dasar' ? t('guru.diff-dasar', '🟢 Dasar') : (diff === 'tinggi' ? t('guru.diff-tinggi', '🔴 Tantangan') : t('guru.diff-sedang', '🟡 Sedang'));
+          var optsHtml = (qItem.options || []).map(function (optText, oIdx) {
+            var isAns = (oIdx === qItem.answer);
+            var letter = String.fromCharCode(65 + oIdx);
+            return '<div class="tg-q-opt' + (isAns ? ' is-correct' : '') + '">' +
+              '<span class="tg-opt-letter">' + letter + '.</span>' +
+              '<span class="tg-opt-text">' + esc(optText) + '</span>' +
+              (isAns ? '<span class="tg-correct-pill">✓ ' + esc(t('guru.kunci', 'Kunci')) + '</span>' : '') +
+            '</div>';
+          }).join('');
+
+          var whyKey = qItem.answer;
+          var mainWhy = (qItem.why && (qItem.why[whyKey] || qItem.why[String(whyKey)])) || '';
+          var trapHtml = '';
+          if (qItem.distractorWhy) {
+            var traps = [];
+            for (var dKey in qItem.distractorWhy) {
+              if (qItem.distractorWhy.hasOwnProperty(dKey) && Number(dKey) !== whyKey) {
+                var dLetter = String.fromCharCode(65 + Number(dKey));
+                traps.push('<div><span class="tg-trap-note">⚠️ ' + esc(t('guru.jebakan-opsi', 'Miskonsepsi Opsi')) + ' ' + dLetter + ':</span> ' + esc(qItem.distractorWhy[dKey]) + '</div>');
+              }
+            }
+            if (traps.length) trapHtml = traps.join('');
+          }
+
+          var explanationHtml = (mainWhy || trapHtml) ? (
+            '<details class="tg-q-explanation">' +
+              '<summary class="tg-q-exp-toggle">💡 ' + esc(t('guru.lihat-pembahasan', 'Lihat Pembahasan & Catatan Guru')) + '</summary>' +
+              '<div class="tg-q-exp-body">' +
+                (mainWhy ? '<p><b>' + esc(t('guru.kunci-konsep', 'Konsep Jawaban:')) + '</b> ' + esc(mainWhy) + '</p>' : '') +
+                trapHtml +
+              '</div>' +
+            '</details>'
+          ) : '';
+
+          return '<div class="tg-qcard">' +
+            '<div class="tg-qcard-top">' +
+              '<label class="tg-qcard-label">' +
+                '<input type="checkbox" name="selected_q_idx" value="' + qIdx + '" class="tg-q-checkbox" data-tg-check="q-select" checked>' +
+                '<span class="tg-q-num">#' + (qIdx + 1) + '</span>' +
+              '</label>' +
+              '<span class="tg-diff-badge is-' + esc(diff) + '">' + esc(diffLabel) + '</span>' +
+            '</div>' +
+            '<div class="tg-qcard-prompt">' + esc(qItem.prompt) + '</div>' +
+            '<div class="tg-qcard-options">' + optsHtml + '</div>' +
+            explanationHtml +
+          '</div>';
+        }).join('');
+
+        var previewCard = '<div class="tg-qbank-section" data-testid="tg-mapel-preview">' +
+          '<div class="tg-qbank-header">' +
+            '<div class="tg-qbank-title-group">' +
+              '<h5>📚 ' + esc(t('guru.daftar-soal-bab', 'Bank Soal di Bab Ini')) + ' <span class="tg-count-pill" data-tg-q-count-label>' + totalAvailable + ' ' + esc(t('guru.soal-tersedia', 'Soal Siap Pakai')) + '</span></h5>' +
+              '<p class="tg-muted tg-small">' + esc(t('guru.sub-daftar-soal', 'Guru dapat melihat butir soal, kunci jawaban (hijau), pembahasan, dan memilih soal yang ingin diterbitkan.')) + '</p>' +
+            '</div>' +
+            '<div class="tg-qbank-quick-btns">' +
+              '<button type="button" class="tg-q-quick-btn" data-tg="quick-count" data-count="5">⚡ ' + esc(t('guru.pilih-5-soal', 'Pilih 5 Soal (Latihan)')) + '</button>' +
+              '<button type="button" class="tg-q-quick-btn" data-tg="quick-count" data-count="10">📝 ' + esc(t('guru.pilih-10-soal', 'Pilih 10 Soal (Ulangan)')) + '</button>' +
+              '<button type="button" class="tg-q-quick-btn" data-tg="quick-count" data-count="' + totalAvailable + '">💯 ' + esc(t('guru.pilih-semua-soal', 'Pilih Semua')) + ' (' + totalAvailable + ')</button>' +
+            '</div>' +
+          '</div>' +
+          '<div class="tg-qbank-list">' + qCardsHtml + '</div>' +
+        '</div>';
+
+        tabContent = '<input type="hidden" name="assign_source" value="mapel">' +
+          subjectSelect + compSelectHtml + compInputs + topicSummaryCard + briefCard + previewCard;
+      } else if (tab === 'curriculum' && C) {
         var phasePills = '<div class="tg-phase-pills">' + phases.map(function (p) {
           return '<button type="button" class="tg-chip' + (curPhase === p.id ? ' is-active' : '') + '" data-tg="assign-phase" data-phase="' + p.id + '"><b>' + esc(p.name) + '</b><small>' + esc(p.cefr) + '</small></button>';
         }).join('') + '</div>';
@@ -625,18 +4346,6 @@
             .replace('{kelas}', u.grade).replace('{sem}', u.semester).replace('{genre}', u.genre).replace('{judul}', u.title)) + '</option>';
         }).join('') + '</select></label>';
 
-        /*
-         * PEMILIH SUB-BAB DAN FITUR BAHASA.
-         *
-         * Guru tidak mengajar "Descriptive Text" sekaligus dalam satu pertemuan — ia
-         * mengajar To Be hari Senin dan Simple Present hari Rabu. Sebelum m025-290 pilihan
-         * terkecil yang tersedia adalah satu bab utuh, jadi tugas untuk pertemuan Senin
-         * ikut membawa soal yang materinya belum diajarkan.
-         *
-         * Yang ditawarkan di sini hanya fitur yang BENAR-BENAR punya soal (getFeatures
-         * membacanya dari butirnya, bukan dari daftar languageFeatures). Menawarkan janji
-         * kurikulum sebagai pilihan akan menghasilkan tugas kosong saat guru mencentangnya.
-         */
         var subs = curUnit ? C.getSubChapters(curUnit.id) : [];
         var curSub = ui.curriculumSub || '';
         if (curSub && subs.every(function (sc) { return sc.id !== curSub; })) curSub = '';
@@ -681,26 +4390,85 @@
           '<label class="tg-label">Skill (pilih 1–3)</label><div class="tg-chips tg-chips-select">' + skills.map(function (k) { return '<label class="tg-chip is-check"><input type="checkbox" name="skills" value="' + k + '"' + (k === pre ? ' checked' : '') + ' data-testid="tg-assign-skill-' + k + '"><span>' + esc(T.SKILL_LABEL[k]) + '</span></label>'; }).join('') + '</div>';
       }
 
-      body = '<form data-tg-form="assign" class="tg-form">' + tabHeader + tabContent +
-        '<label class="tg-label">' + t('guru.judul-tugas-bab', 'Judul Tugas / Bab') + '<input name="title" maxlength="80" value="' + esc(curUnit && tab === 'curriculum' ? curUnit.title : '') + '" placeholder="' + (curUnit && tab === 'curriculum' ? esc(curUnit.title) : esc(t('guru.judul-otomatis', 'Kosongkan untuk judul otomatis'))) + '" data-testid="tg-assign-title"></label>' +
-        /* Pilihan jumlah soal DIPOTONG sesuai isi bab yang sebenarnya. Menawarkan "10" pada bab
-           berisi 7 soal adalah janji yang hanya bisa ditepati dengan menambal dari bank umum —
-           dan penambalan itulah yang membuat tugas kurikulum tercemar sampai m025-290. */
-        '<div class="tg-form-row"><label class="tg-label">' + t('guru.jumlah-soal', 'Jumlah soal') + (tab === 'curriculum' && curUnit ? ' <small class="tg-muted">(tersedia ' + tersedia + ')</small>' : '') + '<select name="count">' + (tab === 'curriculum' && curUnit ? [2, 3, 5, 8, 10, 15].filter(function (n) { return n <= tersedia; }).concat(tersedia && [2, 3, 5, 8, 10, 15].every(function (n) { return n !== tersedia; }) ? [tersedia] : []).sort(function (a, b) { return a - b; }) : [2, 3, 5, 8, 10]).map(function (n) { return '<option' + (n === (tab === 'curriculum' && curUnit ? Math.min(tersedia, 8) : 5) ? ' selected' : '') + '>' + n + '</option>'; }).join('') + '</select></label><label class="tg-label">Tenggat<input type="date" name="deadline" value="' + T.today(Date.now() + 2 * T.DAY) + '" data-testid="tg-assign-deadline"></label></div>' +
-        '<label class="tg-label">Mode</label><div class="tg-mode"><label class="tg-mode-opt"><input type="radio" name="mode" value="latihan" checked><div><b>Latihan</b><small>Feedback langsung tiap soal, boleh diulang</small></div></label><label class="tg-mode-opt"><input type="radio" name="mode" value="ujian" data-testid="tg-assign-mode-exam"><div><b>Ujian mini</b><small>Urutan diacak per murid + timer — anti saling contek</small></div></label></div>' +
+      var defaultTitle = '';
+      if (tab === 'mapel') {
+        var sIdTitle = m.subjectId || ui.assignSubject || ui.curriculumSubject || 'MAT';
+        var mObjTitle = MAPEL_LIST.filter(function (x) { return x.id === sIdTitle; })[0] || MAPEL_LIST[0];
+        var cT = m.compTitle || ui.assignCompTitle || '';
+        defaultTitle = mObjTitle.name + (cT ? ' · ' + cT : '');
+      } else if (tab === 'curriculum' && curUnit) {
+        defaultTitle = curUnit.title;
+      }
+
+      var countOptions = (tab === 'curriculum' && curUnit)
+        ? [2, 3, 5, 8, 10, 15].filter(function (n) { return n <= tersedia; }).concat(tersedia && [2, 3, 5, 8, 10, 15].every(function (n) { return n !== tersedia; }) ? [tersedia] : []).sort(function (a, b) { return a - b; })
+        : (tab === 'mapel' && mapelAvailable)
+          ? [2, 3, 5, 8, 10, 12, 15].filter(function (n) { return n <= mapelAvailable; }).concat(mapelAvailable && [2, 3, 5, 8, 10, 12, 15].every(function (n) { return n !== mapelAvailable; }) ? [mapelAvailable] : []).sort(function (a, b) { return a - b; })
+          : [2, 3, 5, 8, 10, 15, 20];
+
+      var curAssignMode = m.mode || ui.assignMode || 'latihan';
+
+      var stepGuide = '<div class="tg-steps-guide" data-testid="tg-steps-guide">' +
+        '<div class="tg-step-pill is-active"><span>1</span> <b>' + esc(t('guru.langkah-1-materi', '1. Pilih Materi')) + '</b></div>' +
+        '<div class="tg-step-pill"><span>2</span> <b>' + esc(t('guru.langkah-2-mode', '2. Atur Mode & Waktu')) + '</b></div>' +
+        '<div class="tg-step-pill"><span>3</span> <b>' + esc(t('guru.langkah-3-terbitkan', '3. Terbitkan untuk Murid')) + '</b></div>' +
+      '</div>';
+
+      body = '<form data-tg-form="assign" class="tg-form">' + stepGuide + tabHeader + tabContent +
+        '<label class="tg-label">' + t('guru.judul-tugas-bab', 'Judul Tugas / Bab') + '<input name="title" maxlength="80" value="' + esc(defaultTitle) + '" placeholder="' + esc(t('guru.judul-otomatis', 'Kosongkan untuk judul otomatis')) + '" data-testid="tg-assign-title"></label>' +
+        '<div class="tg-form-row"><label class="tg-label">' + t('guru.jumlah-soal', 'Jumlah soal') + (tab === 'mapel' && mapelAvailable ? (' <small class="tg-muted">(' + esc(t('guru.tersedia-label', 'tersedia')) + ' ' + mapelAvailable + ' ' + esc(t('guru.soal-di-bab-ini', 'soal di bab ini')) + ')</small>') : (tab === 'curriculum' && curUnit ? ' <small class="tg-muted">(tersedia ' + tersedia + ')</small>' : '')) + '<select name="count">' + countOptions.map(function (n) { return '<option' + (n === (tab === 'mapel' && mapelAvailable ? Math.min(mapelAvailable, 5) : tab === 'curriculum' && curUnit ? Math.min(tersedia, 8) : 5) ? ' selected' : '') + '>' + n + '</option>'; }).join('') + '</select></label><label class="tg-label">' + t('guru.tenggat-label', 'Tenggat') + '<input type="date" name="deadline" value="' + T.today(Date.now() + 2 * T.DAY) + '" data-testid="tg-assign-deadline"></label></div>' +
+        '<label class="tg-label">' + esc(t('guru.langkah-2-mode', '2. Atur Mode & Waktu')) + '</label><div class="tg-mode"><label class="tg-mode-opt"><input type="radio" name="mode" value="latihan"' + (curAssignMode !== 'ujian' ? ' checked' : '') + '><div><b>🟢 ' + esc(t('guru.mode-latihan-title', 'Mode Latihan Mandiri')) + '</b><small>' + esc(t('guru.mode-latihan-sub', 'Kunci & pembahasan langsung terbuka setelah murid menjawab tiap soal. Cocok untuk PR & belajar mandiri.')) + '</small></div></label><label class="tg-mode-opt"><input type="radio" name="mode" value="ujian"' + (curAssignMode === 'ujian' ? ' checked' : '') + ' data-testid="tg-assign-mode-exam"><div><b>🛡️ ' + esc(t('guru.mode-ujian-title', 'Mode Ujian / Kuis Terjadwal')) + '</b><small>' + esc(t('guru.mode-ujian-sub', 'Ada timer hitung mundur, urutan soal diacak otomatis (anti-contek), nilai terekam otomatis ke rekap guru.')) + '</small></div></label></div>' +
+        '<div class="tg-form-row"><label class="tg-label">' + t('guru.durasi-timer-ujian', 'Durasi Timer (khusus Ujian)') + '<select name="timer"><option value="10">10 Menit</option><option value="15" selected>15 Menit</option><option value="20">20 Menit</option><option value="30">30 Menit</option><option value="45">45 Menit</option><option value="60">60 Menit</option></select></label></div>' +
+        '<label class="tg-label">' + t('guru.target-kelas-paralel', 'Terapkan ke kelas paralel (1 klik untuk banyak kelas)') + '</label><div class="tg-chips tg-chips-select" data-testid="tg-assign-classes">' + st.classes.map(function (k) { return '<label class="tg-chip is-check"><input type="checkbox" name="target_classes" value="' + k.id + '"' + (k.id === (c && c.id) ? ' checked' : '') + ' data-testid="tg-assign-class-' + k.id + '"><span>' + esc(k.name) + ' <b>(' + (k.students ? k.students.length : 0) + ')</b></span></label>'; }).join('') + '</div>' +
         '<label class="tg-label">Untuk siapa</label><div class="tg-chips tg-chips-select tg-chips-scroll"><label class="tg-chip is-check"><input type="radio" name="scope" value="all"' + (tgt.length ? '' : ' checked') + '><span>Seluruh kelas</span></label>' + c.students.map(function (s) { return '<label class="tg-chip is-check"><input type="checkbox" name="targets" value="' + s.id + '"' + (tgt.indexOf(s.id) !== -1 ? ' checked' : '') + '><span>' + esc(s.name) + '</span></label>'; }).join('') + '</div>' +
-        (tab === 'curriculum'
-          ? '<div class="tg-actions"><button type="submit" class="tg-btn is-primary" data-testid="tg-assign-submit">' + icon('sparkles') + ' ' + t('guru.terbitkan-tugas-kurikulum', 'Terbitkan Tugas Kurikulum') + '</button></div></form>'
-          : '<div class="tg-actions"><button type="submit" class="tg-btn is-primary" data-testid="tg-assign-submit">' + icon('sparkles') + ' Susun dari bank soal</button></div></form>');
+        (tab === 'mapel'
+          ? '<div class="tg-actions"><button type="submit" class="tg-btn is-primary" data-testid="tg-assign-submit">' + icon('sparkles') + ' ' + t('guru.terbitkan-tugas-mapel', 'Terbitkan Tugas / Ujian Mapel') + '</button></div></form>'
+          : tab === 'curriculum'
+            ? '<div class="tg-actions"><button type="submit" class="tg-btn is-primary" data-testid="tg-assign-submit">' + icon('sparkles') + ' ' + t('guru.terbitkan-tugas-kurikulum', 'Terbitkan Tugas Kurikulum') + '</button></div></form>'
+            : '<div class="tg-actions"><button type="submit" class="tg-btn is-primary" data-testid="tg-assign-submit">' + icon('sparkles') + ' Susun dari bank soal</button></div></form>');
     } else if (m.kind === 'share-assign' || m.kind === 'assign-detail') {
       var a = (c.assignments || []).filter(function (x) { return x.id === m.id; })[0]; if (!a) return '';
       var tg = c.students.filter(function (s) { return T.targeted(a, s); }), notDone = tg.filter(function (s) { return !(a.done && a.done[s.id]); }), code = T.assignmentCode(c, a);
-      var msg = t('guru.wa-halo', 'Halo! Tugas FIEZEL dari') + ' ' + (st.teacher.name || 'gurumu') + ': *' + a.title + '* (' + a.itemIds.length + ' soal, ±' + a.minutes + ' menit' + (a.deadline ? ', tenggat ' + a.deadline : '') + ').\nBuka FIEZEL → Today Plan → "Punya kode tugas dari guru?" → tempel kode ini:\n\n' + code + '\n\nSetelah selesai, kirim balik "Kode hasil untuk tutor" ya.';
+      var teacherName = (st.teacher && st.teacher.name) || 'gurumu';
+      var modeLabel = a.mode === 'ujian' ? t('guru.mode-ujian-title', 'Mode Ujian / Kuis Terjadwal') + ' (' + a.timer + ' min)' : t('guru.mode-latihan-title', 'Mode Latihan Mandiri');
+      var waMsg = '📢 *TUGAS FIEZEL: ' + a.title + '*\n' +
+        'Dari: ' + teacherName + ' · ' + t('umum.kelas', 'Kelas') + ': ' + c.name + ' (' + c.code + ')\n' +
+        '📝 ' + a.itemIds.length + ' ' + t('umum.soal', 'Soal') + ' · ' + a.minutes + ' min' + (a.deadline ? ' · Tenggat: ' + a.deadline : '') + ' · Mode: ' + modeLabel + '\n\n' +
+        '📱 *Cara Mengerjakan di Aplikasi FIEZEL:*\n' +
+        '1. Buka aplikasi FIEZEL\n' +
+        '2. Buka bagian "KelasKu" atau "Today Plan"\n' +
+        '3. Ketuk "Punya kode tugas dari guru?"\n' +
+        '4. Tempel kode tugas di bawah ini:\n\n' +
+        code + '\n\n' +
+        '✨ Nilai dan progres latihanmu akan otomatis terekam ke sistem guru setelah selesai. Semangat belajar! 💪';
       title = m.kind === 'share-assign' ? t('guru.kirim-tugas-murid', 'Kirim tugas ke murid') : t('guru.status-titik', 'Status:') + ' ' + a.title;
       var canSend = T.syncAvailable() === 'ok', busy = ui.sending === a.id;
-      body = (m.kind === 'share-assign' ? '<div class="tg-send-box" data-testid="tg-send-box"><p class="tg-kicker">' + t('guru.kirim-langsung', 'Kirim langsung (notifikasi di aplikasi murid)') + '</p><p class="tg-muted">' + (canSend ? 'Murid yang memakai kode kelas <b class="tg-mono">' + esc(c.code) + '</b> menerima tugas ini di lonceng notifikasi mereka. Sekali ketuk, sesinya langsung terbuka; hasilnya kembali ke sini otomatis.' : t('guru.masuk-untuk-kirim', 'Masuk dengan akun guru dan online untuk mengirim langsung. Sementara itu pakai kode di bawah.')) + '</p><div class="tg-actions"><button type="button" class="tg-btn is-primary" data-tg="send-assign" data-id="' + a.id + '" data-testid="tg-send-all"' + (!canSend || busy ? ' disabled' : '') + '>' + icon('send') + (busy ? ' Mengirim…' : a.targets ? ' Kirim ke ' + tg.length + ' murid terpilih' : ' ' + t('guru.kirim-semua-murid', 'Kirim ke semua murid')) + '</button>' + (a.sent && a.sent.all ? '<span class="tg-ok">' + icon('check') + ' terkirim ' + esc(T.fmtDate(a.sent.all)) + '</span>' : '') + '</div></div>' +
-          '<details class="tg-fold"><summary>Kode tugas (cadangan bila murid offline)</summary><p class="tg-muted">' + t('guru.murid-tempel-kode', 'Murid menempel kode ini di Today Plan → “Punya kode tugas dari guru?”.') + '</p><textarea class="tg-code" readonly rows="3" data-testid="tg-assign-code">' + esc(code) + '</textarea><div class="tg-actions"><button type="button" class="tg-btn is-ghost is-small" data-tg="copy" data-text="' + esc(code) + '" data-testid="tg-copy-assign-code">' + icon('copy') + ' Salin kode</button><button type="button" class="tg-btn is-ghost is-small" data-tg="copy" data-text="' + esc(msg) + '">' + icon('message-square') + ' Salin pesan lengkap</button><a class="tg-btn is-ghost is-small" target="_blank" rel="noopener" href="' + T.waLink('', msg) + '">' + icon('message-circle') + ' WhatsApp</a></div></details><hr class="tg-hr">' : '') +
-        '<div class="tg-card-head"><h4>' + notDone.length + ' belum selesai · ' + (tg.length - notDone.length) + ' selesai</h4></div><ul class="tg-mini-list tg-send-list">' + tg.map(function (s) { var d = a.done && a.done[s.id], sent = T.sentTo(a, s); return '<li class="' + (d ? 'is-done' : '') + '">' + avatar(s, 'sm') + ' <span class="tg-grow">' + esc(s.name) + (sent && !d ? ' <small class="tg-muted">· terkirim</small>' : '') + '</span>' + (d ? ' <span class="tg-ok">' + pct(d.acc) + '</span>' : (canSend ? '<button type="button" class="tg-btn is-small ' + (sent ? 'is-ghost' : 'is-primary') + '" data-tg="send-assign" data-id="' + a.id + '" data-sid="' + s.id + '" data-testid="tg-send-one-' + s.id + '"' + (busy ? ' disabled' : '') + '>' + icon('send') + (sent ? ' Kirim ulang' : ' Kirim') + '</button>' : '') + ' <button type="button" class="tg-link" data-tg="mark-done" data-id="' + a.id + '" data-sid="' + s.id + '">tandai selesai</button>') + '</li>'; }).join('') + '</ul>' + (notDone.length ? '<div class="tg-actions"><button type="button" class="tg-btn is-ghost is-small" data-tg="copy" data-text="' + esc('Pengingat: tugas *' + a.title + '* belum selesai untuk: ' + notDone.map(function (s) { return s.name; }).join(', ') + (a.deadline ? '. Tenggat ' + a.deadline : '') + '. Semangat! 💪') + '">' + icon('bell') + ' Salin pengingat untuk yang belum</button></div>' : '');
+      body = (m.kind === 'share-assign' ? '<div class="tg-send-box" data-testid="tg-send-box">' +
+          '<div class="tg-delivery-cards">' +
+            '<div class="tg-delivery-card is-wa" data-testid="tg-delivery-wa">' +
+              '<div class="tg-delivery-head"><h4>' + icon('message-circle') + ' ' + esc(t('guru.opsi-wa-title', 'Bagikan ke WhatsApp Kelas (1-Klik)')) + '</h4><span class="tg-badge" style="background:#16A34A">Paling Praktis</span></div>' +
+              '<p class="tg-muted">' + esc(t('guru.opsi-wa-desc', 'Format pesan rapi berisi nama tugas, jumlah soal, dan panduan 4 langkah cara murid membukanya di FIEZEL.')) + '</p>' +
+              '<div class="tg-actions" style="margin-top:10px">' +
+                '<a class="tg-btn tg-btn-wa" target="_blank" rel="noopener" href="' + T.waLink('', waMsg) + '" data-testid="tg-wa-direct-btn">' + icon('message-circle') + ' ' + esc(t('guru.opsi-wa-title', 'Bagikan ke WhatsApp Kelas (1-Klik)')) + '</a>' +
+                '<button type="button" class="tg-btn is-wa-ghost" data-tg="copy" data-text="' + esc(waMsg) + '" data-testid="tg-copy-wa-btn">' + icon('message-square') + ' ' + esc(t('guru.salin-pesan-wa', 'Salin Pesan WhatsApp')) + '</button>' +
+              '</div>' +
+              '<div class="tg-code-box">' +
+                '<label class="tg-label" style="margin-top:10px"><b>' + esc(t('guru.kode-tugas-label', 'Kode Tugas (Bisa Dicatat di Papan Tulis)')) + ':</b></label>' +
+                '<textarea class="tg-code" readonly rows="2" data-testid="tg-assign-code">' + esc(code) + '</textarea>' +
+                '<div><button type="button" class="tg-btn is-ghost is-small" data-tg="copy" data-text="' + esc(code) + '" data-testid="tg-copy-assign-code">' + icon('copy') + ' ' + esc(t('guru.salin-kode-tugas', 'Salin Kode Tugas')) + '</button></div>' +
+              '</div>' +
+            '</div>' +
+            '<div class="tg-delivery-card is-server" data-testid="tg-delivery-server">' +
+              '<div class="tg-delivery-head"><h4>' + icon('send') + ' ' + esc(t('guru.opsi-server-title', 'Kirim Langsung ke Notifikasi Aplikasi')) + '</h4>' + (canSend ? '<span class="tg-ok">' + icon('check') + ' Terhubung Server</span>' : '<span class="tg-muted">' + t('guru.perlu-akun-guru', 'Perlu Akun Guru') + '</span>') + '</div>' +
+              '<p class="tg-muted">' + (canSend ? 'Murid yang memakai kode kelas <b class="tg-mono">' + esc(c.code) + '</b> menerima tugas ini di lonceng notifikasi mereka. Sekali ketuk, sesinya langsung terbuka; hasilnya kembali ke sini otomatis.' : t('guru.masuk-untuk-kirim', 'Masuk dengan akun guru dan online untuk mengirim langsung. Sementara itu pakai kode di bawah.')) + '</p>' +
+              '<div class="tg-actions" style="margin-top:10px">' +
+                (canSend
+                  ? '<button type="button" class="tg-btn is-primary" data-tg="send-assign" data-id="' + a.id + '" data-testid="tg-send-all"' + (busy ? ' disabled' : '') + '>' + icon('send') + (busy ? ' Mengirim…' : a.targets ? ' Kirim ke ' + tg.length + ' murid terpilih' : ' ' + t('guru.kirim-semua-murid', 'Kirim ke semua murid')) + '</button>' + (a.sent && a.sent.all ? '<span class="tg-ok">' + icon('check') + ' terkirim ' + esc(T.fmtDate(a.sent.all)) + '</span>' : '')
+                  : '<button type="button" class="tg-btn is-ghost" data-tg="modal" data-kind="account-teacher">' + icon('user-check') + ' ' + esc(t('guru.masuk-akun-guru-cta', 'Masuk / Aktivasi Akun Guru')) + '</button>') +
+              '</div>' +
+            '</div>' +
+          '</div></div><hr class="tg-hr">' : '') +
+        '<div class="tg-card-head"><h4>' + notDone.length + ' belum selesai · ' + (tg.length - notDone.length) + ' selesai</h4></div><ul class="tg-mini-list tg-send-list">' + tg.map(function (s) { var d = a.done && a.done[s.id], sent = T.sentTo(a, s); return '<li class="' + (d ? 'is-done' : '') + '">' + avatar(s, 'sm') + ' <span class="tg-grow">' + esc(s.name) + (sent && !d ? ' <small class="tg-muted">· terkirim</small>' : '') + '</span>' + (d ? ' <span class="tg-ok">' + pct(d.acc) + '</span>' : (canSend ? '<button type="button" class="tg-btn is-small ' + (sent ? 'is-ghost' : 'is-primary') + '" data-tg="send-assign" data-id="' + a.id + '" data-sid="' + s.id + '" data-testid="tg-send-one-' + s.id + '"' + (busy ? ' disabled' : '') + '>' + icon('send') + (sent ? ' Kirim ulang' : ' Kirim') + '</button>' : '') + ' <button type="button" class="tg-link" data-tg="mark-done" data-id="' + a.id + '" data-sid="' + s.id + '">tandai selesai</button>') + '</li>'; }).join('') + '</ul>' + (notDone.length ? '<div class="tg-actions"><button type="button" class="tg-btn is-ghost is-small" data-tg="copy" data-text="' + esc('Pengingat: tugas *' + a.title + '* belum selesai untuk: ' + notDone.map(function (s) { return s.name; }).join(', ') + (a.deadline ? '. Tenggat ' + a.deadline : '') + '. Semangat! 💪') + '">' + icon('bell') + ' ' + esc(t('guru.salin-pengingat', 'Salin pengingat untuk yang belum')) + '</button></div>' : '');
     } else if (m.kind === 'greet' || m.kind === 'parent') {
       var s2 = student(m.id); if (!s2) return '';
       var text = m.kind === 'greet' ? T.greetingCard(c, s2, st.teacher) : T.parentReport(c, s2, st.teacher);
@@ -738,30 +4506,32 @@
     var act = btn.getAttribute('data-tg'), id = btn.getAttribute('data-id'), c = cls(), T = S();
     if (btn.tagName === 'A' && act === 'wa-draft') { return; }
     switch (act) {
-      case 'view': st.view = btn.getAttribute('data-view'); if (btn.getAttribute('data-skill')) ui.insightSkill = btn.getAttribute('data-skill'); ui.modal = null; ui.drawer = null; ui.filter = ''; break;
+      case 'view':
+        st.view = btn.getAttribute('data-view');
+        if (btn.getAttribute('data-hub-tab')) {
+          try { root.FiezelClassHub._teacherUi().tab = btn.getAttribute('data-hub-tab'); } catch (_) {}
+          if (btn.getAttribute('data-hub-tab') === 'kurikulum') { try { bukaPanelKurikulum(); } catch (_) {} }
+        }
+        if (btn.getAttribute('data-skill')) ui.insightSkill = btn.getAttribute('data-skill');
+        ui.modal = null; ui.drawer = null; ui.filter = '';
+        if (st.view === 'owner_tokens' && !ui.ownerInvites && !ui.ownerLoading) {
+          loadOwnerTeachers();
+        }
+        break;
       case 'account': openAccount(btn.getAttribute('data-mode') || 'login'); return;
-      case 'exit': persist(); exit(); return;
+      case 'exit':
+        if (previewOn || (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('fz-teacher-preview') === '1')) {
+          exitPreview(); previewOn = false; exit({ target: 'student' });
+        } else {
+          persist(); exit();
+        }
+        return;
       /* Keluar demo TIDAK memanggil persist(): yang tersimpan hanya penyimpanan pratinjau,
          dan yang diinginkan justru membuangnya. */
-      case 'demo-exit': exitPreview(); previewOn = false; exit(); return;
+      case 'demo-exit': exitPreview(); previewOn = false; exit({ target: 'landing' }); return;
       case 'demo-activate': openAccount('teacher'); return;
       case 'logout':
-        persist();
-        if (confirm('Keluar dari akun guru?')) {
-          try { localStorage.removeItem('fz_teacher_mode'); } catch(_) {}
-          if (root.state && root.state.preferences) {
-            root.state.preferences.role = 'murid';
-            root.state.view = 'home';
-            try { root.save?.(); } catch(_) {}
-          }
-          if (root.FiezelAccount && root.FiezelAccount.logout) {
-            root.FiezelAccount.logout().then(function () {
-              location.reload();
-            });
-          } else {
-            exit();
-          }
-        }
+        performTeacherLogout();
         return;
       case 'sync': syncAll(false); return;
       case 'inbox': ui.inbox = !ui.inbox; if (ui.inbox) { T.inboxMarkAllRead(st); } break;
@@ -775,18 +4545,30 @@
       case 'send-assign': {
         if (!c) return;
         var asg = (c.assignments || []).filter(function (x) { return x.id === id; })[0]; if (!asg) return;
+        if (T.syncAvailable() !== 'ok') {
+          ui.modal = { kind: 'share-assign', id: asg.id };
+          toast(T.syncLabel(c).text);
+          render();
+          return;
+        }
         var sid = btn.getAttribute('data-sid'), targets = sid ? [sid] : (asg.targets && asg.targets.length ? asg.targets : null);
-        if (T.syncAvailable() !== 'ok') { toast(T.syncLabel(c).text); return; }
         ui.sending = asg.id; render();
         T.sendAssignment(c, asg, targets).then(function (r) {
           ui.sending = null;
+          if (r.ok) asg.retractedAt = null;
           if (r.ok) { saveMinutes(sid ? 1 : 5); toast(sid ? t('guru.toast-kirim-satu', 'Tugas dikirim ke {nama} — muncul di notifikasinya.').replace('{nama}', (student(sid) || {}).name) : t('guru.toast-kirim-banyak', 'Tugas dikirim ke {jumlah} murid — muncul di notifikasi mereka.').replace('{jumlah}', r.count)); }
           else toast(r.error === 'class_code_taken' ? 'Kode kelas dipakai guru lain — ubah kode kelas dulu.' : r.error === 'not_found' ? t('guru.kelas-belum-sinkron', 'Kelas belum terdaftar di server — tekan Sinkron lalu coba lagi.') : t('guru.toast-gagal-kirim', 'Gagal mengirim ({sebab}). Coba lagi.').replace('{sebab}', r.error || 'unknown'));
           persist(); render();
         });
         return;
       }
-      case 'modal': ui.modal = { kind: btn.getAttribute('data-kind'), id: id, skill: btn.getAttribute('data-skill'), target: btn.getAttribute('data-target') }; break;
+      case 'modal': {
+        var __tg = btn.getAttribute('data-targets') || btn.getAttribute('data-target') || null;
+        var __tgt = null;
+        if (__tg && __tg.indexOf(',') !== -1) __tgt = __tg.split(',').map(function (x) { return String(x).trim(); }).filter(Boolean);
+        ui.modal = { kind: btn.getAttribute('data-kind'), id: id, skill: btn.getAttribute('data-skill'), target: btn.getAttribute('data-target'), targets: __tgt };
+        break;
+      }
       case 'drawer': ui.drawer = id; ui.modal = null; break;
       case 'close': ui.modal = null; ui.drawer = null; ui.inbox = false; break;
       case 'pick-class': st.activeClassId = id; break;
@@ -794,22 +4576,205 @@
       case 'copy': copy(btn.getAttribute('data-text'), 'Tersalin.'); return;
       case 'copy-draft': { var ta = el.querySelector('[data-tg-input="draft"]'); copy(ta ? ta.value : '', 'Pesan tersalin.'); saveMinutes(ui.modal && ui.modal.kind === 'parent' ? 8 : 3); persist(); return; }
       case 'mark-sent': { var s = student(id); if (s) { s.notes.push({ at: Date.now(), text: (btn.getAttribute('data-kind') === 'parent' ? 'Laporan orang tua dikirim.' : 'Kartu sapa dikirim.') }); saveMinutes(btn.getAttribute('data-kind') === 'parent' ? 8 : 3); } ui.modal = null; toast('Dicatat di riwayat ' + (s ? s.name : '') + '.'); break; }
-      case 'seed-demo': { var d = T.seedDemo(); st.classes.push(d); st.activeClassId = d.id; st.onboarded = true; ui.modal = null; st.view = 'briefing'; toast(t('guru.kelas-contoh', 'Kelas contoh dimuat — 18 siswa, 2 tugas, data 14 hari.')); break; }
-      case 'delete-class': if (!c || !confirm('Hapus kelas "' + c.name + '" beserta ' + c.students.length + ' siswa? Tidak bisa dibatalkan.')) return; st.classes = st.classes.filter(function (k) { return k.id !== c.id; }); st.activeClassId = st.classes.length ? st.classes[0].id : null; break;
+      case 'delete-class': {
+        if (!c || !confirm('Hapus kelas "' + c.name + '" beserta ' + c.students.length + ' siswa? Tidak bisa dibatalkan.')) return;
+        var delCode = c.code ? S().normalizeClassCode(c.code) : '';
+        if (delCode) {
+          st.deletedClassCodes = st.deletedClassCodes || {};
+          st.deletedClassCodes[delCode] = true;
+          try {
+            var A = S().account ? S().account() : root.FiezelAccount;
+            if (A && typeof A.api === 'function') {
+              A.api('/api/teacher/class/delete', { code: delCode }).catch(function () {});
+            }
+          } catch (_) {}
+        }
+        st.classes = st.classes.filter(function (k) { return k.id !== c.id; });
+        st.activeClassId = st.classes.length ? st.classes[0].id : null;
+        toast('Kelas "' + c.name + '" berhasil dihapus.');
+        break;
+      }
+      case 'clear-all-classes': {
+        if (!confirm('Bersihkan dan hapus SEMUA kelas di KelasKu?')) return;
+        st.classes.forEach(function (k) {
+          if (k.code) {
+            var dc = S().normalizeClassCode(k.code);
+            st.deletedClassCodes = st.deletedClassCodes || {};
+            st.deletedClassCodes[dc] = true;
+            try {
+              var A = S().account ? S().account() : root.FiezelAccount;
+              if (A && typeof A.api === 'function') {
+                A.api('/api/teacher/class/delete', { code: dc }).catch(function () {});
+              }
+            } catch (_) {}
+          }
+        });
+        st.classes = [];
+        st.activeClassId = null;
+        toast('Semua kelas berhasil dibersihkan.');
+        break;
+      }
       case 'delete-student': if (!c) return; c.students = c.students.filter(function (s) { return s.id !== id; }); ui.drawer = null; toast('Siswa dihapus dari kelas.'); break;
-      case 'delete-assign': if (!c || !confirm(t('guru.konfirm-hapus-tugas', 'Hapus tugas ini?'))) return; c.assignments = c.assignments.filter(function (a) { return a.id !== id; }); break;
+      case 'asg-tab': ui.asgTab = btn.getAttribute('data-tab'); ui.confirmDelete = ui.confirmRetract = null; break;
+      case 'archive-assign': { var arA = c && (c.assignments || []).filter(function (x) { return x.id === id; })[0]; if (!arA) return; arA.archivedAt = Date.now(); toast(t('guru.siklus.toast-diarsip', 'Tugas dipindah ke Arsip. Hasil murid tetap tersimpan.')); break; }
+      case 'archive-all-late': { if (!c) return; var tdL = T.today(), nL = 0, scL = null; try { scL = teacherSubjectScope(); } catch (_) { scL = null; } /* hanya yang TERLIHAT guru ini: guru mapel terkunci tidak boleh mengarsipkan tugas rekan di kelas yang sama */ (c.assignments || []).forEach(function (x) { if (scL && scL.locked && !isAssignmentVisible(x, scL)) return; if (!x.archivedAt && x.deadline && x.deadline < tdL) { x.archivedAt = Date.now(); nL++; } }); toast(t('guru.siklus.toast-diarsip-n', '{n} tugas dipindah ke Arsip.').replace('{n}', nL)); break; }
+      case 'unarchive-assign': { var unA = c && (c.assignments || []).filter(function (x) { return x.id === id; })[0]; if (!unA) return; unA.archivedAt = null; ui.confirmDelete = null; toast(t('guru.siklus.toast-dipulihkan', 'Tugas dikembalikan dari Arsip.')); break; }
+      case 'confirm-no': ui.confirmDelete = ui.confirmRetract = null; break;
+      case 'retract-assign': ui.confirmRetract = id; ui.confirmDelete = null; break;
+      case 'retract-yes': {
+        var rtA = c && (c.assignments || []).filter(function (x) { return x.id === id; })[0]; if (!rtA) return;
+        ui.sending = rtA.id; render();
+        T.retractAssignment(c, rtA).then(function (r) {
+          ui.sending = null;
+          if (r.ok) { rtA.archivedAt = Date.now(); ui.confirmRetract = null; toast(r.remote ? t('guru.siklus.toast-ditarik', 'Tugas ditarik. Murid yang belum mengerjakan tidak melihatnya lagi.') : t('guru.siklus.toast-ditarik-lokal', 'Tugas ini hanya pernah dibagikan lewat kode, jadi hanya ditarik dari daftar ini.')); }
+          else toast(t('guru.siklus.toast-gagal-tarik', 'Gagal menarik tugas ({sebab}). Periksa koneksi lalu coba lagi.').replace('{sebab}', r.error || '?'));
+          persist(); render();
+        });
+        return;
+      }
+      /* Hapus hanya hidup di Arsip dan dua langkah: tombol pertama membuka konfirmasi di tempat.
+         Tugas yang masih berlaku bagi murid ikut ditarik supaya tidak tertinggal di HP mereka. */
+      case 'delete-assign': ui.confirmDelete = id; ui.confirmRetract = null; break;
+      case 'delete-yes': {
+        var dlA = c && (c.assignments || []).filter(function (x) { return x.id === id; })[0]; if (!dlA) return;
+        if (sudahDikirim(dlA) && !dlA.retractedAt) { try { T.retractAssignment(c, dlA).catch(function () {}); } catch (_) {} }
+        c.assignments = c.assignments.filter(function (a) { return a.id !== id; }); ui.confirmDelete = null;
+        toast(t('guru.siklus.toast-dihapus', 'Tugas dihapus permanen.'));
+        break;
+      }
       case 'mark-done': { var a = c.assignments.filter(function (x) { return x.id === id; })[0], sid = btn.getAttribute('data-sid'); if (a) { a.done = a.done || {}; a.done[sid] = { at: Date.now(), acc: T.skillAcc(student(sid) || {}, a.skills[0]) }; } saveMinutes(1); break; }
       case 'att': { var s3 = student(id), date = ui.attDate || T.today(); if (s3) { var v = btn.getAttribute('data-v'); s3.attendance[date] = s3.attendance[date] === v ? undefined : v; if (!s3.attendance[date]) delete s3.attendance[date]; if (v === 'H' && (!s3.lastActiveAt || T.today(s3.lastActiveAt) < date)) { /* kehadiran ≠ belajar mandiri; jangan ubah lastActiveAt */ } } saveMinutes(0.2); break; }
       case 'att-all': { var dt = ui.attDate || T.today(); c.students.forEach(function (s) { s.attendance[dt] = 'H'; }); saveMinutes(3); toast('Semua ditandai hadir. Ubah yang tidak hadir saja.'); break; }
-      case 'export-csv': download(c.name.replace(/\W+/g, '-') + '-siswa.csv', T.csvStudents(c), 'text/csv'); saveMinutes(10); toast('CSV diunduh.'); break;
+      case 'export-csv': {
+        var __scExp = null;
+        try { __scExp = teacherSubjectScope(); } catch (_) {}
+        var __rows = rekapRows(c);
+        var __head = ['Nama', 'Mapel', t('guru.rekap-akurasi-pct', 'Akurasi %'), t('guru.rekap-status-kkm', 'Status (KKM 75)'), 'Kehadiran 10x'];
+        var __csv = [__head].concat(__rows.map(function (r) { return [r.nama, r.mapel, r.akurasi == null ? '' : r.akurasi, r.status, r.kehadiran == null ? '' : Math.round(r.kehadiran * 100) + '%']; })).map(function (r) { return r.map(function (v) { return '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"'; }).join(','); }).join('\n');
+        var __fname = (c.name || 'kelas').replace(/\W+/g, '-') + '-' + ((__scExp && __scExp.locked) ? __scExp.active + '-' : '') + 'rekap.csv';
+        download(__fname, __csv, 'text/csv'); saveMinutes(10); toast('CSV rekap' + ((__scExp && __scExp.locked) ? ' ' + __scExp.active : '') + ' diunduh — siap dibuka di Excel / e-Rapor.');
+        break;
+      }
+      case 'export-rekap': {
+        var __sc2 = null;
+        try { __sc2 = teacherSubjectScope(); } catch (_) {}
+        var __rows2 = rekapRows(c);
+        var __mapel2 = (__sc2 && __sc2.locked) ? __sc2.active : (c.subject || '');
+        var __html = '<html><head><meta charset="utf-8"><title>Rekap Nilai ' + esc(c.name) + '</title><style>body{font-family:Georgia,serif;max-width:760px;margin:32px auto;padding:0 16px}table{width:100%;border-collapse:collapse;font-size:13px}th,td{border:1px solid #999;padding:6px 8px;text-align:left}th{background:#eee}h1{font-size:20px}h2{font-size:14px;color:#444}.rem{color:#B93F2A;font-weight:bold}.ok{color:#166052}</style></head><body>' +
+          '<h1>Rekap Nilai — ' + esc(c.name) + '</h1><h2>' + esc(__mapel2 + ' · ' + (st.teacher.school || '') + ' · ' + (st.teacher.name || 'Guru') + ' · KKM 75 · ' + new Date().toLocaleDateString('id-ID')) + '</h2>' +
+          '<table><thead><tr><th>No</th><th>Nama</th><th>Mapel</th><th>Nilai</th><th>Status</th></tr></thead><tbody>' +
+          __rows2.map(function (r, i) { return '<tr><td>' + (i + 1) + '</td><td>' + esc(r.nama) + '</td><td>' + esc(r.mapel) + '</td><td>' + (r.akurasi == null ? '—' : r.akurasi) + '</td><td class="' + (r.status === 'Remedial' ? 'rem' : 'ok') + '">' + esc(r.status) + '</td></tr>'; }).join('') +
+          '</tbody></table><p>' + esc(t('guru.rekap-cetak-note', 'Dicetak dari KelasKu untuk Guru — siap diunggah ke e-Rapor Kemendikbudristek.')) + '</p></body></html>';
+        var w2 = null;
+        try { w2 = window.open('', '_blank'); } catch (_) {}
+        if (w2) { w2.document.write(__html); w2.document.close(); try { w2.print(); } catch (_) {} } else { download(c.name.replace(/\W+/g, '-') + '-rekap.html', __html, 'text/html'); }
+        saveMinutes(10); persist(); return;
+      }
       case 'export-json': download('fiezel-kelasku-guru-cadangan.json', JSON.stringify(st), 'application/json'); return;
       case 'reset-all': if (!confirm(t('guru.konfirm-hapus-semua', 'Hapus SEMUA data KelasKu untuk Guru di perangkat ini?'))) return; st = T.defaults(); break;
       case 'copy-groups': { var g = T.studyGroups(c, ui.insightSkill); copy('Kelompok belajar ' + T.SKILL_LABEL[ui.insightSkill] + ' — ' + c.name + '\n' + g.map(function (x) { return 'Kelompok ' + x.no + ' (mentor: ' + x.mentor.s.name + '): ' + x.members.map(function (m) { return m.s.name; }).join(', '); }).join('\n'), t('guru.kelompok-tersalin', 'Daftar kelompok tersalin.')); saveMinutes(15); persist(); return; }
       case 'copy-all-parents': copy(c.students.map(function (s) { return '=== ' + s.name + ' ===\n' + T.parentReport(c, s, st.teacher); }).join('\n\n'), c.students.length + ' laporan tersalin.'); saveMinutes(c.students.length * 6); persist(); return;
       case 'print-weekly': { var w = window.open('', '_blank'); if (w) { w.document.write('<pre style="font:15px/1.5 Georgia,serif;white-space:pre-wrap;max-width:720px;margin:40px auto">' + esc(T.weeklyClassReport(c, st.teacher)) + '</pre>'); w.document.close(); w.print(); } saveMinutes(20); persist(); return; }
-      case 'assign-tab': { ui.assignTab = btn.getAttribute('data-tab'); persist(); render(); return; }
+      case 'create-assign-from-comp': {
+        var cSubject = ui.curriculumSubject || 'MAT';
+        try {
+          var __scBtn = teacherSubjectScope();
+          if (__scBtn && __scBtn.locked) cSubject = __scBtn.active;
+        } catch (_) {}
+        var code = btn.getAttribute('data-code') || '';
+        var cTit = btn.getAttribute('data-title') || '';
+        var cMode = btn.getAttribute('data-mode') || 'latihan';
+        ui.assignTab = 'mapel';
+        ui.assignSubject = cSubject;
+        ui.assignCompCode = code;
+        ui.assignCompTitle = cTit;
+        ui.assignMode = cMode;
+        ui.modal = {
+          kind: 'assign',
+          tab: 'mapel',
+          subjectId: cSubject,
+          compCode: code,
+          compTitle: cTit,
+          mode: cMode
+        };
+        break;
+      }
+      case 'seed-mapel': runSeedMapel(); return;
+      case 'seed-english': runSeedEnglish(); return;
+      case 'seed-soal': runSeedSoal(); return;
+      case 'refresh-curriculum': {
+        /* Satu tombol Muat Ulang menyegarkan KETIGA sumber panel (main), dengan
+           subjek mengikuti lisensi token (scope). */
+        ui.curriculumError = null;
+        var __rs = null;
+        try { __rs = teacherSubjectScope(); } catch (_) {}
+        var __rSub = (__rs && __rs.locked) ? __rs.active : (ui.curriculumSubject || 'MAT');
+        loadCurriculumTree(__rSub);
+        loadSeedStatus(true);
+        loadBankDepth(__rSub, true);
+        return;
+      }
+      case 'assign-tab': {
+        var __nt = btn.getAttribute('data-tab');
+        try {
+          var __scTab2 = teacherSubjectScope();
+          if (__scTab2 && __scTab2.locked && (__nt === 'curriculum' || __nt === 'skills')) { toast(t('guru.scope-tolak', 'Mapel itu di luar lisensi Anda — tugas dibatalkan.')); return; }
+        } catch (_) {}
+        ui.assignTab = __nt; persist(); render(); return;
+      }
       case 'assign-phase': { ui.curriculumPhase = btn.getAttribute('data-phase'); ui.curriculumUnitId = null; persist(); render(); return; }
       case 'assign-unit': { ui.curriculumUnitId = btn.getAttribute('data-unit'); persist(); render(); return; }
+      case 'select-bab': {
+        var bCode = btn.getAttribute('data-code');
+        var bTitle = btn.getAttribute('data-title') || '';
+        ui.assignCompCode = bCode;
+        ui.assignCompTitle = bTitle;
+        if (ui.modal && ui.modal.kind === 'assign') {
+          ui.modal.compCode = bCode;
+          ui.modal.compTitle = bTitle;
+        }
+        persist(); render(); return;
+      }
+      case 'filter-grade': {
+        var fGrade = btn.getAttribute('data-grade') || 'all';
+        ui.assignGradeFilter = fGrade;
+        persist(); render(); return;
+      }
+      case 'quick-count': {
+        var countReq = parseInt(btn.getAttribute('data-count'), 10) || 5;
+        var modalForm = el.querySelector('[data-tg-form="assign"]');
+        if (modalForm) {
+          var checkboxes = modalForm.querySelectorAll('[data-tg-check="q-select"]');
+          var checkedCount = 0;
+          checkboxes.forEach(function (cb, idx) {
+            cb.checked = (idx < countReq);
+            if (cb.checked) checkedCount++;
+          });
+          var countSel = modalForm.querySelector('[name="count"]');
+          if (countSel) {
+            var optFound = false;
+            for (var oi = 0; oi < countSel.options.length; oi++) {
+              if (parseInt(countSel.options[oi].value, 10) === checkedCount) {
+                countSel.selectedIndex = oi;
+                optFound = true;
+                break;
+              }
+            }
+            if (!optFound && checkedCount > 0) {
+              var newOpt = document.createElement('option');
+              newOpt.value = checkedCount;
+              newOpt.textContent = checkedCount;
+              newOpt.selected = true;
+              countSel.appendChild(newOpt);
+            }
+          }
+          var countLbl = modalForm.querySelector('[data-tg-q-count-label]');
+          if (countLbl) {
+            countLbl.textContent = checkedCount + ' ' + t('guru.soal-dipilih-pill', 'Soal Dipilih');
+          }
+        }
+        return;
+      }
       default: return;
     }
     persist(); render();
@@ -818,50 +4783,203 @@
     var form = e.target.closest ? e.target.closest('[data-tg-form]') : null; if (!form) return;
     e.preventDefault();
     var kind = form.getAttribute('data-tg-form'), fd = new FormData(form), c = cls(), T = S(), viaWa = e.submitter && e.submitter.name === 'wa';
-    if (kind === 'new-class') { var k = T.newClass(fd.get('name'), fd.get('level'), fd.get('subject')); st.classes.push(k); st.activeClassId = k.id; st.onboarded = true; ui.modal = null; st.view = 'classes'; toast('Kelas ' + k.name + ' dibuat. Kode: ' + k.code); if (S().syncAvailable() === 'ok') setTimeout(function () { syncAll(true); }, 400); }
-    else if (kind === 'edit-class' && c) { c.name = String(fd.get('name')).slice(0, 60); c.level = fd.get('level'); c.subject = fd.get('subject'); if (c.sync) c.sync.claimed = false; ui.modal = null; }
+    if (kind === 'new-class') {
+      var __reqSub = String(fd.get('subject') || '').trim().toUpperCase();
+      try {
+        var __scNew = teacherSubjectScope();
+        if (__scNew && __scNew.locked) {
+          if (__scNew.subjects.indexOf(__reqSub) < 0) {
+            toast(t('guru.scope-tolak', 'Mapel itu di luar lisensi Anda — tugas dibatalkan.'));
+            return;
+          }
+        }
+      } catch (_) {}
+      var k = T.newClass(fd.get('name'), fd.get('level'), fd.get('subject'));
+      var customCode = T.normalizeClassCode(fd.get('code'));
+      if (customCode) k.code = customCode;
+      st.classes.push(k); st.activeClassId = k.id; st.onboarded = true; ui.modal = null; st.view = 'classes';
+      toast('Kelas ' + k.name + ' dibuat. Kode: ' + k.code);
+      if (S().syncAvailable() === 'ok') setTimeout(function () { syncAll(true); }, 400);
+    }
+    else if (kind === 'edit-class' && c) {
+      c.name = String(fd.get('name')).slice(0, 60);
+      c.level = fd.get('level');
+      var __editSub = String(fd.get('subject') || '').trim().toUpperCase();
+      try {
+        var __scEdit = teacherSubjectScope();
+        if (__scEdit && __scEdit.locked && __scEdit.subjects.indexOf(__editSub) < 0) {
+          toast(t('guru.scope-tolak', 'Mapel itu di luar lisensi Anda — tugas dibatalkan.'));
+          return;
+        }
+      } catch (_) {}
+      c.subject = fd.get('subject');
+      var editCode = T.normalizeClassCode(fd.get('code'));
+      if (editCode && editCode !== c.code) { c.code = editCode; if (c.sync) c.sync.claimed = false; }
+      else if (c.sync) c.sync.claimed = false;
+      ui.modal = null;
+    }
     else if (kind === 'add-students' && c) { var names = T.parseNames(fd.get('names')), added = 0; names.forEach(function (n) { var fn = T.firstName(n); if (!c.students.some(function (s) { return s.name.toLowerCase() === fn.toLowerCase(); })) { c.students.push(T.newStudent(fn)); added++; } }); ui.modal = null; st.view = 'classes'; saveMinutes(added * 0.5); toast(added + ' siswa ditambahkan.'); }
     else if (kind === 'import-code' && c) { var p = T.parseLearnerCode(fd.get('code')); if (!p) { ui.modal = { kind: 'import-code', error: 'Kode tidak dikenali. Pastikan menyalin utuh "Kode hasil untuk tutor" dari murid.' }; render(); return; } var res = T.ingest(c, p); ui.modal = null; ui.drawer = res.student.id; saveMinutes(4 + res.graded.length * 5); toast('Hasil ' + res.student.name + ' masuk' + (res.graded.length ? ' · ' + res.graded.length + ' tugas dinilai otomatis' : '') + '.'); }
     else if (kind === 'assign' && c) {
-      var srcType = fd.get('assign_source') || 'curriculum';
-      var unitId = fd.get('unit_id');
-      var C = root.FiezelCurriculum;
-      var unit = (C && unitId) ? C.getUnit(unitId) : null;
-      var skills = fd.getAll('skills').slice(0, 3), targets = fd.getAll('targets'), customItems = [];
+      var srcType = fd.get('assign_source') || 'mapel';
+      var count = Number(fd.get('count')) || 5;
+      var mode = fd.get('mode') || 'latihan';
+      var timer = mode === 'ujian' ? (Number(fd.get('timer')) || 15) : 0;
+      var deadline = fd.get('deadline');
+      var targets = fd.get('scope') === 'all' ? null : fd.getAll('targets');
+      var customItems = [];
+      var skills = [];
+      var title = '';
       var kurikulumOnly = false;
-      if (srcType === 'curriculum' && unit) {
-        var count = Number(fd.get('count')) || 5;
-        var fitur = fd.getAll('features');
-        customItems = C.pickItems(unitId, count, { avoid: c.sentItemIds || [], features: fitur, subChapter: fd.get('sub_id') || '' });
-        skills = [unit.genre];
+      var sourceMeta = null;
+
+      if (srcType === 'mapel') {
+        var sId = fd.get('subject_id') || 'MAT';
+        var cCode = fd.get('comp_code') || '';
+        var cTitle = fd.get('comp_title') || '';
+        var mObj = MAPEL_LIST.filter(function (x) { return x.id === sId; })[0] || { name: sId };
+        title = fd.get('title') || (mObj.name + (cTitle ? ' · ' + cTitle : ' · ' + t('umum.tugas', 'Tugas') + ' ' + sId));
+        skills = [sId];
         kurikulumOnly = true;
+
+        var selQIndices = fd.getAll('selected_q_idx');
+        var qData = getMapelQuestionsForCompetency(sId, cCode);
+        var baseList = qData.items;
+
+        if (selQIndices && selQIndices.length > 0 && baseList && baseList.length > 0) {
+          customItems = [];
+          for (var si = 0; si < selQIndices.length; si++) {
+            var sIdx = parseInt(selQIndices[si], 10);
+            var src = baseList[sIdx];
+            if (src) {
+              var itemObj = {
+                id: (src.id || ('q-' + sId.toLowerCase() + '-' + (sIdx + 1))) + '-' + Math.random().toString(36).slice(2, 6),
+                prompt: src.prompt,
+                options: src.options.slice(),
+                answer: src.answer,
+                skill: (cCode || sId || 'mat').toLowerCase().replace(/[^a-z0-9_]/g, '_').slice(0, 32),
+                context: title,
+                why: Object.assign({}, src.why)
+              };
+              if (src.distractorWhy) itemObj.distractorWhy = Object.assign({}, src.distractorWhy);
+              var shuffled = shuffleOptions(itemObj, (Date.now() % 997) + si * 31 + sId.charCodeAt(0));
+              itemObj.options = shuffled.options;
+              itemObj.answer = shuffled.answer;
+              itemObj.why = shuffled.why;
+              if (shuffled.distractorWhy) itemObj.distractorWhy = shuffled.distractorWhy;
+              customItems.push(itemObj);
+            }
+          }
+          count = customItems.length;
+        } else {
+          customItems = synthesizeMapelQuestions(sId, cCode, cTitle, count);
+        }
+
+        sourceMeta = {
+          subjectId: sId,
+          subjectName: mObj.name,
+          compCode: cCode,
+          compTitle: cTitle
+        };
+      } else if (srcType === 'curriculum') {
+        var unitId = fd.get('unit_id');
+        var C = root.FiezelCurriculum;
+        var unit = (C && unitId) ? C.getUnit(unitId) : null;
+        if (unit) {
+          var fitur = fd.getAll('features');
+          customItems = C.pickItems(unitId, count, { avoid: c.sentItemIds || [], features: fitur, subChapter: fd.get('sub_id') || '' });
+          skills = [unit.genre];
+          kurikulumOnly = true;
+          title = fd.get('title') || unit.title;
+          sourceMeta = { unitId: unit.id, genre: unit.genre, grade: unit.grade, phaseId: unit.phaseId };
+        }
+      } else {
+        skills = fd.getAll('skills').slice(0, 3);
+        title = fd.get('title') || '';
       }
-      if (!skills.length && !customItems.length) { toast(t('guru.pilih-satu-skill', 'Pilih minimal satu skill atau bab kurikulum.')); return; }
+
+      if (!skills.length && !customItems.length) {
+        toast(t('guru.pilih-satu-skill', 'Pilih minimal satu skill atau bab kurikulum.'));
+        return;
+      }
+
       var a = T.buildAssignment({
-        title: fd.get('title') || (unit ? unit.title : ''),
+        title: title,
         skills: skills,
         items: customItems,
-        count: fd.get('count'),
-        deadline: fd.get('deadline'),
-        mode: fd.get('mode'),
+        count: count,
+        deadline: deadline,
+        mode: mode,
+        timer: timer,
         targets: targets,
+        teacher: (st && st.teacher && st.teacher.name) || 'Guru',
         avoid: c.sentItemIds,
         curriculumOnly: kurikulumOnly,
-        source: unit ? { unitId: unit.id, genre: unit.genre, grade: unit.grade, phaseId: unit.phaseId } : null
+        source: sourceMeta
       });
+      /* PILAR 1 GUARD: tugas yang diterbitkan saat scope terkunci wajib berlabel
+         subjek berlisensi — menolak penyelundupan mapel lain via DevTools. */
+      try {
+        var __scPub = teacherSubjectScope();
+        if (__scPub && __scPub.locked) {
+          var __sub = (sourceMeta && sourceMeta.subjectId) || (skills[0] || '');
+          __sub = validSubjectId(__sub) || null;
+          if (!__sub || __scPub.subjects.indexOf(__sub) < 0) {
+            toast(t('guru.scope-tolak', 'Mapel itu di luar lisensi Anda — tugas dibatalkan.'));
+            return;
+          }
+        }
+      } catch (_) {}
       c.assignments.push(a);
       c.sentItemIds = (c.sentItemIds || []).concat(a.itemIds).slice(-120);
+      /* PILAR 3 · penerbitan massal paralel: target_classes berisi id kelas tujuan.
+         Tugas yang sama (items/skills/mode/deadline identik, id baru) diterbitkan ke
+         tiap kelas paralel yang dicentang dalam 1 klik. Idempoten per kelas. */
+      var publishedTo = [c.id];
+      try {
+        var tcIds = fd.getAll ? fd.getAll('target_classes') : [];
+        if (tcIds && tcIds.length) {
+          st.classes.forEach(function (k) {
+            if (!k || k.id === c.id) return;
+            if (tcIds.indexOf(k.id) < 0) return;
+            var clone = T.buildAssignment({
+              title: title, skills: skills.slice(), items: (customItems || []).slice(),
+              count: count, deadline: deadline, mode: mode, timer: timer,
+              targets: null, teacher: (st && st.teacher && st.teacher.name) || 'Guru',
+              avoid: k.sentItemIds, curriculumOnly: kurikulumOnly, source: sourceMeta
+            });
+            /* items identik (prompt/opsi sama), id unik per kelas supaya sinkron
+               server tidak menganggapnya satu tugas yang sama. */
+            k.assignments = k.assignments || [];
+            k.assignments.push(clone);
+            k.sentItemIds = (k.sentItemIds || []).concat(clone.itemIds).slice(-120);
+            publishedTo.push(k.id);
+          });
+        }
+      } catch (_) {}
       st.view = 'assignments';
       ui.modal = { kind: 'share-assign', id: a.id };
       ui.drawer = null;
       saveMinutes(25);
-      if (unit) {
-        toast(t('guru.tugas-tersusun', 'Tugas tersusun:') + ' ' + a.itemIds.length + ' soal kurikulum (' + unit.genre + ').');
+      if (srcType === 'mapel') {
+        var sName = (sourceMeta && sourceMeta.subjectName) || 'Mapel';
+        toast(t('guru.tugas-mapel-tersusun', 'Tugas Kurikulum Nasional tersusun:') + ' ' + a.itemIds.length + ' soal ' + sName + (publishedTo.length > 1 ? ' · ' + publishedTo.length + ' kelas paralel.' : '.'));
+      } else if (srcType === 'curriculum') {
+        toast(t('guru.tugas-tersusun', 'Tugas tersusun:') + ' ' + a.itemIds.length + ' soal kurikulum' + (publishedTo.length > 1 ? ' · ' + publishedTo.length + ' kelas.' : '.'));
       } else {
-        toast(t('guru.tugas-tersusun', 'Tugas tersusun:') + ' ' + a.itemIds.length + ' soal dari bank FIEZEL.');
+        toast(t('guru.tugas-tersusun', 'Tugas tersusun:') + ' ' + a.itemIds.length + ' soal dari bank FIEZEL' + (publishedTo.length > 1 ? ' · ' + publishedTo.length + ' kelas.' : '.'));
       }
     }
-    else if (kind === 'announce' && c) { var text = String(fd.get('text')).trim(); c.announcements.push({ id: T.uid('an'), at: Date.now(), text: text }); form.reset(); ui.modal = null; saveMinutes(2); if (viaWa) window.open(T.waLink('', '📣 ' + c.name + '\n' + text), '_blank'); else copy(text, 'Pengumuman disimpan & tersalin.'); }
+    else if (kind === 'announce' && c) {
+      var text = String(fd.get('text')).trim();
+      c.announcements.push({ id: T.uid('an'), at: Date.now(), text: text });
+      c.latestAnnouncement = { text: text, at: Date.now(), teacher: (st.teacher && st.teacher.name) || 'Wali kelas' };
+      form.reset();
+      ui.modal = null;
+      saveMinutes(2);
+      if (viaWa) window.open(T.waLink('', '📣 ' + c.name + '\n' + text), '_blank');
+      else copy(text, 'Pengumuman disimpan & tersalin.');
+    }
     else if (kind === 'journal' && c) { c.journal.push({ id: T.uid('jr'), at: Date.now(), text: String(fd.get('text')).trim(), tags: fd.getAll('tags') }); form.reset(); toast('Refleksi tersimpan.'); }
     else if (kind === 'teacher') { st.teacher = { name: String(fd.get('name')).trim().slice(0, 40), school: String(fd.get('school')).trim().slice(0, 60) }; toast('Profil tersimpan.'); }
     else if (kind === 'phone') { var s = student(form.getAttribute('data-id')); if (s) { s.parentPhone = String(fd.get('phone')).replace(/[^\d+]/g, ''); toast('Kontak tersimpan.'); } }
@@ -870,7 +4988,91 @@
   }
   function onChange(e) {
     var sel = e.target;
+    if (sel.getAttribute('data-tg-check') === 'q-select') {
+      var modalForm = el.querySelector('[data-tg-form="assign"]');
+      if (modalForm) {
+        var cbs = modalForm.querySelectorAll('[data-tg-check="q-select"]');
+        var cnt = 0;
+        cbs.forEach(function (cb) { if (cb.checked) cnt++; });
+        var countSelect = modalForm.querySelector('[name="count"]');
+        if (countSelect) {
+          var found = false;
+          for (var ci = 0; ci < countSelect.options.length; ci++) {
+            if (parseInt(countSelect.options[ci].value, 10) === cnt) {
+              countSelect.selectedIndex = ci;
+              found = true;
+              break;
+            }
+          }
+          if (!found && cnt > 0) {
+            var nOpt = document.createElement('option');
+            nOpt.value = cnt;
+            nOpt.textContent = cnt;
+            nOpt.selected = true;
+            countSelect.appendChild(nOpt);
+          }
+        }
+        var cLbl = modalForm.querySelector('[data-tg-q-count-label]');
+        if (cLbl) {
+          cLbl.textContent = cnt + ' ' + t('guru.soal-dipilih-pill', 'Soal Dipilih');
+        }
+      }
+      return;
+    }
     if (sel.getAttribute('data-tg-select') === 'class') { st.activeClassId = sel.value; ui.drawer = null; persist(); render(); }
+    if (sel.getAttribute('data-tg-select') === 'curriculum-subject') {
+      try {
+        var __scCur = teacherSubjectScope();
+        if (__scCur && __scCur.locked && __scCur.subjects.indexOf(sel.value) < 0) {
+          toast(t('guru.scope-tolak', 'Mapel itu di luar lisensi Anda — tugas dibatalkan.'));
+          render();
+          return;
+        }
+      } catch (_) {}
+      ui.curriculumSubject = sel.value;
+      loadCurriculumTree(sel.value);
+      /* Kedalaman bank dihitung per mapel. Tanpa baris ini, pindah mapel meninggalkan
+         hitungan mapel SEBELUMNYA menempel pada kompetensi mapel baru — angka yang salah
+         tetapi terlihat meyakinkan. bankDepthSubject di panel menjaga ketidakcocokan itu
+         tidak pernah tergambar, dan panggilan ini yang membuatnya cocok lagi. */
+      loadBankDepth(sel.value, true);
+    }
+    if (sel.getAttribute('data-tg-select') === 'assign-subject') {
+      try {
+        var __scAs = teacherSubjectScope();
+        if (__scAs && __scAs.locked && __scAs.subjects.indexOf(sel.value) < 0) {
+          toast(t('guru.scope-tolak', 'Mapel itu di luar lisensi Anda — tugas dibatalkan.'));
+          render();
+          return;
+        }
+      } catch (_) {}
+      ui.assignSubject = sel.value;
+      ui.assignCompCode = '';
+      ui.assignCompTitle = '';
+      ui.assignGradeFilter = 'all';
+      if (ui.modal && ui.modal.kind === 'assign') {
+        ui.modal.subjectId = sel.value;
+        ui.modal.compCode = '';
+        ui.modal.compTitle = '';
+      }
+      if (ui.curriculumSubject !== sel.value) {
+        ui.curriculumSubject = sel.value;
+        loadCurriculumTree(sel.value);
+      }
+      persist(); render();
+    }
+    if (sel.getAttribute('data-tg-select') === 'assign-comp-select') {
+      var opt = sel.options[sel.selectedIndex];
+      var optCode = sel.value;
+      var optTitle = opt ? (opt.getAttribute('data-title') || '') : '';
+      ui.assignCompCode = optCode;
+      ui.assignCompTitle = optTitle;
+      if (ui.modal && ui.modal.kind === 'assign') {
+        ui.modal.compCode = optCode;
+        ui.modal.compTitle = optTitle;
+      }
+      persist(); render();
+    }
     /* Ganti bab = sub-bab lama tidak berlaku lagi. Membiarkannya membuat guru mengira
        sedang memilih "1.2 Simple Present" padahal bab yang dipilih sudah berbeda. */
     if (sel.getAttribute('data-tg-select') === 'unit') { ui.curriculumUnitId = sel.value; ui.curriculumSub = ''; persist(); render(); }
@@ -885,5 +5087,9 @@
   }
   function download(name, text, type) { try { var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type: type || 'text/plain' })); a.download = name; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 800); } catch (_) { copy(text, 'Unduhan tidak didukung — isi tersalin.'); } }
 
-  root.FiezelTeacherShell = { mount: mount, unmount: unmount, render: render, previewAllowed: previewAllowed, exitPreview: exitPreview, _state: function () { return st; }, _autoSyncPlan: autoSyncPlan, _syncTicks: function () { return { every: SYNC_EVERY_MS, chip: CHIP_TICK_MS, stuck: (root.FiezelSyncPlan && root.FiezelSyncPlan.STUCK_MS) || 45000 }; }, _armed: function () { return !!syncTimer && !!chipTimer; } };
+  root.FiezelTeacherShell = { mount: mount, unmount: unmount, render: render, previewAllowed: previewAllowed, ensureCss: ensureCss, exitPreview: exitPreview, _state: function () { return st; }, _autoSyncPlan: autoSyncPlan, _syncTicks: function () { return { every: SYNC_EVERY_MS, chip: CHIP_TICK_MS, stuck: (root.FiezelSyncPlan && root.FiezelSyncPlan.STUCK_MS) || 45000 }; }, _armed: function () { return !!syncTimer && !!chipTimer; }, _synthesizeMapelQuestions: synthesizeMapelQuestions, _MAPEL_LIST: MAPEL_LIST, _MAPEL_CATALOG: MAPEL_CATALOG, _teacherSubjectScope: teacherSubjectScope, _scopeMapelList: scopeMapelList, _assignmentSubject: assignmentSubject, _isAssignmentVisible: isAssignmentVisible, _remedialGroups: remedialGroups, _rekapRows: rekapRows, _subjectScopeBadge: subjectScopeBadge, /* m025-357: panel kurikulum dibuka untuk gerbang supaya HTML-nya bisa diperiksa
+        sungguhan, bukan lewat regex atas sumbernya. `_ui` menyertainya karena panel
+        ini dikendalikan keadaan muat (pohon, status semai, kedalaman bank) dan tanpa
+        akses ke sana gerbang hanya bisa menguji satu keadaan dari lima. */
+    _kurikulumPanel: kurikulumPanel, _ui: function () { return ui; } };
 })(typeof window !== 'undefined' ? window : null);

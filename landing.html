@@ -11,11 +11,159 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#FFF9EE">
-  <title>FIEZEL — Platform Belajar Bahasa Cerdas untuk Murid &amp; Guru</title>
-  <meta name="description" content="FIEZEL adalah platform belajar bahasa cerdas dan adaptif. Bahasa Inggris &amp; Jepang. Vocabulary, Grammar, Reading, Listening, Speaking. AI Tutor &amp; Teacher Dashboard.">
-  <meta property="og:title" content="FIEZEL — Learning That Learns You.">
-  <meta property="og:description" content="Platform belajar bahasa cerdas untuk murid &amp; guru. Bahasa Inggris &amp; Jepang, adaptif, dengan AI tutor.">
-  <meta property="og:image" content="assets/shots/teacher-desktop.png">
+  <title>FIEZEL — Belajar Bahasa Inggris &amp; Jepang untuk Indonesia &amp; Thailand</title>
+  <meta name="description" content="FIEZEL adalah platform belajar bahasa Inggris dan Jepang adaptif berbasis AI untuk pelajar Indonesia dan Thailand. Vocabulary, Grammar, Reading, Speaking, Listening, AI Tutor, serta KelasKu untuk Guru yang menyambungkan tugas kelas ke Kurikulum Nasional. Gratis, bisa dipakai offline.">
+  <meta name="keywords" content="FIEZEL, belajar bahasa Inggris, belajar bahasa Jepang, aplikasi bahasa Inggris, aplikasi bahasa Jepang, English learning, Japanese learning, adaptive learning, vocabulary, grammar, CEFR, JLPT, Indonesia, Thailand, เรียนภาษาอังกฤษ, เรียนภาษาญี่ปุ่น">
+  <meta name="author" content="FIEZEL">
+  <!-- Berkas ini diterbitkan ke ~/public_html/app/, jadi URL-nya /app/landing.html.
+       Kanonik lamanya menunjuk https://fiezel.my.id/landing.html — alamat yang TIDAK PERNAH
+       ada, karena root domain disajikan dari website/. Kanonik ke 404 membuat Google
+       membuang halamannya sama sekali, bukan menggabungkannya. hreflang dicabut dengan
+       alasan yang sama seperti index.html: id dan th dulu menunjuk URL yang identik.
+       Dijaga tests/seo-surface-gate-test.js cek (B) dan (C). -->
+  <link rel="canonical" href="https://fiezel.my.id/app/landing.html">
+  <!-- SEO: Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://fiezel.my.id/app/landing.html">
+  <meta property="og:title" content="FIEZEL — Belajar Bahasa Inggris &amp; Jepang, Adaptif &amp; Gratis">
+  <meta property="og:description" content="Platform belajar bahasa Inggris dan Jepang adaptif berbasis AI untuk pelajar Indonesia dan Thailand. Vocabulary, Grammar, Reading, Speaking, Listening, AI Tutor, dan Teacher Dashboard.">
+  <meta property="og:image" content="https://fiezel.my.id/assets/brand/fiezel-icon-512.png">
+  <meta property="og:site_name" content="FIEZEL">
+  <meta property="og:locale" content="id_ID">
+  <meta property="og:locale:alternate" content="th_TH">
+  <!-- SEO: Twitter/X Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="FIEZEL — Belajar Bahasa Inggris &amp; Jepang, Adaptif &amp; Gratis">
+  <meta name="twitter:description" content="Platform belajar bahasa Inggris dan Jepang adaptif berbasis AI. Untuk pelajar Indonesia dan Thailand. Vocabulary, Grammar, Speaking, Listening, AI Tutor — Gratis!">
+  <meta name="twitter:image" content="https://fiezel.my.id/assets/brand/fiezel-icon-512.png">
+  <!-- SEO: Structured Data JSON-LD (Schema.org) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "@id": "https://fiezel.my.id/#app",
+        "name": "FIEZEL",
+        "alternateName": ["Fiezel", "FIEZEL App", "แอปเรียนภาษา FIEZEL"],
+        "url": "https://fiezel.my.id/app/",
+        "description": "FIEZEL adalah platform belajar bahasa adaptif berbasis AI untuk pelajar di Indonesia dan Thailand. Tersedia kursus Bahasa Inggris (CEFR A1–C2) dan Bahasa Jepang (JLPT N5–N4). Vocabulary, Grammar, Reading, AI Tutor, dan Teacher Dashboard; Speaking dan Listening tersedia untuk kursus Inggris. Gratis dan bisa dipakai offline.",
+        "applicationCategory": "EducationalApplication",
+        "operatingSystem": ["Web", "Android", "iOS"],
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "IDR",
+          "availability": "https://schema.org/InStock"
+        },
+        "featureList": [
+          "Kursus Bahasa Inggris adaptif (CEFR A1–C2)",
+          "Kursus Bahasa Jepang adaptif (JLPT N5–N4)",
+          "Vocabulary adaptif dengan spaced repetition",
+          "Grammar interaktif dengan penjelasan berbahasa Indonesia dan Thai",
+          "Reading comprehension berjenjang",
+          "Speaking practice dengan AI feedback (kursus Inggris)",
+          "Listening dengan neural voice lokal offline (kursus Inggris)",
+          "Tes penempatan CEFR otomatis",
+          "AI Tutor personal",
+          "Teacher Dashboard untuk guru",
+          "Tugas kelas yang menempel bab Kurikulum Nasional (15 bab, 115 soal, kelas 7–12)",
+          "Duel Belajar antar murid",
+          "Offline-first PWA",
+          "Gratis tanpa biaya"
+        ],
+        "inLanguage": ["id", "th", "en", "ja"],
+        "audience": {
+          "@type": "EducationalAudience",
+          "educationalRole": ["student", "teacher"],
+          "geographicArea": [
+            { "@type": "Country", "name": "Indonesia" },
+            { "@type": "Country", "name": "Thailand" }
+          ]
+        },
+        "image": "https://fiezel.my.id/assets/brand/fiezel-icon-512.png",
+        "screenshot": "https://fiezel.my.id/assets/shots/home-desktop.png"
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Apa itu FIEZEL?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "FIEZEL adalah platform belajar bahasa adaptif berbasis AI untuk pelajar di Indonesia dan Thailand. FIEZEL menyediakan kursus Bahasa Inggris dan Bahasa Jepang dengan fitur Vocabulary, Grammar, Reading, Speaking, Listening, AI Tutor personal, dan Teacher Dashboard. Platform ini disesuaikan dengan kemampuan masing-masing pelajar secara otomatis. Dapat diakses gratis di fiezel.my.id dan bisa digunakan offline sebagai PWA."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Bahasa apa saja yang bisa dipelajari di FIEZEL?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "FIEZEL menyediakan kursus dua bahasa: (1) Bahasa Inggris (English) — dari level A1 hingga B2 CEFR, mencakup Vocabulary, Grammar, Reading, Speaking, Listening, dan tes CEFR otomatis; (2) Bahasa Jepang (Japanese/日本語) — dari level N5 hingga N3 JLPT, mencakup Hiragana, Katakana, Kanji, Grammar, Vocabulary, dan tes JLPT."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Apakah FIEZEL tersedia untuk pengguna di Thailand?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Ya, FIEZEL tersedia untuk pengguna di Thailand (ประเทศไทย). Platform ini mendukung antarmuka dan konten dalam bahasa Thailand (ภาษาไทย), sehingga pelajar di Thailand dapat belajar Bahasa Inggris dan Bahasa Jepang dengan nyaman menggunakan FIEZEL."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Apakah FIEZEL bisa dipakai guru dan sekolah?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Bisa, lewat KelasKu untuk Guru: membuat ruang kelas, menerbitkan tugas yang menempel bab dan sub-bab Kurikulum Nasional, melihat analitik per murid dan per kompetensi, serta membagikan rapor orang tua. Perlu dicatat apa adanya: bank kurikulumnya berisi 15 bab dan 115 soal untuk kelas 7–12, jadi ia alat guru menerbitkan tugas, bukan sumber materi kurikulum utama. Kapasitas terpasang 250 pengguna — cukup untuk satu kelas, belum cukup untuk satu sekolah. Selengkapnya di https://fiezel.my.id/untuk-sekolah.html"
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Apakah FIEZEL gratis?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Ya, FIEZEL sepenuhnya gratis untuk semua pengguna di Indonesia maupun Thailand. Semua fitur termasuk kursus Bahasa Inggris, Bahasa Jepang, AI Tutor, dan Teacher Dashboard tersedia tanpa biaya apapun."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Fitur apa saja yang ada di FIEZEL?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Fitur FIEZEL: (1) Kursus Bahasa Inggris adaptif A1–B2 CEFR, (2) Kursus Bahasa Jepang adaptif N5–N3 JLPT, (3) Vocabulary dengan spaced repetition, (4) Grammar interaktif, (5) Reading comprehension, (6) Speaking dengan AI feedback, (7) Listening dengan neural TTS offline, (8) Tes diagnostik CEFR dan JLPT otomatis, (9) AI Tutor personal 24/7, (10) Teacher Dashboard untuk guru, (11) Duel Belajar antar murid, (12) Bisa digunakan offline sebagai PWA."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Bagaimana cara menggunakan FIEZEL?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Cara menggunakan FIEZEL: (1) Buka fiezel.my.id di browser, (2) Install sebagai aplikasi PWA untuk akses offline, (3) Daftar atau masuk dengan Google, (4) Pilih bahasa yang ingin dipelajari: Bahasa Inggris atau Bahasa Jepang, (5) Ikuti tes diagnostik otomatis, (6) Mulai belajar sesuai rekomendasi adaptif."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Apakah FIEZEL bisa digunakan tanpa internet?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Ya, FIEZEL adalah Progressive Web App (PWA) yang bisa diinstall dan digunakan sebagian besar fiturnya tanpa koneksi internet, termasuk vocabulary, grammar, reading, dan listening dengan neural voice lokal yang sudah diunduh."
+            }
+          }
+        ]
+      },
+      {
+        "@type": "WebPage",
+        "url": "https://fiezel.my.id/app/landing.html",
+        "name": "FIEZEL — Belajar Bahasa Inggris dan Jepang untuk Indonesia dan Thailand",
+        "description": "Platform belajar bahasa Inggris dan Jepang adaptif berbasis AI untuk pelajar Indonesia dan Thailand.",
+        "inLanguage": ["id", "th"],
+        "isPartOf": { "@id": "https://fiezel.my.id/#website" }
+      }
+    ]
+  }
+  </script>
 
   <!-- Preload fonts & assets -->
   <link rel="preload" href="assets/fonts/PlusJakartaSans-700.woff2" as="font" type="font/woff2" crossorigin>
@@ -1053,7 +1201,7 @@
             <span class="t-benefit-icon">📋</span>
             <div>
               <h4 data-i18n="teach.b2-title">Tugas &amp; Ujian Dinilai Otomatis</h4>
-              <p data-i18n="teach.b2-desc">Buat kuis mini atau latihan dari ribuan bank soal kurikulum, hasil terkoreksi instan tanpa koreksi manual.</p>
+              <p data-i18n="teach.b2-desc">Terbitkan tugas yang menempel bab Kurikulum Nasional — pilih Fase, bab, sub-bab, lalu fitur bahasanya. Hasil terkoreksi instan tanpa koreksi manual.</p>
             </div>
           </div>
 
@@ -1172,7 +1320,7 @@
         'teach.title': 'KelasKu untuk Guru: Dasbor Manajemen Kelas Cerdas',
         'teach.lead': 'Bebaskan guru dari beban administrasi manual. Pantau kemajuan siswa, deteksi dini siswa tertinggal, dan bagikan tugas dalam hitungan detik.',
         'teach.b1-title': 'Deteksi Dini Siswa Tertinggal', 'teach.b1-desc': 'Algoritma langsung menandai siswa yang memerlukan perhatian khusus sebelum mereka tertinggal jauh.',
-        'teach.b2-title': 'Tugas & Ujian Dinilai Otomatis', 'teach.b2-desc': 'Buat kuis mini atau latihan dari ribuan bank soal kurikulum, hasil terkoreksi instan tanpa koreksi manual.',
+        'teach.b2-title': 'Tugas & Ujian Dinilai Otomatis', 'teach.b2-desc': 'Terbitkan tugas yang menempel bab Kurikulum Nasional — pilih Fase, bab, sub-bab, lalu fitur bahasanya. Hasil terkoreksi instan tanpa koreksi manual.',
         'teach.b3-title': 'Kartu Sapa & Laporan Wali Murid', 'teach.b3-desc': 'Kirim apresiasi atau laporan perkembangan belajar ke WhatsApp orang tua hanya dengan satu klik.',
         'teach.cta': 'Buka Demo <span class="kelasku-brand"><span class="kelasku-main">KelasKu</span> <span class="kelasku-tag">untuk Guru</span></span> →',
         'articles.kicker': 'Wawasan Pembelajaran',
@@ -1225,7 +1373,7 @@
         'teach.title': 'FIEZEL KelasKu สำหรับครู: แดชบอร์ดจัดการชั้นเรียนอัจฉริยะ',
         'teach.lead': 'ปลดปล่อยครูจากภาระงานเอกสาร ติดตามความก้าวหน้า ตรวจจับนักเรียนที่ต้องการความช่วยเหลือ และมอบหมายงานในไม่กี่วินาที',
         'teach.b1-title': 'ตรวจจับนักเรียนที่เสี่ยงตามไม่ทัน', 'teach.b1-desc': 'อัลกอริทึมแจ้งเตือนนักเรียนที่ต้องการการดูแลเป็นพิเศษทันทีก่อนจะตามไม่ทัน',
-        'teach.b2-title': 'ตรวจการบ้านและข้อสอบอัตโนมัติ', 'teach.b2-desc': 'สร้างแบบทดสอบย่อยจากคลังข้อสอบตามหลักสูตร ตรวจผลทันทีโดยไม่ต้องตรวจมือ',
+        'teach.b2-title': 'ตรวจการบ้านและข้อสอบอัตโนมัติ', 'teach.b2-desc': 'เผยแพร่การบ้านที่ยึดกับบทในหลักสูตรแกนกลาง — เลือกช่วงชั้น บท บทย่อย แล้วจุดภาษา ตรวจผลทันทีโดยไม่ต้องตรวจมือ',
         'teach.b3-title': 'การ์ดทักทายและรายงานผู้ปกครอง', 'teach.b3-desc': 'ส่งคำชมหรือรายงานพัฒนาการไปยัง WhatsApp ของผู้ปกครองได้ในคลิกเดียว',
         'teach.cta': 'เปิดดูเดโม KelasKu สำหรับครู →',
         'articles.kicker': 'มุมมองการเรียนรู้',

@@ -129,6 +129,44 @@
   // jadi nomornya harus punya nama - angka lepas di dalam bind() adalah persis yang patah
   // ketika penomoran bergeser.
   var PLACEMENT_STEP = 4;
+  /* m025-367 OWNER: "pilihan kursus apa yang ingin dipelajari murid, langsung muncul
+     pilihannya di onboarding — Bahasa Jepang dan Bahasa Inggris". Nomornya 7 karena nomor
+     langkah adalah IDENTITAS (dipakai paint, data-ob-step, dan gate regresi), bukan urutan;
+     urutannya milik LEAN_SEQUENCE/FULL_SEQUENCE di bawah. */
+  // SVG Flags untuk konsistensi visual lintas platform (khususnya Windows yang tidak
+  // merender emoji bendera negara melainkan huruf regional indicator 'ID' / 'TH').
+  var FLAG_ID = '<svg class="fiezel-flag-svg" viewBox="0 0 36 24" width="36" height="24" aria-hidden="true" focusable="false">'
+    + '<rect width="36" height="12" fill="#E70011"/>'
+    + '<rect y="12" width="36" height="12" fill="#FFFFFF"/>'
+    + '</svg>';
+
+  var FLAG_TH = '<svg class="fiezel-flag-svg" viewBox="0 0 36 24" width="36" height="24" aria-hidden="true" focusable="false">'
+    + '<rect width="36" height="24" fill="#A51931"/>'
+    + '<rect y="4" width="36" height="16" fill="#FFFFFF"/>'
+    + '<rect y="8" width="36" height="8" fill="#2D2A4A"/>'
+    + '</svg>';
+
+  var FLAG_EN = '<svg class="fiezel-flag-svg" viewBox="0 0 60 40" width="36" height="24" aria-hidden="true" focusable="false">'
+    + '<clipPath id="fz-flag-en"><rect width="60" height="40"/></clipPath>'
+    + '<g clip-path="url(#fz-flag-en)">'
+    + '<path d="M0 0v40h60V0z" fill="#012169"/>'
+    + '<path d="M0 0l60 40m0-40L0 40" stroke="#fff" stroke-width="6.67"/>'
+    + '<path d="M0 0l60 40m0-40L0 40" stroke="#c8102e" stroke-width="4.44"/>'
+    + '<path d="M30 0v40M0 20h60" stroke="#fff" stroke-width="11.11"/>'
+    + '<path d="M30 0v40M0 20h60" stroke="#c8102e" stroke-width="6.67"/>'
+    + '</g></svg>';
+
+  var FLAG_JA = '<svg class="fiezel-flag-svg" viewBox="0 0 36 24" width="36" height="24" aria-hidden="true" focusable="false">'
+    + '<rect width="36" height="24" fill="#FFFFFF"/>'
+    + '<circle cx="18" cy="12" r="7.2" fill="#BC002D"/>'
+    + '</svg>';
+
+  var COURSE_STEP = 7;
+  var COURSES = Object.freeze([
+    Object.freeze({ id: 'en', flag: FLAG_EN, titleKey: 'onboarding.course-en', descKey: 'onboarding.course-en-desc' }),
+    Object.freeze({ id: 'ja', flag: FLAG_JA, titleKey: 'onboarding.course-ja', descKey: 'onboarding.course-ja-desc' })
+  ]);
+  function normalizeCourse(v) { return v === 'ja' || v === 'en' ? v : ''; }
 
   /* m025-246 — PERKENALAN RINGKAS (<=3 LAYAR).
      ==========================================================================
@@ -177,8 +215,10 @@
     }
     return UX_OB_FALLBACK[flag] === true;
   }
-  var LEAN_SEQUENCE = Object.freeze([NAME_STEP, 3, PLACEMENT_STEP]);
-  var FULL_SEQUENCE = Object.freeze([1, 2, 3, 4, 5, 6]);
+  /* m025-367: langkah kursus berdiri tepat sesudah nama — kursus yang dipilih menentukan
+     bank soal tes penempatan, jadi ia harus sudah pasti sebelum tujuan dan tes. */
+  var LEAN_SEQUENCE = Object.freeze([NAME_STEP, COURSE_STEP, 3, PLACEMENT_STEP]);
+  var FULL_SEQUENCE = Object.freeze([1, COURSE_STEP, 2, 3, 4, 5, 6]);
   /** Urutan langkah yang berlaku. Dibaca saat show() dipanggil, bukan saat modul
    *  dievaluasi: bendera bisa mendarat setelah berkas ini diurai. */
   function stepSequence() { return uxOn('leanIntro') ? LEAN_SEQUENCE : FULL_SEQUENCE; }
@@ -237,23 +277,11 @@
     } catch (_) { return false; }
   }
 
-  // Peran pengguna: 'murid' (bawaan) atau 'guru'. Guru melompati langkah tujuan/penempatan/
-  // jadwal (itu langkah belajar) dan mendarat di Tutor Action Center.
+  // Peran pengguna: 'murid' (bawaan) atau 'guru'. Sejak m025-367 perannya dipilih di layar
+  // masuk (features/auth/fiezel-auth-screen.js), bukan di sini; catatan lama tetap dibaca.
   var ROLES = ['murid', 'guru'];
   function normalizeRole(v) { v = String(v || '').toLowerCase(); return ROLES.indexOf(v) === -1 ? 'murid' : v; }
   function storedRole(env) { var r = readRecord(env); return normalizeRole(r && r.role); }
-  function roleMarkup(selected) {
-    var cards = [
-      ['murid', T('onboarding.role-murid'), T('onboarding.role-murid-desc')],
-      ['guru', T('onboarding.role-guru'), T('onboarding.role-guru-desc')]
-    ];
-    return '<div class="fiezel-role-grid" role="radiogroup" aria-label="' + T('onboarding.role-aria') + '">'
-      + cards.map(function (c) {
-        var on = c[0] === selected;
-        return '<button type="button" role="radio" aria-checked="' + (on ? 'true' : 'false') + '" class="fiezel-goal-card fiezel-role-card' + (on ? ' is-selected' : '') + '" data-ob-role="' + c[0] + '" data-testid="ob-role-' + c[0] + '">'
-          + '<strong>' + c[1] + '</strong><span>' + c[2] + '</span></button>';
-      }).join('') + '</div>';
-  }
   function readRecord(env) {
     try {
       var store = env && env.localStorage;
@@ -279,6 +307,18 @@
   function storedLocale(env) {
     var record = readRecord(env);
     return normalizeLocale(record && record.locale);
+  }
+
+  /** Kursus yang dipilih di langkah kursus (m025-367), atau '' bila belum pernah dipilih. */
+  function storedCourse(env) {
+    var record = readRecord(env);
+    return normalizeCourse(record && record.course);
+  }
+
+  /** Kode kelas yang dimasukkan murid, atau '' bila tidak ada. */
+  function storedClassCode(env) {
+    var record = readRecord(env);
+    return String((record && record.classCode) || '');
   }
 
   /**
@@ -329,7 +369,8 @@
         goal: String((detail && detail.goal) || ''),
         level: String((detail && detail.level) || ''),
         role: normalizeRole((detail && detail.role) || previous.role),
-        classCode: String((detail && detail.classCode) || previous.classCode || '')
+        classCode: String((detail && detail.classCode) || previous.classCode || ''),
+        course: normalizeCourse((detail && detail.course) || previous.course)
       }));
     } catch (_) { /* penyimpanan penuh tidak boleh mengurung murid di onboarding */ }
   }
@@ -369,11 +410,20 @@
   // render() - kalau suatu hari langkah ditambah, daftar ini yang pertama harus ikut.
   var STEP_LABEL_KEYS = [
     'onboarding.step-name', 'onboarding.step-intro', 'onboarding.step-goal',
-    'onboarding.step-level', 'onboarding.step-reminder', 'onboarding.step-done'
+    'onboarding.step-level', 'onboarding.step-reminder', 'onboarding.step-done',
+    'onboarding.step-course'
   ];
 
   function stepLabels() {
     return STEP_LABEL_KEYS.map(function (key) { return T(key); });
+  }
+
+  /* Kontur topografi identik dengan auth login live (fiezel-auth-screen.js). */
+  var TOPO = 'M121 120C122 123 118 128 115 131C112 133 106 134 102 134C98 135 94 136 90 135C85 135 76 135 74 132C72 130 77 124 77 120C78 116 77 113 79 110C81 107 84 103 88 102C92 101 100 101 103 103C107 104 107 109 110 112C113 115 121 117 121 120Z|M146 120C147 126 140 137 134 141C127 146 116 144 107 147C98 149 90 155 82 155C73 154 59 149 55 143C52 137 57 127 58 120C59 113 59 107 63 101C66 95 72 83 80 81C88 79 101 86 109 89C117 93 120 98 127 103C133 108 145 114 146 120Z|M171 120C172 131 164 146 154 153C144 159 126 154 112 159C98 163 83 180 71 179C59 178 45 162 39 152C33 142 35 130 35 120C36 110 38 101 44 91C50 80 59 60 70 58C82 56 100 73 113 78C126 84 139 83 149 90C159 97 171 109 171 120Z|M197 120C197 135 188 156 175 165C161 173 137 166 118 173C99 180 75 210 60 208C44 205 33 175 25 161C16 146 10 134 9 120C9 106 14 93 22 78C31 64 44 35 60 34C76 32 98 61 118 68C137 75 163 66 177 74C190 83 198 105 197 120Z|M225 120C223 140 209 163 193 175C177 187 151 183 126 193C102 203 67 240 48 236C28 232 21 188 10 169C-1 150 -16 138 -19 120C-21 102 -16 81 -4 63C7 45 30 13 51 12C72 11 97 47 123 55C149 62 190 46 207 57C224 68 228 100 225 120Z|M257 120C252 144 228 167 208 183C188 200 167 209 138 221C110 234 62 268 37 261C13 254 6 203 -8 179C-22 156 -42 142 -47 120C-52 98 -53 65 -38 44C-23 23 16 -3 44 -4C73 -6 99 28 131 35C163 43 217 26 238 40C259 54 262 96 257 120Z|M292 120C284 148 243 167 220 190C197 214 186 244 154 259C122 274 60 291 29 280C-1 269 -14 219 -31 192C-49 166 -69 148 -76 120C-84 92 -97 44 -77 22C-58 -1 4 -11 40 -14C77 -16 105 1 143 7C181 13 242 5 266 23C291 42 299 92 292 120Z|M328 120C318 152 259 167 233 197C207 228 208 289 173 305C138 320 63 309 24 293C-15 277 -38 237 -60 208C-82 180 -98 155 -108 120C-118 85 -144 21 -120 -2C-96 -26 -8 -14 38 -19C85 -24 116 -35 159 -30C201 -26 265 -17 293 8C321 34 338 88 328 120Z|M349 70C349 73 346 76 344 78C341 80 338 79 334 81C331 82 325 88 323 88C320 87 319 80 318 77C316 74 314 73 313 70C313 67 313 64 315 61C316 59 320 54 323 54C326 54 330 60 334 61C338 62 344 59 347 60C350 62 350 67 349 70Z|M371 70C369 76 361 80 356 85C351 89 348 93 341 96C334 100 321 108 315 106C309 104 308 90 305 84C302 78 296 76 295 70C293 64 291 55 295 50C298 45 310 40 318 40C325 40 330 48 339 49C347 51 361 46 366 49C372 53 372 64 371 70Z|M395 70C392 79 374 82 367 91C359 99 360 114 351 119C341 124 319 125 309 121C299 116 295 102 289 93C283 85 278 80 275 70C272 60 263 42 269 36C276 29 301 31 314 30C326 30 334 30 346 32C358 33 378 32 386 38C394 45 398 61 395 70Z|M422 70C417 82 389 84 379 98C369 111 376 144 363 150C351 156 319 141 304 134C288 126 277 116 268 105C259 94 255 84 250 70C245 56 230 27 240 19C250 11 291 25 310 23C330 21 340 5 357 6C373 7 397 15 408 26C418 37 427 58 422 70Z|M446 70C440 86 408 89 397 108C386 127 393 177 377 183C361 189 321 156 299 145C277 134 259 130 245 118C232 106 223 89 218 70C212 51 198 13 213 3C227 -6 280 18 307 14C333 9 349 -24 369 -24C390 -24 417 -2 430 13C442 29 451 54 446 70Z|M315 300C315 302 312 303 311 306C309 309 309 315 306 315C304 316 299 312 296 310C293 309 290 309 288 307C286 305 284 303 283 300C283 297 282 293 285 291C287 290 293 293 297 292C300 291 303 286 306 286C309 286 312 290 314 292C315 294 316 298 315 300Z|M328 300C328 305 330 310 327 316C325 321 319 329 313 330C307 331 297 324 291 321C285 319 280 318 275 314C269 311 261 305 260 300C260 295 267 288 272 284C278 281 285 282 292 280C298 278 306 270 312 271C318 271 327 278 330 283C332 288 329 295 328 300Z|M341 300C342 310 358 323 354 330C350 338 330 343 318 344C307 345 295 340 285 337C275 333 267 330 258 324C249 318 228 307 229 300C230 293 254 286 263 279C272 273 274 265 284 261C293 256 308 252 319 254C330 256 345 265 349 272C352 280 340 290 341 300Z'.split('|');
+
+  function topo() {
+    return '<svg class="fz-auth-topo" viewBox="0 0 390 420" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">'
+      + TOPO.map(function (d) { return '<path d="' + d + '"/>'; }).join('') + '</svg>';
   }
 
   // Band gelap pembawa merek. Warnanya sama dengan panggung splash yang baru saja tutup,
@@ -385,7 +435,7 @@
     var brand = env && env.FiezelSplash && typeof env.FiezelSplash.wordmarkMarkup === 'function'
       ? env.FiezelSplash.wordmarkMarkup('fzob')
       : '<p class="fiezel-ob-word">FIEZEL</p>';
-    return '<div class="fiezel-ob-reveal">' + brand
+    return '<div class="fiezel-ob-reveal">' + topo() + brand
       + '<p class="fiezel-ob-tag">' + escapeHtml(T('onboarding.brand-tag')) + '</p></div>';
   }
 
@@ -403,8 +453,10 @@
   function stepper(step) {
     var labels = sequenceLabels();
     var seq = stepSequence();
-    var pos = 0;
-    for (var s = 0; s < seq.length; s++) if (seq[s] <= (Number(step) || 1)) pos = s;
+    var pos = seq.indexOf(Number(step) || 1);
+    /* Urutan tidak lagi naik (langkah kursus bernomor 7 duduk di posisi kedua), jadi posisi
+       dicari persis; nomor di luar urutan jatuh ke langkah terdekat yang lebih kecil. */
+    if (pos < 0) { pos = 0; for (var s = 0; s < seq.length; s++) if (seq[s] <= (Number(step) || 1) && seq[s] !== COURSE_STEP) pos = s; }
     var current = Math.min(labels.length, Math.max(1, pos + 1));
     var bars = '';
     for (var i = 1; i <= labels.length; i++) {
@@ -526,8 +578,10 @@
 
   function mascotReady(env) {
     try {
-      var api = env && env.FiezelPaw;
-      return !!(api && typeof api.ready === 'function' && api.ready());
+      var api = (env && env.FiezelPaw) || (typeof window !== 'undefined' && window.FiezelPaw) || (typeof self !== 'undefined' && self.FiezelPaw);
+      if (api && typeof api.ready === 'function' && api.ready()) return true;
+      var ce = (env && env.customElements) || (typeof window !== 'undefined' && window.customElements) || (typeof customElements !== 'undefined' && customElements);
+      return !!(ce && typeof ce.get === 'function' && ce.get('fiezel-mascot'));
     } catch (_) { return false; }
   }
 
@@ -626,50 +680,17 @@
       + '<h2 class="fiezel-title">Choose your language</h2>'
       + '<p class="fiezel-body">Pilih bahasa untuk melanjutkan<br><span lang="th">เลือกภาษาเพื่อดำเนินการต่อ</span></p>'
       + '<div class="fiezel-goal-grid fiezel-language-grid" role="group" aria-label="Language / Bahasa / ภาษา">'
-      + choice('id', '🇮🇩', 'Bahasa Indonesia', 'Indonesia')
-      + choice('th', '🇹🇭', 'ภาษาไทย', 'ไทย')
+      + choice('id', FLAG_ID, 'Bahasa Indonesia', 'Indonesia')
+      + choice('th', FLAG_TH, 'ภาษาไทย', 'ไทย')
       + '</div>'
       + (busy === 'th' ? '<p class="fiezel-note" role="status">Menyiapkan Bahasa Thai · <span lang="th">กำลังเตรียมภาษาไทย…</span></p>' : '')
-      + signInMarkup(env)
       + '</div>';
   }
 
-  // ---------------------------------------------------------------------------------------
-  // Pra-langkah, bagian kedua: "sudah punya akun?".
-  //
-  // KENAPA DI SINI, LAYAR PALING AWAL, DAN BUKAN DI PENGATURAN SAJA
-  // ---------------------------------------------------------------
-  // Murid yang ganti HP membuka aplikasi ini dan langsung diminta memilih bahasa, mengetik
-  // nama, memilih tujuan, mengerjakan tes penempatan — lalu baru menemukan tombol masuk
-  // terkubur tiga ketukan di dalam Pengaturan. Saat itu ia sudah menjadi murid BARU bagi
-  // gurunya: `sub` perangkat ini bukan `sub` akunnya, jadi kelas, tugas, dan temannya tidak
-  // ada. Tombol masuk yang baru bisa ditemukan sesudah kerugian itu terjadi adalah tombol
-  // yang datang terlambat.
-  //
-  // KENAPA IA TIDAK MEMAKAI T()
-  // ---------------------------
-  // Alasan yang sama persis dengan pemilih bahasa di atas: pada cat pertama belum ada locale
-  // pilihan dan copy Thai memang belum diunduh. Naskah di sini karena itu ditulis bilingual
-  // secara harfiah, bukan lewat copy-map — dan `tests/th-coverage-test.js` tidak melihatnya
-  // sebagai utang karena ia memang tidak pernah menjadi kunci.
-  //
-  // KENAPA IA SEKUNDER, BUKAN TOMBOL UTAMA
-  // --------------------------------------
-  // Mayoritas yang membuka layar ini adalah murid baru yang memang harus memilih bahasa.
-  // Menaruh tombol masuk sebagai aksi utama akan membuat mereka ragu pada langkah pertama.
-  // Jadi ia berdiri di bawah, dengan garis pemisah, sebagai jalan bagi yang sudah punya akun.
-  // ---------------------------------------------------------------------------------------
-  function signInMarkup(env) {
-    var G = env && env.FiezelGoogle;
-    if (!G || typeof G.available !== 'function' || !G.available()) return '';
-    return '<div class="fiezel-language-signin">'
-      + '<span class="fiezel-language-sep"><span>Already have an account?</span></span>'
-      + '<p class="fiezel-language-signin-note">Sudah punya akun? Masuk dulu supaya kelas dan tugas gurumu ikut.'
-      + '<br><span lang="th">มีบัญชีอยู่แล้วใช่ไหม เข้าสู่ระบบก่อน แล้วห้องเรียนและงานจากครูจะตามมาด้วย</span></p>'
-      + '<div class="fiezel-language-google" data-ob-google></div>'
-      + '<p class="fiezel-note" data-ob-google-status role="status"></p>'
-      + '</div>';
-  }
+  // m025-367: pra-langkah bagian kedua ("sudah punya akun?") DICABUT. Alasannya dulu benar —
+  // tombol masuk yang ditemukan sesudah perkenalan datang terlambat — dan jawabannya kini
+  // lebih kuat: masuk adalah layar WAJIB sebelum perkenalan (features/auth/fiezel-auth-screen.js).
+
 
   // ---------------------------------------------------------------------------------------
   // Step 1 (m025-117): nama murid. WAJIB.
@@ -678,7 +699,7 @@
   // kepala berkas. Tombol Lanjut dinonaktifkan sampai ada nama yang benar-benar bisa dipakai
   // (normalizeName mengembalikan sesuatu), sehingga spasi saja tidak lolos.
   // ---------------------------------------------------------------------------------------
-  function nameMarkup(env, typed, role) {
+  function nameMarkup(env, typed) {
     var clean = normalizeName(typed);
     return reveal(env)
       + topbar(false, false)
@@ -695,11 +716,36 @@
       // m025-242: kalimat panjang soal penyimpanan nama dilepas dari layar - ia benar, tapi
       // ia juga yang membuat langkah pertama harus digulir. Janji yang sama tetap ada di
       // Pengaturan, tempat nama itu bisa diganti.
-      + '<p class="fiezel-role-label">' + T('onboarding.role-question') + '</p>'
-      + roleMarkup(normalizeRole(role))
-      + '<label class="fiezel-field fiezel-classcode-field" data-ob-classcode-wrap' + (normalizeRole(role) === 'guru' ? ' hidden' : '') + '><span>' + T('onboarding.classcode-label') + '</span>'
-      + '<input type="text" data-ob-classcode maxlength="9" placeholder="FZ-XXXXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" data-testid="ob-class-code"></label>'
+      // m025-367 OWNER: pilihan murid/guru dan kode KelasKu PINDAH ke layar masuk
+      // (features/auth/fiezel-auth-screen.js). Langkah ini kembali menanyakan satu hal.
       + btn(T('onboarding.next'), 'data-ob-advance' + (clean ? '' : ' disabled'))
+      + '</div>';
+  }
+
+  // ---------------------------------------------------------------------------------------
+  // Langkah kursus (m025-367): Bahasa Inggris atau Bahasa Jepang. Tidak ada pilihan
+  // bawaan — murid Jepang yang menekan Lanjut tanpa membaca dulu diam-diam berakhir di
+  // kursus Inggris, persis keluhan yang membuat langkah ini ada.
+  // ---------------------------------------------------------------------------------------
+  function courseMarkup(env, selected) {
+    var pick = normalizeCourse(selected);
+    var cards = COURSES.map(function (c) {
+      var on = c.id === pick;
+      return '<button type="button" role="radio" aria-checked="' + (on ? 'true' : 'false') + '" class="fiezel-goal-card fiezel-course-card' + (on ? ' is-selected' : '') + '" data-ob-course="' + c.id + '" data-testid="ob-course-' + c.id + '">'
+        + '<span class="fiezel-course-flag" aria-hidden="true">' + c.flag + '</span>'
+        + '<span class="fiezel-course-text"><b>' + escapeHtml(T(c.titleKey)) + '</b><small>' + escapeHtml(T(c.descKey)) + '</small></span></button>';
+    }).join('');
+    return reveal(env)
+      /* Sama dengan langkah tujuan: di alur ringkas satu-satunya jalan maju adalah memilih
+         (satu ketukan) atau Kembali; di alur penuh "Lewati" global tetap ada. */
+      + topbar(true, uxOn('leanIntro') ? false : undefined)
+      + stepper(COURSE_STEP)
+      + greet(env, pick ? 'observing' : 'curious', T('onboarding.course-greet'))
+      + '<div class="fiezel-sheet" data-ob-step="course">'
+      + '<h2 class="fiezel-title">' + escapeHtml(T('onboarding.course-title')) + '</h2>'
+      + '<div class="fiezel-course-grid" role="radiogroup" aria-label="' + escapeHtml(T('onboarding.course-aria')) + '">' + cards + '</div>'
+      + '<p class="fiezel-note">' + escapeHtml(T('onboarding.course-note')) + '</p>'
+      + btn(T('onboarding.next'), 'data-ob-advance' + (pick ? '' : ' disabled'))
       + '</div>';
   }
 
@@ -742,15 +788,20 @@
     var goals = goalOptions(env);
     var cards = goals.map(function (g) {
       var selected = g.id === selectedGoal;
-      return '<button type="button" class="fiezel-goal-card' + (selected ? ' is-selected' : '') + '" data-ob-goal="' + escapeHtml(g.id) + '">'
+      return '<button type="button" role="radio" aria-checked="' + (selected ? 'true' : 'false') + '" class="fiezel-goal-card' + (selected ? ' is-selected' : '') + '" data-ob-goal="' + escapeHtml(g.id) + '">'
         + '<b>' + escapeHtml(g.label) + '</b></button>';
     }).join('');
-    var levelRow = selectedGoal ? '<div class="fiezel-level-row">' + CEFR_LEVELS.map(function (lv) {
+    var levelRow = selectedGoal ? '<div class="fiezel-level-row" role="radiogroup" aria-label="' + escapeHtml(T('onboarding.step-level-aria')) + '">' + CEFR_LEVELS.map(function (lv) {
       var selected = lv === selectedLevel;
-      return '<button type="button" class="fiezel-level-chip' + (selected ? ' is-selected' : '') + '" data-ob-level="' + lv + '">' + lv + '</button>';
+      return '<button type="button" role="radio" aria-checked="' + (selected ? 'true' : 'false') + '" class="fiezel-level-chip' + (selected ? ' is-selected' : '') + '" data-ob-level="' + lv + '">' + lv + '</button>';
     }).join('') + '</div>' : '';
+    // Audit F18 (2026-09-23): kartu tujuan dan chip level dulu tanpa role/aria-checked -
+    // pembaca layar tidak tahu mana yang terpilih (kartu peran di langkah 1 sudah benar).
+    // Audit F05: "Kembali" kini ada di langkah ini (dulu tidak, padahal langkah sesudahnya
+    // punya), dan jalan lewatinya satu saja - "Lewati langkah ini" di bawah, yang tetap
+    // mengantar ke tawaran tes awal alih-alih menutup seluruh perkenalan.
     return reveal(env)
-      + topbar(false)
+      + topbar(true, uxOn('leanIntro') ? false : undefined)
       + stepper(3)
       // Selama tujuan belum dipilih maskot MENGAMATI pilihan (curious). Begitu tujuan
       // terpilih dan enam chip level muncul, pekerjaannya berubah: ia menimbang jawaban
@@ -759,7 +810,7 @@
         T('onboarding.tujuanmu-yang-menentukan-materi-mana'))
       + '<div class="fiezel-sheet" data-ob-step="3">'
       + T('onboarding.apa-tujuan-you-study')
-      + '<div class="fiezel-goal-grid">' + cards + '</div>'
+      + '<div class="fiezel-goal-grid" role="radiogroup" aria-label="' + escapeHtml(T('onboarding.step-goal')) + '">' + cards + '</div>'
       + (selectedGoal ? T('onboarding.apa-level-lang-you-inline') + levelRow
         + T('onboarding.level-perkiraan-singkat') : '')
       + btn(T('onboarding.next-l554'), 'data-ob-advance' + (selectedGoal ? '' : ' disabled'))
@@ -770,16 +821,41 @@
   // ---------------------------------------------------------------------------------------
   // Step 4: Placement (mengarah ke tes 25 soal yang sungguhan, bukan versi 4-5 soal palsu)
   // ---------------------------------------------------------------------------------------
+  /* Audit F01/F04 (2026-09-22): jumlah soal tes awal dibaca dari sumber yang SAMA dengan tes
+     yang benar-benar dijalankan. Salinan lama memaku "25 soal listening" sementara
+     placement-lite (bendera bawaan) menjalankan 12 soal tanpa listening - janji pertama
+     produk meleset sejak angka pertamanya. Sumbernya fiezel-diagnostic-targets.js
+     (leveltest.totalQuestions / liteQuestions); app.js memakai angka yang sama. */
+  function placementFacts(env) {
+    var lite = uxOn('placementLite'), targets = null;
+    try { targets = (env && env.FiezelDiagnosticTargets) || null; } catch (_) {}
+    if (!targets && typeof require === 'function' && typeof module === 'object') {
+      try { targets = require('../diagnostics/fiezel-diagnostic-targets.js'); } catch (_) {}
+    }
+    var lt = (targets && targets.leveltest) || {};
+    var soal = lite ? Number(lt.liteQuestions) || 12 : Number(lt.totalQuestions) || 25;
+    return { lite: lite, soal: soal, menit: lite ? 5 : 10 };
+  }
+
   function placementMarkup(env) {
+    var facts = placementFacts(env);
+    // Audit F05: SATU jalan lewati per langkah. Dulu langkah ini punya tiga jalan keluar
+    // yang artinya berbeda ("Lewati" di pojok, "Lewati langkah ini", "Kembali"). Pada
+    // perkenalan ringkas (bawaan) ia langkah TERAKHIR, jadi kedua "lewati" berarti hal yang
+    // sama - yang tersisa satu: "Nanti saja" (data-ob-skip, menutup perkenalan). Urutan enam
+    // langkah lama (leanIntro mati) masih punya jadwal & ringkasan sesudahnya, jadi di sana
+    // "Lewati langkah ini" tetap berarti maju satu langkah.
+    var seq = stepSequence(), last = seq[seq.length - 1] === PLACEMENT_STEP;
     return reveal(env)
-      + topbar(true)
+      + topbar(true, last ? false : undefined)
       + stepper(4)
       + greet(env, 'encouraging', T('onboarding.santai-this-bukan-ujian-can'))
       + '<div class="fiezel-sheet" data-ob-step="4">'
       + T('onboarding.apa-level-lang-you')
-      + T('onboarding.isinya-item-listening-grammar-and')
+      + T(facts.lite ? 'onboarding.tes-awal-isi-lite' : 'onboarding.isinya-item-listening-grammar-and', { soal: facts.soal, menit: facts.menit })
       + btn(T('onboarding.btn-placement'), 'data-ob-primary')
-      + btn(T('onboarding.btn-skip-step'), 'data-ob-step-skip', 'ghost')
+      + (last ? btn(T('onboarding.btn-skip-test'), 'data-ob-skip', 'ghost')
+        : btn(T('onboarding.btn-skip-step'), 'data-ob-step-skip', 'ghost'))
       + '</div>';
   }
 
@@ -881,6 +957,7 @@
     var typedName = storedName(target);
     var selectedRole = storedRole(target);
     var typedClassCode = '';
+    var selectedCourse = normalizeCourse(storedCourse(target));
     var selectedGoal = '';
     var selectedLevel = '';
     var closed = false;
@@ -1159,7 +1236,8 @@
     function paint() {
       var html;
       if (step === LANGUAGE_STEP) html = languageMarkup(target, selectedLocale, localeBusy);
-      else if (step === 1) html = nameMarkup(target, typedName, selectedRole);
+      else if (step === 1) html = nameMarkup(target, typedName);
+      else if (step === COURSE_STEP) html = courseMarkup(target, selectedCourse);
       else if (step === 2) html = carouselMarkup(target, slide);
       else if (step === 3) html = goalMarkup(target, selectedGoal, selectedLevel);
       else if (step === 4) html = placementMarkup(target);
@@ -1259,7 +1337,7 @@
       if (closed) return;
       closed = true;
       clearMascotTimers();
-      markCompleted(target, { at: now, via: via, locale: selectedLocale, name: typedName, goal: selectedGoal, level: selectedLevel, role: selectedRole, classCode: typedClassCode });
+      markCompleted(target, { at: now, via: via, locale: selectedLocale, name: typedName, goal: selectedGoal, level: selectedLevel, role: selectedRole, classCode: typedClassCode, course: selectedCourse });
       // Serah terima hanya pada penyelesaian sungguhan; skip/placement keluar lewat fade
       // lama (§2.3: dilewati pada kurangi-gerak dan pada jalur tes penempatan).
       var handedOff = via === 'finish' ? beginHandoff() : false;
@@ -1371,6 +1449,15 @@
         goStep(sequenceStep(1));
         return;
       }
+      if (step === COURSE_STEP) {
+        if (!selectedCourse) return;
+        if (typeof opts.onCourse === 'function') { try { opts.onCourse({ course: selectedCourse }); } catch (_) {} }
+        /* Murid yang masuk dengan kode KelasKu (layar masuk) langsung ke kelasnya — perilaku
+           yang sama dengan kode yang dulu diketik di langkah nama. */
+        if (typedClassCode || storedClassCode(target)) { finish('finish'); return; }
+        goStep(sequenceStep(1));
+        return;
+      }
       if (step === 2 && slide < CAROUSEL_SLIDES.length - 1) { slide += 1; paint(); return; }
       if (isLastStep()) { finish('finish'); return; }
       if (step === 3 && selectedGoal && typeof opts.onGoal === 'function') {
@@ -1393,46 +1480,11 @@
       finish('placement');
     }
 
-    /**
-     * Gambar tombol Google ke layar pemilih bahasa yang SUDAH tercat.
-     *
-     * Kenapa dipanggil dari bind() dan bukan sekali saat mount: `paint()` menulis ulang
-     * `host.innerHTML` setiap kali, jadi tombol yang digambar skrip Google ikut terhapus
-     * pada setiap cat ulang (mis. saat menunggu unduhan copy Thai). Menggambarnya ulang
-     * di sini adalah satu-satunya tempat yang benar.
-     *
-     * Kegagalan di sini TIDAK menutup apa pun: pemilih bahasa sudah tergambar di atasnya,
-     * jadi murid tanpa Google — atau di jaringan sekolah yang memblokirnya — tetap bisa
-     * melanjutkan onboarding seperti biasa.
-     */
-    function mountSignIn() {
-      var slot = host.querySelector('[data-ob-google]');
-      var note = host.querySelector('[data-ob-google-status]');
-      var G = target && target.FiezelGoogle;
-      if (!slot || !G || typeof G.renderButton !== 'function') return;
-      try {
-        G.renderButton(slot, function (res) {
-          if (!note) return;
-          if (res && res.ok) {
-            /* Yang dipulihkan adalah AKUN (kelas, tugas guru, teman) — bukan profil
-               belajar, yang memang hidup di perangkat. Kalimatnya karena itu tidak
-               menjanjikan onboarding terlewat: murid tetap memilih bahasa di bawah. */
-            note.textContent = 'Berhasil masuk' + (res.email ? ' · ' + res.email : '')
-              + ' — pilih bahasamu untuk lanjut. · เข้าสู่ระบบแล้ว เลือกภาษาของคุณเพื่อไปต่อ';
-          } else {
-            note.textContent = (res && res.message)
-              || 'Belum berhasil masuk. Pilih bahasa dulu — masuk bisa nanti dari Pengaturan. · '
-                 + 'ยังเข้าสู่ระบบไม่สำเร็จ เลือกภาษาก่อนนะ เข้าสู่ระบบทีหลังได้จากการตั้งค่า';
-          }
-        }, { locale: 'auto' }).then(function (hasil) {
-          if (note && hasil && !hasil.ok) note.textContent = hasil.message || '';
-        }, function () {});
-      } catch (_) { /* onboarding tidak boleh mati karena satu tombol pihak ketiga */ }
-    }
-
+    /* m025-367: tombol Google di pemilih bahasa DICABUT. Masuk kini layar tersendiri yang
+       WAJIB dan berdiri sebelum perkenalan (features/auth/fiezel-auth-screen.js); blok
+       sekunder "Sudah punya akun?" di sini hanya akan menjadi pintu kedua ke hal yang sama. */
     function bind() {
       try {
-        if (step === LANGUAGE_STEP) mountSignIn();
         var localeButtons = host.querySelectorAll('[data-ob-locale]');
         for (var l = 0; l < localeButtons.length; l++) {
           (function (button) {
@@ -1442,6 +1494,18 @@
             });
           })(localeButtons[l]);
         }
+        host.querySelectorAll('[data-ob-course]').forEach(function (b) {
+          b.addEventListener('click', function () {
+            selectedCourse = normalizeCourse(b.getAttribute('data-ob-course'));
+            host.querySelectorAll('[data-ob-course]').forEach(function (x) {
+              var on = x === b;
+              if (x.classList && typeof x.classList.toggle === 'function') x.classList.toggle('is-selected', on);
+              x.setAttribute('aria-checked', on ? 'true' : 'false');
+            });
+            var nextBtn = host.querySelector('[data-ob-advance]');
+            if (nextBtn && selectedCourse) nextBtn.removeAttribute('disabled');
+          });
+        });
         var nameInput = host.querySelector('[data-ob-name]');
         if (nameInput) {
           // Mengecat ulang seluruh langkah pada setiap ketikan akan mencabut fokus papan
@@ -1466,24 +1530,6 @@
           });
           nameInput.addEventListener('focus', function () { nameReacted = false; });
           nameInput.addEventListener('change', sync);
-          host.querySelectorAll('[data-ob-role]').forEach(function (b) {
-            b.addEventListener('click', function () {
-              selectedRole = normalizeRole(b.getAttribute('data-ob-role'));
-              host.querySelectorAll('[data-ob-role]').forEach(function (x) {
-                var on = x === b; x.classList.toggle('is-selected', on); x.setAttribute('aria-checked', on ? 'true' : 'false');
-              });
-              var next = host.querySelector('[data-ob-advance]');
-              if (next) next.textContent = selectedRole === 'guru' ? T('onboarding.role-guru-cta') : T('onboarding.next');
-              var wrap = host.querySelector('[data-ob-classcode-wrap]');
-              if (wrap) { if (selectedRole === 'guru') wrap.setAttribute('hidden', ''); else wrap.removeAttribute('hidden'); }
-            });
-          });
-          var codeInput = host.querySelector('[data-ob-classcode]');
-          if (codeInput) codeInput.addEventListener('input', function () {
-            var v = String(codeInput.value || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
-            if (v.indexOf('FZ') === 0) v = v.slice(2);
-            typedClassCode = v.length === 6 ? 'FZ-' + v : '';
-          });
           nameInput.addEventListener('keydown', function (event) {
             if (event && (event.key === 'Enter' || event.keyCode === 13)) {
               if (typeof event.preventDefault === 'function') event.preventDefault();
@@ -1611,8 +1657,13 @@
     storedName: storedName,
     storedRole: storedRole,
     normalizeRole: normalizeRole,
-    roleMarkup: roleMarkup,
     storedLocale: storedLocale,
+    storedClassCode: storedClassCode,
+    storedCourse: storedCourse,
+    markLocaleSelected: markLocaleSelected,
+    COURSE_STEP: COURSE_STEP,
+    COURSES: COURSES,
+    courseMarkup: courseMarkup,
     needsName: needsName,
     show: show
   };

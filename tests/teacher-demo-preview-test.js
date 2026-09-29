@@ -39,6 +39,51 @@ const strip = (s) => s.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|[^:])\/\/[^
 const shellCode = strip(shellSrc);
 const storeCode = strip(storeSrc);
 
+/* Badan sebuah fungsi, dipotong dengan mencocokkan kurung kurawal.
+ *
+ * Dipakai R6, dan ia ada karena versi sebelumnya memakai jendela 900 karakter dari
+ * `function render(` sebagai proksi untuk "di dalam render()". Proksi itu bukan menguji
+ * perilaku melainkan JARAK, jadi ia patah bukan ketika pitanya hilang, melainkan ketika
+ * `render()` tumbuh — dan itulah yang terjadi di m025-344/345, saat jaminan welcome()
+ * untuk guru terverifikasi mendorong `demoBanner()` ke karakter 960. Pitanya tetap
+ * dirender; yang patah adalah pengukurnya, dan ia menyumbat SELURUH quality.yml
+ * (langkahnya berhenti pada gerbang merah pertama).
+ */
+function badanFungsi(src, tanda) {
+  const mulai = src.indexOf(tanda);
+  if (mulai < 0) return '';
+  const buka = src.indexOf('{', mulai);
+  if (buka < 0) return '';
+  let dalam = 0;
+  for (let i = buka; i < src.length; i++) {
+    const c = src[i];
+    if (c === '{') dalam++;
+    else if (c === '}') { dalam--; if (dalam === 0) return src.slice(buka, i + 1); }
+  }
+  return src.slice(mulai);
+}
+
+/* Pernyataan cat render(): dari `el.innerHTML` sampai `;` yang menutupnya.
+ * Tanda kutip dilewati utuh supaya `;` di dalam string HTML (`'...;'`) tidak dikira
+ * akhir pernyataan. Dipakai R6 untuk menuntut pita demo benar-benar IKUT TERCETAK,
+ * bukan sekadar disebut di suatu tempat dalam render(). */
+function pernyataanCat(badan) {
+  const mulai = badan.indexOf('el.innerHTML');
+  if (mulai < 0) return '';
+  let kutip = null;
+  for (let i = mulai; i < badan.length; i++) {
+    const c = badan[i];
+    if (kutip) {
+      if (c === '\\') { i++; continue; }
+      if (c === kutip) kutip = null;
+      continue;
+    }
+    if (c === '"' || c === "'" || c === '`') { kutip = c; continue; }
+    if (c === ';') return badan.slice(mulai, i + 1);
+  }
+  return badan.slice(mulai);
+}
+
 /* ------------------------------------------------------------------ R1 · tautan --- */
 
 test('R1 · landing page menautkan Demo Guru ke ?teacher=preview', () => {
@@ -137,8 +182,20 @@ test('R6 · pita demo tampil dengan jalan keluar dan jalan naik ke akun guru', (
   assert.ok(/function demoBanner\(/.test(shellCode), 'pita demo tidak ada');
   assert.ok(/previewOn\s*\?\s*' is-demo'/.test(shellCode) || /is-demo/.test(shellCode),
     'kelas penanda demo tidak dipasang di kerangka');
-  assert.ok(/demoBanner\(\)/.test(shellCode.slice(shellCode.indexOf('function render('), shellCode.indexOf('function render(') + 900)),
-    'pita demo tidak dirender');
+  /* DUA tuntutan, dan keduanya perlu:
+   *   1. demoBanner() ada di dalam badan render() — dipotong dengan mencocokkan kurung
+   *      kurawal, BUKAN dengan menghitung karakter. Penyisipan kode di awal render()
+   *      (seperti blok penjaga m025-345) tidak lagi memerahkan gerbang.
+   *   2. demoBanner() ikut di dalam PERNYATAAN CATNYA. Tanpa ini, gerbang tetap hijau
+   *      walau hasil demoBanner() dibuang dan pitanya tidak pernah sampai ke layar.
+   * Jendela 900 karakter sengaja tidak dipakai di mana pun: menambatkannya ulang hanya
+   * memindahkan ranjaunya, tidak menjinakkannya. */
+  const badanRender = badanFungsi(shellCode, 'function render(');
+  assert.ok(/demoBanner\(\)/.test(badanRender), 'pita demo tidak dirender');
+  const catRender = pernyataanCat(badanRender);
+  assert.ok(catRender, 'pernyataan cat render() tidak ditemukan — tambatan R6 perlu ditinjau');
+  assert.ok(/demoBanner\(\)/.test(catRender),
+    'demoBanner() dipanggil di render() tetapi tidak ikut tercetak ke kerangka');
   assert.ok(/case 'demo-exit':[\s\S]{0,120}exitPreview\(\)/.test(shellCode), 'tombol keluar demo tidak menghapus penanda');
   assert.ok(/case 'demo-activate':[\s\S]{0,80}openAccount\('teacher'\)/.test(shellCode),
     'pita demo tidak menawarkan jalan naik ke akun guru sungguhan');
@@ -157,6 +214,29 @@ test('R7 · naskah pita demo lahir dua bahasa', () => {
   }
   const thBlock = th.slice(th.indexOf("'guru.demo-pita'"), th.indexOf("'guru.demo-cta'") + 260);
   assert.ok(/[฀-๿]/.test(thBlock), 'nilai th untuk pita demo tidak ber-aksara Thai');
+});
+
+/* ----------------------------------------------------------- R8 · kembali ke hero --- */
+
+test('R8 · keluar demo membersihkan URL teacher=preview dan mengarahkan ke landing page hero', () => {
+  assert.ok(/case 'demo-exit':[\s\S]{0,140}exit\(\{\s*target:\s*'landing'\s*\}\)/.test(shellCode),
+    'case demo-exit harus memanggil exit dengan target landing agar kembali ke hero');
+  assert.ok(/function exitPreview\(\)[\s\S]{0,500}replaceState/.test(shellCode),
+    'exitPreview harus membersihkan query parameter teacher via replaceState agar tidak re-arm');
+  const appSrc = read('app.js');
+  assert.ok(/opts\?\.target\s*===\s*'landing'[\s\S]{0,400}\.\.\/#hero/.test(appSrc),
+    'app.js exit callback harus mengarahkan target landing ke ../#hero');
+});
+
+/* --------------------------------------------------------- R9 · sidebar exit demo --- */
+
+test('R9 · tombol keluar di sidebar saat mode demo memanggil exitPreview', () => {
+  const i = shellCode.indexOf("case 'exit':");
+  const exitCase = shellCode.slice(i, i + 350);
+  assert.ok(/previewOn[\s\S]{0,120}exitPreview\(\)/.test(exitCase),
+    'case exit harus membersihkan pratinjau jika previewOn menyala');
+  assert.ok(/exit\(\{\s*target:\s*'student'\s*\}\)/.test(exitCase),
+    'case exit harus mengarahkan ke target student');
 });
 
 let failures = 0;

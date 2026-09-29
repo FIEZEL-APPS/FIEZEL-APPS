@@ -58,6 +58,7 @@ export const BYTE_LIMITS = Object.freeze({
   // --- SLOT 12: login Google. ID token Google ~1-2 KB; cap 8 KB memberi ruang
   //     token panjang tanpa membuka pintu bagi badan besar yang tidak dipakai.
   '/api/auth/google': 8192,
+  '/api/auth/session': 512,                // GET — m025-367
   '/api/account/register': 1024,
   '/api/account/login': 1024,
   '/api/account/logout': 512,
@@ -65,7 +66,10 @@ export const BYTE_LIMITS = Object.freeze({
   '/api/account/teacher-activate': 1536,   // kode 32 char + handle + kata sandi
   '/api/owner/teacher-invite': 1024,
   '/api/owner/teacher-invite/revoke': 512,
+  '/api/owner/teacher-invite/update': 1024,
+  '/api/owner/teacher-invite/delete': 512,
   '/api/owner/teachers': 512,              // GET, tanpa body
+  '/api/owner/teacher/delete': 512,
   '/api/teacher/tree': 512,                // GET
   '/api/teacher/node/save': 16384,         // deskripsi + tujuan + daftar kosakata
   '/api/teacher/node/publish': 512,
@@ -90,6 +94,7 @@ export const BYTE_LIMITS = Object.freeze({
   '/api/teacher/class/list': 512,          // GET
   '/api/teacher/class/reports': 512,       // GET
   '/api/teacher/class/assign': 32768,      // 40 itemIds + 80 nama target + ≤40 soal kustom (class-hub) + amplop
+  '/api/teacher/class/retract': 512,       // { code, id } — m025-365
   // --- SLOT 7: lapisan sosial (route-social.js). Payload kecil = CPU kecil;
   // satu-satunya yang besar adalah evidence batch (maks 20 event, pola LIMITS
   // analytics 8KB — spec sosial §4.4.2).
@@ -126,7 +131,22 @@ export const BYTE_LIMITS = Object.freeze({
   // Nama panggilan murid (maks 24 char sesudah normalisasi) + amplop JSON.
   // Kecil dengan sengaja: payload kecil = CPU kecil, dan rute ini dipanggil
   // setiap murid maksimum sekali sehari.
-  '/api/learner/name': 512
+  '/api/learner/name': 512,
+  // --- SLOT 5: warisan Puter (route-legacy.js) — endpoint yang belum punya cap
+  //     di daftar di atas. Angka diambil dari fiezel-core-worker.js:446-626.
+  '/api/admin/configure': 4096,     // owner: vapidPublicKey + cronToken
+  '/api/admin/status': 512,         // GET, tanpa body
+  '/api/reminders/due': 2048,       // cron: filter + pagination
+  '/api/reminders/ack': 4096,       // cron: id + kind + status + evidence
+  '/api/brain/attempts': 100000,    // batch upload s/d 100 attempt records
+  '/api/evolution/config': 8192,    // owner: konfigurasi evolusi konten
+  '/api/evolution/status': 512,     // GET, tanpa body
+  '/api/content/qa/review': 20000,  // owner: item soal untuk QA review
+  '/api/content/patch/candidate': 20000, // owner: item soal untuk patch
+  '/api/content/self-refine': 20000,// owner: konten untuk self-refine + ledger
+  '/api/feedback/list': 512,        // GET, tanpa body
+  '/api/feedback/clear': 512,       // POST, tanpa body berarti
+  '/api/push/public-key': 512       // GET, tanpa body
 });
 
 /** Cap terakhir untuk path yang tidak terdaftar: kecil, sengaja. */

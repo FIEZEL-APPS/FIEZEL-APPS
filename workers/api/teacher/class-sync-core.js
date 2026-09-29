@@ -24,10 +24,11 @@ export const LIMITS = Object.freeze({
   LEARNER_MIN_INTERVAL_MS: 15000, TEACHER_MIN_INTERVAL_MS: 3000
 });
 
-/** normalizeClassCode(raw) -> 'FZ-XXXXXX' | null. Toleran terhadap huruf kecil dan tanpa strip. */
+/** normalizeClassCode(raw) -> 'FZ-XXXXXX' | null. Toleran terhadap huruf kecil dan tanpa strip. Alfabet kode 6 karakter tanpa O/I/0/1. */
 export function normalizeClassCode(raw) {
   let v = String(raw || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
   if (v.startsWith('FZ')) v = v.slice(2);
+  if (!v || v.length !== 6) return null;
   const code = 'FZ-' + v;
   return CLASS_CODE_RE.test(code) ? code : null;
 }
@@ -150,7 +151,8 @@ export function normalizeCustomItems(items) {
     if (options.some((o) => !o)) return { ok: false, reason: 'bad_custom_options' };
     const answer = intIn(q.answer, options.length - 1);
     if (answer == null) return { ok: false, reason: 'bad_custom_answer' };
-    const skill = typeof q.skill === 'string' && /^[a-z0-9_]{1,32}$/.test(q.skill) ? q.skill : 'grammar';
+    const rawSkill = typeof q.skill === 'string' ? q.skill.trim().toLowerCase().replace(/[^a-z0-9_]/g, '_').slice(0, 32) : '';
+    const skill = /^[a-z0-9_]{1,32}$/.test(rawSkill) ? rawSkill : 'grammar';
     const item = { id, prompt, options, answer, skill };
     if (typeof q.context === 'string' && q.context.trim()) item.context = q.context.trim().slice(0, ASSIGN_LIMITS.CONTEXT_MAX);
     if (q.why && typeof q.why === 'object' && !Array.isArray(q.why)) {
@@ -178,7 +180,13 @@ export function normalizeAssignment(body) {
   if (!id) return { ok: false, reason: 'bad_assign_id' };
   const title = String(a.title || '').trim().slice(0, ASSIGN_LIMITS.TITLE_MAX) || 'Tugas';
   if (!Array.isArray(a.skills) || !a.skills.length || a.skills.length > ASSIGN_LIMITS.SKILLS_MAX) return { ok: false, reason: 'bad_skills' };
-  for (const k of a.skills) if (!/^[a-z0-9_]{1,32}$/.test(String(k))) return { ok: false, reason: 'bad_skill_key' };
+  const cleanSkills = [];
+  for (const raw of a.skills) {
+    const k = String(raw || '').trim().toLowerCase().replace(/[^a-z0-9_]/g, '_').slice(0, 32);
+    if (!/^[a-z0-9_]{1,32}$/.test(k)) return { ok: false, reason: 'bad_skill_key' };
+    if (cleanSkills.indexOf(k) === -1) cleanSkills.push(k);
+  }
+  if (!cleanSkills.length) return { ok: false, reason: 'bad_skills' };
   if (!Array.isArray(a.itemIds) || !a.itemIds.length || a.itemIds.length > ASSIGN_LIMITS.ITEMS_MAX) return { ok: false, reason: 'bad_items' };
   for (const it of a.itemIds) if (typeof it !== 'string' || !it || it.length > ASSIGN_LIMITS.ITEM_ID_MAX) return { ok: false, reason: 'bad_item_id' };
   const minutes = intIn(a.minutes, 240) || 5;
@@ -186,9 +194,17 @@ export function normalizeAssignment(body) {
   const timer = intIn(a.timer, 240) || 0;
   const deadline = typeof a.deadline === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(a.deadline) ? a.deadline : null;
   const from = String(a.from || '').trim().slice(0, ASSIGN_LIMITS.FROM_MAX);
-  const payload = { v: 1, t: 'assign', id, title, skills: a.skills.map(String), itemIds: a.itemIds.slice(), minutes, from, cls: code, deadline, mode, timer, shuffle: !!a.shuffle };
+  const payload = { v: 1, t: 'assign', id, title, skills: cleanSkills, itemIds: a.itemIds.slice(), minutes, from, cls: code, deadline, mode, timer, shuffle: !!a.shuffle };
   const teacher = String(a.teacher || '').trim().slice(0, ASSIGN_LIMITS.TEACHER_MAX);
   if (teacher) payload.teacher = teacher;
+  const rawSubject = a.subjectId || a.subject_id;
+  if (typeof rawSubject === 'string' && rawSubject.trim()) {
+    payload.subjectId = rawSubject.trim().toUpperCase().slice(0, 16);
+  }
+  const rawSubjectName = a.subjectName || a.subject_name;
+  if (typeof rawSubjectName === 'string' && rawSubjectName.trim()) {
+    payload.subjectName = rawSubjectName.trim().slice(0, 60);
+  }
   if (a.items !== undefined) {
     const ci = normalizeCustomItems(a.items);
     if (!ci.ok) return { ok: false, reason: ci.reason };
@@ -204,6 +220,32 @@ export function normalizeAssignment(body) {
   return { ok: true, code, id, payload, targets };
 }
 
+/**
+ * normalizeRetract(body) -> { ok, code, id } | { ok:false, reason }
+ * m025-365 (audit KelasKu K2): guru MENARIK tugas yang sudah dikirim.
+ */
+export function normalizeRetract(body) {
+  if (!body || typeof body !== 'object' || Array.isArray(body)) return { ok: false, reason: 'not_object' };
+  const code = normalizeClassCode(body.code);
+  if (!code) return { ok: false, reason: 'bad_class_code' };
+  const id = typeof body.id === 'string' && /^[A-Za-z0-9_-]{1,40}$/.test(body.id) ? body.id : null;
+  if (!id) return { ok: false, reason: 'bad_assign_id' };
+  return { ok: true, code, id };
+}
+
+/**
+ * Payload penanda tarikan. Ia MENIMPA payload tugas di baris yang sama, jadi murid yang
+ * belum pernah menerima tugasnya pun tidak lagi bisa menariknya dari server — yang tersisa
+ * hanya judul (untuk pesan singkat ke murid) dan nama guru. Butir soal ikut hilang.
+ */
+export function retractPayload(json, r) {
+  let old = null;
+  try { old = JSON.parse(json); } catch { old = null; }
+  const p = { v: 1, t: 'retract', id: r.id, cls: r.code, title: String((old && old.title) || '').slice(0, ASSIGN_LIMITS.TITLE_MAX) };
+  if (old && old.teacher) p.teacher = String(old.teacher).slice(0, ASSIGN_LIMITS.TEACHER_MAX);
+  return p;
+}
+
 /** Baris D1 -> tugas untuk murid; targets yang tidak memuat kunci murid dibuang. */
 export function rowToAssignment(row, key) {
   let payload = null, targets = null;
@@ -214,14 +256,22 @@ export function rowToAssignment(row, key) {
   return { id: row.id, at: Number(row.updated_at) || 0, assignment: payload };
 }
 
-/** normalizeClaim(body) -> { ok, code, title, level } | { ok:false, reason } */
+/** normalizeClaim(body) -> { ok, code, title, level, subjectId?, teacherName? } | { ok:false, reason } */
 export function normalizeClaim(body) {
   if (!body || typeof body !== 'object') return { ok: false, reason: 'not_object' };
   const code = normalizeClassCode(body.code);
   if (!code) return { ok: false, reason: 'bad_class_code' };
   const title = String(body.title || '').trim().slice(0, LIMITS.TITLE_MAX) || 'Kelas';
   const level = typeof body.level === 'string' && /^[ABC][12]$/.test(body.level) ? body.level : null;
-  return { ok: true, code, title, level };
+  const rawSubject = body.subject_id || body.subjectId;
+  const subjectId = typeof rawSubject === 'string' && rawSubject.trim()
+    ? rawSubject.trim().toUpperCase().slice(0, 16)
+    : null;
+  const rawTeacher = body.teacher_name || body.teacherName;
+  const teacherName = typeof rawTeacher === 'string' && rawTeacher.trim()
+    ? rawTeacher.trim().slice(0, 60)
+    : null;
+  return { ok: true, code, title, level, subjectId, teacherName };
 }
 
 /** Pembatas laju per kunci dalam memori isolate: cukup untuk menahan banjir satu perangkat. */

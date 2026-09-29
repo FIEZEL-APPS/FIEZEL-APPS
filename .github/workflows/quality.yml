@@ -205,6 +205,7 @@ jobs:
           node tests/backup-ui-test.js
           node tests/install-health-test.js
           node tests/onboarding-test.js
+          node tests/auth-screen-test.js
           node tests/tour-test.js
           node tests/tours-test.js
           node tests/adaptivity-simulation-v3-hardened-test.js
@@ -213,6 +214,65 @@ jobs:
           node tests/app-telemetry-wiring-test.js
           node tests/brain-config-test.js
           node tests/brain-manifest-test.js
+          # m025-337: gelombang kedua otoritas Braincore (confusionMap + olmInsight jadi
+          # active, frontier ZPD memilih simpul aktif). Menjalankan fungsi produksi di vm.
+          node tests/brain-authority-wave2-test.js
+          node tests/brain-measurement-layer-test.js
+          # Mendarat lewat merge main tanpa pernah didaftarkan, jadi ia tertulis tetapi tidak
+          # pernah dijalankan CI - dan gate-registry-test merah di main karenanya. Didaftarkan
+          # di sini (23 assert, hijau saat didaftarkan) supaya benar-benar menjadi bukti.
+          node tests/kelasku-17mapel-assignment-test.js
+          # Isi mapel Fase D (MAT/IPA/ENG): kompetensi berbeda WAJIB berkolam berbeda, kolam
+          # yang habis dipotong jujur alih-alih ditambal dari kolam mapel, nol pembahasan yang
+          # menyebut posisi pilihan, dan sidecar Thai punya kembaran untuk tiap code & id.
+          # Gerbang di atas hanya mengukur BENTUK soal untuk 17 mapel; ia hijau sekalipun
+          # ketiga mapel ini mengirim bab yang salah - itulah celah yang ditutup di sini.
+          node tests/mapel-fase-d-content-test.js
+          # Modal 'Buat Tugas' guru: pemilihan Bab & Sub-bab Buku Siswa, kolam soal per
+          # sub-bab, dan bentuk soal 17 mapel. Mendarat di m025-349 tanpa pernah didaftarkan,
+          # jadi gate-registry-test merah sejak commit itu. Didaftarkan di sini (27 assert,
+          # hijau saat didaftarkan) supaya ia benar-benar menjadi bukti, bukan berkas yang ada.
+          node tests/modal-assign-teacher-ux-test.js
+          # Isolasi mapel per token guru KelasKu: token IPA/ENG mengunci dasbor ke
+          # mapelnya (badge ganti dropdown, tugas/analitik tersaring, guard tolak
+          # lintas-mapel), multi-mapel terbatas lisensi, tanpa token 17 mapel utuh —
+          # plus remedial/pengayaan otomatis, rekap e-Rapor, dan penerbitan paralel.
+          node tests/teacher-subject-isolation-test.js
+          # Paspor Kompetensi murid: stempel dikunci pada ID unit (bukan genre, yang dipakai
+          # bersama lintas tingkat kelas), buku bukti terpisah dari riwayat kiriman yang
+          # dipotong, dan mengulang misi tidak pernah menurunkan stempel. Temuan K1/K2/K4
+          # reports/AUDIT-UIUX-KELASKU-KURIKULUM-KOMPETENSI-2026-09-20.md.
+          node tests/kelasku-paspor-kompetensi-test.js
+          # Pintu permukaan kurikulum: kurikulum.html tertaut dari Ruang Guru, misi.html
+          # tertaut dari KelasKu, tab Progres murid benar-benar memanggil progresView(),
+          # dan konsol guru memotret-lalu-memulihkan isian saat mengecat ulang. Temuan
+          # X2/X3/K10/G1 reports/AUDIT-UIUX-KELASKU-KURIKULUM-KOMPETENSI-2026-09-20.md.
+          node tests/kurikulum-pintu-test.js
+          # Kuis yang guru terbitkan dari konsol kurikulum sampai ke tab Tugas KelasKu, dan
+          # misi mandiri murid tidak menyamar jadi tugas guru di laporan yang dibaca guru.
+          # Termasuk: jembatannya gagal-diam, dan TIDAK menulis asesmen server ke kunci
+          # tugas lokal. Temuan X4/X5 audit KelasKu 2026-09-20.
+          node tests/kurikulum-satu-buku-test.js
+          # Paspor sebagai ALAT: stempel yang memudar berjadwal (7/21/60 hari), hasil per
+          # sub-bab dari percobaan terakhir, misi yang bisa disaring ke sub-bab goyah,
+          # urutan soal yang diacak, kunci skill mesin alih-alih nama genre Inggris, dan
+          # target mingguan yang selalu menyebut alasannya. Temuan K3/K5/K6/K11 + F3/F4/F6.
+          node tests/kelasku-paspor-alat-test.js
+          # Jangkauan Gelombang 5: zona murid KelasKu dwibahasa (ID_WORDS + t()),
+          # label BackNav kurikulum, konsol guru ramah ponsel/keyboard/kurangi-gerak.
+          node tests/kurikulum-jangkauan-test.js
+          # Rapor ortu F7: satu modul bersama merender dokumen guru & murid (PNG
+          # Canvas + window.print, sisi klien), keadaan kosong tidak dikarang.
+          node tests/kurikulum-rapor-ortu-test.js
+          # Wali Kelas F8 + Papan Kelas F10: agregat /coverage per mapel dan grid
+          # TP × murid dari endpoint yang ada, antrean berbatas, sel ber-aria.
+          node tests/kurikulum-wali-papan-test.js
+          # Misi luring F9 fase 1: precache shell, sesi terakhir + konfirmasi,
+          # runner lokal 6 butir, antrean question_answered idempoten.
+          node tests/kurikulum-luring-test.js
+          # Luring fase 2: endpoint batch paparan-tanpa-mastery, peta eksak,
+          # klien batch-dulu-warisan-bila-404.
+          node tests/kurikulum-luring-fase2-test.js
           node tests/question-allocator-test.js
           node tests/bankor-latihan-test.js
           node tests/fiezel-stat-gate-test.js
@@ -229,7 +289,10 @@ jobs:
           node tests/teacher-csv-test.js
           node tests/teacher-braincore-test.js
           node tests/class-sync-test.js
+          node tests/auto-class-adopt-test.js
           node tests/class-hub-test.js
+          node tests/kelasku-arsip-test.js
+          node tests/kelasku-tarik-test.js
           node tests/exam-focus-guard-test.js
           node tests/class-join-test.js
           node tests/exam-lock-test.js
@@ -245,6 +308,10 @@ jobs:
           node tests/student-single-registration-test.js
           node tests/th-ui-leak-test.js
           node tests/i18n-kunci-hantu-test.js
+          # Arah ketiga cacat i18n: kunci terdaftar DAN dipanggil, tetapi objek parameternya
+          # memuat nama placeholder kembar — nilai pertama hilang tanpa suara. Lahir dari
+          # kartu akar masalah Core Brain yang menyebut prasyaratnya dua kali (audit 2026-09-26).
+          node tests/i18n-param-collision-test.js
           # Lapis AKUN sisi murid (masuk/daftar/aktivasi guru). Ditempatkan tepat sesudah
           # gerbang sosial karena keduanya memakai lane transport yang sama (panggilan
           # langsung ke Worker dengan cookie fz_id), dan cacat di lane itu akan memerahkan
@@ -266,6 +333,14 @@ jobs:
           # BANK SOAL punya jalur hidrasi sendiri yang tidak pernah lewat copy-map.
           # tests/th-bank-purity-test.js menutup celah itu (lihat docs/handoffs/THAI-BANK-PURITY-HANDOFF.md).
           node tests/th-bank-purity-test.js
+          # Pemindai KETIGA, dan lagi-lagi dengan metode berbeda: th-coverage dan
+          # th-bank-purity keduanya memeriksa ISI (kunci dan kata), sementara
+          # teacher-i18n-lazy memeriksa WAKTU. Dasbor guru bocor bahasa selama
+          # berbulan-bulan dengan ke-229 kuncinya LENGKAP di id dan th - yang salah
+          # adalah t() dipanggil di lingkup modul, sebelum copy Thai sempat dimuat,
+          # sehingga kalimatnya membeku ke cadangan Indonesia. Cacat seperti itu tidak
+          # kelihatan dari daftar kunci mana pun.
+          node tests/teacher-i18n-lazy-test.js
           # Pemindai KEDUA, sengaja memakai metode lain: tests/th-bank-purity-test.js memakai
           # leksikon selisih korpus, scan-th-bank-leak.js memakai daftar kata. Titik
           # butanya BERBEDA — pemindai daftar kata inilah yang menemukan delapan
@@ -278,6 +353,29 @@ jobs:
           # hanya berisi kunci listen_sc_*, jadi tidak pernah kena sasaran sekali pun.
           # tests/th-exam-overlay-test.js memeriksa jalur bacanya, bukan datanya.
           node tests/th-exam-overlay-test.js
+          # m025-308: kelas bug yang sama, dua jalur lain. th-exam-overlay menjaga bank ujian
+          # Listening/Speaking; Writing dan reading-exam tidak dijaga siapa pun, dan di situ
+          # 45 petunjuk prompt + 5 catatan tugas ujian + 96 umpan balik per-soal sudah
+          # diterjemahkan, sudah terunduh ke perangkat murid, lalu MENGANGGUR karena overlay
+          # hanya menyalin honesty/rubrik/format. Gerbang ini memanggil applyContentLocale()
+          # yang sungguhan lalu membacanya lewat jalur baca penyaji.
+          node tests/th-content-overlay-test.js
+          # m025-308: kelas bug yang sama pada PEMANGGIL, bukan penyedia. Dua yang
+          # tertangkap: attemptGoogleSignIn yang membiarkan gerbang auth tertinggal di
+          # spinner saat renderButton gagal, dan bukti belajar yang memfabrikasi akurasi
+          # 50% untuk murid tanpa riwayat lalu mengirimnya ke guru. Keduanya hijau di
+          # sisi penyedia sebelum gerbang ini ada.
+          node tests/caller-reacts-test.js
+          # m025-310: kelas bug yang sama pada RUTE, bukan pipa. P3 memasang gerbang flag +
+          # kuota pada rute yang lewat wrapMetered, S3 menambahkannya untuk TTS sesudah
+          # menembak produksi hidup - tetapi SLOT 5 (route-legacy.js) disebar mentah dan
+          # tidak lewat keduanya, jadi /api/ai/chat, jalur tutor yang dipakai app.js, tidak
+          # punya kuota harian per murid dan tidak bisa dimatikan oleh flag. Gerbang ini
+          # menemukan SETIAP rute yang memanggil model dari isi berkas lalu menuntutnya
+          # digerbangi, dan menguji perilakunya terhadap SQL kuota sungguhan (node:sqlite
+          # + migrasi 0001_quota.sql): jatah habis -> 429 tanpa menyentuh model, tanpa D1
+          # -> 503 fail-closed, terjemahan memakai SUB-kuota.
+          node tests/ai-legacy-spend-gate-test.js
           node tests/boot-order-test.js
           node tests/splash-first-paint-test.js
           node tests/teacher-instant-boot-test.js
@@ -419,20 +517,6 @@ jobs:
           # duplikatnya dibuang (temuan PR #336: 19 gerbang terdaftar berulang, ±2m24s
           # terbuang tiap run) — nol gerbang dihapus, hanya salinannya.
           node tests/fiezel-evolution-loop-test.js
-          node tests/core-worker-contract-test.js
-          # m025-201: dua gerbang penutup lima celah Core Brain (audit m025-201).
-          # tests/core-policy-parity-test.js mengadu kebijakan app.js dengan kebijakan Worker atas
-          # matriks skenario yang sama - dua salinan yang seharusnya identik dan selama ini
-          # tidak pernah dibandingkan, sehingga setiap perbaikan yang mendarat di satu sisi
-          # saja lolos tanpa terlihat. Ia juga menuntut tidak ada rute Worker yang memakai
-          # kebijakan MENTAH (celah pelatih AI), bahwa highRiskCount/todayAttempts benar-benar
-          # mengubah keluaran, bahwa pemotong kode rasional berprioritas (alasan otak berhenti
-          # dibuang sebelum sampai ke layar), dan bahwa tren efektivitas dihitung atas sepuluh
-          # hasil - masing-masing dengan bukti-bisa-merah terhadap sumber yang sengaja dirusak.
-          # Diletakkan tepat sesudah tests/core-worker-contract-test.js karena keduanya memuat Worker
-          # yang sama di dalam vm: yang di atas menjaga KONTRAK rutenya, yang ini menjaga
-          # KEBIJAKAN yang mengalir lewat rute itu.
-          node tests/core-policy-parity-test.js
           # tests/brain-page-wiring-test.js menutup lubang yang tests/brain-manifest-test.js tidak jangkau:
           # manifest mengadu dirinya dengan isi direktori, tetapi NOL gerbang mengadunya dengan
           # index.html/sw.js. Modul yang dinyatakan berwenang tetapi tidak pernah dimuat halaman
@@ -446,9 +530,17 @@ jobs:
           node tests/brain-sync-failclosed-test.js
           node tests/brain-sync-rebuild-test.js
           node tests/policy-verdict-test.js
+          # m025-375 (OWNER 2026-09-26): hasil sesi dinilai setelah >= 25 jawaban sasaran terkumpul
+          # lintas sesi, dan panel Home memberi tahu murid sisanya. Satu-satunya gerbang yang
+          # memuat stat-gate + policy-verdict bersama app.js - tanpa keduanya verdict selalu null
+          # dan lubang A2 (semua sesi 'mixed') tidak terlihat.
+          node tests/policy-evidence-window-test.js
           node tests/nof1-test.js
           node tests/param-ledger-test.js
           node tests/self-tune-test.js
+          # m025-376 (audit braincore A3, OWNER 2026-09-27): penyetel resmi disambung ke pemilihan
+          # soal, diukur RETENSI tertunda per lesson (bukan akurasi sesi), dua arah, berpagar.
+          node tests/self-tune-retention-test.js
           node tests/content-chain-test.js
           node tests/content-chain-report-test.js
           node tests/learner-evidence-test.js
@@ -459,6 +551,8 @@ jobs:
           node tests/personal-journey-ui-test.js
           node tests/skills-evidence-test.js
           node tests/skills-dashboard-test.js
+          node tests/certificate-core-test.js
+          node tests/certificate-sign-test.js
           node tests/academic-readiness-test.js
           node tests/library-integrity-test.js
           node tests/pwa-cache-test.js
@@ -480,6 +574,8 @@ jobs:
           #                         kontras AA, dan pilihan murid menang atas perangkat
           node tests/ux-flags-test.js
           node tests/ux-redesign-test.js
+          node tests/today-home-test.js
+          node tests/home-honesty-test.js
           node tests/night-theme-test.js
           # pwa-release-coherence memeriksa keempat penanda SELARAS satu sama lain; ia tidak
           # bisa tahu nomornya sudah dipakai jalur lain. Itu celah yang meloloskan tabrakan
@@ -698,7 +794,6 @@ jobs:
           node tests/e2e-bridge-selftest.js
           node tests/release-audit-gate-test.js
           node tests/cf-transport-test.js
-          node tests/cf-shadow-mode-test.js
           # Kill switch server (`GET /api/config`): penggabungan AND (server hanya bisa
           # mematikan), protokol 1.7 wajib cocok, cermin maks 5 menit di sessionStorage,
           # dan boot tidak diblokir. Dijalankan sesudah dua gerbang di atas karena ia
@@ -716,7 +811,6 @@ jobs:
           # keduanya menjaga sakelar yang sama dari dua sisi: perilaku kode vs perintah
           # yang benar-benar diketik owner saat insiden.
           node tests/config-consistency-test.js
-          node tests/cf-shadow-ledger-test.js
           node tests/ai-transport-switch-test.js
           # A9: gerbang rencana rollout. Diletakkan tepat sesudah dua gerbang sakelar transport
           # karena ia menguji sisi KETIGA dari sakelar yang sama: bukan bentuknya
@@ -793,6 +887,13 @@ jobs:
           # sudah pernah dicabut audit D16.
           node tests/app-interaction-policy-test.js
           node tests/deploy-site-gate-test.js
+          # m025-314: sepupu deploy-site-gate. Yang di atas menjaga CARA berkas diterbitkan;
+          # yang ini menjaga agar berkasnya tidak BERBOHONG tentang alamat hasilnya. Repo
+          # punya dua permukaan terbit (akar -> /app/, website/ -> root domain), dan sampai
+          # gerbang ini ada tidak satu pun dari 278 gerbang membandingkan alamat yang
+          # DIKLAIM kanonik/sitemap/hreflang dengan alamat tempat berkasnya benar-benar
+          # mendarat. Commit SEO c4e506d melewati seluruh CI dengan kanonik menunjuk 404.
+          node tests/seo-surface-gate-test.js
           node tests/coordination-guard-test.js
 
       # =================================================================================
@@ -945,6 +1046,8 @@ jobs:
           node tests/r2-ux-overhaul-smoke-test.js
           node tests/step-tutor-test.js
           node tests/item-calibration-test.js
+          node tests/item-pool-test.js
+          node tests/brain-param-tune-test.js
           node tests/speaking-adaptive-test.js
           node tests/srl-coach-test.js
           node tests/cors-envelope-test.js
@@ -1010,6 +1113,17 @@ jobs:
         # Assert intinya karena itu bukan soal bentuk: evidence tiap soal WAJIB substring
         # persis dari teks bacaannya sendiri.
         run: node tests/japanese-reading-bank-test.js
+      - name: 'Paritas Thai isi bank Jepang: utangnya disensus, bukan tak terlihat'
+        # th-coverage dan th-ui-leak hanya menjangkau naskah ANTARMUKA (yang lahir lewat
+        # FiezelI18n.t()). Isi bank lahir lewat jalur lain - dimuat sebagai JSON, dirender
+        # apa adanya - jadi ia lolos keduanya. Terukur: antarmuka 2.452/2.452 punya kembaran
+        # Thai, isi bank Jepang 0 dari 15.364 medan. Murid Thai mendapat tombol berbahasa
+        # Thai lalu arti kata dan penjelasan berbahasa Indonesia: layar campur.
+        # Gerbang ini TIDAK menuntut 15.364 terjemahan hari ini - itu merah permanen, dan
+        # gerbang merah permanen adalah gerbang yang dimatikan orang. Ia menuntut SENSUS
+        # yang benar: menambah isi Indonesia tanpa Thai memerahkannya sampai angkanya
+        # ditulis ulang bertanggal, dan Thai yang sudah ditulis wajib ikut tercatat.
+        run: node tests/japanese-th-parity-test.js
       - name: 'Konsol kurikulum: pintu ke ruangan kosong wajib tertutup'
         # m025-294 memasang tautan Kurikulum di sidebar Ruang Guru. Isinya dilayani
         # features/curriculum/fz-api.js yang memanggil '/api/...' relatif ke origin yang
@@ -1019,6 +1133,71 @@ jobs:
         # menuntut benderanya MATI di kedua jalur dan tautannya dijaga bendera - sekaligus
         # menuntut mesinnya TIDAK dihapus, supaya satu bendera cukup saat backend siap.
         run: node tests/curriculum-console-gate-test.js
+      - name: 'Kurikulum & Kompetensi hidup DI DALAM dasbor KelasKu, bukan sebagai butir nav'
+        # Instruksi owner (21 Sep 2026): cabut panel Kurikulum & Kompetensi dari dasbor
+        # Ruang Guru, integrasikan sistemnya ke halaman dasbor KelasKu, dan tidak boleh
+        # ada yang kurang. Tiga kegagalan dijaga sekaligus: (1) pintu yatim - butir nav
+        # dicabut tanpa tab pengganti; (2) pintu ke ruangan kosong - tab dipasang tanpa
+        # penjaga alamat backend; (3) mesin tanpa tombol - tiga penyemai yang sudah punya
+        # penangan + runSeed*() sejak lama tetapi nol tombol yang memanggilnya, sementara
+        # naskah sumber-lokal menyuruh guru menekan kartu penyemai yang tidak ada di layar
+        # itu. Sebagian besar assert DIJALANKAN: hub dipasang dengan env tiruan, tabnya
+        # diketuk, dan yang diperiksa adalah HTML yang keluar.
+        run: node tests/kelasku-kurikulum-dashboard-test.js
+      - name: 'Konsol kurikulum hanya punya SATU pintu: KelasKu'
+        # Keputusan owner 14 Sep 2026: guru dan murid yang sudah punya akun KelasKu tidak
+        # boleh diminta identitas kedua. Tiga pintu lama di mesin kurikulum (token FZG-,
+        # email+sandi, sesi Google) DICABUT, termasuk rutenya di server - pintu yang hilang
+        # dari layar tapi hidup di server bukan pintu tertutup, ia pintu tak terlihat.
+        # Gerbang menyisir naskah layar DAN rute server, lalu menuntut jalur penggantinya
+        # terpasang di ketiga lapis (klien, Worker, FastAPI).
+        run: node tests/curriculum-single-door-test.js
+      - name: 'Tiket KelasKu: penanda tangan JS dan pembaca Python sepakat bit per bit'
+        # Tiket ditandatangani di Workers (WebCrypto) dan dibaca di CPython. Bentuknya
+        # terpaksa ditulis dua kali, dan dua tulisan yang menyimpang baru ketahuan di
+        # produksi sebagai "tiket ditolak" tanpa sebab. Gerbang MENJALANKAN kedua sisi atas
+        # vektor yang sama, dua arah, plus penolakan (tanda tangan rusak, kedaluwarsa,
+        # salah audience, kunci lemah).
+        run: node tests/curriculum-ticket-parity-test.js
+      - name: 'Halaman konsol benar-benar memuat konfigurasinya'
+        # m025-298 memindahkan alamat backend ke core-config.js dan menurunkan pintunya dari
+        # nilai itu - tetapi kurikulum.html dan misi.html tidak pernah memuat core-config.js.
+        # FIEZEL_CURRICULUM_CONFIG undefined di kedua halaman, jadi owner boleh memasang
+        # MongoDB + FastAPI dan menempelkan alamatnya: konsolnya TETAP menolak semua
+        # panggilan sambil menuduh owner belum mengonfigurasi apa pun. Gerbang memindai
+        # seluruh *.html di akar: yang memuat fz-api.js WAJIB memuat core-config.js lebih
+        # dulu, dan alamat bawaannya WAJIB tetap kosong.
+        run: node tests/curriculum-config-wiring-test.js
+      - name: 'Rilis kurikulum tidak boleh tertutup salinan lama di cache peramban'
+        # m025-325 TERBIT lalu tidak TERLIHAT: server menyajikan konsol berpintu-KelasKu,
+        # tetapi peramban owner menggambar layar token FZG- yang sudah dicabut tiga rilis
+        # sebelumnya. Sebabnya struktural - kurikulum.html dan misi.html nol entri di
+        # precache sw.js, jadi penjaga generasi milik cangkang murid tidak berlaku di sana,
+        # sementara rujukan skripnya telanjang (URL sama persis untuk setiap rilis). Gerbang
+        # menuntut tiap rujukan lokal membawa `?v=<build>` yang SAMA dengan FIEZEL_PAGE_BUILD,
+        # dan menuntut ritual bump ikut menaikkannya.
+        run: node tests/curriculum-cache-version-test.js
+      - name: 'Penyemai kurikulum punya pintu, bukan cuma kemampuan'
+        # backend/seed_english.py membangun Kurikulum Merdeka Bahasa Inggris UTUH (Fase A-F,
+        # Kelas 1-12, 72 TP, 144 kompetensi) dan endpointnya sudah lama ada - tetapi NOL
+        # antarmuka pernah memanggilnya, jadi satu-satunya kurikulum yang mendarat di MongoDB
+        # adalah demo Matematika 11 kompetensi. Owner menyimpulkan "mata pelajarannya belum
+        # lengkap"; yang kurang bukan isinya melainkan pintunya. Bentuk cacat yang sama persis
+        # dengan token FZG- di PR #428. Gerbang menuntut ketiga lapisnya bersama: endpoint,
+        # pengikat klien, dan kendali di konsol yang penangan aksinya benar-benar ada.
+        run: node tests/curriculum-seed-reachable-test.js
+      - name: 'Kontrak pemasangan backend: env lengkap, CORS tertutup, lifespan tertutupi'
+        # Backend backend/ dipasang permanen di cPanel, dan tiga cacat di jalur itu semuanya
+        # GAGAL DALAM DIAM - API menjawab 200 sementara yang penting tidak terjadi. Diukur,
+        # bukan disimpulkan: (1) Passenger berbicara WSGI, a2wsgi tidak menjalankan lifespan
+        # ASGI, jadi @app.on_event("startup") dilewati - indeks unik, akun owner, dan semaian
+        # kurikulum tidak pernah dibuat, status tetap 200 OK; penawarnya bootstrap.py.
+        # (2) CORS bawaan "*" bersama allow_credentials=True: pada starlette 0.37.2 request
+        # lintas-situs yang membawa cookie dijawab dengan origin penuntutnya DIPANTULKAN,
+        # jadi situs mana pun bisa membaca data murid yang sedang login. (3) env wajib dibaca
+        # os.environ[...] sehingga yang kurang mematikan server saat start - daftarnya
+        # dipindai dari backend/*.py, jadi env berikutnya ikut terjaga sendiri.
+        run: node tests/backend-env-contract-test.js
       - name: 'Konsol kurikulum memanggil alamat yang dikonfigurasi, bukan same-origin'
         # fz-api.js lahir dengan asumsi ingress mengarahkan /api ke FastAPI di domain yang
         # sama. Di produksi FIEZEL itu salah - fiezel.my.id hosting statis, /api/health 404.
@@ -1043,6 +1222,31 @@ jobs:
         # hal dan melakukan hal lain. Gerbang mengikat penjaganya ke ADA-TIDAKNYA berkas di
         # content/ja/, jadi ia BERBALIK menuntut penjaga dicabut begitu banknya dibuat.
         run: node tests/japanese-surface-honesty-test.js
+      - name: 'Permukaan kursus Jepang: furigana/romaji, tabel kana, kartu segera hadir'
+        # Kursus Jepang punya pola yang tidak ada di kursus Inggris: furigana <ruby> dan
+        # romaji yang bisa disembunyikan, tabel kana, label JLPT. Kartu "Segera hadir" untuk
+        # menyimak/berbicara/kanji/simulasi JLPT harus tetap tidak bisa diketuk.
+        run: node tests/japanese-ja-ui-test.js
+      - name: 'Ruang Guru dimuat malas (audit F28)'
+        # Shell + kurikulum guru (±600 KB) tidak lagi dimuat saat boot untuk setiap murid.
+        # Pemuat kecil menjawab previewAllowed() seketika dan mengambil modul penuh hanya
+        # untuk guru/demo; kegagalan unduh jatuh ke Tutor Action Center.
+        run: node tests/teacher-lazy-load-test.js
+      - name: 'Ruang Guru: satu lapis navigasi (audit F25)'
+        run: node tests/teacher-single-nav-test.js
+      - name: 'Intro materi mengajarkan aturan topiknya (audit F10)'
+        run: node tests/grammar-lesson-rule-test.js
+      - name: 'Penjaga bahasa target duduk di rute, bukan di kartu'
+        # Gerbang japanese-surface-honesty di atas HIJAU sepanjang audit m025-314, dan tetap
+        # ada tiga pintu ke latihan dengar/bicara yang tidak dijaganya: kartu skill hub di
+        # Beranda, chip "Dengar" di Beranda, dan rute go()/renderInner itu sendiri. Chip
+        # "Dengar" bahkan berdiri tepat di bawah chip yang mengantar murid ke Bahasa Jepang.
+        # Sebabnya penjaganya dipasang di DAFTAR KARTU, jadi setiap permukaan baru lahir
+        # tanpa penjaga. Gerbang ini menjaga invarian yang berbeda: rutenya yang menolak,
+        # dan kartu hanya kesopanan di atas penolakan itu. Ia MEMUAT app.js di vm lalu
+        # MEMANGGIL daftar kartunya di kedua bahasa - kartu yang dipindah ke fungsi lain
+        # tetap terbaca, karena yang dibaca keluarannya, bukan pola teksnya.
+        run: node tests/target-lang-surface-guard-test.js
       - name: 'Pembungkus i18n memakai kalimat cadangannya, bukan nama kuncinya'
         # FiezelI18n.t() mengembalikan KUNCINYA saat kalimatnya belum termuat - itu
         # disengaja supaya lubangnya terlihat. Tetapi pembungkus t(kunci, cadangan) di
@@ -1070,6 +1274,16 @@ jobs:
         # Gerbang ini membaca daftar kunci LANGSUNG DARI SUMBER, jadi ia ikut tumbuh saat kunci
         # baru lahir dan tidak bisa basi diam-diam.
         run: node tests/target-language-axis-test.js
+      - name: 'Progres tiap bahasa benar-benar berdiri sendiri'
+        # Gerbang di atas menguji MODUL sumbu bahasa dan hijau 10/10 sejak ia lahir —
+        # sementara app.js tidak pernah memanggilnya untuk membentuk satu pun kunci
+        # penyimpanan. Modul yang benar, diuji dengan benar, dan tidak dipakai: kelas cacat
+        # yang tidak bisa dilihat gerbang yang memeriksa modul. Gerbang ini MENJALANKAN
+        # jalur simpan/muat yang sungguhan di kedua bahasa — menjawab soal di Inggris,
+        # berganti ke Jepang, menjawab lagi, lalu pulang — dan menuntut tiga janji:
+        # progres berdiri sendiri, kembali tidak menghapus apa pun, dan kunci Inggris
+        # tidak bergeser sebita pun.
+        run: node tests/target-lang-progress-isolation-test.js
       - name: 'Wave E4: post-test tertunda / probe retensi (fiezel-post-test)'
         # Modul murni baru features/brain/fiezel-retention-probe.js: penjadwal probe retensi
         # deterministik (offset 3/7/21 hari, jitter seeded per lessonId+userSeed) +

@@ -9,7 +9,7 @@
 // contoh yang tidak memuat たべる. Tidak ada yang merah; hanya kartunya yang tidak mengajar
 // apa pun. Assert "kalimat memuat katanya" adalah inti gerbang ini; sisanya penjaga bentuk.
 //
-// Sumbernya (docs/japanese/kosakata-jlpt.json, 1.371 entri) adalah DAFTAR KATA — fakta
+// Sumbernya (docs/japanese/kosakata-jlpt.json, 1.885 entri) adalah DAFTAR KATA — fakta
 // bahasa, bukan karya berhak cipta. Setiap KALIMAT di bank ini ditulis baru; tidak satu pun
 // disalin dari Minna no Nihongo maupun Irodori. Gerbang menahan janji itu dari sisi yang bisa
 // diperiksa mesin: nol kalimat sumber ikut terbawa, karena sumbernya memang tidak punya

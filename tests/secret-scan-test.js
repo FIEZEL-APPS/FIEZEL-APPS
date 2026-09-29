@@ -330,7 +330,8 @@ const BINARY_EXTENSIONS = new Set([
   '.woff', '.woff2', '.ttf', '.otf', '.eot',                   // font
   '.mp3', '.wav', '.m4a', '.ogg', '.opus',                     // aset suara pelajaran
   '.mp4', '.webm', '.mov',                                     // klip pemasaran
-  '.onnx', '.wasm', '.bin', '.pt', '.zip', '.gz', '.pdf'       // model neural & arsip vendor
+  '.onnx', '.wasm', '.bin', '.pt', '.zip', '.gz', '.pdf',      // model neural & arsip vendor
+  '.exe'                                                        // executable Windows (tool sentinel)
 ]);
 
 /**
@@ -355,6 +356,36 @@ const HEURISTIC_PATH_ALLOWLIST = [
     reason: 'Manifest 1.170 objek R2 `a/<sha256>.mp3`. Isinya memang ribuan digest konten '
       + '(alamat aset publik yang sudah dilayani audio.fiezel.my.id) — bukan kredensial. '
       + 'Digest heksa sudah lolos penyaring struktural, entri ini hanya membuat niatnya eksplisit.'
+  },
+  {
+    prefix: 'tools/fiezel-drop/public/calc-icon.b64',
+    reason: 'Ikon kalkulator (PNG 32×32) yang dikodekan Base64 sebagai favicon laman jebakan '
+      + 'Ghost Sentinel — tampilan menyamar sebagai kalkulator. Konten PNG murni: '
+      + 'setiap baris adalah penggalan citra biner, bukan token atau kredensial apa pun. '
+      + 'Detektor heuristik base64url/entropi terpicu karena byte gambar memang acak.'
+  },
+  {
+    prefix: 'tools/fiezel-drop/public/qrcode.min.js',
+    reason: 'Pustaka QR code pihak ketiga (qrcode.js) yang disertakan lokal agar halaman '
+      + 'jebakan Ghost Sentinel bisa berjalan offline. Berkas ini memuat data URI gambar '
+      + 'PNG kecil yang dikodekan Base64 — bukan rahasia, melainkan aset ikon bawaan '
+      + 'pustaka. Kode sumber asli tersedia publik; integritas berkas dijaga oleh commit.'
+  },
+  {
+    /* SALINAN BYTE-IDENTIK dari entri tepat di atas, di rumah barunya.
+       Diukur, bukan diduga: sha256 kedua berkas sama persis
+       (c541ef06327885a8415bca8df6071e14189b4855336def4f36db54bde8484f36, 19.927 bita).
+       Halaman Ghost Sentinel dipindahkan ke website/sentinel/ pada 16 Sep 2026 lewat
+       5e1c4daa, dan pustakanya ikut disalin — pemindai dengan benar menemukannya lagi
+       di jalur baru, karena daftar maaf ini memang dikunci JALUR, bukan isi.
+
+       Entri ini karena itu tidak melonggarkan apa pun yang belum dimaafkan: ia
+       menyatakan ulang keputusan yang sama untuk berkas yang sama. */
+    prefix: 'website/sentinel/qrcode.min.js',
+    reason: 'Salinan byte-identik (sha256 c541ef06…) dari tools/fiezel-drop/public/qrcode.min.js, '
+      + 'dipindahkan ke website/ supaya ter-deploy lewat cPanel. Alasannya sama persis: data URI '
+      + 'PNG 1x1 bawaan pustaka, terdekode menjadi bita ajaib PNG. Pengecualian jalur lama '
+      + 'tertinggal saat berkasnya pindah, dan itu membuat main merah di setiap PR.'
   }
 ];
 

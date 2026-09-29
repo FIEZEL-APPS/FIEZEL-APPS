@@ -28,17 +28,124 @@
        'wasm-unsafe-eval' WAJIB ada: mesin suara neural mengompilasi sherpa-onnx .wasm
        (vendor/supertonic-3, 13 MB) di klien, dan tanpa token itu Chromium menolak
        WebAssembly.instantiate - model 152 MB yang sudah diunduh jadi tidak terpakai. -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://js.puter.com https://accounts.google.com; connect-src 'self' https: wss:; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline' https://accounts.google.com; frame-src 'self' https://accounts.google.com; media-src 'self' blob: data:; worker-src 'self' blob:">
-  <meta name="theme-color" content="#FFF9EE">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://accounts.google.com; connect-src 'self' https: wss:; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline' https://accounts.google.com; frame-src 'self' https://accounts.google.com; media-src 'self' blob: data:; worker-src 'self' blob:">
+  <meta name="theme-color" content="#FBF7F3">
   <!-- Mode gelap dihapus: color-scheme dipaku light agar kontrol form/scrollbar selalu terang. -->
   <meta name="color-scheme" content="light">
-  <meta name="description" content="FIEZEL adalah aplikasi belajar bahasa Inggris adaptif untuk vocabulary, grammar, reading, speaking, listening, dan tes diagnostik CEFR.">
+  <meta name="description" content="FIEZEL adalah aplikasi belajar bahasa adaptif: kursus Bahasa Inggris (CEFR A1–C2) dan Bahasa Jepang (JLPT N5–N4), dengan vocabulary, grammar, reading, dan AI Tutor. Gratis dan bisa dipakai offline.">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" href="./favicon-64.png">
   <link rel="apple-touch-icon" href="./apple-touch-icon.png">
-  <title>FIEZEL | Adaptive English</title>
+  <title>FIEZEL | Belajar Bahasa Inggris &amp; Jepang — Indonesia &amp; Thailand</title>
+  <!-- SEO: kanonik BERKAS INI, bukan kanonik yang kita inginkan.
+       Berkas ini diterbitkan ke ~/public_html/app/ (lihat .cpanel.yml dan
+       .github/workflows/deploy-site.yml), jadi URL-nya https://fiezel.my.id/app/ — bukan
+       root domain, yang disajikan dari website/. Kanonik yang menunjuk "/" dulu meminta
+       Google MEMBUANG /app/ dari indeks sambil sitemap root justru mendaftarkannya:
+       dua perintah yang berlawanan, dan Google menyelesaikannya dengan mengabaikan
+       keduanya. Dijaga tests/seo-surface-gate-test.js cek (B).
+
+       hreflang SENGAJA TIDAK ADA di sini. Cangkang aplikasi ini SATU URL untuk semua
+       bahasa — ganti bahasa terjadi di dalam aplikasi, bukan dengan pindah alamat. Tiga
+       baris hreflang yang semuanya menunjuk URL yang sama bukan "hreflang minimal", ia
+       pasangan yang bertentangan dengan dirinya sendiri dan dibuang Google tanpa pesan
+       galat. Pasangan id/th yang SUNGGUHAN ada di website/ (root dan /th/). -->
+  <link rel="canonical" href="https://fiezel.my.id/app/">
+  <!-- SEO: Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://fiezel.my.id/app/">
+  <meta property="og:title" content="FIEZEL — Belajar Bahasa Inggris &amp; Jepang, Adaptif &amp; Gratis">
+  <meta property="og:description" content="FIEZEL adalah platform belajar bahasa Inggris dan Jepang adaptif berbasis AI untuk pelajar Indonesia dan Thailand. Vocabulary, Grammar, Reading, Speaking, Listening, AI Tutor, dan tes CEFR. Gratis, berjalan offline.">
+  <meta property="og:image" content="https://fiezel.my.id/assets/brand/fiezel-icon-512.png">
+  <meta property="og:site_name" content="FIEZEL">
+  <meta property="og:locale" content="id_ID">
+  <meta property="og:locale:alternate" content="th_TH">
+  <!-- SEO: Twitter/X Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="FIEZEL — Belajar Bahasa Inggris &amp; Jepang, Adaptif &amp; Gratis">
+  <meta name="twitter:description" content="Platform belajar bahasa Inggris dan Jepang adaptif berbasis AI. Untuk pelajar Indonesia dan Thailand. Vocabulary, Grammar, Speaking, Listening, AI Tutor.">
+  <meta name="twitter:image" content="https://fiezel.my.id/assets/brand/fiezel-icon-512.png">
+  <!-- SEO: Keywords & Author -->
+  <meta name="keywords" content="FIEZEL, belajar bahasa Inggris, belajar bahasa Jepang, aplikasi bahasa Inggris, aplikasi bahasa Jepang, English learning app, Japanese learning app, vocabulary, grammar, CEFR, JLPT, adaptive learning, Indonesia, Thailand, เรียนภาษาอังกฤษ, เรียนภาษาญี่ปุ่น">
+  <meta name="author" content="FIEZEL">
+  <!-- SEO: Structured Data JSON-LD (Schema.org) untuk Google AI Overview -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "@id": "https://fiezel.my.id/#app",
+        "name": "FIEZEL",
+        "alternateName": ["Fiezel", "FIEZEL App", "FIEZEL — Ruang Belajar Bahasa", "แอปเรียนภาษา FIEZEL"],
+        "url": "https://fiezel.my.id/app/",
+        "description": "FIEZEL adalah platform belajar bahasa adaptif berbasis AI untuk pelajar di Indonesia dan Thailand. Tersedia kursus Bahasa Inggris (CEFR A1–C2) dan Bahasa Jepang (JLPT N5–N4). Vocabulary, Grammar, Reading, AI Tutor, dan Teacher Dashboard; Speaking dan Listening tersedia untuk kursus Inggris. Gratis dan bisa dipakai offline.",
+        "applicationCategory": "EducationalApplication",
+        "operatingSystem": ["Web", "Android", "iOS"],
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "IDR",
+          "availability": "https://schema.org/InStock"
+        },
+        "featureList": [
+          "Kursus Bahasa Inggris adaptif (CEFR A1–C2)",
+          "Kursus Bahasa Jepang adaptif (JLPT N5–N4)",
+          "Vocabulary adaptif dengan spaced repetition",
+          "Grammar interaktif dengan penjelasan berbahasa Indonesia dan Thai",
+          "Reading comprehension berjenjang",
+          "Speaking practice dengan AI feedback (kursus Inggris)",
+          "Listening dengan neural voice lokal offline (kursus Inggris)",
+          "Tes penempatan CEFR otomatis",
+          "AI Tutor personal",
+          "Teacher Dashboard untuk guru",
+          "Duel Belajar antar murid",
+          "Offline-first PWA",
+          "Gratis tanpa biaya"
+        ],
+        "inLanguage": ["id", "th", "en", "ja"],
+        "audience": {
+          "@type": "EducationalAudience",
+          "educationalRole": ["student", "teacher"],
+          "geographicArea": [
+            { "@type": "Country", "name": "Indonesia" },
+            { "@type": "Country", "name": "Thailand" }
+          ]
+        },
+        "screenshot": "https://fiezel.my.id/assets/shots/home-desktop.png",
+        "image": "https://fiezel.my.id/assets/brand/fiezel-icon-512.png"
+      },
+      {
+        "@type": "EducationalOrganization",
+        "@id": "https://fiezel.my.id/#org",
+        "name": "FIEZEL",
+        "alternateName": ["Fiezel", "แฟลซเซิล"],
+        "url": "https://fiezel.my.id/",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://fiezel.my.id/assets/brand/fiezel-icon-512.png",
+          "width": 512,
+          "height": 512
+        },
+        "description": "FIEZEL adalah platform belajar bahasa adaptif untuk pelajar di Indonesia dan Thailand, menyediakan kursus Bahasa Inggris dan Bahasa Jepang berbasis AI.",
+        "areaServed": ["Indonesia", "Thailand"],
+        "knowsAbout": ["English Language Learning", "Japanese Language Learning", "Adaptive Education", "CEFR", "JLPT", "Vocabulary", "Grammar"]
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://fiezel.my.id/#website",
+        "url": "https://fiezel.my.id/",
+        "name": "FIEZEL",
+        "description": "Platform belajar Bahasa Inggris dan Bahasa Jepang adaptif untuk pelajar Indonesia dan Thailand",
+        "inLanguage": ["id", "th"],
+        "publisher": { "@id": "https://fiezel.my.id/#org" }
+      }
+    ]
+  }
+  </script>
   <!-- m025-84 OWNER: "sebelum muncul splash ada jeda sekitar kurang lebih 3 detik dan
        muncul layar putih seluruh layar". Layar putih itu adalah body kosong: `body{background:
        var(--sky-bottom)}` = #fdf6f5, ditahan selama ~50 berkas skrip (termasuk js.puter.com dari
@@ -66,7 +173,7 @@ html.fz-booting body{overflow:hidden}
 #fiezelBootSplash{--fz-b1:0ms;--fz-b2:240ms;--fz-b3:470ms;--fz-b4:690ms;--fz-b5:870ms;--fz-b6:1060ms;--fz-b7:1150ms;--fz-b8:1400ms;--fz-b9:1520ms;--fz-b10:1655ms;--fz-b11:1780ms;--fz-b12:1900ms}
 /* Salinan APA ADANYA dari style.css (diperiksa tests/splash-first-paint-test.js). */
 .fiezel-wordmark{display:block;width:100%;height:auto}
-.fiezel-splash,.fiezel-ob{--fz-bg:#FFF9EE;--fz-paper:#FFFFFF;--fz-ink:#241A11;--fz-ink-muted:#6E5E47;--fz-accent:#241A11;--fz-accent-deep:#120C07;--fz-gold:#E6A800;--fz-soft:#FFF3C4;--fz-line:#F0E4CF;--fz-sun:#FFC700;--fz-sun-soft:#FFF3C4;--fz-sun-press:#CC9600;--fz-sun-grad:linear-gradient(180deg,#FFDE59,#FFA500);--fz-info:#7A5F1B;--fz-core:#1B1418;--fz-core-soft:#2A2126;--fz-on-core:#FDFAF3;--fz-display:'FZ Instrument Serif',Georgia,'Times New Roman',serif;--fz-heading:'FZ Plus Jakarta Sans',-apple-system,'Segoe UI',sans-serif;--fz-body:'FZ Plus Jakarta Sans',-apple-system,'Segoe UI',sans-serif}
+.fiezel-splash,.fiezel-ob{--fz-bg:#FBF7F3;--fz-paper:#FFFFFF;--fz-ink:#2E2724;--fz-ink-muted:#6E635C;--fz-accent:#9B3A4A;--fz-accent-deep:#7E2D3B;--fz-gold:#7A5512;--fz-soft:#F6E9EB;--fz-line:#EFE7DE;--fz-sun:#F7EACB;--fz-sun-soft:#FBF3E2;--fz-sun-press:#EFDFB8;--fz-sun-grad:linear-gradient(180deg,#F7EACB,#EFDFB8);--fz-info:#7A5512;--fz-core:#1B1418;--fz-core-soft:#2A2126;--fz-on-core:#FDFAF3;--fz-display:'FZ Plus Jakarta Sans',-apple-system,'Segoe UI',sans-serif;--fz-heading:'FZ Plus Jakarta Sans',-apple-system,'Segoe UI',sans-serif;--fz-body:'FZ Plus Jakarta Sans',-apple-system,'Segoe UI',sans-serif}
 .fiezel-splash,.fiezel-ob{position:fixed;inset:0;z-index:2147482000;display:flex;flex-direction:column;background:var(--fz-bg);font-family:var(--fz-body);color:var(--fz-ink);padding-top:max(18px,env(safe-area-inset-top));animation:fzm-page-in .4s cubic-bezier(.22,.61,.36,1) both}
 .fiezel-splash[hidden]{display:none}
 .fiezel-splash.is-leaving,.fiezel-ob.is-leaving{animation:fzm-page-out .3s ease-in both}
@@ -82,8 +189,18 @@ html.fz-booting body{overflow:hidden}
 .fz-fgroup,.fz-barsgroup{opacity:0;will-change:opacity}
 .fiezel-logo .fz-f,.fiezel-logo .fz-bar{transform-box:fill-box}
 .fiezel-splash-brand .fiezel-splash-word{position:absolute;display:block;left:0;right:0;margin:0 auto;bottom:calc(7vh + env(safe-area-inset-bottom,0px));width:min(52vw,238px);text-align:center;opacity:0;transform:translateY(14px);will-change:transform,opacity;pointer-events:none}
+.fz-auth-topo{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+.fz-auth-topo path,.fz-auth-topo line,.fz-auth-topo circle{fill:none !important;stroke:rgba(255,199,0,.24) !important;stroke-width:1.1 !important;stroke-linecap:round !important;stroke-linejoin:round !important}
+.fz-auth-topo .accent{stroke:rgba(255,215,0,.55) !important;stroke-width:1.4 !important}
+.fz-auth-topo .whisper{stroke:rgba(255,199,0,.14) !important;stroke-width:0.95 !important}
 .fiezel-splash-brand .fiezel-wordmark{display:block;width:min(30vw,132px);height:auto;margin:0 auto}
-.fiezel-splash-brand .fiezel-splash-tag{font-family:var(--fz-body);font-size:12px;letter-spacing:.30em;text-transform:uppercase;color:#FFC700;margin:14px 0 0;white-space:nowrap}
+.fiezel-splash-brand .fiezel-splash-tag{font-family:var(--fz-body);font-size:12px;letter-spacing:.30em;text-transform:uppercase;color:#FFD94F;margin:14px 0 0;white-space:nowrap}
+.fiezel-splash-brand .fiezel-splash-kelasku{margin-top:13px;display:flex;align-items:center;justify-content:center}
+.fiezel-splash-brand .kelasku-brand{display:inline-flex;align-items:baseline;justify-content:center;gap:6px;white-space:nowrap}
+.fiezel-splash-brand .kelasku-wordmark{font-family:var(--fz-heading,'Plus Jakarta Sans',sans-serif) !important;font-weight:800;font-size:16px;letter-spacing:.02em;color:#34D399 !important;line-height:1;display:inline-block;animation:fz-kelasku-reveal .75s cubic-bezier(.16,1,.3,1) 1.4s both}
+.fiezel-splash-brand .kelasku-tag{font-family:var(--fz-body,'Plus Jakarta Sans',sans-serif);font-size:10.5px;font-weight:600;letter-spacing:.04em;color:rgba(253,250,243,.65);line-height:1;display:inline-block;animation:fz-tag-reveal .65s cubic-bezier(.16,1,.3,1) 1.52s both}
+@keyframes fz-kelasku-reveal{from{opacity:0;transform:translateY(8px);filter:blur(4px)}to{opacity:1;transform:none;filter:none}}
+@keyframes fz-tag-reveal{from{opacity:0;transform:translateY(4px)}to{opacity:.65;transform:none}}
 @keyframes fz-fade-in{from{opacity:0}to{opacity:1}}
 .fiezel-splash-still .fz-splash-canvas{display:none}
 .fiezel-splash-still .fz-fgroup,.fiezel-splash-still .fz-barsgroup{opacity:1}
@@ -91,6 +208,7 @@ html.fz-booting body{overflow:hidden}
 .fiezel-splash-still .fiezel-logo .fz-bar{transform:none!important;animation:fz-fade-in .3s ease var(--fz-b6,1060ms) both}
 .fiezel-splash-still .fiezel-splash-word{transform:none!important;animation:fz-fade-in .3s ease var(--fz-b7,1150ms) both}
 .fiezel-splash-still .fiezel-splash-tag{transform:none!important;animation:fz-fade-in .24s ease var(--fz-b12,1900ms) both;opacity:0}
+.fiezel-splash-still .fiezel-splash-kelasku{transform:none!important;animation:fz-fade-in .24s ease var(--fz-b12,1900ms) both;opacity:0}
   </style>
   <!-- ============================================================================
        m025-199 (laporan OWNER: "saat boot memasukin splash sangat lama sekali").
@@ -132,8 +250,9 @@ html.fz-booting body{overflow:hidden}
   <link rel="stylesheet" href="./features/tutor-classroom/tutor-v3.css">
   <link rel="stylesheet" href="./features/learner-flow/learner-flow.css">
   <link rel="stylesheet" href="./features/learner-flow/home-polish.css">
-  <!-- Ruang Guru: tema terpisah untuk cangkang guru (features/teacher). Hanya aktif saat body.fz-teacher-mode. -->
-  <link rel="stylesheet" href="./features/teacher/teacher-shell.css">
+  <!-- Ruang Guru: tema cangkang guru (features/teacher/teacher-shell.css, 72 KB) TIDAK lagi
+       dimuat untuk murid (audit F28). FiezelTeacherShell.ensureCss() memasangnya begitu mode
+       guru/demo menyala. -->
   <link rel="stylesheet" href="./features/class-hub/class-hub.css">
   <!-- m026-01: motion system maskot PAW. Sengaja PALING AKHIR di antara stylesheet:
        berkasnya memakai nama token yang bertabrakan dengan style.css (--fz-gold,
@@ -143,13 +262,82 @@ html.fz-booting body{overflow:hidden}
   <link rel="stylesheet" href="./features/mascot/fiezel-motion.css">
   <link rel="stylesheet" href="./features/ui/fiezel-lux.css">
   <link rel="stylesheet" href="./fiezel-2.css">
+  <link rel="stylesheet" href="./features/speaking-listening/jlpt-listening.css">
+  <link rel="stylesheet" href="./features/ui/mobile-edge-fit.css?v=contrast-v25">
+  <style id="fz-contrast-guard">
+    /* High contrast guard: prevent yellow-on-yellow or white-on-yellow illegible text */
+    .fz2-lvls span.is-now,
+    .fz2-lvl.is-now,
+    span.fz2-lvl.is-now,
+    .card .fz2-lvls span.is-now,
+    .card .fz2-lvl.is-now,
+    .card div > span.fz2-lvl.is-now,
+    .card div > span.is-now {
+      background: #FFE02E !important;
+      color: #0A0A0E !important;
+      font-weight: 900 !important;
+    }
+    .ch-badge,
+    span.ch-badge,
+    .card .ch-badge,
+    .card div > span.ch-badge {
+      background: #FFE02E !important;
+      color: #0A0A0E !important;
+      font-weight: 900 !important;
+    }
+    .active-level-control small {
+      background: rgba(255, 224, 46, 0.15) !important;
+      color: #FFE02E !important;
+      border: 1px solid rgba(255, 224, 46, 0.4) !important;
+      font-weight: 800 !important;
+    }
+
+    /* Anti-Ruang Hampa (Zero Void Space): eliminate bottom void across all panels */
+    body, body.fz-lux, body.fz-stage-map .app, body.fz-stage-quiz .app,
+    body.fz-stage-sl .app, body.fz-stage-hub .app, main.app, .app, .view-container, #app {
+      padding-bottom: 0 !important;
+    }
+    #app > section, #app > div, #app > article, main.app > section, main.app > div,
+    section.fade, .classroom-page, .home-page, .home-today,
+    .learner-flow-page, .skills-lab-page, .skills-page, .writing-page, .library-page,
+    .ask-page, .progress-page, .profile-page, .settings-page, .view-page, .view-container {
+      min-height: auto !important;
+      padding-bottom: calc(76px + env(safe-area-inset-bottom, 12px)) !important;
+      scroll-padding-bottom: calc(76px + env(safe-area-inset-bottom, 12px)) !important;
+    }
+    .home-today .today-home-cockpit, .today-home-cockpit, .ch-student,
+    .classroom-shell, .learner-flow-shell, .paw-arena-shell, .tutor-center-shell,
+    .teacher-shell-root, .progress-container, #socialHomeSlot, .fz2-social,
+    .learning-launcher, .fz-card-drawer, .library-reader, .fsl-feedback, .grid,
+    #fzClassHub, #fzLearnerFlow, #fzPawArena, #fzTeacherShell, #fzTutorCenter {
+      padding-bottom: 0 !important;
+      margin-bottom: 0 !important;
+    }
+    .modal-panel, .welcome-panel, .notification-panel, .listening-modal-box {
+      max-height: min(720px, 86vh) !important;
+      padding-bottom: 20px !important;
+      margin-bottom: 0 !important;
+    }
+  </style>
+  <!-- m025-308: <link> ke ./features/ui/fiezel-marshmallow.css DIBUANG. Berkasnya TIDAK
+       PERNAH ADA di repo (nol di riwayat git, nol di origin/main), jadi baris ini adalah
+       404 pada setiap pemuatan halaman sejak ia ditulis.
+
+       Catatan atas jalan buntu yang saya tempuh lebih dulu, supaya tidak diulang:
+       precache-covers-shell memerahkan gerbang karena berkas ini dimuat tetapi tidak
+       diprecache, dan perbaikan pertama saya MENAMBAHKANNYA ke ASSETS sw.js. Itu justru
+       lebih buruk - cache.addAll() menolak seluruh daftar kalau satu entri 404, jadi
+       INSTALASI SERVICE WORKER GAGAL TOTAL dan murid kehilangan mode luring seluruhnya.
+       Ketahuan oleh deploy-site-gate ("setiap entri ASSETS benar-benar ada di repo") dan
+       e2e-level-grammar ("service worker registers on a real origin: registered=false").
+       Dua gerbang itu menangkap persis apa yang mereka ada untuk menangkap. -->
 </head>
 <body class="scene-day">
   <!-- Splash frame-pertama. Isinya WAJIB sama persis dengan FiezelSplash.markup(); modul
        features/brand/fiezel-splash.js mengadopsi elemen ini lewat [data-fiezel-boot-splash]
        alih-alih membuat lapisan kedua, jadi animasi yang sudah berjalan diteruskan, bukan
        diulang dari awal setelah boot selesai. -->
-  <div id="fiezelBootSplash" class="fiezel-splash fiezel-splash-dark" data-fiezel-boot-splash role="dialog" aria-label="Selamat datang di FIEZEL"><div class="fiezel-splash-body fiezel-splash-brand"><canvas class="fz-splash-canvas" aria-hidden="true"></canvas><svg class="fiezel-logo" viewBox="0 0 512 512" role="img" aria-label="FIEZEL"><defs><linearGradient id="fzsGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFD94F"/><stop offset="100%" stop-color="#F0C241"/></linearGradient></defs><g class="fz-fgroup" fill="#FFF4DA"><rect class="fz-f fz-f1" x="136" y="148" width="42"  height="216" rx="20"/><rect class="fz-f fz-f2" x="136" y="148" width="128" height="42"  rx="20"/><rect class="fz-f fz-f3" x="136" y="230" width="102" height="40"  rx="19"/></g><g class="fz-barsgroup" fill="url(#fzsGold)"><rect class="fz-bar fz-bar1" x="298" y="200" width="34" height="112" rx="17"/><rect class="fz-bar fz-bar2" x="348" y="166" width="34" height="180" rx="17"/></g></svg><div class="fiezel-splash-word"><svg class="fiezel-wordmark" viewBox="0 0 1000 260" role="img" aria-label="FIEZEL"><defs><linearGradient id="fzsIv" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFFBF3"/><stop offset="100%" stop-color="#EBDBC0"/></linearGradient><linearGradient id="fzsGo" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFDE59"/><stop offset="45%" stop-color="#FFC700"/><stop offset="100%" stop-color="#E6A800"/></linearGradient></defs><g fill="url(#fzsIv)"><rect x="30" y="30" width="42" height="200" rx="21"/><rect x="30" y="30" width="144" height="42" rx="21"/><rect x="30" y="109" width="116" height="42" rx="21"/><rect x="300" y="30" width="42" height="200" rx="21"/><rect x="300" y="30" width="144" height="42" rx="21"/><rect x="300" y="109" width="100" height="42" rx="21"/><rect x="300" y="188" width="130" height="42" rx="21"/><rect x="478" y="30" width="150" height="42" rx="21"/><rect x="478" y="188" width="150" height="42" rx="21"/><rect x="607" y="30" width="191.38" height="42" rx="21" transform="rotate(124.354 607 51)"/><rect x="662" y="30" width="42" height="200" rx="21"/><rect x="662" y="30" width="144" height="42" rx="21"/><rect x="662" y="109" width="100" height="42" rx="21"/><rect x="662" y="188" width="130" height="42" rx="21"/><rect x="840" y="30" width="42" height="200" rx="21"/><rect x="840" y="188" width="130" height="42" rx="21"/></g><g fill="url(#fzsGo)"><rect x="192" y="30" width="26" height="200" rx="13"/><rect x="240" y="106" width="26" height="124" rx="13"/></g></svg><p class="fiezel-splash-tag">ADAPTIVE ENGLISH</p></div></div></div>
+  <div id="fiezelBootSplash" class="fiezel-splash fiezel-splash-dark" data-fiezel-boot-splash role="dialog" aria-label="Selamat datang di FIEZEL"><div class="fiezel-splash-body fiezel-splash-brand"><svg class="fz-auth-topo" viewBox="0 0 390 420" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false"><path d="M121 120C122 123 118 128 115 131C112 133 106 134 102 134C98 135 94 136 90 135C85 135 76 135 74 132C72 130 77 124 77 120C78 116 77 113 79 110C81 107 84 103 88 102C92 101 100 101 103 103C107 104 107 109 110 112C113 115 121 117 121 120Z"/><path d="M146 120C147 126 140 137 134 141C127 146 116 144 107 147C98 149 90 155 82 155C73 154 59 149 55 143C52 137 57 127 58 120C59 113 59 107 63 101C66 95 72 83 80 81C88 79 101 86 109 89C117 93 120 98 127 103C133 108 145 114 146 120Z"/><path d="M171 120C172 131 164 146 154 153C144 159 126 154 112 159C98 163 83 180 71 179C59 178 45 162 39 152C33 142 35 130 35 120C36 110 38 101 44 91C50 80 59 60 70 58C82 56 100 73 113 78C126 84 139 83 149 90C159 97 171 109 171 120Z"/><path d="M197 120C197 135 188 156 175 165C161 173 137 166 118 173C99 180 75 210 60 208C44 205 33 175 25 161C16 146 10 134 9 120C9 106 14 93 22 78C31 64 44 35 60 34C76 32 98 61 118 68C137 75 163 66 177 74C190 83 198 105 197 120Z"/><path d="M225 120C223 140 209 163 193 175C177 187 151 183 126 193C102 203 67 240 48 236C28 232 21 188 10 169C-1 150 -16 138 -19 120C-21 102 -16 81 -4 63C7 45 30 13 51 12C72 11 97 47 123 55C149 62 190 46 207 57C224 68 228 100 225 120Z"/><path d="M257 120C252 144 228 167 208 183C188 200 167 209 138 221C110 234 62 268 37 261C13 254 6 203 -8 179C-22 156 -42 142 -47 120C-52 98 -53 65 -38 44C-23 23 16 -3 44 -4C73 -6 99 28 131 35C163 43 217 26 238 40C259 54 262 96 257 120Z"/><path d="M292 120C284 148 243 167 220 190C197 214 186 244 154 259C122 274 60 291 29 280C-1 269 -14 219 -31 192C-49 166 -69 148 -76 120C-84 92 -97 44 -77 22C-58 -1 4 -11 40 -14C77 -16 105 1 143 7C181 13 242 5 266 23C291 42 299 92 292 120Z"/><path d="M328 120C318 152 259 167 233 197C207 228 208 289 173 305C138 320 63 309 24 293C-15 277 -38 237 -60 208C-82 180 -98 155 -108 120C-118 85 -144 21 -120 -2C-96 -26 -8 -14 38 -19C85 -24 116 -35 159 -30C201 -26 265 -17 293 8C321 34 338 88 328 120Z"/><path d="M349 70C349 73 346 76 344 78C341 80 338 79 334 81C331 82 325 88 323 88C320 87 319 80 318 77C316 74 314 73 313 70C313 67 313 64 315 61C316 59 320 54 323 54C326 54 330 60 334 61C338 62 344 59 347 60C350 62 350 67 349 70Z"/><path d="M371 70C369 76 361 80 356 85C351 89 348 93 341 96C334 100 321 108 315 106C309 104 308 90 305 84C302 78 296 76 295 70C293 64 291 55 295 50C298 45 310 40 318 40C325 40 330 48 339 49C347 51 361 46 366 49C372 53 372 64 371 70Z"/><path d="M395 70C392 79 374 82 367 91C359 99 360 114 351 119C341 124 319 125 309 121C299 116 295 102 289 93C283 85 278 80 275 70C272 60 263 42 269 36C276 29 301 31 314 30C326 30 334 30 346 32C358 33 378 32 386 38C394 45 398 61 395 70Z"/><path d="M422 70C417 82 389 84 379 98C369 111 376 144 363 150C351 156 319 141 304 134C288 126 277 116 268 105C259 94 255 84 250 70C245 56 230 27 240 19C250 11 291 25 310 23C330 21 340 5 357 6C373 7 397 15 408 26C418 37 427 58 422 70Z"/><path d="M446 70C440 86 408 89 397 108C386 127 393 177 377 183C361 189 321 156 299 145C277 134 259 130 245 118C232 106 223 89 218 70C212 51 198 13 213 3C227 -6 280 18 307 14C333 9 349 -24 369 -24C390 -24 417 -2 430 13C442 29 451 54 446 70Z"/><path d="M315 300C315 302 312 303 311 306C309 309 309 315 306 315C304 316 299 312 296 310C293 309 290 309 288 307C286 305 284 303 283 300C283 297 282 293 285 291C287 290 293 293 297 292C300 291 303 286 306 286C309 286 312 290 314 292C315 294 316 298 315 300Z"/><path d="M328 300C328 305 330 310 327 316C325 321 319 329 313 330C307 331 297 324 291 321C285 319 280 318 275 314C269 311 261 305 260 300C260 295 267 288 272 284C278 281 285 282 292 280C298 278 306 270 312 271C318 271 327 278 330 283C332 288 329 295 328 300Z"/><path d="M341 300C342 310 358 323 354 330C350 338 330 343 318 344C307 345 295 340 285 337C275 333 267 330 258 324C249 318 228 307 229 300C230 293 254 286 263 279C272 273 274 265 284 261C293 256 308 252 319 254C330 256 345 265 349 272C352 280 340 290 341 300Z"/></svg><canvas class="fz-splash-canvas" aria-hidden="true"></canvas><svg class="fiezel-logo" viewBox="0 0 512 512" role="img" aria-label="FIEZEL"><defs><linearGradient id="fzsGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFD94F"/><stop offset="100%" stop-color="#F0C241"/></linearGradient></defs><g class="fz-fgroup" fill="#FFF4DA"><rect class="fz-f fz-f1" x="136" y="148" width="42"  height="216" rx="20"/><rect class="fz-f fz-f2" x="136" y="148" width="128" height="42"  rx="20"/><rect class="fz-f fz-f3" x="136" y="230" width="102" height="40"  rx="19"/></g><g class="fz-barsgroup" fill="url(#fzsGold)"><rect class="fz-bar fz-bar1" x="298" y="200" width="34" height="112" rx="17"/><rect class="fz-bar fz-bar2" x="348" y="166" width="34" height="180" rx="17"/></g></svg><div class="fiezel-splash-word"><svg class="fiezel-wordmark" viewBox="0 0 1000 260" role="img" aria-label="FIEZEL"><defs><linearGradient id="fzsIv" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFFBF3"/><stop offset="100%" stop-color="#EBDBC0"/></linearGradient><linearGradient id="fzsGo" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFD94F"/><stop offset="45%" stop-color="#F5CE45"/><stop offset="100%" stop-color="#F0C241"/></linearGradient></defs><g fill="url(#fzsIv)"><rect x="30" y="30" width="42" height="200" rx="21"/><rect x="30" y="30" width="144" height="42" rx="21"/><rect x="30" y="109" width="116" height="42" rx="21"/><rect x="300" y="30" width="42" height="200" rx="21"/><rect x="300" y="30" width="144" height="42" rx="21"/><rect x="300" y="109" width="100" height="42" rx="21"/><rect x="300" y="188" width="130" height="42" rx="21"/><rect x="478" y="30" width="150" height="42" rx="21"/><rect x="478" y="188" width="150" height="42" rx="21"/><rect x="607" y="30" width="191.38" height="42" rx="21" transform="rotate(124.354 607 51)"/><rect x="662" y="30" width="42" height="200" rx="21"/><rect x="662" y="30" width="144" height="42" rx="21"/><rect x="662" y="109" width="100" height="42" rx="21"/><rect x="662" y="188" width="130" height="42" rx="21"/><rect x="840" y="30" width="42" height="200" rx="21"/><rect x="840" y="188" width="130" height="42" rx="21"/></g><g fill="url(#fzsGo)"><rect x="192" y="30" width="26" height="200" rx="13"/><rect x="240" y="106" width="26" height="124" rx="13"/></g></svg><div class="fiezel-splash-kelasku"><div class="kelasku-brand"><span class="kelasku-wordmark">KelasKu</span><span class="kelasku-tag">untuk Guru</span></div></div></div></div></div>
   <script>
 
     /* Jaring pengaman storage: di iframe preview yang di-sandbox tanpa allow-same-origin,
@@ -238,6 +426,7 @@ html.fz-booting body{overflow:hidden}
       var timer = 0;
       function dismiss() {
         if (timer) { clearTimeout(timer); timer = 0; }
+        clearRecovery();
         try { doc.documentElement.classList.remove('fz-booting'); } catch (e) {}
         try { el.setAttribute('data-fiezel-boot-claimed', 'disposed'); } catch (e) {}
         try { if (el.parentNode) el.parentNode.removeChild(el); } catch (e) {}
@@ -278,7 +467,7 @@ html.fz-booting body{overflow:hidden}
           var retry = doc.createElement('button');
           retry.type = 'button';
           retry.textContent = isTh ? 'โหลดใหม่อีกครั้ง' : 'Muat ulang';
-          retry.style.cssText = 'margin-top:18px;min-height:48px;padding:0 20px;border:0;border-radius:12px;background:#FFC700;color:#241A11;font:700 16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif';
+          retry.style.cssText = 'margin-top:18px;min-height:48px;padding:0 20px;border:0;border-radius:12px;background:#9B3A4A;color:#FFFFFF;font:700 16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif';
           retry.addEventListener('click', function () {
             try { window.location.reload(); } catch (e) { window.location.href = window.location.href; }
           });
@@ -305,6 +494,10 @@ html.fz-booting body{overflow:hidden}
         <span class="brand"><svg class="fiezel-wordmark" id="fzTopMark" viewBox="0 0 1000 260" role="img" aria-label="FIEZEL"><g class="fzw-sparks" aria-hidden="true"><circle class="fzw-spark" cx="51" cy="51" r="15" style="--sx:-70px;--sy:-85px;--sd:0s"/><circle class="fzw-spark" cx="51" cy="205" r="15" style="--sx:-78px;--sy:80px;--sd:.03s"/><circle class="fzw-spark" cx="102" cy="51" r="15" style="--sx:-52px;--sy:-96px;--sd:.06s"/><circle class="fzw-spark" cx="88" cy="130" r="15" style="--sx:-92px;--sy:0px;--sd:.09s"/><circle class="fzw-spark" cx="205" cy="60" r="15" style="--sx:-30px;--sy:-92px;--sd:.12s"/><circle class="fzw-spark" cx="253" cy="168" r="15" style="--sx:-22px;--sy:78px;--sd:.15s"/><circle class="fzw-spark" cx="321" cy="51" r="15" style="--sx:-40px;--sy:-90px;--sd:.18s"/><circle class="fzw-spark" cx="350" cy="130" r="15" style="--sx:-60px;--sy:-6px;--sd:.21s"/><circle class="fzw-spark" cx="365" cy="209" r="15" style="--sx:-44px;--sy:86px;--sd:.24s"/><circle class="fzw-spark" cx="553" cy="51" r="15" style="--sx:6px;--sy:-98px;--sd:.27s"/><circle class="fzw-spark" cx="553" cy="209" r="15" style="--sx:6px;--sy:92px;--sd:.3s"/><circle class="fzw-spark" cx="683" cy="130" r="15" style="--sx:30px;--sy:-4px;--sd:.33s"/><circle class="fzw-spark" cx="734" cy="51" r="15" style="--sx:44px;--sy:-88px;--sd:.36s"/><circle class="fzw-spark" cx="727" cy="209" r="15" style="--sx:40px;--sy:90px;--sd:.39s"/><circle class="fzw-spark" cx="861" cy="130" r="15" style="--sx:86px;--sy:-8px;--sd:.42s"/><circle class="fzw-spark" cx="905" cy="209" r="15" style="--sx:96px;--sy:84px;--sd:.45s"/></g><defs><linearGradient id="fztIv" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--wordmark-ink-hi)"/><stop offset="100%" stop-color="var(--wordmark-ink-lo)"/></linearGradient><linearGradient id="fztGo" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--wordmark-accent-hi)"/><stop offset="100%" stop-color="var(--wordmark-accent-lo)"/></linearGradient></defs><g class="fzw-mark"><g fill="url(#fztIv)"><rect x="30" y="30" width="42" height="200" rx="21"/><rect x="30" y="30" width="144" height="42" rx="21"/><rect x="30" y="109" width="116" height="42" rx="21"/><rect x="300" y="30" width="42" height="200" rx="21"/><rect x="300" y="30" width="144" height="42" rx="21"/><rect x="300" y="109" width="100" height="42" rx="21"/><rect x="300" y="188" width="130" height="42" rx="21"/><rect x="478" y="30" width="150" height="42" rx="21"/><rect x="478" y="188" width="150" height="42" rx="21"/><rect x="607" y="30" width="191.38" height="42" rx="21" transform="rotate(124.354 607 51)"/><rect x="662" y="30" width="42" height="200" rx="21"/><rect x="662" y="30" width="144" height="42" rx="21"/><rect x="662" y="109" width="100" height="42" rx="21"/><rect x="662" y="188" width="130" height="42" rx="21"/><rect x="840" y="30" width="42" height="200" rx="21"/><rect x="840" y="188" width="130" height="42" rx="21"/></g><g fill="url(#fztGo)"><rect x="192" y="30" width="26" height="200" rx="13"/><rect x="240" y="106" width="26" height="124" rx="13"/></g></g></svg></span>
       </button>
       <div class="topbar-actions">
+        <button type="button" id="fzCourseSwitchBtn" class="course-switch-btn" onclick="toggleTargetCourse()" aria-label="Ganti Bahasa Kursus" data-i18n-aria-label="topbar.course-switch-aria" title="Ganti Kursus (Jepang / Inggris)">
+          <span class="course-switch-flag" id="fzCourseFlag"><svg class="fiezel-flag-svg" viewBox="0 0 60 40" width="22" height="15" aria-hidden="true" focusable="false" style="display:inline-block;vertical-align:middle;border-radius:3px"><clipPath id="fz-flag-en-topbar"><rect width="60" height="40" rx="3"/></clipPath><g clip-path="url(#fz-flag-en-topbar)"><path d="M0 0v40h60V0z" fill="#012169"/><path d="M0 0l60 40m0-40L0 40" stroke="#fff" stroke-width="6.67"/><path d="M0 0l60 40m0-40L0 40" stroke="#c8102e" stroke-width="4.44"/><path d="M30 0v40M0 20h60" stroke="#fff" stroke-width="11.11"/><path d="M30 0v40M0 20h60" stroke="#c8102e" stroke-width="6.67"/></g></svg></span>
+          <span class="course-switch-label" id="fzCourseLabel" style="display:none">EN</span>
+        </button>
         <!-- Lonceng notifikasi: tugas dari guru, teman baru, sorakan, undangan. Menggantikan
              pintu topbar "Tanya FIEZEL" (askView tetap ada; aksesnya lewat pembimbing PAW).
              TANPA data-view, dengan sengaja - lihat catatan renderInner() soal kelas active. -->
@@ -356,25 +549,108 @@ html.fz-booting body{overflow:hidden}
        browser yang terlihat dan tidak ada nama murid di layar sistem. -->
   <div id="authGate" class="welcome auth-gate hidden" role="dialog" aria-modal="true" aria-labelledby="authGateTitle" aria-describedby="authGateBody">
     <div class="welcome-panel auth-panel">
-      <img class="auth-mark" src="./assets/brand/fiezel-icon-192.png" alt="" width="72" height="72" decoding="async">
+      <img class="auth-mark auth-vector-hero" src="./assets/brand/paw-mascot-full.svg" alt="PAW" width="110" height="110" decoding="async">
       <h2 id="authGateTitle" data-i18n="auth.gate-title">Masuk ke FIEZEL</h2>
       <p id="authGateBody" data-i18n="auth.gate-body">Akunmu menyimpan progres belajar, streak, dan AI tutor supaya tetap sama di setiap perangkat.</p>
       <p id="authGateStatus" class="auth-status" role="status" data-i18n="auth.status-check">Memeriksa status akun…</p>
-      <button id="authGateButton" type="button" class="auth-primary" onclick="attemptPuterSignIn()"><i data-lucide="user-round"></i><span data-i18n="auth.tombol-lanjutkan">Lanjutkan dengan Puter</span></button>
+      <button id="authGateButton" type="button" class="auth-primary auth-google-btn" onclick="attemptGoogleSignIn()"><svg class="google-logo" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg><span data-i18n="auth.tombol-lanjutkan">Lanjutkan dengan Google</span></button>
+      <div id="authGateGoogleMount" class="auth-gate-google-mount" style="display:none"></div>
       <!-- m026-02: jalan keluar yang selalu ada, meniru notificationGateSkip "Nanti saja"
            persis satu-banding-satu. Tanpa tombol ini, murid yang tidak mau (atau tidak
            bisa) login terkurung di balik .auth-locked - dark-pattern yang sama yang sudah
            dibongkar OWNER di gerbang notifikasi. Pengaturan > Akun Puter adalah jalan
            masuknya kembali. -->
       <button id="authGateSkip" data-testid="auth-gate-skip" type="button" class="text-button wide" onclick="skipPuterSignIn()" data-i18n="auth.skip-btn">Lanjut tanpa akun</button>
-      <p id="authGateSkipHelp" class="auth-help" data-i18n="auth.skip-help">Semua materi dan latihan tetap jalan tanpa akun — tutor AI dan suara neural baru bisa dipakai kalau kamu masuk akun Puter dan ada jaringan.</p>
-      <p id="authGateHelp" class="auth-help" data-i18n="auth.puter-help">Jendela login Puter terbuka sebentar di atas FIEZEL, lalu tertutup sendiri begitu selesai - kamu tidak akan dipindahkan ke browser lain.</p>
-      <p class="auth-legal" data-i18n="auth.legal-note">Dengan melanjutkan, kamu menyetujui progres belajarmu disimpan di akun Puter milikmu sendiri.</p>
+      <p id="authGateSkipHelp" class="auth-help" data-i18n="auth.skip-help">Semua materi dan latihan tetap jalan tanpa akun — tutor AI dan sinkronisasi tersambung saat kamu masuk akun Google.</p>
+      <p id="authGateHelp" class="auth-help" data-i18n="auth.puter-help">Jendela login Google terbuka dengan aman di atas FIEZEL, lalu tertutup sendiri begitu selesai.</p>
+      <p class="auth-legal" data-i18n="auth.legal-note">Dengan melanjutkan, kamu menyetujui progres belajarmu disimpan di akun Google milikmu sendiri.</p>
     </div>
   </div>
 
   <div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Dialog FIEZEL" data-i18n-aria-label="dialog.fiezel-aria">
     <div class="modal-panel" id="modalPanel"></div>
+  </div>
+
+  <!-- PANEL BANK SOAL LISTENING JLPT (N5 & N4) -->
+  <div class="listening-modal" id="listeningPanelModal" onclick="if(event.target===this)closeListeningPanel()" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Bank Soal Listening JLPT N5 dan N4" data-i18n-aria-label="jlpt.modal-aria">
+    <div class="listening-modal-box">
+      <div class="listening-head">
+        <div>
+          <div class="f-tag" style="background:var(--sun-soft);color:var(--gold);margin:0 0 4px;display:inline-block;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:700;" data-i18n="jlpt.official-tag">🎧 RESMI JAPAN FOUNDATION & JEES</div>
+          <h2 class="listening-head-title" data-i18n="jlpt.title">Bank Soal Listening (Chōkai / 聴解)</h2>
+          <span class="listening-head-sub" data-i18n="jlpt.subtitle">Simulasi Ujian Asli JLPT N5 & N4 Lengkap</span>
+        </div>
+        <button type="button" class="listening-close-btn" onclick="closeListeningPanel()" aria-label="Tutup Panel Listening" data-i18n-aria-label="jlpt.close-aria">✕</button>
+      </div>
+
+      <div class="listening-body">
+        <!-- Level Switcher -->
+        <div class="jlpt-level-tabs">
+          <button type="button" class="jlpt-lvl-btn active" id="btnLvlN5" onclick="setListeningLevel('N5')" data-i18n="jlpt.lvl-n5">⭐ JLPT N5 (Dasar)</button>
+          <button type="button" class="jlpt-lvl-btn" id="btnLvlN4" onclick="setListeningLevel('N4')" data-i18n="jlpt.lvl-n4">🌟 JLPT N4 (Menengah)</button>
+        </div>
+
+        <!-- Mondai Category Scroll -->
+        <div class="jlpt-mondai-scroll">
+          <button type="button" class="jlpt-mondai-chip active" data-mondai="all" onclick="setListeningMondai('all')" data-i18n="jlpt.mondai-all">Semua Mondai</button>
+          <button type="button" class="jlpt-mondai-chip" data-mondai="mondai_1" onclick="setListeningMondai('mondai_1')" data-i18n="jlpt.mondai-1">Mondai 1: Tugas (課題)</button>
+          <button type="button" class="jlpt-mondai-chip" data-mondai="mondai_2" onclick="setListeningMondai('mondai_2')" data-i18n="jlpt.mondai-2">Mondai 2: Poin (ポイント)</button>
+          <button type="button" class="jlpt-mondai-chip" data-mondai="mondai_3" onclick="setListeningMondai('mondai_3')" data-i18n="jlpt.mondai-3">Mondai 3: Ungkapan (発話)</button>
+          <button type="button" class="jlpt-mondai-chip" data-mondai="mondai_4" onclick="setListeningMondai('mondai_4')" data-i18n="jlpt.mondai-4">Mondai 4: Respon (即時)</button>
+        </div>
+
+        <!-- Dynamic Question Card Slot -->
+        <div id="listeningQuestionSlot"></div>
+
+        <!-- Official Download Section Footer -->
+        <div style="background:#181824;border-radius:12px;padding:12px 14px;border:1px solid rgba(255,255,255,0.12);">
+          <b style="font-size:12px;color:#FFFFFF;display:block;margin-bottom:4px;" data-i18n="jlpt.download-title">📥 Unduh Bahan Asli JLPT:</b>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;font-size:11.5px;">
+            <a href="https://www.jlpt.jp/samples/sample2018/pdf/N5L.pdf" target="_blank" rel="noopener noreferrer" style="color:#FFE02E;text-decoration:none;font-weight:700;" data-i18n="jlpt.download-n5-pdf">📄 PDF Soal N5</a> ·
+            <a href="https://www.jlpt.jp/samples/sample2018/pdf/N5script.pdf" target="_blank" rel="noopener noreferrer" style="color:#FFE02E;text-decoration:none;font-weight:700;" data-i18n="jlpt.download-n5-script">📝 Naskah N5</a> ·
+            <a href="https://www.jlpt.jp/samples/sample2018/pdf/N4L.pdf" target="_blank" rel="noopener noreferrer" style="color:#FFE02E;text-decoration:none;font-weight:700;" data-i18n="jlpt.download-n4-pdf">📄 PDF Soal N4</a> ·
+            <a href="https://www.jlpt.jp/samples/sample2018/pdf/N4script.pdf" target="_blank" rel="noopener noreferrer" style="color:#FFE02E;text-decoration:none;font-weight:700;" data-i18n="jlpt.download-n4-script">📝 Naskah N4</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- JLPT Bottom Sheet Drawer (#jlptDetailSheet) inside modal box -->
+      <div id="jlptDetailSheet" class="jlpt-detail-sheet" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Naskah dan Pembahasan Soal JLPT" data-i18n-aria-label="jlpt.sheet-aria">
+        <div id="jlptSheetBackdrop" class="jlpt-sheet-backdrop" onclick="closeJlptDetailSheet()" aria-hidden="true"></div>
+        <div class="jlpt-sheet-container" id="jlptSheetContainer">
+          <div class="jlpt-sheet-handle-zone sheet-drag-handle-wrapper" id="jlptSheetHandleZone" onclick="closeJlptDetailSheet()" title="Geser ke bawah untuk menutup" aria-label="Geser ke bawah untuk menutup" data-i18n-aria-label="jlpt.sheet-drag-handle">
+            <span class="sheet-drag-handle jlpt-sheet-handle-bar"></span>
+          </div>
+          <div class="jlpt-sheet-header">
+            <div>
+              <h3 class="jlpt-sheet-title" data-i18n="jlpt.sheet-title">Naskah &amp; Pembahasan</h3>
+              <span class="jlpt-sheet-subtitle" id="jlptSheetSubtitle">JLPT Listening</span>
+            </div>
+            <button type="button" class="jlpt-sheet-close" onclick="closeJlptDetailSheet()" aria-label="Tutup Sheet" data-i18n-aria-label="jlpt.sheet-close-aria">✕</button>
+          </div>
+          <div class="jlpt-sheet-tabs" role="tablist">
+            <button type="button" role="tab" class="jlpt-tab-chip active" id="tabChipScript" onclick="switchJlptSheetTab('script')"><span data-i18n="jlpt.tab-script">📝 Naskah</span></button>
+            <button type="button" role="tab" class="jlpt-tab-chip" id="tabChipExplain" onclick="switchJlptSheetTab('explain')"><span data-i18n="jlpt.tab-explain">Pembahasan</span></button>
+            <button type="button" role="tab" class="jlpt-tab-chip" id="tabChipVocab" onclick="switchJlptSheetTab('vocab')"><span data-i18n="jlpt.tab-vocab">Kosakata</span> (<span id="jlptVocabCount">0</span>)</button>
+          </div>
+          <div class="jlpt-sheet-content">
+            <div class="jlpt-sheet-pane active" id="paneScript" role="tabpanel">
+              <div class="jlpt-transcript-header">
+                <span class="jlpt-transcript-tag">Dialog Percakapan Asli</span>
+                <button type="button" class="jlpt-transcript-play-btn" onclick="togglePlayJlptPrimaryAudio()">▶ Putar Dialog</button>
+              </div>
+              <div class="jlpt-dialogue-bubbles" id="jlptDialogueBubbles"></div>
+            </div>
+            <div class="jlpt-sheet-pane" id="paneExplain" role="tabpanel" style="display:none;">
+              <div id="jlptExplainContent"></div>
+            </div>
+            <div class="jlpt-sheet-pane" id="paneVocab" role="tabpanel" style="display:none;">
+              <div id="jlptVocabContent"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- m025-212: KABAR PEMBARUAN YANG TERLIHAT.
@@ -458,8 +734,6 @@ html.fz-booting body{overflow:hidden}
           type="fiezel/lazy" - browser tidak mengambilnya saat mengurai, dan
           ./fiezel-lazy-loader.js mengangkatnya jadi <script> sungguhan setelah layar
           pertama tercat, atau lebih awal kalau murid membukanya duluan. -->
-  <script async id="fiezelPuterSdk" src="https://js.puter.com/v2/"></script>
-  <script defer src="./fiezel-puter-ready.js"></script>
   <script defer src="./lucide.min.js"></script>
   <script defer src="./version.js"></script>
   <script defer src="./report-config.js"></script>
@@ -498,6 +772,11 @@ html.fz-booting body{overflow:hidden}
   <script defer src="./features/i18n/copy-id-feat-d.js"></script>
   <script defer src="./features/i18n/copy-id-gems.js"></script>
   <script defer src="./features/i18n/copy-id-quota.js"></script>
+  <!-- m025-310: naskah yang LAHIR DI WORKER. route-legacy.js mengirim copyKey di samping
+       text; tanpa berkas ini terdaftar, kuncinya tidak pernah punya naskah dan klien diam-diam
+       jatuh ke kalimat Indonesia dari server - persis layar campur yang mau dihindari.
+       Kembaran th-nya disuntik fiezel-th-loader.js, bukan di sini (aset th tidak statis). -->
+  <script defer src="./features/i18n/copy-id-worker.js"></script>
   <script defer src="./features/i18n/copy-id-settings-locale.js"></script>
   <!-- m025-246: naskah BARU gelombang penyederhanaan pengalaman (navigasi 4 tab, Home
        "Hari ini", ringkasan sesi, tema malam, keadaan gagal audio). Berkas terpisah dengan
@@ -529,6 +808,7 @@ html.fz-booting body{overflow:hidden}
   <script defer src="./features/diagnostics/fiezel-diagnostic-bus.js"></script>
   <script defer src="./features/diagnostics/fiezel-module-selftests.js"></script>
   <script defer src="./features/diagnostics/fiezel-diagnostic-register.js"></script>
+  <script defer src="./features/diagnostics/fiezel-live-chrome-runner.js"></script>
   <!-- Sengaja dimuat sebelum app.js: kalau app.js throw, tombol Diagnostics tetap ada.
        Karena itu Diagnostics TIDAK ikut dimuat malas bersama tumpukan suara lainnya -
        nilainya justru terletak pada tersedia lebih dulu daripada yang ia periksa. -->
@@ -539,6 +819,7 @@ html.fz-booting body{overflow:hidden}
        SEBELUM app.js karena app.js memanggil keduanya pada cat pertama (refreshIcons dan
        syncCoachBubble). Keduanya ringan dan tidak menyentuh jaringan sama sekali. -->
   <script defer src="./features/ui/fiezel-icons.js"></script>
+  <script defer src="./features/ui/fiezel-3d-emblems.js?v=clean-v5"></script>
   <!-- m026-01: <fiezel-mascot> WAJIB terdaftar sebelum dua berkas di bawahnya.
        fiezel-coach-bubble.js memutuskan bentuk wajah gelembung saat install(), dan
        app.js memutuskan wajah panel "Kata FIEZEL" saat cat pertama; keduanya membaca
@@ -555,6 +836,8 @@ html.fz-booting body{overflow:hidden}
        bukan ekonomi hadiah; kill switch localStorage fzPawOutfits. Tanpa berkas
        ini PAW tampil polos - tidak ada yang patah. -->
   <script defer src="./features/mascot/fiezel-paw-outfit.js"></script>
+  <!-- Living Intelligence: Braincore Presence Engine (FiezelPresenceEngine) -->
+  <script defer src="./features/mascot/fiezel-presence-engine.js"></script>
   <script defer src="./features/ui/fiezel-coach-bubble.js"></script>
   <!-- m025-117 Core Brain v2. Dimuat SEBELUM app.js dan tidak ikut dimuat malas: kebijakan
        sesi pertama sudah membutuhkannya, dan tanpa itu murid akan mendapat satu sesi dengan
@@ -590,6 +873,7 @@ html.fz-booting body{overflow:hidden}
        di app.js dijaga availability-check + try/catch - berkas yang belum tiba atau gagal
        dimuat berarti aplikasi berjalan persis seperti sebelum Fase 3. -->
   <script defer src="./features/brain/fiezel-item-calibration.js"></script>
+  <script defer src="./features/brain/fiezel-item-pool.js"></script>
   <script defer src="./features/brain/fiezel-speaking-adaptive.js"></script>
   <script defer src="./features/brain/fiezel-srl-coach.js"></script>
   <!-- brain-learning-infra: lima modul infrastruktur belajar (stat-gate, manifest, config,
@@ -611,10 +895,22 @@ html.fz-booting body{overflow:hidden}
   <!-- Langkah 2: pemutus nasib kebijakan dari INTERVAL, bukan ambang. Dimuat setelah
        stat-gate karena ia adapter di atasnya. -->
   <script defer src="./features/brain/fiezel-policy-verdict.js"></script>
+  <!-- m025-376 (A3): pembagi lesson ke lengan percobaan retensi self-tune. Murni, deterministik. -->
+  <script defer src="./features/brain/fiezel-nof1.js"></script>
+  <!-- Langkah 4+5 roadmap otonomi (OWNER-authorized m025-374, 2026-09-27):
+       param-ledger mencatat setiap perubahan parameter dalam rantai hash yang bisa
+       diperiksa dan dikembalikan; self-tune mengusulkan perubahan parameter DI DALAM
+       batas, dengan 7 pagar keamanan. Dimuat setelah policy-verdict karena selfTune
+       membaca verdict. Modul murni, tanpa jaringan, fail-quiet: modul absen = perilaku
+       identik sebelum m025-374. -->
+  <script defer src="./features/brain/fiezel-param-ledger.js"></script>
+  <script defer src="./features/brain/fiezel-self-tune.js"></script>
   <script defer src="./features/brain/fiezel-question-memory.js"></script>
   <!-- Sumbu bahasa target: kunci penyimpanan per bahasa. Bahasa bawaan (en) TIDAK punya
        awalan, jadi kunci murid Inggris identik byte per byte dengan sebelum modul ini ada. -->
   <script defer src="./features/brain/fiezel-target-language.js"></script>
+  <!-- Permukaan khusus kursus Jepang: furigana/romaji, tabel kana, kartu segera hadir. -->
+  <script defer src="./features/japanese/fiezel-ja-ui.js?v=clean-v5"></script>
   <script defer src="./features/brain/fiezel-question-allocator.js"></script>
   <!-- brain-learning-infra: lane telemetri belajar (config → events → queue → transport).
        Urutan penting: transport membaca queue, queue membaca events, semuanya membaca
@@ -662,6 +958,10 @@ html.fz-booting body{overflow:hidden}
        saat tombolnya benar-benar mau digambar di layar akun. Boot FIEZEL sudah pernah
        tertahan berkas pihak ketiga (catatan m025-84 di atas); jalur itu tidak dibuka lagi. -->
   <script defer src="./features/auth/fiezel-google.js"></script>
+  <!-- m025-367: layar masuk wajib (Selamat datang · Masuk · Daftar). Hanya memasang
+       FiezelAuthScreen; app.js yang memutuskan kapan ia tampil (sesudah splash, sebelum
+       perkenalan), jadi berkas ini tidak menahan boot. -->
+  <script defer src="./features/auth/fiezel-auth-screen.js"></script>
   <script defer src="./features/speaking-listening/fiezel-speaking-listening-addon.js"></script>
   <script defer src="./fiezel-lazy-loader.js"></script>
 
@@ -747,11 +1047,12 @@ html.fz-booting body{overflow:hidden}
   <!-- m025-276: orkestrator PAW ARENA (view sendiri; kartu aturan per-sesi; ?duel= lama tetap hidup). -->
   <script defer src="./features/learner-flow/fiezel-paw-arena.js"></script>
   <script defer src="./features/learner-flow/fiezel-learner-flow.js"></script>
+  <!-- Living Intelligence: Braincore Decision Trace & Bounded Autonomous Controller -->
+  <script defer src="./features/learner-flow/fiezel-decision-trace.js"></script>
   <script defer src="./features/tutor-action-center/fiezel-tutor-action-center.js"></script>
   <!-- Ruang Guru (cangkang guru terpisah). Wajib SEBELUM app.js: tutorCenterView() memasangnya,
        dan isVerifiedTeacher() menanyakan previewAllowed() saat Home digambar pertama kali. -->
   <script defer src="./features/teacher/fiezel-teacher-icons.js"></script>
-  <script defer src="./features/teacher/fiezel-teacher-curriculum.js"></script>
   <script defer src="./features/teacher/fiezel-teacher-store.js"></script>
   <!-- Class hub: Kelas = pusat Guru ↔ Murid ↔ Braincore (dipakai tab Kelas murid & view Kelas Ruang Guru). Harus sebelum teacher-shell. -->
   <!-- Kunci ujian: satu penanda "sedang ujian" untuk pendeteksi DAN pintu AI. Harus sebelum app.js. -->
@@ -759,8 +1060,12 @@ html.fz-booting body{overflow:hidden}
   <!-- Pendeteksi keluar layar saat ujian: inti murni, dipakai class-hub. Harus sebelum class-hub. -->
   <script defer src="./features/class-hub/fiezel-focus-guard.js"></script>
   <script defer src="./features/class-hub/fiezel-braincore-review.js"></script>
+  <script defer src="./features/curriculum/fiezel-curriculum-inbox.js"></script>
   <script defer src="./features/class-hub/fiezel-class-hub.js"></script>
-  <script defer src="./features/teacher/fiezel-teacher-shell.js"></script>
+  <script defer src="./features/curriculum/fz-api.js"></script>
+  <!-- F28: shell + kurikulum guru (±600 KB) dimuat malas; pemuat kecil ini menyediakan
+       previewAllowed() seketika dan mengambil modul penuh hanya untuk guru/demo guru. -->
+  <script defer src="./features/teacher/fiezel-teacher-loader.js"></script>
   <script defer src="./app.js"></script>
   <script defer src="./features/skills-evidence/fiezel-skills-evidence.js"></script>
   <script defer src="./features/academic-readiness/fiezel-academic-readiness.js"></script>
@@ -769,6 +1074,7 @@ html.fz-booting body{overflow:hidden}
   <script defer src="./features/ui/fiezel-report-gesture-isolation.js"></script>
   <script defer src="./features/ui/fiezel-ui-manager.js"></script>
   <script defer src="./features/ui/fiezel-student-mode.js"></script>
+  <script defer src="./features/speaking-listening/fiezel-jlpt-listening.js"></script>
   <!-- T-031: berkas ini memasang `window.FiezelABAnalytics` (pipa eksperimen UI). Ia TIDAK
        BOLEH menyentuh `window.FiezelAnalytics` — nama itu milik modul analytics
        privasi-maksimal yang disuntik app.js di idle, dan `<script defer>` di sini selalu

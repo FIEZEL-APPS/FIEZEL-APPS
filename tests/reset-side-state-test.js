@@ -63,7 +63,20 @@ const DIHAPUS_SAAT_RESET = [
   // terikat `sub` yang TIDAK berubah saat reset, jadi sisa antrean/penanda dari sebelum reset
   // akan muncul sebagai bukti murid yang sama sesudahnya.
   'IDENTITY_EVIDENCE_ATTEMPT_KEY',
-  'LEARNER_NAME_SYNC_KEY'
+  'LEARNER_NAME_SYNC_KEY',
+  // m025-374: Penyetelan-diri berbatas (self-tune) menyimpan ledger parameter adaptif dan
+  // override konfigurasi per-murid. Reset progres harus mengembalikan parameter ke bawaan.
+  'SELF_TUNE_KEY',
+  // Audit braincore 2026-09-26: dua kunci yang ditulis FiezelDecisionTrace sendiri (bukan
+  // app.js), sehingga R2 buta terhadapnya. LIVE_PARAMS_KEY memegang targetSuccess hidup yang
+  // menyetir pemilihan soal; tanpa ini murid yang mereset mewarisi setelan lamanya. R5 di
+  // bawah mengunci literalnya ke konstanta modul supaya penggantian nama tidak lolos diam.
+  'DECISION_TRACE_KEY',
+  'LIVE_PARAMS_KEY',
+  // Braincore langkah 2: catatan jawaban-pertama untuk kesulitan soal gabungan (daftar soal
+  // yang pernah dijawab + kiriman yang belum terkirim). Reset = murid mulai dari nol; sisa
+  // kiriman dari sebelum reset tidak boleh berangkat atas nama progres yang sudah dihapus.
+  'ITEM_POOL_KEY'
 ];
 
 /**
@@ -83,7 +96,9 @@ const SENGAJA_TIDAK_DIRESET = {
   // privasi — TAPI apakah reset progres seharusnya juga memulai ulang hari-0 adalah
   // pertanyaan produk yang belum dijawab siapa pun. Dicatat di sini, bukan diputuskan.
   LEARNING_TELEMETRY_DAY0_KEY: { literal: 'fiezel-lt-day0-v1', alasan: 'jangkar hari-0 lane telemetri; lane itu punya jalur opt-out purge sendiri (lihat catatan OWNER di atas)' },
-  KEY: { literal: 'fiezel.seenAppVersion', alasan: 'penanda versi aplikasi yang sudah dilihat di perangkat ini, bukan progres belajar' }
+  KEY: { literal: 'fiezel.seenAppVersion', alasan: 'penanda versi aplikasi yang sudah dilihat di perangkat ini, bukan progres belajar' },
+  FIEZEL_TARGET_COURSE_KEY: { literal: 'fz_target_course', alasan: 'preferensi kursus target aktif (Jepang/Inggris) per perangkat, bukan progres belajar' },
+  ITEM_POOL_TABLE_KEY: { literal: 'fiezel-item-pool-table-v1', alasan: 'tabel koreksi kesulitan soal dari server, SAMA untuk semua murid (Braincore langkah 2); bukan bukti murid ini' }
 };
 
 /** Isi daftar removeItem di dalam resetProgress(), dibaca dari sumber sungguhan. */
@@ -200,6 +215,19 @@ test('RED · detektor terbukti merah saat kunci dikeluarkan dari daftar reset / 
     const yatim = [...written].filter(k => !list.includes(k) && !Object.prototype.hasOwnProperty.call(SENGAJA_TIDAK_DIRESET, k));
     assert.deepStrictEqual(yatim, []);
   });
+});
+
+test('R5 · kunci yang ditulis modul learner-flow sama dengan konstanta yang dihapus reset', () => {
+  // R2 hanya membaca localStorage.setItem di app.js. Modul yang menulis penyimpanannya sendiri
+  // lolos dari R2 — itu persis cara kunci keputusan & parameter hidup luput dari reset. Gerbang
+  // ini mengikat literal app.js ke konstanta di modulnya: kalau modulnya ganti kunci (v3),
+  // reset yang menghapus kunci lama akan bohong, dan baris ini yang merah.
+  const trace = fs.readFileSync(path.join(ROOT, 'features', 'learner-flow', 'fiezel-decision-trace.js'), 'utf8');
+  const modul = name => { const m = trace.match(new RegExp('\\b' + name + "\\s*=\\s*'([^']*)'")); return m ? m[1] : null; };
+  assert.strictEqual(declaredLiteral(appSource, 'DECISION_TRACE_KEY'), modul('STORAGE_KEY'),
+    'DECISION_TRACE_KEY di app.js tidak sama dengan STORAGE_KEY FiezelDecisionTrace');
+  assert.strictEqual(declaredLiteral(appSource, 'LIVE_PARAMS_KEY'), modul('PARAM_STORAGE_KEY'),
+    'LIVE_PARAMS_KEY di app.js tidak sama dengan PARAM_STORAGE_KEY FiezelDecisionTrace');
 });
 
 test('gate ini terdaftar di CI', () => {

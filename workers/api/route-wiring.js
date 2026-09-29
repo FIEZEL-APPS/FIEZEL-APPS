@@ -63,7 +63,7 @@ import { FREE_BUCKET_LIMITS } from './quota/quota-config.js';
 // P3 - penegakan flag server DI JALUR PERMINTAAN, bukan sekadar dilaporkan ke klien.
 import { checkAiEnabled, checkTtsEnabled } from './feature-gate.js';
 // P3 - pagar neuron tingkat AKUN (jatah vendor), berbeda dari kuota per-murid.
-import { reserveAccountNeurons, releaseAccountNeurons } from './ai/ai-account-budget.js';
+import { reserveNeurons } from './ai/neuron-reservation.js';
 import { QUOTA_CONFIG } from './quota/quota-config.js';
 import { registerQuotaRoutes, enforceQuota, NO_STORE_HEADERS } from './quota/route-quota.js';
 import { sweepExpiredReservations, reconcileHeld } from './quota/quota-store-d1.js';
@@ -77,6 +77,8 @@ import { registerLearningRoutes } from './learning/route-learning-events.js';
 import { registerEvidenceRoutes } from './evidence/route-evidence.js';
 import { purgeEvidence } from './evidence/evidence-store-d1.js';
 import { purgeLearnerEvidence } from './evidence/learner-evidence-store-d1.js';
+import { registerItemPoolRoutes } from './evidence/route-item-pool.js';
+import { purgeItemPool } from './evidence/item-pool-store-d1.js';
 import { jsonResponse, jsonError, unauthenticated, ERR } from './errors.js';
 // A3: pencatat hasil cron. Satu-satunya alasan berkas ini diubah paket kerja A3.
 import { withCronRun, CRON_JOBS } from './cron-status.js';
@@ -113,7 +115,12 @@ function umd(ns, globalName) {
   return ns || null;
 }
 
-const ModelCallGate = umd(modelGateNs, 'FiezelModelCallGate');
+/* m025-310: `const ModelCallGate = umd(...)` DIHAPUS dari sini - perakitan tanda terima
+   pindah ke ai/neuron-reservation.js, jadi berkas ini tidak lagi memanggil satu pun
+   methodnya dan bindingnya menjadi kode mati. IMPOR di atas SENGAJA TIDAK ikut dihapus:
+   ia load-bearing untuk URUTAN, bukan untuk nilainya - route-ai.js dan route-tts.js
+   mengambil chokepoint lewat globalThis, jadi modulnya wajib dievaluasi lebih dulu.
+   Menghapus impornya = `ModelCallGate is undefined` di jalur permintaan. */
 const RouteAi = umd(routeAiNs, 'FiezelRouteAi');
 const RouteTts = umd(routeTtsNs, 'FiezelRouteTts');
 
@@ -391,16 +398,10 @@ function accountBudgetBridgeFactory() {
     const ctx = a.request ? CTX_BY_REQUEST.get(a.request) : null;
     const env = (ctx && ctx.env) || a.env || {};
     if (!ctx) return { allowed: false, reason: 'ai_budget_context_missing', usedBefore: 0 };
-    const db = quotaDb(env);
-    const neurons = accountNeuronsFor(a);
-    const out = await reserveAccountNeurons({ db, env, neurons, now: a.now });
-    if (!out || out.allowed !== true) return out || { allowed: false, reason: 'ai_budget_unreadable', usedBefore: 0 };
-    return ModelCallGate.makeReservation({
-      neurons,
-      cap: out.cap,
-      usedBefore: out.usedBefore,
-      release: () => releaseAccountNeurons({ db, env, neurons, now: a.now })
-    });
+    // m025-310: perakitannya pindah ke ai/neuron-reservation.js dan dipakai bersama
+    // route-legacy.js. BERAPA neuron yang dipesan tetap diputuskan di sini, karena itu
+    // memang berbeda per jalur (accountNeuronsFor menurunkannya dari chars untuk TTS).
+    return reserveNeurons({ env, neurons: accountNeuronsFor(a), now: a.now });
   };
 }
 
@@ -499,6 +500,118 @@ function wrapQuota(handler) {
   };
 }
 
+/**
+ * [L1] GERBANG BELANJA AI UNTUK RUTE SLOT 5 (route-legacy.js).
+ *
+ * LUBANG YANG DITUTUP, dan kenapa ia lolos dua kali sebelumnya:
+ *
+ * P3 memasang gerbang flag + jembatan kuota pada rute yang keluar dari `registerAiRoutes`,
+ * S3 memasangnya pada rute TTS sesudah menembak produksi hidup. Keduanya memasang pagar
+ * pada JALUR, dan pagar jalur hanya melindungi jalur yang dilewati. `route-legacy.js`
+ * disebar mentah di route-slots.js (`...LEGACY_ROUTES`) - ia tidak pernah lewat
+ * `wrapMetered`, jadi tidak pernah lewat keduanya. Akibatnya, pada rute yang justru
+ * dipakai aplikasi:
+ *
+ *   - `POST /api/ai/chat`      <- app.js:coreWorkerExec('/api/ai/chat'), jalur tutor UTAMA
+ *   - `POST /api/ai/translate` <- features/neural-voice/fiezel-subtitle-translate.js
+ *   - `POST /api/coach/context`
+ *
+ *   kuota harian per murid TIDAK berlaku  -> satu murid bisa menghabiskan kolam neuron
+ *                                            seluruh murid; plafon akun menahan TAGIHAN,
+ *                                            bukan KEADILAN antar murid;
+ *   flag `cfAiEnabled` TIDAK berlaku      -> "matikan AI" tidak mematikan jalur utama.
+ *
+ * Jadi yang salah bukan "dua rute terlewat" melainkan tempat pagarnya: ia dipasang pada
+ * pipa, sedangkan yang membelanjakan uang adalah RUTE. Gerbang ini karena itu diekspor,
+ * supaya slot yang tidak memakai pipa tetap memakai MEKANISME YANG SAMA - `enforceQuota`
+ * dan `checkAiEnabled` yang itu juga, bukan salinan kedua. Dua mekanisme untuk satu maksud
+ * adalah cara celah ketiga lahir; baris ini ada supaya tidak ada celah ketiga.
+ *
+ * URUTANNYA SAMA DENGAN P3/S3, dan itu bukan selera:
+ *   1. identitas (401) - keadaan otentikasi tidak boleh terbaca dari selisih 401/403;
+ *   2. flag AI (403)   - fail-CLOSED, termasuk ketika flag TIDAK TERBACA;
+ *   3. store kuota ada (503) - tidak bisa menghitung jatah berarti tidak boleh belanja;
+ *   4. reserve kuota per murid (429 kalau habis) - SEBELUM handler, jadi `quotaCharged`
+ *      benar secara struktur;
+ *   5. handler -> commit / rollback, diurus `enforceQuota` sendiri.
+ *
+ * Plafon neuron AKUN tetap di `runLegacyModel()` dan TIDAK dipindah ke sini: ia menjaga
+ * kolam owner, gerbang ini menjaga pembagian antar murid, dan keduanya harus tetap berlaku
+ * walau satu jalur baru lupa memakai gerbang ini.
+ */
+export function aiSpendGate(bucket, handler) {
+  return async (ctx) => {
+    // URUTAN 401 -> 403, DAN KENAPA IA TIDAK BOLEH DIBALIK.
+    //
+    // Komentar P3 di bawah menuliskannya sebagai aturan: penolakan flag diletakkan SESUDAH
+    // identitas diperiksa "jadi urutan penolakan tetap 401 sebelum 403 - keadaan otentikasi
+    // tidak boleh terbaca dari perbedaan ini". Itu sifat keamanan, bukan selera: kalau flag
+    // menjawab 403 lebih dulu, siapa pun di internet bisa membedakan "token ini sah" dari
+    // "tidak sah" hanya dari selisih kode jawaban, tanpa pernah punya kredensial.
+    //
+    // Versi pertama gerbang ini MELANGGARNYA - flag ditaruh paling depan supaya rute owner
+    // (yang tidak punya sesi murid) tidak terbentur 401. tests/cf-api-contract-test.js
+    // menangkapnya: ia mengirim badan kecil tanpa identitas dan menuntut 401, lalu menerima
+    // 403. Tesnya benar dan pagarnya salah.
+    //
+    // Yang benar bukan memilih salah satu, melainkan memisahkan dua jenis rute:
+    //   - rute BERJATAH (bucket ada)  -> identitas DULU (401), baru flag (403). Kanon P3
+    //     dipulihkan, dan memang jatah murid tidak bisa ditagih tanpa subjek terverifikasi.
+    //   - rute OWNER (bucket null)    -> TIDAK menuntut identitas murid sama sekali, jadi
+    //     tidak ada 401 yang bisa mendahului apa pun dan pertanyaan urutannya tidak lahir.
+    //     Otentikasinya `isOwner()` (Authorization: Bearer + OWNER_TOKEN_HASH); menuntut
+    //     sesi murid di sana memutus alat owner yang sah tanpa melindungi apa pun.
+    if (bucket) {
+      const guard = requireIdentity(ctx);
+      if (guard) return guard;
+    }
+
+    // Flag berlaku untuk KEDUA jenis rute - termasuk rute owner, karena neuronnya dari
+    // kolam yang sama: "matikan AI" yang tidak mematikan belanja owner bukan tombol mati.
+    const flag = await checkAiEnabled(ctx.env);
+    if (!flag.allowed) {
+      return RouteAi.aiDisabledResponse({ reason: flag.reason, headers: ctx.corsHeaders || null });
+    }
+
+    // Rute owner: jatah MURID tidak ditagih dengan sengaja. Yang perlu dijaga di sana adalah
+    // TAGIHAN, dan itu tugas plafon neuron akun di runLegacyModel(). Rutenya sendiri tetap
+    // menolak siapa pun yang bukan owner.
+    if (!bucket) return handler(ctx);
+
+    if (!quotaDb(ctx.env)) {
+      return jsonError(503, ERR.UNAVAILABLE, {}, { headers: Object.assign({}, ctx.corsHeaders, NO_STORE_HEADERS) });
+    }
+
+    // JATAH HANYA DITAGIH KALAU MURIDNYA DILAYANI.
+    //
+    // `enforceQuota` meng-commit setiap kali `next()` kembali tanpa melempar, dan ia
+    // SENGAJA tidak memeriksa status jawabannya (itu bukan urusannya). Tetapi handler SLOT 5
+    // menolak sebagian permintaan SEBELUM model pernah dipanggil - `prompt_too_long` (400),
+    // `text_too_long` (400) - dan penolakan itu di-RETURN, bukan dilempar. Tanpa baris di
+    // bawah, murid yang menempelkan teks terlalu panjang kehilangan satu dari 25 jatah
+    // hariannya untuk permintaan yang ditolak server dan tidak pernah menyentuh model.
+    // Diukur: 400 prompt_too_long, nol panggilan model, `ai_used` tetap naik 1.
+    //
+    // Yang dipakai untuk membatalkannya adalah kanal yang MEMANG dirancang, bukan mekanisme
+    // baru: `commitD1` menerima `actual` per-bucket, di-clamp ke yang direservasi dan
+    // minimal 0 (quota-store-d1.js), jadi `actual:{<bucket>:0}` menagih nol sekaligus
+    // melepas `held`. `enforceQuota` membacanya dari `result.actual`.
+    //
+    // Hasil handler dibungkus lalu dibuka kembali, dan itu disengaja: menempelkan `.actual`
+    // ke objek `Response` bekerja di Node hari ini, tetapi ia mengandalkan objek bawaan
+    // runtime tetap bisa ditambahi properti - asumsi yang tidak perlu diambil untuk apa pun.
+    const out = await enforceQuota(bucket, 1)(quotaCtxFor(ctx), async () => {
+      const response = await handler(ctx);
+      // >= 400 berarti murid TIDAK dilayani. Cadangan 200 saat model gagal TETAP ditagih,
+      // dan itu utang yang sudah tercatat bertanggal di PENAKARAN-NEURON-HANDOFF.md §6 -
+      // di sana modelnya memang sudah disentuh, di sini belum pernah.
+      const served = !(response && Number(response.status) >= 400);
+      return { __response: response, actual: served ? undefined : { [bucket]: 0 } };
+    });
+    return out && out.__response ? out.__response : out;
+  };
+}
+
 function wrapAnalytics(handler) {
   return async (ctx) =>
     handler({ request: requestFor(ctx), env: analyticsEnv(ctx.env), ctx: ctx.executionCtx });
@@ -578,6 +691,14 @@ export function buildExtraRoutes() {
   //      identitas - satu-satunya pengenal adalah `cohort` acak berotasi yang
   //      dibuat perangkat.
   registerEvidenceRoutes(collector(routes, wrapEvidence));
+
+  // [BRAIN] KESULITAN SOAL GABUNGAN (Braincore langkah 2) -
+  //      POST /api/braincore/item-evidence + GET /api/braincore/item-difficulty.
+  //      Database yang SAMA dengan lane bukti (EVIDENCE_DB, migrasi 0015), saklar
+  //      SENDIRI (`ITEM_POOL_ENABLED`, default off). Terdaftar walau mati: modulnya
+  //      menjawab 202 `{disabled:true}` / tabel kosong. Identitas SENGAJA tidak
+  //      dituntut - payload-nya tidak punya pengenal apa pun, bahkan cohort.
+  registerItemPoolRoutes(collector(routes, wrapEvidence));
 
   // [E5] AI + TTS. `deps.enforceQuota` diselesaikan PER PERMINTAAN.
   const aiSink = [];
@@ -733,6 +854,22 @@ export async function runEvidencePurge(env, now) {
 }
 
 /**
+ * (d) Kesulitan soal gabungan (Braincore langkah 2/3): cron Worker HANYA mempurge dedup
+ *     (60 hari) dan penghitung soal + probe (120 hari). Pembangunan `item_pool_table` dan
+ *     penyetelan angka rumus berjalan di GitHub Actions (tools/item-pool-job.mjs): penaksirnya
+ *     butuh ~9-19 ms CPU untuk 1.000-3.000 soal, melewati batas 10 ms Worker gratis.
+ *     Purge jalan selama binding ada, walau saklar dimatikan lagi - lane yang dimatikan setelah
+ *     mengumpulkan data tidak boleh meninggalkan penghitungnya selamanya. Migrasi yang belum
+ *     diterapkan membuat purge gagal dengan `{error}` yang tertangkap, bukan menjatuhkan cron.
+ */
+export async function runItemPoolRollup(env, now) {
+  const db = (env && env.EVIDENCE_DB) || null;
+  if (!db) return { skipped: 'no_binding' };
+  const today = new Date(Number.isFinite(now) ? now : Date.now()).toISOString().slice(0, 10);
+  try { return { purge: await purgeItemPool(db, today) }; } catch (e) { return { purge: { error: e && e.name } }; }
+}
+
+/**
  * Pemetaan cron -> job. Cron yang tidak dikenal (atau kosong, seperti saat
  * dipanggil gerbang) menjalankan KEDUANYA: lebih baik satu job jalan dua kali
  * (keduanya idempoten) daripada tidak jalan karena ekspresi cron diubah di
@@ -760,7 +897,7 @@ export const CRON_ANALYTICS_ROLLUP = '5 17 * * *';
 export async function runScheduled(event, env, executionCtx, now) {
   const cron = String((event && event.cron) || '');
   const at = Number.isFinite(now) ? now : Number((event && event.scheduledTime)) || Date.now();
-  const out = { cron, quotaSweep: null, analyticsRollup: null, evidencePurge: null, learnerEvidencePurge: null };
+  const out = { cron, quotaSweep: null, analyticsRollup: null, evidencePurge: null, learnerEvidencePurge: null, itemPool: null };
 
   const wantSweep = cron === CRON_QUOTA_SWEEP || cron !== CRON_ANALYTICS_ROLLUP;
   const wantRollup = cron === CRON_ANALYTICS_ROLLUP || cron !== CRON_QUOTA_SWEEP;
@@ -793,6 +930,10 @@ export async function runScheduled(event, env, executionCtx, now) {
     try {
       out.learnerEvidencePurge = await runLearnerEvidencePurge(env, at);
     } catch (e) { out.learnerEvidencePurge = { error: e && e.name }; }
+    // Kesulitan soal gabungan: irama harian yang sama, kegagalan sendiri.
+    try {
+      out.itemPool = await runItemPoolRollup(env, at);
+    } catch (e) { out.itemPool = { error: e && e.name }; }
   }
   return out;
 }

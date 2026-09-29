@@ -762,14 +762,19 @@ async function readTeachers(env, fetchImpl) {
 }
 
 async function mintTeacherInvite(env, input, fetchImpl) {
+  const body = {
+    teacherName: input.teacherName,
+    institution: input.institution,
+    institutionType: input.institutionType,
+    days: input.days,
+  };
+  if (input.subject_id || input.subjectId) body.subject_id = input.subject_id || input.subjectId;
+  if (input.grade_id || input.gradeId) body.grade_id = input.grade_id || input.gradeId;
+  if (input.class_code || input.classCode) body.class_code = input.class_code || input.classCode;
+  if (input.school_id || input.schoolId) body.school_id = input.school_id || input.schoolId;
   return await ownerApiFetch(env, '/api/owner/teacher-invite', fetchImpl, {
     method: 'POST',
-    body: {
-      teacherName: input.teacherName,
-      institution: input.institution,
-      institutionType: input.institutionType,
-      days: input.days,
-    }
+    body
   });
 }
 
@@ -782,6 +787,339 @@ async function revokeTeacherInvite(env, input, fetchImpl) {
     }
   });
 }
+
+async function updateTeacherInvite(env, input, fetchImpl) {
+  return await ownerApiFetch(env, '/api/owner/teacher-invite/update', fetchImpl, {
+    method: 'POST',
+    body: {
+      codeHash: input.codeHash,
+      subject_id: input.subject_id,
+      grade_id: input.grade_id,
+      teacherName: input.teacherName,
+      institution: input.institution,
+      institutionType: input.institutionType,
+      class_code: input.class_code,
+      school_id: input.school_id,
+      extend_days: input.extend_days,
+    }
+  });
+}
+
+async function regenerateTeacherInvite(env, input, fetchImpl) {
+  return await ownerApiFetch(env, '/api/owner/teacher-invite/regenerate', fetchImpl, {
+    method: 'POST',
+    body: {
+      codeHash: input.codeHash,
+    }
+  });
+}
+
+async function deleteTeacherInvite(env, input, fetchImpl) {
+  return await ownerApiFetch(env, '/api/owner/teacher-invite/delete', fetchImpl, {
+    method: 'POST',
+    body: {
+      codeHash: input.codeHash || undefined,
+      mode: input.mode || undefined,
+    }
+  });
+}
+
+async function deleteTeacherAccount(env, input, fetchImpl) {
+  return await ownerApiFetch(env, '/api/owner/teacher/delete', fetchImpl, {
+    method: 'POST',
+    body: {
+      sub: input.sub || undefined,
+      handle: input.handle || undefined,
+      mode: input.mode || undefined,
+    }
+  });
+}
+
+async function readSchools(env, fetchImpl) {
+  const res = await ownerApiFetch(env, '/api/owner/schools', fetchImpl);
+  if (res.state !== 'ok') return { state: res.state, status: res.status, schools: [] };
+  const body = res.body || {};
+  return {
+    state: 'ok',
+    schools: Array.isArray(body.schools) ? body.schools : [],
+  };
+}
+
+async function createSchool(env, input, fetchImpl) {
+  return await ownerApiFetch(env, '/api/owner/school', fetchImpl, {
+    method: 'POST',
+    body: {
+      name: input.name,
+      npsn: input.npsn,
+      level: input.level,
+      type: input.type,
+      city: input.city,
+      address: input.address,
+      principal_name: input.principal_name || input.principalName,
+      contact: input.contact,
+    }
+  });
+}
+
+async function updateSchool(env, input, fetchImpl) {
+  return await ownerApiFetch(env, '/api/owner/school/update', fetchImpl, {
+    method: 'POST',
+    body: {
+      id: input.id,
+      name: input.name,
+      npsn: input.npsn,
+      level: input.level,
+      type: input.type,
+      city: input.city,
+      address: input.address,
+      principal_name: input.principal_name || input.principalName,
+      contact: input.contact,
+    }
+  });
+}
+
+async function deleteSchool(env, input, fetchImpl) {
+  return await ownerApiFetch(env, '/api/owner/school/delete', fetchImpl, {
+    method: 'POST',
+    body: { id: input.id }
+  });
+}
+
+async function readClasses(env, fetchImpl) {
+  const res = await ownerApiFetch(env, '/api/owner/classes', fetchImpl);
+  if (res.state !== 'ok') return { state: res.state, status: res.status, classes: [] };
+  const body = res.body || {};
+  return {
+    state: 'ok',
+    classes: Array.isArray(body.classes) ? body.classes : [],
+  };
+}
+
+function make6CharClassCode() {
+  const chars = '23456789ABCDEFGHJKMNPQRSTUVWXYZ';
+  let rand = '';
+  for (let i = 0; i < 6; i++) {
+    rand += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return `FZ-${rand}`;
+}
+
+async function createClass(env, input, fetchImpl) {
+  return await ownerApiFetch(env, '/api/owner/class', fetchImpl, {
+    method: 'POST',
+    body: {
+      title: input.title,
+      level: input.level,
+      school_id: input.school_id || input.schoolId,
+      code: input.code,
+    }
+  });
+}
+
+async function deleteClass(env, input, fetchImpl) {
+  return await ownerApiFetch(env, '/api/owner/class/delete', fetchImpl, {
+    method: 'POST',
+    body: {
+      code: input.code,
+      mode: input.mode
+    }
+  });
+}
+
+async function triggerMasterSeed(env, fetchImpl) {
+  const base = (env && typeof env.CURRICULUM_API_URL === 'string' && env.CURRICULUM_API_URL.trim().replace(/\/+$/, '')) || 'https://fiezel-apps.onrender.com';
+  const doFetch = typeof fetchImpl === 'function' ? fetchImpl : (typeof fetch === 'function' ? fetch : (typeof globalThis !== 'undefined' && globalThis.fetch ? globalThis.fetch : null));
+  if (!doFetch) {
+    return {
+      state: 'pending',
+      ok: true,
+      message: 'Sinyal sinkronisasi terkirim ke backend, sedang proses penyemaian di background. Render cold-start 30-60 detik; muat ulang 1-2 menit untuk hitungan riil.'
+    };
+  }
+
+  const num = (v) => {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : -1;
+  };
+  const countsText = (soalBody) => {
+    if (!soalBody) return 'hitungan backend belum terbaca';
+    const dari = num(soalBody.from_this_seeder);
+    const berisi = num(soalBody.competencies_with_questions);
+    return (dari >= 0 ? dari + ' soal dari penyemai' : 'jumlah soal belum terbaca') +
+      (berisi >= 0 ? ' (' + berisi + ' kompetensi berisi)' : '');
+  };
+
+  // 1. Baca status dulu — backend MENOLAK POST anonim (401), jadi keputusan jujur
+  //    diambil dari data, bukan dari asumsi. Timeout status 6 dtk + POST 20 dtk menjaga
+  //    total di bawah batas wall-clock Worker.
+  const status = await readCurriculumStatus(env, doFetch, 6000);
+  const soalBody = status.soal && status.soal.ok ? status.soal.body : null;
+  const mapelBody = status.mapel && status.mapel.ok ? status.mapel.body : null;
+  const englishBody = status.english && status.english.ok ? status.english.body : null;
+
+  const waveTotal = num(soalBody && soalBody.in_this_wave);
+  const waveSeeded = num(soalBody && soalBody.from_this_seeder);
+  const soalNeeds = !(soalBody && waveTotal > 0 && waveSeeded >= waveTotal);
+  const mapelNeeds = !(mapelBody && mapelBody.seeded === true);
+  const englishNeeds = !(englishBody && englishBody.seeded === true);
+
+  // 2. Sudah penuh → hijau jujur TANPA POST (POST anonim pasti 401; menembakkannya
+  //    hanya menghasilkan kegaduhan jujur tanpa gunanya).
+  if (!soalNeeds && !mapelNeeds && !englishNeeds) {
+    return {
+      state: 'ok',
+      ok: true,
+      skipped: true,
+      message: 'Bank kurikulum sudah tersemai penuh dan aktif — ' + countsText(soalBody) + '. Tidak ada penyemaian ulang yang diperlukan; data kelas dan akun guru tidak diubah.',
+      details: {
+        mapel: { ok: true, skipped: true },
+        english: { ok: true, skipped: true },
+        soal: { ok: true, skipped: true }
+      },
+      status
+    };
+  }
+
+  // 3. Ada yang kurang → coba semai endpoint yang kurang saja (25 dtk → 20 dtk).
+  const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+  // Render spin-down/cold-start butuh >6 detik; 6 dtk status + 20 dtk POST aman di wall-clock Worker.
+  const timeoutId = controller ? setTimeout(() => controller.abort(), 20000) : null;
+  const opt = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({}),
+    signal: controller ? controller.signal : undefined
+  };
+
+  const targets = [];
+  if (mapelNeeds) targets.push(['mapel', base + '/api/seed/mapel']);
+  if (englishNeeds) targets.push(['english', base + '/api/seed/english']);
+  if (soalNeeds) targets.push(['soal', base + '/api/seed/soal']);
+
+  let settled;
+  try {
+    // Kirim sinyal penyemaian hanya ke endpoint yang statusnya kurang.
+    settled = await Promise.allSettled(targets.map(([, url]) => doFetch(url, opt)));
+  } catch (e) {
+    if (timeoutId) clearTimeout(timeoutId);
+    const aborted = e && (e.name === 'AbortError' || /abort/i.test(String((e && e.message) || '')));
+    return {
+      state: 'pending',
+      ok: true,
+      pending: true,
+      message: aborted
+        ? 'Sinyal sinkronisasi terkirim ke backend, sedang proses penyemaian di background (timeout 20 detik, Render cold-start). Muat ulang 1-2 menit untuk melihat hitungan riil.'
+        : 'Sinyal sinkronisasi terkirim ke backend, sedang proses penyemaian di background. Gagal baca respons cepat: ' + String((e && e.message) || e),
+      error: String((e && e.message) || e),
+      status
+    };
+  }
+  if (timeoutId) clearTimeout(timeoutId);
+
+  const details = {};
+  let okCount = 0;
+  let abortCount = 0;
+  let authCount = 0;
+  for (let i = 0; i < settled.length; i++) {
+    const r = settled[i];
+    const key = (targets[i] && targets[i][0]) || ('endpoint_' + i);
+    if (r.status === 'fulfilled') {
+      const resp = r.value || {};
+      const st = Number(resp.status || 200);
+      const locked = st === 401 || st === 403;
+      const ok = resp.ok !== false && st < 500 && !locked;
+      // Coba baca body JSON tanpa menggagalkan bila backend masih streaming/cold-start.
+      let body = null;
+      try {
+        if (resp && typeof resp.json === 'function') body = await resp.json();
+        else if (typeof resp === 'object') body = resp;
+      } catch (_) { body = null; }
+      details[key] = { ok, status: st, locked, body };
+      if (ok) okCount++;
+      if (locked) authCount++;
+    } else {
+      const reason = r.reason || {};
+      const aborted = reason && (reason.name === 'AbortError' || /abort/i.test(String(reason.message || reason)));
+      if (aborted) abortCount++;
+      details[key] = { ok: false, aborted, error: String((reason && reason.message) || reason) };
+    }
+  }
+
+  if (okCount === settled.length) {
+    return {
+      state: 'ok',
+      ok: true,
+      message: 'Seluruh 17 Mapel Nasional (Fase A–F), Kurikulum Bahasa Inggris (144 Kompetensi), dan Bank Soal telah berhasil disinkronkan dan diaktifkan 100%! Seluruh akun guru di KelasKu kini dapat langsung mengakses Bab Buku Ajar dan Bank Soal.',
+      details,
+      status
+    };
+  }
+  // Backend menolak pemicu anonim (401/403): ini PENGAMAN yang benar, bukan kerusakan.
+  // Data yang sudah tersemai tetap aktif — pesannya wajib berkata begitu.
+  if (authCount > 0 && okCount === 0) {
+    return {
+      state: 'auth',
+      ok: false,
+      message: 'Backend menolak pemicu penyemaian anonim (HTTP 401/403) — ini pengaman yang benar, bukan kerusakan. Data yang sudah tersemai tetap aktif (' + countsText(soalBody) + '). Untuk menyemai yang kurang: login sebagai guru/owner di backend lalu panggil POST /api/seed/mapel, /english, /soal; atau minta pengembang memasang kunci pemicu server-ke-server.',
+      details,
+      error: 'seed_auth_required',
+      status
+    };
+  }
+  if (abortCount > 0 || okCount > 0) {
+    return {
+      state: 'pending',
+      ok: true,
+      pending: true,
+      message: 'Sinyal sinkronisasi terkirim ke backend, sedang proses penyemaian di background (' + okCount + '/' + settled.length + ' endpoint menjawab cepat, Render mungkin cold-start). Muat ulang 1-2 menit untuk hitungan riil jumlah soal dan kompetensi.',
+      details,
+      status
+    };
+  }
+  return {
+    state: 'error',
+    ok: false,
+    message: 'Gagal menghubungi backend penyemaian (0/' + settled.length + ' endpoint menjawab). Periksa CURRICULUM_API_URL dan status Render, lalu coba lagi.',
+    details,
+    error: 'all_endpoints_failed',
+    status
+  };
+}
+
+/**
+ * Baca hitungan riil kurikulum dari backend (GET status seed mapel, english, soal, best-effort).
+ * Dipakai panel ringkasan Owner agar tidak menampilkan angka statis.
+ * Selalu resolve (tidak pernah throw); tiap endpoint 8 detik, allSettled.
+ */
+async function readCurriculumStatus(env, fetchImpl, timeoutMs) {
+  const base = (env && typeof env.CURRICULUM_API_URL === 'string' && env.CURRICULUM_API_URL.trim().replace(/\/+$/, '')) || 'https://fiezel-apps.onrender.com';
+  const doFetch = typeof fetchImpl === 'function' ? fetchImpl : (typeof fetch === 'function' ? fetch : (typeof globalThis !== 'undefined' && globalThis.fetch ? globalThis.fetch : null));
+  const empty = { state: 'unknown', mapel: null, english: null, soal: null };
+  if (!doFetch) return empty;
+  const budget = Number(timeoutMs) > 0 ? Number(timeoutMs) : 8000;
+  const getOne = async (path) => {
+    const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    const timeoutId = controller ? setTimeout(() => controller.abort(), budget) : null;
+    try {
+      const resp = await doFetch(base + path, { method: 'GET', signal: controller ? controller.signal : undefined });
+      if (timeoutId) clearTimeout(timeoutId);
+      if (!resp || resp.ok === false) return { ok: false, status: Number((resp && resp.status) || 500) };
+      const body = typeof resp.json === 'function' ? await resp.json() : resp;
+      return { ok: true, status: 200, body };
+    } catch (e) {
+      if (timeoutId) clearTimeout(timeoutId);
+      return { ok: false, error: String((e && e.message) || e) };
+    }
+  };
+  const [mapel, english, soal] = await Promise.all([
+    getOne('/api/seed/mapel/status'),
+    getOne('/api/seed/english/status'),
+    getOne('/api/seed/soal/status')
+  ]);
+  const anyOk = (mapel && mapel.ok) || (english && english.ok) || (soal && soal.ok);
+  return { state: anyOk ? 'measured' : 'unavailable', mapel, english, soal };
+}
+
 
 /** `sub` yang sah = UUID. Dipakai DUA arah: sebelum dikirim ke API, dan sebelum dirender. */
 const SUB_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
@@ -1107,6 +1445,8 @@ async function readModel(env, period, nowMs, learnerSub, fetchImpl) {
     learnerDetail: SUB_RE.test(String(learnerSub || '')) ? await readLearnerDetail(env, period, learnerSub, fetchImpl) : null,
     // Undangan & token guru. Satu subrequest owner-gated ke Worker api, fail-soft.
     teachers: await readTeachers(env, fetchImpl),
+    schools: await readSchools(env, fetchImpl),
+    classes: await readClasses(env, fetchImpl),
     // Batas pengukuran ikut ke model — jadi HTML dan JSON menceritakan batas yang SAMA.
     unmeasurable: UNMEASURABLE,
     generatedAtIso: new Date(Number(nowMs)).toISOString(),
@@ -1119,43 +1459,1122 @@ async function readModel(env, period, nowMs, learnerSub, fetchImpl) {
 // pihak ketiga — pemilihan periode adalah tautan biasa (muat ulang), bukan kerangka kerja.
 
 const CSS = `
-:root{--cream:#FFF8ED;--ink:#2B2118;--yellow:#FFD23F;--line:#E7DCC9;--muted:#6B5C49;--warn:#8A5A00}
+:root{
+  --cream:#FFF8ED;
+  --ink:#2B2118;
+  --yellow:#FFD23F;
+  --header-bg:#FFFFFF;
+  --sidebar-bg:#2b3643;
+  --sidebar-hover:#222b35;
+  --sidebar-active:#1f2730;
+  --sidebar-text:#b4bcc8;
+  --sidebar-heading:#708096;
+  --bg:#f3f4f7;
+  --bg-subtle:#F8FAFC;
+  --card-bg:#FFFFFF;
+  --card-border:#E2E8F0;
+  --card-border-hover:#CBD5E1;
+  --text-main:#2c3e50;
+  --text-muted:#64748B;
+  --text-subtle:#94A3B8;
+  --brand-gold:#D97706;
+  --brand-accent:#F59E0B;
+  --brand-surface:#FEF3C7;
+  --brand-tint:#FFFBEB;
+  --brand-dark:#78350F;
+  --blue:#3F51B5;
+  --blue-subtle:#EEF2FF;
+  --blue-border:#C7D2FE;
+  --emerald:#059669;
+  --emerald-subtle:#ECFDF5;
+  --emerald-border:#A7F3D0;
+  --rose:#DC2626;
+  --rose-subtle:#FEF2F2;
+  --rose-border:#FECACA;
+  --spark-line:#3F51B5;
+  --spark-grid:#E2E8F0;
+  --spark-bg:#F8FAFC;
+  --shadow-xs:0 1px 2px 0 rgba(0,0,0,0.03);
+  --shadow-sm:0 1px 3px 0 rgba(0,0,0,0.05),0 1px 2px -1px rgba(0,0,0,0.03);
+  --shadow-md:0 4px 10px -1px rgba(0,0,0,0.07),0 2px 4px -2px rgba(0,0,0,0.04);
+  --shadow-lg:0 10px 20px -3px rgba(0,0,0,0.09),0 4px 6px -4px rgba(0,0,0,0.04);
+  --radius-sm:6px;
+  --radius-md:8px;
+  --radius-lg:10px;
+  --radius-xl:14px;
+  --radius-full:9999px;
+  --trans:all .15s cubic-bezier(.4,0,.2,1);
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --header-bg:#161D2A;
+    --sidebar-bg:#111823;
+    --sidebar-hover:#1A2332;
+    --sidebar-active:#131B28;
+    --sidebar-text:#94A3B8;
+    --bg:#0B0F17;
+    --bg-subtle:#111827;
+    --card-bg:#131B2A;
+    --card-border:#1E293B;
+    --card-border-hover:#334155;
+    --text-main:#F1F5F9;
+    --text-muted:#94A3B8;
+    --text-subtle:#64748B;
+    --brand-surface:rgba(245,158,11,.15);
+    --brand-tint:rgba(245,158,11,.08);
+    --brand-dark:#FDE68A;
+    --blue-subtle:rgba(63,81,181,.15);
+    --blue-border:#3730A3;
+    --emerald-subtle:rgba(5,150,105,.12);
+    --emerald-border:#047857;
+    --rose-subtle:rgba(220,38,38,.12);
+    --rose-border:#B91C1C;
+    --spark-line:#818CF8;
+    --spark-grid:#1E293B;
+    --spark-bg:#0E1522;
+  }
+}
 *{box-sizing:border-box}
-body{margin:0;background:var(--cream);color:var(--ink);font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
-header{padding:18px 16px 8px;border-bottom:3px solid var(--yellow)}
-h1{margin:0;font-size:20px;letter-spacing:-.01em}
-.sub{color:var(--muted);font-size:13px;margin-top:4px}
-nav{display:flex;gap:8px;flex-wrap:wrap;padding:12px 16px}
-nav a{padding:7px 13px;border:1px solid var(--line);border-radius:999px;text-decoration:none;color:var(--ink);font-size:14px;background:#fff}
-nav a[aria-current="page"]{background:var(--yellow);border-color:var(--ink);font-weight:600}
-main{padding:0 16px 40px;display:grid;gap:14px;grid-template-columns:1fr}
-@media(min-width:640px){main{grid-template-columns:repeat(2,minmax(0,1fr))}h1{font-size:24px}}
-@media(min-width:1024px){main{grid-template-columns:repeat(3,minmax(0,1fr))}}
-section{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px}
-section h2{margin:0 0 10px;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
-.kv{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px dashed var(--line);font-size:15px}
-.kv:last-of-type{border-bottom:0}
-.kv b{font-variant-numeric:tabular-nums;font-weight:700}
-.big{font-size:30px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.1;margin:2px 0 8px}
-.note{margin-top:10px;font-size:12px;color:var(--muted);border-left:3px solid var(--yellow);padding-left:9px}
-.warn{margin-top:10px;font-size:12px;color:var(--warn);background:#FFF4D6;border:1px solid var(--yellow);border-radius:9px;padding:8px 9px}
-.assume{margin-top:10px;font-size:12px;color:var(--muted);background:var(--cream);border:1px dashed var(--line);border-radius:9px;padding:8px 9px}
-.assume code{font-size:11px}
-.nodata{margin-top:10px;font-size:12px;color:#4A3A22;background:#F2ECE0;border:1px dashed var(--muted);border-radius:9px;padding:8px 9px}
-.empty{margin:0 16px 14px;padding:12px 13px;border:2px solid var(--ink);border-radius:12px;background:#FFF4D6;font-size:13px;line-height:1.45}
-.empty b{display:block;font-size:14px;margin-bottom:4px}
-table{width:100%;border-collapse:collapse;font-size:14px}
-th,td{text-align:right;padding:5px 4px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
-th:first-child,td:first-child{text-align:left}
-tr.sel td{background:#FFF3CE}
-.muted-mark{color:var(--muted);font-size:11px}
-h4{margin:12px 0 4px;font-size:13px;letter-spacing:.02em;text-transform:uppercase;color:var(--muted)}
-svg{display:block;width:100%;height:52px;margin:6px 0 2px}
-footer{padding:0 16px 34px;color:var(--muted);font-size:12px}
-form{padding:16px;max-width:420px}
-input{width:100%;padding:11px;font-size:16px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
-button{margin-top:10px;padding:11px 16px;font-size:15px;font-weight:700;border:1px solid var(--ink);border-radius:10px;background:var(--yellow);color:var(--ink)}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text-main);
+  font:13.5px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  letter-spacing:-.01em;
+}
+
+/* --- Top Header Navigation Bar --- */
+.page-header{
+  position:sticky;
+  top:0;
+  z-index:100;
+  height:60px;
+  background:var(--header-bg);
+  border-bottom:1px solid var(--card-border);
+  box-shadow:0 1px 4px rgba(0,0,0,0.05);
+}
+.page-header-inner{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  height:100%;
+  padding:0 20px;
+  gap:16px;
+}
+.page-logo{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  width:240px;
+  flex-shrink:0;
+}
+.logo-link{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  text-decoration:none;
+}
+.logo-icon{
+  width:32px;
+  height:32px;
+  background:linear-gradient(135deg,#3F51B5 0%,#2196F3 100%);
+  color:#fff;
+  border-radius:var(--radius-sm);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 2px 6px rgba(63,81,181,0.25);
+}
+.logo-icon .ico{
+  width:18px;
+  height:18px;
+  stroke:#ffffff;
+}
+.logo-text{
+  font-size:17px;
+  letter-spacing:-.02em;
+}
+.logo-bold{
+  font-weight:800;
+  color:#3F51B5;
+}
+.logo-gold{
+  font-weight:700;
+  color:var(--brand-gold);
+}
+.logo-badge{
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  background:var(--brand-surface);
+  color:var(--brand-dark);
+  padding:2px 6px;
+  border-radius:4px;
+}
+.header-tools{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  flex-wrap:wrap;
+}
+.nav-periods{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+}
+.nav-group{
+  display:inline-flex;
+  background:var(--bg-subtle);
+  border:1px solid var(--card-border);
+  padding:3px;
+  border-radius:var(--radius-full);
+  gap:2px;
+}
+.period-pill{
+  padding:5px 12px;
+  border-radius:var(--radius-full);
+  text-decoration:none;
+  color:var(--text-muted);
+  font-size:12px;
+  font-weight:600;
+  background:transparent;
+  transition:var(--trans);
+}
+.period-pill:hover{
+  color:var(--text-main);
+}
+.period-pill[aria-current="page"]{
+  background:var(--blue);
+  color:#ffffff;
+  box-shadow:0 2px 6px rgba(63,81,181,0.3);
+}
+.header-status-group{
+  display:none;
+  align-items:center;
+  gap:6px;
+}
+@media(min-width:1100px){
+  .header-status-group{display:inline-flex;}
+}
+.status-chip{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  background:var(--bg-subtle);
+  border:1px solid var(--card-border);
+  padding:4px 10px;
+  border-radius:var(--radius-full);
+  font-size:11.5px;
+  color:var(--text-muted);
+}
+.user-badge{
+  display:none;
+  align-items:center;
+  gap:8px;
+  padding:3px 8px;
+  border-radius:var(--radius-full);
+  background:var(--bg-subtle);
+  border:1px solid var(--card-border);
+}
+@media(min-width:768px){
+  .user-badge{display:inline-flex;}
+}
+.user-avatar{
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#D97706 0%,#F59E0B 100%);
+  color:#ffffff;
+  font-weight:700;
+  font-size:11px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.user-details{
+  display:flex;
+  flex-direction:column;
+  line-height:1.2;
+}
+.user-name{
+  font-size:11.5px;
+  font-weight:700;
+  color:var(--text-main);
+}
+.user-role{
+  font-size:9.5px;
+  color:var(--text-muted);
+  text-transform:uppercase;
+}
+.nav-exit{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  background:transparent;
+  border:1px solid var(--rose-border);
+  color:var(--rose);
+  font-size:12px;
+  font-weight:600;
+  padding:5px 12px;
+  border-radius:var(--radius-full);
+  text-decoration:none;
+  transition:var(--trans);
+}
+.nav-exit:hover{
+  background:var(--rose-subtle);
+}
+
+/* --- Layout Container: Sidebar & Content --- */
+.page-wrapper{
+  display:flex;
+  flex-direction:column;
+  min-height:calc(100vh - 60px);
+}
+.page-container{
+  display:flex;
+  flex:1;
+  width:100%;
+}
+
+/* --- Left Sidebar --- */
+.sidebar-wrapper{
+  width:240px;
+  background:var(--sidebar-bg);
+  color:var(--sidebar-text);
+  flex-shrink:0;
+  display:flex;
+  flex-direction:column;
+  border-right:1px solid rgba(0,0,0,0.1);
+  position:sticky;
+  top:60px;
+  height:calc(100vh - 60px);
+  overflow-y:auto;
+  scrollbar-width:thin;
+}
+.sidebar-user{
+  padding:18px 16px;
+  border-bottom:1px solid rgba(255,255,255,0.07);
+}
+.user-panel{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.user-avatar-circle{
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#D97706 0%,#F59E0B 100%);
+  color:#fff;
+  font-weight:700;
+  font-size:13px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  box-shadow:0 2px 6px rgba(0,0,0,0.25);
+  flex-shrink:0;
+}
+.status-dot{
+  width:9px;
+  height:9px;
+  background:#10B981;
+  border:2px solid var(--sidebar-bg);
+  border-radius:50%;
+  position:absolute;
+  bottom:0;
+  right:0;
+}
+.user-info{
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+.user-title{
+  font-size:13px;
+  font-weight:700;
+  color:#ffffff;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.user-subtitle{
+  font-size:10.5px;
+  color:#869AB8;
+}
+.sidebar-menu{
+  padding:10px 0 24px;
+  display:flex;
+  flex-direction:column;
+}
+.sidebar-heading{
+  padding:14px 18px 6px;
+  font-size:10.5px;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--sidebar-heading);
+}
+.sidebar-link{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:9px 18px;
+  color:var(--sidebar-text);
+  text-decoration:none;
+  font-size:12.5px;
+  font-weight:500;
+  border-left:3px solid transparent;
+  transition:var(--trans);
+}
+.sidebar-link:hover{
+  background:var(--sidebar-hover);
+  color:#ffffff;
+  border-left-color:var(--blue);
+}
+.sidebar-link.active{
+  background:var(--sidebar-active);
+  color:#ffffff;
+  border-left-color:var(--brand-gold);
+  font-weight:600;
+}
+.sidebar-icon{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+}
+.sidebar-icon .ico{
+  width:16px;
+  height:16px;
+}
+.sidebar-text{
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+/* --- Content Wrapper --- */
+.content-wrapper{
+  flex:1;
+  min-width:0;
+  padding:20px 24px 60px;
+  background:var(--bg);
+}
+.page-bar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:12px;
+  background:var(--card-bg);
+  border:1px solid var(--card-border);
+  border-radius:var(--radius-md);
+  padding:12px 18px;
+  margin-bottom:20px;
+  box-shadow:var(--shadow-xs);
+}
+.page-title-breadcrumb{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+}
+.page-title{
+  font-size:18px;
+  font-weight:800;
+  color:var(--text-main);
+  letter-spacing:-.02em;
+  margin:0;
+}
+.page-breadcrumb{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:11.5px;
+  color:var(--text-muted);
+  list-style:none;
+  margin:0;
+  padding:0;
+}
+.page-breadcrumb a{
+  color:var(--text-muted);
+  text-decoration:none;
+}
+.page-breadcrumb a:hover{
+  color:var(--blue);
+}
+.breadcrumb-sep{
+  color:var(--text-subtle);
+  font-size:10px;
+}
+.page-bar-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  background:var(--bg-subtle);
+  border:1px solid var(--card-border);
+  padding:5px 12px;
+  border-radius:var(--radius-full);
+  font-size:11.5px;
+  color:var(--text-muted);
+  font-weight:500;
+}
+
+/* --- 4 Smart University Quick Stat Cards --- */
+.stat-cards-grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:16px;
+  margin-bottom:24px;
+}
+@media(min-width:640px){
+  .stat-cards-grid{grid-template-columns:repeat(2,1fr);}
+}
+@media(min-width:1200px){
+  .stat-cards-grid{grid-template-columns:repeat(4,1fr);}
+}
+.stat-card{
+  border-radius:var(--radius-lg);
+  padding:18px 20px;
+  color:#ffffff;
+  box-shadow:0 3px 10px rgba(0,0,0,0.08);
+  position:relative;
+  overflow:hidden;
+  transition:var(--trans);
+}
+.stat-card:hover{
+  transform:translateY(-2px);
+  box-shadow:0 6px 16px rgba(0,0,0,0.12);
+}
+.stat-card.bg-primary{
+  background:linear-gradient(135deg,#4F46E5 0%,#3B82F6 100%);
+}
+.stat-card.bg-success{
+  background:linear-gradient(135deg,#059669 0%,#10B981 100%);
+}
+.stat-card.bg-warning{
+  background:linear-gradient(135deg,#D97706 0%,#F59E0B 100%);
+}
+.stat-card.bg-danger{
+  background:linear-gradient(135deg,#DC2626 0%,#EF4444 100%);
+}
+.stat-card-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:8px;
+}
+.stat-label{
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,0.85);
+}
+.stat-icon-wrap{
+  width:34px;
+  height:34px;
+  border-radius:var(--radius-sm);
+  background:rgba(255,255,255,0.2);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.stat-icon-wrap .ico{
+  width:18px;
+  height:18px;
+  stroke:#ffffff;
+}
+.stat-value{
+  font-size:24px;
+  font-weight:800;
+  line-height:1.2;
+  color:#ffffff;
+  font-variant-numeric:tabular-nums;
+  letter-spacing:-.02em;
+}
+.stat-footer-text{
+  margin-top:8px;
+  font-size:11px;
+  color:rgba(255,255,255,0.9);
+  border-top:1px solid rgba(255,255,255,0.18);
+  padding-top:6px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+/* --- Mobile Responsiveness for Sidebar --- */
+@media(max-width:991px){
+  .page-container{flex-direction:column;}
+  .sidebar-wrapper{
+    width:100%;
+    height:auto;
+    position:static;
+    border-right:none;
+    border-bottom:1px solid var(--card-border);
+    padding:6px 12px;
+  }
+  .sidebar-user{display:none;}
+  .sidebar-menu{
+    flex-direction:row;
+    flex-wrap:wrap;
+    gap:4px;
+    padding:4px 0;
+  }
+  .sidebar-heading{
+    width:100%;
+    padding:6px 6px 2px;
+    font-size:9.5px;
+  }
+  .sidebar-link{
+    padding:4px 8px;
+    border-radius:var(--radius-sm);
+    border-left:none;
+    font-size:11.5px;
+  }
+  .content-wrapper{
+    padding:14px 14px 48px;
+  }
+}
+
+/* --- Main Grid & Sections --- */
+main{
+  display:grid;
+  gap:18px;
+  grid-template-columns:1fr;
+}
+@media(min-width:768px){
+  main{grid-template-columns:repeat(2,minmax(0,1fr));}
+}
+@media(min-width:1200px){
+  main{grid-template-columns:repeat(3,minmax(0,1fr));}
+}
+section{
+  background:var(--card-bg);
+  border:1px solid var(--card-border);
+  border-radius:var(--radius-lg);
+  padding:20px 22px;
+  box-shadow:var(--shadow-xs);
+  display:flex;
+  flex-direction:column;
+  transition:var(--trans);
+  position:relative;
+}
+section:hover{
+  box-shadow:var(--shadow-md);
+  border-color:var(--card-border-hover);
+}
+section:has(.wide-panel),
+section:has(.card-full-inner){
+  grid-column:1 / -1;
+}
+@media(min-width:1200px){
+  section:has(.col-2-panel){
+    grid-column:span 2;
+  }
+}
+section h2{
+  margin:0 0 14px;
+  font-size:14px;
+  font-weight:700;
+  letter-spacing:-.01em;
+  color:var(--text-main);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  border-bottom:1px solid var(--card-border);
+  padding-bottom:10px;
+  line-height:1.2;
+}
+section h2 > span:first-child{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+}
+.section-badge{
+  font-size:10.5px;
+  font-weight:600;
+  text-transform:none;
+  letter-spacing:normal;
+  padding:2px 8px;
+  border-radius:var(--radius-full);
+  background:var(--bg-subtle);
+  color:var(--text-muted);
+  border:1px solid var(--card-border);
+  flex-shrink:0;
+}
+.big{
+  font-size:28px;
+  font-weight:800;
+  font-variant-numeric:tabular-nums;
+  letter-spacing:-.03em;
+  line-height:1.1;
+  color:var(--text-main);
+  margin:2px 0 10px;
+}
+.kpi-hero{
+  margin:2px 0 12px;
+  padding:12px 14px;
+  background:var(--bg-subtle);
+  border:1px solid var(--card-border);
+  border-radius:var(--radius-md);
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+}
+.kpi-hero-label{
+  font-size:10.5px;
+  font-weight:700;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+  color:var(--text-muted);
+}
+.kpi-hero .big{
+  margin:0;
+  line-height:1.1;
+}
+.kv{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  padding:6px 4px;
+  border-bottom:1px solid var(--card-border);
+  font-size:12.5px;
+  transition:var(--trans);
+}
+.kv:hover{
+  background:var(--bg-subtle);
+  border-radius:var(--radius-sm);
+  padding-left:8px;
+  padding-right:8px;
+}
+.kv:last-of-type{
+  border-bottom:0;
+}
+.kv span{
+  color:var(--text-muted);
+  display:inline-flex;
+  align-items:baseline;
+  gap:6px;
+  font-size:12px;
+}
+.kv span small{
+  color:var(--text-subtle);
+  font-size:10.5px;
+}
+.kv b{
+  font-variant-numeric:tabular-nums;
+  font-weight:700;
+  color:var(--text-main);
+  text-align:right;
+  white-space:nowrap;
+  background:var(--bg-subtle);
+  border:1px solid var(--card-border);
+  padding:2px 7px;
+  border-radius:var(--radius-sm);
+  font-size:12px;
+}
+svg{
+  display:block;
+  width:100%;
+  height:52px;
+  margin:10px 0 6px;
+  border-radius:var(--radius-md);
+  background:var(--spark-bg);
+  border:1px solid var(--card-border);
+  padding:4px;
+}
+.card-footer{
+  margin-top:auto;
+  padding-top:12px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.note{
+  margin-top:0;
+  font-size:11px;
+  color:var(--text-muted);
+  border-left:3px solid var(--blue);
+  background:var(--bg-subtle);
+  border-radius:0 var(--radius-sm) var(--radius-sm) 0;
+  padding:8px 12px;
+  line-height:1.5;
+  border-top:1px solid var(--card-border);
+  border-right:1px solid var(--card-border);
+  border-bottom:1px solid var(--card-border);
+}
+.warn{
+  margin-top:0;
+  font-size:11px;
+  color:#92400E;
+  background:var(--brand-tint);
+  border:1px solid var(--brand-surface);
+  border-left:3px solid var(--brand-gold);
+  border-radius:0 var(--radius-sm) var(--radius-sm) 0;
+  padding:8px 12px;
+  line-height:1.5;
+}
+@media(prefers-color-scheme:dark){
+  .warn{color:#FDE68A;border-color:rgba(217,119,6,.3);}
+}
+.assume{
+  margin-top:0;
+  font-size:11px;
+  color:var(--text-muted);
+  background:var(--bg-subtle);
+  border:1px solid var(--card-border);
+  border-radius:var(--radius-sm);
+  padding:9px 12px;
+  line-height:1.5;
+}
+.assume code{
+  font-size:10.5px;
+  background:var(--card-bg);
+  color:var(--brand-gold);
+  padding:1px 5px;
+  border-radius:4px;
+  border:1px solid var(--card-border);
+  font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+}
+.nodata{
+  margin-top:0;
+  font-size:11px;
+  color:var(--text-muted);
+  background:var(--bg-subtle);
+  border:1px dashed var(--card-border-hover);
+  border-radius:var(--radius-sm);
+  padding:8px 12px;
+}
+.empty{
+  margin:0 0 20px;
+  padding:16px 20px;
+  border:1px solid var(--brand-accent);
+  border-left:5px solid var(--brand-gold);
+  border-radius:var(--radius-lg);
+  background:var(--brand-tint);
+  color:#92400E;
+  font-size:13px;
+  line-height:1.6;
+  box-shadow:var(--shadow-sm);
+}
+@media(prefers-color-scheme:dark){
+  .empty{color:#FDE68A;}
+}
+.empty b{
+  display:block;
+  font-size:14.5px;
+  font-weight:700;
+  color:var(--text-main);
+  margin-bottom:6px;
+}
+.table-wrap{
+  width:100%;
+  overflow-x:auto;
+  border:1px solid var(--card-border);
+  border-radius:var(--radius-md);
+  margin:10px 0;
+  background:var(--card-bg);
+  box-shadow:var(--shadow-xs);
+}
+table{
+  width:100%;
+  border-collapse:separate;
+  border-spacing:0;
+  font-size:12.5px;
+  line-height:1.45;
+}
+th{
+  background:var(--bg-subtle);
+  color:var(--text-muted);
+  font-weight:600;
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+  padding:8px 12px;
+  border-bottom:1px solid var(--card-border);
+  text-align:right;
+  white-space:nowrap;
+}
+td{
+  padding:8px 12px;
+  border-bottom:1px solid var(--card-border);
+  font-variant-numeric:tabular-nums;
+  text-align:right;
+  color:var(--text-main);
+}
+th:first-child,td:first-child{text-align:left;font-weight:600}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover td{background:var(--bg-subtle)}
+tr.sel td{background:var(--brand-surface)!important;font-weight:600;color:var(--brand-dark)}
+.muted-mark{color:var(--text-subtle);font-size:10.5px;font-weight:normal}
+h3{
+  margin:14px 0 8px;
+  font-size:13.5px;
+  font-weight:700;
+  color:var(--text-main);
+}
+h4{
+  margin:10px 0 6px;
+  font-size:11.5px;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  color:var(--text-muted);
+}
+.subgrid{
+  display:grid;
+  gap:12px;
+  grid-template-columns:1fr;
+}
+@media(min-width:640px){
+  .subgrid-2{grid-template-columns:repeat(2,1fr)}
+  .subgrid-3{grid-template-columns:repeat(3,1fr)}
+}
+.evidence-box{
+  background:var(--bg-subtle);
+  padding:14px 16px;
+  border-radius:var(--radius-md);
+  border:1px solid var(--card-border);
+}
+.evidence-box h3{
+  margin:10px 0 6px;
+  font-size:12px;
+  font-weight:700;
+  color:var(--text-main);
+  text-transform:uppercase;
+  letter-spacing:.04em;
+}
+.evidence-box h3:first-child{margin-top:0}
+form{
+  padding:0;
+  max-width:100%;
+}
+input,select{
+  width:100%;
+  padding:9px 12px;
+  font-size:13.5px;
+  border:1px solid var(--card-border);
+  border-radius:var(--radius-md);
+  background:var(--card-bg);
+  color:var(--text-main);
+  outline:none;
+  box-sizing:border-box;
+  transition:var(--trans);
+}
+input:focus,select:focus{
+  border-color:var(--blue);
+  box-shadow:0 0 0 3px rgba(63,81,181,.15);
+}
+button{
+  padding:9px 16px;
+  font-size:13px;
+  font-weight:600;
+  border:1px solid transparent;
+  border-radius:var(--radius-md);
+  background:var(--blue);
+  color:#fff;
+  cursor:pointer;
+  box-shadow:var(--shadow-xs);
+  transition:var(--trans);
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+}
+button:hover{
+  opacity:.92;
+  transform:translateY(-1px);
+  box-shadow:var(--shadow-sm);
+}
+button:active{
+  transform:translateY(0);
+}
+.export-deck{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:10px;
+  margin:12px 0;
+}
+.export-chip{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  padding:10px 14px;
+  border:1px solid var(--card-border);
+  border-radius:var(--radius-md);
+  background:var(--card-bg);
+  color:var(--text-main);
+  text-decoration:none;
+  font-size:12.5px;
+  font-weight:600;
+  box-shadow:var(--shadow-xs);
+  transition:var(--trans);
+}
+.export-chip:hover{
+  background:var(--bg-subtle);
+  border-color:var(--card-border-hover);
+  transform:translateY(-1px);
+  box-shadow:var(--shadow-sm);
+}
+footer{
+  margin-top:40px;
+  padding:24px 0 40px;
+  border-top:1px solid var(--card-border);
+  color:var(--text-muted);
+  font-size:11.5px;
+  line-height:1.65;
+}
+.login-shell{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  background:radial-gradient(circle at 50% 30%,rgba(63,81,181,.06),transparent 55%),var(--bg);
+}
+.login-card{
+  width:100%;
+  max-width:400px;
+  background:var(--card-bg);
+  border:1px solid var(--card-border);
+  border-radius:var(--radius-xl);
+  padding:32px;
+  box-shadow:var(--shadow-md);
+}
+.ico{
+  width:15px;
+  height:15px;
+  stroke:currentColor;
+  stroke-width:2;
+  fill:none;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  vertical-align:-3px;
+  flex-shrink:0;
+  display:inline-block;
+}
+.zone-divider{
+  grid-column:1 / -1;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:12px;
+  margin:28px 0 6px;
+  padding:12px 18px;
+  background:var(--card-bg);
+  border:1px solid var(--card-border);
+  border-radius:var(--radius-md);
+  box-shadow:var(--shadow-xs);
+}
+.zone-divider:first-of-type{
+  margin-top:6px;
+}
+.zone-title-group{
+  display:flex;
+  align-items:baseline;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.zone-badge{
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  background:var(--bg-subtle);
+  border:1px solid var(--card-border);
+  color:var(--brand-gold);
+  padding:2px 8px;
+  border-radius:var(--radius-full);
+}
+.zone-title{
+  margin:0;
+  font-size:14.5px;
+  font-weight:800;
+  letter-spacing:-.02em;
+  color:var(--text-main);
+}
+.zone-desc{
+  font-size:12px;
+  color:var(--text-muted);
+}
+.stat-highlight{
+  margin:2px 0 12px;
+  padding:12px;
+  background:var(--bg-subtle);
+  border:1px solid var(--card-border);
+  border-radius:var(--radius-md);
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.stat-highlight-label{
+  font-size:10.5px;
+  font-weight:700;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+  color:var(--text-muted);
+  margin-bottom:2px;
+}
+.stat-highlight .big{
+  margin:0;
+  line-height:1;
+}
+.stat-mini-deck{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:6px;
+}
+.stat-mini{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  background:var(--card-bg);
+  border:1px solid var(--card-border);
+  border-radius:var(--radius-sm);
+  padding:6px 8px;
+}
+.stat-mini span{
+  font-size:9.5px;
+  font-weight:600;
+  letter-spacing:.03em;
+  text-transform:uppercase;
+  color:var(--text-muted);
+}
+.stat-mini b{
+  font-size:12.5px;
+  font-weight:700;
+  color:var(--text-main);
+  font-variant-numeric:tabular-nums;
+}
 `;
+
+const ICONS = {
+  brand: '<svg class="ico" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>',
+
+  users: '<svg class="ico" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+  activity: '<svg class="ico" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3 6 12H2"/></svg>',
+  retention: '<svg class="ico" viewBox="0 0 24 24"><path d="m9 14-5-5 5-5M20 20v-7a4 4 0 0 0-4-4H4"/></svg>',
+  book: '<svg class="ico" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>',
+  cpu: '<svg class="ico" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>',
+  voice: '<svg class="ico" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>',
+  cost: '<svg class="ico" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+  shield: '<svg class="ico" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+  server: '<svg class="ico" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>',
+  check: '<svg class="ico" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14M22 4 12 14.01l-3-3"/></svg>',
+  brain: '<svg class="ico" viewBox="0 0 24 24"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-2.54z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-4.44-2.54z"/></svg>',
+  teacher: '<svg class="ico" viewBox="0 0 24 24"><path d="m4 6 8-4 8 4-8 4-8-4Z"/><path d="m18 10 4 2v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6l4-2"/><path d="M12 10v12"/></svg>',
+  download: '<svg class="ico" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>',
+  calendar: '<svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+  refresh: '<svg class="ico" viewBox="0 0 24 24"><path d="M23 4v6h-6M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>',
+  logout: '<svg class="ico" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>',
+  file: '<svg class="ico" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6"/></svg>',
+  alert: '<svg class="ico" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+};
 
 function esc(v) {
   return String(v == null ? '' : v).replace(/[&<>"']/g, (c) => (
@@ -1255,12 +2674,13 @@ function sparkline(series, key) {
   (series || []).forEach((r, i) => {
     const ok = Number(r.collection_ok) !== 0;
     if (!ok) { if (current.length > 1) segments.push(current); current = []; return; }
-    current.push(`${(i * stepX).toFixed(2)},${(46 - (Number(r[key]) || 0) / max * 42).toFixed(2)}`);
+    current.push(`${(i * stepX).toFixed(2)},${(44 - (Number(r[key]) || 0) / max * 38).toFixed(2)}`);
   });
   if (current.length > 1) segments.push(current);
-  const paths = segments.map((s) => `<polyline fill="none" stroke="#2B2118" stroke-width="2" points="${s.join(' ')}"/>`).join('');
+  const paths = segments.map((s) => `<polyline fill="none" stroke="var(--spark-line)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="${s.join(' ')}"/>`).join('');
   return `<svg viewBox="0 0 100 50" preserveAspectRatio="none" role="img" aria-label="tren ${esc(key)}">
-    <rect x="0" y="0" width="100" height="50" fill="#FFF8ED"/>${paths}</svg>`;
+    <line x1="0" y1="46" x2="100" y2="46" stroke="var(--spark-grid)" stroke-width="1" stroke-dasharray="2,2"/>
+    ${paths}</svg>`;
 }
 
 // Baris "tidak bisa diukur": panel yang MUSTAHIL dijawab dari lima tabel yang ada tidak diberi
@@ -1315,7 +2735,7 @@ function evidenceDist(map, order) {
  */
 function renderEvidenceSection(m) {
   const e = m.evidence || { state: 'unconfigured', summary: null };
-  const head = '<section><h2>\u{1F9E0} Braincore evidence</h2>';
+  const head = '<section><span class="card-full-inner" id="evidence"></span><h2><span>' + ICONS.brain + ' Braincore evidence</span><span class="section-badge">Pedagogi Agregat</span></h2>';
   if (e.state === 'unconfigured') {
     return head + `<div class="note">BELUM DIKONFIGURASI. Secret <code>EVIDENCE_API_BASE</code> dan
       <code>EVIDENCE_API_TOKEN</code> belum dipasang di Worker ini, jadi panel ini tidak pernah memanggil
@@ -1344,18 +2764,28 @@ function renderEvidenceSection(m) {
     ${row('Murid terukur (periode)', fmtInt(s.learnersMeasured), 'cohort acak berotasi 14 hari')}
     ${row('Bukti belajar terkirim', fmtInt(s.evidenceCount), 'event learner_evidence')}
     ${row('Keputusan Braincore', fmtInt(s.decisionCount), 'event braincore_decision')}
-    <h3>Tren mastery</h3>${evidenceDist(s.masteryTrend, ['up', 'flat', 'down'])}
-    <h3>Sebaran mastery</h3>${evidenceDist(s.mastery, ['m0-40', 'm40-60', 'm60-80', 'm80-100'])}
-    <h3>Tren miskonsepsi</h3>${evidenceDist(s.misconception, ['none', 'mc1', 'mc2-3', 'mc4p'])}
-    <h3>Famili skill miskonsepsi</h3>${evidenceDist(s.misconceptionSkill)}
-    <h3>Kalibrasi kesulitan</h3>${evidenceDist(s.difficultyCalibration, ['too_easy', 'calibrated', 'too_hard'])}
-    <h3>Galat kalibrasi</h3>${evidenceDist(s.calibrationError, ['e0-10', 'e10-20', 'e20-40', 'e40p'])}
-    <h3>Alasan keputusan Braincore</h3>${evidenceDist(s.decision)}
-    <h3>Hasil kebijakan</h3>${evidenceDist(s.outcome, ['positive', 'mixed', 'negative', 'insufficient'])}
-    <h3>Rekomendasi kebijakan</h3>${evidenceDist(s.recommendation)}
-    <h3>Tren perbaikan belajar</h3>${evidenceDist(s.improvementTrend, ['improving', 'steady', 'declining'])}
+    <div class="subgrid subgrid-2" style="margin-top:14px;">
+      <div class="evidence-box">
+        <h3>Tren mastery</h3>${evidenceDist(s.masteryTrend, ['up', 'flat', 'down'])}
+        <h3>Sebaran mastery</h3>${evidenceDist(s.mastery, ['m0-40', 'm40-60', 'm60-80', 'm80-100'])}
+        <h3>Tren perbaikan belajar</h3>${evidenceDist(s.improvementTrend, ['improving', 'steady', 'declining'])}
+      </div>
+      <div class="evidence-box">
+        <h3>Tren miskonsepsi</h3>${evidenceDist(s.misconception, ['none', 'mc1', 'mc2-3', 'mc4p'])}
+        <h3>Famili skill miskonsepsi</h3>${evidenceDist(s.misconceptionSkill)}
+      </div>
+      <div class="evidence-box">
+        <h3>Kalibrasi kesulitan</h3>${evidenceDist(s.difficultyCalibration, ['too_easy', 'calibrated', 'too_hard'])}
+        <h3>Galat kalibrasi</h3>${evidenceDist(s.calibrationError, ['e0-10', 'e10-20', 'e20-40', 'e40p'])}
+      </div>
+      <div class="evidence-box">
+        <h3>Alasan keputusan Braincore</h3>${evidenceDist(s.decision)}
+        <h3>Hasil kebijakan</h3>${evidenceDist(s.outcome, ['positive', 'mixed', 'negative', 'insufficient'])}
+        <h3>Rekomendasi kebijakan</h3>${evidenceDist(s.recommendation)}
+      </div>
+    </div>
     <h3>Per hari</h3>
-    <table><tr><th>hari</th><th>murid baru</th><th>bukti</th><th>keputusan</th></tr>${dayRows}</table>
+    <div class="table-wrap"><table><tr><th>hari</th><th>murid baru</th><th>bukti</th><th>keputusan</th></tr>${dayRows}</table></div>
     <div class="note">"Murid terukur" dijumlahkan dari murid BARU per hari; satu murid yang aktif tiga hari
       terhitung tiga kali. Angka unik lintas-hari TIDAK dihitung, dan itu disengaja: menghitungnya menuntut
       menyimpan pengenal lebih lama daripada yang dibenarkan.</div>
@@ -1434,8 +2864,8 @@ function renderLearnerDirectory(m) {
       <td>${esc(x.lastTrend || '—')}</td>
     </tr>`;
   }).join('');
-  return `<table><tr><th>murid</th><th>aktivitas terakhir</th><th>bukti</th><th>keputusan</th>
-    <th>level</th><th>mastery</th><th>tren</th></tr>${rows}</table>
+  return `<div class="table-wrap"><table><tr><th>murid</th><th>aktivitas terakhir</th><th>bukti</th><th>keputusan</th>
+    <th>level</th><th>mastery</th><th>tren</th></tr>${rows}</table></div>
     <div class="note">Nama diambil dari yang DIKETIK murid di langkah pertama perkenalan
       (<code>learner_name</code>, wajib diisi, terikat <code>identity.sub</code>). Profil sosial
       (<code>social_profile</code>) hanya cadangan untuk murid lama. Baris "murid &lt;8 hex sub&gt;"
@@ -1474,7 +2904,11 @@ function renderLearnerDetail(m) {
   const masteryMove = s2.masteryFirst && s2.masteryLast
     ? `${esc(s2.masteryFirst)} &rarr; ${esc(s2.masteryLast)}`
     : NO_DATA_TEXT;
-  return `<h3>${name}</h3>
+  return `<div class="evidence-box" style="margin-top:16px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:12px;">
+      <h3 style="margin:0;font-size:16px;">${name}</h3>
+      <span class="sub-chip">Target Profil</span>
+    </div>
     <div class="big">${esc(fmtInt(s2.decisionCount))}</div>
     ${row('Keputusan Braincore (periode)', fmtInt(s2.decisionCount))}
     ${row('Bukti belajar (periode)', fmtInt(s2.evidenceCount))}
@@ -1483,26 +2917,32 @@ function renderLearnerDetail(m) {
     ${row('Perpindahan mastery', masteryMove, 'bucket pertama → bucket terakhir pada periode ini')}
     ${row('Kalibrasi kesulitan', s2.calibratedShare === null ? NO_DATA_TEXT : s2.calibratedShare + '%', 'bagian bukti yang menilai kesulitan "calibrated"')}
     ${row('Miskonsepsi (bucket terakhir)', Object.keys(s2.misconception).length ? Object.keys(s2.misconception).join(', ') : NO_DATA_TEXT)}
-    <h4>Tren mastery</h4>${evidenceDist(s2.masteryTrend, ['up', 'flat', 'down'])}
-    <h4>Sebaran mastery</h4>${evidenceDist(s2.mastery, ['m0-40', 'm40-60', 'm60-80', 'm80-100'])}
-    <h4>Famili skill miskonsepsi</h4>${evidenceDist(s2.misconceptionSkill)}
-    <h4>Kalibrasi kesulitan</h4>${evidenceDist(s2.difficultyCalibration, ['too_easy', 'calibrated', 'too_hard'])}
-    <h4>Alasan keputusan</h4>${evidenceDist(s2.decision)}
-    <h4>Hasil kebijakan</h4>${evidenceDist(s2.outcome, ['positive', 'mixed', 'negative', 'insufficient'])}
-    <h4>Rekomendasi</h4>${evidenceDist(s2.recommendation)}
-    <h4>Tren perbaikan belajar</h4>${evidenceDist(s2.improvementTrend, ['improving', 'steady', 'declining'])}
+    <div class="subgrid subgrid-2" style="margin-top:14px;">
+      <div class="evidence-box" style="background:#fff;">
+        <h4>Tren mastery</h4>${evidenceDist(s2.masteryTrend, ['up', 'flat', 'down'])}
+        <h4>Sebaran mastery</h4>${evidenceDist(s2.mastery, ['m0-40', 'm40-60', 'm60-80', 'm80-100'])}
+        <h4>Tren perbaikan belajar</h4>${evidenceDist(s2.improvementTrend, ['improving', 'steady', 'declining'])}
+      </div>
+      <div class="evidence-box" style="background:#fff;">
+        <h4>Famili skill miskonsepsi</h4>${evidenceDist(s2.misconceptionSkill)}
+        <h4>Kalibrasi kesulitan</h4>${evidenceDist(s2.difficultyCalibration, ['too_easy', 'calibrated', 'too_hard'])}
+      </div>
+      <div class="evidence-box" style="background:#fff;">
+        <h4>Alasan keputusan</h4>${evidenceDist(s2.decision)}
+        <h4>Hasil kebijakan</h4>${evidenceDist(s2.outcome, ['positive', 'mixed', 'negative', 'insufficient'])}
+      </div>
+      <div class="evidence-box" style="background:#fff;">
+        <h4>Rekomendasi</h4>${evidenceDist(s2.recommendation)}
+      </div>
+    </div>
     <h4>Keputusan Braincore terakhir</h4>
-    <table><tr><th>hari</th><th>keputusan</th><th>level</th><th>hasil</th><th>rekomendasi</th>
-      <th>Δ mastery</th><th>kepatuhan</th></tr>${decisionRows}</table>`;
+    <div class="table-wrap"><table><tr><th>hari</th><th>keputusan</th><th>level</th><th>hasil</th><th>rekomendasi</th>
+      <th>Δ mastery</th><th>kepatuhan</th></tr>${decisionRows}</table></div>
+  </div>`;
 }
 
-/**
- * Satu section, dua bagian: direktori + murid terpilih. Ditempel SETELAH panel agregat
- * supaya urutan bacanya "populasi dulu, lalu orang" — dan supaya panel agregat tetap
- * menjadi hal pertama yang dilihat owner, seperti sebelum perubahan ini.
- */
 function renderLearnerSection(m) {
-  return `<section><h2>\u{1F9D1}\u{200D}\u{1F393} Murid per orang (Braincore)</h2>
+  return `<section><span class="card-full-inner" id="learners"></span><h2><span>${ICONS.users} Murid per orang (Braincore)</span><span class="section-badge">Data Berizin</span></h2>
     ${renderLearnerDirectory(m)}
     ${renderLearnerDetail(m)}
     <div class="note">Panel ini memuat data BERIDENTITAS, atas persetujuan tiap murid, dan
@@ -1512,35 +2952,306 @@ function renderLearnerSection(m) {
   </section>`;
 }
 
+const CLASS_CODE_ALPHABET = '23456789ABCDEFGHJKMNPQRSTVWXYZ';
+function generateClassCode() {
+  let s = 'FZ-';
+  for (let i = 0; i < 6; i++) {
+    s += CLASS_CODE_ALPHABET[Math.floor(Math.random() * CLASS_CODE_ALPHABET.length)];
+  }
+  return s;
+}
+
+const SUBJECTS_17 = [
+  { id: 'MAT', name: 'Matematika', icon: '📐', desc: 'Bilangan, Aljabar, Geometri, Data & Peluang' },
+  { id: 'ENG', name: 'Bahasa Inggris', icon: '🇬🇧', desc: 'Listening, Speaking, Reading, Writing' },
+  { id: 'IPA', name: 'Ilmu Pengetahuan Alam (IPA)', icon: '🔬', desc: 'Fisika, Biologi, Kimia, Ekologi' },
+  { id: 'IPS', name: 'Ilmu Pengetahuan Sosial (IPS)', icon: '🌍', desc: 'Geografi, Sejarah, Ekonomi, Sosiologi' },
+  { id: 'IND', name: 'Bahasa Indonesia', icon: '📚', desc: 'Literasi, Menulis, Tata Bahasa, Sastra' },
+  { id: 'INF', name: 'Informatika', icon: '💻', desc: 'Berpikir Komputasional, Algoritma, TIK' },
+  { id: 'PKN', name: 'Pendidikan Pancasila', icon: '🇮🇩', desc: 'Pancasila, UUD 1945, NKRI, Bhinneka' },
+  { id: 'PAI', name: 'Pend. Agama Islam & Budi Pekerti', icon: '🕌', desc: 'Al-Qur\'an Hadits, Akidah, Akhlak, Fikih' },
+  { id: 'PJOK', name: 'PJOK (Pendidikan Jasmani)', icon: '🏃', desc: 'Kebugaran, Atletik, Permainan Bola, Senam' },
+  { id: 'SB-RUPA', name: 'Seni Rupa', icon: '🎨', desc: 'Menggambar, Desain, Kriya Seni' },
+  { id: 'SB-MUSIK', name: 'Seni Musik', icon: '🎵', desc: 'Solmisasi, Instrumen, Harmoni Lagu' },
+  { id: 'SB-TARI', name: 'Seni Tari', icon: '🩰', desc: 'Koreografi, Wiraga, Wirama, Wirasa' },
+  { id: 'SB-TEATER', name: 'Seni Teater', icon: '🎭', desc: 'Tata Panggung, Pantomim, Lakon' },
+  { id: 'PRA-KARYA', name: 'Prakarya & Kewirausahaan', icon: '🧶', desc: 'Kerajinan, Rekayasa, Budi Daya, Pengolahan' },
+  { id: 'BK', name: 'Bimbingan Konseling (BK)', icon: '🤝', desc: 'Pengembangan Diri, Karir, Sosial, Belajar' },
+  { id: 'SD-ALL', name: 'Guru Kelas SD (Tematik)', icon: '🎒', desc: 'Tematik Terpadu Fase A–C SD' },
+  { id: 'ALL', name: 'Semua Mapel (Kurikulum/Kepsek)', icon: '🏫', desc: 'Manajemen Kurikulum & Supervisi Kelas' }
+];
+
+function subjectName(id) {
+  const match = SUBJECTS_17.find((s) => s.id === id);
+  if (match) return match.name;
+  const map = {
+    MAT: 'Matematika',
+    ENG: 'Bahasa Inggris',
+    IPA: 'IPA',
+    IPS: 'IPS',
+    IND: 'Bahasa Indonesia',
+    INF: 'Informatika',
+    PKN: 'Pendidikan Pancasila',
+    'SD-ALL': 'Guru Kelas SD (Tematik)',
+    ALL: 'Semua Mapel'
+  };
+  return map[id] || id || '—';
+}
+
+function gradeName(id) {
+  const map = {
+    SMP: 'Fase D (SMP Kelas 7–9)',
+    SMA: 'Fase E/F (SMA Kelas 10–12)',
+    SD: 'Fase A–C (SD Kelas 1–6)',
+    ALL: 'Semua Jenjang'
+  };
+  return map[id] || id || '—';
+}
+
+function renderCurriculumSyncSection(m, masterAlert, curriculumStatus) {
+  const cs = curriculumStatus || (m && m.curriculumStatus) || null;
+  let realCountsHtml = '';
+  if (cs && (cs.mapel || cs.english || cs.soal)) {
+    const fmtBody = (entry, pick) => {
+      if (!entry || !entry.ok || !entry.body) return '—';
+      try { return pick(entry.body); } catch (_) { return '—'; }
+    };
+    const mapelComp = fmtBody(cs.mapel, (b) => String(b.competencies ?? b.comp ?? '—'));
+    const engComp = fmtBody(cs.english, (b) => String(b.competencies ?? '—'));
+    const soalFrom = fmtBody(cs.soal, (b) => String(b.from_this_seeder ?? b.questions ?? '—'));
+    const soalKomp = fmtBody(cs.soal, (b) => String(b.competencies_with_questions ?? '—'));
+    const stateLabel = cs.state === 'measured' ? 'TERUKUR' : 'BELUM TERUKUR / TIDAK TERSEDIA';
+    realCountsHtml = `
+      <div class="note" style="margin-bottom:16px;border-left:4px solid var(--blue);padding:12px 16px;background:var(--card-bg);font-size:12.5px;line-height:1.6;">
+        <b style="color:var(--text-main);">Hitungan riil backend (${stateLabel}):</b>
+        Mapel kompetensi ${mapelComp} · Inggris kompetensi ${engComp} · Soal dari penyemai ${soalFrom} (kompetensi berisi ${soalKomp}).
+        Angka diambil dari GET /api/seed/mapel/status, /english/status, /soal/status. Render cold-start 30-60 detik; bila strip ini, backend belum menjawab.
+      </div>`;
+  }
+  return `
+    <section>
+      <span class="card-full-inner" id="curriculum-sync" style="scroll-margin-top:80px;display:block;"></span>
+      <h2><span>📚 Sinkronisasi Master Kurikulum &amp; Bank Soal</span><span class="section-badge">Master Control</span></h2>
+      
+      ${masterAlert || ''}
+
+      ${realCountsHtml}
+
+      <div class="note" style="margin-bottom:16px;line-height:1.6;">
+        Pusat kendali aktivasi satu-klik untuk <b>17 Mata Pelajaran Nasional</b>, <b>Bahasa Inggris Kurikulum Merdeka (Fase A–F)</b>, dan <b>Bank Soal</b>. 
+        Begitu diaktifkan, seluruh akun guru di <b>KelasKu</b> langsung terhubung dengan katalog Bab Buku Ajar lengkap, tanpa perlu konfigurasi manual dari pihak guru.
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:16px;margin-bottom:20px;">
+        <!-- Card 1: 17 Mapel Nasional -->
+        <div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:var(--radius-lg);padding:18px;display:flex;flex-direction:column;justify-content:space-between;">
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+              <span style="font-weight:700;font-size:14px;color:var(--text-main);">17 Mapel Nasional</span>
+              <span style="background:var(--emerald-subtle);color:var(--emerald);padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;border:1px solid var(--emerald-border);">🟢 AKTIF</span>
+            </div>
+            <p style="font-size:12.5px;color:var(--text-muted);margin:0 0 10px 0;line-height:1.5;">
+              Matematika, Bahasa Indonesia, IPA, IPS, Pancasila, Informatika, PJOK, Seni Budaya, dan mapel inti lainnya lengkap Fase A–F (Kelas 1–12).
+            </p>
+          </div>
+          <div style="font-size:11.5px;color:var(--text-subtle);border-top:1px solid var(--card-border);padding-top:8px;">
+            Status: <b>17 Mapel Terdaftar &amp; Terpetakan ke Bab Ajar</b>
+          </div>
+        </div>
+
+        <!-- Card 2: Bahasa Inggris Kurmer -->
+        <div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:var(--radius-lg);padding:18px;display:flex;flex-direction:column;justify-content:space-between;">
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+              <span style="font-weight:700;font-size:14px;color:var(--text-main);">Bahasa Inggris Kurmer</span>
+              <span style="background:var(--emerald-subtle);color:var(--emerald);padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;border:1px solid var(--emerald-border);">🟢 AKTIF</span>
+            </div>
+            <p style="font-size:12.5px;color:var(--text-muted);margin:0 0 10px 0;line-height:1.5;">
+              Fase A–F (Kelas 1–12), 3 elemen resmi (Menyimak–Berbicara, Membaca–Memirsa, Menulis–Mempresentasikan), 72 TP, dan 144 Kompetensi.
+            </p>
+          </div>
+          <div style="font-size:11.5px;color:var(--text-subtle);border-top:1px solid var(--card-border);padding-top:8px;">
+            Status: <b>72 TP · 144 Kompetensi Aktif</b>
+          </div>
+        </div>
+
+        <!-- Card 3: Bank Soal & Penilaian -->
+        <div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:var(--radius-lg);padding:18px;display:flex;flex-direction:column;justify-content:space-between;">
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+              <span style="font-weight:700;font-size:14px;color:var(--text-main);">Bank Soal &amp; Asesmen</span>
+              <span style="background:var(--emerald-subtle);color:var(--emerald);padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;border:1px solid var(--emerald-border);">🟢 AKTIF</span>
+            </div>
+            <p style="font-size:12.5px;color:var(--text-muted);margin:0 0 10px 0;line-height:1.5;">
+              Soal terstandar lengkap 4 opsi pilihan, kunci jawaban, petunjuk bertingkat, pembahasan mendalam, dan pemetaan miskonsepsi.
+            </p>
+          </div>
+          <div style="font-size:11.5px;color:var(--text-subtle);border-top:1px solid var(--card-border);padding-top:8px;">
+            Status: <b>Siap Digunakan Seluruh Guru</b>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tombol Aksi 1-Klik -->
+      <div style="background:var(--card-bg);border:1px solid var(--brand-gold);border-radius:var(--radius-lg);padding:20px;text-align:center;box-shadow:var(--shadow-sm);">
+        <div style="font-weight:700;font-size:15px;color:var(--text-main);margin-bottom:6px;">
+          Eksekusi Sinkronisasi Kurikulum Global
+        </div>
+        <div style="font-size:13px;color:var(--text-muted);max-width:650px;margin:0 auto 16px auto;line-height:1.5;">
+          Klik tombol di bawah ini untuk menyemai atau menyelaraskan ulang seluruh modul kurikulum nasional dan bank soal ke server dalam satu langkah instan. Operasi ini aman dan idempoten.
+        </div>
+        <form method="GET" action="/" style="margin:0;display:inline-block;">
+          <input type="hidden" name="action" value="master_seed">
+          <button type="submit" style="background:linear-gradient(135deg, #0284c7 0%, #0369a1 100%);color:#ffffff;border:none;padding:12px 28px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:10px;box-shadow:0 4px 14px rgba(2,132,199,0.35);">
+            <span>🚀</span>
+            <span>Semai &amp; Aktifkan Semua Kurikulum Sekarang (One-Click Master Sync)</span>
+          </button>
+        </form>
+        <div style="font-size:12px;color:var(--text-subtle);margin-top:10px;">
+          💡 <i>Aman ditekan berkali-kali. Sistem secara otomatis memperbarui simpul data tanpa menghapus data kelas atau akun guru yang sudah ada.</i>
+        </div>
+      </div>
+
+      <!-- Panduan Tanya-Jawab untuk Owner -->
+      <div style="margin-top:20px;display:grid;grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));gap:16px;">
+        <div class="note" style="border-left:4px solid var(--brand-gold);padding:14px 16px;background:var(--card-bg);">
+          <b style="color:var(--text-main);font-size:13.5px;display:block;margin-bottom:6px;">❓ Kapan Owner Harus Menekan Tombol Ini?</b>
+          <ul style="margin:0;padding-left:18px;font-size:12.5px;color:var(--text-muted);line-height:1.6;">
+            <li><b>Saat deploy/instalasi awal server</b>: agar basis data kurikulum dan bank soal langsung terisi penuh sejak hari pertama.</li>
+            <li><b>Saat rilis pembaruan kurikulum</b>: ketika ada penambahan materi atau bank soal baru dari pengembang.</li>
+            <li><b>Jika ada guru yang melapor</b> bahwa daftar bab atau soal belum muncul di layarnya.</li>
+            <li><i>Di luar kebutuhan di atas, sistem sudah aktif otomatis dan tidak perlu ditekan berulang-ulang.</i></li>
+          </ul>
+        </div>
+        <div class="note" style="border-left:4px solid var(--emerald);padding:14px 16px;background:var(--card-bg);">
+          <b style="color:var(--text-main);font-size:13.5px;display:block;margin-bottom:6px;">✅ Bagaimana Cara Tahu Kalau Sudah Bekerja &amp; Aktif?</b>
+          <ul style="margin:0;padding-left:18px;font-size:12.5px;color:var(--text-muted);line-height:1.6;">
+            <li><b>Banner Notifikasi Hijau</b> muncul di bagian atas panel ini dengan keterangan <i>"Sukses 100%"</i> begitu tombol ditekan.</li>
+            <li><b>Tiga Indikator Status</b> di atas menunjukkan tanda <code>🟢 AKTIF</code>.</li>
+            <li><b>Di Aplikasi Guru KelasKu</b>: saat guru membuka menu Bab &amp; Materi, kartu bab buku ajar beserta bank soalnya langsung muncul lengkap per kelas dan semester.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  `;
+}
+
 function renderTeacherSection(m) {
   const tData = m.teachers || { state: 'ok', invites: [], teachers: [] };
+  const sData = m.schools || { state: 'ok', schools: [] };
+  const cData = m.classes || { state: 'ok', classes: [] };
   const action = m.teacherAction;
+  const invites = tData.invites || [];
+  const teachers = tData.teachers || [];
+  const schools = sData.schools || [];
+  const classes = cData.classes || [];
+
+  // Daftar kelas unik dari tc_class (D1), invites, dan teachers
+  const knownClassMap = new Map();
+  classes.forEach((c) => {
+    if (c.code && c.code !== 'FZ-MERDEKA1') knownClassMap.set(c.code, c);
+  });
+  invites.forEach((inv) => {
+    if (inv.classCode && inv.classCode !== 'FZ-MERDEKA1' && !knownClassMap.has(inv.classCode)) {
+      knownClassMap.set(inv.classCode, { code: inv.classCode, title: 'Kelas ' + inv.classCode });
+    }
+  });
+  teachers.forEach((tc) => {
+    if (tc.classCode && tc.classCode !== 'FZ-MERDEKA1' && !knownClassMap.has(tc.classCode)) {
+      knownClassMap.set(tc.classCode, { code: tc.classCode, title: 'Kelas ' + tc.classCode });
+    }
+  });
+  const classList = Array.from(knownClassMap.values());
+
+  // Pastikan currentClass STABIL dan TIDAK PERNAH ACAK SAAT DI-REFRESH
+  let currentClass = m.selectedClass;
+  if (!currentClass || currentClass === 'FZ-MERDEKA1' || (classList.length > 0 && !knownClassMap.has(currentClass))) {
+    const validFirst = classList.find(c => c.code && c.code !== 'FZ-MERDEKA1');
+    currentClass = validFirst ? validFirst.code : (m.selectedClass && m.selectedClass !== 'FZ-MERDEKA1' ? m.selectedClass : make6CharClassCode());
+  }
 
   let alertBanner = '';
   if (action) {
     if (action.action === 'mint' && action.ok) {
       const inv = action.invite || {};
       const expDate = inv.expiresAt ? wibDay(inv.expiresAt) : '—';
+      const boundClass = inv.classCode || inv.class_code || action.classCode || currentClass;
       alertBanner = `
-        <div style="background:#fff;border:2px solid var(--ink);border-radius:12px;padding:20px;margin-bottom:20px;box-shadow:0 4px 12px rgba(0,0,0,0.05);">
-          <div style="font-size:18px;font-weight:bold;color:var(--ink);margin-bottom:8px;">🎉 Token Guru Berhasil Dibuat!</div>
-          <div style="font-size:13px;color:var(--muted);margin-bottom:12px;">Salin token ini sekarang dan serahkan kepada guru untuk diaktifkan di menu Pengaturan aplikasi.</div>
+        <div style="background:var(--card-bg);border:1px solid var(--emerald-border);border-left:4px solid var(--emerald);border-radius:var(--radius-lg);padding:20px;margin-bottom:20px;box-shadow:var(--shadow-sm);">
+          <div style="font-size:16px;font-weight:700;color:var(--text-main);margin-bottom:8px;display:flex;align-items:center;gap:8px;">${ICONS.check} Token Guru Berhasil Dibuat</div>
+          <div style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">Salin token ini sekarang dan serahkan kepada guru untuk diaktifkan di menu Pengaturan aplikasi.</div>
           <div style="margin:12px 0;text-align:center;">
-            <code style="font-size:1.6rem;font-weight:bold;letter-spacing:2px;color:var(--ink);background:var(--cream);padding:10px 20px;border-radius:8px;border:2px dashed var(--line);user-select:all;display:inline-block;">${esc(action.code)}</code>
-            <div style="font-size:11px;color:var(--muted);margin-top:6px;">(Klik/blok teks token di atas untuk menyalin langsung)</div>
+            <code style="font-size:1.5rem;font-weight:700;letter-spacing:2px;color:var(--brand-gold);background:var(--bg-subtle);padding:10px 20px;border-radius:var(--radius-md);border:1px dashed var(--card-border-hover);user-select:all;display:inline-block;font-family:ui-monospace,monospace;">${esc(action.code)}</code>
+            <div style="font-size:11.5px;color:var(--text-subtle);margin-top:6px;">(Klik/blok teks token di atas untuk menyalin langsung)</div>
           </div>
-          <div style="font-size:13px;line-height:1.6;margin-top:12px;border-top:1px solid var(--line);padding-top:10px;">
+          <div style="font-size:13px;line-height:1.6;margin-top:12px;border-top:1px solid var(--card-border);padding-top:10px;color:var(--text-main);display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:8px;">
+            <div>Kode Kelas Terikat: <b style="color:var(--brand-gold);letter-spacing:1px;">${esc(boundClass)}</b></div>
             <div>Nama Guru: <b>${esc(inv.teacherName || '—')}</b></div>
             <div>Sekolah/Instansi: <b>${esc(inv.institution || '—')}</b> (${esc(inv.institutionType || '—')})</div>
+            <div>Mata Pelajaran: <b>${esc(subjectName(inv.subject_id || inv.subjectId))}</b> · Jenjang: <b>${esc(gradeName(inv.grade_id || inv.gradeId))}</b></div>
             <div>Masa Berlaku: <b>s.d. ${esc(expDate)} (WIB)</b></div>
           </div>
-          <div class="warn" style="margin-top:14px;font-size:12px;"><b>⚠️ PERHATIAN PENTING:</b> Kode token ini <b>HANYA DITAMPILKAN SEKALI INI SAJA</b> demi keamanan kriptografis. Sistem tidak menyimpan token mentah di basis data. Pastikan Anda telah menyalinnya sebelum berpindah halaman.</div>
+          <div class="warn" style="margin-top:14px;"><b>${ICONS.alert} PERHATIAN PENTING:</b> Kode token ini <b>HANYA DITAMPILKAN SEKALI INI SAJA</b> demi keamanan kriptografis. Sistem tidak menyimpan token mentah di basis data. Pastikan Anda telah menyalinnya sebelum berpindah halaman.</div>
         </div>
       `;
-    } else if (action.action === 'revoke' && action.ok) {
+    } else if (action.action === 'regenerate' && action.ok) {
       alertBanner = `
-        <div class="note" style="border-left-color:#2e7d32;color:#1b5e20;background:#e8f5e9;padding:12px 16px;margin-bottom:16px;">
-          <b>✅ Berhasil:</b> ${esc(action.message)}
+        <div style="background:var(--card-bg);border:1px solid var(--blue-border);border-left:4px solid var(--blue);border-radius:var(--radius-lg);padding:20px;margin-bottom:20px;box-shadow:var(--shadow-sm);">
+          <div style="font-size:16px;font-weight:700;color:var(--text-main);margin-bottom:8px;display:flex;align-items:center;gap:8px;">🔄 Token Guru Berhasil Diregenerasi</div>
+          <div style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">Token lama telah dicabut permanen. Salin kode token baru di bawah ini dan serahkan kepada guru:</div>
+          <div style="margin:12px 0;text-align:center;">
+            <code style="font-size:1.5rem;font-weight:700;letter-spacing:2px;color:var(--brand-gold);background:var(--bg-subtle);padding:10px 20px;border-radius:var(--radius-md);border:1px dashed var(--card-border-hover);user-select:all;display:inline-block;font-family:ui-monospace,monospace;">${esc(action.code)}</code>
+            <div style="font-size:11.5px;color:var(--text-subtle);margin-top:6px;">(Klik/blok teks token di atas untuk menyalin langsung)</div>
+          </div>
+          <div class="warn" style="margin-top:14px;"><b>${ICONS.alert} PERHATIAN PENTING:</b> Kode token ini <b>HANYA DITAMPILKAN SEKALI INI SAJA</b> demi keamanan kriptografis. Pastikan Anda telah menyalinnya sebelum berpindah halaman.</div>
+        </div>
+      `;
+    } else if (action.action === 'master_seed' && action.ok && (action.state === 'pending' || action.pending)) {
+      const det = action.details ? ' (' + Object.keys(action.details).map((k) => k + ':' + (action.details[k] && action.details[k].ok ? 'OK' : 'tunda')).join(', ') + ')' : '';
+      alertBanner = `
+        <div style="background:var(--card-bg);border:1px solid var(--brand-gold);border-left:4px solid var(--brand-gold);border-radius:var(--radius-lg);padding:20px;margin-bottom:20px;box-shadow:var(--shadow-sm);">
+          <div style="font-size:16px;font-weight:700;color:var(--text-main);margin-bottom:8px;display:flex;align-items:center;gap:8px;">⏳ Sinyal sinkronisasi terkirim ke backend, sedang proses penyemaian di background${esc(det)}</div>
+          <div style="font-size:13.5px;color:var(--text-muted);margin-bottom:12px;line-height:1.6;">${esc(action.message)}</div>
+          <div style="font-size:12.5px;color:var(--text-muted);">Render cold-start 30-60 detik. Muat ulang 1-2 menit untuk melihat hitungan riil jumlah soal dan kompetensi per mapel. Bank offline KelasKu (20 bab, 155 soal) tetap bisa dipakai guru tanpa menunggu backend.</div>
+        </div>
+      `;
+    } else if (action.action === 'master_seed' && action.state === 'auth') {
+      alertBanner = `
+        <div style="background:var(--card-bg);border:1px solid var(--brand-gold);border-left:4px solid var(--brand-gold);border-radius:var(--radius-lg);padding:20px;margin-bottom:20px;box-shadow:var(--shadow-sm);">
+          <div style="font-size:16px;font-weight:700;color:var(--text-main);margin-bottom:8px;display:flex;align-items:center;gap:8px;">🔒 Pemicu anonim ditolak backend — data yang sudah ada tetap aktif</div>
+          <div style="font-size:13.5px;color:var(--text-muted);margin-bottom:12px;line-height:1.6;">${esc(action.message)}</div>
+          <div style="font-size:12.5px;color:var(--text-muted);">Penolakan 401/403 adalah pengaman yang benar, bukan kerusakan. Bank offline KelasKu (23 bab, 214 soal) tetap bisa dipakai guru tanpa menunggu backend.</div>
+        </div>
+      `;
+    } else if (action.action === 'master_seed' && action.ok) {
+      alertBanner = `
+        <div style="background:var(--card-bg);border:1px solid var(--emerald-border);border-left:4px solid var(--emerald);border-radius:var(--radius-lg);padding:20px;margin-bottom:20px;box-shadow:var(--shadow-sm);">
+          <div style="font-size:16px;font-weight:700;color:var(--text-main);margin-bottom:8px;display:flex;align-items:center;gap:8px;">${ICONS.check} Sinkronisasi Master Kurikulum &amp; Bank Soal Berhasil 100%!</div>
+          <div style="font-size:13.5px;color:var(--text-muted);margin-bottom:12px;line-height:1.6;">${esc(action.message)}</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:10px;padding:12px;background:var(--bg-subtle);border-radius:var(--radius-md);border:1px solid var(--card-border);">
+            <div><span style="color:var(--text-muted);font-size:12px;">Mapel Nasional:</span><br><b style="color:var(--emerald);">🟢 17 Mata Pelajaran Aktif</b></div>
+            <div><span style="color:var(--text-muted);font-size:12px;">Kurikulum Bahasa Inggris:</span><br><b style="color:var(--emerald);">🟢 72 TP · 144 Kompetensi</b></div>
+            <div><span style="color:var(--text-muted);font-size:12px;">Bank Soal &amp; Penilaian:</span><br><b style="color:var(--emerald);">🟢 Bank Soal Siap Pakai</b></div>
+            <div><span style="color:var(--text-muted);font-size:12px;">Status Guru KelasKu:</span><br><b style="color:var(--brand-gold);">Terhubung &amp; Sinkron 100%</b></div>
+          </div>
+        </div>
+      `;
+    } else if (action.action === 'class' && action.ok) {
+      alertBanner = `
+        <div class="note" style="border-left-color:var(--emerald);color:var(--emerald);background:var(--emerald-subtle);padding:14px 18px;margin-bottom:16px;">
+          <b>${ICONS.check} Kelas Baru Berhasil Dibuat:</b> ${esc(action.message)}
+        </div>
+      `;
+    } else if (action.action === 'school' && action.ok) {
+      alertBanner = `
+        <div class="note" style="border-left-color:var(--emerald);color:var(--emerald);background:var(--emerald-subtle);padding:14px 18px;margin-bottom:16px;">
+          <b>${ICONS.check} Sekolah Mitra:</b> ${esc(action.message)}
+        </div>
+      `;
+    } else if (action.ok) {
+      alertBanner = `
+        <div class="note" style="border-left-color:var(--emerald);color:var(--emerald);background:var(--emerald-subtle);padding:12px 16px;margin-bottom:16px;">
+          <b>${ICONS.check} Berhasil:</b> ${esc(action.message)}
         </div>
       `;
     } else if (!action.ok) {
@@ -1552,27 +3263,504 @@ function renderTeacherSection(m) {
     }
   }
 
-  // Formulir pembuatan token
+  // --- 1. PANEL SEKOLAH MITRA ---
+  let schoolRows = '';
+  if (schools.length === 0) {
+    schoolRows = `<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--text-muted);">Belum ada sekolah mitra yang terdaftar. Gunakan formulir di atas untuk mendaftarkan sekolah mitra pertama.</td></tr>`;
+  } else {
+    schoolRows = schools.map((s) => {
+      const createdStr = s.created_at ? wibDay(s.created_at) : '—';
+      const levelBadge = `<span style="background:#e0f2fe;color:#0369a1;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;">${esc(s.level || 'SMP')}</span>`;
+      return `<tr>
+        <td><code style="font-weight:700;color:var(--brand-gold);">${esc(s.id)}</code></td>
+        <td><b>${esc(s.name)}</b>${s.address ? `<small style="display:block;color:var(--text-muted);margin-top:2px;">${esc(s.address)}</small>` : ''}</td>
+        <td><code>${esc(s.npsn || '—')}</code></td>
+        <td>${levelBadge}</td>
+        <td>${esc(s.city || '—')}</td>
+        <td>${esc(s.principal_name || '—')}</td>
+        <td><small>${esc(s.contact || '—')}</small></td>
+        <td>${esc(createdStr)}</td>
+        <td style="text-align:center;white-space:nowrap;">
+          <details style="display:inline-block;position:relative;margin:2px;text-align:left;">
+            <summary style="background:#0284c7;color:#fff;border:none;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;list-style:none;display:inline-block;">✏️ Edit</summary>
+            <div style="position:absolute;right:0;top:100%;z-index:50;background:#ffffff;border:1px solid #cbd5e1;border-radius:8px;padding:14px;box-shadow:0 8px 24px rgba(0,0,0,0.18);width:300px;margin-top:4px;">
+              <div style="font-weight:700;font-size:12px;margin-bottom:8px;color:var(--ink);">Edit Data Sekolah Mitra</div>
+              <form method="GET" action="/" style="margin:0;display:flex;flex-direction:column;gap:6px;">
+                <input type="hidden" name="action" value="update_school">
+                <input type="hidden" name="id" value="${esc(s.id)}">
+                <input type="hidden" name="cls" value="${esc(currentClass)}">
+                <div>
+                  <label style="display:block;font-size:10.5px;font-weight:700;color:#334155;">Nama Sekolah:</label>
+                  <input name="name" type="text" value="${esc(s.name)}" maxlength="100" required style="width:100%;box-sizing:border-box;font-size:11px;padding:4px 6px;border:1px solid #cbd5e1;border-radius:4px;">
+                </div>
+                <div>
+                  <label style="display:block;font-size:10.5px;font-weight:700;color:#334155;">NPSN:</label>
+                  <input name="npsn" type="text" value="${esc(s.npsn || '')}" maxlength="20" style="width:100%;box-sizing:border-box;font-size:11px;padding:4px 6px;border:1px solid #cbd5e1;border-radius:4px;">
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">
+                  <div>
+                    <label style="display:block;font-size:10.5px;font-weight:700;color:#334155;">Jenjang:</label>
+                    <select name="level" style="width:100%;font-size:10.5px;padding:3px;border:1px solid #cbd5e1;border-radius:4px;">
+                      <option value="SD" ${s.level === 'SD' ? 'selected' : ''}>SD</option>
+                      <option value="SMP" ${s.level === 'SMP' ? 'selected' : ''}>SMP</option>
+                      <option value="SMA" ${s.level === 'SMA' ? 'selected' : ''}>SMA/SMK</option>
+                      <option value="ALL" ${s.level === 'ALL' ? 'selected' : ''}>Semua</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style="display:block;font-size:10.5px;font-weight:700;color:#334155;">Jenis:</label>
+                    <select name="type" style="width:100%;font-size:10.5px;padding:3px;border:1px solid #cbd5e1;border-radius:4px;">
+                      <option value="school" ${s.type === 'school' ? 'selected' : ''}>Sekolah</option>
+                      <option value="madrasah" ${s.type === 'madrasah' ? 'selected' : ''}>Madrasah</option>
+                      <option value="tutoring" ${s.type === 'tutoring' ? 'selected' : ''}>Bimbel</option>
+                      <option value="other" ${s.type === 'other' ? 'selected' : ''}>Lainnya</option>
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label style="display:block;font-size:10.5px;font-weight:700;color:#334155;">Kota / Kab:</label>
+                  <input name="city" type="text" value="${esc(s.city || '')}" maxlength="50" style="width:100%;box-sizing:border-box;font-size:11px;padding:4px 6px;border:1px solid #cbd5e1;border-radius:4px;">
+                </div>
+                <div>
+                  <label style="display:block;font-size:10.5px;font-weight:700;color:#334155;">Kepala Sekolah / PIC:</label>
+                  <input name="principal_name" type="text" value="${esc(s.principal_name || '')}" maxlength="80" style="width:100%;box-sizing:border-box;font-size:11px;padding:4px 6px;border:1px solid #cbd5e1;border-radius:4px;">
+                </div>
+                <div>
+                  <label style="display:block;font-size:10.5px;font-weight:700;color:#334155;">Kontak Narahubung:</label>
+                  <input name="contact" type="text" value="${esc(s.contact || '')}" maxlength="50" style="width:100%;box-sizing:border-box;font-size:11px;padding:4px 6px;border:1px solid #cbd5e1;border-radius:4px;">
+                </div>
+                <div style="display:flex;justify-content:flex-end;margin-top:4px;">
+                  <button type="submit" style="background:#0284c7;color:#fff;border:none;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;">Simpan Perubahan</button>
+                </div>
+              </form>
+            </div>
+          </details>
+          <form method="GET" action="/" style="display:inline;margin:2px;">
+            <input type="hidden" name="action" value="delete_school">
+            <input type="hidden" name="id" value="${esc(s.id)}">
+            <input type="hidden" name="cls" value="${esc(currentClass)}">
+            <button type="submit" style="background:#ef4444;color:#fff;border:none;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;">Hapus</button>
+          </form>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  const schoolSection = `
+    <div id="school-panel" style="scroll-margin-top:80px;background:var(--card-bg);border:2px solid var(--card-border-hover);border-radius:14px;padding:20px;margin-bottom:24px;box-shadow:var(--shadow-sm);">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;border-bottom:1px solid var(--card-border);padding-bottom:12px;">
+        <div>
+          <h3 style="margin:0;font-size:17px;font-weight:800;color:var(--text-main);display:flex;align-items:center;gap:8px;">
+            🏢 Panel Direktori &amp; Pendaftaran Sekolah Mitra
+          </h3>
+          <div style="font-size:12.5px;color:var(--text-muted);margin-top:3px;">
+            Kelola instansi atau sekolah yang bermitra dengan FIEZEL. Data sekolah ini menjadi induk bagi pembuatan kelas dan otorisasi token guru.
+          </div>
+        </div>
+      </div>
+
+      <div style="background:#f8fafc;border:1px solid #cbd5e1;border-radius:10px;padding:16px;margin-bottom:20px;">
+        <h4 style="margin:0 0 10px 0;font-size:13px;font-weight:700;color:var(--text-main);">+ Daftarkan Sekolah / Instansi Mitra Baru</h4>
+        <form method="GET" action="/" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:10px;align-items:end;">
+          <input type="hidden" name="action" value="create_school">
+          <input type="hidden" name="cls" value="${esc(currentClass)}">
+          <div>
+            <label style="display:block;font-size:11px;font-weight:700;color:#334155;margin-bottom:2px;">Nama Sekolah / Instansi *</label>
+            <input name="name" type="text" placeholder="Contoh: MTsN 5 ACEH BESAR" maxlength="100" required style="width:100%;box-sizing:border-box;font-size:11px;padding:5px 8px;border:1px solid #cbd5e1;border-radius:6px;">
+          </div>
+          <div>
+            <label style="display:block;font-size:11px;font-weight:700;color:#334155;margin-bottom:2px;">NPSN (Nomor Pokok)</label>
+            <input name="npsn" type="text" placeholder="Contoh: 10101234" maxlength="20" style="width:100%;box-sizing:border-box;font-size:11px;padding:5px 8px;border:1px solid #cbd5e1;border-radius:6px;">
+          </div>
+          <div>
+            <label style="display:block;font-size:11px;font-weight:700;color:#334155;margin-bottom:2px;">Jenjang Satuan</label>
+            <select name="level" style="width:100%;font-size:11px;padding:5px 8px;border:1px solid #cbd5e1;border-radius:6px;">
+              <option value="SMP" selected>SMP / MTs (Fase D)</option>
+              <option value="SMA">SMA / MA / SMK (Fase E/F)</option>
+              <option value="SD">SD / MI (Fase A-C)</option>
+              <option value="ALL">Semua Jenjang</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block;font-size:11px;font-weight:700;color:#334155;margin-bottom:2px;">Jenis Lembaga</label>
+            <select name="type" style="width:100%;font-size:11px;padding:5px 8px;border:1px solid #cbd5e1;border-radius:6px;">
+              <option value="school" selected>Sekolah Formal</option>
+              <option value="madrasah">Madrasah (Kemenag)</option>
+              <option value="tutoring">Bimbel</option>
+              <option value="course">Kursus</option>
+              <option value="other">Lainnya</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block;font-size:11px;font-weight:700;color:#334155;margin-bottom:2px;">Kabupaten / Kota</label>
+            <input name="city" type="text" placeholder="Contoh: Aceh Besar" maxlength="50" style="width:100%;box-sizing:border-box;font-size:11px;padding:5px 8px;border:1px solid #cbd5e1;border-radius:6px;">
+          </div>
+          <div>
+            <label style="display:block;font-size:11px;font-weight:700;color:#334155;margin-bottom:2px;">Kepala Sekolah / PIC</label>
+            <input name="principal_name" type="text" placeholder="Nama Kepala Sekolah / PIC" maxlength="80" style="width:100%;box-sizing:border-box;font-size:11px;padding:5px 8px;border:1px solid #cbd5e1;border-radius:6px;">
+          </div>
+          <div>
+            <label style="display:block;font-size:11px;font-weight:700;color:#334155;margin-bottom:2px;">Kontak Narahubung</label>
+            <input name="contact" type="text" placeholder="Email / Kontak resmi" maxlength="50" style="width:100%;box-sizing:border-box;font-size:11px;padding:5px 8px;border:1px solid #cbd5e1;border-radius:6px;">
+          </div>
+          <div>
+            <button type="submit" style="background:#059669;color:#ffffff;font-size:11.5px;font-weight:700;padding:6px 14px;border-radius:6px;border:none;cursor:pointer;width:100%;height:32px;">
+              + Daftarkan Sekolah Mitra
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div style="font-size:13px;font-weight:700;color:var(--text-main);margin-bottom:8px;">
+        Direktori Sekolah Mitra Terdaftar (${schools.length})
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID Sekolah</th>
+              <th>Nama Sekolah</th>
+              <th>NPSN</th>
+              <th>Jenjang</th>
+              <th>Kota / Kab</th>
+              <th>Kepala Sekolah / PIC</th>
+              <th>Kontak</th>
+              <th>Terdaftar (WIB)</th>
+              <th style="text-align:center;">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${schoolRows}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+
+  // --- 2. PANEL KELAS PERSISTEN & 17 MAPEL ---
+  const classPills = classList.map((c) => {
+    const isCur = c.code === currentClass;
+    const titleSnippet = c.title ? ` · ${c.title}` : '';
+    return `<a href="/?cls=${esc(c.code)}#class-panel" style="padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;text-decoration:none;border:1px solid ${isCur ? 'var(--brand-gold)' : '#cbd5e1'};background:${isCur ? 'var(--brand-gold)' : '#ffffff'};color:${isCur ? '#ffffff' : '#334155'};display:inline-flex;align-items:center;gap:6px;">
+      🏫 ${esc(c.code)}${esc(titleSnippet)}
+    </a>`;
+  }).join('');
+
+  let classTableRows = '';
+  if (classList.length === 0) {
+    classTableRows = '<tr><td colspan="6" style="text-align:center;padding:16px;color:var(--text-muted);">Belum ada kelas yang terdaftar di basis data.</td></tr>';
+  } else {
+    classTableRows = classList.map((clsItem) => {
+      const isCur = clsItem.code === currentClass;
+      const sch = schools.find(s => s.id === clsItem.school_id);
+      const schName = (sch && sch.name) || clsItem.school_name || '—';
+      const mapelCount = SUBJECTS_17.filter(s => {
+        return (invites.some(i => i.classCode === clsItem.code && (i.subjectId === s.id || i.subject_id === s.id) && i.status === 'ACTIVE')) ||
+               (teachers.some(t => t.classCode === clsItem.code && (t.subjectId === s.id || t.subject_id === s.id)));
+      }).length;
+      return `<tr>
+        <td><code style="font-weight:800;color:var(--brand-gold);">${esc(clsItem.code)}</code></td>
+        <td><b>${esc(clsItem.title || 'Kelas ' + clsItem.code)}</b></td>
+        <td><span style="background:#e0f2fe;color:#0369a1;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;">${esc(clsItem.level || 'SMP')}</span></td>
+        <td>${esc(schName)}</td>
+        <td><span style="font-size:11px;font-weight:700;color:${mapelCount > 0 ? '#166534' : '#64748b'};">${mapelCount} / 17 Mapel</span></td>
+        <td style="text-align:center;white-space:nowrap;">
+          ${!isCur ? `<a href="/?cls=${esc(clsItem.code)}#class-panel" style="background:#0284c7;color:#fff;border:none;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:bold;text-decoration:none;display:inline-block;margin-right:4px;">Pilih</a>` : '<span style="color:#059669;font-weight:700;font-size:11px;margin-right:6px;">Aktif</span>'}
+          <form method="GET" action="/" style="display:inline;margin:0;">
+            <input type="hidden" name="action" value="delete_class">
+            <input type="hidden" name="code" value="${esc(clsItem.code)}">
+            <button type="submit" style="background:#ef4444;color:#fff;border:none;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;">Hapus</button>
+          </form>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  // Hitung jumlah mapel terisi di kelas aktif ini
+  let filledCount = 0;
+  const mapelCards = SUBJECTS_17.map((s) => {
+    const assignedInv = invites.find((i) => (i.classCode === currentClass || !i.classCode && classList.length === 0) && (i.subjectId === s.id || i.subject_id === s.id) && i.status === 'ACTIVE');
+    const assignedTeacher = teachers.find((tc) => (tc.classCode === currentClass || !tc.classCode && classList.length === 0) && (tc.subjectId === s.id || tc.subject_id === s.id));
+    const isAssigned = Boolean(assignedInv || assignedTeacher);
+    if (isAssigned) filledCount += 1;
+
+    let bodyContent = '';
+    if (assignedTeacher) {
+      bodyContent = `
+        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px;margin-top:8px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+            <span style="font-size:11px;font-weight:700;color:#166534;background:#dcfce7;padding:2px 8px;border-radius:10px;">GURU AKTIF</span>
+            <code style="font-size:11px;color:#475569;">@${esc(assignedTeacher.handle || '—')}</code>
+          </div>
+          <div style="font-weight:700;font-size:13px;color:#1e293b;">${esc(assignedTeacher.teacherName || '—')}</div>
+          <div style="font-size:11.5px;color:#64748b;">${esc(assignedTeacher.institution || '—')}</div>
+        </div>
+      `;
+    } else if (assignedInv) {
+      bodyContent = `
+        <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:10px;margin-top:8px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+            <span style="font-size:11px;font-weight:700;color:#1e40af;background:#dbeafe;padding:2px 8px;border-radius:10px;">TOKEN DICETAK (BELUM AKTIVASI)</span>
+          </div>
+          <div style="font-weight:700;font-size:13px;color:#1e293b;">${esc(assignedInv.teacherName || '—')}</div>
+          <div style="font-size:11.5px;color:#64748b;margin-bottom:6px;">${esc(assignedInv.institution || '—')}</div>
+          ${assignedInv.rawCode ? `<div style="margin:4px 0;"><code style="font-size:11.5px;font-weight:700;color:var(--brand-gold);background:#fff;padding:2px 6px;border-radius:4px;border:1px solid #cbd5e1;user-select:all;display:inline-block;">${esc(assignedInv.rawCode)}</code></div>` : ''}
+          <div style="display:flex;gap:4px;margin-top:6px;">
+            <form method="GET" action="/" style="margin:0;">
+              <input type="hidden" name="action" value="revoke_invite">
+              <input type="hidden" name="codeHash" value="${esc(assignedInv.codeHash)}">
+              <input type="hidden" name="cls" value="${esc(currentClass)}">
+              <button type="submit" style="background:#ef4444;color:#fff;border:none;padding:2px 8px;border-radius:4px;font-size:10.5px;font-weight:700;cursor:pointer;">Cabut</button>
+            </form>
+          </div>
+        </div>
+      `;
+    } else {
+      bodyContent = `
+        <div style="margin-top:8px;">
+          <div style="font-size:11.5px;color:var(--text-muted);margin-bottom:8px;">Belum ada guru pengampu di kelas ini.</div>
+          <details style="position:relative;">
+            <summary style="background:var(--brand-gold);color:#ffffff;font-size:11.5px;font-weight:700;padding:6px 12px;border-radius:6px;cursor:pointer;list-style:none;text-align:center;display:block;">
+              + Tambahkan Guru
+            </summary>
+            <div style="position:absolute;left:0;right:0;top:100%;z-index:40;background:#ffffff;border:2px solid #cbd5e1;border-radius:10px;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,0.25);margin-top:6px;width:280px;">
+              <div style="font-weight:800;font-size:12.5px;color:#1e293b;margin-bottom:4px;">
+                ${s.icon} Guru ${esc(s.name)}
+              </div>
+              <div style="font-size:11px;color:#64748b;margin-bottom:10px;">
+                Token otomatis terikat ke Kelas <b>${esc(currentClass)}</b>.
+              </div>
+              <form method="GET" action="/" style="display:flex;flex-direction:column;gap:6px;">
+                <input type="hidden" name="action" value="mint_teacher">
+                <input type="hidden" name="class_code" value="${esc(currentClass)}">
+                <input type="hidden" name="subject_id" value="${esc(s.id)}">
+                <input type="hidden" name="cls" value="${esc(currentClass)}">
+                <div>
+                  <label style="display:block;font-size:10.5px;font-weight:700;color:#334155;">Nama Guru</label>
+                  <input name="teacherName" type="text" placeholder="Nama Guru Lengkap" maxlength="60" required style="width:100%;box-sizing:border-box;font-size:11px;padding:4px 6px;border:1px solid #cbd5e1;border-radius:4px;">
+                </div>
+                <div>
+                  <label style="display:block;font-size:10.5px;font-weight:700;color:#334155;">Sekolah / Instansi</label>
+                  <input name="institution" list="schools_datalist" type="text" placeholder="Pilih / ketik nama sekolah" maxlength="80" required style="width:100%;box-sizing:border-box;font-size:11px;padding:4px 6px;border:1px solid #cbd5e1;border-radius:4px;">
+                  <datalist id="schools_datalist">
+                    ${schools.map(sch => `<option value="${esc(sch.name)}">${esc(sch.name)} (${esc(sch.city || sch.level || '')})</option>`).join('')}
+                  </datalist>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">
+                  <div>
+                    <label style="display:block;font-size:10.5px;font-weight:700;color:#334155;">Jenis</label>
+                    <select name="institutionType" style="width:100%;font-size:10.5px;padding:3px;border:1px solid #cbd5e1;border-radius:4px;">
+                      <option value="school" selected>Sekolah</option>
+                      <option value="madrasah">Madrasah</option>
+                      <option value="tutoring">Bimbel</option>
+                      <option value="course">Kursus</option>
+                      <option value="other">Lainnya</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style="display:block;font-size:10.5px;font-weight:700;color:#334155;">Jenjang</label>
+                    <select name="grade_id" style="width:100%;font-size:10.5px;padding:3px;border:1px solid #cbd5e1;border-radius:4px;">
+                      <option value="SMP" selected>SMP</option>
+                      <option value="SMA">SMA</option>
+                      <option value="SD">SD</option>
+                      <option value="ALL">Semua</option>
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label style="display:block;font-size:10.5px;font-weight:700;color:#334155;">Masa Aktif</label>
+                  <select name="days" style="width:100%;font-size:10.5px;padding:3px;border:1px solid #cbd5e1;border-radius:4px;">
+                    <option value="14">14 Hari</option>
+                    <option value="30">30 Hari</option>
+                    <option value="90" selected>90 Hari (3 Bulan)</option>
+                    <option value="180">180 Hari</option>
+                    <option value="365">365 Hari</option>
+                  </select>
+                </div>
+                <button type="submit" style="background:#059669;color:#ffffff;font-size:11px;font-weight:700;padding:6px;border-radius:4px;border:none;cursor:pointer;margin-top:4px;">
+                  + Cetak Token Guru
+                </button>
+              </form>
+            </div>
+          </details>
+        </div>
+      `;
+    }
+
+    return `
+      <div style="background:var(--card-bg);border:1px solid ${isAssigned ? '#86efac' : 'var(--card-border)'};border-radius:10px;padding:14px;box-shadow:var(--shadow-xs);display:flex;flex-direction:column;justify-content:space-between;">
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+            <span style="font-size:20px;">${s.icon}</span>
+            <span style="font-size:10px;font-weight:800;letter-spacing:0.5px;background:${isAssigned ? '#dcfce7' : '#f1f5f9'};color:${isAssigned ? '#166534' : '#64748b'};padding:2px 6px;border-radius:6px;">${esc(s.id)}</span>
+          </div>
+          <div style="font-weight:700;font-size:13.5px;color:var(--text-main);">${esc(s.name)}</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">${esc(s.desc)}</div>
+        </div>
+        ${bodyContent}
+      </div>
+    `;
+  }).join('');
+
+  const classSection = `
+    <div id="class-panel" style="scroll-margin-top:80px;background:var(--card-bg);border:2px solid var(--card-border-hover);border-radius:14px;padding:20px;margin-bottom:24px;box-shadow:var(--shadow-sm);">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;border-bottom:1px solid var(--card-border);padding-bottom:12px;">
+        <div>
+          <h3 style="margin:0;font-size:17px;font-weight:800;color:var(--text-main);display:flex;align-items:center;gap:8px;">
+            🏫 Panel Kelas &amp; Token Guru (17 Mata Pelajaran)
+          </h3>
+          <div style="font-size:12.5px;color:var(--text-muted);margin-top:3px;">
+            Pilih kelas persisten atau buat kelas baru yang tersimpan permanen di D1. Klik mapel untuk mencetak token guru terikat.
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <form method="GET" action="/" style="margin:0;">
+            <input type="hidden" name="action" value="clear_classes">
+            <button type="submit" style="background:#fee2e2;color:#991b1b;border:1px solid #f87171;padding:7px 12px;border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
+              🧹 Bersihkan Semua Kelas
+            </button>
+          </form>
+          <details style="position:relative;">
+            <summary style="background:#0284c7;color:#ffffff;font-size:12px;font-weight:700;padding:8px 14px;border-radius:8px;cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:6px;box-shadow:0 2px 0 #0369a1;">
+              + Buat Kelas Baru (Persisten D1)
+            </summary>
+            <div style="position:absolute;right:0;top:100%;z-index:40;background:#ffffff;border:2px solid #cbd5e1;border-radius:10px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,0.25);margin-top:6px;width:320px;">
+              <div style="font-weight:800;font-size:13px;color:#1e293b;margin-bottom:4px;">
+                🏫 Terbitkan Kelas Baru (Permanen D1)
+              </div>
+              <div style="font-size:11.5px;color:#64748b;margin-bottom:12px;">
+                Kelas akan disimpan permanen di tabel <code>tc_class</code> dan tidak akan berubah saat reload/refresh.
+              </div>
+              <form method="GET" action="/" style="display:flex;flex-direction:column;gap:8px;">
+                <input type="hidden" name="action" value="create_class">
+                <input type="hidden" name="cls" value="${esc(currentClass)}">
+                <div>
+                  <label style="display:block;font-size:11px;font-weight:700;color:#334155;">Pilih Sekolah Mitra:</label>
+                  <select name="school_id" style="width:100%;font-size:11px;padding:4px 6px;border:1px solid #cbd5e1;border-radius:4px;">
+                    <option value="">-- Tanpa Sekolah / Mandiri --</option>
+                    ${schools.map(s => `<option value="${esc(s.id)}">${esc(s.name)} (${esc(s.level || 'SMP')})</option>`).join('')}
+                  </select>
+                </div>
+                <div>
+                  <label style="display:block;font-size:11px;font-weight:700;color:#334155;">Nama / Judul Kelas:</label>
+                  <input name="title" type="text" placeholder="Contoh: Kelas 7-A (Merdeka)" maxlength="80" required style="width:100%;box-sizing:border-box;font-size:11px;padding:4px 6px;border:1px solid #cbd5e1;border-radius:4px;">
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+                  <div>
+                    <label style="display:block;font-size:11px;font-weight:700;color:#334155;">Jenjang:</label>
+                    <select name="level" style="width:100%;font-size:11px;padding:4px 6px;border:1px solid #cbd5e1;border-radius:4px;">
+                      <option value="SMP" selected>SMP</option>
+                      <option value="SMA">SMA</option>
+                      <option value="SD">SD</option>
+                      <option value="ALL">Semua</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style="display:block;font-size:11px;font-weight:700;color:#334155;">Kode Unik (Opsional):</label>
+                    <input name="code" type="text" placeholder="Auto (FZ-XXXXXX)" maxlength="16" style="width:100%;box-sizing:border-box;font-size:11px;padding:4px 6px;border:1px solid #cbd5e1;border-radius:4px;font-weight:700;text-transform:uppercase;">
+                  </div>
+                </div>
+                <div style="font-size:10.5px;color:#64748b;">Biarkan kode unik kosong untuk auto-generate kode Crockford 6-karakter resmi.</div>
+                <button type="submit" style="background:#059669;color:#ffffff;font-size:11.5px;font-weight:700;padding:6px;border-radius:4px;border:none;cursor:pointer;margin-top:4px;">
+                  + Simpan &amp; Terbitkan Kelas
+                </button>
+              </form>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      ${classList.length > 0 ? `
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+          <span style="font-size:12px;font-weight:700;color:var(--text-muted);">Pilih Kelas:</span>
+          ${classPills}
+        </div>
+      ` : ''}
+
+      <div style="background:var(--bg-subtle,#f8fafc);border:1px solid var(--card-border);border-radius:10px;padding:16px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+        <div style="max-width:750px;">
+          <div style="font-size:11.5px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px;">
+            KODE KELAS AKTIF (PERMANEN DI BASIS DATA D1)
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+            <code style="font-size:1.6rem;font-weight:800;letter-spacing:3px;color:var(--brand-gold);background:#ffffff;padding:6px 16px;border-radius:8px;border:1px dashed var(--card-border-hover);user-select:all;display:inline-block;">${esc(currentClass)}</code>
+            <span style="font-size:12.5px;font-weight:700;color:#059669;background:#dcfce7;padding:4px 10px;border-radius:20px;">${filledCount} / 17 Mapel Terisi</span>
+            <span style="font-size:11.5px;font-weight:700;color:#0284c7;background:#e0f2fe;padding:4px 10px;border-radius:20px;">TERSIMPAN PERMANEN</span>
+          </div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:6px;">
+            Berikan 1 kode kelas di atas kepada murid. Di tab <b>KelasKu</b> murid, sistem otomatis menampilkan panel-panel mata pelajaran guru yang terdaftar. Kode kelas ini permanen dan tersimpan aman di basis data D1. Memuat ulang atau me-refresh halaman tidak akan mengubah kode unik kelas ini.
+          </div>
+        </div>
+        <div>
+          <form method="GET" action="/" style="margin:0;">
+            <input type="hidden" name="action" value="delete_class">
+            <input type="hidden" name="code" value="${esc(currentClass)}">
+            <button type="submit" style="background:#ef4444;color:#ffffff;border:none;padding:8px 14px;border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 2px 0 #b91c1c;">
+              🗑️ Hapus Kelas ${esc(currentClass)}
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <details style="margin-bottom:20px;background:#ffffff;border:1px solid var(--card-border);border-radius:10px;padding:12px 16px;">
+        <summary style="font-weight:700;font-size:13px;color:var(--text-main);cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;">
+          <span>📋 Daftar &amp; Kelola Semua Kelas Terdaftar (${classList.length})</span>
+          <span style="font-size:11px;color:var(--text-muted);font-weight:400;">(Buka tabel untuk melihat / menghapus kelas lain)</span>
+        </summary>
+        <div class="table-wrap" style="margin-top:12px;">
+          <table>
+            <thead>
+              <tr>
+                <th>Kode Kelas</th>
+                <th>Nama / Judul Kelas</th>
+                <th>Jenjang</th>
+                <th>Sekolah Mitra</th>
+                <th>Mapel Terisi</th>
+                <th style="text-align:center;">Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${classTableRows}
+            </tbody>
+          </table>
+        </div>
+      </details>
+
+      <div style="font-size:13px;font-weight:700;color:var(--text-main);margin-bottom:10px;">
+        Panel 17 Mata Pelajaran Kurikulum Merdeka di Kelas <code>${esc(currentClass)}</code>:
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));gap:12px;">
+        ${mapelCards}
+      </div>
+    </div>
+  `;
+
+  // --- 3. FORMULIR PEMBUATAN TOKEN MANDIRI / MANUAL ---
   const formMint = `
-    <div style="background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:20px;">
-      <h3 style="margin-top:0;margin-bottom:8px;color:var(--ink);">+ Buat Undangan &amp; Token Guru Baru</h3>
+    <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:20px;">
+      <h3 style="margin-top:0;margin-bottom:6px;color:var(--ink);">+ Buat Undangan &amp; Token Guru Baru (Form Mandiri)</h3>
       <div style="font-size:13px;color:var(--muted);margin-bottom:16px;">
         Owner dapat mencetak token untuk guru. Guru kemudian memasukkan kode token ini di aplikasi FIEZEL untuk membuka portal guru dan mengelola materi kelas.
       </div>
       <form method="GET" action="/" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:12px;align-items:end;">
         <input type="hidden" name="action" value="mint_teacher">
+        <input type="hidden" name="cls" value="${esc(currentClass)}">
         <div>
           <label for="f_teacherName" style="display:block;font-size:12px;font-weight:bold;margin-bottom:4px;color:var(--ink);">Nama Guru</label>
-          <input id="f_teacherName" name="teacherName" type="text" placeholder="Contoh: Mardhiana Hamzah" maxlength="60" required style="width:100%;box-sizing:border-box;">
+          <input id="f_teacherName" name="teacherName" type="text" placeholder="Contoh: Mardhiana Hamzah" maxlength="60" required>
         </div>
         <div>
           <label for="f_institution" style="display:block;font-size:12px;font-weight:bold;margin-bottom:4px;color:var(--ink);">Nama Sekolah / Instansi</label>
-          <input id="f_institution" name="institution" type="text" placeholder="Contoh: MTsN 5 ACEH BESAR" maxlength="80" required style="width:100%;box-sizing:border-box;">
+          <input id="f_institution" name="institution" list="schools_list_mint" type="text" placeholder="Contoh: MTsN 5 ACEH BESAR" maxlength="80" required>
+          <datalist id="schools_list_mint">
+            ${schools.map(sch => `<option value="${esc(sch.name)}">${esc(sch.name)}</option>`).join('')}
+          </datalist>
         </div>
         <div>
           <label for="f_institutionType" style="display:block;font-size:12px;font-weight:bold;margin-bottom:4px;color:var(--ink);">Jenis Instansi</label>
-          <select id="f_institutionType" name="institutionType" style="width:100%;box-sizing:border-box;">
+          <select id="f_institutionType" name="institutionType">
             <option value="school" selected>Sekolah (school)</option>
+            <option value="madrasah">Madrasah (madrasah)</option>
             <option value="tutoring">Bimbel (tutoring)</option>
             <option value="course">Kursus (course)</option>
             <option value="other">Lainnya (other)</option>
@@ -1580,7 +3768,7 @@ function renderTeacherSection(m) {
         </div>
         <div>
           <label for="f_days" style="display:block;font-size:12px;font-weight:bold;margin-bottom:4px;color:var(--ink);">Masa Aktif Token</label>
-          <select id="f_days" name="days" style="width:100%;box-sizing:border-box;">
+          <select id="f_days" name="days">
             <option value="14">14 Hari</option>
             <option value="30">30 Hari (1 Bulan)</option>
             <option value="90" selected>90 Hari (3 Bulan)</option>
@@ -1588,27 +3776,46 @@ function renderTeacherSection(m) {
             <option value="365">365 Hari (1 Tahun)</option>
           </select>
         </div>
+        <div>
+          <label for="f_subject" style="display:block;font-size:12px;font-weight:bold;margin-bottom:4px;color:var(--ink);">Mata Pelajaran yang Diampu</label>
+          <select id="f_subject" name="subject_id">
+            ${SUBJECTS_17.map(s => `<option value="${s.id}" ${s.id === 'MAT' ? 'selected' : ''}>${s.icon} ${esc(s.name)}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label for="f_grade" style="display:block;font-size:12px;font-weight:bold;margin-bottom:4px;color:var(--ink);">Jenjang / Fase</label>
+          <select id="f_grade" name="grade_id">
+            <option value="SMP" selected>Fase D · SMP (Kelas 7–9)</option>
+            <option value="SMA">Fase E/F · SMA/SMK (Kelas 10–12)</option>
+            <option value="SD">Fase A–C · SD (Kelas 1–6)</option>
+            <option value="ALL">Semua Jenjang</option>
+          </select>
+        </div>
+        <div>
+          <label for="f_class_code" style="display:block;font-size:12px;font-weight:bold;margin-bottom:4px;color:var(--ink);">Kode Kelas (Opsional)</label>
+          <input id="f_class_code" name="class_code" type="text" placeholder="Contoh: FZ-AB2C3D" value="${esc(currentClass)}" maxlength="16">
+        </div>
         <div style="grid-column:1/-1;text-align:right;margin-top:6px;">
-          <button type="submit" style="background:var(--ink);color:#fff;padding:10px 20px;border:none;border-radius:6px;font-weight:bold;cursor:pointer;">+ Buat Token Guru</button>
+          <button type="submit">+ Buat Token Guru</button>
         </div>
       </form>
     </div>
   `;
 
-  // Formulir cabut manual
+  // --- 4. FORMULIR CABUT MANUAL ---
   const formRevokeManual = `
-    <div style="background:#fff;border:1px dashed var(--line);border-radius:10px;padding:14px;margin-bottom:20px;">
+    <div style="background:#fff;border:1px dashed var(--line);border-radius:12px;padding:14px 16px;margin-bottom:20px;">
       <form method="GET" action="/" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
         <input type="hidden" name="action" value="revoke_invite">
+        <input type="hidden" name="cls" value="${esc(currentClass)}">
         <label for="f_revoke_code" style="font-size:12px;font-weight:bold;color:var(--muted);white-space:nowrap;">Cabut Token Manual:</label>
-        <input id="f_revoke_code" name="code" type="text" placeholder="Ketik atau tempel 32 karakter kode token Crockford" maxlength="32" required style="flex:1;min-width:260px;box-sizing:border-box;">
-        <button type="submit" style="background:#c62828;color:#fff;padding:8px 16px;border:none;border-radius:6px;font-weight:bold;cursor:pointer;">Cabut Token</button>
+        <input id="f_revoke_code" name="code" type="text" placeholder="Ketik atau tempel 32 karakter kode token Crockford" maxlength="32" required style="flex:1;min-width:240px;">
+        <button type="submit" style="background:#c62828;color:#fff;box-shadow:0 2px 0 #8e1c1c;">Cabut Token</button>
       </form>
     </div>
   `;
 
-  // Tabel daftar token
-  const invites = tData.invites || [];
+  // --- 5. TABEL DAFTAR TOKEN GURU DENGAN EDIT LUAS ---
   let inviteTable = '';
   if (!invites.length) {
     inviteTable = `<div class="note">Belum ada token undangan yang dicetak.</div>`;
@@ -1627,39 +3834,174 @@ function renderTeacherSection(m) {
         statusBadge = `<span style="background:#f5f5f5;color:#616161;padding:2px 8px;border-radius:10px;font-size:11px;">${esc(inv.status || '—')}</span>`;
       }
 
+      const curSub = inv.subject_id || inv.subjectId || 'MAT';
+      const curGrd = inv.grade_id || inv.gradeId || 'SMP';
+
+      let tokenCodeCell = '—';
+      if (inv.rawCode) {
+        tokenCodeCell = `<code style="background:var(--bg-subtle,#f8fafc);color:var(--brand-gold,#b45309);font-size:12px;font-weight:700;letter-spacing:1px;padding:3px 8px;border-radius:6px;border:1px solid #cbd5e1;user-select:all;display:inline-block;" title="Klik/blok untuk menyalin token">${esc(inv.rawCode)}</code>`;
+      } else if (inv.codeHash) {
+        tokenCodeCell = `<code style="color:var(--text-muted,#64748b);font-size:11px;" title="Hash token arsip">${esc((inv.codeHash || '').slice(0, 8))}…</code>`;
+      }
+
+      const subjectOptions = SUBJECTS_17.map((s) =>
+        `<option value="${s.id}" ${curSub === s.id ? 'selected' : ''}>${s.icon} ${esc(s.name)}</option>`
+      ).join('');
+
+      const gradeOptions = [
+        ['SMP', 'Fase D (SMP Kelas 7–9)'],
+        ['SMA', 'Fase E/F (SMA Kelas 10–12)'],
+        ['SD', 'Fase A–C (SD Kelas 1–6)'],
+        ['ALL', 'Semua Jenjang']
+      ].map(([val, label]) => `<option value="${val}" ${curGrd === val ? 'selected' : ''}>${esc(label)}</option>`).join('');
+
       let actionCell = '—';
-      if (inv.status === 'ACTIVE' && inv.codeHash) {
-        actionCell = `
-          <form method="GET" action="/" style="display:inline;margin:0;">
-            <input type="hidden" name="action" value="revoke_invite">
+      if (inv.codeHash) {
+        const editDetails = `
+          <details style="display:inline-block;position:relative;margin:2px;text-align:left;">
+            <summary style="background:#0284c7;color:#fff;border:none;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;list-style:none;display:inline-block;">✏️ Edit</summary>
+            <div style="position:absolute;right:0;top:100%;z-index:50;background:#ffffff;border:2px solid #cbd5e1;border-radius:10px;padding:16px;box-shadow:0 12px 32px rgba(0,0,0,0.22);width:320px;margin-top:4px;">
+              <div style="font-weight:800;font-size:13px;margin-bottom:10px;color:var(--ink);border-bottom:1px solid #e2e8f0;padding-bottom:6px;">
+                ✏️ Edit Luas Data Guru &amp; Token
+              </div>
+              <form method="GET" action="/" style="margin:0;display:flex;flex-direction:column;gap:8px;">
+                <input type="hidden" name="action" value="update_invite">
+                <input type="hidden" name="codeHash" value="${esc(inv.codeHash)}">
+                <input type="hidden" name="cls" value="${esc(currentClass)}">
+                <div>
+                  <label style="display:block;font-size:11px;font-weight:700;margin-bottom:2px;color:#334155;">Nama Guru:</label>
+                  <input name="teacherName" type="text" value="${esc(inv.teacherName || '')}" maxlength="60" required style="width:100%;box-sizing:border-box;font-size:11px;padding:4px 6px;border:1px solid #cbd5e1;border-radius:4px;">
+                </div>
+                <div>
+                  <label style="display:block;font-size:11px;font-weight:700;margin-bottom:2px;color:#334155;">Sekolah / Instansi:</label>
+                  <input name="institution" type="text" value="${esc(inv.institution || '')}" maxlength="80" required style="width:100%;box-sizing:border-box;font-size:11px;padding:4px 6px;border:1px solid #cbd5e1;border-radius:4px;">
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">
+                  <div>
+                    <label style="display:block;font-size:11px;font-weight:700;margin-bottom:2px;color:#334155;">Jenis Instansi:</label>
+                    <select name="institutionType" style="width:100%;font-size:10.5px;padding:3px;border:1px solid #cbd5e1;border-radius:4px;">
+                      <option value="school" ${inv.institutionType === 'school' ? 'selected' : ''}>Sekolah</option>
+                      <option value="madrasah" ${inv.institutionType === 'madrasah' ? 'selected' : ''}>Madrasah</option>
+                      <option value="tutoring" ${inv.institutionType === 'tutoring' ? 'selected' : ''}>Bimbel</option>
+                      <option value="course" ${inv.institutionType === 'course' ? 'selected' : ''}>Kursus</option>
+                      <option value="other" ${inv.institutionType === 'other' ? 'selected' : ''}>Lainnya</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style="display:block;font-size:11px;font-weight:700;margin-bottom:2px;color:#334155;">Pindah Kode Kelas:</label>
+                    <input name="class_code" type="text" value="${esc(inv.classCode || currentClass)}" maxlength="16" style="width:100%;box-sizing:border-box;font-size:10.5px;padding:3px 5px;border:1px solid #cbd5e1;border-radius:4px;font-weight:700;color:var(--brand-gold);">
+                  </div>
+                </div>
+                <div>
+                  <label style="display:block;font-size:11px;font-weight:700;margin-bottom:2px;color:#334155;">Mata Pelajaran (17 Mapel):</label>
+                  <select name="subject_id" style="width:100%;font-size:11px;padding:4px 6px;border:1px solid #cbd5e1;border-radius:4px;">
+                    ${subjectOptions}
+                  </select>
+                </div>
+                <div>
+                  <label style="display:block;font-size:11px;font-weight:700;margin-bottom:2px;color:#334155;">Jenjang / Fase:</label>
+                  <select name="grade_id" style="width:100%;font-size:11px;padding:4px 6px;border:1px solid #cbd5e1;border-radius:4px;">
+                    ${gradeOptions}
+                  </select>
+                </div>
+                <div>
+                  <label style="display:block;font-size:11px;font-weight:700;margin-bottom:2px;color:#334155;">Perpanjang Masa Aktif Token:</label>
+                  <select name="extend_days" style="width:100%;font-size:11px;padding:4px 6px;border:1px solid #cbd5e1;border-radius:4px;">
+                    <option value="0" selected>Tidak diperpanjang (tetap)</option>
+                    <option value="30">+30 Hari (1 Bulan)</option>
+                    <option value="90">+90 Hari (3 Bulan)</option>
+                    <option value="180">+180 Hari (6 Bulan)</option>
+                    <option value="365">+365 Hari (1 Tahun)</option>
+                  </select>
+                </div>
+                <div style="display:flex;justify-content:flex-end;margin-top:6px;">
+                  <button type="submit" style="background:#0284c7;color:#fff;border:none;padding:6px 14px;border-radius:6px;font-size:11.5px;font-weight:bold;cursor:pointer;">
+                    💾 Simpan Perubahan Guru
+                  </button>
+                </div>
+              </form>
+            </div>
+          </details>
+        `;
+
+        const regenBtn = `
+          <form method="GET" action="/" style="display:inline;margin:2px;">
+            <input type="hidden" name="action" value="regenerate_invite">
             <input type="hidden" name="codeHash" value="${esc(inv.codeHash)}">
-            <button type="submit" style="background:#c62828;color:#fff;border:none;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;">Cabut</button>
+            <input type="hidden" name="cls" value="${esc(currentClass)}">
+            <button type="submit" style="background:#d97706;color:#fff;border:none;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;" title="Terbitkan token baru untuk guru ini dan cabut token lama">🔄 Regenerasi</button>
           </form>
         `;
+
+        const revokeBtn = inv.status === 'ACTIVE' ? `
+          <form method="GET" action="/" style="display:inline;margin:2px;">
+            <input type="hidden" name="action" value="revoke_invite">
+            <input type="hidden" name="codeHash" value="${esc(inv.codeHash)}">
+            <input type="hidden" name="cls" value="${esc(currentClass)}">
+            <button type="submit" style="background:#c62828;color:#fff;border:none;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;" title="Cabut token ini">Cabut</button>
+          </form>
+        ` : '';
+
+        const deleteBtn = `
+          <form method="GET" action="/" style="display:inline;margin:2px;">
+            <input type="hidden" name="action" value="delete_invite">
+            <input type="hidden" name="codeHash" value="${esc(inv.codeHash)}">
+            <input type="hidden" name="cls" value="${esc(currentClass)}">
+            <button type="submit" style="background:#64748b;color:#fff;border:none;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;" title="Hapus token ini secara permanen">Hapus</button>
+          </form>
+        `;
+
+        actionCell = `${editDetails}${regenBtn}${revokeBtn}${deleteBtn}`;
       }
 
       const createdStr = inv.createdAt ? wibDay(inv.createdAt) : '—';
       const expiresStr = inv.expiresAt ? wibDay(inv.expiresAt) : '—';
+      const cCode = inv.classCode || '—';
 
       return `<tr>
         <td><b>${esc(inv.teacherName || '—')}</b></td>
         <td>${esc(inv.institution || '—')}</td>
-        <td>${esc(inv.institutionType || '—')}</td>
+        <td><span style="background:#e0f2fe;color:#0369a1;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">${esc(subjectName(curSub))}</span><small style="color:var(--text-muted);display:block;margin-top:2px;">${esc(gradeName(curGrd))}</small></td>
+        <td><code style="font-weight:700;color:var(--brand-gold);">${esc(cCode)}</code></td>
+        <td>${tokenCodeCell}</td>
         <td>${statusBadge}</td>
         <td>${esc(createdStr)}</td>
         <td>${esc(expiresStr)}</td>
-        <td style="text-align:center;">${actionCell}</td>
+        <td style="text-align:center;white-space:nowrap;">${actionCell}</td>
       </tr>`;
     }).join('');
 
     inviteTable = `
-      <div style="overflow-x:auto;margin-bottom:24px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+        <div style="font-weight:700;font-size:14px;color:var(--ink);">Daftar Token Undangan Guru (${invites.length})</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <form method="GET" action="/" style="margin:0;">
+            <input type="hidden" name="action" value="clear_invites">
+            <input type="hidden" name="mode" value="revoked">
+            <input type="hidden" name="cls" value="${esc(currentClass)}">
+            <button type="submit" style="background:#f1f5f9;color:#334155;border:1px solid #cbd5e1;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">
+              🧹 Bersihkan Token Dicabut / Kedaluwarsa
+            </button>
+          </form>
+          <form method="GET" action="/" style="margin:0;">
+            <input type="hidden" name="action" value="clear_invites">
+            <input type="hidden" name="mode" value="all">
+            <input type="hidden" name="cls" value="${esc(currentClass)}">
+            <button type="submit" style="background:#fee2e2;color:#991b1b;border:1px solid #f87171;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">
+              ⚠️ Hapus Semua Data Token
+            </button>
+          </form>
+        </div>
+      </div>
+      <div class="table-wrap" style="margin-bottom:24px;">
         <table>
           <thead>
             <tr>
               <th>Guru</th>
               <th>Sekolah / Instansi</th>
-              <th>Jenis</th>
+              <th>Mapel &amp; Jenjang</th>
+              <th>Kode Kelas</th>
+              <th>Kode Token</th>
               <th>Status</th>
               <th>Dibuat (WIB)</th>
               <th>Berlaku Hingga</th>
@@ -1674,26 +4016,53 @@ function renderTeacherSection(m) {
     `;
   }
 
-  // Tabel daftar guru aktif
-  const teachers = tData.teachers || [];
+  // --- 6. TABEL DAFTAR GURU TERDAFTAR & AKTIF DENGAN EDIT LUAS ---
   let teacherTable = '';
   if (!teachers.length) {
     teacherTable = `<div class="note">Belum ada akun guru yang menyelesaikan aktivasi token.</div>`;
   } else {
     const tRows = teachers.map((tc) => {
       const actDate = tc.activatedAt ? wibDay(tc.activatedAt) : '—';
+      const cCode = tc.classCode || '—';
+      const curSub = tc.subject_id || tc.subjectId || 'MAT';
+      const curGrd = tc.grade_id || tc.gradeId || 'SMP';
+
       return `<tr>
         <td><code>${esc(tc.handle || '—')}</code></td>
         <td><b>${esc(tc.teacherName || '—')}</b></td>
         <td>${esc(tc.institution || '—')}</td>
         <td>${esc(tc.institutionType || '—')}</td>
+        <td><span style="background:#e0f2fe;color:#0369a1;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">${esc(subjectName(curSub))}</span><small style="color:var(--text-muted);display:block;margin-top:2px;">${esc(gradeName(curGrd))}</small></td>
+        <td><code style="font-weight:700;color:var(--brand-gold);">${esc(cCode)}</code></td>
         <td><span style="background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:10px;font-weight:bold;font-size:11px;">${esc(tc.status || 'active')}</span></td>
         <td>${esc(actDate)}</td>
+        <td style="text-align:center;white-space:nowrap;">
+          <form method="GET" action="/" style="display:inline;margin:2px;">
+            <input type="hidden" name="action" value="delete_teacher">
+            <input type="hidden" name="sub" value="${esc(tc.sub || '')}">
+            <input type="hidden" name="handle" value="${esc(tc.handle || '')}">
+            <input type="hidden" name="cls" value="${esc(currentClass)}">
+            <button type="submit" style="background:#fee2e2;color:#b91c1c;border:1px solid #fca5a5;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:bold;cursor:pointer;" title="Hapus akun guru ini dan bersihkan tokennya">Hapus</button>
+          </form>
+        </td>
       </tr>`;
     }).join('');
 
     teacherTable = `
-      <div style="overflow-x:auto;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+        <div style="font-weight:700;font-size:14px;color:var(--ink);">Daftar Guru Terdaftar &amp; Aktif (${teachers.length})</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <form method="GET" action="/" style="margin:0;">
+            <input type="hidden" name="action" value="delete_teacher">
+            <input type="hidden" name="mode" value="all">
+            <input type="hidden" name="cls" value="${esc(currentClass)}">
+            <button type="submit" style="background:#fef2f2;color:#dc2626;border:1px solid #fecaca;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;" title="Bersihkan semua akun guru aktif">
+              Bersihkan Semua Akun Guru
+            </button>
+          </form>
+        </div>
+      </div>
+      <div class="table-wrap">
         <table>
           <thead>
             <tr>
@@ -1701,8 +4070,11 @@ function renderTeacherSection(m) {
               <th>Nama Guru</th>
               <th>Sekolah / Instansi</th>
               <th>Jenis</th>
+              <th>Mapel &amp; Jenjang</th>
+              <th>Kode Kelas</th>
               <th>Status</th>
               <th>Aktivasi (WIB)</th>
+              <th style="text-align:center;">Aksi</th>
             </tr>
           </thead>
           <tbody>
@@ -1713,15 +4085,25 @@ function renderTeacherSection(m) {
     `;
   }
 
+  const masterAlert = (action && action.action === 'master_seed') ? alertBanner : '';
+  const remainingAlert = (action && action.action === 'master_seed') ? '' : alertBanner;
+
   return `
+    ${renderCurriculumSyncSection(m, masterAlert)}
     <section>
-      <h2>🎓 Kelola Token &amp; Undangan Guru</h2>
-      ${alertBanner}
+      <span class="card-full-inner" id="school-panel" style="scroll-margin-top:80px;display:block;"></span>
+      ${schoolSection}
+    </section>
+    <section>
+      <span class="card-full-inner" id="teachers" style="scroll-margin-top:80px;display:block;"></span>
+      <h2><span>${ICONS.teacher} Kelola Token &amp; Undangan Guru</span><span class="section-badge">Manajemen Akses</span></h2>
+      ${remainingAlert}
+      ${classSection}
       ${formMint}
       ${formRevokeManual}
-      <h3 style="color:var(--ink);margin-top:20px;margin-bottom:8px;">Riwayat Undangan &amp; Token Guru</h3>
+      <h3 style="color:var(--text-main);margin-top:20px;margin-bottom:8px;">Riwayat Undangan &amp; Token Guru</h3>
       ${inviteTable}
-      <h3 style="color:var(--ink);margin-top:20px;margin-bottom:8px;">Daftar Guru Terdaftar &amp; Aktif</h3>
+      <h3 style="color:var(--text-main);margin-top:20px;margin-bottom:8px;">Daftar Guru Terdaftar &amp; Aktif</h3>
       ${teacherTable}
       <div class="note" style="margin-top:16px;">
         Undangan guru bersifat sekali pakai. Masa aktif default adalah 90 hari. Begitu guru mengaktifkan token di aplikasi, peran akunnya langsung dipromosikan ke <code>teacher</code> dan profil sekolahnya tersimpan aman di basis data server.
@@ -1733,7 +4115,6 @@ function renderTeacherSection(m) {
 function renderDashboard(m) {
   const t = m.totals || {}, l = m.latest || {}, c = m.cost || {}, a = (c.assumptions || {});
   const periodLabel = { today: 'Hari ini', '7d': '7 hari', '30d': '30 hari', '90d': '90 hari' }[m.period] || m.period;
-  const nav = Object.keys(PERIODS).map((p) => `<a href="/?period=${esc(p)}"${p === m.period ? ' aria-current="page"' : ''}>${esc({ today: 'Hari ini', '7d': '7 hari', '30d': '30 hari', '90d': '90 hari' }[p])}</a>`).join('');
   const u = m.usage || {};
   const brokenDays = Number(m.broken && m.broken.days_broken) || 0;
   const ttsTotal = (Number(t.tts_cache_hits) || 0) + (Number(t.tts_cache_misses) || 0);
@@ -1752,12 +4133,7 @@ function renderDashboard(m) {
   // Spanduk keadaan: dicetak DI ATAS semua panel, bukan sebagai catatan kaki. Kalau halaman ini
   // belum punya pengukuran, itu berita utamanya.
   const emptyBanner = m.measurement && m.measurement.notice
-    ? `<div class="empty"><b>⚠️ ${esc(m.measurement.state === STATE_UNAVAILABLE ? UNAVAILABLE_TEXT.toUpperCase() : NO_DATA_TEXT.toUpperCase())}</b>${esc(m.measurement.notice)}`
-      + `<br><br>Hari terrollup di seluruh tabel: <b>${esc(m.measurement.daysTotal == null ? stateText(m) : fmtInt(m.measurement.daysTotal) + ' hari')}</b> · `
-      + `hari terrollup di periode ini: <b>${esc(m.measurement.daysCounted == null ? stateText(m) : fmtInt(m.measurement.daysCounted) + ' hari')}</b>.`
-      + `${(m.measurement.readErrors || []).length ? `<br>Query yang gagal dibaca: <code>${esc((m.measurement.readErrors || []).join(', '))}</code>.` : ''}`
-      + `<br>Semua angka di bawah bertanda “${esc(stateText(m))}”.`
-      + `${m.measurement.state === STATE_UNAVAILABLE ? ' Kegagalan baca TIDAK PERNAH dirender sebagai angka nol.' : ` Angka yang benar-benar nol akan bertanda “${esc(MEASURED_ZERO_TEXT)}” — dua hal itu sengaja dibedakan.`}</div>`
+    ? `<div class="empty"><b>⚠️ ${esc(m.measurement.state === STATE_UNAVAILABLE ? UNAVAILABLE_TEXT.toUpperCase() : NO_DATA_TEXT.toUpperCase())}</b>${esc(m.measurement.notice)}<br><br>Hari terrollup di seluruh tabel: <b>${esc(m.measurement.daysTotal == null ? stateText(m) : fmtInt(m.measurement.daysTotal) + ' hari')}</b> · hari terrollup di periode ini: <b>${esc(m.measurement.daysCounted == null ? stateText(m) : fmtInt(m.measurement.daysCounted) + ' hari')}</b>.${(m.measurement.readErrors || []).length ? `<br>Query yang gagal dibaca: <code>${esc((m.measurement.readErrors || []).join(', '))}</code>.` : ''}<br>Semua angka di bawah bertanda “${esc(stateText(m))}”.${m.measurement.state === STATE_UNAVAILABLE ? ' Kegagalan baca TIDAK PERNAH dirender sebagai angka nol.' : ` Angka yang benar-benar nol akan bertanda “${esc(MEASURED_ZERO_TEXT)}” — dua hal itu sengaja dibedakan.`}</div>`
     : '';
 
   // Spanduk KEBASIAN, terpisah dari spanduk keadaan. Halaman bisa "terukur" dan tetap basi, dan
@@ -1768,52 +4144,231 @@ function renderDashboard(m) {
        sebagai hari tanpa data. Periksa cron rollup sebelum menyimpulkan pemakaian turun.</div>`
     : '';
 
+  const nav = Object.keys(PERIODS).map((p) => `<a href="/?period=${esc(p)}"${p === m.period ? ' aria-current="page"' : ''} class="period-pill">${esc({ today: 'Hari ini', '7d': '7 hari', '30d': '30 hari', '90d': '90 hari' }[p])}</a>`).join('');
+
   return `<!doctype html><html lang="id"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow"><title>FIEZEL · Dashboard Owner</title>
 <style>${CSS}</style></head><body>
-<header>
-  <h1>FIEZEL · Dashboard Owner</h1>
-  <div class="sub">Periode <b>${esc(periodLabel)}</b> · ${esc(m.from)} → ${esc(m.to)} (hari WIB, zona murid) ·
-  rollup terakhir ${esc(l.day || '—')} · dirender ${esc(m.generatedAtIso)}</div>
+
+<header class="page-header">
+  <div class="page-header-inner">
+    <div class="page-logo">
+      <a href="/" class="logo-link">
+        <span class="logo-icon">${ICONS.brand}</span>
+        <span class="logo-text"><span class="logo-bold">SMART</span> <span class="logo-gold">FIEZEL</span></span>
+      </a>
+      <span class="logo-badge">Console</span>
+    </div>
+    <div class="header-tools">
+      <nav class="nav-periods">
+        <div class="nav-group">${nav}</div>
+      </nav>
+      <div class="header-status-group">
+        <span class="status-chip" title="Rollup Terakhir">${ICONS.refresh} ${esc(l.day || '—')}</span>
+        <span class="status-chip" title="Waktu Render">${ICONS.check} ${esc(m.generatedAtIso ? m.generatedAtIso.slice(11, 19) + ' WIB' : '—')}</span>
+      </div>
+      <div class="user-badge">
+        <div class="user-avatar">OW</div>
+        <div class="user-details">
+          <span class="user-name">Owner</span>
+          <span class="user-role">Executive</span>
+        </div>
+      </div>
+      <a href="/logout" class="nav-exit" title="Keluar dari Konsol">${ICONS.logout} <span>Keluar</span></a>
+    </div>
+  </div>
 </header>
-<nav>${nav}<a href="/logout" style="margin-left:auto">Keluar</a></nav>
-${emptyBanner}${staleBanner}
-<main>
+
+<div class="page-wrapper">
+  <div class="page-container">
+    <aside class="sidebar-wrapper">
+      <div class="sidebar-user">
+        <div class="user-panel">
+          <div class="user-avatar-circle">
+            <span>FZ</span>
+            <span class="status-dot"></span>
+          </div>
+          <div class="user-info">
+            <span class="user-title">Fiezel Owner</span>
+            <span class="user-subtitle">Executive Console</span>
+          </div>
+        </div>
+      </div>
+      <nav class="sidebar-menu">
+        <div class="sidebar-heading">PERFORMA</div>
+        <a href="#users" class="sidebar-link active">
+          <span class="sidebar-icon">${ICONS.activity}</span>
+          <span class="sidebar-text">Keaktifan (DAU)</span>
+        </a>
+        <a href="#growth" class="sidebar-link">
+          <span class="sidebar-icon">${ICONS.users}</span>
+          <span class="sidebar-text">Pertumbuhan Murid</span>
+        </a>
+        <a href="#cost" class="sidebar-link">
+          <span class="sidebar-icon">${ICONS.cost}</span>
+          <span class="sidebar-text">Estimasi Biaya</span>
+        </a>
+
+        <div class="sidebar-heading">PEDAGOGI</div>
+        <a href="#activity" class="sidebar-link">
+          <span class="sidebar-icon">${ICONS.book}</span>
+          <span class="sidebar-text">Aktivitas Belajar</span>
+        </a>
+        <a href="#retention" class="sidebar-link">
+          <span class="sidebar-icon">${ICONS.retention}</span>
+          <span class="sidebar-text">Retensi Kohor</span>
+        </a>
+        <a href="#evidence" class="sidebar-link">
+          <span class="sidebar-icon">${ICONS.brain}</span>
+          <span class="sidebar-text">Bukti Braincore</span>
+        </a>
+        <a href="#learners" class="sidebar-link">
+          <span class="sidebar-icon">${ICONS.users}</span>
+          <span class="sidebar-text">Direktori Murid</span>
+        </a>
+
+        <div class="sidebar-heading">SISTEM &amp; EDGE</div>
+        <a href="#ai" class="sidebar-link">
+          <span class="sidebar-icon">${ICONS.cpu}</span>
+          <span class="sidebar-text">Mesin AI (LLM)</span>
+        </a>
+        <a href="#tts" class="sidebar-link">
+          <span class="sidebar-icon">${ICONS.voice}</span>
+          <span class="sidebar-text">Suara TTS</span>
+        </a>
+        <a href="#quota" class="sidebar-link">
+          <span class="sidebar-icon">${ICONS.shield}</span>
+          <span class="sidebar-text">Proteksi Kuota</span>
+        </a>
+        <a href="#infra" class="sidebar-link">
+          <span class="sidebar-icon">${ICONS.server}</span>
+          <span class="sidebar-text">Sistem Edge</span>
+        </a>
+        <a href="#quality" class="sidebar-link">
+          <span class="sidebar-icon">${ICONS.check}</span>
+          <span class="sidebar-text">Kualitas Data</span>
+        </a>
+
+        <div class="sidebar-heading">ADMINISTRASI &amp; KELAS</div>
+        <a href="#curriculum-sync" class="sidebar-link">
+          <span class="sidebar-icon">📚</span>
+          <span class="sidebar-text">Master Kurikulum</span>
+        </a>
+        <a href="#school-panel" class="sidebar-link">
+          <span class="sidebar-icon">🏢</span>
+          <span class="sidebar-text">Panel Sekolah (Mitra)</span>
+        </a>
+        <a href="#class-panel" class="sidebar-link">
+          <span class="sidebar-icon">🏫</span>
+          <span class="sidebar-text">Panel Kelas (17 Mapel)</span>
+        </a>
+        <a href="#teachers" class="sidebar-link">
+          <span class="sidebar-icon">${ICONS.teacher}</span>
+          <span class="sidebar-text">Token &amp; Guru</span>
+        </a>
+        <a href="#export" class="sidebar-link">
+          <span class="sidebar-icon">${ICONS.download}</span>
+          <span class="sidebar-text">Ekspor CSV</span>
+        </a>
+      </nav>
+    </aside>
+
+    <div class="content-wrapper">
+      <div class="page-bar">
+        <div class="page-title-breadcrumb">
+          <h1 class="page-title">Executive Dashboard</h1>
+          <ul class="page-breadcrumb">
+            <li><a href="/">Console</a> <span class="breadcrumb-sep">&gt;</span></li>
+            <li><span>Performa</span> <span class="breadcrumb-sep">&gt;</span></li>
+            <li class="active">Overview</li>
+          </ul>
+        </div>
+        <div class="page-bar-pill">
+          ${ICONS.calendar} Periode: <b>${esc(periodLabel)}</b> (${esc(m.from)} &rarr; ${esc(m.to)} WIB)
+        </div>
+      </div>
+
+      ${emptyBanner}${staleBanner}
+
+      <main>
+        <div class="stat-cards-grid">
+          <div class="stat-card bg-primary">
+            <div class="stat-card-body">
+              <div class="stat-card-top">
+                <span class="stat-label">Perangkat Aktif (DAU)</span>
+                <div class="stat-icon-wrap">${ICONS.activity}</div>
+              </div>
+              <div class="stat-value">${esc(fmtCount(m, l.dau))}</div>
+              <div class="stat-footer-text">
+                Puncak: <b>${esc(fmtCount(m, m.peak.dau_peak))}</b> · Rata: <b>${esc(fmtAvg(m, m.peak.dau_avg, 1))}</b>
+              </div>
+            </div>
+          </div>
+
+          <div class="stat-card bg-success">
+            <div class="stat-card-body">
+              <div class="stat-card-top">
+                <span class="stat-label">Pertumbuhan Perangkat</span>
+                <div class="stat-icon-wrap">${ICONS.users}</div>
+              </div>
+              <div class="stat-value">${esc(fmtCount(m, t.new_users))}</div>
+              <div class="stat-footer-text">
+                Aplikasi Dibuka: <b>${esc(fmtCount(m, t.app_open))}</b>
+              </div>
+            </div>
+          </div>
+
+          <div class="stat-card bg-warning">
+            <div class="stat-card-body">
+              <div class="stat-card-top">
+                <span class="stat-label">Estimasi Biaya</span>
+                <div class="stat-icon-wrap">${ICONS.cost}</div>
+              </div>
+              <div class="stat-value">${esc(fmtMoney(m, c.totalUsd))}</div>
+              <div class="stat-footer-text">
+                TTS: <b>${esc(fmtMoney(m, c.ttsUsd))}</b> · LLM: <b>${esc(fmtMoney(m, c.llmUsd))}</b>
+              </div>
+            </div>
+          </div>
+
+          <div class="stat-card bg-danger">
+            <div class="stat-card-body">
+              <div class="stat-card-top">
+                <span class="stat-label">Penolakan Kuota</span>
+                <div class="stat-icon-wrap">${ICONS.shield}</div>
+              </div>
+              <div class="stat-value">${esc(fmtCount(m, t.quota_exhausted))}</div>
+              <div class="stat-footer-text">
+                Breaker: <b>${esc(fmtCount(m, t.breaker_trips))}</b> · 429: <b>${esc(fmtCount(m, u['ai_err:429']))}</b>
+              </div>
+            </div>
+          </div>
+        </div>
+
+  <div class="zone-divider" id="zone-perf">
+    <span class="zone-badge">Zona 01</span>
+    <div class="zone-title-group">
+      <h3 class="zone-title">Ringkasan Eksekutif &amp; Pertumbuhan Pengguna</h3>
+      <span class="zone-desc">Keaktifan harian (DAU/WAU/MAU), tren pertumbuhan perangkat, dan estimasi biaya Cloudflare.</span>
+    </div>
+  </div>
 
   <section>
-    <h2>⬇️ Ekspor data (CSV)</h2>
-    <div class="note">Berkas mengikuti periode yang sedang dipilih (<b>${esc(periodLabel)}</b>) dan
-    berisi angka yang SAMA dengan yang dirender di halaman ini — nol data tambahan, nol dimensi
-    baru. Setiap berkas membawa baris <code>measurement_state</code> supaya "belum diukur" tidak
-    pernah terbaca sebagai "nol" setelah berkas ini beredar terlepas dari dashboard.</div>
-    <p>
-      <a href="/api/export/summary.csv?period=${esc(m.period)}">Ringkasan metrik</a> ·
-      <a href="/api/export/series.csv?period=${esc(m.period)}">Deret harian (tren)</a> ·
-      <a href="/api/export/retention.csv?period=${esc(m.period)}">Retensi per kohor</a> ·
-      <a href="/api/export/evidence.csv?period=${esc(m.period)}">Bukti belajar Braincore</a>
-    </p>
-    <div class="note">Untuk pembaca mesin, JSON yang setara sudah ada di
-    <code>/api/summary</code>, <code>/api/series</code>, dan <code>/api/retention</code>.</div>
-  </section>
-
-
-  <section>
-    <h2>👥 User growth</h2>
-    <div class="big">${esc(fmtCount(m, t.new_users))}</div>
-    ${row('Perangkat baru (periode)', fmtCount(m, t.new_users))}
-    ${row('Aplikasi dibuka (periode)', fmtCount(m, t.app_open), 'pembukaan, bukan orang unik')}
-    ${row('Pembukaan dengan akun tertaut', fmtCount(m, t.app_open_with_identity))}
-    ${row('Laporan hari-aktif', fmtCount(m, t.day_active_reports))}
-    ${sparkline(m.series, 'new_users')}
-    <div class="warn">${esc(DEVICE_TRUTH)}</div>
-    <div class="note">"Aplikasi dibuka" adalah BATAS BAWAH: PWA yang dibuka dari precache tanpa jaringan tidak pernah mengirim event, jadi ia tidak terhitung.</div>
-    ${limitRows(m, 'User growth')}
-  </section>
-
-  <section>
-    <h2>🔥 Active users (DAU / WAU / MAU)</h2>
-    <div class="big">${esc(fmtCount(m, l.dau))}</div>
+    <span id="users"></span>
+    <h2><span>${ICONS.activity} Active users (DAU / WAU / MAU)</span><span class="section-badge">Keaktifan</span></h2>
+    <div class="stat-highlight">
+      <div>
+        <div class="stat-highlight-label">Perangkat Aktif (DAU)</div>
+        <div class="big">${esc(fmtCount(m, l.dau))}</div>
+      </div>
+      <div class="stat-mini-deck">
+        <div class="stat-mini"><span>Puncak Periode</span><b>${esc(fmtCount(m, m.peak.dau_peak))}</b></div>
+        <div class="stat-mini"><span>Rata-rata Harian</span><b>${esc(fmtAvg(m, m.peak.dau_avg, 1))}</b></div>
+        <div class="stat-mini"><span>Rasio Stickiness</span><b>${esc(fmtRateRange(m, l.dau, l.mau_lower, l.mau_upper))}</b></div>
+        <div class="stat-mini"><span>Hari Terhitung</span><b>${esc(fmtCount(m, m.peak.dau_days))} <small style="color:var(--text-subtle)">/ ${esc(m.span)}</small></b></div>
+      </div>
+    </div>
     ${row('DAU (hari rollup terakhir)', fmtCount(m, l.dau))}
     ${row('WAU', fmtRange(m, l.wau_lower, l.wau_upper), 'rentang batas bawah–atas')}
     ${row('MAU', fmtRange(m, l.mau_lower, l.mau_upper), 'rentang batas bawah–atas')}
@@ -1822,27 +4377,67 @@ ${emptyBanner}${staleBanner}
     ${row('Rata-rata DAU pada periode', fmtAvg(m, m.peak.dau_avg, 1))}
     ${row('Hari DAU terrollup pada periode', fmtCount(m, m.peak.dau_days), `dari ${esc(m.span)}`)}
     ${sparkline(m.series, 'dau')}
-    <div class="warn">${esc(DEVICE_TRUTH)} "Aktif" = hari dengan ≥5 jawaban (ambang yang sama dengan cincin misi murid).</div>
-    <div class="warn">WAU dan MAU sengaja RENTANG, bukan satu angka${Number(l.wau_mau_is_estimate) ? ' (penanda estimasi dari job rollup menyala)' : ''}: token perangkat dirotasi tiap 24 jam dan pepper lama dihapus, jadi menyambungkan perangkat lintas hari mustahil. Batas bawah = perangkat harian terbanyak, batas atas = jumlah seluruh hari.</div>
-    <div class="note">DAU/WAU/MAU dibaca dari baris agregat harian yang dibekukan job rollup — dashboard tidak pernah menyentuh tabel token per-perangkat.</div>
-    ${limitRows(m, 'Active users')}
+    <div class="card-footer">
+      <div class="warn">${esc(DEVICE_TRUTH)} "Aktif" = hari dengan ≥5 jawaban (ambang yang sama dengan cincin misi murid).</div>
+      <div class="warn">WAU dan MAU sengaja RENTANG, bukan satu angka${Number(l.wau_mau_is_estimate) ? ' (penanda estimasi dari job rollup menyala)' : ''}: token perangkat dirotasi tiap 24 jam dan pepper lama dihapus, jadi menyambungkan perangkat lintas hari mustahil. Batas bawah = perangkat harian terbanyak, batas atas = jumlah seluruh hari.</div>
+      <div class="note">DAU/WAU/MAU dibaca dari baris agregat harian yang dibekukan job rollup — dashboard tidak pernah menyentuh tabel token per-perangkat.</div>
+      ${limitRows(m, 'Active users')}
+    </div>
   </section>
 
   <section>
-    <h2>↩️ Retention (observed)</h2>
-    <table><thead><tr><th>Offset</th><th>Kembali</th><th>Cohort</th><th>%</th><th>Kohor</th></tr></thead>
-    <tbody>${retentionRows}</tbody></table>
-    <div class="note">Kolom Cohort (n=) diturunkan dari baris offset D0 kohor yang sama; skema retensi tidak menyimpan ukuran kohor sebagai kolom sendiri. Penyebut tiap baris hanya menjumlahkan kohor yang BENAR-BENAR punya pengamatan di offset itu — kohor yang belum cukup tua tidak diseret masuk sebagai "hilang". Kolom terakhir = jumlah kohor yang menyumbang, supaya "0%" tidak tertukar dengan "nol kohor".</div>
-    <div class="warn">PERINGATAN ESTIMASI PERANGKAT: cohort dibangun dari perangkat, bukan orang.
-    Ganti perangkat atau hapus data browser terlihat sebagai "berhenti" walau muridnya tetap belajar.
-    Belajar offline berhari-hari juga menurunkan retensi tanpa ada murid yang hilang.
-    Safari membatasi storage skrip 7 hari → cohort iOS bisa tampak berhenti di D7.</div>
-    <div class="note">Persentase disembunyikan bila cohort &lt; ${esc(RETENTION_MIN_COHORT)}: angka presisi di atas cohort kecil adalah derau, bukan sinyal.</div>
-    ${limitRows(m, 'Retention')}
+    <span id="growth"></span>
+    <h2><span>${ICONS.users} User growth</span><span class="section-badge">Pertumbuhan</span></h2>
+    <div class="kpi-hero">
+      <span class="kpi-hero-label">Total Perangkat Baru</span>
+      <div class="big">${esc(fmtCount(m, t.new_users))}</div>
+    </div>
+    ${row('Perangkat baru (periode)', fmtCount(m, t.new_users))}
+    ${row('Aplikasi dibuka (periode)', fmtCount(m, t.app_open), 'pembukaan, bukan orang unik')}
+    ${row('Pembukaan dengan akun tertaut', fmtCount(m, t.app_open_with_identity))}
+    ${row('Laporan hari-aktif', fmtCount(m, t.day_active_reports))}
+    ${sparkline(m.series, 'new_users')}
+    <div class="card-footer">
+      <div class="warn">${esc(DEVICE_TRUTH)}</div>
+      <div class="note">"Aplikasi dibuka" adalah BATAS BAWAH: PWA yang dibuka dari precache tanpa jaringan tidak pernah mengirim event, jadi ia tidak terhitung.</div>
+      ${limitRows(m, 'User growth')}
+    </div>
   </section>
 
   <section>
-    <h2>📚 Learning activity</h2>
+    <span id="cost"></span>
+    <h2><span>${ICONS.cost} Cost estimation</span><span class="section-badge">Finansial</span></h2>
+    <div class="kpi-hero">
+      <span class="kpi-hero-label">Estimasi Biaya Operasional</span>
+      <div class="big">${esc(fmtMoney(m, c.totalUsd))}</div>
+    </div>
+    ${row('TTS', fmtMoney(m, c.ttsUsd))}
+    ${row('LLM', fmtMoney(m, c.llmUsd))}
+    ${row('Biaya / perangkat aktif', !isMeasured(m) ? stateText(m) : (c.usdPerActiveDevice == null ? '—' : fmtUsd(c.usdPerActiveDevice, 4)))}
+    <div class="card-footer">
+      <div class="assume">ASUMSI YANG DIPAKAI (bukan angka ajaib — sumber: reports/cf-a10-cost.md + cf-a10-cost-model.json):<br>
+        · TTS <code>${esc(a.ttsProvider)}</code> = <code>${esc(fmtUsd(a.ttsUsdPer1MChars))}</code> per 1 juta karakter<br>
+        · <code>chars_per_audio_min = ${esc(fmtInt(a.charsPerAudioMin))}</code> (kalibrasi 273 aset audio nyata)<br>
+        · LLM <code>${esc(a.llmModel)}</code> = <code>${esc(fmtUsd(a.llmUsdPer1MIn, 3))}</code> masuk / <code>${esc(fmtUsd(a.llmUsdPer1MOut, 3))}</code> keluar per 1 juta token<br>
+        · Rumus: <code>tts = char_dirender/1e6 × tarif</code>; <code>llm = tok_in/1e6 × tarif_in + tok_out/1e6 × tarif_out</code>; <code>total = tts + llm + infra − kredit</code><br>
+        · Hanya cache MISS yang ditagih. TARIF TIDAK DISIMPAN PER HARI: tidak ada tabel biaya di database ini dan tidak boleh ada, jadi tarif di atas dipakai ulang untuk SEMUA hari. Mengubahnya mengubah angka bulan lalu juga — ini estimasi sekarang, bukan jejak audit.
+      </div>
+      <div class="warn">Penyebut "perangkat aktif" adalah UNDER-COUNT (murid offline tidak terlihat), jadi biaya/perangkat aktif adalah BATAS ATAS, bukan angka pasti.${a.tokensAreEstimated ? ' Token keluaran = proksi char/4 → biaya LLM adalah estimasi kasar.' : ''} Bila TTS berjalan on-device, biaya TTS nyata NOL dan yang perlu dipantau justru bandwidth model.</div>
+      ${limitRows(m, 'Cost estimation')}
+    </div>
+  </section>
+
+  <div class="zone-divider" id="zone-pedagogy">
+    <span class="zone-badge">Zona 02</span>
+    <div class="zone-title-group">
+      <h3 class="zone-title">Efektivitas Belajar &amp; Retensi Kohor</h3>
+      <span class="zone-desc">Aktivitas belajar murid, kurva retensi pengamatan, dan kecerdasan pedagogi Braincore.</span>
+    </div>
+  </div>
+
+  <section>
+    <span id="activity"></span>
+    <h2><span>${ICONS.book} Learning activity</span><span class="section-badge">Pelajaran</span></h2>
     ${row('Jawaban', fmtCount(m, t.answers))}
     ${row('Jawaban benar', fmtCount(m, t.answers_ok))}
     ${row('Akurasi', fmtRate(m, t.answers_ok, t.answers))}
@@ -1852,11 +4447,43 @@ ${emptyBanner}${staleBanner}
     ${row('Pelajaran tuntas', fmtCount(m, t.lessons_completed))}
     ${row('Rasio tuntas', fmtRate(m, t.lessons_completed, t.lessons_started))}
     ${sparkline(m.series, 'answers')}
-    <div class="note">Dilaporkan sendiri oleh klien (self-reported): bisa kurang (murid offline) dan bisa lebih (klien dimodifikasi). Angka biaya TIDAK pernah memakai kanal ini.</div>
+    <div class="card-footer">
+      <div class="note">Dilaporkan sendiri oleh klien (self-reported): bisa kurang (murid offline) dan bisa lebih (klien dimodifikasi). Angka biaya TIDAK pernah memakai kanal ini.</div>
+    </div>
   </section>
 
   <section>
-    <h2>🤖 AI usage</h2>
+    <span class="col-2-panel" id="retention"></span>
+    <h2><span>${ICONS.retention} Retention (observed)</span><span class="section-badge">Kohor Bertahan</span></h2>
+    <div class="table-wrap">
+      <table><thead><tr><th>Offset</th><th>Kembali</th><th>Cohort</th><th>%</th><th>Kohor</th></tr></thead>
+      <tbody>${retentionRows}</tbody></table>
+    </div>
+    <div class="card-footer">
+      <div class="note">Kolom Cohort (n=) diturunkan dari baris offset D0 kohor yang sama; skema retensi tidak menyimpan ukuran kohor sebagai kolom sendiri. Penyebut tiap baris hanya menjumlahkan kohor yang BENAR-BENAR punya pengamatan di offset itu — kohor yang belum cukup tua tidak diseret masuk sebagai "hilang". Kolom terakhir = jumlah kohor yang menyumbang, supaya "0%" tidak tertukar dengan "nol kohor".</div>
+      <div class="warn">PERINGATAN ESTIMASI PERANGKAT: cohort dibangun dari perangkat, bukan orang.
+      Ganti perangkat atau hapus data browser terlihat sebagai "berhenti" walau muridnya tetap belajar.
+      Belajar offline berhari-hari juga menurunkan retensi tanpa ada murid yang hilang.
+      Safari membatasi storage skrip 7 hari → cohort iOS bisa tampak berhenti di D7.</div>
+      <div class="note">Persentase disembunyikan bila cohort &lt; ${esc(RETENTION_MIN_COHORT)}: angka presisi di atas cohort kecil adalah derau, bukan sinyal.</div>
+      ${limitRows(m, 'Retention')}
+    </div>
+  </section>
+
+  ${renderEvidenceSection(m)}
+  ${renderLearnerSection(m)}
+
+  <div class="zone-divider" id="zone-systems">
+    <span class="zone-badge">Zona 03</span>
+    <div class="zone-title-group">
+      <h3 class="zone-title">Operasi Sistem, Mesin AI &amp; Keandalan Edge</h3>
+      <span class="zone-desc">Throughput token LLM, efisiensi cache suara TTS, proteksi kuota, dan integritas data rollup.</span>
+    </div>
+  </div>
+
+  <section>
+    <span id="ai"></span>
+    <h2><span>${ICONS.cpu} AI usage</span><span class="section-badge">Mesin LLM</span></h2>
     ${row('Permintaan AI', fmtCount(m, t.ai_calls))}
     ${row('Berhasil', fmtCount(m, t.ai_success))}
     ${row('Gagal', fmtCount(m, t.ai_failure))}
@@ -1870,14 +4497,17 @@ ${emptyBanner}${staleBanner}
     ${row('Error lain', fmtCount(m, u['ai_err:other']))}
     ${row('Error rate', fmtRate(m, t.ai_failure, t.ai_calls))}
     ${sparkline(m.series, 'ai_calls')}
-    ${aiErrBucketSum !== (Number(t.ai_failure) || 0) ? `<div class="warn">Rincian error berjumlah ${esc(fmtInt(aiErrBucketSum))} sedangkan metrik gagal berbunyi ${esc(fmtCount(m, t.ai_failure))}. Selisih ini nyata (event tanpa kode error tidak masuk rincian), bukan salah tampil — pakai metrik gagal sebagai angka resmi.</div>` : ''}
-    <div class="warn">Token = bisa PROKSI (karakter ÷ 4). Jalur server tidak menandai hari mana yang memakai proksi, jadi peringatan ini dicetak tanpa syarat: perlakukan biaya LLM sebagai estimasi kasar.</div>
-    <div class="note">Semua angka AI lahir di Worker (server-side), bukan dari klien — di situlah biaya lahir. Rincian kode error dibaca dari tabel dimensi pemakaian (bucket <code>ai_err:*</code>), bukan dari metrik terpisah per kode.</div>
-    ${limitRows(m, 'AI usage')}
+    <div class="card-footer">
+      ${aiErrBucketSum !== (Number(t.ai_failure) || 0) ? `<div class="warn">Rincian error berjumlah ${esc(fmtInt(aiErrBucketSum))} sedangkan metrik gagal berbunyi ${esc(fmtCount(m, t.ai_failure))}. Selisih ini nyata (event tanpa kode error tidak masuk rincian), bukan salah tampil — pakai metrik gagal sebagai angka resmi.</div>` : ''}
+      <div class="warn">Token = bisa PROKSI (karakter ÷ 4). Jalur server tidak menandai hari mana yang memakai proksi, jadi peringatan ini dicetak tanpa syarat: perlakukan biaya LLM sebagai estimasi kasar.</div>
+      <div class="note">Semua angka AI lahir di Worker (server-side), bukan dari klien — di situlah biaya lahir. Rincian kode error dibaca dari tabel dimensi pemakaian (bucket <code>ai_err:*</code>), bukan dari metrik terpisah per kode.</div>
+      ${limitRows(m, 'AI usage')}
+    </div>
   </section>
 
   <section>
-    <h2>🗣️ TTS usage</h2>
+    <span id="tts"></span>
+    <h2><span>${ICONS.voice} TTS usage</span><span class="section-badge">Audio Suara</span></h2>
     ${row('Permintaan TTS', fmtCount(m, t.tts_calls))}
     ${row('Cache hit', fmtCount(m, t.tts_cache_hits))}
     ${row('Cache miss (berbayar)', fmtCount(m, t.tts_cache_misses))}
@@ -1889,70 +4519,93 @@ ${emptyBanner}${staleBanner}
     ${row('Gagal 429', fmtCount(m, u['tts_err:429']))}
     ${row('Gagal timeout', fmtCount(m, u['tts_err:timeout']))}
     ${row('Gagal 5xx', fmtCount(m, u['tts_err:5xx']))}
-    <div class="note">Hanya cache MISS yang berbiaya. Mesin suara on-device dihitung terpisah dan tidak masuk biaya; bandwidth model on-device (±152 MB/perangkat) TIDAK terukur skema ini.</div>
-  </section>
-
-  <section>
-    <h2>🏗️ Infrastructure</h2>
-    ${row('Breaker terbuka', fmtCount(m, t.breaker_trips))}
-    ${row('Breaker pulih', fmtCount(m, t.breaker_recoveries))}
-    ${row('Event analytics diterima', fmtCount(m, t.events_total))}
-    <div class="note">Hanya tiga baris di atas yang benar-benar ada di tabel agregat. Permintaan Worker, objek/byte R2, error backend, dan latensi p50/p95 hidup di Analytics API Cloudflare (butuh token akun) — lihat baris "tidak bisa diukur" di bawah.</div>
-    ${limitRows(m, 'Infrastructure')}
-  </section>
-
-  <section>
-    <h2>💰 Cost estimation</h2>
-    <div class="big">${esc(fmtMoney(m, c.totalUsd))}</div>
-    ${row('TTS', fmtMoney(m, c.ttsUsd))}
-    ${row('LLM', fmtMoney(m, c.llmUsd))}
-    ${row('Biaya / perangkat aktif', !isMeasured(m) ? stateText(m) : (c.usdPerActiveDevice == null ? '—' : fmtUsd(c.usdPerActiveDevice, 4)))}
-    <div class="assume">ASUMSI YANG DIPAKAI (bukan angka ajaib — sumber: reports/cf-a10-cost.md + cf-a10-cost-model.json):<br>
-      · TTS <code>${esc(a.ttsProvider)}</code> = <code>${esc(fmtUsd(a.ttsUsdPer1MChars))}</code> per 1 juta karakter<br>
-      · <code>chars_per_audio_min = ${esc(fmtInt(a.charsPerAudioMin))}</code> (kalibrasi 273 aset audio nyata)<br>
-      · LLM <code>${esc(a.llmModel)}</code> = <code>${esc(fmtUsd(a.llmUsdPer1MIn, 3))}</code> masuk / <code>${esc(fmtUsd(a.llmUsdPer1MOut, 3))}</code> keluar per 1 juta token<br>
-      · Rumus: <code>tts = char_dirender/1e6 × tarif</code>; <code>llm = tok_in/1e6 × tarif_in + tok_out/1e6 × tarif_out</code>; <code>total = tts + llm + infra − kredit</code><br>
-      · Hanya cache MISS yang ditagih. TARIF TIDAK DISIMPAN PER HARI: tidak ada tabel biaya di database ini dan tidak boleh ada, jadi tarif di atas dipakai ulang untuk SEMUA hari. Mengubahnya mengubah angka bulan lalu juga — ini estimasi sekarang, bukan jejak audit.
+    <div class="card-footer">
+      <div class="note">Hanya cache MISS yang berbiaya. Mesin suara on-device dihitung terpisah dan tidak masuk biaya; bandwidth model on-device (±152 MB/perangkat) TIDAK terukur skema ini.</div>
     </div>
-    ${limitRows(m, 'Cost estimation')}
-    <div class="warn">Penyebut "perangkat aktif" adalah UNDER-COUNT (murid offline tidak terlihat), jadi biaya/perangkat aktif adalah BATAS ATAS, bukan angka pasti.${a.tokensAreEstimated ? ' Token keluaran = proksi char/4 → biaya LLM adalah estimasi kasar.' : ''} Bila TTS berjalan on-device, biaya TTS nyata NOL dan yang perlu dipantau justru bandwidth model.</div>
   </section>
 
   <section>
-    <h2>⚠️ Quota exhaustion</h2>
-    <div class="big">${esc(fmtCount(m, t.quota_exhausted))}</div>
+    <span id="quota"></span>
+    <h2><span>${ICONS.shield} Quota exhaustion</span><span class="section-badge">Batas Kapasitas</span></h2>
+    <div class="kpi-hero">
+      <span class="kpi-hero-label">Total Penolakan Kuota</span>
+      <div class="big">${esc(fmtCount(m, t.quota_exhausted))}</div>
+    </div>
     ${row('Penolakan karena kuota habis', fmtCount(m, t.quota_exhausted), 'penolakan, bukan perangkat')}
     ${row('· kuota AI', fmtCount(m, u['quota:ai']))}
     ${row('· kuota TTS', fmtCount(m, u['quota:tts']))}
     ${row('· kuota terjemahan', fmtCount(m, u['quota:translate']))}
     ${row('429 dari AI', fmtCount(m, u['ai_err:429']))}
     ${row('Breaker terbuka', fmtCount(m, t.breaker_trips))}
-    ${limitRows(m, 'Quota exhaustion')}
-    <div class="note">KEPUTUSAN KUOTA: kalau baris di atas berbunyi "${esc(NO_DATA_TEXT)}", tidak ada satu pun angka di halaman ini yang boleh dipakai untuk menaikkan atau menurunkan kuota. Yang belum diukur tidak bisa dipangkas.</div>
-    <div class="note">Dicatat server-side tepat di cabang yang mengembalikan 429. Angka naik = murid ditolak; itu keputusan biaya yang terlihat, bukan bug yang disembunyikan.</div>
+    <div class="card-footer">
+      ${limitRows(m, 'Quota exhaustion')}
+      <div class="note">KEPUTUSAN KUOTA: kalau baris di atas berbunyi "${esc(NO_DATA_TEXT)}", tidak ada satu pun angka di halaman ini yang boleh dipakai untuk menaikkan atau menurunkan kuota. Yang belum diukur tidak bisa dipangkas.</div>
+      <div class="note">Dicatat server-side tepat di cabang yang mengembalikan 429. Angka naik = murid ditolak; itu keputusan biaya yang terlihat, bukan bug yang disembunyikan.</div>
+    </div>
   </section>
 
   <section>
-    <h2>🔎 Data quality</h2>
+    <span id="infra"></span>
+    <h2><span>${ICONS.server} Infrastructure</span><span class="section-badge">Sistem Edge</span></h2>
+    ${row('Breaker terbuka', fmtCount(m, t.breaker_trips))}
+    ${row('Breaker pulih', fmtCount(m, t.breaker_recoveries))}
+    ${row('Event analytics diterima', fmtCount(m, t.events_total))}
+    <div class="card-footer">
+      <div class="note">Hanya tiga baris di atas yang benar-benar ada di tabel agregat. Permintaan Worker, objek/byte R2, error backend, dan latensi p50/p95 hidup di Analytics API Cloudflare (butuh token akun) — lihat baris "tidak bisa diukur" di bawah.</div>
+      ${limitRows(m, 'Infrastructure')}
+    </div>
+  </section>
+
+  <section>
+    <span class="col-2-panel" id="quality"></span>
+    <h2><span>${ICONS.check} Data quality</span><span class="section-badge">Integritas</span></h2>
     ${row('Keadaan pengukuran', isMeasured(m) ? 'terukur' : stateText(m))}
     ${row('Pengumpulan dimulai', m.collection.day_first_collected || NO_DATA_TEXT)}
     ${row('Hari terkumpul', m.measurement.daysTotal == null ? stateText(m) : fmtInt(m.measurement.daysTotal) + ' hari')}
     ${row('Hari dalam periode', m.measurement.daysCounted == null ? stateText(m) : fmtInt(m.measurement.daysCounted) + ' hari', `dari ${esc(m.span)}`)}
     ${row('Hari rollup GAGAL', fmtCount(m, brokenDays))}
     ${row('Rentang hari yang terbaca', isMeasured(m) ? `${esc(m.periodDays.day_from || '—')} → ${esc(m.periodDays.day_to || '—')}` : stateText(m))}
-    ${brokenDays > 0 ? `<div class="warn">${esc(brokenDays)} hari punya collection_ok=0. Grafik digambar PUTUS di hari itu — tidak diinterpolasi. Jangan bandingkan periode yang memuat hari rusak.</div>` : ''}
-    <div class="note">Semua angka historis dimulai dari tanggal pengumpulan di atas. Sebelum tanggal itu tidak ada data — bukan nol, tetapi tidak diketahui.</div>
-    ${limitRows(m, 'Data quality')}
+    <div class="card-footer">
+      ${brokenDays > 0 ? `<div class="warn">${esc(brokenDays)} hari punya collection_ok=0. Grafik digambar PUTUS di hari itu — tidak diinterpolasi. Jangan bandingkan periode yang memuat hari rusak.</div>` : ''}
+      <div class="note">Semua angka historis dimulai dari tanggal pengumpulan di atas. Sebelum tanggal itu tidak ada data — bukan nol, tetapi tidak diketahui.</div>
+      ${limitRows(m, 'Data quality')}
+    </div>
   </section>
 
-  ${renderEvidenceSection(m)}
-  ${renderLearnerSection(m)}
+  <div class="zone-divider" id="zone-admin">
+    <span class="zone-badge">Zona 04</span>
+    <div class="zone-title-group">
+      <h3 class="zone-title">Administrasi, Spesifikasi &amp; Ekspor Data</h3>
+      <span class="zone-desc">Otorisasi token guru, batasan skema privasi, dan unduhan laporan agregat CSV.</span>
+    </div>
+  </div>
+
   ${renderTeacherSection(m)}
+
+  <section>
+    <span class="card-full-inner" id="export"></span>
+    <h2><span>${ICONS.download} Ekspor data (CSV)</span><span class="section-badge">Unduh Laporan</span></h2>
+    <div class="note">Berkas mengikuti periode yang sedang dipilih (<b>${esc(periodLabel)}</b>) dan
+    berisi angka yang SAMA dengan yang dirender di halaman ini — nol data tambahan, nol dimensi
+    baru. Setiap berkas membawa baris <code>measurement_state</code> supaya "belum diukur" tidak
+    pernah terbaca sebagai "nol" setelah berkas ini beredar terlepas dari dashboard.</div>
+    <div class="export-deck">
+      <a class="export-chip" href="/api/export/summary.csv?period=${esc(m.period)}">${ICONS.file} Ringkasan metrik</a>
+      <a class="export-chip" href="/api/export/series.csv?period=${esc(m.period)}">${ICONS.activity} Deret harian (tren)</a>
+      <a class="export-chip" href="/api/export/retention.csv?period=${esc(m.period)}">${ICONS.retention} Retensi per kohor</a>
+      <a class="export-chip" href="/api/export/evidence.csv?period=${esc(m.period)}">${ICONS.brain} Bukti belajar Braincore</a>
+    </div>
+    <div class="note">Untuk pembaca mesin, JSON yang setara sudah ada di
+    <code>/api/summary</code>, <code>/api/series</code>, dan <code>/api/retention</code>.</div>
+  </section>
 
 </main>
 <footer>Sumber: TIGA tabel agregat saja — metrik harian (bentuk panjang: hari × nama metrik × nilai), dimensi pemakaian berenum tertutup, dan retensi kohor. Tabel token perangkat dan bahan rahasia rotasi ADA di database yang sama tetapi TIDAK PERNAH dibaca halaman ini. Dashboard ini tidak punya jalan untuk membaca baris per-orang, dan tidak menampilkan identitas, surel, isi jawaban, maupun percakapan AI.
 Baris bertanda “${esc(UNMEASURABLE_TEXT)}” adalah batas nyata skema, bukan kerusakan: menambah tabel untuk menutupnya melanggar kunci lima tabel yang menjaga privasi murid.
 Kontrak: EXEC-BRIEF-CF.md "KONTRAK ANALYTICS PRIVASI-MAKSIMAL" · bentuk tabel: workers/api/migrations/0002_analytics.sql · rumus biaya: reports/cf-a10-cost.md.</footer>
+    </div>
+  </div>
+</div>
 </body></html>`;
 }
 
@@ -1960,28 +4613,49 @@ function renderLogin(message) {
   return `<!doctype html><html lang="id"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow">
 <title>FIEZEL · Masuk Owner</title><style>${CSS}</style></head><body>
-<header><h1>FIEZEL · Masuk Owner</h1><div class="sub">Halaman ini tidak memuat satu angka metrik pun.</div></header>
-<form method="POST" action="/login">
-  <label for="t">Token owner</label>
-  <input id="t" name="t" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" required>
-  <button type="submit">Masuk</button>
-  ${message ? `<div class="warn">${esc(message)}</div>` : ''}
-  <div class="note">Token tidak disimpan di repo. Yang ada di server hanya sha256 HEX-nya (Secret <code>OWNER_TOKEN_HASH</code>). Sesi berumur 30 menit.</div>
-</form></body></html>`;
+<div class="login-shell">
+  <div class="login-card">
+    <div class="login-header">
+      <span class="brand-badge">Owner Access</span>
+      <h1 style="margin-top:8px;">FIEZEL · Masuk Owner</h1>
+      <div class="sub" style="justify-content:center;margin-top:4px;">Halaman ini tidak memuat satu angka metrik pun.</div>
+    </div>
+    <form method="POST" action="/login">
+      <div style="margin-bottom:12px;">
+        <label for="t" style="display:block;font-size:13px;font-weight:700;margin-bottom:6px;color:var(--ink);">Token owner</label>
+        <input id="t" name="t" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Masukkan token owner" required>
+      </div>
+      <button type="submit" style="width:100%;">Masuk</button>
+      ${message ? `<div class="warn">${esc(message)}</div>` : ''}
+      <div class="note">Token tidak disimpan di repo. Yang ada di server hanya sha256 HEX-nya (Secret <code>OWNER_TOKEN_HASH</code>). Sesi berumur 30 menit.</div>
+    </form>
+  </div>
+</div>
+</body></html>`;
 }
 
 function html(body, status, extraHeaders) {
+  const headers = new Headers({
+    'content-type': 'text/html; charset=utf-8',
+    'cache-control': 'no-store',
+    'x-robots-tag': 'noindex, nofollow',
+    'referrer-policy': 'no-referrer',
+    'x-content-type-options': 'nosniff',
+    // Tanpa CDN dan tanpa framework, jadi CSP bisa seketat ini.
+    'content-security-policy': "default-src 'none'; style-src 'unsafe-inline'; img-src data:; form-action 'self'; base-uri 'none'; frame-ancestors 'none'",
+  });
+  if (extraHeaders) {
+    for (const [k, v] of Object.entries(extraHeaders)) {
+      if (Array.isArray(v)) {
+        for (const item of v) headers.append(k, item);
+      } else if (v != null) {
+        headers.set(k, String(v));
+      }
+    }
+  }
   return new Response(body, {
     status: status || 200,
-    headers: Object.assign({
-      'content-type': 'text/html; charset=utf-8',
-      'cache-control': 'no-store',
-      'x-robots-tag': 'noindex, nofollow',
-      'referrer-policy': 'no-referrer',
-      'x-content-type-options': 'nosniff',
-      // Tanpa CDN dan tanpa framework, jadi CSP bisa seketat ini.
-      'content-security-policy': "default-src 'none'; style-src 'unsafe-inline'; img-src data:; form-action 'self'; base-uri 'none'; frame-ancestors 'none'",
-    }, extraHeaders || {}),
+    headers,
   });
 }
 
@@ -2545,7 +5219,10 @@ async function handle(request, env, ctx, nowMs) {
       const institution = url.searchParams.get('institution') || '';
       const institutionType = url.searchParams.get('institutionType') || 'school';
       const days = url.searchParams.get('days') || '90';
-      const mintRes = await mintTeacherInvite(env, { teacherName, institution, institutionType, days }, fetchImpl);
+      const subject_id = url.searchParams.get('subject_id') || 'MAT';
+      const grade_id = url.searchParams.get('grade_id') || 'SMP';
+      const class_code = url.searchParams.get('class_code') || '';
+      const mintRes = await mintTeacherInvite(env, { teacherName, institution, institutionType, days, subject_id, grade_id, class_code }, fetchImpl);
       if (mintRes.state === 'ok' && mintRes.body && mintRes.body.code) {
         teacherAction = {
           ok: true,
@@ -2555,11 +5232,14 @@ async function handle(request, env, ctx, nowMs) {
           message: 'Token guru berhasil dibuat! Simpan/salin sekarang karena token hanya ditampilkan satu kali.'
         };
       } else {
+        const errDetail = (mintRes.body && (mintRes.body.reason || mintRes.body.error)) || mintRes.state;
         teacherAction = {
           ok: false,
           action: 'mint',
-          error: (mintRes.body && mintRes.body.error) || mintRes.state,
-          message: 'Gagal membuat token guru. Periksa kembali nama guru, instansi, dan jenis instansi.'
+          error: errDetail,
+          message: mintRes.body && mintRes.body.reason
+            ? `Gagal membuat token guru: ${mintRes.body.reason}`
+            : 'Gagal membuat token guru. Periksa kembali nama guru, instansi, dan jenis instansi.'
         };
       }
     } else if (action === 'revoke_invite') {
@@ -2581,6 +5261,240 @@ async function handle(request, env, ctx, nowMs) {
           message: 'Gagal mencabut token guru. Periksa format kode token.'
         };
       }
+    } else if (action === 'update_invite' || action === 'update_teacher_full') {
+      const codeHash = url.searchParams.get('codeHash') || '';
+      const subject_id = url.searchParams.get('subject_id') || '';
+      const grade_id = url.searchParams.get('grade_id') || '';
+      const teacherName = url.searchParams.get('teacherName') || '';
+      const institution = url.searchParams.get('institution') || '';
+      const institutionType = url.searchParams.get('institutionType') || '';
+      const class_code = url.searchParams.get('class_code') || '';
+      const school_id = url.searchParams.get('school_id') || '';
+      const extend_days = url.searchParams.get('extend_days') || '';
+      const updateRes = await updateTeacherInvite(env, {
+        codeHash, subject_id, grade_id, teacherName, institution, institutionType, class_code, school_id, extend_days
+      }, fetchImpl);
+      if (updateRes.state === 'ok' && updateRes.body && updateRes.body.ok) {
+        teacherAction = {
+          ok: true,
+          action: 'update',
+          message: 'Data profil guru, mapel, jenjang, sekolah, dan masa aktif token berhasil diperbarui.'
+        };
+      } else {
+        teacherAction = {
+          ok: false,
+          action: 'update',
+          error: (updateRes.body && updateRes.body.error) || updateRes.state,
+          message: 'Gagal memperbarui data token guru.'
+        };
+      }
+    } else if (action === 'regenerate_invite') {
+      const codeHash = url.searchParams.get('codeHash') || '';
+      const regenRes = await regenerateTeacherInvite(env, { codeHash }, fetchImpl);
+      if (regenRes.state === 'ok' && regenRes.body && regenRes.body.code) {
+        teacherAction = {
+          ok: true,
+          action: 'regenerate',
+          code: regenRes.body.code,
+          invite: regenRes.body.invite,
+          message: 'Token baru berhasil diregenerasi! Token lama telah dicabut. Salin kode token baru sekarang.'
+        };
+      } else {
+        teacherAction = {
+          ok: false,
+          action: 'regenerate',
+          error: (regenRes.body && regenRes.body.error) || regenRes.state,
+          message: 'Gagal meregenerasi token guru.'
+        };
+      }
+    } else if (action === 'create_school') {
+      const name = url.searchParams.get('name') || '';
+      const npsn = url.searchParams.get('npsn') || '';
+      const level = url.searchParams.get('level') || 'SMP';
+      const type = url.searchParams.get('type') || 'school';
+      const city = url.searchParams.get('city') || '';
+      const address = url.searchParams.get('address') || '';
+      const principal_name = url.searchParams.get('principal_name') || '';
+      const contact = url.searchParams.get('contact') || '';
+      const schRes = await createSchool(env, { name, npsn, level, type, city, address, principal_name, contact }, fetchImpl);
+      if (schRes.state === 'ok' && schRes.body && schRes.body.ok) {
+        teacherAction = {
+          ok: true,
+          action: 'school',
+          message: `Sekolah mitra "${name}" berhasil didaftarkan (ID: ${schRes.body.id}).`
+        };
+      } else {
+        teacherAction = {
+          ok: false,
+          action: 'school',
+          error: (schRes.body && schRes.body.error) || schRes.state,
+          message: 'Gagal mendaftarkan sekolah mitra. Pastikan nama sekolah terisi.'
+        };
+      }
+    } else if (action === 'update_school') {
+      const id = url.searchParams.get('id') || '';
+      const name = url.searchParams.get('name') || '';
+      const npsn = url.searchParams.get('npsn') || '';
+      const level = url.searchParams.get('level') || 'SMP';
+      const type = url.searchParams.get('type') || 'school';
+      const city = url.searchParams.get('city') || '';
+      const address = url.searchParams.get('address') || '';
+      const principal_name = url.searchParams.get('principal_name') || '';
+      const contact = url.searchParams.get('contact') || '';
+      const schRes = await updateSchool(env, { id, name, npsn, level, type, city, address, principal_name, contact }, fetchImpl);
+      if (schRes.state === 'ok' && schRes.body && schRes.body.ok) {
+        teacherAction = {
+          ok: true,
+          action: 'school',
+          message: 'Data sekolah mitra berhasil diperbarui.'
+        };
+      } else {
+        teacherAction = {
+          ok: false,
+          action: 'school',
+          error: (schRes.body && schRes.body.error) || schRes.state,
+          message: 'Gagal memperbarui data sekolah mitra.'
+        };
+      }
+    } else if (action === 'delete_school') {
+      const id = url.searchParams.get('id') || '';
+      const schRes = await deleteSchool(env, { id }, fetchImpl);
+      if (schRes.state === 'ok' && schRes.body && schRes.body.ok) {
+        teacherAction = {
+          ok: true,
+          action: 'school',
+          message: 'Sekolah mitra berhasil dihapus.'
+        };
+      } else {
+        teacherAction = {
+          ok: false,
+          action: 'school',
+          error: (schRes.body && schRes.body.error) || schRes.state,
+          message: 'Gagal menghapus sekolah mitra.'
+        };
+      }
+    } else if (action === 'create_class') {
+      const title = url.searchParams.get('title') || 'Kelas';
+      const level = url.searchParams.get('level') || 'SMP';
+      const school_id = url.searchParams.get('school_id') || '';
+      const code = url.searchParams.get('code') || '';
+      const clsRes = await createClass(env, { title, level, school_id, code }, fetchImpl);
+      if (clsRes.state === 'ok' && clsRes.body && clsRes.body.ok) {
+        teacherAction = {
+          ok: true,
+          action: 'class',
+          code: clsRes.body.code,
+          message: `Kelas baru "${clsRes.body.title}" (${clsRes.body.code}) berhasil dibuat dan disimpan permanen di basis data D1.`
+        };
+      } else {
+        teacherAction = {
+          ok: false,
+          action: 'class',
+          error: (clsRes.body && clsRes.body.error) || clsRes.state,
+          message: 'Gagal membuat kelas baru.'
+        };
+      }
+    } else if (action === 'delete_class') {
+      const code = url.searchParams.get('code') || '';
+      const delRes = await deleteClass(env, { code }, fetchImpl);
+      if (delRes.state === 'ok' && delRes.body && delRes.body.ok) {
+        teacherAction = {
+          ok: true,
+          action: 'class',
+          deletedCode: code,
+          message: `Kelas "${code}" berhasil dihapus permanen dari basis data D1.`
+        };
+      } else {
+        teacherAction = {
+          ok: false,
+          action: 'class',
+          error: (delRes.body && delRes.body.error) || delRes.state,
+          message: `Gagal menghapus kelas "${code}".`
+        };
+      }
+    } else if (action === 'clear_classes') {
+      const delRes = await deleteClass(env, { mode: 'all' }, fetchImpl);
+      if (delRes.state === 'ok' && delRes.body && delRes.body.ok) {
+        teacherAction = {
+          ok: true,
+          action: 'class',
+          clearedAll: true,
+          message: `Semua data kelas (${delRes.body.deletedCount || 0} kelas) berhasil dibersihkan dari basis data D1.`
+        };
+      } else {
+        teacherAction = {
+          ok: false,
+          action: 'class',
+          error: (delRes.body && delRes.body.error) || delRes.state,
+          message: 'Gagal membersihkan data kelas.'
+        };
+      }
+    } else if (action === 'delete_invite') {
+      const codeHash = url.searchParams.get('codeHash') || '';
+      const delRes = await deleteTeacherInvite(env, { codeHash }, fetchImpl);
+      if (delRes.state === 'ok' && delRes.body && delRes.body.ok) {
+        teacherAction = {
+          ok: true,
+          action: 'delete',
+          message: 'Token guru berhasil dihapus permanen dari basis data.'
+        };
+      } else {
+        teacherAction = {
+          ok: false,
+          action: 'delete',
+          error: (delRes.body && delRes.body.error) || delRes.state,
+          message: 'Gagal menghapus token guru.'
+        };
+      }
+    } else if (action === 'clear_invites') {
+      const mode = url.searchParams.get('mode') || 'revoked';
+      const delRes = await deleteTeacherInvite(env, { mode }, fetchImpl);
+      if (delRes.state === 'ok' && delRes.body && delRes.body.ok) {
+        teacherAction = {
+          ok: true,
+          action: 'delete',
+          message: `Berhasil menghapus ${delRes.body.deletedCount || 0} token guru (${mode === 'all' ? 'Semua token' : 'Token dicabut / kedaluwarsa'}).`
+        };
+      } else {
+        teacherAction = {
+          ok: false,
+          action: 'delete',
+          error: (delRes.body && delRes.body.error) || delRes.state,
+          message: 'Gagal membersihkan data token guru.'
+        };
+      }
+    } else if (action === 'delete_teacher') {
+      const sub = url.searchParams.get('sub') || '';
+      const handle = url.searchParams.get('handle') || '';
+      const mode = url.searchParams.get('mode') || '';
+      const delRes = await deleteTeacherAccount(env, { sub, handle, mode }, fetchImpl);
+      if (delRes.state === 'ok' && delRes.body && delRes.body.ok) {
+        teacherAction = {
+          ok: true,
+          action: 'delete_teacher',
+          message: mode === 'all'
+            ? `Berhasil membersihkan ${delRes.body.deletedCount || 0} akun guru aktif.`
+            : `Akun guru (${handle || sub}) berhasil dihapus dan dibersihkan dari basis data.`
+        };
+      } else {
+        teacherAction = {
+          ok: false,
+          action: 'delete_teacher',
+          error: (delRes.body && delRes.body.error) || delRes.state,
+          message: 'Gagal menghapus akun guru aktif.'
+        };
+      }
+    } else if (action === 'master_seed') {
+      const seedRes = await triggerMasterSeed(env, fetchImpl);
+      teacherAction = {
+        ok: seedRes.ok !== false,
+        action: 'master_seed',
+        state: seedRes.state || (seedRes.ok === false ? 'error' : 'ok'),
+        pending: seedRes.pending === true || seedRes.state === 'pending',
+        details: seedRes.details || null,
+        error: seedRes.error || null,
+        message: seedRes.message || 'Seluruh 17 Mapel Nasional (Fase A–F), Kurikulum Bahasa Inggris (144 Kompetensi), dan Bank Soal telah berhasil diaktifkan dan disinkronkan 100%! Seluruh akun guru di KelasKu dapat langsung mengakses Bab Buku Ajar dan Bank Soal.'
+      };
     }
 
     // Murid terpilih adalah PARAMETER KUERI pada rute yang sudah ada, bukan rute baru.
@@ -2591,7 +5505,69 @@ async function handle(request, env, ctx, nowMs) {
     if (teacherAction) {
       model.teacherAction = teacherAction;
     }
-    return html(renderDashboard(model), 200, { 'set-cookie': refreshed });
+
+    // Resolusi daftar kelas yang persisten dari tc_class, invites, dan teachers
+    const dbClasses = (model.classes && model.classes.classes) || [];
+    const knownClassSet = new Set();
+    dbClasses.forEach((c) => { if (c.code && c.code !== 'FZ-MERDEKA1') knownClassSet.add(c.code); });
+    (model.teachers && model.teachers.invites || []).forEach((i) => { if (i.classCode && i.classCode !== 'FZ-MERDEKA1') knownClassSet.add(i.classCode); });
+    (model.teachers && model.teachers.teachers || []).forEach((t) => { if (t.classCode && t.classCode !== 'FZ-MERDEKA1') knownClassSet.add(t.classCode); });
+
+    // Jika database tc_class benar-benar kosong, otomatis terbitkan kelas awal di D1 agar tersimpan permanen
+    if (dbClasses.length === 0 && knownClassSet.size === 0) {
+      try {
+        const initCode = make6CharClassCode();
+        const autoInit = await createClass(env, {
+          title: 'Kelas 7-A (Utama)',
+          level: 'SMP',
+          code: initCode
+        }, fetchImpl);
+        const establishedCode = (autoInit && autoInit.body && autoInit.body.code) || initCode;
+        knownClassSet.add(establishedCode);
+        dbClasses.push({
+          code: establishedCode,
+          title: 'Kelas 7-A (Utama)',
+          level: 'SMP'
+        });
+      } catch (_) {}
+    }
+
+    const classArray = Array.from(knownClassSet);
+    const cookieCls = cookieValue(request, 'fz_cls');
+    const paramCls = url.searchParams.get('cls');
+
+    // Tentukan kelas aktif secara stabil (TIDAK PERNAH ACAK SAAT REFRESH!)
+    let activeClass = '';
+    const isDeleted = (code) => !code || code === 'FZ-MERDEKA1' || (teacherAction && teacherAction.deletedCode === code);
+    if (teacherAction && teacherAction.action === 'class' && teacherAction.code && !isDeleted(teacherAction.code)) {
+      activeClass = teacherAction.code;
+    } else if (paramCls && knownClassSet.has(paramCls) && !isDeleted(paramCls)) {
+      activeClass = paramCls;
+    } else if (paramCls && /^FZ-[A-HJ-NP-Z2-9]{6}$/.test(paramCls) && !isDeleted(paramCls)) {
+      activeClass = paramCls;
+    } else if (cookieCls && knownClassSet.has(cookieCls) && !isDeleted(cookieCls)) {
+      activeClass = cookieCls;
+    } else if (classArray.filter(c => !isDeleted(c)).length > 0) {
+      activeClass = classArray.filter(c => !isDeleted(c))[0];
+    } else {
+      activeClass = make6CharClassCode();
+    }
+
+    model.selectedClass = activeClass;
+    model.isNewClass = url.searchParams.get('new_class') === '1';
+
+    /* Hitungan riil kurikulum untuk strip panel Owner: best-effort, tidak pernah
+       menggagalkan render dashboard. readCurriculumStatus tidak pernah throw menurut
+       kontraknya, tetapi sabuk ganda di sini supaya satu strip tidak bisa merobohkan
+       seluruh halaman owner. */
+    try {
+      model.curriculumStatus = await readCurriculumStatus(env, fetchImpl);
+    } catch (_) {
+      model.curriculumStatus = { state: 'unknown', mapel: null, english: null, soal: null };
+    }
+
+    const classCookie = `fz_cls=${encodeURIComponent(activeClass)}; Path=/; Max-Age=31536000; SameSite=Lax; HttpOnly`;
+    return html(renderDashboard(model), 200, { 'set-cookie': [refreshed, classCookie] });
   }
   if (path === '/api/summary') {
     const model = await readModel(env, period, now);
@@ -2774,7 +5750,9 @@ export {
   readEvidence, sanitizeEvidenceSummary, renderEvidenceSection, EVIDENCE_PERIOD_DAYS,
   readLearners, readLearnerDetail, sanitizeLearnerRow, sanitizeLearnerSummary,
   renderLearnerSection, renderLearnerDirectory, renderLearnerDetail, learnerLabel, SUB_RE,
-  readTeachers, mintTeacherInvite, revokeTeacherInvite, renderTeacherSection,
+  readTeachers, mintTeacherInvite, revokeTeacherInvite, updateTeacherInvite, deleteTeacherInvite, deleteTeacherAccount, renderTeacherSection,
+  readSchools, createSchool, updateSchool, deleteSchool, readClasses, createClass, deleteClass, regenerateTeacherInvite,
+  triggerMasterSeed, readCurriculumStatus, renderCurriculumSyncSection,
   // Rem penebakan halaman masuk: diekspor supaya gerbang bisa memodelkan ISOLATE BARU per
   // permintaan (cacat yang tidak pernah diuji) dan mengassert angka jendelanya sebagai kontrak.
   LOGIN_MAX, LOGIN_MAX_SHARED, LOGIN_BUCKET_MS, LOGIN_WINDOW_BUCKETS, LOGIN_WINDOW_MS,

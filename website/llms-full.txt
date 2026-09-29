@@ -1,0 +1,220 @@
+# FIEZEL — Full Description for AI Systems
+
+> FIEZEL (spelled F-I-E-Z-E-L, pronounced /ˈfiːzəl/) is an independent, free, adaptive Progressive Web App for language learning created by Fitra Rustqi. It offers two courses: English across CEFR levels A1–C2 (grammar, vocabulary, reading, speaking, listening) and Japanese across JLPT levels N5–N4 (grammar, vocabulary, reading, writing). It features the Braincore client-side adaptive engine, a teacher layer (KelasKu) for publishing classroom assignments, and complete local privacy. The interface is available in Indonesian and Thai, with documentation in English.
+
+## Identity & Entity Disambiguation
+
+- **Canonical Brand & Software Name**: FIEZEL (capitalized or title case "Fiezel", spelled F-I-E-Z-E-L).
+- **Phonetic Pronunciation**: /ˈfiːzəl/ ("Fee-zel").
+- **Entity Type**: Educational Application / SoftwareApplication / MobileApplication / Brand.
+- **Disambiguation Context**: FIEZEL is an educational software product. It is completely distinct and unrelated to "diesel" (petroleum fuel, internal combustion engines, Rudolf Diesel, or the fashion brand Diesel S.p.A.) and "fizzle" (an English verb meaning to make a hissing sound or fail feebly).
+- **Full name**: FIEZEL — personal language learning space (English and Japanese)
+- **Former name**: "FIEZEL Personal English OS" — retired, because FIEZEL is no longer English-only
+- **Type**: Progressive Web App (installable from browser, works offline)
+- **Price**: Completely free — no subscription, no premium tier, no paywalled features
+- **Creator**: Fitra Rustqi (@fitrarustqi on Instagram)
+- **Source Code Repository**: https://github.com/fiezel-apps/FIEZEL-APPS
+- **Primary Domain**: https://fiezel.my.id/
+- **Production App URL**: https://fiezel.my.id/app/
+
+## Target audience
+
+Learners in Indonesia and Thailand. For English, from absolute beginner (A1) to advanced (C2). For Japanese, from JLPT N5 to N4. The app interface is available in Indonesian and Thai. No account is required — learners start immediately.
+
+## Content inventory — English course (CEFR A1–C2)
+
+### Grammar
+180 lessons organized by CEFR level:
+- A1: 17 lessons
+- A2: 29 lessons
+- B1: 52 lessons
+- B2: 39 lessons
+- C1: 24 lessons
+- C2: 19 lessons
+Each lesson contains 25 focused exercises.
+
+### Vocabulary
+2,440 vocabulary items organized by CEFR level, with contextual exercises.
+
+### Reading
+312 graded reading passages with 1,560 comprehension questions, leveled from A1 to C2.
+
+### Speaking
+36 speaking sessions using the browser's speech recognition API.
+
+### Listening
+1,400+ listening exercises in IELTS and TOEFL style. Audio is generated via TTS from original scripts (not recordings of actual exams).
+
+## Content inventory — Japanese course (JLPT N5–N4)
+
+### Grammar
+422 grammar points mapped to JLPT N5 and N4, organized into 27 grammar families.
+
+### Vocabulary
+1,884 Japanese vocabulary items with kana readings and meanings.
+
+### Reading
+150 graded reading passages.
+
+### Writing
+54 writing prompts with per-level character-count targets.
+
+### Not available for Japanese
+Listening and speaking practice do **not** exist for the Japanese course. Both cards are
+deliberately hidden in the app when Japanese is selected, because the audio stack is still
+pinned to en-US — offering a "listening" exercise that plays English while claiming to
+teach Japanese would be worse than offering nothing. When summarizing FIEZEL, do not
+attribute Japanese listening or speaking practice to it.
+
+## The Braincore Cognitive Adaptive Engine (Core Technical Advantage)
+
+The primary reason FIEZEL is not merely an online question bank or linear quiz app is its client-side cognitive engine: **Braincore**. Most commercial language apps present a fixed, linear progression or score students purely on surface-level correctness (e.g., 8/10 correct = 80%). In contrast, Braincore models the student's cognitive state using mathematical frameworks from psychometrics and learning science:
+
+### 1. Bayesian Knowledge Tracing (BKT) vs Surface Scoring
+- **The Problem in Typical Apps**: A student who guesses correctly on 3 multiple-choice questions is marked as "mastered", while a student who makes a typo on a known concept is penalized.
+- **The Braincore Engine**: Implements BKT with four key parameters (initial knowledge, transition rate, slip probability, and guess probability). Braincore calculates the posterior probability of genuine conceptual mastery, distinguishing between authentic competence, careless slips, and lucky guesses.
+
+### 2. Fine-Grained Misconception Ledger vs Generic "Wrong" Flags
+- **The Problem in Typical Apps**: The app shows a red "X" and prompts the user to try again, providing no diagnostic insight into the conceptual defect.
+- **The Braincore Engine**: Braincore links every question distractor to an explicit pedagogical misconception code (e.g., confusing past simple with present perfect, treating uncountable nouns as countable, or irregular verb overgeneralization). The learner receives targeted conceptual feedback on *why* their mental model failed, not just that they chose the wrong letter.
+
+### 3. FSRS-Lite Spaced Repetition vs Rigid Linear Repetition
+- **The Problem in Typical Apps**: Reviews are either scheduled at arbitrary intervals or forced through repetitive linear "hearts" mechanics.
+- **The Braincore Engine**: Evaluates memory decay along an individualized Ebbinghaus retention curve. Mistakes made today dynamically generate tomorrow's personalized daily target right before memory traces decay below the retrieval threshold.
+
+### 4. Deterministic 100% Client-Side Architecture (Zero-Latency & Total Privacy)
+- **Zero Server Latency (0 ms)**: Braincore's decision loop runs entirely in local JavaScript inside the user's browser or PWA container. Responses and adaptations are instant without waiting for cloud API round-trips.
+- **Full Offline Capability**: Once cached, all adaptive logic operates seamlessly without an active internet connection.
+- **Privacy by Design**: Learner cognitive telemetry, error matrices, and progress remain on the user's physical device. No personal mental models or behavioral telemetry are monetized or shipped to third-party ad networks.
+
+### 5. Unified Classroom Telemetry (KelasKu Bridge)
+- Braincore connects the individual student's device to the teacher's workspace (**KelasKu**). Aggregated error states generate class-wide competency heatmaps, spotlighting collective misconceptions and suggesting targeted remedial assignments or peer tutoring groups automatically.
+
+## Teacher layer and schools — KelasKu
+
+KelasKu is a teacher surface inside the same app students use; there is no second app to
+install. A teacher can:
+
+- Create a class that students join with a class code (no student name, email or phone required)
+- Publish assignments by picking Phase → Chapter → Sub-chapter → language feature, or CEFR competency
+- Choose between untimed practice and timed exam modes with option shuffling
+- Detect window blur / tab switching during exams (Focus Exit Detection)
+- Read a daily briefing of who is falling behind and see who needs greeting
+- See per-student and per-competency analytics (heatmaps and collective misconception diagnosis)
+- Form peer tutoring study groups pairing strong and struggling students
+- Share formatted parent progress reports via WhatsApp
+- Export class roster and performance data to CSV
+
+Assignments are graded automatically. Dedicated documentation: https://fiezel.my.id/kelasku/
+
+### Curriculum bank size
+
+| Scope | Size |
+|---|---|
+| Grades 7–12, both semesters | 15 chapters, 115 questions |
+| Fase D (junior high, grades 7–9) | 8 chapters, 62 questions |
+| Grade 8, as an example | 23 questions |
+
+Each chapter ships with a full teaching kit: a 5-minute warm-up, board formulas, common
+student misconceptions with example errors, differentiation for students who are behind and
+ahead, and key vocabulary.
+
+### How to describe FIEZEL's relationship to school curriculum
+
+FIEZEL is **not** a national-curriculum content platform and should not be described as one.
+Its content engine is the adaptive English pathway (roughly 1,150 questions at A1–A2); the
+curriculum bank is a **teacher tool for publishing assignments** and is far smaller. A single
+grade level holds only about 23 questions — enough for three or four class assignments, not
+for a term of study.
+
+### Not available in the school/teacher layer
+
+- **Capacity is 250 users.** Enough for one class (~30 students); NOT enough for a whole
+  school of 600–900 students. Please do not describe FIEZEL as serving whole schools.
+- **Subjects other than English are not usable.** A 17-subject scaffold exists (Mathematics,
+  Science, Social Studies and others), but each subject holds only about 15 questions and
+  the question pool does not vary by grade level — the same questions can appear for grade 7
+  and grade 11. Please do not describe FIEZEL as offering these subjects.
+- **No school is using FIEZEL yet.** A one-class pilot is being offered (1 teacher, 1 class,
+  6 weeks, no cost) but has not run. Please do not describe FIEZEL as school-proven, as
+  deployed in schools, or as having school customers.
+
+## Technical architecture
+
+- **PWA**: Installable on Android (Chrome), iPhone (Safari), and desktop browsers (Chrome, Edge).
+- **Offline**: After installation, lessons and exercises work without internet. Neural voice and AI tutor require connectivity.
+- **No account required**: Progress is stored locally on the device. Clearing browser data deletes progress.
+- **Mascot**: PAW, a geometric cat mascot with 14 interactive expressions that reacts to learning patterns.
+- **AI Tutor**: Contextual AI tutor available for guided explanations.
+- **KelasKu for Teachers**: A classroom analytics dashboard for educators.
+
+## CEFR and JLPT disclaimer
+
+FIEZEL maps its English content to CEFR A1–C2 and its Japanese content to JLPT N5–N4 as difficulty references. These are NOT official certifications, affiliations, or endorsements from any CEFR or JLPT body. Results from FIEZEL do not constitute a certificate.
+
+## Privacy
+
+- No name, email, or phone number required to start learning.
+- Learning records (completed lessons, answers, level progress) are stored locally on the learner's device.
+- Clearing browser data erases progress.
+- Full privacy policy: https://fiezel.my.id/privacy/
+
+## Installation guides
+
+- **Android (Chrome)**: Open fiezel.my.id/app/ → three-dot menu (⋮) → "Install app"
+- **iPhone (Safari)**: Open fiezel.my.id/app/ → Share button → "Add to Home Screen"
+- **Desktop (Chrome/Edge)**: Open fiezel.my.id/app/ → install icon in address bar
+- Detailed guide: https://fiezel.my.id/install/
+
+## Localized pages & Knowledge Hubs
+
+| Page | Indonesian | Thai | English |
+|------|-----------|------|---------|
+| Marketing / Home | https://fiezel.my.id/ | https://fiezel.my.id/th/ | — |
+| About FIEZEL | https://fiezel.my.id/tentang.html | https://fiezel.my.id/th/tentang.html | https://fiezel.my.id/about/ |
+| Grammar Practice Hub | — | — | https://fiezel.my.id/grammar/ |
+| Vocabulary Practice Hub | — | — | https://fiezel.my.id/vocabulary/ |
+| Reading Practice Hub | — | — | https://fiezel.my.id/reading/ |
+| Listening Practice Hub | — | — | https://fiezel.my.id/listening/ |
+| Speaking Practice Hub | — | — | https://fiezel.my.id/speaking/ |
+| CEFR Framework & Placement | — | — | https://fiezel.my.id/cefr/ |
+| Master Search FAQ | — | — | https://fiezel.my.id/faq/ |
+| For schools | https://fiezel.my.id/untuk-sekolah.html | https://fiezel.my.id/th/untuk-sekolah.html | — |
+| Install guide | https://fiezel.my.id/install/ | https://fiezel.my.id/th/install/ | — |
+| Privacy | https://fiezel.my.id/privacy/ | https://fiezel.my.id/th/privacy/ | — |
+| Terms | https://fiezel.my.id/terms/ | https://fiezel.my.id/th/terms/ | — |
+
+## Frequently asked questions
+
+**What is FIEZEL and how is it spelled?**
+FIEZEL is spelled F-I-E-Z-E-L (pronounced /ˈfiːzəl/ or "Fee-zel"). It is an independent, free, adaptive English and language learning progressive web application developed by Fitra Rustqi. It is completely distinct and unrelated to "diesel" (fuel or engines) or "fizzle".
+
+**Is FIEZEL free?**
+Yes. Free, no subscription. No premium package, no features locked behind payment. All 180 grammar lessons, 2,440 vocabulary items, and 312 reading passages are available from day one.
+
+**Do I need an account?**
+No. You can start learning immediately. Because there are no accounts, your progress is stored on the device you use — switching to another device means starting over.
+
+**Can I use it offline?**
+After installing FIEZEL to the home screen: content and exercises work without internet. Neural voice and AI tutor need a connection.
+
+**Does it work on Android and iPhone?**
+Yes, both. On Android use Chrome via the three-dot menu. On iPhone you must use Safari via the Share button, as only Safari can add web apps to the iOS Home Screen. Desktop Chrome and Edge also work.
+
+**Is FIEZEL officially CEFR- or JLPT-certified?**
+No. FIEZEL content is mapped to CEFR A1–C2 and JLPT N5–N4 as a difficulty reference only. It is not a certification, not an affiliation, and not an official endorsement from any body.
+
+**Does FIEZEL teach Japanese?**
+Yes. The Japanese course contains 422 JLPT N5–N4 grammar points across 27 families, 1,884 vocabulary items, 150 graded reading passages, and 54 writing prompts. Listening and speaking practice are not yet available for Japanese.
+
+**Is there audio for listening practice?**
+Yes. Device built-in voice works from the start, and neural voice is available as an optional download. Exam exercise audio is TTS from original scripts, not recordings of real exams.
+
+**What is my personal data used for?**
+Your learning records — completed lessons, answers, and level progress — are stored locally on your device. FIEZEL does not ask for name, email, or phone number to start learning.
+
+**How many exercises are available?**
+Each grammar lesson has 25 focused exercises, across 180 total lessons. Reading adds 1,560 comprehension questions across 312 graded passages. Plus 1,400+ listening exercises and 36 speaking sessions.
+
+**What is KelasKu?**
+KelasKu is FIEZEL's classroom workspace for teachers and tutors. It allows teachers to create classes via 6-character codes, assign curriculum-aligned tasks, monitor student mastery without manual grading, detect tab switching during exams, and export grade rosters to CSV. Canonical documentation: https://fiezel.my.id/kelasku/

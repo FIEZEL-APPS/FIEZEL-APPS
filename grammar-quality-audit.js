@@ -6,15 +6,14 @@ const root=__dirname;
 const app=fs.readFileSync(path.join(root,'app.js'),'utf8');
 const grammar=JSON.parse(fs.readFileSync(path.join(root,'grammar-templates.json'),'utf8'));
 const expectedVersion=JSON.parse(fs.readFileSync(path.join(root,'VERSION.json'),'utf8')).version;
+/* m025-375: kontrak sesi lesson = GRAMMAR_LESSON_MODES di app.js (maks 10 soal, pilihan
+   milik lesson sendiri), bukan lagi 25 soal x 25 mode. Lihat komentar GRAMMAR_SESSION_SIZE. */
 const expectedModes=[
-  'apply_form','complete_sentence','justify_correct','recognize_rule','recognize_objective',
-  'sequence_reasoning','identify_misconception','recall_memory_cue','choose_avoidance',
-  'diagnose_distractor_1','diagnose_distractor_2','diagnose_distractor_3',
-  'label_misconception_1','label_misconception_2','label_misconception_3',
-  'repair_distractor_1','repair_distractor_2','repair_distractor_3',
-  'contrast_distractor_1','contrast_distractor_2','contrast_distractor_3',
-  'classify_family','locate_decision_cue','teach_back','mastery_check'
+  'apply_form','justify_correct','complete_sentence','diagnose_distractor_1','repair_distractor_1',
+  'repair_distractor_2','diagnose_distractor_2','repair_distractor_3','diagnose_distractor_3'
 ];
+const REQUIRED_LESSON_MODES=['apply_form','complete_sentence','repair_distractor_1'];
+const LESSON_SESSION_MAX=20,LESSON_SESSION_MIN=5,LESSON_FORM_MODES=5; // m025-378: sesi 20 soal; 5 mode bentuk per templat
 const checks=[];
 let pass=true;
 const check=(name,ok,details)=>{checks.push({name,status:ok?'PASS':'FAIL',details});if(!ok)pass=false};
@@ -113,6 +112,7 @@ vm.createContext(context);const __i18nRt=path.join(root,'features','i18n','fieze
 setTimeout(()=>{
   try{
     const invalidRuntime=[],shortLessons=[],focusLeak=[],modeFailures=[],withinDuplicates=[],genericRuntime=[];
+    const borrowedOptions=[]; // m025-375: sesi lesson hanya boleh memuat teks milik lesson sendiri
     // m025-155: check focus-leak lama tautologis - q.sourceId/conceptId/lessonSkill distempel
     // dari template yang sama sehingga tidak pernah bisa gagal. Check identitas murah tetap
     // dipertahankan, tetapi jaminan kualitas sesungguhnya kini pindah ke KONTRAK provenance
@@ -143,9 +143,12 @@ setTimeout(()=>{
       // needs to inspect every curriculum track, so it walks the same public
       // contract one level at a time rather than bypassing the filter.
       if(runtimeState?.preferences)runtimeState.preferences={...runtimeState.preferences,activeLevel:template.cefr,levelMode:'manual'};
-      const questions=context.buildGrammarLessonQuestions(template.subskill,25);
+      const questions=context.buildGrammarLessonQuestions(template.subskill);
       totalQuestions+=questions.length;
-      if(questions.length!==25)shortLessons.push({skill:template.subskill,count:questions.length});
+      const siblingTemplates=(lessonTemplateIdsV18.get(template.subskill)||new Set([template.id])).size;
+      const expectedSize=Math.min(LESSON_SESSION_MAX,LESSON_FORM_MODES*siblingTemplates);
+      if(questions.length<expectedSize||questions.length>LESSON_SESSION_MAX)shortLessons.push({skill:template.subskill,count:questions.length,expected:expectedSize});
+      for(const q of questions)if((q.optionSources||[]).some(x=>x&&x.origin!=='own'))borrowedOptions.push({lesson:template.subskill,question:q.id,mode:q.practiceMode});
       if(template.cefr==='A1'||template.cefr==='A2'){
         const idFields=[template.pedagogicalObjectiveId,template.misconceptionTargetedId,template.reasoningOperationId,template.explanation?.whyCorrectId,template.explanation?.ruleId,template.explanation?.whyOthersFailId,template.explanation?.howToAvoidId,template.explanation?.memoryCueId,...(template.distractors||[]).flatMap(d=>[d.whyFailsId,d.misconceptionId])];
         for(const f of idFields){if(f&&/\bSiswa\b/.test(f))jargonViolations.push({lesson:template.subskill,issue:'sebutan_Siswa_di_field_A1A2',detail:String(f).slice(0,80)});if(f&&bannedJargonA.test(stripQuoted(f)))jargonViolations.push({lesson:template.subskill,issue:'istilah_internal_di_field_A1A2',detail:String(f).slice(0,80)})}
@@ -156,7 +159,7 @@ setTimeout(()=>{
       }
       const sigs=questions.map(signature),questionTexts=questions.map(q=>norm(q.question)),modes=questions.map(q=>q.practiceMode);
       if(new Set(sigs).size!==questions.length||new Set(questionTexts).size!==questions.length)withinDuplicates.push(template.subskill);
-      if(new Set(modes).size!==expectedModes.length||expectedModes.some(mode=>!modes.includes(mode)))modeFailures.push(template.subskill);
+      if(modes.some(mode=>!expectedModes.includes(mode))||REQUIRED_LESSON_MODES.some(mode=>!modes.includes(mode)))modeFailures.push({lesson:template.subskill,modes:[...new Set(modes)]});
       for(const q of questions){
         modeCounts[q.practiceMode]=(modeCounts[q.practiceMode]||0)+1;
         if(!context.__fiezelAudit.validateQuestion(q).ok)invalidRuntime.push(q.id);
@@ -212,10 +215,10 @@ setTimeout(()=>{
     if(runtimeState?.preferences)runtimeState.preferences={...runtimeState.preferences,activeLevel:previousActiveLevel,levelMode:previousLevelMode};
     const crossLessonDuplicates=[...crossSignatures.entries()].filter(([,owners])=>owners.size>1);
     const sourceReuse=[...sourceOwners.entries()].filter(([,owners])=>owners.size>1);
-    const expectedQuestions=lessonCount*expectedModes.length;
-    check('Runtime question inventory',totalQuestions===expectedQuestions,`generated=${totalQuestions} expected=${expectedQuestions}`);
-    check('Twenty-five questions per lesson',shortLessons.length===0,shortLessons.length?shortLessons:`${lessonCount}/${lessonCount} lessons complete`);
-    check('Twenty-five distinct pedagogical modes',modeFailures.length===0,modeFailures.length?modeFailures:`${expectedModes.length} modes x ${lessonCount} lessons`);
+    check('Runtime question inventory',totalQuestions>=lessonCount*LESSON_SESSION_MIN&&totalQuestions<=lessonCount*LESSON_SESSION_MAX,`generated=${totalQuestions} range=${lessonCount*LESSON_SESSION_MIN}..${lessonCount*LESSON_SESSION_MAX}`);
+    check('Lesson session size (m025-375)',shortLessons.length===0,shortLessons.length?shortLessons.slice(0,10):`${lessonCount}/${lessonCount} lessons: min(20, 5 x templat) soal`);
+    check('Lesson modes are practice-first (m025-375)',modeFailures.length===0,modeFailures.length?modeFailures.slice(0,10):`hanya ${expectedModes.length} mode lesson; ${REQUIRED_LESSON_MODES.join('/')} hadir di tiap lesson`);
+    check('Lesson options are the lesson\'s own text (m025-375)',borrowedOptions.length===0,borrowedOptions.length?{violations:borrowedOptions.length,samples:borrowedOptions.slice(0,10)}:'nol pilihan pinjaman lesson lain di sesi lesson');
     check('Within-lesson question uniqueness',withinDuplicates.length===0,withinDuplicates.length?withinDuplicates:'no repeated question or option signature');
     check('Lesson focus purity',focusLeak.length===0,focusLeak.length?focusLeak.slice(0,10):`all ${totalQuestions.toLocaleString()} questions use the active lesson concept`);
     check('Option provenance contract (m025-155)',provenanceViolations.length===0,provenanceViolations.length?{violations:provenanceViolations.length,samples:provenanceViolations.slice(0,10)}:'semua entry optionSources memenuhi kontrak own/peer/taxonomy/fallback');
@@ -226,7 +229,7 @@ setTimeout(()=>{
     check('No exact runtime duplicates across lessons',crossLessonDuplicates.length===0,`duplicates=${crossLessonDuplicates.length}`);
     check('Runtime integrity validator',invalidRuntime.length===0,`invalid=${invalidRuntime.length}`);
     check('Runtime explanations are production-ready',genericRuntime.length===0,`generic_or_placeholder=${genericRuntime.length}${genericRuntime.length?` ids=${genericRuntime.slice(0,10).join(',')}`:''}`);
-    check('Balanced mode coverage',expectedModes.every(mode=>modeCounts[mode]===lessonCount),Object.fromEntries(expectedModes.map(mode=>[mode,modeCounts[mode]||0])));
+    check('Balanced mode coverage',REQUIRED_LESSON_MODES.every(mode=>(modeCounts[mode]||0)>=lessonCount),Object.fromEntries(expectedModes.map(mode=>[mode,modeCounts[mode]||0])));
     check('Legacy peer-mixing generator removed',!app.includes('familyPeers=')&&!app.includes('levelPeers=')&&!app.includes('others=shuffle(GRAMMAR_ITEMS.filter'), 'lesson builder no longer imports peer concepts');
 
     const report={version:grammar.version,status:pass?'PASS':'NOT READY',counts:{pass:checks.filter(x=>x.status==='PASS').length,fail:checks.filter(x=>x.status==='FAIL').length,lessons:grammar.templates.length,runtimeQuestions:totalQuestions,practiceModes:expectedModes.length,crossLessonDuplicates:crossLessonDuplicates.length,focusLeaks:focusLeak.length,provenanceViolations:provenanceViolations.length,sequenceCueCollisions:sequenceCueCollisions.length,classifyFamilyIssues:classifyFamilyIssues.length},checks,samples};

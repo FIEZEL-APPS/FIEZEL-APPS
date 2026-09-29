@@ -166,8 +166,8 @@ setTimeout(()=>{
   // terkunci untuk latihan karena prasyaratnya sendiri belum dipenuhi. Generator sama-sama
   // deterministik di bawah Math.random beku, jadi jawaban benarnya bisa dihitung di muka.
   const practiceSkillId='subject_object_pronouns_and_possessives';
-  const practiceExpected=ctx.buildGrammarLessonQuestions(practiceSkillId,25);
-  assert(practiceExpected.length===25,'pool latihan lesson pertama kurang dari 25 soal valid');
+  const practiceExpected=ctx.buildGrammarSessionQuestions(practiceSkillId);
+  assert(practiceExpected.length>=10,'pool latihan lesson pertama kurang dari 10 soal valid (m025-375)');
   element('feedback').innerHTML='';
   ctx.practiceSkill(practiceSkillId);
   assert(String((st.activeSession||{}).type||'')==='grammar','kuis latihan tidak dimulai (practiceSkill menolak)');

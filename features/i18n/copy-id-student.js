@@ -110,8 +110,8 @@
     'grammar.lesson-belum-memiliki-materi': 'Materi ini belum punya isi.',
     'grammar.lesson-hanya-tersedia-pada-level': 'Materi ini hanya ada di level {level}.',
     'grammar.pilih-lesson-terlebih-dahulu': 'Pilih materi {level} dulu.',
-    'grammar.mode-practice-terfokus': '{jumlahSoal} jenis latihan',
-    'grammar.urutan-mode-practice': '{level} · nomor {sequence} · {fondasi} · {jumlahSoal} jenis latihan',
+    'grammar.mode-practice-terfokus': '{jumlahSoal} soal latihan singkat',
+    'grammar.urutan-mode-practice': '{level} · nomor {sequence} · {fondasi} · {jumlahSoal} soal',
     'grammar.pahami-dulu-urutan': 'PAHAMI DULU · NOMOR {sequence}',
 
     // ── Level ──
@@ -128,6 +128,8 @@
     'level.deskripsi-c2': 'Sangat mahir · hampir seperti penutur asli',
     'level.deskripsi-fallback': 'Level kamu sekarang',
     'level.entry-chip': 'Belum diuji',
+    'level.entry-tes-awal': 'Mulai tes awal',
+    'level.entry-line-tes-awal': 'Level {level} belum terbukti. Tes awal ({soal} soal, tanpa nilai dan tanpa hukuman) yang menentukan level kerjamu.',
     'level.entry-ikuti-ujian': 'Ikuti ujian',
     'level.entry-nanti-aja': 'Nanti aja',
     'level.ujian-badge': 'Lulus ujian',
@@ -211,7 +213,7 @@
     'skills.lead-listening': 'Dengar dulu, baru jawab. Kalau belum jelas, putar lagi — itu bagian dari latihan.',
     'skills.catatan-level': 'Level kamu: <b>{level}</b> · ganti dari tombol Level',
     'settings.all-can-diatur-dikelompokkan-each': 'Ketuk kelompok untuk membuka pengaturannya.',
-    'social.shell-title': 'Teman',
+    'social.shell-title': 'Profil',
     'social.shell-desc': 'Belajar bareng teman — pakai nama samaran, tanpa chat, dan boleh dimatikan kapan saja.',
     'quiz.vonis-benar': 'Benar! Mantap.',
     'quiz.vonis-salah': 'Belum tepat. Nggak apa-apa, coba lagi.',
@@ -248,7 +250,7 @@
     'student.classroom-title': 'KelasKu',
     'student.coming-soon': 'Segera hadir',
     'student.skills-title': 'Bicara & Dengar',
-    'student.settings-mark': 'PENGATURAN',
+    'student.settings-mark': 'FIEZEL',
     'student.greet-pagi': 'selamat pagi. Mulai hari ini dengan satu latihan kecil.',
     'student.greet-siang': 'selamat siang. Sedikit latihan hari ini bikin kamu makin lancar.',
     'student.greet-sore': 'selamat sore. Waktu yang pas untuk latihan sebentar.',
@@ -318,6 +320,15 @@
     'progress2.week-pill': '{days}/7 hari aktif',
     'progress2.week-note': '{items} soal dikerjakan 7 hari terakhir.',
     'progress2.week-empty': 'Belum ada latihan minggu ini. Satu sesi kecil sudah cukup untuk mulai.',
-    'progress2.days': 'Sen,Sel,Rab,Kam,Jum,Sab,Min'
+    'progress2.days': 'Sen,Sel,Rab,Kam,Jum,Sab,Min',
+    'inbox.default_student_name': 'Murid',
+    'social.profile-tag': 'Profil Pengguna FIEZEL',
+    'presence.concerned': 'Fokusmu sudah luar biasa. Istirahat sejenak bila mulai lelah.',
+    'presence.celebrating': 'Luar biasa! Materi ini berhasil kamu tuntaskan.',
+    'presence.reinforcing': 'Yuk kita cermati polanya bersama sebelum mencoba lagi.',
+    'presence.hinting': 'Perhatikan kata petunjuknya, lalu coba sekali lagi.',
+    'presence.correcting': 'Hampir tepat. Coba periksa lagi pilihan lainnya.',
+    'presence.challenging': 'Latihan ini tampak mudah bagimu. Siap tantangan berikutnya?',
+    'presence.encouraging': 'Bagus sekali! Kamu berhasil menyelesaikannya sendiri.'
   });
 })();

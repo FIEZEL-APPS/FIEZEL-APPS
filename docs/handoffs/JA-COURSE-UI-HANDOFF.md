@@ -1,0 +1,71 @@
+# Handoff — Tampilan khas kursus Bahasa Jepang
+
+**OWNER:** fitrajft-ux · **Status:** selesai tahap 1 (m025-362), menunggu review OWNER.
+
+## Yang dibangun
+
+Kursus Jepang kini berbeda dari kursus Inggris di tiga lapis:
+
+1. **Tema** (`fiezel-2.css`, `body.fz-lang-ja`): palet shu/ai/washi, motif seigaiha, judul
+   Mincho, nav bawah nila dengan cap shu, sudut kartu tegas.
+2. **Istilah** (`FiezelI18n.setCourse('ja')`, kunci `kursus-ja.*` di `copy-*-bahasa.js`):
+   Renshū, Kyōshitsu, Kyō, Shinpo, Watashi, Kotoba, Bunpō, Dokkai, Sakubun, Toshokan.
+3. **Fitur khas aplikasi Jepang** (`features/japanese/fiezel-ja-ui.js`):
+   - Furigana `<ruby>` di atas kanji + romaji terpisah. Tombol ふりがな / ローマ字
+     menyembunyikannya (disimpan di `fiezel-ja-display-v1`, diterapkan sebagai kelas body
+     `fz-ja-no-furigana` / `fz-ja-no-romaji`, tanpa melukis ulang). Tampil di kuis
+     kosakata, flashcard, dan kata hari ini.
+   - **Semua soal, jawaban, dan pembahasan** di layar kuis dan flashcard: pengamat
+     (`FiezelJaUi.observe`, dipasang `renderInner` saat kursus Jepang aktif) memberi setiap
+     potongan teks Jepang furigana di atas kanji + baris romaji, dan memasang tombol
+     ふりがな / ローマ字 di bawah topbar setiap kuis. Bacaan diturunkan dari bank kosakata:
+     kata utuh terpanjang dulu, lalu batang kanji dari kata ber-okurigana (遊ぶ → 遊 = あそ)
+     untuk bentuk berkonjugasi; は/を/へ sesudah kata dibaca wa/o/e. Romaji HANYA ditulis bila
+     seluruh potongan terbaca; kanji di luar bank dibiarkan tanpa furigana.
+   - Tabel kana (rute `kana`, diblokir di kursus Inggris): 46 gojūon + 25 dakuten,
+     hiragana ↔ katakana.
+   - Kata hari ini (今日の言葉) di Kyō, deterministik per hari dari bank level aktif.
+   - Label level JLPT (A1 → N5 …) di tombol level dan keping level beranda. Data tetap CEFR.
+   - Kartu **Segera hadir** di Renshū: Chōkai, Kaiwa, Kanji (urutan goresan), JLPT Moshi.
+     Kartunya `aria-disabled`, tanpa `go()`, jadi tidak menjanjikan isi yang belum ada.
+
+Referensi pola: LingoDeer & LingQ (kontrol furigana), Bunpro (tingkat furigana), tabel kana
+StudyX/ToolV/Hanabira (tombol hiragana/katakana, mode romaji), Migii/Kanjijo (jalur JLPT).
+
+## Gerbang
+
+`tests/japanese-ja-ui-test.js` (terdaftar di `quality.yml`) mengikat J1–J7: ruby hanya untuk
+kata ber-kanji, baris bacaan hanya romaji, preferensi → kelas body, 71 sel kana, kartu segera
+hadir tidak bisa diketuk, label JLPT, rute kana diblokir di kursus Inggris.
+
+## Berikutnya (next)
+
+- Chōkai/Kaiwa: butuh suara dan pengenalan ucapan ja-JP (tumpukan audio masih dipaku en-US,
+  lihat `tests/audio-locale-guard-test.js`). Saat siap, cabut kartunya dari `SOON` dan
+  lepaskan `TARGET_LANG_BLOCKED_VIEWS.ja`.
+- Kanji: butuh data urutan goresan (mis. KanjiVG) dan bank kanji N5.
+- JLPT Moshi: butuh bank soal format JLPT.
+- Kanji di luar bank kosakata (mis. 友だち bila tidak ada) tidak mendapat furigana/romaji; kamus bacaan (mis. KANJIDIC/JMdict) akan menutupnya.
+- Suara kana di tabel: menunggu suara ja-JP yang sama.
+- Kostum PAW khas Jepang (hachimaki): registry outfit tertutup, butuh keputusan OWNER.
+
+## Tema "Studio Ghibli Garden" dicabut dari produksi (m025-365)
+
+Commit `a6c0d11` (bank Listening JLPT N5/N4) ikut membawa redesign "Studio Ghibli Garden"
+ke `fiezel-2.css`: `:root` kedua dengan token `--ghibli-*`, `--maroon` menjadi sage `#6B8F71`,
+dan @import Nunito. Hasilnya, tema itu tampil di SELURUH aplikasi, termasuk kursus Inggris.
+Gerbang `pastel-field-contrast-test` memerahkan `main`.
+
+OWNER, 24 September 2026: tema itu terdorong tak sengaja, dan niatnya untuk **antarmuka
+kursus Jepang**. `fiezel-2.css` dikembalikan ke isi sebelum commit itu (`9fec4a1`). Yang tetap
+di repo:
+- bank `features/speaking-listening/jlpt-listening-bank-v1.json` (belum dimuat kode aplikasi
+  mana pun);
+- `preview-redesign.html` beserta alat pratinjaunya.
+
+Kalau tema ini dihidupkan lagi, dua syarat berlaku, dan keduanya menunggu perintah tertulis
+owner (aturan "NEVER COMMIT OR PUSH REDESIGN" di `AGENTS.md`):
+1. **Cakupannya `body.fz-lang-ja`**, bukan `:root`. Kursus Inggris tidak boleh ikut berubah.
+2. **Tokennya masuk ke `:root` tunggal di `style.css`** (F17, dijaga
+   `pastel-field-contrast-test`). Nilai yang khusus kursus Jepang ditimpa di
+   `html body.fz-lang-ja{...}`, pola yang sudah dipakai palet shu/ai/washi di `fiezel-2.css`.

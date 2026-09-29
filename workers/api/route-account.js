@@ -36,6 +36,11 @@ import { coreDb, roleGate, denied, unauthenticated } from './auth/gate.js';
 import { hashPassword, verifyPassword, needsRehash, checkPasswordPolicy } from './auth/password-core.js';
 import { ROLE, shellForRole, navigationFor } from './auth/role-core.js';
 import { codeWellFormed, hashCode, checkRedeemable, INVITE_PROBLEM } from './auth/invite-core.js';
+import {
+  signCurriculumTicket, TICKET_KEY_ENV, TICKET_KEY_MIN_LENGTH
+} from './auth/curriculum-ticket.js';
+import { ensureTeacherInviteColumns } from './route-owner-teachers.js';
+import { attachIdentityCookie, issueAnonIdentity, ensureIdentityRow } from './mw-identity.js';
 
 /**
  * Hash boneka untuk menyamakan biaya jalur "handle tidak ada". Nilainya adalah
@@ -72,6 +77,9 @@ function accountView(account, role) {
   if (account.teacher_name) view.teacherName = account.teacher_name;
   if (account.institution) view.institution = account.institution;
   if (account.institution_type) view.institutionType = account.institution_type;
+  if (account.subject_id || account.subjectId) view.subjectId = account.subject_id || account.subjectId;
+  if (account.grade_id || account.gradeId) view.gradeId = account.grade_id || account.gradeId;
+  if (account.class_code || account.classCode) view.classCode = account.class_code || account.classCode;
   return view;
 }
 
@@ -196,7 +204,30 @@ export async function routeAccountLogin(ctx) {
 
   // Tujuan sesudah login DITENTUKAN SERVER dari peran (§27). Klien tidak
   // mengirim "mau ke mana", jadi tidak ada yang bisa meminta dasbor guru.
-  return jsonResponse({ ok: true, account: accountView(account, account.role) }, opt);
+  let accountData = account;
+  if (account.role === 'teacher') {
+    const tp = await db
+      .prepare('SELECT teacher_name, institution, institution_type, subject_id, grade_id, class_code FROM teacher_profile WHERE sub = ?1')
+      .bind(account.sub)
+      .first()
+      .catch(() => null);
+    if (tp) {
+      accountData = {
+        ...account,
+        teacher_name: tp.teacher_name,
+        institution: tp.institution,
+        institution_type: tp.institution_type,
+        subject_id: tp.subject_id,
+        grade_id: tp.grade_id,
+        class_code: tp.class_code
+      };
+    }
+  }
+  try {
+    await ensureIdentityRow(ctx.env, account.sub, ctx.now);
+    await attachIdentityCookie(ctx, account.sub);
+  } catch (_) {}
+  return jsonResponse({ ok: true, account: accountView(accountData, account.role) }, opt);
 }
 
 /* ========================================================================== */
@@ -215,6 +246,9 @@ export async function routeAccountLogout(ctx) {
   await gate.db.prepare('UPDATE session SET revoked_at = ?2 WHERE sub = ?1 AND revoked_at IS NULL')
     .bind(gate.sub, ctx.now).run()
     .catch(() => null); // tabel session milik paket identitas; ketiadaannya bukan galat logout
+  try {
+    await issueAnonIdentity(ctx);
+  } catch (_) {}
   return jsonResponse({ ok: true }, gate.opt);
 }
 
@@ -228,7 +262,7 @@ export async function routeAccountMe(ctx) {
   let accountData = gate.account;
   if (gate.role === 'teacher') {
     const tp = await gate.db
-      .prepare('SELECT teacher_name, institution, institution_type FROM teacher_profile WHERE sub = ?1')
+      .prepare('SELECT teacher_name, institution, institution_type, subject_id, grade_id, class_code FROM teacher_profile WHERE sub = ?1')
       .bind(gate.sub)
       .first()
       .catch(() => null);
@@ -237,11 +271,85 @@ export async function routeAccountMe(ctx) {
         ...gate.account,
         teacher_name: tp.teacher_name,
         institution: tp.institution,
-        institution_type: tp.institution_type
+        institution_type: tp.institution_type,
+        subject_id: tp.subject_id,
+        grade_id: tp.grade_id,
+        class_code: tp.class_code
       };
     }
   }
   return jsonResponse({ account: accountView(accountData, gate.role) }, gate.opt);
+}
+
+/* ========================================================================== */
+/* POST /api/account/curriculum-ticket                                         */
+/* ========================================================================== */
+
+/**
+ * Tukarkan identitas KelasKu yang SUDAH terverifikasi dengan tiket berumur dua
+ * menit untuk mesin kurikulum (FastAPI+MongoDB di domain lain).
+ *
+ * Kenapa rute ini ada sama sekali: sampai m025-301 konsol kurikulum punya daftar
+ * gurunya sendiri dan menuntut token `FZG-` yang tidak punya satu pun antarmuka
+ * penerbit. Guru yang sudah terverifikasi di KelasKu tetap ditolak di pintu
+ * kedua, dan murid diminta mendaftar ulang dengan email+sandi ketiga. Rute ini
+ * menghapus pintu kedua itu: yang menyeberang bukan kata sandi, melainkan
+ * pernyataan sekali-pakai tentang siapa pemegang cookie ini MENURUT D1.
+ *
+ * Tiga hal yang sengaja TIDAK dilakukan di sini:
+ *  - peran tidak pernah dibaca dari body/query/header (aturan §3 role-security);
+ *    ia datang dari `roleGate` yang membacanya dari D1 pada permintaan ini juga;
+ *  - tidak ada kelas/kuota di dalam tiket (mw-identity §2: klaim bertanda tangan
+ *    menjadi klaim basi);
+ *  - kunci yang lemah atau tidak dipasang MENOLAK menerbitkan, bukan jatuh ke
+ *    nilai cadangan. Fitur yang mati terang-terangan bisa diperbaiki; tanda
+ *    tangan dengan kunci tebakan tidak pernah ketahuan.
+ */
+export async function routeCurriculumTicket(ctx) {
+  const gate = await roleGate(ctx);
+  if (!gate.ok) return gate.response;
+
+  const secret = ctx.env ? ctx.env[TICKET_KEY_ENV] : '';
+  if (typeof secret !== 'string' || secret.length < TICKET_KEY_MIN_LENGTH) {
+    return jsonError(503, ERR.UNAVAILABLE, {}, gate.opt);
+  }
+
+  const name = gate.account && gate.account.login_handle ? String(gate.account.login_handle) : '';
+  let subjectId = null;
+  let gradeId = null;
+  if (gate.role === 'teacher') {
+    const tp = await gate.db
+      .prepare('SELECT subject_id, grade_id FROM teacher_profile WHERE sub = ?1')
+      .bind(gate.sub)
+      .first()
+      .catch(() => null);
+    if (tp) {
+      subjectId = tp.subject_id || null;
+      gradeId = tp.grade_id || null;
+    }
+  }
+
+  let issued = null;
+  try {
+    issued = await signCurriculumTicket(secret, {
+      sub: gate.sub,
+      role: gate.role,
+      name: name,
+      subject_id: subjectId,
+      grade_id: gradeId
+    }, ctx.now);
+  } catch (_) {
+    return jsonError(503, ERR.UNAVAILABLE, {}, gate.opt);
+  }
+
+  return jsonResponse({
+    ok: true,
+    ticket: issued.ticket,
+    expires_in: issued.expires_in,
+    role: gate.role,
+    subjectId: subjectId,
+    gradeId: gradeId
+  }, gate.opt);
 }
 
 /* ========================================================================== */
@@ -264,6 +372,7 @@ export async function routeTeacherActivate(ctx) {
   const db = coreDb(ctx.env);
   if (!db) return jsonError(503, ERR.INTERNAL, {}, { headers: ctx.corsHeaders });
   await ensureAuthSchema(db);
+  await ensureTeacherInviteColumns(db);
 
   const opt = { headers: ctx.corsHeaders };
   const body = await readJsonFromCtx(ctx, opt);
@@ -276,7 +385,7 @@ export async function routeTeacherActivate(ctx) {
 
   const codeHash = await hashCode(code);
   const invite = await db.prepare(
-    'SELECT code_hash, teacher_name, institution, institution_type, expires_at, used_at, revoked_at ' +
+    'SELECT code_hash, teacher_name, institution, institution_type, expires_at, used_at, revoked_at, subject_id, grade_id, class_code ' +
     'FROM teacher_invite WHERE code_hash = ?1'
   ).bind(codeHash).first();
 
@@ -308,10 +417,22 @@ export async function routeTeacherActivate(ctx) {
       db.prepare('UPDATE auth_account SET role = ?2, institution_id = ?3 WHERE sub = ?1 AND role = ?4')
         .bind(ctx.identity.sub, ROLE.TEACHER, institutionId, ROLE.LEARNER),
       db.prepare('INSERT INTO teacher_profile (sub, teacher_name, institution, institution_type, ' +
-        'institution_id, activated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6)')
+        'institution_id, activated_at, subject_id, grade_id, class_code) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)')
         .bind(ctx.identity.sub, invite.teacher_name, invite.institution, invite.institution_type,
-          institutionId, ctx.now)
+          institutionId, ctx.now, invite.subject_id || null, invite.grade_id || null, invite.class_code || null)
     ]);
+
+    if (invite.class_code) {
+      await db.prepare('INSERT OR IGNORE INTO tc_class (code, teacher_sub, title, level, created_at, updated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6)')
+        .bind(invite.class_code, ctx.identity.sub, invite.institution || 'Kelas', invite.grade_id || 'Umum', ctx.now, ctx.now).run().catch(() => null);
+      await db.prepare('INSERT OR REPLACE INTO tc_class_teacher (class_code, teacher_sub, subject_id, teacher_name, created_at, updated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6)')
+        .bind(invite.class_code, ctx.identity.sub, invite.subject_id || 'ALL', invite.teacher_name, ctx.now, ctx.now).run().catch(() => null);
+    }
+
+    try {
+      await ensureIdentityRow(ctx.env, ctx.identity.sub, ctx.now);
+      await attachIdentityCookie(ctx, ctx.identity.sub);
+    } catch (_) {}
 
     return jsonResponse({
       ok: true,
@@ -320,7 +441,10 @@ export async function routeTeacherActivate(ctx) {
         institution_id: institutionId,
         teacher_name: invite.teacher_name,
         institution: invite.institution,
-        institution_type: invite.institution_type
+        institution_type: invite.institution_type,
+        subject_id: invite.subject_id || null,
+        grade_id: invite.grade_id || null,
+        class_code: invite.class_code || null
       }, ROLE.TEACHER)
     }, { headers: ctx.corsHeaders });
   }
@@ -374,10 +498,22 @@ export async function routeTeacherActivate(ctx) {
     db.prepare('INSERT INTO auth_credential (sub, pass_hash, updated_at, failed_count) VALUES (?1, ?2, ?3, 0)')
       .bind(ctx.identity.sub, passHash, ctx.now),
     db.prepare('INSERT INTO teacher_profile (sub, teacher_name, institution, institution_type, ' +
-      'institution_id, activated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6)')
+      'institution_id, activated_at, subject_id, grade_id, class_code) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)')
       .bind(ctx.identity.sub, invite.teacher_name, invite.institution, invite.institution_type,
-        institutionId, ctx.now)
+        institutionId, ctx.now, invite.subject_id || null, invite.grade_id || null, invite.class_code || null)
   ]);
+
+  if (invite.class_code) {
+    await db.prepare('INSERT OR IGNORE INTO tc_class (code, teacher_sub, title, level, created_at, updated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6)')
+      .bind(invite.class_code, ctx.identity.sub, invite.institution || 'Kelas', invite.grade_id || 'Umum', ctx.now, ctx.now).run().catch(() => null);
+    await db.prepare('INSERT OR REPLACE INTO tc_class_teacher (class_code, teacher_sub, subject_id, teacher_name, created_at, updated_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6)')
+      .bind(invite.class_code, ctx.identity.sub, invite.subject_id || 'ALL', invite.teacher_name, ctx.now, ctx.now).run().catch(() => null);
+  }
+
+  try {
+    await ensureIdentityRow(ctx.env, ctx.identity.sub, ctx.now);
+    await attachIdentityCookie(ctx, ctx.identity.sub);
+  } catch (_) {}
 
   return jsonResponse({
     ok: true,
@@ -386,7 +522,10 @@ export async function routeTeacherActivate(ctx) {
       institution_id: institutionId,
       teacher_name: invite.teacher_name,
       institution: invite.institution,
-      institution_type: invite.institution_type
+      institution_type: invite.institution_type,
+      subject_id: invite.subject_id || null,
+      grade_id: invite.grade_id || null,
+      class_code: invite.class_code || null
     }, ROLE.TEACHER)
   }, { headers: ctx.corsHeaders });
 }
@@ -396,5 +535,6 @@ export const ROUTES = [
   ['POST', '/api/account/login', routeAccountLogin],
   ['POST', '/api/account/logout', routeAccountLogout],
   ['GET', '/api/account/me', routeAccountMe],
-  ['POST', '/api/account/teacher-activate', routeTeacherActivate]
+  ['POST', '/api/account/teacher-activate', routeTeacherActivate],
+  ['POST', '/api/account/curriculum-ticket', routeCurriculumTicket]
 ];

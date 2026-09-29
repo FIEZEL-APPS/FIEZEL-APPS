@@ -21,6 +21,18 @@
  *     tambalan yang membungkus tetangganya) dan Classroom harus bergantung pada grup suara.
  *  4. Semua berkas baru harus ikut di-precache service worker, atau peluncuran offline
  *     akan kehilangan bagian yang justru dipindahkan ke jalur malas.
+ *
+ * m025-314 — SATU PENGECUALIAN, DAN INI ALASANNYA YANG DITULIS PENUH.
+ * `<script type="application/ld+json">` BUKAN skrip. Peramban tidak pernah
+ * mengeksekusinya, tidak pernah menghentikan pengurai untuknya, dan isinya tidak bisa
+ * melempar ReferenceError — ia blok DATA yang dibaca crawler. Seluruh alasan yang
+ * ditulis di butir 2 dan di cek "splash cat-pertama" berbicara tentang skrip yang
+ * BERJALAN; menghitung blok data ke dalamnya membuat gerbang menolak structured data
+ * SEO tanpa satu pun bita perilaku berubah. Itu bukan penjagaan, itu salah alamat.
+ *
+ * Pengecualiannya sengaja dibuat SEMPIT dan berbayar: hanya type persis
+ * "application/ld+json", dan setiap blok yang dikecualikan WAJIB lolos JSON.parse.
+ * Blok yang isinya bukan JSON sah berarti ia bukan data — dan gerbang memerah.
  */
 const assert = require('assert');
 const fs = require('fs');
@@ -39,6 +51,35 @@ const app = fs.readFileSync('./app.js', 'utf8');
 // berkas, dan tanpa ini gate ini akan menghitung kalimat sebagai tag. Panjangnya dijaga
 // tetap sama (diganti spasi) supaya offset yang dipakai perbandingan posisi tidak bergeser.
 const scanHtml = html.replace(/<!--[\s\S]*?-->/g, c => ' '.repeat(c.length));
+/* NILAI `type=` DIBACA TOLERAN — kutip ganda, kutip tunggal, tanpa kutip, dan parameter.
+   ----------------------------------------------------------------------------------------
+   Pengecualian JSON-LD di atas sudah benar arah kebijakannya (hanya application/ld+json, dan
+   setiap blok wajib lolos JSON.parse). Yang belum benar adalah cara nilainya DIBACA.
+
+   HTML mengizinkan tiga bentuk penulisan atribut — type="x", type='x', type=x — dan
+   mengizinkan parameter di belakangnya (type="text/javascript; charset=utf-8"). Pemadanan
+   /\stype="([^"]+)"/ hanya mengenal bentuk pertama, jadi dua bentuk sah lainnya terbaca
+   sebagai type KOSONG lalu dianggap skrip biasa. Akibatnya gerbang MERAH untuk blok data
+   yang sah:
+
+       <script type='application/ld+json'>   -> merah palsu
+       <script type=application/ld+json>     -> merah palsu
+       <script type="APPLICATION/LD+JSON">   -> merah palsu   (perbandingan peka huruf)
+
+   Arahnya memang aman — merah, bukan diam — jadi ini bukan lubang keamanan gerbang. Tetapi
+   merah palsu punya biayanya sendiri: ia menghukum penulisan HTML yang sah, dan gerbang yang
+   merah tanpa sebab adalah gerbang yang lama-lama diabaikan orang.
+
+   Kenapa parameter ikut dipotong: `type="application/ld+json; charset=utf-8"` juga blok data,
+   dan tanpa pemotongan ia tidak akan cocok dengan perbandingan yang ter-anchor.
+
+   Yang TIDAK berubah: skrip yang benar-benar dieksekusi tetap tertangkap di setiap bentuk —
+   itu invarian yang dijaga matriks di badan PR dan tidak boleh dilonggarkan demi kerapian. */
+function scriptType(attrs) {
+  const m = /\stype\s*=\s*("([^"]*)"|'([^']*)'|([^\s"'>]+))/i.exec(String(attrs || ''));
+  const raw = m ? (m[2] !== undefined ? m[2] : m[3] !== undefined ? m[3] : m[4] || '') : '';
+  return raw.split(';')[0].trim().toLowerCase();
+}
 // Semua tag <script> dalam urutan dokumen, beserta atribut yang menentukan kapan ia jalan.
 const scripts = [];
 const scriptRe = /<script\b([^>]*)>/g;
@@ -52,25 +93,34 @@ while ((m = scriptRe.exec(scanHtml)) !== null) {
     inline: !src,
     async: /\sasync(\s|=|$)/.test(attrs),
     defer: /\sdefer(\s|=|$)/.test(attrs),
-    type: (/\stype="([^"]+)"/.exec(attrs) || [])[1] || '',
+    type: scriptType(attrs),
     group: (/\sdata-fiezel-lazy="([^"]+)"/.exec(attrs) || [])[1] || '',
     when: (/\sdata-fiezel-lazy-when="([^"]+)"/.exec(attrs) || [])[1] || '',
     needs: (/\sdata-fiezel-lazy-needs="([^"]+)"/.exec(attrs) || [])[1] || ''
   });
 }
 
-const lazy = scripts.filter(s => s.type === 'fiezel/lazy');
-const eager = scripts.filter(s => s.src && s.type !== 'fiezel/lazy');
-const inline = scripts.filter(s => s.inline);
+// Blok data structured-data dipisahkan dari skrip sungguhan (lihat catatan m025-314 di
+// kepala berkas). `dataBlocks` tetap diperiksa — pengecualiannya berbayar, bukan gratis.
+const dataBlocks = scripts.filter(s => s.type === 'application/ld+json');
+const kode = scripts.filter(s => s.type !== 'application/ld+json');
 
-test('js.puter.com async - bukan blocking, dan bukan defer', () => {
+const lazy = kode.filter(s => s.type === 'fiezel/lazy');
+const eager = kode.filter(s => s.src && s.type !== 'fiezel/lazy');
+const inline = kode.filter(s => s.inline);
+
+test('blok application/ld+json benar-benar DATA - setiap satu lolos JSON.parse', () => {
+  for (const b of dataBlocks) {
+    const mulai = scanHtml.indexOf('>', b.at) + 1;
+    const isi = html.slice(mulai, html.indexOf('</script>', mulai));
+    assert.doesNotThrow(() => JSON.parse(isi),
+      'blok ld+json pada offset ' + b.at + ' bukan JSON sah - ia tidak berhak atas pengecualian skrip-data');
+  }
+});
+
+test('SDK Puter tidak dimuat sama sekali (Puter dihapus total)', () => {
   const puter = scripts.filter(s => /js\.puter\.com/.test(s.src));
-  assert.strictEqual(puter.length, 1, 'SDK Puter harus dimuat tepat sekali');
-  assert.ok(puter[0].async, 'SDK pihak ketiga harus async supaya tidak menahan pengurai');
-  assert.ok(!puter[0].defer,
-    'defer TIDAK cukup: ia mempertahankan urutan, jadi Puter yang lambat tetap menahan seluruh berkas di belakangnya');
-  assert.ok(/id="fiezelPuterSdk"/.test(html),
-    'tag-nya perlu id supaya ./fiezel-puter-ready.js bisa mendengar load/error-nya');
+  assert.strictEqual(puter.length, 0, 'SDK Puter tidak boleh dimuat lagi');
 });
 
 test('setiap skrip lokal ber-defer - tidak ada lagi yang menahan pengurai', () => {
@@ -174,16 +224,15 @@ test('Diagnostics TIDAK ikut malas - nilainya justru ada lebih dulu', () => {
     'panel Diagnostics harus tetap dimuat sungguhan sebelum app.js: kalau app.js melempar, tombolnya harus tetap ada');
 });
 
-test('pemuat malas dan penunggu Puter dimuat sebelum yang membutuhkannya', () => {
+test('pemuat malas dimuat sebelum yang membutuhkannya', () => {
   const idx = src => html.indexOf('<script defer src="' + src + '"></script>');
-  assert.ok(idx('./fiezel-puter-ready.js') > 0);
   assert.ok(idx('./fiezel-lazy-loader.js') > 0);
   assert.ok(idx('./fiezel-lazy-loader.js') < html.indexOf('<script defer src="./app.js">'),
     'app.js memanggil FiezelLazy.load(); pemuatnya harus sudah ada');
 });
 
 test('berkas baru ikut di-precache service worker - peluncuran offline tetap utuh', () => {
-  for (const file of ['./fiezel-puter-ready.js', './fiezel-lazy-loader.js',
+  for (const file of ['./fiezel-lazy-loader.js',
     './features/ui/fiezel-report-gesture-isolation.js', './features/ui/fiezel-boot-tail.js']) {
     assert.ok(sw.includes("'" + file + "'"), file + ' belum ada di ASSETS');
   }
@@ -194,9 +243,11 @@ test('berkas baru ikut di-precache service worker - peluncuran offline tetap utu
 
 test('splash cat-pertama tetap yang pertama diurai', () => {
   const splashAt = html.indexOf('id="fiezelBootSplash"');
-  const firstScriptAt = html.indexOf('<script');
-  assert.ok(splashAt > 0 && splashAt < firstScriptAt,
-    'splash harus diurai sebelum <script> pertama - itu satu-satunya alasan ia tercat lebih dulu');
+  // Yang dijaga adalah skrip yang BERJALAN. Blok application/ld+json tidak dieksekusi
+  // peramban, jadi ia tidak pernah menahan cat pertama (lihat catatan m025-314 di kepala).
+  const firstCodeAt = kode.length ? kode[0].at : -1;
+  assert.ok(splashAt > 0 && firstCodeAt > 0 && splashAt < firstCodeAt,
+    'splash harus diurai sebelum <script> yang BERJALAN pertama - itu satu-satunya alasan ia tercat lebih dulu');
 });
 
 // --- perilaku pemuat, bukan sekadar bentuk dokumen -------------------------------------
@@ -284,14 +335,10 @@ test('gelombang malas berangkat SETELAH layar utama tergambar, bukan sebelumnya'
     'harus ada jaring pengaman: app.js yang melempar sebelum openApp() tidak boleh membuat suara/Classroom tidak pernah terambil');
 });
 
-test('pemakai Puter menunggu kesiapan, tidak menyimpulkan dari ketiadaan', () => {
-  assert.ok(/async function awaitPuter\(/.test(app), 'harus ada satu tempat untuk menunggu SDK');
-  assert.ok(/const sdk=await awaitPuter\(\);if\(sdk\?\.workers\?\.exec\)/.test(app),
-    'coreWorkerExec harus menunggu SDK sebelum melempar puter_workers_unavailable');
-  assert.ok(/function armPuterAuthGate\(\)/.test(app) && /FiezelPuterReady\?\.ready\?\.\(\)/.test(app),
-    'gerbang akun harus dipasang lewat penantian, bukan lewat tebakan sesaat');
-  assert.ok(/if\(!puterAuthAvailable\(\)\)\{\s*\n?\s*setAuthGateState\('pending'\);/.test(app),
-    'tombol login harus berpindah ke pending dan menunggu, bukan gagal diam-diam');
+test('coreWorkerExec langsung merutekan ke Cloudflare (Puter dihapus)', () => {
+  assert.ok(/async function coreWorkerExec\(/.test(app), 'harus ada coreWorkerExec');
+  assert.ok(/cfWorkerFetch\(path,\s*options\)/.test(app),
+    'coreWorkerExec harus langsung memanggil cfWorkerFetch');
 });
 
 (async () => {

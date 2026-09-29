@@ -12,8 +12,8 @@ const GRAMMAR_DECLARED_COUNT=JSON.parse(fs.readFileSync('./grammar-templates.jso
 const assert=(ok,msg)=>{if(!ok)throw new Error(msg)};
 
 assert(/const APP_VERSION=self\.FIEZEL_VERSION/.test(app)&&fs.readFileSync(path.join(root,'version.js'),'utf8').includes(`'${VERSION}'`),'runtime version matches VERSION.json');
-assert(html.indexOf('https://js.puter.com/v2/')>=0&&html.indexOf('https://js.puter.com/v2/')<html.indexOf('./version.js'),'Puter.js must load before FIEZEL runtime scripts');
-assert(/async function askFiezelAI/.test(app)&&/coreWorkerExec\('\/api\/ai\/chat'/.test(app)&&!/puter\.ai\.chat\(/.test(app),'Core-only Puter AI gateway missing or direct bypass present');
+assert(html.indexOf('./version.js')>=0&&html.indexOf('./core-config.js')>=0,'Runtime scripts must load in index.html');
+assert(/async function askFiezelAI/.test(app)&&/coreWorkerExec\('\/api\/ai\/chat'/.test(app)&&!/puter\.ai\.chat\(/.test(app),'Core AI gateway missing or direct bypass present');
 assert(/function openAILoading/.test(app)&&/function renderAIResult/.test(app)&&/function renderAIError/.test(app),'AI modal states missing');
 assert(/id="aiExplainBtn"/.test(app)&&/id="aiWord"/.test(app),'AI entry buttons missing');
 assert(/window\.explainWithAI=explainWithAI/.test(app)&&/window\.explainWordWithAI=explainWordWithAI/.test(app),'AI handlers are not exposed');
@@ -57,7 +57,7 @@ assert(/Jaringan Kekeliruan Kosakata/.test(appCopyUnion)&&/Peta Skill Reading/.t
 // W2-INT: 'Laporan Diagnostik' juga PINDAH byte-identik ke copy-id-app-d.js (union sama).
 // Kredit pembuat tetap dicek di app.js langsung — ia bukan naskah murid yang boleh pindah.
 assert(/Laporan Diagnostik/.test(appCopyUnion)&&(/Dibuat oleh Fitrarustqi/.test(appCopyUnion)||/Dibuat oleh Fitrarustqi/.test(app)),'diagnostic/creator product surface missing');
-assert(/GRAMMAR_SESSION_SIZE=25/.test(app)&&/buildGrammarLessonQuestions/.test(app),'25-question grammar lesson contract missing');
+assert(/GRAMMAR_SESSION_SIZE=20/.test(app)&&/GRAMMAR_LESSON_MODES=/.test(app)&&/buildGrammarLessonQuestions/.test(app),'practice-first 20-question grammar lesson contract missing (m025-375)');
 assert(/getCelestialState/.test(app)&&/playFeedbackSound/.test(app)&&/showAnswerBurst/.test(app),'realtime sky or answer feedback system missing');
 assert(/if\(!state\.adaptiveReady\)return \[\]/.test(app),'adaptive pool must be locked before diagnosis');
 assert(/passage:\{id:r\.id/.test(app),'reading questions do not carry their passage');
@@ -70,7 +70,7 @@ assert(/passage:\{id:r\.id/.test(app),'reading questions do not carry their pass
 // (soal reading selalu ditemani passage-nya, ber-eyebrow berbahasa Indonesia yang benar),
 // bukan ejaan kunci yang boleh berubah kapan saja. Jadi kuncinya sekarang DIBACA dari
 // renderer, lalu nilainya diverifikasi di copy-map — rename lolos, kartu yang hilang tidak.
-const passageEyebrow=/q\.passage\?card\(`<div class="passage passage-reading"><div class="eyebrow">\$\{([^}]+)\}/.exec(app);
+const passageEyebrow=/q\.passage\?card\(`<div class="passage passage-reading"[^>]*><div class="eyebrow">\$\{([^}]+)\}/.exec(app);
 const eyebrowKey=passageEyebrow&&/FiezelI18n\.t\('([^']+)'\)/.exec(passageEyebrow[1]);
 assert(!!passageEyebrow&&(/TEKS BACAAN/.test(passageEyebrow[1])||(!!eyebrowKey&&new RegExp("'"+eyebrowKey[1].replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+"'\\s*:\\s*'TEKS BACAAN'").test(copyIdUnion))),'quiz renderer does not show passage with reading question');
 assert(/const readiness=diagnosticReadinessMap\(state\)/.test(app)&&/state\.adaptiveReady=!!readiness\[getActiveLevel\(state\)\]/.test(app),'adaptive readiness must be evidence-based, per active level');

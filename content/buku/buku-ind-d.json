@@ -1,0 +1,2113 @@
+{
+  "schema": "fiezel-buku-bank-v1",
+  "subjectId": "IND",
+  "phase": "fase_d",
+  "chapters": [
+    {
+      "code": "KOMP-IND-D-7-BAB1-01",
+      "grade": 7,
+      "name": "Bab 1: Jelajah Nusantara",
+      "materi": "",
+      "cpRef": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 1",
+      "target": 20,
+      "items": [
+        {
+          "id": "ind-d-7-b1-q01",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 4, dalam teks 'Pantan Terong yang Instagramable', objek wisata Pantan Terong terletak di kota...",
+          "options": [
+            "Takengon",
+            "Banda Aceh",
+            "Lampung",
+            "Pangandaran"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Teks deskripsi 'Pantan Terong yang Instagramable' secara eksplisit menyebutkan bahwa Pantan Terong merupakan nama tempat wisata populer yang berada di Kota Takengon, Aceh."
+          },
+          "distractorWhy": {
+            "1": "Banda Aceh merupakan kota asal keberangkatan rombongan Rafa pada pukul 01.00 siang, bukan lokasi dari objek wisata Pantan Terong.",
+            "2": "Lampung merupakan lokasi objek wisata kuliner Gang PU yang dibahas dalam teks deskripsi lain berjudul 'Jelajah Rasa di Lampung'.",
+            "3": "Pangandaran merupakan lokasi destinasi wisata Green Canyon dan Sungai Santirah yang dibahas pada bab mengenai pamflet wisata."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 1",
+            "bab": "KOMP-IND-D-7-BAB1-01"
+          }
+        },
+        {
+          "id": "ind-d-7-b1-q02",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 5, berapakah ketinggian bukit Pantan Terong di atas permukaan laut?",
+          "options": [
+            "1.830 meter dpl",
+            "2.662 meter dpl",
+            "1.500 meter dpl",
+            "3.000 meter dpl"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pada teks halaman 5 disebutkan secara rinci bahwa pemandangan cantik di Pantan Terong dinikmati dari ketinggian 1.830 meter di atas permukaan laut."
+          },
+          "distractorWhy": {
+            "1": "Ketinggian 2.662 mdpl merupakan ketinggian Gunung Papandayan sebagaimana tercantum dalam pamflet wisata Papandayan di halaman 16.",
+            "2": "Ketinggian 1.500 meter dpl bukan angka ketinggian yang tercantum dalam teks deskripsi Pantan Terong maupun Gunung Papandayan.",
+            "3": "Angka 3.000 merupakan rata-rata curah hujan (mm/tahun) Gunung Papandayan, bukan ukuran ketinggian Pantan Terong di atas permukaan laut."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 1",
+            "bab": "KOMP-IND-D-7-BAB1-01"
+          }
+        },
+        {
+          "id": "ind-d-7-b1-q03",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 5-6, manakah yang merupakan kalimat perincian untuk menggambarkan keindahan pemandangan alam dari atas Pantan Terong?",
+          "options": [
+            "Dari ketinggian, terlihat warna langit yang jingga terkena semburat sinar matahari di balik deretan gunung-gunung yang kokoh.",
+            "Sebelum pulang, ibuku membeli suvenir yang berbentuk kopi gayo untuk membantu perajin lokal.",
+            "Kami berangkat dari Banda Aceh pukul 01.00 siang dan tiba pukul 08.00 malam di rumah Paman.",
+            "Jalanan kecil menuju puncak sangat menanjak dan curam dengan tikungan-tikungan yang tajam."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat tersebut merinci secara spesifik gambaran visual pemandangan alam (warna langit jingga, semburat matahari, deretan gunung kokoh) yang melibatkan pancaindra penglihatan."
+          },
+          "distractorWhy": {
+            "1": "Kalimat tentang membeli suvenir merupakan bagian dari ajakan mempromosikan produk/kerajinan lokal, bukan perincian keindahan alam.",
+            "2": "Kalimat tersebut menguraikan alur perjalanan waktu dan tempat dari Banda Aceh ke Takengon, bukan kalimat perincian gambaran alam.",
+            "3": "Kalimat tentang jalanan menanjak dan curam menggambarkan kondisi medan perjalanan menuju puncak bukit, bukan perincian keindahan pemandangan dari atas."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 1",
+            "bab": "KOMP-IND-D-7-BAB1-01"
+          }
+        },
+        {
+          "id": "ind-d-7-b1-q04",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 6, jenis makanan atau minuman khas yang dapat dicicipi wisatawan saat berkunjung ke Pantan Terong di Tanah Gayo adalah...",
+          "options": [
+            "Kopi gayo",
+            "Keripik pisang",
+            "Bandrek hangat",
+            "Kue balok lumer"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Teks menyebutkan bahwa pengunjung dapat mencicipi aneka varian sajian kopi asli Tanah Gayo seperti espresso, cappuccino, mochacino, hingga latte."
+          },
+          "distractorWhy": {
+            "1": "Keripik pisang merupakan makanan khas yang diulas dalam teks deskripsi lisan 'Jelajah Rasa di Lampung' di Gang PU Bandar Lampung.",
+            "2": "Bandrek merupakan sajian minuman hangat yang dijadikan contoh objek latihan deskripsi gambar pada Kegiatan 5a halaman 14.",
+            "3": "Kue balok merupakan contoh objek wacana pembanding kalimat perincian rasa dan tekstur makanan pada halaman 12."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 1",
+            "bab": "KOMP-IND-D-7-BAB1-01"
+          }
+        },
+        {
+          "id": "ind-d-7-b1-q05",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 7, kata 'instagramable' yang digunakan dalam teks deskripsi merupakan istilah yang memiliki makna...",
+          "options": [
+            "Layak atau indah untuk diunggah dan dijadikan latar berswafoto di media sosial Instagram",
+            "Dapat dibeli dengan harga murah sebagai suvenir khas daerah",
+            "Memiliki nilai sejarah yang tinggi dan dilindungi pemerintah",
+            "Dapat diakses dengan mudah menggunakan kendaraan umum"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Dalam penjelasan buku hal. 9, instagramable adalah kata serapan bahasa Inggris yang disematkan pada tempat yang indah untuk latar swafoto di Instagram."
+          },
+          "distractorWhy": {
+            "1": "Makna barang murah yang dijadikan oleh-oleh merujuk pada pengertian suvenir atau cendera mata lokal.",
+            "2": "Nilai sejarah dan perlindungan pemerintah merujuk pada objek cagar budaya atau cagar alam, bukan makna istilah instagramable.",
+            "3": "Keterjangkauan akses kendaraan umum merupakan aspek aksesibilitas tempat wisata seperti yang dibahas pada analisis pamflet Papandayan."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 1",
+            "bab": "KOMP-IND-D-7-BAB1-01"
+          }
+        },
+        {
+          "id": "ind-d-7-b1-q06",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 8-9 (Kegiatan 3), perhatikan pencarian makna kata dalam KBBI cetak. Jika kita mencari makna kata dasar 'meredup' dalam KBBI cetak, kata dasar yang harus dicari pada abjad 'R' adalah...",
+          "options": [
+            "redup",
+            "meredup",
+            "edup",
+            "redupkan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kaidah pencarian kata dalam KBBI cetak mengharuskan pengguna menemukan kata dasarnya terlebih dahulu. Kata dasar dari kata berimbuhan 'meredup' adalah 'redup'."
+          },
+          "distractorWhy": {
+            "1": "Pencarian langsung menggunakan kata berimbuhan 'meredup' kurang tepat dalam KBBI cetak karena entri disusun berdasarkan kata dasar.",
+            "2": "Bentuk 'edup' bukanlah kata dasar bahasa Indonesia yang valid dari verba meredup.",
+            "3": "Bentuk 'redupkan' adalah bentuk kata dasar yang sudah mendapat akhiran -kan, bukan kata dasar murni."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 1",
+            "bab": "KOMP-IND-D-7-BAB1-01"
+          }
+        },
+        {
+          "id": "ind-d-7-b1-q07",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 10-11 (Kupas Teori), manakah yang BUKAN merupakan ciri atau tujuan utama dari teks deskripsi?",
+          "options": [
+            "Menceritakan urutan peristiwa rekaan dengan plot konflik yang rumit",
+            "Menggambarkan atau melukiskan suatu benda, tempat, atau suasana tertentu",
+            "Melibatkan pancaindra agar pembaca seolah-olah melihat atau merasakan sendiri",
+            "Menjelaskan ciri-ciri objek seperti warna, ukuran, dan bentuk secara terperinci"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Menceritakan urutan peristiwa rekaan dengan konflik rumit merupakan ciri dari teks narasi/fantasi, bukan teks deskripsi yang berfokus melukiskan objek konkret."
+          },
+          "distractorWhy": {
+            "1": "Pernyataan ini tepat merupakan salah satu poin utama tujuan teks deskripsi pada halaman 9.",
+            "2": "Pernyataan ini tepat merupakan ciri teks deskripsi yang melibatkan penglihatan, pendengaran, penciuman, dan perabaan pada halaman 10.",
+            "3": "Pernyataan ini tepat merupakan ciri teks deskripsi yang menguraikan rupa dan bentuk objek secara mendetail pada halaman 10."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 1",
+            "bab": "KOMP-IND-D-7-BAB1-01"
+          }
+        },
+        {
+          "id": "ind-d-7-b1-q08",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 12 (Tabel 1.2), perhatikan kalimat umum: 'Kue balok itu enak sekali.' Manakah kalimat perincian yang tepat untuk mendukung kalimat umum tersebut?",
+          "options": [
+            "Teksturnya lembut saat digigit dan isian cokelatnya akan lumer di mulutmu.",
+            "Kue balok dibeli oleh Paman di toko roti terkenal kemarin sore.",
+            "Harganya sangat murah sehingga terjangkau oleh semua kalangan.",
+            "Kue tersebut dikemas dalam kotak karton berwarna cokelat tua."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Teks buku halaman 12 memberikan contoh kalimat perinci untuk rasa kue balok yang enak: 'Teksturnya lembut saat digigit dan isian cokelatnya akan lumer di mulutmu.'"
+          },
+          "distractorWhy": {
+            "1": "Kalimat ini menjelaskan alur transaksi pembelian kue, bukan perincian citra rasa atau tekstur yang membuktikan kue itu enak.",
+            "2": "Kalimat ini menguraikan aspek ekonomis atau harga kue, bukan perincian kelezatan rasa kue balok.",
+            "3": "Kalimat ini menggambarkan aspek kemasan luar (wadah), bukan perincian rasa atau kualitas makanan saat dikonsumsi."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 1",
+            "bab": "KOMP-IND-D-7-BAB1-01"
+          }
+        },
+        {
+          "id": "ind-d-7-b1-q09",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 13 (Kupas Teori), gaya bahasa yang mengumpamakan benda mati seolah-olah hidup dan dapat berperilaku seperti manusia disebut...",
+          "options": [
+            "Majas personifikasi",
+            "Majas metafora",
+            "Majas hiperbola",
+            "Majas asosiasi"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kupas Teori halaman 13 mendefinisikan majas personifikasi sebagai gaya bahasa yang mengumpamakan benda mati seolah-olah hidup seperti manusia."
+          },
+          "distractorWhy": {
+            "1": "Majas metafora adalah pemakaian kata yang bukan arti sebenarnya sebagai pembanding langsung tanpa kata pembanding, bukan penginsanan benda mati.",
+            "2": "Majas hiperbola adalah gaya bahasa pengungkapan yang berlebih-lebihan untuk menekankan kesan.",
+            "3": "Majas asosiasi adalah perbandingan dua hal yang sifatnya berbeda tetapi dianggap sama dengan kata pembanding seperti bagai, ibarat, bak."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 1",
+            "bab": "KOMP-IND-D-7-BAB1-01"
+          }
+        },
+        {
+          "id": "ind-d-7-b1-q10",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 13, perhatikan kalimat berikut: 'Angin yang bertiup memainkan rambut dan berputar di sekeliling tubuh.' Kata kerja yang menandai pengumpamaan benda mati seolah-olah hidup pada kalimat tersebut adalah...",
+          "options": [
+            "memainkan dan berputar",
+            "bertiup dan sekeliling",
+            "angin dan rambut",
+            "tubuh dan bertiup"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata 'memainkan' dan 'berputar' adalah tindakan manusiawi yang disematkan kepada angin (benda mati) sehingga menciptakan majas personifikasi."
+          },
+          "distractorWhy": {
+            "1": "Kata 'bertiup' adalah pergerakan alami angin, sedangkan 'sekeliling' adalah kata penunjuk ruang/posisi.",
+            "2": "Kata 'angin' dan 'rambut' keduanya merupakan kata benda (nomina), bukan kata kerja penggerak majas.",
+            "3": "Kata 'tubuh' adalah nomina dan 'bertiup' adalah verba alami angin, tidak mengandung tindakan personifikasi khas manusia."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 1",
+            "bab": "KOMP-IND-D-7-BAB1-01"
+          }
+        },
+        {
+          "id": "ind-d-7-b1-q11",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 13-14, bacalah kutipan novel 'Misteri Terowongan Kereta' karya Tere Liye: '...Meski si ular besi ini sudah menjadi bagian kehidupan kampung, dengan suara klaksonnya yang tidak pernah alpa, melenguh nyaring setiap subuh buta dan tengah malam...' Ungkapan majas personifikasi dalam kutipan tersebut ditunjukkan oleh ungkapan...",
+          "options": [
+            "suara klaksonnya yang tidak pernah alpa, melenguh nyaring",
+            "perjalanan pertama kalinya aku dan Burlian dengan kereta api",
+            "hutan pedalaman Sumatra yang selalu berkabut di pagi hari",
+            "bapak tersenyum sambil takzim menatap langit-langit gerbong"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Klakson kereta api (benda mati) digambarkan memiliki sifat 'tidak pernah alpa' dan dapat 'melenguh nyaring' seperti lembu/hewan bernyawa, yang merupakan majas personifikasi."
+          },
+          "distractorWhy": {
+            "1": "Kalimat ini menceritakan pengalaman tokoh aku dan Burlian menaiki kereta api, merupakan fakta peristiwa naratif tanpa majas.",
+            "2": "Kalimat ini menggambarkan keadaan alam hutan Sumatra yang berkabut, merupakan kenyataan fenomena alamik biasa.",
+            "3": "Kalimat ini menceritakan ekspresi dan tindakan manusia (Bapak) yang menatap langit gerbong, bukan personifikasi benda mati."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 1",
+            "bab": "KOMP-IND-D-7-BAB1-01"
+          }
+        },
+        {
+          "id": "ind-d-7-b1-q12",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 16-17, pamflet wisata 'Taklukkan Puncak Papandayan' memuat informasi detail berupa kelembapan udara 70—80% dan temperatur 10—25°C yang didasarkan pada klasifikasi iklim menurut...",
+          "options": [
+            "Schmidt dan Ferguson",
+            "Junghuhn",
+            "Koppen",
+            "Oldeman"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Dalam teks pamflet wisata Papandayan halaman 16 tertulis eksplisit: 'Menurut klasifikasi Schmidt dan Ferguson, gunung ini memiliki curah hujan rata-rata 3.000 mm/tahun, kelembapan udara 70—80% dan temperatur 10—25° C.'"
+          },
+          "distractorWhy": {
+            "1": "Klasifikasi Junghuhn didasarkan pada ketinggian tempat dan jenis vegetasi tanaman budidaya, bukan rujukan yang tertulis dalam teks pamflet.",
+            "2": "Klasifikasi Koppen didasarkan pada suhu dan curah hujan global, tidak disebutkan dalam teks pamflet Papandayan.",
+            "3": "Klasifikasi Oldeman didasarkan pada bulan basah dan bulan kering untuk pertanian tanaman pangan, tidak dirujuk pada pamflet tersebut."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 1",
+            "bab": "KOMP-IND-D-7-BAB1-01"
+          }
+        },
+        {
+          "id": "ind-d-7-b1-q13",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 16, jika seorang wisatawan dari Jakarta ingin mengunjungi Taman Wisata Alam Gunung Papandayan menggunakan bus jurusan Jakarta—Garut, rute angkutan umum lanjutan yang benar dari Terminal Guntur Garut adalah...",
+          "options": [
+            "Naik angkutan elf jurusan Garut—Cikajang dengan tarif Rp15.000,00",
+            "Naik angkutan elf dari Terminal Cicaheum jurusan Bandung—Cikajang",
+            "Naik bus Primajasa langsung menuju lokasi tempat perkemahan Pondok Saladah",
+            "Naik taksi online langsung menuju gerbang pos 2 Poco Roko"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pamflet wisata Papandayan di hal. 16 menyebutkan rute secara presisi: turun di Terminal Guntur—Garut, lalu lanjutkan dengan angkutan elf jurusan Garut—Cikajang dengan tarif Rp15.000,00."
+          },
+          "distractorWhy": {
+            "1": "Rute Terminal Cicaheum (Bandung) merupakan rute alternatif jika wisatawan berangkat dari Bandung, bukan sambungan dari Terminal Guntur Garut.",
+            "2": "Bus Primajasa hanya beroperasi antar kota (Jakarta—Garut) hingga terminal, tidak masuk ke lokasi perkemahan gunung.",
+            "3": "Pos 2 Poco Roko merupakan pos pendakian di Desa Wae Rebo NTT (halaman 32-33), bukan lokasi di Gunung Papandayan Garut."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 1",
+            "bab": "KOMP-IND-D-7-BAB1-01"
+          }
+        },
+        {
+          "id": "ind-d-7-b1-q14",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 21 (Gambar 1.6 dan 1.7), tempat wisata Sungai Santirah yang menyajikan kegiatan River Tubing secara geografis terletak di...",
+          "options": [
+            "Dusun Giriharja, Desa Selasari, Kecamatan Parigi, Kabupaten Pangandaran",
+            "Desa Sirna Jaya dan Desa Kramat Wangi, Kabupaten Garut",
+            "Kecamatan Takengon, Kabupaten Aceh Tengah, Provinsi Aceh",
+            "Desa Denge, Kecamatan Satarmese Barat, Kabupaten Manggarai"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Keterangan lokasi pada pamflet Wisata Green Canyon (Gambar 1.7) menyebutkan lokasi Sungai Santirah berada di dusun Giriharja, Desa Selasari, Kecamatan Parigi, Kabupaten Pangandaran, Jawa Barat."
+          },
+          "distractorWhy": {
+            "1": "Lokasi tersebut merupakan letak kawasan Taman Wisata Alam Gunung Papandayan di Kabupaten Garut.",
+            "2": "Kecamatan Takengon Aceh Tengah merupakan lokasi objek wisata Bukit Pantan Terong dan Danau Laut Tawar.",
+            "3": "Desa Denge Kabupaten Manggarai NTT merupakan lokasi gerbang awal pendakian menuju Desa Wae Rebo."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 1",
+            "bab": "KOMP-IND-D-7-BAB1-01"
+          }
+        },
+        {
+          "id": "ind-d-7-b1-q15",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 23 (Kupas Teori Awalan meN-), manakah aturan yang BENAR mengenai peluluhan fonem k, p, t, s saat mendapat awalan meN-?",
+          "options": [
+            "Fonem k, p, t, s luluh jika diikuti kata dasar yang berawalan huruf k, p, t, s tunggal (bukan kluster)",
+            "Fonem k, p, t, s tetap luluh meskipun diikuti oleh kata dasar yang berawalan konsonan rangkap (kluster)",
+            "Fonem k, p, t, s luluh ketika bergabung dengan kata berimbuhan berawalan k, p, t, s seperti memperluas",
+            "Fonem k, p, t, s tidak pernah luluh dalam kondisi penambahan awalan meN- bentuk apa pun"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Teori bahasa hal. 23 menjelaskan fonem k, p, t, s luluh jika diawali kata dasar berawalan huruf k, p, t, s tunggal (contoh: meN- + pesona -> memesona, meN- + pengaruh -> memengaruhi)."
+          },
+          "distractorWhy": {
+            "1": "Jika diikuti konsonan rangkap (kluster) seperti pr, kr, kl, fonem k, p, t, s TIDAK luluh (contoh: memprakarsai, mengkriminalkan).",
+            "2": "Pada kata berimbuhan yang diawali k, p, t, s seperti memperluas / mempertaruhkan, fonem p atau t TIDAK luluh.",
+            "3": "Pernyataan ini salah karena dalam kaidah tata bahasa Indonesia standar fonem k, p, t, s mengalami peluluhan jika memenuhi syarat tertentu."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 1",
+            "bab": "KOMP-IND-D-7-BAB1-01"
+          }
+        },
+        {
+          "id": "ind-d-7-b1-q16",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 23 (Tantangan), manakah kalimat yang menggunakan kata berimbuhan meN- dengan peluluhan kata dasar yang BENAR?",
+          "options": [
+            "Kilau sinar matahari yang menerpa permukaan danau itu sangat mengagumkan.",
+            "Perajin memroduksi suvenir dalam kegiatan industri rumah tangga skala kecil.",
+            "Pemandu wisata itu secara tangkas menterjemahkan paparannya ke bahasa Jerman.",
+            "Pendaki gunung tidak memersoalkan kenaikan tarif fasilitas di jalur pendakian."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata 'menerpa' berasal dari awalan meN- + terpa (huruf t luluh menjadi n). Ini merupakan pembentukan kata berimbuhan meN- yang baku dan tepat."
+          },
+          "distractorWhy": {
+            "1": "Bentuk 'memroduksi' salah; kata dasar 'produksi' berawalan kluster pr- sehingga p TIDAK luluh (seharusnya memproduksi).",
+            "2": "Bentuk 'menterjemahkan' salah; kata dasar 'terjemah' berawalan t tunggal sehingga t LULUH menjadi n (seharusnya menerjemahkan).",
+            "3": "Bentuk 'memersoalkan' salah; kata asal 'persoal' mendapat imbuhan me-kan pada bentuk dasar soal/persoal (seharusnya mempersoalkan)."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 1",
+            "bab": "KOMP-IND-D-7-BAB1-01"
+          }
+        },
+        {
+          "id": "ind-d-7-b1-q17",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 25-27 (Menganalisis Informasi Lisan 'Jelajah Wae Rebo'), apakah nama rumah adat tradisional khas Manggarai yang berbentuk kerucut dan memiliki lima tingkat?",
+          "options": [
+            "Mbaru Niang",
+            "Tongkonan",
+            "Rumah Gadang",
+            "Honai"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Teks lisan 'Jelajah Wae Rebo' karya Eugenia Rakhma Subarna menyebutkan bahwa rumah tradisional khas Manggarai yang memiliki 5 tingkat berbentuk kerucut dinamakan Mbaru Niang."
+          },
+          "distractorWhy": {
+            "1": "Tongkonan merupakan rumah adat tradisional masyarakat suku Toraja di Sulawesi Selatan.",
+            "2": "Rumah Gadang merupakan rumah adat tradisional Minangkabau di Sumatera Barat.",
+            "3": "Honai merupakan rumah adat tradisional suku-suku di wilayah pegunungan Papua."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 1",
+            "bab": "KOMP-IND-D-7-BAB1-01"
+          }
+        },
+        {
+          "id": "ind-d-7-b1-q18",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 26-27, pada bangunan rumah Mbaru Niang di Desa Wae Rebo, bagian tingkat ketiga yang berfungsi khusus untuk menyimpan benih jagung dan tanaman bercocok tanam dinamakan...",
+          "options": [
+            "lentar",
+            "lutur",
+            "lobo",
+            "hempang"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Dalam penuturan pandu wisata teks Jelajah Wae Rebo di hal. 27 dijelaskan: '...inilah tingkat ketiga atau yang biasa disebut lentar, berfungsi menyimpan benih jagung dan tanaman untuk bercocok tanam...'"
+          },
+          "distractorWhy": {
+            "1": "Lutur atau tenda adalah tingkat pertama Mbaru Niang yang berfungsi sebagai tempat tinggal dan berkumpul keluarga.",
+            "2": "Lobo (tingkat keempat) dan tempat lainnya memiliki fungsi penyimpanan bahan makanan cadangan saat paceklik.",
+            "3": "Hempang adalah istilah lain dari susunan konstruksi kayu/perabot, bukan nama struktur tingkat ketiga Mbaru Niang."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 1",
+            "bab": "KOMP-IND-D-7-BAB1-01"
+          }
+        },
+        {
+          "id": "ind-d-7-b1-q19",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 28-29 ('Jelajah Rasa di Lampung'), apakah nama kawasan yang terkenal sebagai pusat sentra keripik pisang di Jalan Pagar Alam, Kota Bandar Lampung?",
+          "options": [
+            "Gang PU",
+            "Gang Malioboro",
+            "Pasar Beringharjo",
+            "Pantan Terong"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Teks 'Jelajah Rasa di Lampung' menyebutkan bahwa pusat sentra keripik pisang lampung terletak di Jalan Pagar Alam, Kota Bandar Lampung, yang terkenal dengan sebutan Gang PU."
+          },
+          "distractorWhy": {
+            "1": "Gang Malioboro merupakan kawasan sentra wisata belanja terkenal di Kota Yogyakarta.",
+            "2": "Pasar Beringharjo adalah pasar tradisional di Yogyakarta yang dipakai sebagai contoh teks deskripsi lokasi di hal. 10.",
+            "3": "Pantan Terong adalah bukit tempat wisata pemandangan alam di Kota Takengon Aceh Tengah."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 1",
+            "bab": "KOMP-IND-D-7-BAB1-01"
+          }
+        },
+        {
+          "id": "ind-d-7-b1-q20",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII hal. 31-32 (Kegiatan 9: Kupas Teori Tanda Baca), manakah kalimat yang menggunakan tanda koma (,) dengan BENAR sesuai kaidah kebahasaan?",
+          "options": [
+            "Wah, indah sekali pemandangan di Pantan Terong!",
+            "Gunung Papandayan telah meletus beberapa kali, Meskipun demikian kawahnya tetap indah.",
+            "Ia membeli kopi kain dan tas sebagai oleh-oleh.",
+            "Lili mengambil foto sementara Fajar memilih menikmati kopi."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Halaman 32 menjelaskan bahwa tanda koma dipakai sebelum dan/atau sesudah kata seru (seperti wah, o, ya, aduh) sehingga pemisahan 'Wah, indah sekali...' adalah tepat."
+          },
+          "distractorWhy": {
+            "1": "Setelah ungkapan penghubung antarkalimat 'Meskipun demikian', WAJIB diikuti tanda koma: 'Meskipun demikian, kawahnya...'.",
+            "2": "Pada rincian lebih dari dua unsur (pemerincian), wajib menggunakan tanda koma sebelum kata 'dan': 'kopi, kain, dan tas'.",
+            "3": "Pada kalimat majemuk setara dengan pertentangan/penghubung 'sementara', wajib didahului tanda koma sebelum kata 'sementara'."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 1",
+            "bab": "KOMP-IND-D-7-BAB1-01"
+          }
+        }
+      ]
+    },
+    {
+      "code": "KOMP-IND-D-7-BAB2-01",
+      "grade": 7,
+      "name": "Bab 2: Kelana Cerita Unik",
+      "materi": "",
+      "cpRef": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 2",
+      "target": 20,
+      "items": [
+        {
+          "id": "ind-d-7-b2-q01",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 42-45 Puisi Rakyat), ciri-ciri utama pantun karya sastra Melayu lama yang tepat adalah…",
+          "options": [
+            "Setiap bait terdiri atas 4 baris, bersajak a-b-a-b, baris 1-2 berupa sampiran, dan baris 3-4 berupa isi",
+            "Setiap bait terdiri atas 2 baris, bersajak a-a, dan semuanya merupakan isi nasihat",
+            "Terdiri dari baris bebas tanpa rima dan bait yang fleksibel",
+            "Setiap baris terdiri dari 20 kata dengan sajak a-a-a-a"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pantun memiliki aturan baku: 4 baris per bait, sajak silang (a-b-a-b), 8-12 suku kata per baris, 2 baris awal sampiran, 2 baris akhir isi."
+          },
+          "distractorWhy": {
+            "1": "Ciri 2 baris bersajak a-a merupakan ciri Gurindam.",
+            "2": "Ciri bebas tanpa rima adalah ciri puisi modern/bebas.",
+            "3": "20 kata per baris terlalu panjang untuk aturan 8-12 suku kata."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 2",
+            "bab": "KOMP-IND-D-7-BAB2-01"
+          }
+        },
+        {
+          "id": "ind-d-7-b2-q02",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 48 Gurindam), cermati kutipan gurindam berikut:\n'Jika hendak mengenal orang berbangsa,\nLihat kepada budi dan bahasa.'\nPesan atau nilai moral yang terkandung dalam gurindam tersebut adalah…",
+          "options": [
+            "Kemuliaan dan keutamaan seseorang dapat dinilai dari keluhuran budi pekerti dan tutur bahasanya",
+            "Seseorang dianggap berbangsa tinggi jika memiliki harta yang melimpah",
+            "Bicara yang keras menunjukkan keberanian seseorang",
+            "Bahasa daerah harus dihafalkan oleh setiap suku bangsa"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Gurindam tersebut mengajarkan bahwa harkat derajat seseorang tampak dari kebaikan budi dan ketertiban bahasanya."
+          },
+          "distractorWhy": {
+            "1": "Harta kekayaan bukan ukuran budi bahasa gurindam.",
+            "2": "Bicara keras bukan pesan positif gurindam.",
+            "3": "Penafsiran harfiah yang keliru."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 2",
+            "bab": "KOMP-IND-D-7-BAB2-01"
+          }
+        },
+        {
+          "id": "ind-d-7-b2-q03",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 55-58 Cerita Fantasi), ciri khas utama dari cerita fantasi dibanding cerita fiksi naratif umum adalah…",
+          "options": [
+            "Mengandung keajaiban, keanehan, atau keajaiban supranatural yang tidak ada di dunia nyata (seperti sihir atau lorong waktu)",
+            "Berdasarkan kisah nyata kehidupan pahlawan nasional",
+            "Menggunakan data grafik statistik yang akurat",
+            "Ditulis dalam bahasa Latin Kuno"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Cerita fantasi ditandai oleh daya imajinasi bebas penulis yang menghadirkan hal ajaib/gaib di luar hukum alam nyata."
+          },
+          "distractorWhy": {
+            "1": "Kisah nyata pahlawan adalah teks biografi/sejarah.",
+            "2": "Data statistik adalah ciri teks eksposisi/laporan.",
+            "3": "Penggunaan bahasa Latin bukan kriteria cerita fantasi."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 2",
+            "bab": "KOMP-IND-D-7-BAB2-01"
+          }
+        },
+        {
+          "id": "ind-d-7-b2-q04",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 62 Kebahasaan Teks Fantasi), penggunaan konjungsi urutan waktu yang tepat dalam paragraf narasi cerita fantasi adalah…",
+          "options": [
+            "Setelah itu, tiba-tiba, kemudian, dan akhirnya",
+            "Sebab, karena, oleh karena itu, dan akibatnya",
+            "Tetapi, melainkan, namun, dan sedangkan",
+            "Jika, apabila, bilamana, dan seandainya"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Konjungsi urutan waktu (kronologis) menyambungkan alur peristiwa secara berurutan: setelah itu, tiba-tiba, kemudian, akhirnya."
+          },
+          "distractorWhy": {
+            "1": "Konjungsi kausalitas (sebab-akibat).",
+            "2": "Konjungsi pertentangan.",
+            "3": "Konjungsi pengandaian/syarat."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 2",
+            "bab": "KOMP-IND-D-7-BAB2-01"
+          }
+        },
+        {
+          "id": "ind-d-7-b2-q05",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 65), watak tokoh protagonis dalam cerita fantasi biasanya digambarkan sebagai…",
+          "options": [
+            "Tokoh utama yang berwatak baik, pemberani, dan penolong",
+            "Tokoh jahat penentang utama yang suka merusak",
+            "Tokoh figuran yang tidak memiliki peran cerita",
+            "Tokoh narator yang tidak terlibat dalam konflik"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Protagonis adalah tokoh utama pembawa nilai-nilai kebaikan yang diidolakan dalam alur cerita."
+          },
+          "distractorWhy": {
+            "1": "Tokoh jahat penentang adalah antagonis.",
+            "2": "Tokoh figuran adalah figuran/tritagonis.",
+            "3": "Tokoh narator adalah pencerita."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 2",
+            "bab": "KOMP-IND-D-7-BAB2-01"
+          }
+        },
+        {
+          "id": "ind-d-7-b2-q06",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 70 Uji Kemampuan), bagian struktur cerita fantasi yang memuat puncak konflik atau permasalahan tertinggi yang dihadapi tokoh dinamakan…",
+          "options": [
+            "Klimaks (Komplikasi puncak)",
+            "Orientasi awal",
+            "Resolusi peleraian",
+            "Koda penutup"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Klimaks adalah titik balik puncak ketegangan konflik dalam bagian komplikasi sebelum menuju jalan keluar."
+          },
+          "distractorWhy": {
+            "1": "Orientasi adalah pengenalan latar dan tokoh di awal.",
+            "2": "Resolusi adalah penyelesaian masalah.",
+            "3": "Koda adalah pesan moral penutup."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 2",
+            "bab": "KOMP-IND-D-7-BAB2-01"
+          }
+        }
+      ]
+    },
+    {
+      "code": "KOMP-IND-D-7-BAB3-01",
+      "grade": 7,
+      "name": "Bab 3: Hal yang Baik bagi Tubuh",
+      "materi": "",
+      "cpRef": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+      "target": 12,
+      "items": [
+        {
+          "id": "ind-d-7-b3-q01",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 75-80), tujuan utama penulisan teks prosedur adalah…",
+          "options": [
+            "Petunjuk atau panduan langkah-langkah dalam membuat atau melakukan sesuatu secara runtut",
+            "Menceritakan kisah fiktif tokoh pahlawan",
+            "Menggambarkan keindahan alam secara detail",
+            "Menyampaikan pendapat pro dan kontra terhadap isu sosial"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Teks prosedur memberikan petunjuk operasional sistematis membuat/melakukan sesuatu."
+          },
+          "distractorWhy": {
+            "1": "Teks narasi.",
+            "2": "Teks deskripsi.",
+            "3": "Teks diskusi."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-7-BAB3-01"
+          }
+        },
+        {
+          "id": "ind-d-7-b3-q02",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 84 Struktur Prosedur), urutan struktur teks prosedur yang tepat adalah…",
+          "options": [
+            "Tujuan -> Alat/Bahan -> Langkah-langkah -> Penutup/Penegasan",
+            "Langkah-langkah -> Tujuan -> Alat/Bahan",
+            "Judul -> Kesimpulan -> Langkah-langkah",
+            "Orientasi -> Komplikasi -> Resolusi"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Struktur baku teks prosedur diawali Tujuan, Bahan/Alat, Urutan Langkah, dan Penutup."
+          },
+          "distractorWhy": {
+            "1": "Urutan acak.",
+            "2": "Struktur tidak baku.",
+            "3": "Struktur cerita fantasi."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-7-BAB3-01"
+          }
+        },
+        {
+          "id": "ind-d-7-b3-q03",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 88 Kebahasaan), kalimat imperatif (perintah) yang tepat dalam prosedur pembuatan minuman sehat adalah…",
+          "options": [
+            "Aduk campuran jahe dan madu tersebut hingga larut sempurna!",
+            "Apakah jahe tersebut sudah diiris tipis?",
+            "Saya sangat menyukai aroma jahe segar.",
+            "Jahe adalah tanaman rimpang obat keluarga."
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat imperatif ditandai kata kerja aksi di awal (aduk) dan akhiran perintah (!)."
+          },
+          "distractorWhy": {
+            "1": "Kalimat interogatif (tanya).",
+            "2": "Kalimat deklaratif opini.",
+            "3": "Kalimat deklaratif fakta."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-7-BAB3-01"
+          }
+        },
+        {
+          "id": "ind-d-7-b3-q04",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 92), penggunaan kata keterangan cara yang tepat dalam teks prosedur olahraga adalah…",
+          "options": [
+            "Tarik napas secara perlahan-lahan dan hembuskan lewat mulut",
+            "Olahraga dilakukan pada pagi hari pukul 06.00 WIB",
+            "Gunakan sepatu olahraga ukuran 40",
+            "Lakukan gerakan ini sebanyak 10 kali"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "'Secara perlahan-lahan' adalah keterangan cara (adverbia cara) pelaksanaan aksi."
+          },
+          "distractorWhy": {
+            "1": "Keterangan waktu.",
+            "2": "Keterangan alat/ukuran.",
+            "3": "Keterangan kuantitas/jumlah."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-7-BAB3-01"
+          }
+        },
+        {
+          "id": "ind-d-7-b3-q05",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 82), contoh kata penghubung (konjungsi) urutan dalam teks prosedur adalah…",
+          "options": [
+            "Pertama, kemudian, selanjutnya, dan akhirnya",
+            "Sebab, karena, dan akibatnya",
+            "Tetapi, namun, dan melainkan",
+            "Jika, seandainya, dan jikalau"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Konjungsi urutan (kronologis) menyusun langkah bertahap."
+          },
+          "distractorWhy": {
+            "1": "Konjungsi kausalitas.",
+            "2": "Konjungsi pertentangan.",
+            "3": "Konjungsi pengandaian."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-7-BAB3-01"
+          }
+        },
+        {
+          "id": "ind-d-7-b3-q06",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VII (hal. 96 Uji Kemampuan), bagian penutup dalam teks prosedur berfungsi untuk…",
+          "options": [
+            "Memberikan penegasan ulang ucapan selamat mencoba atau manfaat dari kegiatan yang dipraktikkan",
+            "Merinci daftar harga bahan-bahan yang dibeli",
+            "Menjelaskan kegagalan yang mungkin terjadi",
+            "Menuliskan nama-nama penulis buku"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Penutup berisi apresiasi 'Selamat mencoba' atau ringkasan manfaat hasil."
+          },
+          "distractorWhy": {
+            "1": "Bukan fungsi penutup.",
+            "2": "Bukan fokus penutup.",
+            "3": "Biografi penulis."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-7-BAB3-01"
+          }
+        }
+      ]
+    },
+    {
+      "code": "KOMP-IND-D-7-BAB4-01",
+      "grade": 7,
+      "name": "Bab 4: Aksi Nyata Pelindung Bumi",
+      "materi": "",
+      "cpRef": "",
+      "target": 12,
+      "items": []
+    },
+    {
+      "code": "KOMP-IND-D-7-BAB5-01",
+      "grade": 7,
+      "name": "Bab 5: Membuka Gerbang Dunia",
+      "materi": "",
+      "cpRef": "",
+      "target": 18,
+      "items": []
+    },
+    {
+      "code": "KOMP-IND-D-7-BAB6-01",
+      "grade": 7,
+      "name": "Bab 6: Sampaikan Melalui Surat",
+      "materi": "",
+      "cpRef": "",
+      "target": 19,
+      "items": []
+    },
+    {
+      "code": "KOMP-IND-D-8-BAB1-01",
+      "grade": 8,
+      "name": "Bab 1: Laporan Hasil Observasi",
+      "materi": "",
+      "cpRef": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+      "target": 20,
+      "items": [
+        {
+          "id": "ind-d-8-b1-q01",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 6-10 Teks 'Sepeda Motor di Indonesia'), tujuan utama penulisan teks Laporan Hasil Observasi (LHO) adalah…",
+          "options": [
+            "Satu cara untuk menyampaikan informasi secara objektif berdasarkan pengamatan atau pengujian sistematis di lapangan",
+            "Menceritakan kisah fantasi rekaan penulis",
+            "Mempengaruhi pembaca agar membeli barang dagangan",
+            "Menjelaskan langkah-langkah membuat kerajinan tangan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Teks LHO menyampaikan fakta objektif hasil pengamatan faktual lapangan tanpa opini subjektif."
+          },
+          "distractorWhy": {
+            "1": "Teks fiksi fantasi.",
+            "2": "Teks persuasi/iklan.",
+            "3": "Teks prosedur."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB1-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b1-q02",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 12 Struktur LHO), bagian struktur teks LHO yang memuat pembukaan, pengertian umum, dan pengelompokan awal objek yang diamati dinamakan…",
+          "options": [
+            "Pernyataan umum / Klasifikasi awal",
+            "Deskripsi bagian",
+            "Deskripsi manfaat",
+            "Penutup cerita"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pernyataan umum berisi batasan definisi awal dan pengategorian objek pengamatan."
+          },
+          "distractorWhy": {
+            "1": "Deskripsi bagian merinci ciri fisik.",
+            "2": "Deskripsi manfaat merinci fungsi.",
+            "3": "Penutup bukan istilah baku LHO."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB1-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b1-q03",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 18 Kebahasaan), kata kerja relasional yang sering digunakan dalam pembuka teks LHO untuk mendefinisikan objek adalah…",
+          "options": [
+            "Merupakan, adalah, dan yaitu",
+            "Mendorong, menarik, dan menendang",
+            "Berjalan, berlari, dan melompat",
+            "Sangat, amat, dan sekali"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata kerja relasional (kopula) berfungsi menyambungkan subjek dengan definisi keterangannya."
+          },
+          "distractorWhy": {
+            "1": "Kata kerja aksi fisik.",
+            "2": "Kata kerja lokomotor.",
+            "3": "Adverbia penguat."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB1-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b1-q04",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 22), bagian deskripsi manfaat dalam laporan hasil observasi tentang lidah buaya berisi uraian mengenai…",
+          "options": [
+            "Khasiat dan kegunaan gel lidah buaya untuk obat luka bakar serta bahan kosmetik",
+            "Ciri warna hijau dan bentuk daun berduri lidah buaya",
+            "Asal-usul nama latin Aloe vera",
+            "Harga jual lidah buaya di pasar hias"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Deskripsi manfaat menguraikan nilai guna dan faedah objek observasi bagi manusia/lingkungan."
+          },
+          "distractorWhy": {
+            "1": "Bagian deskripsi fisik.",
+            "2": "Bagian pernyataan umum.",
+            "3": "Informasi pasar komersial."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB1-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b1-q05",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 14), teks Laporan Hasil Observasi harus bersifat ilmiah dan objektif, artinya…",
+          "options": [
+            "Ditulis berdasarkan data fakta yang sebenarnya tanpa dipengaruhi pendapat pribadi atau imajinasi penulis",
+            "Diisi dengan prasangka dan emosi pribadi",
+            "Menggunakan bahasa kiasan puisi Melayu",
+            "Mengabaikan hasil pengamatan di lapangan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Objektif berarti data laporan sesuai kenyataan fakta yang diukur di lapangan."
+          },
+          "distractorWhy": {
+            "1": "Prasangka bertentangan dengan sains.",
+            "2": "Bahasa puisi untuk karya sastra.",
+            "3": "Pengamatan adalah sumber utama."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB1-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b1-q06",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 26 Uji Kemampuan), kalimat berikut yang merupakan kalimat definisi dalam teks LHO adalah…",
+          "options": [
+            "Bendi adalah kendaraan bermesin tarik hewan kuda yang biasa digunakan di Minangkabau.",
+            "Sungguh elok pemandangan di sore hari itu.",
+            "Ayo kita naik bendi bersama-sama!",
+            "Mengapa bendi itu berjalan sangat lambat?"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat definisi menjelaskan pengertian umum objek menggunakan verba 'adalah'."
+          },
+          "distractorWhy": {
+            "1": "Kalimat deskripsi kualitatif opini.",
+            "2": "Kalimat ajakan/persuasi.",
+            "3": "Kalimat tanya."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB1-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b1-q07",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 28), perbedaan utama antara teks Laporan Hasil Observasi dengan teks Deskripsi terletak pada…",
+          "options": [
+            "LHO menggambarkan objek secara umum dan klasifikasi sistematis, sedangkan Teks Deskripsi menggambarkan objek individual secara spesifik",
+            "LHO berupa fiksi, Teks Deskripsi berupa fakta",
+            "LHO hanya berupa gambar tanpa teks",
+            "Teks Deskripsi ditulis oleh ilmuwan luar negeri"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "LHO membahas kelompok objek universal (misal: 'Sepeda Motor'), sedangkan deskripsi melukiskan objek tertentu (misal: 'Sepeda Motor Merah Pak Budi')."
+          },
+          "distractorWhy": {
+            "1": "Keduanya berbasis fakta.",
+            "2": "LHO memuat teks laporan ilmiah.",
+            "3": "Penulis teks bebas."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB1-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b1-q08",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 16), kata ilmiah istilah biologi untuk merujuk pada keanekaragaman flora dan fauna dalam teks LHO adalah…",
+          "options": [
+            "Biodiversitas",
+            "Ekosistemik",
+            "Fotosintetik",
+            "Metabolis"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Biodiversitas merujuk pada keanekaragaman hayati makhluk hidup."
+          },
+          "distractorWhy": {
+            "1": "Ekosistemik tatanan lingkungan.",
+            "2": "Fotosintetik proses cahaya.",
+            "3": "Metabolis proses zat."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB1-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b1-q09",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 20), penggunaan imbuhan pen-an yang tepat pada kata dasar 'darat' membentuk kata…",
+          "options": [
+            "Pendaratan",
+            "Pen-daratan",
+            "Pengdarat",
+            "Penyadarat"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Imbuhan konfiks pe-an pada 'darat' membentuk nomina 'pendaratan'."
+          },
+          "distractorWhy": {
+            "1": "Tanda hubung salah.",
+            "2": "Alomor salah.",
+            "3": "Alomor salah."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB1-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b1-q10",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 30 Uji Kompetensi), langkah pertama dalam menyusun laporan hasil observasi adalah…",
+          "options": [
+            "Menentukan topik objek yang akan diamati dan menyusun jadwal observasi",
+            "Langsung menulis simpulan di akhir",
+            "Membuat hiasan sampul buku",
+            "Menjual hasil laporan ke media"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Menentukan objek observasi adalah tahap perencanaan paling awal."
+          },
+          "distractorWhy": {
+            "1": "Simpulan dibuat paling akhir.",
+            "2": "Hiasan sampul sekunder.",
+            "3": "Menjual laporan di luar proses ilmiah."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB1-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b1-q11",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 24), paragraf yang gagasan utamanya terletak di awal paragraf dinamakan paragraf…",
+          "options": [
+            "Deduktif",
+            "Induktif",
+            "Campuran",
+            "Ineratif"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Paragraf deduktif menempatkan kalimat utama di awal diawali gagasan umum."
+          },
+          "distractorWhy": {
+            "1": "Induktif gagasan di akhir.",
+            "2": "Campuran di awal dan akhir.",
+            "3": "Ineratif di tengah."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB1-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b1-q12",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (hal. 32), tanda baca koma (,) digunakan dalam teks LHO untuk…",
+          "options": [
+            "Memisahkan rincian unsur-unsur dalam suatu pemerincian atau kata penghubung antarklausa",
+            "Mengakhiri kalimat berita",
+            "Menandai pertanyaan narasumber",
+            "Menggantikan tanda petik ganda"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Tanda koma berfungsi memisahkan item rincian atau klausa anak."
+          },
+          "distractorWhy": {
+            "1": "Fungsi tanda titik (.).",
+            "2": "Fungsi tanda tanya (?).",
+            "3": "Fungsi tanda petik (\"\")."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB1-01"
+          }
+        }
+      ]
+    },
+    {
+      "code": "KOMP-IND-D-8-BAB2-01",
+      "grade": 8,
+      "name": "Bab 2: Iklan, Slogan, dan Poster",
+      "materi": "",
+      "cpRef": "",
+      "target": 20,
+      "items": []
+    },
+    {
+      "code": "KOMP-IND-D-8-BAB3-01",
+      "grade": 8,
+      "name": "Bab 3: Artikel Ilmiah Populer",
+      "materi": "",
+      "cpRef": "",
+      "target": 20,
+      "items": []
+    },
+    {
+      "code": "KOMP-IND-D-8-BAB4-01",
+      "grade": 8,
+      "name": "Bab 4: Teks Ulasan Karya Fiksi",
+      "materi": "",
+      "cpRef": "",
+      "target": 20,
+      "items": []
+    },
+    {
+      "code": "KOMP-IND-D-8-BAB5-01",
+      "grade": 8,
+      "name": "Bab 5: Teks Drama",
+      "materi": "",
+      "cpRef": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+      "target": 20,
+      "items": [
+        {
+          "id": "ind-d-8-b5-q01",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab 5 Drama), pengertian drama secara umum adalah karya sastra dan seni pertunjukan yang bertujuan untuk…",
+          "options": [
+            "Menggambarkan kehidupan dan watak manusia melalui tingkah laku (akting) dan dialog yang dipentaskan di atas panggung",
+            "Menyampaikan fakta objektif hasil observasi lapangan secara sistematis",
+            "Menyajikan gagasan argumentatif dalam bentuk bait-bait berirama",
+            "Menjelaskan petunjuk langkah-langkah teknis pembuatan suatu barang"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Drama merupakan karya seni yang melukiskan realitas kehidupan dan karakter manusia lewat peragaan akting serta dialog pemeran."
+          },
+          "distractorWhy": {
+            "1": "Teks Laporan Hasil Observasi.",
+            "2": "Teks Puisi.",
+            "3": "Teks Prosedur."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b5-q02",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab 5 Unsur Drama), perbedaan fisik paling mendasar antara naskah drama dengan cerpen atau novel terletak pada…",
+          "options": [
+            "Penyajian cerita yang didominasi oleh dialog antartokoh dan petunjuk lakuan (kramagung)",
+            "Penggunaan bait dan rima yang terikat oleh aturan larik",
+            "Struktur teks yang hanya terdiri atas tesis dan rekomendasi",
+            "Penulisan paragraf deskriptif tanpa keterlibatan penokohan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Naskah drama ditulis dalam format naskah dialog lengkap dengan petunjuk tindakan/ekspresi (kramagung)."
+          },
+          "distractorWhy": {
+            "1": "Ciri khas karya puisi.",
+            "2": "Struktur teks eksposisi.",
+            "3": "Teks laporan deskriptif."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b5-q03",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab 5 Struktur Dialog), tuturan atau kata-kata yang harus diucapkan oleh pemeran tokoh dalam dialog naskah drama dinamakan…",
+          "options": [
+            "Wawancang",
+            "Kramagung",
+            "Prolog",
+            "Epilog"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Wawancang adalah ucapan/dialog langsung yang dituturkan oleh para tokoh drama."
+          },
+          "distractorWhy": {
+            "1": "Kramagung adalah petunjuk tindakan/ekspresi fisik.",
+            "2": "Prolog adalah kata pengantar pembuka drama.",
+            "3": "Epilog adalah kata penutup drama."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b5-q04",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab 5 Unsur Naskah Drama), petunjuk tindakan, peragaan, atau ekspresi tokoh yang biasanya ditulis dalam tanda kurung atau dicetak miring dinamakan…",
+          "options": [
+            "Kramagung",
+            "Wawancang",
+            "Monolog",
+            "Solilokui"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kramagung merupakan petunjuk teknis pementasan atau aksi fisik tokoh di panggung."
+          },
+          "distractorWhy": {
+            "1": "Wawancang adalah bagian kata-kata yang diucapkan.",
+            "2": "Monolog adalah percakapan tokoh dengan dirinya sendiri.",
+            "3": "Solilokui adalah ungkapan pikiran batin tokoh."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b5-q05",
+          "difficulty": "sedang",
+          "prompt": "Cermatilah kutipan naskah drama berikut:\nAris: (Mengepalkan tangan dan menatap tajam ke arah Budi) \"Jangan sekali-kali kau mengambil buku itu tanpa izinku!\"\nBerdasarkan kutipan tersebut, kalimat dalam tanda kurung '(Mengepalkan tangan dan menatap tajam ke arah Budi)' berfungsi sebagai…",
+          "options": [
+            "Kramagung yang memberi petunjuk ekspresi fisik dan emosi pemeran Aris",
+            "Wawancang yang harus diucapkan oleh pemeran Budi",
+            "Prolog pembuka yang dibacakan oleh narator",
+            "Epilog simpulan cerita di akhir pementasan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Teks dalam kurung tersebut memuat panduan lakuan gestur dan raut wajah (kramagung) bagi pemain."
+          },
+          "distractorWhy": {
+            "1": "Bukan ucapan lisan (wawancang).",
+            "2": "Bukan narasi pembuka adegan.",
+            "3": "Bukan kalimat penutup drama."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b5-q06",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab 5 Alur Drama), bagian struktur dialog tempat dimulainya kemunculan masalah atau pertentangan antartokoh dinamakan…",
+          "options": [
+            "Komplikasi",
+            "Orientasi",
+            "Resolusi",
+            "Klimaks"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Komplikasi berisi pengembangan konflik dan munculnya rintangan yang dihadapi tokoh utama."
+          },
+          "distractorWhy": {
+            "1": "Orientasi merupakan tahap pengenalan tokoh dan latar.",
+            "2": "Resolusi merupakan tahap penyelesaian masalah.",
+            "3": "Klimaks merupakan puncak tertinggi konflik."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b5-q07",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab 5 Penokohan), tokoh dalam drama yang berkedudukan sebagai penentang tokoh utama dan memicu munculnya konflik cerita disebut…",
+          "options": [
+            "Tokoh antagonis",
+            "Tokoh protagonis",
+            "Tokoh tritagonis",
+            "Tokoh figuran"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Tokoh antagonis membawa penolakan/hambatan yang menimbulkan pertentangan terhadap tokoh protagonis."
+          },
+          "distractorWhy": {
+            "1": "Tokoh protagonis adalah pembawa ide utama/pemeran utama positif.",
+            "2": "Tokoh tritagonis adalah penengah konflik.",
+            "3": "Tokoh figuran adalah pemeran pelengkap latar."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b5-q08",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab 5 Penokohan Drama), fungsi utama tokoh tritagonis dalam jalinan cerita drama adalah…",
+          "options": [
+            "Sebagai penengah atau pendamai jika terjadi perselisihan antara protagonis dan antagonis",
+            "Sebagai musuh utama yang menghancurkan cita-cita protagonis",
+            "Sebagai pengatur pencahayaan di luar naskah drama",
+            "Sebagai narator tunggal pembaca prolog drama"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Tritagonis berperan sebagai pihak ketiga penengah yang memberikan nasihat atau jalan keluar netral."
+          },
+          "distractorWhy": {
+            "1": "Fungsi tokoh antagonis.",
+            "2": "Fungsi penata panggung/tata lampu.",
+            "3": "Fungsi narator/dalang."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b5-q09",
+          "difficulty": "tinggi",
+          "prompt": "Cermatilah dialog berikut:\nRina: \"Mengapa kamu selalu menuduhku mengambil dompetmu, Maya? Kita sudah bersahabat sejak kecil!\"\nMaya: \"Semua bukti mengarah kepadamu! Hanya kamu yang berada di kelas saat barang itu hilang!\"\nBerdasarkan petikan dialog tersebut, jenis konflik yang terjadi adalah…",
+          "options": [
+            "Konflik eksternal (antarmanusia/antartokoh) akibat kesalahpahaman dan tuduhan",
+            "Konflik batin internal dalam diri Rina mengenai cita-cita masa depan",
+            "Konflik fisik manusia melawan keganasan alam",
+            "Konflik kebudayaan antara tradisi modern dan tradisional"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Dialog menunjukkan percekcokan terbuka antara dua tokoh (Rina dan Maya) sehingga termasuk konflik eksternal antartokoh."
+          },
+          "distractorWhy": {
+            "1": "Bukan konflik batin pribadi.",
+            "2": "Bukan pertentangan dengan unsur alam.",
+            "3": "Tidak membahas benturan budaya."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b5-q10",
+          "difficulty": "tinggi",
+          "prompt": "Cermatilah petikan naskah drama berikut:\nPak Hadi: (Duduk termenung di sudut meja, memegang kepalanya) \"Haruskah aku menjual tanah warisan orang tuaku ini demi biaya pengobatan anakku, atau membiarkannya tetap utuh? Sungguh pilihan yang sangat berat…\"\nBerdasarkan kutipan tersebut, jenis konflik yang dialami Pak Hadi adalah…",
+          "options": [
+            "Konflik batin (internal) karena pergulatan perasaan dalam mengambil keputusan sulit",
+            "Konflik sosial eksternal akibat bentrok warga desa",
+            "Konflik ideologi antarpartai politik",
+            "Konflik fisik perkelahian di atas panggung"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pak Hadi mengalami perebutan batin dan keraguan dilematis di dalam dirinya sendiri."
+          },
+          "distractorWhy": {
+            "1": "Tidak ada bentrokan dengan warga lain.",
+            "2": "Tidak berkaitan dengan paham politik.",
+            "3": "Tidak ada pertarungan fisik."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b5-q11",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab 5 Alur dan Plot), titik puncak ketegangan cerita dalam naskah drama ketika masalah mencapai tingkat paling intens dinamakan…",
+          "options": [
+            "Klimaks",
+            "Antiklimaks / Peleraian",
+            "Orientasi",
+            "Resolusi"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Klimaks adalah puncak ketegangan di mana nasib tokoh utama ditentukan."
+          },
+          "distractorWhy": {
+            "1": "Antiklimaks adalah tahap meredanya ketegangan.",
+            "2": "Orientasi adalah tahap awal cerita.",
+            "3": "Resolusi adalah penyelesaian akhir."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b5-q12",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab 5 Latar Drama), unsur latar (setting) dalam pertunjukan drama mencakup tiga hal utama, yaitu…",
+          "options": [
+            "Latar tempat, latar waktu, dan latar suasana",
+            "Latar belakang penulis, latar pendidikan, dan latar usia",
+            "Latar musik, latar kamera, dan latar penonton",
+            "Latar sampul, latar halaman, dan latar cetakan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Setting drama membentuk gambaran lokasi kejadian, masa berlangsungnya cerita, dan situasi emosional pentas."
+          },
+          "distractorWhy": {
+            "1": "Merupakan biografi pengarang.",
+            "2": "Istilah produksi audio visual.",
+            "3": "Istilah tata letak buku."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b5-q13",
+          "difficulty": "tinggi",
+          "prompt": "Cermatilah deskripsi adegan berikut:\nSuara gemuruh petir bersahut-sahutan diiringi tiupan angin kencang. Cahaya lampu panggung temaram kebiruan. Para warga berlarian ke sana kemari sambil berteriak ketakutan.\nBerdasarkan deskripsi adegan tersebut, latar suasana yang tercipta adalah…",
+          "options": [
+            "Mencekam dan penuh kecemasan",
+            "Gembira dan penuh suka cita",
+            "Hening dan penuh kedamaian",
+            "Lucu dan mengundang gelak tawa"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kombinasi bunyi petir, lampu temaram, dan jeritan warga menciptakan nuansa genting mencekam."
+          },
+          "distractorWhy": {
+            "1": "Bertentangan dengan situasi bahaya.",
+            "2": "Keadaan sangat bising dan kacau.",
+            "3": "Tidak ada unsur humor."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b5-q14",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab 5 Kebahasaan Drama), ragam bahasa yang dominan digunakan dalam dialog naskah drama adalah…",
+          "options": [
+            "Bahasa lisan yang komunikatif menggunakan kalimat langsung dan kata sapaan",
+            "Bahasa baku ilmiah lugas seperti karya tulis penelitian formal",
+            "Bahasa rumus matematika dan simbol logika",
+            "Bahasa hukum perundang-undangan resmi"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Dialog drama merepresentasikan percakapan nyata antarmanusia sehingga menggunakan tuturan langsung serta kata sapaan."
+          },
+          "distractorWhy": {
+            "1": "Bahasa karya ilmiah laras akademik.",
+            "2": "Bahasa notasi eksakta.",
+            "3": "Bahasa laras hukum formal."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b5-q15",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab 5 Kaidah Kebahasaan), kata kerja aksi (action verbs) sering ditemukan pada bagian kramagung untuk menggambarkan…",
+          "options": [
+            "Tindakan atau perbuatan fisik yang harus dilakukan oleh pemain di panggung",
+            "Pengertian definisi kata menurut kamus",
+            "Sifat abstrak seperti kejujuran dan keberanian",
+            "Urutan angka statistik pementasan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata kerja aksi (seperti 'melangkah', 'menunjuk', 'berlutut') menuntun gerakan nyata pemeran."
+          },
+          "distractorWhy": {
+            "1": "Fungsi kalimat definisi.",
+            "2": "Nomina abstrak.",
+            "3": "Data kuantitatif."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b5-q16",
+          "difficulty": "tinggi",
+          "prompt": "Cermatilah prolog berikut:\n\"Setelah tiga tahun merantau di negeri orang, akhirnya Danu melangkah kembali ke kampung halamannya. Kemudian, ia tertegun melihat rumah tuanya telah kosong…\"\nPenggunaan kata 'setelah' dan 'kemudian' dalam prolog naskah drama tersebut menandakan kaidah kebahasaan berupa…",
+          "options": [
+            "Konjungsi kronologis (urutan waktu)",
+            "Kata kerja relasional definisi",
+            "Kalimat tanya retoris",
+            "Kata ganti penanya"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kata 'setelah' dan 'kemudian' memuat keterhubungan urutan kejadian secara kronologis."
+          },
+          "distractorWhy": {
+            "1": "Verba definisi menggunakan 'adalah'.",
+            "2": "Bukan bentuk pertanyaan.",
+            "3": "Bukan kata tanya."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b5-q17",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab 5 Penyuntingan Drama), tujuan utama kegiatan menyunting naskah drama sebelum dipentaskan adalah…",
+          "options": [
+            "Memperbaiki kesalahan ejaan, tanda baca, kelogisan dialog, serta keselarasan kramagung",
+            "Mengubah naskah drama menjadi artikel ilmiah populer",
+            "Menghilangkan seluruh dialog tokoh sehingga hanya tersisa musik penutup",
+            "Menjual hak cipta naskah kepada sutradara asing"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Menyunting bertujuan menyempurnakan keutuhan naskah dari segi EBI, keterbacaan dialog, dan instruksi teknis kramagung."
+          },
+          "distractorWhy": {
+            "1": "Mengubah jenis genre teks.",
+            "2": "Menghancurkan struktur naskah drama.",
+            "3": "Tindakan transaksi bisnis."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b5-q18",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab 5 Pementasan Drama), sosok yang bertanggung jawab memimpin proses latihan, menafsirkan naskah, dan mengarahkan akting para pemain di panggung adalah…",
+          "options": [
+            "Sutradara",
+            "Produser",
+            "Penata panggung",
+            "Penonton"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Sutradara adalah pemimpin artistik utama yang mengatur jalannya adegan dan akting pemain."
+          },
+          "distractorWhy": {
+            "1": "Produser bertanggung jawab pada pendanaan.",
+            "2": "Penata panggung mengurus properti dan dekorasi.",
+            "3": "Penonton adalah penikmat pertunjukan."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b5-q19",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab 5 Unsur Pementasan), unsur tata panggung (scenery) dan penataan lampu (lighting) dalam pertunjukan drama berfungsi untuk…",
+          "options": [
+            "Mendukung keutuhan latar tempat, waktu, dan suasana adegan agar terasa hidup bagi penonton",
+            "Menggantikan peran actor dalam menyampaikan dialog utama",
+            "Menghitung penjualan tiket penonton pementasan",
+            "Menulis ulang naskah drama di balik panggung"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Dekorasi panggung dan pencahayaan memperkuat efek visual konteks tempat serta emosi adegan."
+          },
+          "distractorWhy": {
+            "1": "Pemeran utama tetap menyampaikan dialog.",
+            "2": "Tugas seksi tiket/bendahara.",
+            "3": "Tugas penulis naskah."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b5-q20",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab 5 Evaluasi Pementasan), sebuah pementasan drama dinilai berhasil dan memukau apabila…",
+          "options": [
+            "Para pemain mampu menghayati karakter tokoh, menyampaikan dialog secara jelas, serta menyelaraskan ekspresi dengan petunjuk kramagung",
+            "Pemain hafal naskah tetapi tampil kaku tanpa penjiwaan emosi",
+            "Tata lampu padam total selama pertunjukan berlangsung",
+            "Dialog diucapkan secara terburu-buru tanpa memperhatikan jeda intonasi"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Keberhasilan pertunjukan drama ditentukan oleh kedalaman penghayatan peran, kejernihan vokal, dan keserasian ekspresi fisik."
+          },
+          "distractorWhy": {
+            "1": "Penampilan kaku mengurangi kualitas akting.",
+            "2": "Lampu padam menghalangi pengamatan penonton.",
+            "3": "Intonasi terburu-buru merusak penyampaian pesan."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB5-01"
+          }
+        }
+      ]
+    },
+    {
+      "code": "KOMP-IND-D-8-BAB6-01",
+      "grade": 8,
+      "name": "Bab 6: Menulis Teks Pidato",
+      "materi": "",
+      "cpRef": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+      "target": 19,
+      "items": [
+        {
+          "id": "ind-d-8-b6-q01",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab VI Menulis Teks Pidato), pengertian pidato secara umum adalah…",
+          "options": [
+            "Kegiatan mengungkapkan pikiran atau ide/gagasan dalam bentuk kata-kata yang ditujukan kepada orang banyak dengan bahasa formal",
+            "Uraian cerita rekaan tentang tokoh dan konflik sosial yang diperankan oleh para pemain di atas panggung pertunjukan",
+            "Catatan harian pribadi yang berisi luapan emosi dan pengalaman batin penulis tanpa ditujukan kepada audiens",
+            "Ringkasan berita fakta ilmiah yang dipublikasikan secara tertulis melalui media cetak atau elektronik"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pidato merupakan kegiatan menyampaikan pikiran, ide, atau gagasan secara lisan dalam bentuk kata-kata yang ditujukan kepada khalayak ramai menggunakan bahasa formal."
+          },
+          "distractorWhy": {
+            "1": "Pernyataan tersebut merupakan definisi dari naskah drama atau pertunjukan drama.",
+            "2": "Pernyataan tersebut merupakan definisi dari buku harian (diari).",
+            "3": "Pernyataan tersebut merupakan karakter teks berita atau artikel jurnalistik."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB6-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b6-q02",
+          "difficulty": "dasar",
+          "prompt": "Dalam Buku Siswa Bahasa Indonesia Kelas VIII (Bab VI), sebutan bagi orang yang ahli atau pandai berpidato di hadapan umum dinamakan…",
+          "options": [
+            "Orator",
+            "Moderator",
+            "Notulis",
+            "Narator"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Orator adalah sebutan khusus bagi orang yang mempunyai keahlian dan kepandaian dalam menyampaikan pidato di depan umum, seperti Ir. Sukarno dan Buya Hamka."
+          },
+          "distractorWhy": {
+            "1": "Moderator adalah orang yang memimpin dan memandu jalannya diskusi atau seminar.",
+            "2": "Notulis adalah orang yang bertugas mencatat hasil rapat atau diskusi.",
+            "3": "Narator adalah orang yang membacakan narasi atau menceritakan alur cerita."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB6-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b6-q03",
+          "difficulty": "dasar",
+          "prompt": "Menurut Buku Siswa Bahasa Indonesia Kelas VIII (Bab VI Tabel 6.1), struktur umum penulisan teks pidato secara runtut terdiri atas…",
+          "options": [
+            "Pembukaan, isi, dan penutup",
+            "Tesis, argumentasi, dan penegasan ulang",
+            "Orientasi, komplikasi, dan resolusi",
+            "Pernyataan umum, urutan sebab-akibat, dan interpretasi"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Struktur teks pidato terdiri atas bagian pembukaan (salam dan sapaan), bagian isi (gagasan utama/argumen), serta bagian penutup (kesimpulan dan salam penutup)."
+          },
+          "distractorWhy": {
+            "1": "Struktur tersebut milik teks eksposisi.",
+            "2": "Struktur tersebut milik teks cerpen atau narasi naskah drama.",
+            "3": "Struktur tersebut milik teks eksplanasi."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB6-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b6-q04",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan pembahasan salam keagamaan di Indonesia pada Bab VI Buku Siswa Bahasa Indonesia Kelas VIII, ucapan salam 'Om swastiastu' berasal dari agama Hindu yang memiliki arti…",
+          "options": [
+            "Semoga dalam keadaan selamat atas karunia Sang Hyang Widhi",
+            "Semoga keselamatan dan rahmat Allah serta keberkahan-Nya terlimpah kepada kalian",
+            "Salam sejahtera bagi kita semua",
+            "Terpujilah Buddha"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Om swastiastu merupakan salam pembuka keagamaan Hindu yang bermakna memohon keselamatan atas karunia Tuhan (Sang Hyang Widhi)."
+          },
+          "distractorWhy": {
+            "1": "Merupakan makna dari salam Assalamualaikum dalam agama Islam.",
+            "2": "Merupakan makna dari Salam Sejahtera dalam agama Kristen dan Katolik.",
+            "3": "Merupakan makna dari salam Namo Buddhaya dalam agama Buddha."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB6-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b6-q05",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan bagian istilah-istilah dalam pidato pada Buku Siswa Bahasa Indonesia Kelas VIII (Bab VI), ilmu tentang pidato atau seni berbicara didefinisikan sebagai…",
+          "options": [
+            "Retorika",
+            "Estetika",
+            "Semiotika",
+            "Fonetika"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Retorika adalah istilah ilmiah yang merujuk pada ilmu tentang pidato atau seni berbicara secara efektif di depan publik."
+          },
+          "distractorWhy": {
+            "1": "Estetika adalah ilmu tentang keindahan dan keharmonisan seni.",
+            "2": "Semiotika adalah ilmu tentang tanda dan simbol dalam bahasa.",
+            "3": "Fonetika adalah ilmu linguistik yang mempelajari bunyi bahasa."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB6-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b6-q06",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab VI), metode berpidato yang dilakukan secara spontan dan tiba-tiba tanpa persiapan naskah sebelumnya disebut…",
+          "options": [
+            "Pidato impromptu",
+            "Pidato manuskrip",
+            "Pidato memoriter",
+            "Pidato ekstempore"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pidato impromptu adalah metode penyampaian pidato secara serta-merta/spontan tanpa membawa naskah atau persiapan khusus sebelumnya."
+          },
+          "distractorWhy": {
+            "1": "Pidato manuskrip menggunakan naskah lengkap tulisan.",
+            "2": "Pidato memoriter menyampaikan pidato dengan cara menghafalkan naskah kata demi kata.",
+            "3": "Pidato ekstempore menyampaikan pidato dengan menyiapkan garis besar atau catatan poin penting."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB6-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b6-q07",
+          "difficulty": "sedang",
+          "prompt": "Cermatilah penggalan pidato berikut:\n\"Pada saat penyampaian visi dan misi, saya mengungkapkan keinginan untuk mengaktifkan kembali beberapa kegiatan, antara lain pembuatan majalah dinding OSIS, kegiatan lomba pidato, dan kegiatan ekstrakurikuler debat bahasa Inggris. Saya berharap nantinya kita dapat bekerja sama untuk mewujudkan ide tersebut.\"\nBerdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab VI), penggalan teks pidato Ketua OSIS tersebut termasuk ke dalam bagian struktur…",
+          "options": [
+            "Isi pidato, karena memuat gagasan utama dan program kerja yang ingin disampaikan oleh orator",
+            "Pembukaan pidato, karena memuat salam keagamaan dan ungkapan sapaan penghormatan",
+            "Penutup pidato, karena berisi kalimat permohonan maaf dan salam perpisahan",
+            "Salam pembuka pidato, karena berisi penghormatan formal kepada kepala sekolah dan dewan guru"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Bagian isi pidato memuat gagasan pokok, ide, gagasan program, serta pandangan yang ingin disampaikan pembawa pidato kepada audiens."
+          },
+          "distractorWhy": {
+            "1": "Bagian pembukaan terletak di awal pidato dan berisi salam serta sapaan penghormatan.",
+            "2": "Bagian penutup berada di akhir pidato dan memuat simpulan serta pesan/harapan akhir.",
+            "3": "Salam pembuka merupakan ucapan sapaan awal seperti selamat pagi atau Assalamualaikum."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB6-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b6-q08",
+          "difficulty": "sedang",
+          "prompt": "Dalam Jelajah Kata Bab VI Buku Siswa Bahasa Indonesia Kelas VIII, gerakan anggota tubuh saat berpidato yang berfungsi meyakinkan pendengar dinamakan…",
+          "options": [
+            "Gestur",
+            "Intonasi",
+            "Artikulasi",
+            "Khalayak"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Gestur adalah gerakan anggota tubuh (seperti tangan, bahu, dan mimik) saat berpidato yang berfungsi memperkuat pesan dan meyakinkan khalayak."
+          },
+          "distractorWhy": {
+            "1": "Intonasi adalah ketepatan irama kalimat dalam berbicara saat berpidato.",
+            "2": "Artikulasi adalah kejelasan pengucapan lafal kata.",
+            "3": "Khalayak adalah sebutan bagi orang banyak atau pendengar pidato."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB6-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b6-q09",
+          "difficulty": "sedang",
+          "prompt": "Cermatilah kutipan pidato dari teks \"Masalah Sampah\" berikut:\n\"Kementerian Lingkungan Hidup dan Kehutanan (KLHK) merilis bahwa jumlah timbunan sampah nasional sebesar 175.000 ton per hari atau setara 64 juta ton per tahun dengan asumsi sampah yang dihasilkan setiap orang 0,7 kg per hari.\"\nBerdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab VI), fungsi penyampaian data kuantitatif tersebut dalam pidato adalah…",
+          "options": [
+            "Memperkuat argumen pidato dengan fakta resmi agar pendengar percaya akan keseriusan masalah sampah",
+            "Menghibur pendengar agar suasana pembacaan pidato menjadi santai dan lucu",
+            "Memenuhi kaidah tata bahasa yang mewajibkan angka matematis dalam pidato",
+            "Mengubah teks pidato persuasif menjadi naskah laporan keuangan instansi"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Penyampaian fakta dan data resmi (seperti rilis KLHK) berfungsi memperkuat argumen dan dasar pemikiran pidato sehingga audiens terpengaruh dan meyakini pesan pidato."
+          },
+          "distractorWhy": {
+            "1": "Data statistik sampah disajikan untuk memberikan bukti faktual objektif, bukan sarana hiburan.",
+            "2": "Kaidah bahasa pidato tidak mewajibkan menyertakan perhitungan matematika.",
+            "3": "Penyajian data KLHK tidak mengubah genre pidato menjadi laporan akuntansi."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB6-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b6-q10",
+          "difficulty": "sedang",
+          "prompt": "Dalam Bab VI Buku Siswa Bahasa Indonesia Kelas VIII, dijelaskan bahwa teks pidato sering memuat kata ilmiah. Pasangan kata ilmiah dan bidang ilmu terkait yang sesuai menurut buku siswa adalah…",
+          "options": [
+            "Ekosistem merupakan kata ilmiah dari bidang ilmu biologi",
+            "Atom merupakan kata ilmiah dari bidang ilmu sejarah",
+            "Khatulistiwa merupakan kata ilmiah dari bidang ilmu bahasa dan sastra",
+            "Bait merupakan kata ilmiah dari bidang ilmu kimia"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Ekosistem merujuk pada keilmuan biologi tentang lingkungan tempat tinggal komunitas organik."
+          },
+          "distractorWhy": {
+            "1": "Atom merupakan kata ilmiah dari bidang ilmu kimia.",
+            "2": "Khatulistiwa merupakan kata ilmiah dari bidang ilmu geografi.",
+            "3": "Bait merupakan kata ilmiah dari bidang ilmu bahasa dan sastra."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB6-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b6-q11",
+          "difficulty": "sedang",
+          "prompt": "Cermatilah kalimat-kalimat berikut:\n(1) Marilah kita melatih diri untuk disiplin dalam membuang sampah pada tempatnya.\n(2) Hari ini hujan deras menyebabkan beberapa jalan di kawasan sekolah tergenang air.\n(3) Buanglah sampah organik ke dalam wadah pengomposan agar bermanfaat.\n(4) Halaman sekolah kami dikelilingi oleh berbagai jenis pepohonan yang rindang.\nBerdasarkan materi penulisan kalimat persuasif pada Bab VI Buku Siswa Bahasa Indonesia Kelas VIII, kalimat yang termasuk contoh kalimat persuasif ditunjukkan oleh nomor…",
+          "options": [
+            "(1) dan (3)",
+            "(2) dan (4)",
+            "(1) dan (2)",
+            "(3) dan (4)"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat (1) dan (3) mengandung ajakan dan bujukan yang ditandai oleh kata 'marilah' dan kata imperatif 'buanglah'."
+          },
+          "distractorWhy": {
+            "1": "Kalimat (2) dan (4) merupakan kalimat berita/deskriptif informatif, bukan kalimat persuasif.",
+            "2": "Kalimat (2) merupakan kalimat berita fenomena alam.",
+            "3": "Kalimat (4) merupakan kalimat deskripsi lingkungan."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB6-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b6-q12",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab VI), manakah di antara kalimat berikut yang merupakan contoh ungkapan rasa peduli atau simpati dalam teks pidato?",
+          "options": [
+            "\"Saya berharap pada masa yang akan datang kita lebih peduli dan memperhatikan masalah sampah.\"",
+            "\"Data menunjukkan produksi sampah nasional mencapai 175.000 ton per hari.\"",
+            "\"Selamat pagi Bapak Kepala Sekolah dan Bapak/Ibu Guru yang saya hormati.\"",
+            "\"Pidato impromptu dilakukan secara spontan tanpa bantuan naskah tertulis.\""
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kalimat tersebut mengekspresikan perhatian, rasa empati, dan kepedulian terhadap kelestarian lingkungan dan penanganan sampah."
+          },
+          "distractorWhy": {
+            "1": "Kalimat tersebut memuat pernyataan fakta data kuantitatif.",
+            "2": "Kalimat tersebut memuat sapaan pembuka pidato.",
+            "3": "Kalimat tersebut memuat definisi metode berpidato."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB6-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b6-q13",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa Bahasa Indonesia Kelas VIII (Bab VI), urutan langkah awal yang tepat dalam menyusun teks pidato sebelum mengumpulkan fakta dan data adalah…",
+          "options": [
+            "Memilih dan menentukan topik, lalu menentukan tujuan pidato dan menyusun kerangka pidato",
+            "Berpidato di depan umum terlebih dahulu baru menentukan topik dan kerangka naskah",
+            "Menghafal naskah pidato secara keseluruhan lalu menyusun ucapan salam pembuka",
+            "Menyunting tata bahasa naskah pidato sebelum menentukan masalah yang akan dibahas"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Langkah penulisan pidato dimulai dengan menentukan topik yang dikuasai/disukai, menetapkan tujuan pidato, lalu membuat kerangka bagian pidato sebelum mencari data pendukung."
+          },
+          "distractorWhy": {
+            "1": "Praktik berpidato dilakukan setelah naskah pidato selesai disusun dan disunting.",
+            "2": "Menghafal naskah adalah salah satu metode berpidato, bukan langkah awal penyusunan.",
+            "3": "Menyunting merupakan tahap akhir perbaikan teks setelah naskah lengkap selesai ditulis."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB6-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b6-q14",
+          "difficulty": "tinggi",
+          "prompt": "Cermatilah penggalan teks pidato berikut:\n\"Bapak dan Ibu Guru serta teman-teman semua. Kita telah mengetahui akibat buruk yang ditimbulkan oleh sampah. Marilah kita melatih diri untuk disiplin membuang sampah pada tempatnya. Jika perlu, kita harus mencari cara untuk mengolah sampah menjadi sesuatu yang bermanfaat...\"\nBerdasarkan analisis struktur dan kebahasaan pidato pada Bab VI Buku Siswa Bahasa Indonesia Kelas VIII, penggalan paragraf tersebut menggabungkan unsur kebahasaan…",
+          "options": [
+            "Kata sapaan khalayak, simpulan dampak masalah, dan kalimat persuasif dengan kata penanda 'marilah'",
+            "Salam keagamaan lima agama, permohonan maaf penutup, dan kata ilmiah astronomi",
+            "Pengenalan identitas orator, pembacaan rima puisi, dan larangan hukum perundang-undangan",
+            "Biodata pengurus OSIS, paparan anggaran biaya sekolah, dan salam perpisahan alumni"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Paragraf tersebut memuat sapaan khalayak ('Bapak dan Ibu Guru serta teman-teman'), penegasan pemahaman dampak sampah, serta ajakan persuasif yang ditandai kata 'marilah'."
+          },
+          "distractorWhy": {
+            "1": "Teks tidak mengandung ucapan salam keagamaan lima agama maupun istilah astronomi.",
+            "2": "Teks tidak memuat unsur naskah puisi atau perundang-undangan.",
+            "3": "Teks tidak membahas rincian anggaran biaya atau biodata pengurus."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB6-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b6-q15",
+          "difficulty": "tinggi",
+          "prompt": "Seorang orator menyampaikan pidato pada acara sekolah. Ia tidak membaca naskah secara utuh kata demi kata, melainkan hanya membawa lembaran catatan kecil yang memuat garis-garis besar topik dan poin penting yang hendak disampaikan.\nBerdasarkan penjelasannya pada Bab VI Buku Siswa Bahasa Indonesia Kelas VIII, metode berpidato yang diterapkan oleh orator tersebut dinamakan…",
+          "options": [
+            "Ekstempore, karena menyampaikan pidato dengan bantuan kerangka/garis besar topik",
+            "Manuskrip, karena membaca seluruh teks naskah pidato kata demi kata sampai selesai",
+            "Memoriter, karena menghafal seluruh isi teks naskah pidato tanpa membawa catatan",
+            "Impromptu, karena berpidato secara mendadak tanpa ada persiapan naskah atau catatan sama sekali"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Metode ekstempore dilakukan dengan menyiapkan catatan garis besar atau poin-poin penting isi pidato sebagai panduan alur berbicara."
+          },
+          "distractorWhy": {
+            "1": "Metode manuskrip mewajibkan pembacaan naskah lengkap secara verbatim.",
+            "2": "Metode memoriter mengandalkan hafalan total tanpa lembaran catatan di tangan.",
+            "3": "Metode impromptu dilakukan mendadak tanpa ada waktu menyiapkan catatan garis besar."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB6-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b6-q16",
+          "difficulty": "tinggi",
+          "prompt": "Cermatilah kutipan kalimat pidato berikut:\n\"KLHK merilis bahwa jumlah timbunan sampah nasional sebesar 175.000 ton per hari dengan asumsi sampah per orang 0,7 kg. Produksi sampah yang sangat besar ini akan berakibat fatal jika diikuti oleh perilaku tidak terpuji masyarakat.\"\nBerdasarkan kotak Jelajah Kata Bab VI Buku Siswa Bahasa Indonesia Kelas VIII, arti kata 'asumsi' dan 'fatal' secara berurutan adalah…",
+          "options": [
+            "Dugaan atau landasan berpikir yang dianggap benar; serta kesalahan/perilaku yang berakibat buruk",
+            "Kenyataan objektif yang teruji di laboratorium; serta keuntungan finansial yang sangat melimpah",
+            "Keputusan hukum perundang-undangan; serta hasil musyawarah kesepakatan bersama",
+            "Rekomendasi tertulis dari tokoh; serta imbauan resmi dari lembaga daerah"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Menurut kotak Jelajah Kata halaman 205, asumsi berarti dugaan atau landasan berpikir yang dianggap benar, sedangkan fatal berarti perilaku atau kesalahan yang berakibat buruk."
+          },
+          "distractorWhy": {
+            "1": "Arti tersebut bertolak belakang dengan makna asumsi dan fatal.",
+            "2": "Merupakan definisi istilah perundang-undangan atau musyawarah.",
+            "3": "Merupakan definisi dari anjuran atau surat imbauan resmi."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB6-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b6-q17",
+          "difficulty": "tinggi",
+          "prompt": "Menurut penjelasan pada Bab VI Buku Siswa Bahasa Indonesia Kelas VIII (halaman 206), pendengar atau pembaca dapat menyimpulkan pesan-pesan yang terkandung dalam naskah pidato melalui tiga langkah mendasar, yaitu…",
+          "options": [
+            "Menemukan topik/gagasan pidato, memahami isi teks pidato, dan mencermati kata-kata yang sering muncul",
+            "Menghafal seluruh naskah pidato, mengukur durasi waktu berbicara, dan menilai intonasi orator",
+            "Mengubah teks pidato menjadi naskah drama, mencatat kata ilmiah, dan menghitung jumlah paragraf",
+            "Menuliskan salam pembuka lima agama, membuat spanduk promosi, dan mengamati gestur audiens"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Buku siswa menjelaskan 3 cara mengidentifikasi pesan pidato: (1) menemukan topik/gagasan pidato, (2) memahami isi teks pidato, dan (3) mencermati kata-kata yang sering muncul dalam teks."
+          },
+          "distractorWhy": {
+            "1": "Tiga hal tersebut merupakan aspek teknik penyampaian pidato, bukan cara menemukan pesan pidato.",
+            "2": "Mengubah bentuk teks menjadi drama dan menghitung paragraf tidak menjamin pemahaman pesan.",
+            "3": "Salam lima agama dan spanduk adalah unsur pelengkap pembuka dan media visual."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB6-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b6-q18",
+          "difficulty": "tinggi",
+          "prompt": "Dalam Bab VI Buku Siswa Bahasa Indonesia Kelas VIII (halaman 215), salah satu langkah penting sebelum menyusun teks pidato adalah memperhitungkan durasi atau lamanya pidato jika dipraktikkan. Alasan utama menentukan alokasi waktu tersebut adalah…",
+          "options": [
+            "Agar pidato dapat disampaikan dalam waktu yang pas serta sesuai dengan situasi dan alokasi susunan acara",
+            "Supaya pembawa pidato dapat menghabiskan waktu acara meskipun materi keluar dari topik utama",
+            "Agar pendengar merasa jenuh sehingga tidak memberikan pertanyaan kritis kepada orator",
+            "Untuk memastikan teks pidato memiliki jumlah paragraf yang sangat tebal"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Menentukan lamanya pidato bertujuan agar teks yang disusun pas dengan alokasi waktu yang diberikan panitia acara serta efisien bagi pendengar."
+          },
+          "distractorWhy": {
+            "1": "Pidato tidak boleh melebar ke luar topik hanya demi menghabiskan alokasi waktu.",
+            "2": "Pidato hendaknya membuat pendengar antusias, bukan membuat jenuh.",
+            "3": "Kualitas pidato diukur dari ketepatan pesan dan struktur, bukan ketebalan halaman naskah."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB6-01"
+          }
+        },
+        {
+          "id": "ind-d-8-b6-q19",
+          "difficulty": "tinggi",
+          "prompt": "Dalam penyusunan teks pidato di lingkungan majemuk, pembawa pidato sering menggunakan salam keagamaan resmi. Berdasarkan Bab VI Buku Siswa Bahasa Indonesia Kelas VIII, pasangan ucapan salam keagamaan beserta makna/asal agama yang tepat adalah…",
+          "options": [
+            "'Namo Buddhaya' dari agama Buddha yang bermakna terpujilah Buddha, serta 'Salam Kebajikan' dari agama Konghucu",
+            "'Om Swastiastu' dari agama Kristen Katolik yang bermakna ucapan selamat pagi bagi seluruh jemaat",
+            "'Salam Sejahtera' dari agama Hindu yang bermakna permohonan maaf kepada para dewa",
+            "'Assalamualaikum' dari agama Konghucu yang bermakna kedamaian bagi seluruh umat manusia"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Namo Buddhaya merupakan ucapan salam agama Buddha (terpujilah Buddha) dan Salam Kebajikan merupakan salam agama Konghucu."
+          },
+          "distractorWhy": {
+            "1": "Om Swastiastu merupakan ucapan salam dari agama Hindu.",
+            "2": "Salam Sejahtera merupakan ucapan salam dari agama Kristen dan Katolik.",
+            "3": "Assalamualaikum merupakan ucapan salam dari agama Islam."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VIII (Edisi Revisi)",
+            "bab": "KOMP-IND-D-8-BAB6-01"
+          }
+        }
+      ]
+    }
+  ]
+}

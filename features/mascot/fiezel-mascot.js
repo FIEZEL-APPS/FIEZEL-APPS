@@ -585,8 +585,6 @@
     static get staticFaces() { return Object.assign({}, STATIC_FACE_FOR_STATE); }
     /** Untuk gerbang: nama ekspresi yang benar-benar ada di pustaka. */
     static get expressions() { return Object.keys(EXPRESSIONS); }
-    /* [FASE-2/3] daftar nama pustaka — additive, tidak menyentuh states */
-    static get expressions() { return Object.keys(EXPRESSIONS); }
     static get poses() { return Object.keys(POSES); }
 
     /* ---------- inti ---------- */
@@ -1206,8 +1204,7 @@
     _blinkLoop() {
       /* [FASE-9] 17 R-5 (no-blink ketat): di bawah kurangi-gerak, loop kedip
          MATI total — bukan sekadar dinetralkan CSS backstop-nya. */
-      if (matchMedia('(prefers-reduced-motion: reduce)').matches
-          || document.body.classList.contains('reduce-motion')) return;
+      if (this._reducedMotion()) return;
       clearTimeout(this._blinkT);            // [P0-2] jangan dobel loop
       const go = () => {
         if (!this.isConnected) return;       // [P1-1] stop saat detached

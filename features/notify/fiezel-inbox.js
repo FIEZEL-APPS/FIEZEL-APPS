@@ -26,11 +26,9 @@
   var MAX = 60;
   var RETENTION_MS = 30 * 86400000;
   var PATH = '/api/learner/class-assignments';
-  /* Rem klien: jarak minimal antar tanya ke server. 10 detik, turun dari 20 — rem lama lebih
-     lambat daripada detak pemanggilnya sendiri (app.js kini menanya tiap 15 detik), jadi ia
-     akan membuang satu dari setiap dua tanya dan mengembalikan jeda menuju setengah menit.
-     Lantai sesungguhnya tetap milik server (5 detik). */
-  var MIN_GAP_MS = 10000;
+  /* Rem klien: jarak minimal antar tanya ke server. Diturunkan ke 5 detik (5000ms),
+     sejajar dengan lantai server (ASSIGN_LIMITS.LEARNER_POLL_MIN_INTERVAL_MS = 5000). */
+  var MIN_GAP_MS = 5000;
   var lastPollAt = 0, busy = false;
 
   function storage() { try { return root.localStorage || null; } catch (_) { return null; } }
@@ -62,12 +60,57 @@
     return e;
   }
 
+  /* ===== TUGAS YANG DITARIK GURU (m025-365, audit KelasKu K2) ============================
+     Server menandai tugas yang ditarik dengan payload { t:'retract' } di baris yang sama,
+     jadi ia tiba lewat kursor yang sudah ada. Di sini ia keluar dari antrean murid dan masuk
+     Arsip KelasKu bertanda `oleh:'guru'` — Arsip menampilkannya sebagai "Ditarik guru" dan
+     menolak memulihkannya. Kunci arsip SAMA dengan milik fiezel-class-hub.js (ARCH_KEY);
+     dijaga tests/kelasku-tarik-test.js. Tugas yang sudah selesai dikerjakan tidak disentuh:
+     hasilnya tetap milik murid dan laporan guru. */
+  var ARCH_KEY = 'fiezel-class-archive-v1';
+  function assignKey() { var TS = root.FiezelTeacherStore; return (TS && TS.ASSIGN_KEY) || 'fiezel-learner-assignments-v1'; }
+  function readJsonKey(k, fb) { try { var v = JSON.parse(storage().getItem(k)); return v == null ? fb : v; } catch (_) { return fb; } }
+  function arsipKelas() {
+    var a = readJsonKey(ARCH_KEY, null);
+    if (!a || typeof a !== 'object') a = {};
+    if (!a.ids || typeof a.ids !== 'object') a.ids = {};
+    if (!Array.isArray(a.missed)) a.missed = [];
+    a.v = 1;
+    return a;
+  }
+  /** Tarik satu tugas dari antrean murid. Mengembalikan ringkasannya, atau null bila tidak ada yang ditarik. */
+  function tarik(p) {
+    remove('ta-' + p.id);
+    var pend = readJsonKey(assignKey(), []);
+    if (!Array.isArray(pend)) pend = [];
+    var hit = pend.filter(function (x) { return x && x.id === p.id; })[0];
+    if (!hit) return null;
+    try { storage().setItem(assignKey(), JSON.stringify(pend.filter(function (x) { return x && x.id !== p.id; }))); } catch (_) { return null; }
+    var arch = arsipKelas();
+    arch.missed = arch.missed.filter(function (x) { return x.id !== p.id; });
+    arch.missed.push(Object.assign({}, hit, { arsipAt: Date.now(), oleh: 'guru' }));
+    if (arch.missed.length > 100) arch.missed = arch.missed.slice(-100);
+    delete arch.ids[p.id];
+    try { storage().setItem(ARCH_KEY, JSON.stringify(arch)); } catch (_) {}
+    return { id: p.id, title: hit.title || p.title || '', teacher: hit.teacher || p.teacher || '' };
+  }
+  /** Guru mengirim ulang tugas yang pernah ditariknya: tanda tarikannya dicabut dari Arsip. */
+  function hidupkanLagi(id) {
+    var arch = arsipKelas(), sisa = arch.missed.filter(function (x) { return !(x.id === id && x.oleh === 'guru'); });
+    if (sisa.length === arch.missed.length) return;
+    arch.missed = sisa;
+    try { storage().setItem(ARCH_KEY, JSON.stringify(arch)); } catch (_) {}
+  }
+
   function classCode() { try { return String(JSON.parse(storage().getItem('fiezel-onboarding-v1') || '{}').classCode || ''); } catch (_) { return ''; } }
   function learnerName() {
     var n = '';
     try { if (typeof root.learnerName === 'function') n = String(root.learnerName() || ''); } catch (_) {}
-    if (!n || /^(sobat|murid|teman)$/i.test(n)) { try { n = String(JSON.parse(storage().getItem('fiezel-onboarding-v1') || '{}').name || ''); } catch (_) {} }
-    return n.trim().split(/\s+/)[0] || '';
+    if (!n || /^(sobat|murid|teman)(\s+.*)?$/i.test(n)) {
+      try { var onb = String(JSON.parse(storage().getItem('fiezel-onboarding-v1') || '{}').name || '').trim(); if (onb) n = onb; } catch (_) {}
+    }
+    var first = (n || '').trim().split(/\s+/)[0] || '';
+    return first || t('inbox.default_student_name', 'Murid');
   }
   function account() { var A = root.FiezelAccount; return A && typeof A.api === 'function' ? A : null; }
   function isTeacher() { try { return !!(root.FiezelAccount && root.FiezelAccount.isTeacher && root.FiezelAccount.isTeacher()); } catch (_) { return false; } }
@@ -86,15 +129,17 @@
     return A.api(PATH + '?cls=' + encodeURIComponent(cls) + '&name=' + encodeURIComponent(name) + '&since=' + since).then(function (r) {
       lastPollAt = Date.now();
       if (!r.ok || !r.data) return null;
-      var TS = root.FiezelTeacherStore, added = [];
+      var TS = root.FiezelTeacherStore, added = [], retracted = [];
       (r.data.assignments || []).forEach(function (row) {
         var a = row && row.assignment; if (!a || !a.id) return;
+        if (a.t === 'retract') { var x = tarik(a); if (x) retracted.push(x); return; }
+        hidupkanLagi(a.id);
         if (TS && TS.acceptAssignmentPayload) { try { TS.acceptAssignmentPayload(a); } catch (_) {} }
         var e = add({ id: 'ta-' + a.id, kind: 'teacher_assignment', at: Number(row.at) || Date.now(), aid: a.id, title: a.title, from: a.from, mode: a.mode, count: (a.itemIds || []).length, minutes: a.minutes, deadline: a.deadline || null, assignment: a });
         if (e) added.push(e);
       });
       var fresh = load(); fresh.cursor[cls] = Number(r.data.cursor) || since; save(fresh);
-      return { added: added };
+      return { added: added, retracted: retracted };
     }).catch(function () { return null; }).then(function (res) { busy = false; return res; });
   }
 
@@ -109,4 +154,22 @@
     items: items, unread: unread, get: get, add: add, markRead: markRead, markAllRead: markAllRead, remove: remove, clear: clear,
     poll: poll, text: text, classCode: classCode, learnerName: learnerName
   });
+
+  try {
+    if (typeof BroadcastChannel !== 'undefined') {
+      var bc = new BroadcastChannel('fiezel-assignment-sync');
+      bc.onmessage = function (ev) {
+        if (ev && ev.data && (ev.data.type === 'assignment-created' || ev.data.type === 'assignment-retracted' || ev.data.type === 'poll-now')) {
+          poll(true);
+        }
+      };
+    }
+    if (root.addEventListener) {
+      root.addEventListener('storage', function (ev) {
+        if (ev && (ev.key === 'fiezel-onboarding-v1' || ev.key === 'fiezel-assignment-sync')) {
+          poll(true);
+        }
+      });
+    }
+  } catch (_) {}
 })(typeof self !== 'undefined' ? self : this);

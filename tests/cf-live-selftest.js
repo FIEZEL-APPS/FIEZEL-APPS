@@ -70,9 +70,12 @@ const check = (name, ok, details) => {
 const FLAGS_BENAR = {
   cfApiEnabled: true, cfAiEnabled: true, cfTtsEnabled: false,
   cfQuotaEnabled: true, cfAnalyticsEnabled: true, cfIdentityEnabled: true,
-  cfSocialEnabled: false
+  cfSocialEnabled: false,
+  // m025-311: ikut ditambahkan supaya tiruan ini SEPADAN dengan yang disajikan Worker
+  // sungguhan (workers/api/schema.js). Tanpa ini skenario BENAR merah atas tiruannya sendiri.
+  cfLearnerEvidenceEnabled: false
 };
-const KILL_BENAR = { ai: true, tts: false, coach: false, analytics: true, social: false };
+const KILL_BENAR = { ai: true, tts: false, coach: false, analytics: true, social: false, learnerEvidence: false };
 
 function buildCookie(mut) {
   const bits = ['fz_id=eyJ2IjoxfQ.tandatangan'];
@@ -148,6 +151,19 @@ function makeServer(mut) {
     }
     if (pathname === '/api/quota') {
       if (mut.quotaLeak) return send(200, { aiRemaining: 25, protocol: '1.7' });
+      return send(401, { error: 'unauthenticated' });
+    }
+    /* m025-311: rute AI SLOT 5. Worker palsu ini HARUS memodelkan kontraknya, kalau tidak
+       skenario BENAR gagal atas tiruannya sendiri - bukan atas cacat gerbang.
+       Dua mutasi baru memaku dua arah yang berbeda:
+         - slot5Missing  : rute belum terpasang (404) -> gerbang harus merah;
+         - slot5FlagFirst: 403 mendahului 401, yaitu urutan gerbang belanja yang BOCOR
+                           (kanon P3: keadaan otentikasi tidak boleh terbaca dari selisih
+                           kode jawaban) -> gerbang harus merah juga. */
+    if (pathname === '/api/ai/chat' || pathname === '/api/ai/translate' || pathname === '/api/coach/context') {
+      req.resume();
+      if (mut.slot5Missing) return send(404, { error: 'not_found' });
+      if (mut.slot5FlagFirst) return send(403, { error: 'ai_disabled' });
       return send(401, { error: 'unauthenticated' });
     }
     if (pathname === '/api/user/me') {
@@ -245,6 +261,8 @@ const SCENARIOS = [
 
   { name: '/api/quota 200 tanpa cookie', mut: { quotaLeak: true }, expect: 'quota-401' },
   { name: '/api/user/me 200 tanpa cookie', mut: { meLeak: true }, expect: 'me-401' },
+  { name: 'rute AI SLOT 5 tidak terpasang (404)', mut: { slot5Missing: true }, expect: 'slot5-ai-chat-not-404' },
+  { name: 'rute AI SLOT 5 menjawab 403 sebelum 401 (urutan BOCOR)', mut: { slot5FlagFirst: true }, expect: 'slot5-ai-chat-401' },
 
   { name: 'cookie fz_id tanpa HttpOnly', mut: { cookieNoHttpOnly: true }, expect: 'cookie-httponly' },
   { name: 'cookie fz_id tanpa Secure', mut: { cookieNoSecure: true }, expect: 'cookie-secure' },

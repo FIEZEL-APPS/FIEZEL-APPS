@@ -226,6 +226,88 @@ test('frontier bekerja pada grammar-curriculum-v1.json asli (≥139 lesson, id u
   }
 });
 
+// ---------------------------------------------------------------------------------
+// (h) Peluruhan waktu (BKT decay): L meluruh menuju L0 bila lama tidak berlatih
+// ---------------------------------------------------------------------------------
+test('peluruhan waktu BKT: kompatibel mundur tanpa nowMs, meluruh eksponensial dengan nowMs', () => {
+  const st = run([true, true, true, true, true], 'decay_test');
+  const mFresh = bkt.mastery(st, 'decay_test');
+  assert.ok(mFresh.L >= 0.95, 'harus mencapai mastery awal');
+  assert.ok(bkt.masteryGate(st, 'decay_test'), 'lolos gate tanpa argumen waktu');
+
+  // Tanpa nowMs -> L tetap tidak berubah sama sekali (kompatibel mundur)
+  const mNoTime = bkt.mastery(st, 'decay_test');
+  assert.strictEqual(mNoTime.L, mFresh.L, 'L tanpa nowMs wajib identik dengan nilai tersimpan');
+
+  // Setelah 30 hari (1 half-life) -> L meluruh separuh jarak ke L0 (0.2)
+  const after30Days = NOW + 30 * 86400000;
+  const m30 = bkt.mastery(st, 'decay_test', after30Days);
+  const expectedL30 = 0.2 + (mFresh.L - 0.2) * 0.5;
+  assert.ok(Math.abs(m30.L - expectedL30) < 1e-4, 'L setelah 30 hari harus meluruh separuh jarak menuju L0');
+  assert.ok(m30.L < mFresh.L, 'L harus turun setelah 30 hari');
+
+  // Setelah 60 hari (2 half-lives) -> L turun di bawah 0.95 sehingga gerbang mastery terkunci
+  const after60Days = NOW + 60 * 86400000;
+  const m60 = bkt.mastery(st, 'decay_test', after60Days);
+  assert.ok(m60.L < 0.95, 'L setelah 60 hari harus di bawah ambang mastery 0.95');
+  assert.strictEqual(bkt.masteryGate(st, 'decay_test', after60Days), false,
+    'masteryGate dengan nowMs harus false bila materi sudah lama tidak dilatih');
+
+  // decay() murni menghasilkan state baru
+  const decayedSt = bkt.decay(st, after30Days);
+  assert.ok(decayedSt.lessons.decay_test.L < st.lessons.decay_test.L, 'state hasil decay harus lebih rendah');
+  assert.strictEqual(st.lessons.decay_test.L, mFresh.L, 'state lama tidak boleh termutasi');
+});
+
+// ---------------------------------------------------------------------------------
+// (i) m025-375 · audit B6: lupa DULU, baru melangkah — dan pembukaan lesson tetap awet
+// ---------------------------------------------------------------------------------
+const DAY = 86400000;
+test('B6 · jawaban salah setelah jeda panjang tidak MENAIKKAN mastery yang tampil', () => {
+  let st = { schema: bkt.SCHEMA, lessons: { x: { L: 0.99, n: 20, lastAt: NOW } } };
+  const t = NOW + 90 * DAY;
+  const before = bkt.mastery(st, 'x', t).L;                 // ~0.30 setelah 3 paruh-waktu
+  st = bkt.update(st, { lesson: 'x', correct: false }, t);
+  const after = bkt.mastery(st, 'x', t).L;
+  assert.ok(after < before, 'salah setelah 90 hari harus menurunkan mastery: ' + before.toFixed(3) + ' -> ' + after.toFixed(3));
+  assert.ok(after < 0.5, 'dulu hasilnya ~0.94 karena L lama 0.99 dipakai sebagai titik awal: ' + after.toFixed(3));
+});
+
+test('B6 · jawaban benar tanpa jeda tetap persis BKT klasik (tanpa peluruhan tambahan)', () => {
+  const a = bkt.update(null, { lesson: 'y', correct: true }, NOW);
+  const b = bkt.update(a, { lesson: 'y', correct: true }, NOW);
+  const c = bkt.update(a, { lesson: 'y', correct: true });
+  assert.strictEqual(b.lessons.y.L, c.lessons.y.L, 'jeda nol dan tanpa nowMs harus identik');
+});
+
+test('B6 · gerbang yang pernah lolos tetap membuka jalan walau L meluruh (tidak mengunci ulang)', () => {
+  let st = run([true, true, true, true, true, true], 'dasar');
+  assert.ok(bkt.masteryGate(st, 'dasar'), 'prasyarat: gerbang lolos');
+  assert.ok(st.lessons.dasar.gatePassedAt > 0, 'saat lolos gerbang dicap');
+  st = bkt.update(st, { lesson: 'dasar', correct: false }, NOW + 120 * DAY);
+  assert.strictEqual(bkt.masteryGate(st, 'dasar'), false, 'L terkini jujur: sudah lupa');
+  assert.strictEqual(bkt.gateEverPassed(st, 'dasar'), true, 'tetapi pembukaan yang sudah terjadi awet');
+  const graph = [{ lessonId: 'dasar', prerequisites: [] }, { lessonId: 'lanjut', prerequisites: ['dasar'] }];
+  const f = bkt.frontier(st, graph, () => 0.7);
+  assert.ok(f.some(x => x.lesson === 'lanjut'), 'frontier tidak boleh tertutup ulang karena prasyarat meluruh');
+});
+
+test('B6 · baris lama yang sudah lolos gerbang sebelum m025-375 dicap sebelum peluruhan', () => {
+  let st = { schema: bkt.SCHEMA, lessons: { lama: { L: 0.99, n: 8, lastAt: NOW } } };
+  st = bkt.update(st, { lesson: 'lama', correct: false }, NOW + 200 * DAY);
+  assert.strictEqual(st.lessons.lama.gatePassedAt, NOW, 'cap diambil dari bukti lama, bukan dari jawaban hari ini');
+  assert.strictEqual(bkt.gateEverPassed(st, 'lama'), true);
+});
+
+test('B6 · rootCause dengan nowMs menemukan prasyarat yang dulu kuat tetapi sudah lupa', () => {
+  let st = run([true, true, true, true, true, true], 'pondasi');
+  st = bkt.update(st, { lesson: 'atas', correct: false }, NOW);
+  const graph = [{ lessonId: 'pondasi', prerequisites: [] }, { lessonId: 'atas', prerequisites: ['pondasi'] }];
+  assert.strictEqual(bkt.rootCause(st, graph, 'atas'), null, 'tanpa waktu: prasyarat terbaca sehat');
+  const rc = bkt.rootCause(st, graph, 'atas', NOW + 90 * DAY);
+  assert.ok(rc && rc.lesson === 'pondasi', 'dengan waktu: prasyarat yang terlupa jadi akar masalah');
+});
+
 test('modul murni: tanpa DOM, tanpa jaringan, tanpa penyimpanan, tanpa jam internal', () => {
   const source = fs.readFileSync('./features/brain/fiezel-mastery-bkt.js', 'utf8')
     .replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');

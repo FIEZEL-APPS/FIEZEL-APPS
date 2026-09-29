@@ -246,5 +246,42 @@ async function upsertEmail(db, sub, check, nowMs) {
     .run();
 }
 
-export const ROUTES = [['POST', '/api/auth/google', routeAuthGoogle]];
+/* ========================================================================== */
+/* GET /api/auth/session — apakah perangkat ini SUDAH MASUK? (m025-367)        */
+/* ========================================================================== */
+/* Sampai build ini tidak ada satu pun rute yang bisa menjawab pertanyaan itu untuk murid
+   yang masuk HANYA dengan Google: mereka tidak punya baris auth_account, jadi
+   /api/account/me (lewat roleGate) menolak mereka seperti orang asing, dan layar hanya
+   bisa menebak dari email di localStorage (audit login L6). Login kini WAJIB, jadi app
+   butuh jawaban yang jujur.
+
+   Rute ini hanya MEMBACA. Ia tidak menerbitkan identitas, tidak membuat akun, dan tidak
+   mengembalikan email atau handle — hanya "sudah masuk atau belum, lewat apa, sebagai
+   murid atau guru". Tanpa cookie yang sah jawabannya selalu signedIn:false, bukan 401:
+   ini pertanyaan status, bukan pintu terkunci. Kedua kueri memakai bentuk yang sudah ada
+   (PK auth_account; indeks UNIQUE (sub, provider) yang dibuktikan INDEX_PROOF). */
+export async function routeAuthSession(ctx) {
+  const opt = { headers: ctx.corsHeaders };
+  const anon = { ok: true, signedIn: false, via: null, role: null };
+  if (!(ctx.identity && ctx.identity.verified && ctx.identity.sub)) return jsonResponse(anon, opt);
+  const db = coreDb(ctx.env);
+  if (!db) return jsonError(503, ERR.UNAVAILABLE, {}, opt);
+  await ensureAuthSchema(db);
+
+  const acc = await db
+    .prepare('SELECT sub, role, login_handle, status, institution_id FROM auth_account WHERE sub = ?1')
+    .bind(ctx.identity.sub)
+    .first();
+  if (acc && acc.status === 'active') {
+    return jsonResponse({ ok: true, signedIn: true, via: 'akun', role: acc.role === 'learner' ? 'murid' : 'guru' }, opt);
+  }
+  const g = await db
+    .prepare('SELECT provider_sub FROM auth_oauth_identity WHERE sub = ?1 AND provider = ?2')
+    .bind(ctx.identity.sub, PROVIDER)
+    .first();
+  if (g && g.provider_sub) return jsonResponse({ ok: true, signedIn: true, via: 'google', role: 'murid' }, opt);
+  return jsonResponse(anon, opt);
+}
+
+export const ROUTES = [['POST', '/api/auth/google', routeAuthGoogle], ['GET', '/api/auth/session', routeAuthSession]];
 export const GOOGLE_ROUTE_ERR = GOOGLE_ERR;

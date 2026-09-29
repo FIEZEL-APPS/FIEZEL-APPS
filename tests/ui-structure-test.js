@@ -4,8 +4,16 @@ const root=__fzRoot;
 const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
 const css=fs.readFileSync(path.join(root,'style.css'),'utf8');
 const app=fs.readFileSync(path.join(root,'app.js'),'utf8');
-const setup=fs.readFileSync(path.join(root,'creator-report-setup.html'),'utf8');
-const dashboard=fs.readFileSync(path.join(root,'creator-report-dashboard.html'),'utf8');
+/* m025-308: kedua halaman bantu (`creator-report-setup.html`,
+   `creator-report-dashboard.html`) dihapus migrasi Cloudflare (73cd02a2). Dua assert yang
+   membacanya diubah jadi PENJAGA BERSYARAT atas halaman bantu APA PUN yang ada hari ini -
+   bukan dibuang, dan bukan dipaku ke dua nama berkas yang kebetulan dulu ada. Bentuk ini
+   lebih kuat daripada yang lama: halaman bantu BARU langsung ikut terjaga tanpa ada daftar
+   yang perlu disunting, persis pelajaran precache-covers-shell. */
+const HALAMAN_BANTU = fs.readdirSync(root)
+  .filter((f) => /\.html$/.test(f))
+  .filter((f) => !['index.html', '404.html', 'landing.html'].includes(f))
+  .map((f) => ({ nama: f, src: fs.readFileSync(path.join(root, f), 'utf8') }));
 const failures=[];
 const check=(ok,message)=>{if(!ok)failures.push(message)};
 
@@ -87,8 +95,25 @@ check(/width:calc\(100% - 16px\)/.test(css),'Mobile bottom navigation lacks a vi
 check(/max-height:min\(760px,88vh\);overflow:auto/.test(css),'Modal content is not viewport bounded.');
 check(/prefers-reduced-motion:reduce/.test(css)&&/\.reduce-motion \*/.test(css),'Reduced-motion coverage is incomplete.');
 check(!/[🔊🗣✨💡🏠📚📈]/u.test(app+html),'Runtime UI still uses legacy control emoji instead of the icon library.');
-check(/type="button" id="deploy"/.test(setup)&&/type="button" id="load"/.test(dashboard),'Auxiliary pages contain implicit buttons.');
-check(/<meta name="viewport"/.test(setup)&&/<meta name="viewport"/.test(dashboard),'Auxiliary pages are not mobile-ready.');
+for(const h of HALAMAN_BANTU){
+  /* Invarian aslinya PUNYA SYARAT, dan syaratnya penting: <button> tanpa type hanya
+     berbahaya DI DALAM <form>, karena di sana ia default 'submit' dan satu klik memuat ulang
+     halaman - kehilangan apa pun yang sudah diisi. Di luar form ia tidak punya yang
+     dikirimkan, jadi menuntut type di sana memerahkan gerbang untuk hal yang tidak merugikan
+     siapa pun (versi pertama penjaga ini melakukan itu: 21 tombol di preview-redesign.html,
+     nol form). Jadi yang diperiksa hanya halaman yang benar-benar punya form. */
+  if(!/<form/i.test(h.src))continue;
+  const implisit=(h.src.match(/<button(?![^>]*\stype=)/g)||[]).length;
+  check(implisit===0,'Halaman bantu '+h.nama+' punya '+implisit+' <button> tanpa type eksplisit di dalam halaman berform.');
+}
+for(const h of HALAMAN_BANTU){
+  check(/<meta name="viewport"/.test(h.src),'Halaman bantu '+h.nama+' tidak siap layar ponsel (tanpa meta viewport).');
+}
+if(!HALAMAN_BANTU.length){
+  console.log('CATATAN m025-308: nol halaman bantu di root - creator-report-setup.html dan '+
+    'creator-report-dashboard.html dihapus migrasi CF. Penjaga di atas menyala sendiri begitu '+
+    'halaman bantu berikutnya dibuat.');
+}
 
 // m025-93 (brief redesign Bab 2, bug kritis #2). OWNER: "bottom navigation bar menimpa
 // konten saat scroll - teks/angka terpotong di belakang nav pill".

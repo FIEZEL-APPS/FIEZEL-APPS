@@ -61,9 +61,9 @@ ul,ol{margin:0;padding:0;list-style:none}
 .brand-word{width:112px;height:auto;color:var(--maroon-deep)}
 .brand-word rect{fill:currentColor}
 .topnav{display:flex;align-items:center;gap:16px}
-.topnav>a:first-child{display:none;font-weight:700;color:var(--maroon-deep);font-size:.92rem;
+.topnav-links>a:first-child{display:none;font-weight:700;color:var(--maroon-deep);font-size:.92rem;
   letter-spacing:.02em;border-bottom:1px solid transparent}
-.topnav>a:first-child:hover{text-decoration:none;border-color:var(--maroon-line-strong)}
+.topnav-links>a:first-child:hover{text-decoration:none;border-color:var(--maroon-line-strong)}
 /* m026 GEO: saklar bahasa manual (id<->th) — pilihan selalu menang atas deteksi IP */
 .lang-switch{font-weight:700;color:var(--maroon-deep);font-size:.88rem;line-height:1;
   border:1px solid var(--maroon-line-strong);border-radius:999px;padding:7px 15px;white-space:nowrap}
@@ -502,7 +502,7 @@ ul,ol{margin:0;padding:0;list-style:none}
   .feat-grid>.feat:last-child{grid-column:1 / -1;display:grid;grid-template-columns:auto 1fr;column-gap:22px;align-items:center}
   .feat-grid>.feat:last-child .ico{grid-row:1 / span 2}
   .feat-grid>.feat:last-child h3{margin-top:0}
-  .topnav>a:first-child{display:inline}
+  .topnav-links>a:first-child{display:inline}
 }
 
 /* ---------- >= 900px ---------- */
@@ -1356,3 +1356,27 @@ ul,ol{margin:0;padding:0;list-style:none}
 @keyframes fzflow-pc-poof{0%,65.6%{opacity:0;transform:scale(.2)}66.4%{opacity:1;transform:scale(1)}67.6%{opacity:0;transform:scale(1.7)}93.4%{opacity:0;transform:scale(.2)}94.2%{opacity:1;transform:scale(1)}95.4%{opacity:0;transform:scale(1.7)}100%{opacity:0;transform:scale(.2)}}
 @keyframes fzflow-heart{0%,60%{opacity:0;transform:translateY(8px) scale(.6)}62%{opacity:1;transform:translateY(0) scale(1)}66%{opacity:0;transform:translateY(-34px) scale(1.1)}67%{opacity:0;transform:translateY(8px) scale(.6)}69%{opacity:1;transform:translateY(0) scale(1)}74%{opacity:0;transform:translateY(-38px) scale(1.15)}75%{opacity:0;transform:translateY(8px) scale(.6)}77%{opacity:1;transform:translateY(0) scale(1)}82.5%{opacity:0;transform:translateY(-38px) scale(1.15)}83%,100%{opacity:0;transform:translateY(8px) scale(.6)}}
 
+
+/* ---------- Audit F26/F27 (2026-09-23) ----------
+   F26: di 390px navigasi selebar 428px - "Mulai Belajar" terpotong dan halaman bisa digeser
+   ke samping. Di bawah 600px tautan sekunder masuk menu ringkas (<details>, tanpa JS);
+   yang tetap di bar hanya logo, "Mulai Belajar", dan tombol Menu. Kredit pindah ke footer.
+   F27: H1 berbahasa murid di atas lipatan; tagline Inggris tetap sebagai baris kecil. */
+.topnav-links{display:flex;align-items:center;gap:16px}
+.topnav-more{display:none;position:relative}
+.topnav-more>summary{list-style:none;cursor:pointer;font-weight:700;color:var(--maroon-deep);font-size:.9rem;
+  border:1px solid var(--maroon-line-strong);border-radius:999px;padding:7px 13px;white-space:nowrap}
+.topnav-more>summary::-webkit-details-marker{display:none}
+.topnav-sheet{position:absolute;right:0;top:calc(100% + 8px);z-index:40;display:grid;gap:4px;min-width:220px;padding:10px;
+  border-radius:16px;background:var(--cream,#FFF9EE);border:1px solid var(--maroon-line-strong);box-shadow:0 18px 40px -20px rgba(36,26,17,.45)}
+.topnav-sheet>a{display:block!important;padding:10px 12px;border-radius:10px;font-weight:700;color:var(--maroon-deep)}
+@media (max-width:599px){
+  .topnav-links{display:none}
+  .topnav-more{display:block}
+  .topnav .btn-sm{white-space:nowrap}
+}
+.mast-h1{margin:14px auto 0;max-width:22ch;font-size:clamp(1.55rem,5.2vw,2.35rem);line-height:1.15;text-wrap:balance}
+.h1-look{font-size:clamp(1.9rem,4.6vw,2.9rem)}
+.foot-credit{margin-top:10px;color:var(--muted);font-size:.9rem;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.foot-credit .credit-ig{display:inline-flex;align-items:center;gap:5px;color:inherit}
+.foot-credit .credit-ig svg{width:16px;height:16px}

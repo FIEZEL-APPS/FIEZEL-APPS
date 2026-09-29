@@ -33,14 +33,24 @@
  *   estimateAbility (coreBrainAttempts) dan bobot bukti BKT.
  * - affectTargetSuccess: AKTIF — menggeser targetSuccess pemilih soal
  *   (frustrated 0.90 / bored 0.75 / default 0.80).
- * - bktUnlock (mastery-bkt): BAYANGAN — bukti dicatat, tetapi panel diagnostik
- *   sendiri memberi label "bayangan - tanpa otoritas unlock"; keputusan buka-kunci
- *   masih di mesin lama (app.js bktShadowMarkup).
- * - confusionMap (confusion-matrix): BAYANGAN — sel kebingungan dicatat ke
- *   penyimpanan lokal oleh app.js tetapi TIDAK pernah dibaca untuk keputusan
- *   maupun UI (hanya terekspos lewat __fiezelAudit).
- * - olmInsight (olm): BAYANGAN — hanya dirender di panel diagnostik
- *   (olmPanelMarkup), tidak memutuskan apa pun.
+ * - bktUnlock (mastery-bkt): AKTIF sejak m025-337 (permintaan OWNER: "BKT nya jangan
+ *   di bekukan" — parameter L0/T/slip/guess TETAP beku, lihat BRAIN-EVOLUTION-DECISIONS.md
+ *   §5; yang dibuka adalah OTORITASNYA). bktMasteredSkills() menyapu lessons BKT yang
+ *   lolos masteryGate() (L>=0,95, n>=5) jadi Set; lessonUnlockState() memakainya sebagai
+ *   jalur TAMBAHAN menuju unlock — satu arah, hanya membuka, tidak pernah mengunci ulang
+ *   yang sudah terbuka heuristik lama. Lima pemanggil: grammar() hub, openGrammarLesson(),
+ *   renderGrammarLesson(), practiceSkill(), buildGrammarQuickQuestions(). Sejak m025-337
+ *   frontier()-nya juga MEMILIH simpul aktif jalur Grammar di antara lesson yang sudah
+ *   terbuka (zpdFrontierPick), tanpa pernah menambah kandidat.
+ * - confusionMap (confusion-matrix): AKTIF sejak m025-337 — topConfusions() dibaca
+ *   confusionRemediationTarget() dan MENENTUKAN isi kartu AI Booster: pasangan yang
+ *   tertukar terarah (share >= 0,34) menggantikan kartu akurasi-mentah dan menautkan
+ *   murid ke lesson yang aturannya sedang tergeser. Sebelum itu ia cuma dipajang
+ *   confusionInsightMarkup dan tidak memutuskan apa pun.
+ * - olmInsight (olm): AKTIF sejak m025-337 — vonis kalibrasi summarize() dibaca
+ *   olmCalibrationNudge() dan memunculkan blok nasihat di ringkasan akhir sesi saat
+ *   nadanya overconfidence/underconfidence. Sebelum itu kalimat yang sama hanya ada di
+ *   panel diagnostik (olmPanelMarkup) yang jarang dibuka murid.
  * - listeningPolicy (listening-adaptive): BAYANGAN — policy() dihitung dan
  *   ditempel sebagai metadata q.__listeningPolicy, tetapi tidak ada satu baris
  *   pun yang membacanya kembali untuk mengubah playback.
@@ -77,7 +87,20 @@
 
   // Versi BUNDLE kebijakan belajar — terpisah dari versi produk. 3.0.0 menandai
   // gelombang Braincore v3 pertama yang punya identitas bundle eksplisit.
-  var BUNDLE_VERSION = '3.8.0';
+  // 3.8.0 -> 3.9.0 (m025-337): bktUnlock shadow -> active, lihat authorityMap di bawah.
+  // 3.9.0 -> 3.10.0 (m025-337, gelombang kedua): confusionMap dan olmInsight ikut aktif,
+  // dan frontier() BKT mulai memilih simpul aktif jalur Grammar.
+  // 3.11.0 → 3.12.0 (OWNER-authorized activation of bounded self-tuning):
+  // selfTune off→active, paramLedger off→active, brainConfig off→active.
+  // Izin OWNER diberikan 2026-09-27 dan dicatat di BRAINCORE-OWNER-ACTIVATION.md.
+  // 3.12.0 → 3.13.0 (m025-376, audit braincore A3, keputusan OWNER 2026-09-27): nof1 off→active.
+  // selfTune kini diukur RETENSI tertunda per lesson (experiment()), dan FiezelNof1.assign
+  // yang membagi lesson ke lengan kontrol/kandidat dipanggil app.js.
+  // 3.13.0 → 3.14.0 (m025-377, Braincore langkah 2): itemPool baru, langsung active.
+  // Kesulitan soal dihitung dari SEMUA murid: FiezelItemPool mencatat jawaban-pertama per
+  // soal (app.js itemPoolObserve) dan menerapkan tabel koreksi gabungan di
+  // itemCalibrationEffective. Tabel kosong (server belum dinyalakan) = perilaku 3.13.0.
+  var BUNDLE_VERSION = '3.14.0';
 
   // Disalin apa adanya dari version.js (self.FIEZEL_VERSION). Bundle ini mengandalkan
   // wiring app.js 5.19.0 (guard modul-absen, sidecar stabilityDays, dsb.) — versi
@@ -116,6 +139,7 @@
     { file: 'fiezel-core-brain.js', global: 'FiezelCoreBrain', schema: 'fiezel-core-brain-v2', authorityKey: 'memory' },
     { file: 'fiezel-evidence-credibility.js', global: 'FiezelEvidenceCredibility', schema: 'fiezel-evidence-credibility-v1', authorityKey: 'evidenceCredibility' },
     { file: 'fiezel-item-calibration.js', global: 'FiezelItemCalibration', schema: 'fiezel-item-calibration-v1', authorityKey: 'itemCalibration' },
+    { file: 'fiezel-item-pool.js', global: 'FiezelItemPool', schema: 'fiezel-item-pool-v1', authorityKey: 'itemPool' },
     { file: 'fiezel-item-prior.js', global: 'FiezelItemPrior', schema: null, authorityKey: 'itemDifficultyPrior' },
     { file: 'fiezel-learning-metrics.js', global: 'FiezelLearningMetrics', schema: 'fiezel-learning-metrics-v1', authorityKey: 'learningMetrics' },
     { file: 'fiezel-listening-adaptive.js', global: 'FiezelListeningAdaptive', schema: 'fiezel-listening-adaptive-v1', authorityKey: 'listeningPolicy' },
@@ -179,30 +203,58 @@
     // adaptive: evidence/policy dibaca hook Speaking Lab, addon yang memutuskan
     // kapan memakainya (app.js:2045-2048) — jalur keputusan belum pasti: 'shadow'.
     itemCalibration: 'active',
+    // m025-377 (Braincore langkah 2): koreksi kesulitan dari SEMUA murid. 'active' karena
+    // app.js memanggilnya di jalur yang sama dengan itemCalibration dan ia MENANG atas
+    // kalibrasi N=1 bila soal sudah dijawab >= 20 murid. Sebelum server menerbitkan tabel,
+    // effective() selalu applied:false dan kalibrasi lokal berjalan seperti sebelumnya.
+    itemPool: 'active',
     srlCoach: 'active',
     speakingPolicy: 'shadow',
-    bktUnlock: 'shadow',
-    confusionMap: 'shadow',
-    olmInsight: 'shadow',
-    listeningPolicy: 'shadow',
+    // m025-337 (permintaan OWNER: "BKT nya jangan di bekukan"): shadow -> active.
+    // masteryGate() (L>=0,95 DAN n>=5 — bukti tinggi, bukan cuma posterior tinggi) kini
+    // dibaca lessonUnlockState() lewat bktMasteredSkills(): sebuah prasyarat yang lolos
+    // gerbang ini membuka lesson berikutnya SEKALIPUN akurasi mentah v2 belum sampai
+    // ambang. Klaim ini bukan "BKT menggantikan v2" — ia cuma bisa MEMBUKA, tidak pernah
+    // MENGUNCI (bktMastered kosong/absen = perilaku identik sebelum m025-337). Parameter
+    // BKT sendiri (L0/T/slip/guess) TETAP beku; itu keputusan terpisah yang tidak berubah
+    // (BRAIN-EVOLUTION-DECISIONS.md §5).
+    bktUnlock: 'active',
+    // m025-337: shadow -> active, dua modul sekaligus, keduanya lewat pola yang sama dengan
+    // bktUnlock — modulnya sudah lengkap dan teruji sejak lahir, yang absen cuma pemanggil.
+    // confusionMap: topConfusions() memilih isi kartu AI Booster (pasangan tertukar
+    // menggantikan kartu akurasi-mentah). olmInsight: vonis kalibrasi summarize() menyalakan
+    // blok nasihat di ringkasan akhir sesi. Keduanya fail-quiet: modul absen, bukti tipis,
+    // atau vonis netral = layar persis seperti sebelum m025-337.
+    confusionMap: 'active',
+    olmInsight: 'active',
+    // listeningPolicy (listening-adaptive): AKTIF (P0.1) — rateBand dan replayQuota
+    // langsung mengatur kecepatan pemutar audio dan kuota putar ulang di app.js.
+    listeningPolicy: 'active',
     stepTutor: 'active',
     productionGrader: 'active',
-    // Langkah 1 roadmap otonomi: probe retensi kini dimuat halaman dan dipanggil —
-    // schedule() saat mastery BKT tembus, evaluate() atas jawaban nyata sesudah jatuh
-    // tempo. Ia MENGUKUR dan tidak memutuskan (rekomendasi half-life tetap advisory,
-    // penulis nextReview tetap tunggal), maka jujurnya 'shadow', bukan 'active'.
-    retentionProbe: 'shadow',
-    // Registry konfigurasi (fiezel-brain-config.js) menyatakan sendiri bahwa ia TIDAK
-    // dibaca modul lain saat runtime dan tidak dimuat index.html — sumber kebenaran
-    // untuk manusia/tooling, bukan jalur keputusan: jujurnya 'off'.
-    brainConfig: 'off',
-    // Langkah 1 roadmap otonomi: learningMetricsSnapshot() di app.js menghitung lima
-    // metrik longitudinal dari riwayat lokal dan merendernya di panel diagnostik.
-    // Tampilan saja — nol keputusan sesi yang bergantung padanya: 'shadow'.
-    learningMetrics: 'shadow',
+    // m025-341: penjadwalnya memang sudah jalan sejak lama, tetapi jadwalnya tidak pernah
+    // dibaca siapa pun — tidak ada satu pun lesson yang benar-benar diuji ulang. Sekarang
+    // ada dua jalur yang MEMUTUSKAN: probe jatuh tempo mengembalikan lesson mastered ke
+    // kolam review (buildAdaptivePool), dan vonis 'rapuh' mencabut klaim penguasaannya di
+    // hub Grammar. Rekomendasi half-life TETAP advisory dan penulis nextReview tetap
+    // tunggal; yang berubah adalah probe kini sampai ke murid. Jujurnya 'active'.
+    retentionProbe: 'active',
+    // m025-374 (OWNER activation): brainConfig off→active. Registry konfigurasi sekarang
+    // DIBACA runtime oleh selfTune: resolve() menghasilkan parameter efektif, sanitize()+BOUNDS
+    // menjaga invarian, dan setiap perubahan tercatat di paramLedger. Izin OWNER 2026-09-27.
+    brainConfig: 'active',
+    // m025-341: bukan tampilan lagi. brierCalibration() sekarang memutuskan lewat
+    // brierEvidenceBump(): Brier Skill Score <= 0 (model kalah dari tebakan base-rate)
+    // menaikkan ambang bukti n yang dituntut sebelum mastery BKT boleh ikut membuka
+    // prasyarat. Satu arah — hanya bisa memperketat, tidak pernah melonggarkan. 'active'.
+    learningMetrics: 'active',
     // Proyeksi bukti sinkron (S5b). Dipanggil app.js lewat brainSyncQueue, tetapi ia
     // MEMBATASI apa yang boleh keluar — ia tidak memutuskan apa pun tentang belajar murid,
     // dan sinkronnya sendiri mati secara default. Jujurnya 'shadow', bukan 'active'.
+    // m025-341: DIPERIKSA ULANG pada gelombang lapisan ukur dan sengaja DIBIARKAN 'shadow'.
+    // Alasan di atas masih benar kata per kata sesudah retentionProbe/learningMetrics naik:
+    // modul ini tetap pembatas jalur keluar, bukan pengambil keputusan belajar. Menaikkannya
+    // hanya supaya "genap tiga" adalah klaim yang lolos gerbang tanpa ada yang berubah.
     attemptRecord: 'shadow',
     // Langkah 2 roadmap otonomi: pemutus nasib kebijakan belajar. Ia BENAR-BENAR
     // memutuskan — hasilnya menentukan status outcome yang membentuk kebijakan sesi
@@ -222,14 +274,21 @@
        dan itu sengaja: langkah 2-4 handoff masih terbuka. */
     questionMemory: 'active',
     questionAllocation: 'active',
-    nof1: 'off',
-    // Langkah 4: rantai hash perubahan parameter. Prasyarat penyetelan-diri, belum ada
-    // pemanggil di app.js karena belum ada parameter yang boleh bergerak sendiri: 'off'.
-    paramLedger: 'off',
-    // Langkah 5: pengusul penyetelan-diri. 'off' dan HARUS tetap 'off' sampai OWNER
-    // memutuskan kelas perubahan apa yang boleh berjalan tanpa manusia. Modulnya siap dan
-    // pagarnya terbukti; yang belum ada adalah izinnya, dan izin bukan pekerjaan kode.
-    selfTune: 'off',
+    // m025-376 (A3): off→active. selfTuneTargetFor/selfTuneRetentionArms di app.js membagi
+    // LESSON ke lengan kontrol/kandidat percobaan retensi lewat assign(); tally() belum dipakai.
+    nof1: 'active',
+    // m025-374 (OWNER activation): paramLedger off→active. Rantai hash perubahan parameter
+    // sekarang AKTIF: selfTune.propose() mencatat setiap delta ke ledger, dan setiap entri
+    // bisa diverifikasi dan dikembalikan. Prasyarat penyetelan-diri yang dibuka bersama.
+    paramLedger: 'active',
+    // m025-374 (OWNER activation, 2026-09-27): selfTune off→active.
+    // OWNER memutuskan: penyetelan-diri BERBATAS diizinkan berjalan tanpa manusia.
+    // Kelas perubahan yang diizinkan: HANYA parameter di TUNABLE (difficulty.targetSuccess,
+    // bkt.T) — daftar TERTUTUP dan sengaja pendek. BKT slip/guess, FSRS, dan misconception
+    // TETAP tidak boleh bergerak sendiri (alasan tertulis di fiezel-self-tune.js:47-54).
+    // Tujuh pagar aktif: BOUNDS, single-param, cooldown, verdict-gate, rollback, kill-switch,
+    // fail-closed — masing-masing terbukti bisa merah (tests/self-tune-test.js).
+    selfTune: 'active',
     // Langkah 6 (separuh kode): pelapor posisi kandidat konten dalam rantainya. Ia tidak
     // pernah menerbitkan apa pun — tahap terjauh yang bisa ia laporkan adalah
     // 'owner_decision' — tetapi ia tetap 'off' karena belum ada pemanggil di app.js, dan

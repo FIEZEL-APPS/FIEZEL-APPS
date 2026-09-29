@@ -129,11 +129,15 @@ test('wiring: tab Kelas → classHubView; notifikasi tugas membuka Kelas; tutor 
      membaca 'Kelas'. Yang dijaga gerbang ini tetap sama persis — entri nav 'hub' dengan
      ikon 'school' dan pemasangan mountTeacher — hanya bentuk labelnya yang tidak lagi
      dibekukan sebagai literal Indonesia. */
-  assert.ok(/\['hub',[^\]]*'school'\]/.test(shell) && /FiezelClassHub\.mountTeacher\(hubEl/.test(shell), 'Ruang Guru memasang hub');
+  assert.ok(/\['hub',[^\]]*'school'(, 'kelas')?\]/.test(shell) && /FiezelClassHub\.mountTeacher\(hubEl/.test(shell), 'Ruang Guru memasang hub');
   assert.ok(/st\.view = 'hub'; st\.hubSeen = true/.test(shell), 'hub landing default sekali');
   const html = read('index.html');
   ['features/class-hub/fiezel-braincore-review.js', 'features/class-hub/fiezel-class-hub.js', 'features/class-hub/class-hub.css'].forEach((f) => assert.ok(html.includes(f), f + ' dimuat'));
-  assert.ok(html.indexOf('fiezel-class-hub.js') < html.indexOf('fiezel-teacher-shell.js'), 'hub sebelum teacher-shell');
+  // F28: teacher-shell kini dimuat malas oleh fiezel-teacher-loader.js SETELAH boot, jadi hub
+  // (tag defer statis) selalu sudah terurai saat shell tiba. Yang dijaga: hub tetap statis,
+  // pemuat ada, dan shell tidak kembali menjadi tag boot.
+  assert.ok(html.indexOf('fiezel-class-hub.js') > 0 && html.indexOf('fiezel-class-hub.js') < html.indexOf('fiezel-teacher-loader.js'), 'hub dimuat sebelum pemuat guru');
+  assert.ok(html.indexOf('features/teacher/fiezel-teacher-shell.js') < 0, 'teacher-shell tidak lagi dimuat saat boot (F28)');
   const sw = read('sw.js');
   ['features/class-hub/fiezel-braincore-review.js', 'features/class-hub/fiezel-class-hub.js', 'features/class-hub/class-hub.css'].forEach((f) => assert.ok(sw.includes(f), f + ' di precache'));
   const hub = read('features/class-hub/fiezel-class-hub.js');
@@ -202,7 +206,9 @@ test('smoke DOM-stub: alur murid (terima → kerjakan → hasil → laporan w/s)
   assert.ok(TS.acceptAssignmentPayload(payload));
   const sEl = mkEl(); const senv = { toast() {}, go() {}, openTutor() { senv.tutor = true; }, afterRender() {} };
   Hub.mountStudent(sEl, senv);
-  assert.ok(sEl.innerHTML.includes('class-hub-student') && sEl.innerHTML.includes('Bu Rina') && sEl.innerHTML.includes('PR Past Tense') && sEl.innerHTML.includes('Belum mulai'));
+  /* m025-364: baris tugas ringkas tidak lagi memasang cap "Belum mulai" — tombol Kerjakan
+     sendirilah penanda belum dimulai, dan "Sedang dikerjakan" muncul begitu runner berjalan. */
+  assert.ok(sEl.innerHTML.includes('class-hub-student') && sEl.innerHTML.includes('Bu Rina') && sEl.innerHTML.includes('PR Past Tense') && sEl.innerHTML.includes('class-open-' + a.id) && sEl.innerHTML.includes('Kerjakan'));
   sEl.fire('click', btn({ 'data-ch': 'open', 'data-id': a.id }));
   assert.ok(sEl.innerHTML.includes('class-runner') && sEl.innerHTML.includes('Soal 1 dari 2'));
   let lf = LF.load(); assert.ok(lf.doneAssign.some((x) => x.id === a.id && x.s === 1), 'status sedang mengerjakan dilaporkan');
@@ -236,7 +242,7 @@ test('smoke DOM-stub: alur murid (terima → kerjakan → hasil → laporan w/s)
   assert.ok(tEl.innerHTML.includes('tclass-result-items') && tEl.innerHTML.includes('1 murid keliru') && /Bentuk dasar dipakai/.test(tEl.innerHTML), 'guru melihat soal keliru + miskonsepsi');
   assert.ok(tEl.innerHTML.includes('tclass-remedial'));
   tEl.fire('click', btn({ 'data-ch': 'ttab', 'data-tab': 'braincore' }));
-  assert.ok(tEl.innerHTML.includes('Braincore menyarankan. Guru memutuskan. Murid belajar.') && /Bentuk dasar dipakai/.test(tEl.innerHTML));
+  assert.ok(tEl.innerHTML.includes('Saran otomatis. Guru memutuskan. Murid belajar.') && /Bentuk dasar dipakai/.test(tEl.innerHTML));
   tEl.fire('click', btn({ 'data-ch': 'remedial', 'data-skill': 'past_tense', 'data-title': 'Remedial Past tense' }));
   assert.strictEqual(Hub._teacherUi().tab, 'buat'); assert.strictEqual(Hub._teacherUi().draft.title, 'Remedial Past tense');
 });
@@ -311,6 +317,73 @@ test('soal bergambar: runner kelas BENAR-BENAR mencetak gambarnya', () => {
   assert.ok(/<svg/.test(sEl.innerHTML), 'GAMBARNYA ikut tercetak — tanpa ini soal mustahil dijawab');
   assert.ok(sEl.innerHTML.includes(pic.picture), 'yang tercetak adalah gambar milik soal ini');
   assert.ok(/aria-label="Gambar: /.test(sEl.innerHTML), 'gambar punya nama aksesibel');
+});
+
+test('student subject chips: strip mapel dan filter tugas per mapel', () => {
+  /* Higiene isolasi: modul hub menyimpan ui() di memori antar mount, jadi store
+     yang diganti tiap tes TIDAK terbaca ulang tanpa muat-ulang modul. Tanpa ini,
+     classTeachers di bawah adalah sisa tes sebelumnya (dulu lolos karena panel
+     17-baris dirender tanpa guru sekalipun — justru yang dihapus instruksi ini). */
+  delete require.cache[require.resolve('../features/class-hub/fiezel-class-hub.js')];
+  require('../features/class-hub/fiezel-class-hub.js');
+  const store = {};
+  globalThis.localStorage = { getItem: (k) => (k in store ? store[k] : null), setItem: (k, v) => { store[k] = String(v); }, removeItem: (k) => { delete store[k]; } };
+  store['fiezel-onboarding-v1'] = JSON.stringify({ name: 'Rani', classCode: 'FZ-998877' });
+  store['fiezel-class-hub-v1'] = JSON.stringify({
+    tab: 'tugas',
+    classTeachers: [
+      { subjectId: 'ENG', teacherName: 'Bu Mardhiana' },
+      { subjectId: 'MAT', teacherName: 'Pak Budi' }
+    ]
+  });
+
+  const TS = globalThis.FiezelTeacherStore;
+  TS.acceptAssignmentPayload({
+    v: 1, t: 'assign', id: 'as-eng-1', title: 'Daily Routine', skills: ['ENG'],
+    itemIds: ['q1'], minutes: 5, from: 'Bu Mardhiana', teacher: 'Bu Mardhiana', cls: 'FZ-998877',
+    source: { subjectId: 'ENG', subjectName: 'Bahasa Inggris' }
+  });
+  TS.acceptAssignmentPayload({
+    v: 1, t: 'assign', id: 'as-mat-1', title: 'Aljabar Dasar', skills: ['MAT'],
+    itemIds: ['q2'], minutes: 5, from: 'Pak Budi', teacher: 'Pak Budi', cls: 'FZ-998877',
+    source: { subjectId: 'MAT', subjectName: 'Matematika' }
+  });
+
+  const Hub = globalThis.FiezelClassHub;
+  const mkEl = () => { const el = { innerHTML: '', _h: {}, addEventListener(t, fn) { (el._h[t] = el._h[t] || []).push(fn); }, querySelector: () => null, fire(t, target) { (el._h[t] || []).forEach((fn) => fn({ target, preventDefault() {} })); } }; return el; };
+  const btn = (attrs) => { const b = { _attrs: attrs, getAttribute: (k) => (k in attrs ? attrs[k] : null), value: attrs.value }; b.closest = (sel) => (sel === '[data-ch]' ? b : null); return b; };
+
+  const sEl = mkEl();
+  Hub.mountStudent(sEl, { toast() {}, go() {}, openTutor() {}, afterRender() {} });
+
+  /* m025-364: kartu mapel besar (±800px sebelum tugas pertama) diganti strip chip satu baris.
+     Nama guru kini ada di baris tugasnya sendiri, tempat murid membacanya. */
+  assert.ok(sEl.innerHTML.includes('class-chip-strip'), 'strip mapel muncul di murid');
+  assert.ok(!sEl.innerHTML.includes('class-subject-panels'), 'kartu mapel besar sudah dicabut');
+  assert.ok(sEl.innerHTML.includes('chip-ENG') && sEl.innerHTML.includes('chip-MAT'), 'kedua mapel punya chip');
+  assert.ok(sEl.innerHTML.includes('Bu Mardhiana'), 'nama Bu Mardhiana muncul di baris tugasnya');
+  assert.ok(sEl.innerHTML.includes('Pak Budi'), 'nama Pak Budi muncul di baris tugasnya');
+  assert.ok(sEl.innerHTML.includes('as-eng-1') && sEl.innerHTML.includes('as-mat-1'), 'kedua tugas tampil sebelum filter');
+
+  // Klik filter Bahasa Inggris
+  sEl.fire('click', btn({ 'data-ch': 'filter-subject', 'data-subject': 'ENG' }));
+  assert.ok(sEl.innerHTML.includes('as-eng-1'), 'tugas B. Inggris tampil saat filter ENG');
+  assert.ok(!sEl.innerHTML.includes('as-mat-1'), 'tugas Matematika terfilter keluar');
+
+  // Buka tab KelasKu
+  sEl.fire('click', btn({ 'data-ch': 'tab', 'data-tab': 'kelas' }));
+  /* Panel 17 baris DIHAPUS TOTAL (instruksi owner): menuh-menuhi tab KelasKu dan
+     kebanyakan barisnya hanya "Menunggu penugasan". Rincian per mapel tetap hidup
+     di kartu filter tab Tugas; tab Kelas hanya membawa baris ringkas + lompat. */
+  assert.ok(!sEl.innerHTML.includes('class-all-subjects-panel'), 'panel 17 mapel sudah hilang total dari tab KelasKu');
+  assert.ok(!sEl.innerHTML.includes('compact-subject-'), 'tak ada sisa baris 17 mapel');
+  assert.ok(sEl.innerHTML.includes('class-teachers-line'), 'baris ringkas guru mapel muncul');
+  assert.ok(sEl.innerHTML.includes('2 Guru Terdaftar'), 'hitungan guru jujur (2 guru di kelas uji)');
+  assert.ok(sEl.innerHTML.includes('class-jump-tugas'), 'tombol lompat ke Tugas tersedia');
+
+  // Tombol lompat membawa murid ke tab Tugas tempat strip filter mapel berada
+  sEl.fire('click', btn({ 'data-ch': 'tab', 'data-tab': 'tugas' }));
+  assert.ok(sEl.innerHTML.includes('class-chip-strip'), 'lompat mendarat di tab Tugas ber-strip mapel');
 });
 
 test('sintaks: app.js & modul class-hub dapat di-parse', () => {

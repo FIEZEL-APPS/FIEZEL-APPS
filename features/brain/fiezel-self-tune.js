@@ -31,6 +31,31 @@
  *     mengusulkan apa pun. Diam adalah default yang aman; menebak tidak pernah.
  *
  * Modul MURNI: tanpa DOM, jaringan, penyimpanan, sumber acak, atau jam internal.
+ *
+ * m025-376 — UKURANNYA DIGANTI SEBELUM DISAMBUNG (audit braincore A3, keputusan OWNER 2026-09-27)
+ * -----------------------------------------------------------------------------------------
+ * propose() di bawah menaikkan difficulty.targetSuccess (soal LEBIH MUDAH) setiap verdict
+ * 'promote' yang diukur dari AKURASI sesi. Akurasi adalah angka yang langsung dinaikkan oleh
+ * perubahan itu sendiri: soal lebih mudah -> lebih banyak benar -> 'promote' -> lebih mudah
+ * lagi. Itu kelas cacat yang sama dengan penyetel tanpa pagar yang dimatikan owner (A1).
+ * propose() dipertahankan apa adanya untuk kompatibilitas gerbang lamanya, tetapi app.js
+ * TIDAK memakainya lagi. Jalur yang disambung adalah experiment():
+ *
+ *   - SATU percobaan pada satu waktu: kontrol = nilai berlaku, kandidat = nilai +/- satu
+ *     langkah. Pemanggil membagi LESSON (bukan soal) ke dua lengan secara deterministik
+ *     (FiezelNof1.assign), sehingga satu lesson selalu dilatih di bawah satu nilai.
+ *   - UKURANNYA RETENSI TERTUNDA: hasil probe retensi 3/7/21 hari (FiezelPostTest) pada
+ *     lesson yang dikuasai SESUDAH percobaan dimulai - "masih ingat beberapa hari kemudian",
+ *     bukan "berapa yang benar hari ini". Memudahkan soal tidak bisa memenangkan ukuran ini.
+ *   - DUA ARAH, tidak simetris. Percobaan pertama mencoba LEBIH SULIT (temuan censoring
+ *     Wave F1: murid ditahan terlalu lama di zona nyaman). Arah sulit diterima bila retensi
+ *     tidak memburuk (non-inferioritas, margin 5pp); arah MUDAH hanya diterima bila retensi
+ *     terbukti LEBIH BAIK (superioritas). Setelah ditolak, arah dibalik.
+ *   - PENJAGA PREDIKSI: kandidat yang membuat tebakan Braincore jelas lebih meleset (Brier
+ *     probe naik > 0.05) ditolak walau retensinya lolos.
+ *   - Percobaan yang tidak pernah mencapai bukti cukup dalam 120 hari dihentikan tanpa
+ *     perubahan (kadaluwarsa), dan arahnya dibalik.
+ * Pagar lama tetap berlaku: batas TUNABLE sejak lahir, satu parameter, kill switch, fail-closed.
  */
 (function (root, factory) {
   var api = factory();
@@ -173,11 +198,107 @@
     return hold('brain4_tune_hold_no_headroom');
   }
 
+  /* ---- m025-376: percobaan retensi (lihat header) ------------------------------------ */
+  var EXPERIMENT_PATH = 'difficulty.targetSuccess';
+  var EXPERIMENT_DEFAULT = 0.80;          // nilai berlaku bila belum pernah ada yang diterima
+  var HARDER_MARGIN = 0.05;               // non-inferioritas: arah sulit boleh "tidak lebih buruk"
+  var EASIER_MARGIN = 0.0001;             // ~superioritas: arah mudah harus terbukti lebih baik
+  var PREDICTION_GUARD = 0.05;            // kenaikan Brier kandidat di atas ini = ditolak
+  var EXPERIMENT_MAX_DAYS = 120;
+  var DAY_MS = 86400000;
+
+  function round4(v) { return Math.round(v * 10000) / 10000; }
+
+  /** Nilai berlaku sebuah parameter percobaan, dijepit ke batas TUNABLE. */
+  function baselineOf(state, path) {
+    var spec = TUNABLE[path];
+    var b = state && state.baseline && typeof state.baseline === 'object' ? num(state.baseline[path]) : null;
+    var v = b === null ? EXPERIMENT_DEFAULT : b;
+    return round4(Math.min(spec.max, Math.max(spec.min, v)));
+  }
+
+  /** Margin verdict untuk arah percobaan: sulit = non-inferioritas, mudah = superioritas. */
+  function marginFor(direction) { return direction < 0 ? HARDER_MARGIN : EASIER_MARGIN; }
+
+  function copyState(st) {
+    var out = {};
+    for (var k in st) if (Object.prototype.hasOwnProperty.call(st, k)) out[k] = st[k];
+    out.baseline = {};
+    if (st.baseline && typeof st.baseline === 'object') {
+      for (var b in st.baseline) if (Object.prototype.hasOwnProperty.call(st.baseline, b)) out.baseline[b] = st.baseline[b];
+    }
+    return out;
+  }
+
+  /**
+   * experiment(state, input, nowMs) -> {decision, state, change, rationale}
+   *
+   * state: {baseline?, experiment?, nextDirection?, halt?}  (tidak dimutasi)
+   * input: {verdict?: keluaran FiezelPolicyVerdict atas lengan RETENSI (margin dari marginFor),
+   *         brier?: {control, candidate}}
+   * decision: 'start' | 'hold' | 'promote' | 'reject' | 'expire'
+   */
+  function experiment(state, input, nowMs) {
+    var st = state && typeof state === 'object' ? state : {};
+    var now = num(nowMs);
+    function out(decision, next, change, rationale) {
+      return { schema: SCHEMA, decision: decision, state: next, change: change || null, rationale: rationale };
+    }
+    if (st.halt === true) return out('hold', st, null, 'brain4_tune_halted');
+    if (now === null) return out('hold', st, null, 'brain4_tune_hold_no_clock');
+    var path = EXPERIMENT_PATH, spec = TUNABLE[path];
+    var current = baselineOf(st, path);
+    var exp = st.experiment && typeof st.experiment === 'object' ? st.experiment : null;
+
+    if (!exp) {
+      var dir = st.nextDirection === 1 ? 1 : -1;
+      var cand = round4(current + dir * spec.step);
+      if (cand < spec.min || cand > spec.max) { dir = -dir; cand = round4(current + dir * spec.step); }
+      if (cand < spec.min || cand > spec.max) return out('hold', st, null, 'brain4_tune_hold_no_headroom');
+      var started = copyState(st);
+      started.experiment = { id: 'tune-' + path + '-' + Math.floor(now), path: path, control: current,
+        candidate: cand, direction: dir, startedAt: Math.floor(now) };
+      return out('start', started, { path: path, from: current, to: cand, direction: dir }, 'brain4_tune_experiment_start');
+    }
+
+    var inp = input && typeof input === 'object' ? input : {};
+    var verdict = inp.verdict && typeof inp.verdict.decision === 'string' ? inp.verdict : null;
+    var closed = copyState(st);
+    closed.experiment = null;
+    if (verdict && verdict.decision === 'promote') {
+      var br = inp.brier && typeof inp.brier === 'object' ? inp.brier : null;
+      var bc = br ? num(br.control) : null, bk = br ? num(br.candidate) : null;
+      if (bc !== null && bk !== null && bk - bc > PREDICTION_GUARD) {
+        closed.nextDirection = -exp.direction;
+        return out('reject', closed, { path: exp.path, from: exp.candidate, to: exp.control },
+          'brain4_tune_reject_prediction_worse');
+      }
+      closed.baseline[exp.path] = exp.candidate;
+      closed.nextDirection = exp.direction;
+      return out('promote', closed, { path: exp.path, from: exp.control, to: exp.candidate }, 'brain4_tune_promote_retention');
+    }
+    if (verdict && verdict.decision === 'reject') {
+      closed.nextDirection = -exp.direction;
+      return out('reject', closed, { path: exp.path, from: exp.candidate, to: exp.control }, 'brain4_tune_reject_retention');
+    }
+    if (now - num(exp.startedAt, now) > EXPERIMENT_MAX_DAYS * DAY_MS) {
+      closed.nextDirection = -exp.direction;
+      return out('expire', closed, { path: exp.path, from: exp.candidate, to: exp.control }, 'brain4_tune_experiment_expired');
+    }
+    return out('hold', st, null, verdict ? 'brain4_tune_hold_verdict_' + verdict.decision : 'brain4_tune_hold_collecting');
+  }
+
   return {
     SCHEMA: SCHEMA,
     TUNABLE: TUNABLE,
     ROLLBACK_MARGIN: ROLLBACK_MARGIN,
     COOLDOWN_SESSIONS: COOLDOWN_SESSIONS,
-    propose: propose
+    propose: propose,
+    EXPERIMENT_PATH: EXPERIMENT_PATH,
+    EXPERIMENT_MAX_DAYS: EXPERIMENT_MAX_DAYS,
+    PREDICTION_GUARD: PREDICTION_GUARD,
+    baselineOf: baselineOf,
+    marginFor: marginFor,
+    experiment: experiment
   };
 });

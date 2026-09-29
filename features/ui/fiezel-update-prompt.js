@@ -36,7 +36,7 @@
   if (typeof navigator === 'undefined' || typeof document === 'undefined') return;
   if (self.FiezelUpdatePrompt) return;
 
-  var CHECK_MS = 30 * 60 * 1000;
+  var CHECK_MS = 60 * 1000;
   var APP_VERSION = String(self.FIEZEL_VERSION || '');
   var started = false, reloadBound = false, shown = false, pendingWorker = null;
 
@@ -52,6 +52,17 @@
     if (sess('fiezel-apply-update') !== '1') return;
     dropSess('fiezel-apply-update');
     try { location.reload(); } catch (_) {}
+  }
+  function isNewerVersion(remote, cur) {
+    if (!remote || !cur || remote === cur) return false;
+    var r = remote.split('.').map(function (n) { return parseInt(n, 10) || 0; });
+    var c = cur.split('.').map(function (n) { return parseInt(n, 10) || 0; });
+    for (var i = 0; i < Math.max(r.length, c.length); i++) {
+      var rv = r[i] || 0, cv = c[i] || 0;
+      if (rv > cv) return true;
+      if (rv < cv) return false;
+    }
+    return false;
   }
   function bindReload() {
     if (reloadBound || !navigator.serviceWorker || typeof navigator.serviceWorker.addEventListener !== 'function') return;
@@ -72,7 +83,12 @@
     node.classList.remove('show');
     setTimeout(function () { node.classList.add('hidden'); }, 260);
   }
-  function later() { shown = false; hide(); setSess('fiezel-update-later', '1'); }
+  function later() {
+    shown = false;
+    hide();
+    setSess('fiezel-update-later', '1');
+    setSess('fiezel-update-later-time', String(Date.now()));
+  }
 
   function apply() {
     bindReload();
@@ -83,14 +99,11 @@
       btn.textContent = (apText && apText !== 'update.applying-text') ? apText : 'Memperbarui...';
     }
     setSess('fiezel-apply-update', '1');
+    hide();
     if (pendingWorker && typeof pendingWorker.postMessage === 'function') {
       try { pendingWorker.postMessage({ type: 'FIEZEL_SKIP_WAITING' }); } catch (_) {}
-      // Jaring pengaman. Kalau controllerchange tidak pernah datang - worker menolak
-      // berpindah, atau pesannya hilang - murid tidak boleh tertinggal selamanya di kartu
-      // yang bertuliskan "Memperbarui...".
       setTimeout(reloadIfApproved, 3500);
     } else {
-      // Tidak ada worker menunggu: halaman baru cukup diambil dengan muat ulang biasa.
       reloadIfApproved();
     }
   }
@@ -128,8 +141,19 @@
   }
   function show(worker, remoteVersion) {
     if (worker) pendingWorker = worker;
+    if (!worker && remoteVersion && APP_VERSION && !isNewerVersion(remoteVersion, APP_VERSION)) return false;
     if (shown) return false;
-    if (sess('fiezel-update-later') === '1') return false;
+    if (sess('fiezel-apply-update') === '1') {
+      dropSess('fiezel-apply-update');
+      return false;
+    }
+    if (sess('fiezel-update-later') === '1') {
+      var laterTime = Number(sess('fiezel-update-later-time') || 0);
+      var SNOOZE_MS = 10 * 60 * 1000;
+      if (laterTime && (Date.now() - laterTime < SNOOZE_MS)) return false;
+      dropSess('fiezel-update-later');
+      dropSess('fiezel-update-later-time');
+    }
     if (lessonActive()) {
       /* Versi terbaru yang menang: kalau dua kandidat mendarat selama satu sesi, yang
          dilepas di akhir adalah yang paling akhir diketahui. */
@@ -173,7 +197,7 @@
   }
 
   function fetchRemoteVersion() {
-    return fetch('./VERSION.json', { cache: 'no-store' })
+    return fetch('./VERSION.json?t=' + Date.now(), { cache: 'no-store' })
       .then(function (r) { return r && r.ok ? r.json() : null; })
       .then(function (v) { return String((v && v.version) || ''); })
       .catch(function () { return ''; });
@@ -209,7 +233,7 @@
           // VERSION.json sudah maju tetapi service worker belum punya kandidat baru (mis.
           // hanya berkas non-precache yang berubah). Kartunya tetap muncul; jalur "tanpa
           // worker menunggu" di apply() menanganinya dengan muat ulang biasa.
-          if (remote && APP_VERSION && remote !== APP_VERSION) return show(null, remote);
+          if (remote && APP_VERSION && isNewerVersion(remote, APP_VERSION)) return show(null, remote);
           return false;
         });
       });
@@ -226,6 +250,9 @@
     document.addEventListener('visibilitychange', function () {
       if (document.visibilityState === 'visible') check(false);
     });
+    window.addEventListener('focus', function () { check(false); });
+    window.addEventListener('online', function () { check(true); });
+    window.addEventListener('hashchange', function () { check(false); });
     if (navigator.permissions && typeof navigator.permissions.query === 'function') {
       navigator.permissions.query({ name: 'periodic-background-sync' }).then(function (status) {
         if (!status || status.state !== 'granted') return;

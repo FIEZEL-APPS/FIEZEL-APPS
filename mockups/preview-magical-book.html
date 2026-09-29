@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Magical Interactive Novel Book — 3s Seamless Loop (60 FPS)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #070B14;
+      --card: #0E172A;
+      --card-border: rgba(236, 201, 104, 0.28);
+      --gold: #ECC968;
+      --gold-light: #FFF2B2;
+      --cyan: #38BDF8;
+      --text: #F8FAFC;
+      --text-muted: #94A3B8;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background: radial-gradient(circle at 50% 15%, #162444 0%, #0C1428 55%, #050811 100%);
+      font-family: 'Nunito', sans-serif;
+      color: var(--text);
+      padding: 40px 20px 80px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .wrapper {
+      max-width: 1080px;
+      width: 100%;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .badge-wrap {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(236, 201, 104, 0.12);
+      border: 1px solid rgba(236, 201, 104, 0.4);
+      color: var(--gold-light);
+      padding: 6px 16px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+    }
+    .badge-cyan {
+      background: rgba(56, 189, 248, 0.12);
+      border-color: rgba(56, 189, 248, 0.4);
+      color: #7DD3FC;
+    }
+    h1 {
+      font-family: 'Baloo 2', cursive;
+      font-size: 42px;
+      font-weight: 800;
+      line-height: 1.15;
+      background: linear-gradient(135deg, #FFFFFF 30%, #ECC968 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 17px;
+      max-width: 720px;
+      margin: 0 auto;
+      line-height: 1.5;
+    }
+    .video-card {
+      background: var(--card);
+      border: 1.5px solid var(--card-border);
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6), 0 0 35px rgba(236, 201, 104, 0.12);
+      margin-bottom: 36px;
+      position: relative;
+    }
+    .video-viewport {
+      position: relative;
+      aspect-ratio: 16 / 9;
+      background: #060913;
+      overflow: hidden;
+    }
+    video {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+    }
+    .playback-toolbar {
+      padding: 18px 24px;
+      background: rgba(10, 16, 30, 0.85);
+      border-top: 1px solid rgba(236, 201, 104, 0.18);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .playback-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    button.btn-ctrl {
+      background: rgba(236, 201, 104, 0.15);
+      border: 1px solid rgba(236, 201, 104, 0.4);
+      color: var(--gold-light);
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    button.btn-ctrl:hover {
+      background: rgba(236, 201, 104, 0.3);
+      border-color: var(--gold);
+      transform: translateY(-1px);
+    }
+    .speed-pills {
+      display: flex;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      padding: 3px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .speed-pill {
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-weight: 700;
+      font-size: 12px;
+      padding: 5px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .speed-pill.active {
+      background: var(--gold);
+      color: #0F172A;
+    }
+    .loop-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #34D399;
+    }
+    .loop-indicator::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      background: #34D399;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #34D399;
+    }
+    .section-title {
+      font-family: 'Baloo 2', cursive;
+      font-size: 26px;
+      font-weight: 800;
+      margin-bottom: 18px;
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .timeline-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 18px;
+      margin-bottom: 36px;
+    }
+    .timeline-card {
+      background: rgba(14, 23, 42, 0.7);
+      border: 1px solid rgba(236, 201, 104, 0.2);
+      border-radius: 20px;
+      padding: 20px;
+      backdrop-filter: blur(10px);
+      position: relative;
+      transition: border-color 0.2s;
+    }
+    .timeline-card:hover {
+      border-color: rgba(236, 201, 104, 0.6);
+    }
+    .time-badge {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 900;
+      padding: 3px 10px;
+      border-radius: 8px;
+      background: var(--gold);
+      color: #0F172A;
+      margin-bottom: 10px;
+    }
+    .time-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: #FFFFFF;
+      margin-bottom: 8px;
+    }
+    .time-desc {
+      font-size: 13px;
+      color: #CBD5E1;
+      line-height: 1.5;
+    }
+    .specs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 36px;
+    }
+    .spec-item {
+      background: rgba(14, 23, 42, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 16px;
+    }
+    .spec-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+    }
+    .spec-val {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--gold-light);
+    }
+    .nav-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    .nav-btn {
+      text-decoration: none;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: var(--text);
+      padding: 10px 22px;
+      border-radius: 14px;
+      font-weight: 700;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .nav-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: var(--gold);
+      color: var(--gold-light);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <header>
+      <div class="badge-wrap">
+        <div class="badge">📖 100% PURE 2D VECTOR RIG</div>
+        <div class="badge badge-cyan">⚡ 60 FPS • 180 FRAMES (EXACT 3.00s)</div>
+        <div class="badge">♾️ ZERO-JUMP SEAMLESS LOOP</div>
+      </div>
+      <h1>Magical Interactive Novel Book</h1>
+      <p class="subtitle">
+        A premium SaaS landing page &amp; educational motion design featuring an alive, floating hardcover tome, blooming pages, 4 orbiting knowledge sheets, and stardust radiance.
+      </p>
+    </header>
+
+    <div class="video-card">
+      <div class="video-viewport">
+        <video id="heroVideo" autoplay loop muted playsinline poster="../assets/motion/posters/magical-book.jpg">
+          <source src="../assets/motion/magical-book.mp4" type="video/mp4">
+          <source src="../assets/motion/magical-book.webm" type="video/webm">
+          Your browser does not support the video tag.
+        </video>
+      </div>
+
+      <div class="playback-toolbar">
+        <div class="playback-controls">
+          <button class="btn-ctrl" id="btnPlayPause" onclick="togglePlay()">⏸️ Pause</button>
+          <button class="btn-ctrl" onclick="restartVideo()">🔄 Replay Loop</button>
+          <button class="btn-ctrl" onclick="stepFrame(-1)">⏮️ -1 Frame</button>
+          <button class="btn-ctrl" onclick="stepFrame(1)">⏭️ +1 Frame</button>
+        </div>
+
+        <div class="speed-pills">
+          <button class="speed-pill" onclick="setSpeed(0.25, this)">0.25x</button>
+          <button class="speed-pill" onclick="setSpeed(0.5, this)">0.5x</button>
+          <button class="speed-pill active" onclick="setSpeed(1.0, this)">1.0x</button>
+          <button class="speed-pill" onclick="setSpeed(1.5, this)">1.5x</button>
+        </div>
+
+        <div class="loop-indicator">
+          Seamless Loop Active
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">✨ 3-Second Choreography Breakdown</div>
+    <div class="timeline-grid">
+      <div class="timeline-card">
+        <span class="time-badge">0.0s – 0.8s</span>
+        <div class="time-title">1. Levitation &amp; Anticipation</div>
+        <div class="time-desc">
+          The closed navy hardcover novel floats in gentle harmonic levitation (18px sinusoidal oscillation). Underneath, a soft contact shadow contracts and expands. Stardust ambient particles drift cyclically with modulo continuity.
+        </div>
+      </div>
+
+      <div class="timeline-card">
+        <span class="time-badge">0.8s – 1.5s</span>
+        <div class="time-title">2. Cover Opens &amp; Gutter Glow</div>
+        <div class="time-desc">
+          The front cover swings open along its spine hinge joint (0° to 172°). As the spine stretches, an expanding golden light flare radiates from the gutter, revealing Chapter I, illuminated text lines, and a gilded celestial astrolabe.
+        </div>
+      </div>
+
+      <div class="timeline-card">
+        <span class="time-badge">1.5s – 2.5s</span>
+        <div class="time-title">3. Detaching Orbiting Pages</div>
+        <div class="time-desc">
+          Four enchanted knowledge sheets (✦ Cosmos, ✒ Story, ⚛ Science, 🌿 Nature) peel out of the book. They traverse a 3D elliptical orbit with accurate foreground/background depth layering, dynamic tilt, and subtle paper drop shadows.
+        </div>
+      </div>
+
+      <div class="timeline-card">
+        <span class="time-badge">2.5s – 3.0s</span>
+        <div class="time-title">4. Seamless Return &amp; Seal</div>
+        <div class="time-desc">
+          The 4 orbiting pages smoothly fold back into the center gutter. The front cover glides shut with cubic-eased deceleration. At frame 180 (exact 3.00s), position, velocity, and particle coordinates match frame 0 with zero jump cut.
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">📐 Technical Architecture</div>
+    <div class="specs-grid">
+      <div class="spec-item">
+        <div class="spec-label">Resolution</div>
+        <div class="spec-val">1920 × 1080 (16:9 FHD)</div>
+      </div>
+      <div class="spec-item">
+        <div class="spec-label">Frame Rate &amp; Duration</div>
+        <div class="spec-val">60 FPS • 180 Frames (3.00s)</div>
+      </div>
+      <div class="spec-item">
+        <div class="spec-label">Loop Continuity</div>
+        <div class="spec-val">C¹ Boundary Math (0 Frame Jump)</div>
+      </div>
+      <div class="spec-item">
+        <div class="spec-label">Styling Paradigm</div>
+        <div class="spec-val">100% Pure 2D Flat Vector</div>
+      </div>
+      <div class="spec-item">
+        <div class="spec-label">Video Formats Rendered</div>
+        <div class="spec-val">H.264 MP4 &amp; VP8/VP9 WebM</div>
+      </div>
+      <div class="spec-item">
+        <div class="spec-label">Remotion Component</div>
+        <div class="spec-val">MagicalBookMotion.jsx</div>
+      </div>
+    </div>
+
+    <div class="nav-buttons">
+      <a class="nav-btn" href="../assets/motion/magical-book.mp4" target="_blank">📥 Open Raw MP4 (1080p 60fps)</a>
+      <a class="nav-btn" href="../assets/motion/magical-book.webm" target="_blank">🌐 Open WebM Version</a>
+      <a class="nav-btn" href="preview-motion.html">🐢 View Penyu Vector Motion</a>
+    </div>
+  </div>
+
+  <script>
+    const vid = document.getElementById('heroVideo');
+    const btnPlayPause = document.getElementById('btnPlayPause');
+
+    function togglePlay() {
+      if (vid.paused) {
+        vid.play();
+        btnPlayPause.innerHTML = '⏸️ Pause';
+      } else {
+        vid.pause();
+        btnPlayPause.innerHTML = '▶️ Play';
+      }
+    }
+
+    function restartVideo() {
+      vid.currentTime = 0;
+      vid.play();
+      btnPlayPause.innerHTML = '⏸️ Pause';
+    }
+
+    function setSpeed(rate, el) {
+      vid.playbackRate = rate;
+      document.querySelectorAll('.speed-pill').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+    }
+
+    function stepFrame(frames) {
+      vid.pause();
+      btnPlayPause.innerHTML = '▶️ Play';
+      vid.currentTime = Math.max(0, Math.min(3.0, vid.currentTime + (frames / 60)));
+    }
+
+    vid.addEventListener('play', () => btnPlayPause.innerHTML = '⏸️ Pause');
+    vid.addEventListener('pause', () => btnPlayPause.innerHTML = '▶️ Play');
+  </script>
+</body>
+</html>

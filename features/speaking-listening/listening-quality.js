@@ -264,7 +264,8 @@ function assertSound(items) {
       if (!who) fail('skenario tanpa karakter di ' + item.id);
       if (characters[who]) fail('karakter dipakai dua skenario: ' + p.character + ' (' + item.id + ')');
       characters[who] = item.id;
-      var place = String(p.scenario.split('—').pop() || '').trim().toLowerCase();
+      var placeMatch = p.scenario.match(/\(([^)]+)\)\s*$/);
+      var place = (placeMatch ? placeMatch[1] : String(p.scenario.split('—').pop() || '')).trim().toLowerCase();
       if (settings[place]) fail('setting dipakai dua skenario: ' + place + ' (' + item.id + ')');
       settings[place] = item.id;
     });

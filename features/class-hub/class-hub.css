@@ -73,10 +73,10 @@
 .ch-mis{margin:8px 0 0;padding-left:18px;font-size:.9rem;line-height:1.5}.ch-mis li{margin-bottom:6px}.ch-mis small{display:block;opacity:.8;font-size:.78rem}
 .ch-write .ch-item-list{margin-bottom:10px}
 
-/* Hub kelas ikut dicat ulang setiap kali cangkang guru dicat ulang (mountTeacher dipanggil
-   dari render()). Saat cat ulang itu hanya membawa data baru, animasi masuknya tidak boleh
-   diputar lagi - lihat .tg.is-repaint di features/teacher/teacher-shell.css. */
-.tg.is-repaint .ch-body,.tg.is-repaint .ch-feedback,.tg.is-repaint .ch-expand{animation:none}
+.tg.is-repaint .ch-body,.tg.is-repaint .ch-feedback,.tg.is-repaint .ch-expand,
+.ch-student.is-repaint,.ch-student.is-repaint .ch-body,.ch-student.is-repaint .ch-feedback,.ch-student.is-repaint .ch-expand,
+.ch.is-repaint,.ch.is-repaint .ch-body{animation:none !important}
+body.reduce-motion .ch-student,body.reduce-motion .ch-body,body.reduce-motion .ch-feedback,body.reduce-motion .ch-expand{animation:none !important}
 
 /* Gambar soal di runner kelas. Sepadan dengan .lf-picture di learner-flow: soal bergambar
    memakai bank dan markup yang sama, jadi ukurannya pun harus terbaca sama oleh murid. */
@@ -173,3 +173,826 @@
 .ch-card-ink p .kelasku-wordmark {
   color: #FFFFFF !important;
 }
+
+/* ---- Panel Misi Kurikulum Murid ---- */
+.ch-curriculum-panel {
+  background: linear-gradient(135deg, rgba(31, 122, 99, 0.08) 0%, rgba(240, 228, 207, 0.5) 100%), var(--ch-bg);
+  border: 1.5px solid rgba(31, 122, 99, 0.28);
+  border-radius: var(--ch-r-lg, 20px);
+  padding: 18px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 18px -10px rgba(31, 122, 99, 0.18);
+  text-decoration: none;
+}
+.ch-curriculum-panel .ch-kicker {
+  color: #1F7A63;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 800;
+}
+.ch-curriculum-panel .ch-kicker i,
+.ch-curriculum-panel .ch-kicker svg {
+  width: 14px;
+  height: 14px;
+}
+.ch-curriculum-panel h3 {
+  font-size: 1.15rem;
+  margin: 4px 0 6px;
+  color: var(--ch-ink, #241A11);
+  letter-spacing: -0.01em;
+}
+.ch-curriculum-panel .ch-actions a {
+  text-decoration: none;
+}
+
+/* ---- Kartu Sapaan / Pengumuman Wali Kelas (KelasKu.dc.html) ---- */
+.ch-greeting-card {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 16px;
+  border-radius: 24px;
+  background: #E5DDF3;
+  color: #523E86;
+  margin-bottom: 6px;
+  animation: chIn .35s ease both;
+}
+.ch-greeting-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.82);
+  color: #523E86;
+  font-family: var(--fz-heading, 'Quicksand', 'Nunito', sans-serif);
+  font-size: 13px;
+  font-weight: 700;
+  flex: none;
+}
+.ch-greeting-content {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+  min-width: 0;
+}
+.ch-greeting-author {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #523E86;
+}
+.ch-greeting-text {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #523E86;
+  line-height: 1.45;
+}
+
+/* ---- Papan Kelas / Leaderboard (KelasKu.dc.html) ---- */
+.ch-papan-body {
+  gap: 16px;
+}
+.ch-papan-card {
+  border-radius: 28px;
+  padding: 18px 16px;
+  background: var(--ch-bg);
+  box-shadow: 0 14px 32px rgba(46, 39, 36, .07), 0 2px 6px rgba(46, 39, 36, .04);
+}
+.ch-papan-period {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ch-accent, #9B3A4A);
+}
+.ch-papan-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 12px;
+}
+.ch-papan-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 12px;
+  border-radius: 18px;
+  transition: background-color .15s;
+}
+.ch-papan-row.is-me {
+  background: #F6E9EB;
+}
+.ch-papan-rank {
+  width: 16px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ch-muted, #786D64);
+  text-align: center;
+  flex: none;
+}
+.ch-papan-row.is-me .ch-papan-rank {
+  color: #9B3A4A;
+}
+.ch-papan-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-family: var(--fz-heading, 'Quicksand', 'Nunito', sans-serif);
+  font-size: 11.5px;
+  font-weight: 700;
+  flex: none;
+}
+.ch-papan-name {
+  flex: 1;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ch-text, #2E2724);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ch-papan-row.is-me .ch-papan-name {
+  font-weight: 700;
+  color: #9B3A4A;
+}
+.ch-papan-badge {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #9B3A4A;
+  margin-left: 4px;
+}
+.ch-papan-score {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ch-text, #2E2724);
+  flex: none;
+}
+.ch-papan-row.is-me .ch-papan-score {
+  color: #9B3A4A;
+}
+
+/* ---- In-App Misi Belajar & Paspor Belajar ---- */
+.ch-curriculum-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: chIn .35s ease both;
+}
+.ch-curriculum-header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.ch-curriculum-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.ch-curriculum-switch {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--ch-soft);
+  border-radius: 999px;
+}
+.ch-curriculum-switch button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  background: transparent;
+  padding: 8px 16px;
+  border-radius: 999px;
+  font: inherit;
+  font-size: .84rem;
+  font-weight: 700;
+  color: var(--ch-muted);
+  cursor: pointer;
+  transition: background-color .15s, color .15s;
+}
+.ch-curriculum-switch button.is-active {
+  background: var(--ch-bg);
+  color: var(--ch-text);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
+}
+.ch-curriculum-switch button i,
+.ch-curriculum-switch button svg {
+  width: 14px;
+  height: 14px;
+}
+.ch-missions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.ch-mission-card {
+  background: var(--ch-bg);
+  border: 1px solid var(--ch-line);
+  border-radius: 20px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: transform .15s, box-shadow .15s;
+}
+.ch-mission-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, .06);
+}
+.ch-mission-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.ch-mission-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--ch-text);
+}
+.ch-mission-desc {
+  font-size: .86rem;
+  color: var(--ch-muted);
+  margin: 0;
+  line-height: 1.4;
+}
+.ch-subchapters-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 0;
+}
+.ch-subchapters-list li {
+  font-size: .76rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--ch-soft);
+  color: var(--ch-text);
+}
+.ch-mission-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--ch-line);
+  flex-wrap: wrap;
+}
+.ch-passport-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+@media(min-width: 580px) {
+  .ch-passport-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.ch-passport-card {
+  background: var(--ch-bg);
+  border: 1px solid var(--ch-line);
+  border-radius: 20px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
+  overflow: hidden;
+}
+.ch-passport-card.is-mastered {
+  border-color: rgba(31, 122, 99, .35);
+  background: linear-gradient(135deg, rgba(233, 247, 240, 0.45) 0%, var(--ch-bg) 100%);
+}
+.ch-passport-stamp {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: .74rem;
+  font-weight: 700;
+  width: fit-content;
+}
+.ch-passport-stamp.is-mastered {
+  background: #D5EBE5;
+  color: #1D5C52;
+}
+.ch-passport-stamp.is-practice {
+  background: #F7EACB;
+  color: #7A5512;
+}
+.ch-passport-stamp.is-unstarted {
+  background: var(--ch-soft);
+  color: var(--ch-muted);
+}
+
+/* ==========================================================================
+   Panel Mata Pelajaran KelasKu (17 Mapel / Subject Panels)
+   ========================================================================== */
+.ch-subject-panels-wrap {
+  margin: 6px 0 14px;
+}
+.ch-subject-panels-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 10px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.ch-subject-panels-head .ch-h3 {
+  font-size: 1.05rem;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ch-subject-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+}
+.ch-subject-card {
+  background: var(--ch-bg);
+  border: 1.5px solid var(--ch-line);
+  border-radius: 16px;
+  padding: 14px;
+  text-align: left;
+  cursor: pointer;
+  transition: transform .18s, border-color .18s, box-shadow .18s;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+  overflow: hidden;
+}
+.ch-subject-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--mapel-color, var(--ch-accent));
+}
+.ch-subject-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--mapel-color, var(--ch-accent));
+  box-shadow: 0 10px 24px -14px rgba(0, 0, 0, 0.25);
+}
+.ch-subject-card.is-active {
+  border-color: var(--mapel-color, var(--ch-accent));
+  background: linear-gradient(180deg, rgba(255, 243, 220, 0.45) 0%, var(--ch-bg) 100%);
+  box-shadow: 0 0 0 1px var(--mapel-color, var(--ch-accent)), 0 8px 20px -10px rgba(0, 0, 0, 0.2);
+}
+.ch-subject-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.ch-subject-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: var(--ch-soft);
+  display: grid;
+  place-items: center;
+  color: var(--mapel-color, var(--ch-accent));
+  flex: none;
+}
+.ch-subject-icon i, .ch-subject-icon svg {
+  width: 18px;
+  height: 18px;
+}
+.ch-badge.is-warn {
+  background: #C2410C;
+  color: #fff;
+}
+.ch-badge.is-ok {
+  background: var(--ch-ok-soft);
+  color: var(--ch-ok);
+  font-weight: 700;
+}
+/* Keadaan "belum ada apa-apa" tidak boleh memakai warna aksen. Badge dasar berwarna
+   aksen putih-di-atas-warna, dan itu membaca sebagai SOROTAN — persis kebalikan dari yang
+   dimaksud. Varian ini diam, supaya mapel tanpa tugas terlihat sebagai mapel tanpa tugas
+   dan bukan sebagai kabar baik. (m025-349, temuan K8.) */
+.ch-badge.is-mute,
+.ch-subject-top .ch-badge:not(.is-warn):not(.is-ok) {
+  background: var(--ch-line, rgba(0,0,0,.08));
+  color: var(--ch-muted);
+  font-weight: 600;
+}
+/* Kartu "Target Minggu Ini" (m025-349, fitur F6). Ia menyebut SATU langkah berikutnya,
+   jadi ia berhak berdiri paling atas dan berhak terlihat berbeda dari katalog di bawahnya. */
+.ch-target-card {
+  background: linear-gradient(150deg, var(--ch-soft), var(--ch-bg));
+  border-color: var(--ch-accent);
+}
+.ch-target-card h3 { margin: 4px 0 2px; }
+
+/* Paspor per sub-bab (fitur F3). Baris-baris ini yang mengubah paspor dari rapor menjadi
+   alat: murid melihat BAGIAN MANA yang goyah, bukan satu angka untuk satu bab. */
+.ch-passport-subs { list-style: none; margin: 8px 0 10px; padding: 0; display: flex; flex-direction: column; gap: 3px; }
+.ch-passport-subs li {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
+  font-size: .78rem; padding: 3px 7px; border-radius: 7px; background: var(--ch-line);
+}
+.ch-passport-subs li span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ch-passport-subs li b { flex: none; font-variant-numeric: tabular-nums; }
+.ch-passport-subs li.is-ok { background: var(--ch-ok-soft); color: var(--ch-ok); }
+.ch-passport-subs li.is-weak { background: var(--ch-bad-soft); color: var(--ch-bad); }
+.ch-passport-subs li.is-untested { opacity: .62; }
+.ch-passport-actions { display: flex; flex-direction: column; gap: 6px; }
+
+/* Stempel yang memudar: bukan hijau (masih bisa), bukan merah (gagal). */
+.ch-passport-stamp.is-due { background: var(--ch-info-soft); color: var(--ch-info); }
+
+/* Tugas dari Kurikulum (m025-349, temuan X4). Kartunya MENINGGALKAN halaman ini menuju
+   misi.html, jadi ia memakai aksen kiri yang sama dengan pintu adaptif di bawah — bukan
+   supaya menonjol, melainkan supaya murid tahu ketukan ini berpindah layar. Bentuknya
+   tetap kartu tugas biasa: ia memang tugas, dan tempatnya memang di sini. */
+.ch-curriculum-inbox { display: flex; flex-direction: column; gap: 10px; }
+.ch-curriculum-inbox > .ch-h2 { margin-bottom: 0; }
+.ch-curriculum-inbox > .ch-small { margin: -4px 0 4px; }
+.ch-curriculum-task {
+  display: block;
+  text-decoration: none;
+  border-left: 3px solid var(--ch-accent);
+}
+.ch-curriculum-task:hover,
+.ch-curriculum-task:focus-visible { transform: translateY(-1px); }
+
+/* Pintu ke misi adaptif (misi.html). Ia MENINGGALKAN halaman ini, jadi ia tidak boleh
+   menyamar sebagai tab: diberi aksen kiri supaya terbaca sebagai jalan keluar, bukan
+   sebagai salah satu kartu misi di bawahnya. (m025-349, temuan X3.) */
+.ch-adaptive-door {
+  border-left: 3px solid var(--ch-accent);
+  margin-bottom: 14px;
+}
+
+/* Ruang lingkup kartu kurikulum: ikon sebaris dengan teksnya, tanpa menaikkan tinggi baris. */
+.ch-curriculum-scope {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 10px;
+}
+.ch-curriculum-scope i,
+.ch-curriculum-scope svg {
+  width: 14px;
+  height: 14px;
+  flex: none;
+}
+.ch-subject-name {
+  margin: 0;
+  font-size: .95rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--ch-text);
+}
+.ch-subject-teacher {
+  margin: 0;
+  font-size: .78rem;
+  color: var(--ch-muted);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.ch-subject-teacher i, .ch-subject-teacher svg {
+  width: 14px;
+  height: 14px;
+  color: var(--ch-ok);
+}
+.ch-no-teacher {
+  color: var(--ch-muted);
+  font-style: italic;
+}
+
+/* Compact list di tab Kelas */
+.ch-subjects-compact-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+.ch-subject-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--ch-soft);
+  border: 1px solid var(--ch-line);
+}
+.ch-subject-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: .84rem;
+}
+.ch-subject-bullet {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex: none;
+}
+.ch-teacher-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: .72rem;
+  font-weight: 700;
+  color: var(--ch-ok);
+  background: var(--ch-ok-soft);
+  padding: 3px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.ch-empty-pill {
+  font-size: .72rem;
+  color: var(--ch-muted);
+  font-style: italic;
+}
+.ch-subject-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: .72rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: var(--ch-soft);
+  color: var(--ch-text);
+  margin-right: 4px;
+}
+
+/* K12/A5 (m025-351): panel tab adalah pembungkus transparan — id/role dibawa untuk
+   aria-controls, tetapi tata letak tetap milik isinya (apa pun display induknya). */
+.ch-tabpanel { display: contents; }
+
+
+
+/* Tab Kurikulum & Kompetensi di hub guru (m025-357). Isinya dirender teacher shell dan
+   memakai kelas .tg-*, jadi yang perlu di sini hanya WADAHNYA: jarak antar bagian yang
+   sama dengan tab lain, dan pembatalan animasi masuk .ch-body — panel ini bisa mengecat
+   ulang berkali-kali saat tiga permintaan latarnya mendarat satu per satu, dan animasi
+   yang diulang di setiap cat ulang terbaca sebagai layar berkedip. */
+.ch-kurikulum{gap:18px;animation:none}
+
+/* ==========================================================================
+   AUDIT 2026-09-22: Chip Strip Filter (mengganti grid 17 kartu mapel)
+   ========================================================================== */
+.ch-chip-strip {
+  display: flex;
+  gap: 6px;
+  padding: 6px 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  mask-image: linear-gradient(to right, transparent 0, #000 0, #000 calc(100% - 24px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 0, #000 calc(100% - 24px), transparent 100%);
+}
+.ch-chip-strip::-webkit-scrollbar { display: none; }
+
+.ch-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 1.5px solid var(--ch-line);
+  background: var(--ch-bg);
+  color: var(--ch-text);
+  font: inherit;
+  font-weight: 700;
+  font-size: .76rem;
+  padding: 7px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex: none;
+  transition: border-color .15s, background-color .15s, transform .15s;
+}
+.ch-chip:hover { transform: translateY(-1px); border-color: var(--chip-color, var(--ch-accent)); }
+.ch-chip.is-active {
+  background: var(--chip-color, var(--ch-accent));
+  color: #fff;
+  border-color: var(--chip-color, var(--ch-accent));
+  box-shadow: 0 4px 12px -6px var(--chip-color, var(--ch-accent));
+}
+.ch-chip.is-clear {
+  background: var(--ch-bad-soft);
+  color: var(--ch-bad);
+  border-color: transparent;
+  font-weight: 800;
+}
+.ch-chip i, .ch-chip svg { width: 14px; height: 14px; }
+.ch-chip-badge {
+  background: var(--ch-accent);
+  color: #fff;
+  border-radius: 999px;
+  font-size: .62rem;
+  padding: 1px 6px;
+  margin-left: 2px;
+  font-weight: 800;
+}
+.ch-chip.is-active .ch-chip-badge {
+  background: rgba(255,255,255,.3);
+  color: #fff;
+}
+
+/* ==========================================================================
+   AUDIT 2026-09-22: Section Dividers & Headings
+   ========================================================================== */
+.ch-divider {
+  border: none;
+  border-top: 1px dashed var(--ch-line);
+  margin: 8px 0;
+}
+.ch-section-tugas,
+.ch-section-done,
+.ch-section-kurikulum {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ch-section-tugas .ch-h2 i,
+.ch-section-tugas .ch-h2 svg,
+.ch-section-done .ch-h2 i,
+.ch-section-done .ch-h2 svg,
+.ch-section-kurikulum .ch-h2 i,
+.ch-section-kurikulum .ch-h2 svg {
+  width: 18px;
+  height: 18px;
+  color: var(--ch-accent);
+}
+
+/* ==========================================================================
+   AUDIT 2026-09-22: Combined Kurikulum Card (compact)
+   ========================================================================== */
+.ch-curriculum-compact {
+  padding: 14px;
+}
+.ch-curriculum-compact .ch-actions {
+  margin-top: 10px;
+}
+
+/* ==========================================================================
+   AUDIT 2026-09-22: Enhanced Progres Tab
+   ========================================================================== */
+.ch-streak-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  background: linear-gradient(135deg, var(--ch-ok-soft), var(--ch-bg));
+  border: 1.5px solid rgba(31, 107, 78, 0.2);
+}
+.ch-streak-emoji {
+  font-size: 2rem;
+  line-height: 1;
+  flex: none;
+}
+.ch-streak-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+.ch-streak-info b {
+  font-size: 1.2rem;
+  font-family: var(--fz-heading, inherit);
+}
+.ch-streak-info span {
+  font-size: .78rem;
+  color: var(--ch-muted);
+  font-weight: 600;
+}
+.ch-top-skills {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 8px 0 0;
+}
+.ch-top-skill-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: .84rem;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: var(--ch-soft);
+}
+.ch-top-skill-row .ch-bar { flex: 1; min-width: 40px; }
+.ch-top-skill-row b { flex: none; font-size: .82rem; font-variant-numeric: tabular-nums; }
+.ch-top-skill-row span { flex: none; min-width: 80px; font-weight: 600; }
+.ch-top-skill-row.is-strong { border-left: 3px solid var(--ch-ok); }
+.ch-top-skill-row.is-weak { border-left: 3px solid var(--ch-bad); }
+
+/* ==========================================================================
+   AUDIT 2026-09-22: Auto-label for Generated Announcements
+   ========================================================================== */
+.ch-greeting-auto {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: .62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: rgba(82, 62, 134, .55);
+  margin-top: 4px;
+}
+.ch-greeting-auto i, .ch-greeting-auto svg {
+  width: 11px;
+  height: 11px;
+}
+
+/* ==========================================================================
+   AUDIT 2026-09-22: Leaderboard Sample Data Indicator
+   ========================================================================== */
+.ch-papan-sample-notice {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .72rem;
+  color: var(--ch-muted);
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--ch-soft);
+  margin-top: 8px;
+}
+.ch-papan-sample-notice i, .ch-papan-sample-notice svg {
+  width: 14px;
+  height: 14px;
+  flex: none;
+}
+
+/* ==========================================================================
+   m025-364 · SIKLUS HIDUP TUGAS MURID (audit KelasKu K1/K3)
+   Segmen status, baris tugas ringkas (judul, satu keterangan, kaki: tenggat + satu tombol),
+   grup waktu, dan Arsip. Warna lewat token --ch-* supaya mode gelap ikut dengan sendirinya.
+   Kontrol .ch-plain dikecualikan dari tombol-angkat global (style.css) dan diberi awalan .ch
+   supaya menang atas `body.fz-lux button` (0,1,2).
+   ========================================================================== */
+.ch-segbar{display:flex;gap:4px;padding:4px;background:var(--ch-soft);border-radius:14px}
+.ch .ch-segbar-btn{flex:1 1 0;min-width:0;display:inline-flex;align-items:center;justify-content:center;gap:6px;border:0;background:transparent;box-shadow:none;color:var(--ch-muted);font:inherit;font-weight:700;font-size:.84rem;padding:9px 6px;border-radius:10px;cursor:pointer;white-space:nowrap;transition:background-color .2s,color .2s}
+.ch .ch-segbar-btn.is-active{background:var(--ch-bg);color:var(--ch-text);box-shadow:0 4px 14px -10px rgba(0,0,0,.45)}
+.ch-segbar-n{min-width:20px;padding:1px 6px;border-radius:999px;background:var(--ch-line);color:var(--ch-text);font-size:.7rem;font-weight:800;text-align:center}
+.ch-segbar-btn.has-late .ch-segbar-n{background:var(--ch-bad-soft);color:var(--ch-bad)}
+.ch .ch-plain:focus-visible{outline:2px solid var(--ch-accent);outline-offset:2px}
+.ch-list{display:flex;flex-direction:column;gap:8px}
+.ch-group{margin:8px 2px 0;font-size:.72rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ch-muted);display:flex;gap:6px;align-items:baseline}
+.ch-group small{font-size:.72rem;letter-spacing:0;font-weight:700}
+.ch-trow{display:flex;align-items:flex-start;gap:12px;padding:12px}
+.ch-trow.is-exam{box-shadow:inset 3px 0 0 var(--ch-info)}
+.ch-trow-lead{flex:none;width:44px;height:44px;border-radius:12px;background:var(--ch-soft);color:var(--ch-text);display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
+.ch-trow-lead small{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--ch-muted)}
+.ch-trow-lead b{font-size:1.02rem;font-weight:800;margin-top:2px}
+.ch-trow-lead.is-late{background:var(--ch-bad-soft);color:var(--ch-bad)}.ch-trow-lead.is-late small{color:var(--ch-bad)}
+.ch-trow-lead.is-none{color:var(--ch-muted)}.ch-trow-lead i,.ch-trow-lead svg{width:18px;height:18px}
+.ch-trow-lead.is-score b{font-size:.84rem;margin:0}
+.ch-trow-lead.is-hi{background:var(--ch-ok-soft);color:var(--ch-ok)}.ch-trow-lead.is-mid{background:var(--ch-info-soft);color:var(--ch-info)}
+.ch-trow-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.ch-trow-tag{align-self:flex-start;display:inline-flex;align-items:center;gap:4px;font-size:.66rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--ch-info)}
+.ch-trow-tag i,.ch-trow-tag svg{width:12px;height:12px}
+.ch-card .ch-trow-title{margin:0;font-size:.96rem;line-height:1.25;font-weight:700;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.ch-trow-meta{margin:0;font-size:.76rem;color:var(--ch-muted);display:flex;flex-wrap:wrap;align-items:center;column-gap:5px;row-gap:1px;min-width:0}
+.ch-sep{opacity:.6}
+.ch-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--chip-color,var(--ch-muted));flex:none;margin-right:1px;vertical-align:middle}
+.ch-chip .ch-dot{margin-right:0}.ch-chip.is-active .ch-dot{background:#fff}
+.ch-trow-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:6px;flex-wrap:wrap}
+.ch-trow-when{font-size:.78rem;font-weight:700;color:var(--ch-muted)}.ch-trow-when.is-urgent{color:var(--ch-bad)}
+.ch-trow-act{display:flex;align-items:center;gap:6px;margin-left:auto}
+.ch-trow.is-done .ch-trow-title,.ch-trow.is-missed .ch-trow-title{font-weight:600}
+.ch .ch-icon-btn{flex:none;width:36px;height:36px;padding:0;display:grid;place-items:center;border-radius:10px;border:1px solid var(--ch-line);background:transparent;box-shadow:none;color:var(--ch-muted);cursor:pointer;transition:background-color .2s,color .2s}
+.ch .ch-icon-btn:hover{background:var(--ch-soft);color:var(--ch-text)}.ch-icon-btn i,.ch-icon-btn svg{width:17px;height:17px}
+.ch-note{margin:0;display:flex;gap:8px;align-items:flex-start;font-size:.8rem;line-height:1.45;color:var(--ch-muted);padding:2px}
+.ch-note i,.ch-note svg{width:15px;height:15px;flex:none;margin-top:2px}
+.ch .ch-fold{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:11px;border:1px dashed var(--ch-line);border-radius:12px;background:transparent;box-shadow:none;color:var(--ch-text);font:inherit;font-weight:700;font-size:.84rem;cursor:pointer}
+.ch-fold i,.ch-fold svg{width:16px;height:16px}
+.ch .ch-archive-link{display:flex;align-items:center;gap:12px;width:100%;margin-top:6px;padding:12px 14px;border:1px solid var(--ch-line);border-radius:var(--ch-r);background:var(--ch-soft);box-shadow:none;color:var(--ch-text);font:inherit;font-weight:600;text-align:left;cursor:pointer}
+.ch-archive-link>span{flex:1;display:flex;flex-direction:column}.ch-archive-link small{color:var(--ch-muted);font-size:.78rem;font-weight:600}
+.ch-archive-link i,.ch-archive-link svg{width:18px;height:18px;flex:none}
+.ch-search{display:flex;align-items:center;gap:8px;padding:0 14px;border:1px solid var(--ch-line);border-radius:999px;background:var(--ch-bg);color:var(--ch-muted)}
+.ch-search i,.ch-search svg{width:16px;height:16px;flex:none}
+.ch-search input{flex:1;min-width:0;border:0;background:transparent;box-shadow:none;font:inherit;color:var(--ch-text);padding:11px 0;outline:none}
+.ch-search:focus-within{border-color:var(--ch-accent)}
+.ch-mandiri{display:flex;flex-direction:column;gap:10px;margin-top:10px;padding-top:14px;border-top:1px dashed var(--ch-line)}
+.ch-mandiri .ch-h2{margin:0}
+@media (max-width:380px){.ch-trow{gap:10px;padding:11px 10px}.ch-trow-lead{width:40px;height:40px}.ch .ch-segbar-btn{font-size:.8rem}}

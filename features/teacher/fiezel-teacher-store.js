@@ -26,6 +26,29 @@
   var DAY = 86400000;
   var SKILL_LABEL = { past_tense: 'Past tense', past_questions: 'Past questions', vocab_a2: 'Vocabulary A2', listening_detail: 'Listening detail', reading_inference: 'Reading inference', speaking: 'Speaking' };
   var SKILL_ORDER = ['past_tense', 'past_questions', 'vocab_a2', 'listening_detail', 'reading_inference', 'speaking'];
+  var MAPEL_NAMES = {
+    MAT: 'Matematika',
+    IND: 'Bahasa Indonesia',
+    ENG: 'Bahasa Inggris',
+    IPA: 'Ilmu Pengetahuan Alam',
+    IPS: 'Ilmu Pengetahuan Sosial',
+    INF: 'Informatika',
+    PPK: 'Pendidikan Pancasila',
+    AGM: 'Pendidikan Agama',
+    FIS: 'Fisika',
+    KIM: 'Kimia',
+    BIO: 'Biologi',
+    EKO: 'Ekonomi',
+    GEO: 'Geografi',
+    SOS: 'Sosiologi',
+    SEJ: 'Sejarah',
+    PJK: 'PJOK',
+    SNB: 'Seni Budaya'
+  };
+  Object.keys(MAPEL_NAMES).forEach(function (k) {
+    SKILL_LABEL[k] = MAPEL_NAMES[k];
+    SKILL_LABEL[k.toLowerCase()] = MAPEL_NAMES[k];
+  });
   var ATT = { H: 'Hadir', I: 'Izin', S: 'Sakit', A: 'Alpa' };
 
   function bank() { return root.FiezelReviewBank; }
@@ -34,7 +57,12 @@
   function b64e(obj) { return btoa(unescape(encodeURIComponent(JSON.stringify(obj)))); }
   function b64d(str) { return JSON.parse(decodeURIComponent(escape(atob(String(str || '').trim())))); }
   function makeClassCode() { var A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', out = ''; for (var i = 0; i < 6; i++) out += A[Math.floor(Math.random() * A.length)]; return 'FZ-' + out; }
-  function normalizeClassCode(v) { v = String(v || '').toUpperCase().replace(/[^A-Z0-9]/g, ''); if (v.indexOf('FZ') === 0) v = v.slice(2); return v.length === 6 ? 'FZ-' + v : ''; }
+  function normalizeClassCode(v) {
+    v = String(v || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+    if (v.indexOf('FZ') === 0) v = v.slice(2);
+    if (!v) return '';
+    return (v.length >= 3 && v.length <= 16) ? 'FZ-' + v : '';
+  }
   function firstName(n) { return String(n || t('umum.murid', 'Murid')).trim().split(/\s+/)[0].slice(0, 24); }
 
   // ---- persist -------------------------------------------------------------------------
@@ -75,6 +103,7 @@
     c.students = (c.students || []).map(normalizeStudent);
     c.assignments = c.assignments || [];
     c.announcements = c.announcements || [];
+    c.latestAnnouncement = c.latestAnnouncement || (c.announcements.length ? c.announcements[c.announcements.length - 1] : null);
     c.journal = c.journal || [];
     c.sentItemIds = c.sentItemIds || [];
     c.pending = Array.isArray(c.pending) ? c.pending : [];
@@ -115,11 +144,21 @@
   function daysSince(ts) { return ts ? Math.floor((Date.now() - ts) / DAY) : null; }
   function pendingAssignments(c, s) {
     var td = today();
-    return (c.assignments || []).filter(function (a) { return targeted(a, s) && !(a.done && a.done[s.id]); }).map(function (a) { return { a: a, late: !!(a.deadline && a.deadline < td) }; });
+    return (c.assignments || []).filter(function (a) { return !a.archivedAt && targeted(a, s) && !(a.done && a.done[s.id]); }).map(function (a) { return { a: a, late: !!(a.deadline && a.deadline < td) }; });
   }
   function targeted(a, s) { return !a.targets || a.targets.indexOf(s.id) !== -1; }
   function weakestSkill(s) {
-    var best = null; SKILL_ORDER.forEach(function (k) { var v = skillAcc(s, k); if (v != null && (!best || v < best.acc)) best = { skill: k, acc: v }; }); return best;
+    var best = null;
+    var list = [];
+    (s.results || []).forEach(function (r) {
+      if (r.skill && list.indexOf(r.skill) === -1) list.push(r.skill);
+    });
+    if (!list.length) list = SKILL_ORDER.slice();
+    list.forEach(function (k) {
+      var v = skillAcc(s, k);
+      if (v != null && (!best || v < best.acc)) best = { skill: k, acc: v };
+    });
+    return best;
   }
   /** Skor risiko 0–100 + alasan yang bisa dibaca guru + satu tindakan konkret. */
   function risk(c, s) {
@@ -139,27 +178,77 @@
     var weak = weakestSkill(s), action;
     if (d != null && d >= 7) action = 'Kirim Kartu Sapa hari ini — sapaan personal, bukan tagihan tugas.';
     else if (late.length) action = 'Ingatkan tugas “' + late[0].a.title + '” lewat pesan singkat + tawarkan waktu tambahan.';
-    else if (weak && weak.acc < 0.5) action = 'Beri 5 soal ' + SKILL_LABEL[weak.skill] + ' ' + t('guru.pendamping-teman', 'dengan pendamping teman (lihat Kelompok Belajar).');
-    else if (level === 'pantau') action = 'Sapa 1 kalimat apresiasi supaya momentumnya tidak putus.';
-    else action = 'Pertahankan — beri tantangan kecil satu level di atas.';
+    else if (weak && weak.acc < 0.5) action = 'Beri 5 soal ' + (SKILL_LABEL[weak.skill] || weak.skill) + ' ' + t('guru.pendamping-teman', 'dengan pendamping teman (lihat Kelompok Belajar).');
+    else if (score >= 25) action = 'Pantau keaktifan minggu ini, pastikan koneksi dan waktu belajarnya cukup.';
+    else action = 'Aman — pertahankan momentum belajar minggu ini.';
     return { score: score, level: level, reasons: reasons, action: action, weak: weak, pending: pend.length, late: late.length, inactiveDays: d };
   }
   function recentAttendance(s, n) { var out = []; for (var i = 0; i < n; i++) { var k = today(Date.now() - i * DAY); out.push({ date: k, v: (s.attendance || {})[k] || null }); } return out; }
   function attendanceRate(s, n) { var a = recentAttendance(s, n || 10).filter(function (x) { return x.v; }); if (!a.length) return null; return a.filter(function (x) { return x.v === 'H'; }).length / a.length; }
   function classStats(c) {
-    var st = c.students, active7 = st.filter(function (s) { var d = daysSince(s.lastActiveAt); return d != null && d <= 7; }).length;
-    var accs = st.map(overallAcc).filter(function (v) { return v != null; }), avg = accs.length ? accs.reduce(function (a, b) { return a + b; }, 0) / accs.length : null;
+    var st = c.students;
+    var accs = st.map(function (s) { return overallAcc(s); }).filter(function (v) { return v != null; });
+    var avg = accs.length ? accs.reduce(function (x, y) { return x + y; }, 0) / accs.length : null;
+    var active7 = st.filter(function (s) { var d = daysSince(s.lastActiveAt); return d != null && d <= 7; }).length;
     var risks = st.map(function (s) { return risk(c, s); }), atRisk = risks.filter(function (r) { return r.level === 'risiko'; }).length, watch = risks.filter(function (r) { return r.level === 'pantau'; }).length;
     var open = (c.assignments || []).filter(function (a) { return st.some(function (s) { return targeted(a, s) && !(a.done && a.done[s.id]); }); }).length;
     return { total: st.length, active7: active7, avgAcc: avg, atRisk: atRisk, watch: watch, openAssignments: open };
   }
+  function activeSkills(c, s) {
+    var set = {}, order = [];
+    function add(k) {
+      if (k && !set[k]) { set[k] = true; order.push(k); }
+    }
+    if (c) {
+      (c.assignments || []).forEach(function (a) {
+        (a.skills || []).forEach(add);
+      });
+      (c.students || []).forEach(function (st) {
+        (st.results || []).forEach(function (r) { add(r.skill); });
+      });
+    }
+    if (s && s.results) {
+      s.results.forEach(function (r) { add(r.skill); });
+    }
+    var isNonEng = c && c.subject && c.subject !== 'ENG' && c.subject !== 'English';
+    if (isNonEng) {
+      if (!order.length) add(c.subject);
+    } else {
+      if (!order.length) {
+        SKILL_ORDER.forEach(add);
+      } else {
+        SKILL_ORDER.forEach(function (k) {
+          if (!set[k] && (!c || !c.assignments || !c.assignments.length)) add(k);
+        });
+      }
+    }
+    return order;
+  }
   function classSkillMap(c) {
-    return SKILL_ORDER.map(function (k) {
-      var cc = 0, nn = 0, low = 0; c.students.forEach(function (s) { (s.results || []).forEach(function (r) { if (r.skill === k) { cc += r.correct; nn += r.total; } }); var v = skillAcc(s, k); if (v != null && v < 0.5) low++; });
-      return { skill: k, label: SKILL_LABEL[k], acc: nn ? cc / nn : null, low: low, n: nn };
+    var list = activeSkills(c);
+    return list.map(function (k) {
+      var cc = 0, nn = 0, low = 0;
+      c.students.forEach(function (s) {
+        (s.results || []).forEach(function (r) {
+          if (r.skill === k) { cc += r.correct; nn += r.total; }
+        });
+        var v = skillAcc(s, k);
+        if (v != null && v < 0.5) low++;
+      });
+      var lbl = SKILL_LABEL[k] || (k.indexOf('KOMP-') === 0 ? k.replace(/^KOMP-/, '') : k);
+      return { skill: k, label: lbl, acc: nn ? cc / nn : null, low: low, n: nn };
     });
   }
-  function heatmap(c) { return c.students.map(function (s) { return { s: s, cells: SKILL_ORDER.map(function (k) { return { skill: k, acc: skillAcc(s, k) }; }), risk: risk(c, s) }; }); }
+  function heatmap(c) {
+    var list = activeSkills(c);
+    return c.students.map(function (s) {
+      return {
+        s: s,
+        cells: list.map(function (k) { return { skill: k, acc: skillAcc(s, k) }; }),
+        risk: risk(c, s)
+      };
+    });
+  }
   /** Kelompok belajar otomatis: pasangkan yang kuat dengan yang lemah pada satu skill (peer tutoring). */
   function studyGroups(c, skill, size) {
     size = size || 4;
@@ -179,7 +268,7 @@
   }
   function agenda(c) {
     var td = today(), out = [];
-    (c.assignments || []).forEach(function (a) { var pend = c.students.filter(function (s) { return targeted(a, s) && !(a.done && a.done[s.id]); }).length; if (pend) out.push({ kind: a.deadline && a.deadline < td ? 'lewat' : a.deadline === td ? 'hari-ini' : 'akan', a: a, pending: pend }); });
+    (c.assignments || []).forEach(function (a) { if (a.archivedAt) return; var pend = c.students.filter(function (s) { return targeted(a, s) && !(a.done && a.done[s.id]); }).length; if (pend) out.push({ kind: a.deadline && a.deadline < td ? 'lewat' : a.deadline === td ? 'hari-ini' : 'akan', a: a, pending: pend }); });
     return out.sort(function (x, y) { return String(x.a.deadline || '9').localeCompare(String(y.a.deadline || '9')); });
   }
 
@@ -287,7 +376,26 @@
   }
   function pendingJoins(c) { return (c && Array.isArray(c.pending) ? c.pending : []).slice().sort(function (a, b) { return (b.at || 0) - (a.at || 0); }); }
   /** Bentuk payload tugas yang dikirim ke server = isi kode tugas (tanpa base64). */
-  function assignmentPayload(c, a) { var p = { v: 1, t: 'assign', id: a.id, title: a.title, skills: a.skills, itemIds: a.itemIds, minutes: a.minutes, from: c.name, cls: c.code, deadline: a.deadline || null, mode: a.mode || 'latihan', timer: a.timer || 0, shuffle: !!a.shuffle }; if (a.teacher) p.teacher = String(a.teacher).slice(0, 60); if (Array.isArray(a.items) && a.items.length) p.items = a.items.map(function (q) { var o = { id: q.id, prompt: q.prompt, options: q.options, answer: q.answer, skill: q.skill }; if (q.context) o.context = q.context; if (q.why && Object.keys(q.why).length) o.why = q.why; return o; }); return p; }
+  function assignmentPayload(c, a) {
+    var cleanSkills = (a.skills || []).map(function (k) {
+      return String(k || '').trim().toLowerCase().replace(/[^a-z0-9_]/g, '_').slice(0, 32);
+    }).filter(function (k) { return /^[a-z0-9_]{1,32}$/.test(k); });
+    if (!cleanSkills.length) cleanSkills = ['grammar'];
+    var p = { v: 1, t: 'assign', id: a.id, title: a.title, skills: cleanSkills, itemIds: a.itemIds, minutes: a.minutes, from: c.name, cls: c.code, deadline: a.deadline || null, mode: a.mode || 'latihan', timer: a.timer || 0, shuffle: !!a.shuffle };
+    p.teacher = a.teacher || (c && c.teacher) || 'Guru';
+    if (a.teacher) p.teacher = String(a.teacher);
+    if (Array.isArray(a.items) && a.items.length) {
+      p.items = a.items.map(function (q) {
+        var rawSk = typeof q.skill === 'string' ? q.skill.trim().toLowerCase().replace(/[^a-z0-9_]/g, '_').slice(0, 32) : '';
+        var sk = /^[a-z0-9_]{1,32}$/.test(rawSk) ? rawSk : cleanSkills[0];
+        var o = { id: q.id, prompt: q.prompt, options: q.options, answer: q.answer, skill: sk };
+        if (q.context) o.context = q.context;
+        if (q.why && Object.keys(q.why).length) o.why = q.why;
+        return o;
+      });
+    }
+    return p;
+  }
   function assignmentCode(c, a) { return b64e(assignmentPayload(c, a)); }
   function parseAssignmentCode(code) { try { var p = b64d(code); if (!p || p.t !== 'assign' || !Array.isArray(p.itemIds)) return null; return p; } catch (_) { return null; } }
   /** Sisi murid: simpan tugas dari kode guru ke antrean Today Plan (dipakai learner-flow). */
@@ -340,7 +448,8 @@
     var minutes = Math.max(3, Math.round(ids.length * 0.9));
     var a = { id: uid('as'), title: String(opts.title || ('Latihan ' + skills.map(function (k) { return SKILL_LABEL[k] || k; }).join(' + '))).slice(0, 80), skills: skills, itemIds: ids, minutes: minutes, mode: opts.mode || 'latihan', timer: opts.mode === 'ujian' ? (Number(opts.timer) || minutes) : 0, shuffle: opts.mode === 'ujian', deadline: opts.deadline || null, createdAt: Date.now(), targets: opts.targets && opts.targets.length ? opts.targets : null, done: {}, progress: {} };
     if (custom.length) a.items = custom;
-    if (opts.teacher) a.teacher = String(opts.teacher).slice(0, 60);
+    var st; try { st = load(); } catch (_) {}
+    a.teacher = opts.teacher || (st && st.teacher && st.teacher.name) || '';
     if (opts.source) a.source = opts.source;
     if (opts.review) a.review = opts.review;
     return a;
@@ -360,14 +469,17 @@
   function parentReport(c, s, teacher) {
     var acc = overallAcc(s), r = risk(c, s), w = r.weak, att = attendanceRate(s, 10), pend = pendingAssignments(c, s);
     var strong = null; SKILL_ORDER.forEach(function (k) { var v = skillAcc(s, k); if (v != null && (!strong || v > strong.acc)) strong = { skill: k, acc: v }; });
-    var lines = ['Assalamu’alaikum / Selamat ' + timeGreeting() + ' Bapak/Ibu orang tua ' + s.name + ',', 'Berikut laporan singkat belajar Bahasa Inggris ' + s.name + ' di kelas ' + c.name + ' (' + fmtDate(Date.now()) + '):', ''];
+    /* AUDIT: nama mapel mengikuti kelasnya — sebelumnya hardcode "Bahasa Inggris"
+       sehingga guru IPA mengirim rapor "belajar Bahasa Inggris" ke orang tua. */
+    var mapelLap = (c && c.subject && MAPEL_NAMES[c.subject]) || (c && c.subject) || 'Bahasa Inggris';
+    var lines = ['Assalamu’alaikum / Selamat ' + timeGreeting() + ' Bapak/Ibu orang tua ' + s.name + ',', 'Berikut laporan singkat belajar ' + mapelLap + ' ' + s.name + ' di kelas ' + c.name + ' (' + fmtDate(Date.now()) + '):', ''];
     lines.push('• Akurasi keseluruhan: ' + pct(acc) + (acc != null ? (acc >= 0.75 ? ' — baik' : acc >= 0.55 ? ' — berkembang' : ' — perlu pendampingan') : ''));
     if (strong) lines.push('• Kekuatan: ' + SKILL_LABEL[strong.skill] + ' (' + pct(strong.acc) + ')');
     if (w) lines.push('• Perlu latihan: ' + SKILL_LABEL[w.skill] + ' (' + pct(w.acc) + ')');
     if (att != null) lines.push('• Kehadiran 10 pertemuan terakhir: ' + Math.round(att * 100) + '%');
     lines.push('• Terakhir belajar mandiri: ' + (s.lastActiveAt ? fmtDate(s.lastActiveAt) : 'belum tercatat'));
     if (pend.length) lines.push(t('guru.tugas-belum-selesai', '• Tugas belum selesai:') + ' ' + pend.map(function (p) { return p.a.title; }).join(', '));
-    lines.push('', 'Yang bisa dibantu di rumah: tanyakan 1 kalimat Bahasa Inggris tentang kegiatan ' + s.name + ' kemarin (melatih ' + (w ? SKILL_LABEL[w.skill] : 'ingatan') + '). Cukup 5 menit.', '', 'Terima kasih atas kerja samanya 🙏', (teacher && teacher.name) || t('guru.tanda-tangan', 'Guru Bahasa Inggris'), (teacher && teacher.school) || '');
+    lines.push('', 'Yang bisa dibantu di rumah: tanyakan 1 hal tentang ' + mapelLap + ' yang dipelajari ' + s.name + ' kemarin (melatih ' + (w ? SKILL_LABEL[w.skill] : 'ingatan') + '). Cukup 5 menit.', '', 'Terima kasih atas kerja samanya 🙏', (teacher && teacher.name) || t('guru.tanda-tangan', 'Guru ' + mapelLap), (teacher && teacher.school) || '');
     return lines.join('\n').trim();
   }
   function weeklyClassReport(c, teacher) {
@@ -376,6 +488,10 @@
     map.forEach(function (m) { if (m.acc != null) lines.push('  - ' + m.label + ': ' + pct(m.acc) + (m.low ? ' (' + m.low + ' siswa <50%)' : '')); });
     if (mis.length) { lines.push('', 'Miskonsepsi utama: ' + mis[0].label + ' — ' + mis[0].pattern + '. Rencana: ' + mis[0].lesson + '.'); }
     if (greet.length) { lines.push('', 'Siswa yang perlu disapa: ' + greet.slice(0, 6).map(function (x) { return x.s.name + ' (' + x.r.reasons[0] + ')'; }).join('; ')); }
+    var la = c.latestAnnouncement || (c.announcements && c.announcements.length ? c.announcements[c.announcements.length - 1] : null);
+    if (la && la.text) {
+      lines.push('', 'Pengumuman kelas (' + (la.teacher || (teacher && teacher.name) || 'Wali kelas') + (la.at ? ' · ' + fmtDate(la.at) : '') + '): ' + la.text);
+    }
     lines.push('', (teacher && teacher.name) || 'Guru', (teacher && teacher.school) || '');
     return lines.join('\n').trim();
   }
@@ -390,7 +506,7 @@
   function fmtDate(ts) { try { return new Date(ts).toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'short' }); } catch (_) { return today(ts); } }
 
   // ---- sinkron server (kode kelas diklaim guru; murid melapor otomatis) -----------------------
-  var SYNC_PATHS = { claim: '/api/teacher/class/claim', list: '/api/teacher/class/list', reports: '/api/teacher/class/reports', report: '/api/learner/class-report', assign: '/api/teacher/class/assign', learnerAssignments: '/api/learner/class-assignments' };
+  var SYNC_PATHS = { claim: '/api/teacher/class/claim', list: '/api/teacher/class/list', reports: '/api/teacher/class/reports', report: '/api/learner/class-report', assign: '/api/teacher/class/assign', retract: '/api/teacher/class/retract', learnerAssignments: '/api/learner/class-assignments' };
   function account() { return root.FiezelAccount || null; }
   /**
    * Kirim tugas ke murid lewat server (masuk ke notifikasi murid). studentIds: null = seluruh
@@ -413,6 +529,22 @@
         if (!names) a.sent.all = Date.now(); else (studentIds || []).forEach(function (id) { a.sent.to[id] = Date.now(); });
         return { ok: true, count: names ? names.length : c.students.length };
       });
+    }).catch(function () { return { ok: false, error: 'unavailable' }; });
+  }
+  /**
+   * Tarik tugas dari murid (m025-365, audit KelasKu K2). Server menimpa baris tugasnya dengan
+   * penanda tarikan; kotak masuk murid membuangnya dari antrean pada tarikan berikutnya.
+   * 404 = tugas tidak pernah lewat server (hanya dibagikan lewat kode) — tidak ada yang bisa
+   * ditarik dari jauh, jadi yang terjadi hanya tarikan lokal, dan pemanggil diberi tahu.
+   */
+  function retractAssignment(c, a) {
+    var avail = syncAvailable();
+    if (avail !== 'ok') return Promise.resolve({ ok: false, error: avail });
+    var A = account();
+    return A.api(SYNC_PATHS.retract, { code: c.code, id: a.id }).then(function (res) {
+      if (!res.ok && res.error !== 'not_found') return { ok: false, error: res.error || 'unknown' };
+      a.retractedAt = Date.now();
+      return { ok: true, remote: !!res.ok };
     }).catch(function () { return { ok: false, error: 'unavailable' }; });
   }
   function sentTo(a, s) { return !!(a.sent && (a.sent.all || (a.sent.to && a.sent.to[s.id]))); }
@@ -458,7 +590,16 @@
   /** Klaim kode kelas di server (idempoten untuk pemilik yang sama). */
   function claimClass(c) {
     var A = account();
-    return A.api(SYNC_PATHS.claim, { code: c.code, title: c.name, level: c.level }).then(function (r) {
+    var acc = (A && A.state && A.state()) || {};
+    var sId = (c && (c.subjectId || c.subject)) || acc.subjectId || null;
+    var tName = (c && c.teacherName) || acc.teacherName || null;
+    return A.api(SYNC_PATHS.claim, {
+      code: c.code,
+      title: c.name,
+      level: c.level,
+      subjectId: sId,
+      teacherName: tName
+    }).then(function (r) {
       if (r.ok) { c.sync = Object.assign(c.sync || {}, { claimed: true, claimedAt: Date.now(), error: '' }); return { ok: true }; }
       c.sync = Object.assign(c.sync || {}, { claimed: false, error: r.error || 'unknown' });
       return { ok: false, error: r.error || 'unknown' };
@@ -521,12 +662,57 @@
     return { state: 'idle', text: 'Belum tersinkron' };
   }
 
-  return { KEY: KEY, ASSIGN_KEY: ASSIGN_KEY, SKILL_LABEL: SKILL_LABEL, SKILL_ORDER: SKILL_ORDER, ATT: ATT, DAY: DAY,
+  /** Tarik daftar kelas guru dari server (/api/teacher/class/list) */
+  function syncClassList(st) {
+    var avail = syncAvailable();
+    if (avail !== 'ok') return Promise.resolve({ ok: false, error: avail, classes: [] });
+    var A = account();
+    return A.api(SYNC_PATHS.list).then(function (r) {
+      if (!r.ok) return { ok: false, error: r.error || 'unknown', classes: [] };
+      var serverClasses = (r.data && r.data.classes) || r.classes || [];
+      if (!Array.isArray(serverClasses) || !serverClasses.length) {
+        return { ok: true, added: 0, classes: st ? st.classes : [] };
+      }
+      var target = st || load();
+      if (!Array.isArray(target.classes)) target.classes = [];
+      var added = 0;
+      var acc = (A.state && A.state()) || {};
+      serverClasses.forEach(function (sc) {
+        var nCode = normalizeClassCode(sc.code);
+        if (!nCode) return;
+        var exists = target.classes.some(function (c) {
+          return normalizeClassCode(c.code) === nCode;
+        });
+        if (!exists) {
+          var sub = sc.subjectId || acc.subjectId || 'MAT';
+          var lvl = sc.level || acc.gradeId || 'SMP';
+          var sTitle = sc.title || (acc.institution ? acc.institution + ' — ' : '') + (MAPEL_NAMES[sub] || sub || 'Kelas');
+          var newC = newClass(sTitle, lvl, sub);
+          newC.code = nCode;
+          newC.sync = { claimed: true, claimedAt: Date.now() };
+          target.classes.push(newC);
+          added++;
+        }
+      });
+      if (added > 0) {
+        if (!target.activeClassId && target.classes.length) {
+          target.activeClassId = target.classes[0].id;
+        }
+        target.onboarded = true;
+        save(target);
+      }
+      return { ok: true, added: added, classes: target.classes };
+    }).catch(function (err) {
+      return { ok: false, error: (err && err.message) || 'unavailable', classes: [] };
+    });
+  }
+
+  return { KEY: KEY, ASSIGN_KEY: ASSIGN_KEY, SKILL_LABEL: SKILL_LABEL, SKILL_ORDER: SKILL_ORDER, MAPEL_NAMES: MAPEL_NAMES, ATT: ATT, DAY: DAY,
     load: load, save: save, defaults: defaults, setPreview: setPreview, isPreview: isPreview, uid: uid, today: today, firstName: firstName, newClass: newClass, newStudent: newStudent, normalizeClass: normalizeClass, seedDemo: seedDemo, makeClassCode: makeClassCode, normalizeClassCode: normalizeClassCode,
-    skillAcc: skillAcc, overallAcc: overallAcc, daysSince: daysSince, risk: risk, classStats: classStats, classSkillMap: classSkillMap, heatmap: heatmap, studyGroups: studyGroups, misconceptions: misconceptions, needsGreeting: needsGreeting, agenda: agenda, pendingAssignments: pendingAssignments, targeted: targeted, recentAttendance: recentAttendance, attendanceRate: attendanceRate, weakestSkill: weakestSkill,
+    skillAcc: skillAcc, overallAcc: overallAcc, daysSince: daysSince, risk: risk, classStats: classStats, classSkillMap: classSkillMap, heatmap: heatmap, activeSkills: activeSkills, studyGroups: studyGroups, misconceptions: misconceptions, needsGreeting: needsGreeting, agenda: agenda, pendingAssignments: pendingAssignments, targeted: targeted, recentAttendance: recentAttendance, attendanceRate: attendanceRate, weakestSkill: weakestSkill,
     durasi: durasi, examLabel: examLabel, acceptJoin: acceptJoin, rejectJoin: rejectJoin, pendingJoins: pendingJoins, normalizeFocus: normalizeFocus, focusGrew: focusGrew, focusOf: focusOf, focusLabel: focusLabel, focusLevel: focusLevel,
     parseLearnerCode: parseLearnerCode, parseLearnerPayload: parseLearnerPayload, ingest: ingest, assignmentCode: assignmentCode, assignmentPayload: assignmentPayload, parseAssignmentCode: parseAssignmentCode, acceptAssignmentCode: acceptAssignmentCode, acceptAssignmentPayload: acceptAssignmentPayload, buildAssignment: buildAssignment,
-    SYNC_PATHS: SYNC_PATHS, syncAvailable: syncAvailable, claimClass: claimClass, pullReports: pullReports, syncClass: syncClass, reportToClass: reportToClass, syncLabel: syncLabel, sendAssignment: sendAssignment, sentTo: sentTo,
+    SYNC_PATHS: SYNC_PATHS, syncAvailable: syncAvailable, claimClass: claimClass, pullReports: pullReports, syncClass: syncClass, syncClassList: syncClassList, reportToClass: reportToClass, syncLabel: syncLabel, sendAssignment: sendAssignment, retractAssignment: retractAssignment, sentTo: sentTo,
     notify: notify, inboxUnread: inboxUnread, inboxMarkAllRead: inboxMarkAllRead, inboxText: inboxText,
     greetingCard: greetingCard, parentReport: parentReport, weeklyClassReport: weeklyClassReport, csvStudents: csvStudents, parseNames: parseNames, waLink: waLink, fmtDate: fmtDate, pct: pct };
 });

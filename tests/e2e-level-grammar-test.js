@@ -142,7 +142,7 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
     // selesai sebelum halaman dimuat - lewat kunci penyimpanan yang sama dengan yang dipakai
     // aplikasi, bukan dengan menyuntik jalan pintas yang hanya ada di tes.
     await cdp.send('Page.addScriptToEvaluateOnNewDocument', {
-      source: `try{localStorage.setItem('fiezel-onboarding-v1',JSON.stringify({done:true,at:Date.now(),via:'e2e',name:'Murid Uji',goal:'',level:''}))}catch(e){}`
+      source: `try{localStorage.setItem('fiezel-onboarding-v1',JSON.stringify({done:true,at:Date.now(),via:'e2e',name:'Murid Uji',goal:'',level:''}));localStorage.setItem('fiezel-auth-v1',JSON.stringify({v:1,signedIn:true,at:Date.now(),role:'murid',via:'akun'}))}catch(e){}`
     }, session);
 
     await cdp.send('Page.navigate', { url: origin }, session);

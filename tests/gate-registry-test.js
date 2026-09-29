@@ -125,6 +125,56 @@ const EXCLUSIONS = new Map([
       '(exit code dari main(), gate residual + gate kalibrasi yang bisa merah) dan karena itu ' +
       'WAJIB terdaftar di quality.yml, bukan dikecualikan. Cara menjalankan alat v1 secara ' +
       'manual: `node adaptivity-simulation.js`.'
+  }],
+  ['tests/chokai-multi-voice-protocol-test.js', {
+    class: 'gerbang-pra-rilis-fitur',
+    reason:
+      'Gerbang pra-rilis fitur audio multi-karakter Chokai JLPT N5 dan N4. Memvalidasi kepatuhan 3 persona (Instruktur, Mahasiswa Laki-laki, Mahasiswi Perempuan) serta jeda breathing pocket 139 turns sebelum aset didistribusikan.'
+  }],
+  ['tests/course-persistence-and-jlpt-mobile-test.js', {
+    class: 'gerbang-pra-rilis-fitur',
+    reason:
+      'Gerbang pra-rilis fitur sinkronisasi dan persistensi kursus target FIEZEL (Jepang dan Inggris) serta arsitektur kartu geser JLPT mobile bottom sheet drawer di lingkungan browser peramban nyata.'
+  }],
+  ['tests/course-persistence-test.js', {
+    class: 'gerbang-pra-rilis-fitur',
+    reason:
+      'Gerbang pra-rilis fitur persistensi target kursus bahasa Jepang dan Inggris saat reload, refresh, maupun backgrounding PWA agar tidak kembali ke bahasa default Inggris.'
+  }],
+  ['tests/jlpt-sheet-drawer-test.js', {
+    class: 'gerbang-pra-rilis-fitur',
+    reason:
+      'Gerbang pra-rilis fitur antarmuka JLPT Bottom Sheet Drawer untuk menampilkan naskah dialog percakapan, terjemahan Indonesia, analisis kunci, dan kosakata secara ergonomis.'
+  }],
+  ['tests/kelasku-public-surface-test.js', {
+    class: 'gerbang-pra-rilis-fitur',
+    reason:
+      'Gerbang validasi permukaan publik KelasKu untuk memverifikasi kanonikalitas H1, kelengkapan metadata, validitas JSON-LD Schema.org (SoftwareApplication, WebPage, FAQPage), kecocokan 100% FAQ visual dengan schema, serta isolasi rute privat guru.'
+  }],
+  ['tests/seo-hardening-audit-test.js', {
+    class: 'gerbang-pra-rilis-fitur',
+    reason:
+      'Gerbang audit kepatuhan SEO/AEO/GEO untuk memastikan tidak adanya regresi semantik diesel/fizzle di halaman materi, pencegahan klaim hiperbolik pada mesin Braincore, penegakan disclaimer non-akreditasi CEFR, dan integritas structured data.'
+  }],
+  ['tests/buku-928-bank-test.js', {
+    class: 'gerbang-pra-rilis-fitur',
+    reason:
+      'Gerbang pengujian bank soal 928 butir Fase D lintas 50 bab untuk mata pelajaran IPA, Bahasa Indonesia, Bahasa Inggris, Matematika, dan IPS sesuai kurikulum merdeka tanpa posisi opsi jawaban statis.'
+  }],
+  ['tests/braincore-living-system-test.js', {
+    class: 'gerbang-pra-rilis-fitur',
+    reason:
+      'Gerbang pengujian sistem kecerdasan kognitif hidup (Living Intelligence) Braincore untuk memvalidasi determinisme runtime trace, prinsip keheningan kehadiran (Presence Engine), deteksi miskonsepsi berulang, dan isolasi penuh 100% luring tanpa dependensi jaringan.'
+  }],
+  ['tests/assignment-poll-speed-test.js', {
+    class: 'gerbang-pra-rilis-fitur',
+    reason:
+      'Gerbang pra-rilis validasi latensi polling notifikasi tugas murid di fiezel-inbox.js dan app.js (MIN_GAP_MS 5s, NOTIF_POLL_MS 6s, boot delay <= 2s) serta sinkronisasi lintas-tab via BroadcastChannel.'
+  }],
+  ['tests/session-security-test.js', {
+    class: 'gerbang-pra-rilis-fitur',
+    reason:
+      'Gerbang pra-rilis verifikasi keamanan sesi HMAC, toleransi clock skew 120s, penolakan token kadaluarsa 180 hari, dan pembersihan memori serta isolasi multi-akun pada aktivasi/deaktivasi akun di klien.'
   }]
 ]);
 

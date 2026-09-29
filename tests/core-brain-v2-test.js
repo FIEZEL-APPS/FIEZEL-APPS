@@ -156,7 +156,13 @@ test('yang diprioritaskan adalah materi di AMBANG lupa, bukan yang paling lama t
   ], { now: NOW });
   assert.strictEqual(ranked[0].id, 'ambang-lupa');
   assert.ok(ranked[0].score > ranked[1].score * 1.5);
-  assert.strictEqual(ranked[ranked.length - 1].id, 'sudah-hilang');
+  // m025-375 (audit braincore B5, keputusan owner 2026-09-26): dulu yang di sini dikunci adalah
+  // 'sudah-hilang' PALING BAWAH - persis absorbing state yang membuat materi terlupa tidak pernah
+  // muncul lagi. Yang paling bawah sekarang yang masih segar (r~0.98, belum jatuh tempo);
+  // materi yang runtuh berada di atasnya, tetapi tetap jauh di bawah ambang lupa (>1.5x di atas).
+  assert.strictEqual(ranked[ranked.length - 1].id, 'masih-segar');
+  assert.ok(ranked.findIndex(r => r.id === 'sudah-hilang') < ranked.findIndex(r => r.id === 'masih-segar'),
+    'materi yang sudah runtuh tidak boleh terkubur di bawah materi yang baru dilihat');
 });
 
 // ---- D. tren dan momentum ---------------------------------------------------------------

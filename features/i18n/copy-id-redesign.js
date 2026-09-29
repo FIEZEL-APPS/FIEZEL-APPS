@@ -33,7 +33,7 @@
     'nav.school': '<span class="kelasku-wordmark">KelasKu</span>',
     'nav.school-aria': 'Ruang KelasKu dan tugas sekolah',
     'nav.home-primary': 'Hari ini',
-    'nav.home-primary-aria': 'Beranda dan fokus harian',
+    'nav.home-primary-aria': 'Hari ini, fokus harian',
     'nav.progress': 'Progres',
     'nav.progress-aria': 'Peta CEFR dan kemahiran',
     'nav.profile': 'Profil',
@@ -41,9 +41,11 @@
 
     /* ── Home "Hari ini" ────────────────────────────────────────────────────── */
     'today.eyebrow': 'Hari ini',
-    'today.cta': 'Mulai 10 menit',
+    /* AUDIT-2026-09-21 T1: CTA memakai {menit} dari todaySessionShape(), bukan angka paku. */
+    'today.cta': 'Mulai {menit} menit',
     'today.cta-lanjut': 'Lanjutkan sesi',
     'today.cta-kenalan': 'Cari level kamu dulu',
+    'today.cta-tes-awal': 'Mulai tes awal · ±{menit} menit',
     'today.isi-judul': 'Isi sesi',
     'today.ringkas': '{soal} soal · sekitar {menit} menit',
     'today.streak': 'Runtun {days} hari',
@@ -72,6 +74,7 @@
     'ringkas.naik': 'Yang naik hari ini',
     'ringkas.naik-kosong': 'Belum ada yang naik cukup jauh untuk dicatat. Itu wajar untuk satu sesi.',
     'ringkas.besok': 'Jatuh tempo besok',
+    'ringkas.kalibrasi': 'Seberapa pas rasa yakinmu',
     'ringkas.besok-kosong': 'Tidak ada yang jatuh tempo besok.',
     'ringkas.besok-item': '{jumlah} materi menunggu diulang',
     'ringkas.baris-naik': '{skill} naik {delta} poin',
@@ -122,6 +125,109 @@
 
     /* ── Edge case: gerbang akun saat offline ───────────────────────────────── */
     'account.offline-lanjut': 'Lanjut tanpa akun',
-    'account.offline-catatan': 'Tidak ada jaringan. Kamu bisa langsung belajar; akun bisa disambungkan nanti.'
+    'account.offline-catatan': 'Tidak ada jaringan. Kamu bisa langsung belajar; akun bisa disambungkan nanti.',
+
+    /* ── SUMBU BAHASA: naskah yang dulu ditulis langsung di app.js (m025-314) ───
+       Audit reports/AUDIT-UI-UX-BAHASA-2026-09-14.md menemukan naskah beranda dan tab
+       Latihan ditulis sebagai literal di app.js — sebagian Inggris, sebagian Indonesia.
+       Yang Inggris sampai ke murid id MAUPUN th; yang Indonesia sampai ke murid th.
+       tests/th-ui-leak-test.js tidak melihatnya karena kata-katanya di luar daftar
+       ID_WORDS-nya; itu blind spot gerbang, bukan izin. */
+
+    /* Nama skill. Dipakai kartu tab Latihan, kartu skill hub, chip cepat, dan judul
+       halaman Writing — SATU sumber, supaya nama yang sama tidak lahir empat kali. */
+    'skill.vocab': 'Kosakata',
+    'skill.grammar': 'Tata Bahasa',
+    'skill.reading': 'Membaca',
+    'skill.writing': 'Menulis',
+    'skill.listening': 'Menyimak',
+    'skill.speaking': 'Berbicara',
+
+    /* Beranda: sapaan maskot, ritme harian, chip latihan singkat. */
+    /* AUDIT-2026-09-21 T1+T3+T9: "10 menit" dipaku diganti {menit} dari todaySessionShape();
+       balon tidak lagi menyapa nama (kartu "Halo, {nama}" yang menyapa); kunci selesai baru
+       untuk apresiasi-bukan-ajakan saat sesi tuntas. */
+    'home.sapaan-runtun-aktif': 'Runtun {hari} hari! Siap lanjut {menit} menit hari ini?',
+    'home.sapaan-selesai': 'Runtun {hari} hari! Sesi hari ini sudah beres. Keren, {nama}.',
+    'home.sapaan-selesai-baru': 'Sesi hari ini sudah beres. Keren, {nama}!',
+    'home.paw-avatar-aria': 'Maskot PAW',
+    'home.paw-bubble-title': 'Kata PAW',
+    'home.ritme-harian': 'Ritme Harian',
+    'home.ritme-harian-hitung': '({selesai}/{target} soal)',
+    'home.latihan-singkat': 'Latihan Singkat',
+    'home.chip-vocab-sub': '10 kartu cepat',
+    'home.chip-grammar-sub': 'Pola kalimat',
+    'home.chip-dengar': 'Dengar',
+    'home.chip-dengar-sub': 'Audio pendek',
+    'home.classroom-eyebrow': 'Segera hadir',
+    'home.classroom-card': 'KelasKu',
+
+    /* Tab Latihan: dua kartu yang dulu mengarang isinya (lihat §A4/A5 di laporan audit).
+       Judul materinya kini dibaca dari riwayat murid, jadi yang tersisa di sini hanya
+       bingkainya — dan bingkai itu tidak boleh menjanjikan angka apa pun sendiri. */
+    'latihan.lanjut-eyebrow': 'Lanjutkan terakhir · Level {level}',
+    'latihan.lanjut-sub': 'Selesaikan materi untuk memperkuat bukti kemahiran',
+    'latihan.booster-tag': 'AI Booster',
+    'latihan.booster-sub': 'Akurasi {akurasi}% · Disarankan latihan {menit} menit',
+    'latihan.booster-tag-tertukar': 'Sering Tertukar',
+    'latihan.booster-sub-tertukar': '{persen}% kekeliruanmu di sini memakai aturan {lawan}. Latih bedanya.',
+    'latihan.booster-cta': 'Latih',
+
+    /* Flashcard: tombol dengar disembunyikan saat kursusnya belum punya suara sendiri,
+       dan alasannya dikatakan — tombol yang hilang tanpa penjelasan terbaca sebagai bug. */
+    'flash.suara-belum-ada': 'Suara untuk {bahasa} belum tersedia, jadi tombol dengar disembunyikan supaya kamu tidak menirukan pelafalan yang salah.',
+    'today.quiz_suffix': 'Soal',
+    'today.start_practice_btn': 'Mulai Latihan Sekarang ➔',
+    'today.vocab_suffix': 'Kosakata',
+    'splash.tagline_for_teacher': 'untuk Guru',
+    /* m025-375 (OWNER 2026-09-26): panel Home saat hasil latihan masih mengumpulkan jawaban. */
+    'home.bukti-judul': 'Hasil latihanmu belum bisa dinilai',
+    'home.bukti-isi': 'Kerjakan {sisa} soal lagi supaya FIEZEL bisa menilai hasil latihanmu dengan akurat.',
+    'home.bukti-hitung': '{n}/{target} jawaban terkumpul',
+    'home.bukti-cta': 'Lanjut latihan',
+    'home.bukti-aria': 'Kemajuan pengumpulan jawaban untuk penilaian latihan',
+    /* Audit UI/UX Home 2026-09-27 (m025-376): teks kartu Home dipindah dari app.js; angkanya kini dihitung. */
+    'home.sapa': 'Hi {nama}!',
+    'home.motivasi-kembali': 'Kemana aja nih, kok baru kelihatan lagi! Yuk latihan sekarang biar ritmemu tetap terjaga. 🔥',
+    'home.motivasi-2': 'Kalau kamu ga belajar mulai dari sekarang, kamu akan susah di kemudian hari. Semangat terus! 💪',
+    'home.motivasi-3': '10 menit latihan hari ini menjaga ritme belajarmu tetap prima. Jangan tunda lagi ya! 🚀',
+    'home.motivasi-4': 'Konsistensi kecil hari ini adalah lompatan besar esok hari. Let\'s do this! ⭐',
+    'home.motivasi-5': 'Setiap kata baru yang kamu kuasai membuka peluang baru di masa depan. Semangat! 🌟',
+    'home.motivasi-6': 'Perjalanan ribuan mil selalu dimulai dari satu langkah kecil hari ini. Terus melangkah! 🌸',
+    'home.kartu-level': 'LEVEL {level}',
+    'home.kartu1-kicker': '📖 KATA HARI INI',
+    'home.kartu1-soal': '{n} SOAL',
+    'home.kartu1-menit': '± {n} MENIT',
+    'home.kartu1-cta-tes': 'MULAI TES LEVEL SEKARANG',
+    'home.hero-cta-mulai': 'Mulai Belajar Sekarang',
+    'home.hero-cta-lanjut': 'Lanjutkan Misi',
+    'home.hero-cta-sub': '{soal} soal · ±{menit} menit · langsung latihan',
+    'home.aurora-target-title': 'Target Latihan Multi-Topik',
+    'home.aurora-target-desc': 'Latihan adaptif gabungan Tata Bahasa, Membaca &amp; Kosakata.',
+    'home.soal-selesai': 'Soal Selesai',
+    'home.latihan-soal-title': 'Latihan Soal',
+    'home.latihan-soal-sub': 'Semua Modul',
+    'kelasku.strip-tugas-aktif': 'Tugas Aktif',
+    'kelasku.strip-latihan-materi': 'Latihan &amp; Materi Kelas',
+    'kelasku.strip-sinkron-guru': 'Sinkronisasi Kurikulum &amp; Guru',
+    'home.kartu2-kicker': '📖 FLASHCARD & REPETISI',
+    'home.kartu2-judul': 'Kosakata Harian',
+    'home.kartu2-isi-baru': 'Latih kosakata level {level} dengan kartu berulang (SRS) supaya lebih lama diingat.',
+    'home.kartu2-isi': '{n} kata level {level} sudah kamu latih. Kata yang hampir lupa muncul lebih dulu.',
+    'home.kartu2-kata': '{n} KATA DILATIH',
+    'home.kartu2-jatuh-tempo': 'PERLU DIULANG HARI INI',
+    'home.kartu2-cta': 'BUKA KOSAKATA HARIAN',
+    'home.kartu3-kicker': '📊 PROGRES BELAJAR',
+    'home.kartu3-judul': 'Perkembangan Minggu Ini',
+    'home.kartu3-isi-naik': 'Akurasimu naik {delta} poin dibanding minggu lalu. Pertahankan ritmenya!',
+    'home.kartu3-isi-turun': 'Akurasimu turun {delta} poin dibanding minggu lalu. Latihan singkat hari ini membantu mengembalikannya.',
+    'home.kartu3-isi-stabil': 'Akurasimu stabil dibanding minggu lalu. Terus latihan supaya naik level.',
+    'home.kartu3-isi-kurang': 'Jawab minimal {min} soal minggu ini dan minggu depan supaya perkembanganmu bisa dibandingkan.',
+    'home.kartu3-akurasi': '{n}% AKURASI',
+    'home.kartu3-akurasi-kosong': 'AKURASI —',
+    'home.kartu3-perubahan': 'POIN VS MINGGU LALU',
+    'home.kartu3-runtun': '🔥 {n} HARI',
+    'home.kartu3-cta': 'LIHAT DETAIL PERKEMBANGAN',
+    'home.bukti-materi': 'Materi: {materi}'
   });
 }());

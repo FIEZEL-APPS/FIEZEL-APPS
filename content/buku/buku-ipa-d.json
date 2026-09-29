@@ -1,0 +1,2869 @@
+{
+  "schema": "fiezel-buku-bank-v1",
+  "subjectId": "IPA",
+  "phase": "fase_d",
+  "chapters": [
+    {
+      "code": "KOMP-IPA-D-7-BAB1-01",
+      "grade": 7,
+      "name": "Hakikat Ilmu Sains dan Metode Ilmiah",
+      "materi": "",
+      "cpRef": "",
+      "target": 38,
+      "items": []
+    },
+    {
+      "code": "KOMP-IPA-D-7-BAB2-01",
+      "grade": 7,
+      "name": "Zat dan Perubahannya",
+      "materi": "",
+      "cpRef": "",
+      "target": 22,
+      "items": []
+    },
+    {
+      "code": "KOMP-IPA-D-7-BAB3-01",
+      "grade": 7,
+      "name": "Suhu, Kalor, dan Pemuaian",
+      "materi": "",
+      "cpRef": "",
+      "target": 21,
+      "items": []
+    },
+    {
+      "code": "KOMP-IPA-D-7-BAB4-01",
+      "grade": 7,
+      "name": "Gerak dan Gaya",
+      "materi": "",
+      "cpRef": "",
+      "target": 20,
+      "items": []
+    },
+    {
+      "code": "KOMP-IPA-D-7-BAB5-01",
+      "grade": 7,
+      "name": "Karakteristik dan Klasifikasi Makhluk Hidup",
+      "materi": "",
+      "cpRef": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+      "target": 16,
+      "items": [
+        {
+          "id": "ipa-d-7-b5-q01",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 138-142), robot canggih dapat bergerak dan berbicara dengan manusia, tetapi robot TIDAK dikelompokkan sebagai makhluk hidup karena…",
+          "options": [
+            "Robot tidak tersusun atas sel biologis, tidak mengalami metabolisme nutrisi, dan tidak dapat bereproduksi menghasilkan keturunan",
+            "Robot memiliki massa yang lebih berat daripada tubuh manusia",
+            "Robot hanya dapat menggunakan baterai dan tidak membutuhkan aliran listrik",
+            "Robot tidak memiliki warna kulit seperti hewan mamalia"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Ciri mutlak makhluk hidup meliputi susunan seluler, metabolisme internal, homeostasis, pertumbuhan, reproduksi, dan respons terhadap rangsangan yang tidak dimiliki mesin robot buatan."
+          },
+          "distractorWhy": {
+            "1": "Massa benda adalah besaran fisis universal dan bukan pembeda antara benda hidup dengan benda mati.",
+            "2": "Sumber energi mesin seperti listrik tidak menentukan status biologis makhluk hidup.",
+            "3": "Warna kulit adalah variasi pigmen luar dan bukan kriteria dasar sains kehidupan."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB5-01"
+          }
+        },
+        {
+          "id": "ipa-d-7-b5-q02",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 140), tumbuhan putri malu (Mimosa pudica) yang mengatupkan daunnya seketika saat disentuh menunjukkan ciri makhluk hidup yaitu…",
+          "options": [
+            "Peka terhadap rangsang (iritabilitas)",
+            "Mengeluarkan zat sisa respirasi (ekskresi)",
+            "Menyesuaikan suhu tubuh secara endoterm",
+            "Mengalami perubahan bentuk secara kimiawi"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Iritabilitas adalah kemampuan organisme hidup untuk menanggapi impuls rangsangan dari lingkungan luar (seperti sentuhan fisik, cahaya, atau getaran)."
+          },
+          "distractorWhy": {
+            "1": "Ekskresi berkaitan dengan pembuangan sisa metabolit sel, bukan gerak seismonasti respons sentuhan.",
+            "2": "Tumbuhan bersifat poikilotermik dan tidak mengatur suhu internal secara endotermik hewan.",
+            "3": "Gerak mengatup adalah perubahan turgor sel fisika tumbuhan, bukan reaksi kimia pembentukan zat baru."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB5-01"
+          }
+        },
+        {
+          "id": "ipa-d-7-b5-q03",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 156 Ayo Uji Kemampuan No. 1), urutan tingkatan hierarki takson pada klasifikasi makhluk hidup dari yang tertinggi sampai terendah adalah…",
+          "options": [
+            "Kingdom -> Filum/Divisio -> Kelas -> Ordo -> Famili -> Genus -> Spesies",
+            "Spesies -> Genus -> Famili -> Ordo -> Kelas -> Filum -> Kingdom",
+            "Kingdom -> Ordo -> Filum -> Kelas -> Famili -> Spesies -> Genus",
+            "Filum -> Kingdom -> Kelas -> Famili -> Ordo -> Genus -> Spesies"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Hierarki taksonomi Linnaeus tersusun runtut dari kelompok terbesar: Dunia/Kingdom, Filum (hewan)/Divisi (tumbuhan), Kelas, Bangsa/Ordo, Suku/Famili, Marga/Genus, dan Jenis/Spesies."
+          },
+          "distractorWhy": {
+            "1": "Urutan ini adalah dari tingkatan terendah ke tertinggi, bukan dari tertinggi ke terendah.",
+            "2": "Ordo diletakkan sebelum Filum dan Kelas, urutan takson ini keliru.",
+            "3": "Filum adalah subkelompok di bawah Kingdom, bukan di atas Kingdom."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB5-01"
+          }
+        },
+        {
+          "id": "ipa-d-7-b5-q04",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 156 Ayo Uji Kemampuan No. 2), bagaimana hubungan antara persamaan ciri dan jumlah anggota organisme pada suatu tingkatan takson dari tingkat tertinggi (Kingdom) menuju tingkat terendah (Spesies)?",
+          "options": [
+            "Jumlah anggota organisme semakin sedikit, tetapi persamaan ciri fisik antaranggotanya semakin banyak dan spesifik",
+            "Jumlah anggota organisme semakin banyak dan persamaan cirinya semakin sedikit",
+            "Jumlah anggota organisme dan persamaan cirinya sama-sama selalu berjumlah konstan",
+            "Persamaan ciri anggota pada tingkat spesies selalu nol persen"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Semakin ke bawah tingkatan takson (mendekati spesies), cakupan anggotanya semakin mengerucut sedikit namun hubungan kekerabatan dan kesamaan cirinya semakin seragam dan identik."
+          },
+          "distractorWhy": {
+            "1": "Jumlah anggota terbanyak berada di tingkat tertinggi Kingdom, bukan di tingkat spesies.",
+            "2": "Karakteristik anggota bervariasi sesuai tingkatan taksonomi dan tidak bernilai konstan.",
+            "3": "Pada tingkat spesies, seluruh individu memiliki persamaan genetik dan morfologi paling tinggi."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB5-01"
+          }
+        },
+        {
+          "id": "ipa-d-7-b5-q05",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 156 Ayo Uji Kemampuan No. 3), perbedaan karakteristik paling mendasar antara kingdom PLANTAE dan kingdom ANIMALIA adalah…",
+          "options": [
+            "Plantae bersifat autotrof (berklorofil dan berdinding sel selulosa), sedangkan Animalia bersifat heterotrof (tidak berdinding sel dan dapat berpindah tempat aktif)",
+            "Plantae tidak memiliki inti sel (prokariotik), sedangkan Animalia memiliki inti sel (eukariotik)",
+            "Plantae bernapas menggunakan paru-paru, sedangkan Animalia tidak memerlukan oksigen",
+            "Plantae berkembang biak secara eksklusif dengan spora dan tidak pernah berbiji"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Tumbuhan (Plantae) memproduksi makanannya sendiri melalui fotosintesis dengan plastida klorofil dan dinding sel kaku, sedangkan hewan (Animalia) mencerna materi organik lain dan bergerak bebas."
+          },
+          "distractorWhy": {
+            "1": "Baik Plantae maupun Animalia sama-sama tergolong domain organisme eukariotik (memiliki membran inti sel).",
+            "2": "Tumbuhan berfotosintesis dan berespirasi melalui stomata, bukan menggunakan organ paru-paru.",
+            "3": "Mayoritas kingdom Plantae modern bereproduksi dengan biji (Spermatophyta), bukan spora semata."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB5-01"
+          }
+        },
+        {
+          "id": "ipa-d-7-b5-q06",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 156 Ayo Uji Kemampuan No. 4), seorang siswa menemukan tumbuhan di kebun sekolah dengan ciri: memiliki bunga sejati dan tulang daun berbentuk sejajar. Ciri lain yang dipastikan dimiliki oleh tumbuhan tersebut adalah…",
+          "options": [
+            "Memiliki sistem perakaran serabut, berkas pembuluh pengangkut tersebar, dan biji berkeping satu (Monokotil)",
+            "Memiliki akar tunggang berkambium dan biji berkeping dua (Dikotil)",
+            "Tidak memiliki jaringan xilem dan floem pengangkut air",
+            "Menghasilkan spora di bagian bawah permukaan daunnya"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Tulang daun sejajar adalah ciri khas tumbuhan berkeping biji tunggal (Monokotil/Liliopsida), yang selalu berpasangan dengan akar serabut dan ikatan pembuluh tersebar tanpa kambium."
+          },
+          "distractorWhy": {
+            "1": "Akar tunggang dan kambium adalah ciri khas tumbuhan berkeping biji dua (Dikotil) bertulang daun menyirip/menjari.",
+            "2": "Tumbuhan berbunga (Angiospermae) adalah tumbuhan vaskular sejati yang memiliki xilem dan floem.",
+            "3": "Spora adalah alat reproduksi tumbuhan paku dan lumut, bukan tumbuhan berbunga."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB5-01"
+          }
+        },
+        {
+          "id": "ipa-d-7-b5-q07",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 156 Tabel 5.3), filum hewan yang memiliki karakteristik tubuh lunak, sebagian besar terlindungi oleh cangkang zat kapur, seperti cumi-cumi, kerang, dan siput adalah…",
+          "options": [
+            "Mollusca",
+            "Arthropoda",
+            "Echinodermata",
+            "Chordata"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Filum Mollusca (dari bahasa Latin mollis = lunak) menaungi hewan triploblastik bertubuh lunak tanpa ruas, sering dilindungi mantel cangkang kalsium karbonat."
+          },
+          "distractorWhy": {
+            "1": "Arthropoda adalah filum hewan beruas dan berkerangka luar kitin (seperti serangga dan udang).",
+            "2": "Echinodermata adalah hewan berkulit duri yang hidup di laut (seperti bintang laut).",
+            "3": "Chordata adalah filum hewan yang memiliki notokorda/tulang belakang."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB5-01"
+          }
+        },
+        {
+          "id": "ipa-d-7-b5-q08",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 156 Tabel 5.3), filum hewan yang memiliki ciri khas kaki beruas-ruas, tubuh bersegmen, dan eksoskeleton dari zat kitin (contoh: belalang, udang, laba-laba, dan kaki seribu) adalah…",
+          "options": [
+            "Arthropoda",
+            "Mollusca",
+            "Annelida",
+            "Porifera"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Filum Arthropoda (arthros = sendi/ruas, podos = kaki) dicirikan oleh kaki beruas, tubuh bersegmen bilateral simetris, dan kutikula kitin luar yang mengalami molting."
+          },
+          "distractorWhy": {
+            "1": "Mollusca bertubuh lunak tanpa segmen kaki beruas.",
+            "2": "Annelida adalah cacing bertubuh gelang tanpa rangka luar kitin keras.",
+            "3": "Porifera adalah hewan spons sederhana berpori yang hidup menetap di dasar laut."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB5-01"
+          }
+        },
+        {
+          "id": "ipa-d-7-b5-q09",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 156 Tabel 5.3), bintang laut dan bulu babi dikelompokkan ke dalam filum ECHINODERMATA karena memiliki karakteristik utama yaitu…",
+          "options": [
+            "Tubuh berduri, memiliki sistem saluran air (ambulakral), dan seluruh anggotanya hidup di habitat laut",
+            "Tubuh tersusun atas selulosa dan dapat berfotosintesis di darat",
+            "Memiliki sayap tipis untuk terbang di udara bebas",
+            "Memiliki tulang belakang sejati dan menyusui anaknya"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Echinodermata (echinos = landak/duri, derma = kulit) adalah biota laut bentik dengan simetri radial dewasa, rangka lempeng kapur berduri, dan kaki tabung ambulakral."
+          },
+          "distractorWhy": {
+            "1": "Echinodermata adalah hewan heterotrof sejati tanpa dinding selulosa.",
+            "2": "Hewan echinodermata adalah biota dasar laut tanpa organ sayap terbang.",
+            "3": "Menyusui anak adalah ciri khas kelas Mamalia pada filum Chordata."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB5-01"
+          }
+        },
+        {
+          "id": "ipa-d-7-b5-q10",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 149), organisme mikroskopis bersel tunggal (uniseluler) yang TIDAK memiliki membran inti sel (prokariotik), seperti bakteri Escherichia coli, dimasukkan ke dalam kingdom…",
+          "options": [
+            "Monera",
+            "Protista",
+            "Fungi",
+            "Plantae"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kingdom Monera mencakup seluruh organisme prokariotik uniseluler yang materi genetik nukleoidnya tidak dibungkus oleh membran inti sel."
+          },
+          "distractorWhy": {
+            "1": "Protista adalah mikroorganisme yang sudah bersifat eukariotik (memiliki membran inti sel).",
+            "2": "Fungi adalah jamur eukariotik berfilamen atau uniseluler yang bersifat heterotrof pengurai.",
+            "3": "Plantae adalah organisme eukariotik multiseluler berklorofil."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB5-01"
+          }
+        },
+        {
+          "id": "ipa-d-7-b5-q11",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 150), jamur (Fungi) TIDAK DAPAT dimasukkan ke dalam kelompok tumbuhan (Plantae) karena…",
+          "options": [
+            "Fungi tidak memiliki klorofil sehingga tidak dapat berfotosintesis dan dinding selnya tersusun dari zat kitin, bukan selulosa",
+            "Fungi selalu berwujud gas dan tidak menempel di tanah",
+            "Fungi dapat terbang aktif seperti serangga",
+            "Fungi memiliki tulang belakang dan jantung beruang empat"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Jamur bersifat heterotrof absorptif (menguraikan bahan organik luar dengan enzim) karena tidak memiliki kloroplas, serta dinding selnya mengandung kitin."
+          },
+          "distractorWhy": {
+            "1": "Jamur adalah materi hayati berwujud padat dan tumbuh menempel pada substrat organik.",
+            "2": "Jamur tidak memiliki jaringan otot dan saraf untuk berpindah tempat secara mandiri.",
+            "3": "Jamur tergolong organisme non-vertebrata tanpa jaringan tulang maupun sistem sirkulasi darah."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB5-01"
+          }
+        },
+        {
+          "id": "ipa-d-7-b5-q12",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 146-148), penulisan nama ilmiah organisme menurut sistem Tatanama Ganda (Binomial Nomenclature) yang benar untuk tanaman padi adalah…",
+          "options": [
+            "Oryza sativa (kata pertama diawali huruf kapital, kata kedua huruf kecil, dan dicetak miring)",
+            "oryza Sativa (kata pertama huruf kecil, kata kedua kapital, cetak tegak)",
+            "ORYZA SATIVA (seluruh huruf menggunakan kapital cetak tebal)",
+            "Oryza-Sativa (diberi tanda hubung garis dan dicetak miring)"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kaidah Linnaeus: kata pertama menunjukkan Genus dengan huruf awal kapital, kata kedua menunjukkan penunjuk spesies dengan huruf kecil, dan ditulis miring atau digarisbawahi terpisah."
+          },
+          "distractorWhy": {
+            "1": "Nama genus wajib diawali huruf kapital dan penunjuk spesies wajib berhuruf kecil.",
+            "2": "Format kapital penuh melanggar konvensi kode internasional tatanama botani/zoologi.",
+            "3": "Tanda hubung tidak digunakan pada tatanama binomial dua kata standar."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB5-01"
+          }
+        },
+        {
+          "id": "ipa-d-7-b5-q13",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 144 Aktivitas 5.3 Kunci Dikotomi), langkah kerja utama dalam menyusun dan menggunakan kunci determinasi dikotomi untuk mengidentifikasi spesimen makhluk hidup adalah…",
+          "options": [
+            "Menyajikan dua pilihan karakteristik yang saling berlawanan pada setiap tahapan nomor hingga diperoleh nama takson organisme",
+            "Menebak nama hewan secara acak berdasarkan warna kulitnya",
+            "Mengurutkan hewan berdasarkan abjad nama daerah setempat",
+            "Menimbang massa tubuh hewan dari yang teringan ke terberat"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kunci dikotomi (dichotomous key) menyajikan pasangan kuplet ciri berlawanan (misal: 1a. bertulang belakang vs 1b. tidak bertulang belakang) yang menuntun pengguna secara logis ke identitas takson."
+          },
+          "distractorWhy": {
+            "1": "Kunci determinasi bertumpu pada morfologi ilmiah objektif, bukan tebakan subjektif.",
+            "2": "Nama ilmiah internasional tidak disusun berdasarkan abjad bahasa lokal daerah.",
+            "3": "Massa tubuh fluktuatif dan bukan kriteria diagnostik identifikasi taksonomi."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB5-01"
+          }
+        },
+        {
+          "id": "ipa-d-7-b5-q14",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 153), Amoeba, Paramecium, dan Euglena dikelompokkan ke dalam kingdom PROTISTA karena…",
+          "options": [
+            "Merupakan organisme eukariotik bersel tunggal atau koloni sederhana yang tidak membentuk jaringan terdiferensiasi kompleks",
+            "Memiliki sistem peredaran darah tertutup dan berkembang biak dengan melahirkan",
+            "Merupakan tumbuhan berbiji terbuka yang menghasilkan bunga sejati",
+            "Tersusun dari sel mati yang kebal terhadap air mendidih"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kingdom Protista menaungi organisme eukariotik tingkat rendah (uniseluler atau multiseluler sederhana) yang menyerupai hewan, tumbuhan, atau jamur tanpa diferensiasi jaringan sejati."
+          },
+          "distractorWhy": {
+            "1": "Protista bersel tunggal dan tidak memiliki organ sirkulasi darah maupun sistem reproduksi melahirkan.",
+            "2": "Protista bukan tumbuhan berpembuluh berbiji.",
+            "3": "Mikroorganisme protista tersusun dari sel hidup aktif bermetabolisme."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB5-01"
+          }
+        },
+        {
+          "id": "ipa-d-7-b5-q15",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 154-155), hewan vertebrata yang memiliki suhu tubuh berubah-ubah mengikuti suhu lingkungan luar (poikiloterm) dan mengalami fase metamorfosis dari hidup di air ke darat adalah…",
+          "options": [
+            "Amfibia (katak dan salamander)",
+            "Aves (burung merpati dan elang)",
+            "Mamalia (kucing dan kelinci)",
+            "Reptilia (kadal dan buaya)"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Amfibia (amphi = dua, bios = hidup) berdarah dingin dan bertelur di air dengan berudu bernapas insang yang bermetamorfosis menjadi individu dewasa bernapas paru-paru dan kulit lembap."
+          },
+          "distractorWhy": {
+            "1": "Aves adalah vertebrata berdarah panas (homoiterm) berbulu tanpa metamorfosis air.",
+            "2": "Mamalia adalah hewan berdarah panas yang menyusui anaknya.",
+            "3": "Reptilia bertelur di darat dengan cangkang kedap air dan tidak menjalani fase larva berudu di air."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB5-01"
+          }
+        },
+        {
+          "id": "ipa-d-7-b5-q16",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 155), kelompok hewan Chordata yang memiliki ciri penutup tubuh berupa bulu, memiliki paruh tanpa gigi, dan bertelur dengan cangkang keras kapur adalah…",
+          "options": [
+            "Aves (burung)",
+            "Pisces (ikan)",
+            "Reptilia (reptil)",
+            "Mamalia"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kelas Aves secara eksklusif dicirikan oleh modifikasi tungkai depan menjadi sayap, penutup tubuh berupa bulu keratin sejati, paruh tanduk tanpa gigi, dan tulang berongga ringan."
+          },
+          "distractorWhy": {
+            "1": "Pisces bertubuh sisik lendir dan bernapas dengan insang di perairan.",
+            "2": "Reptilia ditutupi oleh sisik zat tanduk kering, bukan bulu.",
+            "3": "Mamalia ditutupi oleh rambut, memiliki kelenjar susu, dan melahirkan anak (sebagian besar)."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB5-01"
+          }
+        }
+      ]
+    },
+    {
+      "code": "KOMP-IPA-D-7-BAB6-01",
+      "grade": 7,
+      "name": "Ekologi dan Pelestarian Lingkungan",
+      "materi": "",
+      "cpRef": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+      "target": 16,
+      "items": [
+        {
+          "id": "ipa-d-7-b6-q01",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 161-163), dalam suatu ekosistem kebun sekolah, komponen yang tergolong ke dalam KOMPONEN ABIOTIK adalah…",
+          "options": [
+            "Intensitas cahaya matahari, kelembapan udara, suhu, dan kadar mineral tanah",
+            "Cacing tanah, bakteri pengurai, dan semut hitam",
+            "Pohon mangga, rumput teki, dan tanaman tomat",
+            "Ulat pemakan daun, burung pipit, dan belalang sembah"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Komponen abiotik mencakup seluruh faktor tak hidup fisik dan kimiawi lingkungan yang memengaruhi kelangsungan hidup organisme di ekosistem."
+          },
+          "distractorWhy": {
+            "1": "Cacing, bakteri, dan semut adalah makhluk hidup penyusun komponen biotik.",
+            "2": "Tumbuhan dan rumput adalah organisme autotrof produsen biotik.",
+            "3": "Serangga dan burung adalah organisme konsumen biotik."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB6-01"
+          }
+        },
+        {
+          "id": "ipa-d-7-b6-q02",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 167), organisme yang menduduki tingkatan trofik pertama (produsen) pada rantai makanan selalu berupa…",
+          "options": [
+            "Organisme autotrof seperti tumbuhan hijau dan fitoplankton yang mampu memproduksi makanannya sendiri melalui fotosintesis",
+            "Hewan karnivora predator puncak seperti harimau dan elang",
+            "Bakteri dan jamur dekomposer pengurai zat organik",
+            "Hewan herbivora pemakan rumput di padang savana"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Trofik pertama (dasar piramida energi) wajib ditempati organisme produsen yang mampu mengikat energi foton matahari menjadi energi kimia biomassa organik."
+          },
+          "distractorWhy": {
+            "1": "Karnivora puncak menempati tingkatan trofik tertinggi (trofik 3 atau 4).",
+            "2": "Dekomposer bertugas mendaur ulang materi dari seluruh tingkatan trofik, bukan fondasi fotosintesis.",
+            "3": "Herbivora adalah konsumen primer yang menempati tingkatan trofik kedua."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB6-01"
+          }
+        },
+        {
+          "id": "ipa-d-7-b6-q03",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 180 Ayo Uji Kemampuan No. 1), apa dampak ekologis yang akan terjadi apabila dalam suatu jaring-jaring makanan populasi burung hantu dan elang punah secara mendadak akibat perburuan liar?",
+          "options": [
+            "Populasi tikus dan hama pemakan biji akan meledak tak terkendali sehingga merusak tanaman pertanian secara masif",
+            "Seluruh tanaman padi akan tumbuh sepuluh kali lebih subur",
+            "Populasi ular sawah akan langsung punah bersamaan pada hari yang sama",
+            "Tidak terjadi dampak apa pun karena elang bukan bagian dari ekosistem"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Hilangnya predator alami pemangsa tikus menghilangkan mekanisme kontrol biologis, memicu ledakan populasi mangsa herbivora yang menghancurkan produsen."
+          },
+          "distractorWhy": {
+            "1": "Tanaman pertanian justru rusak parah akibat dimakan oleh populasi hama pengerat yang membeludak.",
+            "2": "Ular sawah memiliki hubungan kompetisi atau mangsa dengan elang dan tidak punah serentak.",
+            "3": "Setiap spesies dalam jejaring makanan saling terkait menjaga homeostasis ekosistem."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB6-01"
+          }
+        },
+        {
+          "id": "ipa-d-7-b6-q04",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 180 Ayo Uji Kemampuan No. 2), seorang ilmuwan menemukan bahwa di Area Hutan A terdapat 10 rantai makanan, sedangkan di Area Hutan B terdapat 50 rantai makanan berbeda. Area yang memiliki stabilitas ekosistem dan keanekaragaman hayati tertinggi adalah…",
+          "options": [
+            "Area Hutan B, karena jaring-jaring makanannya jauh lebih kompleks sehingga jika satu spesies terganggu, masih tersedia banyak jalur alternatif rantai makanan lain",
+            "Area Hutan A, karena semakin sedikit rantai makanan maka hewan semakin cepat kenyang",
+            "Kedua area memiliki stabilitas ekosistem yang identik tanpa memandang jumlah rantai makanannya",
+            "Area Hutan A, karena rantai makanan sederhana kebal terhadap perubahan iklim"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Semakin kompleks jaring-jaring makanan (biodiversitas tinggi), semakin tinggi daya lentur (resiliensi) ekosistem terhadap gangguan karena aliran energi memiliki banyak jalur alternatif."
+          },
+          "distractorWhy": {
+            "1": "Kenyang tidaknya hewan ditentukan oleh ketersediaan biomassa, bukan penyederhanaan rantai trofik.",
+            "2": "Stabilitas ekosistem berbanding lurus dengan kompleksitas interaksi keanekaragaman hayati.",
+            "3": "Rantai makanan sederhana justru sangat rentan runtuh jika salah satu mata rantainya terputus."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB6-01"
+          }
+        },
+        {
+          "id": "ipa-d-7-b6-q05",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 180 Ayo Uji Kemampuan No. 3), usaha nyata sehari-hari yang dapat dilakukan siswa untuk membantu MENGURANGI JEJAK KARBON (carbon footprint) di Bumi adalah…",
+          "options": [
+            "Berjalan kaki atau bersepeda ke sekolah, mematikan peralatan listrik yang tidak terpakai, dan menanam pohon penghijauan",
+            "Membakar sampah plastik di pekarangan rumah setiap sore hari",
+            "Menebang pohon peneduh jalan agar jalanan terlihat lapang",
+            "Menyalakan pendingin udara (AC) dengan pintu dan jendela terbuka lebar"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Jejak karbon adalah emisi gas rumah kaca akibat aktivitas manusia. Menghemat listrik, menggunakan transportasi rendah emisi, dan reboisasi pohon menyerap karbon dioksida atmosfer."
+          },
+          "distractorWhy": {
+            "1": "Membakar plastik menghasilkan emisi karbon dioksida dan racun dioksin berbahaya bagi udara.",
+            "2": "Penebangan pohon mengurangi penyerap karbon alami dan mempercepat laju pemanasan global.",
+            "3": "Menyalakan AC pada ruangan terbuka memboroskan konsumsi energi listrik secara berlebihan."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB6-01"
+          }
+        },
+        {
+          "id": "ipa-d-7-b6-q06",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 180 Ayo Uji Kemampuan No. 4 Fakta Sains Wakatobi 2018), kematian seekor paus sperma dengan 5,9 kg sampah plastik di dalam perutnya memberikan pelajaran penting bahwa sampah plastik di laut…",
+          "options": [
+            "Tidak dapat dicerna dan menyumbat saluran pencernaan satwa laut serta terfragmentasi menjadi mikroplastik yang meracuni rantai makanan bahari",
+            "Merupakan makanan alami bernutrisi tinggi bagi seluruh mamalia laut",
+            "Dapat terurai secara alami dalam waktu dua menit di air laut asin",
+            "Membantu paus berenang lebih cepat di kedalaman samudra"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Plastik bersifat non-biodegradable sintetik. Tertelannya plastik menyebabkan malnutrisi kronis, penyumbatan usus, dan kontaminasi partikel mikroplastik dalam rantai makanan laut."
+          },
+          "distractorWhy": {
+            "1": "Plastik adalah polimer anorganik beracun tanpa nilai gizi nutrisi hayati.",
+            "2": "Plastik konvensional membutuhkan ratusan tahun untuk terdegradasi di alam.",
+            "3": "Timbunan sampah di lambung melemahkan kondisi fisik dan mengancam nyawa satwa laut."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB6-01"
+          }
+        },
+        {
+          "id": "ipa-d-7-b6-q07",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 169), pola interaksi simbiosis antara jamur dan ganggang pada Lichenes (lumut kerak), di mana jamur menyediakan air/mineral dan ganggang menyediakan makanan fotosintesis, merupakan contoh dari…",
+          "options": [
+            "Simbiosis mutualisme (kedua pihak saling menguntungkan)",
+            "Simbiosis parasitisme (satu pihak untung, pihak lain dirugikan)",
+            "Simbiosis komensalisme (satu untung, satu tidak terpengaruh)",
+            "Predasi pemangsaan antarmakhluk hidup"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Mutualisme adalah hubungan timbal balik antara dua organisme berbeda spesies yang saling memberikan keuntungan esensial bagi kelangsungan hidup keduanya."
+          },
+          "distractorWhy": {
+            "1": "Parasitisme menyebabkan kerugian atau penyakit pada inang, tidak saling memberi nutrisi.",
+            "2": "Komensalisme hanya menguntungkan satu pihak tanpa merugikan pihak lain (misal ikan remora dan hiu).",
+            "3": "Predasi adalah interaksi pemangsaan di mana satu organisme membunuh dan memakan mangsanya."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB6-01"
+          }
+        },
+        {
+          "id": "ipa-d-7-b6-q08",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 169), interaksi antara tanaman anggrek yang menempel pada batang pohon mangga merupakan contoh SIMBIOSIS KOMENSALISME karena…",
+          "options": [
+            "Tanaman anggrek mendapat tempat menempel untuk menjangkau cahaya matahari, sedangkan pohon mangga tidak merasa dirugikan dan tidak pula diuntungkan",
+            "Tanaman anggrek menyedot sari makanan dari pembuluh floem pohon mangga hingga mati",
+            "Pohon mangga memakan daun tanaman anggrek sebagai pupuk organik",
+            "Keduanya saling bertukar materi genetik melalui akarnya"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Anggrek adalah tumbuhan epifit yang hanya menumpang tempat (substrat) tanpa mengambil nutrisi inang, sehingga inang tidak dirugikan (komensalisme)."
+          },
+          "distractorWhy": {
+            "1": "Menyerap cairan inang adalah sifat tumbuhan parasit benalu/tali putri, bukan anggrek epifit.",
+            "2": "Pohon mangga berfotosintesis mandiri dan tidak memangsa tumbuhan lain.",
+            "3": "Simbiosis komensalisme tidak melibatkan pertukaran materi genetik antarspesies."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB6-01"
+          }
+        },
+        {
+          "id": "ipa-d-7-b6-q09",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 170), hubungan antara kutu rambut yang menghisap darah dari kulit kepala manusia merupakan contoh SIMBIOSIS PARASITISME karena…",
+          "options": [
+            "Kutu memperoleh nutrisi darah dan tempat tinggal (untung), sementara manusia menderita rasa gatal dan kehilangan darah (rugi)",
+            "Manusia dan kutu rambut sama-sama memperoleh keuntungan kesehatan",
+            "Kutu rambut menghasilkan vitamin penting bagi kesuburan rambut manusia",
+            "Kutu rambut hidup bebas tanpa berinteraksi langsung dengan tubuh manusia"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Parasitisme adalah hubungan hidup bersama di mana parasit mengambil keuntungan nutrisi dari tubuh inang sementara inang dirugikan atau mengalami kerusakan jaringan."
+          },
+          "distractorWhy": {
+            "1": "Manusia menderita iritasi dan kerugian darah, tidak memperoleh keuntungan biologis.",
+            "2": "Kutu adalah ektoparasit obligat penghisap darah tanpa fungsi sintesis vitamin.",
+            "3": "Kutu hidup menempel permanen dan bergantung penuh pada cairan inang."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB6-01"
+          }
+        },
+        {
+          "id": "ipa-d-7-b6-q10",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 168), dalam piramida energi suatu ekosistem alami, efisiensi perpindahan energi rata-rata dari satu tingkatan trofik ke tingkatan trofik di atasnya diperkirakan hanya sebesar…",
+          "options": [
+            "Sekitar 10%, karena 90% energi lainnya hilang sebagai energi panas metabolisme, aktivitas gerak, dan sisa ekskresi",
+            "Seratus persen tanpa ada energi yang hilang sama sekali",
+            "Sekitar 90% berpindah utuh ke tingkatan trofik puncak",
+            "Nol persen karena energi tidak dapat mengalir di antara makhluk hidup"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Hukum efisiensi energi trofik Lindeman menyatakan rata-rata hanya ~10% energi biomassa yang dikonversi menjadi jaringan tubuh trofik berikutnya, selebihnya terdisipasi sebagai panas respirasi."
+          },
+          "distractorWhy": {
+            "1": "Efisiensi 100% melanggar hukum termodinamika tentang disipasi entropi panas.",
+            "2": "Angka 90% adalah porsi energi yang terbuang dan terpakai metabolisme, bukan yang terserap ke trofik atas.",
+            "3": "Energi kimia mengalir nyata melalui rantai konsumsi makanan."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB6-01"
+          }
+        },
+        {
+          "id": "ipa-d-7-b6-q11",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 174), fenomena EUTROFIKASI di perairan danau yang dipicu oleh limpasan pupuk pertanian berlebih mengakibatkan kematian massal ikan karena…",
+          "options": [
+            "Ledakan populasi alga (blooming algae) menutupi permukaan air, dan saat alga mati diuraikan oleh bakteri pengurai yang menghabiskan seluruh oksigen terlarut (anoksia)",
+            "Pupuk kimia mengubah air danau menjadi bongkahan batu padat",
+            "Alga memakan seluruh ikan dan katak di danau secara langsung",
+            "Kandungan air danau menguap seluruhnya menjadi gas karbon monoksida"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Eutrofikasi menyebabkan ledakan gulma/alga akibat kelebihan nitrat-fosfat. Dekomposisi biomassa alga yang mati mengonsumsi oksigen terlarut (DO) drastis hingga ikan mati lemas."
+          },
+          "distractorWhy": {
+            "1": "Eutrofikasi terjadi di media air dan tidak mengubah danau menjadi batu padat.",
+            "2": "Alga adalah organisme fotosintetik mikroskopis autotrof, bukan predator pemangsa ikan.",
+            "3": "Air danau tetap ada namun mengalami penurunan kualitas fisikokimiawi yang fatal bagi fauna air."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB6-01"
+          }
+        },
+        {
+          "id": "ipa-d-7-b6-q12",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 176-178), upaya pelestarian keanekaragaman hayati flora dan fauna yang dilakukan secara INSITU adalah…",
+          "options": [
+            "Pelestarian yang dilakukan langsung di dalam habitat asli alaminya, seperti di Taman Nasional Ujung Kulon dan Cagar Alam",
+            "Pelestarian hewan dengan cara menangkar di kebun binatang kota dan akuarium buatan",
+            "Penyimpanan benih tanaman di laboratorium kriogenik luar negeri",
+            "Pemeliharaan satwa liar langka di dalam kandang rumah pribadi"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Konservasi in situ adalah perlindungan spesies flora dan fauna di dalam ekosistem habitat aslinya (taman nasional, suaka margasatwa, cagar alam) untuk menjaga dinamika populasi alaminya."
+          },
+          "distractorWhy": {
+            "1": "Penangkaran di kebun binatang adalah metode konservasi ex situ (di luar habitat asli).",
+            "2": "Penyimpanan plasma nutfah benih di bank gen adalah konservasi ex situ terisolasi.",
+            "3": "Memelihara satwa langka di rumah melanggar hukum konservasi dan bukan program pelestarian resmi."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB6-01"
+          }
+        },
+        {
+          "id": "ipa-d-7-b6-q13",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 176-178), upaya pelestarian satwa langka yang dilakukan secara EKSITU (ex-situ) adalah…",
+          "options": [
+            "Pelestarian yang dilakukan di luar habitat aslinya dengan membuat lingkungan buatan, seperti di Kebun Raya Bogor dan Taman Safari",
+            "Pelestarian di hutan lindung pedalaman Kalimantan",
+            "Pelestarian terumbu karang di kawasan Taman Nasional Bunaken",
+            "Membiarkan perburuan liar tanpa pengawasan aparat kehutanan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Konservasi ex situ dilakukan dengan memindahkan organisme langka keluar dari habitat aslinya yang terancam ke fasilitas penangkaran buatan terkelola seperti kebun binatang dan kebun raya."
+          },
+          "distractorWhy": {
+            "1": "Hutan lindung habitat asli adalah bentuk konservasi in situ.",
+            "2": "Taman Nasional perairan asli laut adalah konservasi in situ.",
+            "3": "Membiarkan perburuan adalah tindakan destruktif yang memicu kepunahan keanekaragaman hayati."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB6-01"
+          }
+        },
+        {
+          "id": "ipa-d-7-b6-q14",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 165), organisme pengurai (DEKOMPOSER) seperti jamur saprofit dan bakteri tanah memegang peranan krusial dalam siklus materi karena…",
+          "options": [
+            "Menguraikan sisa-sisa jasad makhluk hidup yang mati menjadi senyawa anorganik sederhana penyubur tanah yang dapat diserap kembali oleh produsen",
+            "Menghasilkan gas beracun yang mematikan seluruh populasi tumbuhan",
+            "Memangsa hewan herbivora yang berkeliaran di padang rumput",
+            "Menghentikan daur air dan mineral di permukaan bumi"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Dekomposer menutup siklus biogeokimia dengan memecah materi organik kompleks dari organisme mati menjadi unsur hara mineral tanah yang esensial bagi tumbuhan."
+          },
+          "distractorWhy": {
+            "1": "Dekomposer menghasilkan zat hara yang menyuburkan ekosistem, bukan gas perusak.",
+            "2": "Pengurai mencerna detritus sisa jasad mati secara absorpsi, bukan memburu hewan hidup.",
+            "3": "Pengurai justru menggerakkan siklus nutrisi dan mineral berjalan berkesinambungan."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB6-01"
+          }
+        },
+        {
+          "id": "ipa-d-7-b6-q15",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 173), fenomena akumulasi konsentrasi racun pestisida kimia sintetis yang semakin membesar pada tingkatan trofik tertinggi dalam suatu rantai makanan dikenal dengan istilah…",
+          "options": [
+            "Biomagnifikasi (pemekatan hayati)",
+            "Biodegradasi alami",
+            "Bioindikator ekosistem",
+            "Bioremediasi mikroba"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Biomagnifikasi adalah peningkatan konsentrasi polutan non-biodegradable (seperti DDT atau merkuri) di sepanjang rantai makanan, menyebabkan predator puncak menerima dosis racun tertinggi."
+          },
+          "distractorWhy": {
+            "1": "Biodegradasi adalah penguraian alami bahan ramah lingkungan oleh mikroorganisme.",
+            "2": "Bioindikator adalah spesies yang menjadi tolak ukur biologis kualitas lingkungan hidup.",
+            "3": "Bioremediasi adalah pemanfaatan mikroba untuk membersihkan lahan tercemar limbah."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB6-01"
+          }
+        },
+        {
+          "id": "ipa-d-7-b6-q16",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 177), satwa endemik Indonesia yang dilindungi ketat di kawasan Taman Nasional Komodo di Provinsi Nusa Tenggara Timur adalah…",
+          "options": [
+            "Varanus komodoensis (Kadal purba Komodo)",
+            "Harimau Siberia",
+            "Beruang kutub",
+            "Kanguru pohon Australia"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Komodo (Varanus komodoensis) adalah spesies kadal terbesar di dunia yang merupakan fauna endemik asli kepulauan Nusa Tenggara Timur (Pulau Komodo, Rinca, dan Padar)."
+          },
+          "distractorWhy": {
+            "1": "Harimau Siberia adalah fauna asli kawasan beriklim dingin Rusia dan Tiongkok timur.",
+            "2": "Beruang kutub adalah mamalia predator arktik lingkaran kutub utara.",
+            "3": "Kanguru adalah fauna asli benua Australia dan Papua."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB6-01"
+          }
+        }
+      ]
+    },
+    {
+      "code": "KOMP-IPA-D-7-BAB7-01",
+      "grade": 7,
+      "name": "Bumi dan Tata Surya",
+      "materi": "",
+      "cpRef": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+      "target": 16,
+      "items": [
+        {
+          "id": "ipa-d-7-b7-q01",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 226 Ayo Uji Kemampuan No. 1), jarak suatu planet terhadap Matahari memegang peranan krusial terhadap peluang adanya kehidupan karena menentukan…",
+          "options": [
+            "Suhu permukaan planet yang memungkinkan air berada dalam wujud cair (zona layak huni / habitable zone)",
+            "Jumlah cincin gas yang mengitari khatulistiwa planet",
+            "Warna cahaya bintang yang terlihat dari permukaan planet",
+            "Kecepatan rotasi sumbu magnet planet menjadi bernilai konstan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Zona laik huni (Goldilocks zone) adalah orbit planet yang tidak terlalu dekat sehingga air menguap habis, dan tidak terlalu jauh sehingga air membeku abadi, memungkinkan eksistensi air cair penopang biokimia kehidupan."
+          },
+          "distractorWhy": {
+            "1": "Cincin planet (seperti cincin Saturnus) dibentuk oleh serpihan debu es dan batuan akibat gaya pasang surut gravitasi, bukan jarak zona hidup.",
+            "2": "Warna bintang ditentukan oleh suhu fotosfer bintang induk itu sendiri.",
+            "3": "Kecepatan rotasi sumbu ditentukan oleh momentum sudut awal pembentukan planet."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB7-01"
+          }
+        },
+        {
+          "id": "ipa-d-7-b7-q02",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 226 Ayo Uji Kemampuan No. 2), jika jarak rata-rata Matahari ke Bumi adalah 150.000.000 km dan kecepatan cahaya adalah 300.000 km/detik, berapakah waktu yang dibutuhkan seberkas cahaya Matahari untuk mencapai Bumi?",
+          "options": [
+            "500 detik (sekitar 8,3 menit)",
+            "50 detik (kurang dari 1 menit)",
+            "1.500 detik (sekitar 25 menit)",
+            "365 hari penuh"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Rumus waktu tempuh t = jarak / kelajuan cahaya = 150.000.000 km / 300.000 km/s = 500 detik, setara dengan 500 / 60 = 8 menit 20 detik (sekitar 8,3 menit)."
+          },
+          "distractorWhy": {
+            "1": "Nilai 50 detik diperoleh dari salah pembagian faktor nol desimal.",
+            "2": "Nilai 1.500 detik diperoleh dari perkalian keliru.",
+            "3": "Satu tahun adalah waktu tempuh revolusi bumi mengelilingi matahari, bukan waktu rambat sinar cahaya."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB7-01"
+          }
+        },
+        {
+          "id": "ipa-d-7-b7-q03",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 226 Ayo Uji Kemampuan No. 4), sistem Kalender Hijriah dihitung berdasarkan keteraturan siklus revolusi Bulan mengelilingi Bumi. Tanggal 1 Hijriah ditandai oleh fase Bulan Baru (hilal), maka pada tanggal 14-15 Hijriah penampakan Bulan di langit adalah…",
+          "options": [
+            "Fase Bulan Purnama (Full Moon), di mana piringan Bulan tampak bulat sempurna disinari penuh oleh Matahari",
+            "Fase Bulan Sabit awal yang sangat tipis di ufuk barat",
+            "Fase Gerhana Matahari total yang menggelapkan bumi",
+            "Bulan tidak tampak sama sekali di langit malam hari"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pada pertengahan periode sinodis bulan (sekitar hari ke-14 atau 15), posisi Bulan berada berseberangan dengan Matahari relatif terhadap Bumi, sehingga seluruh permukaan Bulan yang menghadap Bumi memantulkan cahaya matahari penuh."
+          },
+          "distractorWhy": {
+            "1": "Bulan sabit awal muncul pada awal bulan Hijriah (tanggal 2-4).",
+            "2": "Gerhana matahari terjadi saat konjungsi fase Bulan Baru (tanggal 1), bukan saat purnama pertengahan bulan.",
+            "3": "Bulan yang tidak tampak sama sekali adalah fase Bulan Mati/Bulan Baru (hari ke-29/30)."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB7-01"
+          }
+        },
+        {
+          "id": "ipa-d-7-b7-q04",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 226 Ayo Uji Kemampuan No. 5), gravitasi Bulan sangat memengaruhi kestabilan lautan di Bumi. Jika kekuatan gravitasi Bulan meningkat menjadi 2 kali lebih kuat dari saat ini, fenomena alam yang akan terjadi di Bumi adalah…",
+          "options": [
+            "Perbedaan pasang naik dan pasang surut air laut di pantai akan menjadi dua kali lipat lebih ekstrem dan gelombang pasang jauh lebih tinggi",
+            "Air laut di seluruh samudra akan mengering seketika",
+            "Bumi akan berhenti berotasi pada sumbunya seketika itu juga",
+            "Gravitasi bumi akan langsung lenyap menjadi nol"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Gaya diferensial pasang surut gravitasi berbanding lurus dengan massa dan tarikan gravitasi Bulan. Peningkatan dua kali lipat akan melipatgandakan amplitudo pasang surut laut secara drastis."
+          },
+          "distractorWhy": {
+            "1": "Air laut tidak menguap lenyap melainkan mengalami dinamika fluktuasi pasang surut fisik.",
+            "2": "Rotasi bumi mengalami perlambatan deselerasi pasang surut secara gradual bertahap, tidak berhenti mendadak seketika.",
+            "3": "Gravitasi bumi ditentukan oleh massa bumi sendiri dan tidak hilang oleh gaya gravitasi bulan."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB7-01"
+          }
+        },
+        {
+          "id": "ipa-d-7-b7-q05",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 234 Ayo Uji Kemampuan Gambar 7.55), analisis grafik suhu rata-rata permukaan Bumi terhadap jumlah sinar radiasi Matahari dalam beberapa dekade terakhir menunjukkan bahwa…",
+          "options": [
+            "Peningkatan tajam suhu permukaan Bumi terjadi ketika jumlah radiasi Matahari relatif konstan, membuktikan bahwa pemanasan global dipicu oleh peningkatan gas rumah kaca akibat aktivitas manusia",
+            "Pemanasan suhu Bumi semata-mata disebabkan oleh lonjakan panas radiasi Matahari",
+            "Suhu Bumi tidak mengalami perubahan sama sekali sejak ratusan tahun lalu",
+            "Matahari adalah satu-satunya penyebab perubahan iklim modern tanpa peran manusia"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Data ilmiah memverifikasi tren anomali suhu bumi melonjak tinggi sementara variabilitas radiasi surya stabil, mengonfirmasi emisi gas rumah kaca antropogenik sebagai penyebab utama pemanasan global."
+          },
+          "distractorWhy": {
+            "1": "Radiasi matahari stabil dan tidak mengalami lonjakan yang setara dengan kenaikan kurva suhu bumi.",
+            "2": "Kurva grafik mencatat kenaikan suhu rata-rata global yang konsisten dan terukur signifikan.",
+            "3": "Bukti empiris menunjukkan aktivitas industri emisi karbon manusia mendominasi efek pemanasan atmosfer modern."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB7-01"
+          }
+        },
+        {
+          "id": "ipa-d-7-b7-q06",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 195-197), peristiwa pergantian siang dan malam serta gerak semu harian benda langit dari timur ke barat disebabkan oleh…",
+          "options": [
+            "Rotasi Bumi pada porosnya dari arah barat ke timur",
+            "Revolusi Bumi mengelilingi Matahari pada bidang ekliptika",
+            "Pergerakan Matahari mengelilingi planet Bumi",
+            "Perubahan fase Bulan mengitari bumi setiap malam"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Bumi berputar pada poros rotasinya sekali setiap ~24 jam dari barat ke timur, sehingga separuh bumi menghadap matahari bergantian (siang-malam) dan benda langit tampak terbit di timur tenggelam di barat."
+          },
+          "distractorWhy": {
+            "1": "Revolusi bumi mengelilingi matahari mengakibatkan pergantian musim dan gerak semu tahunan, bukan harian.",
+            "2": "Model heliosentris membuktikan bumilah yang berotasi, bukan matahari yang mengitari bumi.",
+            "3": "Fase bulan dipicu posisi orbit bulan terhadap penyinaran matahari, bukan penyebab siang malam bumi."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB7-01"
+          }
+        },
+        {
+          "id": "ipa-d-7-b7-q07",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 198-200), akibat dari peristiwa REVOLUSI BUMI mengelilingi Matahari dengan kemiringan sumbu rotasi sebesar 23,5 derajat adalah…",
+          "options": [
+            "Terjadinya pergantian musim di belahan bumi utara dan selatan serta perbedaan lamanya waktu siang dan malam",
+            "Terjadinya pasang surut air laut setiap enam jam sekali",
+            "Pembelokan arah angin siklon pada garis khatulistiwa",
+            "Terjadinya pergantian hari setiap dua puluh empat jam"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kemiringan sumbu rotasi 23,5° saat bumi berevolusi menyebabkan intensitas penyinaran matahari bergantian lebih condong ke belahan bumi utara atau selatan, melahirkan empat musim siklis tahunan."
+          },
+          "distractorWhy": {
+            "1": "Pasang surut air laut dipicu oleh gaya gravitasi bulan dan matahari.",
+            "2": "Pembelokan arah angin (efek Coriolis) adalah akibat rotasi bumi harian.",
+            "3": "Pergantian hari 24 jam adalah periode putaran rotasi bumi pada porosnya."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB7-01"
+          }
+        },
+        {
+          "id": "ipa-d-7-b7-q08",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 201), peristiwa GERHANA BULAN terjadi ketika posisi benda langit berada pada konfigurasi sejajar berupa…",
+          "options": [
+            "Matahari - Bumi - Bulan berada pada satu garis lurus, sehingga bayangan gelap Bumi menutupi permukaan Bulan",
+            "Matahari - Bulan - Bumi berada pada satu garis lurus saat siang hari",
+            "Bulan berada di antara Matahari dan planet Mars",
+            "Bumi berada di belakang orbit planet Saturnus"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Gerhana bulan terjadi saat fase bulan purnama ketika bumi melintas tepat di antara matahari dan bulan, menghalangi sinar matahari sehingga bayang-bayang umbra dan penumbra bumi jatuh di bulan."
+          },
+          "distractorWhy": {
+            "1": "Konfigurasi Matahari - Bulan - Bumi menghasilkan gerhana Matahari saat siang hari.",
+            "2": "Planet Mars tidak berada di antara matahari dan orbit bulan.",
+            "3": "Saturnus berada di luar orbit bumi dan tidak memicu gerhana bulan kebumian."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB7-01"
+          }
+        },
+        {
+          "id": "ipa-d-7-b7-q09",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 202), peristiwa GERHANA MATAHARI terjadi ketika…",
+          "options": [
+            "Bulan berada di antara Matahari dan Bumi pada satu garis lurus, sehingga piringan Bulan menutupi pandangan sinar Matahari ke sebagian wilayah Bumi",
+            "Bumi berada di antara Matahari dan Bulan pada malam hari",
+            "Matahari padam selama beberapa jam karena kehabisan gas hidrogen",
+            "Bulan meluncur jatuh menabrak atmosfer samudra bumi"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Gerhana matahari terjadi saat fase bulan baru ketika bayangan kerucut umbra bulan menyapu permukaan bumi di siang hari, menghalangi cahaya matahari sementara waktu."
+          },
+          "distractorWhy": {
+            "1": "Bumi di antara matahari dan bulan pada malam hari adalah peristiwa gerhana bulan.",
+            "2": "Matahari tidak padam; cahayanya terhalang oleh benda padat piringan bulan yang melintas.",
+            "3": "Bulan tetap mengorbit stabil di angkasa dan tidak menabrak atmosfer bumi."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB7-01"
+          }
+        },
+        {
+          "id": "ipa-d-7-b7-q10",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 186-190), kelompok PLANET DALAM (terestrial) yang memiliki permukaan padat berbatu di tata surya kita terdiri atas…",
+          "options": [
+            "Merkurius, Venus, Bumi, dan Mars",
+            "Yupiter, Saturnus, Uranus, dan Neptunus",
+            "Bumi, Jupiter, Saturnus, dan Pluto",
+            "Mars, Jupiter, Uranus, dan Matahari"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Planet dalam (terestrial) terletak di antara matahari dan sabuk asteroid utama, tersusun atas batuan silikat dan logam padat berkepadatan tinggi: Merkurius, Venus, Bumi, dan Mars."
+          },
+          "distractorWhy": {
+            "1": "Yupiter, Saturnus, Uranus, dan Neptunus adalah planet luar raksasa gas (jovian).",
+            "2": "Jupiter dan Saturnus adalah raksasa gas, sedangkan Pluto diklasifikasikan sebagai planet kerdil.",
+            "3": "Matahari adalah bintang pusat tata surya, bukan planet."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB7-01"
+          }
+        },
+        {
+          "id": "ipa-d-7-b7-q11",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 191), planet terbesar di tata surya kita yang tersusun dari gas hidrogen dan helium serta memiliki fenomena badai bintik merah raksasa (Great Red Spot) adalah…",
+          "options": [
+            "Yupiter",
+            "Saturnus",
+            "Merkurius",
+            "Venus"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Yupiter adalah raksasa gas dengan massa lebih dari dua kali gabungan seluruh planet lainnya di tata surya dan memiliki badai antisiklon raksasa Great Red Spot yang telah berlangsung berabad-abad."
+          },
+          "distractorWhy": {
+            "1": "Saturnus terkenal dengan sistem cincin es raksasa spektakulernya.",
+            "2": "Merkurius adalah planet terkecil dan terdekat ke matahari yang berbatu tandus.",
+            "3": "Venus adalah planet terpanas berselimut awan tebal gas asam sulfat dan CO2."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB7-01"
+          }
+        },
+        {
+          "id": "ipa-d-7-b7-q12",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 188), mengapa planet VENUS memiliki suhu permukaan paling panas di tata surya (mencapai sekitar 460°C), padahal jaraknya bukan yang paling dekat dengan Matahari?",
+          "options": [
+            "Atmosfer Venus sangat tebal dan didominasi oleh gas karbon dioksida (CO2) hingga 96%, memicu efek rumah kaca tak terkendali yang memerangkap panas ekstrem",
+            "Venus memiliki inti dari uranium radioaktif yang terbakar terus menerus",
+            "Venus berputar sangat cepat sehingga gesekan udaranya menyala membara",
+            "Permukaan Venus dilapisi oleh batu bara padat yang mudah menyala"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Atmosfer gas CO2 bertekanan 90 kali lipat bumi di Venus memicu runaway greenhouse effect ekstrem yang menahan radiasi inframerah keluar, menjadikan permukaannya lebih panas dari Merkurius."
+          },
+          "distractorWhy": {
+            "1": "Venus adalah planet batuan silikat biasa tanpa fisi nuklir uranium raksasa.",
+            "2": "Rotasi Venus justru sangat lambat (243 hari bumi untuk sekali putaran rotasi).",
+            "3": "Permukaan Venus tersusun dari batuan basal vulkanik beku, bukan deposit batu bara organik."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB7-01"
+          }
+        },
+        {
+          "id": "ipa-d-7-b7-q13",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 207-209), lapisan atmosfer Bumi yang paling bawah di mana tempat terjadinya berbagai fenomena cuaca seperti awan, hujan, dan angin adalah…",
+          "options": [
+            "Troposfer",
+            "Stratosfer",
+            "Mesosfer",
+            "Eksosfer"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Troposfer adalah lapisan atmosfer terendah (permukaan tanah hingga ketinggian ~12 km) yang menampung 75-80% massa udara dan hampir seluruh uap air tempat dinamika cuaca berlangsung."
+          },
+          "distractorWhy": {
+            "1": "Stratosfer berada di atas troposfer tempat lapisan ozon penyerap sinar UV berada.",
+            "2": "Mesosfer adalah lapisan dingin tempat terbakarnya sebagian besar meteorit angkasa.",
+            "3": "Eksosfer adalah lapisan terluar atmosfer yang berbatasan langsung dengan ruang hampa antariksa."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB7-01"
+          }
+        },
+        {
+          "id": "ipa-d-7-b7-q14",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 210), lapisan OZON (O3) di lapisan stratosfer memiliki fungsi yang sangat vital bagi kelangsungan hidup di Bumi karena…",
+          "options": [
+            "Menyerap sebagian besar radiasi sinar ultraviolet (UV-B) berbahaya dari Matahari sebelum sampai ke permukaan Bumi",
+            "Menyediakan oksigen untuk bernapas bagi astronot di satelit luar angkasa",
+            "Mendinginkan inti bumi agar magma gunung berapi tidak mendidih",
+            "Menahan gaya gravitasi bulan agar air laut tidak terlempar ke angkasa"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Molekul ozon (O3) menyerap radiasi foton UV matahari berenergi tinggi, melindungi DNA organisme hidup dari bahaya mutasi genetik, kanker kulit, dan katarak mata."
+          },
+          "distractorWhy": {
+            "1": "Lapisan stratosfer berkonsentrasi ozon tipis dan tidak dapat dihirup manusia tanpa alat bantu.",
+            "2": "Ozon atmosfer tidak memengaruhi dinamika konveksi magma mantel kerak bumi.",
+            "3": "Gaya gravitasi diatur oleh massa kebumian tanpa kaitan dengan konsentrasi gas ozon."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB7-01"
+          }
+        },
+        {
+          "id": "ipa-d-7-b7-q15",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 211-213), wilayah kepulauan Indonesia sangat rawan mengalami gempa bumi tektonik dan memiliki banyak gunung api aktif (Ring of Fire) karena terletak pada…",
+          "options": [
+            "Pertemuan tiga lempeng tektonik aktif dunia yaitu Lempeng Indo-Australia, Lempeng Eurasia, dan Lempeng Pasifik",
+            "Pusat gravitasi kutub magnet utara bumi",
+            "Pusat lubang hitam di dasar samudra Hindia",
+            "Jalur lintasan komet yang menabrak bumi setiap bulan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Indonesia berada di zona subduksi aktif pertemuan lempeng tektonik Eurasia di utara, Indo-Australia di selatan, dan Pasifik di timur, memicu seismisitas tinggi dan busur vulkanisme aktif."
+          },
+          "distractorWhy": {
+            "1": "Indonesia berada di kawasan khatulistiwa ekuator, bukan kutub magnet bumi.",
+            "2": "Tidak ada lubang hitam di dalam samudra bumi.",
+            "3": "Gempa bumi dan gunung api dipicu dinamika litosfer mantel bumi, bukan tabrakan komet."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB7-01"
+          }
+        },
+        {
+          "id": "ipa-d-7-b7-q16",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VII (hal. 214), tindakan mitigasi bencana yang paling tepat dan aman saat seseorang berada di dalam ruangan kelas ketika terjadi guncangan GEMPA BUMI kuat adalah…",
+          "options": [
+            "Berlutut, berlindung di bawah meja yang kokoh (drop, cover, hold on), dan menjauhi jendela kaca serta benda gantung",
+            "Segera berlari berebut menuruni tangga darurat secara panik dan berdesakan",
+            "Berdiri di dekat lemari kaca yang tinggi agar terlihat oleh tim penyelamat",
+            "Melompat keluar melalui jendela lantai dua tanpa pengaman"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Prinsip evakuasi gempa: Drop, Cover, Hold On (merunduk, lindungi kepala di bawah meja kokoh, dan berpegangan) mencegah cedera fatal akibat tertimpa reruntuhan plafon dan pecahan kaca."
+          },
+          "distractorWhy": {
+            "1": "Berlari panik di tangga saat guncangan gempa sangat berisiko terinjak dan jatuh dari tangga.",
+            "2": "Lemari kaca mudah roboh dan pecah menimpa tubuh saat guncangan gempa kuat.",
+            "3": "Melompat dari lantai atas menyebabkan risiko patah tulang dan cedera parah seketika."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 5",
+            "bab": "KOMP-IPA-D-7-BAB7-01"
+          }
+        }
+      ]
+    },
+    {
+      "code": "KOMP-IPA-D-8-BAB1-01",
+      "grade": 8,
+      "name": "Pengenalan Sel",
+      "materi": "",
+      "cpRef": "Matematika untuk SMP/MTs Kelas VII — Bab 2",
+      "target": 20,
+      "items": [
+        {
+          "id": "ipa-d-8-b1-q01",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 6-10), organel sel yang berfungsi sebagai pusat pengendali seluruh aktivitas sel serta menyimpan informasi genetik (DNA) adalah…",
+          "options": [
+            "Nukleus (inti sel)",
+            "Mitokondria",
+            "Ribosom",
+            "Lisosom"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Nukleus (inti sel) mengandungi materi genetik (DNA/kromosom) dan mengatur sintesis protein serta pembelahan sel."
+          },
+          "distractorWhy": {
+            "1": "Mitokondria adalah tempat pembentukan energi (respirasi sel).",
+            "2": "Ribosom adalah tempat sintesis protein.",
+            "3": "Lisosom berisi enzim pencernaan intraseluler."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 2",
+            "bab": "KOMP-IPA-D-8-BAB1-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b1-q02",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 14-16 Perbedaan Sel Tumbuhan dan Sel Hewan), organel sel berikut yang HANYA ditemukan pada sel tumbuhan dan TIDAK ada pada sel hewan adalah…",
+          "options": [
+            "Dinding sel dan kloroplas",
+            "Mitokondria dan membran sel",
+            "Nukleus dan sitoplasma",
+            "Ribosom dan retikulum endoplasma"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Sel tumbuhan memiliki dinding sel kaku (selulosa) dan kloroplas (fotosintesis) yang tidak dimiliki sel hewan."
+          },
+          "distractorWhy": {
+            "1": "Mitokondria dan membran sel ada pada sel tumbuhan dan sel hewan.",
+            "2": "Nukleus dan sitoplasma dimiliki oleh kedua jenis sel eukariotik.",
+            "3": "Ribosom dan RE ada pada sel hewan dan tumbuhan."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 2",
+            "bab": "KOMP-IPA-D-8-BAB1-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b1-q03",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 18 Spesialisasi Sel), sel tumbuhan yang terspesialisasi memiliki rambut-rambut halus untuk memperluas bidang penyerapan air dan garam mineral dari tanah adalah…",
+          "options": [
+            "Sel akar rambut (epidermis akar)",
+            "Sel stomata daun",
+            "Sel xilem pembuluh kayu",
+            "Sel floem pembuluh tapis"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Sel rambut akar merupakan modifikasi epidermis akar yang berfungsi meningkatkan luas permukaan absorpsi air tanah."
+          },
+          "distractorWhy": {
+            "1": "Stomata berfungsi untuk pertukaran gas O₂/CO₂ dan transpirasi.",
+            "2": "Xilem mengangkut air dari akar ke daun.",
+            "3": "Floem mengangkut hasil fotosintesis dari daun ke seluruh tubuh."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 2",
+            "bab": "KOMP-IPA-D-8-BAB1-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b1-q04",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 22 Mikroskop), saat mengamati preparat sel gabus menggunakan mikroskop cahaya, jika objek terlihat buram dan kurang jelas, bagian mikroskop yang harus diputar untuk memperjelas fokus bayangan secara halus adalah…",
+          "options": [
+            "Mikrometer (pemutar halus)",
+            "Makrometer (pemutar kasar)",
+            "Revolver pemutar lensa",
+            "Diafragma pengatur cahaya"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Mikrometer (pemutar halus) digunakan untuk menajamkan fokus bayangan objek preparat secara presisi."
+          },
+          "distractorWhy": {
+            "1": "Makrometer digunakan untuk menaik-turunkan tabung/meja secara cepat untuk mencari fokus awal.",
+            "2": "Revolver untuk mengganti perbesaran lensa objektif.",
+            "3": "Diafragma untuk mengatur intensitas cahaya yang masuk."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 2",
+            "bab": "KOMP-IPA-D-8-BAB1-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b1-q05",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 8), organel sel yang dikenal sebagai 'pabrik energi' tempat berlangsungnya respirasi seluler untuk menghasilkan ATP adalah…",
+          "options": [
+            "Mitokondria",
+            "Badan Golgi",
+            "Vakuola",
+            "Peroksisom"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Mitokondria mengoksidasi glukosa menjadi energi kimia dalam bentuk ATP melalui proses respirasi sel."
+          },
+          "distractorWhy": {
+            "1": "Badan Golgi memodifikasi dan mengemas protein/lipid.",
+            "2": "Vakuola menyimpan cadangan makanan dan zat sisa.",
+            "3": "Peroksisom menetralkan racun hidrogen peroksida."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 2",
+            "bab": "KOMP-IPA-D-8-BAB1-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b1-q06",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 25 Spesialisasi Sel Hewan), sel darah merah (eritrosit) manusia memiliki bentuk bikonkaf dan tidak memiliki inti sel saat dewasa. Adaptasi struktur ini bertujuan untuk…",
+          "options": [
+            "Memaksimalkan ruang untuk mengikat molekul hemoglobin dan mengangkut oksigen secara efisien",
+            "Memudahkan sel bergerak aktif memakan bakteri patogen",
+            "Mempercepat pembekuan darah saat terjadi luka",
+            "Menghasilkan antibodi kekebalan tubuh"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Hilangnya inti sel memberi ruang maksimum bagi hemoglobin untuk mengikat O₂ dari paru-paru ke jaringan tubuh."
+          },
+          "distractorWhy": {
+            "1": "Memakan bakteri adalah fungsi sel darah putih (leukosit fagosit).",
+            "2": "Pembekuan darah dilakukan oleh keping darah (trombosit).",
+            "3": "Antibodi dihasilkan oleh limfosit B (sel darah putih)."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 2",
+            "bab": "KOMP-IPA-D-8-BAB1-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b1-q07",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 28 Uji Kemampuan Bab 1), urutan tingkat organisasi kehidupan dari yang terkecil hingga terbesar adalah…",
+          "options": [
+            "Sel -> Jaringan -> Organ -> Sistem Organ -> Organisme",
+            "Organisme -> Sistem Organ -> Organ -> Jaringan -> Sel",
+            "Jaringan -> Sel -> Organ -> Organisme -> Sistem Organ",
+            "Sel -> Organ -> Jaringan -> Organisme -> Sistem Organ"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Tingkat hirarki biologis diawali dari unit terkecil sel, kumpulan sel sejenis membentuk jaringan, jaringan membentuk organ, organ menyusun sistem organ, dan seluruh sistem membentuk organisme."
+          },
+          "distractorWhy": {
+            "1": "Urutan terbalik dari terbesar ke terkecil.",
+            "2": "Jaringan berada di atas sel.",
+            "3": "Organ berada setelah jaringan."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 2",
+            "bab": "KOMP-IPA-D-8-BAB1-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b1-q08",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 12), cairan sel yang mengisi ruangan di antara membran sel dan inti sel tempat organel-organel berada dinamakan…",
+          "options": [
+            "Sitoplasma",
+            "Nukleoplasma",
+            "Cairan selulosa",
+            "Serum biologis"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Sitoplasma adalah matriks koloid berisi air, garam, dan molekul organik yang menjadi tempat organel melayang."
+          },
+          "distractorWhy": {
+            "1": "Nukleoplasma adalah cairan khusus di dalam inti sel (nukleus).",
+            "2": "Selulosa adalah penyusun dinding sel tumbuhan.",
+            "3": "Serum adalah bagian cairan darah tanpa fibrinogen."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 2",
+            "bab": "KOMP-IPA-D-8-BAB1-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b1-q09",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 20), perbesaran total sebuah mikroskop jika lensa okuler memiliki perbesaran 10x dan lensa objektif yang digunakan memiliki perbesaran 40x adalah…",
+          "options": [
+            "400x",
+            "50x",
+            "30x",
+            "4000x"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Perbesaran total mikroskop = perbesaran okuler × perbesaran objektif = 10 × 40 = 400x."
+          },
+          "distractorWhy": {
+            "1": "Nilai 50x terjadi karena salah mengoperasikan penjumlahan 10 + 40.",
+            "2": "Nilai 30x terjadi karena pengurangan 40 - 10.",
+            "3": "Nilai 4000x salah perkalian."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 2",
+            "bab": "KOMP-IPA-D-8-BAB1-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b1-q10",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 30 Bab 1), proses masuknya molekul air dari daerah konsentrasi air tinggi (hipotonis) ke konsentrasi air rendah (hipertonis) melalui membran semipermeabel dinamakan…",
+          "options": [
+            "Osmosis",
+            "Difusi terfasilitasi",
+            "Endositosis",
+            "Transpor aktif eksositosis"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Osmosis adalah pergerakan khusus molekul pelarut (air) melintasi membran selektif permeabel mengikuti gradien konsentrasi."
+          },
+          "distractorWhy": {
+            "1": "Difusi terfasilitasi melibatkan molekul terlarut dengan bantuan protein pembawa.",
+            "2": "Endositosis adalah pembungkusan partikel besar oleh membran.",
+            "3": "Transpor aktif membutuhkan energi ATP."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 2",
+            "bab": "KOMP-IPA-D-8-BAB1-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b1-q11",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 15), zat warna hijau (pigmen) yang terdapat di dalam kloroplas dan berperan menyerap energi cahaya matahari saat fotosintesis adalah…",
+          "options": [
+            "Klorofil",
+            "Karotenoid",
+            "Antosianin",
+            "Fukosantin"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Klorofil adalah pigmen hijau utama pada sel tumbuhan untuk mengabsorpsi spektrum cahaya matahari."
+          },
+          "distractorWhy": {
+            "1": "Karotenoid adalah pigmen oranye/kuning.",
+            "2": "Antosianin adalah pigmen merah/ungu.",
+            "3": "Fukosantin adalah pigmen cokelat pada alga."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 2",
+            "bab": "KOMP-IPA-D-8-BAB1-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b1-q12",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 26), vakuola pada sel tumbuhan berukuran besar (vakuola sentral) yang berfungsi utama untuk…",
+          "options": [
+            "Menyimpan air, cadangan makanan, pigmen, dan menjaga tekanan turgor sel",
+            "Menghasilkan energi listrik kimia sel",
+            "Mencerna kuman patogen yang masuk ke dalam sel",
+            "Membentuk serabut benang spindel saat pembelahan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Vakuola sentral tumbuhan berfungsi menampung cairan sel, metabolit sekunder, dan mempertahankan ketegaran (turgiditas) sel."
+          },
+          "distractorWhy": {
+            "1": "Fungsi mitokondria.",
+            "2": "Fungsi lisosom.",
+            "3": "Fungsi sentriol."
+          },
+          "sumber": {
+            "dokumen": "Matematika untuk SMP/MTs Kelas VII — Bab 2",
+            "bab": "KOMP-IPA-D-8-BAB1-01"
+          }
+        }
+      ]
+    },
+    {
+      "code": "KOMP-IPA-D-8-BAB2-01",
+      "grade": 8,
+      "name": "Struktur dan Fungsi Tubuh Makhluk Hidup",
+      "materi": "",
+      "cpRef": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 2",
+      "target": 12,
+      "items": [
+        {
+          "id": "ipa-d-8-b2-q01",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 42-46 Sistem Pencernaan), enzim ptialin (amilase mulut) yang dihasilkan oleh kelenjar ludah berfungsi untuk mencerna…",
+          "options": [
+            "Karbohidrat (amilum) menjadi gula sederhana (maltosa)",
+            "Protein menjadi pepton",
+            "Lemak menjadi asam lemak dan gliserol",
+            "Vitamin menjadi asam amino"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Enzim amilase/ptialin dalam rongga mulut memecah polisakarida pati (amilum) menjadi disakarida maltosa."
+          },
+          "distractorWhy": {
+            "1": "Pencernaan protein oleh enzim pepsin lambung.",
+            "2": "Pencernaan lemak oleh enzim lipase pankreas/usus.",
+            "3": "Vitamin tidak dipecah menjadi asam amino."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 2",
+            "bab": "KOMP-IPA-D-8-BAB2-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b2-q02",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 52-56 Sistem Peredaran Darah), ruang jantung manusia yang berfungsi memompa darah kaya oksigen (O₂) ke seluruh tubuh melalui pembuluh darah aorta adalah…",
+          "options": [
+            "Bilik kiri (ventrikel kiri)",
+            "Serambi kanan (atrium kanan)",
+            "Bilik kanan (ventrikel kanan)",
+            "Serambi kiri (atrium kiri)"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Ventricle kiri memiliki otot dinding tertebal untuk memompa darah bersih bersirkulasi ke seluruh sistemik tubuh."
+          },
+          "distractorWhy": {
+            "1": "Serambi kanan menerima darah kotor kaya CO₂ dari seluruh tubuh.",
+            "2": "Bilik kanan memompa darah kotor ke paru-paru.",
+            "3": "Serambi kiri menerima darah bersih dari paru-paru."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 2",
+            "bab": "KOMP-IPA-D-8-BAB2-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b2-q03",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 65 Sistem Pernapasan), proses pertukaran gas oksigen (O₂) dan karbondioksida (CO₂) secara difusi di dalam paru-paru terjadi pada struktur…",
+          "options": [
+            "Alveolus",
+            "Bronkus",
+            "Trakea",
+            "Laring"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Alveolus berupa kantung udara berdinding tipis yang dikelilingi kapiler darah tempat pertukaran gas difusi."
+          },
+          "distractorWhy": {
+            "1": "Bronkus adalah cabang batang tenggorokan.",
+            "2": "Trakea adalah saluran pipa pernapasan utama.",
+            "3": "Laring adalah pangkal tenggorokan pita suara."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 2",
+            "bab": "KOMP-IPA-D-8-BAB2-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b2-q04",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 74-78 Sistem Ekskresi), proses pembentukan urine di dalam ginjal yang terjadi pada bagian glomerulus berupa penyaringan sel-sel darah dan protein dinamakan…",
+          "options": [
+            "Filtrasi (penyaringan)",
+            "Reabsorpsi (penyerapan kembali)",
+            "Augmentasi (pengeluaran zat sisa)",
+            "Defekasi (pembuangan feses)"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Filtrasi glomerulus menghasilkan urine primer yang bebas dari sel darah dan molekul protein besar."
+          },
+          "distractorWhy": {
+            "1": "Reabsorpsi terjadi di tubulus kontortus proksimal (menyerap zat berguna).",
+            "2": "Augmentasi terjadi di tubulus kontortus distal (membentuk urine sebenarnya).",
+            "3": "Defekasi adalah pembuangan sisa pencernaan usus besar."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 2",
+            "bab": "KOMP-IPA-D-8-BAB2-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b2-q05",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 48), organ pencernaan yang berfungsi utama menyerap air dan garam mineral dari sisa makanan serta membentuk feses adalah…",
+          "options": [
+            "Usus besar (kolon)",
+            "Usus halus (ileum)",
+            "Lambung",
+            "Kerongkongan (esofagus)"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Usus besar mengabsorpsi sisa air dan pembusukan materi makanan oleh bakteri E. coli."
+          },
+          "distractorWhy": {
+            "1": "Usus halus menyerap sari-sari makanan (nutrisi).",
+            "2": "Lambung mencerna makanan secara kimiawi dan mekanis.",
+            "3": "Kerongkongan menyalurkan makanan via gerak peristaltik."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 2",
+            "bab": "KOMP-IPA-D-8-BAB2-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b2-q06",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 82 Uji Kemampuan Bab 2), gangguan pada sistem peredaran darah berupa penyumbatan pembuluh darah arteri koroner jantung oleh endapan lemak/kolesterol dinamakan…",
+          "options": [
+            "Aterosklerosis (penyakit jantung koroner)",
+            "Anemia",
+            "Leukemia",
+            "Hemofilia"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Aterosklerosis adalah penyempitan arteri akibat plak kolesterol yang mengganggu pasokan O₂ ke otot jantung."
+          },
+          "distractorWhy": {
+            "1": "Anemia adalah kekurangan sel darah merah / hemoglobin.",
+            "2": "Leukemia adalah kanker sel darah putih berlebihan.",
+            "3": "Hemofilia adalah kelainan darah sulit membeku."
+          },
+          "sumber": {
+            "dokumen": "Bahasa Indonesia untuk SMP/MTs Kelas VII (Edisi Revisi) — Bab 2",
+            "bab": "KOMP-IPA-D-8-BAB2-01"
+          }
+        }
+      ]
+    },
+    {
+      "code": "KOMP-IPA-D-8-BAB3-01",
+      "grade": 8,
+      "name": "Usaha, Energi, dan Pesawat Sederhana",
+      "materi": "",
+      "cpRef": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+      "target": 18,
+      "items": [
+        {
+          "id": "ipa-d-8-b3-q01",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 92-95), besarnya usaha (W) yang dilakukan oleh suatu gaya (F) untuk memindahkan benda sejauh perpindahan (s) dirumuskan sebagai…",
+          "options": [
+            "W = F × s",
+            "W = F / s",
+            "W = m × g",
+            "W = F + s"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Usaha secara fisis adalah hasil kali antara gaya yang searah dengan arah perpindahan benda: W = F × s."
+          },
+          "distractorWhy": {
+            "1": "Pembagian F/s keliru.",
+            "2": "m × g adalah rumus gaya berat (w).",
+            "3": "Penjumlahan F + s keliru."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB3-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b3-q02",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 98), sebuah balok didorong dengan gaya sebesar 50 N sehingga berpindah sejauh 4 meter. Usaha yang dilakukan pada balok tersebut adalah…",
+          "options": [
+            "200 Joule",
+            "12,5 Joule",
+            "54 Joule",
+            "20 Joule"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "W = F × s = 50 N × 4 m = 200 Joule."
+          },
+          "distractorWhy": {
+            "1": "50 / 4 = 12,5 J.",
+            "2": "50 + 4 = 54 J.",
+            "3": "50 - 4 = 46 J."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB3-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b3-q03",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 102 Energi Potensial), buah kelapa bermassa 2 kg berada pada ketinggian 10 meter di atas tanah. Jika percepatan gravitasi bumi g = 10 m/s², energi potensial gravitasinya adalah…",
+          "options": [
+            "200 Joule",
+            "20 Joule",
+            "100 Joule",
+            "50 Joule"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Ep = m × g × h = 2 kg × 10 m/s² × 10 m = 200 Joule."
+          },
+          "distractorWhy": {
+            "1": "2 × 10 = 20 J.",
+            "2": "2 × 10 × 5 = 100 J.",
+            "3": "200 / 4 = 50 J."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB3-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b3-q04",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 108 Tuas/Pengungkit), sebuah linggis digunakan untuk mengangkat batu seberat 600 N. Jika lengan beban 0,5 m dan lengan kuasa 1,5 m, gaya kuasa minimum yang diperlukan adalah…",
+          "options": [
+            "200 N",
+            "1800 N",
+            "300 N",
+            "1200 N"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Prinsip tuas: w × lb = F × lk => F = (w × lb) / lk = (600 × 0,5) / 1,5 = 300 / 1,5 = 200 N."
+          },
+          "distractorWhy": {
+            "1": "600 × 3 = 1800 N.",
+            "2": "600 × 0,5 = 300 N.",
+            "3": "600 × 2 = 1200 N."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB3-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b3-q05",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 112 Bidang Miring), bidang miring memudahkan pekerjaan manusia karena…",
+          "options": [
+            "Memperkecil gaya kuasa yang dibutuhkan untuk memindahkan benda ke tempat yang lebih tinggi",
+            "Mengurangi total usaha yang dilakukan menjadi nol",
+            "Memperpendek lintasan perpindahan benda",
+            "Menghilangkan gaya gesek secara sempurna"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Bidang miring memperpanjang lintasan sehingga gaya dorong/tarik (kuasa) yang diperlukan menjadi lebih kecil."
+          },
+          "distractorWhy": {
+            "1": "Usaha total tetap sama.",
+            "2": "Lintasan bidang miring justru lebih panjang.",
+            "3": "Gaya gesek tidak dihilangkan."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB3-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b3-q06",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 115 Katrol), keuntungan mekanis dari sebuah katrol tetap tunggal yang digunakan untuk menimba air di sumur adalah…",
+          "options": [
+            "1",
+            "2",
+            "3",
+            "4"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Katrol tetap tunggal memiliki keuntungan mekanis KM = 1 (hanya mengubah arah gaya)."
+          },
+          "distractorWhy": {
+            "1": "KM = 2 adalah milik katrol bebas tunggal.",
+            "2": "KM = 3 milik sistem katrol 3 tali.",
+            "3": "KM = 4 milik sistem katrol 4 tali."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB3-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b3-q07",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 118 Energi Kinetik), benda bermassa 4 kg bergerak dengan kecepatan v = 5 m/s. Energi kinetik benda tersebut adalah…",
+          "options": [
+            "50 Joule",
+            "100 Joule",
+            "20 Joule",
+            "10 Joule"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Ek = 1/2 × m × v² = 1/2 × 4 kg × (5 m/s)² = 2 × 25 = 50 Joule."
+          },
+          "distractorWhy": {
+            "1": "4 × 25 = 100 J.",
+            "2": "4 × 5 = 20 J.",
+            "3": "1/2 × 4 × 5 = 10 J."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB3-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b3-q08",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 120), pesawat sederhana yang prinsip kerjanya berdasarkan roda berporos contohnya adalah…",
+          "options": [
+            "Roda gigi (gear) pada sepeda balap",
+            "Tang pemotong kawat",
+            "Pisau dapur dapur",
+            "Papan seluncur anak-anak"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Roda gigi sepeda menggunakan prinsip roda berporos untuk mengubah laju putaran dan gaya mekanis."
+          },
+          "distractorWhy": {
+            "1": "Tang adalah pengungkit jenis I.",
+            "2": "Pisau adalah bidang miring.",
+            "3": "Papan seluncur adalah bidang miring."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB3-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b3-q09",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 122), alat berikut yang memanfaatkan prinsip tuas jenis pertama (titik tumpu berada di antara titik beban dan titik kuasa) adalah…",
+          "options": [
+            "Gunting kertas dan jungkit-jungkit",
+            "Gerobak dorong roda satu",
+            "Pinset alis",
+            "Pemotong kertas guilotik"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Gunting memiliki engsel (tumpu) di tengah antara pegangan (kuasa) dan mata gunting (beban)."
+          },
+          "distractorWhy": {
+            "1": "Gerobak roda satu adalah tuas jenis II (beban di tengah).",
+            "2": "Pinset adalah tuas jenis III (kuasa di tengah).",
+            "3": "Pemotong kertas adalah tuas jenis II."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB3-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b3-q10",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 126), keuntungan mekanis bidang miring sepanjang s = 6 meter dengan ketinggian h = 2 meter adalah…",
+          "options": [
+            "3",
+            "12",
+            "0,33",
+            "4"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "KM bidang miring = s / h = 6 m / 2 m = 3."
+          },
+          "distractorWhy": {
+            "1": "6 × 2 = 12.",
+            "2": "2 / 6 = 0,33.",
+            "3": "6 - 2 = 4."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB3-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b3-q11",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 100), hukum kekekalan energi mekanik menyatakan bahwa…",
+          "options": [
+            "Energi tidak dapat diciptakan dan tidak dapat dimusnahkan, tetapi hanya dapat berubah bentuk dari satu energi ke energi lain",
+            "Energi mekanik selalu berkurang akibat adanya gaya gravitasi",
+            "Energi potensial selalu bernilai sama dengan nol saat benda diam",
+            "Energi kinetik hanya ada pada benda bernyawa"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Hukum Kekekalan Energi menyatakan energi alam semesta konstan dan berubah bentuk."
+          },
+          "distractorWhy": {
+            "1": "Energi mekanik konstan jika tak ada gesekan.",
+            "2": "Ep = mgh tergantung ketinggian.",
+            "3": "Energi kinetik ada pada semua benda bergerak."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB3-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b3-q12",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 110), tuas jenis kedua ditandai oleh posisi…",
+          "options": [
+            "Beban berada di antara titik tumpu dan titik kuasa",
+            "Titik tumpu di antara beban dan kuasa",
+            "Titik kuasa di antara tumpu dan beban",
+            "Titik tumpu dan beban menyatu"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Tuas jenis II menempatkan beban di tengah (misal gerobak roda satu, pembuka tutup botol)."
+          },
+          "distractorWhy": {
+            "1": "Tuas jenis I.",
+            "2": "Tuas jenis III.",
+            "3": "Tidak sesuai jenis tuas."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB3-01"
+          }
+        }
+      ]
+    },
+    {
+      "code": "KOMP-IPA-D-8-BAB4-01",
+      "grade": 8,
+      "name": "Tekanan",
+      "materi": "",
+      "cpRef": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+      "target": 19,
+      "items": [
+        {
+          "id": "ipa-d-8-b4-q01",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 132-135), faktor-faktor yang mempengaruhi besarnya tekanan (P) pada zat padat adalah…",
+          "options": [
+            "Gaya tekan (F) dan luas bidang tekan (A)",
+            "Massa jenis dan suhu ruangan",
+            "Volume benda dan warna permukaan",
+            "Ketinggian dan kecepatan gerak"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Tekanan zat padat berbanding lurus dengan gaya tekan F dan berbanding terbalik dengan luas A: P = F / A."
+          },
+          "distractorWhy": {
+            "1": "Suhu bukan faktor langsung zat padat.",
+            "2": "Warna tidak mempengaruhi tekanan.",
+            "3": "Kecepatan gerak bukan faktor P = F/A."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB4-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b4-q02",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 138), sepatu hak tinggi (high heels) menimbulkan tekanan yang lebih besar pada tanah dibanding sepatu sol datar karena…",
+          "options": [
+            "Luas permukaan bidang tekan ujung hak sangat kecil sehingga tekanan menjadi besar",
+            "Massa orang yang memakai hak tinggi bertambah secara drastis",
+            "Gaya gravitasi bekerja lebih kuat pada hak tinggi",
+            "Bahan sepatu terbuat dari logam berat"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Semakin kecil luas bidang tekan A, semakin besar nilai tekanan P yang dihasilkan."
+          },
+          "distractorWhy": {
+            "1": "Massa orang tetap sama.",
+            "2": "Gaya gravitasi tidak berubah.",
+            "3": "Bahan sepatu tidak merubah konsep P = F/A."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB4-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b4-q03",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 142 Tekanan Hidrostatis), besarnya tekanan hidrostatis di dalam zat cair dipengaruhi oleh…",
+          "options": [
+            "Massa jenis zat cair (rho), percepatan gravitasi (g), dan kedalaman (h)",
+            "Bentuk wadah penampung air",
+            "Luas permukaan bagian atas tempat air",
+            "Warna zat cair"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "P_hidrostatis = rho × g × h (makin dalam h, makin besar tekanan)."
+          },
+          "distractorWhy": {
+            "1": "Bentuk wadah tidak mempengaruhi (bejana berhubungan).",
+            "2": "Luas permukaan tidak masuk rumus.",
+            "3": "Warna zat cair irrelevan."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB4-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b4-q04",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 148 Hukum Archimedes), sebuah benda melayang di dalam air jika…",
+          "options": [
+            "Massa jenis benda sama dengan massa jenis air (rho_benda = rho_air)",
+            "Massa jenis benda lebih besar dari air",
+            "Massa jenis benda lebih kecil dari air",
+            "Benda tidak memiliki massa jenis"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Syarat melayang: gaya apung Fa sama dengan berat benda w, yang terjadi saat rho_benda = rho_cair."
+          },
+          "distractorWhy": {
+            "1": "Syarat tenggelam.",
+            "2": "Syarat terapung.",
+            "3": "Semua zat bermassa pasti punya massa jenis."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB4-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b4-q05",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 154 Hukum Pascal), hukum Pascal dimanfaatkan pada alat teknologi yaitu…",
+          "options": [
+            "Pompa hidrolik pengangkat mobil dan rem hidrolik",
+            "Teleskop bintang",
+            "Kapal terbang baling-baling",
+            "Termometer raksa"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Hukum Pascal meneruskan tekanan di ruang tertutup secara merata ke segala arah (mesin hidrolik)."
+          },
+          "distractorWhy": {
+            "1": "Teleskop adalah alat optik.",
+            "2": "Baling-baling kapal terbang aerodinamika Bernoulli.",
+            "3": "Termometer adalah pemuaian termal."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB4-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b4-q06",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 160 Tekanan Gas), alat yang digunakan untuk mengukur tekanan udara luar (atmosfer) dinamakan…",
+          "options": [
+            "Barometer",
+            "Manometer",
+            "Hygrometer",
+            "Termometer"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Barometer (misal barometer Torricelli) mengukur tekanan udara atmosfer."
+          },
+          "distractorWhy": {
+            "1": "Manometer mengukur tekanan gas ruang tertutup.",
+            "2": "Hygrometer mengukur kelembapan udara.",
+            "3": "Termometer mengukur suhu."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB4-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b4-q07",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 165 Aplikasi Biologi), air dan mineral dari tanah dapat naik sampai ke daun pohon yang tinggi akibat adanya…",
+          "options": [
+            "Tekanan akar, kapilaritas batang, dan daya isap daun (transpirasi)",
+            "Gaya dorong angin malam",
+            "Pembakaran fotosintesis di akar",
+            "Gerak otot tumbuhan"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pengangkutan air pada tumbuhan memanfaatkan kombinasi tekanan kapiler xilem dan daya isap transpirasi daun."
+          },
+          "distractorWhy": {
+            "1": "Angin malam bukan faktor internal.",
+            "2": "Fotosintesis di daun bukan di akar.",
+            "3": "Tumbuhan tidak memiliki jaringan otot."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB4-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b4-q08",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 136), satuan tekanan dalam Sistem Internasional (SI) adalah…",
+          "options": [
+            "N/m² atau Pascal (Pa)",
+            "Joule (J)",
+            "Watt (W)",
+            "Newton (N)"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Tekanan P = F/A memiliki satuan N/m² yang disebut Pascal (Pa)."
+          },
+          "distractorWhy": {
+            "1": "Joule adalah satuan energi/usaha.",
+            "2": "Watt adalah satuan daya.",
+            "3": "Newton adalah satuan gaya."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB4-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b4-q09",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 145), penyelam yang menyelam lebih dalam di laut akan merasakan telinganya sakit karena…",
+          "options": [
+            "Tekanan hidrostatis air semakin besar seiring bertambahnya kedalaman",
+            "Suhu air laut menjadi sangat panas",
+            "Kadar garam air laut memudar",
+            "Kandungan oksigen meningkat tajam"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "P = rho × g × h. Makin dalam (h besar), tekanan air pada gendang telinga makin kuat."
+          },
+          "distractorWhy": {
+            "1": "Air laut makin dalam justru makin dingin.",
+            "2": "Kadar garam tidak mempengaruhi tekanan gendang telinga.",
+            "3": "Oksigen bukan penyebab tekanan hidrostatis."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB4-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b4-q10",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 150), kapal laut yang terbuat dari besi baja dapat mengapung di permukaan air laut karena…",
+          "options": [
+            "Bentuk lambung kapal berongga sehingga volume total kapal sangat besar dan massa jenis rata-rata kapal lebih kecil dari massa jenis air",
+            "Besi baja dilapisi minyak tebal",
+            "Kapal ditarik oleh arus permukaan",
+            "Air laut menolak logam besi"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Rongga udara kapal memperbesar volume total sehingga massa jenis rata-rata kapal < rho_air."
+          },
+          "distractorWhy": {
+            "1": "Minyak tidak merubah prinsip Archimedes.",
+            "2": "Arus bukan penentu terapung.",
+            "3": "Air tidak menolak besi."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB4-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b4-q11",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 162), semakin tinggi suatu tempat dari permukaan laut (misal di puncak gunung), maka tekanan udaranya akan…",
+          "options": [
+            "Semakin kecil",
+            "Semakin besar",
+            "Tetap sama persis",
+            "Menjadi nol serta merta"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Ketinggian tempat bertambah => kerapatan dan tebal lapisan udara di atasnya berkurang => tekanan udara mengecil."
+          },
+          "distractorWhy": {
+            "1": "Tekanan besar ada di dataran rendah.",
+            "2": "Tekanan bervariasi terhadap ketinggian.",
+            "3": "Tekanan di gunung belum nol."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB4-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b4-q12",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 168), alat medis sphygmomanometer (tensi darah) bekerja berdasarkan prinsip…",
+          "options": [
+            "Tekanan cairan dan gas dalam ruang tertutup (Hukum Pascal)",
+            "Hukum Pembiasan Cahaya Snellius",
+            "Hukum Kekekalan Energi Mekanik",
+            "Gaya Gesek Statis"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Tensi darah mengukur tekanan pembuluh darah arteri manset tekan berdasarkan transmisi tekanan cair/gas."
+          },
+          "distractorWhy": {
+            "1": "Prinsip optik tidak relevan.",
+            "2": "Prinsip energi mekanik bukan dasar tensi.",
+            "3": "Gaya gesek bukan dasar tensi."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB4-01"
+          }
+        }
+      ]
+    },
+    {
+      "code": "KOMP-IPA-D-8-BAB5-01",
+      "grade": 8,
+      "name": "Getaran, Gelombang, dan Cahaya",
+      "materi": "",
+      "cpRef": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+      "target": 12,
+      "items": [
+        {
+          "id": "ipa-d-8-b5-q01",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 175-178), jumlah getaran yang terjadi dalam waktu satu detik dinamakan…",
+          "options": [
+            "Frekuensi (f)",
+            "Periode (T)",
+            "Amplitudo (A)",
+            "Panjang gelombang (lambda)"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Frekuensi (f = n/t) diukur dalam Hertz (Hz) menyatakan banyaknya getaran per detik."
+          },
+          "distractorWhy": {
+            "1": "Periode adalah waktu untuk satu getaran penuh.",
+            "2": "Amplitudo adalah simpangan terjauh.",
+            "3": "Panjang gelombang adalah jarak 1 gelombang."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b5-q02",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 182), jika sebuah ayunan menghasilkan 60 getaran dalam waktu 15 detik, frekuensi ayunan tersebut adalah…",
+          "options": [
+            "4 Hz",
+            "0,25 Hz",
+            "900 Hz",
+            "45 Hz"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "f = n / t = 60 / 15 = 4 Hz."
+          },
+          "distractorWhy": {
+            "1": "T = 15 / 60 = 0,25 s (periode).",
+            "2": "60 × 15 = 900.",
+            "3": "60 - 15 = 45."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b5-q03",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 186 Gelombang Longitudinal), contoh gelombang longitudinal yang arah rambatnya sejajar dengan arah getarnya adalah…",
+          "options": [
+            "Gelombang bunyi dan gelombang slinki (pegas)",
+            "Gelombang permukaan air",
+            "Gelombang cahaya tampak",
+            "Gelombang radio"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Gelombang bunyi dan slinki terdiri dari rapatan dan renggangan yang berarah sejajar rambatan."
+          },
+          "distractorWhy": {
+            "1": "Gelombang air adalah gelombang transversal.",
+            "2": "Cahaya adalah gelombang transversal elektromagnetik.",
+            "3": "Gelombang radio adalah transversal."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b5-q04",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 192 Bunyi & Ekolokasi), hewan seperti kelelawar dan lumba-lumba memanfaatkan gelombang bunyi berfrekuensi tinggi di atas 20.000 Hz untuk navigasi dinamakan…",
+          "options": [
+            "Ultrasonik",
+            "Infrasonik",
+            "Audiosonik",
+            "Supersonik"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Bunyi ultrasonik memiliki frekuensi > 20.000 Hz yang dimanfaatkan pada ekolokasi hewan dan USG medis."
+          },
+          "distractorWhy": {
+            "1": "Infrasonik < 20 Hz.",
+            "2": "Audiosonik 20 - 20.000 Hz (dengar manusia).",
+            "3": "Supersonik adalah kecepatan melebihi bunyi."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b5-q05",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 198 Sifat Cahaya), pensil yang dimasukkan sebagian ke dalam gelas berisi air bening tampak patah/bengkok karena sifat cahaya yaitu…",
+          "options": [
+            "Pembiasan cahaya (refraksi)",
+            "Pemantulan cahaya (refleksi)",
+            "Pelenturan cahaya (difraksi)",
+            "Penguraian cahaya (dispersi)"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Pembiasan terjadi saat cahaya merambat melewati dua medium dengan kerapatan optik berbeda (udara dan air)."
+          },
+          "distractorWhy": {
+            "1": "Pemantulan adalah membaliknya arah cahaya.",
+            "2": "Difraksi adalah belokan celah sempit.",
+            "3": "Dispersi adalah pemisahan warna pelangi."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b5-q06",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 204 Cermin Cembung), kaca spion kendaraan bermotor menggunakan cermin cembung karena sifat bayangan yang dihasilkan selalu…",
+          "options": [
+            "Maya, tegak, dan diperkecil sehingga jangkauan pandangan pengemudi lebih luas",
+            "Nyata, terbalik, dan diperbesar",
+            "Maya, terbalik, dan sama besar",
+            "Nyata, tegak, dan hilang"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Cermin cembung selalu membentuk bayangan maya, tegak, dan diperkecil untuk memperluas medan pandang."
+          },
+          "distractorWhy": {
+            "1": "Sifat cermin cekung jarak tertentu.",
+            "2": "Bayangan maya tidak terbalik.",
+            "3": "Sifat tidak sesuai optik."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b5-q07",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 210 Alat Optik Mata), penderita rabun jauh (miopi) tidak dapat melihat benda jauh dengan jelas karena bayangan jatuh di depan retina. Cacatan mata ini ditolong dengan kaca mata berlensa…",
+          "options": [
+            "Cekung (lensa negatif / divergen)",
+            "Cembung (lensa positif / konvergen)",
+            "Rangkap (bifokal)",
+            "Silindris"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Lensa cekung menyebarkan sinar sebelum masuk ke mata agar bayangan bergeser tepat ke retina."
+          },
+          "distractorWhy": {
+            "1": "Lensa cembung untuk rabun dekat (hipermetropi).",
+            "2": "Lensa bifokal untuk presbiopi (mata tua).",
+            "3": "Lensa silindris untuk astigmatisme."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b5-q08",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 180), rumus hubungan kecepatan rambat gelombang (v), panjang gelombang (lambda), dan frekuensi (f) adalah…",
+          "options": [
+            "v = lambda × f",
+            "v = lambda / f",
+            "v = f / lambda",
+            "v = lambda + f"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Cepat rambat gelombang v merupakan hasil kali panjang gelombang lambda dan frekuensinya f: v = lambda × f."
+          },
+          "distractorWhy": {
+            "1": "Pembagian lambda/f keliru.",
+            "2": "f/lambda keliru.",
+            "3": "Penjumlahan keliru."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b5-q09",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 190), syarat utama terjadinya gaung atau kerdam pada gedung pertunjukan adalah…",
+          "options": [
+            "Bunyi pantul terdengar hampir bersamaan sebelum bunyi asli selesai diucapkan sehingga mengaburkan kata",
+            "Bunyi pantul terdengar jelas setelah bunyi asli selesai",
+            "Terdapat peredam suara dari busa",
+            "Gedung tidak memiliki dinding"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Gaung timbul bila jarak dinding pantul dekat sehingga bunyi pantul tumpang tindih mengaburkan bunyi asli."
+          },
+          "distractorWhy": {
+            "1": "Syarat gema.",
+            "2": "Peredam busa justru mencegah gaung.",
+            "3": "Tanpa dinding tidak ada pemantulan."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b5-q10",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 215 Mikroskop Optik), bayangan akhir yang dibentuk oleh mikroskop cahaya pembesar jaringan biologis bersifat…",
+          "options": [
+            "Maya, terbalik, dan diperbesar terhadap objek asli",
+            "Nyata, tegak, dan diperkecil",
+            "Maya, tegak, dan sama besar",
+            "Nyata, terbalik, dan sama besar"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kombinasi lensa objektif dan okuler mikroskop menghasilkan bayangan akhir maya, terbalik, diperbesar."
+          },
+          "distractorWhy": {
+            "1": "Mikroskop memperbesar bayangan.",
+            "2": "Bayangan terbalik.",
+            "3": "Bayangan diperbesar."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b5-q11",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 196), bagian mata yang berfungsi mengatur jumlah cahaya yang masuk ke dalam pupil mata adalah…",
+          "options": [
+            "Iris (selaput pelangi)",
+            "Retina",
+            "Kornea",
+            "Lensa mata"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Iris memberi warna mata dan membesar/membendung bukaan pupil untuk mengatur cahaya masuk."
+          },
+          "distractorWhy": {
+            "1": "Retina adalah layar pembentuk bayangan.",
+            "2": "Kornea membiaskan cahaya di depan.",
+            "3": "Lensa mata mengatur fokus bayangan (akomodasi)."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB5-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b5-q12",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 202), pelangi terbentuk di langit setelah hujan akibat fenomena cahaya yaitu…",
+          "options": [
+            "Dispersi dan pembiasan cahaya matahari oleh titik-titik air hujan",
+            "Penyerapan penuh cahaya oleh awan",
+            "Pemantulan cermin alam",
+            "Interferensi cahaya lampu"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Dispersi memisahkan cahaya polikromatik matahari menjadi spektrum warna mejikuhibiniu melalui pembiasan titik air."
+          },
+          "distractorWhy": {
+            "1": "Penyerapan tidak menghasilkan warna.",
+            "2": "Bukan pemantulan cermin.",
+            "3": "Lampu tidak membentuk pelangi alam."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB5-01"
+          }
+        }
+      ]
+    },
+    {
+      "code": "KOMP-IPA-D-8-BAB6-01",
+      "grade": 8,
+      "name": "Unsur, Senyawa, dan Campuran",
+      "materi": "",
+      "cpRef": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+      "target": 20,
+      "items": [
+        {
+          "id": "ipa-d-8-b6-q01",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 225-228), zat tunggal yang paling sederhana dan tidak dapat diuraikan lagi menjadi zat lain secara reaksi kimia biasa dinamakan…",
+          "options": [
+            "Unsur",
+            "Senyawa",
+            "Campuran homogen",
+            "Suspensi"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Unsur adalah zat murni paling mendasar dalam tabel periodik (misal Emas/Au, Oksigen/O)."
+          },
+          "distractorWhy": {
+            "1": "Senyawa terdiri dari gabungan unsur.",
+            "2": "Campuran terdiri dari gabungan zat.",
+            "3": "Suspensi adalah campuran heterogen."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB6-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b6-q02",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 232), air (H₂O) dan garam dapur (NaCl) dikelompokkan sebagai senyawa karena…",
+          "options": [
+            "Tersusun atas dua jenis unsur atau lebih yang terikat secara kimia dengan perbandingan massa tetap",
+            "Dapat dipisahkan dengan saringan kertas sederhana",
+            "Bersifat keruh dan mengendap",
+            "Memiliki komponen yang mudah menguap"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Senyawa adalah ikatan kimia antarunsur dengan rumus dan sifat baru yang berbeda dari unsur penyusunnya."
+          },
+          "distractorWhy": {
+            "1": "Saringan kertas hanya memisahkan campuran heterogen.",
+            "2": "Air jernih dan NaCl larut sempurna.",
+            "3": "Tidak semua menguap."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB6-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b6-q03",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 238 Larutan & Koloid), contoh sistem koloid yang memiliki fase terdispersi dalam medium pendispersi (seperti susu dan santan) ditandai oleh…",
+          "options": [
+            "Tampak homogen secara kasatmata tetapi heterogen secara mikroskopis dan menunjukkan efek Tyndall",
+            "Mengendap secara cepat saat didiamkan sebentar",
+            "Bening dan bening sempurna menembus cahaya tanpa hamburan",
+            "Dapat disaring dengan kertas saring biasa"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Koloid menghamburkan berkas cahaya (Efek Tyndall) dan tidak mengendap dalam waktu singkat."
+          },
+          "distractorWhy": {
+            "1": "Sifat suspensi kasar.",
+            "2": "Sifat larutan sejati.",
+            "3": "Koloid butuh penyaring ultra."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB6-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b6-q04",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 245 Metode Pemisahan), pemisahan campuran yang didasarkan pada perbedaan titik didih antara komponen-komponennya (seperti pemisahan minyak bumi atau pembuatan air suling) dinamakan…",
+          "options": [
+            "Distilasi (penyulingan)",
+            "Filtrasi (penyaringan)",
+            "Kromatografi",
+            "Kristalisasi"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Distilasi memanaskan cairan hingga mendidih dan mengembunkan uap zat bermurni titik didih rendah."
+          },
+          "distractorWhy": {
+            "1": "Filtrasi berdasarkan perbedaan ukuran partikel.",
+            "2": "Kromatografi berdasarkan kepolaran dan kelajuan rambat.",
+            "3": "Kristalisasi menguapkan pelarut."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB6-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b6-q05",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 248 Kromatografi), pemisahan zat warna tinta atau pewarna makanan pada kertas saring dinamakan…",
+          "options": [
+            "Kromatografi kertas",
+            "Evaporasi",
+            "Sublimasi",
+            "Sentrifugasi"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kromatografi kertas menguji kapilaritas dan perambatan perbedaan kecepatan komponen warna tinta."
+          },
+          "distractorWhy": {
+            "1": "Evaporasi menguapkan pelarut air.",
+            "2": "Sublimasi perubahan padat ke gas.",
+            "3": "Sentrifugasi pemutaran cepat."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB6-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b6-q06",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 252 Kristalisasi), pembuatan garam dapur tradisional oleh petani garam di tepi pantai menggunakan metode pemisahan…",
+          "options": [
+            "Kristalisasi / Evaporasi (penguapan air laut oleh sinar matahari)",
+            "Penyulingan bertingkat",
+            "Kromatografi lapis tipis",
+            "Penyaringan mikron"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Sinar matahari menguapkan air laut sehingga meninggalkan kristal garam padat."
+          },
+          "distractorWhy": {
+            "1": "Bukan penyulingan distilasi.",
+            "2": "Bukan kromatografi.",
+            "3": "Bukan saringan mekanis."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB6-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b6-q07",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 256 Sentrifugasi), pemisahan sel darah merah dari plasma darah di laboratorium medis menggunakan alat pemutar berkecepatan tinggi yang menerapkan prinsip…",
+          "options": [
+            "Sentrifugasi",
+            "Filtrasi gravitasi",
+            "Sublimasi iodin",
+            "Distilasi vakum"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Sentrifugasi memutar sampel darah cepat sehingga gaya sentrifugal mengendapkan sel padat ke dasar tabung."
+          },
+          "distractorWhy": {
+            "1": "Filtrasi gravitasi terlalu lambat.",
+            "2": "Sublimasi untuk zat padat mudah menyublim.",
+            "3": "Distilasi untuk cairan bermolaritas beda titik didih."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB6-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b6-q08",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 230), lambang kimia untuk unsur Emas dan Besi secara berurutan adalah…",
+          "options": [
+            "Au dan Fe",
+            "Ag dan Cu",
+            "Fe dan Au",
+            "Es dan Bs"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Au (Aurum = Emas) dan Fe (Ferrum = Besi)."
+          },
+          "distractorWhy": {
+            "1": "Ag (Perak) dan Cu (Tembaga).",
+            "2": "Urutan terbalik.",
+            "3": "Singkatan salah."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB6-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b6-q09",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 235), campuran heterogen antara tepung terigu dengan air yang keruh dan mengendap jika didiamkan dinamakan…",
+          "options": [
+            "Suspensi",
+            "Larutan sejati",
+            "Koloid",
+            "Emulsi cair"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Suspensi adalah campuran heterogen dengan partikel terdispersi besar yang akan mengendap."
+          },
+          "distractorWhy": {
+            "1": "Larutan tidak mengendap.",
+            "2": "Koloid stabil.",
+            "3": "Emulsi butuh pengemulsi."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB6-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b6-q10",
+          "difficulty": "tinggi",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 260), metode pemisahan campuran pasir dan serbuk besi yang paling praktis dan cepat adalah dengan menggunakan…",
+          "options": [
+            "Magnet",
+            "Kertas saring",
+            "Corong pemisah",
+            "Lampu pemanas"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Magnet menarik besi (feromagnetik) keluar dari campuran pasir (non-magnetik)."
+          },
+          "distractorWhy": {
+            "1": "Saringan kertas tidak memisahkan padat-padat.",
+            "2": "Corong pemisah untuk cair-cair.",
+            "3": "Pemanas tidak memisahkan besi."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB6-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b6-q11",
+          "difficulty": "dasar",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 240), larutan gula dan larutan garam dapur termasuk dalam jenis campuran…",
+          "options": [
+            "Homogen (larutan)",
+            "Heterogen",
+            "Suspensi kasar",
+            "Koloid serbuk"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Campuran homogen memiliki komposisi merata sempurna sehingga zat terlarut tidak dapat dibedakan lagi."
+          },
+          "distractorWhy": {
+            "1": "Heterogen komponennya terpisah.",
+            "2": "Suspensi mengendap.",
+            "3": "Koloid menghamburkan cahaya."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB6-01"
+          }
+        },
+        {
+          "id": "ipa-d-8-b6-q12",
+          "difficulty": "sedang",
+          "prompt": "Berdasarkan Buku Siswa IPA Kelas VIII (hal. 250), metode pemisahan kapur barus (kamper) dari kotoran pasir memanfaatkan sifat perubahan wujud…",
+          "options": [
+            "Sublimasi (padat menjadi gas lalu mengkristal kembali)",
+            "Evaporasi",
+            "Pembekuan",
+            "Kondensasi cair"
+          ],
+          "answer": 0,
+          "why": {
+            "0": "Kapur barus menyublim saat dipanaskan dan mengkristal murni di permukaan dingin penutup."
+          },
+          "distractorWhy": {
+            "1": "Evaporasi pelarut air.",
+            "2": "Pembekuan cair ke padat.",
+            "3": "Kondensasi gas ke cair."
+          },
+          "sumber": {
+            "dokumen": "Ilmu Pengetahuan Alam untuk SMP/MTs Kelas VII (Edisi Revisi)",
+            "bab": "KOMP-IPA-D-8-BAB6-01"
+          }
+        }
+      ]
+    }
+  ]
+}

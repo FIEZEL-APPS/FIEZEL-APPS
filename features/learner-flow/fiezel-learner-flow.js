@@ -38,6 +38,21 @@
     { id: 'everyday', label: 'Everyday English', desc: 'Percakapan harian dan pesan singkat.' }
   ];
 
+  /* Audit F05 (2026-09-22): tujuan yang sama ditanya DUA kali - di perkenalan (bahasa murid:
+     "Sekolah", "Kampus") lalu lagi di sini dengan label Inggris ("English for school").
+     Id-nya identik dengan FiezelPersonalJourney.GOAL_IDS, jadi labelnya diambil dari profil
+     yang sama (sudah dwibahasa id/th), dan jawaban perkenalan mengisi langkah ini sendiri. */
+  function goalLabel(g) {
+    try { var J = root.FiezelPersonalJourney; if (J && J.buildGoalProfile) { var p = J.buildGoalProfile(g.id); if (p && p.id === g.id && p.label) return p.label; } } catch (_) {}
+    return g.label;
+  }
+  function onboardingGoal() {
+    try {
+      var r = JSON.parse(localStorage.getItem('fiezel-onboarding-v1') || '{}'), g = String((r && r.goal) || '');
+      return GOALS.some(function (x) { return x.id === g; }) ? g : '';
+    } catch (_) { return ''; }
+  }
+
   function bank() { return root.FiezelReviewBank; }
   function backup() { return root.FiezelProgressBackup; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (m) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[m]; }); }
@@ -389,7 +404,12 @@
     if (!res || !res.id || !Array.isArray(res.results)) return null; var s = ensureState(), B = bank();
     var correct = res.results.filter(function (r) { return r.correct; }).length;
     res.results.forEach(function (r) { record(s, r.skill || res.skill || 'grammar', !!r.correct); });
-    var meta = B && B.SKILLS[res.skill]; s.lessons.push({ at: Date.now(), skill: res.skill, area: meta ? meta.area : (res.skill || 'grammar'), kind: res.mode === 'ujian' ? 'Ujian dari guru' : t('flow.tugas-guru', 'Tugas dari guru'), title: res.title, correct: correct, total: res.results.length, minutes: res.minutes || 0 });
+    /* `selfDirected` (m025-349, temuan X5): misi kurikulum yang DIPILIH SENDIRI murid
+       bukan tugas dari guru, dan tidak boleh dicatat sebagai tugas dari guru — tidak di
+       jurnal murid, dan terutama tidak di laporan yang dibaca gurunya. Pemanggil lama
+       yang tidak mengirim ruas ini tidak berubah artinya. */
+    var mandiri = !!res.selfDirected;
+    var meta = B && B.SKILLS[res.skill]; s.lessons.push({ at: Date.now(), skill: res.skill, area: meta ? meta.area : (res.skill || 'grammar'), kind: mandiri ? t('flow.misi-mandiri', 'Misi kurikulum (pilihan sendiri)') : (res.mode === 'ujian' ? 'Ujian dari guru' : t('flow.tugas-guru', 'Tugas dari guru')), title: res.title, correct: correct, total: res.results.length, minutes: res.minutes || 0 });
     var wrong = res.results.filter(function (r) { return !r.correct; }).slice(0, 40).map(function (r) { return { i: String(r.itemId).slice(0, 40), o: Number(r.chosen) >= 0 ? Number(r.chosen) : 0 }; });
     var entry = { id: res.id, at: Date.now(), c: correct, t: res.results.length }; if (wrong.length) entry.w = wrong;
     // Catatan keluar layar milik sesi ini ikut ke hasil akhir; tanpa penggabungan ini,
@@ -398,9 +418,15 @@
     var prevFocus = (s.doneAssign || []).filter(function (x) { return x.id === res.id; })[0];
     if (res.focus && Number(res.focus.n) > 0) entry.f = { n: Math.round(Number(res.focus.n) || 0), s: Math.round(Number(res.focus.s) || 0), x: Math.round(Number(res.focus.x) || 0) };
     else if (prevFocus && prevFocus.f) entry.f = prevFocus.f;
-    s.doneAssign = (s.doneAssign || []).filter(function (x) { return x.id !== res.id; }).concat([entry]).slice(-8);
-    if (s.plan && s.plan.done.indexOf('assign-' + res.id) === -1) s.plan.done.push('assign-' + res.id);
-    try { localStorage.setItem(ASSIGN_KEY, JSON.stringify(loadAssignments().filter(function (a) { return a.id !== res.id; }))); } catch (_) {}
+    /* `doneAssign` adalah persis yang dikirim ke guru (lihat tutorCode: `assign`). Misi
+       mandiri tidak masuk ke sana: guru yang membaca laporan berhak yakin bahwa setiap
+       baris di situ adalah tugas yang IA kirim. Peta skill dan jurnal tetap terisi —
+       yang tidak terjadi hanyalah pengakuan palsu atas penugasan. */
+    if (!mandiri) {
+      s.doneAssign = (s.doneAssign || []).filter(function (x) { return x.id !== res.id; }).concat([entry]).slice(-8);
+      if (s.plan && s.plan.done.indexOf('assign-' + res.id) === -1) s.plan.done.push('assign-' + res.id);
+      try { localStorage.setItem(ASSIGN_KEY, JSON.stringify(loadAssignments().filter(function (a) { return a.id !== res.id; }))); } catch (_) {}
+    }
     save(s); pushToClass();
     return { correct: correct, total: res.results.length, entry: entry };
   }
@@ -431,6 +457,7 @@
 
   function mount(el, options) {
     mountEl = el; env = options || {}; st = load();
+    if (!st.goal) { var og = onboardingGoal(); if (og) { st.goal = og; save(st); } }
     if (st.goal && st.step === 'goal') st.step = st.diagnostic ? 'plan' : 'diagnostic';
     try { if (new URL(location.href).searchParams.get('duel')) st.tab = 'duel'; } catch (_) {}
     el.addEventListener('click', onClick);
@@ -453,7 +480,7 @@
   }
 
   function stepper() {
-    var steps = [['goal', 'Tujuan'], ['diagnostic', 'Tes singkat'], ['skillmap', 'Peta kemampuan'], ['plan', 'Rencana hari ini'], ['lesson', t('umum.materi', 'Materi')], ['next', 'Berikutnya']];
+    var steps = [['goal', 'Tujuan'], ['diagnostic', t('flow.step-cek', 'Cek cepat')], ['skillmap', 'Peta kemampuan'], ['plan', 'Rencana hari ini'], ['lesson', t('umum.materi', 'Materi')], ['next', 'Berikutnya']];
     var idx = steps.findIndex(function (s) { return s[0] === st.step; });
     return '<ol class="lf-stepper">' + steps.map(function (s, i) { return '<li class="' + (i < idx ? 'is-done' : i === idx ? 'is-current' : '') + '"><span>' + (i + 1) + '</span>' + s[1] + '</li>'; }).join('') + '</ol>';
   }
@@ -474,9 +501,9 @@
   function goalView() {
     return '<div class="lf-card"><h2>Apa tujuan belajarmu?</h2><p class="lf-muted">Tujuan menentukan contoh dan urutan skill. FIEZEL memberi fondasi dan skill map — bukan skor IELTS/TOEFL resmi atau sertifikat.</p>' +
       '<div class="lf-goal-grid">' + GOALS.map(function (g) {
-        return '<button type="button" class="lf-goal' + (st.goal === g.id ? ' is-selected' : '') + '" data-lf="goal" data-goal="' + g.id + '" data-testid="lf-goal-' + g.id + '"><b>' + esc(g.label) + '</b><small>' + esc(g.desc) + '</small></button>';
+        return '<button type="button" class="lf-goal' + (st.goal === g.id ? ' is-selected' : '') + '" data-lf="goal" data-goal="' + g.id + '" data-testid="lf-goal-' + g.id + '"><b>' + esc(goalLabel(g)) + '</b><small>' + esc(g.desc) + '</small></button>';
       }).join('') + '</div>' +
-      '<div class="lf-actions"><button type="button" class="lf-primary" data-lf="start-diagnostic" data-testid="lf-start-diagnostic"' + (st.goal ? '' : ' disabled') + '>Jawab 5 soal singkat</button></div></div>';
+      '<div class="lf-actions"><button type="button" class="lf-primary" data-lf="start-diagnostic" data-testid="lf-start-diagnostic"' + (st.goal ? '' : ' disabled') + '>' + esc(t('flow.btn-cek', 'Cek cepat · 5 soal')) + '</button></div></div>';
   }
 
   function ensureDiagRun() {

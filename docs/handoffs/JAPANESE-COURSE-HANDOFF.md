@@ -618,3 +618,241 @@ dibaca murid Indonesia bukan pintasan bagi murid Thai.
 
 Bahwa berkas ini ikut berubah: ritual bump menyentuh `DIAG_BUILD`; panel diagnostiknya
 sendiri tidak berubah perilaku.
+
+---
+
+## m025-312 — menulis lahir, kosakata genap 1.000, dan keluarga waktu berhenti tertinggal
+
+Otoritas tetap OWNER. Bagian ini **laporan**, bukan usulan: seluruh isinya sudah mendarat di
+cabang ini dan lolos gerbangnya.
+
+### 1. Permukaan MENULIS Jepang lahir, dan penjaganya dicabut dengan jujur
+
+`content/ja/writing-prompts-ja.json` berisi 24 prompt A1/N5, dua per masing-masing dua belas
+keluarga silabus — cakupannya diikat ke bank tata bahasa, bukan ke angka yang diketik, jadi
+keluarga baru di silabus otomatis menuntut prompt barunya.
+
+Sejak m025-297, kartu Menulis disembunyikan dari murid Jepang karena banknya berbahasa
+Inggris. Kartu itu kini **keluar dari penjaga bahasa**, dan `japanese-surface-honesty-test.js`
+ikut dibalik: dulu ia menuntut kartu itu tersembunyi, sekarang ia menuntut kartu itu terlihat —
+dan ia membuktikannya dengan pencocokan kurung kurawal sungguhan, bukan dengan menebak dari
+indentasi. Versi pertama assert-nya TIDAK menggigit: ia tetap hijau waktu kartunya kusembunyikan
+lagi. Diganti, lalu dibuktikan dua arah (ditawarkan → hijau, disembunyikan → merah).
+
+**Menyimak dan Berbicara tetap dijaga, dan itu bukan kemalasan.** Tumpukan audio dipaku ke
+`en-US` (`features/speaking-listening/fiezel-speaking-listening-addon.js`, `language:'en-US'`,
+ditegakkan `tests/audio-locale-guard-test.js`). Bank Jepang untuk dua permukaan itu akan membuat
+aplikasi **memutar audio Inggris dan mendengarkan ucapan Inggris sambil mengaku mengajar
+Jepang** — persis kebohongan yang `japanese-surface-honesty-test.js` ada untuk mencegah.
+Urutannya: perbaiki pengunci lokal dulu, banknya menyusul.
+
+### 2. Kosakata N5: 486 → 1.000
+
+514 entri baru, masing-masing lengkap sampai kalimat contohnya. Yang menahan mutunya bukan
+mata manusia melainkan saringan yang sama dengan entri lama — dan saringan itu memang menangkap
+sesuatu: satu putaran menghasilkan 49 entri tanpa `status:'complete'`, yang artinya app.js akan
+menyaringnya habis dan kartunya **tidak pernah sampai ke murid** meski berkasnya terlihat penuh.
+Satu putaran lain meloloskan baris rusak (`半分food` dengan terjemahan `X`) yang memenuhi semua
+syarat lama; syaratnya diperketat (harus berakhir 。！？, nol huruf Latin, terjemahan ≥ 8 aksara)
+lalu seluruh 1.884 entri diaudit ulang — nol cacat sekelasnya tersisa.
+
+Dua cacat pembukuan ikut diperbaiki: `jumlah` di bank sempat menyalin hitungan **sumber** alih-alih
+hitungan banknya sendiri (N3 mengaku 279 padahal banknya 278), dan `sumber` di
+`docs/japanese/kosakata-jlpt.json` masih mengklaim dua berkas owner untuk berkas yang kini
+berisi 1.885 entri — 514 di antaranya ditulis FIEZEL, bukan milik owner, dan kini berdiri
+sebagai baris sumber ketiga.
+
+### 3. `time_expressions` 12 → 20 subskill
+
+Keluarga ini satu-satunya yang di bawah 16 subskill, dan angka "18 template" menutupi sebabnya:
+**7 dari 18 menumpuk di satu subskill** (`no_ni_with_relative_time`). Murid yang menghabiskan
+keluarga ini bertemu pola yang sama berulang-ulang. Delapan template baru (JP-TM-119…126) menutup
+lubang N5 yang nyata: penghitung じ dan ねん, じかん untuk lama waktu, ぐらい vs ごろ, rentang
+から…まで, まえ sesudah jumlah, まえに sesudah kata kerja kamus, dan bacaan tak beraturan ついたち.
+
+### Keadaan kursus Jepang sesudah m025-312
+
+| Bagian | Inggris | Jepang |
+|---|---|---|
+| Tata bahasa | 139 template | **242 butir A1** (12 keluarga, 16–22 subskill) |
+| Kosakata | 2.440 entri | **1.884 entri, N5 genap 1.000** |
+| Bacaan | 312 bacaan | **150 bacaan A1–C1** |
+| Menulis | ada | **24 prompt A1/N5** |
+| Menyimak | ada | **belum ada — diblokir pengunci `en-US`** |
+| Berbicara | ada | **belum ada — diblokir pengunci `en-US`** |
+
+### Utang yang masih berdiri
+
+1. **Seluruh naskah Jepang berstatus DRAFT AI** dan wajib ditinjau penutur asli sebelum dipakai
+   menilai murid. Dinyatakan di `provenans` tiap bank; bukan sesuatu yang dianggap selesai.
+2. **Tingkat JLPT adalah perkiraan**, bukan daftar resmi Japan Foundation (yang memang tidak
+   lagi diterbitkan sejak 2010). Dinyatakan di `catatan` berkas sumber.
+3. **Menyimak dan berbicara** menunggu pengunci lokal audio dibongkar — keputusan owner, karena
+   ia menyentuh tumpukan suara yang sudah stabil.
+4. **Sidecar Thai untuk isi bank Jepang** belum ada. Naskah antarmukanya sudah dua bahasa;
+   isi banknya belum.
+
+Bahwa `features/neural-voice/fiezel-diag-panel.js` ikut berubah di m025-312: ritual bump
+menyentuh `DIAG_BUILD`. Panel diagnostiknya sendiri tidak berubah perilaku.
+## m025-313 — N4 masuk: 15 keluarga, 180 butir A2
+
+**Status: TERKIRIM.** Otoritas rilis tetap di OWNER; berkas ini mencatat apa yang sudah ada
+supaya sesi berikutnya tidak mengarang ulang.
+
+### Sebelum
+
+Bank Jepang hanya punya satu tingkat: **N5/A1**, 234 butir di 12 keluarga. Murid yang selesai
+N5 tidak punya ke mana pergi — kursusnya berhenti, bukan naik.
+
+### Sesudah
+
+`content/ja/grammar-templates-ja.json` berisi **414 butir**: 234 N5 ditambah **180 N4**, tersebar
+**12 butir di tiap 15 keluarga N4**. Graf keluarga naik 15 → 27, dan tiga slot yang sudah
+dicadangkan dari awal (`keigo`, `plain_forms`, `transitivity_pairs`) akhirnya DIPAKAI.
+
+| gelombang | butir N4 | per keluarga |
+|---|---|---|
+| pertama (cakupan) | 90 | 6 |
+| kedua (kedalaman) | 180 | 12 |
+
+Dua belas butir itu **dua belas subskill berbeda**, bukan dua belas variasi kalimat dari satu
+subskill. Itu keputusan yang menentukan: enam per keluarga berarti murid menghabiskan satu
+keluarga dalam satu sesi lalu melihat butir yang sama berulang, dan alokator adaptifnya
+kehilangan bahan untuk memutar.
+
+### Kenapa satu berkas, bukan bank kedua
+
+Bank ini memakai NAMA MEDAN yang sama dengan `grammar-templates.json` Inggris, jadi butir A2
+lewat alokator, ingatan soal, dan tutor brain YANG SAMA. Satu mesin, dua bahasa. Itu janji yang
+dijaga `japanese-course-wiring-test` dan `japanese-bank-survives-load-test`; siapa pun yang
+tergoda membuat jalur muat kedua akan memerahkan keduanya, dan memang seharusnya begitu.
+
+### Prasyarat: UNION, bukan timpa
+
+Tiga keluarga baru bertabrakan nama dengan slot yang sudah ada di graf. Versi pertama memakai
+`setdefault`, yang **diam-diam mempertahankan prasyarat lama** dan membuang yang baru.
+Tertangkap bukan oleh gerbang, tetapi dari hitungan: 15 + 14 seharusnya 29, yang keluar 27.
+Prasyaratnya sekarang di-UNION:
+
+| keluarga | prasyarat |
+|---|---|
+| `plain_forms` | polite_forms, te_form, verb_groups |
+| `transitivity_pairs` | existence_location, particles, te_form, verb_groups |
+| `keigo` | plain_forms, polite_forms |
+
+### Kontrak per butir dipaksa oleh pembangunnya
+
+Tiap butir punya 20 medan, 4 pilihan, 3 pengecoh **bernama** (masing-masing dengan miskonsepsi
+dan `whyFails`, id dan en), dan 10 bagian penjelasan. Penolong penulisannya memaksa kontrak itu
+lewat assert internal — termasuk bahwa teks tiap pengecoh cocok **persis** dengan salah satu
+pilihan yang salah. Jadi pengecoh yang ditulis untuk pilihan yang tidak ada di daftar
+memerahkan pembangunnya, bukan diam-diam lolos ke bank. Satu pilihan kembar (`あければ` dua
+kali) tertangkap begitu, bukan oleh mata.
+
+### YANG BELUM SEPADAN — jangan diklaim selesai
+
+1. **N5 masih lebih padat per keluarga**: 234/12 = ±19,5 lawan 12 di N4. Dua belas cukup untuk
+   satu putaran adaptif penuh per keluarga tanpa butir berulang, tetapi itu bukan paritas.
+2. **Menyimak dan berbicara masih NOL bank Jepang.** Menulis sudah lahir di m025-312 (bagian
+   sebelum ini) — waktu bagian ini pertama kutulis, ketiganya masih kosong, dan itu sudah tidak
+   benar lagi; dikoreksi saat penggabungan, bukan dibiarkan. Untuk dua yang tersisa,
+   penahanannya bukan kemalasan: tumpukan audionya dipaku ke `en-US`, jadi bank Jepang di sana
+   akan membuat aplikasi memutar audio Inggris sambil mengaku mengajar bahasa Jepang. Yang
+   dibutuhkan lebih dulu adalah sumbu bahasa pada tumpukan audionya, bukan banknya.
+3. Kosakata dan bacaan Jepang **belum** diperluas ke N4; yang dilengkapi tingkatnya baru bank
+   tata bahasanya.
+
+### Langkah berikutnya, menurut urutan nilainya bagi murid
+
+1. `vocabulary-ja.json` dan `reading-bank-ja.json` naik ke N4 — tanpa itu murid N4 membaca dan
+   menghafal pada tingkat N5 sambil berlatih tata bahasa N4.
+2. Salah satu dari menyimak/berbicara/menulis dibuat versi Jepangnya, lalu penjaganya dicabut
+   dan gerbang kejujurannya diperbarui pada langkah yang SAMA.
+3. Kalau kepadatan N4 mau disamakan dengan N5, targetnya ±20 per keluarga (≈300 butir).
+
+### Nomor build
+
+m025-312 → **m025-313**, keempat berkasnya bersama lewat `tools/bump-build.mjs`. Bank ini
+DIPRECACHE `sw.js`; tanpa `SW_REV` baru, murid yang sudah memasang PWA-nya tetap memegang bank
+lama secara offline — dan offline justru keadaan yang paling sering di lapangan. Bahwa
+`features/neural-voice/fiezel-diag-panel.js` ikut berubah: itu ritual bump menyentuh
+`DIAG_BUILD`; panel diagnostiknya sendiri tidak berubah perilaku.
+
+---
+
+## m025-313+ — utang Thai isi bank Jepang berhenti tak terlihat
+
+Otoritas tetap OWNER. **Nol byte produksi berubah**: yang mendarat hanya satu gerbang baru
+dan pendaftarannya di `quality.yml`, jadi nomor build TIDAK dinaikkan — pola yang sama
+dengan PR #365 dan dengan PR usulan kursus ini sendiri.
+
+### Sebabnya: aturan dua bahasa punya lubang seukuran seluruh isi bank
+
+`CLAUDE.md` mengikat satu aturan — setiap teks yang dilihat pengguna lahir DUA BAHASA.
+`th-coverage-test.js` dan `th-ui-leak-test.js` menegakkannya, tetapi keduanya hanya
+menjangkau naskah **antarmuka**, yang lahir lewat `FiezelI18n.t()`. Isi bank lahir lewat
+jalur lain: dimuat sebagai JSON, dirender apa adanya. Ia lolos keduanya.
+
+Diukur, bukan ditebak:
+
+| Lapisan | Paritas Thai |
+|---|---|
+| Naskah antarmuka | **2.452 / 2.452** kunci |
+| Isi bank Jepang | **0 / 15.364** medan |
+
+Murid Thai yang membuka kursus Jepang mendapat menu dan tombol berbahasa Thai, lalu arti
+kata, penjelasan tata bahasa, soal bacaan, dan petunjuk menulis semuanya Indonesia.
+
+Yang paling perlu dicatat: **sebelum ini tidak ada yang bertanya.** Lima gerbang membaca
+`content/ja/`; tiga tidak menyentuh Thai sama sekali, dua hanya memeriksa
+`copy-th-bahasa.js` — naskah tombol pemilih bahasa, bukan isi bank. Hijaunya bukan bukti
+banknya dua bahasa, melainkan bukti tidak ada yang mengukur.
+
+### Yang gerbang ini TIDAK lakukan
+
+Ia tidak menuntut 15.364 terjemahan hari ini. Menuntut itu sekarang berarti merah permanen,
+dan gerbang yang merah permanen adalah gerbang yang dimatikan orang.
+
+Ia menuntut **sensus yang benar**: tiap bank mendaftarkan berapa medan Indonesia yang
+dilihat murid dan berapa yang sudah ber-Thai, bertanggal.
+
+| Perbuatan | Akibat |
+|---|---|
+| menambah isi Indonesia tanpa Thai | `medan` tidak cocok → **MERAH** sampai angkanya ditulis ulang bertanggal |
+| menulis terjemahan Thai | `berTh` tidak cocok → **MERAH**; utang lunas wajib dicoret |
+| bank Jepang baru lahir | tidak ada di sensus → **MERAH**; ditemukan dari isi direktori, bukan dari daftar |
+
+Sensus cocok = hijau. Itu bukan klaim "sudah dua bahasa"; itu klaim **"kami tahu persis
+seberapa jauh dari dua bahasa, dan angkanya tidak bergerak tanpa ada yang tahu"**.
+
+Terjemahan boleh datang dua cara — medan Thai inline, atau sidecar
+`content/ja/<bank>-th.json` (pola yang sudah dipakai kursus Inggris lewat
+`vocabulary-th.json`). Keduanya dihitung, jadi gerbang ini tidak memaksa satu bentuk.
+
+### Dibuktikan menggigit, bukan diklaim
+
+Lima mutasi dijalankan atas kode sungguhan, masing-masing dipulihkan sesudahnya:
+
+| Mutasi | Hasil |
+|---|---|
+| +1 petunjuk Indonesia (utang bertambah) | MERAH — `UTANG TIDAK BERTAMBAH DIAM-DIAM` |
+| satu petunjuk diterjemahkan ke Thai | MERAH — `UTANG YANG LUNAS WAJIB DICORET` |
+| bank Jepang baru muncul tanpa sensus | MERAH — dua assert sekaligus |
+| `medanMurid()` dipaksa pulang kosong | MERAH — penjaga non-kehampaan |
+| sidecar `-th.json` muncul | MERAH — sensus jadi basi |
+
+Dan tiap pemulihan kembali HIJAU, jadi merahnya memang datang dari mutasinya.
+
+**Satu pesan kuperbaiki sesudah pengujian.** Versi pertama memerahkan bank baru lewat
+penjaga non-kehampaan dengan pesan "pemungutnya patah" — padahal pemungutnya sehat, bank
+itu saja yang belum punya cabang. Pesan yang salah mendiagnosis mengirim pembaca berikutnya
+membongkar kode yang tidak rusak, jadi kedua sebab kini dipisah dan disebut dengan benar.
+
+### Utang yang tetap berdiri
+
+1. **15.364 medan masih Indonesia saja.** Sensus membuatnya terlihat dan terhitung; ia tidak
+   menerjemahkan apa pun. Menulis terjemahannya keputusan terpisah — dan naskah Jepangnya
+   sendiri masih DRAFT AI yang belum ditinjau penutur asli, jadi menerjemahkan sekarang
+   berarti menggandakan naskah yang belum diverifikasi.
+2. Menyimak dan berbicara Jepang masih diblokir pengunci `en-US` di tumpukan audio.
+3. Naskah Jepang masih DRAFT AI; tingkat JLPT masih perkiraan.

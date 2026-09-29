@@ -449,7 +449,24 @@
    *
    * sehingga di ekor bawah skor tidak lagi mati ke nol dan item yang runtuh tetap punya
    * urutan yang benar (r 0.03 > r 0.001, bukan seri di 0).
+   *
+   * m025-375 (audit braincore B5, keputusan owner 2026-09-26): faktor itu TIDAK cukup. Pengali
+   * penyelamatan paling besar x2.5, sedangkan ekor Gauss sigma 0.22 jatuh ke ~e^-11 - r=0.03
+   * berskor 0.0001, dan materi yang baru dilihat (r=0.99) 0.32: tiga ribu kali lebih tinggi.
+   * Sisi bawah juga menguburkan zona rawan itu sendiri (r=0.45 kalah dari r=0.95). Kurvanya kini
+   * ASIMETRIS, karena dua sisinya memang menjawab pertanyaan berbeda:
+   *
+   *   r >= 0.75  gauss(r, 0.75, 0.22)                    - makin segar, makin sia-sia diulang;
+   *   r <  0.75  0.45 + 0.55 · r/0.75                    - makin lupa, makin mahal, tapi TIDAK
+   *                                                        pernah jatuh di bawah lantai 0.45.
+   *
+   * Urutannya: ambang lupa (1.0) > zona rawan > jatuh tempo (r=0.9: 0.63) > sudah runtuh
+   * (0.45..0.47, runtuh dangkal di atas runtuh dalam) > belum jatuh tempo (r=0.95: 0.44) > segar.
+   * Materi yang runtuh berhenti menjadi absorbing state; ambang lupa tetap unggul >1.5x.
    */
+  var REVIEW_PEAK = 0.75;          // retensi paling efisien untuk diulang
+  var REVIEW_SPREAD = 0.22;        // lebar sisi atas: makin segar makin sia-sia
+  var REVIEW_RESCUE_FLOOR = 0.45;  // lantai sisi bawah: materi runtuh tidak pernah terkubur
   function reviewPriority(items, options) {
     var opts = options || {};
     var list = Array.isArray(items) ? items : [];
@@ -461,10 +478,10 @@
       var h = item.halfLifeDays == null ? halfLife(item) : num(item.halfLifeDays, BASE_HALF_LIFE_DAYS);
       var ageDays = Math.max(0, (now - num(item.lastSeenAt, now)) / 86400000);
       var r = retrievability(h, ageDays);
-      // Puncak di 0.75, turun mulus ke kedua arah...
-      var urgency = Math.exp(-Math.pow((r - 0.75) / 0.22, 2));
-      // ...dikalikan faktor penyelamatan yang membesar saat r turun (T6).
-      var salvage = 1 + 1.5 * (1 - r);
+      // Asimetris (B5): di atas puncak turun sebagai Gauss, di bawahnya turun landai ke lantai.
+      var urgency = r >= REVIEW_PEAK
+        ? Math.exp(-Math.pow((r - REVIEW_PEAK) / REVIEW_SPREAD, 2))
+        : REVIEW_RESCUE_FLOOR + (1 - REVIEW_RESCUE_FLOOR) * (r / REVIEW_PEAK);
       var weight = clamp(item.weight == null ? 1 : item.weight, 0.2, 3);
       return {
         id: str(item.id),
@@ -474,7 +491,7 @@
         ageDays: round(ageDays, 3),
         retrievability: r,
         dueInDays: round(nextReviewGapDays(h, opts.targetRetention) - ageDays, 3),
-        score: round(urgency * salvage * weight, 4)
+        score: round(urgency * weight, 4)
       };
     }).sort(function (a, b) { return b.score - a.score; });
   }

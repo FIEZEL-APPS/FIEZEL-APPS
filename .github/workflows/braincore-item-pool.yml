@@ -1,0 +1,51 @@
+# FIEZEL — Braincore langkah 2 + 3: tabel kesulitan soal gabungan + usulan penyetelan.
+#
+# KENAPA DI SINI, BUKAN DI CRON WORKER: Worker `fiezel-api` memakai paket gratis (10 ms CPU per
+# invocation, docs/CF-MIGRATION-RUNBOOK.md). Penaksir kesulitan soal butuh ~9-19 ms untuk
+# 1.000-3.000 soal, dan penyetelan angka rumus butuh validasi silang + bootstrap. Job ini
+# membaca penghitung dari D1 `fiezel-evidence` lewat API, menulis balik `item_pool_table`, dan
+# menaruh usulan penyetelan di ringkasan job. Ia TIDAK mengubah angka rumus apa pun — usulan
+# masuk lewat PR yang disetujui owner.
+#
+# Sebelum owner menyalakan `ITEM_POOL_ENABLED` di workers/api/wrangler.toml, job keluar sukses
+# tanpa memakai rahasia apa pun (reports/ITEM_POOL_ACTIVATION.md).
+name: Braincore Item Pool
+
+on:
+  schedule:
+    - cron: '20 18 * * *'   # 01:20 WIB, sesudah purge harian Worker (00:05 WIB)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: braincore-item-pool
+  cancel-in-progress: false
+
+jobs:
+  table-and-tuning:
+    # Penjaga aktor (tests/workflow-actor-gate-test.js): job ini memegang token Cloudflare.
+    # Jadwal harian boleh jalan sendiri (pola push-reminders.yml); dijalankan manual HANYA
+    # oleh owner.
+    if: github.repository == 'FIEZEL-APPS/FIEZEL-APPS' && (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Tabel kesulitan soal + usulan penyetelan
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: node tools/item-pool-job.mjs --out braincore-tuning.json --summary "$GITHUB_STEP_SUMMARY"
+      - name: Simpan laporan penyetelan
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: braincore-tuning
+          path: braincore-tuning.json
+          if-no-files-found: ignore
+          retention-days: 30

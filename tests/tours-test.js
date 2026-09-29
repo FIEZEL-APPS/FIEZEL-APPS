@@ -48,8 +48,8 @@ function sourceBlock(name, source = app) {
  */
 const COPY = {
   menu: [
-    ['Mulai dari Home',
-      'Ini beranda kamu: progres harian, streak, dan saran latihan dari PAW. Semua perjalananmu berangkat dari sini.'],
+    ['Mulai dari Hari ini', // audit F12 2026-09-23: satu nama per tujuan (tab = "Hari ini")
+      'Ini halaman Hari ini: progres harian, runtun belajar, dan saran latihan dari PAW. Semua perjalananmu berangkat dari sini.'],
     /* m025-246: dua langkah ini menunjuk tab yang berbeda sekarang - Vocab dan Reading
        tidak lagi punya tab sendiri; keduanya hidup di dalam Latihan, dan Peta berganti
        nama jadi Progres. Naskahnya diperbarui bersama reports/copy-tour-gems.md, sesuai
@@ -63,7 +63,7 @@ const COPY = {
     ['Chip level kamu',
       'Chip ini nunjukin level aktifmu. Ketuk buat pindah level \u2014 materi dan latihan langsung ngikutin pilihanmu.'],
     ['Tombol Pengaturan',
-      'Ini pintu ke FIEZEL Control Room: suara, gerak, tampilan, sampai data belajarmu \u2014 semuanya kamu yang pegang.'],
+      'Ini pintu ke Pengaturan: suara, gerak, tampilan, sampai data belajarmu \u2014 semuanya kamu yang pegang.'],
     ['Tur menu selesai!',
       'Kamu udah kenal semua menunya. Tur lanjutan bakal muncul otomatis tiap kamu masuk fitur baru \u2014 santai aja.']
   ],
@@ -75,7 +75,7 @@ const COPY = {
     ['Terjemahan Otomatis',
       'Nyalakan toggle ini, dan tiap kalimat subtitle langsung diterjemahkan ke bahasa Indonesia. Harganya 1 Gem Terjemahan per sesi, dan butuh jaringan, ya.'],
     ['Mau lebih pelan?',
-      'Kecepatan suara bisa kamu atur di FIEZEL Control Room, lewat tombol Pengaturan. Setelannya nempel buat semua sesi berikutnya.']
+      'Kecepatan suara bisa kamu atur di Pengaturan. Setelannya nempel buat semua sesi berikutnya.']
   ],
   listening: [
     ['Dengar dulu, baru jawab',
@@ -85,7 +85,7 @@ const COPY = {
     ['Terjemahan Indonesia',
       'Toggle ini nampilin terjemahan tiap soal, seharga 1 Gem Terjemahan per sesi. Gem-nya kamu dapat gratis dari streak jawaban benar.'],
     ['Atur kecepatan suara',
-      'Terlalu cepat? Kecepatan suara bisa diatur di FIEZEL Control Room \u2014 buka lewat tombol Pengaturan kapan aja.']
+      'Terlalu cepat? Kecepatan suara bisa diatur di Pengaturan kapan aja.']
   ]
 };
 const REPLAY_SUBTEXT = 'Menjalankan ulang tur menu dari awal. Tur fitur (Audiobook dan Listening) juga bakal muncul lagi pas kamu masuk fiturnya.';

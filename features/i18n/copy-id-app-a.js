@@ -85,7 +85,7 @@
     // app.js:644 — grammarExercise v21 correctWhy
     'grammar.mode-family-benar': `Fokus {judulLesson} masuk keluarga {labelKeluarga}.`,
     // app.js:612 — grammarExercise v2 correctWhy
-    'grammar.mode-justify-benar': 'Alasan ini nyambungin jawabannya sama konteks kalimat dan aturannya.',
+    'grammar.mode-justify-benar': 'Alasan yang benar selalu menunjuk petunjuk di kalimat itu sendiri.',
     // app.js:634 — grammarExercise v12-14 OPSI
     'grammar.mode-label-opsi-benar': 'jawaban benar, nggak ada kesalahan mikir.',
     // app.js:653 — grammarExercise v24 correctWhy
@@ -101,7 +101,7 @@
     // app.js:619 — grammarExercise v5 correctWhy
     'grammar.mode-reasoning-benar': 'Urutan ini bawa kamu dari petunjuk kalimat ke bentuk yang bener.',
     // app.js:635 — grammarExercise v15-17 (joinQuoteReason head)
-    'grammar.mode-repair-benar-head': `Perbaikannya {kunciDikutip};`,
+    'grammar.mode-repair-benar-head': `Yang benar {kunciDikutip}:`,
     // app.js:635 — grammarExercise v15-17 (joinQuoteReason tail)
     'grammar.mode-repair-benar-tail': 'bentuk itu yang cocok sama kalimat aslinya.',
     // app.js:617 — grammarExercise v3 correctWhy
@@ -110,6 +110,9 @@
     'grammar.mode-teach-benar': 'Ringkasan itu nyatuin tujuan lesson sama aturan yang bener.',
     // app.js:581 — grammarExercise v1 (joinQuoteReason head)
     'grammar.versi-pakai': `Versi pakai {opsiDikutip}`,
+    // app.js — grammarVersionReason (alasan pilihan salah, mode kalimat lengkap)
+    'grammar.versi-salah-pakai': `Di kalimat ini, {opsiDikutip}`,
+    'grammar.versi-salah-awal': 'Di kalimat ini,',
     // app.js:1436 — dailyBrief() weak fallback
     'home.brief-belum-pola': 'Belum ada pola',
     // app.js:1436 — dailyBrief() goal
@@ -266,7 +269,7 @@
     // app.js:181 — LOGIN_MESSAGES[] (top-level const)
     'login.pesan-22-lead': 'Bikin dia jadi skill sehari-hari: baca, ngerti pola, recall kata, dan berani salah.',
     // app.js:182 — LOGIN_MESSAGES[] (top-level const)
-    'login.pesan-23-headline': 'Woy, streak lu sayang kalau dibiarin mati gara-gara “nanti”.',
+    'login.pesan-23-headline': 'Woy, runtun belajar lu sayang kalau dibiarin mati gara-gara “nanti”.',
     // app.js:182 — LOGIN_MESSAGES[] (top-level const)
     'login.pesan-23-lead': 'Buka FIEZEL, selesaikan target minimum, terus bebas lanjut aktivitas lain.',
     // app.js:183 — LOGIN_MESSAGES[] (top-level const)
@@ -346,7 +349,7 @@
     // app.js:201 — LOGIN_MESSAGES[] (top-level const)
     'login.pesan-42-lead': 'Nggak ada hukuman di sini. Buka satu sesi, rantainya nyambung lagi, kita lanjut kayak nggak terjadi apa-apa.',
     // app.js:202 — LOGIN_MESSAGES[] (top-level const)
-    'login.pesan-43-headline': 'Streak lu lagi jalan. Sayang banget kalau putus gara-gara mager sepuluh menit.',
+    'login.pesan-43-headline': 'Runtun belajar lu lagi jalan. Sayang banget kalau putus gara-gara mager sepuluh menit.',
     // app.js:202 — LOGIN_MESSAGES[] (top-level const)
     'login.pesan-43-lead': 'Yang bikin skill naik bukan hari terbaik lu, tapi hari-hari biasa yang tetap lu isi.',
     // app.js:203 — LOGIN_MESSAGES[] (top-level const)
@@ -558,7 +561,7 @@
     // app.js:273 — REMINDER_MESSAGES.daily_goal
     'push.pesan-daily-goal-3': 'Bro, tinggal dikit buat jaga ritme. Beresin dulu sebelum lanjut rebahan.',
     // app.js:274 — REMINDER_MESSAGES.daily_goal
-    'push.pesan-daily-goal-4': 'No pressure, tapi streak lu sayang 😭 kelarin target kecil hari ini.',
+    'push.pesan-daily-goal-4': 'No pressure, tapi runtun belajar lu sayang 😭 kelarin target kecil hari ini.',
     // app.js:277 — REMINDER_MESSAGES.due_review
     'push.pesan-due-review-1': 'Otak lu mulai nge-blur beberapa materi 😭 Review bentar sebelum lupa menang.',
     // app.js:278 — REMINDER_MESSAGES.due_review
@@ -625,6 +628,8 @@
     'quiz.keyakinan-kecatat': `{label} — kecatat`,
     // app.js:1325 — tombol lanjut popup keyakinan
     'quiz.keyakinan-lihat-pembahasan': 'Lihat pembahasan',
+    'quiz.lanjut-soal-berikut': 'Lanjut',
+    'quiz.pembahasan-lengkap': 'Pembahasan lengkap',
     // app.js:1323
     'quiz.keyakinan-skala-1': 'Masih ragu',
     // app.js:1323
@@ -792,9 +797,9 @@
     // app.js:309 — GRAMMAR_FAMILY_LABELS.tense_aspect
     'grammar.keluarga-tense-aspect': 'waktu dan keadaan tindakan',
     // app.js:630 — grammarExercise v8 stem
-    'grammar.mode-avoid-stem': `Strategi mana yang paling bantu biar kesalahan di lesson {judulLesson} nggak keulang?`,
+    'grammar.mode-avoid-stem': `Strategi apa yang mencegah kesalahan di {judulLesson}?`,
     // app.js:581 — grammarExercise v1 stem
-    'grammar.mode-complete-stem': `Pilih versi lengkap yang pas sama pola {judulLesson}:\n{stem}`,
+    'grammar.mode-complete-stem': `Pilih kalimat yang benar:\n{stem}`,
     // app.js:636 — grammarExercise v18-20 correctWhy
     'grammar.mode-contrast-benar': `Perbandingan yang bener nunjukin {kunciDikutip} jawabannya, terus nunjuk di mana {opsiDikutip} melesetnya.`,
     // app.js:636 — grammarExercise v18-20 expl
@@ -806,21 +811,21 @@
     // app.js:636 — grammarExercise v18-20 OPSI distraktor
     'grammar.mode-contrast-opsi-kebalik': `{opsiDikutip} pas, dan {kunciDikutip} malah ngubah maksud kalimatnya.`,
     // app.js:636 — grammarExercise v18-20 stem (contrast_distractor)
-    'grammar.mode-contrast-stem': `Perbandingan mana yang pas antara {kunciDikutip} dan {opsiDikutip}?\n{stem}`,
+    'grammar.mode-contrast-stem': `Bandingkan {kunciDikutip} dan {opsiDikutip}:\n{stem}`,
     // app.js:650 — grammarExercise v22 stem (locate_decision_cue)
-    'grammar.mode-cue-stem': `Petunjuk pertama apa yang harus kamu temuin sebelum nimbang pilihan di contoh ini?\n{stem}`,
+    'grammar.mode-cue-stem': `Petunjuk apa yang paling menentukan jawaban ini?\n{stem}`,
     // app.js:633 — grammarExercise v9-11 expl
     'grammar.mode-diagnose-expl-kunci': `Ini alasan kenapa {kunciDikutip} bener; padahal soal nanya kenapa {opsiDikutip} meleset.`,
     // app.js:633 — grammarExercise v9-11 expl lain
     'grammar.mode-diagnose-expl-lain': `Ini penjelasan buat pilihan {opsiLainDikutip}, bukan buat {opsiDikutip}.`,
     // app.js:633 — grammarExercise v9-11 stem (diagnose_distractor)
-    'grammar.mode-diagnose-stem': `Temanmu milih {opsiDikutip}. Alasan mana yang paling pas jelasin kenapa pilihan itu meleset?\n{stem}`,
+    'grammar.mode-diagnose-stem': `Temanmu memilih {opsiDikutip}. Kenapa pilihan itu salah?\n{stem}`,
     // app.js:644 — grammarExercise v21 expl
     'grammar.mode-family-expl': `Label {labelDikutip} itu keluarga grammar lain. Contoh ini lagi nguji pola keluarga {labelKeluargaDikutip}.`,
     // app.js:644 — grammarExercise v21 stem (classify_family)
-    'grammar.mode-family-stem': `Contoh ini terutama termasuk keluarga grammar yang mana?\n{stem}`,
+    'grammar.mode-family-stem': `Kalimat ini termasuk kelompok grammar mana?\n{stem}`,
     // app.js:612 — grammarExercise v2 stem
-    'grammar.mode-justify-stem': `Kenapa {kunciDikutip} jadi jawaban paling pas di contoh ini?\n{stem}`,
+    'grammar.mode-justify-stem': `Kenapa {kunciDikutip} jawaban yang benar?\n{stem}`,
     // app.js:634 — grammarExercise v12-14 correctWhy
     'grammar.mode-label-benar': `Label itu pas sama pola salah di balik pilihan {opsiDikutip}.`,
     // app.js:634 — grammarExercise v12-14 expl
@@ -828,41 +833,41 @@
     // app.js:634 — grammarExercise v12-14 expl lain
     'grammar.mode-label-expl-lain': `Label ini nunjukin kesalahan mikir di balik pilihan {opsiLainDikutip}, bukan {opsiDikutip}.`,
     // app.js:634 — grammarExercise v12-14 stem (label_misconception)
-    'grammar.mode-label-stem': `Label kesalahan mana yang paling pas buat pilihan {opsiDikutip}?\n{stem}`,
+    'grammar.mode-label-stem': `Kesalahan apa di balik pilihan {opsiDikutip}?\n{stem}`,
     // app.js:653 — grammarExercise v24 stem (mastery_check)
-    'grammar.mode-mastery-stem': `Rencana cek mandiri mana yang paling pas sebelum kamu nuntasin lesson {judulLesson}?`,
+    'grammar.mode-mastery-stem': `Cek mandiri apa yang paling tepat untuk {judulLesson}?`,
     // app.js:623 — grammarExercise v7 stem
-    'grammar.mode-memory-stem': `Pengingat singkat mana yang paling nyambung sama contoh ini?\n{stem}`,
+    'grammar.mode-memory-stem': `Pengingat mana yang paling cocok untuk contoh ini?\n{stem}`,
     // app.js:618 — grammarExercise v4 stem
-    'grammar.mode-objective-stem': `Tujuan belajar mana yang paling nyambung sama soal ini?\n{stem}`,
+    'grammar.mode-objective-stem': `Tujuan belajar mana yang cocok dengan soal ini?\n{stem}`,
     // app.js:619 — grammarExercise v5 stem
-    'grammar.mode-reasoning-stem': `Urutan mikir mana yang paling aman sebelum kamu jawab?\n{stem}`,
+    'grammar.mode-reasoning-stem': `Langkah berpikir mana yang paling tepat sebelum menjawab?\n{stem}`,
     // app.js:635 — grammarExercise v15-17 stem (repair_distractor)
-    'grammar.mode-repair-stem': `Jawaban {opsiDikutip} belum pas. Pilih perbaikan yang tetap jaga maksud kalimatnya:\n{stem}`,
+    'grammar.mode-repair-stem': `{opsiDikutip} masih salah. Yang benar yang mana?\n{stem}`,
     // app.js:617 — grammarExercise v3 stem
-    'grammar.mode-rule-stem': `Aturan mana yang paling pas jelasin jawaban di contoh ini?\n{stem}`,
+    'grammar.mode-rule-stem': `Aturan tata bahasa mana yang berlaku di sini?\n{stem}`,
     // app.js:652 — grammarExercise v23 stem (teach_back)
-    'grammar.mode-teach-stem': `Ringkasan ajar mana yang paling pas buat jelasin lesson {judulLesson} ke temanmu?`,
+    'grammar.mode-teach-stem': `Penjelasan singkat mana yang paling pas untuk {judulLesson}?`,
     // app.js:374 — grammarClue()
     'grammar.petunjuk-clue': `Petunjuk pentingnya adalah “{petunjuk}”.`,
     // app.js:374 — grammarClue() fallback
     'grammar.petunjuk-umum': 'Petunjuknya ada pada hubungan makna, subjek, dan bentuk kata kerja dalam satu kalimat penuh.',
     // app.js:336 — GRAMMAR_PROMPTS[]
-    'grammar.prompt-baca-penuh': `Baca satu kalimat penuh sebelum menjawab. Pilihan mana yang paling cocok?\n{stem}`,
+    'grammar.prompt-baca-penuh': `Baca kalimatnya dengan teliti, lalu pilih jawaban:\n{stem}`,
     // app.js:332 — GRAMMAR_PROMPTS[]
-    'grammar.prompt-cek-nama': `{name} sedang mengecek grammar kalimat ini. Bagian kosongnya sebaiknya diisi dengan apa?\n{stem}`,
+    'grammar.prompt-cek-nama': `{name} sedang mengecek kalimat ini. Apa isian yang tepat?\n{stem}`,
     // app.js:330 — GRAMMAR_PROMPTS[]
-    'grammar.prompt-lengkapi': `Lengkapi kalimat berikut dengan bentuk yang paling tepat:\n{stem}`,
+    'grammar.prompt-lengkapi': `Lengkapi kalimat ini:\n{stem}`,
     // app.js:331 — GRAMMAR_PROMPTS[]
-    'grammar.prompt-makna': `Perhatikan makna kalimatnya, lalu pilih jawaban yang paling pas:\n{stem}`,
+    'grammar.prompt-makna': `Pilih jawaban yang paling tepat:\n{stem}`,
     // app.js:333 — GRAMMAR_PROMPTS[]
-    'grammar.prompt-natural': `Pilih bentuk yang membuat kalimat berikut terdengar benar dan natural:\n{stem}`,
+    'grammar.prompt-natural': `Pilih bentuk yang paling alami dan tepat:\n{stem}`,
     // app.js:334 — GRAMMAR_PROMPTS[]
-    'grammar.prompt-petunjuk': `Cari petunjuk waktu, subjek, atau maksud kalimat, lalu lengkapi bagian kosong:\n{stem}`,
+    'grammar.prompt-petunjuk': `Perhatikan petunjuk kalimat, lalu lengkapi:\n{stem}`,
     // app.js:335 — GRAMMAR_PROMPTS[]
-    'grammar.prompt-pola': `Manakah pilihan yang mengikuti pola grammar dengan tepat?\n{stem}`,
+    'grammar.prompt-pola': `Pilihan mana yang tata bahasanya benar?\n{stem}`,
     // app.js:551 — completeGrammarStem() fallback
-    'grammar.stem-answer-fallback': `{stem} — jawaban: {opsi}`,
+    'grammar.stem-answer-fallback': `{stem} (jawaban: {opsi})`,
     // app.js:915 — levelEntryChoiceCopy() title
     'level.entry-pilih-judul': `Mau belajar di {level}? Sedikit lagi.`,
     // app.js:917 — levelEntryChoiceCopy() deferToast

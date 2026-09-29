@@ -24,18 +24,18 @@
     'ask.materi-terkait': 'Materi terkait',
     // app.js:3988 — status menunggu jawaban AI
     'ask.memikirkan': 'FIEZEL sedang memikirkan jawabannya…',
-    // app.js:2928 — galat layanan Puter tidak tersedia
-    'auth.galat-layanan': 'Layanan akun Puter belum bisa dihubungi. Periksa koneksi lalu coba lagi.',
+    // app.js:2928 — galat layanan tidak tersedia
+    'auth.galat-layanan': 'Layanan akun belum bisa dihubungi. Periksa koneksi lalu coba lagi.',
     // app.js:2934 — new Error(t(...)): pesan Error tampil di status auth
-    'auth.galat-timeout': 'Login Puter tidak merespons. Periksa jendela loginnya, atau coba lagi.',
+    'auth.galat-timeout': 'Login tidak merespons. Periksa jendela loginnya, atau coba lagi.',
     // app.js:2937 — login belum selesai; slug netral (belum+selesai = 2 COMMON lexer gerbang)
     'auth.galat-unfinished': 'Login belum selesai. Coba lagi.',
     // app.js:2757 — status skipped
     'auth.status-dilewati': 'Oke, lanjut tanpa akun.',
     // app.js:2758 — status idle
-    'auth.status-idle': 'Progres belajar, streak, dan AI tutor tersimpan di akunmu.',
+    'auth.status-idle': 'Progres belajar, runtun belajar, dan AI tutor tersimpan di akunmu.',
     // app.js:2753 — status pending
-    'auth.status-menghubungkan': 'Menghubungkan ke Puter…',
+    'auth.status-menghubungkan': 'Menghubungkan ke Google…',
     // app.js:2752 — status signed_in (karakter … asli)
     'auth.status-tersambung': 'Akun tersambung. Membuka FIEZEL…',
     // app.js:2836 — toast lanjut tanpa akun
@@ -43,7 +43,7 @@
     // app.js:2762 — toast completeAuthGate
     'auth.toast-tersambung': 'Akun FIEZEL tersambung.',
     // app.js:2758 — tombol idle
-    'auth.tombol-lanjutkan': 'Lanjutkan dengan Puter',
+    'auth.tombol-lanjutkan': 'Lanjutkan dengan Google',
     // app.js:2753 — tombol pending
     'auth.tombol-menghubungkan': 'Menghubungkan…',
     // app.js:2752 — tombol signed_in (hanya isi <span>)
@@ -167,7 +167,7 @@
     // app.js:2038 — olmDispute() toast konfirmasi remeasure (precompute jumlahSoal, mini-desain plan)
     'progress.olm-ukur-ulang': 'Oke. Kita ukur ulang {skill} lewat {jumlahSoal} soal di sesi berikutnya.',
     // app.js:2608 — vonis kilas jawaban salah
-    'quiz.burst-miss': 'Belum tepat',
+    'quiz.burst-miss': 'Hampir!',
     // app.js:2608 — subteks vonis salah
     'quiz.burst-miss-sub': 'Tenang, kita bedah jawabannya.',
     // app.js:2608 — vonis kilas jawaban benar
@@ -185,12 +185,12 @@
 
     // ---------- Auth Gate, Notification Gate, Update Prompt, Recovery, Shell, Toasts ----------
     'auth.gate-title': 'Masuk ke FIEZEL',
-    'auth.gate-body': 'Akunmu menyimpan progres belajar, streak, dan AI tutor supaya tetap sama di setiap perangkat.',
+    'auth.gate-body': 'Akunmu menyimpan progres belajar, runtun belajar, dan AI tutor supaya tetap sama di setiap perangkat.',
     'auth.status-check': 'Memeriksa status akun…',
     'auth.skip-btn': 'Lanjut tanpa akun',
-    'auth.skip-help': 'Semua materi dan latihan tetap jalan tanpa akun — tutor AI dan suara neural baru bisa dipakai kalau kamu masuk akun Puter dan ada jaringan.',
-    'auth.puter-help': 'Jendela login Puter terbuka sebentar di atas FIEZEL, lalu tertutup sendiri begitu selesai - kamu tidak akan dipindahkan ke browser lain.',
-    'auth.legal-note': 'Dengan melanjutkan, kamu menyetujui progres belajarmu disimpan di akun Puter milikmu sendiri.',
+    'auth.skip-help': 'Semua materi dan latihan tetap jalan tanpa akun — tutor AI dan sinkronisasi tersambung saat kamu masuk akun Google.',
+    'auth.puter-help': 'Jendela login Google terbuka dengan aman di atas FIEZEL, lalu tertutup sendiri begitu selesai.',
+    'auth.legal-note': 'Dengan melanjutkan, kamu menyetujui progres belajarmu disimpan di akun Google milikmu sendiri.',
 
     'notif.gate-badge': 'FIEZEL REMINDER',
     'notif.gate-title': 'Mau diingatkan?',
@@ -235,6 +235,8 @@
     'adaptif.toast-pool-empty': 'Profil adaptif belum memiliki area yang cukup terukur. Lanjutkan latihan level terlebih dahulu.',
     'suara.toast-device-issue': 'Suara sedang bermasalah di perangkatmu. Teksnya tetap bisa kamu baca, dan kamu boleh mencoba lagi nanti.',
     'settings.toast-report-sent': 'Laporan agregat terkirim ke Creator Hub',
-    'settings.toast-report-queued': 'Laporan disimpan di antrean dan akan dicoba lagi'
+    'settings.toast-report-queued': 'Laporan disimpan di antrean dan akan dicoba lagi',
+    /* m025-365 · tugas yang ditarik guru. */
+    'notif.tugas-ditarik': 'Tugas “{title}” ditarik oleh gurumu. Kamu tidak perlu mengerjakannya.'
   });
 }());

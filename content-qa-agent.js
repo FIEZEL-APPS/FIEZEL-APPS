@@ -10,7 +10,8 @@ const norm=v=>text(v).toLowerCase().normalize('NFKC').replace(/[“”‘’]/g,
 const words=v=>norm(v).split(' ').filter(Boolean);
 const sha=v=>crypto.createHash('sha256').update(v).digest('hex');
 const fileSha=f=>sha(fs.readFileSync(path.join(ROOT,f)));
-function jaccard(a,b){const A=new Set(words(a)),B=new Set(words(b));if(!A.size&&!B.size)return 1;let inter=0;for(const x of A)if(B.has(x))inter++;return inter/(A.size+B.size-inter||1)}
+function jaccardSets(A,B){if(!A.size&&!B.size)return 1;let inter=0;const [s1,s2]=A.size<B.size?[A,B]:[B,A];for(const x of s1)if(s2.has(x))inter++;return inter/(A.size+B.size-inter||1)}
+function jaccard(a,b){return jaccardSets(new Set(words(a)),new Set(words(b)))}
 function questionShape(v){return norm(text(v).replace(/Target:\s*[“"].*?[”"]\.?/gi,' Target').replace(/In the case at [^,]+,/gi,'In the case,'))}
 function finding(domain,itemId,category,severity,message,evidence={}){return{domain,itemId:text(itemId).slice(0,120),category,severity,message,evidence}}
 function auditContent(input){
@@ -31,7 +32,8 @@ function auditContent(input){
     if(text(g.stem).length<12)add('grammar',id,'context_thin','review','Grammar stem may not provide enough context to disambiguate the target decision.',{stem:text(g.stem)});
     if(!correctValue)add('grammar',id,'answer_integrity','blocker','Grammar correct answer is empty.');
   }
-  for(let i=0;i<lessons.length;i++)for(let j=i+1;j<lessons.length;j++)if(jaccard(lessons[i].stem,lessons[j].stem)>=0.86)add('grammar',`${lessons[i].id} ~ ${lessons[j].id}`,'repetition','review','Grammar stems are near-duplicates and should be checked for cosmetic rather than pedagogical variation.',{similarity:Number(jaccard(lessons[i].stem,lessons[j].stem).toFixed(3))});
+  const lessonWordSets=lessons.map(l=>new Set(words(l.stem)));
+  for(let i=0;i<lessons.length;i++)for(let j=i+1;j<lessons.length;j++){const sim=jaccardSets(lessonWordSets[i],lessonWordSets[j]);if(sim>=0.86)add('grammar',`${lessons[i].id} ~ ${lessons[j].id}`,'repetition','review','Grammar stems are near-duplicates and should be checked for cosmetic rather than pedagogical variation.',{similarity:Number(sim.toFixed(3))});}
 
   const vocabSeen=new Map(),vocabTriples=new Map();
   for(const v of vocabulary){
@@ -76,12 +78,13 @@ function auditContent(input){
   // membaca teksnya. Dilaporkan per KELOMPOK, bukan per pasangan, supaya satu template yang
   // dipakai 24 kali muncul sebagai satu temuan dan bukan 276.
   const nearDuplicateSeen=new Set();
+  const readingWordSets=reading.map(r=>new Set(words(r.text)));
   for(let i=0;i<reading.length;i++){
     const a=reading[i],aid=text(a.id);if(nearDuplicateSeen.has(aid))continue;
     const cluster=[];
     for(let j=i+1;j<reading.length;j++){
       const b=reading[j],bid=text(b.id);if(nearDuplicateSeen.has(bid))continue;
-      if(jaccard(a.text,b.text)>=NEAR_DUPLICATE_PASSAGE_SIMILARITY){cluster.push(bid);nearDuplicateSeen.add(bid)}
+      if(jaccardSets(readingWordSets[i],readingWordSets[j])>=NEAR_DUPLICATE_PASSAGE_SIMILARITY){cluster.push(bid);nearDuplicateSeen.add(bid)}
     }
     if(!cluster.length)continue;
     nearDuplicateSeen.add(aid);
