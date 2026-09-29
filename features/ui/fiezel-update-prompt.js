@@ -88,14 +88,11 @@
       btn.textContent = (apText && apText !== 'update.applying-text') ? apText : 'Memperbarui...';
     }
     setSess('fiezel-apply-update', '1');
+    hide();
     if (pendingWorker && typeof pendingWorker.postMessage === 'function') {
       try { pendingWorker.postMessage({ type: 'FIEZEL_SKIP_WAITING' }); } catch (_) {}
-      // Jaring pengaman. Kalau controllerchange tidak pernah datang - worker menolak
-      // berpindah, atau pesannya hilang - murid tidak boleh tertinggal selamanya di kartu
-      // yang bertuliskan "Memperbarui...".
       setTimeout(reloadIfApproved, 3500);
     } else {
-      // Tidak ada worker menunggu: halaman baru cukup diambil dengan muat ulang biasa.
       reloadIfApproved();
     }
   }
