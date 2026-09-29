@@ -1628,8 +1628,12 @@ button.launch-card {
 }
 
 .active-level-control small {
-  color: #E2E8F0 !important;
-  font-weight: 700 !important;
+  background: rgba(255, 217, 79, 0.16) !important;
+  color: #FFD94F !important;
+  border: 1px solid rgba(255, 217, 79, 0.35) !important;
+  padding: 3px 8px !important;
+  border-radius: 8px !important;
+  font-weight: 800 !important;
 }
 
 /* Details Drawer below stadium cards */
@@ -1760,7 +1764,8 @@ button.launch-card {
   font-weight: 800 !important;
 }
 
-.fz2-lvls span {
+.fz2-lvls span,
+.card .fz2-lvls span {
   background: #202030 !important;
   color: #94A3B8 !important;
   border: 1px solid rgba(255, 255, 255, 0.08) !important;
@@ -1768,16 +1773,28 @@ button.launch-card {
 
 .fz2-lvls span.is-now,
 .fz2-lvl.is-now,
-span.fz2-lvl.is-now {
+span.fz2-lvl.is-now,
+.card .fz2-lvls span.is-now,
+.card .fz2-lvl.is-now,
+.card div > span.fz2-lvl.is-now,
+.card div > span.is-now,
+.card .fz2-lvls .is-now {
   background: #FFE02E !important;
   color: #0A0A0E !important;
   font-weight: 900 !important;
+  text-shadow: none !important;
 }
 
-.fz2-lvls span.is-done {
+.fz2-lvls span.is-done,
+.fz2-lvl.is-done,
+span.fz2-lvl.is-done,
+.card .fz2-lvls span.is-done,
+.card .fz2-lvl.is-done,
+.card div > span.fz2-lvl.is-done {
   background: #10B981 !important;
   color: #FFFFFF !important;
   font-weight: 800 !important;
+  text-shadow: none !important;
 }
 
 /* Generic Cards across all views */
@@ -1797,10 +1814,20 @@ div.card {
   color: #CBD5E1 !important;
 }
 
-.card > span,
-.card p > span,
-.card div > span:not([class*="badge"]):not([class*="tag"]):not([class*="btn"]):not([class*="act"]):not([class*="avatar"]) {
+.card > span:not([class*="lvl"]),
+.card p > span:not([class*="lvl"]),
+.card div > span:not([class*="badge"]):not([class*="tag"]):not([class*="btn"]):not([class*="act"]):not([class*="avatar"]):not([class*="lvl"]):not(.is-now):not(.is-done) {
   color: #CBD5E1 !important;
+}
+
+/* Ensure .fz2-lvl.is-now stays deep black text even after .card rules */
+.card .fz2-lvls span.is-now,
+.card .fz2-lvl.is-now,
+.card div > span.fz2-lvl.is-now,
+.card div > span.is-now {
+  color: #0A0A0E !important;
+  background: #FFE02E !important;
+  font-weight: 900 !important;
 }
 
 .social-avatar,
@@ -1818,6 +1845,16 @@ span.social-avatar,
   justify-content: center !important;
   border-radius: 50% !important;
   border: none !important;
+}
+
+/* Class Hub Badges (Zero white-on-yellow) */
+.ch-badge,
+span.ch-badge,
+.card .ch-badge,
+.card span.ch-badge {
+  background: #FFE02E !important;
+  color: #0A0A0E !important;
+  font-weight: 900 !important;
 }
 
 /* Quick practice section & Target Lang Chip (Zero Invisible Text) */
