@@ -170,3 +170,27 @@ html body:not(.fz-teacher-mode) #app .fz-aurora-cta-btn{background:rgba(255,199,
   border:1.5px solid rgba(255,199,0,.6)!important;box-shadow:none!important}
 html body:not(.fz-teacher-mode) #app .fz-aurora-cta-btn:hover{background:rgba(255,199,0,.16)!important}
 html body:not(.fz-teacher-mode) #app .fz-aurora-cta-btn *{color:inherit!important}
+
+/* ---------- chip "Coba Bahasa Jepang": lencana あ merah-sakura + warna sendiri ----------
+   Dulu ikon graduation-cap tidak ada di set fz-i → ruang kosong sebelum teks. */
+html body:not(.fz-teacher-mode) #app .target-lang-chip{--vv-ja:#F0445A;
+  display:grid!important;grid-template-columns:auto 1fr auto!important;grid-template-rows:auto auto!important;
+  column-gap:12px!important;row-gap:2px!important;align-items:center!important;padding:12px 14px!important;
+  background:radial-gradient(120% 90% at 0% 50%,rgba(240,68,90,.18),transparent 62%),linear-gradient(160deg,#1E1620,#15131C)!important;
+  border:1.5px dashed rgba(240,68,90,.55)!important;border-radius:18px!important;box-shadow:none!important;
+  transition:transform .18s cubic-bezier(.22,.8,.28,1),border-color .18s ease!important}
+html body:not(.fz-teacher-mode) #app .target-lang-chip:hover{border-color:rgba(240,68,90,.9)!important;transform:translateY(-1px)}
+html body:not(.fz-teacher-mode) #app .target-lang-chip:active{transform:scale(.985)}
+html body:not(.fz-teacher-mode) #app .target-lang-chip.is-active{border-style:solid!important;
+  background:radial-gradient(120% 90% at 0% 50%,rgba(94,184,255,.16),transparent 62%),linear-gradient(160deg,#16192A,#15131C)!important;border-color:rgba(94,184,255,.55)!important}
+html body:not(.fz-teacher-mode) #app .target-lang-chip .chip-ja-badge{grid-row:1 / span 2;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;
+  background:radial-gradient(circle at 35% 30%,#FF6B7D,#D7263D 70%);color:#FFFFFF;font-weight:800;font-size:1.3rem;line-height:1;
+  font-family:"Hiragino Sans","Noto Sans JP","Yu Gothic",system-ui,sans-serif;
+  box-shadow:0 0 0 3px rgba(240,68,90,.18),inset 0 1px 0 rgba(255,255,255,.35)}
+html body:not(.fz-teacher-mode) #app .target-lang-chip.is-active .chip-ja-badge{background:radial-gradient(circle at 35% 30%,#7CC6FF,#1F6FB8 70%);box-shadow:0 0 0 3px rgba(94,184,255,.18),inset 0 1px 0 rgba(255,255,255,.35)}
+html body:not(.fz-teacher-mode) #app .target-lang-chip .chip-label{grid-column:2;font-size:.98rem!important;color:#FFFFFF!important}
+html body:not(.fz-teacher-mode) #app .target-lang-chip .chip-sub{grid-column:2;font-size:.8rem!important;color:var(--vv-muted)!important}
+html body:not(.fz-teacher-mode) #app .target-lang-chip .chip-go,
+html body:not(.fz-teacher-mode) #app .target-lang-chip>svg{grid-column:3;grid-row:1 / span 2;width:18px;height:18px;color:#FF8A9A}
+html body:not(.fz-teacher-mode) #app .target-lang-chip.is-active .chip-go,
+html body:not(.fz-teacher-mode) #app .target-lang-chip.is-active>svg{color:#7CC6FF}

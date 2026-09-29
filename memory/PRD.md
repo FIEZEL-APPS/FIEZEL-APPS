@@ -151,3 +151,6 @@ Lingkup: HANYA warna teks & latar (arahan: latar bersih cerah, tanpa redesign).
 - Akar masalah: mobile-edge-fit.css memaksa tema gelap murid global (:root --panel/--text !important, body #0A0A0E, h1–h6 #fff) → bocor ke Ruang Guru.
 - Perbaikan di akhir features/teacher/teacher-shell.css (scope body.fz-teacher-mode): latar #F6F4EE, kartu putih, sidebar & nav bawah mobile putih, kartu "ink" jadi sage lembut, judul tinta gelap, status chip/pill/avatar dipergelap ≥4,5:1, tombol ghost-light terlihat, bottom nav murid disembunyikan (niat asli CSS guru).
 - Hasil audit otomatis: 0 teks < 4,5:1 di 10 tab desktop + mobile (sebelumnya puluhan elemen gelap/tak terbaca).
+
+## Chip Kursus Jepang (2026-09-29) — m025-386
+- Ikon graduation-cap (tidak ada di set fz-i → kosong) diganti lencana あ merah-sakura; saat kursus Jepang aktif jadi lencana A biru (kembali ke Inggris). Kartu berwarna sendiri + panah; data-testid home-target-lang-chip.

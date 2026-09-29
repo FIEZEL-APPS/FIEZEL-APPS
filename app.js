@@ -13877,9 +13877,11 @@ function targetLangChipMarkup(){
   const tujuan=ja?'en':'ja';
   const judul=ja?FiezelI18n.t('bahasa.chip-aktif-ja'):FiezelI18n.t('bahasa.chip-coba-ja');
   const sub=ja?FiezelI18n.t('bahasa.chip-kembali-en'):FiezelI18n.t('bahasa.chip-coba-ja-sub');
-  return `<button type="button" class="target-lang-chip${ja?' is-active':''}" onclick="setTargetLangPreference('${tujuan}')" aria-label="${esc(FiezelI18n.t('bahasa.chip-aria'))}">
-      <span class="chip-label"><i class="fz-i" data-fz-icon="graduation-cap" style="width:14px;height:14px;display:inline-flex"></i> ${esc(judul)}</span>
+  return `<button type="button" class="target-lang-chip${ja?' is-active':''}" onclick="setTargetLangPreference('${tujuan}')" aria-label="${esc(FiezelI18n.t('bahasa.chip-aria'))}" data-testid="home-target-lang-chip">
+      <span class="chip-ja-badge" aria-hidden="true">${ja?'A':'あ'}</span>
+      <span class="chip-label">${esc(judul)}</span>
       <span class="chip-sub">${esc(sub)}</span>
+      <i class="chip-go" data-lucide="arrow-right" aria-hidden="true"></i>
     </button>`;
 }
 function targetLangRowMarkup(){
