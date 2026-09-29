@@ -28,6 +28,7 @@
     var cards = app.querySelectorAll('.card, .home-fold, details.settings-fold');
     for (var i = 0; i < cards.length; i++) {
       var el = cards[i];
+      if (el.querySelector('.social-soon')) continue; // keadaan kosong ramah + CTA: disembunyikan = layar Profil kosong
       var head = el.querySelector('h2, h3, summary span, summary');
       var headText = norm(head && head.textContent);
       var bodyText = norm(el.textContent);

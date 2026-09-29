@@ -14880,7 +14880,7 @@ function onlineView(){
 // Kartu keadaan yang dijanjikan spec: dua kalimat jujur, nol nada gagal. Belajar tidak
 // pernah butuh fitur ini, dan kartunya mengatakan itu.
 function socialOfflineCard(){const pending=(()=>{try{return socialCore()?.outboxPending()||0}catch(_){return 0}})();return card(`<h3>${FiezelI18n.t('social.offline-title')}</h3><p class="muted">${FiezelI18n.t('social.offline-body',{pendingNote:pending?FiezelI18n.t('social.offline-pending',{count:pending}):''})}</p>`,'social-card')}
-function socialFlagOffCard(flag){return flag==='offline'?socialOfflineCard():card(`<h3>${FiezelI18n.t('social.flag-off-title')}</h3><p class="muted">${FiezelI18n.t('social.flag-off-body')}</p>`,'social-card')}
+function socialFlagOffCard(flag){return flag==='offline'?socialOfflineCard():card(`<div class="social-soon" data-testid="social-soon"><span class="social-soon-icon"><i class="fz-i" data-fz-icon="speaking" aria-hidden="true"></i></span><h3>${FiezelI18n.t('social.flag-off-title')}</h3><p class="muted">${FiezelI18n.t('social.segera-body')}</p><button class="primary" onclick="go('latihan')" data-testid="social-soon-cta">${FiezelI18n.t('social.segera-cta')}</button></div>`,'social-card')}
 async function renderOnlineTab(){
   const seq=++onlineSeq;
   const put=html=>{if(seq!==onlineSeq||state.view!=='online')return;const el=$('onlineRoot');if(el){el.innerHTML=html;enhanceUI()}};

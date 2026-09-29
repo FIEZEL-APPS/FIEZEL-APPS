@@ -189,7 +189,7 @@
     /* Audit UI/UX Home 2026-09-27 (m025-376): teks kartu Home dipindah dari app.js; angkanya kini dihitung. */
     'home.sapa': 'Hi {nama}!',
     'home.motivasi-kembali': 'Kemana aja nih, kok baru kelihatan lagi! Yuk latihan sekarang biar ritmemu tetap terjaga. 🔥',
-    'home.motivasi-2': 'Kalau kamu ga belajar mulai dari sekarang, kamu akan susah di kemudian hari. Semangat terus! 💪',
+    'home.motivasi-2': 'Belajar sedikit tiap hari jauh lebih ampuh daripada banyak sekaligus seminggu sekali. Yuk mulai! 💪',
     'home.motivasi-3': '10 menit latihan hari ini menjaga ritme belajarmu tetap prima. Jangan tunda lagi ya! 🚀',
     'home.motivasi-4': 'Konsistensi kecil hari ini adalah lompatan besar esok hari. Let\'s do this! ⭐',
     'home.motivasi-5': 'Setiap kata baru yang kamu kuasai membuka peluang baru di masa depan. Semangat! 🌟',
