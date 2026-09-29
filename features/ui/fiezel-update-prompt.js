@@ -53,6 +53,17 @@
     dropSess('fiezel-apply-update');
     try { location.reload(); } catch (_) {}
   }
+  function isNewerVersion(remote, cur) {
+    if (!remote || !cur || remote === cur) return false;
+    var r = remote.split('.').map(function (n) { return parseInt(n, 10) || 0; });
+    var c = cur.split('.').map(function (n) { return parseInt(n, 10) || 0; });
+    for (var i = 0; i < Math.max(r.length, c.length); i++) {
+      var rv = r[i] || 0, cv = c[i] || 0;
+      if (rv > cv) return true;
+      if (rv < cv) return false;
+    }
+    return false;
+  }
   function bindReload() {
     if (reloadBound || !navigator.serviceWorker || typeof navigator.serviceWorker.addEventListener !== 'function') return;
     reloadBound = true;
@@ -130,7 +141,12 @@
   }
   function show(worker, remoteVersion) {
     if (worker) pendingWorker = worker;
+    if (!worker && remoteVersion && APP_VERSION && !isNewerVersion(remoteVersion, APP_VERSION)) return false;
     if (shown) return false;
+    if (sess('fiezel-apply-update') === '1') {
+      dropSess('fiezel-apply-update');
+      return false;
+    }
     if (sess('fiezel-update-later') === '1') {
       var laterTime = Number(sess('fiezel-update-later-time') || 0);
       var SNOOZE_MS = 10 * 60 * 1000;
@@ -217,7 +233,7 @@
           // VERSION.json sudah maju tetapi service worker belum punya kandidat baru (mis.
           // hanya berkas non-precache yang berubah). Kartunya tetap muncul; jalur "tanpa
           // worker menunggu" di apply() menanganinya dengan muat ulang biasa.
-          if (remote && APP_VERSION && remote !== APP_VERSION) return show(null, remote);
+          if (remote && APP_VERSION && isNewerVersion(remote, APP_VERSION)) return show(null, remote);
           return false;
         });
       });
