@@ -34,7 +34,7 @@
     'quiz.exit-aria': 'Keluar dari sesi',
     'quiz.exit-label': 'Keluar',
     'quiz.progress-aria': 'Soal {asked} dari {planned}',
-    'quiz.teach-flag': 'Kita ulas dulu',
+    'quiz.teach-flag': 'Jeda mengajar',
     'quiz.reteach-label': 'ULAS BARENG',
     'quiz.reteach-intro': 'Yang bikin tadi keliru:',
     'quiz.reteach-ready': 'Oke, aku siap coba lagi',
