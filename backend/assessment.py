@@ -13,6 +13,8 @@ from pydantic import BaseModel, Field
 
 from db import db
 from auth import teacher_user, current_user
+from access import (assert_class_teacher as _assert_class_teacher, assert_student_access as _assert_student_access,
+                    assert_class_member, assert_assessment_access, teacher_class_ids)
 import braincore as bc
 
 router = APIRouter(prefix="/api", tags=["assessment"])
@@ -86,9 +88,7 @@ async def list_classes(u=Depends(current_user)):
 
 @router.get("/classes/{class_id}")
 async def get_class(class_id: str, u=Depends(current_user)):
-    cls = await db.classes.find_one({"id": class_id}, {"_id": 0})
-    if not cls:
-        raise HTTPException(404, "kelas tidak ditemukan")
+    cls = await assert_class_member(class_id, u)
     cls["students"] = [
         {"user_id": s["user_id"], "name": s.get("name"), "email": s.get("email")}
         for s in await bc.class_students(class_id)]
@@ -101,9 +101,7 @@ class RosterIn(BaseModel):
 
 @router.post("/classes/{class_id}/roster")
 async def add_roster(class_id: str, body: RosterIn, u=Depends(teacher_user)):
-    cls = await db.classes.find_one({"id": class_id}, {"_id": 0})
-    if not cls:
-        raise HTTPException(404, "kelas tidak ditemukan")
+    await _assert_class_teacher(class_id, u)
     created = []
     for raw in body.names:
         name = raw.strip()[:60]
@@ -185,7 +183,8 @@ async def check_blueprint_route(body: BlueprintIn, u=Depends(teacher_user)):
 
 @router.get("/blueprints")
 async def list_blueprints(u=Depends(teacher_user)):
-    return await db.blueprints.find({}, {"_id": 0}).sort("created_at", -1).to_list(200)
+    q: dict[str, Any] = {} if u["role"] == "owner" else {"created_by": u["user_id"]}
+    return await db.blueprints.find(q, {"_id": 0}).sort("created_at", -1).to_list(200)
 
 
 # ----------------------------- perakitan & asesmen -----------------------------
@@ -257,13 +256,12 @@ class AssessmentIn(BaseModel):
     goal_note: str = ""
 
 
-async def _build_assessment(body: AssessmentIn, actor: str) -> dict:
+async def _build_assessment(body: AssessmentIn, u: dict) -> dict:
     if body.assessment_type not in ASSESSMENT_TYPES:
         raise HTTPException(400, f"jenis asesmen harus salah satu dari {list(ASSESSMENT_TYPES)}")
     cfg = ASSESSMENT_TYPES[body.assessment_type]
-    cls = await db.classes.find_one({"id": body.class_id}, {"_id": 0})
-    if not cls:
-        raise HTTPException(404, "kelas tidak ditemukan")
+    cls = await _assert_class_teacher(body.class_id, u)
+    actor = u["user_id"]
     tp_ids = list(body.tp_ids)
     if body.competency_ids and not tp_ids:
         comps = await db.curriculum_nodes.find({"id": {"$in": body.competency_ids}}, {"_id": 0}).to_list(200)
@@ -312,7 +310,7 @@ async def _build_assessment(body: AssessmentIn, actor: str) -> dict:
 
 @router.post("/assessments")
 async def create_assessment(body: AssessmentIn, u=Depends(teacher_user)):
-    doc = await _build_assessment(body, u["user_id"])
+    doc = await _build_assessment(body, u)
     await db.assessments.insert_one(dict(doc))
     doc.pop("_id", None)
     return doc
@@ -339,7 +337,7 @@ async def from_recommendation(body: FromRecIn, u=Depends(teacher_user)):
                            competency_ids=[body.competency_id] if body.competency_id else [],
                            student_ids=body.student_ids, question_count=body.question_count,
                            goal_note="Dibuat dari rekomendasi Braincore")
-    doc = await _build_assessment(payload, u["user_id"])
+    doc = await _build_assessment(payload, u)
     doc["from_recommendation"] = body.kind
     await db.assessments.insert_one(dict(doc))
     doc.pop("_id", None)
@@ -349,13 +347,30 @@ async def from_recommendation(body: FromRecIn, u=Depends(teacher_user)):
 @router.get("/assessments")
 async def list_assessments(class_id: str | None = None, u=Depends(current_user)):
     q: dict[str, Any] = {}
-    if class_id:
-        q["class_id"] = class_id
     if u["role"] == "student":
-        q["student_ids"] = u["user_id"]
+        # Hanya asesmen yang DITUJUKAN padanya: langsung, atau seluruh kelas tempat ia terdaftar.
+        q["$or"] = [{"student_ids": u["user_id"]},
+                    {"for_whole_class": True, "class_id": {"$in": u.get("class_ids") or []}}]
+        if class_id:
+            q["class_id"] = class_id
+    elif u["role"] == "teacher":
+        # Dulu guru tanpa class_id melihat SEMUA asesmen sekolah (IDOR). Kini hanya kelas yang diampu.
+        if class_id:
+            await _assert_class_teacher(class_id, u)
+            q["class_id"] = class_id
+        else:
+            q["class_id"] = {"$in": await teacher_class_ids(u)}
+    elif class_id:
+        q["class_id"] = class_id
     items = await db.assessments.find(q, {"_id": 0}).sort("created_at", -1).to_list(200)
+    # Satu query sesi untuk semua asesmen (dulu satu query per asesmen).
+    sess_rows = await db.sessions.find({"assessment_id": {"$in": [a["id"] for a in items]}},
+                                       {"_id": 0}).to_list(len(items) * 1000 or 1)
+    by_asm: dict[str, list[dict]] = {}
+    for s in sess_rows:
+        by_asm.setdefault(s["assessment_id"], []).append(s)
     for a in items:
-        sess = await db.sessions.find({"assessment_id": a["id"]}, {"_id": 0}).to_list(1000)
+        sess = by_asm.get(a["id"], [])
         a["progress"] = {"started": len(sess),
                          "finished": sum(1 for s in sess if s.get("state") == "finished"),
                          "targets": len(a.get("student_ids") or [])}
@@ -370,6 +385,7 @@ async def get_assessment(assessment_id: str, u=Depends(current_user)):
     a = await db.assessments.find_one({"id": assessment_id}, {"_id": 0})
     if not a:
         raise HTTPException(404, "asesmen tidak ditemukan")
+    await assert_assessment_access(a, u)
     return a
 
 
@@ -388,14 +404,18 @@ async def assessment_analytics(assessment_id: str, u=Depends(teacher_user)):
         d["avg_time_ms"] += at.get("time_ms") or 0
         if at.get("misconception_id"):
             d["misconceptions"][at["misconception_id"]] = d["misconceptions"].get(at["misconception_id"], 0) + 1
+    qrows = await db.questions.find({"question_id": {"$in": list(per_q)}, "is_current": True},
+                                    {"_id": 0, "question_id": 1, "stem": 1, "difficulty": 1,
+                                     "cognitive_level": 1}).to_list(len(per_q) or 1)
+    qmap = {q["question_id"]: q for q in qrows}
     items = []
     for qid, d in per_q.items():
-        q = await db.questions.find_one({"question_id": qid, "is_current": True}, {"_id": 0})
+        q = qmap.get(qid, {})
         p = d["correct"] / d["n"] if d["n"] else None
         items.append({**d, "avg_time_ms": round(d["avg_time_ms"] / d["n"]) if d["n"] else 0,
                       "p_value": round(p, 3) if p is not None else None,
-                      "stem": (q or {}).get("stem"), "difficulty": (q or {}).get("difficulty"),
-                      "cognitive_level": (q or {}).get("cognitive_level"),
+                      "stem": q.get("stem"), "difficulty": q.get("difficulty"),
+                      "cognitive_level": q.get("cognitive_level"),
                       "flag": ("terlalu sulit" if p is not None and p < 0.25 else
                                "terlalu mudah" if p is not None and p > 0.95 else "sehat")})
     items.sort(key=lambda x: (x["p_value"] if x["p_value"] is not None else 1))
@@ -420,11 +440,13 @@ async def assessment_types():
 @router.get("/coverage")
 async def coverage(class_id: str, subject_id: str | None = None, grade_id: str | None = None,
                    u=Depends(teacher_user)):
+    await _assert_class_teacher(class_id, u)
     return await bc.coverage_matrix(class_id, subject_id, grade_id)
 
 
 @router.get("/braincore/recommendations")
 async def get_recommendations(class_id: str, u=Depends(teacher_user)):
+    await _assert_class_teacher(class_id, u)
     return {"class_id": class_id, "recommendations": await bc.recommendations(class_id)}
 
 
@@ -435,6 +457,7 @@ class GroupIn(BaseModel):
 
 @router.post("/braincore/groups")
 async def post_groups(body: GroupIn, u=Depends(teacher_user)):
+    await _assert_class_teacher(body.class_id, u)
     return await bc.dynamic_groups(body.class_id, body.tp_id)
 
 
@@ -446,11 +469,13 @@ class PlanIn(BaseModel):
 
 @router.post("/braincore/lesson-plan")
 async def post_lesson_plan(body: PlanIn, u=Depends(teacher_user)):
+    await _assert_class_teacher(body.class_id, u)
     return await bc.lesson_plan(body.class_id, body.tp_id, body.minutes)
 
 
 @router.get("/braincore/tp-detail")
 async def tp_detail(class_id: str, tp_id: str, u=Depends(teacher_user)):
+    await _assert_class_teacher(class_id, u)
     return {"summary": await bc.student_tp_summary(class_id, tp_id),
             "misconceptions": await bc.class_misconceptions(class_id, tp_id),
             "state_labels": bc.STATE_LABEL}
@@ -458,19 +483,18 @@ async def tp_detail(class_id: str, tp_id: str, u=Depends(teacher_user)):
 
 @router.get("/braincore/passport/{student_id}")
 async def passport(student_id: str, u=Depends(current_user)):
-    if u["role"] == "student" and u["user_id"] != student_id:
-        raise HTTPException(403, "Hanya bisa melihat paspor sendiri")
+    await _assert_student_access(student_id, u)
     return await bc.learning_passport(student_id)
 
 
 @router.get("/braincore/evidence-graph/{student_id}")
 async def evidence(student_id: str, u=Depends(current_user)):
-    if u["role"] == "student" and u["user_id"] != student_id:
-        raise HTTPException(403, "Hanya bisa melihat evidence sendiri")
+    await _assert_student_access(student_id, u)
     return await bc.evidence_graph(student_id)
 
 
 @router.get("/braincore/student-state")
 async def student_state(student_id: str, competency_id: str, u=Depends(current_user)):
+    await _assert_student_access(student_id, u)
     st = await bc.get_state(student_id, competency_id)
     return {**st, "state_label": bc.STATE_LABEL.get(st["state"]), "retrievability": bc.retrievability(st)}
