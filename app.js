@@ -9080,6 +9080,18 @@ function todayHomeMarkup(){
     ? self.FiezelNujum.homeCardMarkup()
     : '';
 
+  /* BUG × Sarang (2026-09-30): adegan Sarang menggantikan hero + kartu NUJUM + Aurora di Home;
+     hub skill, strip KelasKu, dan laci detail tetap. Tanpa modul, tampilan lama utuh. */
+  const bugHome=(self.FiezelBug&&typeof self.FiezelBug.homeMarkup==='function')?self.FiezelBug.homeMarkup():'';
+  if(bugHome)return `<div class="today-home-cockpit fz-edu-cockpit fz-bug-home">
+  ${bugHome}
+  ${quickChips}
+  ${kelaskuStrip}
+  <details class="fz-card-drawer" style="margin-top:4px">
+    <summary class="fz-drawer-toggle"><span>${esc(FiezelI18n.t('home.sesi-next'))}</span><span class="fz-drawer-arrow">▾</span></summary>
+    <div class="fz-drawer-inner">${homeTop}${card1Hero}${card2Hero}${card3Hero}${rhythmBar}${badan}${activeLevelTrustLineMarkup()}${evidenceProgressPanelMarkup()}</div>
+  </details>
+</div>`;
   return `<div class="today-home-cockpit fz-edu-cockpit">
   ${homeTop}
   ${nujumCard}

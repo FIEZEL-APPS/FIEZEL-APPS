@@ -1,0 +1,414 @@
+{
+ "schema": "fiezel-bug-species-v1",
+ "species": {
+  "tense_aspect.aspect_for_completed": {
+   "name": "Udah-Belum",
+   "tag": "Sedang vs selesai tertukar",
+   "color": "#7FB7A4",
+   "shape": "cap",
+   "family": "tense_aspect"
+  },
+  "tense_aspect.habitual_overgeneralized": {
+   "name": "Rutin-Rutin",
+   "tag": "Kebiasaan dipakai buat kejadian sesaat",
+   "color": "#7FB7A4",
+   "shape": "cap",
+   "family": "tense_aspect"
+  },
+  "tense_aspect.progressive_overuse": {
+   "name": "Ing-Ing",
+   "tag": "-ing dipakai berlebihan",
+   "color": "#7FB7A4",
+   "shape": "cap",
+   "family": "tense_aspect"
+  },
+  "tense_aspect.perfect_misuse": {
+   "name": "Si Perfect",
+   "tag": "Perfect salah tempat",
+   "color": "#7FB7A4",
+   "shape": "cap",
+   "family": "tense_aspect"
+  },
+  "tense_aspect.timeline_mismatch": {
+   "name": "Kemarin-Sekarang",
+   "tag": "Tense nggak cocok garis waktu",
+   "color": "#7FB7A4",
+   "shape": "cap",
+   "family": "tense_aspect"
+  },
+  "tense_aspect.future_form_confusion": {
+   "name": "Nanti-Nanti",
+   "tag": "Bentuk masa depan tertukar",
+   "color": "#7FB7A4",
+   "shape": "cap",
+   "family": "tense_aspect"
+  },
+  "agreement.bare_form": {
+   "name": "Polos",
+   "tag": "Kata kerja dasar tanpa penanda",
+   "color": "#E9B44C",
+   "shape": "seg",
+   "family": "agreement"
+  },
+  "agreement.number_mismatch": {
+   "name": "Es-Es",
+   "tag": "Subjek vs kata kerja",
+   "color": "#E9B44C",
+   "shape": "seg",
+   "family": "agreement"
+  },
+  "agreement.missing_auxiliary": {
+   "name": "Tanpa-Bantu",
+   "tag": "Kata bantu hilang",
+   "color": "#E9B44C",
+   "shape": "seg",
+   "family": "agreement"
+  },
+  "structure.double_marking": {
+   "name": "Dobel",
+   "tag": "Penanda ganda",
+   "color": "#C4515F",
+   "shape": "box",
+   "family": "structure"
+  },
+  "structure.word_order": {
+   "name": "Kebalik",
+   "tag": "Urutan kata terbalik",
+   "color": "#C4515F",
+   "shape": "box",
+   "family": "structure"
+  },
+  "structure.inversion_error": {
+   "name": "Salah-Balik",
+   "tag": "Inversi keliru",
+   "color": "#C4515F",
+   "shape": "box",
+   "family": "structure"
+  },
+  "structure.malformed_blend": {
+   "name": "Gado-Gado",
+   "tag": "Dua pola dicampur",
+   "color": "#C4515F",
+   "shape": "box",
+   "family": "structure"
+  },
+  "structure.omitted_element": {
+   "name": "Bolong",
+   "tag": "Ada bagian yang hilang",
+   "color": "#C4515F",
+   "shape": "box",
+   "family": "structure"
+  },
+  "modality.function_confusion": {
+   "name": "Modal-Modal",
+   "tag": "Fungsi modal tertukar",
+   "color": "#8FA9D6",
+   "shape": "spike",
+   "family": "modality"
+  },
+  "modality.strength_miscalibrated": {
+   "name": "Lebay",
+   "tag": "Kekuatan modal nggak pas",
+   "color": "#8FA9D6",
+   "shape": "spike",
+   "family": "modality"
+  },
+  "modality.negation_scope": {
+   "name": "Nggak-Nggak",
+   "tag": "Negasi modal salah cakupan",
+   "color": "#8FA9D6",
+   "shape": "spike",
+   "family": "modality"
+  },
+  "modality.past_reference_error": {
+   "name": "Modal-Lampau",
+   "tag": "Modal masa lampau keliru",
+   "color": "#8FA9D6",
+   "shape": "spike",
+   "family": "modality"
+  },
+  "conditionals.type_mismatch": {
+   "name": "Kalau-Kalau",
+   "tag": "Tipe conditional tertukar",
+   "color": "#D48FB8",
+   "shape": "cap",
+   "family": "conditionals"
+  },
+  "conditionals.clause_form_swap": {
+   "name": "Tukar-Klausa",
+   "tag": "Klausa if/hasil tertukar",
+   "color": "#D48FB8",
+   "shape": "cap",
+   "family": "conditionals"
+  },
+  "passive.active_for_passive": {
+   "name": "Aktif-Pasif",
+   "tag": "Aktif dipakai untuk pasif",
+   "color": "#B39DDB",
+   "shape": "seg",
+   "family": "passive"
+  },
+  "passive.participle_form": {
+   "name": "Pasif-Polos",
+   "tag": "Participle pasif salah bentuk",
+   "color": "#B39DDB",
+   "shape": "seg",
+   "family": "passive"
+  },
+  "passive.causative_confusion": {
+   "name": "Suruh-Suruh",
+   "tag": "Causative tertukar",
+   "color": "#B39DDB",
+   "shape": "seg",
+   "family": "passive"
+  },
+  "passive.impersonal_pattern": {
+   "name": "It-Is-Said",
+   "tag": "Pasif impersonal keliru",
+   "color": "#B39DDB",
+   "shape": "seg",
+   "family": "passive"
+  },
+  "reported.backshift_error": {
+   "name": "Kata-Dia",
+   "tag": "Backshift kalimat laporan",
+   "color": "#F0A868",
+   "shape": "box",
+   "family": "reported"
+  },
+  "reported.deixis_shift": {
+   "name": "Sini-Sana",
+   "tag": "Kata tunjuk laporan tak bergeser",
+   "color": "#F0A868",
+   "shape": "box",
+   "family": "reported"
+  },
+  "articles.definiteness_mismatch": {
+   "name": "The-The",
+   "tag": "the / a tertukar",
+   "color": "#9BC8E6",
+   "shape": "spike",
+   "family": "articles"
+  },
+  "articles.countability_quantifier": {
+   "name": "Banyak-Banyak",
+   "tag": "Countable vs uncountable",
+   "color": "#9BC8E6",
+   "shape": "spike",
+   "family": "articles"
+  },
+  "articles.sound_rule": {
+   "name": "A-An",
+   "tag": "a/an ikut bunyi, bukan huruf",
+   "color": "#9BC8E6",
+   "shape": "spike",
+   "family": "articles"
+  },
+  "articles.zero_article": {
+   "name": "Tanpa-The",
+   "tag": "Artikel nol salah pakai",
+   "color": "#9BC8E6",
+   "shape": "spike",
+   "family": "articles"
+  },
+  "comparison.degree_scope": {
+   "name": "Lebih-Paling",
+   "tag": "Tingkat perbandingan keliru",
+   "color": "#E6C36B",
+   "shape": "cap",
+   "family": "comparison"
+  },
+  "comparison.form_intensifier": {
+   "name": "More-Er",
+   "tag": "Comparative dobel",
+   "color": "#E6C36B",
+   "shape": "cap",
+   "family": "comparison"
+  },
+  "prepositions.semantic_category": {
+   "name": "In-On-At",
+   "tag": "Preposisi tempat/waktu keliru",
+   "color": "#C4515F",
+   "shape": "box",
+   "family": "prepositions"
+  },
+  "prepositions.collocation": {
+   "name": "Interested-With",
+   "tag": "Preposisi ikut terjemahan",
+   "color": "#C4515F",
+   "shape": "box",
+   "family": "prepositions"
+  },
+  "lexical.form_confusion": {
+   "name": "Mirip-Mirip",
+   "tag": "Kata mirip tertukar",
+   "color": "#A3B86C",
+   "shape": "seg",
+   "family": "lexical"
+  },
+  "lexical.register_mismatch": {
+   "name": "Santai-Resmi",
+   "tag": "Ragam bahasa nggak pas",
+   "color": "#A3B86C",
+   "shape": "seg",
+   "family": "lexical"
+  },
+  "complementation.gerund_infinitive_swap": {
+   "name": "To-Ing",
+   "tag": "gerund / infinitive tertukar",
+   "color": "#7FB7A4",
+   "shape": "cap",
+   "family": "complementation"
+  },
+  "complementation.meaning_pair_shift": {
+   "name": "Stop-To-Stop",
+   "tag": "Pasangan makna berubah",
+   "color": "#7FB7A4",
+   "shape": "cap",
+   "family": "complementation"
+  },
+  "complementation.bare_form_error": {
+   "name": "Bare-Bare",
+   "tag": "Bentuk dasar sesudah kata tertentu",
+   "color": "#7FB7A4",
+   "shape": "cap",
+   "family": "complementation"
+  },
+  "complementation.verb_pattern": {
+   "name": "Pola-Kerja",
+   "tag": "Pola kata kerja + pelengkap",
+   "color": "#7FB7A4",
+   "shape": "cap",
+   "family": "complementation"
+  },
+  "relative.pronoun_choice": {
+   "name": "Who-Which",
+   "tag": "Kata ganti relatif tertukar",
+   "color": "#D48FB8",
+   "shape": "spike",
+   "family": "relative"
+  },
+  "relative.restrictiveness": {
+   "name": "Koma-Koma",
+   "tag": "Klausa relatif dan koma",
+   "color": "#D48FB8",
+   "shape": "spike",
+   "family": "relative"
+  },
+  "relative.reduction_error": {
+   "name": "Potong-Salah",
+   "tag": "Reduksi klausa relatif keliru",
+   "color": "#D48FB8",
+   "shape": "spike",
+   "family": "relative"
+  },
+  "question.auxiliary_error": {
+   "name": "Do-Does",
+   "tag": "Kata bantu tanya keliru",
+   "color": "#E9B44C",
+   "shape": "seg",
+   "family": "question"
+  },
+  "question.polarity_negation": {
+   "name": "Ya-Bukan",
+   "tag": "Tanya negatif tertukar",
+   "color": "#E9B44C",
+   "shape": "seg",
+   "family": "question"
+  },
+  "question.wh_choice": {
+   "name": "Wh-Wh",
+   "tag": "Kata tanya tertukar",
+   "color": "#E9B44C",
+   "shape": "seg",
+   "family": "question"
+  },
+  "pronouns.case_form": {
+   "name": "Me-I",
+   "tag": "Bentuk kata ganti keliru",
+   "color": "#8FA9D6",
+   "shape": "box",
+   "family": "pronouns"
+  },
+  "linking.connector_choice": {
+   "name": "Tapi-Jadi",
+   "tag": "Kata penghubung tertukar",
+   "color": "#F0A868",
+   "shape": "spike",
+   "family": "linking"
+  },
+  "transfer.id_l1_pattern": {
+   "name": "Si Harfiah",
+   "tag": "Terjemahan kata per kata",
+   "color": "#C4515F",
+   "shape": "box",
+   "family": "transfer"
+  }
+ },
+ "generic": {
+  "name": "Bug Misterius",
+  "tag": "Kebiasaan yang belum bernama",
+  "color": "#8A7F79",
+  "shape": "spike",
+  "family": "unknown"
+ },
+ "taunts": {
+  "id": {
+   "generic": [
+    "Kena. Lo pilih <b>{opt}</b>. Persis yang gue tebak.",
+    "<b>{opt}</b>? Refleks lama lagi. {bug} kenyang.",
+    "Nggak dibaca sampai habis ya? <b>{opt}</b> itu jebakan gue."
+   ],
+   "timeout": [
+    "Kehabisan waktu. Ragu-ragu itu makanan gue juga.",
+    "Diem aja? {bug} nggak butuh jawaban buat menang."
+   ],
+   "family": {
+    "agreement": "Lihat kata di depan titik-titik, langsung <b>{opt}</b>. Subjek aslinya nggak lo cari.",
+    "tense_aspect": "<b>{opt}</b> — lo nebak dari perasaan, bukan dari penanda waktunya.",
+    "transfer": "<b>{opt}</b> itu bahasa Indonesia yang dipaksa pakai baju Inggris.",
+    "prepositions": "Nerjemahin preposisi kata per kata lagi: <b>{opt}</b>. Gue hidup dari kebiasaan itu.",
+    "articles": "<b>{opt}</b>? Artikel lo pilih pakai kebiasaan, bukan aturan.",
+    "complementation": "Sesudah kata itu bentuknya bukan <b>{opt}</b>. Pola kata kerjanya nggak lo hafal.",
+    "structure": "Urutannya lo susun pakai logika Indonesia: <b>{opt}</b>.",
+    "modality": "<b>{opt}</b> — modalnya lo pilih dari arti kasarnya aja.",
+    "question": "Kalimat tanya butuh kata bantu yang pas, bukan <b>{opt}</b>.",
+    "passive": "<b>{opt}</b>? Siapa yang melakukan dan siapa yang dikenai, kebalik.",
+    "conditionals": "<b>{opt}</b> — tipe kalau-nya nggak lo cek dulu.",
+    "relative": "<b>{opt}</b>? Yang dirujuk orang atau benda, nggak lo lihat.",
+    "comparison": "<b>{opt}</b>? Perbandingannya lo dobel atau lo kurangin.",
+    "reported": "Lapor omongan orang tapi waktunya nggak digeser: <b>{opt}</b>.",
+    "lexical": "<b>{opt}</b> mirip, tapi bukan itu. Lo baca bentuknya, bukan artinya.",
+    "linking": "<b>{opt}</b> nyambungnya ke arah yang salah.",
+    "pronouns": "<b>{opt}</b>? Posisinya subjek atau objek, nggak lo cek."
+   },
+   "win": [
+    "{bug} salah nebak. Kamu baca sampai habis — dia nggak nyangka.",
+    "Tebakan {bug} meleset. Pola lamanya nggak lagi mempan.",
+    "{bug} kecolongan. Itu bukan hoki, itu kamu baca subjeknya."
+   ],
+   "paw": [
+    "Nggak apa-apa bingung. Jujur nggak tahu lebih keren daripada nebak.",
+    "Tenang. Yang penting sekarang kamu tahu bentuk benernya."
+   ]
+  },
+  "th": {
+   "generic": [
+    "โดนแล้ว เธอเลือก <b>{opt}</b> ตรงตามที่ฉันทายไว้",
+    "<b>{opt}</b>? นิสัยเดิมอีกแล้ว {bug} อิ่มเลย",
+    "อ่านไม่จบประโยคใช่ไหม <b>{opt}</b> คือกับดักของฉัน"
+   ],
+   "timeout": [
+    "หมดเวลา ความลังเลก็เป็นอาหารของฉันเหมือนกัน"
+   ],
+   "family": {},
+   "win": [
+    "{bug} ทายผิด เธออ่านจนจบ — มันไม่คิดว่าเธอจะทำได้",
+    "คำทายของ {bug} พลาด นิสัยเดิมไม่ได้ผลอีกแล้ว"
+   ],
+   "paw": [
+    "ไม่เป็นไรที่งง ยอมรับว่าไม่รู้เก่งกว่าการเดา"
+   ]
+  }
+ }
+}

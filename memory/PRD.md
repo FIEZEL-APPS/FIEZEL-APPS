@@ -92,7 +92,7 @@ P1: paritas BKT klien-server, CI backend tests, hapus dead code. P2: refactor N+
   `origin/main`** pada 2026-06 (sebelumnya tertinggal ~2.300 commit) lalu dipatch.
 - Auth: satu pintu tiket KelasKu (`POST /api/auth/kelasku`, HMAC `CURRICULUM_TICKET_KEY`).
 - Env lokal `/app/backend/.env` (tidak di-commit): MONGO_URL, DB_NAME, JWT_SECRET,
-  CURRICULUM_TICKET_KEY, CORS_ORIGINS. Preview: https://grammar-no-theory.preview.emergentagent.com/api/health
+  CURRICULUM_TICKET_KEY, CORS_ORIGINS. Preview: https://nujum-prophecy.preview.emergentagent.com/api/health
 - Frontend repo = halaman statis (kurikulum.html, misi.html, features/*) — tidak disentuh.
 
 ## Yang sudah dikerjakan
@@ -154,3 +154,12 @@ Lingkup: HANYA warna teks & latar (arahan: latar bersih cerah, tanpa redesign).
 
 ## Chip Kursus Jepang (2026-09-29) — m025-386
 - Ikon graduation-cap (tidak ada di set fz-i → kosong) diganti lencana あ merah-sakura; saat kursus Jepang aktif jadi lencana A biru (kembali ke Inggris). Kartu berwarna sendiri + panah; data-testid home-target-lang-chip.
+
+## Hero Feature Baru: BUG × Sarang (2026-09-30) — strategi + prototype
+- Keputusan OWNER: NUJUM direframe menjadi "BUG" — miskonsepsi (taksonomi + optionMisconceptions) jadi makhluk bernama dengan HP (BKT) yang pulih mengikuti kurva lupa; PAW = pemburu. Home "Hari Ini" diganti adegan "Sarang" (panel tinta di kertas hangat, 1 CTA). Antagonisnya adalah LUPA, bukan mesin.
+- Prototype standalone: `mockups/sarang-prototype.html` (Vanilla JS/CSS/Canvas/WebAudio, tanpa dependensi, 360px). Berisi Sarang (3 bug dummy + ring HP + PAW + kata hari ini), Beat Prediksi (mata menyala + counter %), 3 soal dummy, Bug Pecah (partikel Canvas + crack), Digigit (shake + lunge + vibrate + ejekan berbasis distraktor), hasil buruan, HP diperbarui saat kembali.
+- Backlog berurutan: (P0) integrasi ke engine NUJUM nyata + template ejekan per miskonsepsi; (P1) kartu share Canvas → Web Share API; (P1) "Bug kelas minggu ini" di KelasKu; (P2) Soal Sekelas harian (seed tanggal); (P2) Duel Bayangan via kode WA.
+
+## Prototype v2 — game-feel (2026-09-30)
+- `mockups/sarang-prototype.html` diperbarui: Beat Prediksi dengan aura denyut + "mengunci target… 73%!"; arena gelap-hangat; Crucible timer 8 s (panik <3 s: bar merah berkedip, vignette, detak jantung, vibrate); Umpan 2× (timer 5 s, damage/gems 2×, gigitan 2×); "PAW, bantu!" (jawaban + penjelasan tanpa roasting, tidak dihitung gigitan); pecahan kristal Canvas + ring kejut + flash emas + shake; digigit = red flash + shake + lunge + ejekan 1–2 kalimat; Sarang: whisper kecil, PAW melirik ke bug target (pupil), kedip, kuping, ekor; bug target berdenyut; Laporan Perburuan (stempel SEMPURNA/PEMBURU/BERTAHAN/DIGIGIT HABIS, akurasi, gems, daftar bug) + Bagikan ke WhatsApp (Canvas 1080×1350 → Web Share API, fallback unduh PNG).
+- Workspace disinkronkan (merge) ke origin/main m025-387 — `features/nujum/` kini ada di workspace. Integrasi engine (Ledger/BKT/IRT) ke app.js belum dimulai; menunggu setelah game-feel disetujui.

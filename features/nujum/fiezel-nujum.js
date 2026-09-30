@@ -1789,8 +1789,10 @@
 
   root.FiezelNujum = api;
 
-  // Global view handler untuk app.js
   root.nujumView = function () {
+    if (root.FiezelBug && typeof root.FiezelBug.ready === 'function' && root.FiezelBug.ready()) {
+      return root.FiezelBug.view();
+    }
     var isDemo = false;
     try {
       var params = new URLSearchParams(root.location.search);
