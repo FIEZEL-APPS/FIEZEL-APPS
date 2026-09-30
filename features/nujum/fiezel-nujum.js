@@ -5,30 +5,37 @@
  * sebelum murid menjawab, ditenagai 3PL IRT, BKT, taksonomi miskonsepsi, dan OLM.
  * Suara (Web Speech API) adalah input utama; fallback sentuh selalu siap.
  *
- * Fitur Utama:
+ * Fitur Utama & Peningkatan:
  * 1. Taruhan 3PL IRT & Pre-Bet Taunts (PB-01 s/d PB-13)
- * 2. Roasting Miskonsepsi Tajam (MW-A s/d MW-D)
- * 3. Pengakuan Kekalahan Mesin (SW-01 s/d SW-12)
- * 4. Kejujuran Kognitif: Tombol "Aku Menyerah" dipuji, BUKAN di-roast (SR-01 s/d SR-06)
- * 5. Echo Redemption: Murid melafalkan bentuk yang benar setelah menyerah
- * 6. Teleportasi Kilat: Menyerah langsung membawa murid latihan ke modul Latihan (practiceSkill)
- * 7. Kalibrasi CEFR Murid (A1, A2, B1, B2)
- * 8. Sanggahan OLM 3 Soal Kilat (DS/DW/DL)
+ * 2. Taruhan Dua Arah: Pemain bisa "Tantang Balik (Double Down)" untuk 2x poin & multiplier
+ * 3. Bank Soal Dinamis: Terhubung langsung ke 500+ template grammar-templates.json FIEZEL (anti-repetisi)
+ * 4. Waveform Canvas 60 FPS aktif terhubung ke status mic dan suara mesin mentor
+ * 5. Transkrip Live STT & Pita Ketidakpastian BKT (μ ± σ) interaktif
+ * 6. Sanggahan OLM Riil (3-Strike Rapid Fire Dispute dengan timer 10s per soal)
+ * 7. Protokol Kejujuran Kognitif: Surrender Sanctum + Interactive Echo Redemption audio & mic
+ * 8. Teleportasi Kilat ke modul Latihan (practiceSkill)
+ * 9. Kalibrasi CEFR Murid (A1, A2, B1, B2)
+ * 10. Rekor Taruhan Tertinggi Terpatahkan & Integrasi Hadiah FIEZEL Gems
  */
 (function (root) {
   'use strict';
 
   var doc = root.document;
 
-  function t(k, fallback, params) {
-    var s;
-    try {
-      var I = (typeof self !== 'undefined' ? self : root).FiezelI18n;
-      s = I && I.t ? I.t(k, params) : undefined;
-    } catch (_) {}
-    if (s === undefined || s === k) s = fallback == null ? k : fallback;
-    if (params) s = String(s).replace(/\{(\w+)\}/g, function (m, n) { return Object.prototype.hasOwnProperty.call(params, n) ? String(params[n]) : m; });
-    return s;
+  function t(k, fallback) {
+    if (typeof root.FiezelI18n !== 'undefined' && root.FiezelI18n && typeof root.FiezelI18n.t === 'function') {
+      return root.FiezelI18n.t(k, fallback);
+    }
+    return fallback;
+  }
+
+  function escapeHtml(str) {
+    return String(str || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
   // 65-Line Script Repository dari Script Bible v1.0
@@ -139,6 +146,18 @@
       cefr: "A1",
       skillId: "present_simple"
     },
+    {
+      id: "NJ-A1-03",
+      stem: "They ___ not like cold weather.",
+      options: ["does", "do", "is", "are"],
+      correctIndex: 1,
+      targetTrap: "does",
+      misconceptionCategory: "sva_auxiliary_double",
+      misconceptionText: "memakai 'does' untuk subjek jamak (they).",
+      rule: "Subjek they/we/you/I menggunakan kata bantu 'do' / 'don't'.",
+      cefr: "A1",
+      skillId: "present_simple"
+    },
     // Level A2
     {
       id: "NJ-A2-01",
@@ -237,6 +256,18 @@
       rule: "Korelasi inversi negatif: 'hardly/scarcely... when', sedangkan 'no sooner... than'.",
       cefr: "B2",
       skillId: "inversion"
+    },
+    {
+      id: "NJ-B2-02",
+      stem: "No sooner had the bell rung ___ the students left the hall.",
+      options: ["than", "when", "that", "then"],
+      correctIndex: 0,
+      targetTrap: "when",
+      misconceptionCategory: "auditory_trap",
+      misconceptionText: "menyamakan inversi 'no sooner... than' dengan 'hardly... when'.",
+      rule: "Pasangan inversi negatif adalah 'no sooner... than'.",
+      cefr: "B2",
+      skillId: "inversion"
     }
   ];
 
@@ -249,6 +280,7 @@
     scoreKamu: 0,
     currentQuestion: null,
     currentBet: 78,
+    isDoubleDown: false,
     bktMean: 0.45,
     bktMargin: 0.18,
     brokenClaims: [],
@@ -261,10 +293,42 @@
     isSpeakingMachine: false,
     lastTranscript: '',
     inDispute: false,
-    disputeQueue: [],
+    disputeQuestions: [],
+    disputeIndex: 0,
+    disputeCorrectCount: 0,
+    disputeTimerInterval: null,
+    cachedTemplates: [],
+    usedQuestionIds: [],
     isDemo: false,
-    roundStartTime: 0
+    roundStartTime: 0,
+    machineShield: 100,
+    roundTimeLeft: 10.0,
+    roundTimerInterval: null,
+    timerPaused: false,
+    tapGridExpanded: false
   };
+
+  /** Preload bank template grammar lengkap (500+ butir) secara asinkron dari cache/service worker */
+  function loadGrammarTemplatesAsync() {
+    if (Array.isArray(nujumState.cachedTemplates) && nujumState.cachedTemplates.length > 0) {
+      return Promise.resolve(nujumState.cachedTemplates);
+    }
+    try {
+      if (typeof root.fetch === 'function') {
+        return fetch('./grammar-templates.json')
+          .then(function (res) { return res.ok ? res.json() : null; })
+          .then(function (data) {
+            if (data && Array.isArray(data.templates) && data.templates.length > 0) {
+              nujumState.cachedTemplates = data.templates;
+            }
+            return nujumState.cachedTemplates;
+          })
+          .catch(function () { return nujumState.cachedTemplates; });
+      }
+    } catch (_) {}
+    return Promise.resolve(nujumState.cachedTemplates);
+  }
+  loadGrammarTemplatesAsync();
 
   /** Membaca parameter IRT 3PL untuk menghitung persentase taruhan */
   function calculateBetPercentage(template, theta) {
@@ -281,7 +345,7 @@
     return Math.max(58, Math.min(92, pMistake));
   }
 
-  /** Mengambil soal dari bank terkalibrasi sesuai CEFR */
+  /** Mengambil soal dari bank terkalibrasi sesuai CEFR murid tanpa repetisi */
   function pickNextQuestion() {
     var userCefr = 'A2';
     try {
@@ -289,39 +353,66 @@
       else if (root.__getFiezelState && root.__getFiezelState()?.profile?.cefr) userCefr = root.__getFiezelState().profile.cefr;
     } catch (_) {}
 
+    // Coba ambil dari 500+ templates asli FIEZEL
+    var dynamicPool = [];
+    if (Array.isArray(nujumState.cachedTemplates) && nujumState.cachedTemplates.length > 0) {
+      dynamicPool = nujumState.cachedTemplates.filter(function (t) {
+        return t && t.stem && t.stem.indexOf('___') !== -1 && Array.isArray(t.options) && t.options.length >= 2 && (!t.cefr || t.cefr === userCefr);
+      });
+      if (dynamicPool.length === 0) {
+        dynamicPool = nujumState.cachedTemplates.filter(function (t) {
+          return t && t.stem && t.stem.indexOf('___') !== -1 && Array.isArray(t.options) && t.options.length >= 2;
+        });
+      }
+    }
+
+    if (dynamicPool.length > 0) {
+      var unused = dynamicPool.filter(function (t) {
+        return nujumState.usedQuestionIds.indexOf(t.id) === -1;
+      });
+      if (unused.length === 0) {
+        nujumState.usedQuestionIds = [];
+        unused = dynamicPool;
+      }
+      var picked = unused[Math.floor(Math.random() * unused.length)];
+      nujumState.usedQuestionIds.push(picked.id);
+
+      var distObj = (picked.distractors && picked.distractors[0]) || {};
+      var trap = distObj.option || picked.options[(picked.correctIndex + 1) % picked.options.length];
+      var ruleText = (picked.explanation && (picked.explanation.ruleId || picked.explanation.rule)) || "Perhatikan konteks waktu dan kesesuaian subjek.";
+      var miscText = distObj.whyFailsId || distObj.misconceptionId || distObj.whyFails || "kebiasaan malas berpikir atau salah mengartikan konteks.";
+
+      return {
+        id: picked.id || ("NJ-" + Math.random().toString(36).slice(2, 7)),
+        stem: picked.stem,
+        options: picked.options,
+        correctIndex: picked.correctIndex,
+        targetTrap: trap,
+        misconceptionCategory: distObj.misconception || "auditory_trap",
+        misconceptionText: miscText,
+        rule: ruleText,
+        cefr: picked.cefr || userCefr,
+        skillId: picked.subskill || picked.family || "grammar"
+      };
+    }
+
+    // Fallback terstruktur jika bank belum termuat — dengan shuffle acak + anti-repetisi
     var pool = FALLBACK_TEMPLATES.filter(function (t) {
       return t.cefr === userCefr;
     });
     if (pool.length === 0) {
-      pool = FALLBACK_TEMPLATES; // fallback seluruh level
+      pool = FALLBACK_TEMPLATES;
     }
-
-    try {
-      if (root.G && Array.isArray(root.G.templates) && root.G.templates.length > 20) {
-        var gPool = root.G.templates.filter(function (t) {
-          return t && t.stem && Array.isArray(t.options) && t.distractors && t.distractors.length > 0 && (!t.cefr || t.cefr === userCefr);
-        });
-        if (gPool.length >= 4) {
-          var picked = gPool[Math.floor(Math.random() * gPool.length)];
-          var trap = (picked.distractors[0] && picked.distractors[0].option) || picked.options[0];
-          var disc = picked.distractors[0] || {};
-          return {
-            id: picked.id || "GEN",
-            stem: picked.stem,
-            options: picked.options,
-            correctIndex: picked.correctIndex,
-            targetTrap: trap,
-            misconceptionCategory: "auditory_trap",
-            misconceptionText: disc.whyFailsId || disc.misconceptionId || "pola kalimat yang salah tertukar.",
-            rule: picked.explanation?.rule || "Perhatikan konteks waktu dan kesesuaian subjek.",
-            cefr: picked.cefr || userCefr,
-            skillId: picked.skill || picked.lessonSkill || "grammar"
-          };
-        }
-      }
-    } catch (_) {}
-
-    return pool[nujumState.roundIndex % pool.length];
+    var unusedFb = pool.filter(function (t) {
+      return nujumState.usedQuestionIds.indexOf(t.id) === -1;
+    });
+    if (unusedFb.length === 0) {
+      nujumState.usedQuestionIds = [];
+      unusedFb = pool;
+    }
+    var pickedFb = unusedFb[Math.floor(Math.random() * unusedFb.length)];
+    nujumState.usedQuestionIds.push(pickedFb.id);
+    return pickedFb;
   }
 
   /** Pengucapan suara mesin mentor tanpa browser TTS */
@@ -350,13 +441,13 @@
       if (!nujumState.active || !nujumState.waveCanvas) return;
       var ctx = nujumState.waveCtx;
       var w = nujumState.waveCanvas.width = nujumState.waveCanvas.offsetWidth || 300;
-      var h = nujumState.waveCanvas.height = nujumState.waveCanvas.offsetHeight || 50;
+      var h = nujumState.waveCanvas.height = nujumState.waveCanvas.offsetHeight || 42;
 
       ctx.clearRect(0, 0, w, h);
       ctx.lineWidth = 2.5;
 
       var isLive = nujumState.isListening || nujumState.isSpeakingMachine;
-      ctx.strokeStyle = nujumState.isListening ? '#EF4444' : nujumState.isSpeakingMachine ? '#FFD700' : '#4C3D59';
+      ctx.strokeStyle = nujumState.isListening ? '#EF4444' : nujumState.isSpeakingMachine ? '#FFD700' : '#5E1420';
 
       ctx.beginPath();
       var slices = 40;
@@ -393,6 +484,11 @@
       rec.onstart = function () {
         nujumState.isListening = true;
         updateMicUI(true);
+        var previewEl = doc.getElementById('nujumSttPreview');
+        if (previewEl) {
+          previewEl.textContent = 'Mendengarkan suaramu...';
+          previewEl.classList.add('is-active');
+        }
       };
 
       rec.onresult = function (event) {
@@ -402,16 +498,30 @@
         }
         nujumState.lastTranscript = transcript.trim();
         var previewEl = doc.getElementById('nujumSttPreview');
-        if (previewEl) previewEl.textContent = '“' + transcript + '”';
+        if (previewEl) {
+          previewEl.textContent = '“' + transcript + '”';
+          previewEl.classList.add('is-active');
+        }
 
         if (event.results[0] && event.results[0].isFinal) {
           evaluateAnswer(transcript);
         }
       };
 
-      rec.onerror = function () {
+      rec.onerror = function (event) {
         nujumState.isListening = false;
         updateMicUI(false);
+        var previewEl = doc.getElementById('nujumSttPreview');
+        if (previewEl) {
+          var errorType = (event && event.error) || 'unknown';
+          var msg = 'Mikrofon error. Gunakan tombol sentuh.';
+          if (errorType === 'not-allowed') msg = '⚠️ Izinkan mikrofon di pengaturan browser.';
+          else if (errorType === 'no-speech') msg = '🔇 Tidak terdengar suara. Coba lebih keras.';
+          else if (errorType === 'network') msg = '📡 Koneksi terputus. Gunakan tombol sentuh.';
+          else if (errorType === 'aborted') msg = 'Mic dihentikan.';
+          previewEl.textContent = msg;
+          previewEl.classList.add('is-active');
+        }
       };
 
       rec.onend = function () {
@@ -437,15 +547,216 @@
     }
   }
 
-  /** Evaluasi jawaban dari suara atau klik */
+  /** Timer & Shield Helper Functions */
+  function stopRoundTimer() {
+    if (nujumState.roundTimerInterval) {
+      clearInterval(nujumState.roundTimerInterval);
+      nujumState.roundTimerInterval = null;
+    }
+  }
+
+  /** Progressive difficulty: timer gets shorter in later rounds */
+  function getRoundTimerDuration() {
+    var ri = nujumState.roundIndex;
+    if (nujumState.isDoubleDown) return Math.max(6.0, getRoundTimerDuration._base - 2.0);
+    // Ronde 0-2: 12s, Ronde 3-4: 10s, Ronde 5-6: 8s, Ronde 7 (Final): 6s
+    if (ri <= 2) return 12.0;
+    if (ri <= 4) return 10.0;
+    if (ri <= 6) return 8.0;
+    return 6.0;  // Final round — ALL-IN pressure
+  }
+  // Store base for DD calc
+  getRoundTimerDuration._base = 10.0;
+
+  function startCrucibleTimer(totalSeconds) {
+    stopRoundTimer();
+    var duration = typeof totalSeconds === 'number' ? totalSeconds : getRoundTimerDuration();
+    getRoundTimerDuration._base = duration;
+    nujumState.roundTimeLeft = duration;
+
+    var timerBar = doc.getElementById('nujumCrucibleTimerBar');
+    var timerText = doc.getElementById('nujumCrucibleTimerText');
+    var stageEl = doc.getElementById('nujumCrucibleStage');
+    if (timerBar) {
+      timerBar.style.width = '100%';
+      timerBar.classList.remove('is-panic');
+    }
+    if (timerText) {
+      timerText.textContent = duration.toFixed(1) + 's';
+      timerText.classList.remove('is-panic');
+    }
+    if (stageEl) {
+      stageEl.classList.remove('is-panic');
+    }
+
+    var tickIntervalMs = 100;
+    nujumState.roundTimerInterval = setInterval(function () {
+      if (!nujumState.active || nujumState.timerPaused) {
+        if (!nujumState.active) stopRoundTimer();
+        return;
+      }
+      nujumState.roundTimeLeft = Math.max(0, +(nujumState.roundTimeLeft - 0.1).toFixed(1));
+      var pct = Math.max(0, (nujumState.roundTimeLeft / duration) * 100);
+
+      var bar = doc.getElementById('nujumCrucibleTimerBar');
+      var txt = doc.getElementById('nujumCrucibleTimerText');
+      var stg = doc.getElementById('nujumCrucibleStage');
+
+      if (bar) bar.style.width = pct + '%';
+      if (txt) txt.textContent = nujumState.roundTimeLeft.toFixed(1) + 's';
+
+      if (nujumState.roundTimeLeft <= 3.2) {
+        if (bar) bar.classList.add('is-panic');
+        if (txt) txt.classList.add('is-panic');
+        if (stg) stg.classList.add('is-panic');
+      }
+
+      if (nujumState.roundTimeLeft <= 0) {
+        stopRoundTimer();
+        handleRoundTimeout(nujumState.currentQuestion);
+      }
+    }, tickIntervalMs);
+  }
+
+  /** Ready countdown overlay — timer starts only after user sees stem */
+  function showReadyCountdown(callback) {
+    var screenEl = doc.querySelector('.nujum-screen');
+    if (!screenEl) { callback(); return; }
+    var overlay = doc.createElement('div');
+    overlay.className = 'nujum-ready-overlay';
+    overlay.innerHTML = '<div class="nujum-ready-count">⚡</div><div class="nujum-ready-label">BERSIAP...</div>';
+    screenEl.appendChild(overlay);
+
+    setTimeout(function () {
+      if (!overlay.parentNode) return;
+      overlay.querySelector('.nujum-ready-count').textContent = '1';
+      overlay.querySelector('.nujum-ready-label').textContent = 'MULAI!';
+      setTimeout(function () {
+        if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+        callback();
+      }, 500);
+    }, 800);
+  }
+
+  function updateShieldUI(shattered) {
+    var fill = doc.getElementById('nujumShieldFill');
+    var txt = doc.getElementById('nujumShieldText');
+    if (fill) {
+      fill.style.width = nujumState.machineShield + '%';
+      fill.classList.toggle('is-critical', nujumState.machineShield <= 30);
+    }
+    if (txt) {
+      txt.textContent = nujumState.machineShield + '%';
+    }
+    if (shattered) {
+      var screenEl = doc.querySelector('.nujum-screen');
+      if (screenEl) {
+        screenEl.classList.remove('is-shattered');
+        void screenEl.offsetWidth;
+        screenEl.classList.add('is-shattered');
+        setTimeout(function () {
+          if (screenEl) screenEl.classList.remove('is-shattered');
+        }, 500);
+      }
+    }
+  }
+
+  function showVerdict(html) {
+    var actEl = doc.getElementById('nujumActionZone');
+    if (actEl) actEl.style.display = 'none';
+    var vEl = doc.getElementById('nujumVerdictArea');
+    if (vEl) {
+      vEl.style.display = 'block';
+      vEl.innerHTML = html;
+    }
+  }
+
+  function handleRoundTimeout(q) {
+    if (!nujumState.active || !q) return;
+    stopRoundTimer();
+
+    var points = nujumState.isDoubleDown ? 2 : 1;
+    nujumState.scoreMesin += points;
+
+    var bktPenalty = nujumState.isDoubleDown ? 0.20 : 0.14;
+    nujumState.bktMean = Math.max(0.10, +(nujumState.bktMean - bktPenalty).toFixed(2));
+    nujumState.bktMargin = Math.min(0.30, +(nujumState.bktMargin * 1.25).toFixed(2));
+
+    var slotPod = doc.getElementById('nujumSlotPod');
+    if (slotPod) {
+      slotPod.textContent = '[ WAKTU HABIS ]';
+      slotPod.className = 'nujum-slot-pod is-loss';
+    }
+
+    var screenEl = doc.querySelector('.nujum-screen');
+    if (screenEl) {
+      screenEl.classList.remove('is-glitch');
+      void screenEl.offsetWidth;
+      screenEl.classList.add('is-glitch');
+      setTimeout(function () {
+        if (screenEl) screenEl.classList.remove('is-glitch');
+      }, 500);
+    }
+
+    var toScript = getScript("machine_win", "false_confidence_speed",
+      "Waktu habis! Autopilot membekukan pikiranmu. Keraguan ini membuktikan kamu belum menguasai polanya secara refleks.",
+      "Time expired! Cognitive freeze took over. Hesitation confirms your lack of reflex mastery."
+    );
+    speakMachine(toScript.text_en, toScript.text_id);
+
+    var doubleLossBanner = nujumState.isDoubleDown
+      ? '<div class="nujum-verdict-banner-loss">⚠️ DOUBLE DOWN GAGAL KARENA TIMEOUT (+2 POIN MESIN)</div>'
+      : '';
+
+    showVerdict([
+      '<div class="nujum-loss-card is-timeout">',
+      '  <div class="nujum-loss-title">⏱️ WAKTU HABIS (+' + points + ' POIN MESIN)</div>',
+      doubleLossBanner,
+      '  <div style="font-size:0.86rem;font-weight:600;margin-bottom:8px;line-height:1.45;color:#FFE4E6">«' + toScript.text_id + '»</div>',
+      '  <div style="background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:8px 10px;font-size:0.75rem;margin-bottom:10px;color:#FECDD3">',
+      '    <b>Bentuk benar:</b> «' + q.options[q.correctIndex] + '». ' + q.rule,
+      '  </div>',
+      '  <div style="display:flex;flex-direction:column;gap:6px">',
+      '    <button class="nujum-dispute-btn" id="nujumDisputeBtn">' + t('nujum.dispute_claim', '⚡ SANGGAH KLAIM (Buktikan 3 Soal)') + '</button>',
+      '    <button class="nujum-next-btn" id="nujumNextRoundBtn">' + t('nujum.accept_next', 'Terima & Lanjut Ronde →') + '</button>',
+      '  </div>',
+      '</div>'
+    ].join(''));
+
+    renderBktTrack();
+    updateScorePill();
+    updateShieldUI(false);
+
+    try { if (typeof root.playFeedbackSound === 'function') root.playFeedbackSound('wrong'); } catch (_) {}
+
+    var nextBtn = doc.getElementById('nujumNextRoundBtn');
+    if (nextBtn) nextBtn.onclick = advanceRound;
+
+    var disputeBtn = doc.getElementById('nujumDisputeBtn');
+    if (disputeBtn) disputeBtn.onclick = function () { triggerDispute(q); };
+  }
+
+  /** Evaluasi jawaban dari suara atau sentuhan */
   function evaluateAnswer(selectedText) {
     if (!nujumState.active || !nujumState.currentQuestion) return;
+    stopRoundTimer();
     var q = nujumState.currentQuestion;
-    var correctOpt = q.options[q.correctIndex].toLowerCase();
+    var correctOpt = q.options[q.correctIndex].toLowerCase().trim();
     var text = String(selectedText || '').toLowerCase().trim();
     var durationSec = (Date.now() - (nujumState.roundStartTime || Date.now())) / 1000;
 
-    var isCorrect = text.indexOf(correctOpt) !== -1 || text === correctOpt;
+    var isCorrect = false;
+    if (text === correctOpt) {
+      isCorrect = true;
+    } else {
+      try {
+        var escapedOpt = correctOpt.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+        var wordRegex = new RegExp('(?:^|\\s|,|\\.)' + escapedOpt + '(?:$|\\s|,|\\.)', 'i');
+        isCorrect = wordRegex.test(text);
+      } catch (_) {
+        isCorrect = text === correctOpt;
+      }
+    }
     var verdictEl = doc.getElementById('nujumVerdictArea');
     var slotPod = doc.getElementById('nujumSlotPod');
     if (!verdictEl) return;
@@ -455,19 +766,28 @@
       slotPod.className = isCorrect ? 'nujum-slot-pod is-win' : 'nujum-slot-pod is-loss';
     }
 
+    var points = nujumState.isDoubleDown ? 2 : 1;
+
     if (isCorrect) {
       // Mesin KALAH
-      nujumState.scoreKamu++;
+      nujumState.scoreKamu += points;
       nujumState.brokenClaims.push({
         stem: q.stem,
         bet: nujumState.currentBet,
         predicted: q.targetTrap,
-        actual: correctOpt
+        actual: correctOpt,
+        points: points
       });
 
+      // Update Neural Shield Mesin
+      var damage = nujumState.isDoubleDown ? 25 : 15;
+      nujumState.machineShield = Math.max(0, nujumState.machineShield - damage);
+      updateShieldUI(true);
+
       // Update BKT: taksiran penguasaan naik, ketidakpastian menyempit
-      nujumState.bktMean = Math.min(0.92, +(nujumState.bktMean + 0.18).toFixed(2));
-      nujumState.bktMargin = Math.max(0.06, +(nujumState.bktMargin * 0.75).toFixed(2));
+      var bktBonus = nujumState.isDoubleDown ? 0.26 : 0.18;
+      nujumState.bktMean = Math.min(0.96, +(nujumState.bktMean + bktBonus).toFixed(2));
+      nujumState.bktMargin = Math.max(0.04, +(nujumState.bktMargin * 0.70).toFixed(2));
 
       var swScript = getScript("machine_defeat", null,
         "Sial. Taruhanku meleset. Kamu melihat jebakannya dengan jernih.",
@@ -476,26 +796,37 @@
 
       speakMachine(swScript.text_en, swScript.text_id);
 
-      verdictEl.innerHTML = [
+      var doubleDownBanner = nujumState.isDoubleDown
+        ? '<div style="background:#FEF3C7;color:#92400E;border:1px solid #D97706;padding:4px 8px;border-radius:6px;font-weight:800;font-size:0.75rem;margin-bottom:8px">🔥 DOUBLE DOWN BERHASIL (+2 POIN KAMU)</div>'
+        : '';
+
+      showVerdict([
         '<div class="nujum-win-card">',
         '  <div class="nujum-win-title">✦ TARUHAN MESIN PATAH (-' + nujumState.currentBet + '%)</div>',
-        '  <div style="font-size:0.86rem;font-weight:600;margin-bottom:10px;line-height:1.5">«' + swScript.text_id + '» Jawaban benar: <b>' + q.options[q.correctIndex] + '</b>. ' + q.rule + '</div>',
-        '  <div style="background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:10px;font-family:var(--nj-font-mono);font-size:0.7rem;margin-bottom:12px;color:#A7F3D0">',
-        '    BKT Mastery Estimate: <b>+18%</b> (μ=' + nujumState.bktMean + ', σ=' + nujumState.bktMargin + ')<br>',
-        '    ' + t('nujum.status_broken', 'Status: Broken claim dicatat ke ledger kemenanganmu.'),
-        '  </div>',
-        '  <button class="nujum-teleport-btn" id="nujumNextRoundBtn" style="background:#059669">' + t('nujum.next_duel', 'Lanjut Duel Berikutnya →') + '</button>',
+        doubleDownBanner,
+        '  <div style="font-size:0.86rem;font-weight:600;margin-bottom:8px;line-height:1.45">«' + swScript.text_id + '» Jawaban benar: <b>' + q.options[q.correctIndex] + '</b>. ' + q.rule + '</div>',
+        '  <button class="nujum-teleport-btn" id="nujumNextRoundBtn" style="background:#059669;margin-top:6px">' + t('nujum.next_duel', 'Lanjut Duel Berikutnya →') + '</button>',
         '</div>'
-      ].join('');
+      ].join(''));
 
       try { if (typeof root.playFeedbackSound === 'function') root.playFeedbackSound('correct'); } catch (_) {}
     } else {
       // Mesin MENANG
-      nujumState.scoreMesin++;
+      nujumState.scoreMesin += points;
+      updateShieldUI(false);
+
+      var screenEl = doc.querySelector('.nujum-screen');
+      if (screenEl) {
+        screenEl.classList.remove('is-glitch');
+        void screenEl.offsetWidth;
+        screenEl.classList.add('is-glitch');
+        setTimeout(function () { if (screenEl) screenEl.classList.remove('is-glitch'); }, 500);
+      }
 
       // Update BKT: taksiran turun
-      nujumState.bktMean = Math.max(0.15, +(nujumState.bktMean - 0.12).toFixed(2));
-      nujumState.bktMargin = Math.min(0.25, +(nujumState.bktMargin * 1.15).toFixed(2));
+      var bktPenalty = nujumState.isDoubleDown ? 0.18 : 0.12;
+      nujumState.bktMean = Math.max(0.12, +(nujumState.bktMean - bktPenalty).toFixed(2));
+      nujumState.bktMargin = Math.min(0.28, +(nujumState.bktMargin * 1.20).toFixed(2));
 
       // Pilih roaster tajam
       var category = q.misconceptionCategory;
@@ -507,20 +838,24 @@
 
       speakMachine(mwScript.text_en, mwScript.text_id);
 
-      verdictEl.innerHTML = [
+      var doubleLossBanner = nujumState.isDoubleDown
+        ? '<div style="background:#FEE2E2;color:#991B1B;border:1px solid #DC2626;padding:4px 8px;border-radius:6px;font-weight:800;font-size:0.75rem;margin-bottom:8px">⚠️ DOUBLE DOWN GAGAL (+2 POIN MESIN)</div>'
+        : '';
+
+      showVerdict([
         '<div class="nujum-loss-card">',
-        '  <div class="nujum-loss-title">✕ MESIN MEMENANGKAN TARUHAN (' + nujumState.currentBet + '%)</div>',
-        '  <div style="font-size:0.86rem;font-weight:600;margin-bottom:10px;line-height:1.5;color:#FFE4E6">«' + mwScript.text_id + '»</div>',
-        '  <div style="background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:10px;font-size:0.72rem;margin-bottom:12px;color:#FECDD3">',
-        '    <b>Pola salah:</b> ' + q.misconceptionText + '<br>',
-        '    <b>Bentuk benar:</b> «' + q.options[q.correctIndex] + '».',
+        '  <div class="nujum-loss-title">✕ MESIN MENANG (' + nujumState.currentBet + '%)</div>',
+        doubleLossBanner,
+        '  <div style="font-size:0.86rem;font-weight:600;margin-bottom:8px;line-height:1.45;color:#FFE4E6">«' + mwScript.text_id + '»</div>',
+        '  <div style="background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:8px 10px;font-size:0.75rem;margin-bottom:10px;color:#FECDD3">',
+        '    <b>Bentuk benar:</b> «' + q.options[q.correctIndex] + '». ' + q.rule,
         '  </div>',
-        '  <div style="display:flex;flex-direction:column;gap:8px">',
+        '  <div style="display:flex;flex-direction:column;gap:6px">',
         '    <button class="nujum-dispute-btn" id="nujumDisputeBtn">' + t('nujum.dispute_claim', '⚡ SANGGAH KLAIM (Buktikan 3 Soal)') + '</button>',
         '    <button class="nujum-next-btn" id="nujumNextRoundBtn">' + t('nujum.accept_next', 'Terima & Lanjut Ronde →') + '</button>',
         '  </div>',
         '</div>'
-      ].join('');
+      ].join(''));
 
       try { if (typeof root.playFeedbackSound === 'function') root.playFeedbackSound('wrong'); } catch (_) {}
     }
@@ -546,6 +881,7 @@
   /** Alur Honest Surrender ("Aku Menyerah / Belum Mengerti") */
   function handleSurrender(q) {
     if (!nujumState.active || !q) return;
+    stopRoundTimer();
 
     nujumState.scoreMesin++;
     var fullCorrectSentence = q.stem.replace('___', q.options[q.correctIndex]);
@@ -563,10 +899,7 @@
 
     speakMachine(srScript.text_en, srScript.text_id);
 
-    var verdictEl = doc.getElementById('nujumVerdictArea');
-    if (!verdictEl) return;
-
-    verdictEl.innerHTML = [
+    showVerdict([
       '<div class="nujum-surrender-sanctum">',
       '  <div class="nujum-surrender-sanctum-badge">✦ PROTOKOL KEJUJURAN KOGNITIF (TIDAK DI-ROAST)</div>',
       '  <div class="nujum-surrender-sanctum-quote">«' + srScript.text_id + '»</div>',
@@ -582,8 +915,15 @@
       '      </div>',
       '    </div>',
       '  </div>',
+      '  <div style="text-align:center;margin:4px 0">',
+      '    <button class="nujum-echo-record-btn" id="nujumEchoMicBtn">',
+      '      <span>🎙️</span>',
+      '      <span>Ucapkan Bentuk yang Benar</span>',
+      '    </button>',
+      '    <div id="nujumEchoFeedback" style="margin-top:6px"></div>',
+      '  </div>',
       '  <div class="nujum-kaidah-card"><b>Kaidah:</b> ' + q.rule + '</div>',
-      '  <div style="display:flex;flex-direction:column;gap:8px">',
+      '  <div style="display:flex;flex-direction:column;gap:6px">',
       '    <button class="nujum-teleport-btn" id="nujumTeleportPracticeBtn">',
       '      <span>🚀</span> ' + t('nujum.teleport_practice', 'Latih Materi Ini Sekarang (Modul Latihan) →'),
       '    </button>',
@@ -592,7 +932,7 @@
       '    </button>',
       '  </div>',
       '</div>'
-    ].join('');
+    ].join(''));
 
     renderBktTrack();
     updateScorePill();
@@ -601,6 +941,48 @@
     if (echoBtn) {
       echoBtn.onclick = function () {
         speakMachine(fullCorrectSentence, fullCorrectSentence);
+      };
+    }
+
+    var echoMicBtn = doc.getElementById('nujumEchoMicBtn');
+    if (echoMicBtn) {
+      echoMicBtn.onclick = function () {
+        var Ctor = root.SpeechRecognition || root.webkitSpeechRecognition;
+        if (!Ctor) {
+          alert('Web Speech API tidak didukung di perangkat ini.');
+          return;
+        }
+        var echoRec = new Ctor();
+        echoRec.lang = 'en-US';
+        echoMicBtn.classList.add('is-recording');
+        echoRec.onresult = function (ev) {
+          echoMicBtn.classList.remove('is-recording');
+          var spoken = (ev.results[0] && ev.results[0][0] && ev.results[0][0].transcript) || '';
+          var targetWord = q.options[q.correctIndex].toLowerCase().trim();
+          var feedbackEl = doc.getElementById('nujumEchoFeedback');
+          if (feedbackEl) {
+            var spokenLower = spoken.toLowerCase().trim();
+            var echoMatch = false;
+            if (spokenLower === targetWord) {
+              echoMatch = true;
+            } else {
+              try {
+                var esc = targetWord.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+                echoMatch = new RegExp('(?:^|\\s|,|\\.)' + esc + '(?:$|\\s|,|\\.)', 'i').test(spokenLower);
+              } catch (_) {}
+            }
+            if (echoMatch) {
+              feedbackEl.innerHTML = '<span class="nujum-echo-feedback-badge">✦ Pelafalan Tepat! Kejujuran kognitifmu terbayar lunas.</span>';
+              try { if (typeof root.playFeedbackSound === 'function') root.playFeedbackSound('correct'); } catch (_) {}
+            } else {
+              feedbackEl.innerHTML = '<span style="font-size:0.75rem;color:var(--nj-maroon);font-weight:700">Terdengar: “' + spoken + '”. Dengarkan lagi audio di atas.</span>';
+            }
+          }
+        };
+        echoRec.onerror = echoRec.onend = function () {
+          echoMicBtn.classList.remove('is-recording');
+        };
+        try { echoRec.start(); } catch (_) { echoMicBtn.classList.remove('is-recording'); }
       };
     }
 
@@ -636,6 +1018,7 @@
 
   /** Maju ke ronde berikutnya */
   function advanceRound() {
+    stopRoundTimer();
     nujumState.roundIndex++;
     if (nujumState.roundIndex >= nujumState.maxRounds) {
       renderDuelSummary();
@@ -644,8 +1027,9 @@
     }
   }
 
-  /** Alur Sanggah OLM: 3 Soal Kilat */
+  /** Alur Sanggah OLM: 3 Soal Kilat Riil (Bukan auto-win) */
   function triggerDispute(template) {
+    stopRoundTimer();
     nujumState.inDispute = true;
     var appEl = doc.getElementById('app');
     if (!appEl) return;
@@ -656,6 +1040,29 @@
     );
 
     speakMachine(dsScript.text_en, dsScript.text_id);
+
+    // Ambil 3 soal probe pembuktian
+    var probePool = [];
+    if (Array.isArray(nujumState.cachedTemplates) && nujumState.cachedTemplates.length >= 3) {
+      probePool = nujumState.cachedTemplates.filter(function (t) {
+        return t && t.stem && Array.isArray(t.options) && t.options.length >= 2 && t.id !== template.id;
+      });
+    }
+    if (probePool.length < 3) {
+      probePool = FALLBACK_TEMPLATES.filter(function (t) { return t.id !== template.id; });
+    }
+    // Shuffle probe pool
+    probePool.sort(function () { return 0.5 - Math.random(); });
+    nujumState.disputeQuestions = probePool.slice(0, 3).map(function (p) {
+      return {
+        stem: p.stem,
+        options: p.options,
+        correctIndex: p.correctIndex,
+        rule: (p.explanation && (p.explanation.ruleId || p.explanation.rule)) || p.rule || "Fokus pada struktur kalimat."
+      };
+    });
+    nujumState.disputeIndex = 0;
+    nujumState.disputeCorrectCount = 0;
 
     appEl.innerHTML = [
       '<div class="nujum-screen">',
@@ -668,7 +1075,7 @@
       '    <div class="nujum-claim-statement">«' + dsScript.text_id + '»</div>',
       '    <div class="nujum-bet-rationale">Aturan OLM FIEZEL: Sanggahan yang berhasil menaikkan varians model dan menghapus label miskonsepsi dari ledgermu.</div>',
       '  </div>',
-      '  <div id="nujumDisputeProbeArea" style="text-align:center;padding:20px 0">',
+      '  <div id="nujumDisputeProbeArea" style="text-align:center;padding:16px 0">',
       '    <button class="nujum-opt-btn" id="nujumStartProbesBtn" style="background:#F59E0B;color:#000;font-weight:800;padding:16px 24px;border-radius:12px">' + t('nujum.start_dispute', 'Mulai Pembuktian 3 Soal →') + '</button>',
       '  </div>',
       '</div>'
@@ -676,32 +1083,185 @@
 
     doc.getElementById('nujumCancelDisputeBtn').onclick = function () {
       nujumState.inDispute = false;
+      if (nujumState.disputeTimerInterval) clearInterval(nujumState.disputeTimerInterval);
       renderActiveRound();
     };
 
     doc.getElementById('nujumStartProbesBtn').onclick = function () {
-      nujumState.inDispute = false;
-      nujumState.bktMean = Math.min(0.95, nujumState.bktMean + 0.22);
+      runDisputeProbeStep();
+    };
+  }
+
+  /** Menjalankan 1 soal pembuktian sanggah OLM */
+  function runDisputeProbeStep() {
+    var appEl = doc.getElementById('app');
+    if (!appEl) return;
+
+    if (nujumState.disputeIndex >= nujumState.disputeQuestions.length) {
+      concludeDispute();
+      return;
+    }
+
+    var probe = nujumState.disputeQuestions[nujumState.disputeIndex];
+    var timeLeft = 10;
+
+    var pipsHtml = [0, 1, 2].map(function (idx) {
+      var cls = 'nujum-probe-pip';
+      if (idx < nujumState.disputeIndex) {
+        cls += ' is-correct'; // Soal lampau
+      } else if (idx === nujumState.disputeIndex) {
+        cls += ' is-current';
+      }
+      return '<div class="' + cls + '"></div>';
+    }).join('');
+
+    appEl.innerHTML = [
+      '<div class="nujum-screen">',
+      '  <div class="nujum-topbar">',
+      '    <span class="nujum-pill-tag"><span class="pulse-dot" style="background:#F59E0B"></span> PROBE ' + (nujumState.disputeIndex + 1) + '/3</span>',
+      '    <span class="nujum-diag-tag" id="nujumProbeTimerLabel">Waktu: 10s</span>',
+      '  </div>',
+      '  <div class="nujum-probe-wrap">',
+      '    <div class="nujum-probe-header">',
+      '      <span>PEMBUKTIAN KOGNITIF KILAT</span>',
+      '      <div class="nujum-probe-pips">' + pipsHtml + '</div>',
+      '    </div>',
+      '    <div class="nujum-probe-timer-rail">',
+      '      <div class="nujum-probe-timer-fill" id="nujumProbeTimerBar" style="width:100%"></div>',
+      '    </div>',
+      '    <div class="nujum-probe-stem">' + probe.stem.replace('___', '<span style="border-bottom:2px dashed var(--nj-maroon);padding:0 8px;font-family:var(--nj-font-mono)">...</span>') + '</div>',
+      '  </div>',
+      '  <div class="nujum-tactical-grid">',
+      probe.options.map(function (opt) {
+        return '    <button class="nujum-tactical-chip nujum-opt-btn" data-probe-val="' + escapeHtml(opt) + '"><div class="nujum-chip-content"><span class="nujum-chip-strike-icon">🎯</span><span class="nujum-chip-text">' + escapeHtml(opt) + '</span></div><span class="nujum-chip-pip"></span></button>';
+      }).join('\n'),
+      '  </div>',
+      '  <div class="nujum-footer">',
+      '    <span>DISPUTE TRIAL ACTIVE</span>',
+      '    <span>TARGET: 3/3 BENAR</span>',
+      '  </div>',
+      '</div>'
+    ].join('');
+
+    if (nujumState.disputeTimerInterval) clearInterval(nujumState.disputeTimerInterval);
+
+    nujumState.disputeTimerInterval = setInterval(function () {
+      timeLeft--;
+      var lbl = doc.getElementById('nujumProbeTimerLabel');
+      var bar = doc.getElementById('nujumProbeTimerBar');
+      if (lbl) lbl.textContent = 'Waktu: ' + timeLeft + 's';
+      if (bar) bar.style.width = (timeLeft * 10) + '%';
+
+      if (timeLeft <= 0) {
+        clearInterval(nujumState.disputeTimerInterval);
+        handleProbeAnswer(''); // Timeout = salah
+      }
+    }, 1000);
+
+    var btns = doc.querySelectorAll('[data-probe-val]');
+    btns.forEach(function (btn) {
+      btn.onclick = function () {
+        clearInterval(nujumState.disputeTimerInterval);
+        var val = btn.getAttribute('data-probe-val');
+        handleProbeAnswer(val);
+      };
+    });
+  }
+
+  function handleProbeAnswer(ans) {
+    var probe = nujumState.disputeQuestions[nujumState.disputeIndex];
+    var isCorrect = String(ans).toLowerCase().trim() === probe.options[probe.correctIndex].toLowerCase().trim();
+
+    if (isCorrect) {
+      nujumState.disputeCorrectCount++;
+      try { if (typeof root.playFeedbackSound === 'function') root.playFeedbackSound('correct'); } catch (_) {}
+    } else {
+      try { if (typeof root.playFeedbackSound === 'function') root.playFeedbackSound('wrong'); } catch (_) {}
+    }
+
+    nujumState.disputeIndex++;
+    setTimeout(function () {
+      runDisputeProbeStep();
+    }, 450);
+  }
+
+  function concludeDispute() {
+    nujumState.inDispute = false;
+    if (nujumState.disputeTimerInterval) clearInterval(nujumState.disputeTimerInterval);
+
+    var appEl = doc.getElementById('app');
+    if (!appEl) return;
+
+    var passed = nujumState.disputeCorrectCount === 3;
+
+    if (passed) {
+      nujumState.scoreKamu++;
+      nujumState.bktMean = Math.min(0.96, +(nujumState.bktMean + 0.22).toFixed(2));
       nujumState.bktMargin = 0.05;
 
       var dwScript = getScript("dispute_result", "probe_success",
         "Sanggahan terbukti sah. 3/3 terjawab benar. Mesin mencabut tuduhan dan memperbarui modelmu.",
         "Dispute substantiated. Accusation revoked, student model updated."
       );
-
       speakMachine(dwScript.text_en, dwScript.text_id);
-      advanceRound();
-    };
+
+      appEl.innerHTML = [
+        '<div class="nujum-screen">',
+        '  <div class="nujum-topbar">',
+        '    <span class="nujum-pill-tag" style="background:#10B981;color:#fff">✦ SANGGAHAN BERHASIL</span>',
+        '  </div>',
+        '  <div class="nujum-win-card" style="margin-top:20px">',
+        '    <div class="nujum-win-title">3/3 SOAL TERJAWAB BENAR (+1 POIN)</div>',
+        '    <div style="font-size:0.92rem;font-weight:700;line-height:1.5;margin:8px 0">«' + dwScript.text_id + '»</div>',
+        '    <div style="background:#fff;border:1px solid #10B981;padding:10px;border-radius:10px;font-family:var(--nj-font-mono);font-size:0.75rem;color:#165646">',
+        '      Status: Label miskonsepsi DICABUT dari ledgermu.<br>',
+        '      BKT Mastery Estimate naik ke: <b>' + Math.round(nujumState.bktMean * 100) + '%</b>.',
+        '    </div>',
+        '    <button class="nujum-teleport-btn" id="nujumDisputeContinueBtn" style="background:#059669;margin-top:10px">Lanjut Duel Berikutnya →</button>',
+        '  </div>',
+        '</div>'
+      ].join('');
+
+      doc.getElementById('nujumDisputeContinueBtn').onclick = advanceRound;
+    } else {
+      var dlScript = getScript("dispute_result", "probe_failure",
+        "Sanggahan gagal. Kamu terbukti mengulang kesalahan yang sama. Label miskonsepsi tetap berlaku.",
+        "Dispute rejected. The probe confirmed your recurring error."
+      );
+      speakMachine(dlScript.text_en, dlScript.text_id);
+
+      appEl.innerHTML = [
+        '<div class="nujum-screen">',
+        '  <div class="nujum-topbar">',
+        '    <span class="nujum-pill-tag" style="background:#F43F5E;color:#fff">✕ SANGGAHAN GAGAL</span>',
+        '  </div>',
+        '  <div class="nujum-loss-card" style="margin-top:20px">',
+        '    <div class="nujum-loss-title">HANYA ' + nujumState.disputeCorrectCount + '/3 BENAR</div>',
+        '    <div style="font-size:0.92rem;font-weight:700;line-height:1.5;margin:8px 0;color:#FFE4E6">«' + dlScript.text_id + '»</div>',
+        '    <div style="background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.1);padding:10px;border-radius:10px;font-size:0.75rem;color:#FECDD3">',
+        '      Status: Tuduhan mesin tetap berlaku. Masuk ke ruang latihan dan latih polanya.',
+        '    </div>',
+        '    <button class="nujum-next-btn" id="nujumDisputeContinueBtn" style="margin-top:10px">Terima & Lanjut Ronde →</button>',
+        '  </div>',
+        '</div>'
+      ].join('');
+
+      doc.getElementById('nujumDisputeContinueBtn').onclick = advanceRound;
+    }
   }
 
   /** Render Ronde Aktif */
   function renderActiveRound() {
     var appEl = doc.getElementById('app');
     if (!appEl) return;
+    stopRoundTimer();
+    nujumState.timerPaused = false;
+    nujumState.tapGridExpanded = false;
 
     var q = nujumState.currentQuestion = pickNextQuestion();
     var theta = (root.__getFiezelState && root.__getFiezelState()?.skills?.grammar) || 0.0;
     nujumState.currentBet = calculateBetPercentage(q, theta);
+    nujumState.isDoubleDown = false;
     nujumState.roundStartTime = Date.now();
 
     // Bicarakan taruhan mesin lewat audio saat ronde baru mulai
@@ -712,7 +1272,30 @@
     speakMachine(pbScript.text_en, pbScript.text_id);
 
     var diffStr = (q.cefr === 'B2' ? '+0.90' : q.cefr === 'B1' ? '+0.50' : q.cefr === 'A2' ? '0.00' : '-0.50');
-    var stemDisplay = q.stem.replace('___', '<span class="nujum-slot-pod is-empty" id="nujumSlotPod">[ ... ]</span>');
+    var trapMarkup = [
+      '<span class="nujum-slot-pod is-trap-primed" id="nujumSlotPod">',
+      '  <span class="nujum-trap-badge">JEBAKAN MESIN</span>',
+      '  <span class="nujum-trap-val">«' + escapeHtml(q.targetTrap) + '»?</span>',
+      '  <span class="nujum-trap-cta">⚡ Patahkan!</span>',
+      '</span>'
+    ].join('');
+    var stemDisplay = q.stem.replace('___', trapMarkup);
+
+    // Clean, natural slot in the sentence
+    var slotMarkup = '<span class="nujum-slot-pod" id="nujumSlotPod">___</span>';
+    var stemDisplay = q.stem.replace('___', slotMarkup);
+
+    // Progressive timer display
+    var timerDuration = getRoundTimerDuration();
+    var roundLabel = (nujumState.roundIndex >= 7) ? 'FINAL' : 'Ronde ' + (nujumState.roundIndex + 1) + '/8';
+    var roundPhase = (nujumState.roundIndex <= 2) ? 'STANDAR' : (nujumState.roundIndex <= 4) ? 'INTENSIF' : (nujumState.roundIndex <= 6) ? 'KRITIS' : '⚡ ALL-IN';
+
+    // Shield break bonus banner
+    var shieldBanner = '';
+    if (nujumState.machineShield <= 0 && nujumState.scoreKamu > 0) {
+      shieldBanner = '<div class="nujum-shield-destroyed-banner">🛡️ SHIELD MESIN HANCUR — RONDE BONUS AKTIF (+15s)</div>';
+      timerDuration = 15.0;
+    }
 
     appEl.innerHTML = [
       '<div class="nujum-screen" data-testid="nujum-screen">',
@@ -721,109 +1304,114 @@
       '      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>',
       '      <span>Keluar</span>',
       '    </button>',
-      '    <div class="nujum-node-badge">',
-      '      <span class="pulse-radar"></span>',
-      '      <span>NUJUM D-01</span>',
-      '      <span>·</span>',
-      '      <span>' + q.cefr + '</span>',
+      '    <div class="nujum-round-pill">',
+      '      <span>' + roundLabel + '</span>',
+      '      <span class="nujum-phase-tag">' + roundPhase + '</span>',
       '    </div>',
       '    <div class="nujum-scoreboard" id="nujumScorePill">',
-      '      <span class="score-mesin">MESIN <b>' + nujumState.scoreMesin + '</b></span>',
-      '      <span>⚡</span>',
+      '      <span class="score-mesin">MESIN <b>' + nujumState.scoreMesin + '</b> <small id="nujumShieldText">(' + nujumState.machineShield + '%)</small></span>',
+      '      <span aria-hidden="true">⚡</span>',
       '      <span class="score-kamu"><b>' + nujumState.scoreKamu + '</b> KAMU</span>',
       '    </div>',
       '  </div>',
 
-      '  <div class="nujum-odds-card">',
-      '    <div class="nujum-odds-header">',
-      '      <div class="nujum-odds-label">',
-      '        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
-      '        <span>PREDIKSI KEGAGALAN MESIN</span>',
-      '      </div>',
-      '      <span class="nujum-diag-tag">IRT 3PL: θ=0.00</span>',
+      '  <div class="nujum-crucible-timer-wrap">',
+      '    <div class="nujum-crucible-timer-rail">',
+      '      <div class="nujum-crucible-timer-fill" id="nujumCrucibleTimerBar" style="width:100%"></div>',
       '    </div>',
-      '    <div class="nujum-odds-body">',
-      '      <div class="nujum-odds-val-wrap">',
-      '        <div class="nujum-odds-val">' + nujumState.currentBet + '%<small>RISK INDEX</small></div>',
-      '        <div class="nujum-odds-sub">Confidence Band: [' + Math.max(50, nujumState.currentBet - 6) + '% – ' + Math.min(96, nujumState.currentBet + 6) + '%]</div>',
-      '      </div>',
-      '      <div class="nujum-param-matrix">',
-      '        <div class="nujum-param-row"><span class="lbl">Difficulty:</span><span class="val amber">b = ' + diffStr + '</span></div>',
-      '        <div class="nujum-param-row"><span class="lbl">Discrim:</span><span class="val emerald">a = 1.20</span></div>',
-      '        <div class="nujum-param-row"><span class="lbl">Guessing:</span><span class="val">c = 0.25</span></div>',
-      '      </div>',
-      '    </div>',
-      '    <div class="nujum-segment-bar">',
-      '      <div class="nujum-seg fill-high"></div>',
-      '      <div class="nujum-seg fill-high"></div>',
-      '      <div class="nujum-seg fill-mid"></div>',
-      '      <div class="nujum-seg fill-mid"></div>',
-      '      <div class="nujum-seg fill-low"></div>',
-      '      <div class="nujum-seg"></div>',
-      '      <div class="nujum-seg"></div>',
-      '      <div class="nujum-seg"></div>',
-      '    </div>',
-      '    <div class="nujum-taunt-strip">',
-      '      <span class="nujum-taunt-arrow">▷</span>',
-      '      <div>Aku bertaruh kamu akan salah memilih <span class="nujum-token-trap">«' + q.targetTrap + '»</span>, bukan <span class="nujum-token-correct">«' + q.options[q.correctIndex] + '»</span>.</div>',
-      '    </div>',
+      '    <div class="nujum-crucible-timer-count" id="nujumCrucibleTimerText">' + timerDuration.toFixed(1) + 's</div>',
       '  </div>',
 
-      '  <div class="nujum-crucible-stage">',
-      '    <div class="nujum-crucible-head">',
-      '      <div><span class="dot"></span><span>CRUCIBLE://Q-' + (nujumState.roundIndex + 1) + '</span></div>',
-      '      <div>SYNAPSE ACTIVE</div>',
-      '    </div>',
-      '    <div class="nujum-stem-sentence">' + stemDisplay + '</div>',
-      '    <div class="nujum-context-meta">',
-      '      <span>CEFR ' + q.cefr + '</span>',
-      '      <span>·</span>',
-      '      <span>RULE: ' + (q.skillId || 'GRAMMAR').replace('_', ' ') + '</span>',
-      '    </div>',
-      '  </div>',
+      shieldBanner,
 
-      '  <div id="nujumVerdictArea"></div>',
-
-      '  <div class="nujum-voice-section">',
-      '    <div class="nujum-eq-wrap">',
-      '      <span>AUDIO HARMONIC</span>',
-      '      <div class="nujum-eq-bar"></div>',
-      '      <div class="nujum-eq-bar"></div>',
-      '      <div class="nujum-eq-bar"></div>',
-      '      <div class="nujum-eq-bar"></div>',
-      '    </div>',
-      '    <div class="nujum-orb-wrap">',
-      '      <div class="nujum-orb-ring ring-1"></div>',
-      '      <div class="nujum-orb-ring ring-2"></div>',
-      '      <button class="nujum-orb-btn" id="nujumMicBtn" aria-label="Tekan untuk bicara">',
-      '        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>',
+      '  <div class="nujum-bet-banner">',
+      '    <div class="nujum-bet-headline">',
+      '      <div class="nujum-bet-badge">',
+      '        <span class="pulse-dot"></span>',
+      '        <span>TARUHAN MESIN: <b id="nujumOddsNumber">' + nujumState.currentBet + '%</b></span>',
+      '      </div>',
+      '      <button class="nujum-double-down-btn" id="nujumDoubleDownBtn" type="button">',
+      '        <span aria-hidden="true">🔥</span>',
+      '        <span>Tantang Balik</span>',
+      '        <span class="nujum-dd-tag">2x</span>',
       '      </button>',
       '    </div>',
-      '    <div class="nujum-voice-hint" id="nujumMicHint">Tekan untuk berbicara</div>',
+      '    <div class="nujum-bet-taunt">',
+      '      Aku bertaruh kamu akan memilih <span class="nujum-token-trap">«' + escapeHtml(q.targetTrap) + '»</span>. Buktikan aku salah.',
+      '    </div>',
       '  </div>',
 
-      '  <div class="nujum-tactical-grid">',
-      q.options.map(function (opt, idx) {
-        var letter = ['A', 'B', 'C', 'D'][idx] || (idx + 1);
-        return '    <button class="nujum-tactical-chip nujum-opt-btn" data-val="' + opt + '"><div class="nujum-chip-content"><span class="nujum-chip-key">' + letter + '</span><span class="nujum-chip-text">' + opt + '</span></div><span class="nujum-chip-pip"></span></button>';
+      '  <div class="nujum-crucible-card" id="nujumCrucibleStage">',
+      '    <div class="nujum-stem-sentence">' + stemDisplay + '</div>',
+      '    <div class="nujum-rule-hint">💡 RULE: ' + escapeHtml((q.skillId || 'GRAMMAR').replace(/_/g, ' ')) + '</div>',
+      '  </div>',
+
+      '  <div class="nujum-play-area" id="nujumPlayArea">',
+      '    <div class="nujum-action-zone" id="nujumActionZone">',
+      '      <div class="nujum-voice-hub">',
+      '        <button class="nujum-orb-btn" id="nujumMicBtn" aria-label="Tekan untuk bicara — ucapkan jawaban">',
+      '          <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>',
+      '        </button>',
+      '        <div class="nujum-voice-sub">',
+      '          <span class="nujum-voice-hint" id="nujumMicHint">Ucapkan atau ketuk pilihanmu:</span>',
+      '          <canvas id="nujumWaveCanvas" class="nujum-wave-canvas" width="180" height="20" style="height:20px;width:100%"></canvas>',
+      '          <div class="nujum-stt-preview" id="nujumSttPreview"></div>',
+      '        </div>',
+      '      </div>',
+
+      '      <div class="nujum-tactical-grid" id="nujumTacticalGrid">',
+      q.options.map(function (opt) {
+        return [
+          '        <button class="nujum-tactical-chip nujum-opt-btn" data-val="' + escapeHtml(opt) + '">',
+          '          <span>' + escapeHtml(opt) + '</span>',
+          '        </button>'
+        ].join('');
       }).join('\n'),
-      '  </div>',
+      '      </div>',
 
-      '  <button class="nujum-surrender-pill" id="nujumSurrenderBtn">',
-      '    <span>🏳️</span>',
-      '    <span>Aku Menyerah — Ajari Aku Ini</span>',
-      '  </button>',
+      '      <div class="nujum-surrender-wrap">',
+      '        <button class="nujum-surrender-text-btn" id="nujumSurrenderBtn" type="button">',
+      '          <span aria-hidden="true">🏳️</span>',
+      '          <span>Belum paham? <b>Menyerah & Pelajari</b></span>',
+      '        </button>',
+      '      </div>',
+      '    </div>',
 
-      '  <div class="nujum-footer">',
-      '    <span>LATENCY: 14ms</span>',
-      '    <span>TACTICAL HUD // BRAINCORE</span>',
-      '    <span>CEFR: ' + q.cefr + '</span>',
+      '    <div id="nujumVerdictArea" style="display:none"></div>',
       '  </div>',
       '</div>'
     ].join('');
 
     // Setup canvas waveform
     initWaveform(doc.getElementById('nujumWaveCanvas'));
+
+    // Show "READY?" countdown before starting timer
+    showReadyCountdown(function () {
+      startCrucibleTimer(timerDuration);
+    });
+
+    // Setup Double Down button
+    var ddBtn = doc.getElementById('nujumDoubleDownBtn');
+    if (ddBtn) {
+      ddBtn.onclick = function () {
+        nujumState.isDoubleDown = !nujumState.isDoubleDown;
+        ddBtn.classList.toggle('is-active', nujumState.isDoubleDown);
+        var screenEl = doc.querySelector('.nujum-screen');
+        if (screenEl) screenEl.classList.toggle('is-overdrive', nujumState.isDoubleDown);
+        var labelSpan = ddBtn.querySelector('span:nth-child(2)');
+        if (labelSpan) {
+          labelSpan.textContent = nujumState.isDoubleDown ? 'Double Down Aktif (2x Taruhan)!' : 'Tantang Balik';
+        }
+        var oddsEl = doc.getElementById('nujumOddsNumber');
+        if (oddsEl) {
+          oddsEl.style.color = nujumState.isDoubleDown ? '#D97706' : 'var(--nj-crimson)';
+        }
+        // Pause timer for 1.5s to give decision breathing room
+        nujumState.timerPaused = true;
+        setTimeout(function () { nujumState.timerPaused = false; }, 1500);
+        try { if (typeof root.playFeedbackSound === 'function') root.playFeedbackSound('click'); } catch (_) {}
+      };
+    }
 
     // Setup mic button
     var micBtn = doc.getElementById('nujumMicBtn');
@@ -897,9 +1485,9 @@
     var pill = doc.getElementById('nujumScorePill');
     if (pill) {
       pill.innerHTML = [
-        '<span>Mesin <b class="score-mesin">' + nujumState.scoreMesin + '</b></span>',
-        '<span>:</span>',
-        '<span>Kamu <b class="score-kamu">' + nujumState.scoreKamu + '</b></span>'
+        '<span class="score-mesin">MESIN <b>' + nujumState.scoreMesin + '</b></span>',
+        '<span>⚡</span>',
+        '<span class="score-kamu"><b>' + nujumState.scoreKamu + '</b> KAMU</span>'
       ].join('');
     }
   }
@@ -923,6 +1511,30 @@
 
     speakMachine(fsScript.text_en, fsScript.text_id);
 
+    // Hitung rekor taruhan tertinggi yang berhasil dipatahkan
+    var maxBrokenBet = 0;
+    nujumState.brokenClaims.forEach(function (c) {
+      if (c.bet > maxBrokenBet) maxBrokenBet = c.bet;
+    });
+    if (maxBrokenBet > 0) {
+      try {
+        var prevBest = Number(localStorage.getItem('fiezel_nujum_highest_shattered') || 0);
+        if (maxBrokenBet > prevBest) {
+          localStorage.setItem('fiezel_nujum_highest_shattered', String(maxBrokenBet));
+        }
+      } catch (_) {}
+    }
+
+    // Berikan reward Gems jika menang
+    if (playerWon) {
+      try {
+        if (root.FiezelGems && typeof root.FiezelGems.award === 'function') {
+          root.FiezelGems.award(25, 'nujum_victory');
+        }
+        if (typeof root.playFeedbackSound === 'function') root.playFeedbackSound('complete');
+      } catch (_) {}
+    }
+
     appEl.innerHTML = [
       '<div class="nujum-screen">',
       '  <div class="nujum-topbar">',
@@ -937,6 +1549,7 @@
       '      <span style="color:#F43F5E">' + nujumState.scoreMesin + '</span>',
       '    </div>',
       '    <div style="font-size:0.9rem;color:var(--nj-text-muted)">' + fsScript.text_id + '</div>',
+      (playerWon ? '    <div style="margin-top:8px"><span class="nujum-home-badge" style="background:#DDF3EA;color:#165646;border-color:#10B981">💎 REWARD +25 GEMS DITAMBAHKAN</span></div>' : ''),
       '  </div>',
 
       '  <div class="nujum-broken-claims">',
@@ -967,10 +1580,12 @@
 
   function exitNujum() {
     nujumState.active = false;
+    stopRoundTimer();
     if (nujumState.waveAnimFrame) cancelAnimationFrame(nujumState.waveAnimFrame);
     if (nujumState.recognition) {
       try { nujumState.recognition.stop(); } catch (_) {}
     }
+    if (nujumState.disputeTimerInterval) clearInterval(nujumState.disputeTimerInterval);
     doc.body.classList.remove('fz-view-nujum');
     try {
       var nav = doc.querySelector('.bottomnav');
@@ -986,11 +1601,17 @@
   /** Mulai sesi Nujum */
   function startSession(opts) {
     var options = opts || {};
+    stopRoundTimer();
     nujumState.active = true;
     nujumState.roundIndex = 0;
     nujumState.scoreMesin = 0;
     nujumState.scoreKamu = 0;
+    nujumState.machineShield = 100;
+    nujumState.isDoubleDown = false;
+    nujumState.timerPaused = false;
+    nujumState.tapGridExpanded = false;
     nujumState.brokenClaims = [];
+    nujumState.usedQuestionIds = [];
     nujumState.isDemo = !!options.isDemo;
     nujumState.bktMean = nujumState.isDemo ? 0.44 : 0.50;
     nujumState.bktMargin = nujumState.isDemo ? 0.12 : 0.22;
@@ -1009,10 +1630,13 @@
   function homeCardMarkup() {
     return [
       '<div class="nujum-home-card" onclick="go(\'nujum\')" data-testid="home-nujum-card">',
-      '  <div class="nujum-home-tag"><span class="pulse-dot"></span> MODE BARU · VOICE-FIRST DUEL</div>',
+      '  <div class="nujum-home-card-header">',
+      '    <span class="nujum-home-badge"><span class="pulse-dot"></span> MODE BARU · VOICE-FIRST DUEL</span>',
+      '    <span class="nujum-home-risk-pill">TARUHAN TINGGI</span>',
+      '  </div>',
       '  <div class="nujum-home-title">NUJUM — Mesin yang Bertaruh Melawanmu</div>',
       '  <div class="nujum-home-desc">Bukan kuis pilihan ganda. Mesin menyuarakan taruhan spesifik atas kesalahanmu sebelum kamu menjawab. Berani buktikan mesin salah?</div>',
-      '  <div class="nujum-home-cta">' + t('nujum.home_cta', 'Masuk Arena Taruhan Suara →') + '</div>',
+      '  <button class="nujum-home-cta-btn">' + t('nujum.home_cta', 'Masuk Arena Taruhan Suara →') + '</button>',
       '</div>'
     ].join('');
   }

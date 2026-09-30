@@ -11450,23 +11450,66 @@ function buildGrammarLessonQuestions(skill,count=GRAMMAR_SESSION_SIZE,opts={}){
   const exampleStem=String(own[0]?.[0]||'').replace(/\s+/g,' ').trim().toLowerCase();
   if(exampleStem&&out.length>1){const idx=out.findIndex(q=>String(q.question||'').replace(/\s+/g,' ').trim().toLowerCase().includes(exampleStem));if(idx===0)out.push(out.shift())}
   return out}
-/* m025-378: SESI LESSON 20 SOAL, DIACAK TIAP DIBUKA. Soal milik lesson dulu (acak templat &
- * ritme slot), lalu sisanya diisi ULANGAN dari lesson lain yang sudah terbuka di level yang sama:
- * satu soal per lesson per putaran, lesson diacak, stem tak boleh kembar. Soal ulangan ditandai
- * `reviewOf` (ditampilkan sebagai label kecil di kartu soal) dan tetap dicatat ke lesson asalnya,
- * jadi mastery lesson lain ikut terpelihara (retrieval berjarak). Soal pertama tetap isian biasa
+/* m025-378: SESI LESSON 20 SOAL, DIACAK TIAP DIBUKA. Soal milik lesson dulu (1 soal per templat,
+ * bebas repetisi kalimat/stem), lalu sisanya diisi ULANGAN dari lesson lain yang sudah terbuka
+ * di level yang sama (atau peer/foundation level jika lesson lain belum dibuka): satu soal per
+ * lesson per putaran, lesson diacak, stem tak boleh kembar. Soal ulangan ditandai `reviewOf`
+ * (ditampilkan sebagai label kecil di kartu soal) dan tetap dicatat ke lesson asalnya, jadi
+ * mastery lesson lain ikut terpelihara (retrieval berjarak). Soal pertama tetap isian biasa
  * milik lesson ini; soal ulangan disebar merata di antara soal lesson. */
 function buildGrammarSessionQuestions(skill,count=GRAMMAR_SESSION_SIZE){
-  const own=buildGrammarLessonQuestions(skill,count,{shuffle:true});
-  if(!own.length||own.length>=count)return own;
-  const seen=new Set(own.map(q=>String(q.question||'').toLowerCase().replace(/\s+/g,' ').trim()));
-  const pools=shuffle(grammarLessonReviewSkills(skill)).map(x=>[x,shuffle(buildGrammarModeQuestions(x,GRAMMAR_PRACTICE_SLOT_MODES,Number.MAX_SAFE_INTEGER))]).filter(([,p])=>p.length);
+  const meta=GRAMMAR_ITEMS.find(x=>x.skill===skill);if(!meta||meta.level!==getActiveLevel())return[];
+  const ownTemplates=G[skill]||[];if(!ownTemplates.length)return[];
+  const seenSourceIds=new Set(),seenStems=new Set();
+  const normStem=q=>String(q.sourceId||q.question||'').toLowerCase().replace(/“[^”]+” masih salah\. yang benar yang mana\?/i,'').replace(/pilih kalimat yang benar:/i,'').replace(/\s+/g,' ').trim();
+  const own=[];
+  const modes=['apply_form','complete_sentence','repair_distractor_1','repair_distractor_2','repair_distractor_3'];
+  const order=shuffle(Array.from({length:ownTemplates.length},(_,i)=>i));
+  if(order.length>1&&order[0]===0)order.push(order.shift());
+  for(let i=0;i<order.length;i++){
+    const ti=order[i],mode=modes[i%modes.length],variant=GRAMMAR_PRACTICE_MODES.indexOf(mode);
+    const q=variant>=0?makeGrammarQuestion(skill,ownTemplates[ti],variant,skill):null;
+    if(q&&grammarLessonQuestionOwnOnly(q)&&validateQuestion(q).ok){
+      const stem=normStem(q),src=q.sourceId||stem;
+      if(!seenSourceIds.has(src)&&!seenStems.has(stem)){
+        seenSourceIds.add(src);seenStems.add(stem);
+        own.push(q);
+      }
+    }
+  }
+  const exampleStem=String(ownTemplates[0]?.[0]||'').replace(/\s+/g,' ').trim().toLowerCase();
+  if(exampleStem&&own.length>1){const idx=own.findIndex(q=>String(q.question||'').replace(/\s+/g,' ').trim().toLowerCase().includes(exampleStem));if(idx===0)own.push(own.shift())}
+  if(!own.length)return[];
+  if(own.length>=count)return own.slice(0,count);
+
+  const reviewSkills=grammarLessonReviewSkills(skill);
+  const peerSkills=grammarItemsForLevel(meta.level).map(x=>x.skill).filter((x,i,a)=>a.indexOf(x)===i&&x!==skill&&(G[x]||[]).length);
+  const allLevels=['A1','A2','B1','B2','C1','C2'],currentLevelIdx=allLevels.indexOf(meta.level),earlierSkills=[];
+  for(let l=currentLevelIdx-1;l>=0;l--){
+    earlierSkills.push(...grammarItemsForLevel(allLevels[l]).map(x=>x.skill).filter((x,i,a)=>a.indexOf(x)===i&&(G[x]||[]).length));
+  }
+  const candidateSkillGroups=[reviewSkills,peerSkills,earlierSkills];
   const reviews=[];
-  while(reviews.length+own.length<count&&pools.some(([,p])=>p.length)){
-    for(const [from,pool] of pools){
-      if(reviews.length+own.length>=count)break;
-      let q;while(pool.length&&!q){const cand=pool.shift();const key=String(cand.question||'').toLowerCase().replace(/\s+/g,' ').trim();if(!seen.has(key)){seen.add(key);q=cand}}
-      if(q)reviews.push({...q,reviewOf:from});
+  for(const group of candidateSkillGroups){
+    if(own.length+reviews.length>=count)break;
+    const shufGroup=shuffle(group.filter(s=>s!==skill));
+    if(!shufGroup.length)continue;
+    const pools=shufGroup.map(s=>[s,shuffle(buildGrammarModeQuestions(s,GRAMMAR_PRACTICE_SLOT_MODES,Number.MAX_SAFE_INTEGER))]).filter(([,p])=>p.length);
+    let progressed=true;
+    while(own.length+reviews.length<count&&pools.some(([,p])=>p.length)&&progressed){
+      progressed=false;
+      for(const [from,pool] of pools){
+        if(own.length+reviews.length>=count)break;
+        let q;
+        while(pool.length&&!q){
+          const cand=pool.shift(),stem=normStem(cand),src=cand.sourceId||stem;
+          if(!seenSourceIds.has(src)&&!seenStems.has(stem)){
+            seenSourceIds.add(src);seenStems.add(stem);
+            q=cand;
+          }
+        }
+        if(q){reviews.push({...q,reviewOf:from});progressed=true}
+      }
     }
   }
   if(!reviews.length)return own;
@@ -11476,7 +11519,8 @@ function buildGrammarSessionQuestions(skill,count=GRAMMAR_SESSION_SIZE){
     if(k<reviews.length&&(i>=nextReview||r>=rest.length)){out.push(reviews[k++]);nextReview+=step}
     else out.push(rest[r++]);
   }
-  return out}
+  return out.slice(0,count);
+}
 function practiceSkill(skill){if((GRAMMAR_ITEMS.find(x=>x.skill===skill)?.level||'')!==getActiveLevel())return showToast(FiezelI18n.t('grammar.pilih-lesson-terlebih-dahulu',{level:getActiveLevel()}));const unlock=lessonUnlockState(skill,state,bktMasteredSkills());if(unlock.locked)return showToast(lessonLockMessage(unlock));const questions=buildGrammarSessionQuestions(skill,GRAMMAR_SESSION_SIZE);if(questions.length<GRAMMAR_SESSION_MIN)return showToast(FiezelI18n.t('grammar.lesson-new-memiliki-item-valid',{jumlahSoal:questions.length}));quizLoop({type:'grammar',count:Math.min(GRAMMAR_SESSION_SIZE,questions.length),pool:questions,factory:item=>item,preserveOrder:true})}
 /* ---- Sesi Kilat: 20 soal grammar campuran lintas lesson satu level ----------------------
  * Latihan singkat harian. Hanya lesson yang sudah terbuka di level aktif; soal dirotasi antar

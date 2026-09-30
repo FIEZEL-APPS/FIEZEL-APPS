@@ -1064,3 +1064,649 @@ html body .nujum-home-cta-btn:active {
   transform: scale(0.98) !important;
   box-shadow: 1px 1px 0px var(--nj-maroon) !important;
 }
+
+/* ==========================================================================
+   9. INTERACTIVE BKT UNCERTAINTY RIBBON
+   ========================================================================== */
+.nujum-bkt-box {
+  background: var(--nj-bg);
+  border: 1.5px solid rgba(94, 20, 32, 0.15);
+  border-radius: 12px;
+  padding: 8px 12px;
+  margin-top: 10px;
+}
+
+.nujum-bkt-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--nj-font-mono);
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: var(--nj-muted);
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+
+.nujum-bkt-score {
+  color: var(--nj-maroon);
+}
+
+.nujum-bkt-rail {
+  position: relative;
+  height: 8px;
+  background: #EAE2D5;
+  border-radius: 4px;
+  overflow: visible;
+}
+
+.nujum-bkt-ribbon {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: rgba(31, 122, 99, 0.35);
+  border: 1px solid var(--nj-emerald);
+  border-radius: 3px;
+  transition: left 0.3s ease, width 0.3s ease;
+}
+
+.nujum-bkt-dot {
+  position: absolute;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  transform: translate(-50%, -50%);
+  background: var(--nj-emerald);
+  border: 2px solid #FFFFFF;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  border-radius: 50%;
+  transition: left 0.3s ease;
+}
+
+/* ==========================================================================
+   10. LIVE WAVEFORM & STT TRANSCRIPT PREVIEW
+   ========================================================================== */
+.nujum-waveform-container {
+  width: 100%;
+  max-width: 320px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 4px auto;
+}
+
+.nujum-wave-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.nujum-stt-preview {
+  min-height: 24px;
+  font-family: var(--nj-font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--nj-maroon);
+  background: #FFFFFF;
+  border: 1px dashed var(--nj-maroon);
+  border-radius: 8px;
+  padding: 4px 10px;
+  margin-top: 6px;
+  text-align: center;
+  display: none;
+}
+
+.nujum-stt-preview.is-active {
+  display: block;
+  animation: nujumFadeIn 0.2s ease;
+}
+
+/* ==========================================================================
+   11. DOUBLE DOWN (PLAYER STAKES)
+   ========================================================================== */
+.nujum-action-row {
+  margin-bottom: 12px;
+}
+
+.nujum-double-down-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: #FFFFFF;
+  border: 2px solid #D97706;
+  box-shadow: 2px 2px 0px #D97706;
+  color: #B45309;
+  font-family: var(--nj-font-mono);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.nujum-double-down-btn:hover {
+  background: #FEF3C7;
+  transform: translateY(-1px);
+}
+
+.nujum-double-down-btn.is-active {
+  background: #F59E0B !important;
+  color: #FFFFFF !important;
+  border-color: #B45309 !important;
+  box-shadow: 2.5px 2.5px 0px #78350F !important;
+  animation: nujumPulse 1.5s infinite;
+}
+
+.nujum-dd-multiplier {
+  background: #FEF3C7;
+  color: #92400E;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.70rem;
+  border: 1px solid #D97706;
+}
+
+.nujum-double-down-btn.is-active .nujum-dd-multiplier {
+  background: #78350F;
+  color: #FDE68A;
+  border-color: #FDE68A;
+}
+
+@keyframes nujumPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+@keyframes nujumFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==========================================================================
+   12. RAPID PROBE (TRUE 3-STRIKE DISPUTE)
+   ========================================================================== */
+.nujum-probe-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 12px 0;
+}
+
+.nujum-probe-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--nj-font-mono);
+  font-size: 0.76rem;
+  font-weight: 800;
+  color: var(--nj-maroon);
+}
+
+.nujum-probe-pips {
+  display: flex;
+  gap: 6px;
+}
+
+.nujum-probe-pip {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1.5px solid var(--nj-maroon);
+  background: #FFFFFF;
+}
+
+.nujum-probe-pip.is-correct {
+  background: var(--nj-emerald);
+  border-color: var(--nj-emerald);
+}
+
+.nujum-probe-pip.is-wrong {
+  background: var(--nj-crimson);
+  border-color: var(--nj-crimson);
+}
+
+.nujum-probe-pip.is-current {
+  background: var(--nj-yellow);
+  box-shadow: 0 0 6px rgba(255, 217, 79, 0.8);
+}
+
+.nujum-probe-timer-rail {
+  width: 100%;
+  height: 6px;
+  background: #EAE2D5;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.nujum-probe-timer-fill {
+  height: 100%;
+  background: #F59E0B;
+  transition: width 0.1s linear;
+}
+
+.nujum-probe-stem {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--nj-maroon);
+  text-align: center;
+  padding: 12px;
+  background: #FFFFFF;
+  border: 2px solid var(--nj-maroon);
+  border-radius: 14px;
+  box-shadow: var(--nj-shadow-3d);
+}
+
+/* ==========================================================================
+   13. HOME CARD ADDITIONS
+   ========================================================================== */
+.nujum-home-risk-pill {
+  font-family: var(--nj-font-mono);
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #B45309;
+  background: #FEF3C7;
+  border: 1px solid #D97706;
+  padding: 2px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.05em;
+}
+
+.nujum-echo-record-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: var(--nj-emerald);
+  color: #FFFFFF;
+  border: 1.5px solid var(--nj-emerald);
+  font-family: var(--nj-font-mono);
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.nujum-echo-record-btn.is-recording {
+  background: #EF4444 !important;
+  border-color: #B91C1C !important;
+  animation: nujumPulse 1s infinite;
+}
+
+.nujum-echo-feedback-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-family: var(--nj-font-mono);
+  font-size: 0.74rem;
+  font-weight: 800;
+  background: var(--nj-mint);
+  color: #165646;
+  border: 1px solid var(--nj-emerald);
+}
+
+/* ==========================================================================
+   14. PSYCHOLOGICAL INTERCEPT & ADRENALINE VFX OVERHAUL
+   ========================================================================== */
+.nujum-shield-hud {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  background: #FFFFFF;
+  border: 1.5px solid var(--nj-maroon);
+  box-shadow: 2px 2px 0px var(--nj-maroon);
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-family: var(--nj-font-mono);
+  min-width: 105px;
+}
+
+.nujum-shield-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.66rem;
+  font-weight: 800;
+  color: var(--nj-maroon);
+}
+
+.nujum-shield-track {
+  width: 100%;
+  height: 6px;
+  background: #F1ECE1;
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid rgba(94, 20, 32, 0.2);
+}
+
+.nujum-shield-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #10B981 0%, #059669 100%);
+  border-radius: 999px;
+  transition: width 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.3s ease;
+}
+
+.nujum-shield-bar.is-critical {
+  background: linear-gradient(90deg, #EF4444 0%, #B91C1C 100%) !important;
+  animation: njPanicPulse 0.8s infinite ease-in-out;
+}
+
+.nujum-crucible-timer-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+  background: #FFFFFF;
+  border: 1.5px solid var(--nj-maroon);
+  border-radius: 12px;
+  padding: 8px 12px;
+  box-shadow: 2px 2px 0px var(--nj-maroon);
+}
+
+.nujum-crucible-timer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--nj-font-mono);
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--nj-maroon);
+  letter-spacing: 0.04em;
+}
+
+.nujum-crucible-timer-count {
+  font-size: 0.84rem;
+  font-weight: 800;
+  color: var(--nj-crimson);
+  background: #FFE4E6;
+  border: 1px solid var(--nj-crimson);
+  padding: 1px 8px;
+  border-radius: 6px;
+  font-family: var(--nj-font-mono);
+}
+
+.nujum-crucible-timer-count.is-panic {
+  background: #EF4444 !important;
+  color: #FFFFFF !important;
+  border-color: #991B1B !important;
+  animation: njPanicPulse 0.5s infinite;
+}
+
+.nujum-crucible-timer-rail {
+  width: 100%;
+  height: 8px;
+  background: #F1ECE1;
+  border: 1px solid rgba(94, 20, 32, 0.3);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.nujum-crucible-timer-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10B981 0%, #FFD94F 50%, #F59E0B 100%);
+  border-radius: 999px;
+  transition: width 0.1s linear;
+}
+
+.nujum-crucible-timer-fill.is-panic {
+  background: linear-gradient(90deg, #F43F5E 0%, #DC2626 100%) !important;
+  box-shadow: 0 0 10px #EF4444;
+}
+
+.nujum-crucible-stage.is-panic {
+  border-color: #DC2626 !important;
+  animation: njPanicPulse 0.6s infinite ease-in-out;
+}
+
+/* Provokasi Slot Kalimat Langsung */
+.nujum-slot-pod.is-trap-primed {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: #FFF1F2;
+  border: 2px dashed #E11D48;
+  color: #9F1239;
+  padding: 6px 14px;
+  border-radius: 12px;
+  vertical-align: middle;
+  margin: 4px 6px;
+  animation: njTrapGlow 2s infinite ease-in-out;
+}
+
+@keyframes njTrapGlow {
+  0%, 100% { box-shadow: 0 0 0px rgba(225, 29, 72, 0); }
+  50% { box-shadow: 0 0 12px rgba(225, 29, 72, 0.4); border-color: #BE123C; }
+}
+
+.nujum-trap-badge {
+  font-family: var(--nj-font-mono);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #BE123C;
+  text-transform: uppercase;
+}
+
+.nujum-trap-val {
+  font-family: var(--nj-font-mono);
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #881337;
+}
+
+.nujum-trap-cta {
+  font-family: var(--nj-font-sans);
+  font-size: 0.66rem;
+  font-weight: 800;
+  color: #E11D48;
+}
+
+/* De-ABCD: Lexical Strike Indicators */
+.nujum-tactical-header {
+  font-family: var(--nj-font-mono);
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--nj-maroon);
+  letter-spacing: 0.06em;
+  margin-bottom: 8px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.nujum-chip-strike-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: #FFFFFF !important;
+  border: 1.5px solid currentColor !important;
+  color: inherit !important;
+  display: grid;
+  place-items: center;
+  font-size: 0.82rem;
+  flex-shrink: 0;
+}
+
+.nujum-chip-strike-icon.is-trap {
+  background: #FEE2E2 !important;
+  border-color: #DC2626 !important;
+}
+
+/* Keyframe Animations */
+@keyframes njPanicPulse {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0px #EF4444); }
+  50% { transform: scale(1.02); filter: drop-shadow(0 0 8px #EF4444); }
+}
+
+@keyframes njShatterShake {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  20% { transform: translate(-3px, 2px) rotate(-1deg); }
+  40% { transform: translate(3px, -2px) rotate(1deg); }
+  60% { transform: translate(-2px, -1px) rotate(0deg); }
+  80% { transform: translate(2px, 1px) rotate(1deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+@keyframes njGlitchShake {
+  0% { transform: translate(0, 0); filter: hue-rotate(0deg); }
+  25% { transform: translate(-5px, 3px); filter: contrast(150%) hue-rotate(90deg); }
+  50% { transform: translate(4px, -3px); filter: contrast(180%); }
+  75% { transform: translate(-3px, -2px); }
+  100% { transform: translate(0, 0); filter: none; }
+}
+
+.nujum-screen.is-shattered {
+  animation: njShatterShake 0.4s ease-out;
+}
+
+.nujum-screen.is-glitch {
+  animation: njGlitchShake 0.45s ease-out;
+}
+
+.nujum-screen.is-overdrive {
+  border-color: #D97706 !important;
+  box-shadow: 0 0 24px rgba(245, 158, 11, 0.4) !important;
+}
+
+.nujum-verdict-banner-loss {
+  background: #FEE2E2;
+  color: #991B1B;
+  border: 1px solid #DC2626;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: 800;
+  font-size: 0.75rem;
+  margin-bottom: 8px;
+}
+
+/* ==========================================================================
+   15. ACCESSIBILITY: FOCUS, REDUCED MOTION, VOICE-FIRST LAYOUT
+   ========================================================================== */
+
+/* Focus-visible for keyboard navigation */
+.nujum-tactical-chip:focus-visible,
+.nujum-opt-btn:focus-visible,
+.nujum-orb-btn:focus-visible,
+.nujum-surrender-pill:focus-visible,
+.nujum-back-btn:focus-visible,
+.nujum-double-down-btn:focus-visible,
+.nujum-dispute-btn:focus-visible,
+.nujum-next-btn:focus-visible,
+.nujum-teleport-btn:focus-visible,
+.nujum-echo-play-btn:focus-visible,
+.nujum-echo-record-btn:focus-visible {
+  outline: 3px solid var(--nj-maroon) !important;
+  outline-offset: 3px !important;
+  box-shadow: 0 0 0 6px rgba(94, 20, 32, 0.18) !important;
+}
+
+/* Reduced motion for vestibular disorders */
+@media (prefers-reduced-motion: reduce) {
+  .nujum-screen.is-shattered,
+  .nujum-screen.is-glitch,
+  .nujum-shield-bar.is-critical,
+  .nujum-crucible-timer-count.is-panic,
+  .nujum-crucible-stage.is-panic,
+  .nujum-slot-pod.is-trap-primed,
+  .nujum-double-down-btn.is-active,
+  .nujum-echo-record-btn.is-recording,
+  .pulse-dot,
+  .pulse-radar,
+  .nujum-neural-dot {
+    animation: none !important;
+  }
+  .nujum-shield-bar,
+  .nujum-crucible-timer-fill,
+  .nujum-tactical-chip,
+  .nujum-opt-btn,
+  .nujum-slot-pod {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Voice-first: tap grid fallback collapse */
+.nujum-tap-fallback-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  background: none;
+  border: 1.5px dashed rgba(94, 20, 32, 0.25);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-family: var(--nj-font-mono);
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--nj-muted);
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  margin-bottom: 8px;
+  transition: background 0.15s ease;
+}
+
+.nujum-tap-fallback-toggle:hover {
+  background: rgba(94, 20, 32, 0.04);
+}
+
+.nujum-tap-fallback-toggle:active {
+  background: rgba(94, 20, 32, 0.08);
+}
+
+.nujum-tactical-grid.is-collapsed {
+  display: none !important;
+}
+
+/* Ready countdown overlay */
+.nujum-ready-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 249, 238, 0.92);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  gap: 8px;
+}
+
+.nujum-ready-count {
+  font-family: var(--nj-font-mono);
+  font-size: 3.5rem;
+  font-weight: 800;
+  color: var(--nj-maroon);
+  line-height: 1;
+}
+
+.nujum-ready-label {
+  font-family: var(--nj-font-mono);
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--nj-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Shield Destroyed banner */
+.nujum-shield-destroyed-banner {
+  background: linear-gradient(135deg, #DDF3EA 0%, #A7F3D0 100%);
+  border: 2px solid #059669;
+  color: #065F46;
+  padding: 12px 16px;
+  border-radius: 14px;
+  font-weight: 800;
+  font-size: 0.88rem;
+  text-align: center;
+  margin-bottom: 10px;
+  box-shadow: 2px 2px 0px #059669;
+}
+
