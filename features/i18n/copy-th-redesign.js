@@ -220,6 +220,19 @@
     'home.kartu3-perubahan': 'จุด เทียบสัปดาห์ที่แล้ว',
     'home.kartu3-runtun': '🔥 {n} วัน',
     'home.kartu3-cta': 'ดูรายละเอียดพัฒนาการ',
-    'home.bukti-materi': 'บทเรียน: {materi}'
+    'home.bukti-materi': 'บทเรียน: {materi}',
+    /* ── FIEZEL NUJUM (The Ruthless Mentor) ────────────────────────────────── */
+    'nujum.status_broken': 'สถานะ: บันทึกการหักล้างคำทำนายลงในสมุดชัยชนะของคุณแล้ว',
+    'nujum.next_duel': 'ดำเนินการดวลถัดไป →',
+    'nujum.dispute_claim': '⚡ คัดค้านคำทำนาย (พิสูจน์ 3 ข้อ)',
+    'nujum.accept_next': 'ยอมรับและไปรอบถัดไป →',
+    'nujum.teleport_practice': 'ฝึกฝนบทเรียนนี้ตอนนี้ (โหมดฝึกฝน) →',
+    'nujum.next_round': 'ดำเนินการรอบดวลถัดไป →',
+    'nujum.cancel_dispute': 'ยกเลิกการคัดค้าน',
+    'nujum.start_dispute': 'เริ่มการพิสูจน์ 3 ข้อ →',
+    'nujum.speech_unsupported': 'เบราว์เซอร์นี้ไม่รองรับไมโครโฟน Web Speech API โปรดใช้ปุ่มคำด้านล่าง',
+    'nujum.empty_victories': 'ยังไม่มีการเดิมพันที่ถูกหักล้างในเซสชันนี้',
+    'nujum.return_home': 'กลับสู่หน้าหลัก',
+    'nujum.home_cta': 'เข้าสู่สังเวียนเดิมพันเสียง →'
   });
 }());
