@@ -20,6 +20,13 @@
 
   var doc = root.document;
 
+  function t(k, fallback) {
+    if (typeof root.FiezelI18n !== 'undefined' && root.FiezelI18n && typeof root.FiezelI18n.t === 'function') {
+      return root.FiezelI18n.t(k, fallback);
+    }
+    return fallback;
+  }
+
   // 65-Line Script Repository dari Script Bible v1.0
   var NUJUM_SCRIPTS = [
     { id: "PB-01", section: "pre_bet", category: "intuition_trap", text_id: "Aku bertaruh kamu akan memilih kata yang pertama kali muncul di kepalamu, bukan yang benar secara tata bahasa.", text_en: "I bet you will pick the first word that pops into your head, not the one that is grammatically sound." },
@@ -471,9 +478,9 @@
         '  <div style="font-size:0.86rem;font-weight:600;margin-bottom:10px;line-height:1.5">«' + swScript.text_id + '» Jawaban benar: <b>' + q.options[q.correctIndex] + '</b>. ' + q.rule + '</div>',
         '  <div style="background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:10px;font-family:var(--nj-font-mono);font-size:0.7rem;margin-bottom:12px;color:#A7F3D0">',
         '    BKT Mastery Estimate: <b>+18%</b> (μ=' + nujumState.bktMean + ', σ=' + nujumState.bktMargin + ')<br>',
-        '    Status: Broken claim dicatat ke ledger kemenanganmu.',
+        '    ' + t('nujum.status_broken', 'Status: Broken claim dicatat ke ledger kemenanganmu.'),
         '  </div>',
-        '  <button class="nujum-teleport-btn" id="nujumNextRoundBtn" style="background:#059669">Lanjut Duel Berikutnya →</button>',
+        '  <button class="nujum-teleport-btn" id="nujumNextRoundBtn" style="background:#059669">' + t('nujum.next_duel', 'Lanjut Duel Berikutnya →') + '</button>',
         '</div>'
       ].join('');
 
@@ -505,8 +512,8 @@
         '    <b>Bentuk benar:</b> «' + q.options[q.correctIndex] + '».',
         '  </div>',
         '  <div style="display:flex;flex-direction:column;gap:8px">',
-        '    <button class="nujum-dispute-btn" id="nujumDisputeBtn">⚡ SANGGAH KLAIM (Buktikan 3 Soal)</button>',
-        '    <button class="nujum-next-btn" id="nujumNextRoundBtn">Terima & Lanjut Ronde →</button>',
+        '    <button class="nujum-dispute-btn" id="nujumDisputeBtn">' + t('nujum.dispute_claim', '⚡ SANGGAH KLAIM (Buktikan 3 Soal)') + '</button>',
+        '    <button class="nujum-next-btn" id="nujumNextRoundBtn">' + t('nujum.accept_next', 'Terima & Lanjut Ronde →') + '</button>',
         '  </div>',
         '</div>'
       ].join('');
@@ -574,10 +581,10 @@
       '  <div class="nujum-kaidah-card"><b>Kaidah:</b> ' + q.rule + '</div>',
       '  <div style="display:flex;flex-direction:column;gap:8px">',
       '    <button class="nujum-teleport-btn" id="nujumTeleportPracticeBtn">',
-      '      <span>🚀</span> Latih Materi Ini Sekarang (Modul Latihan) →',
+      '      <span>🚀</span> ' + t('nujum.teleport_practice', 'Latih Materi Ini Sekarang (Modul Latihan) →'),
       '    </button>',
       '    <button class="nujum-next-btn" id="nujumNextRoundBtn">',
-      '      Lanjut Ronde Duel Berikutnya →',
+      '      ' + t('nujum.next_round', 'Lanjut Ronde Duel Berikutnya →'),
       '    </button>',
       '  </div>',
       '</div>'
@@ -650,7 +657,7 @@
       '<div class="nujum-screen">',
       '  <div class="nujum-topbar">',
       '    <span class="nujum-pill-tag"><span class="pulse-dot" style="background:#F59E0B"></span> NEGOSIASI OLM AKTIF</span>',
-      '    <button class="nujum-back-btn" id="nujumCancelDisputeBtn">Batal Sanggah</button>',
+      '    <button class="nujum-back-btn" id="nujumCancelDisputeBtn">' + t('nujum.cancel_dispute', 'Batal Sanggah') + '</button>',
       '  </div>',
       '  <div class="nujum-bet-card" style="border-color:#F59E0B">',
       '    <div class="nujum-bet-label" style="color:#F59E0B">SANGGAHAN DIAJUKAN</div>',
@@ -658,7 +665,7 @@
       '    <div class="nujum-bet-rationale">Aturan OLM FIEZEL: Sanggahan yang berhasil menaikkan varians model dan menghapus label miskonsepsi dari ledgermu.</div>',
       '  </div>',
       '  <div id="nujumDisputeProbeArea" style="text-align:center;padding:20px 0">',
-      '    <button class="nujum-opt-btn" id="nujumStartProbesBtn" style="background:#F59E0B;color:#000;font-weight:800;padding:16px 24px;border-radius:12px">Mulai Pembuktian 3 Soal →</button>',
+      '    <button class="nujum-opt-btn" id="nujumStartProbesBtn" style="background:#F59E0B;color:#000;font-weight:800;padding:16px 24px;border-radius:12px">' + t('nujum.start_dispute', 'Mulai Pembuktian 3 Soal →') + '</button>',
       '  </div>',
       '</div>'
     ].join('');
@@ -822,7 +829,7 @@
           nujumState.recognition = setupSpeechRecognition();
         }
         if (!nujumState.recognition) {
-          alert("Mikrofon Web Speech API tidak didukung di peramban ini. Silakan gunakan tombol kata di bawah.");
+          alert(t('nujum.speech_unsupported', 'Mikrofon Web Speech API tidak didukung di peramban ini. Silakan gunakan tombol kata di bawah.'));
           return;
         }
         if (nujumState.isListening) {
@@ -935,13 +942,13 @@
         ? nujumState.brokenClaims.map(function (c) {
             return '<li class="nujum-broken-item">Taruhan <b>' + c.bet + '%</b> meleset: kamu mengucapkan «' + c.actual + '» (mesin memprediksi «' + c.predicted + '»).</li>';
           }).join('')
-        : '<li style="color:var(--nj-text-muted);font-style:italic">Belum ada taruhan yang dipatahkan di sesi ini.</li>',
+        : '<li style="color:var(--nj-text-muted);font-style:italic">' + t('nujum.empty_victories', 'Belum ada taruhan yang dipatahkan di sesi ini.') + '</li>',
       '    </ul>',
       '  </div>',
 
       '  <div style="display:flex;flex-direction:column;gap:12px;margin-top:auto">',
       '    <button class="nujum-opt-btn" id="nujumRematchBtn" style="background:var(--nj-maroon);color:#fff;border-color:#F43F5E;font-size:1.1rem;padding:16px;font-weight:700">Tantang 8 Taruhan Lagi →</button>',
-      '    <button class="nujum-opt-btn" id="nujumReturnHomeBtn">Kembali ke Beranda</button>',
+      '    <button class="nujum-opt-btn" id="nujumReturnHomeBtn">' + t('nujum.return_home', 'Kembali ke Beranda') + '</button>',
       '  </div>',
       '</div>'
     ].join('');
@@ -1001,7 +1008,7 @@
       '  <div class="nujum-home-tag"><span class="pulse-dot"></span> MODE BARU · VOICE-FIRST DUEL</div>',
       '  <div class="nujum-home-title">NUJUM — Mesin yang Bertaruh Melawanmu</div>',
       '  <div class="nujum-home-desc">Bukan kuis pilihan ganda. Mesin menyuarakan taruhan spesifik atas kesalahanmu sebelum kamu menjawab. Berani buktikan mesin salah?</div>',
-      '  <div class="nujum-home-cta">Masuk Arena Taruhan Suara →</div>',
+      '  <div class="nujum-home-cta">' + t('nujum.home_cta', 'Masuk Arena Taruhan Suara →') + '</div>',
       '</div>'
     ].join('');
   }
