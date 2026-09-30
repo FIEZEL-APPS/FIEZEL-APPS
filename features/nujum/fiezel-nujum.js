@@ -38,73 +38,71 @@
       .replace(/'/g, '&#39;');
   }
 
-  // 65-Line Script Repository dari Script Bible v1.0
+  // Savage Roasting & Psychological Duel Script Repository v2.0
   var NUJUM_SCRIPTS = [
-    { id: "PB-01", section: "pre_bet", category: "intuition_trap", text_id: "Aku bertaruh kamu akan memilih kata yang pertama kali muncul di kepalamu, bukan yang benar secara tata bahasa.", text_en: "I bet you will pick the first word that pops into your head, not the one that is grammatically sound." },
-    { id: "PB-02", section: "pre_bet", category: "trap_alert", text_id: "Perhatikan kalimat ini. Ada jebakan yang sengaja dipasang untuk orang yang mengira bahasa Inggris itu cuma soal intuisi.", text_en: "Look closely at this sentence. A trap is waiting for anyone who thinks English is just intuition." },
-    { id: "PB-03", section: "pre_bet", category: "patience", text_id: "Aku beri kamu kesempatan berpikir lima detik. Jangan langsung sentuh pilihan pertama.", text_en: "Take five seconds to actually think. Do not rush to touch the first option." },
-    { id: "PB-04", section: "pre_bet", category: "literal_translation", text_id: "Di soal ini, 78% orang dengan levelmu gagal karena mereka menerjemahkan kata per kata dari bahasa ibu.", text_en: "On this item, 78 percent of learners at your level fail because they translate word for word from Indonesian." },
-    { id: "PB-05", section: "pre_bet", category: "tense_contrast", text_id: "Aku bertaruh kamu tidak bisa membedakan mana bentuk lampau dan mana kebiasaan di kalimat ini.", text_en: "I bet you cannot distinguish completed past from habitual routine in this sentence." },
-    { id: "PB-06", section: "pre_bet", category: "sva_distractor", text_id: "Jangan terkecoh oleh subjek yang panjang. Fokus pada siapa yang sebenarnya melakukan aksi.", text_en: "Do not be distracted by the long noun phrase. Focus on who is actually doing the action." },
-    { id: "PB-07", section: "pre_bet", category: "humility", text_id: "Kalimat ini sederhana, tapi di situlah jebakannya. Orang pintar sering tersandung di batu kecil.", text_en: "This looks deceptively simple. That is precisely where smart people stumble." },
-    { id: "PB-08", section: "pre_bet", category: "high_bet", text_id: "Taruhan mesin kali ini tinggi. Kalau kamu bisa jawab benar tanpa ragu, aku potong pita keraguanku atas tokomu.", text_en: "My bet is high this round. Answer accurately, and I will shrink my doubt margin on your model." },
-    { id: "PB-09", section: "pre_bet", category: "preposition", text_id: "Ada preposisi di sini yang tidak punya padanan langsung dalam bahasa ibumu. Tebak atau paham?", text_en: "There is a preposition here with no direct translation in your native tongue. Pure guess or genuine mastery?" },
-    { id: "PB-10", section: "pre_bet", category: "sva_vs_tense", text_id: "Kamu pikir ini soal tenses? Bukan. Ini soal kesesuaian subjek dan kata kerja. Jangan salah fokus.", text_en: "You think this is about tenses? It is not. It is subject-verb agreement. Do not misdirect your focus." },
-    { id: "PB-11", section: "pre_bet", category: "auditory_trap", text_id: "Dua pilihan ini terdengar sama-sama enak di telinga. Tapi cuma satu yang benar di atas kertas.", text_en: "Both options sound completely natural to casual ears. But only one is grammatically legitimate." },
-    { id: "PB-12", section: "pre_bet", category: "historical_pattern", text_id: "Aku sudah melihat rekaman 200 jawabanmu sebelumnya. Pola salahmu di topik ini terbaca jelas.", text_en: "I analyzed your previous 200 responses. Your error pattern on this specific node is crystal clear." },
-    { id: "PB-13", section: "pre_bet", category: "challenge", text_id: "Buktikan padaku bahwa kamu tidak sedang menebak secara acak.", text_en: "Prove to me that your cognitive engine is running, and you are not just guessing randomly." },
+    // --- PRE-BET TAUNTS (Provokasi Dingin Sebelum Murid Menjawab) ---
+    { id: "PB-01", section: "pre_bet", category: "intuition_trap", text_id: "Aku sudah mencatat 5 kebiasaan malas berpikirmu. Di kalimat ini, aku bertaruh 80% kamu akan terpeleset di lubang yang sama persis.", text_en: "I logged your lazy habits. On this sentence, I bet 80% you will slip into the exact same trap." },
+    { id: "PB-02", section: "pre_bet", category: "trap_alert", text_id: "Perhatikan kalimat ini baik-baik. Ada jebakan empuk yang sengaja kupasang untuk orang yang mengira bahasa Inggris itu modal intuisi semata.", text_en: "Look closely. An obvious trap is set for anyone who assumes English grammar is mere intuition." },
+    { id: "PB-03", section: "pre_bet", category: "patience", text_id: "Jangan berani-berani menyentuh tombol sebelum membaca sampai titik akhir. Otak autopilotmu sudah gatal ingin menebak, kan?", text_en: "Do not touch the button before reading to the period. Your autopilot brain is itching to guess." },
+    { id: "PB-04", section: "pre_bet", category: "literal_translation", text_id: "Di soal ini, 78% orang di levelmu gagal karena kebiasaan buruk menerjemahkan kata per kata dari bahasa Indonesia. Kamu mau ikut jadi korban?", text_en: "78% fail here because of literal Indonesian translation habits. Are you joining that casualty list?" },
+    { id: "PB-05", section: "pre_bet", category: "tense_contrast", text_id: "Aku bertaruh kamu akan memilih kata pertama yang melintas di kepalamu tanpa memeriksa bentuk waktunya.", text_en: "I bet you will pick the first word that crosses your mind without checking the temporal anchor." },
+    { id: "PB-06", section: "pre_bet", category: "sva_distractor", text_id: "Kalimat ini kelihatannya sangat gampang. Di situlah letak kuburan bagi orang-orang yang malas menganalisis subjek aslinya.", text_en: "This looks deceptively simple. That is the graveyard for learners who refuse to trace the true subject." },
+    { id: "PB-07", section: "pre_bet", category: "high_bet", text_id: "Taruhan mesin kali ini tinggi. Coba buktikan otakmu lebih pintar dari algoritma prediksiku. Jangan bikin aku bosan dengan kesalahan klise anak SD.", text_en: "My bet is high this round. Prove your brain outperforms my prediction model. Do not bore me with elementary mistakes." },
+    { id: "PB-08", section: "pre_bet", category: "auditory_trap", text_id: "Dua pilihan ini sama-sama enak di telinga. Tapi cuma satu yang diakui tata bahasa baku. Tebak asal atau paham sungguhan?", text_en: "Both sound natural to colloquial ears. Only one is grammatically legitimate. Pure guess or genuine mastery?" },
+    { id: "PB-09", section: "pre_bet", category: "challenge", text_id: "Aku sudah tahu jalan pintas murahan yang ada di kepalamu. Kamu akan memilih kata itu dalam 3 detik. Buktikan aku salah.", text_en: "I already see the mental shortcut in your head. You will take the bait in 3 seconds. Prove me wrong." },
 
-    { id: "MW-A01", section: "machine_win", category: "tense_continuous", text_id: "Tepat seperti prediksiku. Kamu memakai kebiasaan untuk peristiwa yang berlangsung sekarang. 'Right now' bukan pajangan.", text_en: "Exactly as predicted. You used a habitual tense for an ongoing event. 'Right now' is not decorative." },
-    { id: "MW-A02", section: "machine_win", category: "tense_past", text_id: "Bentuk present kamu pilih padahal penanda waktunya jelas lampau. Bahasa Inggris tidak bekerja seperti itu.", text_en: "You selected present tense despite an explicit past time anchor. English syntax does not bend to wishful thinking." },
-    { id: "MW-A03", section: "machine_win", category: "tense_perfect", text_id: "Present perfect diabaikan lagi. Tiga tahun durasi itu menuntut have/has + V3, bukan sekadar kata kerja dasar.", text_en: "Present perfect ignored once more. That duration marker demanded have/has plus participle, not a bare verb." },
-    { id: "MW-A04", section: "machine_win", category: "subjunctive", text_id: "Subjunctive 'were' ditolak karena telingamu terbiasa dengan 'was'. Naluri kasualmu memenangkan taruhanku.", text_en: "Subjunctive 'were' rejected because your ear prefers colloquial 'was'. Casual habit just handed me this win." },
-    { id: "MW-B01", section: "machine_win", category: "sva_intervening", text_id: "Subjeknya tunggal, kenapa kata kerjanya jamak? Kamu terdistraksi oleh kata benda perantara di tengah kalimat.", text_en: "The head noun is singular, so why pick a plural verb? You were blinded by the intervening prepositional phrase." },
-    { id: "MW-B02", section: "machine_win", category: "sva_neither", text_id: "'Neither' itu tunggal. Berapa kali kamu harus melihat kalimat ini sebelum otakmu berhenti menyamakannya dengan 'both'?", text_en: "'Neither' takes a singular verb. How many trials will it take before your mind stops confusing it with 'both'?" },
-    { id: "MW-B03", section: "machine_win", category: "sva_auxiliary_double", text_id: "Auxiliary 'doesn't' sudah menyerap bentuk orang ketiga. Menambahkan -s lagi di kata kerja utama itu pemborosan fatal.", text_en: "The auxiliary 'doesn't' already absorbed third-person agreement. Appending -s to the main verb is a double-marking error." },
-    { id: "MW-B04", section: "machine_win", category: "sva_collective", text_id: "Kata benda kolektif ini bertindak sebagai satu kesatuan tunggal. Naluri jamakmu mengecohmu.", text_en: "This collective noun acts as a unified singular agent. Your plural intuition misguided you." },
-    { id: "MW-C01", section: "machine_win", category: "preposition_good_at", text_id: "Good at, bukan good in. Berhenti menerjemahkan 'pandai dalam' secara harfiah. Bahasa Inggris punya kolokasi baku.", text_en: "Good at, never good in. Stop translating 'pandai dalam' literally. Idiomatic English enforces strict collocations." },
-    { id: "MW-C02", section: "machine_win", category: "preposition_time", text_id: "Preposisi waktu: at untuk jam spesifik, on untuk hari, in untuk bulan dan tahun. Masih tertukar di level ini?", text_en: "Temporal prepositions: at for clock time, on for specific days, in for years. Why confuse them at this level?" },
-    { id: "MW-C03", section: "machine_win", category: "preposition_interested", text_id: "Interested in, bukan interested with. Naluri terjemahan langsungmu baru saja memberi mesin satu poin gratis.", text_en: "Interested in, not interested with. Direct mother-tongue projection just surrendered another point to my ledger." },
-    { id: "MW-C04", section: "machine_win", category: "preposition_depend", text_id: "Depend on, bukan depend to. Dengarkan ritme kalimatnya, bukan logika bahasa ibumu.", text_en: "Depend on, never depend to. Adhere to English dependency structures, not Indonesian phrasing." },
-    { id: "MW-D01", section: "machine_win", category: "false_confidence_speed", text_id: "Kamu menekan pilihan dalam waktu kurang dari dua detik. Percaya diri tanpa dasar selalu berakhir seperti ini.", text_en: "You clicked in under two seconds. Ungrounded confidence inevitably culminates in this." },
-    { id: "MW-D02", section: "machine_win", category: "false_confidence_guess", text_id: "Tebakan kilat tidak membuatmu terdengar fasih. Itu cuma membuatmu salah lebih cepat.", text_en: "Instant guessing does not make you fluent. It merely accelerates your failure rate." },
-    { id: "MW-D03", section: "machine_win", category: "false_confidence_autopilot", text_id: "Autopilot di kepalamu menang lagi. Kamu bahkan tidak membaca opsi ketiga dan keempat sampai tuntas, kan?", text_en: "Cognitive autopilot reigns supreme again. You did not even read options three and four to completion, did you?" },
-    { id: "MW-D04", section: "machine_win", category: "speed_vs_mastery", text_id: "Kecepatan bukan pemahaman. Mesin ini tidak menilai kecepatan jarimu, tapi kesadaran berpikirmu.", text_en: "Speed is not mastery. This arena measures syntactic clarity, not manual reflex speed." },
+    // --- MACHINE WIN ROASTS (Roasting Menusuk Sesuai Kebiasaan Buruk Murid) ---
+    // 1. Skimming & Kemalasan Subjek-Predikat (SVA)
+    { id: "MW-SVA1", section: "machine_win", category: "sva_intervening", text_id: "Autopilot murahan! Kamu cuma melirik kata tepat sebelum titik-titik, lalu malas mencari siapa subjek aslinya. Malas membaca kok dipelihara?", text_en: "Cheap autopilot! You only glanced at the adjacent noun, too lazy to trace the true subject. Why nurture laziness?" },
+    { id: "MW-SVA2", section: "machine_win", category: "sva_neither", text_id: "Subjeknya tunggal, kenapa kata kerjanya jamak? Kamu terdistraksi oleh frasa perantara di tengah kalimat. Fokusmu gampang sekali dibeli.", text_en: "The subject is singular; why a plural verb? You got blinded by an intervening phrase. Your focus is bought so easily." },
+    { id: "MW-SVA3", section: "machine_win", category: "sva_auxiliary_double", text_id: "Auxiliary 'doesn't' itu sudah menyerap bentuk orang ketiga! Menambahkan '-s' lagi di kata kerja utama itu pemborosan logika yang memalukan.", text_en: "'Doesn't' already absorbed the third-person marker! Adding another '-s' to the main verb is an embarrassing logical waste." },
+    { id: "MW-SVA4", section: "machine_win", category: "sva_collective", text_id: "Berapa kali kamu harus melihat kalimat ini sebelum otakmu berhenti menganggap bahasa Inggris itu sama dengan logika bahasa Indonesia?", text_en: "How many times must you encounter this before your brain stops projecting Indonesian syntax onto English?" },
 
-    { id: "SW-01", section: "machine_defeat", category: "concession_sva", text_id: "Sial. Taruhanku meleset. Kamu melihat jebakan subjek tunggalnya dengan jernih.", text_en: "Dammit. My bet was broken. You detected the singular head noun cleanly." },
-    { id: "SW-02", section: "machine_defeat", category: "concession_high_bet", text_id: "Perhitunganku salah. Taruhan tinggi mesin kamu patahkan tanpa ragu.", text_en: "My calculation failed. You shattered my confident bet without hesitation." },
-    { id: "SW-03", section: "machine_defeat", category: "concession_time_context", text_id: "Bagus. Kamu membaca konteks waktunya sampai tuntas, bukan cuma melirik kata kerja pertama.", text_en: "Well played. You evaluated the entire temporal envelope rather than glancing at the first verb." },
-    { id: "SW-04", section: "machine_defeat", category: "concession_translation", text_id: "Aku akui, tebakanku tentang kebiasaan terjemahan harfiahmu tidak terbukti di soal ini.", text_en: "I concede. My assumption regarding your literal translation habit did not materialize here." },
-    { id: "SW-05", section: "machine_defeat", category: "concession_bkt_shift", text_id: "Kamu tahu perbedaannya. Pita keraguan modelku atas tokomu terpaksa kupersempit.", text_en: "You clearly know the distinction. The uncertainty ribbon on your model must tighten." },
-    { id: "SW-06", section: "machine_defeat", category: "concession_surprise", text_id: "Mengejutkan. Biasanya murid di tingkatmu langsung tersandung di opsi pengecoh itu.", text_en: "Surprising. Learners at your theta score typically fall directly into that distractor." },
-    { id: "SW-07", section: "machine_defeat", category: "concession_solid_ground", text_id: "Taruhan mesin patah. Penguasaanmu di aspek ini ternyata lebih solid dari data awalku.", text_en: "Bet annulled. Your command of this syntactic rule is stronger than my priors assumed." },
-    { id: "SW-08", section: "machine_defeat", category: "concession_restraint", text_id: "Satu poin untukmu. Jangan cepat puas, masih ada ronde berikutnya.", text_en: "A point for you. Do not grow complacent; subsequent rounds will tighten the screws." },
-    { id: "SW-09", section: "machine_defeat", category: "concession_irt_broken", text_id: "Analisis IRT 3PL-ku memprediksi kamu salah. Kamu baru saja membuktikan model statistik bisa keliru.", text_en: "My 3PL IRT model predicted a lapse. You just demonstrated that statistical expectations can be overcome." },
-    { id: "SW-10", section: "machine_defeat", category: "concession_clean_logic", text_id: "Rapi. Pilihanmu tepat dan logikamu tidak goyah oleh distraktor yang kusisipkan.", text_en: "Clean. Your selection was precise, completely unmoved by the subtle distractors." },
-    { id: "SW-11", section: "machine_defeat", category: "concession_bkt_right", text_id: "Pita ketidakpastian BKT-mu bergeser ke kanan. Kamu pantas mendapatkan poin ronde ini.", text_en: "Your BKT mastery curve shifted definitively to the right. Credit where credit is due." },
-    { id: "SW-12", section: "machine_defeat", category: "concession_consistency", text_id: "Pertahananmu kokoh di soal ini. Kita lihat apakah kamu sanggup mempertahankannya sampai akhir.", text_en: "Sturdy defense on this item. Let us see if your cognitive discipline holds until the final bell." },
+    // 2. Kemalasan Tenses & Time Markers
+    { id: "MW-TNS1", section: "machine_win", category: "tense_past", text_id: "Penanda waktunya jelas-jelas lampau, tapi jari autopilotmu malah memilih bentuk present. Menolak kenyataan waktu atau memang malas berpikir?", text_en: "The time marker is clearly in the past, yet your autopilot fingers clicked present tense. Denying reality or just intellectually lazy?" },
+    { id: "MW-TNS2", section: "machine_win", category: "tense_continuous", text_id: "Tepat seperti dugaanku. Kamu memakai kebiasaan untuk peristiwa yang sedang berlangsung sekarang. 'Right now' di situ bukan pajangan!", text_en: "Exactly as expected. You used a routine tense for an event happening right now. That time marker is not a decorative ornament!" },
+    { id: "MW-TNS3", section: "machine_win", category: "tense_perfect", text_id: "Ada durasi waktu di situ, dan kamu mengabaikan present perfect begitu saja? Bahasa Inggrismu nggak akan pernah berkembang kalau cuma modal kata kerja dasar.", text_en: "There is an explicit duration marker, and you bypassed present perfect? Your English will stagnate forever on bare verbs." },
+    { id: "MW-TNS4", section: "machine_win", category: "subjunctive", text_id: "Bentuk 'were' untuk pengandaian kamu tolak cuma karena telingamu terbiasa dengar orang ngomong asal di film. Naluri kasualmu baru saja kuhabisi.", text_en: "You rejected subjunctive 'were' because your ear is addicted to colloquial slang in movies. Casual habit just handed me this victory." },
 
-    { id: "SR-01", section: "honest_surrender", category: "praise_honesty", text_id: "Bagus. Mengakui tidak tahu jauh lebih bermartabat daripada menebak asal jadi dan berpura-pura paham.", text_en: "Good. Acknowledging you do not know is far more honorable than blind guessing." },
-    { id: "SR-02", section: "honest_surrender", category: "praise_honesty", text_id: "Kejujuran kognitif. Itu langkah pertama keluar dari autopilot. Sekarang, dengarkan dan ulangi bentuk yang benar.", text_en: "Cognitive honesty. That is the first real step away from autopilot. Now, listen and echo the correct form." },
-    { id: "SR-03", section: "honest_surrender", category: "praise_honesty", text_id: "Tidak apa-apa menyerah di sini daripada malu saat bicara di dunia nyata nanti. Dengarkan kalimat yang benar.", text_en: "Surrendering here is painless compared to real-world communication breakdowns. Hear the correct sentence." },
-    { id: "SR-04", section: "honest_surrender", category: "praise_honesty", text_id: "Aku hargai kamu tidak menekan asal tombol. Otakmu tahu batasannya. Mari kita perbaiki pola ini.", text_en: "I respect that you refused to mash buttons arbitrarily. Your brain knows its boundary. Let us reconstruct it." },
-    { id: "SR-05", section: "honest_surrender", category: "praise_honesty", text_id: "Menyerah demi belajar itu keberanian, bukan kelemahan. Dengarkan baik-baik cara kalimat ini disusun.", text_en: "Stepping down to learn is courage, not defeat. Listen carefully to how this syntax is constructed." },
-    { id: "SR-06", section: "honest_surrender", category: "praise_honesty", text_id: "Aku tidak akan me-roast orang yang jujur. Aku cuma menyerang kesoktahuan. Ucapkan kalimat yang benar sekarang.", text_en: "I never roast honest learners. I only attack unearned arrogance. Pronounce the correct form now." },
+    // 3. Terjemahan Harfiah dari Bahasa Ibu (Indonesian Projection)
+    { id: "MW-TRN1", section: "machine_win", category: "literal_translation", text_id: "Berhenti menerjemahkan kata demi kata dari bahasa Indonesia di kepalamu! Di bahasa kita nggak ada perubahan kata kerja waktu lampau, makanya otakmu manja.", text_en: "Stop translating word-for-word from Indonesian in your head! Indonesian has no verb inflections, which is why your brain is pampered." },
+    { id: "MW-TRN2", section: "machine_win", category: "preposition_good_at", text_id: "Good at, bukan good in! Jangan memaksakan frasa 'pandai dalam' ke bahasa orang. Bahasa Inggris punya kolokasi baku, bukan logika gotong-royong.", text_en: "Good at, never good in! Stop forcing Indonesian idioms into foreign syntax. English operates on strict collocations." },
+    { id: "MW-TRN3", section: "machine_win", category: "preposition_interested", text_id: "Interested in, bukan interested with! Proyeksi bahasa ibumu baru saja menyetor satu poin gratis ke ledgermu. Memalukan.", text_en: "Interested in, not interested with! Your mother-tongue projection just surrendered an effortless point to my ledger. Embarrassing." },
+    { id: "MW-TRN4", section: "machine_win", category: "preposition_depend", text_id: "Depend on, bukan depend to! Telingamu jangan malas. Dengarkan ritme sintaksis bahasa Inggris, bukan terjemahan Google Translate di kepalamu.", text_en: "Depend on, never depend to! Stop your mental Google Translate. Adhere to actual English syntactic dependencies." },
 
-    { id: "DS-01", section: "dispute", category: "challenge_probe", text_id: "Kamu menyanggah perhitunganku? Bagus. Buktikan dalam 3 soal kilat tanpa jeda.", text_en: "You challenge my calculation? Good. Prove it across three rapid-fire trials." },
-    { id: "DS-02", section: "dispute", category: "challenge_probe", text_id: "Sanggahan diterima di sistem. Kalau kamu berhasil membuktikan 3/3 benar, label miskonsepsi ini dihapus dari ledgermu.", text_en: "Dispute registered. Deliver 3 out of 3 correct answers, and this misconception tag will be purged." },
-    { id: "DS-03", section: "dispute", category: "challenge_probe", text_id: "Jangan cuma tidak terima kalah. Di arena ini, bantahan harus disertai bukti data empiris.", text_en: "Do not simply protest the loss. In this arena, every claim demands empirical evidence." },
-    { id: "DW-01", section: "dispute_result", category: "probe_success", text_id: "Sanggahan terbukti sah. 3/3 terjawab benar. Mesin mencabut tuduhan dan memperbarui modelmu.", text_en: "Dispute substantiated. 3 of 3 correct. Accusation revoked, student model updated." },
-    { id: "DW-02", section: "dispute_result", category: "probe_success", text_id: "Kamu memenangkan debat data. Pradugaku resmi dibatalkan di ledger BKT.", text_en: "You won the data arbitration. The prior misconception flag is formally deleted." },
-    { id: "DL-01", section: "dispute_result", category: "probe_failure", text_id: "Sanggahan gagal. Kamu terbukti mengulang kesalahan yang sama. Label miskonsepsi tetap berlaku.", text_en: "Dispute rejected. The probe confirmed your recurring error. The misconception tag remains permanent." },
-    { id: "DL-02", section: "dispute_result", category: "probe_failure", text_id: "Tiga soal pembuktian menunjukkan tebakan awalku memang benar. Terima faktanya dan latih lagi.", text_en: "The three trial probes validated my original hypothesis. Acknowledge the diagnostic and drill again." },
+    // 4. Tebak Kancing Kilat / False Confidence (< 1.8 detik)
+    { id: "MW-SPD1", section: "machine_win", category: "false_confidence_speed", text_id: "Menjawab dalam 0.8 detik bukan tanda jenius, tapi tanda panik tebak kancing! Kamu bahkan belum sempat mengeja kalimatnya di kepala. Keberuntunganmu habis di sini.", text_en: "Answering in 0.8s is not genius; it is blind button-mashing panic! You did not even spell the sentence in your mind. Your luck ran out." },
+    { id: "MW-SPD2", section: "machine_win", category: "false_confidence_guess", text_id: "Kecepatan jarimu tidak sebanding dengan ketelitian otakmu. Di arena ini, sok cepat tanpa logika cuma mempercepat rasa malumu.", text_en: "Your finger speed cannot compensate for mental carelessness. In this arena, ungrounded speed only accelerates your humiliation." },
+    { id: "MW-SPD3", section: "machine_win", category: "false_confidence_autopilot", text_id: "Percaya diri tanpa dasar selalu berakhir sebagai kekalahan di ledgermu. Baca sampai titik selesai sebelum sok tahu memencet tombol!", text_en: "Baseless confidence always concludes as another loss on your ledger. Read to the final punctuation before acting like a know-it-all!" },
 
-    { id: "FS-A01", section: "duel_summary", category: "player_victory", text_id: "Hasil akhir: Kamu mengalahkan mesin. Data awalku meremehkan ketelitianmu. Tingkatkan ke level berikutnya.", text_en: "Final verdict: You defeated the machine. My initial model underestimated your precision. Advance to the next level." },
-    { id: "FS-A02", section: "duel_summary", category: "player_victory", text_id: "Kamu menang duel. Tapi ingat, konsistensi di 8 ronde tidak menjamin kamu bebas autopilot di dunia nyata.", text_en: "You won the duel. Remember: eight rounds of discipline do not guarantee immunity from autopilot in real speech." },
-    { id: "FS-B01", section: "duel_summary", category: "draw", text_id: "Imbang. Mesin membaca separuh tokomu, dan kamu menyelamatkan separuh sisanya. Pertarungan yang seimbang.", text_en: "A dead draw. I trapped half your attempts, and you defended the rest. An evenly matched clash." },
-    { id: "FS-B02", section: "duel_summary", category: "draw", text_id: "Skor seri. Kamu punya potensi, tapi kebiasaan lama masih sesekali menarikmu ke jebakan klise.", text_en: "Tied score. Genuine competence exists, yet residual habits still pull you toward classic traps." },
-    { id: "FS-C01", section: "duel_summary", category: "machine_victory", text_id: "Mesin memenangkan duel ini. Autopilot di kepalamu masih mendominasi cara bicaramu. Masuk ke ruang latihan dan bongkar polanya.", text_en: "The machine triumphs. Cognitive autopilot still governs your phrasing. Enter the training room and deconstruct it." },
-    { id: "FS-C02", section: "duel_summary", category: "machine_victory", text_id: "Prediksiku tepat di mayoritas ronde. Jangan berkecil hati, tapi berhentilah menebak pakai perasaan.", text_en: "My predictions held across the majority of rounds. Do not despair, but cease relying on mere gut feelings." }
+    // 5. Freeze / Timeout (Waktu Habis)
+    { id: "MW-TO1", section: "machine_win", category: "freeze_timeout", text_id: "Membeku? Delapan detik kamu habiskan cuma buat melamun menatap layar. Di dunia nyata, orang yang kamu ajak bicara sudah pergi memesan kopi baru!", text_en: "Frozen? You wasted eight seconds daydreaming at the glass. In the real world, your conversational partner walked away to order a fresh coffee!" },
+    { id: "MW-TO2", section: "machine_win", category: "speed_vs_mastery", text_id: "Waktu habis! Keraguan berlebihan ini membuktikan kamu tidak pernah melatih pola ini sampai jadi refleks bawah sadar. Otakmu korslet saat ditekan waktu.", text_en: "Time expired! Paralysis of hesitation proves you never drilled this pattern into instinct. Your cognition short-circuited under pressure." },
+
+    // --- MACHINE DEFEAT (Saat Murid Menang - Mesin Mengakui Terpaksa & Tertantang) ---
+    { id: "SW-01", section: "machine_defeat", category: "concession_sva", text_id: "Cih! Taruhanku patah. Ternyata kamu membaca kalimatnya sampai tuntas, bukan cuma melirik kata pertama. Jangan besar kepala dulu, ronde depan kuhabisi.", text_en: "Tch! My bet is broken. Turns out you evaluated the entire sentence rather than glancing at the first word. Do not get cocky; next round I finish you." },
+    { id: "SW-02", section: "machine_defeat", category: "concession_high_bet", text_id: "Sialan. Logikamu tajam kali ini. Kamu nggak terjebak ilusi kata benda perantara yang kupasang. Satu poin untukmu.", text_en: "Dammit. Your logic was razor-sharp this turn. You ignored the intervening noun trap. Point awarded to you." },
+    { id: "SW-03", section: "machine_defeat", category: "concession_time_context", text_id: "Perhitunganku meleset. Kamu berhasil memaksa otakmu berpikir jernih dan membungkam prediksiku. Nikmati selagi bisa.", text_en: "My calculation failed. You forced your mind into clarity and shattered my prediction. Savor it while it lasts." },
+    { id: "SW-04", section: "machine_defeat", category: "concession_translation", text_id: "Mengejutkan. Biasanya murid dengan levelmu langsung mencaplok opsi pengecoh itu. Pertahanan kognisimu lumayan solid di soal ini.", text_en: "Surprising. Learners at your theta score typically swallow that distractor whole. Your cognitive defense held surprisingly solid." },
+    { id: "SW-05", section: "machine_defeat", category: "concession_bkt_shift", text_id: "Poin ini milikmu. Tapi ingat, mematahkan satu taruhan mesin belum membuktikan kamu bebas dari autopilot di dunia nyata.", text_en: "Take the point. But remember: breaking one machine bet does not guarantee you are free from autopilot in real speech." },
+    { id: "SW-06", section: "machine_defeat", category: "concession_surprise", text_id: "Taruhan 80%-ku kamu ratakan dengan tanah. Harus kuakui, caramu membedah subjek tadi cukup rapi.", text_en: "You leveled my 80% bet into the dirt. I concede: your breakdown of the syntactic subject was notably clean." },
+
+    // --- HONEST SURRENDER (Pujian Keras untuk Kejujuran Kognitif - Anti-Roast) ---
+    { id: "SR-01", section: "honest_surrender", category: "praise_honesty", text_id: "Bagus! Setidaknya kamu punya keberanian moral untuk mengakui ketidaktahuanmu daripada sok tahu menebak asal jadi. Pasang telingamu, dengarkan bunyinya sekarang.", text_en: "Good! At least you possess the moral fortitude to admit ignorance rather than recklessly guessing. Open your ears; absorb the phrasing now." },
+    { id: "SR-02", section: "honest_surrender", category: "praise_honesty", text_id: "Kejujuran kognitif. Mengakui batas kemampuan adalah langkah pertama keluar dari autopilot. Sekarang, tirukan bentuk yang benar sampai fasih!", text_en: "Cognitive honesty. Acknowledging your boundaries is step one out of autopilot. Now, echo the correct form until fluent!" },
+    { id: "SR-03", section: "honest_surrender", category: "praise_honesty", text_id: "Menyerah di arena latihan jauh lebih bermartabat daripada sok lancar lalu dipermalukan di dunia nyata. Dengarkan bagaimana kalimat ini disusun.", text_en: "Surrendering in the training arena is far more dignified than fake fluency humiliated in real life. Hear how this syntax is constructed." },
+    { id: "SR-04", section: "honest_surrender", category: "praise_honesty", text_id: "Aku tidak akan me-roast orang yang jujur. Yang kuhabisi cuma kesombongan kosong. Sekarang bersihkan kesalahanmu di modul latihan.", text_en: "I never roast honest learners. I only execute unearned arrogance. Cleanse this gap in the practice module immediately." },
+
+    // --- DISPUTE PROTOCOL (Sanggahan & Pembuktian Data) ---
+    { id: "DS-01", section: "dispute", category: "challenge_probe", text_id: "Kamu berani menyanggah perhitunganku? Bagus! Buktikan dalam 3 soal kilat tanpa jeda bernapas.", text_en: "You dare dispute my calculation? Excellent! Prove it across 3 rapid-fire trials without pausing for breath." },
+    { id: "DS-02", section: "dispute", category: "challenge_probe", text_id: "Jangan cuma tidak terima kalah! Di arena ini, bantahan wajib dibayar dengan data empiris 3/3 benar.", text_en: "Do not whine over defeat! In this crucible, disputes must be vindicated with 3 out of 3 empirical triumphs." },
+    { id: "DW-01", section: "dispute_result", category: "probe_success", text_id: "Sanggahan terbukti sah! Tiga dari tiga terjawab benar. Mesin mencabut tuduhan dan mengakui ketelitianmu.", text_en: "Dispute substantiated! Three of three accurate. Accusation revoked, your precision acknowledged." },
+    { id: "DL-01", section: "dispute_result", category: "probe_failure", text_id: "Sanggahanmu ditolak mentah-mentah! Tiga soal pembuktian menunjukkan tebakan awalku memang benar. Akui fakta dan latih lagi.", text_en: "Dispute crushed! The trial probes confirmed my initial hypothesis. Face the empirical truth and drill again." },
+
+    // --- FINAL SCOREBOARD (Vonis Duel Akhir) ---
+    { id: "FS-A01", section: "duel_summary", category: "player_victory", text_id: "Vonis akhir: Kamu berhasil menaklukkan mesin. Prediksiku meremehkan ketelitianmu. Tingkatkan ke level CEFR berikutnya sekarang!", text_en: "Final verdict: You conquered the machine. My model underestimated your discipline. Advance to the next CEFR level now!" },
+    { id: "FS-B01", section: "duel_summary", category: "draw", text_id: "Hasil imbang. Mesin membaca separuh kebiasaan burukmu, dan kamu menyelamatkan separuh sisanya. Kita belum selesai.", text_en: "Dead draw. I captured half your bad habits, and you defended the rest. We are far from finished." },
+    { id: "FS-C01", section: "duel_summary", category: "machine_victory", text_id: "Mesin memenangkan duel ini! Autopilot dan tebak kancing masih mendominasi kepalamu. Masuk ke ruang latihan dan hancurkan kebiasaan itu sekarang!", text_en: "The machine claims complete victory! Autopilot and blind guessing still rule your mind. Enter the training room and purge that habit now!" }
   ];
 
   function getScript(section, category, fallbackId, fallbackEn) {
@@ -415,20 +413,119 @@
     return pickedFb;
   }
 
-  /** Pengucapan suara mesin mentor tanpa browser TTS */
+  /** Audio Atmosphere Synthesizer (0ms Latency Web Audio API) */
+  var NujumAudioAtmosphere = (function () {
+    var ctx = null;
+    function getCtx() {
+      if (!ctx && (window.AudioContext || window.webkitAudioContext)) {
+        ctx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (ctx && ctx.state === 'suspended') {
+        try { ctx.resume(); } catch (_) {}
+      }
+      return ctx;
+    }
+
+    return {
+      playTauntDrone: function () {
+        var c = getCtx();
+        if (!c) return;
+        try {
+          var osc = c.createOscillator();
+          var gain = c.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(65, c.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(40, c.currentTime + 0.7);
+          gain.gain.setValueAtTime(0.08, c.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.7);
+          osc.connect(gain);
+          gain.connect(c.destination);
+          osc.start();
+          osc.stop(c.currentTime + 0.75);
+        } catch (_) {}
+      },
+      playHeartbeat: function () {
+        var c = getCtx();
+        if (!c) return;
+        try {
+          var osc = c.createOscillator();
+          var gain = c.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(75, c.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(32, c.currentTime + 0.12);
+          gain.gain.setValueAtTime(0.2, c.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, c.currentTime + 0.12);
+          osc.connect(gain);
+          gain.connect(c.destination);
+          osc.start();
+          osc.stop(c.currentTime + 0.14);
+        } catch (_) {}
+      },
+      playShieldCrack: function () {
+        var c = getCtx();
+        if (!c) return;
+        try {
+          var osc = c.createOscillator();
+          var gain = c.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(480, c.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(110, c.currentTime + 0.35);
+          gain.gain.setValueAtTime(0.25, c.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.35);
+          osc.connect(gain);
+          gain.connect(c.destination);
+          osc.start();
+          osc.stop(c.currentTime + 0.36);
+        } catch (_) {}
+      },
+      playGlitchSting: function () {
+        var c = getCtx();
+        if (!c) return;
+        try {
+          var osc = c.createOscillator();
+          var gain = c.createGain();
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(160, c.currentTime);
+          osc.frequency.setValueAtTime(80, c.currentTime + 0.08);
+          gain.gain.setValueAtTime(0.12, c.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, c.currentTime + 0.22);
+          osc.connect(gain);
+          gain.connect(c.destination);
+          osc.start();
+          osc.stop(c.currentTime + 0.23);
+        } catch (_) {}
+      }
+    };
+  })();
+
+  /** Pengucapan suara mesin mentor — FOKUS BAHASA INDONESIA */
   function speakMachine(textEn, textId) {
     nujumState.isSpeakingMachine = true;
+    var speechText = textId || textEn; // Prioritaskan 100% Bahasa Indonesia!
+
+    // Animasi visual mata mesin menyala saat berbicara
+    var core = doc.getElementById('nujumAnimaCore');
+    if (core) core.classList.add('is-speaking');
+
+    // Bunyikan atmosfer drone rendah yang mengancam
+    try { NujumAudioAtmosphere.playTauntDrone(); } catch (_) {}
+
     try {
       if (root.FiezelVoiceSay && typeof root.FiezelVoiceSay.say === 'function') {
-        root.FiezelVoiceSay.say({ en: textEn, id: textId }, { suppressSubtitles: true }).then(function () {
+        root.FiezelVoiceSay.say(speechText, { suppressSubtitles: true, locale: 'id-ID', lang: 'id-ID' }).then(function () {
           nujumState.isSpeakingMachine = false;
+          if (core) core.classList.remove('is-speaking');
         }).catch(function () {
           nujumState.isSpeakingMachine = false;
+          if (core) core.classList.remove('is-speaking');
         });
         return;
       }
     } catch (_) {}
-    setTimeout(function () { nujumState.isSpeakingMachine = false; }, 2500);
+    setTimeout(function () {
+      nujumState.isSpeakingMachine = false;
+      if (core) core.classList.remove('is-speaking');
+    }, 2800);
   }
 
   /** Inisialisasi Canvas Waveform 60 FPS */
@@ -609,6 +706,11 @@
         if (bar) bar.classList.add('is-panic');
         if (txt) txt.classList.add('is-panic');
         if (stg) stg.classList.add('is-panic');
+        var core = doc.getElementById('nujumAnimaCore');
+        if (core) core.classList.add('is-hunting');
+        if (Math.round(nujumState.roundTimeLeft * 10) % 10 === 0 && nujumState.roundTimeLeft > 0) {
+          try { NujumAudioAtmosphere.playHeartbeat(); } catch (_) {}
+        }
       }
 
       if (nujumState.roundTimeLeft <= 0) {
@@ -790,9 +892,16 @@
       nujumState.bktMargin = Math.max(0.04, +(nujumState.bktMargin * 0.70).toFixed(2));
 
       var swScript = getScript("machine_defeat", null,
-        "Sial. Taruhanku meleset. Kamu melihat jebakannya dengan jernih.",
-        "Dammit. My bet failed. You saw through the trap cleanly."
+        "Cih! Taruhanku patah. Ternyata kamu membaca kalimatnya sampai tuntas, bukan cuma melirik kata pertama. Jangan senang dulu, ronde berikutnya kuhabisi.",
+        "Dammit. My bet was broken. You evaluated the entire sentence rather than glancing at the first word."
       );
+
+      try { NujumAudioAtmosphere.playShieldCrack(); } catch (_) {}
+      var core = doc.getElementById('nujumAnimaCore');
+      if (core) {
+        core.classList.remove('is-speaking', 'is-hunting');
+        core.classList.add('is-cracked');
+      }
 
       speakMachine(swScript.text_en, swScript.text_id);
 
@@ -823,6 +932,13 @@
         setTimeout(function () { if (screenEl) screenEl.classList.remove('is-glitch'); }, 500);
       }
 
+      try { NujumAudioAtmosphere.playGlitchSting(); } catch (_) {}
+      var core = doc.getElementById('nujumAnimaCore');
+      if (core) {
+        core.classList.remove('is-speaking', 'is-hunting');
+        core.classList.add('is-roasting');
+      }
+
       // Update BKT: taksiran turun
       var bktPenalty = nujumState.isDoubleDown ? 0.18 : 0.12;
       nujumState.bktMean = Math.max(0.12, +(nujumState.bktMean - bktPenalty).toFixed(2));
@@ -830,9 +946,9 @@
 
       // Pilih roaster tajam
       var category = q.misconceptionCategory;
-      if (durationSec < 2.5) category = "false_confidence_speed";
+      if (durationSec < 1.8) category = "false_confidence_speed";
       var mwScript = getScript("machine_win", category,
-        "Tepat seperti prediksiku. Kamu terjebak di pola yang sudah kuduga.",
+        "Autopilot murahan! Kamu cuma melirik satu kata pertama lalu malas membaca subjek aslinya sampai tuntas.",
         "Exactly as predicted. You walked straight into my diagnostic trap."
       );
 
