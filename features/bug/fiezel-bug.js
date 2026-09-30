@@ -81,10 +81,10 @@
     shown.forEach(function (b, i) {
       var isT = tg && tg.id === b.id;
       out += '<button type="button" class="fzb-bug' + (isT ? ' fzb-target' : '') + '" style="left:' + POS[i][0] + '%;top:' + POS[i][1] + '%;--c:' + b.color + '" onclick="FiezelBug.poke(\'' + esc(b.id) + '\')" aria-label="' + esc(b.name) + '">' +
-        '<span class="fzb-ring">' + ringSVG(b.hp) + '<span class="fzb-body">' + bugSVG(b, 52) + '</span></span><span class="fzb-name">' + esc(b.name) + '</span>' +
+        '<span class="fzb-ring">' + ringSVG(b.hp) + '<span class="fzb-body">' + bugSVG(b, 56) + '</span></span><span class="fzb-name">' + esc(b.name) + '</span>' +
         '<span class="fzb-hpv' + (isT ? ' warn' : b.hp <= 25 ? ' low' : '') + '">' + esc(t('bug.hp', 'HP {hp}%', { hp: b.hp })) + (isT ? ' · ' + esc(t('bug.mengincar', 'mengincar')) : '') + '</span></button>';
     });
-    if (!shown.length) POS.forEach(function (p, i) { out += '<span class="fzb-bug fzb-ghost" style="left:' + p[0] + '%;top:' + p[1] + '%"><span class="fzb-ring"><span class="fzb-q">?</span></span><span class="fzb-name">' + esc(t('bug.belum-ketahuan', 'belum ketahuan')) + '</span></span>'; });
+    if (!shown.length) POS.forEach(function (p, i) { out += '<span class="fzb-bug fzb-ghost" style="left:' + p[0] + '%;top:' + p[1] + '%"><span class="fzb-ring"><span class="fzb-ghost-q">?</span></span><span class="fzb-name">' + esc(t('bug.belum-ketahuan', 'belum ketahuan')) + '</span></span>'; });
     var rec = shown.filter(function (b) { return b.recovered >= 2; }).sort(function (a, b) { return b.recovered - a.recovered; })[0];
     var whisper = rec ? t('bug.whisper-pulih', '{nama} pulih +{hp} HP selagi kamu absen', { nama: rec.name, hp: rec.recovered })
       : shown.length ? t('bug.whisper-siaga', 'Bug pulih secepat kamu lupa. Buru sebelum mereka gemuk.') : t('bug.whisper-kosong', 'Jawab 5 soal — bug pertamamu bakal ketahuan.');
@@ -158,7 +158,7 @@
   function renderQ(i) {
     var r = H.qs[i], q = r.q, b = r.bug, app = doc.getElementById('app'); H.idx = i; H.dd = false; H.locked = false; H.start = Date.now();
     app.innerHTML = '<div class="fzb-hunt fzb-enter"><div class="fzb-vig" id="fzbVig"></div><div class="fzb-flash" id="fzbFlash"></div>' +
-      '<div class="fzb-top"><div class="fzb-mini" id="fzbMini">' + bugSVG(b, 58) + '</div><div class="fzb-meta"><b>' + esc(b.name) + '</b><span>' + esc(b.tag) + ' · ' + esc(t('bug.hp', 'HP {hp}%', { hp: b.hp })) + '</span></div><div class="fzb-bet" id="fzbBet">' + r.bet + '% ' + esc(t('bug.kegigit', 'kegigit')) + '</div></div>' + prog() +
+      '<div class="fzb-top"><button type="button" class="fzb-exit" onclick="FiezelBug.exit()" aria-label="Keluar">✕</button><div class="fzb-mini" id="fzbMini">' + bugSVG(b, 54) + '</div><div class="fzb-meta"><b>' + esc(b.name) + '</b><span>' + esc(b.tag) + ' · ' + esc(t('bug.hp', 'HP {hp}%', { hp: b.hp })) + '</span></div><div class="fzb-bet" id="fzbBet">' + r.bet + '% ' + esc(t('bug.kegigit', 'kegigit')) + '</div></div>' + prog() +
       '<div class="fzb-cru" id="fzbCru"><i id="fzbBar"></i></div><div class="fzb-cru-meta"><span>CRUCIBLE</span><b id="fzbTime">8.0s</b></div>' +
       '<div class="fzb-q"><div class="fzb-kicker">' + esc(t('bug.ronde', 'RONDE {n}', { n: i + 1 })) + ' · ' + esc(String(q.lessonSkill || q.skill || '').replace(/[-_]/g, ' ').toUpperCase()) + '</div><p class="fzb-stem">' + esc(q.question).replace(/_{2,}/, '<u>___</u>') + '</p></div>' +
       '<div class="fzb-opts" id="fzbOpts">' + q.options.map(function (o, k) { return '<button type="button" data-i="' + k + '" data-testid="bug-opt-' + k + '">' + esc(o) + '<i></i></button>'; }).join('') + '</div>' +
@@ -188,9 +188,14 @@
       fb.className = 'fzb-fb win'; fb.innerHTML = '<div class="fzb-tag">' + esc(t('bug.pecah-tag', 'BUG PECAH · TEBAKAN {bet}% MELESET', { bet: r.bet })) + (H.dd ? ' · ' + esc(t('bug.umpan-berhasil', 'UMPAN 2× BERHASIL')) : '') + '</div><div class="fzb-say">' + taunt('win', b) + '</div>' + hpRow() + '<div class="fzb-why"><b>PAW:</b> ' + esc(why) + '</div>'; }
     else { H.results[H.idx] = 'ko'; safe(mode === 'timeout' ? sfx.buzz : sfx.bite); vib([90, 40, 140]); flash(false); shake('fzb-shake'); mini.classList.add('bite'); call('pawReact', 'wrong');
       fb.className = 'fzb-fb lose'; fb.innerHTML = '<div class="fzb-tag">' + esc(t('bug.digigit-tag', 'DIGIGIT · {nama} MENANG TARUHAN', { nama: b.name.toUpperCase() })) + '</div><div class="fzb-say">' + taunt(mode === 'timeout' ? 'timeout' : 'ko', b, j >= 0 ? q.options[j] : '') + '</div>' + hpRow() + '<div class="fzb-why"><b>PAW:</b> ' + esc(why) + '</div>'; }
-    requestAnimationFrame(function () { fb.classList.add('on'); var bar = fb.querySelector('.fzb-bar i'); if (bar) setTimeout(function () { bar.style.width = bar.getAttribute('data-to') + '%'; }, 120); });
     var next = doc.getElementById('fzbNext'); next.textContent = H.idx < H.qs.length - 1 ? t('bug.berikutnya', 'BUG BERIKUTNYA →') : t('bug.lihat-laporan', 'LIHAT LAPORAN PERBURUAN →'); next.classList.remove('hidden');
     next.onclick = function () { H.idx + 1 < H.qs.length ? beat(H.qs[H.idx + 1], function () { renderQ(H.idx + 1); }) : report(); };
+    requestAnimationFrame(function () {
+      fb.classList.add('on');
+      var bar = fb.querySelector('.fzb-bar i');
+      if (bar) setTimeout(function () { bar.style.width = bar.getAttribute('data-to') + '%'; }, 120);
+      try { setTimeout(function () { next.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, 150); } catch (_) {}
+    });
   }
 
   /* Laporan Perburuan + bagikan */
