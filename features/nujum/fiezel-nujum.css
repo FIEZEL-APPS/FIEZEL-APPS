@@ -1701,12 +1701,158 @@ html body .nujum-home-cta-btn:active {
   background: linear-gradient(135deg, #DDF3EA 0%, #A7F3D0 100%);
   border: 2px solid #059669;
   color: #065F46;
-  padding: 12px 16px;
-  border-radius: 14px;
+  padding: 10px 14px;
+  border-radius: 12px;
   font-weight: 800;
-  font-size: 0.88rem;
+  font-size: 0.82rem;
   text-align: center;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   box-shadow: 2px 2px 0px #059669;
 }
+
+/* ==========================================================================
+   16. STREAMLINED DUEL ARENA (SIMPLE, FAST & UNCLUTTERED)
+   ========================================================================== */
+
+.nujum-round-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #FFFFFF;
+  border: 1.5px solid var(--nj-maroon);
+  box-shadow: 2px 2px 0px var(--nj-maroon);
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-family: var(--nj-font-mono);
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--nj-maroon);
+  white-space: nowrap;
+}
+
+.nujum-phase-tag {
+  background: var(--nj-yellow);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 0.64rem;
+}
+
+.nujum-scoreboard small {
+  font-size: 0.68rem;
+  opacity: 0.85;
+}
+
+.nujum-bet-banner {
+  background: #FFFFFF;
+  border: 2px solid var(--nj-maroon);
+  box-shadow: var(--nj-shadow-3d);
+  border-radius: 14px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+}
+
+.nujum-bet-headline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.nujum-bet-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--nj-font-mono);
+  font-size: 0.76rem;
+  font-weight: 800;
+  color: var(--nj-crimson);
+  text-transform: uppercase;
+}
+
+.nujum-bet-badge b {
+  font-size: 1.05rem;
+  color: var(--nj-crimson);
+}
+
+.nujum-dd-tag {
+  background: var(--nj-rose);
+  border: 1px solid var(--nj-maroon);
+  padding: 0 4px;
+  border-radius: 4px;
+  font-size: 0.62rem;
+}
+
+.nujum-bet-taunt {
+  font-size: 0.84rem;
+  line-height: 1.38;
+  color: var(--nj-maroon);
+  font-weight: 600;
+  padding: 6px 8px;
+  background: var(--nj-bg);
+  border-radius: 8px;
+  border: 1px solid rgba(94, 20, 32, 0.10);
+}
+
+.nujum-rule-hint {
+  font-family: var(--nj-font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--nj-muted);
+  margin-top: 6px;
+  letter-spacing: 0.02em;
+}
+
+.nujum-play-area {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.nujum-action-zone {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.nujum-voice-hub {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 2px 0;
+}
+
+.nujum-voice-sub {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  max-width: 220px;
+}
+
+.nujum-surrender-wrap {
+  text-align: center;
+  padding: 2px 0;
+}
+
+.nujum-surrender-text-btn {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  font-family: var(--nj-font-mono);
+  font-size: 0.72rem;
+  color: var(--nj-muted);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: color 0.15s ease;
+}
+
+.nujum-surrender-text-btn:hover {
+  color: var(--nj-maroon);
+}
+
 

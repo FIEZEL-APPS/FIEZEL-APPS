@@ -1,6 +1,6 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-09-30T12:03:29.662Z",
+  "generatedAt": "2026-09-30T14:21:34.542Z",
   "files": {
     "app.js": {
       "leaks": 4,
@@ -19,7 +19,7 @@
           "text": "Nama kriteria: n/4 - satu kalimat alasan yang menunjuk bukti di tulisannya"
         },
         {
-          "line": 15789,
+          "line": 15833,
           "text": "Latihan"
         }
       ]
