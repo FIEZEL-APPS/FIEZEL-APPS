@@ -318,7 +318,7 @@
     nujumState.isSpeakingMachine = true;
     try {
       if (root.FiezelVoiceSay && typeof root.FiezelVoiceSay.say === 'function') {
-        root.FiezelVoiceSay.say({ en: textEn, id: textId }).then(function () {
+        root.FiezelVoiceSay.say({ en: textEn, id: textId }, { suppressSubtitles: true }).then(function () {
           nujumState.isSpeakingMachine = false;
         }).catch(function () {
           nujumState.isSpeakingMachine = false;
@@ -431,13 +431,18 @@
     if (!nujumState.active || !nujumState.currentQuestion) return;
     var q = nujumState.currentQuestion;
     var correctOpt = q.options[q.correctIndex].toLowerCase();
-    var trapOpt = q.targetTrap.toLowerCase();
     var text = String(selectedText || '').toLowerCase().trim();
     var durationSec = (Date.now() - (nujumState.roundStartTime || Date.now())) / 1000;
 
     var isCorrect = text.indexOf(correctOpt) !== -1 || text === correctOpt;
     var verdictEl = doc.getElementById('nujumVerdictArea');
+    var slotPod = doc.getElementById('nujumSlotPod');
     if (!verdictEl) return;
+
+    if (slotPod) {
+      slotPod.textContent = text || correctOpt;
+      slotPod.className = isCorrect ? 'nujum-slot-pod is-win' : 'nujum-slot-pod is-loss';
+    }
 
     if (isCorrect) {
       // Mesin KALAH
@@ -461,10 +466,14 @@
       speakMachine(swScript.text_en, swScript.text_id);
 
       verdictEl.innerHTML = [
-        '<div class="nujum-verdict-banner is-win">',
-        '  <div class="nujum-verdict-title">✦ MESIN KALAH TARUHAN</div>',
-        '  <div class="nujum-verdict-body">Kamu mematahkan taruhan <b>' + nujumState.currentBet + '%</b> mesin. Jawaban benar: «' + q.options[q.correctIndex] + '». ' + q.rule + '</div>',
-        '  <div style="margin-top:12px"><button class="nujum-opt-btn" id="nujumNextRoundBtn" style="background:#047857;border-color:#10B981;color:#FFFFFF;padding:10px 20px;font-size:0.92rem;font-weight:700">Lanjut Taruhan Berikutnya →</button></div>',
+        '<div class="nujum-win-card">',
+        '  <div class="nujum-win-title">✦ TARUHAN MESIN PATAH (-' + nujumState.currentBet + '%)</div>',
+        '  <div style="font-size:0.86rem;font-weight:600;margin-bottom:10px;line-height:1.5">«' + swScript.text_id + '» Jawaban benar: <b>' + q.options[q.correctIndex] + '</b>. ' + q.rule + '</div>',
+        '  <div style="background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:10px;font-family:var(--nj-font-mono);font-size:0.7rem;margin-bottom:12px;color:#A7F3D0">',
+        '    BKT Mastery Estimate: <b>+18%</b> (μ=' + nujumState.bktMean + ', σ=' + nujumState.bktMargin + ')<br>',
+        '    Status: Broken claim dicatat ke ledger kemenanganmu.',
+        '  </div>',
+        '  <button class="nujum-teleport-btn" id="nujumNextRoundBtn" style="background:#059669">Lanjut Duel Berikutnya →</button>',
         '</div>'
       ].join('');
 
@@ -488,13 +497,16 @@
       speakMachine(mwScript.text_en, mwScript.text_id);
 
       verdictEl.innerHTML = [
-        '<div class="nujum-verdict-banner is-loss">',
-        '  <div class="nujum-verdict-title">✕ MESIN MEMENANGKAN TARUHAN (' + nujumState.currentBet + '%)</div>',
-        '  <div class="nujum-verdict-body"><b>Roasting Mentor:</b> ' + mwScript.text_id + '</div>',
-        '  <div style="font-size:0.85rem;color:var(--nj-text-muted);margin:8px 0">Pola salah: <i>' + q.misconceptionText + '</i>. Bentuk benar: «' + q.options[q.correctIndex] + '».</div>',
-        '  <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap">',
+        '<div class="nujum-loss-card">',
+        '  <div class="nujum-loss-title">✕ MESIN MEMENANGKAN TARUHAN (' + nujumState.currentBet + '%)</div>',
+        '  <div style="font-size:0.86rem;font-weight:600;margin-bottom:10px;line-height:1.5;color:#FFE4E6">«' + mwScript.text_id + '»</div>',
+        '  <div style="background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:10px;font-size:0.72rem;margin-bottom:12px;color:#FECDD3">',
+        '    <b>Pola salah:</b> ' + q.misconceptionText + '<br>',
+        '    <b>Bentuk benar:</b> «' + q.options[q.correctIndex] + '».',
+        '  </div>',
+        '  <div style="display:flex;flex-direction:column;gap:8px">',
         '    <button class="nujum-dispute-btn" id="nujumDisputeBtn">⚡ SANGGAH KLAIM (Buktikan 3 Soal)</button>',
-        '    <button class="nujum-opt-btn" id="nujumNextRoundBtn" style="padding:8px 16px;font-size:0.88rem">Lanjut Taruhan →</button>',
+        '    <button class="nujum-next-btn" id="nujumNextRoundBtn">Terima & Lanjut Ronde →</button>',
         '  </div>',
         '</div>'
       ].join('');
@@ -527,6 +539,12 @@
     nujumState.scoreMesin++;
     var fullCorrectSentence = q.stem.replace('___', q.options[q.correctIndex]);
 
+    var slotPod = doc.getElementById('nujumSlotPod');
+    if (slotPod) {
+      slotPod.textContent = q.options[q.correctIndex];
+      slotPod.className = 'nujum-slot-pod is-win';
+    }
+
     var srScript = getScript("honest_surrender", "praise_honesty",
       "Bagus. Mengakui tidak tahu jauh lebih bermartabat daripada menebak asal jadi dan berpura-pura paham.",
       "Good. Acknowledging you do not know is far more honorable than blind guessing."
@@ -538,18 +556,28 @@
     if (!verdictEl) return;
 
     verdictEl.innerHTML = [
-      '<div class="nujum-surrender-banner">',
-      '  <div class="nujum-surrender-title">✦ KEJUJURAN KOGNITIF DIHARGAI (TIDAK DI-ROAST)</div>',
-      '  <div class="nujum-surrender-body">«' + srScript.text_id + '»</div>',
-      '  <div style="font-size:0.84rem;color:var(--nj-text-muted);margin-bottom:6px">Dengarkan & ikuti bentuk yang benar (Echo Redemption):</div>',
-      '  <div class="nujum-echo-box">«' + fullCorrectSentence + '»</div>',
-      '  <div style="font-size:0.85rem;color:#A7F3D0;margin-bottom:12px">Aturan: ' + q.rule + '</div>',
-      '  <div class="nujum-teleport-actions">',
+      '<div class="nujum-surrender-sanctum">',
+      '  <div class="nujum-surrender-sanctum-badge">✦ PROTOKOL KEJUJURAN KOGNITIF (TIDAK DI-ROAST)</div>',
+      '  <div class="nujum-surrender-sanctum-quote">«' + srScript.text_id + '»</div>',
+      '  <div class="nujum-echo-player-card">',
+      '    <div class="nujum-echo-top"><span>ECHO REDEMPTION AUDIO</span><span>VOICE: NATIVE EDUCATOR</span></div>',
+      '    <div class="nujum-echo-body">',
+      '      <button class="nujum-echo-play-btn" id="nujumEchoPlayBtn" aria-label="Putar audio echo redemption">',
+      '        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>',
+      '      </button>',
+      '      <div>',
+      '        <div class="nujum-echo-sentence">«' + fullCorrectSentence + '»</div>',
+      '        <div style="font-size:0.68rem;color:var(--nj-text-muted);font-family:var(--nj-font-mono);margin-top:2px">Dengarkan & ikuti bentuk yang benar</div>',
+      '      </div>',
+      '    </div>',
+      '  </div>',
+      '  <div class="nujum-kaidah-card"><b>Kaidah:</b> ' + q.rule + '</div>',
+      '  <div style="display:flex;flex-direction:column;gap:8px">',
       '    <button class="nujum-teleport-btn" id="nujumTeleportPracticeBtn">',
       '      <span>🚀</span> Latih Materi Ini Sekarang (Modul Latihan) →',
       '    </button>',
-      '    <button class="nujum-opt-btn" id="nujumNextRoundBtn" style="padding:10px 18px">',
-      '      Lanjut Ronde Berikutnya →',
+      '    <button class="nujum-next-btn" id="nujumNextRoundBtn">',
+      '      Lanjut Ronde Duel Berikutnya →',
       '    </button>',
       '  </div>',
       '</div>'
@@ -557,6 +585,13 @@
 
     renderBktTrack();
     updateScorePill();
+
+    var echoBtn = doc.getElementById('nujumEchoPlayBtn');
+    if (echoBtn) {
+      echoBtn.onclick = function () {
+        speakMachine(fullCorrectSentence, fullCorrectSentence);
+      };
+    }
 
     // Setup tombol teleport
     var teleportBtn = doc.getElementById('nujumTeleportPracticeBtn');
@@ -665,75 +700,113 @@
     );
     speakMachine(pbScript.text_en, pbScript.text_id);
 
-    var stemDisplay = q.stem.replace('___', '<span class="nujum-stem-blank">...</span>');
+    var diffStr = (q.cefr === 'B2' ? '+0.90' : q.cefr === 'B1' ? '+0.50' : q.cefr === 'A2' ? '0.00' : '-0.50');
+    var stemDisplay = q.stem.replace('___', '<span class="nujum-slot-pod is-empty" id="nujumSlotPod">[ ... ]</span>');
 
     appEl.innerHTML = [
       '<div class="nujum-screen" data-testid="nujum-screen">',
       '  <div class="nujum-topbar">',
-      '    <button class="nujum-back-btn" id="nujumExitBtn"><i class="fz-i" data-fz-icon="arrow-left"></i> Beranda</button>',
-      '    <span class="nujum-pill-tag"><span class="pulse-dot"></span> NUJUM #' + (nujumState.roundIndex + 1) + '/' + nujumState.maxRounds + ' · ' + q.cefr + '</span>',
-      '    <div class="nujum-score-pill" id="nujumScorePill">',
-      '      <span>Mesin <b class="score-mesin">' + nujumState.scoreMesin + '</b></span>',
-      '      <span>:</span>',
-      '      <span>Kamu <b class="score-kamu">' + nujumState.scoreKamu + '</b></span>',
+      '    <button class="nujum-back-btn" id="nujumExitBtn">',
+      '      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>',
+      '      <span>Keluar</span>',
+      '    </button>',
+      '    <div class="nujum-node-badge">',
+      '      <span class="pulse-radar"></span>',
+      '      <span>NUJUM D-01</span>',
+      '      <span>·</span>',
+      '      <span>' + q.cefr + '</span>',
+      '    </div>',
+      '    <div class="nujum-scoreboard" id="nujumScorePill">',
+      '      <span class="score-mesin">MESIN <b>' + nujumState.scoreMesin + '</b></span>',
+      '      <span>⚡</span>',
+      '      <span class="score-kamu"><b>' + nujumState.scoreKamu + '</b> KAMU</span>',
       '    </div>',
       '  </div>',
 
-      '  <div class="nujum-bet-card">',
-      '    <div class="nujum-bet-header">',
-      '      <span class="nujum-bet-label">Prediksi Kegagalan Mesin</span>',
-      '      <div class="nujum-bet-pct">' + nujumState.currentBet + '<small>%</small></div>',
+      '  <div class="nujum-odds-card">',
+      '    <div class="nujum-odds-header">',
+      '      <div class="nujum-odds-label">',
+      '        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+      '        <span>PREDIKSI KEGAGALAN MESIN</span>',
+      '      </div>',
+      '      <span class="nujum-diag-tag">IRT 3PL: θ=0.00</span>',
       '    </div>',
-      '    <div class="nujum-claim-statement">',
-      '      "Aku bertaruh kamu akan salah memilih <span class="nujum-claim-trap">«' + q.targetTrap + '»</span>, bukan <span class="nujum-claim-target">«' + q.options[q.correctIndex] + '»</span>."',
+      '    <div class="nujum-odds-body">',
+      '      <div class="nujum-odds-val-wrap">',
+      '        <div class="nujum-odds-val">' + nujumState.currentBet + '%<small>RISK INDEX</small></div>',
+      '        <div class="nujum-odds-sub">Confidence Band: [' + Math.max(50, nujumState.currentBet - 6) + '% – ' + Math.min(96, nujumState.currentBet + 6) + '%]</div>',
+      '      </div>',
+      '      <div class="nujum-param-matrix">',
+      '        <div class="nujum-param-row"><span class="lbl">Difficulty:</span><span class="val amber">b = ' + diffStr + '</span></div>',
+      '        <div class="nujum-param-row"><span class="lbl">Discrim:</span><span class="val emerald">a = 1.20</span></div>',
+      '        <div class="nujum-param-row"><span class="lbl">Guessing:</span><span class="val">c = 0.25</span></div>',
+      '      </div>',
       '    </div>',
-      '    <div class="nujum-bet-rationale">',
-      '      <b>Sinyal Taunt:</b> ' + pbScript.text_id,
+      '    <div class="nujum-segment-bar">',
+      '      <div class="nujum-seg fill-high"></div>',
+      '      <div class="nujum-seg fill-high"></div>',
+      '      <div class="nujum-seg fill-mid"></div>',
+      '      <div class="nujum-seg fill-mid"></div>',
+      '      <div class="nujum-seg fill-low"></div>',
+      '      <div class="nujum-seg"></div>',
+      '      <div class="nujum-seg"></div>',
+      '      <div class="nujum-seg"></div>',
+      '    </div>',
+      '    <div class="nujum-taunt-strip">',
+      '      <span class="nujum-taunt-arrow">▷</span>',
+      '      <div>Aku bertaruh kamu akan salah memilih <span class="nujum-token-trap">«' + q.targetTrap + '»</span>, bukan <span class="nujum-token-correct">«' + q.options[q.correctIndex] + '»</span>.</div>',
       '    </div>',
       '  </div>',
 
-      '  <div class="nujum-stem-box">',
-      '    <div class="nujum-stem-text">' + stemDisplay + '</div>',
+      '  <div class="nujum-crucible-stage">',
+      '    <div class="nujum-crucible-head">',
+      '      <div><span class="dot"></span><span>CRUCIBLE://Q-' + (nujumState.roundIndex + 1) + '</span></div>',
+      '      <div>SYNAPSE ACTIVE</div>',
+      '    </div>',
+      '    <div class="nujum-stem-sentence">' + stemDisplay + '</div>',
+      '    <div class="nujum-context-meta">',
+      '      <span>CEFR ' + q.cefr + '</span>',
+      '      <span>·</span>',
+      '      <span>RULE: ' + (q.skillId || 'GRAMMAR').replace('_', ' ') + '</span>',
+      '    </div>',
       '  </div>',
 
       '  <div id="nujumVerdictArea"></div>',
 
-      '  <div class="nujum-wave-wrap">',
-      '    <canvas class="nujum-wave-canvas" id="nujumWaveCanvas"></canvas>',
-      '  </div>',
-      '  <div class="nujum-stt-preview" id="nujumSttPreview">Ucapkan kalimatnya lewat mikrofon atau pilih kata di bawah</div>',
-
-      '  <div class="nujum-actions-wrap">',
-      '    <button class="nujum-mic-btn" id="nujumMicBtn" aria-label="Tekan untuk bicara">',
-      '      <i class="fz-i" data-fz-icon="speaking" style="font-size:28px"></i>',
-      '    </button>',
-      '    <div class="nujum-mic-hint" id="nujumMicHint">Tekan untuk berbicara</div>',
-      '  </div>',
-
-      '  <div class="nujum-fallback-wrap">',
-      '    <div class="nujum-fallback-head">Atau sentuh kata target (fallback luring):</div>',
-      '    <div class="nujum-options-grid">',
-      q.options.map(function (opt) {
-        return '<button class="nujum-opt-btn" data-val="' + opt + '">' + opt + '</button>';
-      }).join(''),
+      '  <div class="nujum-voice-section">',
+      '    <div class="nujum-eq-wrap">',
+      '      <span>AUDIO HARMONIC</span>',
+      '      <div class="nujum-eq-bar"></div>',
+      '      <div class="nujum-eq-bar"></div>',
+      '      <div class="nujum-eq-bar"></div>',
+      '      <div class="nujum-eq-bar"></div>',
       '    </div>',
-      '    <button class="nujum-surrender-btn" id="nujumSurrenderBtn">🏳️ Aku Menyerah, Ajari Aku Ini</button>',
+      '    <div class="nujum-orb-wrap">',
+      '      <div class="nujum-orb-ring ring-1"></div>',
+      '      <div class="nujum-orb-ring ring-2"></div>',
+      '      <button class="nujum-orb-btn" id="nujumMicBtn" aria-label="Tekan untuk bicara">',
+      '        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>',
+      '      </button>',
+      '    </div>',
+      '    <div class="nujum-voice-hint" id="nujumMicHint">Tekan untuk berbicara</div>',
       '  </div>',
 
-      '  <div class="nujum-bkt-card" id="nujumBktCard">',
-      '    <div class="nujum-bkt-header">',
-      '      <span>Taksiran BKT Penguasaan Materi</span>',
-      '      <span id="nujumBktScoreLabel">' + Math.round(nujumState.bktMean * 100) + '% (±' + Math.round(nujumState.bktMargin * 100) + '%)</span>',
-      '    </div>',
-      '    <div class="nujum-bkt-track">',
-      '      <div class="nujum-bkt-ribbon" id="nujumBktRibbon"></div>',
-      '      <div class="nujum-bkt-mean-dot" id="nujumBktDot"></div>',
-      '    </div>',
-      '    <div class="nujum-bkt-foot">',
-      '      <span>0% Nol Bukti</span>',
-      '      <span>Pita Ketidakpastian OLM</span>',
-      '      <span>100% Menguasai</span>',
-      '    </div>',
+      '  <div class="nujum-tactical-grid">',
+      q.options.map(function (opt, idx) {
+        var letter = ['A', 'B', 'C', 'D'][idx] || (idx + 1);
+        return '    <button class="nujum-tactical-chip nujum-opt-btn" data-val="' + opt + '"><div class="nujum-chip-content"><span class="nujum-chip-key">' + letter + '</span><span class="nujum-chip-text">' + opt + '</span></div><span class="nujum-chip-pip"></span></button>';
+      }).join('\n'),
+      '  </div>',
+
+      '  <button class="nujum-surrender-pill" id="nujumSurrenderBtn">',
+      '    <span>🏳️</span>',
+      '    <span>Aku Menyerah — Ajari Aku Ini</span>',
+      '  </button>',
+
+      '  <div class="nujum-footer">',
+      '    <span>LATENCY: 14ms</span>',
+      '    <span>TACTICAL HUD // BRAINCORE</span>',
+      '    <span>CEFR: ' + q.cefr + '</span>',
       '  </div>',
       '</div>'
     ].join('');
@@ -888,6 +961,12 @@
       try { nujumState.recognition.stop(); } catch (_) {}
     }
     doc.body.classList.remove('fz-view-nujum');
+    try {
+      var nav = doc.querySelector('.bottomnav');
+      if (nav) nav.style.removeProperty('display');
+      var topbar = doc.querySelector('.topbar');
+      if (topbar) topbar.style.removeProperty('display');
+    } catch (_) {}
     if (typeof root.go === 'function') {
       root.go('home');
     }
@@ -906,6 +985,12 @@
     nujumState.bktMargin = nujumState.isDemo ? 0.12 : 0.22;
 
     doc.body.classList.add('fz-view-nujum');
+    try {
+      var nav = doc.querySelector('.bottomnav');
+      if (nav) nav.style.setProperty('display', 'none', 'important');
+      var topbar = doc.querySelector('.topbar');
+      if (topbar) topbar.style.setProperty('display', 'none', 'important');
+    } catch (_) {}
     renderActiveRound();
   }
 
