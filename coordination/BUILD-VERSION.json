@@ -1,7 +1,7 @@
 {
-  "version": "m025-384",
+  "version": "m025-387",
   "claimedBy": "branch main",
-  "claimedAt": "2026-09-29T16:07:00.858Z",
-  "reason": "m025-384: merge PR 479 UI audit remediation",
+  "claimedAt": "2026-09-30T16:25:31.493Z",
+  "reason": "m025-385: zero duplicate grammar practice and nujum arena audio",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
