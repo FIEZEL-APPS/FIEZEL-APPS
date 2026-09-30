@@ -800,7 +800,14 @@
       }, 500);
     }
 
-    var toScript = getScript("machine_win", "false_confidence_speed",
+    try { NujumAudioAtmosphere.playGlitchSting(); } catch (_) {}
+    var core = doc.getElementById('nujumAnimaCore');
+    if (core) {
+      core.classList.remove('is-speaking', 'is-hunting');
+      core.classList.add('is-roasting');
+    }
+
+    var toScript = getScript("machine_win", "freeze_timeout",
       "Waktu habis! Autopilot membekukan pikiranmu. Keraguan ini membuktikan kamu belum menguasai polanya secara refleks.",
       "Time expired! Cognitive freeze took over. Hesitation confirms your lack of reflex mastery."
     );
@@ -814,8 +821,8 @@
       '<div class="nujum-loss-card is-timeout">',
       '  <div class="nujum-loss-title">⏱️ WAKTU HABIS (+' + points + ' POIN MESIN)</div>',
       doubleLossBanner,
-      '  <div style="font-size:0.86rem;font-weight:600;margin-bottom:8px;line-height:1.45;color:#FFE4E6">«' + toScript.text_id + '»</div>',
-      '  <div style="background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:8px 10px;font-size:0.75rem;margin-bottom:10px;color:#FECDD3">',
+      '  <div class="nujum-loss-quote">«' + toScript.text_id + '»</div>',
+      '  <div class="nujum-loss-pattern">',
       '    <b>Bentuk benar:</b> «' + q.options[q.correctIndex] + '». ' + q.rule,
       '  </div>',
       '  <div style="display:flex;flex-direction:column;gap:6px">',
@@ -1442,9 +1449,16 @@
 
       '  <div class="nujum-bet-banner">',
       '    <div class="nujum-bet-headline">',
-      '      <div class="nujum-bet-badge">',
-      '        <span class="pulse-dot"></span>',
-      '        <span>TARUHAN MESIN: <b id="nujumOddsNumber">' + nujumState.currentBet + '%</b></span>',
+      '      <div class="nujum-machine-presence">',
+      '        <div class="nujum-anima-core" id="nujumAnimaCore" aria-label="Mata mesin mentor Nujum">',
+      '          <div class="nujum-core-ring ring-outer"></div>',
+      '          <div class="nujum-core-ring ring-middle"></div>',
+      '          <div class="nujum-core-pupil" id="nujumCorePupil"></div>',
+      '        </div>',
+      '        <div class="nujum-bet-badge">',
+      '          <span class="pulse-dot"></span>',
+      '          <span>TARUHAN MESIN: <b id="nujumOddsNumber">' + nujumState.currentBet + '%</b></span>',
+      '        </div>',
       '      </div>',
       '      <button class="nujum-double-down-btn" id="nujumDoubleDownBtn" type="button">',
       '        <span aria-hidden="true">🔥</span>',
@@ -1453,7 +1467,7 @@
       '      </button>',
       '    </div>',
       '    <div class="nujum-bet-taunt">',
-      '      Aku bertaruh kamu akan memilih <span class="nujum-token-trap">«' + escapeHtml(q.targetTrap) + '»</span>. Buktikan aku salah.',
+      '      «' + escapeHtml(pbScript.text_id) + '»',
       '    </div>',
       '  </div>',
 
@@ -1732,6 +1746,7 @@
     nujumState.bktMean = nujumState.isDemo ? 0.44 : 0.50;
     nujumState.bktMargin = nujumState.isDemo ? 0.12 : 0.22;
 
+    doc.body.classList.remove('fz-auth-open');
     doc.body.classList.add('fz-view-nujum');
     try {
       var nav = doc.querySelector('.bottomnav');
