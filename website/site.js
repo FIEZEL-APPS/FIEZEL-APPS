@@ -65,7 +65,6 @@
     }).observe(heroCta);
     if (finalSec) new IntersectionObserver(function (en) { finalIn = en[0].isIntersecting || en[0].boundingClientRect.top < 0; sync(); }).observe(finalSec);
   }
-
   /* ---------- 3. maskot PAW interaktif: Hawaiian Hula Dance (3s dynamic cycle) ---------- */
   function initHulaPaw() {
     var hulaPaw = document.querySelector('.hula-paw');

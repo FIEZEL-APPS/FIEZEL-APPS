@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>FIEZEL NUJUM — The Ivory Arena Prototype</title>
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            maroon: { 800: '#5E1420', 900: '#3A0B13' },
+            sun: '#FFD94F',
+            roseCandy: '#FDE4E8',
+            mintFresh: '#DDF3EA',
+            skyCalm: '#E4F1FB',
+            canvas: '#FFF9EE'
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    :root {
+      --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --maroon: #5E1420;
+      --canvas: #FFF9EE;
+      --sun: #FFD94F;
+      --rose: #FDE4E8;
+      --mint: #DDF3EA;
+      --sky: #E4F1FB;
+    }
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    body {
+      background-color: var(--canvas);
+      color: #241A11;
+      font-family: var(--font-sans);
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+    /* Subtle Warm Arcade Grid */
+    .hud-grid-bg {
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(255, 217, 79, 0.25) 0%, transparent 60%),
+        radial-gradient(circle at 100% 100%, rgba(221, 243, 234, 0.4) 0%, transparent 50%),
+        radial-gradient(rgba(94, 20, 32, 0.06) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 20px 20px;
+    }
+    /* Authentic 3D Card Surfaces */
+    .fz-card-3d {
+      background: #FFFFFF;
+      border: 2px solid var(--maroon);
+      box-shadow: 3px 3px 0px var(--maroon);
+    }
+    .fz-card-3d-mint {
+      background: var(--mint);
+      border: 2px solid #1F7A63;
+      box-shadow: 3px 3px 0px #1F7A63;
+    }
+    .fz-card-3d-rose {
+      background: var(--rose);
+      border: 2px solid var(--maroon);
+      box-shadow: 3px 3px 0px var(--maroon);
+    }
+    .touch-target-44 {
+      min-height: 44px;
+      min-width: 44px;
+    }
+  </style>
+</head>
+<body class="w-full flex flex-col items-center justify-start min-h-screen hud-grid-bg py-4 px-2 sm:px-4">
+
+  <!-- ========================================================================= -->
+  <!-- TOP PROTOTYPE CONTROL BAR (FOR DESIGN REVIEW & INTERACTIVE DEMO)          -->
+  <!-- ========================================================================= -->
+  <aside class="w-full max-w-[500px] mb-4 p-3 rounded-2xl fz-card-3d text-xs flex flex-col gap-2.5 z-50">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-[#5E1420] animate-ping"></span>
+        <span class="font-mono font-bold tracking-wider text-[#5E1420] uppercase text-[11px]">NUJUM // The Ivory Arena Prototype</span>
+      </div>
+      <span class="font-mono text-[10px] text-[#5E1420] bg-yellow-300/40 px-2 py-0.5 rounded border border-[#5E1420]/30 font-bold">Palet Asli Fiezel</span>
+    </div>
+    <!-- State Selector Buttons -->
+    <div class="grid grid-cols-4 gap-1.5 font-mono text-[10px]">
+      <button onclick="setScreenState('active')" id="btn-state-active" class="state-tab py-1.5 px-1 rounded-lg text-center font-bold bg-[#FFD94F] text-[#5E1420] border-2 border-[#5E1420] shadow-[1.5px_1.5px_0px_#5E1420] transition-all">
+        1. Duel HUD
+      </button>
+      <button onclick="setScreenState('surrender')" id="btn-state-surrender" class="state-tab py-1.5 px-1 rounded-lg text-center font-bold bg-white text-[#5E1420] border border-[#5E1420]/30 hover:bg-[#FFF9EE] transition-all">
+        2. Surrender
+      </button>
+      <button onclick="setScreenState('win')" id="btn-state-win" class="state-tab py-1.5 px-1 rounded-lg text-center font-bold bg-white text-[#5E1420] border border-[#5E1420]/30 hover:bg-[#FFF9EE] transition-all">
+        3. Mesin Kalah
+      </button>
+      <button onclick="setScreenState('loss')" id="btn-state-loss" class="state-tab py-1.5 px-1 rounded-lg text-center font-bold bg-white text-[#5E1420] border border-[#5E1420]/30 hover:bg-[#FFF9EE] transition-all">
+        4. Roasting
+      </button>
+    </div>
+  </aside>
+
+  <!-- ========================================================================= -->
+  <!-- MOBILE VIEWPORT STAGE (412px x 890px STRICT HIGH-DENSITY HUD)             -->
+  <!-- ========================================================================= -->
+  <main class="w-full max-w-[412px] min-h-[850px] relative flex flex-col justify-between p-4 sm:p-5 rounded-[32px] bg-[#FFF9EE] border-2 border-[#5E1420] shadow-[4px_4px_0px_#5E1420,0_20px_50px_rgba(94,20,32,0.08)] overflow-hidden">
+    
+    <!-- Ambient Aura Glow Orbs -->
+    <div class="pointer-events-none absolute -top-20 -left-20 w-60 h-60 bg-amber-400/20 rounded-full blur-[80px]"></div>
+    <div class="pointer-events-none absolute top-1/2 -right-24 w-64 h-64 bg-emerald-400/20 rounded-full blur-[100px]"></div>
+    <div class="pointer-events-none absolute -bottom-16 left-8 w-56 h-56 bg-rose-400/20 rounded-full blur-[90px]"></div>
+
+    <!-- ===================================================================== -->
+    <!-- 1. TOP TELEMETRY FLIGHT HUD HEADER                                    -->
+    <!-- ===================================================================== -->
+    <header class="w-full flex items-center justify-between pb-3 border-b-2 border-[#5E1420]/15 z-20">
+      <!-- Back / Exit Action -->
+      <a href="/index.html?view=home" class="touch-target-44 px-3 py-1.5 rounded-xl bg-white border-1.5 border-[#5E1420] shadow-[2px_2px_0px_#5E1420] flex items-center gap-1.5 text-[#5E1420] active:scale-95 transition-all text-xs font-mono font-bold tracking-wider uppercase">
+        <svg class="w-4 h-4 text-[#5E1420]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+        <span>Keluar</span>
+      </a>
+
+      <!-- Center Telemetry Node Badge -->
+      <div class="flex items-center gap-1.5 px-3 py-1 rounded-full border-1.5 border-[#5E1420] bg-white shadow-[2px_2px_0px_#5E1420]">
+        <span class="w-2 h-2 rounded-full bg-[#FFD94F] border border-[#5E1420]"></span>
+        <span class="font-mono text-[10px] text-[#5E1420] font-bold tracking-widest uppercase">NUJUM D-01</span>
+        <span class="text-[#5E1420] font-bold">·</span>
+        <span class="font-mono text-[10px] text-[#5E1420] font-bold tracking-wider uppercase">A1</span>
+      </div>
+
+      <!-- Live Duel Scoreboard -->
+      <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border-1.5 border-[#5E1420] shadow-[2px_2px_0px_#5E1420] font-mono text-[11px]">
+        <span class="text-[#B83A4B] font-bold">MESIN <b id="score-mesin-val" class="ml-0.5">0</b></span>
+        <span class="text-[#5E1420] text-[10px]">⚡</span>
+        <span class="text-[#1F7A63] font-bold"><b id="score-kamu-val" class="mr-0.5">0</b> KAMU</span>
+      </div>
+    </header>
+
+    <!-- ===================================================================== -->
+    <!-- 2. DYNAMIC CONTENT SECTION (SWITCHES BY STATE)                        -->
+    <!-- ===================================================================== -->
+    <div id="dynamic-content-area" class="w-full flex-1 flex flex-col justify-start gap-4 mt-3 z-10">
+
+      <!-- =================================================================== -->
+      <!-- STATE A: ACTIVE DUEL HUD (DEFAULT)                                 -->
+      <!-- =================================================================== -->
+      <div id="state-active-panel" class="flex flex-col gap-4">
+        
+        <!-- Odds Reactor Card -->
+        <section class="fz-card-3d rounded-2xl p-4 relative overflow-hidden">
+          <!-- Top Diagnostic Line -->
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-[#B83A4B]"></span>
+              <span class="font-mono text-[10px] uppercase tracking-wider text-[#5E1420] font-bold">PREDIKSI KEGAGALAN MESIN</span>
+            </div>
+            <span class="font-mono text-[9px] text-[#5E1420] bg-[#FFF9EE] px-2 py-0.5 rounded border border-[#5E1420]/20 font-bold">IRT 3PL: θ=0.00</span>
+          </div>
+
+          <!-- Odds Number & Parameter Matrix -->
+          <div class="flex items-center justify-between py-1">
+            <div>
+              <div class="flex items-baseline gap-1.5">
+                <span class="font-mono text-4xl sm:text-5xl text-[#B83A4B] font-extrabold tracking-tight leading-none">58%</span>
+                <span class="font-mono text-[10px] text-[#5E1420] bg-[#FDE4E8] px-1.5 py-0.5 rounded border border-[#5E1420] font-bold tracking-wider uppercase">RISK INDEX</span>
+              </div>
+              <p class="text-[11px] text-[#7A686B] mt-1 font-mono font-medium">Confidence Band: [52% – 64%]</p>
+            </div>
+
+            <!-- Mathematical Parameters Matrix -->
+            <div class="grid grid-cols-1 gap-1 bg-[#FFF9EE] border border-[#5E1420]/20 rounded-xl p-2 font-mono text-[9px] text-right">
+              <div class="flex justify-between gap-3">
+                <span class="text-[#7A686B]">Difficulty:</span>
+                <span class="text-[#5E1420] font-bold">b = -0.50</span>
+              </div>
+              <div class="flex justify-between gap-3">
+                <span class="text-[#7A686B]">Discrim:</span>
+                <span class="text-[#1F7A63] font-bold">a = 1.20</span>
+              </div>
+              <div class="flex justify-between gap-3">
+                <span class="text-[#7A686B]">Guessing:</span>
+                <span class="text-[#5E1420] font-bold">c = 0.25</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Segmented Probability Bar -->
+          <div class="w-full flex gap-1 my-2">
+            <div class="h-2 flex-1 rounded-sm bg-[#FFD94F] border border-[#5E1420]"></div>
+            <div class="h-2 flex-1 rounded-sm bg-[#FFD94F] border border-[#5E1420]"></div>
+            <div class="h-2 flex-1 rounded-sm bg-[#FFD94F] border border-[#5E1420]"></div>
+            <div class="h-2 flex-1 rounded-sm bg-[#FFD94F] border border-[#5E1420]"></div>
+            <div class="h-2 flex-1 rounded-sm bg-[#EAE2D5]"></div>
+            <div class="h-2 flex-1 rounded-sm bg-[#EAE2D5]"></div>
+          </div>
+
+          <!-- Machine Provocation Claim Box -->
+          <div class="mt-2 p-2.5 rounded-xl bg-[#FFF9EE] border border-[#5E1420]/20 text-xs text-[#5E1420] font-semibold leading-relaxed flex items-start gap-2">
+            <span class="text-[#5E1420] text-sm">▶</span>
+            <div class="flex-1">
+              Aku bertaruh kamu akan salah memilih 
+              <span class="px-1.5 py-0.5 rounded-md bg-[#FDE4E8] border border-[#5E1420] font-mono text-[#5E1420] font-bold">«is leaving»</span>, 
+              bukan 
+              <span class="px-1.5 py-0.5 rounded-md bg-[#DDF3EA] border border-[#1F7A63] font-mono text-[#165646] font-bold">«leaves»</span>.
+            </div>
+          </div>
+        </section>
+
+        <!-- Sentence Crucible Card -->
+        <section class="fz-card-3d rounded-2xl p-4 text-center">
+          <div class="flex items-center justify-between font-mono text-[10px] text-[#7A686B] font-bold tracking-wider mb-2">
+            <span>● CRUCIBLE://Q-1</span>
+            <span>SYNAPSE ACTIVE</span>
+          </div>
+          
+          <div class="text-lg sm:text-xl font-extrabold text-[#5E1420] leading-relaxed my-2">
+            The train 
+            <span id="active-slot-pod" class="inline-flex items-center justify-center min-w-[95px] h-8 px-2.5 rounded-xl bg-[#FFD94F] border-2 border-dashed border-[#5E1420] text-[#5E1420] shadow-[inset_0_1px_3px_rgba(94,20,32,0.1)] transition-all">
+              <span id="slot-pod-text" class="font-mono text-xs font-bold">[ . . . ]</span>
+            </span> 
+            at 8:00 AM every morning.
+          </div>
+
+          <div class="font-mono text-[10px] text-[#7A686B] font-semibold mt-2">
+            RULE: PRESENT SIMPLE
+          </div>
+        </section>
+
+        <!-- Voice Core Orb -->
+        <section class="flex flex-col items-center gap-1.5 my-1">
+          <!-- Harmonic Audio Indicator -->
+          <div class="px-3 py-1 rounded-full bg-white border border-[#5E1420]/20 shadow-[1.5px_1.5px_0px_#5E1420] flex items-center gap-2">
+            <span class="font-mono text-[9px] text-[#5E1420] font-bold uppercase tracking-wider">Audio Harmonic</span>
+            <div class="flex items-center gap-0.5 h-3">
+              <span class="w-1 h-2 rounded-full bg-[#5E1420]"></span>
+              <span class="w-1 h-3 rounded-full bg-[#FFD94F] border border-[#5E1420]"></span>
+              <span class="w-1 h-1.5 rounded-full bg-[#5E1420]"></span>
+            </div>
+          </div>
+
+          <!-- Tactile Mic Button -->
+          <button id="prototype-mic-btn" onclick="toggleVoiceCore()" class="w-16 h-16 rounded-full bg-gradient-to-b from-[#FFE279] to-[#FFD94F] border-3 border-[#5E1420] shadow-[3px_3px_0px_#5E1420,0_8px_20px_rgba(255,217,79,0.5)] active:scale-95 transition-all flex items-center justify-center">
+            <svg class="w-7 h-7 text-[#5E1420]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
+          </button>
+          
+          <span id="mic-status-label" class="font-mono text-[10px] text-[#7A686B] font-bold tracking-wider uppercase">Tekan untuk berbicara</span>
+        </section>
+
+        <!-- 4 Tactile Option Pods (2x2 Grid) -->
+        <section class="grid grid-cols-2 gap-2.5">
+          <!-- Option A: Yellow -->
+          <button onclick="pickOption(this, 'is leaving', false)" class="touch-target-44 rounded-xl p-3 flex items-center justify-between text-left bg-[#FFD94F] border-2 border-[#5E1420] shadow-[2.5px_2.5px_0px_#5E1420] hover:translate-y-[-2px] active:scale-98 transition-all group">
+            <div class="flex items-center gap-2">
+              <span class="w-5 h-5 rounded-lg border border-[#5E1420] bg-white text-[#5E1420] flex items-center justify-center font-mono text-[10px] font-bold">A</span>
+              <span class="font-mono text-xs font-bold text-[#5E1420]">is leaving</span>
+            </div>
+            <span class="w-1.5 h-1.5 rounded-full bg-[#5E1420]/40"></span>
+          </button>
+
+          <!-- Option B: Rose -->
+          <button onclick="pickOption(this, 'leaves', true)" class="touch-target-44 rounded-xl p-3 flex items-center justify-between text-left bg-[#FDE4E8] border-2 border-[#5E1420] shadow-[2.5px_2.5px_0px_#5E1420] hover:translate-y-[-2px] active:scale-98 transition-all group">
+            <div class="flex items-center gap-2">
+              <span class="w-5 h-5 rounded-lg border border-[#5E1420] bg-white text-[#5E1420] flex items-center justify-center font-mono text-[10px] font-bold">B</span>
+              <span class="font-mono text-xs font-bold text-[#5E1420]">leaves</span>
+            </div>
+            <span class="w-1.5 h-1.5 rounded-full bg-[#5E1420]/40"></span>
+          </button>
+
+          <!-- Option C: Mint -->
+          <button onclick="pickOption(this, 'has left', false)" class="touch-target-44 rounded-xl p-3 flex items-center justify-between text-left bg-[#DDF3EA] border-2 border-[#5E1420] shadow-[2.5px_2.5px_0px_#5E1420] hover:translate-y-[-2px] active:scale-98 transition-all group">
+            <div class="flex items-center gap-2">
+              <span class="w-5 h-5 rounded-lg border border-[#1F7A63] bg-white text-[#165646] flex items-center justify-center font-mono text-[10px] font-bold">C</span>
+              <span class="font-mono text-xs font-bold text-[#165646]">has left</span>
+            </div>
+            <span class="w-1.5 h-1.5 rounded-full bg-[#165646]/40"></span>
+          </button>
+
+          <!-- Option D: Sky -->
+          <button onclick="pickOption(this, 'leave', false)" class="touch-target-44 rounded-xl p-3 flex items-center justify-between text-left bg-[#E4F1FB] border-2 border-[#5E1420] shadow-[2.5px_2.5px_0px_#5E1420] hover:translate-y-[-2px] active:scale-98 transition-all group">
+            <div class="flex items-center gap-2">
+              <span class="w-5 h-5 rounded-lg border border-[#1B4D72] bg-white text-[#1B4D72] flex items-center justify-center font-mono text-[10px] font-bold">D</span>
+              <span class="font-mono text-xs font-bold text-[#1B4D72]">leave</span>
+            </div>
+            <span class="w-1.5 h-1.5 rounded-full bg-[#1B4D72]/40"></span>
+          </button>
+        </section>
+
+      </div>
+
+      <!-- =================================================================== -->
+      <!-- STATE B: HONEST SURRENDER SANCTUM (COGNITIVE HONESTY PROTOCOL)     -->
+      <!-- =================================================================== -->
+      <div id="state-surrender-panel" class="hidden flex-col gap-4">
+        <section class="fz-card-3d-mint rounded-2xl p-5 relative overflow-hidden">
+          <!-- Top Badge -->
+          <div class="flex items-center gap-2 mb-3">
+            <span class="px-3 py-1 rounded-full bg-white border border-[#1F7A63] text-[#1F7A63] font-mono text-[10px] font-bold tracking-wider uppercase">
+              ✦ PROTOKOL KEJUJURAN KOGNITIF (TIDAK DI-ROAST)
+            </span>
+          </div>
+
+          <!-- Machine Dignified Praise -->
+          <p class="text-sm font-semibold text-[#165646] italic leading-relaxed mb-4">
+            «Tidak apa-apa menyerah di sini daripada malu saat bicara di dunia nyata nanti. Dengarkan kalimat yang benar.»
+          </p>
+
+          <!-- Echo Redemption Player -->
+          <div class="bg-white rounded-xl p-3.5 border-1.5 border-[#1F7A63] shadow-[2px_2px_0px_#1F7A63] mb-4">
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-mono text-[10px] text-[#1F7A63] uppercase font-bold tracking-wider">ECHO REDEMPTION AUDIO</span>
+              <span class="font-mono text-[9px] text-[#7A686B]">Voice: Native Educator</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <button onclick="playSampleEchoAudio()" class="w-10 h-10 rounded-full bg-[#1F7A63] hover:bg-[#165646] text-white flex items-center justify-center shadow-md active:scale-95 transition-all">
+                <svg class="w-5 h-5 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              </button>
+              <div class="flex-1">
+                <div class="text-xs text-[#165646] font-extrabold">«The train leaves at 8:00 AM every morning.»</div>
+                <div class="text-[10px] text-[#7A686B] font-mono mt-0.5">Dengarkan & ulangi bentuk yang benar</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Rule Explanation -->
+          <div class="p-3 rounded-lg bg-white/70 border border-[#1F7A63]/30 text-xs text-[#165646] leading-relaxed mb-4">
+            <b>Kaidah:</b> Present simple digunakan untuk jadwal keberangkatan, kebiasaan rutin, dan fakta umum.
+          </div>
+
+          <!-- Action Buttons: Teleport vs Continue -->
+          <div class="flex flex-col gap-2">
+            <button onclick="triggerTeleportPractice()" class="touch-target-44 w-full py-3 px-4 rounded-xl bg-[#1F7A63] hover:bg-[#165646] text-white font-bold text-xs tracking-wider uppercase border-2 border-[#165646] shadow-[2px_2px_0px_#0F372D] active:scale-95 transition-all flex items-center justify-center gap-2">
+              <span>🚀</span>
+              <span>Latih Materi Ini Sekarang (Modul Latihan) →</span>
+            </button>
+            <button onclick="setScreenState('active')" class="touch-target-44 w-full py-2.5 px-4 rounded-xl bg-white hover:bg-[#FFF9EE] text-[#165646] border border-[#1F7A63] font-mono text-xs font-bold transition-all">
+              Lanjut Ronde Duel Berikutnya →
+            </button>
+          </div>
+        </section>
+      </div>
+
+      <!-- =================================================================== -->
+      <!-- STATE C: MACHINE DEFEAT / PLAYER VICTORY                           -->
+      <!-- =================================================================== -->
+      <div id="state-win-panel" class="hidden flex-col gap-4">
+        <section class="fz-card-3d-mint rounded-2xl p-5">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-[#1F7A63] animate-ping"></span>
+            <span class="font-mono text-xs font-bold text-[#1F7A63] uppercase tracking-widest">✦ TARUHAN MESIN PATAH (-58%)</span>
+          </div>
+          <p class="text-sm font-bold text-[#165646] leading-relaxed mb-3">
+            «Sial. Taruhanku meleset. Kamu melihat jebakannya dengan jernih dan memilih <b>leaves</b>.»
+          </p>
+          <div class="p-3 bg-white rounded-xl border border-[#1F7A63] text-xs text-[#165646] mb-4 font-mono shadow-[2px_2px_0px_#1F7A63]">
+            <div>BKT Mastery Estimate: <b>+18%</b> (μ=0.63, σ=0.12)</div>
+            <div class="text-[#1F7A63] mt-1 font-bold">Status: Broken Claim dicatat ke ledger kemenanganmu.</div>
+          </div>
+          <button onclick="setScreenState('active')" class="touch-target-44 w-full py-3 rounded-xl bg-[#1F7A63] hover:bg-[#165646] text-white font-bold text-xs uppercase tracking-wider border-2 border-[#165646] shadow-[2px_2px_0px_#0F372D] active:scale-95 transition-all">
+            Lanjut Duel Berikutnya →
+          </button>
+        </section>
+      </div>
+
+      <!-- =================================================================== -->
+      <!-- STATE D: MACHINE WIN / ROASTING & DISPUTE                          -->
+      <!-- =================================================================== -->
+      <div id="state-loss-panel" class="hidden flex-col gap-4">
+        <section class="fz-card-3d-rose rounded-2xl p-5">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="font-mono text-xs font-bold text-[#5E1420] uppercase tracking-widest">✕ MESIN MEMENANGKAN TARUHAN (58%)</span>
+          </div>
+          <p class="text-sm font-bold text-[#5E1420] italic leading-relaxed mb-3">
+            «Tepat seperti prediksiku. Kamu terjebak di bias kebiasaan versus kejadian langsung.»
+          </p>
+          <div class="p-3 bg-white rounded-xl border border-[#5E1420] text-xs text-[#5E1420] mb-4 shadow-[2px_2px_0px_#5E1420]">
+            <div class="font-mono text-[#5E1420] font-bold">Pola salah terdeteksi: <i>tense_continuous</i></div>
+            <div class="text-[#7A686B] text-[11px] mt-1">Jawaban benar: «leaves» (Present simple untuk jadwal).</div>
+          </div>
+          <div class="flex flex-col gap-2">
+            <button onclick="alert('Alur Sanggah OLM: Kamu akan diuji 3 soal kilat tanpa jeda!')" class="touch-target-44 w-full py-3 rounded-xl bg-[#FFD94F] hover:bg-yellow-400 text-[#5E1420] font-mono font-bold text-xs uppercase tracking-wider border-2 border-[#5E1420] shadow-[2px_2px_0px_#5E1420] active:scale-95 transition-all">
+              ⚡ SANGGAH KLAIM (Buktikan 3 Soal)
+            </button>
+            <button onclick="setScreenState('active')" class="touch-target-44 w-full py-2.5 rounded-xl bg-white hover:bg-[#FFF9EE] text-[#5E1420] border border-[#5E1420] font-mono text-xs font-bold transition-all">
+              Terima & Lanjut Ronde →
+            </button>
+          </div>
+        </section>
+      </div>
+
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- 3. DIGNIFIED HONEST SURRENDER PILL & PROTOCOL FOOTER                  -->
+    <!-- ===================================================================== -->
+    <footer class="w-full flex flex-col items-center pt-3 z-20">
+      <!-- Honest Surrender Action Button -->
+      <button onclick="setScreenState('surrender')" class="touch-target-44 w-full max-w-[340px] py-2.5 px-4 rounded-xl bg-white border-2 border-[#5E1420] shadow-[2.5px_2.5px_0px_#5E1420] hover:bg-[#FFF9EE] active:scale-95 transition-all flex items-center justify-center gap-2 group">
+        <span class="text-sm">🏳️</span>
+        <span class="font-mono text-xs text-[#5E1420] font-bold uppercase tracking-wider">Aku Menyerah — Ajari Aku Ini</span>
+      </button>
+
+      <!-- Bottom System Coordinates -->
+      <div class="flex items-center justify-between w-full px-2 mt-3 text-[9px] font-mono text-[#7A686B]">
+        <span>LATENCY: 14ms</span>
+        <span class="tracking-widest text-[#5E1420] font-bold">TACTICAL HUD // BRAINCORE</span>
+        <span>A1: CALIBRATED</span>
+      </div>
+    </footer>
+
+  </main>
+
+  <!-- ========================================================================= -->
+  <!-- CLIENT JAVASCRIPT FOR INTERACTION                                         -->
+  <!-- ========================================================================= -->
+  <script>
+    function setScreenState(state) {
+      const states = ['active', 'surrender', 'win', 'loss'];
+      states.forEach(s => {
+        const panel = document.getElementById('state-' + s + '-panel');
+        const tabBtn = document.getElementById('btn-state-' + s);
+        if (panel) {
+          if (s === state) {
+            panel.classList.remove('hidden');
+            panel.classList.add('flex');
+          } else {
+            panel.classList.add('hidden');
+            panel.classList.remove('flex');
+          }
+        }
+        if (tabBtn) {
+          if (s === state) {
+            tabBtn.className = 'state-tab py-1.5 px-1 rounded-lg text-center font-bold bg-[#FFD94F] text-[#5E1420] border-2 border-[#5E1420] shadow-[1.5px_1.5px_0px_#5E1420] transition-all';
+          } else {
+            tabBtn.className = 'state-tab py-1.5 px-1 rounded-lg text-center font-bold bg-white text-[#5E1420] border border-[#5E1420]/30 hover:bg-[#FFF9EE] transition-all';
+          }
+        }
+      });
+    }
+
+    function pickOption(btn, word, isCorrect) {
+      const pod = document.getElementById('active-slot-pod');
+      const podText = document.getElementById('slot-pod-text');
+      if (pod && podText) {
+        podText.textContent = word;
+        if (isCorrect) {
+          pod.className = 'inline-flex items-center justify-center min-w-[95px] h-8 px-2.5 rounded-xl bg-[#DDF3EA] border-2 border-[#1F7A63] text-[#165646] shadow-[2px_2px_0px_#1F7A63] transition-all';
+          podText.className = 'font-mono text-xs text-[#165646] font-bold tracking-widest';
+          setTimeout(() => {
+            setScreenState('win');
+            const score = document.getElementById('score-kamu-val');
+            if (score) score.textContent = parseInt(score.textContent || '0') + 1;
+          }, 600);
+        } else {
+          pod.className = 'inline-flex items-center justify-center min-w-[95px] h-8 px-2.5 rounded-xl bg-[#FDE4E8] border-2 border-[#5E1420] text-[#5E1420] shadow-[2px_2px_0px_#5E1420] transition-all';
+          podText.className = 'font-mono text-xs text-[#5E1420] font-bold tracking-widest';
+          setTimeout(() => {
+            setScreenState('loss');
+            const score = document.getElementById('score-mesin-val');
+            if (score) score.textContent = parseInt(score.textContent || '0') + 1;
+          }, 600);
+        }
+      }
+    }
+
+    let isListening = false;
+    function toggleVoiceCore() {
+      isListening = !isListening;
+      const btn = document.getElementById('prototype-mic-btn');
+      const label = document.getElementById('mic-status-label');
+      const podText = document.getElementById('slot-pod-text');
+      if (isListening) {
+        btn.classList.add('shadow-[4px_4px_0px_#5E1420,0_12px_28px_rgba(255,217,79,0.8)]', 'scale-105');
+        label.textContent = 'Mendengarkan... Ucapkan kalimat lengkap';
+        label.classList.add('text-[#5E1420]');
+        if (podText) podText.textContent = '“Listening...”';
+      } else {
+        btn.classList.remove('scale-105');
+        label.textContent = 'Tekan untuk berbicara';
+        pickOption(null, 'leaves', true);
+      }
+    }
+
+    function playSampleEchoAudio() {
+      try {
+        alert('Echo Redemption: Memutar audio pelafalan asli «The train leaves at 8:00 AM every morning.»');
+      } catch (_) {}
+    }
+
+    function triggerTeleportPractice() {
+      window.location.href = '/index.html?view=latihan';
+    }
+  </script>
+</body>
+</html>

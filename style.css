@@ -4523,7 +4523,7 @@ body.fz-lesson-mode .topline{position:sticky;top:0;z-index:30;
 /* R2-2 tautan "Lewati materi": gerbang bukti, bukan aksi utama - gaya tautan kecil supaya
    jalur normal tetap terbaca sebagai jalan utama. */
 .lesson-skip-link{
-  display:inline-flex;align-items:center;gap:5px;min-height:0;width:max-content;
+  display:inline-flex;align-items:center;gap:5px;min-height:44px;box-sizing:border-box;width:max-content;
   position:relative;
   margin-top:5px;padding:4px 8px;border-radius:var(--radius-xs);
   background:none;border:1px dashed rgba(36,26,17,.35);box-shadow:none;

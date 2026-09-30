@@ -7359,7 +7359,7 @@ function render(){const __renderStartedAt=Date.now();try{const __r=renderInner()
 let isViewChange=true,lastRenderedView=null;
 function captureActiveElement(container){try{const act=document.activeElement;if(act&&container&&container.contains(act)&&/^(INPUT|TEXTAREA)$/i.test(act.tagName||'')){return{id:act.id,name:act.name,testId:act.getAttribute('data-testid'),val:act.value,s:act.selectionStart,e:act.selectionEnd}}}catch(_){}return null}
 function restoreActiveElement(container,saved){if(!saved||!container)return;try{let r=null;if(saved.id)r=container.querySelector('#'+saved.id);if(!r&&saved.testId)r=container.querySelector('[data-testid="'+saved.testId+'"]');if(!r&&saved.name)r=container.querySelector('[name="'+saved.name+'"]');if(r){if(saved.val!=null&&r.value!==saved.val)r.value=saved.val;r.focus();if(typeof r.setSelectionRange==='function'&&saved.s!=null)r.setSelectionRange(saved.s,saved.e)}}catch(_){}}
-function renderInner(){if(isVerifiedTeacher()&&state.view!=='tutor'){state.view='tutor'}/* Kursus Jepang berbicara dengan istilahnya sendiri (Kotoba, Bunpō, Renshū): lapisan kunci 'kursus-ja.*' di FiezelI18n dinyalakan SEBELUM layar dilukis, dan tabel/elemen statis yang sudah memegang kalimat lama disegarkan sekali saat kursus berganti. */try{const __course=activeTargetLang()==='ja'&&!isVerifiedTeacher()?'ja':null;if(self.FiezelI18n?.getCourse&&FiezelI18n.getCourse()!==__course){FiezelI18n.setCourse(__course);__fzRefreshI18nTables();/* Soal, jawaban, dan pembahasan kursus Jepang diberi furigana + romaji dari bank kosakata, dan tiap kuis mendapat tombol ふりがな/ローマ字. */try{if(__course==='ja')self.FiezelJaUi?.observe?.($('app'),()=>V);else self.FiezelJaUi?.unobserve?.()}catch(_){}}}catch(_){}/* m025-314: go() menolak permukaan yang salah bahasa, tetapi state.view juga bisa datang dari sesi SEBELUM murid berganti kursus (ia tersimpan dan dipulihkan saat boot) — jadi pemulihan itu ikut dijepit di sini, bukan hanya jalur navigasi. */if(targetLangSurfaceBlocked(state.view)){state.view='home'}if(document.body?.classList?.contains?.('fz-teacher-mode')&&state.view!=='tutor'){try{self.FiezelTeacherShell?.unmount?.()}catch(_){}}isViewChange=state.view!==lastRenderedView;lastRenderedView=state.view;const appContainer=$('app'),savedActive=captureActiveElement(appContainer);if(!isViewChange&&appContainer)appContainer.classList.add('is-repaint');speakingListeningMountToken++;if(speakingListeningController){speakingListeningController.destroy();speakingListeningController=null;/* m026-01: satu-satunya tempat sesi dengar benar-benar bubar. Di dalam if, bukan di luar - kalau tidak, tiap navigasi biasa akan memaksa maskot kembali idle dan memotong selebrasi yang sedang jalan. */pawReact('listening-stop')}document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));setApp('');if(state.view==='home')home();if(state.view==='latihan')latihan();if(state.view==='vocab')vocab();if(state.view==='grammar')grammar();if(state.view==='reading')reading();if(state.view==='skills')skillsLab();if(state.view==='listening')skillsLab('listening');if(state.view==='speaking')skillsLab('speaking');if(state.view==='writing')writing();if(state.view==='classroom')classHubView();if(state.view==='library')library();if(state.view==='ask'||state.view==='search')askView();if(state.view==='test')placement();if(state.view==='progress')progress();if(state.view==='online'||state.view==='profile')onlineView();if(state.view==='learn')learnerFlowView();if(state.view==='arena')arenaView();if(state.view==='tutor')tutorCenterView();if(state.view==='kana')kanaView();/* merge SLOT 7 sosial 2026-08-29 *//* Audit F12: layar tanpa tab sendiri tetap menandai tab induknya - Tes awal milik Hari ini, hub latihan milik Latihan. */const TAB_PARENT={kana:'latihan',test:'home',vocab:'latihan',grammar:'latihan',reading:'latihan',writing:'latihan',library:'latihan',skills:'latihan',listening:'latihan',speaking:'latihan',learn:'home',arena:'online'};const activeTabEl=document.querySelector(`[data-view="${state.view}"]`)||(state.view==='profile'?document.querySelector('[data-view="online"]'):state.view==='online'?document.querySelector('[data-view="profile"]'):TAB_PARENT[state.view]?document.querySelector(`.bottomnav [data-view="${TAB_PARENT[state.view]}"]`):null);activeTabEl?.classList.add('active');/* m028 fase3: bendera panggung Skills Lab. Addon listening memaku blok tombolnya ke dasar layar (speaking-listening-addon.css), jadi ia panggung kedua yang bisa ditutupi gelembung. */document.body?.classList?.toggle?.('fz-stage-sl',['skills','listening','speaking'].includes(state.view));/* m028 fase3 (QA §9): Peta Belajar ikut jadi panggung ber-kontrol sejak panel NEXT SESSION punya tombol "Mulai sesi" di dekat dasar layar - screenshot QA menunjukkan gelembung PAW menutupinya utuh. Aturannya sama dengan kuis: peek dilarang, dok mengecil, layar diberi ruang bawah. */document.body?.classList?.toggle?.('fz-stage-map',state.view==='progress');/* 2026-08-29 overhaul I12 (O6 #10): bendera panggung Home. Wajah coach-strip adalah SATU-SATUNYA Pau di Home; gelembung FAB pengambang (Pau kedua, terukur menimpa lipatan hero/skill-hub di 390px) disembunyikan lewat CSS body.fz-stage-home — pola yang sama dengan fz-stage-sl/fz-stage-map, modul gelembung tidak disentuh. */document.body?.classList?.toggle?.('fz-stage-home',state.view==='home');/* q16-P2-2 2026-08-29: hub juga panggung ber-CTA-dekat-dasar (Review Due, Buka flashcards, Mulai 25 soal) \u2014 peek dilarang, dok mengecil, pola sama dengan sl/map. */document.body?.classList?.toggle?.('fz-stage-hub',['vocab','grammar','reading','library','test'].includes(state.view));document.body?.classList?.toggle?.('fz-stage-writing',state.view==='writing');/* v24-F2 2026-08-29: Writing = layar mengarang; FAB disembunyikan via CSS (pola fz-stage-home), modul gelembung tidak disentuh. *//* Kursus Jepang berpakaian sendiri: palet shu/ai/washi di fiezel-2.css menempel lewat bendera ini, jadi layar Inggris tidak tersentuh sama sekali; KelasKu guru punya palet sendiri (teacher-shell.css). */document.body?.classList?.toggle?.('fz-lang-ja',self.FiezelI18n?.getCourse?.()==='ja');try{self.FiezelJaUi?.applyPrefs?.()}catch(_){}enhanceUI();syncExamLockForView();syncCoachBubble();try{refreshNotifBadge()}catch(_){}try{updateTopbarCourseButton()}catch(_){}restoreActiveElement($('app'),savedActive);if(isViewChange){$('app')?.classList?.remove?.('is-repaint');window.scrollTo(0,0)}}
+function renderInner(){if(isVerifiedTeacher()&&state.view!=='tutor'){state.view='tutor'}/* Kursus Jepang berbicara dengan istilahnya sendiri (Kotoba, Bunpō, Renshū): lapisan kunci 'kursus-ja.*' di FiezelI18n dinyalakan SEBELUM layar dilukis, dan tabel/elemen statis yang sudah memegang kalimat lama disegarkan sekali saat kursus berganti. */try{const __course=activeTargetLang()==='ja'&&!isVerifiedTeacher()?'ja':null;if(self.FiezelI18n?.getCourse&&FiezelI18n.getCourse()!==__course){FiezelI18n.setCourse(__course);__fzRefreshI18nTables();/* Soal, jawaban, dan pembahasan kursus Jepang diberi furigana + romaji dari bank kosakata, dan tiap kuis mendapat tombol ふりがな/ローマ字. */try{if(__course==='ja')self.FiezelJaUi?.observe?.($('app'),()=>V);else self.FiezelJaUi?.unobserve?.()}catch(_){}}}catch(_){}/* m025-314: go() menolak permukaan yang salah bahasa, tetapi state.view juga bisa datang dari sesi SEBELUM murid berganti kursus (ia tersimpan dan dipulihkan saat boot) — jadi pemulihan itu ikut dijepit di sini, bukan hanya jalur navigasi. */if(targetLangSurfaceBlocked(state.view)){state.view='home'}if(document.body?.classList?.contains?.('fz-teacher-mode')&&state.view!=='tutor'){try{self.FiezelTeacherShell?.unmount?.()}catch(_){}}isViewChange=state.view!==lastRenderedView;lastRenderedView=state.view;const appContainer=$('app'),savedActive=captureActiveElement(appContainer);if(!isViewChange&&appContainer)appContainer.classList.add('is-repaint');speakingListeningMountToken++;if(speakingListeningController){speakingListeningController.destroy();speakingListeningController=null;/* m026-01: satu-satunya tempat sesi dengar benar-benar bubar. Di dalam if, bukan di luar - kalau tidak, tiap navigasi biasa akan memaksa maskot kembali idle dan memotong selebrasi yang sedang jalan. */pawReact('listening-stop')}document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));setApp('');if(state.view==='home')home();if(state.view==='latihan')latihan();if(state.view==='vocab')vocab();if(state.view==='grammar')grammar();if(state.view==='reading')reading();if(state.view==='skills')skillsLab();if(state.view==='listening')skillsLab('listening');if(state.view==='speaking')skillsLab('speaking');if(state.view==='writing')writing();if(state.view==='classroom')classHubView();if(state.view==='library')library();if(state.view==='ask'||state.view==='search')askView();if(state.view==='test')placement();if(state.view==='progress')progress();if(state.view==='online'||state.view==='profile')onlineView();if(state.view==='learn')learnerFlowView();if(state.view==='arena')arenaView();if(state.view==='tutor')tutorCenterView();if(state.view==='kana')kanaView();if(state.view==='nujum')nujumView();/* merge SLOT 7 sosial 2026-08-29 *//* Audit F12: layar tanpa tab sendiri tetap menandai tab induknya - Tes awal milik Hari ini, hub latihan milik Latihan. */const TAB_PARENT={nujum:'home',kana:'latihan',test:'home',vocab:'latihan',grammar:'latihan',reading:'latihan',writing:'latihan',library:'latihan',skills:'latihan',listening:'latihan',speaking:'latihan',learn:'home',arena:'online'};const activeTabEl=document.querySelector(`[data-view="${state.view}"]`)||(state.view==='profile'?document.querySelector('[data-view="online"]'):state.view==='online'?document.querySelector('[data-view="profile"]'):TAB_PARENT[state.view]?document.querySelector(`.bottomnav [data-view="${TAB_PARENT[state.view]}"]`):null);activeTabEl?.classList.add('active');/* m028 fase3: bendera panggung Skills Lab. Addon listening memaku blok tombolnya ke dasar layar (speaking-listening-addon.css), jadi ia panggung kedua yang bisa ditutupi gelembung. */document.body?.classList?.toggle?.('fz-stage-sl',['skills','listening','speaking'].includes(state.view));/* m028 fase3 (QA §9): Peta Belajar ikut jadi panggung ber-kontrol sejak panel NEXT SESSION punya tombol "Mulai sesi" di dekat dasar layar - screenshot QA menunjukkan gelembung PAW menutupinya utuh. Aturannya sama dengan kuis: peek dilarang, dok mengecil, layar diberi ruang bawah. */document.body?.classList?.toggle?.('fz-stage-map',state.view==='progress');/* 2026-08-29 overhaul I12 (O6 #10): bendera panggung Home. Wajah coach-strip adalah SATU-SATUNYA Pau di Home; gelembung FAB pengambang (Pau kedua, terukur menimpa lipatan hero/skill-hub di 390px) disembunyikan lewat CSS body.fz-stage-home — pola yang sama dengan fz-stage-sl/fz-stage-map, modul gelembung tidak disentuh. */document.body?.classList?.toggle?.('fz-stage-home',state.view==='home');/* q16-P2-2 2026-08-29: hub juga panggung ber-CTA-dekat-dasar (Review Due, Buka flashcards, Mulai 25 soal) \u2014 peek dilarang, dok mengecil, pola sama dengan sl/map. */document.body?.classList?.toggle?.('fz-stage-hub',['vocab','grammar','reading','library','test'].includes(state.view));document.body?.classList?.toggle?.('fz-stage-writing',state.view==='writing');/* v24-F2 2026-08-29: Writing = layar mengarang; FAB disembunyikan via CSS (pola fz-stage-home), modul gelembung tidak disentuh. *//* Kursus Jepang berpakaian sendiri: palet shu/ai/washi di fiezel-2.css menempel lewat bendera ini, jadi layar Inggris tidak tersentuh sama sekali; KelasKu guru punya palet sendiri (teacher-shell.css). */document.body?.classList?.toggle?.('fz-lang-ja',self.FiezelI18n?.getCourse?.()==='ja');try{self.FiezelJaUi?.applyPrefs?.()}catch(_){}enhanceUI();syncExamLockForView();syncCoachBubble();try{refreshNotifBadge()}catch(_){}try{updateTopbarCourseButton()}catch(_){}restoreActiveElement($('app'),savedActive);if(isViewChange){$('app')?.classList?.remove?.('is-repaint');window.scrollTo(0,0)}}
 // m025-115 - pembimbing yang ikut ke mana pun murid pergi (brief bagian 7).
 //
 // Gelembungnya dipasang SEKALI ke <body> dan tidak pernah ikut dicat ulang; yang dikirim
@@ -7415,7 +7415,7 @@ function syncCoachBubble(){
    tautan dalam layar, dan tur semuanya membawa nama view yang sudah ada, dan menghapus
    satu nama dari himpunan ini akan membuat go() menampilkan toast "halaman tak tersedia"
    pada perjalanan yang benar-benar valid. */
-const VALID_VIEWS=new Set(['kana','home','latihan','vocab','grammar','reading','skills','listening','speaking','writing','test','progress','classroom','library','ask','search','online','profile','learn','tutor','arena']);
+const VALID_VIEWS=new Set(['kana','home','latihan','vocab','grammar','reading','skills','listening','speaking','writing','test','progress','classroom','library','ask','search','online','profile','learn','tutor','arena','nujum']);
 function prefersReducedMotion(){try{return !!(self.matchMedia&&self.matchMedia('(prefers-reduced-motion: reduce)').matches)}catch(_){return false}}
 // m026-01 - maskot PAW. Tiga pembungkus di bawah ini adalah SATU-SATUNYA cara app.js
 // berbicara dengan <fiezel-mascot>. Alasannya:
@@ -9076,8 +9076,13 @@ function todayHomeMarkup(){
     </button>
   </section>`;
 
+  const nujumCard = (typeof self.FiezelNujum !== 'undefined' && typeof self.FiezelNujum.homeCardMarkup === 'function')
+    ? self.FiezelNujum.homeCardMarkup()
+    : '';
+
   return `<div class="today-home-cockpit fz-edu-cockpit">
   ${homeTop}
+  ${nujumCard}
   ${heroCta}
   ${card1Hero}
   ${quickChips}
@@ -11445,23 +11450,66 @@ function buildGrammarLessonQuestions(skill,count=GRAMMAR_SESSION_SIZE,opts={}){
   const exampleStem=String(own[0]?.[0]||'').replace(/\s+/g,' ').trim().toLowerCase();
   if(exampleStem&&out.length>1){const idx=out.findIndex(q=>String(q.question||'').replace(/\s+/g,' ').trim().toLowerCase().includes(exampleStem));if(idx===0)out.push(out.shift())}
   return out}
-/* m025-378: SESI LESSON 20 SOAL, DIACAK TIAP DIBUKA. Soal milik lesson dulu (acak templat &
- * ritme slot), lalu sisanya diisi ULANGAN dari lesson lain yang sudah terbuka di level yang sama:
- * satu soal per lesson per putaran, lesson diacak, stem tak boleh kembar. Soal ulangan ditandai
- * `reviewOf` (ditampilkan sebagai label kecil di kartu soal) dan tetap dicatat ke lesson asalnya,
- * jadi mastery lesson lain ikut terpelihara (retrieval berjarak). Soal pertama tetap isian biasa
+/* m025-378: SESI LESSON 20 SOAL, DIACAK TIAP DIBUKA. Soal milik lesson dulu (1 soal per templat,
+ * bebas repetisi kalimat/stem), lalu sisanya diisi ULANGAN dari lesson lain yang sudah terbuka
+ * di level yang sama (atau peer/foundation level jika lesson lain belum dibuka): satu soal per
+ * lesson per putaran, lesson diacak, stem tak boleh kembar. Soal ulangan ditandai `reviewOf`
+ * (ditampilkan sebagai label kecil di kartu soal) dan tetap dicatat ke lesson asalnya, jadi
+ * mastery lesson lain ikut terpelihara (retrieval berjarak). Soal pertama tetap isian biasa
  * milik lesson ini; soal ulangan disebar merata di antara soal lesson. */
 function buildGrammarSessionQuestions(skill,count=GRAMMAR_SESSION_SIZE){
-  const own=buildGrammarLessonQuestions(skill,count,{shuffle:true});
-  if(!own.length||own.length>=count)return own;
-  const seen=new Set(own.map(q=>String(q.question||'').toLowerCase().replace(/\s+/g,' ').trim()));
-  const pools=shuffle(grammarLessonReviewSkills(skill)).map(x=>[x,shuffle(buildGrammarModeQuestions(x,GRAMMAR_PRACTICE_SLOT_MODES,Number.MAX_SAFE_INTEGER))]).filter(([,p])=>p.length);
+  const meta=GRAMMAR_ITEMS.find(x=>x.skill===skill);if(!meta||meta.level!==getActiveLevel())return[];
+  const ownTemplates=G[skill]||[];if(!ownTemplates.length)return[];
+  const seenSourceIds=new Set(),seenStems=new Set();
+  const normStem=q=>String(q.sourceId||q.question||'').toLowerCase().replace(/“[^”]+” masih salah\. yang benar yang mana\?/i,'').replace(/pilih kalimat yang benar:/i,'').replace(/\s+/g,' ').trim();
+  const own=[];
+  const modes=['apply_form','complete_sentence','repair_distractor_1','repair_distractor_2','repair_distractor_3'];
+  const order=shuffle(Array.from({length:ownTemplates.length},(_,i)=>i));
+  if(order.length>1&&order[0]===0)order.push(order.shift());
+  for(let i=0;i<order.length;i++){
+    const ti=order[i],mode=modes[i%modes.length],variant=GRAMMAR_PRACTICE_MODES.indexOf(mode);
+    const q=variant>=0?makeGrammarQuestion(skill,ownTemplates[ti],variant,skill):null;
+    if(q&&grammarLessonQuestionOwnOnly(q)&&validateQuestion(q).ok){
+      const stem=normStem(q),src=q.sourceId||stem;
+      if(!seenSourceIds.has(src)&&!seenStems.has(stem)){
+        seenSourceIds.add(src);seenStems.add(stem);
+        own.push(q);
+      }
+    }
+  }
+  const exampleStem=String(ownTemplates[0]?.[0]||'').replace(/\s+/g,' ').trim().toLowerCase();
+  if(exampleStem&&own.length>1){const idx=own.findIndex(q=>String(q.question||'').replace(/\s+/g,' ').trim().toLowerCase().includes(exampleStem));if(idx===0)own.push(own.shift())}
+  if(!own.length)return[];
+  if(own.length>=count)return own.slice(0,count);
+
+  const reviewSkills=grammarLessonReviewSkills(skill);
+  const peerSkills=grammarItemsForLevel(meta.level).map(x=>x.skill).filter((x,i,a)=>a.indexOf(x)===i&&x!==skill&&(G[x]||[]).length);
+  const allLevels=['A1','A2','B1','B2','C1','C2'],currentLevelIdx=allLevels.indexOf(meta.level),earlierSkills=[];
+  for(let l=currentLevelIdx-1;l>=0;l--){
+    earlierSkills.push(...grammarItemsForLevel(allLevels[l]).map(x=>x.skill).filter((x,i,a)=>a.indexOf(x)===i&&(G[x]||[]).length));
+  }
+  const candidateSkillGroups=[reviewSkills,peerSkills,earlierSkills];
   const reviews=[];
-  while(reviews.length+own.length<count&&pools.some(([,p])=>p.length)){
-    for(const [from,pool] of pools){
-      if(reviews.length+own.length>=count)break;
-      let q;while(pool.length&&!q){const cand=pool.shift();const key=String(cand.question||'').toLowerCase().replace(/\s+/g,' ').trim();if(!seen.has(key)){seen.add(key);q=cand}}
-      if(q)reviews.push({...q,reviewOf:from});
+  for(const group of candidateSkillGroups){
+    if(own.length+reviews.length>=count)break;
+    const shufGroup=shuffle(group.filter(s=>s!==skill));
+    if(!shufGroup.length)continue;
+    const pools=shufGroup.map(s=>[s,shuffle(buildGrammarModeQuestions(s,GRAMMAR_PRACTICE_SLOT_MODES,Number.MAX_SAFE_INTEGER))]).filter(([,p])=>p.length);
+    let progressed=true;
+    while(own.length+reviews.length<count&&pools.some(([,p])=>p.length)&&progressed){
+      progressed=false;
+      for(const [from,pool] of pools){
+        if(own.length+reviews.length>=count)break;
+        let q;
+        while(pool.length&&!q){
+          const cand=pool.shift(),stem=normStem(cand),src=cand.sourceId||stem;
+          if(!seenSourceIds.has(src)&&!seenStems.has(stem)){
+            seenSourceIds.add(src);seenStems.add(stem);
+            q=cand;
+          }
+        }
+        if(q){reviews.push({...q,reviewOf:from});progressed=true}
+      }
     }
   }
   if(!reviews.length)return own;
@@ -11471,7 +11519,8 @@ function buildGrammarSessionQuestions(skill,count=GRAMMAR_SESSION_SIZE){
     if(k<reviews.length&&(i>=nextReview||r>=rest.length)){out.push(reviews[k++]);nextReview+=step}
     else out.push(rest[r++]);
   }
-  return out}
+  return out.slice(0,count);
+}
 function practiceSkill(skill){if((GRAMMAR_ITEMS.find(x=>x.skill===skill)?.level||'')!==getActiveLevel())return showToast(FiezelI18n.t('grammar.pilih-lesson-terlebih-dahulu',{level:getActiveLevel()}));const unlock=lessonUnlockState(skill,state,bktMasteredSkills());if(unlock.locked)return showToast(lessonLockMessage(unlock));const questions=buildGrammarSessionQuestions(skill,GRAMMAR_SESSION_SIZE);if(questions.length<GRAMMAR_SESSION_MIN)return showToast(FiezelI18n.t('grammar.lesson-new-memiliki-item-valid',{jumlahSoal:questions.length}));quizLoop({type:'grammar',count:Math.min(GRAMMAR_SESSION_SIZE,questions.length),pool:questions,factory:item=>item,preserveOrder:true})}
 /* ---- Sesi Kilat: 20 soal grammar campuran lintas lesson satu level ----------------------
  * Latihan singkat harian. Hanya lesson yang sudah terbuka di level aktif; soal dirotasi antar
@@ -14879,9 +14928,9 @@ function onlineView(){
   shell(FiezelI18n.t('social.shell-title'),FiezelI18n.t('social.shell-desc'),`${arenaDoor}${tabs}<div id="onlineRoot">${card(`<p class="muted">${FiezelI18n.t('social.loading')}</p>`)}</div>`);
   renderOnlineTab();
 }
+function socialOfflineCard(){const pending=(()=>{try{return socialCore()?.outboxPending()||0}catch(_){return 0}})();return card(`<h3>${FiezelI18n.t('social.offline-title')}</h3><p class="muted">${FiezelI18n.t('social.offline-body',{pendingNote:pending?FiezelI18n.t('social.offline-pending',{count:pending}):''})}</p>`,'social-card')}
 // Kartu keadaan yang dijanjikan spec: dua kalimat jujur, nol nada gagal. Belajar tidak
 // pernah butuh fitur ini, dan kartunya mengatakan itu.
-function socialOfflineCard(){const pending=(()=>{try{return socialCore()?.outboxPending()||0}catch(_){return 0}})();return card(`<h3>${FiezelI18n.t('social.offline-title')}</h3><p class="muted">${FiezelI18n.t('social.offline-body',{pendingNote:pending?FiezelI18n.t('social.offline-pending',{count:pending}):''})}</p>`,'social-card')}
 function socialFlagOffCard(flag){return flag==='offline'?socialOfflineCard():card(`<div class="social-soon" data-testid="social-soon"><span class="social-soon-icon"><i class="fz-i" data-fz-icon="speaking" aria-hidden="true"></i></span><h3>${FiezelI18n.t('social.flag-off-title')}</h3><p class="muted">${FiezelI18n.t('social.segera-body')}</p><button class="primary" onclick="go('latihan')" data-testid="social-soon-cta">${FiezelI18n.t('social.segera-cta')}</button></div>`,'social-card')}
 async function renderOnlineTab(){
   const seq=++onlineSeq;

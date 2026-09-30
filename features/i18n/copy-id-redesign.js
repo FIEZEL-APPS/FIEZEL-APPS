@@ -228,6 +228,23 @@
     'home.kartu3-perubahan': 'POIN VS MINGGU LALU',
     'home.kartu3-runtun': '🔥 {n} HARI',
     'home.kartu3-cta': 'LIHAT DETAIL PERKEMBANGAN',
-    'home.bukti-materi': 'Materi: {materi}'
+    'home.bukti-materi': 'Materi: {materi}',
+    /* ── FIEZEL NUJUM (The Ruthless Mentor) ────────────────────────────────── */
+    'nujum.status_broken': 'Status: Broken claim dicatat ke ledger kemenanganmu.',
+    'nujum.next_duel': 'Lanjut Duel Berikutnya →',
+    'nujum.dispute_claim': '⚡ SANGGAH KLAIM (Buktikan 3 Soal)',
+    'nujum.accept_next': 'Terima & Lanjut Ronde →',
+    'nujum.teleport_practice': 'Latih Materi Ini Sekarang (Modul Latihan) →',
+    'nujum.next_round': 'Lanjut Ronde Duel Berikutnya →',
+    'nujum.cancel_dispute': 'Batal Sanggah',
+    'nujum.start_dispute': 'Mulai Pembuktian 3 Soal →',
+    'nujum.dispute_status_revoked': 'Status: Label miskonsepsi DICABUT dari ledgermu.',
+    'nujum.dispute_status_failed': 'Status: Tuduhan mesin tetap berlaku. Masuk ke ruang latihan dan latih polanya.',
+    'nujum.surrender_unclear': 'Belum paham?',
+    'nujum.surrender_learn': 'Menyerah & Pelajari',
+    'nujum.speech_unsupported': 'Mikrofon Web Speech API tidak didukung di peramban ini. Silakan gunakan tombol kata di bawah.',
+    'nujum.empty_victories': 'Belum ada taruhan yang dipatahkan di sesi ini.',
+    'nujum.return_home': 'Kembali ke Beranda',
+    'nujum.home_cta': 'Masuk Arena Taruhan Suara →'
   });
 }());

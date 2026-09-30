@@ -46,5 +46,8 @@
     "invite:teacher": "node tools/mint-teacher-invite.mjs",
     "opencode:reset": "node tools/opencode-reset.js",
     "opencode:fresh-user": "node tools/opencode-reset.js --fresh-user"
+  },
+  "devDependencies": {
+    "playwright": "^1.63.0"
   }
 }
