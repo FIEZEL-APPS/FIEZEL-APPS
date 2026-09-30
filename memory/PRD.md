@@ -92,7 +92,7 @@ P1: paritas BKT klien-server, CI backend tests, hapus dead code. P2: refactor N+
   `origin/main`** pada 2026-06 (sebelumnya tertinggal ~2.300 commit) lalu dipatch.
 - Auth: satu pintu tiket KelasKu (`POST /api/auth/kelasku`, HMAC `CURRICULUM_TICKET_KEY`).
 - Env lokal `/app/backend/.env` (tidak di-commit): MONGO_URL, DB_NAME, JWT_SECRET,
-  CURRICULUM_TICKET_KEY, CORS_ORIGINS. Preview: https://grammar-no-theory.preview.emergentagent.com/api/health
+  CURRICULUM_TICKET_KEY, CORS_ORIGINS. Preview: https://nujum-prophecy.preview.emergentagent.com/api/health
 - Frontend repo = halaman statis (kurikulum.html, misi.html, features/*) — tidak disentuh.
 
 ## Yang sudah dikerjakan
