@@ -154,3 +154,8 @@ Lingkup: HANYA warna teks & latar (arahan: latar bersih cerah, tanpa redesign).
 
 ## Chip Kursus Jepang (2026-09-29) — m025-386
 - Ikon graduation-cap (tidak ada di set fz-i → kosong) diganti lencana あ merah-sakura; saat kursus Jepang aktif jadi lencana A biru (kembali ke Inggris). Kartu berwarna sendiri + panah; data-testid home-target-lang-chip.
+
+## Hero Feature Baru: BUG × Sarang (2026-09-30) — strategi + prototype
+- Keputusan OWNER: NUJUM direframe menjadi "BUG" — miskonsepsi (taksonomi + optionMisconceptions) jadi makhluk bernama dengan HP (BKT) yang pulih mengikuti kurva lupa; PAW = pemburu. Home "Hari Ini" diganti adegan "Sarang" (panel tinta di kertas hangat, 1 CTA). Antagonisnya adalah LUPA, bukan mesin.
+- Prototype standalone: `mockups/sarang-prototype.html` (Vanilla JS/CSS/Canvas/WebAudio, tanpa dependensi, 360px). Berisi Sarang (3 bug dummy + ring HP + PAW + kata hari ini), Beat Prediksi (mata menyala + counter %), 3 soal dummy, Bug Pecah (partikel Canvas + crack), Digigit (shake + lunge + vibrate + ejekan berbasis distraktor), hasil buruan, HP diperbarui saat kembali.
+- Backlog berurutan: (P0) integrasi ke engine NUJUM nyata + template ejekan per miskonsepsi; (P1) kartu share Canvas → Web Share API; (P1) "Bug kelas minggu ini" di KelasKu; (P2) Soal Sekelas harian (seed tanggal); (P2) Duel Bayangan via kode WA.
