@@ -20,11 +20,15 @@
 
   var doc = root.document;
 
-  function t(k, fallback) {
-    if (typeof root.FiezelI18n !== 'undefined' && root.FiezelI18n && typeof root.FiezelI18n.t === 'function') {
-      return root.FiezelI18n.t(k, fallback);
-    }
-    return fallback;
+  function t(k, fallback, params) {
+    var s;
+    try {
+      var I = (typeof self !== 'undefined' ? self : root).FiezelI18n;
+      s = I && I.t ? I.t(k, params) : undefined;
+    } catch (_) {}
+    if (s === undefined || s === k) s = fallback == null ? k : fallback;
+    if (params) s = String(s).replace(/\{(\w+)\}/g, function (m, n) { return Object.prototype.hasOwnProperty.call(params, n) ? String(params[n]) : m; });
+    return s;
   }
 
   // 65-Line Script Repository dari Script Bible v1.0
