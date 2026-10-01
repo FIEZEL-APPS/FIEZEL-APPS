@@ -29,4 +29,6 @@ const app = read('app.js');
 ok(/function grammarLessonRule\(item\)\{try\{const r=String\(grammarMeta\(item\)\.rule/.test(app), 'R2 grammarLessonRule membaca aturan template lewat grammarMeta');
 ok(/rule=grammarLessonRule\(item\),clue=grammarClue/.test(app), 'R2 intro materi memakai grammarLessonRule');
 ok(/const exampleStem=String\(own\[0\]\?\.\[0\]/.test(app) && /if\(idx===0\)unique\.push\(unique\.shift\(\)\)/.test(app), 'R3 soal 1 bukan kalimat contoh intro');
+ok(/function ensureConstructiveOpeningQuestion\(list\)/.test(app), 'R4 ensureConstructiveOpeningQuestion terpasang di generator soal grammar');
+ok(/ensureConstructiveOpeningQuestion\(out\)/.test(app) && /ensureConstructiveOpeningQuestion\(unique\)/.test(app), 'R4 sesi grammar menjamin soal 1 bebas dari mode repair / "masih salah"');
 console.log('FIEZEL grammar lesson rule: PASS (' + n + ')');
