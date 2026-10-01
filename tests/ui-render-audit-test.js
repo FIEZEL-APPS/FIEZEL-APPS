@@ -344,7 +344,13 @@ async function main() {
          gerbangnya DIBUKA paksa - sama seperti T2 - supaya invariannya tetap teruji. */
       await page.evaluate(() => {
         const g = document.getElementById('welcome');
-        if (g && g.classList.contains('hidden')) { try { window.setNotificationGateState('default'); } catch (_) {} }
+        if (g && g.classList.contains('hidden')) {
+          try {
+            if (window.state) window.state.ritualMeta = { lastDay: '' };
+            document.getElementById('fzRitual')?.remove();
+            window.setNotificationGateState('default');
+          } catch (_) {}
+        }
       });
       await page.waitForTimeout(600);
       const stacked = await page.evaluate(() => {
