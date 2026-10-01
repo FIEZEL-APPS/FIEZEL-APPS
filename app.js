@@ -11384,6 +11384,7 @@ function renderGrammarLesson(skill){const meta=GRAMMAR_ITEMS.find(x=>x.skill===s
  * selain 'own') ditolak di sini: sesi lesson hanya berisi teks milik lesson itu sendiri.
  * `modes` boleh diganti pemanggil (Sesi Kilat memakai lima mode bentuk). */
 function grammarLessonQuestionOwnOnly(q){return (q?.optionSources||[]).every(x=>x&&x.origin==='own')}
+function ensureConstructiveOpeningQuestion(list){if(!Array.isArray(list)||list.length<=1)return list;const isRepair=q=>{const txt=String(q?.question||'');return /masih salah|yang salah/i.test(txt)||(q?.mode&&String(q.mode).startsWith('repair_'))||(q?.mode&&String(q.mode).startsWith('diagnose_'))};if(!isRepair(list[0]))return list;const idx=list.findIndex(q=>!isRepair(q));if(idx>0){const [c]=list.splice(idx,1);list.unshift(c)}return list}
 function buildGrammarModeQuestions(skill,modes,count){const meta=GRAMMAR_ITEMS.find(x=>x.skill===skill);if(!meta||meta.level!==getActiveLevel())return[];const own=G[skill]||[];if(!own.length)return[];const unique=[],seen=new Set();const take=q=>{const signature=sigQ(q);if(grammarLessonQuestionOwnOnly(q)&&validateQuestion(q).ok&&!seen.has(signature)){seen.add(signature);unique.push(q);return true}return false};
   /* Audit F10 (2026-09-23): own[0] adalah CONTOH yang jawabannya sudah dipajang di layar
      materi; putaran pertama mulai dari item berikutnya (kalau ada), jadi soal pertama bukan
@@ -11399,6 +11400,7 @@ function buildGrammarModeQuestions(skill,modes,count){const meta=GRAMMAR_ITEMS.f
      contoh yang jawabannya baru saja ditunjukkan. */
   const exampleStem=String(own[0]?.[0]||'').replace(/\s+/g,' ').trim().toLowerCase();
   if(exampleStem&&unique.length>1){const idx=unique.findIndex(q=>String(q.question||'').replace(/\s+/g,' ').trim().toLowerCase().includes(exampleStem));if(idx===0)unique.push(unique.shift())}
+  ensureConstructiveOpeningQuestion(unique);
   return unique}
 /* m025-375: jumlah soal yang dijanjikan layar materi. Dua templat -> 10; satu templat -> 9
    (sembilan mode lesson). Dihitung dari data, tidak merakit soal hanya untuk menampilkan angka. */
@@ -11464,6 +11466,7 @@ function buildGrammarLessonQuestions(skill,count=GRAMMAR_SESSION_SIZE,opts={}){
      memajang kalimat contoh itu apa adanya dipindah ke akhir sesi. */
   const exampleStem=String(own[0]?.[0]||'').replace(/\s+/g,' ').trim().toLowerCase();
   if(exampleStem&&out.length>1){const idx=out.findIndex(q=>String(q.question||'').replace(/\s+/g,' ').trim().toLowerCase().includes(exampleStem));if(idx===0)out.push(out.shift())}
+  ensureConstructiveOpeningQuestion(out);
   return out}
 /* m025-378: SESI LESSON 20 SOAL, DIACAK TIAP DIBUKA. Soal milik lesson dulu (1 soal per templat,
  * bebas repetisi kalimat/stem), lalu sisanya diisi ULANGAN dari lesson lain yang sudah terbuka
@@ -11494,8 +11497,9 @@ function buildGrammarSessionQuestions(skill,count=GRAMMAR_SESSION_SIZE){
   }
   const exampleStem=String(ownTemplates[0]?.[0]||'').replace(/\s+/g,' ').trim().toLowerCase();
   if(exampleStem&&own.length>1){const idx=own.findIndex(q=>String(q.question||'').replace(/\s+/g,' ').trim().toLowerCase().includes(exampleStem));if(idx===0)own.push(own.shift())}
+  ensureConstructiveOpeningQuestion(own);
   if(!own.length)return[];
-  if(own.length>=count)return own.slice(0,count);
+  if(own.length>=count)return ensureConstructiveOpeningQuestion(own.slice(0,count));
 
   const reviewSkills=grammarLessonReviewSkills(skill);
   const peerSkills=grammarItemsForLevel(meta.level).map(x=>x.skill).filter((x,i,a)=>a.indexOf(x)===i&&x!==skill&&(G[x]||[]).length);
@@ -11527,14 +11531,14 @@ function buildGrammarSessionQuestions(skill,count=GRAMMAR_SESSION_SIZE){
       }
     }
   }
-  if(!reviews.length)return own;
+  if(!reviews.length)return ensureConstructiveOpeningQuestion(own);
   const out=[own[0]],rest=own.slice(1),step=(rest.length+reviews.length)/reviews.length;
   let nextReview=step/2;
   for(let i=0,r=0,k=0;r<rest.length||k<reviews.length;i++){
     if(k<reviews.length&&(i>=nextReview||r>=rest.length)){out.push(reviews[k++]);nextReview+=step}
     else out.push(rest[r++]);
   }
-  return out.slice(0,count);
+  return ensureConstructiveOpeningQuestion(out.slice(0,count));
 }
 function practiceSkill(skill){if((GRAMMAR_ITEMS.find(x=>x.skill===skill)?.level||'')!==getActiveLevel())return showToast(FiezelI18n.t('grammar.pilih-lesson-terlebih-dahulu',{level:getActiveLevel()}));const unlock=lessonUnlockState(skill,state,bktMasteredSkills());if(unlock.locked)return showToast(lessonLockMessage(unlock));const questions=buildGrammarSessionQuestions(skill,GRAMMAR_SESSION_SIZE);if(questions.length<GRAMMAR_SESSION_MIN)return showToast(FiezelI18n.t('grammar.lesson-new-memiliki-item-valid',{jumlahSoal:questions.length}));quizLoop({type:'grammar',count:Math.min(GRAMMAR_SESSION_SIZE,questions.length),pool:questions,factory:item=>item,preserveOrder:true})}
 /* ---- Sesi Kilat: 20 soal grammar campuran lintas lesson satu level ----------------------
