@@ -8818,3 +8818,35 @@ body .fz-hero-cta.is-resume,body.fz-lux .fz-hero-cta.is-resume{background:linear
   .fz-hero-cta,.option.correct,.option.wrong,.option.correct::after,.option.wrong::after,.combo-badge-flame,.result-stars svg.is-lit,.result-reward-chip{animation:none}
   .result-stars svg.is-lit{transform:none;opacity:1}
 }
+
+/* ===== Audit UX 2026-10 Perbaikan ===== */
+
+/* P0-3: Banner retry di atas opsi saat percobaan pertama salah */
+.quiz-retry-hint{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 14px;margin:0 0 8px;
+  border-radius:var(--radius-sm,18px);
+  background:var(--info-soft,#FBF3E2);
+  color:var(--info,#7A5512);
+  font-size:.88rem;font-weight:600;
+  animation:riseIn .4s var(--ease-spring,cubic-bezier(.34,1.4,.4,1)) both;
+}
+.quiz-retry-hint svg{width:16px;height:16px;flex-shrink:0}
+@media(prefers-reduced-motion:reduce){.quiz-retry-hint{animation:none}}
+
+/* P2-4: Retention peek di layar kemenangan (di luar lipatan details) */
+.result-peek{
+  display:flex;align-items:center;gap:6px;justify-content:center;
+  margin:4px 0;
+  font-size:.88rem;font-weight:600;
+  color:var(--muted,#6E635C);
+}
+.result-peek svg{width:15px;height:15px;flex-shrink:0}
+.result-peek b{color:var(--good-bright,#2E8B69)}
+
+/* P2-5: Review tag visual hierarchy — aksen biru untuk soal ulangan */
+.quiz-review-tag{
+  background:rgba(41,121,255,.08) !important;
+  border-color:rgba(41,121,255,.22) !important;
+  color:var(--info,#2979FF) !important;
+}
