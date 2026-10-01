@@ -1,19 +1,19 @@
 /* FIEZEL BUG — Sarang (Home) + Perburuan. Palet: tinta #2E2724 di kertas hangat #FBF7F3. Prefix fzb- */
 
 /* ---------------- ADIGAN SARANG (Home) ---------------- */
-.fzb-sarang{position:relative;margin:6px 0 12px;height:505px;border-radius:22px;background:#2E2724;color:#FBF7F3;overflow:hidden;box-shadow:0 18px 40px -22px rgba(46,39,36,.6);--tx:50;--ty:52}
-.fzb-sarang::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(60% 45% at 50% 62%,rgba(155,58,74,.30),transparent 70%),radial-gradient(40% 30% at 15% 10%,rgba(247,234,203,.07),transparent 70%)}
-.fzb-fog{position:absolute;inset:-20%;pointer-events:none;opacity:.5;background:radial-gradient(30% 25% at 30% 70%,rgba(233,180,76,.10),transparent 70%),radial-gradient(25% 20% at 75% 40%,rgba(127,183,164,.10),transparent 70%);animation:fzbFog 14s ease-in-out infinite alternate}
+.fzb-sarang{position:relative;margin:6px 0 12px;height:515px;border-radius:26px;background:radial-gradient(120% 90% at 50% 10%,#282220 0%,#141110 80%);border:1px solid rgba(255,217,79,.22);color:#FBF7F3;overflow:hidden;box-shadow:0 24px 50px -12px rgba(0,0,0,.65),inset 0 1px 0 rgba(255,255,255,.08);--tx:50;--ty:52}
+.fzb-sarang::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(60% 45% at 50% 62%,rgba(155,58,74,.32),transparent 70%),radial-gradient(45% 35% at 20% 15%,rgba(255,217,79,.08),transparent 70%)}
+.fzb-fog{position:absolute;inset:-20%;pointer-events:none;opacity:.55;background:radial-gradient(30% 25% at 30% 70%,rgba(233,180,76,.12),transparent 70%),radial-gradient(25% 20% at 75% 40%,rgba(16,185,129,.10),transparent 70%);animation:fzbFog 14s ease-in-out infinite alternate}
 @keyframes fzbFog{to{transform:translate(4%,-3%) scale(1.06)}}
-.fzb-label{position:absolute;top:14px;left:18px;font-size:11px;letter-spacing:.22em;font-weight:800;color:#F7EACB;opacity:.75}
-.fzb-sub{position:absolute;top:30px;left:18px;font-size:12px;color:rgba(251,247,243,.6)}
-.fzb-fosil-chip{position:absolute;top:14px;right:16px;font-size:10px;letter-spacing:.14em;font-weight:900;color:#7FB7A4;border:1px solid rgba(127,183,164,.4);border-radius:999px;padding:4px 9px}
+.fzb-label{position:absolute;top:16px;left:18px;font-size:11px;letter-spacing:.22em;font-weight:800;color:#FFD94F;text-shadow:0 0 10px rgba(255,217,79,.35)}
+.fzb-sub{position:absolute;top:32px;left:18px;font-size:12px;color:rgba(251,247,243,.7);font-weight:500}
+.fzb-fosil-chip{position:absolute;top:16px;right:16px;font-size:10.5px;letter-spacing:.08em;font-weight:800;color:#10B981;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.35);border-radius:999px;padding:4px 10px;box-shadow:0 0 10px rgba(16,185,129,.15)}
 
 /* Tombol Bug di Diorama Sarang — isolasi ketat dari body.fz-lux button */
 body .fzb-sarang button.fzb-bug,
 body.fz-lux .fzb-sarang button.fzb-bug {
   position:absolute!important;
-  width:96px!important;
+  width:100px!important;
   height:auto!important;
   min-height:0!important;
   display:block!important;
@@ -28,10 +28,19 @@ body.fz-lux .fzb-sarang button.fzb-bug {
   cursor:pointer!important;
   box-shadow:none!important;
   -webkit-tap-highlight-color:transparent;
+  transition:transform .18s cubic-bezier(.34,1.56,.64,1)!important;
+}
+body .fzb-sarang button.fzb-bug:hover,
+body.fz-lux .fzb-sarang button.fzb-bug:hover {
+  transform:translate(-50%,-50%) scale(1.08)!important;
+}
+body .fzb-sarang button.fzb-bug:active,
+body.fz-lux .fzb-sarang button.fzb-bug:active {
+  transform:translate(-50%,-50%) scale(.95)!important;
 }
 .fzb-bug.fzb-ghost{
   position:absolute;
-  width:96px;
+  width:100px;
   text-align:center;
   color:#FBF7F3;
   transform:translate(-50%,-50%);
@@ -41,10 +50,10 @@ body.fz-lux .fzb-sarang button.fzb-bug {
 .fzb-ghost .fzb-ring{border:2px dashed rgba(251,247,243,.3);border-radius:50%}
 .fzb-ghost-q{position:absolute;inset:0;display:grid;place-items:center;font-size:26px;font-weight:900;color:rgba(251,247,243,.5)}
 
-.fzb-ring{position:relative;display:block;width:72px;height:72px;margin:0 auto}
+.fzb-ring{position:relative;display:block;width:76px;height:76px;margin:0 auto;filter:drop-shadow(0 4px 12px rgba(0,0,0,.45))}
 .fzb-ring .fzb-hp{position:absolute;inset:0;transform:rotate(-90deg)}
 .fzb-trk{stroke:rgba(251,247,243,.14)}
-.fzb-val{stroke:#E9B44C;stroke-linecap:round;transition:stroke-dashoffset .9s cubic-bezier(.2,.8,.2,1)}
+.fzb-val{stroke:#FFD94F;stroke-linecap:round;transition:stroke-dashoffset .9s cubic-bezier(.2,.8,.2,1);filter:drop-shadow(0 0 6px rgba(255,217,79,.45))}
 .fzb-body{position:absolute;inset:8px;display:grid;place-items:center;animation:fzbIdle 3.6s ease-in-out infinite}
 .fzb-bug:nth-of-type(2) .fzb-body{animation-delay:-1.2s}.fzb-bug:nth-of-type(3) .fzb-body{animation-delay:-2.4s}
 @keyframes fzbIdle{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-4px) rotate(2deg)}}
@@ -52,43 +61,46 @@ body.fz-lux .fzb-sarang button.fzb-bug {
 @keyframes fzbLegs{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
 .fzb-antena{transform-box:fill-box;transform-origin:bottom center;animation:fzbAntena 2.2s ease-in-out infinite}
 @keyframes fzbAntena{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}}
-.fzb-name{display:block!important;margin-top:6px!important;font-size:12px!important;font-weight:800!important;color:#FBF7F3!important;white-space:nowrap!important;text-shadow:0 1px 3px rgba(0,0,0,.6)}
-.fzb-hpv{display:block!important;font-size:10.5px!important;color:rgba(251,247,243,.62)!important;font-variant-numeric:tabular-nums!important;white-space:nowrap!important}
-.fzb-hpv.warn{color:#E9B44C!important;font-weight:800!important}.fzb-hpv.low{color:#7FB7A4!important;font-weight:800!important}
-.fzb-target .fzb-ring::before{content:"";position:absolute;inset:-6px;border-radius:50%;background:radial-gradient(circle,var(--c,#E9B44C) 0,transparent 70%);opacity:.35;animation:fzbMenace 1.6s ease-in-out infinite}
+.fzb-name{display:block!important;margin-top:6px!important;font-size:12px!important;font-weight:800!important;color:#FBF7F3!important;white-space:nowrap!important;text-shadow:0 2px 4px rgba(0,0,0,.8)}
+.fzb-hpv{display:inline-block!important;margin-top:2px!important;font-size:10.5px!important;color:rgba(251,247,243,.75)!important;font-variant-numeric:tabular-nums!important;white-space:nowrap!important;padding:2px 7px!important;border-radius:999px!important;background:rgba(0,0,0,.35)!important;border:1px solid rgba(255,255,255,.08)!important}
+.fzb-hpv.warn{color:#FFD94F!important;border-color:rgba(255,217,79,.4)!important;font-weight:800!important;background:rgba(255,217,79,.12)!important}
+.fzb-hpv.low{color:#10B981!important;border-color:rgba(16,185,129,.4)!important;font-weight:800!important;background:rgba(16,185,129,.12)!important}
+.fzb-target .fzb-ring::before{content:"";position:absolute;inset:-8px;border-radius:50%;background:radial-gradient(circle,var(--c,#FFD94F) 0,transparent 70%);opacity:.45;animation:fzbMenace 1.6s ease-in-out infinite}
 .fzb-target .fzb-body{animation:fzbIdleT 1.6s ease-in-out infinite}
-.fzb-target .fzb-eye{filter:drop-shadow(0 0 4px var(--c,#E9B44C))}
-@keyframes fzbMenace{0%,100%{transform:scale(.9);opacity:.25}50%{transform:scale(1.15);opacity:.55}}
-@keyframes fzbIdleT{0%,100%{transform:scale(1) translateY(0)}50%{transform:scale(1.07) translateY(-3px)}}
+.fzb-target .fzb-eye{filter:drop-shadow(0 0 6px var(--c,#FFD94F))}
+@keyframes fzbMenace{0%,100%{transform:scale(.9);opacity:.3}50%{transform:scale(1.18);opacity:.65}}
+@keyframes fzbIdleT{0%,100%{transform:scale(1) translateY(0)}50%{transform:scale(1.08) translateY(-3px)}}
 .fzb-poke .fzb-body{animation:fzbPoke .5s cubic-bezier(.3,1.5,.4,1)}
 @keyframes fzbPoke{30%{transform:scale(1.3) rotate(-10deg)}}
 
-.fzb-paw{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);width:124px;height:124px;filter:drop-shadow(0 10px 20px rgba(0,0,0,.45));animation:fzbSway 5s ease-in-out infinite}
+.fzb-paw{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);width:124px;height:124px;filter:drop-shadow(0 12px 24px rgba(0,0,0,.55));animation:fzbSway 5s ease-in-out infinite}
 .fzb-paw>*{width:100%!important;height:100%!important}
 @keyframes fzbSway{0%,100%{transform:translate(-50%,-50%) rotate(-1.5deg)}50%{transform:translate(-50%,-50%) rotate(1.5deg)}}
 
 .fzb-whisper{
   position:absolute;
   left:50%;
-  top:20%;
+  top:18%;
   transform:translateX(-50%);
   display:flex;
   align-items:center;
   gap:8px;
-  background:rgba(251,247,243,.10);
-  border:1px solid rgba(251,247,243,.14);
-  backdrop-filter:blur(10px);
-  -webkit-backdrop-filter:blur(10px);
+  background:rgba(20,18,17,.75);
+  border:1px solid rgba(255,217,79,.25);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
   border-radius:999px;
-  padding:6px 14px 6px 10px;
-  font-size:11px;
+  padding:7px 16px 7px 12px;
+  font-size:11.5px;
   max-width:92%;
   box-sizing:border-box;
   white-space:normal;
   text-align:left;
-  line-height:1.3;
+  line-height:1.35;
+  color:#FBF7F3;
+  box-shadow:0 8px 24px rgba(0,0,0,.45);
 }
-.fzb-spk{width:8px;height:8px;border-radius:50%;background:#E9B44C;flex:none;box-shadow:0 0 0 4px rgba(233,180,76,.25)}
+.fzb-spk{width:8px;height:8px;border-radius:50%;background:#FFD94F;flex:none;box-shadow:0 0 0 4px rgba(255,217,79,.25)}
 
 /* CTA Buru Bug di Sarang */
 body .fzb-sarang button.fzb-cta,
@@ -97,11 +109,11 @@ body.fz-lux .fzb-sarang button.fzb-cta {
   left:16px!important;
   right:16px!important;
   bottom:16px!important;
-  height:62px!important;
-  min-height:62px!important;
-  border-radius:18px!important;
-  background:#F7EACB!important;
-  color:#2E2724!important;
+  height:64px!important;
+  min-height:64px!important;
+  border-radius:20px!important;
+  background:linear-gradient(135deg,#FFD94F 0%,#FFB800 100%)!important;
+  color:#1A1412!important;
   display:flex!important;
   align-items:center!important;
   justify-content:space-between!important;
@@ -111,16 +123,26 @@ body.fz-lux .fzb-sarang button.fzb-cta {
   font-size:15px!important;
   letter-spacing:.02em!important;
   border:0!important;
-  box-shadow:0 12px 26px -12px rgba(247,234,203,.55),inset 0 -3px 0 rgba(46,39,36,.12)!important;
+  box-shadow:0 12px 28px -6px rgba(255,184,0,.45),inset 0 -2px 0 rgba(0,0,0,.15)!important;
   overflow:hidden!important;
   text-align:left!important;
   cursor:pointer!important;
   width:auto!important;
+  transition:transform .12s ease,box-shadow .15s ease!important;
+}
+body .fzb-sarang button.fzb-cta:hover,
+body.fz-lux .fzb-sarang button.fzb-cta:hover {
+  transform:translateY(-1px)!important;
+  box-shadow:0 16px 32px -6px rgba(255,184,0,.55)!important;
+}
+body .fzb-sarang button.fzb-cta:active,
+body.fz-lux .fzb-sarang button.fzb-cta:active {
+  transform:translateY(1px)!important;
 }
 .fzb-cta::after{content:"";position:absolute;top:0;bottom:0;width:40%;left:-60%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);animation:fzbSheen 4s ease-in-out infinite}
 @keyframes fzbSheen{0%,60%{left:-60%}100%{left:130%}}
-.fzb-cta small{display:block;font-size:10.5px;font-weight:800;color:#9B3A4A;letter-spacing:.06em}
-.fzb-arrow{width:40px;height:40px;border-radius:50%;background:#2E2724;color:#F7EACB;display:grid;place-items:center;font-size:18px;flex:none}
+.fzb-cta small{display:block;font-size:10.5px;font-weight:800;color:#8B2C3B;letter-spacing:.06em}
+.fzb-arrow{width:40px;height:40px;border-radius:50%;background:#1A1412;color:#FFD94F;display:grid;place-items:center;font-size:18px;flex:none}
 
 /* ---------------- BEAT PREDIKSI (Layar Transisi Intersepsi) ---------------- */
 .fzb-beat{position:fixed;inset:0;z-index:9000;background:#120E0D;color:#FBF7F3;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;opacity:0;transition:opacity .22s ease;font-family:inherit}
