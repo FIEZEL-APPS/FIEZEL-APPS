@@ -133,7 +133,7 @@ async def main():
     cov = await bc.coverage_matrix("K1")
     row = cov["rows"][0]
     print(f"  coverage row: status={row['status']} mastery_pct={row['mastery_pct']} note={row['note']}")
-    check("B7 FIX: note GAP memakai PROPORSI MURID nyata (bukan 100 − rerata posterior)",
+    check("B7 FIX: note GAP memakai PROPORSI MURID nyata (bukan 100 - rerata posterior)",
           row["status"] == "GAP" and "yang aktif) belum mencapai mastery" in row["note"]
           and "% murid (" in row["note"],
           f"note={row['note']}")

@@ -11,6 +11,10 @@ from dotenv import load_dotenv
 load_dotenv(os.path.join(_here, ".env"))
 load_dotenv("/app/backend/.env")
 
+# Fallback dummy env vars untuk pengujian murni tanpa server live
+os.environ.setdefault("MONGO_URL", "mongodb://localhost:27017")
+os.environ.setdefault("DB_NAME", "fiezel_unit_test")
+
 import braincore as bc
 from questions import parse_paste, validate_doc, stem_hash
 from assessment import check_blueprint, assemble
