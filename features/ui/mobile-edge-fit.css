@@ -216,8 +216,41 @@ html body.fz-lang-ja nav.bottomnav .nav[data-view="classroom"].active span {
 .fz-welcome-header {
   display: flex !important;
   flex-direction: column !important;
-  gap: 4px !important;
+  gap: 6px !important;
+  margin-bottom: 6px !important;
+}
+.fz-greet-top-row {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
   margin-bottom: 2px !important;
+}
+.fz-greet-sky-pill {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 4px 10px !important;
+  border-radius: 9999px !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: #FFD94F !important;
+  letter-spacing: 0.02em !important;
+}
+.fz-streak-glow-pill {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  padding: 4px 12px !important;
+  border-radius: 9999px !important;
+  background: linear-gradient(135deg, rgba(255, 217, 79, 0.18) 0%, rgba(255, 153, 0, 0.12) 100%) !important;
+  border: 1px solid rgba(255, 217, 79, 0.35) !important;
+  font-size: 11.5px !important;
+  font-weight: 800 !important;
+  color: #FFD94F !important;
+  box-shadow: 0 0 12px rgba(255, 217, 79, 0.2) !important;
 }
 .fz-greet-title {
   font-size: 24px !important;
@@ -229,9 +262,101 @@ html body.fz-lang-ja nav.bottomnav .nav[data-view="classroom"].active span {
 .fz-greet-motivation {
   font-size: 13.5px !important;
   font-weight: 500 !important;
-  color: rgba(255, 255, 255, 0.65) !important;
+  color: rgba(255, 255, 255, 0.72) !important;
   line-height: 1.45 !important;
   margin: 0 !important;
+}
+
+/* ==========================================================================
+   DAILY RITUAL ANCHOR (HABIT-FORMING MICRO-CHECKLIST)
+   ========================================================================== */
+.fz-ritual-anchor-box {
+  background: #14141E !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 20px !important;
+  padding: 14px 16px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
+  margin: 2px 0 !important;
+}
+.fz-ritual-anchor-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+.fz-ritual-anchor-title {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  color: #FFFFFF !important;
+  letter-spacing: -0.01em !important;
+}
+.fz-ritual-badge {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: #10B981 !important;
+  background: rgba(16, 185, 129, 0.12) !important;
+  padding: 3px 8px !important;
+  border-radius: 9999px !important;
+  border: 1px solid rgba(16, 185, 129, 0.25) !important;
+}
+.fz-ritual-checklist {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+}
+.fz-ritual-check-item {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding: 7px 10px !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  border-radius: 10px !important;
+  border: 1px solid rgba(255, 255, 255, 0.04) !important;
+  font-size: 12px !important;
+  color: rgba(255, 255, 255, 0.8) !important;
+  font-weight: 600 !important;
+}
+.fz-ritual-check-item.is-done {
+  background: rgba(16, 185, 129, 0.06) !important;
+  border-color: rgba(16, 185, 129, 0.2) !important;
+  color: #FFFFFF !important;
+}
+.fz-check-dot {
+  width: 18px !important;
+  height: 18px !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: rgba(255, 255, 255, 0.6) !important;
+  flex-shrink: 0 !important;
+}
+.fz-ritual-check-item.is-done .fz-check-dot {
+  background: #10B981 !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.5) !important;
+}
+.fz-check-label {
+  flex: 1 !important;
+  min-width: 0 !important;
+}
+.fz-confidence-quote {
+  font-size: 11.5px !important;
+  font-weight: 500 !important;
+  color: rgba(255, 217, 79, 0.9) !important;
+  background: rgba(255, 217, 79, 0.08) !important;
+  border: 1px dashed rgba(255, 217, 79, 0.25) !important;
+  padding: 7px 10px !important;
+  border-radius: 10px !important;
+  line-height: 1.4 !important;
 }
 
 /* ==========================================================================
