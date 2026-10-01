@@ -16,7 +16,7 @@ from db import db
 from auth import current_user
 import braincore as bc
 from assessment import ASSESSMENT_TYPES
-from access import assert_student_access, assert_class_teacher, student_targeted
+from access import assert_student_access, assert_class_teacher, assert_assessment_access, student_targeted
 
 router = APIRouter(prefix="/api/learning", tags=["learning"])
 
@@ -267,9 +267,8 @@ async def start_session(body: StartIn, u=Depends(current_user)):
     a = await db.assessments.find_one({"id": body.assessment_id}, {"_id": 0})
     if not a:
         raise HTTPException(404, "asesmen tidak ditemukan")
+    await assert_assessment_access(a, u)
     if u["role"] == "student":
-        if not student_targeted(a, u):
-            raise HTTPException(403, "Asesmen ini bukan untukmu")
         if u["user_id"] not in (a.get("student_ids") or []):
             await db.assessments.update_one({"id": a["id"]}, {"$addToSet": {"student_ids": u["user_id"]}})
     existing = await db.sessions.find_one({"assessment_id": a["id"], "student_id": u["user_id"],
@@ -670,12 +669,27 @@ async def sync_state(body: StateSyncIn, u=Depends(current_user)):
     for item in body.competencies:
         st = await bc.get_state(sid, item.competency_id)
         if item.attempts > st.get("attempts", 0):
+            delta_attempts = item.attempts - st.get("attempts", 0)
+            item_correct = min(item.attempts, max(0, item.correct))
+            delta_correct = min(delta_attempts, max(0, item_correct - st.get("correct", 0)))
+            delta_wrong = delta_attempts - delta_correct
+
             st["attempts"] = item.attempts
-            st["correct"] = max(st.get("correct", 0), item.correct)
-            st["streak"] = item.streak
-            st["hints_used"] = max(st.get("hints_used", 0), item.hints_used)
-            st["retries"] = max(st.get("retries", 0), item.retries)
-            st["p_mastery"] = round(max(0.01, min(0.99, item.p_mastery)), 4)
+            st["correct"] = st.get("correct", 0) + delta_correct
+            st["streak"] = min(st["correct"], max(0, item.streak))
+            st["hints_used"] = max(st.get("hints_used", 0), max(0, item.hints_used))
+            st["retries"] = max(st.get("retries", 0), max(0, item.retries))
+
+            # Server-side BKT recalculation from initial/decayed state to prevent client spoofing
+            p = st.get("p_mastery_decayed", st.get("p_mastery", bc.P_INIT))
+            for _ in range(delta_wrong):
+                p = bc.bkt_step(p, False)
+            for _ in range(delta_correct):
+                p = bc.bkt_step(p, True)
+
+            client_p = max(0.01, min(0.99, item.p_mastery))
+            st["p_mastery"] = round(min(p, client_p), 4)
+            st["client_claimed"] = True
             st["stability_days"] = max(0.5, item.stability_days)
             if item.due_at:
                 st["due_at"] = item.due_at

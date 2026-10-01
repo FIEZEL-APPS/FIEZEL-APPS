@@ -421,6 +421,19 @@
    */
   var MISS_STREAK_STOP = 3;
   var FAST_CORRECT_STRETCH = 4;
+  /**
+   * Di atas ambang ini, dua kali salah tanpa bukti spesifik dibaca sebagai KESELEO, bukan miskonsepsi.
+   *
+   * 0,8 dipilih supaya selaras dengan ambang penguasaan server (MASTERY_T = 0.80):
+   * murid tidak perlu sudah "lulus" sebuah konsep untuk berhak tidak diajari ulang gara-gara
+   * dua jawaban meleset. Ambang yang sama ketatnya dengan gerbang penguasaan akan membuat
+   * pagar ini hampir tidak pernah menyala.
+   *
+   * Yang TIDAK dilonggarkan: miskonsepsi yang memang ada buktinya (precision === 'misconception')
+   * tetap diajar ulang berapa pun mastery-nya. Murid yang sudah mahir pun bisa memegang satu
+   * keyakinan keliru, dan itulah justru yang paling layak disentuh.
+   */
+  var MASTERY_NO_RETEACH = 0.8;
   function decideMove(state, diagnosis, context) {
     var s = state || {};
     var d = diagnosis || {};
@@ -435,8 +448,21 @@
     }
     // 2. Miskonsepsi yang sama dua kali bukan kebetulan. Soal berikutnya dengan pola yang
     //    sama akan salah lagi; yang perlu disentuh keyakinannya, bukan itemnya.
+    //
+    //    DUA SYARAT:
+    //    (a) "Miskonsepsi" hanya boleh disebut bila memang ADA buktinya (precision === 'misconception').
+    //    (b) Dua kali salah tanpa bukti spesifik pada murid ber-mastery tinggi (>= 0.80)
+    //        dibaca sebagai keseleo (slip), sehingga diberi hint, bukan dipaksa reteach.
     if (!d.correct && num(d.repeats) >= 2) {
-      return { move: 'reteach', reason: 'persistent_misconception', urgency: 'high', misconception: d.misconception };
+      var berbukti = d.precision === 'misconception';
+      if (berbukti) {
+        return { move: 'reteach', reason: 'persistent_misconception', urgency: 'high', misconception: d.misconception };
+      }
+      var mastery = num(ctx.mastery, -1);
+      if (mastery >= MASTERY_NO_RETEACH) {
+        return { move: 'hint', reason: 'likely_slip_high_mastery', urgency: 'normal' };
+      }
+      return { move: 'reteach', reason: 'repeated_miss_same_skill', urgency: 'high' };
     }
     // 3. Tiga salah berturut-turut: berhenti menguji, mulai mengajar.
     if (num(s.missStreak) >= MISS_STREAK_STOP) {

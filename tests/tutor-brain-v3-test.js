@@ -167,6 +167,31 @@ test('miskonsepsi yang sama dua kali mengubah tindakan menjadi mengajar ulang', 
   assert.strictEqual(second.misconception, MAP.prepares, 'yang diajar ulang harus disebut namanya');
 });
 
+test('dua kali salah tanpa miskonsepsi bernama pada murid berkemampuan tinggi dibaca sebagai keseleo', () => {
+  const s = session();
+  const a1 = T.record(s, {
+    correct: false, chosenOption: 'x', optionMisconceptions: null,
+    skill: 'reading_detail', concept: 'reading_detail', ms: 8000, now: NOW
+  });
+  const m1 = T.decideMove(s, a1, { remaining: 8, mastery: 0.9 });
+  assert.strictEqual(m1.move, 'hint');
+
+  const a2 = T.record(s, {
+    correct: false, chosenOption: 'x', optionMisconceptions: null,
+    skill: 'reading_detail', concept: 'reading_detail', ms: 8000, now: NOW
+  });
+  const m2 = T.decideMove(s, a2, { remaining: 7, mastery: 0.9 });
+  assert.strictEqual(m2.move, 'hint', 'murid mastery tinggi (>=0.8) tidak diajar ulang karena keseleo');
+  assert.strictEqual(m2.reason, 'likely_slip_high_mastery');
+
+  const sLow = session();
+  T.record(sLow, { correct: false, chosenOption: 'x', optionMisconceptions: null, skill: 'reading_detail', concept: 'reading_detail', ms: 8000, now: NOW });
+  const aLow2 = T.record(sLow, { correct: false, chosenOption: 'x', optionMisconceptions: null, skill: 'reading_detail', concept: 'reading_detail', ms: 8000, now: NOW });
+  const mLow = T.decideMove(sLow, aLow2, { remaining: 7, mastery: 0.4 });
+  assert.strictEqual(mLow.move, 'reteach', 'murid mastery rendah tetap diajar ulang');
+  assert.strictEqual(mLow.reason, 'repeated_miss_same_skill');
+});
+
 test('salah karena sebab yang berbeda-beda tidak dianggap pola — tetapi tiga beruntun tetap dihentikan', () => {
   const s = session();
   const opts = ['prepares', 'has prepared', 'prepare'];

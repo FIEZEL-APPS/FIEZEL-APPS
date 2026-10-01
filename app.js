@@ -4952,7 +4952,10 @@ function tutorObserve(session,q,pickedIndex,ok,ms,ctx={}){
     // dan decideMove menerima opts yang sama persis seperti sebelum Fase 2.
     const affect=affectObserve(q,ok,ms,diagnosis?.timing);
     const affectState=String(affect?.state||affectSessionSync()?.state||'');
-    const decision=T.decideMove(session,diagnosis,{remaining:Number(ctx.remaining)||0,fatigue:coreBrainSnapshot()?.fatigue?.state||'',...(affectState&&affectState!=='neutral'?{affect:{state:affectState}}:{})});
+    const tutorLesson=String(q?.lessonSkill||q?.skill||'');
+    let tutorMastery=null;
+    try{if(bktAvailable()&&tutorLesson){const mm=self.FiezelMasteryBKT.mastery(bktRead(),tutorLesson);if(Number.isFinite(Number(mm?.L)))tutorMastery=Number(mm.L)}}catch{}
+    const decision=T.decideMove(session,diagnosis,{remaining:Number(ctx.remaining)||0,fatigue:coreBrainSnapshot()?.fatigue?.state||'',...(tutorMastery!==null?{mastery:tutorMastery}:{}),...(affectState&&affectState!=='neutral'?{affect:{state:affectState}}:{})});
     // Braincore v3 (T5): setiap diagnosis juga menjadi bukti di buku besar lintas sesi.
     // Hanya jawaban ternilai (bukan retry) - retry adalah bukti scaffolding, bukan bukti
     // keyakinan murid. Fungsi ini punya try/catch sendiri: gagal menulis ledger tidak boleh

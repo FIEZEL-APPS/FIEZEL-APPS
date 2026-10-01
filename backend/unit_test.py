@@ -296,6 +296,29 @@ async def test_state_sync():
     check("sync_state merekonsiliasi kompetensi klien", res["client_competencies_received"] == 1)
     check("sync_state mencatat pembaruan server", res["server_updated_count"] >= 1)
 
+    # Anti-tamper: klaim palsu p_mastery=0.99 dengan 1 attempt salah tidak boleh menjadi MASTERED
+    payload_fake = StateSyncIn(
+        competencies=[
+            CompetencySyncIn(
+                competency_id="COMP-FAKE-01",
+                p_mastery=0.99,
+                attempts=1,
+                correct=0,
+                streak=0,
+                stability_days=1.0
+            )
+        ]
+    )
+    await sync_state(payload_fake, u=user)
+    saved_state = await bc.get_state("STUDENT-1", "COMP-FAKE-01")
+    check("sync_state menolak klaim p_mastery palsu tanpa bukti", saved_state["p_mastery"] <= 0.25)
+    check("sync_state tidak menandai MASTERED untuk klaim palsu", saved_state["state"] != "MASTERED")
+
+
+async def test_empty_competency_ids():
+    res = await bc.next_best_item("STUDENT-1", [], [])
+    check("next_best_item tidak crash (500) pada competency_ids kosong", res is None)
+
 
 def test_shuffled_questions_and_options():
     q = {
@@ -325,6 +348,7 @@ async def main():
     await test_validation()
     await test_blueprint()
     await test_state_sync()
+    await test_empty_competency_ids()
     test_shuffled_questions_and_options()
     print(f"\n=== {ok} PASS / {fail} FAIL ===")
     if fail:

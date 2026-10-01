@@ -292,6 +292,11 @@ async def _build_assessment(body: AssessmentIn, u: dict) -> dict:
         comps = await db.curriculum_nodes.find({"type": "competency", "tp_id": {"$in": tp_ids}},
                                                 {"_id": 0, "id": 1}).to_list(500)
         comp_ids = [c["id"] for c in comps]
+    if body.student_ids:
+        class_students = set(cls.get("student_ids") or [])
+        invalid_students = set(body.student_ids) - class_students
+        if invalid_students:
+            raise HTTPException(403, "Ada murid yang bukan anggota kelas ini")
     whole_class = not body.student_ids
     students = body.student_ids or (cls.get("student_ids") or [])
     doc = {"id": f"AS-{uuid.uuid4().hex[:8].upper()}", "title": body.title.strip()[:100],

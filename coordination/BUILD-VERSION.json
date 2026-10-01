@@ -1,7 +1,7 @@
 {
-  "version": "m025-389",
+  "version": "m025-390",
   "claimedBy": "branch main",
-  "claimedAt": "2026-09-30T20:35:17.080Z",
-  "reason": "fix(bug-ui): overhaul Sarang and Hunt layout, eliminate CSS clash",
+  "claimedAt": "2026-10-01T13:24:23.516Z",
+  "reason": "fix(braincore): remediate sync-state BKT, patch IDORs, and guard high-mastery slips",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

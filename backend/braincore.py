@@ -288,6 +288,8 @@ async def _pool(competency_ids: list[str], transfer: bool | None = None) -> list
 async def next_best_item(student_id: str, competency_ids: list[str], served_ids: list[str],
                          allow_prerequisite: bool = True) -> dict | None:
     """Guru menentukan GOAL (kompetensi), Braincore menentukan PATH (item & urutan)."""
+    if not competency_ids:
+        return None
     states = await get_states(student_id, competency_ids)
     # m025-375 (B6): pilih dan tangga-kan dari penguasaan HARI INI (sudah meluruh), bukan dari
     # angka terakhir yang tercatat - kompetensi yang lama tidak disentuh memang lebih lemah.
