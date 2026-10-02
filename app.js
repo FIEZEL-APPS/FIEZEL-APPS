@@ -11343,7 +11343,7 @@ function grammar(){if(self.FiezelGrammarVocabBridge&&typeof self.FiezelGrammarVo
   const examChip=`<button type="button" class="exam-entry-chip${examEntry?.passed?' is-passed':''}" onclick="openActiveLevelExamPanel()" aria-label="${FiezelI18n.t('grammar.ujian-skip-level-level',{level:esc(level),ujian:examEntry?.passed?FiezelI18n.t('level.ujian-sudah-lulus'):FiezelI18n.t('level.ujian-buka-panel')})}"><i data-lucide="${examEntry?.passed?'badge-check':'award'}"></i><span><b>${FiezelI18n.t('level.ujian-judul')}</b><small>${examEntry?.passed?FiezelI18n.t('level.ujian-lulus-terverifikasi'):FiezelI18n.t('level.ujian-merasa-bisa')}</small></span><i data-lucide="arrow-right"></i></button>`;
   const mistakeVaultCard=(self.FiezelGrammarUpgrade&&typeof self.FiezelGrammarUpgrade.renderVaultCard==='function')?self.FiezelGrammarUpgrade.renderVaultCard():'';
   const intensitySelector=(self.FiezelGrammarVocabBridge&&typeof self.FiezelGrammarVocabBridge.renderIntensitySelector==='function')?self.FiezelGrammarVocabBridge.renderIntensitySelector():'';
-  shell(FiezelI18n.t('student.grammar-title'),FiezelI18n.t('grammar.lesson-terurut-for-level-start',{jumlahLesson:skills.length,level:level}),`<div class="grammar-level-note fz2-path-summary"><span class="fz2-path-ring" style="--p:${skills.length?Math.round(rows.filter(r=>r.completed||r.examVerified).length/skills.length*100):0}" aria-hidden="true"><span class="fz2-path-ring-count">${rows.filter(r=>r.completed||r.examVerified).length}/${skills.length}</span></span><div><b>${FiezelI18n.t('grammar.jalur',{level:esc(level)})}</b><span>${esc(levelDescriptor(level))}</span><small>${FiezelI18n.t('grammar.item-pilihan-boleh-bervariasi-tetapi')}</small></div></div><div class="grammar-hub-tools">${examChip}<div class="path-view-toggle"><button type="button" data-testid="grammar-quick-session-btn" onclick="startGrammarQuickSession()"><i data-lucide="zap"></i> ${FiezelI18n.t('grammar.sesi-kilat')}</button></div><div class="path-view-toggle" style="display:none"><button type="button" data-testid="grammar-video-lab-btn" onclick="startVideoGrammarSession()"><i data-lucide="play"></i> ${FiezelI18n.t('grammar.video-lab','Video Lab')}</button></div><div class="path-view-toggle" style="display:none"><button type="button" data-testid="grammar-token-rail-btn" onclick="startTokenOrderSession()"><i data-lucide="shuffle"></i> ${FiezelI18n.t('grammar.susun-kata','Susun Kata')}</button></div><div class="path-view-toggle"><button type="button" onclick="toggleGrammarHubView()" aria-pressed="${grammarHubListView}"><i data-lucide="${grammarHubListView?'route':'list'}"></i> ${grammarHubListView?FiezelI18n.t('level.toggle-path-view'):FiezelI18n.t('level.toggle-list-view')}</button></div></div>${intensitySelector}${mistakeVaultCard?`<div class="grammar-vault-wrap" style="margin:10px 0">${mistakeVaultCard}</div>`:''}${grammarHubListView?listBody:pathBody}`);
+  shell(FiezelI18n.t('student.grammar-title'),FiezelI18n.t('grammar.lesson-terurut-for-level-start',{jumlahLesson:skills.length,level:level}),`<div class="grammar-level-note fz2-path-summary"><span class="fz2-path-ring" style="--p:${skills.length?Math.round(rows.filter(r=>r.completed||r.examVerified).length/skills.length*100):0}" aria-hidden="true"><span class="fz2-path-ring-count">${rows.filter(r=>r.completed||r.examVerified).length}/${skills.length}</span></span><div><b>${FiezelI18n.t('grammar.jalur',{level:esc(level)})}</b><span>${esc(levelDescriptor(level))}</span><small>${FiezelI18n.t('grammar.item-pilihan-boleh-bervariasi-tetapi')}</small></div></div><div class="grammar-hub-tools">${examChip}<div class="path-view-toggle"><button type="button" data-testid="grammar-quick-session-btn" onclick="startGrammarQuickSession()"><i data-lucide="zap"></i> ${FiezelI18n.t('grammar.sesi-kilat')}</button></div><div class="path-view-toggle"><button type="button" data-testid="grammar-video-lab-btn" onclick="startVideoGrammarSession()"><i data-lucide="play"></i> ${FiezelI18n.t('grammar.video-lab','Video Lab')}</button></div><div class="path-view-toggle" style="display:none"><button type="button" data-testid="grammar-token-rail-btn" onclick="startTokenOrderSession()"><i data-lucide="shuffle"></i> ${FiezelI18n.t('grammar.susun-kata','Susun Kata')}</button></div><div class="path-view-toggle"><button type="button" onclick="toggleGrammarHubView()" aria-pressed="${grammarHubListView}"><i data-lucide="${grammarHubListView?'route':'list'}"></i> ${grammarHubListView?FiezelI18n.t('level.toggle-path-view'):FiezelI18n.t('level.toggle-list-view')}</button></div></div>${intensitySelector}${mistakeVaultCard?`<div class="grammar-vault-wrap" style="margin:10px 0">${mistakeVaultCard}</div>`:''}${grammarHubListView?listBody:pathBody}`);
   // Auto-scroll ke node aktif — sesudah renderInner mengembalikan scroll ke atas.
   // Reduced-motion: lompat tanpa animasi (behavior 'auto'), bukan tanpa fungsi.
   if(!grammarHubListView&&current)setTimeout(()=>{try{document.querySelector('.path-step.is-current')?.scrollIntoView({block:'center',behavior:(prefersReducedMotion()||state.preferences?.motion===false)?'auto':'smooth'})}catch(_){}},140);
@@ -11511,27 +11511,27 @@ function makeGrammarTokenOrderQuestion(skill, item, idx, level){
   const activeLvl=level||meta?.level||getActiveLevel();
   const base=item?.[0]||'',opts=item?.[1]||[],correct=opts[item?.[2]]||'';
   let fullSentence=base.replace(/_{2,}|\[\.\.\.\]/g,correct).trim();
-  if(!fullSentence.includes(correct))fullSentence=`${base} ${correct}`.trim();
-  const cleanWord=w=>String(w||'').replace(/^[.,\/#!$%\^&\*;:{}=\-_`~()“”"']+|[.,\/#!$%\^&\*;:{}=\-_`~()“”"']+$/g,'');
+  if(!fullSentence.includes(correct))fullSentence=(base + ' ' + correct).trim();
+  const cleanWord=w=>String(w||'').trim().replace(/^[^\w\s]+|[^\w\s]+$/g,'');
   const rawTokens=fullSentence.split(/\s+/).map(cleanWord).filter(Boolean);
   const distractors=opts.filter((_,i)=>i!==item?.[2]).map(cleanWord).filter(w=>Boolean(w)&&!w.includes(' ')).slice(0,2);
   const alternates=[];
   if(fullSentence.includes(', but ')){
     const parts=fullSentence.split(', but ');
     if(parts.length===2){
-      alternates.push(`${cleanWord(parts[1])}, but ${cleanWord(parts[0])}`);
-      alternates.push(`${cleanWord(parts[1])} but ${cleanWord(parts[0])}`);
+      alternates.push(cleanWord(parts[1]) + ', but ' + cleanWord(parts[0]));
+      alternates.push(cleanWord(parts[1]) + ' but ' + cleanWord(parts[0]));
     }
   }else if(fullSentence.includes(' but ')){
     const parts=fullSentence.split(' but ');
     if(parts.length===2){
-      alternates.push(`${cleanWord(parts[1])}, but ${cleanWord(parts[0])}`);
-      alternates.push(`${cleanWord(parts[1])} but ${cleanWord(parts[0])}`);
+      alternates.push(cleanWord(parts[1]) + ', but ' + cleanWord(parts[0]));
+      alternates.push(cleanWord(parts[1]) + ' but ' + cleanWord(parts[0]));
     }
   }
   const rule=grammarLessonRule(item);
   return {
-    id:`token-${skill}-${idx}`,
+    id: 'token-' + skill + '-' + idx,
     type:'token-order',
     level:activeLvl,
     skill:skill,
@@ -12001,7 +12001,7 @@ function grammarCorrectOptionReason(optionText,mode,focus,why){
   if(w&&norm(w)!==norm(String(optionText||''))){
     const isTh=self.FiezelI18n?.getLocale?.()==='th';
     const lead=isTh?'ถูกต้อง — ':'bener — ';
-    const tail=(w.toLowerCase().startsWith('bener')||w.toLowerCase().startsWith('benar')||w.startsWith('ถูกต้อง'))?w:`${lead}${w}`;
+    const tail=(w.toLowerCase().startsWith('bener')||w.toLowerCase().startsWith('benar')||w.startsWith('ถูกต้อง'))?w:(lead + w);
     return joinQuoteReason(quoteEmbedShort(optionText),tail);
   }
   const endorse=GRAMMAR_META_KEY_ENDORSE[String(mode||'')]||FiezelI18n.t('grammar.bener-diminta-pola-kalimat',{focus:focus});
@@ -12028,36 +12028,37 @@ function grammarNormalizeOptionSource(raw){
 function grammarSanitizeContext(txt, mode = '', targetWord = '', correctWord = '') {
   if (!txt) return txt;
   const m = String(mode || '');
-  const isNonBlank = m.startsWith('repair_') || m === 'complete_sentence' || m === 'justify_correct' || m.startsWith('diagnose_') || m.startsWith('contrast_') || m === 'token-order';
+  const isNonBlank = String(mode||'').startsWith('repair_') || m === 'complete_sentence' || m === 'justify_correct' || m.startsWith('diagnose_') || m.startsWith('contrast_') || m === 'token-order';
   if (!isNonBlank) return txt;
 
   const isRepair = m.startsWith('repair_');
   const tw = String(targetWord || '').trim();
   const rawCw = String(correctWord || '').trim();
   const cw = (rawCw.length <= 35 && !rawCw.includes('.')) ? rawCw : '';
-  const anchor = isRepair ? (tw ? `“${tw}”` : 'kata yang diperbaiki') : (cw ? `“${cw}”` : 'kata tersebut');
+  const anchor = isRepair ? (tw ? ('“' + tw + '”') : 'kata yang diperbaiki') : (cw ? ('“' + cw + '”') : 'kata tersebut');
 
   let s = String(txt);
   // Indonesian blank patterns
-  s = s.replace(/posisi\s+(?:bagian\s+kosong|titik-titik)(?:nya)?/gi, `posisi ${anchor}`);
-  s = s.replace(/sesudah\s+(?:bagian\s+kosong|titik-titik)(?:nya)?/gi, `sesudah ${anchor}`);
-  s = s.replace(/sebelum\s+(?:bagian\s+kosong|titik-titik)(?:nya)?/gi, `sebelum ${anchor}`);
-  s = s.replace(/di\s+(?:bagian\s+kosong|titik-titik)(?:nya)?/gi, isRepair && tw ? `menggantikan “${tw}”` : 'di kalimat ini');
+  s = s.replace(/posisi\s+(?:bagian\s+kosong|titik-titik)(?:nya)?/gi, 'posisi ' + anchor);
+  s = s.replace(/sesudah\s+(?:bagian\s+kosong|titik-titik)(?:nya)?/gi, 'sesudah ' + anchor);
+  s = s.replace(/sebelum\s+(?:bagian\s+kosong|titik-titik)(?:nya)?/gi, 'sebelum ' + anchor);
+  s = s.replace(/di\s+(?:bagian\s+kosong|titik-titik)(?:nya)?/gi, isRepair && tw ? ('menggantikan “' + tw + '”') : 'di kalimat ini');
   s = s.replace(/mengisi\s+(?:bagian\s+kosong|titik-titik)(?:nya)?/gi, 'melengkapi kalimat ini');
   s = s.replace(/(?:bagian\s+kosong|titik-titik)nya\s+(sesudah|sebelum|ada|jadi)/gi, 'Posisinya $1');
-  s = s.replace(/(?:bagian\s+kosong|titik-titik)nya/gi, `kata ${anchor}`);
-  s = s.replace(/(?:bagian\s+kosong|titik-titik)/gi, isRepair && tw ? `kata “${tw}”` : (cw ? `kata “${cw}”` : 'kata di posisi tersebut'));
+  s = s.replace(/(?:bagian\s+kosong|titik-titik)nya/gi, 'kata ' + anchor);
+  s = s.replace(/(?:bagian\s+kosong|titik-titik)/gi, isRepair && tw ? ('kata “' + tw + '”') : (cw ? ('kata “' + cw + '”') : 'kata di posisi tersebut'));
 
   // Thai blank patterns
-  s = s.replace(/ตำแหน่ง\s*ช่องว่าง/g, `ตำแหน่ง ${anchor}`);
-  s = s.replace(/หลัง\s*ช่องว่าง/g, `หลัง ${anchor}`);
-  s = s.replace(/หน้า\s*ช่องว่าง/g, `หน้า ${anchor}`);
+  s = s.replace(/ตำแหน่ง\s*ช่องว่าง/g, 'ตำแหน่ง ' + anchor);
+  s = s.replace(/หลัง\s*ช่องว่าง/g, 'หลัง ' + anchor);
+  s = s.replace(/หน้า\s*ช่องว่าง/g, 'หน้า ' + anchor);
   s = s.replace(/ใน\s*ช่องว่าง/g, 'ในประโยคนี้');
   s = s.replace(/เติม\s*ช่องว่าง/g, 'เติมในประโยคนี้');
   s = s.replace(/ช่องว่าง/g, 'ตำแหน่งคำนั้น');
 
   return s;
 }
+const sanitizeRepair = grammarSanitizeContext;
 
 function grammarLessonExplain(item,why,distractors,familyRule,focus,mode='',targetWord='',correctWord=''){
   const meta=grammarMeta(item),own=v=>String(v||'').trim();
