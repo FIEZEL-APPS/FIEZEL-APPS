@@ -11339,7 +11339,7 @@ function grammar(){const level=getActiveLevel(),entries=grammarItemsForLevel(lev
   // panjang. Chip lengket di puncak hub memanggil panel ujian yang SAMA, node ujungnya tetap.
   const examChip=`<button type="button" class="exam-entry-chip${examEntry?.passed?' is-passed':''}" onclick="openActiveLevelExamPanel()" aria-label="${FiezelI18n.t('grammar.ujian-skip-level-level',{level:esc(level),ujian:examEntry?.passed?FiezelI18n.t('level.ujian-sudah-lulus'):FiezelI18n.t('level.ujian-buka-panel')})}"><i data-lucide="${examEntry?.passed?'badge-check':'award'}"></i><span><b>${FiezelI18n.t('level.ujian-judul')}</b><small>${examEntry?.passed?FiezelI18n.t('level.ujian-lulus-terverifikasi'):FiezelI18n.t('level.ujian-merasa-bisa')}</small></span><i data-lucide="arrow-right"></i></button>`;
   const mistakeVaultCard=(self.FiezelGrammarUpgrade&&typeof self.FiezelGrammarUpgrade.renderVaultCard==='function')?self.FiezelGrammarUpgrade.renderVaultCard():'';
-  shell(FiezelI18n.t('student.grammar-title'),FiezelI18n.t('grammar.lesson-terurut-for-level-start',{jumlahLesson:skills.length,level:level}),`<div class="grammar-level-note fz2-path-summary"><span class="fz2-path-ring" style="--p:${skills.length?Math.round(rows.filter(r=>r.completed||r.examVerified).length/skills.length*100):0}" aria-hidden="true"><span class="fz2-path-ring-count">${rows.filter(r=>r.completed||r.examVerified).length}/${skills.length}</span></span><div><b>${FiezelI18n.t('grammar.jalur',{level:esc(level)})}</b><span>${esc(levelDescriptor(level))}</span><small>${FiezelI18n.t('grammar.item-pilihan-boleh-bervariasi-tetapi')}</small></div></div><div class="grammar-hub-tools">${examChip}<div class="path-view-toggle"><button type="button" data-testid="grammar-quick-session-btn" onclick="startGrammarQuickSession()"><i data-lucide="zap"></i> ${FiezelI18n.t('grammar.sesi-kilat')}</button></div><div class="path-view-toggle"><button type="button" data-testid="grammar-video-lab-btn" onclick="startVideoGrammarSession()"><i data-lucide="play"></i> ${FiezelI18n.t('grammar.video-lab','Video Lab')}</button></div><div class="path-view-toggle"><button type="button" onclick="toggleGrammarHubView()" aria-pressed="${grammarHubListView}"><i data-lucide="${grammarHubListView?'route':'list'}"></i> ${grammarHubListView?FiezelI18n.t('level.toggle-path-view'):FiezelI18n.t('level.toggle-list-view')}</button></div></div>${mistakeVaultCard?`<div class="grammar-vault-wrap" style="margin:10px 0">${mistakeVaultCard}</div>`:''}${grammarHubListView?listBody:pathBody}`);
+  shell(FiezelI18n.t('student.grammar-title'),FiezelI18n.t('grammar.lesson-terurut-for-level-start',{jumlahLesson:skills.length,level:level}),`<div class="grammar-level-note fz2-path-summary"><span class="fz2-path-ring" style="--p:${skills.length?Math.round(rows.filter(r=>r.completed||r.examVerified).length/skills.length*100):0}" aria-hidden="true"><span class="fz2-path-ring-count">${rows.filter(r=>r.completed||r.examVerified).length}/${skills.length}</span></span><div><b>${FiezelI18n.t('grammar.jalur',{level:esc(level)})}</b><span>${esc(levelDescriptor(level))}</span><small>${FiezelI18n.t('grammar.item-pilihan-boleh-bervariasi-tetapi')}</small></div></div><div class="grammar-hub-tools">${examChip}<div class="path-view-toggle"><button type="button" data-testid="grammar-quick-session-btn" onclick="startGrammarQuickSession()"><i data-lucide="zap"></i> ${FiezelI18n.t('grammar.sesi-kilat')}</button></div><div class="path-view-toggle"><button type="button" data-testid="grammar-video-lab-btn" onclick="startVideoGrammarSession()"><i data-lucide="play"></i> ${FiezelI18n.t('grammar.video-lab','Video Lab')}</button></div><div class="path-view-toggle"><button type="button" data-testid="grammar-token-rail-btn" onclick="startTokenOrderSession()"><i data-lucide="shuffle"></i> ${FiezelI18n.t('grammar.susun-kata','Susun Kata')}</button></div><div class="path-view-toggle"><button type="button" onclick="toggleGrammarHubView()" aria-pressed="${grammarHubListView}"><i data-lucide="${grammarHubListView?'route':'list'}"></i> ${grammarHubListView?FiezelI18n.t('level.toggle-path-view'):FiezelI18n.t('level.toggle-list-view')}</button></div></div>${mistakeVaultCard?`<div class="grammar-vault-wrap" style="margin:10px 0">${mistakeVaultCard}</div>`:''}${grammarHubListView?listBody:pathBody}`);
   // Auto-scroll ke node aktif — sesudah renderInner mengembalikan scroll ke atas.
   // Reduced-motion: lompat tanpa animasi (behavior 'auto'), bukan tanpa fungsi.
   if(!grammarHubListView&&current)setTimeout(()=>{try{document.querySelector('.path-step.is-current')?.scrollIntoView({block:'center',behavior:(prefersReducedMotion()||state.preferences?.motion===false)?'auto':'smooth'})}catch(_){}},140);
@@ -11609,11 +11609,11 @@ function startTokenOrderSession(skill){
     const distractors=opts.filter((_,i)=>i!==item[2]).slice(0,3);
     const rule=grammarLessonRule(item);
     return {
-      id:`token-${skill}-${idx}`,
+      id:`token-${sk}-${idx}`,
       type:'token-order',
-      level:meta.level,
-      skill:skill,
-      lessonSkill:skill,
+      level:meta?.level||activeLvl,
+      skill:sk,
+      lessonSkill:sk,
       question:FiezelI18n.t('grammar.token-order-prompt','Susun kata-kata berikut menjadi kalimat yang tepat:'),
       tokens:rawTokens,
       distractors:distractors,
@@ -12523,10 +12523,10 @@ function quizLoop(cfg){
   if(hintBtn){
     hintBtn.onclick=(e)=>{
       e.stopPropagation();
-      const ruleText=q.explain?.rule||q.rule||FiezelI18n.t('grammar.hint-fallback','Perhatikan pola kalimat dan subjeknya.');
       if(self.FiezelGrammarUpgrade&&typeof self.FiezelGrammarUpgrade.showGrammarHint==='function'){
-        self.FiezelGrammarUpgrade.showGrammarHint(ruleText,hintBtn);
+        self.FiezelGrammarUpgrade.showGrammarHint(q,hintBtn);
       }else{
+        const ruleText=q.explain?.rule||q.rule||FiezelI18n.t('grammar.hint-fallback','Perhatikan pola kalimat dan subjeknya.');
         showToast(ruleText,'info');
       }
     };
@@ -12580,8 +12580,14 @@ function quizLoop(cfg){
   if(q.type==='video-grammar'){
    const stem=$('quizStem');
    if(stem&&q.videoConfig&&self.FiezelGrammarVideo&&typeof self.FiezelGrammarVideo.renderVideoPlayer==='function'){
-     const playerEl=self.FiezelGrammarVideo.renderVideoPlayer(q.videoConfig);
-     stem.before(playerEl);
+     const vState={
+       isPausedForExercise:false,
+       exerciseCompleted:false,
+       video:null,
+       onPauseReached:()=>{try{$('options')?.scrollIntoView({block:'nearest',behavior:'smooth'})}catch(_){}}
+     };
+     const playerEl=self.FiezelGrammarVideo.renderVideoPlayer(q.videoConfig,vState);
+     if(playerEl)stem.before(playerEl);
    }
   }
   /* Fase 3 (C5 butir 4): kalimat ajakan prediksi SRL tampil di bawah soal - jawabannya
@@ -12752,7 +12758,7 @@ function quizLoop(cfg){
      tepat adalah X." mengulang string yang sama dua kali — kini satu kalimat konfirmasi.
      Cabang salah tetap memakai literal "Jawaban yang paling tepat" (jangkar r2 smoke:109
      memastikan literal ini TIDAK bocor di mode ukur — cabang MEASURE di atas tak tersentuh). */
-  f.innerHTML=`<div class="feedback-title"><i data-lucide="${ok?'circle-check-big':'circle-x'}"></i><b>${ok?FiezelI18n.t('quiz.verdict-correct'):FiezelI18n.t('quiz.verdict-wrong')}</b></div><p>${ok?FiezelI18n.t('quiz.correct-answer',{answer:`<strong>${esc(q.options[j])}</strong>`}):`${FiezelI18n.t('quiz.jawabanmu')} <strong>${esc(q.options[j])}</strong>${FiezelI18n.t('quiz.answer-paling-tepat-adalah')} <strong>${esc(q.options[q.answerIndex])}</strong>`}</p>${pickedWhyFails?`<p class="feedback-your-pick"><strong>${FiezelI18n.t('quiz.jawabanmu')}</strong> ${esc(pickedWhyFails)}</p>`:''}${q.type==='grammar'&&q.explain?.rule/* m025-375: alasan dan aturan grammar di dua baris, bukan satu paragraf panjang */?`<p><strong>${FiezelI18n.t('quiz.intinya')}</strong> ${esc(q.explain?.why||FiezelI18n.t('quiz.fallback-context'))}</p><p class="feedback-rule"><strong>${FiezelI18n.t('quiz.aturannya')}</strong> ${esc(q.explain.rule)}</p>`:`<p><strong>${FiezelI18n.t('quiz.intinya')}</strong> ${esc(q.explain?.why||FiezelI18n.t('quiz.fallback-context'))} ${q.explain?.rule?esc(q.explain.rule):''}</p>`}<details class="acc"><summary>${FiezelI18n.t(q.explain?.distractors?'quiz.bandingkan-pilihan-lain':'quiz.pembahasan-lengkap')}</summary><p class="muted">${esc(q.explain?.distractor||FiezelI18n.t('quiz.fallback-unsupported'))} ${esc(q.explain?.avoid||FiezelI18n.t('quiz.fallback-hint-check'))}</p>${q.explain?.distractors?`<div class="distractor-breakdown">${q.explain.distractors.map(x=>`<p><b>${esc(x.option)}:</b> ${esc(x.reason)}</p>`).join('')}</div>`:''}</details><p class="memory-tip"><i data-lucide="lightbulb"></i><span>${esc(q.explain?.memory||FiezelI18n.t('quiz.fallback-hint-connect'))}</span></p><button class="ai-btn" id="aiExplainBtn"><i data-lucide="sparkles"></i> ${FiezelI18n.t('quiz.jelaskan-dengan-cara-lebih-sederhana')}</button>`;
+  f.innerHTML=`<div class="feedback-title"><i data-lucide="${ok?'circle-check-big':'circle-x'}"></i><b>${ok?FiezelI18n.t('quiz.verdict-correct'):FiezelI18n.t('quiz.verdict-wrong')}</b></div><p>${ok?FiezelI18n.t('quiz.correct-answer',{answer:`<strong>${esc(q.options[j])}</strong>`}):`${FiezelI18n.t('quiz.jawabanmu')} <strong>${esc(q.options[j])}</strong>${FiezelI18n.t('quiz.answer-paling-tepat-adalah')} <strong>${esc(q.options[q.answerIndex])}</strong>`}</p>${pickedWhyFails?`<p class="feedback-your-pick"><strong>${FiezelI18n.t('quiz.jawabanmu')}</strong> ${esc(pickedWhyFails)}</p>`:''}${q.type==='grammar'&&q.explain?.rule/* m025-375: alasan dan aturan grammar di dua baris, bukan satu paragraf panjang */?`<p><strong>${FiezelI18n.t('quiz.intinya')}</strong> ${esc(q.explain?.why||FiezelI18n.t('quiz.fallback-context'))}</p><p class="feedback-rule feedback-rule-pill"><strong>${FiezelI18n.t('quiz.aturannya')}</strong> ${esc(q.explain.rule)}</p>`:`<p><strong>${FiezelI18n.t('quiz.intinya')}</strong> ${esc(q.explain?.why||FiezelI18n.t('quiz.fallback-context'))} ${q.explain?.rule?esc(q.explain.rule):''}</p>`}<details class="acc"><summary>${FiezelI18n.t(q.explain?.distractors?'quiz.bandingkan-pilihan-lain':'quiz.pembahasan-lengkap')}</summary><p class="muted">${esc(q.explain?.distractor||FiezelI18n.t('quiz.fallback-unsupported'))} ${esc(q.explain?.avoid||FiezelI18n.t('quiz.fallback-hint-check'))}</p>${q.explain?.distractors?`<div class="distractor-breakdown">${q.explain.distractors.map(x=>`<p><b>${esc(x.option)}:</b> ${esc(x.reason)}</p>`).join('')}</div>`:''}</details><p class="memory-tip"><i data-lucide="lightbulb"></i><span>${esc(q.explain?.memory||FiezelI18n.t('quiz.fallback-hint-connect'))}</span></p><button class="ai-btn" id="aiExplainBtn"><i data-lucide="sparkles"></i> ${FiezelI18n.t('quiz.jelaskan-dengan-cara-lebih-sederhana')}</button>`;
   speak(turn);
   answer.locked=true;
   $('quizNext').disabled=false;
@@ -12846,7 +12852,7 @@ function quizLoop(cfg){
       if(!ok){
         state.mistakeVault=state.mistakeVault||{};
         const mk=q.lessonSkill||q.skill||q.id;
-        if(mk)state.mistakeVault[mk]=(state.mistakeVault[mk]||0)+1;
+        if(mk)state.mistakeVault[mk]=Math.max(2,Number(state.mistakeVault[mk]||0)+1);
       }else if(state.mistakeVault){
         const mk=q.lessonSkill||q.skill||q.id;
         if(mk&&state.mistakeVault[mk]){

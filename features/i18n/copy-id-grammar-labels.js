@@ -211,7 +211,14 @@
   'grammar.video.point': 'Tata Bahasa',
   'grammar.video.progress': 'Kemajuan video',
   'grammar.video.question': 'Perhatikan video dan lengkapi bagian yang kosong.',
-  'grammar.video.speed': 'Kecepatan pemutaran'
+  'grammar.video.speed': 'Kecepatan pemutaran',
+  'grammar.hint-level-1': 'Arah Fokus',
+  'grammar.hint-level-2': 'Aturan Pola',
+  'grammar.hint-level-3': 'Waspada Jebakan',
+  'grammar.hint-level-4': 'Kunci & Memori',
+  'grammar.hint-next': 'Petunjuk Berikutnya',
+  'grammar.hint-close': 'Mengerti',
+  'grammar.token-lepas': 'Ketuk untuk melepas'
 };
   I18N.registerCopy('id', MAP);
 })(typeof globalThis !== 'undefined' ? globalThis : this);

@@ -19,7 +19,9 @@
    */
   FiezelGrammarVideo.createVideoGrammarQuestion = function(template) {
     return {
+      id: template.id,
       type: 'video-grammar',
+      level: template.level,
       question: template.exercise?.question || FiezelI18n.t('grammar.video.question', 'Perhatikan video dan lengkapi bagian yang kosong.'),
       options: template.exercise?.options || [],
       answerIndex: template.exercise?.answerIndex || 0,
@@ -41,10 +43,11 @@
   /**
    * Merender pemutar video HTML5 kustom.
    * @param {Object} config Konfigurasi video
-   * @param {Object} state Status internal (di-mutate)
+   * @param {Object} [state] Status internal (di-mutate)
    * @returns {HTMLElement} Elemen container pemutar video
    */
   FiezelGrammarVideo.renderVideoPlayer = function(config, state) {
+    state = state || {};
     const isEsc = typeof self.esc === 'function';
     const esc = (str) => isEsc ? self.esc(str) : str;
     
@@ -83,7 +86,7 @@
         .cloze-chip:hover { border-color: var(--accent); background: var(--accent-soft); }
         .cloze-chip:disabled { opacity: 0.6; cursor: not-allowed; }
         .grammar-choice-options { display: flex; flex-direction: column; gap: 10px; }
-        .fallback-card { padding: 24px; text-align: center; background: var(--panel-soft); border-radius: var(--radius-lg); display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--muted); }
+        .fallback-card { padding: 20px 16px; text-align: center; background: var(--panel-soft); border-radius: var(--radius-lg); display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text); }
       `;
       document.head.appendChild(style);
     }
@@ -127,12 +130,22 @@
     state.currentLoop = 1;
     state.isPausedForExercise = false;
 
-    // Fallback jika tidak ada URL video
+    // Fallback jika tidak ada URL video: tampilkan konteks subtitle dialog yang kaya
     if (!config.videoUrl) {
       container.innerHTML = `
         <div class="fallback-card">
-          <i data-lucide="eye-off" style="width: 48px; height: 48px; margin-bottom: 12px; opacity: 0.5;"></i>
-          <p>${FiezelI18n.t('grammar.video.no-video', 'Video tidak tersedia, beralih ke teks.')}</p>
+          <i data-lucide="play" style="width: 44px; height: 44px; margin-bottom: 8px; opacity: 0.85; color: var(--accent);"></i>
+          <p style="font-weight:700;margin-bottom:4px">${esc(config.exercise?.grammarPoint || 'Video Grammar Lab')}</p>
+          <p class="muted" style="margin-bottom:12px;font-size:0.85rem">${FiezelI18n.t('grammar.video.no-video', 'Video tidak tersedia, beralih ke teks.')}</p>
+          ${config.subtitles && config.subtitles.length ? `
+            <div class="video-subtitle-dialog" style="display:flex;flex-direction:column;gap:6px;width:100%;max-width:440px;text-align:left">
+              ${config.subtitles.map(s => `
+                <div style="background:var(--panel);padding:6px 12px;border-radius:var(--radius-sm);border:1px solid var(--line-soft);font-size:0.88rem">
+                  <strong style="color:var(--accent-strong)">${esc(s.speaker || 'Dialogue')}:</strong> ${esc(s.text)}
+                </div>
+              `).join('')}
+            </div>
+          ` : ''}
         </div>
       `;
       if (typeof self.enhanceUI === 'function') self.enhanceUI();

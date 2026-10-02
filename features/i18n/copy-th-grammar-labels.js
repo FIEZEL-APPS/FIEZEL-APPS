@@ -211,7 +211,14 @@
   'grammar.video.point': 'ไวยากรณ์',
   'grammar.video.progress': 'ความคืบหน้าวิดีโอ',
   'grammar.video.question': 'ชมวิดีโอและเติมคำในช่องว่าง',
-  'grammar.video.speed': 'ความเร็วในการเล่น'
+  'grammar.video.speed': 'ความเร็วในการเล่น',
+  'grammar.hint-level-1': 'จุดเน้น',
+  'grammar.hint-level-2': 'กฎไวยากรณ์',
+  'grammar.hint-level-3': 'ข้อควรระวัง',
+  'grammar.hint-level-4': 'เคล็ดลับการจำ',
+  'grammar.hint-next': 'คำใบ้ถัดไป',
+  'grammar.hint-close': 'เข้าใจแล้ว',
+  'grammar.token-lepas': 'แตะเพื่อเอาออก'
 };
   I18N.registerCopy('th', MAP);
 })(typeof globalThis !== 'undefined' ? globalThis : this);
