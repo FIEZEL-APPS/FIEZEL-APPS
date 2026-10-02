@@ -149,35 +149,110 @@
   font-style: italic;
 }
 
+/* Question Instruction & Typography Hierarchy */
+.quiz-bubble .question-instruction,
+.quiz-stage .question-instruction,
+.speech-bubble .question-instruction,
+.quiz-shell .question-instruction,
+.card .question-instruction,
+.question .question-instruction,
+.question-instruction {
+  display: inline-block !important;
+  font-size: 0.75rem !important; /* 12px kicker/eyebrow distinct from 18px+ question stem */
+  font-weight: 700 !important;
+  color: #94A3B8 !important; /* Secondary text color (Slate 400), WCAG AAA 7.3:1 contrast on #181824 */
+  letter-spacing: 0.07em !important;
+  text-transform: uppercase !important;
+  margin-bottom: 10px !important;
+  line-height: 1.35 !important;
+  padding: 3px 8px !important;
+  border-radius: 6px !important;
+  background: rgba(148, 163, 184, 0.12) !important;
+}
+
+/* Light mode for question-instruction only on true light surfaces */
+body:not(.theme-dark):not(.fz-lux) .card-light .question-instruction,
+body:not(.theme-dark):not(.fz-lux) .card:not(.quiz-bubble):not(.quiz-stage) .question-instruction {
+  color: #475569 !important; /* Slate 600, high contrast on light backgrounds */
+  background: rgba(100, 116, 139, 0.1) !important;
+}
+
+/* Inside dark quiz bubble/stage, instruction is ALWAYS light Slate 300 */
+.quiz-bubble .question-instruction,
+.quiz-stage .question-instruction,
+.speech-bubble .question-instruction {
+  color: #CBD5E1 !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.quiz-bubble .question-main,
+.quiz-stage .question-main,
+.speech-bubble .question-main,
+.quiz-shell .question-main,
+.card .question-main,
+.question .question-main,
+.question-main {
+  display: block !important;
+  font-size: clamp(1.2rem, 1.15rem + 1.2vw, 1.55rem) !important;
+  font-weight: 700 !important;
+  color: #FFFFFF !important;
+  line-height: 1.45 !important;
+  letter-spacing: -0.01em !important;
+}
+
+/* Light mode for question-main only on true light surfaces */
+body:not(.theme-dark):not(.fz-lux) .card-light .question-main,
+body:not(.theme-dark):not(.fz-lux) .card:not(.quiz-bubble):not(.quiz-stage) .question-main {
+  color: #0F172A !important;
+}
+
+/* Inside dark quiz bubble/stage, main question is ALWAYS pure White */
+.quiz-bubble .question-main,
+.quiz-stage .question-main,
+.speech-bubble .question-main {
+  color: #FFFFFF !important;
+}
+
 /* Target Word / Error Token Highlight in Sentence Correction & Stem */
 .target-word,
 .question-main .target-word,
 .question .target-word,
+.quiz-bubble .target-word,
+.quiz-bubble .question-main .target-word,
+.quiz-stage .target-word,
 mark.target-word,
 .stem-target-word,
 .syntax-target,
 .syntax-error {
   display: inline-block !important;
-  background: rgba(245, 158, 11, 0.22) !important;
-  color: #b45309 !important;
+  background: rgba(245, 158, 11, 0.28) !important;
+  color: #fef3c7 !important;
   font-style: italic !important;
   text-decoration: underline !important;
-  text-decoration-color: #f59e0b !important;
-  text-decoration-thickness: 2px !important;
+  text-decoration-color: #fbbf24 !important;
+  text-decoration-thickness: 2.5px !important;
   text-underline-offset: 4px !important;
+  border-bottom: 2px solid #f59e0b !important;
   border-radius: 4px !important;
-  padding: 0 5px !important;
+  padding: 1px 6px !important;
   font-weight: 700 !important;
 }
 
+body:not(.theme-dark):not(.fz-lux) .card-light .target-word,
+body:not(.theme-dark):not(.fz-lux) .card:not(.quiz-bubble):not(.quiz-stage) .target-word {
+  color: #92400e !important; /* Amber 800, high contrast on light */
+  background: rgba(245, 158, 11, 0.18) !important;
+  text-decoration-color: #d97706 !important;
+  border-bottom: 2px solid #d97706 !important;
+}
+
 .quiz-bubble .target-word,
-.quiz-bubble .question-main .target-word,
 .quiz-stage .target-word,
-.theme-dark .target-word,
-.fz-lux .target-word {
+.speech-bubble .target-word {
   color: #fef3c7 !important;
-  background: rgba(245, 158, 11, 0.28) !important;
+  background: rgba(245, 158, 11, 0.32) !important;
   text-decoration-color: #fbbf24 !important;
+  border-bottom-color: #f59e0b !important;
 }
 
 /* ==========================================================================

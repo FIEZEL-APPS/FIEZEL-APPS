@@ -529,7 +529,28 @@
     'scaffold.setting-santai': 'เรียนสบาย (5 คำศัพท์ · 10 ข้อ)',
     'scaffold.setting-opt-santai': 'เรียนสบาย (5V · 10G)',
     'scaffold.setting-opt-teladan': 'นักเรียนตัวอย่าง (10V · 15G)',
-    'scaffold.setting-opt-rajin': 'ขยันสุด ๆ (15V · 20G)'
+    'scaffold.setting-opt-rajin': 'ขยันสุด ๆ (15V · 20G)',
+    'scaffold.onboarding-title': 'เลือกระดับความเข้มข้นในการเรียน',
+    'scaffold.onboarding-desc': 'เลือกจำนวนคำศัพท์ที่ต้องรู้ก่อนในแต่ละบทเรียนแกรมมาร์',
+    'scaffold.gateway-title': 'ภารกิจคำศัพท์สำคัญ',
+    'scaffold.gateway-subtitle': 'เรียนรู้คำศัพท์สำคัญ {count} คำนี้ผ่านมินิเกมสนุก ๆ เพื่อให้ทำแบบฝึกหัดได้อย่างคล่องแคล่ว!',
+    'scaffold.btn-start-game': 'เริ่มเล่นมินิเกม 🎮',
+    'scaffold.btn-skip-to-grammar': 'ข้ามไปยังแบบฝึกหัดแกรมมาร์ ⚡',
+    'scaffold.game-round1-title': 'จับคู่คำศัพท์และความหมาย',
+    'scaffold.game-round1-desc': 'แตะคำภาษาอังกฤษแล้วแตะความหมายที่ถูกต้อง!',
+    'scaffold.game-round2-title': 'เรียงประโยคตามหลักไวยากรณ์',
+    'scaffold.game-round2-desc': 'เรียงชิ้นส่วนคำให้เป็นประโยคที่ถูกต้อง!',
+    'scaffold.game-combo': 'คอมโบ x{count}! 🔥',
+    'scaffold.game-great': 'ยอดเยี่ยม! 🌟',
+    'scaffold.game-perfect': 'สมบูรณ์แบบ! 💯',
+    'scaffold.game-unlocked-title': 'สุดยอด! จำคำศัพท์ได้แล้ว 🎉',
+    'scaffold.game-unlocked-desc': 'กำลังเปิดแบบฝึกหัดแกรมมาร์อัตโนมัติ...',
+    'scaffold.btn-enter-grammar': 'เข้าสู่แบบฝึกหัดแกรมมาร์ 🚀',
+    'scaffold.fokus-kata': 'คำศัพท์เป้าหมาย: {word} ({meaning})',
+    'scaffold.hint-ketuk-keping': 'แตะชิ้นส่วนด้านล่าง...',
+    'scaffold.btn-periksa-kalimat': 'ตรวจประโยค',
+    'scaffold.toast-urutan-salah': 'ลองตรวจลำดับคำใหม่อีกครั้งนะ!',
+    'scaffold.toast-vocab-terkuasai': 'จำคำศัพท์ได้แล้ว! กำลังเปิดแบบฝึกหัดแกรมมาร์...'
   };
   I18N.registerCopy('th', MAP);
 })(typeof globalThis !== 'undefined' ? globalThis : this);

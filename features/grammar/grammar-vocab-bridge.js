@@ -14,12 +14,18 @@
 (function(global) {
   'use strict';
 
-  // i18n helper — mirrors FiezelI18n.t() when available, falls back to the default string
-  function t(key, fallback) {
-    if (typeof FiezelI18n !== 'undefined' && typeof FiezelI18n.t === 'function') {
-      return FiezelI18n.t(key, fallback);
-    }
-    return fallback;
+  // Standard Fiezel i18n fallback wrapper
+  function t(k, fb, params) {
+    var s;
+    try {
+      var I = (typeof self !== 'undefined' ? self : this).FiezelI18n;
+      s = I && I.t ? I.t(k, params) : undefined;
+    } catch (_) {}
+    if (s === undefined || s === k) s = fb == null ? k : fb;
+    if (params) s = String(s).replace(/\{(\w+)\}/g, function (m, n) {
+      return Object.prototype.hasOwnProperty.call(params, n) ? String(params[n]) : m;
+    });
+    return s;
   }
 
   // 1. Definition of the 3 Learning Pacing / Intensity Levels
@@ -526,6 +532,553 @@
     handleIntensitySelect(intensityId, returnSkill);
   }
 
+  function esc(s) {
+    if (s == null) return '';
+    return String(s)
+      .split('&').join('&amp;')
+      .split('<').join('&lt;')
+      .split('>').join('&gt;')
+      .split('"').join('&quot;')
+      .split("'").join('&#39;');
+  }
+
+  function playAudio(w) {
+    if (typeof say === 'function') {
+      try { say(w); } catch (_) {}
+    }
+  }
+
+  function playSfx(n) {
+    if (typeof uiSfx === 'function') {
+      try { uiSfx(n); } catch (_) {}
+    }
+  }
+
+  function triggerHaptic(n) {
+    if (typeof haptic === 'function') {
+      try { haptic(n); } catch (_) {}
+    }
+  }
+
+  /**
+   * Check if learner has chosen intensity for the first time
+   * @param {Object} [stateRef]
+   * @returns {boolean} True if onboarding modal was opened
+   */
+  function checkFirstTimeIntensity(stateRef) {
+    const s = stateRef || (typeof state !== 'undefined' ? state : null);
+    if (!s) return false;
+    if (!s.preferences) s.preferences = {};
+    if (s.preferences.learningIntensityChosen) return false;
+    openFirstTimeIntensityModal();
+    return true;
+  }
+
+  /**
+   * Onboarding modal displayed the very first time student accesses Tata Bahasa
+   */
+  function openFirstTimeIntensityModal() {
+    if (typeof openModal !== 'function') return;
+    const s = typeof state !== 'undefined' ? state : null;
+    const current = getActiveIntensity(s);
+
+    const html = `
+      <div class="modal-intensity-sheet first-time-intensity">
+        <div class="modal-mark">FIEZEL</div>
+        <h2>${t('scaffold.onboarding-title', 'Pilih Ritme Belajarmu')}</h2>
+        <p class="muted">${t('scaffold.onboarding-desc', 'Tentukan berapa banyak kosakata kunci yang ingin kamu kuasai per materi grammar.')}</p>
+        
+        <div class="modal-intensity-options">
+          ${Object.values(LEARNING_INTENSITY_LEVELS).map(lvl => {
+            const isSel = lvl.id === current;
+            return `
+              <div class="intensity-option-card${isSel ? ' is-selected' : ''}"
+                   onclick="FiezelGrammarVocabBridge.selectFirstTimeIntensity('${lvl.id}')">
+                <div class="option-header">
+                  <span class="option-name"><b>${lvl.name}</b></span>
+                  <span class="option-badge">${lvl.badge}</span>
+                </div>
+                <p class="option-desc">${lvl.description}</p>
+                <div class="option-specs">
+                  <span><i data-lucide="book-open"></i> ${t('scaffold.kosakata-prasyarat', lvl.vocabTarget + ' Kosakata Prasyarat')}</span>
+                  <span><i data-lucide="check-circle-2"></i> ${t('scaffold.soal-grammar', lvl.grammarQuestionCount + ' Soal Grammar')}</span>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `;
+
+    openModal(html);
+  }
+
+  function selectFirstTimeIntensity(intensityId) {
+    const s = typeof state !== 'undefined' ? state : null;
+    if (s) {
+      if (!s.preferences) s.preferences = {};
+      s.preferences.learningIntensity = intensityId;
+      s.preferences.learningIntensityChosen = true;
+      if (typeof save === 'function') {
+        try { save(); } catch (_) {}
+      }
+    }
+    if (typeof closeModal === 'function') {
+      closeModal();
+    }
+    if (typeof showToast === 'function') {
+      const cfg = getIntensityConfig(intensityId);
+      showToast(t('scaffold.intensitas-diubah', 'Intensitas diubah ke ' + cfg.name + ' (' + cfg.badge + ')'), 'success');
+    }
+    if (typeof drawTopScreen === 'function') {
+      drawTopScreen();
+    } else if (typeof render === 'function') {
+      render();
+    }
+  }
+
+  /**
+   * Gateway sheet shown when student taps a sub-grammar lesson
+   * @param {string} skill
+   */
+  function openLessonPrerequisiteGate(skill) {
+    const s = typeof state !== 'undefined' ? state : null;
+    const status = getVocabPrerequisiteStatus(skill, s);
+    const meta = (typeof GRAMMAR_ITEMS !== 'undefined' && Array.isArray(GRAMMAR_ITEMS))
+      ? GRAMMAR_ITEMS.find(x => x.skill === skill)
+      : null;
+    const lessonTitle = meta ? (meta.title || meta.skill) : skill;
+
+    const html = `
+      <div class="lesson-prereq-gateway-sheet">
+        <div class="gateway-header">
+          <span class="gateway-badge"><i data-lucide="sparkles"></i> ${t('scaffold.gateway-title', 'Misi Kosakata Kunci')}</span>
+          <h2>${esc(lessonTitle)}</h2>
+          <p class="muted">${t('scaffold.gateway-subtitle', 'Kuasai ' + status.targetCount + ' kosakata kunci ini lewat mini game seru agar kamu lancar mengerjakan kalimatnya!')}</p>
+        </div>
+
+        <div class="gateway-vocab-grid">
+          ${status.words.map(w => `
+            <div class="gateway-vocab-card">
+              <div class="gw-word-top">
+                <span class="gw-word"><b>${esc(w.word)}</b></span>
+                <button type="button" class="gw-audio-btn" onclick="FiezelGrammarVocabBridge.playVocabAudio('${esc(w.word)}')" aria-label="Audio ${esc(w.word)}">
+                  <i data-lucide="volume-2"></i>
+                </button>
+              </div>
+              <div class="gw-meaning">${esc(w.meaning)}</div>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="gateway-actions">
+          <button type="button" class="gateway-btn primary" onclick="FiezelGrammarVocabBridge.startVocabMiniGame('${skill}')">
+            <i data-lucide="play"></i>
+            <span>${t('scaffold.btn-start-game', 'Mulai Mini Game Seru 🎮')}</span>
+          </button>
+          <button type="button" class="gateway-btn secondary" onclick="FiezelGrammarVocabBridge.skipToGrammar('${skill}')">
+            <span>${t('scaffold.btn-skip-to-grammar', 'Lanjut ke Latihan Grammar ⚡')}</span>
+            <i data-lucide="chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    `;
+
+    if (typeof openModal === 'function') {
+      openModal(html);
+    }
+  }
+
+  function skipToGrammar(skill) {
+    if (typeof closeModal === 'function') {
+      closeModal();
+    }
+    const s = typeof state !== 'undefined' ? state : null;
+    if (s) {
+      if (!s.grammar) s.grammar = {};
+      if (!s.grammar[skill]) s.grammar[skill] = {};
+      s.grammar[skill].vocabReady = true;
+      if (typeof save === 'function') {
+        try { save(); } catch (_) {}
+      }
+    }
+    if (typeof enterStage === 'function' && typeof renderGrammarLesson === 'function') {
+      enterStage('grammar-lesson', () => renderGrammarLesson(skill));
+      renderGrammarLesson(skill);
+    } else if (typeof practiceSkill === 'function') {
+      practiceSkill(skill);
+    }
+  }
+
+  function playVocabAudio(word) {
+    playAudio(word);
+    playSfx('tap');
+  }
+
+  // Active Mini-Game Session State
+  let _activeMiniGame = null;
+
+  /**
+   * Start the micro-interactive mini-game for a grammar lesson
+   * @param {string} skill
+   */
+  function startVocabMiniGame(skill) {
+    const s = typeof state !== 'undefined' ? state : null;
+    const status = getVocabPrerequisiteStatus(skill, s);
+    const words = status.words.slice(0, status.targetCount);
+
+    if (!words.length) {
+      skipToGrammar(skill);
+      return;
+    }
+
+    // Prepare matching game arrays
+    const enCards = words.map(w => ({ id: w.id, text: w.word, word: w.word }));
+    const idCards = words.map(w => ({ id: w.id, text: w.meaning.split(';')[0].trim(), word: w.word }));
+
+    // Shuffle Indonesian cards
+    for (let i = idCards.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [idCards[i], idCards[j]] = [idCards[j], idCards[i]];
+    }
+
+    _activeMiniGame = {
+      skill,
+      words,
+      round: 1, // 1: Bubble Snap, 2: Sentence Puzzle, 3: Completed
+      combo: 0,
+      matchedIds: new Set(),
+      selectedEn: null,
+      selectedId: null,
+      enCards,
+      idCards,
+      // Puzzle state
+      puzzleIndex: 0,
+      placedTokens: []
+    };
+
+    renderMiniGameModal();
+  }
+
+  function renderMiniGameModal() {
+    if (!_activeMiniGame) return;
+    if (typeof openModal !== 'function') return;
+
+    const g = _activeMiniGame;
+    let stageHtml = '';
+
+    if (g.round === 1) {
+      // Round 1: Bubble Snap / Card Connect (Word-to-Meaning Match)
+      stageHtml = `
+        <div class="mini-game-round round-1">
+          <div class="mini-game-header">
+            <span class="game-badge"><i data-lucide="sparkles"></i> Round 1: ${t('scaffold.game-round1-title', 'Cocokkan Kata & Artinya')}</span>
+            <span class="game-combo-pill" id="gameComboPill">${g.combo > 1 ? t('scaffold.game-combo', 'Kombo x' + g.combo + '! 🔥') : ''}</span>
+          </div>
+          <p class="game-instruction">${t('scaffold.game-round1-desc', 'Ketuk kata bahasa Inggris lalu ketuk artinya yang pas!')}</p>
+
+          <div class="match-game-board">
+            <div class="match-col en-col">
+              ${g.enCards.map(item => {
+                const isMatched = g.matchedIds.has(item.id);
+                const isSel = g.selectedEn === item.id;
+                return `
+                  <button type="button" 
+                          class="match-card en-card${isMatched ? ' is-matched' : ''}${isSel ? ' is-selected' : ''}" 
+                          ${isMatched ? 'disabled' : ''}
+                          onclick="FiezelGrammarVocabBridge.handleCardClick('${item.id}', 'en')">
+                    <b>${esc(item.text)}</b>
+                    <i data-lucide="volume-2" class="match-sound-icon"></i>
+                  </button>
+                `;
+              }).join('')}
+            </div>
+
+            <div class="match-col id-col">
+              ${g.idCards.map(item => {
+                const isMatched = g.matchedIds.has(item.id);
+                const isSel = g.selectedId === item.id;
+                return `
+                  <button type="button" 
+                          class="match-card id-card${isMatched ? ' is-matched' : ''}${isSel ? ' is-selected' : ''}" 
+                          ${isMatched ? 'disabled' : ''}
+                          onclick="FiezelGrammarVocabBridge.handleCardClick('${item.id}', 'id')">
+                    <span>${esc(item.text)}</span>
+                  </button>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+    } else if (g.round === 2) {
+      // Round 2: Micro Sentence Puzzle
+      const word = g.words[g.puzzleIndex] || g.words[0];
+      const targetSentence = word.example || ('Please use your ' + word.word + '.');
+      if (!g.cachedTokens || g.cachedWord !== word.word) {
+        const tokens = targetSentence.replace(/[.!?]/g, '').split(/\s+/).filter(Boolean);
+        const shuffled = [...tokens];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        g.cachedTokens = tokens;
+        g.cachedShuffledTokens = shuffled;
+        g.cachedWord = word.word;
+      }
+      const tokens = g.cachedTokens;
+      const shuffledTokens = g.cachedShuffledTokens;
+
+      stageHtml = `
+        <div class="mini-game-round round-2">
+          <div class="mini-game-header">
+            <span class="game-badge"><i data-lucide="sparkles"></i> Round 2: ${t('scaffold.game-round2-title', 'Susun Kalimat Tata Bahasa')}</span>
+            <span class="game-progress-tag">${g.puzzleIndex + 1}/${Math.min(3, g.words.length)}</span>
+          </div>
+          <p class="game-instruction">${t('scaffold.game-round2-desc', 'Susun kepingan kata menjadi kalimat yang tepat!')}</p>
+
+          <div class="puzzle-clue-card">
+            <span class="clue-label">${t('scaffold.fokus-kata', 'Fokus Kata: {word} ({meaning})', { word: word.word, meaning: word.meaning })}</span>
+          </div>
+
+          <div class="puzzle-sentence-stage" id="puzzleSentenceStage">
+            <div class="puzzle-slot-line" id="puzzleSlotLine">
+              ${g.placedTokens.map((tok, idx) => `
+                <button type="button" class="puzzle-placed-chip" onclick="FiezelGrammarVocabBridge.removePuzzleToken(${idx})">
+                  ${esc(tok)}
+                </button>
+              `).join('')}
+              ${g.placedTokens.length === 0 ? '<span class="puzzle-empty-hint">' + t('scaffold.hint-ketuk-keping', 'Ketuk keping di bawah...') + '</span>' : ''}
+            </div>
+          </div>
+
+          <div class="puzzle-bank-tiles">
+            ${shuffledTokens.map((tok, idx) => {
+              const usedCount = g.placedTokens.filter(t => t === tok).length;
+              const totalInTokens = tokens.filter(t => t === tok).length;
+              const isUsed = usedCount >= totalInTokens;
+              return `
+                <button type="button" 
+                        class="puzzle-tile${isUsed ? ' is-used' : ''}" 
+                        ${isUsed ? 'disabled' : ''}
+                        onclick="FiezelGrammarVocabBridge.addPuzzleToken('${esc(tok)}')">
+                  ${esc(tok)}
+                </button>
+              `;
+            }).join('')}
+          </div>
+
+          <div class="puzzle-actions">
+            <button type="button" class="puzzle-submit-btn" onclick="FiezelGrammarVocabBridge.checkSentencePuzzle()">
+              <i data-lucide="check-circle-2"></i>
+              <span>${t('scaffold.btn-periksa-kalimat', 'Periksa Kalimat')}</span>
+            </button>
+          </div>
+        </div>
+      `;
+    } else if (g.round === 3) {
+      // Round 3: Victory & Auto-Unlock
+      stageHtml = `
+        <div class="mini-game-round round-3-unlocked">
+          <div class="unlock-animation-box">
+            <div class="unlock-trophy-ring">
+              <i data-lucide="trophy"></i>
+            </div>
+            <h2>${t('scaffold.game-unlocked-title', 'Luar Biasa! Kosakata Terkuasai 🎉')}</h2>
+            <p class="muted">${t('scaffold.game-unlocked-desc', 'Latihan soal grammar otomatis terbuka untukmu...')}</p>
+
+            <div class="unlock-progress-fill">
+              <div class="fill-bar"></div>
+            </div>
+
+            <button type="button" class="enter-grammar-btn primary" onclick="FiezelGrammarVocabBridge.completeMiniGameAndUnlock('${g.skill}')">
+              <i data-lucide="play"></i>
+              <span>${t('scaffold.btn-enter-grammar', 'Masuk ke Latihan Grammar 🚀')}</span>
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    const html = `
+      <div class="modal-mini-game-sheet">
+        <div class="mini-game-nav">
+          <span class="game-brand">FIEZEL QUEST</span>
+          <button type="button" class="modal-close-corner" onclick="closeModal()" aria-label="Tutup">
+            <i data-lucide="x"></i>
+          </button>
+        </div>
+        ${stageHtml}
+      </div>
+    `;
+
+    openModal(html);
+
+    if (g.round === 3) {
+      // Auto-unlock transition after 1.8 seconds
+      setTimeout(() => {
+        if (_activeMiniGame && _activeMiniGame.round === 3 && _activeMiniGame.skill === g.skill) {
+          completeMiniGameAndUnlock(g.skill);
+        }
+      }, 1800);
+    }
+  }
+
+  function handleCardClick(id, type) {
+    if (!_activeMiniGame || _activeMiniGame.round !== 1) return;
+    const g = _activeMiniGame;
+
+    if (type === 'en') {
+      g.selectedEn = id;
+      const wordObj = g.words.find(w => w.id === id);
+      if (wordObj) playAudio(wordObj.word);
+      playSfx('tap');
+      triggerHaptic('selection');
+    } else if (type === 'id') {
+      g.selectedId = id;
+      playSfx('tap');
+    }
+
+    // Check if both selected
+    if (g.selectedEn && g.selectedId) {
+      if (g.selectedEn === g.selectedId) {
+        // MATCH!
+        g.matchedIds.add(g.selectedEn);
+        g.combo++;
+        playSfx('success');
+        triggerHaptic('medium');
+        g.selectedEn = null;
+        g.selectedId = null;
+
+        // Check completion of Round 1
+        if (g.matchedIds.size >= g.words.length) {
+          playSfx('levelup');
+          setTimeout(() => {
+            if (_activeMiniGame) {
+              _activeMiniGame.round = 2;
+              _activeMiniGame.puzzleIndex = 0;
+              _activeMiniGame.placedTokens = [];
+              renderMiniGameModal();
+            }
+          }, 600);
+          return;
+        }
+      } else {
+        // MISMATCH
+        g.combo = 0;
+        playSfx('error');
+        triggerHaptic('light');
+        g.selectedEn = null;
+        g.selectedId = null;
+      }
+    }
+
+    renderMiniGameModal();
+  }
+
+  function addPuzzleToken(tok) {
+    if (!_activeMiniGame || _activeMiniGame.round !== 2) return;
+    _activeMiniGame.placedTokens.push(tok);
+    playSfx('tap');
+    renderMiniGameModal();
+  }
+
+  function removePuzzleToken(idx) {
+    if (!_activeMiniGame || _activeMiniGame.round !== 2) return;
+    _activeMiniGame.placedTokens.splice(idx, 1);
+    playSfx('tap');
+    renderMiniGameModal();
+  }
+
+  function checkSentencePuzzle() {
+    if (!_activeMiniGame || _activeMiniGame.round !== 2) return;
+    const g = _activeMiniGame;
+    const word = g.words[g.puzzleIndex] || g.words[0];
+    const targetSentence = word.example || ('Please use your ' + word.word + '.');
+    const targetTokens = targetSentence.replace(/[.!?]/g, '').split(/\s+/).filter(Boolean);
+
+    const userSentence = g.placedTokens.join(' ').toLowerCase();
+    const expectedSentence = targetTokens.join(' ').toLowerCase();
+
+    if (userSentence === expectedSentence || g.placedTokens.length >= targetTokens.length) {
+      // Puzzle correct or advanced
+      playSfx('success');
+      playAudio(targetSentence);
+      g.puzzleIndex++;
+      g.placedTokens = [];
+
+      const maxPuzzles = Math.min(2, g.words.length);
+      if (g.puzzleIndex >= maxPuzzles) {
+        // Round 2 completed -> Move to Round 3 (Auto-Unlock!)
+        g.round = 3;
+        playSfx('levelup');
+        renderMiniGameModal();
+      } else {
+        renderMiniGameModal();
+      }
+    } else {
+      playSfx('error');
+      if (typeof showToast === 'function') {
+        showToast(t('scaffold.toast-urutan-salah', 'Coba periksa urutan katanya lagi ya!'), 'warn');
+      }
+    }
+  }
+
+  function completeMiniGameAndUnlock(skill) {
+    _activeMiniGame = null;
+    const s = typeof state !== 'undefined' ? state : null;
+    if (s) {
+      if (!s.grammar) s.grammar = {};
+      if (!s.grammar[skill]) s.grammar[skill] = {};
+      s.grammar[skill].vocabReady = true;
+      if (typeof save === 'function') {
+        try { save(); } catch (_) {}
+      }
+    }
+
+    if (typeof closeModal === 'function') {
+      closeModal();
+    }
+
+    if (typeof showToast === 'function') {
+      showToast(t('scaffold.toast-vocab-terkuasai', 'Kosakata Terkuasai! Membuka Latihan Grammar...'), 'success');
+    }
+
+    // Launch grammar practice
+    if (typeof practiceSkill === 'function') {
+      practiceSkill(skill);
+    } else if (typeof renderGrammarLesson === 'function') {
+      renderGrammarLesson(skill);
+    }
+  }
+
+  /**
+   * Helper to get pure semantic meaning distractors without part-of-speech labels
+   */
+  function getSemanticMeaningDistractors(targetWord, allPool, count = 3) {
+    const targetMeaning = String(targetWord?.meaning || '').split(';')[0].trim().toLowerCase();
+    const otherMeanings = (allPool || [])
+      .filter(w => w.word !== targetWord.word && w.meaning)
+      .map(w => String(w.meaning).split(';')[0].trim().toLowerCase())
+      .filter(m => m !== targetMeaning && m.length > 1 && !/^(kata\s+|noun|verb|adjective|kata benda|kata kerja|kata seru)/i.test(m));
+
+    const unique = [...new Set(otherMeanings)];
+    const shuffled = [...unique];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    const chosen = shuffled.slice(0, count);
+
+    const fallbacks = ['tangan', 'mulut', 'kaki', 'rumah', 'jalan', 'buku', 'teman', 'hari', 'makan', 'minum'];
+    while (chosen.length < count) {
+      const fb = fallbacks[chosen.length % fallbacks.length];
+      if (fb !== targetMeaning && !chosen.includes(fb)) chosen.push(fb);
+    }
+
+    return chosen;
+  }
+
   // Public Interface
   const FiezelGrammarVocabBridge = {
     LEVELS: LEARNING_INTENSITY_LEVELS,
@@ -544,7 +1097,21 @@
     handleIntensitySelect,
     applyIntensityAndClose,
     loadGrammarVocabMap,
-    setGrammarVocabMap
+    setGrammarVocabMap,
+    checkFirstTimeIntensity,
+    openFirstTimeIntensityModal,
+    selectFirstTimeIntensity,
+    openLessonPrerequisiteGate,
+    skipToGrammar,
+    playVocabAudio,
+    startVocabMiniGame,
+    renderMiniGameModal,
+    handleCardClick,
+    addPuzzleToken,
+    removePuzzleToken,
+    checkSentencePuzzle,
+    completeMiniGameAndUnlock,
+    getSemanticMeaningDistractors
   };
 
   // Export to global scope

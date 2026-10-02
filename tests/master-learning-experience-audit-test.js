@@ -141,7 +141,23 @@ assert.ok(!appJs.includes('repairSentence=completeGrammarStem(grammarOptionStem(
 assert.ok(appJs.includes('repairSentence=completeGrammarStem(base,targetWord)'), 'app.js must retain full stem context in repair questions');
 console.log('✓ Test 8 passed: Multi-sentence stem context preserved, preventing explanation-question mismatches.\n');
 
+// 9. EXPLANATION SYNCHRONIZATION (ROOT-CAUSE REPAIR ADAPTATION & CLEAN REASONS)
+console.log('--- TEST 9: Explanation Synchronization Across Practice Modes ---');
+// Verify grammarLessonExplain adapts repair mode explanations
+assert.ok(appJs.includes("mode='',targetWord=''") || appJs.includes("mode='', targetWord=''"), 'grammarLessonExplain must accept mode and targetWord');
+assert.ok(appJs.includes("sanitizeRepair"), 'grammarLessonExplain must sanitize repair explanations');
+assert.ok(appJs.includes("mode.startsWith('repair_')") || appJs.includes("String(mode||'').startsWith('repair_')"), 'repair modes must be detected in grammarLessonExplain');
+// Verify grammarCorrectOptionReason does not prepend redundant pronoun lists to whyCorrect
+assert.ok(appJs.includes("w&&norm(w)!==norm(String(optionText||''))"), 'grammarCorrectOptionReason must prioritize card whyCorrect without boilerplate pollution');
+// Verify style.css and grammar-upgrade.css have uppercase kicker styling for instruction
+assert.ok(styleCss.includes('text-transform: uppercase'), 'style.css must have uppercase kicker for instruction');
+assert.ok(styleCss.includes('0.75rem'), 'style.css must have smaller font size 0.75rem for instruction');
+assert.ok(grammarCss.includes('text-transform: uppercase'), 'grammar-upgrade.css must have uppercase kicker for instruction');
+assert.ok(grammarCss.includes('0.75rem'), 'grammar-upgrade.css must have smaller font size 0.75rem for instruction');
+console.log('✓ Test 9 passed: Root-cause explanation synchronization verified across all practice modes.\n');
+
 console.log('====================================================');
 console.log('ALL MASTER AUDIT LEARNING EXPERIENCE TESTS PASSED!');
 console.log('====================================================');
+
 

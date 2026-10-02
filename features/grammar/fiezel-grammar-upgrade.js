@@ -195,7 +195,7 @@
     }
 
     submitBtn.onclick = () => {
-      const norm = (s) => String(s || '').toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()“”"']/g, '').replace(/\s+/g, ' ').trim();
+      const norm = (s) => String(s || '').toLowerCase().replace(/[^\w\s]/g, '').replace(/\s+/g, ' ').trim();
       const userText = placedTokens.map(t => t.text).join(' ');
       const userNorm = norm(userText);
       const correctText = (q.tokens || []).map(t => typeof t === 'object' && t.text ? t.text : String(t)).join(' ');
@@ -257,22 +257,63 @@
     if (!stem) return '';
     const esc = (str) => {
       if (typeof self !== 'undefined' && typeof self.esc === 'function') return self.esc(str);
-      return String(str ?? '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m]));
+      return String(str ?? '')
+        .split('&').join('&amp;')
+        .split('<').join('&lt;')
+        .split('>').join('&gt;')
+        .split('"').join('&quot;')
+        .split("'").join('&#039;');
     };
 
     // Jika sudah ada tag target-word, kembalikan langsung
     if (/<span class="target-word">|<mark>|<u><i>|<i><u>/i.test(stem)) return stem;
 
-    let target = String(targetWord || '').trim().replace(/^["“'‘]+|["”'’]+$/g, '');
+    // 1. Tangani penanda eksplisit dalam teks jika ada: *kata*, [kata], <u>kata</u>
+    const mdMatch = stem.match(/(\*|_|<u>|\[)([A-Za-z0-9_’'\s-]{1,40})(\*|_|<\/u>|\])/i);
+    if (mdMatch && !/_{2,}|\[\.\.\.\]/.test(mdMatch[0])) {
+      const matchIndex = mdMatch.index;
+      const fullLen = mdMatch[0].length;
+      const word = mdMatch[2].trim();
+      const before = stem.slice(0, matchIndex);
+      const after = stem.slice(matchIndex + fullLen);
+      return `${esc(before)}<span class="target-word">${esc(word)}</span>${esc(after)}`;
+    }
 
-    // Deteksi otomatis jika target belum diset eksplisit dan instruksi meminta perbaikan kalimat
-    if (!target && /perbaiki|repair|koreksi|ganti|benahi|ubah|salah|pilihan yang tepat|แก้ไข/i.test(instruction || '') && Array.isArray(options)) {
-      for (const opt of options) {
-        const cleanOpt = String(opt || '').trim().replace(/^["“'‘]+|["”'’]+$/g, '');
-        if (cleanOpt && cleanOpt.length > 0) {
-          const optRegex = new RegExp(`(?:^|[^A-Za-z0-9_’'])(${cleanOpt.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})(?:[^A-Za-z0-9_’']|$)`, 'i');
+    const stripQuotes = (s) => {
+      let r = String(s || '').trim();
+      const openQuotes = ['"', "'", '\u201c', '\u2018'];
+      const closeQuotes = ['"', "'", '\u201d', '\u2019'];
+      if (r.length >= 2) {
+        const first = r[0];
+        const last = r[r.length - 1];
+        const openIdx = openQuotes.indexOf(first);
+        const closeIdx = closeQuotes.indexOf(last);
+        if (openIdx !== -1 && closeIdx !== -1) {
+          return r.slice(1, -1).trim();
+        }
+      }
+      return r;
+    };
+
+    let target = stripQuotes(targetWord);
+
+    // 2. Deteksi otomatis jika target belum diset eksplisit dan instruksi meminta perbaikan kalimat
+    if (!target && /perbaiki|repair|koreksi|ganti|benahi|ubah|salah|pilihan yang tepat|correct|fix|pilihlah|แก้ไข/i.test(instruction || '')) {
+      const quoteMatch = stem.match(new RegExp('[\\x22\\u201c\\x27\\u2018]([A-Za-z0-9_\\u2019\\x27-]{1,30})[\\x22\\u201d\\x27\\u2019]'));
+      if (quoteMatch && quoteMatch[1]) {
+        target = quoteMatch[1];
+      } else if (Array.isArray(options) && options.length > 0) {
+        const sortedOpts = [...options]
+          .map(opt => stripQuotes(opt))
+          .filter(Boolean)
+          .sort((a, b) => b.length - a.length);
+
+        for (const cleanOpt of sortedOpts) {
+          const cleanOptionText = cleanOpt.replace(/^\[|\]$/g, '').trim();
+          const escOpt = (cleanOptionText || cleanOpt).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          const optRegex = new RegExp('(?:^|[^A-Za-z0-9])(' + escOpt + ')(?:[^A-Za-z0-9]|$)', 'i');
           if (optRegex.test(stem)) {
-            target = cleanOpt;
+            target = cleanOptionText || cleanOpt;
             break;
           }
         }
@@ -280,7 +321,9 @@
     }
 
     if (target) {
-      const regex = new RegExp(`(^|[^A-Za-z0-9_’'])(${target.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})([^A-Za-z0-9_’']|$)`, 'i');
+      const cleanTarget = target.replace(/^\[|\]$/g, '').trim();
+      const escTarget = (cleanTarget || target).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp('(^|[^A-Za-z0-9])(' + escTarget + ')([^A-Za-z0-9]|$)', 'i');
       const match = stem.match(regex);
       if (match) {
         const matchIndex = match.index + match[1].length;

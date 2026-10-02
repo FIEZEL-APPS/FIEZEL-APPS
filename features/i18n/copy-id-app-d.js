@@ -529,7 +529,28 @@
     'scaffold.setting-santai': 'Pelajar Santai (5 Vocab · 10 Soal)',
     'scaffold.setting-opt-santai': 'Pelajar Santai (5V · 10G)',
     'scaffold.setting-opt-teladan': 'Siswa Teladan (10V · 15G)',
-    'scaffold.setting-opt-rajin': 'Super Rajin (15V · 20G)'
+    'scaffold.setting-opt-rajin': 'Super Rajin (15V · 20G)',
+    'scaffold.onboarding-title': 'Pilih Ritme Belajarmu',
+    'scaffold.onboarding-desc': 'Tentukan berapa banyak kosakata kunci yang ingin kamu kuasai per materi grammar.',
+    'scaffold.gateway-title': 'Misi Kosakata Kunci',
+    'scaffold.gateway-subtitle': 'Kuasai {count} kosakata kunci ini lewat mini game seru agar kamu lancar mengerjakan kalimatnya!',
+    'scaffold.btn-start-game': 'Mulai Mini Game Seru 🎮',
+    'scaffold.btn-skip-to-grammar': 'Lanjut ke Latihan Grammar ⚡',
+    'scaffold.game-round1-title': 'Cocokkan Kata & Artinya',
+    'scaffold.game-round1-desc': 'Ketuk kata bahasa Inggris lalu ketuk artinya yang pas!',
+    'scaffold.game-round2-title': 'Susun Kalimat Tata Bahasa',
+    'scaffold.game-round2-desc': 'Susun kepingan kata menjadi kalimat yang tepat!',
+    'scaffold.game-combo': 'Kombo x{count}! 🔥',
+    'scaffold.game-great': 'Hebat! 🌟',
+    'scaffold.game-perfect': 'Sempurna! 💯',
+    'scaffold.game-unlocked-title': 'Luar Biasa! Kosakata Terkuasai 🎉',
+    'scaffold.game-unlocked-desc': 'Latihan soal grammar otomatis terbuka untukmu...',
+    'scaffold.btn-enter-grammar': 'Masuk ke Latihan Grammar 🚀',
+    'scaffold.fokus-kata': 'Fokus Kata: {word} ({meaning})',
+    'scaffold.hint-ketuk-keping': 'Ketuk keping di bawah...',
+    'scaffold.btn-periksa-kalimat': 'Periksa Kalimat',
+    'scaffold.toast-urutan-salah': 'Coba periksa urutan katanya lagi ya!',
+    'scaffold.toast-vocab-terkuasai': 'Kosakata Terkuasai! Membuka Latihan Grammar...'
   };
   I18N.registerCopy('id', MAP);
 })(typeof globalThis !== 'undefined' ? globalThis : this);
