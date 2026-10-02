@@ -414,6 +414,19 @@ assert(appSrc.includes('data-testid="grammar-token-rail-btn"'), 'app.js must pro
 assert(appSrc.includes('feedback-rule-pill'), 'app.js must include feedback-rule-pill class in feedback reveal');
 console.log('✓ Test 8 passed: Hub entry and runtime feedback class confirmed in app.js.');
 
+console.log('--- TEST 9: Seamless Unified 20-Question Grammar Session ---');
+// Verify empty vault returns '' so zero-mistake users see no redundant panels
+sandbox.state.mistakeVault = {};
+sandbox.state.history = [];
+assert.strictEqual(Upgrade.renderVaultCard(), '', 'Empty vault must return empty string to prevent panel clutter');
+
+// Verify weaveGrammarSessionVariety weaves both token-order and video-grammar slots
+assert(appSrc.includes('const tokenSlots=count>=15?[3,10,16]'), 'app.js must reserve token slots in 20-question session');
+assert(appSrc.includes('const videoSlots=count>=15?[6,13,18]'), 'app.js must reserve video slots in 20-question session');
+assert(appSrc.includes('vgBankRaw'), 'app.js must bind vgBankRaw in data loader');
+assert(appSrc.includes('self.__videoGrammarBankCache=vgBankRaw.videoGrammarBank'), 'app.js must populate video cache');
+console.log('✓ Test 9 passed: Unified 20-question session weaving and uncluttered panel confirmed.');
+
 console.log('\n========================================');
-console.log('ALL 8 GRAMMAR UPGRADES FULLY VERIFIED PASS!');
+console.log('ALL GRAMMAR UPGRADES FULLY VERIFIED PASS!');
 console.log('========================================\n');

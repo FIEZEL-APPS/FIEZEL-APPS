@@ -166,7 +166,7 @@
 /* m025-42: one scale, always. The viewport tag alone is ignored by iOS Safari, so the
    layout is pinned here as well and the gestures are refused in fiezel-zoom-lock.js.
    touch-action:manipulation is what removes the double-tap-to-zoom delay and action. */
-html{scroll-behavior:smooth;touch-action:manipulation;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+html{scroll-behavior:auto;touch-action:manipulation;-webkit-text-size-adjust:100%;text-size-adjust:100%;overflow-x:clip}
 html,body{touch-action:manipulation}
 /* m025-43 OWNER: a long press anywhere popped the iOS selection/copy callout on top
    of the lesson. Selection is off app-wide; real text fields keep it, because a
@@ -191,7 +191,8 @@ body{
   color:var(--ambient-text);
   font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,ui-sans-serif,"Segoe UI",sans-serif;
   -webkit-font-smoothing:antialiased;
-  overflow-x:hidden;
+  overflow-x:clip;
+  overflow-y:visible;
   transition:color 1.2s var(--ease),background 1.2s var(--ease);
 }
 
@@ -5975,7 +5976,8 @@ html.has-home-today #globalSky {
   box-sizing: border-box !important;
   width: 100% !important;
   max-width: 100% !important;
-  overflow-x: hidden !important;
+  overflow-x: clip !important;
+  overflow-y: visible !important;
   scroll-padding-bottom: calc(80px + env(safe-area-inset-bottom, 12px)) !important;
 }
 
@@ -8428,8 +8430,15 @@ button.fz-coach-bubble,
 
 /* 1. Viewport & App Container */
 @media (max-width: 768px) {
-  html, body {
-    overflow-x: hidden !important;
+  html {
+    overflow-x: clip !important;
+    overflow-y: auto !important;
+    background: #0A0A0E !important;
+    -webkit-overflow-scrolling: touch;
+  }
+  body {
+    overflow-x: clip !important;
+    overflow-y: visible !important;
     background: #0A0A0E !important;
   }
 

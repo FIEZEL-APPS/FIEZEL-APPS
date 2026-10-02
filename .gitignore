@@ -112,6 +112,7 @@ remotion/public/assets
 *.wav
 *.mp4
 scratch/
+mockups/media/
 archive/
 failed*.txt
 page_*.txt

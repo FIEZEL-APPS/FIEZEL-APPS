@@ -460,6 +460,7 @@
 
   FiezelGrammarUpgrade.renderVaultCard = function() {
     const count = this.getMistakeCount();
+    if (!count || count <= 0) return '';
     
     const cardHtml = `
       <div class="row">
@@ -467,15 +468,11 @@
         <span>${count} ${FiezelI18n.t('grammar.mistake-vault-items', 'catatan')}</span>
       </div>
       <p class="muted">
-        ${count > 0 
-          ? FiezelI18n.t('grammar.mistake-vault-desc-active', 'Latih kembali polanya sampai tuntas 2x sesi.') 
-          : FiezelI18n.t('grammar.mistake-vault-desc-empty', 'Hebat! Kamu tidak memiliki catatan kesalahan tertunda.')}
+        ${FiezelI18n.t('grammar.mistake-vault-desc-active', 'Latih kembali polanya sampai tuntas 2x sesi.')}
       </p>
-      ${count > 0 
-        ? `<button onclick="startMistakeVaultSession()" class="primary">
-             ${FiezelI18n.t('grammar.mistake-vault-btn', 'Latih Kesalahan')} <i data-lucide="arrow-right"></i>
-           </button>` 
-        : ''}
+      <button onclick="startMistakeVaultSession()" class="primary">
+        ${FiezelI18n.t('grammar.mistake-vault-btn', 'Latih Kesalahan')} <i data-lucide="arrow-right"></i>
+      </button>
     `;
 
     return typeof self.card === 'function' ? self.card(cardHtml, 'mistake-vault-card') : `<div class="card mistake-vault-card">${cardHtml}</div>`;

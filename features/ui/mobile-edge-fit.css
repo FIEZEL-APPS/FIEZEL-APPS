@@ -6,8 +6,15 @@
 
 /* 1. Viewport & App Container */
 @media (max-width: 768px) {
-  html, body {
-    overflow-x: hidden !important;
+  html {
+    overflow-x: clip !important;
+    overflow-y: auto !important;
+    background: #FFF9EE !important;
+    -webkit-overflow-scrolling: touch;
+  }
+  body {
+    overflow-x: clip !important;
+    overflow-y: visible !important;
     background: #FFF9EE !important;
   }
 

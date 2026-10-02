@@ -38,7 +38,8 @@
 body.fz-view-nujum {
   background-color: var(--nj-bg) !important;
   color: var(--nj-ink) !important;
-  overflow-x: hidden !important;
+  overflow-x: clip !important;
+  overflow-y: visible !important;
   font-family: var(--nj-font);
 }
 
