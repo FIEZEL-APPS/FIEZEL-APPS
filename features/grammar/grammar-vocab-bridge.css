@@ -1,0 +1,458 @@
+/**
+ * features/grammar/grammar-vocab-bridge.css
+ * Styling for FIEZEL Grammar-Vocab Scaffolding & Pacing Leveling Engine
+ * Enforces high contrast, cream/terracotta palette, zero voids, and clean responsive pill UI.
+ */
+
+/* ==========================================================================
+   1. INTENSITY SELECTOR BAR (Grammar Hub & Settings)
+   ========================================================================== */
+.grammar-intensity-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: #FFFFFF;
+  border: 1px solid #EFE7DE;
+  border-radius: 16px;
+  padding: 12px 14px;
+  margin: 10px 0 16px 0;
+  box-shadow: 0 2px 6px rgba(46, 39, 36, 0.04);
+}
+
+.grammar-intensity-selector.is-compact {
+  padding: 8px 10px;
+  margin: 6px 0 10px 0;
+  border-radius: 12px;
+}
+
+.intensity-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.intensity-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #6E635C;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.intensity-eyebrow i,
+.intensity-eyebrow svg {
+  width: 14px;
+  height: 14px;
+  stroke: #7A5512;
+}
+
+.intensity-current-badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #7A5512;
+  background: #FBF3E2;
+  border: 1px solid #EFDFB8;
+  padding: 2px 8px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.intensity-pill-group {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  background: #F8F3ED;
+  padding: 4px;
+  border-radius: 12px;
+  border: 1px solid #EFE7DE;
+}
+
+@media (max-width: 480px) {
+  .intensity-pill-group {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+}
+
+.intensity-pill {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 8px 6px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  color: #2E2724;
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.2, 0.8, 0.3, 1);
+  text-align: center;
+  user-select: none;
+  min-height: 48px;
+}
+
+.intensity-pill:hover {
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.intensity-pill.is-active {
+  background: #FFFFFF !important;
+  color: #5E1420 !important;
+  border: 1.5px solid #9B3A4A !important;
+  box-shadow: 0 2px 8px rgba(155, 58, 74, 0.12);
+  font-weight: 800;
+}
+
+.intensity-pill-dot {
+  display: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #9B3A4A;
+  margin-bottom: 2px;
+}
+
+.intensity-pill.is-active .intensity-pill-dot {
+  display: inline-block;
+}
+
+.intensity-pill-name {
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.intensity-pill.is-active .intensity-pill-name {
+  font-weight: 800;
+  color: #5E1420;
+}
+
+.intensity-pill-meta {
+  font-size: 0.68rem;
+  color: #6E635C;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.intensity-pill.is-active .intensity-pill-meta {
+  color: #7A5512;
+  font-weight: 700;
+}
+
+/* ==========================================================================
+   2. VOCABULARY SCAFFOLDING WARMUP CARD (Inside Lesson View)
+   ========================================================================== */
+.grammar-vocab-scaffold-card {
+  background: #FFFFFF;
+  border: 1.5px solid #EFE7DE;
+  border-radius: 16px;
+  padding: 14px 16px;
+  margin: 12px 0 16px 0;
+  box-shadow: 0 4px 12px rgba(46, 39, 36, 0.04);
+}
+
+.scaffold-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.scaffold-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.scaffold-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #7A5512;
+}
+
+.scaffold-eyebrow i,
+.scaffold-eyebrow svg {
+  width: 14px;
+  height: 14px;
+  stroke: #7A5512;
+}
+
+.scaffold-stats {
+  font-size: 0.84rem;
+  color: #2E2724;
+}
+
+.scaffold-stats b {
+  color: #059669;
+}
+
+.scaffold-intensity-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #FBF7F3;
+  border: 1px solid #EFE7DE;
+  border-radius: 20px;
+  padding: 5px 10px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #2E2724;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.scaffold-intensity-toggle:hover {
+  background: #F8EBE8;
+  border-color: #9B3A4A;
+  color: #5E1420;
+}
+
+.scaffold-intensity-toggle i,
+.scaffold-intensity-toggle svg {
+  width: 12px;
+  height: 12px;
+}
+
+.scaffold-pills-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 6px 0 10px 0;
+  flex-wrap: wrap;
+}
+
+.scaffold-intensity-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  border-radius: 99px;
+  border: 1px solid #EFE7DE;
+  background: #FFFFFF;
+  color: #6E635C;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.scaffold-intensity-pill:hover {
+  background: #F8F3ED;
+  color: #2E2724;
+}
+
+.scaffold-intensity-pill.is-active {
+  background: #FBF3E2;
+  border-color: #EFDFB8;
+  color: #7A5512;
+  font-weight: 800;
+  box-shadow: 0 1px 3px rgba(122, 85, 18, 0.12);
+}
+
+.scaffold-progress-bar {
+  width: 100%;
+  height: 6px;
+  background: #EFE7DE;
+  border-radius: 99px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.scaffold-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #34D399, #059669);
+  border-radius: 99px;
+  transition: width 0.3s ease;
+}
+
+.scaffold-vocab-rail {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+  max-height: 160px;
+  overflow-y: auto;
+  padding: 2px;
+}
+
+.scaffold-vocab-chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  background: #FBF7F3;
+  border: 1px solid #EFE7DE;
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-size: 0.78rem;
+  color: #2E2724;
+  transition: transform 0.12s ease;
+}
+
+.scaffold-vocab-chip:hover {
+  transform: translateY(-1px);
+}
+
+.scaffold-vocab-chip.is-mastered {
+  background: #ECFDF5;
+  border-color: #A7F3D0;
+  color: #065F46;
+}
+
+.scaffold-vocab-chip.is-mastered .chip-icon {
+  stroke: #059669;
+}
+
+.scaffold-vocab-chip.is-learning {
+  background: #FFFBEB;
+  border-color: #FDE68A;
+  color: #92400E;
+}
+
+.scaffold-vocab-chip.is-learning .chip-icon {
+  stroke: #D97706;
+}
+
+.scaffold-vocab-chip .chip-icon {
+  width: 11px;
+  height: 11px;
+  display: inline-block;
+  align-self: center;
+  stroke: #6E635C;
+}
+
+.chip-word {
+  font-weight: 700;
+  color: inherit;
+}
+
+.chip-meaning {
+  font-size: 0.72rem;
+  color: #6E635C;
+}
+
+.scaffold-vocab-chip.is-mastered .chip-meaning {
+  color: #047857;
+}
+
+.scaffold-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.scaffold-warmup-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 0.88rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   3. MODAL INTENSITY SHEET
+   ========================================================================== */
+.modal-intensity-sheet {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.modal-intensity-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 6px 0;
+}
+
+.intensity-option-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: #FDFAF3;
+  border: 1.5px solid #EFE7DE;
+  border-radius: 14px;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+
+.intensity-option-card:hover {
+  background: #FFFFFF;
+  border-color: #9B3A4A;
+  transform: translateY(-1px);
+}
+
+.intensity-option-card.is-selected {
+  background: #FFFFFF !important;
+  border: 2px solid #9B3A4A !important;
+  box-shadow: 0 4px 12px rgba(155, 58, 74, 0.12);
+}
+
+.option-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.option-name {
+  font-size: 0.95rem;
+  color: #2E2724;
+}
+
+.intensity-option-card.is-selected .option-name {
+  color: #5E1420;
+}
+
+.option-badge {
+  font-size: 0.72rem;
+  font-weight: 800;
+  background: #FBF3E2;
+  border: 1px solid #EFDFB8;
+  color: #7A5512;
+  padding: 2px 8px;
+  border-radius: 16px;
+}
+
+.option-desc {
+  font-size: 0.82rem;
+  color: #6E635C;
+  margin: 0;
+  line-height: 1.35;
+}
+
+.option-specs {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #7A5512;
+}
+
+.option-specs span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.option-specs i,
+.option-specs svg {
+  width: 13px;
+  height: 13px;
+}

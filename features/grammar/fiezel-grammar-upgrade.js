@@ -228,7 +228,8 @@
       annotations.forEach(ann => {
         if (ann.word && ann.type) {
           const regex = new RegExp(`\\b(${ann.word})\\b`, 'gi');
-          result = result.replace(regex, `<span class="syntax-${ann.type}">$1</span>`);
+          const cls = ann.type === 'target' || ann.type === 'error' ? 'target-word' : `syntax-${ann.type}`;
+          result = result.replace(regex, `<span class="${cls}">$1</span>`);
         }
       });
       return result;
@@ -241,6 +242,57 @@
       const type = FiezelGrammarUpgrade.classifyWord(w);
       return type ? `<span class="syntax-${type}">${esc(w)}</span>` : esc(w);
     }).join('');
+  };
+
+  /**
+   * 2b. Target Word Formatter for Sentence Correction & Fill-in Questions
+   * Formats the target word/error token with distinct highlight tint, underline, and italic styling.
+   * @param {string} stem Kalimat utama soal
+   * @param {string} [targetWord] Kata target spesifik jika ada
+   * @param {Array} [options] Pilihan jawaban untuk deteksi otomatis
+   * @param {string} [instruction] Instruksi soal untuk deteksi mode repair
+   * @returns {string} String HTML aman dengan tag <span class="target-word">
+   */
+  FiezelGrammarUpgrade.formatTargetWord = function(stem, targetWord, options, instruction) {
+    if (!stem) return '';
+    const esc = (str) => {
+      if (typeof self !== 'undefined' && typeof self.esc === 'function') return self.esc(str);
+      return String(str ?? '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m]));
+    };
+
+    // Jika sudah ada tag target-word, kembalikan langsung
+    if (/<span class="target-word">|<mark>|<u><i>|<i><u>/i.test(stem)) return stem;
+
+    let target = String(targetWord || '').trim().replace(/^["“'‘]+|["”'’]+$/g, '');
+
+    // Deteksi otomatis jika target belum diset eksplisit dan instruksi meminta perbaikan kalimat
+    if (!target && /perbaiki|repair|koreksi|ganti|benahi|ubah|salah|pilihan yang tepat|แก้ไข/i.test(instruction || '') && Array.isArray(options)) {
+      for (const opt of options) {
+        const cleanOpt = String(opt || '').trim().replace(/^["“'‘]+|["”'’]+$/g, '');
+        if (cleanOpt && cleanOpt.length > 0) {
+          const optRegex = new RegExp(`(?:^|[^A-Za-z0-9_’'])(${cleanOpt.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})(?:[^A-Za-z0-9_’']|$)`, 'i');
+          if (optRegex.test(stem)) {
+            target = cleanOpt;
+            break;
+          }
+        }
+      }
+    }
+
+    if (target) {
+      const regex = new RegExp(`(^|[^A-Za-z0-9_’'])(${target.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})([^A-Za-z0-9_’']|$)`, 'i');
+      const match = stem.match(regex);
+      if (match) {
+        const matchIndex = match.index + match[1].length;
+        const wordLen = match[2].length;
+        const before = stem.slice(0, matchIndex);
+        const word = stem.slice(matchIndex, matchIndex + wordLen);
+        const after = stem.slice(matchIndex + wordLen);
+        return `${esc(before)}<span class="target-word">${esc(word)}</span>${esc(after)}`;
+      }
+    }
+
+    return esc(stem);
   };
 
   /**
@@ -515,6 +567,11 @@
     return 1;
   };
 
-  self.FiezelGrammarUpgrade = FiezelGrammarUpgrade;
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = FiezelGrammarUpgrade;
+  }
+  if (typeof self !== 'undefined') {
+    self.FiezelGrammarUpgrade = FiezelGrammarUpgrade;
+  }
 
 })();

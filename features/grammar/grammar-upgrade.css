@@ -149,6 +149,37 @@
   font-style: italic;
 }
 
+/* Target Word / Error Token Highlight in Sentence Correction & Stem */
+.target-word,
+.question-main .target-word,
+.question .target-word,
+mark.target-word,
+.stem-target-word,
+.syntax-target,
+.syntax-error {
+  display: inline-block !important;
+  background: rgba(245, 158, 11, 0.22) !important;
+  color: #b45309 !important;
+  font-style: italic !important;
+  text-decoration: underline !important;
+  text-decoration-color: #f59e0b !important;
+  text-decoration-thickness: 2px !important;
+  text-underline-offset: 4px !important;
+  border-radius: 4px !important;
+  padding: 0 5px !important;
+  font-weight: 700 !important;
+}
+
+.quiz-bubble .target-word,
+.quiz-bubble .question-main .target-word,
+.quiz-stage .target-word,
+.theme-dark .target-word,
+.fz-lux .target-word {
+  color: #fef3c7 !important;
+  background: rgba(245, 158, 11, 0.28) !important;
+  text-decoration-color: #fbbf24 !important;
+}
+
 /* ==========================================================================
    3. Token Rail Exercise
    ========================================================================== */

@@ -108,6 +108,40 @@ assert.ok(grammarUpgradeJs.includes('tokenResetBtn'), 'fiezel-grammar-upgrade.js
 assert.ok(grammarCss.includes('.token-reset-btn'), 'grammar-upgrade.css must style .token-reset-btn');
 console.log('✓ Test 6 passed: Interactive token reset (Hapus) button available for mobile learners.\n');
 
+// 7. TARGET WORD FORMATTING & HIGHLIGHTING IN SENTENCE CORRECTION
+console.log('--- TEST 7: Target Word Highlight, Underline, and Italic in Sentence Correction ---');
+const FiezelGrammarUpgrade = require(grammarUpgradeJsPath);
+assert.strictEqual(typeof FiezelGrammarUpgrade.formatTargetWord, 'function', 'FiezelGrammarUpgrade.formatTargetWord must be a function');
+
+const testStem = 'The dog is happy. Their tail is moving fast.';
+const formattedOutput = FiezelGrammarUpgrade.formatTargetWord(testStem, 'Their', ['Its', 'Their', "It's", "They're"], 'Perbaiki kalimat berikut dengan pilihan yang tepat:');
+assert.ok(formattedOutput.includes('<span class="target-word">Their</span>'), 'Target word must be wrapped in <span class="target-word">');
+assert.ok(formattedOutput.startsWith('The dog is happy.'), 'Full context opening sentence must be retained');
+
+// Test auto-detection from options when targetWord not passed explicitly
+const autoDetectedOutput = FiezelGrammarUpgrade.formatTargetWord(testStem, '', ['Their', 'Its'], 'Perbaiki kalimat berikut:');
+assert.ok(autoDetectedOutput.includes('<span class="target-word">Their</span>'), 'Target word should auto-detect from options in repair questions');
+
+// Verify CSS rules for .target-word in style.css and grammar-upgrade.css
+assert.ok(styleCss.includes('.target-word'), 'style.css must define .target-word');
+assert.ok(styleCss.includes('rgba(245, 158, 11') || styleCss.includes('rgba(245,158,11'), 'style.css must have amber highlight background');
+assert.ok(styleCss.includes('text-decoration: underline'), 'style.css must have underline');
+assert.ok(styleCss.includes('font-style: italic'), 'style.css must have italic styling');
+
+assert.ok(grammarCss.includes('.target-word'), 'grammar-upgrade.css must define .target-word');
+assert.ok(grammarCss.includes('rgba(245, 158, 11') || grammarCss.includes('rgba(245,158,11'), 'grammar-upgrade.css must have amber highlight background');
+assert.ok(grammarCss.includes('text-decoration: underline'), 'grammar-upgrade.css must have underline');
+assert.ok(grammarCss.includes('font-style: italic'), 'grammar-upgrade.css must have italic styling');
+console.log('✓ Test 7 passed: Target word formatted with highlight, underline, and italic styling.\n');
+
+// 8. FULL CONTEXT PRESERVATION (NO MISMATCHED EXPLANATIONS)
+console.log('--- TEST 8: Full Context Preservation Across Multi-Sentence Stems ---');
+// Verify variant 15-17 in app.js preserves multi-sentence stems instead of stripping them via grammarOptionStem
+assert.ok(!appJs.includes('repairSentence=completeGrammarStem(grammarOptionStem(base)'), 'app.js must not strip opening context sentences with grammarOptionStem');
+assert.ok(appJs.includes('repairSentence=completeGrammarStem(base,targetWord)'), 'app.js must retain full stem context in repair questions');
+console.log('✓ Test 8 passed: Multi-sentence stem context preserved, preventing explanation-question mismatches.\n');
+
 console.log('====================================================');
 console.log('ALL MASTER AUDIT LEARNING EXPERIENCE TESTS PASSED!');
 console.log('====================================================');
+

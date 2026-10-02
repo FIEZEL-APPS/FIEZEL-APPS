@@ -395,6 +395,7 @@
     'grammar.aturan-keluarga-relative-clauses': 'ตัดสินว่าอนุประโยค relative จำเป็นต่อการระบุคนหรือสิ่งที่พูดถึง หรือแค่ให้ข้อมูลเสริม เครื่องหมายจุลภาคมักเป็นคำใบ้สำคัญ',
     'grammar.aturan-keluarga-reported-speech': 'เมื่อคำพูดถูกเปลี่ยนเป็นประโยคเล่าความ มุมมอง ลำดับคำ ตัวบอกเวลา และ tense บางครั้งต้องขยับตามเพื่อให้ยังสมเหตุสมผล',
     'grammar.aturan-keluarga-tense-aspect': 'จุดโฟกัสคือการกระทำเกิดขึ้นเมื่อไร และเป็นกิจวัตร กำลังดำเนินอยู่ จบแล้ว หรือเกิดขึ้นก่อนหน้า หาตัวบอกเวลาให้เจอก่อนค่อยเลือกรูปคำกริยา',
+    'grammar.kembali-ke-lesson': 'ไปต่อที่บทเรียนไวยากรณ์',
     'grammar.keluarga-advanced-grammar': 'รูปแบบ grammar ขั้นสูง',
     'grammar.keluarga-articles-determiners': 'article และคำกำหนดนาม',
     'grammar.keluarga-comparison': 'การเปรียบเทียบ',

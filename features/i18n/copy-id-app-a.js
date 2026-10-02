@@ -752,6 +752,7 @@
     'grammar.aturan-keluarga-reported-speech': 'Saat ucapan dipindahkan menjadi kalimat tidak langsung, sudut pandang, urutan kata, penunjuk waktu, dan tense kadang perlu bergeser agar tetap masuk akal.',
     // app.js:311 — GRAMMAR_FAMILY_RULES.tense_aspect
     'grammar.aturan-keluarga-tense-aspect': 'Fokusnya ada pada kapan sebuah tindakan terjadi dan apakah tindakannya rutin, sedang berlangsung, sudah selesai, atau terjadi lebih dulu. Cari petunjuk waktunya sebelum memilih bentuk kata kerja.',
+    'grammar.kembali-ke-lesson': 'Lanjut ke Materi Grammar',
     // app.js:309 — GRAMMAR_FAMILY_LABELS.advanced_grammar
     'grammar.keluarga-advanced-grammar': 'pola grammar tingkat lanjut',
     // app.js:309 — GRAMMAR_FAMILY_LABELS.articles_determiners

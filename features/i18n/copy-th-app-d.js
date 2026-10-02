@@ -443,6 +443,7 @@
     'settings.gunakan-lang-indonesia-jernih-terasa': 'ใช้ภาษาไทยที่ชัดเจน อ่านแล้วเหมือนพี่เลี้ยงกำลังอธิบายให้ผู้เรียนฟังโดยตรง ใช้ประโยคสั้น เลี่ยงสำนวนแบบตำราเรียน คำนิยามยืดยาว และศัพท์ grammar ที่ไม่ได้อธิบาย ถ้าจำเป็นต้องใช้ศัพท์ภาษาอังกฤษ ให้อธิบายความหมายทันทีด้วยคำง่าย ๆ ยกตัวอย่างหนึ่งอย่างที่ใกล้ชีวิตประจำวัน ห้ามใช้ Markdown หัวข้อทางการ หรือรายการแบบหัวข้อย่อย',
     'settings.gunakan-url-https-dengan-domain': 'ใช้ URL แบบ HTTPS ที่ถูกต้อง',
     'settings.https-nama-worker-puter-work': 'https://worker-anda.example.com',
+    'settings.intensitas-belajar': 'ความเข้มข้นในการเรียน',
     'settings.izin-audio-belum-terbuka-status': 'สิทธิ์เสียงยังไม่ถูกเปิด (สถานะ: suspended) แตะอีกครั้งบนหน้าจอนี้นะ',
     'settings.izin-notifikasi-belum-diberikan-fiezel': 'ยังไม่ได้ให้สิทธิ์การแจ้งเตือน FIEZEL ยังใช้ได้ตามปกติ',
     'settings.izin-notifikasi-ditolak-browser-ubah': 'สิทธิ์การแจ้งเตือนถูกปฏิเสธในเบราว์เซอร์ — เปลี่ยนได้จากไอคอนแม่กุญแจ แล้วค่อยเปิดที่นี่',

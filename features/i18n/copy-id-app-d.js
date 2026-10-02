@@ -443,6 +443,7 @@
     'settings.gunakan-lang-indonesia-jernih-terasa': 'Gunakan Bahasa Indonesia yang jernih dan terasa seperti mentor sedang menjelaskan langsung kepada siswa. Pakai kalimat pendek. Hindari gaya buku teks, definisi panjang, dan istilah grammar yang tidak dijelaskan. Jika perlu menyebut istilah Inggris, langsung terangkan artinya dengan kata sederhana. Beri satu contoh yang dekat dengan kehidupan sehari-hari. Jangan memakai Markdown, judul formal, atau daftar berpoin.',
     'settings.gunakan-url-https-dengan-domain': 'Gunakan URL HTTPS yang valid',
     'settings.https-nama-worker-puter-work': 'https://worker-anda.example.com',
+    'settings.intensitas-belajar': 'Intensitas Belajar',
     'settings.izin-audio-belum-terbuka-status': 'Izin audio belum terbuka (status: suspended). Ketuk sekali lagi di layar ini.',
     'settings.izin-notifikasi-belum-diberikan-fiezel': 'Izin notifikasi belum diberikan. FIEZEL tetap bisa dipakai.',
     'settings.izin-notifikasi-ditolak-browser-ubah': 'Izin notifikasi ditolak di browser — ubah lewat ikon gembok, lalu nyalakan di sini',

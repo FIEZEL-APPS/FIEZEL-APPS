@@ -391,6 +391,7 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 .question{font-size:clamp(var(--fs-h1),1.1rem + 1.8vw,1.75rem);line-height:1.4;margin:8px 0 18px;font-weight:700;letter-spacing:-.01em;white-space:pre-line;word-break:break-word}
 .question-instruction{display:block;font-size:0.85rem;font-weight:600;color:var(--muted);letter-spacing:0.02em;margin-bottom:6px;line-height:1.4;text-transform:none}
 .question-main{display:block;font-size:clamp(1.15rem, 1.1rem + 1.2vw, 1.45rem);font-weight:700;color:var(--text);line-height:1.45}
+.target-word{display:inline-block;background:rgba(245, 158, 11, 0.22);color:#B45309;font-style:italic;text-decoration:underline;text-decoration-color:#F59E0B;text-decoration-thickness:2px;text-underline-offset:4px;border-radius:4px;padding:0 5px;font-weight:700}
 /* i10 2026-08-28 (O5 §3a): banner kata target soal vocab — KATA-nya memimpin layar dengan
    serif display (sekeluarga dengan .word di flashcard), pelafalan menumpang di baseline. */
 .vocab-focus{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:2px 0 0}
@@ -7861,6 +7862,35 @@ body:has(.home-today) .quiz-topbar,
   color: #FFFFFF !important;
   line-height: 1.45 !important;
   letter-spacing: -0.01em !important;
+}
+
+/* Target Word / Error Token Highlight in Sentence Correction & Stem */
+.target-word,
+.question-main .target-word,
+.question .target-word,
+mark.target-word,
+.stem-target-word {
+  display: inline-block !important;
+  background: rgba(245, 158, 11, 0.22) !important;
+  color: #B45309 !important;
+  font-style: italic !important;
+  text-decoration: underline !important;
+  text-decoration-color: #F59E0B !important;
+  text-decoration-thickness: 2px !important;
+  text-underline-offset: 4px !important;
+  border-radius: 4px !important;
+  padding: 0 5px !important;
+  font-weight: 700 !important;
+}
+
+.quiz-bubble .target-word,
+.quiz-bubble .question-main .target-word,
+.quiz-stage .target-word,
+.theme-dark .target-word,
+.fz-lux .target-word {
+  color: #FEF3C7 !important;
+  background: rgba(245, 158, 11, 0.28) !important;
+  text-decoration-color: #FBBF24 !important;
 }
 
 .stage-furigana, .furigana {
