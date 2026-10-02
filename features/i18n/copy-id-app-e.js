@@ -95,6 +95,10 @@
     'quiz.outcome-positive': 'Cara belajarmu lagi pas — kita naikkan pelan-pelan.',
     'quiz.outcome-negative': 'Sesi berikutnya kita bikin lebih ringan dulu, ya.',
     'quiz.outcome-neutral': 'Hasil ini jadi bekal buat ngatur sesi berikutnya.',
-    'quiz.weak-skill-note': ' Yang paling sering meleset tadi: {weak}.'
+    'quiz.weak-skill-note': ' Yang paling sering meleset tadi: {weak}.',
+    'quiz.coba-lagi-pilih-jawaban-lain': 'Coba lagi — pilih jawaban lain',
+    'quiz.milestone-halfway': 'Setengah jalan! Pertahankan fokusmu 💪',
+    'tutor.head-label': 'FIEZEL',
+    'quiz.mengapa-salah': 'Mengapa kurang tepat?'
   });
 }());

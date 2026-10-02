@@ -95,6 +95,10 @@
     'quiz.outcome-positive': 'กลยุทธ์นี้ควรรักษาไว้หรือค่อยๆ เพิ่มระดับ',
     'quiz.outcome-negative': 'เซสชันถัดไปจะถูกลดระดับความยากลง',
     'quiz.outcome-neutral': 'ระบบจะใช้ผลนี้เป็นหลักฐานสำหรับนโยบายถัดไป',
-    'quiz.weak-skill-note': ' สิ่งที่พลาดบ่อยที่สุดเมื่อกี้: {weak}'
+    'quiz.weak-skill-note': ' สิ่งที่พลาดบ่อยที่สุดเมื่อกี้: {weak}',
+    'quiz.coba-lagi-pilih-jawaban-lain': 'ลองอีกครั้ง — เลือกคำตอบอื่น',
+    'quiz.milestone-halfway': 'มาถึงครึ่งทางแล้ว! ตั้งใจต่อไป 💪',
+    'tutor.head-label': 'FIEZEL',
+    'quiz.mengapa-salah': 'ทำไมถึงยังไม่ถูกต้อง?'
   });
 }());
