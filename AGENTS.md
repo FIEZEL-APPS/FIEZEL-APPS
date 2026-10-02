@@ -38,6 +38,28 @@ Whenever creating, regenerating, or updating listening exercises or audio banks:
    - Babak 4: Thinking pocket (1.5-2.0 detik buffer jeda hening di akhir).
 4. **Execution & CI**: Selalu jalankan pipeline otomatis melalui `tools/chokai-audio-pipeline/` dan pastikan gerbang validasi terpenuhi sebelum rilis.
 
+## Mandatory Protocol: Braincore Engine Authority & Zero-Dumbing Invariant
+Setiap agent yang memodifikasi, membuat fitur kuis, evaluasi jawaban, scaffolding pembelajaran, mini-game, atau logika penilaian di FIEZEL:
+1. **DILARANG KERAS MENGABAIKAN BRAINCORE (Haram Dumb-Down Logic)**:
+   - FIEZEL BUKAN aplikasi kuis statis. Jantung pedagogis FIEZEL adalah **Braincore Engine** (`features/brain/`): BKT (Bayesian Knowledge Tracing), IRT 3PL, OLM (Open Learner Model), FSRS Decay, dan Misconception Ledger.
+   - DILARANG KERAS membuat modul/widget terisolasi yang hanya mengandalkan flag boolean statis (seperti `vocabReady = true` atau mock index asal tebak) tanpa terhubung ke pipeline Braincore.
+   - Setiap interaksi belajar (baik di kuis reguler, mini-game, maupun cloze/susun kata) WAJIB mengalirkan telemetri nyata ke `updateMastery()`, `bktRecord()`, dan model kemampuan murid.
+2. **Zero-Loss Input & Anti-Ghost Answer (Pantangan Memalsukan/Mengarang Jawaban Murid)**:
+   - DILARANG KERAS membuang teks/token yang disusun atau diketik murid di layar.
+   - DILARANG KERAS memanggil handler `answer()` dengan index pura-pura/fiktif (`q.answerIndex === 0 ? 1 : 0`) yang mengarang kalimat salah yang tidak pernah dipilih murid.
+   - Layar umpan balik (*feedback modal*) WAJIB menampilkan secara jujur dan akurat apa yang benar-benar disusun/diketik murid (`q.__userTokenAnswer` / `typed`).
+3. **Penyelarasan Pedagogis Total (Haram Memuji Jawaban Salah)**:
+   - Jika jawaban murid salah (`ok === false`), DILARANG KERAS menampilkan pujian atau kalimat statis seperti *"Intinya: Susunan kalimat sudah tepat!"*.
+   - Umpan balik salah WAJIB menunjuk secara presisi alasan kesalahannya:
+     a) Pengecoh bentuk/morfologi yang dipilih (tarik `whyFailsId` / `misconceptionId` dari data distractor template).
+     b) Kata yang belum lengkap (sebutkan kata yang masih tertinggal).
+     c) Kesalahan urutan sintaksis (tunjukkan pola kalimat yang benar).
+4. **Validasi Sintaksis Ketat (Haram Loophole Asal Jumlah Kata)**:
+   - DILARANG KERAS meluluskan latihan susun kata/puzzle hanya karena panjang token sama (`|| placedTokens.length >= targetTokens.length`). Evaluasi WAJIB berbasis kecocokan gramatika kalimat target.
+5. **Smart Prerequisite Bypass (Haram Menyandera Murid Mahir)**:
+   - Gerbang prasyarat (seperti hafalan kosa kata sebelum grammar) WAJIB berkonsultasi ke Braincore BKT/OLM.
+   - Jika murid sudah menguasai kosakata prasyarat ($P(L_t) \ge 0.60$ atau `status.isReady`), sistem WAJIB otomatis membuka materi grammar tanpa memaksakan mini-game berulang kali.
+
 ## Mandatory Protocol: PWA Release Arbiter & Anti-Ghost-Deploy (Wajib Bump Build)
 Setiap kali menyelesaikan fitur, perbaikan bug, konten kuis, atau pembaruan UI/UX di FIEZEL:
 1. **ZERO Ghost Releases (Pantangan Rilis Hantu)**:
