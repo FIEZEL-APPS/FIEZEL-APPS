@@ -202,7 +202,14 @@
       const targets = [correctText, q.options?.[0], ...(q.alternates || [])].filter(Boolean);
       const isCorrect = userText === correctText || targets.some(tgt => norm(tgt) === userNorm);
       
-      if (typeof onComplete === 'function') onComplete(isCorrect);
+      const unplacedTokens = bankTokens.filter(t => !t.placed).map(t => t.text);
+      if (typeof onComplete === 'function') {
+        onComplete(isCorrect, {
+          userText: userText,
+          placedTokens: placedTokens.map(t => t.text),
+          unplacedTokens: unplacedTokens
+        });
+      }
     };
 
     render();

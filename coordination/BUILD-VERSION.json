@@ -1,7 +1,7 @@
 {
-  "version": "m025-400",
+  "version": "m025-401",
   "claimedBy": "branch main",
-  "claimedAt": "2026-10-02T15:47:13.879Z",
-  "reason": "fix(i18n): register scaffold mini-game keys in id and th copy-maps",
+  "claimedAt": "2026-10-02T16:28:04.217Z",
+  "reason": "feat(braincore): integrate bkt mastery telemetry in vocab bridge and fix token-order feedback",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

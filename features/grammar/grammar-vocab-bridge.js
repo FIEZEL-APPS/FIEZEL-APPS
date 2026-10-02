@@ -246,6 +246,57 @@
   }
 
   /**
+   * Braincore Telemetry: Catat bukti penguasaan kosakata ke BKT dan state.vocab
+   */
+  function recordVocabMastery(word, ok, latency = 2000) {
+    if (!word) return;
+    const s = typeof state !== 'undefined' ? state : null;
+    if (typeof updateMastery === 'function') {
+      try { updateMastery('vocab', word, ok, latency); } catch (_) {}
+    } else if (s) {
+      if (!s.vocab) s.vocab = {};
+      if (!s.vocab[word]) s.vocab[word] = { correct: 0, total: 0, mastery: 0, streak: 0 };
+      const v = s.vocab[word];
+      v.total = (v.total || 0) + 1;
+      if (ok) {
+        v.correct = (v.correct || 0) + 1;
+        v.streak = (v.streak || 0) + 1;
+        v.mastery = Math.min(100, (v.mastery || 0) + 20);
+      } else {
+        v.streak = 0;
+        v.mastery = Math.max(0, (v.mastery || 0) - 10);
+      }
+    }
+
+    // Sambungkan ke Braincore BKT Engine
+    try {
+      const root = typeof window !== 'undefined' ? window : (typeof self !== 'undefined' ? self : global);
+      if (root && root.FiezelMasteryBKT && typeof bktRead === 'function' && typeof bktWrite === 'function') {
+        const bktSt = bktRead();
+        const updated = root.FiezelMasteryBKT.update(bktSt, {
+          lesson: 'vocab_' + word,
+          correct: !!ok,
+          weight: ok ? 1.0 : 0.8
+        }, Date.now());
+        bktWrite(updated);
+      }
+    } catch (_) {}
+  }
+
+  /**
+   * Braincore Telemetry: Catat bukti penguasaan grammar ke BKT dan state.grammar
+   */
+  function recordGrammarMastery(skill, ok, latency = 3500) {
+    if (!skill) return;
+    if (typeof updateMastery === 'function') {
+      try { updateMastery('grammar', skill, ok, latency); } catch (_) {}
+    }
+    if (typeof bktRecord === 'function') {
+      try { bktRecord({ lessonSkill: skill, skill: skill }, ok, 1.0, 1.2); } catch (_) {}
+    }
+  }
+
+  /**
    * Check vocabulary prerequisite readiness for a grammar lesson
    * @param {string} skill Grammar lesson identifier
    * @param {Object} [stateRef]
@@ -260,10 +311,25 @@
     let masteredCount = 0;
     let studiedCount = 0;
     const wordsWithStatus = vocabList.map(item => {
-      const vProgress = s?.vocab?.[item.id];
-      const mastery = Number(vProgress?.mastery) || 0;
+      const vProgress = s?.vocab?.[item.word] || s?.vocab?.[item.id];
+      let mastery = Number(vProgress?.mastery) || 0;
+
+      // Integrasi ke Braincore BKT bila data tersedia
+      try {
+        const root = typeof window !== 'undefined' ? window : (typeof self !== 'undefined' ? self : global);
+        if (root && root.FiezelMasteryBKT && typeof bktRead === 'function') {
+          const bktSt = bktRead();
+          if (bktSt && bktSt.lessons) {
+            const bktWord = root.FiezelMasteryBKT.readLesson ? root.FiezelMasteryBKT.readLesson(bktSt.lessons, 'vocab_' + item.word) : null;
+            if (bktWord && bktWord.L > 0) {
+              mastery = Math.max(mastery, Math.round(bktWord.L * 100));
+            }
+          }
+        }
+      } catch (_) {}
+
       const isMastered = mastery >= 60;
-      const isStudied = Boolean(vProgress?.attempts || mastery > 0);
+      const isStudied = Boolean(vProgress?.attempts || vProgress?.total || mastery > 0);
       if (isMastered) masteredCount++;
       if (isStudied) studiedCount++;
       return {
@@ -644,6 +710,24 @@
   function openLessonPrerequisiteGate(skill) {
     const s = typeof state !== 'undefined' ? state : null;
     const status = getVocabPrerequisiteStatus(skill, s);
+
+    // Smart Braincore Bypass: Jika kosakata prasyarat SUDAH dikuasai menurut BKT/OLM
+    if (status.isReady || (s?.grammar?.[skill]?.vocabReady)) {
+      if (s) {
+        if (!s.grammar) s.grammar = {};
+        if (!s.grammar[skill]) s.grammar[skill] = {};
+        s.grammar[skill].vocabReady = true;
+        if (typeof save === 'function') { try { save(); } catch (_) {} }
+      }
+      if (typeof enterStage === 'function' && typeof renderGrammarLesson === 'function') {
+        enterStage('grammar-lesson', () => renderGrammarLesson(skill));
+        renderGrammarLesson(skill);
+      } else if (typeof practiceSkill === 'function') {
+        practiceSkill(skill);
+      }
+      return;
+    }
+
     const meta = (typeof GRAMMAR_ITEMS !== 'undefined' && Array.isArray(GRAMMAR_ITEMS))
       ? GRAMMAR_ITEMS.find(x => x.skill === skill)
       : null;
@@ -1017,6 +1101,10 @@
         g.combo++;
         playSfx('success');
         triggerHaptic('medium');
+        const wordObj = g.words.find(w => w.id === g.selectedEn);
+        if (wordObj) {
+          recordVocabMastery(wordObj.word, true, 2000);
+        }
         g.selectedEn = null;
         g.selectedId = null;
 
@@ -1039,6 +1127,10 @@
         g.combo = 0;
         playSfx('error');
         triggerHaptic('light');
+        const wordObj = g.words.find(w => w.id === g.selectedEn);
+        if (wordObj) {
+          recordVocabMastery(wordObj.word, false, 4000);
+        }
         g.selectedEn = null;
         g.selectedId = null;
       }
@@ -1060,6 +1152,7 @@
       playSfx('success');
       triggerHaptic('medium');
       playAudio(q.word);
+      recordVocabMastery(q.word, true, 1800);
       renderMiniGameModal();
 
       setTimeout(() => {
@@ -1084,6 +1177,7 @@
       g.combo = 0;
       playSfx('error');
       triggerHaptic('light');
+      recordVocabMastery(q.word, false, 3500);
       renderMiniGameModal();
       setTimeout(() => {
         if (!_activeMiniGame || _activeMiniGame.round !== 2) return;
@@ -1115,11 +1209,14 @@
     const targetSentence = word.example || ('Please use your ' + word.word + '.');
     const targetTokens = targetSentence.replace(/[.!?]/g, '').split(/\s+/).filter(Boolean);
 
-    const userSentence = g.placedTokens.join(' ').toLowerCase();
-    const expectedSentence = targetTokens.join(' ').toLowerCase();
+    const norm = s => String(s || '').toLowerCase().replace(/[^\w\s]/g, '').replace(/\s+/g, ' ').trim();
+    const userSentence = norm(g.placedTokens.join(' '));
+    const expectedSentence = norm(targetTokens.join(' '));
 
-    if (userSentence === expectedSentence || g.placedTokens.length >= targetTokens.length) {
-      // Puzzle correct or advanced
+    // STRICT CHECK: Hanya lulus jika susunan kalimat benar-benar tepat sesuai target!
+    if (userSentence === expectedSentence) {
+      // Puzzle correct!
+      recordGrammarMastery(g.skill, true, 3000);
       playSfx('success');
       playAudio(targetSentence);
       g.puzzleIndex++;
@@ -1135,7 +1232,10 @@
         renderMiniGameModal();
       }
     } else {
+      // Salah susunan kalimat: beri tahu murid secara mendidik
+      recordGrammarMastery(g.skill, false, 4500);
       playSfx('error');
+      triggerHaptic('light');
       if (typeof showToast === 'function') {
         showToast(t('scaffold.toast-urutan-salah', 'Coba periksa urutan katanya lagi ya!'), 'warn');
       }
@@ -1143,16 +1243,23 @@
   }
 
   function completeMiniGameAndUnlock(skill) {
-    _activeMiniGame = null;
     const s = typeof state !== 'undefined' ? state : null;
     if (s) {
       if (!s.grammar) s.grammar = {};
       if (!s.grammar[skill]) s.grammar[skill] = {};
       s.grammar[skill].vocabReady = true;
+
+      // Braincore telemetry: pastikan semua kata yang baru dipelajari teregistrasi di s.vocab & BKT
+      const status = getVocabPrerequisiteStatus(skill, s);
+      (status.words || []).forEach(w => {
+        recordVocabMastery(w.word, true, 1500);
+      });
+
       if (typeof save === 'function') {
         try { save(); } catch (_) {}
       }
     }
+    _activeMiniGame = null;
 
     if (typeof closeModal === 'function') {
       closeModal();
@@ -1163,10 +1270,11 @@
     }
 
     // Launch grammar practice
-    if (typeof practiceSkill === 'function') {
-      practiceSkill(skill);
-    } else if (typeof renderGrammarLesson === 'function') {
+    if (typeof enterStage === 'function' && typeof renderGrammarLesson === 'function') {
+      enterStage('grammar-lesson', () => renderGrammarLesson(skill));
       renderGrammarLesson(skill);
+    } else if (typeof practiceSkill === 'function') {
+      practiceSkill(skill);
     }
   }
 
