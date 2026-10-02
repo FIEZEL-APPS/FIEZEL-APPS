@@ -301,7 +301,7 @@
             <strong>${FiezelI18n.t('grammar.petunjuk', 'Petunjuk Tata Bahasa')}</strong>
           </div>
           <span class="hint-level-pill">${currentLvl}/4</span>
-          <button type="button" id="hintCloseBtn" class="hint-close-btn" aria-label="Tutup"><i data-lucide="x"></i></button>
+          <button type="button" id="hintCloseBtn" class="hint-close-btn" aria-label="${FiezelI18n.t('modal.tutup', 'Tutup')}"><i data-lucide="x"></i></button>
         </div>
         <div class="hint-step-indicator" aria-hidden="true">
           ${[1,2,3,4].map(i => `<div class="hint-step-dot${i <= currentLvl ? ' active' : ''}"></div>`).join('')}

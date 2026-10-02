@@ -4,19 +4,34 @@
       "id": "vg-a1-001",
       "level": "A1",
       "skill": "present_simple",
-      "videoUrl": "",
-      "posterUrl": "",
+      "videoUrl": "./assets/motion/fiezel-hero.mp4",
+      "posterUrl": "./assets/motion/posters/fiezel-hero.jpg",
       "subtitles": [
-        { "start": 0.0, "end": 3.0, "text": "I usually drink coffee in the morning.", "speaker": "A" },
-        { "start": 3.0, "end": 5.5, "text": "But today I want tea.", "speaker": "B" }
+        {
+          "start": 0,
+          "end": 1.6,
+          "text": "I usually drink coffee in the morning.",
+          "speaker": "A"
+        },
+        {
+          "start": 1.6,
+          "end": 3,
+          "text": "But today I want tea.",
+          "speaker": "B"
+        }
       ],
-      "pauseAt": 2.5,
+      "pauseAt": 1.4,
       "exercise": {
         "type": "subtitle-cloze",
         "question": "Complete the subtitle:",
         "clozeText": "I usually ___ coffee in the morning.",
         "clozeAnswer": "drink",
-        "options": ["drink", "drinking", "drinks", "drank"],
+        "options": [
+          "drink",
+          "drinking",
+          "drinks",
+          "drank"
+        ],
         "answerIndex": 0,
         "grammarPoint": "Present Simple",
         "rule": "Use present simple (base form) for routines and habits with 'I/you/we/they'.",
@@ -25,32 +40,59 @@
           "rule": "Adverb of frequency (usually) + subject (I) + verb (base form)",
           "memory": "USUALLY = HABIT = Present Simple.",
           "distractors": [
-            { "option": "drinking", "reason": "Needs 'am' (am drinking) for present continuous, but this is a habit, not happening right now." },
-            { "option": "drinks", "reason": "Used with he/she/it, not 'I'." },
-            { "option": "drank", "reason": "Past tense, but 'usually' means it happens regularly." }
+            {
+              "option": "drinking",
+              "reason": "Needs 'am' (am drinking) for present continuous, but this is a habit, not happening right now."
+            },
+            {
+              "option": "drinks",
+              "reason": "Used with he/she/it, not 'I'."
+            },
+            {
+              "option": "drank",
+              "reason": "Past tense, but 'usually' means it happens regularly."
+            }
           ]
         }
       },
       "loopCount": 2,
-      "tags": ["present_simple", "routines"]
+      "tags": [
+        "present_simple",
+        "routines"
+      ]
     },
     {
       "id": "vg-a1-002",
       "level": "A1",
       "skill": "to_be",
-      "videoUrl": "",
-      "posterUrl": "",
+      "videoUrl": "./assets/motion/nusa-curious.mp4",
+      "posterUrl": "./assets/motion/posters/nusa-curious.jpg",
       "subtitles": [
-        { "start": 10.0, "end": 12.5, "text": "Where are you from?", "speaker": "A" },
-        { "start": 12.5, "end": 15.0, "text": "I am from Tokyo.", "speaker": "B" }
+        {
+          "start": 0,
+          "end": 1.8,
+          "text": "Where are you from?",
+          "speaker": "A"
+        },
+        {
+          "start": 1.8,
+          "end": 3.8,
+          "text": "I am from Tokyo.",
+          "speaker": "B"
+        }
       ],
-      "pauseAt": 14.5,
+      "pauseAt": 2,
       "exercise": {
         "type": "subtitle-cloze",
         "question": "Complete the subtitle:",
         "clozeText": "I ___ from Tokyo.",
         "clozeAnswer": "am",
-        "options": ["am", "is", "are", "be"],
+        "options": [
+          "am",
+          "is",
+          "are",
+          "be"
+        ],
         "answerIndex": 0,
         "grammarPoint": "Verb To Be",
         "rule": "Use 'am' with 'I'.",
@@ -59,32 +101,59 @@
           "rule": "I + am",
           "memory": "I goes with AM.",
           "distractors": [
-            { "option": "is", "reason": "Used with he/she/it." },
-            { "option": "are", "reason": "Used with you/we/they." },
-            { "option": "be", "reason": "Base form, needs to be conjugated." }
+            {
+              "option": "is",
+              "reason": "Used with he/she/it."
+            },
+            {
+              "option": "are",
+              "reason": "Used with you/we/they."
+            },
+            {
+              "option": "be",
+              "reason": "Base form, needs to be conjugated."
+            }
           ]
         }
       },
       "loopCount": 2,
-      "tags": ["to_be", "basics"]
+      "tags": [
+        "to_be",
+        "basics"
+      ]
     },
     {
       "id": "vg-a1-003",
       "level": "A1",
       "skill": "articles",
-      "videoUrl": "",
-      "posterUrl": "",
+      "videoUrl": "./assets/motion/magical-book.mp4",
+      "posterUrl": "./assets/motion/posters/magical-book.jpg",
       "subtitles": [
-        { "start": 20.0, "end": 22.0, "text": "Do you have a pet?", "speaker": "A" },
-        { "start": 22.0, "end": 25.0, "text": "Yes, I have an orange cat.", "speaker": "B" }
+        {
+          "start": 0,
+          "end": 1.4,
+          "text": "Do you have a pet?",
+          "speaker": "A"
+        },
+        {
+          "start": 1.4,
+          "end": 2.9,
+          "text": "Yes, I have an orange cat.",
+          "speaker": "B"
+        }
       ],
-      "pauseAt": 24.0,
+      "pauseAt": 1.6,
       "exercise": {
         "type": "subtitle-cloze",
         "question": "Complete the subtitle:",
         "clozeText": "Yes, I have ___ orange cat.",
         "clozeAnswer": "an",
-        "options": ["an", "a", "the", "some"],
+        "options": [
+          "an",
+          "a",
+          "the",
+          "some"
+        ],
         "answerIndex": 0,
         "grammarPoint": "Articles (a/an)",
         "rule": "Use 'an' before a word starting with a vowel sound.",
@@ -93,32 +162,59 @@
           "rule": "an + vowel sound",
           "memory": "Vowel sound = AN.",
           "distractors": [
-            { "option": "a", "reason": "Used before a consonant sound." },
-            { "option": "the", "reason": "Used for specific things we already know about. This is a new cat introduced." },
-            { "option": "some", "reason": "Usually for uncountable nouns or plural. 'Cat' is singular." }
+            {
+              "option": "a",
+              "reason": "Used before a consonant sound."
+            },
+            {
+              "option": "the",
+              "reason": "Used for specific things we already know about. This is a new cat introduced."
+            },
+            {
+              "option": "some",
+              "reason": "Usually for uncountable nouns or plural. 'Cat' is singular."
+            }
           ]
         }
       },
       "loopCount": 2,
-      "tags": ["articles", "vowels"]
+      "tags": [
+        "articles",
+        "vowels"
+      ]
     },
     {
       "id": "vg-a1-004",
       "level": "A1",
       "skill": "prepositions_time",
-      "videoUrl": "",
-      "posterUrl": "",
+      "videoUrl": "./assets/motion/penyu-motion.mp4",
+      "posterUrl": "./assets/motion/posters/penyu-motion.jpg",
       "subtitles": [
-        { "start": 30.0, "end": 33.0, "text": "When is your birthday?", "speaker": "A" },
-        { "start": 33.0, "end": 36.0, "text": "It's on Monday.", "speaker": "B" }
+        {
+          "start": 0,
+          "end": 2.2,
+          "text": "When is your birthday?",
+          "speaker": "A"
+        },
+        {
+          "start": 2.2,
+          "end": 4.8,
+          "text": "It's on Monday.",
+          "speaker": "B"
+        }
       ],
-      "pauseAt": 35.0,
+      "pauseAt": 2.5,
       "exercise": {
         "type": "subtitle-cloze",
         "question": "Complete the subtitle:",
         "clozeText": "It's ___ Monday.",
         "clozeAnswer": "on",
-        "options": ["on", "in", "at", "for"],
+        "options": [
+          "on",
+          "in",
+          "at",
+          "for"
+        ],
         "answerIndex": 0,
         "grammarPoint": "Prepositions of Time",
         "rule": "Use 'on' for days of the week.",
@@ -127,32 +223,59 @@
           "rule": "on + day of the week",
           "memory": "ON days.",
           "distractors": [
-            { "option": "in", "reason": "Used for months, years, or seasons (in May, in 2023)." },
-            { "option": "at", "reason": "Used for times (at 3 PM)." },
-            { "option": "for", "reason": "Used for duration (for 2 days)." }
+            {
+              "option": "in",
+              "reason": "Used for months, years, or seasons (in May, in 2023)."
+            },
+            {
+              "option": "at",
+              "reason": "Used for times (at 3 PM)."
+            },
+            {
+              "option": "for",
+              "reason": "Used for duration (for 2 days)."
+            }
           ]
         }
       },
       "loopCount": 2,
-      "tags": ["prepositions", "time"]
+      "tags": [
+        "prepositions",
+        "time"
+      ]
     },
     {
       "id": "vg-a2-001",
       "level": "A2",
       "skill": "past_simple_regular",
-      "videoUrl": "",
-      "posterUrl": "",
+      "videoUrl": "./assets/motion/nusa-thinking.mp4",
+      "posterUrl": "./assets/motion/posters/nusa-thinking.jpg",
       "subtitles": [
-        { "start": 40.0, "end": 42.5, "text": "What did you do last night?", "speaker": "A" },
-        { "start": 42.5, "end": 45.0, "text": "I watched a movie.", "speaker": "B" }
+        {
+          "start": 0,
+          "end": 1.9,
+          "text": "What did you do last night?",
+          "speaker": "A"
+        },
+        {
+          "start": 1.9,
+          "end": 4,
+          "text": "I watched a movie.",
+          "speaker": "B"
+        }
       ],
-      "pauseAt": 44.0,
+      "pauseAt": 2.2,
       "exercise": {
         "type": "subtitle-cloze",
         "question": "Complete the subtitle:",
         "clozeText": "I ___ a movie.",
         "clozeAnswer": "watched",
-        "options": ["watched", "watch", "watching", "watches"],
+        "options": [
+          "watched",
+          "watch",
+          "watching",
+          "watches"
+        ],
         "answerIndex": 0,
         "grammarPoint": "Past Simple Regular",
         "rule": "Add -ed to regular verbs for past simple.",
@@ -161,32 +284,59 @@
           "rule": "Verb + ed",
           "memory": "PAST = -ED.",
           "distractors": [
-            { "option": "watch", "reason": "Present tense, not past." },
-            { "option": "watching", "reason": "Needs 'was' (was watching) for past continuous." },
-            { "option": "watches", "reason": "Present tense for he/she/it." }
+            {
+              "option": "watch",
+              "reason": "Present tense, not past."
+            },
+            {
+              "option": "watching",
+              "reason": "Needs 'was' (was watching) for past continuous."
+            },
+            {
+              "option": "watches",
+              "reason": "Present tense for he/she/it."
+            }
           ]
         }
       },
       "loopCount": 2,
-      "tags": ["past_simple", "regular"]
+      "tags": [
+        "past_simple",
+        "regular"
+      ]
     },
     {
       "id": "vg-a2-002",
       "level": "A2",
       "skill": "past_simple_irregular",
-      "videoUrl": "",
-      "posterUrl": "",
+      "videoUrl": "./assets/motion/team-walk.mp4",
+      "posterUrl": "./assets/motion/posters/team-walk.jpg",
       "subtitles": [
-        { "start": 50.0, "end": 52.5, "text": "Did you go to the party?", "speaker": "A" },
-        { "start": 52.5, "end": 55.0, "text": "Yes, I went with Sarah.", "speaker": "B" }
+        {
+          "start": 0,
+          "end": 2.1,
+          "text": "Did you go to the party?",
+          "speaker": "A"
+        },
+        {
+          "start": 2.1,
+          "end": 4.4,
+          "text": "Yes, I went with Sarah.",
+          "speaker": "B"
+        }
       ],
-      "pauseAt": 54.0,
+      "pauseAt": 2.4,
       "exercise": {
         "type": "subtitle-cloze",
         "question": "Complete the subtitle:",
         "clozeText": "Yes, I ___ with Sarah.",
         "clozeAnswer": "went",
-        "options": ["went", "go", "goed", "going"],
+        "options": [
+          "went",
+          "go",
+          "goed",
+          "going"
+        ],
         "answerIndex": 0,
         "grammarPoint": "Past Simple Irregular",
         "rule": "'Go' is an irregular verb. Its past form is 'went'.",
@@ -195,32 +345,59 @@
           "rule": "Irregular past form",
           "memory": "Go -> Went in the past.",
           "distractors": [
-            { "option": "go", "reason": "Present tense base form." },
-            { "option": "goed", "reason": "Incorrect attempt to make 'go' regular by adding -ed." },
-            { "option": "going", "reason": "Needs 'was' (was going) for past continuous." }
+            {
+              "option": "go",
+              "reason": "Present tense base form."
+            },
+            {
+              "option": "goed",
+              "reason": "Incorrect attempt to make 'go' regular by adding -ed."
+            },
+            {
+              "option": "going",
+              "reason": "Needs 'was' (was going) for past continuous."
+            }
           ]
         }
       },
       "loopCount": 2,
-      "tags": ["past_simple", "irregular"]
+      "tags": [
+        "past_simple",
+        "irregular"
+      ]
     },
     {
       "id": "vg-a2-003",
       "level": "A2",
       "skill": "comparatives",
-      "videoUrl": "",
-      "posterUrl": "",
+      "videoUrl": "./assets/motion/mira-cheer.mp4",
+      "posterUrl": "./assets/motion/posters/mira-cheer.jpg",
       "subtitles": [
-        { "start": 60.0, "end": 62.5, "text": "This phone is good.", "speaker": "A" },
-        { "start": 62.5, "end": 65.0, "text": "But that one is better.", "speaker": "B" }
+        {
+          "start": 0,
+          "end": 1.6,
+          "text": "This phone is good.",
+          "speaker": "A"
+        },
+        {
+          "start": 1.6,
+          "end": 3.3,
+          "text": "But that one is better.",
+          "speaker": "B"
+        }
       ],
-      "pauseAt": 64.0,
+      "pauseAt": 1.8,
       "exercise": {
         "type": "subtitle-cloze",
         "question": "Complete the subtitle:",
         "clozeText": "But that one is ___.",
         "clozeAnswer": "better",
-        "options": ["better", "gooder", "more good", "best"],
+        "options": [
+          "better",
+          "gooder",
+          "more good",
+          "best"
+        ],
         "answerIndex": 0,
         "grammarPoint": "Comparatives",
         "rule": "'Good' is irregular. Its comparative is 'better'.",
@@ -229,32 +406,59 @@
           "rule": "good -> better -> best",
           "memory": "Better than good.",
           "distractors": [
-            { "option": "gooder", "reason": "Incorrect, 'good' is irregular." },
-            { "option": "more good", "reason": "We don't use 'more' with 'good'." },
-            { "option": "best", "reason": "Superlative, used when comparing 3 or more things." }
+            {
+              "option": "gooder",
+              "reason": "Incorrect, 'good' is irregular."
+            },
+            {
+              "option": "more good",
+              "reason": "We don't use 'more' with 'good'."
+            },
+            {
+              "option": "best",
+              "reason": "Superlative, used when comparing 3 or more things."
+            }
           ]
         }
       },
       "loopCount": 2,
-      "tags": ["comparatives", "adjectives"]
+      "tags": [
+        "comparatives",
+        "adjectives"
+      ]
     },
     {
       "id": "vg-a2-004",
       "level": "A2",
       "skill": "modals_can",
-      "videoUrl": "",
-      "posterUrl": "",
+      "videoUrl": "./assets/motion/nusa-celebrate.mp4",
+      "posterUrl": "./assets/motion/posters/nusa-celebrate.jpg",
       "subtitles": [
-        { "start": 70.0, "end": 72.0, "text": "I can't open this jar.", "speaker": "A" },
-        { "start": 72.0, "end": 74.0, "text": "I can help you.", "speaker": "B" }
+        {
+          "start": 0,
+          "end": 1.5,
+          "text": "I can't open this jar.",
+          "speaker": "A"
+        },
+        {
+          "start": 1.5,
+          "end": 3.3,
+          "text": "I can help you.",
+          "speaker": "B"
+        }
       ],
-      "pauseAt": 73.0,
+      "pauseAt": 1.8,
       "exercise": {
         "type": "subtitle-cloze",
         "question": "Complete the subtitle:",
         "clozeText": "I ___ help you.",
         "clozeAnswer": "can",
-        "options": ["can", "must", "am", "do"],
+        "options": [
+          "can",
+          "must",
+          "am",
+          "do"
+        ],
         "answerIndex": 0,
         "grammarPoint": "Modals (Ability/Offer)",
         "rule": "Use 'can' to express ability or offer help.",
@@ -263,32 +467,59 @@
           "rule": "can + base verb",
           "memory": "CAN = Ability.",
           "distractors": [
-            { "option": "must", "reason": "Too strong, implies obligation, not a simple offer." },
-            { "option": "am", "reason": "'I am help' is grammatically incorrect (would need 'am helping')." },
-            { "option": "do", "reason": "'I do help' is used for emphasis, 'can' is better for offering ability." }
+            {
+              "option": "must",
+              "reason": "Too strong, implies obligation, not a simple offer."
+            },
+            {
+              "option": "am",
+              "reason": "'I am help' is grammatically incorrect (would need 'am helping')."
+            },
+            {
+              "option": "do",
+              "reason": "'I do help' is used for emphasis, 'can' is better for offering ability."
+            }
           ]
         }
       },
       "loopCount": 2,
-      "tags": ["modals", "ability"]
+      "tags": [
+        "modals",
+        "ability"
+      ]
     },
     {
       "id": "vg-a2-005",
       "level": "A2",
       "skill": "present_continuous",
-      "videoUrl": "",
-      "posterUrl": "",
+      "videoUrl": "./assets/motion/mira-wave.mp4",
+      "posterUrl": "./assets/motion/posters/mira-wave.jpg",
       "subtitles": [
-        { "start": 80.0, "end": 82.0, "text": "Can we talk?", "speaker": "A" },
-        { "start": 82.0, "end": 85.0, "text": "Not now, I am studying.", "speaker": "B" }
+        {
+          "start": 0,
+          "end": 1.4,
+          "text": "Can we talk?",
+          "speaker": "A"
+        },
+        {
+          "start": 1.4,
+          "end": 2.9,
+          "text": "Not now, I am studying.",
+          "speaker": "B"
+        }
       ],
-      "pauseAt": 84.0,
+      "pauseAt": 1.7,
       "exercise": {
         "type": "subtitle-cloze",
         "question": "Complete the subtitle:",
         "clozeText": "Not now, I am ___.",
         "clozeAnswer": "studying",
-        "options": ["studying", "study", "studied", "studies"],
+        "options": [
+          "studying",
+          "study",
+          "studied",
+          "studies"
+        ],
         "answerIndex": 0,
         "grammarPoint": "Present Continuous",
         "rule": "Use am/is/are + verb-ing for actions happening right now.",
@@ -297,32 +528,59 @@
           "rule": "am + verb-ing",
           "memory": "NOW = -ING.",
           "distractors": [
-            { "option": "study", "reason": "Base form. 'am study' is grammatically incorrect." },
-            { "option": "studied", "reason": "Past tense, but it's happening 'now'." },
-            { "option": "studies", "reason": "Present simple for he/she/it." }
+            {
+              "option": "study",
+              "reason": "Base form. 'am study' is grammatically incorrect."
+            },
+            {
+              "option": "studied",
+              "reason": "Past tense, but it's happening 'now'."
+            },
+            {
+              "option": "studies",
+              "reason": "Present simple for he/she/it."
+            }
           ]
         }
       },
       "loopCount": 2,
-      "tags": ["present_continuous", "now"]
+      "tags": [
+        "present_continuous",
+        "now"
+      ]
     },
     {
       "id": "vg-b1-001",
       "level": "B1",
       "skill": "present_perfect",
-      "videoUrl": "",
-      "posterUrl": "",
+      "videoUrl": "./assets/motion/fiezel-antigravity.mp4",
+      "posterUrl": "./assets/motion/posters/fiezel-antigravity.jpg",
       "subtitles": [
-        { "start": 90.0, "end": 93.0, "text": "Do you want to see that new movie?", "speaker": "A" },
-        { "start": 93.0, "end": 96.0, "text": "No thanks, I have already seen it.", "speaker": "B" }
+        {
+          "start": 0,
+          "end": 2.2,
+          "text": "Do you want to see that new movie?",
+          "speaker": "A"
+        },
+        {
+          "start": 2.2,
+          "end": 4.8,
+          "text": "No thanks, I have already seen it.",
+          "speaker": "B"
+        }
       ],
-      "pauseAt": 95.0,
+      "pauseAt": 2.5,
       "exercise": {
         "type": "subtitle-cloze",
         "question": "Complete the subtitle:",
         "clozeText": "No thanks, I have already ___ it.",
         "clozeAnswer": "seen",
-        "options": ["seen", "saw", "see", "seeing"],
+        "options": [
+          "seen",
+          "saw",
+          "see",
+          "seeing"
+        ],
         "answerIndex": 0,
         "grammarPoint": "Present Perfect",
         "rule": "Use have/has + past participle (V3) for past actions relevant now.",
@@ -331,32 +589,59 @@
           "rule": "have + past participle",
           "memory": "HAVE + V3.",
           "distractors": [
-            { "option": "saw", "reason": "Past simple (V2). Cannot follow 'have'." },
-            { "option": "see", "reason": "Base form (V1). Cannot follow 'have'." },
-            { "option": "seeing", "reason": "Present participle (-ing). Used for continuous tenses." }
+            {
+              "option": "saw",
+              "reason": "Past simple (V2). Cannot follow 'have'."
+            },
+            {
+              "option": "see",
+              "reason": "Base form (V1). Cannot follow 'have'."
+            },
+            {
+              "option": "seeing",
+              "reason": "Present participle (-ing). Used for continuous tenses."
+            }
           ]
         }
       },
       "loopCount": 2,
-      "tags": ["present_perfect", "experience"]
+      "tags": [
+        "present_perfect",
+        "experience"
+      ]
     },
     {
       "id": "vg-b1-002",
       "level": "B1",
       "skill": "first_conditional",
-      "videoUrl": "",
-      "posterUrl": "",
+      "videoUrl": "./assets/motion/hero.mp4",
+      "posterUrl": "./assets/motion/posters/hero.jpg",
       "subtitles": [
-        { "start": 100.0, "end": 102.5, "text": "Look at those dark clouds.", "speaker": "A" },
-        { "start": 102.5, "end": 105.0, "text": "If it rains, we will stay inside.", "speaker": "B" }
+        {
+          "start": 0,
+          "end": 2.2,
+          "text": "Look at those dark clouds.",
+          "speaker": "A"
+        },
+        {
+          "start": 2.2,
+          "end": 4.8,
+          "text": "If it rains, we will stay inside.",
+          "speaker": "B"
+        }
       ],
-      "pauseAt": 104.0,
+      "pauseAt": 2.5,
       "exercise": {
         "type": "subtitle-cloze",
         "question": "Complete the subtitle:",
         "clozeText": "If it rains, we ___ stay inside.",
         "clozeAnswer": "will",
-        "options": ["will", "would", "are", "do"],
+        "options": [
+          "will",
+          "would",
+          "are",
+          "do"
+        ],
         "answerIndex": 0,
         "grammarPoint": "First Conditional",
         "rule": "Use 'will' in the main clause for a probable future result.",
@@ -365,32 +650,59 @@
           "rule": "If + present simple, will + verb",
           "memory": "Real Future = Will.",
           "distractors": [
-            { "option": "would", "reason": "Used for unreal/imaginary situations (2nd conditional)." },
-            { "option": "are", "reason": "'we are stay' is grammatically incorrect." },
-            { "option": "do", "reason": "Doesn't express future intent here." }
+            {
+              "option": "would",
+              "reason": "Used for unreal/imaginary situations (2nd conditional)."
+            },
+            {
+              "option": "are",
+              "reason": "'we are stay' is grammatically incorrect."
+            },
+            {
+              "option": "do",
+              "reason": "Doesn't express future intent here."
+            }
           ]
         }
       },
       "loopCount": 2,
-      "tags": ["conditional", "future"]
+      "tags": [
+        "conditional",
+        "future"
+      ]
     },
     {
       "id": "vg-b1-003",
       "level": "B1",
       "skill": "passive_voice",
-      "videoUrl": "",
-      "posterUrl": "",
+      "videoUrl": "./assets/motion/nusa-wave.mp4",
+      "posterUrl": "./assets/motion/posters/nusa-wave.jpg",
       "subtitles": [
-        { "start": 110.0, "end": 112.5, "text": "Who built this amazing bridge?", "speaker": "A" },
-        { "start": 112.5, "end": 115.0, "text": "It was built in 1937.", "speaker": "B" }
+        {
+          "start": 0,
+          "end": 1.4,
+          "text": "Who built this amazing bridge?",
+          "speaker": "A"
+        },
+        {
+          "start": 1.4,
+          "end": 2.9,
+          "text": "It was built in 1937.",
+          "speaker": "B"
+        }
       ],
-      "pauseAt": 114.0,
+      "pauseAt": 1.7,
       "exercise": {
         "type": "subtitle-cloze",
         "question": "Complete the subtitle:",
         "clozeText": "It ___ built in 1937.",
         "clozeAnswer": "was",
-        "options": ["was", "is", "did", "has"],
+        "options": [
+          "was",
+          "is",
+          "did",
+          "has"
+        ],
         "answerIndex": 0,
         "grammarPoint": "Passive Voice (Past)",
         "rule": "Use was/were + past participle for passive voice in the past.",
@@ -399,32 +711,59 @@
           "rule": "was/were + V3",
           "memory": "Action received in past = WAS/WERE + V3.",
           "distractors": [
-            { "option": "is", "reason": "Present passive, but '1937' is in the past." },
-            { "option": "did", "reason": "Used in active voice questions/negatives, not passive." },
-            { "option": "has", "reason": "Requires 'been' (has been built) for present perfect passive, but there's a specific date." }
+            {
+              "option": "is",
+              "reason": "Present passive, but '1937' is in the past."
+            },
+            {
+              "option": "did",
+              "reason": "Used in active voice questions/negatives, not passive."
+            },
+            {
+              "option": "has",
+              "reason": "Requires 'been' (has been built) for present perfect passive, but there's a specific date."
+            }
           ]
         }
       },
       "loopCount": 2,
-      "tags": ["passive", "past"]
+      "tags": [
+        "passive",
+        "past"
+      ]
     },
     {
       "id": "vg-b1-004",
       "level": "B1",
       "skill": "gerunds_infinitives",
-      "videoUrl": "",
-      "posterUrl": "",
+      "videoUrl": "./assets/motion/nusa-sleep.mp4",
+      "posterUrl": "./assets/motion/posters/nusa-sleep.jpg",
       "subtitles": [
-        { "start": 120.0, "end": 122.0, "text": "Are you ready?", "speaker": "A" },
-        { "start": 122.0, "end": 125.0, "text": "Yes, I enjoy playing tennis.", "speaker": "B" }
+        {
+          "start": 0,
+          "end": 1.8,
+          "text": "Are you ready?",
+          "speaker": "A"
+        },
+        {
+          "start": 1.8,
+          "end": 3.8,
+          "text": "Yes, I enjoy playing tennis.",
+          "speaker": "B"
+        }
       ],
-      "pauseAt": 124.0,
+      "pauseAt": 2.1,
       "exercise": {
         "type": "subtitle-cloze",
         "question": "Complete the subtitle:",
         "clozeText": "Yes, I enjoy ___ tennis.",
         "clozeAnswer": "playing",
-        "options": ["playing", "to play", "play", "played"],
+        "options": [
+          "playing",
+          "to play",
+          "play",
+          "played"
+        ],
         "answerIndex": 0,
         "grammarPoint": "Gerunds after 'Enjoy'",
         "rule": "The verb 'enjoy' is always followed by a gerund (-ing form).",
@@ -433,32 +772,59 @@
           "rule": "enjoy + verb-ing",
           "memory": "Enjoy -ING.",
           "distractors": [
-            { "option": "to play", "reason": "Infinitive. Some verbs take 'to' (want to), but 'enjoy' takes -ing." },
-            { "option": "play", "reason": "Base form cannot directly follow 'enjoy'." },
-            { "option": "played", "reason": "Past tense form cannot follow 'enjoy' like this." }
+            {
+              "option": "to play",
+              "reason": "Infinitive. Some verbs take 'to' (want to), but 'enjoy' takes -ing."
+            },
+            {
+              "option": "play",
+              "reason": "Base form cannot directly follow 'enjoy'."
+            },
+            {
+              "option": "played",
+              "reason": "Past tense form cannot follow 'enjoy' like this."
+            }
           ]
         }
       },
       "loopCount": 2,
-      "tags": ["gerund", "infinitive"]
+      "tags": [
+        "gerund",
+        "infinitive"
+      ]
     },
     {
       "id": "vg-b2-001",
       "level": "B2",
       "skill": "third_conditional",
-      "videoUrl": "",
-      "posterUrl": "",
+      "videoUrl": "./assets/motion/team-walk.mp4",
+      "posterUrl": "./assets/motion/posters/team-walk.jpg",
       "subtitles": [
-        { "start": 130.0, "end": 133.0, "text": "We missed the flight by five minutes.", "speaker": "A" },
-        { "start": 133.0, "end": 136.0, "text": "If we had left earlier, we would have caught it.", "speaker": "B" }
+        {
+          "start": 0,
+          "end": 2.1,
+          "text": "We missed the flight by five minutes.",
+          "speaker": "A"
+        },
+        {
+          "start": 2.1,
+          "end": 4.5,
+          "text": "If we had left earlier, we would have caught it.",
+          "speaker": "B"
+        }
       ],
-      "pauseAt": 134.5,
+      "pauseAt": 2.4,
       "exercise": {
         "type": "subtitle-cloze",
         "question": "Complete the subtitle:",
         "clozeText": "If we had left earlier, we ___ have caught it.",
         "clozeAnswer": "would",
-        "options": ["would", "will", "had", "couldn't"],
+        "options": [
+          "would",
+          "will",
+          "had",
+          "couldn't"
+        ],
         "answerIndex": 0,
         "grammarPoint": "Third Conditional",
         "rule": "Use would have + V3 for unreal past situations.",
@@ -467,32 +833,59 @@
           "rule": "If + past perfect, would have + V3",
           "memory": "Past unreal = WOULD HAVE.",
           "distractors": [
-            { "option": "will", "reason": "First conditional, for future possibilities, not past." },
-            { "option": "had", "reason": "'we had have caught' is grammatically incorrect." },
-            { "option": "couldn't", "reason": "Changes meaning to negative (would not be able to)." }
+            {
+              "option": "will",
+              "reason": "First conditional, for future possibilities, not past."
+            },
+            {
+              "option": "had",
+              "reason": "'we had have caught' is grammatically incorrect."
+            },
+            {
+              "option": "couldn't",
+              "reason": "Changes meaning to negative (would not be able to)."
+            }
           ]
         }
       },
       "loopCount": 2,
-      "tags": ["conditional", "unreal_past"]
+      "tags": [
+        "conditional",
+        "unreal_past"
+      ]
     },
     {
       "id": "vg-b2-002",
       "level": "B2",
       "skill": "reported_speech",
-      "videoUrl": "",
-      "posterUrl": "",
+      "videoUrl": "./assets/motion/nusa-oops.mp4",
+      "posterUrl": "./assets/motion/posters/nusa-oops.jpg",
       "subtitles": [
-        { "start": 140.0, "end": 142.5, "text": "She said she was tired.", "speaker": "A" },
-        { "start": 142.5, "end": 145.0, "text": "But earlier she told me she was fine.", "speaker": "B" }
+        {
+          "start": 0,
+          "end": 1.5,
+          "text": "She said she was tired.",
+          "speaker": "A"
+        },
+        {
+          "start": 1.5,
+          "end": 3.1,
+          "text": "But earlier she told me she was fine.",
+          "speaker": "B"
+        }
       ],
-      "pauseAt": 144.0,
+      "pauseAt": 1.8,
       "exercise": {
         "type": "subtitle-cloze",
         "question": "Complete the subtitle:",
         "clozeText": "But earlier she ___ me she was fine.",
         "clozeAnswer": "told",
-        "options": ["told", "said", "tells", "spoke"],
+        "options": [
+          "told",
+          "said",
+          "tells",
+          "spoke"
+        ],
         "answerIndex": 0,
         "grammarPoint": "Reported Speech (Say vs Tell)",
         "rule": "Use 'tell' (told) when mentioning WHO was spoken to (an object).",
@@ -501,14 +894,26 @@
           "rule": "told + someone vs said (+ that)",
           "memory": "Tell SOMEONE, Say SOMETHING.",
           "distractors": [
-            { "option": "said", "reason": "'said me' is incorrect. You would need 'said TO me'." },
-            { "option": "tells", "reason": "Present tense, but this is reporting something from 'earlier' (past)." },
-            { "option": "spoke", "reason": "'spoke me' is grammatically incorrect." }
+            {
+              "option": "said",
+              "reason": "'said me' is incorrect. You would need 'said TO me'."
+            },
+            {
+              "option": "tells",
+              "reason": "Present tense, but this is reporting something from 'earlier' (past)."
+            },
+            {
+              "option": "spoke",
+              "reason": "'spoke me' is grammatically incorrect."
+            }
           ]
         }
       },
       "loopCount": 2,
-      "tags": ["reported_speech", "say_tell"]
+      "tags": [
+        "reported_speech",
+        "say_tell"
+      ]
     }
   ]
 }

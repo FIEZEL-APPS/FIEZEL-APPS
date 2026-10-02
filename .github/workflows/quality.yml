@@ -479,6 +479,7 @@ jobs:
           node tests/grammar-curriculum-test.js
           node tests/level-grammar-contract-test.js
           node tests/grammar-unlock-test.js
+          node tests/grammar-8-upgrades-full-test.js
           node tests/placement-accuracy-test.js
           node tests/level-guard-test.js
           node tests/writing-rubric-test.js

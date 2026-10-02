@@ -1,6 +1,6 @@
 {
   "schema": "id-golden-baseline/1",
-  "generatedAt": "2026-10-02T02:34:47.619Z",
+  "generatedAt": "2026-10-02T02:43:45.020Z",
   "root": "C:\\Users\\hp\\fiezel-apps",
   "files": {
     "grammar-explanations-id.json": "e0e1b1690d61d11c6b8c640002a0fe3da8a6fdd96168a3c16d399358d60dc1a2",
@@ -19,9 +19,9 @@
   },
   "literals": {
     "count": 4648,
-    "sha256": "2eb654e7245cfbcab8250f15e4f20508814d8f5027e364dbdc784743a26f77af",
+    "sha256": "351bfafd5fdd3234853c9b14e8331511c53c74c5c655b7d0a4b9e8f4b41981c9",
     "list": [
-      "\n        <div class=\"popover-arrow\"></div>\n        <div class=\"hint-popover-header\">\n          <div style=\"display:flex;align-items:center;gap:6px\">\n            <i data-lucide=\"info\"></i>\n            <strong>${FiezelI18n.t('grammar.petunjuk', 'Petunjuk Tata Bahasa')}</strong>\n          </div>\n          <span class=\"hint-level-pill\">${currentLvl}/4</span>\n          <button type=\"button\" id=\"hintCloseBtn\" class=\"hint-close-btn\" aria-label=\"Tutup\"><i data-lucide=\"x\"></i></button>\n        </div>\n        <div class=\"hint-step-indicator\" aria-hidden=\"true\">\n          ${[1,2,3,4].map(i => ",
+      "\n        <div class=\"popover-arrow\"></div>\n        <div class=\"hint-popover-header\">\n          <div style=\"display:flex;align-items:center;gap:6px\">\n            <i data-lucide=\"info\"></i>\n            <strong>${FiezelI18n.t('grammar.petunjuk', 'Petunjuk Tata Bahasa')}</strong>\n          </div>\n          <span class=\"hint-level-pill\">${currentLvl}/4</span>\n          <button type=\"button\" id=\"hintCloseBtn\" class=\"hint-close-btn\" aria-label=\"${FiezelI18n.t('modal.tutup', 'Tutup')}\"><i data-lucide=\"x\"></i></button>\n        </div>\n        <div class=\"hint-step-indicator\" aria-hidden=\"true\">\n          ${[1,2,3,4].map(i => ",
       "\n      <div class=\"row\">\n        <b><i data-lucide=\"archive\"></i> ${FiezelI18n.t('grammar.mistake-vault-title', 'Koleksi Kesalahan')}</b>\n        <span>${count} ${FiezelI18n.t('grammar.mistake-vault-items', 'catatan')}</span>\n      </div>\n      <p class=\"muted\">\n        ${count > 0 \n          ? FiezelI18n.t('grammar.mistake-vault-desc-active', 'Latih kembali polanya sampai tuntas 2x sesi.') \n          : FiezelI18n.t('grammar.mistake-vault-desc-empty', 'Hebat! Kamu tidak memiliki catatan kesalahan tertunda.')}\n      </p>\n      ${count > 0 \n        ? ",
       "\n      <div class=\"video-exercise-panel\" role=\"dialog\" aria-modal=\"true\" aria-label=\"${FiezelI18n.t('grammar.video.exercise', 'Latihan tata bahasa')}\">\n        <div class=\"exercise-badge\">\n          <i data-lucide=\"pencil\"></i> ${esc(ex.grammarPoint || FiezelI18n.t('grammar.video.point', 'Tata Bahasa'))}\n        </div>\n        <p class=\"muted\" style=\"margin-bottom: 12px; font-size: 0.9rem;\">${esc(ex.question)}</p>\n        <div class=\"cloze-sentence\">\n          ${clozeHtml}\n        </div>\n        <div class=\"cloze-options\">\n          ${(ex.options || []).map((opt, idx) => ",
       "\n      <div class=\"video-exercise-panel\" role=\"dialog\" aria-modal=\"true\">\n        <div class=\"exercise-badge\">\n          <i data-lucide=\"book-open\"></i> ${esc(exercise.grammarPoint || FiezelI18n.t('grammar.video.point', 'Tata Bahasa'))}\n        </div>\n        <h3 class=\"question\" style=\"margin-bottom: 20px;\">${esc(exercise.question)}</h3>\n        <div class=\"grammar-choice-options\">\n          ${(exercise.options || []).map((opt, idx) => ",
