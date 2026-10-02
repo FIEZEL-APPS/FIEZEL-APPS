@@ -440,7 +440,7 @@
     'grammar.mode-memory-stem': 'ข้อความช่วยจำใดตรงกับประโยคนี้ที่สุด?\n{stem}',
     'grammar.mode-objective-stem': 'เป้าหมายการเรียนรู้ใดตรงกับโจทย์ข้อนี้?\n{stem}',
     'grammar.mode-reasoning-stem': 'ลำดับการคิดใดถูกต้องที่สุดก่อนตอบคำถาม?\n{stem}',
-    'grammar.mode-repair-stem': '{opsiDikutip} ยังผิดอยู่ ข้อไหนถูกต้อง?\n{stem}',
+    'grammar.mode-repair-stem': 'แก้ไขประโยคต่อไปนี้ด้วยตัวเลือกที่ถูกต้อง:\n{stem}',
     'grammar.mode-rule-stem': 'กฎไวยากรณ์ข้อใดใช้กับประโยคนี้?\n{stem}',
     'grammar.mode-teach-stem': 'คำอธิบายสั้น ๆ แบบใดเหมาะกับ {judulLesson} ที่สุด?',
     'grammar.petunjuk-clue': 'คำใบ้สำคัญคือ “{petunjuk}”',

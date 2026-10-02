@@ -8842,11 +8842,11 @@
       "templateId": "A1-202",
       "skill": "can_ability",
       "level": "A1",
-      "sentence": "I ___ ride a bike, but I want to learn.",
+      "sentence": "I want to learn to ride a bike, but I ___.",
       "blank": {
         "answer": "can't",
         "alternates": [],
-        "position": 2
+        "position": 38
       },
       "distractors": [
         {
@@ -8869,7 +8869,7 @@
         }
       ],
       "explain": {
-        "why": "“Can't” artinya nggak bisa sekarang, langsung diikuti kata kerja dasar “ride”.",
+        "why": "“Can't” menyatakan ketidakmampuan di masa sekarang: “I want to learn to ride a bike, but I can't”.",
         "rule": "Nggak bisa: can't (cannot) + kata kerja dasar. Tanpa don't, tanpa to.",
         "memory": "Can't + kata kerja: can't ride, can't swim.",
         "avoid": "Anggap can kayak tombol: can atau can't, lalu langsung kata kerjanya."

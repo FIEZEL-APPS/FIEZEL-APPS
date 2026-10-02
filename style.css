@@ -389,17 +389,42 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 /* v6.1 (O4 §5): soal = teks TERBESAR di pelajaran aktif (24–28px, di atas .lesson-title
    24px dan h1 halaman yang didemosi ke h2). Menggantikan nilai interim i10 2026-08-28. */
 .question{font-size:clamp(var(--fs-h1),1.1rem + 1.8vw,1.75rem);line-height:1.4;margin:8px 0 18px;font-weight:700;letter-spacing:-.01em;white-space:pre-line;word-break:break-word}
+.question-instruction{display:block;font-size:0.85rem;font-weight:600;color:var(--muted);letter-spacing:0.02em;margin-bottom:6px;line-height:1.4;text-transform:none}
+.question-main{display:block;font-size:clamp(1.15rem, 1.1rem + 1.2vw, 1.45rem);font-weight:700;color:var(--text);line-height:1.45}
 /* i10 2026-08-28 (O5 §3a): banner kata target soal vocab — KATA-nya memimpin layar dengan
    serif display (sekeluarga dengan .word di flashcard), pelafalan menumpang di baseline. */
 .vocab-focus{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:2px 0 0}
 .vocab-focus-word{font-family:"Instrument Serif",serif;font-size:2rem;line-height:1.1;letter-spacing:-.01em}
 .options{display:grid;gap:var(--sp-2)}
 .option{
+  display:flex;align-items:center;gap:12px;
   text-align:left;background:var(--panel);border:1.5px solid var(--line);
   min-height:52px;padding:var(--sp-4);border-radius:var(--radius-md);
   position:relative;transition:transform var(--dur-s) var(--ease-spring),
   background var(--dur-s) var(--ease),border-color var(--dur-s) var(--ease),
   box-shadow var(--dur-s) var(--ease);
+  text-transform:none !important;font-variant:normal !important;
+}
+.option .option-badge{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:26px;height:26px;border-radius:6px;
+  font-size:0.78rem;font-weight:800;
+  background:var(--surface-soft, rgba(0,0,0,0.05));color:var(--muted);
+  border:1px solid var(--line);flex-shrink:0;text-transform:uppercase;
+}
+.option:not(:disabled):hover .option-badge{
+  background:var(--sun-soft);color:var(--sun-deep);border-color:var(--sun-deep);
+}
+.option.correct .option-badge{
+  background:var(--good-bright);color:#fff;border-color:var(--good-bright);
+}
+.option.wrong .option-badge{
+  background:var(--bad);color:#fff;border-color:var(--bad);
+}
+.option .option-text{
+  flex:1 1 auto;font-size:0.98rem;font-weight:600;color:var(--text);
+  text-transform:none !important;font-variant:normal !important;font-variant-numeric:normal !important;
+  line-height:1.4;
 }
 /* i10 2026-08-28 (O5 §2): pilihan jawaban = baris pilihan yang tenang, bukan kartu chunky
    (resep tebal v6 di bawah kini mengecualikan .option); umpan hover cukup bayangan lembut. */
@@ -488,17 +513,21 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
    soal + pilihan yang sedang dibicarakan oleh panel pembahasan. Kini pil status ringkas di
    tepi atas (aman dari soal), pointer-events tetap none, ritme .show/1500ms tak berubah. */
 .answer-burst{
-  position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top,0px));z-index:130;pointer-events:none;
-  width:auto;max-width:min(320px,calc(100% - 32px));display:grid;grid-auto-flow:column;align-items:center;gap:8px;padding:10px 16px;
-  border:1px solid rgba(var(--surface-pure-rgb),.7);border-radius:var(--radius-pill);background:rgba(var(--surface-pure-rgb),.96);
-  box-shadow:var(--shadow-md);opacity:0;transform:translate(-50%,-18px) scale(.9);
-  transition:opacity var(--dur-m) var(--ease),transform var(--dur-m) var(--ease-spring);backdrop-filter:blur(16px) /* i15: reveal = resep --dur-m, spring hanya di transform (O4 §9) */
+  position:fixed;left:50%;top:max(8px,env(safe-area-inset-top,0px));z-index:130;pointer-events:none;
+  width:auto;max-width:min(280px,calc(100% - 32px));display:flex;align-items:center;justify-content:center;gap:6px;padding:4px 14px;height:32px;box-sizing:border-box;
+  border-radius:var(--radius-pill);
+  box-shadow:0 8px 24px rgba(0,0,0,0.3);opacity:0;transform:translate(-50%,-18px) scale(.9);
+  transition:opacity var(--dur-m) var(--ease),transform var(--dur-m) var(--ease-spring);backdrop-filter:blur(16px)
 }
 .answer-burst.hidden{display:none}.answer-burst.show{opacity:1;transform:translate(-50%,0) scale(1)}
-.answer-burst-icon{width:26px;height:26px;display:grid;place-items:center;border-radius:var(--radius-xs)}.answer-burst-icon svg{width:16px;height:16px}
-.answer-burst strong{font-size:.95rem;letter-spacing:-.01em;white-space:nowrap}.answer-burst small{color:var(--muted);font-size:.76rem;text-align:center}
-.answer-burst.success .answer-burst-icon{color:var(--good);background:var(--good-soft)}
-.answer-burst.error .answer-burst-icon{color:var(--bad);background:var(--bad-soft)}
+.answer-burst-icon{width:18px;height:18px;display:grid;place-items:center;border-radius:var(--radius-xs)}.answer-burst-icon svg{width:14px;height:14px}
+.answer-burst strong{font-size:.82rem;letter-spacing:-.01em;white-space:nowrap;line-height:1}.answer-burst small{color:var(--muted);font-size:.76rem;text-align:center}
+.answer-burst.success{background:#064E3B;border:1px solid #10B981;color:#ECFDF5}
+.answer-burst.success strong{color:#ECFDF5}
+.answer-burst.success .answer-burst-icon{color:#10B981;background:rgba(16,185,129,.2)}
+.answer-burst.error{background:#7F1D1D;border:1px solid #EF4444;color:#FEF2F2}
+.answer-burst.error strong{color:#FEF2F2}
+.answer-burst.error .answer-burst-icon{color:#EF4444;background:rgba(239,68,68,.2)}
 
 /* ---------- bottom nav ---------- */
 .bottomnav{
@@ -4646,26 +4675,26 @@ body.fz-lesson-mode .topline{position:sticky;top:0;z-index:30;
    sun-soft/info (5,42:1) dan teks langkah --ink di surface-warm (15,65:1). */
 .tutor-steps{
   margin:12px 0 2px;padding:12px 14px;border-radius:var(--radius-sm);
-  background:var(--surface-warm);border:1px solid var(--line);
+  background:#FFF8EE !important;border:1.5px solid #FDE68A !important;
   counter-reset:tutor-step;
 }
-.tutor-steps .eyebrow{display:block;margin-bottom:9px}
+.tutor-steps .eyebrow{display:block;margin-bottom:9px;color:#78350F !important;font-weight:800 !important}
 .tutor-step{
   counter-increment:tutor-step;
   position:relative;margin:0 0 9px;padding-left:33px;
-  font-size:.9rem;line-height:1.6;color:var(--ink);
+  font-size:.9rem;line-height:1.6;color:#1C1917 !important;font-weight:600 !important;
 }
 .tutor-step:last-of-type{margin-bottom:0}
 .tutor-step::before{
   content:counter(tutor-step);
   position:absolute;left:0;top:1px;
   display:grid;place-items:center;width:24px;height:24px;border-radius:50%;
-  background:var(--sun-soft);border:1px solid var(--sun-deep);
-  color:var(--info);font-size:.72rem;font-weight:700;font-variant-numeric:tabular-nums;
+  background:#FEF3C7 !important;border:1.5px solid #D97706 !important;
+  color:#92400E !important;font-size:.75rem;font-weight:800;font-variant-numeric:tabular-nums;
 }
 .tutor-step-final{
-  margin:11px 0 0;padding-top:10px;border-top:1px dashed var(--line);
-  font-size:.94rem;line-height:1.6;font-weight:700;color:var(--info);
+  margin:11px 0 0;padding-top:10px;border-top:1px dashed #D97706;
+  font-size:.94rem;line-height:1.6;font-weight:700;color:#78350F !important;
 }
 
 /* ============================================================
@@ -7750,6 +7779,7 @@ body:has(.home-today) .quiz-topbar,
   background: #14141B !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
   color: #FFFFFF !important;
+  margin-bottom: 16px !important;
 }
 
 .quiz-topbar span,
@@ -7807,6 +7837,30 @@ body:has(.home-today) .quiz-topbar,
 .quiz-bubble p,
 .quiz-bubble span {
   color: #FFFFFF !important;
+}
+
+.quiz-bubble .question-instruction,
+.quiz-shell .question-instruction,
+.question-instruction {
+  display: block !important;
+  font-size: 0.86rem !important;
+  font-weight: 600 !important;
+  color: #94A3B8 !important; /* Secondary text color (Slate 400), WCAG AAA 7.3:1 contrast on #181824 */
+  letter-spacing: 0.02em !important;
+  margin-bottom: 8px !important;
+  line-height: 1.4 !important;
+  text-transform: none !important;
+}
+
+.quiz-bubble .question-main,
+.quiz-shell .question-main,
+.question-main {
+  display: block !important;
+  font-size: clamp(1.2rem, 1.15rem + 1.2vw, 1.55rem) !important;
+  font-weight: 700 !important;
+  color: #FFFFFF !important;
+  line-height: 1.45 !important;
+  letter-spacing: -0.01em !important;
 }
 
 .stage-furigana, .furigana {

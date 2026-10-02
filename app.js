@@ -853,7 +853,10 @@ function grammarExercise(skill,item,variant){const meta=grammarMeta(item),correc
   // m025-162 (S3/M3): alasan opsi complete_sentence dipetakan lewat INDEKS (kanal verbatim),
   // bukan pencocokan teks opsi terisi yang gagal senyap di stem multi-blank; jangkar kutipannya
   // isi opsi itu sendiri, bukan 8 kata pertama stem yang identik untuk keempat opsi.
-  if(variant===1)return direct(FiezelI18n.t('grammar.mode-complete-stem',{judulLesson:title.toLowerCase(),stem:base}),meta.options.map(option=>completeGrammarStem(grammarOptionStem(base),option)),meta.correctIndex,joinQuoteReason(FiezelI18n.t('grammar.versi-pakai',{opsiDikutip:quoteEmbedShort(correct)}),causalKey?FiezelI18n.t('quiz.grammar-causal-pas',{reason:causalKey}):FiezelI18n.t('grammar.alasan-versi-pas')),reasons,[],meta.options.map((option,i)=>i===meta.correctIndex?'':grammarVersionReason(option,reasons[i])));
+  if(variant===1){
+    const v1Opts=meta.options;
+    return direct(FiezelI18n.t('grammar.mode-complete-stem',{judulLesson:title.toLowerCase(),stem:base}),v1Opts,meta.correctIndex,joinQuoteReason(FiezelI18n.t('grammar.versi-pakai',{opsiDikutip:quoteEmbedShort(correct)}),causalKey?FiezelI18n.t('quiz.grammar-causal-pas',{reason:causalKey}):FiezelI18n.t('grammar.alasan-versi-pas')),reasons,[],meta.options.map((option,i)=>i===meta.correctIndex?'':grammarVersionReason(option,reasons[i])));
+  }
   // m025-155: mode beropsi KALIMAT (justify/diagnose/label/contrast) tidak boleh jatuh ke
   // heuristik bentuk kata kerja di grammarOptionReason(); tiap opsi salah diberi penjelasan
   // verbatim yang menyebut peran sebenarnya dari kalimat itu.
@@ -907,7 +910,7 @@ function grammarExercise(skill,item,variant){const meta=grammarMeta(item),correc
   // teman — pembacanya tetap "kamu", dan yang milih di dalam soal bukan lagi "siswa".
   if(variant>=9&&variant<=11){const target=wrong[variant-9],others=wrong.filter(x=>x!==target);return direct(FiezelI18n.t('grammar.mode-diagnose-stem',{opsiDikutip:quoteEmbed(target.option),stem:base}),[target.reason,meta.whyCorrect,...others.map(x=>x.reason)].map(grammarCapFirst)/* m025-375 */,0,grammarReasonForLearner(target.option,target.reason,self.FiezelI18n?.getLocale?.()==='th')/* m025-375: kuncinya adalah alasan kartu ini - pembahasan menegaskannya, bukan diagnosis umum yang bisa salah alamat */||grammarOptionReason(target.option,false,target.reason,target.detail?.misconceptionKey),[],[],['',FiezelI18n.t('grammar.mode-diagnose-expl-kunci',{kunciDikutip:quoteEmbedShort(correct),opsiDikutip:quoteEmbedShort(target.option)}),...others.map(x=>FiezelI18n.t('grammar.mode-diagnose-expl-lain',{opsiLainDikutip:quoteEmbedShort(x.option),opsiDikutip:quoteEmbedShort(target.option)}))]);}
   if(variant>=12&&variant<=14){const target=wrong[variant-12],others=wrong.filter(x=>x!==target),labels=others.map(x=>String(x.detail.misconception||x.reason));return direct(FiezelI18n.t('grammar.mode-label-stem',{opsiDikutip:quoteEmbed(target.option),stem:base}),[String(target.detail.misconception||target.reason),FiezelI18n.t('grammar.mode-label-opsi-benar'),...labels],0,FiezelI18n.t('grammar.mode-label-benar',{opsiDikutip:quoteEmbedShort(target.option)}),[],[],['',FiezelI18n.t('grammar.mode-label-expl-keliru',{opsiDikutip:quoteEmbed(target.option)}),...others.map(x=>FiezelI18n.t('grammar.mode-label-expl-lain',{opsiLainDikutip:quoteEmbedShort(x.option),opsiDikutip:quoteEmbedShort(target.option)}))]);}
-  if(variant>=15&&variant<=17){const target=wrong[variant-15];return direct(FiezelI18n.t('grammar.mode-repair-stem',{opsiDikutip:quoteEmbed(target.option),stem:base}),meta.options,meta.correctIndex,joinQuoteReason(FiezelI18n.t('grammar.mode-repair-benar-head',{kunciDikutip:quoteEmbedShort(correct)}),causalKey||FiezelI18n.t('grammar.mode-repair-benar-tail'))/* m025-375: sebab kausal kartu, bukan "bentuk itu yang cocok" */,reasons);}
+  if(variant>=15&&variant<=17){const target=wrong[variant-15],repairSentence=completeGrammarStem(grammarOptionStem(base),target?.option||'');return direct(FiezelI18n.t('grammar.mode-repair-stem',{stem:repairSentence}),meta.options,meta.correctIndex,joinQuoteReason(FiezelI18n.t('grammar.mode-repair-benar-head',{kunciDikutip:quoteEmbedShort(correct)}),causalKey||FiezelI18n.t('grammar.mode-repair-benar-tail'))/* m025-375: sebab kausal kartu, bukan "bentuk itu yang cocok" */,reasons);}
   if(variant>=18&&variant<=20){const target=wrong[variant-18],failure=grammarOptionReason(target.option,false,target.reason,target.detail?.misconceptionKey);return direct(FiezelI18n.t('grammar.mode-contrast-stem',{kunciDikutip:quoteEmbed(correct),opsiDikutip:quoteEmbed(target.option),stem:base}),[joinQuoteReason(FiezelI18n.t('grammar.mode-contrast-opsi-benar-head',{kunciDikutip:quoteEmbed(correct)}),failure),FiezelI18n.t('grammar.mode-contrast-opsi-kebalik',{opsiDikutip:quoteEmbed(target.option),kunciDikutip:quoteEmbed(correct)}),FiezelI18n.t('grammar.mode-contrast-opsi-bolak-balik'),FiezelI18n.t('grammar.mode-contrast-opsi-none')],0,FiezelI18n.t('grammar.mode-contrast-benar',{kunciDikutip:quoteEmbed(correct),opsiDikutip:quoteEmbed(target.option)})/* m025-156 (D5): rumusan bebas-posisi - opsi diacak, "pertama" tidak menunjuk apa pun; m025-161 (F1-2): registernya disantaikan tanpa mengubah posisi */,[],[],['',FiezelI18n.t('grammar.mode-contrast-expl-kebalik',{kunciDikutip:quoteEmbed(correct),opsiDikutip:quoteEmbed(target.option)}),FiezelI18n.t('grammar.mode-contrast-expl-sepadan',{kunciDikutip:quoteEmbed(correct)}),FiezelI18n.t('grammar.mode-contrast-expl-keliru',{kunciDikutip:quoteEmbed(correct)})]);}
   // m025-155: label keluarga pengecoh adalah taksonomi global, bukan konten lesson mana pun -
   // stempel origin 'taxonomy' plus penjelasan verbatim yang jujur, supaya murid tidak lagi
@@ -11508,8 +11511,23 @@ function makeGrammarTokenOrderQuestion(skill, item, idx, level){
   const base=item?.[0]||'',opts=item?.[1]||[],correct=opts[item?.[2]]||'';
   let fullSentence=base.replace(/_{2,}|\[\.\.\.\]/g,correct).trim();
   if(!fullSentence.includes(correct))fullSentence=`${base} ${correct}`.trim();
-  const rawTokens=fullSentence.split(/\s+/).map(w=>w.trim()).filter(Boolean);
-  const distractors=opts.filter((_,i)=>i!==item?.[2]).slice(0,3);
+  const cleanWord=w=>String(w||'').replace(/^[.,\/#!$%\^&\*;:{}=\-_`~()“”"']+|[.,\/#!$%\^&\*;:{}=\-_`~()“”"']+$/g,'');
+  const rawTokens=fullSentence.split(/\s+/).map(cleanWord).filter(Boolean);
+  const distractors=opts.filter((_,i)=>i!==item?.[2]).map(cleanWord).filter(w=>Boolean(w)&&!w.includes(' ')).slice(0,2);
+  const alternates=[];
+  if(fullSentence.includes(', but ')){
+    const parts=fullSentence.split(', but ');
+    if(parts.length===2){
+      alternates.push(`${cleanWord(parts[1])}, but ${cleanWord(parts[0])}`);
+      alternates.push(`${cleanWord(parts[1])} but ${cleanWord(parts[0])}`);
+    }
+  }else if(fullSentence.includes(' but ')){
+    const parts=fullSentence.split(' but ');
+    if(parts.length===2){
+      alternates.push(`${cleanWord(parts[1])}, but ${cleanWord(parts[0])}`);
+      alternates.push(`${cleanWord(parts[1])} but ${cleanWord(parts[0])}`);
+    }
+  }
   const rule=grammarLessonRule(item);
   return {
     id:`token-${skill}-${idx}`,
@@ -11520,6 +11538,7 @@ function makeGrammarTokenOrderQuestion(skill, item, idx, level){
     question:FiezelI18n.t('grammar.token-order-prompt','Susun kata-kata berikut menjadi kalimat yang tepat:'),
     tokens:rawTokens,
     distractors:distractors,
+    alternates:alternates,
     correctOrder:rawTokens.map((_,i)=>i),
     answerIndex:0,
     options:[fullSentence,...distractors.map(d=>fullSentence.replace(correct,d))],
@@ -11674,7 +11693,7 @@ function buildGrammarSessionQuestions(skill,count=GRAMMAR_SESSION_SIZE){
   const meta=GRAMMAR_ITEMS.find(x=>x.skill===skill);if(!meta||meta.level!==getActiveLevel())return[];
   const ownTemplates=G[skill]||[];if(!ownTemplates.length)return[];
   const seenSourceIds=new Set(),seenStems=new Set();
-  const normStem=q=>String(q.sourceId||q.question||'').toLowerCase().replace(/“[^”]+” masih salah\. yang benar yang mana\?/i,'').replace(/pilih kalimat yang benar:/i,'').replace(/\s+/g,' ').trim();
+  const normStem=q=>String(q.sourceId||q.question||'').toLowerCase().replace(/“[^”]+” masih salah\. yang benar yang mana\?/i,'').replace(/perbaiki kalimat berikut dengan pilihan yang tepat:/i,'').replace(/pilih kalimat yang benar:/i,'').replace(/lengkapi kalimat ini:/i,'').replace(/\s+/g,' ').trim();
   const own=[];
   const modes=['apply_form','complete_sentence','repair_distractor_1','repair_distractor_2','repair_distractor_3'];
   const order=shuffle(Array.from({length:ownTemplates.length},(_,i)=>i));
@@ -11797,32 +11816,7 @@ function startTokenOrderSession(skill){
   const meta=GRAMMAR_ITEMS.find(x=>x.skill===sk);
   const arr=G[sk]||[];
   if(!arr.length)return showToast(FiezelI18n.t('grammar.lesson-belum-memiliki-materi'));
-  const tokenQuestions=arr.map((item,idx)=>{
-    const base=item[0]||'',opts=item[1]||[],correct=opts[item[2]]||'';
-    let fullSentence=base.replace(/_{2,}|\[\.\.\.\]/g,correct).trim();
-    if(!fullSentence.includes(correct))fullSentence=`${base} ${correct}`.trim();
-    const rawTokens=fullSentence.split(/\s+/).map(w=>w.trim()).filter(Boolean);
-    const distractors=opts.filter((_,i)=>i!==item[2]).slice(0,3);
-    const rule=grammarLessonRule(item);
-    return {
-      id:`token-${sk}-${idx}`,
-      type:'token-order',
-      level:meta?.level||activeLvl,
-      skill:sk,
-      lessonSkill:sk,
-      question:FiezelI18n.t('grammar.token-order-prompt','Susun kata-kata berikut menjadi kalimat yang tepat:'),
-      tokens:rawTokens,
-      distractors:distractors,
-      correctOrder:rawTokens.map((_,i)=>i),
-      answerIndex:0,
-      options:[fullSentence,...distractors.map(d=>fullSentence.replace(correct,d))],
-      explain:{
-        rule:rule,
-        why:FiezelI18n.t('grammar.susunan-kalimat-tepat','Urutan kata dan bentuk tata bahasa yang tepat.'),
-        memory:String(grammarMeta(item).memory||'').trim()||FiezelI18n.t('grammar.ingat-pola-kalimat','Perhatikan urutan subjek, kata kerja, dan objek.')
-      }
-    };
-  });
+  const tokenQuestions=arr.map((item,idx)=>makeGrammarTokenOrderQuestion(sk,item,idx,meta?.level||activeLvl));
   if(!tokenQuestions.length)return showToast(FiezelI18n.t('grammar.lesson-belum-memiliki-materi'));
   showToast(FiezelI18n.t('grammar.token-start','Memulai latihan susun kata...'),'info');
   quizLoop({type:'grammar',count:Math.min(5,tokenQuestions.length),pool:tokenQuestions,preserveOrder:true});
@@ -11864,20 +11858,27 @@ async function startVideoGrammarSession(){
     const currentLevel=getActiveLevel();
     let matches=bank.filter(x=>x.level===currentLevel);
     if(!matches.length)matches=bank.slice(0,5);
-    const questions=matches.map(template=>{
-      if(self.FiezelGrammarVideo&&typeof self.FiezelGrammarVideo.createVideoGrammarQuestion==='function'){
-        return self.FiezelGrammarVideo.createVideoGrammarQuestion(template);
+    const withVid=matches.filter(x=>x.videoUrl);
+    const withoutVid=matches.filter(x=>!x.videoUrl);
+    const sortedMatches=withVid.length?[...withVid,...withoutVid]:matches;
+    const questions=[];
+    sortedMatches.forEach(template=>{
+      if(Array.isArray(template.checkpoints)&&template.checkpoints.length>1&&self.FiezelGrammarVideo&&typeof self.FiezelGrammarVideo.expandCheckpointsToQuestions==='function'){
+        questions.push(...self.FiezelGrammarVideo.expandCheckpointsToQuestions(template));
+      } else if(self.FiezelGrammarVideo&&typeof self.FiezelGrammarVideo.createVideoGrammarQuestion==='function'){
+        questions.push(self.FiezelGrammarVideo.createVideoGrammarQuestion(template));
+      } else {
+        questions.push({
+          id:template.id,type:'video-grammar',level:template.level,skill:template.skill,
+          question:template.exercise?.question||'Lengkapi kalimat berikut:',
+          options:template.exercise?.options||[],answerIndex:template.exercise?.answerIndex||0,
+          explain:template.exercise?.explain||{},
+          videoConfig:{
+            videoUrl:template.videoUrl,posterUrl:template.posterUrl,subtitles:template.subtitles||[],
+            pauseAt:template.pauseAt||2.0,loopCount:template.loopCount||2,exercise:template.exercise
+          }
+        });
       }
-      return {
-        id:template.id,type:'video-grammar',level:template.level,skill:template.skill,
-        question:template.exercise?.question||'Lengkapi kalimat berikut:',
-        options:template.exercise?.options||[],answerIndex:template.exercise?.answerIndex||0,
-        explain:template.exercise?.explain||{},
-        videoConfig:{
-          videoUrl:template.videoUrl,posterUrl:template.posterUrl,subtitles:template.subtitles||[],
-          pauseAt:template.pauseAt||2.0,loopCount:template.loopCount||2,exercise:template.exercise
-        }
-      };
     });
     showToast(FiezelI18n.t('grammar.video-start','Memulai Video Grammar Lab...'),'info');
     quizLoop({type:'video-grammar',count:questions.length,pool:questions,preserveOrder:true});
@@ -12713,7 +12714,41 @@ function quizLoop(cfg){
     cfg.__halfwayNotified=true;
     try{showToast(FiezelI18n.t('quiz.milestone-halfway','Setengah jalan! Pertahankan fokusmu 💪'),'info')}catch(_){}
   }
-  setApp(`<section class="fade quiz-shell${pawSlot?pawSlot.shellClass:''}"><div class="quiz-topbar"><button id="quizExit" class="quiz-exit" aria-label="${FiezelI18n.t('quiz.exit-aria')}"><i data-lucide="x"></i><span class="quiz-exit-label">${FiezelI18n.t('quiz.exit-label')}</span></button><div class="quiz-progress" role="progressbar" aria-valuemin="0" aria-valuemax="${planned}" aria-valuenow="${asked+1}" aria-label="${FiezelI18n.t('quiz.progress-aria',{asked:asked+1,planned})}"><span>${asked+1}</span><em>/ ${planned}</em><i class="quiz-progress-bar" aria-hidden="true" style="--p:${(asked/Math.max(1,planned)).toFixed(3)}"><b></b></i></div>${(q.type==='grammar'||q.type==='token-order'||q.type==='video-grammar'||q.explain?.rule)?`<button id="quizGrammarHint" type="button" class="grammar-hint-btn" aria-label="${FiezelI18n.t('grammar.hint-aria','Petunjuk Tata Bahasa')}" title="${FiezelI18n.t('grammar.hint-aria','Petunjuk Tata Bahasa')}"><i data-lucide="lightbulb"></i></button>`:''}<button id="quizNext" class="quiz-next" disabled>${FiezelI18n.t('quiz.next-btn')} <i data-lucide="arrow-right"></i></button></div>${pawSlot?'':`<div class="quiz-mascot" aria-hidden="true">${pawFaceMarkup()}</div>`}${q.passage?card(`<div class="passage passage-reading" id="quizPassage"><div class="eyebrow">${FiezelI18n.t('quiz.reading-eyebrow')}</div><h3>${esc(q.passage.title)}</h3><p>${esc(q.passage.text)}</p></div>`,'card-reading'):(cfg.context?card(`<div class="passage" id="quizPassage"><b>${esc(cfg.context.title)}</b><p>${esc(cfg.context.text)}</p></div>`):'')}${card(`${pawSlot?pawSlot.peek:''}${pawSlot&&pawSlot.above?`<div class="quiz-stage">${pawSlot.above}<div class="quiz-bubble">${quizReviewTag(q)}<h2 class="question" id="quizStem">${esc(q.question)}</h2></div></div>`:''}${q.focus?`<div class="vocab-focus"><span class="vocab-focus-word">${jaWord(q.focus.word,q.focus.phonetic)}</span>${q.focus.phonetic?`<span class="phonetic">${jaPhonetic(q.focus.phonetic,'')}</span>`:''}</div>`:''}${q.passage?`<div class="reading-jump-bar"><button type="button" id="readingJumpBtn" class="reading-jump-btn"><i data-lucide="book-open"></i> <span>${FiezelI18n.t('quiz.reading-eyebrow')}</span> <i data-lucide="arrow-up-right"></i></button></div>`:''}${q.type==='listening'?`<div class="quiz-listen quiz-listen-hero"><div class="quiz-listen-controls"><button id="quizListen" class="quiz-listen-btn quiz-listen-btn-hero"><i data-lucide="volume-2"></i> ${FiezelI18n.t('quiz.listen-btn')}</button><button type="button" id="quizListenSpeed" class="quiz-listen-speed-btn" aria-label="Kecepatan Audio"><span id="quizListenSpeedLabel">1.0x</span></button></div><div class="quiz-audio-wave hidden" id="quizAudioWave" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div><span id="quizListenNote" class="muted">${FiezelI18n.t('quiz.listen-note')}</span></div>`:''}${pawSlot&&pawSlot.above?'':`${quizReviewTag(q)}<h2 class="question" id="quizStem">${esc(q.question)}</h2>`}<div id="options" class="options"></div><div id="feedback" class="feedback hidden" role="region" aria-live="polite"></div><div id="tutorTurn" class="tutor-turn hidden"></div>`,pawSlot?pawSlot.cardClass:'')}${pawSlot?pawSlot.side:''} </section>`);
+  const renderQuizQuestionContent=(questionObj)=>{
+    const fullText=String(questionObj?.question||questionObj?.stem||'');
+    let instruction=String(questionObj?.instruction||'').trim();
+    let stem=fullText;
+    if(!instruction){
+      if(fullText.includes('\n')){
+        const parts=fullText.split('\n').map(p=>p.trim()).filter(Boolean);
+        if(parts.length>1){
+          instruction=parts[0];
+          stem=parts.slice(1).join('\n');
+        }
+      }else{
+        const match=fullText.match(/^(Pilih\s+[^:]+:|Lengkapi\s+[^:]+:|Perbaiki\s+[^:]+:|Susun\s+[^:]+:|Tentukan\s+[^:]+:|Bandingkan\s+[^:]+:|Choose\s+[^:]+:|Select\s+[^:]+:|Fill\s+in\s+[^:]+:)\s*(.+)$/i);
+        if(match){
+          instruction=match[1].trim();
+          stem=match[2].trim();
+        }else if(/_{2,}|\[\.\.\.\]/.test(fullText)){
+          const fullWithPrompt=FiezelI18n.t('grammar.prompt-lengkapi',{stem:fullText});
+          if(fullWithPrompt.includes('\n')){
+            const promptParts=fullWithPrompt.split('\n').map(p=>p.trim()).filter(Boolean);
+            instruction=promptParts[0];
+            stem=promptParts.slice(1).join('\n')||fullText;
+          }
+        }else if(q.type==='token-order'){
+          instruction=FiezelI18n.t('grammar.susun-kata','Susun Kata');
+          stem=fullText;
+        }
+      }
+    }
+    if(instruction){
+      return `<span class="question-instruction">${esc(instruction)}</span><span class="question-main">${esc(stem)}</span>`;
+    }
+    return `<span class="question-main">${esc(stem)}</span>`;
+  };
+  setApp(`<section class="fade quiz-shell${pawSlot?pawSlot.shellClass:''}"><div class="quiz-topbar"><button id="quizExit" class="quiz-exit" aria-label="${FiezelI18n.t('quiz.exit-aria')}"><i data-lucide="x"></i><span class="quiz-exit-label">${FiezelI18n.t('quiz.exit-label')}</span></button><div class="quiz-progress" role="progressbar" aria-valuemin="0" aria-valuemax="${planned}" aria-valuenow="${asked+1}" aria-label="${FiezelI18n.t('quiz.progress-aria',{asked:asked+1,planned})}"><span>${asked+1}</span><em>/ ${planned}</em><i class="quiz-progress-bar" aria-hidden="true" style="--p:${(asked/Math.max(1,planned)).toFixed(3)}"><b></b></i></div>${(q.type==='grammar'||q.type==='token-order'||q.type==='video-grammar'||q.explain?.rule)?`<button id="quizGrammarHint" type="button" class="grammar-hint-btn" aria-label="${FiezelI18n.t('grammar.hint-aria','Petunjuk Tata Bahasa')}" title="${FiezelI18n.t('grammar.hint-aria','Petunjuk Tata Bahasa')}"><i data-lucide="lightbulb"></i></button>`:''}<button id="quizNext" class="quiz-next" disabled>${FiezelI18n.t('quiz.next-btn')} <i data-lucide="arrow-right"></i></button></div>${pawSlot?'':`<div class="quiz-mascot" aria-hidden="true">${pawFaceMarkup()}</div>`}${q.passage?card(`<div class="passage passage-reading" id="quizPassage"><div class="eyebrow">${FiezelI18n.t('quiz.reading-eyebrow')}</div><h3>${esc(q.passage.title)}</h3><p>${esc(q.passage.text)}</p></div>`,'card-reading'):(cfg.context?card(`<div class="passage" id="quizPassage"><b>${esc(cfg.context.title)}</b><p>${esc(cfg.context.text)}</p></div>`):'')}${card(`${pawSlot?pawSlot.peek:''}${pawSlot&&pawSlot.above?`<div class="quiz-stage">${pawSlot.above}<div class="quiz-bubble">${quizReviewTag(q)}<h2 class="question" id="quizStem">${renderQuizQuestionContent(q)}</h2></div></div>`:''}${q.focus?`<div class="vocab-focus"><span class="vocab-focus-word">${jaWord(q.focus.word,q.focus.phonetic)}</span>${q.focus.phonetic?`<span class="phonetic">${jaPhonetic(q.focus.phonetic,'')}</span>`:''}</div>`:''}${q.passage?`<div class="reading-jump-bar"><button type="button" id="readingJumpBtn" class="reading-jump-btn"><i data-lucide="book-open"></i> <span>${FiezelI18n.t('quiz.reading-eyebrow')}</span> <i data-lucide="arrow-up-right"></i></button></div>`:''}${q.type==='listening'?`<div class="quiz-listen quiz-listen-hero"><div class="quiz-listen-controls"><button id="quizListen" class="quiz-listen-btn quiz-listen-btn-hero"><i data-lucide="volume-2"></i> ${FiezelI18n.t('quiz.listen-btn')}</button><button type="button" id="quizListenSpeed" class="quiz-listen-speed-btn" aria-label="Kecepatan Audio"><span id="quizListenSpeedLabel">1.0x</span></button></div><div class="quiz-audio-wave hidden" id="quizAudioWave" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div><span id="quizListenNote" class="muted">${FiezelI18n.t('quiz.listen-note')}</span></div>`:''}${pawSlot&&pawSlot.above?'':`${quizReviewTag(q)}<h2 class="question" id="quizStem">${renderQuizQuestionContent(q)}</h2>`}<div id="options" class="options"></div><div id="feedback" class="feedback hidden" role="region" aria-live="polite"></div><div id="tutorTurn" class="tutor-turn hidden"></div>`,pawSlot?pawSlot.cardClass:'')}${pawSlot?pawSlot.side:''} </section>`);
   $('quizExit').onclick=()=>confirmQuizExit();/* W1 P1-2: keluar lewat konfirmasi, bukan seketika. */
   const hintBtn=$('quizGrammarHint');
   if(hintBtn){
@@ -12728,7 +12763,7 @@ function quizLoop(cfg){
     };
   }
   try{window.scrollTo(0,0);document.documentElement.scrollTop=0;document.body.scrollTop=0;document.querySelector('.quiz-topbar, #quizExit')?.scrollIntoView({block:'start',behavior:'auto'})}catch(_){}
-  $('options').append(...opts.map((o,j)=>{const b=document.createElement('button');b.className='option';b.textContent=o;b.onclick=()=>answer(q,j,b);return b}));
+  $('options').append(...opts.map((o,j)=>{const b=document.createElement('button');b.className='option';b.setAttribute('data-choice',String(j));b.textContent=o;b.onclick=()=>answer(q,j,b);return b}));
   if(q.passage){
    const jump=$('readingJumpBtn');
    if(jump){
@@ -12782,6 +12817,7 @@ function quizLoop(cfg){
        video:null,
        onPauseReached:()=>{try{$('options')?.scrollIntoView({block:'nearest',behavior:'smooth'})}catch(_){}}
      };
+     q.__vState=vState;
      const playerEl=self.FiezelGrammarVideo.renderVideoPlayer(q.videoConfig,vState);
      if(playerEl)stem.before(playerEl);
    }
@@ -12939,6 +12975,13 @@ function quizLoop(cfg){
    return;
   }
   document.querySelectorAll('.option')[q.answerIndex]?.classList.add('correct');
+  if(q.type==='video-grammar'&&q.__vState){
+    q.__vState.exerciseCompleted=true;
+    q.__vState.isPausedForExercise=false;
+    const curCp=q.__vState.checkpoints?.[q.__vState.currentCheckpointIndex];
+    if(curCp){curCp.completed=true;curCp.isCorrect=ok}
+    if(typeof q.__vState.updateMarkers==='function')q.__vState.updateMarkers();
+  }
   const turn=tutorCompose(q,j,ok,answer.scaffold||'tell',forced?'reteach':answer.move,answer.timing);
   const f=$('feedback');f.classList.remove('hidden','feedback-success','feedback-error');f.classList.add(ok?'feedback-success':'feedback-error');
   /* m025-377 (Opsi 1, bagian C): saat jawaban SALAH, tampilkan langsung alasan kenapa pilihan

@@ -843,7 +843,7 @@
     // app.js:619 — grammarExercise v5 stem
     'grammar.mode-reasoning-stem': `Langkah berpikir mana yang paling tepat sebelum menjawab?\n{stem}`,
     // app.js:635 — grammarExercise v15-17 stem (repair_distractor)
-    'grammar.mode-repair-stem': `{opsiDikutip} masih salah. Yang benar yang mana?\n{stem}`,
+    'grammar.mode-repair-stem': `Perbaiki kalimat berikut dengan pilihan yang tepat:\n{stem}`,
     // app.js:617 — grammarExercise v3 stem
     'grammar.mode-rule-stem': `Aturan tata bahasa mana yang berlaku di sini?\n{stem}`,
     // app.js:652 — grammarExercise v23 stem (teach_back)

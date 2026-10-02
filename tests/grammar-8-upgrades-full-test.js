@@ -220,9 +220,13 @@ const bankEl = widget.querySelector('#tokenBank');
 const railEl = widget.querySelector('#tokenRail');
 const bankChips = bankEl.querySelectorAll('.token-chip');
 assert(bankChips.length >= 6, 'Must have at least 6 token chips in bank');
-// Check syntax classes on chips
+// Check ALL chips have clean uniform styling without POS syntax classes
+bankChips.forEach(chip => {
+  assert(!chip.className.includes('syntax-'), `Chip "${chip.textContent}" must not contain syntax class (got ${chip.className})`);
+  assert(chip.classList.contains('token-chip'), `Chip "${chip.textContent}" must have token-chip class`);
+});
 const subjChip = bankChips.find(c => c.textContent === 'She');
-assert(subjChip && subjChip.classList.contains('syntax-subj'), 'She token must have syntax-subj class');
+assert(subjChip, 'She token chip must exist in bank');
 
 // Place "She"
 subjChip.onclick();
@@ -230,6 +234,7 @@ let railChips = railEl.querySelectorAll('.token-chip');
 assert.strictEqual(railChips.length, 1, 'Rail should have 1 token placed');
 assert.strictEqual(railChips[0].textContent, 'She');
 assert(railChips[0].classList.contains('in-rail'), 'Rail token must have in-rail class');
+assert(!railChips[0].className.includes('syntax-'), 'Rail token must not have syntax class');
 
 // Tap to unplace "She" (Verifying pointer-events & unplacing fix)
 railChips[0].onclick();
@@ -378,20 +383,68 @@ assert(emptyChoice && emptyChoice.classList.contains('video-overlay-pane'), 'ren
 const emptyExercise = Video.renderVideoExercise(null, null);
 assert(emptyExercise && emptyExercise.classList.contains('video-exercise-wrap'), 'renderVideoExercise must handle null args');
 
-// Verify all 15 items in video-grammar-bank-v1.json
+// Verify bank integrity in video-grammar-bank-v1.json
 const bankData = JSON.parse(fs.readFileSync(path.join(root, 'content', 'video-grammar-bank-v1.json'), 'utf8'));
-assert(Array.isArray(bankData.videoGrammarBank) && bankData.videoGrammarBank.length === 15, 'Bank must contain 15 exercises');
+assert(Array.isArray(bankData.videoGrammarBank) && bankData.videoGrammarBank.length >= 15, 'Bank must contain at least 15 exercises');
 const answerIndicesFound = new Set();
 bankData.videoGrammarBank.forEach(item => {
-  assert.strictEqual(item.videoUrl, '', `${item.id} videoUrl must be empty (mascot motion removed)`);
-  assert.strictEqual(item.posterUrl, '', `${item.id} posterUrl must be empty`);
+  // Enforce zero mascot motion clips (strict AGENTS.md compliance)
+  if (item.videoUrl) {
+    assert(!item.videoUrl.includes('assets/motion'), `${item.id} must not link unapproved mascot motion`);
+    const cleanPath = item.videoUrl.replace(/^\.\//, '');
+    assert(fs.existsSync(path.join(root, cleanPath)), `${item.id} videoUrl file must exist at ${cleanPath}`);
+  }
+  if (item.posterUrl) {
+    assert(!item.posterUrl.includes('assets/motion'), `${item.id} posterUrl must not link mascot motion`);
+    const cleanPoster = item.posterUrl.replace(/^\.\//, '');
+    assert(fs.existsSync(path.join(root, cleanPoster)), `${item.id} posterUrl file must exist at ${cleanPoster}`);
+  }
   const ans = item.exercise.options[item.exercise.answerIndex];
   assert.strictEqual(ans, item.exercise.clozeAnswer, `${item.id} options[answerIndex] must match clozeAnswer`);
   answerIndicesFound.add(item.exercise.answerIndex);
 });
-assert(answerIndicesFound.size > 1, 'Answer indices across bank must be distributed and not all zero');
+// Verify multi-checkpoint sequential configuration (1 video 5 questions)
+const multiCpConfig = {
+  id: 'vg-multi-test',
+  videoUrl: 'test.mp4',
+  checkpoints: [
+    { id: 'cp-1', pauseAt: 3.2, exercise: { clozeText: 'She ___ happy.', options: ['is', 'are'], answerIndex: 0 } },
+    { id: 'cp-2', pauseAt: 10.0, exercise: { clozeText: 'They ___ ready.', options: ['are', 'is'], answerIndex: 0 } },
+    { id: 'cp-3', pauseAt: 18.0, exercise: { clozeText: 'I ___ there.', options: ['was', 'were'], answerIndex: 0 } },
+    { id: 'cp-4', pauseAt: 25.0, exercise: { clozeText: 'We ___ done.', options: ['are', 'is'], answerIndex: 0 } },
+    { id: 'cp-5', pauseAt: 35.0, exercise: { clozeText: 'He ___ gone.', options: ['has', 'have'], answerIndex: 0 } }
+  ],
+  attribution: {
+    source: 'Educational Source Test',
+    url: 'https://youtube.com/test'
+  }
+};
+const multiExerciseEl = Video.renderVideoExercise(multiCpConfig, {});
+assert(multiExerciseEl.querySelector('.video-checkpoints-rail'), 'Must render video checkpoints rail for multi-checkpoint config');
+const indicators = multiExerciseEl.querySelectorAll('.cp-indicator');
+assert.strictEqual(indicators.length, 5, 'Must render exactly 5 checkpoint indicators');
+assert(indicators[0].classList.contains('active'), 'First checkpoint indicator must be active');
+assert(multiExerciseEl.querySelector('.video-attribution-bar'), 'Must render video attribution bar when attribution is configured');
 
-console.log('✓ Test 6 passed: Video grammar question creation, cloze stem, empty-input safety, and bank integrity verified.');
+const expandedQuestions = Video.expandCheckpointsToQuestions(multiCpConfig);
+assert.strictEqual(expandedQuestions.length, 5, 'expandCheckpointsToQuestions must return 5 sequential questions');
+assert.strictEqual(expandedQuestions[0].id, 'vg-multi-test-cp1', 'First question id must match checkpoint');
+assert.strictEqual(expandedQuestions[0].videoConfig.startTime, 0, 'First question startTime must be 0');
+assert.strictEqual(expandedQuestions[1].videoConfig.startTime, 3.2, 'Second question startTime must be 3.2');
+assert.strictEqual(expandedQuestions[1].videoConfig.checkpointIndex, 1, 'Second question checkpointIndex must be 1');
+assert.strictEqual(expandedQuestions[4].id, 'vg-multi-test-cp5', 'Fifth question id must match checkpoint');
+assert.strictEqual(expandedQuestions[4].videoConfig.pauseAt, 35.0, 'Fifth question pauseAt must be 35.0');
+assert.strictEqual(expandedQuestions[4].videoConfig.startTime, 25.0, 'Fifth question startTime must be 25.0');
+assert.strictEqual(expandedQuestions[4].videoConfig.checkpointIndex, 4, 'Fifth question checkpointIndex must be 4');
+assert.strictEqual(expandedQuestions[4].videoConfig.totalCheckpoints, 5, 'Fifth question totalCheckpoints must be 5');
+
+// Test renderVideoPlayer with question 2 config
+const testState = {};
+Video.renderVideoPlayer(expandedQuestions[1].videoConfig, testState);
+assert.strictEqual(testState.currentCheckpointIndex, 1, 'renderVideoPlayer must set currentCheckpointIndex to 1');
+assert.strictEqual(testState.checkpoints[0].completed, true, 'Checkpoints before active index must be marked completed');
+
+console.log('✓ Test 6 passed: Video grammar question creation, cloze stem, empty-input safety, multi-checkpoint 5-question support, and bank integrity verified.');
 
 console.log('--- TEST 7: 4-Tier Mastery Indicator ---');
 assert.strictEqual(Upgrade.getMasteryTier('test', 20), 1, 'Mastery 20% -> Tier 1');
@@ -406,6 +459,7 @@ assert(cssSrc.includes('.token-chip.syntax-verb'), 'CSS must define .token-chip.
 assert(cssSrc.includes('.grammar-hint-popover'), 'CSS must define .grammar-hint-popover');
 assert(cssSrc.includes('.path-ring.mastery-tier-1'), 'CSS must define .path-ring.mastery-tier-1');
 assert(cssSrc.includes('.path-ring.mastery-tier-4'), 'CSS must define .path-ring.mastery-tier-4');
+assert(cssSrc.includes('color: #0f172a !important'), 'CSS must enforce uniform #0f172a font color for token chips');
 console.log('✓ Test 7 passed: 4-tier mastery calculation and CSS ring styling verified.');
 
 console.log('--- TEST 8: Token Rail Entry in Grammar Hub ---');

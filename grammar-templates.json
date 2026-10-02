@@ -14011,7 +14011,7 @@
       "pedagogicalObjective": "Form a negative ability statement with can't plus a base verb.",
       "misconceptionTargeted": "Learner builds the negative of 'can' with 'don't' or adds 'to' after the modal.",
       "reasoningOperation": "identify the meaning as not able -> select can't -> keep the verb in base form",
-      "stem": "I ___ ride a bike, but I want to learn.",
+      "stem": "I want to learn to ride a bike, but I ___.",
       "options": [
         "can't",
         "don't can",
@@ -14043,13 +14043,13 @@
         }
       ],
       "explanation": {
-        "whyCorrect": "'Can't' expresses a present inability and is followed directly by the base verb 'ride'.",
+        "whyCorrect": "'Can't' expresses a present inability: 'I want to learn to ride a bike, but I can't'.",
         "rule": "Negative ability: can't (cannot) + base verb. No 'don't', no 'to'.",
         "whyOthersFail": "'Don't can' mixes two negatives that never combine; 'can't to' adds an extra 'to'; 'couldn't' points to the past.",
         "howToAvoid": "Treat can like a switch: can / can't, then the verb with nothing in between.",
         "memoryCue": "Can't + verb: can't ride, can't swim.",
         "ruleId": "Nggak bisa: can't (cannot) + kata kerja dasar. Tanpa don't, tanpa to.",
-        "whyCorrectId": "“Can't” artinya nggak bisa sekarang, langsung diikuti kata kerja dasar “ride”.",
+        "whyCorrectId": "“Can't” menyatakan ketidakmampuan di masa sekarang: “I want to learn to ride a bike, but I can't”.",
         "whyOthersFailId": "“Don't can” nyampur dua negatif. “Can't to” kelebihan “to”. “Couldn't” nunjuk masa lampau.",
         "howToAvoidId": "Anggap can kayak tombol: can atau can't, lalu langsung kata kerjanya.",
         "memoryCueId": "Can't + kata kerja: can't ride, can't swim."
@@ -18605,26 +18605,26 @@
       "reasoningOperation": "find the subject -> count one or more -> select the be form for one",
       "stem": "My cat ___ very small.",
       "options": [
+        "am",
         "is",
         "are",
-        "am",
         "be"
       ],
-      "correctIndex": 0,
+      "correctIndex": 1,
       "distractors": [
-        {
-          "option": "are",
-          "misconception": "plural agreement",
-          "whyFails": "'Are' is for more than one; 'my cat' is only one.",
-          "whyFailsId": "untuk lebih dari satu, padahal “my cat” cuma satu.",
-          "misconceptionId": "bentuk jamak “are” dipakai untuk satu hewan."
-        },
         {
           "option": "am",
           "misconception": "first-person be",
           "whyFails": "'Am' goes only with 'I'.",
           "whyFailsId": "cuma dipakai bersama “I”.",
           "misconceptionId": "bentuk “am” dipakai untuk subjek selain “I”."
+        },
+        {
+          "option": "are",
+          "misconception": "plural agreement",
+          "whyFails": "'Are' is for more than one; 'my cat' is only one.",
+          "whyFailsId": "untuk lebih dari satu, padahal “my cat” cuma satu.",
+          "misconceptionId": "bentuk jamak “are” dipakai untuk satu hewan."
         },
         {
           "option": "be",
@@ -19670,25 +19670,25 @@
       "stem": "Is this ___ pen, Nadia? It was on your desk.",
       "options": [
         "your",
-        "you",
         "yours",
+        "you",
         "you're"
       ],
       "correctIndex": 0,
       "distractors": [
-        {
-          "option": "you",
-          "misconception": "subject pronoun",
-          "whyFails": "'You' does not show who owns the pen.",
-          "whyFailsId": "nggak menunjukkan siapa pemilik pulpennya.",
-          "misconceptionId": "kata ganti subjek ditaruh sebelum kata benda."
-        },
         {
           "option": "yours",
           "misconception": "possessive pronoun",
           "whyFails": "It stands alone at the end of a sentence, not before 'pen'.",
           "whyFailsId": "dipakai berdiri sendiri di akhir kalimat, bukan sebelum “pen”.",
           "misconceptionId": "bentuk pemilik yang berdiri sendiri ditaruh sebelum kata benda."
+        },
+        {
+          "option": "you",
+          "misconception": "subject pronoun",
+          "whyFails": "'You' does not show who owns the pen.",
+          "whyFailsId": "nggak menunjukkan siapa pemilik pulpennya.",
+          "misconceptionId": "kata ganti subjek ditaruh sebelum kata benda."
         },
         {
           "option": "you're",
@@ -19704,8 +19704,8 @@
         "whyOthersFail": "'You' is not an owner form, 'yours' stands alone, and 'you're' means 'you are'.",
         "howToAvoid": "Find the owner first, then check that a noun follows the blank.",
         "memoryCue": "Your pen; it's yours; you're = you are.",
-        "ruleId": "Sebelum kata benda, pakai bentuk pemilik: “I” jadi “my”, “he” jadi “his”, “she” jadi “her”, “it” jadi “its”, “we” jadi “our”, “they” jadi “their”.",
-        "whyCorrectId": "Kita bertanya ke Nadia (“you”), dan sesudahnya ada kata benda “pen”, jadi pakai bentuk pemilik untuk “you”.",
+        "ruleId": "Sebelum kata benda, pakai kata sifat kepemilikan (possessive determiner): “I” jadi “my”, “you” jadi “your”, “he” jadi “his”, “she” jadi “her”, “it” jadi “its”, “we” jadi “our”, “they” jadi “their”. Jika berdiri sendiri tanpa kata benda, gunakan kata ganti kepemilikan (possessive pronoun) seperti “yours”.",
+        "whyCorrectId": "Kita bertanya langsung ke Nadia (“you”), dan tepat setelah titik-titik ada kata benda “pen”, jadi kita pakai kata sifat penentu kepemilikan “your” (bukan “yours” yang berdiri sendiri tanpa kata benda, dan bukan “you're” yang artinya “you are”).",
         "whyOthersFailId": "“You” bukan bentuk pemilik, “yours” berdiri sendiri, dan “you're” artinya “you are”.",
         "howToAvoidId": "Cari pemiliknya dulu, lalu pastikan ada kata benda sesudah titik-titik.",
         "memoryCueId": "“Your pen”, “it's yours”, dan “you're” = “you are”."
@@ -28680,6 +28680,6 @@
   "indonesianCoverage": {
     "translated": 512,
     "total": 512,
-    "updatedAt": "2026-09-27"
+    "updatedAt": "2026-10-02"
   }
 }

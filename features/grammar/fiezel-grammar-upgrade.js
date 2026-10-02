@@ -112,7 +112,8 @@
     };
     
     const bankTokens = shuffle(allTokens.map((item, id) => {
-      const text = typeof item === 'object' && item.text ? item.text : String(item);
+      const rawText = typeof item === 'object' && item.text ? item.text : String(item);
+      const text = rawText.replace(/^[.,\/#!$%\^&\*;:{}=\-_`~()“”"']+|[.,\/#!$%\^&\*;:{}=\-_`~()“”"']+$/g, '');
       const explicitSyntax = typeof item === 'object' && item.syntax ? item.syntax : '';
       const syntax = explicitSyntax || FiezelGrammarUpgrade.classifyWord(text);
       return { text, id, syntax, placed: false };
@@ -123,13 +124,18 @@
       <div class="token-rail" id="tokenRail" aria-label="${FiezelI18n.t('grammar.token-rail-aria', 'Area penyusunan kalimat')}"></div>
       <div class="token-bank" id="tokenBank" aria-label="${FiezelI18n.t('grammar.token-bank-aria', 'Daftar kata tersedia')}"></div>
       <div class="token-actions">
-        <button id="tokenSubmitBtn" class="primary" disabled>${FiezelI18n.t('quiz.periksa', 'Periksa')}</button>
+        <button type="button" id="tokenResetBtn" class="token-reset-btn" disabled>
+          <i data-lucide="rotate-ccw"></i>
+          <span>${FiezelI18n.t('umum.hapus', 'Hapus')}</span>
+        </button>
+        <button type="button" id="tokenSubmitBtn" class="primary token-submit-btn" disabled>${FiezelI18n.t('quiz.periksa', 'Periksa')}</button>
       </div>
     `;
 
     const railEl = container.querySelector('#tokenRail');
     const bankEl = container.querySelector('#tokenBank');
     const submitBtn = container.querySelector('#tokenSubmitBtn');
+    const resetBtn = container.querySelector('#tokenResetBtn');
 
     const render = () => {
       railEl.innerHTML = '';
@@ -141,11 +147,12 @@
           const placeholder = document.createElement('div');
           placeholder.className = 'token-chip placed placeholder';
           placeholder.setAttribute('aria-hidden', 'true');
+          placeholder.textContent = token.text;
           bankEl.appendChild(placeholder);
         } else {
           const btn = document.createElement('button');
           btn.type = 'button';
-          btn.className = 'token-chip' + (token.syntax ? ` syntax-${token.syntax}` : '');
+          btn.className = 'token-chip';
           btn.textContent = token.text;
           btn.onclick = () => {
             if (typeof self.haptic === 'function') self.haptic('tap');
@@ -162,7 +169,7 @@
       placedTokens.forEach((token, index) => {
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = 'token-chip in-rail' + (token.syntax ? ` syntax-${token.syntax}` : '');
+        btn.className = 'token-chip in-rail';
         btn.textContent = token.text;
         btn.setAttribute('title', FiezelI18n.t('grammar.token-lepas', 'Ketuk untuk melepas'));
         btn.onclick = () => {
@@ -175,18 +182,32 @@
       });
 
       submitBtn.disabled = placedTokens.length === 0;
+      if (resetBtn) resetBtn.disabled = placedTokens.length === 0;
     };
 
+    if (resetBtn) {
+      resetBtn.onclick = () => {
+        if (typeof self.haptic === 'function') self.haptic('tap');
+        bankTokens.forEach((token) => { token.placed = false; });
+        placedTokens.length = 0;
+        render();
+      };
+    }
+
     submitBtn.onclick = () => {
+      const norm = (s) => String(s || '').toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()“”"']/g, '').replace(/\s+/g, ' ').trim();
       const userText = placedTokens.map(t => t.text).join(' ');
+      const userNorm = norm(userText);
       const correctText = (q.tokens || []).map(t => typeof t === 'object' && t.text ? t.text : String(t)).join(' ');
-      const isCorrect = userText === correctText;
+      const targets = [correctText, q.options?.[0], ...(q.alternates || [])].filter(Boolean);
+      const isCorrect = userText === correctText || targets.some(tgt => norm(tgt) === userNorm);
       
       if (typeof onComplete === 'function') onComplete(isCorrect);
     };
 
     render();
     if (typeof self.enhanceUI === 'function') self.enhanceUI();
+    try { if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons(); } catch(_) {}
     return container;
   };
 
@@ -286,15 +307,17 @@
 
     const popover = document.createElement('div');
     popover.id = 'grammarHintPopover';
-    popover.className = 'grammar-hint-popover fade-in';
+    popover.className = 'grammar-hint-popover grammar-hint-sheet fade-in';
     popover.setAttribute('data-level', String(currentLvl));
+    popover.setAttribute('role', 'dialog');
+    popover.setAttribute('aria-modal', 'true');
 
     const updateContent = () => {
       popover.setAttribute('data-level', String(currentLvl));
       const cur = levels[currentLvl - 1];
 
       popover.innerHTML = `
-        <div class="popover-arrow"></div>
+        <div class="hint-sheet-handle" aria-hidden="true"></div>
         <div class="hint-popover-header">
           <div style="display:flex;align-items:center;gap:6px">
             <i data-lucide="info"></i>
@@ -307,8 +330,8 @@
           ${[1,2,3,4].map(i => `<div class="hint-step-dot${i <= currentLvl ? ' active' : ''}"></div>`).join('')}
         </div>
         <div class="hint-body">
-          <p style="font-weight:700;color:var(--accent-strong);margin-bottom:4px;font-size:0.8rem">${esc(cur.title)}</p>
-          <p style="margin:0">${esc(cur.text)}</p>
+          <p class="hint-body-title">${esc(cur.title)}</p>
+          <p class="hint-body-text">${esc(cur.text)}</p>
         </div>
         <div class="hint-popover-actions">
           ${currentLvl < 4 
@@ -345,26 +368,8 @@
     updateContent();
     document.body.appendChild(popover);
 
-    if (anchorEl) {
-      const rect = anchorEl.getBoundingClientRect();
-      const popoverRect = popover.getBoundingClientRect();
-      
-      let top = rect.bottom + window.scrollY + 8;
-      let left = rect.left + window.scrollX + (rect.width / 2) - (popoverRect.width / 2);
-
-      if (left < 10) left = 10;
-      if (left + popoverRect.width > window.innerWidth - 10) {
-        left = window.innerWidth - popoverRect.width - 10;
-      }
-
-      popover.style.top = `${top}px`;
-      popover.style.left = `${left}px`;
-      popover.style.position = 'absolute';
-      popover.style.zIndex = '1000';
-    }
-
     const dismiss = (e) => {
-      if (!popover.contains(e.target) && (!anchorEl || e.target !== anchorEl)) {
+      if (popover.parentNode && !popover.contains(e.target) && (!anchorEl || e.target !== anchorEl)) {
         popover.remove();
         document.removeEventListener('click', dismiss);
         document.removeEventListener('touchstart', dismiss);

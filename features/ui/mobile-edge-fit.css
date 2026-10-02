@@ -2624,6 +2624,104 @@ ruby rt,
   margin-top: 12px !important;
 }
 
+/* Tutor Turn in Quiz / Brain Scaffolding (100% WCAG AAA Compliant) */
+.tutor-turn,
+#tutorTurn,
+html body #tutorTurn,
+html body .tutor-turn {
+  background: #181826 !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.12) !important;
+  border-left: 4px solid #F59E0B !important;
+  border-radius: 18px !important;
+  padding: 16px 18px !important;
+  margin-top: 16px !important;
+  color: #F8FAFC !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25) !important;
+}
+
+.tutor-turn-head,
+html body .tutor-turn .tutor-turn-head {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin-bottom: 10px !important;
+  font-size: 0.75rem !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  color: #FBBF24 !important;
+}
+
+.tutor-turn-head b,
+html body .tutor-turn .tutor-turn-head b {
+  color: #FBBF24 !important;
+  font-weight: 800 !important;
+}
+
+.tutor-turn-face,
+html body .tutor-turn .tutor-turn-face {
+  background: #F59E0B !important;
+  color: #181826 !important;
+  width: 24px !important;
+  height: 24px !important;
+  border-radius: 50% !important;
+  display: grid !important;
+  place-items: center !important;
+}
+
+.tutor-turn-face svg,
+html body .tutor-turn .tutor-turn-face svg {
+  color: #181826 !important;
+  stroke: #181826 !important;
+}
+
+.tutor-turn-say,
+html body .tutor-turn .tutor-turn-say,
+html body #tutorTurn p.tutor-turn-say {
+  margin: 0 !important;
+  font-size: 0.95rem !important;
+  line-height: 1.6 !important;
+  color: #F8FAFC !important;
+}
+
+.tutor-turn-ask,
+html body .tutor-turn .tutor-turn-ask,
+html body #tutorTurn p.tutor-turn-ask {
+  margin: 10px 0 0 !important;
+  font-size: 0.95rem !important;
+  line-height: 1.6 !important;
+  font-weight: 600 !important;
+  color: #FDE68A !important;
+}
+
+.tutor-turn-actions,
+html body .tutor-turn .tutor-turn-actions {
+  margin-top: 14px !important;
+}
+
+.tutor-stuck,
+html body #tutorStuck,
+html body .tutor-stuck {
+  min-height: 44px !important;
+  padding: 10px 18px !important;
+  border-radius: 999px !important;
+  font-size: 0.88rem !important;
+  font-weight: 700 !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.22) !important;
+  color: #FFFFFF !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.tutor-stuck:hover,
+.tutor-stuck:active,
+html body #tutorStuck:hover,
+html body #tutorStuck:active {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-color: #FBBF24 !important;
+  color: #FBBF24 !important;
+}
+
 /* 3. JLPT Listening Modal & Detail Sheet Dark Theme */
 .jlpt-badge-mondai {
   background: #1E1E2C !important;

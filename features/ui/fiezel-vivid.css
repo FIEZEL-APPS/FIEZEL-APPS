@@ -399,6 +399,10 @@ html body:not(.fz-teacher-mode) #app .options .option {
   border: 2px solid rgba(94, 20, 32, 0.15) !important;
   color: #241A11 !important;
   box-shadow: 0 3px 10px rgba(94, 20, 32, 0.04) !important;
+  text-align: left !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
 }
 html body:not(.fz-teacher-mode) #app .options .option:not(:disabled):hover {
   border-color: #5E1420 !important;
@@ -408,6 +412,7 @@ html body:not(.fz-teacher-mode) #app .options .option.was-tried {
   background: #FDE4E8 !important;
   border-color: #5E1420 !important;
   color: #5E1420 !important;
+  align-items: flex-start !important;
 }
 html body:not(.fz-teacher-mode) #app .options .option.correct {
   background: #DDF3EA !important;

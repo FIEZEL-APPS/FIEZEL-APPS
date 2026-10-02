@@ -6007,7 +6007,7 @@
       "misconception": "Kamu bikin negatif can pakai “don't” atau nambahin “to” sesudahnya.",
       "reasoning": "kenali maknanya nggak mampu → pakai can't → kata kerjanya tetap dasar",
       "rule": "Nggak bisa: can't (cannot) + kata kerja dasar. Tanpa don't, tanpa to.",
-      "whyCorrect": "“Can't” artinya nggak bisa sekarang, langsung diikuti kata kerja dasar “ride”.",
+      "whyCorrect": "“Can't” menyatakan ketidakmampuan di masa sekarang: “I want to learn to ride a bike, but I can't”.",
       "whyOthersFail": "“Don't can” nyampur dua negatif. “Can't to” kelebihan “to”. “Couldn't” nunjuk masa lampau.",
       "howToAvoid": "Anggap can kayak tombol: can atau can't, lalu langsung kata kerjanya.",
       "memoryCue": "Can't + kata kerja: can't ride, can't swim.",
@@ -7980,13 +7980,13 @@
       "howToAvoid": "Cari subjeknya dulu, lalu tanya: “I”, satu orang atau benda, atau lebih dari satu?",
       "memoryCue": "Satu kucing: “is”. Dua kucing: “are”.",
       "distractors": {
-        "are": {
-          "misconception": "bentuk jamak “are” dipakai untuk satu hewan.",
-          "whyFails": "untuk lebih dari satu, padahal “my cat” cuma satu."
-        },
         "am": {
           "misconception": "bentuk “am” dipakai untuk subjek selain “I”.",
           "whyFails": "cuma dipakai bersama “I”."
+        },
+        "are": {
+          "misconception": "bentuk jamak “are” dipakai untuk satu hewan.",
+          "whyFails": "untuk lebih dari satu, padahal “my cat” cuma satu."
         },
         "be": {
           "misconception": "bentuk dasar “be” dipakai sebagai kata kerja utama.",
@@ -8430,19 +8430,19 @@
       "objective": "Pilih “my”, “your”, “his”, “her”, “its”, “our”, atau “their” untuk menunjukkan pemilik benda. Contoh: “Is this your pen, Nadia? It was on your desk.”",
       "misconception": "Kamu menaruh kata ganti subjek atau objek sebelum kata benda, karena “dia” dan “mereka” nggak berubah waktu menunjukkan pemilik.",
       "reasoning": "cari pemiliknya → cek kata benda sesudah titik-titik → pilih bentuk pemilik untuk “you”",
-      "rule": "Sebelum kata benda, pakai bentuk pemilik: “I” jadi “my”, “he” jadi “his”, “she” jadi “her”, “it” jadi “its”, “we” jadi “our”, “they” jadi “their”.",
-      "whyCorrect": "Kita bertanya ke Nadia (“you”), dan sesudahnya ada kata benda “pen”, jadi pakai bentuk pemilik untuk “you”.",
+      "rule": "Sebelum kata benda, pakai kata sifat kepemilikan (possessive determiner): “I” jadi “my”, “you” jadi “your”, “he” jadi “his”, “she” jadi “her”, “it” jadi “its”, “we” jadi “our”, “they” jadi “their”. Jika berdiri sendiri tanpa kata benda, gunakan kata ganti kepemilikan (possessive pronoun) seperti “yours”.",
+      "whyCorrect": "Kita bertanya langsung ke Nadia (“you”), dan tepat setelah titik-titik ada kata benda “pen”, jadi kita pakai kata sifat penentu kepemilikan “your” (bukan “yours” yang berdiri sendiri tanpa kata benda, dan bukan “you're” yang artinya “you are”).",
       "whyOthersFail": "“You” bukan bentuk pemilik, “yours” berdiri sendiri, dan “you're” artinya “you are”.",
       "howToAvoid": "Cari pemiliknya dulu, lalu pastikan ada kata benda sesudah titik-titik.",
       "memoryCue": "“Your pen”, “it's yours”, dan “you're” = “you are”.",
       "distractors": {
-        "you": {
-          "misconception": "kata ganti subjek ditaruh sebelum kata benda.",
-          "whyFails": "nggak menunjukkan siapa pemilik pulpennya."
-        },
         "yours": {
           "misconception": "bentuk pemilik yang berdiri sendiri ditaruh sebelum kata benda.",
           "whyFails": "dipakai berdiri sendiri di akhir kalimat, bukan sebelum “pen”."
+        },
+        "you": {
+          "misconception": "kata ganti subjek ditaruh sebelum kata benda.",
+          "whyFails": "nggak menunjukkan siapa pemilik pulpennya."
         },
         "you're": {
           "misconception": "“your” (punyamu) tertukar dengan “you're” (kamu adalah).",
