@@ -4,8 +4,8 @@
       "id": "vg-a1-001",
       "level": "A1",
       "skill": "present_simple",
-      "videoUrl": "./assets/motion/fiezel-hero.mp4",
-      "posterUrl": "./assets/motion/posters/fiezel-hero.jpg",
+      "videoUrl": "",
+      "posterUrl": "",
       "subtitles": [
         {
           "start": 0,
@@ -65,8 +65,8 @@
       "id": "vg-a1-002",
       "level": "A1",
       "skill": "to_be",
-      "videoUrl": "./assets/motion/nusa-curious.mp4",
-      "posterUrl": "./assets/motion/posters/nusa-curious.jpg",
+      "videoUrl": "",
+      "posterUrl": "",
       "subtitles": [
         {
           "start": 0,
@@ -126,8 +126,8 @@
       "id": "vg-a1-003",
       "level": "A1",
       "skill": "articles",
-      "videoUrl": "./assets/motion/magical-book.mp4",
-      "posterUrl": "./assets/motion/posters/magical-book.jpg",
+      "videoUrl": "",
+      "posterUrl": "",
       "subtitles": [
         {
           "start": 0,
@@ -187,8 +187,8 @@
       "id": "vg-a1-004",
       "level": "A1",
       "skill": "prepositions_time",
-      "videoUrl": "./assets/motion/penyu-motion.mp4",
-      "posterUrl": "./assets/motion/posters/penyu-motion.jpg",
+      "videoUrl": "",
+      "posterUrl": "",
       "subtitles": [
         {
           "start": 0,
@@ -248,8 +248,8 @@
       "id": "vg-a2-001",
       "level": "A2",
       "skill": "past_simple_regular",
-      "videoUrl": "./assets/motion/nusa-thinking.mp4",
-      "posterUrl": "./assets/motion/posters/nusa-thinking.jpg",
+      "videoUrl": "",
+      "posterUrl": "",
       "subtitles": [
         {
           "start": 0,
@@ -309,8 +309,8 @@
       "id": "vg-a2-002",
       "level": "A2",
       "skill": "past_simple_irregular",
-      "videoUrl": "./assets/motion/team-walk.mp4",
-      "posterUrl": "./assets/motion/posters/team-walk.jpg",
+      "videoUrl": "",
+      "posterUrl": "",
       "subtitles": [
         {
           "start": 0,
@@ -370,8 +370,8 @@
       "id": "vg-a2-003",
       "level": "A2",
       "skill": "comparatives",
-      "videoUrl": "./assets/motion/mira-cheer.mp4",
-      "posterUrl": "./assets/motion/posters/mira-cheer.jpg",
+      "videoUrl": "",
+      "posterUrl": "",
       "subtitles": [
         {
           "start": 0,
@@ -431,8 +431,8 @@
       "id": "vg-a2-004",
       "level": "A2",
       "skill": "modals_can",
-      "videoUrl": "./assets/motion/nusa-celebrate.mp4",
-      "posterUrl": "./assets/motion/posters/nusa-celebrate.jpg",
+      "videoUrl": "",
+      "posterUrl": "",
       "subtitles": [
         {
           "start": 0,
@@ -492,8 +492,8 @@
       "id": "vg-a2-005",
       "level": "A2",
       "skill": "present_continuous",
-      "videoUrl": "./assets/motion/mira-wave.mp4",
-      "posterUrl": "./assets/motion/posters/mira-wave.jpg",
+      "videoUrl": "",
+      "posterUrl": "",
       "subtitles": [
         {
           "start": 0,
@@ -553,8 +553,8 @@
       "id": "vg-b1-001",
       "level": "B1",
       "skill": "present_perfect",
-      "videoUrl": "./assets/motion/fiezel-antigravity.mp4",
-      "posterUrl": "./assets/motion/posters/fiezel-antigravity.jpg",
+      "videoUrl": "",
+      "posterUrl": "",
       "subtitles": [
         {
           "start": 0,
@@ -614,8 +614,8 @@
       "id": "vg-b1-002",
       "level": "B1",
       "skill": "first_conditional",
-      "videoUrl": "./assets/motion/hero.mp4",
-      "posterUrl": "./assets/motion/posters/hero.jpg",
+      "videoUrl": "",
+      "posterUrl": "",
       "subtitles": [
         {
           "start": 0,
@@ -675,8 +675,8 @@
       "id": "vg-b1-003",
       "level": "B1",
       "skill": "passive_voice",
-      "videoUrl": "./assets/motion/nusa-wave.mp4",
-      "posterUrl": "./assets/motion/posters/nusa-wave.jpg",
+      "videoUrl": "",
+      "posterUrl": "",
       "subtitles": [
         {
           "start": 0,
@@ -736,8 +736,8 @@
       "id": "vg-b1-004",
       "level": "B1",
       "skill": "gerunds_infinitives",
-      "videoUrl": "./assets/motion/nusa-sleep.mp4",
-      "posterUrl": "./assets/motion/posters/nusa-sleep.jpg",
+      "videoUrl": "",
+      "posterUrl": "",
       "subtitles": [
         {
           "start": 0,
@@ -797,8 +797,8 @@
       "id": "vg-b2-001",
       "level": "B2",
       "skill": "third_conditional",
-      "videoUrl": "./assets/motion/team-walk.mp4",
-      "posterUrl": "./assets/motion/posters/team-walk.jpg",
+      "videoUrl": "",
+      "posterUrl": "",
       "subtitles": [
         {
           "start": 0,
@@ -858,8 +858,8 @@
       "id": "vg-b2-002",
       "level": "B2",
       "skill": "reported_speech",
-      "videoUrl": "./assets/motion/nusa-oops.mp4",
-      "posterUrl": "./assets/motion/posters/nusa-oops.jpg",
+      "videoUrl": "",
+      "posterUrl": "",
       "subtitles": [
         {
           "start": 0,

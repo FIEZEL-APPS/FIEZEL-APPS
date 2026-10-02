@@ -145,6 +145,7 @@ package-lock.json
 # assets/motion, jadi mengirimnya tanpa asetnya berarti menyajikan halaman yang 404 di setiap
 # gambar. Polanya sama dengan tools/dev/*.html yang sudah dikecualikan di atas.
 assets/characters/
+assets/motion/
 character-preview.html
 remotion/
 test_reports/
