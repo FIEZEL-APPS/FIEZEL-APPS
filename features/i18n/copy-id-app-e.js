@@ -49,7 +49,7 @@
     'quiz.feedback-saved-body-test': 'Jawabanmu kecatat. Pembahasan lengkap muncul di layar hasil setelah tes ini selesai.',
     'quiz.feedback-saved-body-exam': 'Jawabanmu kecatat. Pembahasan lengkap muncul di layar hasil setelah ujian ini selesai.',
     'quiz.verdict-correct': 'Benar, mantap!',
-    'quiz.verdict-wrong': 'Belum cocok nih, yuk kita bedah bareng yuk...',
+    'quiz.verdict-wrong': 'Belum pas, santai — kita bedah bareng.',
     'quiz.correct-answer': 'Jawabanmu tepat: {answer}',
     'quiz.wrong-answer-key': 'Yang tepat: {answer}.',
     'quiz.cloze-correct': 'Bentukmu tepat: {answer}.',
@@ -105,8 +105,6 @@
     'quiz.menyerah-buka-jawaban': 'Buntu? Buka pembahasan lengkap',
     'quiz.periksa-ulang': 'Periksa Ulang',
     'quiz.sudah-dicoba': 'Sudah dicoba',
-    'quiz.scaffold-success': 'Bagus sekali! Kamu berhasil memperbaikinya sendiri! 🌟',
-    'quiz.aku-paham-pasangkan-sekarang': 'Aku Paham, Pasangkan Sekarang!',
-    'quiz.tutup-dimensi': 'Tutup Dimensi'
+    'quiz.scaffold-success': 'Bagus sekali! Kamu berhasil memperbaikinya sendiri! 🌟'
   });
 }());
