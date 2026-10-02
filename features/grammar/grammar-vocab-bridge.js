@@ -481,7 +481,7 @@
                 </div>
                 <p class="option-desc">${lvl.description}</p>
                 <div class="option-specs">
-                  <span><i data-lucide="book"></i> ${t('scaffold.kosakata-prasyarat', lvl.vocabTarget + ' Kosakata Prasyarat')}</span>
+                  <span><i data-lucide="book-open"></i> ${t('scaffold.kosakata-prasyarat', lvl.vocabTarget + ' Kosakata Prasyarat')}</span>
                   <span><i data-lucide="check-circle-2"></i> ${t('scaffold.soal-grammar', lvl.grammarQuestionCount + ' Soal Grammar')}</span>
                 </div>
               </div>
