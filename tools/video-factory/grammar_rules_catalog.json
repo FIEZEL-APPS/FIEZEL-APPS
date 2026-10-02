@@ -1,0 +1,140 @@
+{
+  "catalog": {
+    "A1": [
+      {
+        "patternId": "to_be_present",
+        "grammarPoint": "To Be (Present): is / am / are",
+        "regex": "\\b(is|am|are)\\b",
+        "distractorMap": {
+          "is": ["am", "are", "be"],
+          "am": ["is", "are", "be"],
+          "are": ["is", "am", "be"]
+        },
+        "rule": "Subject + to be (is / am / are) + complement",
+        "why": "To be harus selaras dengan subjek tunggal atau jamak pada kalimat waktu kini.",
+        "memory": "I pakai AM, He/She/It pakai IS, You/We/They pakai ARE."
+      },
+      {
+        "patternId": "preposition_place_country",
+        "grammarPoint": "Preposition of Place: in (Country/City)",
+        "regex": "\\bin\\s+([A-Z][a-z]+)",
+        "targetWord": "in",
+        "options": ["in", "at", "on", "to"],
+        "rule": "in + Country / City / Large Area",
+        "why": "Preposisi 'in' digunakan untuk wilayah geografis luas seperti kota atau negara.",
+        "memory": "Negara & Kota Besar = IN."
+      },
+      {
+        "patternId": "present_simple_routine",
+        "grammarPoint": "Present Simple: Routine & Habit",
+        "regex": "\\b(usually|always|often)\\s+([a-z]+)",
+        "rule": "Subject + Adverb of Frequency + Verb 1",
+        "why": "Menyatakan kebiasaan berulang menggunakan bentuk kata kerja dasar.",
+        "memory": "Always/Usually/Often menandakan kebiasaan = Present Simple."
+      }
+    ],
+    "A2": [
+      {
+        "patternId": "passive_present_simple_q",
+        "grammarPoint": "Passive Voice Present: is/are + V3",
+        "regex": "\\b(is|are)\\s+your\\s+([a-z]+)\\s+([a-z]+ed|spelt|made|called)",
+        "targetWord": "is",
+        "options": ["is", "are", "does", "do"],
+        "rule": "Wh- + is/are + Subject + Past Participle (V3)?",
+        "why": "Subjek menerima perlakuan/aksi pasif, sehingga memakai to be + kata kerja bentuk ketiga (V3).",
+        "memory": "Dikenai aksi = To Be + V3."
+      },
+      {
+        "patternId": "past_simple_ellipsis",
+        "grammarPoint": "Past Simple Ellipsis: Auxiliary did",
+        "regex": "\\b(did)\\b",
+        "options": ["did", "does", "do", "has"],
+        "rule": "Subject + did (Short Answer / Ellipsis)",
+        "why": "Jawaban singkat untuk aksi lampau menggunakan kata bantu 'did'.",
+        "memory": "Tanya masa lampau, respon singkat pakai DID."
+      },
+      {
+        "patternId": "modals_ability",
+        "grammarPoint": "Modals of Ability: can / could",
+        "regex": "\\b(can|could)\\b",
+        "distractorMap": {
+          "can": ["can", "could", "is", "does"],
+          "could": ["could", "can", "was", "did"]
+        },
+        "rule": "Subject + modal (can / could) + base verb",
+        "why": "Modal auxiliary 'can' menyatakan kemampuan waktu kini, 'could' untuk masa lampau.",
+        "memory": "Setelah modal selalu kata kerja bentuk murni (V1)."
+      },
+      {
+        "patternId": "contraction_it_is",
+        "grammarPoint": "Contraction: it's (It is) vs its",
+        "regex": "\\b(it's)\\b",
+        "options": ["it's", "its", "they're", "there"],
+        "rule": "it's = it is / it has | its = kepunyaan (possessive)",
+        "why": "Gunakan apostrof 'it's' untuk singkatan dari 'it is'.",
+        "memory": "Ada to be = pakai apostrof IT'S."
+      }
+    ],
+    "B1": [
+      {
+        "patternId": "present_perfect_experience",
+        "grammarPoint": "Present Perfect: have / has + V3",
+        "regex": "\\b(have|has)\\s+([a-z]+ed|been|seen|done|asked)",
+        "options": ["have", "has", "had", "having"],
+        "rule": "Subject + have/has + Past Participle (V3)",
+        "why": "Menyatakan pengalaman atau peristiwa yang telah terjadi dan efeknya masih terasa.",
+        "memory": "Have/Has + V3 untuk pengalaman hidup."
+      },
+      {
+        "patternId": "first_conditional",
+        "grammarPoint": "First Conditional: If + Present, Will + V1",
+        "regex": "\\bif\\s+.*\\b(will)\\b",
+        "targetWord": "will",
+        "options": ["will", "would", "shall", "can"],
+        "rule": "If + Simple Present, Subject + will + Verb 1",
+        "why": "Menyatakan kemungkinan nyata di masa depan.",
+        "memory": "Kondisi realistis = IF present, RESULT will."
+      }
+    ],
+    "B2": [
+      {
+        "patternId": "third_conditional",
+        "grammarPoint": "Third Conditional: Unreal Past",
+        "regex": "\\bwould\\s+have\\s+([a-z]+ed|been|done)",
+        "targetWord": "would",
+        "options": ["would", "will", "had", "must"],
+        "rule": "If + Past Perfect, Subject + would have + V3",
+        "why": "Menyatakan pengandaian masa lampau yang tidak mungkin terjadi lagi.",
+        "memory": "Penyesalan masa lalu = would have + V3."
+      },
+      {
+        "patternId": "phrasal_verb_particles",
+        "grammarPoint": "Phrasal Verbs: Verb + Particle",
+        "regex": "\\b(look|put|give|take)\\s+(up|out|off|in)\\b",
+        "rule": "Verb + Specific Prepositional Particle",
+        "why": "Arti kata kerja berubah tergantung partikel yang menyertainya.",
+        "memory": "Perhatikan partikel untuk makna idiomatis."
+      }
+    ],
+    "C1": [
+      {
+        "patternId": "negative_inversion",
+        "grammarPoint": "Negative Inversion: Adverb + Aux + Subject",
+        "regex": "\\b(Rarely|Never|Seldom|Hardly)\\s+(did|have|had|was|were)\\b",
+        "rule": "Negative Adverb + Auxiliary + Subject + Main Verb",
+        "why": "Inversi digunakan untuk memberi penekanan gaya bahasa formal atau dramatis.",
+        "memory": "Diawali kata negatif = susunan kalimat membalik seperti pertanyaan."
+      }
+    ],
+    "C2": [
+      {
+        "patternId": "advanced_colloquial_reductions",
+        "grammarPoint": "Native Reduction & Ellipsis",
+        "regex": "\\b(gonna|wanna|hafta|oughta)\\b",
+        "rule": "Informal spoken reduction of (going to / want to / have to)",
+        "why": "Reduksi fonetis alami pada percakapan cepat penutur asli.",
+        "memory": "Bahasa tutur cepat menyatukan to dengan kata kerja sebelumnya."
+      }
+    ]
+  }
+}

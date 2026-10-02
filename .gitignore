@@ -111,6 +111,7 @@ remotion/public/assets
 *.pcm
 *.wav
 *.mp4
+!content/video/**/*.mp4
 scratch/
 mockups/media/
 archive/

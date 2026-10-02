@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Fiezel Video Grammar — 1 Video 5 Soal (Cake English Style)</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <style>
+    :root {
+      --bg: #0F172A;
+      --card-bg: #1E293B;
+      --border: #334155;
+      --accent: #2563EB;
+      --accent-soft: rgba(37, 99, 235, 0.15);
+      --accent-strong: #60A5FA;
+      --sun: #F59E0B;
+      --good: #10B981;
+      --good-soft: rgba(16, 185, 129, 0.15);
+      --bad: #EF4444;
+      --bad-soft: rgba(239, 68, 68, 0.15);
+      --text: #F8FAFC;
+      --text-muted: #94A3B8;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-pill: 9999px;
+      --dur-s: 0.15s;
+      --dur-m: 0.3s;
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    body {
+      background: #0B0F19;
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      margin: 0;
+      padding: 16px 14px 60px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      box-sizing: border-box;
+    }
+    .header-bar {
+      width: 100%;
+      max-width: 460px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .badge-pilot {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+      color: #fff;
+      font-size: 0.78rem;
+      font-weight: 700;
+      border-radius: var(--radius-pill);
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+    }
+    .tabs-wrap {
+      width: 100%;
+      max-width: 460px;
+      display: flex;
+      gap: 6px;
+      background: #1E293B;
+      padding: 4px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border);
+      margin-bottom: 14px;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 9px 8px;
+      border-radius: var(--radius-pill);
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .tab-btn.active {
+      background: #2563EB;
+      color: #fff;
+      box-shadow: 0 2px 10px rgba(37,99,235,0.4);
+    }
+    .preview-phone-wrap {
+      width: 100%;
+      max-width: 460px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .phone-top-notch {
+      padding: 12px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(8px);
+    }
+    .app-title {
+      font-size: 0.92rem;
+      font-weight: 800;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .app-title span {
+      background: #F59E0B;
+      color: #000;
+      font-size: 0.68rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 800;
+    }
+    .phone-body {
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .legal-notice-card {
+      margin-top: 14px;
+      padding: 12px 14px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: var(--radius-md);
+      font-size: 0.8rem;
+      line-height: 1.45;
+      color: #A7F3D0;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .specs-panel {
+      width: 100%;
+      max-width: 460px;
+      margin-top: 16px;
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      font-size: 0.85rem;
+    }
+    .specs-panel h3 {
+      margin: 0 0 12px;
+      font-size: 0.95rem;
+      color: #F8FAFC;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .spec-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .spec-item:last-child { border-bottom: none; }
+    .spec-label { color: var(--text-muted); }
+    .spec-val { font-weight: 600; color: #E2E8F0; text-align: right; }
+    #feedback {
+      margin-top: 12px;
+      padding: 14px 16px;
+      border-radius: var(--radius-md);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    .feedback-success {
+      background: var(--good-soft);
+      border: 1px solid var(--good);
+      color: #A7F3D0;
+    }
+    .feedback-error {
+      background: var(--bad-soft);
+      border: 1px solid var(--bad);
+      color: #FECACA;
+    }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <div class="header-bar">
+    <div class="badge-pilot">
+      <i data-lucide="sparkles" style="width:14px;height:14px;"></i>
+      CAKE ENGLISH LAB
+    </div>
+    <span style="font-size:0.8rem;color:var(--text-muted);">1 Video • 5 Soal Berurutan</span>
+  </div>
+
+  <!-- Tab Switcher -->
+  <div class="tabs-wrap">
+    <button class="tab-btn active" id="tab5Q" onclick="switchMode('five_q')">
+      <i data-lucide="layers" style="width:14px;height:14px;"></i> Klip 1 (5 Soal)
+    </button>
+    <button class="tab-btn" id="tab5Q2" onclick="switchMode('five_q_part2')">
+      <i data-lucide="layers" style="width:14px;height:14px;"></i> Klip 2 (5 Soal)
+    </button>
+    <button class="tab-btn" id="tabReal" onclick="switchMode('real')">
+      <i data-lucide="mic" style="width:14px;height:14px;"></i> 1 Soal Cepat
+    </button>
+    <button class="tab-btn" id="tabDub" onclick="switchMode('dub')">
+      <i data-lucide="bot" style="width:14px;height:14px;"></i> Dubbed B-Roll
+    </button>
+  </div>
+
+  <div class="preview-phone-wrap">
+    <div class="phone-top-notch">
+      <div class="app-title">
+        FIEZEL <span>VIDEO LAB</span>
+      </div>
+      <div id="modePill" style="font-size:0.75rem;color:var(--good);font-weight:700;">
+        5 Checkpoints Active
+      </div>
+    </div>
+
+    <div class="phone-body">
+      <!-- Container untuk render Video-First Grammar Component -->
+      <div id="videoExerciseContainer"></div>
+
+      <!-- Feedback Area -->
+      <div id="feedback" class="hidden"></div>
+
+      <!-- Legal Compliance Shield Card -->
+      <div class="legal-notice-card">
+        <i data-lucide="shield-check" style="width:20px;height:20px;flex-shrink:0;color:#10B981;margin-top:2px;"></i>
+        <div>
+          <strong style="display:block;color:#fff;margin-bottom:2px;">100% Legal &amp; Aman Hak Cipta</strong>
+          Menggunakan materi edukasi asli dengan atribusi sumber terbuka (*transformative fair use* untuk analisis tata bahasa interaktif), dilengkapi teks dialog darurat jika koneksi luring.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Specs Card -->
+  <div class="specs-panel" id="specsPanel">
+    <!-- Populated by JS -->
+  </div>
+
+  <!-- Scripts -->
+  <script>
+    window.FiezelI18n = { t: (k, f) => f };
+    window.haptic = (t) => { if (navigator.vibrate) navigator.vibrate(10); };
+    window.uiSfx = (t) => {};
+    window.esc = (str) => {
+      const p = document.createElement('p');
+      p.textContent = str || '';
+      return p.innerHTML;
+    };
+  </script>
+  <script src="../features/grammar/fiezel-grammar-video.js"></script>
+
+  <script>
+    let currentMode = 'five_q';
+
+    const CONFIGS = {
+      five_q: {
+        id: "vg-cake-lucy-5q",
+        level: "A1-A2",
+        skill: "conversational_grammar_5q",
+        videoUrl: "./media/cake-lucy-5q-exact.mp4",
+        posterUrl: "./media/cake-lucy-5q-exact-poster.jpg",
+        attribution: {
+          source: "English with Lucy & William: 100 Common English Questions",
+          sourceLabel: "Tonton di YouTube",
+          url: "https://www.youtube.com/watch?v=kYv_8B7eX_g"
+        },
+        subtitles: [
+          { start: 0.0, end: 1.1, speaker: "William", text: "What is your full name?" },
+          { start: 1.1, end: 3.2, speaker: "Lucy", text: "My full name is Lucy Bella Simkins.", censorPattern: /\bis\b/i, censorAnswer: "is" },
+          { start: 3.3, end: 5.8, speaker: "William", text: "How is your first name spelt?", censorPattern: /\bis\b/i, censorAnswer: "is" },
+          { start: 6.2, end: 8.6, speaker: "Lucy", text: "L-U-C-Y. Lucy." },
+          { start: 9.0, end: 10.0, speaker: "William", text: "Who chose your name?" },
+          { start: 10.4, end: 12.0, speaker: "Lucy", text: "I think my mum did.", censorPattern: /\bdid\b/i, censorAnswer: "did" },
+          { start: 12.4, end: 14.4, speaker: "Lucy", text: "I haven't actually asked that question before." },
+          { start: 14.9, end: 16.2, speaker: "William", text: "Where were you born?" },
+          { start: 16.6, end: 19.8, speaker: "Lucy", text: "I was born in Milton Keynes in England.", censorPattern: /in\s+England/i, censorAnswer: "in", censorSuffix: " England" },
+          { start: 20.4, end: 22.4, speaker: "William", text: "Is it a city or a town?" },
+          { start: 22.8, end: 25.8, speaker: "Lucy", text: "I think it's a city. They always refer to it as a city.", censorPattern: /\bit's\b/i, censorAnswer: "it's" }
+        ],
+        checkpoints: [
+          {
+            id: "lucy-cp-1",
+            pauseAt: 3.2,
+            exercise: {
+              type: "subtitle-cloze",
+              grammarPoint: "To Be (Present): is",
+              question: "Lengkapi to be yang tepat untuk nama lengkap Lucy:",
+              clozeText: "My full name ___ Lucy Bella Simkins.",
+              clozeAnswer: "is",
+              options: ["is", "am", "are", "be"],
+              answerIndex: 0,
+              explain: {
+                why: "'My full name' adalah kata benda tunggal (it), sehingga bentuk to be yang sesuai adalah 'is'.",
+                rule: "Singular Subject (He / She / It / Singular Noun) + is",
+                memory: "Satu nama lengkap = IS."
+              }
+            }
+          },
+          {
+            id: "lucy-cp-2",
+            pauseAt: 5.8,
+            exercise: {
+              type: "subtitle-cloze",
+              grammarPoint: "Passive Voice Present: is + spelt (V3)",
+              question: "Lengkapi pertanyaan William tentang cara mengeja nama depan Lucy:",
+              clozeText: "How ___ your first name spelt?",
+              clozeAnswer: "is",
+              options: ["is", "are", "does", "do"],
+              answerIndex: 0,
+              explain: {
+                why: "'your first name' adalah subjek tunggal yang menerima aksi dieja (passive), sehingga kalimat tanya menggunakan to be 'is' + kata kerja bentuk ketiga (spelt).",
+                rule: "Wh- + is + Singular Subject + V3 (Past Participle)?",
+                memory: "Dieja tunggal = How IS it spelt?"
+              }
+            }
+          },
+          {
+            id: "lucy-cp-3",
+            pauseAt: 12.0,
+            exercise: {
+              type: "subtitle-cloze",
+              grammarPoint: "Past Simple: Auxiliary did (Ellipsis)",
+              question: "Lengkapi jawaban Lucy tentang siapa yang memilih namanya:",
+              clozeText: "I think my mum ___.",
+              clozeAnswer: "did",
+              options: ["did", "does", "do", "has"],
+              answerIndex: 0,
+              explain: {
+                why: "William bertanya dengan kata kerja lampau 'chose' (V2 dari choose), sehingga elipsis jawaban lampau menggunakan 'did'.",
+                rule: "Past Simple Ellipsis: Who + V2...? -> Subject + did.",
+                memory: "Tanya aksi lampau (chose), respon singkat pakai DID."
+              }
+            }
+          },
+          {
+            id: "lucy-cp-4",
+            pauseAt: 19.8,
+            exercise: {
+              type: "subtitle-cloze",
+              grammarPoint: "Preposition of Place: in (Country)",
+              question: "Lengkapi preposisi tempat untuk negara Inggris (England):",
+              clozeText: "I was born in Milton Keynes, ___ England.",
+              clozeAnswer: "in",
+              options: ["in", "at", "on", "to"],
+              answerIndex: 0,
+              explain: {
+                why: "Untuk wilayah negara, kepulauan, atau kawasan teritorial luas (seperti England), preposisi tempat yang benar adalah 'in'.",
+                rule: "Preposition of Place: in + City / Country (in England, in Jakarta)",
+                memory: "Negara & kota besar = IN."
+              }
+            }
+          },
+          {
+            id: "lucy-cp-5",
+            pauseAt: 25.8,
+            exercise: {
+              type: "subtitle-cloze",
+              grammarPoint: "Contraction: it's (It is) vs its",
+              question: "Lengkapi singkatan kata (contraction) yang tepat untuk 'it is':",
+              clozeText: "I think ___ a city.",
+              clozeAnswer: "it's",
+              options: ["it's", "its", "they're", "there"],
+              answerIndex: 0,
+              explain: {
+                why: "'it's' dengan apostrof adalah singkatan dari 'it is' (subjek + to be). Sedangkan 'its' tanpa apostrof adalah kata ganti kepunyaan (possessive adjective).",
+                rule: "it's = it is (atau it has) | its = kepunyaan (its color, its name)",
+                memory: "Ada to be (is) = pakai apostrof IT'S."
+              }
+            }
+          }
+        ],
+        specs: {
+          title: "1 Video 5 Soal (Cake English Multi-Checkpoint)",
+          source: "English with Lucy & William (100 Common English Questions)",
+          voice: "100% Suara Manusia Asli (Natural British Accent & Real Pacing)",
+          lipSync: "100% Sinkron Sempurna (Organic Speech & Face Recording)",
+          flow: "Jeda Otomatis di 5 Titik Soal (3.2s, 5.8s, 12.0s, 19.8s, 25.8s) 100% 1-to-1 dengan Badge Nomor Video #1-#5",
+          filesize: "1.77 MB (26.0 detik H.264 + AAC, +faststart)"
+        }
+      },
+      five_q_part2: {
+        id: "vg-cake-lucy-clip2-5q",
+        level: "A2",
+        skill: "conversational_grammar_5q",
+        videoUrl: "./media/cake-lucy-clip2-5q.mp4",
+        posterUrl: "./media/cake-lucy-clip2-5q-poster.jpg",
+        attribution: {
+          source: "English with Lucy & William: 100 Common English Questions (Part 2)",
+          sourceLabel: "Tonton di YouTube",
+          url: "https://www.youtube.com/watch?v=kYv_8B7eX_g"
+        },
+        subtitles: [
+          { start: 0.0, end: 1.8, speaker: "William", text: "Do you have a favourite colour?", censorPattern: /\bDo\b/i, censorAnswer: "Do" },
+          { start: 1.8, end: 4.8, speaker: "Lucy", text: "Yes, my favourite colour is orange.", censorPattern: /\bis\b/i, censorAnswer: "is" },
+          { start: 4.8, end: 7.5, speaker: "William", text: "What kind of music do you listen to?", censorPattern: /\bto\b\?$/i, censorAnswer: "to", censorSuffix: "?" },
+          { start: 7.5, end: 11.4, speaker: "Lucy", text: "I don't really listen to too much music, whatever's in the charts.", censorPattern: /\bdon't\b/i, censorAnswer: "don't" },
+          { start: 11.4, end: 13.8, speaker: "William", text: "Do you have a favourite musical artist?" },
+          { start: 13.8, end: 16.2, speaker: "Lucy", text: "I love Taylor Swift.", censorPattern: /\blove\b/i, censorAnswer: "love" }
+        ],
+        checkpoints: [
+          {
+            id: "lucy2-cp-1",
+            pauseAt: 1.8,
+            exercise: {
+              type: "subtitle-cloze",
+              grammarPoint: "Present Simple Question: Do + you",
+              question: "Lengkapi kata bantu tanya (auxiliary verb) yang tepat untuk subjek 'you':",
+              clozeText: "___ you have a favourite colour?",
+              clozeAnswer: "Do",
+              options: ["Do", "Does", "Are", "Did"],
+              answerIndex: 0,
+              explain: {
+                why: "Untuk subjek 'you' dalam kalimat tanya Present Simple, gunakan kata kerja bantu 'Do'.",
+                rule: "Do + you/we/they + Verb 1?",
+                memory: "Tanya 'you' waktu kini = pakai DO."
+              }
+            }
+          },
+          {
+            id: "lucy2-cp-2",
+            pauseAt: 4.8,
+            exercise: {
+              type: "subtitle-cloze",
+              grammarPoint: "To Be (Present): is",
+              question: "Lengkapi to be yang tepat untuk warna favorit (singular subject):",
+              clozeText: "Yes, my favourite colour ___ orange.",
+              clozeAnswer: "is",
+              options: ["am", "is", "are", "be"],
+              answerIndex: 1,
+              explain: {
+                why: "'my favourite colour' adalah kata benda tunggal (it), sehingga bentuk to be yang sesuai adalah 'is'.",
+                rule: "Singular Subject (it / singular noun) + is",
+                memory: "Satu warna favorit = IS."
+              }
+            }
+          },
+          {
+            id: "lucy2-cp-3",
+            pauseAt: 7.5,
+            exercise: {
+              type: "subtitle-cloze",
+              grammarPoint: "Dependent Preposition: listen to",
+              question: "Lengkapi preposisi yang melekat pada kata kerja 'listen':",
+              clozeText: "What kind of music do you listen ___?",
+              clozeAnswer: "to",
+              options: ["at", "for", "to", "on"],
+              answerIndex: 2,
+              explain: {
+                why: "Kata kerja 'listen' berpasangan dengan preposisi 'to' ketika merujuk pada objek musik atau audio.",
+                rule: "listen + to + noun/object",
+                memory: "Mendengarkan sesuatu = Listen TO."
+              }
+            }
+          },
+          {
+            id: "lucy2-cp-4",
+            pauseAt: 11.4,
+            exercise: {
+              type: "subtitle-cloze",
+              grammarPoint: "Present Simple Negative: don't + Verb 1",
+              question: "Lengkapi bentuk negatif yang tepat untuk subjek 'I':",
+              clozeText: "I ___ really listen to too much music.",
+              clozeAnswer: "don't",
+              options: ["doesn't", "not", "aren't", "don't"],
+              answerIndex: 3,
+              explain: {
+                why: "Kalimat negatif Present Simple untuk subjek 'I' menggunakan auxiliary 'don't' diikuti kata kerja dasar 'listen'.",
+                rule: "I/You/We/They + don't + Verb 1",
+                memory: "I + don't untuk menyangkal rutinitas."
+              }
+            }
+          },
+          {
+            id: "lucy2-cp-5",
+            pauseAt: 16.0,
+            exercise: {
+              type: "subtitle-cloze",
+              grammarPoint: "Present Simple: Preference Verb (love)",
+              question: "Lengkapi kata kerja bentuk dasar untuk menyatakan kesukaan:",
+              clozeText: "I ___ Taylor Swift.",
+              clozeAnswer: "love",
+              options: ["love", "loves", "loving", "loved"],
+              answerIndex: 0,
+              explain: {
+                why: "Menyatakan kesukaan waktu kini dengan subjek 'I' memakai bentuk dasar murni (V1) tanpa akhiran -s.",
+                rule: "Subject (I) + Base Verb (love)",
+                memory: "I love (tanpa -s)."
+              }
+            }
+          }
+        ],
+        specs: {
+          title: "Klip 2: 1 Video 5 Soal (Cake English Multi-Checkpoint)",
+          source: "English with Lucy & William (100 Common English Questions Part 2)",
+          voice: "100% Suara Manusia Asli (Natural British Accent & Real Pacing)",
+          lipSync: "100% Sinkron Sempurna (Organic Speech & Face Recording)",
+          flow: "Jeda Otomatis di 5 Titik Soal (1.8s, 4.8s, 7.5s, 11.4s, 16.0s) dengan Rel Nomor #1-#5",
+          filesize: "1.12 MB (16.5 detik H.264 + AAC, +faststart)"
+        }
+      },
+      real: {
+        id: "vg-cake-ryan-jake",
+        level: "A2",
+        skill: "modals_can",
+        videoUrl: "./media/cake-ryan-jake.mp4",
+        posterUrl: "./media/cake-ryan-jake-poster.jpg",
+        attribution: {
+          source: "Ryan Reynolds & Jake Gyllenhaal (Wired Interview)",
+          sourceLabel: "YouTube",
+          url: "https://www.youtube.com"
+        },
+        subtitles: [
+          { start: 0.4, end: 2.2, text: "Can Jake Gyllenhaal sing?", speaker: "Ryan Reynolds" },
+          { start: 2.2, end: 3.8, text: "Yes, he can.", speaker: "Jake Gyllenhaal" },
+          { start: 3.8, end: 4.8, text: "And dance?", speaker: "Ryan Reynolds" },
+          { start: 4.8, end: 6.2, text: "Nope.", speaker: "Jake Gyllenhaal" }
+        ],
+        pauseAt: 2.8,
+        loopCount: 2,
+        speed: 1.0,
+        exercise: {
+          type: "subtitle-cloze",
+          grammarPoint: "Modals: Can (Ability)",
+          question: "Lengkapi kalimat respon dari percakapan asli di atas:",
+          clozeText: "Yes, he ___.",
+          clozeAnswer: "can",
+          options: ["can", "could", "is", "does"],
+          answerIndex: 0,
+          explain: {
+            why: "Pertanyaan memakai modal 'Can' ('Can Jake Gyllenhaal sing?'), sehingga jawaban singkatnya kembali menggunakan 'can': 'Yes, he can'.",
+            rule: "Modal auxiliary match: Can you / he ... ? -> Yes, I / he can.",
+            memory: "Tanya CAN, jawab CAN."
+          }
+        },
+        specs: {
+          title: "Klip Singkat 1 Soal (Cake English Approach)",
+          source: "Ryan Reynolds & Jake Gyllenhaal (Interview Asli)",
+          voice: "100% Suara Manusia Asli (Natural Audio)",
+          lipSync: "100% Sinkron Sempurna (Organic Speech)",
+          flow: "1 Titik Jeda di detik 2.8s",
+          filesize: "1.3 MB (6.5 detik H.264 + AAC)"
+        }
+      },
+      dub: {
+        id: "vg-pilot-001",
+        level: "A1",
+        skill: "present_simple",
+        videoUrl: "./media/pilot-coffee.mp4",
+        posterUrl: "./media/pilot-coffee-poster.jpg",
+        attribution: {
+          source: "Stock Video (Pexels CC0) + Neural TTS",
+          sourceLabel: "Pexels",
+          url: "https://www.pexels.com"
+        },
+        subtitles: [
+          { start: 0.5, end: 2.6, text: "I usually drink coffee in the morning.", speaker: "Speaker A" },
+          { start: 3.1, end: 5.2, text: "But today I want tea.", speaker: "Speaker B" }
+        ],
+        pauseAt: 2.6,
+        loopCount: 2,
+        speed: 1.0,
+        exercise: {
+          type: "subtitle-cloze",
+          grammarPoint: "Present Simple (Routines)",
+          question: "Lengkapi subtitle dari dialog yang baru saja kamu dengar:",
+          clozeText: "I usually ___ coffee in the morning.",
+          clozeAnswer: "drink",
+          options: ["drink", "drinking", "drinks", "drank"],
+          answerIndex: 0,
+          explain: {
+            why: "Kata 'usually' menandakan kebiasaan. Untuk subjek 'I', gunakan bentuk dasar 'drink'.",
+            rule: "Subject (I) + Adverb (usually) + Verb 1 (drink)",
+            memory: "USUALLY = KEBIASAAN = Present Simple."
+          }
+        },
+        specs: {
+          title: "Klip Stock Video Didubbing TTS (Sebelumnya)",
+          source: "Stock Video Pexels CC0 + Dubbing Edge-TTS",
+          voice: "AI Neural TTS (Kelemahan: Kurang intonasi alami)",
+          lipSync: "Kelemahan: Bibir tidak sinkron (Silent B-roll)",
+          flow: "1 Titik Jeda di detik 2.6s",
+          filesize: "856 KB (5.5 detik H.264 + AAC)"
+        }
+      }
+    };
+
+    function renderMode(mode) {
+      const conf = CONFIGS[mode];
+      const container = document.getElementById('videoExerciseContainer');
+      const feedbackEl = document.getElementById('feedback');
+      const modePill = document.getElementById('modePill');
+      const specsPanel = document.getElementById('specsPanel');
+
+      const existingVideo = container.querySelector('video');
+      if (existingVideo) {
+        try {
+          existingVideo.pause();
+          existingVideo.removeAttribute('src');
+          existingVideo.load();
+        } catch(_) {}
+      }
+      container.innerHTML = '';
+      feedbackEl.className = 'hidden';
+      modePill.textContent = conf.checkpoints 
+        ? `${conf.level} • 5 Checkpoint Berurutan` 
+        : `${conf.level} • ${conf.exercise?.grammarPoint || 'Tata Bahasa'}`;
+
+      // Render Specs
+      specsPanel.innerHTML = `
+        <h3>
+          <i data-lucide="${mode === 'five_q' ? 'layers' : (mode === 'real' ? 'star' : 'alert-circle')}" style="color:${mode === 'five_q' ? '#10B981' : (mode === 'real' ? 'var(--sun)' : 'var(--text-muted)')};width:18px;height:18px;"></i>
+          ${conf.specs.title}
+        </h3>
+        <div class="spec-item">
+          <span class="spec-label">Sumber Cuplikan:</span>
+          <span class="spec-val">${conf.specs.source}</span>
+        </div>
+        <div class="spec-item">
+          <span class="spec-label">Karakter Suara:</span>
+          <span class="spec-val" style="color:${mode !== 'dub' ? 'var(--good)' : 'var(--sun)'}">${conf.specs.voice}</span>
+        </div>
+        <div class="spec-item">
+          <span class="spec-label">Sinkronisasi Bibir:</span>
+          <span class="spec-val" style="color:${mode !== 'dub' ? 'var(--good)' : 'var(--bad)'}">${conf.specs.lipSync}</span>
+        </div>
+        <div class="spec-item">
+          <span class="spec-label">Alur Pembelajaran:</span>
+          <span class="spec-val" style="color:#60A5FA">${conf.specs.flow || conf.specs.checkpointFlow}</span>
+        </div>
+        <div class="spec-item">
+          <span class="spec-label">Ukuran & Durasi:</span>
+          <span class="spec-val">${conf.specs.filesize}</span>
+        </div>
+      `;
+
+      const videoElement = FiezelGrammarVideo.renderVideoExercise(conf, {
+        onAnswer: (isCorrect, chosenIndex, currentCp, cpIdx) => {
+          feedbackEl.classList.remove('hidden');
+          const ex = currentCp?.exercise || conf.exercise;
+          if (isCorrect) {
+            feedbackEl.className = 'feedback-success';
+            feedbackEl.innerHTML = `
+              <div style="font-weight:700;display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+                <i data-lucide="check-circle" style="width:18px;height:18px;"></i> Jawaban Tepat! (Correct)
+              </div>
+              <p style="margin:0 0 6px;">${ex.explain.why}</p>
+              <div style="font-size:0.8rem;opacity:0.9;font-weight:600;">Rumus: ${ex.explain.rule}</div>
+            `;
+          } else {
+            feedbackEl.className = 'feedback-error';
+            feedbackEl.innerHTML = `
+              <div style="font-weight:700;display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+                <i data-lucide="x-circle" style="width:18px;height:18px;"></i> Belum Tepat
+              </div>
+              <p style="margin:0;">Jawaban yang benar: <strong>${ex.clozeAnswer}</strong>. ${ex.explain.why}</p>
+            `;
+          }
+          if (window.lucide) lucide.createIcons();
+        }
+      });
+
+      container.appendChild(videoElement);
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function switchMode(mode) {
+      currentMode = mode;
+      document.getElementById('tab5Q').classList.toggle('active', mode === 'five_q');
+      document.getElementById('tab5Q2').classList.toggle('active', mode === 'five_q_part2');
+      document.getElementById('tabReal').classList.toggle('active', mode === 'real');
+      document.getElementById('tabDub').classList.toggle('active', mode === 'dub');
+      renderMode(mode);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderMode('five_q');
+    });
+  </script>
+</body>
+</html>
