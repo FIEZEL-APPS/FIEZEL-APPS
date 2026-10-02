@@ -182,6 +182,10 @@
       });
 
       submitBtn.disabled = placedTokens.length === 0;
+      if (q.__scaffoldAttempt) {
+        submitBtn.classList.add('token-submit-retry');
+        submitBtn.innerHTML = `<i data-lucide="rotate-ccw"></i> <span>${FiezelI18n.t('quiz.periksa-ulang', 'Periksa Ulang')}</span>`;
+      }
       if (resetBtn) resetBtn.disabled = placedTokens.length === 0;
     };
 

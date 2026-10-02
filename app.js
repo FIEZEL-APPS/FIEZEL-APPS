@@ -11907,6 +11907,7 @@ function startTokenOrderSession(skill){
   quizLoop({type:'grammar',count:Math.min(5,tokenQuestions.length),pool:tokenQuestions,preserveOrder:true});
 }
 window.startTokenOrderSession=startTokenOrderSession;
+window.getGrammarBank=()=>G;window.getGrammarItems=()=>GRAMMAR_ITEMS;window.getState=()=>state;
 
 function startMistakeVaultSession(){
   const skills=[];
@@ -13054,41 +13055,14 @@ function quizLoop(cfg){
   const host=$('tutorTurn');if(!host||!turn||(!turn.say&&!turn.ask))return;
   host.classList.remove('hidden');
   let isFrustrated=false;try{isFrustrated=affectSessionSync().state==='frustrated'}catch{}
-  host.innerHTML=`<div class="tutor-turn-head"><span class="tutor-turn-face"><i data-lucide="graduation-cap"></i></span><b>${esc(FiezelI18n.t('tutor.head-label','FIEZEL'))}</b></div>`
+  const headTitle=retry?FiezelI18n.t('quiz.petunjuk-guru','Petunjuk Guru'):FiezelI18n.t('tutor.head-label','FIEZEL');
+  host.innerHTML=`<div class="tutor-turn-head"><span class="tutor-turn-face"><i data-lucide="graduation-cap"></i></span><b>${esc(headTitle)}</b></div>`
+   +(retry&&q.__diagnosticClue?`<div class="tutor-diagnostic-clue"><i data-lucide="lightbulb"></i><span>${esc(q.__diagnosticClue)}</span></div>`:'')
    +(turn.say?`<p class="tutor-turn-say">${esc(personalize(turn.say))}</p>`:'')
    +(turn.ask?`<p class="tutor-turn-ask">${esc(personalize(turn.ask))}</p>`:'')
-   /* Fase 3 (C5 butir 6) + Gelombang 2 (P1.3): di anak tangga 'worked' ATAU saat afek
-      terdeteksi 'frustrated', soal ber-langkah (reasoningOperation di bank) dipecah
-      FiezelStepTutor.decompose menjadi tuntunan 2-3 langkah yang tampil SEBELUM murid
-      memilih lagi. Guarded: tanpa modul/template, string kosong = markup lama. */
    +(retry&&(answer.scaffold==='worked'||isFrustrated)?stepTutorGuidanceMarkup(q):'')
-   +(retry?FiezelI18n.t('quiz.div-class-tutor-turn-actions'):'');
+   +(retry?`<div class="tutor-turn-actions"><button id="tutorStuck" type="button" class="tutor-stuck quiz-giveup-btn"><i data-lucide="help-circle"></i><span>${FiezelI18n.t('quiz.menyerah-buka-jawaban','Buntu? Buka pembahasan lengkap')}</span></button></div>`:'');
   if(retry)$('tutorStuck').onclick=()=>{
-   // Murid yang bilang belum paham TIDAK diberi soal lagi - ia dinaikkan satu anak tangga
-   // bantuan. Mengulang pertanyaan yang sama kepada orang yang baru saja mengaku bingung
-   // adalah cara tercepat membuat dia berhenti mengaku.
-   /* m025-186 (A11-03): dulu handler ini SELALU membuka jawaban, jadi anak tangga 'worked'
-      tidak pernah dapat percobaan sungguhan - melanggar kontrak probe->hint->worked->tell
-      milik tutor-brain sendiri. Sekarang eskalasi diputuskan FiezelTutorBrain.escalate():
-      reveal hanya di anak tangga 'tell'; selain itu giliran bantuan yang lebih tebal
-      digambar ulang dan murid boleh mencoba lagi. Fallback ke perilaku lama bila modul absen. */
-   let out=null;
-   try{
-    if(tutorAvailable()&&typeof self.FiezelTutorBrain.escalate==='function'){
-     const picked=String(q?.options?.[answer.lastPick]??'');
-     out=self.FiezelTutorBrain.escalate(answer.scaffold,{
-      explanation:{rule:tutorIndonesian(q?.explain?.rule),whyCorrect:tutorIndonesian(q?.explain?.why),memoryCue:tutorIndonesian(q?.explain?.memory),howToAvoid:tutorIndonesian(q?.explain?.avoid)},
-      whyFails:tutorWhyFails(q,picked),
-      conceptLabel:friendlySkillName(q?.lessonSkill||q?.skill||q?.type)
-     },tutor);
-    }
-   }catch{out=null}
-   if(out&&out.scaffold&&!out.reveal&&out.turn&&(out.turn.say||out.turn.ask)){
-    answer.scaffold=out.scaffold;
-    speak(out.turn,{retry:true});
-    return;
-   }
-   answer.scaffold=out?.scaffold||tutorEscalate(answer.scaffold);
    reveal(q,answer.lastPick,false,{forced:true});
   };
   // D5 S10: #tutorTurn duduk DI BAWAH #options - di layar HP, giliran tutor yang menahan
@@ -13119,8 +13093,96 @@ function quizLoop(cfg){
    enhanceUI();
   };
 
+  /** Format perbandingan jawaban murid vs kunci jawaban dengan sorotan diff kata. */
+  const formatDiffPicks=(cleanUser,cleanCorr,question)=>{
+    if(!cleanUser||!cleanCorr||cleanUser===cleanCorr){
+      return {
+        userHtml:`<strong>${esc(cleanUser||'')}</strong>`,
+        correctHtml:`<strong>${esc(cleanCorr||'')}</strong>`
+      };
+    }
+    const cleanWord=w=>String(w||'').replace(/^[^\w\s]+|[^\w\s]+$/g,'').toLowerCase();
+    const wrapWord=(w,cls)=>{
+      const m=String(w||'').match(/^([^\w\s]*)(.*?)([^\w\s]*)$/);
+      if(!m||!m[2])return `<mark class="${cls}">${esc(w)}</mark>`;
+      return `${esc(m[1])}<mark class="${cls}">${esc(m[2])}</mark>${esc(m[3])}`;
+    };
+
+    const uWords=cleanUser.trim().split(/\s+/);
+    const cWords=cleanCorr.trim().split(/\s+/);
+
+    if(uWords.length===1&&cWords.length===1){
+      return {
+        userHtml:`<strong>${wrapWord(cleanUser,'diff-word-wrong')}</strong>`,
+        correctHtml:`<strong>${wrapWord(cleanCorr,'diff-word-correct')}</strong>`
+      };
+    }
+
+    if(uWords.length===cWords.length){
+      let diffCount=0;
+      const uRes=[], cRes=[];
+      for(let i=0;i<uWords.length;i++){
+        if(cleanWord(uWords[i])!==cleanWord(cWords[i])){
+          diffCount++;
+          uRes.push(wrapWord(uWords[i],'diff-word-wrong'));
+          cRes.push(wrapWord(cWords[i],'diff-word-correct'));
+        }else{
+          uRes.push(esc(uWords[i]));
+          cRes.push(esc(cWords[i]));
+        }
+      }
+      if(diffCount>0&&diffCount<=Math.max(3,Math.floor(uWords.length/2))){
+        return {
+          userHtml:`<strong>${uRes.join(' ')}</strong>`,
+          correctHtml:`<strong>${cRes.join(' ')}</strong>`
+        };
+      }
+    }
+
+    // Different length: only mark words that are genuinely NOT part of the correct sentence
+    const cCleanSet=new Set(cWords.map(cleanWord));
+    const wrongWords=new Set();
+    uWords.forEach(w=>{
+      const cw=cleanWord(w);
+      if(cw&&!cCleanSet.has(cw))wrongWords.add(cw);
+    });
+
+    if(wrongWords.size>0){
+      const uCleanSet=new Set(uWords.map(cleanWord));
+      const uRes=uWords.map(w=>{
+        if(wrongWords.has(cleanWord(w))){
+          return wrapWord(w,'diff-word-wrong');
+        }
+        return esc(w);
+      });
+      const cRes=cWords.map(w=>{
+        const cw=cleanWord(w);
+        if(!uCleanSet.has(cw)){
+          const sharesStem=Array.from(wrongWords).some(dw=>(
+            dw.startsWith(cw.slice(0,3))||cw.startsWith(dw.slice(0,3))
+          ));
+          if(sharesStem){
+            return wrapWord(w,'diff-word-correct');
+          }
+        }
+        return esc(w);
+      });
+      return {
+        userHtml:`<strong>${uRes.join(' ')}</strong>`,
+        correctHtml:`<strong>${cRes.join(' ')}</strong>`
+      };
+    }
+
+    return {
+      userHtml:`<strong>${esc(cleanUser)}</strong>`,
+      correctHtml:`<strong>${esc(cleanCorr)}</strong>`
+    };
+  };
+
  /** Membuka jawaban dan seluruh penjelasannya. Jalur akhir untuk satu soal. */
  const reveal=(q,j,ok,{forced=false}={})=>{
+  q.__diagnosticClue='';
+  $('tutorTurn')?.classList.add('hidden');
   document.querySelectorAll('.option').forEach(b=>b.disabled=true);
   /* W1 P1-1: di mode ukur TIDAK ADA yang dibuka — tidak ada sorotan kunci, tidak ada
      vonis, tidak ada pembahasan, tidak ada tombol AI. Hanya tanda terima netral; murid
@@ -13157,15 +13219,19 @@ function quizLoop(cfg){
   const tokenDiagnosis=(!ok&&q.type==='token-order')?diagnoseTokenOrderMistake(q):'';
   const pickedWhyFails=(!ok&&(q.type==='grammar'||q.type==='token-order'||q.type==='video-grammar'))
     ? (tokenDiagnosis || (Array.isArray(q.explain?.distractors)
-        ? String((q.explain.distractors.find(x=>norm(String(x.option))===norm(String(q.options?.[j]||userPickDisplay)))||{}).reason||'').trim()
+        ? String((q.explain.distractors.find(x=>{
+            const xNorm=norm(String(x.option));
+            const pNorm=norm(String(q.options?.[j]||userPickDisplay));
+            return xNorm===pNorm||(xNorm&&pNorm&&(pNorm.includes(xNorm)||xNorm.includes(pNorm)));
+          })||{}).reason||'').trim()
         : ''))
     : '';
 
   let whyText=q.explain?.why||FiezelI18n.t('quiz.fallback-context');
-  if(!ok&&q.type==='token-order'){
+  if(!ok){
     if(/susunan kalimat sudah tepat/i.test(whyText)||whyText===FiezelI18n.t('grammar.susunan-kalimat-tepat','Urutan kata dan bentuk tata bahasa yang tepat.')){
       whyText=q.explain?.rule
-        ? `Kalimat yang tepat: “${cleanCorrect}”.`
+        ? (q.type==='token-order'?`Kalimat yang tepat: “${cleanCorrect}”.`:`Bentuk yang tepat: “${cleanCorrect}”.`)
         : FiezelI18n.t('quiz.fallback-context');
     }
   }
@@ -13179,7 +13245,16 @@ function quizLoop(cfg){
      tepat adalah X." mengulang string yang sama dua kali — kini satu kalimat konfirmasi.
      Cabang salah tetap memakai literal "Jawaban yang paling tepat" (jangkar r2 smoke:109
      memastikan literal ini TIDAK bocor di mode ukur — cabang MEASURE di atas tak tersentuh). */
-  f.innerHTML=`<div class="feedback-title"><i data-lucide="${ok?'circle-check-big':'circle-x'}"></i><b>${ok?FiezelI18n.t('quiz.verdict-correct'):FiezelI18n.t('quiz.verdict-wrong')}</b></div><p>${ok?FiezelI18n.t('quiz.correct-answer',{answer:`<strong>${esc(cleanCorrect)}</strong>`}):`${FiezelI18n.t('quiz.jawabanmu')} <strong>${esc(cleanUserPick)}</strong>${FiezelI18n.t('quiz.answer-paling-tepat-adalah')} <strong>${esc(cleanCorrect)}</strong>.`}</p>${pickedWhyFails?`<p class="feedback-your-pick"><strong>${FiezelI18n.t('quiz.jawabanmu')}</strong> ${esc(pickedWhyFails)}</p>`:''}${(q.type==='grammar'||q.type==='token-order'||q.type==='video-grammar')&&q.explain?.rule/* m025-375: alasan dan aturan grammar di dua baris, bukan satu paragraf panjang */?`<p><strong>${FiezelI18n.t('quiz.intinya')}</strong> ${esc(whyText)}</p><p class="feedback-rule feedback-rule-pill"><strong>${FiezelI18n.t('quiz.aturannya')}</strong> ${esc(q.explain.rule)}</p>`:`<p><strong>${FiezelI18n.t('quiz.intinya')}</strong> ${esc(whyText)} ${q.explain?.rule?esc(q.explain.rule):''}</p>`}<details class="acc"><summary>${FiezelI18n.t(q.explain?.distractors?'quiz.bandingkan-pilihan-lain':'quiz.pembahasan-lengkap')}</summary><p class="muted">${esc(q.explain?.distractor||FiezelI18n.t('quiz.fallback-unsupported'))} ${esc(q.explain?.avoid||FiezelI18n.t('quiz.fallback-hint-check'))}</p>${q.explain?.distractors?`<div class="distractor-breakdown">${q.explain.distractors.map(x=>`<p><b>${esc(x.option)}:</b> ${esc(x.reason)}</p>`).join('')}</div>`:''}</details><div class="feedback-memory-box memory-tip"><div class="feedback-memory-header"><i data-lucide="lightbulb"></i><span class="feedback-memory-kicker">${FiezelI18n.t('quiz.trik-ingat','Trik Cepat Ingat')}</span></div><div class="feedback-memory-content">${formatMemoryTipForDisplay(esc(q.explain?.memory||FiezelI18n.t('quiz.fallback-hint-connect')))}</div></div><button class="ai-btn" id="aiExplainBtn"><i data-lucide="sparkles"></i> ${FiezelI18n.t('quiz.jelaskan-dengan-cara-lebih-sederhana')}</button>`;
+   document.getElementById('quizScaffoldNudge')?.remove();
+   const diff=(!ok)?formatDiffPicks(cleanUserPick,cleanCorrect,q):null;
+   const userPickRender=diff?diff.userHtml:`<strong>${esc(cleanUserPick)}</strong>`;
+   const correctPickRender=diff?diff.correctHtml:`<strong>${esc(cleanCorrect)}</strong>`;
+   const isScaffoldSuccess=ok&&(q.__scaffoldSuccess||q.__scaffoldAttempt);
+   const verdictTitle=ok
+     ? (isScaffoldSuccess?FiezelI18n.t('quiz.scaffold-success','Bagus sekali! Kamu berhasil memperbaikinya sendiri! 🌟'):FiezelI18n.t('quiz.verdict-correct'))
+     : FiezelI18n.t('quiz.verdict-wrong');
+   const verdictIcon=ok?(isScaffoldSuccess?'sparkles':'circle-check-big'):'circle-x';
+  f.innerHTML=`<div class="feedback-title"><i data-lucide="${verdictIcon}"></i><b>${verdictTitle}</b></div><p>${ok?FiezelI18n.t('quiz.correct-answer',{answer:`<strong>${esc(cleanCorrect)}</strong>`}):`${FiezelI18n.t('quiz.jawabanmu')} ${userPickRender}${FiezelI18n.t('quiz.answer-paling-tepat-adalah')} ${correctPickRender}.`}</p>${pickedWhyFails?`<p class="feedback-your-pick"><strong>${FiezelI18n.t('quiz.mengapa-salah','Mengapa kurang tepat?')}</strong> ${esc(pickedWhyFails)}</p>`:''}${(q.type==='grammar'||q.type==='token-order'||q.type==='video-grammar')&&q.explain?.rule/* m025-375: alasan dan aturan grammar di dua baris, bukan satu paragraf panjang */?`<p><strong>${FiezelI18n.t('quiz.intinya')}</strong> ${esc(whyText)}</p><p class="feedback-rule feedback-rule-pill"><strong>${FiezelI18n.t('quiz.aturannya')}</strong> ${esc(q.explain.rule)}</p>`:`<p><strong>${FiezelI18n.t('quiz.intinya')}</strong> ${esc(whyText)} ${q.explain?.rule?esc(q.explain.rule):''}</p>`}<details class="acc"><summary>${FiezelI18n.t(q.explain?.distractors?'quiz.bandingkan-pilihan-lain':'quiz.pembahasan-lengkap')}</summary><p class="muted">${esc(q.explain?.distractor||FiezelI18n.t('quiz.fallback-unsupported'))} ${esc(q.explain?.avoid||FiezelI18n.t('quiz.fallback-hint-check'))}</p>${q.explain?.distractors?`<div class="distractor-breakdown">${q.explain.distractors.map(x=>`<p><b>${esc(x.option)}:</b> ${esc(x.reason)}</p>`).join('')}</div>`:''}</details><div class="feedback-memory-box memory-tip"><div class="feedback-memory-header"><i data-lucide="lightbulb"></i><span class="feedback-memory-kicker">${FiezelI18n.t('quiz.trik-ingat','Trik Cepat Ingat')}</span></div><div class="feedback-memory-content">${formatMemoryTipForDisplay(esc(q.explain?.memory||FiezelI18n.t('quiz.fallback-hint-connect')))}</div></div><button class="ai-btn" id="aiExplainBtn"><i data-lucide="sparkles"></i> ${FiezelI18n.t('quiz.jelaskan-dengan-cara-lebih-sederhana')}</button>`;
   speak(turn);
   answer.locked=true;
   $('quizNext').disabled=false;
@@ -13234,11 +13309,16 @@ function quizLoop(cfg){
   /* W1 P1-1: mode ukur menandai pilihan secara NETRAL (tanpa warna vonis) dan berbunyi
      netral \u2014 umpan balik taktil/bunyi tetap hidup, verdiknya yang tidak bocor.
      Literal answerFeedbackSignal/showAnswerBurst tetap dipakai jalur latihan (release-audit). */
+  const isRetryTrial = !ok && firstTry && answer.scaffold !== 'tell' && !cfg.noHints && !MEASURE;
   if(MEASURE){
    button.classList.add('picked');
    button.setAttribute('aria-pressed','true');
    try{button.style.outline='3px solid var(--ink)';button.style.outlineOffset='2px'}catch(_){}
    haptic('tap');uiSfx('button_tap');
+  }else if(isRetryTrial){
+   button.classList.add('was-tried');
+   haptic('tap');
+   try{uiSfx('paw_encourage')}catch(_){}
   }else{
    button.classList.add(ok?'correct':'wrong');
    answerFeedbackSignal(ok);
@@ -13293,9 +13373,12 @@ function quizLoop(cfg){
    if(decision.move==='reteach'&&!cfg.noHints&&!MEASURE){forceConcept=quizConcept(q);pendingCard=tutorConceptCard(q,j)}
    if(decision.move==='breathe')answer.breathe=true;
   }else{
-   // Percobaan kedua tidak menaikkan skor atau penguasaan, tetapi tetap menutup episode
-   // miskonsepsi ketika bantuannya berhasil. Tanpa peristiwa ini Tutor Brain hanya
-   // mengingat kegagalannya dan terus menaikkan bantuan untuk konsep yang sudah pulih.
+   // Percobaan kedua berhasil berkat scaffolding (Zone of Proximal Development)
+   if(ok){
+     score = (Number(score)||0) + 0.75;
+     q.__scaffoldSuccess = true;
+     try{uiSfx('streak_milestone')}catch(_){}
+   }
    const decision=tutorObserve(tutor,q,j,ok,ms,{remaining:remaining.length,scored:false});
    answer.move=decision.move;answer.scaffold=decision.scaffold;answer.timing=decision.diagnosis?.timing||'';
    if(decision.move==='reteach'){forceConcept=quizConcept(q);pendingCard=tutorConceptCard(q,j)}
@@ -13359,17 +13442,51 @@ function quizLoop(cfg){
      (cfg.noHints) - kalau tidak, "terverifikasi" hanya berarti dituntun sampai benar. */
   if(!ok&&firstTry&&answer.scaffold!=='tell'&&!cfg.noHints&&!MEASURE){
    answer.retryOf=q.id;
-   button.disabled=true;
-   /* i10 2026-08-28 (O5 §6.3-1): PILIHANMU menunjuk SATU pilihan. Percobaan pertama yang
-      sudah dimatikan turun ke tanda netral DICOBA (badge teks — kontrak non-warna m025
-      terjaga); vonis merah final tetap milik pilihan terakhir saat reveal(). */
-   button.classList.replace('wrong','was-tried');
-   /* P0-3 (audit UX 2026-10): banner retry di atas opsi supaya murid tidak bingung. */
-   try{const hint=document.createElement('p');hint.className='quiz-retry-hint';hint.setAttribute('role','status');hint.innerHTML='<i data-lucide="refresh-cw"></i> '+FiezelI18n.t('quiz.coba-lagi-pilih-jawaban-lain','Coba lagi — pilih jawaban lain');const opts=$('options');if(opts&&!opts.querySelector('.quiz-retry-hint'))opts.before(hint);enhanceUI()}catch(_){}
+   q.__scaffoldAttempt=1;
+
+   document.getElementById('quizScaffoldNudge')?.remove();
+
+   if(q.type==='token-order'){
+     const submitBtn=button;
+     if(submitBtn){
+       submitBtn.disabled=false;
+       submitBtn.classList.remove('was-tried','wrong');
+       submitBtn.classList.add('token-submit-retry');
+       submitBtn.innerHTML=`<i data-lucide="rotate-ccw"></i> <span>${FiezelI18n.t('quiz.periksa-ulang','Periksa Ulang')}</span>`;
+     }
+     const railChips=document.querySelectorAll('.token-rail .token-chip');
+     const distractorWords=new Set();
+     if(Array.isArray(q.distractors))q.distractors.forEach(d=>{if(d?.option)distractorWords.add(norm(String(d.option)))});
+     if(Array.isArray(q.explain?.distractors))q.explain.distractors.forEach(d=>{if(d?.option)distractorWords.add(norm(String(d.option)))});
+     railChips.forEach(chip=>{
+       if(distractorWords.has(norm(chip.textContent))){
+         chip.classList.add('token-nudge-shake');
+         setTimeout(()=>chip.classList.remove('token-nudge-shake'),1200);
+       }
+     });
+
+     q.__diagnosticClue=diagnoseTokenOrderMistake(q);
+   }else{
+     button.disabled=true;
+     button.classList.add('was-tried');
+     if(!button.querySelector('.tried-tag')){
+       button.insertAdjacentHTML('beforeend',` <span class="tried-tag">${FiezelI18n.t('quiz.sudah-dicoba','Sudah dicoba')}</span>`);
+     }
+     let nudgeText='';
+     if(Array.isArray(q.explain?.distractors)){
+       const userChoice=q.options?.[j];
+       const found=q.explain.distractors.find(x=>norm(String(x.option))===norm(String(userChoice)));
+       if(found&&found.reason){
+         nudgeText=`Pilihan “${userChoice}” kurang tepat: ${found.reason}. Coba pilih opsi lainnya!`;
+       }
+     }
+     if(!nudgeText){
+       nudgeText=FiezelI18n.t('quiz.coba-lagi-pilih-jawaban-lain','Coba lagi — periksa petunjuk dan pilih jawaban lain');
+     }
+     q.__diagnosticClue=nudgeText;
+   }
+
    speak(tutorCompose(q,j,false,answer.scaffold,answer.move,answer.timing),{retry:true});
-   /* [FASE-4] 09 §3.3: pijakan retry ADALAH momen petunjuk — maskot ikut 'hint'
-      SETELAH beat concern ≤1000ms selesai (13 §2.2), bukan menimpanya. Tanpa bunyi:
-      SFX hint sudah dipensiunkan (20 §4); cooldown 8 detiknya dijaga komponen. */
    setTimeout(()=>{try{pawReact('hint')}catch(_){}},1100);
    enhanceUI();
    return;

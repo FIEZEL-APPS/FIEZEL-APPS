@@ -100,6 +100,11 @@
     'quiz.milestone-halfway': 'Setengah jalan! Pertahankan fokusmu 💪',
     'tutor.head-label': 'FIEZEL',
     'quiz.mengapa-salah': 'Mengapa kurang tepat?',
-    'quiz.trik-ingat': 'Trik Cepat Ingat'
+    'quiz.trik-ingat': 'Trik Cepat Ingat',
+    'quiz.petunjuk-guru': 'Petunjuk Guru',
+    'quiz.menyerah-buka-jawaban': 'Buntu? Buka pembahasan lengkap',
+    'quiz.periksa-ulang': 'Periksa Ulang',
+    'quiz.sudah-dicoba': 'Sudah dicoba',
+    'quiz.scaffold-success': 'Bagus sekali! Kamu berhasil memperbaikinya sendiri! 🌟'
   });
 }());

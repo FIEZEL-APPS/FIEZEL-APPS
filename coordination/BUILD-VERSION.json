@@ -1,7 +1,7 @@
 {
-  "version": "m025-401",
+  "version": "m025-402",
   "claimedBy": "branch main",
-  "claimedAt": "2026-10-02T16:28:04.217Z",
-  "reason": "feat(braincore): integrate bkt mastery telemetry in vocab bridge and fix token-order feedback",
+  "claimedAt": "2026-10-02T18:20:32.457Z",
+  "reason": "feat(quiz): 2-tier adaptive scaffolding into tutor explanation with compact prompt and zero maroon",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
