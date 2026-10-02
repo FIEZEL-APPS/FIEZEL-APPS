@@ -1,7 +1,7 @@
 {
-  "version": "m025-395",
+  "version": "m025-396",
   "claimedBy": "branch main",
-  "claimedAt": "2026-10-02T01:17:12.165Z",
-  "reason": "feat: active grammar UI/UX upgrade and video-first integration",
+  "claimedAt": "2026-10-02T04:27:00.000Z",
+  "reason": "feat(grammar): sync unified 20-question session and shell cache build m025-396",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
