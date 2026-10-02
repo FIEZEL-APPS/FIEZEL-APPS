@@ -652,9 +652,9 @@
     const html = `
       <div class="lesson-prereq-gateway-sheet">
         <div class="gateway-header">
-          <span class="gateway-badge"><i data-lucide="sparkles"></i> ${t('scaffold.gateway-title', 'Misi Kosakata Kunci')}</span>
+          <span class="gateway-badge"><i data-lucide="sparkles"></i> ${t('scaffold.gateway-title', 'Hafal Dulu Kosakata Ini!')}</span>
           <h2>${esc(lessonTitle)}</h2>
-          <p class="muted">${t('scaffold.gateway-subtitle', 'Kuasai ' + status.targetCount + ' kosakata kunci ini lewat mini game seru agar kamu lancar mengerjakan kalimatnya!')}</p>
+          <p class="muted">${t('scaffold.gateway-subtitle', 'Setelah kamu menghafalnya, latihan grammar otomatis terbuka!')}</p>
         </div>
 
         <div class="gateway-vocab-grid">
@@ -666,7 +666,7 @@
                   <i data-lucide="volume-2"></i>
                 </button>
               </div>
-              <div class="gw-meaning">${esc(w.meaning)}</div>
+              <div class="gw-meaning">${esc(w.meaning.split(';')[0].trim())}</div>
             </div>
           `).join('')}
         </div>
@@ -675,10 +675,6 @@
           <button type="button" class="gateway-btn primary" onclick="FiezelGrammarVocabBridge.startVocabMiniGame('${skill}')">
             <i data-lucide="play"></i>
             <span>${t('scaffold.btn-start-game', 'Mulai Mini Game Seru 🎮')}</span>
-          </button>
-          <button type="button" class="gateway-btn secondary" onclick="FiezelGrammarVocabBridge.skipToGrammar('${skill}')">
-            <span>${t('scaffold.btn-skip-to-grammar', 'Lanjut ke Latihan Grammar ⚡')}</span>
-            <i data-lucide="chevron-right"></i>
           </button>
         </div>
       </div>
@@ -728,11 +724,11 @@
     const words = status.words.slice(0, status.targetCount);
 
     if (!words.length) {
-      skipToGrammar(skill);
+      completeMiniGameAndUnlock(skill);
       return;
     }
 
-    // Prepare matching game arrays
+    // Prepare matching game arrays for Round 1
     const enCards = words.map(w => ({ id: w.id, text: w.word, word: w.word }));
     const idCards = words.map(w => ({ id: w.id, text: w.meaning.split(';')[0].trim(), word: w.word }));
 
@@ -742,17 +738,42 @@
       [idCards[i], idCards[j]] = [idCards[j], idCards[i]];
     }
 
+    // Prepare Round 2: Rapid ABCD Meaning Questions (e.g., body -> A. tangan, B. mulut, C. kaki, D. badan)
+    const allPoolFallback = (typeof V !== 'undefined' && Array.isArray(V)) ? V : words;
+    const rapidWords = words.slice(0, Math.min(4, words.length));
+    const rapidQuestions = rapidWords.map(w => {
+      const correctMeaning = w.meaning.split(';')[0].trim();
+      const distractors = getSemanticMeaningDistractors(w, words.concat(allPoolFallback), 3);
+      const choices = [correctMeaning, ...distractors];
+      for (let i = choices.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [choices[i], choices[j]] = [choices[j], choices[i]];
+      }
+      return {
+        id: w.id,
+        word: w.word,
+        phonetic: w.phonetic || '',
+        correctMeaning,
+        options: choices
+      };
+    });
+
     _activeMiniGame = {
       skill,
       words,
-      round: 1, // 1: Bubble Snap, 2: Sentence Puzzle, 3: Completed
+      round: 1, // 1: Bubble Snap (Match), 2: Rapid Meaning ABCD, 3: Sentence Puzzle, 4: Auto-Unlock
       combo: 0,
       matchedIds: new Set(),
       selectedEn: null,
       selectedId: null,
       enCards,
       idCards,
-      // Puzzle state
+      // Round 2 state
+      rapidQuestions,
+      rapidIndex: 0,
+      rapidSelected: null,
+      rapidIsCorrect: null,
+      // Round 3 Puzzle state
       puzzleIndex: 0,
       placedTokens: []
     };
@@ -812,7 +833,46 @@
         </div>
       `;
     } else if (g.round === 2) {
-      // Round 2: Micro Sentence Puzzle
+      // Round 2: Rapid-Fire Meaning Challenge (ABCD)
+      const q = g.rapidQuestions[g.rapidIndex] || g.rapidQuestions[0];
+      stageHtml = `
+        <div class="mini-game-round round-rapid">
+          <div class="mini-game-header">
+            <span class="game-badge"><i data-lucide="sparkles"></i> Round 2: ${t('scaffold.game-round2-rapid-title', 'Tebak Arti Kilat')}</span>
+            <span class="game-combo-pill">${g.combo > 1 ? t('scaffold.game-combo', 'Kombo x' + g.combo + '! 🔥') : ''}</span>
+            <span class="game-progress-tag">${g.rapidIndex + 1}/${g.rapidQuestions.length}</span>
+          </div>
+          <p class="game-instruction">${t('scaffold.game-round2-rapid-desc', 'Pilih arti kata bahasa Inggris di bawah ini dengan cepat!')}</p>
+
+          <div class="rapid-word-card">
+            <div class="rapid-word-banner">
+              <h2 class="rapid-target-word">${esc(q.word)}</h2>
+              <button type="button" class="rapid-audio-btn" onclick="FiezelGrammarVocabBridge.playVocabAudio('${esc(q.word)}')" aria-label="Audio ${esc(q.word)}">
+                <i data-lucide="volume-2"></i>
+              </button>
+            </div>
+            ${q.phonetic ? `<div class="rapid-phonetic">${esc(q.phonetic)}</div>` : ''}
+          </div>
+
+          <div class="rapid-options-grid">
+            ${q.options.map((opt, idx) => {
+              const letter = ['A', 'B', 'C', 'D'][idx] || String(idx + 1);
+              let stateClass = '';
+              if (g.rapidSelected === opt) {
+                stateClass = g.rapidIsCorrect ? ' is-correct' : ' is-wrong';
+              }
+              return `
+                <button type="button" class="rapid-choice-btn${stateClass}" onclick="FiezelGrammarVocabBridge.handleRapidChoice('${esc(opt)}')">
+                  <span class="choice-letter">${letter}</span>
+                  <span class="choice-text">${esc(opt)}</span>
+                </button>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      `;
+    } else if (g.round === 3) {
+      // Round 3: Micro Sentence Puzzle with Grammar Clue
       const word = g.words[g.puzzleIndex] || g.words[0];
       const targetSentence = word.example || ('Please use your ' + word.word + '.');
       if (!g.cachedTokens || g.cachedWord !== word.word) {
@@ -829,16 +889,26 @@
       const tokens = g.cachedTokens;
       const shuffledTokens = g.cachedShuffledTokens;
 
+      const meta = (typeof GRAMMAR_ITEMS !== 'undefined' && Array.isArray(GRAMMAR_ITEMS))
+        ? GRAMMAR_ITEMS.find(x => x.skill === g.skill)
+        : null;
+      const grammarRuleText = meta ? (meta.title || meta.skill) : 'Pola Tata Bahasa';
+
       stageHtml = `
-        <div class="mini-game-round round-2">
+        <div class="mini-game-round round-3-puzzle">
           <div class="mini-game-header">
-            <span class="game-badge"><i data-lucide="sparkles"></i> Round 2: ${t('scaffold.game-round2-title', 'Susun Kalimat Tata Bahasa')}</span>
-            <span class="game-progress-tag">${g.puzzleIndex + 1}/${Math.min(3, g.words.length)}</span>
+            <span class="game-badge"><i data-lucide="sparkles"></i> Round 3: ${t('scaffold.game-round3-title', 'Susun Kalimat Tata Bahasa')}</span>
+            <span class="game-progress-tag">${g.puzzleIndex + 1}/${Math.min(2, g.words.length)}</span>
           </div>
-          <p class="game-instruction">${t('scaffold.game-round2-desc', 'Susun kepingan kata menjadi kalimat yang tepat!')}</p>
+          <p class="game-instruction">${t('scaffold.game-round3-desc', 'Susun kepingan kata menjadi kalimat yang tepat sesuai aturan grammar!')}</p>
+
+          <div class="puzzle-grammar-cue">
+            <i data-lucide="lightbulb"></i>
+            <span><b>${t('scaffold.fokus-tata-bahasa', 'Aturan Grammar')}:</b> ${esc(grammarRuleText)}</span>
+          </div>
 
           <div class="puzzle-clue-card">
-            <span class="clue-label">${t('scaffold.fokus-kata', 'Fokus Kata: {word} ({meaning})', { word: word.word, meaning: word.meaning })}</span>
+            <span class="clue-label">${t('scaffold.fokus-kata', 'Fokus Kata: {word} ({meaning})', { word: word.word, meaning: word.meaning.split(';')[0].trim() })}</span>
           </div>
 
           <div class="puzzle-sentence-stage" id="puzzleSentenceStage">
@@ -853,7 +923,7 @@
           </div>
 
           <div class="puzzle-bank-tiles">
-            ${shuffledTokens.map((tok, idx) => {
+            ${shuffledTokens.map(tok => {
               const usedCount = g.placedTokens.filter(t => t === tok).length;
               const totalInTokens = tokens.filter(t => t === tok).length;
               const isUsed = usedCount >= totalInTokens;
@@ -876,15 +946,15 @@
           </div>
         </div>
       `;
-    } else if (g.round === 3) {
-      // Round 3: Victory & Auto-Unlock
+    } else if (g.round === 4) {
+      // Round 4: Victory Celebration & Automatic Auto-Unlock into Grammar Practice
       stageHtml = `
-        <div class="mini-game-round round-3-unlocked">
+        <div class="mini-game-round round-4-unlocked">
           <div class="unlock-animation-box">
             <div class="unlock-trophy-ring">
-              <i data-lucide="trophy"></i>
+              <i data-lucide="sparkles"></i>
             </div>
-            <h2>${t('scaffold.game-unlocked-title', 'Luar Biasa! Kosakata Terkuasai 🎉')}</h2>
+            <h2>${t('scaffold.game-unlocked-title', 'Luar Biasa! Kosakata Terhafal Sempurna 🎉')}</h2>
             <p class="muted">${t('scaffold.game-unlocked-desc', 'Latihan soal grammar otomatis terbuka untukmu...')}</p>
 
             <div class="unlock-progress-fill">
@@ -914,13 +984,13 @@
 
     openModal(html);
 
-    if (g.round === 3) {
-      // Auto-unlock transition after 1.8 seconds
+    if (g.round === 4) {
+      // Auto-unlock transition after 1.4 seconds
       setTimeout(() => {
-        if (_activeMiniGame && _activeMiniGame.round === 3 && _activeMiniGame.skill === g.skill) {
+        if (_activeMiniGame && _activeMiniGame.round === 4 && _activeMiniGame.skill === g.skill) {
           completeMiniGameAndUnlock(g.skill);
         }
-      }, 1800);
+      }, 1400);
     }
   }
 
@@ -955,12 +1025,13 @@
           playSfx('levelup');
           setTimeout(() => {
             if (_activeMiniGame) {
-              _activeMiniGame.round = 2;
-              _activeMiniGame.puzzleIndex = 0;
-              _activeMiniGame.placedTokens = [];
+              _activeMiniGame.round = 2; // Move to Rapid Meaning Challenge
+              _activeMiniGame.rapidIndex = 0;
+              _activeMiniGame.rapidSelected = null;
+              _activeMiniGame.rapidIsCorrect = null;
               renderMiniGameModal();
             }
-          }, 600);
+          }, 500);
           return;
         }
       } else {
@@ -976,22 +1047,69 @@
     renderMiniGameModal();
   }
 
-  function addPuzzleToken(tok) {
+  function handleRapidChoice(chosen) {
     if (!_activeMiniGame || _activeMiniGame.round !== 2) return;
+    const g = _activeMiniGame;
+    const q = g.rapidQuestions[g.rapidIndex];
+    if (!q) return;
+
+    g.rapidSelected = chosen;
+    if (chosen === q.correctMeaning) {
+      g.rapidIsCorrect = true;
+      g.combo++;
+      playSfx('success');
+      triggerHaptic('medium');
+      playAudio(q.word);
+      renderMiniGameModal();
+
+      setTimeout(() => {
+        if (!_activeMiniGame || _activeMiniGame.round !== 2) return;
+        _activeMiniGame.rapidSelected = null;
+        _activeMiniGame.rapidIsCorrect = null;
+        _activeMiniGame.rapidIndex++;
+
+        if (_activeMiniGame.rapidIndex >= _activeMiniGame.rapidQuestions.length) {
+          // Advance to Round 3 (Sentence Puzzle)
+          _activeMiniGame.round = 3;
+          _activeMiniGame.puzzleIndex = 0;
+          _activeMiniGame.placedTokens = [];
+          playSfx('levelup');
+          renderMiniGameModal();
+        } else {
+          renderMiniGameModal();
+        }
+      }, 420);
+    } else {
+      g.rapidIsCorrect = false;
+      g.combo = 0;
+      playSfx('error');
+      triggerHaptic('light');
+      renderMiniGameModal();
+      setTimeout(() => {
+        if (!_activeMiniGame || _activeMiniGame.round !== 2) return;
+        _activeMiniGame.rapidSelected = null;
+        _activeMiniGame.rapidIsCorrect = null;
+        renderMiniGameModal();
+      }, 600);
+    }
+  }
+
+  function addPuzzleToken(tok) {
+    if (!_activeMiniGame || _activeMiniGame.round !== 3) return;
     _activeMiniGame.placedTokens.push(tok);
     playSfx('tap');
     renderMiniGameModal();
   }
 
   function removePuzzleToken(idx) {
-    if (!_activeMiniGame || _activeMiniGame.round !== 2) return;
+    if (!_activeMiniGame || _activeMiniGame.round !== 3) return;
     _activeMiniGame.placedTokens.splice(idx, 1);
     playSfx('tap');
     renderMiniGameModal();
   }
 
   function checkSentencePuzzle() {
-    if (!_activeMiniGame || _activeMiniGame.round !== 2) return;
+    if (!_activeMiniGame || _activeMiniGame.round !== 3) return;
     const g = _activeMiniGame;
     const word = g.words[g.puzzleIndex] || g.words[0];
     const targetSentence = word.example || ('Please use your ' + word.word + '.');
@@ -1009,8 +1127,8 @@
 
       const maxPuzzles = Math.min(2, g.words.length);
       if (g.puzzleIndex >= maxPuzzles) {
-        // Round 2 completed -> Move to Round 3 (Auto-Unlock!)
-        g.round = 3;
+        // Round 3 completed -> Move to Round 4 (Celebration & Auto-Unlock!)
+        g.round = 4;
         playSfx('levelup');
         renderMiniGameModal();
       } else {
@@ -1107,6 +1225,7 @@
     startVocabMiniGame,
     renderMiniGameModal,
     handleCardClick,
+    handleRapidChoice,
     addPuzzleToken,
     removePuzzleToken,
     checkSentencePuzzle,

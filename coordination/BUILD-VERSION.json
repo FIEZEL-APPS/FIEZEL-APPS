@@ -1,7 +1,7 @@
 {
-  "version": "m025-398",
+  "version": "m025-399",
   "claimedBy": "branch main",
-  "claimedAt": "2026-10-02T15:02:56.789Z",
-  "reason": "feat(pwa): bump build m025-398 for vocabulary mini-game and unified pedagogical cues",
+  "claimedAt": "2026-10-02T15:38:11.690Z",
+  "reason": "feat(grammar): 4-round vocab mini-game, rapid meaning ABCD, daylight palette, and auto-unlock",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

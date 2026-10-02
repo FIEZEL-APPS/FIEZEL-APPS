@@ -11225,7 +11225,7 @@ function makeVocabQuestion(v,preferType){
   };
   // m025-114: placement dasar memaksa bentuk termudah ("meaning"). Tanpa ini, satu tes
   // 25 soal bisa kebetulan berisi empat soal part-of-speech dan salah membaca level.
-  const types=['meaning','context','partOfSpeech','synonym']; let type=types.includes(preferType)?preferType:pick(types);
+  const types=['meaning','context','partOfSpeech','synonym']; let type=types.includes(preferType)?preferType:(preferType==='meaning'?preferType:pick(['meaning','context','synonym']));
   // Urutan syarat dijaga: kata tanpa sinonim gugur lebih dulu, jadi bank tidak disapu
   // untuk soal yang memang tidak akan pernah berbentuk sinonim.
   /* m025-375: kunci soal sinonim dulu SELALU v.synonyms[0] - 694 dari 1.016 kata bersinonim
@@ -11236,6 +11236,7 @@ function makeVocabQuestion(v,preferType){
   if(type==='synonym'&&(!synonymAnswer||synonymPool().length<3))type='meaning';
   if(type==='context'&&!v.example)type='meaning';
   if(type==='partOfSpeech'&&!partOfSpeechAskable(v))type='meaning';
+  if(type==='partOfSpeech')type='meaning';
   let q,options,answer;
   /* i10 2026-08-28 (O5 §3): (a) latihan vocab memimpin dengan KATA-nya — q.focus dirender
      draw() sebagai banner kata+pelafalan, jadi stem tipe meaning/context/synonym tidak lagi
@@ -11280,7 +11281,7 @@ let grammarHubListView=false;
 let pawPathWatch=null;
 function toggleGrammarHubView(){grammarHubListView=!grammarHubListView;grammar();enhanceUI()}
 window.toggleGrammarHubView=toggleGrammarHubView;
-function grammar(){if(self.FiezelGrammarVocabBridge&&typeof self.FiezelGrammarVocabBridge.checkFirstTimeIntensity==='function'){self.FiezelGrammarVocabBridge.checkFirstTimeIntensity(state);}const level=getActiveLevel(),entries=grammarItemsForLevel(level).slice().sort((a,b)=>Number(a.sequence||Number.MAX_SAFE_INTEGER)-Number(b.sequence||Number.MAX_SAFE_INTEGER)),skills=entries.map(x=>x.skill).filter((x,i,a)=>a.indexOf(x)===i);
+function grammar(){const level=getActiveLevel(),entries=grammarItemsForLevel(level).slice().sort((a,b)=>Number(a.sequence||Number.MAX_SAFE_INTEGER)-Number(b.sequence||Number.MAX_SAFE_INTEGER)),skills=entries.map(x=>x.skill).filter((x,i,a)=>a.indexOf(x)===i);
   const examEntry=levelTrustState(state).exams[level]||null;
   const bktMastered=bktMasteredSkills();
   /* m025-341: lesson yang GAGAL probe retensi kehilangan KLAIM penguasaannya di jalur ini —
@@ -11355,8 +11356,9 @@ function grammar(){if(self.FiezelGrammarVocabBridge&&typeof self.FiezelGrammarVo
   const pawPathDone=rows.filter(r=>r.completed).length;
   if(pawPathWatch&&pawPathWatch.level===level&&pawPathDone>pawPathWatch.done&&!grammarHubListView)setTimeout(()=>{pawStageState('.path-mascot fiezel-mascot','celebrating',{hold:1400})},260);
   pawPathWatch={level,done:pawPathDone};
+  if(self.FiezelGrammarVocabBridge&&typeof self.FiezelGrammarVocabBridge.checkFirstTimeIntensity==='function'){self.FiezelGrammarVocabBridge.checkFirstTimeIntensity(state);}
 }
-function openGrammarLesson(skill){const meta=GRAMMAR_ITEMS.find(x=>x.skill===skill);if(!meta||meta.level!==getActiveLevel())return showToast(FiezelI18n.t('grammar.lesson-hanya-tersedia-pada-level',{level:getActiveLevel()}));const unlock=lessonUnlockState(skill,state,bktMasteredSkills());if(unlock.locked)return showToast(lessonLockMessage(unlock));if(!(G[skill]||[]).length)return showToast(FiezelI18n.t('grammar.lesson-belum-memiliki-materi'));if(self.FiezelGrammarVocabBridge&&typeof self.FiezelGrammarVocabBridge.getVocabPrerequisiteStatus==='function'){const status=self.FiezelGrammarVocabBridge.getVocabPrerequisiteStatus(skill,state);if(status&&!status.isReady&&!state.grammar?.[skill]?.vocabReady){self.FiezelGrammarVocabBridge.openLessonPrerequisiteGate(skill);return}}enterStage('grammar-lesson',()=>renderGrammarLesson(skill));renderGrammarLesson(skill)}
+function openGrammarLesson(skill){const meta=GRAMMAR_ITEMS.find(x=>x.skill===skill);if(!meta||meta.level!==getActiveLevel())return showToast(FiezelI18n.t('grammar.lesson-hanya-tersedia-pada-level',{level:getActiveLevel()}));const unlock=lessonUnlockState(skill,state,bktMasteredSkills());if(unlock.locked)return showToast(lessonLockMessage(unlock));if(!(G[skill]||[]).length)return showToast(FiezelI18n.t('grammar.lesson-belum-memiliki-materi'));if(self.FiezelGrammarVocabBridge&&typeof self.FiezelGrammarVocabBridge.openLessonPrerequisiteGate==='function'){if(!state.grammar?.[skill]?.vocabReady){self.FiezelGrammarVocabBridge.openLessonPrerequisiteGate(skill);return}}enterStage('grammar-lesson',()=>renderGrammarLesson(skill));renderGrammarLesson(skill)}
 /* Panel "?" layar materi Grammar. Pola yang sama dengan openSkillHelp() di Skills Lab,
    dengan satu perbedaan yang penting: ia MEMBAWA SERTA levelControlMarkup(). Keterangan
    boleh dilipat, tetapi KONTROL tidak boleh hilang - "Level belajar / Ganti" adalah satu-
@@ -11755,7 +11757,7 @@ function buildGrammarSessionQuestions(skill,count=GRAMMAR_SESSION_SIZE){
   }
   return ensureConstructiveOpeningQuestion(weaveGrammarSessionVariety(out.slice(0,count),skill,meta.level,ownTemplates,reviewSkills));
 }
-function practiceSkill(skill){if((GRAMMAR_ITEMS.find(x=>x.skill===skill)?.level||'')!==getActiveLevel())return showToast(FiezelI18n.t('grammar.pilih-lesson-terlebih-dahulu',{level:getActiveLevel()}));const unlock=lessonUnlockState(skill,state,bktMasteredSkills());if(unlock.locked)return showToast(lessonLockMessage(unlock));const sessionCount=(typeof FiezelGrammarVocabBridge!=='undefined'&&FiezelGrammarVocabBridge.getIntensityGrammarCount)?FiezelGrammarVocabBridge.getIntensityGrammarCount(undefined,state):GRAMMAR_SESSION_SIZE;const questions=buildGrammarSessionQuestions(skill,sessionCount);if(questions.length<GRAMMAR_SESSION_MIN)return showToast(FiezelI18n.t('grammar.lesson-new-memiliki-item-valid',{jumlahSoal:questions.length}));quizLoop({type:'grammar',count:Math.min(GRAMMAR_SESSION_SIZE,questions.length),pool:questions,factory:item=>item,preserveOrder:true})}
+function practiceSkill(skill){if((GRAMMAR_ITEMS.find(x=>x.skill===skill)?.level||'')!==getActiveLevel())return showToast(FiezelI18n.t('grammar.pilih-lesson-terlebih-dahulu',{level:getActiveLevel()}));const unlock=lessonUnlockState(skill,state,bktMasteredSkills());if(unlock.locked)return showToast(lessonLockMessage(unlock));if(self.FiezelGrammarVocabBridge&&typeof self.FiezelGrammarVocabBridge.openLessonPrerequisiteGate==='function'){if(!state.grammar?.[skill]?.vocabReady){self.FiezelGrammarVocabBridge.openLessonPrerequisiteGate(skill);return;}}const sessionCount=(typeof FiezelGrammarVocabBridge!=='undefined'&&FiezelGrammarVocabBridge.getIntensityGrammarCount)?FiezelGrammarVocabBridge.getIntensityGrammarCount(undefined,state):GRAMMAR_SESSION_SIZE;const questions=buildGrammarSessionQuestions(skill,sessionCount);if(questions.length<GRAMMAR_SESSION_MIN)return showToast(FiezelI18n.t('grammar.lesson-new-memiliki-item-valid',{jumlahSoal:questions.length}));quizLoop({type:'grammar',count:Math.min(GRAMMAR_SESSION_SIZE,questions.length),pool:questions,factory:item=>item,preserveOrder:true})}
 /* ---- Sesi Kilat: 20 soal grammar campuran lintas lesson satu level ----------------------
  * Latihan singkat harian. Hanya lesson yang sudah terbuka di level aktif; soal dirotasi antar
  * lesson (satu per lesson per putaran) dan dibatasi ke mode BENTUK (apply/complete/repair)
