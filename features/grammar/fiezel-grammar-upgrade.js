@@ -759,134 +759,220 @@
   };
 
   /**
-   * Menghasilkan Markup HTML Dimensi Mochi:
-   * - Hyperspace Blink & Cosmic Dimension Portal
-   * - Swirling Particle Sparks
-   * - Mochi Cubes (Mochi Normal tenang, Mochi Kesalahan bingung dengan tanda tanya berputar & sweat drop)
-   * - Mystery Lock Clue (Pilihan salah vs Pilihan benar yang gemoy dan mudah dipahami)
+   * Menghasilkan Markup HTML Dimensi Mochi: "Mochi Connector" (2-Actor Focus)
+   * Hanya menampilkan 2 karakter Mochi yang saling berhubungan (Subjek Pemicu <-> Kata Kerja/Pasangan)
+   * atau 1 Mochi jika kata hilang total, bukan 5 balok rumus gramatika yang membingungkan murid.
    */
-  FiezelGrammarUpgrade.renderSuperheroLegoDrop = function(targetSentence, userSentence) {
-    const blocks = FiezelGrammarUpgrade.parseSentenceLegoBlocks(targetSentence);
-    if (!blocks || blocks.length === 0) return '';
-
+  FiezelGrammarUpgrade.renderSuperheroLegoDrop = function(targetSentence, userSentence, q) {
     const norm = (s) => String(s || '').toLowerCase().replace(/[^\w\s]/g, '').trim();
+    const cleanSent = String(targetSentence || '').replace(/[.,\/#!$%\^&\*;:{}=\-_`~()“”"']+/g, ' ').replace(/\s+/g, ' ').trim();
+    const words = cleanSent.split(' ').filter(Boolean);
+    if (words.length === 0) return '';
+
     const userWords = String(userSentence || '').split(/\s+/).map(norm).filter(Boolean);
 
-    // Cari blok mana yang bermasalah / hilang ingatan berdasarkan jawaban murid
-    let confusedRole = 'verb'; // Default ke kata kerja jika tidak terdeteksi
+    // 1. Ekstrak Subjek (Pemicu) dan Kata Kerja (Pasangan)
+    const blocks = FiezelGrammarUpgrade.parseSentenceLegoBlocks(targetSentence) || [];
+    let subjectBlock = blocks.find(b => b.role === 'subject');
+    let verbBlock = blocks.find(b => b.role === 'verb');
+
+    // Fallback cerdas jika parseSentenceLegoBlocks tidak menemukan subject/verb
+    if (!subjectBlock) {
+      subjectBlock = {
+        role: 'subject',
+        label: 'Subjek',
+        color: 'subject-blue',
+        text: words[0] || 'Subjek'
+      };
+    }
+    if (!verbBlock) {
+      verbBlock = {
+        role: 'verb',
+        label: 'Pasangannya',
+        color: 'verb-emerald',
+        text: words[1] || 'Kata Kerja'
+      };
+    }
+
+    // Deteksi bentuk salah yang dipilih murid
+    let userWrongWord = '';
+    const verbWords = verbBlock.text.split(/\s+/).map(norm);
     if (userWords.length > 0) {
-      for (const b of blocks) {
-        const blockWords = b.text.split(/\s+/).map(norm);
-        const hasMatch = blockWords.some(bw => userWords.includes(bw));
-        if (!hasMatch) {
-          confusedRole = b.role;
+      // Cari kata di userWords yang mirip tapi bukan kata yang benar
+      for (const uw of userWords) {
+        if (!verbWords.includes(uw) && (uw.startsWith(verbWords[0]?.slice(0, 3)) || verbWords[0]?.startsWith(uw.slice(0, 3)))) {
+          userWrongWord = uw;
           break;
+        }
+      }
+      if (!userWrongWord) {
+        // Cek distractor dari q jika ada
+        const distractors = q?.explain?.distractors || [];
+        for (const d of distractors) {
+          if (userWords.includes(norm(d.option))) {
+            userWrongWord = d.option;
+            break;
+          }
         }
       }
     }
 
-    // Bangun 14 partikel magis yang berkumpul
+    if (!userWrongWord && userWords.length > 0) {
+      // Fallback deteksi kata yang tidak ada di target
+      const targetNormWords = words.map(norm);
+      const extraWord = userWords.find(uw => !targetNormWords.includes(uw));
+      if (extraWord) userWrongWord = extraWord;
+    }
+
+    // 2. Bangun Label & Alasan Edukatif yang Ramah Murid
+    let subjectBadge = 'Subjek';
+    let verbBadge = 'Pasangannya';
+    const subTextLower = subjectBlock.text.toLowerCase();
+
+    // Deteksi orang tunggal vs jamak
+    const isSingleThirdPerson = /^(he|she|it|my brother|my sister|my mother|my father|the boy|the girl|john|budi|siti|ani|rudi)\b/i.test(subTextLower);
+    const isPluralOrFirst = /^(i|you|they|we|my brothers|my sisters|the boys|the girls|people|students)\b/i.test(subTextLower);
+
+    if (isSingleThirdPerson) {
+      subjectBadge = 'Subjek (1 Orang)';
+      verbBadge = 'Wajib (+s / -es)';
+    } else if (isPluralOrFirst) {
+      subjectBadge = 'Subjek (Banyak / I / You)';
+      verbBadge = 'Bentuk Asli (Tanpa -s)';
+    }
+
+    // Penjelasan interaktif ringkas 1-2 kalimat
+    let simpleExplanation = '';
+    if (q?.explain?.why) {
+      simpleExplanation = q.explain.why;
+    } else if (isSingleThirdPerson) {
+      simpleExplanation = `Karena temannya cuma 1 orang (${subjectBlock.text}), kata kerjanya wajib berpasangan dengan akhiran -s (${verbBlock.text})!`;
+    } else {
+      simpleExplanation = `Pasangan untuk "${subjectBlock.text}" adalah "${verbBlock.text}". Ayo satukan mereka!`;
+    }
+
+    // 3. Bangun 14 partikel magis yang berkumpul
     const particlesHtml = Array.from({ length: 14 }).map((_, i) => {
       const angle = (i / 14) * 360;
       const delay = (i * 45) % 400;
       return `<span class="mochi-spark-particle" style="--p-angle: ${angle}deg; --p-delay: ${delay}ms;"></span>`;
     }).join('');
 
-    let confusedBlockInfo = null;
-
-    const blocksHtml = blocks.map((b, idx) => {
-      const isConfused = b.role === confusedRole;
-      if (isConfused) confusedBlockInfo = b;
-
-      const dropDelayMs = 280 + idx * 110;
-      const textRevealDelayMs = dropDelayMs + 360;
-      
-      return `
-        <div class="mochi-bot-cube-wrapper${isConfused ? ' is-confused-target' : ''}" style="animation-delay: ${dropDelayMs}ms;">
-          <!-- Floating question bubble di luar kubus -->
-          <div class="mochi-floating-qmark${isConfused ? ' spinning-mystery-qmark' : ''}" style="animation-delay: ${dropDelayMs + 400}ms;">
-            <span>${isConfused ? '?' : '?'}</span>
-            ${isConfused ? '<span class="qmark-ping-ring"></span>' : ''}
-          </div>
-
-          <!-- Sweat drop / Keringat dingin jika sedang bingung -->
-          ${isConfused ? '<div class="mochi-sweat-drop" aria-hidden="true">💧</div>' : ''}
-
-          <!-- Badan Kubus Mochi (Squishy Bot) -->
-          <div class="mochi-bot-cube mochi-skin-${b.color}${isConfused ? ' mochi-confused-body' : ''}" data-role="${b.role}">
-            <!-- Kawaii anime sparkling eyes & blushing cheeks -->
-            <div class="mochi-face-container">
-              <span class="mochi-cheek left"></span>
-              <div class="mochi-face-eyes${isConfused ? ' eyes-confused' : ''}">
-                <div class="mochi-eye left">
-                  <span class="glint-main"></span>
-                  <span class="glint-sub"></span>
-                </div>
-                <div class="mochi-eye right">
-                  <span class="glint-main"></span>
-                  <span class="glint-sub"></span>
-                </div>
-              </div>
-              <span class="mochi-cheek right"></span>
-            </div>
-
-            <!-- Teks peran yang muncul mekar saat mendarat di perut mochi -->
-            <div class="mochi-role-badge" style="animation-delay: ${textRevealDelayMs}ms;">
-              <span class="mochi-role-text">${b.label}</span>
-            </div>
-
-            <!-- Kata kalimat bahasa Inggris di badan mochi -->
-            <div class="mochi-word-content" style="animation-delay: ${textRevealDelayMs + 80}ms;">
-              <span class="mochi-word-text">${b.text}</span>
-            </div>
-
-            <!-- Kilau lembut 3D mochi jelly -->
-            <div class="mochi-gloss-specular"></div>
-          </div>
-        </div>
-      `;
-    }).join(`
-      <div class="mochi-cube-connector" style="animation-delay: 380ms;">
-        <i data-lucide="arrow-right"></i>
-      </div>
-    `);
-
-    // Clue gembok mini yang sangat sederhana & ramah anak
-    const mysteryClueHtml = confusedBlockInfo ? `
-      <div class="mochi-mystery-lock-clue">
-        <div class="mystery-lock-header">
-          <span class="mystery-pulse-dot"></span>
-          <span class="mystery-clue-label">KUNCI TEKA-TEKI MOCHI ${confusedBlockInfo.label.toUpperCase()}</span>
-        </div>
-        <p class="mystery-clue-bubble">
-          💡 <strong>Lihat balok yang berkedip!</strong> Pastikan urutan dan bentuk kata pada bagian <strong>"${confusedBlockInfo.text}"</strong> sudah tepat dengan subjek kalimatnya ya!
-        </p>
-      </div>
-    ` : '';
-
     return `
-      <!-- Flash Kedip Seluruh Layar (Hyperspace Blink Effect) -->
-      <div class="mochi-dimension-flash" aria-hidden="true"></div>
+      <!-- Layar Penuh Dimensi Mochi (Cinematic Fullscreen Mochi Connector) -->
+      <div id="quizSuperheroLegoDrop" class="mochi-fullscreen-dimension" role="dialog" aria-modal="true" aria-label="Dimensi Pasangan Mochi">
+        <!-- Flash Kedip Seluruh Layar (Hyperspace Blink Effect) -->
+        <div class="mochi-dimension-flash" aria-hidden="true"></div>
 
-      <!-- Stage Dimensi Mochi -->
-      <div id="quizSuperheroLegoDrop" class="quiz-superhero-lego-wrapper mochi-bot-stage mochi-dimension-portal" role="region" aria-label="Dimensi Mochi">
-        <!-- Partikel Pendaran Dimensi Splash FIEZEL -->
+        <!-- Partikel Pendaran Menari Lembut -->
         <div class="mochi-portal-particles" aria-hidden="true">
           ${particlesHtml}
         </div>
 
-        <div class="lego-superhero-header">
-          <div class="lego-superhero-title">
-            <span class="superhero-hero-badge"><i data-lucide="sparkles"></i> DIMENSI TEKA-TEKI MOCHI</span>
-            <span class="superhero-hero-subtitle">Bantu Mochi menemukan bagian cerita yang pas:</span>
+        <!-- Tombol Tutup Bebas di Kanan Atas Viewport -->
+        <button type="button" class="mochi-floating-close-btn" onclick="document.getElementById('quizSuperheroLegoDrop')?.remove();" aria-label="${FiezelI18n.t('quiz.tutup-dimensi', 'Tutup Dimensi')}">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+
+        <!-- Konten Dimensi Mochi Bebas (Tanpa Kartu Panel) -->
+        <div class="mochi-dimension-content">
+          <!-- Header Judul Mengambang Bersih -->
+          <div class="mochi-floating-title">
+            <span class="superhero-hero-badge"><i data-lucide="sparkles"></i> DIMENSI PASANGAN MOCHI</span>
+            <span class="superhero-hero-subtitle">Dua Mochi ini harus selalu berpasangan:</span>
+          </div>
+
+          <!-- Panggung Duet Mochi: Subjek Pemicu <--> Pasangan Target -->
+          <div class="mochi-connector-duet">
+            <!-- Mochi 1: Subjek / Pemicu (Biru) -->
+            <div class="mochi-bot-cube-wrapper mochi-actor-left" style="animation-delay: 240ms;">
+              <div class="mochi-bot-cube mochi-skin-subject-blue">
+                <div class="mochi-face-container">
+                  <span class="mochi-cheek left"></span>
+                  <div class="mochi-face-eyes">
+                    <div class="mochi-eye left"><span class="glint-main"></span><span class="glint-sub"></span></div>
+                    <div class="mochi-eye right"><span class="glint-main"></span><span class="glint-sub"></span></div>
+                  </div>
+                  <span class="mochi-cheek right"></span>
+                </div>
+                <div class="mochi-role-badge">
+                  <span class="mochi-role-text">${subjectBadge}</span>
+                </div>
+                <div class="mochi-word-content">
+                  <span class="mochi-word-text">${subjectBlock.text}</span>
+                </div>
+                <div class="mochi-gloss-specular"></div>
+              </div>
+            </div>
+
+            <!-- Kilau Medan Magnet / Ikatan Listrik Mochi -->
+            <div class="mochi-magnetic-spark" aria-hidden="true">
+              <span class="spark-line"></span>
+              <div class="spark-heart">✨</div>
+              <span class="spark-line"></span>
+            </div>
+
+            <!-- Mochi 2: Target / Pasangan Benar (Hijau Berpendar) -->
+            <div class="mochi-bot-cube-wrapper mochi-actor-right is-confused-target" style="animation-delay: 360ms;">
+              <!-- Floating QMark Gemoy -->
+              <div class="mochi-floating-qmark spinning-mystery-qmark">
+                <span>?</span>
+                <span class="qmark-ping-ring"></span>
+              </div>
+              <div class="mochi-sweat-drop" aria-hidden="true">💧</div>
+
+              <div class="mochi-bot-cube mochi-skin-verb-emerald mochi-confused-body">
+                <div class="mochi-face-container">
+                  <span class="mochi-cheek left"></span>
+                  <div class="mochi-face-eyes eyes-confused">
+                    <div class="mochi-eye left"><span class="glint-main"></span><span class="glint-sub"></span></div>
+                    <div class="mochi-eye right"><span class="glint-main"></span><span class="glint-sub"></span></div>
+                  </div>
+                  <span class="mochi-cheek right"></span>
+                </div>
+                <div class="mochi-role-badge">
+                  <span class="mochi-role-text">${verbBadge}</span>
+                </div>
+                <div class="mochi-word-content">
+                  <span class="mochi-word-text">${verbBlock.text}</span>
+                </div>
+                <div class="mochi-gloss-specular"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Perbandingan Langsung: Jawaban Salah vs Pasangan Benar -->
+          ${userWrongWord ? `
+            <div class="mochi-mini-contrast-pills">
+              <span class="pill-wrong">
+                <i data-lucide="x-circle"></i> Tadi dipilih: <b>${userWrongWord}</b>
+              </span>
+              <span class="pill-arrow">➔</span>
+              <span class="pill-correct">
+                <i data-lucide="check-circle-2"></i> Pasangannya: <b>${verbBlock.text}</b>
+              </span>
+            </div>
+          ` : ''}
+
+          <!-- Balon Penjelasan Mochi: Ramah & Langsung ke Inti -->
+          <div class="mochi-mystery-lock-clue">
+            <div class="mystery-lock-header">
+              <span class="mystery-pulse-dot"></span>
+              <span class="mystery-clue-label">KUNCI PASANGAN MOCHI</span>
+            </div>
+            <p class="mystery-clue-bubble">
+              💡 ${simpleExplanation}
+            </p>
+          </div>
+
+          <!-- Tombol Aksi Coba Lagi -->
+          <div class="mochi-action-row">
+            <button type="button" class="mochi-try-again-btn" onclick="document.getElementById('quizSuperheroLegoDrop')?.remove();">
+              <span>${FiezelI18n.t('quiz.aku-paham-pasangkan-sekarang', 'Aku Paham, Pasangkan Sekarang!')}</span>
+              <i data-lucide="arrow-right"></i>
+            </button>
           </div>
         </div>
-
-        <div class="lego-blocks-carousel mochi-carousel">
-          ${blocksHtml}
-        </div>
-
-        ${mysteryClueHtml}
       </div>
     `;
   };

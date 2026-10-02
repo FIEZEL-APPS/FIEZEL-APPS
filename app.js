@@ -5022,17 +5022,18 @@ function tutorIndonesian(text){
  */
 function diagnoseTokenOrderMistake(q){
   if(!q||q.type!=='token-order')return '';
-  const placed=Array.isArray(q.__placedTokens)?q.__placedTokens:[];
-  const unplaced=Array.isArray(q.__unplacedTokens)?q.__unplacedTokens:[];
-  const distractors=Array.isArray(q.distractors)?q.distractors:[];
-  const requiredTokens=Array.isArray(q.tokens)?q.tokens:[];
-  const normWord=w=>String(w||'').toLowerCase().replace(/^[^\w\s]+|[^\w\s]+$/g,'').trim();
+  const toText = t => typeof t === 'object' && t !== null && t.text ? String(t.text) : String(t || '');
+  const placed = (Array.isArray(q.__placedTokens) ? q.__placedTokens : []).map(toText);
+  const unplaced = (Array.isArray(q.__unplacedTokens) ? q.__unplacedTokens : []).map(toText);
+  const distractors = (Array.isArray(q.distractors) ? q.distractors : []).map(toText);
+  const requiredTokens = (Array.isArray(q.tokens) ? q.tokens : []).map(toText);
+  const normWord = w => String(w||'').toLowerCase().replace(/^[^\w\s]+|[^\w\s]+$/g,'').trim();
 
   // Kasus 2: Memilih Token Pengecoh (Distractor / Typo / Morfologi)
-  const chosenDistractor=placed.find(t=>distractors.some(d=>normWord(d)===normWord(t)));
+  const chosenDistractor = placed.find(t => distractors.some(d => normWord(d) === normWord(t)));
   if(chosenDistractor){
-    const distInfo=(q.explain?.distractors||[]).find(d=>normWord(d.option)===normWord(chosenDistractor));
-    let reason=String(distInfo?.whyFailsId||distInfo?.whyFails||distInfo?.reason||'').trim();
+    const distInfo = (q.explain?.distractors||[]).find(d => normWord(d.option) === normWord(chosenDistractor));
+    let reason = String(distInfo?.whyFailsId || distInfo?.whyFails || distInfo?.reason || '').trim();
     if(reason){
       if(/^kata\s+/i.test(reason)){
         return reason;
@@ -5043,22 +5044,22 @@ function diagnoseTokenOrderMistake(q){
   }
 
   // Kasus 1: Token Belum Lengkap (Incomplete)
-  const placedCopy=placed.map(normWord);
-  const missingRequired=[];
+  const placedCopy = placed.map(normWord);
+  const missingRequired = [];
   for(const req of requiredTokens){
-    const rNorm=normWord(req);
-    const idx=placedCopy.indexOf(rNorm);
-    if(idx>=0){
-      placedCopy.splice(idx,1);
+    const rNorm = normWord(req);
+    const idx = placedCopy.indexOf(rNorm);
+    if(idx >= 0){
+      placedCopy.splice(idx, 1);
     }else{
       missingRequired.push(req);
     }
   }
 
-  if(unplaced.length>0&&(missingRequired.length>0||placed.length<requiredTokens.length)){
-    const missingList=missingRequired.length>0
+  if(unplaced.length > 0 && (missingRequired.length > 0 || placed.length < requiredTokens.length)){
+    const missingList = missingRequired.length > 0
       ? missingRequired.join(', ')
-      : unplaced.filter(u=>!distractors.some(d=>normWord(d)===normWord(u))).join(', ');
+      : unplaced.filter(u => !distractors.some(d => normWord(d) === normWord(u))).join(', ');
     if(missingList){
       return `Kalimatmu belum selesai disusun. Masih ada kata yang belum dimasukkan: ${missingList}.`;
     }
@@ -5066,8 +5067,8 @@ function diagnoseTokenOrderMistake(q){
   }
 
   // Kasus 3: Salah Urutan Kata (Word-Order Inversion)
-  const correctSentence=(q.options&&q.options[q.answerIndex])||requiredTokens.join(' ');
-  const patternHint=q.explain?.rule?` Perhatikan pola: ${q.explain.rule}`:` Perhatikan susunan kalimat yang tepat.`;
+  const correctSentence = (q.options && q.options[q.answerIndex]) || requiredTokens.join(' ');
+  const patternHint = q.explain?.rule ? ` Perhatikan pola: ${q.explain.rule}` : ` Perhatikan susunan kalimat yang tepat.`;
   return `Urutan kata belum tepat.${patternHint}`;
 }
 
@@ -13493,13 +13494,11 @@ function quizLoop(cfg){
        const correctSent=(q.type==='token-order'&&(q.tokens||[]).length>0)
          ? q.tokens.map(t=>typeof t==='object'&&t.text?t.text:String(t)).join(' ')
          : (q.options&&q.options[q.answerIndex]?q.options[q.answerIndex]:(q.question||''));
-       const legoHtml=self.FiezelGrammarUpgrade.renderSuperheroLegoDrop(correctSent,q.__userTokenAnswer||'');
+        const userSent = q.__userTokenAnswer || (q.options && typeof j === 'number' && q.options[j] ? q.options[j] : '');
+        const legoHtml=self.FiezelGrammarUpgrade.renderSuperheroLegoDrop(correctSent,userSent,q);
        if(legoHtml){
-         const stemEl=quizStem||document.querySelector('.quiz-top');
-         if(stemEl){
-           stemEl.insertAdjacentHTML('afterend',legoHtml);
-           if(window.lucide&&typeof window.lucide.createIcons==='function')window.lucide.createIcons();
-         }
+         document.body.insertAdjacentHTML('beforeend',legoHtml);
+         if(window.lucide&&typeof window.lucide.createIcons==='function')window.lucide.createIcons();
        }
      }
    }catch(_){}

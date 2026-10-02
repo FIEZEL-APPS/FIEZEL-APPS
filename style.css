@@ -9392,12 +9392,17 @@ body:not(.theme-dark):not(.fz-lux) .tutor-stuck:hover {
 .lego-superhero-header {
   margin-bottom: 6px;
   padding: 0 4px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 .lego-superhero-title {
   display: flex;
   flex-direction: column;
   gap: 3px;
+  flex: 1;
 }
 
 .superhero-hero-badge {
@@ -9418,50 +9423,41 @@ body:not(.theme-dark):not(.fz-lux) .tutor-stuck:hover {
   line-height: 1.35;
 }
 
+.mochi-free-stage,
 .mochi-carousel {
   display: flex;
   align-items: center;
-  gap: 12px;
-  overflow-x: auto;
-  padding: 18px 6px 14px;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 215, 0, 0.3) transparent;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 16px 14px;
+  overflow: visible;
+  padding: 12px 0 20px;
+  width: 100%;
 }
 
-.mochi-carousel::-webkit-scrollbar {
-  height: 6px;
-}
-.mochi-carousel::-webkit-scrollbar-thumb {
-  background: rgba(255, 215, 0, 0.3);
-  border-radius: 999px;
-}
-
-/* Wrapper tiap kubus mochi */
+/* Wrapper tiap kubus mochi (Ukuran Lebih Mungil & Compact) */
 .mochi-bot-cube-wrapper {
   flex-shrink: 0;
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  animation: mochiDropSquash 750ms cubic-bezier(0.28, 1.45, 0.58, 1) both;
+  animation: mochiDropGentle 850ms cubic-bezier(0.16, 1, 0.3, 1) both;
   transform-origin: bottom center;
 }
 
-/* Fisika Jatuh: Stretch di udara ➔ Squash membal saat mendarat (Grok bot style) */
-@keyframes mochiDropSquash {
+/* Fisika Jatuh: Gerakan Sangat Lembut & Halus Sutra (Ultra-Smooth Spring) */
+@keyframes mochiDropGentle {
   0% {
     opacity: 0;
-    transform: translateY(-55px) scale(0.8, 1.3);
+    transform: translateY(-40px) scale(0.9, 1.15);
   }
-  50% {
+  60% {
     opacity: 1;
-    transform: translateY(0px) scale(1.3, 0.72);
+    transform: translateY(0px) scale(1.08, 0.94);
   }
-  70% {
-    transform: translateY(-8px) scale(0.92, 1.1);
-  }
-  85% {
-    transform: translateY(2px) scale(1.05, 0.95);
+  80% {
+    transform: translateY(-4px) scale(0.98, 1.02);
   }
   100% {
     opacity: 1;
@@ -9469,65 +9465,47 @@ body:not(.theme-dark):not(.fz-lux) .tutor-stuck:hover {
   }
 }
 
-/* Balon Tanda Tanya Melayang di Luar Badan Kubus */
+/* Balon Tanda Tanya Melayang Lembut di Luar Badan Kubus */
 .mochi-floating-qmark {
   position: absolute;
-  top: -12px;
-  right: -5px;
-  width: 24px;
-  height: 24px;
+  top: -10px;
+  right: -4px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   background: #FFFBEB;
-  border: 2px solid #F59E0B;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35), 0 0 12px rgba(245, 158, 11, 0.5);
+  border: 1.5px solid #F59E0B;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25), 0 0 10px rgba(245, 158, 11, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 10;
-  animation: qmarkPopFloat 2.6s infinite ease-in-out both;
+  animation: qmarkGentleFloat 3.2s infinite ease-in-out both;
   transform-origin: center bottom;
 }
 
 .mochi-floating-qmark span {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 800;
   color: #B45309;
   line-height: 1;
 }
 
-@keyframes qmarkPopFloat {
-  0% {
-    transform: scale(0) translateY(0);
-    opacity: 0;
+@keyframes qmarkGentleFloat {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
   }
-  20% {
-    transform: scale(1.2) translateY(-4px);
-    opacity: 1;
-  }
-  35% {
-    transform: scale(1) translateY(0);
-    opacity: 1;
-  }
-  55% {
-    transform: scale(1.08) translateY(-5px) rotate(6deg);
-    opacity: 1;
-  }
-  75% {
-    transform: scale(0.96) translateY(-2px) rotate(-4deg);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1) translateY(0) rotate(0deg);
-    opacity: 1;
+  50% {
+    transform: translateY(-4px) rotate(6deg);
   }
 }
 
-/* Badan Kubus Mochi 3D */
+/* Badan Kubus Mochi 3D - Ukuran Responsif yang Pas di Layar HP Tanpa Scroll */
 .mochi-bot-cube {
-  width: 118px;
-  min-height: 104px;
-  border-radius: 22px;
-  padding: 12px 10px 14px;
+  width: 86px;
+  min-height: 80px;
+  border-radius: 17px;
+  padding: 7px 6px 9px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -9535,13 +9513,13 @@ body:not(.theme-dark):not(.fz-lux) .tutor-stuck:hover {
   justify-content: flex-start;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4), inset 0 2.5px 4px rgba(255, 255, 255, 0.45), inset 0 -4px 8px rgba(0, 0, 0, 0.25);
-  border: 2px solid transparent;
-  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.35), inset 0 2px 3.5px rgba(255, 255, 255, 0.4), inset 0 -3px 6px rgba(0, 0, 0, 0.2);
+  border: 1.5px solid transparent;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .mochi-bot-cube:hover {
-  transform: translateY(-4px) scale(1.05);
+  transform: translateY(-3px) scale(1.03);
 }
 
 /* Warna-Warna Kubus Mochi (Bentuk Sama, Kulit Berbeda) */
@@ -9574,14 +9552,14 @@ body:not(.theme-dark):not(.fz-lux) .tutor-stuck:hover {
   color: #4C0519;
 }
 
-/* Wajah Karakter Mochi Kawaii (Mata Besar Berbinar & Pipi Merona) */
+/* Wajah Karakter Mochi Kawaii (Mata Mungil Berbinar & Pipi Merona) */
 .mochi-face-container {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
   margin-top: 2px;
-  margin-bottom: 5px;
+  margin-bottom: 4px;
   position: relative;
   width: 100%;
 }
@@ -9590,53 +9568,53 @@ body:not(.theme-dark):not(.fz-lux) .tutor-stuck:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 16px;
+  gap: 12px;
 }
 
-/* Mata Besar Menggemaskan Kawaii */
+/* Mata Menggemaskan Kawaii */
 .mochi-eye {
-  width: 17px;
-  height: 22px;
+  width: 13px;
+  height: 18px;
   border-radius: 50% 50% 46% 46% / 60% 60% 40% 40%;
   background: radial-gradient(circle at 50% 70%, #1E1B4B 0%, #0F172A 70%, #020617 100%);
   position: relative;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.45);
-  animation: mochiKawaiiBlink 4.2s infinite ease-in-out;
+  box-shadow: 0 1.5px 3.5px rgba(0, 0, 0, 0.35);
+  animation: mochiKawaiiBlink 4.5s infinite ease-in-out;
   display: inline-block;
   overflow: hidden;
 }
 
-/* Kilauan Utama di Mata (Besar & Berbinar) */
+/* Kilauan Utama di Mata (Bening & Bersih) */
 .mochi-eye .glint-main {
   position: absolute;
-  top: 2.5px;
-  left: 2.5px;
-  width: 7.5px;
-  height: 8.5px;
+  top: 2px;
+  left: 2px;
+  width: 5.5px;
+  height: 6.5px;
   border-radius: 50%;
   background: #FFFFFF;
-  box-shadow: 0 0 3px rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 2px rgba(255, 255, 255, 0.8);
 }
 
-/* Kilauan Kedua di Bawah (Efek Mata Basah Anime) */
+/* Kilauan Kedua di Bawah */
 .mochi-eye .glint-sub {
   position: absolute;
-  bottom: 3.5px;
-  right: 2.5px;
-  width: 4px;
-  height: 4px;
+  bottom: 2.5px;
+  right: 2px;
+  width: 3px;
+  height: 3px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.85);
 }
 
 /* Pipi Merona Merah Muda (Kawaii Blush) */
 .mochi-cheek {
-  width: 12px;
-  height: 6px;
+  width: 9px;
+  height: 5px;
   border-radius: 50%;
   background: rgba(255, 75, 120, 0.55);
-  filter: blur(1px);
-  margin-top: 8px;
+  filter: blur(0.8px);
+  margin-top: 6px;
 }
 
 @keyframes mochiKawaiiBlink {
@@ -9650,30 +9628,28 @@ body:not(.theme-dark):not(.fz-lux) .tutor-stuck:hover {
 
 /* Teks Peran yang Muncul Mekar di Badan Mochi */
 .mochi-role-badge {
-  background: rgba(255, 255, 255, 0.92);
-  border-radius: 8px;
-  padding: 2px 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-  animation: mochiTextBloom 450ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
-  margin-top: 4px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 6px;
+  padding: 1.5px 6px;
+  box-shadow: 0 1.5px 4px rgba(0, 0, 0, 0.12);
+  animation: mochiTextBloomGentle 500ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  margin-top: 2px;
 }
 
 .mochi-role-text {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: #0F172A;
   display: block;
+  line-height: 1.2;
 }
 
-@keyframes mochiTextBloom {
+@keyframes mochiTextBloomGentle {
   0% {
     opacity: 0;
-    transform: scale(0.4);
-  }
-  75% {
-    transform: scale(1.15);
+    transform: scale(0.6);
   }
   100% {
     opacity: 1;
@@ -9683,26 +9659,26 @@ body:not(.theme-dark):not(.fz-lux) .tutor-stuck:hover {
 
 /* Teks Kata Bahasa Inggris di Bawah Peran */
 .mochi-word-content {
-  margin-top: 4px;
+  margin-top: 3px;
   text-align: center;
   width: 100%;
-  animation: mochiWordSlideUp 400ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation: mochiWordSlideGentle 450ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .mochi-word-text {
-  font-size: 13.5px;
+  font-size: 12px;
   font-weight: 800;
-  line-height: 1.25;
+  line-height: 1.2;
   color: #FFFFFF;
-  text-shadow: 0 1.5px 3px rgba(0, 0, 0, 0.45);
+  text-shadow: 0 1px 2.5px rgba(0, 0, 0, 0.4);
   display: block;
   word-break: break-word;
 }
 
-@keyframes mochiWordSlideUp {
+@keyframes mochiWordSlideGentle {
   0% {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(5px);
   }
   100% {
     opacity: 1;
@@ -9713,10 +9689,10 @@ body:not(.theme-dark):not(.fz-lux) .tutor-stuck:hover {
 /* Kilau 3D Lembut */
 .mochi-gloss-specular {
   position: absolute;
-  top: 3px;
-  left: 12px;
-  width: 32px;
-  height: 10px;
+  top: 2.5px;
+  left: 9px;
+  width: 24px;
+  height: 8px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.45);
   filter: blur(1px);
@@ -9734,8 +9710,8 @@ body:not(.theme-dark):not(.fz-lux) .tutor-stuck:hover {
 }
 
 .mochi-cube-connector svg {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
 }
 
 @keyframes mochiConnectorPop {
@@ -9744,201 +9720,376 @@ body:not(.theme-dark):not(.fz-lux) .tutor-stuck:hover {
 }
 
 /* ==========================================================================
-   MOCHI DIMENSION SHIFT: FLASH, PARTICLES, CONFUSED MOCHI & MYSTERY CLUE
+   MOCHI FULLSCREEN IMMERSIVE DIMENSION (SANGAT LEMBUT & CINEMATIC)
    ========================================================================== */
 
-/* 1. Flash Kedip Seluruh Layar (Hyperspace Blink Effect) */
-.mochi-dimension-flash {
+/* 1. Layar Penuh Dimensi Kosmik */
+.mochi-fullscreen-dimension {
   position: fixed;
   inset: 0;
-  background: radial-gradient(circle at center, rgba(147, 51, 234, 0.45) 0%, rgba(59, 130, 246, 0.3) 50%, rgba(15, 23, 42, 0.95) 100%);
-  z-index: 80;
-  pointer-events: none;
-  animation: mochiDimensionFlash 650ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: radial-gradient(circle at center, rgba(23, 20, 48, 0.94) 0%, rgba(11, 14, 28, 0.98) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  animation: mochiDimFadeIn 500ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-@keyframes mochiDimensionFlash {
+@keyframes mochiDimFadeIn {
   0% {
     opacity: 0;
-    transform: scale(1.1);
-  }
-  25% {
-    opacity: 0.95;
-    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.9) 0%, rgba(168, 85, 247, 0.6) 50%, rgba(15, 23, 42, 0.95) 100%);
-  }
-  50% {
-    opacity: 0.6;
+    transform: scale(0.97);
   }
   100% {
-    opacity: 0;
+    opacity: 1;
     transform: scale(1);
-    visibility: hidden;
   }
 }
 
-/* 2. Portal Cosmic Mochi Stage */
-.mochi-dimension-portal {
-  background: linear-gradient(155deg, rgba(22, 19, 44, 0.98) 0%, rgba(13, 17, 38, 0.98) 100%) !important;
-  border: 1.5px solid rgba(168, 85, 247, 0.45) !important;
-  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.65), 0 0 32px rgba(168, 85, 247, 0.22) !important;
-  position: relative;
-  overflow: hidden;
+/* 2. Flash Lembut (Soft Cosmic Radiance) */
+.mochi-dimension-flash {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.75) 0%, rgba(168, 85, 247, 0.4) 45%, rgba(15, 23, 42, 0) 80%);
+  z-index: 1;
+  pointer-events: none;
+  animation: mochiSoftFlash 700ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Partikel Pendaran Menari (Swirling Splash Particles) */
+@keyframes mochiSoftFlash {
+  0% { opacity: 0; transform: scale(0.85); }
+  30% { opacity: 0.85; transform: scale(1.05); }
+  100% { opacity: 0; transform: scale(1); visibility: hidden; }
+}
+
+/* 3. Tampilan Mochi Mengambang Bebas Langsung di Layar (Tanpa Kartu Panel) */
+.mochi-dimension-content {
+  width: 100%;
+  max-width: 480px;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 16px;
+  position: relative;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  animation: portalCardFloatIn 650ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes portalCardFloatIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Tombol Tutup Mengambang Bebas di Pojok Kanan Atas Viewport */
+.mochi-floating-close-btn {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #E2E8F0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  backdrop-filter: blur(8px);
+  transition: all 0.2s ease;
+}
+
+.mochi-floating-close-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  color: #FFFFFF;
+  transform: scale(1.08);
+}
+
+.mochi-floating-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+
+/* Partikel Pendaran Menari Sangat Lembut */
 .mochi-portal-particles {
   position: absolute;
   inset: 0;
   pointer-events: none;
   overflow: hidden;
-  z-index: 1;
+  z-index: 2;
 }
 
 .mochi-spark-particle {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 5px;
-  height: 5px;
+  width: 4px;
+  height: 4px;
   border-radius: 50%;
   background: #FDE047;
-  box-shadow: 0 0 8px #FDE047, 0 0 14px #C084FC;
+  box-shadow: 0 0 6px #FDE047, 0 0 12px #C084FC;
   opacity: 0;
-  animation: mochiParticleSwirl 1.4s ease-out forwards;
+  animation: mochiParticleSwirlGentle 1.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   animation-delay: var(--p-delay, 0ms);
 }
 
-@keyframes mochiParticleSwirl {
+@keyframes mochiParticleSwirlGentle {
   0% {
     opacity: 0;
-    transform: rotate(var(--p-angle, 0deg)) translateY(120px) scale(0);
+    transform: rotate(var(--p-angle, 0deg)) translateY(100px) scale(0);
   }
-  30% {
-    opacity: 1;
-    transform: rotate(calc(var(--p-angle, 0deg) + 60deg)) translateY(40px) scale(1.4);
+  35% {
+    opacity: 0.9;
+    transform: rotate(calc(var(--p-angle, 0deg) + 45deg)) translateY(30px) scale(1.2);
   }
   80% {
-    opacity: 0.8;
-    transform: rotate(calc(var(--p-angle, 0deg) + 120deg)) translateY(10px) scale(0.9);
+    opacity: 0.6;
+    transform: rotate(calc(var(--p-angle, 0deg) + 90deg)) translateY(8px) scale(0.85);
   }
   100% {
     opacity: 0;
-    transform: rotate(calc(var(--p-angle, 0deg) + 180deg)) translateY(0px) scale(0);
+    transform: rotate(calc(var(--p-angle, 0deg) + 130deg)) translateY(0px) scale(0);
   }
 }
 
-/* 3. Mochi yang Bingung (Target Kesalahan) */
+/* Mochi Bingung Bergetar Halus */
 .mochi-bot-cube-wrapper.is-confused-target {
-  animation: mochiDropSquash 750ms cubic-bezier(0.28, 1.45, 0.58, 1) both, mochiWobbleConfused 2.4s infinite ease-in-out 1s;
+  animation: mochiDropGentle 850ms cubic-bezier(0.16, 1, 0.3, 1) both, mochiGentleTilt 3s infinite ease-in-out 1s;
 }
 
-@keyframes mochiWobbleConfused {
+@keyframes mochiGentleTilt {
   0%, 100% { transform: translateY(0) rotate(0deg); }
-  25% { transform: translateY(-4px) rotate(-4deg); }
-  75% { transform: translateY(-2px) rotate(4deg); }
+  33% { transform: translateY(-3px) rotate(-3deg); }
+  66% { transform: translateY(-1.5px) rotate(3deg); }
 }
 
 .mochi-confused-body {
   border-color: #FBBF24 !important;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45), 0 0 20px rgba(251, 191, 36, 0.55), inset 0 2.5px 4px rgba(255, 255, 255, 0.5) !important;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4), 0 0 18px rgba(251, 191, 36, 0.5), inset 0 2px 3.5px rgba(255, 255, 255, 0.45) !important;
 }
 
-/* Tanda Tanya Berputar / Berdenyut Aktif */
-.mochi-floating-qmark.spinning-mystery-qmark {
-  background: #FEF3C7;
-  border-color: #D97706;
-  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.6), 0 0 16px rgba(245, 158, 11, 0.8);
-  animation: qmarkMysteryBounce 1.8s infinite ease-in-out both;
-}
-
-.mochi-floating-qmark .qmark-ping-ring {
-  position: absolute;
-  inset: -4px;
-  border-radius: 50%;
-  border: 1.5px solid #F59E0B;
-  animation: qmarkPing 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
-  pointer-events: none;
-}
-
-@keyframes qmarkMysteryBounce {
-  0%, 100% { transform: scale(1) translateY(0) rotate(0deg); }
-  50% { transform: scale(1.18) translateY(-6px) rotate(12deg); }
-}
-
-@keyframes qmarkPing {
-  0% { transform: scale(0.9); opacity: 0.9; }
-  80%, 100% { transform: scale(1.65); opacity: 0; }
-}
-
-/* Keringat Dingin Chibi Anime (💧) */
+/* Keringat Dingin Chibi Mungil */
 .mochi-sweat-drop {
   position: absolute;
-  top: 14px;
+  top: 10px;
   left: 2px;
-  font-size: 15px;
+  font-size: 13px;
   z-index: 12;
-  animation: sweatDropJiggle 1.4s infinite ease-in-out;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+  animation: sweatDropJiggleGentle 1.8s infinite ease-in-out;
+  filter: drop-shadow(0 1.5px 3px rgba(0,0,0,0.3));
 }
 
-@keyframes sweatDropJiggle {
+@keyframes sweatDropJiggleGentle {
   0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(3px) scale(1.15, 0.9); }
+  50% { transform: translateY(2px) scale(1.1, 0.95); }
 }
 
-/* 4. Mystery Lock Clue Box (Petunjuk Sederhana & Ramah) */
+/* Kotak Petunjuk Teka-Teki Mengambang Lembut */
 .mochi-mystery-lock-clue {
-  margin-top: 14px;
-  padding: 12px 14px;
-  background: rgba(15, 23, 42, 0.75);
-  border: 1px dashed rgba(251, 191, 36, 0.5);
-  border-radius: 14px;
+  margin-top: 18px;
+  padding: 12px 18px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(251, 191, 36, 0.35);
+  border-radius: 18px;
   position: relative;
   z-index: 5;
-  animation: clueBoxFadeIn 500ms ease-out both 800ms;
-}
-
-@keyframes clueBoxFadeIn {
-  0% { opacity: 0; transform: translateY(10px); }
-  100% { opacity: 1; transform: translateY(0); }
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  animation: clueBoxFadeIn 500ms ease-out both 700ms;
 }
 
 .mystery-lock-header {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 4px;
+  gap: 7px;
+  margin-bottom: 5px;
 }
 
 .mystery-pulse-dot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
-  background: #F59E0B;
-  box-shadow: 0 0 8px #F59E0B;
-  animation: pulseDot 1.2s infinite;
-}
-
-@keyframes pulseDot {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.4); opacity: 0.6; }
+  background: #FBBF24;
+  box-shadow: 0 0 8px #FBBF24;
+  display: inline-block;
 }
 
 .mystery-clue-label {
   font-size: 11px;
   font-weight: 800;
-  letter-spacing: 0.06em;
-  color: #FCD34D;
+  letter-spacing: 0.05em;
+  color: #FBBF24;
+  text-transform: uppercase;
 }
 
 .mystery-clue-bubble {
-  font-size: 13px;
-  font-weight: 500;
+  margin: 0;
+  font-size: 12.5px;
   line-height: 1.45;
   color: #E2E8F0;
-  margin: 0;
 }
 
 .mystery-clue-bubble strong {
   color: #FDE047;
+}
+
+/* Tombol Aksi Coba Lagi */
+.mochi-action-row {
+  margin-top: 14px;
+  display: flex;
+  justify-content: center;
+}
+
+.mochi-try-again-btn {
+  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 14px;
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 6px 18px rgba(217, 119, 6, 0.35);
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+}
+
+.mochi-try-again-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(217, 119, 6, 0.45);
+}
+
+.mochi-try-again-btn:active {
+  transform: translateY(1px);
+}
+
+/* ==========================================================================
+   MOCHI CONNECTOR DUET & MAGNETIC BOND STYLES (2-ACTOR FOCUS)
+   ========================================================================== */
+
+/* Panggung Duet 2 Mochi Terfokus */
+.mochi-connector-duet {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  margin: 10px 0 16px;
+  position: relative;
+  z-index: 5;
+  width: 100%;
+}
+
+.mochi-connector-duet .mochi-bot-cube {
+  width: 96px;
+  min-height: 88px;
+  padding: 8px 6px 10px;
+}
+
+/* Medan Magnet / Pendaran Penghubung */
+.mochi-magnetic-spark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  position: relative;
+}
+
+.mochi-magnetic-spark .spark-line {
+  width: 22px;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(96, 165, 250, 0.2), rgba(253, 224, 71, 0.9), rgba(52, 211, 153, 0.2));
+  border-radius: 999px;
+  box-shadow: 0 0 8px #FDE047;
+  animation: sparkPulse 1.8s infinite ease-in-out;
+}
+
+.mochi-magnetic-spark .spark-heart {
+  font-size: 16px;
+  animation: sparkHeartBeat 1.8s infinite cubic-bezier(0.16, 1, 0.3, 1);
+  filter: drop-shadow(0 0 6px rgba(253, 224, 71, 0.8));
+}
+
+@keyframes sparkPulse {
+  0%, 100% { opacity: 0.4; transform: scaleX(0.85); }
+  50% { opacity: 1; transform: scaleX(1.15); }
+}
+
+@keyframes sparkHeartBeat {
+  0%, 100% { transform: scale(0.9); }
+  50% { transform: scale(1.25); }
+}
+
+/* Kontras Ringkas: Jawaban Salah vs Pasangan Benar */
+.mochi-mini-contrast-pills {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 8px 16px;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  margin-bottom: 14px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  animation: clueBoxFadeIn 450ms ease-out both 500ms;
+}
+
+.mochi-mini-contrast-pills .pill-wrong {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  color: #FCA5A5;
+  background: rgba(239, 68, 68, 0.15);
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.mochi-mini-contrast-pills .pill-wrong b {
+  color: #F87171;
+  text-decoration: line-through;
+}
+
+.mochi-mini-contrast-pills .pill-arrow {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.mochi-mini-contrast-pills .pill-correct {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  color: #6EE7B7;
+  background: rgba(16, 185, 129, 0.15);
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+.mochi-mini-contrast-pills .pill-correct b {
+  color: #34D399;
 }
