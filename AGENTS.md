@@ -38,8 +38,34 @@ Whenever creating, regenerating, or updating listening exercises or audio banks:
    - Babak 4: Thinking pocket (1.5-2.0 detik buffer jeda hening di akhir).
 4. **Execution & CI**: Selalu jalankan pipeline otomatis melalui `tools/chokai-audio-pipeline/` dan pastikan gerbang validasi terpenuhi sebelum rilis.
 
-
-
+## Mandatory Protocol: PWA Release Arbiter & Anti-Ghost-Deploy (Wajib Bump Build)
+Setiap kali menyelesaikan fitur, perbaikan bug, konten kuis, atau pembaruan UI/UX di FIEZEL:
+1. **ZERO Ghost Releases (Pantangan Rilis Hantu)**:
+   - DILARANG KERAS menutup sesi atau menganggap pekerjaan selesai tanpa menaikkan nomor build melalui arbiter.
+   - Tanpa menaikkan build, `SW_REV` di `sw.js` tidak berubah, Service Worker peramban murid TIDAK akan pernah memperbarui shell cache (`fiezel-shell-*`), dan notifikasi pembaruan ("Pembaruan Tersedia") TIDAK AKAN PERNAH muncul di perangkat murid.
+2. **Satu Pintu Resmi (Single Source of Truth)**:
+   - SELALU gunakan alat arbiter resmi:
+     ```bash
+     node tools/bump-build.mjs "<tipe(cakupan): deskripsi ringkas perubahan>"
+     ```
+   - DILARANG KERAS mengetik atau menyunting manual nomor build di `sw.js`, `core-config.js`, atau `features/neural-voice/fiezel-diag-panel.js`.
+3. **Verifikasi Keselarasan 6 Titik (Hexa-Sync Invariant)**:
+   - Selalu jalankan pemeriksaan sinkronisasi:
+     ```bash
+     node tools/bump-build.mjs --check
+     ```
+   - Pastikan output mencetak `Selaras` untuk 6 titik wajib:
+     - `coordination/BUILD-VERSION.json` (`version`)
+     - `sw.js` (`SW_REV`)
+     - `core-config.js` (`self.FIEZEL_PAGE_BUILD`)
+     - `features/neural-voice/fiezel-diag-panel.js` (`var DIAG_BUILD`)
+     - `kurikulum.html` (`?v=m025-XXX`)
+     - `misi.html` (`?v=m025-XXX`)
+4. **Validasi Mutu & Pemantauan CI Sampai Tuntas**:
+   - Jalankan uji lokal sebelum commit: `node tests/id-golden-snapshot-test.js`, `node tests/th-ui-leak-test.js`, `node tests/curriculum-cache-version-test.js`, `node tests/gate-registry-test.js`.
+   - Stage HANYA berkas yang terkait rilis (patuhi *Git Protection Rule* untuk aset mockup/redesign).
+   - Push ke `origin/main` dan pantau alur CI GitHub Actions (`gh run watch <run-id>` untuk *FIEZEL Quality Gate* dan *FIEZEL Deploy Site*) sampai 100% HIJAU.
+   - Buktikan situs produksi (`https://fiezel.my.id/app/`) telah menyajikan build baru sebelum melapor ke user.
 
 ## Google Stitch Collaboration Rules
 When the user brings a Google Stitch design:
