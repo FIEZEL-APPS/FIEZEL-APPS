@@ -53,7 +53,7 @@ const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
 // dilayani dan kedua berkas baru tidak pernah sampai ke pengguna lama - aplikasi mereka
 // akan menjalankan app.js baru tanpa berkas benderanya, dan seluruh bendera jatuh ke
 // salinan bawaan di app.js. Naik SEKALI untuk seluruh gelombang.
-const SW_REV='m025-394-contrast-obsidian-20260929';
+const SW_REV='m025-395-contrast-obsidian-20260929';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
 // m025-61: health check menanyakan revisi shell langsung ke worker yang sedang aktif.
 // Menebaknya dari nama cache tidak cukup: cache lama bisa tertinggal, sedangkan jawaban ini
@@ -136,7 +136,8 @@ const ASSETS=['./','./index.html','./style.css','./features/mascot/fiezel-motion
   // titik-koma di komentar blok ASSETS - pwa-cache-test memotong daftar di situ.)
   // Termasuk aset RESERVED/RETIRED
   // (splash_paw_appear, stamp_thud) supaya cache dan direktori tidak pernah berbeda isi.
-  './assets/audio/sfx/answer_correct.ogg','./assets/audio/sfx/answer_correct_perfect.ogg','./assets/audio/sfx/answer_wrong.ogg','./assets/audio/sfx/answer_wrong_retry.ogg','./assets/audio/sfx/button_tap.ogg','./assets/audio/sfx/error_system.ogg','./assets/audio/sfx/exam_complete.ogg','./assets/audio/sfx/exam_pass.ogg','./assets/audio/sfx/exam_result_reveal.ogg','./assets/audio/sfx/exam_score_tick.ogg','./assets/audio/sfx/lesson_complete.ogg','./assets/audio/sfx/lesson_start.ogg','./assets/audio/sfx/level_up.ogg','./assets/audio/sfx/notif_achievement.ogg','./assets/audio/sfx/notif_general.ogg','./assets/audio/sfx/notif_streak_reminder.ogg','./assets/audio/sfx/page_transition.ogg','./assets/audio/sfx/paw_appear.ogg','./assets/audio/sfx/paw_celebrate.ogg','./assets/audio/sfx/paw_encourage.ogg','./assets/audio/sfx/paw_greet.ogg','./assets/audio/sfx/splash_intro.ogg','./assets/audio/sfx/splash_paw_appear.ogg','./assets/audio/sfx/stamp_thud.ogg','./assets/audio/sfx/streak_5.ogg','./assets/audio/sfx/streak_10.ogg','./assets/audio/sfx/xp_gain.ogg'];
+  './assets/audio/sfx/answer_correct.ogg','./assets/audio/sfx/answer_correct_perfect.ogg','./assets/audio/sfx/answer_wrong.ogg','./assets/audio/sfx/answer_wrong_retry.ogg','./assets/audio/sfx/button_tap.ogg','./assets/audio/sfx/error_system.ogg','./assets/audio/sfx/exam_complete.ogg','./assets/audio/sfx/exam_pass.ogg','./assets/audio/sfx/exam_result_reveal.ogg','./assets/audio/sfx/exam_score_tick.ogg','./assets/audio/sfx/lesson_complete.ogg','./assets/audio/sfx/lesson_start.ogg','./assets/audio/sfx/level_up.ogg','./assets/audio/sfx/notif_achievement.ogg','./assets/audio/sfx/notif_general.ogg','./assets/audio/sfx/notif_streak_reminder.ogg','./assets/audio/sfx/page_transition.ogg','./assets/audio/sfx/paw_appear.ogg','./assets/audio/sfx/paw_celebrate.ogg','./assets/audio/sfx/paw_encourage.ogg','./assets/audio/sfx/paw_greet.ogg','./assets/audio/sfx/splash_intro.ogg','./assets/audio/sfx/splash_paw_appear.ogg','./assets/audio/sfx/stamp_thud.ogg','./assets/audio/sfx/streak_5.ogg','./assets/audio/sfx/streak_10.ogg','./assets/audio/sfx/xp_gain.ogg',
+  './features/grammar/grammar-upgrade.css','./features/grammar/fiezel-grammar-upgrade.js','./features/grammar/fiezel-grammar-video.js','./content/video-grammar-bank-v1.json'];
 // Fallback MP3 (OI-1): Safari/iOS tidak bisa mendekode Ogg Vorbis, jadi ke-27 bunyi
 // dikirim kembar .mp3 di assets/audio/sfx/ dan fiezel-ui-sfx.js memilih ekstensinya
 // lewat canPlayType. Kembaran MP3 itu SENGAJA TIDAK masuk ASSETS di atas: konvensi repo
