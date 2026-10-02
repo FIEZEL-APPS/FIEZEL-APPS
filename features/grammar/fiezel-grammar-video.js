@@ -828,12 +828,12 @@
       attrEl.id = 'videoAttributionBar';
       attrEl.innerHTML = `
         <span>
-          <i data-lucide="video" style="width:13px;height:13px;margin-right:4px;vertical-align:-2px;"></i>
+          <i data-lucide="circle-play" style="width:13px;height:13px;margin-right:4px;vertical-align:-2px;"></i>
           ${esc(config.attribution.source || t('grammar.video.edu-material', 'Materi Edukasi'))}
         </span>
         ${config.attribution.url ? `
           <a href="${esc(config.attribution.url)}" target="_blank" rel="noopener noreferrer">
-            <i data-lucide="external-link" style="width:12px;height:12px;"></i> ${esc(config.attribution.sourceLabel || t('grammar.video.open-source', 'Buka di YouTube'))}
+            <i data-lucide="arrow-up-right" style="width:12px;height:12px;"></i> ${esc(config.attribution.sourceLabel || t('grammar.video.open-source', 'Buka di YouTube'))}
           </a>
         ` : ''}
       `;
