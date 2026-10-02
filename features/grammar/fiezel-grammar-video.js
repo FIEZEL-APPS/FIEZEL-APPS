@@ -96,7 +96,7 @@
         <span class="video-subtitle-text" style="display:none;"></span>
       </div>
       <div class="video-loop-badge hidden" id="videoLoopBadge">
-        <i data-lucide="repeat"></i> <span>1/${config.loopCount || 1}</span>
+        <i data-lucide="rotate-ccw"></i> <span>1/${config.loopCount || 1}</span>
       </div>
       <div class="video-controls">
         <button class="video-play-btn" aria-label="${FiezelI18n.t('grammar.video.play-pause', 'Putar / Jeda')}">
@@ -131,7 +131,7 @@
     if (!config.videoUrl) {
       container.innerHTML = `
         <div class="fallback-card">
-          <i data-lucide="video-off" style="width: 48px; height: 48px; margin-bottom: 12px; opacity: 0.5;"></i>
+          <i data-lucide="eye-off" style="width: 48px; height: 48px; margin-bottom: 12px; opacity: 0.5;"></i>
           <p>${FiezelI18n.t('grammar.video.no-video', 'Video tidak tersedia, beralih ke teks.')}</p>
         </div>
       `;
@@ -267,7 +267,7 @@
     pane.innerHTML = `
       <div class="video-exercise-panel" role="dialog" aria-modal="true" aria-label="${FiezelI18n.t('grammar.video.exercise', 'Latihan tata bahasa')}">
         <div class="exercise-badge">
-          <i data-lucide="pen-tool"></i> ${esc(ex.grammarPoint || FiezelI18n.t('grammar.video.point', 'Tata Bahasa'))}
+          <i data-lucide="pencil"></i> ${esc(ex.grammarPoint || FiezelI18n.t('grammar.video.point', 'Tata Bahasa'))}
         </div>
         <p class="muted" style="margin-bottom: 12px; font-size: 0.9rem;">${esc(ex.question)}</p>
         <div class="cloze-sentence">
