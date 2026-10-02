@@ -99,6 +99,7 @@
     'quiz.coba-lagi-pilih-jawaban-lain': 'ลองอีกครั้ง — เลือกคำตอบอื่น',
     'quiz.milestone-halfway': 'มาถึงครึ่งทางแล้ว! ตั้งใจต่อไป 💪',
     'tutor.head-label': 'FIEZEL',
-    'quiz.mengapa-salah': 'ทำไมถึงยังไม่ถูกต้อง?'
+    'quiz.mengapa-salah': 'ทำไมถึงยังไม่ถูกต้อง?',
+    'quiz.trik-ingat': 'เทคนิคจำเร็ว'
   });
 }());

@@ -1111,7 +1111,8 @@
     removePuzzleToken,
     checkSentencePuzzle,
     completeMiniGameAndUnlock,
-    getSemanticMeaningDistractors
+    getSemanticMeaningDistractors,
+    getActiveMiniGame: () => _activeMiniGame
   };
 
   // Export to global scope

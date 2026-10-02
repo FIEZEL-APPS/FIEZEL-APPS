@@ -525,15 +525,30 @@
         ${ruleText ? `<p class="grammar-rule-text"><strong>${FiezelI18n.t('quiz.aturannya', 'Aturannya:')}</strong> ${ruleText}</p>` : ''}
       </div>
 
-      <p class="memory-tip">
-        <i data-lucide="lightbulb"></i>
-        <span>${memoryTip}</span>
-      </p>
+      <div class="feedback-memory-box memory-tip">
+        <div class="feedback-memory-header">
+          <i data-lucide="lightbulb"></i>
+          <span class="feedback-memory-kicker">${FiezelI18n.t('quiz.trik-ingat', 'Trik Cepat Ingat')}</span>
+        </div>
+        <div class="feedback-memory-content">
+          ${FiezelGrammarUpgrade.formatMemoryTip ? FiezelGrammarUpgrade.formatMemoryTip(memoryTip) : ('<span>' + memoryTip + '</span>')}
+        </div>
+      </div>
 
       <button class="ai-btn" id="aiExplainBtn" onclick="if(typeof explainWithAI==='function') explainWithAI(q, j);">
         <i data-lucide="sparkles"></i> ${FiezelI18n.t('quiz.jelaskan-dengan-cara-lebih-sederhana', 'Jelaskan lebih sederhana')}
       </button>
     `;
+  };
+
+  /**
+   * Helper format tips mengingat: memformat perbandingan rumus (=) menjadi bullet terstruktur
+   */
+  FiezelGrammarUpgrade.formatMemoryTip = function(txt) {
+    if (!txt) return '';
+    let s = String(txt).trim();
+    s = s.replace(/\b(Trik cepat|Tips cepat|Tips|Trik ingat|Catatan):/gi, '<strong>$1:</strong>');
+    return `<span>${s}</span>`;
   };
 
   /**

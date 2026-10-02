@@ -1946,10 +1946,42 @@ div.card {
   color: #CBD5E1 !important;
 }
 
-.card > span:not([class*="lvl"]),
-.card p > span:not([class*="lvl"]),
-.card div > span:not([class*="badge"]):not([class*="tag"]):not([class*="btn"]):not([class*="act"]):not([class*="avatar"]):not([class*="lvl"]):not(.is-now):not(.is-done) {
+.card > span:not([class*="lvl"]):not(.feedback-memory-kicker):not(#feedback *),
+.card p > span:not([class*="lvl"]):not(#feedback *),
+.card div > span:not([class*="badge"]):not([class*="tag"]):not([class*="btn"]):not([class*="act"]):not([class*="avatar"]):not([class*="lvl"]):not(.is-now):not(.is-done):not(.feedback-memory-kicker):not(#feedback *) {
   color: #CBD5E1 !important;
+}
+
+/* Ensure feedback memory box and kicker retain their high-contrast colors */
+.feedback-memory-box,
+.card .feedback-memory-box,
+#feedback .feedback-memory-box {
+  background: rgba(245, 158, 11, 0.12) !important;
+  border: 1px solid rgba(245, 158, 11, 0.35) !important;
+}
+
+.feedback-memory-kicker,
+.card .feedback-memory-kicker,
+.card div > span.feedback-memory-kicker,
+#feedback .feedback-memory-kicker {
+  color: #FBBF24 !important;
+}
+
+.feedback-memory-content,
+.feedback-memory-content span,
+.card .feedback-memory-content,
+.card .feedback-memory-content span,
+.card div > span.feedback-memory-content,
+.card div > .feedback-memory-content span,
+#feedback .feedback-memory-content,
+#feedback .feedback-memory-content span {
+  color: #F8FAFC !important;
+}
+
+.feedback-memory-content strong,
+.card .feedback-memory-content strong,
+#feedback .feedback-memory-content strong {
+  color: #FEF08A !important;
 }
 
 /* Ensure .fz2-lvl.is-now stays deep black text even after .card rules */

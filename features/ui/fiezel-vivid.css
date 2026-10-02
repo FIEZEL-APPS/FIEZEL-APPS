@@ -777,14 +777,14 @@ html body:not(.fz-teacher-mode) .social-card {
   box-shadow: 0 4px 18px rgba(94, 20, 32, 0.05) !important;
 }
 
-/* Override legacy card muted span text */
-html body:not(.fz-teacher-mode) .card p {
+/* Override legacy card muted span text (restricted to non-quiz cards) */
+html body:not(.fz-teacher-mode) .card:not(.quiz-shell *):not(.card-quiz *):not(#feedback *):not(.feedback *) p:not(#feedback *):not(.feedback *) {
   color: #7A686B !important;
 }
 
-html body:not(.fz-teacher-mode) .card > span:not([class*="lvl"]),
-html body:not(.fz-teacher-mode) .card p > span:not([class*="lvl"]),
-html body:not(.fz-teacher-mode) .card div > span:not([class*="badge"]):not([class*="tag"]):not([class*="btn"]):not([class*="act"]):not([class*="avatar"]):not([class*="lvl"]):not(.is-now):not(.is-done) {
+html body:not(.fz-teacher-mode) .card:not(.quiz-shell *):not(.card-quiz *):not(#feedback *):not(.feedback *) > span:not([class*="lvl"]):not(#feedback *):not(.feedback *),
+html body:not(.fz-teacher-mode) .card:not(.quiz-shell *):not(.card-quiz *):not(#feedback *):not(.feedback *) p:not(#feedback *):not(.feedback *) > span:not([class*="lvl"]),
+html body:not(.fz-teacher-mode) .card:not(.quiz-shell *):not(.card-quiz *):not(#feedback *):not(.feedback *) div > span:not([class*="badge"]):not([class*="tag"]):not([class*="btn"]):not([class*="act"]):not([class*="avatar"]):not([class*="lvl"]):not(.is-now):not(.is-done):not(#feedback *):not(.feedback *):not(.feedback-memory-kicker) {
   color: #7A686B !important;
 }
 

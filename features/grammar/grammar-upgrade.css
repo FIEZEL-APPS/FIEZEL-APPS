@@ -68,17 +68,21 @@
 
 .feedback-rule-pill,
 .grammar-rule-pill {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-1);
-  background: var(--panel);
-  padding: var(--sp-2) var(--sp-3);
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--line-soft);
-  font-size: .85rem;
-  font-weight: 600;
-  color: var(--text);
-  margin-top: var(--sp-2);
+  display: block !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  padding: 12px 16px !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  font-size: 0.90rem !important;
+  line-height: 1.55 !important;
+  color: #F8FAFC !important;
+  margin: 12px 0 !important;
+}
+
+.feedback-rule-pill strong,
+.grammar-rule-pill strong {
+  color: #38BDF8 !important;
+  font-weight: 800 !important;
 }
 
 .feedback-comparison {
@@ -86,9 +90,27 @@
   grid-template-columns: 1fr 1fr;
   gap: var(--sp-3);
   margin-top: var(--sp-2);
-  background: var(--panel);
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 12px !important;
   padding: var(--sp-3);
-  border-radius: var(--radius-sm);
+  color: #F8FAFC !important;
+}
+
+[data-theme="light"] .card-light .feedback-rule-pill,
+[data-theme="light"] .card-light .grammar-rule-pill,
+body:not(.theme-dark):not(.fz-lux) .card-light .feedback-rule-pill,
+body:not(.theme-dark):not(.fz-lux) .card-light .grammar-rule-pill {
+  background: #F1F5F9 !important;
+  border-color: #CBD5E1 !important;
+  color: #1E293B !important;
+}
+
+[data-theme="light"] .card-light .feedback-rule-pill strong,
+[data-theme="light"] .card-light .grammar-rule-pill strong,
+body:not(.theme-dark):not(.fz-lux) .card-light .feedback-rule-pill strong,
+body:not(.theme-dark):not(.fz-lux) .card-light .grammar-rule-pill strong {
+  color: #0369A1 !important;
 }
 
 .feedback-comparison-item {
@@ -1113,3 +1135,119 @@ body:not(.fz-dark) .token-reset-btn {
     transition: none !important;
   }
 }
+
+/* ==========================================================================
+   Memory Box (Trik Cepat Ingat) — High Contrast Scaffolding
+   ========================================================================== */
+.feedback-memory-box,
+.feedback .memory-tip,
+.card .feedback-memory-box,
+.card .feedback .memory-tip,
+#feedback .feedback-memory-box {
+  display: block !important;
+  background: rgba(245, 158, 11, 0.12) !important;
+  border: 1px solid rgba(245, 158, 11, 0.35) !important;
+  border-radius: 14px !important;
+  padding: 12px 16px !important;
+  margin: 14px 0 !important;
+  text-align: left !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25) !important;
+}
+
+.feedback-memory-header {
+  display: flex !important;
+  align-items: center !important;
+  gap: 7px !important;
+  margin-bottom: 8px !important;
+}
+
+.feedback-memory-header svg,
+.feedback-memory-header i,
+.feedback .memory-tip i[data-lucide="lightbulb"],
+.feedback .memory-tip svg {
+  width: 17px !important;
+  height: 17px !important;
+  color: #FBBF24 !important;
+  flex-shrink: 0 !important;
+  filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.4)) !important;
+}
+
+html body .card .feedback-memory-kicker,
+html body .card div > span.feedback-memory-kicker,
+html body .feedback-memory-kicker,
+.feedback-memory-kicker {
+  font-size: 0.72rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  color: #FBBF24 !important;
+  line-height: 1 !important;
+}
+
+html body .card .feedback-memory-content,
+html body .card .feedback-memory-content span,
+html body .card div > span.feedback-memory-content,
+html body .card div > .feedback-memory-content span,
+html body .feedback-memory-content,
+html body .feedback-memory-content span,
+.feedback-memory-content,
+.feedback-memory-content span,
+.feedback .memory-tip span {
+  font-size: 0.92rem !important;
+  line-height: 1.55 !important;
+  color: #F8FAFC !important;
+  display: block !important;
+}
+
+html body .card .feedback-memory-content strong,
+html body .feedback-memory-content strong,
+.feedback-memory-content strong,
+.feedback .memory-tip strong {
+  color: #FEF08A !important;
+  font-weight: 700 !important;
+}
+
+.feedback-memory-content .memory-bullet,
+.feedback .memory-tip .memory-bullet {
+  display: block !important;
+  margin: 4px 0 !important;
+  color: #F8FAFC !important;
+}
+
+html body #feedback p,
+html body .feedback p {
+  color: #F8FAFC !important;
+}
+
+/* Light Mode Overrides for Memory Box */
+[data-theme="light"] .card-light .feedback-memory-box,
+[data-theme="light"] .card-light .feedback .memory-tip,
+body:not(.theme-dark):not(.fz-lux) .card-light .feedback-memory-box,
+body:not(.theme-dark):not(.fz-lux) .card-light .feedback .memory-tip {
+  background: #FEF3C7 !important;
+  border-color: #FDE68A !important;
+}
+
+[data-theme="light"] .card-light .feedback-memory-kicker,
+[data-theme="light"] .card-light .feedback-memory-header svg,
+body:not(.theme-dark):not(.fz-lux) .card-light .feedback-memory-kicker,
+body:not(.theme-dark):not(.fz-lux) .card-light .feedback-memory-header svg {
+  color: #78350F !important;
+}
+
+[data-theme="light"] .card-light .feedback-memory-content,
+[data-theme="light"] .card-light .feedback-memory-content span,
+[data-theme="light"] .card-light .feedback .memory-tip span,
+body:not(.theme-dark):not(.fz-lux) .card-light .feedback-memory-content,
+body:not(.theme-dark):not(.fz-lux) .card-light .feedback-memory-content span,
+body:not(.theme-dark):not(.fz-lux) .card-light .feedback .memory-tip span {
+  color: #1E293B !important;
+}
+
+[data-theme="light"] .card-light .feedback-memory-content strong,
+[data-theme="light"] .card-light .feedback .memory-tip strong,
+body:not(.theme-dark):not(.fz-lux) .card-light .feedback-memory-content strong,
+body:not(.theme-dark):not(.fz-lux) .card-light .feedback .memory-tip strong {
+  color: #78350F !important;
+}
+

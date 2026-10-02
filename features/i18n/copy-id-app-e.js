@@ -99,6 +99,7 @@
     'quiz.coba-lagi-pilih-jawaban-lain': 'Coba lagi — pilih jawaban lain',
     'quiz.milestone-halfway': 'Setengah jalan! Pertahankan fokusmu 💪',
     'tutor.head-label': 'FIEZEL',
-    'quiz.mengapa-salah': 'Mengapa kurang tepat?'
+    'quiz.mengapa-salah': 'Mengapa kurang tepat?',
+    'quiz.trik-ingat': 'Trik Cepat Ingat'
   });
 }());

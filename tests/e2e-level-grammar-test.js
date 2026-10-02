@@ -10,6 +10,7 @@ const __fzRoot = require('path').join(__dirname, '..'); /* m025-254: berkas ini 
 // Chromium dijalankan lewat CDP langsung, tanpa dependensi npm baru.
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 const http = require('http');
 const { spawn } = require('child_process');
 
@@ -42,6 +43,9 @@ function findBrowser() {
   const candidates = [
     process.env.FIEZEL_E2E_CHROME,
     process.env.CHROME_PATH,
+    'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+    'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
+    path.join(process.env.LOCALAPPDATA || '', 'Google\\Chrome\\Application\\chrome.exe'),
     '/opt/pw-browsers/chromium-1194/chrome-linux/chrome',
     '/opt/pw-browsers/chromium/chrome-linux/chrome',
     '/usr/bin/google-chrome',
@@ -66,7 +70,7 @@ function launch(binary) {
     const child = spawn(binary, [
       '--headless=new', '--remote-debugging-port=0', '--no-sandbox', '--disable-gpu',
       '--disable-dev-shm-usage', '--no-first-run', '--no-default-browser-check',
-      '--user-data-dir=' + fs.mkdtempSync('/tmp/fiezel-e2e-')
+      '--user-data-dir=' + fs.mkdtempSync(path.join(os.tmpdir(), 'fiezel-e2e-'))
     ], { stdio: ['ignore', 'pipe', 'pipe'] });
     let buffer = '';
     const timer = setTimeout(() => reject(new Error('browser tidak mengumumkan endpoint DevTools dalam 30 detik')), 30000);

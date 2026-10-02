@@ -389,9 +389,9 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 /* v6.1 (O4 §5): soal = teks TERBESAR di pelajaran aktif (24–28px, di atas .lesson-title
    24px dan h1 halaman yang didemosi ke h2). Menggantikan nilai interim i10 2026-08-28. */
 .question{font-size:clamp(var(--fs-h1),1.1rem + 1.8vw,1.75rem);line-height:1.4;margin:8px 0 18px;font-weight:700;letter-spacing:-.01em;white-space:pre-line;word-break:break-word}
-.question-instruction{display:block;font-size:0.85rem;font-weight:600;color:var(--muted);letter-spacing:0.02em;margin-bottom:6px;line-height:1.4;text-transform:none}
+.question-instruction{display:inline-block;font-size:0.75rem;font-weight:700;color:var(--muted);letter-spacing:0.07em;text-transform:uppercase;margin-bottom:10px;line-height:1.35;padding:3px 8px;border-radius:6px;background:rgba(148,163,184,0.12)}
 .question-main{display:block;font-size:clamp(1.15rem, 1.1rem + 1.2vw, 1.45rem);font-weight:700;color:var(--text);line-height:1.45}
-.target-word{display:inline-block;background:rgba(245, 158, 11, 0.22);color:#B45309;font-style:italic;text-decoration:underline;text-decoration-color:#F59E0B;text-decoration-thickness:2px;text-underline-offset:4px;border-radius:4px;padding:0 5px;font-weight:700}
+.target-word{display:inline-block;background:rgba(245,158,11,0.28);color:#B45309;font-style:italic;text-decoration:underline;text-decoration-color:#FBBF24;text-decoration-thickness:2.5px;text-underline-offset:4px;border-bottom:2px solid #F59E0B;border-radius:4px;padding:1px 6px;font-weight:700}
 /* i10 2026-08-28 (O5 §3a): banner kata target soal vocab — KATA-nya memimpin layar dengan
    serif display (sekeluarga dengan .word di flashcard), pelafalan menumpang di baseline. */
 .vocab-focus{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:2px 0 0}
@@ -7747,9 +7747,110 @@ body.fz-lux .lesson-example {
   border: 1px solid rgba(16, 185, 129, 0.3) !important;
 }
 
-.memory-tip,
-.memory-tip span {
-  color: #E2E8F0 !important;
+.feedback-memory-box,
+.feedback .memory-tip {
+  display: block !important;
+  background: rgba(245, 158, 11, 0.12) !important;
+  border: 1px solid rgba(245, 158, 11, 0.35) !important;
+  border-radius: 14px !important;
+  padding: 12px 16px !important;
+  margin: 14px 0 !important;
+  text-align: left !important;
+}
+
+.feedback-memory-header {
+  display: flex !important;
+  align-items: center !important;
+  gap: 7px !important;
+  margin-bottom: 8px !important;
+}
+
+.feedback-memory-header svg,
+.feedback-memory-header i,
+.feedback .memory-tip i[data-lucide="lightbulb"],
+.feedback .memory-tip svg {
+  width: 17px !important;
+  height: 17px !important;
+  color: #FBBF24 !important;
+  flex-shrink: 0 !important;
+}
+
+html body .card .feedback-memory-kicker,
+html body .card div > span.feedback-memory-kicker,
+html body .feedback-memory-kicker,
+.feedback-memory-kicker {
+  font-size: 0.72rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  color: #FBBF24 !important;
+  line-height: 1 !important;
+}
+
+html body .card .feedback-memory-content,
+html body .card .feedback-memory-content span,
+html body .card div > span.feedback-memory-content,
+html body .card div > .feedback-memory-content span,
+html body .feedback-memory-content,
+html body .feedback-memory-content span,
+.feedback-memory-content,
+.feedback-memory-content span,
+.feedback .memory-tip span {
+  font-size: 0.92rem !important;
+  line-height: 1.55 !important;
+  color: #F8FAFC !important;
+  display: block !important;
+}
+
+html body .card .feedback-memory-content strong,
+html body .feedback-memory-content strong,
+.feedback-memory-content strong,
+.feedback .memory-tip strong {
+  color: #FEF08A !important;
+  font-weight: 700 !important;
+}
+
+.feedback-memory-content .memory-bullet,
+.feedback .memory-tip .memory-bullet {
+  display: block !important;
+  margin: 4px 0 !important;
+  color: #F8FAFC !important;
+}
+
+html body #feedback p,
+html body .feedback p {
+  color: #F8FAFC !important;
+}
+
+[data-theme="light"] .card-light .feedback-memory-box,
+[data-theme="light"] .card-light .feedback .memory-tip,
+body:not(.theme-dark):not(.fz-lux) .card-light .feedback-memory-box,
+body:not(.theme-dark):not(.fz-lux) .card-light .feedback .memory-tip {
+  background: #FEF3C7 !important;
+  border-color: #FDE68A !important;
+}
+
+[data-theme="light"] .card-light .feedback-memory-kicker,
+[data-theme="light"] .card-light .feedback-memory-header svg,
+body:not(.theme-dark):not(.fz-lux) .card-light .feedback-memory-kicker,
+body:not(.theme-dark):not(.fz-lux) .card-light .feedback-memory-header svg {
+  color: #78350F !important;
+}
+
+[data-theme="light"] .card-light .feedback-memory-content,
+[data-theme="light"] .card-light .feedback-memory-content span,
+[data-theme="light"] .card-light .feedback .memory-tip span,
+body:not(.theme-dark):not(.fz-lux) .card-light .feedback-memory-content,
+body:not(.theme-dark):not(.fz-lux) .card-light .feedback-memory-content span,
+body:not(.theme-dark):not(.fz-lux) .card-light .feedback .memory-tip span {
+  color: #1E293B !important;
+}
+
+[data-theme="light"] .card-light .feedback-memory-content strong,
+[data-theme="light"] .card-light .feedback .memory-tip strong,
+body:not(.theme-dark):not(.fz-lux) .card-light .feedback-memory-content strong,
+body:not(.theme-dark):not(.fz-lux) .card-light .feedback .memory-tip strong {
+  color: #78350F !important;
 }
 
 .skill-page-topbar button,
