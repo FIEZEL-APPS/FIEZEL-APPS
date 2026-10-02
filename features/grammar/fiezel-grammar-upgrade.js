@@ -759,28 +759,65 @@
   };
 
   /**
-   * Menghasilkan Markup HTML Mochi Bot Squishy Cubes dengan Animasi Turun dari Topbar
+   * Menghasilkan Markup HTML Dimensi Mochi:
+   * - Hyperspace Blink & Cosmic Dimension Portal
+   * - Swirling Particle Sparks
+   * - Mochi Cubes (Mochi Normal tenang, Mochi Kesalahan bingung dengan tanda tanya berputar & sweat drop)
+   * - Mystery Lock Clue (Pilihan salah vs Pilihan benar yang gemoy dan mudah dipahami)
    */
   FiezelGrammarUpgrade.renderSuperheroLegoDrop = function(targetSentence, userSentence) {
     const blocks = FiezelGrammarUpgrade.parseSentenceLegoBlocks(targetSentence);
     if (!blocks || blocks.length === 0) return '';
 
+    const norm = (s) => String(s || '').toLowerCase().replace(/[^\w\s]/g, '').trim();
+    const userWords = String(userSentence || '').split(/\s+/).map(norm).filter(Boolean);
+
+    // Cari blok mana yang bermasalah / hilang ingatan berdasarkan jawaban murid
+    let confusedRole = 'verb'; // Default ke kata kerja jika tidak terdeteksi
+    if (userWords.length > 0) {
+      for (const b of blocks) {
+        const blockWords = b.text.split(/\s+/).map(norm);
+        const hasMatch = blockWords.some(bw => userWords.includes(bw));
+        if (!hasMatch) {
+          confusedRole = b.role;
+          break;
+        }
+      }
+    }
+
+    // Bangun 14 partikel magis yang berkumpul
+    const particlesHtml = Array.from({ length: 14 }).map((_, i) => {
+      const angle = (i / 14) * 360;
+      const delay = (i * 45) % 400;
+      return `<span class="mochi-spark-particle" style="--p-angle: ${angle}deg; --p-delay: ${delay}ms;"></span>`;
+    }).join('');
+
+    let confusedBlockInfo = null;
+
     const blocksHtml = blocks.map((b, idx) => {
-      const dropDelayMs = 100 + idx * 110;
-      const textRevealDelayMs = dropDelayMs + 380;
+      const isConfused = b.role === confusedRole;
+      if (isConfused) confusedBlockInfo = b;
+
+      const dropDelayMs = 280 + idx * 110;
+      const textRevealDelayMs = dropDelayMs + 360;
+      
       return `
-        <div class="mochi-bot-cube-wrapper" style="animation-delay: ${dropDelayMs}ms;">
+        <div class="mochi-bot-cube-wrapper${isConfused ? ' is-confused-target' : ''}" style="animation-delay: ${dropDelayMs}ms;">
           <!-- Floating question bubble di luar kubus -->
-          <div class="mochi-floating-qmark" style="animation-delay: ${dropDelayMs + 450}ms;">
-            <span>?</span>
+          <div class="mochi-floating-qmark${isConfused ? ' spinning-mystery-qmark' : ''}" style="animation-delay: ${dropDelayMs + 400}ms;">
+            <span>${isConfused ? '?' : '?'}</span>
+            ${isConfused ? '<span class="qmark-ping-ring"></span>' : ''}
           </div>
 
+          <!-- Sweat drop / Keringat dingin jika sedang bingung -->
+          ${isConfused ? '<div class="mochi-sweat-drop" aria-hidden="true">💧</div>' : ''}
+
           <!-- Badan Kubus Mochi (Squishy Bot) -->
-          <div class="mochi-bot-cube mochi-skin-${b.color}" data-role="${b.role}">
+          <div class="mochi-bot-cube mochi-skin-${b.color}${isConfused ? ' mochi-confused-body' : ''}" data-role="${b.role}">
             <!-- Kawaii anime sparkling eyes & blushing cheeks -->
             <div class="mochi-face-container">
               <span class="mochi-cheek left"></span>
-              <div class="mochi-face-eyes">
+              <div class="mochi-face-eyes${isConfused ? ' eyes-confused' : ''}">
                 <div class="mochi-eye left">
                   <span class="glint-main"></span>
                   <span class="glint-sub"></span>
@@ -809,22 +846,47 @@
         </div>
       `;
     }).join(`
-      <div class="mochi-cube-connector" style="animation-delay: 280ms;">
+      <div class="mochi-cube-connector" style="animation-delay: 380ms;">
         <i data-lucide="arrow-right"></i>
       </div>
     `);
 
+    // Clue gembok mini yang sangat sederhana & ramah anak
+    const mysteryClueHtml = confusedBlockInfo ? `
+      <div class="mochi-mystery-lock-clue">
+        <div class="mystery-lock-header">
+          <span class="mystery-pulse-dot"></span>
+          <span class="mystery-clue-label">KUNCI TEKA-TEKI MOCHI ${confusedBlockInfo.label.toUpperCase()}</span>
+        </div>
+        <p class="mystery-clue-bubble">
+          💡 <strong>Lihat balok yang berkedip!</strong> Pastikan urutan dan bentuk kata pada bagian <strong>"${confusedBlockInfo.text}"</strong> sudah tepat dengan subjek kalimatnya ya!
+        </p>
+      </div>
+    ` : '';
+
     return `
-      <div id="quizSuperheroLegoDrop" class="quiz-superhero-lego-wrapper mochi-bot-stage" role="region" aria-label="Struktur Kalimat Mochi Bot">
+      <!-- Flash Kedip Seluruh Layar (Hyperspace Blink Effect) -->
+      <div class="mochi-dimension-flash" aria-hidden="true"></div>
+
+      <!-- Stage Dimensi Mochi -->
+      <div id="quizSuperheroLegoDrop" class="quiz-superhero-lego-wrapper mochi-bot-stage mochi-dimension-portal" role="region" aria-label="Dimensi Mochi">
+        <!-- Partikel Pendaran Dimensi Splash FIEZEL -->
+        <div class="mochi-portal-particles" aria-hidden="true">
+          ${particlesHtml}
+        </div>
+
         <div class="lego-superhero-header">
           <div class="lego-superhero-title">
-            <span class="superhero-hero-badge"><i data-lucide="sparkles"></i> PANDUAN STRUKTUR MOCHI</span>
-            <span class="superhero-hero-subtitle">Lihat urutan cerita dari para kubus mochi:</span>
+            <span class="superhero-hero-badge"><i data-lucide="sparkles"></i> DIMENSI TEKA-TEKI MOCHI</span>
+            <span class="superhero-hero-subtitle">Bantu Mochi menemukan bagian cerita yang pas:</span>
           </div>
         </div>
+
         <div class="lego-blocks-carousel mochi-carousel">
           ${blocksHtml}
         </div>
+
+        ${mysteryClueHtml}
       </div>
     `;
   };

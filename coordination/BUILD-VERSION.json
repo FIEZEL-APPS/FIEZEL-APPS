@@ -1,7 +1,7 @@
 {
-  "version": "m025-405",
+  "version": "m025-406",
   "claimedBy": "branch main",
-  "claimedAt": "2026-10-02T18:55:04.835Z",
-  "reason": "feat(quiz): kawaii anime sparkling eyes and blush for mochi bots m025-405",
+  "claimedAt": "2026-10-02T19:07:23.080Z",
+  "reason": "feat(quiz): mochi dimension flash, swirling particles, and mystery clue lock m025-406",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

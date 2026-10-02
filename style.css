@@ -9742,3 +9742,203 @@ body:not(.theme-dark):not(.fz-lux) .tutor-stuck:hover {
   0% { opacity: 0; transform: scale(0.4); }
   100% { opacity: 1; transform: scale(1); }
 }
+
+/* ==========================================================================
+   MOCHI DIMENSION SHIFT: FLASH, PARTICLES, CONFUSED MOCHI & MYSTERY CLUE
+   ========================================================================== */
+
+/* 1. Flash Kedip Seluruh Layar (Hyperspace Blink Effect) */
+.mochi-dimension-flash {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(147, 51, 234, 0.45) 0%, rgba(59, 130, 246, 0.3) 50%, rgba(15, 23, 42, 0.95) 100%);
+  z-index: 80;
+  pointer-events: none;
+  animation: mochiDimensionFlash 650ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes mochiDimensionFlash {
+  0% {
+    opacity: 0;
+    transform: scale(1.1);
+  }
+  25% {
+    opacity: 0.95;
+    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.9) 0%, rgba(168, 85, 247, 0.6) 50%, rgba(15, 23, 42, 0.95) 100%);
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1);
+    visibility: hidden;
+  }
+}
+
+/* 2. Portal Cosmic Mochi Stage */
+.mochi-dimension-portal {
+  background: linear-gradient(155deg, rgba(22, 19, 44, 0.98) 0%, rgba(13, 17, 38, 0.98) 100%) !important;
+  border: 1.5px solid rgba(168, 85, 247, 0.45) !important;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.65), 0 0 32px rgba(168, 85, 247, 0.22) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Partikel Pendaran Menari (Swirling Splash Particles) */
+.mochi-portal-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.mochi-spark-particle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #FDE047;
+  box-shadow: 0 0 8px #FDE047, 0 0 14px #C084FC;
+  opacity: 0;
+  animation: mochiParticleSwirl 1.4s ease-out forwards;
+  animation-delay: var(--p-delay, 0ms);
+}
+
+@keyframes mochiParticleSwirl {
+  0% {
+    opacity: 0;
+    transform: rotate(var(--p-angle, 0deg)) translateY(120px) scale(0);
+  }
+  30% {
+    opacity: 1;
+    transform: rotate(calc(var(--p-angle, 0deg) + 60deg)) translateY(40px) scale(1.4);
+  }
+  80% {
+    opacity: 0.8;
+    transform: rotate(calc(var(--p-angle, 0deg) + 120deg)) translateY(10px) scale(0.9);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(calc(var(--p-angle, 0deg) + 180deg)) translateY(0px) scale(0);
+  }
+}
+
+/* 3. Mochi yang Bingung (Target Kesalahan) */
+.mochi-bot-cube-wrapper.is-confused-target {
+  animation: mochiDropSquash 750ms cubic-bezier(0.28, 1.45, 0.58, 1) both, mochiWobbleConfused 2.4s infinite ease-in-out 1s;
+}
+
+@keyframes mochiWobbleConfused {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-4px) rotate(-4deg); }
+  75% { transform: translateY(-2px) rotate(4deg); }
+}
+
+.mochi-confused-body {
+  border-color: #FBBF24 !important;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45), 0 0 20px rgba(251, 191, 36, 0.55), inset 0 2.5px 4px rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Tanda Tanya Berputar / Berdenyut Aktif */
+.mochi-floating-qmark.spinning-mystery-qmark {
+  background: #FEF3C7;
+  border-color: #D97706;
+  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.6), 0 0 16px rgba(245, 158, 11, 0.8);
+  animation: qmarkMysteryBounce 1.8s infinite ease-in-out both;
+}
+
+.mochi-floating-qmark .qmark-ping-ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 1.5px solid #F59E0B;
+  animation: qmarkPing 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+  pointer-events: none;
+}
+
+@keyframes qmarkMysteryBounce {
+  0%, 100% { transform: scale(1) translateY(0) rotate(0deg); }
+  50% { transform: scale(1.18) translateY(-6px) rotate(12deg); }
+}
+
+@keyframes qmarkPing {
+  0% { transform: scale(0.9); opacity: 0.9; }
+  80%, 100% { transform: scale(1.65); opacity: 0; }
+}
+
+/* Keringat Dingin Chibi Anime (💧) */
+.mochi-sweat-drop {
+  position: absolute;
+  top: 14px;
+  left: 2px;
+  font-size: 15px;
+  z-index: 12;
+  animation: sweatDropJiggle 1.4s infinite ease-in-out;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+@keyframes sweatDropJiggle {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(3px) scale(1.15, 0.9); }
+}
+
+/* 4. Mystery Lock Clue Box (Petunjuk Sederhana & Ramah) */
+.mochi-mystery-lock-clue {
+  margin-top: 14px;
+  padding: 12px 14px;
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px dashed rgba(251, 191, 36, 0.5);
+  border-radius: 14px;
+  position: relative;
+  z-index: 5;
+  animation: clueBoxFadeIn 500ms ease-out both 800ms;
+}
+
+@keyframes clueBoxFadeIn {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.mystery-lock-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.mystery-pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #F59E0B;
+  box-shadow: 0 0 8px #F59E0B;
+  animation: pulseDot 1.2s infinite;
+}
+
+@keyframes pulseDot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.6; }
+}
+
+.mystery-clue-label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: #FCD34D;
+}
+
+.mystery-clue-bubble {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.45;
+  color: #E2E8F0;
+  margin: 0;
+}
+
+.mystery-clue-bubble strong {
+  color: #FDE047;
+}
