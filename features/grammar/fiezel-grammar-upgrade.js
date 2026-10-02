@@ -945,7 +945,7 @@
           ${userWrongWord ? `
             <div class="mochi-mini-contrast-pills">
               <span class="pill-wrong">
-                <i data-lucide="x-circle"></i> Tadi dipilih: <b>${userWrongWord}</b>
+                <i data-lucide="circle-x"></i> Tadi dipilih: <b>${userWrongWord}</b>
               </span>
               <span class="pill-arrow">➔</span>
               <span class="pill-correct">
