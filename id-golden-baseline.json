@@ -1,6 +1,6 @@
 {
   "schema": "id-golden-baseline/1",
-  "generatedAt": "2026-10-02T20:35:03.562Z",
+  "generatedAt": "2026-10-02T21:32:09.343Z",
   "root": "C:\\Users\\hp\\fiezel-apps",
   "files": {
     "grammar-explanations-id.json": "40c79cbfd1893abdf7f7b24f7c13b30ccebd03940a12d128259a07e485cf3a3f",
@@ -18,8 +18,8 @@
     "features/audio-assets/fiezel-audio-key.js": "11624e303917fe0df881ac3f410911587766fd6f4d2491ca6687ec42de8d457d"
   },
   "literals": {
-    "count": 4725,
-    "sha256": "3350ead1e3805e19f367b9fb2e80f6b4400bc3cb67956ebcd50c710b3232bb49",
+    "count": 4727,
+    "sha256": "feced0ae76c23578f4978e2ebe3fd4bef39341a6767fb6be16419343875b1ba3",
     "list": [
       "\n        <div class=\"mini-game-round round-1\">\n          <div class=\"mini-game-header\">\n            <span class=\"game-badge\"><i data-lucide=\"sparkles\"></i> Round 1: ${t('scaffold.game-round1-title', 'Cocokkan Kata & Artinya')}</span>\n            <span class=\"game-combo-pill\" id=\"gameComboPill\">${g.combo > 1 ? t('scaffold.game-combo', 'Kombo x' + g.combo + '! 🔥') : ''}</span>\n          </div>\n          <p class=\"game-instruction\">${t('scaffold.game-round1-desc', 'Ketuk kata bahasa Inggris lalu ketuk artinya yang pas!')}</p>\n\n          <div class=\"match-game-board\">\n            <div class=\"match-col en-col\">\n              ${g.enCards.map(item => {\n                const isMatched = g.matchedIds.has(item.id);\n                const isSel = g.selectedEn === item.id;\n                return ",
       "\n        <div class=\"mini-game-round round-3-puzzle\">\n          <div class=\"mini-game-header\">\n            <span class=\"game-badge\"><i data-lucide=\"sparkles\"></i> Round 3: ${t('scaffold.game-round3-title', 'Susun Kalimat Tata Bahasa')}</span>\n            <span class=\"game-progress-tag\">${g.puzzleIndex + 1}/${Math.min(2, g.words.length)}</span>\n          </div>\n          <p class=\"game-instruction\">${t('scaffold.game-round3-desc', 'Susun kepingan kata menjadi kalimat yang tepat sesuai aturan grammar!')}</p>\n\n          <div class=\"puzzle-grammar-cue\">\n            <i data-lucide=\"lightbulb\"></i>\n            <span><b>${t('scaffold.fokus-tata-bahasa', 'Aturan Grammar')}:</b> ${esc(grammarRuleText)}</span>\n          </div>\n\n          <div class=\"puzzle-clue-card\">\n            <span class=\"clue-label\">${t('scaffold.fokus-kata', 'Fokus Kata: {word} ({meaning})', { word: word.word, meaning: word.meaning.split(';')[0].trim() })}</span>\n          </div>\n\n          <div class=\"puzzle-sentence-stage\" id=\"puzzleSentenceStage\">\n            <div class=\"puzzle-slot-line\" id=\"puzzleSlotLine\">\n              ${g.placedTokens.map((tok, idx) => ",
@@ -1434,6 +1434,7 @@
       "Aktif. Kalau tetap sunyi, periksa saklar senyap di sisi iPhone dan volume dering/media.",
       "Aktifkan notifikasi untuk FIEZEL di pengaturan perangkat.",
       "Aktivitas vulkanisme dari gunung api di Indonesia justru menghasilkan tanah vulkanis yang sangat subur.",
+      "Aku Paham, Pasangkan Sekarang!",
       "Aku bacakan sebagian dulu. Potong jadi dua bagian kalau mau utuh.",
       "Aku belum berhasil membunyikan kalimat ini. Bukan kamu yang salah — teksnya tetap bisa dibaca, dan suaranya biasanya kembali beberapa menit lagi.",
       "Aku belum berhasil membunyikan kalimat ini. Bukan kamu yang salah — teksnya tetap bisa dibaca, dan suaranya biasanya kembali dalam beberapa menit.",
@@ -4474,6 +4475,7 @@
       "progress.label-tingkat-soal",
       "progress.metrik-belajar",
       "progress.tab-cara-soal-dipilih",
+      "quiz.aku-paham-pasangkan-sekarang",
       "quiz.coba-lagi-pilih-jawaban-lain",
       "quiz.lanjut-soal-berikut",
       "quiz.menyerah-buka-jawaban",
