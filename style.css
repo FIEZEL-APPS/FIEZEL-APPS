@@ -9574,46 +9574,77 @@ body:not(.theme-dark):not(.fz-lux) .tutor-stuck:hover {
   color: #4C0519;
 }
 
-/* Mata Digital Karakter Mochi (Blinking Grok/Coucou Eyes with Cute Highlights) */
+/* Wajah Karakter Mochi Kawaii (Mata Besar Berbinar & Pipi Merona) */
+.mochi-face-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 2px;
+  margin-bottom: 5px;
+  position: relative;
+  width: 100%;
+}
+
 .mochi-face-eyes {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 16px;
-  margin-top: 4px;
-  margin-bottom: 6px;
-  height: 16px;
-  width: 100%;
 }
 
+/* Mata Besar Menggemaskan Kawaii */
 .mochi-eye {
-  width: 9px;
-  height: 14px;
-  border-radius: 999px;
-  background: #0F172A;
+  width: 17px;
+  height: 22px;
+  border-radius: 50% 50% 46% 46% / 60% 60% 40% 40%;
+  background: radial-gradient(circle at 50% 70%, #1E1B4B 0%, #0F172A 70%, #020617 100%);
   position: relative;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
-  animation: mochiEyeBlink 3.8s infinite;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.45);
+  animation: mochiKawaiiBlink 4.2s infinite ease-in-out;
   display: inline-block;
+  overflow: hidden;
 }
 
-.mochi-eye::after {
-  content: '';
+/* Kilauan Utama di Mata (Besar & Berbinar) */
+.mochi-eye .glint-main {
   position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 3.5px;
-  height: 3.5px;
+  top: 2.5px;
+  left: 2.5px;
+  width: 7.5px;
+  height: 8.5px;
   border-radius: 50%;
   background: #FFFFFF;
+  box-shadow: 0 0 3px rgba(255, 255, 255, 0.8);
 }
 
-@keyframes mochiEyeBlink {
-  0%, 46%, 50%, 100% {
+/* Kilauan Kedua di Bawah (Efek Mata Basah Anime) */
+.mochi-eye .glint-sub {
+  position: absolute;
+  bottom: 3.5px;
+  right: 2.5px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+/* Pipi Merona Merah Muda (Kawaii Blush) */
+.mochi-cheek {
+  width: 12px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 75, 120, 0.55);
+  filter: blur(1px);
+  margin-top: 8px;
+}
+
+@keyframes mochiKawaiiBlink {
+  0%, 45%, 52%, 100% {
     transform: scaleY(1);
   }
   48% {
-    transform: scaleY(0.12);
+    transform: scaleY(0.08);
   }
 }
 

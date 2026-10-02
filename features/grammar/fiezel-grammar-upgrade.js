@@ -777,10 +777,20 @@
 
           <!-- Badan Kubus Mochi (Squishy Bot) -->
           <div class="mochi-bot-cube mochi-skin-${b.color}" data-role="${b.role}">
-            <!-- Digital eyes yang berkedip lucu ala Grok/Coucou -->
-            <div class="mochi-face-eyes">
-              <span class="mochi-eye left"></span>
-              <span class="mochi-eye right"></span>
+            <!-- Kawaii anime sparkling eyes & blushing cheeks -->
+            <div class="mochi-face-container">
+              <span class="mochi-cheek left"></span>
+              <div class="mochi-face-eyes">
+                <div class="mochi-eye left">
+                  <span class="glint-main"></span>
+                  <span class="glint-sub"></span>
+                </div>
+                <div class="mochi-eye right">
+                  <span class="glint-main"></span>
+                  <span class="glint-sub"></span>
+                </div>
+              </div>
+              <span class="mochi-cheek right"></span>
             </div>
 
             <!-- Teks peran yang muncul mekar saat mendarat di perut mochi -->
