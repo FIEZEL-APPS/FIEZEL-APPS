@@ -1,0 +1,762 @@
+/* ==========================================================================
+   FIEZEL — Grammar UI/UX Upgrade
+   Enhances feedback, grammar syntax highlighting, token-based exercises, 
+   and mastery indicators. Extends design system tokens.
+   ========================================================================== */
+
+/* ==========================================================================
+   1. Enhanced Feedback Bottom Sheet
+   ========================================================================== */
+
+@keyframes feedbackSlideUp {
+  from {
+    transform: translateY(16px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.feedback-success,
+.feedback-error {
+  margin-top: var(--sp-3);
+  padding: var(--sp-4);
+  border-radius: var(--radius-md);
+  line-height: 1.6;
+  font-size: var(--fs-small, .875rem);
+  animation: feedbackSlideUp var(--dur-m) var(--ease-spring) both;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.feedback-success {
+  background: var(--good-soft);
+  color: var(--text);
+  border: 1px solid var(--good-bright);
+}
+
+.feedback-error {
+  background: var(--bad-soft);
+  color: var(--text);
+  border: 1px solid var(--bad);
+}
+
+.feedback-title {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-weight: 800;
+  font-size: 1.1rem;
+}
+
+.feedback-success .feedback-title {
+  color: var(--good-bright);
+}
+
+.feedback-error .feedback-title {
+  color: var(--bad-bright);
+}
+
+.feedback-title svg {
+  width: 24px;
+  height: 24px;
+}
+
+.feedback-rule-pill {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  background: var(--panel);
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line-soft);
+  font-size: .85rem;
+  font-weight: 600;
+  color: var(--text);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.feedback-comparison {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-3);
+  margin-top: var(--sp-2);
+  background: var(--panel);
+  padding: var(--sp-3);
+  border-radius: var(--radius-sm);
+}
+
+.feedback-comparison-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+
+.feedback-comparison-correct {
+  color: var(--good);
+  font-weight: 700;
+}
+
+.feedback-comparison-incorrect {
+  color: var(--bad);
+  text-decoration: line-through;
+  opacity: 0.8;
+}
+
+/* ==========================================================================
+   2. Color-Coded Grammar Syntax
+   ========================================================================== */
+
+.syntax-verb,
+.syntax-prep,
+.syntax-subj,
+.syntax-obj,
+.syntax-aux {
+  font-weight: 700;
+  padding: 0 2px;
+  border-radius: 4px;
+}
+
+.syntax-verb {
+  color: var(--good-bright);
+  background: var(--good-soft);
+}
+
+.syntax-prep {
+  color: var(--info);
+  background: var(--info-soft);
+}
+
+.syntax-subj {
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+}
+
+.syntax-obj {
+  color: var(--info);
+  background: var(--sun-soft);
+  border-bottom: 2px solid var(--sun-deep);
+}
+
+.syntax-aux {
+  color: var(--muted);
+  background: var(--line-soft);
+  font-style: italic;
+}
+
+/* ==========================================================================
+   3. Token Rail Exercise
+   ========================================================================== */
+
+@keyframes chipSnap {
+  0% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+@keyframes shakeError {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+.token-rail {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  padding: var(--sp-4);
+  background: var(--panel-soft);
+  border-radius: var(--radius-lg);
+  min-height: 80px;
+  align-items: center;
+}
+
+.token-slot {
+  min-width: 60px;
+  height: 44px;
+  border: 2px dashed var(--line-strong);
+  border-radius: var(--radius-pill);
+  transition: background var(--dur-s) var(--ease), border-color var(--dur-s) var(--ease);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.token-bank {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-top: var(--sp-4);
+  justify-content: center;
+}
+
+.token-chip {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 var(--sp-4);
+  background: var(--panel);
+  color: var(--text);
+  font-weight: 700;
+  font-size: 1rem;
+  border: 2px solid var(--line-strong);
+  border-radius: var(--radius-pill);
+  box-shadow: 0 4px 0 var(--line-strong);
+  cursor: pointer;
+  transition: transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease), opacity var(--dur-m) var(--ease);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+
+.token-chip:hover {
+  background: var(--panel-soft);
+}
+
+.token-chip:active {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 var(--line-strong);
+}
+
+.token-chip.placed {
+  opacity: 0.4;
+  pointer-events: none;
+  background: var(--line-soft);
+  box-shadow: 0 0 0 var(--line-strong);
+  transform: translateY(4px);
+}
+
+.token-chip.correct {
+  background: var(--good-soft);
+  color: var(--good-bright);
+  border-color: var(--good-bright);
+  box-shadow: 0 4px 0 var(--good-bright);
+  animation: chipSnap var(--dur-m) var(--ease-spring);
+}
+
+.token-chip.wrong {
+  background: var(--bad-soft);
+  color: var(--bad);
+  border-color: var(--bad);
+  box-shadow: 0 4px 0 var(--bad);
+  animation: shakeError var(--dur-s) var(--ease);
+}
+
+/* ==========================================================================
+   4. Mistake Vault Badge
+   ========================================================================== */
+
+.vault-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent);
+  color: var(--cream);
+  border-radius: var(--radius-pill);
+  padding: 2px 8px;
+  font-size: .75rem;
+  font-weight: 800;
+  min-width: 24px;
+  height: 24px;
+}
+
+.vault-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: var(--sp-4);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-3);
+  transition: transform var(--dur-s) var(--ease-spring);
+}
+
+.vault-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.vault-empty {
+  text-align: center;
+  padding: var(--sp-6) var(--sp-4);
+  color: var(--muted);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.vault-empty svg {
+  width: 64px;
+  height: 64px;
+  color: var(--line-strong);
+}
+
+/* ==========================================================================
+   5. Grammar Hint Popover
+   ========================================================================== */
+
+@keyframes popoverEnter {
+  from { opacity: 0; transform: translateY(10px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.grammar-hint-btn {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: var(--sun-deep);
+  border: none;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: background var(--dur-s) var(--ease), color var(--dur-s) var(--ease);
+}
+
+.grammar-hint-btn:hover {
+  background: var(--sun-soft);
+  color: var(--gold);
+}
+
+.grammar-hint-btn:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.grammar-hint-popover {
+  position: absolute;
+  top: calc(100% + var(--sp-2));
+  right: 0;
+  width: max-content;
+  max-width: 280px;
+  background: var(--core);
+  color: var(--on-core);
+  padding: var(--sp-3);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  font-size: .85rem;
+  line-height: 1.5;
+  z-index: 100;
+  animation: popoverEnter var(--dur-m) var(--ease-spring) both;
+}
+
+.grammar-hint-popover::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  right: 20px;
+  width: 12px;
+  height: 12px;
+  background: var(--core);
+  transform: rotate(45deg);
+  border-radius: 2px;
+}
+
+/* ==========================================================================
+   6. Mastery Tier Indicators
+   ========================================================================== */
+
+.mastery-indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+}
+
+.mastery-tier-1 {
+  border-color: var(--line-strong);
+}
+
+.mastery-tier-2 {
+  border-color: var(--sun);
+}
+
+.mastery-tier-3 {
+  border-color: var(--good);
+}
+
+.mastery-tier-4 {
+  border-color: var(--gold);
+  background: var(--sun-soft);
+}
+
+@keyframes decayPulse {
+  0% { transform: scale(0.8); opacity: 0.8; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+.mastery-decay {
+  border-color: var(--info);
+  position: relative;
+}
+
+.mastery-decay::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border: 2px solid var(--info);
+  border-radius: 50%;
+  animation: decayPulse 2s infinite;
+}
+
+/* ==========================================================================
+   7. Combo & Streak Enhancements
+   ========================================================================== */
+
+@keyframes comboBurst {
+  0% { transform: scale(0.8); opacity: 0; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.combo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(135deg, var(--sun), var(--gold));
+  color: var(--text);
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  font-weight: 800;
+  font-size: .9rem;
+  box-shadow: var(--shadow-sm);
+  animation: comboBurst var(--dur-l) var(--ease-spring);
+}
+
+.combo-badge::before {
+  content: '🔥';
+  font-size: 1.1rem;
+}
+
+@keyframes milestoneCelebrate {
+  0% { transform: translateY(20px); opacity: 0; }
+  20% { transform: translateY(-5px); opacity: 1; }
+  40% { transform: translateY(0); opacity: 1; }
+  80% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(-10px); opacity: 0; }
+}
+
+.streak-milestone {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--core);
+  color: var(--sun);
+  padding: var(--sp-3) var(--sp-5);
+  border-radius: var(--radius-pill);
+  font-size: 1.25rem;
+  font-weight: 800;
+  box-shadow: var(--shadow-lg);
+  pointer-events: none;
+  z-index: 200;
+  animation: milestoneCelebrate 2.5s var(--ease) forwards;
+}
+
+/* ==========================================================================
+   Reduced Motion
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .feedback-success,
+  .feedback-error,
+  .token-chip.correct,
+  .token-chip.wrong,
+  .grammar-hint-popover,
+  .mastery-decay::after,
+  .combo-badge,
+  .streak-milestone {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* ==========================================================================
+   8. Video-First Grammar Exercise
+   ========================================================================== */
+
+@keyframes videoOverlaySlideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.video-grammar-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+/* ---- Player ---- */
+
+.video-player-wrap {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--core);
+}
+
+.video-player-wrap video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ---- Subtitle Strip ---- */
+
+.video-subtitle-strip {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: var(--sp-3) var(--sp-4);
+  padding-bottom: max(var(--sp-3), env(safe-area-inset-bottom));
+  background: rgba(27, 20, 24, .72);
+  color: var(--on-core);
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.video-subtitle-active {
+  color: var(--sun);
+  text-shadow: 0 1px 4px rgba(27, 20, 24, .5);
+}
+
+/* ---- Controls ---- */
+
+.video-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+}
+
+.video-play-btn {
+  width: 50px;
+  height: 50px;
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--core);
+  color: var(--on-core);
+  border: none;
+  border-radius: 50%;
+  box-shadow: var(--shadow-md);
+  cursor: pointer;
+  transition: transform var(--dur-s) var(--ease);
+}
+
+.video-play-btn:hover {
+  transform: scale(1.08);
+}
+
+.video-play-btn:active {
+  transform: scale(0.95);
+}
+
+.video-play-btn:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.video-speed-btn {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 var(--sp-4);
+  background: var(--panel-soft);
+  color: var(--text);
+  font-weight: 700;
+  font-size: .875rem;
+  border: none;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: background var(--dur-s) var(--ease);
+}
+
+.video-speed-btn:hover {
+  background: var(--line-soft);
+}
+
+.video-speed-btn:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* ---- Progress Bar ---- */
+
+.video-progress {
+  width: 100%;
+  height: 4px;
+  background: var(--line-soft);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+
+.video-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--sun), var(--sun-deep));
+  border-radius: var(--radius-pill);
+  transition: width var(--dur-s) var(--ease);
+}
+
+/* ---- Loop Badge ---- */
+
+.video-loop-badge {
+  position: absolute;
+  top: var(--sp-3);
+  right: var(--sp-3);
+  padding: 4px var(--sp-3);
+  background: rgba(27, 20, 24, .65);
+  backdrop-filter: blur(8px);
+  color: var(--on-core);
+  font-size: .75rem;
+  font-weight: 700;
+  border-radius: var(--radius-pill);
+  z-index: 2;
+}
+
+/* ---- Exercise Overlay ---- */
+
+.video-exercise-overlay {
+  background: var(--panel);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  box-shadow: var(--shadow-lg);
+  padding: var(--sp-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  animation: videoOverlaySlideUp var(--dur-m) var(--ease-spring) both;
+}
+
+.video-grammar-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 700;
+  font-size: .8rem;
+  border-radius: var(--radius-pill);
+}
+
+/* ---- Cloze Exercise ---- */
+
+.video-cloze-text {
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1.6;
+  color: var(--text);
+}
+
+.video-cloze-blank {
+  display: inline-block;
+  min-width: 80px;
+  border: none;
+  border-bottom: 2px dashed var(--accent);
+  background: transparent;
+  text-align: center;
+  font: inherit;
+  font-weight: 700;
+  color: var(--text);
+  padding: 2px var(--sp-2);
+  transition: background var(--dur-s) var(--ease), border-color var(--dur-s) var(--ease);
+}
+
+.video-cloze-blank.filled {
+  background: var(--sun-soft);
+  border-color: var(--accent);
+  font-weight: 800;
+}
+
+.video-cloze-blank.correct {
+  background: var(--good-soft);
+  border-color: var(--good);
+  color: var(--good-bright);
+}
+
+.video-cloze-blank.wrong {
+  background: var(--bad-soft);
+  border-color: var(--bad);
+  color: var(--bad);
+}
+
+/* ---- Chip Options ---- */
+
+.video-chip-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  justify-content: center;
+  margin-top: var(--sp-3);
+}
+
+.video-chip-options .token-chip {
+  /* Inherits token-chip styles from section 3 */
+}
+
+/* ---- Fallback ---- */
+
+.video-fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-3);
+  padding: var(--sp-6) var(--sp-4);
+  background: var(--panel-soft);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  color: var(--muted);
+  font-size: var(--fs-small, .875rem);
+}
+
+.video-fallback svg {
+  width: 48px;
+  height: 48px;
+  color: var(--line-strong);
+}
+
+/* ---- Mobile: cap video height ---- */
+
+@media (max-width: 600px) {
+  .video-player-wrap {
+    max-height: 45vh;
+  }
+}
+
+/* ==========================================================================
+   Reduced Motion — Video Grammar additions
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .video-exercise-overlay,
+  .video-play-btn {
+    animation: none !important;
+    transition: none !important;
+  }
+}
