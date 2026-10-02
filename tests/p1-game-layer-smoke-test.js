@@ -48,7 +48,7 @@ const INITIAL_CLASS={welcome:'welcome notification-gate hidden',authGate:'welcom
 function element(id){if(!elements[id]){const el=fakeEl('div');el.id=id;el.className=INITIAL_CLASS[id]||'';el.classList=fakeClassList(el);elements[id]=el}return elements[id]}
 const fakeBody={className:'',appendChild(el){bodyChildren.push(el)}};fakeBody.classList=fakeClassList(fakeBody);
 const document={baseURI:'http://localhost/',body:fakeBody,getElementById:id=>{
-  if(id==='fzRitual'||id==='fzPrasasti')return bodyChildren.find(e=>e.id===id)||null;
+  if(id==='fzRitual'||id==='fzPrasasti'||id==='confidencePop')return bodyChildren.find(e=>e.id===id)||null;
   return element(id);
 },querySelector(){return null},querySelectorAll(){return []},createElement:t=>fakeEl(t),addEventListener(){},startViewTransition:undefined};
 const store={};
