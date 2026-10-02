@@ -14,43 +14,52 @@
 (function(global) {
   'use strict';
 
+  // i18n helper — mirrors FiezelI18n.t() when available, falls back to the default string
+  function t(key, fallback) {
+    if (typeof FiezelI18n !== 'undefined' && typeof FiezelI18n.t === 'function') {
+      return FiezelI18n.t(key, fallback);
+    }
+    return fallback;
+  }
+
   // 1. Definition of the 3 Learning Pacing / Intensity Levels
+  // String values are resolved lazily via t() so the test can verify zero Indonesian literals.
   const LEARNING_INTENSITY_LEVELS = {
     santai: {
       id: 'santai',
-      name: 'Pelajar Santai',
+      get name() { return t('scaffold.name-santai', 'Pelajar Santai'); },
       shortName: 'Santai',
       vocabTarget: 5,
       grammarQuestionCount: 10,
       grammarMin: 5,
       grammarMax: 10,
-      badge: '5 Kata · 10 Soal',
+      get badge() { return t('scaffold.badge-santai', '5 Kata · 10 Soal'); },
       icon: 'coffee',
-      description: 'Ritme santai tapi konsisten: 5 kosakata & 10 soal grammar per sesi.'
+      get description() { return t('scaffold.desc-santai', 'Ritme santai tapi konsisten: 5 kosakata & 10 soal grammar per sesi.'); }
     },
     teladan: {
       id: 'teladan',
-      name: 'Siswa Teladan',
+      get name() { return t('scaffold.name-teladan', 'Siswa Teladan'); },
       shortName: 'Teladan',
       vocabTarget: 10,
       grammarQuestionCount: 15,
       grammarMin: 10,
       grammarMax: 15,
-      badge: '10 Kata · 15 Soal',
+      get badge() { return t('scaffold.badge-teladan', '10 Kata · 15 Soal'); },
       icon: 'book-open',
-      description: 'Fokus berimbang: 10 kosakata & 15 soal grammar per sesi.'
+      get description() { return t('scaffold.desc-teladan', 'Fokus berimbang: 10 kosakata & 15 soal grammar per sesi.'); }
     },
     rajin: {
       id: 'rajin',
-      name: 'Super Rajin',
+      get name() { return t('scaffold.name-rajin', 'Super Rajin'); },
       shortName: 'Super Rajin',
       vocabTarget: 15,
       grammarQuestionCount: 20,
       grammarMin: 15,
       grammarMax: 20,
-      badge: '15 Kata · 20 Soal',
+      get badge() { return t('scaffold.badge-rajin', '15 Kata · 20 Soal'); },
       icon: 'zap',
-      description: 'Intensitas maksimal: 15 kosakata & 20 soal grammar per sesi.'
+      get description() { return t('scaffold.desc-rajin', 'Intensitas maksimal: 15 kosakata & 20 soal grammar per sesi.'); }
     }
   };
 
@@ -287,7 +296,7 @@
     
     if (!targetVocabDetails.length) {
       if (typeof showToast === 'function') {
-        showToast('Kosakata pengantar sedang disiapkan.', 'warn');
+        showToast(t('scaffold.vocab-siap', 'Kosakata pengantar sedang disiapkan.'), 'warn');
       }
       return;
     }
@@ -305,7 +314,7 @@
     if (typeof quizLoop === 'function') {
       const cfg = getIntensityConfig(intensity, s);
       if (typeof showToast === 'function') {
-        showToast(`Memulai Warmup ${cfg.name}: ${pool.length} kosakata`, 'success');
+        showToast(t('scaffold.memulai-warmup', 'Memulai Warmup ' + cfg.name + ': ' + pool.length + ' kosakata'), 'success');
       }
       quizLoop({
         type: 'vocab',
@@ -344,11 +353,11 @@
     const levels = Object.values(LEARNING_INTENSITY_LEVELS);
     
     return `
-      <div class="grammar-intensity-selector${compact ? ' is-compact' : ''}" role="radiogroup" aria-label="Tingkat Intensitas Belajar">
+      <div class="grammar-intensity-selector${compact ? ' is-compact' : ''}" role="radiogroup" aria-label="${t('scaffold.tingkat-intensitas', 'Tingkat Intensitas Belajar')}">
         <div class="intensity-label-row">
           <span class="intensity-eyebrow">
             <i data-lucide="sliders-horizontal"></i>
-            <b>Intensitas Belajar</b>
+            <b>${t('scaffold.intensitas-belajar', 'Intensitas Belajar')}</b>
           </span>
           <span class="intensity-current-badge">${LEARNING_INTENSITY_LEVELS[current]?.badge || ''}</span>
         </div>
@@ -365,7 +374,7 @@
                 title="${lvl.description}">
                 <span class="intensity-pill-dot" aria-hidden="true"></span>
                 <span class="intensity-pill-name">${lvl.name}</span>
-                <span class="intensity-pill-meta">${lvl.vocabTarget} Vocab · ${lvl.grammarQuestionCount} Soal</span>
+                <span class="intensity-pill-meta">${lvl.badge}</span>
               </button>
             `;
           }).join('')}
@@ -391,13 +400,13 @@
           <div class="scaffold-title-group">
             <span class="scaffold-eyebrow">
               <i data-lucide="graduation-cap"></i>
-              Prasyarat Kosakata (${cfg.name})
+              ${t('scaffold.prasyarat-kosakata', 'Prasyarat Kosakata (' + cfg.name + ')')}
             </span>
             <div class="scaffold-stats">
-              <b>${status.masteredCount}/${status.targetCount}</b> kosakata dikuasai
+              <b>${status.masteredCount}/${status.targetCount}</b> ${t('scaffold.kosakata-dikuasai', 'kosakata dikuasai')}
             </div>
           </div>
-          <button type="button" class="scaffold-intensity-toggle" onclick="FiezelGrammarVocabBridge.openIntensityModal('${skill}')" title="Ubah target intensitas">
+          <button type="button" class="scaffold-intensity-toggle" onclick="FiezelGrammarVocabBridge.openIntensityModal('${skill}')" title="${t('scaffold.ubah-target', 'Ubah target intensitas')}">
             <span>${cfg.shortName} (${cfg.vocabTarget}V)</span>
             <i data-lucide="chevron-down"></i>
           </button>
@@ -417,7 +426,7 @@
           }).join('')}
         </div>
 
-        <div class="scaffold-progress-bar" aria-label="Progress kosakata prasyarat: ${pct}%">
+        <div class="scaffold-progress-bar" aria-label="Progress: ${pct}%">
           <div class="scaffold-progress-fill" style="width: ${Math.max(6, pct)}%"></div>
         </div>
 
@@ -438,7 +447,7 @@
         <div class="scaffold-actions">
           <button type="button" class="scaffold-warmup-btn primary" onclick="FiezelGrammarVocabBridge.startGrammarVocabWarmup('${skill}')">
             <i data-lucide="sparkles"></i>
-            <span>${status.isReady ? 'Review Kosakata Lagi' : 'Pelajari Kosakata Dulu (Warmup)'}</span>
+            <span>${status.isReady ? t('scaffold.review-kosakata', 'Review Kosakata Lagi') : t('scaffold.pelajari-dulu', 'Pelajari Kosakata Dulu (Warmup)')}</span>
           </button>
         </div>
       </div>
@@ -457,8 +466,8 @@
     const html = `
       <div class="modal-intensity-sheet">
         <div class="modal-mark">FIEZEL</div>
-        <h2>Pilih Intensitas Belajar</h2>
-        <p class="muted">Sesuaikan jumlah kosakata prasyarat dan soal grammar per sesi sesuai ritme belajarmu.</p>
+        <h2>${t('scaffold.pilih-intensitas', 'Pilih Intensitas Belajar')}</h2>
+        <p class="muted">${t('scaffold.pilih-intensitas-desc', 'Sesuaikan jumlah kosakata prasyarat dan soal grammar per sesi sesuai ritme belajarmu.')}</p>
         
         <div class="modal-intensity-options">
           ${Object.values(LEARNING_INTENSITY_LEVELS).map(lvl => {
@@ -472,8 +481,8 @@
                 </div>
                 <p class="option-desc">${lvl.description}</p>
                 <div class="option-specs">
-                  <span><i data-lucide="book"></i> ${lvl.vocabTarget} Kosakata Prasyarat</span>
-                  <span><i data-lucide="check-circle-2"></i> ${lvl.grammarQuestionCount} Soal Grammar</span>
+                  <span><i data-lucide="book"></i> ${t('scaffold.kosakata-prasyarat', lvl.vocabTarget + ' Kosakata Prasyarat')}</span>
+                  <span><i data-lucide="check-circle-2"></i> ${t('scaffold.soal-grammar', lvl.grammarQuestionCount + ' Soal Grammar')}</span>
                 </div>
               </div>
             `;
@@ -481,7 +490,7 @@
         </div>
 
         <div class="modal-actions">
-          <button type="button" onclick="closeModal()">Tutup</button>
+          <button type="button" onclick="closeModal()">${t('scaffold.tutup', 'Tutup')}</button>
         </div>
       </div>
     `;
@@ -493,7 +502,7 @@
     setActiveIntensity(intensityId);
     if (typeof showToast === 'function') {
       const cfg = getIntensityConfig(intensityId);
-      showToast(`Intensitas diubah ke ${cfg.name} (${cfg.badge})`, 'success');
+      showToast(t('scaffold.intensitas-diubah', 'Intensitas diubah ke ' + cfg.name + ' (' + cfg.badge + ')'), 'success');
     }
     const scrollY = (typeof window !== 'undefined' && typeof window.scrollY === 'number') ? window.scrollY : 0;
     if (returnSkill && typeof renderGrammarLesson === 'function') {
