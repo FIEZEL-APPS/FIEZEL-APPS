@@ -1,6 +1,6 @@
 {
   "schema": "id-golden-baseline/1",
-  "generatedAt": "2026-10-02T09:37:52.802Z",
+  "generatedAt": "2026-10-02T10:03:54.304Z",
   "root": "C:\\Users\\hp\\fiezel-apps",
   "files": {
     "grammar-explanations-id.json": "957287e42e6eada2b95e6dfa000350ba95468aeae452b15739d6dbe5c0d4ddb1",
@@ -18,8 +18,8 @@
     "features/audio-assets/fiezel-audio-key.js": "11624e303917fe0df881ac3f410911587766fd6f4d2491ca6687ec42de8d457d"
   },
   "literals": {
-    "count": 4476,
-    "sha256": "617aa659fed282f16727e4f6a0efdf7fc9139fe162a1c2bcd5130f3d843969bb",
+    "count": 4478,
+    "sha256": "263c39adfabdc4e051a2a54ad16dd08e5dd1b98e821e11805dc497fd8db54d99",
     "list": [
       "\n      ?self.FiezelPostTest.evaluate(st,results):null;\n    let dueCount=0,scheduledCount=0;\n    for(const lesson of Object.keys(st.probes)){\n      const list=Array.isArray(st.probes[lesson]?.probes)?st.probes[lesson].probes:[];\n      scheduledCount+=list.length;\n      for(const p of list)if(Number(p?.dueAt)<=now)dueCount++;\n    }\n    return {lessons:Object.keys(st.probes).length,scheduled:scheduledCount,due:dueCount,measured:results.length,evaluation:evalOut};\n  }catch{return null}\n}\n/* KEWENANGAN kalibrasi (Langkah 1, m025-341): otak menilai ramalannya sendiri, lalu\n * bertindak atas penilaian itu.\n *\n * brierCalibration() sudah dihitung sejak lama tetapi hasilnya hanya dipajang. Brier Skill\n * Score = 1 - brier/baseline: > 0 berarti prediksi model mengalahkan tebakan base-rate,\n * <= 0 berarti TIDAK - model ini, untuk murid ini, tidak lebih baik daripada menebak.\n *\n * Kalau model tidak bisa dipercaya meramal, ia juga tidak boleh dipercaya MEMBUKA lesson\n * dengan bukti seadanya. Maka vonis buruk menaikkan ambang bukti (n) yang dituntut sebelum\n * mastery BKT boleh ikut membuka prasyarat.\n *\n * DUA PAGAR YANG MENENTUKAN BENTUK FUNGSI INI:\n *   1. SATU ARAH. Kembaliannya selalu >= 0. Kalibrasi buruk hanya bisa membuat sistem\n *      lebih KETAT; tidak ada jalan bagi fungsi ini untuk melonggarkan apa pun. Kalibrasi\n *      yang bagus bukan alasan membuka lesson lebih mudah.\n *   2. FAIL-QUIET. Modul absen, riwayat tipis (modul menahan di bawah brierMinTotal=10),\n *      baseline nol, atau apa pun yang melempar => 0, dan perilaku persis seperti sebelum\n *      langkah ini. */\nfunction brierEvidenceBump(now=Date.now()){\n  const M=self.FiezelLearningMetrics;\n  if(!M||typeof M.brierCalibration!==",
       "\n      case 'silent':                        // L5: kalau mulut sempat mulai (taksiran L3 kandas), tutup SEKARANG\n        degradedLatch = false;\n        closeTurn(false);\n        break;\n      case 'interrupt':                     // stop(): snap tutup\n        degradedLatch = false;\n        closeTurn(true);\n        break;\n      default:\n        break;                              // fase asing dari versi fasad lebih baru: diabaikan tanpa suara\n    }\n  }\n\n  try { doc.addEventListener('fiezel-speech', onSpeech); } catch (_) {}\n\n  /* Suara terdegradasi (audibility-fix): mulut mati SEKETIKA dan tidak boleh\n     hidup lagi untuk sisa giliran — apa pun yang masih dikirim lapisan bawah. */\n  try {\n    root.addEventListener('fiezel-neural-voice-degraded', function () {\n      if (turn) closeTurn(true);\n      degradedLatch = true;                 // dilepas oleh end/silent/interrupt fasad berikutnya\n    });\n  } catch (_) {}\n\n  /* Permukaan kecil untuk Diagnostics/tes — bukan API pemanggil biasa:\n     satu-satunya pintu bicara tetap FiezelVoiceSay.say(). */\n  root.FiezelSpeechBridge = Object.freeze({\n    SCHEMA: SCHEMA,\n    speaking: function () { return !!turn; },\n    degraded: function () { return !!degradedLatch; },\n    motionAllowed: motionAllowed\n  });\n})(typeof self !== 'undefined' ? self : (typeof window !== 'undefined' ? window : this));\n",
@@ -2312,6 +2312,7 @@
       "Kamu belum ikut liga global. Keikutsertaan dipilih saat membuat profil; sakelar ikut/keluar liga menyusul di paket berikutnya — papan Teman tetap terbuka penuh untukmu.",
       "Kamu belum masuk KelasKu. Masuk dulu di aplikasi FIEZEL, lalu kembali ke sini.",
       "Kamu bergabung ke KelasKu {code}.",
+      "Kamu berhasil menyelesaikan seluruh checkpoint tata bahasa dalam percakapan asli ini.",
       "Kamu bisa meraih apa saja dengan latihan konsisten.",
       "Kamu boleh berhenti di sini. Kalau masih mau, satu sesi tambahan tidak apa-apa.",
       "Kamu dan @{handle} sekarang berteman.",
@@ -2593,6 +2594,7 @@
       "Latihan",
       "Latihan ",
       "Latihan &amp; Materi Kelas",
+      "Latihan 5 Checkpoint Selesai!",
       "Latihan Mandiri",
       "Latihan Mistake Vault ({count} soal)",
       "Latihan Singkat",
