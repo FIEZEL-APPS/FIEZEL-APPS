@@ -18,23 +18,30 @@
    * @returns {Object} Objek soal standar
    */
   FiezelGrammarVideo.createVideoGrammarQuestion = function(template) {
+    template = template || {};
+    const ex = template.exercise || {};
+    let stemQuestion = ex.question || FiezelI18n.t('grammar.video.question', 'Perhatikan video dan lengkapi bagian yang kosong.');
+    if (ex.clozeText) {
+      stemQuestion = stemQuestion ? `${stemQuestion} ${ex.clozeText}` : ex.clozeText;
+    }
+
     return {
-      id: template.id,
+      id: template.id || `vg-${Date.now()}`,
       type: 'video-grammar',
-      level: template.level,
-      question: template.exercise?.question || FiezelI18n.t('grammar.video.question', 'Perhatikan video dan lengkapi bagian yang kosong.'),
-      options: template.exercise?.options || [],
-      answerIndex: template.exercise?.answerIndex || 0,
+      level: template.level || 'A1',
+      question: stemQuestion,
+      options: ex.options || [],
+      answerIndex: Number.isInteger(ex.answerIndex) ? ex.answerIndex : 0,
       videoConfig: {
-        videoUrl: template.videoUrl,
-        posterUrl: template.posterUrl,
+        videoUrl: template.videoUrl || '',
+        posterUrl: template.posterUrl || '',
         subtitles: template.subtitles || [],
         pauseAt: template.pauseAt || 0,
         loopCount: template.loopCount || 3,
         speed: template.speed || 1.0,
         exercise: template.exercise
       },
-      explain: template.exercise?.explain || {},
+      explain: ex.explain || {},
       skill: template.skill,
       lessonSkill: template.lessonSkill
     };
@@ -42,11 +49,12 @@
 
   /**
    * Merender pemutar video HTML5 kustom.
-   * @param {Object} config Konfigurasi video
+   * @param {Object} [config] Konfigurasi video
    * @param {Object} [state] Status internal (di-mutate)
    * @returns {HTMLElement} Elemen container pemutar video
    */
   FiezelGrammarVideo.renderVideoPlayer = function(config, state) {
+    config = config || {};
     state = state || {};
     const isEsc = typeof self.esc === 'function';
     const esc = (str) => isEsc ? self.esc(str) : str;
@@ -60,7 +68,7 @@
       style.id = 'fiezel-video-grammar-style';
       style.textContent = `
         .video-exercise-wrap { display: flex; flex-direction: column; width: 100%; height: 100%; position: relative; overflow: hidden; border-radius: var(--radius-lg); background: var(--surface); box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid var(--line); margin-bottom: 16px; }
-        .video-player-container { position: relative; width: 100%; padding-top: 56.25%; background: #000; overflow: hidden; flex-shrink: 0; }
+        .video-player-container { position: relative; width: 100%; padding-top: 56.25%; background: #000; overflow: hidden; flex-shrink: 0; border-radius: var(--radius-lg); margin-bottom: 16px; }
         .video-player-container video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
         .video-controls { position: absolute; bottom: 0; left: 0; right: 0; padding: 12px 16px; background: linear-gradient(transparent, rgba(0,0,0,0.8)); display: flex; align-items: center; gap: 12px; z-index: 10; }
         .video-controls button { background: none; border: none; color: #fff; cursor: pointer; padding: 4px; display: grid; place-items: center; border-radius: var(--radius-sm); }
@@ -89,8 +97,8 @@
         .cloze-chip:hover { border-color: var(--accent); background: var(--accent-soft); }
         .cloze-chip:disabled { opacity: 0.6; cursor: not-allowed; }
         .grammar-choice-options { display: flex; flex-direction: column; gap: 10px; }
-        .video-player-container.is-fallback { padding-top: 0; background: var(--surface); }
-        .fallback-card { padding: 20px 16px; text-align: center; background: var(--panel-soft); border-radius: var(--radius-lg); display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; box-sizing: border-box; color: var(--text); }
+        .video-player-container.is-fallback { padding-top: 0; background: transparent; margin-bottom: 16px; }
+        .fallback-card { padding: 20px 16px; text-align: center; background: var(--panel-soft); border: 1px solid var(--line-soft); border-radius: var(--radius-lg); display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; box-sizing: border-box; color: var(--text); }
       `;
       document.head.appendChild(style);
     }
@@ -301,7 +309,7 @@
   FiezelGrammarVideo.renderSubtitleCloze = function(config, onSubmit) {
     const isEsc = typeof self.esc === 'function';
     const esc = (str) => isEsc ? self.esc(str) : str;
-    const ex = config.exercise;
+    const ex = (config && config.exercise) ? config.exercise : {};
 
     const pane = document.createElement('div');
     pane.className = 'video-overlay-pane';
@@ -336,7 +344,7 @@
         if (typeof self.haptic === 'function') self.haptic('tap');
         const idx = parseInt(chip.getAttribute('data-idx'), 10);
         const isCorrect = idx === ex.answerIndex;
-        const optText = ex.options[idx];
+        const optText = (ex.options && ex.options[idx]) || '';
         
         chips.forEach(c => c.disabled = true);
         
@@ -353,7 +361,7 @@
           self.uiSfx(isCorrect ? 'correct' : 'wrong');
         }
 
-        onSubmit(isCorrect, idx);
+        if (typeof onSubmit === 'function') onSubmit(isCorrect, idx);
       };
     });
 
@@ -363,11 +371,12 @@
 
   /**
    * Merender overlay pilihan ganda tata bahasa konvensional.
-   * @param {Object} exercise Objek exercise
-   * @param {Function} onAnswer Callback
+   * @param {Object} [exercise] Objek exercise
+   * @param {Function} [onAnswer] Callback
    * @returns {HTMLElement} Elemen pane
    */
   FiezelGrammarVideo.renderGrammarChoiceOverlay = function(exercise, onAnswer) {
+    exercise = exercise || {};
     const isEsc = typeof self.esc === 'function';
     const esc = (str) => isEsc ? self.esc(str) : str;
 
@@ -402,7 +411,7 @@
           self.uiSfx(isCorrect ? 'correct' : 'wrong');
         }
 
-        onAnswer(isCorrect, idx);
+        if (typeof onAnswer === 'function') onAnswer(isCorrect, idx);
       };
     });
 
@@ -412,11 +421,13 @@
 
   /**
    * Merender pengalaman lengkap Video-First Grammar Exercise.
-   * @param {Object} config Konfigurasi
-   * @param {Object} callbacks Callbacks { onAnswer, onComplete, onSkip }
+   * @param {Object} [config] Konfigurasi
+   * @param {Object} [callbacks] Callbacks { onAnswer, onComplete, onSkip }
    * @returns {HTMLElement} Elemen root
    */
   FiezelGrammarVideo.renderVideoExercise = function(config, callbacks) {
+    config = config || {};
+    callbacks = callbacks || {};
     const root = document.createElement('div');
     root.className = 'video-exercise-wrap';
 
@@ -434,9 +445,6 @@
       }
     };
 
-    const playerEl = this.renderVideoPlayer(config, state);
-    root.appendChild(playerEl);
-
     let overlayPane = null;
 
     state.onPauseReached = () => {
@@ -451,11 +459,12 @@
         // Tampilkan umpan balik menggunakan FiezelGrammarUpgrade jika tersedia
         const feedbackHost = document.getElementById('feedback');
         if (feedbackHost && self.FiezelGrammarUpgrade?.buildFeedbackHTML) {
+          const ex = config.exercise || {};
           const qObj = {
             type: 'grammar',
-            options: config.exercise.options,
-            answerIndex: config.exercise.answerIndex,
-            explain: config.exercise.explain
+            options: ex.options || [],
+            answerIndex: ex.answerIndex || 0,
+            explain: ex.explain || {}
           };
           feedbackHost.innerHTML = self.FiezelGrammarUpgrade.buildFeedbackHTML(qObj, chosenIndex, isCorrect);
           feedbackHost.classList.remove('hidden', 'feedback-success', 'feedback-error');
@@ -489,16 +498,23 @@
       if (type === 'subtitle-cloze') {
         overlayPane = this.renderSubtitleCloze(config, handleAnswer);
       } else {
-        overlayPane = this.renderGrammarChoiceOverlay(config.exercise, handleAnswer);
+        overlayPane = this.renderGrammarChoiceOverlay(config.exercise || {}, handleAnswer);
       }
 
       root.appendChild(overlayPane);
       
       // Animasi masuk
-      requestAnimationFrame(() => {
+      if (typeof requestAnimationFrame === 'function') {
+        requestAnimationFrame(() => {
+          overlayPane.classList.add('active');
+        });
+      } else {
         overlayPane.classList.add('active');
-      });
+      }
     };
+
+    const playerEl = this.renderVideoPlayer(config, state);
+    root.appendChild(playerEl);
 
     // Keyboard support: Space untuk play/pause
     root.tabIndex = 0;

@@ -88,12 +88,12 @@
         "clozeText": "I ___ from Tokyo.",
         "clozeAnswer": "am",
         "options": [
-          "am",
           "is",
+          "am",
           "are",
           "be"
         ],
-        "answerIndex": 0,
+        "answerIndex": 1,
         "grammarPoint": "Verb To Be",
         "rule": "Use 'am' with 'I'.",
         "explain": {
@@ -149,12 +149,12 @@
         "clozeText": "Yes, I have ___ orange cat.",
         "clozeAnswer": "an",
         "options": [
-          "an",
           "a",
           "the",
+          "an",
           "some"
         ],
-        "answerIndex": 0,
+        "answerIndex": 2,
         "grammarPoint": "Articles (a/an)",
         "rule": "Use 'an' before a word starting with a vowel sound.",
         "explain": {
@@ -210,12 +210,12 @@
         "clozeText": "It's ___ Monday.",
         "clozeAnswer": "on",
         "options": [
-          "on",
           "in",
           "at",
-          "for"
+          "for",
+          "on"
         ],
-        "answerIndex": 0,
+        "answerIndex": 3,
         "grammarPoint": "Prepositions of Time",
         "rule": "Use 'on' for days of the week.",
         "explain": {
@@ -271,12 +271,12 @@
         "clozeText": "I ___ a movie.",
         "clozeAnswer": "watched",
         "options": [
-          "watched",
           "watch",
+          "watched",
           "watching",
           "watches"
         ],
-        "answerIndex": 0,
+        "answerIndex": 1,
         "grammarPoint": "Past Simple Regular",
         "rule": "Add -ed to regular verbs for past simple.",
         "explain": {
@@ -332,12 +332,12 @@
         "clozeText": "Yes, I ___ with Sarah.",
         "clozeAnswer": "went",
         "options": [
-          "went",
           "go",
           "goed",
+          "went",
           "going"
         ],
-        "answerIndex": 0,
+        "answerIndex": 2,
         "grammarPoint": "Past Simple Irregular",
         "rule": "'Go' is an irregular verb. Its past form is 'went'.",
         "explain": {
@@ -393,12 +393,12 @@
         "clozeText": "But that one is ___.",
         "clozeAnswer": "better",
         "options": [
-          "better",
           "gooder",
           "more good",
-          "best"
+          "best",
+          "better"
         ],
-        "answerIndex": 0,
+        "answerIndex": 3,
         "grammarPoint": "Comparatives",
         "rule": "'Good' is irregular. Its comparative is 'better'.",
         "explain": {
@@ -515,12 +515,12 @@
         "clozeText": "Not now, I am ___.",
         "clozeAnswer": "studying",
         "options": [
-          "studying",
           "study",
+          "studying",
           "studied",
           "studies"
         ],
-        "answerIndex": 0,
+        "answerIndex": 1,
         "grammarPoint": "Present Continuous",
         "rule": "Use am/is/are + verb-ing for actions happening right now.",
         "explain": {
@@ -576,12 +576,12 @@
         "clozeText": "No thanks, I have already ___ it.",
         "clozeAnswer": "seen",
         "options": [
-          "seen",
           "saw",
           "see",
+          "seen",
           "seeing"
         ],
-        "answerIndex": 0,
+        "answerIndex": 2,
         "grammarPoint": "Present Perfect",
         "rule": "Use have/has + past participle (V3) for past actions relevant now.",
         "explain": {
@@ -637,12 +637,12 @@
         "clozeText": "If it rains, we ___ stay inside.",
         "clozeAnswer": "will",
         "options": [
-          "will",
           "would",
           "are",
-          "do"
+          "do",
+          "will"
         ],
-        "answerIndex": 0,
+        "answerIndex": 3,
         "grammarPoint": "First Conditional",
         "rule": "Use 'will' in the main clause for a probable future result.",
         "explain": {
@@ -759,12 +759,12 @@
         "clozeText": "Yes, I enjoy ___ tennis.",
         "clozeAnswer": "playing",
         "options": [
-          "playing",
           "to play",
+          "playing",
           "play",
           "played"
         ],
-        "answerIndex": 0,
+        "answerIndex": 1,
         "grammarPoint": "Gerunds after 'Enjoy'",
         "rule": "The verb 'enjoy' is always followed by a gerund (-ing form).",
         "explain": {
@@ -820,12 +820,12 @@
         "clozeText": "If we had left earlier, we ___ have caught it.",
         "clozeAnswer": "would",
         "options": [
-          "would",
           "will",
           "had",
+          "would",
           "couldn't"
         ],
-        "answerIndex": 0,
+        "answerIndex": 2,
         "grammarPoint": "Third Conditional",
         "rule": "Use would have + V3 for unreal past situations.",
         "explain": {
@@ -881,12 +881,12 @@
         "clozeText": "But earlier she ___ me she was fine.",
         "clozeAnswer": "told",
         "options": [
-          "told",
           "said",
           "tells",
-          "spoke"
+          "spoke",
+          "told"
         ],
-        "answerIndex": 0,
+        "answerIndex": 3,
         "grammarPoint": "Reported Speech (Say vs Tell)",
         "rule": "Use 'tell' (told) when mentioning WHO was spoken to (an object).",
         "explain": {

@@ -351,7 +351,47 @@ const playerEl = Video.renderVideoPlayer(vq.videoConfig);
 assert(playerEl, 'renderVideoPlayer must return element without crashing when state is undefined');
 assert(playerEl.innerHTML.includes('Alice'), 'Fallback card must display dialogue subtitles');
 assert(playerEl.innerHTML.includes('Bob'), 'Fallback card must display dialogue subtitles');
-console.log('✓ Test 6 passed: Video grammar question creation and safe player fallback verified.');
+
+// Test clozeText stem integration
+const clozeTemplate = {
+  id: 'vg-cloze-test',
+  level: 'A2',
+  exercise: {
+    question: 'Complete the subtitle:',
+    clozeText: 'I usually ___ coffee in the morning.',
+    options: ['drink', 'drank'],
+    answerIndex: 0
+  }
+};
+const vqCloze = Video.createVideoGrammarQuestion(clozeTemplate);
+assert(vqCloze.question.includes('I usually ___ coffee in the morning.'), 'Question stem must include clozeText');
+
+// Edge cases: null/undefined safety
+const emptyQ = Video.createVideoGrammarQuestion(null);
+assert(emptyQ && emptyQ.type === 'video-grammar', 'createVideoGrammarQuestion must handle null template');
+const emptyPlayer = Video.renderVideoPlayer(null);
+assert(emptyPlayer && emptyPlayer.classList.contains('is-fallback'), 'renderVideoPlayer must handle null config');
+const emptyCloze = Video.renderSubtitleCloze(null, () => {});
+assert(emptyCloze && emptyCloze.classList.contains('video-overlay-pane'), 'renderSubtitleCloze must handle null config');
+const emptyChoice = Video.renderGrammarChoiceOverlay(null, () => {});
+assert(emptyChoice && emptyChoice.classList.contains('video-overlay-pane'), 'renderGrammarChoiceOverlay must handle null exercise');
+const emptyExercise = Video.renderVideoExercise(null, null);
+assert(emptyExercise && emptyExercise.classList.contains('video-exercise-wrap'), 'renderVideoExercise must handle null args');
+
+// Verify all 15 items in video-grammar-bank-v1.json
+const bankData = JSON.parse(fs.readFileSync(path.join(root, 'content', 'video-grammar-bank-v1.json'), 'utf8'));
+assert(Array.isArray(bankData.videoGrammarBank) && bankData.videoGrammarBank.length === 15, 'Bank must contain 15 exercises');
+const answerIndicesFound = new Set();
+bankData.videoGrammarBank.forEach(item => {
+  assert.strictEqual(item.videoUrl, '', `${item.id} videoUrl must be empty (mascot motion removed)`);
+  assert.strictEqual(item.posterUrl, '', `${item.id} posterUrl must be empty`);
+  const ans = item.exercise.options[item.exercise.answerIndex];
+  assert.strictEqual(ans, item.exercise.clozeAnswer, `${item.id} options[answerIndex] must match clozeAnswer`);
+  answerIndicesFound.add(item.exercise.answerIndex);
+});
+assert(answerIndicesFound.size > 1, 'Answer indices across bank must be distributed and not all zero');
+
+console.log('✓ Test 6 passed: Video grammar question creation, cloze stem, empty-input safety, and bank integrity verified.');
 
 console.log('--- TEST 7: 4-Tier Mastery Indicator ---');
 assert.strictEqual(Upgrade.getMasteryTier('test', 20), 1, 'Mastery 20% -> Tier 1');
