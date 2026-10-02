@@ -636,6 +636,173 @@
     return 1;
   };
 
+  /**
+   * 7. Superhero Semantic Lego Blocks Engine
+   * Memecah kalimat menjadi blok semantik:
+   * 🟨 Kapan? (time)
+   * 🟦 Siapa? (subject/agent)
+   * 🟩 Ngapain? (verb/action)
+   * 🟧 Apa/Di mana? (object/place)
+   */
+  const TIME_EXPRESSIONS = [
+    'these days', 'every morning', 'every day', 'every night', 'every week', 'every year',
+    'in the morning', 'in the afternoon', 'in the evening', 'at night', 'at noon',
+    'last night', 'last week', 'last year', 'yesterday', 'today', 'tomorrow', 'now',
+    'right now', 'at the moment', 'on mondays', 'on sundays', 'at the weekend', 'on weekends',
+    'always', 'usually', 'often', 'sometimes', 'rarely', 'never', 'already', 'yet', 'soon', 'later'
+  ];
+
+  FiezelGrammarUpgrade.parseSentenceLegoBlocks = function(sentence) {
+    if (!sentence || typeof sentence !== 'string') return [];
+    const cleanSentence = sentence.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()“”"']+/g, ' ').replace(/\s+/g, ' ').trim();
+    const words = cleanSentence.split(' ');
+    if (words.length === 0 || !words[0]) return [];
+
+    const lowerSentence = cleanSentence.toLowerCase();
+    const blocks = [];
+    const usedWordIndices = new Set();
+
+    // 1. Deteksi Kapan? (Time expressions)
+    for (const timePhrase of TIME_EXPRESSIONS) {
+      const phraseWords = timePhrase.split(' ');
+      const pLen = phraseWords.length;
+      for (let i = 0; i <= words.length - pLen; i++) {
+        let match = true;
+        for (let k = 0; k < pLen; k++) {
+          if (usedWordIndices.has(i + k) || words[i + k].toLowerCase() !== phraseWords[k]) {
+            match = false;
+            break;
+          }
+        }
+        if (match) {
+          const matchedWords = words.slice(i, i + pLen).join(' ');
+          blocks.push({
+            role: 'time',
+            label: 'Kapan?',
+            emoji: '⏰',
+            color: 'time-amber',
+            text: matchedWords,
+            startIndex: i,
+            length: pLen
+          });
+          for (let k = 0; k < pLen; k++) usedWordIndices.add(i + k);
+        }
+      }
+    }
+
+    // 2. Deteksi Siapa? (Subject) & Ngapain? (Verb) & Apa? (Object)
+    let currentSubject = [];
+    let currentVerb = [];
+    let currentObject = [];
+    let state = 'seek_subject'; // 'seek_subject' -> 'seek_verb' -> 'seek_object'
+
+    for (let i = 0; i < words.length; i++) {
+      if (usedWordIndices.has(i)) {
+        continue;
+      }
+      const w = words[i];
+      const wLower = w.toLowerCase();
+      const isVerb = COMMON_VERBS.has(wLower) || AUX_WORDS.has(wLower) || (wLower.length > 3 && (wLower.endsWith('ing') || wLower.endsWith('ed') || wLower.endsWith('es') || wLower.endsWith('s') && !wLower.endsWith('ss')));
+
+      if (state === 'seek_subject') {
+        if (!isVerb) {
+          currentSubject.push(w);
+        } else {
+          state = 'seek_verb';
+          currentVerb.push(w);
+        }
+      } else if (state === 'seek_verb') {
+        if (isVerb || AUX_WORDS.has(wLower)) {
+          currentVerb.push(w);
+        } else {
+          state = 'seek_object';
+          currentObject.push(w);
+        }
+      } else if (state === 'seek_object') {
+        currentObject.push(w);
+      }
+    }
+
+    if (currentSubject.length > 0) {
+      blocks.push({
+        role: 'subject',
+        label: 'Siapa?',
+        emoji: '👤',
+        color: 'subject-blue',
+        text: currentSubject.join(' '),
+        startIndex: words.indexOf(currentSubject[0])
+      });
+    }
+
+    if (currentVerb.length > 0) {
+      blocks.push({
+        role: 'verb',
+        label: 'Ngapain?',
+        emoji: '⚡',
+        color: 'verb-emerald',
+        text: currentVerb.join(' '),
+        startIndex: words.indexOf(currentVerb[0])
+      });
+    }
+
+    if (currentObject.length > 0) {
+      blocks.push({
+        role: 'object',
+        label: 'Apa / Objek',
+        emoji: '🎯',
+        color: 'object-coral',
+        text: currentObject.join(' '),
+        startIndex: words.indexOf(currentObject[0])
+      });
+    }
+
+    // Urutkan kembali blok sesuai kemunculan aslinya di kalimat
+    blocks.sort((a, b) => a.startIndex - b.startIndex);
+    return blocks;
+  };
+
+  /**
+   * Menghasilkan Markup HTML Superhero Lego Blocks dengan Animasi Turun dari Topbar
+   */
+  FiezelGrammarUpgrade.renderSuperheroLegoDrop = function(targetSentence, userSentence) {
+    const blocks = FiezelGrammarUpgrade.parseSentenceLegoBlocks(targetSentence);
+    if (!blocks || blocks.length === 0) return '';
+
+    const blocksHtml = blocks.map((b, idx) => {
+      const delayMs = 120 + idx * 90;
+      return `
+        <div class="lego-block-superhero lego-${b.color}" style="animation-delay: ${delayMs}ms;" data-role="${b.role}">
+          <div class="lego-block-badge">
+            <span class="lego-emoji">${b.emoji}</span>
+            <span class="lego-label">${b.label}</span>
+          </div>
+          <div class="lego-block-content">
+            <span class="lego-word">${b.text}</span>
+          </div>
+          <div class="lego-block-sheen"></div>
+        </div>
+      `;
+    }).join(`
+      <div class="lego-block-connector" style="animation-delay: 200ms;">
+        <i data-lucide="arrow-right"></i>
+      </div>
+    `);
+
+    return `
+      <div id="quizSuperheroLegoDrop" class="quiz-superhero-lego-wrapper" role="region" aria-label="Struktur Kalimat Lego">
+        <div class="lego-superhero-header">
+          <div class="lego-superhero-title">
+            <span class="superhero-hero-badge"><i data-lucide="zap"></i> LEGO STRUKTUR KALIMAT</span>
+            <span class="superhero-hero-subtitle">Perhatikan susunan cerita di bawah ini:</span>
+          </div>
+        </div>
+        <div class="lego-blocks-carousel">
+          ${blocksHtml}
+        </div>
+      </div>
+    `;
+  };
+
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = FiezelGrammarUpgrade;
   }

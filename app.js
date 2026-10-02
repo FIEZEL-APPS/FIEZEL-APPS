@@ -13486,6 +13486,24 @@ function quizLoop(cfg){
      q.__diagnosticClue=nudgeText;
    }
 
+   // Superhero Lego Blocks Dropdown dari Topbar
+   try{
+     document.getElementById('quizSuperheroLegoDrop')?.remove();
+     if(self.FiezelGrammarUpgrade&&typeof self.FiezelGrammarUpgrade.renderSuperheroLegoDrop==='function'){
+       const correctSent=(q.type==='token-order'&&(q.tokens||[]).length>0)
+         ? q.tokens.map(t=>typeof t==='object'&&t.text?t.text:String(t)).join(' ')
+         : (q.options&&q.options[q.answerIndex]?q.options[q.answerIndex]:(q.question||''));
+       const legoHtml=self.FiezelGrammarUpgrade.renderSuperheroLegoDrop(correctSent,q.__userTokenAnswer||'');
+       if(legoHtml){
+         const stemEl=quizStem||document.querySelector('.quiz-top');
+         if(stemEl){
+           stemEl.insertAdjacentHTML('afterend',legoHtml);
+           if(window.lucide&&typeof window.lucide.createIcons==='function')window.lucide.createIcons();
+         }
+       }
+     }
+   }catch(_){}
+
    speak(tutorCompose(q,j,false,answer.scaffold,answer.move,answer.timing),{retry:true});
    setTimeout(()=>{try{pawReact('hint')}catch(_){}},1100);
    enhanceUI();

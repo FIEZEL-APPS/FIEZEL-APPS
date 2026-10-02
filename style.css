@@ -9356,3 +9356,226 @@ body:not(.theme-dark):not(.fz-lux) .tutor-stuck:hover {
   flex-shrink: 0 !important;
   margin-top: 2px !important;
 }
+
+/* ==========================================================================
+   SUPERHERO SEMANTIC LEGO BLOCKS (GROK/COUCOU BOUNCE & ELASTIC DROP)
+   ========================================================================== */
+
+.quiz-superhero-lego-wrapper {
+  margin: 12px 0 16px;
+  padding: 14px 14px 16px;
+  background: linear-gradient(145deg, rgba(24, 24, 36, 0.95), rgba(15, 23, 42, 0.98));
+  border: 1.5px solid rgba(255, 215, 0, 0.35);
+  border-radius: 18px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45), 0 0 24px rgba(255, 215, 0, 0.12);
+  animation: superheroDropEntrance 650ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  transform-origin: top center;
+  position: relative;
+  overflow: hidden;
+}
+
+@keyframes superheroDropEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(-40px) scale(0.85);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(8px) scale(1.03);
+  }
+  80% {
+    transform: translateY(-4px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.lego-superhero-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.lego-superhero-title {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.superhero-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #FCD34D;
+  background: rgba(251, 191, 36, 0.15);
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+.superhero-hero-badge svg {
+  width: 13px;
+  height: 13px;
+  color: #FBBF24;
+}
+
+.superhero-hero-subtitle {
+  font-size: 0.8rem;
+  color: #94A3B8;
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+.lego-blocks-carousel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 6px 2px 10px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 215, 0, 0.3) transparent;
+}
+
+.lego-blocks-carousel::-webkit-scrollbar {
+  height: 5px;
+}
+.lego-blocks-carousel::-webkit-scrollbar-thumb {
+  background: rgba(255, 215, 0, 0.3);
+  border-radius: 999px;
+}
+
+.lego-block-superhero {
+  flex-shrink: 0;
+  min-width: 105px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+  animation: superheroBlockPop 550ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  transform-origin: center bottom;
+  border: 1.5px solid transparent;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.lego-block-superhero:hover {
+  transform: translateY(-3px) scale(1.04);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.35);
+}
+
+@keyframes superheroBlockPop {
+  0% {
+    opacity: 0;
+    transform: translateY(28px) scale(0.65) rotate(-6deg);
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(-5px) scale(1.08) rotate(2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
+}
+
+/* 🟨 Kapan? - Amber / Gold */
+.lego-time-amber {
+  background: linear-gradient(135deg, #78350F 0%, #B45309 60%, #D97706 100%);
+  border-color: #FCD34D;
+  color: #FEF3C7;
+}
+
+/* 🟦 Siapa? - Royal Indigo / Sky Blue */
+.lego-subject-blue {
+  background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 60%, #3B82F6 100%);
+  border-color: #93C5FD;
+  color: #EFF6FF;
+}
+
+/* 🟩 Ngapain? - Action Emerald */
+.lego-verb-emerald {
+  background: linear-gradient(135deg, #064E3B 0%, #059669 60%, #10B981 100%);
+  border-color: #6EE7B7;
+  color: #ECFDF5;
+}
+
+/* 🟧 Apa / Di mana? - Coral / Magenta */
+.lego-object-coral {
+  background: linear-gradient(135deg, #831843 0%, #DB2777 60%, #F43F5E 100%);
+  border-color: #FBCFE8;
+  color: #FFF1F2;
+}
+
+.lego-block-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 4px;
+}
+
+.lego-emoji {
+  font-size: 1.05rem;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+.lego-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.92;
+}
+
+.lego-block-content {
+  font-size: 0.95rem;
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  word-break: break-word;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+}
+
+.lego-block-sheen {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+  transform: skewX(-22deg);
+  animation: legoSheenSweep 3.5s infinite ease-in-out;
+}
+
+@keyframes legoSheenSweep {
+  0%, 65% { left: -100%; }
+  100% { left: 180%; }
+}
+
+.lego-block-connector {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.4);
+  animation: superheroConnectorFade 400ms ease forwards;
+}
+
+.lego-block-connector svg {
+  width: 16px;
+  height: 16px;
+}
+
+@keyframes superheroConnectorFade {
+  from { opacity: 0; transform: scale(0.5); }
+  to { opacity: 1; transform: scale(1); }
+}

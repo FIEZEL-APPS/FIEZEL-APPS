@@ -49,7 +49,7 @@
     'quiz.feedback-saved-body-test': 'Jawabanmu kecatat. Pembahasan lengkap muncul di layar hasil setelah tes ini selesai.',
     'quiz.feedback-saved-body-exam': 'Jawabanmu kecatat. Pembahasan lengkap muncul di layar hasil setelah ujian ini selesai.',
     'quiz.verdict-correct': 'Benar, mantap!',
-    'quiz.verdict-wrong': 'Belum pas, santai — kita bedah bareng.',
+    'quiz.verdict-wrong': 'Belum cocok nih, yuk kita bedah bareng yuk...',
     'quiz.correct-answer': 'Jawabanmu tepat: {answer}',
     'quiz.wrong-answer-key': 'Yang tepat: {answer}.',
     'quiz.cloze-correct': 'Bentukmu tepat: {answer}.',
