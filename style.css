@@ -9358,33 +9358,30 @@ body:not(.theme-dark):not(.fz-lux) .tutor-stuck:hover {
 }
 
 /* ==========================================================================
-   SUPERHERO SEMANTIC LEGO BLOCKS (GROK/COUCOU BOUNCE & ELASTIC DROP)
+   MOCHI BOT SQUISHY CUBES (GROK / COUCOU JELLY PHYSICS & FLOATING QUESTION MARK)
    ========================================================================== */
 
-.quiz-superhero-lego-wrapper {
-  margin: 12px 0 16px;
-  padding: 14px 14px 16px;
-  background: linear-gradient(145deg, rgba(24, 24, 36, 0.95), rgba(15, 23, 42, 0.98));
+.quiz-superhero-lego-wrapper.mochi-bot-stage {
+  margin: 14px 0 18px;
+  padding: 16px 14px 18px;
+  background: linear-gradient(155deg, rgba(20, 20, 32, 0.96) 0%, rgba(13, 17, 30, 0.98) 100%);
   border: 1.5px solid rgba(255, 215, 0, 0.35);
-  border-radius: 18px;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45), 0 0 24px rgba(255, 215, 0, 0.12);
-  animation: superheroDropEntrance 650ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  border-radius: 22px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5), 0 0 28px rgba(255, 215, 0, 0.12);
+  animation: mochiStageEntrance 600ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
   transform-origin: top center;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 
-@keyframes superheroDropEntrance {
+@keyframes mochiStageEntrance {
   0% {
     opacity: 0;
-    transform: translateY(-40px) scale(0.85);
+    transform: translateY(-30px) scale(0.9);
   }
-  60% {
+  65% {
     opacity: 1;
-    transform: translateY(8px) scale(1.03);
-  }
-  80% {
-    transform: translateY(-4px) scale(0.98);
+    transform: translateY(6px) scale(1.02);
   }
   100% {
     opacity: 1;
@@ -9393,189 +9390,324 @@ body:not(.theme-dark):not(.fz-lux) .tutor-stuck:hover {
 }
 
 .lego-superhero-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 6px;
+  padding: 0 4px;
 }
 
 .lego-superhero-title {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
 }
 
 .superhero-hero-badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font-size: 0.72rem;
+  gap: 5px;
+  font-size: 11px;
   font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  letter-spacing: 0.05em;
   color: #FCD34D;
-  background: rgba(251, 191, 36, 0.15);
-  padding: 3px 8px;
-  border-radius: 6px;
-  border: 1px solid rgba(251, 191, 36, 0.3);
-}
-
-.superhero-hero-badge svg {
-  width: 13px;
-  height: 13px;
-  color: #FBBF24;
+  text-transform: uppercase;
 }
 
 .superhero-hero-subtitle {
-  font-size: 0.8rem;
-  color: #94A3B8;
+  font-size: 13px;
   font-weight: 500;
-  margin-top: 2px;
+  color: #94A3B8;
+  line-height: 1.35;
 }
 
-.lego-blocks-carousel {
+.mochi-carousel {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   overflow-x: auto;
-  padding: 6px 2px 10px;
+  padding: 18px 6px 14px;
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 215, 0, 0.3) transparent;
 }
 
-.lego-blocks-carousel::-webkit-scrollbar {
-  height: 5px;
+.mochi-carousel::-webkit-scrollbar {
+  height: 6px;
 }
-.lego-blocks-carousel::-webkit-scrollbar-thumb {
+.mochi-carousel::-webkit-scrollbar-thumb {
   background: rgba(255, 215, 0, 0.3);
   border-radius: 999px;
 }
 
-.lego-block-superhero {
+/* Wrapper tiap kubus mochi */
+.mochi-bot-cube-wrapper {
   flex-shrink: 0;
-  min-width: 105px;
-  padding: 10px 12px;
-  border-radius: 14px;
   position: relative;
-  overflow: hidden;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
-  animation: superheroBlockPop 550ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
-  transform-origin: center bottom;
-  border: 1.5px solid transparent;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: mochiDropSquash 750ms cubic-bezier(0.28, 1.45, 0.58, 1) both;
+  transform-origin: bottom center;
 }
 
-.lego-block-superhero:hover {
-  transform: translateY(-3px) scale(1.04);
-  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.35);
-}
-
-@keyframes superheroBlockPop {
+/* Fisika Jatuh: Stretch di udara ➔ Squash membal saat mendarat (Grok bot style) */
+@keyframes mochiDropSquash {
   0% {
     opacity: 0;
-    transform: translateY(28px) scale(0.65) rotate(-6deg);
+    transform: translateY(-55px) scale(0.8, 1.3);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(0px) scale(1.3, 0.72);
   }
   70% {
-    opacity: 1;
-    transform: translateY(-5px) scale(1.08) rotate(2deg);
+    transform: translateY(-8px) scale(0.92, 1.1);
+  }
+  85% {
+    transform: translateY(2px) scale(1.05, 0.95);
   }
   100% {
     opacity: 1;
-    transform: translateY(0) scale(1) rotate(0deg);
+    transform: translateY(0) scale(1, 1);
   }
 }
 
-/* 🟨 Kapan? - Amber / Gold */
-.lego-time-amber {
-  background: linear-gradient(135deg, #78350F 0%, #B45309 60%, #D97706 100%);
-  border-color: #FCD34D;
-  color: #FEF3C7;
-}
-
-/* 🟦 Siapa? - Royal Indigo / Sky Blue */
-.lego-subject-blue {
-  background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 60%, #3B82F6 100%);
-  border-color: #93C5FD;
-  color: #EFF6FF;
-}
-
-/* 🟩 Ngapain? - Action Emerald */
-.lego-verb-emerald {
-  background: linear-gradient(135deg, #064E3B 0%, #059669 60%, #10B981 100%);
-  border-color: #6EE7B7;
-  color: #ECFDF5;
-}
-
-/* 🟧 Apa / Di mana? - Coral / Magenta */
-.lego-object-coral {
-  background: linear-gradient(135deg, #831843 0%, #DB2777 60%, #F43F5E 100%);
-  border-color: #FBCFE8;
-  color: #FFF1F2;
-}
-
-.lego-block-badge {
+/* Balon Tanda Tanya Melayang di Luar Badan Kubus */
+.mochi-floating-qmark {
+  position: absolute;
+  top: -12px;
+  right: -5px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #FFFBEB;
+  border: 2px solid #F59E0B;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35), 0 0 12px rgba(245, 158, 11, 0.5);
   display: flex;
   align-items: center;
-  gap: 5px;
-  margin-bottom: 4px;
+  justify-content: center;
+  z-index: 10;
+  animation: qmarkPopFloat 2.6s infinite ease-in-out both;
+  transform-origin: center bottom;
 }
 
-.lego-emoji {
-  font-size: 1.05rem;
+.mochi-floating-qmark span {
+  font-size: 14px;
+  font-weight: 800;
+  color: #B45309;
   line-height: 1;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
 }
 
-.lego-label {
-  font-size: 0.72rem;
+@keyframes qmarkPopFloat {
+  0% {
+    transform: scale(0) translateY(0);
+    opacity: 0;
+  }
+  20% {
+    transform: scale(1.2) translateY(-4px);
+    opacity: 1;
+  }
+  35% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+  55% {
+    transform: scale(1.08) translateY(-5px) rotate(6deg);
+    opacity: 1;
+  }
+  75% {
+    transform: scale(0.96) translateY(-2px) rotate(-4deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+/* Badan Kubus Mochi 3D */
+.mochi-bot-cube {
+  width: 118px;
+  min-height: 104px;
+  border-radius: 22px;
+  padding: 12px 10px 14px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4), inset 0 2.5px 4px rgba(255, 255, 255, 0.45), inset 0 -4px 8px rgba(0, 0, 0, 0.25);
+  border: 2px solid transparent;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.mochi-bot-cube:hover {
+  transform: translateY(-4px) scale(1.05);
+}
+
+/* Warna-Warna Kubus Mochi (Bentuk Sama, Kulit Berbeda) */
+
+/* 🟨 Mochi Kuning: Kapan? (Warm Butter Gold) */
+.mochi-skin-time-amber {
+  background: radial-gradient(circle at 35% 25%, #FDE047 0%, #EAB308 55%, #CA8A04 100%);
+  border-color: #FEF08A;
+  color: #422006;
+}
+
+/* 🟦 Mochi Biru: Siapa? (Electric Sky Blue) */
+.mochi-skin-subject-blue {
+  background: radial-gradient(circle at 35% 25%, #60A5FA 0%, #3B82F6 55%, #1D4ED8 100%);
+  border-color: #BFDBFE;
+  color: #0F172A;
+}
+
+/* 🟩 Mochi Hijau: Ngapain? (Vibrant Mint Action) */
+.mochi-skin-verb-emerald {
+  background: radial-gradient(circle at 35% 25%, #34D399 0%, #10B981 55%, #047857 100%);
+  border-color: #A7F3D0;
+  color: #022C22;
+}
+
+/* 🟧 Mochi Pink: Apa/Objek? (Kawaii Strawberry Coral) */
+.mochi-skin-object-coral {
+  background: radial-gradient(circle at 35% 25%, #FB7185 0%, #F43F5E 55%, #BE123C 100%);
+  border-color: #FECDD3;
+  color: #4C0519;
+}
+
+/* Mata Digital Karakter Mochi (Blinking Grok/Coucou Eyes with Cute Highlights) */
+.mochi-face-eyes {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 4px;
+  margin-bottom: 6px;
+  height: 16px;
+  width: 100%;
+}
+
+.mochi-eye {
+  width: 9px;
+  height: 14px;
+  border-radius: 999px;
+  background: #0F172A;
+  position: relative;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  animation: mochiEyeBlink 3.8s infinite;
+  display: inline-block;
+}
+
+.mochi-eye::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 3.5px;
+  height: 3.5px;
+  border-radius: 50%;
+  background: #FFFFFF;
+}
+
+@keyframes mochiEyeBlink {
+  0%, 46%, 50%, 100% {
+    transform: scaleY(1);
+  }
+  48% {
+    transform: scaleY(0.12);
+  }
+}
+
+/* Teks Peran yang Muncul Mekar di Badan Mochi */
+.mochi-role-badge {
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 8px;
+  padding: 2px 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  animation: mochiTextBloom 450ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  margin-top: 4px;
+}
+
+.mochi-role-text {
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  opacity: 0.92;
+  color: #0F172A;
+  display: block;
 }
 
-.lego-block-content {
-  font-size: 0.95rem;
+@keyframes mochiTextBloom {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  75% {
+    transform: scale(1.15);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Teks Kata Bahasa Inggris di Bawah Peran */
+.mochi-word-content {
+  margin-top: 4px;
+  text-align: center;
+  width: 100%;
+  animation: mochiWordSlideUp 400ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.mochi-word-text {
+  font-size: 13.5px;
   font-weight: 800;
   line-height: 1.25;
-  letter-spacing: -0.01em;
+  color: #FFFFFF;
+  text-shadow: 0 1.5px 3px rgba(0, 0, 0, 0.45);
+  display: block;
   word-break: break-word;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.4);
 }
 
-.lego-block-sheen {
+@keyframes mochiWordSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Kilau 3D Lembut */
+.mochi-gloss-specular {
   position: absolute;
-  top: 0;
-  left: -100%;
-  width: 60%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
-  transform: skewX(-22deg);
-  animation: legoSheenSweep 3.5s infinite ease-in-out;
+  top: 3px;
+  left: 12px;
+  width: 32px;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.45);
+  filter: blur(1px);
+  pointer-events: none;
 }
 
-@keyframes legoSheenSweep {
-  0%, 65% { left: -100%; }
-  100% { left: 180%; }
-}
-
-.lego-block-connector {
+/* Konektor Antar Mochi */
+.mochi-cube-connector {
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: rgba(255, 255, 255, 0.4);
-  animation: superheroConnectorFade 400ms ease forwards;
+  color: rgba(255, 255, 255, 0.45);
+  animation: mochiConnectorPop 400ms ease forwards;
 }
 
-.lego-block-connector svg {
+.mochi-cube-connector svg {
   width: 16px;
   height: 16px;
 }
 
-@keyframes superheroConnectorFade {
-  from { opacity: 0; transform: scale(0.5); }
-  to { opacity: 1; transform: scale(1); }
+@keyframes mochiConnectorPop {
+  0% { opacity: 0; transform: scale(0.4); }
+  100% { opacity: 1; transform: scale(1); }
 }

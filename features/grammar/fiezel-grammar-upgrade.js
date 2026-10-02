@@ -727,7 +727,6 @@
       blocks.push({
         role: 'subject',
         label: 'Siapa?',
-        emoji: '👤',
         color: 'subject-blue',
         text: currentSubject.join(' '),
         startIndex: words.indexOf(currentSubject[0])
@@ -738,7 +737,6 @@
       blocks.push({
         role: 'verb',
         label: 'Ngapain?',
-        emoji: '⚡',
         color: 'verb-emerald',
         text: currentVerb.join(' '),
         startIndex: words.indexOf(currentVerb[0])
@@ -748,8 +746,7 @@
     if (currentObject.length > 0) {
       blocks.push({
         role: 'object',
-        label: 'Apa / Objek',
-        emoji: '🎯',
+        label: 'Apa / Objek?',
         color: 'object-coral',
         text: currentObject.join(' '),
         startIndex: words.indexOf(currentObject[0])
@@ -762,41 +759,60 @@
   };
 
   /**
-   * Menghasilkan Markup HTML Superhero Lego Blocks dengan Animasi Turun dari Topbar
+   * Menghasilkan Markup HTML Mochi Bot Squishy Cubes dengan Animasi Turun dari Topbar
    */
   FiezelGrammarUpgrade.renderSuperheroLegoDrop = function(targetSentence, userSentence) {
     const blocks = FiezelGrammarUpgrade.parseSentenceLegoBlocks(targetSentence);
     if (!blocks || blocks.length === 0) return '';
 
     const blocksHtml = blocks.map((b, idx) => {
-      const delayMs = 120 + idx * 90;
+      const dropDelayMs = 100 + idx * 110;
+      const textRevealDelayMs = dropDelayMs + 380;
       return `
-        <div class="lego-block-superhero lego-${b.color}" style="animation-delay: ${delayMs}ms;" data-role="${b.role}">
-          <div class="lego-block-badge">
-            <span class="lego-emoji">${b.emoji}</span>
-            <span class="lego-label">${b.label}</span>
+        <div class="mochi-bot-cube-wrapper" style="animation-delay: ${dropDelayMs}ms;">
+          <!-- Floating question bubble di luar kubus -->
+          <div class="mochi-floating-qmark" style="animation-delay: ${dropDelayMs + 450}ms;">
+            <span>?</span>
           </div>
-          <div class="lego-block-content">
-            <span class="lego-word">${b.text}</span>
+
+          <!-- Badan Kubus Mochi (Squishy Bot) -->
+          <div class="mochi-bot-cube mochi-skin-${b.color}" data-role="${b.role}">
+            <!-- Digital eyes yang berkedip lucu ala Grok/Coucou -->
+            <div class="mochi-face-eyes">
+              <span class="mochi-eye left"></span>
+              <span class="mochi-eye right"></span>
+            </div>
+
+            <!-- Teks peran yang muncul mekar saat mendarat di perut mochi -->
+            <div class="mochi-role-badge" style="animation-delay: ${textRevealDelayMs}ms;">
+              <span class="mochi-role-text">${b.label}</span>
+            </div>
+
+            <!-- Kata kalimat bahasa Inggris di badan mochi -->
+            <div class="mochi-word-content" style="animation-delay: ${textRevealDelayMs + 80}ms;">
+              <span class="mochi-word-text">${b.text}</span>
+            </div>
+
+            <!-- Kilau lembut 3D mochi jelly -->
+            <div class="mochi-gloss-specular"></div>
           </div>
-          <div class="lego-block-sheen"></div>
         </div>
       `;
     }).join(`
-      <div class="lego-block-connector" style="animation-delay: 200ms;">
+      <div class="mochi-cube-connector" style="animation-delay: 280ms;">
         <i data-lucide="arrow-right"></i>
       </div>
     `);
 
     return `
-      <div id="quizSuperheroLegoDrop" class="quiz-superhero-lego-wrapper" role="region" aria-label="Struktur Kalimat Lego">
+      <div id="quizSuperheroLegoDrop" class="quiz-superhero-lego-wrapper mochi-bot-stage" role="region" aria-label="Struktur Kalimat Mochi Bot">
         <div class="lego-superhero-header">
           <div class="lego-superhero-title">
-            <span class="superhero-hero-badge"><i data-lucide="zap"></i> LEGO STRUKTUR KALIMAT</span>
-            <span class="superhero-hero-subtitle">Perhatikan susunan cerita di bawah ini:</span>
+            <span class="superhero-hero-badge"><i data-lucide="sparkles"></i> PANDUAN STRUKTUR MOCHI</span>
+            <span class="superhero-hero-subtitle">Lihat urutan cerita dari para kubus mochi:</span>
           </div>
         </div>
-        <div class="lego-blocks-carousel">
+        <div class="lego-blocks-carousel mochi-carousel">
           ${blocksHtml}
         </div>
       </div>
