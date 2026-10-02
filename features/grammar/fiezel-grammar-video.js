@@ -69,6 +69,9 @@
         .video-progress-bar { width: 100%; height: 4px; background: rgba(255,255,255,0.3); border-radius: 2px; position: relative; overflow: hidden; }
         .video-progress-fill { position: absolute; left: 0; top: 0; height: 100%; background: var(--sun); width: 0%; border-radius: 2px; transition: width 0.1s linear; }
         .video-speed-btn { font-size: 0.85rem; font-weight: 700; width: 44px; height: 32px; background: rgba(255,255,255,0.2) !important; border-radius: 16px !important; }
+        .video-center-play { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: rgba(0,0,0,0.65); border: 2px solid rgba(255,255,255,0.85); border-radius: 50%; color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 8; backdrop-filter: blur(4px); transition: transform 0.2s, opacity 0.2s; box-shadow: 0 4px 16px rgba(0,0,0,0.4); }
+        .video-center-play:hover { transform: translate(-50%, -50%) scale(1.1); background: rgba(0,0,0,0.85); }
+        .video-center-play.hidden { opacity: 0; pointer-events: none; }
         .video-subtitle-overlay { position: absolute; bottom: 50px; left: 0; right: 0; text-align: center; pointer-events: none; padding: 0 16px; z-index: 5; }
         .video-subtitle-text { display: inline-block; background: rgba(0,0,0,0.65); color: #fff; padding: 6px 12px; border-radius: var(--radius-sm); font-size: 1rem; text-shadow: 0 1px 2px rgba(0,0,0,0.8); line-height: 1.4; transition: all 0.2s; backdrop-filter: blur(4px); }
         .video-subtitle-text.highlight { color: var(--sun); transform: scale(1.05); }
@@ -92,9 +95,12 @@
     }
 
     container.innerHTML = `
-      <video playsinline preload="metadata" ${config.posterUrl ? `poster="${esc(config.posterUrl)}"` : ''} aria-label="${FiezelI18n.t('grammar.video.player-aria', 'Pemutar video tata bahasa')}">
-        ${config.videoUrl ? `<source src="${esc(config.videoUrl)}" type="video/mp4">` : ''}
+      <video playsinline preload="auto" ${config.posterUrl ? `poster="${esc(config.posterUrl)}"` : ''} aria-label="${FiezelI18n.t('grammar.video.player-aria', 'Pemutar video tata bahasa')}">
+        ${config.videoUrl ? `<source src="${esc(config.videoUrl)}" type="video/mp4"><source src="${esc(config.videoUrl.replace(/\.mp4$/, '.webm'))}" type="video/webm">` : ''}
       </video>
+      <button type="button" class="video-center-play" aria-label="${FiezelI18n.t('grammar.video.play-pause', 'Putar / Jeda')}">
+        <i data-lucide="play" style="width: 26px; height: 26px; margin-left: 3px;"></i>
+      </button>
       <div class="video-subtitle-overlay" aria-live="polite">
         <span class="video-subtitle-text" style="display:none;"></span>
       </div>
@@ -116,6 +122,7 @@
     `;
 
     const video = container.querySelector('video');
+    const centerPlayBtn = container.querySelector('.video-center-play');
     const playBtn = container.querySelector('.video-play-btn');
     const playIcon = container.querySelector('.play-icon');
     const pauseIcon = container.querySelector('.pause-icon');
@@ -160,12 +167,35 @@
 
     const togglePlay = () => {
       if (video.paused) {
-        video.play().catch(e => {
-          console.warn('Playback failed', e);
-          if (state.onError) state.onError(e);
-        });
+        const p = video.play();
+        if (p && typeof p.catch === 'function') {
+          p.catch(e => {
+            console.warn('Playback unmuted failed, retrying muted:', e);
+            video.muted = true;
+            video.play().catch(err => {
+              console.warn('Playback failed completely', err);
+              if (state.onError) state.onError(err);
+            });
+          });
+        }
       } else {
         video.pause();
+      }
+    };
+
+    if (centerPlayBtn) {
+      centerPlayBtn.onclick = (e) => {
+        e.stopPropagation();
+        if (typeof self.haptic === 'function') self.haptic('tap');
+        togglePlay();
+      };
+    }
+
+    video.onclick = (e) => {
+      e.stopPropagation();
+      if (!state.isPausedForExercise) {
+        if (typeof self.haptic === 'function') self.haptic('tap');
+        togglePlay();
       }
     };
 
@@ -176,11 +206,13 @@
     };
 
     video.onplay = () => {
+      if (centerPlayBtn) centerPlayBtn.classList.add('hidden');
       playIcon.style.display = 'none';
       pauseIcon.style.display = 'block';
     };
 
     video.onpause = () => {
+      if (centerPlayBtn && !state.isPausedForExercise) centerPlayBtn.classList.remove('hidden');
       playIcon.style.display = 'block';
       pauseIcon.style.display = 'none';
     };
