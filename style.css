@@ -409,7 +409,7 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
   display:inline-flex;align-items:center;justify-content:center;
   min-width:26px;height:26px;border-radius:6px;
   font-size:0.78rem;font-weight:800;
-  background:var(--surface-soft, rgba(0,0,0,0.05));color:var(--muted);
+  background:var(--panel-soft);color:var(--muted);
   border:1px solid var(--line);flex-shrink:0;text-transform:uppercase;
 }
 .option:not(:disabled):hover .option-badge{
