@@ -110,18 +110,43 @@
       }
       return array;
     };
+
+    // Compact Indonesian gloss dictionary for common grammar tokens
+    const GLOSS_DICT = {
+      'she': 'dia (pr)', 'he': 'dia (lk)', 'it': 'itu/ia', 'they': 'mereka', 'we': 'kita/kami', 'i': 'saya', 'you': 'kamu',
+      'always': 'selalu', 'usually': 'biasanya', 'often': 'sering', 'sometimes': 'kadang', 'never': 'tidak pernah',
+      'every day': 'tiap hari', 'every night': 'tiap malam', 'in the morning': 'di pagi hari',
+      'drinks': 'minum (+s)', 'drink': 'minum', 'drank': 'minum (lampau)', 'drinking': 'sedang minum',
+      'watches': 'nonton (+es)', 'watch': 'nonton', 'watched': 'nonton (lampau)', 'watching': 'sedang nonton',
+      'eats': 'makan (+s)', 'eat': 'makan', 'ate': 'makan (lampau)', 'eating': 'sedang makan',
+      'reads': 'baca (+s)', 'read': 'baca', 'reading': 'sedang baca',
+      'plays': 'main (+s)', 'play': 'main', 'played': 'main (lampau)', 'playing': 'sedang main',
+      'goes': 'pergi (+es)', 'go': 'pergi', 'went': 'pergi (lampau)', 'going': 'sedang pergi',
+      'warm tea': 'teh hangat', 'a cup of': 'secangkir', 'the news': 'berita', 'my sister': 'kakakku'
+    };
     
     const bankTokens = shuffle(allTokens.map((item, id) => {
       const rawText = typeof item === 'object' && item.text ? item.text : String(item);
       const text = rawText.replace(/^[.,\/#!$%\^&\*;:{}=\-_`~()“”"']+|[.,\/#!$%\^&\*;:{}=\-_`~()“”"']+$/g, '');
       const explicitSyntax = typeof item === 'object' && item.syntax ? item.syntax : '';
       const syntax = explicitSyntax || FiezelGrammarUpgrade.classifyWord(text);
-      return { text, id, syntax, placed: false };
+      const lower = text.toLowerCase();
+      const gloss = (q.gloss && q.gloss[text]) || (q.gloss && q.gloss[lower]) || GLOSS_DICT[lower] || '';
+      return { text, id, syntax, gloss, placed: false };
     }));
     const placedTokens = [];
+    let vacantSlotIndex = null;
+    let showGloss = false;
     
     container.innerHTML = `
+      <div class="gx-hint" id="tokenScaffoldHint" hidden></div>
       <div class="token-rail" id="tokenRail" aria-label="${FiezelI18n.t('grammar.token-rail-aria', 'Area penyusunan kalimat')}"></div>
+      <div class="gx-gloss-bar">
+        <span class="token-bank-label">${FiezelI18n.t('grammar.token-bank-aria', 'Daftar kata tersedia')}</span>
+        <button type="button" class="gx-btn-gloss" id="tokenGlossToggle">
+          <span>📖</span> ${FiezelI18n.t('grammar.intip-arti', 'Intip arti kata')}
+        </button>
+      </div>
       <div class="token-bank" id="tokenBank" aria-label="${FiezelI18n.t('grammar.token-bank-aria', 'Daftar kata tersedia')}"></div>
       <div class="token-actions">
         <button type="button" id="tokenResetBtn" class="token-reset-btn" disabled>
@@ -132,10 +157,20 @@
       </div>
     `;
 
+    const hintEl = container.querySelector('#tokenScaffoldHint');
     const railEl = container.querySelector('#tokenRail');
     const bankEl = container.querySelector('#tokenBank');
+    const glossToggleBtn = container.querySelector('#tokenGlossToggle');
     const submitBtn = container.querySelector('#tokenSubmitBtn');
     const resetBtn = container.querySelector('#tokenResetBtn');
+
+    if (glossToggleBtn) {
+      glossToggleBtn.onclick = () => {
+        showGloss = !showGloss;
+        glossToggleBtn.classList.toggle('active', showGloss);
+        render();
+      };
+    }
 
     const render = () => {
       railEl.innerHTML = '';
@@ -152,34 +187,62 @@
         } else {
           const btn = document.createElement('button');
           btn.type = 'button';
-          btn.className = 'token-chip';
-          btn.textContent = token.text;
+          btn.className = 'token-chip' + (showGloss && token.gloss ? ' has-gloss' : '');
+          if (showGloss && token.gloss) {
+            btn.innerHTML = `<span class="token-gloss">${token.gloss}</span><span class="token-word">${token.text}</span>`;
+          } else {
+            btn.textContent = token.text;
+          }
           btn.onclick = () => {
             if (typeof self.haptic === 'function') self.haptic('tap');
             if (typeof self.uiSfx === 'function') self.uiSfx('pop');
             token.placed = true;
-            placedTokens.push(token);
+            if (vacantSlotIndex !== null && vacantSlotIndex <= placedTokens.length) {
+              placedTokens.splice(vacantSlotIndex, 0, token);
+              vacantSlotIndex = null;
+            } else {
+              placedTokens.push(token);
+            }
+            if (hintEl) hintEl.hidden = true;
             render();
           };
           bankEl.appendChild(btn);
         }
       });
 
-      // Render kata di rail (kalimat yang sedang disusun)
+      // Render kata di rail (kalimat yang sedang disusun) dengan dukungan vacant slot insertion
       placedTokens.forEach((token, index) => {
+        if (vacantSlotIndex === index) {
+          const vacantEl = document.createElement('span');
+          vacantEl.className = 'gx-vacant-slot';
+          vacantEl.innerHTML = '<span>↳</span> isi di sini';
+          railEl.appendChild(vacantEl);
+        }
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = 'token-chip in-rail';
-        btn.textContent = token.text;
+        btn.className = 'token-chip in-rail' + (showGloss && token.gloss ? ' has-gloss' : '');
+        if (showGloss && token.gloss) {
+          btn.innerHTML = `<span class="token-gloss">${token.gloss}</span><span class="token-word">${token.text}</span>`;
+        } else {
+          btn.textContent = token.text;
+        }
         btn.setAttribute('title', FiezelI18n.t('grammar.token-lepas', 'Ketuk untuk melepas'));
         btn.onclick = () => {
           if (typeof self.haptic === 'function') self.haptic('tap');
           token.placed = false;
           placedTokens.splice(index, 1);
+          vacantSlotIndex = index;
           render();
         };
         railEl.appendChild(btn);
       });
+
+      if (vacantSlotIndex !== null && vacantSlotIndex >= placedTokens.length) {
+        const vacantEl = document.createElement('span');
+        vacantEl.className = 'gx-vacant-slot';
+        vacantEl.innerHTML = '<span>↳</span> isi di sini';
+        railEl.appendChild(vacantEl);
+      }
 
       submitBtn.disabled = placedTokens.length === 0;
       if (q.__scaffoldAttempt) {
@@ -194,6 +257,8 @@
         if (typeof self.haptic === 'function') self.haptic('tap');
         bankTokens.forEach((token) => { token.placed = false; });
         placedTokens.length = 0;
+        vacantSlotIndex = null;
+        if (hintEl) hintEl.hidden = true;
         render();
       };
     }
@@ -207,6 +272,38 @@
       const isCorrect = userText === correctText || targets.some(tgt => norm(tgt) === userNorm);
       
       const unplacedTokens = bankTokens.filter(t => !t.placed).map(t => t.text);
+
+      // Scaffolding on first wrong attempt without deducting lives / failing immediately
+      if (!isCorrect && !q.__scaffoldAttempt) {
+        q.__scaffoldAttempt = true;
+        railEl.classList.remove('gx-shake');
+        void railEl.offsetWidth;
+        railEl.classList.add('gx-shake');
+        
+        // Diagnose error for the scaffold hint
+        let hintTitle = FiezelI18n.t('grammar.hint-periksa', 'Coba periksa sekali lagi');
+        let hintBody = FiezelI18n.t('grammar.hint-cek-urutan', 'Perhatikan bentuk kata kerja dan subjek kalimatmu.');
+        const badToken = placedTokens.find(t => distractors.some(d => String(d).toLowerCase() === t.text.toLowerCase()));
+        if (badToken) {
+          hintTitle = FiezelI18n.t('grammar.hint-kata-kurang-pas', 'Cek kata “{word}”', { word: badToken.text });
+          hintBody = FiezelI18n.t('grammar.hint-kata-ganti', 'Kata “{word}” mungkin belum sesuai dengan konteks kalimat. Coba ganti dengan bentuk lain di bank kata.', { word: badToken.text });
+        } else if (placedTokens.length < tokens.length) {
+          hintTitle = FiezelI18n.t('grammar.hint-kata-kurang', 'Ada kata yang belum terpasang');
+          hintBody = FiezelI18n.t('grammar.hint-lengkapi-semua', 'Masih ada kata yang tertinggal di bank kata. Lengkapi susunannya.');
+        }
+
+        if (hintEl) {
+          hintEl.innerHTML = `
+            <div class="gx-hint-badge">💡 <span>PETUNJUK · 1 KESEMPATAN LAGI</span></div>
+            <div class="gx-hint-title">${hintTitle}</div>
+            <div class="gx-hint-body">${hintBody}</div>
+          `;
+          hintEl.hidden = false;
+        }
+        render();
+        return;
+      }
+
       if (typeof onComplete === 'function') {
         onComplete(isCorrect, {
           userText: userText,
@@ -534,7 +631,16 @@
       <div class="feedback-rule-pill grammar-rule-pill">
         <p class="grammar-rule-why"><strong>${FiezelI18n.t('quiz.intinya', 'Intinya:')}</strong> ${whyText}</p>
         ${ruleText ? `<p class="grammar-rule-text"><strong>${FiezelI18n.t('quiz.aturannya', 'Aturannya:')}</strong> ${ruleText}</p>` : ''}
+        <button type="button" class="gx-pin-formula-btn" onclick="if(typeof gxPinFormula==='function') gxPinFormula(this); else this.classList.add('pinned');">
+          <span>🔖</span> ${FiezelI18n.t('grammar.pin-formula', 'Simpan Rumus ke Catatan')}
+        </button>
       </div>
+
+      ${(q.contrast || q.explain?.contrast) ? `
+      <div class="gx-contrast-card">
+        <div class="gx-contrast-title">💡 ${FiezelI18n.t('grammar.contrast-title', 'Beda dengan Bahasa Indonesia')}</div>
+        <div class="gx-contrast-body">${esc(q.contrast || q.explain?.contrast)}</div>
+      </div>` : ''}
 
       <div class="feedback-memory-box memory-tip">
         <div class="feedback-memory-header">

@@ -1,7 +1,7 @@
 {
-  "version": "m025-435",
+  "version": "m025-436",
   "claimedBy": "branch main",
-  "claimedAt": "2026-10-03T21:29:07.086Z",
-  "reason": "fix(item-pool): handle D1 Cloudflare HTTP 401 gracefully on cron job",
+  "claimedAt": "2026-10-03T22:39:00.555Z",
+  "reason": "feat(ui): rollout tactile clay experience and braincore grammar coach",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

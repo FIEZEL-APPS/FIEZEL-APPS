@@ -1758,9 +1758,9 @@ body:not(.theme-dark):not(.fz-lux) .card-light .braincore-pill.mastery,
 
 body:not(.theme-dark):not(.fz-lux) .card-light .braincore-pill.target,
 [data-theme="light"] .card-light .braincore-pill.target {
-  background: #f3e8ff !important;
-  color: #7e22ce !important;
-  border-color: #e9d5ff !important;
+  background: #fef3c7 !important;
+  color: #92400e !important;
+  border-color: #fde68a !important;
 }
 
 body:not(.theme-dark):not(.fz-lux) .card-light .braincore-pill.alert,
@@ -1796,4 +1796,350 @@ body:not(.theme-dark):not(.fz-lux) .card-light .braincore-pill.schedule,
   width: 12px !important;
   height: 12px !important;
 }
+
+/* ==========================================================================
+   TACTILE CLAY GRAMMAR COACH EXTENSIONS (Zero purple, weights <= 800)
+   ========================================================================== */
+
+/* ---------- Vertical Word Gloss (Ruby Layout, No Horizontal Blowout) ---------- */
+.gx-gloss-bar {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  margin-bottom: 8px !important;
+  width: 100% !important;
+}
+
+.gx-btn-gloss {
+  font-family: inherit !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  color: #0284C7 !important;
+  background: #F0F9FF !important;
+  border: 1.5px solid #BAE6FD !important;
+  border-radius: 9999px !important;
+  padding: 3px 10px !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  box-shadow: 0 2px 0 #BAE6FD !important;
+  transition: all 0.12s ease !important;
+}
+
+.gx-btn-gloss:active,
+.gx-btn-gloss.active {
+  background: #E0F2FE !important;
+  transform: translateY(1px) !important;
+  box-shadow: 0 1px 0 #BAE6FD !important;
+}
+
+.token-chip.has-gloss,
+.bank-token.has-gloss {
+  display: inline-flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  padding: 6px 12px !important;
+  box-sizing: border-box !important;
+}
+
+.token-chip .token-gloss,
+.bank-token .bank-gloss {
+  display: block !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  color: #0284C7 !important;
+  line-height: 1.1 !important;
+  margin-bottom: 2px !important;
+  letter-spacing: -0.01em !important;
+  white-space: nowrap !important;
+}
+
+.token-chip .token-word,
+.bank-token .bank-word {
+  display: block !important;
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  color: #0F172A !important;
+  line-height: 1.2 !important;
+  white-space: nowrap !important;
+}
+
+/* ---------- Smart In-Place Vacant Slot Indicator ---------- */
+.gx-vacant-slot {
+  border: 2px dashed #F59E0B !important;
+  background: #FFFBEB !important;
+  border-radius: 14px !important;
+  padding: 6px 12px !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  color: #B45309 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  animation: gxPulseVacant 1.4s infinite ease-in-out !important;
+}
+
+@keyframes gxPulseVacant {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(0.96); opacity: 0.7; }
+}
+
+.gx-slot-actions {
+  display: flex !important;
+  justify-content: flex-end !important;
+  margin-top: 6px !important;
+  width: 100% !important;
+}
+
+.gx-btn-clear-slot {
+  font-family: inherit !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  color: #94A3B8 !important;
+  background: none !important;
+  border: none !important;
+  cursor: pointer !important;
+  padding: 3px 6px !important;
+  border-radius: 8px !important;
+  transition: all 0.12s ease !important;
+}
+
+.gx-btn-clear-slot:hover {
+  color: #EF4444 !important;
+  background: #FEF2F2 !important;
+}
+
+/* ---------- Scaffolding Hint Card (No Answer Leakage) ---------- */
+.gx-hint {
+  background: #FFFBEB !important;
+  border: 2px solid #FCD34D !important;
+  border-radius: 18px !important;
+  padding: 12px 14px !important;
+  box-shadow: 0 3px 0 #FBBF24 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+  margin: 10px 0 !important;
+  animation: gxRise 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+.gx-hint[hidden] {
+  display: none !important;
+}
+
+.gx-hint-badge {
+  font-size: 10.5px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase !important;
+  color: #B45309 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+.gx-hint-title {
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  color: #78350F !important;
+}
+
+.gx-hint-body {
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: #78350F !important;
+  line-height: 1.45 !important;
+}
+
+.gx-hint-body b {
+  color: #9A3412 !important;
+}
+
+/* ---------- Indonesian Contrastive Card & Bookmark Pin ---------- */
+.gx-contrast-card {
+  background: #FEF3C7 !important;
+  border: 2px solid #FCD34D !important;
+  border-radius: 16px !important;
+  padding: 12px 14px !important;
+  box-shadow: 0 3px 0 #FDE68A !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 5px !important;
+  margin-top: 8px !important;
+}
+
+.gx-contrast-title {
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  color: #92400E !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+}
+
+.gx-contrast-body {
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+  color: #78350F !important;
+  line-height: 1.45 !important;
+}
+
+.gx-pin-formula-btn {
+  align-self: flex-start !important;
+  font-family: inherit !important;
+  font-size: 11.5px !important;
+  font-weight: 800 !important;
+  color: #0F172A !important;
+  background: #FFFFFF !important;
+  border: 1.5px solid #CBD5E1 !important;
+  border-radius: 10px !important;
+  padding: 5px 10px !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  box-shadow: 0 2px 0 #E2E8F0 !important;
+  margin-top: 6px !important;
+  transition: all 0.14s ease !important;
+}
+
+.gx-pin-formula-btn:active {
+  transform: translateY(1px) !important;
+}
+
+.gx-pin-formula-btn.pinned {
+  background: #DCFCE7 !important;
+  border-color: #86EFAC !important;
+  color: #166534 !important;
+  box-shadow: 0 2px 0 #BBF7D0 !important;
+}
+
+/* ---------- Grit Guard Confirmation Modal ---------- */
+.gx-nudge-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  background: rgba(15, 23, 42, 0.45) !important;
+  backdrop-filter: blur(4px) !important;
+  z-index: 9999 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 20px !important;
+  animation: gxFadeIn 0.2s ease-out !important;
+}
+
+.gx-nudge-overlay[hidden] {
+  display: none !important;
+}
+
+.gx-nudge-box {
+  background: #FFFFFF !important;
+  border: 2.5px solid #0F172A !important;
+  border-radius: 22px !important;
+  padding: 20px !important;
+  max-width: 320px !important;
+  width: 100% !important;
+  box-shadow: 0 8px 0 #CBD5E1 !important;
+  text-align: center !important;
+}
+
+.gx-nudge-icon {
+  font-size: 32px !important;
+  margin-bottom: 6px !important;
+}
+
+.gx-nudge-title {
+  font-size: 16px !important;
+  font-weight: 800 !important;
+  color: #0F172A !important;
+  margin-bottom: 6px !important;
+}
+
+.gx-nudge-desc {
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+  color: #475569 !important;
+  line-height: 1.45 !important;
+  margin-bottom: 16px !important;
+}
+
+.gx-nudge-actions {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+}
+
+.gx-btn-nudge-try {
+  background: #FFB800 !important;
+  border: 2px solid #D97706 !important;
+  border-radius: 14px !important;
+  padding: 11px !important;
+  font-family: inherit !important;
+  font-size: 13.5px !important;
+  font-weight: 800 !important;
+  color: #0F172A !important;
+  box-shadow: 0 3px 0 #D97706 !important;
+  cursor: pointer !important;
+}
+
+.gx-btn-nudge-try:active {
+  transform: translateY(2px) !important;
+  box-shadow: 0 1px 0 #D97706 !important;
+}
+
+.gx-btn-nudge-giveup {
+  background: #F8FAFC !important;
+  border: 2px solid #CBD5E1 !important;
+  border-radius: 14px !important;
+  padding: 9px !important;
+  font-family: inherit !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  color: #64748B !important;
+  cursor: pointer !important;
+}
+
+/* ---------- Toast Notification Container ---------- */
+.gx-toast {
+  position: fixed !important;
+  bottom: 84px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  background: #0F172A !important;
+  color: #FFFFFF !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  padding: 10px 18px !important;
+  border-radius: 9999px !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22) !important;
+  z-index: 10000 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  pointer-events: none !important;
+  animation: gxToastUp 0.25s ease-out !important;
+}
+
+.gx-toast[hidden] {
+  display: none !important;
+}
+
+@keyframes gxToastUp {
+  from { transform: translate(-50%, 15px); opacity: 0; }
+  to { transform: translate(-50%, 0); opacity: 1; }
+}
+
+@keyframes gxRise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes gxFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 
