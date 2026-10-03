@@ -1,0 +1,493 @@
+/* ==========================================================================
+   FIEZEL · features/ui/fiezel-tactile-clay.css
+   TACTILE CLAY DESIGN SYSTEM — OFFICIAL PWA RUNTIME OVERHAUL
+   Physical 3D bevels, daylight travertine canvas, Solar Gold tactile CTA,
+   emerald KelasKu cards, obsidian signature cards, and responsive haptic states.
+   ========================================================================== */
+
+:root {
+  /* Base Canvas */
+  --bg-stage:         #E5ECF6;
+  --bg-canvas:        #FAF8F5;
+
+  /* Clay Surfaces */
+  --card-surface:     #FFFFFF;
+  --card-border:      #E2E8F0;
+  --card-bevel:       #CBD5E1;
+  --card-shadow:      0 6px 0 var(--card-bevel), 0 14px 28px rgba(15, 23, 42, 0.05);
+
+  /* Core Brand: Fiezel Solar Gold */
+  --gold-primary:     #FFD21E;
+  --gold-gradient:    linear-gradient(180deg, #FFE054 0%, #FFB703 100%);
+  --gold-bevel:       #D97706;
+  --gold-shadow:      0 5px 0 var(--gold-bevel), 0 12px 24px rgba(255, 183, 3, 0.35);
+  --gold-text:        #2E1800;
+
+  /* Typography */
+  --text-main:        #0F172A;
+  --text-sub:         #64748B;
+  --text-muted:       #94A3B8;
+  --font-sans:        'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono:        'JetBrains Mono', monospace;
+
+  /* Functional Accents */
+  --flame-orange:     #FF5E1E;
+  --flame-bevel:      #C2410C;
+  --emerald-green:    #22C55E;
+  --emerald-bevel:    #15803D;
+  --sky-blue:         #0284C7;
+  --sky-bevel:        #0369A1;
+  --crimson-hp:       #EF4444;
+  --crimson-bevel:    #B91C1C;
+
+  /* Signature Dark Card */
+  --card-black:       #0B0F17;
+  --card-black-elev:  #131926;
+  --yellow-bright:    #FFE600;
+  --yellow-warm:      #FFD21E;
+  --shadow-ivory:     #E2D7BC;
+
+  /* KelasKu Official Signature Emerald */
+  --kelasku-emerald:        #1F7A63;
+  --kelasku-emerald-dark:   #166052;
+  --kelasku-emerald-deep:   #0F372D;
+  --kelasku-emerald-soft:   #DDEFE7;
+  --kelasku-emerald-border: #A9D5CA;
+  --kelasku-emerald-bevel:  #7CBBAE;
+
+  /* Physics */
+  --ease-bounce:      cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* 1. GLOBAL CANVAS & TYPOGRAPHY */
+html, body,
+main.app, .app, #app,
+.home-today, .home-page,
+.classroom-page, .progress-page, .profile-page,
+.skills-lab-page, .skills-page, .writing-page,
+.library-page, .ask-page, .settings-page,
+.learner-flow-page, .view-page, .view-container {
+  background-color: var(--bg-canvas) !important;
+  color: var(--text-main) !important;
+  font-family: var(--font-sans) !important;
+  -webkit-font-smoothing: antialiased !important;
+}
+
+/* 2. CLAY CARDS WITH 3D BEVEL */
+.card, .home-card, .today-card, .fz-stadium-card,
+.card-surface, .hero-card, .skill-card, .classroom-card,
+.quiz-card, .feedback-card, .stat-card, .library-card,
+.arena-card, .proctor-card, .class-bar, .fz-aurora-card {
+  background: var(--card-surface) !important;
+  border: 2px solid var(--card-border) !important;
+  border-radius: 20px !important;
+  box-shadow: var(--card-shadow) !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+.card:hover, .home-card:hover, .fz-stadium-card:hover {
+  border-color: #CBD5E1 !important;
+}
+
+/* 3. SIGNATURE DARK CARDS */
+.fz-card-dark, .card-black, .streak-card,
+.fz-stadium-card.fz-card-dark {
+  background: var(--card-black) !important;
+  border: 2px solid #1E293B !important;
+  border-radius: 20px !important;
+  box-shadow: 0 6px 0 var(--shadow-ivory), 0 14px 28px rgba(11, 15, 23, 0.2) !important;
+  color: #FFFFFF !important;
+}
+
+.fz-card-dark .fz-clean-header-title,
+.fz-card-dark h3, .fz-card-dark b {
+  color: #FFFFFF !important;
+}
+
+.fz-card-dark .fz-clean-header-sub,
+.fz-card-dark p, .fz-card-dark small {
+  color: #94A3B8 !important;
+}
+
+.fz-vocab-kicker-tag.is-dark-tag {
+  color: var(--yellow-bright) !important;
+  font-weight: 800 !important;
+}
+
+/* 4. KELASKU EMERALD CARDS */
+.kelasku-card, .ch-task-card, .ch-card,
+.ch-student, .ch-assignment-tile {
+  background: #FFFFFF !important;
+  border: 2px solid var(--kelasku-emerald-border) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 6px 0 var(--kelasku-emerald-bevel), 0 14px 28px rgba(31, 122, 99, 0.08) !important;
+}
+
+.kelasku-wordmark {
+  color: var(--kelasku-emerald) !important;
+  font-family: var(--font-sans) !important;
+  font-weight: 800 !important;
+}
+
+/* 5. TACTILE 3D PRIMARY ACTION BUTTONS (Solar Gold Clay) */
+.primary, .btn-primary, .fz-hero-cta,
+.fz-aurora-cta-btn, .token-submit-btn,
+.quiz-submit-btn, .btn-sim-progress,
+.home-hero-cta, button.primary {
+  background: var(--gold-gradient) !important;
+  border: 2px solid var(--gold-bevel) !important;
+  border-radius: 18px !important;
+  color: var(--gold-text) !important;
+  font-family: var(--font-sans) !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.02em !important;
+  box-shadow: var(--gold-shadow) !important;
+  cursor: pointer !important;
+  transition: transform 0.12s ease, box-shadow 0.12s ease !important;
+  text-decoration: none !important;
+}
+
+.primary:hover, .btn-primary:hover, .fz-hero-cta:hover {
+  filter: brightness(1.03) !important;
+}
+
+.primary:active, .btn-primary:active, .fz-hero-cta:active,
+.fz-aurora-cta-btn:active, .token-submit-btn:active {
+  transform: translateY(3px) !important;
+  box-shadow: 0 2px 0 var(--gold-bevel), 0 4px 8px rgba(255, 183, 3, 0.2) !important;
+}
+
+.primary:disabled, .token-submit-btn:disabled,
+button.primary:disabled {
+  background: #E2E8F0 !important;
+  border-color: #CBD5E1 !important;
+  color: #94A3B8 !important;
+  box-shadow: 0 3px 0 #CBD5E1 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+}
+
+/* 6. TACTILE 3D SECONDARY BUTTONS */
+button:not(.primary):not(.nav):not(.token-chip):not(.fz-aurora-audio-btn):not(.option-btn):not(.fz-i),
+.btn:not(.primary) {
+  background: #FFFFFF !important;
+  border: 2px solid var(--card-border) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 4px 0 var(--card-bevel) !important;
+  color: var(--text-main) !important;
+  font-family: var(--font-sans) !important;
+  font-weight: 800 !important;
+  cursor: pointer !important;
+  transition: transform 0.1s ease, box-shadow 0.1s ease !important;
+}
+
+button:not(.primary):not(.nav):not(.token-chip):not(.fz-aurora-audio-btn):not(.option-btn):not(.fz-i):active,
+.btn:not(.primary):active {
+  transform: translateY(2px) !important;
+  box-shadow: 0 2px 0 var(--card-bevel) !important;
+}
+
+/* 7. TACTILE 3D AUDIO BUTTONS */
+.fz-aurora-audio-btn, .audio-btn-3d,
+.audio-play-btn, .audio-btn {
+  background: #FFFFFF !important;
+  border: 2px solid #BAE6FD !important;
+  border-radius: 14px !important;
+  color: var(--sky-blue) !important;
+  box-shadow: 0 4px 0 #BAE6FD !important;
+  cursor: pointer !important;
+  transition: all 0.12s !important;
+}
+
+.fz-aurora-audio-btn:active, .audio-btn-3d:active {
+  transform: translateY(2px) !important;
+  box-shadow: 0 1px 0 #BAE6FD !important;
+}
+
+/* 8. TACTILE DOCKED BOTTOM NAVIGATION */
+.bottomnav {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 2px solid var(--card-border) !important;
+  border-radius: 24px !important;
+  box-shadow: 0 8px 0 var(--card-bevel), 0 16px 32px rgba(15, 23, 42, 0.08) !important;
+  max-width: 440px !important;
+  width: calc(100% - 24px) !important;
+  margin: 0 auto 10px auto !important;
+  padding: 6px 8px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-around !important;
+}
+
+.bottomnav .nav {
+  border-radius: 16px !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  font-weight: 800 !important;
+  font-family: var(--font-sans) !important;
+  color: var(--text-muted) !important;
+  transition: all 0.15s var(--ease-bounce) !important;
+  padding: 6px 10px !important;
+}
+
+.bottomnav .nav .fz-i {
+  --fz-i-fill: #E2E8F0;
+  --fz-i-line: #94A3B8;
+}
+
+.bottomnav .nav:hover {
+  color: #334155 !important;
+}
+
+.bottomnav .nav.active {
+  background: #FEF3C7 !important;
+  border: 1.5px solid #F59E0B !important;
+  border-radius: 16px !important;
+  box-shadow: 0 3px 0 var(--gold-bevel) !important;
+  transform: translateY(-2px) !important;
+  color: #B45309 !important;
+}
+
+.bottomnav .nav.active .fz-i {
+  --fz-i-fill: #FFD21E;
+  --fz-i-line: #0F172A;
+}
+
+.bottomnav .nav[data-view="classroom"].active {
+  background: #EAF5F1 !important;
+  border: 1.5px solid var(--kelasku-emerald-border) !important;
+  box-shadow: 0 3px 0 var(--kelasku-emerald-bevel) !important;
+  color: var(--kelasku-emerald) !important;
+}
+
+.bottomnav .nav[data-view="classroom"].active .fz-i {
+  --fz-i-fill: var(--kelasku-emerald-soft);
+  --fz-i-line: var(--kelasku-emerald);
+}
+
+/* 9. GRAMMAR COACH ENGINE INTEGRATION (Token Rail & Ruby Gloss) */
+.token-rail {
+  background: #F8FAFC !important;
+  border: 2px dashed #CBD5E1 !important;
+  border-radius: 20px !important;
+  min-height: 72px !important;
+  padding: 10px 12px !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+  align-items: center !important;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.03) !important;
+}
+
+.token-bank {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+  padding: 10px 0 !important;
+}
+
+.token-chip {
+  background: #FFFFFF !important;
+  border: 2px solid var(--card-border) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 4px 0 var(--card-bevel) !important;
+  color: #0F172A !important;
+  font-family: var(--font-sans) !important;
+  font-weight: 800 !important;
+  padding: 8px 14px !important;
+  cursor: pointer !important;
+  transition: transform 0.1s ease, box-shadow 0.1s ease !important;
+}
+
+.token-chip:active {
+  transform: translateY(2px) !important;
+  box-shadow: 0 1px 0 var(--card-bevel) !important;
+}
+
+.token-chip.in-rail {
+  background: #FEF3C7 !important;
+  border-color: #FCD34D !important;
+  box-shadow: 0 4px 0 #FBBF24 !important;
+  color: #78350F !important;
+}
+
+/* Ruby Gloss: Gloss Bahasa Indonesia tepat tegak di atas kata Inggris */
+.token-chip.has-gloss {
+  display: inline-flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 6px 14px !important;
+  min-height: 48px !important;
+}
+
+.token-gloss {
+  display: block !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  color: #D97706 !important;
+  line-height: 1.1 !important;
+  margin-bottom: 2px !important;
+  text-transform: capitalize !important;
+}
+
+.token-word {
+  display: block !important;
+  font-size: 14.5px !important;
+  font-weight: 800 !important;
+  color: #0F172A !important;
+  line-height: 1.2 !important;
+}
+
+/* Vacant Slot Insertion */
+.gx-vacant-slot {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  padding: 6px 12px !important;
+  background: #FEF3C7 !important;
+  border: 2px dashed #F59E0B !important;
+  border-radius: 14px !important;
+  color: #B45309 !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+}
+
+/* Scaffolding Hint */
+.gx-hint {
+  background: #FFFDF5 !important;
+  border: 2px solid #FCD34D !important;
+  border-radius: 16px !important;
+  padding: 12px 14px !important;
+  box-shadow: 0 4px 0 #FBBF24 !important;
+  margin: 10px 0 !important;
+}
+
+.gx-hint-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  font-size: 10.5px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.05em !important;
+  color: #B45309 !important;
+  margin-bottom: 4px !important;
+}
+
+.gx-hint-title {
+  font-size: 13.5px !important;
+  font-weight: 800 !important;
+  color: #78350F !important;
+  margin-bottom: 2px !important;
+}
+
+.gx-hint-body {
+  font-size: 12.5px !important;
+  color: #92400E !important;
+  line-height: 1.4 !important;
+}
+
+/* L1 Contrast Card: Beda dengan Bahasa Indonesia */
+.gx-contrast-card {
+  background: #F0FDF4 !important;
+  border: 2px solid #BBF7D0 !important;
+  border-radius: 16px !important;
+  padding: 12px 14px !important;
+  box-shadow: 0 4px 0 #86EFAC !important;
+  margin: 10px 0 !important;
+}
+
+.gx-contrast-title {
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  color: #15803D !important;
+  margin-bottom: 4px !important;
+}
+
+.gx-contrast-body {
+  font-size: 12.5px !important;
+  color: #166534 !important;
+  line-height: 1.4 !important;
+}
+
+/* Pin Formula Button */
+.gx-pin-formula-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 6px 12px !important;
+  background: #FEF3C7 !important;
+  border: 1.5px solid #FCD34D !important;
+  border-radius: 9999px !important;
+  box-shadow: 0 2px 0 #FBBF24 !important;
+  font-size: 11.5px !important;
+  font-weight: 800 !important;
+  color: #78350F !important;
+  cursor: pointer !important;
+  margin-top: 8px !important;
+  transition: all 0.1s ease !important;
+}
+
+.gx-pin-formula-btn:active {
+  transform: translateY(2px) !important;
+  box-shadow: none !important;
+}
+
+.gx-pin-formula-btn.pinned {
+  background: #D1FAE5 !important;
+  border-color: #6EE7B7 !important;
+  box-shadow: 0 2px 0 #34D399 !important;
+  color: #065F46 !important;
+}
+
+/* 10. QUIZ OPTION BUTTONS */
+.option-btn, .quiz-option, .choice-btn {
+  background: #FFFFFF !important;
+  border: 2px solid var(--card-border) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 4px 0 var(--card-bevel) !important;
+  font-family: var(--font-sans) !important;
+  font-weight: 700 !important;
+  color: var(--text-main) !important;
+  padding: 12px 16px !important;
+  cursor: pointer !important;
+  transition: transform 0.1s ease, box-shadow 0.1s ease !important;
+}
+
+.option-btn:hover, .choice-btn:hover {
+  border-color: #CBD5E1 !important;
+}
+
+.option-btn:active, .choice-btn:active {
+  transform: translateY(2px) !important;
+  box-shadow: 0 2px 0 var(--card-bevel) !important;
+}
+
+.option-btn.is-selected, .quiz-option.is-selected {
+  background: #FEF3C7 !important;
+  border-color: #F59E0B !important;
+  box-shadow: 0 4px 0 #D97706 !important;
+  color: #78350F !important;
+}
+
+/* 11. HEADER WELCOME & STREAK PILLS */
+.fz-welcome-header {
+  margin-bottom: 12px !important;
+}
+
+.fz-greet-title {
+  font-size: 20px !important;
+  font-weight: 800 !important;
+  color: #0F172A !important;
+  letter-spacing: -0.02em !important;
+}
+
+.fz-greet-motivation {
+  font-size: 13px !important;
+  color: var(--text-sub) !important;
+  font-weight: 600 !important;
+  margin-top: 2px !important;
+}
