@@ -4852,22 +4852,219 @@ function speakingAdaptivePolicy(){
     return self.FiezelSpeakingAdaptive.policy({coverageHistory:rows,weakLessons,...(mastery===null?{}:{mastery})})||null;
   }catch{return null}
 }
-/* ---- C5 butir 6 (rendering): tuntunan langkah FiezelStepTutor saat scaffold 'worked' ----
- * VanLehn (council C10): granularitas langkah, bukan kefasihan bahasa. Saat murid sudah
- * sampai di anak tangga 'worked', soal ber-reasoningOperation dipecah menjadi 2-3 langkah
- * tuntunan yang tampil SEBELUM murid memilih lagi - jawabannya tetap soal yang sama. */
-function stepTutorGuidance(q){
-  const S=self.FiezelStepTutor;
-  if(!S||typeof S.decompose!=='function'||q?.type!=='grammar')return null;
+/* ---- C5 butir 6 (rendering): tuntunan langkah FiezelStepTutor saat murid kewalahan ----
+ * VanLehn (council C10): granularitas langkah, bukan kefasihan bahasa. Soal dipecah
+ * menjadi 2-3 langkah tuntunan pedagogis yang terstruktur di semua jenis materi (grammar,
+ * vocab, reading, listening, token-order, cloze) saat murid mengalami kesulitan atau kewalahan. */
+function isLearnerOverwhelmed(q){
   try{
-    const skill=String(q.lessonSkill||q.skill||'');
-    const item=(G?.[skill]||[]).find(x=>String(x?.[8]||'')===String(q.sourceId||''));
-    const reasoning=String(item?.[11]||'');
-    if(!reasoning)return null;
-    const out=S.decompose(String(q.question||''),{reasoningOperation:reasoning,stem:String(q.question||'')});
-    if(!(out&&Array.isArray(out.steps)&&out.steps.length))return null;
-    return stepTutorThai(stepTutorLocalSteps(item,out),String(q.question||''));
-  }catch{return null}
+    if(self.__forceOverwhelmedForTest)return true;
+    const aff=affectSessionSync?.()?.state||tutorSession?.()?.affect;
+    if(aff==='frustrated'||aff==='fatigued')return true;
+    const missStreak=Number(tutorSession?.()?.missStreak||0);
+    if(missStreak>=1)return true;
+    if(typeof answer==='object'&&answer){
+      if(answer.scaffold==='worked'||answer.scaffold==='tell'||answer.scaffold==='hint'||answer.breathe)return true;
+    }
+    if(q?.__scaffoldAttempt>=1)return true;
+    const skill=String(q?.lessonSkill||q?.skill||'');
+    if(self.FiezelMasteryBKT&&typeof self.FiezelMasteryBKT.mastery==='function'){
+      const m=self.FiezelMasteryBKT.mastery(bktRead?.(),skill);
+      if(m&&Number(m.L)<0.65)return true;
+    }
+    const mistakeCount=Number(state?.mistakeVault?.[skill]||0);
+    if(mistakeCount>=1)return true;
+    return false;
+  }catch(_){
+    return false;
+  }
+}
+function stepTutorGuidance(q){
+  if(!q)return null;
+  const S=self.FiezelStepTutor;
+  const t=(k,p)=>FiezelI18n.t(k,p);
+  const pfx=n=>t('brain-step.step-prefix',{n});
+
+  // 1. Grammar & Video-Grammar
+  if(q.type==='grammar'||q.type==='video-grammar'){
+    try{
+      const skill=String(q.lessonSkill||q.skill||'');
+      const item=(G?.[skill]||[]).find(x=>String(x?.[8]||'')===String(q.sourceId||''));
+      const reasoning=String(item?.[11]||'');
+      if(S&&typeof S.decompose==='function'&&reasoning){
+        const out=S.decompose(String(q.question||''),{reasoningOperation:reasoning,stem:String(q.question||'')});
+        if(out&&Array.isArray(out.steps)&&out.steps.length){
+          return stepTutorThai(stepTutorLocalSteps(item,out),String(q.question||''));
+        }
+      }
+    }catch(_){}
+    return {
+      steps:[
+        {ask:pfx(1)+t('tutor-step.grammar-step-1'),expect:'cue',rationale:'brain3_step_identify',localized:true},
+        {ask:pfx(2)+t('tutor-step.grammar-step-2'),expect:'rule',rationale:'brain3_step_apply',localized:true},
+        {ask:pfx(3)+t('tutor-step.grammar-step-3'),expect:'selection',rationale:'brain3_step_eliminate',localized:true}
+      ],
+      finalAsk:t('tutor-step.grammar-final'),
+      rationale:'brain3_step_tutor_decomposed'
+    };
+  }
+
+  // 2. Vocab
+  if(q.type==='vocab'){
+    const word=String(q.focus?.word||q.targetWord||'').trim();
+    const vSkill=String(q.skill||'');
+    if(vSkill.includes('context')){
+      return {
+        steps:[
+          {ask:pfx(1)+t('tutor-step.vocab-context-step-1',{word:word||'ini'}),expect:'context',rationale:'brain3_step_identify',localized:true},
+          {ask:pfx(2)+t('tutor-step.vocab-context-step-2'),expect:'nuance',rationale:'brain3_step_compare',localized:true},
+          {ask:pfx(3)+t('tutor-step.vocab-context-step-3'),expect:'meaning',rationale:'brain3_step_select',localized:true}
+        ],
+        finalAsk:t('tutor-step.vocab-context-final'),
+        rationale:'brain3_step_tutor_decomposed'
+      };
+    }
+    if(vSkill.includes('synonym')){
+      return {
+        steps:[
+          {ask:pfx(1)+t('tutor-step.vocab-synonym-step-1',{word:word||'ini'}),expect:'core_meaning',rationale:'brain3_step_identify',localized:true},
+          {ask:pfx(2)+t('tutor-step.vocab-synonym-step-2'),expect:'compare',rationale:'brain3_step_compare',localized:true},
+          {ask:pfx(3)+t('tutor-step.vocab-synonym-step-3'),expect:'synonym',rationale:'brain3_step_select',localized:true}
+        ],
+        finalAsk:t('tutor-step.vocab-synonym-final'),
+        rationale:'brain3_step_tutor_decomposed'
+      };
+    }
+    if(vSkill.includes('partOfSpeech')){
+      return {
+        steps:[
+          {ask:pfx(1)+t('tutor-step.vocab-pos-step-1',{word:word||'ini'}),expect:'position',rationale:'brain3_step_identify',localized:true},
+          {ask:pfx(2)+t('tutor-step.vocab-pos-step-2'),expect:'function',rationale:'brain3_step_compare',localized:true},
+          {ask:pfx(3)+t('tutor-step.vocab-pos-step-3'),expect:'pos',rationale:'brain3_step_select',localized:true}
+        ],
+        finalAsk:t('tutor-step.vocab-pos-final'),
+        rationale:'brain3_step_tutor_decomposed'
+      };
+    }
+    return {
+      steps:[
+        {ask:pfx(1)+t('tutor-step.vocab-meaning-step-1',{word:word||'ini'}),expect:'definition',rationale:'brain3_step_identify',localized:true},
+        {ask:pfx(2)+t('tutor-step.vocab-meaning-step-2'),expect:'eliminate',rationale:'brain3_step_eliminate',localized:true},
+        {ask:pfx(3)+t('tutor-step.vocab-meaning-step-3'),expect:'meaning',rationale:'brain3_step_select',localized:true}
+      ],
+      finalAsk:t('tutor-step.vocab-meaning-final'),
+      rationale:'brain3_step_tutor_decomposed'
+    };
+  }
+
+  // 3. Reading
+  if(q.type==='reading'){
+    const rSkill=String(q.skill||'');
+    if(rSkill.includes('main_idea')||rSkill.includes('purpose')){
+      return {
+        steps:[
+          {ask:pfx(1)+t('tutor-step.reading-main-step-1'),expect:'skimming',rationale:'brain3_step_identify',localized:true},
+          {ask:pfx(2)+t('tutor-step.reading-main-step-2'),expect:'theme',rationale:'brain3_step_compare',localized:true},
+          {ask:pfx(3)+t('tutor-step.reading-main-step-3'),expect:'main_idea',rationale:'brain3_step_select',localized:true}
+        ],
+        finalAsk:t('tutor-step.reading-main-final'),
+        rationale:'brain3_step_tutor_decomposed'
+      };
+    }
+    if(rSkill.includes('detail')||rSkill.includes('evidence')){
+      return {
+        steps:[
+          {ask:pfx(1)+t('tutor-step.reading-detail-step-1'),expect:'keywords',rationale:'brain3_step_identify',localized:true},
+          {ask:pfx(2)+t('tutor-step.reading-detail-step-2'),expect:'scanning',rationale:'brain3_step_check',localized:true},
+          {ask:pfx(3)+t('tutor-step.reading-detail-step-3'),expect:'evidence',rationale:'brain3_step_select',localized:true}
+        ],
+        finalAsk:t('tutor-step.reading-detail-final'),
+        rationale:'brain3_step_tutor_decomposed'
+      };
+    }
+    if(rSkill.includes('infer')||rSkill.includes('conclusion')){
+      return {
+        steps:[
+          {ask:pfx(1)+t('tutor-step.reading-infer-step-1'),expect:'cue',rationale:'brain3_step_identify',localized:true},
+          {ask:pfx(2)+t('tutor-step.reading-infer-step-2'),expect:'deduction',rationale:'brain3_step_compare',localized:true},
+          {ask:pfx(3)+t('tutor-step.reading-infer-step-3'),expect:'inference',rationale:'brain3_step_select',localized:true}
+        ],
+        finalAsk:t('tutor-step.reading-infer-final'),
+        rationale:'brain3_step_tutor_decomposed'
+      };
+    }
+    return {
+      steps:[
+        {ask:pfx(1)+t('tutor-step.reading-generic-step-1'),expect:'keywords',rationale:'brain3_step_identify',localized:true},
+        {ask:pfx(2)+t('tutor-step.reading-generic-step-2'),expect:'scanning',rationale:'brain3_step_check',localized:true},
+        {ask:pfx(3)+t('tutor-step.reading-generic-step-3'),expect:'evidence',rationale:'brain3_step_select',localized:true}
+      ],
+      finalAsk:t('tutor-step.reading-generic-final'),
+      rationale:'brain3_step_tutor_decomposed'
+    };
+  }
+
+  // 4. Listening
+  if(q.type==='listening'){
+    const lSkill=String(q.skill||'');
+    if(lSkill.includes('gist')){
+      return {
+        steps:[
+          {ask:pfx(1)+t('tutor-step.listening-gist-step-1'),expect:'speakers',rationale:'brain3_step_identify',localized:true},
+          {ask:pfx(2)+t('tutor-step.listening-gist-step-2'),expect:'core_topic',rationale:'brain3_step_compare',localized:true},
+          {ask:pfx(3)+t('tutor-step.listening-gist-step-3'),expect:'gist',rationale:'brain3_step_select',localized:true}
+        ],
+        finalAsk:t('tutor-step.listening-gist-final'),
+        rationale:'brain3_step_tutor_decomposed'
+      };
+    }
+    return {
+      steps:[
+        {ask:pfx(1)+t('tutor-step.listening-detail-step-1'),expect:'situation',rationale:'brain3_step_identify',localized:true},
+        {ask:pfx(2)+t('tutor-step.listening-detail-step-2'),expect:'question_focus',rationale:'brain3_step_check',localized:true},
+        {ask:pfx(3)+t('tutor-step.listening-detail-step-3'),expect:'action',rationale:'brain3_step_select',localized:true}
+      ],
+      finalAsk:t('tutor-step.listening-detail-final'),
+      rationale:'brain3_step_tutor_decomposed'
+    };
+  }
+
+  // 5. Token Order
+  if(q.type==='token-order'){
+    return {
+      steps:[
+        {ask:pfx(1)+t('tutor-step.token-step-1'),expect:'subject',rationale:'brain3_step_identify',localized:true},
+        {ask:pfx(2)+t('tutor-step.token-step-2'),expect:'verb',rationale:'brain3_step_apply',localized:true},
+        {ask:pfx(3)+t('tutor-step.token-step-3'),expect:'predicate',rationale:'brain3_step_select',localized:true}
+      ],
+      finalAsk:t('tutor-step.token-final'),
+      rationale:'brain3_step_tutor_decomposed'
+    };
+  }
+
+  // 6. Cloze
+  if(q.type==='cloze'){
+    return {
+      steps:[
+        {ask:pfx(1)+t('tutor-step.cloze-step-1'),expect:'blank_context',rationale:'brain3_step_identify',localized:true},
+        {ask:pfx(2)+t('tutor-step.cloze-step-2'),expect:'grammar_rule',rationale:'brain3_step_apply',localized:true},
+        {ask:pfx(3)+t('tutor-step.cloze-step-3'),expect:'production',rationale:'brain3_step_select',localized:true}
+      ],
+      finalAsk:t('tutor-step.cloze-final'),
+      rationale:'brain3_step_tutor_decomposed'
+    };
+  }
+
+  // 7. Universal fallback for any other question format
+  return {
+    steps:[
+      {ask:pfx(1)+t('tutor-step.reading-generic-step-1'),expect:'keywords',rationale:'brain3_step_identify',localized:true},
+      {ask:pfx(2)+t('tutor-step.reading-generic-step-2'),expect:'scanning',rationale:'brain3_step_check',localized:true},
+      {ask:pfx(3)+t('tutor-step.reading-generic-step-3'),expect:'evidence',rationale:'brain3_step_select',localized:true}
+    ],
+    finalAsk:t('tutor-step.reading-generic-final'),
+    rationale:'brain3_step_tutor_decomposed'
+  };
 }
 /* W3-BRAIN-TH: rakit ulang ask/finalAsk step-tutor untuk locale th DI SISI APP.
  * Alasannya bukan selera: decompose() modul membekukan kalimat finalAsk Indonesia di dalam
@@ -13201,7 +13398,7 @@ function quizLoop(cfg){
    +(retry&&q.__diagnosticClue?`<div class="tutor-diagnostic-clue"><i data-lucide="lightbulb"></i><span>${esc(q.__diagnosticClue)}</span></div>`:'')
    +(showSayAndAsk&&turn.say?`<p class="tutor-turn-say">${esc(personalize(turn.say))}</p>`:'')
    +(showSayAndAsk&&turn.ask?`<p class="tutor-turn-ask">${esc(personalize(turn.ask))}</p>`:'')
-   +(retry&&(answer.scaffold==='worked'||isFrustrated)?stepTutorGuidanceMarkup(q):'')
+   +(retry&&(isLearnerOverwhelmed(q)||answer.scaffold==='worked'||answer.scaffold==='hint'||isFrustrated)?stepTutorGuidanceMarkup(q):'')
    +(retry?`<div class="tutor-turn-actions"><button id="tutorStuck" type="button" class="tutor-stuck quiz-giveup-btn"><i data-lucide="help-circle"></i><span>${FiezelI18n.t('quiz.menyerah-buka-jawaban','Buntu? Buka pembahasan lengkap')}</span></button></div>`:'');
   if(retry)$('tutorStuck').onclick=()=>{
    reveal(q,answer.lastPick,false,{forced:true});
@@ -13466,8 +13663,10 @@ function quizLoop(cfg){
        +repeatBadge
        +fsrsBadge
        +`</div>`;
-   }
-   f.innerHTML=`<div class="feedback-title"><i data-lucide="${verdictIcon}"></i><b>${verdictTitle}</b></div>${telemetryRowHtml}<p>${ok?FiezelI18n.t('quiz.correct-answer',{answer:`<strong>${esc(cleanCorrect)}</strong>`}):`${FiezelI18n.t('quiz.jawabanmu')} ${userPickRender}${FiezelI18n.t('quiz.answer-paling-tepat-adalah')} ${correctPickRender}.`}</p>${pickedWhyFails?`<p class="feedback-your-pick"><strong>${FiezelI18n.t('quiz.mengapa-salah','Mengapa kurang tepat?')}</strong> ${esc(pickedWhyFails)}</p>`:''}${(q.type==='grammar'||q.type==='token-order'||q.type==='video-grammar')&&q.explain?.rule/* m025-375: alasan dan aturan grammar di dua baris, bukan satu paragraf panjang */?`<p><strong>${FiezelI18n.t('quiz.intinya')}</strong> ${esc(whyText)}</p><p class="feedback-rule feedback-rule-pill"><strong>${FiezelI18n.t('quiz.aturannya')}</strong> ${esc(q.explain.rule)}</p>`:`<p><strong>${FiezelI18n.t('quiz.intinya')}</strong> ${esc(whyText)} ${q.explain?.rule?esc(q.explain.rule):''}</p>`}<details class="acc"><summary>${FiezelI18n.t(q.explain?.distractors?'quiz.bandingkan-pilihan-lain':'quiz.pembahasan-lengkap')}</summary><p class="muted">${esc(q.explain?.distractor||FiezelI18n.t('quiz.fallback-unsupported'))} ${esc(q.explain?.avoid||FiezelI18n.t('quiz.fallback-hint-check'))}</p>${q.explain?.distractors?`<div class="distractor-breakdown">${q.explain.distractors.map(x=>`<p><b>${esc(x.option)}:</b> ${esc(x.reason)}</p>`).join('')}</div>`:''}</details><div class="feedback-memory-box memory-tip"><div class="feedback-memory-header"><i data-lucide="lightbulb"></i><span class="feedback-memory-kicker">${FiezelI18n.t('quiz.trik-ingat','Trik Cepat Ingat')}</span></div><div class="feedback-memory-content">${formatMemoryTipForDisplay(esc(q.explain?.memory||FiezelI18n.t('quiz.fallback-hint-connect')))}</div></div><button class="ai-btn" id="aiExplainBtn"><i data-lucide="sparkles"></i> ${FiezelI18n.t('quiz.jelaskan-dengan-cara-lebih-sederhana')}</button>`;
+    }
+   const showStepGuidanceInFeedback = !MEASURE && !ok && isLearnerOverwhelmed(q);
+   const stepGuidanceHtml = showStepGuidanceInFeedback ? stepTutorGuidanceMarkup(q) : '';
+   f.innerHTML=`<div class="feedback-title"><i data-lucide="${verdictIcon}"></i><b>${verdictTitle}</b></div>${telemetryRowHtml}<p>${ok?FiezelI18n.t('quiz.correct-answer',{answer:`<strong>${esc(cleanCorrect)}</strong>`}):`${FiezelI18n.t('quiz.jawabanmu')} ${userPickRender}${FiezelI18n.t('quiz.answer-paling-tepat-adalah')} ${correctPickRender}.`}</p>${pickedWhyFails?`<p class="feedback-your-pick"><strong>${FiezelI18n.t('quiz.mengapa-salah','Mengapa kurang tepat?')}</strong> ${esc(pickedWhyFails)}</p>`:''}${stepGuidanceHtml}${(q.type==='grammar'||q.type==='token-order'||q.type==='video-grammar')&&q.explain?.rule/* m025-375: alasan dan aturan grammar di dua baris, bukan satu paragraf panjang */?`<p><strong>${FiezelI18n.t('quiz.intinya')}</strong> ${esc(whyText)}</p><p class="feedback-rule feedback-rule-pill"><strong>${FiezelI18n.t('quiz.aturannya')}</strong> ${esc(q.explain.rule)}</p>`:`<p><strong>${FiezelI18n.t('quiz.intinya')}</strong> ${esc(whyText)} ${q.explain?.rule?esc(q.explain.rule):''}</p>`}<details class="acc"><summary>${FiezelI18n.t(q.explain?.distractors?'quiz.bandingkan-pilihan-lain':'quiz.pembahasan-lengkap')}</summary><p class="muted">${esc(q.explain?.distractor||FiezelI18n.t('quiz.fallback-unsupported'))} ${esc(q.explain?.avoid||FiezelI18n.t('quiz.fallback-hint-check'))}</p>${q.explain?.distractors?`<div class="distractor-breakdown">${q.explain.distractors.map(x=>`<p><b>${esc(x.option)}:</b> ${esc(x.reason)}</p>`).join('')}</div>`:''}</details><div class="feedback-memory-box memory-tip"><div class="feedback-memory-header"><i data-lucide="lightbulb"></i><span class="feedback-memory-kicker">${FiezelI18n.t('quiz.trik-ingat','Trik Cepat Ingat')}</span></div><div class="feedback-memory-content">${formatMemoryTipForDisplay(esc(q.explain?.memory||FiezelI18n.t('quiz.fallback-hint-connect')))}</div></div><button class="ai-btn" id="aiExplainBtn"><i data-lucide="sparkles"></i> ${FiezelI18n.t('quiz.jelaskan-dengan-cara-lebih-sederhana')}</button>`;
   speak(turn);
   answer.locked=true;
   $('quizNext').disabled=false;
@@ -17171,7 +17370,7 @@ if(typeof document!=='undefined'&&document.addEventListener){
   });
 }
 /* ============================== akhir blok SOSIAL (SLOT 7) ========================== */
-window.istilahMurid=istilahMurid;/* dipapar untuk gerbang QA: penerjemah enum harus bisa disapu penuh */window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={showBrandSplash,showOnboarding,prefersReducedMotion,readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,/* m025-246: dipapar untuk regression-test - gerbang itu harus bisa MENANYAKAN ukuran rencana penempatan, bukan memaku 25 dan merah setiap kali ukurannya berubah dengan sengaja. */placementSize,placementBlueprint,/* cetak biru PENUH dipapar terpisah: gerbang harus tetap bisa menjaga invarian 'penempatan penuh memuat ketiga jenis konten' walau jalur murid memakai cetak biru lite */PLACEMENT_BLUEPRINT_FULL:PLACEMENT_BLUEPRINT,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,/* m025-201: dipapar untuk tests/core-policy-parity-test.js - gerbang paritas tidak bisa membandingkan apa yang tidak bisa ia panggil */capRationaleCodes,policyEffectiveness,sanitizePolicyEffectiveness,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,coreBrainMemory,tutorSession,tutorObserve,misconceptionLedgerRead,misconceptionLedgerActive,coreBrainAttempts,quizPredictedSuccess,evidenceKappa,bktRead,bktRecord,bktShadowMarkup,brainManifestMarkup,learningTelemetryMode,learningTelemetryEmitAnswer,learningTelemetryStudyDay,braincoreEvidenceMode,braincoreEvidenceCohort,braincoreEvidenceCohortForBuild,braincoreEvidenceDay,braincoreEvidenceEmitSnapshot,activeLevelOverallMastery,braincoreEvidenceEmitDecision,braincoreEvidenceFlush,braincoreEvidenceObserveSession,braincoreDecisionReason,braincoreEvidenceAnyLaneActive,identityEvidenceMode,learnerNameSyncToServer,maybeSyncLearnerName,identityEvidenceActive,identityEvidenceMirror,identityEvidenceFlush,forgetLearnerEvidence,confusionMatrixRead,confusionMatrixRecord,affectObserve,affectSessionSync,affectTargetSuccess,listeningAdaptivePolicy,olmPanelMarkup,coreBrainPanelMarkup,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession,/* Fase 3 (C5): kalibrasi item, cloze, OLM negotiated, SRL, speaking adaptif, step tutor */itemCalibrationRead,itemCalibrationObserve,itemCalibrationEffective,calibrationItemId,ensureClozeBank,makeClozeQuestion,clozeAdaptivePicks,clozeSkillReady,clozeProductionRecord,olmSummarizeInput,olmDispute,olmProbeNextSkill,olmProbeConsume,olmNegotiationRead,srlSessionPlan,srlPredictPrompt,srlCaptureConfidence,srlReflect,srlSessionSync,speakingCoverageRows,speakingAdaptiveEvidence,speakingAdaptivePolicy,stepTutorGuidance,stepTutorGuidanceMarkup,record,quizLoop,startAdaptive,/* m025-308: dipapar untuk tests/th-content-overlay-test.js. Gerbang itu harus bisa memanggil overlay yang SUNGGUHAN lalu membacanya lewat jalur baca yang dipakai penyaji - kalau ia hanya boleh memeriksa isi sidecar, ia mengulang kebutaan yang justru membiarkan 45 petunjuk writing dan 96 umpan balik reading-exam menganggur. */applyContentLocale,writingPromptPool,writingExamTask,readingExamSets,makeExamReadingQuestion,/* m025-314: dipapar untuk tests/target-lang-surface-guard-test.js. Gerbang itu harus bisa MEMANGGIL daftar kartu yang sungguhan lalu membacanya, bukan menebak dari pola teks di app.js - penjaga yang hanya diuji lewat grep akan tetap hijau saat kartunya dipindah ke fungsi lain. */latihanCards,skillHubModel,skillHubMarkup,continueLearningCard,aiBoosterCard,targetLangSurfaceBlocked,targetLangVoiceBlocked,courseLanguageLabel,/* `state` adalah binding modul, jadi ia TIDAK muncul sebagai properti global di vm - gerbang yang perlu menggeser bahasa target atau membaca layar aktif tidak punya jalan lain. Diekspor sebagai FUNGSI, bukan nilai: salinan yang diambil saat berkas dimuat akan basi begitu state ditugaskan ulang (loadState dipanggil lagi saat akun berpindah). */liveState:()=>state,/* B1 (m025-317): dipapar untuk tests/target-lang-progress-isolation-test.js. Gerbang itu harus MENJALANKAN jalur simpan/muat yang sungguhan di kedua bahasa - sumbu yang hanya diuji lewat modulnya adalah persis cara cacat ini bertahan berbulan-bulan. */saveFlushWrite,switchTargetLangStorage,progressStorageKey,pickProgress,sideStateKey,PROGRESS_STATE_FIELDS,PROGRESS_PREF_FIELDS,/* Migrasi sekali-jalan saat murid masuk akun. Dipapar karena inilah satu-satunya jalur yang bisa MENELANTARKAN progres bahasa: ia lahir sebelum ruang nama @lang ada. Gerbang harus menjalankannya, bukan membaca namanya. */activateAccountStateFromPuter,migrateSideStateToAccount,FIEZEL_TARGET_COURSE_KEY,decisionTrace:()=>self.FiezelDecisionTrace,presenceEngine:()=>self.FiezelPresenceEngine,/* m025-375: dipapar untuk tests/policy-evidence-window-test.js - gerbang harus bisa memanggil jendela bukti dan panel Home yang sungguhan. */policyEvidenceArms,policyEvidenceMin,policyEvidenceProgress,evidenceProgressPanelMarkup,todayHomeMarkup,/* m025-376: dipapar untuk tests/self-tune-retention-test.js. */selfTuneAfterOutcome,selfTuneTargetFor,selfTuneRetentionArms,loadSelfTuneState,retentionProbeResults,RETENTION_PROBE_KEY,SELF_TUNE_KEY,/* Audit UI/UX Home 2026-09-27: dipapar untuk tests/home-honesty-test.js. */homeWeekStats,homeVocabStats,HOME_WEEK_MIN,/* Braincore langkah 2: dipapar untuk tests/item-pool-test.js - gerbang harus menjalankan jalur catat/kirim/baca yang sungguhan. */itemPoolObserve,itemPoolFlush,itemPoolRefreshTable,itemPoolEffective,itemPoolCanonicalPrior,itemPoolPriorPrediction,itemPoolTable,ITEM_POOL_KEY,ITEM_POOL_TABLE_KEY,/* langkah 3 */itemPoolProbePrediction,itemPoolObserveProbe};
+window.istilahMurid=istilahMurid;/* dipapar untuk gerbang QA: penerjemah enum harus bisa disapu penuh */window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={showBrandSplash,showOnboarding,prefersReducedMotion,readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,/* m025-246: dipapar untuk regression-test - gerbang itu harus bisa MENANYAKAN ukuran rencana penempatan, bukan memaku 25 dan merah setiap kali ukurannya berubah dengan sengaja. */placementSize,placementBlueprint,/* cetak biru PENUH dipapar terpisah: gerbang harus tetap bisa menjaga invarian 'penempatan penuh memuat ketiga jenis konten' walau jalur murid memakai cetak biru lite */PLACEMENT_BLUEPRINT_FULL:PLACEMENT_BLUEPRINT,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,/* m025-201: dipapar untuk tests/core-policy-parity-test.js - gerbang paritas tidak bisa membandingkan apa yang tidak bisa ia panggil */capRationaleCodes,policyEffectiveness,sanitizePolicyEffectiveness,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,coreBrainMemory,tutorSession,tutorObserve,misconceptionLedgerRead,misconceptionLedgerActive,coreBrainAttempts,quizPredictedSuccess,evidenceKappa,bktRead,bktRecord,bktShadowMarkup,brainManifestMarkup,learningTelemetryMode,learningTelemetryEmitAnswer,learningTelemetryStudyDay,braincoreEvidenceMode,braincoreEvidenceCohort,braincoreEvidenceCohortForBuild,braincoreEvidenceDay,braincoreEvidenceEmitSnapshot,activeLevelOverallMastery,braincoreEvidenceEmitDecision,braincoreEvidenceFlush,braincoreEvidenceObserveSession,braincoreDecisionReason,braincoreEvidenceAnyLaneActive,identityEvidenceMode,learnerNameSyncToServer,maybeSyncLearnerName,identityEvidenceActive,identityEvidenceMirror,identityEvidenceFlush,forgetLearnerEvidence,confusionMatrixRead,confusionMatrixRecord,affectObserve,affectSessionSync,affectTargetSuccess,listeningAdaptivePolicy,olmPanelMarkup,coreBrainPanelMarkup,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession,/* Fase 3 (C5): kalibrasi item, cloze, OLM negotiated, SRL, speaking adaptif, step tutor */itemCalibrationRead,itemCalibrationObserve,itemCalibrationEffective,calibrationItemId,ensureClozeBank,makeClozeQuestion,clozeAdaptivePicks,clozeSkillReady,clozeProductionRecord,olmSummarizeInput,olmDispute,olmProbeNextSkill,olmProbeConsume,olmNegotiationRead,srlSessionPlan,srlPredictPrompt,srlCaptureConfidence,srlReflect,srlSessionSync,speakingCoverageRows,speakingAdaptiveEvidence,speakingAdaptivePolicy,stepTutorGuidance,stepTutorGuidanceMarkup,isLearnerOverwhelmed,record,quizLoop,startAdaptive,/* m025-308: dipapar untuk tests/th-content-overlay-test.js. Gerbang itu harus bisa memanggil overlay yang SUNGGUHAN lalu membacanya lewat jalur baca yang dipakai penyaji - kalau ia hanya boleh memeriksa isi sidecar, ia mengulang kebutaan yang justru membiarkan 45 petunjuk writing dan 96 umpan balik reading-exam menganggur. */applyContentLocale,writingPromptPool,writingExamTask,readingExamSets,makeExamReadingQuestion,/* m025-314: dipapar untuk tests/target-lang-surface-guard-test.js. Gerbang itu harus bisa MEMANGGIL daftar kartu yang sungguhan lalu membacanya, bukan menebak dari pola teks di app.js - penjaga yang hanya diuji lewat grep akan tetap hijau saat kartunya dipindah ke fungsi lain. */latihanCards,skillHubModel,skillHubMarkup,continueLearningCard,aiBoosterCard,targetLangSurfaceBlocked,targetLangVoiceBlocked,courseLanguageLabel,/* `state` adalah binding modul, jadi ia TIDAK muncul sebagai properti global di vm - gerbang yang perlu menggeser bahasa target atau membaca layar aktif tidak punya jalan lain. Diekspor sebagai FUNGSI, bukan nilai: salinan yang diambil saat berkas dimuat akan basi begitu state ditugaskan ulang (loadState dipanggil lagi saat akun berpindah). */liveState:()=>state,/* B1 (m025-317): dipapar untuk tests/target-lang-progress-isolation-test.js. Gerbang itu harus MENJALANKAN jalur simpan/muat yang sungguhan di kedua bahasa - sumbu yang hanya diuji lewat modulnya adalah persis cara cacat ini bertahan berbulan-bulan. */saveFlushWrite,switchTargetLangStorage,progressStorageKey,pickProgress,sideStateKey,PROGRESS_STATE_FIELDS,PROGRESS_PREF_FIELDS,/* Migrasi sekali-jalan saat murid masuk akun. Dipapar karena inilah satu-satunya jalur yang bisa MENELANTARKAN progres bahasa: ia lahir sebelum ruang nama @lang ada. Gerbang harus menjalankannya, bukan membaca namanya. */activateAccountStateFromPuter,migrateSideStateToAccount,FIEZEL_TARGET_COURSE_KEY,decisionTrace:()=>self.FiezelDecisionTrace,presenceEngine:()=>self.FiezelPresenceEngine,/* m025-375: dipapar untuk tests/policy-evidence-window-test.js - gerbang harus bisa memanggil jendela bukti dan panel Home yang sungguhan. */policyEvidenceArms,policyEvidenceMin,policyEvidenceProgress,evidenceProgressPanelMarkup,todayHomeMarkup,/* m025-376: dipapar untuk tests/self-tune-retention-test.js. */selfTuneAfterOutcome,selfTuneTargetFor,selfTuneRetentionArms,loadSelfTuneState,retentionProbeResults,RETENTION_PROBE_KEY,SELF_TUNE_KEY,/* Audit UI/UX Home 2026-09-27: dipapar untuk tests/home-honesty-test.js. */homeWeekStats,homeVocabStats,HOME_WEEK_MIN,/* Braincore langkah 2: dipapar untuk tests/item-pool-test.js - gerbang harus menjalankan jalur catat/kirim/baca yang sungguhan. */itemPoolObserve,itemPoolFlush,itemPoolRefreshTable,itemPoolEffective,itemPoolCanonicalPrior,itemPoolPriorPrediction,itemPoolTable,ITEM_POOL_KEY,ITEM_POOL_TABLE_KEY,/* langkah 3 */itemPoolProbePrediction,itemPoolObserveProbe};
 window.FIEZEL_TARGET_COURSE_KEY=FIEZEL_TARGET_COURSE_KEY;
 window.startVocabQuiz=startVocabQuiz;window.buildAdaptivePool=buildAdaptivePool;window.buildGrammarLessonQuestions=buildGrammarLessonQuestions;window.getScenePalette=getScenePalette;window.getCelestialState=getCelestialState;window.playFeedbackSound=playFeedbackSound;window.updateMastery=updateMastery;window.markMastered=markMastered;window.__getFiezelState=()=>state;window.__fiezelValidViews=()=>[...VALID_VIEWS];window.__fiezelDueReviews=()=>dueItems().length;window.buildAdaptivePolicy=buildAdaptivePolicy;window.studyDayKey=studyDayKey;window.startAdaptive=startAdaptive;window.showToast=showToast;window.answerFeedbackSignal=answerFeedbackSignal;window.practiceSkill=practiceSkill;window.openReadingLevel=openReadingLevel;window.startReadingRandom=startReadingRandom;window.startReadingAdaptive=startReadingAdaptive;window.startPlacement=startPlacement;window.startLevelPractice=startLevelPractice;window.startAdaptive=startAdaptive;window.resetProgress=resetProgress;window.closeModal=closeModal;window.openSettings=openSettings;window.openReportPreview=openReportPreview;window.sendCreatorReport=sendCreatorReport;window.askCoachAI=askCoachAI;window.dismissWelcome=dismissWelcome;window.requestStudyNotificationPermission=requestStudyNotificationPermission;window.declineStudyNotifications=declineStudyNotifications;window.skipPuterSignIn=skipPuterSignIn;window.attemptGoogleSignIn=attemptGoogleSignIn;window.shouldPresentPuterPopup=shouldPresentPuterPopup;window.notifyAppUpdateIfNew=notifyAppUpdateIfNew;window.setConfidence=setConfidence;window.explainWithAI=explainWithAI;window.explainWordWithAI=explainWordWithAI;window.olmDispute=olmDispute;/* Fase 3 (C5 butir 3): handler tombol sanggah di panel OLM */
 // m025-84: dipasang di ujung berkas, saat go()/state/VALID_VIEWS sudah ada, dan SEBELUM

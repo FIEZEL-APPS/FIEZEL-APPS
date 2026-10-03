@@ -237,6 +237,72 @@
     'brain-step.final-direct': 'Jawab soalnya: "' + '{stem}' + '" — apa jawabanmu?',
     'brain-step.final-fallback': '\u0041pa jaw\u0061banmu \u0075ntuk so\u0061l ini?',
 
+    // ---------- tutor-step.* (Tuntunan Langkah Universal) ----------
+    'tutor-step.grammar-step-1': 'Cermati penanda waktu atau kata petunjuk utama pada kalimat ini.',
+    'tutor-step.grammar-step-2': 'Cocokkan subjek dengan bentuk kata kerja yang sesuai aturan tata bahasa.',
+    'tutor-step.grammar-step-3': 'Singkirkan pilihan yang tidak memenuhi rumus dan tentukan bentuk yang tepat.',
+    'tutor-step.grammar-final': 'Sekarang satukan langkah di atas, apa pilihan paling tepat menurutmu?',
+
+    'tutor-step.vocab-meaning-step-1': 'Kenali makna dasar atau kata kunci di sekeliling kata “{word}”.',
+    'tutor-step.vocab-meaning-step-2': 'Timbang makna yang paling masuk akal dan singkirkan arti yang melenceng.',
+    'tutor-step.vocab-meaning-step-3': 'Tentukan padanan arti yang paling pas dan akurat.',
+    'tutor-step.vocab-meaning-final': 'Sekarang satukan langkah di atas, apa pilihan paling tepat menurutmu?',
+
+    'tutor-step.vocab-context-step-1': 'Baca kalimat contoh secara utuh dan temukan kata kunci di sekitar kata “{word}”.',
+    'tutor-step.vocab-context-step-2': 'Tentukan nuansa makna yang paling masuk akal dalam alur kalimat tersebut.',
+    'tutor-step.vocab-context-step-3': 'Pilih arti yang paling sesuai konteks kalimat.',
+    'tutor-step.vocab-context-final': 'Sekarang satukan langkah di atas, apa pilihan paling tepat menurutmu?',
+
+    'tutor-step.vocab-synonym-step-1': 'Kenali makna inti dari kata “{word}”.',
+    'tutor-step.vocab-synonym-step-2': 'Timbang pilihan kata yang memiliki rasa bahasa dan arti paling setara.',
+    'tutor-step.vocab-synonym-step-3': 'Pilih sinonim yang paling mendekati dan sepadan.',
+    'tutor-step.vocab-synonym-final': 'Sekarang satukan langkah di atas, apa pilihan paling tepat menurutmu?',
+
+    'tutor-step.vocab-pos-step-1': 'Perhatikan posisi kata “{word}” di dalam susunan kalimat.',
+    'tutor-step.vocab-pos-step-2': 'Tentukan perannya apakah sebagai benda, tindakan, atau sifat penjelas.',
+    'tutor-step.vocab-pos-step-3': 'Pilih jenis kata yang tepat sesuai fungsinya.',
+    'tutor-step.vocab-pos-final': 'Sekarang satukan langkah di atas, apa pilihan paling tepat menurutmu?',
+
+    'tutor-step.reading-main-step-1': 'Baca sekilas kalimat pembuka dan penutup setiap paragraf bacaan.',
+    'tutor-step.reading-main-step-2': 'Temukan topik atau benang merah yang dibahas secara berulang.',
+    'tutor-step.reading-main-step-3': 'Pilih gagasan umum yang merangkum keseluruhan isi teks.',
+    'tutor-step.reading-main-final': 'Sekarang satukan gagasan di atas, apa pilihan paling tepat menurutmu?',
+
+    'tutor-step.reading-detail-step-1': 'Ambil kata kunci dari pertanyaan lalu cari lokasinya di dalam teks bacaan.',
+    'tutor-step.reading-detail-step-2': 'Baca cermat kalimat tempat kata kunci itu berada serta kalimat di dekatnya.',
+    'tutor-step.reading-detail-step-3': 'Cocokkan fakta di dalam bacaan dengan pilihan jawaban yang paling setia pada bukti teks.',
+    'tutor-step.reading-detail-final': 'Sekarang satukan bukti di atas, mana jawaban yang paling tepat?',
+
+    'tutor-step.reading-infer-step-1': 'Temukan petunjuk situasi atau tindakan yang tersirat di dalam bacaan.',
+    'tutor-step.reading-infer-step-2': 'Hubungkan bukti tersirat itu dengan logika yang paling masuk akal.',
+    'tutor-step.reading-infer-step-3': 'Pilih kesimpulan yang paling kuat didukung oleh bukti teks.',
+    'tutor-step.reading-infer-final': 'Sekarang satukan bukti di atas, mana kesimpulan yang paling tepat?',
+
+    'tutor-step.reading-generic-step-1': 'Temukan kata kunci inti pertanyaan di dalam teks bacaan.',
+    'tutor-step.reading-generic-step-2': 'Baca cermat kalimat di sekitar kata kunci itu untuk memeriksa bukti langsung.',
+    'tutor-step.reading-generic-step-3': 'Cocokkan bukti tersebut dengan pilihan jawaban yang paling didukung teks.',
+    'tutor-step.reading-generic-final': 'Sekarang satukan bukti di atas, mana jawaban yang paling tepat?',
+
+    'tutor-step.listening-gist-step-1': 'Ingat kembali siapa saja yang berbicara dan latar situasi utama percakapannya.',
+    'tutor-step.listening-gist-step-2': 'Fokus pada topik utama atau masalah yang sedang mereka bicarakan bersama.',
+    'tutor-step.listening-gist-step-3': 'Pilih inti percakapan yang merangkum keseluruhan dialog.',
+    'tutor-step.listening-gist-final': 'Sekarang satukan pemahaman audio di atas, apa jawaban paling tepat menurutmu?',
+
+    'tutor-step.listening-detail-step-1': 'Ingat kembali situasi pembuka dan siapa yang sedang berbicara.',
+    'tutor-step.listening-detail-step-2': 'Pusatkan perhatian pada kata tanya dan informasi spesifik yang diminta di akhir audio.',
+    'tutor-step.listening-detail-step-3': 'Pilih jawaban yang langsung merespons situasi audio tersebut.',
+    'tutor-step.listening-detail-final': 'Sekarang satukan pemahaman audio di atas, apa jawaban paling tepat menurutmu?',
+
+    'tutor-step.token-step-1': 'Temukan subjek pelaku atau topik utama untuk ditempatkan di awal kalimat.',
+    'tutor-step.token-step-2': 'Letakkan kata kerja atau kata bantu tepat setelah subjek sesuai aturan tata bahasa.',
+    'tutor-step.token-step-3': 'Susun objek serta keterangan waktu atau tempat di bagian akhir kalimat.',
+    'tutor-step.token-final': 'Sekarang rangkai semua bagian di atas, bagaimana susunan kalimat yang benar?',
+
+    'tutor-step.cloze-step-1': 'Cermati kata sebelum dan sesudah bagian rumpang untuk mengetahui jenis kata yang dibutuhkan.',
+    'tutor-step.cloze-step-2': 'Perhatikan penanda waktu dan subjek kalimat untuk menyesuaikan bentuk kata kerjanya.',
+    'tutor-step.cloze-step-3': 'Tuliskan kata dengan ejaan yang tepat sesuai pola kalimat.',
+    'tutor-step.cloze-final': 'Sekarang satukan langkah di atas, apa kata yang paling tepat untuk melengkapi kalimat?',
+
     // ---------- brain-tutor.* ----------
     'brain-tutor.concept-fallback': 'materi ini',
     'brain-tutor.compare-direct': 'Yuk bandingkan: jawabanmu "' + '{chosen}' + '" dengan bentuk yang tepat "' + '{right}' + '" ya.',
