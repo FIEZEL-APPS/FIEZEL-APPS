@@ -10,7 +10,10 @@ import os
 from datetime import datetime, timezone, timedelta
 from typing import Any
 
-from db import db
+try:
+    from db import db
+except Exception:
+    db = None
 
 # --- Parameter registry dari coordination/braincore-contract.json (Single Source of Truth) ---
 _CONTRACT_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
