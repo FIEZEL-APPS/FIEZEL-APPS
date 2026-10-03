@@ -4206,7 +4206,7 @@ body.fz-lesson-mode .topline{position:sticky;top:0;z-index:30;
 
 /* Glow pulse pada opsi yang masih bisa dipilih saat retry.
    Pulse halus supaya menarik mata tanpa mengganggu konsentrasi. */
-.option.retry-available{border-color:var(--primary)!important;
+.option.retry-available{border-color:var(--accent)!important;
   animation:retry-glow 2s ease-in-out .5s infinite;
   box-shadow:0 0 0 2px rgba(234,88,12,.12)}
 @keyframes retry-glow{
@@ -4218,10 +4218,10 @@ body.fz-lesson-mode .topline{position:sticky;top:0;z-index:30;
 /* Floating retry bar: mengganti tombol "Lanjut" yang disabled saat retry.
    Berbagi z-index dan posisi dengan .quiz-floating-bar. */
 .quiz-floating-retry{justify-content:space-between;padding:10px 16px;gap:12px;
-  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-pill,999px);
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-pill,999px);
   box-shadow:0 4px 16px -2px rgba(36,26,17,.18);max-width:480px;margin:0 auto;width:calc(100% - 32px)}
 .retry-bar-label{display:flex;align-items:center;gap:8px;font-weight:600;font-size:.88rem;
-  color:var(--primary);white-space:nowrap}
+  color:var(--accent);white-space:nowrap}
 .retry-bar-label svg{width:18px;height:18px;flex:0 0 auto}
 .retry-giveup-btn{min-height:36px;padding:6px 14px;border-radius:var(--radius-sm);
   font-size:.8rem;font-weight:600;background:transparent;border:1px solid var(--line);
