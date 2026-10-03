@@ -525,6 +525,11 @@ test('app.js tidak pernah menyuapkan penjelasan mentah bank soal ke naskah tutor
   assert.ok(/function tutorWhyFails\(/.test(app), 'penyaring alasan per-pilihan hilang');
   assert.ok(/priorMisses:Number\(diagnosis\.priorMisses/.test(app),
     'tangga bantuan disuapi jumlah paparan, bukan jumlah kegagalan');
+  // Audit braincore-feedback #1: fadeCredit dihitung record() dan dibaca scaffoldLevel(), tetapi
+  // jembatan app.js dulu membuangnya — janji "bantuan memudar saat murid membaik" hanya hidup di
+  // tes modul, tidak di jalur yang dikirim. Assert ini mengunci WIRING-nya, bukan perilakunya.
+  assert.ok(/fadeCredit:Number\(diagnosis\.fadeCredit/.test(app),
+    'kredit pemudaran bantuan tidak disalurkan dari diagnosis ke scaffoldLevel');
 });
 
 test('modul tutor ikut dimuat halaman dan ikut di-precache service worker', () => {

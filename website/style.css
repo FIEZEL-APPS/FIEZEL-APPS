@@ -1380,3 +1380,150 @@ ul,ol{margin:0;padding:0;list-style:none}
 .foot-credit{margin-top:10px;color:var(--muted);font-size:.9rem;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .foot-credit .credit-ig{display:inline-flex;align-items:center;gap:5px;color:inherit}
 .foot-credit .credit-ig svg{width:16px;height:16px}
+
+/* =========================================================================
+   REFAKTORING ELEMEN LANDING HERO MOBILE-FIRST (360px - 412px)
+   ========================================================================= */
+
+/* 1. Pengaturan Kotak Aksi Tunggal (Thumb-Zone Optimized) */
+.mast-action-box {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+/* Tombol Utama: Memenuhi Standar Touch Target (Tinggi >= 54px) */
+.btn-primary-hero {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 320px;
+  min-height: 54px;
+  padding: 10px 20px;
+  border-radius: var(--radius-pill);
+  background: var(--sun-grad);
+  border: 1px solid var(--sun-deep);
+  box-shadow: 0 4px 0 var(--maroon), 0 8px 20px rgba(109, 25, 38, 0.12);
+  text-decoration: none;
+  touch-action: manipulation;
+  transition: transform var(--fz-fast, 0.18s) var(--fz-out, ease-out), box-shadow var(--fz-fast, 0.18s) var(--fz-out, ease-out);
+}
+
+.btn-primary-hero:hover {
+  text-decoration: none;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 var(--maroon), 0 10px 24px rgba(109, 25, 38, 0.16);
+}
+
+.btn-primary-hero:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 var(--maroon);
+}
+
+.btn-primary-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--maroon-deep);
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+}
+
+.btn-primary-caption {
+  font-size: var(--fs-micro, 12px);
+  font-weight: 700;
+  color: var(--maroon);
+  line-height: 1.25;
+  margin-top: 2px;
+}
+
+/* Jalur Aksi Sekunder: Touch Target Aman 44px */
+.mast-sub-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.sub-action-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 44px;
+  padding: 4px 10px;
+  font-size: var(--fs-label, 14px);
+  font-weight: 700;
+  color: var(--maroon-deep);
+  text-decoration: none;
+  border-radius: 8px;
+  transition: background var(--fz-fast, 0.18s) var(--fz-out, ease-out);
+}
+
+.sub-action-link:hover,
+.sub-action-link:focus-visible {
+  background: rgba(140, 34, 51, 0.06);
+  text-decoration: underline;
+}
+
+.sub-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #1F7A63;
+  display: inline-block;
+}
+
+.sub-action-sep {
+  color: var(--maroon-line-strong);
+  font-size: 0.8rem;
+}
+
+/* 2. Trust Badges Ramping Berbentuk Pills */
+.mast-trust-pills {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 14px;
+}
+
+.trust-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--maroon-mid);
+  background: rgba(255, 253, 248, 0.9);
+  border: 1px solid var(--maroon-line);
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  box-shadow: 0 1px 3px rgba(109, 25, 38, 0.04);
+}
+
+.trust-pill svg {
+  color: var(--maroon);
+}
+
+/* 3. Optimasi Khusus Viewport 360px – 412px */
+@media (max-width: 412px) {
+  .masthead {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  .mast-h1 {
+    font-size: 1.62rem;
+  }
+  .btn-primary-hero {
+    max-width: 100%;
+  }
+  .fzflow-glyph {
+    opacity: 0.15 !important;
+  }
+}
+

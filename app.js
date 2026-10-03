@@ -4976,10 +4976,22 @@ function tutorObserve(session,q,pickedIndex,ok,ms,ctx={}){
     // keyakinan murid. Fungsi ini punya try/catch sendiri: gagal menulis ledger tidak boleh
     // menggagalkan keputusan tutor.
     if(ctx.scored!==false)misconceptionLedgerRecord(session,q,diagnosis,ok);
-    const mastery=Number(state.grammar?.[q?.lessonSkill||q?.skill]?.mastery||state.vocab?.[q?.target]?.mastery||0);
+    // DUA SKALA 'mastery' HIDUP BERDAMINGAN DI SINI, dan keduanya benar - karena itu diberi
+    // nama yang tegas supaya tidak tertukar saat salah satu dibaca ulang:
+    //   - tutorMastery  : BKT, 0..1 (FiezelMasteryBKT.mastery().L) -> decideMove ambang 0.80.
+    //   - masteryPercent: state murid, 0..100 -> scaffoldLevel.
+    // Mengirim yang satu ke ambang yang lain (80 vs 0.80) akan membuat murid mahir selamanya
+    // terbaca pemula, atau sebaliknya - jadi jangan pernah menyatukan namanya.
+    const masteryPercent=Number(state.grammar?.[q?.lessonSkill||q?.skill]?.mastery||state.vocab?.[q?.target]?.mastery||0);
     const scaffold=T.scaffoldLevel({
       priorMisses:Number(diagnosis.priorMisses||0),
-      mastery,misconceptionRepeats:Number(diagnosis.repeats||0)
+      mastery:masteryPercent,misconceptionRepeats:Number(diagnosis.repeats||0),
+      /* Audit braincore-feedback #1: record() sudah menghitung kredit pemudaran bantuan (dua
+         keberhasilan mandiri berturut pada satu konsep), tetapi jembatan ini dulu membuang
+         `diagnosis.fadeCredit` sebelum sampai ke scaffoldLevel - sehingga tangga bantuan tidak
+         pernah benar-benar turun di produksi walau modulnya mengklaim bisa. Tanpa baris ini,
+         janji "bantuan memudar saat murid membaik" hanya bunyi di tes modul, tidak di app. */
+      fadeCredit:Number(diagnosis.fadeCredit||0)
     });
     if(decision.move!=='continue')session.interventions++;
     return{move:decision.move,scaffold,diagnosis,decision}
@@ -5011,6 +5023,48 @@ function tutorIndonesian(text){
   }catch{}
   const id=(value.match(TUTOR_ID_MARKERS)||[]).length,en=(value.match(TUTOR_EN_MARKERS)||[]).length;
   return en>=3&&en>id?'':value
+}
+/**
+ * Menamai POLA urutan yang tertukar, bukan sekadar "urutan belum tepat".
+ *
+ * Kasus 3 hanya dicapai setelah Kasus 1 (kata belum lengkap) dan Kasus 2 (memilih pengecoh)
+ * tersingkir, jadi seluruh kata wajib sudah terpasang dan yang berbeda murni URUTANNYA.
+ * Seorang guru tidak berhenti di "urusannya salah"; ia menunjuk letak yang tertukar. Tetapi
+ * tutor juga TIDAK BOLEH menuduh pola yang tidak ada - maka hanya pola yang bisa dikenali
+ * dengan yakin yang disebut namanya, dan di luar itu ditunjuk kata pertama yang berbeda posisi
+ * (selalu tersedia, selalu benar). Fungsi ini murni: tidak menyentuh DOM, jaringan, atau jam.
+ */
+function tokenOrderInversionClue(placed,required){
+  const norm=w=>String(w||'').toLowerCase().replace(/^[^\w\s]+|[^\w\s]+$/g,'').trim();
+  const placedRaw=Array.isArray(placed)?placed.map(w=>String(w||'')):[];
+  const requiredRaw=Array.isArray(required)?required.map(w=>String(w||'')):[];
+  const p=placedRaw.map(norm).filter(Boolean),r=requiredRaw.map(norm).filter(Boolean);
+  if(p.length<2||r.length!==p.length)return '';
+  // Seluruh kata sudah ada; ini murni permutasi. Bila bukan permutasi, pola urutan tidak bisa
+  // disebut dengan yakin - biarkan pemanggil memakai kalimat umum.
+  const pSorted=[...p].sort(),rSorted=[...r].sort();
+  if(pSorted.some((w,i)=>w!==rSorted[i]))return '';
+  const AUX='am is are was were be been being do does did has have had will would shall should can could may might must'.split(' ');
+  const SUBJ='i you he she it we they'.split(' ');
+  const pAux=p.findIndex(w=>AUX.includes(w)),rAux=r.findIndex(w=>AUX.includes(w));
+  const pSubj=p.findIndex(w=>SUBJ.includes(w)),rSubj=r.findIndex(w=>SUBJ.includes(w));
+  const pNot=p.indexOf('not'),rNot=r.indexOf('not');
+  // (a) Kata kerja bantu mendahului subjek. Kalimat berita Inggris menaruh subjek lebih dulu;
+  //     kalau murid membaliknya, ia sedang memakai pola tanya.
+  if(pAux>=0&&pSubj>=0&&pAux<pSubj&&rSubj>=0&&rAux>=0&&rSubj<rAux){
+    return `Urutan subjek dan kata kerjanya terbalik: “${requiredRaw[rSubj]}” seharusnya datang sebelum “${requiredRaw[rAux]}”.`;
+  }
+  // (b) "not" menempel di sisi yang salah dari kata kerja bantu.
+  if(pNot>=0&&rNot>=0&&pNot!==rNot&&rAux>=0&&rSubj>=0&&rSubj<rAux&&rNot===rAux+1){
+    return `Kata “not” seharusnya menempel setelah “${requiredRaw[rAux]}”, bukan di tempat lain.`;
+  }
+  // (c) Kata pertama yang berbeda posisi - selalu benar, tidak pernah menuduh pola yang salah.
+  const i=p.findIndex((w,k)=>w!==r[k]);
+  if(i>=0){
+    const after=i>0?`setelah “${requiredRaw.slice(0,i).join(' ')}”, kamu menaruh “`:`kamu menaruh “`;
+    return `Urutan katanya belum tepat: ${after}${placedRaw[i]}”, padahal di posisi itu seharusnya “${requiredRaw[i]}”.`;
+  }
+  return '';
 }
 /**
  * Alasan Indonesia mengapa pilihan yang diambil murid gagal.
@@ -5067,6 +5121,11 @@ function diagnoseTokenOrderMistake(q){
 
   // Kasus 3: Salah Urutan Kata (Word-Order Inversion)
   const correctSentence=(q.options&&q.options[q.answerIndex])||requiredTokens.join(' ');
+  const inversion=tokenOrderInversionClue(placed,requiredTokens);
+  if(inversion){
+    const polaHint=q.explain?.rule?` Pola yang tepat: ${q.explain.rule}`:'';
+    return `${inversion}${polaHint}`;
+  }
   const patternHint=q.explain?.rule?` Perhatikan pola: ${q.explain.rule}`:` Perhatikan susunan kalimat yang tepat.`;
   return `Urutan kata belum tepat.${patternHint}`;
 }
@@ -12175,6 +12234,46 @@ function grammarLessonExplain(item,why,distractors,familyRule,focus,mode='',targ
     distractor:distractorText
   };
 }
+/* Audit braincore-feedback #2: MODE META KEKURANGAN IDENTITAS MISKONSEPSI.
+ *
+ * Peta item[15] dikunci oleh TEKS pilihan berupa bentuk kata kerja ("prepares", "has prepared"),
+ * jadi di sembilan mode yang pilihannya berupa KALIMAT (rule/objective/memory/justify/diagnose/
+ * label/contrast/keluarga/teach-back) pencariannya selalu meleset, `diagnose()` jatuh ke presisi
+ * 'skill', dan identitas diagnostiknya hilang. Akibatnya bukan reboot buta - decideMove masih
+ * menyebut reteach lewat jalur 'repeated_miss_same_skill' - melainkan Tutor Brain dan buku besar
+ * lintas sesi kehilangan NAMA pola yang berulang, dan model tidak bisa membedakan "salah lagi di
+ * materi ini" dari "tertukar dengan aturan materi lain" (provenance m025-150 sudah membawa jejak
+ * itu, tetapi tidak pernah sampai ke diagnosis).
+ *
+ * Fungsi ini TIDAK MENGARANG miskonsepsi: label yang dipakai hanya yang benar-benar diketahui
+ * dari jenis pilihannya. Pilihan pinjaman (origin 'peer') dinamai dari lesson asalnya - itu pola
+ * yang jujur dan bisa berulang; label taksonomi keluarga dinamai apa adanya; sisa pilihan salah
+ * dari lesson ini disebut struktural ("pernyataan materi yang keliru") tanpa menuduh keyakinan
+ * spesifik. Pilihan 'fallback' SENGAJA tidak diberi label: pengecoh generik tidak membawa bukti
+ * apa pun tentang keyakinan murid, lebih baik jujur 'unclassified' daripada menuduh.
+ *
+ * Label berbahasa Indonesia karena buku besar membacakannya di panel OLM (misconceptionText).
+ */
+function grammarOptionMisconceptions(item,marked){
+  const out=Object.assign(Object.create(null),grammarMisconceptionKeys(item));
+  for(const m of (Array.isArray(marked)?marked:[])){
+    if(!m||m.ok)continue;
+    const text=String(m.x||'').trim();
+    if(!text||out[text])continue;
+    const src=(m.src&&typeof m.src==='object')?m.src:null;
+    const origin=src?String(src.origin||''):'own';
+    const srcId=src?String(src.sourceId||'').trim():'';
+    if(origin==='fallback')continue; // pengecoh generik: tidak ada bukti untuk diberi nama
+    if(origin==='peer'&&srcId){
+      out[text]=`tertukar dengan aturan materi lain: ${srcId}`;
+    }else if(origin==='taxonomy'){
+      out[text]='keliru menamai keluarga pola';
+    }else{
+      out[text]='memilih pernyataan materi yang keliru';
+    }
+  }
+  return Object.keys(out).length?out:null;
+}
 function makeGrammarQuestion(skill,item,variant=0,lessonSkill=skill){
   const exercise=grammarExercise(skill,item,variant),
   correctWord=String(exercise.options?.[exercise.answerIndex]||''),
@@ -12202,7 +12301,10 @@ function makeGrammarQuestion(skill,item,variant=0,lessonSkill=skill){
   // m025-118: bahan mentah Tutor Brain. optionMisconceptions memakai teks pilihan sebagai
   // kunci - bukan indeks - karena pilihan diacak setiap kali soal dibuat, dan indeks yang
   // bergeser akan mendiagnosis miskonsepsi yang salah dengan sangat meyakinkan.
-  optionMisconceptions:item?.[15]||null,
+  // Audit braincore-feedback #2: sumbernya bukan lagi item[15] mentah, melainkan
+  // grammarOptionMisconceptions() - peta kata kerja item[15] DIGABUNG identitas diagnostik
+  // untuk pilihan berbentuk kalimat (mode meta), supaya diagnosis tidak lagi buta di sana.
+  optionMisconceptions:grammarOptionMisconceptions(item,marked),
   // m025-150: {teks pilihan -> id template asalnya}, hanya untuk pilihan pinjaman. Tanpa ini
   // "murid memilih aturan lesson lain" tercatat sebagai sekadar salah di lesson ini, dan
   // lesson mana yang sebenarnya tertukar tidak pernah bisa dilihat.

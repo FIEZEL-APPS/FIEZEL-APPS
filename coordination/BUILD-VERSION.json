@@ -1,7 +1,7 @@
 {
-  "version": "m025-419",
-  "claimedBy": "branch main",
-  "claimedAt": "2026-10-03T17:12:11.356Z",
-  "reason": "fix(tests): exempt interactive chrome mini game test in no network scanner",
+  "version": "m025-422",
+  "claimedBy": "branch fix/braincore-feedback-audit",
+  "claimedAt": "2026-10-03T17:47:56.138Z",
+  "reason": "feat(landing): refactor hero single-cta and mobile-first ergonomics",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
