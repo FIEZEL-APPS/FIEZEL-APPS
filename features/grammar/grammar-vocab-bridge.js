@@ -845,21 +845,18 @@
     _activeMiniGame = {
       skill,
       words,
-      round: 1, // 1: Bubble Snap (Match), 2: Rapid Meaning ABCD, 3: Sentence Puzzle, 4: Auto-Unlock
+      round: 1, // 1: Match, 2: Sentence Puzzle, 3: Victory Scorecard
       combo: 0,
+      bestCombo: 0,
       matchedIds: new Set(),
       selectedEn: null,
       selectedId: null,
       enCards,
       idCards,
-      // Round 2 state
-      rapidQuestions,
-      rapidIndex: 0,
-      rapidSelected: null,
-      rapidIsCorrect: null,
-      // Round 3 Puzzle state
+      // Sentence puzzle state
       puzzleIndex: 0,
-      placedTokens: []
+      placedTokens: [],
+      puzzleFeedback: null
     };
 
     renderMiniGameModal();
@@ -871,19 +868,55 @@
 
     const g = _activeMiniGame;
     let stageHtml = '';
+    const currentRound = (g.round === 3 || g.round === 4 || g.isVictory) ? 3 : (g.round === 2 ? 2 : 1);
+    const totalRounds = 3;
 
-    if (g.round === 1) {
-      // Round 1: Bubble Snap / Card Connect (Word-to-Meaning Match)
+    // Segmented Stepper Bar
+    const steps = [
+      { num: 1, label: t('scaffold.step-match', 'Cocokkan') },
+      { num: 2, label: t('scaffold.step-puzzle', 'Susun Kalimat') },
+      { num: 3, label: t('scaffold.step-ready', 'Siap Belajar') }
+    ];
+
+    const progressBarHtml = `
+      <div class="mini-game-stepper" role="progressbar" aria-valuenow="${currentRound}" aria-valuemin="1" aria-valuemax="${totalRounds}">
+        ${steps.map((st, idx) => {
+          const isDone = currentRound > st.num;
+          const isCurrent = currentRound === st.num;
+          return `
+            <div class="stepper-node${isDone ? ' is-done' : ''}${isCurrent ? ' is-active' : ''}">
+              <div class="stepper-dot">
+                ${isDone ? '<i data-lucide="check"></i>' : `<span>${st.num}</span>`}
+              </div>
+              <span class="stepper-label">${st.label}</span>
+            </div>
+            ${idx < steps.length - 1 ? `<div class="stepper-line${isDone ? ' is-done' : ''}"></div>` : ''}
+          `;
+        }).join('')}
+      </div>
+    `;
+
+    if (currentRound === 1) {
+      // Round 1: Word-to-Meaning Matching Game
+      const remainingPairs = g.words.length - g.matchedIds.size;
       stageHtml = `
-        <div class="mini-game-round round-1">
-          <div class="mini-game-header">
-            <span class="game-badge"><i data-lucide="sparkles"></i> Round 1: ${t('scaffold.game-round1-title', 'Cocokkan Kata & Artinya')}</span>
-            <span class="game-combo-pill" id="gameComboPill">${g.combo > 1 ? t('scaffold.game-combo', 'Kombo x' + g.combo + '! 🔥') : ''}</span>
+        <div class="mini-game-round round-1" data-testid="mini-game-stage-match">
+          <div class="stage-hero-banner">
+            <div class="stage-title-wrap">
+              <span class="stage-tag"><i data-lucide="sparkles"></i> ${t('scaffold.round1-badge', 'Tahap 1')}</span>
+              <h3 class="stage-heading">${t('scaffold.game-round1-title', 'Cocokkan Kata & Artinya')}</h3>
+            </div>
+            <div class="stage-meta-badges">
+              ${g.combo > 1 ? `<span class="game-combo-pill" id="gameComboPill">🔥 x${g.combo}</span>` : ''}
+              <span class="game-counter-pill">${g.matchedIds.size}/${g.words.length}</span>
+            </div>
           </div>
-          <p class="game-instruction">${t('scaffold.game-round1-desc', 'Ketuk kata bahasa Inggris lalu ketuk artinya yang pas!')}</p>
+          
+          <p class="game-instruction">${t('scaffold.game-round1-desc', 'Ketuk kartu bahasa Inggris lalu pilih artinya dalam bahasa Indonesia.')}</p>
 
           <div class="match-game-board">
             <div class="match-col en-col">
+              <div class="col-header">${t('scaffold.col-english', 'Bahasa Inggris')}</div>
               ${g.enCards.map(item => {
                 const isMatched = g.matchedIds.has(item.id);
                 const isSel = g.selectedEn === item.id;
@@ -891,8 +924,9 @@
                   <button type="button" 
                           class="match-card en-card${isMatched ? ' is-matched' : ''}${isSel ? ' is-selected' : ''}" 
                           ${isMatched ? 'disabled' : ''}
-                          onclick="FiezelGrammarVocabBridge.handleCardClick('${item.id}', 'en')">
-                    <b>${esc(item.text)}</b>
+                          onclick="FiezelGrammarVocabBridge.handleCardClick('${item.id}', 'en')"
+                          aria-pressed="${isSel}">
+                    <span class="card-text">${esc(item.text)}</span>
                     <i data-lucide="volume-2" class="match-sound-icon"></i>
                   </button>
                 `;
@@ -900,6 +934,7 @@
             </div>
 
             <div class="match-col id-col">
+              <div class="col-header">${t('scaffold.col-indonesia', 'Arti Indonesia')}</div>
               ${g.idCards.map(item => {
                 const isMatched = g.matchedIds.has(item.id);
                 const isSel = g.selectedId === item.id;
@@ -907,56 +942,22 @@
                   <button type="button" 
                           class="match-card id-card${isMatched ? ' is-matched' : ''}${isSel ? ' is-selected' : ''}" 
                           ${isMatched ? 'disabled' : ''}
-                          onclick="FiezelGrammarVocabBridge.handleCardClick('${item.id}', 'id')">
-                    <span>${esc(item.text)}</span>
+                          onclick="FiezelGrammarVocabBridge.handleCardClick('${item.id}', 'id')"
+                          aria-pressed="${isSel}">
+                    <span class="card-text">${esc(item.text)}</span>
                   </button>
                 `;
               }).join('')}
             </div>
           </div>
-        </div>
-      `;
-    } else if (g.round === 2) {
-      // Round 2: Rapid-Fire Meaning Challenge (ABCD)
-      const q = g.rapidQuestions[g.rapidIndex] || g.rapidQuestions[0];
-      stageHtml = `
-        <div class="mini-game-round round-rapid">
-          <div class="mini-game-header">
-            <span class="game-badge"><i data-lucide="sparkles"></i> Round 2: ${t('scaffold.game-round2-rapid-title', 'Tebak Arti Kilat')}</span>
-            <span class="game-combo-pill">${g.combo > 1 ? t('scaffold.game-combo', 'Kombo x' + g.combo + '! 🔥') : ''}</span>
-            <span class="game-progress-tag">${g.rapidIndex + 1}/${g.rapidQuestions.length}</span>
-          </div>
-          <p class="game-instruction">${t('scaffold.game-round2-rapid-desc', 'Pilih arti kata bahasa Inggris di bawah ini dengan cepat!')}</p>
 
-          <div class="rapid-word-card">
-            <div class="rapid-word-banner">
-              <h2 class="rapid-target-word">${esc(q.word)}</h2>
-              <button type="button" class="rapid-audio-btn" onclick="FiezelGrammarVocabBridge.playVocabAudio('${esc(q.word)}')" aria-label="Audio ${esc(q.word)}">
-                <i data-lucide="volume-2"></i>
-              </button>
-            </div>
-            ${q.phonetic ? `<div class="rapid-phonetic">${esc(q.phonetic)}</div>` : ''}
-          </div>
-
-          <div class="rapid-options-grid">
-            ${q.options.map((opt, idx) => {
-              const letter = ['A', 'B', 'C', 'D'][idx] || String(idx + 1);
-              let stateClass = '';
-              if (g.rapidSelected === opt) {
-                stateClass = g.rapidIsCorrect ? ' is-correct' : ' is-wrong';
-              }
-              return `
-                <button type="button" class="rapid-choice-btn${stateClass}" onclick="FiezelGrammarVocabBridge.handleRapidChoice('${esc(opt)}')">
-                  <span class="choice-letter">${letter}</span>
-                  <span class="choice-text">${esc(opt)}</span>
-                </button>
-              `;
-            }).join('')}
+          <div class="stage-bottom-status">
+            <span class="status-subtle">${remainingPairs > 0 ? t('scaffold.pairs-remaining', 'Tersisa ' + remainingPairs + ' pasangan kata', { count: remainingPairs }) : t('scaffold.all-paired', 'Semua pasangan cocok!')}</span>
           </div>
         </div>
       `;
-    } else if (g.round === 3) {
-      // Round 3: Micro Sentence Puzzle with Grammar Clue
+    } else if (currentRound === 2) {
+      // Round 2: Sentence Puzzle with Smart Grammar Infiltration
       const word = g.words[g.puzzleIndex] || g.words[0];
       const targetSentence = word.example || ('Please use your ' + word.word + '.');
       if (!g.cachedTokens || g.cachedWord !== word.word) {
@@ -977,78 +978,131 @@
         ? GRAMMAR_ITEMS.find(x => x.skill === g.skill)
         : null;
       const grammarRuleText = meta ? (meta.title || meta.skill) : 'Pola Tata Bahasa';
+      const maxPuzzles = Math.min(2, g.words.length);
 
       stageHtml = `
-        <div class="mini-game-round round-3-puzzle">
-          <div class="mini-game-header">
-            <span class="game-badge"><i data-lucide="sparkles"></i> Round 3: ${t('scaffold.game-round3-title', 'Susun Kalimat Tata Bahasa')}</span>
-            <span class="game-progress-tag">${g.puzzleIndex + 1}/${Math.min(2, g.words.length)}</span>
+        <div class="mini-game-round round-2 round-puzzle round-3-puzzle" data-testid="mini-game-stage-puzzle">
+          <div class="stage-hero-banner">
+            <div class="stage-title-wrap">
+              <span class="stage-tag"><i data-lucide="sparkles"></i> ${t('scaffold.round2-badge', 'Tahap 2')}</span>
+              <h3 class="stage-heading">${t('scaffold.game-round3-title', 'Susun Kalimat Tata Bahasa')}</h3>
+            </div>
+            <div class="stage-meta-badges">
+              <span class="game-counter-pill">${g.puzzleIndex + 1}/${maxPuzzles}</span>
+            </div>
           </div>
+
           <p class="game-instruction">${t('scaffold.game-round3-desc', 'Susun kepingan kata menjadi kalimat yang tepat sesuai aturan grammar!')}</p>
 
-          <div class="puzzle-grammar-cue">
-            <i data-lucide="lightbulb"></i>
-            <span><b>${t('scaffold.fokus-tata-bahasa', 'Aturan Grammar')}:</b> ${esc(grammarRuleText)}</span>
-          </div>
-
-          <div class="puzzle-clue-card">
-            <span class="clue-label">${t('scaffold.fokus-kata', 'Fokus Kata: {word} ({meaning})', { word: word.word, meaning: word.meaning.split(';')[0].trim() })}</span>
+          <div class="puzzle-context-card">
+            <div class="context-item">
+              <i data-lucide="book-open"></i>
+              <span><b>${t('scaffold.fokus-tata-bahasa', 'Aturan')}:</b> ${esc(grammarRuleText)}</span>
+            </div>
+            <div class="context-item word-highlight">
+              <i data-lucide="target"></i>
+              <span><b>${t('scaffold.label-kata-kunci', 'Kata Kunci')}:</b> <u>${esc(word.word)}</u> (${esc(word.meaning.split(';')[0].trim())})</span>
+            </div>
           </div>
 
           <div class="puzzle-sentence-stage" id="puzzleSentenceStage">
             <div class="puzzle-slot-line" id="puzzleSlotLine">
               ${g.placedTokens.map((tok, idx) => `
-                <button type="button" class="puzzle-placed-chip" onclick="FiezelGrammarVocabBridge.removePuzzleToken(${idx})">
-                  ${esc(tok)}
+                <button type="button" class="puzzle-placed-chip" onclick="FiezelGrammarVocabBridge.removePuzzleToken(${idx})" title="Ketuk untuk melepas">
+                  <span class="tok-text">${esc(tok)}</span>
+                  <i data-lucide="x" class="chip-remove-icon"></i>
                 </button>
               `).join('')}
               ${g.placedTokens.length === 0 ? '<span class="puzzle-empty-hint">' + t('scaffold.hint-ketuk-keping', 'Ketuk keping di bawah...') + '</span>' : ''}
             </div>
           </div>
 
-          <div class="puzzle-bank-tiles">
-            ${shuffledTokens.map(tok => {
-              const usedCount = g.placedTokens.filter(t => t === tok).length;
-              const totalInTokens = tokens.filter(t => t === tok).length;
-              const isUsed = usedCount >= totalInTokens;
-              return `
-                <button type="button" 
-                        class="puzzle-tile${isUsed ? ' is-used' : ''}" 
-                        ${isUsed ? 'disabled' : ''}
-                        onclick="FiezelGrammarVocabBridge.addPuzzleToken('${esc(tok)}')">
-                  ${esc(tok)}
-                </button>
-              `;
-            }).join('')}
+          ${g.puzzleFeedback ? `
+            <div class="puzzle-pedagogical-feedback ${g.puzzleFeedback.ok ? 'is-success' : 'is-error'}" role="alert">
+              <i data-lucide="${g.puzzleFeedback.ok ? 'check-circle-2' : 'alert-circle'}"></i>
+              <div class="feedback-body">
+                <span class="feedback-title">${g.puzzleFeedback.ok ? t('scaffold.puzzle-ok-title', 'Tepat Sekali!') : t('scaffold.puzzle-err-title', 'Periksa Kembali')}</span>
+                <span class="feedback-desc">${esc(g.puzzleFeedback.message)}</span>
+              </div>
+            </div>
+          ` : ''}
+
+          <div class="puzzle-bank-wrapper">
+            <span class="bank-label">${t('scaffold.bank-label', 'Pilihan Kata:')}</span>
+            <div class="puzzle-bank-tiles">
+              ${shuffledTokens.map(tok => {
+                const usedCount = g.placedTokens.filter(t => t === tok).length;
+                const totalInTokens = tokens.filter(t => t === tok).length;
+                const isUsed = usedCount >= totalInTokens;
+                return `
+                  <button type="button" 
+                          class="puzzle-tile${isUsed ? ' is-used' : ''}" 
+                          ${isUsed ? 'disabled aria-disabled="true"' : ''}
+                          onclick="FiezelGrammarVocabBridge.addPuzzleToken('${esc(tok)}')">
+                    ${esc(tok)}
+                  </button>
+                `;
+              }).join('')}
+            </div>
           </div>
 
-          <div class="puzzle-actions">
-            <button type="button" class="puzzle-submit-btn" onclick="FiezelGrammarVocabBridge.checkSentencePuzzle()">
+          <div class="puzzle-actions-bar">
+            <button type="button" 
+                    class="puzzle-submit-btn" 
+                    ${g.placedTokens.length === 0 ? 'disabled' : ''}
+                    onclick="FiezelGrammarVocabBridge.checkSentencePuzzle()">
               <i data-lucide="check-circle-2"></i>
               <span>${t('scaffold.btn-periksa-kalimat', 'Periksa Kalimat')}</span>
             </button>
           </div>
         </div>
       `;
-    } else if (g.round === 4) {
-      // Round 4: Victory Celebration & Automatic Auto-Unlock into Grammar Practice
+    } else {
+      // Round 3: Victory & Comprehensive Mastery Scorecard
       stageHtml = `
-        <div class="mini-game-round round-4-unlocked">
-          <div class="unlock-animation-box">
-            <div class="unlock-trophy-ring">
+        <div class="mini-game-round round-3-unlocked round-4-unlocked round-victory" data-testid="mini-game-stage-complete">
+          <div class="victory-card-wrap">
+            <div class="victory-icon-emblem">
               <i data-lucide="sparkles"></i>
             </div>
-            <h2>${t('scaffold.game-unlocked-title', 'Luar Biasa! Kosakata Terhafal Sempurna 🎉')}</h2>
-            <p class="muted">${t('scaffold.game-unlocked-desc', 'Latihan soal grammar otomatis terbuka untukmu...')}</p>
+            
+            <h2 class="victory-headline">${t('scaffold.game-unlocked-title', 'Kosakata Terkuasai Sempurna! 🎉')}</h2>
+            <p class="victory-subtext">${t('scaffold.game-unlocked-desc', 'Semua kosakata kunci berhasil kamu kuasai. Kamu siap menaklukkan materi grammar ini!')}</p>
 
-            <div class="unlock-progress-fill">
-              <div class="fill-bar"></div>
+            <div class="mastery-summary-box">
+              <div class="summary-stat-row">
+                <div class="summary-metric">
+                  <span class="metric-num">${g.words.length}</span>
+                  <span class="metric-label">${t('scaffold.metric-vocab', 'Kosakata Dikuasai')}</span>
+                </div>
+                <div class="summary-metric-divider"></div>
+                <div class="summary-metric">
+                  <span class="metric-num">${(g.bestCombo && g.bestCombo > 0) ? g.bestCombo : (g.combo > 0 ? g.combo : 1)}x</span>
+                  <span class="metric-label">${t('scaffold.metric-combo', 'Kombo Terbaik')}</span>
+                </div>
+                <div class="summary-metric-divider"></div>
+                <div class="summary-metric">
+                  <span class="metric-num">100%</span>
+                  <span class="metric-label">${t('scaffold.metric-ready', 'Kesiapan BKT')}</span>
+                </div>
+              </div>
+
+              <div class="mastered-vocab-pills">
+                ${g.words.map(w => `
+                  <span class="mastered-pill">
+                    <i data-lucide="check"></i>
+                    <b>${esc(w.word)}</b> (${esc(w.meaning.split(';')[0].trim())})
+                  </span>
+                `).join('')}
+              </div>
             </div>
 
-            <button type="button" class="enter-grammar-btn primary" onclick="FiezelGrammarVocabBridge.completeMiniGameAndUnlock('${g.skill}')">
-              <i data-lucide="play"></i>
-              <span>${t('scaffold.btn-enter-grammar', 'Masuk ke Latihan Grammar 🚀')}</span>
-            </button>
+            <div class="victory-cta-actions">
+              <button type="button" class="enter-grammar-btn primary" onclick="FiezelGrammarVocabBridge.completeMiniGameAndUnlock('${g.skill}')">
+                <span>${t('scaffold.btn-enter-grammar', 'Masuk ke Latihan Grammar')}</span>
+                <i data-lucide="arrow-right"></i>
+              </button>
+            </div>
           </div>
         </div>
       `;
@@ -1057,25 +1111,20 @@
     const html = `
       <div class="modal-mini-game-sheet">
         <div class="mini-game-nav">
-          <span class="game-brand">FIEZEL QUEST</span>
-          <button type="button" class="modal-close-corner" onclick="closeModal()" aria-label="Tutup">
+          <div class="nav-brand-group">
+            <span class="game-brand">FIEZEL QUEST</span>
+            <span class="game-lesson-indicator">${esc(g.skill)}</span>
+          </div>
+          <button type="button" class="modal-close-corner" onclick="closeModal()" aria-label="${t('scaffold.close', 'Tutup')}">
             <i data-lucide="x"></i>
           </button>
         </div>
+        ${progressBarHtml}
         ${stageHtml}
       </div>
     `;
 
     openModal(html);
-
-    if (g.round === 4) {
-      // Auto-unlock transition after 1.4 seconds
-      setTimeout(() => {
-        if (_activeMiniGame && _activeMiniGame.round === 4 && _activeMiniGame.skill === g.skill) {
-          completeMiniGameAndUnlock(g.skill);
-        }
-      }, 1400);
-    }
   }
 
   function handleCardClick(id, type) {
@@ -1098,7 +1147,10 @@
       if (g.selectedEn === g.selectedId) {
         // MATCH!
         g.matchedIds.add(g.selectedEn);
-        g.combo++;
+        g.combo = (g.combo || 0) + 1;
+        if (g.combo > (g.bestCombo || 0)) {
+          g.bestCombo = g.combo;
+        }
         playSfx('success');
         triggerHaptic('medium');
         const wordObj = g.words.find(w => w.id === g.selectedEn);
@@ -1113,13 +1165,13 @@
           playSfx('levelup');
           setTimeout(() => {
             if (_activeMiniGame) {
-              _activeMiniGame.round = 2; // Move to Rapid Meaning Challenge
-              _activeMiniGame.rapidIndex = 0;
-              _activeMiniGame.rapidSelected = null;
-              _activeMiniGame.rapidIsCorrect = null;
+              _activeMiniGame.round = 2; // Move to Sentence Puzzle Stage
+              _activeMiniGame.puzzleIndex = 0;
+              _activeMiniGame.placedTokens = [];
+              _activeMiniGame.puzzleFeedback = null;
               renderMiniGameModal();
             }
-          }, 500);
+          }, 450);
           return;
         }
       } else {
@@ -1203,7 +1255,7 @@
   }
 
   function checkSentencePuzzle() {
-    if (!_activeMiniGame || _activeMiniGame.round !== 3) return;
+    if (!_activeMiniGame || (_activeMiniGame.round !== 2 && _activeMiniGame.round !== 3)) return;
     const g = _activeMiniGame;
     const word = g.words[g.puzzleIndex] || g.words[0];
     const targetSentence = word.example || ('Please use your ' + word.word + '.');
@@ -1219,26 +1271,56 @@
       recordGrammarMastery(g.skill, true, 3000);
       playSfx('success');
       playAudio(targetSentence);
-      g.puzzleIndex++;
-      g.placedTokens = [];
+      g.puzzleFeedback = {
+        ok: true,
+        message: t('scaffold.puzzle-correct-detail', 'Susunan kalimat tepat sesuai pola grammar!')
+      };
+      renderMiniGameModal();
 
-      const maxPuzzles = Math.min(2, g.words.length);
-      if (g.puzzleIndex >= maxPuzzles) {
-        // Round 3 completed -> Move to Round 4 (Celebration & Auto-Unlock!)
-        g.round = 4;
-        playSfx('levelup');
-        renderMiniGameModal();
-      } else {
-        renderMiniGameModal();
-      }
+      setTimeout(() => {
+        if (!_activeMiniGame) return;
+        _activeMiniGame.puzzleIndex++;
+        _activeMiniGame.placedTokens = [];
+        _activeMiniGame.puzzleFeedback = null;
+
+        const maxPuzzles = Math.min(2, _activeMiniGame.words.length);
+        if (_activeMiniGame.puzzleIndex >= maxPuzzles) {
+          _activeMiniGame.round = 3;
+          _activeMiniGame.isVictory = true;
+          playSfx('levelup');
+          renderMiniGameModal();
+        } else {
+          renderMiniGameModal();
+        }
+      }, 700);
     } else {
-      // Salah susunan kalimat: beri tahu murid secara mendidik
+      // Salah susunan kalimat: bedah secara presisi dan mendidik
       recordGrammarMastery(g.skill, false, 4500);
       playSfx('error');
       triggerHaptic('light');
-      if (typeof showToast === 'function') {
-        showToast(t('scaffold.toast-urutan-salah', 'Coba periksa urutan katanya lagi ya!'), 'warn');
+
+      // Analisis token yang tertinggal atau salah posisi
+      const missingTokens = targetTokens.filter(t => !g.placedTokens.includes(t));
+      let feedbackMsg = '';
+      if (g.placedTokens.length < targetTokens.length) {
+        if (missingTokens.length > 0) {
+          feedbackMsg = t('scaffold.missing-token-feedback', 'Kata "' + missingTokens[0] + '" belum kamu masukkan ke kalimat.', { word: missingTokens[0] });
+        } else {
+          feedbackMsg = t('scaffold.incomplete-sentence', 'Kalimat belum lengkap, masih ada kata yang tertinggal.');
+        }
+      } else {
+        feedbackMsg = t('scaffold.reorder-hint', 'Periksa kembali urutan subjek dan kata kerjanya.');
       }
+
+      g.puzzleFeedback = {
+        ok: false,
+        message: feedbackMsg
+      };
+
+      if (typeof showToast === 'function') {
+        showToast(feedbackMsg, 'warn');
+      }
+      renderMiniGameModal();
     }
   }
 
