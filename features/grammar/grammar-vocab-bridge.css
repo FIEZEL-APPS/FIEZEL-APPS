@@ -1158,12 +1158,40 @@
   margin-top: 10px;
 }
 
+.puzzle-actions-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.puzzle-hint-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: #FFFBEB;
+  color: #B45309;
+  border: 1.5px solid #FDE68A;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.puzzle-hint-btn:active {
+  transform: scale(0.97);
+  background: #FEF3C7;
+}
+
 .puzzle-submit-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  width: 100%;
+  flex: 1;
   background: linear-gradient(135deg, #10B981 0%, #059669 100%);
   color: #FFFFFF;
   border: none;

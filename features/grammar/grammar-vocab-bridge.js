@@ -206,6 +206,44 @@
   }
 
   /**
+   * Cari kalimat latihan yang benar-benar memadukan kata kunci dengan pola grammar aktif
+   */
+  function getAlignedSentenceForPuzzle(skill, wordObj) {
+    if (!wordObj) return 'Please use your words.';
+    const w = String(wordObj.word || '').toLowerCase();
+    
+    // Coba cari dari bank soal grammar aktif (G atau GRAMMAR_ITEMS)
+    if (typeof G !== 'undefined' && G && G[skill] && Array.isArray(G[skill])) {
+      for (const item of G[skill]) {
+        // item[0] adalah stem kalimat, misal: "My cat ___ very small." atau "They ___ at home today."
+        const stem = String(item[0] || '');
+        const correctOpt = Array.isArray(item[1]) && Number.isInteger(item[2]) ? item[1][item[2]] : '';
+        if (stem && correctOpt && stem.includes('___')) {
+          const filled = stem.replace('___', correctOpt).replace(/[.!?]/g, '').trim();
+          const tokens = filled.split(/\s+/);
+          // Cek apakah kalimat soal memuat kata kosakata ini
+          const matchWord = tokens.some(tok => tok.toLowerCase().replace(/[^a-z]/g, '') === w);
+          if (matchWord && tokens.length <= 7) {
+            return filled + '.';
+          }
+        }
+      }
+    }
+
+    // Jika tidak ditemukan kecocokan persis di bank grammar aktif, periksa apakah word.example ringkas
+    if (wordObj.example && typeof wordObj.example === 'string') {
+      const exClean = wordObj.example.trim();
+      const exTokens = exClean.replace(/[.!?]/g, '').trim().split(/\s+/).filter(Boolean);
+      // Gunakan kalimat contoh kamus bila ringkas (<= 7 kata) dan utuh
+      if (exTokens.length >= 3 && exTokens.length <= 7) {
+        return /[.!?]$/.test(exClean) ? exClean : exClean + '.';
+      }
+    }
+
+    return 'We study ' + wordObj.word + ' here.';
+  }
+
+  /**
    * Retrieve vocabulary items mapped to a specific grammar lesson/skill
    * @param {string} skill Lesson identifier (e.g. 'be_subject_agreement')
    * @param {string} [intensityId] Optional intensity level (defaults to active)
@@ -856,6 +894,7 @@
       // Sentence puzzle state
       puzzleIndex: 0,
       placedTokens: [],
+      hintRequested: false,
       puzzleFeedback: null
     };
 
@@ -959,7 +998,7 @@
     } else if (currentRound === 2) {
       // Round 2: Sentence Puzzle with Smart Grammar Infiltration
       const word = g.words[g.puzzleIndex] || g.words[0];
-      const targetSentence = word.example || ('Please use your ' + word.word + '.');
+      const targetSentence = getAlignedSentenceForPuzzle(g.skill, word);
       if (!g.cachedTokens || g.cachedWord !== word.word) {
         const tokens = targetSentence.replace(/[.!?]/g, '').split(/\s+/).filter(Boolean);
         const shuffled = [...tokens];
@@ -1047,6 +1086,14 @@
           </div>
 
           <div class="puzzle-actions-bar">
+            ${(!g.puzzleFeedback?.ok && g.hasTriedOnce && !g.hintRequested) ? `
+              <button type="button" 
+                      class="puzzle-hint-btn" 
+                      onclick="FiezelGrammarVocabBridge.requestPuzzleHint()">
+                <i data-lucide="lightbulb"></i>
+                <span>${t('scaffold.btn-minta-petunjuk', 'Petunjuk Pola')}</span>
+              </button>
+            ` : ''}
             <button type="button" 
                     class="puzzle-submit-btn" 
                     ${g.placedTokens.length === 0 ? 'disabled' : ''}
@@ -1258,7 +1305,7 @@
     if (!_activeMiniGame || (_activeMiniGame.round !== 2 && _activeMiniGame.round !== 3)) return;
     const g = _activeMiniGame;
     const word = g.words[g.puzzleIndex] || g.words[0];
-    const targetSentence = word.example || ('Please use your ' + word.word + '.');
+    const targetSentence = getAlignedSentenceForPuzzle(g.skill, word);
     const targetTokens = targetSentence.replace(/[.!?]/g, '').split(/\s+/).filter(Boolean);
 
     const norm = s => String(s || '').toLowerCase().replace(/[^\w\s]/g, '').replace(/\s+/g, ' ').trim();
@@ -1312,6 +1359,7 @@
         feedbackMsg = t('scaffold.reorder-hint', 'Periksa kembali urutan subjek dan kata kerjanya.');
       }
 
+      g.hasTriedOnce = true;
       g.puzzleFeedback = {
         ok: false,
         message: feedbackMsg
@@ -1322,6 +1370,23 @@
       }
       renderMiniGameModal();
     }
+  }
+
+  function requestPuzzleHint() {
+    if (!_activeMiniGame || (_activeMiniGame.round !== 2 && _activeMiniGame.round !== 3)) return;
+    const g = _activeMiniGame;
+    const word = g.words[g.puzzleIndex] || g.words[0];
+    const targetSentence = getAlignedSentenceForPuzzle(g.skill, word);
+    const targetTokens = targetSentence.replace(/[.!?]/g, '').split(/\s+/).filter(Boolean);
+    const firstWord = targetTokens[0] || '';
+
+    g.hintRequested = true;
+    playSfx('tap');
+    g.puzzleFeedback = {
+      ok: false,
+      message: t('scaffold.hint-first-token', 'Petunjuk: Kalimat ini diawali dengan kata "' + firstWord + '".', { word: firstWord })
+    };
+    renderMiniGameModal();
   }
 
   function completeMiniGameAndUnlock(skill) {
@@ -1419,6 +1484,7 @@
     addPuzzleToken,
     removePuzzleToken,
     checkSentencePuzzle,
+    requestPuzzleHint,
     completeMiniGameAndUnlock,
     getSemanticMeaningDistractors,
     getActiveMiniGame: () => _activeMiniGame

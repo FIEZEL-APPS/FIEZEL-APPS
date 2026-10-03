@@ -554,6 +554,8 @@
     'scaffold.fokus-kata': 'คำศัพท์เป้าหมาย: {word} ({meaning})',
     'scaffold.hint-ketuk-keping': 'แตะชิ้นส่วนด้านล่าง...',
     'scaffold.btn-periksa-kalimat': 'ตรวจประโยค',
+    'scaffold.btn-minta-petunjuk': 'คำใบ้รูปแบบ',
+    'scaffold.hint-first-token': 'คำใบ้: ประโยคนี้ขึ้นต้นด้วยคำว่า "{word}"',
     'scaffold.toast-urutan-salah': 'ลองตรวจลำดับคำใหม่อีกครั้งนะ!',
     'scaffold.toast-vocab-terkuasai': 'จำคำศัพท์ได้แล้ว! กำลังเปิดแบบฝึกหัดแกรมมาร์...',
     'scaffold.step-match': 'จับคู่',
@@ -576,6 +578,8 @@
     'scaffold.metric-vocab': 'คำศัพท์ที่เชี่ยวชาญ',
     'scaffold.metric-combo': 'คอมโบสูงสุด',
     'scaffold.metric-ready': 'ความพร้อม BKT',
+    'scaffold.btn-minta-petunjuk': 'คำใบ้รูปแบบประโยค',
+    'scaffold.hint-first-token': 'คำใบ้: ประโยคนี้ขึ้นต้นด้วยคำว่า "{word}"',
     'scaffold.close': 'ปิด'
   };
   I18N.registerCopy('th', MAP);

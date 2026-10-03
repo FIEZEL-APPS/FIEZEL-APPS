@@ -554,6 +554,8 @@
     'scaffold.fokus-kata': 'Fokus Kata: {word} ({meaning})',
     'scaffold.hint-ketuk-keping': 'Ketuk keping di bawah...',
     'scaffold.btn-periksa-kalimat': 'Periksa Kalimat',
+    'scaffold.btn-minta-petunjuk': 'Petunjuk Pola',
+    'scaffold.hint-first-token': 'Petunjuk: Kalimat ini diawali dengan kata "{word}".',
     'scaffold.toast-urutan-salah': 'Coba periksa urutan katanya lagi ya!',
     'scaffold.toast-vocab-terkuasai': 'Kosakata Terkuasai! Membuka Latihan Grammar...',
     'scaffold.step-match': 'Cocokkan',
@@ -576,6 +578,8 @@
     'scaffold.metric-vocab': 'Kosakata Dikuasai',
     'scaffold.metric-combo': 'Kombo Terbaik',
     'scaffold.metric-ready': 'Kesiapan BKT',
+    'scaffold.btn-minta-petunjuk': 'Petunjuk Pola',
+    'scaffold.hint-first-token': 'Petunjuk: Kalimat ini diawali dengan kata "{word}".',
     'scaffold.close': 'Tutup'
   };
   I18N.registerCopy('id', MAP);
