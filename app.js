@@ -13282,7 +13282,7 @@ function quizLoop(cfg){
      const skillTitle=(typeof grammarCurriculumEntry==='function'&&grammarCurriculumEntry(skillKey)?.title)||skillKey.replace(/-/g,' ');
      const mistakeCount=Number(state.mistakeVault?.[skillKey]||0);
      const repeatBadge=mistakeCount>=2
-       ?`<span class="braincore-pill alert"><i data-lucide="alert-triangle"></i> ${mistakeCount}x ${FiezelI18n.t('quiz.ledger-keliru')}</span>`
+       ?`<span class="braincore-pill alert"><i data-lucide="triangle-alert"></i> ${mistakeCount}x ${FiezelI18n.t('quiz.ledger-keliru')}</span>`
        : '';
      let fsrsBadge='';
      try{
@@ -13294,8 +13294,8 @@ function quizLoop(cfg){
      }catch(_){}
 
      telemetryRowHtml=`<div class="braincore-telemetry-row">`
-       +(bktPercent!==null?`<span class="braincore-pill mastery"><i data-lucide="gauge"></i> BKT ${bktPercent}%</span>`:'')
-       +(skillTitle?`<span class="braincore-pill target"><i data-lucide="crosshair"></i> ${esc(skillTitle)}</span>`:'')
+       +(bktPercent!==null?`<span class="braincore-pill mastery"><i data-lucide="activity"></i> BKT ${bktPercent}%</span>`:'')
+       +(skillTitle?`<span class="braincore-pill target"><i data-lucide="target"></i> ${esc(skillTitle)}</span>`:'')
        +repeatBadge
        +fsrsBadge
        +`</div>`;

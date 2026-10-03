@@ -1,7 +1,7 @@
 {
-  "version": "m025-414",
+  "version": "m025-415",
   "claimedBy": "branch main",
-  "claimedAt": "2026-10-03T13:12:18.962Z",
-  "reason": "feat(braincore): progressive scaffolding, streamlined clues, and live telemetry badges",
+  "claimedAt": "2026-10-03T13:21:38.797Z",
+  "reason": "fix(icons): align braincore telemetry icons with lucide subset",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
