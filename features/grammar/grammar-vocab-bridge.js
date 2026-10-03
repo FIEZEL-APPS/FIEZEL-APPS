@@ -1019,7 +1019,7 @@
 
           ${g.puzzleFeedback ? `
             <div class="puzzle-pedagogical-feedback ${g.puzzleFeedback.ok ? 'is-success' : 'is-error'}" role="alert">
-              <i data-lucide="${g.puzzleFeedback.ok ? 'check-circle-2' : 'alert-circle'}"></i>
+              <i data-lucide="${g.puzzleFeedback.ok ? 'check-circle-2' : 'circle-x'}"></i>
               <div class="feedback-body">
                 <span class="feedback-title">${g.puzzleFeedback.ok ? t('scaffold.puzzle-ok-title', 'Tepat Sekali!') : t('scaffold.puzzle-err-title', 'Periksa Kembali')}</span>
                 <span class="feedback-desc">${esc(g.puzzleFeedback.message)}</span>
