@@ -9156,7 +9156,7 @@ function todayHomeMarkup(){
   const homeTop = `<div class="fz-welcome-header">`
     + `<div class="fz-greet-title">${esc(FiezelI18n.t('home.sapa', { nama: currentLearner }))}</div>`
     + `<p class="fz-greet-motivation">${esc(currentMotivation)}</p>`
-    + `<a href="./tactile-clay.html" class="fz-tactile-entry-pill" style="display:inline-flex;align-items:center;justify-content:space-between;width:100%;box-sizing:border-box;margin:10px 0 6px;padding:9px 13px;background:#FFFDF5;border:1.5px solid #FCD34D;border-radius:14px;text-decoration:none;box-shadow:0 3px 0 #FBBF24;color:#78350F"><span style="display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:800"><span>✨</span> <span>Tampilan Baru: Tactile Clay &amp; Grammar Coach</span></span><span style="font-size:11.5px;font-weight:800;color:#B45309">Buka →</span></a>`
+    + `<a href="./tactile-clay.html" class="fz-tactile-entry-pill" style="display:inline-flex;align-items:center;justify-content:space-between;width:100%;box-sizing:border-box;margin:10px 0 6px;padding:9px 13px;background:#FFFDF5;border:1.5px solid #FCD34D;border-radius:14px;text-decoration:none;box-shadow:0 3px 0 #FBBF24;color:#78350F"><span style="display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:800"><i data-lucide="sparkles" style="width:16px;height:16px;display:inline-block;vertical-align:middle"></i> <span>Tampilan Baru: Tactile Clay &amp; Grammar Coach</span></span><span style="font-size:11.5px;font-weight:800;color:#B45309">Buka →</span></a>`
     + `</div>`;
   /* UX-BRIEF §1: tombol aksi utama yang mencolok di lipatan pertama - "Mulai Belajar Sekarang"
      atau "Lanjutkan Misi" kalau ada sesi yang tertunda. Satu ketukan → homeQuickStart(). */
