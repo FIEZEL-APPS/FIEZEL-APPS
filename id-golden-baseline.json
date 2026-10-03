@@ -1,6 +1,6 @@
 {
   "schema": "id-golden-baseline/1",
-  "generatedAt": "2026-10-03T16:27:16.819Z",
+  "generatedAt": "2026-10-03T16:47:36.042Z",
   "root": "C:\\Users\\hp\\fiezel-apps",
   "files": {
     "grammar-explanations-id.json": "40c79cbfd1893abdf7f7b24f7c13b30ccebd03940a12d128259a07e485cf3a3f",
@@ -18,8 +18,8 @@
     "features/audio-assets/fiezel-audio-key.js": "11624e303917fe0df881ac3f410911587766fd6f4d2491ca6687ec42de8d457d"
   },
   "literals": {
-    "count": 4726,
-    "sha256": "644abec7496f65bf3dfe99e588c7d994d72a5d63d1e11f7c7dfea86894913d26",
+    "count": 4728,
+    "sha256": "e5aa2e22ddc1832f0ac5b31088712bbbdc257c2f759af62a00635259d374cecd",
     "list": [
       "\n        <div class=\"mini-game-round round-2 round-puzzle round-3-puzzle\" data-testid=\"mini-game-stage-puzzle\">\n          <div class=\"stage-hero-banner\">\n            <div class=\"stage-title-wrap\">\n              <span class=\"stage-tag\"><i data-lucide=\"sparkles\"></i> ${t('scaffold.round2-badge', 'Tahap 2')}</span>\n              <h3 class=\"stage-heading\">${t('scaffold.game-round3-title', 'Susun Kalimat Tata Bahasa')}</h3>\n            </div>\n            <div class=\"stage-meta-badges\">\n              <span class=\"game-counter-pill\">${g.puzzleIndex + 1}/${maxPuzzles}</span>\n            </div>\n          </div>\n\n          <p class=\"game-instruction\">${t('scaffold.game-round3-desc', 'Susun kepingan kata menjadi kalimat yang tepat sesuai aturan grammar!')}</p>\n\n          <div class=\"puzzle-context-card\">\n            <div class=\"context-item\">\n              <i data-lucide=\"book-open\"></i>\n              <span><b>${t('scaffold.fokus-tata-bahasa', 'Aturan')}:</b> ${esc(grammarRuleText)}</span>\n            </div>\n            <div class=\"context-item word-highlight\">\n              <i data-lucide=\"target\"></i>\n              <span><b>${t('scaffold.label-kata-kunci', 'Kata Kunci')}:</b> <u>${esc(word.word)}</u> (${esc(word.meaning.split(';')[0].trim())})</span>\n            </div>\n          </div>\n\n          <div class=\"puzzle-sentence-stage\" id=\"puzzleSentenceStage\">\n            <div class=\"puzzle-slot-line\" id=\"puzzleSlotLine\">\n              ${g.placedTokens.map((tok, idx) => ",
       "\n        <div class=\"mini-game-round round-3-unlocked round-4-unlocked round-victory\" data-testid=\"mini-game-stage-complete\">\n          <div class=\"victory-card-wrap\">\n            <div class=\"victory-icon-emblem\">\n              <i data-lucide=\"sparkles\"></i>\n            </div>\n            \n            <h2 class=\"victory-headline\">${t('scaffold.game-unlocked-title', 'Kosakata Terkuasai Sempurna! 🎉')}</h2>\n            <p class=\"victory-subtext\">${t('scaffold.game-unlocked-desc', 'Semua kosakata kunci berhasil kamu kuasai. Kamu siap menaklukkan materi grammar ini!')}</p>\n\n            <div class=\"mastery-summary-box\">\n              <div class=\"summary-stat-row\">\n                <div class=\"summary-metric\">\n                  <span class=\"metric-num\">${g.words.length}</span>\n                  <span class=\"metric-label\">${t('scaffold.metric-vocab', 'Kosakata Dikuasai')}</span>\n                </div>\n                <div class=\"summary-metric-divider\"></div>\n                <div class=\"summary-metric\">\n                  <span class=\"metric-num\">${(g.bestCombo && g.bestCombo > 0) ? g.bestCombo : (g.combo > 0 ? g.combo : 1)}x</span>\n                  <span class=\"metric-label\">${t('scaffold.metric-combo', 'Kombo Terbaik')}</span>\n                </div>\n                <div class=\"summary-metric-divider\"></div>\n                <div class=\"summary-metric\">\n                  <span class=\"metric-num\">100%</span>\n                  <span class=\"metric-label\">${t('scaffold.metric-ready', 'Kesiapan BKT')}</span>\n                </div>\n              </div>\n\n              <div class=\"mastered-vocab-pills\">\n                ${g.words.map(w => ",
@@ -2525,6 +2525,7 @@
       "Kardus yang terlalu kecil untuk buku-bukunya",
       "Karena ia merasa sangat sakit hari itu",
       "Kartu yang sedang ia buat untuk ibunya",
+      "Kata \"{word}\" belum kamu masukkan ke kalimat.",
       "Kata Inggris apa yang cocok untuk gambar ini?",
       "Kata bantu pertanyaan salah tense atau jenis",
       "Kata baru itu kayak koin — dikumpulin dikit-dikit.",
@@ -2690,6 +2691,7 @@
       "Konteks soal atau materi yang kamu buka diproses oleh Core AI untuk membuat penjelasan. Jangan masukkan data pribadi.",
       "Kosakata",
       "Kosakata (Vocabulary)",
+      "Kosakata Dikuasai",
       "Kosakata Harian",
       "Kosakata Terkuasai! Membuka Latihan Grammar...",
       "Kosakata akademik dasar",

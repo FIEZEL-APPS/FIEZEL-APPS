@@ -555,7 +555,28 @@
     'scaffold.hint-ketuk-keping': 'แตะชิ้นส่วนด้านล่าง...',
     'scaffold.btn-periksa-kalimat': 'ตรวจประโยค',
     'scaffold.toast-urutan-salah': 'ลองตรวจลำดับคำใหม่อีกครั้งนะ!',
-    'scaffold.toast-vocab-terkuasai': 'จำคำศัพท์ได้แล้ว! กำลังเปิดแบบฝึกหัดแกรมมาร์...'
+    'scaffold.toast-vocab-terkuasai': 'จำคำศัพท์ได้แล้ว! กำลังเปิดแบบฝึกหัดแกรมมาร์...',
+    'scaffold.step-match': 'จับคู่',
+    'scaffold.step-puzzle': 'เรียงประโยค',
+    'scaffold.step-ready': 'พร้อมเรียน',
+    'scaffold.round1-badge': 'ขั้นที่ 1',
+    'scaffold.round2-badge': 'ขั้นที่ 2',
+    'scaffold.col-english': 'ภาษาอังกฤษ',
+    'scaffold.col-indonesia': 'ความหมาย',
+    'scaffold.pairs-remaining': 'เหลืออีก {count} คู่',
+    'scaffold.all-paired': 'จับคู่ถูกต้องทั้งหมดแล้ว!',
+    'scaffold.label-kata-kunci': 'คำศัพท์เป้าหมาย',
+    'scaffold.puzzle-ok-title': 'ถูกต้องยอดเยี่ยม!',
+    'scaffold.puzzle-err-title': 'ลองตรวจสอบอีกครั้ง',
+    'scaffold.puzzle-correct-detail': 'โครงสร้างประโยคถูกต้องตามหลักไวยากรณ์!',
+    'scaffold.missing-token-feedback': 'คุณยังไม่ได้ใส่คำว่า "{word}" ในประโยค',
+    'scaffold.incomplete-sentence': 'ประโยคยังไม่สมบูรณ์ ยังมีคำที่ตกหล่น',
+    'scaffold.reorder-hint': 'ลองตรวจสอบลำดับของประธานและกริยาใหม่อีกครั้ง',
+    'scaffold.bank-label': 'ตัวเลือกคำ:',
+    'scaffold.metric-vocab': 'คำศัพท์ที่เชี่ยวชาญ',
+    'scaffold.metric-combo': 'คอมโบสูงสุด',
+    'scaffold.metric-ready': 'ความพร้อม BKT',
+    'scaffold.close': 'ปิด'
   };
   I18N.registerCopy('th', MAP);
 })(typeof globalThis !== 'undefined' ? globalThis : this);

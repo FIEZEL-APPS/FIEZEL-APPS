@@ -555,7 +555,28 @@
     'scaffold.hint-ketuk-keping': 'Ketuk keping di bawah...',
     'scaffold.btn-periksa-kalimat': 'Periksa Kalimat',
     'scaffold.toast-urutan-salah': 'Coba periksa urutan katanya lagi ya!',
-    'scaffold.toast-vocab-terkuasai': 'Kosakata Terkuasai! Membuka Latihan Grammar...'
+    'scaffold.toast-vocab-terkuasai': 'Kosakata Terkuasai! Membuka Latihan Grammar...',
+    'scaffold.step-match': 'Cocokkan',
+    'scaffold.step-puzzle': 'Susun Kalimat',
+    'scaffold.step-ready': 'Siap Belajar',
+    'scaffold.round1-badge': 'Tahap 1',
+    'scaffold.round2-badge': 'Tahap 2',
+    'scaffold.col-english': 'Bahasa Inggris',
+    'scaffold.col-indonesia': 'Arti Indonesia',
+    'scaffold.pairs-remaining': 'Tersisa {count} pasangan kata',
+    'scaffold.all-paired': 'Semua pasangan cocok!',
+    'scaffold.label-kata-kunci': 'Kata Kunci',
+    'scaffold.puzzle-ok-title': 'Tepat Sekali!',
+    'scaffold.puzzle-err-title': 'Periksa Kembali',
+    'scaffold.puzzle-correct-detail': 'Susunan kalimat tepat sesuai pola grammar!',
+    'scaffold.missing-token-feedback': 'Kata "{word}" belum kamu masukkan ke kalimat.',
+    'scaffold.incomplete-sentence': 'Kalimat belum lengkap, masih ada kata yang tertinggal.',
+    'scaffold.reorder-hint': 'Periksa kembali urutan subjek dan kata kerjanya.',
+    'scaffold.bank-label': 'Pilihan Kata:',
+    'scaffold.metric-vocab': 'Kosakata Dikuasai',
+    'scaffold.metric-combo': 'Kombo Terbaik',
+    'scaffold.metric-ready': 'Kesiapan BKT',
+    'scaffold.close': 'Tutup'
   };
   I18N.registerCopy('id', MAP);
 })(typeof globalThis !== 'undefined' ? globalThis : this);

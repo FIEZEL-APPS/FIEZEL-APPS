@@ -126,6 +126,14 @@ const EXCLUSIONS = new Map([
       'WAJIB terdaftar di quality.yml, bukan dikecualikan. Cara menjalankan alat v1 secara ' +
       'manual: `node adaptivity-simulation.js`.'
   }],
+  ['tests/chrome-mini-game-test.js', {
+    class: 'gerbang-pra-rilis-fitur',
+    reason:
+      'BUKAN gerbang CI Linux: tes interaktif Playwright yang mengontrol Google Chrome browser desktop ' +
+      'secara langsung di lingkungan lokal Windows dengan server lokal (memerlukan instalasi browser biner ' +
+      'Google Chrome dan GUI). Kontrak integritas unit and scaffolding Mini Game di CI telah dijaga oleh ' +
+      'kunci-hantu-test dan id-golden-snapshot-test.'
+  }],
   ['tests/chokai-multi-voice-protocol-test.js', {
     class: 'gerbang-pra-rilis-fitur',
     reason:
