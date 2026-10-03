@@ -156,6 +156,26 @@ async function run() {
     const puzzleHint = await page.$eval('.puzzle-empty-hint', el => el.textContent.trim());
     console.log('  -> Round 2 Puzzle Slot Line initialized:', puzzleHint);
 
+    // 7b. Test Click on Puzzle Tile and Chip Removal interaction
+    console.log('✓ Clicking first available puzzle tile...');
+    const firstTile = await page.$('.puzzle-tile:not(.is-used)');
+    if (!firstTile) throw new Error('No clickable puzzle tile found in Round 2');
+    const tileWord = await firstTile.textContent().then(t => t.trim());
+    await firstTile.click();
+
+    await page.waitForSelector('.puzzle-placed-chip', { timeout: 3000 });
+    const placedWord = await page.$eval('.puzzle-placed-chip .tok-text', el => el.textContent.trim());
+    console.log(`  -> Placed chip verified: "${placedWord}" (matches clicked tile "${tileWord}")`);
+    if (placedWord !== tileWord) throw new Error(`Placed chip mismatch: expected ${tileWord}, got ${placedWord}`);
+
+    // Click chip to remove
+    console.log('✓ Clicking placed chip to remove from slot line...');
+    await page.click('.puzzle-placed-chip');
+    await page.waitForTimeout(200);
+    const chipCountAfterRemove = await page.$$eval('.puzzle-placed-chip', chips => chips.length);
+    console.log('  -> Placed chip count after removal:', chipCountAfterRemove);
+    if (chipCountAfterRemove !== 0) throw new Error('Chip removal failed');
+
     // 8. Test Victory & Auto-Unlock (Round 3)
     console.log('✓ Transitioning to Round 3 (Auto-Unlock & Trophy Ring)...');
     await page.evaluate(() => {

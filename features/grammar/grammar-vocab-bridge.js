@@ -1292,14 +1292,14 @@
   }
 
   function addPuzzleToken(tok) {
-    if (!_activeMiniGame || _activeMiniGame.round !== 3) return;
+    if (!_activeMiniGame || (_activeMiniGame.round !== 2 && _activeMiniGame.round !== 3)) return;
     _activeMiniGame.placedTokens.push(tok);
     playSfx('tap');
     renderMiniGameModal();
   }
 
   function removePuzzleToken(idx) {
-    if (!_activeMiniGame || _activeMiniGame.round !== 3) return;
+    if (!_activeMiniGame || (_activeMiniGame.round !== 2 && _activeMiniGame.round !== 3)) return;
     _activeMiniGame.placedTokens.splice(idx, 1);
     playSfx('tap');
     renderMiniGameModal();

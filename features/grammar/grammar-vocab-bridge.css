@@ -494,8 +494,15 @@
   border-radius: 24px !important;
   border: 1px solid rgba(226, 232, 240, 0.9) !important;
   box-shadow: 0 24px 60px rgba(15, 23, 42, 0.2) !important;
+  width: 92% !important;
   max-width: 480px !important;
-  padding: 22px 20px !important;
+  max-height: 90vh !important;
+  max-height: 90dvh !important;
+  padding: 24px 20px !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
 }
 
 #modalPanel:has(.lesson-prereq-gateway-sheet) h2,
@@ -518,6 +525,8 @@
   gap: 16px;
   padding: 0;
   background: #FFFFFF;
+  height: 100%;
+  box-sizing: border-box;
 }
 
 .gateway-header {
@@ -567,70 +576,88 @@
 
 .gateway-vocab-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap: 8px;
-  max-height: 240px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  max-height: 280px;
   overflow-y: auto;
-  padding: 4px;
+  -webkit-overflow-scrolling: touch;
+  padding: 6px;
   background: #F8FAFC;
   border: 1px solid #E2E8F0;
   border-radius: 14px;
 }
 
+@media (max-width: 360px) {
+  .gateway-vocab-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .gateway-vocab-card {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
   background: #FFFFFF;
-  border: 1px solid #E2E8F0;
-  border-radius: 10px;
-  padding: 8px 10px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  border: 1.5px solid #E2E8F0;
+  border-radius: 12px;
+  padding: 10px 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   transition: transform 0.15s ease;
+  min-height: 52px;
+  box-sizing: border-box;
 }
 
 .gateway-vocab-card:hover {
   transform: translateY(-1px);
+  border-color: #38BDF8;
 }
 
 .gw-word-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 4px;
+  gap: 6px;
 }
 
 .gw-word {
-  font-size: 0.92rem;
+  font-size: 0.95rem;
   color: #0F172A;
+  font-weight: 800;
+  line-height: 1.2;
 }
 
 .gw-audio-btn {
   background: #F0FDF4;
   border: 1px solid #BBF7D0;
   color: #059669;
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   padding: 0;
+  flex-shrink: 0;
+  transition: all 0.12s ease;
+}
+
+.gw-audio-btn:active {
+  transform: scale(0.92);
+  background: #DCFCE7;
 }
 
 .gw-audio-btn i {
-  width: 13px;
-  height: 13px;
+  width: 14px;
+  height: 14px;
 }
 
 .gw-meaning {
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   color: #0284C7;
   font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  line-height: 1.3;
 }
 
 .gateway-actions {
