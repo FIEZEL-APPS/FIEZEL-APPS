@@ -144,7 +144,7 @@
       <div class="gx-gloss-bar">
         <span class="token-bank-label">${FiezelI18n.t('grammar.token-bank-aria', 'Daftar kata tersedia')}</span>
         <button type="button" class="gx-btn-gloss" id="tokenGlossToggle">
-          <span>📖</span> ${FiezelI18n.t('grammar.intip-arti', 'Intip arti kata')}
+          <span>📖</span> Intip arti kata
         </button>
       </div>
       <div class="token-bank" id="tokenBank" aria-label="${FiezelI18n.t('grammar.token-bank-aria', 'Daftar kata tersedia')}"></div>
@@ -281,15 +281,15 @@
         railEl.classList.add('gx-shake');
         
         // Diagnose error for the scaffold hint
-        let hintTitle = FiezelI18n.t('grammar.hint-periksa', 'Coba periksa sekali lagi');
-        let hintBody = FiezelI18n.t('grammar.hint-cek-urutan', 'Perhatikan bentuk kata kerja dan subjek kalimatmu.');
+        let hintTitle = 'Coba periksa sekali lagi';
+        let hintBody = 'Perhatikan bentuk kata kerja dan subjek kalimatmu.';
         const badToken = placedTokens.find(t => distractors.some(d => String(d).toLowerCase() === t.text.toLowerCase()));
         if (badToken) {
-          hintTitle = FiezelI18n.t('grammar.hint-kata-kurang-pas', 'Cek kata “{word}”', { word: badToken.text });
-          hintBody = FiezelI18n.t('grammar.hint-kata-ganti', 'Kata “{word}” mungkin belum sesuai dengan konteks kalimat. Coba ganti dengan bentuk lain di bank kata.', { word: badToken.text });
+          hintTitle = `Cek kata “${badToken.text}”`;
+          hintBody = `Kata “${badToken.text}” mungkin belum sesuai dengan konteks kalimat. Coba ganti dengan bentuk lain di bank kata.`;
         } else if (placedTokens.length < tokens.length) {
-          hintTitle = FiezelI18n.t('grammar.hint-kata-kurang', 'Ada kata yang belum terpasang');
-          hintBody = FiezelI18n.t('grammar.hint-lengkapi-semua', 'Masih ada kata yang tertinggal di bank kata. Lengkapi susunannya.');
+          hintTitle = 'Ada kata yang belum terpasang';
+          hintBody = 'Masih ada kata yang tertinggal di bank kata. Lengkapi susunannya.';
         }
 
         if (hintEl) {
@@ -632,13 +632,13 @@
         <p class="grammar-rule-why"><strong>${FiezelI18n.t('quiz.intinya', 'Intinya:')}</strong> ${whyText}</p>
         ${ruleText ? `<p class="grammar-rule-text"><strong>${FiezelI18n.t('quiz.aturannya', 'Aturannya:')}</strong> ${ruleText}</p>` : ''}
         <button type="button" class="gx-pin-formula-btn" onclick="if(typeof gxPinFormula==='function') gxPinFormula(this); else this.classList.add('pinned');">
-          <span>🔖</span> ${FiezelI18n.t('grammar.pin-formula', 'Simpan Rumus ke Catatan')}
+          <span>🔖</span> Simpan Rumus ke Catatan
         </button>
       </div>
 
       ${(q.contrast || q.explain?.contrast) ? `
       <div class="gx-contrast-card">
-        <div class="gx-contrast-title">💡 ${FiezelI18n.t('grammar.contrast-title', 'Beda dengan Bahasa Indonesia')}</div>
+        <div class="gx-contrast-title">💡 Beda dengan Bahasa Indonesia</div>
         <div class="gx-contrast-body">${esc(q.contrast || q.explain?.contrast)}</div>
       </div>` : ''}
 
