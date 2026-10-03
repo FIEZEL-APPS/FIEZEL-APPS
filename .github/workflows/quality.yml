@@ -507,6 +507,7 @@ jobs:
           node tests/core-brain-test.js
           node tests/core-brain-v2-test.js
           node tests/tutor-brain-v3-test.js
+          node tests/braincore-feedback-audit-test.js
           node tests/misconception-diagnosis-test.js
           node tests/tutor-reteach-card-test.js
           node tests/fiezel-autonomy-config-test.js
