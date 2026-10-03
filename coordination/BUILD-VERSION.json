@@ -1,7 +1,7 @@
 {
-  "version": "m025-434",
+  "version": "m025-435",
   "claimedBy": "branch main",
-  "claimedAt": "2026-10-03T21:16:40.024Z",
-  "reason": "fix(style): use canonical design tokens --accent and --panel instead of undefined tokens",
+  "claimedAt": "2026-10-03T21:29:07.086Z",
+  "reason": "fix(item-pool): handle D1 Cloudflare HTTP 401 gracefully on cron job",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

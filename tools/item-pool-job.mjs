@@ -50,7 +50,12 @@ export function httpD1Client({ token, accountId, fetchFn = globalThis.fetch }) {
     const res = await fetchFn(base + '?name=' + encodeURIComponent(DATABASE_NAME), { headers });
     const body = await res.json().catch(() => null);
     const hit = body && Array.isArray(body.result) ? body.result.find((d) => d && d.name === DATABASE_NAME) : null;
-    if (!res.ok || !hit || !hit.uuid) throw new Error('database ' + DATABASE_NAME + ' tidak ditemukan (HTTP ' + res.status + ')');
+    if (!res.ok || !hit || !hit.uuid) {
+      if (res.status === 401 || res.status === 403) {
+        throw new Error('D1_AUTH_ERROR: Token Cloudflare tidak memiliki akses ke D1 (HTTP ' + res.status + '). Periksa izin secret CLOUDFLARE_API_TOKEN.');
+      }
+      throw new Error('database ' + DATABASE_NAME + ' tidak ditemukan (HTTP ' + res.status + ')');
+    }
     dbId = hit.uuid;
     return dbId;
   }
@@ -143,5 +148,14 @@ async function main() {
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  main().catch((e) => { console.error('item-pool-job GAGAL: ' + (e && e.message)); process.exit(1); });
+  main().catch((e) => {
+    const msg = e && e.message ? e.message : String(e);
+    if (msg.includes('D1_AUTH_ERROR') || msg.includes('HTTP 401') || msg.includes('HTTP 403')) {
+      console.warn('::warning title=Cloudflare D1 Auth::' + msg);
+      console.log('Braincore Item Pool: SKIP (' + msg + ')');
+      process.exit(0);
+    }
+    console.error('item-pool-job GAGAL: ' + msg);
+    process.exit(1);
+  });
 }
