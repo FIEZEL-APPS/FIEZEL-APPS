@@ -1694,3 +1694,106 @@ body.fz-stage-quiz .bottomnav {
   visibility: hidden !important;
   pointer-events: none !important;
 }
+
+/* ==========================================================================
+   Braincore Live Telemetry Row & Tutor Speed Indicator
+   ========================================================================== */
+.braincore-telemetry-row {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin: 6px 0 10px 0 !important;
+}
+
+.braincore-pill {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  padding: 3px 9px !important;
+  border-radius: 9999px !important;
+  font-size: 0.76rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.02em !important;
+  line-height: 1.3 !important;
+}
+
+.braincore-pill svg {
+  width: 13px !important;
+  height: 13px !important;
+}
+
+.braincore-pill.mastery {
+  background: rgba(14, 165, 233, 0.16) !important;
+  color: #38bdf8 !important;
+  border: 1px solid rgba(56, 189, 248, 0.35) !important;
+}
+
+.braincore-pill.target {
+  background: rgba(168, 85, 247, 0.16) !important;
+  color: #c084fc !important;
+  border: 1px solid rgba(192, 132, 252, 0.35) !important;
+  text-transform: capitalize !important;
+}
+
+.braincore-pill.alert {
+  background: rgba(239, 68, 68, 0.18) !important;
+  color: #fca5a5 !important;
+  border: 1px solid rgba(239, 68, 68, 0.4) !important;
+}
+
+.braincore-pill.schedule {
+  background: rgba(16, 185, 129, 0.16) !important;
+  color: #6ee7b7 !important;
+  border: 1px solid rgba(16, 185, 129, 0.35) !important;
+}
+
+/* Light mode support */
+body:not(.theme-dark):not(.fz-lux) .card-light .braincore-pill.mastery,
+[data-theme="light"] .card-light .braincore-pill.mastery {
+  background: #e0f2fe !important;
+  color: #0369a1 !important;
+  border-color: #bae6fd !important;
+}
+
+body:not(.theme-dark):not(.fz-lux) .card-light .braincore-pill.target,
+[data-theme="light"] .card-light .braincore-pill.target {
+  background: #f3e8ff !important;
+  color: #7e22ce !important;
+  border-color: #e9d5ff !important;
+}
+
+body:not(.theme-dark):not(.fz-lux) .card-light .braincore-pill.alert,
+[data-theme="light"] .card-light .braincore-pill.alert {
+  background: #fee2e2 !important;
+  color: #b91c1c !important;
+  border-color: #fecaca !important;
+}
+
+body:not(.theme-dark):not(.fz-lux) .card-light .braincore-pill.schedule,
+[data-theme="light"] .card-light .braincore-pill.schedule {
+  background: #dcfce7 !important;
+  color: #15803d !important;
+  border-color: #bbf7d0 !important;
+}
+
+/* Tutor speed indicator pill */
+.tutor-speed-pill {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  margin-left: auto !important;
+  padding: 2px 8px !important;
+  border-radius: 9999px !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  background: rgba(245, 158, 11, 0.18) !important;
+  color: #f59e0b !important;
+  border: 1px solid rgba(245, 158, 11, 0.35) !important;
+}
+
+.tutor-speed-pill svg {
+  width: 12px !important;
+  height: 12px !important;
+}
+

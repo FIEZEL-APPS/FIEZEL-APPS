@@ -1321,8 +1321,8 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 .feedback.feedback-error{border-color:#F5C6BC;box-shadow:inset 4px 0 0 #D9534F;background:#FFF5F2}
 .feedback-title{display:flex;align-items:center;gap:9px;margin-bottom:6px}.feedback-title svg{width:21px;height:21px}.feedback-success .feedback-title{color:var(--good)}.feedback-error .feedback-title{color:#B23B2A}
 .feedback-your-pick{margin:2px 0 6px;padding:8px 12px;border-radius:10px;background:rgba(217,83,52,.08);border-left:3px solid #D9534F;font-size:var(--fs-body,15px);line-height:1.5}.feedback-your-pick strong{color:#B23B2A;margin-right:4px}
-.diff-word-wrong{display:inline-block;color:#FF8A80;background:rgba(255,82,82,.18);border:1px solid rgba(255,82,82,.35);padding:1px 6px;margin:0 2px;border-radius:6px;font-weight:700;text-decoration:line-through;text-decoration-color:#FF5252}
-.diff-word-correct{display:inline-block;color:#69F0AE;background:rgba(0,230,118,.18);border:1px solid rgba(0,230,118,.35);padding:1px 6px;margin:0 2px;border-radius:6px;font-weight:700}
+.diff-word-wrong{display:inline-flex;align-items:center;justify-content:center;min-width:28px;color:#FF8A80;background:rgba(255,82,82,.22);border:1px solid rgba(255,82,82,.45);border-bottom:2.5px solid #FF5252;padding:2px 8px;margin:0 4px;border-radius:6px;font-weight:800;text-decoration:none;box-sizing:border-box}
+.diff-word-correct{display:inline-flex;align-items:center;justify-content:center;min-width:28px;color:#69F0AE;background:rgba(0,230,118,.22);border:1px solid rgba(0,230,118,.45);border-bottom:2.5px solid #00E676;padding:2px 8px;margin:0 4px;border-radius:6px;font-weight:800;box-sizing:border-box}
 .token-nudge-shake{animation:nudgeShake .45s cubic-bezier(.36,.07,.19,.97) both;border-color:#F59E0B!important;box-shadow:0 0 8px rgba(245,158,11,.45)!important}
 @keyframes nudgeShake{10%,90%{transform:translate3d(-2px,0,0)}20%,80%{transform:translate3d(3px,0,0)}30%,50%,70%{transform:translate3d(-3px,0,0)}40%,60%{transform:translate3d(3px,0,0)}}
 .token-submit-retry{background:#F59E0B!important;border-color:#D97706!important;color:#181826!important;font-weight:700!important}

@@ -1,7 +1,7 @@
 {
-  "version": "m025-413",
+  "version": "m025-414",
   "claimedBy": "branch main",
-  "claimedAt": "2026-10-03T00:22:29.159Z",
-  "reason": "fix(grammar): edge-to-edge quiz card anti-void, option spacing & braincore feedback",
+  "claimedAt": "2026-10-03T13:12:18.962Z",
+  "reason": "feat(braincore): progressive scaffolding, streamlined clues, and live telemetry badges",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

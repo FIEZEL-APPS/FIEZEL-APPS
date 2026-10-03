@@ -105,6 +105,9 @@
     'quiz.menyerah-buka-jawaban': 'คิดไม่ออก? ดูเฉลยและคำอธิบาย',
     'quiz.periksa-ulang': 'ตรวจอีกครั้ง',
     'quiz.sudah-dicoba': 'ลองแล้ว',
-    'quiz.scaffold-success': 'ยอดเยี่ยมมาก! คุณแก้ไขได้ด้วยตัวเอง! 🌟'
+    'quiz.scaffold-success': 'ยอดเยี่ยมมาก! คุณแก้ไขได้ด้วยตัวเอง! 🌟',
+    'quiz.terlalu-cepat': 'เร็วเกินไป',
+    'quiz.ledger-keliru': 'ผิด',
+    'quiz.review-in-days': 'ทบทวน {days} วัน'
   });
 }());

@@ -105,6 +105,9 @@
     'quiz.menyerah-buka-jawaban': 'Buntu? Buka pembahasan lengkap',
     'quiz.periksa-ulang': 'Periksa Ulang',
     'quiz.sudah-dicoba': 'Sudah dicoba',
-    'quiz.scaffold-success': 'Bagus sekali! Kamu berhasil memperbaikinya sendiri! 🌟'
+    'quiz.scaffold-success': 'Bagus sekali! Kamu berhasil memperbaikinya sendiri! 🌟',
+    'quiz.terlalu-cepat': 'Terlalu cepat',
+    'quiz.ledger-keliru': 'keliru',
+    'quiz.review-in-days': 'Review {days}h'
   });
 }());

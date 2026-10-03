@@ -13056,10 +13056,12 @@ function quizLoop(cfg){
   host.classList.remove('hidden');
   let isFrustrated=false;try{isFrustrated=affectSessionSync().state==='frustrated'}catch{}
   const headTitle=retry?FiezelI18n.t('quiz.petunjuk-guru','Petunjuk Guru'):FiezelI18n.t('tutor.head-label','FIEZEL');
-  host.innerHTML=`<div class="tutor-turn-head"><span class="tutor-turn-face"><i data-lucide="graduation-cap"></i></span><b>${esc(headTitle)}</b></div>`
+  const speedBadge=(retry&&answer.timing==='guess')?`<span class="tutor-speed-pill"><i data-lucide="zap"></i> ${esc(FiezelI18n.t('quiz.terlalu-cepat','Terlalu cepat'))}</span>`:'';
+  const showSayAndAsk=!retry||!q.__diagnosticClue;
+  host.innerHTML=`<div class="tutor-turn-head"><span class="tutor-turn-face"><i data-lucide="graduation-cap"></i></span><b>${esc(headTitle)}</b>${speedBadge}</div>`
    +(retry&&q.__diagnosticClue?`<div class="tutor-diagnostic-clue"><i data-lucide="lightbulb"></i><span>${esc(q.__diagnosticClue)}</span></div>`:'')
-   +(turn.say?`<p class="tutor-turn-say">${esc(personalize(turn.say))}</p>`:'')
-   +(turn.ask?`<p class="tutor-turn-ask">${esc(personalize(turn.ask))}</p>`:'')
+   +(showSayAndAsk&&turn.say?`<p class="tutor-turn-say">${esc(personalize(turn.say))}</p>`:'')
+   +(showSayAndAsk&&turn.ask?`<p class="tutor-turn-ask">${esc(personalize(turn.ask))}</p>`:'')
    +(retry&&(answer.scaffold==='worked'||isFrustrated)?stepTutorGuidanceMarkup(q):'')
    +(retry?`<div class="tutor-turn-actions"><button id="tutorStuck" type="button" class="tutor-stuck quiz-giveup-btn"><i data-lucide="help-circle"></i><span>${FiezelI18n.t('quiz.menyerah-buka-jawaban','Buntu? Buka pembahasan lengkap')}</span></button></div>`:'');
   if(retry)$('tutorStuck').onclick=()=>{
@@ -13262,7 +13264,43 @@ function quizLoop(cfg){
      ? (isScaffoldSuccess?FiezelI18n.t('quiz.scaffold-success','Bagus sekali! Kamu berhasil memperbaikinya sendiri! 🌟'):FiezelI18n.t('quiz.verdict-correct'))
      : FiezelI18n.t('quiz.verdict-wrong');
    const verdictIcon=ok?(isScaffoldSuccess?'sparkles':'circle-check-big'):'circle-x';
-  f.innerHTML=`<div class="feedback-title"><i data-lucide="${verdictIcon}"></i><b>${verdictTitle}</b></div><p>${ok?FiezelI18n.t('quiz.correct-answer',{answer:`<strong>${esc(cleanCorrect)}</strong>`}):`${FiezelI18n.t('quiz.jawabanmu')} ${userPickRender}${FiezelI18n.t('quiz.answer-paling-tepat-adalah')} ${correctPickRender}.`}</p>${pickedWhyFails?`<p class="feedback-your-pick"><strong>${FiezelI18n.t('quiz.mengapa-salah','Mengapa kurang tepat?')}</strong> ${esc(pickedWhyFails)}</p>`:''}${(q.type==='grammar'||q.type==='token-order'||q.type==='video-grammar')&&q.explain?.rule/* m025-375: alasan dan aturan grammar di dua baris, bukan satu paragraf panjang */?`<p><strong>${FiezelI18n.t('quiz.intinya')}</strong> ${esc(whyText)}</p><p class="feedback-rule feedback-rule-pill"><strong>${FiezelI18n.t('quiz.aturannya')}</strong> ${esc(q.explain.rule)}</p>`:`<p><strong>${FiezelI18n.t('quiz.intinya')}</strong> ${esc(whyText)} ${q.explain?.rule?esc(q.explain.rule):''}</p>`}<details class="acc"><summary>${FiezelI18n.t(q.explain?.distractors?'quiz.bandingkan-pilihan-lain':'quiz.pembahasan-lengkap')}</summary><p class="muted">${esc(q.explain?.distractor||FiezelI18n.t('quiz.fallback-unsupported'))} ${esc(q.explain?.avoid||FiezelI18n.t('quiz.fallback-hint-check'))}</p>${q.explain?.distractors?`<div class="distractor-breakdown">${q.explain.distractors.map(x=>`<p><b>${esc(x.option)}:</b> ${esc(x.reason)}</p>`).join('')}</div>`:''}</details><div class="feedback-memory-box memory-tip"><div class="feedback-memory-header"><i data-lucide="lightbulb"></i><span class="feedback-memory-kicker">${FiezelI18n.t('quiz.trik-ingat','Trik Cepat Ingat')}</span></div><div class="feedback-memory-content">${formatMemoryTipForDisplay(esc(q.explain?.memory||FiezelI18n.t('quiz.fallback-hint-connect')))}</div></div><button class="ai-btn" id="aiExplainBtn"><i data-lucide="sparkles"></i> ${FiezelI18n.t('quiz.jelaskan-dengan-cara-lebih-sederhana')}</button>`;
+   const skillKey=String(q.lessonSkill||q.skill||q.target||'');
+   let bktPercent=null;
+   try{
+     const bktSt=bktRead();
+     if(bktSt&&self.FiezelMasteryBKT){
+       const m=self.FiezelMasteryBKT.mastery(bktSt,skillKey);
+       if(m&&Number.isFinite(Number(m.L)))bktPercent=Math.round(Number(m.L)*100);
+     }
+   }catch(_){}
+   if(bktPercent===null&&skillKey&&state.grammar?.[skillKey]){
+     bktPercent=Number(state.grammar[skillKey].mastery||0);
+   }
+
+   let telemetryRowHtml='';
+   if(skillKey||bktPercent!==null){
+     const skillTitle=(typeof grammarCurriculumEntry==='function'&&grammarCurriculumEntry(skillKey)?.title)||skillKey.replace(/-/g,' ');
+     const mistakeCount=Number(state.mistakeVault?.[skillKey]||0);
+     const repeatBadge=mistakeCount>=2
+       ?`<span class="braincore-pill alert"><i data-lucide="alert-triangle"></i> ${mistakeCount}x ${FiezelI18n.t('quiz.ledger-keliru')}</span>`
+       : '';
+     let fsrsBadge='';
+     try{
+       const bObj=state.grammar?.[skillKey]||state.vocab?.[skillKey];
+       if(bObj&&bObj.nextReview){
+         const days=Math.max(1,Math.round((bObj.nextReview-Date.now())/86400000));
+         fsrsBadge=`<span class="braincore-pill schedule"><i data-lucide="calendar"></i> ${FiezelI18n.t('quiz.review-in-days',{days})}</span>`;
+       }
+     }catch(_){}
+
+     telemetryRowHtml=`<div class="braincore-telemetry-row">`
+       +(bktPercent!==null?`<span class="braincore-pill mastery"><i data-lucide="gauge"></i> BKT ${bktPercent}%</span>`:'')
+       +(skillTitle?`<span class="braincore-pill target"><i data-lucide="crosshair"></i> ${esc(skillTitle)}</span>`:'')
+       +repeatBadge
+       +fsrsBadge
+       +`</div>`;
+   }
+   f.innerHTML=`<div class="feedback-title"><i data-lucide="${verdictIcon}"></i><b>${verdictTitle}</b></div>${telemetryRowHtml}<p>${ok?FiezelI18n.t('quiz.correct-answer',{answer:`<strong>${esc(cleanCorrect)}</strong>`}):`${FiezelI18n.t('quiz.jawabanmu')} ${userPickRender}${FiezelI18n.t('quiz.answer-paling-tepat-adalah')} ${correctPickRender}.`}</p>${pickedWhyFails?`<p class="feedback-your-pick"><strong>${FiezelI18n.t('quiz.mengapa-salah','Mengapa kurang tepat?')}</strong> ${esc(pickedWhyFails)}</p>`:''}${(q.type==='grammar'||q.type==='token-order'||q.type==='video-grammar')&&q.explain?.rule/* m025-375: alasan dan aturan grammar di dua baris, bukan satu paragraf panjang */?`<p><strong>${FiezelI18n.t('quiz.intinya')}</strong> ${esc(whyText)}</p><p class="feedback-rule feedback-rule-pill"><strong>${FiezelI18n.t('quiz.aturannya')}</strong> ${esc(q.explain.rule)}</p>`:`<p><strong>${FiezelI18n.t('quiz.intinya')}</strong> ${esc(whyText)} ${q.explain?.rule?esc(q.explain.rule):''}</p>`}<details class="acc"><summary>${FiezelI18n.t(q.explain?.distractors?'quiz.bandingkan-pilihan-lain':'quiz.pembahasan-lengkap')}</summary><p class="muted">${esc(q.explain?.distractor||FiezelI18n.t('quiz.fallback-unsupported'))} ${esc(q.explain?.avoid||FiezelI18n.t('quiz.fallback-hint-check'))}</p>${q.explain?.distractors?`<div class="distractor-breakdown">${q.explain.distractors.map(x=>`<p><b>${esc(x.option)}:</b> ${esc(x.reason)}</p>`).join('')}</div>`:''}</details><div class="feedback-memory-box memory-tip"><div class="feedback-memory-header"><i data-lucide="lightbulb"></i><span class="feedback-memory-kicker">${FiezelI18n.t('quiz.trik-ingat','Trik Cepat Ingat')}</span></div><div class="feedback-memory-content">${formatMemoryTipForDisplay(esc(q.explain?.memory||FiezelI18n.t('quiz.fallback-hint-connect')))}</div></div><button class="ai-btn" id="aiExplainBtn"><i data-lucide="sparkles"></i> ${FiezelI18n.t('quiz.jelaskan-dengan-cara-lebih-sederhana')}</button>`;
   speak(turn);
   answer.locked=true;
   $('quizNext').disabled=false;
@@ -13482,16 +13520,25 @@ function quizLoop(cfg){
      }
      let nudgeText='';
      const userChoice=q.options?.[j];
+     let rawReason='';
      if(Array.isArray(q.explain?.distractors)){
        const found=q.explain.distractors.find(x=>norm(String(x.option))===norm(String(userChoice)));
        if(found&&found.reason){
-         nudgeText=`Pilihan “${userChoice}” kurang tepat: ${found.reason}. Coba pilih opsi lainnya!`;
+         rawReason=found.reason;
        }
      }
-     if(!nudgeText&&userChoice){
+     if(!rawReason&&userChoice){
        const tutorWhy=tutorWhyFails(q, userChoice);
        if(tutorWhy){
-         nudgeText=`Pilihan “${userChoice}” kurang tepat: ${tutorWhy}. Coba pilih opsi lainnya!`;
+         rawReason=tutorWhy;
+       }
+     }
+     const cleanReason=String(rawReason||'').trim().replace(/\.+$/,'');
+     if(cleanReason){
+       if(answer.scaffold==='probe'){
+         nudgeText=`Perhatikan lagi: “${userChoice}” kurang pas di sini. ${cleanReason}. Coba telaah opsi yang tersisa!`;
+       }else{
+         nudgeText=`Pilihan “${userChoice}” kurang tepat: ${cleanReason}. Coba pilih opsi lainnya!`;
        }
      }
      if(!nudgeText){
