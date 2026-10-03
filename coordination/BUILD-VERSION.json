@@ -1,7 +1,7 @@
 {
-  "version": "m025-430",
+  "version": "m025-431",
   "claimedBy": "branch main",
-  "claimedAt": "2026-10-03T20:04:02.205Z",
-  "reason": "fix(quiz-ux): perbaiki alur salah pertama dengan scaffold nudge banner, active option glow, dan floating retry bar",
+  "claimedAt": "2026-10-03T20:20:44.337Z",
+  "reason": "fix(tutor-brain): align naskah contract assertions for breathe, compare, and headline",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

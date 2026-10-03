@@ -554,7 +554,7 @@
    */
   var NASKAH_ID = Object.freeze({
     'brain-tutor.concept-fallback': 'materi ini',
-    'brain-tutor.compare-direct': 'Yuk bandingkan: susunanmu "' + '{chosen}' + '" dengan bentuk yang tepat "' + '{right}' + '" ya.',
+    'brain-tutor.compare-direct': 'Yuk bandingkan: jawabanmu "' + '{chosen}' + '" dengan bentuk yang tepat "' + '{right}' + '" ya.',
     'brain-tutor.worked-step1': 'Langkah 1, kita pahami aturannya dulu: ' + '{rule}' + '.',
     'brain-tutor.worked-step2': 'Langkah 2, kita terapkan ke kalimatnya: "' + '{sentence}' + '".',
     'brain-tutor.worked-step3': 'Langkah 3, jadi bentuk yang paling pas: "' + '{answer}' + '".',
@@ -572,9 +572,9 @@
     'brain-tutor.move-celebrate': 'Nah, mantap! Jebakan yang tadi bikin kamu keliru sudah berhasil kamu lewati dengan pemahaman yang benar, bukan tebakan.',
     'brain-tutor.move-consolidate': 'Tepat sekali! Karena tadi sempat berpikir agak lama, kita mantapkan dulu di sini sebentar sebelum naik level ya.',
     'brain-tutor.move-stretch': 'Keren, jawabannya cepat dan tepat berturut-turut! Level ini sudah kamu kuasai, yuk kita coba tantangan yang sedikit lebih tinggi.',
-    'brain-tutor.move-breathe': 'Yuk istirahat sejenak! Kalau mulai lelah wajar kok kalau jawaban melambat. Istirahat dulu sebentar, nanti lanjut lagi biar otak segar.',
+    'brain-tutor.move-breathe': 'Yuk istirahat sejenak! Kalau pikiran mulai capek, wajar kok kalau jawaban melambat. Istirahat dulu sebentar, nanti lanjut lagi biar otak segar.',
     'brain-tutor.move-wrapup': 'Soalnya habis. Kita cukupkan sesi ini ya.',
-    'brain-tutor.headline-resolved': 'Sesi ini kamu berhasil menaklukkan ' + '{count}' + ' hal yang tadinya bikin keliru.',
+    'brain-tutor.headline-resolved': 'Sesi ini kamu berhasil lewati ' + '{count}' + ' hal yang tadinya bikin keliru.',
     'brain-tutor.headline-persistent': 'Ada ' + '{count}' + ' pola yang masih perlu kita asah lagi, tenang saja nanti kita kejar di sesi berikutnya ya.',
     'brain-tutor.headline-empty': 'Belum ada jawaban di sesi ini.',
     'brain-tutor.headline-clean': 'Luar biasa! Sesi ini bersih tanpa ada pola salah yang berulang.'
