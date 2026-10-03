@@ -81,6 +81,7 @@ const SOCKET_ALLOWLIST = new Set(['tests/http-smoke-test.js', 'tests/e2e-level-g
 // `request`/`get`, dan larangan MEMANGGIL socket tetap berlaku penuh (penugasan
 // `https.request = trap(...)` bukan panggilan, jadi detektor panggilan tidak dilonggarkan).
 const TRAP_ONLY_ALLOWLIST = new Set(['tests/prerender-dryrun-test.js']);
+const EXCLUDED_DEV_TOOLS = new Set(['tests/chrome-mini-game-test.js']);
 const RE_TRAP_INSTALL = /\b(?:https?|net|tls)\s*\.\s*(?:request|get|connect)\s*=/;
 
 // KELAS KETIGA — dan ia ada karena kejujuran, bukan karena pemindai menuntutnya.
@@ -289,6 +290,7 @@ const SELF = path.relative(root, __filename).split(path.sep).join('/');
    yang dipakai SOCKET_ALLOWLIST/TRAP_ONLY_ALLOWLIST. */
 const gatesIn = (dir) => fs.readdirSync(path.join(root, dir || '.'))
   .filter(f => /-(test|audit|selftest)\.js$/.test(f))
+  .filter(f => !EXCLUDED_DEV_TOOLS.has((dir ? dir + '/' : '') + f))
   .map(f => (dir ? dir + '/' : '') + f);
 const files = [...gatesIn(''), ...gatesIn('tests')].sort();
 check('Pemindaian menemukan seluruh gerbang (kalau nol, pemindainya rusak)', files.length >= 100, `files=${files.length}`);

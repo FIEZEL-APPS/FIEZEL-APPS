@@ -1,7 +1,7 @@
 {
-  "version": "m025-418",
+  "version": "m025-419",
   "claimedBy": "branch main",
-  "claimedAt": "2026-10-03T17:00:50.092Z",
-  "reason": "fix(grammar): align error icon to lucide subset circle-x",
+  "claimedAt": "2026-10-03T17:12:11.356Z",
+  "reason": "fix(tests): exempt interactive chrome mini game test in no network scanner",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
