@@ -12,7 +12,7 @@
  *   6. mastery -> intervention fades and challenge increases (mastery_milestone -> CELEBRATING, avoidConcept)
  *   7. identical event stream -> identical Braincore result (replay determinism)
  *   8. offline execution -> core loop still works (zero network dependencies)
- *   9. decision -> evidence trace (tamper-evident 64-bit cryptographic chaining & verifyLedger)
+ *   9. decision -> evidence trace (tamper-evident 64-bit deterministic hash chaining & verifyLedger)
  *  10. evidence -> subsequent Braincore behavior (evidence raises ability; same 0.80 target picks a harder next item)
  */
 'use strict';
@@ -433,7 +433,7 @@ test('Invariant 8 · Offline execution -> Core loop works 100% locally with zero
 // -------------------------------------------------------------------------
 // Invariant 9: Decision -> Evidence Trace (Tamper-Evident Ledger Integrity)
 // -------------------------------------------------------------------------
-test('Invariant 9 · Decision -> Evidence trace (cryptographic chain & tamper detection)', () => {
+test('Invariant 9 · Decision -> Evidence trace (tamper-evident hash chain & tamper detection)', () => {
   decisionTrace.clear();
 
   const d1 = decisionTrace.recordDecision({ action: 'a1', targetSkill: 's1', targetDifficulty: 2.0, nowMs: 1710000200000 });

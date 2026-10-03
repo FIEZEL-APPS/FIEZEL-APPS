@@ -350,9 +350,9 @@ test('Scenario I · Kesiapan agregasi diagnostik: rekapitulasi keputusan tanpa k
 });
 
 // =========================================================================
-// Scenario J: Cryptographic Tamper-Evident Hash Chain Verification
+// Scenario J: Deterministic Tamper-Evident Hash Chain Verification (FNV-1a)
 // =========================================================================
-test('Scenario J · Rantai hash kriptografis anti-rusak (tamper-evident): verifikasi integritas & deteksi manipulasi data', () => {
+test('Scenario J · Rantai hash deterministik anti-rusak (tamper-evident FNV-1a): verifikasi integritas & deteksi manipulasi data', () => {
   decisionTrace.clear();
 
   // Buat 4 keputusan berturut-turut
@@ -378,7 +378,7 @@ test('Scenario J · Rantai hash kriptografis anti-rusak (tamper-evident): verifi
     window.localStorage.setItem(decisionTrace.STORAGE_KEY, JSON.stringify(store));
   }
 
-  // Verifikasi bahwa auditor kriptografis langsung menangkap kecurangan
+  // Verifikasi bahwa auditor hash chain deterministik langsung menangkap kecurangan
   // Pada environment Node tanpa localStorage, memoryBuffer diuji
   const checkTamper = decisionTrace.verifyLedger();
   // Catatan: Jika memoryBuffer store dirubah langsung by reference

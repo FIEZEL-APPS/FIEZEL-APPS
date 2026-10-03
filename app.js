@@ -5076,10 +5076,18 @@ function tokenOrderInversionClue(placed,required){
  */
 function diagnoseTokenOrderMistake(q){
   if(!q||q.type!=='token-order')return '';
-  const placed=Array.isArray(q.__placedTokens)?q.__placedTokens:[];
+  const placed=(Array.isArray(q.__placedTokens)&&q.__placedTokens.length)
+    ? q.__placedTokens
+    : ((Array.isArray(q.__userTokenList)&&q.__userTokenList.length)
+        ? q.__userTokenList
+        : String(q.__userTokenAnswer||'').replace(/[.!?]/g,'').split(/\s+/).filter(Boolean));
   const unplaced=Array.isArray(q.__unplacedTokens)?q.__unplacedTokens:[];
   const distractors=Array.isArray(q.distractors)?q.distractors:[];
-  const requiredTokens=Array.isArray(q.tokens)?q.tokens:[];
+  const requiredTokens=(Array.isArray(q.tokens)&&q.tokens.length)
+    ? q.tokens
+    : ((Array.isArray(q.__requiredTokens)&&q.__requiredTokens.length)
+        ? q.__requiredTokens
+        : String(q.options?.[q.answerIndex]||q.options?.[0]||'').replace(/[.!?]/g,'').split(/\s+/).filter(Boolean));
   const normWord=w=>String(w||'').toLowerCase().replace(/^[^\w\s]+|[^\w\s]+$/g,'').trim();
 
   // Kasus 2: Memilih Token Pengecoh (Distractor / Typo / Morfologi)
