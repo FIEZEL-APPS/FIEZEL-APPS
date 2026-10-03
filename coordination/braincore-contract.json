@@ -1,0 +1,86 @@
+{
+  "$schema": "https://fiezel.my.id/schemas/braincore-contract-v1.json",
+  "version": "1.0.0",
+  "title": "FIEZEL Braincore Canonical Contract & Parameter Registry",
+  "description": "Single Source of Truth yang mendefinisikan parameter matematika, semantik model, formula retensi/decay, dan aturan rekonsiliasi lintas client-server.",
+  "namespaces": {
+    "lesson_mastery": {
+      "scope": "client_offline",
+      "target_entity": "lesson",
+      "bkt_params": {
+        "L0": 0.20,
+        "T": 0.15,
+        "slip": 0.10,
+        "guess": 0.25
+      },
+      "gate": {
+        "mastery_threshold": 0.95,
+        "min_observations": 5,
+        "zpd_window": {
+          "lo": 0.55,
+          "hi": 0.90
+        }
+      },
+      "decay": {
+        "model": "exponential_half_life",
+        "half_life_days": 30.0,
+        "tau_days": 43.28085,
+        "formula": "L(t) = L0 + (L_prev - L0) * exp(-dt / tau)",
+        "half_life_formula": "L(t) = L0 + (L_prev - L0) * 2^(-dt / half_life_days)"
+      },
+      "retrievability": {
+        "formula": "R(t) = 2^(-dt / half_life_days)"
+      },
+      "rationale": "Evaluasi tingkat mikro luring pada unit lesson untuk membuka frontier ZPD sebelum materi berikutnya dapat diakses murid."
+    },
+    "competency_mastery": {
+      "scope": "server_authoritative",
+      "target_entity": "competency",
+      "bkt_params": {
+        "p_init": 0.25,
+        "p_learn": 0.18,
+        "p_slip": 0.10,
+        "p_guess": 0.20
+      },
+      "gate": {
+        "mastery_threshold": 0.80,
+        "developing_threshold": 0.60,
+        "min_correct_for_mastery": 3,
+        "retention_days": 3
+      },
+      "irt_3pl": {
+        "discrimination": 1.5,
+        "guess_floor": 0.25,
+        "target_success": 0.80,
+        "theta_scale": "1.0 + 4.0 * max(0.0, min(1.0, p))"
+      },
+      "decay": {
+        "model": "exponential_half_life",
+        "half_life_days": 30.0,
+        "tau_days": 43.28085,
+        "formula": "p(t) = p_init + (p_prev - p_init) * exp(-dt / tau)"
+      },
+      "retrievability": {
+        "model": "exponential_half_life",
+        "formula": "R(t) = 2^(-dt / stability_days)"
+      },
+      "rationale": "Evaluasi tingkat makro agregat di server atas node kompetensi kurikulum untuk matriks coverage, pengelompokan dinamis, dan rekomendasi guru."
+    }
+  },
+  "metrics_semantics": {
+    "mean_mastery_probability": "Rata-rata probabilitas posterior mastery di seluruh siswa yang terdaftar/terekspos (0.00 .. 1.00)",
+    "students_mastered_pct": "Persentase siswa yang benar-benar telah mencapai state MASTERED (0.0% .. 100.0%)",
+    "students_not_mastered_pct": "Persentase siswa terekspos yang belum mencapai state MASTERED (0.0% .. 100.0%)",
+    "mastery_pct_legacy_alias": "Nilai legacy 0..100 yang memetakan ke mean_mastery_probability * 100 untuk kompatibilitas ke belakang"
+  },
+  "privacy_and_cohort": {
+    "min_cohort": 5,
+    "suppress_on_small_cohort": true,
+    "rule": "Agregat kelas di bawah 5 murid wajib ditahan atau disamarkan untuk mencegah kebocoran data individual."
+  },
+  "integrity_and_tamper": {
+    "algorithm": "FNV-1a 32-bit + fmix32 ganda (64-bit hex)",
+    "classification": "deterministic_tamper_evident_hash_chain",
+    "security_warning": "Bukan hash kriptografis tahan tabrakan (non-cryptographic). Ditujukan eksklusif untuk determinisme, replay audit, dan deteksi tampering kasual di perangkat."
+  }
+}

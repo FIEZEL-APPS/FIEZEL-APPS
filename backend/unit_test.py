@@ -24,13 +24,23 @@ import db as db_module
 class _MockCollection:
     def __init__(self, name=""):
         self.name = name
-    async def find_one(self, *args, **kwargs):
+        self._docs = {}
+    async def find_one(self, filter_dict=None, *args, **kwargs):
         if self.name == "curriculum_nodes":
             return {"id": "TP-MAT-D-7-BIL-01", "code": "BIL-01", "name": "Bilangan"}
+        if filter_dict:
+            key = (filter_dict.get("student_id"), filter_dict.get("competency_id"))
+            if key in self._docs:
+                return dict(self._docs[key])
         return None
     async def count_documents(self, *args, **kwargs):
         return 10
-    async def update_one(self, *args, **kwargs):
+    async def update_one(self, filter_dict=None, update_dict=None, upsert=False, *args, **kwargs):
+        if filter_dict and update_dict and "$set" in update_dict:
+            key = (filter_dict.get("student_id"), filter_dict.get("competency_id"))
+            doc = dict(self._docs.get(key, {}))
+            doc.update(update_dict["$set"])
+            self._docs[key] = doc
         return None
     def find(self, *args, **kwargs):
         return self
@@ -43,15 +53,20 @@ class _MockCollection:
                  "is_current": True} for i in range(10)]
 
 class _MockDB:
+    def __init__(self):
+        self._collections = {}
     def __getattr__(self, name):
-        return _MockCollection(name)
+        if name not in self._collections:
+            self._collections[name] = _MockCollection(name)
+        return self._collections[name]
 
-db_module.db = _MockDB()
+db_mock = _MockDB()
+db_module.db = db_mock
 import questions
-questions.db = db_module.db
+questions.db = db_mock
 import assessment
-assessment.db = db_module.db
-bc.db = db_module.db
+assessment.db = db_mock
+bc.db = db_mock
 
 ok, fail = 0, 0
 
@@ -317,6 +332,26 @@ async def test_state_sync():
     saved_state = await bc.get_state("STUDENT-1", "COMP-FAKE-01")
     check("sync_state menolak klaim p_mastery palsu tanpa bukti", saved_state["p_mastery"] <= 0.25)
     check("sync_state tidak menandai MASTERED untuk klaim palsu", saved_state["state"] != "MASTERED")
+
+    # Anti-tamper sejati (regresi FATAL #3): klien mengaku 100 percobaan BENAR sekaligus.
+    # Tanpa pagar delta_correct + SYNC_P_CEILING, replay BKT 100 langkah benar tembus MASTERED.
+    payload_brute = StateSyncIn(
+        competencies=[
+            CompetencySyncIn(
+                competency_id="COMP-BRUTE-01",
+                p_mastery=0.99,
+                attempts=100,
+                correct=100,
+                streak=100,
+                stability_days=10.0
+            )
+        ]
+    )
+    await sync_state(payload_brute, u=user)
+    brute_state = await bc.get_state("STUDENT-1", "COMP-BRUTE-01")
+    check("sync_state menolak spoof 100 attempted correct", brute_state["p_mastery"] < bc.MASTERY_T)
+    check("sync_state tidak MASTERED dari klaim 100 benar", brute_state["state"] not in bc.MASTERED_STATES)
+    check("sync_state menandai state sinkron butuh konfirmasi", brute_state.get("sync_pending_confirmation") is True)
 
 
 async def test_empty_competency_ids():

@@ -1,25 +1,25 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-10-03T18:28:53.678Z",
+  "generatedAt": "2026-10-03T20:10:25.905Z",
   "files": {
     "app.js": {
       "leaks": 4,
       "budget": 4,
       "sample": [
         {
-          "line": 9318,
+          "line": 9345,
           "text": "Selesaikan ritme hari ini"
         },
         {
-          "line": 10154,
+          "line": 10181,
           "text": "— Penugasan latihan dan pemantauan capaian murid."
         },
         {
-          "line": 10767,
+          "line": 10794,
           "text": "Nama kriteria: n/4 - satu kalimat alasan yang menunjuk bukti di tulisannya"
         },
         {
-          "line": 16742,
+          "line": 16822,
           "text": "Latihan"
         }
       ]
@@ -68,15 +68,15 @@
       "sample": [
         {
           "line": 564,
-          "text": "Belum tepat, dan itu wajar di bagian ini."
+          "text": "Belum tepat nih, tapi wajar kok, bagian ini memang sering bikin terkecoh."
         },
         {
           "line": 567,
-          "text": ". Sekarang coba lagi."
+          "text": ". Sekarang coba lagi yuk."
         },
         {
-          "line": 569,
-          "text": "Petunjuknya ada di kata yang menunjukkan kapan kejadiannya. Coba lagi."
+          "line": 568,
+          "text": ". Sekarang coba jawab lagi ya."
         },
         {
           "line": 579,
@@ -472,8 +472,8 @@
     }
   },
   "copyKeys": {
-    "id": 3460,
-    "th": 3462,
+    "id": 3465,
+    "th": 3467,
     "idTanpaTh": 0
   },
   "pass": true

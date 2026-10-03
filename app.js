@@ -5041,7 +5041,7 @@ function tokenOrderInversionClue(placed,required){
   const p=placedRaw.map(norm).filter(Boolean),r=requiredRaw.map(norm).filter(Boolean);
   if(p.length<2||r.length!==p.length)return '';
   // Seluruh kata sudah ada; ini murni permutasi. Bila bukan permutasi, pola urutan tidak bisa
-  // disebut dengan yakin - biarkan pemanggil memakai kalimat umum.
+  // disebut dengan yakin; biarkan pemanggil memakai kalimat umum.
   const pSorted=[...p].sort(),rSorted=[...r].sort();
   if(pSorted.some((w,i)=>w!==rSorted[i]))return '';
   const AUX='am is are was were be been being do does did has have had will would shall should can could may might must'.split(' ');
@@ -5049,20 +5049,31 @@ function tokenOrderInversionClue(placed,required){
   const pAux=p.findIndex(w=>AUX.includes(w)),rAux=r.findIndex(w=>AUX.includes(w));
   const pSubj=p.findIndex(w=>SUBJ.includes(w)),rSubj=r.findIndex(w=>SUBJ.includes(w));
   const pNot=p.indexOf('not'),rNot=r.indexOf('not');
-  // (a) Kata kerja bantu mendahului subjek. Kalimat berita Inggris menaruh subjek lebih dulu;
-  //     kalau murid membaliknya, ia sedang memakai pola tanya.
+  const isThai=typeof FiezelI18n!=='undefined'&&FiezelI18n.getLocale()==='th';
+
+  // (a) Kata kerja bantu mendahului subjek.
   if(pAux>=0&&pSubj>=0&&pAux<pSubj&&rSubj>=0&&rAux>=0&&rSubj<rAux){
-    return `Urutan subjek dan kata kerjanya terbalik: “${requiredRaw[rSubj]}” seharusnya datang sebelum “${requiredRaw[rAux]}”.`;
+    if(isThai){
+      return `สลับประธานกับกริยาช่วยอยู่นะจ๊ะ ต้องวาง “${requiredRaw[rSubj]}” ก่อน “${requiredRaw[rAux]}” นะ`;
+    }
+    return `Urutan subjek dan kata kerjanya terbalik nih, kata “${requiredRaw[rSubj]}” dulu baru “${requiredRaw[rAux]}” ya.`;
   }
   // (b) "not" menempel di sisi yang salah dari kata kerja bantu.
   if(pNot>=0&&rNot>=0&&pNot!==rNot&&rAux>=0&&rSubj>=0&&rSubj<rAux&&rNot===rAux+1){
-    return `Kata “not” seharusnya menempel setelah “${requiredRaw[rAux]}”, bukan di tempat lain.`;
+    if(isThai){
+      return `คำว่า “not” ต้องวางต่อท้าย “${requiredRaw[rAux]}” พอดีนะจ๊ะ`;
+    }
+    return `Kata “not” harusnya menempel pas setelah “${requiredRaw[rAux]}”, bukan di posisi lain ya.`;
   }
-  // (c) Kata pertama yang berbeda posisi - selalu benar, tidak pernah menuduh pola yang salah.
+  // (c) Kata pertama yang berbeda posisi.
   const i=p.findIndex((w,k)=>w!==r[k]);
   if(i>=0){
+    if(isThai){
+      const afterTh=i>0?`ต่อจาก “${requiredRaw.slice(0,i).join(' ')}” `:``;
+      return `เรียงคำยังไม่ถูกนะ ${afterTh}ตรงนี้ต้องเป็น “${requiredRaw[i]}” ก่อน ไม่ใช่ “${placedRaw[i]}” จ้ะ`;
+    }
     const after=i>0?`setelah “${requiredRaw.slice(0,i).join(' ')}”, kamu menaruh “`:`kamu menaruh “`;
-    return `Urutan katanya belum tepat: ${after}${placedRaw[i]}”, padahal di posisi itu seharusnya “${requiredRaw[i]}”.`;
+    return `Urutan katanya belum tepat nih: ${after}${placedRaw[i]}”, padahal di posisi itu seharusnya “${requiredRaw[i]}” dulu ya.`;
   }
   return '';
 }
@@ -5071,11 +5082,11 @@ function tokenOrderInversionClue(placed,required){
  *
  * Alasan per-pilihan selalu dibuka dengan pilihannya sendiri di dalam tanda kutip. Pada varian
  * metakognitif pilihan itu adalah kalimat Inggris mentah dari bank soal, jadi bagian kutipannya
- * dibuang lebih dulu - yang tersisa adalah diagnosis Indonesianya, dan itulah yang perlu
- * didengar murid.
+ * dibuang lebih dulu. Yang tersisa adalah diagnosis ramah yang didengar murid.
  */
 function diagnoseTokenOrderMistake(q){
   if(!q||q.type!=='token-order')return '';
+  const isThai=typeof FiezelI18n!=='undefined'&&FiezelI18n.getLocale()==='th';
   const placed=(Array.isArray(q.__placedTokens)&&q.__placedTokens.length)
     ? q.__placedTokens
     : ((Array.isArray(q.__userTokenList)&&q.__userTokenList.length)
@@ -5095,13 +5106,19 @@ function diagnoseTokenOrderMistake(q){
   if(chosenDistractor){
     const distInfo=(q.explain?.distractors||[]).find(d=>normWord(d.option)===normWord(chosenDistractor));
     let reason=String(distInfo?.whyFailsId||distInfo?.whyFails||distInfo?.reason||'').trim();
+    if(isThai){
+      if(reason){
+        return `คำว่า “${chosenDistractor}” ยังไม่ค่อยเข้ากับประโยคนี้นะ: ${reason}`;
+      }
+      return `คำว่า “${chosenDistractor}” ยังไม่ใช่ตัวเลือกที่ถูกสำหรับประโยคนี้จ้ะ`;
+    }
     if(reason){
       if(/^kata\s+/i.test(reason)){
         return reason;
       }
-      return `Kata “${chosenDistractor}” kurang tepat: ${reason}`;
+      return `Kata “${chosenDistractor}” kurang pas di sini ya: ${reason}`;
     }
-    return `Kata “${chosenDistractor}” bukan pilihan yang tepat untuk kalimat ini.`;
+    return `Kata “${chosenDistractor}” bukan pasangan yang tepat untuk kalimat ini nih.`;
   }
 
   // Kasus 1: Token Belum Lengkap (Incomplete)
@@ -5121,21 +5138,31 @@ function diagnoseTokenOrderMistake(q){
     const missingList=missingRequired.length>0
       ? missingRequired.join(', ')
       : unplaced.filter(u=>!distractors.some(d=>normWord(d)===normWord(u))).join(', ');
-    if(missingList){
-      return `Kalimatmu belum selesai disusun. Masih ada kata yang belum dimasukkan: ${missingList}.`;
+    if(isThai){
+      if(missingList){
+        return `ยังเรียงประโยคไม่ครบนะจ๊ะ ยังขาดคำว่า: ${missingList}`;
+      }
+      return 'ยังเรียงประโยคไม่ครบนะ ยังมีคำที่ยังไม่ได้ใส่อยู่จ้ะ';
     }
-    return 'Kalimatmu belum selesai disusun. Masih ada kata yang belum dimasukkan.';
+    if(missingList){
+      return `Susunan kalimatmu masih kurang kata nih. Yuk lengkapi kata: ${missingList}.`;
+    }
+    return 'Susunan kalimatmu masih kurang kata nih, masih ada yang belum dimasukkan.';
   }
 
   // Kasus 3: Salah Urutan Kata (Word-Order Inversion)
   const correctSentence=(q.options&&q.options[q.answerIndex])||requiredTokens.join(' ');
   const inversion=tokenOrderInversionClue(placed,requiredTokens);
   if(inversion){
-    const polaHint=q.explain?.rule?` Pola yang tepat: ${q.explain.rule}`:'';
+    const polaHint=q.explain?.rule?(isThai?` รูปแบบที่ถูกต้องคือ: ${q.explain.rule}`:` Pola yang pas: ${q.explain.rule}`):'';
     return `${inversion}${polaHint}`;
   }
-  const patternHint=q.explain?.rule?` Perhatikan pola: ${q.explain.rule}`:` Perhatikan susunan kalimat yang tepat.`;
-  return `Urutan kata belum tepat.${patternHint}`;
+  if(isThai){
+    const patternHint=q.explain?.rule?` ลองสังเกตรูปแบบนี้นะ: ${q.explain.rule}`:` สังเกตการเรียงประโยคที่ถูกต้องดูนะ`;
+    return `เรียงลำดับคำยังไม่ถูกจ้ะ${patternHint}`;
+  }
+  const patternHint=q.explain?.rule?` Coba perhatikan polanya ya: ${q.explain.rule}`:` Perhatikan susunan kalimat yang pas ya.`;
+  return `Urutan katanya belum tepat nih.${patternHint}`;
 }
 
 function tutorWhyFails(q,chosen){
@@ -12974,6 +13001,8 @@ function quizLoop(cfg){
      Semua id (quizExit/quizNext/quizListen/quizListenNote/quizStem/options/feedback/tutorTurn)
      dan literal quiz-shell/quiz-mascot TETAP — kontrak r2/paw/lesson-experience. */
   $('quizFloatingBar')?.remove();
+  document.getElementById('quizScaffoldNudge')?.remove();
+  document.querySelectorAll('.option.retry-available').forEach(b=>b.classList.remove('retry-available'));
   /* P1-1 (audit UX 2026-10): milestone penyemangat di tengah jalan pada sesi panjang (>=10 soal). */
   if(!MEASURE&&planned>=10&&asked===Math.floor(planned/2)&&asked>0&&!cfg.__halfwayNotified){
     cfg.__halfwayNotified=true;
@@ -13181,7 +13210,10 @@ function quizLoop(cfg){
   // jawaban bisa muncul di luar viewport dan murid tidak tahu tutor sedang bicara. Scroll
   // hanya pada giliran retry (saat tutor benar-benar menahan); gerak halus dihormati lewat
   // gerbang ganda prefers-reduced-motion + preferensi app (pola yang sama dengan quizLoop).
-  if(retry)try{host.scrollIntoView({block:'nearest',behavior:(prefersReducedMotion()||state.preferences?.motion===false)?'auto':'smooth'})}catch{}
+  if(retry)try{
+   const scrollTarget=document.getElementById('quizScaffoldNudge')||host;
+   scrollTarget.scrollIntoView({block:'nearest',behavior:(prefersReducedMotion()||state.preferences?.motion===false)?'auto':'smooth'});
+  }catch{}
   enhanceUI();
  };
 
@@ -13202,6 +13234,29 @@ function quizLoop(cfg){
     };
    }
    bar.classList.add('is-visible');
+   enhanceUI();
+  };
+
+  const showQuizFloatingRetry=(questionObj,lastPickIndex)=>{
+   let bar=$('quizFloatingBar');
+   if(bar)bar.remove();
+   bar=document.createElement('div');
+   bar.id='quizFloatingBar';
+   bar.className='quiz-floating-bar is-visible';
+   const isToken=questionObj?.type==='token-order';
+   const barLabel=isToken
+    ? FiezelI18n.t('quiz.retry-floating-token-label','Periksa susunan katamu yuk')
+    : FiezelI18n.t('quiz.retry-floating-label','Pilih jawaban lain yuk');
+   const giveupLabel=FiezelI18n.t('quiz.retry-giveup-btn','Buka Pembahasan');
+   bar.innerHTML=`<div class="quiz-floating-retry"><span class="retry-bar-label"><i data-lucide="rotate-ccw"></i> <span>${esc(barLabel)}</span></span><button type="button" id="quizRetryGiveUp" class="retry-giveup-btn">${esc(giveupLabel)}</button></div>`;
+   (document.querySelector('.quiz-shell')||document.body).appendChild(bar);
+   bar.querySelector('#quizRetryGiveUp').onclick=()=>{
+    haptic('tap');
+    bar.remove();
+    document.getElementById('quizScaffoldNudge')?.remove();
+    document.querySelectorAll('.option.retry-available').forEach(b=>b.classList.remove('retry-available'));
+    reveal(questionObj,lastPickIndex,false,{forced:true});
+   };
    enhanceUI();
   };
 
@@ -13294,6 +13349,8 @@ function quizLoop(cfg){
  /** Membuka jawaban dan seluruh penjelasannya. Jalur akhir untuk satu soal. */
  const reveal=(q,j,ok,{forced=false}={})=>{
   q.__diagnosticClue='';
+  document.getElementById('quizScaffoldNudge')?.remove();
+  document.querySelectorAll('.option.retry-available').forEach(b=>b.classList.remove('retry-available'));
   $('tutorTurn')?.classList.add('hidden');
   document.querySelectorAll('.option').forEach(b=>b.disabled=true);
   /* W1 P1-1: di mode ukur TIDAK ADA yang dibuka — tidak ada sorotan kunci, tidak ada
@@ -13460,6 +13517,9 @@ function quizLoop(cfg){
 
  function answer(q,j,button){
   if(answer.locked)return;
+  document.getElementById('quizScaffoldNudge')?.remove();
+  document.querySelectorAll('.option.retry-available').forEach(b=>b.classList.remove('retry-available'));
+  if($('quizFloatingBar')?.querySelector('.quiz-floating-retry'))$('quizFloatingBar')?.remove();
   const ok=j===q.answerIndex,ms=Date.now()-start,firstTry=answer.retryOf!==q.id;
   answer.lastPick=j;
   /* W1 P1-1: mode ukur menandai pilihan secara NETRAL (tanpa warna vonis) dan berbunyi
@@ -13601,6 +13661,7 @@ function quizLoop(cfg){
    q.__scaffoldAttempt=1;
 
    document.getElementById('quizScaffoldNudge')?.remove();
+   document.querySelectorAll('.option.retry-available').forEach(b=>b.classList.remove('retry-available'));
 
    if(q.type==='token-order'){
      const submitBtn=button;
@@ -13646,16 +13707,35 @@ function quizLoop(cfg){
      const cleanReason=String(rawReason||'').trim().replace(/\.+$/,'');
      if(cleanReason){
        if(answer.scaffold==='probe'){
-         nudgeText=`Perhatikan lagi: “${userChoice}” kurang pas di sini. ${cleanReason}. Coba telaah opsi yang tersisa!`;
+         nudgeText=`Perhatikan lagi: “${userChoice}” kurang pas di sini. ${cleanReason}. Coba telaah opsi yang tersisa ya!`;
        }else{
-         nudgeText=`Pilihan “${userChoice}” kurang tepat: ${cleanReason}. Coba pilih opsi lainnya!`;
+         nudgeText=`Pilihan “${userChoice}” kurang tepat: ${cleanReason}. Coba pilih opsi lainnya ya!`;
        }
      }
      if(!nudgeText){
-       nudgeText=FiezelI18n.t('quiz.coba-lagi-pilih-jawaban-lain','Coba lagi — periksa petunjuk dan pilih jawaban lain');
+       nudgeText=FiezelI18n.t('quiz.coba-lagi-pilih-jawaban-lain','Coba lagi yuk, periksa petunjuk dan pilih jawaban lain');
      }
      q.__diagnosticClue=nudgeText;
+
+     document.querySelectorAll('.option:not(.was-tried):not(:disabled)').forEach(opt=>{
+       opt.classList.add('retry-available');
+     });
    }
+
+   const nudgeEl=document.createElement('div');
+   nudgeEl.id='quizScaffoldNudge';
+   nudgeEl.className='scaffold-nudge';
+   const isToken=q.type==='token-order';
+   const bannerText=isToken
+     ? FiezelI18n.t('quiz.scaffold-retry-token-banner','Belum tepat, tapi kamu masih punya satu kesempatan lagi nih! Coba susun ulang lalu periksa lagi yuk')
+     : FiezelI18n.t('quiz.scaffold-retry-banner','Belum tepat, tapi kamu masih punya satu kesempatan lagi nih! Coba cek petunjuk lalu pilih jawaban lain yuk');
+   nudgeEl.innerHTML=`<i data-lucide="rotate-ccw"></i><span>${esc(bannerText)}</span>`;
+   const optContainer=$('options')||document.querySelector('.token-rail')||document.querySelector('.quiz-token-container');
+   if(optContainer&&optContainer.parentNode){
+     optContainer.parentNode.insertBefore(nudgeEl,optContainer);
+   }
+
+   showQuizFloatingRetry(q,j);
 
    speak(tutorCompose(q,j,false,answer.scaffold,answer.move,answer.timing),{retry:true});
    setTimeout(()=>{try{pawReact('hint')}catch(_){}},1100);

@@ -239,30 +239,30 @@
 
     // ---------- brain-tutor.* ----------
     'brain-tutor.concept-fallback': 'materi ini',
-    'brain-tutor.compare-direct': 'Bandingkan langsung: jawabanmu "' + '{chosen}' + '" vs bentuk benar "' + '{right}' + '"',
-    'brain-tutor.worked-step1': 'Langkah 1 - pegang aturannya: ' + '{rule}' + '.',
-    'brain-tutor.worked-step2': 'Langkah 2 - terapkan ke kalimatnya: "' + '{sentence}' + '".',
-    'brain-tutor.worked-step3': 'Langkah 3 - jadi bentuk yang dipakai: "' + '{answer}' + '".',
-    'brain-tutor.worked-fallback': 'Inti ' + '{concept}' + ': ikuti bentuk yang diminta konteksnya.',
-    'brain-tutor.timing-guess': 'Tadi cepat sekali jawabnya. Coba baca ulang kalimatnya pelan-pelan dulu ya - separuh soal ini dimenangkan di bacaannya, bukan di pilihannya.',
-    'brain-tutor.why-fails': 'Ini yang bikin pilihan tadi gagal - ' + '{why}' + '.',
-    'brain-tutor.not-yet': 'Belum tepat, dan itu wajar di bagian ini.',
-    'brain-tutor.probe-rotated': '{rotated}' + '. Coba pikirkan lagi dari situ.',
-    'brain-tutor.probe-default': 'Sebelum lihat pilihannya lagi - petunjuk waktu di kalimat itu yang mana?',
-    'brain-tutor.hint-rotated': 'Cara lain melihatnya: ' + '{rotated}' + '. Sekarang coba lagi.',
-    'brain-tutor.hint-cue': 'Pegangan singkatnya: ' + '{cue}' + '. Sekarang coba lagi.',
-    'brain-tutor.hint-default': 'Petunjuknya ada di kata yang menunjukkan kapan kejadiannya. Coba lagi.',
-    'brain-tutor.worked-intro': ' Aku kerjakan satu yang mirip dulu ya, biar kelihatan langkahnya.',
-    'brain-tutor.reveal-intro': ' Oke, aku buka sekarang.',
-    'brain-tutor.move-celebrate': 'Nah, itu dia. Yang tadi bikin kamu keliru, barusan kamu lewati. Pertahankan cara mikirnya.',
-    'brain-tutor.move-consolidate': 'Benar. Tapi tadi kamu perlu waktu lumayan, jadi kita mantapkan dulu di sini sebentar sebelum naik.',
-    'brain-tutor.move-stretch': 'Beruntun dan cepat. Ini sudah di bawah kemampuanmu sekarang - aku naikkan sedikit.',
-    'brain-tutor.move-breathe': 'Kita berhenti di sini dulu. Jawabanmu mulai melambat dan mulai meleset bareng, dan itu tanda capek, bukan tanda kamu tidak bisa. Lanjut nanti hasilnya jauh lebih nempel.',
-    'brain-tutor.move-wrapup': 'Soalnya habis. Kita tutup sesi ini.',
-    'brain-tutor.headline-resolved': 'Sesi ini kamu benar-benar melewati ' + '{count}' + ' hal yang tadinya bikin keliru.',
-    'brain-tutor.headline-persistent': 'Ada ' + '{count}' + ' pola yang masih mengganjal - itu yang kita kejar sesi berikutnya.',
+    'brain-tutor.compare-direct': 'Yuk bandingkan: susunanmu "' + '{chosen}' + '" dengan bentuk yang tepat "' + '{right}' + '" ya.',
+    'brain-tutor.worked-step1': 'Langkah 1, kita pahami aturannya dulu: ' + '{rule}' + '.',
+    'brain-tutor.worked-step2': 'Langkah 2, kita terapkan ke kalimatnya: "' + '{sentence}' + '".',
+    'brain-tutor.worked-step3': 'Langkah 3, jadi bentuk yang paling pas: "' + '{answer}' + '".',
+    'brain-tutor.worked-fallback': 'Kuncinya pada ' + '{concept}' + ': ikuti bentuk yang diminta konteks kalimatnya ya.',
+    'brain-tutor.timing-guess': 'Tadi cepat banget jawabnya! Coba baca ulang kalimatnya pelan-pelan ya, kuncinya ada di bacaannya bukan di pilihan jawabannya.',
+    'brain-tutor.why-fails': 'Pilihan tadi kurang pas karena ' + '{why}' + '.',
+    'brain-tutor.not-yet': 'Belum tepat nih, tapi wajar kok, bagian ini memang sering bikin terkecoh.',
+    'brain-tutor.probe-rotated': '{rotated}' + '. Coba renungkan lagi dari petunjuk ini ya.',
+    'brain-tutor.probe-default': 'Sebelum lihat pilihannya lagi, coba cek mana kata penunjuk waktu di kalimat itu?',
+    'brain-tutor.hint-rotated': 'Coba lihat dari sudut ini: ' + '{rotated}' + '. Sekarang coba lagi yuk.',
+    'brain-tutor.hint-cue': 'Kunci ingatannya: ' + '{cue}' + '. Sekarang coba jawab lagi ya.',
+    'brain-tutor.hint-default': 'Petunjuknya ada di kata yang menunjukkan kapan kejadiannya. Yuk coba lagi.',
+    'brain-tutor.worked-intro': ' Aku contohkan satu yang mirip dulu ya, biar makin jelas langkahnya.',
+    'brain-tutor.reveal-intro': ' Oke, aku buka pembahasannya ya.',
+    'brain-tutor.move-celebrate': 'Nah, mantap! Jebakan yang tadi bikin kamu keliru sudah berhasil kamu lewati dengan pemahaman yang benar, bukan tebakan.',
+    'brain-tutor.move-consolidate': 'Tepat sekali! Karena tadi sempat berpikir agak lama, kita mantapkan dulu di sini sebentar sebelum naik level ya.',
+    'brain-tutor.move-stretch': 'Keren, jawabannya cepat dan tepat berturut-turut! Level ini sudah kamu kuasai, yuk kita coba tantangan yang sedikit lebih tinggi.',
+    'brain-tutor.move-breathe': 'Yuk istirahat sejenak! Kalau mulai lelah wajar kok kalau jawaban melambat. Istirahat dulu sebentar, nanti lanjut lagi biar otak segar.',
+    'brain-tutor.move-wrapup': 'Soalnya habis. Kita cukupkan sesi ini ya.',
+    'brain-tutor.headline-resolved': 'Sesi ini kamu berhasil menaklukkan ' + '{count}' + ' hal yang tadinya bikin keliru.',
+    'brain-tutor.headline-persistent': 'Ada ' + '{count}' + ' pola yang masih perlu kita asah lagi, tenang saja nanti kita kejar di sesi berikutnya ya.',
     'brain-tutor.headline-empty': 'Belum ada jawaban di sesi ini.',
-    'brain-tutor.headline-clean': 'Sesi bersih, tanpa pola salah yang berulang.',
+    'brain-tutor.headline-clean': 'Luar biasa! Sesi ini bersih tanpa ada pola salah yang berulang.',
 
     // ---------- brain-olm.* ----------
     'brain-olm.insufficient': 'belum cukup data',
@@ -318,7 +318,14 @@
     // features/library/fiezel-library-ui.js:705
     'pustaka.translate': '<span class="library-translation-mark">TERJEMAHAN</span>',
     // features/library/fiezel-library-ui.js:703
-    'pustaka.translate-kalimat': 'Terjemahan kalimat'
+    'pustaka.translate-kalimat': 'Terjemahan kalimat',
+
+    // m025-429: UX perbaikan salah pertama / retry scaffold
+    'quiz.scaffold-retry-banner': 'Belum tepat, tapi kamu masih punya satu kesempatan lagi nih! Coba cek petunjuk lalu pilih jawaban lain yuk',
+    'quiz.scaffold-retry-token-banner': 'Belum tepat, tapi kamu masih punya satu kesempatan lagi nih! Coba susun ulang lalu periksa lagi yuk',
+    'quiz.retry-floating-label': 'Pilih jawaban lain yuk',
+    'quiz.retry-floating-token-label': 'Periksa susunan katamu yuk',
+    'quiz.retry-giveup-btn': 'Buka Pembahasan'
   });
 
   // Ekspor untuk rantai require Node: modul features me-require berkas ini dan langsung

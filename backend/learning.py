@@ -3,6 +3,7 @@ hint, retry, evidence, mastery, retensi, transfer. Termasuk telemetry idempoten.
 """
 import re
 import uuid
+import math
 import hashlib
 import random
 from datetime import datetime, timezone, timedelta
@@ -666,38 +667,99 @@ async def sync_state(body: StateSyncIn, u=Depends(current_user)):
     sid = u["user_id"]
     updated_cids = []
 
-    for item in body.competencies:
+    # --- Batas kepercayaan pada rekonsiliasi offline (anti-DoS DAN anti-spoof) ---
+    # MAX_SYNC_DELTA_ATTEMPTS hanya membatasi biaya loop (DoS). Ia TIDAK cukup untuk
+    # mencegah spoof: konstanta BKT terkonvergensi sangat cepat (2 langkah benar dari
+    # P_INIT sudah ~0.92), sehingga klien cukup mengaku "20 benar" untuk tembus MASTERY.
+    # Karena itu ada tiga pagar tambahan:
+    #   1. claimed "benar" dibatasi 2 per sinkron -> tidak memenuhi MIN_CORRECT_FOR_MASTERY.
+    #   2. posterior dari replay dipagari di bawah ambang mastery (SYNC_P_CEILING).
+    #   3. state hasil sinkron DILARANG MASTERED; mastery hanya sah lewat attempt asli server.
+    MAX_SYNC_DELTA_ATTEMPTS = 20
+    MAX_SYNC_DELTA_CORRECT = 2
+    SYNC_P_CEILING = min(bc.MASTERY_T - 0.05, 0.75)
+    MAX_SYNC_ITEMS = 200
+
+    for item in body.competencies[:MAX_SYNC_ITEMS]:
         st = await bc.get_state(sid, item.competency_id)
-        if item.attempts > st.get("attempts", 0):
-            delta_attempts = item.attempts - st.get("attempts", 0)
-            item_correct = min(item.attempts, max(0, item.correct))
-            delta_correct = min(delta_attempts, max(0, item_correct - st.get("correct", 0)))
+        current_attempts = st.get("attempts", 0)
+        current_correct = st.get("correct", 0)
+
+        try:
+            it_attempts = int(item.attempts)
+        except (TypeError, ValueError):
+            it_attempts = current_attempts
+        try:
+            it_correct = int(item.correct)
+        except (TypeError, ValueError):
+            it_correct = current_correct
+
+        if it_attempts > current_attempts:
+            raw_delta = it_attempts - current_attempts
+            delta_attempts = min(raw_delta, MAX_SYNC_DELTA_ATTEMPTS)
+            claimed_correct = min(current_attempts + delta_attempts, max(0, it_correct))
+            delta_correct = max(0, min(claimed_correct - current_correct, MAX_SYNC_DELTA_CORRECT))
+            delta_correct = min(delta_correct, delta_attempts)
             delta_wrong = delta_attempts - delta_correct
 
-            st["attempts"] = item.attempts
-            st["correct"] = st.get("correct", 0) + delta_correct
-            st["streak"] = min(st["correct"], max(0, item.streak))
-            st["hints_used"] = max(st.get("hints_used", 0), max(0, item.hints_used))
-            st["retries"] = max(st.get("retries", 0), max(0, item.retries))
+            st["attempts"] = current_attempts + delta_attempts
+            st["correct"] = current_correct + delta_correct
+            try:
+                st["streak"] = min(st["correct"], max(0, int(item.streak or 0)))
+            except (TypeError, ValueError):
+                st["streak"] = min(st["correct"], 0)
+            try:
+                st["hints_used"] = max(st.get("hints_used", 0), max(0, int(item.hints_used or 0)))
+            except (TypeError, ValueError):
+                pass
+            try:
+                st["retries"] = max(st.get("retries", 0), max(0, int(item.retries or 0)))
+            except (TypeError, ValueError):
+                pass
 
-            # Server-side BKT recalculation from initial/decayed state to prevent client spoofing
+            # Replay BKT server-side dari state SERVER (bukan dari klaim klien), lalu pagari
+            # di bawah ambang mastery supaya satu sinkron tidak pernah bisa "membeli" mastery.
             p = st.get("p_mastery_decayed", st.get("p_mastery", bc.P_INIT))
             for _ in range(delta_wrong):
                 p = bc.bkt_step(p, False)
             for _ in range(delta_correct):
                 p = bc.bkt_step(p, True)
+            p = min(p, SYNC_P_CEILING)
 
-            client_p = max(0.01, min(0.99, item.p_mastery))
+            # Klaim klien hanya boleh MENURUNKAN posterior (peluruhan), tidak menaikkan.
+            try:
+                raw_p = float(item.p_mastery)
+                if math.isnan(raw_p) or math.isinf(raw_p):
+                    raw_p = bc.P_INIT
+            except (TypeError, ValueError):
+                raw_p = bc.P_INIT
+            client_p = max(0.01, min(1.0, raw_p))
             st["p_mastery"] = round(min(p, client_p), 4)
             st["client_claimed"] = True
-            st["stability_days"] = max(0.5, item.stability_days)
+            st["synced_at"] = bc.now()
+            try:
+                raw_stab = float(item.stability_days)
+                if math.isnan(raw_stab) or math.isinf(raw_stab):
+                    raw_stab = 1.0
+            except (TypeError, ValueError):
+                raw_stab = 1.0
+            st["stability_days"] = max(0.5, min(180.0, raw_stab))
             if item.due_at:
                 st["due_at"] = item.due_at
             if item.last_at:
                 st["last_at"] = item.last_at
             if item.tp_id:
                 st["tp_id"] = item.tp_id
-            st["state"] = bc.derive_state(st)
+
+            derived = bc.derive_state(st)
+            # Sinkronisasi offline TIDAK boleh mengangkat status ke mastery. Apa pun hasil
+            # replay, state efektif dipagari di bawah MASTERED dan ditandai butuh konfirmasi
+            # attempt asli yang diobservasi server (bc.apply_attempt).
+            if derived in bc.MASTERED_STATES:
+                derived = ("DEVELOPING" if st["p_mastery"] >= bc.DEVELOPING_T
+                           else ("PRACTICING" if st["attempts"] >= 2 else "EXPOSED"))
+            st["sync_pending_confirmation"] = True
+            st["state"] = derived
             st.pop("p_mastery_decayed", None)
             await db.learner_competency.update_one(
                 {"student_id": sid, "competency_id": item.competency_id},
@@ -705,7 +767,7 @@ async def sync_state(body: StateSyncIn, u=Depends(current_user)):
             )
             updated_cids.append(item.competency_id)
 
-    for mis in body.misconceptions:
+    for mis in body.misconceptions[:MAX_SYNC_ITEMS]:
         cid = mis.get("competency_id")
         mid = mis.get("misconception_id")
         if cid and mid and not mis.get("resolved"):

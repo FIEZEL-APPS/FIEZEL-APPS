@@ -31,6 +31,8 @@ if not os.environ.get("REACT_APP_BACKEND_URL"):
                 if line.startswith("REACT_APP_BACKEND_URL"):
                     os.environ["REACT_APP_BACKEND_URL"] = line.split("=", 1)[1].strip().strip('"')
                     break
+    except Exception:
+        pass
 BASE = os.environ.get("REACT_APP_BACKEND_URL", "http://127.0.0.1:8001").rstrip("/")
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
