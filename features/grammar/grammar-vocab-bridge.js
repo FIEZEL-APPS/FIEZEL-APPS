@@ -1157,17 +1157,21 @@
 
     const html = `
       <div class="modal-mini-game-sheet">
-        <div class="mini-game-nav">
-          <div class="nav-brand-group">
-            <span class="game-brand">FIEZEL QUEST</span>
-            <span class="game-lesson-indicator">${esc(g.skill)}</span>
+        <div class="mini-game-header-fixed">
+          <div class="mini-game-nav">
+            <div class="nav-brand-group">
+              <span class="game-brand">FIEZEL QUEST</span>
+              <span class="game-lesson-indicator">${esc(g.skill)}</span>
+            </div>
+            <button type="button" class="modal-close-corner" onclick="closeModal()" aria-label="${t('scaffold.close', 'Tutup')}">
+              <i data-lucide="x"></i>
+            </button>
           </div>
-          <button type="button" class="modal-close-corner" onclick="closeModal()" aria-label="${t('scaffold.close', 'Tutup')}">
-            <i data-lucide="x"></i>
-          </button>
+          ${progressBarHtml}
         </div>
-        ${progressBarHtml}
-        ${stageHtml}
+        <div class="mini-game-scroll-body">
+          ${stageHtml}
+        </div>
       </div>
     `;
 

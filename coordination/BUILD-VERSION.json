@@ -1,7 +1,7 @@
 {
-  "version": "m025-425",
+  "version": "m025-426",
   "claimedBy": "branch main",
-  "claimedAt": "2026-10-03T18:26:22.083Z",
-  "reason": "fix(braincore): selaraskan kontrak bkt kanonik, kurva kalibrasi empiris, metrik posterior dan kejujuran hash",
+  "claimedAt": "2026-10-03T18:54:08.351Z",
+  "reason": "fix(ui): polish mini game modal to duolingo-grade native app layout",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
