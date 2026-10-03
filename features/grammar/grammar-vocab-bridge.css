@@ -373,6 +373,30 @@
   gap: 14px;
 }
 
+.modal-intensity-sheet h2 {
+  color: #F8FAFC !important;
+  font-size: 1.25rem !important;
+  font-weight: 800 !important;
+  margin: 0 !important;
+  text-align: center !important;
+}
+
+.modal-intensity-sheet .modal-mark {
+  color: #F59E0B !important;
+  font-size: 0.72rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.12em !important;
+  text-align: center !important;
+}
+
+.modal-intensity-sheet p.muted {
+  color: #94A3B8 !important;
+  font-size: 0.88rem !important;
+  text-align: center !important;
+  line-height: 1.5 !important;
+  margin: 0 0 4px 0 !important;
+}
+
 .modal-intensity-options {
   display: flex;
   flex-direction: column;

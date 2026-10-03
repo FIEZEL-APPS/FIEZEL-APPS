@@ -13217,15 +13217,23 @@ function quizLoop(cfg){
   const cleanCorrect=String(q.options?.[q.answerIndex]||'').replace(/\.+$/,'');
 
   const tokenDiagnosis=(!ok&&q.type==='token-order')?diagnoseTokenOrderMistake(q):'';
-  const pickedWhyFails=(!ok&&(q.type==='grammar'||q.type==='token-order'||q.type==='video-grammar'))
-    ? (tokenDiagnosis || (Array.isArray(q.explain?.distractors)
-        ? String((q.explain.distractors.find(x=>{
-            const xNorm=norm(String(x.option));
-            const pNorm=norm(String(q.options?.[j]||userPickDisplay));
-            return xNorm===pNorm||(xNorm&&pNorm&&(pNorm.includes(xNorm)||xNorm.includes(pNorm)));
-          })||{}).reason||'').trim()
-        : ''))
-    : '';
+  let pickedWhyFails='';
+  if(!ok&&(q.type==='grammar'||q.type==='token-order'||q.type==='video-grammar')){
+    if(tokenDiagnosis){
+      pickedWhyFails=tokenDiagnosis;
+    }else if(Array.isArray(q.explain?.distractors)){
+      const found=q.explain.distractors.find(x=>{
+        const xNorm=norm(String(x.option));
+        const pNorm=norm(String(q.options?.[j]||userPickDisplay));
+        return xNorm===pNorm||(xNorm&&pNorm&&(pNorm.includes(xNorm)||xNorm.includes(pNorm)));
+      });
+      if(found&&found.reason)pickedWhyFails=String(found.reason).trim();
+    }
+    if(!pickedWhyFails){
+      const tutorWhy=tutorWhyFails(q, userPickDisplay);
+      if(tutorWhy)pickedWhyFails=tutorWhy;
+    }
+  }
 
   let whyText=q.explain?.why||FiezelI18n.t('quiz.fallback-context');
   if(!ok){
@@ -13473,11 +13481,17 @@ function quizLoop(cfg){
        button.insertAdjacentHTML('beforeend',` <span class="tried-tag">${FiezelI18n.t('quiz.sudah-dicoba','Sudah dicoba')}</span>`);
      }
      let nudgeText='';
+     const userChoice=q.options?.[j];
      if(Array.isArray(q.explain?.distractors)){
-       const userChoice=q.options?.[j];
        const found=q.explain.distractors.find(x=>norm(String(x.option))===norm(String(userChoice)));
        if(found&&found.reason){
          nudgeText=`Pilihan “${userChoice}” kurang tepat: ${found.reason}. Coba pilih opsi lainnya!`;
+       }
+     }
+     if(!nudgeText&&userChoice){
+       const tutorWhy=tutorWhyFails(q, userChoice);
+       if(tutorWhy){
+         nudgeText=`Pilihan “${userChoice}” kurang tepat: ${tutorWhy}. Coba pilih opsi lainnya!`;
        }
      }
      if(!nudgeText){

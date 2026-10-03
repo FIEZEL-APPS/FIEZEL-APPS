@@ -30,13 +30,35 @@
   }
 
   /* Inner view content below topbar gets comfortable screen padding */
-  .app > *:not(.topbar):not(#globalSky):not(.notification-panel):not(.auth-panel):not(.modal-panel):not(.listening-modal),
+  .app > *:not(#app):not(.topbar):not(#globalSky):not(.notification-panel):not(.auth-panel):not(.modal-panel):not(.listening-modal):not(.quiz-shell),
   #appInner,
   .home-today,
   .section-head,
   .quick-practice-section {
     padding-left: 16px !important;
     padding-right: 16px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Quiz Shell: Edge-to-edge mobile fit with sleek 6px margin, ZERO VOID */
+  body:has(.quiz-shell) main.app,
+  body.fz-stage-quiz main.app,
+  body:has(.quiz-shell) .app,
+  body.fz-stage-quiz .app {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  body:has(.quiz-shell) #app,
+  body.fz-stage-quiz #app,
+  .app > #app:has(.quiz-shell) {
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+    width: 100% !important;
+    max-width: 100% !important;
     box-sizing: border-box !important;
   }
 }
@@ -1946,9 +1968,9 @@ div.card {
   color: #CBD5E1 !important;
 }
 
-.card > span:not([class*="lvl"]):not(.feedback-memory-kicker):not(#feedback *):not(#quizScaffoldNudge *):not(.quiz-scaffold-nudge *),
-.card p > span:not([class*="lvl"]):not(#feedback *):not(#quizScaffoldNudge *):not(.quiz-scaffold-nudge *),
-.card div > span:not([class*="badge"]):not([class*="tag"]):not([class*="btn"]):not([class*="act"]):not([class*="avatar"]):not([class*="lvl"]):not(.is-now):not(.is-done):not(.feedback-memory-kicker):not(#feedback *):not(#quizScaffoldNudge *):not(.quiz-scaffold-nudge *) {
+.card > span:not([class*="lvl"]):not(.feedback-memory-kicker):not(#feedback *):not(#quizScaffoldNudge *):not(.quiz-scaffold-nudge *):not(.tutor-diagnostic-clue *):not(#tutorTurn *):not(.tutor-turn *),
+.card p > span:not([class*="lvl"]):not(#feedback *):not(#quizScaffoldNudge *):not(.quiz-scaffold-nudge *):not(.tutor-diagnostic-clue *):not(#tutorTurn *):not(.tutor-turn *),
+.card div > span:not([class*="badge"]):not([class*="tag"]):not([class*="btn"]):not([class*="act"]):not([class*="avatar"]):not([class*="lvl"]):not(.is-now):not(.is-done):not(.feedback-memory-kicker):not(#feedback *):not(#quizScaffoldNudge *):not(.quiz-scaffold-nudge *):not(.tutor-diagnostic-clue *):not(#tutorTurn *):not(.tutor-turn *) {
   color: #CBD5E1 !important;
 }
 
@@ -3948,16 +3970,17 @@ body:not(.theme-dark):not(.fz-lux) .tutor-stuck:hover {
 .tutor-diagnostic-clue,
 .tutor-turn .tutor-diagnostic-clue,
 .card .tutor-diagnostic-clue,
-#tutorTurn .tutor-diagnostic-clue {
-  background: rgba(56, 189, 248, 0.14) !important;
-  border: 1px solid rgba(56, 189, 248, 0.35) !important;
-  border-radius: 10px !important;
-  padding: 10px 14px !important;
-  color: #F8FAFC !important;
+#tutorTurn .tutor-diagnostic-clue,
+.tutor-diagnostic-clue {
+  background: #F0F9FF !important;
+  border: 1px solid #BAE6FD !important;
+  border-radius: 12px !important;
+  padding: 12px 14px !important;
+  color: #0369A1 !important;
   font-weight: 600 !important;
   font-size: 14px !important;
   line-height: 1.55 !important;
-  margin: 6px 0 10px !important;
+  margin: 8px 0 12px !important;
   display: flex !important;
   align-items: flex-start !important;
   gap: 10px !important;
@@ -3968,16 +3991,37 @@ body:not(.theme-dark):not(.fz-lux) .tutor-stuck:hover {
 .card .tutor-diagnostic-clue span,
 .card div > .tutor-diagnostic-clue span,
 #tutorTurn .tutor-diagnostic-clue span {
-  color: #F8FAFC !important;
+  color: #0369A1 !important;
   font-weight: 600 !important;
   font-size: 14px !important;
+  line-height: 1.55 !important;
 }
 
 .tutor-diagnostic-clue svg,
 .tutor-turn .tutor-diagnostic-clue svg {
-  width: 17px !important;
-  height: 17px !important;
-  color: #38BDF8 !important;
+  width: 18px !important;
+  height: 18px !important;
+  color: #0284C7 !important;
   flex-shrink: 0 !important;
   margin-top: 2px !important;
+}
+
+body.scene-night .card .tutor-diagnostic-clue,
+body.scene-night #tutorTurn .tutor-diagnostic-clue,
+body.scene-night .tutor-diagnostic-clue,
+body.theme-dark .card .tutor-diagnostic-clue,
+body.theme-dark #tutorTurn .tutor-diagnostic-clue,
+body.theme-dark .tutor-diagnostic-clue {
+  background: rgba(14, 165, 233, 0.16) !important;
+  border-color: rgba(56, 189, 248, 0.35) !important;
+  color: #E0F2FE !important;
+}
+
+body.scene-night .tutor-diagnostic-clue span,
+body.scene-night #tutorTurn .tutor-diagnostic-clue span,
+body.scene-night .card .tutor-diagnostic-clue span,
+body.theme-dark .tutor-diagnostic-clue span,
+body.theme-dark #tutorTurn .tutor-diagnostic-clue span,
+body.theme-dark .card .tutor-diagnostic-clue span {
+  color: #E0F2FE !important;
 }

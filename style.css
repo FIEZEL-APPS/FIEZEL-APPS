@@ -4177,30 +4177,19 @@ body.fz-lesson-mode .topline{position:sticky;top:0;z-index:30;
    mana yang tadi dipilih. Keduanya dipasang sebagai pseudo-element - nol perubahan
    pada answer()/reveal(), jadi tidak ada kontrak markup yang bergeser. */
 .option.correct::after,
-.option.wrong::after,
-.option.was-tried::after{
+.option.wrong::after{
   display:block;width:fit-content;margin-top:0;padding:3px 9px;border-radius:var(--radius-pill);
   font-size:.75rem;font-weight:700;letter-spacing:.08em;white-space:nowrap;flex:none
 }
 /* Tag ditaruh DI BAWAH teks pilihan, bukan mengambang di sudut: pilihan jawaban bisa
-   dua baris pada layar sempit, dan tag mengambang akan menabraknya.
-   m025-361: niat "di bawah" itu dulu tidak pernah terjadi. .option mewarisi
-   display:inline-flex ARAH BARIS dari resep button global, jadi ::after menjadi flex item
-   DI SAMPING teks. Di HP teks jawaban memakan lebar, tag dipaksa menyusut sampai
-   min-content - dan word-break:break-word (fiezel-2.css) membuat min-content itu selebar
-   SATU huruf: "DICOBA" tersusun ke bawah per huruf. Pilihan bertag kini disusun kolom
-   (tag benar-benar turun, dengan lebar penuh), nowrap + flex:none menjaganya satu baris.
-   Perataan tetap milik resep button (tengah), sama dengan pilihan yang belum bertag. */
-.option.correct,.option.wrong,.option.was-tried{flex-direction:column;gap:9px}
+   dua baris pada layar sempit, dan tag mengambang akan menabraknya. */
+.option.correct,.option.wrong{flex-direction:column;gap:9px}
 .option.correct::after{content:"BENAR";background:var(--good);color:var(--on-core)}
 .option.wrong::after{content:"PILIHANMU";background:var(--bad);color:var(--on-core)}
 :lang(th) .option.correct::after{content:"ถูกต้อง"}
 :lang(th) .option.wrong::after{content:"คำตอบของคุณ"}
-:lang(th) .option.was-tried::after{content:"ลองแล้ว"}
-/* i10 2026-08-28 (O5 §6.3-1): PILIHANMU menunjuk SATU pilihan — percobaan pertama yang
-   gagal diturunkan answer() ke .was-tried: tanda teks netral DICOBA (kontrak non-warna
-   m025 terjaga: state tetap terbaca tanpa membedakan warna). */
-.option.was-tried::after{content:"DICOBA";background:var(--panel);color:var(--muted);border:1px solid var(--line)}
+/* Tanda netral .tried-tag disuntikkan secara dinamis & terlokalisasi di app.js; ::after dinonaktifkan agar tidak ada double badge */
+.option.was-tried::after{display:none !important;content:none !important}
 .option.was-tried:disabled{border-color:var(--line);background:var(--panel-soft);color:var(--muted)}
 
 /* Rincian pengecoh dulu selalu terbentang. Pada soal empat pilihan itu empat paragraf
@@ -8697,13 +8686,23 @@ button.fz-coach-bubble,
   }
 
   /* Inner view content below topbar gets comfortable screen padding */
-  .app > *:not(.topbar):not(#globalSky):not(.notification-panel):not(.auth-panel):not(.modal-panel):not(.listening-modal),
+  .app > *:not(#app):not(.topbar):not(#globalSky):not(.notification-panel):not(.auth-panel):not(.modal-panel):not(.listening-modal),
+  body:not(.fz-stage-quiz):not(:has(.quiz-shell)) #app,
   #appInner,
   .home-today,
   .section-head,
   .quick-practice-section {
     padding-left: 16px !important;
     padding-right: 16px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Quiz Shell: Sleek edge-to-edge fit with 6px margin, ZERO lateral void */
+  body.fz-stage-quiz #app,
+  body:has(.quiz-shell) #app,
+  #app:has(.quiz-shell) {
+    padding-left: 6px !important;
+    padding-right: 6px !important;
     box-sizing: border-box !important;
   }
 }
@@ -9324,11 +9323,11 @@ body:not(.theme-dark):not(.fz-lux) .tutor-stuck:hover {
 .tutor-turn .tutor-diagnostic-clue,
 .card .tutor-diagnostic-clue,
 #tutorTurn .tutor-diagnostic-clue {
-  background: rgba(56, 189, 248, 0.14) !important;
-  border: 1px solid rgba(56, 189, 248, 0.35) !important;
-  border-radius: 10px !important;
+  background: #F0F9FF !important;
+  border: 1px solid #BAE6FD !important;
+  border-radius: 12px !important;
   padding: 10px 14px !important;
-  color: #F8FAFC !important;
+  color: #0369A1 !important;
   font-weight: 600 !important;
   font-size: 14px !important;
   line-height: 1.55 !important;
@@ -9343,7 +9342,7 @@ body:not(.theme-dark):not(.fz-lux) .tutor-stuck:hover {
 .card .tutor-diagnostic-clue span,
 .card div > .tutor-diagnostic-clue span,
 #tutorTurn .tutor-diagnostic-clue span {
-  color: #F8FAFC !important;
+  color: #0369A1 !important;
   font-weight: 600 !important;
   font-size: 14px !important;
 }
@@ -9352,7 +9351,24 @@ body:not(.theme-dark):not(.fz-lux) .tutor-stuck:hover {
 .tutor-turn .tutor-diagnostic-clue svg {
   width: 17px !important;
   height: 17px !important;
-  color: #38BDF8 !important;
+  color: #0284C7 !important;
   flex-shrink: 0 !important;
   margin-top: 2px !important;
+}
+
+body.scene-night .tutor-diagnostic-clue,
+body.theme-dark .tutor-diagnostic-clue {
+  background: rgba(14, 165, 233, 0.16) !important;
+  border-color: rgba(56, 189, 248, 0.35) !important;
+  color: #E0F2FE !important;
+}
+
+body.scene-night .tutor-diagnostic-clue span,
+body.theme-dark .tutor-diagnostic-clue span {
+  color: #E0F2FE !important;
+}
+
+body.scene-night .tutor-diagnostic-clue svg,
+body.theme-dark .tutor-diagnostic-clue svg {
+  color: #38BDF8 !important;
 }

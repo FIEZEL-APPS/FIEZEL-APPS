@@ -472,10 +472,10 @@
           <div class="scaffold-title-group">
             <span class="scaffold-eyebrow">
               <i data-lucide="graduation-cap"></i>
-              ${t('scaffold.prasyarat-kosakata', 'Prasyarat Kosakata (' + cfg.name + ')')}
+              ${t('scaffold.prasyarat-kosakata', 'Prasyarat Kosakata (' + cfg.name + ')', { name: cfg.name })}
             </span>
             <div class="scaffold-stats">
-              <b>${status.masteredCount}/${status.targetCount}</b> ${t('scaffold.kosakata-dikuasai', 'kosakata dikuasai')}
+              <b>${status.masteredCount}/${status.targetCount}</b> ${t('scaffold.kosakata-dikuasai', 'kosakata dikuasai', { mastered: status.masteredCount, total: status.targetCount })}
             </div>
           </div>
           <button type="button" class="scaffold-intensity-toggle" onclick="FiezelGrammarVocabBridge.openIntensityModal('${skill}')" title="${t('scaffold.ubah-target', 'Ubah target intensitas')}">
@@ -553,8 +553,8 @@
                 </div>
                 <p class="option-desc">${lvl.description}</p>
                 <div class="option-specs">
-                  <span><i data-lucide="book-open"></i> ${t('scaffold.kosakata-prasyarat', lvl.vocabTarget + ' Kosakata Prasyarat')}</span>
-                  <span><i data-lucide="check-circle-2"></i> ${t('scaffold.soal-grammar', lvl.grammarQuestionCount + ' Soal Grammar')}</span>
+                  <span><i data-lucide="book-open"></i> ${t('scaffold.kosakata-prasyarat', lvl.vocabTarget + ' Kosakata Prasyarat', { count: lvl.vocabTarget })}</span>
+                  <span><i data-lucide="check-circle-2"></i> ${t('scaffold.soal-grammar', lvl.grammarQuestionCount + ' Soal Grammar', { count: lvl.grammarQuestionCount })}</span>
                 </div>
               </div>
             `;
@@ -574,7 +574,7 @@
     setActiveIntensity(intensityId);
     if (typeof showToast === 'function') {
       const cfg = getIntensityConfig(intensityId);
-      showToast(t('scaffold.intensitas-diubah', 'Intensitas diubah ke ' + cfg.name + ' (' + cfg.badge + ')'), 'success');
+      showToast(t('scaffold.intensitas-diubah', 'Intensitas diubah ke ' + cfg.name + ' (' + cfg.badge + ')', { name: cfg.name, badge: cfg.badge }), 'success');
     }
     const scrollY = (typeof window !== 'undefined' && typeof window.scrollY === 'number') ? window.scrollY : 0;
     if (returnSkill && typeof renderGrammarLesson === 'function') {
@@ -666,8 +666,8 @@
                 </div>
                 <p class="option-desc">${lvl.description}</p>
                 <div class="option-specs">
-                  <span><i data-lucide="book-open"></i> ${t('scaffold.kosakata-prasyarat', lvl.vocabTarget + ' Kosakata Prasyarat')}</span>
-                  <span><i data-lucide="check-circle-2"></i> ${t('scaffold.soal-grammar', lvl.grammarQuestionCount + ' Soal Grammar')}</span>
+                  <span><i data-lucide="book-open"></i> ${t('scaffold.kosakata-prasyarat', lvl.vocabTarget + ' Kosakata Prasyarat', { count: lvl.vocabTarget })}</span>
+                  <span><i data-lucide="check-circle-2"></i> ${t('scaffold.soal-grammar', lvl.grammarQuestionCount + ' Soal Grammar', { count: lvl.grammarQuestionCount })}</span>
                 </div>
               </div>
             `;
@@ -694,7 +694,7 @@
     }
     if (typeof showToast === 'function') {
       const cfg = getIntensityConfig(intensityId);
-      showToast(t('scaffold.intensitas-diubah', 'Intensitas diubah ke ' + cfg.name + ' (' + cfg.badge + ')'), 'success');
+      showToast(t('scaffold.intensitas-diubah', 'Intensitas diubah ke ' + cfg.name + ' (' + cfg.badge + ')', { name: cfg.name, badge: cfg.badge }), 'success');
     }
     if (typeof drawTopScreen === 'function') {
       drawTopScreen();
@@ -738,7 +738,7 @@
         <div class="gateway-header">
           <span class="gateway-badge"><i data-lucide="sparkles"></i> ${t('scaffold.gateway-title', 'Hafal Dulu Kosakata Ini!')}</span>
           <h2>${esc(lessonTitle)}</h2>
-          <p class="muted">${t('scaffold.gateway-subtitle', 'Setelah kamu menghafalnya, latihan grammar otomatis terbuka!')}</p>
+          <p class="muted">${t('scaffold.gateway-subtitle', 'Setelah kamu menghafalnya, latihan grammar otomatis terbuka!', { count: status.targetCount || (status.words ? status.words.length : 5) })}</p>
         </div>
 
         <div class="gateway-vocab-grid">
