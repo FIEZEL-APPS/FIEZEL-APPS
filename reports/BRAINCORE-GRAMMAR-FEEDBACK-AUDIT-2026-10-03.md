@@ -290,3 +290,63 @@ Belum diuji di audit ini: mode ukur (placement / ujian level) dan Ujian Skip Lev
 
 Setiap perbaikan G1–G4 sebaiknya membawa gerbang yang memakai skenario probe ini (klik
 sungguhan di Chromium), karena keempatnya lolos dari 300+ gerbang yang ada.
+
+---
+
+## 8. Status perbaikan — Fase 1 (build `m025-442`)
+
+| ID | Status | Yang berubah |
+|----|--------|--------------|
+| G1 | **Diperbaiki** | Widget susun kata tidak lagi menahan kiriman salah; setiap kiriman sampai ke `answer()`. Dua kesempatan, salah-lalu-benar tercatat salah di percobaan pertama (sama dengan pilihan ganda). |
+| G2 | **Diperbaiki** | Satu pencocok `grammarReasonEntry()` untuk `reveal()`, nudge retry, dan `tutorWhyFails()`: eksak dulu; cadangan substring per kata utuh, hanya di antara pilihan salah, hanya bila tepat satu, tidak pernah kunci. Salah alamat di 2.100 soal: **0**. |
+| G3 | **Diperbaiki** | 17 literal pindah ke pasangan `copy-id/th-app-e` + `copy-id/th-grammar-labels` (nudge retry, "Kalimat/Bentuk yang tepat", alasan cadangan susun kata, tombol gloss, slot kosong, kamus gloss). Gloss susun kata kini juga diambil dari bank kosakata ber-overlay locale (di th hanya arti beraksara Thai); tombol gloss disembunyikan bila tidak ada arti. |
+| G4 | **Diperbaiki** | Lencana "Nx keliru" menghitung jawaban salah sungguhan dari riwayat; hitungan Mistake Vault (syarat lulus dua sesi) tidak lagi dibaca sebagai jumlah kesalahan. "Review {days}h" → "Review {days} hari". |
+| G6 | **Diperbaiki** | Sesudah pembahasan jawaban salah dibuka, kotak tutor tidak mengulang alasan dan tidak menyuruh "coba jawab lagi"; tutor hanya bicara bila ada sinyal "terlalu cepat". |
+| G12 | **Diperbaiki** | Tombol palsu "Simpan Rumus" dihapus; tombol AI dipasang lewat JS (bukan `onclick` inline dengan `q`/`j` global). |
+| — | **Baru** | Grader cloze menyetarakan kontraksi tak-ambigu (can't = cannot = can not, won't = will not, isn't = is not, I'm = I am, should've = should have …); `'s`/`'d` sengaja tidak. 0 bentrok dengan pengecoh di 436 item. Sebelumnya 28 pasangan kontraksi di bank tidak punya alternates. |
+| G5, G7, G8, G9, G10, G11 | Terbuka | Lihat §9. |
+
+Gerbang baru `tests/grammar-feedback-regression-test.js` (14 cek; bagian browser SKIP tanpa
+Playwright) — **merah 14/14 pada kode sebelum perbaikan**, hijau sesudahnya. Baseline
+id-golden ditulis ulang dengan sengaja karena literal yang dipindah ke copy-map.
+
+---
+
+## 9. Peta jalan: supaya kehebatan BrainCore benar-benar terasa
+
+Temuan terpenting audit ini: **isinya sudah kaya, yang kurang adalah jalannya ke layar.**
+512 template grammar punya penjelasan dwibahasa 100% (aturan, alasan benar, alasan tiap
+pengecoh, cara menghindari, pegangan ingatan); 1.536 alasan per pengecoh terisi; 436 item
+cloze lengkap penjelasannya. Menambah konten sebelum kabelnya benar hanya menambah teks yang
+salah alamat. Urutan yang disarankan:
+
+**Fase 2 — Tangga bantuan yang terlihat (G5 + G7).** Saat retry tampilkan tangga BrainCore
+apa adanya: `probe` = satu pertanyaan penggiring (howToAvoid), `hint` = pegangan ingatan,
+`worked` = contoh yang dikerjakan **dari soal lain dengan subskill yang sama** (bukan soal ini
+— itu membocorkan jawaban sebelum `tell`), `tell` = buka. Kirim `session` ke `composeTurn`
+supaya rotasi "jangan ulangi penjelasan yang gagal" hidup. Ini mengubah isi layar retry
+(sekarang selalu tuntunan langkah), jadi perlu satu keputusan owner.
+
+**Fase 2b — Diagnosis jawaban ketik (cloze).** Grader kini adil terhadap kontraksi, tetapi
+jawaban salah yang bukan pengecoh hanya mendapat "Yang tepat: …". Simulasi: pada **56 dari 89**
+item yang jawabannya diawali kata bantu, murid yang menghilangkan kata bantunya ("preparing"
+untuk "is preparing") — kesalahan transfer bahasa ibu paling umum bagi murid Indonesia maupun
+Thai — tidak mendapat diagnosis apa pun. Tambahkan jenis kesalahan murni di grader:
+`missing_auxiliary`, `word_order`, `extra_context_words` (murid menyalin kata di sekitar
+celah), `overregularization` (goed/taked), masing-masing dengan kalimat dwibahasa.
+
+**Fase 3 — Kontras bahasa ibu per keluarga, bukan per soal.** Sebagian besar kesalahan murid
+Indonesia dan Thai datang dari hal yang tidak ada di bahasa mereka: perubahan bentuk kata kerja
+(tense, -s orang ketiga), to-be, artikel, jamak -s. Satu catatan kontras per keluarga (21
+keluarga × id/th, bukan 512 × 2) yang ditampilkan di pembahasan saat miskonsepsi berbau
+transfer — kartu kontrasnya sudah ada di `buildFeedbackHTML`, tinggal disambung ke `reveal()`.
+
+**Fase 4 — Bukti yang jujur (G8, G9–G11).** Catat tingkat petunjuk yang dipakai dan teruskan ke
+`record()` sebagai kredibilitas lebih rendah; jawaban murid susun kata ke AI explain; putuskan
+apakah susun kata/video-grammar masuk BKT.
+
+**Fase 5 — Ukur kebingungan, lalu perbaiki konten yang paling membingungkan dulu.** Sinyalnya
+sudah mengalir di decision trace: ketukan "Jelaskan lebih sederhana", "Buka Pembahasan",
+dan keberhasilan percobaan kedua sesudah petunjuk. Agregasikan per template; template yang
+penjelasannya tidak menolong naik ke antrean penulisan ulang. Dengan begitu peningkatan
+konten berikutnya diarahkan oleh data murid, bukan tebakan.
