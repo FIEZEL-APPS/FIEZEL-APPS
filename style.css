@@ -7483,6 +7483,10 @@ body:has(.home-today) #modalPanel {
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85) !important;
 }
 
+body.fz-lux .modal-panel h2,
+body:has(.home-today) .modal-panel h2,
+body.fz-lux #modalPanel h2,
+body:has(.home-today) #modalPanel h2,
 .modal-panel h2,
 .modal-panel h3 {
   color: #FFFFFF !important;
