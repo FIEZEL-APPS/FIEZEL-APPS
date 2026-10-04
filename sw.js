@@ -53,7 +53,7 @@ const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
 // dilayani dan kedua berkas baru tidak pernah sampai ke pengguna lama - aplikasi mereka
 // akan menjalankan app.js baru tanpa berkas benderanya, dan seluruh bendera jatuh ke
 // salinan bawaan di app.js. Naik SEKALI untuk seluruh gelombang.
-const SW_REV='m025-452-unified-grammar-20261002';
+const SW_REV='m025-453-unified-grammar-20261002';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
 // m025-61: health check menanyakan revisi shell langsung ke worker yang sedang aktif.
 // Menebaknya dari nama cache tidak cukup: cache lama bisa tertinggal, sedangkan jawaban ini
@@ -86,7 +86,7 @@ const ASSETS=['./','./index.html','./style.css','./features/mascot/fiezel-motion
   // orkestrator fiezel-splash.js, jadi ketiganya berkas shell dan wajib precache
   // (splash offline tanpa salah satu lapisan = boot pincang tanpa suara kesalahan apa pun).
   './features/brand/fiezel-splash-particles.js','./features/brand/fiezel-splash-equalizer.js','./features/brand/fiezel-splash-pawstamp.js',
-  './features/brand/fiezel-splash.js','./features/onboarding/fiezel-onboarding.js','./features/onboarding/fiezel-tour.js','./assets/brand/fiezel-wordmark.svg','./assets/brand/fiezel-paw.svg','./assets/brand/paw-mascot-full.svg','./assets/brand/fiezel-wordmark-mono.svg','./assets/brand/abstract-topo-lines.svg','./assets/brand/fiezel-icon-512.png','./assets/brand/fiezel-icon-192.png','./assets/brand/fiezel-icon.svg','./assets/fonts/InstrumentSerif-400.woff2','./assets/fonts/PlusJakartaSans-400.woff2','./assets/fonts/PlusJakartaSans-500.woff2','./assets/fonts/PlusJakartaSans-600.woff2','./assets/fonts/PlusJakartaSans-700.woff2',
+  './features/brand/fiezel-splash.js','./features/onboarding/fiezel-onboarding.js','./features/onboarding/fiezel-tour.js','./assets/brand/fiezel-wordmark.svg','./assets/brand/fiezel-paw.svg','./assets/brand/paw-mascot-full.svg','./assets/brand/fiezel-wordmark-mono.svg','./assets/brand/fiezel-icon-512.png','./assets/brand/fiezel-icon-192.png','./assets/brand/fiezel-icon.svg','./assets/fonts/InstrumentSerif-400.woff2','./assets/fonts/PlusJakartaSans-400.woff2','./assets/fonts/PlusJakartaSans-500.woff2','./assets/fonts/PlusJakartaSans-600.woff2','./assets/fonts/PlusJakartaSans-700.woff2',
   './features/tutor-classroom/fiezel-tutor-dialog.js','./features/tutor-classroom/fiezel-tutor-voice-chat.js','./features/library/fiezel-library.js','./features/library/fiezel-library-ui.js','./features/library/library-books-v1.json','./features/brain/fiezel-tutor-brain.js',
   // Braincore v3: sembilan modul penalaran baru ikut precache shell - PWA ini offline-first,
   // dan modul brain yang tidak ter-cache berarti murid offline kehilangan lapisan adaptifnya

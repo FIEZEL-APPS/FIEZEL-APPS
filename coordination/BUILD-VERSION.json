@@ -1,7 +1,7 @@
 {
-  "version": "m025-452",
-  "claimedBy": "branch main",
-  "claimedAt": "2026-10-04T10:29:09.388Z",
-  "reason": "fix(social): enhance modal contrast for qr and friend invite sheets",
+  "version": "m025-453",
+  "claimedBy": "branch claude/inspiring-franklin-xml8hz",
+  "claimedAt": "2026-10-04T10:40:37.081Z",
+  "reason": "sw.js: drop missing precache asset abstract-topo-lines.svg (SW install was failing)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
