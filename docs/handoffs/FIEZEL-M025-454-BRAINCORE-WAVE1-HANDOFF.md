@@ -35,3 +35,9 @@ Semua butir hanya muncul bila buktinya ada. Murid tanpa riwayat tidak melihat ap
 
 ## Belum dikerjakan (Gelombang 2 dan 3 di laporan audit)
 KelasKu (laporan ke guru, Papan Kelas, tugas remedial), graf kurikulum, dan pengingat di jam terbaik.
+
+## Ikut di PR ini: aset precache yang hilang (dari main m025-452)
+`b89287dc` menambahkan `./assets/brand/abstract-topo-lines.svg` ke `ASSETS` `sw.js`, padahal berkasnya tidak ada.
+`install` memakai `cache.addAll()`, sehingga satu 404 menggagalkan seluruh pemasangan service worker dan PWA
+murid tidak pernah menerima update. Main m025-453 (`5fb97ce1`) hanya membuat uji e2e menunggu ulang, dan entrinya
+masih ada. PR ini menghapus entri itu. `tests/precache-covers-shell-test.js` (merah di main) kembali hijau.
