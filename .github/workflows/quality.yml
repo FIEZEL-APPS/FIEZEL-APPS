@@ -478,6 +478,7 @@ jobs:
           node tests/voice-callsite-prefetch-test.js
           node tests/tts-transport-switch-test.js
           node tests/audio-asset-pipeline-test.js
+          node tests/audio-csp-media-src-test.js
           node product-audit.js
           node tests/runtime-stage8-test.js
           node tests/ai-integration-test.js

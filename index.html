@@ -28,7 +28,7 @@
        'wasm-unsafe-eval' WAJIB ada: mesin suara neural mengompilasi sherpa-onnx .wasm
        (vendor/supertonic-3, 13 MB) di klien, dan tanpa token itu Chromium menolak
        WebAssembly.instantiate - model 152 MB yang sudah diunduh jadi tidak terpakai. -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://accounts.google.com; connect-src 'self' https: wss:; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline' https://accounts.google.com; frame-src 'self' https://accounts.google.com; media-src 'self' blob: data:; worker-src 'self' blob:">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://accounts.google.com; connect-src 'self' https: wss:; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline' https://accounts.google.com; frame-src 'self' https://accounts.google.com; media-src 'self' blob: data: https://fiezel-audio.fitrajft.workers.dev https://audio.fiezel.my.id https://api.fiezel.my.id; worker-src 'self' blob:">
   <meta name="theme-color" content="#FBF7F3">
   <!-- Mode gelap dihapus: color-scheme dipaku light agar kontrol form/scrollbar selalu terang. -->
   <meta name="color-scheme" content="light">
@@ -771,6 +771,7 @@ html.fz-booting body{overflow:hidden}
     <button type="button" class="nav" data-view="latihan" data-testid="nav-latihan" onclick="go('latihan')" aria-label="Latihan" data-i18n-aria-label="nav.practice-aria"><i class="fz-i" data-fz-icon="practice" aria-hidden="true"></i><span data-i18n="nav.practice">Latihan</span></button>
     <button type="button" class="nav" data-view="classroom" data-testid="nav-classroom" onclick="go('classroom')" aria-label="KelasKu" data-i18n-aria-label="nav.school-aria"><i class="fz-i" data-fz-icon="classroom" aria-hidden="true"></i><span data-i18n="nav.school" data-i18n-html="nav.school"><span class="kelasku-wordmark">KelasKu</span></span></button>
     <button type="button" class="nav active" data-view="home" data-testid="nav-home" onclick="go('home')" aria-label="Hari ini" data-i18n-aria-label="nav.home-primary-aria"><i class="fz-i" data-fz-icon="home" aria-hidden="true"></i><span data-i18n="nav.home-primary">Hari ini</span></button>
+    <button type="button" class="nav" data-view="game" data-testid="nav-game" onclick="go('game')" aria-label="Game" data-i18n-aria-label="nav.game-aria"><i class="fz-i" data-fz-icon="game" aria-hidden="true"></i><span data-i18n="nav.game">Game</span></button>
     <button type="button" class="nav" data-view="progress" data-testid="nav-progress" onclick="go('progress')" aria-label="Progres" data-i18n-aria-label="nav.progress-aria"><i class="fz-i" data-fz-icon="progress" aria-hidden="true"></i><span data-i18n="nav.progress">Progres</span></button>
     <button type="button" class="nav" data-view="online" data-testid="nav-profile" onclick="go('online')" aria-label="Profil" data-i18n-aria-label="nav.profile-aria"><i class="fz-i" data-fz-icon="profile" aria-hidden="true"></i><span data-i18n="nav.profile">Profil</span></button>
   </nav>

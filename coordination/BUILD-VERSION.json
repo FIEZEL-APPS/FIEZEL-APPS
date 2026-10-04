@@ -1,7 +1,7 @@
 {
-  "version": "m025-466",
-  "claimedBy": "branch claude/optimistic-tesla-2vi199",
-  "claimedAt": "2026-10-04T22:37:58.920Z",
-  "reason": "fix(audio): kembalikan pemutar blob - CSP media-src memblokir URL R2 langsung",
+  "version": "m025-470",
+  "claimedBy": "branch feat/audio-streaming-csp",
+  "claimedAt": "2026-10-04T23:01:27.900Z",
+  "reason": "perf(audio): stream R2 audio langsung dengan allowlist CSP media-src",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
