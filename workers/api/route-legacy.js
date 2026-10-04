@@ -92,6 +92,42 @@ function isBudgetDenial(error) {
 }
 
 // Helper pembaca JSON yang aman
+/* m025-464: allowlist catatan percobaan, SAMA PERSIS dengan
+   features/brain/fiezel-attempt-record.js (ALLOWED + ID_RE). Server ikut menyaring karena
+   lembar privasi sekolah menjanjikan daftar field ini — klien lama atau klien rusak tidak
+   boleh bisa menyimpan kalimat soal atau jawaban murid. tests/progress-sync-test.js menjaga
+   kedua daftar tetap kembar. */
+export const BRAIN_ATTEMPT_FIELDS = Object.freeze(['schema', 'attemptId', 'at', 'ok', 'type', 'skill', 'lesson', 'item',
+  'kappa', 'predicted', 'difficulty', 'timing', 'concept', 'misconception', 'sessionId']);
+const BRAIN_ID_RE = /^[A-Za-z0-9._:@#-]{1,80}$/;
+const BRAIN_TYPES = ['vocab', 'grammar', 'reading', 'listening', 'speaking'];
+const BRAIN_TIMINGS = ['guess', 'normal', 'struggled'];
+export function projectBrainAttempt(att) {
+  if (!att || typeof att !== 'object' || Array.isArray(att)) return null;
+  for (const k of Object.keys(att)) if (!BRAIN_ATTEMPT_FIELDS.includes(k)) return null;
+  if (typeof att.attemptId !== 'string' || !BRAIN_ID_RE.test(att.attemptId)) return null;
+  if (typeof att.at !== 'number' || !isFinite(att.at) || att.at <= 0) return null;
+  if (typeof att.ok !== 'boolean') return null;
+  const out = { schema: 'fiezel-attempt-record-v1', attemptId: att.attemptId, at: Math.floor(att.at), ok: att.ok };
+  for (const k of ['skill', 'lesson', 'item', 'concept', 'misconception', 'sessionId']) {
+    if (att[k] === undefined) continue;
+    if (typeof att[k] !== 'string' || !BRAIN_ID_RE.test(att[k])) return null;
+    out[k] = att[k];
+  }
+  if (att.type !== undefined) { if (!BRAIN_TYPES.includes(att.type)) return null; out.type = att.type; }
+  if (att.timing !== undefined) { if (!BRAIN_TIMINGS.includes(att.timing)) return null; out.timing = att.timing; }
+  for (const k of ['kappa', 'predicted']) {
+    if (att[k] === undefined) continue;
+    if (typeof att[k] !== 'number' || !isFinite(att[k]) || att[k] < 0 || att[k] > 1) return null;
+    out[k] = att[k];
+  }
+  if (att.difficulty !== undefined) {
+    if (typeof att.difficulty !== 'number' || !isFinite(att.difficulty)) return null;
+    out.difficulty = att.difficulty;
+  }
+  return out;
+}
+
 async function readJson(ctx) {
   if (ctx.bodyText !== undefined) {
     try { return JSON.parse(ctx.bodyText); } catch { return {}; }
@@ -424,37 +460,53 @@ const RAW_ROUTES = [
   }],
   
   // 9. POST /api/brain/attempts
+  //
+  // m025-464 (progres ikut akun): rute ini dulu menyimpan JSON APA PUN yang dikirim klien dan
+  // menelan galat tulis (`.catch(() => {})`) lalu tetap menjawab `success:true`. Dua-duanya
+  // tidak lagi boleh, karena sekarang ada janji tertulis di atasnya:
+  //   - lembar privasi sekolah menyebut PERSIS field yang tersimpan — jadi server ikut
+  //     menyaring dengan allowlist yang sama (`projectBrainAttempt`), bukan hanya percaya klien;
+  //   - lencana "Tersimpan aman" di aplikasi murid membaca `recorded` dari sini. Galat tulis
+  //     yang ditelan berarti lencana hijau untuk data yang tidak pernah tersimpan.
   ['POST', '/api/brain/attempts', async (ctx) => {
     const opt = { headers: ctx.corsHeaders };
     const sub = ctx.identity?.sub;
     if (!sub) return jsonError(401, 'unauthorized', {}, opt);
-    
+
     const body = await readJson(ctx);
     const attempts = Array.isArray(body.attempts) ? body.attempts : [];
-    
+
     if (attempts.length > 100) {
       return jsonError(400, 'too_many_attempts', { max: 100 }, opt);
     }
-    
+    if (!ctx.env.CORE_DB) return jsonError(503, 'storage_unavailable', {}, opt);
+
     const now = ctx.now || Date.now();
-    if (ctx.env.CORE_DB && attempts.length > 0) {
-      for (const att of attempts) {
-        const attemptId = String(att.id || att.attemptId || `att_${now}_${Math.random().toString(36).slice(2, 6)}`);
-        await ctx.env.CORE_DB.prepare(
+    const clean = attempts.map(projectBrainAttempt).filter(Boolean);
+    if (clean.length) {
+      try {
+        await ctx.env.CORE_DB.batch(clean.map((att) => ctx.env.CORE_DB.prepare(
           `INSERT OR REPLACE INTO brain_attempts (sub, attempt_id, data, created_at) VALUES (?, ?, ?, ?)`
-        ).bind(sub, attemptId, JSON.stringify(att), now).run().catch(() => {});
+        ).bind(sub, att.attemptId, JSON.stringify(att), now)));
+      } catch (_) {
+        return jsonError(503, 'storage_failed', {}, opt);
       }
     }
-    
-    return jsonResponse({ success: true, recorded: attempts.length }, { status: 200, ...opt });
+
+    return jsonResponse({
+      success: true,
+      recorded: clean.length,
+      accepted: clean.map((a) => a.attemptId),
+      rejected: attempts.length - clean.length
+    }, { status: 200, ...opt });
   }],
-  
+
   // 10. GET /api/brain/attempts
   ['GET', '/api/brain/attempts', async (ctx) => {
     const opt = { headers: ctx.corsHeaders };
     const sub = ctx.identity?.sub;
     if (!sub) return jsonError(401, 'unauthorized', {}, opt);
-    
+
     let attempts = [];
     if (ctx.env.CORE_DB) {
       try {
@@ -466,8 +518,27 @@ const RAW_ROUTES = [
         }).filter(Boolean);
       } catch (_) {}
     }
-    
+
     return jsonResponse({ attempts, protocol: '1.7' }, { status: 200, ...opt });
+  }],
+
+  // 10b. POST /api/brain/attempts/delete — hak hapus (m025-464).
+  // Lembar privasi berjanji murid/orang tua bisa menghapus progres yang tersimpan di server
+  // dari aplikasi sendiri, tanpa menghubungi siapa pun. Hanya baris milik `sub` cookie ini;
+  // tidak ada parameter yang bisa menunjuk akun lain.
+  ['POST', '/api/brain/attempts/delete', async (ctx) => {
+    const opt = { headers: ctx.corsHeaders };
+    const sub = ctx.identity?.sub;
+    if (!sub) return jsonError(401, 'unauthorized', {}, opt);
+    if (!ctx.env.CORE_DB) return jsonError(503, 'storage_unavailable', {}, opt);
+    let deleted = 0;
+    try {
+      const r = await ctx.env.CORE_DB.prepare(`DELETE FROM brain_attempts WHERE sub = ?`).bind(sub).run();
+      deleted = Number(r?.meta?.changes) || 0;
+    } catch (_) {
+      return jsonError(503, 'storage_failed', {}, opt);
+    }
+    return jsonResponse({ success: true, deleted }, { status: 200, ...opt });
   }],
 
   // ==========================================

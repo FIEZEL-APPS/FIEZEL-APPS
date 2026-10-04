@@ -23,21 +23,31 @@ hasilnya tanpa mengoreksi manual.
 
 ## Data apa yang dikumpulkan — dan yang TIDAK
 
-**Yang disimpan hanya di ponsel anak Anda, tidak pernah dikirim ke mana pun:**
-seluruh riwayat belajar — jawaban, waktu pengerjaan, dan catatan kemajuannya.
+**Yang tetap hanya di ponsel anak Anda, tidak pernah dikirim:**
+kalimat soal dan jawaban yang ditulis atau dipilih anak saat belajar mandiri.
 
-**Yang dikirim ke guru dan sistem aplikasi, hanya dua hal:**
+**Yang disimpan di akun anak di server, supaya progresnya tidak hilang saat ganti ponsel:**
+catatan latihan — kode soal, benar/salah, waktu mengerjakan, dan kode jenis kesalahan.
+Bagian ini **hanya menyala setelah Bapak/Ibu menyetujui** formulir ini, dan dapat dimatikan
+serta dihapus kapan saja dari aplikasi (Pengaturan → Data → "Hapus dari server").
+
+**Yang dikirim ke guru:**
 - **Nama depan** anak Anda saja (maksimal 24 huruf)
 - Ringkasan hasil belajar per keterampilan (misalnya: "tata bahasa 70%")
+- Untuk **tugas dari guru**: soal mana yang salah dan pilihan jawaban (A/B/C/D) yang
+  dipilih, supaya guru tahu bagian mana yang perlu dijelaskan ulang di kelas
+
+**Akun:** anak masuk dengan akun Google (atau akun FIEZEL). Alamat email akun itu tersimpan
+sebagai satu-satunya kontak, tidak dipakai untuk iklan dan tidak dibagikan.
 
 **Yang TIDAK PERNAH dikumpulkan, dalam bentuk apa pun:**
 
 | ✗ Nama lengkap | ✗ Alamat rumah | ✗ Nomor telepon |
 |---|---|---|
-| ✗ Alamat email | ✗ NISN / NIK | ✗ Lokasi / GPS |
-| ✗ Foto atau suara | ✗ Jawaban mentah anak | ✗ Data orang tua |
+| ✗ Kalimat soal & jawaban tertulis | ✗ NISN / NIK | ✗ Lokasi / GPS |
+| ✗ Foto atau suara | ✗ Data orang tua | ✗ Riwayat penjelajahan |
 
-Aplikasi ini **tidak memerlukan pendaftaran akun**, **tidak menampilkan iklan**, dan
+Aplikasi ini **tidak menampilkan iklan** dan
 **tidak menjual atau membagikan data kepada pihak mana pun**.
 
 ## Hak Bapak/Ibu
@@ -49,8 +59,9 @@ Sesuai **Undang-Undang No. 27 Tahun 2022 tentang Pelindungan Data Pribadi**:
    pengurangan nilai dan tidak ada perlakuan berbeda.
 2. Bapak/Ibu dapat **menarik persetujuan kapan saja** tanpa perlu memberi alasan, cukup
    memberi tahu guru.
-3. Seluruh data dapat **dihapus total kapan saja** dengan menghapus aplikasi dari ponsel
-   anak. Tidak ada salinan yang tertinggal di server.
+3. Data dapat **dihapus kapan saja**: catatan latihan di server lewat tombol "Hapus dari
+   server" di aplikasi (atau minta penanggung jawab), data di ponsel dengan menghapus
+   aplikasinya.
 4. Bapak/Ibu dapat bertanya apa pun mengenai data ini melalui kontak di bawah.
 
 ---
@@ -67,7 +78,8 @@ Saya yang bertanda tangan di bawah ini:
 
 Menyatakan bahwa saya telah membaca dan memahami keterangan di atas, dan:
 
-&nbsp;&nbsp;&nbsp;&nbsp;☐ **MENYETUJUI** anak saya mengikuti uji coba aplikasi FIEZEL
+&nbsp;&nbsp;&nbsp;&nbsp;☐ **MENYETUJUI** anak saya mengikuti uji coba aplikasi FIEZEL, **termasuk penyimpanan
+catatan latihan di akunnya** supaya progresnya tidak hilang saat ganti ponsel
 
 &nbsp;&nbsp;&nbsp;&nbsp;☐ **TIDAK MENYETUJUI** — saya memahami anak saya tetap mengikuti pelajaran seperti biasa
 
