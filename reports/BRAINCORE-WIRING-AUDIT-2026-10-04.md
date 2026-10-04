@@ -1,6 +1,6 @@
 # Audit kabel BrainCore → dashboard murid dan KelasKu
 
-> **Status:** Gelombang 1 (D1, D2, D3, D5, D6) tersambung di m025-457. Gelombang 2 (K1, K2, K3) tersambung di m025-462 (`docs/handoffs/FIEZEL-M025-462-BRAINCORE-WAVE2-KELASKU-HANDOFF.md`). Yang belum: K4, D4, D7, dan D8. (Klaim "graf kurikulum tidak pernah diisi" di draf awal salah, lihat koreksi di §2C.)
+> **Status:** Gelombang 1 (D1, D2, D3, D5, D6) tersambung di m025-457. Gelombang 2 (K1, K2, K3) tersambung di m025-462 (`docs/handoffs/FIEZEL-M025-462-BRAINCORE-WAVE2-KELASKU-HANDOFF.md`). D4 dan D7 tersambung di m025-462 (PR yang sama). Yang belum: K4 dan D8. (Klaim "graf kurikulum tidak pernah diisi" di draf awal salah, lihat koreksi di §2C.)
 
 **Tanggal:** 2026-10-04 · **Basis:** `main` @ `587335cd` (m025-450)
 **Pertanyaan owner:** kemampuan BrainCore mana yang sudah dihitung tetapi belum sampai ke dashboard
@@ -70,7 +70,7 @@ KelasKu (murid maupun guru) sama sekali tidak tersambung ke model belajar BrainC
 | `fiezel-core-brain.js` | `lessonNode`, `curriculumGraphSize` (publik) | **Koreksi 2026-10-04:** draf awal laporan ini menyebut graf kurikulum tidak pernah diisi. Itu **salah**. `setCurriculumGraph(GRAMMAR_CURRICULUM)` dipanggil di `app.js:5766` lewat `?.(` (pola yang terlewat oleh pencarian awal), dan `rootCause` memakainya lewat `prerequisiteChain`. Yang belum dipakai dari luar hanya dua pembaca ini, dan keduanya tidak perlu disambungkan. |
 | | `trend`, `reviewPriority`, `optimalDifficulty`, `difficultyBand` (publik) | Sebagian dipakai secara internal oleh `analyze()`, tetapi tidak pernah ditampilkan. |
 | `fiezel-confusion-matrix.js` | `suggestPrerequisiteEdges` | Bisa mengusulkan sambungan prasyarat baru dari pola tertukar murid. Ini pasangan alami untuk graf kurikulum di atas. |
-| `fiezel-affect.js` | `suggestionFor` | `affectSuggestionMarkup()` ada, tetapi tidak memakai fungsi modul ini. |
+| `fiezel-affect.js` | `suggestionFor` | **Koreksi:** dipakai di dalam `assess()` (fiezel-affect.js:279, 296), dan sarannya sampai ke layar lewat `affectSuggestionMarkup()`. Tidak perlu disambungkan. |
 | `fiezel-item-prior.js` | `explain` | Alasan tingkat kesulitan soal. Berguna untuk tinjauan soal guru di KelasKu. |
 | `fiezel-question-memory.js` | `summary`, `stateOf`, `priorityOf`, `recordOf` | Lihat D8. |
 | `fiezel-param-ledger.js` | `verify`, `rollbackTo` | Penyetelan-diri tidak punya layar audit atau tombol kembalikan untuk owner. |

@@ -23,6 +23,15 @@ Otoritas: OWNER "perbaiki semua dan lanjutkan sampai semuanya merge", atas
   terkuat dan terlemah ikut penguasaan BrainCore per pelajaran. Kartu "Kata Braincore Hari Ini" yang sama dengan
   Beranda tampil di atas.
 
+## Ikut di PR yang sama: Gelombang 3 sebagian (D4, D7)
+- **D4:** pengingat lunak "ulangan rawan lupa" dan "kemarin belum belajar" kini boleh datang lebih awal di awal
+  jam belajar terbaik murid (`studyWindows` Core Brain lewat `braincoreBestWindowFrom` dan `alrsSoftHour`).
+  Ini hanya berlaku bila Core Brain yakin. Pengingat tidak pernah digeser lebih larut dari jadwal lama, dan
+  jam tenang malam tetap berlaku.
+- **D7:** tab Analisis Progres menampilkan peta kekeliruan antar-pelajaran dari matriks BrainCore
+  (`confusionInsightMarkup`).
+- Gerbang: `tests/braincore-wave3-reminder-analysis-test.js` (8 cek).
+
 ## Gerbang
 - Baru: `tests/braincore-wave2-kelasku-test.js` (12 cek, termasuk penolakan teks bebas di server).
 - `id-golden-baseline.json` ditulis ulang dengan sengaja (kalimat `kelas.bc-*` baru).
@@ -30,4 +39,4 @@ Otoritas: OWNER "perbaiki semua dan lanjutkan sampai semuanya merge", atas
 ## Belum dikerjakan
 - K4: tugas remedial dari guru belum dipersonalisasi per murid. Bank soal guru memakai kunci skill yang
   berbeda dari kunci pelajaran BrainCore, jadi perlu peta skill ke pelajaran lebih dulu.
-- Gelombang 3: pengingat di jam belajar terbaik (D4), tab Analisis membaca matriks kekeliruan dan OLM (D7), status konsep di Belajar mandiri (D8). Catatan: klaim draf audit bahwa graf kurikulum tidak pernah diisi ternyata salah, karena `setCurriculumGraph` sudah dipanggil di `app.js:5766`.
+- D8: status konsep di Belajar mandiri. Catatan: klaim draf audit bahwa graf kurikulum tidak pernah diisi ternyata salah, karena `setCurriculumGraph` sudah dipanggil di `app.js:5766`.
