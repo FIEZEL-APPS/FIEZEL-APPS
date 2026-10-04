@@ -108,6 +108,10 @@
     'quiz.scaffold-success': 'Bagus sekali! Kamu berhasil memperbaikinya sendiri! 🌟',
     'quiz.terlalu-cepat': 'Terlalu cepat',
     'quiz.ledger-keliru': 'keliru',
-    'quiz.review-in-days': 'Review {days}h'
+    'quiz.review-in-days': 'Review {days} hari',
+    'quiz.retry-why-probe': 'Perhatikan lagi: “{pilihan}” kurang pas di sini. {alasan}. Coba telaah opsi yang tersisa ya!',
+    'quiz.retry-why-hint': 'Pilihan “{pilihan}” kurang tepat: {alasan}. Coba pilih opsi lainnya ya!',
+    'quiz.why-kalimat-tepat': 'Kalimat yang tepat: “{jawaban}”.',
+    'quiz.why-bentuk-tepat': 'Bentuk yang tepat: “{jawaban}”.'
   });
 }());

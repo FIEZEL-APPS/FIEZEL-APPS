@@ -5362,13 +5362,30 @@ function diagnoseTokenOrderMistake(q){
   return `Urutan katanya belum tepat nih.${patternHint}`;
 }
 
+/**
+ * Entri alasan (q.explain.distractors) milik pilihan yang DIAMBIL murid.
+ *
+ * Audit BRAINCORE-GRAMMAR-FEEDBACK-AUDIT-2026-10-03 G2: pencocok lama memakai substring di
+ * dalam satu find(), dan daftar pengecoh berisi SEMUA pilihan (termasuk kunci) dalam urutan
+ * acak - jadi murid yang memilih "going" bisa membaca alasan milik "go" ("“go” bener — …")
+ * di bawah judul "Mengapa kurang tepat?". Sekarang: cocok PERSIS dulu di seluruh daftar;
+ * cadangan substring (per kata utuh) hanya di antara pilihan SALAH, tidak pernah kunci, dan
+ * hanya kalau tepat satu yang cocok - alasan yang mungkin salah alamat lebih buruk daripada
+ * tidak ada alasan.
+ */
+function grammarReasonEntry(q,picked){
+  const list=Array.isArray(q?.explain?.distractors)?q.explain.distractors:[];
+  const nw=w=>String(w??'').toLowerCase().replace(/[^\w\s]/g,'').replace(/\s+/g,' ').trim();
+  const p=nw(picked);
+  if(!p||!list.length)return null;
+  const exact=list.find(x=>nw(x?.option)===p);
+  if(exact)return exact;
+  const key=nw(q?.options?.[q?.answerIndex]);
+  const near=list.filter(x=>{const o=nw(x?.option);return o&&o!==key&&((' '+p+' ').includes(' '+o+' ')||(' '+o+' ').includes(' '+p+' '))});
+  return near.length===1?near[0]:null;
+}
 function tutorWhyFails(q,chosen){
-  const normWord=w=>String(w||'').toLowerCase().replace(/[^\w\s]/g,'').trim();
-  const cNorm=normWord(chosen);
-  const match=(q?.explain?.distractors||[]).find(x=>{
-    const oNorm=normWord(x?.option);
-    return oNorm===cNorm||(oNorm&&cNorm.includes(oNorm));
-  });
+  const match=grammarReasonEntry(q,chosen);
   const raw=String(match?.reason||match?.whyFailsId||match?.whyFails||'').trim();
   if(!raw)return '';
   const stripped=raw.replace(/^\s*[\u201c"][\s\S]*?[\u201d"]\s*/,'').trim();
@@ -11842,6 +11859,30 @@ try{
   }
 }catch(_){}
 
+/* Arti kata untuk tombol "intip arti" di soal susun kata, diambil dari bank kosakata yang
+   SUDAH ber-overlay locale (V). Hanya arti pertama, dipendekkan. Di locale th, arti yang
+   belum punya padanan Thai (V jatuh ke arti Indonesia) dilewati: lebih baik tanpa arti
+   daripada arti berbahasa yang salah. Kata fungsi & bentuk berinfleksi (she, went, eats)
+   dilengkapi widget dari copy-map grammar.gloss.*. */
+function tokenGlossMap(words){
+  const out={};
+  try{
+    if(!Array.isArray(V)||!V.length)return out;
+    if(tokenGlossMap.src!==V){
+      const idx=new Map();
+      for(const v of V){const w=String(v?.word||'').toLowerCase().trim();if(w&&!idx.has(w)&&v?.meaning)idx.set(w,String(v.meaning))}
+      tokenGlossMap.src=V;tokenGlossMap.idx=idx;
+    }
+    const th=(self.FiezelI18n?.getLocale?.()==='th');
+    for(const t of (Array.isArray(words)?words:[])){
+      const k=String(t||'').toLowerCase();const m=tokenGlossMap.idx.get(k);if(!m)continue;
+      if(th&&!/[\u0E00-\u0E7F]/.test(m))continue;
+      const short=m.split(/[;,]/)[0].trim();
+      if(short&&short.length<=28)out[k]=short;
+    }
+  }catch{}
+  return out;
+}
 function makeGrammarTokenOrderQuestion(skill, item, idx, level){
   const meta=GRAMMAR_ITEMS.find(x=>x.skill===skill);
   const activeLvl=level||meta?.level||getActiveLevel();
@@ -11871,7 +11912,7 @@ function makeGrammarTokenOrderQuestion(skill, item, idx, level){
   const explainDistractors=[];
   distractors.forEach(d=>{
     const match=rawDistList.find(x=>cleanWord(x?.option||'').toLowerCase()===d.toLowerCase())||{};
-    const reason=match.whyFailsId||match.whyFails||(typeof grammarOptionReason==='function'?grammarOptionReason(d,false,match.reason||'',match.misconceptionKey||match.misconception||''):'')||`Kata “${d}” bukan bentuk yang tepat.`;
+    const reason=match.whyFailsId||match.whyFails||(typeof grammarOptionReason==='function'?grammarOptionReason(d,false,match.reason||'',match.misconceptionKey||match.misconception||''):'')||FiezelI18n.t('grammar.token-reason-fallback',{kata:d});
     const entry={
       option:d,
       reason:reason,
@@ -11896,6 +11937,7 @@ function makeGrammarTokenOrderQuestion(skill, item, idx, level){
     lessonSkill:skill,
     question:FiezelI18n.t('grammar.token-order-prompt','Susun kata-kata berikut menjadi kalimat yang tepat:'),
     tokens:rawTokens,
+    gloss:tokenGlossMap([...rawTokens,...distractors]),
     distractors:distractors,
     alternates:alternates,
     correctOrder:rawTokens.map((_,i)=>i),
@@ -13572,11 +13614,7 @@ function quizLoop(cfg){
     if(tokenDiagnosis){
       pickedWhyFails=tokenDiagnosis;
     }else if(Array.isArray(q.explain?.distractors)){
-      const found=q.explain.distractors.find(x=>{
-        const xNorm=norm(String(x.option));
-        const pNorm=norm(String(q.options?.[j]||userPickDisplay));
-        return xNorm===pNorm||(xNorm&&pNorm&&(pNorm.includes(xNorm)||xNorm.includes(pNorm)));
-      });
+      const found=grammarReasonEntry(q,q.options?.[j]||userPickDisplay);
       if(found&&found.reason)pickedWhyFails=String(found.reason).trim();
     }
     if(!pickedWhyFails){
@@ -13589,7 +13627,7 @@ function quizLoop(cfg){
   if(!ok){
     if(/susunan kalimat sudah tepat/i.test(whyText)||whyText===FiezelI18n.t('grammar.susunan-kalimat-tepat','Urutan kata dan bentuk tata bahasa yang tepat.')){
       whyText=q.explain?.rule
-        ? (q.type==='token-order'?`Kalimat yang tepat: “${cleanCorrect}”.`:`Bentuk yang tepat: “${cleanCorrect}”.`)
+        ? FiezelI18n.t(q.type==='token-order'?'quiz.why-kalimat-tepat':'quiz.why-bentuk-tepat',{jawaban:cleanCorrect})
         : FiezelI18n.t('quiz.fallback-context');
     }
   }
@@ -13628,7 +13666,11 @@ function quizLoop(cfg){
    let telemetryRowHtml='';
    if(skillKey||bktPercent!==null){
      const skillTitle=(typeof grammarCurriculumEntry==='function'&&grammarCurriculumEntry(skillKey)?.title)||skillKey.replace(/-/g,' ');
-     const mistakeCount=Number(state.mistakeVault?.[skillKey]||0);
+     /* Audit G4: hitungan Mistake Vault sengaja dimulai dari 2 (syarat lulus dua sesi), jadi
+        TIDAK boleh dibaca sebagai "berapa kali keliru" - lencana dulu menulis "2x keliru"
+        sesudah kesalahan PERTAMA. Lencana kini menghitung jawaban salah sungguhan pada skill
+        ini (percobaan pertama yang tercatat di riwayat). */
+     const mistakeCount=(state.history||[]).slice(-300).filter(h=>h&&!h.ok&&(h.target===skillKey||h.skill===skillKey)).length;
      const repeatBadge=mistakeCount>=2
        ?`<span class="braincore-pill alert"><i data-lucide="triangle-alert"></i> ${mistakeCount}x ${FiezelI18n.t('quiz.ledger-keliru')}</span>`
        : '';
@@ -13651,7 +13693,17 @@ function quizLoop(cfg){
    const showStepGuidanceInFeedback = !MEASURE && !ok && isLearnerOverwhelmed(q);
    const stepGuidanceHtml = showStepGuidanceInFeedback ? stepTutorGuidanceMarkup(q) : '';
    f.innerHTML=`<div class="feedback-title"><i data-lucide="${verdictIcon}"></i><b>${verdictTitle}</b></div>${telemetryRowHtml}<p>${ok?FiezelI18n.t('quiz.correct-answer',{answer:`<strong>${esc(cleanCorrect)}</strong>`}):`${FiezelI18n.t('quiz.jawabanmu')} ${userPickRender}${FiezelI18n.t('quiz.answer-paling-tepat-adalah')} ${correctPickRender}.`}</p>${pickedWhyFails?`<p class="feedback-your-pick"><strong>${FiezelI18n.t('quiz.mengapa-salah','Mengapa kurang tepat?')}</strong> ${esc(pickedWhyFails)}</p>`:''}${stepGuidanceHtml}${(q.type==='grammar'||q.type==='token-order'||q.type==='video-grammar')&&q.explain?.rule/* m025-375: alasan dan aturan grammar di dua baris, bukan satu paragraf panjang */?`<p><strong>${FiezelI18n.t('quiz.intinya')}</strong> ${esc(whyText)}</p><p class="feedback-rule feedback-rule-pill"><strong>${FiezelI18n.t('quiz.aturannya')}</strong> ${esc(q.explain.rule)}</p>`:`<p><strong>${FiezelI18n.t('quiz.intinya')}</strong> ${esc(whyText)} ${q.explain?.rule?esc(q.explain.rule):''}</p>`}<details class="acc"><summary>${FiezelI18n.t(q.explain?.distractors?'quiz.bandingkan-pilihan-lain':'quiz.pembahasan-lengkap')}</summary><p class="muted">${esc(q.explain?.distractor||FiezelI18n.t('quiz.fallback-unsupported'))} ${esc(q.explain?.avoid||FiezelI18n.t('quiz.fallback-hint-check'))}</p>${q.explain?.distractors?`<div class="distractor-breakdown">${q.explain.distractors.map(x=>`<p><b>${esc(x.option)}:</b> ${esc(x.reason)}</p>`).join('')}</div>`:''}</details><div class="feedback-memory-box memory-tip"><div class="feedback-memory-header"><i data-lucide="lightbulb"></i><span class="feedback-memory-kicker">${FiezelI18n.t('quiz.trik-ingat','Trik Cepat Ingat')}</span></div><div class="feedback-memory-content">${formatMemoryTipForDisplay(esc(q.explain?.memory||FiezelI18n.t('quiz.fallback-hint-connect')))}</div></div><button class="ai-btn" id="aiExplainBtn"><i data-lucide="sparkles"></i> ${FiezelI18n.t('quiz.jelaskan-dengan-cara-lebih-sederhana')}</button>`;
-  speak(turn);
+  /* Audit G6: sesudah pembahasan jawaban SALAH dibuka, giliran tutor dulu (a) mengulang
+     kalimat "Mengapa kurang tepat?" yang sama persis di kotak pembahasan tepat di atasnya,
+     dan (b) pada tangga probe/hint menutup dengan "Sekarang coba jawab lagi ya" padahal semua
+     pilihan sudah terkunci. Kotak pembahasan adalah satu-satunya sumber di titik ini; tutor
+     hanya bicara bila punya hal yang TIDAK ada di kotak itu - sinyal "terlalu cepat". */
+  if(ok)speak(turn);
+  else if(answer.timing==='guess'){
+   let guess=null;
+   try{if(tutorAvailable())guess=self.FiezelTutorBrain.composeTurn({move:'hint',scaffold:'probe',explanation:{},whyFails:'',timing:'guess'})}catch{}
+   if(guess&&guess.say)speak({say:guess.say,ask:''});
+  }
   answer.locked=true;
   $('quizNext').disabled=false;
   showQuizFloatingNext();
@@ -13876,7 +13928,7 @@ function quizLoop(cfg){
      const userChoice=q.options?.[j];
      let rawReason='';
      if(Array.isArray(q.explain?.distractors)){
-       const found=q.explain.distractors.find(x=>norm(String(x.option))===norm(String(userChoice)));
+       const found=grammarReasonEntry(q,userChoice);
        if(found&&found.reason){
          rawReason=found.reason;
        }
@@ -13889,11 +13941,7 @@ function quizLoop(cfg){
      }
      const cleanReason=String(rawReason||'').trim().replace(/\.+$/,'');
      if(cleanReason){
-       if(answer.scaffold==='probe'){
-         nudgeText=`Perhatikan lagi: “${userChoice}” kurang pas di sini. ${cleanReason}. Coba telaah opsi yang tersisa ya!`;
-       }else{
-         nudgeText=`Pilihan “${userChoice}” kurang tepat: ${cleanReason}. Coba pilih opsi lainnya ya!`;
-       }
+       nudgeText=FiezelI18n.t(answer.scaffold==='probe'?'quiz.retry-why-probe':'quiz.retry-why-hint',{pilihan:userChoice,alasan:cleanReason});
      }
      if(!nudgeText){
        nudgeText=FiezelI18n.t('quiz.coba-lagi-pilih-jawaban-lain','Coba lagi yuk, periksa petunjuk dan pilih jawaban lain');

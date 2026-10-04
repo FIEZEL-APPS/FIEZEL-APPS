@@ -745,6 +745,13 @@
             explain: activeEx.explain || {}
           };
           feedbackHost.innerHTML = self.FiezelGrammarUpgrade.buildFeedbackHTML(qObj, chosenIndex, isCorrect);
+          // Tombol AI dipasang di sini, bukan lewat onclick inline: atribut inline berjalan di
+          // lingkup global, tempat `q`/`j` tidak pernah ada.
+          const aiBtn = feedbackHost.querySelector('#aiExplainBtn');
+          if (aiBtn) {
+            if (typeof self.explainWithAI === 'function') aiBtn.onclick = () => self.explainWithAI(qObj, chosenIndex);
+            else aiBtn.remove();
+          }
           feedbackHost.classList.remove('hidden', 'feedback-success', 'feedback-error');
           feedbackHost.classList.add(isCorrect ? 'feedback-success' : 'feedback-error');
           if (typeof self.enhanceUI === 'function') self.enhanceUI();

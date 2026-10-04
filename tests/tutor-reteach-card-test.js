@@ -50,7 +50,7 @@ function test(name, fn) {
 // Fungsi-fungsi yang dipakai kartu diambil apa adanya dari app.js dan dijalankan di VM.
 // Menyalin ulang logikanya ke dalam tes akan menguji salinan, bukan yang dikirim.
 function loadCardFns() {
-  const wanted = ['TUTOR_ID_MARKERS', 'TUTOR_EN_MARKERS', 'tutorIndonesian', 'tutorWhyFails', 'tutorConceptCard'];
+  const wanted = ['TUTOR_ID_MARKERS', 'TUTOR_EN_MARKERS', 'tutorIndonesian', 'grammarReasonEntry', 'tutorWhyFails', 'tutorConceptCard'];
   const parts = [];
   for (const name of wanted) {
     const re = name.startsWith('TUTOR_')
