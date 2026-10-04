@@ -430,6 +430,10 @@ jobs:
           # paling-rawan-dulu, dua tab tidak saling menimpa (jalur simpan sungguhan di dua "tab"),
           # dan sinkron riwayat BrainCore benar-benar dipanggil tanpa macet. Node murni.
           node tests/learning-integrity-2026-10-04-test.js
+          # Lanjutan audit 2026-10-04: "Masih belajar" bukan jawaban salah (V-E), taksiran kemampuan
+          # mulai dari level aktif (P-C), dan lesson grammar/bacaan yang jatuh tempo dari level lama
+          # tetap diulang sesudah naik level. Bagian browser SKIP tanpa Playwright.
+          node tests/review-continuity-2026-10-04-test.js
           node tests/css-keyframe-uniq-test.js
           node tests/pastel-field-contrast-test.js
           node tests/topbar-logo-contrast-test.js
