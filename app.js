@@ -12804,8 +12804,10 @@ function reading(){const level=getActiveLevel(),active=R.filter(r=>r.level===lev
 function openReadingLevel(l){const active=getActiveLevel();if(String(l||'')!==active)return showToast(FiezelI18n.t('reading.reading-dikunci-level',{active:active}));const r=pick(R.filter(x=>x.level===active));if(r)readingSession(r);else showToast(FiezelI18n.t('reading.reading-belum-tersedia',{active:active}))}
 function startReadingRandom(){const active=getActiveLevel(),pool=R.filter(r=>r.level===active);if(pool.length)readingSession(pick(pool));else showToast(FiezelI18n.t('reading.reading-belum-tersedia',{active:active}))}
 /* Ulangan lintas level (audit 2026-10-04): bacaan yang JATUH TEMPO dari level <= aktif didahulukan;
-   sesudah itu perilaku lama (bacaan level aktif yang masih lemah, lalu acak). */
-function startReadingAdaptive(){if(!state.adaptiveReady){showToast(FiezelI18n.t('reading.reading-terbuka-setelah-tes-awal'));return}const now=Date.now(),level=getActiveLevel(),due=R.filter(x=>reviewLevelOk(x.level,level)&&state.reading[x.id]?.nextReview&&state.reading[x.id].nextReview<=now),ids=new Set(Object.entries(state.reading).filter(([,x])=>x.total&&(x.mastery<80||(x.nextReview&&x.nextReview<=now))).map(([id])=>id)),pool=R.filter(x=>x.level===level),r=pick(due)||pick(pool.filter(x=>ids.has(x.id)))||pick(pool);if(r)readingSession(r,{review:r.level!==level});else showToast(FiezelI18n.t('reading.belum-ada-area-reading-perlu',{level:level}))}
+   sesudah itu perilaku lama (bacaan level aktif yang masih lemah, lalu acak). Kolamnya tetap
+   tercakup: hanya level <= aktif, dan hanya yang jatuh tempo - bukan kolam semua level
+   (kontrak tests/level-grammar-contract-test.js). */
+function startReadingAdaptive(){if(!state.adaptiveReady){showToast(FiezelI18n.t('reading.reading-terbuka-setelah-tes-awal'));return}const now=Date.now(),level=getActiveLevel(),due=R.filter(x=>reviewLevelOk(x.level,level)&&state.reading[x.id]?.nextReview&&state.reading[x.id].nextReview<=now),ids=new Set(Object.entries(state.reading).filter(([,x])=>x.total&&(x.mastery<80||(x.nextReview&&x.nextReview<=now))).map(([id])=>id)),pool=R.filter(x=>x.level===level),r=pick(due)||pick(pool.filter(x=>ids.has(x.id)))||pick(pool);if(r)readingSession(r,{review:due.includes(r)});else showToast(FiezelI18n.t('reading.belum-ada-area-reading-perlu',{level:level}))}
 function readingSkill(original){
   const q=String(original||'').toLowerCase();
   if(/\bwhy\b|reason|because|suggest|imply/.test(q))return 'inference';
