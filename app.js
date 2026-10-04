@@ -8062,7 +8062,7 @@ window.openLiveVoiceStage=openLiveVoiceStage;window.closeLiveVoiceStage=closeLiv
 window.fzStageToggleMic=fzStageToggleMic;window.fzStageToggleRound=fzStageToggleRound;
 window.fzStageCorrectGuess=fzStageCorrectGuess;window.fzStageNextCard=fzStageNextCard;
 window.fzStageSfx=fzStageSfx;window.fzStageReact=fzStageReact;window.fzStageInvite=fzStageInvite;
-if(typeof document!=='undefined'){
+if(typeof document!=='undefined'&&typeof document.addEventListener==='function'){
   document.addEventListener('keydown',(e)=>{if(e&&e.key==='Escape'&&fzStageDrawerOpen){e.preventDefault();closeLiveVoiceStage()}});
 }
 /* ===== LOGIN WAJIB (m025-367, keputusan OWNER 24 September 2026) =========================

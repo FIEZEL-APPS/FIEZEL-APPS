@@ -1,7 +1,7 @@
 {
-  "version": "m025-443",
+  "version": "m025-444",
   "claimedBy": "branch main",
-  "claimedAt": "2026-10-04T06:12:04.549Z",
-  "reason": "fix(ui): 2-col latihan grid, compact roadmap, direct lesson intro, emerald tutor, and clean feedback",
+  "claimedAt": "2026-10-04T06:19:14.472Z",
+  "reason": "fix(stage): guard document.addEventListener for vm regression test",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
