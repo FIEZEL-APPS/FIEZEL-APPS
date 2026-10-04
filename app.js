@@ -9448,18 +9448,7 @@ function todayHomeMarkup(){
     ? self.FiezelNujum.homeCardMarkup()
     : '';
 
-  /* BUG × Sarang (2026-09-30): adegan Sarang menggantikan hero + kartu NUJUM + Aurora di Home;
-     hub skill, strip KelasKu, dan laci detail tetap. Tanpa modul, tampilan lama utuh. */
-  const bugHome=(self.FiezelBug&&typeof self.FiezelBug.homeMarkup==='function')?self.FiezelBug.homeMarkup():'';
-  if(bugHome)return `<div class="today-home-cockpit fz-edu-cockpit fz-bug-home">
-  ${bugHome}
-  ${quickChips}
-  ${kelaskuStrip}
-  <details class="fz-card-drawer" style="margin-top:4px">
-    <summary class="fz-drawer-toggle"><span>${esc(FiezelI18n.t('home.sesi-next'))}</span><span class="fz-drawer-arrow">▾</span></summary>
-    <div class="fz-drawer-inner">${homeTop}${card1Hero}${card2Hero}${card3Hero}${rhythmBar}${badan}${activeLevelTrustLineMarkup()}${evidenceProgressPanelMarkup()}</div>
-  </details>
-</div>`;
+  /* Home Cockpit: Render pure daylight Tactile Clay interface directly */
   return `<div class="today-home-cockpit fz-edu-cockpit">
   ${homeTop}
   ${nujumCard}
@@ -9467,19 +9456,14 @@ function todayHomeMarkup(){
   ${card1Hero}
   ${quickChips}
   ${kelaskuStrip}
-  <details class="fz-card-drawer" style="margin-top:4px">
-    <summary class="fz-drawer-toggle"><span>${esc(FiezelI18n.t('home.sesi-next') || (isTh ? 'รายละเอียดเนื้อหา & จังหวะ' : 'DETAIL MATERI & RITME'))}</span><span class="fz-drawer-arrow">▾</span></summary>
-    <div class="fz-drawer-inner">
-      ${card2Hero}
-      ${card3Hero}
-      <div class="today-head"><span class="today-eyebrow">${FiezelI18n.t('today.eyebrow')}</span>${todayHeadChips}</div>
-      ${rhythmBar}
-      ${badan}
-      ${streak>0?`<p class="today-streak"><i class="fz-i" data-fz-icon="flame" aria-hidden="true"></i> ${esc(FiezelI18n.t('today.streak',{days:streak}))}</p>`:''}
-      ${activeLevelTrustLineMarkup()}
-      ${evidenceProgressPanelMarkup()}
-    </div>
-  </details>
+  ${card2Hero}
+  ${card3Hero}
+  <div class="today-head"><span class="today-eyebrow">${FiezelI18n.t('today.eyebrow')}</span>${todayHeadChips}</div>
+  ${rhythmBar}
+  ${badan}
+  ${streak>0?`<p class="today-streak"><i class="fz-i" data-fz-icon="flame" aria-hidden="true"></i> ${esc(FiezelI18n.t('today.streak',{days:streak}))}</p>`:''}
+  ${activeLevelTrustLineMarkup()}
+  ${evidenceProgressPanelMarkup()}
   ${heroMascotMarkup}
   ${jaCourseOn()?FiezelJaUi.wordOfDayMarkup(V.filter(v=>v.level===getActiveLevel())):''}
   ${learnerFlowHomeMarkup()}

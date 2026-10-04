@@ -6000,27 +6000,27 @@ body.fz-auth-open{overflow:hidden}
    ========================================================================== */
 
 html, body {
-  --fz-sports-bg: #0A0A0E;
-  --fz-sports-card-bg: #14141A;
-  --fz-sports-card-border: rgba(255, 255, 255, 0.15);
-  --fz-sports-yellow: #FFE02E;
-  --fz-sports-yellow-hi: #FFE848;
-  --fz-sports-yellow-lo: #FFD42D;
-  --fz-sports-yellow-ink: #0A0A0E;
-  --fz-sports-yellow-glow: rgba(255, 224, 46, 0.4);
-  --fz-sports-silver-hi: #F0F2F6;
-  --fz-sports-silver-lo: #D2D7E2;
-  --fz-sports-dark-hi: #25252E;
-  --fz-sports-dark-lo: #15151A;
-  --fz-sports-text-muted: #8E8E98;
+  --fz-sports-bg: #FAF8F5;
+  --fz-sports-card-bg: #FFFFFF;
+  --fz-sports-card-border: #E2E8F0;
+  --fz-sports-yellow: #FFD21E;
+  --fz-sports-yellow-hi: #FFE054;
+  --fz-sports-yellow-lo: #FFB703;
+  --fz-sports-yellow-ink: #2E1800;
+  --fz-sports-yellow-glow: rgba(255, 210, 30, 0.4);
+  --fz-sports-silver-hi: #FFFFFF;
+  --fz-sports-silver-lo: #F1F5F9;
+  --fz-sports-dark-hi: #FFFFFF;
+  --fz-sports-dark-lo: #F8FAFC;
+  --fz-sports-text-muted: #64748B;
 }
 
 /* Home Page Canvas & Shell Resets */
 html:has(.home-today),
 body:has(.home-today) {
   scroll-padding-bottom: calc(76px + env(safe-area-inset-bottom, 12px)) !important;
-  background: #0A0A0E !important;
-  color: #FFFFFF !important;
+  background: #FAF8F5 !important;
+  color: #0F172A !important;
 }
 
 body:has(.home-today) main.app {
@@ -6037,8 +6037,8 @@ html.has-home-today #globalSky {
 }
 
 .home-today {
-  background: radial-gradient(ellipse 90% 40% at 50% -5%, rgba(255, 224, 46, 0.12) 0%, transparent 60%), #0A0A0E !important;
-  color: #FFFFFF !important;
+  background: #FAF8F5 !important;
+  color: #0F172A !important;
   min-height: auto !important;
   padding: 16px 14px calc(80px + env(safe-area-inset-bottom, 12px)) 14px !important;
   position: relative !important;
@@ -6573,14 +6573,14 @@ details[open] .fz-drawer-arrow {
 .fz-sports-cta {
   width: 100% !important;
   margin-top: 10px !important;
-  background: #0A0A0E !important;
-  color: #FFFFFF !important;
-  border-radius: 16px !important;
+  background: linear-gradient(180deg, #FFE054 0%, #FFB703 100%) !important;
+  color: #2E1800 !important;
+  border-radius: 18px !important;
   padding: 15px 20px !important;
   font-weight: 800 !important;
   font-size: 14.5px !important;
-  border: none !important;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25) !important;
+  border: 2px solid #D97706 !important;
+  box-shadow: 0 5px 0 #D97706, 0 12px 24px rgba(255, 183, 3, 0.35) !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -6865,7 +6865,7 @@ nav.bottomnav .nav:hover:not(.active) svg,
 }
 
 /* ==========================================================================
-   UNIFIED LUXURY DARK DESIGN SYSTEM — HARMONIZED ACROSS ALL PANELS
+   UNIFIED DAYLIGHT TACTILE CLAY DESIGN SYSTEM — HARMONIZED ACROSS ALL PANELS
    (HOME, LATIHAN, KELASKU, PROGRES, PROFIL / ONLINE & SUBVIEWS)
    ========================================================================== */
 
@@ -6877,8 +6877,8 @@ body.scene-night,
 body.fz-lux,
 body.fz-lang-ja,
 html.fiezel-ui-v6 body {
-  background-color: #0A0A0E !important;
-  color: #FFFFFF !important;
+  background-color: #FAF8F5 !important;
+  color: #0F172A !important;
 }
 
 #globalSky {
@@ -6887,36 +6887,36 @@ html.fiezel-ui-v6 body {
 
 main.app {
   background: transparent !important;
-  color: #FFFFFF !important;
+  color: #0F172A !important;
 }
 
 #app {
   background: transparent !important;
-  color: #FFFFFF !important;
+  color: #0F172A !important;
 }
 
-/* Page containers & subtle ambient gold glow */
+/* Page containers */
 section.fade,
 .classroom-page,
 .home-page {
-  background: radial-gradient(ellipse 90% 40% at 50% -5%, rgba(255, 224, 46, 0.08) 0%, transparent 60%), #0A0A0E !important;
-  color: #FFFFFF !important;
+  background: #FAF8F5 !important;
+  color: #0F172A !important;
   min-height: auto !important;
   padding-bottom: calc(80px + env(safe-area-inset-bottom, 12px)) !important;
 }
 
 /* Bottom Nav Scrim */
 .nav-scrim {
-  background: linear-gradient(180deg, transparent 0%, rgba(10, 10, 14, 0.85) 60%, #0A0A0E 100%) !important;
+  background: linear-gradient(180deg, transparent 0%, rgba(250, 248, 245, 0.85) 60%, #FAF8F5 100%) !important;
 }
 
-/* 2. Universal Luxury Dark Topbar */
+/* 2. Universal Tactile Clay Daylight Topbar */
 header.topbar {
-  background: rgba(14, 14, 20, 0.88) !important;
+  background: rgba(255, 255, 255, 0.95) !important;
   backdrop-filter: blur(20px) !important;
   -webkit-backdrop-filter: blur(20px) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5) !important;
+  border-bottom: 2px solid #E2E8F0 !important;
+  box-shadow: 0 4px 0 #CBD5E1 !important;
   position: sticky !important;
   top: 0 !important;
   z-index: 100 !important;
@@ -6924,42 +6924,44 @@ header.topbar {
 
 .topbar .brand-button {
   background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 .topbar .brand svg.fiezel-wordmark {
-  filter: drop-shadow(0 2px 8px rgba(255, 217, 79, 0.35)) !important;
+  filter: none !important;
 }
 
 .topbar .brand svg.fiezel-wordmark text,
 .topbar .brand svg.fiezel-wordmark path,
 .topbar .brand svg.fiezel-wordmark rect,
 .topbar .brand svg.fiezel-wordmark g {
-  --wordmark-ink-hi: #FFFFFF !important;
-  --wordmark-ink-lo: #F8ECD5 !important;
-  --wordmark-accent-hi: #FFE02E !important;
-  --wordmark-accent-lo: #FFB800 !important;
+  --wordmark-ink-hi: #0F172A !important;
+  --wordmark-ink-lo: #1E293B !important;
+  --wordmark-accent-hi: #FFD21E !important;
+  --wordmark-accent-lo: #D97706 !important;
 }
 
-#fzTopMark #fztIv stop:first-child { stop-color: #FFFFFF !important; }
-#fzTopMark #fztIv stop:last-child { stop-color: #F8ECD5 !important; }
-#fzTopMark #fztGo stop:first-child { stop-color: #FFE02E !important; }
-#fzTopMark #fztGo stop:last-child { stop-color: #FFB800 !important; }
+#fzTopMark #fztIv stop:first-child { stop-color: #0F172A !important; }
+#fzTopMark #fztIv stop:last-child { stop-color: #1E293B !important; }
+#fzTopMark #fztGo stop:first-child { stop-color: #FFD21E !important; }
+#fzTopMark #fztGo stop:last-child { stop-color: #D97706 !important; }
 
 .topbar .icon-button,
 .topbar .course-switch-btn,
 .topbar #fzCourseSwitchBtn {
-  background: #181822 !important;
-  border: 1px solid rgba(255, 255, 255, 0.09) !important;
-  color: #E4E4E7 !important;
-  box-shadow: none !important;
+  background: #FFFFFF !important;
+  border: 2px solid #E2E8F0 !important;
+  color: #0F172A !important;
+  box-shadow: 0 3px 0 #CBD5E1 !important;
   transition: all 0.2s ease !important;
 }
 
 .topbar .icon-button:hover,
 .topbar .course-switch-btn:hover {
-  background: #242432 !important;
-  color: #FFFFFF !important;
-  border-color: rgba(255, 255, 255, 0.2) !important;
+  background: #F8FAFC !important;
+  color: #0F172A !important;
+  border-color: #CBD5E1 !important;
 }
 
 .topbar .course-switch-btn {
@@ -6968,7 +6970,7 @@ header.topbar {
 }
 
 .topbar .course-switch-label {
-  color: #FFFFFF !important;
+  color: #0F172A !important;
   font-weight: 800 !important;
 }
 
@@ -6978,7 +6980,7 @@ header.topbar {
 }
 
 .section-head h1 {
-  color: #FFFFFF !important;
+  color: #0F172A !important;
   font-weight: 800 !important;
   letter-spacing: -0.02em !important;
   font-size: 1.85rem !important;
@@ -6986,38 +6988,38 @@ header.topbar {
 }
 
 .section-head p {
-  color: #9494A0 !important;
+  color: #64748B !important;
   font-size: 0.95rem !important;
   margin-top: 4px !important;
 }
 
 /* Level Control Button in Section Head */
 .active-level-control {
-  background: #181822 !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  color: #FFFFFF !important;
+  background: #FFFFFF !important;
+  border: 2px solid #E2E8F0 !important;
+  color: #0F172A !important;
   border-radius: 14px !important;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35) !important;
+  box-shadow: 0 4px 0 #CBD5E1 !important;
   transition: all 0.2s ease !important;
 }
 
 .active-level-control:hover {
-  background: #222230 !important;
-  border-color: rgba(255, 224, 46, 0.4) !important;
+  background: #F8FAFC !important;
+  border-color: #CBD5E1 !important;
 }
 
 .active-level-control span {
-  color: #8E8E98 !important;
+  color: #64748B !important;
 }
 
 .active-level-control strong {
-  color: #FFE02E !important;
+  color: #D97706 !important;
   font-weight: 800 !important;
 }
 
 .active-level-control small {
-  background: rgba(255, 255, 255, 0.08) !important;
-  color: #FFFFFF !important;
+  background: #F1F5F9 !important;
+  color: #0F172A !important;
   border-radius: 6px !important;
 }
 
@@ -7026,11 +7028,11 @@ html body:has(.home-today) .card,
 body.fz-lux .card,
 .social-card,
 .progress-card {
-  background: #14141B !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  background: #FFFFFF !important;
+  border: 2px solid #E2E8F0 !important;
   border-radius: 20px !important;
-  color: #FFFFFF !important;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
+  color: #0F172A !important;
+  box-shadow: 0 6px 0 #CBD5E1, 0 14px 28px rgba(15, 23, 42, 0.05) !important;
   padding: 20px !important;
 }
 
@@ -7038,13 +7040,13 @@ body.fz-lux .card,
 .card h3,
 .card strong,
 .card b {
-  color: #FFFFFF !important;
+  color: #0F172A !important;
 }
 
 .card p.muted,
 .card small,
 .card .muted {
-  color: #8E8E98 !important;
+  color: #64748B !important;
 }
 
 .card hr {
@@ -7713,15 +7715,16 @@ body.fz-lux .path-node {
 
 /* Grammar Lesson Detail Page */
 .grammar-lesson-page {
-  background: radial-gradient(ellipse 90% 40% at 50% -5%, rgba(255, 224, 46, 0.08) 0%, transparent 60%), #0A0A0E !important;
-  color: #FFFFFF !important;
+  background: #FAF8F5 !important;
+  color: #0F172A !important;
 }
 
 .grammar-lesson-card {
-  background: #14141B !important;
-  border: 1px solid rgba(255, 255, 255, 0.09) !important;
+  background: #FFFFFF !important;
+  border: 2px solid #E2E8F0 !important;
   border-radius: 20px !important;
-  color: #FFFFFF !important;
+  box-shadow: 0 6px 0 #CBD5E1 !important;
+  color: #0F172A !important;
 }
 
 .lesson-bubble {
@@ -7906,33 +7909,33 @@ body:not(.theme-dark):not(.fz-lux) .card-light .feedback .memory-tip strong {
 }
 
 /* ==========================================================================
-   12. QUIZ & PRACTICE SCREENS HIGH-CONTRAST (DARK LUXURY ATHLETIC)
+   12. QUIZ & PRACTICE SCREENS (DAYLIGHT TACTILE CLAY)
    ========================================================================== */
 .quiz-shell,
 .stage-shell {
-  background: #0A0A0E !important;
-  color: #FFFFFF !important;
+  background: #FAF8F5 !important;
+  color: #0F172A !important;
 }
 
 body.fz-lux .quiz-topbar,
 body:has(.home-today) .quiz-topbar,
 .stage-header {
-  background: #14141B !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
-  color: #FFFFFF !important;
+  background: #FFFFFF !important;
+  border-bottom: 2px solid #E2E8F0 !important;
+  color: #0F172A !important;
   margin-bottom: 16px !important;
 }
 
 .quiz-topbar span,
 .quiz-progress span,
 .stage-counter {
-  color: #FFFFFF !important;
+  color: #0F172A !important;
   font-weight: 800 !important;
 }
 
 .quiz-topbar em,
 .quiz-progress em {
-  color: #94A3B8 !important;
+  color: #64748B !important;
 }
 
 .quiz-exit {
@@ -8709,13 +8712,13 @@ button.fz-coach-bubble,
   html {
     overflow-x: clip !important;
     overflow-y: auto !important;
-    background: #0A0A0E !important;
+    background: #FAF8F5 !important;
     -webkit-overflow-scrolling: touch;
   }
   body {
     overflow-x: clip !important;
     overflow-y: visible !important;
-    background: #0A0A0E !important;
+    background: #FAF8F5 !important;
   }
 
   main.app,
