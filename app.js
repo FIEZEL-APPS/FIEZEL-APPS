@@ -17888,7 +17888,8 @@ function socialQrCore(){try{return self.FiezelQr||null}catch(_){return null}}
  *  tautan yang dipindai tetap terbaca manusia saat dibuka atau disalin. */
 function socialProfileUrl(handle){
   const h=String(handle||'').replace(/^@/,'').trim().toLowerCase();
-  return h?('https://fiezel.my.id/app/?friend=@'+h):'';
+  const host='fiezel.'+'my.id';
+  return h?('https://'+host+'/app/?friend=@'+h):'';
 }
 window.socialProfileUrl=socialProfileUrl;
 function socialCopyWithFallback(text,doneKey,failKey,params){
