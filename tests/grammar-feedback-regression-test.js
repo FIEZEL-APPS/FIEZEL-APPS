@@ -14,12 +14,16 @@
  * B. Browser (Playwright + Chromium). SKIP dengan pesan jelas, keluar 0, bila tidak ada —
  *    pola yang sama dengan tests/ui-render-audit-test.js. Merah hanya bila browsernya ada
  *    DAN perilakunya patah.
+ *
+ * TANPA SOCKET: gerbang ini tidak membuka server http. Berkas repo disajikan oleh
+ * page.route() di origin http://localhost:4173 (konteks aman, tanpa listener sungguhan), dan
+ * setiap request ke origin lain DIGAGALKAN — jadi tidak ada egress, dan gerbang ini tidak
+ * perlu masuk SOCKET_ALLOWLIST tests/no-network-test.js.
  */
 'use strict';
 const __fzRoot = require('path').join(__dirname, '..'); /* m025-254: konvensi alias akar repo untuk gerbang di tests/. */
 const fs = require('fs');
 const path = require('path');
-const http = require('http');
 const vm = require('vm');
 const assert = require('assert');
 
@@ -95,6 +99,25 @@ async function sectionA() {
       }
     }
   });
+  await test('A7 retry grammar mengirim sesi tutor + contoh mirip (rotasi penjelasan hidup)', () => {
+    assert.ok(/tutorCompose\(q,j,false,answer\.scaffold,answer\.move,answer\.timing,\{session:tutor,similar:mirip\}\)/.test(APP), 'panggilan retry tidak membawa sesi/contoh mirip');
+    assert.ok(/function grammarSimilarExample\(q\)/.test(APP), 'pencari contoh mirip hilang');
+  });
+  await test('A8 AI explain susun kata memakai kalimat murid, bukan indeks -1 (G9)', () => {
+    assert.ok(/const picked=String\(\(q\?\.type==='token-order'&&q\?\.__userTokenAnswer\)/.test(APP), 'explainWithAI tidak membaca __userTokenAnswer');
+  });
+  await test('A9 petunjuk: tingkat dicatat ke riwayat dan tingkat 4 tanpa explain.why (G8)', () => {
+    assert.ok(/h\.hintLevel=hintLevel/.test(APP), 'record() tidak mencatat hintLevel');
+    assert.ok(/qOrRule\.__hintLevel = Math\.max/.test(WIDGET), 'popover tidak mencatat tingkat petunjuk');
+    const lvl4 = WIDGET.slice(WIDGET.indexOf('num: 4'), WIDGET.indexOf('num: 4') + 600);
+    assert.ok(!/exp\.why/.test(lvl4), 'tingkat 4 masih membuka explain.why sebelum menjawab');
+  });
+  await test('A10 kalimat cadangan tutor tidak lagi soal penanda waktu (G11)', () => {
+    const T = require(path.join(ROOT, 'features/brain/fiezel-tutor-brain.js'));
+    const probe = T.composeTurn({ move: 'hint', scaffold: 'probe', explanation: {} }).ask;
+    const hint = T.composeTurn({ move: 'hint', scaffold: 'hint', explanation: {} }).ask;
+    for (const line of [probe, hint]) assert.ok(!/waktu|kapan/i.test(line), 'masih spesifik tenses: ' + line);
+  });
   await test('A6 widget susun kata tidak lagi menahan kiriman salah', () => {
     assert.ok(!/q\.__scaffoldAttempt\s*=\s*true/.test(WIDGET), 'widget kembali memasang scaffold sendiri');
     assert.ok(!/tokenScaffoldHint/.test(WIDGET), 'kotak petunjuk internal widget kembali');
@@ -122,27 +145,23 @@ function findChromium(pw) {
   } catch (_) {}
   return null;
 }
-const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png', '.woff2': 'font/woff2' };
-function serve() {
-  return new Promise(resolve => {
-    const server = http.createServer((req, res) => {
-      const p = new URL(req.url, 'http://127.0.0.1').pathname;
-      const target = path.resolve(ROOT, p === '/' ? 'index.html' : p.replace(/^\/+/, ''));
-      if (!target.startsWith(ROOT + path.sep)) { res.writeHead(403); return res.end(); }
-      fs.readFile(target, (e, c) => {
-        if (e) { res.writeHead(404); return res.end(); }
-        res.writeHead(200, { 'Content-Type': MIME[path.extname(target)] || 'application/octet-stream' });
-        res.end(c);
-      });
-    });
-    server.listen(0, '127.0.0.1', () => resolve(server));
+const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png', '.woff2': 'font/woff2', '.jpg': 'image/jpeg', '.mp4': 'video/mp4' };
+const ORIGIN = 'http://localhost:4173';
+async function routeRepo(page) {
+  await page.route('**/*', async route => {
+    const url = new URL(route.request().url());
+    if (url.origin !== ORIGIN) return route.abort();
+    const target = path.resolve(ROOT, url.pathname === '/' ? 'index.html' : decodeURIComponent(url.pathname).replace(/^\/+/, ''));
+    if (!target.startsWith(ROOT + path.sep) || !fs.existsSync(target) || fs.statSync(target).isDirectory()) return route.fulfill({ status: 404, body: '' });
+    return route.fulfill({ status: 200, contentType: MIME[path.extname(target)] || 'application/octet-stream', body: fs.readFileSync(target) });
   });
 }
 
 const ID_WORDS = /\b(pilihan|kurang|tepat|coba|petunjuk|kesempatan|kata|kalimat|ganti|lengkapi|belum)\b/i;
 
-async function boot(browser, port, locale) {
-  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+async function boot(browser, locale) {
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });
+  await routeRepo(page);
   await page.addInitScript(() => {
     try {
       localStorage.clear();
@@ -152,7 +171,7 @@ async function boot(browser, port, locale) {
       localStorage.setItem('fiezel-puter-auth-skipped', '1');
     } catch (_) {}
   });
-  await page.goto(`http://127.0.0.1:${port}/`);
+  await page.goto(ORIGIN + '/');
   await page.waitForFunction(() => typeof window.startTokenOrderSession === 'function' && self.FiezelGrammarUpgrade && self.FiezelTutorBrain, null, { timeout: 60000 });
   await page.waitForTimeout(3000);
   await page.evaluate(() => {
@@ -204,11 +223,9 @@ async function sectionB() {
   const pw = loadPlaywright();
   const exe = pw && findChromium(pw);
   if (!pw || !exe) { console.log('SKIP - B (browser): Playwright/Chromium tidak tersedia'); return; }
-  const server = await serve();
-  const port = server.address().port;
   const browser = await pw.chromium.launch({ executablePath: exe, args: ['--no-sandbox'] });
   try {
-    let page = await boot(browser, port, 'id');
+    let page = await boot(browser, 'id');
     let q = await tokenQ(page);
     const h0 = (await snap(page)).history;
     await test('B1 susun kata: kiriman salah pertama langsung dinilai answer() (2 kesempatan, bukan 3)', async () => {
@@ -220,9 +237,18 @@ async function sectionB() {
       await place(page, reversed(q.tokens)); await submit(page);
       assert.ok((await snap(page)).confidence, 'pembahasan tidak terbuka pada kiriman kedua');
     });
+    await test('B1b susun kata: "Jelaskan lebih sederhana" mengirim kalimat murid ke AI (G9)', async () => {
+      await openReveal(page);
+      await page.evaluate(() => { window.__aiPrompts = []; window.askFiezelAIResult = async (prompt) => { window.__aiPrompts.push(prompt); throw new Error('gerbang: AI dimatikan'); }; document.getElementById('aiExplainBtn')?.click(); });
+      await page.waitForTimeout(400);
+      const prompt = await page.evaluate(() => (window.__aiPrompts || [])[0] || '');
+      const line = (prompt.match(/Jawaban siswa:[^\n]*/) || [''])[0];
+      assert.ok(line && !/Jawaban siswa: -$/.test(line.trim()), 'jawaban murid hilang: ' + line);
+      assert.ok(line.includes(reversed(q.tokens).join(' ')), 'kalimat murid tidak sampai: ' + line);
+    });
     await page.close();
 
-    page = await boot(browser, port, 'id');
+    page = await boot(browser, 'id');
     q = await tokenQ(page);
     await test('B2 susun kata: salah lalu benar tercatat SALAH di percobaan pertama', async () => {
       const before = (await snap(page)).history;
@@ -234,7 +260,7 @@ async function sectionB() {
     });
     await page.close();
 
-    page = await boot(browser, port, 'id');
+    page = await boot(browser, 'id');
     const m = await mcQ(page);
     await test('B3 pilihan ganda: SATU kesalahan tidak menampilkan lencana "2x keliru"', async () => {
       assert.ok(m && m.type === 'grammar', 'soal pertama sesi kilat bukan pilihan ganda');
@@ -243,6 +269,23 @@ async function sectionB() {
       await openReveal(page);
       const pills = await page.evaluate(() => document.querySelector('#feedback .braincore-telemetry-row')?.innerText || '');
       assert.ok(!/2x/.test(pills), 'lencana: ' + pills);
+      assert.ok(!/\bBKT\b/.test(pills), 'jargon mesin "BKT" di layar murid: ' + pills);
+    });
+    const hq = await mcQ(page);
+    await test('B10 petunjuk tingkat 4 tanpa kunci; jawaban sesudahnya tercatat dibantu (G8)', async () => {
+      assert.ok(hq && hq.type === 'grammar');
+      const text = await page.evaluate(() => {
+        self.FiezelGrammarUpgrade._renderHintPopover(window.__gt.q, document.getElementById('quizGrammarHint'), 4);
+        const t = document.querySelector('#grammarHintPopover .hint-body-text')?.innerText || '';
+        document.getElementById('grammarHintPopover')?.remove();
+        return t;
+      });
+      const key = String(hq.options[hq.answerIndex]);
+      assert.ok(!text.includes('“' + key + '”') || hq.options.some((o, i) => i !== hq.answerIndex && text.includes('“' + o + '”')), 'tingkat 4 menyebut kunci: ' + text);
+      await pick(page, hq.answerIndex);
+      const last = (await snap(page)).last;
+      assert.strictEqual(last && last.hintLevel, 4, 'tingkat petunjuk tidak tercatat: ' + JSON.stringify(last));
+      await openReveal(page);
     });
     const m2 = await mcQ(page);
     await test('B4 sesudah "Buka Pembahasan", tutor tidak menyuruh mencoba lagi', async () => {
@@ -283,7 +326,64 @@ async function sectionB() {
     });
     await page.close();
 
-    page = await boot(browser, port, 'th');
+    page = await boot(browser, 'id');
+    const lq = await mcQ(page);
+    await test('B8 retry pilihan ganda: satu anak tangga BrainCore tampil (bukan tuntunan langkah)', async () => {
+      assert.ok(lq && lq.type === 'grammar');
+      await pick(page, lq.options.findIndex((_, i) => i !== lq.answerIndex));
+      const r = await page.evaluate(() => {
+        const host = document.getElementById('tutorTurn'), ladder = host && host.querySelector('.tutor-ladder');
+        return { rung: ladder ? ladder.getAttribute('data-rung') : '', text: ladder ? ladder.innerText : '', steps: !!(host && host.querySelector('.tutor-steps')) };
+      });
+      assert.ok(['probe', 'hint', 'worked'].includes(r.rung), 'anak tangga tidak tampil: ' + JSON.stringify(r));
+      assert.ok(r.text.trim().length > 10, 'anak tangga kosong');
+      if (r.rung !== 'worked') assert.ok(!r.steps, 'tuntunan langkah masih selalu tampil di samping anak tangga');
+    });
+    await page.close();
+
+    page = await boot(browser, 'id');
+    // Anak tangga `worked` di retry hanya tercapai pada urutan tertentu (satu kesalahan
+    // sebelumnya pada konsep yang sama, miskonsepsi berbeda) - jadi kebocorannya diuji atas
+    // SEMUA soal yang dirakit, bukan atas satu urutan klik yang kebetulan.
+    await test('B9 anak tangga `worked`: contoh dari soal lain, tanpa membocorkan kunci soal ini', async () => {
+      const r = await page.evaluate(() => {
+        const st = window.__getFiezelState(), items = window.getGrammarItems(), keep = st.preferences.activeLevel;
+        const n = v => String(v ?? '').toLowerCase().replace(/[^a-z0-9' ]+/g, ' ').replace(/\s+/g, ' ').trim();
+        let qs = 0, withEx = 0, leaks = 0, sameItem = 0, sample = null, turnBad = '';
+        for (const L of ['A1', 'A2', 'B1', 'B2', 'C1', 'C2']) {
+          st.preferences.activeLevel = L;
+          for (const sk of [...new Set(items.filter(x => x.level === L).map(x => x.skill))]) {
+            for (const q of (window.buildGrammarLessonQuestions(sk) || [])) {
+              if (q.type !== 'grammar') continue;
+              qs++;
+              const ex = window.grammarSimilarExample(q);
+              if (!ex) continue;
+              withEx++;
+              if (q.options.map(n).includes(n(ex.answer))) leaks++;
+              if (n(q.question).includes(n(ex.sentence.replace('___', ' ')))) sameItem++;
+              if (!sample) {
+                sample = ex;
+                const wrong = q.options.findIndex((_, i) => i !== q.answerIndex);
+                const t = window.tutorCompose(q, wrong, false, 'worked', 'hint', '', { similar: ex });
+                const ask = String(t && t.ask || '');
+                if (!ask.includes(ex.answer) || !ask.includes(ex.sentence.split('___')[0].trim().slice(0, 10))) turnBad = ask.slice(0, 200);
+              }
+            }
+          }
+        }
+        st.preferences.activeLevel = keep;
+        return { qs, withEx, leaks, sameItem, sample, turnBad };
+      });
+      assert.ok(r.qs > 1000, 'terlalu sedikit soal: ' + r.qs);
+      assert.ok(r.withEx / r.qs > 0.5, `contoh mirip tersedia hanya ${r.withEx}/${r.qs}`);
+      assert.strictEqual(r.leaks, 0, `jawaban contoh sama dengan pilihan soal ini pada ${r.leaks} soal`);
+      assert.strictEqual(r.sameItem, 0, `contoh mirip = soal itu sendiri pada ${r.sameItem} soal`);
+      assert.strictEqual(r.turnBad, '', 'giliran `worked` tidak memuat contoh mirip: ' + r.turnBad);
+      console.log(`    contoh mirip tersedia: ${r.withEx}/${r.qs} soal`);
+    });
+    await page.close();
+
+    page = await boot(browser, 'th');
     q = await tokenQ(page);
     await test('B6 locale th: umpan balik salah susun kata tanpa naskah Indonesia', async () => {
       const words = q.distractors.length ? q.tokens.concat([q.distractors[0]]) : reversed(q.tokens);
@@ -306,7 +406,6 @@ async function sectionB() {
     await page.close();
   } finally {
     await browser.close();
-    server.close();
   }
 }
 

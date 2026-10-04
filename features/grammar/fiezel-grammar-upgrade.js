@@ -489,7 +489,10 @@
       {
         num: 4,
         title: FiezelI18n.t('grammar.hint-level-4', 'Kunci & Memori'),
-        text: (exp.why ? `${exp.why} ` : '') + (exp.memory ? `💡 ${exp.memory}` : FiezelI18n.t('quiz.fallback-hint-connect', 'Ingat pola kalimat dan hubungannya dengan subjek.'))
+        // Audit G8: dulu tingkat ini membuka `explain.why` - kalimat "kenapa jawaban benar itu
+        // benar" yang pada ±78% soal menyebut kuncinya, SEBELUM murid menjawab. Kini hanya
+        // pegangan ingatan; alasan lengkapnya tetap ada di pembahasan sesudah menjawab.
+        text: exp.memory ? `💡 ${exp.memory}` : FiezelI18n.t('quiz.fallback-hint-connect', 'Ingat pola kalimat dan hubungannya dengan subjek.')
       }
     ];
 
@@ -504,6 +507,11 @@
 
     const updateContent = () => {
       popover.setAttribute('data-level', String(currentLvl));
+      // Audit G8: tingkat petunjuk tertinggi yang DILIHAT murid dicatat di soal; app.js
+      // menuliskannya ke baris riwayat dan meringankan bobot bukti jawaban benar sesudahnya.
+      if (typeof qOrRule === 'object' && qOrRule !== null) {
+        qOrRule.__hintLevel = Math.max(Number(qOrRule.__hintLevel) || 0, currentLvl);
+      }
       const cur = levels[currentLvl - 1];
 
       popover.innerHTML = `

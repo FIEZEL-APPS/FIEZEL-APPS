@@ -199,7 +199,13 @@ const ALLOWLIST = Object.freeze({
    (konsol guru, misi.html, bank konten) dijelaskan per berkas di ALLOWLIST di atas.
    Catatan: 'Fase' juga meleset ke teks ajaran kelas tutor dan 'Menunggu' ke judul skenario
    menyimak — keduanya konten, bukan naskah UI; keduanya dicatat di ALLOWLIST. */
-const ID_WORDS = /\b(Akun|Masuk|Daftar|Pengaturan|Simpan|Batal|Lanjut|Kembali|Selesai|Silakan|Memuat|Jawaban|Pilih|Kirim|Aktifkan|Aktivasi|Nama|Kelas|Guru|Murid|Suara|Notifikasi|Riwayat|Belajar|Undangan|Coba lagi|Status|Belum|Sudah|Hapus|Tambah|Ubah|Buat|Tutup|Cari|Ruang|Tugas|Soal|Materi|Metrik|Lanjutkan|Selesaikan|Kosakata|Latihan|Akurasi|Ritme|Dengar|Runtun|Tingkat|Sekarang|Kemahiran|Disarankan|Direkomendasikan|Menunggu|Tenggat|Mapel|Fase|Kurikulum|Merdeka|Tuntas|Misi|Paspor|Kompetensi|Lengkap|Terdaftar|Penugasan)\b/;
+/* Kata baris terakhir (Kesempatan/KESEMPATAN/Intip) ditambahkan audit umpan balik grammar
+   2026-10-03 (reports/BRAINCORE-GRAMMAR-FEEDBACK-AUDIT-2026-10-03.md G3): petunjuk widget susun
+   kata "PETUNJUK · 1 KESEMPATAN LAGI" dan tombol "Intip arti kata" sampai ke murid Thai dalam
+   bahasa Indonesia tanpa satu gerbang pun merah. Ketiganya tidak menerangi utang lain. Kata
+   yang lebih luas (Petunjuk, Perhatikan, Pilihan) SENGAJA belum: mereka menerangi kebocoran
+   lama di berkas lain yang dicatat sebagai utang di laporan itu, bukan disembunyikan di sini. */
+const ID_WORDS = /\b(Akun|Masuk|Daftar|Pengaturan|Simpan|Batal|Lanjut|Kembali|Selesai|Silakan|Memuat|Jawaban|Pilih|Kirim|Aktifkan|Aktivasi|Nama|Kelas|Guru|Murid|Suara|Notifikasi|Riwayat|Belajar|Undangan|Coba lagi|Status|Belum|Sudah|Hapus|Tambah|Ubah|Buat|Tutup|Cari|Ruang|Tugas|Soal|Materi|Metrik|Lanjutkan|Selesaikan|Kosakata|Latihan|Akurasi|Ritme|Dengar|Runtun|Tingkat|Sekarang|Kemahiran|Disarankan|Direkomendasikan|Menunggu|Tenggat|Mapel|Fase|Kurikulum|Merdeka|Tuntas|Misi|Paspor|Kompetensi|Lengkap|Terdaftar|Penugasan|Kesempatan|KESEMPATAN|Intip)\b/;
 
 /* Buang komentar tanpa menggeser nomor baris — komentar Indonesia ada di mana-mana di repo
    ini dan bukan naskah murid. */

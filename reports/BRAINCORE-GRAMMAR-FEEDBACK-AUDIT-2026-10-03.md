@@ -15,6 +15,10 @@ soal aktif hanya *ditangkap* lewat pegangan modul yang memang menerimanya. Setia
 bawah menunjuk nomor probe (P1–P13). Probe dijalankan tiga kali; angka P8 bergeser
 sedikit karena pilihan diacak ulang tiap run (rentangnya ditulis), urutan besarnya stabil.
 
+> **Status:** seluruh temuan G1–G12 sudah diperbaiki di build `m025-442` dan dikunci gerbang
+> `tests/grammar-feedback-regression-test.js` — lihat §8. Bagian 1–7 adalah keadaan SEBELUM
+> perbaikan (basis `c15dadd`), dibiarkan apa adanya sebagai catatan audit.
+
 Aturan tulis sama seperti laporan Braincore sebelumnya: setiap klaim membawa angka atau baris
 kode; yang belum terbukti ditulis sebagai belum terbukti.
 
@@ -293,22 +297,44 @@ sungguhan di Chromium), karena keempatnya lolos dari 300+ gerbang yang ada.
 
 ---
 
-## 8. Status perbaikan — Fase 1 (build `m025-442`)
+## 8. Status perbaikan (build `m025-442`)
+
+Semua temuan G1–G12 diperbaiki di PR yang sama, dalam dua gelombang: Fase 1 (G1–G4, G6, G12,
+kontraksi cloze) dan Fase 2 (G5, G7–G11, disetujui owner 2026-10-04).
 
 | ID | Status | Yang berubah |
 |----|--------|--------------|
-| G1 | **Diperbaiki** | Widget susun kata tidak lagi menahan kiriman salah; setiap kiriman sampai ke `answer()`. Dua kesempatan, salah-lalu-benar tercatat salah di percobaan pertama (sama dengan pilihan ganda). |
+| G1 | **Diperbaiki** | Widget susun kata tidak lagi menahan kiriman salah; setiap kiriman sampai ke `answer()`. Dua kesempatan, salah-lalu-benar tercatat salah di percobaan pertama (sama dengan pilihan ganda). Bonus: di mode ukur (placement/ujian) widget dulu juga menahan kiriman salah pertama — kini satu kiriman = satu jawaban. |
 | G2 | **Diperbaiki** | Satu pencocok `grammarReasonEntry()` untuk `reveal()`, nudge retry, dan `tutorWhyFails()`: eksak dulu; cadangan substring per kata utuh, hanya di antara pilihan salah, hanya bila tepat satu, tidak pernah kunci. Salah alamat di 2.100 soal: **0**. |
-| G3 | **Diperbaiki** | 17 literal pindah ke pasangan `copy-id/th-app-e` + `copy-id/th-grammar-labels` (nudge retry, "Kalimat/Bentuk yang tepat", alasan cadangan susun kata, tombol gloss, slot kosong, kamus gloss). Gloss susun kata kini juga diambil dari bank kosakata ber-overlay locale (di th hanya arti beraksara Thai); tombol gloss disembunyikan bila tidak ada arti. |
-| G4 | **Diperbaiki** | Lencana "Nx keliru" menghitung jawaban salah sungguhan dari riwayat; hitungan Mistake Vault (syarat lulus dua sesi) tidak lagi dibaca sebagai jumlah kesalahan. "Review {days}h" → "Review {days} hari". |
+| G3 | **Diperbaiki** | 17 literal pindah ke pasangan `copy-id/th-app-e` + `copy-id/th-grammar-labels`. Gloss susun kata juga dari bank kosakata ber-overlay locale (th hanya arti beraksara Thai); tombol gloss disembunyikan bila tidak ada arti. `tests/th-ui-leak-test.js` kini juga mengenali *Kesempatan/KESEMPATAN/Intip*. |
+| G4 | **Diperbaiki** | Lencana "Nx keliru" menghitung jawaban salah sungguhan dari riwayat. "Review {days}h" → "Review {days} hari". |
+| G5 | **Diperbaiki** | Retry grammar menampilkan alasan pilihan salah + SATU anak tangga BrainCore berlabel dua bahasa: *Pertanyaan penuntun* (probe), *Pegangan ingatan* (hint), *Contoh mirip dari soal lain* (worked). Tuntunan langkah soal ini hanya cadangan (`worked` tanpa contoh mirip, atau murid frustrasi). Tipe non-grammar tidak berubah. |
 | G6 | **Diperbaiki** | Sesudah pembahasan jawaban salah dibuka, kotak tutor tidak mengulang alasan dan tidak menyuruh "coba jawab lagi"; tutor hanya bicara bila ada sinyal "terlalu cepat". |
-| G12 | **Diperbaiki** | Tombol palsu "Simpan Rumus" dihapus; tombol AI dipasang lewat JS (bukan `onclick` inline dengan `q`/`j` global). |
-| — | **Baru** | Grader cloze menyetarakan kontraksi tak-ambigu (can't = cannot = can not, won't = will not, isn't = is not, I'm = I am, should've = should have …); `'s`/`'d` sengaja tidak. 0 bentrok dengan pengecoh di 436 item. Sebelumnya 28 pasangan kontraksi di bank tidak punya alternates. |
-| G5, G7, G8, G9, G10, G11 | Terbuka | Lihat §9. |
+| G7 | **Diperbaiki** | Retry mengirim sesi tutor + id konsep ke `composeTurn`, jadi rotasi "jangan ulangi penjelasan yang gagal" dan pemudaran bantuan (`assisted`) hidup di produksi. Anak tangga `worked` memakai contoh dari soal LAIN di lesson yang sama (`grammarSimilarExample`), dengan jawaban yang tidak sama dengan pilihan/kata mana pun di soal ini: tersedia di 1.445/2.100 soal, kebocoran kunci 0. `chosenOption`/`correctAnswer` sengaja tidak dikirim (varian kontras modul akan menyebut kunci sebelum `tell`). |
+| G8 | **Diperbaiki** | Tingkat petunjuk tertinggi yang dilihat dicatat di soal dan di baris riwayat (`hintLevel`); jawaban BENAR sesudah petunjuk menjadi bukti lebih ringan untuk BKT/kalibrasi (kappa × 0,85/0,7/0,5/0,35 untuk tingkat 1–4; jawaban salah tidak diringankan). Tingkat 4 sebelum menjawab hanya pegangan ingatan, tidak lagi `explain.why`. |
+| G9 | **Diperbaiki** | "Jelaskan lebih sederhana" di susun kata mengirim kalimat yang disusun murid. |
+| G10 | **Diperbaiki** | Pil "BKT x%" menjadi "Penguasaan x%" (id/th). Untuk susun kata/video-grammar, angkanya dari mastery skill yang memang diperbarui jawaban itu, bukan BKT yang tidak tersentuh. |
+| G11 | **Diperbaiki** | Kalimat cadangan probe/hint di naskah tutor (id + th) tidak lagi soal penanda waktu; `explain` susun kata kini punya `avoid` sendiri. |
+| G12 | **Diperbaiki** | Tombol palsu "Simpan Rumus" dihapus; tombol AI dipasang lewat JS; judul kartu kontras lewat i18n. |
+| — | **Baru** | Grader cloze menyetarakan kontraksi tak-ambigu (can't = cannot = can not, won't = will not, isn't = is not, I'm = I am, should've = should have …); `'s`/`'d` sengaja tidak. 0 bentrok dengan pengecoh di 436 item. |
 
-Gerbang baru `tests/grammar-feedback-regression-test.js` (14 cek; bagian browser SKIP tanpa
-Playwright) — **merah 14/14 pada kode sebelum perbaikan**, hijau sesudahnya. Baseline
-id-golden ditulis ulang dengan sengaja karena literal yang dipindah ke copy-map.
+**Gerbang.** `tests/grammar-feedback-regression-test.js` (22 cek; bagian browser SKIP tanpa
+Playwright, tanpa socket — berkas disajikan lewat `page.route`). Fase 1: merah 14/14 pada kode
+sebelum perbaikan. Fase 2: 9 cek baru merah pada kode Fase 1. Hijau 22/22 sesudahnya. Baseline
+id-golden ditulis ulang dengan sengaja (literal dipindah ke copy-map / naskah tutor diubah).
+
+### Temuan baru selama perbaikan (di luar G1–G12)
+
+- **G13 — Penjelasan video-grammar berbahasa Inggris.** `content/video-grammar-bank-v1.json`
+  (20 entri) menyimpan `explain.why`/`rule` dalam bahasa Inggris dan tidak punya overlay id/th;
+  `reveal()` menampilkannya apa adanya untuk murid Indonesia maupun Thai. Butuh penulisan konten
+  (±20 × 2 bahasa), belum dikerjakan di PR ini.
+- **Utang kebocoran Thai yang ikut terlihat.** Saat mencoba memperlebar `ID_WORDS`, kata
+  *Petunjuk* menerangi literal Indonesia di jalur murid `features/grammar/grammar-vocab-bridge.js:1391`
+  dan `features/learner-flow/fiezel-review-bank.js` (3 baris), *Perhatikan* di
+  `features/nujum/fiezel-nujum.js:383`, `features/speaking-listening/fiezel-jlpt-listening.js:500`,
+  `features/tutor-classroom/fiezel-tutor-v3.js:232`. Di luar jalur umpan balik grammar; dicatat,
+  tidak disembunyikan.
 
 ---
 
@@ -320,7 +346,7 @@ pengecoh, cara menghindari, pegangan ingatan); 1.536 alasan per pengecoh terisi;
 cloze lengkap penjelasannya. Menambah konten sebelum kabelnya benar hanya menambah teks yang
 salah alamat. Urutan yang disarankan:
 
-**Fase 2 — Tangga bantuan yang terlihat (G5 + G7).** Saat retry tampilkan tangga BrainCore
+**Fase 2 — Tangga bantuan yang terlihat (G5 + G7). — SELESAI, lihat §8.** Saat retry tampilkan tangga BrainCore
 apa adanya: `probe` = satu pertanyaan penggiring (howToAvoid), `hint` = pegangan ingatan,
 `worked` = contoh yang dikerjakan **dari soal lain dengan subskill yang sama** (bukan soal ini
 — itu membocorkan jawaban sebelum `tell`), `tell` = buka. Kirim `session` ke `composeTurn`
@@ -341,7 +367,7 @@ Indonesia dan Thai datang dari hal yang tidak ada di bahasa mereka: perubahan be
 keluarga × id/th, bukan 512 × 2) yang ditampilkan di pembahasan saat miskonsepsi berbau
 transfer — kartu kontrasnya sudah ada di `buildFeedbackHTML`, tinggal disambung ke `reveal()`.
 
-**Fase 4 — Bukti yang jujur (G8, G9–G11).** Catat tingkat petunjuk yang dipakai dan teruskan ke
+**Fase 4 — Bukti yang jujur (G8, G9–G11). — SELESAI, lihat §8.** Catat tingkat petunjuk yang dipakai dan teruskan ke
 `record()` sebagai kredibilitas lebih rendah; jawaban murid susun kata ke AI explain; putuskan
 apakah susun kata/video-grammar masuk BKT.
 

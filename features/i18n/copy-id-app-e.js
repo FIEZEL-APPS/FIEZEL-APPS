@@ -112,6 +112,11 @@
     'quiz.retry-why-probe': 'Perhatikan lagi: “{pilihan}” kurang pas di sini. {alasan}. Coba telaah opsi yang tersisa ya!',
     'quiz.retry-why-hint': 'Pilihan “{pilihan}” kurang tepat: {alasan}. Coba pilih opsi lainnya ya!',
     'quiz.why-kalimat-tepat': 'Kalimat yang tepat: “{jawaban}”.',
-    'quiz.why-bentuk-tepat': 'Bentuk yang tepat: “{jawaban}”.'
+    'quiz.why-bentuk-tepat': 'Bentuk yang tepat: “{jawaban}”.',
+    'tutor.ladder-probe': 'Pertanyaan penuntun',
+    'tutor.ladder-hint': 'Pegangan ingatan',
+    'tutor.ladder-worked': 'Contoh mirip dari soal lain',
+    'tutor.ladder-worked-now': 'Sekarang pakai langkah yang sama untuk soalmu.',
+    'quiz.pill-penguasaan': 'Penguasaan {persen}%'
   });
 }());
