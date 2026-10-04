@@ -261,7 +261,7 @@ body.fz-lux .modal{background:rgba(36,26,17,.45);backdrop-filter:blur(8px);-webk
 body.fz-lux .welcome-panel,body.fz-lux .modal-panel{
   border-radius:var(--lux-r-xl);border:1px solid var(--lux-line);background:var(--lux-paper);box-shadow:var(--lux-shadow-lg);padding:24px 22px;
 }
-body.fz-lux .modal-panel h2,body.fz-lux .welcome-panel h2{font:400 1.7rem/1.1 var(--fz-display);letter-spacing:-.015em}
+body.fz-lux .modal-panel h2,body.fz-lux .welcome-panel h2{font:400 1.7rem/1.1 var(--fz-display);letter-spacing:-.015em;color:var(--text,#FFFFFF)}
 body.fz-lux .modal-mark,body.fz-lux .eyebrow,body.fz-lux .fsl-kicker{color:var(--lux-yellow-deep);letter-spacing:.18em;font-size:.62rem;font-weight:800}
 body.fz-lux .toast{background:var(--core,#1B1418);color:var(--on-core,#FDFAF3);border:1px solid var(--core-line,#3A3038);box-shadow:var(--lux-shadow-lg)}
 body.fz-lux .settings-fold,body.fz-lux .home-fold{border-radius:var(--lux-r-lg);border:1px solid var(--lux-line);background:var(--lux-paper)}

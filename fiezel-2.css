@@ -155,6 +155,19 @@ body.fz-lux .fz2-more[open] summary,body .fz2-more[open] summary{margin-bottom:8
 /* Kode QR profil: kotak putih dengan bantalan, QR selalu gelap di atas terang. */
 .fz3-qr{display:flex;justify-content:center;align-items:center;margin:14px auto;padding:14px;width:min(78vw,320px);border-radius:18px;background:#FFFFFF;border:1px solid var(--line);box-shadow:0 8px 30px rgba(17,17,17,.12)}
 .fz3-qr svg{display:block;width:100%;height:auto;aspect-ratio:1/1}
+p.fz2-myid,
+.modal-panel p.fz2-myid,
+#modalPanel p.fz2-myid {
+  color: #111118 !important;
+  font-weight: 800 !important;
+  background: #FFF9E6 !important;
+  border: 1px solid rgba(255, 222, 67, 0.4) !important;
+  padding: 8px 16px !important;
+  border-radius: 12px !important;
+  display: inline-block !important;
+  margin: 10px auto !important;
+  text-align: center !important;
+}
 
 /* ---------- gerak ---------- */
 @media (prefers-reduced-motion:no-preference){
