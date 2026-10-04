@@ -30,4 +30,4 @@ Otoritas: OWNER "perbaiki semua dan lanjutkan sampai semuanya merge", atas
 ## Belum dikerjakan
 - K4: tugas remedial dari guru belum dipersonalisasi per murid. Bank soal guru memakai kunci skill yang
   berbeda dari kunci pelajaran BrainCore, jadi perlu peta skill ke pelajaran lebih dulu.
-- Gelombang 3: graf kurikulum (`setCurriculumGraph`) dan pengingat di jam belajar terbaik.
+- Gelombang 3: pengingat di jam belajar terbaik (D4), tab Analisis membaca matriks kekeliruan dan OLM (D7), status konsep di Belajar mandiri (D8). Catatan: klaim draf audit bahwa graf kurikulum tidak pernah diisi ternyata salah, karena `setCurriculumGraph` sudah dipanggil di `app.js:5766`.
