@@ -92,9 +92,16 @@
    * @param {Function} onComplete Callback saat pengguna selesai/submit, dipanggil dengan boolean (isCorrect)
    * @returns {HTMLElement} Elemen DOM siap dimasukkan ke dalam kuis
    */
-  FiezelGrammarUpgrade.renderTokenOrder = function(q, onComplete) {
+  FiezelGrammarUpgrade.renderTokenOrder = function(q, onComplete, opts) {
+    // Mode ukur (tes penempatan, ujian lompat level, gerbang lewati materi): tanpa bantuan
+    // apa pun - arti kata yang bisa diintip adalah bantuan, dan bantuan di alat ukur membuat
+    // levelnya mengukur bantuan itu, bukan muridnya (audit P-A 2026-10-04).
+    const measure = !!(opts && opts.measure);
     const container = document.createElement('div');
     container.className = 'token-order-container';
+    const esc = (str) => String(str ?? '')
+      .split('&').join('&amp;').split('<').join('&lt;').split('>').join('&gt;')
+      .split('"').join('&quot;').split("'").join('&#039;');
 
     const tokens = [...(q.tokens || [])];
     const distractors = [...(q.distractors || [])];
@@ -111,41 +118,46 @@
       return array;
     };
 
-    // Compact Indonesian gloss dictionary for common grammar tokens
-    const GLOSS_DICT = {
-      'she': 'dia (pr)', 'he': 'dia (lk)', 'it': 'itu/ia', 'they': 'mereka', 'we': 'kita/kami', 'i': 'saya', 'you': 'kamu',
-      'always': 'selalu', 'usually': 'biasanya', 'often': 'sering', 'sometimes': 'kadang', 'never': 'tidak pernah',
-      'every day': 'tiap hari', 'every night': 'tiap malam', 'in the morning': 'di pagi hari',
-      'drinks': 'minum (+s)', 'drink': 'minum', 'drank': 'minum (lampau)', 'drinking': 'sedang minum',
-      'watches': 'nonton (+es)', 'watch': 'nonton', 'watched': 'nonton (lampau)', 'watching': 'sedang nonton',
-      'eats': 'makan (+s)', 'eat': 'makan', 'ate': 'makan (lampau)', 'eating': 'sedang makan',
-      'reads': 'baca (+s)', 'read': 'baca', 'reading': 'sedang baca',
-      'plays': 'main (+s)', 'play': 'main', 'played': 'main (lampau)', 'playing': 'sedang main',
-      'goes': 'pergi (+es)', 'go': 'pergi', 'went': 'pergi (lampau)', 'going': 'sedang pergi',
-      'warm tea': 'teh hangat', 'a cup of': 'secangkir', 'the news': 'berita', 'my sister': 'kakakku'
+    // Arti kata (gloss) dalam bahasa MURID. Dua sumber, keduanya sudah dwibahasa:
+    //  1. q.gloss — peta {kata: arti} dari pembuat soal (app.js mengisinya dari bank kosakata
+    //     yang sudah ber-overlay locale);
+    //  2. kamus kecil kata fungsi & bentuk berinfleksi di copy-map (`grammar.gloss.<kata>`),
+    //     karena bank kosakata hanya memuat bentuk dasar.
+    // Dulu kamusnya literal Indonesia di sini, jadi murid Thai membaca "dia (pr)".
+    const glossFor = (text) => {
+      const lower = text.toLowerCase();
+      const fromQ = (q.gloss && (q.gloss[text] || q.gloss[lower])) || '';
+      if (fromQ) return String(fromQ);
+      const key = 'grammar.gloss.' + lower;
+      try {
+        if (typeof FiezelI18n.hasCopy === 'function' && FiezelI18n.hasCopy('id', key)) return FiezelI18n.t(key);
+      } catch (_) {}
+      return '';
     };
-    
+
     const bankTokens = shuffle(allTokens.map((item, id) => {
       const rawText = typeof item === 'object' && item.text ? item.text : String(item);
       const text = rawText.replace(/^[.,\/#!$%\^&\*;:{}=\-_`~()“”"']+|[.,\/#!$%\^&\*;:{}=\-_`~()“”"']+$/g, '');
       const explicitSyntax = typeof item === 'object' && item.syntax ? item.syntax : '';
       const syntax = explicitSyntax || FiezelGrammarUpgrade.classifyWord(text);
-      const lower = text.toLowerCase();
-      const gloss = (q.gloss && q.gloss[text]) || (q.gloss && q.gloss[lower]) || GLOSS_DICT[lower] || '';
+      const gloss = glossFor(text);
       return { text, id, syntax, gloss, placed: false };
     }));
+    // Tombol "intip arti" hanya muncul kalau memang ada arti yang bisa diintip: tombol yang
+    // ditekan lalu tidak mengubah apa pun justru membuat murid mengira aplikasinya rusak.
+    const anyGloss = !measure && bankTokens.some(t => t.gloss);
     const placedTokens = [];
     let vacantSlotIndex = null;
     let showGloss = false;
-    
+    const vacantSlotHtml = () => `<span aria-hidden="true">↳</span> ${esc(FiezelI18n.t('grammar.token-isi-di-sini'))}`;
+
     container.innerHTML = `
-      <div class="gx-hint" id="tokenScaffoldHint" hidden></div>
       <div class="token-rail" id="tokenRail" aria-label="${FiezelI18n.t('grammar.token-rail-aria', 'Area penyusunan kalimat')}"></div>
       <div class="gx-gloss-bar">
         <span class="token-bank-label">${FiezelI18n.t('grammar.token-bank-aria', 'Daftar kata tersedia')}</span>
-        <button type="button" class="gx-btn-gloss" id="tokenGlossToggle">
-          <span>📖</span> Intip arti kata
-        </button>
+        ${anyGloss ? `<button type="button" class="gx-btn-gloss" id="tokenGlossToggle" aria-pressed="false">
+          <span aria-hidden="true">📖</span> ${esc(FiezelI18n.t('grammar.token-intip-arti'))}
+        </button>` : ''}
       </div>
       <div class="token-bank" id="tokenBank" aria-label="${FiezelI18n.t('grammar.token-bank-aria', 'Daftar kata tersedia')}"></div>
       <div class="token-actions">
@@ -157,7 +169,6 @@
       </div>
     `;
 
-    const hintEl = container.querySelector('#tokenScaffoldHint');
     const railEl = container.querySelector('#tokenRail');
     const bankEl = container.querySelector('#tokenBank');
     const glossToggleBtn = container.querySelector('#tokenGlossToggle');
@@ -168,6 +179,7 @@
       glossToggleBtn.onclick = () => {
         showGloss = !showGloss;
         glossToggleBtn.classList.toggle('active', showGloss);
+        glossToggleBtn.setAttribute('aria-pressed', String(showGloss));
         render();
       };
     }
@@ -189,7 +201,7 @@
           btn.type = 'button';
           btn.className = 'token-chip' + (showGloss && token.gloss ? ' has-gloss' : '');
           if (showGloss && token.gloss) {
-            btn.innerHTML = `<span class="token-gloss">${token.gloss}</span><span class="token-word">${token.text}</span>`;
+            btn.innerHTML = `<span class="token-gloss">${esc(token.gloss)}</span><span class="token-word">${esc(token.text)}</span>`;
           } else {
             btn.textContent = token.text;
           }
@@ -203,7 +215,6 @@
             } else {
               placedTokens.push(token);
             }
-            if (hintEl) hintEl.hidden = true;
             render();
           };
           bankEl.appendChild(btn);
@@ -215,14 +226,14 @@
         if (vacantSlotIndex === index) {
           const vacantEl = document.createElement('span');
           vacantEl.className = 'gx-vacant-slot';
-          vacantEl.innerHTML = '<span>↳</span> isi di sini';
+          vacantEl.innerHTML = vacantSlotHtml();
           railEl.appendChild(vacantEl);
         }
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'token-chip in-rail' + (showGloss && token.gloss ? ' has-gloss' : '');
         if (showGloss && token.gloss) {
-          btn.innerHTML = `<span class="token-gloss">${token.gloss}</span><span class="token-word">${token.text}</span>`;
+          btn.innerHTML = `<span class="token-gloss">${esc(token.gloss)}</span><span class="token-word">${esc(token.text)}</span>`;
         } else {
           btn.textContent = token.text;
         }
@@ -240,7 +251,7 @@
       if (vacantSlotIndex !== null && vacantSlotIndex >= placedTokens.length) {
         const vacantEl = document.createElement('span');
         vacantEl.className = 'gx-vacant-slot';
-        vacantEl.innerHTML = '<span>↳</span> isi di sini';
+        vacantEl.innerHTML = vacantSlotHtml();
         railEl.appendChild(vacantEl);
       }
 
@@ -258,7 +269,6 @@
         bankTokens.forEach((token) => { token.placed = false; });
         placedTokens.length = 0;
         vacantSlotIndex = null;
-        if (hintEl) hintEl.hidden = true;
         render();
       };
     }
@@ -273,35 +283,16 @@
       
       const unplacedTokens = bankTokens.filter(t => !t.placed).map(t => t.text);
 
-      // Scaffolding on first wrong attempt without deducting lives / failing immediately
-      if (!isCorrect && !q.__scaffoldAttempt) {
-        q.__scaffoldAttempt = true;
+      // Kiriman SALAH langsung diteruskan ke answer() di app.js. Dulu widget menahan kiriman
+      // salah pertama dan memberi petunjuknya sendiri: answer() tidak pernah melihatnya,
+      // sehingga murid mendapat tiga kesempatan (bukan dua), salah-lalu-benar tercatat benar
+      // di percobaan pertama, dan BrainCore buta terhadap kesalahan pertama (audit
+      // BRAINCORE-GRAMMAR-FEEDBACK-AUDIT-2026-10-03 G1). Retry, petunjuk, dan diagnosisnya
+      // (diagnoseTokenOrderMistake) sudah dimiliki answer(); widget cukup memberi goyangan.
+      if (!isCorrect) {
         railEl.classList.remove('gx-shake');
         void railEl.offsetWidth;
         railEl.classList.add('gx-shake');
-        
-        // Diagnose error for the scaffold hint
-        let hintTitle = 'Coba periksa sekali lagi';
-        let hintBody = 'Perhatikan bentuk kata kerja dan subjek kalimatmu.';
-        const badToken = placedTokens.find(t => distractors.some(d => String(d).toLowerCase() === t.text.toLowerCase()));
-        if (badToken) {
-          hintTitle = `Cek kata “${badToken.text}”`;
-          hintBody = `Kata “${badToken.text}” mungkin belum sesuai dengan konteks kalimat. Coba ganti dengan bentuk lain di bank kata.`;
-        } else if (placedTokens.length < tokens.length) {
-          hintTitle = 'Ada kata yang belum terpasang';
-          hintBody = 'Masih ada kata yang tertinggal di bank kata. Lengkapi susunannya.';
-        }
-
-        if (hintEl) {
-          hintEl.innerHTML = `
-            <div class="gx-hint-badge">💡 <span>PETUNJUK · 1 KESEMPATAN LAGI</span></div>
-            <div class="gx-hint-title">${hintTitle}</div>
-            <div class="gx-hint-body">${hintBody}</div>
-          `;
-          hintEl.hidden = false;
-        }
-        render();
-        return;
       }
 
       if (typeof onComplete === 'function') {
@@ -502,7 +493,10 @@
       {
         num: 4,
         title: FiezelI18n.t('grammar.hint-level-4', 'Kunci & Memori'),
-        text: (exp.why ? `${exp.why} ` : '') + (exp.memory ? `💡 ${exp.memory}` : FiezelI18n.t('quiz.fallback-hint-connect', 'Ingat pola kalimat dan hubungannya dengan subjek.'))
+        // Audit G8: dulu tingkat ini membuka `explain.why` - kalimat "kenapa jawaban benar itu
+        // benar" yang pada ±78% soal menyebut kuncinya, SEBELUM murid menjawab. Kini hanya
+        // pegangan ingatan; alasan lengkapnya tetap ada di pembahasan sesudah menjawab.
+        text: exp.memory ? `💡 ${exp.memory}` : FiezelI18n.t('quiz.fallback-hint-connect', 'Ingat pola kalimat dan hubungannya dengan subjek.')
       }
     ];
 
@@ -517,6 +511,11 @@
 
     const updateContent = () => {
       popover.setAttribute('data-level', String(currentLvl));
+      // Audit G8: tingkat petunjuk tertinggi yang DILIHAT murid dicatat di soal; app.js
+      // menuliskannya ke baris riwayat dan meringankan bobot bukti jawaban benar sesudahnya.
+      if (typeof qOrRule === 'object' && qOrRule !== null) {
+        qOrRule.__hintLevel = Math.max(Number(qOrRule.__hintLevel) || 0, currentLvl);
+      }
       const cur = levels[currentLvl - 1];
 
       popover.innerHTML = `
@@ -631,14 +630,11 @@
       <div class="feedback-rule-pill grammar-rule-pill">
         <p class="grammar-rule-why"><strong>${FiezelI18n.t('quiz.intinya', 'Intinya:')}</strong> ${whyText}</p>
         ${ruleText ? `<p class="grammar-rule-text"><strong>${FiezelI18n.t('quiz.aturannya', 'Aturannya:')}</strong> ${ruleText}</p>` : ''}
-        <button type="button" class="gx-pin-formula-btn" onclick="if(typeof gxPinFormula==='function') gxPinFormula(this); else this.classList.add('pinned');">
-          <span>🔖</span> Simpan Rumus ke Catatan
-        </button>
       </div>
 
       ${(q.contrast || q.explain?.contrast) ? `
       <div class="gx-contrast-card">
-        <div class="gx-contrast-title">💡 Beda dengan Bahasa Indonesia</div>
+        <div class="gx-contrast-title">💡 ${FiezelI18n.t('grammar.contrast-title')}</div>
         <div class="gx-contrast-body">${esc(q.contrast || q.explain?.contrast)}</div>
       </div>` : ''}
 
@@ -652,7 +648,7 @@
         </div>
       </div>
 
-      <button class="ai-btn" id="aiExplainBtn" onclick="if(typeof explainWithAI==='function') explainWithAI(q, j);">
+      <button class="ai-btn" id="aiExplainBtn">
         <i data-lucide="sparkles"></i> ${FiezelI18n.t('quiz.jelaskan-dengan-cara-lebih-sederhana', 'Jelaskan lebih sederhana')}
       </button>
     `;

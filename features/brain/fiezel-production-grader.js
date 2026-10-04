@@ -75,6 +75,32 @@
   }
 
   /**
+   * Bentuk kanonis KONTRAKSI: "can't" = "can not" = "cannot", "isn't" = "is not",
+   * "won't" = "will not", "I'm" = "I am", "they've" = "they have".
+   * KENAPA: bank cloze menyimpan satu bentuk (mis. "can't") dan hanya sebagian item punya
+   * daftar alternates — murid yang menulis "cannot" dulu divonis SALAH untuk jawaban yang
+   * benar. Menulis bentuk panjang atau pendek bukan pengetahuan grammar yang diuji.
+   * Yang SENGAJA tidak disentuh: "'s" (is/has/posesif) dan "'d" (had/would) — ambigu, jadi
+   * keduanya tetap harus terdaftar sebagai alternates bila memang sah.
+   */
+  function canonicalContractions(text) {
+    if (!text) return '';
+    return (' ' + text + ' ')
+      .replace(/\bcan't\b/g, 'cannot')
+      .replace(/\bcan not\b/g, 'cannot')
+      .replace(/\bwon't\b/g, 'will not')
+      .replace(/\bshan't\b/g, 'shall not')
+      .replace(/\b([a-z]+)n't\b/g, '$1 not')
+      .replace(/\blet's\b/g, 'let us')
+      .replace(/\b([a-z]+)'m\b/g, '$1 am')
+      .replace(/\b([a-z]+)'re\b/g, '$1 are')
+      .replace(/\b([a-z]+)'ve\b/g, '$1 have')
+      .replace(/\b([a-z]+)'ll\b/g, '$1 will')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  /**
    * Jarak Levenshtein klasik (sisip/hapus/ganti, masing-masing biaya 1).
    * KENAPA dua baris bergulir dan bukan matriks penuh: jawaban cloze pendek, tapi grader
    * dipanggil per ketukan "periksa" di perangkat murah — hemat alokasi itu sopan.
@@ -201,6 +227,20 @@
       }
     }
 
+    // Pass 1b — sama persis setelah kontraksi diseragamkan ("cannot" untuk kunci "can't").
+    var canonAnswer = canonicalContractions(normAnswer);
+    for (var ce = 0; ce < candidates.length; ce++) {
+      if (canonAnswer && canonAnswer === canonicalContractions(candidates[ce])) {
+        return {
+          ok: true,
+          distance: 0,
+          matchedDistractor: null,
+          rationale: 'brain3_production_contraction_equivalent',
+          confidence: 1
+        };
+      }
+    }
+
     // Pass 2 — jawaban yang PERSIS sama dengan distraktor berlabel adalah miskonsepsi yang
     // diketik sendiri, bukan typo. Ini dicek SEBELUM toleransi jarak-1 ke target: "these"
     // saat target "those" bukan jari meleset kalau "these" memang distraktor item itu
@@ -303,6 +343,7 @@
     SCHEMA: SCHEMA,
     MORPHEME_SUFFIXES: MORPHEME_SUFFIXES.slice(),
     normalize: normalize,
+    canonicalContractions: canonicalContractions,
     levenshtein: levenshtein,
     grade: grade,
     gradeSet: gradeSet

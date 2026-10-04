@@ -422,6 +422,14 @@ jobs:
           # Ia SKIP (keluar 0) kalau Playwright/Chromium tidak ada, jadi CI publik tidak berubah;
           # ia merah hanya kalau browsernya ada DAN invariannya benar-benar patah.
           node tests/ui-render-audit-test.js
+          # Umpan balik salah-jawab grammar (audit 2026-10-03): kiriman salah susun kata harus
+          # sampai ke answer(), alasan "Mengapa kurang tepat?" harus milik pilihan yang diambil,
+          # dan layar Thai tanpa naskah Indonesia. Bagian browser SKIP tanpa Playwright.
+          node tests/grammar-feedback-regression-test.js
+          # Perbaikan tiga audit 2026-10-04: mode ukur tanpa petunjuk, ulangan kosakata lintas level
+          # paling-rawan-dulu, dua tab tidak saling menimpa (jalur simpan sungguhan di dua "tab"),
+          # dan sinkron riwayat BrainCore benar-benar dipanggil tanpa macet. Node murni.
+          node tests/learning-integrity-2026-10-04-test.js
           node tests/css-keyframe-uniq-test.js
           node tests/pastel-field-contrast-test.js
           node tests/topbar-logo-contrast-test.js

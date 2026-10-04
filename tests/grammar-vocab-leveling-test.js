@@ -283,7 +283,9 @@ console.log('--- TEST 10: Vocab Hub Quiz Scaling & Interaction Robustness ---');
 const vocabQuizFnSrc = sourceBlock('startVocabQuiz');
 assert(vocabQuizFnSrc, 'startVocabQuiz function must exist in app.js');
 
-const runVocabQuizInSandbox = (intensity) => {
+// Audit V-A 2026-10-04: startVocabQuiz membangun kolamnya sendiri (kartu jatuh tempo dulu, lalu kata
+// level aktif) dan menyaringnya dengan validateQuestion/sigQ, jadi sandbox menyediakan ketiganya.
+const runVocabQuizInSandbox = (intensity, dueCards = []) => {
   let launched = null;
   const sb = {
     state: { preferences: { learningIntensity: intensity } },
@@ -292,18 +294,32 @@ const runVocabQuizInSandbox = (intensity) => {
     shuffle: (arr) => arr.slice(),
     V: vocabMaster,
     makeVocabQuestion: (item) => ({ ...item }),
+    vocabReviewQueue: () => dueCards,
+    validateQuestion: () => ({ ok: true }),
+    sigQ: (q) => String(q.id),
     quizLoop: (cfg) => { launched = cfg; },
     showToast: () => {},
     FiezelI18n: { t: () => '' }
   };
   vm.createContext(sb);
   vm.runInContext(`${vocabQuizFnSrc}\nstartVocabQuiz();`, sb);
-  return launched?.count;
+  return launched;
 };
 
-assert.strictEqual(runVocabQuizInSandbox('santai'), 5, 'Vocab Hub quiz must scale to 5 for Pelajar Santai');
-assert.strictEqual(runVocabQuizInSandbox('teladan'), 10, 'Vocab Hub quiz must scale to 10 for Siswa Teladan');
-assert.strictEqual(runVocabQuizInSandbox('rajin'), 15, 'Vocab Hub quiz must scale to 15 for Super Rajin');
+assert.strictEqual(runVocabQuizInSandbox('santai')?.count, 5, 'Vocab Hub quiz must scale to 5 for Pelajar Santai');
+assert.strictEqual(runVocabQuizInSandbox('teladan')?.count, 10, 'Vocab Hub quiz must scale to 10 for Siswa Teladan');
+assert.strictEqual(runVocabQuizInSandbox('rajin')?.count, 15, 'Vocab Hub quiz must scale to 15 for Super Rajin');
+assert.strictEqual(runVocabQuizInSandbox('teladan')?.pool.length, 10, 'Vocab Hub quiz pool must hold exactly one session of words');
+{
+  // Kartu jatuh tempo (termasuk level di bawah level aktif) wajib ikut sesi, di depan kolam.
+  const a1 = vocabMaster.filter(v => v.level === 'A1');
+  const due = [{ ...a1[a1.length - 1], level: 'A1' }, { id: 'due-old-level', word: 'old', level: 'A1' }];
+  const launchedDue = runVocabQuizInSandbox('santai', due);
+  assert.strictEqual(JSON.stringify(launchedDue.pool.slice(0, 2).map(q => String(q.id))), JSON.stringify(due.map(v => String(v.id))), 'Due cards must lead the vocab quiz pool'); // JSON: array dari realm vm
+  assert.strictEqual(launchedDue.pool.length, 5, 'Due cards count toward the session size, not on top of it');
+  assert.strictEqual(new Set(launchedDue.pool.map(q => String(q.id))).size, 5, 'A due card must not appear twice in one session');
+  assert.strictEqual(launchedDue.allowCrossLevel, true, 'Vocab quiz must allow due cards from earlier levels');
+}
 
 // Test scroll position restoration in handleIntensitySelect
 let restoredScrollY = null;

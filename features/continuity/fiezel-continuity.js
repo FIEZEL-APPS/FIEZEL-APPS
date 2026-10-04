@@ -412,6 +412,138 @@
     return merged;
   }
 
+  /* ---- Audit F1 2026-10-04: DUA TAB, SATU BLOB STATE ------------------------------------
+   *
+   * Seluruh progres (riwayat, mastery, jadwal, gem) tersimpan sebagai satu blob per akun, dan
+   * setiap tab menulis ulang blob itu dari memorinya sendiri. Tab yang dibuka lebih dulu lalu
+   * menyimpan satu perubahan kecil menghapus SELURUH kemajuan tab lain (probe audit O6: riwayat
+   * 5 -> 0, gem 2 -> 0). Di HP ini terjadi saat PWA terpasang dan tab browser sama-sama terbuka.
+   *
+   * Obatnya penggabungan TIGA ARAH, bukan "siapa terakhir menang":
+   *   base   = state yang tersimpan saat tab INI terakhir membaca/menulis,
+   *   mine   = state di memori tab ini,
+   *   theirs = state yang baru saja ditulis tab lain.
+   * Bidang yang hanya diubah satu pihak diambil dari pihak itu. Bidang yang diubah keduanya
+   * digabung sesuai maknanya: riwayat per attemptId, catatan berwaktu per isi, penghitung
+   * dijumlahkan dari base (mine + theirs - base), buku gem per entri, item materi per item
+   * (bukti terbaru menang, laterRow), sisanya tab ini menang. Murni, tanpa I/O, deterministik.
+   */
+  var TAB_LOCAL_FIELDS = { view: 1, activeSession: 1, inflightAttempt: 1, pendingInterruptNotice: 1, coachCache: 1 };
+  var COUNTER_FIELDS = { totalAnswered: 1, totalCorrect: 1, totalTimeMs: 1 };
+  var CONCURRENT_HISTORY_LIMIT = 1000;
+  function sameValue(a, b) { return JSON.stringify(a) === JSON.stringify(b); }
+  function isPlainObject(v) { return !!v && typeof v === 'object' && !Array.isArray(v); }
+  function mergeCounter(b, m, t) {
+    var bb = Number(b) || 0, mm = Number(m) || 0, tt = Number(t) || 0;
+    return Math.max(mm, tt, mm + tt - bb);
+  }
+  function rowKey(row) {
+    if (!row || typeof row !== 'object') return 'v:' + JSON.stringify(row);
+    if (row.attemptId) return 'a:' + String(row.attemptId);
+    if (row.id && (row.at || row.startedAt)) return 'i:' + String(row.id) + '|' + String(row.at || row.startedAt);
+    return 'j:' + JSON.stringify(row);
+  }
+  function rowTime(row) {
+    if (!row || typeof row !== 'object') return NaN;
+    var at = row.at != null ? row.at : row.startedAt;
+    var n = Number(at);
+    return isFinite(n) && n > 0 ? n : Date.parse(String(at || ''));
+  }
+  /** Tab ini tetap utuh; baris yang HANYA ditambahkan tab lain (tidak ada di base) menyusul. */
+  function mergeAppended(b, m, t, limit) {
+    var mine = Array.isArray(m) ? m : [], theirs = Array.isArray(t) ? t : [], base = Array.isArray(b) ? b : [];
+    var known = {}, i;
+    for (i = 0; i < base.length; i++) known[rowKey(base[i])] = true;
+    for (i = 0; i < mine.length; i++) known[rowKey(mine[i])] = true;
+    var out = mine.slice();
+    var added = false;
+    for (i = 0; i < theirs.length; i++) {
+      var k = rowKey(theirs[i]);
+      if (known[k]) continue;
+      known[k] = true; out.push(theirs[i]); added = true;
+    }
+    if (added && out.every(function (r) { return isFinite(rowTime(r)); })) {
+      out = out.map(function (r, idx) { return { r: r, idx: idx }; })
+        .sort(function (x, y) { return (rowTime(x.r) - rowTime(y.r)) || (x.idx - y.idx); })
+        .map(function (x) { return x.r; });
+    }
+    return limit ? out.slice(-limit) : out;
+  }
+  function mergeGemsConcurrent(b, m, t) {
+    if (!isPlainObject(m) || !isPlainObject(t)) return m || t;
+    var base = isPlainObject(b) ? b : {};
+    var earned = mergeCounter(base.earnedTotal, m.earnedTotal, t.earnedTotal);
+    var spent = mergeCounter(base.spentTotal, m.spentTotal, t.spentTotal);
+    if (spent > earned) spent = earned;
+    var ledger = mergeAppended(base.ledger, m.ledger, t.ledger, 0);
+    var out = {};
+    for (var key in m) if (Object.prototype.hasOwnProperty.call(m, key)) out[key] = m[key];
+    out.earnedTotal = earned; out.spentTotal = spent; out.balance = earned - spent; out.ledger = ledger;
+    return out;
+  }
+  function mergeDailyConcurrent(b, m, t) {
+    if (!isPlainObject(m) || !isPlainObject(t)) return m || t;
+    if (String(m.date || '') !== String(t.date || '')) return String(m.date || '') > String(t.date || '') ? m : t;
+    var base = isPlainObject(b) && String(b.date || '') === String(m.date || '') ? b : { count: 0, attempts: 0 };
+    var out = {};
+    for (var key in m) if (Object.prototype.hasOwnProperty.call(m, key)) out[key] = m[key];
+    out.count = mergeCounter(base.count, m.count, t.count);
+    out.attempts = mergeCounter(base.attempts, m.attempts, t.attempts);
+    out.meaningful = !!(m.meaningful || t.meaningful);
+    return out;
+  }
+  function mergeBucketConcurrent(b, m, t) {
+    var base = isPlainObject(b) ? b : {}, mine = isPlainObject(m) ? m : {}, theirs = isPlainObject(t) ? t : {};
+    var out = {}, keys = Object.keys(mine).concat(Object.keys(theirs).filter(function (k) { return !Object.prototype.hasOwnProperty.call(mine, k); }));
+    for (var i = 0; i < keys.length; i++) {
+      var k = keys[i], mv = mine[k], tv = theirs[k], bv = base[k];
+      if (mv === undefined) { if (bv === undefined) out[k] = tv; continue; }
+      if (tv === undefined) { out[k] = mv; continue; }
+      if (sameValue(mv, bv)) out[k] = tv;
+      else if (sameValue(tv, bv)) out[k] = mv;
+      else out[k] = laterRow(mv, tv);
+    }
+    return out;
+  }
+  function mergeValueConcurrent(b, m, t) {
+    if (m === undefined) return b === undefined ? t : undefined;
+    if (t === undefined) return m;
+    if (sameValue(m, b)) return t;
+    if (sameValue(t, b)) return m;
+    if (isPlainObject(m) && isPlainObject(t)) {
+      var base = isPlainObject(b) ? b : {}, out = {};
+      var keys = Object.keys(m).concat(Object.keys(t).filter(function (k) { return !Object.prototype.hasOwnProperty.call(m, k); }));
+      for (var i = 0; i < keys.length; i++) {
+        var v = mergeValueConcurrent(base[keys[i]], m[keys[i]], t[keys[i]]);
+        if (v !== undefined) out[keys[i]] = v;
+      }
+      return out;
+    }
+    if (Array.isArray(m) && Array.isArray(t)) return mergeAppended(b, m, t, 0);
+    return m;
+  }
+  function mergeConcurrentState(baseState, mineState, theirsState) {
+    var base = isPlainObject(baseState) ? baseState : {}, mine = isPlainObject(mineState) ? mineState : {}, theirs = isPlainObject(theirsState) ? theirsState : {};
+    var out = {};
+    var keys = Object.keys(mine).concat(Object.keys(theirs).filter(function (k) { return !Object.prototype.hasOwnProperty.call(mine, k); }));
+    for (var i = 0; i < keys.length; i++) {
+      var f = keys[i], b = base[f], m = mine[f], t = theirs[f], v;
+      if (TAB_LOCAL_FIELDS[f]) v = m;
+      else if (f === 'stateRevision') v = Math.max(Number(m) || 0, Number(t) || 0);
+      else if (sameValue(m, b) && t !== undefined) v = t;
+      else if (sameValue(t, b) || t === undefined) v = m;
+      else if (COUNTER_FIELDS[f]) v = mergeCounter(b, m, t);
+      else if (f === 'history') v = mergeAppended(b, m, t, CONCURRENT_HISTORY_LIMIT);
+      else if (f === 'gems') v = mergeGemsConcurrent(b, m, t);
+      else if (f === 'daily') v = mergeDailyConcurrent(b, m, t);
+      else if (f === 'streak') v = Math.max(Number(m) || 0, Number(t) || 0);
+      else if (ITEM_BUCKETS.indexOf(f) !== -1) v = mergeBucketConcurrent(b, m, t);
+      else v = mergeValueConcurrent(b, m, t);
+      if (v !== undefined) out[f] = v;
+    }
+    return out;
+  }
+
   return {
     BACKUP_SCHEMA: BACKUP_SCHEMA,
     ENVELOPE_SCHEMA: ENVELOPE_SCHEMA,
@@ -423,6 +555,7 @@
     encryptBackup: encryptBackup,
     decryptBackup: decryptBackup,
     previewRestore: previewRestore,
-    mergeProgress: mergeProgress
+    mergeProgress: mergeProgress,
+    mergeConcurrentState: mergeConcurrentState
   };
 });

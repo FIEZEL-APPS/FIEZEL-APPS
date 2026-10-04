@@ -108,6 +108,15 @@
     'quiz.scaffold-success': 'ยอดเยี่ยมมาก! คุณแก้ไขได้ด้วยตัวเอง! 🌟',
     'quiz.terlalu-cepat': 'เร็วเกินไป',
     'quiz.ledger-keliru': 'ผิด',
-    'quiz.review-in-days': 'ทบทวน {days} วัน'
+    'quiz.review-in-days': 'ทบทวน {days} วัน',
+    'quiz.retry-why-probe': 'ลองดูอีกครั้ง: “{pilihan}” ยังไม่เหมาะกับตรงนี้ {alasan} ลองพิจารณาตัวเลือกที่เหลือดู',
+    'quiz.retry-why-hint': 'ตัวเลือก “{pilihan}” ยังไม่ถูก: {alasan} ลองเลือกตัวเลือกอื่นดู',
+    'quiz.why-kalimat-tepat': 'ประโยคที่ถูกต้องคือ “{jawaban}”',
+    'quiz.why-bentuk-tepat': 'รูปที่ถูกต้องคือ “{jawaban}”',
+    'tutor.ladder-probe': 'คำถามชวนคิด',
+    'tutor.ladder-hint': 'เคล็ดลับช่วยจำ',
+    'tutor.ladder-worked': 'ตัวอย่างคล้ายกันจากข้ออื่น',
+    'tutor.ladder-worked-now': 'ทีนี้ใช้ขั้นตอนเดียวกันกับข้อของคุณ',
+    'quiz.pill-penguasaan': 'ความชำนาญ {persen}%'
   });
 }());
