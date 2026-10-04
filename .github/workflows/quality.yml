@@ -448,6 +448,8 @@ jobs:
           node tests/review-continuity-2026-10-04-test.js
           node tests/braincore-wave1-wiring-test.js
           node tests/grammar-ux-p1-2026-10-04-test.js
+          node tests/braincore-wave2-kelasku-test.js
+          node tests/braincore-wave3-reminder-analysis-test.js
           node tests/css-keyframe-uniq-test.js
           node tests/pastel-field-contrast-test.js
           node tests/topbar-logo-contrast-test.js

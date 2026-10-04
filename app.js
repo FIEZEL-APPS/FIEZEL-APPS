@@ -7166,8 +7166,17 @@ function notifyAppUpdateIfNew(){
 // catatan panjang di kepala berkas itu.
 function startUpdateWatcher(){try{self.FiezelUpdatePrompt?.start?.()}catch{}}
 function buildALRSContext(now=Date.now()){
-  const evidence=buildLearnerEvidenceModel(now),last=lastLearningAt(),daysInactive=last?Math.max(0,Math.floor((now-last)/86400000)):999;return{now,hour:studyHour(now),today:studyDayKey(now),consecutiveWrong:Number(state.consecutiveWrong||0),totalAnswered:Number(state.totalAnswered||0),todayAttempts:Number(state.daily?.date===studyDayKey(now)?state.daily?.attempts||0:0),streakDays:Number(state.streak||0),daysInactive,dueReviews:evidence.memory.dueReviews,maxForgettingRisk:evidence.memory.maxForgettingRisk,consistency14d:evidence.behavior.consistency14d,abandonmentRate:evidence.behavior.abandonmentRate,recurringErrorSkills:evidence.skills.recurringErrorSkills}
+  const evidence=buildLearnerEvidenceModel(now),last=lastLearningAt(),daysInactive=last?Math.max(0,Math.floor((now-last)/86400000)):999;return{now,hour:studyHour(now),bestWindowFrom:braincoreBestWindowFrom(now),today:studyDayKey(now),consecutiveWrong:Number(state.consecutiveWrong||0),totalAnswered:Number(state.totalAnswered||0),todayAttempts:Number(state.daily?.date===studyDayKey(now)?state.daily?.attempts||0:0),streakDays:Number(state.streak||0),daysInactive,dueReviews:evidence.memory.dueReviews,maxForgettingRisk:evidence.memory.maxForgettingRisk,consistency14d:evidence.behavior.consistency14d,abandonmentRate:evidence.behavior.abandonmentRate,recurringErrorSkills:evidence.skills.recurringErrorSkills}
 }
+/* m025-463 audit kabel BrainCore D4: jam belajar terbaik murid (studyWindows Core Brain) dulu hanya
+ * tampil di tab ke-4 Progres. Sekarang pengingat lunak "ulangan rawan lupa" dan "kemarin belum belajar"
+ * boleh datang LEBIH AWAL, di awal jam terbaik murid, bukan selalu sesudah jam tetap 16/18. Hanya bila
+ * Core Brain YAKIN (cukup bukti dan selisih akurasi nyata); jam tenang malam tetap berlaku, dan
+ * pengingat tidak pernah digeser lebih larut dari jadwal lamanya. */
+function braincoreBestWindowFrom(now=Date.now()){
+  try{const c=coreBrainSnapshot(now)?.chronotype;const from=Number(c?.best?.from);return c?.confident&&Number.isFinite(from)?from:null}catch{return null}
+}
+function alrsSoftHour(ctx,hour){const from=Number(ctx?.bestWindowFrom);return ctx&&ctx.bestWindowFrom!=null&&Number.isFinite(from)?Math.min(hour,from):hour}
 function selectALRSDecision(ctx,meta={},force=false){
   if(!ctx)return null;
   // Quiet hours always hold, even for a struggle alert: a teacher does not phone at 3am.
@@ -7179,7 +7188,7 @@ function selectALRSDecision(ctx,meta={},force=false){
   const minGap=struggling?ALRS_STRUGGLE_MIN_GAP_MS:ALRS_MIN_GAP_MS;
   if(!force&&Number(meta.lastNotificationAt||0)&&ctx.now-Number(meta.lastNotificationAt)<minGap)return null;
   if(!force&&!struggling&&meta.lastNotificationDay===ctx.today)return null;
-  let kind='',trigger='';if(struggling){kind='struggling';trigger='consecutive_wrong_answers'}else if(ctx.totalAnswered===0&&ctx.hour>=15){kind='starter';trigger='no_learning_evidence'}else if(ctx.daysInactive>=7){kind='inactivity_7';trigger='inactive_7_plus_days'}else if(ctx.daysInactive>=3){kind='inactivity_3';trigger='inactive_3_plus_days'}else if(ctx.daysInactive>=2){kind='inactivity_2';trigger='inactive_2_days'}else if(ctx.daysInactive>=1&&ctx.hour>=18){kind='inactivity_1';trigger='inactive_1_day'}else if(ctx.dueReviews>0&&ctx.maxForgettingRisk>=60&&ctx.hour>=16){kind='due_review';trigger='high_forgetting_risk'}else if(ctx.todayAttempts<MEANINGFUL_ATTEMPTS&&ctx.hour>=20){kind='daily_goal';trigger='daily_minimum_not_met'}else if(ctx.todayAttempts===0&&ctx.hour>=17){kind='starter';trigger='today_empty'}else if(ctx.todayAttempts>=MEANINGFUL_ATTEMPTS&&[3,7,14,30,60,100].includes(ctx.streakDays)&&ctx.hour>=19&&meta.lastPositiveDay!==ctx.today){kind='positive';trigger='streak_milestone'}
+  let kind='',trigger='';if(struggling){kind='struggling';trigger='consecutive_wrong_answers'}else if(ctx.totalAnswered===0&&ctx.hour>=15){kind='starter';trigger='no_learning_evidence'}else if(ctx.daysInactive>=7){kind='inactivity_7';trigger='inactive_7_plus_days'}else if(ctx.daysInactive>=3){kind='inactivity_3';trigger='inactive_3_plus_days'}else if(ctx.daysInactive>=2){kind='inactivity_2';trigger='inactive_2_days'}else if(ctx.daysInactive>=1&&ctx.hour>=alrsSoftHour(ctx,18)){kind='inactivity_1';trigger='inactive_1_day'}else if(ctx.dueReviews>0&&ctx.maxForgettingRisk>=60&&ctx.hour>=alrsSoftHour(ctx,16)){kind='due_review';trigger='high_forgetting_risk'}else if(ctx.todayAttempts<MEANINGFUL_ATTEMPTS&&ctx.hour>=20){kind='daily_goal';trigger='daily_minimum_not_met'}else if(ctx.todayAttempts===0&&ctx.hour>=17){kind='starter';trigger='today_empty'}else if(ctx.todayAttempts>=MEANINGFUL_ATTEMPTS&&[3,7,14,30,60,100].includes(ctx.streakDays)&&ctx.hour>=19&&meta.lastPositiveDay!==ctx.today){kind='positive';trigger='streak_milestone'}
   return kind?{kind,trigger,evidence:{consecutiveWrong:ctx.consecutiveWrong,daysInactive:ctx.daysInactive,dueReviews:ctx.dueReviews,maxForgettingRisk:ctx.maxForgettingRisk,todayAttempts:ctx.todayAttempts,streakDays:ctx.streakDays,consistency14d:ctx.consistency14d,abandonmentRate:ctx.abandonmentRate,recurringErrorSkills:ctx.recurringErrorSkills}}:null
 }
 function appendALRSEvidenceLog(entry){const meta=state.reminderMeta||{};meta.evidenceLog=[...(Array.isArray(meta.evidenceLog)?meta.evidenceLog:[]),entry].slice(-ALRS_EVIDENCE_LOG_LIMIT);state.reminderMeta=meta}
@@ -10872,6 +10881,28 @@ function braincoreGrammarFocusLine(){
   }
   return teks?`<p class="fz-bc-focus" data-testid="braincore-grammar-focus">${esc(teks)}</p>`:'';
 }
+/* m025-459 Gelombang 2 audit kabel BrainCore (K1): ringkasan BrainCore yang ikut laporan kelas ke
+ * guru. Bentuknya sengaja sempit dan tanpa kalimat (divalidasi normalizeReport di server):
+ * level aktif, arah belajar, jumlah materi yang menunggu diulang, paling banyak 3 pelajaran
+ * grammar dengan penguasaan terendah (minimal 3 bukti), dan pelajaran yang paling sering
+ * tertukar. Tanpa riwayat jawaban, tidak ada ringkasan. */
+function braincoreClassDigest(){
+  if(!(Array.isArray(state.history)&&state.history.length))return null;
+  const lv=String(getActiveLevel()||'');
+  if(!LEVELS.includes(lv))return null;
+  let dir='new';
+  try{dir={improving:'up',plateau:'flat',declining:'down'}[coreBrainSnapshot()?.momentum?.state]||'new'}catch{}
+  let due=0;try{due=Math.max(0,Math.min(100000,Number(dueItems().length)||0))}catch{}
+  let weak=[];
+  try{
+    const M=self.FiezelMasteryBKT,raw=bktRead();
+    if(M&&raw?.lessons){const now=Date.now();weak=Object.keys(raw.lessons).filter(k=>/^[a-z0-9_]{1,64}$/.test(k)).map(k=>({k,m:M.mastery(raw,k,now)||{}})).filter(x=>Number(x.m.n)>=3&&Number(x.m.L)<0.6).sort((a,b)=>Number(a.m.L)-Number(b.m.L)).slice(0,3).map(x=>x.k)}
+  }catch{}
+  const out={lv,dir,due,weak};
+  try{const fix=braincoreFixSkill(braincoreConfusedPair());if(fix&&/^[a-z0-9_]{1,64}$/.test(fix))out.fix=fix}catch{}
+  return out;
+}
+window.braincoreClassDigest=braincoreClassDigest;
 function jaChokaiHomeBannerMarkup(){
   if(!jaCourseOn())return '';
   return `<div class="card ja-chokai-banner" onclick="openListeningPanel()" role="button" tabindex="0" aria-label="Chōkai JLPT N5 / N4" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openListeningPanel();}">
@@ -16492,12 +16523,15 @@ function progress(){
     kesiapan yang kolomnya kosong, dan "Menunggu konten". Selama belum ada satu jawaban pun,
     kedua modul itu diganti SATU kalimat yang menjelaskan kapan mereka muncul. */
  const progressFresh=!(Array.isArray(state.history)&&state.history.length);
+ /* m025-463 audit kabel BrainCore D7: peta kekeliruan antar-pelajaran dari matriks BrainCore ikut tampil di
+    tab Analisis, tempat murid membaca kesalahannya, bukan hanya di tab ke-4. */
  const tabContent={
   overview:`<div class="grid progress-grid">${cefrRoadmapMarkup()}${weeklyActivityChartMarkup()}${nextSessionPanelMarkup()}${braincoreProofPanelMarkup()}${uxOn('personalJourneyTab')?journeyMarkup():''}${socialSummaryCardMarkup()}${/* Audit F15: modul kosong disembunyikan sampai ada bukti; murid baru membaca ringkasan di atas + satu kalimat di bawah, bukan belasan 0%. */progressFresh?'':`<div><h3>${FiezelI18n.t('progress.peta-study')}</h3>${mapCards}</div>`}
    ${progressFresh&&!due.length?'':card(`<h3>${FiezelI18n.t('progress.ulangan-pintar')}</h3>${due.length?due.map(([k,x])=>`<div class="row"><span>${esc(friendlySkillName(k))}</span><span>${FiezelI18n.t('progress.dikuasai-risiko-lupa',{mastery:x.mastery||0,x:Math.round(forgettingProbability(x)*100)})}</span></div>`).join('<hr>')+`<div style="margin-top:12px"><button class="primary" onclick="reviewVocab()"><i data-lucide="history"></i> ${FiezelI18n.t('progress.mulai-review-btn',{jumlah:due.length})}</button></div>`:'<p class="muted">'+FiezelI18n.t('progress.belum-ada-materi-perlu-diulang')+'</p>'}`)}
    ${card(`<details class="prasasti-fold"><summary><h3>${FiezelI18n.t('progress.prasasti-judul')}</h3><i data-lucide="chevron-down" aria-hidden="true"></i></summary><p class="muted">${FiezelI18n.t('progress.lencana-bukti-study-redup-menunjukkan')}</p>${prasastiGalleryMarkup()}</details>`,'prasasti-gallery-card')}
    </div>`,
   analysis:`<div class="grid progress-grid">
+   ${confusionInsightMarkup()}
    ${card(`<h3>${FiezelI18n.t('progress.lab-kesalahan')}</h3>${patterns.length?patterns.map(x=>`<div class="row"><span>${esc(friendlySkillName(x.key))}</span><b>${FiezelI18n.t('progress.salah',{errors:x.errors,rate:Math.round(x.rate*100)})}</b></div>${x.common?`<p class="muted">${FiezelI18n.t('progress.pilihan-paling-sering-muncul-kali',{common:esc(x.common),count:x.count})}</p>`:''}`).join('<hr>'):'<p class="muted">'+FiezelI18n.t('progress.belum-ada-pola-kesalahan-berulang')+'</p>'}`)}
    ${card(`<h3>${FiezelI18n.t('progress.pola-kesalahan')}</h3>${patterns.length?patterns.slice(0,4).map(x=>`<p><b>${esc(friendlySkillName(x.key))}</b>: ${FiezelI18n.t('progress.error-pattern',{errors:x.errors,common:x.common?FiezelI18n.t('progress.error-common-choice',{choice:esc(x.common),count:x.count}):FiezelI18n.t('progress.error-no-common')})}</p>`).join(''):'<p class="muted">'+FiezelI18n.t('progress.bukti-pending-cukup-for-menemukan')+'</p>'}`)}
    ${card(`<h3>${FiezelI18n.t('progress.weakness-heading')}</h3>${timelineHtml}`)}
@@ -18135,7 +18169,7 @@ async function socialTemanMarkup(core){
     const liveStage=activeStages.find(s=>String(s.hostHandle||'').toLowerCase()===hClean);
     const milestones=vis&&Array.isArray(f.milestones)?f.milestones.slice(0,3).map(m=>`<span class="social-chip">${esc(core.milestoneLabel(m.kind))}</span>`).join(''):'';
     const liveBadge=liveStage?`<span class="fz-stage-live-badge" data-testid="live-badge" style="background:#E53935;color:#FFF;font-size:10px;font-weight:800;padding:2px 6px;border-radius:6px;display:inline-flex;align-items:center;gap:4px;margin-left:6px;"><span class="fz-stage-live-dot" style="width:6px;height:6px;border-radius:50%;background:#FFF;"></span>LIVE (${esc(liveStage.roomId)})</span>`:'';
-    const liveBtn=liveStage?`<button type="button" class="social-voice-btn" style="background:#00E5FF;color:#0F172A;font-weight:800;border:none;" onclick="openLiveVoiceStage('${esc(liveStage.roomId)}')" data-testid="join-stage-live"><i data-lucide="radio"></i> Nonton Live</button>`:'';
+    const liveBtn=liveStage?`<button type="button" class="social-voice-btn" style="background:#00E5FF;color:#0F172A;font-weight:800;border:none;" onclick="openLiveVoiceStage('${esc(liveStage.roomId)}')" data-testid="join-stage-live"><i data-lucide="audio-lines"></i> Nonton Live</button>`:'';
     return `<div class="social-friend"><span class="social-avatar" aria-hidden="true">${esc(String(f.handle||'?').charAt(0).toUpperCase())}</span><div class="social-friend-body"><b>@${esc(f.handle)}</b>${liveBadge}<small>${esc(core.presenceLabel(f))}${vis&&f.band?` · ${esc(f.band)}`:''}${vis&&Number(f.streakDays)>0?` · 🔥 ${Number(f.streakDays)} hari`:''}</small>${milestones?`<div class="social-chips">${milestones}</div>`:''}</div><div class="social-friend-acts">${liveBtn}<button type="button" class="social-voice-btn" onclick="socialAjakVoice('${esc(f.handle)}')" data-testid="ajak-voice-${esc(f.handle)}" aria-label="${esc(FiezelI18n.t('social3.voice-ajak'))}"><i data-lucide="mic"></i> ${esc(FiezelI18n.t('social3.voice-ajak'))}</button><button type="button" class="social-cheer-btn" onclick="socialOpenCheer('${esc(f.handle)}')" aria-label="${FiezelI18n.t('social.cheer-modal-title',{handle:esc(f.handle)})}">👏 ${FiezelI18n.t('social.cheer-btn')}</button></div></div>`;
   }).join(''):`<div class="social-empty"><p><b>${FiezelI18n.t('social.no-friends-title')}</b></p><p class="muted">${FiezelI18n.t('social.no-friends-body')}</p></div>`;
   const reqList2=reqList.filter(r=>!/^$/.test(String(r.handle||'')));

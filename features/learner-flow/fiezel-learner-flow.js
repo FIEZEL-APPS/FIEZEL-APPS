@@ -341,6 +341,9 @@
        pertama. Murid yang menekan Gabung saat sinyalnya putus tetap sampai ke guru begitu
        jaringannya kembali — kalau tidak, ketukan itu hilang dan guru tidak pernah tahu. */
     if (st.pendingJoin) payload.j = 1;
+    /* m025-459 audit kabel BrainCore K1: ringkasan BrainCore (enum + bilangan + kunci pelajaran,
+       tanpa teks) supaya guru melihat pelajaran lemah dan materi yang menunggu diulang. */
+    try { var bc = typeof root.braincoreClassDigest === 'function' ? root.braincoreClassDigest() : null; if (bc) payload.bc = bc; } catch (_) {}
     /* Catatan ujian non-tugas ikut selama ia masih hari ini: guru butuh melihatnya saat
        ujiannya masih hangat, dan laporan yang mengulang catatan pekan lalu hanya kebisingan. */
     if (st.examFocus && Date.now() - Number(st.examFocus.at || 0) < 86400000) {
