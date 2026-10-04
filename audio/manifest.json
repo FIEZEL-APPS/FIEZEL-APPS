@@ -1,7 +1,7 @@
 {
   "schema": "fiezel-audio-manifest-v1",
-  "version": 73,
-  "generatedAt": "2026-10-04T22:29:32.268Z",
+  "version": 78,
+  "generatedAt": "2026-10-04T22:44:02.908Z",
   "assetBaseUrl": "https://fiezel-audio.fitrajft.workers.dev",
   "voiceProfile": {
     "voiceId": "4KH3q7xDXbPdY3S5yw0Y",
@@ -14788,6 +14788,54 @@
       "checksum": "b75460d9e311db90658b4be2845e3d1356c57cc0f3b73ccfac1b8f3adc836772",
       "sourceRef": "listen_sc_c1_gist_018",
       "createdAt": "2026-10-04T22:27:24.244Z",
+      "status": "ready"
+    },
+    "ead8df8628ad297364e035612a0d0ebae3c6faeb9295c345f4995e28e00c70ea": {
+      "url": "a/ead8df8628ad297364e035612a0d0ebae3c6faeb9295c345f4995e28e00c70ea.mp3",
+      "contentType": "listening",
+      "locale": "en-US",
+      "voiceId": "Aoede",
+      "modelId": "gemini-tts-gemini-2.5-flash-preview-tts",
+      "bytes": 315450,
+      "checksum": "71c5e1c29f307a3b1911f3f000a5686f48f5f26b0e86c8618a995579d8a3a87d",
+      "sourceRef": "listen_sc_c1_dictation_017",
+      "createdAt": "2026-10-04T22:31:01.825Z",
+      "status": "ready"
+    },
+    "ad99858ddfa9c489c4ef37ad4cc9b6258e23d323c7c06663202a1f2d25f5277f": {
+      "url": "a/ad99858ddfa9c489c4ef37ad4cc9b6258e23d323c7c06663202a1f2d25f5277f.mp3",
+      "contentType": "listening",
+      "locale": "en-US",
+      "voiceId": "Aoede",
+      "modelId": "gemini-tts-gemini-2.5-flash-preview-tts",
+      "bytes": 1125690,
+      "checksum": "b617eb63fad9ff75e6b82268445baa298ccf6751cd304458ce70d328be06dc0a",
+      "sourceRef": "listen_sc_c1_gist_019",
+      "createdAt": "2026-10-04T22:31:52.051Z",
+      "status": "ready"
+    },
+    "0dcc99bbefafa20ee8e6f1ce8eeb1a8d5bdcb48e9e82b26b7e0634180123edcf": {
+      "url": "a/0dcc99bbefafa20ee8e6f1ce8eeb1a8d5bdcb48e9e82b26b7e0634180123edcf.mp3",
+      "contentType": "listening",
+      "locale": "en-US",
+      "voiceId": "Aoede",
+      "modelId": "gemini-tts-gemini-2.5-flash-preview-tts",
+      "bytes": 186810,
+      "checksum": "19a9c450b471f2683ff1aeeede11e341ff5d9ec822cd30fd8ac09c284a37bd57",
+      "sourceRef": "listen_sc_c1_dictation_018",
+      "createdAt": "2026-10-04T22:32:04.007Z",
+      "status": "ready"
+    },
+    "926810c3c223978909b0b2051dba54957a27a1e72d0c7154dd7e30b693be3419": {
+      "url": "a/926810c3c223978909b0b2051dba54957a27a1e72d0c7154dd7e30b693be3419.mp3",
+      "contentType": "listening",
+      "locale": "en-US",
+      "voiceId": "Aoede",
+      "modelId": "gemini-tts-gemini-2.5-flash-preview-tts",
+      "bytes": 398010,
+      "checksum": "68d607a03bc05664c0d14b80c0477d3e0ca1f614ac288d6b534ffb9554b5c9d5",
+      "sourceRef": "listen_sc_c1_dictation_019",
+      "createdAt": "2026-10-04T22:33:48.225Z",
       "status": "ready"
     }
   },
