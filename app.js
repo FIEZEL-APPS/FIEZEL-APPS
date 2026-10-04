@@ -13480,7 +13480,7 @@ function quizLoop(cfg){
   const rung=String(answer.scaffold||'');
   const rungKnown=rung==='probe'||rung==='hint'||rung==='worked';
   const ladderAsk=grammarLadder&&rungKnown&&turn.ask&&!(rung==='worked'&&!similar)?String(turn.ask):'';
-  const ladderHtml=ladderAsk?`<div class="tutor-ladder" data-rung="${esc(rung)}"><small class="eyebrow">${esc(FiezelI18n.t('tutor.ladder-'+rung))}</small><p class="tutor-turn-ask">${esc(personalize(ladderAsk))}</p>${rung==='worked'?`<p class="tutor-ladder-now">${esc(FiezelI18n.t('tutor.ladder-worked-now'))}</p>`:''}</div>`:'';
+  const ladderHtml=ladderAsk?`<div class="tutor-ladder" data-rung="${esc(rung)}"><small class="eyebrow">${esc(FiezelI18n.t(rung==='probe'?'tutor.ladder-probe':rung==='hint'?'tutor.ladder-hint':'tutor.ladder-worked'))}</small><p class="tutor-turn-ask">${esc(personalize(ladderAsk))}</p>${rung==='worked'?`<p class="tutor-ladder-now">${esc(FiezelI18n.t('tutor.ladder-worked-now'))}</p>`:''}</div>`:'';
   const showSteps=retry&&(grammarLadder?((rung==='worked'&&!similar)||isFrustrated||!ladderAsk):(isLearnerOverwhelmed(q)||answer.scaffold==='worked'||answer.scaffold==='hint'||isFrustrated));
   host.innerHTML=`<div class="tutor-turn-head"><span class="tutor-turn-face"><i data-lucide="graduation-cap"></i></span><b>${esc(headTitle)}</b>${speedBadge}</div>`
    +(retry&&q.__diagnosticClue?`<div class="tutor-diagnostic-clue"><i data-lucide="lightbulb"></i><span>${esc(q.__diagnosticClue)}</span></div>`:'')
