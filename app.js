@@ -7443,6 +7443,7 @@ function openApp(){
   // yang sama dengan undangan teman: alamat dibaca di sini, aksinya ditunda sedikit
   // supaya splash & lencana Home selesai lebih dulu.
   try{fzStageAutoJoin()}catch(_){}
+  try{pollStageInvites();setInterval(pollStageInvites,12000)}catch(_){}
   armSocialInviteSheet();
   // Sesi akun ditanyakan di gelombang yang sama: sesudah sambutan selesai, sebelum murid
   // menyentuh Pengaturan. 401 = anonim dan itu normal, jadi jalur ini senyap.
@@ -7764,6 +7765,7 @@ function startWelcomeExperience(){
      5. Naskah: seluruh teks Indonesia sengaja TANPA tanda hubung, sesuai naskah naskah app lain.
    ================================================================================== */
 let fzStageDrawerOpen=false,fzStageDrawerReturnFocus=null,fzStageRoomId=null,fzStageRtcClient=null,fzStageCoordinator=null,fzStageInviteCopied=false,fzStageCoordinatorWired=false;
+let fzStageHandRequested=false,fzStageHandsList=[],fzStagePeers=new Map(),fzStageAudienceCount=0,fzStageLocalLevel=0;
 /* Pembungkus i18n dengan cadangan kata (pola fiezel-class-hub.js). Kunci `stage.*` TIDAK
    didaftarkan di copy-id mana pun dengan SENGAJA: kalimat aslinya sudah berbahasa Indonesia
    dan menjadi cadangan di sini, jadi murid id membaca kalimat yang sama persis tanpa perlu
@@ -7789,11 +7791,25 @@ function fzStageSetBackgroundInert(on){
 }
 /** Kamus `?stage=FZ-XXXX`: dibaca modul transport supaya aturan bentuk kode tinggal satu. */
 function fzStageParseParam(){try{return fzStageRtc()?.parseStageParam?.(location.search)||null}catch(_){return null}}
+
+function fzStageCopyRoomCode(){
+  if(!fzStageRoomId)return;
+  try{
+    navigator.clipboard?.writeText?.(String(fzStageRoomId)).then(()=>{
+      showToast(t('stage.kode-disalin','Kode ruang disalin ke papan klip.'),'success');
+    }).catch(()=>{
+      showToast(String(fzStageRoomId));
+    });
+  }catch(_){
+    showToast(String(fzStageRoomId));
+  }
+}
+window.fzStageCopyRoomCode=fzStageCopyRoomCode;
+
 function fzStageDrawerShell(){
   const core=fzStageCore();
   const room=esc(fzStageRoomLabel(fzStageRoomId));
   const rtc=fzStageRtc();
-  const inviteUrl=rtc&&rtc.buildInviteUrl?rtc.buildInviteUrl(fzStageRoomId):'';
   const card=core&&fzStageCoordinator&&fzStageCoordinator.currentCard;
   const state=fzStageCoordinator?fzStageCoordinator.state:'OFFLINE';
   const score=fzStageCoordinator?Number(fzStageCoordinator.score||0):0;
@@ -7801,22 +7817,77 @@ function fzStageDrawerShell(){
   const active=state==='TABOO_ROUND_ACTIVE';
   const taboo=(card&&Array.isArray(card.taboo))?card.taboo:[];
   const localNote=fzStageRoomId?'' : `<p class="fz-stage-local-note">${esc(t('stage.buat-ruangan-dulu','Buat ruangan dulu supaya temanmu bisa masuk lewat tautan undangan.'))}</p>`;
+
+  const myRole=fzStageRtcClient?fzStageRtcClient.role:(fzStageRoomId?'audience':'host');
+  const isHost=myRole==='host';
+  const isSpeaker=myRole==='speaker';
+  const isAudience=myRole==='audience';
+
+  const partner=Array.from(fzStagePeers.values()).find(p=>p.role==='host'||p.role==='speaker');
+  const audienceList=Array.from(fzStagePeers.values()).filter(p=>p.role==='audience');
+
+  const partnerSlotHtml=partner?`
+    <div class="fz-stage-speaker-slot">
+      <div class="fz-stage-avatar-wrapper">
+        <span class="fz-stage-acoustic-ripple" id="fzStagePartnerRipple"></span>
+        <span class="fz-stage-avatar-circle">${esc((partner.name||'Teman').slice(0,2).toUpperCase())}</span>
+        <span class="fz-stage-mic-badge${partner.isMuted?' is-muted':''}" id="fzStagePartnerMic">${partner.isMuted?'🔇':'🎙️'}</span>
+      </div>
+      <span class="fz-stage-speaker-name">${esc(partner.name||t('stage.rekan','Rekan duet'))}</span>
+      <span class="fz-stage-role-pill is-${partner.role}">${partner.role==='host'?'HOST':'PEMBICARA'}</span>
+    </div>`:`
+    <div class="fz-stage-speaker-slot">
+      <div class="fz-stage-avatar-wrapper">
+        <span class="fz-stage-avatar-circle" style="opacity:0.4;">👥</span>
+      </div>
+      <span class="fz-stage-speaker-name" style="color:#64748B;">${esc(t('stage.menunggu-rekan','Menunggu rekan'))}</span>
+      <span class="fz-stage-role-pill is-empty">${esc(t('stage.kosong','KOSONG'))}</span>
+    </div>`;
+
   return `<div class="fz-stage-shell${active?' is-game':''}" data-testid="stage-shell">
     <div class="fz-stage-topbar">
-      <div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
         <span class="fz-stage-live-badge"><span class="fz-stage-live-dot"></span>${esc(t('stage.live','LIVE'))}</span>
-        <div class="fz-stage-room-title">${esc(t('stage.judul','Panggung Suara Live'))}</div>
-        <div class="fz-stage-meta"><span>${esc(t('stage.ruang','Ruang'))}: <b>${room}</b></span><span>${esc(t('stage.skor','Skor'))}: <b id="fzStageScore">${score}</b></span></div>
+        <span class="fz-stage-room-chip" onclick="fzStageCopyRoomCode()" title="${esc(t('stage.salin-kode','Salin kode ruang'))}">🔑 <b>${room}</b></span>
+        <span class="fz-stage-viewer-pill">👥 <span id="fzStageAudienceCount">${fzStageAudienceCount}</span></span>
+        <div class="fz-stage-meta" style="margin-left:4px;"><span>${esc(t('stage.skor','Skor'))}: <b id="fzStageScore">${score}</b></span></div>
       </div>
-      <button type="button" class="fz-stage-close-btn" onclick="closeLiveVoiceStage()" aria-label="${esc(t('stage.tutup-aria','Tutup panggung suara'))}">&#10005;</button>
+      <button type="button" class="fz-stage-quiet-exit-btn" onclick="closeLiveVoiceStage()" aria-label="${esc(t('stage.tutup-aria','Tutup panggung suara'))}">🚪 ${esc(t('stage.keluar','Keluar'))}</button>
     </div>
+
     <div class="fz-stage-speakers">
       <div class="fz-stage-speakers-grid">
-        <div class="fz-stage-speaker-slot"><div class="fz-stage-avatar-wrapper"><span class="fz-stage-speaking-pulse" id="fzStageLocalPulse"></span><span class="fz-stage-avatar-circle">&#127908;</span><span class="fz-stage-mic-badge${fzStageRtcClient&&fzStageRtcClient.isMuted?' is-muted':''}" id="fzStageLocalMic">&#127911;</span></div><span class="fz-stage-speaker-name">${esc(learnerName())}</span></div>
-        <div class="fz-stage-speaker-slot"><div class="fz-stage-avatar-wrapper"><span class="fz-stage-avatar-circle">&#127911;</span></div><span class="fz-stage-speaker-name">${esc(t('stage.rekan','Rekan duet'))}</span></div>
-        <div class="fz-stage-speaker-slot"><div class="fz-stage-avatar-wrapper"><span class="fz-stage-avatar-circle">&#127926;</span></div><span class="fz-stage-speaker-name">${esc(t('stage.penonton','Penonton'))}</span></div>
+        <div class="fz-stage-speaker-slot">
+          <div class="fz-stage-avatar-wrapper">
+            <span class="fz-stage-acoustic-ripple" id="fzStageLocalRipple"></span>
+            <span class="fz-stage-speaking-pulse" id="fzStageLocalPulse"></span>
+            <span class="fz-stage-avatar-circle">${esc(learnerName().slice(0,2).toUpperCase())}</span>
+            <span class="fz-stage-mic-badge${fzStageRtcClient&&fzStageRtcClient.isMuted?' is-muted':''}" id="fzStageLocalMic">${fzStageRtcClient&&fzStageRtcClient.isMuted?'🔇':'🎙️'}</span>
+          </div>
+          <span class="fz-stage-speaker-name">${esc(learnerName())}</span>
+          <span class="fz-stage-role-pill is-${myRole}">${myRole==='host'?'HOST':(myRole==='speaker'?'PEMBICARA':'PENDENGAR')}</span>
+        </div>
+        ${partnerSlotHtml}
       </div>
     </div>
+
+    <div class="fz-stage-audience-tray">
+      <div class="fz-stage-audience-title">
+        <span>${esc(t('stage.pendengar','Pendengar'))} (${audienceList.length})</span>
+      </div>
+      <div class="fz-stage-audience-grid">
+        ${audienceList.length?audienceList.map(a=>`
+          <div class="fz-stage-audience-item" title="${esc(a.name||'')}">
+            <span class="fz-stage-avatar-circle" style="width:34px;height:34px;font-size:12px;">${esc((a.name||'?').slice(0,2).toUpperCase())}</span>
+            ${a.raisedHand?`<span class="fz-stage-hand-indicator">✋</span>`:''}
+            <span class="fz-stage-audience-name">${esc(a.name||'')}</span>
+          </div>
+        `).join(''):`<span class="fz-stage-empty-audience">${esc(t('stage.belum-ada-pendengar','Belum ada penonton lain'))}</span>`}
+      </div>
+    </div>
+
+    <div class="fz-stage-floating-canvas" id="fzStageFloatCanvas"></div>
+
     <div class="fz-stage-game-box">
       <div class="fz-stage-game-header">
         <span class="fz-stage-secret-kicker">${esc(t('stage.kartu-rahasia','Kartu rahasia'))}</span>
@@ -7830,31 +7901,72 @@ function fzStageDrawerShell(){
         <div class="fz-stage-taboo-title">${esc(t('stage.kata-terlarang','Kata terlarang'))}</div>
         <div class="fz-stage-taboo-row">${taboo.length?taboo.map(w=>`<span class="fz-stage-taboo-tag">${esc(String(w))}</span>`).join(''):`<span class="fz-stage-chat-line">${esc(t('stage.belum-ada-kartu','Belum ada kartu aktif'))}</span>`}</div>
       </div>
-      <div class="fz-stage-game-btns">
+      ${isAudience?`<div class="fz-stage-audience-hud-note" style="text-align:center;padding:8px;font-size:12px;color:#94A3B8;">🎧 ${esc(t('stage.mode-penonton-info','Kamu menyimak permainan. Dengar petunjuk tanpa kata terlarang!'))}</div>`:`<div class="fz-stage-game-btns">
         <button type="button" class="fz-stage-btn-correct" onclick="fzStageCorrectGuess()">&#9989; ${esc(t('stage.benar','Benar'))}</button>
         <button type="button" class="fz-stage-btn-pass" onclick="fzStageNextCard()">&#9193; ${esc(t('stage.ganti','Ganti kartu'))}</button>
         <button type="button" class="fz-stage-btn-test" onclick="fzStageToggleRound()">${active?esc(t('stage.hentikan-ronde','Hentikan ronde')):esc(t('stage.mulai-ronde','Mulai ronde'))}</button>
-      </div>
+      </div>`}
     </div>
+
     <div class="fz-stage-chat-log" id="fzStageChatLog" aria-live="polite"><p class="fz-stage-chat-line"><b>${esc(t('stage.juri','Juri Fiezel'))}</b>: ${esc(t('stage.sambut','Selamat bermain. Jelaskan kartunya, jangan sampai keceplosan.'))}</p></div>
+
     <div class="fz-stage-bottom">
-      <div class="fz-stage-deck-row">
-        <div class="fz-stage-reactions">
-          <button type="button" onclick="fzStageReact('clap')" aria-label="${esc(t('stage.tepuk','Tepuk tangan'))}">&#128079;</button>
-          <button type="button" onclick="fzStageReact('fire')" aria-label="${esc(t('stage.semangat','Semangat'))}">&#128293;</button>
-          <button type="button" onclick="fzStageReact('laugh')" aria-label="${esc(t('stage.tawa','Tawa'))}">&#128514;</button>
+      ${isAudience?`
+        <button type="button" class="fz-stage-btn-request-speak${fzStageHandRequested?' is-pending':''}" id="fzStageBtnRequestSpeak" onclick="fzStageRequestToSpeak()">${fzStageHandRequested?'✋ '+esc(t('stage.menunggu-izin','Menunggu Izin Host...')):'✋ '+esc(t('stage.minta-naik','Minta Naik Panggung'))}</button>
+        <div class="fz-stage-deck-row" style="justify-content:center;margin-top:6px;">
+          <div class="fz-stage-reactions">
+            <button type="button" onclick="fzStageReact('clap')" aria-label="${esc(t('stage.tepuk','Tepuk tangan'))}">&#128079;</button>
+            <button type="button" onclick="fzStageReact('fire')" aria-label="${esc(t('stage.semangat','Semangat'))}">&#128293;</button>
+            <button type="button" onclick="fzStageReact('laugh')" aria-label="${esc(t('stage.tawa','Tawa'))}">&#128514;</button>
+            <button type="button" onclick="fzStageReact('heart')" aria-label="${esc(t('stage.cinta','Suka'))}">&#128150;</button>
+          </div>
         </div>
-        <button type="button" class="fz-stage-mic-btn${fzStageRtcClient&&fzStageRtcClient.isMuted?' is-muted':''}" id="fzStageMicBtn" onclick="fzStageToggleMic()" aria-label="${esc(t('stage.mikrofon','Hidup atau matikan mikrofon'))}">&#127908;</button>
-      </div>
-      <div class="fz-stage-sfx-row">
-        <button type="button" class="fz-stage-sfx-btn" onclick="fzStageSfx('ding')">${esc(t('stage.sfx-ding','Lonceng'))}</button>
-        <button type="button" class="fz-stage-sfx-btn" onclick="fzStageSfx('buzzer')">${esc(t('stage.sfx-buzzer','Buzzer'))}</button>
-        <button type="button" class="fz-stage-sfx-btn" onclick="fzStageSfx('alarm')">${esc(t('stage.sfx-alarm','Alarm'))}</button>
-        <button type="button" class="fz-stage-sfx-btn" onclick="fzStageSfx('cheer')">${esc(t('stage.sfx-cheer','Sorak'))}</button>
-      </div>
-      <button type="button" class="fz-stage-invite-btn" onclick="fzStageInvite()">&#128241; ${esc(t('stage.undang-wa','Bagikan undangan lewat WhatsApp'))}</button>
-      ${localNote}
-      <p class="fz-stage-footer-note" id="fzStageFooterNote">${esc(t('stage.catatan-footer','Suara berjalan dua arah lewat P2P. Saling bicara bergantian supaya tidak saling memotong.'))}</p>
+        <p class="fz-stage-footer-note" id="fzStageFooterNote">${esc(t('stage.catatan-footer-penonton','Kamu berada dalam mode penonton. Angkat tangan untuk meminta izin bicara.'))}</p>
+      `:''}
+
+      ${isHost?`
+        <div class="fz-stage-host-bar">
+          <button type="button" class="fz-stage-btn-ajak" onclick="fzStageOpenFriendPicker()">👥 ${esc(t('stage.ajak-teman','Ajak Teman'))}</button>
+          <button type="button" class="fz-stage-btn-hands" id="fzStageBtnHands" onclick="fzStageOpenHandsModal()">✋ ${esc(t('stage.izin-bicara','Izin Bicara'))} <span class="fz-stage-hands-badge" id="fzStageHandsBadge">${fzStageHandsList.length}</span></button>
+        </div>
+        <div class="fz-stage-deck-row">
+          <div class="fz-stage-reactions">
+            <button type="button" onclick="fzStageReact('clap')" aria-label="${esc(t('stage.tepuk','Tepuk tangan'))}">&#128079;</button>
+            <button type="button" onclick="fzStageReact('fire')" aria-label="${esc(t('stage.semangat','Semangat'))}">&#128293;</button>
+            <button type="button" onclick="fzStageReact('laugh')" aria-label="${esc(t('stage.tawa','Tawa'))}">&#128514;</button>
+            <button type="button" onclick="fzStageReact('heart')" aria-label="${esc(t('stage.cinta','Suka'))}">&#128150;</button>
+          </div>
+          <button type="button" class="fz-stage-mic-btn${fzStageRtcClient&&fzStageRtcClient.isMuted?' is-muted':''}" id="fzStageMicBtn" onclick="fzStageToggleMic()" aria-label="${esc(t('stage.mikrofon','Hidup atau matikan mikrofon'))}">&#127908;</button>
+        </div>
+        <div class="fz-stage-sfx-row">
+          <button type="button" class="fz-stage-sfx-btn" onclick="fzStageSfx('ding')">${esc(t('stage.sfx-ding','Lonceng'))}</button>
+          <button type="button" class="fz-stage-sfx-btn" onclick="fzStageSfx('buzzer')">${esc(t('stage.sfx-buzzer','Buzzer'))}</button>
+          <button type="button" class="fz-stage-sfx-btn" onclick="fzStageSfx('alarm')">${esc(t('stage.sfx-alarm','Alarm'))}</button>
+          <button type="button" class="fz-stage-sfx-btn" onclick="fzStageSfx('cheer')">${esc(t('stage.sfx-cheer','Sorak'))}</button>
+        </div>
+        <button type="button" class="fz-stage-invite-btn" onclick="fzStageInvite()">&#128241; ${esc(t('stage.undang-wa','Bagikan tautan panggung'))}</button>
+        ${localNote}
+        <p class="fz-stage-footer-note" id="fzStageFooterNote">${esc(t('stage.catatan-footer','Suara berjalan dua arah lewat P2P. Saling bicara bergantian supaya tidak saling memotong.'))}</p>
+      `:''}
+
+      ${isSpeaker?`
+        <div class="fz-stage-deck-row">
+          <div class="fz-stage-reactions">
+            <button type="button" onclick="fzStageReact('clap')" aria-label="${esc(t('stage.tepuk','Tepuk tangan'))}">&#128079;</button>
+            <button type="button" onclick="fzStageReact('fire')" aria-label="${esc(t('stage.semangat','Semangat'))}">&#128293;</button>
+            <button type="button" onclick="fzStageReact('laugh')" aria-label="${esc(t('stage.tawa','Tawa'))}">&#128514;</button>
+            <button type="button" onclick="fzStageReact('heart')" aria-label="${esc(t('stage.cinta','Suka'))}">&#128150;</button>
+          </div>
+          <button type="button" class="fz-stage-mic-btn${fzStageRtcClient&&fzStageRtcClient.isMuted?' is-muted':''}" id="fzStageMicBtn" onclick="fzStageToggleMic()" aria-label="${esc(t('stage.mikrofon','Hidup atau matikan mikrofon'))}">&#127908;</button>
+        </div>
+        <div class="fz-stage-sfx-row">
+          <button type="button" class="fz-stage-sfx-btn" onclick="fzStageSfx('ding')">${esc(t('stage.sfx-ding','Lonceng'))}</button>
+          <button type="button" class="fz-stage-sfx-btn" onclick="fzStageSfx('buzzer')">${esc(t('stage.sfx-buzzer','Buzzer'))}</button>
+          <button type="button" class="fz-stage-sfx-btn" onclick="fzStageSfx('alarm')">${esc(t('stage.sfx-alarm','Alarm'))}</button>
+          <button type="button" class="fz-stage-sfx-btn" onclick="fzStageSfx('cheer')">${esc(t('stage.sfx-cheer','Sorak'))}</button>
+        </div>
+        <p class="fz-stage-footer-note" id="fzStageFooterNote">${esc(t('stage.catatan-footer-speaker','Kamu aktif sebagai pembicara di panggung bersama host.'))}</p>
+      `:''}
     </div>
   </div>`;
 }
@@ -7865,7 +7977,6 @@ function fzStagePaint(){
   try{enhanceUI()}catch(_){}
   return true;
 }
-/** Menyisipkan satu baris obrolan tanpa menggambar ulang seluruh panggung (timer tetap hidup). */
 function fzStageAppendChat(sender,text){
   try{
     const log=$('fzStageChatLog');if(!log)return false;
@@ -7878,13 +7989,50 @@ function fzStageAppendChat(sender,text){
     return true;
   }catch(_){return false}
 }
-/** Memasang seluruh pendengar mesin ke DOM laci. Dipanggil sekali per sesi koordinator
- *  (bukan sekali per pembukaan laci) karena koordinator persisten — pendengar ditambahkan
- *  sekali untuk selamanya dan membaca DOM lewat $() pada saat kejadian terjadi. */
+function fzStageUpdatePeersCount(){
+  const audience=Array.from(fzStagePeers.values()).filter(p=>p.role==='audience');
+  fzStageAudienceCount=audience.length;
+  const el=$('fzStageAudienceCount');
+  if(el)el.textContent=String(fzStageAudienceCount);
+}
+function fzStageHandleAudioLevel(data){
+  if(!data)return;
+  const isLocal=data.peerId==='local'||data.peerId===(fzStageRtcClient&&fzStageRtcClient.peerId);
+  const ripple=$(isLocal?'fzStageLocalRipple':'fzStagePartnerRipple');
+  const pulse=isLocal?$('fzStageLocalPulse'):null;
+  const speaking=(data.level||0)>0.08;
+  if(ripple){
+    if(speaking){
+      const scale=1.0+Math.min(0.5,(data.level||0)*1.5);
+      ripple.style.transform=`scale(${scale})`;
+      ripple.style.opacity='0.9';
+    }else{
+      ripple.style.transform='scale(1)';
+      ripple.style.opacity='0';
+    }
+  }
+  if(pulse){
+    pulse.style.opacity=speaking?'0.85':'0';
+  }
+}
+function fzStageSpawnFloatEmoji(emoji){
+  try{
+    const canvas=$('fzStageFloatCanvas');if(!canvas)return;
+    const el=document.createElement('div');
+    el.className='fz-stage-float-emoji';
+    el.textContent=emoji;
+    const left=15+Math.random()*70;
+    el.style.left=left+'%';
+    const rotStart=-15+Math.random()*30;
+    const rotEnd=-25+Math.random()*50;
+    el.style.setProperty('--rot-start',rotStart+'deg');
+    el.style.setProperty('--rot-end',rotEnd+'deg');
+    canvas.appendChild(el);
+    setTimeout(()=>{try{canvas.removeChild(el)}catch(_){}},2600);
+  }catch(_){}
+}
 function fzStageWireCoordinator(){
   const core=fzStageCore();if(!core||!fzStageCoordinator)return false;
-  // Guard: wiring cukup sekali per koordinator. Tanpa ini, setiap openLiveVoiceStage()
-  // menambahkan satu set pendengar baru, sehingga pesan obrolan muncul N kali.
   if(fzStageCoordinatorWired)return true;
   try{
     fzStageCoordinator.on('stateChange',()=>{const el=$('fzStageTimer');if(el&&fzStageCoordinator.state!=='TABOO_ROUND_ACTIVE')el.textContent=t('stage.siap','Siap');});
@@ -7903,9 +8051,7 @@ function fzStageWireCoordinator(){
     return true;
   }catch(_){return false}
 }
-/** Membuka laci. roomId null = buat ruangan baru; bila ada, langsung bergabung. */
 async function openLiveVoiceStage(roomId){
-  // Guard: panggung sudah terbuka — tidak perlu buka lagi (mencegah double-wiring).
   if(fzStageDrawerOpen)return true;
   const rtc=fzStageRtc(),core=fzStageCore();
   const mount=$('fzStageDrawer');if(!mount)return false;
@@ -7925,7 +8071,7 @@ async function openLiveVoiceStage(roomId){
 
   if(!fzStageCoordinator){
     fzStageCoordinator=new core.LiveStageCoordinator({roundTimeSeconds:30});
-    fzStageCoordinatorWired=false; // koordinator baru → wiring belum dilakukan
+    fzStageCoordinatorWired=false;
   }
   if(!fzStageCoordinator.cards||!fzStageCoordinator.cards.length){
     try{
@@ -7940,14 +8086,54 @@ async function openLiveVoiceStage(roomId){
 
   if(!fzStageRtcClient){
     fzStageRtcClient=new rtc.WebRtcStageClient({peerName:learnerName(),mode:'auto'});
-    // Daftarkan pendengar peerJoined/peerLeft hanya saat client baru dibuat agar tidak
-    // bertumpuk saat openLiveVoiceStage() dipanggil berkali-kali dalam satu sesi.
-    try{fzStageRtcClient.on('peerJoined',(p)=>fzStageAppendChat(t('stage.system-sender','Panggung Suara'),t('stage.teman-masuk','{nama} masuk ke panggung.',{nama:(p&&p.name)||t('stage.teman','Teman')})))}catch(_){}
-    try{fzStageRtcClient.on('peerLeft',(p)=>fzStageAppendChat(t('stage.system-sender','Panggung Suara'),t('stage.teman-keluar','{nama} keluar dari panggung.',{nama:(p&&p.name)||t('stage.teman','Teman')})))}catch(_){}
+    try{fzStageRtcClient.on('peerJoined',(p)=>{
+      if(p&&p.peerId)fzStagePeers.set(p.peerId,p);
+      fzStageUpdatePeersCount();
+      fzStageAppendChat(t('stage.system-sender','Panggung Suara'),t('stage.teman-masuk','{nama} masuk ke panggung.',{nama:(p&&p.name)||t('stage.teman','Teman')}));
+      fzStagePaint();
+    })}catch(_){}
+    try{fzStageRtcClient.on('peerLeft',(p)=>{
+      if(p&&p.peerId)fzStagePeers.delete(p.peerId);
+      fzStageUpdatePeersCount();
+      fzStageAppendChat(t('stage.system-sender','Panggung Suara'),t('stage.teman-keluar','{nama} keluar dari panggung.',{nama:(p&&p.name)||t('stage.teman','Teman')}));
+      fzStagePaint();
+    })}catch(_){}
+    try{fzStageRtcClient.on('peerRoleChanged',(data)=>{
+      if(data&&data.peerId&&fzStagePeers.has(data.peerId)){
+        const peer=fzStagePeers.get(data.peerId);
+        peer.role=data.role;
+        fzStagePeers.set(data.peerId,peer);
+      }
+      fzStageUpdatePeersCount();
+      fzStagePaint();
+    })}catch(_){}
+    try{fzStageRtcClient.on('handRaised',(data)=>{
+      if(!fzStageHandsList.some(h=>h.peerId===data.peerId)){
+        fzStageHandsList.push(data);
+      }
+      const badge=$('fzStageHandsBadge');
+      if(badge)badge.textContent=String(fzStageHandsList.length);
+      showToast(t('stage.ada-permintaan','{nama} meminta izin naik panggung.',{nama:data.peerName||'Penonton'}));
+      try{uiSfx('notif_achievement')}catch(_){}
+      fzStagePaint();
+    })}catch(_){}
+    try{fzStageRtcClient.on('rolePromoted',()=>{
+      fzStageHandRequested=false;
+      showToast(t('stage.promosi-berhasil','Kamu sekarang di panggung sebagai pembicara!'),'success');
+      try{uiSfx('xp_gain')}catch(_){}
+      fzStagePaint();
+    })}catch(_){}
+    try{fzStageRtcClient.on('roleDemoted',()=>{
+      showToast(t('stage.kembali-penonton','Kamu kembali menjadi penonton.'));
+      fzStagePaint();
+    })}catch(_){}
+    try{fzStageRtcClient.on('audioLevel',(data)=>{
+      fzStageHandleAudioLevel(data);
+    })}catch(_){}
   }
   let joined=null;
   if(roomId){
-    joined=await fzStageRtcClient.joinRoom({roomId,peerName:learnerName(),role:'speaker'}).catch(()=>({ok:false,error:'join_failed'}));
+    joined=await fzStageRtcClient.joinRoom({roomId,peerName:learnerName(),role:'audience'}).catch(()=>({ok:false,error:'join_failed'}));
     if(!joined||!joined.ok){
       const sebab=joined&&joined.error==='stage_disabled'?t('stage.belum-aktif','Fitur panggung suara belum aktif untuk akunmu.'):t('stage.ruang-gagal','Ruang tidak ditemukan atau sudah berakhir.');
       try{showToast(sebab)}catch(_){}
@@ -7955,7 +8141,7 @@ async function openLiveVoiceStage(roomId){
     }
     fzStageRoomId=joined.roomId;
   }else{
-    joined=await fzStageRtcClient.createRoom({hostName:learnerName(),title:t('stage.judul','Panggung Suara Live')}).catch(()=>({ok:false,error:'create_failed'}));
+    joined=await fzStageRtcClient.createRoom({hostName:learnerName(),hostHandle:learnerName().toLowerCase().replace(/\s+/g,'_'),title:t('stage.judul','Panggung Suara Live')}).catch(()=>({ok:false,error:'create_failed'}));
     if(!joined||!joined.ok){
       const sebab=joined&&joined.error==='stage_disabled'?t('stage.belum-aktif','Fitur panggung suara belum aktif untuk akunmu.'):t('stage.ruang-gagal-buat','Ruang tidak bisa dibuat sekarang.');
       try{showToast(sebab)}catch(_){}
@@ -7977,7 +8163,6 @@ async function openLiveVoiceStage(roomId){
   try{uiSfx('open')}catch(_){}
   return true;
 }
-/** Mengganti tampilan nama kartu tanpa menghentikan ronde. */
 function fzStageNextCard(){
   try{fzStageCoordinator?.nextCard?.();fzStagePaint()}catch(_){}
 }
@@ -7998,7 +8183,7 @@ function fzStageToggleMic(){
   try{fzStageRtcClient.setMuted(!fzStageRtcClient.isMuted)}catch(_){}
   const muted=!!fzStageRtcClient.isMuted;
   try{
-    const badge=$('fzStageLocalMic');if(badge)badge.classList.toggle('is-muted',muted);
+    const badge=$('fzStageLocalMic');if(badge){badge.classList.toggle('is-muted',muted);badge.textContent=muted?'🔇':'🎙️';}
     const btn=$('fzStageMicBtn');if(btn)btn.classList.toggle('is-muted',muted);
   }catch(_){}
   try{showToast(muted?t('stage.mikrofon-mati','Mikrofon dimatikan.'):t('stage.mikrofon-hidup','Mikrofon menyala.'))}catch(_){}
@@ -8007,9 +8192,176 @@ function fzStageSfx(kind){
   try{fzStageCoordinator?.sfx?.play?.(kind)}catch(_){}
 }
 function fzStageReact(kind){
-  const map={clap:'tepuk tangan',fire:'semangat',laugh:'tawa'};
+  const emojiMap={clap:'👏',fire:'🔥',laugh:'😂',heart:'💖'};
+  const emoji=emojiMap[kind]||'👏';
+  fzStageSpawnFloatEmoji(emoji);
+  const map={clap:'tepuk tangan',fire:'semangat',laugh:'tawa',heart:'suka'};
   try{fzStageAppendChat(learnerName(),t('stage.reaksi','Mengirim reaksi')+': '+(map[kind]||kind))}catch(_){}
   try{uiSfx('notif_achievement')}catch(_){}
+}
+async function fzStageRequestToSpeak(){
+  if(!fzStageRtcClient||!fzStageRoomId)return;
+  if(fzStageHandRequested)return;
+  try{
+    const res=await fzStageRtcClient.requestToSpeak();
+    if(res&&res.ok){
+      fzStageHandRequested=true;
+      const btn=$('fzStageBtnRequestSpeak');
+      if(btn){
+        btn.classList.add('is-pending');
+        btn.textContent='✋ '+t('stage.menunggu-izin','Menunggu Izin Host...');
+      }
+      showToast(t('stage.permintaan-terkirim','Permintaan bicara terkirim ke Host.'),'success');
+    }else{
+      showToast(t('stage.permintaan-gagal','Gagal mengirim permintaan bicara.'));
+    }
+  }catch(_){
+    showToast(t('stage.permintaan-gagal','Gagal mengirim permintaan bicara.'));
+  }
+}
+function fzStageOpenHandsModal(){
+  const list=fzStageHandsList;
+  const markup=`<div class="modal-mark">✋</div><h2>${esc(t('stage.permintaan-bicara','Permintaan Bicara'))}</h2><p class="muted">${esc(t('stage.permintaan-bicara-desc','Pilih penonton yang ingin kamu izinkan naik ke panggung.'))}</p>
+  <div style="max-height:40vh;overflow-y:auto;display:flex;flex-direction:column;gap:8px;margin:12px 0;">
+    ${list.length?list.map(h=>`<div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.06);padding:10px 12px;border-radius:12px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="width:34px;height:34px;border-radius:50%;background:#1E293B;display:flex;align-items:center;justify-content:center;font-weight:700;">${esc(String(h.peerName||'?').slice(0,2).toUpperCase())}</span>
+        <div><b>${esc(h.peerName||'Penonton')}</b></div>
+      </div>
+      <div style="display:flex;gap:6px;">
+        <button type="button" class="primary" style="padding:6px 12px;font-size:12px;" onclick="fzStageDecideHand('${esc(h.peerId)}','approve')">Setujui</button>
+        <button type="button" style="padding:6px 10px;font-size:12px;" onclick="fzStageDecideHand('${esc(h.peerId)}','reject')">Tolak</button>
+      </div>
+    </div>`).join(''):`<div style="text-align:center;padding:16px;color:#94A3B8;">${esc(t('stage.tidak-ada-permintaan','Belum ada permintaan bicara.'))}</div>`}
+  </div>
+  <div class="modal-actions"><button type="button" onclick="closeModal()">${esc(t('coach.close-aria','Tutup'))}</button></div>`;
+  openModal(markup);
+}
+async function fzStageDecideHand(peerId,action){
+  if(!fzStageRtcClient||!fzStageRoomId)return;
+  try{
+    await fzStageRtcClient.decideHand({peerId,action});
+    fzStageHandsList=fzStageHandsList.filter(h=>h.peerId!==peerId);
+    const badge=$('fzStageHandsBadge');
+    if(badge)badge.textContent=String(fzStageHandsList.length);
+    closeModal();
+    if(action==='approve'){
+      showToast(t('stage.izin-diberikan','Izin bicara disetujui.'),'success');
+    }else{
+      showToast(t('stage.izin-ditolak','Permintaan bicara ditolak.'));
+    }
+  }catch(_){}
+}
+async function fzStageOpenFriendPicker(){
+  const core=socialCore();
+  if(!core){
+    showToast(t('stage.teman-tidak-siap','Daftar teman belum siap.'));
+    return;
+  }
+  let frList=[];
+  try{
+    const fr=await core.api.friends();
+    if(fr&&fr.ok&&Array.isArray(fr.data?.friends))frList=fr.data.friends;
+  }catch(_){}
+  const overlay=document.createElement('div');
+  overlay.className='fz-stage-picker-overlay';
+  overlay.id='fzStageFriendPicker';
+  overlay.onclick=function(e){if(e.target===overlay)closeStageFriendPicker()};
+  overlay.innerHTML=`<div class="fz-stage-picker-sheet">
+    <div class="fz-stage-picker-header">
+      <div class="fz-stage-picker-title">👥 ${esc(t('stage.ajak-teman-live','Ajak Teman ke Panggung'))}</div>
+      <button type="button" class="fz-stage-close-btn" onclick="closeStageFriendPicker()" style="font-size:16px;">&#10005;</button>
+    </div>
+    <div class="fz-stage-picker-list">
+      ${frList.length?frList.map(f=>`<div class="fz-stage-picker-item">
+        <div class="fz-stage-picker-item-info">
+          <div class="fz-stage-picker-avatar">${esc(String(f.handle||'?').charAt(0).toUpperCase())}</div>
+          <div>
+            <div class="fz-stage-picker-name">${esc(f.name||f.handle||'Teman')}</div>
+            <div class="fz-stage-picker-handle">@${esc(f.handle)}</div>
+          </div>
+        </div>
+        <button type="button" class="fz-stage-picker-btn" id="fzStageAjakBtn_${esc(f.handle)}" onclick="fzStageSendDirectInvite('${esc(f.handle)}')">${esc(t('stage.ajak-masuk','Ajak Masuk'))}</button>
+      </div>`).join(''):`<div style="text-align:center;padding:24px;color:#94A3B8;">${esc(t('stage.belum-punya-teman','Belum ada teman terhubung. Tambahkan teman di tab Teman!'))}</div>`}
+    </div>
+  </div>`;
+  document.body.appendChild(overlay);
+}
+function closeStageFriendPicker(){
+  try{
+    const el=$('fzStageFriendPicker');
+    if(el&&el.parentNode)el.parentNode.removeChild(el);
+  }catch(_){}
+}
+async function fzStageSendDirectInvite(handle){
+  if(!fzStageRtcClient||!fzStageRoomId)return;
+  const h=String(handle||'').replace(/^@/,'').toLowerCase();
+  const btn=$('fzStageAjakBtn_'+h);
+  if(btn){btn.disabled=true;btn.textContent=t('stage.mengirim','Mengirim...');}
+  try{
+    const res=await fzStageRtcClient.sendStageInvite({
+      toHandle:h,
+      fromHandle:learnerName().toLowerCase().replace(/\s+/g,'_'),
+      fromName:learnerName(),
+      roomId:fzStageRoomId,
+      title:t('stage.judul','Panggung Suara Live')
+    });
+    if(res&&res.ok){
+      if(btn){btn.className='fz-stage-picker-btn is-sent';btn.textContent='✓ '+t('stage.terkirim','Terkirim');}
+      showToast(t('stage.undangan-terkirim-teman','Undangan dikirim ke @{handle}',{handle:h}),'success');
+    }else{
+      if(btn){btn.disabled=false;btn.textContent=t('stage.ajak-masuk','Ajak Masuk');}
+      showToast(t('stage.gagal-kirim-undangan','Gagal mengirim undangan.'));
+    }
+  }catch(_){
+    if(btn){btn.disabled=false;btn.textContent=t('stage.ajak-masuk','Ajak Masuk');}
+    showToast(t('stage.gagal-kirim-undangan','Gagal mengirim undangan.'));
+  }
+}
+function showStageIncomingCallBanner(inv){
+  if(fzStageDrawerOpen)return;
+  if($('fzStageCallBanner'))return;
+  const banner=document.createElement('div');
+  banner.className='fz-stage-call-banner';
+  banner.id='fzStageCallBanner';
+  banner.innerHTML=`
+    <div class="fz-stage-call-avatar">${esc(String(inv.fromName||inv.fromHandle||'?').charAt(0).toUpperCase())}</div>
+    <div class="fz-stage-call-body">
+      <div class="fz-stage-call-title">🎙️ ${esc(inv.fromName||inv.fromHandle||'Teman')}</div>
+      <div class="fz-stage-call-desc">${esc(t('stage.mengajak-ke-ruang','Mengajakmu ke panggung {kode}',{kode:inv.roomId}))}</div>
+    </div>
+    <div class="fz-stage-call-actions">
+      <button type="button" class="fz-stage-call-btn-join" onclick="acceptStageCall('${esc(inv.roomId)}')">${esc(t('stage.nonton-langsung','Nonton'))}</button>
+      <button type="button" class="fz-stage-call-btn-later" onclick="dismissStageCall()">${esc(t('stage.nanti','Nanti'))}</button>
+    </div>
+  `;
+  document.body.appendChild(banner);
+  try{uiSfx('notif_achievement')}catch(_){}
+  setTimeout(()=>{dismissStageCall()},15000);
+}
+function acceptStageCall(roomId){
+  dismissStageCall();
+  if(roomId)openLiveVoiceStage(roomId);
+}
+function dismissStageCall(){
+  try{
+    const b=$('fzStageCallBanner');
+    if(b&&b.parentNode)b.parentNode.removeChild(b);
+  }catch(_){}
+}
+async function pollStageInvites(){
+  if(fzStageDrawerOpen)return;
+  const core=socialCore();
+  if(!core||!core.api)return;
+  const myHandle=socialProfileCache?.handle||learnerName().toLowerCase().replace(/\s+/g,'_');
+  if(!myHandle)return;
+  try{
+    const res=await core.api.stageInvites(myHandle);
+    if(res&&res.ok&&Array.isArray(res.data?.invites)&&res.data.invites.length>0){
+      const latest=res.data.invites[0];
+      showStageIncomingCallBanner(latest);
+    }
+  }catch(_){}
 }
 /** Undangan WhatsApp. Kode ruang + tautan ?stage= dirakit modul transport (satu sumber). */
 function fzStageInvite(){
@@ -8035,19 +8387,27 @@ function fzStageInvite(){
 function fzStageInviteTo(handle){
   const rtc=fzStageRtc();if(!rtc||!fzStageRoomId)return false;
   const h=String(handle||'').replace(/^@/,'').toLowerCase();
+  try{
+    if(fzStageRtcClient&&typeof fzStageRtcClient.sendStageInvite==='function'){
+      fzStageRtcClient.sendStageInvite({
+        toHandle:h,
+        fromHandle:learnerName().toLowerCase().replace(/\s+/g,'_'),
+        fromName:learnerName(),
+        roomId:fzStageRoomId,
+        title:t('stage.judul','Panggung Suara Live')
+      }).catch(()=>{});
+    }
+  }catch(_){}
   const url=rtc.buildInviteUrl(fzStageRoomId);
   const teks=t('stage.undangan-teks','Ayo main Sarang Tabu di Panggung Suara FIEZEL. Kode ruang {kode}.',{kode:fzStageRoomId})+(h?(' @'+h):'');
   let wa=url;
   try{wa=rtc.buildInviteUrl(fzStageRoomId,teks)}catch(_){}
   try{
-    const w=window.open(wa,'_blank','noopener');
-    if(!w)throw new Error('popup_blocked');
-    try{navigator.clipboard?.writeText?.(teks+' '+url)}catch(_){}
+    navigator.clipboard?.writeText?.(teks+' '+url);
     fzStageInviteCopied=true;
-    try{showToast(t('stage.undangan-terkirim','Undangan dibuka di WhatsApp. Tautannya juga disalin.'))}catch(_){}
+    showToast(t('stage.undangan-terkirim-teman','Undangan panggung suara disiapkan untuk @{handle}.',{handle:h}),'success');
     return true;
   }catch(_){
-    try{showToast(t('stage.undangan-gagal','Tidak bisa membuka WhatsApp. Salin tautannya: {tautan}',{tautan:url}))}catch(_){}
     return false;
   }
 }
@@ -8058,17 +8418,17 @@ function closeLiveVoiceStage(){
   try{fzStageCoordinator?.stopRound?.()}catch(_){}
   try{fzStageRtcClient?.leave?.()}catch(_){}
   try{fzStageRtcClient=null}catch(_){}
-  // Koordinator persisten agar riwayat obrolan tidak hilang, namun wiring
-  // tetap valid karena pendengar tidak bertumpuk (guard fzStageCoordinatorWired).
-  // Bila koordinator suatu saat direset, flag ikut di-nol-kan di openLiveVoiceStage.
   fzStageDrawerOpen=false;
   fzStageRoomId=null;
+  fzStageHandRequested=false;
+  fzStageHandsList=[];
+  fzStagePeers.clear();
+  fzStageAudienceCount=0;
   try{if(mount){mount.classList.remove('is-open');mount.setAttribute('aria-hidden','true');const h=$('fzStageDrawerMount');if(h)h.innerHTML=''}}catch(_){}
   fzStageSetBackgroundInert(false);
   try{fzStageDrawerReturnFocus&&document.contains(fzStageDrawerReturnFocus)&&fzStageDrawerReturnFocus.focus?.({preventScroll:true})}catch(_){}
   fzStageDrawerReturnFocus=null;
   try{uiSfx('close')}catch(_){}
-  // Buang ?stage= dari alamat supaya menutup panggung tidak memicu gabung ulang tiap boot.
   try{
     if(location.search.indexOf('stage=')>=0){
       const u=new URL(location.href);u.searchParams.delete('stage');
@@ -8090,6 +8450,11 @@ window.openLiveVoiceStage=openLiveVoiceStage;window.closeLiveVoiceStage=closeLiv
 window.fzStageToggleMic=fzStageToggleMic;window.fzStageToggleRound=fzStageToggleRound;
 window.fzStageCorrectGuess=fzStageCorrectGuess;window.fzStageNextCard=fzStageNextCard;
 window.fzStageSfx=fzStageSfx;window.fzStageReact=fzStageReact;window.fzStageInvite=fzStageInvite;
+window.fzStageRequestToSpeak=fzStageRequestToSpeak;window.fzStageOpenFriendPicker=fzStageOpenFriendPicker;
+window.closeStageFriendPicker=closeStageFriendPicker;window.fzStageSendDirectInvite=fzStageSendDirectInvite;
+window.fzStageOpenHandsModal=fzStageOpenHandsModal;window.fzStageDecideHand=fzStageDecideHand;
+window.showStageIncomingCallBanner=showStageIncomingCallBanner;window.acceptStageCall=acceptStageCall;
+window.dismissStageCall=dismissStageCall;window.pollStageInvites=pollStageInvites;
 /* Pola penjaga yang sama dengan listener tingkat-atas lain di berkas ini: harness vm gerbang
    (tests/regression-test.js) memberi `document` tanpa addEventListener. */
 if(typeof document!=='undefined'&&typeof document.addEventListener==='function'){
@@ -17747,6 +18112,13 @@ async function socialTemanMarkup(core){
   let reqList=[];
   try{const rq=await core.api.friendRequests();reqList=rq.ok&&Array.isArray(rq.data?.requests)?rq.data.requests:[]}catch(_){reqList=[]}
   socialRequestCount=reqList.length;
+
+  let activeStages=[];
+  try{
+    const stg=await core.api.stageActive();
+    if(stg&&stg.ok&&Array.isArray(stg.data?.stages))activeStages=stg.data.stages;
+  }catch(_){activeStages=[]}
+
   // URL undangan ?invite=KODE dari share-sheet teman → prefill kolom tukar kode.
   let urlInvite='';try{urlInvite=String(new URLSearchParams(location.search).get('invite')||'').trim()}catch(_){urlInvite=''}
   const inviteCard=card(`<h3>${FiezelI18n.t('social.invite-title')}</h3><p class="muted">${FiezelI18n.t('social.invite-desc')}</p>
@@ -17759,8 +18131,12 @@ async function socialTemanMarkup(core){
   const classCard=socialClassCardMarkup();
   const list=friends.length?friends.map(f=>{
     const vis=f.visible!==false;
+    const hClean=String(f.handle||'').replace(/^@/,'').toLowerCase();
+    const liveStage=activeStages.find(s=>String(s.hostHandle||'').toLowerCase()===hClean);
     const milestones=vis&&Array.isArray(f.milestones)?f.milestones.slice(0,3).map(m=>`<span class="social-chip">${esc(core.milestoneLabel(m.kind))}</span>`).join(''):'';
-    return `<div class="social-friend"><span class="social-avatar" aria-hidden="true">${esc(String(f.handle||'?').charAt(0).toUpperCase())}</span><div class="social-friend-body"><b>@${esc(f.handle)}</b><small>${esc(core.presenceLabel(f))}${vis&&f.band?` · ${esc(f.band)}`:''}${vis&&Number(f.streakDays)>0?` · 🔥 ${Number(f.streakDays)} hari`:''}</small>${milestones?`<div class="social-chips">${milestones}</div>`:''}</div><div class="social-friend-acts"><button type="button" class="social-voice-btn" onclick="socialAjakVoice('${esc(f.handle)}')" data-testid="ajak-voice-${esc(f.handle)}" aria-label="${esc(FiezelI18n.t('social3.voice-ajak'))}"><i data-lucide="mic"></i> ${esc(FiezelI18n.t('social3.voice-ajak'))}</button><button type="button" class="social-cheer-btn" onclick="socialOpenCheer('${esc(f.handle)}')" aria-label="${FiezelI18n.t('social.cheer-modal-title',{handle:esc(f.handle)})}">👏 ${FiezelI18n.t('social.cheer-btn')}</button></div></div>`;
+    const liveBadge=liveStage?`<span class="fz-stage-live-badge" data-testid="live-badge" style="background:#E53935;color:#FFF;font-size:10px;font-weight:800;padding:2px 6px;border-radius:6px;display:inline-flex;align-items:center;gap:4px;margin-left:6px;"><span class="fz-stage-live-dot" style="width:6px;height:6px;border-radius:50%;background:#FFF;"></span>LIVE (${esc(liveStage.roomId)})</span>`:'';
+    const liveBtn=liveStage?`<button type="button" class="social-voice-btn" style="background:#00E5FF;color:#0F172A;font-weight:800;border:none;" onclick="openLiveVoiceStage('${esc(liveStage.roomId)}')" data-testid="join-stage-live"><i data-lucide="radio"></i> Nonton Live</button>`:'';
+    return `<div class="social-friend"><span class="social-avatar" aria-hidden="true">${esc(String(f.handle||'?').charAt(0).toUpperCase())}</span><div class="social-friend-body"><b>@${esc(f.handle)}</b>${liveBadge}<small>${esc(core.presenceLabel(f))}${vis&&f.band?` · ${esc(f.band)}`:''}${vis&&Number(f.streakDays)>0?` · 🔥 ${Number(f.streakDays)} hari`:''}</small>${milestones?`<div class="social-chips">${milestones}</div>`:''}</div><div class="social-friend-acts">${liveBtn}<button type="button" class="social-voice-btn" onclick="socialAjakVoice('${esc(f.handle)}')" data-testid="ajak-voice-${esc(f.handle)}" aria-label="${esc(FiezelI18n.t('social3.voice-ajak'))}"><i data-lucide="mic"></i> ${esc(FiezelI18n.t('social3.voice-ajak'))}</button><button type="button" class="social-cheer-btn" onclick="socialOpenCheer('${esc(f.handle)}')" aria-label="${FiezelI18n.t('social.cheer-modal-title',{handle:esc(f.handle)})}">👏 ${FiezelI18n.t('social.cheer-btn')}</button></div></div>`;
   }).join(''):`<div class="social-empty"><p><b>${FiezelI18n.t('social.no-friends-title')}</b></p><p class="muted">${FiezelI18n.t('social.no-friends-body')}</p></div>`;
   const reqList2=reqList.filter(r=>!/^$/.test(String(r.handle||'')));
   const reqSection=card(`<h3>${FiezelI18n.t('social3.req-section-title')}</h3><p class="muted">${FiezelI18n.t('social3.req-section-desc')}</p>${reqList2.length?reqList2.map(r=>friendRequestRow(r)).join(''):`<div class="social-empty"><p class="muted">${FiezelI18n.t('social3.req-none')}</p></div>`}`,'social-card');

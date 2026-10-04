@@ -28,6 +28,8 @@ class StageSignalingCore {
        menit habis. Sinyal terlama dibuang lebih dulu: handshake WebRTC selalu butuh
        sinyal TERBARU, bukan yang tertunda lama. */
     this.MAX_SIGNAL_QUEUE = options.maxSignalQueue || 50;
+    this.invites = new Map();
+    this.INVITE_TTL_MS = options.inviteTtlMs || 10 * 60 * 1000; // 10 menit
     this.now = typeof options.now === 'function' ? options.now : () => Date.now();
   }
 
@@ -61,7 +63,7 @@ class StageSignalingCore {
     }
   }
 
-  createRoom({ hostName = 'Host', title = 'Sarang Suara' } = {}) {
+  createRoom({ hostName = 'Host', hostHandle = '', title = 'Sarang Suara' } = {}) {
     this.cleanupExpiredRooms();
 
     let roomId = this.generateRoomId();
@@ -75,9 +77,11 @@ class StageSignalingCore {
     const room = {
       roomId,
       title: String(title).slice(0, 40),
+      hostHandle: String(hostHandle || '').slice(0, 24),
       createdAt: now,
       lastActivityAt: now,
       hostPeerId,
+      handsRaised: new Map(),
       state: {
         gameMode: 'sarang_tabu',
         currentCardId: 'TABOO-EN-001',
@@ -167,7 +171,8 @@ class StageSignalingCore {
       title: room.title,
       hostPeerId: room.hostPeerId,
       state: room.state,
-      peers: peerList
+      peers: peerList,
+      handsRaised: Array.from((room.handsRaised || new Map()).values())
     };
   }
 
@@ -250,12 +255,185 @@ class StageSignalingCore {
       });
     }
 
+    if (room.handsRaised) {
+      room.handsRaised.delete(peerId);
+    }
+
     // Pakai cleanRoomId supaya penghapusan ruang cocok dengan kunci Map yang sudah diatas-hurufkan
     if (room.peers.size === 0) {
       this.rooms.delete(cleanRoomId);
     }
 
     return { ok: true };
+  }
+
+  raiseHand({ roomId, peerId, peerName } = {}) {
+    const cleanRoomId = String(roomId).toUpperCase().trim();
+    const room = this.rooms.get(cleanRoomId);
+    if (!room) return { ok: false, error: 'room_not_found' };
+    const peer = room.peers.get(peerId);
+    if (!peer) return { ok: false, error: 'peer_not_found' };
+
+    const now = this.now();
+    const handInfo = {
+      peerId,
+      name: peer.name || peerName || 'Teman',
+      requestedAt: now
+    };
+    if (!room.handsRaised) room.handsRaised = new Map();
+    room.handsRaised.set(peerId, handInfo);
+
+    const hostPeer = room.peers.get(room.hostPeerId);
+    if (hostPeer) {
+      this.enqueueSignal(hostPeer, {
+        type: 'hand_raised',
+        peerId,
+        name: handInfo.name,
+        timestamp: now
+      });
+    }
+
+    return { ok: true, handsRaisedCount: room.handsRaised.size };
+  }
+
+  decideHand({ roomId, hostPeerId, targetPeerId, action = 'approve' } = {}) {
+    const cleanRoomId = String(roomId).toUpperCase().trim();
+    const room = this.rooms.get(cleanRoomId);
+    if (!room) return { ok: false, error: 'room_not_found' };
+    if (room.hostPeerId !== hostPeerId) return { ok: false, error: 'unauthorized' };
+
+    const targetPeer = room.peers.get(targetPeerId);
+    if (!targetPeer) return { ok: false, error: 'peer_not_found' };
+
+    if (room.handsRaised) {
+      room.handsRaised.delete(targetPeerId);
+    }
+
+    const now = this.now();
+    if (action === 'approve') {
+      targetPeer.role = 'speaker';
+      this.enqueueSignal(targetPeer, {
+        type: 'hand_decided',
+        approved: true,
+        role: 'speaker',
+        timestamp: now
+      });
+
+      for (const [, p] of room.peers.entries()) {
+        this.enqueueSignal(p, {
+          type: 'peer_role_changed',
+          peerId: targetPeerId,
+          role: 'speaker',
+          name: targetPeer.name,
+          timestamp: now
+        });
+      }
+      return { ok: true, approved: true, role: 'speaker' };
+    } else {
+      this.enqueueSignal(targetPeer, {
+        type: 'hand_decided',
+        approved: false,
+        timestamp: now
+      });
+      return { ok: true, approved: false };
+    }
+  }
+
+  demoteSpeaker({ roomId, hostPeerId, targetPeerId } = {}) {
+    const cleanRoomId = String(roomId).toUpperCase().trim();
+    const room = this.rooms.get(cleanRoomId);
+    if (!room) return { ok: false, error: 'room_not_found' };
+    if (room.hostPeerId !== hostPeerId) return { ok: false, error: 'unauthorized' };
+
+    const targetPeer = room.peers.get(targetPeerId);
+    if (!targetPeer) return { ok: false, error: 'peer_not_found' };
+
+    targetPeer.role = 'audience';
+    const now = this.now();
+
+    this.enqueueSignal(targetPeer, {
+      type: 'speaker_demoted',
+      role: 'audience',
+      timestamp: now
+    });
+
+    for (const [, p] of room.peers.entries()) {
+      this.enqueueSignal(p, {
+        type: 'peer_role_changed',
+        peerId: targetPeerId,
+        role: 'audience',
+        name: targetPeer.name,
+        timestamp: now
+      });
+    }
+
+    return { ok: true, role: 'audience' };
+  }
+
+  sendStageInvite({ fromHandle, fromName, toHandle, roomId, title } = {}) {
+    const cleanToHandle = String(toHandle || '').replace(/^@/, '').toLowerCase().trim();
+    if (!cleanToHandle) return { ok: false, error: 'invalid_handle' };
+
+    const now = this.now();
+    let userInvites = this.invites.get(cleanToHandle);
+    if (!userInvites) {
+      userInvites = [];
+      this.invites.set(cleanToHandle, userInvites);
+    }
+
+    userInvites = userInvites.filter((inv) => (now - inv.createdAt) < this.INVITE_TTL_MS);
+
+    const invite = {
+      id: 'inv_' + this.now().toString(36) + '_' + Math.random().toString(36).substr(2, 4),
+      fromHandle: String(fromHandle || '').replace(/^@/, '').toLowerCase(),
+      fromName: String(fromName || 'Teman').slice(0, 24),
+      roomId: String(roomId || '').toUpperCase(),
+      title: String(title || 'Panggung Suara Live').slice(0, 40),
+      createdAt: now
+    };
+
+    userInvites.push(invite);
+    this.invites.set(cleanToHandle, userInvites);
+
+    return { ok: true, inviteId: invite.id };
+  }
+
+  getStageInvites({ handle } = {}) {
+    const cleanHandle = String(handle || '').replace(/^@/, '').toLowerCase().trim();
+    if (!cleanHandle) return { ok: true, invites: [] };
+
+    const now = this.now();
+    const userInvites = this.invites.get(cleanHandle) || [];
+    const valid = userInvites.filter((inv) => (now - inv.createdAt) < this.INVITE_TTL_MS);
+    this.invites.delete(cleanHandle);
+
+    return { ok: true, invites: valid };
+  }
+
+  getActiveStages() {
+    this.cleanupExpiredRooms();
+    const list = [];
+    const now = this.now();
+    for (const [roomId, room] of this.rooms.entries()) {
+      if (now - room.lastActivityAt > 120000 || room.peers.size === 0) continue;
+      const host = room.peers.get(room.hostPeerId);
+      const speakerCount = Array.from(room.peers.values())
+        .filter((p) => p.role === 'speaker' || p.role === 'host').length;
+      const audienceCount = Array.from(room.peers.values())
+        .filter((p) => p.role === 'audience').length;
+
+      list.push({
+        roomId,
+        title: room.title,
+        hostName: host ? host.name : 'Host',
+        hostHandle: room.hostHandle || '',
+        speakerCount,
+        audienceCount,
+        totalPeers: room.peers.size,
+        updatedAt: room.lastActivityAt
+      });
+    }
+    return { ok: true, stages: list };
   }
 }
 

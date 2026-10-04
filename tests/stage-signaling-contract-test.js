@@ -181,6 +181,73 @@ signaling.leaveRoom({ roomId: hostRes.roomId, peerId: hostRes.peerId });
 const checkEmpty = signaling.joinRoom({ roomId: hostRes.roomId, peerName: 'Orang Asing' });
 assert(checkEmpty.ok === false && checkEmpty.error === 'room_not_found', 'Ruang otomatis dibersihkan saat seluruh anggota telah keluar');
 
+console.log('\n--- [GERBANG 6] Antrean Angkat Tangan & Promosi Peran (Hand Raise & Decide) ---');
+const stage2 = new StageSignalingCore();
+const host2 = stage2.createRoom({ hostName: 'Rian Pratama', hostHandle: 'rian_p', title: 'Live English Room' });
+const aud2 = stage2.joinRoom({ roomId: host2.roomId, peerName: 'Siti Aminah', role: 'audience' });
+assert(aud2.ok === true && aud2.role === 'audience', 'Siti bergabung sebagai penonton/audience');
+
+// 1. Audience mengangkat tangan untuk minta bicara
+const raiseRes = stage2.raiseHand({ roomId: host2.roomId, peerId: aud2.peerId, peerName: 'Siti Aminah' });
+assert(raiseRes.ok === true && raiseRes.handsRaisedCount === 1, 'Audience berhasil mengangkat tangan');
+
+// Host memeriksa sinyal dan menerima notifikasi hand_raised
+const hostPollHand = stage2.pollSignals({ roomId: host2.roomId, peerId: host2.peerId });
+const handSignal = hostPollHand.signals.find(s => s.type === 'hand_raised');
+assert(handSignal && handSignal.peerId === aud2.peerId, 'Host menerima sinyal hand_raised dari Siti');
+
+// 2. Host menyetujui permintaan Siti
+const decideRes = stage2.decideHand({
+  roomId: host2.roomId,
+  hostPeerId: host2.peerId,
+  targetPeerId: aud2.peerId,
+  action: 'approve'
+});
+assert(decideRes.ok === true && decideRes.approved === true && decideRes.role === 'speaker', 'Host berhasil menyetujui promosi peran ke speaker');
+
+// Siti memeriksa sinyal dan menerima hand_decided approved
+const sitiPoll = stage2.pollSignals({ roomId: host2.roomId, peerId: aud2.peerId });
+const decidedSignal = sitiPoll.signals.find(s => s.type === 'hand_decided');
+assert(decidedSignal && decidedSignal.approved === true, 'Siti menerima konfirmasi promosi ke speaker');
+
+// 3. Host menurunkan Siti kembali ke audience
+const demoteRes = stage2.demoteSpeaker({
+  roomId: host2.roomId,
+  hostPeerId: host2.peerId,
+  targetPeerId: aud2.peerId
+});
+assert(demoteRes.ok === true && demoteRes.role === 'audience', 'Host berhasil menurunkan pembicara kembali ke audience');
+
+console.log('\n--- [GERBANG 7] Kehadiran Sosial Langsung & Undangan In-App ---');
+// 1. Periksa daftar siaran panggung aktif
+const activeStagesRes = stage2.getActiveStages();
+assert(activeStagesRes.ok === true && activeStagesRes.stages.length === 1, 'Panggung yang sedang aktif terdeteksi');
+assert(activeStagesRes.stages[0].roomId === host2.roomId, 'Room ID cocok di daftar panggung aktif');
+assert(activeStagesRes.stages[0].hostHandle === 'rian_p', 'Host handle tercatat dengan benar');
+
+// 2. Kirim undangan in-app langsung ke teman
+const inviteSendRes = stage2.sendStageInvite({
+  fromHandle: 'rian_p',
+  fromName: 'Rian Pratama',
+  toHandle: 'budi_santoso',
+  roomId: host2.roomId,
+  title: 'Live English Room'
+});
+assert(inviteSendRes.ok === true && typeof inviteSendRes.inviteId === 'string', 'Undangan in-app berhasil dikirim tanpa WhatsApp');
+
+// 3. Teman memeriksa antrean undangan in-app
+const invitePollRes = stage2.getStageInvites({ handle: 'budi_santoso' });
+assert(invitePollRes.ok === true && invitePollRes.invites.length === 1, 'Teman menerima undangan in-app yang tertuju padanya');
+assert(invitePollRes.invites[0].roomId === host2.roomId && invitePollRes.invites[0].fromHandle === 'rian_p', 'Detail undangan cocok');
+
+// Undangan otomatis terhapus setelah diambil (drained)
+const invitePollEmpty = stage2.getStageInvites({ handle: 'budi_santoso' });
+assert(invitePollEmpty.ok === true && invitePollEmpty.invites.length === 0, 'Undangan habis terkuras setelah diambil');
+
+// Bersihkan room stage2
+stage2.leaveRoom({ roomId: host2.roomId, peerId: aud2.peerId });
+stage2.leaveRoom({ roomId: host2.roomId, peerId: host2.peerId });
+
 console.log('\n============================================================');
 if (failures === 0) {
   console.log(`HASIL AKHIR: SEMUA ${results.length} PENGUJIAN SIGNALING LULUS (100% HIJAU)`);

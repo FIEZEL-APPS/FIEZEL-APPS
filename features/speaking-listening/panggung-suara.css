@@ -520,19 +520,24 @@
 }
 
 .fz-stage-invite-btn {
-  background: linear-gradient(135deg, #25D366, #128C7E);
+  background: linear-gradient(135deg, #10B981, #059669);
   border: none;
   color: #FFFFFF;
   font-size: 12px;
   font-weight: 800;
-  padding: 9px 12px;
-  border-radius: 10px;
+  padding: 10px 14px;
+  border-radius: 12px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
   width: 100%;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.fz-stage-invite-btn:active {
+  transform: scale(0.98);
 }
 
 .fz-stage-local-note {
@@ -547,4 +552,607 @@
   text-align: center;
   padding: 6px 14px 2px;
 }
+
+/* =========================================================================
+ * STUDIO LIVE & AUDIENCE OVERHAUL (TikTok Live & Discord Stage Standard)
+ * ========================================================================= */
+
+.fz-stage-viewer-pill {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--fz-stage-border);
+  color: #E2E8F0;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.fz-stage-viewer-pill span {
+  color: #38BDF8;
+}
+
+.fz-stage-role-pill {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 6px;
+  margin-top: 2px;
+}
+
+.fz-stage-role-pill.is-host {
+  background: rgba(245, 158, 11, 0.2);
+  color: #FCD34D;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+.fz-stage-role-pill.is-speaker {
+  background: rgba(56, 189, 248, 0.2);
+  color: #7DD3FC;
+  border: 1px solid rgba(56, 189, 248, 0.4);
+}
+
+.fz-stage-role-pill.is-audience {
+  background: rgba(148, 163, 184, 0.15);
+  color: #CBD5E1;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+/* Acoustic Ripple Wave multi tier */
+.fz-stage-acoustic-ripple {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  pointer-events: none;
+  border: 2px solid #00E5FF;
+  opacity: 0;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 1;
+}
+
+.fz-stage-avatar-wrapper.is-speaking .fz-stage-acoustic-ripple {
+  opacity: 0.85;
+  animation: fzStageAcousticPulse 1.2s cubic-bezier(0.25, 0.8, 0.25, 1) infinite;
+}
+
+@keyframes fzStageAcousticPulse {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 229, 255, 0.6); opacity: 0.9; }
+  50% { transform: scale(1.15); box-shadow: 0 0 15px 4px rgba(16, 185, 129, 0.4); opacity: 0.7; }
+  100% { transform: scale(1.3); box-shadow: 0 0 25px 8px rgba(0, 229, 255, 0); opacity: 0; }
+}
+
+/* Tray Grid Penonton (Audience) */
+.fz-stage-audience-tray {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid var(--fz-stage-border);
+  border-radius: 18px;
+  padding: 10px 14px;
+  margin: 6px 14px;
+}
+
+.fz-stage-audience-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--muted, #94A3B8);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.fz-stage-audience-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  min-height: 44px;
+  align-items: center;
+}
+
+.fz-stage-audience-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  width: 44px;
+  text-align: center;
+}
+
+.fz-stage-audience-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #334155;
+  color: #F8FAFC;
+  font-size: 13px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+}
+
+.fz-stage-audience-item span.fz-stage-aud-name {
+  font-size: 10px;
+  color: #94A3B8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 44px;
+}
+
+.fz-stage-audience-empty {
+  font-size: 11px;
+  color: var(--muted, #94A3B8);
+  font-style: italic;
+  padding: 6px 0;
+}
+
+/* Action Dock Kontekstual Peran */
+.fz-stage-dock {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.fz-stage-btn-request-speak {
+  background: linear-gradient(135deg, #0284C7, #0369A1);
+  color: #FFFFFF;
+  border: none;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 12px 16px;
+  border-radius: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
+  transition: transform 0.15s ease;
+}
+
+.fz-stage-btn-request-speak:active {
+  transform: scale(0.98);
+}
+
+.fz-stage-btn-request-speak.is-pending {
+  background: rgba(2, 132, 199, 0.3);
+  color: #7DD3FC;
+  border: 1px solid rgba(2, 132, 199, 0.5);
+  cursor: default;
+  box-shadow: none;
+}
+
+.fz-stage-host-bar {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.fz-stage-btn-ajak {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #34D399;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 9px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.fz-stage-btn-hands {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  color: #FBBF24;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 9px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  position: relative;
+}
+
+.fz-stage-hands-badge {
+  background: var(--fz-stage-danger);
+  color: #FFFFFF;
+  font-size: 9px;
+  font-weight: 800;
+  padding: 1px 5px;
+  border-radius: 999px;
+  margin-left: 4px;
+}
+
+/* Floating Live Reaction Ticker */
+.fz-stage-float-reaction {
+  position: absolute;
+  bottom: 80px;
+  right: 18px;
+  font-size: 26px;
+  pointer-events: none;
+  animation: fzStageFloatReaction 1.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  z-index: 100;
+}
+
+@keyframes fzStageFloatReaction {
+  0% { transform: translateY(0) scale(0.6) rotate(0deg); opacity: 0; }
+  20% { transform: translateY(-20px) scale(1.1) rotate(-8deg); opacity: 1; }
+  80% { transform: translateY(-90px) scale(1) rotate(6deg); opacity: 0.8; }
+  100% { transform: translateY(-130px) scale(0.8) rotate(0deg); opacity: 0; }
+}
+
+/* In-App Friend Picker Sheet */
+.fz-stage-picker-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  z-index: 150;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.fz-stage-picker-sheet {
+  background: #0F172A;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 24px 24px 0 0;
+  width: 100%;
+  max-width: 480px;
+  max-height: 75vh;
+  display: flex;
+  flex-direction: column;
+  padding: 18px 18px 24px;
+  box-sizing: border-box;
+  animation: fzStageSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fzStageSlideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.fz-stage-picker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.fz-stage-picker-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: #FFFFFF;
+}
+
+.fz-stage-picker-list {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 50vh;
+}
+
+.fz-stage-picker-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid var(--fz-stage-border);
+  padding: 10px 12px;
+  border-radius: 14px;
+}
+
+.fz-stage-picker-item-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.fz-stage-picker-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #1E293B;
+  color: #F8FAFC;
+  font-size: 14px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fz-stage-picker-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.fz-stage-picker-handle {
+  font-size: 11px;
+  color: var(--muted, #94A3B8);
+}
+
+.fz-stage-picker-btn {
+  background: var(--fz-stage-accent);
+  color: #FFFFFF;
+  border: none;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.fz-stage-picker-btn.is-sent {
+  background: #334155;
+  color: #94A3B8;
+  cursor: default;
+}
+
+/* Floating Incoming Stage Call Banner */
+.fz-stage-call-banner {
+  position: fixed;
+  top: 14px;
+  left: 14px;
+  right: 14px;
+  max-width: 450px;
+  margin: 0 auto;
+  background: rgba(15, 23, 42, 0.95);
+  border: 1.5px solid #10B981;
+  border-radius: 18px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 1000;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(16, 185, 129, 0.25);
+  animation: fzStageCallDrop 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fzStageCallDrop {
+  from { transform: translateY(-120%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.fz-stage-call-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #1E293B;
+  color: #10B981;
+  font-size: 16px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #10B981;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.fz-stage-call-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.fz-stage-call-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: #FFFFFF;
+}
+
+.fz-stage-call-desc {
+  font-size: 11px;
+  color: var(--muted, #94A3B8);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fz-stage-call-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.fz-stage-call-btn-join {
+  background: #10B981;
+  color: #FFFFFF;
+  border: none;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.fz-stage-call-btn-later {
+  background: rgba(255, 255, 255, 0.08);
+  color: #94A3B8;
+  border: none;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 6px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* =========================================================================
+ * V2 ENHANCEMENTS: TIKTOK LIVE & DISCORD STAGE STANDARD (M025-V2)
+ * ========================================================================= */
+
+.fz-stage-room-chip {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #34D399;
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.2s;
+}
+
+.fz-stage-room-chip:hover {
+  background: rgba(16, 185, 129, 0.22);
+  border-color: rgba(16, 185, 129, 0.5);
+}
+
+.fz-stage-quiet-exit-btn {
+  background: rgba(244, 63, 94, 0.12);
+  border: 1px solid rgba(244, 63, 94, 0.3);
+  color: #FB7185;
+  font-family: var(--font, system-ui, sans-serif);
+  font-size: 11px;
+  font-weight: 800;
+  padding: 5px 11px;
+  border-radius: 20px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.2s;
+}
+
+.fz-stage-quiet-exit-btn:hover {
+  background: rgba(244, 63, 94, 0.22);
+  color: #FFFFFF;
+}
+
+.fz-stage-radial-timer {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fz-stage-timer-svg {
+  width: 48px;
+  height: 48px;
+  transform: rotate(-90deg);
+}
+
+.fz-stage-timer-track {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.08);
+  stroke-width: 4;
+}
+
+.fz-stage-timer-progress {
+  fill: none;
+  stroke: var(--fz-stage-accent);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-dasharray: 125.6;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 1s linear, stroke 0.3s ease;
+}
+
+.fz-stage-radial-timer.is-urgent .fz-stage-timer-progress {
+  stroke: var(--fz-stage-danger);
+  filter: drop-shadow(0 0 6px rgba(244, 63, 94, 0.8));
+}
+
+.fz-stage-timer-label {
+  position: absolute;
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  font-weight: 800;
+  color: #FFFFFF;
+}
+
+.fz-stage-hud-badge {
+  background: rgba(16, 185, 129, 0.18);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #34D399;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+.fz-stage-hand-indicator {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #F59E0B;
+  color: #000000;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--fz-stage-bg);
+  animation: fzStageHandWave 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes fzStageHandWave {
+  from { transform: rotate(-8deg) scale(0.95); }
+  to { transform: rotate(12deg) scale(1.15); }
+}
+
+.fz-stage-floating-canvas {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 60;
+  overflow: hidden;
+}
+
+.fz-stage-float-emoji {
+  position: absolute;
+  bottom: 100px;
+  font-size: 30px;
+  animation: fzStageRise 2.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.45));
+}
+
+@keyframes fzStageRise {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.6) rotate(0deg);
+  }
+  15% {
+    opacity: 1;
+    transform: translateY(-20px) scale(1.25) rotate(var(--rot-start, -8deg));
+  }
+  75% {
+    opacity: 0.95;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-440px) scale(1) rotate(var(--rot-end, 15deg));
+  }
+}
+
+
 

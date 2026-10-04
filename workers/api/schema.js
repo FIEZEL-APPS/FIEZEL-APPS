@@ -155,7 +155,13 @@ export const BYTE_LIMITS = Object.freeze({
   '/api/stage/signal': 16384,
   '/api/stage/poll': 512,           // GET, tanpa body
   '/api/stage/state': 4096,
-  '/api/stage/leave': 512
+  '/api/stage/leave': 512,
+  '/api/stage/hand/raise': 512,
+  '/api/stage/hand/decide': 512,
+  '/api/stage/speaker/demote': 512,
+  '/api/stage/invite': 1024,
+  '/api/stage/invites': 512,        // GET, tanpa body
+  '/api/stage/active': 512          // GET, tanpa body
 });
 
 /** Cap terakhir untuk path yang tidak terdaftar: kecil, sengaja. */
