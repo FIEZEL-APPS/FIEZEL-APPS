@@ -83,12 +83,18 @@ const src = [
   grab(/const PLACEMENT_BLUEPRINT=\{[^\n]+;/),
   grab(/const PLACEMENT_LITE_BLUEPRINT=\{[^\n]+;/)
 ].join('\n');
-const levelLine = grab(/state\.level=accuracy<45\?1:Math\.min\(Number\(state\.placementBandLevel\)\|\|6,accuracy<60\?2:accuracy<72\?3:accuracy<82\?4:accuracy<92\?5:6\);/);
+// Sesudah perbaikan P-B (2026-10-04) baris skoringnya bercabang `cfg.placementLite?<tangga>:<akurasi>`;
+// yang diambil di sini hanya cabang akurasi (tes penuh), dan tes ringkas memakai
+// placementLiteBandLevel bila fungsi itu ada - jadi probe yang sama mengukur kode lama DAN baru.
+const levelLine = 'state.level=' + grab(/accuracy<45\?1:Math\.min\(Number\(state\.placementBandLevel\)\|\|6,accuracy<60\?2:accuracy<72\?3:accuracy<82\?4:accuracy<92\?5:6\);/);
+const liteSrc = /function placementLiteBandLevel\(/.test(APP)
+  ? [grab(/const PLACEMENT_LITE_FORGIVE_BANDS=[^;]+;/), grab(/function placementLiteBandLevel\(bands\)\{[\s\S]*?\n\}/)].join('\n') : '';
 const ctx = {};
 vm.createContext(ctx);
 vm.runInContext(src + `
 this.levelFor=function(answers){const state={};state.placementBandLevel=placementBandLevel(placementBandTally(answers));const accuracy=Math.round(answers.filter(a=>a.ok).length/answers.length*100);${levelLine}return state.level};
 this.bandOnly=function(answers){return placementBandLevel(placementBandTally(answers))};
+${liteSrc ? liteSrc + '\nthis.levelForLite=function(answers){return Math.max(1,placementLiteBandLevel(placementBandTally(answers)))};' : ''}
 this.blueprints={lite:PLACEMENT_LITE_BLUEPRINT,full:PLACEMENT_BLUEPRINT};`, ctx);
 function placementDistribution(blueprint, pCorrect, runs, seed, rule) {
   const rnd = lcg(seed), hist = { A1: 0, A2: 0, B1: 0, B2: 0, C1: 0, C2: 0 };
@@ -98,7 +104,7 @@ function placementDistribution(blueprint, pCorrect, runs, seed, rule) {
       const plan = blueprint[lv], n = (plan.vocab || 0) + (plan.grammar || 0) + (plan.listening || 0);
       for (let k = 0; k < n; k++) answers.push({ level: lv, ok: rnd() < (typeof pCorrect === 'function' ? pCorrect(lv) : pCorrect) });
     }
-    hist[LEVELS[(rule || ctx.levelFor)(answers) - 1]]++;
+    hist[LEVELS[(rule || (blueprint === ctx.blueprints.lite && ctx.levelForLite) || ctx.levelFor)(answers) - 1]]++;
   }
   const pct = {};
   for (const k of LEVELS) pct[k] = (hist[k] / runs * 100).toFixed(3) + '%';

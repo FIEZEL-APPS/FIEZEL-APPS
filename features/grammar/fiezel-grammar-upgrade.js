@@ -92,7 +92,11 @@
    * @param {Function} onComplete Callback saat pengguna selesai/submit, dipanggil dengan boolean (isCorrect)
    * @returns {HTMLElement} Elemen DOM siap dimasukkan ke dalam kuis
    */
-  FiezelGrammarUpgrade.renderTokenOrder = function(q, onComplete) {
+  FiezelGrammarUpgrade.renderTokenOrder = function(q, onComplete, opts) {
+    // Mode ukur (tes penempatan, ujian lompat level, gerbang lewati materi): tanpa bantuan
+    // apa pun - arti kata yang bisa diintip adalah bantuan, dan bantuan di alat ukur membuat
+    // levelnya mengukur bantuan itu, bukan muridnya (audit P-A 2026-10-04).
+    const measure = !!(opts && opts.measure);
     const container = document.createElement('div');
     container.className = 'token-order-container';
     const esc = (str) => String(str ?? '')
@@ -141,7 +145,7 @@
     }));
     // Tombol "intip arti" hanya muncul kalau memang ada arti yang bisa diintip: tombol yang
     // ditekan lalu tidak mengubah apa pun justru membuat murid mengira aplikasinya rusak.
-    const anyGloss = bankTokens.some(t => t.gloss);
+    const anyGloss = !measure && bankTokens.some(t => t.gloss);
     const placedTokens = [];
     let vacantSlotIndex = null;
     let showGloss = false;

@@ -1,5 +1,7 @@
 # Audit tes penempatan level & IRT 3PL — 2026-10-04
 
+> **Status 2026-10-04:** P-A dan P-B **diperbaiki** di PR yang sama (lihat §5). P-C dan P-D belum.
+
 **Basis:** branch `claude/inspiring-franklin-xml8hz` @ `cce82e55` (build `m025-442`), dibandingkan
 dengan `main` @ `1dff4b6d` bila perilakunya berbeda. **Pertanyaan owner:** apakah algoritma IRT
 3PL benar-benar mengukur kesulitan soal secara matematis, atau ada celah yang membuat jawaban
@@ -115,3 +117,39 @@ bentuk yang benar.
    langkah Elo dengan taksiran EAP/MAP 3PL untuk n kecil.
 4. **P-D** — dokumentasikan bahwa "kesulitan soal" adalah prior + kalibrasi online, supaya tidak
    dibaca sebagai IRT yang sudah dikalibrasi.
+
+---
+
+## 5. Status perbaikan (2026-10-04, disetujui owner)
+
+**P-A — diperbaiki.** Tombol petunjuk tata bahasa tidak dirender lagi di mode ukur (`MEASURE`
+atau `cfg.noHints`: tes penempatan, ujian lompat level, gerbang lewati materi); "intip arti" di
+susun kata ikut hilang di mode ukur, dan popover petunjuk yang masih terbuka ditutup saat sesi ukur
+dimulai. Sesi belajar biasa tidak berubah. Probe C diulang sesudah perbaikan (10 run):
+
+| Strategi | Sebelum (branch) | Sesudah |
+|---|---|---|
+| baca petunjuk | 77,2% benar; A1 16, A2 2, C2 1 | **17,5% benar; A1 10/10** |
+| acak | 25,4%; A1 19/19 | 25,8%; A1 10/10 |
+| layar dengan tombol petunjuk | 108/108 | **0/120** |
+
+**P-B — diperbaiki untuk tes ringkas** (`placementLiteBandLevel`). Plafon akurasi tidak dipakai
+lagi di tes ringkas; band yang lulus 2/2 tetap dinaiki seperti biasa; satu band dasar (A1 atau A2)
+yang hanya separuh benar dimaafkan SEKALI, dan hanya bila band berikutnya membuktikannya. Tes penuh
+25 soal tidak berubah. Probe B (kurva 3PL, 50.000 run per murid, 200.000 untuk penebak):
+
+| Murid | Tertahan di A1 sebelum | Tertahan di A1 sesudah | Tepat di levelnya sebelum → sesudah |
+|---|---|---|---|
+| θ=3 (B1) | 38,0% | **6,5%** | 13,4% → 31,9% |
+| θ=4 (B2) | 9,4% | **0,4%** | 17,2% → 24,4% |
+| θ=5 (C1) | 2,0% | **0,0%** | 22,6% → 23,0% |
+| θ=6 (C2) | 0,5% | **0,0%** | 26,2% → 26,3% |
+| penebak acak | A1 99,74%, ≥ B1 0,013% | A1 96,24%, ≥ B1 0,32% | — |
+
+Ongkosnya dicatat terang: penebak murni kini A2 pada 3,4% run (dulu 0,25%), dan murid A1 tepat-di-
+ambang (θ=1) naik ke A2 pada 19% run. Penempatan satu tingkat terlalu tinggi dikoreksi otomatis oleh
+masa percobaan `levelTrust` (kesalahan di level baru menurunkannya); tertahan di A1 tidak punya
+koreksi otomatis, jadi pertukaran ini sengaja ke arah itu. Dua soal per band tetap batas presisi tes
+ringkas - tes 25 soal tetap tersedia. Gerbang: `tests/placement-accuracy-test.js` bagian L1-L6.
+
+**P-C, P-D — belum dikerjakan.**

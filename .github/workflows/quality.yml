@@ -426,6 +426,10 @@ jobs:
           # sampai ke answer(), alasan "Mengapa kurang tepat?" harus milik pilihan yang diambil,
           # dan layar Thai tanpa naskah Indonesia. Bagian browser SKIP tanpa Playwright.
           node tests/grammar-feedback-regression-test.js
+          # Perbaikan tiga audit 2026-10-04: mode ukur tanpa petunjuk, ulangan kosakata lintas level
+          # paling-rawan-dulu, dua tab tidak saling menimpa (jalur simpan sungguhan di dua "tab"),
+          # dan sinkron riwayat BrainCore benar-benar dipanggil tanpa macet. Node murni.
+          node tests/learning-integrity-2026-10-04-test.js
           node tests/css-keyframe-uniq-test.js
           node tests/pastel-field-contrast-test.js
           node tests/topbar-logo-contrast-test.js

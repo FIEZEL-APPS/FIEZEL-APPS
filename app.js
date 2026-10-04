@@ -1757,15 +1757,68 @@ function accountStateKey(uuid){const id=String(uuid||'').replace(/[^A-Za-z0-9_-]
    SEKALI supaya murid tahu progresnya tidak tersimpan, tanpa menghentikan sesi berjalan. */
 var saveWriteQueued=false;
 let saveStorageWarned=false;
+/* ---- Audit F1 2026-10-04: dua tab tidak boleh saling menimpa --------------------------
+ *
+ * Dulu setiap flush menulis seluruh blob dari memori tab itu; stateRevision dinaikkan tetapi
+ * tidak pernah dibandingkan, dan tidak ada listener `storage`. Tab yang dibuka lebih dulu lalu
+ * menyimpan satu perubahan kecil menghapus SELURUH kemajuan tab lain (probe O6).
+ *
+ * Sekarang setiap flush meninggalkan tanda kecil `fiezel-state-rev-v1|<kunci>` = "<revisi>:<id tab>", dan tab
+ * ini mengingat salinan state yang tersimpan saat ia terakhir membaca/menulis (stateSyncBase).
+ * Sebelum menulis, kalau tandanya bukan milik tab ini (atau event `storage` sudah mengabarkan
+ * tulisan tab lain), state tersimpan dibaca dan DIGABUNG tiga arah dengan memori tab ini
+ * (FiezelContinuity.mergeConcurrentState) - baru kemudian ditulis. Saat tab kembali terlihat,
+ * tulisan tab lain langsung digabung supaya layar tidak menampilkan angka basi. */
+const STATE_TAB_ID=Math.random().toString(36).slice(2,10);
+let stateSyncBase='',stateSyncKey='',stateSyncToken='',stateExternalDirty=false;
+/* Ruang nama sendiri, BUKAN akhiran kunci state: banyak jalur (migrasi akun, isolasi kursus) memindai
+   kunci berawalan 'fiezel-v4-state'/'fiezel-v5-state:' dan tidak boleh menemukan kunci asing di sana. */
+function stateRevKey(key=activeStateStorageKey){return 'fiezel-state-rev-v1|'+String(key||'')}
+function stateSyncReset(json){
+  stateSyncKey=activeStateStorageKey;stateExternalDirty=false;
+  try{stateSyncBase=typeof json==='string'?json:JSON.stringify(state)}catch(_){stateSyncBase=''}
+  try{stateSyncToken=localStorage.getItem(stateRevKey())||''}catch(_){stateSyncToken=''}
+}
+try{stateSyncReset()}catch(_){}
+/** Menggabung tulisan tab lain ke memori tab ini. true = ada yang digabung. */
+function stateMergeExternal(){
+  if(!stateSyncBase||stateSyncKey!==activeStateStorageKey)return false;
+  let token='';try{token=localStorage.getItem(stateRevKey())||''}catch(_){}
+  if(!stateExternalDirty&&token===stateSyncToken)return false;
+  stateExternalDirty=false;stateSyncToken=token;
+  const C=self.FiezelContinuity;
+  if(!C||typeof C.mergeConcurrentState!=='function')return false;
+  /* Kursus Inggris: blob mentah tab lain - simetris dengan stateSyncBase (keduanya JSON memori
+     tab penulisnya), jadi "tidak ada yang berubah" terbaca persis dan sanitasi muat tidak terbaca
+     sebagai perubahan. Kursus lain tersusun dari dua kunci, jadi dirakit lewat loadState. */
+  let theirs=null,base=null,theirsJson='';
+  try{
+    const raw=localStorage.getItem(activeStateStorageKey);
+    if(raw===null)return false;
+    theirs=JSON.parse(raw);
+    if(targetLangOfRaw(theirs)==='en')theirsJson=raw;
+    else{theirs=loadState(activeStateStorageKey);theirsJson=JSON.stringify(theirs)}
+    base=JSON.parse(stateSyncBase);
+  }catch(_){return false}
+  if(!theirs||typeof theirs!=='object'||theirsJson===stateSyncBase)return false;
+  const merged=C.mergeConcurrentState(base,state,theirs);
+  /* Di tempat, bukan `state=...`: modul lain memegang rujukan objek state yang sama. */
+  Object.keys(state).forEach(k=>{if(!Object.prototype.hasOwnProperty.call(merged,k))delete state[k]});
+  Object.assign(state,merged);
+  stateSyncBase=theirsJson;
+  try{coreBrainCache=null}catch(_){}
+  return true;
+}
 function saveFlushWrite(){
   saveWriteQueued=false;
+  try{stateMergeExternal()}catch(_){}
   state.stateRevision=Math.max(0,Math.floor(Number(state.stateRevision)||0))+1;
   if(activeAccountUuid)state.ownerUuid=activeAccountUuid;
   try{
     const lang=(function(){try{return self.FiezelTargetLanguage?.normalize?.(state?.preferences?.targetLang)||'en'}catch(_){return state?.preferences?.targetLang==='ja'?'ja':'en'}}());
     /* Bahasa bawaan menulis SATU blob utuh ke kunci dasar - persis perilaku sebelum sumbu
        bahasa lahir, byte per byte. Lihat catatan panjang di atas loadState(). */
-    if(lang==='en'){localStorage.setItem(activeStateStorageKey,JSON.stringify(state));return}
+    if(lang==='en'){const json=JSON.stringify(state);localStorage.setItem(activeStateStorageKey,json);stateSyncMarkWritten(json);return}
     /* Bahasa lain: progres ke kunci bahasanya, bidang global ke kunci dasar.
        Blob dasar dibaca ulang lalu HANYA bidang globalnya yang ditimpa, supaya progres
        INGGRIS yang tersimpan di sana tidak tersentuh sama sekali saat murid belajar Jepang. */
@@ -1788,7 +1841,38 @@ function saveFlushWrite(){
     global.preferences=prefsBaru;
     localStorage.setItem(activeStateStorageKey,JSON.stringify(global));
     localStorage.setItem(progressStorageKey(activeStateStorageKey,lang),JSON.stringify(pickProgress(state)));
+    stateSyncMarkWritten(null);
   }catch{if(!saveStorageWarned){saveStorageWarned=true;try{showToast(FiezelI18n.t('common.toast-penyimpanan-penuh'),'warn')}catch{}}}
+}
+/** Sesudah tulisan berhasil: tanda revisi milik tab ini + salinan dasar untuk gabungan berikutnya. */
+function stateSyncMarkWritten(json){
+  stateSyncKey=activeStateStorageKey;
+  stateSyncToken=`${state.stateRevision}:${STATE_TAB_ID}`;
+  try{localStorage.setItem(stateRevKey(),stateSyncToken)}catch(_){}
+  try{stateSyncBase=typeof json==='string'?json:JSON.stringify(state)}catch(_){stateSyncBase=''}
+}
+if(typeof window!=='undefined'&&window.addEventListener){
+  /* Event `storage` hanya sampai ke tab LAIN - tepat sinyal yang dibutuhkan. Tab lama yang belum
+     menulis tanda revisi tetap terdeteksi lewat kunci state-nya sendiri. */
+  window.addEventListener('storage',e=>{
+    try{
+      const k=String(e?.key||'');
+      if(!k||(k!==activeStateStorageKey&&k!==stateRevKey()&&k.indexOf(activeStateStorageKey)!==0))return;
+      stateExternalDirty=true;
+      /* Tab ini sedang terlihat (layar terbagi): gabung diam-diam - tanpa render ulang dan tanpa
+         toast, karena tab lain bisa menulis di setiap jawaban. Toast + render hanya saat tab
+         kembali terlihat (visibilitychange). */
+      if(typeof document!=='undefined'&&document.visibilityState==='visible')stateMergeExternal();
+    }catch(_){}
+  });
+}
+function stateAdoptExternal(){
+  let merged=false;
+  try{merged=stateMergeExternal()}catch(_){merged=false}
+  if(!merged)return false;
+  try{if(!stageStack.length)render()}catch(_){}
+  try{showToast(FiezelI18n.t('state.tab-lain-digabung'),'info')}catch(_){}
+  return true;
 }
 function save(){const readiness=diagnosticReadinessMap(state);state.adaptiveReadyByLevel=readiness;state.adaptiveReady=!!readiness[getActiveLevel(state)];recomputeMeaningfulDays(state);if(saveWriteQueued)return;saveWriteQueued=true;if(typeof queueMicrotask==='function')queueMicrotask(saveFlushWrite);else saveFlushWrite()}
 /**
@@ -1866,7 +1950,7 @@ function activateAccountState(rawId){
 function deactivateAccountState(){
   try{save()}catch(_){}
   activeAccountUuid='';activeStateStorageKey=LEGACY_STATE_KEY;
-  state=loadState(LEGACY_STATE_KEY);coreBrainCache=null;
+  state=loadState(LEGACY_STATE_KEY);coreBrainCache=null;try{stateSyncReset()}catch(_){}
   if(appOpened)render();
 }
 function studyTimeZone(sourceState=null){const prefs=sourceState?.preferences||(stateReady?state?.preferences:null)||defaultPreferences;return validTimeZone(prefs?.timeZone||detectedTimeZone())}
@@ -1955,7 +2039,7 @@ function abandonActiveSession(reason='exit'){
      menutup gerbang lesson itu 24 jam. Membuka lalu keluar sebelum menjawab tetap gratis. */
   if(String(a.type||'')==='level-exam'&&answered>0){try{recordSkipExamFail(state,String(a.levelScope||''),{score:0,total:Number(a.planned||LEVEL_EXAM_SIZE),accuracy:0,weakSkill:'ujian ditinggalkan sebelum selesai'})}catch(_){}}
   if(String(a.type||'')==='grammar-skip'&&answered>0&&a.skipGateSkill){try{const g=state.grammar[a.skipGateSkill]||{correct:0,total:0,streak:0,mastery:0};g.skipGateCooldownUntil=Date.now()+LEVEL_EXAM_COOLDOWN_MS;state.grammar[a.skipGateSkill]=g}catch(_){}}
-  state.sessionHistory=[...(state.sessionHistory||[]),session].slice(-100);state.activeSession=null;state.inflightAttempt=null;/* W1 P1-2: penalti sudah diputuskan di atas \u2014 penandanya selesai. */const outcome=recordPolicyOutcomeFromSession(session,now);save();queueRemoteActivitySync();if(outcome)queuePolicyOutcomeSync(outcome);braincoreEvidenceObserveSession(outcome,now);/*Lane C*/anSessionEnded(session);/*A1-EMIT*/return true
+  state.sessionHistory=[...(state.sessionHistory||[]),session].slice(-100);state.activeSession=null;state.inflightAttempt=null;/* W1 P1-2: penalti sudah diputuskan di atas \u2014 penandanya selesai. */const outcome=recordPolicyOutcomeFromSession(session,now);save();queueRemoteActivitySync();try{queueBrainSyncFlush()}catch(_){}/* Audit F2 */if(outcome)queuePolicyOutcomeSync(outcome);braincoreEvidenceObserveSession(outcome,now);/*Lane C*/anSessionEnded(session);/*A1-EMIT*/return true
 }
 function completeActiveSession(cfg,score,total){
   try{['placement','level_exam','reading_exam'].forEach(k=>examLockEnd(k))}catch(_){}
@@ -2902,7 +2986,20 @@ function memoryItemDifficulty(bucket,key){
    dengan SEMUA level lewat fallback `||level`, jadi angka "review jatuh tempo" bisa terus
    menagih materi yang mustahil dibuka. Kini kunci tanpa konten yang bisa dilacak tidak
    dihitung jatuh tempo. */
-function dueItems(){const level=getActiveLevel();return [['vocab',state.vocab],['grammar',state.grammar],['reading',state.reading]].flatMap(([type,bucket])=>Object.entries(bucket||{}).filter(([key,x])=>x?.nextReview&&x.nextReview<=Date.now()&&contentLevelFor(type,key)===level))}
+/* Audit V-B 2026-10-04: naik level dulu menghapus ulangan KOSAKATA level lama dari hitungan dan
+   dari sesi ulangan, selamanya - kata A1 yang jatuh tempo tidak pernah diulang lagi sesudah murid
+   pindah ke A2. Kosakata kini dihitung untuk semua level <= level aktif (vocabReviewLevelOk);
+   kunci yatim tetap tertolak karena contentLevelFor-nya kosong. Grammar/reading tidak berubah. */
+function vocabReviewLevelOk(level,active=getActiveLevel()){const i=LEVELS.indexOf(String(level||''));return i>=0&&i<=LEVELS.indexOf(active)}
+function dueItems(){const level=getActiveLevel();return [['vocab',state.vocab],['grammar',state.grammar],['reading',state.reading]].flatMap(([type,bucket])=>Object.entries(bucket||{}).filter(([key,x])=>x?.nextReview&&x.nextReview<=Date.now()&&(type==='vocab'?vocabReviewLevelOk(contentLevelFor(type,key),level):contentLevelFor(type,key)===level)))}
+/* Audit V-A 2026-10-04: antrean ulangan kosakata - kartu jatuh tempo di level <= aktif, paling
+   rawan lupa lebih dulu (risiko dari model FSRS-lite yang sama yang menulis jadwalnya). Dipakai
+   "Review jatuh tempo", "Uji kosakata", dan flashcards supaya ketiganya membaca jadwal yang sama. */
+function vocabReviewQueue(){
+  const active=getActiveLevel(),now=Date.now();
+  return V.filter(v=>{const m=state.vocab?.[v.id];return m?.nextReview&&m.nextReview<=now&&vocabReviewLevelOk(v.level,active)})
+    .sort((a,b)=>(forgettingProbability(state.vocab[b.id])-forgettingProbability(state.vocab[a.id]))||(Number(state.vocab[a.id].nextReview)-Number(state.vocab[b.id].nextReview)));
+}
 function forgettingProbability(b){
   if(!b?.total)return 0;
   const ageDays=Math.max(0,(Date.now()-(b.lastSeen||Date.now()))/86400000);
@@ -4052,6 +4149,8 @@ function learningMetricsSnapshot(now=Date.now()){
 const BRAIN_SYNC_KEY='fiezel-brain-sync-v1';
 const BRAIN_SYNC_BATCH=50;
 const BRAIN_SYNC_QUEUE_MAX=300;
+/* Audit F3: daftar terkirim harus muat seluruh riwayat yang bisa dipindai (record() memotong riwayat di 1.000). */
+const BRAIN_SYNC_SENT_MAX=1200;
 function brainSyncModule(){return self.FiezelAttemptRecord}
 /** Tiga syarat di atas, dievaluasi di satu tempat supaya tidak ada jalur yang lupa satu. */
 function brainSyncEnabled(){
@@ -4099,11 +4198,47 @@ async function brainSyncFlush(){
   try{
     const r=await coreWorkerExec('/api/brain/attempts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({attempts:batch})});
     if(!r||!r.ok)return false;
+    /* Audit F3 2026-10-04: daftar "terkirim" dulu dipotong 300 id terakhir, sementara
+       brainSyncPending memindai riwayat (maks 1.000 baris) dari yang TERTUA. Begitu riwayat lewat
+       ±350 baris, id lama jatuh dari daftar, baris lama dianggap belum terkirim lagi, dan setiap
+       flush mengirim ulang baris lama - baris terbaru tidak pernah tercapai. Sekarang daftar
+       dipangkas menurut RIWAYAT YANG MASIH ADA (id yang sudah keluar dari riwayat tidak akan
+       dipindai lagi), jadi setiap baris yang masih bisa dipindai tetap tercatat terkirim. */
     const st=brainSyncRead(),terkirim=Array.isArray(st.sent)?st.sent:[];
-    brainSyncWrite({...st,sent:[...terkirim,...batch.map(x=>x.attemptId)].slice(-BRAIN_SYNC_QUEUE_MAX),lastPushedAt:Date.now()});
+    const hidup=new Set((state.history||[]).map(h=>h&&h.attemptId).filter(Boolean));
+    brainSyncWrite({...st,sent:[...terkirim,...batch.map(x=>x.attemptId)].filter(id=>hidup.has(id)).slice(-BRAIN_SYNC_SENT_MAX),lastPushedAt:Date.now()});
+    /* Satu flush = satu batch 50; sisa antrean menyusul tanpa menunggu sesi berikutnya. */
+    if(batch.length>=BRAIN_SYNC_BATCH)queueBrainSyncFlush(1500);
     return true;
   }catch{return false}
 }
+/* Audit F2 2026-10-04: brainSyncFlush() dulu didefinisikan tetapi tidak pernah dipanggil, jadi
+   riwayat percobaan BrainCore tidak pernah sampai ke server walau murid menyalakan sinkron. Kini
+   ia dipanggil sesudah sesi selesai/ditinggalkan, saat koneksi kembali (`online`), saat app
+   dibuka, dan saat murid menyalakannya di Pengaturan. Syarat fail-closed tetap SATU-SATUNYA
+   gerbang (brainSyncEnabled): tanpa persetujuan murid + akun + worker, panggilan ini diam. */
+let brainSyncTimer=null,brainSyncInflight=false;
+function queueBrainSyncFlush(delay=2500){
+  try{
+    if(!brainSyncEnabled())return false;
+    clearTimeout(brainSyncTimer);
+    brainSyncTimer=setTimeout(async()=>{
+      if(brainSyncInflight)return;
+      if(typeof navigator!=='undefined'&&navigator.onLine===false)return;
+      brainSyncInflight=true;
+      try{await brainSyncFlush()}catch(_){}finally{brainSyncInflight=false}
+    },Math.max(0,Number(delay)||0));
+    brainSyncTimer?.unref?.();
+    return true;
+  }catch(_){return false}
+}
+function setBrainSyncPreference(on){
+  state.preferences={...(state.preferences||{}),brainSync:on===true};
+  save();
+  if(on===true)queueBrainSyncFlush(500);
+  return state.preferences.brainSync;
+}
+window.setBrainSyncPreference=setBrainSyncPreference;
 /* ---- S6 sinkron: TARIK lalu PUTAR ULANG, bukan gabungkan model -----------------------
  *
  * Inilah panen dari bukti S4. Model otak tidak punya operasi gabungan yang bermakna — BKT
@@ -11494,7 +11629,10 @@ function bindSwipe(el,onLeft,onRight){let sx=0,sy=0;el.addEventListener('touchst
 function flashcards(level){
   const active=getActiveLevel();
   if(String(level||'')!==active)return showToast(FiezelI18n.t('flash.terkunci',{level:active}));
-  const pool=shuffle(V.filter(v=>v.level===level));
+  /* Audit V-A: kartu jatuh tempo (level ini dan di bawahnya) di depan, sisanya kata level ini
+     teracak. Dulu seluruh dek diacak tanpa membaca jadwal. */
+  const dueCards=vocabReviewQueue(),dueIds=new Set(dueCards.map(v=>v.id));
+  const pool=[...dueCards,...shuffle(V.filter(v=>v.level===level&&!dueIds.has(v.id)))];
   if(!pool.length)return showToast(FiezelI18n.t('flash.kosong',{level:level}));
   // m025-117: kartu flashcard adalah layar DI DALAM view vocabulary. Tanpa entri stage,
   // tekanan kembali dari sini mengambil entri view Vocabulary dan melempar murid ke Home.
@@ -11520,7 +11658,8 @@ function flashcards(level){
 
 function reviewVocab(){
   const active=getActiveLevel();
-  const due=shuffle(V.filter(v=>v.level===active&&state.vocab[v.id]?.nextReview&&state.vocab[v.id].nextReview<=Date.now()));
+  /* Audit V-A/V-B: semua level <= aktif, paling rawan lupa lebih dulu. */
+  const due=vocabReviewQueue();
   if(!due.length)return showToast(FiezelI18n.t('ulangan.kosong'));
   let i=0,flipped=false;
   const draw=()=>{
@@ -11536,7 +11675,13 @@ function reviewVocab(){
   draw()
 }
 
-function startVocabQuiz(){const level=getActiveLevel(),pool=shuffle(V.filter(v=>v.level===level));if(!pool.length)return showToast(FiezelI18n.t('vocab.quiz-kosong',{level:level}));const vocabCount=(typeof FiezelGrammarVocabBridge!=='undefined'&&FiezelGrammarVocabBridge.getIntensityVocabTarget)?FiezelGrammarVocabBridge.getIntensityVocabTarget(undefined,state):10;quizLoop({type:'vocab',count:vocabCount,pool,factory:makeVocabQuestion})}
+/* Audit V-A 2026-10-04: "Uji kosakata" dulu mengacak SEMUA kata level aktif tanpa membaca jadwal
+   (kartu jatuh tempo muncul sama seringnya dengan acak murni). Kini sesi diisi kartu jatuh tempo
+   lebih dulu - termasuk level di bawahnya (V-B), paling rawan lupa di depan - lalu ditambah kata
+   level aktif. Soalnya dibangun dan disaring (validateQuestion, sigQ) DI SINI sampai tepat
+   sebanyak sesi, karena quizLoop mengacak kolam lalu memotongnya - kolam yang lebih panjang akan
+   membuang kartu jatuh tempo secara acak. allowCrossLevel membiarkan kartu level lama lolos. */
+function startVocabQuiz(){const level=getActiveLevel(),vocabCount=(typeof FiezelGrammarVocabBridge!=='undefined'&&FiezelGrammarVocabBridge.getIntensityVocabTarget)?FiezelGrammarVocabBridge.getIntensityVocabTarget(undefined,state):10,dueCards=vocabReviewQueue(),dueIds=new Set(dueCards.map(v=>v.id)),pool=[],sigs=new Set();for(const v of [...dueCards,...shuffle(V.filter(x=>x.level===level&&!dueIds.has(x.id)))]){if(pool.length>=vocabCount)break;let q=null;try{q=makeVocabQuestion(v)}catch(_){q=null}if(!q||!validateQuestion(q).ok||sigs.has(sigQ(q)))continue;sigs.add(sigQ(q));pool.push(q)}if(!pool.length)return showToast(FiezelI18n.t('vocab.quiz-kosong',{level:level}));quizLoop({type:'vocab',count:vocabCount,pool,factory:x=>x,allowCrossLevel:true})}
 /* m025-375: sinonim yang layak jadi kunci = kata yang juga ada di bank kosakata pada level yang
    sama atau lebih rendah dari kata targetnya; yang levelnya paling rendah dipilih. Peta kata->level
    dibangun sekali per identitas bank V (bank berganti saat locale/kursus berganti). */
@@ -12838,7 +12983,10 @@ const PLACEMENT_BLUEPRINT={A1:{vocab:3,grammar:2,listening:1},A2:{vocab:2,gramma
 
    ONGKOS YANG DITERIMA, ditulis di sini supaya tidak ditemukan sebagai kejutan:
    dua bukti per band berarti ambang 0,625 menuntut 2/2 benar untuk naik, jadi
-   satu keteledoran di band bawah menurunkan hasilnya satu tingkat. Tes ini
+   satu keteledoran di band bawah menurunkan hasilnya satu tingkat. (Audit P-B
+   2026-10-04: ongkos itu ternyata menahan murid B1 di A1 pada 38% run, jadi tes
+   ringkas kini memakai placementLiteBandLevel - satu keteledoran di A1/A2 boleh
+   dimaafkan bila band berikutnya membuktikannya - dan tanpa plafon akurasi.) Tes ini
    memang kurang presisi daripada yang 25 soal - itu arti kata "lite". Yang
    ditukar dengan presisi itu adalah murid yang benar-benar SAMPAI ke soal
    pertamanya, dan hasilnya bukan vonis: mesin adaptif terus mengoreksi level
@@ -12912,11 +13060,13 @@ function placementBandTally(answers){
   return bands;
 }
 /** Chip bukti per band untuk layar hasil: menunjukkan DASAR dari level, bukan cuma levelnya. */
-function placementBandChips(bands){
+function placementBandChips(bands,placedLevel){
   if(!bands)return '';
-  return LEVELS.map(level=>{
+  return LEVELS.map((level,i)=>{
     const band=bands[level]||{n:0,ok:0};
-    const passed=band.n>=PLACEMENT_BAND_MIN_EVIDENCE&&(band.ok||0)/band.n>=PLACEMENT_BAND_PASS;
+    /* Tes ringkas boleh memaafkan satu band dasar (placementLiteBandLevel): band di bawah level
+       hasil ikut ditandai lulus, supaya chip tidak membantah level yang diumumkan. */
+    const passed=(band.n>=PLACEMENT_BAND_MIN_EVIDENCE&&(band.ok||0)/band.n>=PLACEMENT_BAND_PASS)||(Number(placedLevel)>i+1&&band.n>0);
     return `<span class="result-band ${passed?'result-band-pass':''}">${esc(level)} ${band.ok||0}/${band.n||0}</span>`;
   }).join('');
 }
@@ -12928,6 +13078,38 @@ function placementBandLevel(bands){
     if(!band||!(band.n>=PLACEMENT_BAND_MIN_EVIDENCE))break;
     if(!((band.ok||0)/band.n>=PLACEMENT_BAND_PASS))break;
     level=i+1;
+  }
+  return level;
+}
+/* ---- Audit P-B 2026-10-04: tangga tes RINGKAS --------------------------------------------
+ *
+ * Tes ringkas memberi tiap band hanya DUA soal, jadi ambang 0,625 berarti 2/2. Simulasi audit
+ * (reports/PLACEMENT-IRT-AUDIT-2026-10-04.md, B2/B3) menunjukkan ongkosnya: satu keteledoran di
+ * band A1 atau A2 menghentikan tangga, ditambah plafon akurasi 45/60/72/82/92 yang dikalibrasi
+ * untuk blueprint 25 soal yang berat di pangkal. Hasilnya murid B1 sejati ditempatkan A1 pada
+ * 38% run, murid B2 9,7%.
+ *
+ * Aturannya di sini: band yang lulus 2/2 tetap dinaiki seperti biasa. SATU band dasar (A1 atau
+ * A2) yang hanya separuh benar dimaafkan sekali, dan hanya bila band berikutnya membuktikannya:
+ * band berikutnya lulus penuh -> tangga lanjut melewatinya; band berikutnya benar sebagian ->
+ * murid ditempatkan DI band yang dimaafkan, lalu berhenti. Band di atas A2 tetap ketat, karena di
+ * sanalah dua tebakan beruntung paling murah membeli level. Plafon akurasi tidak dipakai untuk
+ * tes ringkas: tangga band sendiri sudah menahan penebak (simulasi 40.000 run: A1 96%, di atas A2
+ * 0,4%, B2 ke atas 0%), sedangkan murid B1 yang tertahan di A1 turun dari 38% ke 6,6% dan murid
+ * B2 dari 9,7% ke 0,4%. Gerbangnya: tests/placement-accuracy-test.js bagian "lite". */
+const PLACEMENT_LITE_FORGIVE_BANDS=2;
+function placementLiteBandLevel(bands){
+  let level=1,forgiven=false;
+  for(let i=0;i<LEVELS.length;i++){
+    const band=bands?.[LEVELS[i]];
+    if(!band||!(band.n>=PLACEMENT_BAND_MIN_EVIDENCE))break;
+    if((band.ok||0)/band.n>=PLACEMENT_BAND_PASS){level=i+1;continue}
+    if(forgiven||i>=PLACEMENT_LITE_FORGIVE_BANDS||i>=LEVELS.length-1||!((band.ok||0)/band.n>=0.5))break;
+    forgiven=true;
+    const next=bands?.[LEVELS[i+1]];
+    if(next&&next.n>=PLACEMENT_BAND_MIN_EVIDENCE&&(next.ok||0)/next.n>=PLACEMENT_BAND_PASS){level=i+2;i++;continue}
+    if(next&&(next.ok||0)>=1)level=i+1;
+    break;
   }
   return level;
 }
@@ -13078,7 +13260,7 @@ async function startPlacement(){
   // level; di bawah itu angkanya tidak lagi berarti dan tes ditahan.
   const floor=placementSize()-Object.values(placementBlueprint()).reduce((n,plan)=>n+plan.listening,0);
   if(qs.length<floor){resumeDeferredWelcome();return showToast(FiezelI18n.t('placement.validator-hanya-menemukan-item-unik',{length:qs.length}),'warn')}
-  quizLoop({type:'placement',count:placementSize(),pool:qs,factory:x=>x,placement:true});
+  quizLoop({type:'placement',count:placementSize(),pool:qs,factory:x=>x,placement:true,placementLite:uxOn('placementLite')});
   /* Jaring pengaman: kalau kuisnya tidak jadi masuk sebagai stage (overlay tak kunjung
      pergi), sambutan yang ditahan tidak boleh ikut hilang. */
   {const t=setTimeout(()=>{if(!stageStack.length)resumeDeferredWelcome()},4000);t?.unref?.()}
@@ -13134,6 +13316,11 @@ function quizLoop(cfg){
     hanya runner tugas Kelas yang melakukannya, jadi keluar layar di sini tidak tercatat sama
     sekali dan pembimbing tetap bisa ditanya di tengah ujian. */
  try{const lk=String(cfg.examKind||'')||(String(cfg.type||'')==='placement'||cfg.placement?'placement':(['level-exam','grammar-skip'].includes(String(cfg.type||''))?'level_exam':''));if(lk)examLockBegin(lk,{});}catch(_){}
+ /* Audit P-A 2026-10-04: mode ukur tanpa bantuan. Lampu petunjuk tata bahasa dan arti kata
+    susun-kata tidak dirender di bawah MEASURE/noHints (lihat topbar di draw() dan renderTokenOrder);
+    popover petunjuk yang masih terbuka dari sesi belajar sebelumnya ditutup di sini. Probe audit:
+    membaca petunjuk saja memberi 77-85% benar di tes penempatan. */
+ if(MEASURE||cfg.noHints)try{document.getElementById('grammarHintPopover')?.remove()}catch(_){}
  let questions=cfg.pool.map(item=>cfg.factory?cfg.factory(item):item).filter(q=>cfg.placement||cfg.allowCrossLevel||!q?.level||q.level===(cfg.levelScope||getActiveLevel()));
  const unique=[],seen=new Set();
  /* Fase 3 (C5 butir 2): soal cloze memang tanpa opsi (murid mengetik), jadi validator
@@ -13319,7 +13506,7 @@ function quizLoop(cfg){
     }
     return `<span class="question-main">${formattedStem}</span>`;
   };
-  setApp(`<section class="fade quiz-shell${pawSlot?pawSlot.shellClass:''}"><div class="quiz-topbar"><button id="quizExit" class="quiz-exit" aria-label="${FiezelI18n.t('quiz.exit-aria')}"><i data-lucide="x"></i><span class="quiz-exit-label">${FiezelI18n.t('quiz.exit-label')}</span></button><div class="quiz-progress" role="progressbar" aria-valuemin="0" aria-valuemax="${planned}" aria-valuenow="${asked+1}" aria-label="${FiezelI18n.t('quiz.progress-aria',{asked:asked+1,planned})}"><span>${asked+1}</span><em>/ ${planned}</em><i class="quiz-progress-bar" aria-hidden="true" style="--p:${(asked/Math.max(1,planned)).toFixed(3)}"><b></b></i></div>${(q.type==='grammar'||q.type==='token-order'||q.type==='video-grammar'||q.explain?.rule)?`<button id="quizGrammarHint" type="button" class="grammar-hint-btn" aria-label="${FiezelI18n.t('grammar.hint-aria','Petunjuk Tata Bahasa')}" title="${FiezelI18n.t('grammar.hint-aria','Petunjuk Tata Bahasa')}"><i data-lucide="lightbulb"></i></button>`:''}<button id="quizNext" class="quiz-next" disabled>${FiezelI18n.t('quiz.next-btn')} <i data-lucide="arrow-right"></i></button></div>${pawSlot?'':`<div class="quiz-mascot" aria-hidden="true">${pawFaceMarkup()}</div>`}${q.passage?card(`<div class="passage passage-reading" id="quizPassage"><div class="eyebrow">${FiezelI18n.t('quiz.reading-eyebrow')}</div><h3>${esc(q.passage.title)}</h3><p>${esc(q.passage.text)}</p></div>`,'card-reading'):(cfg.context?card(`<div class="passage" id="quizPassage"><b>${esc(cfg.context.title)}</b><p>${esc(cfg.context.text)}</p></div>`):'')}${card(`${pawSlot?pawSlot.peek:''}${pawSlot&&pawSlot.above?`<div class="quiz-stage">${pawSlot.above}<div class="quiz-bubble">${quizReviewTag(q)}<h2 class="question" id="quizStem">${renderQuizQuestionContent(q)}</h2></div></div>`:''}${q.focus?`<div class="vocab-focus"><span class="vocab-focus-word">${jaWord(q.focus.word,q.focus.phonetic)}</span>${q.focus.phonetic?`<span class="phonetic">${jaPhonetic(q.focus.phonetic,'')}</span>`:''}</div>`:''}${q.passage?`<div class="reading-jump-bar"><button type="button" id="readingJumpBtn" class="reading-jump-btn"><i data-lucide="book-open"></i> <span>${FiezelI18n.t('quiz.reading-eyebrow')}</span> <i data-lucide="arrow-up-right"></i></button></div>`:''}${q.type==='listening'?`<div class="quiz-listen quiz-listen-hero"><div class="quiz-listen-controls"><button id="quizListen" class="quiz-listen-btn quiz-listen-btn-hero"><i data-lucide="volume-2"></i> ${FiezelI18n.t('quiz.listen-btn')}</button><button type="button" id="quizListenSpeed" class="quiz-listen-speed-btn" aria-label="Kecepatan Audio"><span id="quizListenSpeedLabel">1.0x</span></button></div><div class="quiz-audio-wave hidden" id="quizAudioWave" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div><span id="quizListenNote" class="muted">${FiezelI18n.t('quiz.listen-note')}</span></div>`:''}${pawSlot&&pawSlot.above?'':`${quizReviewTag(q)}<h2 class="question" id="quizStem">${renderQuizQuestionContent(q)}</h2>`}<div id="options" class="options"></div><div id="feedback" class="feedback hidden" role="region" aria-live="polite"></div><div id="tutorTurn" class="tutor-turn hidden"></div>`,pawSlot?pawSlot.cardClass:'')}${pawSlot?pawSlot.side:''} </section>`);
+  setApp(`<section class="fade quiz-shell${pawSlot?pawSlot.shellClass:''}"><div class="quiz-topbar"><button id="quizExit" class="quiz-exit" aria-label="${FiezelI18n.t('quiz.exit-aria')}"><i data-lucide="x"></i><span class="quiz-exit-label">${FiezelI18n.t('quiz.exit-label')}</span></button><div class="quiz-progress" role="progressbar" aria-valuemin="0" aria-valuemax="${planned}" aria-valuenow="${asked+1}" aria-label="${FiezelI18n.t('quiz.progress-aria',{asked:asked+1,planned})}"><span>${asked+1}</span><em>/ ${planned}</em><i class="quiz-progress-bar" aria-hidden="true" style="--p:${(asked/Math.max(1,planned)).toFixed(3)}"><b></b></i></div>${(!MEASURE&&!cfg.noHints&&(q.type==='grammar'||q.type==='token-order'||q.type==='video-grammar'||q.explain?.rule))?`<button id="quizGrammarHint" type="button" class="grammar-hint-btn" aria-label="${FiezelI18n.t('grammar.hint-aria','Petunjuk Tata Bahasa')}" title="${FiezelI18n.t('grammar.hint-aria','Petunjuk Tata Bahasa')}"><i data-lucide="lightbulb"></i></button>`:''}<button id="quizNext" class="quiz-next" disabled>${FiezelI18n.t('quiz.next-btn')} <i data-lucide="arrow-right"></i></button></div>${pawSlot?'':`<div class="quiz-mascot" aria-hidden="true">${pawFaceMarkup()}</div>`}${q.passage?card(`<div class="passage passage-reading" id="quizPassage"><div class="eyebrow">${FiezelI18n.t('quiz.reading-eyebrow')}</div><h3>${esc(q.passage.title)}</h3><p>${esc(q.passage.text)}</p></div>`,'card-reading'):(cfg.context?card(`<div class="passage" id="quizPassage"><b>${esc(cfg.context.title)}</b><p>${esc(cfg.context.text)}</p></div>`):'')}${card(`${pawSlot?pawSlot.peek:''}${pawSlot&&pawSlot.above?`<div class="quiz-stage">${pawSlot.above}<div class="quiz-bubble">${quizReviewTag(q)}<h2 class="question" id="quizStem">${renderQuizQuestionContent(q)}</h2></div></div>`:''}${q.focus?`<div class="vocab-focus"><span class="vocab-focus-word">${jaWord(q.focus.word,q.focus.phonetic)}</span>${q.focus.phonetic?`<span class="phonetic">${jaPhonetic(q.focus.phonetic,'')}</span>`:''}</div>`:''}${q.passage?`<div class="reading-jump-bar"><button type="button" id="readingJumpBtn" class="reading-jump-btn"><i data-lucide="book-open"></i> <span>${FiezelI18n.t('quiz.reading-eyebrow')}</span> <i data-lucide="arrow-up-right"></i></button></div>`:''}${q.type==='listening'?`<div class="quiz-listen quiz-listen-hero"><div class="quiz-listen-controls"><button id="quizListen" class="quiz-listen-btn quiz-listen-btn-hero"><i data-lucide="volume-2"></i> ${FiezelI18n.t('quiz.listen-btn')}</button><button type="button" id="quizListenSpeed" class="quiz-listen-speed-btn" aria-label="Kecepatan Audio"><span id="quizListenSpeedLabel">1.0x</span></button></div><div class="quiz-audio-wave hidden" id="quizAudioWave" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div><span id="quizListenNote" class="muted">${FiezelI18n.t('quiz.listen-note')}</span></div>`:''}${pawSlot&&pawSlot.above?'':`${quizReviewTag(q)}<h2 class="question" id="quizStem">${renderQuizQuestionContent(q)}</h2>`}<div id="options" class="options"></div><div id="feedback" class="feedback hidden" role="region" aria-live="polite"></div><div id="tutorTurn" class="tutor-turn hidden"></div>`,pawSlot?pawSlot.cardClass:'')}${pawSlot?pawSlot.side:''} </section>`);
   $('quizExit').onclick=()=>confirmQuizExit();/* W1 P1-2: keluar lewat konfirmasi, bukan seketika. */
   const hintBtn=$('quizGrammarHint');
   if(hintBtn){
@@ -13379,7 +13566,7 @@ function quizLoop(cfg){
      q.__unplacedTokens=detail?.unplacedTokens||[];
      q.__placedTokens=detail?.placedTokens||[];
      answer(q,isCorrect?q.answerIndex:-1,tokenWidget.querySelector('#tokenSubmitBtn')||tokenWidget);
-   });
+   },{measure:MEASURE||!!cfg.noHints});
    host.appendChild(tokenWidget);
   }
   if(q.type==='video-grammar'){
@@ -14327,6 +14514,8 @@ function finishQuiz(cfg,score,total,tutorReport){
   if(cfg)cfg.__finished=true;
   const accuracy=Math.round(score/Math.max(1,total)*100),session=completeActiveSession(cfg,score,total);
   // F1 placement: level dibaca dari DUA hal yang harus sepakat, dan yang lebih rendah menang.
+  // (Tes RINGKAS hanya memakai tangga bukti, versi placementLiteBandLevel - lihat Audit P-B di
+  // sana: plafon akurasi di bawah dikalibrasi untuk blueprint 25 soal.)
   //
   //   1. `state.placementBandLevel` - tangga bukti per band (lihat placementBandLevel, jauh di
   //      atas). Inilah penentu utamanya: mulai A1, naik hanya dengan bukti benar di band itu.
@@ -14342,13 +14531,13 @@ function finishQuiz(cfg,score,total,tutorReport){
   // menguji PERILAKUnya (monotonik, selalu-salah -> A1, acak tidak boleh > A2) tanpa memaku
   // angka ambangnya. `state.placementBandLevel` yang belum ada berarti "tidak ada plafon dari
   // bukti band", jadi di dalam test yang berjalan tanpa sesi ia jatuh ke plafon akurasi murni.
-  if(cfg.placement)state.placementBandLevel=placementBandLevel(placementBandTally(cfg.__placementAnswers));
+  if(cfg.placement)state.placementBandLevel=(cfg.placementLite?placementLiteBandLevel:placementBandLevel)(placementBandTally(cfg.__placementAnswers));
   const placementBands=cfg.placement?placementBandTally(cfg.__placementAnswers):null;
   // Bukti per band ikut disimpan supaya hasil tes bisa diaudit owner maupun murid, bukan hanya
   // dipercaya. Satu angka level tanpa bandnya adalah kesimpulan tanpa dasar.
   if(cfg.placement)state.placementBands=placementBands;
   const placementWasDone=!!state.placementDone;
-  if(cfg.placement){state.level=accuracy<45?1:Math.min(Number(state.placementBandLevel)||6,accuracy<60?2:accuracy<72?3:accuracy<82?4:accuracy<92?5:6);state.placementDone=true;state.placementLastAt=Date.now();/* m028 (kontrak owner 3): placement adalah BUKTI - levelnya langsung terverifikasi. */try{levelTrustAdoptPlacement(placementLevel(state))}catch(_){}}
+  if(cfg.placement){state.level=cfg.placementLite?Math.max(1,Number(state.placementBandLevel)||1):accuracy<45?1:Math.min(Number(state.placementBandLevel)||6,accuracy<60?2:accuracy<72?3:accuracy<82?4:accuracy<92?5:6);state.placementDone=true;state.placementLastAt=Date.now();/* m028 (kontrak owner 3): placement adalah BUKTI - levelnya langsung terverifikasi. */try{levelTrustAdoptPlacement(placementLevel(state))}catch(_){}}
   // Hasil tes vs level yang dipilih sendiri di onboarding. `getActiveLevel()` mendahulukan
   // `preferences.activeLevel`, jadi tanpa penyelesaian di sini seluruh perbaikan skoring tidak
   // akan pernah terlihat oleh murid yang keburu menebak levelnya sendiri di layar perkenalan.
@@ -14385,7 +14574,7 @@ function finishQuiz(cfg,score,total,tutorReport){
     else{const b=state.grammar[cfg.skipGateSkill]||{correct:0,total:0,streak:0,mastery:0};b.skipGateCooldownUntil=Date.now()+LEVEL_EXAM_COOLDOWN_MS;state.grammar[cfg.skipGateSkill]=b}
     skipVerdict={passed,message:passed?FiezelI18n.t('quiz.bukti-diterima-right-ditandai-finish',{skor:score,total:total,title:judul}):FiezelI18n.t('quiz.new-right-gerbang-butuh-minimal',{skor:score,total:total,LESSON_SKIP_GATE_PASS:LESSON_SKIP_GATE_PASS})};
   }
-  state.sessionHistory=[...(state.sessionHistory||[]),session].slice(-100);const outcome=recordPolicyOutcomeFromSession(session);save();if(outcome)queuePolicyOutcomeSync(outcome);braincoreEvidenceObserveSession(outcome);/*Lane C*/anSessionEnded(session);/*A1-EMIT*/
+  state.sessionHistory=[...(state.sessionHistory||[]),session].slice(-100);const outcome=recordPolicyOutcomeFromSession(session);save();if(outcome)queuePolicyOutcomeSync(outcome);try{queueBrainSyncFlush()}catch(_){}/* Audit F2 */braincoreEvidenceObserveSession(outcome);/*Lane C*/anSessionEnded(session);/*A1-EMIT*/
   /* SOSIAL (SLOT 7): bukti Poin Bukti di-ANTRE, tidak pernah ditunggu — kegagalan jaringan
      apa pun berhenti di dalam queueSocialEvidence dan layar hasil tidak tahu-menahu. */
   try{queueSocialEvidence(cfg&&cfg.type==='level-exam'&&examVerdict?.passed?[{kind:'exam_passed',band:String(cfg.levelScope||'')}]:[])}catch(_){}
@@ -14445,7 +14634,7 @@ function finishQuiz(cfg,score,total,tutorReport){
   // hanya menampilkan persentase; nama level baru terlihat sesudah kembali ke Home lewat chip
   // level (temuan empiris §2 nomor 3). Murid berhak tahu hasil tesnya di momen pengumumannya,
   // beserta band mana yang menjadi dasarnya.
-  const placementLevelBlock=cfg.placement&&placementLevelName?`<div class="result-level"><span class="result-level-mark">${FiezelI18n.t('quiz.placement-mark')}</span><b class="result-level-name">${esc(placementLevelName)}</b><span class="result-level-desc">${esc(levelDescriptor(placementLevelName))}</span><span class="result-level-scope">${FiezelI18n.t('quiz.placement-scope')}</span></div>${placementBands?`<div class="result-bands"><small>${FiezelI18n.t('quiz.placement-evidence')}</small><div class="result-band-row">${placementBandChips(placementBands)}</div><small>${FiezelI18n.t('quiz.placement-rule')}</small></div>`:''}${placementAdopted?`<p class="muted">${FiezelI18n.t('quiz.placement-adopted')}</p>`:''}${placementManualLevel?`<p class="muted">${FiezelI18n.t('quiz.placement-manual-override',{manual:`<b>${esc(placementManualLevel)}</b>`,result:`<b>${esc(placementLevelName)}</b>`})}</p>`:''}`:'';
+  const placementLevelBlock=cfg.placement&&placementLevelName?`<div class="result-level"><span class="result-level-mark">${FiezelI18n.t('quiz.placement-mark')}</span><b class="result-level-name">${esc(placementLevelName)}</b><span class="result-level-desc">${esc(levelDescriptor(placementLevelName))}</span><span class="result-level-scope">${FiezelI18n.t('quiz.placement-scope')}</span></div>${placementBands?`<div class="result-bands"><small>${FiezelI18n.t('quiz.placement-evidence')}</small><div class="result-band-row">${placementBandChips(placementBands,state.level)}</div><small>${FiezelI18n.t('quiz.placement-rule')}</small></div>`:''}${placementAdopted?`<p class="muted">${FiezelI18n.t('quiz.placement-adopted')}</p>`:''}${placementManualLevel?`<p class="muted">${FiezelI18n.t('quiz.placement-manual-override',{manual:`<b>${esc(placementManualLevel)}</b>`,result:`<b>${esc(placementLevelName)}</b>`})}</p>`:''}`:'';
   const placementAdoptButton=cfg.placement&&placementManualLevel?`<button class="primary" onclick="usePlacementLevel()&&go('home')">${FiezelI18n.t('quiz.placement-adopt-btn',{level:esc(placementLevelName)})} <i data-lucide="arrow-right"></i></button>`:'';
   /* W1 P1-1 (09-001): pembahasan per-soal mode ukur HIDUP DI SINI \u2014 setelah pengukuran
      selesai, bukan di tengahnya. Nilai belajarnya utuh (jawabanmu vs kunci + intinya +
@@ -15363,6 +15552,7 @@ function switchTargetLangStorage(value){
   try{localStorage.setItem(activeStateStorageKey,JSON.stringify(global))}catch(_){}
   syncTargetLangFamilyGraph(value);
   state=loadState();                      // progres bahasa BARU (atau nol kalau belum ada)
+  try{stateSyncReset()}catch(_){}         // Audit F1: dasar gabungan dua-tab ikut pindah bahasa
 }
 window.switchTargetLangStorage=switchTargetLangStorage;
 async function setTargetLangPreference(next){
@@ -15443,7 +15633,7 @@ function openSettings(){const p=state.preferences||defaultPreferences,endpoint=p
   /* SOSIAL (SLOT 7): pintu masuk Profil Online + sakelar Mode Privat papan. Sakelar bicara
      ke server SAAT diubah (bukan saat Simpan) karena janjinya "hilang dari papan seketika";
      tanpa profil/offline ia menolak jujur lewat toast dan kembali ke posisi semula. */
-  const grupOnline=`<div class="settings-list"><button type="button" class="setting-row setting-row-action" onclick="openOnlineView()"><span class="setting-icon"><i data-lucide="users"></i></span><span><b>${FiezelI18n.t('settings.online-profile-label')}</b><small>${FiezelI18n.t('settings.online-profile-desc')}</small></span><i data-lucide="chevron-right"></i></button><label class="setting-row"><span class="setting-icon"><i data-lucide="eye-off"></i></span><span><b>${FiezelI18n.t('settings.private-mode-label')}</b><small>${FiezelI18n.t('settings.private-mode-desc')}</small></span><input id="settingBoardHidden" type="checkbox" ${socialProfileCache?.flags?.boardHidden?'checked':''} aria-label="${FiezelI18n.t('settings.private-mode-aria')}"></label></div>`;
+  const grupOnline=`<div class="settings-list"><button type="button" class="setting-row setting-row-action" onclick="openOnlineView()"><span class="setting-icon"><i data-lucide="users"></i></span><span><b>${FiezelI18n.t('settings.online-profile-label')}</b><small>${FiezelI18n.t('settings.online-profile-desc')}</small></span><i data-lucide="chevron-right"></i></button><label class="setting-row"><span class="setting-icon"><i data-lucide="eye-off"></i></span><span><b>${FiezelI18n.t('settings.private-mode-label')}</b><small>${FiezelI18n.t('settings.private-mode-desc')}</small></span><input id="settingBoardHidden" type="checkbox" ${socialProfileCache?.flags?.boardHidden?'checked':''} aria-label="${FiezelI18n.t('settings.private-mode-aria')}"></label><label class="setting-row"><span class="setting-icon"><i data-lucide="cloud-upload"></i></span><span><b>${FiezelI18n.t('settings.brain-sync-label')}</b><small>${FiezelI18n.t(activeAccountUuid?'settings.brain-sync-desc':'settings.brain-sync-desc-no-account')}</small></span><input id="settingBrainSync" type="checkbox" ${state.preferences?.brainSync===true?'checked':''} ${activeAccountUuid?'':'disabled'} onchange="setBrainSyncPreference(this.checked)" aria-label="${FiezelI18n.t('settings.brain-sync-label')}"></label></div>`;
   openModal(`<div class="settings-head"><div class="modal-mark">${FiezelI18n.t('student.settings-mark')}</div><h2>${FiezelI18n.t('settings.title',{name:esc(learnerName())})}</h2><p>${FiezelI18n.t('settings.all-can-diatur-dikelompokkan-each')}</p></div>`
     /* m025-262: fold ini dulu menawarkan 'Masuk / Daftar' kepada SETIAP murid — permukaan
        pendaftaran keempat, sesudah onboarding, gerbang Puter, dan Online & Teman. Sekarang
@@ -17448,6 +17638,7 @@ setTimeout(()=>{
     maybeSyncLearnerName();
   }catch(_){}
   try{itemPoolSync()}catch(_){}
+  try{queueBrainSyncFlush(0)}catch(_){}/* Audit F2: sisa riwayat dari sesi offline sebelumnya */
 },2500);
 if(typeof window!=='undefined'&&window.addEventListener){
   window.addEventListener('online',()=>{
@@ -17457,11 +17648,19 @@ if(typeof window!=='undefined'&&window.addEventListener){
       maybeSyncLearnerName();
     }catch(_){}
     try{itemPoolSync()}catch(_){}
+    /* Audit offline F2/F4/F5 2026-10-04: yang tertahan selama offline ikut dikirim begitu koneksi
+       kembali - riwayat BrainCore (bila murid menyalakan sinkron), ringkasan aktivitas untuk
+       pengingat, dan antrean hasil kebijakan sesi - bukan menunggu sesi online berikutnya. */
+    try{queueBrainSyncFlush(1500)}catch(_){}
+    try{if(Number(state?.totalAnswered||0)>0)queueRemoteActivitySync()}catch(_){}
+    try{if(state?.policyOutcomeMeta?.queue?.length)flushPolicyOutcomeQueue()}catch(_){}
   });
 }
 if(typeof document!=='undefined'&&document.addEventListener){
   document.addEventListener('visibilitychange',()=>{
     if(document.visibilityState==='visible'){
+      /* Audit F1: tulisan tab lain digabung begitu tab ini terlihat lagi. */
+      try{if(stateExternalDirty)stateAdoptExternal()}catch(_){}
       try{
         if(identityEvidenceActive())identityEvidenceFlush();
         if(braincoreEvidenceMode()==='on')braincoreEvidenceFlush();

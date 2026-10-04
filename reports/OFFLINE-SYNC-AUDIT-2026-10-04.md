@@ -1,5 +1,7 @@
 # Audit ketahanan data offline → online (lokal → Cloudflare) — 2026-10-04
 
+> **Status 2026-10-04:** F1, F2, F3, F4, F5 **diperbaiki** di PR yang sama (lihat §6).
+
 **Basis:** branch `claude/inspiring-franklin-xml8hz` @ `cce82e55` (build `m025-442`; jalur simpan &
 sinkron identik dengan `main` @ `1dff4b6d`). **Pertanyaan owner:** murid menyelesaikan dua sesi
 latihan saat internet putus, lalu tersambung lagi — apakah skor, gem, dan riwayat BrainCore
@@ -117,3 +119,37 @@ jadi probe sesi kilat tidak menyentuhnya.
    `flushPolicyOutcomeQueue()`.
 4. **Gem** hanya hidup di perangkat. Bukan bug offline, tetapi berarti gem hilang bila perangkat
    hilang/dibersihkan — perlu keputusan produk.
+
+---
+
+## 6. Status perbaikan (2026-10-04, disetujui owner)
+
+**F1 — diperbaiki: dua tab tidak saling menimpa.** Setiap simpan meninggalkan tanda kecil
+`fiezel-state-rev-v1|<kunci>` = "revisi:id-tab", dan tab mengingat salinan state tersimpan saat ia
+terakhir membaca/menulis. Sebelum menulis, kalau tanda itu bukan miliknya (atau event `storage`
+sudah mengabarkan tulisan tab lain), state tersimpan digabung **tiga arah** dengan memori tab ini
+(`FiezelContinuity.mergeConcurrentState`): riwayat per `attemptId`, catatan berwaktu per isi,
+penghitung `mine + theirs − base`, buku gem per entri (saldo = earned − spent), item materi per item
+(bukti terbaru), layar & sesi berjalan milik tab sendiri. Saat tab kembali terlihat, tulisan tab
+lain langsung digabung (layar diperbarui bila tidak di tengah kuis, dengan toast id/th).
+
+**F2 — diperbaiki: `brainSyncFlush()` dipanggil.** Sesudah sesi selesai atau ditinggalkan, saat
+`online`, saat app dibuka, dan saat murid menyalakannya. Sinkron tetap **mati secara bawaan**
+(gerbang fail-closed `tests/brain-sync-failclosed-test.js` tidak disentuh); murid menyalakannya
+lewat sakelar baru **Pengaturan → Online & Teman → "Cadangkan riwayat belajar ke akun"** (id/th,
+nonaktif tanpa akun).
+
+**F3 — diperbaiki.** Daftar "terkirim" dipangkas menurut riwayat yang masih ada (maks 1.200), bukan
+300 id terakhir; sisa antrean > 50 baris menyusul otomatis.
+
+**F4/F5 — diperbaiki.** Listener `online` juga mengirim ringkasan aktivitas dan antrean hasil
+kebijakan.
+
+Probe diulang sesudah perbaikan: O1, O2, O5 tetap utuh; O3 kini juga mengirim `/api/activity` saat
+tersambung lagi; **O6: riwayat & sesi tab A tetap ada** sesudah tab B menyimpan
+(`kemajuanAHilang: false`). `/api/brain/attempts` tetap 0 di probe karena probe tidak menyalakan
+sinkron - perilaku fail-closed yang benar. Gerbang: `tests/learning-integrity-2026-10-04-test.js`
+(menjalankan jalur simpan sungguhan di dua "tab" yang berbagi satu localStorage, dan
+`brainSyncFlush` sungguhan atas 1.000 baris riwayat).
+
+**Belum:** gem tetap hanya di perangkat (keputusan produk, §5 butir 4).

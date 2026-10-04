@@ -1,5 +1,7 @@
 # Audit mesin hafalan kosakata & pengulangan berkala (FSRS) — 2026-10-04
 
+> **Status 2026-10-04:** V-A dan V-B **diperbaiki** di PR yang sama (lihat §5). V-C, V-D, V-E belum.
+
 **Basis:** branch `claude/inspiring-franklin-xml8hz` @ `cce82e55` (build `m025-442`; jalur kosakata
 identik dengan `main` @ `1dff4b6d`). **Pertanyaan owner:** apakah kartu yang dijawab salah benar
 dijadwalkan ulang (besok harinya) sesuai rumus peluruhan ingatan FSRS, atau hanya diacak ulang
@@ -103,3 +105,28 @@ pesan "kesulitan beruntun"). Penilaian diri saat menjelajah kartu menjadi bukti 
    konsisten dengan jadwal 30 harinya; satu penulis jadwal.
 5. **V-E** — "Masih belajar" dicatat sebagai sinyal penilaian diri (tanpa `lapses` /
    `consecutiveWrong`), atau hanya menjadwalkan ulang tanpa menghukum statistik.
+
+---
+
+## 5. Status perbaikan (2026-10-04, disetujui owner)
+
+**V-A — diperbaiki.** Satu antrean `vocabReviewQueue()` (kartu jatuh tempo di level ≤ level aktif,
+paling rawan lupa lebih dulu, risiko dari model FSRS-lite yang sama) kini dibaca oleh "Uji
+kosakata", flashcards, dan "Review jatuh tempo". "Uji kosakata" membangun dan menyaring soalnya
+sendiri sampai tepat sebanyak sesi (kartu jatuh tempo dulu, lalu kata level aktif), karena
+`quizLoop` mengacak lalu memotong kolam. Flashcards menaruh kartu jatuh tempo di depan dek.
+
+**V-B — diperbaiki.** `dueItems()` menghitung kosakata jatuh tempo dari semua level ≤ level aktif
+(`vocabReviewLevelOk`); kunci yatim tetap ditolak. Grammar/reading tidak berubah.
+
+Probe diulang sesudah perbaikan:
+
+| | Sebelum | Sesudah |
+|---|---|---|
+| V4: kata pertama "Uji kosakata" adalah kartu jatuh tempo | 1/15 sesi (acak murni 0,88) | **15/15** |
+| V6: kartu A1 jatuh tempo sesudah naik ke A2 | 0 | **1** |
+
+Gerbang: `tests/learning-integrity-2026-10-04-test.js` (V-A/V-B) dan
+`tests/grammar-vocab-leveling-test.js` Test 10 (bentuk kolam "Uji kosakata").
+
+**V-C, V-D, V-E — belum dikerjakan.**

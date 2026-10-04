@@ -404,6 +404,37 @@ async function sectionB() {
       assert.ok(!/\b(Pilihan|kurang tepat|Coba pilih|Perhatikan lagi)\b/.test(s.tutor), 'tutor: ' + s.tutor.slice(0, 200));
     });
     await page.close();
+
+    // Audit P-A 2026-10-04: mode ukur tanpa bantuan. Probe audit: membaca lampu petunjuk saja
+    // memberi 77-85% benar di tes penempatan, karena tombolnya tampil di 100% layar soal.
+    page = await boot(browser, 'id');
+    await test('C1 tes penempatan: tidak ada lampu petunjuk maupun "intip arti" di layar soal mana pun (P-A)', async () => {
+      const r = await page.evaluate(async () => {
+        const st = window.__getFiezelState(); st.placementDone = false; st.placementLastAt = 0;
+        await window.startPlacement();
+        const sleep = ms => new Promise(res => setTimeout(res, ms));
+        let screens = 0, hint = 0, gloss = 0;
+        for (let i = 0; i < 40 && !st.placementDone; i++) {
+          await sleep(80);
+          const opts = [...document.querySelectorAll('#options .option')];
+          if (!opts.length) continue;
+          screens++;
+          if (document.getElementById('quizGrammarHint')) hint++;
+          if (document.getElementById('tokenGlossToggle')) gloss++;
+          opts[0].click(); await sleep(40); document.getElementById('quizNext')?.click(); await sleep(60);
+        }
+        return { screens, hint, gloss };
+      });
+      assert.ok(r.screens >= 10, 'tes penempatan tidak berjalan: ' + JSON.stringify(r));
+      assert.strictEqual(r.hint, 0, `lampu petunjuk tampil di ${r.hint}/${r.screens} layar tes penempatan`);
+      assert.strictEqual(r.gloss, 0, `"intip arti" tampil di ${r.gloss}/${r.screens} layar tes penempatan`);
+    });
+    await test('C2 sesi belajar biasa tetap punya lampu petunjuk', async () => {
+      await page.evaluate(() => window.startGrammarQuickSession());
+      await page.waitForTimeout(900);
+      assert.ok(await page.evaluate(() => !!document.getElementById('quizGrammarHint')), 'lampu petunjuk hilang dari sesi belajar');
+    });
+    await page.close();
   } finally {
     await browser.close();
   }

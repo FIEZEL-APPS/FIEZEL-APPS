@@ -72,9 +72,16 @@ check('PLACEMENT_SIZE is a sane question count', PLACEMENT_SIZE >= 12 && PLACEME
 // m025-165: baris skoring kini juga mengadopsi hasil placement ke levelTrust (kontrak owner:
 // placement adalah bukti), jadi setelah placementDone boleh ada pernyataan lanjutan di blok
 // yang sama. Yang diekstrak tetap HANYA pernyataan skoringnya sendiri.
-const scoringMatch = app.match(/if\(cfg\.placement\)\{(state\.level=accuracy[^;]+;)state\.placementDone=true[;}]/);
+// Audit P-B 2026-10-04: tes RINGKAS bercabang lebih dulu (`cfg.placementLite?<tangga>:`), lalu
+// pernyataan akurasi tes penuh menyusul. Keduanya diekstrak dan diuji terpisah di bawah.
+const scoringRaw = app.match(/if\(cfg\.placement\)\{state\.level=cfg\.placementLite\?([^:]+):(accuracy[^;]+;)state\.placementDone=true[;}]/);
+const scoringMatch = scoringRaw ? [scoringRaw[0], 'state.level=' + scoringRaw[2]] : null;
+const liteScoringExpr = scoringRaw ? scoringRaw[1] : '';
 check('Placement scoring statement is extractable', !!scoringMatch,
   scoringMatch ? scoringMatch[1] : 'pola inline di finish quizLoop() berubah — perbarui regex, jangan lemahkan');
+check('Lite placement level reads ONLY the evidence ladder (no accuracy cap)',
+  /^Math\.max\(1,Number\(state\.placementBandLevel\)\|\|1\)$/.test(liteScoringExpr),
+  liteScoringExpr || 'cabang cfg.placementLite tidak ditemukan');
 
 const placementLevelSource = sourceBlock('placementLevel');
 check('placementLevel() is extractable', /function\s+placementLevel\s*\(/.test(placementLevelSource),
@@ -264,6 +271,81 @@ check('Result screen names the final CEFR level', /placementLevelName/.test(fini
   finishSource ? 'finishQuiz menghitung dan menampilkan nama level placement' : 'finishQuiz tidak ditemukan');
 
 // ---------------------------------------------------------------------------
+// 4b. Tes RINGKAS (audit P-B 2026-10-04) - tangga placementLiteBandLevel, tanpa plafon akurasi
+// ---------------------------------------------------------------------------
+// Peluang benar murid sejati per band memakai kurva 3PL yang SAMA dengan Core Brain
+// (features/brain/fiezel-core-brain.js successProbability: c=0,25, a=1,5, b = indeks band).
+const P3 = (theta, band) => 0.25 + 0.75 / (1 + Math.exp(-1.5 * (theta - band)));
+const liteSource = sourceBlock('placementLiteBandLevel');
+const liteForgiveMatch = app.match(/const\s+PLACEMENT_LITE_FORGIVE_BANDS\s*=\s*(\d+)/);
+const liteBlueprintMatch = app.match(/const\s+PLACEMENT_LITE_BLUEPRINT\s*=\s*(\{[^;]+\})/);
+check('Lite ladder (placementLiteBandLevel + PLACEMENT_LITE_FORGIVE_BANDS + PLACEMENT_LITE_BLUEPRINT) is extractable',
+  /function\s+placementLiteBandLevel\s*\(/.test(liteSource) && !!liteForgiveMatch && !!liteBlueprintMatch,
+  `lite=${!!liteSource} forgive=${liteForgiveMatch ? liteForgiveMatch[1] : 'MISSING'} blueprint=${!!liteBlueprintMatch}`);
+check('finishQuiz picks the lite ladder for a lite session',
+  /state\.placementBandLevel=\(cfg\.placementLite\?placementLiteBandLevel:placementBandLevel\)\(placementBandTally\(cfg\.__placementAnswers\)\)/.test(app),
+  'state.placementBandLevel harus memakai placementLiteBandLevel bila cfg.placementLite');
+check('startPlacement marks the lite session',
+  /quizLoop\(\{type:'placement',[^}]*placementLite:uxOn\('placementLite'\)\}\)/.test(app),
+  'startPlacement harus meneruskan placementLite:uxOn(\'placementLite\') ke quizLoop');
+const lite = { distributions: {} };
+if (liteSource && liteForgiveMatch && liteBlueprintMatch && liteScoringExpr) {
+  const liteLadder = vm.runInNewContext(`${liteSource}\nplacementLiteBandLevel`,
+    { LEVELS, PLACEMENT_BAND_PASS: bandPassMatch ? Number(bandPassMatch[1]) : 1, PLACEMENT_BAND_MIN_EVIDENCE: bandMinMatch ? Number(bandMinMatch[1]) : 99, PLACEMENT_LITE_FORGIVE_BANDS: Number(liteForgiveMatch[1]) }, { timeout: 1000 });
+  const liteScoring = new Function('state', `state.level=${liteScoringExpr};`);
+  const liteBlueprint = vm.runInNewContext(`(${liteBlueprintMatch[1]})`, {}, { timeout: 1000 });
+  const liteBand = Object.fromEntries(LEVELS.map(l => [l, Object.values(liteBlueprint[l] || {}).reduce((a, n) => a + (Number(n) || 0), 0)]));
+  const liteLevelFor = answers => { const st = { placementBandLevel: liteLadder(ladder.tally(answers)) }; liteScoring(st); return placementLevel({ level: st.level }); };
+  const liteFromBands = okByBand => { const answers = []; LEVELS.forEach((l, i) => { for (let k = 0; k < liteBand[l]; k++) answers.push({ level: l, ok: k < (okByBand[i] ?? 0) }); }); return liteLevelFor(answers); };
+  const LITE_TRIALS = 4000;
+  const liteDist = (seed, probForBand) => {
+    const r = mulberry32(seed), d = Object.fromEntries(LEVELS.map(l => [l, 0]));
+    for (let t = 0; t < LITE_TRIALS; t++) {
+      const answers = [];
+      for (const l of LEVELS) for (let k = 0; k < liteBand[l]; k++) answers.push({ level: l, ok: r() < probForBand(l) });
+      d[liteLevelFor(answers)]++;
+    }
+    return d;
+  };
+  const pct = (d, keys) => keys.reduce((a, k) => a + d[k], 0) / LITE_TRIALS;
+  const g = lite.distributions.guess = liteDist(SEED ^ 0x0101, () => GUESS_P);
+  // B2 ke atas tidak bisa dibuat nol mutlak dengan dua soal per band: penebak yang menebak benar
+  // 2/2 di tiga band berturut-turut (0,0625^3 ≈ 0,02%) memang tak bisa dibedakan dari yang tahu.
+  check('L1 lite: pure guessing exceeds A2 in at most 1% and reaches B2+ in at most 0.1%', pct(g, LEVELS.slice(2)) <= 0.01 && pct(g, LEVELS.slice(3)) <= 0.001,
+    `distribusi ${JSON.stringify(g)}`);
+  check('L1 lite: median outcome of pure guessing is A1', g.A1 > LITE_TRIALS / 2, `A1 ${g.A1}/${LITE_TRIALS}`);
+  const b = lite.distributions.beginner = liteDist(SEED ^ 0x0202, l => (l === 'A1' || l === 'A2' ? 0.95 : GUESS_P));
+  check('L2 lite: beginner (only A1/A2 known) lands on A1 or A2 in at least 90% of trials', pct(b, ['A1', 'A2']) >= 0.9, `distribusi ${JSON.stringify(b)}`);
+  const sb = lite.distributions.solidB1 = liteDist(SEED ^ 0x0303, l => (LEVELS.indexOf(l) <= 2 ? 0.95 : GUESS_P));
+  check('L3 lite: learner solid through B1 is placed at B1 in the majority of trials', sb.B1 > LITE_TRIALS / 2, `distribusi ${JSON.stringify(sb)}`);
+  // L4 - inti audit P-B: murid berkemampuan tinggi tidak boleh tertahan di A1. Batas lama (tangga
+  // ketat + plafon akurasi) memberi θ=3 -> A1 38%, θ=4 -> 9,7%.
+  const heldA1 = {};
+  for (const theta of [3, 4, 5, 6]) {
+    const d = lite.distributions['theta' + theta] = liteDist(SEED ^ (0x0400 + theta), l => P3(theta, LEVELS.indexOf(l) + 1));
+    heldA1[theta] = d.A1 / LITE_TRIALS;
+  }
+  check('L4 lite: able learners are not held at A1 (θ=3 ≤12%, θ=4 ≤2%, θ≥5 ≤1%)',
+    heldA1[3] <= 0.12 && heldA1[4] <= 0.02 && heldA1[5] <= 0.01 && heldA1[6] <= 0.01,
+    `P(A1 | θ) = ${JSON.stringify(Object.fromEntries(Object.entries(heldA1).map(([k, v]) => [k, (v * 100).toFixed(1) + '%'])))}`);
+  check('L5 lite: all wrong -> A1, all right -> C2', liteFromBands([0, 0, 0, 0, 0, 0]) === 'A1' && liteFromBands([2, 2, 2, 2, 2, 2]) === 'C2',
+    `semua salah ${liteFromBands([0, 0, 0, 0, 0, 0])}, semua benar ${liteFromBands([2, 2, 2, 2, 2, 2])}`);
+  const cases = [
+    [[2, 2, 0, 2, 2, 2], 'A2', 'band B1 0/2 menghentikan tangga'],
+    [[2, 2, 1, 2, 2, 2], 'A2', 'B1 1/2 tidak dimaafkan (hanya A1/A2)'],
+    [[1, 1, 2, 2, 2, 2], 'A1', 'A1 dimaafkan, A2 hanya sebagian -> tetap A1'],
+    [[1, 2, 2, 0, 0, 0], 'B1', 'A1 1/2 dimaafkan karena A2 lulus penuh'],
+    [[2, 1, 1, 0, 0, 0], 'A2', 'A2 1/2 + B1 sebagian -> ditempatkan di A2'],
+    [[2, 1, 0, 2, 2, 2], 'A1', 'A2 1/2 + B1 0/2 -> tidak ada bukti, tetap A1'],
+    [[1, 2, 1, 2, 2, 2], 'A2', 'maaf hanya SEKALI: A1 dimaafkan, B1 1/2 berhenti'],
+    [[0, 2, 2, 2, 2, 2], 'A1', 'band 0/2 tidak pernah dimaafkan']
+  ];
+  const caseIssues = cases.map(([ok, want, why]) => { const got = liteFromBands(ok); return got === want ? '' : `${JSON.stringify(ok)} -> ${got}, harus ${want} (${why})`; }).filter(Boolean);
+  check('L6 lite: forgiveness is one-time, base bands only, and needs proof from the next band', caseIssues.length === 0,
+    caseIssues.length ? caseIssues.join('; ') : `${cases.length} kasus sesuai`);
+}
+
+// ---------------------------------------------------------------------------
 // 5. Report
 // ---------------------------------------------------------------------------
 const report = {
@@ -282,6 +364,7 @@ const report = {
   randomGuessing: { distribution, aboveA2, atB2OrAbove, median: medianLevel },
   realisticBeginner: { distribution: beginnerDistribution, misplacedAboveA2: beginnerMisplaced },
   solidThroughB1: { distribution: solidDistribution },
+  lite,
   accuracySweep: Object.fromEntries([0, 20, 35, 44, 45, 50, 59, 60, 71, 72, 81, 82, 91, 92, 100].map(a => [a, levelNameForAccuracy(a)])),
   checks
 };
