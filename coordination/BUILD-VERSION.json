@@ -1,7 +1,7 @@
 {
-  "version": "m025-449",
+  "version": "m025-450",
   "claimedBy": "branch main",
-  "claimedAt": "2026-10-04T08:36:16.548Z",
-  "reason": "fix(ux): zero-leak thai tour and grammar badge, merge review continuity",
+  "claimedAt": "2026-10-04T08:56:12.653Z",
+  "reason": "fix(stage): pass root context to webrtc stage factory and auto fallback auth",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
