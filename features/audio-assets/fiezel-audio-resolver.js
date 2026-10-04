@@ -193,12 +193,16 @@
    * beserta 'vary: origin'. Aset ini publik dan tidak membawa kredensial.
    */
   function loadForPlayback(url) {
-    var f = root.fetch;
-    if (typeof f !== 'function') return Promise.resolve(null);
-    return f(url, { cache: 'force-cache' }).then(function (response) {
-      if (!response || !response.ok) return null;
-      return storeResponse(url, response).then(function () { return response; });
-    }).catch(function () { return null; });
+    return cachedResponse(url).then(function (cached) {
+      if (cached) return cached;
+      var f = root.fetch;
+      if (typeof f !== 'function') return null;
+      return f(url, { cache: 'force-cache' }).then(function (response) {
+        if (!response || !response.ok) return null;
+        storeResponse(url, response);
+        return response;
+      }).catch(function () { return null; });
+    });
   }
 
   function responseToObjectUrl(response) {
@@ -209,74 +213,48 @@
     }).catch(function () { return null; });
   }
 
-  /**
-   * Mengisi cache persisten DI BELAKANG LAYAR, sesudah aset selesai terdengar. Tidak pernah
-   * melempar dan tidak ditunggu siapa pun: gagal menyimpan hanya berarti pemutaran berikutnya
-   * mengalir dari R2 lagi.
-   */
-  function warmCache(url) {
-    try { loadForPlayback(url).catch(function () {}); } catch (_) {}
-  }
-
-  /**
-   * m025-462 SUARA LANGSUNG MULAI. Dulu setiap aset yang belum ada di cache diunduh UTUH,
-   * diubah ke blob, baru diputar - jadi murid menunggu seluruh berkas sebelum mendengar
-   * apa pun. Sekarang:
-   *
-   *   - cache persisten KENA  -> putar dari blob lokal (seketika, juga saat luring);
-   *   - cache persisten LUPUT -> elemen Audio memutar URL R2 LANGSUNG dan mulai berbunyi
-   *     sambil mengalir; sesudah 'ended', berkas diambil sekali lagi (biasanya dari cache
-   *     HTTP) dan disimpan ke Cache API untuk pemutaran berikutnya.
-   *
-   * Elemen Audio tidak butuh CORS untuk memutar, jadi jebakan no-cors (blob 0 byte) tidak
-   * berlaku di jalur langsung; jalur cache tetap memakai fetch CORS seperti sebelumnya.
-   */
   function playUrl(url, options) {
     var opts = options || {};
     var Ctor = root.Audio;
     if (typeof Ctor !== 'function') return Promise.resolve(false);
     stop();
 
-    return cachedResponse(url).then(function (cached) {
-      if (!cached) return playSource(Ctor, url, false, opts, url);
-      return responseToObjectUrl(cached).then(function (objectUrl) {
-        return playSource(Ctor, objectUrl || url, !!objectUrl, opts, objectUrl ? '' : url);
-      });
-    });
-  }
-
-  function playSource(Ctor, src, isObjectUrl, opts, warmUrl) {
-    return new Promise(function (done) {
-      var el;
-      try { el = new Ctor(); } catch (_) { if (isObjectUrl) { try { root.URL.revokeObjectURL(src); } catch (_) {} } done(false); return; }
-      current = el;
-      var settled = false;
-      function finish(ok) {
-        if (settled) return;
-        settled = true;
-        try { root.clearTimeout(el.__fiezelGuard); } catch (_) {}
-        if (isObjectUrl) { try { root.URL.revokeObjectURL(src); } catch (_) {} }
-        if (current === el) current = null;
-        if (ok) metrics.plays++; else metrics.playFailures++;
-        if (ok && warmUrl) warmCache(warmUrl);
-        done(ok);
-      }
-      el.__fiezelSettle = finish;
-      el.__fiezelGuard = root.setTimeout(function () { finish(false); }, 10000);
-      el.addEventListener('playing', function () { try { root.clearTimeout(el.__fiezelGuard); } catch (_) {} });
-      el.preload = 'auto';
-      if (typeof opts.speed === 'number' && opts.speed > 0) el.playbackRate = opts.speed;
-      if (typeof opts.onProgress === 'function') {
-        el.addEventListener('timeupdate', function () {
-          try { opts.onProgress(el.currentTime || 0, el.duration || 0); } catch (_) {}
+    return loadForPlayback(url).then(function (response) {
+      if (!response) return false;
+      return responseToObjectUrl(response).then(function (objectUrl) {
+        if (!objectUrl) return false;
+        return new Promise(function (done) {
+          var el;
+          try { el = new Ctor(); } catch (_) { try { root.URL.revokeObjectURL(objectUrl); } catch (_) {} done(false); return; }
+          current = el;
+          var settled = false;
+          function finish(ok) {
+            if (settled) return;
+            settled = true;
+            try { root.clearTimeout(el.__fiezelGuard); } catch (_) {}
+            try { root.URL.revokeObjectURL(objectUrl); } catch (_) {}
+            if (current === el) current = null;
+            if (ok) metrics.plays++; else metrics.playFailures++;
+            done(ok);
+          }
+          el.__fiezelSettle = finish;
+          el.__fiezelGuard = root.setTimeout(function () { finish(false); }, 10000);
+          el.addEventListener('playing', function () { try { root.clearTimeout(el.__fiezelGuard); } catch (_) {} });
+          el.preload = 'auto';
+          if (typeof opts.speed === 'number' && opts.speed > 0) el.playbackRate = opts.speed;
+          if (typeof opts.onProgress === 'function') {
+            el.addEventListener('timeupdate', function () {
+              try { opts.onProgress(el.currentTime || 0, el.duration || 0); } catch (_) {}
+            });
+          }
+          el.addEventListener('ended', function () { finish(true); });
+          el.addEventListener('error', function () { finish(false); });
+          el.src = objectUrl;
+          var started = null;
+          try { started = el.play(); } catch (_) { finish(false); return; }
+          if (started && typeof started.catch === 'function') started.catch(function () { finish(false); });
         });
-      }
-      el.addEventListener('ended', function () { finish(true); });
-      el.addEventListener('error', function () { finish(false); });
-      el.src = src;
-      var started = null;
-      try { started = el.play(); } catch (_) { finish(false); return; }
-      if (started && typeof started.catch === 'function') started.catch(function () { finish(false); });
+      });
     });
   }
 
