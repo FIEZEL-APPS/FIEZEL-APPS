@@ -70,6 +70,7 @@ function launch(binary) {
     const child = spawn(binary, [
       '--headless=new', '--remote-debugging-port=0', '--no-sandbox', '--disable-gpu',
       '--disable-dev-shm-usage', '--no-first-run', '--no-default-browser-check',
+      '--unsafely-treat-insecure-origin-as-secure=http://127.0.0.1,http://localhost',
       '--user-data-dir=' + fs.mkdtempSync(path.join(os.tmpdir(), 'fiezel-e2e-'))
     ], { stdio: ['ignore', 'pipe', 'pipe'] });
     let buffer = '';
@@ -239,20 +240,20 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
     // --- Service worker benar-benar terdaftar ----------------------------------------------
     // Pemicuan dan verifikasi pendaftaran service worker
-    let sw = await evaluate(`(async () => {
-      if (!('serviceWorker' in navigator)) return false;
-      let reg = await navigator.serviceWorker.getRegistration();
-      if (reg) return true;
+    let swInfo = await evaluate(`(async () => {
+      if (!('serviceWorker' in navigator)) return { supported: false, error: 'no-sw' };
       try {
-        await navigator.serviceWorker.register('./sw.js');
-        await new Promise(r => setTimeout(r, 600));
-        reg = await navigator.serviceWorker.getRegistration();
-        return !!reg;
-      } catch (_) {
-        return false;
+        let reg = await navigator.serviceWorker.getRegistration();
+        if (reg) return { ok: true, active: !!reg.active, installing: !!reg.installing, waiting: !!reg.waiting };
+        reg = await navigator.serviceWorker.register('./sw.js', { scope: './' });
+        await new Promise(r => setTimeout(r, 1200));
+        let regAfter = await navigator.serviceWorker.getRegistration();
+        return { ok: !!regAfter, registered: !!reg };
+      } catch (err) {
+        return { ok: false, error: String(err && err.message || err) };
       }
     })()`, true);
-    check('The service worker registers on a real origin', sw === true, `registered=${sw}`);
+    check('The service worker registers on a real origin', swInfo && swInfo.ok === true, JSON.stringify(swInfo));
 
     cdp.close();
   } catch (error) {
