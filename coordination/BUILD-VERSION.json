@@ -1,7 +1,7 @@
 {
-  "version": "m025-460",
+  "version": "m025-461",
   "claimedBy": "branch main",
-  "claimedAt": "2026-10-04T12:58:35.640Z",
-  "reason": "fix(stage): rename stage translation wrapper to fzStageT to pass i18n ghost key gate",
+  "claimedAt": "2026-10-04T13:14:15.745Z",
+  "reason": "fix(stage): register live stage keys in copy-id and th to restore zero-leak parity",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

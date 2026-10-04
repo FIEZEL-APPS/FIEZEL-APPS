@@ -1,30 +1,26 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-10-04T13:00:51.998Z",
+  "generatedAt": "2026-10-04T13:14:46.548Z",
   "files": {
     "app.js": {
-      "leaks": 27,
+      "leaks": 4,
       "budget": 4,
       "sample": [
         {
-          "line": 7783,
-          "text": "Belum ada ruang"
+          "line": 10928,
+          "text": "Selesaikan ritme hari ini"
         },
         {
-          "line": 7819,
-          "text": "Buat ruangan dulu supaya temanmu bisa masuk lewat tautan undangan."
+          "line": 11764,
+          "text": "— Penugasan latihan dan pemantauan capaian murid."
         },
         {
-          "line": 7843,
-          "text": "Menunggu rekan"
+          "line": 12377,
+          "text": "Nama kriteria: n/4 - satu kalimat alasan yang menunjuk bukti di tulisannya"
         },
         {
-          "line": 7855,
-          "text": "Tutup panggung suara"
-        },
-        {
-          "line": 7885,
-          "text": "Belum ada penonton lain"
+          "line": 18985,
+          "text": "Latihan"
         }
       ]
     },
@@ -468,9 +464,9 @@
     }
   },
   "copyKeys": {
-    "id": 3680,
-    "th": 3682,
+    "id": 3716,
+    "th": 3718,
     "idTanpaTh": 0
   },
-  "pass": false
+  "pass": true
 }
