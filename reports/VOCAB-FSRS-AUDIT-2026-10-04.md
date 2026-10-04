@@ -1,6 +1,6 @@
 # Audit mesin hafalan kosakata & pengulangan berkala (FSRS) — 2026-10-04
 
-> **Status 2026-10-04:** V-A, V-B (m025-442) dan V-E (m025-443) **diperbaiki** (lihat §5). V-C, V-D belum.
+> **Status 2026-10-04:** V-A, V-B (m025-442) dan V-E (m025-444) **diperbaiki** (lihat §5). V-C, V-D belum.
 
 **Basis:** branch `claude/inspiring-franklin-xml8hz` @ `cce82e55` (build `m025-442`; jalur kosakata
 identik dengan `main` @ `1dff4b6d`). **Pertanyaan owner:** apakah kartu yang dijawab salah benar
@@ -129,12 +129,12 @@ Probe diulang sesudah perbaikan:
 Gerbang: `tests/learning-integrity-2026-10-04-test.js` (V-A/V-B) dan
 `tests/grammar-vocab-leveling-test.js` Test 10 (bentuk kolam "Uji kosakata").
 
-**V-E — diperbaiki (m025-443).** "Masih belajar" di flashcards dan di "Review jatuh tempo" kini
+**V-E — diperbaiki (m025-444).** "Masih belajar" di flashcards dan di "Review jatuh tempo" kini
 memanggil `markStillLearning()`: total, benar, lapses, beruntun-salah, dan mastery tidak bergerak;
 kartunya hanya dijadwalkan kembali dalam 10 menit (tidak pernah lebih lambat dari jadwal yang sudah
 ada). Kata yang belum pernah dijawab ikut masuk antrean ulangan tanpa percobaan palsu.
 
-**Lanjutan V-B (m025-443).** Lesson grammar dan bacaan yang jatuh tempo dari level di bawah level
+**Lanjutan V-B (m025-444).** Lesson grammar dan bacaan yang jatuh tempo dari level di bawah level
 aktif kini juga dihitung (`dueItems`) dan masuk sesi adaptif serta "Reading adaptif" (butir
 ditandai `__crossLevelReview`, tetap tercatat dengan level aslinya). Angka "jatuh tempo" kosakata di
 Beranda kini sama dengan isi "Review jatuh tempo".

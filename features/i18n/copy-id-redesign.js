@@ -68,6 +68,10 @@
     'latihan.reading-note': 'Paham bacaan',
     'latihan.writing-note': 'Menulis kalimat',
     'latihan.library-note': 'Bacaan bebas',
+    /* SLOT 13: kartu pintu masuk Panggung Suara Live di tab Latihan. Label sengaja
+       TANPA tanda hubung, sesuai naskah naskah app lain. */
+    'latihan.panggung': 'Panggung Suara Live',
+    'latihan.panggung-note': 'Bicara dua arah dan permainan kata',
 
     /* ── Ringkasan akhir sesi ───────────────────────────────────────────────── */
     'ringkas.judul': 'Ringkasan sesi',

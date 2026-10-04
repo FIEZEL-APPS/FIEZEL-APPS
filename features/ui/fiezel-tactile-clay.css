@@ -27,7 +27,7 @@
   --text-main:        #0F172A;
   --text-sub:         #64748B;
   --text-muted:       #94A3B8;
-  --font-sans:        'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-sans:        'FZ Plus Jakarta Sans', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono:        'JetBrains Mono', monospace;
 
   /* Functional Accents */
@@ -115,12 +115,23 @@ main.app, .app, #app,
 }
 
 /* 4. KELASKU EMERALD CARDS */
-.kelasku-card, .ch-task-card, .ch-card,
-.ch-student, .ch-assignment-tile {
+.kelasku-card, .ch-task-card,
+.ch-assignment-tile {
   background: #FFFFFF !important;
   border: 2px solid var(--kelasku-emerald-border) !important;
-  border-radius: 20px !important;
-  box-shadow: 0 6px 0 var(--kelasku-emerald-bevel), 0 14px 28px rgba(31, 122, 99, 0.08) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 4px 0 var(--kelasku-emerald-bevel), 0 10px 20px rgba(31, 122, 99, 0.06) !important;
+}
+
+.ch-student {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 8px 14px calc(96px + env(safe-area-inset-bottom)) !important;
+  max-width: 520px !important;
+  margin: 0 auto !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
 }
 
 .kelasku-wordmark {
@@ -168,8 +179,8 @@ button.primary:disabled {
 }
 
 /* 6. TACTILE 3D SECONDARY BUTTONS */
-button:not(.primary):not(.nav):not(.token-chip):not(.fz-aurora-audio-btn):not(.option-btn):not(.fz-i):not(.brand-button):not(.icon-button):not(.course-switch-btn):not(.fzb-bug):not(.fzb-exit):not(.kelasku-strip-btn):not(.fz-drawer-toggle):not(.close-btn):not(#modalClose),
-.btn:not(.primary) {
+button:not(.primary):not(.nav):not(.token-chip):not(.fz-aurora-audio-btn):not(.option-btn):not(.fz-i):not(.brand-button):not(.icon-button):not(.course-switch-btn):not(.fzb-bug):not(.fzb-exit):not(.kelasku-strip-btn):not(.fz-drawer-toggle):not(.close-btn):not(#modalClose):not(.hero-cta-btn):not(.bug-raid-btn):not(.class-btn-3d):not(.audio-btn-3d):not(.today-cta-soft):not(.target-lang-chip):not(.btn-class-selector):not(.ch-segbar-btn):not(.ch-tab):not(.progress-tab):not(.active-level-control):not(.ch-btn-kerjakan):not(.ch-btn-mulai):not(.ch-btn-tuntas),
+.btn:not(.primary):not(.hero-cta-btn):not(.bug-raid-btn):not(.class-btn-3d):not(.target-lang-chip):not(.ch-btn-kerjakan):not(.ch-btn-mulai):not(.ch-btn-tuntas) {
   background: #FFFFFF !important;
   border: 2px solid var(--card-border) !important;
   border-radius: 14px !important;
@@ -181,8 +192,8 @@ button:not(.primary):not(.nav):not(.token-chip):not(.fz-aurora-audio-btn):not(.o
   transition: transform 0.1s ease, box-shadow 0.1s ease !important;
 }
 
-button:not(.primary):not(.nav):not(.token-chip):not(.fz-aurora-audio-btn):not(.option-btn):not(.fz-i):not(.brand-button):not(.icon-button):not(.course-switch-btn):not(.fzb-bug):not(.fzb-exit):not(.kelasku-strip-btn):not(.fz-drawer-toggle):not(.close-btn):not(#modalClose):active,
-.btn:not(.primary):active {
+button:not(.primary):not(.nav):not(.token-chip):not(.fz-aurora-audio-btn):not(.option-btn):not(.fz-i):not(.brand-button):not(.icon-button):not(.course-switch-btn):not(.fzb-bug):not(.fzb-exit):not(.kelasku-strip-btn):not(.fz-drawer-toggle):not(.close-btn):not(#modalClose):not(.hero-cta-btn):not(.bug-raid-btn):not(.class-btn-3d):not(.audio-btn-3d):not(.today-cta-soft):not(.target-lang-chip):not(.btn-class-selector):not(.ch-segbar-btn):not(.ch-tab):not(.progress-tab):not(.active-level-control):not(.ch-btn-kerjakan):not(.ch-btn-mulai):not(.ch-btn-tuntas):active,
+.btn:not(.primary):not(.hero-cta-btn):not(.bug-raid-btn):not(.class-btn-3d):not(.target-lang-chip):not(.ch-btn-kerjakan):not(.ch-btn-mulai):not(.ch-btn-tuntas):active {
   transform: translateY(2px) !important;
   box-shadow: 0 2px 0 var(--card-bevel) !important;
 }
@@ -506,23 +517,93 @@ button.brand-button {
   color: #78350F !important;
 }
 
-/* 11. HEADER WELCOME & STREAK PILLS */
-.fz-welcome-header {
-  margin-bottom: 12px !important;
+/* 11. LUXURY TACTILE CLAY WELCOME BAR */
+.fz-welcome-header.tactile-welcome-bar {
+  margin: 6px 0 16px 0 !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
 }
 
+.tactile-welcome-inner {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  gap: 10px !important;
+}
+
+.tactile-welcome-left {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 3px !important;
+  min-width: 0 !important;
+}
+
+.tactile-kicker-row {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+.tactile-kicker-dot {
+  width: 7px !important;
+  height: 7px !important;
+  border-radius: 50% !important;
+  background: #22C55E !important;
+  box-shadow: 0 0 6px rgba(34, 197, 94, 0.7) !important;
+  display: inline-block !important;
+  flex-shrink: 0 !important;
+}
+
+.tactile-kicker-text {
+  font-family: 'FZ Plus Jakarta Sans', var(--font-sans), sans-serif !important;
+  font-size: 10.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.08em !important;
+  color: #64748B !important;
+  text-transform: uppercase !important;
+}
+
+html body:not(.fz-teacher-mode) .fz-greet-title,
+html body:not(.fz-teacher-mode) .home-today .fz-greet-title,
+html body:not(.fz-teacher-mode) .fz-welcome-header .fz-greet-title,
 .fz-greet-title {
-  font-size: 20px !important;
-  font-weight: 800 !important;
+  font-family: 'FZ Plus Jakarta Sans', var(--font-sans), sans-serif !important;
+  font-size: 24px !important;
+  font-weight: 700 !important;
   color: #0F172A !important;
-  letter-spacing: -0.02em !important;
+  letter-spacing: -0.03em !important;
+  line-height: 1.15 !important;
+  margin: 0 !important;
 }
 
-.fz-greet-motivation {
-  font-size: 13px !important;
-  color: var(--text-sub) !important;
-  font-weight: 600 !important;
-  margin-top: 2px !important;
+.tactile-streak-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  background: #FFFFFF !important;
+  border: 2px solid #FED7AA !important;
+  border-radius: 14px !important;
+  padding: 6px 12px !important;
+  box-shadow: 0 4px 0 #FDBA74, 0 8px 16px rgba(249, 115, 22, 0.08) !important;
+  flex-shrink: 0 !important;
+}
+
+.tactile-streak-val {
+  font-family: 'FZ Plus Jakarta Sans', var(--font-sans), sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  color: #C2410C !important;
+  line-height: 1 !important;
+}
+
+.tactile-streak-lbl {
+  font-family: 'FZ Plus Jakarta Sans', var(--font-sans), sans-serif !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  color: #EA580C !important;
+  letter-spacing: 0.05em !important;
+  line-height: 1 !important;
 }
 
 /* 12. AURORA HERO CARD (WORD OF THE DAY & SESI ADAPTIF) */
@@ -653,13 +734,39 @@ button.brand-button {
   --fz-i-line: #D97706;
 }
 
-/* 14. TOPBAR WORDMARK & ICONS */
-header.topbar {
-  background: rgba(255, 255, 255, 0.95) !important;
+/* 14. TOPBAR: 100% TACTILE CLAY SPECIFICATION */
+header.topbar,
+.topbar {
+  background: rgba(250, 248, 245, 0.96) !important;
   backdrop-filter: blur(16px) !important;
   -webkit-backdrop-filter: blur(16px) !important;
   border-bottom: 2px solid #E2E8F0 !important;
-  box-shadow: 0 4px 0 #CBD5E1 !important;
+  box-shadow: 0 3px 0 #CBD5E1 !important;
+  padding: 10px 14px !important;
+  min-height: 56px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+.topbar .brand-button {
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  display: flex !important;
+  align-items: center !important;
+  cursor: pointer !important;
+}
+
+.topbar .brand-button:active {
+  transform: scale(0.96) !important;
+}
+
+.topbar .brand svg.fiezel-wordmark {
+  width: 98px !important;
+  height: 26px !important;
+  display: block !important;
 }
 
 .topbar .brand svg.fiezel-wordmark text,
@@ -672,12 +779,4109 @@ header.topbar {
   --wordmark-accent-lo: #D97706 !important;
 }
 
-.topbar .icon-button,
+.topbar-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+/* Circular 3D Tactile Buttons in Topbar */
 .topbar .course-switch-btn,
 .topbar #fzCourseSwitchBtn {
-  background: #FFFFFF !important;
-  border: 2px solid #E2E8F0 !important;
-  border-radius: 14px !important;
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+  min-height: 34px !important;
+  border-radius: 50% !important;
+  background: #012169 !important;
+  border: 2px solid #CBD5E1 !important;
   box-shadow: 0 3px 0 #CBD5E1 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  cursor: pointer !important;
+  transition: transform 0.12s ease, box-shadow 0.12s ease !important;
+}
+
+.topbar .course-switch-btn:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 0 #CBD5E1 !important;
+}
+
+.topbar .course-switch-btn:active {
+  transform: translateY(2px) !important;
+  box-shadow: 0 1px 0 #CBD5E1 !important;
+}
+
+.topbar .course-switch-btn .course-switch-flag {
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.topbar .course-switch-btn svg.fiezel-flag-svg {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 50% !important;
+  object-fit: cover !important;
+}
+
+.topbar .icon-button {
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+  min-height: 34px !important;
+  border-radius: 50% !important;
+  background: #FFFFFF !important;
+  border: 1.5px solid var(--card-border, #E2E8F0) !important;
+  box-shadow: 0 3px 0 #CBD5E1 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  color: var(--text-main, #0F172A) !important;
+  cursor: pointer !important;
+  transition: transform 0.12s ease, box-shadow 0.12s ease !important;
+  position: relative !important;
+}
+
+.topbar .icon-button:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 0 #CBD5E1 !important;
+}
+
+.topbar .icon-button:active {
+  transform: translateY(2px) !important;
+  box-shadow: 0 1px 0 #CBD5E1 !important;
+}
+
+.topbar .icon-button svg,
+.topbar .icon-button i {
+  width: 17px !important;
+  height: 17px !important;
+}
+
+.topbar .notif-badge:not(.hidden) {
+  position: absolute !important;
+  top: 4px !important;
+  right: 4px !important;
+  width: 7px !important;
+  height: 7px !important;
+  background: #EF4444 !important;
+  border-radius: 50% !important;
+  border: 1.5px solid #FFFFFF !important;
+}
+
+/* ==========================================================================
+   15. TACTILE CLAY HOME COCKPIT & CARDS (HERO, BUG ARENA, QUICK GRID, KELASKU)
+   ========================================================================== */
+body:has(.home-today) #app,
+#app:has(.home-today) {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+.home-page.home-today,
+.home-today {
+  padding: 10px 12px calc(84px + env(safe-area-inset-bottom, 12px)) 12px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.today-home-cockpit,
+.tactile-home-cockpit {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 14px !important;
+  width: 100% !important;
+  max-width: 460px !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* Hero Quest Card */
+.hero-card {
+  width: 100% !important;
+  max-width: 100% !important;
+  background: #FFFFFF !important;
+  border-radius: 24px !important;
+  border: 2px solid var(--card-border) !important;
+  box-shadow: 0 8px 0 var(--card-bevel), 0 16px 32px rgba(15, 23, 42, 0.06) !important;
+  padding: 16px 14px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 14px !important;
+  position: relative !important;
+  box-sizing: border-box !important;
+}
+
+.hero-header-row {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+}
+
+.hero-tag {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  font-size: 11.5px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase !important;
+  color: #D97706 !important;
+}
+
+.hero-rhythm-badge {
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  color: var(--text-sub) !important;
+  font-family: var(--font-mono) !important;
+}
+
+.hero-rhythm-badge span {
   color: #0F172A !important;
 }
+
+/* 3D Progress Track */
+.hero-progress-track {
+  width: 100% !important;
+  height: 12px !important;
+  background: #EEF2F6 !important;
+  border-radius: 9999px !important;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.06) !important;
+  overflow: hidden !important;
+  padding: 2px !important;
+  box-sizing: border-box !important;
+}
+
+.hero-progress-fill {
+  height: 100% !important;
+  background: linear-gradient(90deg, #F59E0B, #FFD21E) !important;
+  border-radius: 9999px !important;
+  box-shadow: 0 2px 6px rgba(245, 158, 11, 0.4) !important;
+  position: relative !important;
+  transition: width 0.5s var(--ease-bounce) !important;
+}
+
+.hero-progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 1px;
+  left: 4px;
+  right: 4px;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.55);
+  border-radius: 9999px;
+}
+
+/* Word of the Day Micro-Learning Tile */
+.hero-micro-bite {
+  background: #F8FAFC !important;
+  border: 1.5px solid #E2E8F0 !important;
+  border-radius: 16px !important;
+  padding: 12px 14px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+}
+
+.micro-text-group {
+  flex: 1 !important;
+  min-width: 0 !important;
+}
+
+.micro-word-title {
+  display: flex !important;
+  align-items: baseline !important;
+  gap: 6px !important;
+}
+
+.word-en {
+  font-size: 16.5px !important;
+  font-weight: 800 !important;
+  color: #0F172A !important;
+}
+
+.word-ipa {
+  font-size: 12.5px !important;
+  font-family: var(--font-mono) !important;
+  color: var(--sky-blue) !important;
+  font-weight: 700 !important;
+}
+
+.word-id {
+  font-size: 12px !important;
+  color: var(--text-sub) !important;
+  margin-top: 2px !important;
+}
+
+.adaptive-sub {
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  color: #92400E !important;
+  background: #FEF3C7 !important;
+  border: 1px solid #FDE68A !important;
+  border-radius: 6px !important;
+  padding: 2px 7px !important;
+  margin-top: 4px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  width: fit-content !important;
+}
+
+/* 3D Audio Button */
+.audio-btn-3d {
+  background: #FFFFFF !important;
+  border: 2px solid #BAE6FD !important;
+  color: var(--sky-blue) !important;
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 14px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  box-shadow: 0 4px 0 #BAE6FD !important;
+  transition: all 0.12s !important;
+  flex-shrink: 0 !important;
+}
+
+.audio-btn-3d:active {
+  transform: translateY(3px) !important;
+  box-shadow: 0 1px 0 #BAE6FD !important;
+}
+
+.waveform-bars {
+  display: flex !important;
+  align-items: center !important;
+  gap: 2.5px !important;
+  height: 10px !important;
+  margin-top: 2px !important;
+}
+
+.waveform-bar {
+  width: 2.5px !important;
+  background: var(--sky-blue) !important;
+  border-radius: 2px !important;
+  height: 3px !important;
+  transition: height 0.15s ease !important;
+}
+
+/* Chunky Tactile 3D Action CTA (Solar Gold Clay) */
+button.hero-cta-btn,
+.hero-cta-btn {
+  width: 100% !important;
+  background: linear-gradient(180deg, #FFE054 0%, #FFB703 100%) !important;
+  background-color: #FFD21E !important;
+  color: #2E1800 !important;
+  font-family: var(--font-sans) !important;
+  font-size: 14.5px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.02em !important;
+  border: none !important;
+  border-radius: 18px !important;
+  padding: 15px 18px !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  box-shadow: 0 5px 0 #D97706, 0 12px 24px rgba(255, 183, 3, 0.35) !important;
+  position: relative !important;
+  transition: all 0.12s ease-out !important;
+  box-sizing: border-box !important;
+}
+
+button.hero-cta-btn::before,
+.hero-cta-btn::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 2px !important;
+  left: 12px !important;
+  right: 12px !important;
+  height: 4px !important;
+  background: rgba(255, 255, 255, 0.55) !important;
+  border-radius: 9999px !important;
+}
+
+button.hero-cta-btn:hover,
+.hero-cta-btn:hover {
+  filter: brightness(1.04) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 7px 0 var(--gold-bevel), 0 16px 28px rgba(255, 183, 3, 0.4) !important;
+}
+
+button.hero-cta-btn:active,
+.hero-cta-btn:active {
+  transform: translateY(4px) !important;
+  box-shadow: 0 1px 0 var(--gold-bevel), 0 4px 10px rgba(255, 183, 3, 0.2) !important;
+}
+
+/* Bug Arena (Tactical Boss Raid) */
+.bug-arena-card {
+  width: 100% !important;
+  max-width: 100% !important;
+  background: #FFFFFF !important;
+  border: 2px solid var(--card-border) !important;
+  border-radius: 24px !important;
+  padding: 16px 14px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  box-shadow: 0 6px 0 var(--card-bevel), 0 14px 28px rgba(15, 23, 42, 0.04) !important;
+  box-sizing: border-box !important;
+}
+
+.bug-arena-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+}
+
+.arena-title-wrap {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.arena-title {
+  font-size: 13.5px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+  color: #0F172A !important;
+}
+
+.arena-count-badge {
+  background: #FEE2E2 !important;
+  border: 1.5px solid #FCA5A5 !important;
+  color: #B91C1C !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  padding: 3px 10px !important;
+  border-radius: 9999px !important;
+  box-shadow: 0 2px 0 #FCA5A5 !important;
+}
+
+/* Bug List Items */
+.bug-items-stack {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 9px !important;
+}
+
+.bug-row {
+  background: #F8FAFC !important;
+  border: 1.5px solid var(--card-border) !important;
+  border-radius: 16px !important;
+  padding: 11px 14px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+  cursor: pointer !important;
+  box-shadow: 0 3px 0 #E2E8F0 !important;
+  transition: all 0.15s !important;
+}
+
+.bug-row:hover {
+  border-color: #CBD5E1 !important;
+  transform: translateY(-1px) !important;
+}
+
+.bug-row:active {
+  transform: translateY(2px) !important;
+  box-shadow: 0 1px 0 #E2E8F0 !important;
+}
+
+.bug-row-top {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+}
+
+.bug-name {
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  color: #0F172A !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.bug-hp-pill {
+  font-family: var(--font-mono) !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  padding: 2px 8px !important;
+  border-radius: 6px !important;
+}
+
+.bug-hp-pill.crimson {
+  color: #B91C1C !important;
+  background: #FEE2E2 !important;
+  border: 1px solid #FCA5A5 !important;
+}
+
+.bug-hp-pill.gold {
+  color: #B45309 !important;
+  background: #FEF3C7 !important;
+  border: 1px solid #FDE68A !important;
+}
+
+.bug-summary {
+  font-size: 11.5px !important;
+  color: var(--text-sub) !important;
+  line-height: 1.35 !important;
+}
+
+/* HP Gauge 3D */
+.hp-bar-track {
+  width: 100% !important;
+  height: 7px !important;
+  background: #E2E8F0 !important;
+  border-radius: 9999px !important;
+  overflow: hidden !important;
+  padding: 1px !important;
+  box-sizing: border-box !important;
+}
+
+.hp-bar-fill {
+  height: 100% !important;
+  border-radius: 9999px !important;
+  transition: width 0.5s ease !important;
+}
+
+.hp-bar-fill.crimson {
+  width: 82%;
+  background: linear-gradient(90deg, #F87171, #EF4444) !important;
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.4) !important;
+}
+
+.hp-bar-fill.gold {
+  width: 60%;
+  background: linear-gradient(90deg, #FDE047, #EAB308) !important;
+  box-shadow: 0 2px 4px rgba(234, 179, 8, 0.4) !important;
+}
+
+/* Panel Eliminasi 5 Bug Hari Ini: Kartu Hitam + Tulisan Kuning Cerah + Shadow Putih Gading */
+button.bug-raid-btn,
+.bug-raid-btn {
+  width: 100% !important;
+  background: var(--card-black) !important;
+  background-color: #0B0F17 !important;
+  border: 2px solid var(--yellow-bright) !important;
+  color: var(--yellow-bright) !important;
+  font-family: var(--font-sans) !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  padding: 13px 16px !important;
+  border-radius: 16px !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 9px !important;
+  box-shadow: 0 5px 0 var(--shadow-ivory), 0 10px 20px rgba(11, 15, 23, 0.15) !important;
+  transition: all 0.12s !important;
+  box-sizing: border-box !important;
+}
+
+button.bug-raid-btn:hover,
+.bug-raid-btn:hover {
+  background: #131926 !important;
+  border-color: #FFD21E !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 0 var(--shadow-ivory), 0 12px 24px rgba(11, 15, 23, 0.2) !important;
+}
+
+button.bug-raid-btn:active,
+.bug-raid-btn:active {
+  transform: translateY(3px) !important;
+  box-shadow: 0 1px 0 var(--shadow-ivory) !important;
+}
+
+/* Quick Practice Head & Headline */
+.quick-practice-head {
+  width: 100% !important;
+  display: block !important;
+  margin-bottom: 6px !important;
+}
+
+.section-headline {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  width: 100% !important;
+  margin-top: 2px !important;
+}
+
+.section-title {
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase !important;
+  color: #0F172A !important;
+}
+
+.section-see-all {
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  color: var(--sky-blue) !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+}
+
+/* Tactile Language Shortcut Banner */
+button.target-lang-chip,
+.target-lang-chip {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  width: 100% !important;
+  margin: 0 0 10px 0 !important;
+  padding: 10px 14px !important;
+  border-radius: 16px !important;
+  background: #F8FAFC !important;
+  border: 1.5px solid var(--card-border) !important;
+  box-shadow: 0 3px 0 #E2E8F0 !important;
+  cursor: pointer !important;
+  text-align: left !important;
+  transition: all 0.12s ease !important;
+  box-sizing: border-box !important;
+}
+
+button.target-lang-chip:hover,
+.target-lang-chip:hover {
+  border-color: #CBD5E1 !important;
+  transform: translateY(-1px) !important;
+}
+
+button.target-lang-chip:active,
+.target-lang-chip:active {
+  transform: translateY(2px) !important;
+  box-shadow: 0 1px 0 #E2E8F0 !important;
+}
+
+.target-lang-chip .chip-ja-badge {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 10px !important;
+  background: #EEF2FF !important;
+  border: 1.5px solid #C7D2FE !important;
+  box-shadow: 0 2px 0 #C7D2FE !important;
+  color: #4F46E5 !important;
+  font-family: var(--font-sans) !important;
+  font-weight: 800 !important;
+  font-size: 15px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+}
+
+.target-lang-chip .chip-label {
+  font-weight: 800 !important;
+  font-size: 12.5px !important;
+  color: var(--text-main) !important;
+  display: block !important;
+}
+
+.target-lang-chip .chip-sub {
+  font-size: 11px !important;
+  color: var(--text-sub) !important;
+  font-weight: 600 !important;
+  display: block !important;
+}
+
+.target-lang-chip .chip-go {
+  color: var(--sky-blue) !important;
+  width: 18px !important;
+  height: 18px !important;
+  flex-shrink: 0 !important;
+}
+
+.quick-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 11px !important;
+}
+
+.grid-tile {
+  background: #FFFFFF !important;
+  border: 2px solid var(--card-border) !important;
+  border-radius: 20px !important;
+  padding: 14px 13px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  box-shadow: 0 5px 0 var(--card-bevel), 0 10px 20px rgba(15, 23, 42, 0.04) !important;
+  cursor: pointer !important;
+  transition: all 0.15s !important;
+}
+
+.grid-tile:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 7px 0 var(--card-bevel), 0 14px 24px rgba(15, 23, 42, 0.06) !important;
+}
+
+.grid-tile:active {
+  transform: translateY(3px) !important;
+  box-shadow: 0 2px 0 var(--card-bevel) !important;
+}
+
+.tile-top {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+}
+
+.tile-icon-3d {
+  width: 42px !important;
+  height: 42px !important;
+  border-radius: 14px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.tile-icon-3d.vocab { 
+  background: #E0F2FE !important; 
+  border: 1.5px solid #BAE6FD !important; 
+  box-shadow: 0 3px 0 #BAE6FD !important;
+}
+.tile-icon-3d.grammar { 
+  background: #EEF2FF !important; 
+  border: 1.5px solid #C7D2FE !important; 
+  box-shadow: 0 3px 0 #C7D2FE !important;
+}
+.tile-icon-3d.reading { 
+  background: #DCFCE7 !important; 
+  border: 1.5px solid #BBF7D0 !important; 
+  box-shadow: 0 3px 0 #BBF7D0 !important;
+}
+.tile-icon-3d.listening { 
+  background: #FEF3C7 !important; 
+  border: 1.5px solid #FDE68A !important; 
+  box-shadow: 0 3px 0 #FDE68A !important;
+}
+
+.tile-badge {
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  color: var(--text-muted) !important;
+  text-transform: uppercase !important;
+  background: #F1F5F9 !important;
+  padding: 3px 8px !important;
+  border-radius: 9999px !important;
+}
+
+.tile-name {
+  font-size: 13.5px !important;
+  font-weight: 800 !important;
+  color: #0F172A !important;
+}
+
+.tile-meta {
+  font-size: 11.5px !important;
+  color: var(--text-sub) !important;
+  font-weight: 600 !important;
+}
+
+/* Classroom Task Banner */
+.class-bar {
+  background: #FFFFFF !important;
+  border: 2px solid var(--kelasku-emerald-border) !important;
+  border-radius: 20px !important;
+  padding: 13px 15px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  box-shadow: 0 5px 0 var(--kelasku-emerald-border), 0 12px 24px rgba(31, 122, 99, 0.08) !important;
+  position: relative !important;
+  cursor: pointer !important;
+}
+
+.class-left {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+.class-icon-wrap {
+  width: 42px !important;
+  height: 42px !important;
+  border-radius: 13px !important;
+  background: var(--kelasku-emerald-soft) !important;
+  border: 1.5px solid var(--kelasku-emerald-border) !important;
+  box-shadow: 0 3px 0 var(--kelasku-emerald-bevel) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+}
+
+.class-info {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+}
+
+.class-badge-brand {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  line-height: 1 !important;
+}
+
+.class-badge-brand .kelasku-wordmark {
+  font-size: 13px !important;
+}
+
+.class-badge-dot {
+  font-size: 8px !important;
+  color: #94A3B8 !important;
+}
+
+.class-badge-tag {
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  color: var(--kelasku-emerald) !important;
+  background: var(--kelasku-emerald-soft) !important;
+  padding: 1px 6px !important;
+  border-radius: 9999px !important;
+  letter-spacing: 0.03em !important;
+}
+
+.class-title {
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  color: #0F172A !important;
+  line-height: 1.25 !important;
+}
+
+.class-due {
+  font-size: 11px !important;
+  color: var(--kelasku-emerald-dark) !important;
+  font-weight: 700 !important;
+}
+
+button.class-btn-3d,
+.class-btn-3d {
+  background: linear-gradient(180deg, #248F74 0%, #1F7A63 100%) !important;
+  background-color: #1F7A63 !important;
+  color: #FFFFFF !important;
+  border: none !important;
+  font-family: inherit !important;
+  font-size: 11.5px !important;
+  font-weight: 800 !important;
+  padding: 9px 15px !important;
+  border-radius: 9999px !important;
+  cursor: pointer !important;
+  box-shadow: 0 3px 0 var(--kelasku-emerald-deep), 0 6px 14px rgba(31, 122, 99, 0.35) !important;
+  transition: all 0.12s !important;
+  white-space: nowrap !important;
+}
+
+button.class-btn-3d:active,
+.class-btn-3d:active {
+  transform: translateY(2px) !important;
+  box-shadow: 0 1px 0 var(--kelasku-emerald-deep) !important;
+}
+
+/* ==========================================================================
+   UNIVERSAL MOBILE EDGE-TO-EDGE & TACTILE CLAY SHELL
+   ========================================================================== */
+#app,
+.app {
+  width: 100% !important;
+  max-width: 440px !important;
+  margin: 0 auto !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.home-today,
+section.fade,
+#fzClassHub,
+.classroom-page,
+.progress-page,
+.profile-page,
+.ch-student {
+  width: 100% !important;
+  max-width: 440px !important;
+  margin: 0 auto !important;
+  padding-left: 12px !important;
+  padding-right: 12px !important;
+  box-sizing: border-box !important;
+}
+
+/* Universal Section Headers */
+.section-head,
+.latihan-hero-header,
+.kelasku-hero-header,
+.progres-hero-header,
+.profile-hero-header {
+  padding: 6px 4px 14px 4px !important;
+  margin: 0 !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+html body:not(.fz-teacher-mode) h1,
+html body:not(.fz-teacher-mode) h2,
+html body:not(.fz-teacher-mode) h3,
+html body:not(.fz-teacher-mode) .section-head h1,
+.section-head h1,
+.latihan-title,
+.kelasku-brand-title,
+.progres-title,
+.profile-title,
+h1 {
+  font-family: var(--font-sans) !important;
+  font-size: 26px !important;
+  font-weight: 700 !important;
+  color: #0F172A !important;
+  letter-spacing: -0.025em !important;
+  line-height: 1.15 !important;
+  margin: 0 0 3px 0 !important;
+}
+
+html body:not(.fz-teacher-mode) .section-head h1::after,
+.section-head h1::after {
+  display: none !important;
+}
+
+.section-head p,
+.latihan-subtitle,
+.kelasku-subtitle,
+.progres-subtitle,
+.profile-subtitle {
+  font-family: var(--font-sans) !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: #64748B !important;
+  line-height: 1.4 !important;
+  margin: 0 !important;
+}
+
+/* Universal Tactile Clay Level Control Banner */
+.section-head .active-level-control,
+.latihan-level-card,
+.practice-level-banner {
+  background: #FFFFFF !important;
+  border: 2px solid var(--card-border, #E2E8F0) !important;
+  border-radius: 20px !important;
+  padding: 10px 14px !important;
+  box-shadow: 0 4px 0 var(--card-bevel, #CBD5E1), 0 10px 20px rgba(15, 23, 42, 0.04) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  margin: 10px 0 16px 0 !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.section-head .active-level-control span:first-child,
+.level-label {
+  font-family: var(--font-sans) !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  color: #64748B !important;
+}
+
+.section-head .active-level-control b,
+.section-head .active-level-control .active-level-val,
+.level-pill-badge {
+  background: #0B0F17 !important;
+  color: #FFE600 !important;
+  font-family: var(--font-mono), 'JetBrains Mono', monospace !important;
+  font-size: 16px !important;
+  font-weight: 800 !important;
+  padding: 3px 12px !important;
+  border-radius: 10px !important;
+  letter-spacing: 0.04em !important;
+  box-shadow: 0 2px 0 #CBD5E1 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.section-head .active-level-control button,
+.btn-ganti-level {
+  background: #F8FAFC !important;
+  border: 1.5px solid #CBD5E1 !important;
+  border-radius: 12px !important;
+  padding: 5px 12px !important;
+  font-family: var(--font-sans) !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  color: #334155 !important;
+  box-shadow: 0 2px 0 #CBD5E1 !important;
+  cursor: pointer !important;
+  transition: all 0.12s ease !important;
+}
+
+.section-head .active-level-control button:hover,
+.btn-ganti-level:hover {
+  background: #F1F5F9 !important;
+  color: #0F172A !important;
+}
+
+/* TAB LATIHAN (LATIHAN HUB) TACTILE CLAY */
+.continue-learning-card {
+  background: #0B0F17 !important;
+  border: 2px solid #1A2234 !important;
+  border-radius: 22px !important;
+  padding: 16px !important;
+  box-shadow: 0 5px 0 #E2D7BC, 0 16px 28px rgba(15, 23, 42, 0.12) !important;
+  color: #FFFFFF !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  margin-bottom: 16px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  cursor: pointer !important;
+}
+
+.continue-card-body {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 3px !important;
+  text-align: left !important;
+}
+
+.continue-card-body small:first-child {
+  color: #FFE600 !important;
+  font-family: var(--font-sans) !important;
+  font-size: 10.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+}
+
+.continue-card-body b {
+  color: #FFFFFF !important;
+  font-family: var(--font-sans) !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.01em !important;
+}
+
+.continue-card-body small:last-child {
+  color: #94A3B8 !important;
+  font-family: var(--font-sans) !important;
+  font-size: 11.5px !important;
+  font-weight: 500 !important;
+}
+
+.continue-card-btn {
+  background: linear-gradient(180deg, #FFE054, #FFB703) !important;
+  border: 1.5px solid #D97706 !important;
+  border-radius: 14px !important;
+  padding: 9px 16px !important;
+  font-family: var(--font-sans) !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  color: #2E1800 !important;
+  box-shadow: 0 3px 0 #D97706 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  flex-shrink: 0 !important;
+}
+
+.learning-launcher {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 12px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.launch-card {
+  background: #FFFFFF !important;
+  border: 2px solid var(--card-border, #E2E8F0) !important;
+  border-radius: 22px !important;
+  padding: 16px 14px !important;
+  box-shadow: 0 5px 0 var(--card-bevel, #CBD5E1), 0 12px 24px rgba(15, 23, 42, 0.04) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  min-height: 146px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  text-align: left !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+  position: relative !important;
+}
+
+.launch-card:hover {
+  border-color: #CBD5E1 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 7px 0 var(--card-bevel, #CBD5E1), 0 16px 28px rgba(15, 23, 42, 0.06) !important;
+}
+
+.launch-card:active {
+  transform: translateY(3px) !important;
+  box-shadow: 0 2px 0 var(--card-bevel, #CBD5E1) !important;
+}
+
+.launch-card .launch-icon {
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 14px !important;
+  background: #F8FAFC !important;
+  border: 1.5px solid #E2E8F0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-bottom: 8px !important;
+}
+
+.launch-card b {
+  font-family: var(--font-sans) !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  color: #0F172A !important;
+  display: block !important;
+  line-height: 1.25 !important;
+}
+
+.launch-card small {
+  font-family: var(--font-sans) !important;
+  font-size: 11.5px !important;
+  font-weight: 500 !important;
+  color: #64748B !important;
+  display: block !important;
+  margin-top: 2px !important;
+}
+
+.launch-card [data-lucide="arrow-up-right"] {
+  position: absolute !important;
+  top: 14px !important;
+  right: 14px !important;
+  color: #94A3B8 !important;
+}
+
+/* TAB KELASKU (CLASSROOM HUB) TACTILE CLAY */
+#fzClassHub,
+.ch-student {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.ch-head {
+  padding: 6px 4px 14px 4px !important;
+  border: none !important;
+  background: transparent !important;
+}
+
+.ch-head h1,
+.ch-head [data-testid="class-hub-title"] {
+  font-family: var(--font-sans) !important;
+  font-size: 26px !important;
+  font-weight: 700 !important;
+  color: #0F172A !important;
+  letter-spacing: -0.025em !important;
+}
+
+.ch-head [data-testid="class-hub-title"] .kelasku-wordmark {
+  color: var(--kelasku-emerald, #1F7A63) !important;
+}
+
+.ch-nav,
+.task-filter-row {
+  display: flex !important;
+  gap: 8px !important;
+  overflow-x: auto !important;
+  scrollbar-width: none !important;
+  margin: 10px 0 16px 0 !important;
+  padding: 4px 0 !important;
+}
+
+.ch-nav button,
+.task-filter-chip {
+  background: #FFFFFF !important;
+  border: 1.5px solid #CBD5E1 !important;
+  border-radius: 9999px !important;
+  padding: 7px 16px !important;
+  font-family: var(--font-sans) !important;
+  font-size: 12.5px !important;
+  font-weight: 700 !important;
+  color: #334155 !important;
+  box-shadow: 0 3px 0 #CBD5E1 !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+  transition: all 0.12s ease !important;
+}
+
+.ch-nav button.active,
+.task-filter-chip.active {
+  background: var(--kelasku-emerald, #1F7A63) !important;
+  color: #FFFFFF !important;
+  border-color: #0F372D !important;
+  box-shadow: 0 3px 0 #0F372D !important;
+}
+
+.ch-card,
+.ch-empty,
+.ch-join-card,
+.teacher-broadcast-card {
+  background: #FFFFFF !important;
+  border: 2px solid var(--card-border, #E2E8F0) !important;
+  border-radius: 22px !important;
+  box-shadow: 0 5px 0 var(--card-bevel, #CBD5E1), 0 12px 24px rgba(15, 23, 42, 0.04) !important;
+  padding: 18px 16px !important;
+  margin-bottom: 14px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.ch-join-card button,
+.btn-task-action {
+  background: linear-gradient(180deg, #248F74, #1F7A63) !important;
+  color: #FFFFFF !important;
+  border: 1.5px solid #0F372D !important;
+  border-radius: 14px !important;
+  padding: 10px 20px !important;
+  font-family: var(--font-sans) !important;
+  font-size: 13.5px !important;
+  font-weight: 700 !important;
+  box-shadow: 0 4px 0 #0F372D !important;
+  cursor: pointer !important;
+}
+
+/* TAB PROGRES (PROGRESS PASSPORT) TACTILE CLAY */
+.stat-grid,
+.progress-stats-grid,
+.progres-grid-4 {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 12px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  margin: 12px 0 16px 0 !important;
+}
+
+.stat-card,
+.stat-grid > div,
+.progress-stats-grid > div {
+  background: #FFFFFF !important;
+  border: 2px solid var(--card-border, #E2E8F0) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 4px 0 var(--card-bevel, #CBD5E1), 0 10px 20px rgba(15, 23, 42, 0.03) !important;
+  padding: 14px 16px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  min-height: 88px !important;
+  text-align: left !important;
+  box-sizing: border-box !important;
+}
+
+.stat-card b,
+.stat-grid b,
+.progress-stats-grid b {
+  font-family: var(--font-mono), 'JetBrains Mono', monospace !important;
+  font-size: 24px !important;
+  font-weight: 700 !important;
+  color: #0F172A !important;
+  line-height: 1.1 !important;
+  display: block !important;
+}
+
+.stat-card small,
+.stat-grid small,
+.progress-stats-grid small {
+  font-family: var(--font-sans) !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: #64748B !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  display: block !important;
+  margin-bottom: 4px !important;
+}
+
+.progres-hero-card {
+  background: #FFFFFF !important;
+  border: 2px solid var(--card-border, #E2E8F0) !important;
+  border-radius: 24px !important;
+  padding: 18px !important;
+  box-shadow: 0 5px 0 var(--card-bevel, #CBD5E1) !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  margin-bottom: 14px !important;
+}
+
+.progres-track {
+  width: 100% !important;
+  height: 12px !important;
+  background: #E2E8F0 !important;
+  border-radius: 999px !important;
+  overflow: hidden !important;
+  position: relative !important;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.06) !important;
+  margin: 10px 0 !important;
+}
+
+.progres-fill-candy {
+  height: 100% !important;
+  border-radius: 999px !important;
+  background: linear-gradient(90deg, #FFD21E 0%, #10B981 100%) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.4) !important;
+}
+
+/* =========================================================================
+   TAB PROFIL TACTILE CLAY DESIGN SYSTEM (100% COCKPIT MATCH)
+   ========================================================================= */
+#viewProfile {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 14px !important;
+  padding: 0 0 24px 0 !important;
+  width: 100% !important;
+}
+
+/* 1. Profile Hero Card */
+.profile-hero-card,
+.profile-card {
+  background: #FFFFFF !important;
+  border: 2px solid var(--card-border, #E2E8F0) !important;
+  border-radius: 24px !important;
+  padding: 18px !important;
+  box-shadow: 0 5px 0 var(--card-bevel, #CBD5E1), 0 14px 28px rgba(15, 23, 42, 0.04) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 16px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  margin-bottom: 14px !important;
+}
+
+.profile-user-top {
+  display: flex !important;
+  align-items: center !important;
+  gap: 14px !important;
+}
+
+.profile-avatar-wrap {
+  position: relative !important;
+  flex-shrink: 0 !important;
+}
+
+.profile-avatar-tactile {
+  width: 64px !important;
+  height: 64px !important;
+  border-radius: 22px !important;
+  background: linear-gradient(135deg, #0284C7 0%, #0369A1 100%) !important;
+  border: 2.5px solid #FFFFFF !important;
+  box-shadow: 0 4px 0 #075985, 0 10px 18px rgba(2, 132, 199, 0.25) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #FFFFFF !important;
+  font-size: 24px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.02em !important;
+}
+
+.profile-status-dot {
+  position: absolute !important;
+  bottom: -2px !important;
+  right: -2px !important;
+  width: 16px !important;
+  height: 16px !important;
+  border-radius: 50% !important;
+  background: #10B981 !important;
+  border: 2.5px solid #FFFFFF !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.12) !important;
+}
+
+.profile-user-info {
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 3px !important;
+  min-width: 0 !important;
+}
+
+.profile-name-row {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 6px !important;
+}
+
+.profile-fullname {
+  font-size: 18px !important;
+  font-weight: 800 !important;
+  color: #0F172A !important;
+  line-height: 1.2 !important;
+}
+
+.profile-btn-edit {
+  background: #F1F5F9 !important;
+  border: 1.5px solid #CBD5E1 !important;
+  border-radius: 10px !important;
+  padding: 4px 10px !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  color: #334155 !important;
+  cursor: pointer !important;
+  box-shadow: 0 2px 0 #CBD5E1 !important;
+  transition: all 0.12s ease !important;
+}
+
+.profile-btn-edit:active {
+  transform: translateY(2px) !important;
+  box-shadow: none !important;
+}
+
+.profile-handle {
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: #64748B !important;
+  font-family: var(--font-mono, monospace) !important;
+}
+
+.profile-badges-row {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  margin-top: 4px !important;
+  flex-wrap: wrap !important;
+}
+
+.profile-level-chip {
+  background: #EFF6FF !important;
+  border: 1px solid #BFDBFE !important;
+  color: #1D4ED8 !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  padding: 2px 8px !important;
+  border-radius: 6px !important;
+}
+
+.profile-school-chip {
+  background: #ECFDF5 !important;
+  border: 1px solid #A7F3D0 !important;
+  color: #047857 !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  padding: 2px 8px !important;
+  border-radius: 6px !important;
+}
+
+/* 3-Stat Tactile Blocks */
+.profile-stats-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 8px !important;
+}
+
+.profile-stat-box {
+  background: #F8FAFC !important;
+  border: 1.5px solid #E2E8F0 !important;
+  border-radius: 16px !important;
+  padding: 10px 8px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  text-align: center !important;
+  gap: 2px !important;
+  box-shadow: 0 3px 0 #CBD5E1 !important;
+}
+
+.profile-stat-val {
+  font-family: var(--font-mono, monospace) !important;
+  font-size: 16px !important;
+  font-weight: 800 !important;
+  color: #0F172A !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 3px !important;
+}
+
+.profile-stat-lbl {
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  color: #64748B !important;
+}
+
+/* 2. KelasKu Enrolled School Card */
+.profile-kelasku-card {
+  background: #FFFFFF !important;
+  border: 2px solid #A7F3D0 !important;
+  border-radius: 22px !important;
+  padding: 16px !important;
+  box-shadow: 0 4px 0 #6EE7B7, 0 10px 20px rgba(16, 185, 129, 0.06) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  margin-bottom: 14px !important;
+}
+
+.kelasku-head-row {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+.kelasku-badge-online {
+  font-size: 10.5px !important;
+  font-weight: 800 !important;
+  color: #047857 !important;
+  background: #D1FAE5 !important;
+  padding: 3px 8px !important;
+  border-radius: 6px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+}
+
+.kelasku-title-wrap {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+.kelasku-icon-circle {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 12px !important;
+  background: #DDEFE7 !important;
+  border: 1.5px solid #1F7A63 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+}
+
+.kelasku-info-content {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+}
+
+.kelasku-class-name {
+  font-size: 15px !important;
+  font-weight: 800 !important;
+  color: #064E3B !important;
+}
+
+.kelasku-teacher-sub {
+  font-size: 11.5px !important;
+  font-weight: 600 !important;
+  color: #059669 !important;
+}
+
+.kelasku-code-bar {
+  background: #F0FDF4 !important;
+  border: 1px dashed #86EFAC !important;
+  border-radius: 12px !important;
+  padding: 8px 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+.code-label-group {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.code-txt {
+  font-family: var(--font-mono, monospace) !important;
+  font-size: 13.5px !important;
+  font-weight: 800 !important;
+  color: #065F46 !important;
+  letter-spacing: 0.05em !important;
+}
+
+.btn-copy-code {
+  background: #FFFFFF !important;
+  border: 1px solid #86EFAC !important;
+  border-radius: 8px !important;
+  padding: 3px 8px !important;
+  font-size: 10.5px !important;
+  font-weight: 800 !important;
+  color: #047857 !important;
+  cursor: pointer !important;
+  box-shadow: 0 2px 0 #A7F3D0 !important;
+  transition: all 0.1s ease !important;
+}
+
+.btn-copy-code:active {
+  transform: translateY(1px) !important;
+  box-shadow: none !important;
+}
+
+/* 3. Section Cards (Goals, Settings, Account) */
+.profile-section-card {
+  background: #FFFFFF !important;
+  border: 2px solid var(--card-border, #E2E8F0) !important;
+  border-radius: 22px !important;
+  padding: 16px !important;
+  box-shadow: 0 5px 0 var(--card-bevel, #CBD5E1), 0 14px 28px rgba(15, 23, 42, 0.04) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 14px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  margin-bottom: 14px !important;
+}
+
+.section-card-header {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+}
+
+.section-card-header.is-collapsible {
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+  cursor: pointer !important;
+  user-select: none !important;
+}
+
+.header-text-group {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+  flex: 1 !important;
+  min-width: 0 !important;
+}
+
+.header-action-group {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  flex-shrink: 0 !important;
+}
+
+.btn-card-collapse {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 10px !important;
+  background: #F1F5F9 !important;
+  border: 1.5px solid #CBD5E1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #475569 !important;
+  cursor: pointer !important;
+  box-shadow: 0 2px 0 #CBD5E1 !important;
+  transition: all 0.15s ease !important;
+  flex-shrink: 0 !important;
+}
+
+.btn-card-collapse:hover {
+  background: #E2E8F0 !important;
+  color: #0F172A !important;
+}
+
+.btn-card-collapse:active {
+  transform: translateY(2px) !important;
+  box-shadow: none !important;
+}
+
+.chevron-icon {
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+.profile-section-card.is-collapsed .chevron-icon {
+  transform: rotate(180deg) !important;
+}
+
+.card-collapsed-pill {
+  display: none !important;
+  font-size: 10.5px !important;
+  font-weight: 700 !important;
+  color: #0284C7 !important;
+  background: #E0F2FE !important;
+  padding: 3px 8px !important;
+  border-radius: 6px !important;
+  border: 1px solid #BAE6FD !important;
+}
+
+.profile-section-card.is-collapsed .card-collapsed-pill {
+  display: inline-block !important;
+}
+
+.section-card-body {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 14px !important;
+  transition: all 0.2s ease !important;
+}
+
+.profile-section-card.is-collapsed .section-card-body {
+  display: none !important;
+}
+
+.section-card-title {
+  font-size: 15px !important;
+  font-weight: 800 !important;
+  color: #0F172A !important;
+}
+
+.section-card-desc {
+  font-size: 11.5px !important;
+  font-weight: 600 !important;
+  color: #64748B !important;
+}
+
+/* Goal Pills Selector */
+.goal-pills-row {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 8px !important;
+}
+
+.goal-pill-btn {
+  background: #F8FAFC !important;
+  border: 1.5px solid #E2E8F0 !important;
+  border-radius: 14px !important;
+  padding: 10px 6px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 3px !important;
+  cursor: pointer !important;
+  box-shadow: 0 3px 0 #CBD5E1 !important;
+  transition: all 0.12s ease !important;
+}
+
+.goal-pill-btn:hover {
+  border-color: #CBD5E1 !important;
+}
+
+.goal-pill-btn.active {
+  background: #0B0F17 !important;
+  border-color: #0B0F17 !important;
+  box-shadow: 0 3px 0 #E2D7BC !important;
+}
+
+.goal-pill-btn.active .goal-time {
+  color: #FFE600 !important;
+}
+
+.goal-pill-btn.active .goal-label {
+  color: #F8FAFC !important;
+}
+
+.goal-time {
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  color: #0F172A !important;
+}
+
+.goal-label {
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  color: #64748B !important;
+}
+
+/* Setting Row Items */
+.setting-row-item {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  padding: 6px 0 !important;
+  border-bottom: 1px solid #F1F5F9 !important;
+}
+
+.setting-row-item:last-child {
+  border-bottom: none !important;
+  padding-bottom: 0 !important;
+}
+
+.setting-left-col {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+  flex: 1 !important;
+}
+
+.setting-item-name {
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  color: #0F172A !important;
+}
+
+.setting-item-desc {
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  color: #64748B !important;
+}
+
+/* Tactile Toggle Switch */
+.tactile-toggle {
+  position: relative !important;
+  width: 44px !important;
+  height: 26px !important;
+  flex-shrink: 0 !important;
+}
+
+.tactile-toggle input {
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.tactile-slider {
+  position: absolute !important;
+  cursor: pointer !important;
+  top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
+  background: #E2E8F0 !important;
+  border-radius: 999px !important;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1) !important;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+.tactile-slider:before {
+  position: absolute !important;
+  content: "" !important;
+  height: 20px !important;
+  width: 20px !important;
+  left: 3px !important;
+  bottom: 3px !important;
+  background: #FFFFFF !important;
+  border-radius: 50% !important;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2) !important;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+.tactile-toggle input:checked + .tactile-slider {
+  background: #10B981 !important;
+}
+
+.tactile-toggle input:checked + .tactile-slider:before {
+  transform: translateX(18px) !important;
+}
+
+/* Speed Selector Pills */
+.speed-pills-wrap {
+  display: flex !important;
+  background: #F1F5F9 !important;
+  border: 1px solid #CBD5E1 !important;
+  border-radius: 12px !important;
+  padding: 3px !important;
+  gap: 3px !important;
+}
+
+.speed-btn {
+  background: transparent !important;
+  border: none !important;
+  border-radius: 9px !important;
+  padding: 5px 10px !important;
+  font-family: var(--font-mono, monospace) !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  color: #64748B !important;
+  cursor: pointer !important;
+  transition: all 0.12s ease !important;
+}
+
+.speed-btn.active {
+  background: #FFFFFF !important;
+  color: #0F172A !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.08) !important;
+}
+
+/* Synchronize & Safe Anonymous ID */
+.profile-sync-box {
+  background: #F8FAFC !important;
+  border: 1.5px solid #E2E8F0 !important;
+  border-radius: 16px !important;
+  padding: 12px 14px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+}
+
+.sync-status-row {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  color: #047857 !important;
+}
+
+.sync-id-row {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+}
+
+.sync-id-val {
+  font-family: var(--font-mono, monospace) !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  color: #334155 !important;
+  background: #FFFFFF !important;
+  padding: 4px 10px !important;
+  border-radius: 8px !important;
+  border: 1px solid #CBD5E1 !important;
+  letter-spacing: 0.04em !important;
+}
+
+/* Action Buttons in Profile */
+.profile-action-btn {
+  width: 100% !important;
+  background: #F8FAFC !important;
+  border: 1.5px solid #CBD5E1 !important;
+  border-radius: 14px !important;
+  padding: 12px 16px !important;
+  font-family: var(--font-sans, sans-serif) !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  color: #1E293B !important;
+  box-shadow: 0 3px 0 #CBD5E1 !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  transition: all 0.12s ease !important;
+}
+
+.profile-action-btn:active {
+  transform: translateY(2px) !important;
+  box-shadow: none !important;
+}
+
+.profile-action-btn.secondary {
+  background: #FFFFFF !important;
+  border-color: #E2E8F0 !important;
+  color: #475569 !important;
+}
+
+.profile-action-btn.danger {
+  background: #FEF2F2 !important;
+  border-color: #FECACA !important;
+  color: #DC2626 !important;
+  box-shadow: 0 3px 0 #FCA5A5 !important;
+}
+
+/* Profile Footer Version */
+.profile-version-foot {
+  text-align: center !important;
+  padding: 10px 0 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 3px !important;
+}
+
+.version-stamp {
+  font-family: var(--font-mono, monospace) !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: #64748B !important;
+}
+
+.version-desc {
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  color: #94A3B8 !important;
+}
+
+/* ==========================================================================
+   TACTILE CLAY MASTER OVERRIDES: TOPBAR, TABS, LAUNCH CARDS & PANELS
+   ========================================================================== */
+
+/* 1. TOPBAR WORDMARK & EQUALIZER ANIMATION */
+:root, body, header.topbar, .topbar, #fzTopMark {
+  --wordmark-ink-hi: #0F172A !important;
+  --wordmark-ink-lo: #020617 !important;
+  --wordmark-accent-hi: #FFE054 !important;
+  --wordmark-accent-lo: #FF9E00 !important;
+}
+
+header.topbar .brand svg.fiezel-wordmark,
+.topbar .brand svg.fiezel-wordmark {
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,0.06));
+}
+
+.fz-eq-bar-1 {
+  transform-origin: 205px 230px;
+  animation: fzEq1Pulse 2.2s ease-in-out infinite !important;
+}
+.fz-eq-bar-2 {
+  transform-origin: 253px 230px;
+  animation: fzEq2Pulse 2.2s ease-in-out infinite 0.35s !important;
+}
+@keyframes fzEq1Pulse {
+  0%, 100% { transform: scaleY(1); }
+  38% { transform: scaleY(0.72); }
+  72% { transform: scaleY(1.06); }
+}
+@keyframes fzEq2Pulse {
+  0%, 100% { transform: scaleY(1); }
+  42% { transform: scaleY(1.42); }
+  78% { transform: scaleY(0.86); }
+}
+
+/* 2. UNIVERSAL ANTI-MAROON & LUXURY OBSIDIAN HEADERS */
+html body:not(.fz-teacher-mode) #app h1,
+html body:not(.fz-teacher-mode) #app h2,
+html body:not(.fz-teacher-mode) #app h3,
+html body:not(.fz-teacher-mode) #app h4,
+html body:not(.fz-teacher-mode) #app .section-head h1,
+html body:not(.fz-teacher-mode) #app .section-title,
+html body:not(.fz-teacher-mode) #app .quick-practice-title,
+html body:not(.fz-teacher-mode) #app .arena-title,
+html body:not(.fz-teacher-mode) #app .latihan-title,
+html body:not(.fz-teacher-mode) #app .cat-title,
+html body:not(.fz-teacher-mode) .section-head h1,
+.section-head h1,
+.quick-practice-title,
+.latihan-title {
+  color: #0F172A !important;
+  font-family: 'FZ Plus Jakarta Sans', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-weight: 800 !important;
+  text-shadow: none !important;
+}
+
+.section-head h1::after,
+.section-title::after,
+h1::after {
+  display: none !important;
+}
+
+/* 3. HIGH-SPECIFICITY OVERRIDES FOR LAUNCH CARDS IN TAB LATIHAN */
+html body:not(.fz-teacher-mode) #app .launch-card,
+html body #app .launch-card,
+.launch-card {
+  background: #FFFFFF !important;
+  border: 2px solid #E2E8F0 !important;
+  border-radius: 22px !important;
+  box-shadow: 0 5px 0 #CBD5E1, 0 10px 22px rgba(15, 23, 42, 0.04) !important;
+  padding: 15px 14px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  min-height: 140px !important;
+  text-align: left !important;
+  cursor: pointer !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease !important;
+  position: relative !important;
+}
+
+html body:not(.fz-teacher-mode) #app .launch-card:hover,
+.launch-card:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 7px 0 #CBD5E1, 0 14px 28px rgba(15, 23, 42, 0.07) !important;
+  border-color: #CBD5E1 !important;
+}
+
+html body:not(.fz-teacher-mode) #app .launch-card:active,
+.launch-card:active {
+  transform: translateY(3px) !important;
+  box-shadow: 0 2px 0 #CBD5E1 !important;
+}
+
+html body:not(.fz-teacher-mode) #app .launch-card b,
+html body #app .launch-card b,
+.launch-card b {
+  font-size: 14.5px !important;
+  line-height: 1.25 !important;
+  color: #0F172A !important;
+  font-weight: 800 !important;
+  display: block !important;
+  margin-top: 4px !important;
+}
+
+html body:not(.fz-teacher-mode) #app .launch-card small,
+html body #app .launch-card small,
+.launch-card small {
+  font-size: 11.5px !important;
+  color: #64748B !important;
+  font-weight: 600 !important;
+  display: block !important;
+}
+
+html body:not(.fz-teacher-mode) #app .launch-card .launch-icon,
+.launch-card .launch-icon {
+  width: 42px !important;
+  height: 42px !important;
+  border-radius: 14px !important;
+  background: #E0F2FE !important;
+  border: 1.5px solid #BAE6FD !important;
+  box-shadow: 0 3px 0 #BAE6FD !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-bottom: 8px !important;
+}
+
+html body:not(.fz-teacher-mode) #app .launch-card:has([data-fz-icon="vocab"]) .launch-icon {
+  background: #E0F2FE !important; border-color: #BAE6FD !important; box-shadow: 0 3px 0 #BAE6FD !important;
+  --fz-i-fill: #38BDF8 !important; --fz-i-line: #0369A1 !important;
+}
+html body:not(.fz-teacher-mode) #app .launch-card:has([data-fz-icon="grammar"]) .launch-icon {
+  background: #EEF2FF !important; border-color: #C7D2FE !important; box-shadow: 0 3px 0 #C7D2FE !important;
+  --fz-i-fill: #818CF8 !important; --fz-i-line: #4F46E5 !important;
+}
+html body:not(.fz-teacher-mode) #app .launch-card:has([data-fz-icon="reading"]) .launch-icon {
+  background: #DCFCE7 !important; border-color: #BBF7D0 !important; box-shadow: 0 3px 0 #BBF7D0 !important;
+  --fz-i-fill: #4ADE80 !important; --fz-i-line: #15803D !important;
+}
+html body:not(.fz-teacher-mode) #app .launch-card:has([data-fz-icon="skills"]) .launch-icon,
+html body:not(.fz-teacher-mode) #app .launch-card:has([data-fz-icon="speaking"]) .launch-icon {
+  background: #FEF3C7 !important; border-color: #FDE68A !important; box-shadow: 0 3px 0 #FDE68A !important;
+  --fz-i-fill: #FBBF24 !important; --fz-i-line: #B45309 !important;
+}
+html body:not(.fz-teacher-mode) #app .launch-card:has([data-fz-icon="writing"]) .launch-icon {
+  background: #FFEDD5 !important; border-color: #FED7AA !important; box-shadow: 0 3px 0 #FDBA74 !important;
+  --fz-i-fill: #FB923C !important; --fz-i-line: #C2410C !important;
+}
+html body:not(.fz-teacher-mode) #app .launch-card:has([data-fz-icon="library"]) .launch-icon {
+  background: #F1F5F9 !important; border-color: #CBD5E1 !important; box-shadow: 0 3px 0 #94A3B8 !important;
+  --fz-i-fill: #64748B !important; --fz-i-line: #334155 !important;
+}
+
+/* 4. TACTILE CLAY TABS STRIP (PROGRES, KELASKU, PROFIL) */
+html body #app .progress-tabs,
+html body .progress-tabs,
+.progress-tabs,
+html body #app .ch-tabs,
+html body .ch-tabs,
+.ch-tabs,
+html body #app .sub-nav,
+.sub-nav {
+  background: #F1F5F9 !important;
+  border: 1.5px solid #CBD5E1 !important;
+  border-radius: 9999px !important;
+  box-shadow: 0 2px 0 #CBD5E1 !important;
+  padding: 4px !important;
+  display: flex !important;
+  gap: 6px !important;
+  margin: 10px 0 16px 0 !important;
+  overflow-x: auto !important;
+  scrollbar-width: none !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+html body #app .progress-tabs::-webkit-scrollbar,
+.progress-tabs::-webkit-scrollbar {
+  display: none !important;
+}
+
+html body #app .progress-tab,
+html body .progress-tab,
+.progress-tab {
+  background: transparent !important;
+  color: #475569 !important;
+  font-family: 'FZ Plus Jakarta Sans', 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  border: none !important;
+  border-radius: 9999px !important;
+  padding: 8px 16px !important;
+  box-shadow: none !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+  white-space: nowrap !important;
+  flex: 1 1 0 !important;
+}
+
+html body #app .progress-tab.active,
+html body #app .progress-tab[aria-selected="true"],
+html body .progress-tab.active,
+.progress-tab.active,
+.progress-tab[aria-selected="true"] {
+  background: #0B0F17 !important;
+  color: #FFE600 !important;
+  font-weight: 800 !important;
+  box-shadow: 0 2px 0 #CBD5E1 !important;
+}
+
+/* KELASKU SUBTABS (Tugas | Hasilku | Kelas Saya) - Symmetrical 3-Column Grid */
+html body #app .ch-tabs,
+html body .ch-tabs,
+.ch-tabs {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 4px !important;
+  padding: 4px !important;
+  background: #E2E8F0 !important;
+  border: none !important;
+  border-radius: 9999px !important;
+  box-shadow: none !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  margin: 6px 0 12px 0 !important;
+  overflow: visible !important;
+}
+
+html body #app .ch-tab,
+html body .ch-tab,
+.ch-tab {
+  width: 100% !important;
+  flex: 1 1 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  padding: 7px 6px !important;
+  font-family: 'FZ Plus Jakarta Sans', 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+  color: #64748B !important;
+  border: none !important;
+  border-radius: 9999px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+  transition: all 0.15s ease !important;
+  box-sizing: border-box !important;
+}
+
+html body #app .ch-tab.is-active,
+html body .ch-tab.is-active,
+.ch-tab.is-active {
+  background: #FFFFFF !important;
+  color: #0F172A !important;
+  font-weight: 800 !important;
+  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.08) !important;
+}
+
+html body #app .ch-tab .ch-badge,
+html body .ch-tab .ch-badge,
+.ch-tab .ch-badge,
+.ch-tab-badge {
+  background: #FEE2E2 !important;
+  color: #EF4444 !important;
+  border: none !important;
+  outline: none !important;
+  border-radius: 9999px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  padding: 1px 6.5px !important;
+  margin-left: 6px !important;
+  min-width: 17px !important;
+  height: 17px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+  box-shadow: none !important;
+}
+
+/* 5. KELASKU REFINED CLAY CARDS (Compact, Sleek, Precision) */
+html body #app .ch-card,
+html body #app .ch-link-card,
+.ch-card, .ch-link-card {
+  background: #FFFFFF !important;
+  border: 1.5px solid #E2E8F0 !important;
+  border-radius: 18px !important;
+  color: #0F172A !important;
+  box-shadow: 0 3px 0 #CBD5E1, 0 8px 18px rgba(15, 23, 42, 0.04) !important;
+  padding: 13px 14px !important;
+  margin-bottom: 10px !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+}
+
+html body #app .ch-card h2,
+html body #app .ch-card h3,
+.ch-card h2, .ch-card h3 {
+  color: #0F172A !important;
+  font-weight: 800 !important;
+  font-size: 14px !important;
+  margin: 0 0 4px 0 !important;
+}
+
+/* Compact streak card (Belum belajar hari ini) */
+html body #app .ch-card.ch-streak-card,
+.ch-card.ch-streak-card {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 12px !important;
+  padding: 11px 13px !important;
+  border-radius: 16px !important;
+  background: #FFFFFF !important;
+  border: 1.5px solid #E2E8F0 !important;
+  box-shadow: 0 3px 0 #CBD5E1, 0 6px 14px rgba(15, 23, 42, 0.03) !important;
+  margin-bottom: 10px !important;
+}
+
+.ch-streak-emoji {
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px !important;
+  border-radius: 10px !important;
+  background: #F8FAFC !important;
+  border: 1px solid #E2E8F0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 16px !important;
+  line-height: 1 !important;
+}
+
+.ch-streak-info {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+  min-width: 0 !important;
+}
+
+.ch-streak-info b {
+  font-family: var(--font-sans), 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 13.5px !important;
+  font-weight: 800 !important;
+  color: #0F172A !important;
+  line-height: 1.2 !important;
+  display: block !important;
+}
+
+.ch-streak-info span {
+  font-family: var(--font-sans), 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  color: #64748B !important;
+  line-height: 1.25 !important;
+  display: block !important;
+}
+
+/* 3-Column KPI Stat Grid in Hasilku */
+html body #app .ch-kpis,
+.ch-kpis {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 8px !important;
+  margin-bottom: 10px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+html body #app .ch-kpi,
+.ch-kpi {
+  background: #F8FAFC !important;
+  border: 1.5px solid #E2E8F0 !important;
+  border-radius: 14px !important;
+  box-shadow: 0 2px 0 #CBD5E1 !important;
+  padding: 8px 6px !important;
+  margin-bottom: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  gap: 2px !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+html body #app .ch-kpi b,
+.ch-kpi b {
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 18px !important;
+  font-weight: 800 !important;
+  color: #0F172A !important;
+  line-height: 1.15 !important;
+  display: block !important;
+}
+
+html body #app .ch-kpi span,
+.ch-kpi span {
+  font-family: var(--font-sans), 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 10.5px !important;
+  font-weight: 600 !important;
+  color: #64748B !important;
+  line-height: 1.2 !important;
+  display: block !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  max-width: 100% !important;
+}
+
+/* Nested KPI inside cards (e.g. Minggu Ini) */
+html body #app .ch-card .ch-kpi,
+.ch-card .ch-kpi {
+  background: #F1F5F9 !important;
+  border: 1px solid #CBD5E1 !important;
+  box-shadow: 0 1.5px 0 #CBD5E1 !important;
+  padding: 7px 6px !important;
+  border-radius: 12px !important;
+}
+
+.ch-head {
+  margin-bottom: 8px !important;
+  padding: 0 2px !important;
+}
+.ch-head h1 {
+  font-size: 20px !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.02em !important;
+  line-height: 1.2 !important;
+  color: #0F172A !important;
+  margin: 0 0 2px 0 !important;
+}
+.ch-head .ch-sub {
+  font-size: 12px !important;
+  color: #64748B !important;
+  font-weight: 500 !important;
+  line-height: 1.3 !important;
+}
+
+.ch-kicker {
+  font-family: var(--font-sans), 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 10.5px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  color: #64748B !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  margin: 0 0 6px 0 !important;
+}
+
+html body #app .ch-card.ch-empty,
+.ch-card.ch-empty {
+  background: #F8FAFC !important;
+  border: 1.5px dashed #CBD5E1 !important;
+  border-radius: 18px !important;
+  padding: 22px 14px !important;
+  color: #475569 !important;
+  text-align: center !important;
+  box-shadow: none !important;
+  margin-bottom: 10px !important;
+}
+
+html body #app .ch-card.ch-empty p,
+.ch-card.ch-empty p {
+  color: #64748B !important;
+  font-size: 12.5px !important;
+  line-height: 1.35 !important;
+  max-width: 30ch !important;
+  margin: 0 auto !important;
+}
+
+html body #app .ch-btn.is-primary,
+.ch-btn.is-primary,
+html body #app .ch-card .ch-btn,
+.ch-card .ch-btn {
+  background: linear-gradient(180deg, #248F74 0%, #1F7A63 100%) !important;
+  color: #FFFFFF !important;
+  font-family: 'FZ Plus Jakarta Sans', 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  border: none !important;
+  border-radius: 9999px !important;
+  padding: 10px 20px !important;
+  box-shadow: 0 3px 0 #0F372D, 0 6px 14px rgba(31, 122, 99, 0.25) !important;
+  cursor: pointer !important;
+  transition: transform 0.12s, box-shadow 0.12s !important;
+}
+html body #app .ch-btn.is-primary:active,
+.ch-btn.is-primary:active {
+  transform: translateY(2px) !important;
+  box-shadow: 0 1px 0 #0F372D !important;
+}
+
+/* 6. LEVEL CONTROL BANNER: HIGH CONTRAST DARK BADGE WITH YELLOW A1 */
+html body #app .active-level-control,
+.active-level-control {
+  background: #FFFFFF !important;
+  border: 2px solid #E2E8F0 !important;
+  border-radius: 20px !important;
+  padding: 10px 16px !important;
+  box-shadow: 0 4px 0 #CBD5E1, 0 10px 20px rgba(15, 23, 42, 0.04) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  margin: 10px 0 16px 0 !important;
+}
+
+html body #app .active-level-control span:first-child,
+.active-level-control span:first-child {
+  font-family: 'FZ Plus Jakarta Sans', 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  color: #64748B !important;
+}
+
+html body #app .active-level-control b,
+html body #app .active-level-control .active-level-val,
+.active-level-control b {
+  background: #0B0F17 !important;
+  color: #FFE600 !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 16px !important;
+  font-weight: 800 !important;
+  padding: 4px 14px !important;
+  border-radius: 12px !important;
+  letter-spacing: 0.04em !important;
+  box-shadow: 0 2px 0 #CBD5E1 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* 7. ACTIVE LEVEL CONTROL PILL */
+html body #app .active-level-control,
+html body .active-level-control,
+.active-level-control {
+  background: #FFFFFF !important;
+  border: 2px solid #E2E8F0 !important;
+  box-shadow: 0 4px 0 #CBD5E1 !important;
+  border-radius: 18px !important;
+  padding: 12px 18px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  cursor: pointer !important;
+  margin-bottom: 16px !important;
+  transition: transform 0.12s ease, box-shadow 0.12s ease !important;
+}
+
+.active-level-control:active {
+  transform: translateY(2px) !important;
+  box-shadow: 0 2px 0 #CBD5E1 !important;
+}
+
+.active-level-control span {
+  font-family: var(--font-sans), 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 13.5px !important;
+  font-weight: 700 !important;
+  color: #475569 !important;
+}
+
+.active-level-control strong {
+  font-family: var(--font-sans), 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 22px !important;
+  font-weight: 800 !important;
+  color: #D97706 !important;
+  letter-spacing: -0.02em !important;
+}
+
+.active-level-control small {
+  background: #FEF3C7 !important;
+  border: 1.5px solid #FDE68A !important;
+  border-radius: 9999px !important;
+  padding: 4px 12px !important;
+  font-family: var(--font-sans), 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  color: #B45309 !important;
+  box-shadow: 0 2px 0 #F59E0B !important;
+}
+
+/* 8. PROGRES 2x2 TACTILE STAT GRID & GEM CARD */
+html body #app .progress-stats,
+.progress-stats {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 10px !important;
+}
+
+html body #app .progress-stats > div,
+.progress-stats > div {
+  background: #0B0F17 !important;
+  border: 1.5px solid #1E293B !important;
+  border-radius: 18px !important;
+  padding: 14px 12px !important;
+  text-align: center !important;
+  box-shadow: 0 4px 0 #020617, 0 8px 16px rgba(0,0,0,0.12) !important;
+}
+
+html body #app .progress-stats > div small,
+.progress-stats > div small {
+  color: #94A3B8 !important;
+  font-size: 10.5px !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  display: block !important;
+  margin-bottom: 4px !important;
+}
+
+html body #app .progress-stats > div b,
+.progress-stats > div b {
+  color: #FFFFFF !important;
+  font-size: 20px !important;
+  font-weight: 800 !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  display: block !important;
+}
+
+/* GEM Card: Luxury Warm Gold Clay with High Contrast */
+html body #app .progress-stats > div.stat-gem-span,
+html body .stat-gem-span,
+.progress-stats > div.stat-gem-span,
+.stat-gem-span {
+  grid-column: 1 / -1 !important;
+  background: #FFFBEB !important;
+  border: 2px solid #FDE68A !important;
+  border-radius: 18px !important;
+  box-shadow: 0 4px 0 #F59E0B !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 12px 18px !important;
+}
+
+html body #app .progress-stats > div.stat-gem-span small,
+html body .stat-gem-span small,
+.stat-gem-span small {
+  color: #B45309 !important;
+  font-family: var(--font-sans), 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.06em !important;
+  margin: 0 !important;
+  display: inline-block !important;
+}
+
+html body #app .progress-stats > div.stat-gem-span strong,
+html body #app .progress-stats > div.stat-gem-span b,
+html body .stat-gem-span strong,
+html body .stat-gem-span b,
+.stat-gem-span strong,
+.stat-gem-span b {
+  color: #92400E !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 1.4rem !important;
+  font-weight: 800 !important;
+  margin: 0 !important;
+  display: inline-block !important;
+}
+
+/* 9. TACTILE CLAY LEVEL ROADMAP (CEFR LADDER [A1] [A2] [B1] [B2] [C1] [C2]) */
+html body #app .fz2-level.card,
+html body .fz2-level.card,
+.fz2-level.card {
+  background: #FFFFFF !important;
+  border: 2px solid #E2E8F0 !important;
+  border-radius: 24px !important;
+  box-shadow: 0 6px 0 #CBD5E1, 0 14px 28px rgba(15, 23, 42, 0.05) !important;
+  padding: 20px !important;
+  position: relative !important;
+}
+
+html body #app .fz2-level-head,
+.fz2-level-head {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  margin-bottom: 8px !important;
+}
+
+html body #app .fz2-level-head .eyebrow,
+.fz2-level-head .eyebrow {
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  color: #64748B !important;
+}
+
+html body #app .fz2-level-big,
+.fz2-level-big {
+  display: none !important;
+}
+
+html body #app .fz2-level-lead,
+.fz2-level-lead {
+  font-family: var(--font-sans), 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  color: #0F172A !important;
+  line-height: 1.45 !important;
+  margin-bottom: 12px !important;
+}
+
+html body #app .fz2-lvls,
+html body .fz2-lvls,
+.fz2-lvls,
+.card .fz2-lvls {
+  display: flex !important;
+  gap: 8px !important;
+  margin-top: 16px !important;
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+html body #app .fz2-lvl::before,
+html body .fz2-lvl::before,
+.fz2-lvl::before {
+  display: none !important;
+}
+
+/* Inactive Level Pills: High Contrast, Crisp Slate Keys */
+html body #app .fz2-lvls span,
+html body #app .fz2-lvl,
+html body .fz2-lvls span,
+html body .fz2-lvl,
+.fz2-lvls span,
+.fz2-lvl,
+.card .fz2-lvls span,
+.card .fz2-lvl {
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 44px !important;
+  padding: 0 4px !important;
+  background: #F8FAFC !important;
+  border: 2px solid #CBD5E1 !important;
+  border-radius: 14px !important;
+  box-shadow: 0 3px 0 #94A3B8 !important;
+  color: #1E293B !important;
+  font-family: var(--font-sans), 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.01em !important;
+  text-shadow: none !important;
+  transition: all 0.15s ease !important;
+}
+
+/* Active Level Pill: Radiant Solar Gold Clay Key */
+html body #app .fz2-lvls span.is-now,
+html body #app .fz2-lvl.is-now,
+html body .fz2-lvls span.is-now,
+html body .fz2-lvl.is-now,
+.fz2-lvls span.is-now,
+.fz2-lvl.is-now,
+.card .fz2-lvls span.is-now,
+.card .fz2-lvl.is-now,
+.card div > span.fz2-lvl.is-now,
+.card div > span.is-now,
+.card .fz2-lvls .is-now {
+  background: linear-gradient(180deg, #FEF08A 0%, #FACC15 100%) !important;
+  border: 2px solid #CA8A04 !important;
+  box-shadow: 0 4px 0 #A16207, 0 6px 14px rgba(202, 138, 4, 0.28) !important;
+  color: #713F12 !important;
+  font-weight: 800 !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Completed Level Pill: Emerald Clay Key */
+html body #app .fz2-lvls span.is-done,
+html body #app .fz2-lvl.is-done,
+html body .fz2-lvls span.is-done,
+html body .fz2-lvl.is-done,
+.fz2-lvls span.is-done,
+.fz2-lvl.is-done,
+.card .fz2-lvls span.is-done,
+.card .fz2-lvl.is-done,
+.card div > span.fz2-lvl.is-done {
+  background: linear-gradient(180deg, #D1FAE5 0%, #A7F3D0 100%) !important;
+  border: 2px solid #059669 !important;
+  box-shadow: 0 3px 0 #047857 !important;
+  color: #064E3B !important;
+  font-weight: 800 !important;
+}
+
+/* 10. KELASKU TOPBAR BRAND & CLASS SELECTOR */
+body.fz-view-classroom header.topbar #topBrandWrap,
+body.fz-view-classroom header.topbar .brand-button,
+body.fz-view-classroom header.topbar #topGamifyCluster,
+body.fz-view-classroom header.topbar .topbar-actions {
+  display: none !important;
+}
+
+body.fz-view-classroom header.topbar #topBrandKelasKu {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  cursor: pointer !important;
+}
+
+body.fz-view-classroom header.topbar #topKelasKuCluster {
+  display: flex !important;
+  align-items: center !important;
+}
+
+.kelasku-top-brand .kelasku-wordmark {
+  font-family: var(--font-sans), 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 23px !important;
+  font-weight: 800 !important;
+  color: var(--kelasku-emerald, #1F7A63) !important;
+  letter-spacing: -0.025em !important;
+  line-height: 1 !important;
+}
+
+.kelasku-top-brand .kelasku-brand-tag {
+  font-family: var(--font-sans), 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  color: #065F46 !important;
+  background: #D1FAE5 !important;
+  border: 1px solid #A7F3D0 !important;
+  padding: 2px 7px !important;
+  border-radius: 6px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.04em !important;
+}
+
+.btn-class-selector {
+  background: #FFFFFF !important;
+  border: 2px solid var(--kelasku-emerald-border, #A9D5CA) !important;
+  border-radius: 9999px !important;
+  padding: 6px 14px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+  font-family: var(--font-sans), 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  color: var(--kelasku-emerald-dark, #166052) !important;
+  box-shadow: 0 3px 0 var(--kelasku-emerald-bevel, #7CBBAE) !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  width: auto !important;
+  flex-shrink: 0 !important;
+  line-height: 1 !important;
+  transition: all 0.12s !important;
+}
+
+.btn-class-selector svg {
+  flex-shrink: 0 !important;
+  width: 16px !important;
+  height: 16px !important;
+}
+
+.btn-class-selector span {
+  white-space: nowrap !important;
+  line-height: 1 !important;
+}
+
+.btn-class-selector:hover {
+  background: var(--kelasku-emerald-tint, #F2F9F6) !important;
+}
+
+.btn-class-selector:active {
+  transform: translateY(2px) !important;
+  box-shadow: 0 1px 0 var(--kelasku-emerald-bevel, #7CBBAE) !important;
+}
+
+/* 11. KELASKU FILTER BAR (SEGBAR - Exact Mockup Alignment) */
+html body #app .ch-segbar,
+html body .ch-segbar,
+.ch-segbar {
+  display: flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  margin: 10px 0 14px 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
+}
+
+html body #app .ch-segbar .ch-segbar-btn,
+html body .ch-segbar .ch-segbar-btn,
+.ch-segbar .ch-segbar-btn {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0 !important;
+  background: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+  border-radius: 9999px !important;
+  padding: 5px 8px !important;
+  font-family: var(--font-sans), 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 10.5px !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  color: #334155 !important;
+  white-space: nowrap !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+}
+
+html body #app .ch-segbar .ch-segbar-btn.is-active,
+html body .ch-segbar .ch-segbar-btn.is-active,
+.ch-segbar .ch-segbar-btn.is-active {
+  background: #0F172A !important;
+  color: #FFFFFF !important;
+  border: 1px solid #0F172A !important;
+  font-weight: 800 !important;
+  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.15) !important;
+}
+
+html body #app .ch-segbar .ch-segbar-btn[style*="display:none"],
+html body .ch-segbar .ch-segbar-btn[style*="display:none"],
+.ch-segbar .ch-segbar-btn[style*="display:none"] {
+  display: none !important;
+}
+
+html body #app .ch-segbar .ch-segbar-n,
+html body .ch-segbar .ch-segbar-n,
+.ch-segbar-n {
+  display: inline !important;
+  color: inherit !important;
+  background: transparent !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  font-size: inherit !important;
+  font-weight: inherit !important;
+  border: none !important;
+  box-shadow: none !important;
+  min-width: 0 !important;
+}
+
+html body #app .ch-segbar .ch-btn-archive,
+html body .ch-segbar .ch-btn-archive,
+.ch-segbar .ch-btn-archive {
+  margin-left: auto !important;
+  width: 28px !important;
+  height: 28px !important;
+  padding: 0 !important;
+  border-radius: 8px !important;
+  border: 1px solid #E2E8F0 !important;
+  background: #FFFFFF !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* 12. KELASKU ANNOUNCEMENT CARD (Bu Sari) */
+html body #app .ch-greeting-card,
+.ch-greeting-card {
+  background: #F0FDF4 !important;
+  border: 1.5px solid #86EFAC !important;
+  border-radius: 18px !important;
+  padding: 12px 14px !important;
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.06), 0 2px 0 #BBF7D0 !important;
+  margin-bottom: 12px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+.ch-greeting-top {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 10px !important;
+}
+.ch-greeting-avatar-wrap {
+  position: relative !important;
+  flex-shrink: 0 !important;
+}
+.ch-greeting-avatar {
+  width: 38px !important;
+  height: 38px !important;
+  border-radius: 50% !important;
+  background: #047857 !important;
+  color: #FFFFFF !important;
+  font-size: 13.5px !important;
+  font-weight: 800 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  letter-spacing: 0.02em !important;
+}
+.ch-greeting-dot {
+  position: absolute !important;
+  bottom: -1px !important;
+  right: -1px !important;
+  width: 11px !important;
+  height: 11px !important;
+  border-radius: 50% !important;
+  background: #10B981 !important;
+  border: 2px solid #FFFFFF !important;
+}
+.ch-greeting-body {
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+}
+.ch-greeting-header-row {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  margin-bottom: 5px !important;
+}
+.ch-greeting-author {
+  font-size: 13.5px !important;
+  font-weight: 800 !important;
+  color: #0F172A !important;
+}
+.ch-greeting-role {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: #059669 !important;
+}
+.ch-greeting-bubble {
+  background: #FFFFFF !important;
+  border: 1px solid #BBF7D0 !important;
+  border-radius: 12px !important;
+  padding: 8px 12px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  color: #1E293B !important;
+  line-height: 1.4 !important;
+}
+.ch-greeting-time {
+  color: #059669 !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  margin-top: 5px !important;
+}
+
+/* 13. KELASKU TASK ITEMS (Precise 3-Column Layout) */
+html body #app .ch-task-item,
+.ch-task-item {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding: 10px 12px !important;
+  border-radius: 16px !important;
+  background: #FFFFFF !important;
+  border: 1.5px solid #E2E8F0 !important;
+  box-shadow: 0 2px 0 #CBD5E1, 0 4px 10px rgba(15, 23, 42, 0.03) !important;
+  margin-bottom: 9px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+.ch-task-date {
+  width: 44px !important;
+  height: 48px !important;
+  border-radius: 12px !important;
+  background: #FFFFFF !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+}
+.ch-task-date.is-red {
+  background: #FFF1F2 !important;
+  border: 1.5px solid #FECDD3 !important;
+}
+.ch-task-date.is-red .ch-task-day,
+.ch-task-date.is-red .ch-task-num {
+  color: #E11D48 !important;
+}
+.ch-task-date.is-amber {
+  background: #FFFBEB !important;
+  border: 1.5px solid #FDE68A !important;
+}
+.ch-task-date.is-amber .ch-task-day,
+.ch-task-date.is-amber .ch-task-num {
+  color: #D97706 !important;
+}
+.ch-task-date.is-green {
+  background: #F0FDF4 !important;
+  border: 1.5px solid #BBF7D0 !important;
+}
+.ch-task-date.is-green .ch-task-day,
+.ch-task-date.is-green .ch-task-num {
+  color: #059669 !important;
+}
+.ch-task-day {
+  font-size: 9px !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  line-height: 1 !important;
+  margin-bottom: 1px !important;
+}
+.ch-task-num {
+  font-size: 17px !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+}
+.ch-task-body {
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+}
+.ch-task-tag {
+  font-size: 9px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.03em !important;
+  text-transform: uppercase !important;
+  margin-bottom: 2px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+.ch-task-tag.is-purple { color: #4F46E5 !important; }
+.ch-task-tag.is-amber { color: #D97706 !important; }
+.ch-task-tag.is-green { color: #059669 !important; }
+.ch-task-title {
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  color: #0F172A !important;
+  margin: 0 0 2px !important;
+  line-height: 1.25 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+.ch-task-meta {
+  font-size: 10px !important;
+  font-weight: 500 !important;
+  color: #64748B !important;
+  margin: 0 !important;
+  line-height: 1.2 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+.ch-task-action {
+  flex-shrink: 0 !important;
+  margin-left: auto !important;
+}
+html body #app .ch-task-action button.ch-btn-kerjakan,
+html body #app .ch-btn-kerjakan,
+button.ch-btn-kerjakan,
+.ch-btn-kerjakan {
+  background: #F59E0B !important;
+  color: #0F172A !important;
+  font-family: var(--font-sans), 'Plus Jakarta Sans', sans-serif !important;
+  font-weight: 700 !important;
+  font-size: 11px !important;
+  border-radius: 9999px !important;
+  padding: 6px 12px !important;
+  border: none !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 3px !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+}
+.ch-btn-kerjakan:active {
+  transform: translateY(1px) !important;
+}
+html body #app .ch-task-action button.ch-btn-mulai,
+html body #app .ch-btn-mulai,
+button.ch-btn-mulai,
+.ch-btn-mulai {
+  background: #FEF3C7 !important;
+  color: #92400E !important;
+  font-family: var(--font-sans), 'Plus Jakarta Sans', sans-serif !important;
+  font-weight: 700 !important;
+  font-size: 11px !important;
+  border-radius: 9999px !important;
+  padding: 6px 12px !important;
+  border: 1px solid #FDE68A !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 3px !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+}
+.ch-btn-mulai:active {
+  transform: translateY(1px) !important;
+}
+html body #app .ch-task-action .ch-btn-tuntas,
+html body #app .ch-btn-tuntas,
+.ch-btn-tuntas {
+  background: #DCFCE7 !important;
+  color: #16A34A !important;
+  font-family: var(--font-sans), 'Plus Jakarta Sans', sans-serif !important;
+  font-weight: 700 !important;
+  font-size: 11px !important;
+  border-radius: 9999px !important;
+  padding: 5px 12px !important;
+  border: 1px solid #86EFAC !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 3px !important;
+  white-space: nowrap !important;
+}
+
+/* 14. TOPBAR GAMIFY PILLS (Streak & XP) */
+.topbar-gamify-pills {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+.topbar-pill {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  background: #FFFFFF !important;
+  border: 1.5px solid #E2E8F0 !important;
+  border-radius: 9999px !important;
+  padding: 4px 10px !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  color: #0F172A !important;
+  box-shadow: 0 2px 0 #E2E8F0 !important;
+  line-height: 1 !important;
+}
+.topbar-pill-icon {
+  font-size: 13px !important;
+  line-height: 1 !important;
+}
+
+/* 15. PROFILE & KELASKU PRESENTATION (Exact Mockup Alignment) */
+html body.fz-view-profile #app .progress-tabs,
+html body.fz-view-profile .progress-tabs,
+body.fz-view-profile .progress-tabs,
+body.fz-view-profile nav.progress-tabs,
+body.fz-view-profile .section-head,
+body.fz-view-profile .active-level-control,
+body.fz-view-profile #cardIdPribadi,
+body.fz-view-profile #cardSuaraAudio,
+body.fz-view-profile .profile-section-card:not(#cardTargetHarian),
+body.fz-view-profile .btn-card-collapse,
+body.fz-view-profile .card-collapsed-pill,
+body.fz-view-profile .topbar-actions > button[onclick="openSettings()"],
+body.fz-view-classroom .topbar-actions > button[onclick="openSettings()"] {
+  display: none !important;
+}
+
+html body.fz-view-profile header.topbar,
+body.fz-view-profile header.topbar {
+  display: none !important;
+}
+
+body.fz-view-profile #app {
+  padding-top: 14px !important;
+}
+
+/* Zero newspaper disclaimer text - keep UI ultra-clean and modern */
+html body.fz-view-profile .section-card-desc,
+body.fz-view-profile .section-card-desc,
+html body.fz-view-profile .setting-item-desc,
+body.fz-view-profile .setting-item-desc,
+html body.fz-view-profile .profile-version-foot,
+body.fz-view-profile .profile-version-foot,
+.section-card-desc,
+.setting-item-desc,
+.profile-version-foot {
+  display: none !important;
+}
+
+/* Zero leak screen reader utility */
+.sr-only,
+span.sr-only,
+[data-testid="class-hub-title"].sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+
+
+
+
+/* ==========================================================================
+   16. LATIHAN — compact centered launcher grid (no topbar, no lead text)
+   ========================================================================== */
+html body.fz-view-latihan header.topbar,
+html body.fz-view-grammar header.topbar {
+  display: none !important;
+}
+html body.fz-view-latihan #app,
+html body.fz-view-grammar #app {
+  padding-top: 18px !important;
+}
+html body.fz-view-latihan #app .section-head > div > p,
+html body.fz-view-grammar #app .section-head > div > p {
+  display: none !important;
+}
+html body.fz-view-latihan #app .section-head h1,
+html body.fz-view-grammar #app .section-head h1 {
+  font-size: 26px !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.02em !important;
+  margin: 0 !important;
+}
+html body.fz-view-latihan #app .section-head,
+html body.fz-view-grammar #app .section-head {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+  margin-bottom: 14px !important;
+}
+html body.fz-view-latihan #app .section-head > div,
+html body.fz-view-grammar #app .section-head > div {
+  flex: 0 1 auto !important;
+}
+/* level control becomes a small pill beside the title */
+html body.fz-view-latihan #app .section-head .active-level-control,
+html body.fz-view-grammar #app .section-head .active-level-control {
+  display: inline-flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  align-self: center !important;
+  flex-shrink: 0 !important;
+  gap: 6px !important;
+  width: auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 6px 8px 6px 12px !important;
+  border-radius: 9999px !important;
+  border: 1.5px solid #E2E8F0 !important;
+  background: #FFFFFF !important;
+  box-shadow: 0 2px 0 #E2E8F0 !important;
+}
+html body.fz-view-latihan #app .section-head .active-level-control > span,
+html body.fz-view-grammar #app .section-head .active-level-control > span {
+  display: none !important;
+}
+html body.fz-view-latihan #app .section-head .active-level-control strong,
+html body.fz-view-grammar #app .section-head .active-level-control strong {
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  color: #D97706 !important;
+  line-height: 1 !important;
+}
+html body.fz-view-latihan #app .section-head .active-level-control small,
+html body.fz-view-grammar #app .section-head .active-level-control small {
+  font-size: 10.5px !important;
+  font-weight: 800 !important;
+  color: #0F172A !important;
+  background: #FDE047 !important;
+  border-radius: 9999px !important;
+  padding: 3px 8px !important;
+  line-height: 1 !important;
+}
+
+html body.fz-view-latihan #app .learning-launcher {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+  margin: 0 !important;
+}
+html body.fz-view-latihan #app .learning-launcher .launch-card {
+  position: relative !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  gap: 6px !important;
+  min-height: 104px !important;
+  height: auto !important;
+  aspect-ratio: auto !important;
+  padding: 16px 12px !important;
+  border-radius: 20px !important;
+  background: #FFFFFF !important;
+  border: 1.5px solid #E2E8F0 !important;
+  box-shadow: 0 4px 0 #E2E8F0, 0 8px 18px rgba(15, 23, 42, 0.04) !important;
+  overflow: hidden !important;
+}
+html body.fz-view-latihan #app .learning-launcher .launch-card:active {
+  transform: translateY(2px) !important;
+  box-shadow: 0 2px 0 #E2E8F0 !important;
+}
+html body.fz-view-latihan #app .learning-launcher .launch-card::before,
+html body.fz-view-latihan #app .learning-launcher .launch-card::after,
+html body.fz-view-latihan #app .learning-launcher .launch-card > svg,
+html body.fz-view-latihan #app .learning-launcher .launch-card > i[data-lucide] {
+  display: none !important;
+}
+html body.fz-view-latihan #app .learning-launcher .launch-card .launch-icon {
+  display: grid !important;
+  place-items: center !important;
+  width: 48px !important;
+  height: 48px !important;
+  margin: 0 auto 4px !important;
+  border-radius: 16px !important;
+  flex-shrink: 0 !important;
+}
+html body.fz-view-latihan #app .learning-launcher .launch-card .launch-icon svg {
+  width: 24px !important;
+  height: 24px !important;
+}
+html body.fz-view-latihan #app .learning-launcher .launch-card > span:nth-child(2) {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  width: 100% !important;
+}
+html body.fz-view-latihan #app .learning-launcher .launch-card b {
+  display: block !important;
+  font-size: 13.5px !important;
+  font-weight: 800 !important;
+  line-height: 1.25 !important;
+  letter-spacing: -0.01em !important;
+  color: #0F172A !important;
+  text-align: center !important;
+  white-space: normal !important;
+  word-break: break-word !important;
+}
+html body.fz-view-latihan #app .learning-launcher .launch-card small {
+  display: block !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  color: #64748B !important;
+  margin-top: 2px !important;
+  line-height: 1.2 !important;
+}
+/* If there is an odd last card, center it nicely */
+html body.fz-view-latihan #app .learning-launcher .launch-card:last-child:nth-child(odd) {
+  grid-column: span 2 !important;
+  max-width: calc(50% - 6px) !important;
+  margin: 0 auto !important;
+  width: 100% !important;
+}
+
+/* ==========================================================================
+   17. GRAMMAR HUB — simple: title + progress strip + one row of tool pills
+   ========================================================================== */
+html body.fz-view-grammar #app .grammar-intensity-selector,
+html body.fz-view-grammar #app .fz2-path-summary small,
+html body.fz-view-grammar #app .exam-entry-chip small,
+html body.fz-view-grammar #app .exam-entry-chip > svg:last-child {
+  display: none !important;
+}
+html body.fz-view-grammar #app .fz2-path-summary {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  padding: 12px 14px !important;
+  border-radius: 18px !important;
+  margin: 0 0 12px !important;
+  min-height: 0 !important;
+}
+html body.fz-view-grammar #app .fz2-path-summary .fz2-path-ring {
+  width: 46px !important;
+  height: 46px !important;
+  flex-shrink: 0 !important;
+}
+html body.fz-view-grammar #app .fz2-path-summary .fz2-path-ring-count {
+  font-size: 12px !important;
+}
+html body.fz-view-grammar #app .fz2-path-summary b {
+  font-size: 15px !important;
+  line-height: 1.2 !important;
+}
+html body.fz-view-grammar #app .fz2-path-summary span:not(.fz2-path-ring):not(.fz2-path-ring-count) {
+  font-size: 12px !important;
+}
+html body.fz-view-grammar #app .grammar-hub-tools {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  gap: 6px !important;
+  overflow-x: auto !important;
+  scrollbar-width: none !important;
+  margin: 0 0 14px !important;
+  padding: 2px 0 4px !important;
+}
+html body.fz-view-grammar #app .grammar-hub-tools::-webkit-scrollbar { display: none !important; }
+html body.fz-view-grammar #app .grammar-hub-tools > .path-view-toggle {
+  flex: 0 0 auto !important;
+  margin: 0 !important;
+  width: auto !important;
+}
+html body.fz-view-grammar #app .grammar-hub-tools .exam-entry-chip,
+html body.fz-view-grammar #app .grammar-hub-tools .path-view-toggle > button {
+  flex: 0 0 auto !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  width: auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 7px 11px !important;
+  border-radius: 9999px !important;
+  border: 1.5px solid #E2E8F0 !important;
+  background: #FFFFFF !important;
+  box-shadow: 0 2px 0 #E2E8F0 !important;
+  font-size: 11.5px !important;
+  font-weight: 800 !important;
+  color: #0F172A !important;
+  white-space: nowrap !important;
+  line-height: 1 !important;
+}
+html body.fz-view-grammar #app .grammar-hub-tools .exam-entry-chip {
+  background: #FEF3C7 !important;
+  border-color: #FCD34D !important;
+  box-shadow: 0 2px 0 #FCD34D !important;
+}
+html body.fz-view-grammar #app .grammar-hub-tools .exam-entry-chip b,
+html body.fz-view-grammar #app .grammar-hub-tools .exam-entry-chip span {
+  color: #92400E !important;
+  font-size: 11.5px !important;
+  font-weight: 800 !important;
+  opacity: 1 !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+html body.fz-view-grammar #app .grammar-hub-tools svg {
+  width: 14px !important;
+  height: 14px !important;
+  flex-shrink: 0 !important;
+}
+
+/* ==========================================================================
+   18. RITME BELAJAR MODAL — readable title, compact one-line options
+   ========================================================================== */
+.modal-intensity-sheet.first-time-intensity {
+  max-width: 340px !important;
+  margin: 0 auto !important;
+  padding: 4px 2px 2px !important;
+  text-align: center !important;
+}
+.modal-intensity-sheet.first-time-intensity .modal-mark {
+  font-size: 10.5px !important;
+  letter-spacing: 0.16em !important;
+  margin-bottom: 6px !important;
+}
+.modal-intensity-sheet.first-time-intensity h2 {
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  font-size: 20px !important;
+  font-weight: 800 !important;
+  line-height: 1.2 !important;
+  margin: 0 0 14px !important;
+}
+.modal-intensity-sheet.first-time-intensity > p.muted,
+.modal-intensity-sheet.first-time-intensity .option-desc,
+.modal-intensity-sheet.first-time-intensity .option-specs {
+  display: none !important;
+}
+.modal-intensity-sheet.first-time-intensity .modal-intensity-options {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+}
+.modal-intensity-sheet.first-time-intensity .intensity-option-card {
+  padding: 12px 14px !important;
+  border-radius: 14px !important;
+  min-height: 0 !important;
+  border: 1.5px solid #E2E8F0 !important;
+  background: #FFFFFF !important;
+  cursor: pointer !important;
+}
+.modal-intensity-sheet.first-time-intensity .intensity-option-card.is-selected {
+  border-color: #10B981 !important;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.18) !important;
+}
+.modal-intensity-sheet.first-time-intensity .option-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+  margin: 0 !important;
+}
+.modal-intensity-sheet.first-time-intensity .option-name b {
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  color: #0F172A !important;
+}
+.modal-intensity-sheet.first-time-intensity .intensity-option-card.is-selected .option-name b {
+  color: #047857 !important;
+}
+.modal-intensity-sheet.first-time-intensity .option-badge {
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  padding: 4px 9px !important;
+  border-radius: 9999px !important;
+  white-space: nowrap !important;
+}
+
+/* ========================================================
+   FIEZEL PRACTICE & PEDAGOGY CLARITY ELEVATION
+   ======================================================== */
+
+/* 1. Lesson Example Card Contrast */
+html body:not(.fz-teacher-mode) #app .lesson-example h3,
+.lesson-example h3 {
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  font-weight: 800 !important;
+  font-size: 1.15rem !important;
+}
+html body:not(.fz-teacher-mode) #app .lesson-example p,
+.lesson-example p {
+  color: #CBD5E1 !important;
+}
+html body:not(.fz-teacher-mode) #app .lesson-example p strong,
+.lesson-example p strong {
+  color: #FCD34D !important;
+}
+
+/* 2. Memory Tip High Contrast */
+.grammar-lesson-card .memory-tip,
+.lesson-stage .memory-tip,
+.card .memory-tip {
+  background: #FFFBEB !important;
+  border: 1.5px solid #FDE68A !important;
+  border-radius: 14px !important;
+  padding: 12px 14px !important;
+  color: #78350F !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  margin-top: 14px !important;
+}
+.grammar-lesson-card .memory-tip span,
+.lesson-stage .memory-tip span,
+.card .memory-tip span {
+  color: #78350F !important;
+  font-weight: 700 !important;
+  font-size: 13px !important;
+  line-height: 1.45 !important;
+}
+.grammar-lesson-card .memory-tip svg,
+.lesson-stage .memory-tip svg,
+.card .memory-tip svg {
+  color: #D97706 !important;
+  width: 20px !important;
+  height: 20px !important;
+  flex-shrink: 0 !important;
+}
+
+/* 3. Scaffold Retry Nudge High Contrast */
+html body:not(.fz-teacher-mode) #app #quizScaffoldNudge,
+#quizScaffoldNudge,
+.scaffold-nudge {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  background: #FFFBEB !important;
+  border: 1.5px solid #FCD34D !important;
+  border-left: 4px solid #F59E0B !important;
+  border-radius: 14px !important;
+  padding: 12px 14px !important;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.12) !important;
+  opacity: 1 !important;
+  transform: none !important;
+  margin-bottom: 12px !important;
+}
+html body:not(.fz-teacher-mode) #app #quizScaffoldNudge span,
+#quizScaffoldNudge span,
+.scaffold-nudge span {
+  color: #78350F !important;
+  font-weight: 700 !important;
+  font-size: 13px !important;
+  line-height: 1.45 !important;
+}
+html body:not(.fz-teacher-mode) #app #quizScaffoldNudge svg,
+#quizScaffoldNudge svg,
+.scaffold-nudge svg {
+  color: #D97706 !important;
+  width: 20px !important;
+  height: 20px !important;
+  flex-shrink: 0 !important;
+}
+
+/* 4. Feedback & Explanation Sheet */
+#feedback {
+  background: #0F172A !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 20px !important;
+  padding: 18px 20px 24px !important;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.3) !important;
+  color: #F8FAFC !important;
+}
+#feedback .feedback-title {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin-bottom: 12px !important;
+}
+#feedback .feedback-title b {
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  font-size: 17px !important;
+  font-weight: 800 !important;
+}
+#feedback p {
+  color: #F1F5F9 !important;
+  font-size: 13.5px !important;
+  line-height: 1.55 !important;
+  margin: 6px 0 !important;
+}
+#feedback p strong {
+  color: #38BDF8 !important;
+}
+#feedback .feedback-your-pick {
+  background: rgba(239, 68, 68, 0.14) !important;
+  border-left: 3px solid #EF4444 !important;
+  padding: 8px 12px !important;
+  border-radius: 8px !important;
+  color: #FECACA !important;
+}
+#feedback .feedback-your-pick strong {
+  color: #F87171 !important;
+}
+#feedback .feedback-rule-pill {
+  background: rgba(56, 189, 248, 0.12) !important;
+  border: 1px solid rgba(56, 189, 248, 0.3) !important;
+  border-radius: 10px !important;
+  padding: 8px 12px !important;
+  color: #E0F2FE !important;
+}
+#feedback .feedback-rule-pill strong {
+  color: #38BDF8 !important;
+}
+#feedback details {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-radius: 10px !important;
+  padding: 8px 12px !important;
+  margin: 10px 0 !important;
+}
+#feedback details summary {
+  color: #FCD34D !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  font-size: 13px !important;
+}
+#feedback details p.muted {
+  color: #94A3B8 !important;
+  font-size: 12.5px !important;
+  margin-top: 6px !important;
+}
+#feedback .feedback-memory-box {
+  background: rgba(251, 191, 36, 0.12) !important;
+  border: 1px solid rgba(251, 191, 36, 0.3) !important;
+  border-radius: 12px !important;
+  padding: 12px 14px !important;
+  margin: 12px 0 !important;
+}
+#feedback .feedback-memory-kicker {
+  color: #FCD34D !important;
+  font-weight: 800 !important;
+  font-size: 13px !important;
+}
+#feedback .feedback-memory-content {
+  color: #FEF3C7 !important;
+  font-size: 13.5px !important;
+  font-weight: 600 !important;
+  line-height: 1.5 !important;
+}
+#feedback .ai-btn {
+  background: linear-gradient(135deg, #6366F1, #8B5CF6) !important;
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+  border-radius: 12px !important;
+  padding: 10px 16px !important;
+  border: none !important;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35) !important;
+  cursor: pointer !important;
+  width: 100% !important;
+  margin-top: 10px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+}
+
+/* 5. Step Guidance inside Feedback Sheet */
+#feedback .tutor-steps {
+  background: #1E293B !important;
+  border: 1px solid rgba(245, 158, 11, 0.4) !important;
+  border-radius: 14px !important;
+  padding: 14px 16px !important;
+  margin: 12px 0 !important;
+}
+#feedback .tutor-steps .eyebrow {
+  color: #FCD34D !important;
+  font-weight: 800 !important;
+  font-size: 11px !important;
+  letter-spacing: 0.08em !important;
+  display: block !important;
+  margin-bottom: 8px !important;
+}
+#feedback .tutor-step {
+  color: #F1F5F9 !important;
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+  margin-bottom: 8px !important;
+}
+#feedback .tutor-step::before {
+  background: #334155 !important;
+  border: 1.5px solid #F59E0B !important;
+  color: #FCD34D !important;
+}
+#feedback .tutor-step-final {
+  color: #FEF08A !important;
+  border-top: 1px dashed rgba(245, 158, 11, 0.4) !important;
+  font-size: 13px !important;
+  padding-top: 8px !important;
+  margin-top: 8px !important;
+}
+
+/* 6. Enforce Memory Tip Text In All Cards */
+html body #app .card p.memory-tip,
+html body #app .card p.memory-tip span,
+html body #app .card .memory-tip,
+html body #app .card .memory-tip span,
+html body #app .memory-tip,
+html body #app .memory-tip span {
+  color: #78350F !important;
+  -webkit-text-fill-color: #78350F !important;
+  font-weight: 700 !important;
+}
+
+/* ========================================================
+   7. GRAMMAR ROADMAP: COMPACT, EYE-FRIENDLY, CLEAN CARDS
+   ======================================================== */
+.path-step {
+  display: grid !important;
+  grid-template-columns: 44px minmax(0, 1fr) !important;
+  gap: 12px !important;
+  align-items: flex-start !important;
+  padding: 6px 0 14px !important;
+}
+.path-step::after {
+  left: 21px !important;
+  top: 48px !important;
+}
+.path-node {
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 50% !important;
+  background: #FFFFFF !important;
+  border: 2px solid #E2E8F0 !important;
+  box-shadow: 0 3px 0 #E2E8F0 !important;
+}
+.path-ring {
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+.path-ring > b {
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  color: #0F172A !important;
+}
+.path-ring > i,
+.path-ring svg {
+  width: 18px !important;
+  height: 18px !important;
+  color: #10B981 !important;
+}
+.path-step.is-current .path-node {
+  border-color: #F59E0B !important;
+  box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.18) !important;
+  animation: none !important;
+}
+.path-step.is-current .path-ring > b {
+  color: #D97706 !important;
+}
+
+/* Compact, clean, friendly lesson card */
+.path-step .path-label,
+html body.fz-view-grammar #app .path-step .path-label {
+  background: #FFFFFF !important;
+  border: 1.5px solid #E2E8F0 !important;
+  border-radius: 16px !important;
+  padding: 12px 14px !important;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04) !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+}
+.path-step.is-current .path-label,
+html body.fz-view-grammar #app .path-step.is-current .path-label {
+  border: 2px solid #F59E0B !important;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.12) !important;
+}
+.path-step.is-locked .path-label,
+html body.fz-view-grammar #app .path-step.is-locked .path-label {
+  background: #F8FAFC !important;
+  border-color: #E2E8F0 !important;
+  opacity: 0.82 !important;
+  box-shadow: none !important;
+}
+.path-step .path-label b,
+html body.fz-view-grammar #app .path-step .path-label b {
+  font-size: 13.5px !important;
+  font-weight: 800 !important;
+  color: #0F172A !important;
+  line-height: 1.3 !important;
+  margin: 0 !important;
+}
+.path-step.is-locked .path-label b {
+  color: #64748B !important;
+}
+.path-step .path-label > span,
+html body.fz-view-grammar #app .path-step .path-label > span {
+  font-size: 11.5px !important;
+  font-weight: 600 !important;
+  color: #64748B !important;
+  line-height: 1.3 !important;
+  margin: 0 !important;
+}
+.path-step.is-locked .path-label > span {
+  color: #94A3B8 !important;
+}
+.path-step .path-label .lesson-lock-note {
+  font-size: 11px !important;
+  color: #94A3B8 !important;
+  margin: 2px 0 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+}
+.path-step .path-label .lesson-lock-note svg {
+  width: 12px !important;
+  height: 12px !important;
+  color: #94A3B8 !important;
+}
+
+/* Compact CTA button & skip link */
+.path-step .path-label .path-cta,
+html body.fz-view-grammar #app .path-step .path-label .path-cta {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  width: auto !important;
+  align-self: flex-start !important;
+  height: 32px !important;
+  min-height: 0 !important;
+  padding: 6px 16px !important;
+  margin-top: 6px !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  border-radius: 9999px !important;
+  background: linear-gradient(135deg, #F59E0B, #D97706) !important;
+  color: #FFFFFF !important;
+  border: none !important;
+  box-shadow: 0 2px 6px rgba(217, 119, 6, 0.25) !important;
+}
+.path-step .path-label .lesson-skip-link,
+html body.fz-view-grammar #app .path-step .path-label .lesson-skip-link {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  width: auto !important;
+  align-self: flex-start !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: #64748B !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 3px 0 !important;
+  margin-top: 2px !important;
+}
+.path-step.is-locked .lesson-skip-link {
+  display: none !important;
+}
+.path-step .path-mascot {
+  display: none !important;
+}
+
+/* ========================================================
+   8. FLOATING ACTION BAR & RETRY BAR: NO DARK BACKGROUND
+   ======================================================== */
+#quizFloatingBar,
+.quiz-floating-bar {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  pointer-events: none !important;
+  padding-bottom: max(16px, env(safe-area-inset-bottom)) !important;
+}
+#quizFloatingBar *,
+.quiz-floating-bar * {
+  pointer-events: auto !important;
+}
+.quiz-floating-retry {
+  background: #FFFFFF !important;
+  border: 1.5px solid #E2E8F0 !important;
+  border-radius: 9999px !important;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12) !important;
+  padding: 8px 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  max-width: 360px !important;
+  margin: 0 auto !important;
+}
+.retry-bar-label {
+  color: #D97706 !important;
+  font-weight: 700 !important;
+  font-size: 12.5px !important;
+}
+.retry-bar-label svg {
+  color: #D97706 !important;
+  width: 16px !important;
+  height: 16px !important;
+}
+.retry-giveup-btn {
+  background: #0F172A !important;
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+  font-size: 12px !important;
+  border-radius: 9999px !important;
+  padding: 6px 14px !important;
+  border: none !important;
+  cursor: pointer !important;
+}
+
+/* ========================================================
+   9. EMERALD GREEN TUTOR HEAD & SPEED PILL
+   ======================================================== */
+.tutor-turn-face,
+html body .tutor-turn .tutor-turn-face,
+#tutorTurn .tutor-turn-face {
+  background: #10B981 !important;
+  color: #FFFFFF !important;
+}
+.tutor-turn-face svg,
+html body .tutor-turn .tutor-turn-face svg,
+#tutorTurn .tutor-turn-face svg {
+  color: #FFFFFF !important;
+  stroke: #FFFFFF !important;
+}
+.tutor-turn-head b,
+html body .tutor-turn .tutor-turn-head b,
+#tutorTurn .tutor-turn-head b {
+  color: #10B981 !important;
+}
+.tutor-speed-pill,
+html body .tutor-speed-pill,
+#tutorTurn .tutor-speed-pill {
+  background: rgba(16, 185, 129, 0.16) !important;
+  color: #10B981 !important;
+  border: 1px solid rgba(16, 185, 129, 0.35) !important;
+}
+.tutor-speed-pill svg,
+#tutorTurn .tutor-speed-pill svg {
+  color: #10B981 !important;
+}
+.tutor-diagnostic-clue,
+#tutorTurn .tutor-diagnostic-clue {
+  background: rgba(16, 185, 129, 0.12) !important;
+  border: 1px solid rgba(16, 185, 129, 0.3) !important;
+  border-radius: 12px !important;
+  padding: 10px 14px !important;
+  color: #E2E8F0 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  margin: 8px 0 !important;
+}
+.tutor-diagnostic-clue svg,
+#tutorTurn .tutor-diagnostic-clue svg {
+  color: #10B981 !important;
+  width: 18px !important;
+  height: 18px !important;
+  flex-shrink: 0 !important;
+}
+.tutor-diagnostic-clue span,
+#tutorTurn .tutor-diagnostic-clue span {
+  color: #ECFDF5 !important;
+  font-size: 13.5px !important;
+  line-height: 1.45 !important;
+}
+
+/* ========================================================
+   10. HIDE BRAINCORE TELEMETRY PILLS IN FEEDBACK
+   ======================================================== */
+.braincore-telemetry-row,
+#feedback .braincore-telemetry-row {
+  display: none !important;
+}
+
+/* ========================================================
+   11. GRAMMAR LESSON DIRECT HERO CARD
+   ======================================================== */
+.grammar-lesson-card .grammar-start-hero {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  text-align: center !important;
+  padding: 24px 20px 20px !important;
+}
+.grammar-hero-badge {
+  display: inline-block !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.08em !important;
+  color: #D97706 !important;
+  background: #FEF3C7 !important;
+  padding: 4px 10px !important;
+  border-radius: 9999px !important;
+  margin-bottom: 12px !important;
+}
+.grammar-start-hero h2 {
+  font-size: 20px !important;
+  font-weight: 800 !important;
+  color: #0F172A !important;
+  line-height: 1.3 !important;
+  margin: 0 0 12px !important;
+}
+.grammar-brief-rule {
+  font-size: 14.5px !important;
+  line-height: 1.55 !important;
+  color: #475569 !important;
+  margin: 0 0 24px !important;
+}
+.grammar-start-direct-btn {
+  width: 100% !important;
+  height: 52px !important;
+  border-radius: 9999px !important;
+  font-size: 15px !important;
+  font-weight: 800 !important;
+  background: linear-gradient(135deg, #F59E0B, #D97706) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.3) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  border: none !important;
+  cursor: pointer !important;
+}
+
+
+

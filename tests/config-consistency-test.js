@@ -88,11 +88,15 @@ const killSwitchKeys = readFrozenKeys(schema, 'KILL_SWITCH_DEFAULTS');
 // `cfLearnerEvidenceEnabled` dan `learnerEvidence`, keduanya default false dan fail-closed
 // di route-learner-evidence.js. Angka di bawah dinaikkan SADAR bersama commit itu —
 // gerbang ini memang dirancang supaya penambahan flag tidak bisa lewat tanpa dilihat orang.
+//
+// 9 & 7 sejak SLOT 13 (4 Okt 2026): panggung suara live menambah `cfStageEnabled`
+// (CLIENT_FLAG_DEFAULTS) dan `stage` (KILL_SWITCH_DEFAULTS), keduanya default false dan
+// fail-closed di stage/route-stage.js lewat featureAllowedFrom. Angka dinaikkan SADAR.
 check('CLIENT_FLAG_DEFAULTS terbaca dari workers/api/schema.js',
-  Array.isArray(clientFlagKeys) && clientFlagKeys.length === 8,
+  Array.isArray(clientFlagKeys) && clientFlagKeys.length === 9,
   clientFlagKeys ? clientFlagKeys.join(',') : 'TIDAK TERBACA');
 check('KILL_SWITCH_DEFAULTS terbaca dari workers/api/schema.js',
-  Array.isArray(killSwitchKeys) && killSwitchKeys.length === 6,
+  Array.isArray(killSwitchKeys) && killSwitchKeys.length === 7,
   killSwitchKeys ? killSwitchKeys.join(',') : 'TIDAK TERBACA');
 
 const FLAG_KEYS = new Set(clientFlagKeys || []);

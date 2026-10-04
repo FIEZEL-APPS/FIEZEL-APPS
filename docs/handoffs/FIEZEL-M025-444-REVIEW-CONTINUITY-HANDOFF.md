@@ -1,15 +1,17 @@
-# FIEZEL m025-443 — Penilaian diri flashcard, titik awal kemampuan, ulangan lintas level — Handoff
+# FIEZEL m025-444 — Penilaian diri flashcard, titik awal kemampuan, ulangan lintas level — Handoff
 
 Tanggal: 2026-10-04 WIB
-Release: `FIEZEL_PAGE_BUILD=m025-443`, `DIAG_BUILD=m025-443`, `SW_REV=m025-443-unified-grammar-20261002` (lewat
+Release: `FIEZEL_PAGE_BUILD=m025-444`, `DIAG_BUILD=m025-444`, `SW_REV=m025-444-unified-grammar-20261002` (lewat
 `tools/bump-build.mjs`; perubahan `features/neural-voice/fiezel-diag-panel.js` di PR ini HANYA nomor build)
-Branch: `claude/inspiring-franklin-xml8hz` (dimulai ulang dari `main` @ `b4c29219`, m025-442)
+Branch: `claude/inspiring-franklin-xml8hz` → FIEZEL-APPS/FIEZEL-APPS#485 (dari `main` @ `b4c29219` m025-442, lalu `main` @ `ab74553f` m025-443 redesign latihan grammar digabung masuk)
 Otoritas: OWNER memilih tiga perbaikan ini dari daftar sisa audit 2026-10-04 ("kerjakan 3 ini dulu").
 
 ## STATUS
 
 Machine-verified lokal. Gerbang baru `tests/review-continuity-2026-10-04-test.js` 16/16 hijau (bagian
-browser lewat `page.route`, tanpa socket) dan merah 1/11 di `main` m025-442. Hasil suite penuh
+browser lewat `page.route`, tanpa socket) dan merah 1/11 di `main` m025-442.
+Ikut diperbaiki dari `main` m025-443: listener `keydown` tingkat-atas panggung suara kini dijaga
+`typeof document.addEventListener==='function'` (tests/regression-test.js merah di `ab74553f`). Hasil suite penuh
 `quality.yml` dan CI ada di PR.
 
 ## APA YANG BERUBAH

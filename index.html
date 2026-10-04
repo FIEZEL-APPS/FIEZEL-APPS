@@ -266,10 +266,11 @@ html.fz-booting body{overflow:hidden}
   <link rel="stylesheet" href="./fiezel-2.css">
   <link rel="stylesheet" href="./features/speaking-listening/jlpt-listening.css">
   <link rel="stylesheet" href="./features/ui/mobile-edge-fit.css?v=contrast-v25">
-  <link rel="stylesheet" href="./features/ui/fiezel-vivid.css?v=vivid-v1">
+  <link rel="stylesheet" href="./features/ui/fiezel-vivid.css?v=vivid-v2">
   <link rel="stylesheet" href="./features/nujum/fiezel-nujum.css">
   <link rel="stylesheet" href="./features/bug/fiezel-bug.css?v=hunt-v2">
-  <link rel="stylesheet" href="./features/ui/fiezel-tactile-clay.css">
+  <link rel="stylesheet" href="./features/ui/fiezel-tactile-clay.css?v=clay-v2">
+  <link rel="stylesheet" href="./features/speaking-listening/panggung-suara.css">
   <style id="fz-contrast-guard">
     /* High contrast guard: prevent yellow-on-yellow or white-on-yellow illegible text */
     .fz2-lvls span.is-now,
@@ -280,23 +281,23 @@ html.fz-booting body{overflow:hidden}
     .card div > span.fz2-lvl.is-now,
     .card div > span.is-now {
       background: #FFD94F !important;
-      color: #5E1420 !important;
-      border: 1px solid #5E1420 !important;
+      color: #0F172A !important;
+      border: 1px solid #0F172A !important;
       font-weight: 800 !important;
     }
-    .ch-badge,
-    span.ch-badge,
-    .card .ch-badge,
-    .card div > span.ch-badge {
+    .ch-badge:not(.ch-tab-badge),
+    span.ch-badge:not(.ch-tab-badge),
+    .card .ch-badge:not(.ch-tab-badge),
+    .card div > span.ch-badge:not(.ch-tab-badge) {
       background: #FFD94F !important;
-      color: #5E1420 !important;
-      border: 1px solid #5E1420 !important;
+      color: #0F172A !important;
+      border: 1px solid #0F172A !important;
       font-weight: 800 !important;
     }
     .active-level-control small {
       background: #FFD94F !important;
-      color: #5E1420 !important;
-      border: 1px solid #5E1420 !important;
+      color: #0F172A !important;
+      border: 1px solid #0F172A !important;
       font-weight: 800 !important;
     }
 
@@ -519,10 +520,21 @@ html.fz-booting body{overflow:hidden}
       <!-- m025-127: gradien wordmark topbar memakai token, bukan hex mati. Hanya SALINAN INI
            yang bertema - salinan di splash sengaja tetap gading/emas karena panggungnya
            memang selalu gelap, dan menyeretnya ikut bertema akan membuatnya hilang di sana. -->
-      <button type="button" class="brand-button" onclick="go('home')" aria-label="Kembali ke Home" data-i18n-aria-label="nav.back-home-aria">
+      <button type="button" class="brand-button" id="topBrandWrap" onclick="go('home')" aria-label="Kembali ke Home" data-i18n-aria-label="nav.back-home-aria">
         <span class="brand"><svg class="fiezel-wordmark" id="fzTopMark" viewBox="0 0 1000 260" role="img" aria-label="FIEZEL"><g class="fzw-sparks" aria-hidden="true"><circle class="fzw-spark" cx="51" cy="51" r="15" style="--sx:-70px;--sy:-85px;--sd:0s"/><circle class="fzw-spark" cx="51" cy="205" r="15" style="--sx:-78px;--sy:80px;--sd:.03s"/><circle class="fzw-spark" cx="102" cy="51" r="15" style="--sx:-52px;--sy:-96px;--sd:.06s"/><circle class="fzw-spark" cx="88" cy="130" r="15" style="--sx:-92px;--sy:0px;--sd:.09s"/><circle class="fzw-spark" cx="205" cy="60" r="15" style="--sx:-30px;--sy:-92px;--sd:.12s"/><circle class="fzw-spark" cx="253" cy="168" r="15" style="--sx:-22px;--sy:78px;--sd:.15s"/><circle class="fzw-spark" cx="321" cy="51" r="15" style="--sx:-40px;--sy:-90px;--sd:.18s"/><circle class="fzw-spark" cx="350" cy="130" r="15" style="--sx:-60px;--sy:-6px;--sd:.21s"/><circle class="fzw-spark" cx="365" cy="209" r="15" style="--sx:-44px;--sy:86px;--sd:.24s"/><circle class="fzw-spark" cx="553" cy="51" r="15" style="--sx:6px;--sy:-98px;--sd:.27s"/><circle class="fzw-spark" cx="553" cy="209" r="15" style="--sx:6px;--sy:92px;--sd:.3s"/><circle class="fzw-spark" cx="683" cy="130" r="15" style="--sx:30px;--sy:-4px;--sd:.33s"/><circle class="fzw-spark" cx="734" cy="51" r="15" style="--sx:44px;--sy:-88px;--sd:.36s"/><circle class="fzw-spark" cx="727" cy="209" r="15" style="--sx:40px;--sy:90px;--sd:.39s"/><circle class="fzw-spark" cx="861" cy="130" r="15" style="--sx:86px;--sy:-8px;--sd:.42s"/><circle class="fzw-spark" cx="905" cy="209" r="15" style="--sx:96px;--sy:84px;--sd:.45s"/></g><defs><linearGradient id="fztIv" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--wordmark-ink-hi)"/><stop offset="100%" stop-color="var(--wordmark-ink-lo)"/></linearGradient><linearGradient id="fztGo" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--wordmark-accent-hi)"/><stop offset="100%" stop-color="var(--wordmark-accent-lo)"/></linearGradient></defs><g class="fzw-mark"><g fill="url(#fztIv)"><rect x="30" y="30" width="42" height="200" rx="21"/><rect x="30" y="30" width="144" height="42" rx="21"/><rect x="30" y="109" width="116" height="42" rx="21"/><rect x="300" y="30" width="42" height="200" rx="21"/><rect x="300" y="30" width="144" height="42" rx="21"/><rect x="300" y="109" width="100" height="42" rx="21"/><rect x="300" y="188" width="130" height="42" rx="21"/><rect x="478" y="30" width="150" height="42" rx="21"/><rect x="478" y="188" width="150" height="42" rx="21"/><rect x="607" y="30" width="191.38" height="42" rx="21" transform="rotate(124.354 607 51)"/><rect x="662" y="30" width="42" height="200" rx="21"/><rect x="662" y="30" width="144" height="42" rx="21"/><rect x="662" y="109" width="100" height="42" rx="21"/><rect x="662" y="188" width="130" height="42" rx="21"/><rect x="840" y="30" width="42" height="200" rx="21"/><rect x="840" y="188" width="130" height="42" rx="21"/></g><g fill="url(#fztGo)"><rect x="192" y="30" width="26" height="200" rx="13"/><rect x="240" y="106" width="26" height="124" rx="13"/></g></g></svg></span>
       </button>
-      <div class="topbar-actions">
+
+      <!-- KelasKu Official Wordmark (Visible ONLY in KelasKu panel) -->
+      <div class="kelasku-top-brand" id="topBrandKelasKu" style="display:none; align-items:center; gap:8px;" onclick="go('home')" role="button" tabindex="0" aria-label="KelasKu">
+        <span class="kelasku-wordmark" style="font-size:23px; font-weight:800; color:var(--kelasku-emerald, #1F7A63); letter-spacing:-0.025em; line-height:1;">KelasKu</span>
+        <span class="kelasku-brand-tag" style="font-size:10px; font-weight:800; color:#065F46; background:#D1FAE5; border:1px solid #A7F3D0; padding:2px 7px; border-radius:6px; text-transform:uppercase; letter-spacing:0.04em;">Aktif</span>
+      </div>
+
+      <div class="topbar-actions" id="topGamifyCluster">
+        <div class="topbar-gamify-pills" id="topGamifyPills" style="display:flex;align-items:center;gap:6px;">
+          <span class="topbar-pill topbar-streak" id="topbarStreakPill" title="Streak"><span class="topbar-pill-icon">🔥</span> <b id="topbarStreakVal">3</b></span>
+          <span class="topbar-pill topbar-xp" id="topbarXpPill" title="Poin XP"><span class="topbar-pill-icon">⚡</span> <b id="topbarXpVal">120</b></span>
+        </div>
         <button type="button" id="fzCourseSwitchBtn" class="course-switch-btn" onclick="toggleTargetCourse()" aria-label="Ganti Bahasa Kursus" data-i18n-aria-label="topbar.course-switch-aria" title="Ganti Kursus (Jepang / Inggris)">
           <span class="course-switch-flag" id="fzCourseFlag"><svg class="fiezel-flag-svg" viewBox="0 0 60 40" width="22" height="15" aria-hidden="true" focusable="false" style="display:inline-block;vertical-align:middle;border-radius:3px"><clipPath id="fz-flag-en-topbar"><rect width="60" height="40" rx="3"/></clipPath><g clip-path="url(#fz-flag-en-topbar)"><path d="M0 0v40h60V0z" fill="#012169"/><path d="M0 0l60 40m0-40L0 40" stroke="#fff" stroke-width="6.67"/><path d="M0 0l60 40m0-40L0 40" stroke="#c8102e" stroke-width="4.44"/><path d="M30 0v40M0 20h60" stroke="#fff" stroke-width="11.11"/><path d="M30 0v40M0 20h60" stroke="#c8102e" stroke-width="6.67"/></g></svg></span>
           <span class="course-switch-label" id="fzCourseLabel" style="display:none">EN</span>
@@ -533,6 +545,19 @@ html.fz-booting body{overflow:hidden}
         <button type="button" id="fzNotifBtn" class="icon-button notif-button" onclick="openNotifications()" aria-label="Notifikasi" data-i18n-aria-label="topbar.notif-aria" data-testid="topbar-notif-button"><i data-lucide="bell"></i><span id="fzNotifBadge" class="notif-badge hidden" aria-hidden="true" data-testid="topbar-notif-badge"></span></button>
         <button type="button" class="icon-button" onclick="openSettings()" aria-label="Buka pengaturan" data-i18n-aria-label="nav.open-settings-aria"><i data-lucide="sliders-horizontal"></i></button>
         <div class="version" id="version"></div>
+      </div>
+
+      <!-- KelasKu Class Selector Pill Badge (Visible ONLY in KelasKu panel) -->
+      <div class="kelasku-top-cluster" id="topKelasKuCluster" style="display:none; align-items:center;">
+        <button class="btn-class-selector" onclick="openJoinClassModal()" type="button" aria-label="Pilih Kelas" data-testid="kelasku-topbar-selector">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block;">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          <span id="topKelasKuCodeLabel">X IPA 2 ▾</span>
+        </button>
       </div>
     </header>
     <!-- D16 (D5 T3): aria-live dicabut dari #app - live region seluruh layar membuat pembaca
@@ -598,6 +623,13 @@ html.fz-booting body{overflow:hidden}
 
   <div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Dialog FIEZEL" data-i18n-aria-label="dialog.fiezel-aria">
     <div class="modal-panel" id="modalPanel"></div>
+  </div>
+
+  <!-- LACI LAYAR PENUH PANGGUNG SUARA LIVE (SLOT 13). Markup statis + slot dinamis:
+       app.js menggambar isi panggung ke dalam #fzStageDrawerMount saat dibuka. -->
+  <div id="fzStageDrawer" class="fz-stage-drawer" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Panggung Suara Live" data-i18n-aria-label="stage.drawer-aria">
+    <div class="fz-stage-drawer-backdrop" onclick="closeLiveVoiceStage()" aria-hidden="true"></div>
+    <div class="fz-stage-drawer-panel" id="fzStageDrawerMount"></div>
   </div>
 
   <!-- PANEL BANK SOAL LISTENING JLPT (N5 & N4) -->
@@ -827,6 +859,17 @@ html.fz-booting body{overflow:hidden}
   <!-- m025-276: naskah PAW ARENA (dwibahasa). Nama merek "PAW ARENA" tidak diterjemahkan;
        kalimat sekelilingnya dua bahasa. Domain sendiri → th-coverage menuntut copy-th-pawarena.js. -->
   <script defer src="./features/i18n/copy-id-pawarena.js"></script>
+  <!-- SLOT 13: naskah Panggung Suara Live (laci, mesin Sarang Tabu, undangan, keadaan
+       gagal). Domain sendiri karena naskahnya besar dan lahir bersama fitur baru; karena
+       berkas ini ada, pendaftaran domain otomatis th-coverage menuntut copy-th-stage.js,
+       yang dimuat dinamis lewat fiezel-th-loader.js. -->
+  <script defer src="./features/i18n/copy-id-stage.js"></script>
+  <!-- SISTEM PERTEMANAN ala LINE (SLOT 7 sosial): Kartu ID + Kode QR profil, deteksi
+       tautan masuk ?friend=@handle, kotak permintaan teman, tombol Ajak Main Suara.
+       Domain sendiri karena naskahnya baru dan besar; karena berkas ini ada, pendaftaran
+       domain otomatis th-coverage menuntut copy-th-friend.js, yang dimuat dinamis lewat
+       fiezel-th-loader.js. -->
+  <script defer src="./features/i18n/copy-id-friend.js"></script>
   <!-- W4-MERGE: aset th TIDAK dimuat statis (copy-th-*, naskah-th-brain, dua dataset th) —
        semuanya disuntik/difetch DINAMIS oleh pemuat kecil di bawah HANYA saat locale th
        (AI-13 F02/F05: murid Indonesia nol byte th). Pemuat wajib SETELAH fiezel-i18n.js
@@ -971,6 +1014,18 @@ html.fz-booting body{overflow:hidden}
        seluruh pemanggilnya di app.js guarded dan fitur teman kembali ke jalur manual. -->
   <script defer src="./features/social/fiezel-invite-link.js"></script>
   <script defer src="./features/social/fiezel-social-notify.js"></script>
+  <!-- SISTEM PERTEMANAN ala LINE: generator Kode QR SVG murni (tanpa pustaka pihak ketiga).
+       Inti mandiri (tidak menyentuh DOM saat dimuat); app.js membacanya di belakang
+       try/catch saat modal QR dibuka. Dimuat sebelum app.js. -->
+  <script defer src="./features/social/fiezel-qr.js"></script>
+  <!-- PANGGUNG SUARA LIVE (SLOT 13): mesin permainan Sarang Tabu + transport WebRTC P2P.
+       Keduanya inti mandiri (pola gems-core/fiezel-social: tanpa import, tanpa menyentuh
+       state app.js) dan dimuat SEBELUM app.js supaya kait buka drawer menemukannya sejak
+       boot; kalau salah satu gagal dimuat, seluruh pemanggilnya di app.js guarded dan
+       fitur panggung diam tanpa mengganggu belajar. Bank kartu dimuat malas lewat
+       fetch dari app.js saat drawer pertama dibuka. -->
+  <script defer src="./features/speaking-listening/fiezel-panggung-suara.js"></script>
+  <script defer src="./features/speaking-listening/fiezel-webrtc-stage.js"></script>
   <!-- KOTAK MASUK MURID: tugas dari guru (polling /api/learner/class-assignments) + lonceng topbar. -->
   <!-- Perencana detak bersama (papan guru + papan murid). Harus sebelum app.js dan teacher-shell. -->
   <script defer src="./features/notify/fiezel-sync-plan.js"></script>

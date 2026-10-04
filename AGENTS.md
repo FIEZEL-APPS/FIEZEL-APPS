@@ -57,8 +57,21 @@ Setiap agent yang memodifikasi, membuat fitur kuis, evaluasi jawaban, scaffoldin
 4. **Validasi Sintaksis Ketat (Haram Loophole Asal Jumlah Kata)**:
    - DILARANG KERAS meluluskan latihan susun kata/puzzle hanya karena panjang token sama (`|| placedTokens.length >= targetTokens.length`). Evaluasi WAJIB berbasis kecocokan gramatika kalimat target.
 5. **Smart Prerequisite Bypass (Haram Menyandera Murid Mahir)**:
-   - Gerbang prasyarat (seperti hafalan kosa kata sebelum grammar) WAJIB berkonsultasi ke Braincore BKT/OLM.
-   - Jika murid sudah menguasai kosakata prasyarat ($P(L_t) \ge 0.60$ atau `status.isReady`), sistem WAJIB otomatis membuka materi grammar tanpa memaksakan mini-game berulang kali.
+    - Gerbang prasyarat (seperti hafalan kosa kata sebelum grammar) WAJIB berkonsultasi ke Braincore BKT/OLM.
+    - Jika murid sudah menguasai kosakata prasyarat ($P(L_t) \ge 0.60$ atau `status.isReady`), sistem WAJIB otomatis membuka materi grammar tanpa memaksakan mini-game berulang kali.
+6. **Invarian Mode Ujian Bebas Bocoran (Anti-Leak Exam Purity)**:
+    - Dalam mode ukur (`cfg.measureMode`, tes penempatan / placement test, atau ujian kenaikan level):
+      * DILARANG KERAS memunculkan tombol petunjuk (*hint*), kartu bantuan, popover bocoran, atau tombol intip arti kata.
+      * Evaluasi WAJIB murni mengukur kemampuan tanpa bantuan scaffold apapun agar kalibrasi IRT 3PL objektif.
+7. **Ketahanan Status Multi-Tab & Sinkronisasi Tanpa Hilang (Zero-Loss State)**:
+    - Penyimpanan status di `localStorage` wajib aman dari tab lama yang menimpa tab baru saat murid membuka beberapa jendela peramban.
+    - Pipa pengiriman `brainSyncFlush()` dan antrean Braincore attempts wajib dipanggil dan mengalir saat kembali online tanpa batas antrean buntu.
+
+## Mandatory Protocol: Probe-Driven Empirical Audit (Standar Pengujian Empiris Nyata)
+Setiap agent yang melakukan audit bug, meninjau penalaran kuis, atau mengevaluasi alur data di FIEZEL:
+1. **Dilarang Audit Asumsi Teoretis**: DILARANG KERAS menyimpulkan bug atau kelayakan sistem hanya dari membaca potongan teks kode tanpa bukti eksekusi nyata.
+2. **Wajib Probe Headless Playwright**: Setiap temuan WAJIB dibuktikan melalui skrip probe peramban Chromium Playwright (`tools/dev/*probe.js` atau `tests/*probe.js`) yang melakukan klik tombol layaknya murid sungguhan dan membaca `state.history`, `localStorage`, serta basis data IndexedDB secara langsung.
+3. **Validasi Dua Arah**: Jalankan probe pembanding sebelum perbaikan dan sesudah perbaikan untuk memastikan solusi terbukti menyelesaikan masalah tanpa regresi.
 
 ## Mandatory Protocol: PWA Release Arbiter & Anti-Ghost-Deploy (Wajib Bump Build)
 Setiap kali menyelesaikan fitur, perbaikan bug, konten kuis, atau pembaruan UI/UX di FIEZEL:
@@ -83,7 +96,14 @@ Setiap kali menyelesaikan fitur, perbaikan bug, konten kuis, atau pembaruan UI/U
      - `features/neural-voice/fiezel-diag-panel.js` (`var DIAG_BUILD`)
      - `kurikulum.html` (`?v=m025-XXX`)
      - `misi.html` (`?v=m025-XXX`)
-4. **Validasi Mutu & Pemantauan CI Sampai Tuntas**:
+4. **Kewajiban Dokumentasi Serah Terima (Mandatory Handoff Dossier)**:
+   - Setiap rilis fitur baru, perubahan sistemik, atau audit perbaikan besar WAJIB menyertakan berkas serah terima resmi di `docs/handoffs/FIEZEL-M025XXX-...-HANDOFF.md`.
+   - Berkas handoff wajib mendokumentasikan:
+     a) Ringkasan temuan audit dan alasan perubahan.
+     b) Bukti pengujian empiris (skrip probe Playwright peramban headless).
+     c) Daftar seluruh berkas yang disentuh dan perubahannya.
+     d) Status kelulusan gerbang mutu lokal dan catatan utang teknis yang tersisa.
+5. **Validasi Mutu & Pemantauan CI Sampai Tuntas**:
    - Jalankan uji lokal sebelum commit: `node tests/id-golden-snapshot-test.js`, `node tests/th-ui-leak-test.js`, `node tests/curriculum-cache-version-test.js`, `node tests/gate-registry-test.js`.
    - Stage HANYA berkas yang terkait rilis (patuhi *Git Protection Rule* untuk aset mockup/redesign).
    - Push ke `origin/main` dan pantau alur CI GitHub Actions (`gh run watch <run-id>` untuk *FIEZEL Quality Gate* dan *FIEZEL Deploy Site*) sampai 100% HIJAU.

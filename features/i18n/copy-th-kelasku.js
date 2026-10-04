@@ -13,6 +13,9 @@
     'kelasku.belum-tersambung': 'บัญชี KelasKu ยังไม่ได้เชื่อมต่อในแอปนี้',
     'kelasku.belum-masuk': 'คุณยังไม่ได้เข้าสู่ระบบ KelasKu กรุณาเข้าสู่ระบบในแอป FIEZEL ก่อน แล้วกลับมาที่หน้านี้',
     'kelasku.jembatan-mati': 'สะพานเชื่อม KelasKu ยังไม่ได้เปิดใช้งานบนเซิร์ฟเวอร์',
-    'kelasku.tiket-gagal': 'ไม่สามารถรับตั๋วเข้าใช้งานจาก KelasKu ได้'
+    'kelasku.tiket-gagal': 'ไม่สามารถรับตั๋วเข้าใช้งานจาก KelasKu ได้',
+    'kelas.demo-rekam-meta': 'บันทึก 1 นาที · ประเมินโดยครูและ AI',
+    'kelas.demo-selesai-meta': 'เสร็จสิ้น · คะแนน 90 (ถูก 18/20 ข้อ)',
+    'kelas.soal-adaptif-bobot': 'ข้อสอบแบบปรับระดับ · น้ำหนักคะแนน 15%'
   });
 })();

@@ -1687,6 +1687,16 @@ body.voice-bundle-locked .bottomnav,body.voice-bundle-locked .app-header{pointer
   src:url('./assets/fonts/PlusJakartaSans-600.woff2') format('woff2')}
 @font-face{font-family:'FZ Plus Jakarta Sans';font-style:normal;font-weight:700;font-display:swap;
   src:url('./assets/fonts/PlusJakartaSans-700.woff2') format('woff2')}
+@font-face{font-family:'Plus Jakarta Sans';font-style:normal;font-weight:400;font-display:swap;
+  src:url('./assets/fonts/PlusJakartaSans-400.woff2') format('woff2')}
+@font-face{font-family:'Plus Jakarta Sans';font-style:normal;font-weight:500;font-display:swap;
+  src:url('./assets/fonts/PlusJakartaSans-500.woff2') format('woff2')}
+@font-face{font-family:'Plus Jakarta Sans';font-style:normal;font-weight:600;font-display:swap;
+  src:url('./assets/fonts/PlusJakartaSans-600.woff2') format('woff2')}
+@font-face{font-family:'Plus Jakarta Sans';font-style:normal;font-weight:700;font-display:swap;
+  src:url('./assets/fonts/PlusJakartaSans-700.woff2') format('woff2')}
+@font-face{font-family:'Plus Jakarta Sans';font-style:normal;font-weight:800;font-display:swap;
+  src:url('./assets/fonts/PlusJakartaSans-700.woff2') format('woff2')}
 /* m025-246: @font-face 'FZ Fredoka' DICABUT bersama keluarga fontnya (OWNER:
    "Tipografi: 3 -> 2 keluarga font (buang Fredoka)"). Tidak ada satu pun selektor yang
    masih menyebut nama keluarga itu - satu-satunya pemakainya adalah --fz-display-round,
@@ -6040,7 +6050,7 @@ html.has-home-today #globalSky {
   background: #FAF8F5 !important;
   color: #0F172A !important;
   min-height: auto !important;
-  padding: 16px 14px calc(80px + env(safe-area-inset-bottom, 12px)) 14px !important;
+  padding: 10px 10px calc(84px + env(safe-area-inset-bottom, 12px)) 10px !important;
   position: relative !important;
   box-sizing: border-box !important;
   width: 100% !important;
@@ -6052,13 +6062,13 @@ html.has-home-today #globalSky {
 
 .home-today .today-home-cockpit {
   width: 100% !important;
-  max-width: 440px !important;
+  max-width: 460px !important;
   margin: 0 auto !important;
   display: flex !important;
   flex-direction: column !important;
-  gap: 16px !important;
+  gap: 14px !important;
   box-sizing: border-box !important;
-  padding-bottom: 0 !important;
+  padding: 0 !important;
 }
 
 /* ==========================================================================
@@ -8731,15 +8741,35 @@ button.fz-coach-bubble,
     box-sizing: border-box !important;
   }
 
-  /* Inner view content below topbar gets comfortable screen padding */
-  .app > *:not(#app):not(.topbar):not(#globalSky):not(.notification-panel):not(.auth-panel):not(.modal-panel):not(.listening-modal),
-  body:not(.fz-stage-quiz):not(:has(.quiz-shell)) #app,
-  #appInner,
+  /* Mobile edge-to-edge layout: zero lateral void across all panels */
+  #app {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    width: 100% !important;
+    max-width: 440px !important;
+    margin: 0 auto !important;
+    box-sizing: border-box !important;
+  }
+
   .home-today,
-  .section-head,
-  .quick-practice-section {
-    padding-left: 16px !important;
-    padding-right: 16px !important;
+  section.fade,
+  #fzClassHub,
+  .classroom-page,
+  .progress-page,
+  .profile-page,
+  .ch-student {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+    width: 100% !important;
+    max-width: 440px !important;
+    margin: 0 auto !important;
+    box-sizing: border-box !important;
+  }
+
+  .section-head {
+    padding-left: 4px !important;
+    padding-right: 4px !important;
+    margin-bottom: 14px !important;
     box-sizing: border-box !important;
   }
 

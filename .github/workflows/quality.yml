@@ -305,6 +305,18 @@ jobs:
           node tests/social-frontend-test.js
           node tests/social-schema-contract-test.js
           node tests/social-invite-link-test.js
+          # SLOT 13 PANGGUNG SUARA LIVE (frontend) - kontrak naskah/CSS/modul panggung
+          # suara dan kontrak signaling dua arah. Diletakkan tepat sesudah gerbang sosial
+          # karena keduanya berbagi lane transport Worker+anon yang sama; cacat di lane
+          # itu akan memerahkan keduanya berdampingan.
+          node tests/panggung-suara-contract-test.js
+          node tests/stage-signaling-contract-test.js
+          # SISTEM PERTEMANAN ala LINE (SLOT 7): generator Kode QR SVG murni (dibandingkan
+          # modul demi modul dengan qrcode.min.js acuan yang sudah terbukti di repo) dan
+          # jembatan fitur pertemanan (tautan ?friend=, kotak permintaan, lencana tab,
+          # ajak main suara, paritas kunci i18n ID/TH, naskah bebas tanda hubung).
+          node tests/friend-qr-contract-test.js
+          node tests/friend-system-contract-test.js
           node tests/student-single-registration-test.js
           node tests/th-ui-leak-test.js
           node tests/i18n-kunci-hantu-test.js

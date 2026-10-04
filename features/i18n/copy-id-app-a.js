@@ -25,7 +25,7 @@
     // app.js:1096 — saveFlushWrite() showToast
     'common.toast-penyimpanan-penuh': 'Penyimpanan perangkat penuh - progresmu tidak ikut tersimpan. Kosongkan ruang, lalu lanjutkan.',
     // app.js:577 — grammarExercise v0 correctWhy
-    'grammar.alasan-benar-kausal': `pas di sini — {alasan}`,
+    'grammar.alasan-benar-kausal': `pas di sini, {alasan}`,
     // app.js:577 — grammarExercise v0 correctWhy fallback
     'grammar.alasan-benar-pola': `pas banget sama pola {judulLesson}.`,
     // app.js:465 — grammarOptionReason()

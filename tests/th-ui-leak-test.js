@@ -66,9 +66,8 @@ const ALLOWLIST = Object.freeze({
      5 -> 6 (m025-351): literal 'Tenggat ' di kartu tugas ZONE GURU (Ruang Guru) ikut
      terlihat setelah 'Tenggat' masuk daftar kata. Zona murid KelasKu sudah dwibahasa
      penuh lewat t() — yang tersisa ini permukaan guru, dan permukaan guru memang ID.
-     Turun 6 -> 5 (m025-364): literal 'Latihan · ' di kartu tugas murid hilang bersama
-     assignCard; baris tugas ringkas yang menggantikannya lewat t() seluruhnya. */
-  'features/class-hub/fiezel-class-hub.js': 5,
+     Turun 6 -> 5 (m025-364); 5 -> 3 (m025-446): literal di kartu tugas murid dan toast diselaraskan ke i18n t(). */
+  'features/class-hub/fiezel-class-hub.js': 3,
   'features/neural-voice/fiezel-cf-voice-notice.js': 3,         // cermin naskah kanon quota
   /* Naik 1 -> 3 (m025-271). Blok "sudah punya akun?" ikut berdiri di pemilih bahasa,
      dan alasannya sama persis dengan literal yang sudah ada di sana: pada cat PERTAMA

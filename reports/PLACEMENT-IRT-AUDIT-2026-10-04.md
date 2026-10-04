@@ -1,6 +1,6 @@
 # Audit tes penempatan level & IRT 3PL — 2026-10-04
 
-> **Status 2026-10-04:** P-A, P-B (m025-442) dan P-C (m025-443) **diperbaiki** (lihat §5). P-D belum.
+> **Status 2026-10-04:** P-A, P-B (m025-442) dan P-C (m025-444) **diperbaiki** (lihat §5). P-D belum.
 
 **Basis:** branch `claude/inspiring-franklin-xml8hz` @ `cce82e55` (build `m025-442`), dibandingkan
 dengan `main` @ `1dff4b6d` bila perilakunya berbeda. **Pertanyaan owner:** apakah algoritma IRT
@@ -152,7 +152,7 @@ masa percobaan `levelTrust` (kesalahan di level baru menurunkannya); tertahan di
 koreksi otomatis, jadi pertukaran ini sengaja ke arah itu. Dua soal per band tetap batas presisi tes
 ringkas - tes 25 soal tetap tersedia. Gerbang: `tests/placement-accuracy-test.js` bagian L1-L6.
 
-**P-C — diperbaiki (m025-443).** `coreBrainSnapshot()` kini meneruskan `priorAbility` = indeks level
+**P-C — diperbaiki (m025-444).** `coreBrainSnapshot()` kini meneruskan `priorAbility` = indeks level
 aktif murid (A1=1 … C2=6) ke `FiezelCoreBrain.analyze()`, bukan konstanta 1,5. Riwayat yang dibaca
 juga hanya milik level aktif, jadi prior dan buktinya bicara tentang level yang sama. Simulasi 12
 jawaban di level murid sendiri (3.000 run):

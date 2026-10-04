@@ -1,0 +1,550 @@
+/* features/speaking-listening/panggung-suara.css
+ * Styling Panggung Suara Live (Fiezel Live Voice Stage & Sarang Tabu).
+ * Seluruh selector dinamespace dengan .fz-stage-.
+ * Token kanonikal FIEZEL saja: --accent, --panel, --text, --muted, --danger.
+ * Catatan naskah: komentar berbahasa Indonesia sengaja ditulis tanpa tanda hubung.
+ */
+
+:root {
+  --fz-stage-bg: #090D16;
+  --fz-stage-card: rgba(26, 34, 53, 0.85);
+  --fz-stage-border: rgba(255, 255, 255, 0.08);
+  --fz-stage-danger: var(--danger, #E5484D);
+  --fz-stage-accent: var(--accent, #10B981);
+}
+
+.fz-stage-shell {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  background: var(--fz-stage-bg);
+  color: #F8FAFC;
+  border-radius: 28px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  font-family: var(--font, system-ui, sans-serif);
+}
+
+/* Flash Alarm Frame */
+.fz-stage-shell.is-alarm {
+  animation: fzStageFlash 0.65s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+@keyframes fzStageFlash {
+  0%, 100% { box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6); }
+  20%, 60% { box-shadow: 0 0 50px var(--fz-stage-danger); transform: translate3d(-3px, 0, 0); }
+  40%, 80% { box-shadow: 0 0 50px var(--fz-stage-danger); transform: translate3d(3px, 0, 0); }
+}
+
+/* Banner Pelanggaran Kilat */
+.fz-stage-alarm-banner {
+  position: absolute;
+  top: 60px;
+  left: 12px;
+  right: 12px;
+  background: linear-gradient(135deg, rgba(229, 72, 77, 0.98), rgba(185, 28, 28, 0.98));
+  border: 2px solid #FECDD3;
+  border-radius: 16px;
+  padding: 10px 14px;
+  color: #FFFFFF;
+  z-index: 70;
+  box-shadow: 0 10px 30px rgba(229, 72, 77, 0.5);
+  transform: translateY(-130%);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.25s ease;
+}
+
+.fz-stage-alarm-banner.is-active {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.fz-stage-alarm-title {
+  font-size: 13px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fz-stage-alarm-desc {
+  font-size: 11px;
+  color: #FEE2E2;
+  margin-top: 3px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.fz-stage-speed-pill {
+  background: rgba(0, 0, 0, 0.35);
+  padding: 2px 7px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 800;
+  color: #FEF08A;
+}
+
+/* Top Nav Strip */
+.fz-stage-topbar {
+  padding: 16px 18px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--fz-stage-border);
+}
+
+.fz-stage-live-badge {
+  background: var(--fz-stage-danger);
+  color: #FFF;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.fz-stage-live-dot {
+  width: 5px;
+  height: 5px;
+  background: #FFF;
+  border-radius: 50%;
+  animation: fzStagePulse 1.6s ease-in-out infinite;
+}
+
+@keyframes fzStagePulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.fz-stage-room-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: #FFF;
+}
+
+.fz-stage-meta {
+  font-size: 11px;
+  color: var(--muted, #94A3B8);
+  display: flex;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+/* Panggung Pembicara */
+.fz-stage-speakers {
+  background: var(--fz-stage-card);
+  border: 1px solid var(--fz-stage-border);
+  border-radius: 20px;
+  padding: 12px 14px;
+  margin: 12px 14px 6px;
+}
+
+.fz-stage-speakers-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.fz-stage-speaker-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+}
+
+.fz-stage-avatar-wrapper {
+  position: relative;
+  width: 58px;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fz-stage-avatar-circle {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #1E293B;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  position: relative;
+  z-index: 2;
+}
+
+.fz-stage-speaking-pulse {
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 2px solid var(--fz-stage-accent);
+  opacity: 0;
+  z-index: 1;
+  animation: fzStageRipple 1.6s ease-out infinite;
+}
+
+@keyframes fzStageRipple {
+  0% { transform: scale(0.85); opacity: 0.9; }
+  100% { transform: scale(1.35); opacity: 0; }
+}
+
+.fz-stage-mic-badge {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--fz-stage-accent);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  border: 2px solid var(--fz-stage-bg);
+  z-index: 3;
+}
+
+.fz-stage-mic-badge.is-muted {
+  background: #475569;
+}
+
+.fz-stage-speaker-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: #FFF;
+}
+
+/* Kartu Game Sarang Tabu */
+.fz-stage-game-box {
+  background: linear-gradient(145deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 20px;
+  padding: 12px 14px;
+  margin: 6px 14px;
+}
+
+.fz-stage-game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.fz-stage-timer-pill {
+  background: rgba(229, 72, 77, 0.15);
+  border: 1px solid rgba(229, 72, 77, 0.3);
+  color: #FB7185;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.fz-stage-secret-card {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid var(--fz-stage-border);
+  border-radius: 14px;
+  padding: 10px 12px;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.fz-stage-secret-kicker {
+  font-size: 10px;
+  font-weight: 800;
+  color: #38BDF8;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.fz-stage-secret-word {
+  font-size: 24px;
+  font-weight: 800;
+  color: #FFFFFF;
+  margin: 2px 0;
+}
+
+.fz-stage-secret-prompt {
+  font-size: 11px;
+  color: var(--muted, #94A3B8);
+  margin-bottom: 8px;
+}
+
+.fz-stage-taboo-box {
+  background: rgba(229, 72, 77, 0.08);
+  border: 1px dashed rgba(229, 72, 77, 0.35);
+  border-radius: 10px;
+  padding: 6px 8px;
+}
+
+.fz-stage-taboo-title {
+  font-size: 10px;
+  font-weight: 800;
+  color: #F87171;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+
+.fz-stage-taboo-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+}
+
+.fz-stage-taboo-tag {
+  background: rgba(229, 72, 77, 0.2);
+  border: 1px solid rgba(229, 72, 77, 0.4);
+  color: #FECDD3;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s;
+}
+
+.fz-stage-taboo-tag.is-violated {
+  background: #EF4444 !important;
+  border-color: #FECDD3 !important;
+  color: white !important;
+  transform: scale(1.08);
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.8);
+}
+
+.fz-stage-game-btns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.fz-stage-btn-correct {
+  background: linear-gradient(135deg, #10B981, #059669);
+  border: none;
+  color: white;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 9px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.fz-stage-btn-pass {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--fz-stage-border);
+  color: #FFF;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 9px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.fz-stage-btn-test {
+  grid-column: span 2;
+  background: rgba(229, 72, 77, 0.15);
+  border: 1px solid rgba(229, 72, 77, 0.4);
+  color: #FECDD3;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 7px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+/* Bilah Bawah & Soundboard */
+.fz-stage-bottom {
+  padding: 12px 14px 18px;
+  border-top: 1px solid var(--fz-stage-border);
+  background: rgba(10, 15, 26, 0.95);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.fz-stage-deck-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.fz-stage-reactions {
+  display: flex;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 4px 8px;
+  border-radius: 20px;
+}
+
+.fz-stage-reactions button {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.fz-stage-reactions button:active {
+  transform: scale(1.3);
+}
+
+.fz-stage-mic-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #10B981, #059669);
+  border: 3px solid rgba(16, 185, 129, 0.4);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.4);
+}
+
+.fz-stage-mic-btn.is-muted {
+  background: #334155;
+  border-color: #475569;
+  box-shadow: none;
+  color: #94A3B8;
+}
+
+.fz-stage-sfx-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.fz-stage-sfx-btn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--fz-stage-border);
+  color: var(--muted, #94A3B8);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 6px 2px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+}
+
+/* Laci Layar Penuh (Stage Drawer) */
+.fz-stage-drawer {
+  position: fixed;
+  inset: 0;
+  z-index: 130;
+  display: none;
+}
+
+.fz-stage-drawer.is-open {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fz-stage-drawer-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(4, 7, 14, 0.8);
+  backdrop-filter: blur(4px);
+}
+
+.fz-stage-drawer-panel {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 480px;
+  max-height: 96vh;
+  overflow-y: auto;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.fz-stage-close-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--fz-stage-border);
+  color: #FFF;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fz-stage-chat-log {
+  max-height: 96px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0 14px 6px;
+}
+
+.fz-stage-chat-line {
+  font-size: 11px;
+  color: var(--muted, #94A3B8);
+}
+
+.fz-stage-chat-line b {
+  color: #E2E8F0;
+}
+
+.fz-stage-invite-btn {
+  background: linear-gradient(135deg, #25D366, #128C7E);
+  border: none;
+  color: #FFFFFF;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 9px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.fz-stage-local-note {
+  font-size: 10px;
+  color: #FCD34D;
+  text-align: center;
+}
+
+.fz-stage-footer-note {
+  font-size: 10px;
+  color: var(--muted, #94A3B8);
+  text-align: center;
+  padding: 6px 14px 2px;
+}
+

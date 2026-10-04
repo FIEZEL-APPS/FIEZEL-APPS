@@ -142,6 +142,20 @@ body.fz-lux .fz2-more summary::before,body .fz2-more summary::before{content:"+"
 body.fz-lux .fz2-more[open] summary::before,body .fz2-more[open] summary::before{content:"–"}
 body.fz-lux .fz2-more[open] summary,body .fz2-more[open] summary{margin-bottom:8px}
 
+/* ---------- sistem pertemanan ala LINE: tombol suara, QR, lencana tab ---------- */
+/* Tombol "Ajak Main Suara" hanya di baris teman; ikon pengeras suara menandainya sebagai
+   aksi suara, terpisah dari sorakan di sebelahnya. Radius & warna memakai token optik FIEZEL. */
+.social-friend-acts{display:flex;align-items:center;gap:6px;flex:0 0 auto}
+.social-voice-btn{flex:0 0 auto;display:inline-flex;align-items:center;gap:5px;padding:7px 11px;border-radius:12px;font-size:.82rem;font-weight:700;border:1px solid var(--pz-mint-line);background:var(--pz-mint);color:var(--pz-mint-ink);cursor:pointer;line-height:1}
+.social-voice-btn i{width:15px;height:15px}
+.social-voice-btn:active{transform:translateY(1px)}
+/* Lencana angka pada tab Teman (permintaan yang belum diproses). */
+.progress-tab .fz3-tab-badge{position:relative;top:auto;right:auto;margin-left:6px;vertical-align:middle}
+.progress-tab .fz3-tab-badge.hidden{display:none}
+/* Kode QR profil: kotak putih dengan bantalan, QR selalu gelap di atas terang. */
+.fz3-qr{display:flex;justify-content:center;align-items:center;margin:14px auto;padding:14px;width:min(78vw,320px);border-radius:18px;background:#FFFFFF;border:1px solid var(--line);box-shadow:0 8px 30px rgba(17,17,17,.12)}
+.fz3-qr svg{display:block;width:100%;height:auto;aspect-ratio:1/1}
+
 /* ---------- gerak ---------- */
 @media (prefers-reduced-motion:no-preference){
   body.fz-lux .fz2-social,body .fz2-social{animation:riseIn var(--dur-m) var(--ease) both;animation-delay:.12s}

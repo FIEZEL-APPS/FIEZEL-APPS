@@ -80,6 +80,11 @@ FEATURE_SOCIAL    = "on"
 # flags.cfLearnerEvidenceEnabled=true) DAN persetujuan per-murid di
 # `learner_evidence_consent`. Tanpa persetujuan itu, lane yang menyala pun menulis NOL baris.
 FEATURE_LEARNER_EVIDENCE = "on"
+# SLOT 13 panggung suara live (stage/route-stage.js): LAHIR MATI sesuai aturan produksi.
+# Menyalakannya butuh TIGA sakelar AND: var ini "on" + KV cfg:flags enabled.stage=true +
+# flags.cfStageEnabled=true. Fail-closed bila KV tak terbaca. Ruang siaran hanya hidup
+# in memory selama handshake P2P (TTL 30 menit); tidak ada progres belajar yang disimpan.
+FEATURE_STAGE     = "on"
 # Angka limit hanya untuk NASKAH UX (bab 12); penegakan tetap di server.
 #
 # 🔄 TEMUAN LAPANGAN 28 Agu 2026 — DUA ANGKA UNTUK HAL YANG SAMA, SUDAH DISELARASKAN.

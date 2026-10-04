@@ -132,6 +132,15 @@ import { ROUTES as CLASS_SYNC_ROUTES } from './route-class-sync.js';
  * (kasus penautan butuh identitas yang sedang dipakai) -> verifikasi tanda tangan
  * ID token terhadap JWKS Google di dalam modulnya. */
 import { ROUTES as GOOGLE_AUTH_ROUTES } from './route-auth-google.js';
+/* --- SLOT 13: PANGGUNG SUARA LIVE (stage/route-stage.js) — /api/stage/*.  [TERPASANG]
+ * Dipasang sebagai array `ROUTES` sungguhan (jalur yang dirancang berkas ini),
+ * BUKAN lewat route-wiring.js, alasan yang SAMA dengan SLOT 7/9/10: tidak memanggil
+ * provider berbayar (nol jembatan kuota/neuron). Gerbangnya hidup di dalam modulnya:
+ * identitas (mw-identity) -> flag FEATURE_STAGE + KV (fail-closed, mesin
+ * featureAllowedFrom yang sama dengan AI/TTS/sosial). Ruang siaran disimpan IN MEMORY
+ * (transien, TTL 30 menit) karena tidak ada progres belajar yang perlu dipersistenkan.
+ * Cap byte per path terdaftar di schema.js BYTE_LIMITS seperti slot lain. */
+import { ROUTES as STAGE_ROUTES } from './stage/route-stage.js';
 
 export const EXTRA_ROUTES = [
   ...buildExtraRoutes(),  /* SLOT 1-4 */
@@ -145,4 +154,5 @@ export const EXTRA_ROUTES = [
   ...TEACHER_ROUTES,          /* SLOT 10 */
   ...CLASS_SYNC_ROUTES,       /* SLOT 11 */
   ...GOOGLE_AUTH_ROUTES,      /* SLOT 12 */
+  ...STAGE_ROUTES,            /* SLOT 13 */
 ];
