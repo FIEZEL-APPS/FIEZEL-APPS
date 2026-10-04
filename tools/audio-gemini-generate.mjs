@@ -413,19 +413,24 @@ async function main() {
     }
 
     console.log(`[GENERATING] (${i + 1}/${queue.length}) Level ${job.identity.contentType}: "${identity.canonicalText.slice(0, 40)}..."`);
-    let result = await synthesizeGemini(identity.canonicalText, voiceId, apiKeys[currentKeyIndex]);
-
-    if (result.fatal && result.fatal.includes('Kuota harian')) {
-      console.warn(`[KEY EXHAUSTED] Key ${currentKeyIndex + 1}/${apiKeys.length} mencapai batas kuota.`);
-      if (currentKeyIndex + 1 < apiKeys.length) {
+    let result;
+    while (currentKeyIndex < apiKeys.length) {
+      result = await synthesizeGemini(identity.canonicalText, voiceId, apiKeys[currentKeyIndex]);
+      if (result.fatal && result.fatal.includes('Kuota harian')) {
+        console.warn(`[KEY EXHAUSTED] Key ${currentKeyIndex + 1}/${apiKeys.length} mencapai batas kuota harian.`);
         currentKeyIndex++;
-        console.log(`[ROTATING KEY] Beralih ke Key ${currentKeyIndex + 1}/${apiKeys.length}...`);
-        result = await synthesizeGemini(identity.canonicalText, voiceId, apiKeys[currentKeyIndex]);
-      } else {
-        console.error(`[FATAL ERROR] Seluruh ${apiKeys.length} Gemini API Key telah mencapai batas kuota harian.`);
-        break;
+        if (currentKeyIndex < apiKeys.length) {
+          console.log(`[ROTATING KEY] Beralih ke Key ${currentKeyIndex + 1}/${apiKeys.length}...`);
+          continue;
+        } else {
+          console.error(`[FATAL ERROR] Seluruh ${apiKeys.length} Gemini API Key telah mencapai batas kuota harian.`);
+          break;
+        }
       }
-    } else if (result.fatal) {
+      break;
+    }
+
+    if (result?.fatal) {
       console.error(`[FATAL ERROR] ${result.fatal}`);
       break;
     }
