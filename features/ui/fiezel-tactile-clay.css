@@ -4688,8 +4688,9 @@ html body.fz-view-grammar #app .path-step .path-label .path-cta {
   font-size: 12px !important;
   font-weight: 800 !important;
   border-radius: 9999px !important;
-  background: linear-gradient(135deg, #F59E0B, #D97706) !important;
-  color: #FFFFFF !important;
+  background: linear-gradient(135deg, #FBBF24, #F59E0B) !important;
+  /* Audit UX grammar U14: putih di atas amber hanya 2,6:1; teks gelap di atas amber terang > 7:1. */
+  color: #1F1A14 !important;
   border: none !important;
   box-shadow: 0 2px 6px rgba(217, 119, 6, 0.25) !important;
 }
@@ -5343,3 +5344,23 @@ button.fiezel-language-choice {
 .fz-bc-card button.fz-bc-cta:active{transform:translateY(2px);box-shadow:0 1px 0 #D99A00}
 .fz-bc-proof{margin:0;padding-left:18px;display:grid;gap:6px;color:#1F1A14}
 .fz-bc-focus{margin:8px 0 0;padding:8px 12px;border-radius:12px;background:#FFF6DF;color:#5C3B00;font-weight:700;font-size:.9rem}
+
+/* Audit UX grammar U7 (2026-10-04): judul tur tercat gelap di kartu gelap (1,02:1) karena isi teks
+   h2 global memakai fill transparan. Warna dan fill dipaku putih khusus di kartu tur. */
+.fz-tour .fz-tour-card h2{color:#FFFFFF!important;-webkit-text-fill-color:#FFFFFF!important;background:none!important}
+
+/* Audit UX grammar U8 (2026-10-04): bar mengambang "coba lagi" / "Lanjut" (position:fixed) menutupi
+   kartu petunjuk dan kartu "Trik Cepat Ingat" di bawahnya. Selama bar itu ada, isi kuis diberi ruang
+   bawah setinggi bar. Tombol "Buntu? Buka pembahasan lengkap" di kartu guru disembunyikan selama bar
+   coba lagi tampil, karena bar itu sudah punya tombol "Buka Pembahasan": satu aksi, satu tombol. */
+.quiz-shell:has(#quizFloatingBar){padding-bottom:180px!important}
+.quiz-shell:has(#quizFloatingBar .quiz-floating-retry) #tutorStuck{display:none!important}
+
+/* Audit UX grammar U12 (2026-10-04): satu contoh kalimat di kartu materi, kata kuncinya ditebalkan. */
+html body #app .grammar-brief-example{margin:4px 0 14px;padding:10px 14px;border-radius:14px;background:#FFF6DF!important;color:#3A2A00!important;-webkit-text-fill-color:#3A2A00!important;font-size:1rem;line-height:1.45;text-transform:none!important;letter-spacing:normal!important}
+html body #app .grammar-brief-example span{font-weight:800;color:#7A4E00!important;-webkit-text-fill-color:#7A4E00!important;background:none!important;margin-right:4px;padding:0!important;text-transform:none!important}
+html body #app .grammar-brief-example b{color:#9A3412!important;-webkit-text-fill-color:#9A3412!important;font-weight:800;background:none!important}
+
+/* Audit UX grammar U14 (2026-10-04): "Buka materi" putih di atas amber (2,6:1) dan catatan pelajaran
+   terkunci abu muda (2,45:1). Teks tombol digelapkan, catatan kunci dipertegas: keduanya di atas 4,5:1. */
+.path-step .lesson-lock-note,html body #app .path-step .lesson-lock-note{color:#5B5348!important}

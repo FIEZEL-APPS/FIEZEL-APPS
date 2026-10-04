@@ -648,6 +648,19 @@
     // kembali ke frasa yang persis sama dua kali berturut-turut selama masih ada varian lain.
     var rotated = failed > 0 && variants.length ? variants[(failed - 1) % variants.length] : '';
 
+    // Audit UX grammar U4 (2026-10-04): sebelum jawaban dibuka (tangga probe/hint), petunjuk tidak
+    // boleh memuat kunci jawabannya. Contoh nyata: soal "I can't see ___." diberi petunjuk
+    // "'I see him', tapi 'he sees me'", sehingga kesempatan kedua praktis gratis tetapi tetap
+    // dicatat benar. Kalimat yang memuat kunci (utuh, sebagai kata) diganti petunjuk umum.
+    var kunci = str(it.correctAnswer || ex.correct);
+    var bocor = function (teks) {
+      if (!kunci || !teks) return false;
+      var pola = kunci.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      try { return new RegExp('(^|[^A-Za-z])' + pola + '([^A-Za-z]|$)', 'i').test(String(teks)); } catch (_) { return false; }
+    };
+    // Rotasi varian (aturan, alasan, lalu kontras jawabanmu vs bentuk benar sesudah gagal
+    // berulang) TIDAK disaring: kontras itu disengaja oleh gerbang tutor-brain-v3. Yang disaring
+    // hanya contoh pegangan ingatan dan saran menghindar, sumber kebocoran di temuan U4.
     if (move === 'hint' || move === 'reteach') {
       if (it.timing === 'guess') {
         say = lineFor(T, 'brain-tutor.timing-guess');
@@ -658,10 +671,10 @@
       }
       if (level === 'probe') {
         ask = rotated ? fill(lineFor(T, 'brain-tutor.probe-rotated'), { rotated: rotated })
-          : (str(ex.howToAvoid) || lineFor(T, 'brain-tutor.probe-default'));
+          : ((str(ex.howToAvoid) && !bocor(ex.howToAvoid)) ? str(ex.howToAvoid) : lineFor(T, 'brain-tutor.probe-default'));
       } else if (level === 'hint') {
         ask = rotated ? fill(lineFor(T, 'brain-tutor.hint-rotated'), { rotated: rotated })
-          : clause(ex.memoryCue) ? fill(lineFor(T, 'brain-tutor.hint-cue'), { cue: clause(ex.memoryCue) })
+          : (clause(ex.memoryCue) && !bocor(ex.memoryCue)) ? fill(lineFor(T, 'brain-tutor.hint-cue'), { cue: clause(ex.memoryCue) })
             : lineFor(T, 'brain-tutor.hint-default');
       } else if (level === 'worked') {
         say += lineFor(T, 'brain-tutor.worked-intro');

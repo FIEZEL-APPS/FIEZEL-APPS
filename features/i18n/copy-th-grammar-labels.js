@@ -208,6 +208,8 @@
   'grammar.video.complete-title': 'แบบฝึกหัด 5 จุดตรวจเสร็จสมบูรณ์!',
   'grammar.video.edu-material': 'สื่อการเรียนรู้',
   'grammar.video.exercise': 'แบบฝึกหัดไวยากรณ์',
+  'grammar.contoh-singkat': 'ตัวอย่าง:',
+  'grammar.token-order-panduan': 'เรียงคำให้เป็นประโยคนี้ แล้วเติมคำในช่องว่าง: {kalimat}',
   'grammar.video.no-video': 'ไม่มีวิดีโอ สลับไปใช้ข้อความ',
   'grammar.video.of': 'จาก',
   'grammar.video.open-source': 'เปิดใน YouTube',

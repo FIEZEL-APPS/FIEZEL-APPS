@@ -285,6 +285,13 @@
     // membaca completed() maupun untuk bendera state.toursSeen milik app.js, yang hanya
     // dicatat ketika shown/no_target).
     if (lessonModeActive(target)) return { shown: false, reason: 'lesson_active' };
+    // Audit UX grammar U7 (2026-10-04): tur yang menumpuk di atas modal lain (misalnya "Pilih ritme
+    // belajarmu") membuat murid melihat dua jendela sekaligus. Ditunda TANPA markCompleted, sama
+    // seperti pelajaran: tur berhak ditawarkan lagi saat layarnya sudah lapang.
+    try {
+      var openDialog = doc.querySelector('.modal.show, .modal.open, [aria-modal="true"]:not(.fz-tour)');
+      if (opts.force !== true && openDialog) return { shown: false, reason: 'dialog_open' };
+    } catch (_) {}
 
     var resolved = resolveSteps(target, Array.isArray(opts.steps) ? opts.steps : STEPS);
     // Tidak ada yang bisa ditunjuk berarti tidak ada yang bisa diajarkan. Ditandai selesai
