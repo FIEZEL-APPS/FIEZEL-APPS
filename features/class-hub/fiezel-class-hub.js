@@ -2128,6 +2128,23 @@
      Tampil hanya bila minimal satu murid sudah mengirim ringkasan. Pelajaran yang paling banyak
      disebut lemah menjadi saran remedial dengan tombol yang sama dengan saran skill di bawah. */
   function lessonName(k) { try { var n = typeof root.friendlySkillName === 'function' ? root.friendlySkillName(k) : ''; return n && n !== k ? n : k.replace(/_/g, ' '); } catch (_) { return k; } }
+  /* K4 (audit kabel BrainCore 2026-10-04): tugas remedial dulu satu untuk seluruh kelas, isinya
+     diambil acak per skill, jadi murid yang sudah menguasai mendapat soal yang sama dengan murid
+     yang tertinggal. Kini tiap murid yang dilaporkan BrainCore punya tombol remedialnya sendiri:
+     tugas dikirim HANYA ke murid itu (targets), skill-nya skill bank yang paling lemah MILIK murid
+     itu, lalu pelajaran lemah dari BrainCore yang menyangkut past tense ikut menunjuk skill
+     bank-nya. Kosong berarti tidak ada bukti, dan tombolnya tidak ditampilkan. */
+  function remedialSkillsFor(s) {
+    var TS = T(), bs = bankSkills(), scored = [];
+    bs.forEach(function (k) { var v = TS && TS.skillAcc ? TS.skillAcc(s, k) : null; if (v != null && v < 0.7) scored.push({ k: k, v: v }); });
+    scored.sort(function (x, y) { return x.v - y.v; });
+    var out = scored.map(function (x) { return x.k; });
+    ((s && s.braincore && s.braincore.weak) || []).forEach(function (w) {
+      var k = /past/.test(w) ? (/question|did/.test(w) ? 'past_questions' : 'past_tense') : null;
+      if (k && bs.indexOf(k) !== -1 && out.indexOf(k) === -1) out.push(k);
+    });
+    return out.slice(0, 2);
+  }
   function tBraincoreLearnerModel(c) {
     var withBc = (c.students || []).filter(function (s) { return s && s.braincore; });
     if (!withBc.length) return '';
@@ -2146,7 +2163,8 @@
       '<ul class="ch-mini-list" data-testid="tclass-braincore-students">' + withBc.slice(0, 40).map(function (s) {
         var b = s.braincore;
         return '<li><span class="ch-grow"><b>' + esc(s.name || '') + '</b> <small>' + esc(b.lv) + ' · ' + esc(arahLabel[b.dir] || '') + '</small></span>' +
-          (b.weak && b.weak.length ? '<small>' + esc(lessonName(b.weak[0])) + '</small>' : '') + '</li>';
+          (b.weak && b.weak.length ? '<small>' + esc(lessonName(b.weak[0])) + '</small>' : '') +
+          (remedialSkillsFor(s).length ? '<button type="button" class="tg-btn is-ghost is-small" data-ch="remedial-murid" data-student="' + esc(s.id) + '" data-testid="tclass-remedial-murid">' + icon('life-buoy') + ' ' + esc(t('kelas.bc-remedial-murid', 'Remedial khusus')) + '</button>' : '') + '</li>';
       }).join('') + '</ul></section>';
   }
   function tBraincore(c, env) {
@@ -2225,6 +2243,7 @@
       case 'use-suggest': d = draft(c); d.useSuggest[i] = !d.useSuggest[i]; d.finals[i] = Object.assign({}, d.useSuggest[i] ? d.review.items[i].suggested.question : d.review.items[i].original, { skill: d.review.items[i].analysis.skill }); break;
       case 'drop-review': d = draft(c); d.review.items.splice(i, 1); d.finals.splice(i, 1); var ap = {}, us = {}; Object.keys(d.approved).forEach(function (k) { var n = Number(k); if (n < i) ap[n] = d.approved[k]; else if (n > i) ap[n - 1] = d.approved[k]; }); Object.keys(d.useSuggest).forEach(function (k) { var n = Number(k); if (n < i) us[n] = d.useSuggest[k]; else if (n > i) us[n - 1] = d.useSuggest[k]; }); d.approved = ap; d.useSuggest = us; d.review.summary.count = d.review.items.length; d.review.summary.ready = d.review.items.filter(function (r) { return r.analysis.verdict === 'siap'; }).length; if (!d.review.items.length) { d.step = 1; d.review = null; } break;
       case 'commit': commitDraft(c, env, !!b.getAttribute('data-send')); return;
+      case 'remedial-murid': { var sid = b.getAttribute('data-student'), who = (c.students || []).filter(function (x) { return x && x.id === sid; })[0], rs = who ? remedialSkillsFor(who) : []; if (!rs.length) break; tUi.draft = null; d = draft(c); d.source = 'bank'; d.skills = rs; d.count = 8; d.targets = [sid]; d.title = t('kelas.bc-remedial-judul', 'Remedial untuk {nama}', { nama: who.name || '' }); d.deadline = T().today(Date.now() + 3 * T().DAY); tUi.tab = 'buat'; break; }
       case 'remedial': tUi.draft = null; d = draft(c); d.source = 'bank'; d.skills = [b.getAttribute('data-skill')].filter(function (k) { return B() && B().SKILLS[k]; }); if (!d.skills.length) d.skills = ['past_tense']; d.count = 8; d.title = b.getAttribute('data-title') || ''; d.deadline = T().today(Date.now() + 3 * T().DAY); tUi.tab = 'buat'; break;
       default: return;
     }

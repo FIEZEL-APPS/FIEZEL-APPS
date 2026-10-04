@@ -143,6 +143,8 @@
     'flow.tugas-hilang': 'Tugas ini sudah selesai atau tidak ditemukan.',
     'flow.tugas-selesai': 'Tugas ini sudah kamu selesaikan.',
     'flow.belajar-hari-ini': 'Belajar hari ini',
+    'flow.konsep-ringkas': 'Ingatan soalmu: {kuat} sudah kuat, {goyah} masih goyah, {ulang} waktunya diulang.',
+    'flow.konsep-dahulu': 'Sesi berikutnya mendahulukan yang masih goyah.',
     'flow.soal-berikutnya': 'Soal berikutnya',
     'flow.kembali-rencana': 'Kembali ke rencana',
     'flow.belum-ada-lesson': 'Belum ada lesson yang selesai.',

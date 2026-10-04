@@ -81,6 +81,8 @@
     'kelas.bc-arah-turun': 'ควรได้รับการดูแล',
     'kelas.bc-arah-baru': 'เพิ่งเริ่ม',
     'kelas.streak-sub-belajar': 'เรียนหรือทำงานทุกวันเพื่อรักษาสถิติต่อเนื่องของคุณ',
+    'kelas.bc-remedial-murid': 'ซ่อมเสริมเฉพาะคน',
+    'kelas.bc-remedial-judul': 'ซ่อมเสริมสำหรับ {nama}',
     'kelas.streak-sub': 'ทำงานทุกวันเพื่อรักษาสถิติต่อเนื่อง',
     'kelas.terhubung': 'เชื่อมต่อแล้ว',
     'kelas.tutor-judul': 'ติวเตอร์ FIEZEL',
