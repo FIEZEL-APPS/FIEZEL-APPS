@@ -319,6 +319,25 @@
     'bug.dibantu': 'DIBANTU PAW',
     'bug.bagikan': 'BAGIKAN KE WHATSAPP',
     'bug.share-teks': 'Sarang gue hari ini: {p} bug pecah, {g} lolos. Berani buru bug lo sendiri? fiezel.my.id #BuruBug',
-    'bug.tersimpan': 'Gambar laporan tersimpan — kirim ke grup kelas!'
+    'bug.tersimpan': 'Gambar laporan tersimpan — kirim ke grup kelas!',
+    // m025-454 Gelombang 1 audit kabel BrainCore: bahasa murid, tanpa istilah mesin, tanpa tanda pisah.
+    'bc.aria': 'Saran Braincore untuk hari ini',
+    'bc.judul': 'Kata Braincore Hari Ini',
+    'bc.arah-naik': 'Langkahmu makin lancar! Hari ini kita rapikan: {fokus}',
+    'bc.arah-datar': 'Kamu sudah stabil. Hari ini kita dorong lagi: {fokus}',
+    'bc.arah-turun': 'Pelan-pelan saja. Hari ini kita kuatkan lagi: {fokus}',
+    'bc.arah-baru': 'Yuk mulai! Hari ini kita latih: {fokus}',
+    'bc.pudar-kata': '{n} kata ini mulai memudar di ingatanmu: {daftar}',
+    'bc.segarkan': 'Segarkan Sekarang',
+    'bc.tertukar': 'Sering tertukar: {a} vs {b}',
+    'bc.perbaiki': 'Perbaiki Dasarnya',
+    'bc.bukti-judul': 'Bukti kamu makin pintar',
+    'bc.bukti-cepat': 'Kamu {kali}x lebih cepat menjawab dibanding minggu lalu',
+    'bc.bukti-stabil': 'Kecepatan menjawabmu stabil dibanding minggu lalu',
+    'bc.bukti-melekat': '{persen}% kata yang dipelajari masih melekat kuat',
+    'bc.bukti-naik': 'Ketepatanmu naik {poin} poin sejak awal latihan',
+    'bc.bukti-kosong': 'Selesaikan beberapa sesi lagi. Buktinya akan muncul di sini.',
+    'bc.fokus-pasangan': 'Fokus saat ini: membedakan {a} dan {b}',
+    'bc.fokus-materi': 'Fokus saat ini: {materi}'
   });
 }());

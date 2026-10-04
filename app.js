@@ -10358,6 +10358,7 @@ function todayHomeMarkup(){
   return `<div class="today-home-cockpit fz-edu-cockpit tactile-home-cockpit">
   ${homeTop}
   ${heroQuestCard}
+  ${braincoreHomeCardMarkup()}
   ${bugArenaCard}
   ${quickPracticeCard}
   ${kelaskuCard}
@@ -10377,6 +10378,131 @@ function todayHomeMarkup(){
     ${socialHomeMarkup()}
   </div>
 </div>`;
+}
+/* ---- m025-454 Gelombang 1 audit kabel BrainCore (D1/D2/D3/D5/D6) -----------------------
+ * Hasil BrainCore yang selama ini hanya tinggal di tab ke-4 Progres sekarang sampai ke Beranda,
+ * Ringkasan Progres, dan hub Grammar. Aturan bahasanya ditetapkan owner: kalimat murid yang
+ * pendek, tanpa istilah mesin, satu sampai dua baris per butir, langsung dengan tombol aksi.
+ * Setiap baris hanya muncul bila buktinya ada; tanpa bukti, butirnya tidak digambar sama sekali.
+ */
+/** Fokus hari ini dalam kata-kata murid: lesson sasaran rencana adaptif, atau nama ranahnya. */
+function braincoreFocusName(policy){
+  const p=policy||(()=>{try{return buildAdaptivePolicy()}catch{return null}})();
+  if(!p)return '';
+  const nama=p.targetSkill?friendlySkillName(p.targetSkill):'';
+  if(nama&&nama!==p.targetSkill)return nama;
+  const ranah={vocab:'skill.vocab',vocabulary:'skill.vocab',grammar:'skill.grammar',reading:'skill.reading'}[p.primaryDomain];
+  return ranah?FiezelI18n.t(ranah):'';
+}
+/** Satu kalimat penyemangat dari arah belajar (momentum Core Brain). */
+function braincoreDirectionLine(policy){
+  const fokus=braincoreFocusName(policy);
+  if(!fokus)return '';
+  let arah='unknown';
+  try{arah=String(coreBrainSnapshot()?.momentum?.state||'unknown')}catch{}
+  const kunci={improving:'bc.arah-naik',plateau:'bc.arah-datar',declining:'bc.arah-turun'}[arah]||'bc.arah-baru';
+  return FiezelI18n.t(kunci,{fokus});
+}
+/** Kata yang mulai memudar: antrean review kosakata, yang sudah diurutkan dari risiko lupa
+ *  Core Brain tertinggi. Tombolnya membuka antrean yang sama, jadi yang disebut = yang diulang. */
+function braincoreFadingWords(limit=3){
+  try{return vocabReviewQueue().slice(0,limit).map(v=>String(v.word||'').trim()).filter(Boolean)}catch{return []}
+}
+/** Pasangan jawaban yang paling sering tertukar di soal grammar (jawaban murid vs kunci).
+ *  Hanya jawaban pendek (kata atau frasa), minimal dua kali, dari 200 jawaban terakhir. */
+function braincoreConfusedPair(){
+  const pendek=t=>{const x=String(t||'').trim();return x&&x.length<=24&&x.split(/\s+/).length<=3?x:''};
+  const hitung=new Map();
+  for(const h of (state.history||[]).slice(-200)){
+    if(!h||h.ok||!['grammar','cloze'].includes(String(h.type||'')))continue;
+    const a=pendek(h.correctAnswer),b=pendek(h.selectedAnswer);
+    if(!a||!b||a.toLowerCase()===b.toLowerCase())continue;
+    const k=[a.toLowerCase(),b.toLowerCase()].sort().join('|');
+    const row=hitung.get(k)||{a,b,n:0,skill:''};
+    row.n++;if(h.target)row.skill=String(h.target);
+    hitung.set(k,row);
+  }
+  const top=[...hitung.values()].filter(r=>r.n>=2).sort((x,y)=>y.n-x.n)[0];
+  return top||null;
+}
+/** Lesson yang membuka "Perbaiki Dasarnya": lesson asal pasangan itu bila bisa dibuka sekarang,
+ *  kalau tidak sasaran remedial dari matriks kekeliruan. Kosong = tombol menuju hub Grammar. */
+function braincoreFixSkill(pair){
+  const bisa=id=>{try{return !!id&&(GRAMMAR_ITEMS.find(x=>x.skill===id)?.level||'')===getActiveLevel()&&!lessonUnlockState(id,state,bktMasteredSkills()).locked}catch{return false}};
+  if(pair&&bisa(pair.skill))return pair.skill;
+  try{const r=confusionRemediationTarget();if(r&&bisa(r.from))return r.from}catch{}
+  return '';
+}
+function braincoreFixBasics(){
+  const skill=braincoreFixSkill(braincoreConfusedPair());
+  if(skill)return openGrammarLesson(skill);
+  return go('grammar');
+}
+window.braincoreFixBasics=braincoreFixBasics;
+/** Kartu "Kata Braincore Hari Ini" di Beranda. */
+function braincoreHomeCardMarkup(){
+  if(jaCourseOn())return '';
+  if(!(Array.isArray(state.history)&&state.history.length))return '';
+  let policy=null;try{policy=buildAdaptivePolicy()}catch{}
+  const arah=braincoreDirectionLine(policy);
+  const kata=braincoreFadingWords(3);
+  const pasangan=braincoreConfusedPair();
+  if(!arah&&!kata.length&&!pasangan)return '';
+  const baris=[];
+  if(kata.length)baris.push(`<div class="fz-bc-row"><p>${esc(FiezelI18n.t('bc.pudar-kata',{n:kata.length,daftar:kata.join(', ')}))}</p><button type="button" class="fz-bc-cta" data-testid="bc-segarkan" onclick="reviewVocab()">${esc(FiezelI18n.t('bc.segarkan'))}</button></div>`);
+  if(pasangan)baris.push(`<div class="fz-bc-row"><p>${esc(FiezelI18n.t('bc.tertukar',{a:pasangan.a,b:pasangan.b}))}</p><button type="button" class="fz-bc-cta" data-testid="bc-perbaiki" onclick="braincoreFixBasics()">${esc(FiezelI18n.t('bc.perbaiki'))}</button></div>`);
+  return `<section class="fz-bc-card" data-testid="braincore-home-card" aria-label="${esc(FiezelI18n.t('bc.aria'))}">
+    <div class="fz-bc-head"><i class="fz-i" data-fz-icon="paw" aria-hidden="true" style="width:16px;height:16px"></i><b>${esc(FiezelI18n.t('bc.judul'))}</b></div>
+    ${arah?`<p class="fz-bc-arah">${esc(arah)}</p>`:''}
+    ${baris.join('')}
+  </section>`;
+}
+/** Panel "Bukti kamu makin pintar" di Ringkasan Progres: angka nyata dalam kalimat biasa. */
+function braincoreProofLines(now=Date.now()){
+  const out=[];
+  const hist=Array.isArray(state.history)?state.history:[];
+  // 1. Kecepatan: median waktu jawaban benar 7 hari terakhir vs 7 hari sebelumnya.
+  const median=xs=>{const a=xs.slice().sort((x,y)=>x-y);return a.length?a[Math.floor(a.length/2)]:0};
+  const ms=(from,to)=>hist.filter(h=>h&&h.ok&&Number(h.ms)>300&&Number(h.ms)<120000&&Number(h.at)>=from&&Number(h.at)<to).map(h=>Number(h.ms));
+  const hari=86400000,ini=ms(now-7*hari,now+1),lalu=ms(now-14*hari,now-7*hari);
+  if(ini.length>=8&&lalu.length>=8){
+    const kali=median(lalu)/Math.max(1,median(ini));
+    if(kali>=1.15)out.push(FiezelI18n.t('bc.bukti-cepat',{kali:(Math.round(kali*10)/10).toLocaleString(FiezelI18n.getLocale()==='th'?'th-TH':'id-ID')}));
+    else if(kali>0.87)out.push(FiezelI18n.t('bc.bukti-stabil'));
+  }
+  // 2. Ingatan: bagian kata yang sudah dipelajari dan risiko lupanya masih rendah.
+  const kata=Object.values(state.vocab||{}).filter(b=>b&&Number(b.total)>0);
+  if(kata.length>=5){
+    const kuat=kata.filter(b=>forgettingProbability(b)<0.2).length;
+    const persen=Math.round(kuat/kata.length*100);
+    // Angka rendah tidak ditulis sebagai "bukti": kata yang memudar sudah disebut kartu Beranda.
+    if(persen>=50)out.push(FiezelI18n.t('bc.bukti-melekat',{persen}));
+  }
+  // 3. Ketepatan: rata-rata kenaikan dari jawaban awal ke jawaban akhir per materi.
+  try{
+    const g=learningMetricsSnapshot(now)?.gain;
+    const naik=(g?.lessons||[]).filter(l=>l&&!l.insufficient&&Number.isFinite(Number(l.gain))).map(l=>Number(l.gain));
+    if(naik.length){const poin=Math.round(naik.reduce((s,x)=>s+x,0)/naik.length*100);if(poin>=3)out.push(FiezelI18n.t('bc.bukti-naik',{poin}))}
+  }catch{}
+  return out;
+}
+function braincoreProofPanelMarkup(){
+  if(!(Array.isArray(state.history)&&state.history.length))return '';
+  const lines=braincoreProofLines();
+  return card(`<h3>${esc(FiezelI18n.t('bc.bukti-judul'))}</h3>${lines.length?`<ul class="fz-bc-proof">${lines.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:`<p class="muted">${esc(FiezelI18n.t('bc.bukti-kosong'))}</p>`}`,'fz-bc-proof-card');
+}
+/** Satu baris fokus di hub Grammar. */
+function braincoreGrammarFocusLine(){
+  if(!(Array.isArray(state.history)&&state.history.length))return '';
+  const pasangan=braincoreConfusedPair();
+  let teks='';
+  if(pasangan)teks=FiezelI18n.t('bc.fokus-pasangan',{a:pasangan.a,b:pasangan.b});
+  else{
+    let nama='';
+    try{const p=buildAdaptivePolicy();if(p?.targetSkill&&GRAMMAR_ITEMS.some(x=>x.skill===p.targetSkill)){const n=friendlySkillName(p.targetSkill);if(n&&n!==p.targetSkill)nama=n}}catch{}
+    if(nama)teks=FiezelI18n.t('bc.fokus-materi',{materi:nama});
+  }
+  return teks?`<p class="fz-bc-focus" data-testid="braincore-grammar-focus">${esc(teks)}</p>`:'';
 }
 function jaChokaiHomeBannerMarkup(){
   if(!jaCourseOn())return '';
@@ -12596,7 +12722,7 @@ function grammar(){const level=getActiveLevel(),entries=grammarItemsForLevel(lev
   const examChip=`<button type="button" class="exam-entry-chip${examEntry?.passed?' is-passed':''}" onclick="openActiveLevelExamPanel()" aria-label="${FiezelI18n.t('grammar.ujian-skip-level-level',{level:esc(level),ujian:examEntry?.passed?FiezelI18n.t('level.ujian-sudah-lulus'):FiezelI18n.t('level.ujian-buka-panel')})}"><i data-lucide="${examEntry?.passed?'badge-check':'award'}"></i><span><b>${FiezelI18n.t('level.ujian-judul')}</b><small>${examEntry?.passed?FiezelI18n.t('level.ujian-lulus-terverifikasi'):FiezelI18n.t('level.ujian-merasa-bisa')}</small></span><i data-lucide="arrow-right"></i></button>`;
   const mistakeVaultCard=(self.FiezelGrammarUpgrade&&typeof self.FiezelGrammarUpgrade.renderVaultCard==='function')?self.FiezelGrammarUpgrade.renderVaultCard():'';
   const intensitySelector=(self.FiezelGrammarVocabBridge&&typeof self.FiezelGrammarVocabBridge.renderIntensitySelector==='function')?self.FiezelGrammarVocabBridge.renderIntensitySelector():'';
-  shell(FiezelI18n.t('student.grammar-title'),FiezelI18n.t('grammar.lesson-terurut-for-level-start',{jumlahLesson:skills.length,level:level}),`<div class="grammar-level-note fz2-path-summary"><span class="fz2-path-ring" style="--p:${skills.length?Math.round(rows.filter(r=>r.completed||r.examVerified).length/skills.length*100):0}" aria-hidden="true"><span class="fz2-path-ring-count">${rows.filter(r=>r.completed||r.examVerified).length}/${skills.length}</span></span><div><b>${FiezelI18n.t('grammar.jalur',{level:esc(level)})}</b><span>${esc(levelDescriptor(level))}</span><small>${FiezelI18n.t('grammar.item-pilihan-boleh-bervariasi-tetapi')}</small></div></div><div class="grammar-hub-tools">${examChip}<div class="path-view-toggle"><button type="button" data-testid="grammar-quick-session-btn" onclick="startGrammarQuickSession()"><i data-lucide="zap"></i> ${FiezelI18n.t('grammar.sesi-kilat')}</button></div><div class="path-view-toggle"><button type="button" data-testid="grammar-video-lab-btn" onclick="startVideoGrammarSession()"><i data-lucide="play"></i> ${FiezelI18n.t('grammar.video-lab','Video Lab')}</button></div><div class="path-view-toggle" style="display:none"><button type="button" data-testid="grammar-token-rail-btn" onclick="startTokenOrderSession()"><i data-lucide="shuffle"></i> ${FiezelI18n.t('grammar.susun-kata','Susun Kata')}</button></div><div class="path-view-toggle"><button type="button" onclick="toggleGrammarHubView()" aria-pressed="${grammarHubListView}"><i data-lucide="${grammarHubListView?'route':'list'}"></i> ${grammarHubListView?FiezelI18n.t('level.toggle-path-view'):FiezelI18n.t('level.toggle-list-view')}</button></div></div>${intensitySelector}${mistakeVaultCard?`<div class="grammar-vault-wrap" style="margin:10px 0">${mistakeVaultCard}</div>`:''}${grammarHubListView?listBody:pathBody}`);
+  shell(FiezelI18n.t('student.grammar-title'),FiezelI18n.t('grammar.lesson-terurut-for-level-start',{jumlahLesson:skills.length,level:level}),`<div class="grammar-level-note fz2-path-summary"><span class="fz2-path-ring" style="--p:${skills.length?Math.round(rows.filter(r=>r.completed||r.examVerified).length/skills.length*100):0}" aria-hidden="true"><span class="fz2-path-ring-count">${rows.filter(r=>r.completed||r.examVerified).length}/${skills.length}</span></span><div><b>${FiezelI18n.t('grammar.jalur',{level:esc(level)})}</b><span>${esc(levelDescriptor(level))}</span><small>${FiezelI18n.t('grammar.item-pilihan-boleh-bervariasi-tetapi')}</small></div></div>${braincoreGrammarFocusLine()}<div class="grammar-hub-tools">${examChip}<div class="path-view-toggle"><button type="button" data-testid="grammar-quick-session-btn" onclick="startGrammarQuickSession()"><i data-lucide="zap"></i> ${FiezelI18n.t('grammar.sesi-kilat')}</button></div><div class="path-view-toggle"><button type="button" data-testid="grammar-video-lab-btn" onclick="startVideoGrammarSession()"><i data-lucide="play"></i> ${FiezelI18n.t('grammar.video-lab','Video Lab')}</button></div><div class="path-view-toggle" style="display:none"><button type="button" data-testid="grammar-token-rail-btn" onclick="startTokenOrderSession()"><i data-lucide="shuffle"></i> ${FiezelI18n.t('grammar.susun-kata','Susun Kata')}</button></div><div class="path-view-toggle"><button type="button" onclick="toggleGrammarHubView()" aria-pressed="${grammarHubListView}"><i data-lucide="${grammarHubListView?'route':'list'}"></i> ${grammarHubListView?FiezelI18n.t('level.toggle-path-view'):FiezelI18n.t('level.toggle-list-view')}</button></div></div>${intensitySelector}${mistakeVaultCard?`<div class="grammar-vault-wrap" style="margin:10px 0">${mistakeVaultCard}</div>`:''}${grammarHubListView?listBody:pathBody}`);
   // Auto-scroll ke node aktif — sesudah renderInner mengembalikan scroll ke atas.
   // Reduced-motion: lompat tanpa animasi (behavior 'auto'), bukan tanpa fungsi.
   if(!grammarHubListView&&current)setTimeout(()=>{try{document.querySelector('.path-step.is-current')?.scrollIntoView({block:'center',behavior:(prefersReducedMotion()||state.preferences?.motion===false)?'auto':'smooth'})}catch(_){}},140);
@@ -15994,7 +16120,7 @@ function progress(){
     kedua modul itu diganti SATU kalimat yang menjelaskan kapan mereka muncul. */
  const progressFresh=!(Array.isArray(state.history)&&state.history.length);
  const tabContent={
-  overview:`<div class="grid progress-grid">${cefrRoadmapMarkup()}${weeklyActivityChartMarkup()}${nextSessionPanelMarkup()}${uxOn('personalJourneyTab')?journeyMarkup():''}${socialSummaryCardMarkup()}${/* Audit F15: modul kosong disembunyikan sampai ada bukti; murid baru membaca ringkasan di atas + satu kalimat di bawah, bukan belasan 0%. */progressFresh?'':`<div><h3>${FiezelI18n.t('progress.peta-study')}</h3>${mapCards}</div>`}
+  overview:`<div class="grid progress-grid">${cefrRoadmapMarkup()}${weeklyActivityChartMarkup()}${nextSessionPanelMarkup()}${braincoreProofPanelMarkup()}${uxOn('personalJourneyTab')?journeyMarkup():''}${socialSummaryCardMarkup()}${/* Audit F15: modul kosong disembunyikan sampai ada bukti; murid baru membaca ringkasan di atas + satu kalimat di bawah, bukan belasan 0%. */progressFresh?'':`<div><h3>${FiezelI18n.t('progress.peta-study')}</h3>${mapCards}</div>`}
    ${progressFresh&&!due.length?'':card(`<h3>${FiezelI18n.t('progress.ulangan-pintar')}</h3>${due.length?due.map(([k,x])=>`<div class="row"><span>${esc(friendlySkillName(k))}</span><span>${FiezelI18n.t('progress.dikuasai-risiko-lupa',{mastery:x.mastery||0,x:Math.round(forgettingProbability(x)*100)})}</span></div>`).join('<hr>')+`<div style="margin-top:12px"><button class="primary" onclick="reviewVocab()"><i data-lucide="history"></i> ${FiezelI18n.t('progress.mulai-review-btn',{jumlah:due.length})}</button></div>`:'<p class="muted">'+FiezelI18n.t('progress.belum-ada-materi-perlu-diulang')+'</p>'}`)}
    ${card(`<details class="prasasti-fold"><summary><h3>${FiezelI18n.t('progress.prasasti-judul')}</h3><i data-lucide="chevron-down" aria-hidden="true"></i></summary><p class="muted">${FiezelI18n.t('progress.lencana-bukti-study-redup-menunjukkan')}</p>${prasastiGalleryMarkup()}</details>`,'prasasti-gallery-card')}
    </div>`,
