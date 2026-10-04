@@ -1763,29 +1763,32 @@ let saveStorageWarned=false;
  * tidak pernah dibandingkan, dan tidak ada listener `storage`. Tab yang dibuka lebih dulu lalu
  * menyimpan satu perubahan kecil menghapus SELURUH kemajuan tab lain (probe O6).
  *
- * Sekarang setiap flush meninggalkan tanda kecil `fiezel-state-rev-v1|<kunci>` = "<revisi>:<id tab>", dan tab
- * ini mengingat salinan state yang tersimpan saat ia terakhir membaca/menulis (stateSyncBase).
- * Sebelum menulis, kalau tandanya bukan milik tab ini (atau event `storage` sudah mengabarkan
- * tulisan tab lain), state tersimpan dibaca dan DIGABUNG tiga arah dengan memori tab ini
+ * Sekarang tab ini mengingat revisi dan salinan state yang tersimpan saat ia terakhir membaca/
+ * menulis (stateSyncRev, stateSyncBase). Sebelum menulis, kalau revisi di blob tersimpan bukan
+ * revisi itu (atau event `storage` sudah mengabarkan tulisan tab lain), state tersimpan dibaca
+ * dan DIGABUNG tiga arah dengan memori tab ini
  * (FiezelContinuity.mergeConcurrentState) - baru kemudian ditulis. Saat tab kembali terlihat,
  * tulisan tab lain langsung digabung supaya layar tidak menampilkan angka basi. */
-const STATE_TAB_ID=Math.random().toString(36).slice(2,10);
-let stateSyncBase='',stateSyncKey='',stateSyncToken='',stateExternalDirty=false;
-/* Ruang nama sendiri, BUKAN akhiran kunci state: banyak jalur (migrasi akun, isolasi kursus) memindai
-   kunci berawalan 'fiezel-v4-state'/'fiezel-v5-state:' dan tidak boleh menemukan kunci asing di sana. */
-function stateRevKey(key=activeStateStorageKey){return 'fiezel-state-rev-v1|'+String(key||'')}
+let stateSyncBase='',stateSyncKey='',stateSyncRev=NaN,stateExternalDirty=false;
+/* Revisi blob tersimpan, dibaca dari AWAL string-nya: `stateRevision` adalah kunci kedua
+   defaultState, jadi selalu ada di ratusan karakter pertama. Tanpa kunci penanda terpisah -
+   satu flush tetap SATU penulisan localStorage (tests/save-path-perf-test.js). -1 = belum ada. */
+function storedStateRevision(){
+  try{const raw=localStorage.getItem(activeStateStorageKey);if(raw===null)return -1;const m=/"stateRevision":(\d+)/.exec(raw.slice(0,4000));return m?Number(m[1]):NaN}
+  catch(_){return NaN}
+}
 function stateSyncReset(json){
   stateSyncKey=activeStateStorageKey;stateExternalDirty=false;
   try{stateSyncBase=typeof json==='string'?json:JSON.stringify(state)}catch(_){stateSyncBase=''}
-  try{stateSyncToken=localStorage.getItem(stateRevKey())||''}catch(_){stateSyncToken=''}
+  stateSyncRev=storedStateRevision();
 }
 try{stateSyncReset()}catch(_){}
 /** Menggabung tulisan tab lain ke memori tab ini. true = ada yang digabung. */
 function stateMergeExternal(){
   if(!stateSyncBase||stateSyncKey!==activeStateStorageKey)return false;
-  let token='';try{token=localStorage.getItem(stateRevKey())||''}catch(_){}
-  if(!stateExternalDirty&&token===stateSyncToken)return false;
-  stateExternalDirty=false;stateSyncToken=token;
+  const rev=storedStateRevision();
+  if(!stateExternalDirty&&(rev===stateSyncRev||!Number.isFinite(rev)||rev<0))return false;
+  stateExternalDirty=false;stateSyncRev=rev;
   const C=self.FiezelContinuity;
   if(!C||typeof C.mergeConcurrentState!=='function')return false;
   /* Kursus Inggris: blob mentah tab lain - simetris dengan stateSyncBase (keduanya JSON memori
@@ -1844,20 +1847,19 @@ function saveFlushWrite(){
     stateSyncMarkWritten(null);
   }catch{if(!saveStorageWarned){saveStorageWarned=true;try{showToast(FiezelI18n.t('common.toast-penyimpanan-penuh'),'warn')}catch{}}}
 }
-/** Sesudah tulisan berhasil: tanda revisi milik tab ini + salinan dasar untuk gabungan berikutnya. */
+/** Sesudah tulisan berhasil: revisi + salinan dasar untuk gabungan berikutnya. */
 function stateSyncMarkWritten(json){
   stateSyncKey=activeStateStorageKey;
-  stateSyncToken=`${state.stateRevision}:${STATE_TAB_ID}`;
-  try{localStorage.setItem(stateRevKey(),stateSyncToken)}catch(_){}
+  stateSyncRev=Number(state.stateRevision);
   try{stateSyncBase=typeof json==='string'?json:JSON.stringify(state)}catch(_){stateSyncBase=''}
 }
 if(typeof window!=='undefined'&&window.addEventListener){
-  /* Event `storage` hanya sampai ke tab LAIN - tepat sinyal yang dibutuhkan. Tab lama yang belum
-     menulis tanda revisi tetap terdeteksi lewat kunci state-nya sendiri. */
+  /* Event `storage` hanya sampai ke tab LAIN - tepat sinyal yang dibutuhkan. Revisi tersimpan
+     tetap diperiksa di setiap flush untuk tab yang tidak menerima event (dibekukan, bfcache). */
   window.addEventListener('storage',e=>{
     try{
       const k=String(e?.key||'');
-      if(!k||(k!==activeStateStorageKey&&k!==stateRevKey()&&k.indexOf(activeStateStorageKey)!==0))return;
+      if(!k||(k!==activeStateStorageKey&&k.indexOf(activeStateStorageKey)!==0))return;
       stateExternalDirty=true;
       /* Tab ini sedang terlihat (layar terbagi): gabung diam-diam - tanpa render ulang dan tanpa
          toast, karena tab lain bisa menulis di setiap jawaban. Toast + render hanya saat tab

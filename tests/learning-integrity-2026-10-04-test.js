@@ -142,16 +142,17 @@ check('P-A a hint popover left open by a practice session is closed when a measu
   }
 
   // Jalur simpan SUNGGUHAN, dua "tab" berbagi satu localStorage.
-  const start = app.indexOf('const STATE_TAB_ID=');
+  const start = app.indexOf("let stateSyncBase='',stateSyncKey='',stateSyncRev=NaN");
   const endMerge = start >= 0 ? app.indexOf('function saveFlushWrite(', start) : -1;
   const pieces = [start >= 0 && endMerge > start ? app.slice(start, endMerge) : '', fn('saveFlushWrite'), fn('stateSyncMarkWritten')];
   check('F1 extract the save path (stateSync*, saveFlushWrite) from app.js', pieces.every(Boolean));
   check('F1 saveFlushWrite merges external writes BEFORE writing', /function saveFlushWrite\(\)\{\s*saveWriteQueued=false;\s*try\{stateMergeExternal\(\)\}catch\(_\)\{\}/.test(app));
   check('F1 other tabs are noticed through the storage event', /window\.addEventListener\('storage',e=>\{[\s\S]{0,400}stateExternalDirty=true/.test(app));
-  check('F1 revision token lives outside the state-key prefixes', /function stateRevKey\(key=activeStateStorageKey\)\{return 'fiezel-state-rev-v1\|'\+/.test(app));
+  check('F1 foreign writes are detected from the stored revision (no extra key)', /function storedStateRevision\(\)/.test(app) && !/fiezel-state-rev-v1/.test(app));
   if (pieces.every(Boolean)) {
     const store = {};
-    const localStorage = { getItem: k => (Object.prototype.hasOwnProperty.call(store, k) ? store[k] : null), setItem: (k, v) => { store[k] = String(v); }, removeItem: k => { delete store[k]; } };
+    let writes = 0;
+    const localStorage = { getItem: k => (Object.prototype.hasOwnProperty.call(store, k) ? store[k] : null), setItem: (k, v) => { writes++; store[k] = String(v); }, removeItem: k => { delete store[k]; } };
     const KEY = 'fiezel-v5-state:murid';
     const fresh = { stateRevision: 0, view: 'home', totalAnswered: 0, totalCorrect: 0, history: [], sessionHistory: [], gems: { schema: 'fiezel-gems-v1', balance: 0, earnedTotal: 0, spentTotal: 0, ledger: [] }, vocab: {}, preferences: { motion: true } };
     store[KEY] = JSON.stringify(fresh);
@@ -181,8 +182,10 @@ check('P-A a hint popover left open by a practice session is closed when a measu
     check('F1 real save path: the first tab in turn keeps the stale tab\'s change',
       saved2.history.length === 6 && saved2.preferences.motion === false && saved2.totalAnswered === 6,
       JSON.stringify({ history: saved2.history.length, motion: saved2.preferences.motion, total: saved2.totalAnswered }));
-    const tok = store['fiezel-state-rev-v1|' + KEY] || '';
-    check('F1 every write leaves a revision token', /^\d+:[a-z0-9]+$/.test(tok), tok);
+    const before = writes;
+    vm.runInContext("state.preferences.motion=true;saveFlushWrite();", tabB);
+    check('F1 a save that merges is still exactly ONE localStorage write', writes - before === 1, (writes - before) + ' penulisan');
+    check('F1 revisions keep rising across tabs', JSON.parse(store[KEY]).stateRevision > saved2.stateRevision, `${saved2.stateRevision} -> ${JSON.parse(store[KEY]).stateRevision}`);
   }
 }
 

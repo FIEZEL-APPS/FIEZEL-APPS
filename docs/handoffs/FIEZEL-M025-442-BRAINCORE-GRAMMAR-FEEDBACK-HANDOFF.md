@@ -52,15 +52,16 @@ perbaikan per temuan ada di bagian terakhir tiap laporan.
 3. **V-A/V-B** `vocabReviewQueue()` dibaca "Uji kosakata", flashcards, "Review jatuh tempo";
    `dueItems()` kosakata mencakup level ≤ aktif. Probe: kata pertama jatuh tempo 1/15 → 15/15;
    kartu A1 sesudah naik ke A2 0 → 1.
-4. **F1** dua tab: tanda revisi `fiezel-state-rev-v1|<kunci>` + gabungan tiga arah
-   `FiezelContinuity.mergeConcurrentState` sebelum setiap tulisan + listener `storage`. Probe O6:
+4. **F1** dua tab: revisi blob tersimpan dibandingkan sebelum setiap tulisan (tanpa kunci
+   tambahan - satu flush tetap satu penulisan) + gabungan tiga arah
+   `FiezelContinuity.mergeConcurrentState` + listener `storage`. Probe O6:
    kemajuan tab A tidak lagi hilang.
 5. **F2/F3/F4/F5** `brainSyncFlush()` dipanggil (akhir sesi, `online`, boot, Pengaturan); daftar
    terkirim dipangkas menurut riwayat hidup (tidak macet); `online` juga mengirim aktivitas dan
    antrean hasil kebijakan. Sinkron TETAP mati secara bawaan - sakelar baru di Pengaturan → Online
    & Teman (kunci `settings.brain-sync-*`, id/th).
 
-Gerbang baru: `tests/learning-integrity-2026-10-04-test.js` (35 cek, Node murni, merah 0/20 di
+Gerbang baru: `tests/learning-integrity-2026-10-04-test.js` (36 cek, Node murni, merah 0/20 di
 kode sebelum perbaikan); `tests/grammar-feedback-regression-test.js` C1-C2 (browser);
 `tests/placement-accuracy-test.js` L1-L6; `tests/grammar-vocab-leveling-test.js` Test 10 diperluas.
 

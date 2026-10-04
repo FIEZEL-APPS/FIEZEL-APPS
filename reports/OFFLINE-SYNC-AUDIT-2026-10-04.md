@@ -124,10 +124,10 @@ jadi probe sesi kilat tidak menyentuhnya.
 
 ## 6. Status perbaikan (2026-10-04, disetujui owner)
 
-**F1 — diperbaiki: dua tab tidak saling menimpa.** Setiap simpan meninggalkan tanda kecil
-`fiezel-state-rev-v1|<kunci>` = "revisi:id-tab", dan tab mengingat salinan state tersimpan saat ia
-terakhir membaca/menulis. Sebelum menulis, kalau tanda itu bukan miliknya (atau event `storage`
-sudah mengabarkan tulisan tab lain), state tersimpan digabung **tiga arah** dengan memori tab ini
+**F1 — diperbaiki: dua tab tidak saling menimpa.** Tab mengingat revisi dan salinan state
+tersimpan saat ia terakhir membaca/menulis. Sebelum menulis, kalau `stateRevision` di blob tersimpan
+bukan revisi itu (atau event `storage` sudah mengabarkan tulisan tab lain), state tersimpan digabung
+**tiga arah** dengan memori tab ini
 (`FiezelContinuity.mergeConcurrentState`): riwayat per `attemptId`, catatan berwaktu per isi,
 penghitung `mine + theirs − base`, buku gem per entri (saldo = earned − spent), item materi per item
 (bukti terbaru), layar & sesi berjalan milik tab sendiri. Saat tab kembali terlihat, tulisan tab
