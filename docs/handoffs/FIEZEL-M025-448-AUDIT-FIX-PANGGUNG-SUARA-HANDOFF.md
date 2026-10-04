@@ -1,10 +1,10 @@
 # Handoff: Audit dan Perbaikan Bug Panggung Suara SLOT 13 + Sistem Pertemanan ala LINE
 
-**Build**: `m025-446` (selaras 6 titik hexa-sync)
+**Build**: `m025-448` (selaras 6 titik hexa-sync)
 **Tanggal**: 4 Oktober 2026
-**Lingkup**: Audit menyeluruh Kelompok 1 (fitur belum di-commit), penemuan dan perbaikan bug.
-**Status**: 8/8 gate hijau. Seluruh berkas masih di working tree lokal, belum di-commit
-sesuai Git Protection Rule sampai Owner memerintahkan.
+**Lingkup**: Audit menyeluruh Kelompok 1 (Panggung Suara SLOT 13 + Sistem Pertemanan ala LINE),
+penemuan dan perbaikan bug, pelunasan utang i18n kunci hantu, dan ekspansi kartu Sarang Tabu.
+**Status**: 14/14 gate hijau.
 
 ---
 
