@@ -208,6 +208,8 @@
   'grammar.video.complete-title': 'Latihan 5 Checkpoint Selesai!',
   'grammar.video.edu-material': 'Materi Edukasi',
   'grammar.video.exercise': 'Latihan tata bahasa',
+  'grammar.contoh-singkat': 'Contoh:',
+  'grammar.token-order-panduan': 'Susun kata menjadi kalimat ini, lalu isi bagian kosongnya: {kalimat}',
   'grammar.video.no-video': 'Video tidak tersedia, beralih ke teks.',
   'grammar.video.of': 'dari',
   'grammar.video.open-source': 'Buka di YouTube',

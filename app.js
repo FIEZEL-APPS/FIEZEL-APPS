@@ -5273,11 +5273,14 @@ function stepTutorThai(out,question){
     return{...out,steps,finalAsk};
   }catch{return out}
 }
-function stepTutorGuidanceMarkup(q){
+function stepTutorGuidanceMarkup(q,opts={}){
   const gd=stepTutorGuidance(q);
   if(!gd)return '';
   const cleanDash=s=>String(s||'').replace(/\s*[—–]\s*/g,', ');
-  return `<div class="tutor-steps"><small class="eyebrow">${FiezelI18n.t('tutor.tuntunan-eyebrow')}</small>${gd.steps.map(s=>`<p class="tutor-step">${esc(cleanDash(s?.ask))}</p>`).join('')}<p class="tutor-step-final">${esc(cleanDash(gd.finalAsk))}</p></div>`;
+  /* Audit UX grammar U10: di pembahasan jawabannya sudah dibuka, jadi penutup "apa jawabanmu?"
+     tidak lagi ditanyakan; langkahnya tetap tampil sebagai cara berpikir. */
+  const penutup=opts.revealed?'':`<p class="tutor-step-final">${esc(cleanDash(gd.finalAsk))}</p>`;
+  return `<div class="tutor-steps"><small class="eyebrow">${FiezelI18n.t('tutor.tuntunan-eyebrow')}</small>${gd.steps.map(s=>`<p class="tutor-step">${esc(cleanDash(s?.ask))}</p>`).join('')}${penutup}</div>`;
 }
 function tutorSession(){
   if(!tutorAvailable())return null;
@@ -12778,7 +12781,7 @@ function renderGrammarLesson(skill){const meta=GRAMMAR_ITEMS.find(x=>x.skill===s
   const lessonPawReady=(()=>{try{return !!self.FiezelPaw?.ready?.()}catch(_){return false}})();
   const lessonFace=lessonPawReady?'<fiezel-mascot class="lesson-mascot"></fiezel-mascot>':'<span class="fz-i" data-fz-icon="paw"></span>';
   const lessonPaw=`<div class="lesson-stage" aria-hidden="true"><span class="lesson-stage-paw">${lessonFace}</span><span class="lesson-bubble"><b>${esc(friendlySkillName(skill))}</b></span></div>`;
-  setApp(`<section class="fade grammar-lesson-page"><div class="skill-page-topbar"><button type="button" class="skill-back-btn" onclick="exitStage()"><i data-lucide="arrow-left"></i> <span>${FiezelI18n.t('grammar.kembali-grammar-hub')}</span></button><button type="button" class="skill-help-dot" onclick="openGrammarLessonHelp('${esc(skill)}')" aria-label="${esc(FiezelI18n.t('skills.bantuan'))}" title="${esc(FiezelI18n.t('skills.bantuan'))}"><span aria-hidden="true">?</span></button></div>${card(`<div class="grammar-start-hero"><span class="grammar-hero-badge">${esc(FiezelI18n.t('skill.grammar','TATA BAHASA').toUpperCase())} · ${esc(getActiveLevel())}</span><h2>${esc(friendlySkillName(skill))}</h2><p class="grammar-brief-rule">${esc(rule)}</p><button onclick="practiceSkill('${esc(skill)}')" class="primary grammar-start-direct-btn">${FiezelI18n.t('grammar.start-item',{jumlahSoal:grammarLessonSessionTarget(skill)})} <i data-lucide="arrow-right"></i></button></div>`,'grammar-lesson-card')}<div class="toolbar"><button onclick="exitStage()"><i data-lucide="arrow-left"></i> ${FiezelI18n.t('grammar.kembali-grammar-hub')}</button></div></section>`);
+  setApp(`<section class="fade grammar-lesson-page"><div class="skill-page-topbar"><button type="button" class="skill-back-btn" onclick="exitStage()"><i data-lucide="arrow-left"></i> <span>${FiezelI18n.t('grammar.kembali-grammar-hub')}</span></button><button type="button" class="skill-help-dot" onclick="openGrammarLessonHelp('${esc(skill)}')" aria-label="${esc(FiezelI18n.t('skills.bantuan'))}" title="${esc(FiezelI18n.t('skills.bantuan'))}"><span aria-hidden="true">?</span></button></div>${card(`<div class="grammar-start-hero"><span class="grammar-hero-badge">${esc(FiezelI18n.t('skill.grammar','TATA BAHASA').toUpperCase())} · ${esc(getActiveLevel())}</span><h2>${esc(friendlySkillName(skill))}</h2><p class="grammar-brief-rule">${esc(rule)}</p>${(()=>{/* Audit UX grammar U12: aturan abstrak tanpa contoh sulit dipahami murid A1. Satu kalimat dari soal pertama pelajaran ini, kata kuncinya ditebalkan. */const kalimat=String(base||'');if(!correct||!/_{2,}|\[\.\.\.\]/.test(kalimat))return '';const [kiri,kanan]=kalimat.split(/_{2,}|\[\.\.\.\]/);return `<p class="grammar-brief-example"><span>${esc(FiezelI18n.t('grammar.contoh-singkat'))}</span> ${esc(kiri)}<b>${esc(correct)}</b>${esc(kanan||'')}</p>`})()}<button onclick="practiceSkill('${esc(skill)}')" class="primary grammar-start-direct-btn">${FiezelI18n.t('grammar.start-item',{jumlahSoal:grammarLessonSessionTarget(skill)})} <i data-lucide="arrow-right"></i></button></div>`,'grammar-lesson-card')}</section>`);
   enhanceUI()}
 /* m025-375: SESI LESSON = GRAMMAR_LESSON_MODES, bergilir antar-templat.
  * Pengganti seleksi mode-coverage-first (m025-155) yang wajib mengisi ke-25 mode. Putaran k
@@ -12963,7 +12966,10 @@ function makeGrammarTokenOrderQuestion(skill, item, idx, level){
     level:activeLvl,
     skill:skill,
     lessonSkill:skill,
-    question:FiezelI18n.t('grammar.token-order-prompt','Susun kata-kata berikut menjadi kalimat yang tepat:'),
+    /* Audit UX grammar U5: tanpa kalimat tujuan, susunan lain yang sama benarnya ("Where is he? I can't
+       see Tom.") dinilai salah. Kalimat rumpang aslinya kini jadi panduan; yang diuji tetap urutan
+       kata dan pilihan kata untuk bagian kosongnya. */
+    question:base&&/_{2,}|\[\.\.\.\]/.test(base)?FiezelI18n.t('grammar.token-order-panduan',{kalimat:base}):FiezelI18n.t('grammar.token-order-prompt','Susun kata-kata berikut menjadi kalimat yang tepat:'),
     tokens:rawTokens,
     gloss:tokenGlossMap([...rawTokens,...distractors]),
     distractors:distractors,
@@ -12985,9 +12991,11 @@ function getOrMakeVideoGrammarQuestion(skill, level, fallbackItem, idx, usedVgId
   const bank=self.__videoGrammarBankCache;
   let match=null;
   if(Array.isArray(bank)&&bank.length){
+    /* Audit UX grammar U2 (2026-10-04): HANYA video milik skill pelajaran ini. Dulu jatuh ke
+       video selevel atau video apa saja, sehingga pelajaran kata ganti memunculkan "Present
+       Simple" berbahasa Inggris. Tanpa video yang cocok, cabang fallbackItem di bawah membuat
+       soal dari kalimat pelajaran sendiri. */
     match=bank.find(x=>!usedVgIds.has(x.id)&&(x.skill===skill||x.lessonSkill===skill));
-    if(!match)match=bank.find(x=>!usedVgIds.has(x.id)&&x.level===level);
-    if(!match)match=bank.find(x=>!usedVgIds.has(x.id));
   }
   if(match){
     usedVgIds.add(match.id);
@@ -14778,7 +14786,7 @@ function quizLoop(cfg){
      telemetryRowHtml='';
     }
    const showStepGuidanceInFeedback = !MEASURE && !ok && isLearnerOverwhelmed(q);
-   const stepGuidanceHtml = showStepGuidanceInFeedback ? stepTutorGuidanceMarkup(q) : '';
+   const stepGuidanceHtml = showStepGuidanceInFeedback ? stepTutorGuidanceMarkup(q,{revealed:true}) : '';
    const stripDash = s => String(s || '').replace(/\s*[—–]\s*/g, ', ').replace(/,\s*,/g, ', ');
    whyText = stripDash(whyText);
    if(pickedWhyFails) pickedWhyFails = stripDash(pickedWhyFails);

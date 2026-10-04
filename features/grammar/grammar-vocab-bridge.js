@@ -258,7 +258,13 @@
       const lessonEntry = map.lessons[skill];
       const details = lessonEntry.vocabDetails || [];
       if (details.length) {
-        return details.slice(0, targetCount);
+        /* Audit UX grammar U6: arti di peta ini hanya berbahasa Indonesia. V sudah ditimpa arti
+           sesuai locale (vocabForLocale di app.js), jadi murid Thai membaca arti Thai. */
+        const bank = (typeof V !== 'undefined' && Array.isArray(V)) ? V : [];
+        return details.slice(0, targetCount).map(d => {
+          const v = bank.find(x => x && x.id === d.id);
+          return v && v.meaning ? Object.assign({}, d, { meaning: v.meaning }) : d;
+        });
       }
     }
 
@@ -1120,7 +1126,7 @@
               <div class="summary-stat-row">
                 <div class="summary-metric">
                   <span class="metric-num">${g.words.length}</span>
-                  <span class="metric-label">${t('scaffold.metric-vocab', 'Kosakata Dikuasai')}</span>
+                  <span class="metric-label">${t('scaffold.metric-vocab', 'Kosakata Dikenali')}</span>
                 </div>
                 <div class="summary-metric-divider"></div>
                 <div class="summary-metric">
@@ -1130,7 +1136,7 @@
                 <div class="summary-metric-divider"></div>
                 <div class="summary-metric">
                   <span class="metric-num">100%</span>
-                  <span class="metric-label">${t('scaffold.metric-ready', 'Kesiapan BKT')}</span>
+                  <span class="metric-label">${t('scaffold.metric-ready', 'Siap Latihan')}</span>
                 </div>
               </div>
 
@@ -1161,7 +1167,7 @@
           <div class="mini-game-nav">
             <div class="nav-brand-group">
               <span class="game-brand">FIEZEL QUEST</span>
-              <span class="game-lesson-indicator">${esc(g.skill)}</span>
+              <span class="game-lesson-indicator">${esc((typeof friendlySkillName === 'function' && friendlySkillName(g.skill)) || g.skill)}</span>
             </div>
             <button type="button" class="modal-close-corner" onclick="closeModal()" aria-label="${t('scaffold.close', 'Tutup')}">
               <i data-lucide="x"></i>

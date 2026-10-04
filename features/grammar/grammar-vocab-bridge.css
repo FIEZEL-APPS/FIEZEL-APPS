@@ -1560,3 +1560,8 @@ body:has(.modal-intensity-sheet) nav.bottomnav {
   width: 16px;
   height: 16px;
 }
+
+/* Audit UX grammar U11 (2026-10-04): style.css memasang .modal-close-corner absolut di top/right
+   -8px untuk modal biasa, sehingga di kepala FIEZEL QUEST tombol tutupnya terpotong di tepi
+   layar. Di dalam lembar quest tombolnya ikut alur kepala dan cukup besar untuk jari. */
+.modal-mini-game-sheet .modal-close-corner{position:static;flex:0 0 auto;width:40px;height:40px;top:auto;right:auto}

@@ -216,7 +216,7 @@
     'social.shell-title': 'Profil',
     'social.shell-desc': 'Belajar bareng teman — pakai nama samaran, tanpa chat, dan boleh dimatikan kapan saja.',
     'quiz.vonis-benar': 'Benar! Mantap.',
-    'quiz.vonis-salah': 'Belum tepat. Nggak apa-apa, coba lagi.',
+    'quiz.vonis-salah': 'Belum tepat. Nggak apa-apa, yuk lihat pembahasannya.',
     'quiz.burst-ok-sub': 'Mantap, kamu sudah paham polanya.',
     'quiz.burst-miss-sub': 'Tenang, kita lihat bareng jawabannya.',
     'quiz.analyzing-judul': 'FIEZEL menyiapkan penjelasannya…',

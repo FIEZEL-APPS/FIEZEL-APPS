@@ -1,5 +1,7 @@
 # Audit UI/UX sesi latihan grammar: dari kursi murid
 
+> **Status m025-458:** U1 sampai U12 dan U14 **diperbaiki** (lihat `docs/handoffs/FIEZEL-M025-458-GRAMMAR-UX-FIXES-HANDOFF.md`, gerbang `tests/grammar-ux-p1-2026-10-04-test.js`). U13 dan butir polesan U15 sampai U18 belum.
+
 **Tanggal:** 2026-10-04
 **Basis:** `main` @ `587335cd` (build `m025-450`). Ini sudah memuat redesign latihan grammar
 (m025-443/445), perbaikan tur dan badge Thai (m025-449), dan perbaikan panggung suara (m025-450).

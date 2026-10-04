@@ -12,6 +12,19 @@
 
   const FiezelGrammarVideo = {};
 
+  /* Audit UX grammar U1 (2026-10-04): tanpa video, subtitle tampil sebagai teks. Baris yang sama
+     persis dengan kalimat soal yang sudah terisi membocorkan jawabannya, jadi baris itu tampil
+     dalam bentuk rumpang (clozeText). */
+  function blankAnswerInSubtitle(text, ex) {
+    const raw = String(text == null ? '' : text);
+    const cloze = ex && ex.clozeText ? String(ex.clozeText) : '';
+    const ans = ex && ex.clozeAnswer ? String(ex.clozeAnswer) : '';
+    if (!cloze || !ans || !/_{2,}/.test(cloze)) return raw;
+    const norm = x => String(x).toLowerCase().replace(/[^a-z0-9' ]+/g, ' ').replace(/\s+/g, ' ').trim();
+    return norm(raw) === norm(cloze.replace(/_{2,}/, ans)) ? cloze : raw;
+  }
+  FiezelGrammarVideo.blankAnswerInSubtitle = blankAnswerInSubtitle;
+
   /**
    * Mengkonversi template soal grammar-video menjadi format soal standar kuis
    * yang kompatibel dengan quizLoop.
@@ -21,7 +34,7 @@
   FiezelGrammarVideo.createVideoGrammarQuestion = function(template) {
     template = template || {};
     const ex = template.exercise || {};
-    let stemQuestion = ex.question || (typeof FiezelI18n !== 'undefined' && FiezelI18n.t ? FiezelI18n.t('grammar.video.question', 'Perhatikan video dan lengkapi bagian yang kosong.') : 'Perhatikan video dan lengkapi bagian yang kosong.');
+    let stemQuestion = (typeof FiezelI18n !== 'undefined' && FiezelI18n.t ? FiezelI18n.t('grammar.video.question', 'Perhatikan video dan lengkapi bagian yang kosong.') : 'Perhatikan video dan lengkapi bagian yang kosong.');
     if (ex.clozeText) {
       stemQuestion = stemQuestion ? `${stemQuestion} ${ex.clozeText}` : ex.clozeText;
     }
@@ -185,12 +198,11 @@
         <div class="fallback-card">
           <i data-lucide="book-open" style="width: 44px; height: 44px; margin-bottom: 8px; opacity: 0.85; color: var(--accent, #2563EB);"></i>
           <p style="font-weight:700;margin-bottom:4px">${esc(config.exercise?.grammarPoint || 'Video Grammar Lab')}</p>
-          <p class="muted" style="margin-bottom:12px;font-size:0.85rem">${t('grammar.video.no-video', 'Video tidak tersedia, beralih ke teks.')}</p>
           ${config.subtitles && config.subtitles.length ? `
             <div class="video-subtitle-dialog" style="display:flex;flex-direction:column;gap:6px;width:100%;max-width:440px;text-align:left">
               ${config.subtitles.map(s => `
-                <div style="background:var(--panel, #0F172A);padding:6px 12px;border-radius:var(--radius-sm, 8px);border:1px solid var(--line-soft, #334155);font-size:0.88rem">
-                  <strong style="color:var(--accent-strong, #60A5FA)">${esc(s.speaker || 'Dialogue')}:</strong> ${esc(s.text)}
+                <div style="background:rgba(255,255,255,0.08);color:#F1F5F9;padding:8px 12px;border-radius:var(--radius-sm, 8px);border:1px solid rgba(255,255,255,0.18);font-size:0.92rem;line-height:1.4">
+                  <strong style="color:#93C5FD">${esc(s.speaker || 'Dialogue')}:</strong> ${esc(blankAnswerInSubtitle(s.text, config.exercise))}
                 </div>
               `).join('')}
             </div>

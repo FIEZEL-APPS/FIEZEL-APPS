@@ -317,7 +317,7 @@
     'brain-tutor.probe-default': 'Sebelum lihat pilihannya lagi, coba cek mana kata penunjuk waktu di kalimat itu?',
     'brain-tutor.hint-rotated': 'Coba lihat dari sudut ini: ' + '{rotated}' + '. Sekarang coba lagi yuk.',
     'brain-tutor.hint-cue': 'Kunci ingatannya: ' + '{cue}' + '. Sekarang coba jawab lagi ya.',
-    'brain-tutor.hint-default': 'Petunjuknya ada di kata yang menunjukkan kapan kejadiannya. Yuk coba lagi.',
+    'brain-tutor.hint-default': 'Petunjuknya ada di kata-kata di sekitar bagian yang kosong. Baca lagi pelan-pelan, lalu coba lagi ya.',
     'brain-tutor.worked-intro': ' Aku contohkan satu yang mirip dulu ya, biar makin jelas langkahnya.',
     'brain-tutor.reveal-intro': ' Oke, aku buka pembahasannya ya.',
     'brain-tutor.move-celebrate': 'Nah, mantap! Jebakan yang tadi bikin kamu keliru sudah berhasil kamu lewati dengan pemahaman yang benar, bukan tebakan.',
