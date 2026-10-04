@@ -146,7 +146,16 @@ export const BYTE_LIMITS = Object.freeze({
   '/api/content/self-refine': 20000,// owner: konten untuk self-refine + ledger
   '/api/feedback/list': 512,        // GET, tanpa body
   '/api/feedback/clear': 512,       // POST, tanpa body berarti
-  '/api/push/public-key': 512       // GET, tanpa body
+  '/api/push/public-key': 512,      // GET, tanpa body
+  // --- SLOT 13: panggung suara live (stage/route-stage.js). Payload kecil:
+  // signaling hanya membawa SDP/ICE (puluhan sampai ratusan byte) + kode ruang.
+  // Cap 16 KB memberi ruang SDP panjang tanpa membuka pintu bagi badan besar.
+  '/api/stage/create': 1024,
+  '/api/stage/join': 1024,
+  '/api/stage/signal': 16384,
+  '/api/stage/poll': 512,           // GET, tanpa body
+  '/api/stage/state': 4096,
+  '/api/stage/leave': 512
 });
 
 /** Cap terakhir untuk path yang tidak terdaftar: kecil, sengaja. */
@@ -211,7 +220,12 @@ export const CLIENT_FLAG_DEFAULTS = Object.freeze({
   // Default false seperti semua yang lain, dan di sini default itu bukan formalitas:
   // lane ini menyimpan bukti yang terikat `identity.sub`, jadi ia lahir MATI dan
   // hanya menyala kalau owner benar-benar menuliskannya di KV.
-  cfLearnerEvidenceEnabled: false
+  cfLearnerEvidenceEnabled: false,
+  // SLOT 13. Panggung Suara Live (dua arah audio + game Sarang Tabu). Default
+  // false seperti semua yang lain: fitur lahir MATI sampai owner menyalakannya
+  // di KV. Flag ini TIDAK ikut daftar enam flag kill switch app.js; modul klien
+  // membacanya sendiri dari /api/config (pola fiezel-social.js).
+  cfStageEnabled: false
 });
 
 /** Kill switch tingkat server (bukan flag klien): mematikan jalur mahal. */
@@ -221,7 +235,8 @@ export const KILL_SWITCH_DEFAULTS = Object.freeze({
   coach: false,
   analytics: false,
   social: false,
-  learnerEvidence: false   // SLOT 9 — kill switch lane bukti per-murid
+  learnerEvidence: false,  // SLOT 9 — kill switch lane bukti per-murid
+  stage: false             // SLOT 13 — kill switch panggung suara live
 });
 
 /* --------------------------------------------------------------------------

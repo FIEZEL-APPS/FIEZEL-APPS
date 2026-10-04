@@ -42,7 +42,10 @@ export const ERR = {
   // Persetujuan murid belum ada, sudah dicabut, atau versinya bukan versi yang
   // berlaku. SATU kode untuk ketiganya: membedakannya memberi tahu pemanggil
   // keadaan persetujuan orang lain kalau cookie-nya pernah bocor.
-  CONSENT_REQUIRED: 'consent_required'
+  CONSENT_REQUIRED: 'consent_required',
+  // --- SLOT 13: panggung suara live (stage/route-stage.js) -----------------
+  // Gerbang flag panggung menolak (fail-closed). Satu bentuk untuk semua sebab.
+  STAGE_DISABLED: 'stage_disabled'
 };
 
 /**

@@ -16,6 +16,9 @@
     'kelasku.belum-tersambung': 'Akun KelasKu belum tersambung di aplikasi ini.',
     'kelasku.belum-masuk': 'Kamu belum masuk KelasKu. Masuk dulu di aplikasi FIEZEL, lalu kembali ke sini.',
     'kelasku.jembatan-mati': 'Jembatan KelasKu belum dinyalakan di server.',
-    'kelasku.tiket-gagal': 'Gagal mengambil tiket KelasKu.'
+    'kelasku.tiket-gagal': 'Gagal mengambil tiket KelasKu.',
+    'kelas.demo-rekam-meta': 'Rekam 1 menit · Dinilai Guru & AI',
+    'kelas.demo-selesai-meta': 'Selesai · Nilai 90 (18/20 benar)',
+    'kelas.soal-adaptif-bobot': 'soal adaptif · Bobot nilai 15%'
   });
 })();

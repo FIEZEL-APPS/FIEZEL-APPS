@@ -83,6 +83,9 @@
     'latihan.reading-note': 'ความเข้าใจในการอ่าน',
     'latihan.writing-note': 'เขียนประโยค',
     'latihan.library-note': 'อ่านตามใจชอบ',
+    /* SLOT 13: การ์ดทางเข้าเวทีเสียงสดในแท็บฝึกฝน (คู่ไทยของ copy-id-redesign.js) */
+    'latihan.panggung': 'เวทีเสียงสด (เรียนคู่)',
+    'latihan.panggung-note': 'พูดคุยสองทางและเล่นเกมคำ',
 
     /* ── Ringkasan akhir sesi ──────────────────────────────── */
     'ringkas.judul': 'สรุปรอบนี้',

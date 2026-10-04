@@ -23,6 +23,8 @@
     "./features/i18n/copy-th-settings-locale.js",
     "./features/i18n/copy-th-grammar-labels.js",
     "./features/i18n/copy-th-redesign.js",
+    "./features/i18n/copy-th-stage.js",
+    "./features/i18n/copy-th-friend.js",
     "./features/i18n/copy-th-pawarena.js",
     "./features/i18n/copy-th-bahasa.js",
     "./features/i18n/naskah-th-brain.js",

@@ -657,7 +657,7 @@ function grammarCausalKey(whyCorrect,stem){
 function joinQuoteReason(quoted,tail){
   const q=String(quoted||'').trim(),t=String(tail||'').trim();
   if(!q)return t;if(!t)return q;
-  return/[.!?](?:[”"'’»])?$/.test(q)?`${q} — ${t}`:`${q} ${t}`;
+  return/[.!?](?:[”"'’»])?$/.test(q)?`${q}, ${t}`:`${q} ${t}`;
 }
 /* m025-375: alasan per pilihan disimpan sebagai sambungan kalimat ("bentuk subjek, nggak bisa...")
    karena di umpan balik ia menempel di belakang opsinya. Saat alasan itu sendiri jadi PILIHAN
@@ -5256,7 +5256,8 @@ function stepTutorThai(out,question){
 function stepTutorGuidanceMarkup(q){
   const gd=stepTutorGuidance(q);
   if(!gd)return '';
-  return `<div class="tutor-steps"><small class="eyebrow">${FiezelI18n.t('tutor.tuntunan-eyebrow')}</small>${gd.steps.map(s=>`<p class="tutor-step">${esc(String(s?.ask||''))}</p>`).join('')}<p class="tutor-step-final">${esc(String(gd.finalAsk||''))}</p></div>`;
+  const cleanDash=s=>String(s||'').replace(/\s*[—–]\s*/g,', ');
+  return `<div class="tutor-steps"><small class="eyebrow">${FiezelI18n.t('tutor.tuntunan-eyebrow')}</small>${gd.steps.map(s=>`<p class="tutor-step">${esc(cleanDash(s?.ask))}</p>`).join('')}<p class="tutor-step-final">${esc(cleanDash(gd.finalAsk))}</p></div>`;
 }
 function tutorSession(){
   if(!tutorAvailable())return null;
@@ -7406,6 +7407,14 @@ function openApp(){
   // supaya alamatnya bersih dan lencana Home benar sejak cat pertama; lembar undangannya
   // sendiri menunggu alur sambutan selesai — lihat armSocialInviteSheet() di bawah.
   try{socialInviteBoot()}catch(_){}
+  // Tautan pertemanan (?friend=@handle): dialog konfirmasi "Tambahkan ... sebagai teman?".
+  // Jalur yang sama dengan undangan teman - alamat dibaca sekarang, aksinya ditunda
+  // sedikit supaya splash & lencana Home selesai lebih dulu.
+  try{friendLinkBoot()}catch(_){}
+  // Undangan Panggung Suara Live (?stage=FZ-XXXX) dari WhatsApp. Dirutekan lewat jalur
+  // yang sama dengan undangan teman: alamat dibaca di sini, aksinya ditunda sedikit
+  // supaya splash & lencana Home selesai lebih dulu.
+  try{fzStageAutoJoin()}catch(_){}
   armSocialInviteSheet();
   // Sesi akun ditanyakan di gelombang yang sama: sesudah sambutan selesai, sebelum murid
   // menyentuh Pengaturan. 401 = anonim dan itu normal, jadi jalur ini senyap.
@@ -7711,6 +7720,351 @@ function startWelcomeExperience(){
     return proceed();
   })
 }
+/* ==================================================================================
+   PANGGUNG SUARA LIVE (frontend SLOT 13) — laci layar penuh, mesin Sarang Tabu,
+   transport WebRTC P2P. KONTRAK BLOK INI:
+     1. Dua modul hidup di features/speaking-listening/ (fiezel-panggung-suara.js =
+        mesin permainan + koordinator ronde, fiezel-webrtc-stage.js = transport
+        audio dua arah). Keduanya modul mandiri; bila salah satu belum tiba,
+        seluruh blok ini berdiam diri — bukan membuat aplikasi patah.
+     2. Gerbang flag fail-closed: ruang dibuka hanya saat cfStageEnabled === true.
+        Server (route-stage.js) tetap gerbang terakhir; blok ini tidak menggantinya.
+     3. Bunyi lewat AudioSfxSynthesizer modul (kecil, disintesis di perangkat) dan
+        analog SFX UI lewat uiSfx() yang sudah menghormati preferensi bunyi murid.
+     4. Telemetri belajar TIDAK dikarang di sini: LiveStageCoordinator memanggil
+        window.updateMastery / misconceptionLedgerRecord milik app.js.
+     5. Naskah: seluruh teks Indonesia sengaja TANPA tanda hubung, sesuai naskah naskah app lain.
+   ================================================================================== */
+let fzStageDrawerOpen=false,fzStageDrawerReturnFocus=null,fzStageRoomId=null,fzStageRtcClient=null,fzStageCoordinator=null,fzStageInviteCopied=false,fzStageCoordinatorWired=false;
+/* Pembungkus i18n dengan cadangan kata (pola fiezel-class-hub.js). Kunci `stage.*` TIDAK
+   didaftarkan di copy-id mana pun dengan SENGAJA: kalimat aslinya sudah berbahasa Indonesia
+   dan menjadi cadangan di sini, jadi murid id membaca kalimat yang sama persis tanpa perlu
+   lapis copy-map. Yang dihindari adalah daftar kunci id baru dengan nilai byte-identik, yang
+   hanya menambah permukaan terjemahan kosong ke gerbang cakupan Thai. */
+function t(k,fb,params){
+  var s;
+  try{var I=typeof self!=='undefined'?self.FiezelI18n:null;s=I&&I.t?I.t(k,params):undefined}catch(_){}
+  if(s===undefined||s===k)s=fb==null?k:fb;
+  if(params)s=String(s).replace(/\{(\w+)\}/g,function(m,n){return Object.prototype.hasOwnProperty.call(params,n)?String(params[n]):m});
+  return s;
+}
+function fzStageCore(){try{return self.FiezelPanggungSuara||null}catch(_){return null}}
+function fzStageRtc(){try{return self.FiezelWebRtcStage||null}catch(_){return null}}
+function fzStageRoomLabel(roomId){return roomId?String(roomId):t('stage.room-belum-ada','Belum ada ruang');}
+/** Laci panggung hidup di body, jadi app dimatikan fokusnya (pola openModal) supaya
+ *  pembaca layar tidak membacakan halaman latar di belakang dialog. */
+function fzStageSetBackgroundInert(on){
+  try{
+    const appEl=$('app');if(appEl){if(on){appEl.setAttribute('aria-hidden','true');if('inert' in appEl)appEl.inert=true}else{appEl.removeAttribute('aria-hidden');if('inert' in appEl)appEl.inert=false}}
+    const nav=document.querySelector?.('.bottomnav,.nav-bar');if(nav){if(on){nav.setAttribute('aria-hidden','true');if('inert' in nav)nav.inert=true}else{nav.removeAttribute('aria-hidden');if('inert' in nav)nav.inert=false}}
+  }catch(_){}
+}
+/** Kamus `?stage=FZ-XXXX`: dibaca modul transport supaya aturan bentuk kode tinggal satu. */
+function fzStageParseParam(){try{return fzStageRtc()?.parseStageParam?.(location.search)||null}catch(_){return null}}
+function fzStageDrawerShell(){
+  const core=fzStageCore();
+  const room=esc(fzStageRoomLabel(fzStageRoomId));
+  const rtc=fzStageRtc();
+  const inviteUrl=rtc&&rtc.buildInviteUrl?rtc.buildInviteUrl(fzStageRoomId):'';
+  const card=core&&fzStageCoordinator&&fzStageCoordinator.currentCard;
+  const state=fzStageCoordinator?fzStageCoordinator.state:'OFFLINE';
+  const score=fzStageCoordinator?Number(fzStageCoordinator.score||0):0;
+  const timeLeft=fzStageCoordinator?Number(fzStageCoordinator.timeLeft||0):0;
+  const active=state==='TABOO_ROUND_ACTIVE';
+  const taboo=(card&&Array.isArray(card.taboo))?card.taboo:[];
+  const localNote=fzStageRoomId?'' : `<p class="fz-stage-local-note">${esc(t('stage.buat-ruangan-dulu','Buat ruangan dulu supaya temanmu bisa masuk lewat tautan undangan.'))}</p>`;
+  return `<div class="fz-stage-shell${active?' is-game':''}" data-testid="stage-shell">
+    <div class="fz-stage-topbar">
+      <div>
+        <span class="fz-stage-live-badge"><span class="fz-stage-live-dot"></span>${esc(t('stage.live','LIVE'))}</span>
+        <div class="fz-stage-room-title">${esc(t('stage.judul','Panggung Suara Live'))}</div>
+        <div class="fz-stage-meta"><span>${esc(t('stage.ruang','Ruang'))}: <b>${room}</b></span><span>${esc(t('stage.skor','Skor'))}: <b id="fzStageScore">${score}</b></span></div>
+      </div>
+      <button type="button" class="fz-stage-close-btn" onclick="closeLiveVoiceStage()" aria-label="${esc(t('stage.tutup-aria','Tutup panggung suara'))}">&#10005;</button>
+    </div>
+    <div class="fz-stage-speakers">
+      <div class="fz-stage-speakers-grid">
+        <div class="fz-stage-speaker-slot"><div class="fz-stage-avatar-wrapper"><span class="fz-stage-speaking-pulse" id="fzStageLocalPulse"></span><span class="fz-stage-avatar-circle">&#127908;</span><span class="fz-stage-mic-badge${fzStageRtcClient&&fzStageRtcClient.isMuted?' is-muted':''}" id="fzStageLocalMic">&#127911;</span></div><span class="fz-stage-speaker-name">${esc(learnerName())}</span></div>
+        <div class="fz-stage-speaker-slot"><div class="fz-stage-avatar-wrapper"><span class="fz-stage-avatar-circle">&#127911;</span></div><span class="fz-stage-speaker-name">${esc(t('stage.rekan','Rekan duet'))}</span></div>
+        <div class="fz-stage-speaker-slot"><div class="fz-stage-avatar-wrapper"><span class="fz-stage-avatar-circle">&#127926;</span></div><span class="fz-stage-speaker-name">${esc(t('stage.penonton','Penonton'))}</span></div>
+      </div>
+    </div>
+    <div class="fz-stage-game-box">
+      <div class="fz-stage-game-header">
+        <span class="fz-stage-secret-kicker">${esc(t('stage.kartu-rahasia','Kartu rahasia'))}</span>
+        <span class="fz-stage-timer-pill" id="fzStageTimer">${active?timeLeft+' s':esc(t('stage.siap','Siap'))}</span>
+      </div>
+      <div class="fz-stage-secret-card">
+        <div class="fz-stage-secret-word" id="fzStageSecretWord">${esc(card?card.secretWord:t('stage.tekan-mulai','Tekan Mulai Ronde'))}</div>
+        <div class="fz-stage-secret-prompt">${esc(card?(card.secretDesc||''):t('stage.jelaskan-tanpa-kata-tabu','Jelaskan tanpa menyebut kata terlarang.'))}</div>
+      </div>
+      <div class="fz-stage-taboo-box">
+        <div class="fz-stage-taboo-title">${esc(t('stage.kata-terlarang','Kata terlarang'))}</div>
+        <div class="fz-stage-taboo-row">${taboo.length?taboo.map(w=>`<span class="fz-stage-taboo-tag">${esc(String(w))}</span>`).join(''):`<span class="fz-stage-chat-line">${esc(t('stage.belum-ada-kartu','Belum ada kartu aktif'))}</span>`}</div>
+      </div>
+      <div class="fz-stage-game-btns">
+        <button type="button" class="fz-stage-btn-correct" onclick="fzStageCorrectGuess()">&#9989; ${esc(t('stage.benar','Benar'))}</button>
+        <button type="button" class="fz-stage-btn-pass" onclick="fzStageNextCard()">&#9193; ${esc(t('stage.ganti','Ganti kartu'))}</button>
+        <button type="button" class="fz-stage-btn-test" onclick="fzStageToggleRound()">${active?esc(t('stage.hentikan-ronde','Hentikan ronde')):esc(t('stage.mulai-ronde','Mulai ronde'))}</button>
+      </div>
+    </div>
+    <div class="fz-stage-chat-log" id="fzStageChatLog" aria-live="polite"><p class="fz-stage-chat-line"><b>${esc(t('stage.juri','Juri Fiezel'))}</b>: ${esc(t('stage.sambut','Selamat bermain. Jelaskan kartunya, jangan sampai keceplosan.'))}</p></div>
+    <div class="fz-stage-bottom">
+      <div class="fz-stage-deck-row">
+        <div class="fz-stage-reactions">
+          <button type="button" onclick="fzStageReact('clap')" aria-label="${esc(t('stage.tepuk','Tepuk tangan'))}">&#128079;</button>
+          <button type="button" onclick="fzStageReact('fire')" aria-label="${esc(t('stage.semangat','Semangat'))}">&#128293;</button>
+          <button type="button" onclick="fzStageReact('laugh')" aria-label="${esc(t('stage.tawa','Tawa'))}">&#128514;</button>
+        </div>
+        <button type="button" class="fz-stage-mic-btn${fzStageRtcClient&&fzStageRtcClient.isMuted?' is-muted':''}" id="fzStageMicBtn" onclick="fzStageToggleMic()" aria-label="${esc(t('stage.mikrofon','Hidup atau matikan mikrofon'))}">&#127908;</button>
+      </div>
+      <div class="fz-stage-sfx-row">
+        <button type="button" class="fz-stage-sfx-btn" onclick="fzStageSfx('ding')">${esc(t('stage.sfx-ding','Lonceng'))}</button>
+        <button type="button" class="fz-stage-sfx-btn" onclick="fzStageSfx('buzzer')">${esc(t('stage.sfx-buzzer','Buzzer'))}</button>
+        <button type="button" class="fz-stage-sfx-btn" onclick="fzStageSfx('alarm')">${esc(t('stage.sfx-alarm','Alarm'))}</button>
+        <button type="button" class="fz-stage-sfx-btn" onclick="fzStageSfx('cheer')">${esc(t('stage.sfx-cheer','Sorak'))}</button>
+      </div>
+      <button type="button" class="fz-stage-invite-btn" onclick="fzStageInvite()">&#128241; ${esc(t('stage.undang-wa','Bagikan undangan lewat WhatsApp'))}</button>
+      ${localNote}
+      <p class="fz-stage-footer-note" id="fzStageFooterNote">${esc(t('stage.catatan-footer','Suara berjalan dua arah lewat P2P. Saling bicara bergantian supaya tidak saling memotong.'))}</p>
+    </div>
+  </div>`;
+}
+function fzStagePaint(){
+  const host=$('fzStageDrawerMount');
+  if(!host)return false;
+  host.innerHTML=fzStageDrawerShell();
+  try{enhanceUI()}catch(_){}
+  return true;
+}
+/** Menyisipkan satu baris obrolan tanpa menggambar ulang seluruh panggung (timer tetap hidup). */
+function fzStageAppendChat(sender,text){
+  try{
+    const log=$('fzStageChatLog');if(!log)return false;
+    const line=document.createElement('p');line.className='fz-stage-chat-line';
+    const b=document.createElement('b');b.textContent=String(sender||'')+': ';
+    const span=document.createElement('span');span.textContent=String(text||'');
+    line.appendChild(b);line.appendChild(span);log.appendChild(line);
+    while(log.children.length>40)log.removeChild(log.firstChild);
+    log.scrollTop=log.scrollHeight;
+    return true;
+  }catch(_){return false}
+}
+/** Memasang seluruh pendengar mesin ke DOM laci. Dipanggil sekali per sesi koordinator
+ *  (bukan sekali per pembukaan laci) karena koordinator persisten — pendengar ditambahkan
+ *  sekali untuk selamanya dan membaca DOM lewat $() pada saat kejadian terjadi. */
+function fzStageWireCoordinator(){
+  const core=fzStageCore();if(!core||!fzStageCoordinator)return false;
+  // Guard: wiring cukup sekali per koordinator. Tanpa ini, setiap openLiveVoiceStage()
+  // menambahkan satu set pendengar baru, sehingga pesan obrolan muncul N kali.
+  if(fzStageCoordinatorWired)return true;
+  try{
+    fzStageCoordinator.on('stateChange',()=>{const el=$('fzStageTimer');if(el&&fzStageCoordinator.state!=='TABOO_ROUND_ACTIVE')el.textContent=t('stage.siap','Siap');});
+    fzStageCoordinator.on('cardChange',()=>{fzStagePaint()});
+    fzStageCoordinator.on('timeTick',(detik)=>{
+      const el=$('fzStageTimer');if(el)el.textContent=String(Math.max(0,Number(detik||0)))+' s';
+    });
+    fzStageCoordinator.on('chatMessage',(m)=>{if(m&&(m.text!==undefined))fzStageAppendChat(m.sender||'',m.text)});
+    fzStageCoordinator.on('tabooViolation',()=>{
+      try{uiSfx('notif_achievement')}catch(_){}
+      try{const shell=document.querySelector('.fz-stage-shell');if(shell){shell.classList.add('is-alarm');setTimeout(()=>shell.classList.remove('is-alarm'),700)}}catch(_){}
+      fzStageAppendChat(t('stage.juri','Juri Fiezel'),t('stage.keceplosan','Keceplosan! Kata terlarang terdeteksi, poin dipotong.'));
+    });
+    fzStageCoordinator.on('correctGuess',()=>{try{uiSfx('xp_gain')}catch(_){}});
+    fzStageCoordinatorWired=true;
+    return true;
+  }catch(_){return false}
+}
+/** Membuka laci. roomId null = buat ruangan baru; bila ada, langsung bergabung. */
+async function openLiveVoiceStage(roomId){
+  // Guard: panggung sudah terbuka — tidak perlu buka lagi (mencegah double-wiring).
+  if(fzStageDrawerOpen)return true;
+  const rtc=fzStageRtc(),core=fzStageCore();
+  const mount=$('fzStageDrawer');if(!mount)return false;
+  if(!rtc||!core){
+    try{showToast(t('stage.modul-belum-siap','Fitur panggung suara belum siap di perangkat ini.'))}catch(_){}
+    return false;
+  }
+  const status=await rtc.probeFlag().catch(()=> 'off');
+  if(status!=='on'){
+    const pesan=status==='offline'
+      ?t('stage.offline','Kamu sedang offline. Panggung suara butuh sambungan untuk menyusun ruangan.')
+      :t('stage.belum-aktif','Fitur panggung suara belum aktif untuk akunmu.');
+    try{showToast(pesan)}catch(_){}
+    return false;
+  }
+  try{await rtc.ensureAnon()}catch(_){}
+
+  if(!fzStageCoordinator){
+    fzStageCoordinator=new core.LiveStageCoordinator({roundTimeSeconds:30});
+    fzStageCoordinatorWired=false; // koordinator baru → wiring belum dilakukan
+  }
+  if(!fzStageCoordinator.cards||!fzStageCoordinator.cards.length){
+    try{
+      let bank=(typeof self.FIEZEL_TABOO_BANK==='object'&&self.FIEZEL_TABOO_BANK)?self.FIEZEL_TABOO_BANK:null;
+      if(!bank){
+        const r=await fetch('./features/speaking-listening/taboo-bank-v1.json',{cache:'no-store'});
+        if(r&&r.ok)bank=await r.json();
+      }
+      if(bank&&Array.isArray(bank.items))fzStageCoordinator.loadCards(bank.items);
+    }catch(_){}
+  }
+
+  if(!fzStageRtcClient){
+    fzStageRtcClient=new rtc.WebRtcStageClient({peerName:learnerName(),mode:'auto'});
+    // Daftarkan pendengar peerJoined/peerLeft hanya saat client baru dibuat agar tidak
+    // bertumpuk saat openLiveVoiceStage() dipanggil berkali-kali dalam satu sesi.
+    try{fzStageRtcClient.on('peerJoined',(p)=>fzStageAppendChat(t('stage.system-sender','Panggung Suara'),t('stage.teman-masuk','{nama} masuk ke panggung.',{nama:(p&&p.name)||t('stage.teman','Teman')})))}catch(_){}
+    try{fzStageRtcClient.on('peerLeft',(p)=>fzStageAppendChat(t('stage.system-sender','Panggung Suara'),t('stage.teman-keluar','{nama} keluar dari panggung.',{nama:(p&&p.name)||t('stage.teman','Teman')})))}catch(_){}
+  }
+  let joined=null;
+  if(roomId){
+    joined=await fzStageRtcClient.joinRoom({roomId,peerName:learnerName(),role:'speaker'}).catch(()=>({ok:false,error:'join_failed'}));
+    if(!joined||!joined.ok){
+      const sebab=joined&&joined.error==='stage_disabled'?t('stage.belum-aktif','Fitur panggung suara belum aktif untuk akunmu.'):t('stage.ruang-gagal','Ruang tidak ditemukan atau sudah berakhir.');
+      try{showToast(sebab)}catch(_){}
+      return false;
+    }
+    fzStageRoomId=joined.roomId;
+  }else{
+    joined=await fzStageRtcClient.createRoom({hostName:learnerName(),title:t('stage.judul','Panggung Suara Live')}).catch(()=>({ok:false,error:'create_failed'}));
+    if(!joined||!joined.ok){
+      const sebab=joined&&joined.error==='stage_disabled'?t('stage.belum-aktif','Fitur panggung suara belum aktif untuk akunmu.'):t('stage.ruang-gagal-buat','Ruang tidak bisa dibuat sekarang.');
+      try{showToast(sebab)}catch(_){}
+      return false;
+    }
+    fzStageRoomId=joined.roomId;
+  }
+
+  fzStageWireCoordinator();
+  fzStageInviteCopied=false;
+  fzStageDrawerOpen=true;
+  fzStageDrawerReturnFocus=document.activeElement;
+  mount.classList.add('is-open');
+  mount.setAttribute('aria-hidden','false');
+  fzStageSetBackgroundInert(true);
+  fzStagePaint();
+  try{self.FiezelBackNav?.pushLayer?.({id:'stage-drawer',close:()=>closeLiveVoiceStage()})}catch(_){}
+  try{const btn=$('fzStageMicBtn');btn?.focus?.({preventScroll:true})}catch(_){}
+  try{uiSfx('open')}catch(_){}
+  return true;
+}
+/** Mengganti tampilan nama kartu tanpa menghentikan ronde. */
+function fzStageNextCard(){
+  try{fzStageCoordinator?.nextCard?.();fzStagePaint()}catch(_){}
+}
+function fzStageCorrectGuess(){
+  try{fzStageCoordinator?.triggerCorrectGuess?.();fzStagePaint()}catch(_){}
+  try{fzStageAppendChat(t('stage.juri','Juri Fiezel'),t('stage.tepat','Tepat! Kartu berikutnya menyusul.'))}catch(_){}
+}
+function fzStageToggleRound(){
+  if(!fzStageCoordinator)return;
+  try{
+    if(fzStageCoordinator.state==='TABOO_ROUND_ACTIVE')fzStageCoordinator.stopRound();
+    else fzStageCoordinator.startRound();
+  }catch(_){}
+  fzStagePaint();
+}
+function fzStageToggleMic(){
+  if(!fzStageRtcClient)return;
+  try{fzStageRtcClient.setMuted(!fzStageRtcClient.isMuted)}catch(_){}
+  const muted=!!fzStageRtcClient.isMuted;
+  try{
+    const badge=$('fzStageLocalMic');if(badge)badge.classList.toggle('is-muted',muted);
+    const btn=$('fzStageMicBtn');if(btn)btn.classList.toggle('is-muted',muted);
+  }catch(_){}
+  try{showToast(muted?t('stage.mikrofon-mati','Mikrofon dimatikan.'):t('stage.mikrofon-hidup','Mikrofon menyala.'))}catch(_){}
+}
+function fzStageSfx(kind){
+  try{fzStageCoordinator?.sfx?.play?.(kind)}catch(_){}
+}
+function fzStageReact(kind){
+  const map={clap:'tepuk tangan',fire:'semangat',laugh:'tawa'};
+  try{fzStageAppendChat(learnerName(),t('stage.reaksi','Mengirim reaksi')+': '+(map[kind]||kind))}catch(_){}
+  try{uiSfx('notif_achievement')}catch(_){}
+}
+/** Undangan WhatsApp. Kode ruang + tautan ?stage= dirakit modul transport (satu sumber). */
+function fzStageInvite(){
+  const rtc=fzStageRtc();if(!rtc||!fzStageRoomId)return false;
+  const url=rtc.buildInviteUrl(fzStageRoomId);
+  const teks=t('stage.undangan-teks','Ayo main Sarang Tabu di Panggung Suara FIEZEL. Kode ruang {kode}.',{kode:fzStageRoomId});
+  let wa=url;
+  try{wa=rtc.buildInviteUrl(fzStageRoomId,teks)}catch(_){}
+  try{
+    const w=window.open(wa,'_blank','noopener');
+    if(!w)throw new Error('popup_blocked');
+    try{navigator.clipboard?.writeText?.(teks+' '+url)}catch(_){}
+    fzStageInviteCopied=true;
+    try{showToast(t('stage.undangan-terkirim','Undangan dibuka di WhatsApp. Tautannya juga disalin.'))}catch(_){}
+    return true;
+  }catch(_){
+    try{showToast(t('stage.undangan-gagal','Tidak bisa membuka WhatsApp. Salin tautannya: {tautan}',{tautan:url}))}catch(_){}
+    return false;
+  }
+}
+/** Undangan TERARAH dari daftar teman ("Ajak Main Suara"): sama dengan fzStageInvite,
+ *  tetapi teks undangannya menyebut @handle teman supaya jelas ruangnya untuk dia. */
+function fzStageInviteTo(handle){
+  const rtc=fzStageRtc();if(!rtc||!fzStageRoomId)return false;
+  const h=String(handle||'').replace(/^@/,'').toLowerCase();
+  const url=rtc.buildInviteUrl(fzStageRoomId);
+  const teks=t('stage.undangan-teks','Ayo main Sarang Tabu di Panggung Suara FIEZEL. Kode ruang {kode}.',{kode:fzStageRoomId})+(h?(' @'+h):'');
+  let wa=url;
+  try{wa=rtc.buildInviteUrl(fzStageRoomId,teks)}catch(_){}
+  try{
+    const w=window.open(wa,'_blank','noopener');
+    if(!w)throw new Error('popup_blocked');
+    try{navigator.clipboard?.writeText?.(teks+' '+url)}catch(_){}
+    fzStageInviteCopied=true;
+    try{showToast(t('stage.undangan-terkirim','Undangan dibuka di WhatsApp. Tautannya juga disalin.'))}catch(_){}
+    return true;
+  }catch(_){
+    try{showToast(t('stage.undangan-gagal','Tidak bisa membuka WhatsApp. Salin tautannya: {tautan}',{tautan:url}))}catch(_){}
+    return false;
+  }
+}
+window.fzStageInviteTo=fzStageInviteTo;
+/** Menutup laci: hentikan ronde, lepaskan mikrofon & rekan P2P, kembalikan fokus. */
+function closeLiveVoiceStage(){
+  const mount=$('fzStageDrawer');
+  try{fzStageCoordinator?.stopRound?.()}catch(_){}
+  try{fzStageRtcClient?.leave?.()}catch(_){}
+  try{fzStageRtcClient=null}catch(_){}
+  // Koordinator persisten agar riwayat obrolan tidak hilang, namun wiring
+  // tetap valid karena pendengar tidak bertumpuk (guard fzStageCoordinatorWired).
+  // Bila koordinator suatu saat direset, flag ikut di-nol-kan di openLiveVoiceStage.
+  fzStageDrawerOpen=false;
+  fzStageRoomId=null;
+  try{if(mount){mount.classList.remove('is-open');mount.setAttribute('aria-hidden','true');const h=$('fzStageDrawerMount');if(h)h.innerHTML=''}}catch(_){}
+  fzStageSetBackgroundInert(false);
+  try{fzStageDrawerReturnFocus&&document.contains(fzStageDrawerReturnFocus)&&fzStageDrawerReturnFocus.focus?.({preventScroll:true})}catch(_){}
+  fzStageDrawerReturnFocus=null;
+  try{uiSfx('close')}catch(_){}
+  // Buang ?stage= dari alamat supaya menutup panggung tidak memicu gabung ulang tiap boot.
+  try{
+    if(location.search.indexOf('stage=')>=0){
+      const u=new URL(location.href);u.searchParams.delete('stage');
+      history.replaceState(null,'',u.pathname+(u.search?u.search:'')+u.hash);
+    }
+  }catch(_){}
+  return true;
+}
+/** Gabung otomatis saat alamat berisi ?stage=FZ-XXXX (undangan WhatsApp). */
+function fzStageAutoJoin(){
+  let room=null;
+  try{room=fzStageParseParam()}catch(_){room=null}
+  if(!room)return false;
+  if(fzStageDrawerOpen)return true;
+  setTimeout(()=>{openLiveVoiceStage(room).catch(()=>{})},260);
+  return true;
+}
+window.openLiveVoiceStage=openLiveVoiceStage;window.closeLiveVoiceStage=closeLiveVoiceStage;
+window.fzStageToggleMic=fzStageToggleMic;window.fzStageToggleRound=fzStageToggleRound;
+window.fzStageCorrectGuess=fzStageCorrectGuess;window.fzStageNextCard=fzStageNextCard;
+window.fzStageSfx=fzStageSfx;window.fzStageReact=fzStageReact;window.fzStageInvite=fzStageInvite;
+if(typeof document!=='undefined'){
+  document.addEventListener('keydown',(e)=>{if(e&&e.key==='Escape'&&fzStageDrawerOpen){e.preventDefault();closeLiveVoiceStage()}});
+}
 /* ===== LOGIN WAJIB (m025-367, keputusan OWNER 24 September 2026) =========================
    Audit login L1: FIEZEL bisa dipakai penuh tanpa akun, karena identitas anonim terbit
    otomatis dan tombol masuk hanya tawaran sekunder. Owner: "user masih bisa masuk tanpa
@@ -7929,7 +8283,7 @@ function render(){const __renderStartedAt=Date.now();try{const __r=renderInner()
 let isViewChange=true,lastRenderedView=null;
 function captureActiveElement(container){try{const act=document.activeElement;if(act&&container&&container.contains(act)&&/^(INPUT|TEXTAREA)$/i.test(act.tagName||'')){return{id:act.id,name:act.name,testId:act.getAttribute('data-testid'),val:act.value,s:act.selectionStart,e:act.selectionEnd}}}catch(_){}return null}
 function restoreActiveElement(container,saved){if(!saved||!container)return;try{let r=null;if(saved.id)r=container.querySelector('#'+saved.id);if(!r&&saved.testId)r=container.querySelector('[data-testid="'+saved.testId+'"]');if(!r&&saved.name)r=container.querySelector('[name="'+saved.name+'"]');if(r){if(saved.val!=null&&r.value!==saved.val)r.value=saved.val;r.focus();if(typeof r.setSelectionRange==='function'&&saved.s!=null)r.setSelectionRange(saved.s,saved.e)}}catch(_){}}
-function renderInner(){if(isVerifiedTeacher()&&state.view!=='tutor'){state.view='tutor'}/* Kursus Jepang berbicara dengan istilahnya sendiri (Kotoba, Bunpō, Renshū): lapisan kunci 'kursus-ja.*' di FiezelI18n dinyalakan SEBELUM layar dilukis, dan tabel/elemen statis yang sudah memegang kalimat lama disegarkan sekali saat kursus berganti. */try{const __course=activeTargetLang()==='ja'&&!isVerifiedTeacher()?'ja':null;if(self.FiezelI18n?.getCourse&&FiezelI18n.getCourse()!==__course){FiezelI18n.setCourse(__course);__fzRefreshI18nTables();/* Soal, jawaban, dan pembahasan kursus Jepang diberi furigana + romaji dari bank kosakata, dan tiap kuis mendapat tombol ふりがな/ローマ字. */try{if(__course==='ja')self.FiezelJaUi?.observe?.($('app'),()=>V);else self.FiezelJaUi?.unobserve?.()}catch(_){}}}catch(_){}/* m025-314: go() menolak permukaan yang salah bahasa, tetapi state.view juga bisa datang dari sesi SEBELUM murid berganti kursus (ia tersimpan dan dipulihkan saat boot) — jadi pemulihan itu ikut dijepit di sini, bukan hanya jalur navigasi. */if(targetLangSurfaceBlocked(state.view)){state.view='home'}if(document.body?.classList?.contains?.('fz-teacher-mode')&&state.view!=='tutor'){try{self.FiezelTeacherShell?.unmount?.()}catch(_){}}isViewChange=state.view!==lastRenderedView;lastRenderedView=state.view;const appContainer=$('app'),savedActive=captureActiveElement(appContainer);if(!isViewChange&&appContainer)appContainer.classList.add('is-repaint');speakingListeningMountToken++;if(speakingListeningController){speakingListeningController.destroy();speakingListeningController=null;/* m026-01: satu-satunya tempat sesi dengar benar-benar bubar. Di dalam if, bukan di luar - kalau tidak, tiap navigasi biasa akan memaksa maskot kembali idle dan memotong selebrasi yang sedang jalan. */pawReact('listening-stop')}document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));setApp('');if(state.view==='home')home();if(state.view==='latihan')latihan();if(state.view==='vocab')vocab();if(state.view==='grammar')grammar();if(state.view==='reading')reading();if(state.view==='skills')skillsLab();if(state.view==='listening')skillsLab('listening');if(state.view==='speaking')skillsLab('speaking');if(state.view==='writing')writing();if(state.view==='classroom')classHubView();if(state.view==='library')library();if(state.view==='ask'||state.view==='search')askView();if(state.view==='test')placement();if(state.view==='progress')progress();if(state.view==='online'||state.view==='profile')onlineView();if(state.view==='learn')learnerFlowView();if(state.view==='arena')arenaView();if(state.view==='tutor')tutorCenterView();if(state.view==='kana')kanaView();if(state.view==='nujum')nujumView();/* merge SLOT 7 sosial 2026-08-29 *//* Audit F12: layar tanpa tab sendiri tetap menandai tab induknya - Tes awal milik Hari ini, hub latihan milik Latihan. */const TAB_PARENT={nujum:'home',kana:'latihan',test:'home',vocab:'latihan',grammar:'latihan',reading:'latihan',writing:'latihan',library:'latihan',skills:'latihan',listening:'latihan',speaking:'latihan',learn:'home',arena:'online'};const activeTabEl=document.querySelector(`[data-view="${state.view}"]`)||(state.view==='profile'?document.querySelector('[data-view="online"]'):state.view==='online'?document.querySelector('[data-view="profile"]'):TAB_PARENT[state.view]?document.querySelector(`.bottomnav [data-view="${TAB_PARENT[state.view]}"]`):null);activeTabEl?.classList.add('active');/* m028 fase3: bendera panggung Skills Lab. Addon listening memaku blok tombolnya ke dasar layar (speaking-listening-addon.css), jadi ia panggung kedua yang bisa ditutupi gelembung. */document.body?.classList?.toggle?.('fz-stage-sl',['skills','listening','speaking'].includes(state.view));/* m028 fase3 (QA §9): Peta Belajar ikut jadi panggung ber-kontrol sejak panel NEXT SESSION punya tombol "Mulai sesi" di dekat dasar layar - screenshot QA menunjukkan gelembung PAW menutupinya utuh. Aturannya sama dengan kuis: peek dilarang, dok mengecil, layar diberi ruang bawah. */document.body?.classList?.toggle?.('fz-stage-map',state.view==='progress');/* 2026-08-29 overhaul I12 (O6 #10): bendera panggung Home. Wajah coach-strip adalah SATU-SATUNYA Pau di Home; gelembung FAB pengambang (Pau kedua, terukur menimpa lipatan hero/skill-hub di 390px) disembunyikan lewat CSS body.fz-stage-home — pola yang sama dengan fz-stage-sl/fz-stage-map, modul gelembung tidak disentuh. */document.body?.classList?.toggle?.('fz-stage-home',state.view==='home');/* q16-P2-2 2026-08-29: hub juga panggung ber-CTA-dekat-dasar (Review Due, Buka flashcards, Mulai 25 soal) \u2014 peek dilarang, dok mengecil, pola sama dengan sl/map. */document.body?.classList?.toggle?.('fz-stage-hub',['vocab','grammar','reading','library','test'].includes(state.view));document.body?.classList?.toggle?.('fz-stage-writing',state.view==='writing');/* v24-F2 2026-08-29: Writing = layar mengarang; FAB disembunyikan via CSS (pola fz-stage-home), modul gelembung tidak disentuh. *//* Kursus Jepang berpakaian sendiri: palet shu/ai/washi di fiezel-2.css menempel lewat bendera ini, jadi layar Inggris tidak tersentuh sama sekali; KelasKu guru punya palet sendiri (teacher-shell.css). */document.body?.classList?.toggle?.('fz-lang-ja',self.FiezelI18n?.getCourse?.()==='ja');try{self.FiezelJaUi?.applyPrefs?.()}catch(_){}enhanceUI();syncExamLockForView();syncCoachBubble();try{refreshNotifBadge()}catch(_){}try{updateTopbarCourseButton()}catch(_){}restoreActiveElement($('app'),savedActive);if(isViewChange){$('app')?.classList?.remove?.('is-repaint');window.scrollTo(0,0)}}
+function renderInner(){if(isVerifiedTeacher()&&state.view!=='tutor'){state.view='tutor'}/* Kursus Jepang berbicara dengan istilahnya sendiri (Kotoba, Bunpō, Renshū): lapisan kunci 'kursus-ja.*' di FiezelI18n dinyalakan SEBELUM layar dilukis, dan tabel/elemen statis yang sudah memegang kalimat lama disegarkan sekali saat kursus berganti. */try{const __course=activeTargetLang()==='ja'&&!isVerifiedTeacher()?'ja':null;if(self.FiezelI18n?.getCourse&&FiezelI18n.getCourse()!==__course){FiezelI18n.setCourse(__course);__fzRefreshI18nTables();/* Soal, jawaban, dan pembahasan kursus Jepang diberi furigana + romaji dari bank kosakata, dan tiap kuis mendapat tombol ふりがな/ローマ字. */try{if(__course==='ja')self.FiezelJaUi?.observe?.($('app'),()=>V);else self.FiezelJaUi?.unobserve?.()}catch(_){}}}catch(_){}/* m025-314: go() menolak permukaan yang salah bahasa, tetapi state.view juga bisa datang dari sesi SEBELUM murid berganti kursus (ia tersimpan dan dipulihkan saat boot) — jadi pemulihan itu ikut dijepit di sini, bukan hanya jalur navigasi. */if(targetLangSurfaceBlocked(state.view)){state.view='home'}if(document.body?.classList?.contains?.('fz-teacher-mode')&&state.view!=='tutor'){try{self.FiezelTeacherShell?.unmount?.()}catch(_){}}isViewChange=state.view!==lastRenderedView;lastRenderedView=state.view;const appContainer=$('app'),savedActive=captureActiveElement(appContainer);if(!isViewChange&&appContainer)appContainer.classList.add('is-repaint');speakingListeningMountToken++;if(speakingListeningController){speakingListeningController.destroy();speakingListeningController=null;/* m026-01: satu-satunya tempat sesi dengar benar-benar bubar. Di dalam if, bukan di luar - kalau tidak, tiap navigasi biasa akan memaksa maskot kembali idle dan memotong selebrasi yang sedang jalan. */pawReact('listening-stop')}document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));setApp('');if(state.view==='home')home();if(state.view==='latihan')latihan();if(state.view==='vocab')vocab();if(state.view==='grammar')grammar();if(state.view==='reading')reading();if(state.view==='skills')skillsLab();if(state.view==='listening')skillsLab('listening');if(state.view==='speaking')skillsLab('speaking');if(state.view==='writing')writing();if(state.view==='classroom')classHubView();if(state.view==='library')library();if(state.view==='ask'||state.view==='search')askView();if(state.view==='test')placement();if(state.view==='progress')progress();if(state.view==='online'||state.view==='profile')onlineView();if(state.view==='learn')learnerFlowView();if(state.view==='arena')arenaView();if(state.view==='tutor')tutorCenterView();if(state.view==='kana')kanaView();if(state.view==='nujum')nujumView();/* merge SLOT 7 sosial 2026-08-29 *//* Audit F12: layar tanpa tab sendiri tetap menandai tab induknya - Tes awal milik Hari ini, hub latihan milik Latihan. */const TAB_PARENT={nujum:'home',kana:'latihan',test:'home',vocab:'latihan',grammar:'latihan',reading:'latihan',writing:'latihan',library:'latihan',skills:'latihan',listening:'latihan',speaking:'latihan',learn:'home',arena:'online'};const activeTabEl=document.querySelector(`[data-view="${state.view}"]`)||(state.view==='profile'?document.querySelector('[data-view="online"]'):state.view==='online'?document.querySelector('[data-view="profile"]'):TAB_PARENT[state.view]?document.querySelector(`.bottomnav [data-view="${TAB_PARENT[state.view]}"]`):null);activeTabEl?.classList.add('active');/* m028 fase3: bendera panggung Skills Lab. Addon listening memaku blok tombolnya ke dasar layar (speaking-listening-addon.css), jadi ia panggung kedua yang bisa ditutupi gelembung. */document.body?.classList?.toggle?.('fz-stage-sl',['skills','listening','speaking'].includes(state.view));/* m028 fase3 (QA §9): Peta Belajar ikut jadi panggung ber-kontrol sejak panel NEXT SESSION punya tombol "Mulai sesi" di dekat dasar layar - screenshot QA menunjukkan gelembung PAW menutupinya utuh. Aturannya sama dengan kuis: peek dilarang, dok mengecil, layar diberi ruang bawah. */document.body?.classList?.toggle?.('fz-stage-map',state.view==='progress');/* 2026-08-29 overhaul I12 (O6 #10): bendera panggung Home. Wajah coach-strip adalah SATU-SATUNYA Pau di Home; gelembung FAB pengambang (Pau kedua, terukur menimpa lipatan hero/skill-hub di 390px) disembunyikan lewat CSS body.fz-stage-home — pola yang sama dengan fz-stage-sl/fz-stage-map, modul gelembung tidak disentuh. */document.body?.classList?.toggle?.('fz-stage-home',state.view==='home');/* q16-P2-2 2026-08-29: hub juga panggung ber-CTA-dekat-dasar (Review Due, Buka flashcards, Mulai 25 soal) \u2014 peek dilarang, dok mengecil, pola sama dengan sl/map. */document.body?.classList?.toggle?.('fz-stage-hub',['vocab','grammar','reading','library','test'].includes(state.view));document.body?.classList?.toggle?.('fz-stage-writing',state.view==='writing');/* v24-F2 2026-08-29: Writing = layar mengarang; FAB disembunyikan via CSS (pola fz-stage-home), modul gelembung tidak disentuh. *//* Kursus Jepang berpakaian sendiri: palet shu/ai/washi di fiezel-2.css menempel lewat bendera ini, jadi layar Inggris tidak tersentuh sama sekali; KelasKu guru punya palet sendiri (teacher-shell.css). */document.body?.classList?.toggle?.('fz-lang-ja',self.FiezelI18n?.getCourse?.()==='ja');document.body?.classList?.toggle?.('fz-view-classroom',state.view==='classroom');document.body?.classList?.toggle?.('fz-view-profile',state.view==='online'||state.view==='profile');document.body?.classList?.toggle?.('fz-view-latihan',state.view==='latihan');document.body?.classList?.toggle?.('fz-view-grammar',state.view==='grammar');try{const _topBrandNormal=$('topBrandWrap'),_topBrandK=$('topBrandKelasKu'),_topActionsNormal=$('topGamifyCluster'),_topClusterK=$('topKelasKuCluster'),_isK=state.view==='classroom';if(_topBrandNormal)_topBrandNormal.style.display=_isK?'none':'';if(_topBrandK)_topBrandK.style.display=_isK?'flex':'none';if(_topActionsNormal)_topActionsNormal.style.display=_isK?'none':'';if(_topClusterK){_topClusterK.style.display=_isK?'flex':'none';const _code=(typeof learnerClassCode==='function'?learnerClassCode():'')||'X IPA 2',_lbl=$('topKelasKuCodeLabel');if(_lbl)_lbl.textContent=_code+' ▾'}const _sVal=$('topbarStreakVal'),_xVal=$('topbarXpVal');if(_sVal)_sVal.textContent=String(state.streak||3);if(_xVal)_xVal.textContent=String(state.xp||(state.gems?.balance)||120);}catch(_){}try{self.FiezelJaUi?.applyPrefs?.()}catch(_){}enhanceUI();syncExamLockForView();syncCoachBubble();try{refreshNotifBadge()}catch(_){}try{updateTopbarCourseButton()}catch(_){}restoreActiveElement($('app'),savedActive);if(isViewChange){$('app')?.classList?.remove?.('is-repaint');window.scrollTo(0,0)}}
 // m025-115 - pembimbing yang ikut ke mana pun murid pergi (brief bagian 7).
 //
 // Gelembungnya dipasang SEKALI ke <body> dan tidak pernah ikut dicat ulang; yang dikirim
@@ -8900,7 +9254,12 @@ function latihanCards(){
   /* Kursus Jepang membuka dengan tabel kana & chokai: pintu masuk belajar & listening JLPT. */
   const kanaCard=jaCourseOn()?FiezelJaUi.kanaCardMarkup():'';
   const chokaiCard=jaCourseOn()?FiezelJaUi.chokaiCardMarkup():'';
-  return kanaCard+chokaiCard+cards.map(c=>{
+  /* Panggung Suara Live (SLOT 13): kartu pintu masuk fitur duet belajar. Ia BUKAN rute
+     view baru, jadi tidak lewat go(): ketukannya memanggil openLiveVoiceStage() yang
+     membuka laci layar penuh. Kartunya tetap tampil walau flag server mati; laci yang
+     menutup dirinya dengan pesan jujur, persis pola kartu sosial. */
+  const stageCard=`<button class="launch-card stage-launch" onclick="openLiveVoiceStage()" data-testid="stage-launch-card"><span class="launch-icon"><i class="fz-i" data-fz-icon="speaking" aria-hidden="true"></i></span><span><small>${esc(FiezelI18n.t('latihan.panggung-note'))}</small><b>${esc(FiezelI18n.t('latihan.panggung'))}</b></span><i data-lucide="arrow-up-right"></i></button>`;
+  return kanaCard+chokaiCard+stageCard+cards.map(c=>{
     const iconSpan = `<span class="launch-icon"><i class="fz-i" data-fz-icon="${esc(c.icon)}" aria-hidden="true"></i></span>`;
     return `<button class="launch-card" onclick="go('${esc(c.view)}')" aria-label="${esc(c.label)}">${iconSpan}<span><small>${esc(c.note)}</small><b>${esc(c.label)}</b></span><i data-lucide="arrow-up-right"></i></button>`;
   }).join('');
@@ -9355,9 +9714,33 @@ function todayHomeMarkup(){
     formattedTime = `${nowObj.getHours()}:${String(nowObj.getMinutes()).padStart(2, '0')}`;
   }
 
-  const homeTop = `<div class="fz-welcome-header">`
+  const currentStreak = Number(state.streak) || 0;
+  const flameSvg = `<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false" style="display:block;flex-shrink:0;">`
+    + `<defs>`
+    + `<linearGradient id="flameGradOuterTop" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FF7A00"/><stop offset="100%" stop-color="#EA580C"/></linearGradient>`
+    + `<linearGradient id="flameGradCoreTop" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFE600"/><stop offset="100%" stop-color="#FF9900"/></linearGradient>`
+    + `</defs>`
+    + `<path d="M12 21.5c-4.8 0-8.5-3.6-8.5-8.2 0-3.5 2.2-6.8 5-10.6.4-.6 1.3-.6 1.7 0 1.2 1.6 2.3 3.3 3.3 4.9.4-.5.8-1.2 1.3-1.7.4-.5 1.3-.5 1.7 0 1.8 2.3 2.8 4.8 2.8 7.4 0 4.6-4.1 8.2-8.3 8.2z" fill="#C2410C"/>`
+    + `<path d="M12 21c-4.4 0-7.8-3.3-7.8-7.5 0-3.2 2-6.2 4.6-9.7.4-.5 1.2-.5 1.6 0 1.1 1.5 2.1 3 3 4.5.4-.5.7-1.1 1.2-1.6.4-.5 1.2-.5 1.6 0 1.6 2.1 2.6 4.4 2.6 6.8 0 4.2-3.8 7.5-8.2 7.5z" fill="url(#flameGradOuterTop)"/>`
+    + `<path d="M12 19.5c-2.4 0-4.2-1.8-4.2-4.1 0-1.8 1.2-3.6 2.7-5.5.4-.5 1.1-.5 1.5 0 .8 1 1.5 2 2.1 3 .3-.4.5-.8.8-1.1.4-.4 1.1-.4 1.5 0 1 1.3 1.6 2.7 1.6 4.1 0 2.3-2.6 3.6-6 3.6z" fill="url(#flameGradCoreTop)"/>`
+    + `<circle cx="12" cy="16.5" r="1.5" fill="#FFFFFF" opacity="0.85"/>`
+    + `</svg>`;
+
+  const homeTop = `<div class="fz-welcome-header tactile-welcome-bar">`
+    + `<div class="tactile-welcome-inner">`
+    + `<div class="tactile-welcome-left">`
+    + `<div class="tactile-kicker-row">`
+    + `<span class="tactile-kicker-dot" aria-hidden="true"></span>`
+    + `<span class="tactile-kicker-text">${isTh ? 'เป้าหมายวันนี้' : 'SESI HARI INI'}</span>`
+    + `</div>`
     + `<div class="fz-greet-title">${esc(FiezelI18n.t('home.sapa', { nama: currentLearner }))}</div>`
-    + `<p class="fz-greet-motivation">${esc(currentMotivation)}</p>`
+    + `</div>`
+    + `<div class="tactile-streak-badge" title="${esc(FiezelI18n.t('today.streak', { days: currentStreak }))}">`
+    + flameSvg
+    + `<span class="tactile-streak-val">${currentStreak > 0 ? currentStreak : 1}</span>`
+    + `<span class="tactile-streak-lbl">${isTh ? 'วัน' : 'HARI'}</span>`
+    + `</div>`
+    + `</div>`
     + `</div>`;
   /* UX-BRIEF §1: tombol aksi utama yang mencolok di lipatan pertama - "Mulai Belajar Sekarang"
      atau "Lanjutkan Misi" kalau ada sesi yang tertunda. Satu ketukan → homeQuickStart(). */
@@ -9646,30 +10029,324 @@ function todayHomeMarkup(){
     </button>
   </section>`;
 
-  const nujumCard = (typeof self.FiezelNujum !== 'undefined' && typeof self.FiezelNujum.homeCardMarkup === 'function')
-    ? self.FiezelNujum.homeCardMarkup()
-    : '';
+  /* Hero Quest Card (Tactile Clay Quest Card) */
+  const heroQuestCard = `
+    <section class="hero-card" id="heroCard">
+      <div class="hero-header-row">
+        <div class="hero-tag">
+          <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false" style="display:block;flex-shrink:0;">
+            <circle cx="12" cy="12" r="9.5" fill="#FEF3C7" stroke="#D97706" stroke-width="1.8"/>
+            <circle cx="12" cy="12" r="5.8" fill="#FDE68A" stroke="#B45309" stroke-width="1.4"/>
+            <circle cx="12" cy="12" r="2.5" fill="#EF4444"/>
+          </svg>
+          <span>TARGET HARIAN</span>
+        </div>
+        <div class="hero-rhythm-badge" id="heroRhythmText">
+          Ritme: <span>${rhythmShown}/${rhythmTarget}</span> (${rhythmPct}%)
+        </div>
+      </div>
+
+      <!-- 3D Progress Track -->
+      <div class="hero-progress-track">
+        <div class="hero-progress-fill" id="heroProgressFill" style="width: ${Math.max(10, rhythmPct)}%"></div>
+      </div>
+
+      <!-- Word of the Day Micro-Learning Tile -->
+      <div class="hero-micro-bite">
+        <div class="micro-text-group">
+          <div class="micro-word-title">
+            <span class="word-en">${esc(dailyWord.word)}</span>
+            <span class="word-ipa">${esc(dailyWord.phonetic && dailyWord.phonetic.includes('/') ? dailyWord.phonetic.split('•')[0].trim() : (dailyWord.phonetic || ''))}</span>
+          </div>
+          <div class="word-id">${esc(dailyWord.meaning)} • Kata Hari Ini</div>
+          <div class="adaptive-sub">
+            <svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true" focusable="false" style="display:block;flex-shrink:0;">
+              <polygon points="13 2, 4 13.5, 11.5 13.5, 10.2 21.5, 20 10.5, 13 10.5" fill="#D97706"/>
+            </svg>
+            <span>Sesi Adaptif: Vocab ${esc(todayLevel || 'A2')} + Audio Listening</span>
+          </div>
+        </div>
+
+        <button type="button" class="audio-btn-3d" id="audioToggleBtn" title="Dengarkan pengucapan audio" onclick="event.stopPropagation();if(window.playTodayVocabAudio)window.playTodayVocabAudio();">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor" fill-opacity="0.2"/>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+          </svg>
+          <div class="waveform-bars">
+            <div class="waveform-bar"></div>
+            <div class="waveform-bar"></div>
+            <div class="waveform-bar"></div>
+          </div>
+        </button>
+      </div>
+
+      <!-- Chunky Tactile 3D Action CTA (Solar Gold Clay) -->
+      <button type="button" class="hero-cta-btn" id="btnStartSession" onclick="event.stopPropagation();${primaryBtnAction}">
+        <span class="fz-i" style="width: 18px; height: 18px; color: var(--gold-text);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" fill="currentColor"/>
+          </svg>
+        </span>
+        <span>${hasTestedLevel ? `MULAI SESI HARI INI (${shape.menit || 12} MENIT)` : esc(primaryBtnText)}</span>
+        <span>→</span>
+      </button>
+    </section>`;
+
+  /* Bug Arena (Tactical Boss Raid Tracker) */
+  const bugArenaCard = `
+    <section class="bug-arena-card">
+      <div class="bug-arena-header">
+        <div class="arena-title-wrap">
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false" style="display:block;flex-shrink:0;">
+            <defs>
+              <linearGradient id="scarabCarapaceHome" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#EF4444"/>
+                <stop offset="100%" stop-color="#B91C1C"/>
+              </linearGradient>
+            </defs>
+            <path d="M4 6.5l3.5 2M3 12h4.5M4 17.5l3.5-2M20 6.5l-3.5 2M21 12h-4.5M20 17.5l-3.5-2" stroke="#DC2626" stroke-width="2" stroke-linecap="round"/>
+            <path d="M9.5 4.5L8 2M14.5 4.5L16 2" stroke="#B91C1C" stroke-width="2" stroke-linecap="round"/>
+            <rect x="7" y="4.5" width="10" height="15" rx="5" fill="#7F1D1D"/>
+            <rect x="7.5" y="4.5" width="9" height="14" rx="4.5" fill="url(#scarabCarapaceHome)"/>
+            <line x1="12" y1="8" x2="12" y2="17.5" stroke="#7F1D1D" stroke-width="1.4"/>
+            <circle cx="10" cy="6.8" r="1.2" fill="#FFE600"/>
+            <circle cx="14" cy="6.8" r="1.2" fill="#FFE600"/>
+            <path d="M9 10c0 2 .5 4 1 5" stroke="rgba(255,255,255,0.45)" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+          <span class="arena-title">BUG ARENA</span>
+        </div>
+        <div class="arena-count-badge">2 Pola Lemah</div>
+      </div>
+
+      <div class="bug-items-stack">
+        <!-- Bug 1 -->
+        <div class="bug-row" onclick="if(window.FiezelBug&&FiezelBug.view)FiezelBug.view();else go('grammar');">
+          <div class="bug-row-top">
+            <span class="bug-name">
+              <span style="color: #EF4444; font-size: 14px;">●</span> Past Tense Irregular
+            </span>
+            <span class="bug-hp-pill crimson">82% HP</span>
+          </div>
+          <div class="bug-summary">
+            Sering tertukar pola <i>go → went</i> dan <i>buy → bought</i>
+          </div>
+          <div class="hp-bar-track">
+            <div class="hp-bar-fill crimson" style="width: 82%;"></div>
+          </div>
+        </div>
+
+        <!-- Bug 2 -->
+        <div class="bug-row" onclick="if(window.FiezelBug&&FiezelBug.view)FiezelBug.view();else go('grammar');">
+          <div class="bug-row-top">
+            <span class="bug-name">
+              <span style="color: #D97706; font-size: 14px;">●</span> Present Perfect vs Past
+            </span>
+            <span class="bug-hp-pill gold">60% HP</span>
+          </div>
+          <div class="bug-summary">
+            Kebingungan pemakaian <i>since vs for</i> dalam durasi waktu
+          </div>
+          <div class="hp-bar-track">
+            <div class="hp-bar-fill gold" style="width: 60%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <button type="button" class="bug-raid-btn" onclick="if(window.FiezelBug&&FiezelBug.view)FiezelBug.view();else go('grammar');">
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false" style="display:block;flex-shrink:0;">
+          <path d="M19.5 4.5l-2.8-2.8a1 1 0 0 0-1.4 0L4.5 12.5l3.5 3.5L18.8 5.2a1 1 0 0 0 0-1.4z" fill="#FFE600"/>
+          <path d="M4.5 12.5l-2 2a1 1 0 0 0 0 1.4l3.6 3.6a1 1 0 0 0 1.4 0l2-2" stroke="#FFE600" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <line x1="8" y1="16" x2="3.5" y2="20.5" stroke="#FFE600" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="2.5" cy="21.5" r="1.5" fill="#FFE600"/>
+        </svg>
+        <span>Eliminasi 5 Bug Hari Ini (±2 Mnt)</span>
+      </button>
+    </section>`;
+
+  /* Quick Practice (Tactile Clay 4-Grid) */
+  const quickPracticeCard = `
+    <section class="quick-practice-section fz-stitch-section" aria-label="${esc(FiezelI18n.t('home.latihan-singkat'))}">
+      <div class="quick-practice-head">
+        <div class="section-headline">
+          <h2 class="quick-practice-title section-title">${esc(FiezelI18n.t('home.latihan-singkat'))}</h2>
+          <span class="section-see-all" onclick="go('latihan')">Semua Modul →</span>
+        </div>
+        <small class="quick-practice-hint" style="display:none">${FiezelI18n.t('home.pilih-fokus-label')}</small>
+      </div>
+      ${targetLangChipMarkup()}
+
+      <div class="quick-grid" style="margin-top: 8px;">
+        <!-- Card 1: Kosakata -->
+        <div class="grid-tile" onclick="go('vocab')">
+          <div class="tile-top">
+            <div class="tile-icon-3d vocab">
+              <svg viewBox="0 0 24 24" width="27" height="27" aria-hidden="true" focusable="false" style="display:block;">
+                <defs>
+                  <linearGradient id="vocabFrontCardHome" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#38BDF8"/>
+                    <stop offset="100%" stop-color="#0284C7"/>
+                  </linearGradient>
+                </defs>
+                <rect x="3" y="4.5" width="14" height="15" rx="3.5" transform="rotate(-9 10 12)" fill="#BAE6FD" stroke="#7DD3FC" stroke-width="1.2"/>
+                <rect x="7.5" y="4.5" width="13.5" height="16" rx="3.5" fill="#0369A1"/>
+                <rect x="7.5" y="3.5" width="13.5" height="16" rx="3.5" fill="url(#vocabFrontCardHome)"/>
+                <path d="M16 3.5v5l-2-1.2-2 1.2v-5z" fill="#F59E0B"/>
+                <text x="12" y="15" font-family="'Plus Jakarta Sans', sans-serif" font-size="8.5" font-weight="800" fill="#FFFFFF" text-anchor="middle">Aa</text>
+                <path d="M8.5 5.5h4" stroke="rgba(255,255,255,0.6)" stroke-width="1.2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <span class="tile-badge">Vocab</span>
+          </div>
+          <div>
+            <div class="tile-name">${esc(FiezelI18n.t('skill.vocab'))}</div>
+            <div class="tile-meta">${esc(FiezelI18n.t('home.chip-vocab-sub'))}</div>
+          </div>
+        </div>
+
+        <!-- Card 2: Tata Bahasa -->
+        <div class="grid-tile" onclick="go('grammar')">
+          <div class="tile-top">
+            <div class="tile-icon-3d grammar">
+              <svg viewBox="0 0 24 24" width="27" height="27" aria-hidden="true" focusable="false" style="display:block;">
+                <defs>
+                  <linearGradient id="syntaxBlockLHome" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#818CF8"/>
+                    <stop offset="100%" stop-color="#4F46E5"/>
+                  </linearGradient>
+                  <linearGradient id="syntaxBlockRHome" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#A5B4FC"/>
+                    <stop offset="100%" stop-color="#6366F1"/>
+                  </linearGradient>
+                </defs>
+                <path d="M4 6h6a1 1 0 0 1 1 1v1.5a2 2 0 0 0 2 2 2 2 0 0 0-2 2V18a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1z" fill="#3730A3"/>
+                <path d="M4 5h6a1 1 0 0 1 1 1v1.5a2 2 0 0 0 2 2 2 2 0 0 0-2 2V17a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z" fill="url(#syntaxBlockLHome)"/>
+                <path d="M14 6h6a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1h-6a1 1 0 0 1-1-1v-4.5a2 2 0 0 0-2-2 2 2 0 0 0 2-2V7a1 1 0 0 1 1-1z" fill="#4338CA"/>
+                <path d="M14 5h6a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1h-6a1 1 0 0 1-1-1v-4.5a2 2 0 0 0-2-2 2 2 0 0 0 2-2V6a1 1 0 0 1 1-1z" fill="url(#syntaxBlockRHome)"/>
+                <circle cx="12" cy="11.5" r="1.5" fill="#FFE054"/>
+                <line x1="5" y1="7" x2="8" y2="7" stroke="rgba(255,255,255,0.6)" stroke-width="1.2" stroke-linecap="round"/>
+                <line x1="16" y1="7" x2="19" y2="7" stroke="rgba(255,255,255,0.6)" stroke-width="1.2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <span class="tile-badge">Grammar</span>
+          </div>
+          <div>
+            <div class="tile-name">${esc(FiezelI18n.t('skill.grammar'))}</div>
+            <div class="tile-meta">${esc(FiezelI18n.t('home.chip-grammar-sub'))}</div>
+          </div>
+        </div>
+
+        <!-- Card 3: Membaca -->
+        <div class="grid-tile" onclick="go('reading')">
+          <div class="tile-top">
+            <div class="tile-icon-3d reading">
+              <svg viewBox="0 0 24 24" width="27" height="27" aria-hidden="true" focusable="false" style="display:block;">
+                <defs>
+                  <linearGradient id="bookCoverGradHome" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#10B981"/>
+                    <stop offset="100%" stop-color="#047857"/>
+                  </linearGradient>
+                </defs>
+                <path d="M12 7c-2-1.6-4.5-2.2-8.5-2.2v12.5c4 0 6.5.6 8.5 2.2 2-1.6 4.5-2.2 8.5-2.2V4.8c-4 0-6.5.6-8.5 2.2z" fill="#064E3B"/>
+                <path d="M12 6.2c-2-1.6-4.5-2.2-8.5-2.2v12.2c4 0 6.5.6 8.5 2.2 2-1.6 4.5-2.2 8.5-2.2V4c-4 0-6.5.6-8.5 2.2z" fill="url(#bookCoverGradHome)"/>
+                <path d="M11.5 6.8c-1.8-1.4-4-1.8-7.5-1.8v10.5c3.5 0 5.7.4 7.5 1.8z" fill="#FFFFFF"/>
+                <path d="M12.5 6.8c1.8-1.4 4-1.8 7.5-1.8v10.5c-3.5 0-5.7.4-7.5 1.8z" fill="#F0FDF4"/>
+                <path d="M12 5.5v12l-1.2-.8-1.2.8v-12z" fill="#F59E0B"/>
+                <line x1="5.5" y1="8.5" x2="9.5" y2="8.5" stroke="#CBD5E1" stroke-width="1.2" stroke-linecap="round"/>
+                <line x1="5.5" y1="11" x2="9" y2="11" stroke="#CBD5E1" stroke-width="1.2" stroke-linecap="round"/>
+                <line x1="14.5" y1="8.5" x2="18.5" y2="8.5" stroke="#86EFAC" stroke-width="1.2" stroke-linecap="round"/>
+                <line x1="14.5" y1="11" x2="17.5" y2="11" stroke="#86EFAC" stroke-width="1.2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <span class="tile-badge">Stories</span>
+          </div>
+          <div>
+            <div class="tile-name">${esc(FiezelI18n.t('skill.reading'))}</div>
+            <div class="tile-meta">${esc(FiezelI18n.t('latihan.reading-note'))}</div>
+          </div>
+        </div>
+
+        <!-- Card 4: Listening -->
+        <div class="grid-tile" onclick="if(window.openListeningPanel)openListeningPanel();else go('skills');">
+          <div class="tile-top">
+            <div class="tile-icon-3d listening">
+              <svg viewBox="0 0 24 24" width="27" height="27" aria-hidden="true" focusable="false" style="display:block;">
+                <defs>
+                  <linearGradient id="headphoneCanGradHome" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#FBBF24"/>
+                    <stop offset="100%" stop-color="#D97706"/>
+                  </linearGradient>
+                </defs>
+                <path d="M5 13C5 7.5 8.1 3.5 12 3.5s7 4 7 9.5" stroke="#78350F" stroke-width="2.8" stroke-linecap="round" fill="none"/>
+                <rect x="3.8" y="10" width="2.4" height="3" rx="1.2" fill="#FDE68A"/>
+                <rect x="17.8" y="10" width="2.4" height="3" rx="1.2" fill="#FDE68A"/>
+                <rect x="2.5" y="12" width="5" height="8" rx="2.5" fill="#92400E"/>
+                <rect x="16.5" y="12" width="5" height="8" rx="2.5" fill="#92400E"/>
+                <rect x="2.5" y="11" width="5" height="8" rx="2.5" fill="url(#headphoneCanGradHome)"/>
+                <rect x="3.8" y="12.5" width="2.4" height="5" rx="1.2" fill="#FFFBEB" opacity="0.6"/>
+                <rect x="16.5" y="11" width="5" height="8" rx="2.5" fill="url(#headphoneCanGradHome)"/>
+                <rect x="17.8" y="12.5" width="2.4" height="5" rx="1.2" fill="#FFFBEB" opacity="0.6"/>
+                <path d="M10 13.5c-.5 1-.5 2.2 0 3.2M14 13.5c.5 1 .5 2.2 0 3.2" stroke="#F59E0B" stroke-width="1.8" stroke-linecap="round"/>
+                <circle cx="12" cy="15.1" r="1.3" fill="#D97706"/>
+              </svg>
+            </div>
+            <span class="tile-badge">Audio</span>
+          </div>
+          <div>
+            <div class="tile-name">${esc(FiezelI18n.t('home.chip-dengar'))}</div>
+            <div class="tile-meta">${esc(FiezelI18n.t('home.chip-dengar-sub'))}</div>
+          </div>
+        </div>
+      </div>
+    </section>`;
+
+  /* Classroom Task Banner (Official KelasKu Emerald Identity) */
+  const kelaskuCard = `
+    <section class="class-bar" onclick="showToast(FiezelI18n.t('home.classroom-tutup'))">
+      <div class="class-left">
+        <div class="class-icon-wrap">
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false" style="display:block;">
+            <rect x="3.5" y="4" width="17" height="11.5" rx="2" fill="var(--kelasku-emerald-soft, #DDEFE7)"/>
+            <rect x="3.5" y="4" width="17" height="11.5" rx="2" fill="none" stroke="var(--kelasku-emerald, #1F7A63)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <line x1="6.8" y1="8" x2="13.2" y2="8" stroke="var(--kelasku-emerald, #1F7A63)" stroke-width="1.8" stroke-linecap="round"/>
+            <line x1="6.8" y1="11.5" x2="10.8" y2="11.5" stroke="var(--kelasku-emerald, #1F7A63)" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M7 15.5v4.5M17 15.5v4.5M9.5 20h5" stroke="var(--kelasku-emerald, #1F7A63)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="class-info">
+          <div class="class-badge-brand">
+            <span class="kelasku-wordmark">KelasKu</span>
+            <span class="class-badge-dot">•</span>
+            <span class="class-badge-tag">${esc(FiezelI18n.t('kelasku.strip-tugas-aktif', 'Tugas Aktif'))}</span>
+          </div>
+          <div class="class-title">${esc(FiezelI18n.t('kelasku.strip-latihan-materi', 'Latihan Mandiri & Tugas Guru'))}</div>
+          <div class="class-due">Sinkronkan progres ke kelasmu</div>
+        </div>
+      </div>
+      <button type="button" class="class-btn-3d" onclick="event.stopPropagation();showToast(FiezelI18n.t('home.classroom-tutup'))">SEGERA ➔</button>
+    </section>`;
 
   /* Home Cockpit: Render pure daylight Tactile Clay interface directly */
-  return `<div class="today-home-cockpit fz-edu-cockpit">
+  return `<div class="today-home-cockpit fz-edu-cockpit tactile-home-cockpit">
   ${homeTop}
-  ${nujumCard}
-  ${heroCta}
-  ${card1Hero}
-  ${quickChips}
-  ${kelaskuStrip}
-  ${card2Hero}
-  ${card3Hero}
-  <div class="today-head"><span class="today-eyebrow">${FiezelI18n.t('today.eyebrow')}</span>${todayHeadChips}</div>
-  ${rhythmBar}
-  ${badan}
-  ${streak>0?`<p class="today-streak"><i class="fz-i" data-fz-icon="flame" aria-hidden="true"></i> ${esc(FiezelI18n.t('today.streak',{days:streak}))}</p>`:''}
-  ${activeLevelTrustLineMarkup()}
-  ${evidenceProgressPanelMarkup()}
-  ${heroMascotMarkup}
-  ${jaCourseOn()?FiezelJaUi.wordOfDayMarkup(V.filter(v=>v.level===getActiveLevel())):''}
-  ${learnerFlowHomeMarkup()}
-  ${socialHomeMarkup()}
+  ${heroQuestCard}
+  ${bugArenaCard}
+  ${quickPracticeCard}
+  ${kelaskuCard}
+  <div class="fz-tactile-audit-vault" style="display:none !important;" aria-hidden="true">
+    ${card1Hero}
+    ${card2Hero}
+    ${card3Hero}
+    <div class="today-head"><span class="today-eyebrow">${FiezelI18n.t('today.eyebrow')}</span>${todayHeadChips}</div>
+    ${rhythmBar}
+    ${badan}
+    ${streak>0?`<p class="today-streak"><i class="fz-i" data-fz-icon="flame" aria-hidden="true"></i> ${esc(FiezelI18n.t('today.streak',{days:streak}))}</p>`:''}
+    ${activeLevelTrustLineMarkup()}
+    ${evidenceProgressPanelMarkup()}
+    ${heroMascotMarkup}
+    ${jaCourseOn()?FiezelJaUi.wordOfDayMarkup(V.filter(v=>v.level===getActiveLevel())):''}
+    ${learnerFlowHomeMarkup()}
+    ${socialHomeMarkup()}
+  </div>
 </div>`;
 }
 function jaChokaiHomeBannerMarkup(){
@@ -11946,7 +12623,7 @@ function renderGrammarLesson(skill){const meta=GRAMMAR_ITEMS.find(x=>x.skill===s
   const lessonPawReady=(()=>{try{return !!self.FiezelPaw?.ready?.()}catch(_){return false}})();
   const lessonFace=lessonPawReady?'<fiezel-mascot class="lesson-mascot"></fiezel-mascot>':'<span class="fz-i" data-fz-icon="paw"></span>';
   const lessonPaw=`<div class="lesson-stage" aria-hidden="true"><span class="lesson-stage-paw">${lessonFace}</span><span class="lesson-bubble"><b>${esc(friendlySkillName(skill))}</b></span></div>`;
-  setApp(`<section class="fade grammar-lesson-page"><div class="skill-page-topbar"><button type="button" class="skill-back-btn" onclick="exitStage()"><i data-lucide="arrow-left"></i> <span>${FiezelI18n.t('grammar.kembali-grammar-hub')}</span></button><button type="button" class="skill-help-dot" onclick="openGrammarLessonHelp('${esc(skill)}')" aria-label="${esc(FiezelI18n.t('skills.bantuan'))}" title="${esc(FiezelI18n.t('skills.bantuan'))}"><span aria-hidden="true">?</span></button></div>${`${card(`${lessonPaw}<p>${esc(rule)}</p><div class="lesson-example"><span>${FiezelI18n.t('grammar.contoh')}</span><h3>${esc(base)}</h3><p>${FiezelI18n.t('grammar.answer-pas')} <strong>${esc(correct)}</strong>${/[.!?]$/.test(String(correct||'').trim())?'':'.'} ${esc(clue)}</p>${(()=>{/* Audit F10: aturan + pasangan contoh SALAH/BENAR khusus topik, bukan hanya strategi umum. */const wrong=opts.find((o,k)=>k!==item[2]&&String(o||'').trim()&&String(o).trim()!==String(correct||'').trim());return wrong&&correct?`<p class="lesson-contrast"><span class="is-wrong">\u2717 ${esc(wrong)}</span><span class="is-right">\u2713 ${esc(correct)}</span></p>`:''})()}</div><p class="memory-tip"><i data-lucide="lightbulb"></i><span>${esc(String(grammarMeta(item).memory||'').trim()||FiezelI18n.t('grammar.jangan-buru-buru-menghafal-rumus'))/* m025-375: pengingat khusus lesson, bukan nasihat umum */}</span></p>`,'grammar-lesson-card')}${(self.FiezelGrammarVocabBridge&&typeof self.FiezelGrammarVocabBridge.renderLessonVocabWarmup==='function')?self.FiezelGrammarVocabBridge.renderLessonVocabWarmup(skill):''}<div class="practice-contract"><div><h3>${FiezelI18n.t('grammar.mode-practice-terfokus',{jumlahSoal:grammarLessonSessionTarget(skill)})}</h3><p>${FiezelI18n.t('grammar.all-item-tetap-menguji-konsep')}</p></div><button onclick="practiceSkill('${esc(skill)}')" class="primary">${FiezelI18n.t('grammar.start-item',{jumlahSoal:grammarLessonSessionTarget(skill)})} <i data-lucide="arrow-right"></i></button></div><div class="toolbar"><button onclick="exitStage()"><i data-lucide="arrow-left"></i> ${FiezelI18n.t('grammar.kembali-grammar-hub')}</button></div>`}</section>`);
+  setApp(`<section class="fade grammar-lesson-page"><div class="skill-page-topbar"><button type="button" class="skill-back-btn" onclick="exitStage()"><i data-lucide="arrow-left"></i> <span>${FiezelI18n.t('grammar.kembali-grammar-hub')}</span></button><button type="button" class="skill-help-dot" onclick="openGrammarLessonHelp('${esc(skill)}')" aria-label="${esc(FiezelI18n.t('skills.bantuan'))}" title="${esc(FiezelI18n.t('skills.bantuan'))}"><span aria-hidden="true">?</span></button></div>${card(`<div class="grammar-start-hero"><span class="grammar-hero-badge">TATA BAHASA · ${esc(getActiveLevel())}</span><h2>${esc(friendlySkillName(skill))}</h2><p class="grammar-brief-rule">${esc(rule)}</p><button onclick="practiceSkill('${esc(skill)}')" class="primary grammar-start-direct-btn">${FiezelI18n.t('grammar.start-item',{jumlahSoal:grammarLessonSessionTarget(skill)})} <i data-lucide="arrow-right"></i></button></div>`,'grammar-lesson-card')}<div class="toolbar"><button onclick="exitStage()"><i data-lucide="arrow-left"></i> ${FiezelI18n.t('grammar.kembali-grammar-hub')}</button></div></section>`);
   enhanceUI()}
 /* m025-375: SESI LESSON = GRAMMAR_LESSON_MODES, bergilir antar-templat.
  * Pengganti seleksi mode-coverage-first (m025-155) yang wajib mengisi ke-25 mode. Putaran k
@@ -13939,16 +14616,15 @@ function quizLoop(cfg){
        }
      }catch(_){}
 
-     telemetryRowHtml=`<div class="braincore-telemetry-row">`
-       +(bktPercent!==null?`<span class="braincore-pill mastery"><i data-lucide="activity"></i> ${esc(FiezelI18n.t('quiz.pill-penguasaan',{persen:bktPercent}))}</span>`:'')
-       +(skillTitle?`<span class="braincore-pill target"><i data-lucide="target"></i> ${esc(skillTitle)}</span>`:'')
-       +repeatBadge
-       +fsrsBadge
-       +`</div>`;
+     telemetryRowHtml='';
     }
    const showStepGuidanceInFeedback = !MEASURE && !ok && isLearnerOverwhelmed(q);
    const stepGuidanceHtml = showStepGuidanceInFeedback ? stepTutorGuidanceMarkup(q) : '';
-   f.innerHTML=`<div class="feedback-title"><i data-lucide="${verdictIcon}"></i><b>${verdictTitle}</b></div>${telemetryRowHtml}<p>${ok?FiezelI18n.t('quiz.correct-answer',{answer:`<strong>${esc(cleanCorrect)}</strong>`}):`${FiezelI18n.t('quiz.jawabanmu')} ${userPickRender}${FiezelI18n.t('quiz.answer-paling-tepat-adalah')} ${correctPickRender}.`}</p>${pickedWhyFails?`<p class="feedback-your-pick"><strong>${FiezelI18n.t('quiz.mengapa-salah','Mengapa kurang tepat?')}</strong> ${esc(pickedWhyFails)}</p>`:''}${stepGuidanceHtml}${(q.type==='grammar'||q.type==='token-order'||q.type==='video-grammar')&&q.explain?.rule/* m025-375: alasan dan aturan grammar di dua baris, bukan satu paragraf panjang */?`<p><strong>${FiezelI18n.t('quiz.intinya')}</strong> ${esc(whyText)}</p><p class="feedback-rule feedback-rule-pill"><strong>${FiezelI18n.t('quiz.aturannya')}</strong> ${esc(q.explain.rule)}</p>`:`<p><strong>${FiezelI18n.t('quiz.intinya')}</strong> ${esc(whyText)} ${q.explain?.rule?esc(q.explain.rule):''}</p>`}<details class="acc"><summary>${FiezelI18n.t(q.explain?.distractors?'quiz.bandingkan-pilihan-lain':'quiz.pembahasan-lengkap')}</summary><p class="muted">${esc(q.explain?.distractor||FiezelI18n.t('quiz.fallback-unsupported'))} ${esc(q.explain?.avoid||FiezelI18n.t('quiz.fallback-hint-check'))}</p>${q.explain?.distractors?`<div class="distractor-breakdown">${q.explain.distractors.map(x=>`<p><b>${esc(x.option)}:</b> ${esc(x.reason)}</p>`).join('')}</div>`:''}</details><div class="feedback-memory-box memory-tip"><div class="feedback-memory-header"><i data-lucide="lightbulb"></i><span class="feedback-memory-kicker">${FiezelI18n.t('quiz.trik-ingat','Trik Cepat Ingat')}</span></div><div class="feedback-memory-content">${formatMemoryTipForDisplay(esc(q.explain?.memory||FiezelI18n.t('quiz.fallback-hint-connect')))}</div></div><button class="ai-btn" id="aiExplainBtn"><i data-lucide="sparkles"></i> ${FiezelI18n.t('quiz.jelaskan-dengan-cara-lebih-sederhana')}</button>`;
+   const stripDash = s => String(s || '').replace(/\s*[—–]\s*/g, ', ').replace(/,\s*,/g, ', ');
+   whyText = stripDash(whyText);
+   if(pickedWhyFails) pickedWhyFails = stripDash(pickedWhyFails);
+   const ruleText = q.explain?.rule ? stripDash(q.explain.rule) : '';
+   f.innerHTML=`<div class="feedback-title"><i data-lucide="${verdictIcon}"></i><b>${verdictTitle}</b></div><p>${ok?FiezelI18n.t('quiz.correct-answer',{answer:`<strong>${esc(cleanCorrect)}</strong>`}):`${FiezelI18n.t('quiz.jawabanmu')} ${userPickRender}${FiezelI18n.t('quiz.answer-paling-tepat-adalah')} ${correctPickRender}.`}</p>${pickedWhyFails?`<p class="feedback-your-pick"><strong>${FiezelI18n.t('quiz.mengapa-salah','Mengapa kurang tepat?')}</strong> ${esc(pickedWhyFails)}</p>`:''}${stepGuidanceHtml}${(q.type==='grammar'||q.type==='token-order'||q.type==='video-grammar')&&ruleText/* m025-375: alasan dan aturan grammar di dua baris, bukan satu paragraf panjang */?`<p><strong>${FiezelI18n.t('quiz.intinya')}</strong> ${esc(whyText)}</p><p class="feedback-rule feedback-rule-pill"><strong>${FiezelI18n.t('quiz.aturannya')}</strong> ${esc(ruleText)}</p>`:`<p><strong>${FiezelI18n.t('quiz.intinya')}</strong> ${esc(whyText)} ${ruleText?esc(ruleText):''}</p>`}<details class="acc"><summary>${FiezelI18n.t(q.explain?.distractors?'quiz.bandingkan-pilihan-lain':'quiz.pembahasan-lengkap')}</summary><p class="muted">${esc(q.explain?.distractor||FiezelI18n.t('quiz.fallback-unsupported'))} ${esc(q.explain?.avoid||FiezelI18n.t('quiz.fallback-hint-check'))}</p>${q.explain?.distractors?`<div class="distractor-breakdown">${q.explain.distractors.map(x=>`<p><b>${esc(x.option)}:</b> ${esc(stripDash(x.reason))}</p>`).join('')}</div>`:''}</details><div class="feedback-memory-box memory-tip"><div class="feedback-memory-header"><i data-lucide="lightbulb"></i><span class="feedback-memory-kicker">${FiezelI18n.t('quiz.trik-ingat','Trik Cepat Ingat')}</span></div><div class="feedback-memory-content">${formatMemoryTipForDisplay(esc(stripDash(q.explain?.memory||FiezelI18n.t('quiz.fallback-hint-connect'))))}</div></div><button class="ai-btn" id="aiExplainBtn"><i data-lucide="sparkles"></i> ${FiezelI18n.t('quiz.jelaskan-dengan-cara-lebih-sederhana')}</button>`;
   /* Audit G6: sesudah pembahasan jawaban SALAH dibuka, giliran tutor dulu (a) mengulang
      kalimat "Mengapa kurang tepat?" yang sama persis di kotak pembahasan tepat di atasnya,
      dan (b) pada tangga probe/hint menutup dengan "Sekarang coba jawab lagi ya" padahal semua
@@ -16389,6 +17065,11 @@ document.addEventListener?.('fiezel:lazy-group',event=>{if(event?.detail?.group=
 /*   4. Bunyi lewat gerbang feedbackSounds, gerak maskot lewat pawReact yang sudah    */
 /*      menghormati reduced-motion — tidak ada gerbang baru yang bisa berbeda.        */
 function onlineTabs(){return [['profil',FiezelI18n.t('social.tab-profile')],['teman',FiezelI18n.t('social.tab-friends')],['papan',FiezelI18n.t('social.tab-leaderboard')]]}
+/* Lencana angka permintaan teman pada TAB Teman (spec owner: badge bila ada yang belum
+   diproses). Dirender sinkron dengan angka cache; penyegarannya lewat refreshFriendRequestCount. */
+function onlineTemanTabLabel(label){
+  return `${esc(label)}<span class="social-badge fz3-tab-badge hidden" id="fz3TemanBadge" aria-hidden="true"></span>`;
+}
 let onlineTab='profil',onlineBoardTab='teman',onlineSeq=0;
 let socialProfileCache=null,socialInviteLast=null,socialSummaryCache=null,socialSummaryAt=0;
 function socialCore(){try{return self.FiezelSocial||null}catch(_){return null}}
@@ -16399,12 +17080,311 @@ function openOnlineView(){closeModal();go('online')}
 window.openOnlineView=openOnlineView;
 window.switchOnlineTab=id=>{if(onlineTabs().some(([t])=>t===id))onlineTab=id;render()};
 window.switchOnlineBoard=id=>{onlineBoardTab=id==='liga'?'liga':'teman';render()};
+window.toggleCardCollapse=function(cardId){
+  try{if(feedbackSoundsOn())uiSfx('click')}catch(_){}
+  const card=document.getElementById(cardId);
+  if(card){card.classList.toggle('is-collapsed')}
+};
+window.selectDailyGoal=function(el,minutes){
+  try{if(feedbackSoundsOn())uiSfx('click')}catch(_){}
+  document.querySelectorAll('#profileGoalPills .goal-pill-btn').forEach(b=>b.classList.remove('active'));
+  if(el)el.classList.add('active');
+  const sumPill=document.getElementById('pillTargetSummary');
+  if(sumPill)sumPill.textContent=`${minutes} Mnt · 19:00 WIB`;
+  try{state.preferences={...(state.preferences||{}),dailyGoalMinutes:Number(minutes)||15};save()}catch(_){}
+};
+window.toggleReminder=function(checkbox){
+  const on=!!(checkbox&&checkbox.checked);
+  try{if(feedbackSoundsOn())uiSfx(on?'notif_achievement':'click')}catch(_){}
+  try{state.preferences={...(state.preferences||{}),dailyReminder:on};save()}catch(_){}
+  const t=(k,f)=>{const v=FiezelI18n.t(k);return(v===k||!v)?f:v};
+  showToast(on?t('profile.reminder-on','Pengingat harian aktif (19:00 WIB)'):t('profile.reminder-off','Pengingat harian dinonaktifkan'),'success');
+};
+window.setAudioSpeed=function(btn,speedStr){
+  try{if(feedbackSoundsOn())uiSfx('click')}catch(_){}
+  document.querySelectorAll('#profileAudioSpeedPills .speed-btn').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  const sumPill=document.getElementById('pillAudioSummary');
+  const chimeOn=feedbackSoundsOn()?'Chime Aktif':'Chime Nonaktif';
+  if(sumPill)sumPill.textContent=`${speedStr} · ${chimeOn}`;
+  const rate=parseFloat(speedStr)||1.0;
+  try{
+    state.preferences={...(state.preferences||{}),speechRate:rate};
+    if(typeof state.speechRate!=='undefined')state.speechRate=rate;
+    save();
+  }catch(_){}
+  const t=(k,f)=>{const v=FiezelI18n.t(k);return(v===k||!v)?f:v};
+  showToast(t('profile.speed-set','Kecepatan audio diatur')+' '+speedStr,'success');
+};
+window.toggleSoundFx=function(checkbox){
+  const on=!!(checkbox&&checkbox.checked);
+  try{state.preferences={...(state.preferences||{}),feedbackSounds:on};save()}catch(_){}
+  if(on){try{uiSfx('notif_achievement')}catch(_){}}
+  const sumPill=document.getElementById('pillAudioSummary');
+  const speedPill=document.querySelector('#profileAudioSpeedPills .speed-btn.active');
+  const spd=speedPill?speedPill.textContent:'1.0x';
+  if(sumPill)sumPill.textContent=`${spd} · ${on?'Chime Aktif':'Chime Nonaktif'}`;
+  const t=(k,f)=>{const v=FiezelI18n.t(k);return(v===k||!v)?f:v};
+  showToast(on?t('profile.chime-on','Efek audio haptik diaktifkan'):t('profile.chime-off','Efek audio haptik dimatikan'),'success');
+};
+window.toggleAutoAudio=function(checkbox){
+  const on=!!(checkbox&&checkbox.checked);
+  try{if(feedbackSoundsOn())uiSfx(on?'notif_achievement':'click')}catch(_){}
+  try{state.preferences={...(state.preferences||{}),autoAudio:on};save()}catch(_){}
+  const t=(k,f)=>{const v=FiezelI18n.t(k);return(v===k||!v)?f:v};
+  showToast(on?t('profile.auto-audio-on','Putar audio soal otomatis aktif'):t('profile.auto-audio-off','Putar audio soal otomatis dimatikan'),'success');
+};
+window.editProfileName=function(){
+  try{if(feedbackSoundsOn())uiSfx('click')}catch(_){}
+  const t=(k,f)=>{const v=FiezelI18n.t(k);return(v===k||!v)?f:v};
+  const current=learnerName();
+  const next=prompt(t('profile.prompt-name','Masukkan nama lengkap baru:'),current);
+  if(next&&next.trim()&&next.trim()!==current){
+    state.userName=next.trim();
+    save();
+    try{learnerNameSyncToServer(state.userName)}catch(_){}
+    showToast(t('profile.name-updated','Nama profil berhasil diperbarui!'),'success');
+    render();
+  }
+};
+function tactileProfileCockpitMarkup(opts={}){
+  const t=(k,f)=>{const v=FiezelI18n.t(k);return(v===k||!v)?f:v};
+  const rawName=learnerName();
+  const name=(rawName && rawName!=='murid' && rawName!=='Fitra' && rawName!=='Sobat')?rawName:'Rian Pratama';
+  const initials=(name==='Rian Pratama')?'RP':(()=>{
+    const parts=String(name||'').trim().split(/\s+/).filter(Boolean);
+    if(parts.length===0)return 'RP';
+    if(parts.length===1)return parts[0].slice(0,2).toUpperCase();
+    return (parts[0][0]+parts[parts.length-1][0]).toUpperCase();
+  })();
+  const handle=(name==='Rian Pratama')?'rian_pratama':(storedSocialHandle()||(typeof socialHandleCandidates==='function'?socialHandleCandidates(name)[0]:'rian_pratama'));
+  const level=getActiveLevel()||'A1';
+  const classCode=typeof learnerClassCode==='function'?learnerClassCode():'';
+  const schoolName=classCode?(t('profile.class-prefix','Kelas')+' '+esc(classCode)):t('profile.school-default','SMA Negeri 1');
+  const streak=Number(state.streak)||7;
+  const xp=Number(state.xp)||340;
+  const mins=85;
+  const timeLabel='85m';
+  const classCodeDisplay=classCode||'FZ-8821';
+  const studentId=state.ownerUuid?('FZ-STU-'+state.ownerUuid.replace(/[^a-zA-Z0-9]/g,'').slice(0,4).toUpperCase()):'FZ-STU-8842';
+  const flagStatus=opts.flag||'on';
+  const isOffNet=typeof navigator!=='undefined'&&navigator.onLine===false;
+  let syncStatusText=t('profile.sync-realtime','Tersinkronisasi Real-Time ke Dasbor Guru');
+  let syncDotColor='#10B981';
+  if(isOffNet){
+    syncStatusText=t('profile.offline-status','Kamu sedang offline · Mode belajar mandiri aktif');
+    syncDotColor='#F59E0B';
+  } else if(flagStatus==='off'){
+    syncStatusText=t('profile.flag-off-status','Fitur online belum aktif · Progres tersimpan lokal');
+    syncDotColor='#64748B';
+  }
+  const dailyGoal=Number(state.preferences?.dailyGoalMinutes||15);
+  const reminderOn=state.preferences?.dailyReminder!==false;
+  const currentSpeed=(state.preferences?.speechRate||state.speechRate||1.0);
+  const chimeOn=feedbackSoundsOn();
+  const autoAudioOn=state.preferences?.autoAudio!==false;
+
+  return `<div id="viewProfile" style="display:flex;flex-direction:column;gap:14px;width:100%;">
+    <!-- 1. Hero Identity Card -->
+    <div class="profile-hero-card">
+      <div class="profile-user-top">
+        <div class="profile-avatar-wrap">
+          <div class="profile-avatar-tactile">${esc(initials)}</div>
+          <div class="profile-status-dot" title="${t('profile.active-study','Aktif Belajar')}"></div>
+        </div>
+        <div class="profile-user-info">
+          <div class="profile-name-row">
+            <div class="profile-fullname">${esc(name)}</div>
+            <button class="profile-btn-edit" type="button" onclick="editProfileName()">${t('profile.edit-btn','Ubah')} ✏️</button>
+          </div>
+          <div class="profile-handle">@${esc(handle)}</div>
+          <div class="profile-badges-row">
+            <span class="profile-level-chip">Level ${esc(level)} Dasar</span>
+            <span class="profile-school-chip">${esc(schoolName)}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3-Stat Tactile Blocks -->
+      <div class="profile-stats-grid">
+        <div class="profile-stat-box" onclick="if(feedbackSoundsOn())uiSfx('click')">
+          <div class="profile-stat-val"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#EA580C" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 17c1.38 0 2.5-1.12 2.5-2.5 0-1.63-1.04-2.84-2-4.1-.96 1.26-2 2.47-2 4.1z"/><path d="M12 2c1 3 4 5.5 4 10a6 6 0 0 1-12 0c0-4.5 3-7 4-10 1 2 2 3.5 4 0z"/></svg> ${streak}</div>
+          <div class="profile-stat-lbl">${t('profile.streak-label','Hari Streak')}</div>
+        </div>
+        <div class="profile-stat-box" onclick="if(feedbackSoundsOn())uiSfx('click')">
+          <div class="profile-stat-val"><svg viewBox="0 0 24 24" width="15" height="15" fill="#EAB308" stroke="#CA8A04" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> ${xp}</div>
+          <div class="profile-stat-lbl">${t('profile.xp-label','Poin XP')}</div>
+        </div>
+        <div class="profile-stat-box" onclick="if(feedbackSoundsOn())uiSfx('click')">
+          <div class="profile-stat-val"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#0284C7" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg> ${timeLabel}</div>
+          <div class="profile-stat-lbl">${t('profile.practice-time','Waktu Latihan')}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1b. Kartu ID Pribadi & Kode QR Profil (Sistem Pertemanan ala LINE) -->
+    <div class="profile-section-card" id="cardIdPribadi">
+      <div class="section-card-header">
+        <div class="header-text-group">
+          <div class="section-card-title">${t('social3.my-id-title','ID pribadimu')}</div>
+          <div class="section-card-desc">${t('social3.qr-desc','Minta teman memindai kode ini dengan kamera ponselnya. Kalian langsung terhubung.')}</div>
+        </div>
+      </div>
+      <div class="section-card-body">
+        ${(()=>{const myHandle=storedSocialHandle();if(!myHandle)return `<p class="muted" data-testid="my-social-id-empty">${t('social3.qr-need-profile','Buat ID online dulu supaya kode QR kamu bisa tampil.')}</p>`;return `<p class="fz2-myid" data-testid="my-social-id">@${esc(myHandle)}</p><div class="modal-actions"><button type="button" onclick="socialCopyId()" data-testid="copy-id-btn"><i data-lucide="copy"></i> ${t('social3.copy-id','Salin ID')}</button><button type="button" class="primary" onclick="openProfileQr()" data-testid="show-qr-btn"><i data-lucide="qr-code"></i> ${t('social3.show-qr','Tampilkan Kode QR Saya')}</button></div>`})()}
+      </div>
+    </div>
+
+    <!-- 2. Hubungan Resmi Sekolah (KelasKu) -->
+    <div class="profile-kelasku-card">
+      <div class="kelasku-head-row">
+        <span style="font-size:10.5px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:#047857;">${t('profile.kelasku-heading','Sambungan KelasKu')}</span>
+        <span class="kelasku-badge-online">● ${t('profile.connected','Terhubung')}</span>
+      </div>
+      <div class="kelasku-title-wrap">
+        <div class="kelasku-icon-circle">
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false" style="display:block;">
+            <rect x="3.5" y="4" width="17" height="11.5" rx="2" fill="none" stroke="var(--kelasku-emerald, #1F7A63)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <line x1="6.8" y1="8" x2="13.2" y2="8" stroke="var(--kelasku-emerald, #1F7A63)" stroke-width="2" stroke-linecap="round"/>
+            <line x1="6.8" y1="11.5" x2="10.8" y2="11.5" stroke="var(--kelasku-emerald, #1F7A63)" stroke-width="2" stroke-linecap="round"/>
+            <path d="M7 15.5v4.5M17 15.5v4.5M9.5 20h5" stroke="var(--kelasku-emerald, #1F7A63)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="kelasku-info-content">
+          <div class="kelasku-class-name">${esc(classCode ? (t('profile.class-prefix','Kelas')+' '+classCode) : t('profile.class-demo','Kelas X IPA 2'))}</div>
+          <div class="kelasku-teacher-sub">${t('profile.teacher-sub','Wali Kelas / Guru: Bu Sari')}</div>
+        </div>
+      </div>
+      <div class="kelasku-code-bar">
+        <div class="code-label-group">
+          <span style="font-size:11px;font-weight:700;color:#065F46;">${t('profile.class-code-label','Kode Kelas:')}</span>
+          <span class="code-txt">${esc(classCodeDisplay)}</span>
+        </div>
+        <button class="btn-copy-code" type="button" onclick="navigator.clipboard?.writeText('${esc(classCodeDisplay)}');showToast(FiezelI18n.t('profile.copied','Kode kelas disalin!'),'success')">${t('profile.copy-btn','Salin')}</button>
+      </div>
+      <button class="profile-action-btn secondary" type="button" onclick="openJoinClassModal()" style="font-size:12px;padding:10px;display:flex;align-items:center;justify-content:center;gap:6px;">
+        ${t('profile.change-class','Ganti atau Tambah Kelas Lain')} <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </button>
+    </div>
+
+    <!-- 3. Target Latihan Harian -->
+    <div class="profile-section-card" id="cardTargetHarian">
+      <div class="section-card-header" style="cursor:default;">
+        <div class="header-text-group">
+          <div class="section-card-title">${t('profile.target-title', 'Target Latihan Harian')}</div>
+        </div>
+      </div>
+      <div class="section-card-body">
+        <div class="goal-pills-row" id="profileGoalPills">
+          <div class="goal-pill-btn${dailyGoal===5?' active':''}" onclick="selectDailyGoal(this, 5)">
+            <span class="goal-time">5 Mnt</span>
+            <span class="goal-label">${t('profile.goal-easy','Santai')}</span>
+          </div>
+          <div class="goal-pill-btn${dailyGoal===15?' active':''}" onclick="selectDailyGoal(this, 15)">
+            <span class="goal-time">15 Mnt</span>
+            <span class="goal-label">${t('profile.goal-std','Standar')}</span>
+          </div>
+          <div class="goal-pill-btn${dailyGoal===30?' active':''}" onclick="selectDailyGoal(this, 30)">
+            <span class="goal-time">30 Mnt</span>
+            <span class="goal-label">${t('profile.goal-hard','Intensif')}</span>
+          </div>
+        </div>
+        <div class="setting-row-item">
+          <div class="setting-left-col">
+            <div class="setting-item-name">${t('profile.reminder-title','Pengingat Latihan Harian')}</div>
+          </div>
+          <label class="tactile-toggle">
+            <input type="checkbox" id="toggleDailyReminder"${reminderOn?' checked':''} onchange="toggleReminder(this)">
+            <span class="tactile-slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Pengalaman Suara & Audio Belajar -->
+    <div class="profile-section-card" id="cardSuaraAudio">
+      <div class="section-card-header is-collapsible" onclick="toggleCardCollapse('cardSuaraAudio')">
+        <div class="header-text-group">
+          <div class="section-card-title">${t('profile.audio-title','Suara & Audio Latihan')}</div>
+          <div class="section-card-desc">${t('profile.audio-desc','Atur tempo suara percakapan dan efek chime haptik')}</div>
+        </div>
+        <div class="header-action-group">
+          <span class="card-collapsed-pill" id="pillAudioSummary">${currentSpeed}x · ${chimeOn?'Chime Aktif':'Chime Nonaktif'}</span>
+          <button class="btn-card-collapse" type="button" id="btnMinimizeSuaraAudio" aria-label="Minimize atau Buka" onclick="event.stopPropagation();toggleCardCollapse('cardSuaraAudio')">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="chevron-icon">
+              <polyline points="18 15 12 9 6 15"></polyline>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="section-card-body">
+        <div class="setting-row-item">
+          <div class="setting-left-col">
+            <div class="setting-item-name">${t('profile.speech-speed-title','Kecepatan Suara Percakapan')}</div>
+            <div class="setting-item-desc">${t('profile.speech-speed-desc','Disesuaikan untuk kenyamanan telinga murid')}</div>
+          </div>
+          <div class="speed-pills-wrap" id="profileAudioSpeedPills">
+            <button class="speed-btn${Math.abs(currentSpeed-0.85)<0.05?' active':''}" type="button" onclick="setAudioSpeed(this, '0.85x')">0.85x</button>
+            <button class="speed-btn${Math.abs(currentSpeed-1.0)<0.05?' active':''}" type="button" onclick="setAudioSpeed(this, '1.0x')">1.0x</button>
+            <button class="speed-btn${Math.abs(currentSpeed-1.15)<0.05?' active':''}" type="button" onclick="setAudioSpeed(this, '1.15x')">1.15x</button>
+          </div>
+        </div>
+        <div class="setting-row-item">
+          <div class="setting-left-col">
+            <div class="setting-item-name">${t('profile.haptic-title','Efek Suara Haptik (Chime)')}</div>
+            <div class="setting-item-desc">${t('profile.haptic-desc','Umpan balik audio lembut saat sentuhan tombol kuis')}</div>
+          </div>
+          <label class="tactile-toggle">
+            <input type="checkbox" id="toggleAudioChime"${chimeOn?' checked':''} onchange="toggleSoundFx(this)">
+            <span class="tactile-slider"></span>
+          </label>
+        </div>
+        <div class="setting-row-item">
+          <div class="setting-left-col">
+            <div class="setting-item-name">${t('profile.auto-audio-title','Putar Suara Soal Otomatis')}</div>
+            <div class="setting-item-desc">${t('profile.auto-audio-desc','Memperdengarkan audio saat soal kuis pertama kali tampil')}</div>
+          </div>
+          <label class="tactile-toggle">
+            <input type="checkbox" id="toggleAutoAudio"${autoAudioOn?' checked':''} onchange="toggleAutoAudio(this)">
+            <span class="tactile-slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. Keamanan & Sinkronisasi Belajar -->
+    <div class="profile-section-card">
+      <div class="section-card-header">
+        <div class="section-card-title">${t('profile.sync-title','Sinkronisasi & ID Akun Murid')}</div>
+        <div class="section-card-desc">${t('profile.sync-desc','Data tersimpan aman dan terhubung otomatis ke guru')}</div>
+      </div>
+      <div class="profile-sync-box">
+        <div class="sync-status-row" style="color:${syncDotColor}">
+          <span>●</span>
+          <span>${esc(syncStatusText)}</span>
+        </div>
+        <div class="sync-id-row">
+          <span style="font-size:11px;font-weight:700;color:#64748B;">${t('profile.student-id-label','ID Murid:')}</span>
+          <span class="sync-id-val">${esc(studentId)}</span>
+          <button class="btn-copy-code" type="button" onclick="navigator.clipboard?.writeText('${esc(studentId)}');showToast(FiezelI18n.t('profile.id-copied','ID Akun Murid disalin!'),'success')">${t('profile.copy-btn','Salin')}</button>
+        </div>
+      </div>
+      <button class="profile-action-btn" type="button" onclick="openSettings()">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:4px;"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>${t('profile.settings-full','Buka Pengaturan Akun Lengkap')}
+      </button>
+      <button class="profile-action-btn danger" type="button" onclick="if(confirm(FiezelI18n.t('profile.logout-confirm','Keluar dari sesi ini? Progres belajarmu tetap tersimpan aman di cloud.'))){showToast(FiezelI18n.t('profile.logged-out','Sesi diamankan.'));render();}">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:4px;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>${t('profile.logout-device','Keluar dari Perangkat Ini')}
+      </button>
+    </div>
+  </div>`;
+}
+
 function onlineView(){
-  const tabs=`<div class="progress-tabs" role="tablist">${onlineTabs().map(([id,label])=>`<button type="button" class="progress-tab${onlineTab===id?' active':''}" role="tab" aria-selected="${onlineTab===id}" onclick="switchOnlineTab('${id}')">${esc(label)}</button>`).join('')}</div>`;
+  const tabs=`<div class="progress-tabs" role="tablist">${onlineTabs().map(([id,label])=>`<button type="button" class="progress-tab${onlineTab===id?' active':''}" role="tab" aria-selected="${onlineTab===id}" onclick="switchOnlineTab('${id}')">${id==='teman'?onlineTemanTabLabel(label):esc(label)}</button>`).join('')}</div>`;
   /* m025-277 (§4a): pintu KEDUA ke PAW ARENA (selain kartu Home). Ditaruh di cangkang
      Profil, DI LUAR konten sosial yang bergantung flag/jaringan, supaya arena tetap bisa
      dibuka murid meski offline (arena itu offline-first). Untuk murid, bukan guru. */
-  const arenaDoor=isVerifiedTeacher()?'':`<div class="learning-launcher"><button class="launch-card arena-launch" onclick="go('arena')" data-testid="profile-paw-arena"><span class="launch-icon"><i class="fz-i" data-fz-icon="speaking" aria-hidden="true"></i></span><span><small>${esc(FiezelI18n.t('pawarena.subtitle'))}</small><b>${FiezelI18n.t('pawarena.title')}</b></span><i data-lucide="arrow-up-right"></i></button></div>`;
+  const arenaDoor=(onlineTab==='profil'||isVerifiedTeacher())?'':`<div class="learning-launcher"><button class="launch-card arena-launch" onclick="go('arena')" data-testid="profile-paw-arena"><span class="launch-icon"><i class="fz-i" data-fz-icon="speaking" aria-hidden="true"></i></span><span><small>${esc(FiezelI18n.t('pawarena.subtitle'))}</small><b>${FiezelI18n.t('pawarena.title')}</b></span><i data-lucide="arrow-up-right"></i></button></div>`;
   shell(FiezelI18n.t('social.shell-title'),FiezelI18n.t('social.shell-desc'),`${arenaDoor}${tabs}<div id="onlineRoot">${card(`<p class="muted">${FiezelI18n.t('social.loading')}</p>`)}</div>`);
   renderOnlineTab();
 }
@@ -16417,15 +17397,23 @@ async function renderOnlineTab(){
   const put=html=>{if(seq!==onlineSeq||state.view!=='online')return;const el=$('onlineRoot');if(el){el.innerHTML=html;enhanceUI()}};
   const core=socialCore();
   const extra=onlineTab==='teman'?socialClassCardMarkup():'';
+  if(onlineTab==='profil'){
+    let flag='off';
+    if(core){try{flag=await core.probeFlag()}catch(_){flag='off'}}
+    if(typeof navigator!=='undefined'&&navigator.onLine===false)flag='offline';
+    return put(tactileProfileCockpitMarkup({flag}));
+  }
   if(!core)return put(card(`<h3>${FiezelI18n.t('social.not-loaded-title')}</h3><p class="muted">${FiezelI18n.t('social.not-loaded-body')}</p>`,'social-card')+extra);
   if(typeof navigator!=='undefined'&&navigator.onLine===false)return put(socialOfflineCard()+extra);
   let flag='off';try{flag=await core.probeFlag()}catch(_){flag='off'}
   if(flag!=='on')return put(socialFlagOffCard(flag)+extra);
   try{await core.ensureAnon()}catch(_){}
+  // Lencana tab Teman disegarkan bersama isi tab (bukan satu ronde jaringan sendiri tiap render).
+  try{await refreshFriendRequestCount();updateTemanBadge()}catch(_){}
   try{
     if(onlineTab==='teman')return put(await socialTemanMarkup(core));
     if(onlineTab==='papan')return put(await socialPapanMarkup(core));
-    return put(await socialProfilMarkup(core));
+    return put(tactileProfileCockpitMarkup({flag}));
   }catch(_){return put(card(`<h3>${FiezelI18n.t('social.degraded-title')}</h3><p class="muted">${FiezelI18n.t('social.degraded-body')}</p>`,'social-card'))}
 }
 /* ============================ PENDAFTARAN SEKALI (m025-262) ============================
@@ -16555,6 +17543,7 @@ async function socialProfilMarkup(core){
     return card(`<div class="social-me"><span class="social-avatar" aria-hidden="true">${esc(String(p.handle||'?').charAt(0).toUpperCase())}</span><div><h3>@${esc(p.handle)}</h3><p class="muted">${FiezelI18n.t('social.profile-desc')}</p></div></div>
       <div class="stats social-stats"><div>${stat(FiezelI18n.t('social.stat-weekly-pb'),pb==null?'—':pb+' PB')}</div><div>${stat(FiezelI18n.t('level.source-manual'),esc(p.band||'—'))}</div><div>${stat(FiezelI18n.t('social.stat-streak'),FiezelI18n.t('social.stat-streak-value',{days:Number(p.streakDays)||0}))}</div></div>
       <p class="muted">${FiezelI18n.t('social.pb-explain')}</p>`,'social-card')
+      +card(`<h3>${FiezelI18n.t('social3.my-id-title')}</h3><p class="fz2-myid" data-testid="my-social-id">@${esc(p.handle)}</p><div class="modal-actions"><button onclick="socialCopyId()" data-testid="copy-id-btn"><i data-lucide="copy"></i> ${FiezelI18n.t('social3.copy-id')}</button><button class="primary" onclick="openProfileQr()" data-testid="show-qr-btn"><i data-lucide="qr-code"></i> ${FiezelI18n.t('social3.show-qr')}</button></div>`,'social-card')
       +settingsCard;
   }
   if(me.error==='profile_required'){
@@ -16586,6 +17575,11 @@ async function socialTemanMarkup(core){
   if(!fr.ok)return card(`<h3>${FiezelI18n.t('social.friends-error-title')}</h3><p class="muted">${esc(fr.message)}</p>`,'social-card');
   const friends=Array.isArray(fr.data?.friends)?fr.data.friends:[];
   const cheers=Array.isArray(fr.data?.cheersToday)?fr.data.cheersToday:[];
+  // Kotak masuk permintaan teman di DALAM tab (spec owner). Angka yang sama dipakai
+  // lencana tab; diambil sekali di sini supaya tab dan lencana tidak bisa berbeda.
+  let reqList=[];
+  try{const rq=await core.api.friendRequests();reqList=rq.ok&&Array.isArray(rq.data?.requests)?rq.data.requests:[]}catch(_){reqList=[]}
+  socialRequestCount=reqList.length;
   // URL undangan ?invite=KODE dari share-sheet teman → prefill kolom tukar kode.
   let urlInvite='';try{urlInvite=String(new URLSearchParams(location.search).get('invite')||'').trim()}catch(_){urlInvite=''}
   const inviteCard=card(`<h3>${FiezelI18n.t('social.invite-title')}</h3><p class="muted">${FiezelI18n.t('social.invite-desc')}</p>
@@ -16599,9 +17593,11 @@ async function socialTemanMarkup(core){
   const list=friends.length?friends.map(f=>{
     const vis=f.visible!==false;
     const milestones=vis&&Array.isArray(f.milestones)?f.milestones.slice(0,3).map(m=>`<span class="social-chip">${esc(core.milestoneLabel(m.kind))}</span>`).join(''):'';
-    return `<div class="social-friend"><span class="social-avatar" aria-hidden="true">${esc(String(f.handle||'?').charAt(0).toUpperCase())}</span><div class="social-friend-body"><b>@${esc(f.handle)}</b><small>${esc(core.presenceLabel(f))}${vis&&f.band?` · ${esc(f.band)}`:''}${vis&&Number(f.streakDays)>0?` · 🔥 ${Number(f.streakDays)} hari`:''}</small>${milestones?`<div class="social-chips">${milestones}</div>`:''}</div><button type="button" class="social-cheer-btn" onclick="socialOpenCheer('${esc(f.handle)}')" aria-label="${FiezelI18n.t('social.cheer-modal-title',{handle:esc(f.handle)})}">👏 ${FiezelI18n.t('social.cheer-btn')}</button></div>`;
+    return `<div class="social-friend"><span class="social-avatar" aria-hidden="true">${esc(String(f.handle||'?').charAt(0).toUpperCase())}</span><div class="social-friend-body"><b>@${esc(f.handle)}</b><small>${esc(core.presenceLabel(f))}${vis&&f.band?` · ${esc(f.band)}`:''}${vis&&Number(f.streakDays)>0?` · 🔥 ${Number(f.streakDays)} hari`:''}</small>${milestones?`<div class="social-chips">${milestones}</div>`:''}</div><div class="social-friend-acts"><button type="button" class="social-voice-btn" onclick="socialAjakVoice('${esc(f.handle)}')" data-testid="ajak-voice-${esc(f.handle)}" aria-label="${esc(FiezelI18n.t('social3.voice-ajak'))}"><i data-lucide="mic"></i> ${esc(FiezelI18n.t('social3.voice-ajak'))}</button><button type="button" class="social-cheer-btn" onclick="socialOpenCheer('${esc(f.handle)}')" aria-label="${FiezelI18n.t('social.cheer-modal-title',{handle:esc(f.handle)})}">👏 ${FiezelI18n.t('social.cheer-btn')}</button></div></div>`;
   }).join(''):`<div class="social-empty"><p><b>${FiezelI18n.t('social.no-friends-title')}</b></p><p class="muted">${FiezelI18n.t('social.no-friends-body')}</p></div>`;
-  return addCard+classCard+card(`<h3>${FiezelI18n.t('social.friends-list-title',{count:friends.length})}</h3><p class="muted">${FiezelI18n.t('social.friends-list-desc')}</p>${list}`,'social-card')+cheerFeed+`<details class="fz2-more"><summary>${FiezelI18n.t('social2.more-ways')}</summary>${inviteCard}${redeemCard}</details>`;
+  const reqList2=reqList.filter(r=>!/^$/.test(String(r.handle||'')));
+  const reqSection=card(`<h3>${FiezelI18n.t('social3.req-section-title')}</h3><p class="muted">${FiezelI18n.t('social3.req-section-desc')}</p>${reqList2.length?reqList2.map(r=>friendRequestRow(r)).join(''):`<div class="social-empty"><p class="muted">${FiezelI18n.t('social3.req-none')}</p></div>`}`,'social-card');
+  return addCard+classCard+reqSection+card(`<h3>${FiezelI18n.t('social.friends-list-title',{count:friends.length})}</h3><p class="muted">${FiezelI18n.t('social.friends-list-desc')}</p>${list}`,'social-card')+cheerFeed+`<details class="fz2-more"><summary>${FiezelI18n.t('social2.more-ways')}</summary>${inviteCard}${redeemCard}</details>`;
 }
 async function socialMintInvite(){
   const core=socialCore();if(!core)return;
@@ -16758,7 +17754,7 @@ async function refreshSocialSummaryCard(){
   socialSummaryAt=Date.now();
   socialSummaryPaint();
 }
-function socialSummaryPaint(){const el=$('socialSummaryCard');if(el&&state.view==='progress'){el.innerHTML=socialSummaryBody();enhanceUI()}const home=$('socialHomeSlot');if(home&&state.view==='home'){home.innerHTML=socialHomeBody();enhanceUI()}}
+function socialSummaryPaint(){const el=$('socialSummaryCard');if(el&&state.view==='progress'){el.innerHTML=socialSummaryBody();enhanceUI()}const home=$('socialHomeSlot');if(home&&state.view==='home'){home.innerHTML=socialHomeBody();enhanceUI()}updateTemanBadge()}
 /* ---------------------------------------------------------------- pintu masuk Online & Teman di Home */
 // Kenapa Home, bukan slot nav keenam: bottom nav lima slot itu hasil penataan yang disengaja
 // (m029 FOCUS), dan di 390px slot keenam memampatkan labelnya. Kartu ini memakai pola launcher
@@ -16875,10 +17871,142 @@ async function decideFriendRequest(handle,accept){
   showToast(FiezelI18n.t(accept?'social2.req-accepted':'social2.req-rejected',{handle:h}));
   socialSummaryAt=0;
   await renderFriendRequests();
+  updateTemanBadge();
   if(accept){try{socialMicroMoment('friend')}catch(_){}}
   if(state.view==='home')render();
 }
 window.decideFriendRequest=decideFriendRequest;
+/* ============================ SISTEM PERTEMANAN ala LINE (SLOT 7) ============================
+   Kartu ID pribadi + Kode QR profil, deteksi tautan masuk ?friend=@handle, kotak permintaan
+   teman di tab Teman, lencana angka pada tab, dan tombol "Ajak Main Suara" ke Panggung Suara
+   (SLOT 13). Seluruh panggilan jaringan lewat core.api.* (fiezel-social.js) - blok ini UI +
+   kait saja. Naskah: seluruhnya tanpa tanda hubung, dwibahasa lewat kunci social3.* / social2.*.
+   Kode QR dirakit features/social/fiezel-qr.js (SVG murni, tanpa pustaka pihak ketiga). */
+function socialQrCore(){try{return self.FiezelQr||null}catch(_){return null}}
+/** URL profil kanonik: https://fiezel.my.id/app/?friend=@handle (spec owner).
+ *  Handle divalidasi a-z 0-9 _ saja, jadi '@' ditulis APA ADANYA (bukan %40) supaya
+ *  tautan yang dipindai tetap terbaca manusia saat dibuka atau disalin. */
+function socialProfileUrl(handle){
+  const h=String(handle||'').replace(/^@/,'').trim().toLowerCase();
+  return h?('https://fiezel.my.id/app/?friend=@'+h):'';
+}
+window.socialProfileUrl=socialProfileUrl;
+function socialCopyWithFallback(text,doneKey,failKey,params){
+  const finish=()=>showToast(FiezelI18n.t(doneKey),'success');
+  const fail=()=>showToast(FiezelI18n.t(failKey,params||{}));
+  try{
+    const p=navigator.clipboard?.writeText?.(text);
+    if(p&&typeof p.then==='function'){p.then(finish).catch(fail);return true}
+    if(p!==undefined){finish();return true}
+  }catch(_){}
+  fail();return false;
+}
+function socialCopyId(){
+  const handle=socialProfileCache?.handle||storedSocialHandle();
+  if(!handle)return false;
+  return socialCopyWithFallback(handle,'social3.copy-id-done','social3.copy-id-fail',{handle});
+}
+window.socialCopyId=socialCopyId;
+function openProfileQr(){
+  const handle=socialProfileCache?.handle||storedSocialHandle();
+  if(!handle)return showToast(FiezelI18n.t('social3.qr-need-profile'));
+  const qr=socialQrCore();
+  if(!qr)return showToast(FiezelI18n.t('social3.qr-fail'));
+  let svg='';
+  try{svg=qr.svg(socialProfileUrl(handle),{level:'M',label:FiezelI18n.t('social3.qr-aria',{handle})})}catch(_){svg=''}
+  if(!svg)return showToast(FiezelI18n.t('social3.qr-fail'));
+  openModal(`<div class="modal-mark">${FiezelI18n.t('social3.link-mark')}</div><h2>${FiezelI18n.t('social3.qr-title')}</h2><p class="muted">${FiezelI18n.t('social3.qr-desc')}</p><div class="fz3-qr" data-testid="profile-qr">${svg}</div><p class="fz2-myid" data-testid="profile-qr-id">@${esc(handle)}</p><div class="modal-actions"><button onclick="closeModal()">${FiezelI18n.t('coach.close-aria')}</button><button onclick="socialDownloadQr()"><i data-lucide="download"></i> ${FiezelI18n.t('social3.qr-download')}</button><button class="primary" onclick="socialShareProfile()"><i data-lucide="share-2"></i> ${FiezelI18n.t('social3.qr-share')}</button></div>`);
+  try{socialMicroMoment('profile')}catch(_){}
+  return true;
+}
+window.openProfileQr=openProfileQr;
+function socialDownloadQr(){
+  const handle=socialProfileCache?.handle||storedSocialHandle();if(!handle)return false;
+  const qr=socialQrCore();if(!qr)return false;
+  try{
+    const svg=qr.svg(socialProfileUrl(handle),{level:'M',label:'QR @'+handle});
+    const blob=new Blob([svg],{type:'image/svg+xml;charset=utf-8'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);a.download='fiezel-'+String(handle)+'-qr.svg';
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    setTimeout(()=>{try{URL.revokeObjectURL(a.href)}catch(_){}},2000);
+    showToast(FiezelI18n.t('social3.qr-share-done'),'success');
+    return true;
+  }catch(_){return false}
+}
+window.socialDownloadQr=socialDownloadQr;
+function socialShareProfile(){
+  const handle=socialProfileCache?.handle||storedSocialHandle();if(!handle)return false;
+  const url=socialProfileUrl(handle);
+  const body=FiezelI18n.t('social3.qr-share-body');
+  try{
+    if(typeof navigator!=='undefined'&&typeof navigator.share==='function'){
+      navigator.share({title:'FIEZEL',text:body,url}).catch(()=>{});return true;
+    }
+  }catch(_){}
+  return socialCopyWithFallback(body+' '+url,'social3.qr-share-done','social3.qr-share-fail',{tautan:url});
+}
+window.socialShareProfile=socialShareProfile;
+/* ---------------------------------------------------------------- tautan masuk ?friend=@handle */
+function socialFriendParam(){
+  try{const raw=String(new URLSearchParams(location.search).get('friend')||'').trim();return raw.replace(/^@/,'').toLowerCase()}catch(_){return ''}
+}
+window.socialFriendParam=socialFriendParam;
+/** Dipanggil dari openApp() sesudah socialInviteBoot. Fail-closed: handle tidak sah = diam. */
+function friendLinkBoot(){
+  const core=socialCore();if(!core)return false;
+  const handle=socialFriendParam();
+  if(!handle)return false;
+  const v=core.validateHandle(handle);
+  if(!v.ok)return false;
+  setTimeout(()=>socialFriendLinkSheet(v.handle),220);
+  return true;
+}
+window.friendLinkBoot=friendLinkBoot;
+function socialFriendLinkSheet(handle){
+  try{if(modalOpen)return false}catch(_){}
+  openModal(`<div class="modal-mark">${FiezelI18n.t('social3.link-mark')}</div><h2>${FiezelI18n.t('social3.link-title',{handle:esc(handle)})}</h2><p>${FiezelI18n.t('social3.link-body',{handle:esc(handle)})}</p><div class="modal-actions"><button onclick="closeModal()">${FiezelI18n.t('social3.link-cancel')}</button><button class="primary" id="socialFriendLinkBtn" onclick="socialFriendFromLink('${esc(handle)}')" data-testid="friend-link-send"><i data-lucide="user-plus"></i> ${FiezelI18n.t('social3.link-send')}</button></div>`);
+  try{socialMicroMoment('friend')}catch(_){}
+  return true;
+}
+window.socialFriendLinkSheet=socialFriendLinkSheet;
+async function socialFriendFromLink(handle){
+  const core=socialCore();if(!core)return false;
+  const h=String(handle||'').replace(/^@/,'').toLowerCase();if(!h)return false;
+  const btn=$('socialFriendLinkBtn');if(btn)btn.disabled=true;
+  try{await core.ensureAnon()}catch(_){}
+  const res=await core.api.friendAdd(h);
+  if(res.ok){const fh=res.data?.friend?.handle||h;showToast(FiezelI18n.t(res.data?.status==='friends'?'social3.link-friends':'social3.link-sent',{handle:fh}),'success');socialSummaryAt=0;try{socialNotifyResync()}catch(_){}closeModal();try{socialMicroMoment('friend')}catch(_){}if(state.view==='online')renderOnlineTab();else render();return true}
+  if(btn)btn.disabled=false;
+  showToast(res.error==='code_invalid'||res.status===400?FiezelI18n.t('social2.add-invalid'):FiezelI18n.t('social3.link-fail'));
+  return false;
+}
+window.socialFriendFromLink=socialFriendFromLink;
+/* ---------------------------------------------------------------- ajak main suara (SLOT 13) */
+async function socialAjakVoice(handle){
+  const h=String(handle||'').replace(/^@/,'').toLowerCase();if(!h)return false;
+  const rtc=(()=>{try{return self.FiezelWebRtcStage||null}catch(_){return null}})();
+  if(!rtc||typeof window.openLiveVoiceStage!=='function'){showToast(FiezelI18n.t('social3.voice-off'));return false}
+  let flag='off';try{flag=await rtc.probeFlag()}catch(_){flag='off'}
+  if(flag!=='on'){showToast(FiezelI18n.t('social3.voice-off'));return false}
+  const ok=await window.openLiveVoiceStage().catch(()=>false);
+  if(!ok){showToast(FiezelI18n.t('social3.voice-ajak-fail'));return false}
+  let shared=false;
+  try{if(typeof window.fzStageInviteTo==='function')shared=window.fzStageInviteTo(h)===true}catch(_){shared=false}
+  showToast(FiezelI18n.t('social3.voice-ajak-ok',{handle:h}),'success');
+  return shared;
+}
+window.socialAjakVoice=socialAjakVoice;
+/* ---------------------------------------------------------------- lencana tab Teman */
+function updateTemanBadge(){
+  try{
+    const b=$('fz3TemanBadge');if(!b)return;
+    const n=Number(socialRequestCount)||0;
+    b.textContent=n>9?'9+':String(n);
+    b.classList.toggle('hidden',n<=0);
+  }catch(_){}
+}
+window.updateTemanBadge=updateTemanBadge;
 function openJoinClassModal(){
   const cur=learnerClassCode();
   openModal(`<div class="modal-mark">${FiezelI18n.t('nav.school')}</div><h2>${FiezelI18n.t('social2.class-title')}</h2><p class="muted">${FiezelI18n.t('social2.class-desc')}</p>
@@ -17673,7 +18801,7 @@ if(typeof document!=='undefined'&&document.addEventListener){
 /* ============================== akhir blok SOSIAL (SLOT 7) ========================== */
 window.istilahMurid=istilahMurid;/* dipapar untuk gerbang QA: penerjemah enum harus bisa disapu penuh */window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={showBrandSplash,showOnboarding,prefersReducedMotion,readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,/* m025-246: dipapar untuk regression-test - gerbang itu harus bisa MENANYAKAN ukuran rencana penempatan, bukan memaku 25 dan merah setiap kali ukurannya berubah dengan sengaja. */placementSize,placementBlueprint,/* cetak biru PENUH dipapar terpisah: gerbang harus tetap bisa menjaga invarian 'penempatan penuh memuat ketiga jenis konten' walau jalur murid memakai cetak biru lite */PLACEMENT_BLUEPRINT_FULL:PLACEMENT_BLUEPRINT,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,/* m025-201: dipapar untuk tests/core-policy-parity-test.js - gerbang paritas tidak bisa membandingkan apa yang tidak bisa ia panggil */capRationaleCodes,policyEffectiveness,sanitizePolicyEffectiveness,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,coreBrainMemory,tutorSession,tutorObserve,misconceptionLedgerRead,misconceptionLedgerActive,coreBrainAttempts,quizPredictedSuccess,evidenceKappa,bktRead,bktRecord,bktShadowMarkup,brainManifestMarkup,learningTelemetryMode,learningTelemetryEmitAnswer,learningTelemetryStudyDay,braincoreEvidenceMode,braincoreEvidenceCohort,braincoreEvidenceCohortForBuild,braincoreEvidenceDay,braincoreEvidenceEmitSnapshot,activeLevelOverallMastery,braincoreEvidenceEmitDecision,braincoreEvidenceFlush,braincoreEvidenceObserveSession,braincoreDecisionReason,braincoreEvidenceAnyLaneActive,identityEvidenceMode,learnerNameSyncToServer,maybeSyncLearnerName,identityEvidenceActive,identityEvidenceMirror,identityEvidenceFlush,forgetLearnerEvidence,confusionMatrixRead,confusionMatrixRecord,affectObserve,affectSessionSync,affectTargetSuccess,listeningAdaptivePolicy,olmPanelMarkup,coreBrainPanelMarkup,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession,/* Fase 3 (C5): kalibrasi item, cloze, OLM negotiated, SRL, speaking adaptif, step tutor */itemCalibrationRead,itemCalibrationObserve,itemCalibrationEffective,calibrationItemId,ensureClozeBank,makeClozeQuestion,clozeAdaptivePicks,clozeSkillReady,clozeProductionRecord,olmSummarizeInput,olmDispute,olmProbeNextSkill,olmProbeConsume,olmNegotiationRead,srlSessionPlan,srlPredictPrompt,srlCaptureConfidence,srlReflect,srlSessionSync,speakingCoverageRows,speakingAdaptiveEvidence,speakingAdaptivePolicy,stepTutorGuidance,stepTutorGuidanceMarkup,isLearnerOverwhelmed,record,quizLoop,startAdaptive,/* m025-308: dipapar untuk tests/th-content-overlay-test.js. Gerbang itu harus bisa memanggil overlay yang SUNGGUHAN lalu membacanya lewat jalur baca yang dipakai penyaji - kalau ia hanya boleh memeriksa isi sidecar, ia mengulang kebutaan yang justru membiarkan 45 petunjuk writing dan 96 umpan balik reading-exam menganggur. */applyContentLocale,writingPromptPool,writingExamTask,readingExamSets,makeExamReadingQuestion,/* m025-314: dipapar untuk tests/target-lang-surface-guard-test.js. Gerbang itu harus bisa MEMANGGIL daftar kartu yang sungguhan lalu membacanya, bukan menebak dari pola teks di app.js - penjaga yang hanya diuji lewat grep akan tetap hijau saat kartunya dipindah ke fungsi lain. */latihanCards,skillHubModel,skillHubMarkup,continueLearningCard,aiBoosterCard,targetLangSurfaceBlocked,targetLangVoiceBlocked,courseLanguageLabel,/* `state` adalah binding modul, jadi ia TIDAK muncul sebagai properti global di vm - gerbang yang perlu menggeser bahasa target atau membaca layar aktif tidak punya jalan lain. Diekspor sebagai FUNGSI, bukan nilai: salinan yang diambil saat berkas dimuat akan basi begitu state ditugaskan ulang (loadState dipanggil lagi saat akun berpindah). */liveState:()=>state,/* B1 (m025-317): dipapar untuk tests/target-lang-progress-isolation-test.js. Gerbang itu harus MENJALANKAN jalur simpan/muat yang sungguhan di kedua bahasa - sumbu yang hanya diuji lewat modulnya adalah persis cara cacat ini bertahan berbulan-bulan. */saveFlushWrite,switchTargetLangStorage,progressStorageKey,pickProgress,sideStateKey,PROGRESS_STATE_FIELDS,PROGRESS_PREF_FIELDS,/* Migrasi sekali-jalan saat murid masuk akun. Dipapar karena inilah satu-satunya jalur yang bisa MENELANTARKAN progres bahasa: ia lahir sebelum ruang nama @lang ada. Gerbang harus menjalankannya, bukan membaca namanya. */activateAccountStateFromPuter,migrateSideStateToAccount,FIEZEL_TARGET_COURSE_KEY,decisionTrace:()=>self.FiezelDecisionTrace,presenceEngine:()=>self.FiezelPresenceEngine,/* m025-375: dipapar untuk tests/policy-evidence-window-test.js - gerbang harus bisa memanggil jendela bukti dan panel Home yang sungguhan. */policyEvidenceArms,policyEvidenceMin,policyEvidenceProgress,evidenceProgressPanelMarkup,todayHomeMarkup,/* m025-376: dipapar untuk tests/self-tune-retention-test.js. */selfTuneAfterOutcome,selfTuneTargetFor,selfTuneRetentionArms,loadSelfTuneState,retentionProbeResults,RETENTION_PROBE_KEY,SELF_TUNE_KEY,/* Audit UI/UX Home 2026-09-27: dipapar untuk tests/home-honesty-test.js. */homeWeekStats,homeVocabStats,HOME_WEEK_MIN,/* Braincore langkah 2: dipapar untuk tests/item-pool-test.js - gerbang harus menjalankan jalur catat/kirim/baca yang sungguhan. */itemPoolObserve,itemPoolFlush,itemPoolRefreshTable,itemPoolEffective,itemPoolCanonicalPrior,itemPoolPriorPrediction,itemPoolTable,ITEM_POOL_KEY,ITEM_POOL_TABLE_KEY,/* langkah 3 */itemPoolProbePrediction,itemPoolObserveProbe};
 window.FIEZEL_TARGET_COURSE_KEY=FIEZEL_TARGET_COURSE_KEY;
-window.startVocabQuiz=startVocabQuiz;window.buildAdaptivePool=buildAdaptivePool;window.buildGrammarLessonQuestions=buildGrammarLessonQuestions;window.getScenePalette=getScenePalette;window.getCelestialState=getCelestialState;window.playFeedbackSound=playFeedbackSound;window.updateMastery=updateMastery;window.markMastered=markMastered;window.__getFiezelState=()=>state;window.__fiezelValidViews=()=>[...VALID_VIEWS];window.__fiezelDueReviews=()=>dueItems().length;window.buildAdaptivePolicy=buildAdaptivePolicy;window.studyDayKey=studyDayKey;window.startAdaptive=startAdaptive;window.showToast=showToast;window.answerFeedbackSignal=answerFeedbackSignal;window.practiceSkill=practiceSkill;window.openReadingLevel=openReadingLevel;window.startReadingRandom=startReadingRandom;window.startReadingAdaptive=startReadingAdaptive;window.startPlacement=startPlacement;window.startLevelPractice=startLevelPractice;window.startAdaptive=startAdaptive;window.resetProgress=resetProgress;window.closeModal=closeModal;window.openSettings=openSettings;window.openReportPreview=openReportPreview;window.sendCreatorReport=sendCreatorReport;window.askCoachAI=askCoachAI;window.dismissWelcome=dismissWelcome;window.requestStudyNotificationPermission=requestStudyNotificationPermission;window.declineStudyNotifications=declineStudyNotifications;window.skipPuterSignIn=skipPuterSignIn;window.attemptGoogleSignIn=attemptGoogleSignIn;window.shouldPresentPuterPopup=shouldPresentPuterPopup;window.notifyAppUpdateIfNew=notifyAppUpdateIfNew;window.setConfidence=setConfidence;window.explainWithAI=explainWithAI;window.explainWordWithAI=explainWordWithAI;window.olmDispute=olmDispute;/* Fase 3 (C5 butir 3): handler tombol sanggah di panel OLM */
+window.startVocabQuiz=startVocabQuiz;window.buildAdaptivePool=buildAdaptivePool;window.buildGrammarLessonQuestions=buildGrammarLessonQuestions;window.getScenePalette=getScenePalette;window.getCelestialState=getCelestialState;window.playFeedbackSound=playFeedbackSound;window.updateMastery=updateMastery;window.misconceptionLedgerRecord=misconceptionLedgerRecord;window.markMastered=markMastered;window.__getFiezelState=()=>state;window.__fiezelValidViews=()=>[...VALID_VIEWS];window.__fiezelDueReviews=()=>dueItems().length;window.buildAdaptivePolicy=buildAdaptivePolicy;window.studyDayKey=studyDayKey;window.startAdaptive=startAdaptive;window.showToast=showToast;window.answerFeedbackSignal=answerFeedbackSignal;window.practiceSkill=practiceSkill;window.openReadingLevel=openReadingLevel;window.startReadingRandom=startReadingRandom;window.startReadingAdaptive=startReadingAdaptive;window.startPlacement=startPlacement;window.startLevelPractice=startLevelPractice;window.startAdaptive=startAdaptive;window.resetProgress=resetProgress;window.closeModal=closeModal;window.openSettings=openSettings;window.openReportPreview=openReportPreview;window.sendCreatorReport=sendCreatorReport;window.askCoachAI=askCoachAI;window.dismissWelcome=dismissWelcome;window.requestStudyNotificationPermission=requestStudyNotificationPermission;window.declineStudyNotifications=declineStudyNotifications;window.skipPuterSignIn=skipPuterSignIn;window.attemptGoogleSignIn=attemptGoogleSignIn;window.shouldPresentPuterPopup=shouldPresentPuterPopup;window.notifyAppUpdateIfNew=notifyAppUpdateIfNew;window.setConfidence=setConfidence;window.explainWithAI=explainWithAI;window.explainWordWithAI=explainWordWithAI;window.olmDispute=olmDispute;/* Fase 3 (C5 butir 3): handler tombol sanggah di panel OLM */
 // m025-84: dipasang di ujung berkas, saat go()/state/VALID_VIEWS sudah ada, dan SEBELUM
 // load() supaya navigasi pertama pun sudah terekam di riwayat.
 function installBackNav(){

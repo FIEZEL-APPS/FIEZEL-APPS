@@ -1,0 +1,457 @@
+{
+  "version": "1.1.0",
+  "name": "Fiezel Taboo Bank",
+  "description": "Bank kartu permainan Sarang Tabu untuk latihan circumlocution dan kelancaran berbicara",
+  "items": [
+    {
+      "id": "TABOO-EN-001",
+      "language": "en",
+      "secretWord": "AIRPORT",
+      "secretDesc": "Jelaskan tempat ini dalam bahasa Inggris tanpa menyebut kata terlarang!",
+      "taboo": ["PLANE", "TICKET", "FLY"],
+      "difficulty": "a1",
+      "category": "travel",
+      "grammarHint": "Gunakan frasa deskripsi tempat: A place where people go when they want to travel far.",
+      "variants": {
+        "plane": ["plane", "planes", "airplane", "aeroplane", "aircraft"],
+        "ticket": ["ticket", "tickets", "ticketing", "boarding"],
+        "fly": ["fly", "flying", "flew", "flown", "flight", "flighting", "flies"]
+      }
+    },
+    {
+      "id": "TABOO-EN-002",
+      "language": "en",
+      "secretWord": "DOCTOR",
+      "secretDesc": "Jelaskan profesi ini dalam bahasa Inggris tanpa menyebut kata terlarang!",
+      "taboo": ["HOSPITAL", "SICK", "MEDICINE"],
+      "difficulty": "a1",
+      "category": "daily",
+      "grammarHint": "Gunakan frasa profesi: A person who checks your body when you feel unwell.",
+      "variants": {
+        "hospital": ["hospital", "hospitals", "clinic", "clinics"],
+        "sick": ["sick", "sickness", "ill", "illness", "pain"],
+        "medicine": ["medicine", "medicines", "medical", "drug", "drugs", "pill", "pills"]
+      }
+    },
+    {
+      "id": "TABOO-EN-003",
+      "language": "en",
+      "secretWord": "LIBRARY",
+      "secretDesc": "Jelaskan tempat ini dalam bahasa Inggris tanpa menyebut kata terlarang!",
+      "taboo": ["BOOK", "READ", "QUIET"],
+      "difficulty": "a2",
+      "category": "academic",
+      "grammarHint": "Gunakan frasa suasana: A building filled with information where talking loudly is not allowed.",
+      "variants": {
+        "book": ["book", "books", "novel", "novels"],
+        "read": ["read", "reading", "reader", "reads"],
+        "quiet": ["quiet", "quietly", "silence", "silent", "calm"]
+      }
+    },
+    {
+      "id": "TABOO-EN-004",
+      "language": "en",
+      "secretWord": "UMBRELLA",
+      "secretDesc": "Jelaskan benda ini dalam bahasa Inggris tanpa menyebut kata terlarang!",
+      "taboo": ["RAIN", "WATER", "WET"],
+      "difficulty": "a1",
+      "category": "daily",
+      "grammarHint": "Gunakan frasa fungsi: Something you hold above your head when drops fall from the sky.",
+      "variants": {
+        "rain": ["rain", "raining", "rainy", "rains", "storm"],
+        "water": ["water", "waters", "watering", "liquid"],
+        "wet": ["wet", "wetness", "wetter", "damp", "soaked"]
+      }
+    },
+    {
+      "id": "TABOO-EN-005",
+      "language": "en",
+      "secretWord": "RESTAURANT",
+      "secretDesc": "Jelaskan tempat ini dalam bahasa Inggris tanpa menyebut kata terlarang!",
+      "taboo": ["FOOD", "EAT", "WAITER"],
+      "difficulty": "a1",
+      "category": "daily",
+      "grammarHint": "Gunakan frasa aktivitas: A place where you pay money to have a delicious meal prepared for you.",
+      "variants": {
+        "food": ["food", "foods", "dish", "dishes", "meal", "meals"],
+        "eat": ["eat", "eating", "ate", "eaten", "eats", "dining"],
+        "waiter": ["waiter", "waiters", "waitress", "server"]
+      }
+    },
+    {
+      "id": "TABOO-EN-006",
+      "language": "en",
+      "secretWord": "GUITAR",
+      "secretDesc": "Jelaskan alat ini dalam bahasa Inggris tanpa menyebut kata terlarang!",
+      "taboo": ["MUSIC", "STRING", "PLAY"],
+      "difficulty": "a2",
+      "category": "social",
+      "grammarHint": "Gunakan frasa karakteristik: An instrument made of wood that makes sound when your fingers touch the wires.",
+      "variants": {
+        "music": ["music", "musical", "musician", "song", "songs", "tune"],
+        "string": ["string", "strings", "wire", "wires", "chord", "chords"],
+        "play": ["play", "playing", "player", "played", "plays"]
+      }
+    },
+    {
+      "id": "TABOO-EN-007",
+      "language": "en",
+      "secretWord": "INTERNET",
+      "secretDesc": "Jelaskan konsep ini dalam bahasa Inggris tanpa menyebut kata terlarang!",
+      "taboo": ["ONLINE", "WIFI", "COMPUTER"],
+      "difficulty": "b1",
+      "category": "academic",
+      "grammarHint": "Gunakan frasa jaringan global: A global network that connects billions of digital devices across the world.",
+      "variants": {
+        "online": ["online", "web", "website", "cyber"],
+        "wifi": ["wifi", "wi-fi", "wireless", "connection", "connect"],
+        "computer": ["computer", "computers", "laptop", "laptops", "pc", "device"]
+      }
+    },
+    {
+      "id": "TABOO-EN-008",
+      "language": "en",
+      "secretWord": "BEACH",
+      "secretDesc": "Jelaskan tempat ini dalam bahasa Inggris tanpa menyebut kata terlarang!",
+      "taboo": ["SAND", "OCEAN", "SUMMER"],
+      "difficulty": "a1",
+      "category": "travel",
+      "grammarHint": "Gunakan deskripsi geografis: The sunny area where the land meets the salty blue water.",
+      "variants": {
+        "sand": ["sand", "sandy", "sands"],
+        "ocean": ["ocean", "oceans", "sea", "seas", "wave", "waves"],
+        "summer": ["summer", "sunny", "sunshine", "sun"]
+      }
+    },
+    {
+      "id": "TABOO-EN-009",
+      "language": "en",
+      "secretWord": "ELEPHANT",
+      "secretDesc": "Jelaskan hewan ini dalam bahasa Inggris tanpa menyebut kata terlarang!",
+      "taboo": ["ANIMAL", "BIG", "TRUNK"],
+      "difficulty": "a2",
+      "category": "nature",
+      "grammarHint": "Gunakan frasa ciri fisik: A huge grey creature with large ears and a long nose that lives in Africa or Asia.",
+      "variants": {
+        "animal": ["animal", "animals", "creature", "creatures", "beast"],
+        "big": ["big", "huge", "giant", "large", "enormous"],
+        "trunk": ["trunk", "trunks", "nose", "snout"]
+      }
+    },
+    {
+      "id": "TABOO-EN-010",
+      "language": "en",
+      "secretWord": "TELEPHONE",
+      "secretDesc": "Jelaskan benda ini dalam bahasa Inggris tanpa menyebut kata terlarang!",
+      "taboo": ["CALL", "RING", "MOBILE"],
+      "difficulty": "a1",
+      "category": "daily",
+      "grammarHint": "Gunakan frasa fungsi: A device you hold to your ear to speak with someone far away.",
+      "variants": {
+        "call": ["call", "calling", "called", "calls", "phone"],
+        "ring": ["ring", "ringing", "rings", "rang", "sound"],
+        "mobile": ["mobile", "cell", "cellphone", "smartphone", "handphone"]
+      }
+    },
+    {
+      "id": "TABOO-EN-011",
+      "language": "en",
+      "secretWord": "TEACHER",
+      "secretDesc": "Jelaskan profesi ini dalam bahasa Inggris tanpa menyebut kata terlarang!",
+      "taboo": ["SCHOOL", "TEACH", "STUDENT"],
+      "difficulty": "a1",
+      "category": "academic",
+      "grammarHint": "Gunakan frasa profesi: A person who stands in front of a class and helps others learn new things.",
+      "variants": {
+        "school": ["school", "schools", "classroom", "class", "classrooms"],
+        "teach": ["teach", "teaching", "teaches", "taught", "educate", "instruct"],
+        "student": ["student", "students", "pupil", "pupils", "learner", "learners"]
+      }
+    },
+    {
+      "id": "TABOO-EN-012",
+      "language": "en",
+      "secretWord": "RAINBOW",
+      "secretDesc": "Jelaskan fenomena ini dalam bahasa Inggris tanpa menyebut kata terlarang!",
+      "taboo": ["COLOR", "SKY", "RAIN"],
+      "difficulty": "a2",
+      "category": "nature",
+      "grammarHint": "Gunakan frasa fenomena alam: A curved band of many hues that appears after a shower when the sun comes out.",
+      "variants": {
+        "color": ["color", "colors", "colour", "colours", "hue", "hues"],
+        "sky": ["sky", "skies", "heaven", "air"],
+        "rain": ["rain", "raining", "rainy", "rains", "shower", "storm"]
+      }
+    },
+    {
+      "id": "TABOO-EN-013",
+      "language": "en",
+      "secretWord": "KITCHEN",
+      "secretDesc": "Jelaskan ruangan ini dalam bahasa Inggris tanpa menyebut kata terlarang!",
+      "taboo": ["COOK", "FOOD", "STOVE"],
+      "difficulty": "a1",
+      "category": "daily",
+      "grammarHint": "Gunakan frasa ruangan: The room in a house where meals are prepared and dishes are washed.",
+      "variants": {
+        "cook": ["cook", "cooking", "cooked", "cooks", "chef"],
+        "food": ["food", "foods", "dish", "dishes", "meal", "meals"],
+        "stove": ["stove", "stoves", "oven", "ovens", "burner", "cooker"]
+      }
+    },
+    {
+      "id": "TABOO-EN-014",
+      "language": "en",
+      "secretWord": "AIRPLANE",
+      "secretDesc": "Jelaskan kendaraan ini dalam bahasa Inggris tanpa menyebut kata terlarang!",
+      "taboo": ["FLY", "SKY", "AIRPORT"],
+      "difficulty": "a2",
+      "category": "travel",
+      "grammarHint": "Gunakan frasa kendaraan: A large machine with wings that carries passengers high above the clouds.",
+      "variants": {
+        "fly": ["fly", "flying", "flew", "flown", "flight", "flies"],
+        "sky": ["sky", "skies", "cloud", "clouds", "above"],
+        "airport": ["airport", "airports", "terminal", "runway"]
+      }
+    },
+    {
+      "id": "TABOO-EN-015",
+      "language": "en",
+      "secretWord": "BIRTHDAY",
+      "secretDesc": "Jelaskan perayaan ini dalam bahasa Inggris tanpa menyebut kata terlarang!",
+      "taboo": ["CAKE", "PARTY", "GIFT"],
+      "difficulty": "a1",
+      "category": "social",
+      "grammarHint": "Gunakan frasa perayaan: The special day each year when people sing to you and you get older.",
+      "variants": {
+        "cake": ["cake", "cakes", "candle", "candles", "dessert"],
+        "party": ["party", "parties", "celebration", "celebrate"],
+        "gift": ["gift", "gifts", "present", "presents", "surprise"]
+      }
+    },
+    {
+      "id": "TABOO-EN-016",
+      "language": "en",
+      "secretWord": "MUSEUM",
+      "secretDesc": "Jelaskan tempat ini dalam bahasa Inggris tanpa menyebut kata terlarang!",
+      "taboo": ["ART", "OLD", "HISTORY"],
+      "difficulty": "a2",
+      "category": "academic",
+      "grammarHint": "Gunakan frasa deskripsi tempat: A quiet building where valuable objects from the past are kept for visitors to see.",
+      "variants": {
+        "art": ["art", "arts", "painting", "paintings", "sculpture"],
+        "old": ["old", "ancient", "antique", "antiques", "historic"],
+        "history": ["history", "historical", "past", "heritage"]
+      }
+    },
+    {
+      "id": "TABOO-EN-017",
+      "language": "en",
+      "secretWord": "HOSPITAL",
+      "secretDesc": "Jelaskan tempat ini dalam bahasa Inggris tanpa menyebut kata terlarang!",
+      "taboo": ["DOCTOR", "SICK", "NURSE"],
+      "difficulty": "a2",
+      "category": "daily",
+      "grammarHint": "Gunakan frasa deskripsi tempat: A large building where people stay to get treatment when they are hurt.",
+      "variants": {
+        "doctor": ["doctor", "doctors", "physician", "surgeon"],
+        "sick": ["sick", "sickness", "ill", "illness", "unwell", "patient"],
+        "nurse": ["nurse", "nurses", "nursing", "caregiver"]
+      }
+    },
+    {
+      "id": "TABOO-EN-018",
+      "language": "en",
+      "secretWord": "CAMERA",
+      "secretDesc": "Jelaskan benda ini dalam bahasa Inggris tanpa menyebut kata terlarang!",
+      "taboo": ["PHOTO", "PICTURE", "LENS"],
+      "difficulty": "a2",
+      "category": "daily",
+      "grammarHint": "Gunakan frasa fungsi: A small device you point at something to keep a memory in a digital file.",
+      "variants": {
+        "photo": ["photo", "photos", "photograph", "photographs", "snapshot"],
+        "picture": ["picture", "pictures", "image", "images", "shot", "shots"],
+        "lens": ["lens", "lenses", "zoom", "focus", "shutter"]
+      }
+    },
+    {
+      "id": "TABOO-JA-001",
+      "language": "ja",
+      "secretWord": "せんせい (先生)",
+      "secretDesc": "Jelaskan profesi ini dalam bahasa Jepang tanpa menyebut kata terlarang!",
+      "taboo": ["がっこう", "おしえる", "べんきょう"],
+      "difficulty": "a1",
+      "category": "academic",
+      "grammarHint": "Gunakan frasa: 人たちを導く職業です。",
+      "variants": {
+        "がっこう": ["がっこう", "学校", "教室", "きょうしつ"],
+        "おしえる": ["おしえる", "教える", "教えます", "おしえます", "おしえて"],
+        "べんきょう": ["べんきょう", "勉強", "べんきょうする", "学", "まなぶ"]
+      }
+    },
+    {
+      "id": "TABOO-JA-002",
+      "language": "ja",
+      "secretWord": "じてんしゃ (自転車)",
+      "secretDesc": "Jelaskan kendaraan ini dalam bahasa Jepang tanpa menyebut kata terlarang!",
+      "taboo": ["くるま", "タイヤ", "はしる"],
+      "difficulty": "a2",
+      "category": "daily",
+      "grammarHint": "Gunakan frasa: 足でこいで進む乗り物です。",
+      "variants": {
+        "くるま": ["くるま", "車", "自動車", "じどうしゃ"],
+        "タイヤ": ["タイヤ", "たいや", "輪", "わ"],
+        "はしる": ["はしる", "走る", "走ります", "はしります", "スピード"]
+      }
+    },
+    {
+      "id": "TABOO-JA-003",
+      "language": "ja",
+      "secretWord": "りんご (林檎)",
+      "secretDesc": "Jelaskan buah ini dalam bahasa Jepang tanpa menyebut kata terlarang!",
+      "taboo": ["くだもの", "あかい", "たべる"],
+      "difficulty": "a1",
+      "category": "food",
+      "grammarHint": "Gunakan frasa: 木になる丸い実です。",
+      "variants": {
+        "くだもの": ["くだもの", "果物", "フルーツ", "ふるうつ"],
+        "あかい": ["あかい", "赤い", "赤", "あか"],
+        "たべる": ["たべる", "食べる", "食べます", "たべます", "食"]
+      }
+    },
+    {
+      "id": "TABOO-JA-004",
+      "language": "ja",
+      "secretWord": "うみ (海)",
+      "secretDesc": "Jelaskan tempat ini dalam bahasa Jepang tanpa menyebut kata terlarang!",
+      "taboo": ["みず", "あおい", "およぐ"],
+      "difficulty": "a1",
+      "category": "nature",
+      "grammarHint": "Gunakan frasa: 広くて塩辛い水の場所です。",
+      "variants": {
+        "みず": ["みず", "水", "お水", "みずうみ"],
+        "あおい": ["あおい", "青い", "青", "あお"],
+        "およぐ": ["およぐ", "泳ぐ", "泳ぎます", "およぎます", "水泳"]
+      }
+    },
+    {
+      "id": "TABOO-JA-005",
+      "language": "ja",
+      "secretWord": "でんしゃ (電車)",
+      "secretDesc": "Jelaskan kendaraan ini dalam bahasa Jepang tanpa menyebut kata terlarang!",
+      "taboo": ["えき", "せんろ", "のる"],
+      "difficulty": "a2",
+      "category": "travel",
+      "grammarHint": "Gunakan frasa: レールの上を走る長い乗り物です。",
+      "variants": {
+        "えき": ["えき", "駅", "ていりゅうじょ", "停留所"],
+        "せんろ": ["せんろ", "線路", "レール", "れーる"],
+        "のる": ["のる", "乗る", "乗ります", "のります", "乗車"]
+      }
+    },
+    {
+      "id": "TABOO-JA-006",
+      "language": "ja",
+      "secretWord": "とけい (時計)",
+      "secretDesc": "Jelaskan benda ini dalam bahasa Jepang tanpa menyebut kata terlarang!",
+      "taboo": ["じかん", "はり", "うで"],
+      "difficulty": "a1",
+      "category": "daily",
+      "grammarHint": "Gunakan frasa: 時間を知るための道具です。",
+      "variants": {
+        "じかん": ["じかん", "時間", "時刻", "じこく"],
+        "はり": ["はり", "針", "長針", "短針", "ちょうしん", "たんしん"],
+        "うで": ["うで", "腕", "手首", "てくび", "リストバンド"]
+      }
+    },
+    {
+      "id": "TABOO-JA-007",
+      "language": "ja",
+      "secretWord": "ねこ (猫)",
+      "secretDesc": "Jelaskan hewan ini dalam bahasa Jepang tanpa menyebut kata terlarang!",
+      "taboo": ["どうぶつ", "なく", "かわいい"],
+      "difficulty": "a1",
+      "category": "nature",
+      "grammarHint": "Gunakan frasa: ひげがあって、ネズミを追う家の動物です。",
+      "variants": {
+        "どうぶつ": ["どうぶつ", "動物", "ペット", "ぺっと"],
+        "なく": ["なく", "鳴く", "鳴きます", "なきます", "鳴き声"],
+        "かわいい": ["かわいい", "可愛い", "かわいらしい", "キュート"]
+      }
+    },
+    {
+      "id": "TABOO-JA-008",
+      "language": "ja",
+      "secretWord": "やま (山)",
+      "secretDesc": "Jelaskan tempat ini dalam bahasa Jepang tanpa menyebut kata terlarang!",
+      "taboo": ["たかい", "のぼる", "しぜん"],
+      "difficulty": "a1",
+      "category": "nature",
+      "grammarHint": "Gunakan frasa: 地面から高く盛り上がった大きな地形です。",
+      "variants": {
+        "たかい": ["たかい", "高い", "高", "たか"],
+        "のぼる": ["のぼる", "登る", "登ります", "のぼります", "登山"],
+        "しぜん": ["しぜん", "自然", "森", "もり", "景色"]
+      }
+    },
+    {
+      "id": "TABOO-JA-009",
+      "language": "ja",
+      "secretWord": "ほん (本)",
+      "secretDesc": "Jelaskan benda ini dalam bahasa Jepang tanpa menyebut kata terlarang!",
+      "taboo": ["よむ", "ページ", "としょかん"],
+      "difficulty": "a1",
+      "category": "academic",
+      "grammarHint": "Gunakan frasa: 文字がたくさん書かれた紙の束です。",
+      "variants": {
+        "よむ": ["よむ", "読む", "読みます", "よみます", "読書"],
+        "ページ": ["ページ", "ぺーじ", "頁", "紙", "かみ"],
+        "としょかん": ["としょかん", "図書館", "本屋", "ほんや"]
+      }
+    },
+    {
+      "id": "TABOO-JA-010",
+      "language": "ja",
+      "secretWord": "あめ (雨)",
+      "secretDesc": "Jelaskan cuaca ini dalam bahasa Jepang tanpa menyebut kata terlarang!",
+      "taboo": ["そら", "かさ", "みず"],
+      "difficulty": "a1",
+      "category": "nature",
+      "grammarHint": "Gunakan frasa: 雲から落ちてくる水滴です。",
+      "variants": {
+        "そら": ["そら", "空", "天気", "てんき", "雲"],
+        "かさ": ["かさ", "傘", "雨傘", "あまがさ"],
+        "みず": ["みず", "水", "水滴", "すいてき", "しずく"]
+      }
+    },
+    {
+      "id": "TABOO-JA-011",
+      "language": "ja",
+      "secretWord": "さかな (魚)",
+      "secretDesc": "Jelaskan hewan ini dalam bahasa Jepang tanpa menyebut kata terlarang!",
+      "taboo": ["うみ", "およぐ", "たべる"],
+      "difficulty": "a1",
+      "category": "food",
+      "grammarHint": "Gunakan frasa: 水の中で暮らす、ひれのある生き物です。",
+      "variants": {
+        "うみ": ["うみ", "海", "川", "かわ", "池"],
+        "およぐ": ["およぐ", "泳ぐ", "泳ぎます", "およぎます", "水泳"],
+        "たべる": ["たべる", "食べる", "食べます", "たべます", "料理"]
+      }
+    },
+    {
+      "id": "TABOO-JA-012",
+      "language": "ja",
+      "secretWord": "がっこう (学校)",
+      "secretDesc": "Jelaskan tempat ini dalam bahasa Jepang tanpa menyebut kata terlarang!",
+      "taboo": ["せんせい", "べんきょう", "きょうしつ"],
+      "difficulty": "a1",
+      "category": "academic",
+      "grammarHint": "Gunakan frasa: 子供たちが毎日通って学ぶ場所です。",
+      "variants": {
+        "せんせい": ["せんせい", "先生", "教師", "きょうし"],
+        "べんきょう": ["べんきょう", "勉強", "学習", "がくしゅう", "授業"],
+        "きょうしつ": ["きょうしつ", "教室", "クラス", "くらす"]
+      }
+    }
+  ]
+}
