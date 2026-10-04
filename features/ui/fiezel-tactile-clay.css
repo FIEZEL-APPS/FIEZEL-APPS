@@ -5364,3 +5364,51 @@ html body #app .grammar-brief-example b{color:#9A3412!important;-webkit-text-fil
 /* Audit UX grammar U14 (2026-10-04): "Buka materi" putih di atas amber (2,6:1) dan catatan pelajaran
    terkunci abu muda (2,45:1). Teks tombol digelapkan, catatan kunci dipertegas: keduanya di atas 4,5:1. */
 .path-step .lesson-lock-note,html body #app .path-step .lesson-lock-note{color:#5B5348!important}
+
+/* Audit UX grammar U13, U15 sampai U17 dan sisa kontras (2026-10-04, putaran kedua).
+   U13: toast di sesi pelajaran turun ke bawah layar (24px) dan menutup pilihan jawaban serta bar
+        "Lanjut". Selama pelajaran, toast naik menutupi bilah atas (tombol keluar dan hitungan soal)
+        saja, yang tidak perlu disentuh dalam 2,6 detik itu.
+   U15: dua desain bertabrakan di simpul jalur hub. fiezel-2.css membuatnya titik 16px tanpa nomor
+        (`.path-ring>b{display:none}`), lalu tactile-clay membesarkan tombolnya jadi kotak 44px
+        berpadding tombol umum, jadi yang tampil kotak putih kosong. Kotaknya dipertahankan dan
+        diisi: lingkaran 34px, nomor pelajaran, ikon kunci atau centang. Ikon pil "Ujian Naik Level"
+        tercat krem di atas putih; kini cokelat tua.
+   U16: chip "Sudah dicoba" abu #94A3B8 di atas abu tipis (2,24:1) kini abu tua (di atas 7:1).
+   U17: petunjuk "Ketuk keping di bawah..." #94A3B8 (2,45:1) kini #5B6474 (di atas 5:1).
+   Sisa kontras dari probe ulang:
+     - kalimat pegangan ingatan tutor (#FDE68A) tampil di kartu tangga petunjuk yang TERANG (1,19:1);
+     - kartu "Trik Cepat Ingat" bertinta cokelat di atas panel pembahasan gelap (1,56:1). Kartunya
+       diberi latar krem padat supaya terbaca di panel mana pun;
+     - label "Daftar kata tersedia" abu sangat muda (1,48:1);
+     - label "PRASASTI BARU" kuning di atas krem (1,29:1). */
+body.fz-lesson-mode .toast,body:has(.quiz-shell) .toast{top:calc(10px + env(safe-area-inset-top));bottom:auto!important}
+html body #app .path-step .path-node{padding:0!important;display:flex!important;align-items:center!important;justify-content:center!important}
+html body #app .path-step .path-node .path-ring{width:34px!important;height:34px!important;border-radius:50%!important;flex:none!important}
+html body #app .path-step .path-node .path-ring > b{display:block!important;margin:0!important;padding:0!important;height:auto!important;line-height:1!important;background:none!important;border:0!important;box-shadow:none!important;font-size:14px!important;font-weight:800!important;color:#1F1A14!important;-webkit-text-fill-color:#1F1A14!important}
+html body #app .path-step .path-node .path-ring > svg{display:block!important;width:18px!important;height:18px!important;color:#1F1A14!important}
+html body #app .path-step.is-current .path-node .path-ring{background:#FFC93C!important}
+html body #app .path-step.is-locked .path-node .path-ring > svg{color:#5B5348!important}
+html body #app .path-step.is-mastered .path-node .path-ring > svg,html body #app .path-step.is-completed .path-node .path-ring > svg{color:#0B3B24!important}
+html body #app .exam-entry-chip > svg{display:block!important;color:#8A5A00!important;opacity:1!important}
+html body #app .path-step .path-node .path-ring > svg,html body #app .exam-entry-chip > svg{fill:none!important;stroke:currentColor!important;background:none!important;border-radius:0!important;box-shadow:none!important}
+html body #app .path-step .path-node .path-ring > svg *,html body #app .exam-entry-chip > svg *{color:inherit!important;fill:none!important;stroke:currentColor!important}
+html body #app .quiz-shell .option .tried-tag,html body .tried-tag{background:#E8EDF3!important;color:#3F4A5A!important;-webkit-text-fill-color:#3F4A5A!important}
+html body .puzzle-empty-hint{color:#5B6474!important;-webkit-text-fill-color:#5B6474!important}
+html body #app .tutor-ladder .tutor-turn-ask,html body #tutorTurn .tutor-ladder p.tutor-turn-ask{color:#7A3E00!important;-webkit-text-fill-color:#7A3E00!important}
+html body #feedback .feedback-memory-box,html body .card .feedback-memory-box{background:#FFF6DF!important;border-color:#F1D9A8!important}
+html body #feedback .feedback-memory-box .feedback-memory-kicker,html body .card .feedback-memory-box .feedback-memory-kicker{color:#7A4E00!important;-webkit-text-fill-color:#7A4E00!important}
+html body #feedback .feedback-memory-box .feedback-memory-content,html body #feedback .feedback-memory-box .feedback-memory-content span,html body .card .feedback-memory-box .feedback-memory-content,html body .card .feedback-memory-box .feedback-memory-content span{color:#3A2A00!important;-webkit-text-fill-color:#3A2A00!important}
+html body #app .token-bank-label,html body .gx-gloss-bar .token-bank-label{color:#4A5363!important;-webkit-text-fill-color:#4A5363!important}
+html body .fz-prasasti-card .modal-mark{color:#8A5A00!important;-webkit-text-fill-color:#8A5A00!important}
+/* Probe ulang juga menemukan dua JUDUL yang tidak terlihat sama sekali: judul modal "Misi Kosakata
+   Kunci" dan judul kemenangan FIEZEL QUEST tercat putih (aturan umum `.modal-panel h2` untuk
+   panel gelap) di atas kartu putih, 1:1. Keduanya dipaku gelap. Sisanya label kecil di bawah
+   4,5:1 yang digelapkan satu tingkat dalam keluarga warnanya sendiri. */
+html body .gateway-header h2,html body .modal .gateway-header h2,html body h2.victory-headline,html body .modal h2.victory-headline{color:#0F172A!important;-webkit-text-fill-color:#0F172A!important;background:none!important}
+html body .active-level-control strong{color:#9A4A00!important;-webkit-text-fill-color:#9A4A00!important}
+html body .gateway-badge{color:#075985!important;-webkit-text-fill-color:#075985!important}
+html body .gw-meaning{color:#0369A1!important;-webkit-text-fill-color:#0369A1!important}
+html body .stage-tag{color:#047857!important;-webkit-text-fill-color:#047857!important}
+html body #app .grammar-hero-badge{color:#8A4B00!important;-webkit-text-fill-color:#8A4B00!important}
+html body #tutorTurn .tutor-turn-head b{color:#34D399!important;-webkit-text-fill-color:#34D399!important}

@@ -13,6 +13,8 @@ export const CLASS_CODE_RE = /^FZ-[A-HJ-NP-Z2-9]{6}$/;
    diimpor: worker dan klien tidak berbagi modul, dan satu-satunya hal yang boleh melintas di
    antara keduanya adalah data. Menambah jenis ujian berarti menyunting kedua daftar — dan
    gerbangnya menuntut keduanya identik. */
+export const BRAINCORE_LEVELS = Object.freeze(['A1', 'A2', 'B1', 'B2', 'C1', 'C2']);
+export const BRAINCORE_DIRS = Object.freeze(['up', 'flat', 'down', 'new']);
 export const EXAM_KINDS = Object.freeze(['assignment', 'reading_exam', 'listening_exam', 'speaking_exam', 'writing_exam', 'placement', 'level_exam']);
 export const LIMITS = Object.freeze({
   NAME_MAX: 24, TITLE_MAX: 60, SKILLS_MAX: 12, SKILL_KEY_MAX: 32, COUNT_MAX: 5000,
@@ -123,7 +125,29 @@ export function normalizeReport(body, nowMs) {
       assign.push(entry);
     }
   }
-  return { ok: true, code, name, key: learnerKey(name), report: { v: 1, name, at: reportedAt, goal, skills, lessons, cls: code, assign, j: join, fx: examFocus } };
+  /* bc = ringkasan BrainCore murid (m025-459, audit kabel BrainCore K1). Guru dulu hanya
+     menerima benar/total per skill, padahal BrainCore sudah tahu pelajaran mana yang lemah dan
+     berapa materi yang menunggu diulang. Batasnya sama ketatnya dengan fx: enum dan bilangan,
+     plus kunci pelajaran berpola mesin; TIDAK ADA teks bebas dan tidak ada jawaban murid. */
+  let braincore;
+  if (body.bc !== undefined) {
+    const bc = body.bc;
+    if (!bc || typeof bc !== 'object' || Array.isArray(bc)) return { ok: false, reason: 'bad_braincore' };
+    const lv = typeof bc.lv === 'string' && BRAINCORE_LEVELS.includes(bc.lv) ? bc.lv : null;
+    const dir = typeof bc.dir === 'string' && BRAINCORE_DIRS.includes(bc.dir) ? bc.dir : null;
+    const due = intIn(bc.due, LIMITS.COUNT_MAX);
+    if (!lv || !dir || due == null) return { ok: false, reason: 'bad_braincore' };
+    const lessonKey = (x) => typeof x === 'string' && /^[a-z0-9_]{1,64}$/.test(x) ? x : null;
+    let weak = [];
+    if (bc.weak !== undefined) {
+      if (!Array.isArray(bc.weak) || bc.weak.length > 3) return { ok: false, reason: 'bad_braincore' };
+      for (const w of bc.weak) { const k = lessonKey(w); if (!k) return { ok: false, reason: 'bad_braincore' }; weak.push(k); }
+    }
+    let fix;
+    if (bc.fix !== undefined) { fix = lessonKey(bc.fix); if (!fix) return { ok: false, reason: 'bad_braincore' }; }
+    braincore = { lv, dir, due, weak, fix };
+  }
+  return { ok: true, code, name, key: learnerKey(name), report: { v: 1, name, at: reportedAt, goal, skills, lessons, cls: code, assign, j: join, fx: examFocus, bc: braincore } };
 }
 
 export const ASSIGN_LIMITS = Object.freeze({

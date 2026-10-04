@@ -86,7 +86,7 @@
     'auth.layar.sudah-guru': 'Sudah punya akun guru?',
     'auth.layar.ulangi-sandi': 'Ulangi kata sandi',
     'auth.layar.welcome-lead': 'Belajar Bahasa Inggris dan Bahasa Jepang adaptif. Masuk sekali, progresmu ikut ke HP mana pun.',
-    /* --- m025-462 progres ikut akun (sinkron berizin) --- */
+    /* --- m025-464 progres ikut akun (sinkron berizin) --- */
     'sinkron.judul': "Progres ikut akun",
     'sinkron.baru-saja': "baru saja",
     'sinkron.menit-lalu': "{n} menit lalu",

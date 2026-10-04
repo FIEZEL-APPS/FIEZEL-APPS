@@ -1,5 +1,7 @@
 # Audit kabel BrainCore → dashboard murid dan KelasKu
 
+> **Status:** Gelombang 1 (D1, D2, D3, D5, D6) tersambung di m025-457. Gelombang 2 (K1, K2, K3) tersambung di m025-462 (`docs/handoffs/FIEZEL-M025-462-BRAINCORE-WAVE2-KELASKU-HANDOFF.md`). D4 dan D7 tersambung di m025-462 (PR yang sama). D8 dan K4 tersambung di m025-463 (`docs/handoffs/FIEZEL-M025-463-BRAINCORE-WAVE4-UX-POLISH-HANDOFF.md`). Semua kabel di audit ini kini tersambung. Batas yang tersisa: bank review guru baru punya lima skill, jadi remedial per murid hanya bisa menunjuk pelajaran lemah yang menyangkut past tense. (Klaim "graf kurikulum tidak pernah diisi" di draf awal salah, lihat koreksi di §2C.)
+
 **Tanggal:** 2026-10-04 · **Basis:** `main` @ `587335cd` (m025-450)
 **Pertanyaan owner:** kemampuan BrainCore mana yang sudah dihitung tetapi belum sampai ke dashboard
 murid dan KelasKu, sehingga cuma jadi "kode bagus yang disimpan di gudang"?
@@ -65,10 +67,10 @@ KelasKu (murid maupun guru) sama sekali tidak tersambung ke model belajar BrainC
 
 | Modul | Fungsi yang belum punya pemanggil | Catatan |
 |---|---|---|
-| `fiezel-core-brain.js` | `setCurriculumGraph`, `prerequisiteChain`, `lessonNode`, `curriculumGraphSize` | **Graf kurikulum tidak pernah diisi.** Analisis akar masalah hanya berjalan di atas graf keluarga konsep, bukan rantai prasyarat lesson. |
+| `fiezel-core-brain.js` | `lessonNode`, `curriculumGraphSize` (publik) | **Koreksi 2026-10-04:** draf awal laporan ini menyebut graf kurikulum tidak pernah diisi. Itu **salah**. `setCurriculumGraph(GRAMMAR_CURRICULUM)` dipanggil di `app.js:5766` lewat `?.(` (pola yang terlewat oleh pencarian awal), dan `rootCause` memakainya lewat `prerequisiteChain`. Yang belum dipakai dari luar hanya dua pembaca ini, dan keduanya tidak perlu disambungkan. |
 | | `trend`, `reviewPriority`, `optimalDifficulty`, `difficultyBand` (publik) | Sebagian dipakai secara internal oleh `analyze()`, tetapi tidak pernah ditampilkan. |
 | `fiezel-confusion-matrix.js` | `suggestPrerequisiteEdges` | Bisa mengusulkan sambungan prasyarat baru dari pola tertukar murid. Ini pasangan alami untuk graf kurikulum di atas. |
-| `fiezel-affect.js` | `suggestionFor` | `affectSuggestionMarkup()` ada, tetapi tidak memakai fungsi modul ini. |
+| `fiezel-affect.js` | `suggestionFor` | **Koreksi:** dipakai di dalam `assess()` (fiezel-affect.js:279, 296), dan sarannya sampai ke layar lewat `affectSuggestionMarkup()`. Tidak perlu disambungkan. |
 | `fiezel-item-prior.js` | `explain` | Alasan tingkat kesulitan soal. Berguna untuk tinjauan soal guru di KelasKu. |
 | `fiezel-question-memory.js` | `summary`, `stateOf`, `priorityOf`, `recordOf` | Lihat D8. |
 | `fiezel-param-ledger.js` | `verify`, `rollbackTo` | Penyetelan-diri tidak punya layar audit atau tombol kembalikan untuk owner. |
@@ -99,8 +101,8 @@ Setiap teks baru wajib lewat pasangan `copy-id-*` / `copy-th-*`.
 6. Tugas remedial dari guru diisi butir yang menyasar miskonsepsi aktif tiap murid (K4).
 
 **Gelombang 3: mesin yang belum dipanggil**
-7. Isi graf kurikulum (`setCurriculumGraph` dari `grammar-curriculum-v1.json`) supaya akar masalah
-   memakai rantai prasyarat lesson (C).
+7. ~~Isi graf kurikulum~~ (sudah terisi, lihat koreksi di §2C). Sebagai gantinya: pakai `suggestPrerequisiteEdges` matriks
+   kekeliruan untuk mengusulkan sambungan prasyarat baru dari pola tertukar murid.
 8. Pengingat belajar memakai jam terbaik dari `studyWindows` (D4).
 9. Tab Analisis membaca matriks kekeliruan dan OLM, bukan menghitung ulang (D7).
 

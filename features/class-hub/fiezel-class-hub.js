@@ -1303,6 +1303,32 @@
       linkCards +
     '</div>';
   }
+  /* ===== m025-459 Gelombang 2 audit kabel BrainCore (K3) =================================
+     Papan Kelas dulu dihitung sendiri: streak dari kiriman tugas saja, skill terkuat/terlemah
+     dari akurasi mentah Belajar mandiri. Murid yang rajin berlatih di luar tugas tampil "0 hari",
+     dan angka di sini bisa bertentangan dengan Progres. Sekarang:
+       - streak memakai SEMUA hari belajar (riwayat jawaban aplikasi) ditambah hari kirim tugas;
+       - pelajaran grammar ikut dinilai dari penguasaan BrainCore (BKT, minimal 3 bukti);
+       - kartu "Kata Braincore Hari Ini" yang sama dengan Beranda tampil di atas.
+     Semua pembacaan fail-soft: tanpa modul atau tanpa bukti, layar sama seperti sebelumnya. */
+  function appState() { try { return typeof root.__getFiezelState === 'function' ? root.__getFiezelState() : null; } catch (_) { return null; } }
+  function learningDays() {
+    var out = {}, dayMs = 86400000, st = appState();
+    ((st && st.history) || []).forEach(function (h) { if (h && h.at) out[Math.floor(Number(h.at) / dayMs)] = true; });
+    return out;
+  }
+  function braincoreLessonSkills() {
+    try {
+      var M = root.FiezelMasteryBKT, raw = typeof root.bktRead === 'function' ? root.bktRead() : null;
+      if (!M || typeof M.mastery !== 'function' || !raw || !raw.lessons) return [];
+      var now = Date.now(), name = typeof root.friendlySkillName === 'function' ? root.friendlySkillName : null;
+      return Object.keys(raw.lessons).map(function (k) {
+        var m = M.mastery(raw, k, now) || {}, label = name ? name(k) : '';
+        return { key: k, label: label && label !== k ? label : '', acc: Math.max(0, Math.min(1, Number(m.L) || 0)), total: Number(m.n) || 0, correct: 0 };
+      }).filter(function (s) { return s.label && s.total >= 3; });
+    } catch (_) { return []; }
+  }
+  function braincoreCardMarkup() { try { return typeof root.braincoreHomeCardMarkup === 'function' ? root.braincoreHomeCardMarkup() : ''; } catch (_) { return ''; } }
   function progresView() {
     var lf = null; try { lf = LF() ? LF().load() : null; } catch (_) {}
     var skills = (lf && lf.skills) || {}, keys = Object.keys(skills), done = subs();
@@ -1311,10 +1337,11 @@
 
     /* ── Streak harian ── */
     var streak = 0;
-    if (done.length) {
+    if (done.length || Object.keys(learningDays()).length) {
       var dayMs = 86400000;
       var byDay = {};
       done.forEach(function (s) { if (s.at) { var d = Math.floor(s.at / dayMs); byDay[d] = true; } });
+      var belajar = learningDays(); Object.keys(belajar).forEach(function (d) { byDay[d] = true; });
       var todayD = Math.floor(Date.now() / dayMs);
       var checkD = byDay[todayD] ? todayD : todayD - 1;
       while (byDay[checkD]) { streak++; checkD--; }
@@ -1329,6 +1356,7 @@
       var s = skills[k];
       return { key: k, acc: s.total ? s.correct / s.total : 0, total: s.total || 0, correct: s.correct || 0 };
     }).filter(function (s) { return s.total >= 3; })
+      .concat(braincoreLessonSkills())
       .sort(function (a, b) { return b.acc - a.acc; });
 
     var topStrong = sortedSkills.slice(0, 3);
@@ -1338,7 +1366,7 @@
 
     function skillRow(s, cls) {
       return '<div class="ch-top-skill-row ' + cls + '">' +
-        '<span>' + esc(skillLabel(s.key)) + '</span>' +
+        '<span>' + esc(s.label || skillLabel(s.key)) + '</span>' +
         '<span class="ch-bar"><i style="width:' + Math.round(s.acc * 100) + '%"></i></span>' +
         '<b>' + Math.round(s.acc * 100) + '%</b>' +
       '</div>';
@@ -1350,12 +1378,13 @@
     var weekAvg = weekDone.length ? weekDone.reduce(function (m, s) { return m + (s.t ? s.c / s.t : 0); }, 0) / weekDone.length : null;
 
     return '<div class="ch-body">' +
+      braincoreCardMarkup() +
       /* Streak card */
       '<section class="ch-card ch-streak-card" data-testid="class-streak">' +
         '<span class="ch-streak-emoji">' + streakEmoji + '</span>' +
         '<div class="ch-streak-info">' +
           '<b>' + esc(streakLabel) + '</b>' +
-          '<span>' + esc(t('kelas.streak-sub', 'Kerjakan tugas setiap hari untuk menjaga streak')) + '</span>' +
+          '<span>' + esc(t('kelas.streak-sub-belajar', 'Belajar atau kerjakan tugas setiap hari untuk menjaga runtunmu')) + '</span>' +
         '</div>' +
       '</section>' +
 
@@ -2094,6 +2123,50 @@
       '<section class="ch-card"><p class="ch-kicker">' + t('kelas.soal-sering-keliru', 'Soal yang paling sering keliru') + '</p>' + (im.rows.length ? '<ol class="ch-item-list" data-testid="tclass-result-items">' + im.rows.slice(0, 8).map(function (r) { return '<li><p class="ch-muted">Soal ' + (r.index + 1) + ' · <b>' + r.n + ' murid keliru</b></p>' + (r.q ? '<b>' + esc(r.q.prompt) + '</b><p class="ch-muted ch-small">Kunci: ' + esc(r.q.options[r.q.answer]) + '</p>' : '<p class="ch-muted">' + esc(r.id) + '</p>') + (r.tags.length ? '<div class="ch-tags">' + r.tags.map(function (t) { return '<span class="ch-tag is-warn">' + esc(t.label) + ' ×' + t.n + '</span>'; }).join('') + '</div>' : '') + '</li>'; }).join('') + '</ol>' : '<p class="ch-muted">' + t('kelas.belum-ada-bukti-soal', 'Belum ada bukti per-soal. Muncul otomatis setelah murid menyelesaikan tugas di aplikasi.') + '</p>') + '</section>' +
       (im.misconceptions.length ? '<section class="ch-card ch-card-ink"><p class="ch-kicker">Miskonsepsi dari tugas ini</p><ol class="ch-mis">' + im.misconceptions.slice(0, 4).map(function (m) { return '<li><b>' + esc(m.label) + '</b><small>' + m.n + ' jawaban</small></li>'; }).join('') + '</ol><div class="ch-actions"><button type="button" class="tg-btn is-primary is-small" data-ch="remedial" data-skill="' + esc(a.skills[0]) + '" data-title="' + esc('Remedial: ' + a.title) + '" data-testid="tclass-remedial">' + icon('life-buoy') + ' ' + t('kelas.buat-remedial', 'Buat tugas remedial') + '</button></div></section>' : '') + '</div>';
   }
+  /* m025-459 audit kabel BrainCore K2: model belajar BrainCore tiap murid (dari laporan kelas, blok
+     bc) kini sampai ke guru. Sebelumnya "Saran Braincore" hanya membaca akurasi mentah tugas.
+     Tampil hanya bila minimal satu murid sudah mengirim ringkasan. Pelajaran yang paling banyak
+     disebut lemah menjadi saran remedial dengan tombol yang sama dengan saran skill di bawah. */
+  function lessonName(k) { try { var n = typeof root.friendlySkillName === 'function' ? root.friendlySkillName(k) : ''; return n && n !== k ? n : k.replace(/_/g, ' '); } catch (_) { return k; } }
+  /* K4 (audit kabel BrainCore 2026-10-04): tugas remedial dulu satu untuk seluruh kelas, isinya
+     diambil acak per skill, jadi murid yang sudah menguasai mendapat soal yang sama dengan murid
+     yang tertinggal. Kini tiap murid yang dilaporkan BrainCore punya tombol remedialnya sendiri:
+     tugas dikirim HANYA ke murid itu (targets), skill-nya skill bank yang paling lemah MILIK murid
+     itu, lalu pelajaran lemah dari BrainCore yang menyangkut past tense ikut menunjuk skill
+     bank-nya. Kosong berarti tidak ada bukti, dan tombolnya tidak ditampilkan. */
+  function remedialSkillsFor(s) {
+    var TS = T(), bs = bankSkills(), scored = [];
+    bs.forEach(function (k) { var v = TS && TS.skillAcc ? TS.skillAcc(s, k) : null; if (v != null && v < 0.7) scored.push({ k: k, v: v }); });
+    scored.sort(function (x, y) { return x.v - y.v; });
+    var out = scored.map(function (x) { return x.k; });
+    ((s && s.braincore && s.braincore.weak) || []).forEach(function (w) {
+      var k = /past/.test(w) ? (/question|did/.test(w) ? 'past_questions' : 'past_tense') : null;
+      if (k && bs.indexOf(k) !== -1 && out.indexOf(k) === -1) out.push(k);
+    });
+    return out.slice(0, 2);
+  }
+  function tBraincoreLearnerModel(c) {
+    var withBc = (c.students || []).filter(function (s) { return s && s.braincore; });
+    if (!withBc.length) return '';
+    var tally = {}, turun = 0, ulang = 0;
+    withBc.forEach(function (s) {
+      var b = s.braincore;
+      (b.weak || []).forEach(function (k) { tally[k] = (tally[k] || 0) + 1; });
+      if (b.dir === 'down') turun++;
+      if (b.due > 0) ulang++;
+    });
+    var top = Object.keys(tally).map(function (k) { return { k: k, n: tally[k] }; }).sort(function (x, y) { return y.n - x.n; }).slice(0, 3);
+    var arahLabel = { up: t('kelas.bc-arah-naik', 'makin lancar'), flat: t('kelas.bc-arah-datar', 'stabil'), down: t('kelas.bc-arah-turun', 'perlu didampingi'), 'new': t('kelas.bc-arah-baru', 'baru mulai') };
+    return '<section class="ch-card" data-testid="tclass-braincore-model"><p class="ch-kicker">' + icon('brain') + ' ' + esc(t('kelas.bc-judul', 'Kata Braincore tentang muridmu')) + '</p>' +
+      (top.length ? '<p>' + esc(t('kelas.bc-lemah-kelas', 'Paling banyak murid masih lemah di:')) + '</p><ol class="ch-mis">' + top.map(function (x) { return '<li><b>' + esc(lessonName(x.k)) + '</b><small>' + esc(t('kelas.bc-n-murid', '{n} murid', { n: x.n })) + '</small></li>'; }).join('') + '</ol>' : '') +
+      '<p class="ch-muted ch-small">' + esc(t('kelas.bc-ringkas', '{turun} murid perlu didampingi, {ulang} murid punya materi yang menunggu diulang.', { turun: turun, ulang: ulang })) + '</p>' +
+      '<ul class="ch-mini-list" data-testid="tclass-braincore-students">' + withBc.slice(0, 40).map(function (s) {
+        var b = s.braincore;
+        return '<li><span class="ch-grow"><b>' + esc(s.name || '') + '</b> <small>' + esc(b.lv) + ' · ' + esc(arahLabel[b.dir] || '') + '</small></span>' +
+          (b.weak && b.weak.length ? '<small>' + esc(lessonName(b.weak[0])) + '</small>' : '') +
+          (remedialSkillsFor(s).length ? '<button type="button" class="tg-btn is-ghost is-small" data-ch="remedial-murid" data-student="' + esc(s.id) + '" data-testid="tclass-remedial-murid">' + icon('life-buoy') + ' ' + esc(t('kelas.bc-remedial-murid', 'Remedial khusus')) + '</button>' : '') + '</li>';
+      }).join('') + '</ul></section>';
+  }
   function tBraincore(c, env) {
     var TS = T(), map = TS.classSkillMap(c), mis = TS.misconceptions(c), agg = {}, n = 0;
     if (env && env.skillMatchesSubject) {
@@ -2103,7 +2176,7 @@
     (c.assignments || []).forEach(function (a) { itemMisses(c, a).misconceptions.forEach(function (m) { agg[m.label] = (agg[m.label] || 0) + m.n; n += m.n; }); });
     var fromEvidence = Object.keys(agg).map(function (k) { return { label: k, n: agg[k] }; }).sort(function (x, y) { return y.n - x.n; }).slice(0, 5);
     var weakest = map.filter(function (m) { return m.acc != null; }).sort(function (x, y) { return x.acc - y.acc; })[0];
-    return '<div class="ch-body"><section class="ch-card ch-card-ink"><p class="ch-kicker">Prinsip</p><h3>' + t('kelas.braincore-alur', 'Saran otomatis. Guru memutuskan. Murid belajar.') + '</h3><p class="ch-muted">' + esc(t('kelas.sumber-angka', 'Semua angka di bawah berasal dari bukti murid di kelas ini: laporan sinkron dan soal yang keliru pada tugasmu. Tidak ada AI cloud, tidak ada tebakan tanpa data.')) + '</p></section>' +
+    return '<div class="ch-body">' + tBraincoreLearnerModel(c) + '<section class="ch-card ch-card-ink"><p class="ch-kicker">Prinsip</p><h3>' + t('kelas.braincore-alur', 'Saran otomatis. Guru memutuskan. Murid belajar.') + '</h3><p class="ch-muted">' + esc(t('kelas.sumber-angka', 'Semua angka di bawah berasal dari bukti murid di kelas ini: laporan sinkron dan soal yang keliru pada tugasmu. Tidak ada AI cloud, tidak ada tebakan tanpa data.')) + '</p></section>' +
       '<section class="ch-card"><p class="ch-kicker">Peta skill kelas</p><ul class="ch-skill-list">' + map.map(function (m) { return '<li><span>' + esc(m.label) + '</span><span class="ch-bar"><i style="width:' + Math.round((m.acc || 0) * 100) + '%"></i></span><b>' + pct(m.acc) + '</b><small>' + (m.low ? m.low + ' murid &lt;50%' : m.n ? m.n + ' soal' : 'belum ada data') + '</small></li>'; }).join('') + '</ul></section>' +
       '<section class="ch-card"><p class="ch-kicker">Miskonsepsi terdeteksi</p>' + (fromEvidence.length ? '<p class="ch-muted ch-small">Dari ' + n + ' ' + esc(t('kelas.jawaban-keliru', 'jawaban keliru pada tugas yang kamu kirim.')) + '</p><ol class="ch-mis">' + fromEvidence.map(function (m) { return '<li><b>' + esc(m.label) + '</b><small>' + m.n + '×</small></li>'; }).join('') + '</ol>' : '') + (mis.length ? '<p class="ch-muted ch-small">Dari pola skill kelas:</p><ol class="ch-mis">' + mis.map(function (m) { return '<li><b>' + esc(m.label) + '</b> — ' + esc(m.pattern) + '<small>' + esc(m.lesson) + '</small></li>'; }).join('') + '</ol>' : '') + (!fromEvidence.length && !mis.length ? '<p class="ch-muted">' + t('kelas.belum-cukup-bukti', 'Belum ada bukti cukup. Kirim satu tugas dan tunggu murid mengerjakannya.') + '</p>' : '') + '</section>' +
       '<section class="ch-card"><p class="ch-kicker">Saran Braincore untuk langkah berikutnya</p>' + (weakest ? '<p>Skill terlemah kelas: <b>' + esc(weakest.label) + '</b> (' + pct(weakest.acc) + '). Saran: tugas remedial 8 soal, mode latihan, tenggat 3 hari.</p><div class="ch-actions"><button type="button" class="tg-btn is-primary" data-ch="remedial" data-skill="' + esc(weakest.skill) + '" data-title="' + esc('Remedial ' + weakest.label) + '" data-testid="tclass-braincore-remedial">' + icon('life-buoy') + ' Susun tugas remedial</button><button type="button" class="tg-btn is-ghost" data-tg="view" data-view="insights">' + icon('activity') + ' Analitik lengkap</button></div>' : '<p class="ch-muted">Saran muncul setelah ada akurasi per skill.</p>') + '</section></div>';
@@ -2170,6 +2243,7 @@
       case 'use-suggest': d = draft(c); d.useSuggest[i] = !d.useSuggest[i]; d.finals[i] = Object.assign({}, d.useSuggest[i] ? d.review.items[i].suggested.question : d.review.items[i].original, { skill: d.review.items[i].analysis.skill }); break;
       case 'drop-review': d = draft(c); d.review.items.splice(i, 1); d.finals.splice(i, 1); var ap = {}, us = {}; Object.keys(d.approved).forEach(function (k) { var n = Number(k); if (n < i) ap[n] = d.approved[k]; else if (n > i) ap[n - 1] = d.approved[k]; }); Object.keys(d.useSuggest).forEach(function (k) { var n = Number(k); if (n < i) us[n] = d.useSuggest[k]; else if (n > i) us[n - 1] = d.useSuggest[k]; }); d.approved = ap; d.useSuggest = us; d.review.summary.count = d.review.items.length; d.review.summary.ready = d.review.items.filter(function (r) { return r.analysis.verdict === 'siap'; }).length; if (!d.review.items.length) { d.step = 1; d.review = null; } break;
       case 'commit': commitDraft(c, env, !!b.getAttribute('data-send')); return;
+      case 'remedial-murid': { var sid = b.getAttribute('data-student'), who = (c.students || []).filter(function (x) { return x && x.id === sid; })[0], rs = who ? remedialSkillsFor(who) : []; if (!rs.length) break; tUi.draft = null; d = draft(c); d.source = 'bank'; d.skills = rs; d.count = 8; d.targets = [sid]; d.title = t('kelas.bc-remedial-judul', 'Remedial untuk {nama}', { nama: who.name || '' }); d.deadline = T().today(Date.now() + 3 * T().DAY); tUi.tab = 'buat'; break; }
       case 'remedial': tUi.draft = null; d = draft(c); d.source = 'bank'; d.skills = [b.getAttribute('data-skill')].filter(function (k) { return B() && B().SKILLS[k]; }); if (!d.skills.length) d.skills = ['past_tense']; d.count = 8; d.title = b.getAttribute('data-title') || ''; d.deadline = T().today(Date.now() + 3 * T().DAY); tUi.tab = 'buat'; break;
       default: return;
     }

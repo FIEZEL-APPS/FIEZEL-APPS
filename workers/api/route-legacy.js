@@ -92,7 +92,7 @@ function isBudgetDenial(error) {
 }
 
 // Helper pembaca JSON yang aman
-/* m025-462: allowlist catatan percobaan, SAMA PERSIS dengan
+/* m025-464: allowlist catatan percobaan, SAMA PERSIS dengan
    features/brain/fiezel-attempt-record.js (ALLOWED + ID_RE). Server ikut menyaring karena
    lembar privasi sekolah menjanjikan daftar field ini — klien lama atau klien rusak tidak
    boleh bisa menyimpan kalimat soal atau jawaban murid. tests/progress-sync-test.js menjaga
@@ -461,7 +461,7 @@ const RAW_ROUTES = [
   
   // 9. POST /api/brain/attempts
   //
-  // m025-462 (progres ikut akun): rute ini dulu menyimpan JSON APA PUN yang dikirim klien dan
+  // m025-464 (progres ikut akun): rute ini dulu menyimpan JSON APA PUN yang dikirim klien dan
   // menelan galat tulis (`.catch(() => {})`) lalu tetap menjawab `success:true`. Dua-duanya
   // tidak lagi boleh, karena sekarang ada janji tertulis di atasnya:
   //   - lembar privasi sekolah menyebut PERSIS field yang tersimpan — jadi server ikut
@@ -522,7 +522,7 @@ const RAW_ROUTES = [
     return jsonResponse({ attempts, protocol: '1.7' }, { status: 200, ...opt });
   }],
 
-  // 10b. POST /api/brain/attempts/delete — hak hapus (m025-462).
+  // 10b. POST /api/brain/attempts/delete — hak hapus (m025-464).
   // Lembar privasi berjanji murid/orang tua bisa menghapus progres yang tersimpan di server
   // dari aplikasi sendiri, tanpa menghubungi siapa pun. Hanya baris milik `sub` cookie ini;
   // tidak ada parameter yang bisa menunjuk akun lain.

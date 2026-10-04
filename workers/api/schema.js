@@ -139,7 +139,7 @@ export const BYTE_LIMITS = Object.freeze({
   '/api/reminders/due': 2048,       // cron: filter + pagination
   '/api/reminders/ack': 4096,       // cron: id + kind + status + evidence
   '/api/brain/attempts': 100000,    // batch upload s/d 100 attempt records
-  '/api/brain/attempts/delete': 1024, // m025-462: hapus progres milik sub cookie ini (tanpa badan berarti)
+  '/api/brain/attempts/delete': 1024, // m025-464: hapus progres milik sub cookie ini (tanpa badan berarti)
   '/api/evolution/config': 8192,    // owner: konfigurasi evolusi konten
   '/api/evolution/status': 512,     // GET, tanpa body
   '/api/content/qa/review': 20000,  // owner: item soal untuk QA review
