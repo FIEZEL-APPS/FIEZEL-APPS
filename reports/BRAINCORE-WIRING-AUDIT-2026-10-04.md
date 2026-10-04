@@ -1,6 +1,6 @@
 # Audit kabel BrainCore → dashboard murid dan KelasKu
 
-> **Status:** Gelombang 1 (D1, D2, D3, D5, D6) tersambung di m025-457. Gelombang 2 (K1, K2, K3) tersambung di m025-462 (`docs/handoffs/FIEZEL-M025-462-BRAINCORE-WAVE2-KELASKU-HANDOFF.md`). D4 dan D7 tersambung di m025-462 (PR yang sama). Yang belum: K4 dan D8. (Klaim "graf kurikulum tidak pernah diisi" di draf awal salah, lihat koreksi di §2C.)
+> **Status:** Gelombang 1 (D1, D2, D3, D5, D6) tersambung di m025-457. Gelombang 2 (K1, K2, K3) tersambung di m025-462 (`docs/handoffs/FIEZEL-M025-462-BRAINCORE-WAVE2-KELASKU-HANDOFF.md`). D4 dan D7 tersambung di m025-462 (PR yang sama). D8 dan K4 tersambung di m025-463 (`docs/handoffs/FIEZEL-M025-463-BRAINCORE-WAVE4-UX-POLISH-HANDOFF.md`). Semua kabel di audit ini kini tersambung. Batas yang tersisa: bank review guru baru punya lima skill, jadi remedial per murid hanya bisa menunjuk pelajaran lemah yang menyangkut past tense. (Klaim "graf kurikulum tidak pernah diisi" di draf awal salah, lihat koreksi di §2C.)
 
 **Tanggal:** 2026-10-04 · **Basis:** `main` @ `587335cd` (m025-450)
 **Pertanyaan owner:** kemampuan BrainCore mana yang sudah dihitung tetapi belum sampai ke dashboard
