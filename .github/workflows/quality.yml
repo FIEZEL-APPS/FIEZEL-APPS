@@ -393,6 +393,7 @@ jobs:
           node tests/teacher-instant-boot-test.js
           node tests/kurikulum-integritas-test.js
           node tests/teacher-demo-preview-test.js
+          node tests/progress-sync-test.js
           # m025-199: m025-84 memindahkan markup splash ke frame pertama, tetapi peramban
           # tetap menahan cat sampai style.css (286 KB) berlaku - separuh cacat yang sama
           # bertahan sampai pemilik melaporkannya lagi. Gerbang ini menjaga separuh kedua,

@@ -4174,11 +4174,44 @@ const BRAIN_SYNC_QUEUE_MAX=300;
 /* Audit F3: daftar terkirim harus muat seluruh riwayat yang bisa dipindai (record() memotong riwayat di 1.000). */
 const BRAIN_SYNC_SENT_MAX=1200;
 function brainSyncModule(){return self.FiezelAttemptRecord}
+/* m025-455: catatan latihan milik AKUN, jadi harus sampai ke Worker CF dengan cookie akun
+   (credentials:'include') — sama dengan cek sesi login (FiezelAuthScreen.checkServer). Jalur
+   Puter lama (`puter.workers.exec`) tidak membawa cookie itu, jadi data akan tersimpan di
+   identitas yang salah. Tanpa alamat CF, kembali ke jalur lama apa adanya. */
+function progressSyncFetch(path,options={}){
+  if(typeof CF_ENABLED!=='undefined'&&CF_ENABLED&&typeof cfWorkerFetch==='function')return cfWorkerFetch(path,options);
+  return coreWorkerExec(path,options);
+}
 /** Tiga syarat di atas, dievaluasi di satu tempat supaya tidak ada jalur yang lupa satu. */
+/* m025-455 (progres ikut akun): OWNER memutuskan sinkron MENYALA OTOMATIS setelah izin orang
+ * tua/wali tercatat (preferences.progressSyncConsent). Syarat 1 di atas kini dibaca begini:
+ *   - brainSync===false  -> murid/ortu mematikannya sendiri; itu menang atas izin.
+ *   - brainSync===true   -> dinyalakan manual (jalur lama tetap sah).
+ *   - selain itu         -> menyala HANYA bila izin sudah tercatat.
+ * Syarat 2 "ada akun" kini juga dipenuhi sesi masuk Google/akun FIEZEL: tujuan sinkronnya
+ * adalah cookie akun di server (route-auth-google.js: sub akun tidak pernah berubah).
+ * Tanpa izin tidak ada satu byte pun yang dikirim — default tetap mati. */
+function progressSyncConsented(){const c=state?.preferences?.progressSyncConsent;return !!(c&&typeof c==='object'&&Number(c.at)>0)}
+function progressSyncSignedIn(){
+  if(activeAccountUuid)return true;
+  try{const s=self.FiezelAuthScreen?.readSession?.(self);return !!(s&&s.role==='murid')}catch{return false}
+}
+/* Penanda pemilik: akun yang sedang masuk. Dipakai menolak kirim/gabung saat akun LAIN masuk di
+   HP yang sama (kakak-adik berbagi HP) — riwayat milik satu murid tidak boleh mengalir ke akun
+   murid lain. */
+function progressSyncOwner(){
+  if(activeAccountUuid)return 'u:'+activeAccountUuid;
+  try{const e=String(self.FiezelGoogle?.rememberedEmail?.()||'').trim().toLowerCase();if(e)return 'g:'+e}catch{}
+  return '';
+}
 function brainSyncEnabled(){
   try{
-    if(state?.preferences?.brainSync!==true)return false;
-    if(!activeAccountUuid)return false;
+    const pref=state?.preferences?.brainSync;
+    if(pref===false)return false;
+    /* typeof: gerbang lama mengekstrak fungsi ini sendirian ke sandbox — tanpa helper izin, ia
+       harus tetap berperilaku seperti sebelum m025-455 (hanya jalur manual). */
+    if(pref!==true&&!(typeof progressSyncConsented==='function'&&progressSyncConsented()))return false;
+    if(!activeAccountUuid&&!(typeof progressSyncSignedIn==='function'&&progressSyncSignedIn()))return false;
     if(!CORE_WORKER_URL)return false;
     const M=brainSyncModule();
     return !!(M&&typeof M.project==='function');
@@ -4216,10 +4249,21 @@ function brainSyncPending(limit=BRAIN_SYNC_BATCH){
 async function brainSyncFlush(){
   if(!brainSyncEnabled())return false;
   const batch=brainSyncPending();
-  if(!batch.length)return true;
+  const pemilikOk=()=>typeof progressSyncOwnerOk!=='function'||progressSyncOwnerOk();
+  const tandai=(patch)=>{if(typeof progressSyncMark==='function')progressSyncMark(patch)};
+  if(!batch.length){if(pemilikOk())tandai({saving:false,lastCheckedAt:Date.now()});return true}
   try{
-    const r=await coreWorkerExec('/api/brain/attempts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({attempts:batch})});
-    if(!r||!r.ok)return false;
+    if(!pemilikOk())return false;
+    tandai({saving:true,savingSince:Date.now()});
+    const kirim=typeof progressSyncFetch==='function'?progressSyncFetch:coreWorkerExec;
+    const r=await kirim('/api/brain/attempts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({attempts:batch})});
+    if(!r||!r.ok){tandai({saving:false,lastErrorAt:Date.now()});return false}
+    /* m025-455: server kini menyaring dengan allowlist yang sama dan menyebut berapa yang
+       DITOLAK. Baris yang ditolak tetap ditandai "sudah ditangani" — mengirim ulang catatan yang
+       cacat tidak akan pernah berhasil dan hanya menyumbat antrean — tetapi jumlahnya dicatat
+       supaya tidak ada yang berpura-pura semuanya tersimpan. */
+    const balasan=typeof r.json==='function'?await r.json().catch(()=>null):null;
+    const ditolak=Math.max(0,Number(balasan?.rejected)||0);
     /* Audit F3 2026-10-04: daftar "terkirim" dulu dipotong 300 id terakhir, sementara
        brainSyncPending memindai riwayat (maks 1.000 baris) dari yang TERTUA. Begitu riwayat lewat
        ±350 baris, id lama jatuh dari daftar, baris lama dianggap belum terkirim lagi, dan setiap
@@ -4228,11 +4272,11 @@ async function brainSyncFlush(){
        dipindai lagi), jadi setiap baris yang masih bisa dipindai tetap tercatat terkirim. */
     const st=brainSyncRead(),terkirim=Array.isArray(st.sent)?st.sent:[];
     const hidup=new Set((state.history||[]).map(h=>h&&h.attemptId).filter(Boolean));
-    brainSyncWrite({...st,sent:[...terkirim,...batch.map(x=>x.attemptId)].filter(id=>hidup.has(id)).slice(-BRAIN_SYNC_SENT_MAX),lastPushedAt:Date.now()});
+    brainSyncWrite({...st,sent:[...terkirim,...batch.map(x=>x.attemptId)].filter(id=>hidup.has(id)).slice(-BRAIN_SYNC_SENT_MAX),lastPushedAt:Date.now(),saving:false,lastErrorAt:0,rejected:(Number(st.rejected)||0)+ditolak,owner:st.owner||(typeof progressSyncOwner==='function'?progressSyncOwner():'')});
     /* Satu flush = satu batch 50; sisa antrean menyusul tanpa menunggu sesi berikutnya. */
     if(batch.length>=BRAIN_SYNC_BATCH)queueBrainSyncFlush(1500);
     return true;
-  }catch{return false}
+  }catch{tandai({saving:false,lastErrorAt:Date.now()});return false}
 }
 /* Audit F2 2026-10-04: brainSyncFlush() dulu didefinisikan tetapi tidak pernah dipanggil, jadi
    riwayat percobaan BrainCore tidak pernah sampai ke server walau murid menyalakan sinkron. Kini
@@ -4278,7 +4322,7 @@ window.setBrainSyncPreference=setBrainSyncPreference;
 async function brainSyncPull(){
   if(!brainSyncEnabled())return null;
   try{
-    const r=await coreWorkerExec('/api/brain/attempts',{method:'GET'});
+    const r=await progressSyncFetch('/api/brain/attempts',{method:'GET'});
     if(!r||!r.ok)return null;
     const data=await r.json().catch(()=>null);
     const rows=Array.isArray(data?.attempts)?data.attempts:[];
@@ -4338,6 +4382,134 @@ function brainSyncApplyRebuild(hasil){
     return true;
   }catch{return false}
 }
+/* ---- m025-455 PROGRES IKUT AKUN: izin, status jujur, pulihkan, hapus ----------------------
+ *
+ * Keputusan OWNER 2026-10-04: sinkron menyala otomatis SETELAH izin orang tua/wali tercatat.
+ * Izinnya sendiri adalah formulir tertulis (docs/pilot/IZIN-ORANG-TUA.md); yang dicatat di
+ * sini adalah pernyataan di aplikasi bahwa izin itu sudah diberikan, plus kapan.
+ *
+ * STATUS HARUS JUJUR. Lencana "tersimpan" hanya boleh membaca waktu dari jawaban server yang
+ * BERHASIL (lastPushedAt/lastCheckedAt ditulis setelah r.ok). Tidak ada jalur yang menulis
+ * waktu itu secara optimistis. Lihat tests/progress-sync-test.js.
+ */
+function progressSyncMark(patch){try{brainSyncWrite({...brainSyncRead(),...patch})}catch{}}
+/** Akun yang sedang masuk = pemilik antrean? Antrean tanpa pemilik dicap oleh akun pertama. */
+function progressSyncOwnerOk(){
+  const now=progressSyncOwner();
+  if(!now)return false;
+  const st=brainSyncRead();
+  if(!st.owner){brainSyncWrite({...st,owner:now});return true}
+  return st.owner===now;
+}
+/** Keadaan untuk UI: 'off' | 'needs-consent' | 'needs-login' | 'other-account' | 'saving' | 'error' | 'saved' | 'pending'. */
+function progressSyncStatus(nowMs=Date.now()){
+  const pref=state?.preferences?.brainSync;
+  if(pref===false)return {state:'off'};
+  if(pref!==true&&!progressSyncConsented())return {state:'needs-consent'};
+  if(!progressSyncSignedIn())return {state:'needs-login'};
+  if(!brainSyncEnabled())return {state:'off'};
+  const st=brainSyncRead();
+  const owner=progressSyncOwner();
+  if(st.owner&&owner&&st.owner!==owner)return {state:'other-account'};
+  if(st.saving&&nowMs-Number(st.savingSince||0)<60000)return {state:'saving'};
+  const okAt=Math.max(Number(st.lastPushedAt)||0,Number(st.lastCheckedAt)||0);
+  if(Number(st.lastErrorAt)>okAt)return {state:'error',at:okAt||0};
+  if(!okAt)return {state:'pending'};
+  const sisa=brainSyncPending(BRAIN_SYNC_SENT_MAX).length;
+  return sisa>0?{state:'pending',at:okAt,sisa}:{state:'saved',at:okAt};
+}
+function progressSyncAgo(at,nowMs=Date.now()){
+  const menit=Math.max(0,Math.round((nowMs-Number(at||0))/60000));
+  if(menit<1)return FiezelI18n.t('sinkron.baru-saja');
+  if(menit<60)return FiezelI18n.t('sinkron.menit-lalu',{n:menit});
+  const jam=Math.round(menit/60);
+  if(jam<48)return FiezelI18n.t('sinkron.jam-lalu',{n:jam});
+  return FiezelI18n.t('sinkron.hari-lalu',{n:Math.round(jam/24)});
+}
+function progressSyncStatusText(){
+  const s=progressSyncStatus();
+  if(s.state==='saved')return FiezelI18n.t('sinkron.status-tersimpan',{waktu:progressSyncAgo(s.at)});
+  if(s.state==='pending')return s.at?FiezelI18n.t('sinkron.status-menunggu-sebagian',{waktu:progressSyncAgo(s.at)}):FiezelI18n.t('sinkron.status-menunggu');
+  const KUNCI={saving:'sinkron.status-saving',error:'sinkron.status-error',off:'sinkron.status-off','needs-consent':'sinkron.status-needs-consent','needs-login':'sinkron.status-needs-login','other-account':'sinkron.status-other-account'};
+  return FiezelI18n.t(KUNCI[s.state]||'sinkron.status-off');
+}
+/** Catat izin orang tua/wali (atau pernyataan murid dewasa) lalu nyalakan sinkron. */
+function progressSyncGiveConsent(by){
+  const siapa=by==='dewasa'?'dewasa':'wali';
+  const prefs={...(state.preferences||{}),progressSyncConsent:{at:Date.now(),by:siapa}};
+  delete prefs.brainSync;
+  state.preferences=prefs;save();
+  queueBrainSyncFlush(300);
+  setTimeout(()=>{try{progressSyncRestoreOffer()}catch(_){}},800);
+  return true;
+}
+/** Matikan/nyalakan lagi. Mematikan TIDAK menghapus salinan server — itu tombol terpisah. */
+function progressSyncSetOn(on){
+  if(on===true&&!progressSyncConsented())return false;
+  state.preferences={...(state.preferences||{}),brainSync:on===true?true:false};save();
+  if(on===true)queueBrainSyncFlush(300);
+  return true;
+}
+/** Hapus seluruh salinan progres di server milik akun ini, lalu matikan sinkron. */
+async function progressSyncDeleteServer(){
+  try{
+    const r=await progressSyncFetch('/api/brain/attempts/delete',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
+    if(!r||!r.ok)return {ok:false};
+    const d=await r.json().catch(()=>null);
+    state.preferences={...(state.preferences||{}),brainSync:false};save();
+    brainSyncWrite({queue:[],sent:[],lastPushedAt:0,lastCheckedAt:0,lastErrorAt:0,saving:false,owner:''});
+    return {ok:true,deleted:Number(d?.deleted)||0};
+  }catch{return {ok:false}}
+}
+/* PULIHKAN DI HP BARU. Ditawarkan, tidak pernah diterapkan diam-diam: murid melihat berapa
+ * latihan yang akan kembali, lalu memilih. Hanya untuk perangkat yang riwayat lokalnya masih
+ * tipis (HP baru / data dibersihkan) — di HP lama yang sudah berisi, aliran lokal + server
+ * tetap digabung lewat putar-ulang yang sama, tetapi tidak perlu menyela murid. */
+let progressSyncOfferShown=false;
+async function progressSyncRestoreOffer(){
+  if(progressSyncOfferShown||!brainSyncEnabled()||!progressSyncOwnerOk())return false;
+  const st=brainSyncRead();
+  if(Number(st.lastRebuiltAt)>0)return false;
+  if((state.history||[]).length>20)return false;
+  const remote=await brainSyncPull();
+  if(!Array.isArray(remote)||!remote.length)return false;
+  const hasil=brainSyncRebuild(remote);
+  if(!hasil||!(hasil.ringkasan?.baruDariPerangkatLain>0))return false;
+  progressSyncOfferShown=true;
+  const n=hasil.ringkasan.baruDariPerangkatLain,lessons=hasil.ringkasan.lessonTerlacak;
+  openModal(`<div class="settings-head"><div class="modal-mark">${FiezelI18n.t('sinkron.pulih-mark')}</div><h2>${FiezelI18n.t('sinkron.pulih-judul')}</h2><p>${FiezelI18n.t('sinkron.pulih-isi',{n,lessons})}</p><p class="muted">${FiezelI18n.t('sinkron.pulih-batas')}</p></div><div class="modal-actions"><button type="button" id="syncRestoreLater">${FiezelI18n.t('sinkron.pulih-nanti')}</button><button type="button" class="primary" id="syncRestoreYes" data-testid="sync-restore-yes">${FiezelI18n.t('sinkron.pulih-ya')}</button></div>`);
+  $('syncRestoreLater')?.addEventListener('click',closeModal);
+  $('syncRestoreYes')?.addEventListener('click',()=>{
+    const ok=brainSyncApplyRebuild(hasil);
+    closeModal();
+    showToast(FiezelI18n.t(ok?'sinkron.pulih-berhasil':'sinkron.pulih-gagal'),ok?'success':'warn');
+    try{render()}catch(_){}
+  });
+  return true;
+}
+function progressSyncSettingsMarkup(){
+  const s=progressSyncStatus();
+  const kartu=(isi)=>`<div class="report-settings progress-sync-settings" data-testid="progress-sync-card"><div class="row"><div><b>${FiezelI18n.t('sinkron.judul')}</b><p class="muted" data-testid="progress-sync-status">${esc(progressSyncStatusText())}</p></div></div>${isi}</div>`;
+  if(s.state==='needs-consent'){
+    return kartu(`<p class="muted">${FiezelI18n.t('sinkron.izin-penjelasan')}</p><div class="modal-actions"><button type="button" class="primary" data-testid="progress-sync-consent-wali" onclick="progressSyncConsentFromSettings('wali')">${FiezelI18n.t('sinkron.izin-wali')}</button><button type="button" data-testid="progress-sync-consent-dewasa" onclick="progressSyncConsentFromSettings('dewasa')">${FiezelI18n.t('sinkron.izin-dewasa')}</button></div>`);
+  }
+  const nyala=s.state!=='off';
+  return kartu(`<p class="muted">${FiezelI18n.t('sinkron.apa-yang-disimpan')}</p><div class="modal-actions">${nyala?`<button type="button" data-testid="progress-sync-off" onclick="progressSyncToggleFromSettings(false)">${FiezelI18n.t('sinkron.matikan')}</button>`:`<button type="button" class="primary" data-testid="progress-sync-on" onclick="progressSyncToggleFromSettings(true)">${FiezelI18n.t('sinkron.nyalakan')}</button>`}<button type="button" class="danger" data-testid="progress-sync-delete" onclick="progressSyncDeleteFromSettings()">${FiezelI18n.t('sinkron.hapus-server')}</button></div>`);
+}
+function progressSyncRefreshCard(){try{const el=document.querySelector('[data-testid="progress-sync-card"]');if(el)el.outerHTML=progressSyncSettingsMarkup()}catch(_){}}
+function progressSyncConsentFromSettings(by){progressSyncGiveConsent(by);showToast(FiezelI18n.t('sinkron.izin-tercatat'),'success');progressSyncRefreshCard();setTimeout(progressSyncRefreshCard,4000)}
+function progressSyncToggleFromSettings(on){progressSyncSetOn(on);progressSyncRefreshCard();if(on)setTimeout(progressSyncRefreshCard,4000)}
+let progressSyncDeleteArmed=0;
+async function progressSyncDeleteFromSettings(){
+  /* Dua ketukan, tanpa confirm(): ketukan pertama mempersenjatai, kedua (dalam 6 detik) menghapus. */
+  const now=Date.now();
+  if(now-progressSyncDeleteArmed>6000){progressSyncDeleteArmed=now;showToast(FiezelI18n.t('sinkron.hapus-konfirmasi'),'warn');return}
+  progressSyncDeleteArmed=0;
+  const r=await progressSyncDeleteServer();
+  showToast(r.ok?FiezelI18n.t('sinkron.hapus-berhasil',{n:r.deleted}):FiezelI18n.t('sinkron.hapus-gagal'),r.ok?'success':'warn');
+  progressSyncRefreshCard();
+}
+Object.assign(window,{progressSyncConsentFromSettings,progressSyncToggleFromSettings,progressSyncDeleteFromSettings});
 /* ---- Butir 5: afek sesi dengan histeresis ---- */
 /* Keadaan afek per SESI, di memori saja (bukan localStorage): afek adalah cuaca sesi, bukan
  * sifat murid. changed=true setelah perubahan pertama - modul lalu menahan keadaan itu
@@ -16333,7 +16505,7 @@ function openSettings(){const p=state.preferences||defaultPreferences,endpoint=p
   // itulah yang melaporkan shell usang, jadi tombol perbaikannya berdampingan dengannya.
   /* Audit F15: "Hapus semua progres" pindah dari dasar halaman Progres ke Pengaturan -> Data
      (tetap lewat konfirmasi resetProgress). */
-  const grupData=`${continuitySettingsMarkup()}<div class="card reset-card"><h3>${FiezelI18n.t('progress.reset-progres')}</h3><p class="muted">${FiezelI18n.t('settings.reset-lokasi-desc')}</p><button type="button" class="danger" data-testid="settings-reset-progress" onclick="resetProgress()">${FiezelI18n.t('progress.reset-progres')}</button></div><div class="card cache-card"><h3>${FiezelI18n.t('settings.bersihkan-cache-judul')}</h3><p class="muted">${FiezelI18n.t('settings.menghapus-berkas-aplikasi-lama-menumpuk')}</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button id="settingCheckUpdate" type="button" class="primary" style="flex:1"><i data-lucide="refresh-cw"></i> Cek Pembaruan</button><button id="settingClearCache" type="button" style="flex:1"><i data-lucide="trash-2"></i> ${FiezelI18n.t('settings.bersihkan-cache-amp-muat-ulang')}</button></div></div><div class="card"><h3>${FiezelI18n.t('settings.kesehatan-instalasi-judul')}</h3><div id="installHealth"><p class="muted">${FiezelI18n.t('settings.memeriksa-pemasangan')}</p></div></div>`;
+  const grupData=`${progressSyncSettingsMarkup()}${continuitySettingsMarkup()}<div class="card reset-card"><h3>${FiezelI18n.t('progress.reset-progres')}</h3><p class="muted">${FiezelI18n.t('settings.reset-lokasi-desc')}</p><button type="button" class="danger" data-testid="settings-reset-progress" onclick="resetProgress()">${FiezelI18n.t('progress.reset-progres')}</button></div><div class="card cache-card"><h3>${FiezelI18n.t('settings.bersihkan-cache-judul')}</h3><p class="muted">${FiezelI18n.t('settings.menghapus-berkas-aplikasi-lama-menumpuk')}</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button id="settingCheckUpdate" type="button" class="primary" style="flex:1"><i data-lucide="refresh-cw"></i> Cek Pembaruan</button><button id="settingClearCache" type="button" style="flex:1"><i data-lucide="trash-2"></i> ${FiezelI18n.t('settings.bersihkan-cache-amp-muat-ulang')}</button></div></div><div class="card"><h3>${FiezelI18n.t('settings.kesehatan-instalasi-judul')}</h3><div id="installHealth"><p class="muted">${FiezelI18n.t('settings.memeriksa-pemasangan')}</p></div></div>`;
   /* Audit F16 (2026-09-23): "Creator Learning Report", "Endpoint Webhook Laporan", dan
      "Pasang Creator Hub" adalah alat pengembang, bukan pengaturan murid. Blok itu kini
      tersembunyi kecuali mode kreator (guru terverifikasi, ?creator=1, atau
@@ -18803,6 +18975,7 @@ setTimeout(()=>{
   }catch(_){}
   try{itemPoolSync()}catch(_){}
   try{queueBrainSyncFlush(0)}catch(_){}/* Audit F2: sisa riwayat dari sesi offline sebelumnya */
+  try{progressSyncRestoreOffer()}catch(_){}/* m025-455: HP baru -> tawarkan pulihkan progres dari akun */
 },2500);
 if(typeof window!=='undefined'&&window.addEventListener){
   window.addEventListener('online',()=>{
