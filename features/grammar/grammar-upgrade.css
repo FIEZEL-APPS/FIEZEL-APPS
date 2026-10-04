@@ -2151,3 +2151,18 @@ body:not(.theme-dark):not(.fz-lux) .card-light .braincore-pill.schedule,
 }
 
 
+
+/* Fase 2 audit umpan balik (G5): satu anak tangga bantuan BrainCore di giliran retry —
+   pertanyaan penuntun / pegangan ingatan / contoh mirip dari soal lain. Palet sama dengan
+   .tutor-steps (style.css) yang kontrasnya sudah diukur: teks #1C1917 dan label #78350F di
+   latar #FFF8EE. */
+.tutor-ladder{
+  margin:12px 0 2px;padding:12px 14px;border-radius:var(--radius-sm, 10px);
+  background:#FFF8EE !important;border:1.5px solid #FDE68A !important;
+}
+.tutor-ladder .eyebrow{display:block;margin-bottom:6px;color:#78350F !important;font-weight:800 !important}
+.tutor-ladder .tutor-turn-ask{margin:0;font-size:.92rem;line-height:1.6;color:#1C1917 !important;font-weight:600 !important}
+.tutor-ladder-now{
+  margin:10px 0 0;padding-top:9px;border-top:1px dashed #D97706;
+  font-size:.92rem;line-height:1.55;font-weight:700;color:#78350F !important;
+}

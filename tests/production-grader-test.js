@@ -118,6 +118,29 @@ test('alternates diterima (kontraksi do not / don\'t)', () => {
   assert.strictEqual(r.rationale, 'brain3_production_alternate_accepted');
 });
 
+// (e2) Kontraksi setara tanpa harus didaftarkan per item (audit grammar-feedback 2026-10-03:
+// 321 dari 436 item cloze tidak punya alternates, jadi "cannot" untuk kunci "can't" divonis salah).
+test('kontraksi tak-ambigu setara tanpa alternates', () => {
+  const pairs = [['cannot', "can't"], ['can not', "can't"], ['do not have to', "don't have to"],
+    ['must not', "mustn't"], ["should've warned", 'should have warned'], ['I am', "I'm"],
+    ['will not', "won't"], ['is not', "isn't"]];
+  for (const [answer, target] of pairs) {
+    const r = grader.grade(answer, target);
+    assert.strictEqual(r.ok, true, answer + ' harus setara dengan ' + target);
+    assert.strictEqual(r.rationale, 'brain3_production_contraction_equivalent');
+  }
+});
+
+test("kontraksi ambigu ('s, 'd) TIDAK diseragamkan", () => {
+  assert.strictEqual(grader.grade('he is', "he's").ok, false, "'s bisa is/has/posesif");
+  assert.strictEqual(grader.grade('she had', "she'd").ok, false, "'d bisa had/would");
+});
+
+test('kontraksi tidak melonggarkan sinyal morfem', () => {
+  const r = grader.grade("doesn't goes", "doesn't go");
+  assert.strictEqual(r.ok, false, 'salah bentuk kata kerja tetap salah walau kontraksinya sama');
+});
+
 test('alternates juga mendapat toleransi typo non-inisial', () => {
   const r = grader.grade('colour', 'color', { alternates: ['colour'] });
   assert.strictEqual(r.ok, true);
