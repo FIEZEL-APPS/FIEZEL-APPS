@@ -243,7 +243,7 @@ async function synthesizeGemini(text, voiceName, apiKey) {
       let detail = '';
       try { detail = await response.text(); } catch (_) {}
       lastError = `http_${response.status}: ${detail.slice(0, 200)}`;
-      const isDailyExhausted = /GenerateContentRequestsPerDayPerProject/i.test(detail);
+      const isDailyExhausted = /GenerateContentRequestsPerDayPerProject|exceeded your current quota/i.test(detail);
       if (isDailyExhausted) {
         return { fatal: `Kuota harian Gemini tercapai (HTTP 429: ${detail.slice(0, 200)})` };
       }
