@@ -1,7 +1,7 @@
 {
-  "version": "m025-453",
+  "version": "m025-454",
   "claimedBy": "branch main",
-  "claimedAt": "2026-10-04T10:43:04.656Z",
-  "reason": "fix(ci): strengthen e2e service worker registration check and release m025-453",
+  "claimedAt": "2026-10-04T10:51:24.054Z",
+  "reason": "fix(ci): ensure service worker registration in e2e test suite and bump to m025-454",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

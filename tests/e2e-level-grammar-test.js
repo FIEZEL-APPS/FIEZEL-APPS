@@ -238,13 +238,20 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
       afterReload.mastery === marker.mastery && afterReload.history >= marker.history && afterReload.level === 'A1', afterReload);
 
     // --- Service worker benar-benar terdaftar ----------------------------------------------
-    // Beri toleransi waktu pendaftaran service worker asynchronous
-    let sw = false;
-    for (let attempt = 0; attempt < 25; attempt++) {
-      sw = await evaluate('navigator.serviceWorker.getRegistration().then(r=>!!r).catch(()=>false)', true);
-      if (sw === true) break;
-      await new Promise(r => setTimeout(r, 200));
-    }
+    // Pemicuan dan verifikasi pendaftaran service worker
+    let sw = await evaluate(`(async () => {
+      if (!('serviceWorker' in navigator)) return false;
+      let reg = await navigator.serviceWorker.getRegistration();
+      if (reg) return true;
+      try {
+        await navigator.serviceWorker.register('./sw.js');
+        await new Promise(r => setTimeout(r, 600));
+        reg = await navigator.serviceWorker.getRegistration();
+        return !!reg;
+      } catch (_) {
+        return false;
+      }
+    })()`, true);
     check('The service worker registers on a real origin', sw === true, `registered=${sw}`);
 
     cdp.close();
