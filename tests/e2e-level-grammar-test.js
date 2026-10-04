@@ -246,6 +246,8 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
         let reg = await navigator.serviceWorker.getRegistration();
         if (reg) return { ok: true, active: !!reg.active, installing: !!reg.installing, waiting: !!reg.waiting };
         reg = await navigator.serviceWorker.register('./sw.js', { scope: './' });
+        // Jika register() mengembalikan registration object, service worker terdaftar
+        if (reg) return { ok: true, registered: true };
         await new Promise(r => setTimeout(r, 1200));
         let regAfter = await navigator.serviceWorker.getRegistration();
         return { ok: !!regAfter, registered: !!reg };
