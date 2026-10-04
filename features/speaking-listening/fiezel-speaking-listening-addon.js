@@ -578,7 +578,8 @@
       if(!say||typeof say.say!=='function')return Promise.reject(new Error('voice_door_unavailable'));
       this.stop();
       const rate=clamp(options.rate??this.config.ttsRate,.55,1.3);
-      return say.say(String(text||''),{speed:rate})
+      const sayOptions={speed:rate};if(options.suppressSubtitles===true)sayOptions.suppressSubtitles=true;
+      return say.say(String(text||''),sayOptions)
         .then(ok=>{ if(ok===false)throw new Error('voice_playback_failed'); return {provider:'puter-txt2speech'}; });
     }
     /* V6 (reports/voice-v5-prefetch.md §3 baris 3): menghangatkan naskah item BERIKUTNYA.

@@ -17788,7 +17788,19 @@ prefetchPlacementListening();
 // Pemanasan pertama di atas hampir pasti tidak menemukan apa pun: runtime suara sekarang
 // baru tiba setelah layar pertama tercat. Tanpa pengulangan ini, ketukan pertama murid
 // akan menanggung seluruh ongkos inisialisasi yang justru ingin dipindahkan ke waktu idle.
-document.addEventListener?.('fiezel:lazy-group',event=>{if(event?.detail?.group==='voice')warmNeuralVoice()});
+// m025-462: indeks audio R2 (~640 KB) ikut dipanaskan di jendela idle. Dulu ia baru diambil
+// saat murid menekan Dengarkan pertama kali, jadi ketukan itu menunggu unduhan + parse
+// indeks sebelum MP3-nya sendiri sempat diminta. load() berbagi satu janji, jadi say()
+// yang datang lebih cepat dari idle tidak mengunduh dua kali.
+function warmAudioManifest(){
+  const manifest=window.FiezelAudioManifest;
+  if(!manifest||typeof manifest.load!=='function')return;
+  const run=()=>{if(document.visibilityState==='hidden')return;try{manifest.load()?.catch?.(()=>{})}catch{}};
+  if(typeof window.requestIdleCallback==='function')window.requestIdleCallback(run,{timeout:3000});
+  else setTimeout(run,800);
+}
+warmAudioManifest();
+document.addEventListener?.('fiezel:lazy-group',event=>{if(event?.detail?.group==='voice'){warmNeuralVoice();warmAudioManifest()}});
 /* ================================================================================== */
 /* FIEZEL ONLINE / SOSIAL (frontend SLOT 7) — view 'online', evidence outbox, sorakan. */
 /*                                                                                    */
