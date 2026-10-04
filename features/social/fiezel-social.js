@@ -46,7 +46,10 @@
     evidence:'/api/social/rank/evidence',
     boardFriends:'/api/social/rank/board/friends',
     boardLeague:'/api/social/rank/board/league',
-    optout:'/api/social/rank/optout'
+    optout:'/api/social/rank/optout',
+    stageActive:'/api/stage/active',
+    stageInvite:'/api/stage/invite',
+    stageInvites:'/api/stage/invites'
   });
   // Enum stiker sorakan (token mesin dari server; emoji + label urusan sini).
   var STICKERS=Object.freeze([
@@ -247,7 +250,10 @@
     cheer:function(handle,sticker){return call(API_PATHS.cheer,{handle:String(handle||''),sticker:String(sticker||'')})},
     boardFriends:function(){return call(API_PATHS.boardFriends)},
     boardLeague:function(){return call(API_PATHS.boardLeague)},
-    optout:function(hidden){return call(API_PATHS.optout,{hidden:hidden===true})}
+    optout:function(hidden){return call(API_PATHS.optout,{hidden:hidden===true})},
+    stageActive:function(){return call(API_PATHS.stageActive)},
+    stageInvite:function(toHandle,roomId,title,fromHandle,fromName){return call(API_PATHS.stageInvite,{toHandle:String(toHandle||'').replace(/^@/,'').toLowerCase(),roomId:String(roomId||'').toUpperCase(),title:String(title||'Panggung Suara Live'),fromHandle:String(fromHandle||''),fromName:String(fromName||'')})},
+    stageInvites:function(handle){var p=API_PATHS.stageInvites+(handle?('?handle='+encodeURIComponent(String(handle).replace(/^@/,'').toLowerCase())):'');return call(p)}
   });
 
   // ---------------------------------------------------------------- outbox bukti (offline-first)

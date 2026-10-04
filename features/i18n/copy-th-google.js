@@ -90,7 +90,7 @@
     'auth.layar.sudah-guru': 'มีบัญชีครูแล้วใช่ไหม?',
     'auth.layar.ulangi-sandi': 'ยืนยันรหัสผ่าน',
     'auth.layar.welcome-lead': 'เรียนภาษาอังกฤษและภาษาญี่ปุ่นแบบปรับตัว เข้าสู่ระบบครั้งเดียว ความคืบหน้าของคุณตามไปทุกเครื่อง',
-    /* --- m025-455 progres ikut akun (sinkron berizin) --- */
+    /* --- m025-462 progres ikut akun (sinkron berizin) --- */
     'sinkron.judul': "ความคืบหน้าตามบัญชี",
     'sinkron.baru-saja': "เมื่อสักครู่",
     'sinkron.menit-lalu': "{n} นาทีที่แล้ว",

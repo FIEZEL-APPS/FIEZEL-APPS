@@ -97,6 +97,7 @@ async function stageGate(ctx) {
 const SCHEMA_CREATE = {
   allow: {
     hostName: { type: 'string', max: 24 },
+    hostHandle: { type: 'string', max: 24 },
     title: { type: 'string', max: 40 }
   }
 };
@@ -113,6 +114,41 @@ const SCHEMA_LEAVE = {
   allow: {
     roomId: { type: 'string', max: 8, required: true },
     peerId: { type: 'string', max: 64, required: true }
+  }
+};
+
+const SCHEMA_HAND_RAISE = {
+  allow: {
+    roomId: { type: 'string', max: 8, required: true },
+    peerId: { type: 'string', max: 64, required: true },
+    peerName: { type: 'string', max: 24 }
+  }
+};
+
+const SCHEMA_HAND_DECIDE = {
+  allow: {
+    roomId: { type: 'string', max: 8, required: true },
+    hostPeerId: { type: 'string', max: 64, required: true },
+    targetPeerId: { type: 'string', max: 64, required: true },
+    action: { type: 'string', max: 16, required: true }
+  }
+};
+
+const SCHEMA_SPEAKER_DEMOTE = {
+  allow: {
+    roomId: { type: 'string', max: 8, required: true },
+    hostPeerId: { type: 'string', max: 64, required: true },
+    targetPeerId: { type: 'string', max: 64, required: true }
+  }
+};
+
+const SCHEMA_STAGE_INVITE = {
+  allow: {
+    toHandle: { type: 'string', max: 24, required: true },
+    fromHandle: { type: 'string', max: 24 },
+    fromName: { type: 'string', max: 24 },
+    roomId: { type: 'string', max: 8, required: true },
+    title: { type: 'string', max: 40 }
   }
 };
 
@@ -146,6 +182,7 @@ async function routeCreate(ctx) {
 
   const res = stageSignalingCoreInstance.createRoom({
     hostName: shape.value.hostName || 'Host',
+    hostHandle: shape.value.hostHandle || '',
     title: shape.value.title || 'Sarang Suara Live'
   });
   return jsonResponse(res, gate.opt);
@@ -229,6 +266,90 @@ async function routeLeave(ctx) {
   return jsonResponse({ ok: true }, gate.opt);
 }
 
+async function routeHandRaise(ctx) {
+  const gate = await stageGate(ctx);
+  if (gate.deny) return gate.deny;
+  const body = await readJsonFromCtx(ctx, gate.opt);
+  if (!body.ok) return body.response;
+  const shape = validateShape(body.value, SCHEMA_HAND_RAISE);
+  if (!shape.ok) return jsonError(400, ERR.SCHEMA_INVALID, {}, gate.opt);
+
+  const res = stageSignalingCoreInstance.raiseHand({
+    roomId: shape.value.roomId,
+    peerId: shape.value.peerId,
+    peerName: shape.value.peerName
+  });
+  return jsonResponse(res, { ...gate.opt, status: res.ok ? 200 : 400 });
+}
+
+async function routeHandDecide(ctx) {
+  const gate = await stageGate(ctx);
+  if (gate.deny) return gate.deny;
+  const body = await readJsonFromCtx(ctx, gate.opt);
+  if (!body.ok) return body.response;
+  const shape = validateShape(body.value, SCHEMA_HAND_DECIDE);
+  if (!shape.ok) return jsonError(400, ERR.SCHEMA_INVALID, {}, gate.opt);
+
+  const res = stageSignalingCoreInstance.decideHand({
+    roomId: shape.value.roomId,
+    hostPeerId: shape.value.hostPeerId,
+    targetPeerId: shape.value.targetPeerId,
+    action: shape.value.action
+  });
+  return jsonResponse(res, { ...gate.opt, status: res.ok ? 200 : 400 });
+}
+
+async function routeSpeakerDemote(ctx) {
+  const gate = await stageGate(ctx);
+  if (gate.deny) return gate.deny;
+  const body = await readJsonFromCtx(ctx, gate.opt);
+  if (!body.ok) return body.response;
+  const shape = validateShape(body.value, SCHEMA_SPEAKER_DEMOTE);
+  if (!shape.ok) return jsonError(400, ERR.SCHEMA_INVALID, {}, gate.opt);
+
+  const res = stageSignalingCoreInstance.demoteSpeaker({
+    roomId: shape.value.roomId,
+    hostPeerId: shape.value.hostPeerId,
+    targetPeerId: shape.value.targetPeerId
+  });
+  return jsonResponse(res, { ...gate.opt, status: res.ok ? 200 : 400 });
+}
+
+async function routeStageInvite(ctx) {
+  const gate = await stageGate(ctx);
+  if (gate.deny) return gate.deny;
+  const body = await readJsonFromCtx(ctx, gate.opt);
+  if (!body.ok) return body.response;
+  const shape = validateShape(body.value, SCHEMA_STAGE_INVITE);
+  if (!shape.ok) return jsonError(400, ERR.SCHEMA_INVALID, {}, gate.opt);
+
+  const res = stageSignalingCoreInstance.sendStageInvite({
+    toHandle: shape.value.toHandle,
+    fromHandle: shape.value.fromHandle,
+    fromName: shape.value.fromName,
+    roomId: shape.value.roomId,
+    title: shape.value.title
+  });
+  return jsonResponse(res, { ...gate.opt, status: res.ok ? 200 : 400 });
+}
+
+async function routeStageInvites(ctx) {
+  const gate = await stageGate(ctx);
+  if (gate.deny) return gate.deny;
+  const handle = ctx.url && ctx.url.searchParams ? ctx.url.searchParams.get('handle') : null;
+
+  const res = stageSignalingCoreInstance.getStageInvites({ handle });
+  return jsonResponse(res, gate.opt);
+}
+
+async function routeStageActive(ctx) {
+  const gate = await stageGate(ctx);
+  if (gate.deny) return gate.deny;
+
+  const res = stageSignalingCoreInstance.getActiveStages();
+  return jsonResponse(res, gate.opt);
+}
+
 /* ========================================================== pendaftaran rute ====== */
 
 export const ROUTES = [
@@ -237,5 +358,11 @@ export const ROUTES = [
   ['POST', '/api/stage/signal', routeSignal],
   ['GET', '/api/stage/poll', routePoll],
   ['POST', '/api/stage/state', routeState],
-  ['POST', '/api/stage/leave', routeLeave]
+  ['POST', '/api/stage/leave', routeLeave],
+  ['POST', '/api/stage/hand/raise', routeHandRaise],
+  ['POST', '/api/stage/hand/decide', routeHandDecide],
+  ['POST', '/api/stage/speaker/demote', routeSpeakerDemote],
+  ['POST', '/api/stage/invite', routeStageInvite],
+  ['GET', '/api/stage/invites', routeStageInvites],
+  ['GET', '/api/stage/active', routeStageActive]
 ];

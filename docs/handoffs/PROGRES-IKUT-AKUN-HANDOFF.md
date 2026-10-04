@@ -1,4 +1,4 @@
-# Progres ikut akun — Sprint 1 Lapis 0 (m025-455)
+# Progres ikut akun — Sprint 1 Lapis 0 (m025-462)
 
 Wewenang: OWNER, 4 Oktober 2026. Keputusan owner: **sinkron progres menyala otomatis
 setelah izin orang tua/wali tercatat**; murid/ortu tetap bisa mematikan dan menghapus.

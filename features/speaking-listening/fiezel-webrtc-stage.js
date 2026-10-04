@@ -230,6 +230,8 @@
       this.broadcastChannel = null;
       this.pollInterval = null;
       this.pollActive = false;
+      this.hostHandle = options.hostHandle || '';
+      this.handsRaised = [];
 
       this.listeners = {
         connected: [],
@@ -237,12 +239,19 @@
         peerLeft: [],
         audioTrackAdded: [],
         connectionStateChange: [],
-        error: []
+        error: [],
+        handRaised: [],
+        handDecided: [],
+        rolePromoted: [],
+        roleDemoted: [],
+        audioLevel: [],
+        peerRoleChanged: []
       };
     }
 
     on(event, callback) {
-      if (this.listeners[event]) this.listeners[event].push(callback);
+      if (!this.listeners[event]) this.listeners[event] = [];
+      this.listeners[event].push(callback);
     }
 
     emit(event, data) {
@@ -268,7 +277,22 @@
         },
         video: false
       });
+      this.startLocalAudioMeter();
       return this.localStream;
+    }
+
+    startLocalAudioMeter() {
+      if (!this.localStream) return;
+      if (this.meters.has('local')) {
+        this.meters.get('local').stop();
+        this.meters.delete('local');
+      }
+      var self = this;
+      var meter = createAudioMeter(this.localStream, function (lvl) {
+        var activeLvl = self.isMuted ? 0 : lvl;
+        self.emit('audioLevel', { peerId: self.peerId || 'local', level: activeLvl });
+      });
+      this.meters.set('local', meter);
     }
 
     setMuted(muted) {
@@ -280,6 +304,7 @@
         this.localStream.getAudioTracks().forEach(function (track) {
           track.enabled = !mutedNow;
         });
+        this.emit('audioLevel', { peerId: this.peerId || 'local', level: 0 });
       }
     }
 
@@ -287,8 +312,10 @@
     async createRoom(opts) {
       opts = opts || {};
       var hostName = opts.hostName || 'Host';
+      var hostHandle = opts.hostHandle || this.hostHandle || '';
       var title = opts.title || t('stage.default-room-title', 'Sarang Suara');
       this.peerName = hostName;
+      this.hostHandle = hostHandle;
       var data = null;
 
       if (this.mode !== 'channel') {
@@ -302,7 +329,7 @@
             var resp = await transport('/api/stage/create', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ hostName: hostName, title: title })
+              body: JSON.stringify({ hostName: hostName, hostHandle: hostHandle, title: title })
             });
             var body = await resp.json().catch(function () { return null; });
             if (resp.ok && body && body.ok) data = body;
@@ -329,6 +356,7 @@
       this.roomId = data.roomId;
       this.peerId = data.peerId;
       this.role = 'host';
+      this.handsRaised = [];
       // Ruang lokal (BroadcastChannel tab ganda / mockup) TIDAK punya catatan di server,
       // jadi leave() harus melewatkan /api/stage/leave supaya tidak memicu 404/400 palsu.
       this.localRoom = !!data.local;
@@ -343,7 +371,7 @@
       opts = opts || {};
       var roomId = opts.roomId;
       var peerName = opts.peerName || 'Teman';
-      var role = opts.role || 'speaker';
+      var role = opts.role || 'audience';
       this.peerName = peerName;
       var data = null;
 
@@ -394,6 +422,7 @@
       this.roomId = data.roomId;
       this.peerId = data.peerId;
       this.role = data.role;
+      this.handsRaised = Array.isArray(data.handsRaised) ? data.handsRaised : [];
       // idem createRoom(): ruang lokal tidak terdaftar di server -> leave() senyap.
       this.localRoom = !!data.local;
 
@@ -443,10 +472,16 @@
       var pc = new RTCPeerConnection(DEFAULT_RTC_CONFIG);
       this.peerConnections.set(remotePeerId, pc);
 
-      if (this.localStream) {
+      if (this.localStream && (this.role === 'host' || this.role === 'speaker')) {
         this.localStream.getTracks().forEach(function (track) {
           pc.addTrack(track, self.localStream);
         });
+      } else {
+        try {
+          if (typeof pc.addTransceiver === 'function') {
+            pc.addTransceiver('audio', { direction: 'recvonly' });
+          }
+        } catch (_) {}
       }
 
       pc.onicecandidate = function (event) {
@@ -458,6 +493,12 @@
       pc.ontrack = function (event) {
         var remoteStream = event.streams[0] || new MediaStream([event.track]);
         self.playRemoteStream(remotePeerId, remoteStream);
+        if (!self.meters.has(remotePeerId)) {
+          var meter = createAudioMeter(remoteStream, function (lvl) {
+            self.emit('audioLevel', { peerId: remotePeerId, level: lvl });
+          });
+          self.meters.set(remotePeerId, meter);
+        }
         self.emit('audioTrackAdded', { peerId: remotePeerId, stream: remoteStream });
       };
 
@@ -596,9 +637,87 @@
         return;
       }
 
+      if (item.type === 'hand_raised') {
+        var handItem = {
+          peerId: item.peerId,
+          name: item.name || 'Teman',
+          timestamp: item.timestamp || Date.now()
+        };
+        var existingIdx = -1;
+        for (var h = 0; h < this.handsRaised.length; h++) {
+          if (this.handsRaised[h].peerId === item.peerId) { existingIdx = h; break; }
+        }
+        if (existingIdx >= 0) this.handsRaised[existingIdx] = handItem;
+        else this.handsRaised.push(handItem);
+
+        this.emit('handRaised', handItem);
+        return;
+      }
+
+      if (item.type === 'hand_decided') {
+        var approved = item.approved === true;
+        this.emit('handDecided', { approved: approved, role: approved ? 'speaker' : 'audience' });
+        if (approved) {
+          this.role = 'speaker';
+          this.emit('rolePromoted', { role: 'speaker' });
+          var selfPromote = this;
+          this.initLocalAudio().then(async function () {
+            selfPromote.startLocalAudioMeter();
+            for (var [pId, pc] of selfPromote.peerConnections.entries()) {
+              if (selfPromote.localStream) {
+                selfPromote.localStream.getTracks().forEach(function (t) {
+                  try { pc.addTrack(t, selfPromote.localStream); } catch (_) {}
+                });
+                try {
+                  var offer = await pc.createOffer();
+                  await pc.setLocalDescription(offer);
+                  selfPromote.sendSignalToPeer(pId, { type: 'offer', sdp: pc.localDescription });
+                } catch (e) {
+                  console.warn('Renegotiation notice:', e);
+                }
+              }
+            }
+          }).catch(function (e) { console.warn('Promote mic error:', e); });
+        }
+        return;
+      }
+
+      if (item.type === 'peer_role_changed') {
+        if (item.peerId === this.peerId && item.role) {
+          this.role = item.role;
+        }
+        this.emit('peerRoleChanged', { peerId: item.peerId, role: item.role, name: item.name });
+        return;
+      }
+
+      if (item.type === 'speaker_demoted') {
+        if (!item.toPeerId || item.toPeerId === this.peerId) {
+          this.role = 'audience';
+          if (this.localStream) {
+            this.localStream.getTracks().forEach(function (track) { track.stop(); });
+            this.localStream = null;
+          }
+          if (this.meters.has('local')) {
+            this.meters.get('local').stop();
+            this.meters.delete('local');
+          }
+          this.emit('roleDemoted', { role: 'audience' });
+        }
+        return;
+      }
+
       var fromPeerId = item.fromPeerId;
       var signal = item.signal;
       if (!fromPeerId || !signal) return;
+
+      if (signal.type === 'request_speak') {
+        this.emit('handRaised', { peerId: fromPeerId, name: signal.name || 'Teman', timestamp: Date.now() });
+        return;
+      }
+      if (signal.type === 'grant_speak') {
+        this.emit('handDecided', { approved: true, role: 'speaker' });
+        return;
+      }
 
       var pc = this.initPeerConnection(fromPeerId, false);
 
@@ -614,6 +733,97 @@
           await pc.addIceCandidate(new RTCIceCandidate(signal.candidate))
             .catch(function (e) { console.warn('ICE candidate notice:', e); });
         }
+      }
+    }
+
+    async requestToSpeak() {
+      if (this.role === 'host' || this.role === 'speaker') {
+        return { ok: true, alreadySpeaker: true };
+      }
+      if (this.broadcastChannel) {
+        this.broadcastChannel.postMessage({
+          type: 'hand_raised',
+          roomId: this.roomId,
+          peerId: this.peerId,
+          name: this.peerName
+        });
+        return { ok: true };
+      }
+      try {
+        var resp = await transport('/api/stage/hand/raise', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            roomId: this.roomId,
+            peerId: this.peerId,
+            peerName: this.peerName
+          })
+        });
+        var data = await resp.json().catch(function () { return null; });
+        return data || { ok: true };
+      } catch (err) {
+        console.warn('Gagal angkat tangan:', err);
+        return { ok: false, error: err.message };
+      }
+    }
+
+    async decideHand(targetPeerId, action) {
+      action = action || 'approve';
+      this.handsRaised = this.handsRaised.filter(function (h) { return h.peerId !== targetPeerId; });
+
+      if (this.broadcastChannel) {
+        this.broadcastChannel.postMessage({
+          type: 'hand_decided',
+          toPeerId: targetPeerId,
+          approved: action === 'approve',
+          role: action === 'approve' ? 'speaker' : 'audience'
+        });
+        return { ok: true };
+      }
+
+      try {
+        var resp = await transport('/api/stage/hand/decide', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            roomId: this.roomId,
+            hostPeerId: this.peerId,
+            targetPeerId: targetPeerId,
+            action: action
+          })
+        });
+        var data = await resp.json().catch(function () { return null; });
+        return data || { ok: true };
+      } catch (err) {
+        console.warn('Gagal memutuskan tangan:', err);
+        return { ok: false, error: err.message };
+      }
+    }
+
+    async demoteSpeaker(targetPeerId) {
+      if (this.broadcastChannel) {
+        this.broadcastChannel.postMessage({
+          type: 'speaker_demoted',
+          toPeerId: targetPeerId
+        });
+        return { ok: true };
+      }
+
+      try {
+        var resp = await transport('/api/stage/speaker/demote', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            roomId: this.roomId,
+            hostPeerId: this.peerId,
+            targetPeerId: targetPeerId
+          })
+        });
+        var data = await resp.json().catch(function () { return null; });
+        return data || { ok: true };
+      } catch (err) {
+        console.warn('Gagal demote speaker:', err);
+        return { ok: false, error: err.message };
       }
     }
 
@@ -677,6 +887,49 @@
     }
   }
 
+  async function sendStageInvite(opts) {
+    opts = opts || {};
+    try {
+      await ensureAnon();
+      var resp = await transport('/api/stage/invite', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          toHandle: opts.toHandle,
+          fromHandle: opts.fromHandle,
+          fromName: opts.fromName,
+          roomId: opts.roomId,
+          title: opts.title
+        })
+      });
+      return await resp.json().catch(function () { return { ok: false }; });
+    } catch (e) {
+      return { ok: false, error: e.message };
+    }
+  }
+
+  async function getStageInvites(opts) {
+    opts = opts || {};
+    try {
+      await ensureAnon();
+      var path = '/api/stage/invites' + (opts.handle ? ('?handle=' + encodeURIComponent(opts.handle)) : '');
+      var resp = await transport(path, { method: 'GET' });
+      return await resp.json().catch(function () { return { ok: true, invites: [] }; });
+    } catch (e) {
+      return { ok: false, error: e.message, invites: [] };
+    }
+  }
+
+  async function getActiveStages() {
+    try {
+      await ensureAnon();
+      var resp = await transport('/api/stage/active', { method: 'GET' });
+      return await resp.json().catch(function () { return { ok: true, stages: [] }; });
+    } catch (e) {
+      return { ok: false, error: e.message, stages: [] };
+    }
+  }
+
   return {
     WebRtcStageClient: WebRtcStageClient,
     createAudioMeter: createAudioMeter,
@@ -684,6 +937,9 @@
     parseStageParam: parseStageParam,
     probeFlag: probeFlag,
     stageFlag: stageFlag,
-    ensureAnon: ensureAnon
+    ensureAnon: ensureAnon,
+    sendStageInvite: sendStageInvite,
+    getStageInvites: getStageInvites,
+    getActiveStages: getActiveStages
   };
 });

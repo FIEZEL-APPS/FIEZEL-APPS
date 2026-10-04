@@ -139,7 +139,7 @@ export const BYTE_LIMITS = Object.freeze({
   '/api/reminders/due': 2048,       // cron: filter + pagination
   '/api/reminders/ack': 4096,       // cron: id + kind + status + evidence
   '/api/brain/attempts': 100000,    // batch upload s/d 100 attempt records
-  '/api/brain/attempts/delete': 1024, // m025-455: hapus progres milik sub cookie ini (tanpa badan berarti)
+  '/api/brain/attempts/delete': 1024, // m025-462: hapus progres milik sub cookie ini (tanpa badan berarti)
   '/api/evolution/config': 8192,    // owner: konfigurasi evolusi konten
   '/api/evolution/status': 512,     // GET, tanpa body
   '/api/content/qa/review': 20000,  // owner: item soal untuk QA review
@@ -156,7 +156,13 @@ export const BYTE_LIMITS = Object.freeze({
   '/api/stage/signal': 16384,
   '/api/stage/poll': 512,           // GET, tanpa body
   '/api/stage/state': 4096,
-  '/api/stage/leave': 512
+  '/api/stage/leave': 512,
+  '/api/stage/hand/raise': 512,
+  '/api/stage/hand/decide': 512,
+  '/api/stage/speaker/demote': 512,
+  '/api/stage/invite': 1024,
+  '/api/stage/invites': 512,        // GET, tanpa body
+  '/api/stage/active': 512          // GET, tanpa body
 });
 
 /** Cap terakhir untuk path yang tidak terdaftar: kecil, sengaja. */

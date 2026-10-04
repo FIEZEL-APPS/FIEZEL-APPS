@@ -1,6 +1,6 @@
 'use strict';
 /**
- * Gerbang PROGRES IKUT AKUN (m025-455) — docs/handoffs/PROGRES-IKUT-AKUN-HANDOFF.md.
+ * Gerbang PROGRES IKUT AKUN (m025-462) — docs/handoffs/PROGRES-IKUT-AKUN-HANDOFF.md.
  *
  * P1  allowlist server kembar dengan klien (fiezel-attempt-record.js ALLOWED)
  * P2  server menolak catatan berisi field asing (kalimat soal / jawaban tidak bisa tersimpan)
