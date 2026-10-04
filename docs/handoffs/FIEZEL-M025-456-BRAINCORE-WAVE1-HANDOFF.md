@@ -1,7 +1,7 @@
-# FIEZEL m025-455: BrainCore Gelombang 1, hasil BrainCore sampai ke Beranda, Progres, dan Grammar
+# FIEZEL m025-456: BrainCore Gelombang 1, hasil BrainCore sampai ke Beranda, Progres, dan Grammar
 
 Tanggal: 2026-10-04
-Release: `FIEZEL_PAGE_BUILD=m025-455`, `DIAG_BUILD=m025-455`, `SW_REV=m025-455-unified-grammar-20261002` (lewat
+Release: `FIEZEL_PAGE_BUILD=m025-456`, `DIAG_BUILD=m025-456`, `SW_REV=m025-456-unified-grammar-20261002` (lewat
 `tools/bump-build.mjs`). Perubahan `features/neural-voice/fiezel-diag-panel.js` HANYA nomor build.
 Branch: `claude/inspiring-franklin-xml8hz`, PR FIEZEL-APPS/FIEZEL-APPS#486.
 Otoritas: OWNER memilih "Mulai dari Beranda (Gelombang 1)" dari `reports/BRAINCORE-WIRING-AUDIT-2026-10-04.md` §3,
