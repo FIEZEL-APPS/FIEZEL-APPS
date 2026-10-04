@@ -1695,22 +1695,17 @@ html body #app .today-card.fz-stadium-card {
 }
 
 html, body {
-  background: #0A0A0E !important;
-  color: #F8FAFC !important;
+  background: #FAF8F5 !important;
+  color: #0F172A !important;
 }
 
-/* Headings on dark backgrounds */
-h1, h2, h3, h4, h5, h6 {
-  color: #FFFFFF !important;
-}
-
-/* Common text elements defaulting to readable light colors on dark surfaces */
+/* Common text elements defaulting to readable dark colors on daylight surfaces */
 .home-page,
 .section-head,
 .home-section-head,
 .learning-launcher,
 .home-today {
-  color: #F8FAFC !important;
+  color: #0F172A !important;
 }
 
 .home-section-head h2,
