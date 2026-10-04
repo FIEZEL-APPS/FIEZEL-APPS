@@ -71,8 +71,8 @@ check('P-A a hint popover left open by a practice session is closed when a measu
 // V-A / V-B — ulangan kosakata lintas level, paling rawan lupa dulu
 // ---------------------------------------------------------------------------------------
 {
-  const src = ['contentLevelFor', 'vocabReviewLevelOk', 'dueItems', 'vocabReviewQueue'].map(n => fn(n));
-  check('V extract vocabReviewLevelOk/dueItems/vocabReviewQueue from app.js', src.every(Boolean), src.map((s, i) => i + ':' + !!s).join(' '));
+  const src = ['contentLevelFor', 'reviewLevelOk', 'dueItems', 'vocabReviewQueue'].map(n => fn(n));
+  check('V extract reviewLevelOk/dueItems/vocabReviewQueue from app.js', src.every(Boolean), src.map((s, i) => i + ':' + !!s).join(' '));
   if (src.every(Boolean)) {
     const now = Date.now(), DAY = 86400000;
     const V = [

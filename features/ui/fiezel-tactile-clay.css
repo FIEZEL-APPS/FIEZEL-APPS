@@ -4736,40 +4736,70 @@ html body.fz-view-grammar #app .path-step .path-label .lesson-skip-link {
 .quiz-floating-retry {
   background: #FFFFFF !important;
   border: 1.5px solid #E2E8F0 !important;
-  border-radius: 9999px !important;
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12) !important;
-  padding: 8px 16px !important;
+  border-radius: 18px !important;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15) !important;
+  padding: 12px 18px !important;
   display: flex !important;
+  flex-direction: column !important;
   align-items: center !important;
-  justify-content: space-between !important;
-  gap: 12px !important;
-  max-width: 360px !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  width: calc(100% - 32px) !important;
+  max-width: 380px !important;
   margin: 0 auto !important;
+  box-sizing: border-box !important;
 }
 .retry-bar-label {
-  color: #D97706 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  color: #B45309 !important;
   font-weight: 700 !important;
-  font-size: 12.5px !important;
+  font-size: 13.5px !important;
+  text-align: center !important;
+  white-space: normal !important;
 }
 .retry-bar-label svg {
   color: #D97706 !important;
   width: 16px !important;
   height: 16px !important;
+  flex-shrink: 0 !important;
 }
 .retry-giveup-btn {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  max-width: 280px !important;
+  min-height: 40px !important;
   background: #0F172A !important;
   color: #FFFFFF !important;
   font-weight: 800 !important;
-  font-size: 12px !important;
-  border-radius: 9999px !important;
-  padding: 6px 14px !important;
+  font-size: 13px !important;
+  border-radius: 12px !important;
+  padding: 8px 16px !important;
   border: none !important;
   cursor: pointer !important;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.15) !important;
+  transition: transform 0.15s ease, background-color 0.15s ease !important;
+}
+.retry-giveup-btn:active {
+  transform: scale(0.98) !important;
 }
 
 /* ========================================================
-   9. EMERALD GREEN TUTOR HEAD & SPEED PILL
+   9. HIGH CONTRAST TUTOR TURN & TEACHER CLUE
    ======================================================== */
+#tutorTurn,
+.tutor-turn {
+  background: #FFFFFF !important;
+  border: 1.5px solid #E2E8F0 !important;
+  border-left: 4px solid #047857 !important;
+  border-radius: 16px !important;
+  padding: 14px 16px !important;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08) !important;
+}
 .tutor-turn-face,
 html body .tutor-turn .tutor-turn-face,
 #tutorTurn .tutor-turn-face {
@@ -4785,26 +4815,45 @@ html body .tutor-turn .tutor-turn-face svg,
 .tutor-turn-head b,
 html body .tutor-turn .tutor-turn-head b,
 #tutorTurn .tutor-turn-head b {
-  color: #10B981 !important;
+  color: #047857 !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.08em !important;
+}
+.tutor-turn-say,
+#tutorTurn .tutor-turn-say {
+  color: #0F172A !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  line-height: 1.55 !important;
+  margin: 6px 0 0 !important;
+}
+.tutor-turn-ask,
+#tutorTurn .tutor-turn-ask {
+  color: #0F172A !important;
+  font-size: 14.5px !important;
+  font-weight: 700 !important;
+  line-height: 1.55 !important;
+  margin: 8px 0 0 !important;
 }
 .tutor-speed-pill,
 html body .tutor-speed-pill,
 #tutorTurn .tutor-speed-pill {
   background: rgba(16, 185, 129, 0.16) !important;
-  color: #10B981 !important;
+  color: #047857 !important;
   border: 1px solid rgba(16, 185, 129, 0.35) !important;
 }
 .tutor-speed-pill svg,
 #tutorTurn .tutor-speed-pill svg {
-  color: #10B981 !important;
+  color: #047857 !important;
 }
 .tutor-diagnostic-clue,
 #tutorTurn .tutor-diagnostic-clue {
-  background: rgba(16, 185, 129, 0.12) !important;
-  border: 1px solid rgba(16, 185, 129, 0.3) !important;
+  background: #ECFDF5 !important;
+  border: 1.5px solid #A7F3D0 !important;
+  border-left: 4px solid #059669 !important;
   border-radius: 12px !important;
   padding: 10px 14px !important;
-  color: #E2E8F0 !important;
   display: flex !important;
   align-items: center !important;
   gap: 10px !important;
@@ -4812,16 +4861,107 @@ html body .tutor-speed-pill,
 }
 .tutor-diagnostic-clue svg,
 #tutorTurn .tutor-diagnostic-clue svg {
-  color: #10B981 !important;
+  color: #047857 !important;
   width: 18px !important;
   height: 18px !important;
   flex-shrink: 0 !important;
 }
 .tutor-diagnostic-clue span,
 #tutorTurn .tutor-diagnostic-clue span {
-  color: #ECFDF5 !important;
+  color: #064E3B !important;
+  font-weight: 700 !important;
   font-size: 13.5px !important;
   line-height: 1.45 !important;
+}
+.tutor-ladder {
+  background: #F8FAFC !important;
+  border: 1px solid #E2E8F0 !important;
+  border-radius: 12px !important;
+  padding: 10px 14px !important;
+  margin-top: 8px !important;
+}
+.tutor-ladder .eyebrow {
+  color: #047857 !important;
+  font-weight: 800 !important;
+  font-size: 11px !important;
+  text-transform: uppercase !important;
+}
+.tutor-ladder .tutor-turn-ask {
+  color: #0F172A !important;
+  font-weight: 700 !important;
+  font-size: 14px !important;
+}
+.tutor-ladder .tutor-ladder-now {
+  color: #334155 !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+}
+
+/* ULAS BARENG (RETEACH TUTOR CARD) */
+.tutor-card,
+.card .tutor-card {
+  background: #FFFFFF !important;
+  border: 1.5px solid #E2E8F0 !important;
+  border-radius: 20px !important;
+  padding: 20px !important;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08) !important;
+  display: grid !important;
+  gap: 14px !important;
+}
+.tutor-card-head small {
+  color: #047857 !important;
+  font-weight: 800 !important;
+  font-size: 12px !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase !important;
+  display: block !important;
+  margin-bottom: 2px !important;
+}
+.tutor-card-head b {
+  color: #0F172A !important;
+  font-size: 18px !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.01em !important;
+}
+.tutor-card-why {
+  color: #1E293B !important;
+  background: #F8FAFC !important;
+  border: 1px solid #E2E8F0 !important;
+  border-left: 4px solid #10B981 !important;
+  border-radius: 12px !important;
+  padding: 12px 14px !important;
+  font-size: 14px !important;
+  line-height: 1.55 !important;
+  margin: 0 !important;
+}
+.tutor-card-rule {
+  color: #0F172A !important;
+  font-weight: 700 !important;
+  font-size: 15px !important;
+  line-height: 1.55 !important;
+  margin: 0 !important;
+}
+.tutor-card-cue {
+  color: #334155 !important;
+  font-weight: 600 !important;
+  font-size: 13.5px !important;
+  line-height: 1.5 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin: 0 !important;
+}
+.tutor-card-cue svg {
+  color: #F59E0B !important;
+  width: 18px !important;
+  height: 18px !important;
+  flex-shrink: 0 !important;
+}
+#teachNext {
+  min-height: 48px !important;
+  font-weight: 800 !important;
+  font-size: 15px !important;
+  border-radius: 14px !important;
 }
 
 /* ========================================================
@@ -4883,5 +5023,310 @@ html body .tutor-speed-pill,
   cursor: pointer !important;
 }
 
+/* ========================================================
+   12. WIDE-SCREEN DESKTOP & TABLET COHESIVE FRAMING
+   Eliminates left-right empty void feeling across the app
+   ======================================================== */
+@media (min-width: 768px) {
+  body {
+    background: radial-gradient(circle at 50% 15%, #FFFDF8 0%, #F5EFEB 100%) !important;
+    background-attachment: fixed !important;
+  }
+  .app,
+  main.app {
+    max-width: 680px !important;
+    margin: 20px auto !important;
+    padding: 24px 28px calc(60px + env(safe-area-inset-bottom)) 28px !important;
+    background: #FFFFFF !important;
+    border: 1.5px solid #EFE8DF !important;
+    border-radius: 28px !important;
+    box-shadow: 0 20px 60px rgba(46, 39, 36, 0.08), 0 4px 16px rgba(46, 39, 36, 0.04) !important;
+    min-height: calc(100vh - 40px) !important;
+    box-sizing: border-box !important;
+    position: relative !important;
+    z-index: 2 !important;
+  }
+  body::before {
+    content: "" !important;
+    position: fixed !important;
+    inset: 0 !important;
+    background: radial-gradient(circle at 10% 25%, rgba(254, 243, 199, 0.4) 0%, transparent 50%),
+                radial-gradient(circle at 90% 75%, rgba(209, 250, 229, 0.3) 0%, transparent 50%) !important;
+    pointer-events: none !important;
+    z-index: 0 !important;
+  }
+}
 
+/* ========================================================
+   13. TOKEN ORDER (SUSUN KATA) PRECISE BALANCED ACTIONS
+   Full-width balanced 2-column actions grid
+   ======================================================== */
+.token-actions,
+#gxTokenOrderContainer .token-actions,
+.token-order-container .token-actions {
+  display: grid !important;
+  grid-template-columns: minmax(100px, 1fr) minmax(150px, 1.8fr) !important;
+  align-items: stretch !important;
+  gap: 12px !important;
+  width: 100% !important;
+  margin-top: 24px !important;
+  box-sizing: border-box !important;
+}
+
+.token-reset-btn,
+#gxTokenOrderContainer .token-reset-btn,
+.token-order-container .token-reset-btn,
+#tokenResetBtn {
+  min-height: 48px !important;
+  height: 48px !important;
+  padding: 0 16px !important;
+  background: #F8FAFC !important;
+  color: #334155 !important;
+  border: 1.5px solid #E2E8F0 !important;
+  border-bottom: 3.5px solid #CBD5E1 !important;
+  border-radius: 16px !important;
+  font-size: 14.5px !important;
+  font-weight: 700 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  cursor: pointer !important;
+  transition: all 120ms ease !important;
+  box-sizing: border-box !important;
+}
+
+.token-reset-btn svg,
+#tokenResetBtn svg {
+  width: 16px !important;
+  height: 16px !important;
+  color: #64748B !important;
+}
+
+.token-reset-btn:not(:disabled):hover,
+#tokenResetBtn:not(:disabled):hover {
+  background: #F1F5F9 !important;
+  color: #0F172A !important;
+  border-color: #CBD5E1 !important;
+}
+
+.token-reset-btn:not(:disabled):active,
+#tokenResetBtn:not(:disabled):active {
+  transform: translateY(2px) !important;
+  border-bottom-width: 1.5px !important;
+}
+
+.token-reset-btn:disabled,
+#tokenResetBtn:disabled {
+  opacity: 0.45 !important;
+  cursor: not-allowed !important;
+  background: #F8FAFC !important;
+  border-color: #E2E8F0 !important;
+  border-bottom-color: #E2E8F0 !important;
+  color: #94A3B8 !important;
+}
+
+.token-submit-btn,
+#gxTokenOrderContainer .token-submit-btn,
+.token-order-container .token-submit-btn,
+#tokenSubmitBtn {
+  min-height: 48px !important;
+  height: 48px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  padding: 0 20px !important;
+  font-size: 15px !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.01em !important;
+  border-radius: 16px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  cursor: pointer !important;
+  transition: all 120ms ease !important;
+  box-sizing: border-box !important;
+}
+
+/* Disabled state */
+.token-submit-btn:disabled,
+#tokenSubmitBtn:disabled {
+  background: #E2E8F0 !important;
+  color: #94A3B8 !important;
+  border: 1.5px solid #CBD5E1 !important;
+  border-bottom: 3.5px solid #CBD5E1 !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
+}
+
+/* Enabled normal state */
+.token-submit-btn:not(:disabled):not(.token-submit-retry),
+#tokenSubmitBtn:not(:disabled):not(.token-submit-retry) {
+  background: linear-gradient(180deg, #10B981, #059669) !important;
+  color: #FFFFFF !important;
+  border: none !important;
+  border-bottom: 3.5px solid #047857 !important;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25) !important;
+}
+
+.token-submit-btn:not(:disabled):not(.token-submit-retry):hover,
+#tokenSubmitBtn:not(:disabled):not(.token-submit-retry):hover {
+  background: linear-gradient(180deg, #059669, #047857) !important;
+}
+
+.token-submit-btn:not(:disabled):not(.token-submit-retry):active,
+#tokenSubmitBtn:not(:disabled):not(.token-submit-retry):active {
+  transform: translateY(2px) !important;
+  border-bottom-width: 1.5px !important;
+}
+
+/* Retry state (Periksa Ulang) */
+.token-submit-btn.token-submit-retry,
+#tokenSubmitBtn.token-submit-retry {
+  background: linear-gradient(180deg, #F59E0B, #D97706) !important;
+  color: #FFFFFF !important;
+  border: none !important;
+  border-bottom: 3.5px solid #B45309 !important;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25) !important;
+}
+
+.token-bank-label {
+  color: #334155 !important;
+  font-size: 13.5px !important;
+  font-weight: 700 !important;
+}
+
+/* ========================================================
+   14. ONBOARDING LANGUAGE PICKER (ZERO DOUBLE-CARD, SYMMETRIC)
+   Clean, high-contrast, country above flag, large flags
+   ======================================================== */
+.fiezel-language-sheet,
+div.fiezel-sheet.fiezel-language-sheet {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 32px 16px 24px !important;
+  margin: auto auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  text-align: center !important;
+  width: 100% !important;
+  max-width: 440px !important;
+  box-sizing: border-box !important;
+}
+
+.fiezel-language-sheet .fiezel-language-kicker {
+  display: inline-block !important;
+  font-size: 11.5px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.12em !important;
+  color: #D97706 !important;
+  background: #FEF3C7 !important;
+  border: 1px solid #FDE68A !important;
+  border-radius: 9999px !important;
+  padding: 4px 14px !important;
+  margin-bottom: 12px !important;
+  text-transform: uppercase !important;
+}
+
+.fiezel-language-sheet .fiezel-title,
+.fiezel-language-sheet h2.fiezel-title {
+  color: #0F172A !important;
+  font-family: var(--fz-display, "Instrument Serif", Georgia, serif) !important;
+  font-size: 30px !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.02em !important;
+  line-height: 1.2 !important;
+  margin: 0 0 10px 0 !important;
+  text-align: center !important;
+}
+
+.fiezel-language-sheet .fiezel-body {
+  color: #475569 !important;
+  font-size: 14.5px !important;
+  line-height: 1.55 !important;
+  margin: 0 auto 26px auto !important;
+  text-align: center !important;
+  max-width: 340px !important;
+}
+
+.fiezel-language-grid,
+div.fiezel-language-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 16px !important;
+  width: 100% !important;
+  max-width: 380px !important;
+  margin: 0 auto !important;
+  box-sizing: border-box !important;
+}
+
+.fiezel-language-choice,
+button.fiezel-language-choice {
+  background: #FFFFFF !important;
+  border: 1.5px solid #E2E8F0 !important;
+  border-bottom: 4px solid #CBD5E1 !important;
+  border-radius: 22px !important;
+  padding: 20px 14px 18px !important;
+  min-height: 136px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 14px !important;
+  cursor: pointer !important;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06) !important;
+  transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+}
+
+.fiezel-language-choice:hover {
+  background: #F8FAFC !important;
+  border-color: #94A3B8 !important;
+  border-bottom-color: #64748B !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.1) !important;
+}
+
+.fiezel-language-choice:active {
+  transform: translateY(2px) !important;
+  border-bottom-width: 2px !important;
+}
+
+.fiezel-language-choice.is-selected {
+  background: #F0F9FF !important;
+  border-color: #0284C7 !important;
+  border-bottom-color: #0369A1 !important;
+  box-shadow: 0 8px 24px rgba(2, 132, 199, 0.18) !important;
+}
+
+.fiezel-language-country {
+  display: block !important;
+  color: #0F172A !important;
+  font-size: 16.5px !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.01em !important;
+  text-align: center !important;
+  order: 1 !important;
+}
+
+.fiezel-language-flag {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  order: 2 !important;
+}
+
+.fiezel-language-flag .fiezel-flag-svg,
+.fiezel-language-choice .fiezel-flag-svg {
+  width: 68px !important;
+  height: 44px !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.12) !important;
+  border: 1px solid rgba(15, 23, 42, 0.1) !important;
+  display: block !important;
+}
 

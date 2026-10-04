@@ -26,12 +26,13 @@
 
 (function (root, factory) {
   if (typeof module === 'object' && module.exports) {
-    module.exports = factory();
+    module.exports = factory(root);
   } else {
-    root.FiezelWebRtcStage = factory();
+    root.FiezelWebRtcStage = factory(root);
   }
-})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+})(typeof globalThis !== 'undefined' ? globalThis : (typeof window !== 'undefined' ? window : this), function (root) {
   'use strict';
+  root = root || (typeof globalThis !== 'undefined' ? globalThis : (typeof window !== 'undefined' ? window : this));
 
   // Pembungkus i18n dengan cadangan kata (pola fiezel-class-hub.js): kalimat aslinya
   // berbahasa Indonesia dan menjadi cadangan; kuncinya tetap didaftarkan di copy-map
@@ -66,21 +67,26 @@
 
   function baseUrl() {
     try {
-      var cfg = root.FIEZEL_CF_CONFIG || {};
+      var r = root || (typeof globalThis !== 'undefined' ? globalThis : (typeof window !== 'undefined' ? window : this));
+      var cfg = (r && r.FIEZEL_CF_CONFIG) || {};
       return String(cfg.base || '').trim().replace(/\/$/, '');
     } catch (_) { return ''; }
   }
 
   function online() {
-    try { return !(root.navigator && root.navigator.onLine === false); } catch (_) { return true; }
+    try {
+      var r = root || (typeof globalThis !== 'undefined' ? globalThis : (typeof window !== 'undefined' ? window : this));
+      return !(r && r.navigator && r.navigator.onLine === false);
+    } catch (_) { return true; }
   }
 
   /** Transport signaling tunggal. Memakai coreWorkerExec app.js bila tersedia. */
   async function transport(path, options) {
     var opts = options || {};
-    if (typeof root.coreWorkerExec === 'function') {
+    var r = root || (typeof globalThis !== 'undefined' ? globalThis : (typeof window !== 'undefined' ? window : this));
+    if (r && typeof r.coreWorkerExec === 'function') {
       try {
-        var viaCore = await root.coreWorkerExec(path, opts);
+        var viaCore = await r.coreWorkerExec(path, opts);
         if (viaCore) return viaCore;
       } catch (_) { /* jatuh ke fetch langsung */ }
     }
@@ -300,7 +306,7 @@
             });
             var body = await resp.json().catch(function () { return null; });
             if (resp.ok && body && body.ok) data = body;
-            else if (body && body.error) return { ok: false, error: String(body.error), status: resp.status };
+            else if (body && body.error && body.error !== 'unauthenticated') return { ok: false, error: String(body.error), status: resp.status };
           } catch (e) {
             console.info('Server HTTP tidak terjangkau, memakai BroadcastChannel lokal:', e.message);
           }
@@ -356,7 +362,7 @@
             });
             var body = await resp.json().catch(function () { return null; });
             if (resp.ok && body && body.ok) data = body;
-            else if (body && body.error) return { ok: false, error: String(body.error), status: resp.status };
+            else if (body && body.error && body.error !== 'unauthenticated') return { ok: false, error: String(body.error), status: resp.status };
           } catch (e) {
             console.info('Server HTTP tidak terjangkau, memakai BroadcastChannel lokal:', e.message);
           }

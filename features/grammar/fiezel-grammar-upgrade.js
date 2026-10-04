@@ -125,18 +125,24 @@
     //     karena bank kosakata hanya memuat bentuk dasar.
     // Dulu kamusnya literal Indonesia di sini, jadi murid Thai membaca "dia (pr)".
     const glossFor = (text) => {
-      const lower = text.toLowerCase();
+      const lower = text.toLowerCase().replace(/^[^\w]+|[^\w]+$/g, '');
       const fromQ = (q.gloss && (q.gloss[text] || q.gloss[lower])) || '';
       if (fromQ) return String(fromQ);
+      const isThai = (self.FiezelI18n?.getLocale?.() === 'th');
+      const loc = isThai ? 'th' : 'id';
       const key = 'grammar.gloss.' + lower;
       try {
-        if (typeof FiezelI18n.hasCopy === 'function' && FiezelI18n.hasCopy('id', key)) return FiezelI18n.t(key);
+        if (typeof FiezelI18n.hasCopy === 'function' && FiezelI18n.hasCopy(loc, key)) return FiezelI18n.t(key);
       } catch (_) {}
+      if (self.FiezelGrammarLexicon && typeof self.FiezelGrammarLexicon.lookup === 'function') {
+        const gl = self.FiezelGrammarLexicon.lookup(lower, loc);
+        if (gl) return gl;
+      }
       return '';
     };
 
     const bankTokens = shuffle(allTokens.map((item, id) => {
-      const rawText = typeof item === 'object' && item.text ? item.text : String(item);
+      const rawText = typeof item === 'object' && item ? (item.text || item.option || item.word || '') : String(item ?? '');
       const text = rawText.replace(/^[.,\/#!$%\^&\*;:{}=\-_`~()“”"']+|[.,\/#!$%\^&\*;:{}=\-_`~()“”"']+$/g, '');
       const explicitSyntax = typeof item === 'object' && item.syntax ? item.syntax : '';
       const syntax = explicitSyntax || FiezelGrammarUpgrade.classifyWord(text);

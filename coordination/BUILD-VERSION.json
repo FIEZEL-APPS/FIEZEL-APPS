@@ -1,7 +1,7 @@
 {
-  "version": "m025-448",
+  "version": "m025-449",
   "claimedBy": "branch main",
-  "claimedAt": "2026-10-04T07:54:40.683Z",
-  "reason": "docs(stage): update audit handoff and th-ui-leak report",
+  "claimedAt": "2026-10-04T08:36:16.548Z",
+  "reason": "fix(ux): zero-leak thai tour and grammar badge, merge review continuity",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

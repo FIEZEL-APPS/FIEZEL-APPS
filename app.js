@@ -2990,16 +2990,18 @@ function memoryItemDifficulty(bucket,key){
    dihitung jatuh tempo. */
 /* Audit V-B 2026-10-04: naik level dulu menghapus ulangan KOSAKATA level lama dari hitungan dan
    dari sesi ulangan, selamanya - kata A1 yang jatuh tempo tidak pernah diulang lagi sesudah murid
-   pindah ke A2. Kosakata kini dihitung untuk semua level <= level aktif (vocabReviewLevelOk);
-   kunci yatim tetap tertolak karena contentLevelFor-nya kosong. Grammar/reading tidak berubah. */
-function vocabReviewLevelOk(level,active=getActiveLevel()){const i=LEVELS.indexOf(String(level||''));return i>=0&&i<=LEVELS.indexOf(active)}
-function dueItems(){const level=getActiveLevel();return [['vocab',state.vocab],['grammar',state.grammar],['reading',state.reading]].flatMap(([type,bucket])=>Object.entries(bucket||{}).filter(([key,x])=>x?.nextReview&&x.nextReview<=Date.now()&&(type==='vocab'?vocabReviewLevelOk(contentLevelFor(type,key),level):contentLevelFor(type,key)===level)))}
+   pindah ke A2. Kosakata kini dihitung untuk semua level <= level aktif (reviewLevelOk);
+   kunci yatim tetap tertolak karena contentLevelFor-nya kosong. Audit lanjutan 2026-10-04: lesson
+   grammar dan bacaan memakai aturan yang SAMA - sebelumnya keduanya hilang dari hitungan dan dari
+   sesi ulangan begitu murid naik level. */
+function reviewLevelOk(level,active=getActiveLevel()){const i=LEVELS.indexOf(String(level||''));return i>=0&&i<=LEVELS.indexOf(active)}
+function dueItems(){const level=getActiveLevel();return [['vocab',state.vocab],['grammar',state.grammar],['reading',state.reading]].flatMap(([type,bucket])=>Object.entries(bucket||{}).filter(([key,x])=>x?.nextReview&&x.nextReview<=Date.now()&&reviewLevelOk(contentLevelFor(type,key),level)))}
 /* Audit V-A 2026-10-04: antrean ulangan kosakata - kartu jatuh tempo di level <= aktif, paling
    rawan lupa lebih dulu (risiko dari model FSRS-lite yang sama yang menulis jadwalnya). Dipakai
    "Review jatuh tempo", "Uji kosakata", dan flashcards supaya ketiganya membaca jadwal yang sama. */
 function vocabReviewQueue(){
   const active=getActiveLevel(),now=Date.now();
-  return V.filter(v=>{const m=state.vocab?.[v.id];return m?.nextReview&&m.nextReview<=now&&vocabReviewLevelOk(v.level,active)})
+  return V.filter(v=>{const m=state.vocab?.[v.id];return m?.nextReview&&m.nextReview<=now&&reviewLevelOk(v.level,active)})
     .sort((a,b)=>(forgettingProbability(state.vocab[b.id])-forgettingProbability(state.vocab[a.id]))||(Number(state.vocab[a.id].nextReview)-Number(state.vocab[b.id].nextReview)));
 }
 function forgettingProbability(b){
@@ -3085,6 +3087,15 @@ function updateMastery(bucket,key,ok,ms=6000,confidence=null,attemptAt=Date.now(
   state.consecutiveWrong=ok?0:Number(state.consecutiveWrong||0)+1;
   if(!ok)state.lastWrongAt=Date.now();const accuracy=b.correct/Math.max(1,b.total);b.mastery=Math.min(100,Math.round(accuracy*100*Math.min(1,b.total/5)));scheduleNext(b,ok,ms,confidence,{now:attemptAt,baseStability,baseLapses,baseLapseBurden,baseStabilityDays,baseLastSeen,difficulty:itemDifficulty});b.lastSchedule={at:attemptAt,baseStability,baseLapses,baseLapseBurden,baseStabilityDays,baseLastSeen,difficulty:itemDifficulty,ok:!!ok,ms:Math.max(0,Number(ms)||0)};state[bucket][key]=b;save()}
 function markMastered(bucket,key){if(!key)return;const b=state[bucket][key]||{correct:0,total:0,streak:0,mastery:0};b.mastery=100;b.streak=Math.max(1,b.streak);b.stability=Math.max(30,b.stability||1);b.nextReview=Date.now()+Math.max(30,b.stability)*86400000;b.lastSeen=Date.now();b.lapseBurden=Math.max(0,Number(b.lapseBurden)||0)*.5;state[bucket][key]=b;save()}
+/* Audit V-E 2026-10-04: "Masih belajar" di flashcard adalah PENILAIAN DIRI, bukan jawaban salah.
+   Dulu tombol itu memanggil updateMastery(...,false): total naik, lapses naik, dan
+   consecutiveWrong naik - murid yang jujur berkata "belum hafal" saat menjelajah kartu tercatat
+   gagal, mastery-nya turun, dan bisa memicu pesan "kesulitan beruntun". Sekarang statistik
+   jawaban (total, benar, lapses, beruntun-salah, mastery) tidak disentuh; kartunya hanya
+   dijadwalkan kembali sebentar lagi (langkah belajar ala Anki), tidak pernah lebih lambat dari
+   jadwal yang sudah ada, supaya muncul di "Review jatuh tempo" dan "Uji kosakata" berikutnya. */
+const STILL_LEARNING_GAP_MS=10*60000;
+function markStillLearning(bucket,key){if(!key||!state[bucket])return;const now=Date.now(),b=state[bucket][key]||{correct:0,total:0,streak:0,mastery:0,nextReview:0,stability:1,lapses:0,lapseBurden:0,lastSeen:0,lastWrong:0};const soon=now+STILL_LEARNING_GAP_MS,current=Number(b.nextReview)||0;b.nextReview=current>now?Math.min(current,soon):soon;b.selfStillLearning=(Number(b.selfStillLearning)||0)+1;b.lastSelfRatedAt=now;state[bucket][key]=b;save()}
 function dailyBrief(){const due=dueItems();const profile=getDiagnosticProfile();const weak=Object.entries(profile.weakSkills).sort((a,b)=>b[1].score-a[1].score)[0]?.[0];return {review:due.length,weak:weak||FiezelI18n.t('home.brief-belum-pola'),goal:state.adaptiveReady?FiezelI18n.t('home.brief-goal-adaptif'):FiezelI18n.t('home.brief-goal-tes-awal')} }
 function getDiagnosticProfile(){
  const active=getActiveLevel(),history=(state.history||[]).filter(h=>historyMatchesActive(h,active)),profile={weakSkills:{},weakTypes:{},weakTargets:{},total:history.length,accuracy:history.length?history.filter(h=>h.ok).length/history.length:0};
@@ -3523,6 +3534,14 @@ function coreBrainWeakTarget(){
  * ikut kedaluwarsa oleh waktu: model ingatan bergantung pada usia materi, jadi potret satu
  * jam lalu bukan potret yang sama.
  */
+/* Audit P-C 2026-10-04: titik awal taksiran kemampuan = level aktif murid (hasil tes penempatan,
+   ujian lompat level, atau pilihannya sendiri), bukan konstanta 1,5 untuk semua orang. Dengan
+   prior 1,5 dan langkah Elo yang mengecil, 12 jawaban tidak cukup untuk menempuh jarak ke atas:
+   murid C2 masih ditaksir B1 (rerata 3,0) sehingga kesulitan adaptif sesi-sesi awalnya terlalu
+   mudah. Riwayat yang dibaca coreBrainAttempts() juga hanya milik level aktif, jadi prior dan
+   buktinya bicara tentang level yang sama. Level dipetakan ke θ = indeks level (A1=1 .. C2=6),
+   titik tengah yang sama dengan pemetaan balik modul (Math.round(ability)). */
+function coreBrainPriorAbility(){const i=LEVELS.indexOf(String(getActiveLevel()||''));return i>=0?i+1:1.5}
 function coreBrainSnapshot(now=Date.now()){
   if(!coreBrainAvailable())return null;
   const key=`${state.stateRevision||0}:${Math.floor(now/60000)}`;
@@ -3531,6 +3550,7 @@ function coreBrainSnapshot(now=Date.now()){
   try{
     value=self.FiezelCoreBrain.analyze({
       now,
+      priorAbility:coreBrainPriorAbility(),
       attempts:coreBrainAttempts(),
       memory:coreBrainMemory(),
       sessionAttempts:coreBrainSessionAttempts(),
@@ -5695,12 +5715,16 @@ function buildAdaptivePool(count,policy=buildAdaptivePolicy(),reservoirMultiplie
     tetap jadi cadangan supaya perilaku tanpa modul identik. */
  const targetD=Number(policy?.exactDifficulty??policy?.targetDifficulty);
  score-=Math.abs(difficulty-(Number.isFinite(targetD)&&targetD>0?targetD:difficulty))*1.4;candidates.push({q,score,domain,skill,measured,due,risk})};
- for(const v of V){if(v.level!==level)continue;const b=state.vocab[v.id],due=!!(b?.nextReview&&b.nextReview<=now);if(!b?.total||(b.mastery>=MASTERY_THRESHOLD&&!due))continue;const risk=forgettingProbability(b),score=(profile.weakTargets[v.id]||0)*3+risk*6+(100-(b.mastery||0))*.04;const q=makeVocabQuestion(v);q.difficulty=LEVELS.indexOf(v.level)+1;add(q,score,{measured:true,due,risk})}
+ /* Ulangan lintas level (audit 2026-10-04): materi level DI BAWAH level aktif ikut kolam HANYA
+    saat jatuh tempo, dan ditandai __crossLevelReview supaya lolos saringan level quizLoop - materi
+    lama yang tidak jatuh tempo tetap di luar sesi. Soal bertanda tetap tercatat dengan level
+    aslinya (q.level), jadi buktinya tidak tercampur dengan bukti level aktif. */
+ for(const v of V){const cross=v.level!==level;if(cross&&!reviewLevelOk(v.level,level))continue;const b=state.vocab[v.id],due=!!(b?.nextReview&&b.nextReview<=now);if(cross&&!due)continue;if(!b?.total||(b.mastery>=MASTERY_THRESHOLD&&!due))continue;const risk=forgettingProbability(b),score=(profile.weakTargets[v.id]||0)*3+risk*6+(100-(b.mastery||0))*.04;const q=makeVocabQuestion(v);q.difficulty=LEVELS.indexOf(v.level)+1;if(cross)q.__crossLevelReview=true;add(q,score,{measured:true,due,risk})}
  /* Langkah 1 (m025-341): probe retensi jatuh tempo dan vonis rapuh mengembalikan lesson
     yang SUDAH mastered ke kolam review - sebagai review biasa, bukan layar terpisah. Set
     kosong (modul absen / state rusak / belum ada jadwal) = kolam persis seperti sebelumnya. */
  const probeDue=retentionProbeDueLessons(now),probeFragile=retentionFragileLessons(now);
- for(const [skill,b] of Object.entries(state.grammar)){const grammarMeta=GRAMMAR_ITEMS.find(x=>x.skill===skill);if(grammarMeta?.level!==level)continue;const probeHit=probeDue.has(skill)||probeFragile.has(skill),due=!!(b?.nextReview&&b.nextReview<=now)||probeHit;if(!b?.total||(b.mastery>=MASTERY_THRESHOLD&&!due))continue;for(const item of adaptiveGrammarItems(skill,b,targetSkill===skill)){const risk=forgettingProbability(b),score=(profile.weakSkills[skill]?.score||0)*10+risk*6+(100-b.mastery)*.04,variants=targetSkill===skill?GRAMMAR_LESSON_MODES.slice(0,5):['apply_form'];/* m025-375: sasaran adaptif memakai mode sesi lesson (tanpa soal teori/pinjaman), bukan varian 0..7 */for(const [rank,modeName] of variants.entries()){const variant=GRAMMAR_PRACTICE_MODES.indexOf(modeName);const q=makeGrammarQuestion(skill,item,variant,skill);if(!grammarLessonQuestionOwnOnly(q))continue;
+ for(const [skill,b] of Object.entries(state.grammar)){const grammarMeta=GRAMMAR_ITEMS.find(x=>x.skill===skill),cross=grammarMeta?.level!==level;if(cross&&!reviewLevelOk(grammarMeta?.level,level))continue;const probeHit=probeDue.has(skill)||probeFragile.has(skill),due=!!(b?.nextReview&&b.nextReview<=now)||probeHit;if(cross&&!due)continue;if(!b?.total||(b.mastery>=MASTERY_THRESHOLD&&!due))continue;for(const item of adaptiveGrammarItems(skill,b,targetSkill===skill)){const risk=forgettingProbability(b),score=(profile.weakSkills[skill]?.score||0)*10+risk*6+(100-b.mastery)*.04,variants=targetSkill===skill?GRAMMAR_LESSON_MODES.slice(0,5):['apply_form'];/* m025-375: sasaran adaptif memakai mode sesi lesson (tanpa soal teori/pinjaman), bukan varian 0..7 */for(const [rank,modeName] of variants.entries()){const variant=GRAMMAR_PRACTICE_MODES.indexOf(modeName);const q=makeGrammarQuestion(skill,item,variant,skill);if(!grammarLessonQuestionOwnOnly(q))continue;
   /* Braincore v3 (temuan T1 council): semua item ber-difficulty = indeks level CEFR, jadi IRT
      berdegenerasi menjadi pelacak akurasi. FiezelItemPrior memberi variansi kesulitan NYATA
      per mode latihan (teach_back lebih berat daripada recognition dasar). Dijaga penuh:
@@ -5712,14 +5736,15 @@ function buildAdaptivePool(count,policy=buildAdaptivePolicy(),reservoirMultiplie
      Guarded: tanpa FiezelItemCalibration, q.difficulty tetap prior lama. */
   q.__priorDifficulty=q.difficulty;
   try{const eff=itemCalibrationEffective(q,q.difficulty);if(eff)q.difficulty=eff}catch{}
+  if(cross)q.__crossLevelReview=true;
   add(q,score-rank*.05,{measured:true,due,risk})}}}
- for(const r of R){if(r.level!==level)continue;const b=state.reading[r.id],due=!!(b?.nextReview&&b.nextReview<=now);if(b?.mastery>=MASTERY_THRESHOLD&&!due)continue;for(const [i,q0] of (r.qs||[]).entries()){
+ for(const r of R){const cross=r.level!==level;if(cross&&!reviewLevelOk(r.level,level))continue;const b=state.reading[r.id],due=!!(b?.nextReview&&b.nextReview<=now);if(cross&&!due)continue;if(b?.mastery>=MASTERY_THRESHOLD&&!due)continue;for(const [i,q0] of (r.qs||[]).entries()){
   /* m025-163: q0 itu TUPLE [stem, options, answerIndex, meta] - q0.skill/q0.type selalu
      undefined, dulu semua soal reading diskor sebagai reading_detail (temuan Fable/council).
      Tipe dibaca dari meta di indeks 3; kalau bank tidak menyimpannya, diturunkan dari teks
      pertanyaan lewat readingSkill() - RUMUS YANG SAMA dengan makeReadingQuestion, supaya
      skill di kolam ini selalu identik dengan q.skill soal yang dihasilkannya. */
-  const meta0=q0?.[3]&&typeof q0[3]==='object'?q0[3]:null,skill=`reading_${(meta0&&meta0.type)||readingSkill(q0?.[0])||'detail'}`,risk=b?forgettingProbability(b):0,score=(profile.weakSkills[skill]?.score||0)*10+(b?risk*6:2);add(makeReadingQuestion(r,q0,i),score,{measured:!!b,due,risk})}}
+  const meta0=q0?.[3]&&typeof q0[3]==='object'?q0[3]:null,skill=`reading_${(meta0&&meta0.type)||readingSkill(q0?.[0])||'detail'}`,risk=b?forgettingProbability(b):0,score=(profile.weakSkills[skill]?.score||0)*10+(b?risk*6:2),rq=makeReadingQuestion(r,q0,i);if(cross&&rq)rq.__crossLevelReview=true;add(rq,score,{measured:!!b,due,risk})}}
  const requested=Math.max(1,Math.round(Number(count)||1)),limit=Math.max(requested,Math.min(candidates.length,requested*Math.max(1,Math.min(5,Math.round(Number(reservoirMultiplier)||1))))),ranked=candidates.sort((a,b)=>b.score-a.score),result=[],picked=new Set(),take=(fn,n)=>{for(const x of ranked){if(result.length>=limit||n<=0)break;if(picked.has(x)||!fn(x))continue;picked.add(x);result.push(x.q);n--}};
  if(targetSkill)take(x=>x.skill===targetSkill||x.skill.includes(targetSkill)||targetSkill.includes(x.skill),Math.ceil(limit*.4));
  if(primary)take(x=>x.domain===primary,Math.ceil(limit*.55)-result.filter(q=>normalizePolicyDomain(q.type)===primary).length);
@@ -8062,6 +8087,8 @@ window.openLiveVoiceStage=openLiveVoiceStage;window.closeLiveVoiceStage=closeLiv
 window.fzStageToggleMic=fzStageToggleMic;window.fzStageToggleRound=fzStageToggleRound;
 window.fzStageCorrectGuess=fzStageCorrectGuess;window.fzStageNextCard=fzStageNextCard;
 window.fzStageSfx=fzStageSfx;window.fzStageReact=fzStageReact;window.fzStageInvite=fzStageInvite;
+/* Pola penjaga yang sama dengan listener tingkat-atas lain di berkas ini: harness vm gerbang
+   (tests/regression-test.js) memberi `document` tanpa addEventListener. */
 if(typeof document!=='undefined'&&typeof document.addEventListener==='function'){
   document.addEventListener('keydown',(e)=>{if(e&&e.key==='Escape'&&fzStageDrawerOpen){e.preventDefault();closeLiveVoiceStage()}});
 }
@@ -9553,7 +9580,9 @@ function homeWeekStats(now=Date.now()){
 /** Kosakata level aktif: yang sudah pernah dilatih, dan yang jatuh tempo diulang sekarang. */
 function homeVocabStats(now=Date.now()){
   const level=getActiveLevel();let practised=0,due=0;
-  for(const [key,x] of Object.entries(state.vocab||{})){if(!x?.total||contentLevelFor('vocab',key)!==level)continue;practised++;if(x.nextReview&&x.nextReview<=now)due++}
+  /* Jatuh tempo dihitung untuk level <= aktif - angka yang sama dengan isi "Review jatuh tempo"
+     (vocabReviewQueue); "dilatih" tetap milik level aktif. */
+  for(const [key,x] of Object.entries(state.vocab||{})){const lvl=contentLevelFor('vocab',key);if(!lvl)continue;if(x?.total&&lvl===level)practised++;if(x?.nextReview&&x.nextReview<=now&&reviewLevelOk(lvl,level))due++}
   return{practised,due}
 }
 function todayHomeMarkup(){
@@ -12327,7 +12356,7 @@ function flashcards(level){
     // gratis secara UX; kalau ia menggeser kartu, stop() membatalkan yang masih menganggur.
     const nextCard=pool[i+1]||null;
     $('speakWord')?.addEventListener('click',e=>{e.stopPropagation();audio.play(v.word,{contentType:'word',next:nextCard?nextCard.word:''})});$('speakSentence')?.addEventListener('click',e=>{e.stopPropagation();audio.play(v.example,{contentType:'sentence',next:nextCard?nextCard.example:''})});$('aiWord').onclick=e=>{e.stopPropagation();explainWordWithAI(v)};
-    $('learning').onclick=e=>{e.stopPropagation();updateMastery('vocab',v.id,false);save();showToast(FiezelI18n.t('flash.toast-progres'),'success');i++;draw()};
+    $('learning').onclick=e=>{e.stopPropagation();markStillLearning('vocab',v.id);showToast(FiezelI18n.t('flash.toast-progres'),'success');i++;draw()};
     $('mastered').onclick=e=>{e.stopPropagation();markMastered('vocab',v.id);haptic('success');showToast(FiezelI18n.t('flash.toast-dikuasai'),'success');/* [FASE-4] 09 §3.3: kartu dikuasai = pengakuan → proud. */try{pawReact('badge-earned')}catch(_){}i++;draw()};
     bindSwipe($('flashcard'),()=>{audio.stop();i++;draw()},()=>{audio.stop();i=Math.max(0,i-1);draw()})
   };
@@ -12346,7 +12375,7 @@ function reviewVocab(){
     setApp(`<section class="fade"><div class="topline"><button id="backReview"><i data-lucide="arrow-left"></i> ${FiezelI18n.t('student.vocab-title')}</button><b>${FiezelI18n.t('ulangan.topline',{idx:i+1,total:due.length})}</b></div>${card(`<div class="flashcard ${flipped?'flipped':''}" id="reviewCard" role="button" tabindex="0"><div class="flash-inner"><div class="flash-face flash-front"><div class="eyebrow">${FiezelI18n.t('ulangan.eyebrow',{level:esc(v.level)})}</div><div class="flash-front-main"><h2 class="word">${jaWord(v.word,v.phonetic)}</h2><div class="phonetic">${jaPhonetic(v.phonetic,FiezelI18n.t('flash.pelafalan-kosong'))}</div>${jaTogglesMarkup()}</div><p class="muted flash-flip-hint"><i data-lucide="refresh-cw"></i> ${FiezelI18n.t('flash.tap-meaning')}</p></div><div class="flash-face flash-back"><span class="flash-kicker">${FiezelI18n.t('flash.arti')}</span><h3 class="flash-meaning">${esc(v.meaning)}</h3><div class="flash-example-box"><p class="flash-example-en">“${esc(v.example)}”</p>${v.exampleTranslation?`<p class="flash-example-id">${esc(v.exampleTranslation)}</p>`:''}</div><p class="muted flash-flip-hint"><i data-lucide="rotate-ccw"></i> ${FiezelI18n.t('flash.tap-back')}</p></div></div></div><div class="flash-mastery-bar"><button type="button" id="reviewLearning" class="flash-btn-learning"><i data-lucide="book-open"></i> ${FiezelI18n.t('flash.still-learning')}</button><button type="button" class="primary flash-btn-mastered" id="reviewMastered"><i data-lucide="check-circle-2"></i> ${FiezelI18n.t('flash.sudah-dikuasai')}</button></div><div class="swipe-hint">${FiezelI18n.t('flash.geser')}</div>`,'card-flashcard')} </section>`);
     $('backReview').onclick=()=>exitStage();const flip=()=>{flipped=!flipped;$('reviewCard').classList.toggle('flipped',flipped);haptic('tap')};
     $('reviewCard').onclick=flip;$('reviewCard').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();flip()}};
-    $('reviewLearning').onclick=e=>{e.stopPropagation();updateMastery('vocab',v.id,false);save();i++;draw()};
+    $('reviewLearning').onclick=e=>{e.stopPropagation();markStillLearning('vocab',v.id);i++;draw()};
     $('reviewMastered').onclick=e=>{e.stopPropagation();markMastered('vocab',v.id);haptic('success');/* [FASE-4] 09 §3.3: dikuasai dari ulangan juga pengakuan → proud. */try{pawReact('badge-earned')}catch(_){}i++;draw()};
     bindSwipe($('reviewCard'),()=>{i++;draw()},()=>{i=Math.max(0,i-1);draw()})
   };
@@ -12623,7 +12652,7 @@ function renderGrammarLesson(skill){const meta=GRAMMAR_ITEMS.find(x=>x.skill===s
   const lessonPawReady=(()=>{try{return !!self.FiezelPaw?.ready?.()}catch(_){return false}})();
   const lessonFace=lessonPawReady?'<fiezel-mascot class="lesson-mascot"></fiezel-mascot>':'<span class="fz-i" data-fz-icon="paw"></span>';
   const lessonPaw=`<div class="lesson-stage" aria-hidden="true"><span class="lesson-stage-paw">${lessonFace}</span><span class="lesson-bubble"><b>${esc(friendlySkillName(skill))}</b></span></div>`;
-  setApp(`<section class="fade grammar-lesson-page"><div class="skill-page-topbar"><button type="button" class="skill-back-btn" onclick="exitStage()"><i data-lucide="arrow-left"></i> <span>${FiezelI18n.t('grammar.kembali-grammar-hub')}</span></button><button type="button" class="skill-help-dot" onclick="openGrammarLessonHelp('${esc(skill)}')" aria-label="${esc(FiezelI18n.t('skills.bantuan'))}" title="${esc(FiezelI18n.t('skills.bantuan'))}"><span aria-hidden="true">?</span></button></div>${card(`<div class="grammar-start-hero"><span class="grammar-hero-badge">TATA BAHASA · ${esc(getActiveLevel())}</span><h2>${esc(friendlySkillName(skill))}</h2><p class="grammar-brief-rule">${esc(rule)}</p><button onclick="practiceSkill('${esc(skill)}')" class="primary grammar-start-direct-btn">${FiezelI18n.t('grammar.start-item',{jumlahSoal:grammarLessonSessionTarget(skill)})} <i data-lucide="arrow-right"></i></button></div>`,'grammar-lesson-card')}<div class="toolbar"><button onclick="exitStage()"><i data-lucide="arrow-left"></i> ${FiezelI18n.t('grammar.kembali-grammar-hub')}</button></div></section>`);
+  setApp(`<section class="fade grammar-lesson-page"><div class="skill-page-topbar"><button type="button" class="skill-back-btn" onclick="exitStage()"><i data-lucide="arrow-left"></i> <span>${FiezelI18n.t('grammar.kembali-grammar-hub')}</span></button><button type="button" class="skill-help-dot" onclick="openGrammarLessonHelp('${esc(skill)}')" aria-label="${esc(FiezelI18n.t('skills.bantuan'))}" title="${esc(FiezelI18n.t('skills.bantuan'))}"><span aria-hidden="true">?</span></button></div>${card(`<div class="grammar-start-hero"><span class="grammar-hero-badge">${esc(FiezelI18n.t('skill.grammar','TATA BAHASA').toUpperCase())} · ${esc(getActiveLevel())}</span><h2>${esc(friendlySkillName(skill))}</h2><p class="grammar-brief-rule">${esc(rule)}</p><button onclick="practiceSkill('${esc(skill)}')" class="primary grammar-start-direct-btn">${FiezelI18n.t('grammar.start-item',{jumlahSoal:grammarLessonSessionTarget(skill)})} <i data-lucide="arrow-right"></i></button></div>`,'grammar-lesson-card')}<div class="toolbar"><button onclick="exitStage()"><i data-lucide="arrow-left"></i> ${FiezelI18n.t('grammar.kembali-grammar-hub')}</button></div></section>`);
   enhanceUI()}
 /* m025-375: SESI LESSON = GRAMMAR_LESSON_MODES, bergilir antar-templat.
  * Pengganti seleksi mode-coverage-first (m025-155) yang wajib mengisi ke-25 mode. Putaran k
@@ -13453,7 +13482,11 @@ function reading(){const level=getActiveLevel(),active=R.filter(r=>r.level===lev
   const examMarkup=(uxOn('skillExams')&&readingExamSets().length)?`<div class="card reading-exam"><div class="row"><b>${FiezelI18n.t('reading.practice-berformat-ujian')}</b><span>${FiezelI18n.t('reading.set-untuk',{length:examSets.length,level:esc(level)})}</span></div>${examSets.length?examSets.map(set=>{const f=readingExamFormat(set);return `<div class="reading-exam-set"><b>${esc(set.title)}</b><span>${FiezelI18n.t('reading.kata-item-menit',{label:esc(f?.label||''),wordCount:set.wordCount,jumlahSoal:set.questions.length,minutesPerPassage:f?.minutesPerPassage||'-'})}</span><small>${esc(f?.note||'')}</small><button onclick="startReadingExam('${esc(set.id)}')">${FiezelI18n.t('reading.mulai-set')} <i data-lucide="arrow-right"></i></button></div>`}).join(''):`<p class="muted">${FiezelI18n.t('reading.belum-ada-set-berformat-ujian',{level:esc(level),join:esc(examLevels.join(', ')||'-')})}</p>`}<p class="muted">${esc(READING_EXAM?.honesty||'')}</p></div>`:'';shell(FiezelI18n.t('reading.ruang-reading'),FiezelI18n.t('reading.bacaan-item-for-level',{length:active.length,total:total,level:level}),`<div class="level-scope-note"><b>${esc(level)}</b> · ${esc(levelDescriptor(level))}<span>${FiezelI18n.t('reading.bacaan-level-lain-tersimpan-tetapi')}</span></div>${examMarkup}<div class="toolbar"><button class="${state.adaptiveReady?'':'primary'}" onclick="startReadingRandom()"><i data-lucide="shuffle"></i> ${FiezelI18n.t('reading.bacaan-acak',{level:esc(level)})}</button><button class="${state.adaptiveReady?'primary':''}" onclick="startReadingAdaptive()"${state.adaptiveReady?'':' title="'+FiezelI18n.t('reading.terbuka-setelah-tes-awal-selesai')+'"'}><i data-lucide="zap"></i> ${FiezelI18n.t('student.reading-adaptive')}</button></div><div class="grid"><div class="card"><div class="row"><b>${FiezelI18n.t('grammar.jalur',{level:esc(level)})}</b><span>${FiezelI18n.t('reading.bacaan',{length:active.length})}</span></div><p class="muted">${active.length?FiezelI18n.t('reading.hub-instruction'):FiezelI18n.t('reading.hub-empty')}</p>${active.length?`<button onclick="openReadingLevel('${level}')">${FiezelI18n.t('reading.buka-bacaan')} <i data-lucide="arrow-right"></i></button>`:''}</div></div>`)}
 function openReadingLevel(l){const active=getActiveLevel();if(String(l||'')!==active)return showToast(FiezelI18n.t('reading.reading-dikunci-level',{active:active}));const r=pick(R.filter(x=>x.level===active));if(r)readingSession(r);else showToast(FiezelI18n.t('reading.reading-belum-tersedia',{active:active}))}
 function startReadingRandom(){const active=getActiveLevel(),pool=R.filter(r=>r.level===active);if(pool.length)readingSession(pick(pool));else showToast(FiezelI18n.t('reading.reading-belum-tersedia',{active:active}))}
-function startReadingAdaptive(){if(!state.adaptiveReady){showToast(FiezelI18n.t('reading.reading-terbuka-setelah-tes-awal'));return}const now=Date.now(),level=getActiveLevel(),ids=new Set(Object.entries(state.reading).filter(([,x])=>x.total&&(x.mastery<80||(x.nextReview&&x.nextReview<=now))).map(([id])=>id)),pool=R.filter(x=>x.level===level),r=pick(pool.filter(x=>ids.has(x.id)))||pick(pool);if(r)readingSession(r);else showToast(FiezelI18n.t('reading.belum-ada-area-reading-perlu',{level:level}))}
+/* Ulangan lintas level (audit 2026-10-04): bacaan yang JATUH TEMPO dari level <= aktif didahulukan;
+   sesudah itu perilaku lama (bacaan level aktif yang masih lemah, lalu acak). Kolamnya tetap
+   tercakup: hanya level <= aktif, dan hanya yang jatuh tempo - bukan kolam semua level
+   (kontrak tests/level-grammar-contract-test.js). */
+function startReadingAdaptive(){if(!state.adaptiveReady){showToast(FiezelI18n.t('reading.reading-terbuka-setelah-tes-awal'));return}const now=Date.now(),level=getActiveLevel(),due=R.filter(x=>reviewLevelOk(x.level,level)&&state.reading[x.id]?.nextReview&&state.reading[x.id].nextReview<=now),ids=new Set(Object.entries(state.reading).filter(([,x])=>x.total&&(x.mastery<80||(x.nextReview&&x.nextReview<=now))).map(([id])=>id)),pool=R.filter(x=>x.level===level),r=pick(due)||pick(pool.filter(x=>ids.has(x.id)))||pick(pool);if(r)readingSession(r,{review:due.includes(r)});else showToast(FiezelI18n.t('reading.belum-ada-area-reading-perlu',{level:level}))}
 function readingSkill(original){
   const q=String(original||'').toLowerCase();
   if(/\bwhy\b|reason|because|suggest|imply/.test(q))return 'inference';
@@ -13573,7 +13606,7 @@ function startReadingExam(id){
   if(!qs.length)return showToast(FiezelI18n.t('reading.item-for-set-pending-lengkap'));
   quizLoop({type:'reading',count:qs.length,pool:qs,factory:x=>x,context:set,preserveOrder:true,examKind:'reading_exam'});
 }
-function readingSession(r){const qs=(r.qs||[]).map((q,i)=>makeReadingQuestion(r,q,i));quizLoop({type:'reading',count:Math.min(8,qs.length),pool:qs,factory:x=>x,context:r,preserveOrder:true})}
+function readingSession(r,opts={}){const qs=(r.qs||[]).map((q,i)=>makeReadingQuestion(r,q,i));if(opts.review)qs.forEach(q=>{if(q)q.__crossLevelReview=true});quizLoop({type:'reading',count:Math.min(8,qs.length),pool:qs,factory:x=>x,context:r,preserveOrder:true})}
 /* m025-246: naskah layar penempatan mengikuti JUMLAH SOAL yang benar-benar akan
    disajikan. Empat kalimat lamanya memaku angka 25; dengan placement-lite yang 12,
    layar itu akan menjanjikan 25 lalu menyajikan 12 - kebohongan kecil di tempat
@@ -14000,7 +14033,7 @@ function quizLoop(cfg){
     popover petunjuk yang masih terbuka dari sesi belajar sebelumnya ditutup di sini. Probe audit:
     membaca petunjuk saja memberi 77-85% benar di tes penempatan. */
  if(MEASURE||cfg.noHints)try{document.getElementById('grammarHintPopover')?.remove()}catch(_){}
- let questions=cfg.pool.map(item=>cfg.factory?cfg.factory(item):item).filter(q=>cfg.placement||cfg.allowCrossLevel||!q?.level||q.level===(cfg.levelScope||getActiveLevel()));
+ let questions=cfg.pool.map(item=>cfg.factory?cfg.factory(item):item).filter(q=>cfg.placement||cfg.allowCrossLevel||q?.__crossLevelReview===true||!q?.level||q.level===(cfg.levelScope||getActiveLevel()));
  const unique=[],seen=new Set();
  /* Fase 3 (C5 butir 2): soal cloze memang tanpa opsi (murid mengetik), jadi validator
     pilihan-ganda pasti menolaknya - ia divalidasi dengan syaratnya sendiri: ada kalimat,

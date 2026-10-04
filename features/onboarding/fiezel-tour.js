@@ -54,7 +54,10 @@
       require('../i18n/copy-id-feat-b.js');
     } catch (loadError) { I18N = null; }
   }
-  function T(key, params) { return I18N ? I18N.t(key, params) : String(key); }
+  function T(key, params) {
+    var i18n = (typeof globalThis !== 'undefined' && globalThis.FiezelI18n) || (typeof self !== 'undefined' && self.FiezelI18n) || I18N;
+    return i18n ? i18n.t(key, params) : String(key);
+  }
 
   // Copy Thai dimuat setelah pemilih bahasa pertama selesai. Menyimpan hasil T() langsung
   // saat modul dievaluasi membekukan copy Indonesia untuk seluruh umur halaman, walaupun
@@ -515,7 +518,13 @@
     try { host.addEventListener('click', onOverlayClick); } catch (_) {}
     try { if (target.addEventListener) target.addEventListener('resize', onReflow); } catch (_) {}
     try { if (target.addEventListener) target.addEventListener('orientationchange', onReflow); } catch (_) {}
-    try { if (doc.addEventListener) doc.addEventListener('keydown', onKey); } catch (_) {}
+    try { doc.addEventListener('keydown', onKey); } catch (_) {}
+
+    var i18n = (target && target.FiezelI18n) || (typeof globalThis !== 'undefined' && globalThis.FiezelI18n) || (typeof self !== 'undefined' && self.FiezelI18n);
+    function onLocaleChange() { if (!closed && !paused) paint(); }
+    if (i18n && typeof i18n.onChange === 'function') {
+      try { i18n.onChange(onLocaleChange); } catch (_) {}
+    }
 
     // I11: dua pengamat penahanan. (1) kelas <body> - fz-lesson-mode disetel syncLessonMode
     // SEBELUM layar pelajaran digambar, jadi turnya sudah tersembunyi saat soal muncul.

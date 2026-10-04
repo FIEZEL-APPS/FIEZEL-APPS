@@ -450,51 +450,75 @@ body:not(.fz-dark) .token-chip.placed.placeholder {
 }
 
 .token-actions {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: flex-end !important;
+  display: grid !important;
+  grid-template-columns: 1fr 1.6fr !important;
+  align-items: stretch !important;
   gap: 12px !important;
-  margin-top: 18px !important;
+  width: 100% !important;
+  margin-top: 24px !important;
+  box-sizing: border-box !important;
 }
 
 .token-reset-btn {
-  background: rgba(255, 255, 255, 0.08) !important;
-  color: #f8fafc !important;
-  border: 1.5px solid rgba(255, 255, 255, 0.22) !important;
-  border-radius: var(--radius-pill, 9999px) !important;
-  padding: 10px 20px !important;
-  font-size: 0.92rem !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  background: #f1f5f9 !important;
+  color: #334155 !important;
+  border: 1.5px solid #e2e8f0 !important;
+  border-bottom: 3.5px solid #cbd5e1 !important;
+  border-radius: 16px !important;
+  padding: 0 16px !important;
+  font-size: 14.5px !important;
   font-weight: 700 !important;
   cursor: pointer !important;
   display: inline-flex !important;
   align-items: center !important;
+  justify-content: center !important;
   gap: 8px !important;
-  transition: all var(--dur-s, 150ms) ease !important;
+  transition: all 120ms ease !important;
+  box-sizing: border-box !important;
+}
+
+.token-reset-btn svg {
+  width: 16px !important;
+  height: 16px !important;
+  color: #64748b !important;
 }
 
 .token-reset-btn:not(:disabled):hover {
-  background: rgba(239, 68, 68, 0.18) !important;
-  color: #fca5a5 !important;
-  border-color: #ef4444 !important;
-}
-
-.token-reset-btn:disabled {
-  opacity: 0.4 !important;
-  cursor: not-allowed !important;
-}
-
-body.fz-lux .token-reset-btn,
-body:not(.fz-dark) .token-reset-btn {
-  background: #f1f5f9 !important;
-  color: #475569 !important;
+  background: #e2e8f0 !important;
+  color: #0f172a !important;
   border-color: #cbd5e1 !important;
 }
 
+.token-reset-btn:not(:disabled):active {
+  transform: translateY(2px) !important;
+  border-bottom-width: 1.5px !important;
+}
+
+.token-reset-btn:disabled {
+  opacity: 0.45 !important;
+  cursor: not-allowed !important;
+  background: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+  border-bottom-color: #e2e8f0 !important;
+  color: #94a3b8 !important;
+}
+
 .token-submit-btn {
-  min-width: 130px !important;
-  padding: 12px 24px !important;
-  font-size: 1rem !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  padding: 0 20px !important;
+  font-size: 15px !important;
   font-weight: 800 !important;
+  border-radius: 16px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  box-sizing: border-box !important;
 }
 
 /* ==========================================================================
@@ -1808,6 +1832,14 @@ body:not(.theme-dark):not(.fz-lux) .card-light .braincore-pill.schedule,
   align-items: center !important;
   margin-bottom: 8px !important;
   width: 100% !important;
+}
+
+.token-bank-label,
+.gx-gloss-bar .token-bank-label {
+  color: #334155 !important;
+  font-size: 13.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.01em !important;
 }
 
 .gx-btn-gloss {
