@@ -5330,3 +5330,16 @@ button.fiezel-language-choice {
   display: block !important;
 }
 
+
+/* m025-454 Gelombang 1 audit kabel BrainCore: kartu "Kata Braincore Hari Ini" (Beranda), panel
+   bukti belajar (Progres), dan baris fokus hub Grammar. Teks gelap di atas kartu terang, tombol
+   amber bertulisan gelap: kontras di atas 4,5:1 pada keduanya. */
+.fz-bc-card{margin:12px 0;padding:14px 16px;border-radius:20px;background:#FFFFFF;border:1px solid #F1E3C6;box-shadow:0 4px 0 #F1E3C6;color:#1F1A14;display:grid;gap:10px}
+.fz-bc-head{display:flex;align-items:center;gap:8px;font-size:.82rem;letter-spacing:.04em;text-transform:uppercase;color:#7A4E00}
+.fz-bc-arah{margin:0;font-size:1rem;font-weight:700;line-height:1.35;color:#1F1A14}
+.fz-bc-row{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding-top:10px;border-top:1px dashed #F1E3C6}
+.fz-bc-row p{margin:0;font-size:.92rem;line-height:1.35;color:#3A3128}
+.fz-bc-card button.fz-bc-cta{flex:0 0 auto;min-height:44px;padding:0 14px;border-radius:14px;border:0;background:#FFC93C;color:#1F1A14;font-weight:800;font-size:.85rem;box-shadow:0 3px 0 #D99A00;cursor:pointer}
+.fz-bc-card button.fz-bc-cta:active{transform:translateY(2px);box-shadow:0 1px 0 #D99A00}
+.fz-bc-proof{margin:0;padding-left:18px;display:grid;gap:6px;color:#1F1A14}
+.fz-bc-focus{margin:8px 0 0;padding:8px 12px;border-radius:12px;background:#FFF6DF;color:#5C3B00;font-weight:700;font-size:.9rem}

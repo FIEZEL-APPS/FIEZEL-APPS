@@ -310,6 +310,25 @@
     'bug.dibantu': 'PAW ช่วย',
     'bug.bagikan': 'แชร์ไป WHATSAPP',
     'bug.share-teks': 'รังของฉันวันนี้: บั๊กแตก {p} หลุด {g} กล้าล่าบั๊กของตัวเองไหม? fiezel.my.id #BuruBug',
-    'bug.tersimpan': 'บันทึกรูปรายงานแล้ว — ส่งให้กลุ่มห้องเลย!'
+    'bug.tersimpan': 'บันทึกรูปรายงานแล้ว — ส่งให้กลุ่มห้องเลย!',
+    // m025-454 Gelombang 1 audit kabel BrainCore: bahasa murid, tanpa istilah mesin, tanpa tanda pisah.
+    'bc.aria': 'คำแนะนำจาก Braincore สำหรับวันนี้',
+    'bc.judul': 'Braincore บอกอะไรวันนี้',
+    'bc.arah-naik': 'ก้าวของคุณคล่องขึ้นแล้ว! วันนี้มาเก็บให้เรียบร้อย: {fokus}',
+    'bc.arah-datar': 'คุณทำได้สม่ำเสมอแล้ว วันนี้มาดันต่ออีกนิด: {fokus}',
+    'bc.arah-turun': 'ค่อย ๆ ไปนะ วันนี้มาทบทวนให้แน่นอีกครั้ง: {fokus}',
+    'bc.arah-baru': 'มาเริ่มกันเลย! วันนี้เราจะฝึก: {fokus}',
+    'bc.pudar-kata': 'คำ {n} คำนี้เริ่มเลือนจากความจำแล้ว: {daftar}',
+    'bc.segarkan': 'ทบทวนตอนนี้',
+    'bc.tertukar': 'มักสลับกัน: {a} กับ {b}',
+    'bc.perbaiki': 'แก้ที่พื้นฐาน',
+    'bc.bukti-judul': 'หลักฐานว่าคุณเก่งขึ้น',
+    'bc.bukti-cepat': 'คุณตอบเร็วขึ้น {kali} เท่าเมื่อเทียบกับสัปดาห์ที่แล้ว',
+    'bc.bukti-stabil': 'ความเร็วในการตอบของคุณคงที่เมื่อเทียบกับสัปดาห์ที่แล้ว',
+    'bc.bukti-melekat': 'คำที่เรียนแล้ว {persen}% ยังจำได้แม่น',
+    'bc.bukti-naik': 'ความแม่นยำของคุณเพิ่มขึ้น {poin} คะแนนตั้งแต่เริ่มฝึก',
+    'bc.bukti-kosong': 'ทำอีกสักสองสามรอบ แล้วหลักฐานจะขึ้นที่นี่',
+    'bc.fokus-pasangan': 'โฟกัสตอนนี้: แยก {a} กับ {b} ให้ออก',
+    'bc.fokus-materi': 'โฟกัสตอนนี้: {materi}'
   });
 }());
