@@ -302,11 +302,13 @@ async function main() {
     process.exit(2);
   }
 
-  const apiKey = String(process.env.GEMINI_API_KEY || '').trim();
-  if (!apiKey) {
+  const rawApiKeys = String(process.env.GEMINI_API_KEY || '').trim();
+  const apiKeys = rawApiKeys.split(',').map((k) => k.trim()).filter(Boolean);
+  if (apiKeys.length === 0) {
     console.error('GEMINI_API_KEY belum diset di environment / secrets.');
     process.exit(2);
   }
+  let currentKeyIndex = 0;
 
   const manifest = loadManifest();
   const voiceId = args.voice;
@@ -362,7 +364,7 @@ async function main() {
 
   if (args.verifyOnly) {
     console.log('\n[VERIFY] Menguji Gemini API Key...');
-    const testResult = await synthesizeGemini('Hello, welcome to Fiezel!', voiceId, apiKey);
+    const testResult = await synthesizeGemini('Hello, welcome to Fiezel!', voiceId, apiKeys[0]);
     if (testResult.bytes) {
       console.log(`[VERIFY SUCCESS] Gemini API Key aktif! Sampel audio berhasil digenerate (${testResult.bytes.length} bytes).`);
       process.exit(0);
@@ -411,9 +413,19 @@ async function main() {
     }
 
     console.log(`[GENERATING] (${i + 1}/${queue.length}) Level ${job.identity.contentType}: "${identity.canonicalText.slice(0, 40)}..."`);
-    const result = await synthesizeGemini(identity.canonicalText, voiceId, apiKey);
+    let result = await synthesizeGemini(identity.canonicalText, voiceId, apiKeys[currentKeyIndex]);
 
-    if (result.fatal) {
+    if (result.fatal && result.fatal.includes('Kuota harian')) {
+      console.warn(`[KEY EXHAUSTED] Key ${currentKeyIndex + 1}/${apiKeys.length} mencapai batas kuota.`);
+      if (currentKeyIndex + 1 < apiKeys.length) {
+        currentKeyIndex++;
+        console.log(`[ROTATING KEY] Beralih ke Key ${currentKeyIndex + 1}/${apiKeys.length}...`);
+        result = await synthesizeGemini(identity.canonicalText, voiceId, apiKeys[currentKeyIndex]);
+      } else {
+        console.error(`[FATAL ERROR] Seluruh ${apiKeys.length} Gemini API Key telah mencapai batas kuota harian.`);
+        break;
+      }
+    } else if (result.fatal) {
       console.error(`[FATAL ERROR] ${result.fatal}`);
       break;
     }
