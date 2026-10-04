@@ -100,10 +100,23 @@ jobs:
           git config user.email 'noreply@github.com'
           git add audio/manifest.json
           git commit -m "Audio: aset listening $CONTENT hasil produksi Gemini TTS"
-          for attempt in 1 2 3; do
-            if git push; then exit 0; fi
-            echo "Push gagal (percobaan $attempt); menarik rebase lalu mencoba lagi."
-            git pull --rebase --autostash || true
+          for attempt in 1 2 3 4 5; do
+            if git push origin main; then exit 0; fi
+            echo "Push gagal (percobaan $attempt); sinkronisasi manifest remote..."
+            git fetch origin main
+            node -e '
+              const fs = require("fs");
+              const cp = require("child_process");
+              const local = JSON.parse(fs.readFileSync("audio/manifest.json", "utf8"));
+              const remote = JSON.parse(cp.execSync("git show origin/main:audio/manifest.json").toString());
+              local.assets = Object.assign({}, remote.assets, local.assets);
+              local.version = Math.max(Number(local.version) || 0, Number(remote.version) || 0) + 1;
+              fs.writeFileSync("audio/manifest.json", JSON.stringify(local, null, 2) + "\n");
+            '
+            git reset --mixed origin/main
+            git add audio/manifest.json
+            git commit -m "Audio: aset listening $CONTENT hasil produksi Gemini TTS (merged)" || true
+            sleep 2
           done
           echo 'Manifest tidak bisa didorong. Aset sudah ada di R2.' >&2
           exit 1
