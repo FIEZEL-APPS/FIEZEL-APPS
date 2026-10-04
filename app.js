@@ -10872,6 +10872,28 @@ function braincoreGrammarFocusLine(){
   }
   return teks?`<p class="fz-bc-focus" data-testid="braincore-grammar-focus">${esc(teks)}</p>`:'';
 }
+/* m025-459 Gelombang 2 audit kabel BrainCore (K1): ringkasan BrainCore yang ikut laporan kelas ke
+ * guru. Bentuknya sengaja sempit dan tanpa kalimat (divalidasi normalizeReport di server):
+ * level aktif, arah belajar, jumlah materi yang menunggu diulang, paling banyak 3 pelajaran
+ * grammar dengan penguasaan terendah (minimal 3 bukti), dan pelajaran yang paling sering
+ * tertukar. Tanpa riwayat jawaban, tidak ada ringkasan. */
+function braincoreClassDigest(){
+  if(!(Array.isArray(state.history)&&state.history.length))return null;
+  const lv=String(getActiveLevel()||'');
+  if(!LEVELS.includes(lv))return null;
+  let dir='new';
+  try{dir={improving:'up',plateau:'flat',declining:'down'}[coreBrainSnapshot()?.momentum?.state]||'new'}catch{}
+  let due=0;try{due=Math.max(0,Math.min(100000,Number(dueItems().length)||0))}catch{}
+  let weak=[];
+  try{
+    const M=self.FiezelMasteryBKT,raw=bktRead();
+    if(M&&raw?.lessons){const now=Date.now();weak=Object.keys(raw.lessons).filter(k=>/^[a-z0-9_]{1,64}$/.test(k)).map(k=>({k,m:M.mastery(raw,k,now)||{}})).filter(x=>Number(x.m.n)>=3&&Number(x.m.L)<0.6).sort((a,b)=>Number(a.m.L)-Number(b.m.L)).slice(0,3).map(x=>x.k)}
+  }catch{}
+  const out={lv,dir,due,weak};
+  try{const fix=braincoreFixSkill(braincoreConfusedPair());if(fix&&/^[a-z0-9_]{1,64}$/.test(fix))out.fix=fix}catch{}
+  return out;
+}
+window.braincoreClassDigest=braincoreClassDigest;
 function jaChokaiHomeBannerMarkup(){
   if(!jaCourseOn())return '';
   return `<div class="card ja-chokai-banner" onclick="openListeningPanel()" role="button" tabindex="0" aria-label="Chōkai JLPT N5 / N4" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openListeningPanel();}">

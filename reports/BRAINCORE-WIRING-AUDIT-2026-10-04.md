@@ -1,5 +1,7 @@
 # Audit kabel BrainCore → dashboard murid dan KelasKu
 
+> **Status:** Gelombang 1 (D1, D2, D3, D5, D6) tersambung di m025-457. Gelombang 2 (K1, K2, K3) tersambung di m025-462 (`docs/handoffs/FIEZEL-M025-462-BRAINCORE-WAVE2-KELASKU-HANDOFF.md`). Yang belum: K4, D4, D7, D8, dan graf kurikulum.
+
 **Tanggal:** 2026-10-04 · **Basis:** `main` @ `587335cd` (m025-450)
 **Pertanyaan owner:** kemampuan BrainCore mana yang sudah dihitung tetapi belum sampai ke dashboard
 murid dan KelasKu, sehingga cuma jadi "kode bagus yang disimpan di gudang"?

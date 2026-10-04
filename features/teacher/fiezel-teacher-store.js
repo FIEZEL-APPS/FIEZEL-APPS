@@ -281,7 +281,14 @@
     try {
       if (!p || p.v !== 1 || !p.skills) return null;
       var results = Object.keys(p.skills).map(function (k) { return { skill: k, correct: Number(p.skills[k].c) || 0, total: Number(p.skills[k].t) || 0 }; });
-      return { name: firstName(p.name), lastActiveAt: Number(p.at) || Date.now(), targetDone: (p.lessons || 0) >= 3, results: results, goal: p.goal || null, cls: normalizeClassCode(p.cls) || null, join: p.j === 1 || p.j === true, examFocus: (p.fx && typeof p.fx === 'object' && !Array.isArray(p.fx) && p.fx.k) ? { k: String(p.fx.k).slice(0, 24), n: Number(p.fx.n) || 0, s: Number(p.fx.s) || 0, x: Number(p.fx.x) || 0 } : null, assignments: Array.isArray(p.assign) ? p.assign : (p.assign ? [{ id: p.assign }] : []) };
+      /* m025-459 audit kabel BrainCore K2: ringkasan BrainCore murid. Dinormalkan lagi di sini
+         karena kelas juga bisa terisi dari KODE yang ditempel guru, jalur yang tidak lewat server. */
+      var bc = null;
+      if (p.bc && typeof p.bc === 'object' && !Array.isArray(p.bc) && /^(A1|A2|B1|B2|C1|C2)$/.test(String(p.bc.lv)) && /^(up|flat|down|new)$/.test(String(p.bc.dir))) {
+        var key = function (x) { return typeof x === 'string' && /^[a-z0-9_]{1,64}$/.test(x) ? x : null; };
+        bc = { lv: String(p.bc.lv), dir: String(p.bc.dir), due: Math.max(0, Math.min(100000, Number(p.bc.due) || 0)), weak: (Array.isArray(p.bc.weak) ? p.bc.weak : []).map(key).filter(Boolean).slice(0, 3), fix: key(p.bc.fix) || '' };
+      }
+      return { braincore: bc, name: firstName(p.name), lastActiveAt: Number(p.at) || Date.now(), targetDone: (p.lessons || 0) >= 3, results: results, goal: p.goal || null, cls: normalizeClassCode(p.cls) || null, join: p.j === 1 || p.j === true, examFocus: (p.fx && typeof p.fx === 'object' && !Array.isArray(p.fx) && p.fx.k) ? { k: String(p.fx.k).slice(0, 24), n: Number(p.fx.n) || 0, s: Number(p.fx.s) || 0, x: Number(p.fx.x) || 0 } : null, assignments: Array.isArray(p.assign) ? p.assign : (p.assign ? [{ id: p.assign }] : []) };
     } catch (_) { return null; }
   }
   /* ---- pendeteksi keluar layar (assign.f dari murid) ------------------------------------
@@ -333,7 +340,7 @@
     if (Array.isArray(c.pending) && c.pending.length) c.pending = c.pending.filter(function (p) { return String(p.name || '').toLowerCase() !== String(parsed.name || '').toLowerCase(); });
     var incoming = {}; parsed.results.forEach(function (r) { incoming[r.skill] = r; });
     s.results = s.results.filter(function (r) { return !incoming[r.skill]; }).concat(parsed.results);
-    s.lastActiveAt = parsed.lastActiveAt; s.targetDone = parsed.targetDone || s.targetDone; s.goal = parsed.goal || s.goal;
+    s.lastActiveAt = parsed.lastActiveAt; s.targetDone = parsed.targetDone || s.targetDone; s.goal = parsed.goal || s.goal; if (parsed.braincore) s.braincore = parsed.braincore;
     s.attendance[today(parsed.lastActiveAt)] = s.attendance[today(parsed.lastActiveAt)] || 'H';
     var graded = [], focusEvents = [], explicit = parsed.assignments || [];
     (c.assignments || []).forEach(function (a) {
