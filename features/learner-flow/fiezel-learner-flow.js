@@ -121,6 +121,33 @@
     return st.qmem && st.qmem.schema === M.SCHEMA && st.qmem.items ? st.qmem : M.emptyMemory();
   }
 
+  /* D8 (audit kabel BrainCore 2026-10-04): ingatan per butir soal sudah dihitung QuestionMemory
+     dan dipakai alokator, tetapi murid tidak pernah melihatnya. Satu baris di Rencana hari ini:
+     berapa soal sudah kuat, masih goyah, dan waktunya diulang. Butir yang baru saja tampil
+     dibaca dari keadaan dasarnya (stateOf tanpa jam), supaya "baru saja dilihat" tidak
+     menyembunyikan apakah butir itu kuat atau goyah. */
+  function conceptStates(st, nowMs) {
+    var M = QM(), mem = memoryOf(st);
+    if (!M || !mem || typeof M.stateOf !== 'function') return null;
+    var out = { kuat: 0, goyah: 0, ulang: 0, total: 0 };
+    for (var id in mem.items) {
+      if (!Object.prototype.hasOwnProperty.call(mem.items, id)) continue;
+      var s = M.stateOf(mem, id, nowMs);
+      if (s === 'recently-seen') s = M.stateOf(mem, id);
+      if (s === 'mastered') out.kuat++;
+      else if (s === 'weak' || s === 'repeated-error') out.goyah++;
+      else if (s === 'due-for-review') out.ulang++;
+      out.total++;
+    }
+    return out;
+  }
+  function conceptStatesMarkup(st) {
+    var c = conceptStates(st, Date.now());
+    if (!c || c.total < 5) return '';
+    return '<p class="lf-reason" data-testid="lf-concept-states">' + esc(t('flow.konsep-ringkas', 'Ingatan soalmu: {kuat} sudah kuat, {goyah} masih goyah, {ulang} waktunya diulang.').replace('{kuat}', c.kuat).replace('{goyah}', c.goyah).replace('{ulang}', c.ulang)) +
+      (c.goyah ? ' ' + esc(t('flow.konsep-dahulu', 'Sesi berikutnya mendahulukan yang masih goyah.')) : '') + '</p>';
+  }
+
   /* Butir untuk satu blok rencana. Alokator kalau ada, pickFresh kalau tidak. */
   function allocateIds(st, block) {
     var B = bank(), A = QA();
@@ -580,6 +607,7 @@
         return '<li class="' + (done ? 'is-done' : '') + '" data-testid="lf-plan-block-' + b.id + '"><span class="lf-num">' + (i + 1) + '</span><div><b>' + esc(b.kind) + ': ' + esc(b.title) + '</b><small>' + b.minutes + ' menit · ' + (b.count || (b.itemIds || []).length) + ' soal' + (b.from ? ' · dari ' + esc(b.from) : '') + '</small></div>' +
           (done ? '<span class="lf-done">' + t('umum.selesai', 'Selesai') + '</span>' : '<button type="button" class="lf-mini lf-start" data-lf="start-lesson" data-block="' + b.id + '" data-testid="lf-start-' + b.id + '">Mulai</button>') + '</li>';
       }).join('') + '</ol>' +
+      conceptStatesMarkup(st) +
       '<p class="lf-reason" data-testid="lf-plan-reason"><b>Alasan sesi ini:</b> ' + esc(plan.reason) + '</p>' +
       '<div class="lf-assign-code" data-testid="lf-assign-code"><label class="lf-muted" for="lfAssignCode">Punya kode tugas dari guru?</label><div class="lf-actions"><input id="lfAssignCode" class="lf-code lf-code-input" placeholder="Tempel kode tugas di sini" autocomplete="off" data-testid="lf-assign-code-input"><button type="button" class="lf-mini" data-lf="accept-assign" data-testid="lf-accept-assign">Tambahkan ke rencana</button></div></div>' +
       '<div class="lf-actions">' + (doneCount < plan.blocks.length ? '<button type="button" class="lf-primary" data-lf="start-first" data-testid="lf-start-first">Mulai sesi berikutnya</button>' : '<span class="lf-done">Rencana hari ini selesai</span>') +

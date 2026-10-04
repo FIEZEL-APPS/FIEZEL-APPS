@@ -87,6 +87,8 @@
     'kelas.bc-arah-turun': 'perlu didampingi',
     'kelas.bc-arah-baru': 'baru mulai',
     'kelas.streak-sub-belajar': 'Belajar atau kerjakan tugas setiap hari untuk menjaga runtunmu',
+    'kelas.bc-remedial-murid': 'Remedial khusus',
+    'kelas.bc-remedial-judul': 'Remedial untuk {nama}',
     'kelas.streak-sub': 'Kerjakan tugas setiap hari untuk menjaga runtun belajar',
     'kelas.terhubung': 'terhubung',
     'kelas.tutor-judul': 'Tutor FIEZEL',

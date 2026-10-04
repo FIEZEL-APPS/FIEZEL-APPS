@@ -1,7 +1,7 @@
 {
-  "version": "m025-462",
+  "version": "m025-463",
   "claimedBy": "branch claude/inspiring-franklin-xml8hz",
-  "claimedAt": "2026-10-04T21:20:36.109Z",
-  "reason": "BrainCore Gelombang 2: KelasKu murid dan guru",
+  "claimedAt": "2026-10-04T21:51:23.823Z",
+  "reason": "BrainCore D8 dan K4, polesan UX grammar U13 sampai U17",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

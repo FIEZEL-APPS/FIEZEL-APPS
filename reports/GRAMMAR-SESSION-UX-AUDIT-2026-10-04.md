@@ -1,6 +1,6 @@
 # Audit UI/UX sesi latihan grammar: dari kursi murid
 
-> **Status m025-458:** U1 sampai U12 dan U14 **diperbaiki** (lihat `docs/handoffs/FIEZEL-M025-458-GRAMMAR-UX-FIXES-HANDOFF.md`, gerbang `tests/grammar-ux-p1-2026-10-04-test.js`). U13 dan butir polesan U15 sampai U18 belum.
+> **Status m025-458:** U1 sampai U12 dan U14 **diperbaiki** (lihat `docs/handoffs/FIEZEL-M025-458-GRAMMAR-UX-FIXES-HANDOFF.md`, gerbang `tests/grammar-ux-p1-2026-10-04-test.js`). U13, U15, U16, dan U17 diperbaiki di m025-463 (`docs/handoffs/FIEZEL-M025-463-BRAINCORE-WAVE4-UX-POLISH-HANDOFF.md`, gerbang `tests/grammar-ux-p3-2026-10-04-test.js`), bersama temuan probe ulang: dua judul modal yang putih di atas putih dan delapan label di bawah 4,5:1. U18 (mode gelap identik dengan terang) dibiarkan: tema terang memang dipakai di seluruh aplikasi.
 
 **Tanggal:** 2026-10-04
 **Basis:** `main` @ `587335cd` (build `m025-450`). Ini sudah memuat redesign latihan grammar

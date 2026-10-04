@@ -138,6 +138,8 @@
     'flow.tugas-hilang': 'งานนี้เสร็จแล้วหรือไม่พบ',
     'flow.tugas-selesai': 'คุณทำงานนี้เสร็จแล้ว',
     'flow.belajar-hari-ini': 'เรียนวันนี้',
+    'flow.konsep-ringkas': 'ความจำโจทย์ของคุณ: แน่นแล้ว {kuat} ข้อ ยังไม่มั่นคง {goyah} ข้อ ถึงเวลาทบทวน {ulang} ข้อ',
+    'flow.konsep-dahulu': 'รอบถัดไปจะเริ่มจากข้อที่ยังไม่มั่นคงก่อน',
     'flow.soal-berikutnya': 'ข้อถัดไป',
     'flow.kembali-rencana': 'กลับไปที่แผน',
     'flow.belum-ada-lesson': 'ยังไม่มีบทเรียนที่เรียนจบ',
