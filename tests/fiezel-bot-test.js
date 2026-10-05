@@ -47,8 +47,8 @@ console.log('[T2] Menjalankan self-test tools/fiezel-bot.mjs...');
 {
   const r = sh('node', ['tools/fiezel-bot.mjs', 'self-test'], true);
   assert(r.out.includes('Self-Test: PASS'), 'Self-test harus mencetak PASS');
-  assert(/PASS \(24\/24 tests\)/.test(r.out), 'Self-test harus lulus 24/24');
-  console.log('  ok (24/24)');
+  assert(/PASS \(25\/25 tests\)/.test(r.out), 'Self-test harus lulus 25/25');
+  console.log('  ok (25/25)');
 }
 pass++;
 
@@ -244,6 +244,15 @@ console.log('[T20] [KUALITAS] Review kritis: multi-lensa + uji skeptis + skenari
   assert(/REVIEW_LENSES\s*=\s*\[/.test(engineSrc) && engineSrc.includes('SKEPTIC_REVIEW'), 'Engine wajib punya lensa review dan prompt uji skeptis');
   assert(engineSrc.includes('function applySkepticVerdicts') && engineSrc.includes("skeptic: 'confirmed'"), 'Hanya temuan yang dikonfirmasi uji skeptis yang bertahan');
   assert(engineSrc.includes('Skenario gagal'), 'Temuan wajib menampilkan skenario gagal');
+}
+console.log('  ok');
+pass++;
+
+console.log('[T21] [KUOTA] Rotasi banyak kunci Gemini tersambung di workflow...');
+{
+  const passes = (wfContent.match(/GEMINI_API_KEYS: \$\{\{ secrets\.GEMINI_API_KEYS \}\}/g) || []).length;
+  assert(passes === 2, `Job review dan heal wajib meneruskan secrets.GEMINI_API_KEYS (ditemukan ${passes})`);
+  assert(engineSrc.includes('function geminiKeyList') && engineSrc.includes('KEY_ROTATE_STATUS'), 'Engine wajib merotasi kunci Gemini');
 }
 console.log('  ok');
 pass++;

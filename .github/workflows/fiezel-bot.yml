@@ -142,6 +142,8 @@ jobs:
         if: steps.meta.outputs.pr_number != ''
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          # Opsional: beberapa kunci dipisah koma; dirotasi otomatis saat satu kunci habis (429).
+          GEMINI_API_KEYS: ${{ secrets.GEMINI_API_KEYS }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           GITHUB_TOKEN: ${{ github.token }}
           GH_TOKEN: ${{ github.token }}
@@ -403,6 +405,8 @@ jobs:
         if: steps.collect.outputs.pr_number != '' && steps.guard.outputs.protected == 'false'
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          # Opsional: beberapa kunci dipisah koma; dirotasi otomatis saat satu kunci habis (429).
+          GEMINI_API_KEYS: ${{ secrets.GEMINI_API_KEYS }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           GITHUB_TOKEN: ${{ github.token }}
           GH_TOKEN: ${{ github.token }}

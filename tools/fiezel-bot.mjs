@@ -120,7 +120,8 @@ const sleep = (ms) => new Promise(r => setTimeout(r, ms));
  * Mencoba satu model dengan coba-ulang bertahap untuk galat sementara.
  * `request(signal)` mengembalikan Response fetch; `extract(json)` mengambil teksnya.
  */
-async function tryModel(label, request, extract, { timeoutMs, deadline, errors, retryDelays }) {
+async function tryModel(label, request, extract, { timeoutMs, deadline, errors, retryDelays }, state = {}) {
+  state.lastStatus = 0;
   for (let attempt = 0; attempt <= retryDelays.length; attempt++) {
     const left = deadline - Date.now();
     if (left <= 0) { errors.push(`${label}: anggaran waktu LLM habis`); return ''; }
@@ -137,6 +138,7 @@ async function tryModel(label, request, extract, { timeoutMs, deadline, errors, 
         return '';
       }
       errors.push(`${label}: HTTP ${res.status}${tag}`);
+      state.lastStatus = res.status;
       if (!LLM_RETRYABLE_STATUS.has(res.status)) return '';
       const ra = Number(res.headers?.get?.('retry-after'));
       if (Number.isFinite(ra) && ra > 0) retryAfterMs = Math.min(ra * 1000, 30_000);
@@ -151,6 +153,20 @@ async function tryModel(label, request, extract, { timeoutMs, deadline, errors, 
   }
   return '';
 }
+
+/**
+ * Daftar kunci Gemini: GEMINI_API_KEYS (dipisah koma/spasi/baris baru) lalu
+ * GEMINI_API_KEY, tanpa duplikat. Kunci TIDAK PERNAH dicetak; log hanya "kunci#N".
+ */
+function geminiKeyList(env = process.env) {
+  const all = [...String(env.GEMINI_API_KEYS || '').split(/[\s,;]+/), String(env.GEMINI_API_KEY || '')]
+    .map(k => k.trim()).filter(Boolean);
+  return [...new Set(all)];
+}
+/** Indeks kunci yang terakhir berhasil — panggilan berikutnya mulai dari sini. */
+let geminiKeyCursor = 0;
+/** Status yang berarti "kunci ini tidak bisa dipakai sekarang" → coba kunci lain, model sama. */
+const KEY_ROTATE_STATUS = new Set([401, 403, 429]);
 
 // KEAMANAN: Semua kunci API dibaca HANYA dari environment variable.
 // Di GitHub Actions, diisi oleh repository secrets (${{ secrets.GROQ_API_KEY }}).
@@ -572,7 +588,7 @@ async function queryLLM(prompt, systemInstruction = '', opts = {}) {
   const tier = opts.tier === 'fast' ? 'fast' : 'review';
   const timeoutMs = opts.timeoutMs || (tier === 'review' ? LLM_REVIEW_TIMEOUT_MS : LLM_TIMEOUT_MS);
   const maxOutputTokens = opts.maxOutputTokens || (tier === 'review' ? 16384 : 4096);
-  const geminiKey = process.env.GEMINI_API_KEY || '';
+  const geminiKeys = geminiKeyList();
   const groqKey = process.env.GROQ_API_KEY || '';
   const errors = [];
   const ctl = {
@@ -582,24 +598,34 @@ async function queryLLM(prompt, systemInstruction = '', opts = {}) {
   };
 
   // 1. Gemini — kunci lewat HEADER, bukan query URL.
-  if (geminiKey) {
+  if (geminiKeys.length) {
     const generationConfig = { temperature: 0.15, maxOutputTokens };
     if (opts.json) generationConfig.responseMimeType = 'application/json';
     const body = { contents: [{ role: 'user', parts: [{ text: prompt }] }], generationConfig };
     if (systemInstruction) body.systemInstruction = { parts: [{ text: systemInstruction }] };
+    const n = geminiKeys.length;
+    // Banyak kunci: kunci yang habis (429) / ditolak (401/403) langsung diganti kunci
+    // berikutnya untuk MODEL YANG SAMA, sebelum turun ke model yang lebih lemah.
+    const keyCtl = n > 1 ? { ...ctl, retryDelays: ctl.retryDelays.slice(0, 1) } : ctl;
     for (const model of modelChainFor('gemini', tier)) {
-      const text = await tryModel(`gemini/${model}`,
-        (signal) => fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'x-goog-api-key': geminiKey },
-          body: JSON.stringify(body),
-          signal,
-        }),
-        (data) => (data.candidates?.[0]?.content?.parts || []).map(p => p.text || '').join(''),
-        ctl);
-      if (text) {
-        if (errors.length) console.warn('[Fiezel Bot v2] LLM pulih setelah galat:', errors.join(' | '));
-        return { text, provider: `Google Gemini (${model})`, model };
+      for (let k = 0; k < n; k++) {
+        const idx = (geminiKeyCursor + k) % n;
+        const state = {};
+        const text = await tryModel(`gemini/${model}${n > 1 ? ` kunci#${idx + 1}` : ''}`,
+          (signal) => fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-goog-api-key': geminiKeys[idx] },
+            body: JSON.stringify(body),
+            signal,
+          }),
+          (data) => (data.candidates?.[0]?.content?.parts || []).map(p => p.text || '').join(''),
+          keyCtl, state);
+        if (text) {
+          geminiKeyCursor = idx;
+          if (errors.length) console.warn('[Fiezel Bot v2] LLM pulih setelah galat:', errors.join(' | '));
+          return { text, provider: `Google Gemini (${model})`, model };
+        }
+        if (!KEY_ROTATE_STATUS.has(state.lastStatus)) break; // masalah model/jaringan, bukan kunci
       }
     }
   }
@@ -2204,6 +2230,44 @@ async function runSelfTest() {
     if (r.text !== 'ok dari cepat' || calls.join() !== 'kuat,kuat,kuat,cepat,cepat') throw new Error(`T19 FAIL: ${r.text} / ${calls.join()}`);
   }
   console.log('  ✅ T19: Coba-ulang 429/503 & turun ke model cadangan');
+  pass++;
+
+  // T25: Rotasi banyak kunci Gemini — kunci habis (429) diganti kunci lain untuk model
+  // yang sama, kunci yang berhasil diingat, dan kunci tidak pernah muncul di log.
+  {
+    if (geminiKeyList({ GEMINI_API_KEYS: 'a1, b2\nc3;a1', GEMINI_API_KEY: 'd4' }).join() !== 'a1,b2,c3,d4') throw new Error('T25 FAIL: daftar kunci');
+    const realFetch = globalThis.fetch, saved = { ...process.env }, realCursor = geminiKeyCursor;
+    const used = [];
+    globalThis.fetch = async (url, init) => {
+      const key = init.headers['x-goog-api-key'];
+      used.push(key);
+      const resp = (status, body) => ({ ok: status === 200, status, headers: { get: () => null }, json: async () => body });
+      if (key === 'KUNCI-HABIS-1' || key === 'KUNCI-HABIS-2') return resp(429, {});
+      return resp(200, { candidates: [{ content: { parts: [{ text: 'ok' }] } }] });
+    };
+    process.env.GEMINI_API_KEYS = 'KUNCI-HABIS-1,KUNCI-HABIS-2,KUNCI-SEHAT-3';
+    delete process.env.GEMINI_API_KEY; delete process.env.GROQ_API_KEY;
+    process.env.FIEZEL_BOT_GEMINI_REVIEW_MODELS = 'satu'; process.env.FIEZEL_BOT_GEMINI_FAST_MODELS = 'satu';
+    const logs = [];
+    const realWarn = console.warn;
+    console.warn = (...a) => logs.push(a.join(' '));
+    geminiKeyCursor = 0;
+    let r1, r2, usedSecond;
+    try {
+      r1 = await queryLLM('p', '', { tier: 'review', retryDelays: [0, 0] });
+      usedSecond = used.length;
+      r2 = await queryLLM('p', '', { tier: 'review', retryDelays: [0, 0] });
+    } finally {
+      globalThis.fetch = realFetch; console.warn = realWarn; geminiKeyCursor = realCursor;
+      for (const k of ['GEMINI_API_KEYS', 'GEMINI_API_KEY', 'GROQ_API_KEY', 'FIEZEL_BOT_GEMINI_REVIEW_MODELS', 'FIEZEL_BOT_GEMINI_FAST_MODELS']) {
+        if (saved[k] === undefined) delete process.env[k]; else process.env[k] = saved[k];
+      }
+    }
+    if (r1.text !== 'ok' || r1.model !== 'satu' || used.slice(0, usedSecond).at(-1) !== 'KUNCI-SEHAT-3') throw new Error(`T25 FAIL: rotasi ${used.join()}`);
+    if (used.slice(usedSecond).join() !== 'KUNCI-SEHAT-3' || r2.text !== 'ok') throw new Error(`T25 FAIL: kunci sehat tidak diingat ${used.slice(usedSecond)}`);
+    if (logs.some(l => l.includes('KUNCI-')) || !logs.join().includes('kunci#1')) throw new Error('T25 FAIL: kunci bocor ke log');
+  }
+  console.log('  ✅ T25: Rotasi banyak kunci Gemini (habis → kunci berikutnya, kunci sehat diingat, tidak bocor ke log)');
   pass++;
 
   // T20: Simbol yang diubah ditemukan, pemanggilnya dikumpulkan (produk dulu, definisi & baris terkirim dilewati).
