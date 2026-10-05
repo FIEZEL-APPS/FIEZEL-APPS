@@ -996,3 +996,8 @@ body.reduce-motion .ch-student,body.reduce-motion .ch-body,body.reduce-motion .c
 .ch-mandiri{display:flex;flex-direction:column;gap:10px;margin-top:10px;padding-top:14px;border-top:1px dashed var(--ch-line)}
 .ch-mandiri .ch-h2{margin:0}
 @media (max-width:380px){.ch-trow{gap:10px;padding:11px 10px}.ch-trow-lead{width:40px;height:40px}.ch .ch-segbar-btn{font-size:.8rem}}
+
+/* Soal menyimak di runner tugas: tombol Dengarkan, naskah sesudah menjawab (temuan role play murid). */
+.ch-listen{display:flex;flex-direction:column;gap:8px;margin:0 0 12px}
+.ch-listen .ch-btn{align-self:flex-start}
+.ch-transcript summary{cursor:pointer;font-weight:600}

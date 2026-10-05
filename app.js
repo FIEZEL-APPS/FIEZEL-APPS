@@ -17783,7 +17783,7 @@ async function askCloudflareAITask(clientTask,ctx){
 const AI_TASKS_SAAT_DINILAI=Object.freeze(['writing_feedback','session_recap']);
 function aiTaskBlockedByLock(task){return typeof examLockActive==='function'&&examLockActive()&&AI_TASKS_SAAT_DINILAI.indexOf(String(task||'question'))===-1}
 async function askFiezelAIResult(prompt,task='question',ctx=null){
-  if(aiTaskBlockedByLock(task)){if(typeof examLockNotice==='function')examLockNotice();throw new Error(FiezelI18n.t('ujian.ai-terkunci-singkat','Nonaktif selama ujian.'))}
+  if(aiTaskBlockedByLock(task)){if(typeof examLockNotice==='function')examLockNotice();throw new Error(examLock()?.kind()==='assignment'?FiezelI18n.t('sekolah.ai-terkunci-tugas-singkat','AI nonaktif selama mengerjakan tugas dari guru.'):FiezelI18n.t('ujian.ai-terkunci-singkat','Nonaktif selama ujian.'))}
   if(aiTaskTransportMode()==='on'&&AI_TASK_MAP[String(task||'')]&&aiTaskRequestBody(task,ctx))return askCloudflareAITask(task,ctx);
   const text=await askPuterAI(prompt,task);
   return{text,degraded:false,note:'',source:'puter',transport:'puter'};

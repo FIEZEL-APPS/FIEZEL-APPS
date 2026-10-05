@@ -1,7 +1,7 @@
 {
-  "version": "m025-483",
-  "claimedBy": "branch claude/exciting-ritchie-vyrs2e",
-  "claimedAt": "2026-10-05T12:45:49.601Z",
-  "reason": "Fitur sekolah Indonesia R1-R8 digabung dengan main terbaru (RUMUS KILAT, fiezel-bot), rapor KKTP presisi bukti pecahan",
+  "version": "m025-484",
+  "claimedBy": "branch claude/kelasku-murid-jujur",
+  "claimedAt": "2026-10-05T13:27:28.973Z",
+  "reason": "KelasKu murid jujur: tanpa label/tugas/pengumuman karangan, status kiriman hasil yang benar, soal menyimak dengan tombol Dengarkan",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
