@@ -120,7 +120,7 @@ test('P1 · butir lesson datang dari alokator BANKOR, bukan dari pickFresh', () 
   const plan = toPlan(s);
   const blok = plan.blocks.filter((b) => b.id === 'daily_mix')[0];
   assert.ok(blok, 'rencana tidak punya blok daily_mix');
-  
+
   assert.ok(blok.itemIds && blok.itemIds.length > 0, 'daily_mix harus punya itemIds dari alokator');
 
   const stSebelum = JSON.parse(JSON.stringify(s.state()));
