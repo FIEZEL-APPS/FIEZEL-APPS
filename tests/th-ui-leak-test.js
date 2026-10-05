@@ -175,7 +175,8 @@ const ALLOWLIST = Object.freeze({
      saja; utang th domain 'sekolah' tercatat di UTANG_TANPA_TH (tests/th-coverage-test.js). */
   'features/learner-flow/fiezel-review-bank.js': 15,
   /* 7 -> 8 (2026-10-05): satu label rekap Rapor KKTP (R2). Layar guru Indonesia; lihat keputusan owner di atas. */
-  'features/teacher/fiezel-rapor-kktp.js': 3,                   // kepala kolom CSV e-Rapor (format resmi berbahasa Indonesia)
+  'features/teacher/fiezel-rapor-kktp.js': 3,
+  'features/teacher/fiezel-analisis-butir.js': 2,               // kepala kolom CSV analisis butir (R5), layar guru Indonesia                   // kepala kolom CSV e-Rapor (format resmi berbahasa Indonesia)
   'features/teacher/fiezel-teacher-shell.js': 8,                // layar guru, naskah lama (+4 m025-351: label 'Tenggat & tugas', 'Mapel', 'Penugasan nilai (assignment)', dan contoh soal 'Penugasan Kontingen...' ikut terlihat setelah kosakata baru masuk daftar)
   'features/teacher/fiezel-teacher-store.js': 3,                // idem
   'features/tutor-action-center/fiezel-tutor-action-center.js': 3, // idem

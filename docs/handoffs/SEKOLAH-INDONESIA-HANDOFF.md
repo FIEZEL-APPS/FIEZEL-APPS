@@ -84,17 +84,39 @@ Kontrak:
    Guru bisa mematikan pengacakan per tugas dengan `variant:false`.
 4. Ini **mempersulit**, bukan mustahilkan, contek: murid masih bisa menyalin teks jawaban.
 
+## R5 — Kalibrasi soal lintas murid: Analisis Butir Soal (m025-478)
+
+Temuan: kalibrasi kesulitan lintas murid tingkat aplikasi **sudah ada dan menyala**
+(`FiezelItemPool`, `ITEM_POOL_ENABLED = "on"`, mode klien `'on'`, job harian
+`braincore-item-pool.yml`) — tetapi hanya untuk soal grammar aplikasi utama, dan guru tidak
+pernah melihat hasilnya. R5 karena itu tidak membangun mesin kedua; ia memberi guru kalibrasi
+tingkat KELAS yang memang diwajibkan: analisis butir soal.
+
+| Bagian | Berkas |
+|---|---|
+| Inti murni: tingkat kesukaran p, daya beda D (27% atas vs bawah), fungsi pengecoh, rekomendasi, CSV | `features/teacher/fiezel-analisis-butir.js` (`FiezelAnalisisButir`) |
+| Tombol "Analisis butir" di kartu tugas, modal tabel, unduh CSV | `features/teacher/fiezel-teacher-shell.js` (`analisisButirModal`, `case 'butir-csv'`) |
+| Gerbang | `tests/analisis-butir-test.js` |
+
+Kontrak:
+1. **Hanya hasil aplikasi** (punya `w[]`) yang dihitung; nilai kertas dilaporkan sebagai dilewati.
+2. **Daya beda butuh ≥ 10 murid**; di bawahnya "Belum cukup murid", bukan angka.
+3. D negatif = **periksa kunci jawaban** (kelompok bawah lebih sering benar daripada atas).
+
+Belum: perluasan `FiezelItemPool` ke soal bank KelasKu/latihan murid/TKA (butuh prediksi saat
+penyajian di runner KelasKu dan learner-flow — pekerjaan BrainCore tersendiri).
+
 ## Gerbang Thai yang disesuaikan (keputusan owner, bertanggal)
 
 - `tests/th-coverage-test.js`: `UTANG_TANPA_TH` + `['sekolah', { sejak: '2026-10-05' }]`.
 - `tests/teacher-i18n-lazy-test.js` dan `tests/th-ui-leak-test.js`: kunci `sekolah.*` dikecualikan
   dari tuntutan th **hanya selama** entri utang di atas ada. Anggaran literal th-ui-leak naik
-  untuk `fiezel-review-bank.js` (1→15, naskah soal TKA), `fiezel-teacher-shell.js` (7→8), dan
-  `fiezel-rapor-kktp.js` (baru, 3: kepala kolom CSV e-Rapor).
+  untuk `fiezel-review-bank.js` (1→15, naskah soal TKA), `fiezel-teacher-shell.js` (7→8), `fiezel-rapor-kktp.js` (baru, 3: kepala kolom CSV e-Rapor), dan
+  `fiezel-analisis-butir.js` (baru, 2: kepala kolom CSV).
 - `tests/teacher-lazy-load-test.js`: bundel guru boleh memuat modul `features/teacher/` di antara
   kurikulum dan shell; urutan kurikulum-pertama/shell-terakhir tetap dijaga.
 
 ## Belum dikerjakan
 
-R5–R8 (lihat dokumen strategi). Bank TKA target ≥ 60 bacaan; sekarang 16. Pemetaan TP ke Capaian Pembelajaran Fase D resmi belum
+R6–R8 (lihat dokumen strategi). Bank TKA target ≥ 60 bacaan; sekarang 16. Pemetaan TP ke Capaian Pembelajaran Fase D resmi belum
 ada: TP saat ini = keterampilan yang dilatih kelas.

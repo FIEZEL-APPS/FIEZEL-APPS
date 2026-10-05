@@ -21,7 +21,7 @@
   'use strict';
   if (!root || !root.document || root.FiezelTeacherShell) return;
 
-  var BUNDLE = ['./features/teacher/fiezel-teacher-curriculum.js', './features/teacher/fiezel-kelas-tanpa-hp.js', './features/teacher/fiezel-rapor-kktp.js', './features/teacher/fiezel-teacher-shell.js'];
+  var BUNDLE = ['./features/teacher/fiezel-teacher-curriculum.js', './features/teacher/fiezel-kelas-tanpa-hp.js', './features/teacher/fiezel-rapor-kktp.js', './features/teacher/fiezel-analisis-butir.js', './features/teacher/fiezel-teacher-shell.js'];
   var loading = null;
 
   function isTeacherRole() {

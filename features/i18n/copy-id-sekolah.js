@@ -13,6 +13,17 @@
   if (!I18N) return; // urutan script salah — fiezel-i18n.js wajib dimuat lebih dulu
 
   I18N.registerCopy('id', {
+    'sekolah.butir-csv': "Unduh CSV analisis",
+    'sekolah.butir-daya-beda': "Daya beda",
+    'sekolah.butir-dilewati': "{n} murid dengan nilai kertas tidak dihitung (tanpa rincian per soal).",
+    'sekolah.butir-judul': "Analisis butir soal — {judul}",
+    'sekolah.butir-kesukaran': "Kesukaran",
+    'sekolah.butir-kosong': "Belum ada murid yang mengerjakan tugas ini lewat aplikasi.",
+    'sekolah.butir-pengecoh': "Pilihan (jumlah murid)",
+    'sekolah.butir-penjelasan': "Dihitung dari {n} murid yang mengerjakan lewat aplikasi. Daya beda membandingkan 27% murid nilai tertinggi dan terendah; butuh minimal {min} murid.",
+    'sekolah.butir-rekomendasi': "Rekomendasi",
+    'sekolah.butir-soal': "Soal",
+    'sekolah.butir-tombol': "Analisis butir",
     'sekolah.cetak-gagal': "Lembar soal belum bisa disiapkan.",
     'sekolah.cetak-lembar': "Cetak lembar soal",
     'sekolah.dan': "dan",
