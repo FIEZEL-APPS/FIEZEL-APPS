@@ -47,8 +47,8 @@ console.log('[T2] Menjalankan self-test tools/fiezel-bot.mjs...');
 {
   const r = sh('node', ['tools/fiezel-bot.mjs', 'self-test'], true);
   assert(r.out.includes('Self-Test: PASS'), 'Self-test harus mencetak PASS');
-  assert(/PASS \(22\/22 tests\)/.test(r.out), 'Self-test harus lulus 22/22');
-  console.log('  ok (22/22)');
+  assert(/PASS \(24\/24 tests\)/.test(r.out), 'Self-test harus lulus 24/24');
+  console.log('  ok (24/24)');
 }
 pass++;
 
@@ -183,8 +183,10 @@ console.log('[T15] [KUALITAS] Review AI: konteks berkas utuh + temuan terverifik
     assert(engineSrc.includes(`function ${comp}`), `Engine wajib punya ${comp}`);
   }
   const reviewBody = engineSrc.slice(engineSrc.indexOf('async function runReview'), engineSrc.indexOf('function composeAiSection'));
-  assert(reviewBody.includes('buildFileContext(') && reviewBody.includes('verifyFindings('), 'runReview wajib membaca berkas utuh dan memverifikasi temuan');
-  assert(/json:\s*true/.test(reviewBody), 'Review AI wajib meminta keluaran JSON terstruktur');
+  const pipelineBody = engineSrc.slice(engineSrc.indexOf('async function runAiReview'), engineSrc.indexOf('async function runReview'));
+  assert(reviewBody.includes('buildFileContext(') && reviewBody.includes('runAiReview('), 'runReview wajib membaca berkas utuh dan memakai pipeline AI');
+  assert(pipelineBody.includes('verifyFindings('), 'Pipeline AI wajib memverifikasi kutipan temuan ke kode');
+  assert(/json:\s*true/.test(pipelineBody), 'Review AI wajib meminta keluaran JSON terstruktur');
   assert(wfContent.includes('FIEZEL_INLINE_OUT'), 'Workflow wajib meneruskan FIEZEL_INLINE_OUT ke engine');
   assert(wfContent.includes('pulls.createReview') && wfContent.includes('listReviewComments'), 'Workflow wajib memposting review inline dan mencegah duplikat');
 }
@@ -231,6 +233,17 @@ console.log('[T19] [KUALITAS] Kode pemanggil dikirim ke AI & ketepatan diukur ha
   assert(/timeout-minutes:\s*\d+/.test(m), 'Metrik wajib punya timeout-minutes');
   assert(!/secrets\./.test(m) && !/contents:\s*write/.test(m), 'Metrik tidak boleh memegang secrets atau izin tulis kode');
   assert(m.includes('fiezel-bot.mjs metrics'), 'Metrik wajib menjalankan perintah metrics engine');
+}
+console.log('  ok');
+pass++;
+
+console.log('[T20] [KUALITAS] Review kritis: multi-lensa + uji skeptis + skenario gagal...');
+{
+  const reviewBody = engineSrc.slice(engineSrc.indexOf('async function runReview'), engineSrc.indexOf('function writeVerdict'));
+  assert(reviewBody.includes('runAiReview('), 'runReview wajib memakai pipeline multi-lensa + uji skeptis');
+  assert(/REVIEW_LENSES\s*=\s*\[/.test(engineSrc) && engineSrc.includes('SKEPTIC_REVIEW'), 'Engine wajib punya lensa review dan prompt uji skeptis');
+  assert(engineSrc.includes('function applySkepticVerdicts') && engineSrc.includes("skeptic: 'confirmed'"), 'Hanya temuan yang dikonfirmasi uji skeptis yang bertahan');
+  assert(engineSrc.includes('Skenario gagal'), 'Temuan wajib menampilkan skenario gagal');
 }
 console.log('  ok');
 pass++;
