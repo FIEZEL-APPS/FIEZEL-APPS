@@ -10,9 +10,8 @@ Komponen: CI Quality Gate & Secret Scanner (`tools/fiezel-bot.mjs`, `tests/secre
 Pada saat integrasi dan merge fitur Panel Game (bottom nav button Game, kartu poster game PAW ARENA, dan Bug Arena Boss Raid), workflow CI `FIEZEL Quality Gate` pada GitHub Actions runner gagal di langkah `Core validation`.
 
 ### Akar Masalah:
-- Berkas `tools/fiezel-bot.mjs` baris 800 pada pengujian internal T4 menuliskan string literal:
-  `const testSecrets = ['+ghp_abcdefghijklmnopqrstuvwxyz1234567890', '+-----BEGIN PRIVATE KEY-----'];`
-- `tests/secret-scan-test.js` mendeteksi pola `pemPrivateKey` (`-----BEGIN ... PRIVATE KEY-----`) sebagai hard secret invariant pada setiap berkas yang dilacak git.
+- Berkas `tools/fiezel-bot.mjs` baris 800 pada pengujian internal T4 sebelumnya menuliskan fixture pengujian dengan pola blok kunci privat PEM literal secara langsung (`[DASH5]BEGIN PRIVATE KEY[DASH5]`).
+- `tests/secret-scan-test.js` mendeteksi pola `pemPrivateKey` sebagai hard secret invariant pada setiap berkas yang dilacak git.
 - Sesuai prinsip *Zero False Positive and Self-Scanning Principle* di `secret-scan-test.js`, fixture pengujian dilarang memuat literal PEM secara langsung, melainkan harus dibangun secara dinamis melalui penggabungan string:
   `'+' + '-'.repeat(5) + 'BEGIN PRIVATE KEY' + '-'.repeat(5)`
 
