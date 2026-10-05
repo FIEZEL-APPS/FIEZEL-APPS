@@ -377,6 +377,20 @@
     for (var i = 0; i < recent.length && out.length < OUTBOX_BATCH; i++) if (!ids[recent[i].id]) { out.push(recent[i]); ids[recent[i].id] = true; }
     return out;
   }
+  /* Layar hasil KelasKu dulu selalu berkata "Hasil ini dikirim ke Bu Sari", juga saat HP tanpa
+     sinyal dan hasilnya masih di kotak keluar (temuan role play murid 2026-10-05). Status ini
+     dibaca layar itu; event di bawah membuatnya diperbarui begitu kiriman benar-benar sampai. */
+  function kabarLaporan(ok) {
+    try { if (root.dispatchEvent && typeof root.CustomEvent === 'function') root.dispatchEvent(new root.CustomEvent('fiezel:class-report', { detail: { ok: ok } })); } catch (_) {}
+  }
+  /** 'terkirim' | 'mengirim' | 'menunggu' untuk hasil tugas `id`. */
+  function resultStatus(id) {
+    var s = ensureState();
+    if (!classCode() || !(s.assignOutbox || []).some(function (x) { return x.id === id; })) return 'terkirim';
+    var offline = false; try { offline = root.navigator && root.navigator.onLine === false; } catch (_) {}
+    if (offline || (s.classReport && s.classReport.ok === false)) return 'menunggu';
+    return 'mengirim';
+  }
   function offlineStatus() {
     var s = ensureState();
     return { pending: (s.assignOutbox || []).length, lastOkAt: s.classReport && s.classReport.ok ? s.classReport.at : 0, saved: loadAssignments().length };
@@ -402,7 +416,8 @@
           if (r && r.ok && st.pendingJoin) st.pendingJoin = 0;
           save(st);
           if (r && r.ok) clearRetry(); else scheduleRetry();
-        }, function () { scheduleRetry(); });
+          kabarLaporan(!!(r && r.ok));
+        }, function () { st.classReport = { at: Date.now(), ok: false, error: 'network' }; save(st); scheduleRetry(); kabarLaporan(false); });
       } catch (_) { scheduleRetry(); }
     }
     var T = root.FiezelTutorActionCenter; if (!T) return true;
@@ -921,5 +936,5 @@
     });
   }
 
-  return { KEY: KEY, ASSIGN_KEY: ASSIGN_KEY, GOALS: GOALS, mount: mount, render: render, load: load, buildPlan: buildPlan, skillSummary: skillSummary, weeklySummary: weeklySummary, tutorCode: tutorCode, rankedSkills: rankedSkills, statusOf: statusOf, openAssignment: openAssignment, announceJoin: announceJoin, recordExamFocus: recordExamFocus, markAssignmentStarted: markAssignmentStarted, recordAssignmentFocus: recordAssignmentFocus, recordAssignmentResult: recordAssignmentResult, pushToClass: function () { ensureState(); return pushToClass(); }, _retryState: function () { return { pending: !!retryTimer, delay: retryDelay }; }, offlineStatus: offlineStatus, _drainPending: function () { return !!drainTimer; }, _state: function () { return st; } };
+  return { KEY: KEY, ASSIGN_KEY: ASSIGN_KEY, GOALS: GOALS, mount: mount, render: render, load: load, buildPlan: buildPlan, skillSummary: skillSummary, weeklySummary: weeklySummary, tutorCode: tutorCode, rankedSkills: rankedSkills, statusOf: statusOf, openAssignment: openAssignment, announceJoin: announceJoin, recordExamFocus: recordExamFocus, markAssignmentStarted: markAssignmentStarted, recordAssignmentFocus: recordAssignmentFocus, recordAssignmentResult: recordAssignmentResult, pushToClass: function () { ensureState(); return pushToClass(); }, _retryState: function () { return { pending: !!retryTimer, delay: retryDelay }; }, offlineStatus: offlineStatus, resultStatus: resultStatus, _drainPending: function () { return !!drainTimer; }, _state: function () { return st; } };
 });

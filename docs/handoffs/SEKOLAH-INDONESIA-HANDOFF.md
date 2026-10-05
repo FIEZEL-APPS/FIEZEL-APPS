@@ -178,6 +178,22 @@ undangan Panggung Suara (tiap 12 dtk untuk semua murid) adalah ±⅓ permintaan.
 Ikut diperbaiki: `tests/class-hub-test.js` tidak lagi bergantung pada urutan soal (sejak R4
 urutannya berbiji dari id tugas yang lahir acak, jadi tes itu kadang merah).
 
+## KelasKu murid — temuan role play (m025-484)
+
+Role play murid di browser (HP 390 px, tanpa sinyal) menemukan isi karangan di panel tugas murid
+yang dipasang lagi oleh desain m025-443, padahal audit 2026-09-22 (instruksi owner) melarangnya.
+
+| Temuan | Perbaikan | Berkas |
+|---|---|---|
+| Semua tugas berlabel "TATA BAHASA • LESSON 12 & 13" dan "soal adaptif • Bobot nilai 15%" | Label dari area keterampilan (`areaTugas`), info hanya fakta (`infoTugas`: jumlah soal, ujian/menit) | `fiezel-class-hub.js` |
+| Murid tanpa tugas melihat 3 tugas contoh fiktif, termasuk "Selesai · Nilai 90" | Keadaan kosong yang jujur | `sampleCardsMarkup` |
+| Hitungan "Selesai (1)" / "Perlu Dikerjakan (2)" dari `|| 1` / `|| 2` | Angka nyata | `segmenBar` |
+| Pengumuman "Ujian formatif hari Jumat! · Diposting 2 jam lalu" atas nama Bu Sari | Kartu sapaan hanya bila guru benar-benar menulis | `teacherGreetingCard` |
+| Layar hasil "Hasil ini dikirim ke Bu Sari" padahal tanpa sinyal | Status nyata dari kotak keluar R6: terkirim / mengirim / menunggu sinyal; layar diperbarui lewat event `fiezel:class-report` | `statusKirim`, `resultStatus` di learner-flow |
+| Soal menyimak menampilkan naskah, tanpa suara | Tombol Dengarkan (FiezelVoiceSay), naskah sesudah menjawab; tanpa mesin suara naskah tampil dengan catatan | `konteksSoal`, `case 'dengar'` |
+
+Gerbang: `tests/kelasku-murid-jujur-test.js`.
+
 ## Gerbang Thai yang disesuaikan (keputusan owner, bertanggal)
 
 - `tests/th-coverage-test.js`: `UTANG_TANPA_TH` + `['sekolah', { sejak: '2026-10-05' }]`.
