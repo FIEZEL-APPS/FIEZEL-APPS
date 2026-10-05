@@ -19927,7 +19927,7 @@
         "rule": "I, you, we, they: have got. He, she, it: has got. Question: Have or Has + subject + got? Negative: haven't got, hasn't got.",
         "whyOthersFail": "'Hasn't' is for he, she, or it; 'don't' and 'am not' do not go with 'got'.",
         "howToAvoid": "Find the subject first: he, she, or it takes has; the others take have. Never add do.",
-        "memoryCue": "I haven't got; she hasn't got.",
+        "memoryCue": "[[Orang ke-1 tunggal / Jamak]] I, you, we, they + haven't got. [[Orang ke-3 tunggal]] She, he, it + hasn't got.",
         "ruleId": "“I”, “you”, “we”, “they” pakai “have got”. “He”, “she”, “it” pakai “has got”. Untuk bertanya, “have/has” pindah ke depan. Negatifnya “haven't/hasn't got”.",
         "whyCorrectId": "Subjeknya “I”, dan bentuk negatif “have got” adalah “haven't got”.",
         "whyOthersFailId": "“Hasn't” untuk “he”, “she”, atau “it”. “Don't” dan “am not” nggak dipasangkan dengan “got”.",

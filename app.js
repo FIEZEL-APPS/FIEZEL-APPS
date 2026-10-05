@@ -14007,6 +14007,7 @@ function formatMemoryTipForDisplay(txt) {
   if (!txt) return '';
   let s = String(txt).trim();
   s = s.replace(/\b(Trik cepat|Tips cepat|Tips|Trik ingat|Catatan):/gi, '<strong>$1:</strong>');
+  s = s.replace(/\[\[(.*?)\]\]/g, '<small class="muted" style="display:block;margin-top:8px;margin-bottom:2px;font-size:0.85em;line-height:1.2">$1</small>');
   return `<span>${s}</span>`;
 }
 
@@ -15739,13 +15740,15 @@ function quizLoop(cfg){
   f.innerHTML=`<div class="feedback-title"><i data-lucide="${ok?'circle-check-big':'circle-x'}"></i><b>${ok?FiezelI18n.t('quiz.verdict-correct'):FiezelI18n.t('quiz.verdict-wrong')}</b></div><p>${FiezelI18n.t('quiz.you-menulis')} <strong>${esc(typed)}</strong>. ${detail}</p><p><strong>${FiezelI18n.t('quiz.intinya')}</strong> ${esc(q.explain?.why||FiezelI18n.t('quiz.fallback-tense-check'))} ${q.explain?.rule?esc(q.explain.rule):''}</p><div class="feedback-memory-box memory-tip"><div class="feedback-memory-header"><i data-lucide="lightbulb"></i><span class="feedback-memory-kicker">${FiezelI18n.t('quiz.trik-ingat','Trik Cepat Ingat')}</span></div><div class="feedback-memory-content">${formatMemoryTipForDisplay(esc(q.explain?.memory||FiezelI18n.t('quiz.fallback-tense-read')))}</div></div>`;
   answer.locked=true;
   $('quizNext').disabled=false;
-  showQuizFloatingNext();
-  /* W1 P1-4 (11-001 saudara cloze): pembahasan cloze juga harus terlihat, aturan yang sama. */
-  try{f.scrollIntoView({block:'nearest',behavior:(prefersReducedMotion()||state.preferences?.motion===false)?'auto':'smooth'})}catch{}
+  if(input)input.classList.add(ok?'correct':'wrong');
+  
   /* m025-186 (A16-F1): tanpa titipan ini, kedua tombol popup jatuh ke quizNext.click()
      dan MELOMPATI pembahasan yang barusan dicat. Kelanjutannya cukup menutup popup dan
      mengantar mata ke panel pembahasan di baliknya - persis yang dijanjikan tombolnya. */
-  confidencePopThen=()=>{try{$('feedback')?.scrollIntoView({block:'nearest',behavior:'auto'})}catch{}};
+  confidencePopThen=()=>{
+    showQuizFloatingNext();
+    try{$('feedback')?.scrollIntoView({block:'nearest',behavior:(prefersReducedMotion()||state.preferences?.motion===false)?'auto':'smooth'})}catch{}
+  };
   openConfidencePop(ok);
   enhanceUI();
  };
