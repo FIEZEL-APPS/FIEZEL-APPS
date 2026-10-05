@@ -43,16 +43,13 @@ permissions:
   issues: write
   actions: read
 
-concurrency:
-  # Dikelompokkan per PR/branch agar tiga kegagalan pada PR yang sama tidak
-  # memicu tiga heal paralel yang saling menimpa push.
-  group: fiezel-bot-${{ github.event.pull_request.number || github.event.workflow_run.pull_requests[0].number || github.event.workflow_run.head_branch || github.event.inputs.pr_number || github.run_id }}
-  cancel-in-progress: false
-
 jobs:
   # 1. Otomatis Review Setiap PR Dibuka atau Diperbarui (Zero Manual Command)
   auto-pr-review:
     name: Auto PR Review & Invariant Audit
+    concurrency:
+      group: fiezel-bot-review-${{ github.event.pull_request.number || github.event.issue.number || github.event.inputs.pr_number || github.run_id }}
+      cancel-in-progress: true
     timeout-minutes: 20
     runs-on: ubuntu-latest
     # KEAMANAN: tolak PR dari fork + wajib penulis OWNER/MEMBER. Hanya MASTER
@@ -148,10 +145,13 @@ jobs:
           set -euo pipefail
           mkdir -p /tmp/fiezel-bot
           if [[ "$EVENT_NAME" == "workflow_dispatch" && "$COMMAND" == "explain" ]]; then
-            node tools/fiezel-bot.mjs explain --pr="$PR_NUM" > /tmp/fiezel-bot/out.md 2>&1 || true
+            node tools/fiezel-bot.mjs explain --pr="$PR_NUM" > /tmp/fiezel-bot/raw.log 2>&1 || true
+            sed -n '/<!-- FIEZEL_BOT_EXPLAIN -->/,$p' /tmp/fiezel-bot/raw.log > /tmp/fiezel-bot/out.md || cp /tmp/fiezel-bot/raw.log /tmp/fiezel-bot/out.md
+            echo "MARKER=<!-- FIEZEL_BOT_EXPLAIN -->" >> "$GITHUB_ENV"
           else
             node tools/fiezel-bot.mjs review --pr="$PR_NUM" > /tmp/fiezel-bot/raw.log 2>&1 || true
             sed -n '/<!-- FIEZEL_BOT_REVIEW -->/,$p' /tmp/fiezel-bot/raw.log > /tmp/fiezel-bot/out.md || cp /tmp/fiezel-bot/raw.log /tmp/fiezel-bot/out.md
+            echo "MARKER=<!-- FIEZEL_BOT_REVIEW -->" >> "$GITHUB_ENV"
           fi
           # Permukaan diagnostik: tampilkan galat LLM (mis. nama model/kuota) di log CI.
           echo "----- Fiezel Bot diagnostics -----"
@@ -170,7 +170,7 @@ jobs:
             const body = fs.readFileSync(path, 'utf8').trim();
             if (!body) return;
 
-            const marker = '<!-- FIEZEL_BOT_REVIEW -->';
+            const marker = process.env.MARKER || '<!-- FIEZEL_BOT_REVIEW -->';
             const { owner, repo } = context.repo;
             const issue_number = Number(process.env.PR_NUMBER);
             const comments = await github.paginate(github.rest.issues.listComments, {
@@ -186,6 +186,9 @@ jobs:
   # 2. Otomatis Sembuhkan CI Ketika Gagal (Self-Healing Loop)
   auto-ci-heal:
     name: Auto CI Self-Healing & Fix
+    concurrency:
+      group: fiezel-bot-heal-${{ github.event.workflow_run.head_branch || github.event.inputs.pr_number || github.run_id }}
+      cancel-in-progress: false
     timeout-minutes: 20
     runs-on: ubuntu-latest
     # KEAMANAN: tolak fork, wajib run berasal dari repo ini, aktor MASTER saja.
@@ -361,9 +364,13 @@ jobs:
             exit 0
           fi
           git commit -m "bot(heal): auto-healing CI failure by Fiezel Bot"
-          git push origin "HEAD:${HEAD_BRANCH}"
-          echo "patched=true" >> "$GITHUB_OUTPUT"
-          echo "Berkas terpatch: ${FILES[*]}"
+          if git push origin "HEAD:${HEAD_BRANCH}"; then
+            echo "patched=true" >> "$GITHUB_OUTPUT"
+            echo "Berkas terpatch: ${FILES[*]}"
+          else
+            echo "patched=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Gagal melakukan push (mungkin branch sudah maju). Laporan tetap dikirim."
+          fi
 
       - name: Post CI Heal Report on PR
         if: steps.collect.outputs.pr_number != ''
