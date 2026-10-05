@@ -1,7 +1,7 @@
 {
-  "version": "m025-479",
-  "claimedBy": "branch fix-cloze-next-btn-memory-faded",
-  "claimedAt": "2026-10-05T08:50:46.273Z",
-  "reason": "feat(grammar): apply RUMUS KILAT formatting to Batch 1 topics",
+  "version": "m025-481",
+  "claimedBy": "branch claude/exciting-ritchie-vyrs2e",
+  "claimedAt": "2026-10-05T08:58:51.803Z",
+  "reason": "fix(grammar): apply precise positive/negative comparison for have got per user directive",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

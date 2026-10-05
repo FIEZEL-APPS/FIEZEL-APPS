@@ -56,8 +56,7 @@
       },
       "pedagogicalObjectiveId": "Bedain kebiasaan yang berulang dari kejadian yang lagi jalan sekarang. Pilih present simple atau present continuous.",
       "misconceptionTargetedId": "Kamu pakai present simple yang buat kebiasaan, padahal kejadiannya lagi jalan di depan mata.",
-      "reasoningOperationId": "cari kata kunci waktunya → tentuin bentuk kata kerjanya",
-      "ruleId": "Fakta atau kebiasaan (rutinitas) pakai Present Simple. Subjek “he”, “she”, “it” wajib ditambah -s/-es pada kata kerjanya.<br><br>💡 <b>RUMUS KILAT</b>:<br>Subjek tunggal (He/She/It) ➡️ Kata kerja pakai akhiran <b>-s/-es</b> (misal: plays, goes).<br>Subjek jamak (I/You/We/They) ➡️ Kata kerja <b>tanpa tambahan apa pun</b> (misal: play, go)."
+      "reasoningOperationId": "cari kata kunci waktunya → tentuin bentuk kata kerjanya"
     },
     {
       "id": "TA-002",
@@ -113,8 +112,7 @@
       },
       "pedagogicalObjectiveId": "Pilih past simple buat kejadian yang waktunya disebut jelas. Pakai present perfect kalau waktunya nggak disebut tapi efeknya masih kebawa sekarang.",
       "misconceptionTargetedId": "Kamu ngira present perfect selalu berarti masih jalan sekarang. Padahal maknanya lampau tanpa waktu pasti yang masih nyambung ke sekarang.",
-      "reasoningOperationId": "temukan tanggal atau tahun yang pasti di kalimatnya → pilih past simple, bukan present perfect",
-      "ruleId": "Kejadian di masa lalu pakai Verb 2. Kalau bertanya atau negatif, bentuk masa lalunya ditanggung oleh “did/didn't”, jadi kata kerjanya wajib kembali ke dasar (Verb 1).<br><br>💡 <b>RUMUS KILAT</b>:<br>Kalau ADA kata <b>did</b> / <b>didn't</b> ➡️ Kata kerjanya WAJIB balik ke dasar (Verb 1).<br>Kalau NGGAK ADA <b>did</b> ➡️ Kata kerjanya pakai Verb 2."
+      "reasoningOperationId": "temukan tanggal atau tahun yang pasti di kalimatnya → pilih past simple, bukan present perfect"
     },
     {
       "id": "TA-003",
@@ -170,8 +168,7 @@
       },
       "pedagogicalObjectiveId": "Bedain rencana yang udah diatur dari keputusan yang baru muncul pas kamu ngomong.",
       "misconceptionTargetedId": "Kamu nganggep tawaran yang baru muncul pas ngomong sebagai rencana yang udah diatur, jadi milih present continuous, bukan “will”.",
-      "reasoningOperationId": "cek udah direncanain dari tadi atau baru diputusin pas ngomong → pilih bentuk masa depannya",
-      "ruleId": "Rencana yang sudah pasti (niat) pakai “be going to”. Tebakan masa depan tanpa rencana matang pakai “will”.<br><br>💡 <b>RUMUS KILAT</b>:<br>Punya NIAT/RENCANA pasti ➡️ Pakai <b>be going to</b>.<br>Cuma MENEBAK masa depan (belum pasti) ➡️ Pakai <b>will</b>."
+      "reasoningOperationId": "cek udah direncanain dari tadi atau baru diputusin pas ngomong → pilih bentuk masa depannya"
     },
     {
       "id": "MO-001",
@@ -955,8 +952,7 @@
       },
       "pedagogicalObjectiveId": "Pakai past continuous buat kejadian latar yang lebih panjang. Pakai past simple buat kejadian pendek yang nyela.",
       "misconceptionTargetedId": "Kamu pakai past simple buat dua kejadiannya karena sama-sama lampau.",
-      "reasoningOperationId": "tentuin mana kejadian latar dan mana yang nyela → pilih bentuk tiap kata kerjanya",
-      "ruleId": "Kejadian di masa lalu pakai Verb 2. Kalau bertanya atau negatif, bentuk masa lalunya ditanggung oleh “did/didn't”, jadi kata kerjanya wajib kembali ke dasar (Verb 1).<br><br>💡 <b>RUMUS KILAT</b>:<br>Kalau ADA kata <b>did</b> / <b>didn't</b> ➡️ Kata kerjanya WAJIB balik ke dasar (Verb 1).<br>Kalau NGGAK ADA <b>did</b> ➡️ Kata kerjanya pakai Verb 2."
+      "reasoningOperationId": "tentuin mana kejadian latar dan mana yang nyela → pilih bentuk tiap kata kerjanya"
     },
     {
       "id": "TA-005",
@@ -3924,8 +3920,7 @@
       },
       "pedagogicalObjectiveId": "Pakai present simple buat kejadian yang udah dipatok jadwal resmi. Bukan present continuous atau “going to”.",
       "misconceptionTargetedId": "Kamu langsung pakai “going to” atau present continuous buat semua kejadian nanti. Jadwal tetap jadi kelewat.",
-      "reasoningOperationId": "cek jadwalnya dipatok pihak luar atau keputusan pribadi → pilih present simple buat jadwal resmi",
-      "ruleId": "Fakta atau kebiasaan (rutinitas) pakai Present Simple. Subjek “he”, “she”, “it” wajib ditambah -s/-es pada kata kerjanya.<br><br>💡 <b>RUMUS KILAT</b>:<br>Subjek tunggal (He/She/It) ➡️ Kata kerja pakai akhiran <b>-s/-es</b> (misal: plays, goes).<br>Subjek jamak (I/You/We/They) ➡️ Kata kerja <b>tanpa tambahan apa pun</b> (misal: play, go)."
+      "reasoningOperationId": "cek jadwalnya dipatok pihak luar atau keputusan pribadi → pilih present simple buat jadwal resmi"
     },
     {
       "id": "b4_001",
@@ -4037,8 +4032,7 @@
       },
       "pedagogicalObjectiveId": "Kamu bedain past perfect sebagai kilas balik sebelum alur utama. Past simple nandain rangkaian kejadian di alur utama.",
       "misconceptionTargetedId": "Kamu pakai past simple buat semua kejadian lampau di cerita. Bedanya kilas balik dan urutan maju jadi ilang.",
-      "reasoningOperationId": "tentuin kejadian mana yang lebih dulu terhadap alur utama cerita → tandain yang lebih dulu dengan past perfect",
-      "ruleId": "Kejadian di masa lalu pakai Verb 2. Kalau bertanya atau negatif, bentuk masa lalunya ditanggung oleh “did/didn't”, jadi kata kerjanya wajib kembali ke dasar (Verb 1).<br><br>💡 <b>RUMUS KILAT</b>:<br>Kalau ADA kata <b>did</b> / <b>didn't</b> ➡️ Kata kerjanya WAJIB balik ke dasar (Verb 1).<br>Kalau NGGAK ADA <b>did</b> ➡️ Kata kerjanya pakai Verb 2."
+      "reasoningOperationId": "tentuin kejadian mana yang lebih dulu terhadap alur utama cerita → tandain yang lebih dulu dengan past perfect"
     },
     {
       "id": "b4_003",
@@ -5326,8 +5320,7 @@
       },
       "pedagogicalObjectiveId": "Kamu ngenali “would” nggak bisa nyatain keadaan lampau. Kata itu cuma buat tindakan yang berulang.",
       "misconceptionTargetedId": "Kamu nganggep “used to” dan “would” bisa saling gantiin buat semua kebiasaan lampau, termasuk keadaan.",
-      "reasoningOperationId": "cek kalimatnya nyebut keadaan lampau atau tindakan berulang → pilih bentuk yang boleh dipakai",
-      "ruleId": "Kejadian di masa lalu pakai Verb 2. Kalau bertanya atau negatif, bentuk masa lalunya ditanggung oleh “did/didn't”, jadi kata kerjanya wajib kembali ke dasar (Verb 1).<br><br>💡 <b>RUMUS KILAT</b>:<br>Kalau ADA kata <b>did</b> / <b>didn't</b> ➡️ Kata kerjanya WAJIB balik ke dasar (Verb 1).<br>Kalau NGGAK ADA <b>did</b> ➡️ Kata kerjanya pakai Verb 2."
+      "reasoningOperationId": "cek kalimatnya nyebut keadaan lampau atau tindakan berulang → pilih bentuk yang boleh dipakai"
     },
     {
       "id": "b5_002",
@@ -6671,8 +6664,7 @@
       },
       "pedagogicalObjectiveId": "Kebiasaan dengan subjek he, she, atau it pakai kata kerja plus -s",
       "misconceptionTargetedId": "Kamu gampang lupa akhiran -s buat he, she, atau it. Kadang malah kepakai bentuk -ing atau bentuk lampau.",
-      "reasoningOperationId": "cari kata petunjuk kebiasaan “every morning” → lihat subjeknya → tambahin -s",
-      "ruleId": "Fakta atau kebiasaan (rutinitas) pakai Present Simple. Subjek “he”, “she”, “it” wajib ditambah -s/-es pada kata kerjanya.<br><br>💡 <b>RUMUS KILAT</b>:<br>Subjek tunggal (He/She/It) ➡️ Kata kerja pakai akhiran <b>-s/-es</b> (misal: plays, goes).<br>Subjek jamak (I/You/We/They) ➡️ Kata kerja <b>tanpa tambahan apa pun</b> (misal: play, go)."
+      "reasoningOperationId": "cari kata petunjuk kebiasaan “every morning” → lihat subjeknya → tambahin -s"
     },
     {
       "id": "A1-004",
@@ -6784,8 +6776,7 @@
       },
       "pedagogicalObjectiveId": "Frasa benda jamak kayak two books pakai are",
       "misconceptionTargetedId": "Kamu gampang pakai is sesudah there, padahal bendanya lebih dari satu. Kadang malah kepakai be atau was.",
-      "reasoningOperationId": "lewati kata “there” → lihat benda sesudahnya → tentuin tunggal atau jamak",
-      "ruleId": "“There is” artinya ada (untuk satu benda atau benda tak bisa dihitung). “There are” artinya ada (untuk banyak benda).<br><br>💡 <b>RUMUS KILAT</b>:<br>Benda SETELAHNYA cuma SATU (a/an) ➡️ Pakai <b>There is</b>.<br>Benda SETELAHNYA LEBIH DARI SATU (akhiran -s) ➡️ Pakai <b>There are</b>."
+      "reasoningOperationId": "lewati kata “there” → lihat benda sesudahnya → tentuin tunggal atau jamak"
     },
     {
       "id": "A1-006",
@@ -7346,7 +7337,7 @@
       "pedagogicalObjectiveId": "Masangin have got dan has got sama subjeknya buat nunjukin punya",
       "misconceptionTargetedId": "Kamu gampang pakai satu bentuk buat semua subjek. Kadang have ketuker sama is atau does.",
       "reasoningOperationId": "lihat subjeknya → pilih have atau has → got tetap di belakangnya",
-      "ruleId": "“I”, “you”, “we”, “they” pakai “have got”. “He”, “she”, “it” pakai “has got”.<br><br>💡 <b>RUMUS KILAT</b>:<br>Kalau ADA kata “got” ➡️ Negatifnya pasti <b>haven't / hasn't</b>.<br>Kalau NGGAK ADA kata “got” ➡️ Negatifnya pakai <b>don't / doesn't</b>."
+      "ruleId": "Jika kalimatnya HANYA pakai \"have\" (tanpa \"got\"):<br><br>Positif: <i>I have money.</i><br>Negatif: <i>I don't have money.</i> (Kamu butuh \"don't\" / \"doesn't\")<br><br>Jika kalimatnya pakai \"have got\":<br><br>Positif: <i>I have got money.</i><br>Negatif: <i>I haven't got money.</i> (Kata \"have/has\" langsung digabung dengan \"not\" menjadi \"haven't/hasn't\". Tidak boleh pakai \"don't/doesn't\").<br><br>Karena itu, kalau di soal ada kata \"got\", pasangannya pasti <b>haven't / hasn't</b>. Kalau mau pakai \"don't / doesn't\", kata \"got\" nya harus dibuang.<br><br>💡 <b>RUMUS KILAT</b>:<br>Pakai got ➡️ <b>haven't / hasn't got</b><br>Tanpa got ➡️ <b>don't / doesn't have</b>"
     },
     {
       "id": "A1-010",
@@ -7402,8 +7393,7 @@
       },
       "pedagogicalObjectiveId": "Bikin bentuk lampau beraturan pakai akhiran -ed. Sesudah did, kata kerjanya balik ke bentuk dasar.",
       "misconceptionTargetedId": "Kamu gampang nandain lampau dua kali. Udah ada did, kata kerjanya masih dapat -ed.",
-      "reasoningOperationId": "cari kata waktu lampaunya → cek ada did atau nggak",
-      "ruleId": "Kejadian di masa lalu pakai Verb 2. Kalau bertanya atau negatif, bentuk masa lalunya ditanggung oleh “did/didn't”, jadi kata kerjanya wajib kembali ke dasar (Verb 1).<br><br>💡 <b>RUMUS KILAT</b>:<br>Kalau ADA kata <b>did</b> / <b>didn't</b> ➡️ Kata kerjanya WAJIB balik ke dasar (Verb 1).<br>Kalau NGGAK ADA <b>did</b> ➡️ Kata kerjanya pakai Verb 2."
+      "reasoningOperationId": "cari kata waktu lampaunya → cek ada did atau nggak"
     },
     {
       "id": "A1-011",
@@ -7459,8 +7449,7 @@
       },
       "pedagogicalObjectiveId": "Milih was atau were sesuai subjeknya di kalimat lampau",
       "misconceptionTargetedId": "Kamu gampang pakai was buat semua subjek. Kadang malah kepakai bentuk sekarang are.",
-      "reasoningOperationId": "lihat subjeknya tunggal atau jamak → pilih was atau were",
-      "ruleId": "Kejadian masa lalu tanpa kata kerja aksi (contoh: sifat, tempat) menggunakan “was” atau “were” (bentuk lampau dari am/is/are).<br><br>💡 <b>RUMUS KILAT</b>:<br>Subjek tunggal (I/He/She/It) ➡️ Pakai <b>was</b>.<br>Subjek jamak (You/We/They) ➡️ Pakai <b>were</b>."
+      "reasoningOperationId": "lihat subjeknya tunggal atau jamak → pilih was atau were"
     },
     {
       "id": "A1-012",
@@ -7628,8 +7617,7 @@
       },
       "pedagogicalObjectiveId": "Bikin present continuous utuh: bentuk be yang cocok plus kata kerja -ing",
       "misconceptionTargetedId": "Kamu gampang nulis kata kerja -ing tanpa am, is, atau are. Bahasa Indonesia nggak butuh kata bantu itu.",
-      "reasoningOperationId": "temukan kata petunjuk “right now” → pasang dua bagiannya",
-      "ruleId": "Kejadian yang sedang berlangsung saat ini pakai bentuk “be” (am/is/are) ditambah Verb-ing.<br><br>💡 <b>RUMUS KILAT</b>:<br>Sedang terjadi SEKARANG ➡️ Wajib pasangkan <b>am/is/are</b> + <b>Verb-ing</b>.<br>Kebiasaan berulang ➡️ Pakai Verb biasa (Present Simple, tanpa -ing)."
+      "reasoningOperationId": "temukan kata petunjuk “right now” → pasang dua bagiannya"
     },
     {
       "id": "A1-015",
@@ -8245,8 +8233,7 @@
       },
       "pedagogicalObjectiveId": "Nyatain harapan soal keadaan sekarang yang nggak nyata pakai “wish” + past simple.",
       "misconceptionTargetedId": "Kamu ngejaga bentuk sekarang sesudah “wish”, atau minjem “would” dan past perfect dari pola pengandaian lain.",
-      "reasoningOperationId": "kenali harapan soal situasi sekarang → mundurin kata kerjanya satu langkah ke past simple",
-      "ruleId": "Kejadian di masa lalu pakai Verb 2. Kalau bertanya atau negatif, bentuk masa lalunya ditanggung oleh “did/didn't”, jadi kata kerjanya wajib kembali ke dasar (Verb 1).<br><br>💡 <b>RUMUS KILAT</b>:<br>Kalau ADA kata <b>did</b> / <b>didn't</b> ➡️ Kata kerjanya WAJIB balik ke dasar (Verb 1).<br>Kalau NGGAK ADA <b>did</b> ➡️ Kata kerjanya pakai Verb 2."
+      "reasoningOperationId": "kenali harapan soal situasi sekarang → mundurin kata kerjanya satu langkah ke past simple"
     },
     {
       "id": "CO-009",
@@ -9031,7 +9018,7 @@
       "pedagogicalObjectiveId": "Bikin pertanyaan have got dengan majuin have ke depan subjek, tanpa do",
       "misconceptionTargetedId": "Kamu gampang nambahin do ke pertanyaan have got. Kadang has kepakai buat you.",
       "reasoningOperationId": "kenali pola pertanyaan have got → majuin have ke depan “you” → got tetap di belakang",
-      "ruleId": "“I”, “you”, “we”, “they” pakai “have got”. “He”, “she”, “it” pakai “has got”.<br><br>💡 <b>RUMUS KILAT</b>:<br>Kalau ADA kata “got” ➡️ Negatifnya pasti <b>haven't / hasn't</b>.<br>Kalau NGGAK ADA kata “got” ➡️ Negatifnya pakai <b>don't / doesn't</b>."
+      "ruleId": "Jika kalimatnya HANYA pakai \"have\" (tanpa \"got\"):<br><br>Positif: <i>I have money.</i><br>Negatif: <i>I don't have money.</i> (Kamu butuh \"don't\" / \"doesn't\")<br><br>Jika kalimatnya pakai \"have got\":<br><br>Positif: <i>I have got money.</i><br>Negatif: <i>I haven't got money.</i> (Kata \"have/has\" langsung digabung dengan \"not\" menjadi \"haven't/hasn't\". Tidak boleh pakai \"don't/doesn't\").<br><br>Karena itu, kalau di soal ada kata \"got\", pasangannya pasti <b>haven't / hasn't</b>. Kalau mau pakai \"don't / doesn't\", kata \"got\" nya harus dibuang.<br><br>💡 <b>RUMUS KILAT</b>:<br>Pakai got ➡️ <b>haven't / hasn't got</b><br>Tanpa got ➡️ <b>don't / doesn't have</b>"
     },
     {
       "id": "CG-003",
@@ -9087,8 +9074,7 @@
       },
       "pedagogicalObjectiveId": "Frasa benda tunggal kayak a big park pakai is",
       "misconceptionTargetedId": "Kamu gampang pakai are sesudah there, padahal bendanya cuma satu. Kadang malah kepakai am atau be.",
-      "reasoningOperationId": "lewati kata “there” → lihat benda sesudahnya → tentuin tunggal atau jamak",
-      "ruleId": "“There is” artinya ada (untuk satu benda atau benda tak bisa dihitung). “There are” artinya ada (untuk banyak benda).<br><br>💡 <b>RUMUS KILAT</b>:<br>Benda SETELAHNYA cuma SATU (a/an) ➡️ Pakai <b>There is</b>.<br>Benda SETELAHNYA LEBIH DARI SATU (akhiran -s) ➡️ Pakai <b>There are</b>."
+      "reasoningOperationId": "lewati kata “there” → lihat benda sesudahnya → tentuin tunggal atau jamak"
     },
     {
       "id": "PR-006",
@@ -9256,8 +9242,7 @@
       },
       "pedagogicalObjectiveId": "Bikin kalimat tanya lampau dengan was atau were tanpa nambah did",
       "misconceptionTargetedId": "Kamu gampang nambah “did” di kalimat tanya, padahal “was/were” cukup dibalik. Kadang “was” juga kepakai buat subjek jamak.",
-      "reasoningOperationId": "kenali kata kerjanya “be” → balik “was/were” ke depan → cocokkan sama jumlah subjeknya",
-      "ruleId": "Kejadian masa lalu tanpa kata kerja aksi (contoh: sifat, tempat) menggunakan “was” atau “were” (bentuk lampau dari am/is/are).<br><br>💡 <b>RUMUS KILAT</b>:<br>Subjek tunggal (I/He/She/It) ➡️ Pakai <b>was</b>.<br>Subjek jamak (You/We/They) ➡️ Pakai <b>were</b>."
+      "reasoningOperationId": "kenali kata kerjanya “be” → balik “was/were” ke depan → cocokkan sama jumlah subjeknya"
     },
     {
       "id": "A1-116",
@@ -9425,8 +9410,7 @@
       },
       "pedagogicalObjectiveId": "Pakai present simple buat rutinitas yang ditandai kata frekuensi kayak every day",
       "misconceptionTargetedId": "Kamu pakai bentuk -ing buat kebiasaan, cuma karena kejadiannya di masa sekarang.",
-      "reasoningOperationId": "cari kata frekuensinya → kenali ini rutinitas → pilih present simple",
-      "ruleId": "Fakta atau kebiasaan (rutinitas) pakai Present Simple. Subjek “he”, “she”, “it” wajib ditambah -s/-es pada kata kerjanya.<br><br>💡 <b>RUMUS KILAT</b>:<br>Subjek tunggal (He/She/It) ➡️ Kata kerja pakai akhiran <b>-s/-es</b> (misal: plays, goes).<br>Subjek jamak (I/You/We/They) ➡️ Kata kerja <b>tanpa tambahan apa pun</b> (misal: play, go)."
+      "reasoningOperationId": "cari kata frekuensinya → kenali ini rutinitas → pilih present simple"
     },
     {
       "id": "MO-101",
@@ -9706,8 +9690,7 @@
       },
       "pedagogicalObjectiveId": "Pakai past simple buat kejadian pendek yang motong aksi latar past continuous",
       "misconceptionTargetedId": "Kamu ikut manjangin kejadian pemotongnya jadi bentuk -ing, karena kalimat sekitarnya bentuk -ing.",
-      "reasoningOperationId": "temukan kejadian pendek yang motong → tandai dengan past simple",
-      "ruleId": "Kejadian di masa lalu pakai Verb 2. Kalau bertanya atau negatif, bentuk masa lalunya ditanggung oleh “did/didn't”, jadi kata kerjanya wajib kembali ke dasar (Verb 1).<br><br>💡 <b>RUMUS KILAT</b>:<br>Kalau ADA kata <b>did</b> / <b>didn't</b> ➡️ Kata kerjanya WAJIB balik ke dasar (Verb 1).<br>Kalau NGGAK ADA <b>did</b> ➡️ Kata kerjanya pakai Verb 2."
+      "reasoningOperationId": "temukan kejadian pendek yang motong → tandai dengan past simple"
     },
     {
       "id": "AR-103",
@@ -10099,8 +10082,7 @@
       },
       "pedagogicalObjectiveId": "Pilih present perfect buat hitungan aksi yang selesai di dalam periode waktu yang jelas-jelas masih terbuka.",
       "misconceptionTargetedId": "Kamu denger angka pasti terus langsung ambil past simple, padahal periode “today”-nya belum tutup.",
-      "reasoningOperationId": "cek periode waktunya udah tutup atau masih buka → periode terbuka dengan hitungan berjalan pakai present perfect",
-      "ruleId": "Kejadian di masa lalu pakai Verb 2. Kalau bertanya atau negatif, bentuk masa lalunya ditanggung oleh “did/didn't”, jadi kata kerjanya wajib kembali ke dasar (Verb 1).<br><br>💡 <b>RUMUS KILAT</b>:<br>Kalau ADA kata <b>did</b> / <b>didn't</b> ➡️ Kata kerjanya WAJIB balik ke dasar (Verb 1).<br>Kalau NGGAK ADA <b>did</b> ➡️ Kata kerjanya pakai Verb 2."
+      "reasoningOperationId": "cek periode waktunya udah tutup atau masih buka → periode terbuka dengan hitungan berjalan pakai present perfect"
     },
     {
       "id": "TA-017",
@@ -10156,8 +10138,7 @@
       },
       "pedagogicalObjectiveId": "Pilih “be going to” buat niat yang udah diputuskan sebelum ngomong, ditandai bukti persiapan yang udah jalan.",
       "misconceptionTargetedId": "Kamu pakai “will” buat semua makna masa depan, padahal rencana yang udah disiapin sebelum ngomong butuh “be going to”.",
-      "reasoningOperationId": "cari kapan keputusannya diambil → kalau sebelum ngomong (persiapan udah jalan), pakai “be going to”",
-      "ruleId": "Rencana yang sudah pasti (niat) pakai “be going to”. Tebakan masa depan tanpa rencana matang pakai “will”.<br><br>💡 <b>RUMUS KILAT</b>:<br>Punya NIAT/RENCANA pasti ➡️ Pakai <b>be going to</b>.<br>Cuma MENEBAK masa depan (belum pasti) ➡️ Pakai <b>will</b>."
+      "reasoningOperationId": "cari kapan keputusannya diambil → kalau sebelum ngomong (persiapan udah jalan), pakai “be going to”"
     },
     {
       "id": "MO-010",
@@ -11221,8 +11202,7 @@
       },
       "pedagogicalObjectiveId": "Pilih past simple, bukan “used to” atau “would”, buat satu kejadian lampau yang bertanggal.",
       "misconceptionTargetedId": "Kamu nempelin “used to” atau “would” ke kejadian sekali karena kejadiannya terasa lama, padahal dua bentuk itu butuh kebiasaan berulang.",
-      "reasoningOperationId": "cek penanda waktunya → satu kejadian tertentu berarti past simple, kebiasaan lama yang berulang baru boleh used to atau would",
-      "ruleId": "Kejadian di masa lalu pakai Verb 2. Kalau bertanya atau negatif, bentuk masa lalunya ditanggung oleh “did/didn't”, jadi kata kerjanya wajib kembali ke dasar (Verb 1).<br><br>💡 <b>RUMUS KILAT</b>:<br>Kalau ADA kata <b>did</b> / <b>didn't</b> ➡️ Kata kerjanya WAJIB balik ke dasar (Verb 1).<br>Kalau NGGAK ADA <b>did</b> ➡️ Kata kerjanya pakai Verb 2."
+      "reasoningOperationId": "cek penanda waktunya → satu kejadian tertentu berarti past simple, kebiasaan lama yang berulang baru boleh used to atau would"
     },
     {
       "id": "PR-013",
@@ -11894,8 +11874,7 @@
       },
       "pedagogicalObjectiveId": "Kamu tahan past simple buat langkah-langkah setara yang maju berurutan di cerita. Jangan ada satu langkah yang dinaikin jadi past perfect.",
       "misconceptionTargetedId": "Kamu naburin past perfect ke kejadian berurutan biasa, dianggap bentuk lampau yang lebih keren. Padahal dia penanda kilas balik buat kejadian yang lebih dulu.",
-      "reasoningOperationId": "cek kejadiannya maju di alur utama atau lompat ke sebelumnya → langkah maju tetap past simple",
-      "ruleId": "Kejadian di masa lalu pakai Verb 2. Kalau bertanya atau negatif, bentuk masa lalunya ditanggung oleh “did/didn't”, jadi kata kerjanya wajib kembali ke dasar (Verb 1).<br><br>💡 <b>RUMUS KILAT</b>:<br>Kalau ADA kata <b>did</b> / <b>didn't</b> ➡️ Kata kerjanya WAJIB balik ke dasar (Verb 1).<br>Kalau NGGAK ADA <b>did</b> ➡️ Kata kerjanya pakai Verb 2."
+      "reasoningOperationId": "cek kejadiannya maju di alur utama atau lompat ke sebelumnya → langkah maju tetap past simple"
     },
     {
       "id": "PA-009",
@@ -13239,8 +13218,7 @@
       },
       "pedagogicalObjectiveId": "Pakai past simple tak nyata sesudah “it's high time” buat desakan yang udah telat.",
       "misconceptionTargetedId": "Kamu nyocokin tense ke rasa “sudah waktunya”, jadi sesudah “it's high time” malah naruh bentuk kini atau “will”.",
-      "reasoningOperationId": "kenali sinyal telat “complaining for months” sesudah “it's high time” → geser kata kerjanya ke past simple tak nyata",
-      "ruleId": "Kejadian di masa lalu pakai Verb 2. Kalau bertanya atau negatif, bentuk masa lalunya ditanggung oleh “did/didn't”, jadi kata kerjanya wajib kembali ke dasar (Verb 1).<br><br>💡 <b>RUMUS KILAT</b>:<br>Kalau ADA kata <b>did</b> / <b>didn't</b> ➡️ Kata kerjanya WAJIB balik ke dasar (Verb 1).<br>Kalau NGGAK ADA <b>did</b> ➡️ Kata kerjanya pakai Verb 2."
+      "reasoningOperationId": "kenali sinyal telat “complaining for months” sesudah “it's high time” → geser kata kerjanya ke past simple tak nyata"
     },
     {
       "id": "CM-008",
@@ -14024,8 +14002,7 @@
       },
       "pedagogicalObjectiveId": "Kata kerja present simple tetap bentuk dasar sesudah subjek jamak.",
       "misconceptionTargetedId": "Kamu nambahin -s ke semua kata kerja present simple, padahal sesudah “we” nggak perlu.",
-      "reasoningOperationId": "cari subjeknya → cek tunggal atau jamak → jamak tetap bentuk dasar",
-      "ruleId": "Fakta atau kebiasaan (rutinitas) pakai Present Simple. Subjek “he”, “she”, “it” wajib ditambah -s/-es pada kata kerjanya.<br><br>💡 <b>RUMUS KILAT</b>:<br>Subjek tunggal (He/She/It) ➡️ Kata kerja pakai akhiran <b>-s/-es</b> (misal: plays, goes).<br>Subjek jamak (I/You/We/They) ➡️ Kata kerja <b>tanpa tambahan apa pun</b> (misal: play, go)."
+      "reasoningOperationId": "cari subjeknya → cek tunggal atau jamak → jamak tetap bentuk dasar"
     },
     {
       "id": "A1-202",
@@ -14137,8 +14114,7 @@
       },
       "pedagogicalObjectiveId": "Tambahin -ed ke kata kerja teratur buat kejadian selesai yang ada kata waktu lampaunya.",
       "misconceptionTargetedId": "Kamu biarin kata kerjanya polos sesudah “last night”, atau nandain lampau dua kali pakai “did”.",
-      "reasoningOperationId": "cari kata waktu lampaunya → kata kerja teratur → tambah -ed sekali",
-      "ruleId": "Kejadian di masa lalu pakai Verb 2. Kalau bertanya atau negatif, bentuk masa lalunya ditanggung oleh “did/didn't”, jadi kata kerjanya wajib kembali ke dasar (Verb 1).<br><br>💡 <b>RUMUS KILAT</b>:<br>Kalau ADA kata <b>did</b> / <b>didn't</b> ➡️ Kata kerjanya WAJIB balik ke dasar (Verb 1).<br>Kalau NGGAK ADA <b>did</b> ➡️ Kata kerjanya pakai Verb 2."
+      "reasoningOperationId": "cari kata waktu lampaunya → kata kerja teratur → tambah -ed sekali"
     },
     {
       "id": "A1-204",
@@ -14194,8 +14170,7 @@
       },
       "pedagogicalObjectiveId": "Pasangin “are” sama kata kerja -ing buat subjek jamak yang lagi beraksi sekarang.",
       "misconceptionTargetedId": "Kamu pilih “is” buat subjek jamak, atau ngilangin kata bantu be di depan kata kerja -ing.",
-      "reasoningOperationId": "lihat “Look!” → kejadian lagi jalan → subjek jamak pakai are + -ing",
-      "ruleId": "Kejadian yang sedang berlangsung saat ini pakai bentuk “be” (am/is/are) ditambah Verb-ing.<br><br>💡 <b>RUMUS KILAT</b>:<br>Sedang terjadi SEKARANG ➡️ Wajib pasangkan <b>am/is/are</b> + <b>Verb-ing</b>.<br>Kebiasaan berulang ➡️ Pakai Verb biasa (Present Simple, tanpa -ing)."
+      "reasoningOperationId": "lihat “Look!” → kejadian lagi jalan → subjek jamak pakai are + -ing"
     },
     {
       "id": "A1-205",
@@ -15371,8 +15346,7 @@
       },
       "pedagogicalObjectiveId": "Pakai “could” sesudah “wish” buat kemampuan yang nggak dimiliki pembicara sekarang.",
       "misconceptionTargetedId": "Kamu pakai “can” atau “would” sesudah “wish” buat keadaan diri sendiri sekarang.",
-      "reasoningOperationId": "wish soal sekarang → mundur satu langkah → can jadi could",
-      "ruleId": "Kejadian di masa lalu pakai Verb 2. Kalau bertanya atau negatif, bentuk masa lalunya ditanggung oleh “did/didn't”, jadi kata kerjanya wajib kembali ke dasar (Verb 1).<br><br>💡 <b>RUMUS KILAT</b>:<br>Kalau ADA kata <b>did</b> / <b>didn't</b> ➡️ Kata kerjanya WAJIB balik ke dasar (Verb 1).<br>Kalau NGGAK ADA <b>did</b> ➡️ Kata kerjanya pakai Verb 2."
+      "reasoningOperationId": "wish soal sekarang → mundur satu langkah → can jadi could"
     },
     {
       "id": "TA-205",
@@ -16492,8 +16466,7 @@
       },
       "pedagogicalObjectiveId": "Pakai present simple buat jadwal umum tetap kayak jam buka museum.",
       "misconceptionTargetedId": "Kamu pakai bentuk masa depan atau -ing buat jadwal resmi.",
-      "reasoningOperationId": "kenali jadwal umum tetap → pilih present simple → hindari bentuk rencana pribadi",
-      "ruleId": "Fakta atau kebiasaan (rutinitas) pakai Present Simple. Subjek “he”, “she”, “it” wajib ditambah -s/-es pada kata kerjanya.<br><br>💡 <b>RUMUS KILAT</b>:<br>Subjek tunggal (He/She/It) ➡️ Kata kerja pakai akhiran <b>-s/-es</b> (misal: plays, goes).<br>Subjek jamak (I/You/We/They) ➡️ Kata kerja <b>tanpa tambahan apa pun</b> (misal: play, go)."
+      "reasoningOperationId": "kenali jadwal umum tetap → pilih present simple → hindari bentuk rencana pribadi"
     },
     {
       "id": "RS-205",
@@ -18005,8 +17978,7 @@
       },
       "pedagogicalObjectiveId": "Pakai past simple sesudah “It's time” walau ngomongin sekarang.",
       "misconceptionTargetedId": "Kamu pakai kata kerja sekarang atau masa depan sesudah “it's time” + subjek.",
-      "reasoningOperationId": "kenali it's time + subjek → ingat lampau tak nyata → pilih past simple",
-      "ruleId": "Kejadian di masa lalu pakai Verb 2. Kalau bertanya atau negatif, bentuk masa lalunya ditanggung oleh “did/didn't”, jadi kata kerjanya wajib kembali ke dasar (Verb 1).<br><br>💡 <b>RUMUS KILAT</b>:<br>Kalau ADA kata <b>did</b> / <b>didn't</b> ➡️ Kata kerjanya WAJIB balik ke dasar (Verb 1).<br>Kalau NGGAK ADA <b>did</b> ➡️ Kata kerjanya pakai Verb 2."
+      "reasoningOperationId": "kenali it's time + subjek → ingat lampau tak nyata → pilih past simple"
     },
     {
       "id": "CM-206",
@@ -19799,7 +19771,7 @@
       "pedagogicalObjectiveId": "Pakai “have got” atau “has got” untuk menyebut apa yang dimiliki seseorang. Contoh: “My grandparents have got a big garden.”",
       "misconceptionTargetedId": "Kamu pakai “have” untuk semua subjek, atau membuat kalimat tanya dan negatifnya dengan “do”, karena kata “punya” nggak pernah berubah.",
       "reasoningOperationId": "cari subjeknya → hitung satu orang atau lebih → pilih bentuk untuk lebih dari satu orang",
-      "ruleId": "“I”, “you”, “we”, “they” pakai “have got”. “He”, “she”, “it” pakai “has got”.<br><br>💡 <b>RUMUS KILAT</b>:<br>Kalau ADA kata “got” ➡️ Negatifnya pasti <b>haven't / hasn't</b>.<br>Kalau NGGAK ADA kata “got” ➡️ Negatifnya pakai <b>don't / doesn't</b>."
+      "ruleId": "Jika kalimatnya HANYA pakai \"have\" (tanpa \"got\"):<br><br>Positif: <i>I have money.</i><br>Negatif: <i>I don't have money.</i> (Kamu butuh \"don't\" / \"doesn't\")<br><br>Jika kalimatnya pakai \"have got\":<br><br>Positif: <i>I have got money.</i><br>Negatif: <i>I haven't got money.</i> (Kata \"have/has\" langsung digabung dengan \"not\" menjadi \"haven't/hasn't\". Tidak boleh pakai \"don't/doesn't\").<br><br>Karena itu, kalau di soal ada kata \"got\", pasangannya pasti <b>haven't / hasn't</b>. Kalau mau pakai \"don't / doesn't\", kata \"got\" nya harus dibuang.<br><br>💡 <b>RUMUS KILAT</b>:<br>Pakai got ➡️ <b>haven't / hasn't got</b><br>Tanpa got ➡️ <b>don't / doesn't have</b>"
     },
     {
       "id": "A1-326",
@@ -19856,7 +19828,7 @@
       "pedagogicalObjectiveId": "Pakai “have got” atau “has got” untuk menyebut apa yang dimiliki seseorang. Contoh: “Dimas has got a bad cold today.”",
       "misconceptionTargetedId": "Kamu pakai “have” untuk semua subjek, atau membuat kalimat tanya dan negatifnya dengan “do”, karena kata “punya” nggak pernah berubah.",
       "reasoningOperationId": "cari subjeknya → pastikan itu satu orang → pilih bentuk untuk satu orang",
-      "ruleId": "“I”, “you”, “we”, “they” pakai “have got”. “He”, “she”, “it” pakai “has got”.<br><br>💡 <b>RUMUS KILAT</b>:<br>Kalau ADA kata “got” ➡️ Negatifnya pasti <b>haven't / hasn't</b>.<br>Kalau NGGAK ADA kata “got” ➡️ Negatifnya pakai <b>don't / doesn't</b>."
+      "ruleId": "Jika kalimatnya HANYA pakai \"have\" (tanpa \"got\"):<br><br>Positif: <i>I have money.</i><br>Negatif: <i>I don't have money.</i> (Kamu butuh \"don't\" / \"doesn't\")<br><br>Jika kalimatnya pakai \"have got\":<br><br>Positif: <i>I have got money.</i><br>Negatif: <i>I haven't got money.</i> (Kata \"have/has\" langsung digabung dengan \"not\" menjadi \"haven't/hasn't\". Tidak boleh pakai \"don't/doesn't\").<br><br>Karena itu, kalau di soal ada kata \"got\", pasangannya pasti <b>haven't / hasn't</b>. Kalau mau pakai \"don't / doesn't\", kata \"got\" nya harus dibuang.<br><br>💡 <b>RUMUS KILAT</b>:<br>Pakai got ➡️ <b>haven't / hasn't got</b><br>Tanpa got ➡️ <b>don't / doesn't have</b>"
     },
     {
       "id": "A1-327",
@@ -19913,7 +19885,7 @@
       "pedagogicalObjectiveId": "Pakai “have got” atau “has got” untuk menyebut apa yang dimiliki seseorang. Contoh: “Has your brother got a phone?” “Yes, he has.”",
       "misconceptionTargetedId": "Kamu pakai “have” untuk semua subjek, atau membuat kalimat tanya dan negatifnya dengan “do”, karena kata “punya” nggak pernah berubah.",
       "reasoningOperationId": "cari subjek sesudah titik-titik → pastikan itu “he” → taruh bentuk untuk “he” di depan subjek",
-      "ruleId": "“I”, “you”, “we”, “they” pakai “have got”. “He”, “she”, “it” pakai “has got”.<br><br>💡 <b>RUMUS KILAT</b>:<br>Kalau ADA kata “got” ➡️ Negatifnya pasti <b>haven't / hasn't</b>.<br>Kalau NGGAK ADA kata “got” ➡️ Negatifnya pakai <b>don't / doesn't</b>."
+      "ruleId": "Jika kalimatnya HANYA pakai \"have\" (tanpa \"got\"):<br><br>Positif: <i>I have money.</i><br>Negatif: <i>I don't have money.</i> (Kamu butuh \"don't\" / \"doesn't\")<br><br>Jika kalimatnya pakai \"have got\":<br><br>Positif: <i>I have got money.</i><br>Negatif: <i>I haven't got money.</i> (Kata \"have/has\" langsung digabung dengan \"not\" menjadi \"haven't/hasn't\". Tidak boleh pakai \"don't/doesn't\").<br><br>Karena itu, kalau di soal ada kata \"got\", pasangannya pasti <b>haven't / hasn't</b>. Kalau mau pakai \"don't / doesn't\", kata \"got\" nya harus dibuang.<br><br>💡 <b>RUMUS KILAT</b>:<br>Pakai got ➡️ <b>haven't / hasn't got</b><br>Tanpa got ➡️ <b>don't / doesn't have</b>"
     },
     {
       "id": "A1-328",
@@ -19970,7 +19942,7 @@
       "pedagogicalObjectiveId": "Pakai “have got” atau “has got” untuk menyebut apa yang dimiliki seseorang. Contoh: “Sorry, I haven't got any money with me today.”",
       "misconceptionTargetedId": "Kamu pakai “have” untuk semua subjek, atau membuat kalimat tanya dan negatifnya dengan “do”, karena kata “punya” nggak pernah berubah.",
       "reasoningOperationId": "cari subjeknya → pastikan itu “I” → tambahkan “not” pada bentuk untuk “I”",
-      "ruleId": "“I”, “you”, “we”, “they” pakai “have got”. “He”, “she”, “it” pakai “has got”.<br><br>💡 <b>RUMUS KILAT</b>:<br>Kalau ADA kata “got” ➡️ Negatifnya pasti <b>haven't / hasn't</b>.<br>Kalau NGGAK ADA kata “got” ➡️ Negatifnya pakai <b>don't / doesn't</b>."
+      "ruleId": "Jika kalimatnya HANYA pakai \"have\" (tanpa \"got\"):<br><br>Positif: <i>I have money.</i><br>Negatif: <i>I don't have money.</i> (Kamu butuh \"don't\" / \"doesn't\")<br><br>Jika kalimatnya pakai \"have got\":<br><br>Positif: <i>I have got money.</i><br>Negatif: <i>I haven't got money.</i> (Kata \"have/has\" langsung digabung dengan \"not\" menjadi \"haven't/hasn't\". Tidak boleh pakai \"don't/doesn't\").<br><br>Karena itu, kalau di soal ada kata \"got\", pasangannya pasti <b>haven't / hasn't</b>. Kalau mau pakai \"don't / doesn't\", kata \"got\" nya harus dibuang.<br><br>💡 <b>RUMUS KILAT</b>:<br>Pakai got ➡️ <b>haven't / hasn't got</b><br>Tanpa got ➡️ <b>don't / doesn't have</b>"
     },
     {
       "id": "A1-329",
@@ -20026,8 +19998,7 @@
       },
       "pedagogicalObjectiveId": "Pakai “there is” untuk satu benda dan “there are” untuk banyak benda, untuk bilang ada sesuatu di suatu tempat. Contoh: “There is some milk in the fridge.”",
       "misconceptionTargetedId": "Kamu memakai “have” untuk arti “ada”, atau mencocokkan kata kerjanya dengan “there”, bukan dengan benda sesudahnya.",
-      "reasoningOperationId": "cari benda sesudah titik-titik → cek bisa dihitung atau nggak → pilih bentuk untuk benda yang nggak bisa dihitung",
-      "ruleId": "“There is” artinya ada (untuk satu benda atau benda tak bisa dihitung). “There are” artinya ada (untuk banyak benda).<br><br>💡 <b>RUMUS KILAT</b>:<br>Benda SETELAHNYA cuma SATU (a/an) ➡️ Pakai <b>There is</b>.<br>Benda SETELAHNYA LEBIH DARI SATU (akhiran -s) ➡️ Pakai <b>There are</b>."
+      "reasoningOperationId": "cari benda sesudah titik-titik → cek bisa dihitung atau nggak → pilih bentuk untuk benda yang nggak bisa dihitung"
     },
     {
       "id": "A1-330",
@@ -20083,8 +20054,7 @@
       },
       "pedagogicalObjectiveId": "Pakai “there is” untuk satu benda dan “there are” untuk banyak benda, untuk bilang ada sesuatu di suatu tempat. Contoh: “There are five people in my family.”",
       "misconceptionTargetedId": "Kamu memakai “have” untuk arti “ada”, atau mencocokkan kata kerjanya dengan “there”, bukan dengan benda sesudahnya.",
-      "reasoningOperationId": "cari benda sesudah titik-titik → hitung satu atau banyak → pilih bentuk untuk banyak benda",
-      "ruleId": "“There is” artinya ada (untuk satu benda atau benda tak bisa dihitung). “There are” artinya ada (untuk banyak benda).<br><br>💡 <b>RUMUS KILAT</b>:<br>Benda SETELAHNYA cuma SATU (a/an) ➡️ Pakai <b>There is</b>.<br>Benda SETELAHNYA LEBIH DARI SATU (akhiran -s) ➡️ Pakai <b>There are</b>."
+      "reasoningOperationId": "cari benda sesudah titik-titik → hitung satu atau banyak → pilih bentuk untuk banyak benda"
     },
     {
       "id": "A1-331",
@@ -20140,8 +20110,7 @@
       },
       "pedagogicalObjectiveId": "Pakai “there is” untuk satu benda dan “there are” untuk banyak benda, untuk bilang ada sesuatu di suatu tempat. Contoh: “Is there a bank near here?”",
       "misconceptionTargetedId": "Kamu memakai “have” untuk arti “ada”, atau mencocokkan kata kerjanya dengan “there”, bukan dengan benda sesudahnya.",
-      "reasoningOperationId": "cari benda sesudah “there” → hitung satu atau banyak → taruh bentuk tunggal di depan “there”",
-      "ruleId": "“There is” artinya ada (untuk satu benda atau benda tak bisa dihitung). “There are” artinya ada (untuk banyak benda).<br><br>💡 <b>RUMUS KILAT</b>:<br>Benda SETELAHNYA cuma SATU (a/an) ➡️ Pakai <b>There is</b>.<br>Benda SETELAHNYA LEBIH DARI SATU (akhiran -s) ➡️ Pakai <b>There are</b>."
+      "reasoningOperationId": "cari benda sesudah “there” → hitung satu atau banyak → taruh bentuk tunggal di depan “there”"
     },
     {
       "id": "A1-332",
@@ -20197,8 +20166,7 @@
       },
       "pedagogicalObjectiveId": "Pakai “there is” untuk satu benda dan “there are” untuk banyak benda, untuk bilang ada sesuatu di suatu tempat. Contoh: “Are there any cookies in the jar?” “No, there aren't.”",
       "misconceptionTargetedId": "Kamu memakai “have” untuk arti “ada”, atau mencocokkan kata kerjanya dengan “there”, bukan dengan benda sesudahnya.",
-      "reasoningOperationId": "cari benda sesudah “there” → hitung satu atau banyak → taruh bentuk jamak di depan “there”",
-      "ruleId": "“There is” artinya ada (untuk satu benda atau benda tak bisa dihitung). “There are” artinya ada (untuk banyak benda).<br><br>💡 <b>RUMUS KILAT</b>:<br>Benda SETELAHNYA cuma SATU (a/an) ➡️ Pakai <b>There is</b>.<br>Benda SETELAHNYA LEBIH DARI SATU (akhiran -s) ➡️ Pakai <b>There are</b>."
+      "reasoningOperationId": "cari benda sesudah “there” → hitung satu atau banyak → taruh bentuk jamak di depan “there”"
     },
     {
       "id": "A1-333",
@@ -20478,8 +20446,7 @@
       },
       "pedagogicalObjectiveId": "Pakai present simple untuk kebiasaan: tambah -s atau -es pada kata kerja sesudah “he”, “she”, atau “it”. Contoh: “My dad watches the news every evening.”",
       "misconceptionTargetedId": "Kamu lupa -s sesudah “he”, “she”, “it”, atau malah menambah -s sesudah “I”, “you”, “we”, “they”, karena kata kerja bahasa Indonesia nggak pernah berubah.",
-      "reasoningOperationId": "cari subjeknya → cek akhiran ch pada kata kerja → tambah -es",
-      "ruleId": "Fakta atau kebiasaan (rutinitas) pakai Present Simple. Subjek “he”, “she”, “it” wajib ditambah -s/-es pada kata kerjanya.<br><br>💡 <b>RUMUS KILAT</b>:<br>Subjek tunggal (He/She/It) ➡️ Kata kerja pakai akhiran <b>-s/-es</b> (misal: plays, goes).<br>Subjek jamak (I/You/We/They) ➡️ Kata kerja <b>tanpa tambahan apa pun</b> (misal: play, go)."
+      "reasoningOperationId": "cari subjeknya → cek akhiran ch pada kata kerja → tambah -es"
     },
     {
       "id": "A1-338",
@@ -20535,8 +20502,7 @@
       },
       "pedagogicalObjectiveId": "Pakai present simple untuk kebiasaan: tambah -s atau -es pada kata kerja sesudah “he”, “she”, atau “it”. Contoh: “My friends play badminton on Saturdays.”",
       "misconceptionTargetedId": "Kamu lupa -s sesudah “he”, “she”, “it”, atau malah menambah -s sesudah “I”, “you”, “we”, “they”, karena kata kerja bahasa Indonesia nggak pernah berubah.",
-      "reasoningOperationId": "cari subjeknya → hitung satu orang atau lebih → pakai bentuk dasarnya",
-      "ruleId": "Fakta atau kebiasaan (rutinitas) pakai Present Simple. Subjek “he”, “she”, “it” wajib ditambah -s/-es pada kata kerjanya.<br><br>💡 <b>RUMUS KILAT</b>:<br>Subjek tunggal (He/She/It) ➡️ Kata kerja pakai akhiran <b>-s/-es</b> (misal: plays, goes).<br>Subjek jamak (I/You/We/They) ➡️ Kata kerja <b>tanpa tambahan apa pun</b> (misal: play, go)."
+      "reasoningOperationId": "cari subjeknya → hitung satu orang atau lebih → pakai bentuk dasarnya"
     },
     {
       "id": "A1-339",
@@ -20592,8 +20558,7 @@
       },
       "pedagogicalObjectiveId": "Pakai present simple untuk kebiasaan: tambah -s atau -es pada kata kerja sesudah “he”, “she”, atau “it”. Contoh: “Sinta goes to school at 6:30 every day.”",
       "misconceptionTargetedId": "Kamu lupa -s sesudah “he”, “she”, “it”, atau malah menambah -s sesudah “I”, “you”, “we”, “they”, karena kata kerja bahasa Indonesia nggak pernah berubah.",
-      "reasoningOperationId": "cari subjeknya → cek akhiran o pada kata kerja → tambah -es",
-      "ruleId": "Fakta atau kebiasaan (rutinitas) pakai Present Simple. Subjek “he”, “she”, “it” wajib ditambah -s/-es pada kata kerjanya.<br><br>💡 <b>RUMUS KILAT</b>:<br>Subjek tunggal (He/She/It) ➡️ Kata kerja pakai akhiran <b>-s/-es</b> (misal: plays, goes).<br>Subjek jamak (I/You/We/They) ➡️ Kata kerja <b>tanpa tambahan apa pun</b> (misal: play, go)."
+      "reasoningOperationId": "cari subjeknya → cek akhiran o pada kata kerja → tambah -es"
     },
     {
       "id": "A1-340",
@@ -20649,8 +20614,7 @@
       },
       "pedagogicalObjectiveId": "Pakai present simple untuk kebiasaan: tambah -s atau -es pada kata kerja sesudah “he”, “she”, atau “it”. Contoh: “The baby cries a lot at night.”",
       "misconceptionTargetedId": "Kamu lupa -s sesudah “he”, “she”, “it”, atau malah menambah -s sesudah “I”, “you”, “we”, “they”, karena kata kerja bahasa Indonesia nggak pernah berubah.",
-      "reasoningOperationId": "cari subjeknya → cek akhiran konsonan + y → ubah y jadi -ies",
-      "ruleId": "Fakta atau kebiasaan (rutinitas) pakai Present Simple. Subjek “he”, “she”, “it” wajib ditambah -s/-es pada kata kerjanya.<br><br>💡 <b>RUMUS KILAT</b>:<br>Subjek tunggal (He/She/It) ➡️ Kata kerja pakai akhiran <b>-s/-es</b> (misal: plays, goes).<br>Subjek jamak (I/You/We/They) ➡️ Kata kerja <b>tanpa tambahan apa pun</b> (misal: play, go)."
+      "reasoningOperationId": "cari subjeknya → cek akhiran konsonan + y → ubah y jadi -ies"
     },
     {
       "id": "A1-341",
@@ -21154,8 +21118,7 @@
       },
       "pedagogicalObjectiveId": "Pakai “am”, “is”, atau “are” + kata kerja -ing untuk kejadian yang sedang berlangsung sekarang. Contoh: “Shh! The baby is sleeping now.”",
       "misconceptionTargetedId": "Kamu menulis kata kerja -ing tanpa “am”, “is”, atau “are”, karena kata “sedang” nggak butuh kata bantu, atau memakai bentuk kebiasaan untuk kejadian sekarang.",
-      "reasoningOperationId": "perhatikan kata “now” → cari subjeknya, “the baby” → gabungkan bentuk “be” untuk satu orang dengan -ing",
-      "ruleId": "Kejadian yang sedang berlangsung saat ini pakai bentuk “be” (am/is/are) ditambah Verb-ing.<br><br>💡 <b>RUMUS KILAT</b>:<br>Sedang terjadi SEKARANG ➡️ Wajib pasangkan <b>am/is/are</b> + <b>Verb-ing</b>.<br>Kebiasaan berulang ➡️ Pakai Verb biasa (Present Simple, tanpa -ing)."
+      "reasoningOperationId": "perhatikan kata “now” → cari subjeknya, “the baby” → gabungkan bentuk “be” untuk satu orang dengan -ing"
     },
     {
       "id": "A1-350",
@@ -21211,8 +21174,7 @@
       },
       "pedagogicalObjectiveId": "Pakai “am”, “is”, atau “are” + kata kerja -ing untuk kejadian yang sedang berlangsung sekarang. Contoh: “Look! My friends are building a sandcastle on the beach.”",
       "misconceptionTargetedId": "Kamu menulis kata kerja -ing tanpa “am”, “is”, atau “are”, karena kata “sedang” nggak butuh kata bantu, atau memakai bentuk kebiasaan untuk kejadian sekarang.",
-      "reasoningOperationId": "perhatikan kata “Look!” → hitung teman-temannya → gabungkan bentuk “be” untuk banyak orang dengan -ing",
-      "ruleId": "Kejadian yang sedang berlangsung saat ini pakai bentuk “be” (am/is/are) ditambah Verb-ing.<br><br>💡 <b>RUMUS KILAT</b>:<br>Sedang terjadi SEKARANG ➡️ Wajib pasangkan <b>am/is/are</b> + <b>Verb-ing</b>.<br>Kebiasaan berulang ➡️ Pakai Verb biasa (Present Simple, tanpa -ing)."
+      "reasoningOperationId": "perhatikan kata “Look!” → hitung teman-temannya → gabungkan bentuk “be” untuk banyak orang dengan -ing"
     },
     {
       "id": "A1-351",
@@ -21268,8 +21230,7 @@
       },
       "pedagogicalObjectiveId": "Pakai “am”, “is”, atau “are” + kata kerja -ing untuk kejadian yang sedang berlangsung sekarang. Contoh: “I am doing my homework at the moment, so I can't play.”",
       "misconceptionTargetedId": "Kamu menulis kata kerja -ing tanpa “am”, “is”, atau “are”, karena kata “sedang” nggak butuh kata bantu, atau memakai bentuk kebiasaan untuk kejadian sekarang.",
-      "reasoningOperationId": "perhatikan “at the moment” → cari subjeknya, “I” → gabungkan bentuk “be” untuk “I” dengan -ing",
-      "ruleId": "Kejadian yang sedang berlangsung saat ini pakai bentuk “be” (am/is/are) ditambah Verb-ing.<br><br>💡 <b>RUMUS KILAT</b>:<br>Sedang terjadi SEKARANG ➡️ Wajib pasangkan <b>am/is/are</b> + <b>Verb-ing</b>.<br>Kebiasaan berulang ➡️ Pakai Verb biasa (Present Simple, tanpa -ing)."
+      "reasoningOperationId": "perhatikan “at the moment” → cari subjeknya, “I” → gabungkan bentuk “be” untuk “I” dengan -ing"
     },
     {
       "id": "A1-352",
@@ -21325,8 +21286,7 @@
       },
       "pedagogicalObjectiveId": "Pakai “am”, “is”, atau “are” + kata kerja -ing untuk kejadian yang sedang berlangsung sekarang. Contoh: “What are you doing?” “I am looking for my pen.”",
       "misconceptionTargetedId": "Kamu menulis kata kerja -ing tanpa “am”, “is”, atau “are”, karena kata “sedang” nggak butuh kata bantu, atau memakai bentuk kebiasaan untuk kejadian sekarang.",
-      "reasoningOperationId": "lihat pertanyaan “What are you doing?” → ingat bentuk “be” untuk “I” → gabungkan dengan “look” + -ing",
-      "ruleId": "Kejadian yang sedang berlangsung saat ini pakai bentuk “be” (am/is/are) ditambah Verb-ing.<br><br>💡 <b>RUMUS KILAT</b>:<br>Sedang terjadi SEKARANG ➡️ Wajib pasangkan <b>am/is/are</b> + <b>Verb-ing</b>.<br>Kebiasaan berulang ➡️ Pakai Verb biasa (Present Simple, tanpa -ing)."
+      "reasoningOperationId": "lihat pertanyaan “What are you doing?” → ingat bentuk “be” untuk “I” → gabungkan dengan “look” + -ing"
     },
     {
       "id": "A1-353",
@@ -21382,8 +21342,7 @@
       },
       "pedagogicalObjectiveId": "Pakai “was” atau “were” untuk cerita masa lalu: “was” untuk “I”, “he”, “she”, “it”; “were” untuk “you”, “we”, “they”. Contoh: “I was sick yesterday, so I stayed at home.”",
       "misconceptionTargetedId": "Kamu memakai bentuk sekarang walaupun ada kata waktu lampau, karena bahasa Indonesia nggak berubah bentuk menurut waktu, atau memakai “was” untuk semua subjek.",
-      "reasoningOperationId": "perhatikan kata “yesterday” → cari subjeknya, “I” → pilih bentuk lampau untuk “I”",
-      "ruleId": "Kejadian masa lalu tanpa kata kerja aksi (contoh: sifat, tempat) menggunakan “was” atau “were” (bentuk lampau dari am/is/are).<br><br>💡 <b>RUMUS KILAT</b>:<br>Subjek tunggal (I/He/She/It) ➡️ Pakai <b>was</b>.<br>Subjek jamak (You/We/They) ➡️ Pakai <b>were</b>."
+      "reasoningOperationId": "perhatikan kata “yesterday” → cari subjeknya, “I” → pilih bentuk lampau untuk “I”"
     },
     {
       "id": "A1-354",
@@ -21439,8 +21398,7 @@
       },
       "pedagogicalObjectiveId": "Pakai “was” atau “were” untuk cerita masa lalu: “was” untuk “I”, “he”, “she”, “it”; “were” untuk “you”, “we”, “they”. Contoh: “We were at the beach last Sunday. It was fun!”",
       "misconceptionTargetedId": "Kamu memakai bentuk sekarang walaupun ada kata waktu lampau, karena bahasa Indonesia nggak berubah bentuk menurut waktu, atau memakai “was” untuk semua subjek.",
-      "reasoningOperationId": "perhatikan “last Sunday” → cari subjeknya, “we” → pilih bentuk lampau untuk “we”",
-      "ruleId": "Kejadian masa lalu tanpa kata kerja aksi (contoh: sifat, tempat) menggunakan “was” atau “were” (bentuk lampau dari am/is/are).<br><br>💡 <b>RUMUS KILAT</b>:<br>Subjek tunggal (I/He/She/It) ➡️ Pakai <b>was</b>.<br>Subjek jamak (You/We/They) ➡️ Pakai <b>were</b>."
+      "reasoningOperationId": "perhatikan “last Sunday” → cari subjeknya, “we” → pilih bentuk lampau untuk “we”"
     },
     {
       "id": "A1-355",
@@ -21496,8 +21454,7 @@
       },
       "pedagogicalObjectiveId": "Pakai “was” atau “were” untuk cerita masa lalu: “was” untuk “I”, “he”, “she”, “it”; “were” untuk “you”, “we”, “they”. Contoh: “Was the test easy?” “Yes, it was!”",
       "misconceptionTargetedId": "Kamu memakai bentuk sekarang walaupun ada kata waktu lampau, karena bahasa Indonesia nggak berubah bentuk menurut waktu, atau memakai “was” untuk semua subjek.",
-      "reasoningOperationId": "lihat jawaban “it was” → cari subjeknya, yaitu ujiannya → taruh bentuk lampau untuk satu benda di depan subjek",
-      "ruleId": "Kejadian masa lalu tanpa kata kerja aksi (contoh: sifat, tempat) menggunakan “was” atau “were” (bentuk lampau dari am/is/are).<br><br>💡 <b>RUMUS KILAT</b>:<br>Subjek tunggal (I/He/She/It) ➡️ Pakai <b>was</b>.<br>Subjek jamak (You/We/They) ➡️ Pakai <b>were</b>."
+      "reasoningOperationId": "lihat jawaban “it was” → cari subjeknya, yaitu ujiannya → taruh bentuk lampau untuk satu benda di depan subjek"
     },
     {
       "id": "A1-356",
@@ -21553,8 +21510,7 @@
       },
       "pedagogicalObjectiveId": "Pakai “was” atau “were” untuk cerita masa lalu: “was” untuk “I”, “he”, “she”, “it”; “were” untuk “you”, “we”, “they”. Contoh: “Ten years ago, this town was very small.”",
       "misconceptionTargetedId": "Kamu memakai bentuk sekarang walaupun ada kata waktu lampau, karena bahasa Indonesia nggak berubah bentuk menurut waktu, atau memakai “was” untuk semua subjek.",
-      "reasoningOperationId": "perhatikan “ten years ago” → pastikan “this town” itu satu tempat → pilih bentuk lampau untuk satu benda",
-      "ruleId": "Kejadian masa lalu tanpa kata kerja aksi (contoh: sifat, tempat) menggunakan “was” atau “were” (bentuk lampau dari am/is/are).<br><br>💡 <b>RUMUS KILAT</b>:<br>Subjek tunggal (I/He/She/It) ➡️ Pakai <b>was</b>.<br>Subjek jamak (You/We/They) ➡️ Pakai <b>were</b>."
+      "reasoningOperationId": "perhatikan “ten years ago” → pastikan “this town” itu satu tempat → pilih bentuk lampau untuk satu benda"
     },
     {
       "id": "A1-357",
@@ -21610,8 +21566,7 @@
       },
       "pedagogicalObjectiveId": "Tambah -ed pada kata kerja beraturan untuk kejadian yang sudah selesai, dan pakai bentuk dasar sesudah “did”. Contoh: “We danced at the school party last Friday.”",
       "misconceptionTargetedId": "Kamu membiarkan kata kerjanya dalam bentuk dasar walaupun ada “yesterday”, karena kata kerja bahasa Indonesia nggak berubah, atau tetap memakai -ed sesudah “did”.",
-      "reasoningOperationId": "perhatikan “last Friday” → cek akhiran e pada kata kerja → tambah -d",
-      "ruleId": "Kejadian di masa lalu pakai Verb 2. Kalau bertanya atau negatif, bentuk masa lalunya ditanggung oleh “did/didn't”, jadi kata kerjanya wajib kembali ke dasar (Verb 1).<br><br>💡 <b>RUMUS KILAT</b>:<br>Kalau ADA kata <b>did</b> / <b>didn't</b> ➡️ Kata kerjanya WAJIB balik ke dasar (Verb 1).<br>Kalau NGGAK ADA <b>did</b> ➡️ Kata kerjanya pakai Verb 2."
+      "reasoningOperationId": "perhatikan “last Friday” → cek akhiran e pada kata kerja → tambah -d"
     },
     {
       "id": "A1-358",
@@ -21667,8 +21622,7 @@
       },
       "pedagogicalObjectiveId": "Tambah -ed pada kata kerja beraturan untuk kejadian yang sudah selesai, dan pakai bentuk dasar sesudah “did”. Contoh: “Ali studied for his math test two days ago.”",
       "misconceptionTargetedId": "Kamu membiarkan kata kerjanya dalam bentuk dasar walaupun ada “yesterday”, karena kata kerja bahasa Indonesia nggak berubah, atau tetap memakai -ed sesudah “did”.",
-      "reasoningOperationId": "perhatikan “two days ago” → cek akhiran konsonan + y → ubah y jadi -ied",
-      "ruleId": "Kejadian di masa lalu pakai Verb 2. Kalau bertanya atau negatif, bentuk masa lalunya ditanggung oleh “did/didn't”, jadi kata kerjanya wajib kembali ke dasar (Verb 1).<br><br>💡 <b>RUMUS KILAT</b>:<br>Kalau ADA kata <b>did</b> / <b>didn't</b> ➡️ Kata kerjanya WAJIB balik ke dasar (Verb 1).<br>Kalau NGGAK ADA <b>did</b> ➡️ Kata kerjanya pakai Verb 2."
+      "reasoningOperationId": "perhatikan “two days ago” → cek akhiran konsonan + y → ubah y jadi -ied"
     },
     {
       "id": "A1-359",
@@ -21724,8 +21678,7 @@
       },
       "pedagogicalObjectiveId": "Tambah -ed pada kata kerja beraturan untuk kejadian yang sudah selesai, dan pakai bentuk dasar sesudah “did”. Contoh: “Did you visit your grandma yesterday?”",
       "misconceptionTargetedId": "Kamu membiarkan kata kerjanya dalam bentuk dasar walaupun ada “yesterday”, karena kata kerja bahasa Indonesia nggak berubah, atau tetap memakai -ed sesudah “did”.",
-      "reasoningOperationId": "lihat “Did” di awal kalimat → ingat “did” butuh bentuk dasar → pakai kata kerja dalam bentuk dasarnya",
-      "ruleId": "Kejadian di masa lalu pakai Verb 2. Kalau bertanya atau negatif, bentuk masa lalunya ditanggung oleh “did/didn't”, jadi kata kerjanya wajib kembali ke dasar (Verb 1).<br><br>💡 <b>RUMUS KILAT</b>:<br>Kalau ADA kata <b>did</b> / <b>didn't</b> ➡️ Kata kerjanya WAJIB balik ke dasar (Verb 1).<br>Kalau NGGAK ADA <b>did</b> ➡️ Kata kerjanya pakai Verb 2."
+      "reasoningOperationId": "lihat “Did” di awal kalimat → ingat “did” butuh bentuk dasar → pakai kata kerja dalam bentuk dasarnya"
     },
     {
       "id": "A1-360",
@@ -21781,8 +21734,7 @@
       },
       "pedagogicalObjectiveId": "Tambah -ed pada kata kerja beraturan untuk kejadian yang sudah selesai, dan pakai bentuk dasar sesudah “did”. Contoh: “The shop opened at nine o'clock yesterday.”",
       "misconceptionTargetedId": "Kamu membiarkan kata kerjanya dalam bentuk dasar walaupun ada “yesterday”, karena kata kerja bahasa Indonesia nggak berubah, atau tetap memakai -ed sesudah “did”.",
-      "reasoningOperationId": "perhatikan kata “yesterday” → kenali “open” sebagai kata kerja beraturan → tambah -ed",
-      "ruleId": "Kejadian di masa lalu pakai Verb 2. Kalau bertanya atau negatif, bentuk masa lalunya ditanggung oleh “did/didn't”, jadi kata kerjanya wajib kembali ke dasar (Verb 1).<br><br>💡 <b>RUMUS KILAT</b>:<br>Kalau ADA kata <b>did</b> / <b>didn't</b> ➡️ Kata kerjanya WAJIB balik ke dasar (Verb 1).<br>Kalau NGGAK ADA <b>did</b> ➡️ Kata kerjanya pakai Verb 2."
+      "reasoningOperationId": "perhatikan kata “yesterday” → kenali “open” sebagai kata kerja beraturan → tambah -ed"
     },
     {
       "id": "A1-361",
@@ -23406,8 +23358,7 @@
       },
       "pedagogicalObjectiveId": "Pilih present simple untuk kebiasaan dan present continuous untuk kejadian yang sedang berlangsung. Contoh: “Dina usually walks to school, but today she is taking the bus.”",
       "misconceptionTargetedId": "Kamu memilih bentuk kata kerja tanpa melihat kata waktunya, karena “setiap hari” dan “sekarang” nggak mengubah kata kerja dalam bahasa Indonesia.",
-      "reasoningOperationId": "cari kata waktunya, “usually” → pastikan itu kebiasaan → pilih bentuk kebiasaan untuk “she”",
-      "ruleId": "Fakta atau kebiasaan (rutinitas) pakai Present Simple. Subjek “he”, “she”, “it” wajib ditambah -s/-es pada kata kerjanya.<br><br>💡 <b>RUMUS KILAT</b>:<br>Subjek tunggal (He/She/It) ➡️ Kata kerja pakai akhiran <b>-s/-es</b> (misal: plays, goes).<br>Subjek jamak (I/You/We/They) ➡️ Kata kerja <b>tanpa tambahan apa pun</b> (misal: play, go)."
+      "reasoningOperationId": "cari kata waktunya, “usually” → pastikan itu kebiasaan → pilih bentuk kebiasaan untuk “she”"
     },
     {
       "id": "A2-322",
@@ -23463,8 +23414,7 @@
       },
       "pedagogicalObjectiveId": "Pilih present simple untuk kebiasaan dan present continuous untuk kejadian yang sedang berlangsung. Contoh: “Be quiet! The students are taking an exam at the moment.”",
       "misconceptionTargetedId": "Kamu memilih bentuk kata kerja tanpa melihat kata waktunya, karena “setiap hari” dan “sekarang” nggak mengubah kata kerja dalam bahasa Indonesia.",
-      "reasoningOperationId": "cari kata waktunya, “at the moment” → hitung murid-muridnya → gabungkan bentuk “be” jamak dengan -ing",
-      "ruleId": "Fakta atau kebiasaan (rutinitas) pakai Present Simple. Subjek “he”, “she”, “it” wajib ditambah -s/-es pada kata kerjanya.<br><br>💡 <b>RUMUS KILAT</b>:<br>Subjek tunggal (He/She/It) ➡️ Kata kerja pakai akhiran <b>-s/-es</b> (misal: plays, goes).<br>Subjek jamak (I/You/We/They) ➡️ Kata kerja <b>tanpa tambahan apa pun</b> (misal: play, go)."
+      "reasoningOperationId": "cari kata waktunya, “at the moment” → hitung murid-muridnya → gabungkan bentuk “be” jamak dengan -ing"
     },
     {
       "id": "A2-323",
@@ -23520,8 +23470,7 @@
       },
       "pedagogicalObjectiveId": "Pilih present simple untuk kebiasaan dan present continuous untuk kejadian yang sedang berlangsung. Contoh: “My mum doesn't drink coffee. She only drinks tea.”",
       "misconceptionTargetedId": "Kamu memilih bentuk kata kerja tanpa melihat kata waktunya, karena “setiap hari” dan “sekarang” nggak mengubah kata kerja dalam bahasa Indonesia.",
-      "reasoningOperationId": "lihat kalimat kedua → pastikan itu kebiasaan → pilih bentuk negatif kebiasaan untuk “she”",
-      "ruleId": "Fakta atau kebiasaan (rutinitas) pakai Present Simple. Subjek “he”, “she”, “it” wajib ditambah -s/-es pada kata kerjanya.<br><br>💡 <b>RUMUS KILAT</b>:<br>Subjek tunggal (He/She/It) ➡️ Kata kerja pakai akhiran <b>-s/-es</b> (misal: plays, goes).<br>Subjek jamak (I/You/We/They) ➡️ Kata kerja <b>tanpa tambahan apa pun</b> (misal: play, go)."
+      "reasoningOperationId": "lihat kalimat kedua → pastikan itu kebiasaan → pilih bentuk negatif kebiasaan untuk “she”"
     },
     {
       "id": "A2-324",
@@ -23577,8 +23526,7 @@
       },
       "pedagogicalObjectiveId": "Pilih present simple untuk kebiasaan dan present continuous untuk kejadian yang sedang berlangsung. Contoh: “Why are you carrying an umbrella? It isn't raining.”",
       "misconceptionTargetedId": "Kamu memilih bentuk kata kerja tanpa melihat kata waktunya, karena “setiap hari” dan “sekarang” nggak mengubah kata kerja dalam bahasa Indonesia.",
-      "reasoningOperationId": "perhatikan “It isn't raining” → pastikan kejadiannya sekarang → taruh “are” sebelum “you” dan tambah -ing",
-      "ruleId": "Fakta atau kebiasaan (rutinitas) pakai Present Simple. Subjek “he”, “she”, “it” wajib ditambah -s/-es pada kata kerjanya.<br><br>💡 <b>RUMUS KILAT</b>:<br>Subjek tunggal (He/She/It) ➡️ Kata kerja pakai akhiran <b>-s/-es</b> (misal: plays, goes).<br>Subjek jamak (I/You/We/They) ➡️ Kata kerja <b>tanpa tambahan apa pun</b> (misal: play, go)."
+      "reasoningOperationId": "perhatikan “It isn't raining” → pastikan kejadiannya sekarang → taruh “are” sebelum “you” dan tambah -ing"
     },
     {
       "id": "A2-325",
@@ -24530,8 +24478,7 @@
       },
       "pedagogicalObjectiveId": "Pakai “was/were” + -ing untuk kegiatan panjang di masa lalu, dan past simple untuk kejadian singkat yang memotongnya. Contoh: “We were watching TV when the lights went out.”",
       "misconceptionTargetedId": "Kamu memakai bentuk yang sama untuk kedua kejadian, karena kata “sedang” sering dihilangkan.",
-      "reasoningOperationId": "cari kejadian singkatnya, yaitu lampu padam → pastikan menonton TV kegiatan yang panjang → gabungkan “were” dengan -ing",
-      "ruleId": "Kejadian di masa lalu pakai Verb 2. Kalau bertanya atau negatif, bentuk masa lalunya ditanggung oleh “did/didn't”, jadi kata kerjanya wajib kembali ke dasar (Verb 1).<br><br>💡 <b>RUMUS KILAT</b>:<br>Kalau ADA kata <b>did</b> / <b>didn't</b> ➡️ Kata kerjanya WAJIB balik ke dasar (Verb 1).<br>Kalau NGGAK ADA <b>did</b> ➡️ Kata kerjanya pakai Verb 2."
+      "reasoningOperationId": "cari kejadian singkatnya, yaitu lampu padam → pastikan menonton TV kegiatan yang panjang → gabungkan “were” dengan -ing"
     },
     {
       "id": "A2-342",
@@ -24587,8 +24534,7 @@
       },
       "pedagogicalObjectiveId": "Pakai “was/were” + -ing untuk kegiatan panjang di masa lalu, dan past simple untuk kejadian singkat yang memotongnya. Contoh: “I was sleeping when my phone suddenly rang.”",
       "misconceptionTargetedId": "Kamu memakai bentuk yang sama untuk kedua kejadian, karena kata “sedang” sering dihilangkan.",
-      "reasoningOperationId": "perhatikan kata “suddenly” → pastikan dering ponsel kejadian singkat → pilih bentuk past simple dari “ring”",
-      "ruleId": "Kejadian di masa lalu pakai Verb 2. Kalau bertanya atau negatif, bentuk masa lalunya ditanggung oleh “did/didn't”, jadi kata kerjanya wajib kembali ke dasar (Verb 1).<br><br>💡 <b>RUMUS KILAT</b>:<br>Kalau ADA kata <b>did</b> / <b>didn't</b> ➡️ Kata kerjanya WAJIB balik ke dasar (Verb 1).<br>Kalau NGGAK ADA <b>did</b> ➡️ Kata kerjanya pakai Verb 2."
+      "reasoningOperationId": "perhatikan kata “suddenly” → pastikan dering ponsel kejadian singkat → pilih bentuk past simple dari “ring”"
     },
     {
       "id": "A2-343",
@@ -24644,8 +24590,7 @@
       },
       "pedagogicalObjectiveId": "Pakai “was/were” + -ing untuk kegiatan panjang di masa lalu, dan past simple untuk kejadian singkat yang memotongnya. Contoh: “What were you doing when the teacher came in?”",
       "misconceptionTargetedId": "Kamu memakai bentuk yang sama untuk kedua kejadian, karena kata “sedang” sering dihilangkan.",
-      "reasoningOperationId": "perhatikan kata “when” → pastikan yang ditanya kegiatan yang sedang berlangsung → taruh “were” sebelum “you”",
-      "ruleId": "Kejadian di masa lalu pakai Verb 2. Kalau bertanya atau negatif, bentuk masa lalunya ditanggung oleh “did/didn't”, jadi kata kerjanya wajib kembali ke dasar (Verb 1).<br><br>💡 <b>RUMUS KILAT</b>:<br>Kalau ADA kata <b>did</b> / <b>didn't</b> ➡️ Kata kerjanya WAJIB balik ke dasar (Verb 1).<br>Kalau NGGAK ADA <b>did</b> ➡️ Kata kerjanya pakai Verb 2."
+      "reasoningOperationId": "perhatikan kata “when” → pastikan yang ditanya kegiatan yang sedang berlangsung → taruh “were” sebelum “you”"
     },
     {
       "id": "A2-344",
@@ -24701,8 +24646,7 @@
       },
       "pedagogicalObjectiveId": "Pakai “was/were” + -ing untuk kegiatan panjang di masa lalu, dan past simple untuk kejadian singkat yang memotongnya. Contoh: “Rani broke her arm while she was playing basketball.”",
       "misconceptionTargetedId": "Kamu memakai bentuk yang sama untuk kedua kejadian, karena kata “sedang” sering dihilangkan.",
-      "reasoningOperationId": "cari kegiatan panjangnya, “was playing” → pastikan patahnya kejadian singkat → pilih bentuk lampau khusus dari “break”",
-      "ruleId": "Kejadian di masa lalu pakai Verb 2. Kalau bertanya atau negatif, bentuk masa lalunya ditanggung oleh “did/didn't”, jadi kata kerjanya wajib kembali ke dasar (Verb 1).<br><br>💡 <b>RUMUS KILAT</b>:<br>Kalau ADA kata <b>did</b> / <b>didn't</b> ➡️ Kata kerjanya WAJIB balik ke dasar (Verb 1).<br>Kalau NGGAK ADA <b>did</b> ➡️ Kata kerjanya pakai Verb 2."
+      "reasoningOperationId": "cari kegiatan panjangnya, “was playing” → pastikan patahnya kejadian singkat → pilih bentuk lampau khusus dari “break”"
     },
     {
       "id": "A2-345",
@@ -28742,6 +28686,6 @@
   "indonesianCoverage": {
     "translated": 512,
     "total": 512,
-    "updatedAt": "2026-10-02"
+    "updatedAt": "2026-10-05"
   }
-}\n
+}
