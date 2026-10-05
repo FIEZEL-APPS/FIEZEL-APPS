@@ -1,7 +1,7 @@
 {
-  "version": "m025-472",
-  "claimedBy": "branch feat/lightning-fast-audio",
-  "claimedAt": "2026-10-05T01:02:00.978Z",
-  "reason": "perf(audio): in-memory cache dan prefetch proaktif untuk pemutaran secepat kilat",
+  "version": "m025-473",
+  "claimedBy": "branch chore/bot-activation-handoff",
+  "claimedAt": "2026-10-05T01:48:31.979Z",
+  "reason": "docs(bot): handoff aktivasi penuh Fiezel Bot + proteksi branch main",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
