@@ -1,7 +1,7 @@
 {
-  "version": "m025-470",
-  "claimedBy": "branch feat/audio-streaming-csp",
-  "claimedAt": "2026-10-05T00:05:10.169Z",
-  "reason": "feat(game): panel game di bottom nav, poster card paw arena, dan bug arena boss raid",
+  "version": "m025-471",
+  "claimedBy": "branch main",
+  "claimedAt": "2026-10-05T00:24:24.631Z",
+  "reason": "fix(ci): perbaiki pemPrivateKey scanner false positive di fiezel-bot",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
