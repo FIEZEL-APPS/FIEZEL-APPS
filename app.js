@@ -1349,6 +1349,13 @@ function applyContentLocale(){
         const out=q.slice();
         if(t.stem)out[0]=t.stem;
         out[1]=opts;
+        const m=q[3]&&typeof q[3]===typeof{}?q[3]:null;
+        /* m025-483: why/whyOthersFail A1/A2 adalah teks MURID ID. Sidecar Thai belum
+           menerjemahkannya, jadi menyalinnya apa adanya akan menampilkan penjelasan Indonesia
+           di layar Thai. Salon hanya bila sidecar punya versi Thai; kalau tidak, buang
+           supaya penyaji jatuh ke templat netral (yang lokalisasi lewat FiezelI18n), BUKAN
+           membocorkan naskah Indonesia. */
+        if(m){const m2=Object.assign({},m);if(t.why){m2.why=t.why;if(t.whyOthersFail)m2.whyOthersFail=t.whyOthersFail;else delete m2.whyOthersFail}else{delete m2.why;delete m2.whyOthersFail}out[3]=m2;}
         return out;
       })});
     });
