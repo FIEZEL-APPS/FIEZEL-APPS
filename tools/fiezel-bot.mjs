@@ -674,6 +674,8 @@ const CONTEXT_SKIP = /(^|\/)(vendor|node_modules|audio|assets)\/|\.min\.js$|pack
 const CONTEXT_FULL_FILE_MAX = 40_000;
 const CONTEXT_WINDOW_LINES = 30;
 const CONTEXT_DEFAULT_BUDGET = 150_000;
+/** Sisa anggaran sekecil ini tidak layak dipakai untuk potongan berkas. */
+const CONTEXT_MIN_PARTIAL = 2_000;
 const MAX_AI_FINDINGS = 10;
 const SEVERITIES = ['high', 'medium', 'low'];
 const SEVERITY_ICON = { high: '🔴', medium: '🟠', low: '🟡' };
@@ -753,9 +755,10 @@ function buildFileContext(changedFiles, diffMap, opts = {}) {
     .map(f => ({ file: f, added: diffMap.get(f)?.added || new Set() }))
     .sort((a, b) => (CONTEXT_CODE_EXT.test(a.file) ? 0 : 1) - (CONTEXT_CODE_EXT.test(b.file) ? 0 : 1) || b.added.size - a.added.size);
 
-  const parts = [], included = [], omitted = [];
+  const parts = [], included = [], omitted = [], partial = [];
   const sentLines = new Map(); // berkas → Set nomor baris yang sudah dikirim (dipakai pencari pemanggil)
   let used = 0;
+  const prepared = [];
   for (const { file, added } of candidates) {
     const lines = readLines(file);
     if (!lines) continue;
@@ -770,21 +773,40 @@ function buildFileContext(changedFiles, diffMap, opts = {}) {
       }
       keep = [...set].sort((a, b) => a - b);
     }
-    const out = [`=== FILE: ${file} (${lines.length} baris${full ? '' : ', hanya potongan di sekitar perubahan'}) ===`];
+    const header = `=== FILE: ${file} (${lines.length} baris${full ? '' : ', hanya potongan di sekitar perubahan'}) ===`;
+    const rendered = [];
     let prev = 0;
     for (const n of keep) {
-      if (prev && n !== prev + 1) out.push('  …');
-      out.push(`${String(n).padStart(5)}${added.has(n) ? '+' : ' '}| ${lines[n - 1].slice(0, 400)}`);
+      rendered.push({ n, text: `${prev && n !== prev + 1 ? '  …\n' : ''}${String(n).padStart(5)}${added.has(n) ? '+' : ' '}| ${lines[n - 1].slice(0, 400)}` });
       prev = n;
     }
-    const chunk = out.join('\n');
-    if (used + chunk.length > budget) { omitted.push(file); continue; }
-    parts.push(chunk);
-    included.push(file);
-    sentLines.set(file, new Set(keep));
-    used += chunk.length;
+    prepared.push({ file, header, rendered, size: header.length + rendered.reduce((t, r) => t + r.text.length + 1, 0) });
   }
-  return { text: parts.join('\n\n'), included, omitted, sentLines };
+  const emit = (p, sent, truncated) => {
+    const chunk = [p.header, ...sent.map(r => r.text), ...(truncated ? ['  … (terpotong: anggaran konteks habis)'] : [])].join('\n');
+    parts.push(chunk);
+    included.push(p.file);
+    if (truncated) partial.push(p.file);
+    sentLines.set(p.file, new Set(sent.map(r => r.n)));
+    used += chunk.length;
+  };
+  // Putaran 1: semua berkas yang muat UTUH (urutan prioritas). Putaran 2: sisa
+  // anggaran untuk potongan berkas yang tidak muat — berkas kecil tidak boleh
+  // terbuang hanya karena berkas besar di depannya menghabiskan anggaran.
+  const deferred = [];
+  for (const p of prepared) {
+    if (used + p.size <= budget) emit(p, p.rendered, false);
+    else deferred.push(p);
+  }
+  for (const p of deferred) {
+    const left = budget - used - p.header.length - 80;
+    if (left < CONTEXT_MIN_PARTIAL) { omitted.push(p.file); continue; }
+    let acc = 0;
+    const sent = [];
+    for (const r of p.rendered) { if (acc + r.text.length + 1 > left) break; sent.push(r); acc += r.text.length + 1; }
+    emit(p, sent, true);
+  }
+  return { text: parts.join('\n\n'), included, omitted, partial, sentLines };
 }
 
 // ── KODE PEMANGGIL: siapa yang memakai fungsi yang diubah PR ini? ──
@@ -1146,7 +1168,7 @@ function composeAiSection(aiResult, aiReview) {
   const out = [];
   if (aiReview.summary) out.push(`> ${normalizeWs(aiReview.summary).slice(0, 500)}`, '');
   const { verified, dropped, context } = aiReview;
-  out.push(`**${verified.length} temuan terverifikasi**${dropped.length ? ` · ${dropped.length} dibuang karena tidak terbukti di kode` : ''} · konteks: ${context.included.length} berkas dibaca utuh/terpotong${context.omitted.length ? `, ${context.omitted.length} dilewati` : ''}, ${context.callerSites || 0} lokasi pemanggil`);
+  out.push(`**${verified.length} temuan terverifikasi**${dropped.length ? ` · ${dropped.length} dibuang karena tidak terbukti di kode` : ''} · konteks: ${context.included.length} berkas dibaca${context.partial?.length ? ` (${context.partial.length} terpotong anggaran)` : ''}${context.omitted.length ? `, ${context.omitted.length} dilewati` : ''}, ${context.callerSites || 0} lokasi pemanggil`);
   if (!verified.length) {
     out.push('', '_Tidak ada temuan AI yang bisa dibuktikan di kode._');
   } else {
@@ -1861,6 +1883,12 @@ async function runSelfTest() {
   const fc = buildFileContext(['small.js', 'big.js', 'pic.png'], new Map([['big.js', { added: new Set([1500]), right: new Set([1500]) }]]), { readLines: ctxRead, budget: 100000 });
   if (fc.included.join() !== 'big.js,small.js' || !fc.text.includes(' 1500+| line_1500_') || fc.text.includes('line_1400_') || !fc.text.includes('    1 | let s = 1;')) {
     throw new Error('T18 FAIL: buildFileContext');
+  }
+  // Anggaran sempit: berkas kedua dikirim TERPOTONG, bukan dibuang.
+  const tight = buildFileContext(['big.js', 'small2.js'], new Map([['big.js', { added: new Set([1500]), right: new Set([1500]) }]]),
+    { readLines: (f) => (f === 'big.js' ? big : f === 'small2.js' ? Array.from({ length: 400 }, (_, i) => `const v${i} = ${i};`) : null), budget: 12000 });
+  if (tight.included.join() !== 'big.js,small2.js' || tight.partial.join() !== 'small2.js' || !tight.text.includes('terpotong: anggaran') || tight.text.length > 12000 || tight.sentLines.get('small2.js').has(400)) {
+    throw new Error(`T18 FAIL: potongan anggaran ${tight.included}/${tight.partial}/${tight.text.length}`);
   }
   const parsedJson = parseFindingsJson('```json\n{"summary":"s","findings":[{"file":"a"}]}\n```');
   if (!parsedJson.ok || parsedJson.findings.length !== 1 || parseFindingsJson('bukan json').ok) throw new Error('T18 FAIL: parseFindingsJson');
