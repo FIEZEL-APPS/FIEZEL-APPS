@@ -122,6 +122,10 @@ async function run() {
     })));
     console.log('Nav items:', JSON.stringify(navLabels));
 
+    const homeScreenshotPath = path.join(ARTIFACTS_DIR, 'home-bottomnav-mobile-view.png');
+    await page.screenshot({ path: homeScreenshotPath, fullPage: false });
+    console.log(`Home screenshot saved to: ${homeScreenshotPath}`);
+
     console.log('Clicking Game tab...');
     await page.click('[data-testid="nav-game"]', { force: true });
     await page.waitForTimeout(600);
@@ -143,6 +147,13 @@ async function run() {
     const mobileScrollScreenshotPath = path.join(ARTIFACTS_DIR, 'game-panel-mobile-scrolled.png');
     await page.screenshot({ path: mobileScrollScreenshotPath, fullPage: false });
     console.log(`Mobile scrolled screenshot saved to: ${mobileScrollScreenshotPath}`);
+
+    // Scroll further to see the 4 arcade poster cards
+    await page.evaluate(() => window.scrollBy(0, 460));
+    await page.waitForTimeout(400);
+    const mobileArcadeScreenshotPath = path.join(ARTIFACTS_DIR, 'game-panel-mobile-arcade.png');
+    await page.screenshot({ path: mobileArcadeScreenshotPath, fullPage: false });
+    console.log(`Mobile arcade screenshot saved to: ${mobileArcadeScreenshotPath}`);
 
     // 2. Desktop viewport test (1200 x 800)
     console.log('--- Testing Desktop Viewport (1200 x 800) ---');

@@ -16480,129 +16480,117 @@ function startSentencePuzzleArcade(){
   go('grammar');
 }
 
-/* Bug Arena (Tactical Boss Raid Tracker) - ditempatkan di panel Game */
+/* Bug Arena (Epic Volcanic Boss Raid Poster) - ditempatkan di panel Game */
 function bugArenaCardMarkup() {
   return `
-    <section class="bug-arena-card">
-      <div class="bug-arena-header">
-        <div class="arena-title-wrap">
-          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false" style="display:block;flex-shrink:0;">
-            <defs>
-              <linearGradient id="scarabCarapaceHome" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#EF4444"/>
-                <stop offset="100%" stop-color="#B91C1C"/>
-              </linearGradient>
-            </defs>
-            <path d="M4 6.5l3.5 2M3 12h4.5M4 17.5l3.5-2M20 6.5l-3.5 2M21 12h-4.5M20 17.5l-3.5-2" stroke="#DC2626" stroke-width="2" stroke-linecap="round"/>
-            <path d="M9.5 4.5L8 2M14.5 4.5L16 2" stroke="#B91C1C" stroke-width="2" stroke-linecap="round"/>
-            <rect x="7" y="4.5" width="10" height="15" rx="5" fill="#7F1D1D"/>
-            <rect x="7.5" y="4.5" width="9" height="14" rx="4.5" fill="url(#scarabCarapaceHome)"/>
-            <line x1="12" y1="8" x2="12" y2="17.5" stroke="#7F1D1D" stroke-width="1.4"/>
-            <circle cx="10" cy="6.8" r="1.2" fill="#FFE600"/>
-            <circle cx="14" cy="6.8" r="1.2" fill="#FFE600"/>
-            <path d="M9 10c0 2 .5 4 1 5" stroke="rgba(255,255,255,0.45)" stroke-width="1.2" stroke-linecap="round"/>
+    <div class="game-poster-card bug-poster-card" onclick="if(window.FiezelBug&&FiezelBug.view)FiezelBug.view();else go('grammar');">
+      <div class="poster-magma-glow" aria-hidden="true"></div>
+      <div class="poster-cyber-grid" aria-hidden="true"></div>
+      <div class="poster-badge-row">
+        <span class="poster-kicker bug-kicker">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
           </svg>
-          <span class="arena-title">BUG ARENA</span>
-        </div>
-        <div class="arena-count-badge">2 Pola Lemah</div>
+          <span>BOSS RAID SINTAKSIS</span>
+        </span>
+        <span class="poster-threat-tag"><span class="threat-pulse-dot"></span> 2 ANCAMAN AKTIF</span>
       </div>
-
-      <div class="bug-items-stack">
-        <!-- Bug 1 -->
-        <div class="bug-row" onclick="if(window.FiezelBug&&FiezelBug.view)FiezelBug.view();else go('grammar');">
-          <div class="bug-row-top">
-            <span class="bug-name">
-              <span style="color: #EF4444; font-size: 14px;">●</span> Past Tense Irregular
-            </span>
-            <span class="bug-hp-pill crimson">82% HP</span>
-          </div>
-          <div class="bug-summary">
-            Sering tertukar pola <i>go → went</i> dan <i>buy → bought</i>
-          </div>
-          <div class="hp-bar-track">
-            <div class="hp-bar-fill crimson" style="width: 82%;"></div>
-          </div>
+      <div class="poster-body">
+        <div class="poster-titles">
+          <span class="poster-sub-brand bug-sub-brand">MISI ELIMINASI SINTAKSIS</span>
+          <h2 class="poster-main-title bug-title">BUG ARENA</h2>
+          <p class="poster-tagline">Pola grammar yang sering keliru telah bermutasi menjadi Monster Bug! Tumbangkan segera sebelum menguras HP belajarmu.</p>
         </div>
-
-        <!-- Bug 2 -->
-        <div class="bug-row" onclick="if(window.FiezelBug&&FiezelBug.view)FiezelBug.view();else go('grammar');">
-          <div class="bug-row-top">
-            <span class="bug-name">
-              <span style="color: #D97706; font-size: 14px;">●</span> Present Perfect vs Past
-            </span>
-            <span class="bug-hp-pill gold">60% HP</span>
-          </div>
-          <div class="bug-summary">
-            Kebingungan pemakaian <i>since vs for</i> dalam durasi waktu
-          </div>
-          <div class="hp-bar-track">
-            <div class="hp-bar-fill gold" style="width: 60%;"></div>
-          </div>
+        <div class="poster-graphic bug-boss-graphic" aria-hidden="true">
+          <svg viewBox="0 0 100 100" class="bug-boss-svg" width="84" height="84">
+            <defs>
+              <linearGradient id="pstScarabGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#FF6B6B"/>
+                <stop offset="50%" stop-color="#DC2626"/>
+                <stop offset="100%" stop-color="#7F1D1D"/>
+              </linearGradient>
+              <radialGradient id="pstScarabEye" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#FFF066"/>
+                <stop offset="100%" stop-color="#EA580C"/>
+              </radialGradient>
+            </defs>
+            <circle cx="50" cy="50" r="44" fill="rgba(220, 38, 38, 0.15)" stroke="rgba(239, 68, 68, 0.4)" stroke-width="2"/>
+            <path d="M22 36 L10 26 M18 50 L6 50 M22 64 L10 74 M78 36 L90 26 M82 50 L94 50 M78 64 L90 74" stroke="#EF4444" stroke-width="4" stroke-linecap="round"/>
+            <path d="M42 20 Q34 10 38 6 Q46 12 46 22 M58 20 Q66 10 62 6 Q54 12 54 22" fill="#991B1B" stroke="#EF4444" stroke-width="2"/>
+            <rect x="32" y="24" width="36" height="56" rx="18" fill="url(#pstScarabGrad)" stroke="#F87171" stroke-width="2.5"/>
+            <line x1="50" y1="36" x2="50" y2="76" stroke="#450A0A" stroke-width="2.5"/>
+            <path d="M38 40 Q40 58 46 68" stroke="rgba(255,255,255,0.4)" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+            <ellipse cx="50" cy="28" rx="13" ry="10" fill="#7F1D1D"/>
+            <circle cx="43" cy="27" r="3.5" fill="url(#pstScarabEye)"/>
+            <circle cx="57" cy="27" r="3.5" fill="url(#pstScarabEye)"/>
+          </svg>
         </div>
       </div>
 
-      <button type="button" class="bug-raid-btn" onclick="if(window.FiezelBug&&FiezelBug.view)FiezelBug.view();else go('grammar');">
-        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false" style="display:block;flex-shrink:0;">
-          <path d="M19.5 4.5l-2.8-2.8a1 1 0 0 0-1.4 0L4.5 12.5l3.5 3.5L18.8 5.2a1 1 0 0 0 0-1.4z" fill="#FFE600"/>
-          <path d="M4.5 12.5l-2 2a1 1 0 0 0 0 1.4l3.6 3.6a1 1 0 0 0 1.4 0l2-2" stroke="#FFE600" stroke-width="2" stroke-linecap="round" fill="none"/>
-          <line x1="8" y1="16" x2="3.5" y2="20.5" stroke="#FFE600" stroke-width="2" stroke-linecap="round"/>
-          <circle cx="2.5" cy="21.5" r="1.5" fill="#FFE600"/>
-        </svg>
-        <span>Eliminasi 5 Bug Hari Ini (±2 Mnt)</span>
-      </button>
-    </section>`;
+      <!-- Tactical Boss HP Tracks -->
+      <div class="boss-hp-stack">
+        <div class="boss-hp-unit">
+          <div class="boss-hp-meta">
+            <span class="boss-name"><b>Past Tense Irregular</b> <small>go → went / buy → bought</small></span>
+            <span class="boss-hp-badge crimson">82% HP</span>
+          </div>
+          <div class="boss-hp-track">
+            <div class="boss-hp-bar crimson" style="width: 82%"></div>
+          </div>
+        </div>
+        <div class="boss-hp-unit">
+          <div class="boss-hp-meta">
+            <span class="boss-name"><b>Present Perfect vs Past</b> <small>since vs for</small></span>
+            <span class="boss-hp-badge amber">60% HP</span>
+          </div>
+          <div class="boss-hp-track">
+            <div class="boss-hp-bar amber" style="width: 60%"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="poster-cta-wrap">
+        <button type="button" class="poster-action-btn bug-raid-action-btn" onclick="event.stopPropagation();if(window.FiezelBug&&FiezelBug.view)FiezelBug.view();else go('grammar');">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" fill="currentColor"/>
+          </svg>
+          <span>SERANG &amp; ELIMINASI BUG (±2 MNT)</span>
+          <i data-lucide="arrow-right"></i>
+        </button>
+      </div>
+    </div>`;
 }
 
 function gameHubMarkup(){
   const streak = Number(state.streak) || 3;
-  const xp = Number(state.xp || state.gems?.balance || 120);
-  const level = getActiveLevel() || 'A1';
   const trophy = (()=>{try{return localStorage.getItem('fz_arena_trophies')||'450'}catch(_){return '450'}})();
 
   return `<div class="game-hub-container">
-    <div class="game-hub-top-bar">
-      <div class="game-brand-cluster">
-        <span class="game-brand-icon"><i class="fz-i" data-fz-icon="game"></i></span>
-        <div class="game-brand-titles">
-          <h1 class="game-brand-heading">${esc(FiezelI18n.t('game.title'))}</h1>
-          <p class="game-brand-sub">${esc(FiezelI18n.t('game.subtitle'))}</p>
-        </div>
+    <!-- Header with Back Button and Quick Stats -->
+    <div class="game-hub-top-nav">
+      <button type="button" class="game-back-pill" onclick="go('home')" aria-label="Kembali ke Beranda">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        <span>Beranda</span>
+      </button>
+      <div class="game-quick-badges">
+        <span class="game-badge-trophy" title="Total Trophy Arena"><i data-lucide="trophy"></i> <b>${trophy}</b></span>
+        <span class="game-badge-flame" title="Runtun Belajar"><i class="fz-i" data-fz-icon="flame"></i> <b>${streak} Hari</b></span>
       </div>
     </div>
 
-    <div class="game-stats-ribbon">
-      <div class="game-stat-pill">
-        <span class="stat-icon flame"><i class="fz-i" data-fz-icon="flame"></i></span>
-        <div class="stat-meta">
-          <small>${esc(FiezelI18n.t('game.streak-label'))}</small>
-          <b>${streak} ${esc(FiezelI18n.t('game.days-unit'))}</b>
-        </div>
-      </div>
-      <div class="game-stat-pill">
-        <span class="stat-icon gold"><i data-lucide="zap"></i></span>
-        <div class="stat-meta">
-          <small>Total XP</small>
-          <b>${xp} XP</b>
-        </div>
-      </div>
-      <div class="game-stat-pill">
-        <span class="stat-icon trophy"><i data-lucide="trophy"></i></span>
-        <div class="stat-meta">
-          <small>${esc(FiezelI18n.t('game.trophy-label'))}</small>
-          <b>${trophy} 🏆</b>
-        </div>
-      </div>
-      <div class="game-stat-pill">
-        <span class="stat-icon level"><i class="fz-i" data-fz-icon="practice"></i></span>
-        <div class="stat-meta">
-          <small>${esc(FiezelI18n.t('game.mastery-label'))}</small>
-          <b>Level ${level}</b>
-        </div>
-      </div>
+    <div class="game-hub-header-titles">
+      <h1 class="game-brand-heading">${esc(FiezelI18n.t('game.title'))}</h1>
+      <p class="game-brand-sub">${esc(FiezelI18n.t('game.subtitle'))}</p>
     </div>
 
-    <!-- POSTER GAME CARD: PAW ARENA -->
-    <div class="game-poster-card" onclick="go('arena')">
+    <!-- 1. POSTER GAME CARD: PAW ARENA (Multiplayer Esports 1v1) -->
+    <div class="game-section-header">
+      <h4>DUEL MULTIPLAYER 1V1</h4>
+      <span class="section-sub">Adu kecepatan &amp; ketangkasan bahasa bersama kawan</span>
+    </div>
+    <div class="game-poster-card paw-poster-card" onclick="go('arena')">
       <div class="poster-cyber-grid" aria-hidden="true"></div>
       <div class="poster-light-ray" aria-hidden="true"></div>
       <div class="poster-badge-row">
@@ -16641,27 +16629,29 @@ function gameHubMarkup(){
         <span class="poster-mode-pill"><i data-lucide="trophy"></i> ${esc(FiezelI18n.t('game.mode-stakes'))}</span>
       </div>
       <div class="poster-cta-wrap">
-        <button type="button" class="poster-action-btn" onclick="event.stopPropagation();go('arena')">
+        <button type="button" class="poster-action-btn paw-action-btn" onclick="event.stopPropagation();go('arena')">
           <span>${esc(FiezelI18n.t('game.paw-arena-cta'))}</span>
           <i data-lucide="arrow-right"></i>
         </button>
       </div>
     </div>
 
-    <!-- BUG ARENA: BOSS RAID TRACKER -->
+    <!-- 2. POSTER GAME CARD: BUG ARENA (Boss Raid Tracker) -->
     <div class="game-section-header">
-      <h4>BOSS RAID TERTARGET</h4>
+      <h4>BOSS RAID SINTAKSIS</h4>
       <span class="section-sub">Eliminasi kelemahan tata bahasa sebelum menguras HP</span>
     </div>
     ${bugArenaCardMarkup()}
 
+    <!-- 3. ARCADE MINI-GAMES POSTER GRID -->
     <div class="game-section-header">
       <h4>${esc(FiezelI18n.t('game.section-title'))}</h4>
       <span class="section-sub">${esc(FiezelI18n.t('game.section-sub'))}</span>
     </div>
 
     <div class="game-arcade-grid">
-      <div class="game-arcade-card" onclick="startVocabArcade()">
+      <!-- Mochi Crunch -->
+      <div class="game-arcade-card mochi-card" onclick="startVocabArcade()">
         <div class="arcade-card-top">
           <span class="arcade-badge bubble">${esc(FiezelI18n.t('game.bubble-badge'))}</span>
           <span class="arcade-icon-wrap"><i data-lucide="sparkles"></i></span>
@@ -16669,23 +16659,25 @@ function gameHubMarkup(){
         <h4 class="arcade-card-title">${esc(FiezelI18n.t('game.bubble-title'))}</h4>
         <p class="arcade-card-desc">${esc(FiezelI18n.t('game.bubble-desc'))}</p>
         <div class="arcade-card-footer">
-          <span class="arcade-play-hint">${esc(FiezelI18n.t('game.play-cta'))}</span>
+          <span class="arcade-play-hint">${esc(FiezelI18n.t('game.play-cta'))} ➔</span>
         </div>
       </div>
 
-      <div class="game-arcade-card" onclick="startSentencePuzzleArcade()">
+      <!-- Sentence Puzzle Forge -->
+      <div class="game-arcade-card puzzle-card" onclick="startSentencePuzzleArcade()">
         <div class="arcade-card-top">
           <span class="arcade-badge puzzle">${esc(FiezelI18n.t('game.puzzle-badge'))}</span>
-          <span class="arcade-icon-wrap"><i data-lucide="sparkles"></i></span>
+          <span class="arcade-icon-wrap"><i data-lucide="layers"></i></span>
         </div>
         <h4 class="arcade-card-title">${esc(FiezelI18n.t('game.puzzle-title'))}</h4>
         <p class="arcade-card-desc">${esc(FiezelI18n.t('game.puzzle-desc'))}</p>
         <div class="arcade-card-footer">
-          <span class="arcade-play-hint">${esc(FiezelI18n.t('game.puzzle-cta'))}</span>
+          <span class="arcade-play-hint">${esc(FiezelI18n.t('game.puzzle-cta'))} ➔</span>
         </div>
       </div>
 
-      <div class="game-arcade-card" onclick="try{openLiveVoiceStage()}catch(_){go('skills')}">
+      <!-- Panggung Suara Live -->
+      <div class="game-arcade-card voice-card" onclick="try{openLiveVoiceStage()}catch(_){go('skills')}">
         <div class="arcade-card-top">
           <span class="arcade-badge voice">${esc(FiezelI18n.t('game.voice-badge'))}</span>
           <span class="arcade-icon-wrap"><i data-lucide="mic"></i></span>
@@ -16693,10 +16685,11 @@ function gameHubMarkup(){
         <h4 class="arcade-card-title">${esc(FiezelI18n.t('game.voice-title'))}</h4>
         <p class="arcade-card-desc">${esc(FiezelI18n.t('game.voice-desc'))}</p>
         <div class="arcade-card-footer">
-          <span class="arcade-play-hint">${esc(FiezelI18n.t('game.stage-cta'))}</span>
+          <span class="arcade-play-hint">${esc(FiezelI18n.t('game.stage-cta'))} ➔</span>
         </div>
       </div>
 
+      <!-- Nujum Voice Mentor -->
       <div class="game-arcade-card nujum-card" onclick="go('nujum')">
         <div class="arcade-card-top">
           <span class="arcade-badge nujum">${esc(FiezelI18n.t('game.nujum-badge'))}</span>
@@ -16705,7 +16698,7 @@ function gameHubMarkup(){
         <h4 class="arcade-card-title">${esc(FiezelI18n.t('game.nujum-title'))}</h4>
         <p class="arcade-card-desc">${esc(FiezelI18n.t('game.nujum-desc'))}</p>
         <div class="arcade-card-footer">
-          <span class="arcade-play-hint">${esc(FiezelI18n.t('game.nujum-cta'))}</span>
+          <span class="arcade-play-hint">${esc(FiezelI18n.t('game.nujum-cta'))} ➔</span>
         </div>
       </div>
     </div>
