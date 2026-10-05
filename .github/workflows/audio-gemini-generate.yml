@@ -27,6 +27,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 concurrency:
   group: fiezel-gemini-audio-generate
@@ -91,6 +92,7 @@ jobs:
         if: ${{ inputs.apply == 'APPLY' }}
         env:
           CONTENT: ${{ inputs.content }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           if [ -z "$(git status --porcelain audio/manifest.json)" ]; then
             echo 'Tidak ada aset baru.'
@@ -99,10 +101,14 @@ jobs:
           git config user.name 'fiezel-audio-bot'
           git config user.email 'noreply@github.com'
           git add audio/manifest.json
-          git commit -m "Audio: aset listening $CONTENT hasil produksi Gemini TTS"
-          for attempt in 1 2 3 4 5; do
-            if git push origin main; then exit 0; fi
-            echo "Push gagal (percobaan $attempt); sinkronisasi manifest remote..."
+          git commit -m "Audio: aset $CONTENT hasil produksi Gemini TTS"
+          pushed=false
+          for attempt in 1 2 3; do
+            if git push origin main; then
+              pushed=true
+              break
+            fi
+            echo "Push langsung ke main ditolak (percobaan $attempt), sinkronisasi manifest remote..."
             git fetch origin main
             node -e '
               const fs = require("fs");
@@ -115,8 +121,17 @@ jobs:
             '
             git reset --mixed origin/main
             git add audio/manifest.json
-            git commit -m "Audio: aset listening $CONTENT hasil produksi Gemini TTS (merged)" || true
+            git commit -m "Audio: aset $CONTENT hasil produksi Gemini TTS (merged)" || true
             sleep 2
           done
-          echo 'Manifest tidak bisa didorong. Aset sudah ada di R2.' >&2
-          exit 1
+
+          if [ "$pushed" = false ]; then
+            echo "Proteksi branch main aktif. Mendorong ke branch audio-update dan membuat pull request..."
+            BRANCH_NAME="audio-update-$(date +%s)"
+            git checkout -b "$BRANCH_NAME"
+            git push -u origin "$BRANCH_NAME"
+            gh pr create --base main --head "$BRANCH_NAME" \
+              --title "Audio: sinkronisasi manifest ($CONTENT via Gemini TTS)" \
+              --body "Aset audio telah berhasil diproduksi dan diverifikasi di Cloudflare R2. PR ini menyinkronkan manifest.json ke branch main."
+            echo "Pull request untuk update manifest berhasil dibuat."
+          fi
