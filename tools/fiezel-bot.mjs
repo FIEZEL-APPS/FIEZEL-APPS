@@ -1314,8 +1314,18 @@ async function runHeal(prNumber, logPath = '', opts = {}) {
   const matches = CI_FAILURE_SIGNATURES.filter(sig => sig.re.test(logContent));
   console.log(`[Fiezel Bot v2] Failure domains terdeteksi: ${matches.map(m => m.domain).join(', ') || 'unclassified'}`);
 
+  // Branch yang tertinggal dari main membuat sinyal lain PALSU: perubahan main ikut
+  // terhitung sebagai perubahan PR (mis. "produk berubah tanpa bump"). Bump atau
+  // patch AI di atas branch basi justru menambah kesalahan; yang benar adalah
+  // menggabungkan main dulu, lalu membiarkan CI menilai ulang.
+  const plan = planHeal(matches);
+  if (plan === 'stale') {
+    console.log('[Fiezel Bot v2] ⛔ Branch tertinggal dari main. Gabungkan main ke branch ini dulu; sinyal kegagalan lain bisa palsu. Tidak ada bump/patch.');
+    return { changed: false, files: [], reason: 'branch-stale' };
+  }
+
   // Prioritas: bump HANYA jika sinyal release-boundary benar-benar ada.
-  const bumpMatch = matches.find(m => m.autofix === 'bump');
+  const bumpMatch = plan === 'bump' ? matches.find(m => m.autofix === 'bump') : null;
   if (bumpMatch) {
     console.log(`[Fiezel Bot v2] 🔧 Deterministic fix: ${bumpMatch.domain} → auto bump-build`);
     const ok = runBump('bot(heal): auto-synchronize release boundary');
@@ -1324,7 +1334,7 @@ async function runHeal(prNumber, logPath = '', opts = {}) {
 
   // Cek apakah ada syntax error atau test failure yang bisa di-fix AI
   const aiMatch = matches.find(m => m.autofix === 'ai');
-  if (aiMatch || matches.length === 0) {
+  if (plan === 'ai') {
     console.log(`[Fiezel Bot v2] 🤖 AI-assisted fix for: ${aiMatch?.domain || 'unclassified failure'}...`);
     const prompt = `CI failed. Failure domain: ${aiMatch?.domain || 'unknown'}.
 
@@ -1359,6 +1369,20 @@ Diagnose the root cause and provide exact code fixes:
   }
   console.log('[Fiezel Bot v2] Tidak dapat memperbaiki otomatis.');
   return { changed: false, files: [], reason: 'unfixable' };
+}
+
+/**
+ * Rencana heal dari domain kegagalan yang cocok:
+ *  'stale'  — branch tertinggal dari main: berhenti, sinyal lain tidak bisa dipercaya;
+ *  'bump'   — sinyal release-boundary nyata: bump deterministik;
+ *  'ai'     — kegagalan tes/sintaks atau tak terklasifikasi: patch AI tervalidasi;
+ *  'manual' — domain yang dikenal tetapi tidak bisa diperbaiki otomatis.
+ */
+function planHeal(matches) {
+  if (matches.some(m => m.domain === 'Branch Freshness')) return 'stale';
+  if (matches.some(m => m.autofix === 'bump')) return 'bump';
+  if (matches.length === 0 || matches.some(m => m.autofix === 'ai')) return 'ai';
+  return 'manual';
 }
 
 /** Menulis daftar berkas yang dipatch agar workflow hanya `git add` berkas itu. */
@@ -2007,6 +2031,25 @@ async function runSelfTest() {
     if (!report.startsWith(METRICS_MARKER) || !report.includes('**50%**') || !report.includes('3 dari 5 (60%)')) throw new Error('T21 FAIL: laporan');
   }
   console.log('  ✅ T21: Ketepatan temuan (klasifikasi, pengumpulan, laporan)');
+  pass++;
+
+  // T22: Rencana heal — branch basi mengalahkan bump (kasus nyata PR #502: log memuat
+  // Branch Freshness + Release Boundary, dan bump di atas branch basi itu salah).
+  {
+    const sig = (log) => CI_FAILURE_SIGNATURES.filter(x => x.re.test(log));
+    const cases = [
+      ['A7 FAIL: candidate head does not contain current main\nA7 FAIL: product deploy must increment Diagnostics', 'stale'],
+      ['A7 FAIL: product deploy must increment Diagnostics m025-N exactly +1', 'bump'],
+      ['AssertionError [ERR_ASSERTION]: harus 3', 'ai'],
+      ['sesuatu yang tidak dikenal sama sekali', 'ai'],
+      ['Error: request timed out after 30s', 'manual'],
+    ];
+    for (const [log, want] of cases) {
+      const got = planHeal(sig(log));
+      if (got !== want) throw new Error(`T22 FAIL: "${log.slice(0, 40)}" → ${got}, harus ${want}`);
+    }
+  }
+  console.log('  ✅ T22: Rencana heal (branch basi → berhenti, bukan bump)');
   pass++;
 
   console.log(`\n✅ Fiezel Bot v2 Self-Test: PASS (${pass}/${pass} tests)`);
