@@ -153,6 +153,9 @@ jobs:
             node tools/fiezel-bot.mjs review --pr="$PR_NUM" > /tmp/fiezel-bot/raw.log 2>&1 || true
             sed -n '/<!-- FIEZEL_BOT_REVIEW -->/,$p' /tmp/fiezel-bot/raw.log > /tmp/fiezel-bot/out.md || cp /tmp/fiezel-bot/raw.log /tmp/fiezel-bot/out.md
           fi
+          # Permukaan diagnostik: tampilkan galat LLM (mis. nama model/kuota) di log CI.
+          echo "----- Fiezel Bot diagnostics -----"
+          grep -iE 'LLM tidak tersedia|HTTP [0-9]|AbortError|Error|timeout' /tmp/fiezel-bot/raw.log | head -20 || true
 
       - name: Upsert review comment on PR (No Spam, Single Living Comment)
         if: steps.meta.outputs.pr_number != ''
