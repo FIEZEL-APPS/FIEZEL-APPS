@@ -475,7 +475,15 @@
               new Promise(function (resolve) { setTimeout(function () { resolve(null); }, ASK_TIMEOUT); })
             ])
           : null;
-        push('coach', answer && String(answer).trim() ? String(answer) : localAnswer(context, text));
+        /* R8: jawaban yang datang dari AI diberi label; jawaban lokal (tanpa AI) dan kabar
+           "AI nonaktif selama tugas/ujian" tidak. */
+        /* `ask` boleh menjawab teks biasa (kabar terkunci, pemanggil lama) atau {text, ai}. */
+        var dariAI = !!(answer && typeof answer === 'object' && answer.ai);
+        if (answer && typeof answer === 'object') answer = answer.text;
+        var terkunci = typeof opts.aiLocked === 'function' && opts.aiLocked();
+        if (dariAI && !terkunci && answer && String(answer).trim()) push('coach', '<p>' + esc(String(answer)) + '</p><p class="ai-label">' + esc(T('sekolah.ai-label')) + '</p>', true);
+        else if (answer && String(answer).trim()) push('coach', String(answer));
+        else push('coach', localAnswer(context, text));
       } catch (error) {
         push('coach', localAnswer(context, text));
       } finally {
