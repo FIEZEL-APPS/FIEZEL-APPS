@@ -47,8 +47,8 @@ console.log('[T2] Menjalankan self-test tools/fiezel-bot.mjs...');
 {
   const r = sh('node', ['tools/fiezel-bot.mjs', 'self-test'], true);
   assert(r.out.includes('Self-Test: PASS'), 'Self-test harus mencetak PASS');
-  assert(/PASS \(12\/12 tests\)/.test(r.out), 'Self-test harus lulus 12/12');
-  console.log('  ok (12/12)');
+  assert(/PASS \(14\/14 tests\)/.test(r.out), 'Self-test harus lulus 14/14');
+  console.log('  ok (14/14)');
 }
 pass++;
 
@@ -148,6 +148,29 @@ console.log('[T12] [INTEGRITAS] Memastikan heal menolak branch terproteksi...');
 {
   assert(engineSrc.includes('protected-branch'), 'Engine harus menolak heal pada branch terproteksi');
   assert(/main\|master/.test(wfContent), 'Workflow harus menolak push ke main/master');
+}
+console.log('  ok');
+pass++;
+
+console.log('[T13] [BUG] Memastikan perintah fix/bump menulis daftar patch (bukan dibuang)...');
+{
+  const mainSrc = engineSrc.slice(engineSrc.indexOf('async function main()'));
+  for (const mode of ['fix', 'bump', 'heal']) {
+    const start = mainSrc.indexOf(`case '${mode}'`);
+    assert(start !== -1, `case '${mode}' wajib ada di main()`);
+    const next = mainSrc.indexOf('case ', start + 5);
+    const body = mainSrc.slice(start, next === -1 ? undefined : next);
+    assert(body.includes('writePatchList'), `Perintah '${mode}' wajib menulis daftar patch; tanpanya step push workflow membuang hasilnya`);
+  }
+}
+console.log('  ok');
+pass++;
+
+console.log('[T14] [BUG] Memastikan review & heal tidak berbagi grup concurrency...');
+{
+  assert(!/^concurrency\s*:/m.test(wfContent), 'Concurrency tingkat workflow dilarang: heal yang antre bisa membatalkan review (check wajib)');
+  assert(/concurrency:\s*\n\s*group: fiezel-bot-review-/.test(wfContent), 'Job review wajib punya grup concurrency sendiri');
+  assert(/concurrency:\s*\n\s*group: fiezel-bot-heal-/.test(wfContent), 'Job heal wajib punya grup concurrency sendiri');
 }
 console.log('  ok');
 pass++;

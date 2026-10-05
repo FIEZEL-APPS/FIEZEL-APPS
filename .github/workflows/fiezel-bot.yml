@@ -43,11 +43,10 @@ permissions:
   issues: write
   actions: read
 
-concurrency:
-  # Dikelompokkan per PR/branch agar tiga kegagalan pada PR yang sama tidak
-  # memicu tiga heal paralel yang saling menimpa push.
-  group: fiezel-bot-${{ github.event.pull_request.number || github.event.workflow_run.pull_requests[0].number || github.event.workflow_run.head_branch || github.event.inputs.pr_number || github.run_id }}
-  cancel-in-progress: false
+# Concurrency ada di tingkat JOB, bukan workflow. Dulu review dan heal berbagi
+# satu grup per PR: run review yang sedang antre bisa digantikan heal, sehingga
+# check wajib "Auto PR Review & Invariant Audit" pada head itu berstatus
+# cancelled dan merge terblokir. Kini review dan heal punya grup masing-masing.
 
 jobs:
   # 1. Otomatis Review Setiap PR Dibuka atau Diperbarui (Zero Manual Command)
@@ -55,6 +54,10 @@ jobs:
     name: Auto PR Review & Invariant Audit
     timeout-minutes: 20
     runs-on: ubuntu-latest
+    # Review untuk head lama tidak berguna begitu ada push baru → batalkan.
+    concurrency:
+      group: fiezel-bot-review-${{ github.event.pull_request.number || github.event.inputs.pr_number || github.run_id }}
+      cancel-in-progress: true
     # KEAMANAN: tolak PR dari fork + wajib penulis OWNER/MEMBER. Hanya MASTER
     # (FIEZEL-APPS) yang boleh memicu lewat workflow_dispatch.
     if: |
@@ -148,11 +151,14 @@ jobs:
           set -euo pipefail
           mkdir -p /tmp/fiezel-bot
           if [[ "$EVENT_NAME" == "workflow_dispatch" && "$COMMAND" == "explain" ]]; then
-            node tools/fiezel-bot.mjs explain --pr="$PR_NUM" > /tmp/fiezel-bot/out.md 2>&1 || true
+            marker='<!-- FIEZEL_BOT_EXPLAIN -->'
+            node tools/fiezel-bot.mjs explain --pr="$PR_NUM" > /tmp/fiezel-bot/raw.log 2>&1 || true
           else
+            marker='<!-- FIEZEL_BOT_REVIEW -->'
             node tools/fiezel-bot.mjs review --pr="$PR_NUM" > /tmp/fiezel-bot/raw.log 2>&1 || true
-            sed -n '/<!-- FIEZEL_BOT_REVIEW -->/,$p' /tmp/fiezel-bot/raw.log > /tmp/fiezel-bot/out.md || cp /tmp/fiezel-bot/raw.log /tmp/fiezel-bot/out.md
           fi
+          # Hanya bagian mulai marker yang diposting (tanpa log konsol mesin).
+          awk -v m="$marker" 'index($0, m) { on = 1 } on' /tmp/fiezel-bot/raw.log > /tmp/fiezel-bot/out.md
           # Permukaan diagnostik: tampilkan galat LLM (mis. nama model/kuota) di log CI.
           echo "----- Fiezel Bot diagnostics -----"
           grep -iE 'LLM tidak tersedia|HTTP [0-9]|AbortError|Error|timeout' /tmp/fiezel-bot/raw.log | head -20 || true
@@ -170,7 +176,8 @@ jobs:
             const body = fs.readFileSync(path, 'utf8').trim();
             if (!body) return;
 
-            const marker = '<!-- FIEZEL_BOT_REVIEW -->';
+            const marker = ['<!-- FIEZEL_BOT_EXPLAIN -->', '<!-- FIEZEL_BOT_REVIEW -->'].find(m => body.startsWith(m));
+            if (!marker) return;
             const { owner, repo } = context.repo;
             const issue_number = Number(process.env.PR_NUMBER);
             const comments = await github.paginate(github.rest.issues.listComments, {
@@ -188,6 +195,10 @@ jobs:
     name: Auto CI Self-Healing & Fix
     timeout-minutes: 20
     runs-on: ubuntu-latest
+    # Heal per PR/branch berjalan berurutan agar push tidak saling menimpa.
+    concurrency:
+      group: fiezel-bot-heal-${{ github.event.workflow_run.pull_requests[0].number || github.event.workflow_run.head_branch || github.event.inputs.pr_number || github.run_id }}
+      cancel-in-progress: false
     # KEAMANAN: tolak fork, wajib run berasal dari repo ini, aktor MASTER saja.
     if: |
       (github.event_name == 'workflow_run' &&
@@ -366,11 +377,14 @@ jobs:
           echo "Berkas terpatch: ${FILES[*]}"
 
       - name: Post CI Heal Report on PR
-        if: steps.collect.outputs.pr_number != ''
+        # !cancelled(): laporan tetap terposting walau step push gagal
+        # (mis. branch sudah maju sehingga push non-fast-forward ditolak).
+        if: ${{ !cancelled() && steps.collect.outputs.pr_number != '' }}
         uses: actions/github-script@v7
         env:
           PR_NUMBER: ${{ steps.collect.outputs.pr_number }}
           PATCHED: ${{ steps.push.outputs.patched }}
+          PUSH_OUTCOME: ${{ steps.push.outcome }}
           PROTECTED: ${{ steps.guard.outputs.protected }}
         with:
           script: |
@@ -384,6 +398,8 @@ jobs:
             let outcome;
             if (protectedBranch) {
               outcome = '⛔ Branch terproteksi — bot menolak menulis. Perbaikan manual diperlukan.';
+            } else if (process.env.PUSH_OUTCOME === 'failure') {
+              outcome = '⚠️ Patch dibuat tetapi **push gagal** (kemungkinan branch sudah maju sejak commit yang gagal). Tidak ada perubahan yang masuk ke branch.';
             } else if (patched) {
               outcome = '✅ Patch diterapkan dan di-push. Push memakai `GITHUB_TOKEN` sehingga **tidak memicu CI baru secara otomatis** — jalankan ulang workflow untuk memverifikasi.';
             } else {
