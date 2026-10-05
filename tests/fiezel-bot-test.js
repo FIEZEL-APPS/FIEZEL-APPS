@@ -200,4 +200,12 @@ console.log('[T16] [KUALITAS] Rantai model diatur lewat variabel, bukan ditulis 
 console.log('  ok');
 pass++;
 
+console.log('[T17] [OTOMASI] Review berjalan juga pada PR draft...');
+{
+  const reviewJob = wfContent.slice(wfContent.indexOf('auto-pr-review:'), wfContent.indexOf('auto-ci-heal:'));
+  assert(!/pull_request\.draft/.test(reviewJob), 'Job review tidak boleh melewati PR draft (PR agen selalu dibuka sebagai draft)');
+}
+console.log('  ok');
+pass++;
+
 console.log(`\n✅ SEMUA PENGUJIAN FIEZEL BOT v2.1 LULUS (${pass}/${pass} PASS).`);

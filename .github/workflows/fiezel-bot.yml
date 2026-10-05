@@ -58,11 +58,12 @@ jobs:
     concurrency:
       group: fiezel-bot-review-${{ github.event.pull_request.number || github.event.inputs.pr_number || github.run_id }}
       cancel-in-progress: true
+    # PR draft IKUT direview: PR otomatis (agen) selalu dibuka sebagai draft, dan
+    # review harus jalan tanpa menunggu owner menekan "Ready for review".
     # KEAMANAN: tolak PR dari fork + wajib penulis OWNER/MEMBER. Hanya MASTER
     # (FIEZEL-APPS) yang boleh memicu lewat workflow_dispatch.
     if: |
       (github.event_name == 'pull_request' &&
-        !github.event.pull_request.draft &&
         github.event.pull_request.head.repo.full_name == github.repository &&
         (github.event.pull_request.author_association == 'OWNER' ||
          github.event.pull_request.author_association == 'MEMBER')) ||
