@@ -1,7 +1,7 @@
 {
-  "version": "m025-482",
-  "claimedBy": "branch fix/grammar-have-got-exact2",
-  "claimedAt": "2026-10-05T09:34:05.200Z",
-  "reason": "feat(grammar): sync RUMUS KILAT and A vs B explanations across batches 1-5 and Python sources",
+  "version": "m025-483",
+  "claimedBy": "branch claude/exciting-ritchie-vyrs2e",
+  "claimedAt": "2026-10-05T12:45:49.601Z",
+  "reason": "Fitur sekolah Indonesia R1-R8 digabung dengan main terbaru (RUMUS KILAT, fiezel-bot), rapor KKTP presisi bukti pecahan",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
