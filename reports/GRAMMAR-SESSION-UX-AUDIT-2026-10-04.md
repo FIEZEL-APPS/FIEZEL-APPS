@@ -1,6 +1,6 @@
 # Audit UI/UX sesi latihan grammar: dari kursi murid
 
-> **Status m025-458:** U1 sampai U12 dan U14 **diperbaiki** (lihat `docs/handoffs/FIEZEL-M025-458-GRAMMAR-UX-FIXES-HANDOFF.md`, gerbang `tests/grammar-ux-p1-2026-10-04-test.js`). U13, U15, U16, dan U17 diperbaiki di m025-463 (`docs/handoffs/FIEZEL-M025-463-BRAINCORE-WAVE4-UX-POLISH-HANDOFF.md`, gerbang `tests/grammar-ux-p3-2026-10-04-test.js`), bersama temuan probe ulang: dua judul modal yang putih di atas putih dan delapan label di bawah 4,5:1. U18 (mode gelap identik dengan terang) dibiarkan: tema terang memang dipakai di seluruh aplikasi.
+> **Status m025-463:** U1 sampai U12 dan U14 **diperbaiki** (lihat `docs/handoffs/FIEZEL-M025-458-GRAMMAR-UX-FIXES-HANDOFF.md`, gerbang `tests/grammar-ux-p1-2026-10-04-test.js`). U13, U15, U16, dan U17 diperbaiki di m025-463 (`docs/handoffs/FIEZEL-M025-463-BRAINCORE-WAVE4-UX-POLISH-HANDOFF.md`, gerbang `tests/grammar-ux-p3-2026-10-04-test.js`), bersama temuan probe ulang: dua judul modal yang putih di atas putih, delapan label di bawah 4,5:1, dan **U19** (peredupan opasitas pada chip "Sudah dicoba" dan baris meta jalur terkunci). U18 (mode gelap identik dengan terang) dibiarkan: tema terang memang dipakai di seluruh aplikasi.
 
 **Tanggal:** 2026-10-04
 **Basis:** `main` @ `587335cd` (build `m025-450`). Ini sudah memuat redesign latihan grammar
@@ -93,6 +93,7 @@ untuk teks biasa dan 3:1 untuk teks besar.
 | U16 | Chip "Sudah dicoba" pada pilihan yang sudah dicoba | `05-salah-pertama` | 2,24:1 |
 | U17 | Petunjuk tahap 2 QUEST "Ketuk keping di bawah…" | `02-quest-2` | 2,45:1 |
 | U18 | HP bermode gelap menghasilkan layar yang identik dengan mode terang. Ini tampaknya sengaja; sebutkan di desain kalau memang begitu. | `15-gelap-*` | hub dan kartu materi 0 piksel berbeda dari versi terang; soal tetap bertema terang |
+| U19 | **Peredupan opasitas menyembunyikan kontras rendah.** Chip "Sudah dicoba" di dalam `.option:disabled{opacity:.78}` terender 4,3:1, dan baris meta kartu terkunci `"pola grammar dasar · Dikuasai 0%"` di dalam `.path-label{opacity:.82}` terender 3,3:1; keduanya lolos kalau opasitas diabaikan. | `05-salah-pertama`, `02-grammar-hub` | 7,63:1 → 4,31:1 dan 4,62:1 → 3,26:1 setelah opasitas |
 
 ---
 

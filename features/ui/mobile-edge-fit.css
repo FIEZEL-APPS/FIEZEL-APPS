@@ -138,7 +138,7 @@ html.fiezel-ui-v6 body.fz-lux .bottomnav {
   box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.5) !important;
   padding: 6px 0 max(10px, env(safe-area-inset-bottom)) 0 !important;
   display: grid !important;
-  grid-template-columns: repeat(5, 1fr) !important;
+  grid-template-columns: repeat(6, 1fr) !important;
   gap: 0 !important;
   transform: none !important;
   z-index: 1000 !important;

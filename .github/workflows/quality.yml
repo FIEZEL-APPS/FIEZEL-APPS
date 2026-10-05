@@ -898,6 +898,7 @@ jobs:
           # membuktikan pencocokan itu berpegang pada nama persis dengan data akun
           # tiruan yang sengaja memuat pasangan staging/produksi berdampingan.
           node tests/attach-live-bindings-test.js
+          node tests/fiezel-bot-test.js
           # F5: gerbang meta pendaftaran. Diletakkan PALING AKHIR dengan sengaja — ia
           # membaca berkas workflow ini sendiri dan membandingkannya dengan seluruh
           # berkas uji yang dilacak git, jadi ia hanya berarti setelah semua entri di

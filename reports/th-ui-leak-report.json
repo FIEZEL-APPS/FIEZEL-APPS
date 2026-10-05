@@ -1,25 +1,25 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-10-04T13:14:46.548Z",
+  "generatedAt": "2026-10-05T00:07:13.154Z",
   "files": {
     "app.js": {
       "leaks": 4,
       "budget": 4,
       "sample": [
         {
-          "line": 10928,
+          "line": 11059,
           "text": "Selesaikan ritme hari ini"
         },
         {
-          "line": 11764,
+          "line": 11895,
           "text": "— Penugasan latihan dan pemantauan capaian murid."
         },
         {
-          "line": 12377,
+          "line": 12508,
           "text": "Nama kriteria: n/4 - satu kalimat alasan yang menunjuk bukti di tulisannya"
         },
         {
-          "line": 18985,
+          "line": 19388,
           "text": "Latihan"
         }
       ]
@@ -103,15 +103,15 @@
       "budget": 3,
       "sample": [
         {
-          "line": 1985,
+          "line": 2014,
           "text": "Latihan · ±"
         },
         {
-          "line": 2033,
+          "line": 2062,
           "text": "Tenggat"
         },
         {
-          "line": 2033,
+          "line": 2062,
           "text": "Latihan — umpan balik tiap soal"
         }
       ]
@@ -173,7 +173,7 @@
       "budget": 1,
       "sample": [
         {
-          "line": 254,
+          "line": 281,
           "text": ", jadi pola ini akan diulang lagi besok. Sekarang kita lanjut ke"
         }
       ]
@@ -417,15 +417,15 @@
       "budget": 3,
       "sample": [
         {
-          "line": 467,
+          "line": 474,
           "text": ". Aku bangga. Lanjutkan ritmenya — 1 sesi kecil tiap hari lebih ampuh daripada 1 sesi panjang seminggu."
         },
         {
-          "line": 476,
+          "line": 483,
           "text": "• Akurasi keseluruhan:"
         },
         {
-          "line": 499,
+          "line": 506,
           "text": "Akurasi"
         }
       ]
@@ -464,8 +464,8 @@
     }
   },
   "copyKeys": {
-    "id": 3716,
-    "th": 3718,
+    "id": 3762,
+    "th": 3764,
     "idTanpaTh": 0
   },
   "pass": true

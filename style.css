@@ -535,7 +535,7 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
   position:fixed;bottom:max(12px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);width:min(560px,calc(100% - 24px));
   padding:7px;background:rgba(var(--surface-pure-rgb),.86);
   border:1px solid rgba(239,231,232,.9);border-radius:var(--radius-lg);
-  display:grid;grid-template-columns:repeat(5,1fr);gap:4px;z-index:40;
+  display:grid;grid-template-columns:repeat(6,1fr);gap:4px;z-index:40;
   /* v6.1 (O4 §2): bayangan pill pindah ke satu definisi v6 di bawah — tiga def lama bersaing. */
 }
 .nav{
@@ -6681,6 +6681,8 @@ body.fz-lux nav.bottomnav,
 body.fz-lux .bottomnav,
 body:has(.home-today) nav.bottomnav,
 body:has(.home-today) .bottomnav,
+body.fz-view-game nav.bottomnav,
+body.fz-view-game .bottomnav,
 .home-today ~ .bottomnav {
   position: fixed !important;
   top: auto !important;
@@ -6697,13 +6699,23 @@ body:has(.home-today) .bottomnav,
   border-radius: 0 !important;
   padding: 8px 12px max(8px, env(safe-area-inset-bottom, 0px)) 12px !important;
   display: grid !important;
-  grid-template-columns: repeat(5, 1fr) !important;
+  grid-template-columns: repeat(6, 1fr) !important;
   align-items: center !important;
   gap: 4px !important;
   border: none !important;
   border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
   box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.45) !important;
   z-index: 200 !important;
+}
+
+/* Sembunyikan topbar pada panel Game sesuai preferensi pengguna */
+body.fz-view-game header.topbar,
+body.fz-view-game .topbar {
+  display: none !important;
+}
+
+body.fz-view-game main.app {
+  padding-top: calc(16px + env(safe-area-inset-top, 0px)) !important;
 }
 
 /* Ensure body and app container have sufficient bottom padding so content is never covered */
@@ -8833,6 +8845,8 @@ header.topbar {
 /* 3. Bottom Navigation Bar: Docked Full-Width (Duolingo Style) */
 html body.fz-lux nav.bottomnav,
 html body:has(.home-today) .bottomnav,
+html body.fz-view-game nav.bottomnav,
+html body.fz-view-game .bottomnav,
 html.fiezel-ui-v6 body.fz-lux .bottomnav {
   position: fixed !important;
   bottom: 0 !important;
@@ -8852,7 +8866,7 @@ html.fiezel-ui-v6 body.fz-lux .bottomnav {
   box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.5) !important;
   padding: 8px 0 max(10px, env(safe-area-inset-bottom)) 0 !important;
   display: grid !important;
-  grid-template-columns: repeat(5, 1fr) !important;
+  grid-template-columns: repeat(6, 1fr) !important;
   gap: 0 !important;
   transform: none !important;
   z-index: 1000 !important;
@@ -8860,7 +8874,9 @@ html.fiezel-ui-v6 body.fz-lux .bottomnav {
 }
 
 html body.fz-lux nav.bottomnav .nav,
-html body:has(.home-today) .bottomnav .nav {
+html body:has(.home-today) .bottomnav .nav,
+html body.fz-view-game nav.bottomnav .nav,
+html body.fz-view-game .bottomnav .nav {
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;

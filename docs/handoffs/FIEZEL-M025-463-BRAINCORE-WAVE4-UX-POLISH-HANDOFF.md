@@ -59,6 +59,28 @@ Semua di `features/ui/fiezel-tactile-clay.css` (blok paling bawah, berkomentar):
 - U18 (mode gelap identik dengan terang): tidak diubah. Itu keputusan desain yang konsisten di
   seluruh aplikasi; dicatat di laporan audit sebagai disengaja.
 
+### U19: label jalur terkunci di bawah 4,5:1 setelah opasitas dihitung
+Probe audit membaca warna teks dan latar apa adanya, jadi ia buta pada peredupan yang datang dari
+opasitas `:disabled`/leluhur. Dua kelas cacat lolos karena itu:
+- chip "Sudah dicoba" (U16) hidup di dalam `.option.was-tried:disabled{opacity:.78}`, jadi 7,63:1
+  mentah hanya terender ~4,3:1;
+- baris meta kartu pelajaran terkunci (`"pola grammar dasar · Dikuasai 0%"`, `#64748B` di atas
+  `#F8FAFC`) hidup di dalam `.path-step.is-locked .path-label{opacity:.82}`, jadi 4,62:1 mentah
+  terender ~3,3:1.
+
+Perbaikannya di `features/ui/fiezel-tactile-clay.css` (blok paling bawah):
+- opasitas pilihan "Sudah dicoba" dikembalikan (`opacity:1`) selama chip tampil;
+- nada baris meta jalur terkunci dinaikkan ke `#3F4A5A` (terender ~5,3:1 pada .82); judul dan
+  catatan kunci sudah lolos dan tidak disentuh.
+
+Sekaligus `tools/dev/grammar-ux-audit-2026-10-04-probe.js` dibuat sadar-opasitas: kontras dihitung
+dari seluruh rantai `opacity` (gaya elemen sendiri diabaikan terpisah karena `getComputedStyle` anak
+selalu melaporkan 1), warna teks dibaca dari `-webkit-text-fill-color`, dan elemen yang sedang
+bertransisi opasitas (toast yang baru muncul) atau bertinta gradien/potong dilewati alih-alih
+divonis palsu. Setelah itu sisa temuan di bawah ambang sama dengan yang sudah didokumentasikan:
+judul ber-teks gradien, tombol nonaktif "Hapus"/"Periksa" (dikecualikan WCAG), dan layar hasil yang
+tertutup modal Prasasti.
+
 ### Ikut terbawa
 - `app.js`: tombol live stage memakai ikon `audio-lines` alih-alih `radio`, yang tidak ada di subset
   `lucide.min.js` dan membuat `tests/lucide-icon-coverage-test.js` merah di main.
@@ -68,8 +90,9 @@ Semua di `features/ui/fiezel-tactile-clay.css` (blok paling bawah, berkomentar):
   QuestionMemory sungguhan, posisi barisnya, batas 5 butir; pemilihan skill K4 per murid, pemetaan
   past, tanpa tombol bila tanpa bukti, `targets = [sid]`; bilingual id/th, tanpa tanda pisah, tanpa
   istilah mesin.
-- `tests/grammar-ux-p3-2026-10-04-test.js` (19 cek): aturan U13, U15 sampai U17 dan dua judul ada,
-  dan setiap pasangan warna yang ditulisnya lolos 4,5:1 (dihitung, bukan ditebak).
+- `tests/grammar-ux-p3-2026-10-04-test.js` (23 cek): aturan U13, U15 sampai U17, U19 dan dua judul
+  ada, dan setiap pasangan warna yang ditulisnya lolos 4,5:1 (dihitung, bukan ditebak). U19 dihitung
+  pada opasitas `.82` yang sama, karena di situlah cacatnya lahir.
 - Keduanya terdaftar di `.github/workflows/quality.yml` sesudah gerbang gelombang 3.
 
 ## Diverifikasi di browser

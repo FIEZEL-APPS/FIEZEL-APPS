@@ -38,16 +38,25 @@ function inspectPage(opts) {
   const parse = c => { const m = String(c || '').match(/rgba?\(([^)]+)\)/); if (!m) return null; const p = m[1].split(',').map(x => parseFloat(x)); return { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 }; };
   const lum = c => { const f = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }; return 0.2126 * f(c.r) + 0.7152 * f(c.g) + 0.0722 * f(c.b); };
   const blend = (top, bottom) => ({ r: top.r * top.a + bottom.r * (1 - top.a), g: top.g * top.a + bottom.g * (1 - top.a), b: top.b * top.a + bottom.b * (1 - top.a), a: 1 });
+  /* Opasitas sebuah elemen membuat SELURUH subtree-nya tembus pandang (group opacity): teks maupun
+     latar ikut meredup. Kalau ini diabaikan, kontras mentah terlihat lolos padahal yang dirender
+     tidak (mis. `.option.was-tried:disabled{opacity:.78}` meredupkan chip ".tried-tag" bersarang).
+     Elemen yang SEDANG bertransisi opasitas (mis. toast yang baru muncul) dilewati: yang dinilai
+     adalah tampilan akhirnya, bukan keadaan antara. */
+  const opacityRunning = n => { try { return typeof n.getAnimations === 'function' && n.getAnimations().some(a => /opacity/i.test(String(a.transitionProperty || a.animationName || ''))); } catch (_) { return false; } };
+  const visualOpacity = n => { if (opacityRunning(n)) return 1; const v = Number(getComputedStyle(n).opacity); return Number.isFinite(v) ? v : 1; };
   const bgOf = el => {
     const layers = [];
+    let op = 1; /* opasitas kumulatif dari elemen ini MENTOK ke atas; tiap latar ikut level simpulnya */
     for (let n = el; n && n.nodeType === 1; n = n.parentElement) {
       const cs = getComputedStyle(n);
+      op *= visualOpacity(n);
       if (cs.backgroundImage && cs.backgroundImage !== 'none' && !/url\(/.test(cs.backgroundImage)) {
         const stops = [...cs.backgroundImage.matchAll(/rgba?\([^)]+\)/g)].map(x => parse(x[0])).filter(Boolean);
-        if (stops.length) { const avg = stops.reduce((a, s) => ({ r: a.r + s.r / stops.length, g: a.g + s.g / stops.length, b: a.b + s.b / stops.length, a: Math.min(a.a, s.a) }), { r: 0, g: 0, b: 0, a: 1 }); layers.push(avg); if (avg.a >= 0.99) break; }
+        if (stops.length) { const avg = stops.reduce((a, s) => ({ r: a.r + s.r / stops.length, g: a.g + s.g / stops.length, b: a.b + s.b / stops.length, a: Math.min(a.a, s.a) }), { r: 0, g: 0, b: 0, a: 1 }); const a = avg.a * op; layers.push({ ...avg, a }); if (a >= 0.99) break; }
       }
       const c = parse(cs.backgroundColor);
-      if (c && c.a > 0) { layers.push(c); if (c.a >= 0.99) break; }
+      if (c && c.a > 0) { const a = c.a * op; layers.push({ ...c, a }); if (a >= 0.99) break; }
     }
     let base = { r: 255, g: 255, b: 255, a: 1 };
     const bodyBg = parse(getComputedStyle(document.body).backgroundColor);
@@ -55,7 +64,10 @@ function inspectPage(opts) {
     for (let i = layers.length - 1; i >= 0; i--) base = blend(layers[i], base);
     return base;
   };
-  const visible = el => { const r = el.getBoundingClientRect(); const cs = getComputedStyle(el); return r.width > 0 && r.height > 0 && cs.visibility !== 'hidden' && cs.display !== 'none' && Number(cs.opacity) > 0.05 && r.bottom > 0 && r.top < innerHeight * 3; };
+  /* Opasitas leluhur SAJA; opasitas elemen sendiri dikenakan pada warna teks (lihat pemakaian). */
+  const ancestorOpacity = el => { let o = 1; for (let n = el.parentElement; n && n.nodeType === 1; n = n.parentElement) o *= visualOpacity(n); return o; };
+  const renderedOpacity = el => visualOpacity(el) * ancestorOpacity(el);
+  const visible = el => { const r = el.getBoundingClientRect(); const cs = getComputedStyle(el); return r.width > 0 && r.height > 0 && cs.visibility !== 'hidden' && cs.display !== 'none' && renderedOpacity(el) > 0.05 && r.bottom > 0 && r.top < innerHeight * 3; };
   const lowContrast = [];
   const seen = new Set();
   for (const el of document.querySelectorAll('body *')) {
@@ -63,9 +75,18 @@ function inspectPage(opts) {
     const own = [...el.childNodes].filter(n => n.nodeType === 3 && n.textContent.trim()).map(n => n.textContent.trim()).join(' ');
     if (!own || own.length < 2) continue;
     const cs = getComputedStyle(el);
-    const fg = parse(cs.color); if (!fg) continue;
+    /* Browser mengecat glif dengan `-webkit-text-fill-color` bila diset; warna itu yang menentukan
+       kontras yang benar-benar dilihat murid (beberapa judul dipaku lewat fill-color saja). Teks
+       gradien/potongan (fill transparan + background-clip:text) tidak bisa diukur dari gaya, jadi
+       dilewati alih-alih divonis 1:1 palsu. */
+    const fill = parse(cs.webkitTextFillColor);
+    const clip = String(cs.webkitBackgroundClip || cs.backgroundClip || '');
+    if ((fill && fill.a === 0) || /text/.test(clip)) continue;
+    const fg = (fill && fill.a > 0) ? fill : parse(cs.color); if (!fg) continue;
     const bg = bgOf(el);
-    const fgEff = blend(fg, bg);
+    /* Teks ikut diredupkan opasitas elemen sendiri dan para leluhurnya; latar sudah menanggung
+       seluruh rantai di bgOf. Ini menghindari vonis palsu lolos saat leluhur memakai group opacity. */
+    const fgEff = blend({ ...fg, a: fg.a * ancestorOpacity(el) }, bg);
     const L1 = lum(fgEff), L2 = lum(bg);
     const ratio = (Math.max(L1, L2) + 0.05) / (Math.min(L1, L2) + 0.05);
     const size = parseFloat(cs.fontSize), weight = parseInt(cs.fontWeight, 10) || 400;

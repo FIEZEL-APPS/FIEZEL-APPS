@@ -54,6 +54,8 @@
     'nav.progress-aria': 'แผนที่ CEFR และระดับความชำนาญ',
     'nav.profile': 'โปรไฟล์',
     'nav.profile-aria': 'โปรไฟล์ผู้เรียนและเพื่อน',
+    'nav.game': 'เกม',
+    'nav.game-aria': 'อาร์เคดและความท้าทาย',
 
     /* ── Home "Hari ini" ───────────────────────────────────── */
     'today.eyebrow': 'วันนี้',
@@ -329,6 +331,40 @@
     'bc.bukti-naik': 'ความแม่นยำของคุณเพิ่มขึ้น {poin} คะแนนตั้งแต่เริ่มฝึก',
     'bc.bukti-kosong': 'ทำอีกสักสองสามรอบ แล้วหลักฐานจะขึ้นที่นี่',
     'bc.fokus-pasangan': 'โฟกัสตอนนี้: แยก {a} กับ {b} ให้ออก',
-    'bc.fokus-materi': 'โฟกัสตอนนี้: {materi}'
+    'bc.fokus-materi': 'โฟกัสตอนนี้: {materi}',
+
+    /* ── Game Hub Arcade ────────────────────────────────────────────────────── */
+    'game.title': 'อาร์เคดและเกม',
+    'game.subtitle': 'ท้าทายทักษะภาษาผ่านมินิเกมแสนสนุก',
+    'game.streak-label': 'สตรีคเกม',
+    'game.days-unit': 'วัน',
+    'game.trophy-label': 'ถ้วยรางวัลอารีนา',
+    'game.mastery-label': 'ระดับความชำนาญ',
+    'game.arena-kicker': 'โหมดดวลสุดมันส์',
+    'game.arena-live': 'ผู้เล่นพร้อม',
+    'game.paw-arena-title': 'PAW ARENA',
+    'game.paw-arena-desc': 'ท้าบอทหรือเพื่อน: ทายความหมาย ต่อคำ และชิงถ้วยรางวัล!',
+    'game.paw-arena-cta': 'เริ่มดวลอารีนา',
+    'game.mode-story': 'Story Chain',
+    'game.mode-signal': 'สัญญาณแม่นยำ',
+    'game.mode-stakes': 'เดิมพันแต้ม',
+    'game.section-title': 'เลือกสนามประลอง',
+    'game.section-sub': 'เลือกโหมดเกมที่คุณชื่นชอบเพื่อฝึกฝนอย่างเพลิดเพลิน',
+    'game.bubble-badge': 'ความเร็ว',
+    'game.bubble-title': 'Mochi Crunch',
+    'game.bubble-desc': 'จับคู่คำศัพท์แบบรวดเร็วพร้อมเอฟเฟกต์โมจินุ่มหนึบ',
+    'game.play-cta': 'เล่นเลย',
+    'game.puzzle-badge': 'ไวยากรณ์',
+    'game.puzzle-title': 'Sentence Puzzle',
+    'game.puzzle-desc': 'ต่อชิ้นส่วนคำให้เป็นประโยคที่สมบูรณ์แบบไร้ที่ติ',
+    'game.puzzle-cta': 'ต่อประโยค',
+    'game.voice-badge': 'การออกเสียง',
+    'game.voice-title': 'เวทีเสียงสด',
+    'game.voice-desc': 'ทดสอบการออกเสียงและจังหวะการพูดสดบนเวทีเสียง',
+    'game.stage-cta': 'เปิดเวที',
+    'game.nujum-badge': 'เมนเทอร์สุดโหด',
+    'game.nujum-title': 'NUJUM',
+    'game.nujum-desc': 'คุยกับเมนเทอร์จอมเข้มงวดที่พร้อมชี้จุดผิดแบบตรงไปตรงมา',
+    'game.nujum-cta': 'เผชิญหน้ากับ NUJUM'
   });
 }());

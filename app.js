@@ -8859,7 +8859,7 @@ function render(){const __renderStartedAt=Date.now();try{const __r=renderInner()
 let isViewChange=true,lastRenderedView=null;
 function captureActiveElement(container){try{const act=document.activeElement;if(act&&container&&container.contains(act)&&/^(INPUT|TEXTAREA)$/i.test(act.tagName||'')){return{id:act.id,name:act.name,testId:act.getAttribute('data-testid'),val:act.value,s:act.selectionStart,e:act.selectionEnd}}}catch(_){}return null}
 function restoreActiveElement(container,saved){if(!saved||!container)return;try{let r=null;if(saved.id)r=container.querySelector('#'+saved.id);if(!r&&saved.testId)r=container.querySelector('[data-testid="'+saved.testId+'"]');if(!r&&saved.name)r=container.querySelector('[name="'+saved.name+'"]');if(r){if(saved.val!=null&&r.value!==saved.val)r.value=saved.val;r.focus();if(typeof r.setSelectionRange==='function'&&saved.s!=null)r.setSelectionRange(saved.s,saved.e)}}catch(_){}}
-function renderInner(){if(isVerifiedTeacher()&&state.view!=='tutor'){state.view='tutor'}/* Kursus Jepang berbicara dengan istilahnya sendiri (Kotoba, Bunpō, Renshū): lapisan kunci 'kursus-ja.*' di FiezelI18n dinyalakan SEBELUM layar dilukis, dan tabel/elemen statis yang sudah memegang kalimat lama disegarkan sekali saat kursus berganti. */try{const __course=activeTargetLang()==='ja'&&!isVerifiedTeacher()?'ja':null;if(self.FiezelI18n?.getCourse&&FiezelI18n.getCourse()!==__course){FiezelI18n.setCourse(__course);__fzRefreshI18nTables();/* Soal, jawaban, dan pembahasan kursus Jepang diberi furigana + romaji dari bank kosakata, dan tiap kuis mendapat tombol ふりがな/ローマ字. */try{if(__course==='ja')self.FiezelJaUi?.observe?.($('app'),()=>V);else self.FiezelJaUi?.unobserve?.()}catch(_){}}}catch(_){}/* m025-314: go() menolak permukaan yang salah bahasa, tetapi state.view juga bisa datang dari sesi SEBELUM murid berganti kursus (ia tersimpan dan dipulihkan saat boot) — jadi pemulihan itu ikut dijepit di sini, bukan hanya jalur navigasi. */if(targetLangSurfaceBlocked(state.view)){state.view='home'}if(document.body?.classList?.contains?.('fz-teacher-mode')&&state.view!=='tutor'){try{self.FiezelTeacherShell?.unmount?.()}catch(_){}}isViewChange=state.view!==lastRenderedView;lastRenderedView=state.view;const appContainer=$('app'),savedActive=captureActiveElement(appContainer);if(!isViewChange&&appContainer)appContainer.classList.add('is-repaint');speakingListeningMountToken++;if(speakingListeningController){speakingListeningController.destroy();speakingListeningController=null;/* m026-01: satu-satunya tempat sesi dengar benar-benar bubar. Di dalam if, bukan di luar - kalau tidak, tiap navigasi biasa akan memaksa maskot kembali idle dan memotong selebrasi yang sedang jalan. */pawReact('listening-stop')}document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));setApp('');if(state.view==='home')home();if(state.view==='latihan')latihan();if(state.view==='vocab')vocab();if(state.view==='grammar')grammar();if(state.view==='reading')reading();if(state.view==='skills')skillsLab();if(state.view==='listening')skillsLab('listening');if(state.view==='speaking')skillsLab('speaking');if(state.view==='writing')writing();if(state.view==='classroom')classHubView();if(state.view==='library')library();if(state.view==='ask'||state.view==='search')askView();if(state.view==='test')placement();if(state.view==='progress')progress();if(state.view==='online'||state.view==='profile')onlineView();if(state.view==='learn')learnerFlowView();if(state.view==='arena')arenaView();if(state.view==='tutor')tutorCenterView();if(state.view==='kana')kanaView();if(state.view==='nujum')nujumView();/* merge SLOT 7 sosial 2026-08-29 *//* Audit F12: layar tanpa tab sendiri tetap menandai tab induknya - Tes awal milik Hari ini, hub latihan milik Latihan. */const TAB_PARENT={nujum:'home',kana:'latihan',test:'home',vocab:'latihan',grammar:'latihan',reading:'latihan',writing:'latihan',library:'latihan',skills:'latihan',listening:'latihan',speaking:'latihan',learn:'home',arena:'online'};const activeTabEl=document.querySelector(`[data-view="${state.view}"]`)||(state.view==='profile'?document.querySelector('[data-view="online"]'):state.view==='online'?document.querySelector('[data-view="profile"]'):TAB_PARENT[state.view]?document.querySelector(`.bottomnav [data-view="${TAB_PARENT[state.view]}"]`):null);activeTabEl?.classList.add('active');/* m028 fase3: bendera panggung Skills Lab. Addon listening memaku blok tombolnya ke dasar layar (speaking-listening-addon.css), jadi ia panggung kedua yang bisa ditutupi gelembung. */document.body?.classList?.toggle?.('fz-stage-sl',['skills','listening','speaking'].includes(state.view));/* m028 fase3 (QA §9): Peta Belajar ikut jadi panggung ber-kontrol sejak panel NEXT SESSION punya tombol "Mulai sesi" di dekat dasar layar - screenshot QA menunjukkan gelembung PAW menutupinya utuh. Aturannya sama dengan kuis: peek dilarang, dok mengecil, layar diberi ruang bawah. */document.body?.classList?.toggle?.('fz-stage-map',state.view==='progress');/* 2026-08-29 overhaul I12 (O6 #10): bendera panggung Home. Wajah coach-strip adalah SATU-SATUNYA Pau di Home; gelembung FAB pengambang (Pau kedua, terukur menimpa lipatan hero/skill-hub di 390px) disembunyikan lewat CSS body.fz-stage-home — pola yang sama dengan fz-stage-sl/fz-stage-map, modul gelembung tidak disentuh. */document.body?.classList?.toggle?.('fz-stage-home',state.view==='home');/* q16-P2-2 2026-08-29: hub juga panggung ber-CTA-dekat-dasar (Review Due, Buka flashcards, Mulai 25 soal) \u2014 peek dilarang, dok mengecil, pola sama dengan sl/map. */document.body?.classList?.toggle?.('fz-stage-hub',['vocab','grammar','reading','library','test'].includes(state.view));document.body?.classList?.toggle?.('fz-stage-writing',state.view==='writing');/* v24-F2 2026-08-29: Writing = layar mengarang; FAB disembunyikan via CSS (pola fz-stage-home), modul gelembung tidak disentuh. *//* Kursus Jepang berpakaian sendiri: palet shu/ai/washi di fiezel-2.css menempel lewat bendera ini, jadi layar Inggris tidak tersentuh sama sekali; KelasKu guru punya palet sendiri (teacher-shell.css). */document.body?.classList?.toggle?.('fz-lang-ja',self.FiezelI18n?.getCourse?.()==='ja');document.body?.classList?.toggle?.('fz-view-classroom',state.view==='classroom');document.body?.classList?.toggle?.('fz-view-profile',state.view==='online'||state.view==='profile');document.body?.classList?.toggle?.('fz-view-latihan',state.view==='latihan');document.body?.classList?.toggle?.('fz-view-grammar',state.view==='grammar');try{const _topBrandNormal=$('topBrandWrap'),_topBrandK=$('topBrandKelasKu'),_topActionsNormal=$('topGamifyCluster'),_topClusterK=$('topKelasKuCluster'),_isK=state.view==='classroom';if(_topBrandNormal)_topBrandNormal.style.display=_isK?'none':'';if(_topBrandK)_topBrandK.style.display=_isK?'flex':'none';if(_topActionsNormal)_topActionsNormal.style.display=_isK?'none':'';if(_topClusterK){_topClusterK.style.display=_isK?'flex':'none';const _code=(typeof learnerClassCode==='function'?learnerClassCode():'')||'X IPA 2',_lbl=$('topKelasKuCodeLabel');if(_lbl)_lbl.textContent=_code+' ▾'}const _sVal=$('topbarStreakVal'),_xVal=$('topbarXpVal');if(_sVal)_sVal.textContent=String(state.streak||3);if(_xVal)_xVal.textContent=String(state.xp||(state.gems?.balance)||120);}catch(_){}try{self.FiezelJaUi?.applyPrefs?.()}catch(_){}enhanceUI();syncExamLockForView();syncCoachBubble();try{refreshNotifBadge()}catch(_){}try{updateTopbarCourseButton()}catch(_){}restoreActiveElement($('app'),savedActive);if(isViewChange){$('app')?.classList?.remove?.('is-repaint');window.scrollTo(0,0)}}
+function renderInner(){if(isVerifiedTeacher()&&state.view!=='tutor'){state.view='tutor'}/* Kursus Jepang berbicara dengan istilahnya sendiri (Kotoba, Bunpō, Renshū): lapisan kunci 'kursus-ja.*' di FiezelI18n dinyalakan SEBELUM layar dilukis, dan tabel/elemen statis yang sudah memegang kalimat lama disegarkan sekali saat kursus berganti. */try{const __course=activeTargetLang()==='ja'&&!isVerifiedTeacher()?'ja':null;if(self.FiezelI18n?.getCourse&&FiezelI18n.getCourse()!==__course){FiezelI18n.setCourse(__course);__fzRefreshI18nTables();/* Soal, jawaban, dan pembahasan kursus Jepang diberi furigana + romaji dari bank kosakata, dan tiap kuis mendapat tombol ふりがな/ローマ字. */try{if(__course==='ja')self.FiezelJaUi?.observe?.($('app'),()=>V);else self.FiezelJaUi?.unobserve?.()}catch(_){}}}catch(_){}/* m025-314: go() menolak permukaan yang salah bahasa, tetapi state.view juga bisa datang dari sesi SEBELUM murid berganti kursus (ia tersimpan dan dipulihkan saat boot) — jadi pemulihan itu ikut dijepit di sini, bukan hanya jalur navigasi. */if(targetLangSurfaceBlocked(state.view)){state.view='home'}if(document.body?.classList?.contains?.('fz-teacher-mode')&&state.view!=='tutor'){try{self.FiezelTeacherShell?.unmount?.()}catch(_){}}isViewChange=state.view!==lastRenderedView;lastRenderedView=state.view;const appContainer=$('app'),savedActive=captureActiveElement(appContainer);if(!isViewChange&&appContainer)appContainer.classList.add('is-repaint');speakingListeningMountToken++;if(speakingListeningController){speakingListeningController.destroy();speakingListeningController=null;/* m026-01: satu-satunya tempat sesi dengar benar-benar bubar. Di dalam if, bukan di luar - kalau tidak, tiap navigasi biasa akan memaksa maskot kembali idle dan memotong selebrasi yang sedang jalan. */pawReact('listening-stop')}document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));setApp('');if(state.view==='home')home();if(state.view==='latihan')latihan();if(state.view==='vocab')vocab();if(state.view==='grammar')grammar();if(state.view==='reading')reading();if(state.view==='skills')skillsLab();if(state.view==='listening')skillsLab('listening');if(state.view==='speaking')skillsLab('speaking');if(state.view==='writing')writing();if(state.view==='classroom')classHubView();if(state.view==='library')library();if(state.view==='ask'||state.view==='search')askView();if(state.view==='test')placement();if(state.view==='progress')progress();if(state.view==='online'||state.view==='profile')onlineView();if(state.view==='learn')learnerFlowView();if(state.view==='arena')arenaView();if(state.view==='tutor')tutorCenterView();if(state.view==='kana')kanaView();if(state.view==='nujum')nujumView();if(state.view==='game')gameView();/* merge SLOT 7 sosial 2026-08-29 *//* Audit F12: layar tanpa tab sendiri tetap menandai tab induknya - Tes awal milik Hari ini, hub latihan milik Latihan. */const TAB_PARENT={nujum:'home',kana:'latihan',test:'home',vocab:'latihan',grammar:'latihan',reading:'latihan',writing:'latihan',library:'latihan',skills:'latihan',listening:'latihan',speaking:'latihan',learn:'home',arena:'game',game:'game'};const activeTabEl=document.querySelector(`[data-view="${state.view}"]`)||(state.view==='profile'?document.querySelector('[data-view="online"]'):state.view==='online'?document.querySelector('[data-view="profile"]'):TAB_PARENT[state.view]?document.querySelector(`.bottomnav [data-view="${TAB_PARENT[state.view]}"]`):null);activeTabEl?.classList.add('active');/* m028 fase3: bendera panggung Skills Lab. Addon listening memaku blok tombolnya ke dasar layar (speaking-listening-addon.css), jadi ia panggung kedua yang bisa ditutupi gelembung. */document.body?.classList?.toggle?.('fz-stage-sl',['skills','listening','speaking'].includes(state.view));/* m028 fase3 (QA §9): Peta Belajar ikut jadi panggung ber-kontrol sejak panel NEXT SESSION punya tombol "Mulai sesi" di dekat dasar layar - screenshot QA menunjukkan gelembung PAW menutupinya utuh. Aturannya sama dengan kuis: peek dilarang, dok mengecil, layar diberi ruang bawah. */document.body?.classList?.toggle?.('fz-stage-map',state.view==='progress');/* 2026-08-29 overhaul I12 (O6 #10): bendera panggung Home. Wajah coach-strip adalah SATU-SATUNYA Pau di Home; gelembung FAB pengambang (Pau kedua, terukur menimpa lipatan hero/skill-hub di 390px) disembunyikan lewat CSS body.fz-stage-home — pola yang sama dengan fz-stage-sl/fz-stage-map, modul gelembung tidak disentuh. */document.body?.classList?.toggle?.('fz-stage-home',state.view==='home');/* q16-P2-2 2026-08-29: hub juga panggung ber-CTA-dekat-dasar (Review Due, Buka flashcards, Mulai 25 soal) \u2014 peek dilarang, dok mengecil, pola sama dengan sl/map. */document.body?.classList?.toggle?.('fz-stage-hub',['vocab','grammar','reading','library','test'].includes(state.view));document.body?.classList?.toggle?.('fz-stage-writing',state.view==='writing');/* v24-F2 2026-08-29: Writing = layar mengarang; FAB disembunyikan via CSS (pola fz-stage-home), modul gelembung tidak disentuh. *//* Kursus Jepang berpakaian sendiri: palet shu/ai/washi di fiezel-2.css menempel lewat bendera ini, jadi layar Inggris tidak tersentuh sama sekali; KelasKu guru punya palet sendiri (teacher-shell.css). */document.body?.classList?.toggle?.('fz-lang-ja',self.FiezelI18n?.getCourse?.()==='ja');document.body?.classList?.toggle?.('fz-view-classroom',state.view==='classroom');document.body?.classList?.toggle?.('fz-view-profile',state.view==='online'||state.view==='profile');document.body?.classList?.toggle?.('fz-view-latihan',state.view==='latihan');document.body?.classList?.toggle?.('fz-view-grammar',state.view==='grammar');document.body?.classList?.toggle?.('fz-view-game',state.view==='game');try{const _topBrandNormal=$('topBrandWrap'),_topBrandK=$('topBrandKelasKu'),_topActionsNormal=$('topGamifyCluster'),_topClusterK=$('topKelasKuCluster'),_isK=state.view==='classroom';if(_topBrandNormal)_topBrandNormal.style.display=_isK?'none':'';if(_topBrandK)_topBrandK.style.display=_isK?'flex':'none';if(_topActionsNormal)_topActionsNormal.style.display=_isK?'none':'';if(_topClusterK){_topClusterK.style.display=_isK?'flex':'none';const _code=(typeof learnerClassCode==='function'?learnerClassCode():'')||'X IPA 2',_lbl=$('topKelasKuCodeLabel');if(_lbl)_lbl.textContent=_code+' ▾'}const _sVal=$('topbarStreakVal'),_xVal=$('topbarXpVal');if(_sVal)_sVal.textContent=String(state.streak||3);if(_xVal)_xVal.textContent=String(state.xp||(state.gems?.balance)||120);}catch(_){}try{self.FiezelJaUi?.applyPrefs?.()}catch(_){}enhanceUI();syncExamLockForView();syncCoachBubble();try{refreshNotifBadge()}catch(_){}try{updateTopbarCourseButton()}catch(_){}restoreActiveElement($('app'),savedActive);if(isViewChange){$('app')?.classList?.remove?.('is-repaint');window.scrollTo(0,0)}}
 // m025-115 - pembimbing yang ikut ke mana pun murid pergi (brief bagian 7).
 //
 // Gelembungnya dipasang SEKALI ke <body> dan tidak pernah ikut dicat ulang; yang dikirim
@@ -8915,7 +8915,7 @@ function syncCoachBubble(){
    tautan dalam layar, dan tur semuanya membawa nama view yang sudah ada, dan menghapus
    satu nama dari himpunan ini akan membuat go() menampilkan toast "halaman tak tersedia"
    pada perjalanan yang benar-benar valid. */
-const VALID_VIEWS=new Set(['kana','home','latihan','vocab','grammar','reading','skills','listening','speaking','writing','test','progress','classroom','library','ask','search','online','profile','learn','tutor','arena','nujum']);
+const VALID_VIEWS=new Set(['kana','home','latihan','game','vocab','grammar','reading','skills','listening','speaking','writing','test','progress','classroom','library','ask','search','online','profile','learn','tutor','arena','nujum']);
 function prefersReducedMotion(){try{return !!(self.matchMedia&&self.matchMedia('(prefers-reduced-motion: reduce)').matches)}catch(_){return false}}
 // m026-01 - maskot PAW. Tiga pembungkus di bawah ini adalah SATU-SATUNYA cara app.js
 // berbicara dengan <fiezel-mascot>. Alasannya:
@@ -10670,77 +10670,6 @@ function todayHomeMarkup(){
       </button>
     </section>`;
 
-  /* Bug Arena (Tactical Boss Raid Tracker) */
-  const bugArenaCard = `
-    <section class="bug-arena-card">
-      <div class="bug-arena-header">
-        <div class="arena-title-wrap">
-          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false" style="display:block;flex-shrink:0;">
-            <defs>
-              <linearGradient id="scarabCarapaceHome" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#EF4444"/>
-                <stop offset="100%" stop-color="#B91C1C"/>
-              </linearGradient>
-            </defs>
-            <path d="M4 6.5l3.5 2M3 12h4.5M4 17.5l3.5-2M20 6.5l-3.5 2M21 12h-4.5M20 17.5l-3.5-2" stroke="#DC2626" stroke-width="2" stroke-linecap="round"/>
-            <path d="M9.5 4.5L8 2M14.5 4.5L16 2" stroke="#B91C1C" stroke-width="2" stroke-linecap="round"/>
-            <rect x="7" y="4.5" width="10" height="15" rx="5" fill="#7F1D1D"/>
-            <rect x="7.5" y="4.5" width="9" height="14" rx="4.5" fill="url(#scarabCarapaceHome)"/>
-            <line x1="12" y1="8" x2="12" y2="17.5" stroke="#7F1D1D" stroke-width="1.4"/>
-            <circle cx="10" cy="6.8" r="1.2" fill="#FFE600"/>
-            <circle cx="14" cy="6.8" r="1.2" fill="#FFE600"/>
-            <path d="M9 10c0 2 .5 4 1 5" stroke="rgba(255,255,255,0.45)" stroke-width="1.2" stroke-linecap="round"/>
-          </svg>
-          <span class="arena-title">BUG ARENA</span>
-        </div>
-        <div class="arena-count-badge">2 Pola Lemah</div>
-      </div>
-
-      <div class="bug-items-stack">
-        <!-- Bug 1 -->
-        <div class="bug-row" onclick="if(window.FiezelBug&&FiezelBug.view)FiezelBug.view();else go('grammar');">
-          <div class="bug-row-top">
-            <span class="bug-name">
-              <span style="color: #EF4444; font-size: 14px;">●</span> Past Tense Irregular
-            </span>
-            <span class="bug-hp-pill crimson">82% HP</span>
-          </div>
-          <div class="bug-summary">
-            Sering tertukar pola <i>go → went</i> dan <i>buy → bought</i>
-          </div>
-          <div class="hp-bar-track">
-            <div class="hp-bar-fill crimson" style="width: 82%;"></div>
-          </div>
-        </div>
-
-        <!-- Bug 2 -->
-        <div class="bug-row" onclick="if(window.FiezelBug&&FiezelBug.view)FiezelBug.view();else go('grammar');">
-          <div class="bug-row-top">
-            <span class="bug-name">
-              <span style="color: #D97706; font-size: 14px;">●</span> Present Perfect vs Past
-            </span>
-            <span class="bug-hp-pill gold">60% HP</span>
-          </div>
-          <div class="bug-summary">
-            Kebingungan pemakaian <i>since vs for</i> dalam durasi waktu
-          </div>
-          <div class="hp-bar-track">
-            <div class="hp-bar-fill gold" style="width: 60%;"></div>
-          </div>
-        </div>
-      </div>
-
-      <button type="button" class="bug-raid-btn" onclick="if(window.FiezelBug&&FiezelBug.view)FiezelBug.view();else go('grammar');">
-        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false" style="display:block;flex-shrink:0;">
-          <path d="M19.5 4.5l-2.8-2.8a1 1 0 0 0-1.4 0L4.5 12.5l3.5 3.5L18.8 5.2a1 1 0 0 0 0-1.4z" fill="#FFE600"/>
-          <path d="M4.5 12.5l-2 2a1 1 0 0 0 0 1.4l3.6 3.6a1 1 0 0 0 1.4 0l2-2" stroke="#FFE600" stroke-width="2" stroke-linecap="round" fill="none"/>
-          <line x1="8" y1="16" x2="3.5" y2="20.5" stroke="#FFE600" stroke-width="2" stroke-linecap="round"/>
-          <circle cx="2.5" cy="21.5" r="1.5" fill="#FFE600"/>
-        </svg>
-        <span>Eliminasi 5 Bug Hari Ini (±2 Mnt)</span>
-      </button>
-    </section>`;
-
   /* Quick Practice (Tactile Clay 4-Grid) */
   const quickPracticeCard = `
     <section class="quick-practice-section fz-stitch-section" aria-label="${esc(FiezelI18n.t('home.latihan-singkat'))}">
@@ -10908,7 +10837,6 @@ function todayHomeMarkup(){
   ${homeTop}
   ${heroQuestCard}
   ${braincoreHomeCardMarkup()}
-  ${bugArenaCard}
   ${quickPracticeCard}
   ${kelaskuCard}
   <div class="fz-tactile-audit-vault" style="display:none !important;" aria-hidden="true">
@@ -16523,6 +16451,263 @@ function nextSessionPanelMarkup(){
 // Alur learner (diagnostic → rencana → lesson → feedback) dan Tutor Action Center. Logikanya
 // hidup di features/learner-flow dan features/tutor-action-center; di sini hanya jembatan layar.
 function learnerFlowView(){setApp('<div id="fzLearnerFlow" class="learner-flow-shell"></div>');const mod=self.FiezelLearnerFlow;if(!mod){$('fzLearnerFlow').innerHTML='<p class="muted">Modul alur belajar belum termuat.</p>';return}mod.mount($('fzLearnerFlow'),{toast:showToast,appVersion:APP_VERSION,learnerName,afterRender:enhanceUI})}
+function gameView(){
+  setApp(`<div class="game-view-shell fade">${gameHubMarkup()}</div>`);
+}
+function startVocabArcade(){
+  try{
+    if(self.FiezelGrammarVocabBridge?.startVocabMiniGame){
+      const items=grammarItemsForLevel(getActiveLevel())||[];
+      const skill=items[0]?.skill||'present_simple';
+      self.FiezelGrammarVocabBridge.startVocabMiniGame(skill);
+      return;
+    }
+  }catch(_){}
+  go('vocab');
+}
+function startSentencePuzzleArcade(){
+  try{
+    if(self.FiezelGrammarVocabBridge?.startVocabMiniGame){
+      const items=grammarItemsForLevel(getActiveLevel())||[];
+      const skill=items[1]?.skill||items[0]?.skill||'past_simple';
+      self.FiezelGrammarVocabBridge.startVocabMiniGame(skill);
+      return;
+    }
+  }catch(_){}
+  go('grammar');
+}
+
+/* Bug Arena (Tactical Boss Raid Tracker) - ditempatkan di panel Game */
+function bugArenaCardMarkup() {
+  return `
+    <section class="bug-arena-card">
+      <div class="bug-arena-header">
+        <div class="arena-title-wrap">
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false" style="display:block;flex-shrink:0;">
+            <defs>
+              <linearGradient id="scarabCarapaceHome" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#EF4444"/>
+                <stop offset="100%" stop-color="#B91C1C"/>
+              </linearGradient>
+            </defs>
+            <path d="M4 6.5l3.5 2M3 12h4.5M4 17.5l3.5-2M20 6.5l-3.5 2M21 12h-4.5M20 17.5l-3.5-2" stroke="#DC2626" stroke-width="2" stroke-linecap="round"/>
+            <path d="M9.5 4.5L8 2M14.5 4.5L16 2" stroke="#B91C1C" stroke-width="2" stroke-linecap="round"/>
+            <rect x="7" y="4.5" width="10" height="15" rx="5" fill="#7F1D1D"/>
+            <rect x="7.5" y="4.5" width="9" height="14" rx="4.5" fill="url(#scarabCarapaceHome)"/>
+            <line x1="12" y1="8" x2="12" y2="17.5" stroke="#7F1D1D" stroke-width="1.4"/>
+            <circle cx="10" cy="6.8" r="1.2" fill="#FFE600"/>
+            <circle cx="14" cy="6.8" r="1.2" fill="#FFE600"/>
+            <path d="M9 10c0 2 .5 4 1 5" stroke="rgba(255,255,255,0.45)" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+          <span class="arena-title">BUG ARENA</span>
+        </div>
+        <div class="arena-count-badge">2 Pola Lemah</div>
+      </div>
+
+      <div class="bug-items-stack">
+        <!-- Bug 1 -->
+        <div class="bug-row" onclick="if(window.FiezelBug&&FiezelBug.view)FiezelBug.view();else go('grammar');">
+          <div class="bug-row-top">
+            <span class="bug-name">
+              <span style="color: #EF4444; font-size: 14px;">●</span> Past Tense Irregular
+            </span>
+            <span class="bug-hp-pill crimson">82% HP</span>
+          </div>
+          <div class="bug-summary">
+            Sering tertukar pola <i>go → went</i> dan <i>buy → bought</i>
+          </div>
+          <div class="hp-bar-track">
+            <div class="hp-bar-fill crimson" style="width: 82%;"></div>
+          </div>
+        </div>
+
+        <!-- Bug 2 -->
+        <div class="bug-row" onclick="if(window.FiezelBug&&FiezelBug.view)FiezelBug.view();else go('grammar');">
+          <div class="bug-row-top">
+            <span class="bug-name">
+              <span style="color: #D97706; font-size: 14px;">●</span> Present Perfect vs Past
+            </span>
+            <span class="bug-hp-pill gold">60% HP</span>
+          </div>
+          <div class="bug-summary">
+            Kebingungan pemakaian <i>since vs for</i> dalam durasi waktu
+          </div>
+          <div class="hp-bar-track">
+            <div class="hp-bar-fill gold" style="width: 60%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <button type="button" class="bug-raid-btn" onclick="if(window.FiezelBug&&FiezelBug.view)FiezelBug.view();else go('grammar');">
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false" style="display:block;flex-shrink:0;">
+          <path d="M19.5 4.5l-2.8-2.8a1 1 0 0 0-1.4 0L4.5 12.5l3.5 3.5L18.8 5.2a1 1 0 0 0 0-1.4z" fill="#FFE600"/>
+          <path d="M4.5 12.5l-2 2a1 1 0 0 0 0 1.4l3.6 3.6a1 1 0 0 0 1.4 0l2-2" stroke="#FFE600" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <line x1="8" y1="16" x2="3.5" y2="20.5" stroke="#FFE600" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="2.5" cy="21.5" r="1.5" fill="#FFE600"/>
+        </svg>
+        <span>Eliminasi 5 Bug Hari Ini (±2 Mnt)</span>
+      </button>
+    </section>`;
+}
+
+function gameHubMarkup(){
+  const streak = Number(state.streak) || 3;
+  const xp = Number(state.xp || state.gems?.balance || 120);
+  const level = getActiveLevel() || 'A1';
+  const trophy = (()=>{try{return localStorage.getItem('fz_arena_trophies')||'450'}catch(_){return '450'}})();
+
+  return `<div class="game-hub-container">
+    <div class="game-hub-top-bar">
+      <div class="game-brand-cluster">
+        <span class="game-brand-icon"><i class="fz-i" data-fz-icon="game"></i></span>
+        <div class="game-brand-titles">
+          <h1 class="game-brand-heading">${esc(FiezelI18n.t('game.title'))}</h1>
+          <p class="game-brand-sub">${esc(FiezelI18n.t('game.subtitle'))}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="game-stats-ribbon">
+      <div class="game-stat-pill">
+        <span class="stat-icon flame"><i class="fz-i" data-fz-icon="flame"></i></span>
+        <div class="stat-meta">
+          <small>${esc(FiezelI18n.t('game.streak-label'))}</small>
+          <b>${streak} ${esc(FiezelI18n.t('game.days-unit'))}</b>
+        </div>
+      </div>
+      <div class="game-stat-pill">
+        <span class="stat-icon gold"><i data-lucide="zap"></i></span>
+        <div class="stat-meta">
+          <small>Total XP</small>
+          <b>${xp} XP</b>
+        </div>
+      </div>
+      <div class="game-stat-pill">
+        <span class="stat-icon trophy"><i data-lucide="trophy"></i></span>
+        <div class="stat-meta">
+          <small>${esc(FiezelI18n.t('game.trophy-label'))}</small>
+          <b>${trophy} 🏆</b>
+        </div>
+      </div>
+      <div class="game-stat-pill">
+        <span class="stat-icon level"><i class="fz-i" data-fz-icon="practice"></i></span>
+        <div class="stat-meta">
+          <small>${esc(FiezelI18n.t('game.mastery-label'))}</small>
+          <b>Level ${level}</b>
+        </div>
+      </div>
+    </div>
+
+    <!-- POSTER GAME CARD: PAW ARENA -->
+    <div class="game-poster-card" onclick="go('arena')">
+      <div class="poster-cyber-grid" aria-hidden="true"></div>
+      <div class="poster-light-ray" aria-hidden="true"></div>
+      <div class="poster-badge-row">
+        <span class="poster-kicker"><i data-lucide="swords"></i> <span>${esc(FiezelI18n.t('game.arena-kicker'))}</span></span>
+        <span class="poster-live-tag"><span class="live-pulse-dot"></span> ${esc(FiezelI18n.t('game.arena-live'))}</span>
+      </div>
+      <div class="poster-body">
+        <div class="poster-titles">
+          <span class="poster-sub-brand">CHAMPIONS LEAGUE 1V1</span>
+          <h2 class="poster-main-title">${esc(FiezelI18n.t('game.paw-arena-title'))}</h2>
+          <p class="poster-tagline">${esc(FiezelI18n.t('game.paw-arena-desc'))}</p>
+        </div>
+        <div class="poster-graphic" aria-hidden="true">
+          <svg viewBox="0 0 100 100" class="poster-trophy-svg" width="84" height="84">
+            <defs>
+              <linearGradient id="pstGoldGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#FFF5C0"/>
+                <stop offset="50%" stop-color="#FFD700"/>
+                <stop offset="100%" stop-color="#FF8A00"/>
+              </linearGradient>
+            </defs>
+            <path d="M50 10 L82 24 V52 C82 72 50 90 50 90 C50 90 18 72 18 52 V24 Z" fill="rgba(255, 215, 0, 0.15)" stroke="url(#pstGoldGrad)" stroke-width="2.5"/>
+            <path d="M30 70 L70 30 M28 32 L34 26 L74 66 L68 72 Z" fill="#FFE082" opacity="0.85"/>
+            <path d="M70 70 L30 30 M72 32 L66 26 L26 66 L32 72 Z" fill="#FFCA28" opacity="0.85"/>
+            <path d="M38 38 h24 v14 c0 8 -5 14 -12 14 s-12 -6 -12 -14 Z" fill="url(#pstGoldGrad)"/>
+            <path d="M34 42 c-5 0 -8 4 -8 9 s4 8 8 8 h4 v-4 h-4 c-2 0 -4 -2 -4 -4 s2 -4 4 -4 h4 v-5 Z" fill="url(#pstGoldGrad)"/>
+            <path d="M66 42 c5 0 8 4 8 9 s-4 8 -8 8 h-4 v-4 h4 c2 0 4 -2 4 -4 s-2 -4 -4 -4 h-4 v-5 Z" fill="url(#pstGoldGrad)"/>
+            <rect x="47" y="66" width="6" height="10" fill="url(#pstGoldGrad)"/>
+            <rect x="40" y="76" width="20" height="5" rx="2.5" fill="url(#pstGoldGrad)"/>
+          </svg>
+        </div>
+      </div>
+      <div class="poster-modes-strip">
+        <span class="poster-mode-pill"><i data-lucide="zap"></i> ${esc(FiezelI18n.t('game.mode-story'))}</span>
+        <span class="poster-mode-pill"><i data-lucide="sparkles"></i> ${esc(FiezelI18n.t('game.mode-signal'))}</span>
+        <span class="poster-mode-pill"><i data-lucide="trophy"></i> ${esc(FiezelI18n.t('game.mode-stakes'))}</span>
+      </div>
+      <div class="poster-cta-wrap">
+        <button type="button" class="poster-action-btn" onclick="event.stopPropagation();go('arena')">
+          <span>${esc(FiezelI18n.t('game.paw-arena-cta'))}</span>
+          <i data-lucide="arrow-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- BUG ARENA: BOSS RAID TRACKER -->
+    <div class="game-section-header">
+      <h4>BOSS RAID TERTARGET</h4>
+      <span class="section-sub">Eliminasi kelemahan tata bahasa sebelum menguras HP</span>
+    </div>
+    ${bugArenaCardMarkup()}
+
+    <div class="game-section-header">
+      <h4>${esc(FiezelI18n.t('game.section-title'))}</h4>
+      <span class="section-sub">${esc(FiezelI18n.t('game.section-sub'))}</span>
+    </div>
+
+    <div class="game-arcade-grid">
+      <div class="game-arcade-card" onclick="startVocabArcade()">
+        <div class="arcade-card-top">
+          <span class="arcade-badge bubble">${esc(FiezelI18n.t('game.bubble-badge'))}</span>
+          <span class="arcade-icon-wrap"><i data-lucide="sparkles"></i></span>
+        </div>
+        <h4 class="arcade-card-title">${esc(FiezelI18n.t('game.bubble-title'))}</h4>
+        <p class="arcade-card-desc">${esc(FiezelI18n.t('game.bubble-desc'))}</p>
+        <div class="arcade-card-footer">
+          <span class="arcade-play-hint">${esc(FiezelI18n.t('game.play-cta'))}</span>
+        </div>
+      </div>
+
+      <div class="game-arcade-card" onclick="startSentencePuzzleArcade()">
+        <div class="arcade-card-top">
+          <span class="arcade-badge puzzle">${esc(FiezelI18n.t('game.puzzle-badge'))}</span>
+          <span class="arcade-icon-wrap"><i data-lucide="sparkles"></i></span>
+        </div>
+        <h4 class="arcade-card-title">${esc(FiezelI18n.t('game.puzzle-title'))}</h4>
+        <p class="arcade-card-desc">${esc(FiezelI18n.t('game.puzzle-desc'))}</p>
+        <div class="arcade-card-footer">
+          <span class="arcade-play-hint">${esc(FiezelI18n.t('game.puzzle-cta'))}</span>
+        </div>
+      </div>
+
+      <div class="game-arcade-card" onclick="try{openLiveVoiceStage()}catch(_){go('skills')}">
+        <div class="arcade-card-top">
+          <span class="arcade-badge voice">${esc(FiezelI18n.t('game.voice-badge'))}</span>
+          <span class="arcade-icon-wrap"><i data-lucide="mic"></i></span>
+        </div>
+        <h4 class="arcade-card-title">${esc(FiezelI18n.t('game.voice-title'))}</h4>
+        <p class="arcade-card-desc">${esc(FiezelI18n.t('game.voice-desc'))}</p>
+        <div class="arcade-card-footer">
+          <span class="arcade-play-hint">${esc(FiezelI18n.t('game.stage-cta'))}</span>
+        </div>
+      </div>
+
+      <div class="game-arcade-card nujum-card" onclick="go('nujum')">
+        <div class="arcade-card-top">
+          <span class="arcade-badge nujum">${esc(FiezelI18n.t('game.nujum-badge'))}</span>
+          <span class="arcade-icon-wrap"><i data-lucide="flame"></i></span>
+        </div>
+        <h4 class="arcade-card-title">${esc(FiezelI18n.t('game.nujum-title'))}</h4>
+        <p class="arcade-card-desc">${esc(FiezelI18n.t('game.nujum-desc'))}</p>
+        <div class="arcade-card-footer">
+          <span class="arcade-play-hint">${esc(FiezelI18n.t('game.nujum-cta'))}</span>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
 /* m025-277: PAW ARENA sebagai view sendiri (§4 opsi a) — tanpa tab baru. ?duel= lama tetap
    dilayani jalur learner-flow; view ini pintu ruang permainan tersendiri. */
 function arenaView(){setApp('<div id="fzPawArena" class="paw-arena-shell"></div>');const mod=self.FiezelPawArena;if(!mod){$('fzPawArena').innerHTML='<p class="muted">Modul PAW ARENA belum termuat.</p>';return}mod.mount($('fzPawArena'),{toast:showToast,appVersion:APP_VERSION,learnerName,afterRender:enhanceUI})}

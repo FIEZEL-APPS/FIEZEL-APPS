@@ -151,7 +151,12 @@
       '<path class="fz-line" d="M12 12.6c1.2 1 1.8 1.9 1.8 2.8a1.8 1.8 0 0 1-3.6 0c0-.9.6-1.8 1.8-2.8z"/>',
     profile: '<polygon class="fz-fill" points="12,2.8 19.5,7.1 19.5,16.9 12,21.2 4.5,16.9 4.5,7.1" opacity="0.15"/>' +
       '<polygon class="fz-line" points="12,2.8 19.5,7.1 19.5,16.9 12,21.2 4.5,16.9 4.5,7.1"/>' +
-      '<circle class="fz-line" cx="12" cy="12" r="3.2"/>'
+      '<circle class="fz-line" cx="12" cy="12" r="3.2"/>',
+    game: '<rect class="fz-fill" x="3.5" y="7" width="17" height="10" rx="5" opacity="0.16"/>' +
+      '<rect class="fz-line" x="3.5" y="7" width="17" height="10" rx="5"/>' +
+      '<path class="fz-line" d="M7 12h4M9 10v4"/>' +
+      '<circle class="fz-fill" cx="15.5" cy="10.5" r="1.1"/>' +
+      '<circle class="fz-fill" cx="17.5" cy="13" r="1.1"/>'
   };
 
   var SVG_HEAD = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">';

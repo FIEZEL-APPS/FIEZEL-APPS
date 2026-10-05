@@ -33,6 +33,12 @@ check('U15 simpul jalur tanpa padding tombol umum, lingkarannya 34px', /\.path-s
 check('U15 nomor pelajaran tampil lagi (fiezel-2.css menyembunyikannya)', /\.path-node \.path-ring > b\{display:block!important/.test(css) && /\.path-ring>b,body \.path-ring>i,body \.path-ring>svg\{display:none\}/.test(fs.readFileSync(path.join(__fzRoot, 'fiezel-2.css'), 'utf8')));
 check('U15 ikon kunci, centang, dan ikon pil Ujian tampil dengan goresan warna induknya', /\.path-node \.path-ring > svg\{display:block!important/.test(css) && /\.exam-entry-chip > svg \*\{color:inherit!important;fill:none!important;stroke:currentColor!important\}/.test(css));
 check('Judul modal Misi Kosakata dan judul kemenangan QUEST tidak lagi putih di atas putih', /html body \.gateway-header h2,[^{]*h2\.victory-headline\{color:#0F172A!important;-webkit-text-fill-color:#0F172A!important/.test(css));
+// U16 tidak cukup dengan pasangan warna mentah: pilihan yang sudah dicoba tetap `:disabled` dan
+// `body .option:disabled:not(.correct):not(.wrong){opacity:.78}` (fiezel-2.css) meredupkan chip yang
+// bersarang (7,63:1 jadi terender ~4,31:1). Gerbang ini menuntut opasitas dikembalikan, dan
+// aturannya ditulis SESUDAH pasangan warna supaya menang di cascade.
+check('U16 pilihan "Sudah dicoba" tidak diredupkan opacity :disabled (fiezel-2.css)', /body \.option\.was-tried:disabled\{opacity:1!important\}/.test(css), 'aturan opacity:1 untuk .option.was-tried:disabled tidak ada');
+check('U16 aturan opasitas ditulis sesudah pasangan warna chip (menang cascade)', css.indexOf('.option.was-tried:disabled{opacity:1!important}') > css.indexOf('html body .tried-tag{'), 'urutan aturan salah');
 
 const pairs = [
   ['U16 chip "Sudah dicoba"', 'html body .tried-tag{', '#E8EDF3'],
@@ -55,6 +61,16 @@ for (const [name, sel, bg] of pairs) {
   check(`${name} lolos 4,5:1`, r >= 4.5, `${fg} di atas ${bg} = ${r.toFixed(2)}`);
 }
 check('Kartu "Trik Cepat Ingat" berlatar krem padat (terbaca di panel terang maupun gelap)', /\.feedback-memory-box\{background:#FFF6DF!important/.test(css));
+// U19: label jalur terkunci hidup di dalam `.path-label{opacity:.82}`, jadi kontras mentahnya menipu.
+// Gerbang ini menghitung pasangan yang benar-benar terender: teks dan latar sama-sama dikalikan .82.
+const under = (hex, a, behind) => { const f = parseInt(hex.slice(1), 16), b = parseInt(behind.slice(1), 16); const mix = s => { const v = ((f >> s) & 255) * a + ((b >> s) & 255) * (1 - a); return Math.round(v); }; return '#' + [16, 8, 0].map(s => mix(s).toString(16).padStart(2, '0')).join(''); };
+check('U19 baris meta jalur terkunci tidak lagi abu muda di opacity .82', /#app \.path-step\.is-locked \.path-label > span\{color:#3F4A5A!important/.test(css), 'aturan #3F4A5A untuk meta jalur terkunci tidak ada');
+{
+  const cardEff = under('#F8FAFC', 0.82, '#FFFFFF');
+  const inkEff = under('#3F4A5A', 0.82, cardEff);
+  const r = ratio(inkEff, cardEff);
+  check('U19 meta jalur terkunci lolos 4,5:1 pada opasitas yang sama', r >= 4.5, `${inkEff} di atas ${cardEff} = ${r.toFixed(2)}`);
+}
 
 console.log(`\ngrammar-ux-p3-2026-10-04-test: ${pass}/${pass + fails.length} PASS`);
 if (fails.length) { console.error('GAGAL: ' + fails.join(' | ')); process.exit(1); }

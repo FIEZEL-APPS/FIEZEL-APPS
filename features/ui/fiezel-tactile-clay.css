@@ -5374,7 +5374,10 @@ html body #app .grammar-brief-example b{color:#9A3412!important;-webkit-text-fil
         berpadding tombol umum, jadi yang tampil kotak putih kosong. Kotaknya dipertahankan dan
         diisi: lingkaran 34px, nomor pelajaran, ikon kunci atau centang. Ikon pil "Ujian Naik Level"
         tercat krem di atas putih; kini cokelat tua.
-   U16: chip "Sudah dicoba" abu #94A3B8 di atas abu tipis (2,24:1) kini abu tua (di atas 7:1).
+   U16: chip "Sudah dicoba" abu #94A3B8 di atas abu tipis (2,24:1) kini abu tua. Tetapi pilihan yang
+        sudah dicoba tetap `:disabled`, dan `body .option:disabled:not(.correct):not(.wrong){opacity:.78}`
+        (fiezel-2.css) meredupkan seluruh isinya, jadi angka yang dirender cuma 4,31:1. Opasitas
+        dikembalikan khusus selama chip tampil (di bawah, sesudah pasangan warnanya).
    U17: petunjuk "Ketuk keping di bawah..." #94A3B8 (2,45:1) kini #5B6474 (di atas 5:1).
    Sisa kontras dari probe ulang:
      - kalimat pegangan ingatan tutor (#FDE68A) tampil di kartu tangga petunjuk yang TERANG (1,19:1);
@@ -5394,6 +5397,11 @@ html body #app .exam-entry-chip > svg{display:block!important;color:#8A5A00!impo
 html body #app .path-step .path-node .path-ring > svg,html body #app .exam-entry-chip > svg{fill:none!important;stroke:currentColor!important;background:none!important;border-radius:0!important;box-shadow:none!important}
 html body #app .path-step .path-node .path-ring > svg *,html body #app .exam-entry-chip > svg *{color:inherit!important;fill:none!important;stroke:currentColor!important}
 html body #app .quiz-shell .option .tried-tag,html body .tried-tag{background:#E8EDF3!important;color:#3F4A5A!important;-webkit-text-fill-color:#3F4A5A!important}
+/* U16 lanjutan: `body .option:disabled:not(.correct):not(.wrong){opacity:.78}` (fiezel-2.css) ikut
+   meredupkan `.tried-tag` yang bersarang, jadi kontras mentah 7,63:1 hanya terender ~4,31:1.
+   Selama chip "Sudah dicoba" tampil, pilihan yang sudah dicoba tidak lagi diredupkan. Ditulis di
+   sini (setelah pasangan warnanya) dengan spesifisitas yang menang atas `.option:disabled:...`. */
+html body #app #options .option.was-tried:disabled,html body #app .quiz-shell .option.was-tried:disabled,body .option.was-tried:disabled{opacity:1!important}
 html body .puzzle-empty-hint{color:#5B6474!important;-webkit-text-fill-color:#5B6474!important}
 html body #app .tutor-ladder .tutor-turn-ask,html body #tutorTurn .tutor-ladder p.tutor-turn-ask{color:#7A3E00!important;-webkit-text-fill-color:#7A3E00!important}
 html body #feedback .feedback-memory-box,html body .card .feedback-memory-box{background:#FFF6DF!important;border-color:#F1D9A8!important}
@@ -5407,8 +5415,526 @@ html body .fz-prasasti-card .modal-mark{color:#8A5A00!important;-webkit-text-fil
    4,5:1 yang digelapkan satu tingkat dalam keluarga warnanya sendiri. */
 html body .gateway-header h2,html body .modal .gateway-header h2,html body h2.victory-headline,html body .modal h2.victory-headline{color:#0F172A!important;-webkit-text-fill-color:#0F172A!important;background:none!important}
 html body .active-level-control strong{color:#9A4A00!important;-webkit-text-fill-color:#9A4A00!important}
+/* U19 (temuan probe berkontras-sadar-opasitas): kartu pelajaran TERKUNCI memakai
+   `.path-step.is-locked .path-label{opacity:.82}`, jadi baris meta "pola grammar dasar · Dikuasai 0%"
+   (#64748B di atas kartu #F8FAFC) yang mentah 4,62:1 terender ~3,3:1. Nadanya dinaikkan supaya
+   tetap terlihat "terkunci" namun lolos 4,5:1 pada opasitas yang sama. Judul dan catatan kunci
+   sudah lolos dan tidak disentuh. */
+html body.fz-view-grammar #app .path-step.is-locked .path-label > span{color:#3F4A5A!important;-webkit-text-fill-color:#3F4A5A!important}
 html body .gateway-badge{color:#075985!important;-webkit-text-fill-color:#075985!important}
 html body .gw-meaning{color:#0369A1!important;-webkit-text-fill-color:#0369A1!important}
 html body .stage-tag{color:#047857!important;-webkit-text-fill-color:#047857!important}
 html body #app .grammar-hero-badge{color:#8A4B00!important;-webkit-text-fill-color:#8A4B00!important}
 html body #tutorTurn .tutor-turn-head b{color:#34D399!important;-webkit-text-fill-color:#34D399!important}
+
+/* ==========================================================================
+   FIEZEL ARCADE & GAME HUB (VIEW: 'game')
+   Tactile Daylight Travertine Clay UI, responsive 3D bevels, hero cards
+   ========================================================================== */
+.game-hub-container {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 6px 12px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-sizing: border-box;
+}
+
+.game-stats-ribbon {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  background: #FFFFFF;
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: 10px;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+  box-sizing: border-box;
+}
+
+@media (max-width: 580px) {
+  .game-stats-ribbon {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+}
+
+.game-stat-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px;
+}
+
+.game-stat-pill .stat-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.game-stat-pill .stat-icon.flame {
+  background: rgba(255, 94, 30, 0.12);
+  color: #FF5E1E;
+}
+.game-stat-pill .stat-icon.gold {
+  background: rgba(255, 210, 30, 0.18);
+  color: #D97706;
+}
+.game-stat-pill .stat-icon.trophy {
+  background: rgba(245, 158, 11, 0.14);
+  color: #B45309;
+}
+.game-stat-pill .stat-icon.level {
+  background: rgba(2, 132, 199, 0.12);
+  color: #0284C7;
+}
+
+.game-stat-pill .stat-icon svg,
+.game-stat-pill .stat-icon .fz-i {
+  width: 18px;
+  height: 18px;
+}
+
+.game-stat-pill .stat-meta small {
+  display: block;
+  font-size: 10px;
+  color: #64748B;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.game-stat-pill .stat-meta b {
+  display: block;
+  font-size: 12.5px;
+  color: #0F172A;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.game-view-shell {
+  width: 100%;
+  max-width: 580px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.game-hub-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 4px 0 16px;
+  padding: 2px 4px;
+}
+
+.game-brand-cluster {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.game-brand-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #FFE02E 0%, #F59E0B 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 0 #D97706, 0 8px 18px rgba(245, 158, 11, 0.28);
+  flex-shrink: 0;
+}
+
+.game-brand-icon .fz-i {
+  --fz-i-fill: #FFFBEB;
+  --fz-i-line: #78350F;
+  width: 26px;
+  height: 26px;
+}
+
+.game-brand-heading {
+  font-size: 22px;
+  font-weight: 800;
+  color: #0F172A !important;
+  -webkit-text-fill-color: #0F172A !important;
+  margin: 0;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.game-brand-sub {
+  font-size: 13px;
+  color: #64748B !important;
+  -webkit-text-fill-color: #64748B !important;
+  margin: 2px 0 0;
+}
+
+/* ==========================================================================
+   GAME POSTER CARD: PAW ARENA (Hyper-Attractive Esports & Gaming Poster)
+   ========================================================================== */
+.game-poster-card {
+  position: relative;
+  background:
+    radial-gradient(110% 120% at 90% 10%, rgba(255, 170, 0, 0.45) 0%, rgba(168, 85, 247, 0.3) 40%, transparent 70%),
+    radial-gradient(90% 90% at 10% 90%, rgba(59, 130, 246, 0.35) 0%, transparent 65%),
+    linear-gradient(145deg, #090514 0%, #150B33 35%, #231245 70%, #381259 100%) !important;
+  border-radius: 24px !important;
+  border: 2px solid rgba(255, 215, 0, 0.55) !important;
+  box-shadow: 0 18px 44px -8px rgba(112, 0, 255, 0.48), 0 0 28px rgba(255, 180, 0, 0.25), inset 0 2px 0 rgba(255, 255, 255, 0.35), inset 0 -4px 14px rgba(0, 0, 0, 0.7) !important;
+  color: #FFFFFF !important;
+  overflow: hidden !important;
+  cursor: pointer !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 16px !important;
+  padding: 24px 20px 22px !important;
+}
+
+.game-poster-card:active {
+  transform: translateY(2px) !important;
+  box-shadow: 0 8px 24px -4px rgba(112, 0, 255, 0.45), 0 0 16px rgba(255, 180, 0, 0.2) !important;
+}
+
+.poster-cyber-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 20px 20px;
+  pointer-events: none;
+  mask-image: radial-gradient(ellipse at 80% 20%, black 40%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse at 80% 20%, black 40%, transparent 80%);
+}
+
+.poster-light-ray {
+  position: absolute;
+  top: -30px;
+  right: -20px;
+  width: 170px;
+  height: 170px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 220, 50, 0.35) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.poster-badge-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+
+.poster-kicker {
+  background: linear-gradient(90deg, rgba(239, 68, 68, 0.35), rgba(245, 158, 11, 0.35)) !important;
+  border: 1.5px solid #F59E0B !important;
+  color: #FFE57F !important;
+  -webkit-text-fill-color: #FFE57F !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.05em !important;
+  padding: 4px 12px !important;
+  border-radius: 20px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  box-shadow: 0 0 14px rgba(245, 158, 11, 0.35) !important;
+  text-transform: uppercase !important;
+}
+
+.poster-kicker svg {
+  width: 14px;
+  height: 14px;
+  stroke: #FFE57F;
+}
+
+.poster-live-tag {
+  background: rgba(34, 197, 94, 0.2) !important;
+  border: 1px solid rgba(74, 222, 128, 0.5) !important;
+  color: #86EFAC !important;
+  -webkit-text-fill-color: #86EFAC !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  padding: 4px 11px !important;
+  border-radius: 20px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+.live-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #22C55E;
+  box-shadow: 0 0 10px #22C55E;
+}
+
+.poster-body {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+  gap: 12px;
+}
+
+.poster-titles {
+  flex: 1;
+}
+
+.poster-sub-brand {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #FBBF24 !important;
+  -webkit-text-fill-color: #FBBF24 !important;
+  display: block;
+  margin-bottom: 3px;
+}
+
+.poster-main-title {
+  font-size: 26px !important;
+  font-weight: 900 !important;
+  line-height: 1.1 !important;
+  margin: 0 0 8px !important;
+  letter-spacing: 0.03em !important;
+  text-transform: uppercase !important;
+  background: linear-gradient(180deg, #FFFFFF 0%, #FFF3B0 35%, #FFD000 70%, #FF8800 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  filter: drop-shadow(0 3px 10px rgba(255, 136, 0, 0.5)) !important;
+}
+
+.poster-tagline {
+  font-size: 12.5px !important;
+  line-height: 1.45 !important;
+  color: #CBD5E1 !important;
+  -webkit-text-fill-color: #CBD5E1 !important;
+  margin: 0 !important;
+}
+
+.poster-graphic {
+  flex-shrink: 0;
+  filter: drop-shadow(0 8px 20px rgba(255, 170, 0, 0.45));
+}
+
+.poster-modes-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  position: relative;
+  z-index: 2;
+}
+
+.poster-mode-pill {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  padding: 5px 12px !important;
+  border-radius: 12px !important;
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  color: #F1F5F9 !important;
+  -webkit-text-fill-color: #F1F5F9 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+.poster-mode-pill svg {
+  width: 12px;
+  height: 12px;
+  stroke: #FBBF24;
+}
+
+.poster-cta-wrap {
+  position: relative;
+  z-index: 2;
+  margin-top: 4px;
+}
+
+.poster-action-btn {
+  width: 100% !important;
+  background: linear-gradient(180deg, #FFE033 0%, #FFB300 50%, #FF8000 100%) !important;
+  border: 2px solid #FFF3B0 !important;
+  border-radius: 16px !important;
+  padding: 13px 24px !important;
+  color: #2D0C00 !important;
+  -webkit-text-fill-color: #2D0C00 !important;
+  font-family: var(--font-sans) !important;
+  font-size: 14px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px !important;
+  box-shadow: 0 6px 0 #9E4500, 0 14px 28px rgba(255, 128, 0, 0.5) !important;
+  cursor: pointer !important;
+  transition: all 0.12s ease !important;
+}
+
+.poster-action-btn:active {
+  transform: translateY(3px) !important;
+  box-shadow: 0 3px 0 #9E4500, 0 6px 14px rgba(255, 128, 0, 0.4) !important;
+}
+
+.poster-action-btn svg {
+  width: 17px;
+  height: 17px;
+  stroke: #2D0C00;
+  stroke-width: 2.8;
+}
+
+/* Backward compatibility aliases */
+.game-hero-card { display: none !important; }
+.game-cta-btn { display: none !important; }
+
+/* Enhanced Boss Raid Card in Game Hub */
+.game-hub-container .bug-arena-card {
+  margin-top: 4px !important;
+  border: 2px solid #FCA5A5 !important;
+  box-shadow: 0 6px 0 #FCA5A5, 0 14px 28px rgba(239, 68, 68, 0.08) !important;
+}
+
+.game-section-header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 6px;
+}
+
+.game-section-header h4 {
+  font-size: 16px;
+  font-weight: 800;
+  color: #0F172A !important;
+  -webkit-text-fill-color: #0F172A !important;
+  margin: 0;
+}
+
+.game-section-header .section-sub {
+  font-size: 12px;
+  color: #64748B;
+  font-weight: 500;
+}
+
+.game-arcade-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+@media (max-width: 540px) {
+  .game-arcade-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.game-arcade-card {
+  background: #FFFFFF;
+  border-radius: 18px;
+  border: 1px solid var(--card-border);
+  box-shadow: 0 5px 0 var(--card-bevel), 0 10px 20px rgba(15, 23, 42, 0.04);
+  padding: 18px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  box-sizing: border-box;
+}
+
+.game-arcade-card:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 var(--card-bevel), 0 4px 10px rgba(15, 23, 42, 0.05);
+}
+
+.game-arcade-card .arcade-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.arcade-badge {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 8px;
+  letter-spacing: 0.03em;
+}
+
+.arcade-badge.bubble {
+  background: rgba(2, 132, 199, 0.1);
+  color: #0284C7;
+}
+
+.arcade-badge.puzzle {
+  background: rgba(139, 92, 246, 0.12);
+  color: #7C3AED;
+}
+
+.arcade-badge.voice {
+  background: rgba(245, 158, 11, 0.14);
+  color: #D97706;
+}
+
+.arcade-badge.nujum {
+  background: rgba(239, 68, 68, 0.12);
+  color: #DC2626;
+}
+
+.arcade-icon-wrap {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: #F8FAFC;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #475569;
+}
+
+.arcade-icon-wrap svg {
+  width: 18px;
+  height: 18px;
+}
+
+.arcade-card-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: #0F172A !important;
+  -webkit-text-fill-color: #0F172A !important;
+  margin: 2px 0 0;
+}
+
+.arcade-card-desc {
+  font-size: 12px;
+  color: #64748B !important;
+  -webkit-text-fill-color: #64748B !important;
+  line-height: 1.45;
+  margin: 0;
+  flex-grow: 1;
+}
+
+.arcade-card-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 4px;
+}
+
+.arcade-play-hint {
+  font-size: 12px;
+  font-weight: 800;
+  color: #D97706;
+}
+

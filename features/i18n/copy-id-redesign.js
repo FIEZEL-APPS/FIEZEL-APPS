@@ -38,6 +38,8 @@
     'nav.progress-aria': 'Peta CEFR dan kemahiran',
     'nav.profile': 'Profil',
     'nav.profile-aria': 'Profil murid dan teman',
+    'nav.game': 'Game',
+    'nav.game-aria': 'Arena permainan dan tantangan',
 
     /* ── Home "Hari ini" ────────────────────────────────────────────────────── */
     'today.eyebrow': 'Hari ini',
@@ -338,6 +340,40 @@
     'bc.bukti-naik': 'Ketepatanmu naik {poin} poin sejak awal latihan',
     'bc.bukti-kosong': 'Selesaikan beberapa sesi lagi. Buktinya akan muncul di sini.',
     'bc.fokus-pasangan': 'Fokus saat ini: membedakan {a} dan {b}',
-    'bc.fokus-materi': 'Fokus saat ini: {materi}'
+    'bc.fokus-materi': 'Fokus saat ini: {materi}',
+
+    /* ── Game Hub Arcade ────────────────────────────────────────────────────── */
+    'game.title': 'Arcade & Game',
+    'game.subtitle': 'Tantang kemampuan bahasa lewat arena interaktif',
+    'game.streak-label': 'Streak Game',
+    'game.days-unit': 'Hari',
+    'game.trophy-label': 'Trophy Arena',
+    'game.mastery-label': 'Level Mahir',
+    'game.arena-kicker': 'Mode Duel Seru',
+    'game.arena-live': 'Pemain Siap',
+    'game.paw-arena-title': 'PAW ARENA',
+    'game.paw-arena-desc': 'Tantang bot atau teman: adu tebak arti, sambung kata, dan rebut trophy!',
+    'game.paw-arena-cta': 'Mulai Duel Arena',
+    'game.mode-story': 'Story Chain',
+    'game.mode-signal': 'Sinyal Presisi',
+    'game.mode-stakes': 'Taruhan Poin',
+    'game.section-title': 'Pilihan Arena Tantangan',
+    'game.section-sub': 'Pilih mode permainan favoritmu untuk latihan seru',
+    'game.bubble-badge': 'Kecepatan',
+    'game.bubble-title': 'Mochi Crunch',
+    'game.bubble-desc': 'Cocokkan kosakata kilat dengan animasi kenyal ala mochi.',
+    'game.play-cta': 'Mainkan Sekarang',
+    'game.puzzle-badge': 'Sintaksis',
+    'game.puzzle-title': 'Sentence Puzzle',
+    'game.puzzle-desc': 'Susun potongan kata menjadi kalimat sempurna tanpa celah.',
+    'game.puzzle-cta': 'Susun Kalimat',
+    'game.voice-badge': 'Intonasi',
+    'game.voice-title': 'Panggung Suara Live',
+    'game.voice-desc': 'Uji pelafalan dan ritme bicara langsung di panggung vokal.',
+    'game.stage-cta': 'Buka Panggung',
+    'game.nujum-badge': 'Mentor Keras',
+    'game.nujum-title': 'NUJUM',
+    'game.nujum-desc': 'Bicara dengan mentor galak yang siap mengoreksi kesalahanmu.',
+    'game.nujum-cta': 'Hadapi NUJUM'
   });
 }());
