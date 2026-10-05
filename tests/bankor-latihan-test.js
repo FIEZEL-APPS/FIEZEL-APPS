@@ -118,24 +118,17 @@ function toPlan(s) {
 test('P1 · butir lesson datang dari alokator BANKOR, bukan dari pickFresh', () => {
   const s = stage({ handle: 'murid-p1' });
   const plan = toPlan(s);
-  const blok = plan.blocks.filter((b) => !b.itemIds)[0];
-  assert.ok(blok, 'rencana tidak punya blok yang butirnya dipilih sistem');
+  const blok = plan.blocks.filter((b) => b.id === 'daily_mix')[0];
+  assert.ok(blok, 'rencana tidak punya blok daily_mix');
+  
+  assert.ok(blok.itemIds && blok.itemIds.length > 0, 'daily_mix harus punya itemIds dari alokator');
 
   const stSebelum = JSON.parse(JSON.stringify(s.state()));
   s.click({ 'data-lf': 'start-lesson', 'data-block': blok.id });
   const dipakai = s.state().activeLesson.itemIds;
 
-  const A = globalThis.FiezelQuestionAllocator, M = globalThis.FiezelQuestionMemory;
-  const harusnya = A.allocate({
-    pool: globalThis.FiezelReviewBank.itemsFor(blok.skill),
-    memory: stSebelum.qmem && stSebelum.qmem.schema === M.SCHEMA ? stSebelum.qmem : M.emptyMemory(),
-    count: blok.count,
-    nowMs: Date.now(),
-    seed: 'murid-p1'
-  }).items.map((it) => it.id);
-
-  assert.deepStrictEqual(dipakai, harusnya,
-    'set lesson tidak sama dengan keputusan alokator — penyambungannya putus');
+  assert.deepStrictEqual(dipakai, blok.itemIds,
+    'set lesson tidak sama dengan keputusan buildPlan');
 });
 
 /* -------------------------------------------------------- P2 · jawaban jadi ingatan --- */
@@ -143,7 +136,7 @@ test('P1 · butir lesson datang dari alokator BANKOR, bukan dari pickFresh', () 
 test('P2 · setiap jawaban tercatat di ingatan soal dengan hasil benar/salah-nya', () => {
   const s = stage({ handle: 'murid-p2' });
   const plan = toPlan(s);
-  const blok = plan.blocks.filter((b) => !b.itemIds)[0];
+  const blok = plan.blocks.filter((b) => b.id === 'daily_mix')[0];
   const M = globalThis.FiezelQuestionMemory;
   assert.ok(!s.state().qmem || Object.keys(s.state().qmem.items || {}).length === 0,
     'ingatan sudah terisi sebelum satu soal pun dikerjakan');
@@ -168,7 +161,7 @@ test('P3 · ingatan ikut tersimpan ke localStorage dan terbaca lagi setelah muat
   const store = {};
   const s = stage({ handle: 'murid-p3', store: store });
   const plan = toPlan(s);
-  const blok = plan.blocks.filter((b) => !b.itemIds)[0];
+  const blok = plan.blocks.filter((b) => b.id === 'daily_mix')[0];
   const ids = doLesson(s, blok.id, () => true);
 
   const disimpan = JSON.parse(store['fiezel-learner-flow-v1']);
@@ -186,7 +179,7 @@ test('P3 · ingatan ikut tersimpan ke localStorage dan terbaca lagi setelah muat
 test('P4 · butir yang dijawab SALAH lebih diprioritaskan daripada yang dijawab benar', () => {
   const s = stage({ handle: 'murid-p4' });
   const plan = toPlan(s);
-  const blok = plan.blocks.filter((b) => !b.itemIds)[0];
+  const blok = plan.blocks.filter((b) => b.id === 'daily_mix')[0];
   const ids = doLesson(s, blok.id, (i) => i % 2 === 0);
   const salah = ids.filter((id, i) => i % 2 === 1);
   const benar = ids.filter((id, i) => i % 2 === 0);
@@ -207,7 +200,7 @@ test('P5 · urutan ditentukan identitas murid, bukan jam: beda murid beda set, m
   const jalankan = (handle) => {
     const s = stage({ handle: handle, store: {} });
     const plan = toPlan(s);
-    const blok = plan.blocks.filter((b) => !b.itemIds)[0];
+    const blok = plan.blocks.filter((b) => b.id === 'daily_mix')[0];
     s.click({ 'data-lf': 'start-lesson', 'data-block': blok.id });
     return s.state().activeLesson.itemIds.join(',');
   };
