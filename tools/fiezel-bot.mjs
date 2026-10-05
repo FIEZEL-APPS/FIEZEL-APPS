@@ -1272,7 +1272,11 @@ async function runAiReview({ basePrompt, prTitle, changedFiles, diffMap, extraFi
   }
   for (const d of [...dropped, ...rejected]) console.log(`[Fiezel Bot v2] Temuan AI dibuang (${d.reason}): ${d.file}:${d.line} ${d.title || ''}`);
   const models = [...new Set(answered.map(r => r.model).filter(Boolean))].join(', ');
+  // Jujur soal mutu: bila semua lensa hanya dilayani model "lite" (model lain kehabisan
+  // kuota/429 — kasus nyata PR #502), review ini kurang tajam dan harus terlihat begitu.
+  const degraded = answered.every(r => /lite/i.test(r.model || ''));
   return {
+    degraded,
     provider: `Gemini/LLM ${answered.length}/${lenses.length} lensa (${models})${skeptic.ok ? ' + uji skeptis' : ''}`,
     summary,
     parseError: parseErrors === answered.length,
@@ -1393,6 +1397,9 @@ function composeAiSection(aiResult, aiReview) {
   const out = [];
   if (aiReview.summary) out.push(`> ${normalizeWs(aiReview.summary).slice(0, 500)}`, '');
   const { verified, dropped, context, stats } = aiReview;
+  if (aiReview.degraded) {
+    out.push('> ⚠️ **Mutu review terbatas:** model AI utama sedang kehabisan kuota/sibuk, sehingga review ini hanya memakai model ringan (lite). Temuan bisa terlewat; jalankan ulang review setelah kuota pulih untuk hasil yang tajam.', '');
+  }
   out.push(`**${verified.length} temuan terverifikasi**${dropped.length ? ` · ${dropped.length} dibuang karena tidak terbukti di kode` : ''} · konteks: ${context.included.length} berkas dibaca${context.partial?.length ? ` (${context.partial.length} terpotong anggaran)` : ''}${context.omitted.length ? `, ${context.omitted.length} dilewati` : ''}, ${context.callerSites || 0} lokasi pemanggil`);
   if (stats) {
     out.push('', `<sub>Saringan: ${stats.answered}/${stats.lenses} lensa review → ${stats.proposed} usulan → ${stats.quoteOk} lolos cek kutipan → ${stats.candidates} kandidat unik → ${stats.skeptic.ok ? `${stats.confirmed} lolos uji skeptis${stats.disputed ? `, ${stats.disputed} diperdebatkan` : ''}` : 'uji skeptis tidak tersedia (temuan ditandai belum teruji)'}</sub>`);
@@ -2386,8 +2393,11 @@ async function runSelfTest() {
     if (rv.verified.length !== 1 || rv.verified[0].line !== 2 || rv.verified[0].skeptic !== 'confirmed' || !rv.verified[0].scenario.includes('latest')) throw new Error(`T24 FAIL: hasil ${JSON.stringify(rv.verified.map(v => [v.line, v.skeptic]))}`);
     if (!rv.dropped.some(d => d.reason.startsWith('ditolak uji skeptis') && d.title === 'spasi berlebih')) throw new Error('T24 FAIL: tuduhan palsu tidak ditolak');
     if (rv.stats.proposed !== 3 || rv.stats.candidates !== 2 || rv.stats.confirmed !== 1) throw new Error(`T24 FAIL: statistik ${JSON.stringify(rv.stats)}`);
+    if (rv.degraded) throw new Error('T24 FAIL: model non-lite tidak boleh ditandai mutu terbatas');
   }
-  console.log('  ✅ T24: Pipeline kritis (3 lensa → dedupe → uji skeptis menolak tuduhan palsu)');
+  const degradedMd = composeAiSection({ text: 'ok' }, { degraded: true, summary: '', verified: [], dropped: [], context: { included: [], omitted: [], partial: [] }, stats: null });
+  if (!degradedMd.includes('Mutu review terbatas')) throw new Error('T24 FAIL: peringatan mutu terbatas');
+  console.log('  ✅ T24: Pipeline kritis (3 lensa → dedupe → uji skeptis menolak tuduhan palsu; peringatan model lite)');
   pass++;
 
   console.log(`\n✅ Fiezel Bot v2 Self-Test: PASS (${pass}/${pass} tests)`);
