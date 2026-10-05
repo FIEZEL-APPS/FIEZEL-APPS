@@ -64,7 +64,7 @@ LESSONS = {
              "Kamu memakai satu kata depan untuk semua waktu, karena kata “pada” bisa dipakai untuk semuanya.",
              "คุณใช้คำบุพบทคำเดียวกับเวลาทุกแบบ เพราะคำว่า 'ตอน' ใช้ได้กับทุกอย่าง"),
         rule=("In + month, year, or part of the day (in July, in the evening). On + day or date (on Tuesday). At + clock time (at 6:15).",
-              "“In” untuk bulan, tahun, atau bagian hari (“in July”, “in the evening”). “On” untuk hari atau tanggal (“on Tuesday”). “At” untuk jam (“at 6:15”).",
+              "Kalau periode waktu luas (bulan, tahun, musim, bagian hari): Pakai “in”. Contoh: <b>in July</b> (di bulan Juli), <b>in 2024</b>, <b>in the morning</b> (di pagi hari).<br>Kalau hari dan tanggal spesifik: Pakai “on”. Contoh: <b>on Monday</b> (pada hari Senin), <b>on October 5th</b> (pada tanggal 5 Oktober), <b>on my birthday</b>.<br>Kalau jam yang tepat atau titik waktu tertentu: Pakai “at”. Contoh: <b>at 7 o'clock</b> (pada jam 7 tepat), <b>at noon</b> (tengah hari), <b>at night</b> (malam hari).<br><br>💡 <b>RUMUS KILAT</b>:<br>Periode luas (bulan, tahun, abad, pagi/siang/malam) ➡️ Pakai <b>in</b>.<br>Hari & tanggal spesifik (ada nama hari / tanggal) ➡️ Pakai <b>on</b>.<br>Jam tepat & titik waktu spesifik (jam dinding, noon, night) ➡️ Pakai <b>at</b>.",
               "'in' ใช้กับเดือน ปี หรือช่วงของวัน ('in July', 'in the evening') 'on' ใช้กับวันหรือวันที่ ('on Tuesday') และ 'at' ใช้กับเวลาบนนาฬิกา ('at 6:15')"),
         avoid=("Ask first: a month, a day, or a clock time? Then choose in, on, or at.",
                "Tanya dulu: bulan, hari, atau jam? Baru pilih “in”, “on”, atau “at”.",
