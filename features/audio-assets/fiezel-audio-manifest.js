@@ -134,7 +134,7 @@
     if (typeof f !== 'function') return Promise.reject(new Error('fetch_unavailable'));
     // Versi manifest ikut di query supaya service worker lama tidak menahan indeks usang;
     // berkas MP3-nya sendiri kekal dan tidak butuh perlakuan ini. Lihat pasal 10.
-    return f(url, { cache: 'no-cache' }).then(function (res) {
+    return f(url, { cache: 'default' }).then(function (res) {
       if (!res || !res.ok) throw new Error('audio_manifest_http_' + (res ? res.status : 'error'));
       return res.json();
     });
@@ -194,6 +194,13 @@
     state.index = null; state.pending = null; state.error = '';
     state.version = 0; state.voiceProfile = null; state.voiceProfiles = []; state.attempts = 0;
     state.assetBaseUrl = ''; state.url = DEFAULT_URL;
+  }
+
+  // m025-472: hangatkan manifest di latar belakang seketika (0ms) di lingkungan peramban
+  if (typeof root !== 'undefined' && root.document) {
+    setTimeout(function () {
+      try { load().catch(function () {}); } catch (_) {}
+    }, 0);
   }
 
   return Object.freeze({

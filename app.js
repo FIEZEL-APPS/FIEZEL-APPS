@@ -10375,6 +10375,7 @@ function todayHomeMarkup(){
     }
   } catch(_) {}
   const dailyWord = dailyFiveWords[vocabVisitIdx] || dailyFiveWords[0];
+  try{if(typeof audio!=='undefined'&&audio.prefetch&&dailyWord&&dailyWord.word){audio.prefetch(dailyWord.word,{contentType:'word'})}}catch(_){}
   const vocabOrderNum = vocabVisitIdx + 1;
 
   if (typeof window !== 'undefined') {
@@ -12175,8 +12176,7 @@ function prefetchNextVoice(next,options){
   if(!say||typeof say.prefetch!=='function')return false;
   const generation=voicePrefetchGeneration,opts={...(options||{})};
   const run=()=>{if(generation!==voicePrefetchGeneration)return;try{say.prefetch(english,opts)}catch{}};
-  if(typeof requestIdleCallback==='function')requestIdleCallback(run,{timeout:1200});
-  else setTimeout(run,0);
+  setTimeout(run,0);
   return true;
 }
 // m025-33 FIEZEL Classroom: Category -> Topic -> Classroom. Fiezel speaks English with
@@ -12983,7 +12983,8 @@ function flashcards(level){
     $('speakWord')?.addEventListener('click',e=>{e.stopPropagation();audio.play(v.word,{contentType:'word',next:nextCard?nextCard.word:''})});$('speakSentence')?.addEventListener('click',e=>{e.stopPropagation();audio.play(v.example,{contentType:'sentence',next:nextCard?nextCard.example:''})});$('aiWord').onclick=e=>{e.stopPropagation();explainWordWithAI(v)};
     $('learning').onclick=e=>{e.stopPropagation();markStillLearning('vocab',v.id);showToast(FiezelI18n.t('flash.toast-progres'),'success');i++;draw()};
     $('mastered').onclick=e=>{e.stopPropagation();markMastered('vocab',v.id);haptic('success');showToast(FiezelI18n.t('flash.toast-dikuasai'),'success');/* [FASE-4] 09 §3.3: kartu dikuasai = pengakuan → proud. */try{pawReact('badge-earned')}catch(_){}i++;draw()};
-    bindSwipe($('flashcard'),()=>{audio.stop();i++;draw()},()=>{audio.stop();i=Math.max(0,i-1);draw()})
+    bindSwipe($('flashcard'),()=>{audio.stop();i++;draw()},()=>{audio.stop();i=Math.max(0,i-1);draw()});
+    try{if(v?.word)audio.prefetch(v.word,{contentType:'word'});if(v?.example)audio.prefetch(v.example,{contentType:'sentence'})}catch(_){}
   };
   enterStage('vocab-flashcards',{draw:()=>draw(),leave:()=>audio.stop()});
   draw()
@@ -13002,7 +13003,8 @@ function reviewVocab(){
     $('reviewCard').onclick=flip;$('reviewCard').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();flip()}};
     $('reviewLearning').onclick=e=>{e.stopPropagation();markStillLearning('vocab',v.id);i++;draw()};
     $('reviewMastered').onclick=e=>{e.stopPropagation();markMastered('vocab',v.id);haptic('success');/* [FASE-4] 09 §3.3: dikuasai dari ulangan juga pengakuan → proud. */try{pawReact('badge-earned')}catch(_){}i++;draw()};
-    bindSwipe($('reviewCard'),()=>{i++;draw()},()=>{i=Math.max(0,i-1);draw()})
+    bindSwipe($('reviewCard'),()=>{i++;draw()},()=>{i=Math.max(0,i-1);draw()});
+    try{if(v?.word)audio.prefetch(v.word,{contentType:'word'});if(v?.example)audio.prefetch(v.example,{contentType:'sentence'})}catch(_){}
   };
   enterStage('vocab-review',()=>draw());
   draw()
@@ -14933,6 +14935,7 @@ function quizLoop(cfg){
   // sampai audio benar-benar berbunyi, supaya jawaban benar tidak bisa didapat tanpa
   // mendengar; kalau suaranya gagal, kuncinya dilepas agar murid tidak terjebak.
   if(q.type==='listening'){
+   if(q.script)try{audio.prefetch(q.script,{contentType:'listening',speed:1.0})}catch(_){}
    const lPolicy=listeningAdaptivePolicy();
    try{q.__listeningPolicy=lPolicy}catch{}
    let currentListenSpeed=lPolicy?.rateBand==='slow'?0.8:(lPolicy?.rateBand==='fast'?1.1:1.0);

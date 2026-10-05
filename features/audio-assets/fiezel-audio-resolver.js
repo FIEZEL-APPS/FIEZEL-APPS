@@ -19,6 +19,8 @@
   var SCHEMA = 'fiezel-audio-resolver-v1';
   var CACHE_NAME = 'fiezel-r2-audio-v1';
   var STATE = Object.freeze({ ABSENT: 'ABSENT', READY: 'READY', FAILED: 'FAILED' });
+  var MEM_CACHE_LIMIT = 80;
+  var memCache = new Map();
 
   var metrics = {
     lookups: 0,
@@ -193,29 +195,71 @@
    * CORS aman di sini karena Worker R2 memang menyajikan 'access-control-allow-origin: *'
    * beserta 'vary: origin'. Aset ini publik dan tidak membawa kredensial.
    */
+  function cacheInMemory(url, blob) {
+    if (!blob || !blob.size || !root.URL || typeof root.URL.createObjectURL !== 'function') return null;
+    if (memCache.has(url)) {
+      var existing = memCache.get(url);
+      memCache.delete(url);
+      memCache.set(url, existing);
+      return existing;
+    }
+    try {
+      var obj = root.URL.createObjectURL(blob);
+      if (memCache.size >= MEM_CACHE_LIMIT) {
+        var oldest = memCache.keys().next().value;
+        var oldVal = memCache.get(oldest);
+        memCache.delete(oldest);
+        try { root.URL.revokeObjectURL(oldVal); } catch (_) {}
+      }
+      memCache.set(url, obj);
+      return obj;
+    } catch (_) { return null; }
+  }
+
   function loadForPlayback(url) {
     return cachedResponse(url).then(function (cached) {
-      if (cached) return cached;
+      if (cached) {
+        var copy;
+        try { copy = cached.clone(); } catch (_) { copy = null; }
+        if (copy && typeof copy.blob === 'function') {
+          copy.blob().then(function (blob) {
+            cacheInMemory(url, blob);
+          }).catch(function () {});
+        }
+        return cached;
+      }
       var f = root.fetch;
       if (typeof f !== 'function') return null;
       return f(url, { cache: 'force-cache' }).then(function (response) {
         if (!response || !response.ok) return null;
+        var copy;
+        try { copy = response.clone(); } catch (_) { copy = null; }
         storeResponse(url, response);
+        if (copy && typeof copy.blob === 'function') {
+          copy.blob().then(function (blob) {
+            cacheInMemory(url, blob);
+          }).catch(function () {});
+        }
         return response;
       }).catch(function () { return null; });
     });
   }
 
-  function responseToObjectUrl(response) {
+  function responseToObjectUrl(response, url) {
+    if (url && memCache.has(url)) return Promise.resolve(memCache.get(url));
     if (!response || typeof response.blob !== 'function') return Promise.resolve(null);
     return response.blob().then(function (blob) {
       if (!blob || !blob.size) return null;
+      if (url) {
+        var mem = cacheInMemory(url, blob);
+        if (mem) return mem;
+      }
       try { return root.URL.createObjectURL(blob); } catch (_) { return null; }
     }).catch(function () { return null; });
   }
 
   /**
-   * Mengisi cache persisten DI BELAKANG LAYAR, sesudah aset selesai terdengar. Tidak pernah
+   * Mengisi cache persisten DI BELAKANG LAYAR. Tidak pernah
    * melempar dan tidak ditunggu siapa pun: gagal menyimpan hanya berarti pemutaran berikutnya
    * mengalir dari R2 lagi.
    */
@@ -250,8 +294,16 @@
       }
       el.__fiezelSettle = finish;
       el.__fiezelGuard = root.setTimeout(function () { finish(false); }, 10000);
-      el.addEventListener('playing', function () { try { root.clearTimeout(el.__fiezelGuard); } catch (_) {} });
+      el.addEventListener('playing', function () {
+        try { root.clearTimeout(el.__fiezelGuard); } catch (_) {}
+        if (warmUrl) {
+          var toWarm = warmUrl;
+          warmUrl = '';
+          warmCache(toWarm);
+        }
+      });
       el.preload = 'auto';
+      try { el.crossOrigin = 'anonymous'; } catch (_) {}
       if (typeof opts.speed === 'number' && opts.speed > 0) el.playbackRate = opts.speed;
       if (typeof opts.onProgress === 'function') {
         el.addEventListener('timeupdate', function () {
@@ -273,12 +325,12 @@
         metrics.playFailures++;
         return false;
       }
-      return responseToObjectUrl(response).then(function (objectUrl) {
+      return responseToObjectUrl(response, url).then(function (objectUrl) {
         if (!objectUrl) {
           metrics.playFailures++;
           return false;
         }
-        return playSource(Ctor, objectUrl, true, opts, '', true).then(function (res) {
+        return playSource(Ctor, objectUrl, false, opts, '', true).then(function (res) {
           return res.ok;
         });
       });
@@ -286,9 +338,10 @@
   }
 
   function streamWithBlobFallback(Ctor, url, opts) {
-    // Jalur streaming langsung: countFailures false agar kegagalan awal tidak mendua
-    // bila jalur blob fallback berhasil.
-    return playSource(Ctor, url, false, opts, url, false).then(function (res) {
+    // Jalur streaming langsung: langsung hangatkan cache persisten di latar belakang
+    warmCache(url);
+    // countFailures false agar kegagalan awal tidak mendua bila jalur blob fallback berhasil.
+    return playSource(Ctor, url, false, opts, '', false).then(function (res) {
       if (res.ok) return true;
       if (res.stopped) return false;
       return playBlobFallback(Ctor, url, opts);
@@ -297,9 +350,9 @@
 
   /**
    * Pemutaran audio aset R2:
-   *  - cache persisten KENA  -> putar dari blob lokal (seketika, juga saat luring).
-   *  - cache persisten LUPUT -> streaming langsung (`el.src = url`).
-   *    Sesudah 'ended' sukses, cache dihangatkan di latar belakang lewat loadForPlayback().
+   *  - in-memory cache KENA -> putar instan dari URL objek blob (<10ms).
+   *  - cache persisten KENA  -> bangun URL objek dan putar dari blob lokal.
+   *  - cache persisten LUPUT -> streaming langsung (`el.src = url`) + hangatkan di latar belakang.
    *    Jika streaming gagal ('error' / play() ditolak / timeout), coba SEKALI jalur blob
    *    lama sebagai jaring pengaman sebelum menjawab false.
    */
@@ -309,11 +362,20 @@
     if (typeof Ctor !== 'function') return Promise.resolve(false);
     stop();
 
+    if (memCache.has(url)) {
+      var memObjUrl = memCache.get(url);
+      memCache.delete(url);
+      memCache.set(url, memObjUrl);
+      return playSource(Ctor, memObjUrl, false, opts, '', true).then(function (res) {
+        return res.ok;
+      });
+    }
+
     return cachedResponse(url).then(function (cached) {
       if (cached) {
-        return responseToObjectUrl(cached).then(function (objectUrl) {
+        return responseToObjectUrl(cached, url).then(function (objectUrl) {
           if (objectUrl) {
-            return playSource(Ctor, objectUrl, true, opts, '', true).then(function (res) {
+            return playSource(Ctor, objectUrl, false, opts, '', true).then(function (res) {
               return res.ok;
             });
           }
@@ -334,6 +396,7 @@
   function prefetch(request) {
     return resolve(request).then(function (result) {
       if (result.state !== STATE.READY) return false;
+      if (memCache.has(result.url)) return true;
       var f = root.fetch;
       if (typeof f !== 'function') return false;
       // Mode yang sama dengan loadForPlayback. Kalau keduanya berbeda, prefetch mengisi
@@ -341,7 +404,14 @@
       // pemanggil melewati prefetch mesin runtime untuk kalimat yang tetap belum siap.
       return f(result.url, { cache: 'force-cache' }).then(function (res) {
         if (!res || !res.ok) return false;
+        var copy;
+        try { copy = res.clone(); } catch (_) { copy = null; }
         storeResponse(result.url, res);
+        if (copy && typeof copy.blob === 'function') {
+          copy.blob().then(function (blob) {
+            cacheInMemory(result.url, blob);
+          }).catch(function () {});
+        }
         return true;
       }).catch(function () { return false; });
     });
@@ -356,6 +426,7 @@
       voiceProfiles: voiceProfiles(),
       metrics: Object.freeze(Object.assign({}, metrics)),
       playing: !!current,
+      inMemoryCacheSize: memCache.size,
       persistentCache: Object.freeze({ name: CACHE_NAME, supported: cacheSupported() })
     });
   }
