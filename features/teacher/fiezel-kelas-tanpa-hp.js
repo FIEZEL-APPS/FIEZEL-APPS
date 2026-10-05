@@ -155,7 +155,9 @@
   /**
    * Nilai dari kertas: { sid: jumlahBenar }. Murid yang sudah mengerjakan lewat aplikasi TIDAK
    * ditimpa — bukti per soal dari aplikasi lebih kaya daripada satu angka dari kertas.
-   * Mengembalikan jumlah murid yang tercatat.
+   * Kotak yang DIKOSONGKAN menghapus nilai kertas yang sudah tersimpan (salah input, murid
+   * ternyata absen); hasil dari aplikasi tetap tidak tersentuh.
+   * Mengembalikan jumlah murid yang tercatat atau dihapus.
    */
   function recordPaperScores(c, a, scores, now) {
     if (!c || !a || !scores) return 0;
@@ -166,7 +168,10 @@
     (c.students || []).forEach(function (s) {
       if (!Object.prototype.hasOwnProperty.call(scores, s.id)) return;
       var raw = scores[s.id];
-      if (raw === '' || raw == null) return;
+      if (raw === '' || raw == null) {
+        if (a.done[s.id] && a.done[s.id].src === 'kertas') { delete a.done[s.id]; n++; }
+        return;
+      }
       var benar = Math.round(Number(raw));
       if (!isFinite(benar) || benar < 0 || benar > total) return;
       if (a.done[s.id] && a.done[s.id].src !== 'kertas') return;

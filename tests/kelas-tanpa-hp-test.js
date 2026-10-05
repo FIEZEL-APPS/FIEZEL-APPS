@@ -74,6 +74,9 @@ check('K4 nilai kertas tervalidasi dan tidak menimpa hasil aplikasi', () => {
   assert.strictEqual(a2.done.s3.src, undefined, 'hasil aplikasi tidak ditimpa');
   assert.strictEqual(K.recordPaperScores(c2, a2, { s1: '6' }, 2000), 1, 'nilai kertas boleh dikoreksi');
   assert.strictEqual(a2.done.s1.c, 6);
+  assert.strictEqual(K.recordPaperScores(c2, a2, { s1: '', s2: '', s3: '' }, 3000), 1, 'kotak kosong menghapus nilai kertas saja');
+  assert.ok(!a2.done.s1, 'nilai kertas yang salah input bisa dihapus');
+  assert.ok(a2.done.s3 && a2.done.s3.c === 3, 'hasil aplikasi tidak ikut terhapus');
 });
 
 check('K5 pemanasan: paling banyak salah dulu; tanpa data pakai keterampilan terlemah', () => {

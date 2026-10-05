@@ -80,6 +80,31 @@ check('R5 CSV e-Rapor: suntingan guru menang, kutip aman', () => {
   assert.ok(lines[2].includes('"Budi ""Bud"", Jr"'));
 });
 
+check('R8 nilai kertas (Kelas Tanpa HP) masuk rapor', () => {
+  global.FiezelKelasTanpaHP = require(path.join(__fzRoot, 'features/teacher/fiezel-kelas-tanpa-hp.js'));
+  const B = global.FiezelReviewBank;
+  const pt = B.pickFresh('past_tense', 4, { seed: 3 }).map((q) => q.id);
+  const vc = B.pickFresh('vocab_a2', 4, { seed: 3 }).map((q) => q.id);
+  const k = {
+    name: '7B',
+    students: [{ id: 'x', name: 'Tono', results: [] }],
+    assignments: [
+      { id: 'p1', skills: ['past_tense'], itemIds: pt, done: { x: { c: 3, t: 4, src: 'kertas' } } },
+      { id: 'p2', skills: ['past_tense', 'vocab_a2'], itemIds: pt.concat(vc), done: { x: { c: 6, t: 8, src: 'kertas' } } },
+      { id: 'p3', skills: ['past_tense'], itemIds: pt, done: { x: { c: 4, t: 4, at: 1, w: [] } } }
+    ]
+  };
+  assert.deepStrictEqual(R.daftarTP(k), ['past_tense', 'vocab_a2'], 'TP lahir dari nilai kertas');
+  const r = R.raporMurid(k, k.students[0]);
+  const rp = r.rows.find((x) => x.skill === 'past_tense'), rv = r.rows.find((x) => x.skill === 'vocab_a2');
+  assert.strictEqual(rp.n, 8, 'p1 utuh + separuh p2; hasil aplikasi p3 tidak dihitung dua kali');
+  assert.strictEqual(rp.acc, 6 / 8);
+  assert.strictEqual(rv.n, 4);
+  assert.strictEqual(rv.tingkat, 'kurang-data', 'separuh lembar kertas (4 soal) belum cukup bukti untuk TP sendiri');
+  assert.ok(r.nilai != null, 'murid tanpa HP tetap punya nilai rapor');
+  delete global.FiezelKelasTanpaHP;
+});
+
 check('R6 KKM 75 tidak lagi tertanam di layar guru', () => {
   const shell = read('features/teacher/fiezel-teacher-shell.js');
   assert.ok(!/KKM 75/.test(shell.replace(/\/\*[\s\S]*?\*\//g, '')), 'masih ada "KKM 75" di kode yang tampil');

@@ -82,11 +82,36 @@
     return (sk && (sk.short || sk.label)) || String(skill || '').replace(/[_-]+/g, ' ');
   }
 
-  /** TP kelas: keterampilan yang punya bukti pada minimal satu murid, urut stabil. */
-  function daftarTP(c) {
+  /**
+   * Bukti dari NILAI KERTAS (R1, `a.done[sid].src === 'kertas'`). Kertas hanya memberi jumlah
+   * benar, tanpa rincian per soal, jadi jumlah itu dibagi ke keterampilan tugas menurut porsi
+   * soalnya (tugas satu keterampilan = utuh ke keterampilan itu). Tanpa ini, kelas yang memakai
+   * Kelas Tanpa HP tidak pernah punya rapor: `s.results` hanya terisi dari HP murid.
+   */
+  function buktiKertas(c, s, env) {
+    var per = {}, K = (env && env.kelas) || (root && root.FiezelKelasTanpaHP);
+    (c && c.assignments || []).forEach(function (a) {
+      var d = a && a.done && s && a.done[s.id];
+      if (!d || d.src !== 'kertas' || !(Number(d.t) > 0)) return;
+      var hitung = {}, jumlah = 0;
+      var items = K && typeof K.resolveItems === 'function' ? K.resolveItems(a, env) : [];
+      items.forEach(function (q) { var k = q.skill || (a.skills || [])[0]; if (k) { hitung[k] = (hitung[k] || 0) + 1; jumlah++; } });
+      if (!jumlah) (a.skills || []).forEach(function (k) { if (k) { hitung[k] = (hitung[k] || 0) + 1; jumlah++; } });
+      Object.keys(hitung).forEach(function (k) {
+        var porsi = hitung[k] / jumlah, p = per[k] || (per[k] = { c: 0, n: 0 });
+        p.c += (Number(d.c) || 0) * porsi; p.n += Number(d.t) * porsi;
+      });
+    });
+    return per;
+  }
+
+  /** TP kelas: keterampilan yang punya bukti (aplikasi atau kertas) pada minimal satu murid, urut stabil. */
+  function daftarTP(c, env) {
     var seen = {}, out = [];
+    function tambah(k) { if (k && !seen[k]) { seen[k] = true; out.push(k); } }
     (c && c.students || []).forEach(function (s) {
-      (s.results || []).forEach(function (r) { if (r && r.skill && r.total > 0 && !seen[r.skill]) { seen[r.skill] = true; out.push(r.skill); } });
+      (s.results || []).forEach(function (r) { if (r && r.total > 0) tambah(r.skill); });
+      Object.keys(buktiKertas(c, s, env)).forEach(tambah);
     });
     return out.sort();
   }
@@ -99,11 +124,13 @@
       var p = per[r.skill] || (per[r.skill] = { c: 0, n: 0 });
       p.c += Number(r.correct) || 0; p.n += Number(r.total) || 0;
     });
-    var rows = daftarTP(c).map(function (k) {
+    var kertas = buktiKertas(c, s, env);
+    Object.keys(kertas).forEach(function (k) { var p = per[k] || (per[k] = { c: 0, n: 0 }); p.c += kertas[k].c; p.n += kertas[k].n; });
+    var rows = daftarTP(c, env).map(function (k) {
       var p = per[k] || { c: 0, n: 0 };
       var cukup = p.n >= MIN_BUKTI;
       var acc = p.n ? p.c / p.n : null;
-      return { skill: k, label: labelTP(k, env), tp: rumusanTP(k, env), acc: cukup ? acc : null, n: p.n, tingkat: tingkat(cukup ? acc : null, kktp) };
+      return { skill: k, label: labelTP(k, env), tp: rumusanTP(k, env), acc: cukup ? acc : null, n: Math.round(p.n * 100) / 100, tingkat: tingkat(cukup ? acc : null, kktp) };
     });
     var dinilai = rows.filter(function (r) { return r.acc != null; });
     var nilai = dinilai.length ? Math.round(dinilai.reduce(function (x, r) { return x + r.acc; }, 0) / dinilai.length * 100) : null;
@@ -159,6 +186,7 @@
     tingkat: tingkat,
     labelTingkat: labelTingkat,
     daftarTP: daftarTP,
+    buktiKertas: buktiKertas,
     raporMurid: raporMurid,
     deskripsi: deskripsi,
     raporKelas: raporKelas,
