@@ -6673,16 +6673,18 @@ details[open] .fz-drawer-arrow {
 /* ==========================================================================
    ANCHORED LUXURY TACTILE CLAY FLOATING BOTTOM NAVIGATION BAR (6 TABS)
    ========================================================================== */
-html.fiezel-ui-v6 nav.bottomnav,
-html.fiezel-ui-v6 .bottomnav,
+html body nav.bottomnav,
+html body .bottomnav,
+html body.fz-lux nav.bottomnav,
+html body.fz-lux .bottomnav,
+html body.fz-view-game nav.bottomnav,
+html body.fz-view-game .bottomnav,
 html body.fz-lang-ja nav.bottomnav,
 html body.fz-lang-ja .bottomnav,
-body.fz-lux nav.bottomnav,
-body.fz-lux .bottomnav,
+html.fiezel-ui-v6 nav.bottomnav,
+html.fiezel-ui-v6 .bottomnav,
 body:has(.home-today) nav.bottomnav,
 body:has(.home-today) .bottomnav,
-body.fz-view-game nav.bottomnav,
-body.fz-view-game .bottomnav,
 .home-today ~ .bottomnav {
   position: fixed !important;
   top: auto !important;
@@ -6693,9 +6695,7 @@ body.fz-view-game .bottomnav,
   width: min(500px, calc(100% - 20px)) !important;
   max-width: 500px !important;
   margin: 0 !important;
-  background: rgba(255, 255, 255, 0.96) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
+  background: rgba(255, 255, 255, 0.98) !important;
   border-radius: 24px !important;
   border: 2px solid #E2E8F0 !important;
   box-shadow: 0 6px 0 #CBD5E1, 0 16px 32px rgba(15, 23, 42, 0.08) !important;
@@ -6704,7 +6704,7 @@ body.fz-view-game .bottomnav,
   grid-template-columns: repeat(6, 1fr) !important;
   align-items: center !important;
   gap: 2px !important;
-  z-index: 200 !important;
+  z-index: 1000 !important;
   box-sizing: border-box !important;
 }
 
@@ -6738,6 +6738,7 @@ body.fz-lesson-mode .bottomnav {
 
 html body.fz-lang-ja nav.bottomnav .nav,
 html body.fz-lang-ja .bottomnav .nav,
+html body nav.bottomnav .nav,
 html body .bottomnav .nav,
 html body.fz-lux nav.bottomnav .nav,
 html body:has(.home-today) .bottomnav .nav {
@@ -6759,10 +6760,20 @@ html body:has(.home-today) .bottomnav .nav {
   cursor: pointer !important;
   overflow: visible !important;
   box-sizing: border-box !important;
+  transform: none !important;
+}
+
+/* Kill older pseudo-elements like yellow oval pill ::after */
+html body nav.bottomnav .nav::after,
+html body .bottomnav .nav::after,
+nav.bottomnav .nav::after,
+.bottomnav .nav::after {
+  display: none !important;
 }
 
 html body.fz-lang-ja nav.bottomnav .nav span,
 html body.fz-lang-ja .bottomnav .nav span,
+html body nav.bottomnav .nav span,
 html body .bottomnav .nav span,
 nav.bottomnav .nav span,
 .bottomnav .nav span {
@@ -6780,6 +6791,7 @@ nav.bottomnav .nav span,
 
 html body.fz-lang-ja nav.bottomnav .nav .fz-i,
 html body.fz-lang-ja .bottomnav .nav .fz-i,
+html body nav.bottomnav .nav .fz-i,
 html body .bottomnav .nav .fz-i,
 nav.bottomnav .nav .fz-i,
 .bottomnav .nav .fz-i {
@@ -6793,10 +6805,12 @@ nav.bottomnav .nav .fz-i,
   justify-content: center !important;
   --fz-i-fill: #E2E8F0 !important;
   --fz-i-line: #64748B !important;
+  margin-top: 0 !important;
 }
 
 html body.fz-lang-ja nav.bottomnav .nav svg,
 html body.fz-lang-ja .bottomnav .nav svg,
+html body nav.bottomnav .nav svg,
 html body .bottomnav .nav svg,
 html body .bottomnav .nav i,
 nav.bottomnav .nav svg,
@@ -6822,6 +6836,7 @@ html body:has(.home-today) .bottomnav .nav.active {
   border-radius: 14px !important;
   border: 1.5px solid #F59E0B !important;
   box-shadow: 0 2px 0 #D97706 !important;
+  transform: none !important;
 }
 
 html body.fz-lang-ja nav.bottomnav .nav.active span,
@@ -6837,14 +6852,17 @@ nav.bottomnav .nav.active span,
 html body.fz-lang-ja nav.bottomnav .nav.active .fz-i,
 html body.fz-lang-ja .bottomnav .nav.active .fz-i,
 html body nav.bottomnav .nav.active .fz-i,
+html body .bottomnav .nav.active .fz-i,
 nav.bottomnav .nav.active .fz-i,
 .bottomnav .nav.active .fz-i {
   --fz-i-fill: #FFD21E !important;
   --fz-i-line: #92400E !important;
-  filter: drop-shadow(0 1px 3px rgba(245, 158, 11, 0.35)) !important;
+  filter: drop-shadow(0 1px 3px rgba(245, 158, 11, 0.4)) !important;
 }
 
 /* KelasKu emerald active */
+html body nav.bottomnav .nav[data-view="classroom"].active,
+html body .bottomnav .nav[data-view="classroom"].active,
 nav.bottomnav .nav[data-view="classroom"].active,
 .bottomnav .nav[data-view="classroom"].active {
   background: #EAF5F1 !important;
@@ -6853,17 +6871,722 @@ nav.bottomnav .nav[data-view="classroom"].active,
   color: #047857 !important;
 }
 
+html body nav.bottomnav .nav[data-view="classroom"].active span,
+html body .bottomnav .nav[data-view="classroom"].active span,
 nav.bottomnav .nav[data-view="classroom"].active span,
 .bottomnav .nav[data-view="classroom"].active span {
   color: #047857 !important;
   font-weight: 800 !important;
 }
 
+html body nav.bottomnav .nav[data-view="classroom"].active .fz-i,
+html body .bottomnav .nav[data-view="classroom"].active .fz-i,
 nav.bottomnav .nav[data-view="classroom"].active .fz-i,
 .bottomnav .nav[data-view="classroom"].active .fz-i {
   --fz-i-fill: #A7F3D0 !important;
   --fz-i-line: #047857 !important;
   filter: drop-shadow(0 1px 3px rgba(16, 185, 129, 0.35)) !important;
+}
+
+/* ==========================================================================
+   SELF-CONTAINED GAME HUB & POSTER CARDS (ARCADE, PAW ARENA, BUG RAID)
+   ========================================================================== */
+.game-hub-container {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 18px !important;
+  padding: 12px 14px 100px !important;
+  width: 100% !important;
+  max-width: 580px !important;
+  margin: 0 auto !important;
+  box-sizing: border-box !important;
+}
+
+.game-hub-top-nav {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  margin: 4px 0 14px !important;
+  padding: 0 2px !important;
+}
+
+.game-back-pill {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  background: #FFFFFF !important;
+  border: 1.5px solid #E2E8F0 !important;
+  border-radius: 14px !important;
+  padding: 7px 15px !important;
+  font-family: var(--font-sans) !important;
+  font-size: 13.5px !important;
+  font-weight: 800 !important;
+  color: #0F172A !important;
+  box-shadow: 0 3px 0 #CBD5E1 !important;
+  cursor: pointer !important;
+  transition: transform 0.12s ease, box-shadow 0.12s ease !important;
+}
+
+.game-back-pill:active {
+  transform: translateY(2px) !important;
+  box-shadow: 0 1px 0 #CBD5E1 !important;
+}
+
+.game-back-pill svg {
+  stroke: #0F172A !important;
+}
+
+.game-quick-badges {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.game-badge-trophy, .game-badge-flame {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  background: #FFFFFF !important;
+  border: 1.5px solid #E2E8F0 !important;
+  border-radius: 12px !important;
+  padding: 6px 12px !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  color: #0F172A !important;
+  box-shadow: 0 2px 0 #E2E8F0 !important;
+}
+
+.game-badge-trophy i, .game-badge-trophy svg {
+  color: #F59E0B !important;
+  width: 15px !important;
+  height: 15px !important;
+}
+
+.game-badge-flame .fz-i {
+  --fz-i-fill: #FED7AA !important;
+  --fz-i-line: #EA580C !important;
+  width: 16px !important;
+  height: 16px !important;
+}
+
+.game-hub-header-titles {
+  margin: 0 0 16px !important;
+  padding: 0 2px !important;
+}
+
+.game-hub-header-titles .game-brand-heading {
+  font-size: 24px !important;
+  font-weight: 900 !important;
+  color: #0F172A !important;
+  -webkit-text-fill-color: #0F172A !important;
+  letter-spacing: -0.02em !important;
+  margin: 0 !important;
+  line-height: 1.15 !important;
+}
+
+.game-hub-header-titles .game-brand-sub {
+  font-size: 13px !important;
+  color: #64748B !important;
+  -webkit-text-fill-color: #64748B !important;
+  margin: 4px 0 0 !important;
+  line-height: 1.4 !important;
+}
+
+/* PAW ARENA POSTER CARD */
+.game-poster-card {
+  position: relative !important;
+  background:
+    radial-gradient(110% 120% at 90% 10%, rgba(255, 170, 0, 0.45) 0%, rgba(168, 85, 247, 0.3) 40%, transparent 70%),
+    radial-gradient(90% 90% at 10% 90%, rgba(59, 130, 246, 0.35) 0%, transparent 65%),
+    linear-gradient(145deg, #090514 0%, #150B33 35%, #231245 70%, #381259 100%) !important;
+  border-radius: 24px !important;
+  border: 2px solid rgba(255, 215, 0, 0.55) !important;
+  box-shadow: 0 18px 44px -8px rgba(112, 0, 255, 0.48), 0 0 28px rgba(255, 180, 0, 0.25), inset 0 2px 0 rgba(255, 255, 255, 0.35), inset 0 -4px 14px rgba(0, 0, 0, 0.7) !important;
+  color: #FFFFFF !important;
+  overflow: hidden !important;
+  cursor: pointer !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 16px !important;
+  padding: 24px 20px 22px !important;
+}
+
+.game-poster-card:active {
+  transform: translateY(2px) !important;
+  box-shadow: 0 8px 24px -4px rgba(112, 0, 255, 0.45), 0 0 16px rgba(255, 180, 0, 0.2) !important;
+}
+
+.poster-cyber-grid {
+  position: absolute !important;
+  inset: 0 !important;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px) !important;
+  background-size: 20px 20px !important;
+  pointer-events: none !important;
+  mask-image: radial-gradient(ellipse at 80% 20%, black 40%, transparent 80%) !important;
+  -webkit-mask-image: radial-gradient(ellipse at 80% 20%, black 40%, transparent 80%) !important;
+}
+
+.poster-light-ray {
+  position: absolute !important;
+  top: -30px !important;
+  right: -20px !important;
+  width: 170px !important;
+  height: 170px !important;
+  border-radius: 50% !important;
+  background: radial-gradient(circle, rgba(255, 220, 50, 0.35) 0%, transparent 70%) !important;
+  pointer-events: none !important;
+}
+
+.poster-badge-row {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+.poster-kicker {
+  background: linear-gradient(90deg, rgba(239, 68, 68, 0.35), rgba(245, 158, 11, 0.35)) !important;
+  border: 1.5px solid #F59E0B !important;
+  color: #FFE57F !important;
+  -webkit-text-fill-color: #FFE57F !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.05em !important;
+  padding: 4px 12px !important;
+  border-radius: 20px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  box-shadow: 0 0 14px rgba(245, 158, 11, 0.35) !important;
+  text-transform: uppercase !important;
+}
+
+.poster-kicker svg {
+  width: 14px !important;
+  height: 14px !important;
+  stroke: #FFE57F !important;
+}
+
+.poster-live-tag {
+  background: rgba(34, 197, 94, 0.2) !important;
+  border: 1px solid rgba(74, 222, 128, 0.5) !important;
+  color: #86EFAC !important;
+  -webkit-text-fill-color: #86EFAC !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  padding: 4px 11px !important;
+  border-radius: 20px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+.live-pulse-dot {
+  width: 7px !important;
+  height: 7px !important;
+  border-radius: 50% !important;
+  background: #22C55E !important;
+  box-shadow: 0 0 10px #22C55E !important;
+}
+
+.poster-body {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  position: relative !important;
+  z-index: 2 !important;
+  gap: 12px !important;
+}
+
+.poster-titles {
+  flex: 1 !important;
+}
+
+.poster-sub-brand {
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase !important;
+  color: #FBBF24 !important;
+  -webkit-text-fill-color: #FBBF24 !important;
+  display: block !important;
+  margin-bottom: 3px !important;
+}
+
+.poster-main-title {
+  font-size: 26px !important;
+  font-weight: 900 !important;
+  line-height: 1.1 !important;
+  margin: 0 0 8px !important;
+  letter-spacing: 0.03em !important;
+  text-transform: uppercase !important;
+  background: linear-gradient(180deg, #FFFFFF 0%, #FFF3B0 35%, #FFD000 70%, #FF8800 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  filter: drop-shadow(0 3px 10px rgba(255, 136, 0, 0.5)) !important;
+}
+
+.poster-tagline {
+  font-size: 12.5px !important;
+  line-height: 1.45 !important;
+  color: #CBD5E1 !important;
+  -webkit-text-fill-color: #CBD5E1 !important;
+  margin: 0 !important;
+}
+
+.poster-graphic {
+  flex-shrink: 0 !important;
+  filter: drop-shadow(0 8px 20px rgba(255, 170, 0, 0.45)) !important;
+}
+
+.poster-modes-strip {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+.poster-mode-pill {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  padding: 5px 12px !important;
+  border-radius: 12px !important;
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  color: #F1F5F9 !important;
+  -webkit-text-fill-color: #F1F5F9 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+.poster-mode-pill svg {
+  width: 12px !important;
+  height: 12px !important;
+  stroke: #FBBF24 !important;
+}
+
+.poster-cta-wrap {
+  position: relative !important;
+  z-index: 2 !important;
+  margin-top: 4px !important;
+}
+
+.poster-action-btn {
+  width: 100% !important;
+  background: linear-gradient(180deg, #FFE033 0%, #FFB300 50%, #FF8000 100%) !important;
+  border: 2px solid #FFF3B0 !important;
+  border-radius: 16px !important;
+  padding: 13px 24px !important;
+  color: #2D0C00 !important;
+  -webkit-text-fill-color: #2D0C00 !important;
+  font-family: var(--font-sans) !important;
+  font-size: 14px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px !important;
+  box-shadow: 0 6px 0 #9E4500, 0 14px 28px rgba(255, 128, 0, 0.5) !important;
+  cursor: pointer !important;
+  transition: all 0.12s ease !important;
+  box-sizing: border-box !important;
+}
+
+.poster-action-btn:active {
+  transform: translateY(3px) !important;
+  box-shadow: 0 3px 0 #9E4500, 0 6px 14px rgba(255, 128, 0, 0.4) !important;
+}
+
+.poster-action-btn svg {
+  width: 17px !important;
+  height: 17px !important;
+  stroke: #2D0C00 !important;
+  stroke-width: 2.8 !important;
+}
+
+.paw-action-btn {
+  background: linear-gradient(180deg, #FFE033 0%, #FFB300 50%, #FF8000 100%) !important;
+  border: 2px solid #FFF3B0 !important;
+  color: #2D0C00 !important;
+  -webkit-text-fill-color: #2D0C00 !important;
+  box-shadow: 0 6px 0 #9E4500, 0 14px 28px rgba(255, 128, 0, 0.5) !important;
+}
+
+.paw-action-btn span {
+  color: #2D0C00 !important;
+  -webkit-text-fill-color: #2D0C00 !important;
+  font-weight: 900 !important;
+}
+
+/* BUG ARENA BOSS RAID POSTER CARD */
+.bug-poster-card {
+  position: relative !important;
+  background:
+    radial-gradient(110% 120% at 85% 15%, rgba(239, 68, 68, 0.45) 0%, rgba(185, 28, 28, 0.3) 45%, rgba(15, 23, 42, 0.95) 85%),
+    radial-gradient(90% 90% at 10% 90%, rgba(220, 38, 38, 0.3) 0%, transparent 65%),
+    linear-gradient(155deg, #180306 0%, #28070E 35%, #350812 70%, #150205 100%) !important;
+  border-radius: 24px !important;
+  border: 2px solid rgba(239, 68, 68, 0.65) !important;
+  box-shadow: 0 18px 44px -8px rgba(220, 38, 38, 0.45), 0 0 28px rgba(239, 68, 68, 0.22), inset 0 2px 0 rgba(255, 255, 255, 0.3), inset 0 -4px 14px rgba(0, 0, 0, 0.7) !important;
+  color: #FFFFFF !important;
+  overflow: hidden !important;
+  cursor: pointer !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 16px !important;
+  padding: 24px 20px 22px !important;
+}
+
+.bug-poster-card:active {
+  transform: translateY(2px) !important;
+  box-shadow: 0 8px 24px -4px rgba(220, 38, 38, 0.4), 0 0 16px rgba(239, 68, 68, 0.18) !important;
+}
+
+.poster-magma-glow {
+  position: absolute !important;
+  top: -30px !important;
+  right: -20px !important;
+  width: 170px !important;
+  height: 170px !important;
+  border-radius: 50% !important;
+  background: radial-gradient(circle, rgba(239, 68, 68, 0.4) 0%, transparent 70%) !important;
+  pointer-events: none !important;
+}
+
+.bug-kicker {
+  background: linear-gradient(90deg, rgba(220, 38, 38, 0.4), rgba(239, 68, 68, 0.35)) !important;
+  border: 1.5px solid #EF4444 !important;
+  color: #FCA5A5 !important;
+  -webkit-text-fill-color: #FCA5A5 !important;
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.35) !important;
+}
+
+.poster-threat-tag {
+  background: rgba(239, 68, 68, 0.22) !important;
+  border: 1px solid rgba(248, 113, 113, 0.6) !important;
+  color: #FCA5A5 !important;
+  -webkit-text-fill-color: #FCA5A5 !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  padding: 4px 11px !important;
+  border-radius: 20px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+.threat-pulse-dot {
+  width: 7px !important;
+  height: 7px !important;
+  border-radius: 50% !important;
+  background: #EF4444 !important;
+  box-shadow: 0 0 10px #EF4444 !important;
+}
+
+.bug-sub-brand {
+  color: #FCA5A5 !important;
+  -webkit-text-fill-color: #FCA5A5 !important;
+}
+
+.bug-title {
+  background: linear-gradient(180deg, #FFFFFF 0%, #FED7AA 35%, #F87171 70%, #DC2626 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  filter: drop-shadow(0 3px 10px rgba(220, 38, 38, 0.6)) !important;
+}
+
+.bug-boss-graphic {
+  filter: drop-shadow(0 8px 24px rgba(220, 38, 38, 0.55)) !important;
+}
+
+.boss-hp-stack {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  position: relative !important;
+  z-index: 2 !important;
+  background: rgba(0, 0, 0, 0.32) !important;
+  border: 1px solid rgba(239, 68, 68, 0.35) !important;
+  border-radius: 16px !important;
+  padding: 12px 14px !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+.boss-hp-unit {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+}
+
+.boss-hp-meta {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: baseline !important;
+  gap: 8px !important;
+}
+
+.boss-hp-meta .boss-name {
+  font-size: 12.5px !important;
+  color: #F1F5F9 !important;
+}
+
+.boss-hp-meta .boss-name b {
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+  display: inline-block !important;
+  margin-right: 4px !important;
+}
+
+.boss-hp-meta .boss-name small {
+  color: #FCA5A5 !important;
+  font-size: 11px !important;
+  font-style: italic !important;
+}
+
+.boss-hp-badge {
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  padding: 2px 7px !important;
+  border-radius: 6px !important;
+  letter-spacing: 0.02em !important;
+}
+
+.boss-hp-badge.crimson {
+  background: rgba(220, 38, 38, 0.35) !important;
+  border: 1px solid #EF4444 !important;
+  color: #FCA5A5 !important;
+}
+
+.boss-hp-badge.amber {
+  background: rgba(217, 119, 6, 0.35) !important;
+  border: 1px solid #F59E0B !important;
+  color: #FDE68A !important;
+}
+
+.boss-hp-track {
+  width: 100% !important;
+  height: 8px !important;
+  border-radius: 6px !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  overflow: hidden !important;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4) !important;
+}
+
+.boss-hp-bar {
+  height: 100% !important;
+  border-radius: 6px !important;
+  transition: width 0.4s ease !important;
+}
+
+.boss-hp-bar.crimson {
+  background: linear-gradient(90deg, #DC2626, #EF4444, #F87171) !important;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.7) !important;
+}
+
+.boss-hp-bar.amber {
+  background: linear-gradient(90deg, #D97706, #F59E0B, #FDE68A) !important;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.7) !important;
+}
+
+.bug-raid-action-btn {
+  background: linear-gradient(180deg, #EF4444 0%, #DC2626 50%, #991B1B 100%) !important;
+  border: 2px solid #FCA5A5 !important;
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  box-shadow: 0 6px 0 #7F1D1D, 0 14px 28px rgba(220, 38, 38, 0.45) !important;
+  font-family: var(--font-sans) !important;
+  font-size: 13.5px !important;
+  font-weight: 800 !important;
+  box-sizing: border-box !important;
+}
+
+.bug-raid-action-btn:active {
+  box-shadow: 0 3px 0 #7F1D1D, 0 6px 14px rgba(220, 38, 38, 0.35) !important;
+}
+
+.bug-raid-action-btn span {
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  font-weight: 800 !important;
+}
+
+.bug-raid-action-btn svg {
+  stroke: #FFFFFF !important;
+  fill: #FFFFFF !important;
+}
+
+/* ARCADE MINI GAMES */
+.game-section-header {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+  margin-top: 8px !important;
+}
+
+.game-section-header h4 {
+  font-size: 15px !important;
+  font-weight: 800 !important;
+  color: #0F172A !important;
+  -webkit-text-fill-color: #0F172A !important;
+  margin: 0 !important;
+  letter-spacing: -0.01em !important;
+}
+
+.game-section-header .section-sub {
+  font-size: 12px !important;
+  color: #64748B !important;
+  font-weight: 500 !important;
+}
+
+.game-arcade-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 14px !important;
+}
+
+@media (max-width: 540px) {
+  .game-arcade-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+.game-arcade-card {
+  position: relative !important;
+  border-radius: 20px !important;
+  border: 2px solid #E2E8F0 !important;
+  box-shadow: 0 6px 0 var(--card-bevel, #CBD5E1), 0 12px 24px rgba(15, 23, 42, 0.05) !important;
+  padding: 18px 16px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+  cursor: pointer !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+}
+
+.game-arcade-card:active {
+  transform: translateY(3px) !important;
+  box-shadow: 0 3px 0 var(--card-bevel, #CBD5E1), 0 6px 12px rgba(15, 23, 42, 0.06) !important;
+}
+
+.game-arcade-card.mochi-card {
+  background: radial-gradient(120% 120% at 90% 10%, rgba(56, 189, 248, 0.25) 0%, transparent 60%), linear-gradient(150deg, #F0F9FF 0%, #E0F2FE 100%) !important;
+  border-color: #BAE6FD !important;
+  box-shadow: 0 6px 0 #7DD3FC, 0 12px 24px rgba(2, 132, 199, 0.08) !important;
+}
+
+.game-arcade-card.puzzle-card {
+  background: radial-gradient(120% 120% at 90% 10%, rgba(168, 85, 247, 0.25) 0%, transparent 60%), linear-gradient(150deg, #FAF5FF 0%, #F3E8FF 100%) !important;
+  border-color: #DDD6FE !important;
+  box-shadow: 0 6px 0 #C4B5FD, 0 12px 24px rgba(124, 58, 237, 0.08) !important;
+}
+
+.game-arcade-card.voice-card {
+  background: radial-gradient(120% 120% at 90% 10%, rgba(245, 158, 11, 0.25) 0%, transparent 60%), linear-gradient(150deg, #FFFBEB 0%, #FEF3C7 100%) !important;
+  border-color: #FDE68A !important;
+  box-shadow: 0 6px 0 #FCD34D, 0 12px 24px rgba(217, 119, 6, 0.08) !important;
+}
+
+.game-arcade-card.nujum-card {
+  background: radial-gradient(120% 120% at 90% 10%, rgba(239, 68, 68, 0.25) 0%, transparent 60%), linear-gradient(150deg, #FEF2F2 0%, #FEE2E2 100%) !important;
+  border-color: #FECACA !important;
+  box-shadow: 0 6px 0 #FCA5A5, 0 12px 24px rgba(220, 38, 38, 0.08) !important;
+}
+
+.game-arcade-card .arcade-card-top {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+}
+
+.arcade-badge {
+  font-size: 10.5px !important;
+  font-weight: 800 !important;
+  padding: 4px 9px !important;
+  border-radius: 8px !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+}
+
+.game-arcade-card.mochi-card .arcade-badge {
+  background: #E0F2FE !important;
+  color: #0284C7 !important;
+}
+
+.game-arcade-card.puzzle-card .arcade-badge {
+  background: #F3E8FF !important;
+  color: #7C3AED !important;
+}
+
+.game-arcade-card.voice-card .arcade-badge {
+  background: #FEF3C7 !important;
+  color: #D97706 !important;
+}
+
+.game-arcade-card.nujum-card .arcade-badge {
+  background: #FEE2E2 !important;
+  color: #DC2626 !important;
+}
+
+.arcade-card-hero {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+.arcade-icon-wrap {
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: #FFFFFF !important;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.06) !important;
+}
+
+.game-arcade-card.mochi-card .arcade-icon-wrap svg {
+  color: #0284C7 !important;
+}
+
+.game-arcade-card.puzzle-card .arcade-icon-wrap svg {
+  color: #7C3AED !important;
+}
+
+.game-arcade-card.voice-card .arcade-icon-wrap svg {
+  color: #D97706 !important;
+}
+
+.game-arcade-card.nujum-card .arcade-icon-wrap svg {
+  color: #DC2626 !important;
+}
+
+.arcade-card-hero h5 {
+  font-size: 15px !important;
+  font-weight: 800 !important;
+  color: #0F172A !important;
+  -webkit-text-fill-color: #0F172A !important;
+  margin: 0 !important;
+}
+
+.arcade-card-hero p {
+  font-size: 12px !important;
+  color: #64748B !important;
+  -webkit-text-fill-color: #64748B !important;
+  margin: 2px 0 0 !important;
 }
 
 /* ==========================================================================

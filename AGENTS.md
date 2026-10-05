@@ -106,7 +106,7 @@ Setiap kali menyelesaikan fitur, perbaikan bug, konten kuis, atau pembaruan UI/U
 5. **Validasi Mutu & Pemantauan CI Sampai Tuntas**:
    - Jalankan uji lokal sebelum commit: `node tests/id-golden-snapshot-test.js`, `node tests/th-ui-leak-test.js`, `node tests/curriculum-cache-version-test.js`, `node tests/gate-registry-test.js`.
    - Stage HANYA berkas yang terkait rilis (patuhi *Git Protection Rule* untuk aset mockup/redesign).
-   - Push ke `origin/main` dan pantau alur CI GitHub Actions (`gh run watch <run-id>` untuk *FIEZEL Quality Gate* dan *FIEZEL Deploy Site*) sampai 100% HIJAU.
+   - Buat Pull Request (PR) ke branch `main`, lalu pantau alur CI GitHub Actions (`gh run watch <run-id>` untuk *FIEZEL Quality Gate* dan *FIEZEL Deploy Site*) sampai 100% HIJAU sebelum PR digabungkan (merge).
    - Buktikan situs produksi (`https://fiezel.my.id/app/`) telah menyajikan build baru sebelum melapor ke user.
 
 ## Google Stitch Collaboration Rules
@@ -124,4 +124,5 @@ When the user brings a Google Stitch design:
 4. **Design-First, Code-Second**: Always have a clear visual reference before writing code.
 
 ## Git Protection Rule
+- **WAJIB PULL REQUEST (PR)**: Setiap kali ada perbaikan bug, penambahan fitur, atau perubahan apapun yang akan digabungkan (merge) ke branch `main`, **WAJIB membuat Pull Request (PR) terlebih dahulu**. DILARANG KERAS melakukan push atau merge langsung ke `main` tanpa melalui PR.
 - **NEVER COMMIT OR PUSH REDESIGN**: Jangan pernah melakukan `git commit` maupun `git push` untuk seluruh aset, berkas, mockup, dan kode redesign ini ke repositori git tanpa perintah tertulis eksplisit dari pengguna. Seluruh hasil kerja tetap berada di lingkungan lokal/preview.

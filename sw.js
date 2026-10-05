@@ -53,7 +53,7 @@ const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
 // dilayani dan kedua berkas baru tidak pernah sampai ke pengguna lama - aplikasi mereka
 // akan menjalankan app.js baru tanpa berkas benderanya, dan seluruh bendera jatuh ke
 // salinan bawaan di app.js. Naik SEKALI untuk seluruh gelombang.
-const SW_REV='m025-475-unified-grammar-20261002';
+const SW_REV='m025-476-unified-grammar-20261002';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
 // m025-61: health check menanyakan revisi shell langsung ke worker yang sedang aktif.
 // Menebaknya dari nama cache tidak cukup: cache lama bisa tertinggal, sedangkan jawaban ini
@@ -204,8 +204,8 @@ const isLocaleThAsset=request=>{
   }catch{return false}
 };
 const shellScope=String(self.registration?.scope||`${self.location.origin}/`);
-const shellUrls=new Set(ASSETS.map(asset=>new URL(asset,shellScope).href));
-const isShellRequest=request=>request?.mode==='navigate'||shellUrls.has(new URL(request.url).href);
+const shellUrls=new Set(ASSETS.map(asset=>new URL(asset,shellScope).pathname));
+const isShellRequest=request=>request?.mode==='navigate'||(Boolean(request?.url)&&shellUrls.has(new URL(request.url).pathname));
 
 // m025-83 OWNER: "puter jangan dialihkan ke web lagi, itu sangat mengganggu". This USED to
 // be engine-aware: Chromium got strict COOP:same-origin (crossOriginIsolated=true, so the
@@ -406,7 +406,7 @@ self.addEventListener('fetch',e=>{
     // Non-navigation shell assets remain cache-first within this exact generation.
     // Missing shell bytes are refetched into this generation, never borrowed from
     // legacy shell entries that still happen to exist in the stable runtime cache.
-    responsePromise=caches.match(e.request,{cacheName:SHELL_CACHE}).then(c=>c||fetch(e.request).then(r=>{if(r&&r.ok){const copy=r.clone();caches.open(SHELL_CACHE).then(cache=>cache.put(e.request,copy))}return r}));
+    responsePromise=caches.match(e.request,{cacheName:SHELL_CACHE,ignoreSearch:true}).then(c=>c||fetch(e.request).then(r=>{if(r&&r.ok){const copy=r.clone();caches.open(SHELL_CACHE).then(cache=>cache.put(e.request,copy))}return r}));
   }else{
     responsePromise=caches.match(e.request,{cacheName:CACHE}).then(c=>c||fetch(e.request).then(r=>{if(r&&r.ok&&!isNeuralAsset(e.request)){const copy=r.clone();caches.open(CACHE).then(cache=>cache.put(e.request,copy))}return r}));
   }

@@ -112,9 +112,7 @@ nav.bottomnav,
 html body.fz-lux nav.bottomnav,
 html body:not(.fz-teacher-mode) nav.bottomnav,
 html.fiezel-ui-v6 body.fz-lux .bottomnav {
-  background: #FFFFFF !important;
-  border-top: 1.5px solid rgba(94, 20, 32, 0.10) !important;
-  box-shadow: 0 -4px 20px rgba(94, 20, 32, 0.05) !important;
+  /* respect tactile clay floating pill bottomnav */
 }
 
 nav.bottomnav .nav,
@@ -851,9 +849,7 @@ html body nav.bottomnav,
 html body.fz-lux nav.bottomnav,
 html body.fz-lang-ja nav.bottomnav,
 html.fiezel-ui-v6 body nav.bottomnav {
-  background: #FFFFFF !important;
-  border-top: 1.5px solid rgba(94, 20, 32, 0.10) !important;
-  box-shadow: 0 -4px 20px rgba(94, 20, 32, 0.05) !important;
+  /* respect tactile clay floating pill bottomnav */
 }
 
 html body nav.bottomnav .nav,
