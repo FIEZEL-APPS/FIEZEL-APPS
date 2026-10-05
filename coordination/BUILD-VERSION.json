@@ -1,7 +1,7 @@
 {
-  "version": "m025-482",
-  "claimedBy": "branch fix/grammar-have-got-exact2",
-  "claimedAt": "2026-10-05T09:34:05.200Z",
-  "reason": "feat(grammar): sync RUMUS KILAT and A vs B explanations across batches 1-5 and Python sources",
+  "version": "m025-483",
+  "claimedBy": "branch feat/reading-a12-explanations",
+  "claimedAt": "2026-10-05T12:57:44.387Z",
+  "reason": "feat(reading): penjelasan why/whyOthersFail terkurasi untuk 500 soal A1/A2 + sidecar Thai + penjaga locale",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
