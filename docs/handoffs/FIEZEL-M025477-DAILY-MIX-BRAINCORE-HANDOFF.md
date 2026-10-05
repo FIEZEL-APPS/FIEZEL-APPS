@@ -1,7 +1,7 @@
 # Handoff: Daily Mix Interleaving berbasis Braincore (M025-477)
 
 ## Ringkasan Eksekutif
-Sistem "Rencana Hari Ini" di Fiezel Learner Flow telah dirombak. Alih-alih menampilkan *to-do list* yang memaksa murid memilih blok kompetensi (Grammar, Vocabulary, Listening) secara manual, kini UI menampilkan **satu tombol "Mulai Belajar Sekarang"**. 
+Sistem "Rencana Hari Ini" di Fiezel Learner Flow telah dirombak. Alih-alih menampilkan *to-do list* yang memaksa murid memilih blok kompetensi (Grammar, Vocabulary, Listening) secara manual, kini UI menampilkan **satu tombol "Mulai Belajar Sekarang"**.
 
 Di balik layar, sistem secara cerdas menggabungkan alokasi soal dari tiap skill (BKT / FSRS) menjadi satu sesi `mixed` dengan metode *Interleaved Practice* (selang-seling). Ini memberikan pengalaman yang lebih mengalir (*seamless*) ala Duolingo tanpa melanggar otoritas Braincore Engine.
 

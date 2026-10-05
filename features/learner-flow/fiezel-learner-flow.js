@@ -223,7 +223,7 @@
     var ids1 = allocateIds(st, { skill: first.id, count: 5 });
     var ids2 = allocateIds(st, { skill: second.id, count: 5 });
     var ids3 = listen ? allocateIds(st, { skill: listen.id, count: 3 }) : [];
-    
+
     // Interleaving (selang-seling) untuk Daily Mix
     var mixedIds = [];
     var maxLen = Math.max(ids1.length, ids2.length, ids3.length);
@@ -617,13 +617,13 @@
 
   function planView() {
     var plan = ensurePlan(st), B = bank(), doneCount = plan.done.length;
-    
+
     // Cari blok Daily Mix
     var mixBlock = plan.blocks.filter(function (b) { return b.id === 'daily_mix'; })[0];
     var assignBlocks = plan.blocks.filter(function (b) { return b.id !== 'daily_mix'; });
 
     var totalItems = plan.blocks.reduce(function (m, b) { return m + (b.count || (b.itemIds || []).length); }, 0);
-    
+
     var html = '<div class="lf-card lf-plan" data-testid="lf-today-plan"><p class="lf-kicker">Rencana hari ini</p><h2>Rencana hari ini — ' + plan.minutes + ' menit</h2>' +
       '<div class="lf-plan-meta"><div><small>Target hari ini</small><b>' + totalItems + ' soal</b></div>' +
       '<div><small>Durasi</small><b>' + plan.minutes + ' menit</b></div></div>' +
@@ -649,7 +649,7 @@
     }
 
     html += '<div class="lf-assign-code" data-testid="lf-assign-code"><label class="lf-muted" for="lfAssignCode">Punya kode tugas dari guru?</label><div class="lf-actions"><input id="lfAssignCode" class="lf-code lf-code-input" placeholder="Tempel kode tugas di sini" autocomplete="off" data-testid="lf-assign-code-input"><button type="button" class="lf-mini" data-lf="accept-assign" data-testid="lf-accept-assign">Tambahkan ke rencana</button></div></div>' +
-      '<div class="lf-actions">' + 
+      '<div class="lf-actions">' +
       '<button type="button" class="lf-ghost" data-lf="to-skillmap" data-testid="lf-back-skillmap">Lihat peta kemampuan</button></div></div>';
 
     return html;
