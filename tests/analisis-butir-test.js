@@ -52,6 +52,7 @@ check('B3 daya beda & kunci terbalik', () => {
   assert.strictEqual(r3.d, -1); assert.strictEqual(r3.dayaBeda, 'terbalik'); assert.strictEqual(r3.rekomendasi, 'periksa-kunci');
   const kecil = AB.analisis({}, Object.assign({}, a, { done: { x: { c: 3, t: 3, w: [] } } }));
   assert.strictEqual(kecil.rows[0].d, null); assert.strictEqual(kecil.rows[0].dayaBeda, 'kurang-data');
+  assert.ok(kecil.rows.every((r) => r.rekomendasi === 'kurang-data'), 'murid < 10: tidak boleh "layak dipakai lagi"');
 });
 
 check('B4 pengecoh tidak berfungsi', () => {

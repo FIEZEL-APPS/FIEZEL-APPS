@@ -57,7 +57,9 @@
     return 'perbaiki';
   }
   function rekomendasi(r) {
-    if (r.p == null) return 'kurang-data';
+    /* Tanpa daya beda (murid < MIN_DAYA_BEDA) tidak ada dasar untuk menyatakan soal layak:
+       tingkat kesukaran saja tidak membedakan soal yang baik dari soal yang kuncinya keliru. */
+    if (r.p == null || r.dayaBeda === 'kurang-data') return 'kurang-data';
     if (r.dayaBeda === 'terbalik') return 'periksa-kunci';
     if (r.dayaBeda === 'perbaiki' || (r.kesukaran !== 'sedang' && r.dayaBeda === 'cukup')) return 'perbaiki';
     if (r.pengecohMati > 0 && r.n >= MIN_DAYA_BEDA) return 'ganti-pengecoh';
