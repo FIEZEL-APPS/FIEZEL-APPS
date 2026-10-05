@@ -91,7 +91,8 @@ test('pengacakan tidak memihak posisi awal',()=>{
   for(let t=0;t<4000;t++){const s=shuffle(base);count[s[0]]=(count[s[0]]||0)+1}
   const v=Object.values(count);
   assert.equal(v.length,10,'tidak semua soal pernah muncul pertama');
-  assert.ok((Math.max(...v)-Math.min(...v))/4000<0.03,'sebaran posisi pertama timpang: '+v.join('/'));
+  const chi2 = v.reduce((s, c) => s + (c - 400) ** 2 / 400, 0); // 9 derajat bebas
+  assert.ok(chi2 < 40, 'sebaran posisi pertama timpang: ' + v.join('/') + ' (chi2=' + chi2.toFixed(1) + ')'); // p ≈ 4e-6
 });
 test('sesi mengambil soal lewat jalur yang diacak',()=>{
   const src=fs.readFileSync(path.join(feature,'fiezel-speaking-listening-addon.js'),'utf8');
