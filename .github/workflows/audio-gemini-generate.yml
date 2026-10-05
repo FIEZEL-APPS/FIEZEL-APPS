@@ -126,12 +126,12 @@ jobs:
           done
 
           if [ "$pushed" = false ]; then
-            echo "Proteksi branch main aktif. Mendorong ke branch audio-update dan membuat pull request..."
+            echo "Proteksi branch main aktif. Mendorong ke branch audio-update..."
             BRANCH_NAME="audio-update-$(date +%s)"
             git checkout -b "$BRANCH_NAME"
             git push -u origin "$BRANCH_NAME"
+            echo "Branch $BRANCH_NAME berhasil didorong ke remote."
             gh pr create --base main --head "$BRANCH_NAME" \
               --title "Audio: sinkronisasi manifest ($CONTENT via Gemini TTS)" \
-              --body "Aset audio telah berhasil diproduksi dan diverifikasi di Cloudflare R2. PR ini menyinkronkan manifest.json ke branch main."
-            echo "Pull request untuk update manifest berhasil dibuat."
+              --body "Aset audio telah berhasil diproduksi dan diverifikasi di Cloudflare R2. Branch ini menyinkronkan manifest.json ke branch main." || echo "Catatan: PR dapat digabungkan manual atau via auto-merge dari branch $BRANCH_NAME."
           fi
