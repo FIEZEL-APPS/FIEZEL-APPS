@@ -67,6 +67,23 @@ Kontrak:
 3. **Peta kesiapan bukan prediksi.** Status hanya muncul setelah 6 soal per level; tidak ada
    angka peluang lulus.
 
+## R4 — Tugas berbeda per murid (m025-478)
+
+Masalah: contekan PR di grup WA berbentuk "1B 2C 3A", juga jawaban hasil AI yang disalin.
+
+| Bagian | Berkas |
+|---|---|
+| Urutan soal (non-ujian) dan urutan pilihan (soal bank) per murid, berbiji dari id tugas + nama murid | `features/class-hub/fiezel-class-hub.js` (`variantSeed`, `optionPerm`, `optionButtons`, `startRunner`) |
+| Gerbang (menjalankan fungsi asli lewat vm) | `tests/tugas-varian-test.js` |
+
+Kontrak:
+1. **Yang diacak hanya tampilan.** `data-i` tetap indeks pilihan asli, jadi `w[]`, miskonsepsi
+   per pengecoh, pemanasan R1, dan rapor R2 tidak berubah.
+2. **Stabil per murid.** Murid yang membuka ulang tugasnya melihat urutan yang sama.
+3. **Soal tulisan guru tidak diacak pilihannya** ("A dan B benar" bergantung pada urutan).
+   Guru bisa mematikan pengacakan per tugas dengan `variant:false`.
+4. Ini **mempersulit**, bukan mustahilkan, contek: murid masih bisa menyalin teks jawaban.
+
 ## Gerbang Thai yang disesuaikan (keputusan owner, bertanggal)
 
 - `tests/th-coverage-test.js`: `UTANG_TANPA_TH` + `['sekolah', { sejak: '2026-10-05' }]`.
@@ -79,5 +96,5 @@ Kontrak:
 
 ## Belum dikerjakan
 
-R4–R8 (lihat dokumen strategi). Bank TKA target ≥ 60 bacaan; sekarang 16. Pemetaan TP ke Capaian Pembelajaran Fase D resmi belum
+R5–R8 (lihat dokumen strategi). Bank TKA target ≥ 60 bacaan; sekarang 16. Pemetaan TP ke Capaian Pembelajaran Fase D resmi belum
 ada: TP saat ini = keterampilan yang dilatih kelas.

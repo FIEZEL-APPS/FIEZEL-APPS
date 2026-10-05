@@ -892,6 +892,7 @@
   function startRunner(a) {
     var u = ui(), order = a.itemIds.map(function (_, i) { return i; });
     if (a.shuffle || a.mode === 'ujian') order = shuffle(order, a.id.length * 7 + Date.now() % 1000);
+    else if (a.variant !== false && !a.isMission) order = shuffle(order, variantSeed(a)); /* R4: urutan soal per murid */
     u.runner = { aid: a.id, idx: 0, order: order, answers: [], chosen: null, revealed: false, startedAt: Date.now(), timerEnd: a.mode === 'ujian' && a.timer ? Date.now() + a.timer * 60000 : 0, finished: false, result: null };
     u.tab = 'tugas'; u.review = null;
     u.focus = a.mode === 'ujian' && FG() ? FG().start(a.id, Date.now()) : null;
@@ -1775,8 +1776,29 @@
       '</div>' +
     '</div>';
   }
-  function optionButtons(item, chosen, revealed) {
-    return '<div class="ch-options">' + item.options.map(function (o, i) { var cls = 'ch-option'; if (revealed) { if (i === item.answer) cls += ' is-correct'; else if (i === chosen) cls += ' is-wrong'; } else if (i === chosen) cls += ' is-chosen'; return '<button type="button" class="' + cls + '" data-ch="answer" data-i="' + i + '"' + (revealed ? ' disabled' : '') + ' data-testid="class-option-' + i + '"><span class="ch-opt-key">' + String.fromCharCode(65 + i) + '</span>' + esc(o) + '</button>'; }).join('') + '</div>';
+  /* R4 TUGAS BERBEDA PER MURID (docs/STRATEGI-SEKOLAH-INDONESIA-2026.md). Contekan di grup WA
+     berbentuk "1B 2C 3A". Setiap murid kini mendapat urutan soal dan urutan pilihan sendiri,
+     berbiji dari id tugas + nama murid (stabil kalau murid membuka ulang tugasnya). Yang diacak
+     hanya TAMPILAN: data-i tetap indeks pilihan ASLI, jadi jawaban, w[], miskonsepsi per pengecoh,
+     dan pemanasan guru tidak berubah sama sekali. Soal tulisan guru (a.items) tidak diacak
+     pilihannya — pilihan seperti "A dan B benar" bergantung pada urutannya. */
+  function variantSeed(a) {
+    var ob = readJson('fiezel-onboarding-v1', {}) || {}, key = String(a && a.id || '') + '|' + String(ob.name || ob.nama || '').toLowerCase();
+    var h = 2166136261;
+    for (var i = 0; i < key.length; i++) { h ^= key.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
+    return (h % 233279) + 1;
+  }
+  function optionPerm(a, item) {
+    var n = item && item.options ? item.options.length : 0, idx = [];
+    for (var i = 0; i < n; i++) idx.push(i);
+    if (!a || a.variant === false || !item || (a.items || []).some(function (x) { return x && x.id === item.id; })) return idx;
+    var h = variantSeed(a);
+    for (var k = 0; k < String(item.id).length; k++) h = (h * 31 + String(item.id).charCodeAt(k)) % 233279;
+    return shuffle(idx, h + 1);
+  }
+  function optionButtons(item, chosen, revealed, perm) {
+    var order = Array.isArray(perm) && perm.length === item.options.length ? perm : item.options.map(function (_, i) { return i; });
+    return '<div class="ch-options">' + order.map(function (i, pos) { var o = item.options[i]; var cls = 'ch-option'; if (revealed) { if (i === item.answer) cls += ' is-correct'; else if (i === chosen) cls += ' is-wrong'; } else if (i === chosen) cls += ' is-chosen'; return '<button type="button" class="' + cls + '" data-ch="answer" data-i="' + i + '"' + (revealed ? ' disabled' : '') + ' data-testid="class-option-' + i + '"><span class="ch-opt-key">' + String.fromCharCode(65 + pos) + '</span>' + esc(o) + '</button>'; }).join('') + '</div>';
   }
   function runnerView() {
     var r = ui().runner;
@@ -1795,7 +1817,7 @@
          pertanyaannya sepenuhnya pada gambarnya; tanpa itu murid membaca "Kata Inggris apa
          yang cocok untuk gambar ini?" tanpa satu pun gambar dan hanya bisa menebak.
          Markupnya datang dari bank (B().pictureHtml), bukan disalin ke sini. */
-      '<article class="ch-card ch-question">' + bankPicture(item) + (item.context ? '<p class="ch-context">' + esc(item.context) + '</p>' : '') + '<h2>' + esc(item.prompt) + '</h2>' + optionButtons(item, r.chosen, r.revealed) + fb +
+      '<article class="ch-card ch-question">' + bankPicture(item) + (item.context ? '<p class="ch-context">' + esc(item.context) + '</p>' : '') + '<h2>' + esc(item.prompt) + '</h2>' + optionButtons(item, r.chosen, r.revealed, optionPerm(a, item)) + fb +
       (r.revealed ? '<div class="ch-actions"><button type="button" class="ch-btn is-primary" data-ch="next" data-testid="class-next">' + (r.idx + 1 >= r.order.length ? t('umum.selesai', 'Selesai') : t('umum.lanjut', 'Lanjut')) + ' ' + icon('arrow-right') + '</button></div>' : '') + '</article></div>';
   }
   function reviewView(id) {
