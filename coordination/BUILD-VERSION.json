@@ -1,7 +1,7 @@
 {
-  "version": "m025-490",
-  "claimedBy": "branch fix/quiz-retry-ui-and-pedagogical-hint-polish",
-  "claimedAt": "2026-10-05T16:23:15.349Z",
-  "reason": "fix(pwa): eliminate overscroll preview and boot splash flash on swipe back",
+  "version": "m025-491",
+  "claimedBy": "tidak tercatat (jalankan ulang di dalam git, atau set FIEZEL_BUILD_CLAIMER)",
+  "claimedAt": "2026-10-05T16:28:00.406Z",
+  "reason": "bot(heal): auto-synchronize release boundary",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
