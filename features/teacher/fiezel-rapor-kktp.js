@@ -116,8 +116,10 @@
     return out.sort();
   }
 
-  /** Baris rapor satu murid: per TP {skill, acc, n, tingkat} + nilai akhir. */
-  function raporMurid(c, s, env) {
+  /** Baris rapor satu murid: per TP {skill, acc, n, tingkat} + nilai akhir.
+      `tps` (opsional) = daftarTP(c) yang sudah dihitung; raporKelas mengirimnya supaya daftar TP
+      kelas dihitung SEKALI, bukan sekali per murid (dulu O(murid² × tugas)). */
+  function raporMurid(c, s, env, tps) {
     var kktp = kktpOf(c), per = {};
     (s.results || []).forEach(function (r) {
       if (!r || !r.skill) return;
@@ -126,7 +128,7 @@
     });
     var kertas = buktiKertas(c, s, env);
     Object.keys(kertas).forEach(function (k) { var p = per[k] || (per[k] = { c: 0, n: 0 }); p.c += kertas[k].c; p.n += kertas[k].n; });
-    var rows = daftarTP(c, env).map(function (k) {
+    var rows = (tps || daftarTP(c, env)).map(function (k) {
       var p = per[k] || { c: 0, n: 0 };
       var cukup = p.n >= MIN_BUKTI;
       var acc = p.n ? p.c / p.n : null;
@@ -164,7 +166,8 @@
   }
 
   function raporKelas(c, env) {
-    return (c && c.students || []).map(function (s) { var r = raporMurid(c, s, env); r.deskripsi = deskripsi(r); return r; });
+    var tps = daftarTP(c, env);
+    return (c && c.students || []).map(function (s) { var r = raporMurid(c, s, env, tps); r.deskripsi = deskripsi(r); return r; });
   }
 
   function csvCell(v) { return '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"'; }

@@ -102,6 +102,7 @@ check('R8 nilai kertas (Kelas Tanpa HP) masuk rapor', () => {
   assert.strictEqual(rv.n, 4);
   assert.strictEqual(rv.tingkat, 'kurang-data', 'separuh lembar kertas (4 soal) belum cukup bukti untuk TP sendiri');
   assert.ok(r.nilai != null, 'murid tanpa HP tetap punya nilai rapor');
+  assert.ok(/var tps = daftarTP\(c, env\);\s*return \(c && c\.students \|\| \[\]\)\.map\(function \(s\) \{ var r = raporMurid\(c, s, env, tps\)/.test(fs.readFileSync(path.join(__fzRoot, 'features/teacher/fiezel-rapor-kktp.js'), 'utf8')), 'raporKelas menghitung daftar TP sekali per kelas');
   delete global.FiezelKelasTanpaHP;
 });
 
