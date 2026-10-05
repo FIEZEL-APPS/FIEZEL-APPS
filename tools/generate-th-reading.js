@@ -25,13 +25,21 @@ const { buildLexicon, residuIndonesia } = require(path.join(root, 'th-purity-lex
 
 const LEKSIKON = buildLexicon(root);
 const peta = readJson('tools/th-strings/reading.json');
+// Kata fungsi Indonesia yang SENGAJA tidak ada di leksikon korpus (terlalu umum untuk
+// disimpulkan dari selisih korpus), tetapi ditangkap pemindai ketiga scan-th-bank-leak.js.
+// Gap inilah yang membuat "ke pasar"/"di jalan" lolos sebagai "Inggris" lalu bocor ke murid
+// Thai. Bila salah satu muncul, string WAJIB punya terjemahan di peta — gagal keras kalau tidak.
+const KATA_FUNGSI = new Set(['ke', 'di', 'dari', 'pada', 'yang', 'dan', 'untuk', 'dengan']);
+const RE_LATIN_WORD = /[A-Za-z][A-Za-z'-]*/g;
 
 const belumTerpeta = new Set();
 function th(nilai, label) {
   const s = String(nilai == null ? '' : nilai).trim();
   if (!s) return '';
+  const perluPeta = residuIndonesia(s, LEKSIKON).length
+    || (s.match(RE_LATIN_WORD) || []).some((w) => KATA_FUNGSI.has(w.toLowerCase()));
   // Sudah berbahasa Inggris (mis. pilihan mode paraphrase) → biarkan apa adanya.
-  if (!residuIndonesia(s, LEKSIKON).length) return s;
+  if (!perluPeta) return s;
   const t = peta[s];
   if (!t) { belumTerpeta.add(label + ' :: ' + s); return s; }
   return t;
