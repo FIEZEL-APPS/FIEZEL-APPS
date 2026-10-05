@@ -169,7 +169,11 @@
     }
     return false;
   }
-  /* Kelompok remedial/pengayaan otomatis per KKM (default 75%). Murni. */
+  /* R2: KKTP kelas (Kriteria Ketercapaian Tujuan Pembelajaran) menggantikan "KKM 75" yang
+     dulu tertanam di kode. Diatur guru per kelas lewat modal Rapor KKTP; bawaan 75%. */
+  function kktpKelas(c) { var R = root.FiezelRaporKKTP; return R ? R.kktpOf(c) : 0.75; }
+  function kktpPersen(c) { return Math.round(kktpKelas(c) * 100); }
+  /* Kelompok remedial/pengayaan otomatis per KKTP kelas (bawaan 75%). Murni. */
   function remedialGroups(c, kkm) {
     var T = S(), out = { kkm: (kkm == null ? 0.75 : kkm), remedial: [], pengayaan: [], tuntas: [] };
     if (!c || !c.students) return out;
@@ -203,7 +207,7 @@
     var mapel = (sc && sc.locked) ? sc.active : null;
     return (c.students || []).map(function (s) {
       var acc = T.overallAcc(s);
-      var status = acc == null ? t('guru.rekap-belum-ada', 'Belum ada nilai') : acc >= 0.75 ? 'Tuntas' : 'Remedial';
+      var status = acc == null ? t('guru.rekap-belum-ada', 'Belum ada nilai') : acc >= kktpKelas(c) ? t('sekolah.status-tercapai', 'Tercapai') : t('sekolah.status-remedial', 'Remedial');
       return { nama: s.name, akurasi: acc == null ? null : Math.round(acc * 100), status: status, mapel: mapel || (c.subject || ''), kehadiran: T.attendanceRate(s, 10) };
     });
   }
@@ -3335,7 +3339,7 @@
     try { __scCls = teacherSubjectScope(); } catch (_) {}
     var __scopeNote = (__scCls && __scCls.locked) ? subjectScopeBadge() : '';
     return __scopeNote + '<div class="tg-toolbar"><div class="tg-tabs">' + st.classes.map(function (k) { return '<button type="button" class="tg-tab' + (k.id === c.id ? ' is-active' : '') + '" data-tg="pick-class" data-id="' + k.id + '">' + esc(k.name) + '<small>' + k.students.length + '</small></button>'; }).join('') + '<button type="button" class="tg-tab is-add" data-tg="modal" data-kind="new-class" data-testid="tg-new-class">' + t('guru.kelas-tambah-btn', '+ Kelas') + '</button></div>' +
-      '<div class="tg-toolbar-actions"><label class="tg-search">' + icon('search') + '<input type="search" placeholder="' + t('guru.cari-siswa', 'Cari siswa…') + '" value="' + esc(ui.filter) + '" data-tg-input="filter" data-testid="tg-student-search" aria-label="' + esc(t('guru.cari-siswa', 'Cari siswa…')) + '"></label><button type="button" class="tg-btn is-ghost" data-tg="modal" data-kind="attendance" data-testid="tg-attendance">' + icon('check-square') + '<span>Absensi</span></button><button type="button" class="tg-btn is-ghost" data-tg="export-csv" data-testid="tg-export-csv">' + icon('download') + '<span>CSV</span></button><button type="button" class="tg-btn is-ghost" data-tg="export-rekap" data-testid="tg-export-rekap">' + icon('file-text') + '<span>' + t('guru.rekap-erapor', 'Rekap e-Rapor') + '</span></button><button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="add-students" data-testid="tg-add-students">' + icon('user-plus') + '<span>' + t('guru.tambah-siswa', 'Tambah siswa') + '</span></button></div></div>' +
+      '<div class="tg-toolbar-actions"><label class="tg-search">' + icon('search') + '<input type="search" placeholder="' + t('guru.cari-siswa', 'Cari siswa…') + '" value="' + esc(ui.filter) + '" data-tg-input="filter" data-testid="tg-student-search" aria-label="' + esc(t('guru.cari-siswa', 'Cari siswa…')) + '"></label><button type="button" class="tg-btn is-ghost" data-tg="modal" data-kind="attendance" data-testid="tg-attendance">' + icon('check-square') + '<span>Absensi</span></button><button type="button" class="tg-btn is-ghost" data-tg="export-csv" data-testid="tg-export-csv">' + icon('download') + '<span>CSV</span></button><button type="button" class="tg-btn is-ghost" data-tg="export-rekap" data-testid="tg-export-rekap">' + icon('file-text') + '<span>' + t('guru.rekap-erapor', 'Rekap e-Rapor') + '</span></button>' + (root.FiezelRaporKKTP ? '<button type="button" class="tg-btn is-ghost" data-tg="modal" data-kind="rapor-kktp" data-testid="tg-rapor-kktp">' + icon('notebook-pen') + '<span>' + esc(t('sekolah.rapor-kktp', 'Rapor KKTP')) + '</span></button>' : '') + '<button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="add-students" data-testid="tg-add-students">' + icon('user-plus') + '<span>' + t('guru.tambah-siswa', 'Tambah siswa') + '</span></button></div></div>' +
       '<section class="tg-card tg-class-meta"><div><p class="tg-kicker">' + esc(mapelNames[c.subject] || c.subject || 'English') + ' · Level ' + esc(c.level) + (c.demo ? ' · <span class="tg-demo">data contoh</span>' : '') + '</p><h3>' + esc(c.name) + '</h3>' +
       (c.latestAnnouncement && c.latestAnnouncement.text ? '<p class="tg-latest-ann" style="margin:4px 0 8px;font-size:13px;color:var(--tg-text)">📢 <b>Pengumuman:</b> ' + esc(c.latestAnnouncement.text) + ' <small class="tg-muted">(' + esc(c.latestAnnouncement.teacher || 'Wali kelas') + (c.latestAnnouncement.at ? ' · ' + T.fmtDate(c.latestAnnouncement.at) : '') + ')</small></p>' : '') +
       '<small>Kode kelas <b class="tg-mono">' + esc(c.code) + '</b> — ' + esc(t('guru.kode-kelas-jelas', 'murid mengetiknya saat onboarding; setiap selesai sesi, hasilnya dikirim ke server dan masuk ke sini otomatis.')) + ' ' + (c.sync && c.sync.claimed ? '<span class="tg-ok">Kode terdaftar di server.</span>' : S().syncAvailable() === 'ok' ? '<span class="tg-muted">Kode belum terdaftar — tekan Sinkron.</span>' : '<span class="tg-muted">Tanpa akun guru, tempel kode hasil murid secara manual.</span>') + '</small></div><div class="tg-actions"><button type="button" class="tg-btn is-ghost is-small" data-tg="modal" data-kind="edit-class">' + icon('pencil') + ' ' + t('umum.ubah', 'Ubah') + '</button><details class="tg-more"><summary class="tg-btn is-ghost is-small" aria-label="' + esc(t('guru.aksi-lain', 'Aksi lain')) + '">' + icon('more-horizontal') + '</summary><div class="tg-more-menu"><button type="button" class="tg-btn is-danger is-small" data-tg="delete-class" data-testid="tg-delete-class">' + icon('trash-2') + ' ' + t('guru.hapus-kelas', 'Hapus kelas') + '</button></div></details></div></section>' +
@@ -3448,8 +3452,8 @@
     if (!c.students.length) return scopeNote + '<section class="tg-card tg-center tg-empty-state" data-testid="tg-empty-insights"><div class="tg-empty-ill" aria-hidden="true">' + icon('activity') + '</div><h3>' + t('guru.belum-data-analisis', 'Belum ada data untuk dianalisis') + '</h3><p class="tg-muted">' + t('guru.tambah-siswa-dulu', 'Tambah siswa atau tempel kode hasil latihan murid dulu.') + '</p></section>';
     if (sc && sc.locked && !map.length) return scopeNote + '<section class="tg-card tg-center tg-empty-state" data-testid="tg-empty-insights-scoped"><div class="tg-empty-ill" aria-hidden="true">' + icon('activity') + '</div><h3>' + esc(t('guru.belum-data-mapel', 'Belum ada data {mapel}').replace('{mapel}', sc.active)) + '</h3><p class="tg-muted">' + t('guru.tambah-tugas-mapel-dulu', 'Terbitkan tugas mapel Anda dulu — analitik lain disembunyikan agar tidak tercampur.') + '</p><button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="assign" data-testid="tg-empty-insights-assign">' + icon('plus') + '<span>' + t('guru.buat-tugas-ujian', 'Buat tugas / ujian') + '</span></button></section>';
     var rem = null;
-    try { rem = remedialGroups(c, 0.75); } catch (_) { rem = { remedial: [], pengayaan: [] }; }
-    var remedialCard = '<section class="tg-card tg-remedial" data-testid="tg-remedial-auto"><div class="tg-card-head"><div><p class="tg-kicker">' + t('guru.remedial-otomatis', 'Remedial & pengayaan otomatis (KKM 75%)') + '</p><h3>' + t('guru.remedial-judul', 'Siapa remedial, siapa pengayaan') + '</h3></div><span class="tg-count">' + (rem.remedial.length + rem.pengayaan.length) + '</span></div>' +
+    try { rem = remedialGroups(c, kktpKelas(c)); } catch (_) { rem = { remedial: [], pengayaan: [] }; }
+    var remedialCard = '<section class="tg-card tg-remedial" data-testid="tg-remedial-auto"><div class="tg-card-head"><div><p class="tg-kicker">' + t('sekolah.remedial-otomatis', 'Remedial & pengayaan otomatis (KKTP {k}%)', { k: kktpPersen(c) }) + '</p><h3>' + t('guru.remedial-judul', 'Siapa remedial, siapa pengayaan') + '</h3></div><span class="tg-count">' + (rem.remedial.length + rem.pengayaan.length) + '</span></div>' +
       '<div class="tg-grid tg-grid-2">' +
       '<div><h4>' + t('guru.remedial-perlu', 'Perlu remedial') + ' (' + rem.remedial.length + ')</h4>' + (rem.remedial.length ? '<ul class="tg-mini-list">' + rem.remedial.map(function (x) { return '<li>' + avatar(x.s, 'sm') + ' <span class="tg-grow">' + esc(x.s.name) + ' · ' + pct(x.acc) + '</span></li>'; }).join('') + '</ul><div class="tg-actions"><button type="button" class="tg-btn is-primary is-small" data-tg="modal" data-kind="assign" data-targets="' + esc(rem.remedial.map(function (x) { return x.s.id; }).join(',')) + '" data-testid="tg-remedial-create">' + icon('plus') + ' ' + t('guru.buat-remedial', 'Buat sesi remedial') + '</button></div>' : '<p class="tg-empty">' + t('guru.remedial-kosong', 'Nol siswa di bawah KKM. Pertahankan.') + '</p>') + '</div>' +
       '<div><h4>' + t('guru.pengayaan-judul', 'Pengayaan (≥90%)') + ' (' + rem.pengayaan.length + ')</h4>' + (rem.pengayaan.length ? '<ul class="tg-mini-list">' + rem.pengayaan.map(function (x) { return '<li>' + avatar(x.s, 'sm') + ' <span class="tg-grow">' + esc(x.s.name) + ' · ' + pct(x.acc) + '</span></li>'; }).join('') + '</ul><div class="tg-actions"><button type="button" class="tg-btn is-ghost is-small" data-tg="modal" data-kind="assign" data-targets="' + esc(rem.pengayaan.map(function (x) { return x.s.id; }).join(',')) + '" data-testid="tg-enrich-create">' + icon('sparkles') + ' ' + t('guru.buat-pengayaan', 'Buat pengayaan') + '</button></div>' : '<p class="tg-empty">' + t('guru.pengayaan-kosong', 'Belum ada siswa ≥90%.') + '</p>') + '</div>' +
@@ -4487,6 +4491,9 @@
         '<ul class="tg-att-list" data-testid="tg-att-list">' + c.students.map(function (s) { var v = (s.attendance || {})[date] || ''; return '<li>' + avatar(s, 'sm') + '<span>' + esc(s.name) + '</span><div class="tg-seg">' + ['H', 'I', 'S', 'A'].map(function (k) { return '<button type="button" class="tg-seg-btn is-' + k + (v === k ? ' is-on' : '') + '" data-tg="att" data-id="' + s.id + '" data-v="' + k + '" title="' + T.ATT[k] + '" data-testid="tg-att-' + s.id + '-' + k + '">' + k + '</button>'; }).join('') + '</div></li>'; }).join('') + '</ul><p class="tg-muted">H hadir · I izin · S sakit · A alpa. Dua alpa dalam seminggu menaikkan skor risiko siswa.</p>';
     } else if (m.kind === 'board') {
       return board(c);
+    } else if (m.kind === 'rapor-kktp') {
+      title = t('sekolah.rapor-judul', 'Rapor KKTP — {kelas}', { kelas: c.name }); wide = true;
+      body = raporKktpModal(c);
     } else if (m.kind === 'warmup') {
       return warmup(c);
     } else if (m.kind === 'paper-scores') {
@@ -4517,6 +4524,26 @@
         (w.reveal ? '' : '<button type="button" class="tg-btn is-primary" data-tg="warm-reveal" data-testid="tg-warm-reveal">' + icon('lightbulb') + ' ' + esc(t('sekolah.pemanasan-jawaban', 'Tampilkan jawaban')) + '</button>') +
         (last ? '<button type="button" class="tg-btn is-ghost" data-tg="close" data-testid="tg-warm-done">' + icon('check') + ' ' + esc(t('sekolah.pemanasan-selesai', 'Selesai, lanjut pelajaran')) + '</button>' : '<button type="button" class="tg-btn is-ghost" data-tg="warm-next" data-testid="tg-warm-next">' + icon('chevron-right') + ' ' + esc(t('sekolah.pemanasan-berikutnya', 'Soal berikutnya')) + '</button>') +
         '</div>' : '') + '</div>';
+  }
+  /* R2: modal Rapor KKTP — atur KKTP kelas, lihat tingkat per TP, sunting deskripsi, unduh CSV.
+     Suntingan guru disimpan di c.raporEdits supaya tidak hilang saat modal ditutup. */
+  function raporKktpModal(c) {
+    var R = root.FiezelRaporKKTP; if (!R) return '';
+    var rapor = R.raporKelas(c), edits = c.raporEdits || {}, tps = R.daftarTP(c);
+    return '<form data-tg-form="rapor-kktp" class="tg-form" data-testid="tg-rapor-form">' +
+      '<div class="tg-rapor-head"><label class="tg-label">' + esc(t('sekolah.kktp-label', 'KKTP kelas (%)')) + '<input type="number" name="kktp" min="50" max="95" step="1" value="' + kktpPersen(c) + '" data-testid="tg-kktp-input"></label>' +
+      '<p class="tg-muted">' + esc(t('sekolah.rapor-penjelasan', 'Tingkat dihitung per tujuan pembelajaran dari jawaban murid. Tujuan dengan kurang dari {n} jawaban ditulis "belum cukup data". Deskripsi bisa kamu sunting sebelum disalin ke e-Rapor.', { n: R.MIN_BUKTI })) + '</p></div>' +
+      (tps.length ? '<p class="tg-muted">' + esc(t('sekolah.rapor-tp', 'Tujuan pembelajaran yang diukur:')) + ' ' + tps.map(function (k) { return '<b>' + esc(k.replace(/_/g, ' ')) + '</b>'; }).join(', ') + '</p>' : '') +
+      '<ul class="tg-rapor-list">' + rapor.map(function (r) {
+        var e = edits[r.s.id] || {};
+        return '<li data-testid="tg-rapor-' + esc(r.s.id) + '"><div class="tg-rapor-who">' + avatar(r.s, 'sm') + '<b>' + esc(r.s.name) + '</b><span class="tg-rapor-nilai">' + (r.nilai == null ? '—' : r.nilai) + '</span><small class="tg-muted">' +
+          r.rows.map(function (x) { return esc(x.label) + ': ' + esc(R.labelTingkat(x.tingkat)); }).join(' · ') + '</small></div>' +
+          '<textarea name="tinggi_' + esc(r.s.id) + '" rows="2" aria-label="' + esc(t('sekolah.rapor-tinggi-aria', 'Capaian tertinggi {nama}', { nama: r.s.name })) + '">' + esc(e.tinggi != null ? e.tinggi : r.deskripsi.tinggi) + '</textarea>' +
+          '<textarea name="rendah_' + esc(r.s.id) + '" rows="2" aria-label="' + esc(t('sekolah.rapor-rendah-aria', 'Capaian yang perlu ditingkatkan {nama}', { nama: r.s.name })) + '">' + esc(e.rendah != null ? e.rendah : r.deskripsi.rendah) + '</textarea></li>';
+      }).join('') + '</ul>' +
+      '<div class="tg-actions"><button type="submit" name="aksi" value="simpan" class="tg-btn is-ghost" data-testid="tg-rapor-simpan">' + icon('check') + ' ' + esc(t('sekolah.rapor-simpan', 'Simpan KKTP & suntingan')) + '</button>' +
+      '<button type="submit" name="aksi" value="csv" class="tg-btn is-primary" data-testid="tg-rapor-csv">' + icon('download') + ' ' + esc(t('sekolah.rapor-csv', 'Unduh CSV e-Rapor')) + '</button>' +
+      '<button type="submit" name="aksi" value="reset" class="tg-btn is-ghost" data-testid="tg-rapor-reset">' + icon('refresh-cw') + ' ' + esc(t('sekolah.rapor-reset', 'Susun ulang deskripsi')) + '</button></div></form>';
   }
   /* R1: modal nilai kertas — satu kotak angka per murid sasaran. */
   function paperScoresModal(c, a) {
@@ -4696,7 +4723,7 @@
         var __scExp = null;
         try { __scExp = teacherSubjectScope(); } catch (_) {}
         var __rows = rekapRows(c);
-        var __head = ['Nama', 'Mapel', t('guru.rekap-akurasi-pct', 'Akurasi %'), t('guru.rekap-status-kkm', 'Status (KKM 75)'), 'Kehadiran 10x'];
+        var __head = ['Nama', 'Mapel', t('guru.rekap-akurasi-pct', 'Akurasi %'), t('sekolah.rekap-status-kktp', 'Status (KKTP {k}%)', { k: kktpPersen(c) }), 'Kehadiran 10x'];
         var __csv = [__head].concat(__rows.map(function (r) { return [r.nama, r.mapel, r.akurasi == null ? '' : r.akurasi, r.status, r.kehadiran == null ? '' : Math.round(r.kehadiran * 100) + '%']; })).map(function (r) { return r.map(function (v) { return '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"'; }).join(','); }).join('\n');
         var __fname = (c.name || 'kelas').replace(/\W+/g, '-') + '-' + ((__scExp && __scExp.locked) ? __scExp.active + '-' : '') + 'rekap.csv';
         download(__fname, __csv, 'text/csv'); saveMinutes(10); toast('CSV rekap' + ((__scExp && __scExp.locked) ? ' ' + __scExp.active : '') + ' diunduh — siap dibuka di Excel / e-Rapor.');
@@ -4708,7 +4735,7 @@
         var __rows2 = rekapRows(c);
         var __mapel2 = (__sc2 && __sc2.locked) ? __sc2.active : (c.subject || '');
         var __html = '<html><head><meta charset="utf-8"><title>Rekap Nilai ' + esc(c.name) + '</title><style>body{font-family:Georgia,serif;max-width:760px;margin:32px auto;padding:0 16px}table{width:100%;border-collapse:collapse;font-size:13px}th,td{border:1px solid #999;padding:6px 8px;text-align:left}th{background:#eee}h1{font-size:20px}h2{font-size:14px;color:#444}.rem{color:#B93F2A;font-weight:bold}.ok{color:#166052}</style></head><body>' +
-          '<h1>Rekap Nilai — ' + esc(c.name) + '</h1><h2>' + esc(__mapel2 + ' · ' + (st.teacher.school || '') + ' · ' + (st.teacher.name || 'Guru') + ' · KKM 75 · ' + new Date().toLocaleDateString('id-ID')) + '</h2>' +
+          '<h1>Rekap Nilai — ' + esc(c.name) + '</h1><h2>' + esc(__mapel2 + ' · ' + (st.teacher.school || '') + ' · ' + (st.teacher.name || 'Guru') + ' · KKTP ' + kktpPersen(c) + '% · ' + new Date().toLocaleDateString('id-ID')) + '</h2>' +
           '<table><thead><tr><th>No</th><th>Nama</th><th>Mapel</th><th>Nilai</th><th>Status</th></tr></thead><tbody>' +
           __rows2.map(function (r, i) { return '<tr><td>' + (i + 1) + '</td><td>' + esc(r.nama) + '</td><td>' + esc(r.mapel) + '</td><td>' + (r.akurasi == null ? '—' : r.akurasi) + '</td><td class="' + (r.status === 'Remedial' ? 'rem' : 'ok') + '">' + esc(r.status) + '</td></tr>'; }).join('') +
           '</tbody></table><p>' + esc(t('guru.rekap-cetak-note', 'Dicetak dari KelasKu untuk Guru — siap diunggah ke e-Rapor Kemendikbudristek.')) + '</p></body></html>';
@@ -4830,6 +4857,26 @@
     var form = e.target.closest ? e.target.closest('[data-tg-form]') : null; if (!form) return;
     e.preventDefault();
     var kind = form.getAttribute('data-tg-form'), fd = new FormData(form), c = cls(), T = S(), viaWa = e.submitter && e.submitter.name === 'wa';
+    if (kind === 'rapor-kktp') {
+      var Rk = root.FiezelRaporKKTP; if (!Rk || !c) return;
+      var aksi = (e.submitter && e.submitter.value) || 'simpan';
+      var kktpBaru = Number(fd.get('kktp')), gantiKktp = isFinite(kktpBaru) && Math.round(kktpBaru) !== kktpPersen(c);
+      if (isFinite(kktpBaru)) Rk.setKktp(c, kktpBaru);
+      if (aksi === 'reset' || gantiKktp) { c.raporEdits = {}; }
+      else {
+        var ed = {}, asli = {};
+        Rk.raporKelas(c).forEach(function (r) { asli[r.s.id] = r.deskripsi; });
+        c.students.forEach(function (s) {
+          var hi = fd.get('tinggi_' + s.id), lo = fd.get('rendah_' + s.id), a0 = asli[s.id] || {};
+          if (hi != null && String(hi) !== a0.tinggi) (ed[s.id] = ed[s.id] || {}).tinggi = String(hi).slice(0, 600);
+          if (lo != null && String(lo) !== a0.rendah) (ed[s.id] = ed[s.id] || {}).rendah = String(lo).slice(0, 600);
+        });
+        c.raporEdits = ed;
+      }
+      if (aksi === 'csv') { download((c.name || 'kelas').replace(/\W+/g, '-') + '-rapor-kktp.csv', '\ufeff' + Rk.csvRapor(c, c.raporEdits), 'text/csv'); saveMinutes(30); toast(t('sekolah.rapor-csv-terunduh', 'CSV rapor diunduh — buka di Excel lalu salin ke e-Rapor.')); }
+      else toast(gantiKktp ? t('sekolah.kktp-tersimpan', 'KKTP kelas diubah menjadi {k}%. Deskripsi disusun ulang.', { k: kktpPersen(c) }) : t('sekolah.rapor-tersimpan', 'Rapor tersimpan.'));
+      persist(); render(); return;
+    }
     if (kind === 'paper-scores') {
       var Ks = root.FiezelKelasTanpaHP, aS = (c && c.assignments || []).filter(function (x) { return x.id === form.getAttribute('data-id'); })[0];
       if (!Ks || !aS) return;

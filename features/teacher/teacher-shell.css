@@ -800,3 +800,12 @@ html body.fz-teacher-mode .tg .tg-mnav-more .tg-mnav-sheet button.is-active{back
 .tg-paper-list li{display:flex;align-items:center;gap:10px}
 .tg-paper-list input{width:84px;margin-left:auto}
 @media (max-width:640px){.ktp-warm-opts{grid-template-columns:1fr}}
+/* R2 Rapor KKTP */
+.tg-rapor-head{display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap}
+.tg-rapor-head .tg-label input{width:96px}
+.tg-rapor-list{list-style:none;padding:0;margin:12px 0;display:grid;gap:14px;max-height:56vh;overflow:auto}
+.tg-rapor-list li{border:1px solid var(--tg-line,#ddd);border-radius:12px;padding:10px 12px;display:grid;gap:6px}
+.tg-rapor-who{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.tg-rapor-nilai{margin-left:auto;font-weight:700;font-size:1.1rem}
+.tg-rapor-who small{flex-basis:100%}
+.tg-rapor-list textarea{width:100%;font:inherit;resize:vertical}
