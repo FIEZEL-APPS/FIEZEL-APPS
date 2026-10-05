@@ -1,7 +1,7 @@
 {
   "schema": "fiezel-audio-manifest-v1",
-  "version": 139,
-  "generatedAt": "2026-10-05T00:30:39.279Z",
+  "version": 143,
+  "generatedAt": "2026-10-05T00:32:26.377Z",
   "assetBaseUrl": "https://fiezel-audio.fitrajft.workers.dev",
   "voiceProfile": {
     "voiceId": "4KH3q7xDXbPdY3S5yw0Y",
@@ -15448,6 +15448,42 @@
       "checksum": "0cf75161daaecdd0750aa1c785eb2fc99404909321b88a4568980cc2d1c1f0f3",
       "sourceRef": "listen_sc_c2_dictation_008",
       "createdAt": "2026-10-05T00:30:31.670Z",
+      "status": "ready"
+    },
+    "cb03d6bb8dfa4ec7b02e925bf0223809aff2e746554b1a04515db570d805d20e": {
+      "url": "a/cb03d6bb8dfa4ec7b02e925bf0223809aff2e746554b1a04515db570d805d20e.mp3",
+      "contentType": "listening",
+      "locale": "en-US",
+      "voiceId": "Aoede",
+      "modelId": "gemini-tts-gemini-2.5-flash-preview-tts",
+      "bytes": 1452090,
+      "checksum": "8526fddaddbb388d625729103d596ab33b4b5c32af607a2c8d374ae996a58cdc",
+      "sourceRef": "listen_sc_c2_gist_008",
+      "createdAt": "2026-10-05T00:31:45.517Z",
+      "status": "ready"
+    },
+    "54b9a7c3a18253506cffb1c0040a303eb55f7b2345369aea8c85ea46ef9e8c81": {
+      "url": "a/54b9a7c3a18253506cffb1c0040a303eb55f7b2345369aea8c85ea46ef9e8c81.mp3",
+      "contentType": "listening",
+      "locale": "en-US",
+      "voiceId": "Aoede",
+      "modelId": "gemini-tts-gemini-2.5-flash-preview-tts",
+      "bytes": 401850,
+      "checksum": "328654af4b85be0e9b34912d53f7b600efe05e2202a1fa04eb001f4144b78086",
+      "sourceRef": "listen_sc_c2_dictation_009",
+      "createdAt": "2026-10-05T00:31:58.728Z",
+      "status": "ready"
+    },
+    "c8037060a5956ae9f381ff9b98de8b59d9ddef1f095816122d3137643cbff914": {
+      "url": "a/c8037060a5956ae9f381ff9b98de8b59d9ddef1f095816122d3137643cbff914.mp3",
+      "contentType": "listening",
+      "locale": "en-US",
+      "voiceId": "Aoede",
+      "modelId": "gemini-tts-gemini-2.5-flash-preview-tts",
+      "bytes": 1463610,
+      "checksum": "18ce27f5bc3ab3c87c13c5820a9fe3b9b9bf8e0a0246e87185fa866710202ead",
+      "sourceRef": "listen_sc_c2_gist_009",
+      "createdAt": "2026-10-05T00:32:19.025Z",
       "status": "ready"
     }
   },
