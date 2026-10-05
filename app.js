@@ -16568,15 +16568,15 @@ function gameHubMarkup(){
   return `<div class="game-hub-container">
     <!-- Header with Back Button and Quick Stats -->
     <div class="game-hub-top-nav">
-      <button type="button" class="game-back-pill" onclick="go('home')" aria-label="Kembali ke Beranda">
+      <button type="button" class="game-back-pill" onclick="go('home')" aria-label="${esc(FiezelI18n.t('nav.home-primary-aria'))}">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M19 12H5M12 19l-7-7 7-7"/>
         </svg>
-        <span>Beranda</span>
+        <span>${esc(FiezelI18n.t('nav.home-primary'))}</span>
       </button>
       <div class="game-quick-badges">
-        <span class="game-badge-trophy" title="Total Trophy Arena"><i data-lucide="trophy"></i> <b>${trophy}</b></span>
-        <span class="game-badge-flame" title="Runtun Belajar"><i class="fz-i" data-fz-icon="flame"></i> <b>${streak} Hari</b></span>
+        <span class="game-badge-trophy"><i data-lucide="trophy"></i> <b>${trophy}</b></span>
+        <span class="game-badge-flame"><i class="fz-i" data-fz-icon="flame"></i> <b>${streak} ${esc(FiezelI18n.t('game.days-unit'))}</b></span>
       </div>
     </div>
 
