@@ -1,9 +1,9 @@
 # FIEZEL HANDOFF DOSSIER: SMP PEDAGOGICAL POLISH & ANTI-LEAK CUE SANITIZATION
-**Build Version:** `m025-484`  
-**Base Commit / Branch:** `fix/quiz-retry-ui-and-pedagogical-hint-polish`  
-**Target Branch:** `main`  
-**Hexa-Sync Status:** `Selaras` (6/6 titik tersinkronisasi)  
-**Date:** 2026-10-05  
+**Build Version:** `m025-484`
+**Base Commit / Branch:** `fix/quiz-retry-ui-and-pedagogical-hint-polish`
+**Target Branch:** `main`
+**Hexa-Sync Status:** `Selaras` (6/6 titik tersinkronisasi)
+**Date:** 2026-10-05
 
 ---
 

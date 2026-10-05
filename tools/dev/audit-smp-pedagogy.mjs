@@ -17,7 +17,7 @@ templates.forEach((t, i) => {
   const cue = (t.explanation?.memoryCueId || t.explanation?.memoryCue || '').toLowerCase();
   const rule = (t.explanation?.ruleId || t.explanation?.rule || '').toLowerCase();
   const correct = (t.options?.[t.correctIndex] || '').toLowerCase().trim();
-  
+
   // Check leak
   const leaksKey = correct.length > 2 && cue.includes(correct);
   const leaksPattern = /\b(-ed|-ing|-s|-es)\b/.test(cue) || /pakai\s+["']?[a-z]+["']?|pilih\s+["']?[a-z]+["']?/.test(cue);

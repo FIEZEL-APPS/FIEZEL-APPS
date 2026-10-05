@@ -20,7 +20,7 @@ templates.forEach((t) => {
   const rule = (t.explanation?.ruleId || t.explanation?.rule || '').toLowerCase();
   const correct = (t.options?.[t.correctIndex] || '').trim();
   const correctLower = correct.toLowerCase();
-  
+
   // 1. Check answer leaks in memoryCue
   let isLeak = false;
   let leakReason = '';
