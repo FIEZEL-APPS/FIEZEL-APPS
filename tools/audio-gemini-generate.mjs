@@ -160,6 +160,27 @@ function readJson(relative) {
 }
 
 const REGISTRY = {
+  vocabulary() {
+    const rank = { A1: 0, A2: 1, B1: 2, B2: 3, C1: 4, C2: 5 };
+    const records = readJson('vocabulary-master.json');
+    const items = [];
+
+    records.forEach((record, index) => {
+      const level = rank[record?.level] ?? 99;
+      if (record?.word) {
+        items.push({ text: record.word, contentType: 'word', locale: 'en-US', sourceRef: record.id, level, kind: 0, index });
+      }
+      for (const example of record?.examples || []) {
+        if (example?.en) {
+          items.push({ text: example.en, contentType: 'sentence', locale: 'en-US', sourceRef: record.id, level, kind: 1, index });
+        }
+      }
+    });
+
+    return items
+      .sort((a, b) => (a.level - b.level) || (a.kind - b.kind) || (a.index - b.index))
+      .map(({ text, contentType, locale, sourceRef }) => ({ text, contentType, locale, sourceRef }));
+  },
   listening() {
     const bank = readJson('features/speaking-listening/listening-bank-v1.json');
     const order = { A1: 0, A2: 1, B1: 2, B2: 3, C1: 4, C2: 5 };

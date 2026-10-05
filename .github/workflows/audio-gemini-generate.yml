@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       content:
-        description: 'Kumpulan konten: listening'
+        description: 'Kumpulan konten: listening / vocabulary'
         required: true
         default: 'listening'
       voice:
