@@ -134,6 +134,14 @@ const EXCLUSIONS = new Map([
       'Google Chrome dan GUI). Kontrak integritas unit and scaffolding Mini Game di CI telah dijaga oleh ' +
       'kunci-hantu-test dan id-golden-snapshot-test.'
   }],
+  ['tools/dev/fiezel-vt-audit.js', {
+    class: 'alat-pelaporan',
+    reason:
+      'BUKAN gerbang CI Linux: alat pelaporan audit empiris Playwright Chromium lokal untuk mengukur ' +
+      'transisi layar dan peredupan opacity View Transitions (m025-487). Memerlukan browser grafis ' +
+      'Playwright lokal serta port web server aktif. Bukti kelulusan frame coverage 1.000 terdokumentasi ' +
+      'di docs/handoffs/FIEZEL-M025487-PWA-FLICKER-REFRESH-FIX-HANDOFF.md.'
+  }],
   ['tests/chokai-multi-voice-protocol-test.js', {
     class: 'gerbang-pra-rilis-fitur',
     reason:
