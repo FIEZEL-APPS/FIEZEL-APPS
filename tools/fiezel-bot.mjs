@@ -299,7 +299,7 @@ function failureLines(log) {
   const lines = text.split('\n').filter(l =>
     !/\[36;1m/.test(l)
     && /(\bFAIL\b|FAIL:|\bnot ok\b|\bError\b|\bERROR\b|##\[error\]|AssertionError|GAGAL|✗|❌)/.test(l)
-    && !/(\bPASS\b|\bok - |LULUS|\b0 FAIL\b|fail-closed)/i.test(l));
+    && !/(\bPASS\b|\bok - |LULUS|\b0 FAIL\b|fail-closed)/.test(l));
   return lines.length ? lines.join('\n') : text;
 }
 
