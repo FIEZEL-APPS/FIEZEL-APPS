@@ -1,7 +1,7 @@
 {
-  "version": "m025-481",
-  "claimedBy": "branch claude/exciting-ritchie-vyrs2e",
-  "claimedAt": "2026-10-05T08:58:51.803Z",
-  "reason": "fix(grammar): apply precise positive/negative comparison for have got per user directive",
+  "version": "m025-482",
+  "claimedBy": "branch feat/fiezel-bot-honest-runtime-probe",
+  "claimedAt": "2026-10-05T10:04:53.051Z",
+  "reason": "fix(sw): cabut 5 entri ASSETS tanpa berkas (bocor dari merge #511) & selaraskan baseline id-golden",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
