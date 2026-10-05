@@ -415,7 +415,7 @@
   function statusKirim(res) {
     var st = 'terkirim'; try { st = LF() && LF().resultStatus ? LF().resultStatus(res.id) : 'terkirim'; } catch (_) {}
     if (st === 'menunggu') return '<span data-testid="class-result-menunggu">' + icon('clock') + ' ' + esc(t('sekolah.hasil-menunggu-sinyal', 'Hasil ini tersimpan di HP-mu dan otomatis terkirim ke {guru} begitu ada sinyal. Tidak perlu dikerjakan ulang.', { guru: res.teacher })) + '</span>';
-    if (st === 'mengirim') return '<span data-testid="class-result-mengirim">' + icon('loader') + ' ' + esc(t('sekolah.hasil-mengirim', 'Mengirim hasil ke {guru}…', { guru: res.teacher })) + '</span>';
+    if (st === 'mengirim') return '<span data-testid="class-result-mengirim">' + icon('send') + ' ' + esc(t('sekolah.hasil-mengirim', 'Mengirim hasil ke {guru}…', { guru: res.teacher })) + '</span>';
     return icon('send') + ' ' + esc(t('kelas.hasil-dikirim-guru', 'Hasil ini dikirim ke {guru} — termasuk soal yang perlu diulang.', { guru: res.teacher }));
   }
   /** Satu baris tugas yang belum dikerjakan: tata letak presisi horizontal sesuai mockup. */
