@@ -488,8 +488,8 @@ const GRAMMAR_PRACTICE_MODES=[
  * teori yang tidak melatih bahasa Inggris dan paling sering disebut murid "nggak ngerti".
  * Putaran berjalan per mode, dan di dalam satu mode bergilir antar-templat lesson. */
 const GRAMMAR_LESSON_MODES=[
-  'apply_form','justify_correct','complete_sentence','diagnose_distractor_1','repair_distractor_1',
-  'repair_distractor_2','diagnose_distractor_2','repair_distractor_3','diagnose_distractor_3'
+  'apply_form','complete_sentence','repair_distractor_1',
+  'repair_distractor_2','repair_distractor_3'
 ];
 // m025-161 (F1-1): JUDUL LESSON KORUP. Judul dipakai di stem, why, dan ekor alasan; sebelum
 // ini fallback-nya mengganti kata Inggris DI DALAM slug Inggris (vs→dan, with→dengan) dan
@@ -1349,6 +1349,13 @@ function applyContentLocale(){
         const out=q.slice();
         if(t.stem)out[0]=t.stem;
         out[1]=opts;
+        const m=q[3]&&typeof q[3]===typeof{}?q[3]:null;
+        /* m025-483: why/whyOthersFail A1/A2 adalah teks MURID ID. Sidecar Thai belum
+           menerjemahkannya, jadi menyalinnya apa adanya akan menampilkan penjelasan Indonesia
+           di layar Thai. Salon hanya bila sidecar punya versi Thai; kalau tidak, buang
+           supaya penyaji jatuh ke templat netral (yang lokalisasi lewat FiezelI18n), BUKAN
+           membocorkan naskah Indonesia. */
+        if(m){const m2=Object.assign({},m);if(t.why){m2.why=t.why;if(t.whyOthersFail)m2.whyOthersFail=t.whyOthersFail;else delete m2.whyOthersFail}else{delete m2.why;delete m2.whyOthersFail}out[3]=m2;}
         return out;
       })});
     });
@@ -5746,6 +5753,7 @@ function tutorCompose(q,pickedIndex,ok,scaffold,move,timing='',opts={}){
     const tokenWhy=(!ok&&q?.type==='token-order')?diagnoseTokenOrderMistake(q):'';
     // Penjelasan yang dipakai tutor SELALU bidang `explain` hasil olahan FIEZEL, tidak pernah
     // objek asli dari bank soal: bank menyimpannya dalam bahasa Inggris.
+    const cleanKeyGuard=String((q?.options&&q.options[q.answerIndex])||q?.targetWord||'');
     return self.FiezelTutorBrain.composeTurn({
       move:ok?(move||'continue'):(move||'hint'),scaffold,
       explanation:{
@@ -5756,7 +5764,9 @@ function tutorCompose(q,pickedIndex,ok,scaffold,move,timing='',opts={}){
       ...(tutorSesi?{concept:quizConcept(q)}:{}),
       whyFails:ok?'':(tokenWhy||tutorWhyFails(q,chosenText)),
       conceptLabel:friendlySkillName(q?.lessonSkill||q?.skill||q?.type),
-      timing:String(timing||'')
+      timing:String(timing||''),
+      keyGuard:cleanKeyGuard,
+      options:Array.isArray(q?.options)?q.options:[]
     },tutorSesi||undefined)
   }catch{return null}
 }
@@ -13334,7 +13344,7 @@ function grammarLessonSessionTarget(skill){const targetSize=(typeof FiezelGramma
  * pilihan yang diklik). Sejalan dengan GRAMMAR_QUICK_MODES (Sesi Kilat) yang sudah bebas teori. */
 const GRAMMAR_LESSON_SLOTS=['apply_form','complete_sentence','repair_distractor_1','apply_form','repair_distractor_2','complete_sentence','repair_distractor_3','apply_form','complete_sentence','repair_distractor_1','apply_form','repair_distractor_2','complete_sentence','apply_form','repair_distractor_3','complete_sentence','repair_distractor_1','apply_form','repair_distractor_2','complete_sentence'];
 const GRAMMAR_PRACTICE_SLOT_MODES=['apply_form','complete_sentence','repair_distractor_1','repair_distractor_2','repair_distractor_3'];
-const GRAMMAR_WHY_SLOT_MODES=['justify_correct','diagnose_distractor_1','diagnose_distractor_2','diagnose_distractor_3'];
+const GRAMMAR_WHY_SLOT_MODES=['repair_distractor_1','repair_distractor_2','repair_distractor_3'];
 function buildGrammarLessonQuestions(skill,count=GRAMMAR_SESSION_SIZE,opts={}){
   const meta=GRAMMAR_ITEMS.find(x=>x.skill===skill);if(!meta||meta.level!==getActiveLevel())return[];
   const own=G[skill]||[],n=own.length;if(!n)return[];
@@ -15002,7 +15012,7 @@ function quizLoop(cfg){
     finally{if(wave)wave.classList.add('hidden');listen.disabled=false;pawReact('listening-stop');enhanceUI()}
    };
   }
-  $('quizNext').onclick=()=>{if(answer.locked){$('quizFloatingBar')?.remove();closeConfidencePop();answer.locked=false;audio.stop();asked++;lastConcept=quizConcept(q);start=Date.now();draw()}};
+  $('quizNext').onclick=()=>{if(answer.locked){$('quizFloatingBar')?.remove();document.querySelector('.quiz-shell')?.classList.remove('has-retry-active');closeConfidencePop();answer.locked=false;audio.stop();asked++;lastConcept=quizConcept(q);start=Date.now();draw()}};
  };
 
  /**
@@ -15043,7 +15053,7 @@ function quizLoop(cfg){
   // hanya pada giliran retry (saat tutor benar-benar menahan); gerak halus dihormati lewat
   // gerbang ganda prefers-reduced-motion + preferensi app (pola yang sama dengan quizLoop).
   if(retry)try{
-   const scrollTarget=document.getElementById('quizScaffoldNudge')||host;
+   const scrollTarget=host||document.getElementById('quizScaffoldNudge');
    scrollTarget.scrollIntoView({block:'nearest',behavior:(prefersReducedMotion()||state.preferences?.motion===false)?'auto':'smooth'});
   }catch{}
   enhanceUI();
@@ -15081,10 +15091,13 @@ function quizLoop(cfg){
     : FiezelI18n.t('quiz.retry-floating-label','Pilih jawaban lain yuk');
    const giveupLabel=FiezelI18n.t('quiz.retry-giveup-btn','Buka Pembahasan');
    bar.innerHTML=`<div class="quiz-floating-retry"><span class="retry-bar-label"><i data-lucide="rotate-ccw"></i> <span>${esc(barLabel)}</span></span><button type="button" id="quizRetryGiveUp" class="retry-giveup-btn">${esc(giveupLabel)}</button></div>`;
-   (document.querySelector('.quiz-shell')||document.body).appendChild(bar);
+   const shell=document.querySelector('.quiz-shell');
+   if(shell)shell.classList.add('has-retry-active');
+   (shell||document.body).appendChild(bar);
    bar.querySelector('#quizRetryGiveUp').onclick=()=>{
     haptic('tap');
     bar.remove();
+    document.querySelector('.quiz-shell')?.classList.remove('has-retry-active');
     document.getElementById('quizScaffoldNudge')?.remove();
     document.querySelectorAll('.option.retry-available').forEach(b=>b.classList.remove('retry-available'));
     reveal(questionObj,lastPickIndex,false,{forced:true});
@@ -15182,6 +15195,7 @@ function quizLoop(cfg){
  const reveal=(q,j,ok,{forced=false}={})=>{
   q.__diagnosticClue='';
   document.getElementById('quizScaffoldNudge')?.remove();
+  document.querySelector('.quiz-shell')?.classList.remove('has-retry-active');
   document.querySelectorAll('.option.retry-available').forEach(b=>b.classList.remove('retry-available'));
   $('tutorTurn')?.classList.add('hidden');
   document.querySelectorAll('.option').forEach(b=>b.disabled=true);

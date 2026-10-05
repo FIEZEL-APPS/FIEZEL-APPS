@@ -429,7 +429,7 @@
     'grammar.mode-cue-stem': 'จุดสังเกตสำคัญในประโยคนี้คืออะไร?\n{stem}',
     'grammar.mode-diagnose-expl-kunci': 'นี่คือเหตุผลว่าทำไม {kunciDikutip} ถึงถูกต้อง แต่โจทย์ถามว่าทำไม {opsiDikutip} ถึงพลาด',
     'grammar.mode-diagnose-expl-lain': 'นี่เป็นคำอธิบายของตัวเลือก {opsiLainDikutip} ไม่ใช่ของ {opsiDikutip}',
-    'grammar.mode-diagnose-stem': 'เพื่อนเลือก {opsiDikutip} ทำไมตัวเลือกนี้จึงไม่ถูกต้อง?\n{stem}',
+    'grammar.mode-diagnose-stem': 'ตัวเลือก {opsiDikutip} ไม่เหมาะสมสำหรับประโยคนี้ เพราะเหตุใด?\n{stem}',
     'grammar.mode-family-expl': 'ป้าย {labelDikutip} เป็นกลุ่ม grammar อื่น ตัวอย่างนี้กำลังทดสอบรูปแบบของกลุ่ม {labelKeluargaDikutip}',
     'grammar.mode-family-stem': 'ประโยคนี้จัดอยู่ในกลุ่มไวยากรณ์ใด?\n{stem}',
     'grammar.mode-justify-stem': 'ทำไม {kunciDikutip} จึงเป็นคำตอบที่ถูกต้อง?\n{stem}',

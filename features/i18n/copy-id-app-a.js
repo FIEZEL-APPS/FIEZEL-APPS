@@ -820,7 +820,7 @@
     // app.js:633 — grammarExercise v9-11 expl lain
     'grammar.mode-diagnose-expl-lain': `Ini penjelasan buat pilihan {opsiLainDikutip}, bukan buat {opsiDikutip}.`,
     // app.js:633 — grammarExercise v9-11 stem (diagnose_distractor)
-    'grammar.mode-diagnose-stem': `Temanmu memilih {opsiDikutip}. Kenapa pilihan itu salah?\n{stem}`,
+    'grammar.mode-diagnose-stem': `Pilihan {opsiDikutip} kurang tepat untuk kalimat ini. Mengapa?\n{stem}`,
     // app.js:644 — grammarExercise v21 expl
     'grammar.mode-family-expl': `Label {labelDikutip} itu keluarga grammar lain. Contoh ini lagi nguji pola keluarga {labelKeluargaDikutip}.`,
     // app.js:644 — grammarExercise v21 stem (classify_family)

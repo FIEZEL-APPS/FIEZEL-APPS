@@ -955,8 +955,9 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
   color:#fff;transition:transform .15s ease,box-shadow .15s ease;
 }
 .quiz-floating-next-btn:active{transform:scale(.96);transition-duration:.08s}
-.quiz-floating-next-btn svg{width:20px;height:20px}
 .quiz-shell{padding-bottom:calc(92px + env(safe-area-inset-bottom, 0px))!important}/* audit F08: 52px tombol + 16px jarak + nafas, ditambah area aman iOS - pembahasan terakhir tidak pernah tertutup */
+.quiz-shell.has-retry-active,
+.quiz-shell:has(#tutorTurn:not(.hidden)){padding-bottom:calc(220px + env(safe-area-inset-bottom, 0px))!important}
 /* ==========================================================================
    Popup keyakinan (m025-133)
    ==========================================================================
