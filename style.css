@@ -6918,7 +6918,7 @@ nav.bottomnav .nav[data-view="classroom"].active .fz-i,
   border: 1.5px solid #E2E8F0 !important;
   border-radius: 14px !important;
   padding: 7px 15px !important;
-  font-family: var(--font-sans) !important;
+  font-family: inherit !important;
   font-size: 13.5px !important;
   font-weight: 800 !important;
   color: #0F172A !important;
@@ -7187,7 +7187,7 @@ nav.bottomnav .nav[data-view="classroom"].active .fz-i,
   padding: 13px 24px !important;
   color: #2D0C00 !important;
   -webkit-text-fill-color: #2D0C00 !important;
-  font-family: var(--font-sans) !important;
+  font-family: inherit !important;
   font-size: 14px !important;
   font-weight: 900 !important;
   letter-spacing: 0.05em !important;
@@ -7406,7 +7406,7 @@ nav.bottomnav .nav[data-view="classroom"].active .fz-i,
   color: #FFFFFF !important;
   -webkit-text-fill-color: #FFFFFF !important;
   box-shadow: 0 6px 0 #7F1D1D, 0 14px 28px rgba(220, 38, 38, 0.45) !important;
-  font-family: var(--font-sans) !important;
+  font-family: inherit !important;
   font-size: 13.5px !important;
   font-weight: 800 !important;
   box-sizing: border-box !important;
@@ -7466,7 +7466,7 @@ nav.bottomnav .nav[data-view="classroom"].active .fz-i,
   position: relative !important;
   border-radius: 20px !important;
   border: 2px solid #E2E8F0 !important;
-  box-shadow: 0 6px 0 var(--card-bevel, #CBD5E1), 0 12px 24px rgba(15, 23, 42, 0.05) !important;
+  box-shadow: 0 6px 0 #CBD5E1, 0 12px 24px rgba(15, 23, 42, 0.05) !important;
   padding: 18px 16px !important;
   display: flex !important;
   flex-direction: column !important;
@@ -7479,7 +7479,7 @@ nav.bottomnav .nav[data-view="classroom"].active .fz-i,
 
 .game-arcade-card:active {
   transform: translateY(3px) !important;
-  box-shadow: 0 3px 0 var(--card-bevel, #CBD5E1), 0 6px 12px rgba(15, 23, 42, 0.06) !important;
+  box-shadow: 0 3px 0 #CBD5E1, 0 6px 12px rgba(15, 23, 42, 0.06) !important;
 }
 
 .game-arcade-card.mochi-card {
