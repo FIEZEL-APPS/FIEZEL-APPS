@@ -7,7 +7,7 @@
  * string ada", melainkan menegakkan pertahanan keamanan yang sesungguhnya.
  *
  * T1. Skrip CLI valid sintaksis.
- * T2. Self-test internal lulus (12 sub-test, termasuk patch-jail).
+ * T2. Self-test internal lulus (28 sub-test, termasuk patch-jail).
  * T3. Workflow mematuhi standar A9 + tidak memiliki jalur push anonim.
  * T4. Tidak mengganggu gerbang timeout workflow keseluruhan.
  * T5. Komponen kunci engine v2 hadir.
@@ -18,6 +18,8 @@
  * T10.[KEAMANAN] Push hanya berkas yang dipatch (bukan `git add -A`).
  * T11.[INTEGRITAS] Patch-jail menolak path berbahaya (uji langsung ke engine).
  * T12.[INTEGRITAS] Mesin menolak heal pada branch terproteksi.
+ * T22.[KUOTA] Hemat 429 (memo model habis), ringkasan galat ringkas, heal jujur.
+ * T23.[EKSEKUSI] Probe Chromium, anotasi temuan usang, pemasangan browser di job review.
  */
 
 const fs = require('fs');
@@ -47,8 +49,8 @@ console.log('[T2] Menjalankan self-test tools/fiezel-bot.mjs...');
 {
   const r = sh('node', ['tools/fiezel-bot.mjs', 'self-test'], true);
   assert(r.out.includes('Self-Test: PASS'), 'Self-test harus mencetak PASS');
-  assert(/PASS \(26\/26 tests\)/.test(r.out), 'Self-test harus lulus 26/26');
-  console.log('  ok (26/26)');
+  assert(/PASS \(28\/28 tests\)/.test(r.out), 'Self-test harus lulus 28/28');
+  console.log('  ok (28/28)');
 }
 pass++;
 
@@ -71,6 +73,9 @@ console.log('[T5] Memeriksa komponen kunci v2 di engine...');
     'runDeterministicScan', 'classifyFiles', 'computeRiskScore', 'CI_FAILURE_SIGNATURES',
     'SECRET_PATTERNS', 'SUBSYSTEMS', 'composeReviewMarkdown', 'FIEZEL_SYSTEM_PROMPT',
     'resolveSafeRepoPath', 'readHexaSync', 'HEXA_SYNC_MARKERS', 'writePatchList', 'fenceUntrusted',
+    // v2.2: hemat kuota + laporan jujur + verifikasi eksekusi + penanda temuan usang.
+    'geminiModelExhausted', 'summarizeLlmErrors', 'applyReplacementBlocksDetailed',
+    'probeFindingsRuntime', 'pickProbeTarget', 'runResolve', 'selectSupersededFindings',
   ];
   for (const comp of requiredComponents) {
     assert(engineSrc.includes(comp), `Komponen kunci v2 "${comp}" tidak ditemukan di engine`);
@@ -253,6 +258,36 @@ console.log('[T21] [KUOTA] Rotasi banyak kunci Gemini tersambung di workflow...'
   const passes = (wfContent.match(/GEMINI_API_KEYS: \$\{\{ secrets\.GEMINI_API_KEYS \}\}/g) || []).length;
   assert(passes === 2, `Job review dan heal wajib meneruskan secrets.GEMINI_API_KEYS (ditemukan ${passes})`);
   assert(engineSrc.includes('function geminiKeyList') && engineSrc.includes('KEY_ROTATE_STATUS'), 'Engine wajib merotasi kunci Gemini');
+}
+console.log('  ok');
+pass++;
+
+console.log('[T22] [KUOTA] Hemat 429 (memo model habis), laporan galat ringkas, & heal jujur...');
+{
+  assert(engineSrc.includes('geminiModelExhausted') && engineSrc.includes('geminiModelStrikes'),
+    'Engine wajib menandai model yang seluruh kuncinya habis agar tidak diprobe berulang');
+  assert(engineSrc.includes('function summarizeLlmErrors'),
+    'Galat LLM wajib diringkas per model (bukan 23 baris kunci)');
+  assert(engineSrc.includes('function applyReplacementBlocksDetailed') && engineSrc.includes('blok SEARCH tidak cocok'),
+    'Kegagalan SEARCH wajib dilaporkan dengan alasan persis');
+  assert(engineSrc.includes('ai-patch-not-applied'),
+    'runHeal wajib mengembalikan reason spesifik, bukan selalu "unfixable"');
+}
+console.log('  ok');
+pass++;
+
+console.log('[T23] [EKSEKUSI] Verifikasi Chromium, anotasi temuan usang, & pemasangan browser di job review...');
+{
+  assert(fs.existsSync(path.join(ROOT, 'tools', 'fiezel-bot-probe.mjs')),
+    'Probe eksekusi tools/fiezel-bot-probe.mjs wajib ada');
+  assert(engineSrc.includes('probeFindingsRuntime') && engineSrc.includes('function pickProbeTarget'),
+    'Review wajib memanggil probe eksekusi & memetakan berkas ke halaman');
+  assert(engineSrc.includes('selectSupersededFindings') && engineSrc.includes('fiezel-bot-superseded:'),
+    'Temuan inline usang wajib bisa dianotasi (idempoten)');
+  assert(/playwright install[^\n]*chromium/.test(wfContent),
+    'Job review wajib memasang Chromium Playwright (verifikasi eksekusi)');
+  assert(wfContent.includes('FIEZEL_BOT_PROBE'), 'Workflow wajib menyalakan FIEZEL_BOT_PROBE di job review');
+  assert(wfContent.includes('fiezel-bot.mjs resolve'), 'Workflow wajib memanggil mode resolve untuk menandai temuan usang');
 }
 console.log('  ok');
 pass++;
