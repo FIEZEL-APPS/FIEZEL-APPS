@@ -413,7 +413,9 @@ async function queryLLM(prompt, systemInstruction = '') {
 
   // 1. Gemini — kunci lewat HEADER, bukan query URL.
   if (geminiKey) {
-    for (const model of ['gemini-flash-latest', 'gemini-2.5-pro', 'gemini-pro-latest']) {
+    // Nama model harus yang benar-benar tersedia untuk kunci ini (gemini-2.5-pro
+    // mengembalikan 404 di akun ini, sehingga review kehilangan lapisan AI).
+    for (const model of ['gemini-3.5-flash', 'gemini-3.8-flash', 'gemini-flash-lite-latest', 'gemini-flash-latest']) {
       const ctrl = new AbortController();
       const timer = setTimeout(() => ctrl.abort(), LLM_TIMEOUT_MS);
       try {
