@@ -79,7 +79,8 @@
   }
   function labelTP(skill, env) {
     var B = bank(env), sk = B && B.SKILLS && B.SKILLS[skill];
-    return (sk && (sk.short || sk.label)) || String(skill || '').replace(/[_-]+/g, ' ');
+    var s = (sk && (sk.short || sk.label)) || String(skill || '').replace(/[_-]+/g, ' ');
+    return s.charAt(0).toUpperCase() + s.slice(1);
   }
 
   /**
@@ -192,6 +193,7 @@
     tingkat: tingkat,
     labelTingkat: labelTingkat,
     daftarTP: daftarTP,
+    labelTP: labelTP,
     buktiKertas: buktiKertas,
     raporMurid: raporMurid,
     deskripsi: deskripsi,

@@ -4511,10 +4511,11 @@
   function board(c) {
     var T = S(), stt = T.classStats(c), map = T.classSkillMap(c), mis = T.misconceptions(c), ag = T.agenda(c);
     return '<div class="tg-board" data-testid="tg-board"><button type="button" class="tg-board-close" data-tg="close" aria-label="' + t('guru.tutup-mode-papan', 'Tutup mode papan') + '">' + icon('x') + ' Tutup</button><p class="tg-board-kicker">' + esc(c.name) + ' · ' + esc(new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' })) + '</p><h2>Kemajuan kita minggu ini</h2>' +
+      /* R1: tombol pemanasan di ATAS papan — di bawah statistik ia jatuh di luar layar proyektor 720p dan layar HP. */
+      (root.FiezelKelasTanpaHP ? '<button type="button" class="tg-btn is-primary tg-board-warm-btn" data-tg="warm-start" data-testid="tg-warm-start">' + icon('sparkles') + ' ' + esc(t('sekolah.pemanasan-mulai', 'Mulai pemanasan 5 menit')) + '</button>' : '') +
       '<div class="tg-board-kpi"><div><b>' + stt.active7 + '<small>/' + stt.total + '</small></b><span>teman yang belajar minggu ini</span></div><div><b>' + pct(stt.avgAcc) + '</b><span>akurasi kelas</span></div><div><b>' + (ag.length ? ag[0].a.deadline || '—' : '—') + '</b><span>' + (ag.length ? 'tenggat: ' + esc(ag[0].a.title) : 'tidak ada tenggat') + '</span></div></div>' +
       '<div class="tg-board-skills">' + map.filter(function (m) { return m.acc != null; }).map(function (m) { return '<div><span>' + esc(m.label) + '</span>' + bar(m.acc, m.acc < 0.5 ? 'is-warn' : '') + '<b>' + pct(m.acc) + '</b></div>'; }).join('') + '</div>' +
-      (mis.length ? '<p class="tg-board-focus">' + icon('target') + ' Fokus hari ini: <b>' + esc(mis[0].label) + '</b> — ' + esc(mis[0].pattern) + '</p>' : '') +
-      (root.FiezelKelasTanpaHP ? '<button type="button" class="tg-btn is-primary tg-board-warm-btn" data-tg="warm-start" data-testid="tg-warm-start">' + icon('sparkles') + ' ' + esc(t('sekolah.pemanasan-mulai', 'Mulai pemanasan 5 menit')) + '</button>' : '') + '</div>';
+      (mis.length ? '<p class="tg-board-focus">' + icon('target') + ' Fokus hari ini: <b>' + esc(mis[0].label) + '</b> — ' + esc(mis[0].pattern) + '</p>' : '') + '</div>';
   }
   /* R1 Kelas Tanpa HP: pemanasan proyektor. Daftar soalnya dibekukan saat dibuka (ui.warm) supaya
      urutan tidak bergeser di tengah pelajaran ketika laporan murid baru masuk. */
@@ -4534,7 +4535,8 @@
     var AB = root.FiezelAnalisisButir; if (!AB) return '';
     var h = AB.analisis(c, a);
     var head = '<p class="tg-muted">' + esc(t('sekolah.butir-penjelasan', 'Dihitung dari {n} murid yang mengerjakan lewat aplikasi. Daya beda membandingkan 27% murid nilai tertinggi dan terendah; butuh minimal {min} murid.', { n: h.n, min: AB.MIN_DAYA_BEDA })) +
-      (h.dilewati ? ' ' + esc(t('sekolah.butir-dilewati', '{n} murid dengan nilai kertas tidak dihitung (tanpa rincian per soal).', { n: h.dilewati })) : '') + '</p>';
+      (h.kertas ? ' ' + esc(t('sekolah.butir-dilewati', '{n} murid dengan nilai kertas tidak dihitung (tanpa rincian per soal).', { n: h.kertas })) : '') +
+      (h.tanpaRincian ? ' ' + esc(t('sekolah.butir-dilewati-lama', '{n} murid mengirim hasil dari aplikasi versi lama tanpa rincian per soal, jadi tidak dihitung.', { n: h.tanpaRincian })) : '') + '</p>';
     if (!h.n) return head + '<p data-testid="tg-butir-kosong">' + esc(t('sekolah.butir-kosong', 'Belum ada murid yang mengerjakan tugas ini lewat aplikasi.')) + '</p>';
     return head + '<div class="tg-table-wrap"><table class="tg-table tg-butir-table" data-testid="tg-butir-table"><thead><tr><th>No</th><th>' + esc(t('sekolah.butir-soal', 'Soal')) + '</th><th>p</th><th>' + esc(t('sekolah.butir-kesukaran', 'Kesukaran')) + '</th><th>D</th><th>' + esc(t('sekolah.butir-daya-beda', 'Daya beda')) + '</th><th>' + esc(t('sekolah.butir-pengecoh', 'Pilihan (jumlah murid)')) + '</th><th>' + esc(t('sekolah.butir-rekomendasi', 'Rekomendasi')) + '</th></tr></thead><tbody>' +
       h.rows.map(function (r) {
@@ -4550,7 +4552,7 @@
     return '<form data-tg-form="rapor-kktp" class="tg-form" data-testid="tg-rapor-form">' +
       '<div class="tg-rapor-head"><label class="tg-label">' + esc(t('sekolah.kktp-label', 'KKTP kelas (%)')) + '<input type="number" name="kktp" min="50" max="95" step="1" value="' + kktpPersen(c) + '" data-testid="tg-kktp-input"></label>' +
       '<p class="tg-muted">' + esc(t('sekolah.rapor-penjelasan', 'Tingkat dihitung per tujuan pembelajaran dari jawaban murid. Tujuan dengan kurang dari {n} jawaban ditulis "belum cukup data". Deskripsi bisa kamu sunting sebelum disalin ke e-Rapor.', { n: R.MIN_BUKTI })) + '</p></div>' +
-      (tps.length ? '<p class="tg-muted">' + esc(t('sekolah.rapor-tp', 'Tujuan pembelajaran yang diukur:')) + ' ' + tps.map(function (k) { return '<b>' + esc(k.replace(/_/g, ' ')) + '</b>'; }).join(', ') + '</p>' : '') +
+      (tps.length ? '<p class="tg-muted">' + esc(t('sekolah.rapor-tp', 'Tujuan pembelajaran yang diukur:')) + ' ' + tps.map(function (k) { return '<b>' + esc(R.labelTP ? R.labelTP(k) : k.replace(/_/g, ' ')) + '</b>'; }).join(', ') + '</p>' : '') +
       '<ul class="tg-rapor-list">' + rapor.map(function (r) {
         var e = edits[r.s.id] || {};
         return '<li data-testid="tg-rapor-' + esc(r.s.id) + '"><div class="tg-rapor-who">' + avatar(r.s, 'sm') + '<b>' + esc(r.s.name) + '</b><span class="tg-rapor-nilai">' + (r.nilai == null ? '—' : r.nilai) + '</span><small class="tg-muted">' +

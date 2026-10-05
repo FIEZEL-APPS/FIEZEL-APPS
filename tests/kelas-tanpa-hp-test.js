@@ -106,6 +106,11 @@ check('K7 sambungan ke layar guru, loader, service worker, halaman', () => {
   for (const s of ['data-tg="print-sheet"', "data-kind=\"paper-scores\"", "case 'print-sheet'", "kind === 'paper-scores'", 'data-tg="warm-start"', "m.kind === 'warmup'", "case 'warm-reveal'", "case 'warm-next'"]) {
     assert.ok(shell.includes(s), 'shell: ' + s);
   }
+  const papan = shell.slice(shell.indexOf('function board(c)'), shell.indexOf('function warmup(c)'));
+  assert.ok(papan.indexOf('data-tg="warm-start"') > 0 && papan.indexOf('data-tg="warm-start"') < papan.indexOf('tg-board-kpi'), 'tombol pemanasan di atas statistik papan (terjangkau di layar 720p/HP)');
+  const css = read('features/teacher/teacher-shell.css');
+  assert.ok(/\.tg-board\{overflow-y:auto/.test(css), 'papan bisa digulir');
+  assert.ok(/\.tg-board \.ktp-warm-prompt\{color:#EAF1EE!important\}/.test(css), 'pertanyaan pemanasan tidak gelap-di-atas-gelap');
   const loader = (read('features/teacher/fiezel-teacher-loader.js').match(/var BUNDLE = \[[^\]]*\]/) || [''])[0];
   assert.ok(loader.indexOf('fiezel-kelas-tanpa-hp.js') > 0 && loader.indexOf('fiezel-kelas-tanpa-hp.js') < loader.indexOf('fiezel-teacher-shell.js'), 'modul dimuat sebelum shell');
   const sw = read('sw.js');

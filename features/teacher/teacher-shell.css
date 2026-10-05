@@ -817,3 +817,14 @@ html body.fz-teacher-mode .tg .tg-mnav-more .tg-mnav-sheet button.is-active{back
 .tg-butir-opsi .is-mati{color:#8a2a1a;text-decoration:underline dotted}
 .tg-butir-table tr.is-periksa-kunci td{background:#fde2dd}
 .tg-butir-table tr.is-perbaiki td{background:#fff4d6}
+
+/* R1 — temuan role play guru (2026-10-05):
+   1. Papan & pemanasan bisa digulir: .tg-board fixed setinggi layar tanpa overflow membuat isi di
+      bawah lipatan (dulu tombol pemanasan) tidak terjangkau di proyektor 720p dan di HP.
+   2. Judul di papan gelap: aturan `html body.fz-teacher-mode .tg :is(h1,h2,h3…)` mewarnai judul
+      dengan tinta gelap — di latar papan yang juga gelap judulnya hilang ("Kemajuan kita minggu
+      ini" dan pertanyaan pemanasan). Aturan itu ber-!important, jadi pengecualian papan di bawah juga
+      ber-!important dengan selektor yang lebih spesifik. */
+.tg-board{overflow-y:auto;overscroll-behavior:contain}
+html body.fz-teacher-mode .tg .tg-board :is(h1,h2,h3),html body.fz-teacher-mode .tg .tg-board .ktp-warm-prompt{color:#EAF1EE!important}
+.tg-board-warm-btn{align-self:flex-start}

@@ -135,7 +135,21 @@
     var ids1 = B ? B.pick('past_tense', 5, 11).map(function (x) { return x.id; }) : [], ids2 = B ? B.pick('listening_detail', 5, 13).map(function (x) { return x.id; }) : [];
     c.assignments.push({ id: uid('as'), title: 'Review Past Tense — penanda waktu', skills: ['past_tense'], itemIds: ids1, minutes: 6, mode: 'latihan', deadline: today(t - DAY), createdAt: t - 4 * DAY, targets: null, done: {} });
     c.assignments.push({ id: uid('as'), title: 'Ujian mini Listening detail', skills: ['listening_detail'], itemIds: ids2, minutes: 8, mode: 'ujian', timer: 8, shuffle: true, deadline: today(t + 2 * DAY), createdAt: t - DAY, targets: null, done: {} });
-    c.students.forEach(function (s, i) { if (i % 3 !== 2) c.assignments[0].done[s.id] = { at: t - 2 * DAY, acc: skillAcc(s, 'past_tense') }; if (i % 2 === 0 && (t - s.lastActiveAt) / DAY < 3) c.assignments[1].done[s.id] = { at: t - 6e5, acc: skillAcc(s, 'listening_detail') }; });
+    /* Hasil demo membawa bukti per soal (c, t, w) seperti laporan murid sungguhan — tanpanya guru
+       yang mencoba demo tidak pernah melihat Analisis butir, Pemanasan, atau Rapor dari data tugas
+       (temuan role play guru 2026-10-05). Soal yang salah dipilih berurutan dari yang "paling
+       sukar", dan pengecohnya bergiliran antarmurid — supaya tabelnya punya pola yang bisa dibaca. */
+    function demoHasil(ids, acc, i) {
+      var n = ids.length, benar = Math.max(0, Math.min(n, Math.round((Number(acc) || 0) * n))), w = [];
+      for (var k = 0; k < n - benar; k++) {
+        var id = ids[(n - 1 - k + (i % 2)) % n], q = B && B.byId ? B.byId(id) : null;
+        var ans = q ? (typeof q.answer === 'number' ? q.answer : q.options.indexOf(q.answer)) : 0;
+        var salah = q ? q.options.map(function (_, j) { return j; }).filter(function (j) { return j !== ans; }) : [1];
+        w.push({ i: id, o: salah[(i + k) % salah.length] });
+      }
+      return { acc: n ? benar / n : acc, c: benar, t: n, w: w.length ? w : undefined };
+    }
+    c.students.forEach(function (s, i) { if (i % 3 !== 2) c.assignments[0].done[s.id] = Object.assign({ at: t - 2 * DAY }, demoHasil(ids1, skillAcc(s, 'past_tense'), i)); if (i % 2 === 0 && (t - s.lastActiveAt) / DAY < 3) c.assignments[1].done[s.id] = Object.assign({ at: t - 6e5 }, demoHasil(ids2, skillAcc(s, 'listening_detail'), i)); });
     c.announcements.push({ id: uid('an'), at: t - 2 * DAY, text: 'Besok kita bahas Past Tense lewat cerita liburan kalian. Siapkan 3 kalimat tentang kegiatan minggu lalu ya!' });
     c.journal.push({ id: uid('jr'), at: t - 3 * DAY, text: 'Metode “timeline di papan” ampuh untuk yesterday/ago. Fikri dan Rizky masih tertukar verb 1/verb 2 saat pertanyaan.', tags: [c.students[5].id, c.students[7].id] });
     return c;

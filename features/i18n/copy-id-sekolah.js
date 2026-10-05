@@ -78,6 +78,7 @@
     'sekolah.butir-db-cukup': "Cukup",
     'sekolah.butir-db-sangat-baik': "Sangat baik",
     'sekolah.butir-dilewati': "{n} murid dengan nilai kertas tidak dihitung (tanpa rincian per soal).",
+    'sekolah.butir-dilewati-lama': "{n} murid mengirim hasil dari aplikasi versi lama tanpa rincian per soal, jadi tidak dihitung.",
     'sekolah.butir-ganti-pengecoh': "Ganti pengecoh yang tidak dipilih",
     'sekolah.butir-judul': "Analisis butir soal — {judul}",
     'sekolah.butir-kesukaran': "Kesukaran",

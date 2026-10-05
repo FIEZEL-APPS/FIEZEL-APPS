@@ -45,6 +45,23 @@ check('B2 p dari w[]; nilai kertas dilewati', () => {
   assert.strictEqual(r2.p, 0.5); assert.strictEqual(r3.p, 0.5);
 });
 
+check('B6 murid bernilai sempurna (tanpa w) ikut dihitung; laporan lama tanpa rincian dipisah dari kertas', () => {
+  const ids = a.itemIds;
+  const done = {
+    sempurna: { c: ids.length, t: ids.length, at: 1 },          // aplikasi: benar semua -> laporan tanpa w
+    lama: { c: 1, t: ids.length, at: 1 },                        // aplikasi versi lama: ada salah, tanpa w
+    kertas: { c: 2, t: ids.length, at: 1, src: 'kertas' },
+    biasa: { c: ids.length - 1, t: ids.length, at: 1, w: [{ i: ids[0], o: 1 }] }
+  };
+  const h = AB.analisis({}, Object.assign({}, a, { done }));
+  assert.strictEqual(h.n, 2, 'sempurna + biasa');
+  assert.strictEqual(h.kertas, 1);
+  assert.strictEqual(h.tanpaRincian, 1);
+  assert.strictEqual(h.rows[0].p, 0.5, 'soal 1: satu benar (sempurna), satu salah (biasa)');
+  const shell = fs.readFileSync(path.join(__fzRoot, 'features/teacher/fiezel-teacher-shell.js'), 'utf8');
+  assert.ok(shell.includes("'sekolah.butir-dilewati-lama'") && /n: h\.kertas \}/.test(shell), 'pesan kertas dan laporan lama terpisah');
+});
+
 check('B3 daya beda & kunci terbalik', () => {
   const [, r2, r3] = h.rows;
   assert.strictEqual(h.kelompok, 3);

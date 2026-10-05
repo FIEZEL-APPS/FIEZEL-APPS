@@ -80,13 +80,19 @@
    * Murid dihitung bila hasilnya dari aplikasi (punya w[] atau t > 0 tanpa src kertas).
    */
   function analisis(c, a, env) {
-    var list = items(a, env), done = (a && a.done) || {}, peserta = [], dilewati = 0;
+    var list = items(a, env), done = (a && a.done) || {}, peserta = [], kertas = 0, tanpaRincian = 0;
     Object.keys(done).forEach(function (sid) {
       var d = done[sid];
       if (!d) return;
-      if (d.src === 'kertas' || !Array.isArray(d.w)) { dilewati++; return; }
+      if (d.src === 'kertas') { kertas++; return; }
+      /* Laporan murid hanya membawa `w` (soal yang salah) bila ADA yang salah — murid yang benar
+         semua datang tanpa `w`. Mereka bukan "tanpa rincian": rinciannya justru lengkap, kosong.
+         (Temuan role play guru 2026-10-05: murid bernilai sempurna terbuang dari analisis dan
+         disebut "nilai kertas".) */
+      var w = Array.isArray(d.w) ? d.w : (Number(d.t) > 0 && Number(d.c) === Number(d.t) ? [] : null);
+      if (!w) { tanpaRincian++; return; }
       var salah = {};
-      d.w.forEach(function (x) { var id = x && (x.i || x.id); if (id) salah[id] = (x.o == null ? -1 : Number(x.o)); });
+      w.forEach(function (x) { var id = x && (x.i || x.id); if (id) salah[id] = (x.o == null ? -1 : Number(x.o)); });
       var benar = list.filter(function (q) { return !Object.prototype.hasOwnProperty.call(salah, q.id); }).length;
       peserta.push({ sid: sid, salah: salah, skor: typeof d.c === 'number' ? d.c : benar });
     });
@@ -121,7 +127,7 @@
       row.rekomendasi = rekomendasi(row);
       return row;
     });
-    return { n: n, dilewati: dilewati, kelompok: g, rows: rows };
+    return { n: n, dilewati: kertas + tanpaRincian, kertas: kertas, tanpaRincian: tanpaRincian, kelompok: g, rows: rows };
   }
 
   function csvCell(v) { return '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"'; }
