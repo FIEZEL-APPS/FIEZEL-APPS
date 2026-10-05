@@ -285,7 +285,7 @@
     var area = L.skill === 'mixed' ? 'mixed' : (B.SKILLS[L.skill] ? B.SKILLS[L.skill].area : 'mixed');
     st.lessons.push({ at: Date.now(), skill: L.skill, area: area, kind: L.kind, title: L.title, correct: correct, total: L.results.length, minutes: L.minutes });
     if (st.plan && st.plan.done.indexOf(L.blockId) === -1) st.plan.done.push(L.blockId);
-    if (L.blockId.indexOf('assign-') === 0) { st.doneAssign = (st.doneAssign || []).concat([{ id: L.blockId.slice(7), at: Date.now(), c: correct, t: L.results.length }]).slice(-6); try { localStorage.setItem(ASSIGN_KEY, JSON.stringify(loadAssignments().filter(function (a) { return 'assign-' + a.id !== L.blockId; }))); } catch (_) {} }
+    if (L.blockId.indexOf('assign-') === 0) { var hasilTugas = { id: L.blockId.slice(7), at: Date.now(), c: correct, t: L.results.length }; st.doneAssign = (st.doneAssign || []).concat([hasilTugas]).slice(-6); outboxAdd(st, hasilTugas); try { localStorage.setItem(ASSIGN_KEY, JSON.stringify(loadAssignments().filter(function (a) { return 'assign-' + a.id !== L.blockId; }))); } catch (_) {} }
     st.lastNext = buildNext(st, L, correct);
     st.activeLesson = null;
     pushToClass();
@@ -358,6 +358,43 @@
     if (retryTimer && retryTimer.unref) retryTimer.unref();
   }
   // Di perangkat yang sama (kelas demo/uji), hasil diagnostic langsung masuk ke kelas berkode.
+  /* R6 PAKET TUGAS OFFLINE (docs/STRATEGI-SEKOLAH-INDONESIA-2026.md). Laporan ke guru membawa
+     paling banyak 8 tugas (server: ASSIGN_MAX 8) dan dikirim sebagai KEADAAN TERBARU — jadi murid
+     yang menyelesaikan lebih dari 8 tugas saat tanpa sinyal dulu kehilangan hasil yang paling lama:
+     gurunya tidak pernah menerimanya. Kotak keluar ini menyimpan setiap hasil yang BELUM dikonfirmasi
+     server (maks. 60) dan mengirimnya bertahap, yang paling lama dulu, sampai habis. */
+  /* Jeda antarkiriman di atas lantai server 15 detik (LEARNER_MIN_INTERVAL_MS). */
+  var OUTBOX_MAX = 60, OUTBOX_BATCH = 8, OUTBOX_DRAIN_MS = 16000, drainTimer = null;
+  function outboxAdd(s, entry) {
+    if (!s || !entry || !entry.id || !(entry.t > 0)) return;
+    s.assignOutbox = (s.assignOutbox || []).filter(function (x) { return x.id !== entry.id; }).concat([entry]).slice(-OUTBOX_MAX);
+  }
+  /** Daftar `assign` untuk laporan: hasil tertunda (paling lama dulu), lalu status terbaru. */
+  function assignForReport(s) {
+    var out = [], ids = {};
+    (s.assignOutbox || []).slice(0, OUTBOX_BATCH).forEach(function (x) { out.push(x); ids[x.id] = true; });
+    var recent = (s.doneAssign || []).slice().reverse();
+    for (var i = 0; i < recent.length && out.length < OUTBOX_BATCH; i++) if (!ids[recent[i].id]) { out.push(recent[i]); ids[recent[i].id] = true; }
+    return out;
+  }
+  /* Layar hasil KelasKu dulu selalu berkata "Hasil ini dikirim ke Bu Sari", juga saat HP tanpa
+     sinyal dan hasilnya masih di kotak keluar (temuan role play murid 2026-10-05). Status ini
+     dibaca layar itu; event di bawah membuatnya diperbarui begitu kiriman benar-benar sampai. */
+  function kabarLaporan(ok) {
+    try { if (root.dispatchEvent && typeof root.CustomEvent === 'function') root.dispatchEvent(new root.CustomEvent('fiezel:class-report', { detail: { ok: ok } })); } catch (_) {}
+  }
+  /** 'terkirim' | 'mengirim' | 'menunggu' untuk hasil tugas `id`. */
+  function resultStatus(id) {
+    var s = ensureState();
+    if (!classCode() || !(s.assignOutbox || []).some(function (x) { return x.id === id; })) return 'terkirim';
+    var offline = false; try { offline = root.navigator && root.navigator.onLine === false; } catch (_) {}
+    if (offline || (s.classReport && s.classReport.ok === false)) return 'menunggu';
+    return 'mengirim';
+  }
+  function offlineStatus() {
+    var s = ensureState();
+    return { pending: (s.assignOutbox || []).length, lastOkAt: s.classReport && s.classReport.ok ? s.classReport.at : 0, saved: loadAssignments().length };
+  }
   function pushToClass() {
     if (!classCode()) return false;
     var payload = null;
@@ -366,12 +403,21 @@
     var TS = root.FiezelTeacherStore;
     if (TS && TS.reportToClass) {
       try {
+        var terkirim = {};
+        (payload.assign || []).forEach(function (x) { if (x && x.t > 0) terkirim[x.id] = x.at; });
         TS.reportToClass(payload).then(function (r) {
           st.classReport = { at: Date.now(), ok: !!r.ok, error: r.error || '' };
+          if (r && r.ok && st.assignOutbox && st.assignOutbox.length) {
+            /* Hanya entri yang PERSIS terkirim (id + waktu sama) yang dilepas: hasil yang dikerjakan
+               ulang sesudah laporan berangkat tetap menunggu kiriman berikutnya. */
+            st.assignOutbox = st.assignOutbox.filter(function (x) { return terkirim[x.id] !== x.at; });
+            if (st.assignOutbox.length && !drainTimer && typeof setTimeout === 'function') { drainTimer = setTimeout(function () { drainTimer = null; pushToClass(); }, OUTBOX_DRAIN_MS); if (drainTimer && drainTimer.unref) drainTimer.unref(); }
+          }
           if (r && r.ok && st.pendingJoin) st.pendingJoin = 0;
           save(st);
           if (r && r.ok) clearRetry(); else scheduleRetry();
-        }, function () { scheduleRetry(); });
+          kabarLaporan(!!(r && r.ok));
+        }, function () { st.classReport = { at: Date.now(), ok: false, error: 'network' }; save(st); scheduleRetry(); kabarLaporan(false); });
       } catch (_) { scheduleRetry(); }
     }
     var T = root.FiezelTutorActionCenter; if (!T) return true;
@@ -383,7 +429,7 @@
     Object.keys(st.skills || {}).forEach(function (id) { var s = st.skills[id]; if (s && !skills[id] && /^[a-z0-9_]{1,32}$/.test(id) && Object.keys(skills).length < 12) skills[id] = { c: s.correct, t: s.total }; });
     var nm = String(name || '').trim();
     if (!nm || /^(sobat|murid|teman)$/i.test(nm)) { try { nm = String(JSON.parse(localStorage.getItem('fiezel-onboarding-v1') || '{}').name || nm || t('umum.murid', 'Murid')); } catch (_) { nm = nm || t('umum.murid', 'Murid'); } }
-    var payload = { v: 1, name: nm.split(' ')[0], at: Date.now(), goal: st.goal, skills: skills, lessons: st.lessons.length, cls: classCode() || undefined, assign: (st.doneAssign || []).length ? st.doneAssign.slice(-8) : undefined };
+    var payload = { v: 1, name: nm.split(' ')[0], at: Date.now(), goal: st.goal, skills: skills, lessons: st.lessons.length, cls: classCode() || undefined, assign: assignForReport(st).length ? assignForReport(st) : undefined };
     /* Penanda "aku baru memasukkan kode kelasmu" ikut sampai ia benar-benar mendarat: ia
        dilepas HANYA oleh kiriman yang berhasil (lihat pushToClass), bukan oleh percobaan
        pertama. Murid yang menekan Gabung saat sinyalnya putus tetap sampai ke guru begitu
@@ -475,6 +521,7 @@
        yang tidak terjadi hanyalah pengakuan palsu atas penugasan. */
     if (!mandiri) {
       s.doneAssign = (s.doneAssign || []).filter(function (x) { return x.id !== res.id; }).concat([entry]).slice(-8);
+      outboxAdd(s, entry);
       if (s.plan && s.plan.done.indexOf('assign-' + res.id) === -1) s.plan.done.push('assign-' + res.id);
       try { localStorage.setItem(ASSIGN_KEY, JSON.stringify(loadAssignments().filter(function (a) { return a.id !== res.id; }))); } catch (_) {}
     }
@@ -519,14 +566,18 @@
 
   function render() {
     if (!mountEl) return;
-    var tabs = [['flow', 'Alur belajar'], ['duel', 'Duel'], ['summary', 'Ringkasan'], ['backup', 'Progres & backup']];
+    var tabs = [['flow', 'Alur belajar'], ['bicara', t('sekolah.tab-bicara', 'Bicara privat')], ['duel', 'Duel'], ['summary', 'Ringkasan'], ['backup', 'Progres & backup']];
     var html = '<section class="lf" data-testid="learner-flow">' +
       '<header class="lf-head"><div><p class="lf-kicker">Practice pathway</p><h1>' + t('flow.belajar-hari-ini', 'Belajar hari ini') + '</h1></div>' +
       '<nav class="lf-tabs" role="tablist">' + tabs.map(function (t) { return '<button type="button" role="tab" class="lf-tab' + (st.tab === t[0] ? ' is-active' : '') + '" data-lf="tab" data-tab="' + t[0] + '" data-testid="lf-tab-' + t[0] + '">' + t[1] + '</button>'; }).join('') + '</nav></header>' +
-      (st.tab === 'summary' ? summaryView() : st.tab === 'backup' ? backupView() : st.tab === 'duel' ? '<div id="lfDuelHost" data-testid="lf-duel-host"></div>' : flowView()) + '</section>';
+      (st.tab === 'summary' ? summaryView() : st.tab === 'backup' ? backupView() : st.tab === 'duel' ? '<div id="lfDuelHost" data-testid="lf-duel-host"></div>' : st.tab === 'bicara' ? '<div id="lfBicaraHost" data-testid="lf-bicara-host"></div>' : flowView()) + '</section>';
     mountEl.innerHTML = html;
     if (st.tab === 'duel') { var D = root.FiezelDuel, host = mountEl.querySelector('#lfDuelHost'); if (D && host) D.mount(host, env); else if (host) host.innerHTML = '<p class="lf-muted">Modul Duel belum termuat.</p>'; }
     else if (root.FiezelDuel && root.FiezelDuel.unmount) root.FiezelDuel.unmount();
+    /* R7 latihan bicara privat: modulnya memasang dirinya sendiri; tanpa skor, tanpa kiriman ke guru. */
+    var BP = root.FiezelBicaraPrivat;
+    if (st.tab === 'bicara') { var bh = mountEl.querySelector('#lfBicaraHost'); if (BP && bh) BP.mount(bh, env); else if (bh) bh.innerHTML = '<p class="lf-muted">' + esc(t('sekolah.bicara-belum-termuat', 'Latihan bicara belum termuat. Coba buka ulang aplikasi.')) + '</p>'; }
+    else if (BP && BP.unmount) BP.unmount();
     if (env.afterRender) try { env.afterRender(); } catch (_) {}
   }
 
@@ -615,6 +666,57 @@
       '<div class="lf-actions"><button type="button" class="lf-primary" data-lf="to-plan" data-testid="lf-to-plan">Susun rencana hari ini</button><button type="button" class="lf-ghost" data-lf="redo-diagnostic" data-testid="lf-redo-diagnostic">Ulangi diagnostic</button></div></div>';
   }
 
+  /* R3 Jalur Membaca TKA (docs/STRATEGI-SEKOLAH-INDONESIA-2026.md). Bahasa Inggris di TKA SMA
+     diuji lewat membaca: tekstual, inferensial, evaluatif. Peta ini JUJUR: ia hanya menghitung
+     latihan murid di tiap level dan tidak pernah memprediksi nilai TKA atau peluang lulus. */
+  var TKA_MIN = 6;
+  function tkaReadiness(st) {
+    var B = bank(), order = (B && B.TKA_ORDER) || [];
+    return order.map(function (k) {
+      var s = st.skills && st.skills[k], n = s ? s.total : 0, acc = n ? s.correct / s.total : null;
+      var status = n < TKA_MIN ? 'belum' : acc >= 0.8 ? 'kuat' : acc >= 0.6 ? 'sedang' : 'perlu';
+      return { id: k, meta: B.SKILLS[k], n: n, acc: acc, status: status };
+    });
+  }
+  /* R6: murid harus TAHU bahwa tugasnya aman tanpa sinyal dan hasilnya belum/sudah sampai. */
+  function offlineMarkup() {
+    if (!classCode()) return '';
+    var o = offlineStatus();
+    if (!o.saved && !o.pending) return '';
+    var bits = [];
+    if (o.saved) bits.push(t('sekolah.offline-tersimpan', '{n} tugas tersimpan di HP — bisa dikerjakan tanpa internet.').replace('{n}', o.saved));
+    bits.push(o.pending
+      ? t('sekolah.offline-menunggu', '{n} hasil menunggu sinyal untuk dikirim ke guru. Hasilmu aman di HP.').replace('{n}', o.pending)
+      : t('sekolah.offline-terkirim', 'Semua hasil tugas sudah sampai ke guru.'));
+    return '<p class="lf-offline' + (o.pending ? ' is-pending' : '') + '" data-testid="lf-offline-status">' + bits.map(esc).join(' ') + '</p>';
+  }
+  function tkaMarkup(st) {
+    var rows = tkaReadiness(st); if (!rows.length) return '';
+    var LBL = {
+      belum: t('sekolah.tka-status-belum', 'Belum cukup latihan'),
+      kuat: t('sekolah.tka-status-kuat', 'Kuat'),
+      sedang: t('sekolah.tka-status-sedang', 'Sedang'),
+      perlu: t('sekolah.tka-status-perlu', 'Perlu latihan')
+    };
+    return '<div class="lf-card lf-tka" data-testid="lf-tka"><p class="lf-kicker">' + esc(t('sekolah.tka-kicker', 'Persiapan TKA')) + '</p>' +
+      '<h3>' + esc(t('sekolah.tka-judul', 'Latihan Membaca TKA')) + '</h3>' +
+      '<p class="lf-muted">' + esc(t('sekolah.tka-lead', 'Bahasa Inggris di TKA diuji lewat membaca. Latih tiga kemampuannya satu per satu.')) + '</p>' +
+      '<ul class="lf-tka-list">' + rows.map(function (r) {
+        return '<li data-testid="lf-tka-' + r.id + '"><div><b>' + esc(r.meta.short) + '</b><small>' + esc(r.meta.objective) + '</small></div>' +
+          '<span class="lf-tka-chip is-' + r.status + '" data-testid="lf-tka-status-' + r.id + '">' + esc(LBL[r.status]) + (r.n ? ' · ' + r.n + ' ' + esc(t('sekolah.tka-soal', 'soal')) : '') + '</span>' +
+          '<button type="button" class="lf-mini lf-start" data-lf="start-tka" data-skill="' + r.id + '" data-testid="lf-start-tka-' + r.id + '">' + esc(t('sekolah.tka-latih', 'Latih 6 soal')) + '</button></li>';
+      }).join('') + '</ul>' +
+      '<p class="lf-muted lf-tka-note">' + esc(t('sekolah.tka-catatan', 'Ini peta latihan, bukan prediksi nilai TKA. Status muncul setelah 6 soal per kemampuan.')) + '</p></div>';
+  }
+  function startTka(st, skill) {
+    var B = bank(); if (!B || !B.SKILLS[skill] || (B.TKA_ORDER || []).indexOf(skill) === -1) return false;
+    var avoid = (st.seen && st.seen[skill]) || [];
+    var ids = B.pickFresh(skill, 6, { avoid: avoid, seed: (Date.now() % 997) + 3 }).map(function (it) { return it.id; });
+    if (ids.length < 6) ids = B.pickFresh(skill, 6, { seed: (Date.now() % 991) + 5 }).map(function (it) { return it.id; });
+    startLesson(st, { id: 'tka-' + skill + '-' + Date.now().toString(36), kind: t('sekolah.tka-judul', 'Latihan Membaca TKA'), skill: skill, title: B.SKILLS[skill].lesson, minutes: 8, itemIds: ids });
+    return true;
+  }
+
   function planView() {
     var plan = ensurePlan(st), B = bank(), doneCount = plan.done.length;
 
@@ -647,6 +749,10 @@
       }).join('');
       html += '</ol>';
     }
+
+    html += offlineMarkup();
+    html += '<div class="lf-card lf-bicara-ajak" data-testid="lf-bicara-ajak"><h3>' + esc(t('sekolah.bicara-ajak-judul', 'Malu bicara bahasa Inggris?')) + '</h3><p class="lf-muted">' + esc(t('sekolah.bicara-ajak-isi', 'Latihan bicara privat: tanpa nilai, tanpa penonton, tidak direkam, tidak dikirim ke guru.')) + '</p><div class="lf-actions"><button type="button" class="lf-mini" data-lf="tab" data-tab="bicara" data-testid="lf-bicara-buka">' + esc(t('sekolah.bicara-ajak-tombol', 'Mulai latihan bicara')) + '</button></div></div>';
+    html += tkaMarkup(st);
 
     html += '<div class="lf-assign-code" data-testid="lf-assign-code"><label class="lf-muted" for="lfAssignCode">Punya kode tugas dari guru?</label><div class="lf-actions"><input id="lfAssignCode" class="lf-code lf-code-input" placeholder="Tempel kode tugas di sini" autocomplete="off" data-testid="lf-assign-code-input"><button type="button" class="lf-mini" data-lf="accept-assign" data-testid="lf-accept-assign">Tambahkan ke rencana</button></div></div>' +
       '<div class="lf-actions">' +
@@ -767,6 +873,7 @@
         if (nb) startLesson(st, nb);
         break;
       }
+      case 'start-tka': { ensurePlan(st); startTka(st, btn.getAttribute('data-skill')); break; }
       case 'start-lesson': {
         var p2 = ensurePlan(st), blk = p2.blocks.filter(function (b) { return b.id === btn.getAttribute('data-block'); })[0];
         if (blk) startLesson(st, blk);
@@ -829,5 +936,5 @@
     });
   }
 
-  return { KEY: KEY, ASSIGN_KEY: ASSIGN_KEY, GOALS: GOALS, mount: mount, render: render, load: load, buildPlan: buildPlan, skillSummary: skillSummary, weeklySummary: weeklySummary, tutorCode: tutorCode, rankedSkills: rankedSkills, statusOf: statusOf, openAssignment: openAssignment, announceJoin: announceJoin, recordExamFocus: recordExamFocus, markAssignmentStarted: markAssignmentStarted, recordAssignmentFocus: recordAssignmentFocus, recordAssignmentResult: recordAssignmentResult, pushToClass: function () { ensureState(); return pushToClass(); }, _retryState: function () { return { pending: !!retryTimer, delay: retryDelay }; }, _state: function () { return st; } };
+  return { KEY: KEY, ASSIGN_KEY: ASSIGN_KEY, GOALS: GOALS, mount: mount, render: render, load: load, buildPlan: buildPlan, skillSummary: skillSummary, weeklySummary: weeklySummary, tutorCode: tutorCode, rankedSkills: rankedSkills, statusOf: statusOf, openAssignment: openAssignment, announceJoin: announceJoin, recordExamFocus: recordExamFocus, markAssignmentStarted: markAssignmentStarted, recordAssignmentFocus: recordAssignmentFocus, recordAssignmentResult: recordAssignmentResult, pushToClass: function () { ensureState(); return pushToClass(); }, _retryState: function () { return { pending: !!retryTimer, delay: retryDelay }; }, offlineStatus: offlineStatus, resultStatus: resultStatus, _drainPending: function () { return !!drainTimer; }, _state: function () { return st; } };
 });

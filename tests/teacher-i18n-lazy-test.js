@@ -221,7 +221,11 @@ for (const rel of TARGETS) {
   const used = new Set();
   for (const m of src.matchAll(/\bt\(\s*'([a-z0-9][a-z0-9.\-]*)'/gi)) used.add(m[1]);
   const missId = [...used].filter(k => !idKeys.has(k)).sort();
-  const missTh = [...used].filter(k => !thKeys.has(k)).sort();
+  /* Keputusan OWNER 2026-10-05: kunci domain 'sekolah.' (fitur sekolah Indonesia) sengaja tanpa th.
+     Pengecualian ini HANYA berlaku selama utangnya tercatat resmi di UTANG_TANPA_TH
+     (tests/th-coverage-test.js) — begitu entri itu dihapus, kunci sekolah kembali dituntut di th. */
+  const sekolahDitunda = /\['sekolah',\s*\{\s*sejak:/.test(fs.readFileSync(path.join(ROOT, 'tests/th-coverage-test.js'), 'utf8'));
+  const missTh = [...used].filter(k => !thKeys.has(k) && !(sekolahDitunda && k.indexOf('sekolah.') === 0)).sort();
   if (!missId.length && !missTh.length) {
     ok('(B) ' + rel + ': ' + used.size + ' kunci lengkap di id dan th');
   } else {

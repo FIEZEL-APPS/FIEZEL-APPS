@@ -244,3 +244,40 @@
 .paw-story-item{display:flex;gap:10px;align-items:center;justify-content:space-between}
 .paw-story-snip{flex:1;min-width:0;font-style:italic;color:var(--ink,#2b2b2b);overflow:hidden;text-overflow:ellipsis}
 .paw-story-full{max-height:70vh;overflow:auto}
+/* R3 Latihan Membaca TKA */
+.lf-tka{margin-top:20px}
+.lf-tka-list{list-style:none;padding:0;margin:12px 0;display:grid;gap:10px}
+.lf-tka-list li{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:10px 12px;border:1.5px solid var(--line);border-radius:14px}
+.lf-tka-list li small{display:block;color:var(--muted);font-size:.8rem;margin-top:2px}
+.lf-tka-chip{font-size:.76rem;font-weight:700;padding:4px 10px;border-radius:999px;background:var(--panel-soft);white-space:nowrap}
+.lf-tka-chip.is-kuat{background:#dff3e8;color:#14593a}
+.lf-tka-chip.is-sedang{background:#fff1cc;color:#6b4a00}
+.lf-tka-chip.is-perlu{background:#fde2dd;color:#8a2a1a}
+.lf-tka-note{font-size:.8rem}
+@media (max-width:560px){.lf-tka-list li{grid-template-columns:1fr auto}.lf-tka-list li>div{grid-column:1/-1}}
+
+/* R6 paket tugas offline: status tugas tersimpan & hasil yang menunggu sinyal */
+.lf-offline { margin: 12px 0 0; padding: 10px 12px; border-radius: 10px; font-size: .9rem; background: var(--lf-soft, rgba(16, 185, 129, .08)); border: 1px solid rgba(16, 185, 129, .25); }
+.lf-offline.is-pending { background: rgba(245, 158, 11, .08); border-color: rgba(245, 158, 11, .35); }
+
+/* R7 latihan bicara privat (features/speaking-listening/fiezel-bicara-privat.js) */
+.lf-bicara-ajak h3 { margin: 0 0 4px; }
+.bp-intro p { margin: 6px 0; }
+.bp-daftar { list-style: none; padding: 0; margin: 12px 0 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.bp-topik { width: 100%; text-align: left; padding: 10px 12px; border-radius: 12px; border: 1px solid rgba(127, 127, 127, .25); background: transparent; color: inherit; font: inherit; cursor: pointer; display: flex; flex-direction: column; gap: 2px; }
+.bp-topik small { opacity: .75; }
+.bp-topik.is-next { border-color: rgba(16, 185, 129, .6); box-shadow: 0 0 0 2px rgba(16, 185, 129, .15); }
+.bp-topik.is-done { opacity: .7; }
+.bp-instruksi { margin: 8px 0 4px; }
+.bp-kalimat { font-size: 1.25rem; font-weight: 600; margin: 4px 0 8px; line-height: 1.4; }
+.bp-slot { border-bottom: 2px dashed currentColor; padding: 0 4px; }
+.bp-isian { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 8px; }
+.bp-isian span { padding: 4px 10px; border-radius: 999px; background: rgba(99, 102, 241, .12); }
+.bp-kerangka { font-style: italic; opacity: .8; margin: 0 0 8px; }
+.bp-contoh { padding: 8px 10px; border-radius: 8px; background: rgba(99, 102, 241, .08); }
+.bp-umpan { margin: 10px 0; padding: 10px 12px; border-radius: 10px; background: rgba(16, 185, 129, .08); }
+.bp-umpan p { margin: 2px 0; }
+.bp-putuskan { margin-top: 10px; }
+
+/* R8 label jawaban AI (Tanya FIEZEL, pembimbing PAW, Pustaka) — docs/KEPATUHAN-AI-SEKOLAH.md */
+.ai-label { margin: 8px 0 0; font-size: .82rem; opacity: .8; font-style: italic; }

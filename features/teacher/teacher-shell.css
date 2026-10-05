@@ -783,3 +783,49 @@ html body.fz-teacher-mode .tg .tg-mnav-more:is(.is-active,[open])>summary{backgr
 html body.fz-teacher-mode .tg .tg-mnav-more .tg-mnav-sheet{background:#FFFFFF!important;border:1px solid #E2DCCE!important}
 html body.fz-teacher-mode .tg .tg-mnav-more .tg-mnav-sheet button{color:#182220!important}
 html body.fz-teacher-mode .tg .tg-mnav-more .tg-mnav-sheet button.is-active{background:#1F7A63!important;color:#FFFFFF!important}
+
+/* R1 Kelas Tanpa HP — pemanasan proyektor dan nilai kertas (m025, strategi sekolah 2026). */
+.tg-board-warm-btn{margin-top:28px;font-size:18px;padding:14px 22px}
+.ktp-warm{max-width:980px;margin:0 auto;text-align:left}
+.ktp-warm-kicker{font-size:18px;opacity:.75;margin:0 0 14px}
+.ktp-warm-ctx{font-size:24px;line-height:1.45;border-left:4px solid currentColor;padding-left:16px;margin:0 0 16px;white-space:pre-wrap;opacity:.9}
+.ktp-warm-prompt{font-size:clamp(26px,3.4vw,44px);line-height:1.25;margin:0 0 22px}
+.ktp-warm-opts{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.ktp-warm-opts li{font-size:clamp(20px,2.4vw,30px);padding:14px 18px;border:2px solid rgba(255,255,255,.35);border-radius:14px}
+.ktp-warm-opts li b{display:inline-block;min-width:1.6em}
+.ktp-warm-opts li.is-key{background:#1f8f5f;border-color:#1f8f5f;color:#fff}
+.ktp-warm-why{font-size:22px;margin:18px 0 0;line-height:1.45}
+.ktp-warm-pic svg{width:180px;height:auto}
+.tg-warm-actions{justify-content:center;margin-top:26px}
+.tg-paper-list li{display:flex;align-items:center;gap:10px}
+.tg-paper-list input{width:84px;margin-left:auto}
+@media (max-width:640px){.ktp-warm-opts{grid-template-columns:1fr}}
+/* R2 Rapor KKTP */
+.tg-rapor-head{display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap}
+.tg-rapor-head .tg-label input{width:96px}
+.tg-rapor-list{list-style:none;padding:0;margin:12px 0;display:grid;gap:14px;max-height:56vh;overflow:auto}
+.tg-rapor-list li{border:1px solid var(--tg-line,#ddd);border-radius:12px;padding:10px 12px;display:grid;gap:6px}
+.tg-rapor-who{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.tg-rapor-nilai{margin-left:auto;font-weight:700;font-size:1.1rem}
+.tg-rapor-who small{flex-basis:100%}
+.tg-rapor-list textarea{width:100%;font:inherit;resize:vertical}
+/* R5 Analisis butir soal */
+.tg-butir-table td{vertical-align:top}
+.tg-butir-soal{max-width:280px}
+.tg-butir-opsi span{display:inline-block;margin-right:6px;white-space:nowrap}
+.tg-butir-opsi .is-key{font-weight:700;color:#14593a}
+.tg-butir-opsi .is-mati{color:#8a2a1a;text-decoration:underline dotted}
+.tg-butir-table tr.is-periksa-kunci td{background:#fde2dd}
+.tg-butir-table tr.is-perbaiki td{background:#fff4d6}
+
+/* R1 — temuan role play guru (2026-10-05):
+   1. Papan & pemanasan bisa digulir: .tg-board fixed setinggi layar tanpa overflow membuat isi di
+      bawah lipatan (dulu tombol pemanasan) tidak terjangkau di proyektor 720p dan di HP.
+   2. Judul di papan gelap: aturan `html body.fz-teacher-mode .tg :is(h1,h2,h3…)` mewarnai judul
+      dengan tinta gelap — di latar papan yang juga gelap judulnya hilang ("Kemajuan kita minggu
+      ini" dan pertanyaan pemanasan). Aturan itu ber-!important, jadi pengecualian papan di bawah juga
+      ber-!important dengan selektor yang lebih spesifik. */
+.tg-board{overflow-y:auto;overscroll-behavior:contain}
+html body.fz-teacher-mode .tg .tg-board :is(h1,h2,h3),html body.fz-teacher-mode .tg .tg-board .ktp-warm-prompt{color:#EAF1EE!important}
+.tg-board-warm-btn{align-self:flex-start}
+.ktp-warm-dengar summary{cursor:pointer;font-size:18px;opacity:.85}

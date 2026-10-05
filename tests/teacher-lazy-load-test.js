@@ -30,7 +30,10 @@ ok(html.indexOf('features/teacher/fiezel-teacher-shell.js') < 0 && html.indexOf(
   'L1 shell & kurikulum guru tidak dimuat saat boot');
 ok(html.indexOf('fiezel-teacher-loader.js') > 0 && html.indexOf('fiezel-teacher-loader.js') < html.indexOf('src="./app.js'),
   'L1 pemuat guru dimuat sebelum app.js');
-ok(/BUNDLE = \['\.\/features\/teacher\/fiezel-teacher-curriculum\.js', '\.\/features\/teacher\/fiezel-teacher-shell\.js'\]/.test(loader),
+/* 2026-10-05: modul sekolah murni (fiezel-kelas-tanpa-hp.js, fiezel-rapor-kktp.js) boleh duduk di
+   ANTARA kurikulum dan shell — shell memakainya saat render. Yang dijaga tetap: kurikulum pertama,
+   shell terakhir, dan hanya berkas features/teacher/. */
+ok(/BUNDLE = \['\.\/features\/teacher\/fiezel-teacher-curriculum\.js'(, '\.\/features\/teacher\/fiezel-[a-z-]+\.js')*, '\.\/features\/teacher\/fiezel-teacher-shell\.js'\]/.test(loader),
   'L2 urutan bundel: kurikulum lalu shell');
 
 const body = (src, name) => {

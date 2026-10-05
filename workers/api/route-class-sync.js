@@ -20,7 +20,7 @@ import { jsonResponse, jsonError, ERR } from './errors.js';
 import { readJsonFromCtx } from './mw-guard.js';
 import { roleGate, coreDb, unauthenticated } from './auth/gate.js';
 import { ensureAuthSchema } from './auth-schema.js';
-import { normalizeReport, normalizeClaim, normalizeClassCode, normalizeAssignment, normalizeRetract, retractPayload, rowToAssignment, learnerKey, makeRateLimiter, rowToReport, LIMITS, ASSIGN_LIMITS } from './teacher/class-sync-core.js';
+import { normalizeReport, normalizeClaim, normalizeClassCode, normalizeAssignment, normalizeRetract, retractPayload, rowToAssignment, learnerKey, makeRateLimiter, rowToReport, mergeAssign, LIMITS, ASSIGN_LIMITS } from './teacher/class-sync-core.js';
 
 const learnerAllowed = makeRateLimiter(LIMITS.LEARNER_MIN_INTERVAL_MS);
 const learnerPollAllowed = makeRateLimiter(ASSIGN_LIMITS.LEARNER_POLL_MIN_INTERVAL_MS);
@@ -46,6 +46,12 @@ export async function routeLearnerClassReport(ctx) {
   await ensureAuthSchema(db);
   const cls = await db.prepare('SELECT code FROM tc_class WHERE code = ?1').bind(r.code).first();
   if (!cls) return jsonError(404, ERR.NOT_FOUND, {}, o);
+
+  // R6: tugas dari laporan sebelumnya digabung, bukan ditimpa (lihat mergeAssign).
+  const prevRow = await db.prepare('SELECT report_json FROM tc_class_report WHERE class_code = ?1 AND learner_key = ?2').bind(r.code, r.key).first();
+  let prevAssign;
+  try { prevAssign = prevRow && JSON.parse(prevRow.report_json).assign; } catch (_) { prevAssign = undefined; }
+  r.report.assign = mergeAssign(prevAssign, r.report.assign);
 
   await db.prepare(
     'INSERT INTO tc_class_report (class_code, learner_key, display_name, learner_sub, reported_at, report_json, updated_at) ' +

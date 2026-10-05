@@ -18,7 +18,7 @@ export const BRAINCORE_DIRS = Object.freeze(['up', 'flat', 'down', 'new']);
 export const EXAM_KINDS = Object.freeze(['assignment', 'reading_exam', 'listening_exam', 'speaking_exam', 'writing_exam', 'placement', 'level_exam']);
 export const LIMITS = Object.freeze({
   NAME_MAX: 24, TITLE_MAX: 60, SKILLS_MAX: 12, SKILL_KEY_MAX: 32, COUNT_MAX: 5000,
-  ASSIGN_MAX: 8, ASSIGN_ID_MAX: 40, WRONG_MAX: 40, REPORTS_PAGE: 200,
+  ASSIGN_MAX: 8, ASSIGN_STORED_MAX: 40, ASSIGN_ID_MAX: 40, WRONG_MAX: 40, REPORTS_PAGE: 200,
   // Pendeteksi keluar layar (assign.f): batas atas yang sengaja longgar untuk sesi
   // terpanjang yang masuk akal, tetapi tetap TERTUTUP — angka mustahil dari jam
   // perangkat yang meloncat ditolak di gerbang, bukan dipajang di layar guru.
@@ -308,6 +308,29 @@ export function makeRateLimiter(minIntervalMs, capacity = 4000) {
     last.set(key, nowMs);
     return true;
   };
+}
+
+/**
+ * R6 PAKET TUGAS OFFLINE: satu laporan membawa paling banyak ASSIGN_MAX tugas, dan murid yang
+ * mengerjakan banyak tugas tanpa sinyal mengirim hasilnya bertahap. Laporan baru karena itu
+ * DIGABUNG dengan tugas yang sudah tersimpan, bukan menimpanya — kalau ditimpa, guru yang belum
+ * menarik di antara dua kiriman kehilangan kiriman pertama. Per id: hasil selesai (t > 0)
+ * mengalahkan status "sedang dikerjakan"; sesama jenis, yang lebih baru menang. Disimpan paling
+ * banyak ASSIGN_STORED_MAX, yang terbaru.
+ */
+export function mergeAssign(prev, next) {
+  const done = (x) => !!x && Number(x.t) > 0;
+  const by = new Map();
+  for (const x of [].concat(Array.isArray(prev) ? prev : [], Array.isArray(next) ? next : [])) {
+    if (!x || typeof x !== 'object' || !x.id) continue;
+    const old = by.get(x.id);
+    if (!old) { by.set(x.id, x); continue; }
+    if (done(old) && !done(x)) continue;
+    if (done(x) && !done(old)) { by.set(x.id, x); continue; }
+    if ((Number(x.at) || 0) >= (Number(old.at) || 0)) by.set(x.id, x);
+  }
+  const all = [...by.values()].sort((a, b) => (Number(a.at) || 0) - (Number(b.at) || 0));
+  return all.length ? all.slice(-LIMITS.ASSIGN_STORED_MAX) : undefined;
 }
 
 /** Baris D1 -> objek yang dibaca klien guru. report_json yang rusak dibuang, bukan melempar. */

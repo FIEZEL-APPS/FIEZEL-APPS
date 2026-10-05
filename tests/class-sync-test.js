@@ -44,6 +44,7 @@ function fakeD1() {
         if (/SELECT code, title, level FROM tc_class WHERE code = \?1/.test(s)) { const c = cls.get(args[0]); return c ? { code: c.code, title: c.title, level: c.level } : null; }
         if (/SELECT code, teacher_sub FROM tc_class WHERE code/.test(s)) { const c = cls.get(args[0]); return c ? { code: c.code, teacher_sub: c.teacher_sub } : null; }
         if (/SELECT code FROM tc_class WHERE code = \?1/.test(s)) { const c = cls.get(args[0]); return c ? { code: c.code } : null; }
+        if (/SELECT report_json FROM tc_class_report WHERE class_code = \?1 AND learner_key = \?2/.test(s)) { const r = rep.get(args[0] + '|' + args[1]); return r ? { report_json: r.report_json } : null; }
         throw new Error('first tak dikenal: ' + s);
       },
       async all() {

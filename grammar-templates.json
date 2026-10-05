@@ -7336,7 +7336,8 @@
       },
       "pedagogicalObjectiveId": "Masangin have got dan has got sama subjeknya buat nunjukin punya",
       "misconceptionTargetedId": "Kamu gampang pakai satu bentuk buat semua subjek. Kadang have ketuker sama is atau does.",
-      "reasoningOperationId": "lihat subjeknya → pilih have atau has → got tetap di belakangnya"
+      "reasoningOperationId": "lihat subjeknya → pilih have atau has → got tetap di belakangnya",
+      "ruleId": "Jika kalimatnya HANYA pakai \"have\" (tanpa \"got\"):<br><br>Positif: <i>I have money.</i><br>Negatif: <i>I don't have money.</i> (Kamu butuh \"don't\" / \"doesn't\")<br><br>Jika kalimatnya pakai \"have got\":<br><br>Positif: <i>I have got money.</i><br>Negatif: <i>I haven't got money.</i> (Kata \"have/has\" langsung digabung dengan \"not\" menjadi \"haven't/hasn't\". Tidak boleh pakai \"don't/doesn't\").<br><br>Karena itu, kalau di soal ada kata \"got\", pasangannya pasti <b>haven't / hasn't</b>. Kalau mau pakai \"don't / doesn't\", kata \"got\" nya harus dibuang.<br><br>💡 <b>RUMUS KILAT</b>:<br>Pakai got ➡️ <b>haven't / hasn't got</b><br>Tanpa got ➡️ <b>don't / doesn't have</b>"
     },
     {
       "id": "A1-010",
@@ -9016,7 +9017,8 @@
       },
       "pedagogicalObjectiveId": "Bikin pertanyaan have got dengan majuin have ke depan subjek, tanpa do",
       "misconceptionTargetedId": "Kamu gampang nambahin do ke pertanyaan have got. Kadang has kepakai buat you.",
-      "reasoningOperationId": "kenali pola pertanyaan have got → majuin have ke depan “you” → got tetap di belakang"
+      "reasoningOperationId": "kenali pola pertanyaan have got → majuin have ke depan “you” → got tetap di belakang",
+      "ruleId": "Jika kalimatnya HANYA pakai \"have\" (tanpa \"got\"):<br><br>Positif: <i>I have money.</i><br>Negatif: <i>I don't have money.</i> (Kamu butuh \"don't\" / \"doesn't\")<br><br>Jika kalimatnya pakai \"have got\":<br><br>Positif: <i>I have got money.</i><br>Negatif: <i>I haven't got money.</i> (Kata \"have/has\" langsung digabung dengan \"not\" menjadi \"haven't/hasn't\". Tidak boleh pakai \"don't/doesn't\").<br><br>Karena itu, kalau di soal ada kata \"got\", pasangannya pasti <b>haven't / hasn't</b>. Kalau mau pakai \"don't / doesn't\", kata \"got\" nya harus dibuang.<br><br>💡 <b>RUMUS KILAT</b>:<br>Pakai got ➡️ <b>haven't / hasn't got</b><br>Tanpa got ➡️ <b>don't / doesn't have</b>"
     },
     {
       "id": "CG-003",
@@ -19768,7 +19770,8 @@
       },
       "pedagogicalObjectiveId": "Pakai “have got” atau “has got” untuk menyebut apa yang dimiliki seseorang. Contoh: “My grandparents have got a big garden.”",
       "misconceptionTargetedId": "Kamu pakai “have” untuk semua subjek, atau membuat kalimat tanya dan negatifnya dengan “do”, karena kata “punya” nggak pernah berubah.",
-      "reasoningOperationId": "cari subjeknya → hitung satu orang atau lebih → pilih bentuk untuk lebih dari satu orang"
+      "reasoningOperationId": "cari subjeknya → hitung satu orang atau lebih → pilih bentuk untuk lebih dari satu orang",
+      "ruleId": "Jika kalimatnya HANYA pakai \"have\" (tanpa \"got\"):<br><br>Positif: <i>I have money.</i><br>Negatif: <i>I don't have money.</i> (Kamu butuh \"don't\" / \"doesn't\")<br><br>Jika kalimatnya pakai \"have got\":<br><br>Positif: <i>I have got money.</i><br>Negatif: <i>I haven't got money.</i> (Kata \"have/has\" langsung digabung dengan \"not\" menjadi \"haven't/hasn't\". Tidak boleh pakai \"don't/doesn't\").<br><br>Karena itu, kalau di soal ada kata \"got\", pasangannya pasti <b>haven't / hasn't</b>. Kalau mau pakai \"don't / doesn't\", kata \"got\" nya harus dibuang.<br><br>💡 <b>RUMUS KILAT</b>:<br>Pakai got ➡️ <b>haven't / hasn't got</b><br>Tanpa got ➡️ <b>don't / doesn't have</b>"
     },
     {
       "id": "A1-326",
@@ -19824,7 +19827,8 @@
       },
       "pedagogicalObjectiveId": "Pakai “have got” atau “has got” untuk menyebut apa yang dimiliki seseorang. Contoh: “Dimas has got a bad cold today.”",
       "misconceptionTargetedId": "Kamu pakai “have” untuk semua subjek, atau membuat kalimat tanya dan negatifnya dengan “do”, karena kata “punya” nggak pernah berubah.",
-      "reasoningOperationId": "cari subjeknya → pastikan itu satu orang → pilih bentuk untuk satu orang"
+      "reasoningOperationId": "cari subjeknya → pastikan itu satu orang → pilih bentuk untuk satu orang",
+      "ruleId": "Jika kalimatnya HANYA pakai \"have\" (tanpa \"got\"):<br><br>Positif: <i>I have money.</i><br>Negatif: <i>I don't have money.</i> (Kamu butuh \"don't\" / \"doesn't\")<br><br>Jika kalimatnya pakai \"have got\":<br><br>Positif: <i>I have got money.</i><br>Negatif: <i>I haven't got money.</i> (Kata \"have/has\" langsung digabung dengan \"not\" menjadi \"haven't/hasn't\". Tidak boleh pakai \"don't/doesn't\").<br><br>Karena itu, kalau di soal ada kata \"got\", pasangannya pasti <b>haven't / hasn't</b>. Kalau mau pakai \"don't / doesn't\", kata \"got\" nya harus dibuang.<br><br>💡 <b>RUMUS KILAT</b>:<br>Pakai got ➡️ <b>haven't / hasn't got</b><br>Tanpa got ➡️ <b>don't / doesn't have</b>"
     },
     {
       "id": "A1-327",
@@ -19880,7 +19884,8 @@
       },
       "pedagogicalObjectiveId": "Pakai “have got” atau “has got” untuk menyebut apa yang dimiliki seseorang. Contoh: “Has your brother got a phone?” “Yes, he has.”",
       "misconceptionTargetedId": "Kamu pakai “have” untuk semua subjek, atau membuat kalimat tanya dan negatifnya dengan “do”, karena kata “punya” nggak pernah berubah.",
-      "reasoningOperationId": "cari subjek sesudah titik-titik → pastikan itu “he” → taruh bentuk untuk “he” di depan subjek"
+      "reasoningOperationId": "cari subjek sesudah titik-titik → pastikan itu “he” → taruh bentuk untuk “he” di depan subjek",
+      "ruleId": "Jika kalimatnya HANYA pakai \"have\" (tanpa \"got\"):<br><br>Positif: <i>I have money.</i><br>Negatif: <i>I don't have money.</i> (Kamu butuh \"don't\" / \"doesn't\")<br><br>Jika kalimatnya pakai \"have got\":<br><br>Positif: <i>I have got money.</i><br>Negatif: <i>I haven't got money.</i> (Kata \"have/has\" langsung digabung dengan \"not\" menjadi \"haven't/hasn't\". Tidak boleh pakai \"don't/doesn't\").<br><br>Karena itu, kalau di soal ada kata \"got\", pasangannya pasti <b>haven't / hasn't</b>. Kalau mau pakai \"don't / doesn't\", kata \"got\" nya harus dibuang.<br><br>💡 <b>RUMUS KILAT</b>:<br>Pakai got ➡️ <b>haven't / hasn't got</b><br>Tanpa got ➡️ <b>don't / doesn't have</b>"
     },
     {
       "id": "A1-328",
@@ -19936,7 +19941,8 @@
       },
       "pedagogicalObjectiveId": "Pakai “have got” atau “has got” untuk menyebut apa yang dimiliki seseorang. Contoh: “Sorry, I haven't got any money with me today.”",
       "misconceptionTargetedId": "Kamu pakai “have” untuk semua subjek, atau membuat kalimat tanya dan negatifnya dengan “do”, karena kata “punya” nggak pernah berubah.",
-      "reasoningOperationId": "cari subjeknya → pastikan itu “I” → tambahkan “not” pada bentuk untuk “I”"
+      "reasoningOperationId": "cari subjeknya → pastikan itu “I” → tambahkan “not” pada bentuk untuk “I”",
+      "ruleId": "Jika kalimatnya HANYA pakai \"have\" (tanpa \"got\"):<br><br>Positif: <i>I have money.</i><br>Negatif: <i>I don't have money.</i> (Kamu butuh \"don't\" / \"doesn't\")<br><br>Jika kalimatnya pakai \"have got\":<br><br>Positif: <i>I have got money.</i><br>Negatif: <i>I haven't got money.</i> (Kata \"have/has\" langsung digabung dengan \"not\" menjadi \"haven't/hasn't\". Tidak boleh pakai \"don't/doesn't\").<br><br>Karena itu, kalau di soal ada kata \"got\", pasangannya pasti <b>haven't / hasn't</b>. Kalau mau pakai \"don't / doesn't\", kata \"got\" nya harus dibuang.<br><br>💡 <b>RUMUS KILAT</b>:<br>Pakai got ➡️ <b>haven't / hasn't got</b><br>Tanpa got ➡️ <b>don't / doesn't have</b>"
     },
     {
       "id": "A1-329",

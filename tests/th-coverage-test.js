@@ -126,6 +126,10 @@ const UTANG_TANPA_TH = new Map([
      di fiezel-th-loader.js + locale-assets-th.json). Daftar ini sekarang KOSONG — dan itu
      keadaan yang seharusnya: setiap nama baru di sini berarti memilih mengirim layar
      berbahasa campur ke murid Thai. */
+  /* 2026-10-05: keputusan OWNER — fitur strategi sekolah Indonesia (Kelas Tanpa HP, rapor
+     KKTP, dst.) dibangun dalam bahasa Indonesia saja; fokus produk saat ini adalah sekolah
+     Indonesia. Layar-layar ini milik guru Indonesia, bukan alur murid Thai. */
+  ['sekolah', { sejak: '2026-10-05', catatan: 'fitur sekolah Indonesia; th ditunda atas keputusan owner' }],
 ]);
 
 /*
