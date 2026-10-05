@@ -109,11 +109,20 @@
     return { A: A, B: B };
   }
 
+  /* Soal MENYIMAK: naskahnya adalah apa yang harus didengar murid. Mencetaknya di lembar murid
+     mengubah ujian dengar menjadi ujian membaca dengan jawaban tertulis di atas soalnya (temuan
+     role play guru 2026-10-05). Naskah dipindah ke halaman kunci untuk dibacakan guru. */
+  function soalDengar(p, env) {
+    var B = bank(env), sk = B && B.SKILLS && B.SKILLS[p.skill || (p.source && p.source.skill)];
+    return !!(p.context && ((sk && sk.area === 'listening') || /^listening/.test(String(p.skill || ''))));
+  }
   function questionHtml(p, env) {
     var B = bank(env), pic = '';
     try { if (B && typeof B.pictureHtml === 'function') pic = B.pictureHtml(p.source, 'ktp-pic') || ''; } catch (_) { pic = ''; }
-    return '<li class="ktp-q">' +
-      (p.context ? '<div class="ktp-ctx">' + esc(p.context) + '</div>' : '') + pic +
+    var ctx = !p.context ? ''
+      : soalDengar(p, env) ? '<div class="ktp-ctx ktp-dengar">' + esc(t('sekolah.lembar-dengar', 'Dengarkan guru membacakan percakapan untuk soal ini.')) + '</div>'
+      : '<div class="ktp-ctx">' + esc(p.context) + '</div>';
+    return '<li class="ktp-q">' + ctx + pic +
       '<p class="ktp-prompt">' + esc(p.prompt) + '</p>' +
       '<ol class="ktp-opts">' + p.options.map(function (o, i) { return '<li><b>' + LETTERS[i] + '.</b> ' + esc(o) + '</li>'; }).join('') + '</ol></li>';
   }
@@ -128,7 +137,7 @@
       '.ktp-id{display:grid;grid-template-columns:2fr 1fr 1fr;gap:4mm;border:1px solid #333;padding:3mm;margin:0 0 4mm;font-size:11pt}' +
       '.ktp-id span{border-bottom:1px dotted #333;display:block;min-height:6mm}' +
       'ol.ktp-list{padding-left:7mm;margin:0}.ktp-q{margin:0 0 4mm;break-inside:avoid}.ktp-prompt{margin:0 0 1mm}' +
-      '.ktp-ctx{border-left:3px solid #999;padding-left:3mm;margin:0 0 1.5mm;font-size:11.5pt;white-space:pre-wrap}' +
+      '.ktp-ctx{border-left:3px solid #999;padding-left:3mm;margin:0 0 1.5mm;font-size:11.5pt;white-space:pre-wrap}.ktp-dengar{font-style:italic;white-space:normal}' +
       'ol.ktp-opts{list-style:none;padding-left:2mm;margin:0;display:grid;grid-template-columns:1fr 1fr;gap:0 6mm}' +
       '.ktp-pic svg{width:34mm;height:auto}table{border-collapse:collapse;width:100%;font-size:11pt}' +
       'th,td{border:1px solid #444;padding:1.5mm 2mm;text-align:center}.ktp-foot{font-size:9.5pt;color:#555;margin-top:4mm}';
@@ -145,9 +154,17 @@
         list.map(function (p) { return '<th>' + p.n + '</th>'; }).join('') + '</tr><tr>' +
         list.map(function (p) { return '<td>' + LETTERS[p.key] + '</td>'; }).join('') + '</tr></table>';
     }
+    function naskah() {
+      var nomorB = {}; v.B.forEach(function (p) { nomorB[p.id] = p.n; });
+      var dengar = v.A.filter(function (p) { return soalDengar(p, env); });
+      if (!dengar.length) return '';
+      return '<h2>' + esc(t('sekolah.naskah-judul', 'Naskah untuk dibacakan guru')) + '</h2>' + dengar.map(function (p) {
+        return '<div class="ktp-q"><p class="ktp-prompt"><b>' + esc(t('sekolah.naskah-nomor', 'Varian A no. {a} · Varian B no. {b}', { a: p.n, b: nomorB[p.id] })) + '</b></p><div class="ktp-ctx">' + esc(p.context) + '</div></div>';
+      }).join('');
+    }
     var body = items.length
       ? sheet('A', v.A) + sheet('B', v.B) +
-        '<section class="ktp-page"><h1>' + esc(t('sekolah.kunci-judul', 'Kunci jawaban — untuk guru')) + '</h1><p class="ktp-meta">' + esc(a.title || '') + '</p>' + keyTable('A', v.A) + keyTable('B', v.B) + '</section>'
+        '<section class="ktp-page"><h1>' + esc(t('sekolah.kunci-judul', 'Kunci jawaban — untuk guru')) + '</h1><p class="ktp-meta">' + esc(a.title || '') + '</p>' + keyTable('A', v.A) + keyTable('B', v.B) + naskah() + '</section>'
       : '<p>' + esc(t('sekolah.lembar-kosong', 'Tugas ini belum punya soal yang bisa dicetak.')) + '</p>';
     return '<!doctype html><html lang="id"><head><meta charset="utf-8"><title>' + esc(a.title || 'Lembar soal') + '</title><style>' + css + '</style></head><body>' + body + '</body></html>';
   }
@@ -233,7 +250,10 @@
     return '<div class="ktp-warm" data-testid="ktp-warm" data-idx="' + i + '">' +
       '<p class="ktp-warm-kicker">' + esc(t('sekolah.pemanasan-nomor', 'Pemanasan · soal {i} dari {n}', { i: i + 1, n: list.length })) +
       (r.wrong ? ' · ' + esc(t('sekolah.pemanasan-salah', '{n} teman keliru di soal ini', { n: r.wrong })) : '') + '</p>' +
-      (q.context ? '<div class="ktp-warm-ctx">' + esc(q.context) + '</div>' : '') + pic +
+      (q.context ? (soalDengar({ context: q.context, skill: q.skill, source: q }, env)
+        /* Menyimak di proyektor: naskah dilipat supaya kelas MENDENGAR dulu; guru membukanya untuk dibacakan. */
+        ? '<details class="ktp-warm-ctx ktp-warm-dengar"' + (reveal ? ' open' : '') + '><summary>' + esc(t('sekolah.pemanasan-naskah', 'Naskah untuk dibacakan guru')) + '</summary>' + esc(q.context) + '</details>'
+        : '<div class="ktp-warm-ctx">' + esc(q.context) + '</div>') : '') + pic +
       '<h2 class="ktp-warm-prompt">' + esc(q.prompt) + '</h2>' +
       '<ol class="ktp-warm-opts">' + q.options.map(function (o, k) {
         return '<li class="' + (reveal && k === ans ? 'is-key' : '') + '"' + (reveal && k === ans ? ' data-testid="ktp-warm-key"' : '') + '><b>' + LETTERS[k] + '</b> ' + esc(o) + '</li>';

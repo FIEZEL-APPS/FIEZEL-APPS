@@ -63,6 +63,23 @@ check('K3 lembar cetak lengkap dan aman dari markup', () => {
   assert.ok(/size:A4/.test(html));
 });
 
+check('K8 ujian menyimak: naskah tidak tercetak di lembar murid, pindah ke halaman kunci guru', () => {
+  const ldIds = B.pickFresh('listening_detail', 3, { seed: 13 }).map((q) => q.id);
+  const al = { id: 'as-dengar', title: 'Ujian menyimak', itemIds: ldIds };
+  const html = K.worksheetHtml(c, al, {});
+  const halaman = html.split('<section class="ktp-page">');
+  const murid = halaman[1] + halaman[2], kunci = halaman[3];
+  const naskah = B.byId(ldIds[0]).context.split('\n')[0];
+  assert.ok(!murid.includes(naskah.replace(/'/g, '&#39;')) && !murid.includes(naskah), 'naskah bocor ke lembar murid');
+  assert.ok(/class="ktp-ctx ktp-dengar"/.test(murid), 'lembar murid memberi petunjuk mendengarkan');
+  assert.ok(/Naskah untuk dibacakan guru/.test(kunci) && /Varian A no\. 1 · Varian B no\. \d/.test(kunci), 'naskah + nomor kedua varian di halaman kunci');
+  const slide = K.warmupSlideHtml([{ item: B.byId(ldIds[0]), wrong: 0 }], 0, false);
+  assert.ok(/<details class="ktp-warm-ctx ktp-warm-dengar">/.test(slide), 'pemanasan: naskah dilipat sebelum jawaban');
+  assert.ok(/ktp-warm-dengar" open>/.test(K.warmupSlideHtml([{ item: B.byId(ldIds[0]), wrong: 0 }], 0, true)), 'terbuka setelah jawaban');
+  const baca = K.worksheetHtml(c, a, {});
+  assert.ok(!/class="ktp-ctx ktp-dengar"/.test(baca.split('Kunci jawaban')[0]), 'soal non-menyimak tetap mencetak konteksnya');
+});
+
 check('K4 nilai kertas tervalidasi dan tidak menimpa hasil aplikasi', () => {
   const a2 = JSON.parse(JSON.stringify(a));
   a2.done = { s3: { at: 1, acc: 0.5, c: 3, t: 6, w: [] } };

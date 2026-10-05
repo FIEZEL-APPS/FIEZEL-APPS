@@ -828,3 +828,4 @@ html body.fz-teacher-mode .tg .tg-mnav-more .tg-mnav-sheet button.is-active{back
 .tg-board{overflow-y:auto;overscroll-behavior:contain}
 html body.fz-teacher-mode .tg .tg-board :is(h1,h2,h3),html body.fz-teacher-mode .tg .tg-board .ktp-warm-prompt{color:#EAF1EE!important}
 .tg-board-warm-btn{align-self:flex-start}
+.ktp-warm-dengar summary{cursor:pointer;font-size:18px;opacity:.85}
