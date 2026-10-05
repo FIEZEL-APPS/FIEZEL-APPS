@@ -214,16 +214,32 @@
       blocks.push({ id: 'assign-' + a.id, kind: a.mode === 'ujian' ? 'Ujian dari guru' : t('flow.tugas-guru', 'Tugas dari guru'), skill: a.skills[0], title: a.title, minutes: a.minutes, itemIds: a.itemIds, from: a.teacher ? a.teacher + ' · ' + a.from : a.from });
       a.skills.forEach(function (s) { used[s] = true; });
     });
+
     var first = ranked[0], second = ranked[1];
-    blocks.push({ id: 'b1', kind: 'Review', skill: first.id, title: B.SKILLS[first.id].short, minutes: 4, count: 5 });
-    blocks.push({ id: 'b2', kind: B.AREAS[B.SKILLS[second.id].area], skill: second.id, title: B.SKILLS[second.id].label, minutes: 5, count: 5 });
     var third = ranked.filter(function (r) { return r.id !== first.id && r.id !== second.id && !used[r.id]; });
     var listen = third.filter(function (r) { return r.id === 'listening_detail'; })[0] || third[0];
-    if (listen) blocks.push({ id: 'b3', kind: B.AREAS[B.SKILLS[listen.id].area], skill: listen.id, title: listen.id === 'listening_detail' ? 'Short dialogue' : B.SKILLS[listen.id].label, minutes: 3, count: 3 });
+
+    // Alokasi per skill
+    var ids1 = allocateIds(st, { skill: first.id, count: 5 });
+    var ids2 = allocateIds(st, { skill: second.id, count: 5 });
+    var ids3 = listen ? allocateIds(st, { skill: listen.id, count: 3 }) : [];
+    
+    // Interleaving (selang-seling) untuk Daily Mix
+    var mixedIds = [];
+    var maxLen = Math.max(ids1.length, ids2.length, ids3.length);
+    for (var i = 0; i < maxLen; i++) {
+      if (i < ids1.length) mixedIds.push(ids1[i]);
+      if (i < ids2.length) mixedIds.push(ids2[i]);
+      if (i < ids3.length) mixedIds.push(ids3[i]);
+    }
+
     var weakNames = [first, second].filter(function (r) { return r.status.id !== 'strong'; }).map(function (r) { return B.SKILLS[r.id].short.toLowerCase(); });
-    var reason = weakNames.length >= 2 ? 'Dipilih karena dua pola ini masih sering tertukar di latihan terakhir: ' + weakNames.join(' dan ') + '.'
-      : weakNames.length === 1 ? 'Dipilih karena ' + weakNames[0] + ' masih sering tertukar di latihan terakhir; sisanya menjaga skill yang sudah cukup kuat.'
-      : 'Dipilih untuk menjaga ritme: semua skill awal sudah cukup kuat, jadi hari ini porsi review dibuat ringan.';
+    var reason = weakNames.length >= 2 ? 'Kompilasi ini difokuskan pada: ' + weakNames.join(' dan ') + ', diselingi materi lain untuk menjaga ritme.'
+      : weakNames.length === 1 ? 'Kompilasi ini difokuskan pada ' + weakNames[0] + ', diselingi review untuk skill yang sudah kuat.'
+      : 'Semua skill awal sudah cukup kuat, jadi hari ini porsi review dibuat seimbang di semua area.';
+
+    blocks.push({ id: 'daily_mix', kind: t('flow.latihan-gabungan', 'Latihan Gabungan'), skill: 'mixed', title: 'Daily Mix', minutes: 12, count: mixedIds.length, itemIds: mixedIds });
+
     return { date: today(now), blocks: blocks, reason: reason, done: [], minutes: blocks.reduce(function (m, b) { return m + b.minutes; }, 0) };
   }
   function ensurePlan(st) {
@@ -238,7 +254,10 @@
     var ids = block.itemIds || allocateIds(st, block);
     /* markSeen TETAP dipanggil: st.seen masih dipakai diagnosticSet di bawah. Membuangnya
        adalah perubahan tersendiri, bukan bagian penyambungan ini. */
-    ids.forEach(function (id) { markSeen(block.skill, id); });
+    ids.forEach(function (id) {
+      var it = B.byId(id);
+      markSeen(it ? it.skill : block.skill, id);
+    });
     st.activeLesson = { blockId: block.id, skill: block.skill, title: block.title, kind: block.kind, minutes: block.minutes, itemIds: ids, index: 0, attempt: 0, results: [], feedback: null, revealed: false, startedAt: Date.now() };
     st.step = 'lesson';
   }
@@ -263,7 +282,8 @@
   }
   function finishLesson(st) {
     var L = st.activeLesson, B = bank(), correct = L.results.filter(function (r) { return r.correct; }).length;
-    st.lessons.push({ at: Date.now(), skill: L.skill, area: B.SKILLS[L.skill].area, kind: L.kind, title: L.title, correct: correct, total: L.results.length, minutes: L.minutes });
+    var area = L.skill === 'mixed' ? 'mixed' : (B.SKILLS[L.skill] ? B.SKILLS[L.skill].area : 'mixed');
+    st.lessons.push({ at: Date.now(), skill: L.skill, area: area, kind: L.kind, title: L.title, correct: correct, total: L.results.length, minutes: L.minutes });
     if (st.plan && st.plan.done.indexOf(L.blockId) === -1) st.plan.done.push(L.blockId);
     if (L.blockId.indexOf('assign-') === 0) { st.doneAssign = (st.doneAssign || []).concat([{ id: L.blockId.slice(7), at: Date.now(), c: correct, t: L.results.length }]).slice(-6); try { localStorage.setItem(ASSIGN_KEY, JSON.stringify(loadAssignments().filter(function (a) { return 'assign-' + a.id !== L.blockId; }))); } catch (_) {} }
     st.lastNext = buildNext(st, L, correct);
@@ -273,7 +293,8 @@
   }
   function buildNext(st, L, correct) {
     var B = bank(), plan = st.plan, remaining = plan.blocks.filter(function (b) { return plan.done.indexOf(b.id) === -1; });
-    var wrong = L.results.length - correct, skillName = B.SKILLS[L.skill].short.toLowerCase();
+    var wrong = L.results.length - correct;
+    var skillName = L.skill === 'mixed' ? t('flow.latihan-gabungan', 'Latihan Gabungan') : (B.SKILLS[L.skill] ? B.SKILLS[L.skill].short.toLowerCase() : 'materi');
     var reason;
     if (remaining.length) {
       var nb = remaining[0];
@@ -596,22 +617,42 @@
 
   function planView() {
     var plan = ensurePlan(st), B = bank(), doneCount = plan.done.length;
-    var mainSkill = B.SKILLS[plan.blocks.filter(function (b) { return b.id === 'b1'; })[0].skill];
-    return '<div class="lf-card lf-plan" data-testid="lf-today-plan"><p class="lf-kicker">Rencana hari ini</p><h2>Rencana hari ini — ' + plan.minutes + ' menit</h2>' +
-      '<div class="lf-plan-meta"><div><small>Target hari ini</small><b>' + plan.blocks.length + ' sesi · ' + plan.blocks.reduce(function (m, b) { return m + (b.count || (b.itemIds || []).length); }, 0) + ' soal</b></div>' +
-      '<div><small>Durasi</small><b>' + plan.minutes + ' menit</b></div>' +
-      '<div><small>Skill utama</small><b>' + esc(mainSkill.short) + '</b></div>' +
-      '<div><small>Review yang harus diulang</small><b>' + esc(plan.blocks.filter(function (b) { return b.kind === 'Review'; }).map(function (b) { return b.title; }).join(', ') || '—') + '</b></div></div>' +
-      '<ol class="lf-plan-list">' + plan.blocks.map(function (b, i) {
+    
+    // Cari blok Daily Mix
+    var mixBlock = plan.blocks.filter(function (b) { return b.id === 'daily_mix'; })[0];
+    var assignBlocks = plan.blocks.filter(function (b) { return b.id !== 'daily_mix'; });
+
+    var totalItems = plan.blocks.reduce(function (m, b) { return m + (b.count || (b.itemIds || []).length); }, 0);
+    
+    var html = '<div class="lf-card lf-plan" data-testid="lf-today-plan"><p class="lf-kicker">Rencana hari ini</p><h2>Rencana hari ini — ' + plan.minutes + ' menit</h2>' +
+      '<div class="lf-plan-meta"><div><small>Target hari ini</small><b>' + totalItems + ' soal</b></div>' +
+      '<div><small>Durasi</small><b>' + plan.minutes + ' menit</b></div></div>' +
+      conceptStatesMarkup(st) +
+      '<p class="lf-reason" data-testid="lf-plan-reason"><b>Kompilasi Cerdas:</b> ' + esc(plan.reason) + '</p>';
+
+    if (mixBlock) {
+      var done = plan.done.indexOf(mixBlock.id) !== -1;
+      html += '<div style="margin: 24px 0; text-align: center; padding: 24px; border: 2px dashed var(--edge); border-radius: 12px;">' +
+        '<h3>' + esc(mixBlock.title) + '</h3><p class="lf-muted" style="margin-bottom:16px;">' + t('flow.latihan-selang-seling', 'Latihan selang-seling dari berbagai kemampuan') + ' (' + mixBlock.minutes + ' menit)</p>' +
+        (done ? '<span class="lf-done" style="font-size:16px;">' + t('flow.selesai-hari-ini', 'Selesai untuk hari ini!') + '</span>' : '<button type="button" class="lf-primary" style="font-size: 1.1em; padding: 12px 32px;" data-lf="start-lesson" data-block="' + mixBlock.id + '" data-testid="lf-start-' + mixBlock.id + '">' + t('flow.mulai-sekarang', 'Mulai Belajar Sekarang') + '</button>') +
+        '</div>';
+    }
+
+    if (assignBlocks.length > 0) {
+      html += '<h3 style="margin-top:24px">' + t('flow.tugas-guru', 'Tugas dari Guru') + '</h3><ol class="lf-plan-list">';
+      html += assignBlocks.map(function (b, i) {
         var done = plan.done.indexOf(b.id) !== -1;
         return '<li class="' + (done ? 'is-done' : '') + '" data-testid="lf-plan-block-' + b.id + '"><span class="lf-num">' + (i + 1) + '</span><div><b>' + esc(b.kind) + ': ' + esc(b.title) + '</b><small>' + b.minutes + ' menit · ' + (b.count || (b.itemIds || []).length) + ' soal' + (b.from ? ' · dari ' + esc(b.from) : '') + '</small></div>' +
-          (done ? '<span class="lf-done">' + t('umum.selesai', 'Selesai') + '</span>' : '<button type="button" class="lf-mini lf-start" data-lf="start-lesson" data-block="' + b.id + '" data-testid="lf-start-' + b.id + '">Mulai</button>') + '</li>';
-      }).join('') + '</ol>' +
-      conceptStatesMarkup(st) +
-      '<p class="lf-reason" data-testid="lf-plan-reason"><b>Alasan sesi ini:</b> ' + esc(plan.reason) + '</p>' +
-      '<div class="lf-assign-code" data-testid="lf-assign-code"><label class="lf-muted" for="lfAssignCode">Punya kode tugas dari guru?</label><div class="lf-actions"><input id="lfAssignCode" class="lf-code lf-code-input" placeholder="Tempel kode tugas di sini" autocomplete="off" data-testid="lf-assign-code-input"><button type="button" class="lf-mini" data-lf="accept-assign" data-testid="lf-accept-assign">Tambahkan ke rencana</button></div></div>' +
-      '<div class="lf-actions">' + (doneCount < plan.blocks.length ? '<button type="button" class="lf-primary" data-lf="start-first" data-testid="lf-start-first">Mulai sesi berikutnya</button>' : '<span class="lf-done">Rencana hari ini selesai</span>') +
+          (done ? '<span class="lf-done">' + t('umum.selesai', 'Selesai') + '</span>' : '<button type="button" class="lf-mini lf-start" data-lf="start-lesson" data-block="' + b.id + '" data-testid="lf-start-' + b.id + '">Kerjakan</button>') + '</li>';
+      }).join('');
+      html += '</ol>';
+    }
+
+    html += '<div class="lf-assign-code" data-testid="lf-assign-code"><label class="lf-muted" for="lfAssignCode">Punya kode tugas dari guru?</label><div class="lf-actions"><input id="lfAssignCode" class="lf-code lf-code-input" placeholder="Tempel kode tugas di sini" autocomplete="off" data-testid="lf-assign-code-input"><button type="button" class="lf-mini" data-lf="accept-assign" data-testid="lf-accept-assign">Tambahkan ke rencana</button></div></div>' +
+      '<div class="lf-actions">' + 
       '<button type="button" class="lf-ghost" data-lf="to-skillmap" data-testid="lf-back-skillmap">Lihat peta kemampuan</button></div></div>';
+
+    return html;
   }
 
   function lessonView() {
@@ -619,7 +660,8 @@
     var footer = '';
     if (fb && !L.revealed) footer = '<div class="lf-actions"><button type="button" class="lf-primary" data-lf="retry" data-testid="lf-retry">' + t('umum.coba-lagi', 'Coba lagi') + '</button></div>';
     else if (fb && L.revealed) footer = '<div class="lf-actions"><button type="button" class="lf-primary" data-lf="lesson-next" data-testid="lf-lesson-next">' + (L.index + 1 >= L.itemIds.length ? 'Selesaikan lesson' : t('flow.soal-berikutnya', 'Soal berikutnya')) + '</button></div>';
-    return '<div class="lf-intro"><p class="lf-kicker">' + esc(L.kind) + '</p><h2>' + esc(L.title) + '</h2><p class="lf-muted">Tujuan: ' + esc(B.SKILLS[L.skill].objective) + '</p></div>' +
+    var obj = L.skill === 'mixed' ? t('flow.objektif-gabungan', 'Latihan gabungan dari berbagai kemampuan') : (B.SKILLS[L.skill] ? B.SKILLS[L.skill].objective : '');
+    return '<div class="lf-intro"><p class="lf-kicker">' + esc(L.kind) + '</p><h2>' + esc(L.title) + '</h2><p class="lf-muted">Tujuan: ' + esc(obj) + '</p></div>' +
       questionCard(item, { action: 'lesson-answer', progress: t('flow.soal-progress', 'Soal {n} dari {total}').replace('{n}', L.index + 1).replace('{total}', L.itemIds.length), feedback: fb, revealed: L.revealed, chosen: L.lastChoice, locked: !!fb && (L.revealed || !fb.correct) && !!fb, showTranscript: L.attempt > 0 || !!L.transcript, footer: footer }) +
       '<div class="lf-actions lf-actions-end"><button type="button" class="lf-ghost" data-lf="abandon" data-testid="lf-abandon">' + t('flow.kembali-rencana', 'Kembali ke rencana') + '</button></div>';
   }
