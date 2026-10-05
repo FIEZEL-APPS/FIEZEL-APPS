@@ -1,7 +1,7 @@
 {
-  "version": "m025-471",
-  "claimedBy": "branch main",
-  "claimedAt": "2026-10-05T00:24:24.631Z",
-  "reason": "fix(ci): perbaiki pemPrivateKey scanner false positive di fiezel-bot",
+  "version": "m025-472",
+  "claimedBy": "branch feat/lightning-fast-audio",
+  "claimedAt": "2026-10-05T01:02:00.978Z",
+  "reason": "perf(audio): in-memory cache dan prefetch proaktif untuk pemutaran secepat kilat",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
