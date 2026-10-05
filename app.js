@@ -15727,7 +15727,7 @@ function quizLoop(cfg){
   const detail=ok&&rationale==='brain3_production_near_match'
    ?FiezelI18n.t('quiz.hampir-persis-me-hitung-right',{answer:`<strong>${esc(q.clozeAnswer)}</strong>`})
    :ok?FiezelI18n.t('quiz.cloze-correct',{answer:`<strong>${esc(q.clozeAnswer)}</strong>`})
-   :res?.matchedDistractor?FiezelI18n.t('quiz.cloze-distractor',{misconception:esc(res.matchedDistractor.misconceptionId||res.matchedDistractor.whyFailsId||res.matchedDistractor.misconception||FiezelI18n.t('quiz.cloze-distractor-default')),answer:`<strong>${esc(q.clozeAnswer)}</strong>`})
+   :res?.matchedDistractor?FiezelI18n.t('quiz.cloze-distractor',{misconception:esc(res.matchedDistractor.whyFailsId||res.matchedDistractor.misconceptionId||res.matchedDistractor.misconception||FiezelI18n.t('quiz.cloze-distractor-default')),answer:`<strong>${esc(q.clozeAnswer)}</strong>`})
    :rationale==='brain3_production_morpheme_miss'?FiezelI18n.t('quiz.kata-dasarnya-right-bentuknya-pending',{answer:`<strong>${esc(q.clozeAnswer)}</strong>`})
    :FiezelI18n.t('quiz.tepat-strong-strong',{clozeAnswer:esc(q.clozeAnswer)});
   const f=$('feedback');f.classList.remove('hidden');f.classList.add(ok?'feedback-success':'feedback-error');

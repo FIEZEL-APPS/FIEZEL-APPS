@@ -175,6 +175,39 @@ const geminiDeadKeys = new Set();
 const geminiKeyCooldown = new Map();
 /** Lama kunci+model diistirahatkan setelah 429 (kuota per menit pulih; kuota harian tetap dilewati). */
 const KEY_COOLDOWN_MS = 60_000;
+/** Batas atas cooldown menaik: 429 beruntun pada model yang benar-benar habis tidak
+ *  perlu dicoba lagi di sisa run (job review/heal hidup < 20 menit). */
+const KEY_COOLDOWN_MAX_MS = 15 * 60_000;
+/** "model" → jumlah 429 beruntun; cooldown kunci berikutnya dikalikan jumlah ini. */
+const geminiModelStrikes = new Map();
+/** Model yang SELURUH kuncinya sudah ditolak (429/401/403) pada run ini. Melihat panggilan
+ *  pertama membakar 23 kunci Gemini (laporan heal PR #506), lensa/uji-skeptis/heal berikutnya
+ *  tidak boleh memprobe ulang model yang sama sekali tidak punya kunci tersisa. */
+const geminiModelExhausted = new Set();
+
+/**
+ * Ringkasan galat LLM yang JUJUR dan tidak membanjiri log. Sebelum ini setiap kegagalan
+ * dicetak satu per satu ("kunci#1 … kunci#23 …") sehingga laporan heal 4.000 karakter
+ * habis oleh daftar kunci dan alasan sebenarnya tenggelam. Label tetap memuat `kunci#N`
+ * (jejak yang berguna saat menelusuri), tetapi digabung per model + status.
+ */
+function summarizeLlmErrors(errors) {
+  const byModel = new Map();
+  for (const raw of errors || []) {
+    const e = String(raw);
+    const m = /^((?:gemini|groq)\/[^\s:]+)(?:\s+(kunci#\d+))?:/.exec(e);
+    const model = m ? m[1] : 'llm';
+    const keyTag = m && m[2] ? m[2] : '';
+    const status = (/HTTP (\d{3})/.exec(e) || [, (/timeout/i.test(e) ? 'timeout' : 'lain')])[1];
+    if (!byModel.has(model)) byModel.set(model, { keys: [], counts: new Map() });
+    const b = byModel.get(model);
+    if (keyTag && !b.keys.includes(keyTag)) b.keys.push(keyTag);
+    b.counts.set(status, (b.counts.get(status) || 0) + 1);
+  }
+  return [...byModel]
+    .map(([model, b]) => `${model}${b.keys.length ? ' ' + b.keys.join(',') : ''}: ${[...b.counts].map(([s, n]) => `${s}×${n}`).join(', ')}`)
+    .join(' | ');
+}
 
 // KEAMANAN: Semua kunci API dibaca HANYA dari environment variable.
 // Di GitHub Actions, diisi oleh repository secrets (${{ secrets.GROQ_API_KEY }}).
@@ -618,7 +651,16 @@ async function queryLLM(prompt, systemInstruction = '', opts = {}) {
     // jadi lensa dan uji skeptis berikutnya tidak membuang waktu mengetuk pintu yang sama.
     const keyCtl = n > 1 ? { ...ctl, retryDelays: ctl.retryDelays.slice(0, 1), noRetryStatus: KEY_ROTATE_STATUS } : ctl;
     for (const model of modelChainFor('gemini', tier)) {
-      let skipped = 0;
+      if (n > 1 && geminiModelExhausted.has(model)) {
+        errors.push(`gemini/${model}: dilewati (semua ${n} kunci telah dicoba pada run ini)`);
+        continue;
+      }
+      // Strike per model (bukan per kunci): model yang seluruh kuncinya kena 429
+      // benar-benar kehabisan kuota; cooldown kunci berikutnya naik linier agar
+      // 23 kunci tidak dibakar berulang untuk model yang sama.
+      const strike = geminiModelStrikes.get(model) || 0;
+      const cooldownMs = Math.min(KEY_COOLDOWN_MS * (strike + 1), KEY_COOLDOWN_MAX_MS);
+      let skipped = 0, saw429 = false, sawNonRotate = false;
       for (let k = 0; k < n; k++) {
         const idx = (geminiKeyCursor + k) % n;
         const coolKey = `${model}|${idx}`;
@@ -635,13 +677,19 @@ async function queryLLM(prompt, systemInstruction = '', opts = {}) {
           keyCtl, state);
         if (text) {
           geminiKeyCursor = idx;
-          if (errors.length) console.warn('[Fiezel Bot v2] LLM pulih setelah galat:', errors.join(' | '));
+          if (errors.length) console.warn('[Fiezel Bot v2] LLM pulih setelah galat:', summarizeLlmErrors(errors));
           return { text, provider: `Google Gemini (${model})`, model };
         }
-        if (!KEY_ROTATE_STATUS.has(state.lastStatus)) break; // masalah model/jaringan, bukan kunci
-        if (state.lastStatus === 429) geminiKeyCooldown.set(coolKey, Date.now() + Math.max(KEY_COOLDOWN_MS, state.retryAfterMs));
-        else geminiDeadKeys.add(idx);
+        if (!KEY_ROTATE_STATUS.has(state.lastStatus)) { sawNonRotate = true; break; } // masalah model/jaringan, bukan kunci
+        if (state.lastStatus === 429) {
+          saw429 = true;
+          geminiKeyCooldown.set(coolKey, Date.now() + Math.max(cooldownMs, state.retryAfterMs));
+          geminiModelStrikes.set(model, strike + 1);
+        } else {
+          geminiDeadKeys.add(idx);
+        }
       }
+      if (n > 1 && !sawNonRotate && saw429) geminiModelExhausted.add(model);
       if (skipped) errors.push(`gemini/${model}: ${skipped} kunci dilewati (ditolak/masih kena kuota)`);
     }
   }
@@ -664,13 +712,13 @@ async function queryLLM(prompt, systemInstruction = '', opts = {}) {
         (data) => data.choices?.[0]?.message?.content || '',
         ctl);
       if (text) {
-        if (errors.length) console.warn('[Fiezel Bot v2] LLM pulih setelah galat:', errors.join(' | '));
+        if (errors.length) console.warn('[Fiezel Bot v2] LLM pulih setelah galat:', summarizeLlmErrors(errors));
         return { text, provider: `Groq AI (${model})`, model };
       }
     }
   }
 
-  if (errors.length) console.warn('[Fiezel Bot v2] LLM tidak tersedia:', errors.join(' | '));
+  if (errors.length) console.warn('[Fiezel Bot v2] LLM tidak tersedia:', summarizeLlmErrors(errors));
   return { text: '', provider: 'Deterministic Heuristic Only', model: '' };
 }
 
@@ -1122,6 +1170,9 @@ function composeInlineComment(v) {
     v.explanation,
     ...(v.scenario ? ['', `**Skenario gagal:** ${v.scenario}`] : []),
     ...(v.skeptic === 'disputed' ? ['', `⚖️ **Diperdebatkan:** ${v.support.length} lensa review menemukan ini secara terpisah, tetapi penguji skeptis menolak: _${v.skepticReason}_ — periksa skenario di atas dengan menjalankannya.`] : []),
+    ...(v.runtime && v.runtime.probed ? (v.runtime.ok
+      ? ['', `🧪 **Diuji eksekusi (Chromium):** \`${v.runtime.target}\` dimuat ulang dan **tidak** memunculkan galat runtime — gejala yang diklaim belum terbukti di peramban.`]
+      : ['', `🧪 **Terbukti juga oleh eksekusi (Chromium):** memuat \`${v.runtime.target}\` memunculkan ${(v.runtime.errors || []).length} galat runtime: ${(v.runtime.errors || []).slice(0, 3).map(e => `\`${String(e).slice(0, 90)}\``).join(', ')}.`]) : []),
     '',
     `<details><summary>Bukti (terverifikasi di \`${v.file}:${v.line}\`)</summary>`,
     '',
@@ -1412,6 +1463,29 @@ GENERAL TASK: find REAL defects introduced or exposed by this PR that the determ
     aiReview.context = fileContext;
     const st = aiReview.stats;
     console.log(`[Fiezel Bot v2] Pipeline AI: ${st.answered}/${st.lenses} lensa → ${st.proposed} usulan → ${st.quoteOk} lolos kutipan → ${st.candidates} kandidat → ${st.skeptic.ok ? `${st.confirmed} lolos uji skeptis, ${st.disputed} diperdebatkan` : 'uji skeptis tidak tersedia (temuan belum teruji)'}.`);
+
+    // ── LAPISAN 2d: Verifikasi eksekusi (Playwright) ──
+    // Cek kutipan hanya membuktikan baris itu ADA. Untuk temuan yang menunjuk
+    // permukaan runtime, jalankan aplikasinya di Chromium dan lihat apakah
+    // gejalanya benar-benar muncul. Bila peramban tak tersedia, temuan ditandai
+    // "belum diuji eksekusi" — jujur, bukan diam-diam dianggap terbukti.
+    const probe = probeFindingsRuntime(aiReview.verified);
+    if (probe.size) {
+      let clean = 0, failing = 0, untested = 0;
+      for (const v of aiReview.verified) {
+        const r = probe.get(v.id);
+        if (!r) continue;
+        v.runtime = r;
+        if (!r.probed) untested++;
+        else if (r.ok) clean++;
+        else failing++;
+      }
+      aiReview.runtime = { clean, failing, untested, ran: clean + failing > 0 };
+      if (aiReview.runtime.ran) {
+        console.log(`[Fiezel Bot v2] Probe eksekusi Chromium: ${clean} halaman boot bersih, ${failing} memunculkan galat runtime, ${untested} tak dapat diuji.`);
+      }
+    }
+
     writeInlineFindings(aiReview.verified);
     // Temuan berat yang terbukti di kode tidak boleh dibungkus verdict hijau.
     if (risk.verdict === 'APPROVED' && aiReview.verified.some(v => v.severity === 'high')) {
@@ -1454,12 +1528,17 @@ function composeAiSection(aiResult, aiReview) {
   if (stats) {
     out.push('', `<sub>Saringan: ${stats.answered}/${stats.lenses} lensa review → ${stats.proposed} usulan → ${stats.quoteOk} lolos cek kutipan → ${stats.candidates} kandidat unik → ${stats.skeptic.ok ? `${stats.confirmed} lolos uji skeptis${stats.disputed ? `, ${stats.disputed} diperdebatkan` : ''}` : 'uji skeptis tidak tersedia (temuan ditandai belum teruji)'}</sub>`);
   }
+  if (aiReview.runtime && aiReview.runtime.ran) {
+    out.push('', `<sub>Verifikasi eksekusi (Chromium/Playwright): ${aiReview.runtime.clean} halaman contoh dimuat bersih, ${aiReview.runtime.failing} memunculkan galat runtime. Temuan yang menunjuk berkas runtime ikut diuji; yang tak punya permukaan runtime jujur ditandai "belum diuji eksekusi".</sub>`);
+  } else if (verified.some(v => v.file && /\.(js|mjs|css|html)$/i.test(v.file))) {
+    out.push('', '<sub>⚠️ Verifikasi eksekusi (Chromium) tidak dijalankan pada review ini — temuan runtime hanya lolos cek kutipan, belum diuji di peramban.</sub>');
+  }
   if (!verified.length) {
     out.push('', '_Tidak ada temuan AI yang bisa dibuktikan di kode._');
   } else {
     out.push('');
     verified.forEach((v, i) => {
-      out.push(`${i + 1}. ${SEVERITY_ICON[v.severity]} **${v.title}** — \`${v.file}:${v.line}\`${v.inDiff ? ' _(komentar di baris)_' : ''}${v.skeptic === 'unverified' ? ' _(belum lolos uji skeptis)_' : v.skeptic === 'disputed' ? ` _(⚖️ diperdebatkan: ${v.support.length} lensa vs uji skeptis)_` : ''}`);
+      out.push(`${i + 1}. ${SEVERITY_ICON[v.severity]} **${v.title}** — \`${v.file}:${v.line}\`${v.inDiff ? ' _(komentar di baris)_' : ''}${v.runtime && v.runtime.probed ? (v.runtime.ok ? ' _(🧪 diuji eksekusi: belum terlihat di peramban)_' : ' _(🧪 dikonfirmasi eksekusi Chromium)_') : ''}${v.skeptic === 'unverified' ? ' _(belum lolos uji skeptis)_' : v.skeptic === 'disputed' ? ` _(⚖️ diperdebatkan: ${v.support.length} lensa vs uji skeptis)_` : ''}`);
       if (v.explanation) out.push(`   ${v.explanation.replace(/\n+/g, ' ')}`);
       if (v.scenario) out.push(`   **Skenario gagal:** ${v.scenario.replace(/\n+/g, ' ')}`);
     });
@@ -1639,17 +1718,42 @@ Diagnose the root cause and provide exact code fixes:
 <<<END>>>`;
 
     const aiResult = await queryLLM(prompt, FIEZEL_SYSTEM_PROMPT, { tier: 'review' });
-    if (aiResult.text) {
-      const patchedFiles = applyReplacementBlocks(aiResult.text);
-      if (patchedFiles.length > 0) {
-        if (!runValidationLoop()) {
-          console.log('[Fiezel Bot v2] ⏪ Patch AI gagal di gerbang pre-commit. Melakukan rollback...');
-          for (const f of patchedFiles) sh('git', ['restore', f], { allowFailure: true });
-          return { changed: false, files: [], reason: 'validation-failed' };
+    if (!aiResult.text) {
+      console.log('[Fiezel Bot v2] ⛔ AI tidak menjawab (semua kunci/model habis). Tidak ada patch untuk diterapkan.');
+      return { changed: false, files: [], reason: 'ai-unavailable' };
+    }
+    let { patched: patchedFiles, failures } = applyReplacementBlocksDetailed(aiResult.text);
+
+    // Patch yang SEARCH-nya tidak cocok dikirim ULANG sekali dengan potongan
+    // berkas nyata: model sering salah menyalin baris, dan membiarkannya sebagai
+    // "unfixable" membuat murid menunggu perbaikan yang sebenarnya bisa dilakukan.
+    if (!patchedFiles.length && failures.some(f => /SEARCH tidak cocok/.test(f.reason))) {
+      const retryPrompt = buildMismatchRetryPrompt(failures, aiResult.text);
+      if (retryPrompt) {
+        console.log('[Fiezel Bot v2] 🔁 SEARCH tidak cocok — mengirim ulang potongan berkas nyata ke AI (1 putaran).');
+        const retry = await queryLLM(retryPrompt, FIEZEL_SYSTEM_PROMPT, { tier: 'review' });
+        if (retry.text) {
+          const second = applyReplacementBlocksDetailed(retry.text);
+          // Hanya terima bila menghasilkan patch; jika tidak, pertahankan kegagalan asli.
+          if (second.patched.length) { patchedFiles = second.patched; failures = second.failures; }
+          else failures = second.failures.length ? second.failures : failures;
         }
-        writePatchList(patchedFiles);
-        return { changed: true, files: patchedFiles, reason: 'ai-patch' };
       }
+    }
+
+    if (patchedFiles.length > 0) {
+      if (!runValidationLoop()) {
+        console.log('[Fiezel Bot v2] ⏪ Patch AI gagal di gerbang pre-commit. Melakukan rollback...');
+        for (const f of patchedFiles) sh('git', ['restore', f], { allowFailure: true });
+        return { changed: false, files: [], reason: 'validation-failed' };
+      }
+      writePatchList(patchedFiles);
+      return { changed: true, files: patchedFiles, reason: 'ai-patch' };
+    }
+    if (failures.length) {
+      const detail = failures.map(f => `${f.file}: ${f.reason}`).join('; ');
+      console.log(`[Fiezel Bot v2] ⛔ Patch AI tidak dapat diterapkan — ${detail}`);
+      return { changed: false, files: [], reason: 'ai-patch-not-applied', detail };
     }
   }
 
@@ -1983,12 +2087,23 @@ function replaceLiteral(content, search, replacement) {
   return content.slice(0, idx) + replacement + content.slice(idx + search.length);
 }
 
-function applyReplacementBlocks(patchText) {
+/**
+ * Versi RINCI dari `applyReplacementBlocks`: mengembalikan berkas yang berhasil
+ * dipatch dan daftar kegagalan per-berkas (path tidak aman, SEARCH kosong,
+ * berkas hilang, SEARCH tidak cocok, syntax error). Laporan heal memakai ini
+ * supaya "unfixable" diganti alasan persis — mis. "blok SEARCH tidak cocok
+ * dengan isi berkas saat ini" — temuan audit PR #506.
+ */
+function applyReplacementBlocksDetailed(patchText) {
+  const text = String(patchText || '');
   const blockRegex = /<<<FILE:\s*(.+?)>>>[\r\n]+<<<SEARCH>>>([\s\S]*?)<<<REPLACE>>>([\s\S]*?)<<<END>>>/g;
   let match;
   const patchedFiles = [];
+  const failures = [];
+  let blocksSeen = 0;
 
-  while ((match = blockRegex.exec(patchText)) !== null) {
+  while ((match = blockRegex.exec(text)) !== null) {
+    blocksSeen++;
     const relFile = match[1].trim();
     const searchTarget = cleanBlockText(match[2]);
     const replacement = cleanBlockText(match[3]);
@@ -1997,14 +2112,20 @@ function applyReplacementBlocks(patchText) {
     const safe = resolveSafeRepoPath(relFile);
     if (!safe.ok) {
       console.warn(`[Fiezel Bot v2] ⛔ Ditolak (patch jail): "${relFile}" — ${safe.reason}`);
+      failures.push({ file: relFile, reason: `ditolak patch jail (${safe.reason})` });
       continue;
     }
     if (!searchTarget) {
       console.warn(`[Fiezel Bot v2] ⛔ Ditolak: blok SEARCH kosong pada ${safe.rel}`);
+      failures.push({ file: safe.rel, reason: 'blok SEARCH kosong' });
       continue;
     }
     const absPath = safe.abs;
-    if (!fs.existsSync(absPath)) { console.warn(`[Fiezel Bot v2] File tidak ditemukan: ${safe.rel}`); continue; }
+    if (!fs.existsSync(absPath)) {
+      console.warn(`[Fiezel Bot v2] File tidak ditemukan: ${safe.rel}`);
+      failures.push({ file: safe.rel, reason: 'berkas tidak ditemukan' });
+      continue;
+    }
 
     const original = fs.readFileSync(absPath, 'utf8');
     let content = replaceLiteral(original, searchTarget, replacement);
@@ -2016,7 +2137,11 @@ function applyReplacementBlocks(patchText) {
       content = replaceLiteral(normContent, normTarget, replacement.replace(/\r\n/g, '\n'));
     }
 
-    if (content === null) { console.warn(`[Fiezel Bot v2] Search block tidak cocok di ${safe.rel}`); continue; }
+    if (content === null) {
+      console.warn(`[Fiezel Bot v2] Search block tidak cocok di ${safe.rel}`);
+      failures.push({ file: safe.rel, reason: 'blok SEARCH tidak cocok dengan isi berkas saat ini', search: searchTarget.slice(0, 1500) });
+      continue;
+    }
 
     // Syntax validation untuk JS/MJS
     fs.writeFileSync(absPath, content, 'utf8');
@@ -2025,13 +2150,119 @@ function applyReplacementBlocks(patchText) {
       if (check.status !== 0) {
         console.error(`[Fiezel Bot v2] ❌ Syntax error setelah patch pada ${safe.rel}! Rollback.`);
         fs.writeFileSync(absPath, original, 'utf8');
+        failures.push({ file: safe.rel, reason: 'syntax error setelah patch (dibatalkan)' });
         continue;
       }
     }
     console.log(`[Fiezel Bot v2] ✅ Patched: ${safe.rel}`);
     if (!patchedFiles.includes(safe.rel)) patchedFiles.push(safe.rel);
   }
-  return patchedFiles;
+
+  // Blok yang tak pernah ditutup `<<<END>>>` tidak tertangkap regex — laporkan
+  // supaya laporan tidak menyebut "unfixable" tanpa jejak.
+  const declared = (text.match(/<<<FILE:/g) || []).length;
+  if (declared > blocksSeen) {
+    failures.push({ file: `(${declared - blocksSeen} blok)`, reason: 'blok tidak lengkap / tanpa penanda <<<END>>>' });
+  }
+  return { patched: patchedFiles, failures };
+}
+
+/** Kompatibilitas: pemanggil lama cukup melihat daftar berkas yang berhasil dipatch. */
+function applyReplacementBlocks(patchText) {
+  return applyReplacementBlocksDetailed(patchText).patched;
+}
+
+/**
+ * Prompt perbaikan ketika blok SEARCH AI tidak cocok: kirim potongan berkas
+ * SUNGGUHAN (dipagar sebagai tak tepercaya) agar model menyalin baris persis,
+ * bukan menebak dari memori. Mengembalikan '' bila tak ada bahan.
+ */
+function buildMismatchRetryPrompt(failures, priorText) {
+  const mismatch = (failures || []).filter(f => /SEARCH tidak cocok/.test(f.reason) && f.search);
+  if (!mismatch.length) return '';
+  const parts = [];
+  for (const f of mismatch.slice(0, 3)) {
+    const lines = readRepoLines(f.file);
+    if (!lines) continue;
+    const snippet = lines.slice(0, 160).join('\n');
+    parts.push(`FILE: ${f.file}\n${fenceUntrusted('RETRY_FILE', `--- SEARCH YANG GAGAL (tidak cocok) ---\n${f.search}\n--- ISI BERKAS SUNGGUHAN (baris 1-${Math.min(160, lines.length)}) ---\n${snippet}`, 7000)}`);
+  }
+  if (!parts.length) return '';
+  return `Blok SEARCH pada balasan sebelumnya TIDAK COCOK dengan isi berkas nyata, jadi patch gagal diterapkan.
+
+${parts.join('\n\n')}
+
+Salin ulang baris SEARCH PERSIS dari isi berkas di atas (termasuk spasi/indentasi), lalu kirim blok lengkap:
+<<<FILE: path/to/file.ext>>>
+<<<SEARCH>>>
+[baris persis dari berkas]
+<<<REPLACE>>>
+[baris pengganti]
+<<<END>>>
+
+Perbaiki HANYA yang diminta. Jangan menyentuh berkas lain.`;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// VERIFIKASI EKSEKUSI (Playwright) — item #2
+// ═══════════════════════════════════════════════════════════════════════════
+
+/** Berkas yang tidak punya permukaan runtime (tes/alat/dokumen/data) tak perlu diuji peramban. */
+const PROBE_SKIP_DIRS = /^(tests|tools|docs|reports|coordination|stitch-export|website|node_modules)\//i;
+
+/**
+ * Memetakan berkas temuan ke halaman yang bisa dibuka di peramban sungguhan.
+ * - `.html` yang ada → halaman itu sendiri;
+ * - `.js`/`.mjs`/`.css` (produk) → `index.html` (shell aplikasi);
+ * - berkas non-runtime (tes/alat/dokumen/data) → null (jujur: tidak diuji eksekusi).
+ * Fungsi murni (tanpa peramban) supaya bisa diuji di self-test.
+ */
+function pickProbeTarget(file) {
+  const f = String(file || '').replace(/\\/g, '/').replace(/^\.\//, '');
+  if (!f || PROBE_SKIP_DIRS.test(f)) return null;
+  if (/\.(md|txt|json|ya?ml|sql|csv|lock|png|jpe?g|gif|svg|webp|mp3|wav|mp4|woff2?)$/i.test(f)) return null;
+  if (/\.html$/i.test(f)) return fs.existsSync(path.join(ROOT, f)) ? f : null;
+  if (/\.(js|mjs|css)$/i.test(f)) return fs.existsSync(path.join(ROOT, 'index.html')) ? 'index.html' : null;
+  return null;
+}
+
+/**
+ * Menjalankan probe Playwright sebagai proses terpisah dan mengembalikan peta
+ * id-temuan → hasil eksekusi. Dihentikan dengan hormat (bukan gagal) bila
+ * peramban/modul tak ada: verifikasi yang tak tersedia TIDAK boleh memalsukan
+ * kesimpulan. `FIEZEL_BOT_PROBE=off` mematikan fitur ini.
+ */
+function probeFindingsRuntime(findings) {
+  const result = new Map();
+  if (process.env.FIEZEL_BOT_PROBE === 'off') return result;
+  if (!Array.isArray(findings) || !findings.length) return result;
+  const script = path.join(ROOT, 'tools', 'fiezel-bot-probe.mjs');
+  if (!fs.existsSync(script)) return result;
+
+  const jobs = [];
+  for (const f of findings) {
+    const target = f.target || pickProbeTarget(f.file);
+    if (target) jobs.push({ id: f.id, file: f.file, line: f.line, target });
+  }
+  if (!jobs.length) return result;
+
+  const inFile = path.join(os.tmpdir(), `fiezel-probe-in-${process.pid}.json`);
+  const outFile = path.join(os.tmpdir(), `fiezel-probe-out-${process.pid}.json`);
+  try {
+    fs.writeFileSync(inFile, JSON.stringify(jobs), 'utf8');
+    const r = sh('node', [script, `--in=${inFile}`, `--out=${outFile}`], { allowFailure: true, timeout: 240_000 });
+    if (r.status !== 0) {
+      console.warn(`[Fiezel Bot v2] Probe eksekusi dilewati: ${(r.stderr || r.stdout || '').toString().slice(0, 200)}`);
+      return result;
+    }
+    const rows = JSON.parse(fs.readFileSync(outFile, 'utf8'));
+    for (const row of rows) result.set(row.id, row);
+  } catch (e) {
+    console.warn(`[Fiezel Bot v2] Probe eksekusi dilewati: ${e.message}`);
+  } finally {
+    for (const p of [inFile, outFile]) { try { if (fs.existsSync(p)) fs.unlinkSync(p); } catch (_) { /* abaikan */ } }
+  }
+  return result;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -2282,6 +2513,7 @@ async function runSelfTest() {
     const realWarn = console.warn;
     console.warn = (...a) => logs.push(a.join(' '));
     geminiKeyCursor = 0; geminiDeadKeys.clear(); geminiKeyCooldown.clear();
+    geminiModelStrikes.clear(); geminiModelExhausted.clear();
     let r1, r2, usedSecond;
     try {
       r1 = await queryLLM('p', '', { tier: 'review', retryDelays: [0, 0] });
@@ -2290,6 +2522,7 @@ async function runSelfTest() {
     } finally {
       globalThis.fetch = realFetch; console.warn = realWarn; geminiKeyCursor = realCursor;
       geminiDeadKeys.clear(); geminiKeyCooldown.clear();
+      geminiModelStrikes.clear(); geminiModelExhausted.clear();
       for (const k of ['GEMINI_API_KEYS', 'GEMINI_API_KEY', 'GROQ_API_KEY', 'FIEZEL_BOT_GEMINI_REVIEW_MODELS', 'FIEZEL_BOT_GEMINI_FAST_MODELS']) {
         if (saved[k] === undefined) delete process.env[k]; else process.env[k] = saved[k];
       }
@@ -2321,6 +2554,7 @@ async function runSelfTest() {
     const realWarn = console.warn;
     console.warn = () => {};
     geminiKeyCursor = 0; geminiDeadKeys.clear(); geminiKeyCooldown.clear();
+    geminiModelStrikes.clear(); geminiModelExhausted.clear();
     let r1, r2, first;
     try {
       r1 = await queryLLM('p', '', { tier: 'review', retryDelays: [0, 0] });
@@ -2329,6 +2563,7 @@ async function runSelfTest() {
     } finally {
       globalThis.fetch = realFetch; console.warn = realWarn; geminiKeyCursor = realCursor;
       geminiDeadKeys.clear(); geminiKeyCooldown.clear();
+      geminiModelStrikes.clear(); geminiModelExhausted.clear();
       for (const k of ['GEMINI_API_KEYS', 'GEMINI_API_KEY', 'GROQ_API_KEY', 'FIEZEL_BOT_GEMINI_REVIEW_MODELS', 'FIEZEL_BOT_GEMINI_FAST_MODELS']) {
         if (saved[k] === undefined) delete process.env[k]; else process.env[k] = saved[k];
       }
