@@ -285,7 +285,7 @@
     var area = L.skill === 'mixed' ? 'mixed' : (B.SKILLS[L.skill] ? B.SKILLS[L.skill].area : 'mixed');
     st.lessons.push({ at: Date.now(), skill: L.skill, area: area, kind: L.kind, title: L.title, correct: correct, total: L.results.length, minutes: L.minutes });
     if (st.plan && st.plan.done.indexOf(L.blockId) === -1) st.plan.done.push(L.blockId);
-    if (L.blockId.indexOf('assign-') === 0) { st.doneAssign = (st.doneAssign || []).concat([{ id: L.blockId.slice(7), at: Date.now(), c: correct, t: L.results.length }]).slice(-6); try { localStorage.setItem(ASSIGN_KEY, JSON.stringify(loadAssignments().filter(function (a) { return 'assign-' + a.id !== L.blockId; }))); } catch (_) {} }
+    if (L.blockId.indexOf('assign-') === 0) { var hasilTugas = { id: L.blockId.slice(7), at: Date.now(), c: correct, t: L.results.length }; st.doneAssign = (st.doneAssign || []).concat([hasilTugas]).slice(-6); outboxAdd(st, hasilTugas); try { localStorage.setItem(ASSIGN_KEY, JSON.stringify(loadAssignments().filter(function (a) { return 'assign-' + a.id !== L.blockId; }))); } catch (_) {} }
     st.lastNext = buildNext(st, L, correct);
     st.activeLesson = null;
     pushToClass();
@@ -358,6 +358,29 @@
     if (retryTimer && retryTimer.unref) retryTimer.unref();
   }
   // Di perangkat yang sama (kelas demo/uji), hasil diagnostic langsung masuk ke kelas berkode.
+  /* R6 PAKET TUGAS OFFLINE (docs/STRATEGI-SEKOLAH-INDONESIA-2026.md). Laporan ke guru membawa
+     paling banyak 8 tugas (server: ASSIGN_MAX 8) dan dikirim sebagai KEADAAN TERBARU — jadi murid
+     yang menyelesaikan lebih dari 8 tugas saat tanpa sinyal dulu kehilangan hasil yang paling lama:
+     gurunya tidak pernah menerimanya. Kotak keluar ini menyimpan setiap hasil yang BELUM dikonfirmasi
+     server (maks. 60) dan mengirimnya bertahap, yang paling lama dulu, sampai habis. */
+  /* Jeda antarkiriman di atas lantai server 15 detik (LEARNER_MIN_INTERVAL_MS). */
+  var OUTBOX_MAX = 60, OUTBOX_BATCH = 8, OUTBOX_DRAIN_MS = 16000, drainTimer = null;
+  function outboxAdd(s, entry) {
+    if (!s || !entry || !entry.id || !(entry.t > 0)) return;
+    s.assignOutbox = (s.assignOutbox || []).filter(function (x) { return x.id !== entry.id; }).concat([entry]).slice(-OUTBOX_MAX);
+  }
+  /** Daftar `assign` untuk laporan: hasil tertunda (paling lama dulu), lalu status terbaru. */
+  function assignForReport(s) {
+    var out = [], ids = {};
+    (s.assignOutbox || []).slice(0, OUTBOX_BATCH).forEach(function (x) { out.push(x); ids[x.id] = true; });
+    var recent = (s.doneAssign || []).slice().reverse();
+    for (var i = 0; i < recent.length && out.length < OUTBOX_BATCH; i++) if (!ids[recent[i].id]) { out.push(recent[i]); ids[recent[i].id] = true; }
+    return out;
+  }
+  function offlineStatus() {
+    var s = ensureState();
+    return { pending: (s.assignOutbox || []).length, lastOkAt: s.classReport && s.classReport.ok ? s.classReport.at : 0, saved: loadAssignments().length };
+  }
   function pushToClass() {
     if (!classCode()) return false;
     var payload = null;
@@ -366,8 +389,16 @@
     var TS = root.FiezelTeacherStore;
     if (TS && TS.reportToClass) {
       try {
+        var terkirim = {};
+        (payload.assign || []).forEach(function (x) { if (x && x.t > 0) terkirim[x.id] = x.at; });
         TS.reportToClass(payload).then(function (r) {
           st.classReport = { at: Date.now(), ok: !!r.ok, error: r.error || '' };
+          if (r && r.ok && st.assignOutbox && st.assignOutbox.length) {
+            /* Hanya entri yang PERSIS terkirim (id + waktu sama) yang dilepas: hasil yang dikerjakan
+               ulang sesudah laporan berangkat tetap menunggu kiriman berikutnya. */
+            st.assignOutbox = st.assignOutbox.filter(function (x) { return terkirim[x.id] !== x.at; });
+            if (st.assignOutbox.length && !drainTimer && typeof setTimeout === 'function') { drainTimer = setTimeout(function () { drainTimer = null; pushToClass(); }, OUTBOX_DRAIN_MS); if (drainTimer && drainTimer.unref) drainTimer.unref(); }
+          }
           if (r && r.ok && st.pendingJoin) st.pendingJoin = 0;
           save(st);
           if (r && r.ok) clearRetry(); else scheduleRetry();
@@ -383,7 +414,7 @@
     Object.keys(st.skills || {}).forEach(function (id) { var s = st.skills[id]; if (s && !skills[id] && /^[a-z0-9_]{1,32}$/.test(id) && Object.keys(skills).length < 12) skills[id] = { c: s.correct, t: s.total }; });
     var nm = String(name || '').trim();
     if (!nm || /^(sobat|murid|teman)$/i.test(nm)) { try { nm = String(JSON.parse(localStorage.getItem('fiezel-onboarding-v1') || '{}').name || nm || t('umum.murid', 'Murid')); } catch (_) { nm = nm || t('umum.murid', 'Murid'); } }
-    var payload = { v: 1, name: nm.split(' ')[0], at: Date.now(), goal: st.goal, skills: skills, lessons: st.lessons.length, cls: classCode() || undefined, assign: (st.doneAssign || []).length ? st.doneAssign.slice(-8) : undefined };
+    var payload = { v: 1, name: nm.split(' ')[0], at: Date.now(), goal: st.goal, skills: skills, lessons: st.lessons.length, cls: classCode() || undefined, assign: assignForReport(st).length ? assignForReport(st) : undefined };
     /* Penanda "aku baru memasukkan kode kelasmu" ikut sampai ia benar-benar mendarat: ia
        dilepas HANYA oleh kiriman yang berhasil (lihat pushToClass), bukan oleh percobaan
        pertama. Murid yang menekan Gabung saat sinyalnya putus tetap sampai ke guru begitu
@@ -475,6 +506,7 @@
        yang tidak terjadi hanyalah pengakuan palsu atas penugasan. */
     if (!mandiri) {
       s.doneAssign = (s.doneAssign || []).filter(function (x) { return x.id !== res.id; }).concat([entry]).slice(-8);
+      outboxAdd(s, entry);
       if (s.plan && s.plan.done.indexOf('assign-' + res.id) === -1) s.plan.done.push('assign-' + res.id);
       try { localStorage.setItem(ASSIGN_KEY, JSON.stringify(loadAssignments().filter(function (a) { return a.id !== res.id; }))); } catch (_) {}
     }
@@ -627,6 +659,18 @@
       return { id: k, meta: B.SKILLS[k], n: n, acc: acc, status: status };
     });
   }
+  /* R6: murid harus TAHU bahwa tugasnya aman tanpa sinyal dan hasilnya belum/sudah sampai. */
+  function offlineMarkup() {
+    if (!classCode()) return '';
+    var o = offlineStatus();
+    if (!o.saved && !o.pending) return '';
+    var bits = [];
+    if (o.saved) bits.push(t('sekolah.offline-tersimpan', '{n} tugas tersimpan di HP — bisa dikerjakan tanpa internet.').replace('{n}', o.saved));
+    bits.push(o.pending
+      ? t('sekolah.offline-menunggu', '{n} hasil menunggu sinyal untuk dikirim ke guru. Hasilmu aman di HP.').replace('{n}', o.pending)
+      : t('sekolah.offline-terkirim', 'Semua hasil tugas sudah sampai ke guru.'));
+    return '<p class="lf-offline' + (o.pending ? ' is-pending' : '') + '" data-testid="lf-offline-status">' + bits.map(esc).join(' ') + '</p>';
+  }
   function tkaMarkup(st) {
     var rows = tkaReadiness(st); if (!rows.length) return '';
     var LBL = {
@@ -687,6 +731,7 @@
       html += '</ol>';
     }
 
+    html += offlineMarkup();
     html += tkaMarkup(st);
 
     html += '<div class="lf-assign-code" data-testid="lf-assign-code"><label class="lf-muted" for="lfAssignCode">Punya kode tugas dari guru?</label><div class="lf-actions"><input id="lfAssignCode" class="lf-code lf-code-input" placeholder="Tempel kode tugas di sini" autocomplete="off" data-testid="lf-assign-code-input"><button type="button" class="lf-mini" data-lf="accept-assign" data-testid="lf-accept-assign">Tambahkan ke rencana</button></div></div>' +
@@ -871,5 +916,5 @@
     });
   }
 
-  return { KEY: KEY, ASSIGN_KEY: ASSIGN_KEY, GOALS: GOALS, mount: mount, render: render, load: load, buildPlan: buildPlan, skillSummary: skillSummary, weeklySummary: weeklySummary, tutorCode: tutorCode, rankedSkills: rankedSkills, statusOf: statusOf, openAssignment: openAssignment, announceJoin: announceJoin, recordExamFocus: recordExamFocus, markAssignmentStarted: markAssignmentStarted, recordAssignmentFocus: recordAssignmentFocus, recordAssignmentResult: recordAssignmentResult, pushToClass: function () { ensureState(); return pushToClass(); }, _retryState: function () { return { pending: !!retryTimer, delay: retryDelay }; }, _state: function () { return st; } };
+  return { KEY: KEY, ASSIGN_KEY: ASSIGN_KEY, GOALS: GOALS, mount: mount, render: render, load: load, buildPlan: buildPlan, skillSummary: skillSummary, weeklySummary: weeklySummary, tutorCode: tutorCode, rankedSkills: rankedSkills, statusOf: statusOf, openAssignment: openAssignment, announceJoin: announceJoin, recordExamFocus: recordExamFocus, markAssignmentStarted: markAssignmentStarted, recordAssignmentFocus: recordAssignmentFocus, recordAssignmentResult: recordAssignmentResult, pushToClass: function () { ensureState(); return pushToClass(); }, _retryState: function () { return { pending: !!retryTimer, delay: retryDelay }; }, offlineStatus: offlineStatus, _drainPending: function () { return !!drainTimer; }, _state: function () { return st; } };
 });

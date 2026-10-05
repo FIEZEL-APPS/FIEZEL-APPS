@@ -106,6 +106,27 @@ Kontrak:
 Belum: perluasan `FiezelItemPool` ke soal bank KelasKu/latihan murid/TKA (butuh prediksi saat
 penyajian di runner KelasKu dan learner-flow — pekerjaan BrainCore tersendiri).
 
+## R6 — Paket tugas offline (m025-478)
+
+Temuan: tugas dari guru SUDAH tersimpan di HP setelah ditarik dan bisa dikerjakan tanpa sinyal.
+Yang bocor ada di arah balik: satu laporan membawa paling banyak 8 tugas (`ASSIGN_MAX`) dan
+server MENIMPA laporan lama. Murid yang menyelesaikan 12 tugas tanpa sinyal kehilangan 4 hasil
+paling lama — gurunya tidak pernah menerimanya, dan murid mengira sudah mengumpulkan.
+
+| Bagian | Berkas |
+|---|---|
+| Kotak keluar hasil yang belum dikonfirmasi server (`assignOutbox`, maks. 60), dikirim 8 per laporan, paling lama dulu, jeda 16 detik | `features/learner-flow/fiezel-learner-flow.js` (`outboxAdd`, `assignForReport`, `pushToClass`) |
+| Status untuk murid: "N tugas tersimpan di HP" + "N hasil menunggu sinyal" | `offlineMarkup` + `.lf-offline` di `learner-flow.css` |
+| Server menggabungkan tugas laporan baru dengan yang tersimpan (maks. 40) | `workers/api/teacher/class-sync-core.js` (`mergeAssign`), `workers/api/route-class-sync.js` |
+| Gerbang | `tests/paket-offline-test.js` |
+
+Kontrak:
+1. **Yang dilepas dari kotak keluar hanya yang persis terkirim** (id + `at` sama). Hasil yang
+   dikerjakan ulang sesudah laporan berangkat tetap menunggu.
+2. **Jeda antarkiriman ≥ lantai server** (`LEARNER_MIN_INTERVAL_MS` 15 dtk); gerbang O3 menjaganya.
+3. **Server: hasil selesai (`t > 0`) tidak dikalahkan status "sedang dikerjakan"**; sesama jenis
+   yang lebih baru menang.
+
 ## Gerbang Thai yang disesuaikan (keputusan owner, bertanggal)
 
 - `tests/th-coverage-test.js`: `UTANG_TANPA_TH` + `['sekolah', { sejak: '2026-10-05' }]`.
@@ -118,5 +139,5 @@ penyajian di runner KelasKu dan learner-flow — pekerjaan BrainCore tersendiri)
 
 ## Belum dikerjakan
 
-R6–R8 (lihat dokumen strategi). Bank TKA target ≥ 60 bacaan; sekarang 16. Pemetaan TP ke Capaian Pembelajaran Fase D resmi belum
+R7–R8 (lihat dokumen strategi). R6 belum punya "paket mingguan" dengan tanggal buka per tugas; guru masih mengirim tugas satu per satu. Bank TKA target ≥ 60 bacaan; sekarang 16. Pemetaan TP ke Capaian Pembelajaran Fase D resmi belum
 ada: TP saat ini = keterampilan yang dilatih kelas.

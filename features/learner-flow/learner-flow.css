@@ -255,3 +255,7 @@
 .lf-tka-chip.is-perlu{background:#fde2dd;color:#8a2a1a}
 .lf-tka-note{font-size:.8rem}
 @media (max-width:560px){.lf-tka-list li{grid-template-columns:1fr auto}.lf-tka-list li>div{grid-column:1/-1}}
+
+/* R6 paket tugas offline: status tugas tersimpan & hasil yang menunggu sinyal */
+.lf-offline { margin: 12px 0 0; padding: 10px 12px; border-radius: 10px; font-size: .9rem; background: var(--lf-soft, rgba(16, 185, 129, .08)); border: 1px solid rgba(16, 185, 129, .25); }
+.lf-offline.is-pending { background: rgba(245, 158, 11, .08); border-color: rgba(245, 158, 11, .35); }
