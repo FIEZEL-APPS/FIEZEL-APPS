@@ -1030,7 +1030,7 @@ function composeInlineComment(v) {
     fence,
     '</details>',
     '',
-    `<sub>Fiezel Bot v2 • temuan AI terverifikasi • beri 👍 bila benar, 👎 bila salah (dipakai mengukur ketepatan bot)</sub>`,
+    `<sub>Fiezel Bot v2 • temuan AI terverifikasi • tidak perlu ditanggapi owner: ketepatan dihitung otomatis dari perbaikan atau penolakan di PR (👍/👎 opsional)</sub>`,
     `<!-- fiezel-bot-finding:${v.id} -->`,
   ].join('\n');
 }
@@ -1521,7 +1521,7 @@ function composeMetricsReport(rows, summaries, opts = {}) {
     const list = rows.filter(r => r.severity === sev);
     lines.push(`| ${SEVERITY_ICON[sev]} ${sev} | ${count('diterima', list)} | ${count('ditolak', list)} | ${count('diabaikan', list)} | ${count('terbuka', list)} | ${pct(count('diterima', list), decided(list))} |`);
   }
-  lines.push('', '**Cara memberi label:** beri 👍 pada komentar inline Fiezel Bot yang benar, 👎 yang salah. Tanpa reaksi, status ditebak dari tindakan: baris diubah = diterima, di-resolve tanpa perubahan = ditolak.');
+  lines.push('', '**Cara status dihitung (otomatis, tanpa perlu tindakan owner):** baris yang dikomentari lalu diperbaiki = diterima; di-resolve tanpa perubahan kode = ditolak; PR selesai tanpa tanggapan = diabaikan. Reaksi 👍/👎 pada komentar bot bersifat opsional dan, bila ada, mengalahkan tebakan otomatis.');
   if (rows.length) {
     lines.push('', '<details><summary>Rincian temuan (terbaru dulu, maks. 40)</summary>', '', '| PR | Lokasi | Temuan | Status |', '|---|---|---|---|');
     for (const r of [...rows].sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt))).slice(0, 40)) {
