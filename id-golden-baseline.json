@@ -1,12 +1,12 @@
 {
   "schema": "id-golden-baseline/1",
-  "generatedAt": "2026-10-05T07:36:39.802Z",
+  "generatedAt": "2026-10-05T08:31:00.564Z",
   "root": "C:\\Users\\hp\\fiezel-apps",
   "files": {
-    "grammar-explanations-id.json": "40c79cbfd1893abdf7f7b24f7c13b30ccebd03940a12d128259a07e485cf3a3f",
+    "grammar-explanations-id.json": "36658ce50a7cd7d4d3de27d11d866579fae5ddf682d2f90c9495c2fa8f1f9e35",
     "grammar-misconception-id.json": "5c4b511ae931bc101067bd9a7760273ad62b5d33e653bfd5ae0abebb72ea82a5",
     "grammar-labels-id.js": "dfd86bd7591f7cba9327e9f14e6aa05e38e7ff15036c7d7741493ad166d297d7",
-    "grammar-templates.json": "587e8d3d177bd185f8f4b87d755d2923097774962673e1261ea21d5b29503d37",
+    "grammar-templates.json": "ec0c97ca185c52cfdf5100ef23396d67d927d4d047c06cf60afffdee58a5006e",
     "vocabulary-master.json": "9c32e169a25116f2e2f394ca21266c48e54935b06149e9cfe55c3645b094c96c",
     "misconception-taxonomy-v1.json": "3aa37cea0f4a101eceda89bad008b560d9685419540475116a61439a2c572753",
     "manifest.json": "0cb19d48f7c1ec7f20420102bf7fa096c17bfa1fad8ead0a2d918c24160039b7",
