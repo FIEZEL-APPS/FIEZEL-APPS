@@ -551,14 +551,18 @@
 
   function render() {
     if (!mountEl) return;
-    var tabs = [['flow', 'Alur belajar'], ['duel', 'Duel'], ['summary', 'Ringkasan'], ['backup', 'Progres & backup']];
+    var tabs = [['flow', 'Alur belajar'], ['bicara', t('sekolah.tab-bicara', 'Bicara privat')], ['duel', 'Duel'], ['summary', 'Ringkasan'], ['backup', 'Progres & backup']];
     var html = '<section class="lf" data-testid="learner-flow">' +
       '<header class="lf-head"><div><p class="lf-kicker">Practice pathway</p><h1>' + t('flow.belajar-hari-ini', 'Belajar hari ini') + '</h1></div>' +
       '<nav class="lf-tabs" role="tablist">' + tabs.map(function (t) { return '<button type="button" role="tab" class="lf-tab' + (st.tab === t[0] ? ' is-active' : '') + '" data-lf="tab" data-tab="' + t[0] + '" data-testid="lf-tab-' + t[0] + '">' + t[1] + '</button>'; }).join('') + '</nav></header>' +
-      (st.tab === 'summary' ? summaryView() : st.tab === 'backup' ? backupView() : st.tab === 'duel' ? '<div id="lfDuelHost" data-testid="lf-duel-host"></div>' : flowView()) + '</section>';
+      (st.tab === 'summary' ? summaryView() : st.tab === 'backup' ? backupView() : st.tab === 'duel' ? '<div id="lfDuelHost" data-testid="lf-duel-host"></div>' : st.tab === 'bicara' ? '<div id="lfBicaraHost" data-testid="lf-bicara-host"></div>' : flowView()) + '</section>';
     mountEl.innerHTML = html;
     if (st.tab === 'duel') { var D = root.FiezelDuel, host = mountEl.querySelector('#lfDuelHost'); if (D && host) D.mount(host, env); else if (host) host.innerHTML = '<p class="lf-muted">Modul Duel belum termuat.</p>'; }
     else if (root.FiezelDuel && root.FiezelDuel.unmount) root.FiezelDuel.unmount();
+    /* R7 latihan bicara privat: modulnya memasang dirinya sendiri; tanpa skor, tanpa kiriman ke guru. */
+    var BP = root.FiezelBicaraPrivat;
+    if (st.tab === 'bicara') { var bh = mountEl.querySelector('#lfBicaraHost'); if (BP && bh) BP.mount(bh, env); else if (bh) bh.innerHTML = '<p class="lf-muted">' + esc(t('sekolah.bicara-belum-termuat', 'Latihan bicara belum termuat. Coba buka ulang aplikasi.')) + '</p>'; }
+    else if (BP && BP.unmount) BP.unmount();
     if (env.afterRender) try { env.afterRender(); } catch (_) {}
   }
 
@@ -732,6 +736,7 @@
     }
 
     html += offlineMarkup();
+    html += '<div class="lf-card lf-bicara-ajak" data-testid="lf-bicara-ajak"><h3>' + esc(t('sekolah.bicara-ajak-judul', 'Malu bicara bahasa Inggris?')) + '</h3><p class="lf-muted">' + esc(t('sekolah.bicara-ajak-isi', 'Latihan bicara privat: tanpa nilai, tanpa penonton, tidak direkam, tidak dikirim ke guru.')) + '</p><div class="lf-actions"><button type="button" class="lf-mini" data-lf="tab" data-tab="bicara" data-testid="lf-bicara-buka">' + esc(t('sekolah.bicara-ajak-tombol', 'Mulai latihan bicara')) + '</button></div></div>';
     html += tkaMarkup(st);
 
     html += '<div class="lf-assign-code" data-testid="lf-assign-code"><label class="lf-muted" for="lfAssignCode">Punya kode tugas dari guru?</label><div class="lf-actions"><input id="lfAssignCode" class="lf-code lf-code-input" placeholder="Tempel kode tugas di sini" autocomplete="off" data-testid="lf-assign-code-input"><button type="button" class="lf-mini" data-lf="accept-assign" data-testid="lf-accept-assign">Tambahkan ke rencana</button></div></div>' +

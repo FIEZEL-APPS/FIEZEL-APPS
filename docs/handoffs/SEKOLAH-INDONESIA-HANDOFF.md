@@ -127,6 +127,29 @@ Kontrak:
 3. **Server: hasil selesai (`t > 0`) tidak dikalahkan status "sedang dikerjakan"**; sesama jenis
    yang lebih baru menang.
 
+## R7 — Latihan bicara privat (m025-478)
+
+Masalah: murid SMP takut salah dan malu berbicara bahasa Inggris di depan teman. Latihan bicara
+yang ada (`speaking-bank-v1.json`, 36 butir A1–C2) memakai ambang lulus — tepat untuk ujian,
+tetapi bagi murid yang malu, "belum lulus" adalah alasan untuk berhenti mencoba.
+
+| Bagian | Berkas |
+|---|---|
+| Bank 25 topik A1–A2 × 6 latihan = 150 (tirukan → ganti kata → jawab sendiri), umpan balik "sudah terdengar / coba lagi", kemajuan lokal, layar | `features/speaking-listening/fiezel-bicara-privat.js` (`FiezelBicaraPrivat`) |
+| Tab "Bicara privat" + kartu ajakan "Malu bicara bahasa Inggris?" di rencana | `features/learner-flow/fiezel-learner-flow.js` (`render`, `planView`) |
+| Gaya | `features/learner-flow/learner-flow.css` (blok R7) |
+| Gerbang | `tests/bicara-privat-test.js` |
+
+Kontrak:
+1. **Tanpa angka.** `cocokkan()` tidak mengembalikan skor, persen, atau lulus; layar tidak
+   menampilkan persen. Murid sendiri yang menandai "sudah lancar".
+2. **Tanpa rekaman dan tanpa kiriman.** Tidak ada `MediaRecorder`, `fetch`, atau `reportToClass`
+   di modul; transkrip pengenal suara hanya hidup di layar. Yang disimpan hanya peta `lancar`
+   di `localStorage` (`fiezel-bicara-privat-v1`). Guru tidak melihat apa pun dari sini.
+3. **Jalan tanpa pengenal suara dan tanpa internet** (dengar contoh → ucapkan → nilai sendiri).
+4. **Bank lama tidak disentuh.** `speaking-bank-v1.json` dikunci jumlahnya dan dibangun ulang
+   oleh `tools/dev/rebuild-speaking-listening-data.js`; bank privat sengaja terpisah.
+
 ## Gerbang Thai yang disesuaikan (keputusan owner, bertanggal)
 
 - `tests/th-coverage-test.js`: `UTANG_TANPA_TH` + `['sekolah', { sejak: '2026-10-05' }]`.
@@ -139,5 +162,5 @@ Kontrak:
 
 ## Belum dikerjakan
 
-R7–R8 (lihat dokumen strategi). R6 belum punya "paket mingguan" dengan tanggal buka per tugas; guru masih mengirim tugas satu per satu. Bank TKA target ≥ 60 bacaan; sekarang 16. Pemetaan TP ke Capaian Pembelajaran Fase D resmi belum
+R8 (lihat dokumen strategi). R6 belum punya "paket mingguan" dengan tanggal buka per tugas; guru masih mengirim tugas satu per satu. Bank TKA target ≥ 60 bacaan; sekarang 16. Pemetaan TP ke Capaian Pembelajaran Fase D resmi belum
 ada: TP saat ini = keterampilan yang dilatih kelas.
