@@ -127,6 +127,11 @@ jobs:
             git checkout origin/main -- tools/fiezel-bot.mjs 2>/dev/null || true
             git checkout origin/main -- tools/bump-build.mjs 2>/dev/null || true
           fi
+          # Probe eksekusi (verifikasi Chromium) mungkin belum ada di branch lama;
+          # tarik dari main agar review tetap bisa menguji runtime (bila browser ada).
+          if [[ ! -f tools/fiezel-bot-probe.mjs ]]; then
+            git checkout origin/main -- tools/fiezel-bot-probe.mjs 2>/dev/null || true
+          fi
           if [[ ! -f tools/fiezel-bot.mjs ]]; then
             echo "⛔ tools/fiezel-bot.mjs tidak ditemukan di branch maupun di main."; exit 1
           fi
@@ -137,6 +142,19 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+
+      # Verifikasi eksekusi (item #2): pasang Chromium agar temuan runtime benar-benar
+      # diuji di peramban, bukan hanya dicocokkan kutipannya. Non-wajib: bila gagal,
+      # probe melewati diri dengan jujur dan review tetap berjalan.
+      - name: Install Chromium for runtime probe
+        if: steps.meta.outputs.pr_number != '' && steps.meta.outputs.head_branch != ''
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          npm install --ignore-scripts --no-audit --no-fund --no-save playwright
+          npx --yes playwright install --with-deps chromium || {
+            echo "::warning::Chromium tidak terpasang; verifikasi eksekusi akan dilewati (temuan ditandai belum diuji)."
+          }
 
       - name: Generate AI Code Review / Explanation
         if: steps.meta.outputs.pr_number != ''
@@ -150,6 +168,8 @@ jobs:
           PR_NUM: ${{ steps.meta.outputs.pr_number }}
           EVENT_NAME: ${{ github.event_name }}
           COMMAND: ${{ github.event.inputs.command }}
+          # Verifikasi eksekusi: 'on' = jalankan probe Chromium; 'off' = lewati.
+          FIEZEL_BOT_PROBE: 'on'
           # Rantai model bisa diganti di Settings → Variables tanpa menyunting kode
           # (daftar dipisah koma; kosong = bawaan di tools/fiezel-bot.mjs).
           FIEZEL_BOT_GEMINI_REVIEW_MODELS: ${{ vars.FIEZEL_BOT_GEMINI_REVIEW_MODELS }}
@@ -248,6 +268,19 @@ jobs:
                 }
               }
             }
+
+      # Item #1: temuan inline bot yang kini sudah usang (baris berubah) atau
+      # di-resolve ditandai sebagai tidak berlaku, sekali saja (idempoten).
+      - name: Mark superseded findings on PR
+        if: steps.meta.outputs.pr_number != ''
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUM: ${{ steps.meta.outputs.pr_number }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          node tools/fiezel-bot.mjs resolve --pr="$PR_NUM" || true
 
       # Check ini (Auto PR Review & Invariant Audit) adalah required check `main`.
       # Dulu ia selalu hijau walau verdict 🔴, sehingga proteksi branch tidak
@@ -484,6 +517,28 @@ jobs:
             const patched = process.env.PATCHED === 'true';
             const protectedBranch = process.env.PROTECTED === 'true';
 
+            // SEBAB PERSIS dari mesin heal (JSON satu baris `HEAL_RESULT:` di akhir log).
+            // Sebelum ini laporan hanya berkata "tidak ada patch" tanpa sebab, padahal
+            // masalah nyata PR #506 adalah "blok SEARCH tidak cocok di style.css".
+            const reasonMap = {
+              'ai-patch': 'patch AI tervalidasi diterapkan',
+              'ai-patch-not-applied': 'AI mengusulkan patch, tetapi blok SEARCH tidak cocok dengan isi berkas saat ini',
+              'ai-unavailable': 'AI tidak menjawab (kuota kunci/model habis) sehingga tidak ada patch',
+              'validation-failed': 'patch AI mematahkan invarian sehingga dibatalkan (rollback)',
+              'unfixable': 'kegagalan tidak dapat diperbaiki otomatis (butuh intervensi manual)',
+            };
+            let healReason = '';
+            try {
+              const m = /HEAL_RESULT: (\{[^\n]*\})/.exec(log);
+              if (m) {
+                const r = JSON.parse(m[1]);
+                if (r && r.reason) {
+                  healReason = reasonMap[r.reason] || r.reason;
+                  if (r.detail) healReason += ` — ${r.detail}`;
+                }
+              }
+            } catch (e) { /* log lama tanpa HEAL_RESULT */ }
+
             let outcome;
             if (protectedBranch) {
               outcome = '⛔ Branch terproteksi — bot menolak menulis. Perbaikan manual diperlukan.';
@@ -492,8 +547,9 @@ jobs:
             } else if (patched) {
               outcome = '✅ Patch diterapkan dan di-push. Push memakai `GITHUB_TOKEN` sehingga **tidak memicu CI baru secara otomatis** — jalankan ulang workflow untuk memverifikasi.';
             } else {
-              outcome = 'ℹ️ Tidak ada patch yang diterapkan (log kosong, tidak ada pola yang dikenal, atau patch gagal validasi). **Tidak ada perubahan yang dibuat.**';
+              outcome = 'ℹ️ Tidak ada patch yang diterapkan. **Tidak ada perubahan yang dibuat.**' + (healReason ? '' : ' (log kosong, tidak ada pola yang dikenal, atau patch gagal validasi.)');
             }
+            if (healReason) outcome += `\n\n**Sebab persis:** ${healReason}.`;
 
             const marker = '<!-- FIEZEL_BOT_AUTO_HEAL -->';
             const body = `${marker}\n` +
