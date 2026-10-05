@@ -43,20 +43,27 @@ permissions:
   issues: write
   actions: read
 
+# Concurrency ada di tingkat JOB, bukan workflow. Dulu review dan heal berbagi
+# satu grup per PR: run review yang sedang antre bisa digantikan heal, sehingga
+# check wajib "Auto PR Review & Invariant Audit" pada head itu berstatus
+# cancelled dan merge terblokir. Kini review dan heal punya grup masing-masing.
+
 jobs:
   # 1. Otomatis Review Setiap PR Dibuka atau Diperbarui (Zero Manual Command)
   auto-pr-review:
     name: Auto PR Review & Invariant Audit
-    concurrency:
-      group: fiezel-bot-review-${{ github.event.pull_request.number || github.event.issue.number || github.event.inputs.pr_number || github.run_id }}
-      cancel-in-progress: true
     timeout-minutes: 20
     runs-on: ubuntu-latest
+    # Review untuk head lama tidak berguna begitu ada push baru → batalkan.
+    concurrency:
+      group: fiezel-bot-review-${{ github.event.pull_request.number || github.event.inputs.pr_number || github.run_id }}
+      cancel-in-progress: true
+    # PR draft IKUT direview: PR otomatis (agen) selalu dibuka sebagai draft, dan
+    # review harus jalan tanpa menunggu owner menekan "Ready for review".
     # KEAMANAN: tolak PR dari fork + wajib penulis OWNER/MEMBER. Hanya MASTER
     # (FIEZEL-APPS) yang boleh memicu lewat workflow_dispatch.
     if: |
       (github.event_name == 'pull_request' &&
-        !github.event.pull_request.draft &&
         github.event.pull_request.head.repo.full_name == github.repository &&
         (github.event.pull_request.author_association == 'OWNER' ||
          github.event.pull_request.author_association == 'MEMBER')) ||
@@ -135,24 +142,36 @@ jobs:
         if: steps.meta.outputs.pr_number != ''
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          # Opsional: beberapa kunci dipisah koma; dirotasi otomatis saat satu kunci habis (429).
+          GEMINI_API_KEYS: ${{ secrets.GEMINI_API_KEYS }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           GITHUB_TOKEN: ${{ github.token }}
           GH_TOKEN: ${{ github.token }}
           PR_NUM: ${{ steps.meta.outputs.pr_number }}
           EVENT_NAME: ${{ github.event_name }}
           COMMAND: ${{ github.event.inputs.command }}
+          # Rantai model bisa diganti di Settings → Variables tanpa menyunting kode
+          # (daftar dipisah koma; kosong = bawaan di tools/fiezel-bot.mjs).
+          FIEZEL_BOT_GEMINI_REVIEW_MODELS: ${{ vars.FIEZEL_BOT_GEMINI_REVIEW_MODELS }}
+          FIEZEL_BOT_GEMINI_FAST_MODELS: ${{ vars.FIEZEL_BOT_GEMINI_FAST_MODELS }}
+          FIEZEL_BOT_GROQ_MODELS: ${{ vars.FIEZEL_BOT_GROQ_MODELS }}
+          FIEZEL_BOT_CONTEXT_CHARS: ${{ vars.FIEZEL_BOT_CONTEXT_CHARS }}
+          FIEZEL_BOT_CALLER_CHARS: ${{ vars.FIEZEL_BOT_CALLER_CHARS }}
+          FIEZEL_INLINE_OUT: /tmp/fiezel-bot/inline.json
+          FIEZEL_VERDICT_OUT: /tmp/fiezel-bot/verdict.txt
         run: |
           set -euo pipefail
           mkdir -p /tmp/fiezel-bot
+          rm -f "$FIEZEL_INLINE_OUT" "$FIEZEL_VERDICT_OUT"
           if [[ "$EVENT_NAME" == "workflow_dispatch" && "$COMMAND" == "explain" ]]; then
+            marker='<!-- FIEZEL_BOT_EXPLAIN -->'
             node tools/fiezel-bot.mjs explain --pr="$PR_NUM" > /tmp/fiezel-bot/raw.log 2>&1 || true
-            sed -n '/<!-- FIEZEL_BOT_EXPLAIN -->/,$p' /tmp/fiezel-bot/raw.log > /tmp/fiezel-bot/out.md || cp /tmp/fiezel-bot/raw.log /tmp/fiezel-bot/out.md
-            echo "MARKER=<!-- FIEZEL_BOT_EXPLAIN -->" >> "$GITHUB_ENV"
           else
+            marker='<!-- FIEZEL_BOT_REVIEW -->'
             node tools/fiezel-bot.mjs review --pr="$PR_NUM" > /tmp/fiezel-bot/raw.log 2>&1 || true
-            sed -n '/<!-- FIEZEL_BOT_REVIEW -->/,$p' /tmp/fiezel-bot/raw.log > /tmp/fiezel-bot/out.md || cp /tmp/fiezel-bot/raw.log /tmp/fiezel-bot/out.md
-            echo "MARKER=<!-- FIEZEL_BOT_REVIEW -->" >> "$GITHUB_ENV"
           fi
+          # Hanya bagian mulai marker yang diposting (tanpa log konsol mesin).
+          awk -v m="$marker" 'index($0, m) { on = 1 } on' /tmp/fiezel-bot/raw.log > /tmp/fiezel-bot/out.md
           # Permukaan diagnostik: tampilkan galat LLM (mis. nama model/kuota) di log CI.
           echo "----- Fiezel Bot diagnostics -----"
           grep -iE 'LLM tidak tersedia|HTTP [0-9]|AbortError|Error|timeout' /tmp/fiezel-bot/raw.log | head -20 || true
@@ -170,7 +189,8 @@ jobs:
             const body = fs.readFileSync(path, 'utf8').trim();
             if (!body) return;
 
-            const marker = process.env.MARKER || '<!-- FIEZEL_BOT_REVIEW -->';
+            const marker = ['<!-- FIEZEL_BOT_EXPLAIN -->', '<!-- FIEZEL_BOT_REVIEW -->'].find(m => body.startsWith(m));
+            if (!marker) return;
             const { owner, repo } = context.repo;
             const issue_number = Number(process.env.PR_NUMBER);
             const comments = await github.paginate(github.rest.issues.listComments, {
@@ -183,14 +203,81 @@ jobs:
               await github.rest.issues.createComment({ owner, repo, issue_number, body });
             }
 
+      - name: Post verified AI findings inline (review comments on lines)
+        if: steps.meta.outputs.pr_number != ''
+        uses: actions/github-script@v7
+        env:
+          PR_NUMBER: ${{ steps.meta.outputs.pr_number }}
+        with:
+          script: |
+            const fs = require('fs');
+            const file = '/tmp/fiezel-bot/inline.json';
+            if (!fs.existsSync(file)) return;
+            let items = [];
+            try { items = JSON.parse(fs.readFileSync(file, 'utf8')); } catch (e) { core.warning(`inline.json rusak: ${e.message}`); return; }
+            if (!Array.isArray(items) || items.length === 0) return;
+
+            const { owner, repo } = context.repo;
+            const pull_number = Number(process.env.PR_NUMBER);
+            const pr = (await github.rest.pulls.get({ owner, repo, pull_number })).data;
+            // Jangan ulang temuan yang sama di setiap push: kenali lewat marker id.
+            const existing = await github.paginate(github.rest.pulls.listReviewComments, { owner, repo, pull_number, per_page: 100 });
+            const seen = new Set();
+            for (const c of existing) {
+              const m = /<!-- fiezel-bot-finding:([0-9a-f]+) -->/.exec(c.body || '');
+              if (m) seen.add(m[1]);
+            }
+            const fresh = items.filter(i => i && i.id && i.path && Number.isInteger(i.line) && !seen.has(i.id)).slice(0, 10);
+            if (fresh.length === 0) { core.info('Semua temuan inline sudah pernah diposting.'); return; }
+
+            const comments = fresh.map(i => ({ path: i.path, line: i.line, side: 'RIGHT', body: i.body }));
+            try {
+              await github.rest.pulls.createReview({
+                owner, repo, pull_number, commit_id: pr.head.sha, event: 'COMMENT',
+                body: `🤖 Fiezel Bot v2 — ${comments.length} temuan AI terverifikasi di baris kode.`,
+                comments,
+              });
+            } catch (e) {
+              // 422 = salah satu baris tak lagi ada di diff head terbaru; posting satu per satu.
+              core.warning(`createReview gagal (${e.status}): ${e.message} — mencoba satu per satu`);
+              for (const c of comments) {
+                try {
+                  await github.rest.pulls.createReviewComment({ owner, repo, pull_number, commit_id: pr.head.sha, ...c });
+                } catch (err) {
+                  core.warning(`Lewati ${c.path}:${c.line}: ${err.message}`);
+                }
+              }
+            }
+
+      # Check ini (Auto PR Review & Invariant Audit) adalah required check `main`.
+      # Dulu ia selalu hijau walau verdict 🔴, sehingga proteksi branch tidak
+      # menahan apa pun. Kini pelanggaran invarian DETERMINISTIK menggagalkannya.
+      # Temuan AI tidak pernah menggagalkan check (paling jauh verdict kuning).
+      - name: Tegakkan verdict deterministik (gagal bila CHANGES REQUESTED)
+        if: steps.meta.outputs.pr_number != ''
+        run: |
+          set -euo pipefail
+          f=/tmp/fiezel-bot/verdict.txt
+          if [[ ! -f "$f" ]]; then
+            echo "Tidak ada verdict (explain, atau tidak ada perubahan untuk direview)."
+            exit 0
+          fi
+          verdict="$(head -n1 "$f")"
+          echo "Verdict Fiezel Bot: $verdict"
+          if [[ "$verdict" == "CHANGES REQUESTED" ]]; then
+            echo "::error::Fiezel Bot menemukan pelanggaran invarian kritis (lihat tabel Audit Invarian di komentar review). Perbaiki sebelum merge."
+            exit 1
+          fi
+
   # 2. Otomatis Sembuhkan CI Ketika Gagal (Self-Healing Loop)
   auto-ci-heal:
     name: Auto CI Self-Healing & Fix
-    concurrency:
-      group: fiezel-bot-heal-${{ github.event.workflow_run.head_branch || github.event.inputs.pr_number || github.run_id }}
-      cancel-in-progress: false
     timeout-minutes: 20
     runs-on: ubuntu-latest
+    # Heal per PR/branch berjalan berurutan agar push tidak saling menimpa.
+    concurrency:
+      group: fiezel-bot-heal-${{ github.event.workflow_run.pull_requests[0].number || github.event.workflow_run.head_branch || github.event.inputs.pr_number || github.run_id }}
+      cancel-in-progress: false
     # KEAMANAN: tolak fork, wajib run berasal dari repo ini, aktor MASTER saja.
     if: |
       (github.event_name == 'workflow_run' &&
@@ -318,6 +405,8 @@ jobs:
         if: steps.collect.outputs.pr_number != '' && steps.guard.outputs.protected == 'false'
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          # Opsional: beberapa kunci dipisah koma; dirotasi otomatis saat satu kunci habis (429).
+          GEMINI_API_KEYS: ${{ secrets.GEMINI_API_KEYS }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           GITHUB_TOKEN: ${{ github.token }}
           GH_TOKEN: ${{ github.token }}
@@ -325,6 +414,8 @@ jobs:
           HEAD_BRANCH: ${{ steps.collect.outputs.head_branch }}
           COMMAND: ${{ github.event.inputs.command }}
           FIEZEL_PATCH_LIST: /tmp/fiezel-bot/patched.txt
+          FIEZEL_BOT_GEMINI_REVIEW_MODELS: ${{ vars.FIEZEL_BOT_GEMINI_REVIEW_MODELS }}
+          FIEZEL_BOT_GROQ_MODELS: ${{ vars.FIEZEL_BOT_GROQ_MODELS }}
         run: |
           set -euo pipefail
           rm -f /tmp/fiezel-bot/patched.txt
@@ -369,15 +460,20 @@ jobs:
             echo "Berkas terpatch: ${FILES[*]}"
           else
             echo "patched=false" >> "$GITHUB_OUTPUT"
+            echo "push_failed=true" >> "$GITHUB_OUTPUT"
             echo "::warning::Gagal melakukan push (mungkin branch sudah maju). Laporan tetap dikirim."
           fi
 
       - name: Post CI Heal Report on PR
-        if: steps.collect.outputs.pr_number != ''
+        # !cancelled(): laporan tetap terposting walau step push gagal
+        # (mis. branch sudah maju sehingga push non-fast-forward ditolak).
+        if: ${{ !cancelled() && steps.collect.outputs.pr_number != '' }}
         uses: actions/github-script@v7
         env:
           PR_NUMBER: ${{ steps.collect.outputs.pr_number }}
           PATCHED: ${{ steps.push.outputs.patched }}
+          PUSH_OUTCOME: ${{ steps.push.outcome }}
+          PUSH_FAILED: ${{ steps.push.outputs.push_failed }}
           PROTECTED: ${{ steps.guard.outputs.protected }}
         with:
           script: |
@@ -391,6 +487,8 @@ jobs:
             let outcome;
             if (protectedBranch) {
               outcome = '⛔ Branch terproteksi — bot menolak menulis. Perbaikan manual diperlukan.';
+            } else if (process.env.PUSH_FAILED === 'true' || process.env.PUSH_OUTCOME === 'failure') {
+              outcome = '⚠️ Patch dibuat tetapi **push gagal** (kemungkinan branch sudah maju sejak commit yang gagal). Tidak ada perubahan yang masuk ke branch.';
             } else if (patched) {
               outcome = '✅ Patch diterapkan dan di-push. Push memakai `GITHUB_TOKEN` sehingga **tidak memicu CI baru secara otomatis** — jalankan ulang workflow untuk memverifikasi.';
             } else {

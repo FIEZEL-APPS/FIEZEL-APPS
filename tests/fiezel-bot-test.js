@@ -47,8 +47,8 @@ console.log('[T2] Menjalankan self-test tools/fiezel-bot.mjs...');
 {
   const r = sh('node', ['tools/fiezel-bot.mjs', 'self-test'], true);
   assert(r.out.includes('Self-Test: PASS'), 'Self-test harus mencetak PASS');
-  assert(/PASS \(12\/12 tests\)/.test(r.out), 'Self-test harus lulus 12/12');
-  console.log('  ok (12/12)');
+  assert(/PASS \(25\/25 tests\)/.test(r.out), 'Self-test harus lulus 25/25');
+  console.log('  ok (25/25)');
 }
 pass++;
 
@@ -148,6 +148,111 @@ console.log('[T12] [INTEGRITAS] Memastikan heal menolak branch terproteksi...');
 {
   assert(engineSrc.includes('protected-branch'), 'Engine harus menolak heal pada branch terproteksi');
   assert(/main\|master/.test(wfContent), 'Workflow harus menolak push ke main/master');
+}
+console.log('  ok');
+pass++;
+
+console.log('[T13] [BUG] Memastikan perintah fix/bump menulis daftar patch (bukan dibuang)...');
+{
+  const mainSrc = engineSrc.slice(engineSrc.indexOf('async function main()'));
+  for (const mode of ['fix', 'bump', 'heal']) {
+    const start = mainSrc.indexOf(`case '${mode}'`);
+    assert(start !== -1, `case '${mode}' wajib ada di main()`);
+    const next = mainSrc.indexOf('case ', start + 5);
+    const body = mainSrc.slice(start, next === -1 ? undefined : next);
+    assert(body.includes('writePatchList'), `Perintah '${mode}' wajib menulis daftar patch; tanpanya step push workflow membuang hasilnya`);
+  }
+}
+console.log('  ok');
+pass++;
+
+console.log('[T14] [BUG] Memastikan review & heal tidak berbagi grup concurrency...');
+{
+  assert(!/^concurrency\s*:/m.test(wfContent), 'Concurrency tingkat workflow dilarang: heal yang antre bisa membatalkan review (check wajib)');
+  assert(/concurrency:\s*\n\s*group: fiezel-bot-review-/.test(wfContent), 'Job review wajib punya grup concurrency sendiri');
+  assert(/concurrency:\s*\n\s*group: fiezel-bot-heal-/.test(wfContent), 'Job heal wajib punya grup concurrency sendiri');
+  const concCount = (wfContent.match(/^ {4}concurrency:/gm) || []).length;
+  assert(concCount === 2, `Tepat satu kunci concurrency per job (ditemukan ${concCount}); kunci ganda membuat YAML ambigu`);
+}
+console.log('  ok');
+pass++;
+
+console.log('[T15] [KUALITAS] Review AI: konteks berkas utuh + temuan terverifikasi + komentar inline...');
+{
+  for (const comp of ['buildFileContext', 'verifyFindings', 'parseDiffFiles', 'writeInlineFindings']) {
+    assert(engineSrc.includes(`function ${comp}`), `Engine wajib punya ${comp}`);
+  }
+  const reviewBody = engineSrc.slice(engineSrc.indexOf('async function runReview'), engineSrc.indexOf('function composeAiSection'));
+  const pipelineBody = engineSrc.slice(engineSrc.indexOf('async function runAiReview'), engineSrc.indexOf('async function runReview'));
+  assert(reviewBody.includes('buildFileContext(') && reviewBody.includes('runAiReview('), 'runReview wajib membaca berkas utuh dan memakai pipeline AI');
+  assert(pipelineBody.includes('verifyFindings('), 'Pipeline AI wajib memverifikasi kutipan temuan ke kode');
+  assert(/json:\s*true/.test(pipelineBody), 'Review AI wajib meminta keluaran JSON terstruktur');
+  assert(wfContent.includes('FIEZEL_INLINE_OUT'), 'Workflow wajib meneruskan FIEZEL_INLINE_OUT ke engine');
+  assert(wfContent.includes('pulls.createReview') && wfContent.includes('listReviewComments'), 'Workflow wajib memposting review inline dan mencegah duplikat');
+}
+console.log('  ok');
+pass++;
+
+console.log('[T16] [KUALITAS] Rantai model diatur lewat variabel, bukan ditulis mati...');
+{
+  for (const v of ['FIEZEL_BOT_GEMINI_REVIEW_MODELS', 'FIEZEL_BOT_GEMINI_FAST_MODELS', 'FIEZEL_BOT_GROQ_MODELS']) {
+    assert(wfContent.includes(`\${{ vars.${v} }}`), `Workflow wajib meneruskan vars.${v}`);
+    assert(engineSrc.includes(`'${v}'`), `Engine wajib membaca ${v}`);
+  }
+  assert(/tier:\s*'review'/.test(engineSrc) && /tier:\s*'fast'/.test(engineSrc), 'Engine wajib memakai tier review (kuat) dan fast');
+}
+console.log('  ok');
+pass++;
+
+console.log('[T17] [OTOMASI] Review berjalan juga pada PR draft...');
+{
+  const reviewJob = wfContent.slice(wfContent.indexOf('auto-pr-review:'), wfContent.indexOf('auto-ci-heal:'));
+  assert(!/pull_request\.draft/.test(reviewJob), 'Job review tidak boleh melewati PR draft (PR agen selalu dibuka sebagai draft)');
+}
+console.log('  ok');
+pass++;
+
+console.log('[T18] [GERBANG] Check wajib review gagal pada pelanggaran invarian deterministik...');
+{
+  const reviewJob = wfContent.slice(wfContent.indexOf('auto-pr-review:'), wfContent.indexOf('auto-ci-heal:'));
+  assert(reviewJob.includes('FIEZEL_VERDICT_OUT'), 'Job review wajib meneruskan FIEZEL_VERDICT_OUT ke engine');
+  assert(/CHANGES REQUESTED[\s\S]{0,300}exit 1/.test(reviewJob), 'Job review wajib exit 1 bila verdict CHANGES REQUESTED');
+  assert(engineSrc.includes('function writeVerdict') && /writeVerdict\(risk\.verdict\)/.test(engineSrc), 'Engine wajib menulis verdict deterministik');
+}
+console.log('  ok');
+pass++;
+
+console.log('[T19] [KUALITAS] Kode pemanggil dikirim ke AI & ketepatan diukur harian...');
+{
+  const reviewBody = engineSrc.slice(engineSrc.indexOf('async function runReview'), engineSrc.indexOf('function writeVerdict'));
+  assert(reviewBody.includes('buildCallerContext(') && reviewBody.includes('extraFiles'), 'runReview wajib mengirim kode pemanggil dan mengizinkan temuan di berkas pemanggil');
+  const mPath = path.join(ROOT, '.github/workflows/fiezel-bot-metrics.yml');
+  assert(fs.existsSync(mPath), 'Workflow fiezel-bot-metrics.yml wajib ada');
+  const m = fs.readFileSync(mPath, 'utf8');
+  assert(/schedule:/.test(m) && /workflow_dispatch:/.test(m), 'Metrik wajib terjadwal dan bisa dipicu manual');
+  assert(/timeout-minutes:\s*\d+/.test(m), 'Metrik wajib punya timeout-minutes');
+  assert(!/secrets\./.test(m) && !/contents:\s*write/.test(m), 'Metrik tidak boleh memegang secrets atau izin tulis kode');
+  assert(m.includes('fiezel-bot.mjs metrics'), 'Metrik wajib menjalankan perintah metrics engine');
+}
+console.log('  ok');
+pass++;
+
+console.log('[T20] [KUALITAS] Review kritis: multi-lensa + uji skeptis + skenario gagal...');
+{
+  const reviewBody = engineSrc.slice(engineSrc.indexOf('async function runReview'), engineSrc.indexOf('function writeVerdict'));
+  assert(reviewBody.includes('runAiReview('), 'runReview wajib memakai pipeline multi-lensa + uji skeptis');
+  assert(/REVIEW_LENSES\s*=\s*\[/.test(engineSrc) && engineSrc.includes('SKEPTIC_REVIEW'), 'Engine wajib punya lensa review dan prompt uji skeptis');
+  assert(engineSrc.includes('function applySkepticVerdicts') && engineSrc.includes("skeptic: 'confirmed'"), 'Hanya temuan yang dikonfirmasi uji skeptis yang bertahan');
+  assert(engineSrc.includes('Skenario gagal'), 'Temuan wajib menampilkan skenario gagal');
+}
+console.log('  ok');
+pass++;
+
+console.log('[T21] [KUOTA] Rotasi banyak kunci Gemini tersambung di workflow...');
+{
+  const passes = (wfContent.match(/GEMINI_API_KEYS: \$\{\{ secrets\.GEMINI_API_KEYS \}\}/g) || []).length;
+  assert(passes === 2, `Job review dan heal wajib meneruskan secrets.GEMINI_API_KEYS (ditemukan ${passes})`);
+  assert(engineSrc.includes('function geminiKeyList') && engineSrc.includes('KEY_ROTATE_STATUS'), 'Engine wajib merotasi kunci Gemini');
 }
 console.log('  ok');
 pass++;
