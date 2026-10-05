@@ -1071,15 +1071,17 @@ function composeInlineComment(v) {
     '',
     v.explanation,
     ...(v.scenario ? ['', `**Skenario gagal:** ${v.scenario}`] : []),
+    ...(v.skeptic === 'disputed' ? ['', `⚖️ **Diperdebatkan:** ${v.support.length} lensa review menemukan ini secara terpisah, tetapi penguji skeptis menolak: _${v.skepticReason}_ — periksa skenario di atas dengan menjalankannya.`] : []),
     '',
     `<details><summary>Bukti (terverifikasi di \`${v.file}:${v.line}\`)</summary>`,
     '',
     fence,
     v.evidence,
     fence,
+    ...(v.skepticTrace ? ['', `**Perhitungan penguji skeptis:** ${v.skepticTrace}`] : []),
     '</details>',
     '',
-    `<sub>Fiezel Bot v2 • ${v.skeptic === 'confirmed' ? 'lolos cek kutipan + uji skeptis' : 'lolos cek kutipan (uji skeptis tidak tersedia)'} • tidak perlu ditanggapi owner: ketepatan dihitung otomatis dari perbaikan atau penolakan di PR (👍/👎 opsional)</sub>`,
+    `<sub>Fiezel Bot v2 • ${v.skeptic === 'confirmed' ? 'lolos cek kutipan + uji skeptis' : v.skeptic === 'disputed' ? `diperdebatkan (${v.support.length} lensa vs uji skeptis)` : 'lolos cek kutipan (uji skeptis tidak tersedia)'} • tidak perlu ditanggapi owner: ketepatan dihitung otomatis dari perbaikan atau penolakan di PR (👍/👎 opsional)</sub>`,
     `<!-- fiezel-bot-finding:${v.id} -->`,
   ].join('\n');
 }
@@ -1169,7 +1171,9 @@ function buildSkepticPrompt(candidates, opts = {}) {
 ${blocks.join('\n\n')}
 
 ${opts.callerText ? `Other call sites of changed functions (read-only context):\n${fenceUntrusted('CALLERS', opts.callerText, 30000)}\n` : ''}
-For EACH candidate decide "confirmed" or "rejected". Confirm ONLY if ALL hold:
+For EACH candidate, first EXECUTE the relevant code mentally with concrete values — the candidate's scenario, or your own counter-example — and write inputs, every intermediate value and the final result in "trace". Arithmetic (time zones and UTC offsets, date boundaries, indices, lengths, rounding) MUST be computed explicitly with numbers, never judged by intuition or by how "usual" the code looks. Reject a candidate only if your trace shows the code produces the CORRECT result for that scenario.
+
+Then decide "confirmed" or "rejected". Confirm ONLY if ALL hold:
 1. The claim matches what the code literally says (re-read the marked line and its surroundings; reject claims about whitespace, truncation or content that the code does not show).
 2. You can state a concrete input/state sequence that produces wrong behaviour in THIS code.
 3. The problem is not already prevented elsewhere in the code shown (guards, copies, validation, callers that never pass such input).
@@ -1178,7 +1182,7 @@ If two candidates describe the same root cause, confirm only the one pointing at
 You may lower or raise severity (high = wrong results/data loss/security for students or teachers; medium = wrong behaviour in edge cases; low = minor).
 
 Respond with ONLY JSON:
-{"verdicts": [{"id": "<id>", "verdict": "confirmed|rejected", "severity": "high|medium|low", "scenario": "<skenario gagal konkret, Bahasa Indonesia>", "reason": "<alasan singkat, Bahasa Indonesia>"}]}`;
+{"verdicts": [{"id": "<id>", "trace": "<eksekusi dengan nilai konkret: masukan → nilai antara → hasil>", "verdict": "confirmed|rejected", "severity": "high|medium|low", "scenario": "<skenario gagal konkret, Bahasa Indonesia>", "reason": "<alasan singkat, Bahasa Indonesia>"}]}`;
 }
 
 function parseVerdictsJson(text) {
@@ -1203,13 +1207,22 @@ function applySkepticVerdicts(candidates, parsed) {
   const kept = [], rejected = [];
   for (const c of candidates) {
     const v = parsed.map.get(c.id);
+    const trace = normalizeWs(v?.trace || '').slice(0, 800);
     if (v && String(v.verdict).toLowerCase() === 'confirmed') {
       const sev = String(v.severity || '').toLowerCase();
       kept.push({ ...c, skeptic: 'confirmed', severity: SEVERITIES.includes(sev) ? sev : c.severity,
-        scenario: String(v.scenario || c.scenario || '').trim().slice(0, 600) });
+        scenario: String(v.scenario || c.scenario || '').trim().slice(0, 600), skepticTrace: trace });
+      continue;
+    }
+    const reason = normalizeWs(v?.reason || 'tidak dikonfirmasi').slice(0, 300);
+    // Satu penguji tidak boleh membatalkan temuan yang ditemukan SENDIRI-SENDIRI oleh
+    // ≥2 lensa (kasus nyata PR #502: tiga lensa menemukan tanda offset WIB terbalik,
+    // penguji skeptis salah hitung dan menolaknya). Temuan seperti itu dilaporkan
+    // sebagai "diperdebatkan" beserta argumen kedua pihak, bukan dibuang diam-diam.
+    if ((c.support?.length || 0) >= 2 && !/duplikat/i.test(reason)) {
+      kept.push({ ...c, skeptic: 'disputed', skepticReason: reason, skepticTrace: trace });
     } else {
-      rejected.push({ file: c.file, line: c.line, title: c.title,
-        reason: `ditolak uji skeptis: ${normalizeWs(v?.reason || 'tidak dikonfirmasi').slice(0, 200)}` });
+      rejected.push({ file: c.file, line: c.line, title: c.title, reason: `ditolak uji skeptis: ${reason.slice(0, 200)}` });
     }
   }
   return { kept, rejected };
@@ -1220,7 +1233,9 @@ function dedupeFindings(list) {
   const rank = { high: 0, medium: 1, low: 2 };
   const out = [];
   for (const f of [...list].sort((a, b) => rank[a.severity] - rank[b.severity])) {
-    if (!out.some(o => o.file === f.file && Math.abs(o.line - f.line) <= 2)) out.push(f);
+    const same = out.find(o => o.file === f.file && Math.abs(o.line - f.line) <= 2);
+    if (same) { if (f.lens && !same.support.includes(f.lens)) same.support.push(f.lens); continue; }
+    out.push({ ...f, support: f.lens ? [f.lens] : [] });
   }
   return out;
 }
@@ -1264,7 +1279,8 @@ async function runAiReview({ basePrompt, prTitle, changedFiles, diffMap, extraFi
     verified: kept.slice(0, MAX_AI_FINDINGS),
     dropped: [...dropped, ...rejected],
     stats: { lenses: lenses.length, answered: answered.length, proposed: raw.length, quoteOk: verified.length,
-      candidates: candidates.length, confirmed: kept.filter(k => k.skeptic === 'confirmed').length, skepticRejected: rejected.length, skeptic },
+      candidates: candidates.length, confirmed: kept.filter(k => k.skeptic === 'confirmed').length,
+      disputed: kept.filter(k => k.skeptic === 'disputed').length, skepticRejected: rejected.length, skeptic },
   };
 }
 
@@ -1341,7 +1357,7 @@ GENERAL TASK: find REAL defects introduced or exposed by this PR that the determ
   if (aiReview) {
     aiReview.context = fileContext;
     const st = aiReview.stats;
-    console.log(`[Fiezel Bot v2] Pipeline AI: ${st.answered}/${st.lenses} lensa → ${st.proposed} usulan → ${st.quoteOk} lolos kutipan → ${st.candidates} kandidat → ${st.skeptic.ok ? `${st.confirmed} lolos uji skeptis` : 'uji skeptis tidak tersedia (temuan belum teruji)'}.`);
+    console.log(`[Fiezel Bot v2] Pipeline AI: ${st.answered}/${st.lenses} lensa → ${st.proposed} usulan → ${st.quoteOk} lolos kutipan → ${st.candidates} kandidat → ${st.skeptic.ok ? `${st.confirmed} lolos uji skeptis, ${st.disputed} diperdebatkan` : 'uji skeptis tidak tersedia (temuan belum teruji)'}.`);
     writeInlineFindings(aiReview.verified);
     // Temuan berat yang terbukti di kode tidak boleh dibungkus verdict hijau.
     if (risk.verdict === 'APPROVED' && aiReview.verified.some(v => v.severity === 'high')) {
@@ -1379,14 +1395,14 @@ function composeAiSection(aiResult, aiReview) {
   const { verified, dropped, context, stats } = aiReview;
   out.push(`**${verified.length} temuan terverifikasi**${dropped.length ? ` · ${dropped.length} dibuang karena tidak terbukti di kode` : ''} · konteks: ${context.included.length} berkas dibaca${context.partial?.length ? ` (${context.partial.length} terpotong anggaran)` : ''}${context.omitted.length ? `, ${context.omitted.length} dilewati` : ''}, ${context.callerSites || 0} lokasi pemanggil`);
   if (stats) {
-    out.push('', `<sub>Saringan: ${stats.answered}/${stats.lenses} lensa review → ${stats.proposed} usulan → ${stats.quoteOk} lolos cek kutipan → ${stats.candidates} kandidat unik → ${stats.skeptic.ok ? `${stats.confirmed} lolos uji skeptis` : 'uji skeptis tidak tersedia (temuan ditandai belum teruji)'}</sub>`);
+    out.push('', `<sub>Saringan: ${stats.answered}/${stats.lenses} lensa review → ${stats.proposed} usulan → ${stats.quoteOk} lolos cek kutipan → ${stats.candidates} kandidat unik → ${stats.skeptic.ok ? `${stats.confirmed} lolos uji skeptis${stats.disputed ? `, ${stats.disputed} diperdebatkan` : ''}` : 'uji skeptis tidak tersedia (temuan ditandai belum teruji)'}</sub>`);
   }
   if (!verified.length) {
     out.push('', '_Tidak ada temuan AI yang bisa dibuktikan di kode._');
   } else {
     out.push('');
     verified.forEach((v, i) => {
-      out.push(`${i + 1}. ${SEVERITY_ICON[v.severity]} **${v.title}** — \`${v.file}:${v.line}\`${v.inDiff ? ' _(komentar di baris)_' : ''}${v.skeptic === 'unverified' ? ' _(belum lolos uji skeptis)_' : ''}`);
+      out.push(`${i + 1}. ${SEVERITY_ICON[v.severity]} **${v.title}** — \`${v.file}:${v.line}\`${v.inDiff ? ' _(komentar di baris)_' : ''}${v.skeptic === 'unverified' ? ' _(belum lolos uji skeptis)_' : v.skeptic === 'disputed' ? ` _(⚖️ diperdebatkan: ${v.support.length} lensa vs uji skeptis)_` : ''}`);
       if (v.explanation) out.push(`   ${v.explanation.replace(/\n+/g, ' ')}`);
       if (v.scenario) out.push(`   **Skenario gagal:** ${v.scenario.replace(/\n+/g, ' ')}`);
     });
@@ -2298,8 +2314,13 @@ async function runSelfTest() {
   {
     if (selectedLenses({}).length !== 3 || selectedLenses({ FIEZEL_BOT_REVIEW_LENSES: '1' }).length !== 1 || selectedLenses({ FIEZEL_BOT_REVIEW_LENSES: 'x' }).length !== 3) throw new Error('T23 FAIL: selectedLenses');
     const mk = (o) => ({ id: o.id, file: 'a.js', line: o.line, severity: o.sev, title: o.id, explanation: '', scenario: '', evidence: 'x', lens: 'l' });
-    const dd = dedupeFindings([mk({ id: 'a', line: 10, sev: 'low' }), mk({ id: 'b', line: 11, sev: 'high' }), mk({ id: 'c', line: 40, sev: 'medium' })]);
-    if (dd.map(f => f.id).join() !== 'b,c') throw new Error(`T23 FAIL: dedupe ${dd.map(f => f.id)}`);
+    const dd = dedupeFindings([{ ...mk({ id: 'a', line: 10, sev: 'low' }), lens: 'data' }, mk({ id: 'b', line: 11, sev: 'high' }), mk({ id: 'c', line: 40, sev: 'medium' })]);
+    if (dd.map(f => f.id).join() !== 'b,c' || dd[0].support.join() !== 'l,data') throw new Error(`T23 FAIL: dedupe ${JSON.stringify(dd.map(f => [f.id, f.support]))}`);
+    // Ditemukan ≥2 lensa lalu ditolak skeptis → diperdebatkan, bukan dibuang (kasus WIB PR #502).
+    const disp = applySkepticVerdicts([{ ...mk({ id: 'w1', line: 19, sev: 'high' }), support: ['logika', 'data', 'niat'] }, { ...mk({ id: 'w2', line: 50, sev: 'low' }), support: ['logika', 'data'] }, { ...mk({ id: 'w3', line: 70, sev: 'low' }), support: ['niat'] }],
+      parseVerdictsJson('{"verdicts":[{"id":"w1","verdict":"rejected","reason":"pengurangan offset valid","trace":"ts-7h → ..."},{"id":"w2","verdict":"rejected","reason":"duplikat dari w1"},{"id":"w3","verdict":"rejected","reason":"gaya"}]}'));
+    if (disp.kept.length !== 1 || disp.kept[0].skeptic !== 'disputed' || !disp.kept[0].skepticReason.includes('offset') || disp.rejected.length !== 2) throw new Error('T23 FAIL: diperdebatkan');
+    if (!composeInlineComment({ ...disp.kept[0], explanation: 'x', evidence: 'const a = 1;' }).includes('Diperdebatkan')) throw new Error('T23 FAIL: label diperdebatkan');
     const cands = [mk({ id: 'r1', line: 5, sev: 'medium' }), mk({ id: 'f1', line: 9, sev: 'high' }), mk({ id: 'm1', line: 30, sev: 'low' })];
     const ap = applySkepticVerdicts(cands, parseVerdictsJson('{"verdicts":[{"id":"r1","verdict":"confirmed","severity":"high","scenario":"input kosong → crash"},{"id":"f1","verdict":"rejected","reason":"sudah dijaga baris 7"}]}'));
     if (ap.kept.length !== 1 || ap.kept[0].id !== 'r1' || ap.kept[0].severity !== 'high' || ap.kept[0].skeptic !== 'confirmed' || !ap.kept[0].scenario.includes('crash')) throw new Error('T23 FAIL: konfirmasi skeptis');
