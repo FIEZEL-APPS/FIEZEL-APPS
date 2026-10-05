@@ -1,7 +1,7 @@
 {
-  "version": "m025-491",
-  "claimedBy": "tidak tercatat (jalankan ulang di dalam git, atau set FIEZEL_BUILD_CLAIMER)",
-  "claimedAt": "2026-10-05T16:28:00.406Z",
-  "reason": "bot(heal): auto-synchronize release boundary",
+  "version": "m025-492",
+  "claimedBy": "branch main",
+  "claimedAt": "2026-10-05T18:33:06.802Z",
+  "reason": "m025-492 kartu pembaruan: sinyal build halaman (bukan VERSION.json beku) + cabang SW jaringan-dulu untuk coordination/BUILD-VERSION.json, supaya PWA terpasang berhenti membeku tanpa kabar",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
