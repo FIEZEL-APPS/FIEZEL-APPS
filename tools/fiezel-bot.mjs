@@ -120,8 +120,9 @@ const sleep = (ms) => new Promise(r => setTimeout(r, ms));
  * Mencoba satu model dengan coba-ulang bertahap untuk galat sementara.
  * `request(signal)` mengembalikan Response fetch; `extract(json)` mengambil teksnya.
  */
-async function tryModel(label, request, extract, { timeoutMs, deadline, errors, retryDelays, rotateKeys }, state = {}) {
+async function tryModel(label, request, extract, { timeoutMs, deadline, errors, retryDelays, noRetryStatus }, state = {}) {
   state.lastStatus = 0;
+  state.retryAfterMs = 0;
   for (let attempt = 0; attempt <= retryDelays.length; attempt++) {
     const left = deadline - Date.now();
     if (left <= 0) { errors.push(`${label}: anggaran waktu LLM habis`); return ''; }
@@ -139,10 +140,10 @@ async function tryModel(label, request, extract, { timeoutMs, deadline, errors, 
       }
       errors.push(`${label}: HTTP ${res.status}${tag}`);
       state.lastStatus = res.status;
-      if (!LLM_RETRYABLE_STATUS.has(res.status)) return '';
-      if (rotateKeys && KEY_ROTATE_STATUS.has(res.status)) return '';
       const ra = Number(res.headers?.get?.('retry-after'));
-      if (Number.isFinite(ra) && ra > 0) retryAfterMs = Math.min(ra * 1000, 30_000);
+      if (Number.isFinite(ra) && ra > 0) retryAfterMs = state.retryAfterMs = Math.min(ra * 1000, 30_000);
+      // Pemanggil punya jalan keluar yang lebih cepat (mis. kunci lain) → jangan menunggu di sini.
+      if (!LLM_RETRYABLE_STATUS.has(res.status) || noRetryStatus?.has(res.status)) return '';
     } catch (e) {
       // Timeout tidak diulang (model lambat akan lambat lagi); galat jaringan diulang.
       errors.push(`${label}: ${e.name === 'AbortError' ? 'timeout' : e.message}${tag}`);
@@ -168,6 +169,12 @@ function geminiKeyList(env = process.env) {
 let geminiKeyCursor = 0;
 /** Status yang berarti "kunci ini tidak bisa dipakai sekarang" → coba kunci lain, model sama. */
 const KEY_ROTATE_STATUS = new Set([401, 403, 429]);
+/** Kunci yang ditolak Google (401/403): dilewati sampai proses selesai. Isinya indeks, bukan kunci. */
+const geminiDeadKeys = new Set();
+/** "model|indeks" → waktu kunci itu boleh dicoba lagi untuk model itu setelah 429. */
+const geminiKeyCooldown = new Map();
+/** Lama kunci+model diistirahatkan setelah 429 (kuota per menit pulih; kuota harian tetap dilewati). */
+const KEY_COOLDOWN_MS = 60_000;
 
 // KEAMANAN: Semua kunci API dibaca HANYA dari environment variable.
 // Di GitHub Actions, diisi oleh repository secrets (${{ secrets.GROQ_API_KEY }}).
@@ -605,12 +612,17 @@ async function queryLLM(prompt, systemInstruction = '', opts = {}) {
     const body = { contents: [{ role: 'user', parts: [{ text: prompt }] }], generationConfig };
     if (systemInstruction) body.systemInstruction = { parts: [{ text: systemInstruction }] };
     const n = geminiKeys.length;
-    // Banyak kunci: kunci yang habis (429) / ditolak (401/403) langsung diganti kunci
-    // berikutnya untuk MODEL YANG SAMA tanpa jeda.
-    const keyCtl = { ...ctl, rotateKeys: n > 1 };
+    // Banyak kunci: kunci yang habis (429) / ditolak (401/403) LANGSUNG diganti kunci
+    // berikutnya untuk MODEL YANG SAMA tanpa jeda, sebelum turun ke model yang lebih
+    // lemah. Kunci yang ditolak dan pasangan model+kunci yang baru kena 429 diingat,
+    // jadi lensa dan uji skeptis berikutnya tidak membuang waktu mengetuk pintu yang sama.
+    const keyCtl = n > 1 ? { ...ctl, retryDelays: ctl.retryDelays.slice(0, 1), noRetryStatus: KEY_ROTATE_STATUS } : ctl;
     for (const model of modelChainFor('gemini', tier)) {
+      let skipped = 0;
       for (let k = 0; k < n; k++) {
         const idx = (geminiKeyCursor + k) % n;
+        const coolKey = `${model}|${idx}`;
+        if (n > 1 && (geminiDeadKeys.has(idx) || (geminiKeyCooldown.get(coolKey) || 0) > Date.now())) { skipped++; continue; }
         const state = {};
         const text = await tryModel(`gemini/${model}${n > 1 ? ` kunci#${idx + 1}` : ''}`,
           (signal) => fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
@@ -627,7 +639,10 @@ async function queryLLM(prompt, systemInstruction = '', opts = {}) {
           return { text, provider: `Google Gemini (${model})`, model };
         }
         if (!KEY_ROTATE_STATUS.has(state.lastStatus)) break; // masalah model/jaringan, bukan kunci
+        if (state.lastStatus === 429) geminiKeyCooldown.set(coolKey, Date.now() + Math.max(KEY_COOLDOWN_MS, state.retryAfterMs));
+        else geminiDeadKeys.add(idx);
       }
+      if (skipped) errors.push(`gemini/${model}: ${skipped} kunci dilewati (ditolak/masih kena kuota)`);
     }
   }
 
@@ -2266,7 +2281,7 @@ async function runSelfTest() {
     const logs = [];
     const realWarn = console.warn;
     console.warn = (...a) => logs.push(a.join(' '));
-    geminiKeyCursor = 0;
+    geminiKeyCursor = 0; geminiDeadKeys.clear(); geminiKeyCooldown.clear();
     let r1, r2, usedSecond;
     try {
       r1 = await queryLLM('p', '', { tier: 'review', retryDelays: [0, 0] });
@@ -2274,15 +2289,54 @@ async function runSelfTest() {
       r2 = await queryLLM('p', '', { tier: 'review', retryDelays: [0, 0] });
     } finally {
       globalThis.fetch = realFetch; console.warn = realWarn; geminiKeyCursor = realCursor;
+      geminiDeadKeys.clear(); geminiKeyCooldown.clear();
       for (const k of ['GEMINI_API_KEYS', 'GEMINI_API_KEY', 'GROQ_API_KEY', 'FIEZEL_BOT_GEMINI_REVIEW_MODELS', 'FIEZEL_BOT_GEMINI_FAST_MODELS']) {
         if (saved[k] === undefined) delete process.env[k]; else process.env[k] = saved[k];
       }
     }
-    if (r1.text !== 'ok' || r1.model !== 'satu' || used.slice(0, usedSecond).at(-1) !== 'KUNCI-SEHAT-3') throw new Error(`T25 FAIL: rotasi ${used.join()}`);
+    if (r1.text !== 'ok' || r1.model !== 'satu' || used.slice(0, usedSecond).join() !== 'KUNCI-HABIS-1,KUNCI-HABIS-2,KUNCI-SEHAT-3') throw new Error(`T25 FAIL: rotasi harus langsung tanpa coba-ulang ${used.join()}`);
     if (used.slice(usedSecond).join() !== 'KUNCI-SEHAT-3' || r2.text !== 'ok') throw new Error(`T25 FAIL: kunci sehat tidak diingat ${used.slice(usedSecond)}`);
     if (logs.some(l => l.includes('KUNCI-')) || !logs.join().includes('kunci#1')) throw new Error('T25 FAIL: kunci bocor ke log');
   }
   console.log('  ✅ T25: Rotasi banyak kunci Gemini (habis → kunci berikutnya, kunci sehat diingat, tidak bocor ke log)');
+  pass++;
+
+  // T26: Kunci yang ditolak (401) tidak diketuk lagi di model mana pun, dan pasangan
+  // model+kunci yang kena 429 diistirahatkan — panggilan berikutnya langsung ke model cadangan.
+  {
+    const realFetch = globalThis.fetch, saved = { ...process.env }, realCursor = geminiKeyCursor;
+    const hits = [];
+    globalThis.fetch = async (url, init) => {
+      const model = String(url).match(/models\/([^:]+):/)?.[1];
+      const key = init.headers['x-goog-api-key'];
+      hits.push(`${model}:${key}`);
+      const resp = (status, body) => ({ ok: status === 200, status, headers: { get: () => null }, json: async () => body });
+      if (key === 'RUSAK') return resp(401, {});
+      if (model === 'kuat') return resp(429, {});
+      return resp(200, { candidates: [{ content: { parts: [{ text: 'ok' }] } }] });
+    };
+    process.env.GEMINI_API_KEYS = 'RUSAK,A,B';
+    delete process.env.GEMINI_API_KEY; delete process.env.GROQ_API_KEY;
+    process.env.FIEZEL_BOT_GEMINI_REVIEW_MODELS = 'kuat'; process.env.FIEZEL_BOT_GEMINI_FAST_MODELS = 'cepat';
+    const realWarn = console.warn;
+    console.warn = () => {};
+    geminiKeyCursor = 0; geminiDeadKeys.clear(); geminiKeyCooldown.clear();
+    let r1, r2, first;
+    try {
+      r1 = await queryLLM('p', '', { tier: 'review', retryDelays: [0, 0] });
+      first = hits.length;
+      r2 = await queryLLM('p', '', { tier: 'review', retryDelays: [0, 0] });
+    } finally {
+      globalThis.fetch = realFetch; console.warn = realWarn; geminiKeyCursor = realCursor;
+      geminiDeadKeys.clear(); geminiKeyCooldown.clear();
+      for (const k of ['GEMINI_API_KEYS', 'GEMINI_API_KEY', 'GROQ_API_KEY', 'FIEZEL_BOT_GEMINI_REVIEW_MODELS', 'FIEZEL_BOT_GEMINI_FAST_MODELS']) {
+        if (saved[k] === undefined) delete process.env[k]; else process.env[k] = saved[k];
+      }
+    }
+    if (r1.model !== 'cepat' || hits.slice(0, first).join() !== 'kuat:RUSAK,kuat:A,kuat:B,cepat:A') throw new Error(`T26 FAIL: panggilan pertama ${hits.join()}`);
+    if (r2.model !== 'cepat' || hits.slice(first).join() !== 'cepat:A') throw new Error(`T26 FAIL: kunci rusak/kena kuota diketuk lagi ${hits.slice(first)}`);
+  }
+  console.log('  ✅ T26: Kunci rusak dilewati permanen, model+kunci kena kuota diistirahatkan');
   pass++;
 
   // T20: Simbol yang diubah ditemukan, pemanggilnya dikumpulkan (produk dulu, definisi & baris terkirim dilewati).
