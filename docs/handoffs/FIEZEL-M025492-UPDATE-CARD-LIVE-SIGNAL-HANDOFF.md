@@ -113,8 +113,8 @@ server uji, dengan `VERSION.json` **beku `5.19.0` di KEDUA sisi** — persis pro
   "pageBuild": "m025-492", "liveBuild": "m025-492", "hasilCheck": false,
   "banner": { "visible": false, "opacity": "0", "display": "none", "width": 0, "height": 0 }
 },
-"P1_kartuMunculSaatBuildLiveLebihBaru": true,
-"P2_kartuTidakMunculSaatSudahMutakhir": true
+"P1_kartu_muncul_saat_build_live_baru": true,
+"P2_kartu_senyap_saat_sudah_mutakhir": true
 ```
 
 Karena `VERSION.json` identik di kedua konteks, perbedaan hasil **hanya** dapat berasal dari

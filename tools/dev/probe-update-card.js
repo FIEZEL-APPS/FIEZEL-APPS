@@ -85,11 +85,11 @@ async function jalankan(browser, { pageBuild, liveBuild, label }) {
   const hasil = {
     konteks1_perangkatLama: lama,
     konteks2_perangkatMutakhir: mutakhir,
-    P1_kartuMunculSaatBuildLiveLebihBaru: lama.hasilCheck === true && !!lama.banner && lama.banner.visible,
-    P2_kartuTidakMunculSaatSudahMutakhir: mutakhir.hasilCheck === false && !!mutakhir.banner && !mutakhir.banner.visible
+    P1_kartu_muncul_saat_build_live_baru: lama.hasilCheck === true && !!lama.banner && lama.banner.visible,
+    P2_kartu_senyap_saat_sudah_mutakhir: mutakhir.hasilCheck === false && !!mutakhir.banner && !mutakhir.banner.visible
   };
   console.log(JSON.stringify(hasil, null, 2));
-  const lulus = hasil.P1_kartuMunculSaatBuildLiveLebihBaru && hasil.P2_kartuTidakMunculSaatSudahMutakhir;
+  const lulus = hasil.P1_kartu_muncul_saat_build_live_baru && hasil.P2_kartu_senyap_saat_sudah_mutakhir;
   console.log('\n' + (lulus ? 'PROBE PASS' : 'PROBE FAIL'));
   process.exit(lulus ? 0 : 1);
 })().catch((e) => { console.error(e.stack || e); process.exit(1); });
