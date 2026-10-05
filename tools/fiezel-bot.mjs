@@ -120,7 +120,7 @@ const sleep = (ms) => new Promise(r => setTimeout(r, ms));
  * Mencoba satu model dengan coba-ulang bertahap untuk galat sementara.
  * `request(signal)` mengembalikan Response fetch; `extract(json)` mengambil teksnya.
  */
-async function tryModel(label, request, extract, { timeoutMs, deadline, errors, retryDelays }, state = {}) {
+async function tryModel(label, request, extract, { timeoutMs, deadline, errors, retryDelays, rotateKeys }, state = {}) {
   state.lastStatus = 0;
   for (let attempt = 0; attempt <= retryDelays.length; attempt++) {
     const left = deadline - Date.now();
@@ -140,6 +140,7 @@ async function tryModel(label, request, extract, { timeoutMs, deadline, errors, 
       errors.push(`${label}: HTTP ${res.status}${tag}`);
       state.lastStatus = res.status;
       if (!LLM_RETRYABLE_STATUS.has(res.status)) return '';
+      if (rotateKeys && KEY_ROTATE_STATUS.has(res.status)) return '';
       const ra = Number(res.headers?.get?.('retry-after'));
       if (Number.isFinite(ra) && ra > 0) retryAfterMs = Math.min(ra * 1000, 30_000);
     } catch (e) {
@@ -605,8 +606,8 @@ async function queryLLM(prompt, systemInstruction = '', opts = {}) {
     if (systemInstruction) body.systemInstruction = { parts: [{ text: systemInstruction }] };
     const n = geminiKeys.length;
     // Banyak kunci: kunci yang habis (429) / ditolak (401/403) langsung diganti kunci
-    // berikutnya untuk MODEL YANG SAMA, sebelum turun ke model yang lebih lemah.
-    const keyCtl = n > 1 ? { ...ctl, retryDelays: ctl.retryDelays.slice(0, 1) } : ctl;
+    // berikutnya untuk MODEL YANG SAMA tanpa jeda.
+    const keyCtl = { ...ctl, rotateKeys: n > 1 };
     for (const model of modelChainFor('gemini', tier)) {
       for (let k = 0; k < n; k++) {
         const idx = (geminiKeyCursor + k) % n;
