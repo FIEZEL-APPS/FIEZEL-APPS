@@ -823,14 +823,22 @@
     showAskAnswer(t('library.ask-thinking', 'Fiezel sedang menjawab…'));
     var dialog = root.FiezelTutorDialog;
     var context = askContext();
-    var ai = (typeof root.askFiezelAI === 'function' && dialog)
-      ? Promise.resolve().then(function () { return root.askFiezelAI(dialog.aiPrompt(question, context)); }).catch(function () { return null; })
-      : Promise.resolve(null);
+    /* R8: askFiezelAIResult membawa tanda `degraded` — jawaban terdegradasi disusun dari
+       materi, bukan AI, jadi tidak diberi label AI. */
+    var dariAI = false;
+    var ai = (typeof root.askFiezelAIResult === 'function' && dialog)
+      ? Promise.resolve().then(function () { return root.askFiezelAIResult(dialog.aiPrompt(question, context)); }).then(function (r) { dariAI = !!(r && r.text && r.degraded !== true); return r && r.text; }).catch(function () { return null; })
+      : (typeof root.askFiezelAI === 'function' && dialog)
+        ? Promise.resolve().then(function () { return root.askFiezelAI(dialog.aiPrompt(question, context)); }).then(function (x) { dariAI = !!x; return x; }).catch(function () { return null; })
+        : Promise.resolve(null);
     ai.then(function (text) {
       var answer = String(text || '').trim();
+      if (!answer) dariAI = false;
       if (!answer && dialog) answer = dialog.respond(question, context, memory()).id;
       if (!answer) answer = t('pustaka.fiezel-pending-can-menjawab');
       showAskAnswer(answer);
+      /* R8: jawaban dari AI diberi label; jawaban mesin lokal tidak. */
+      if (dariAI) { var host = doc.getElementById('libraryAskAnswer'); if (host) { var lbl = doc.createElement('p'); lbl.className = 'ai-label'; lbl.textContent = t('sekolah.ai-label'); host.appendChild(lbl); } }
       return speakAnswer(answer);
     }).catch(function () { showAskAnswer(t('pustaka.fiezel-pending-can-menjawab')); });
   }

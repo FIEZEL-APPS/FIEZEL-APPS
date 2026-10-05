@@ -278,3 +278,6 @@
 .bp-umpan { margin: 10px 0; padding: 10px 12px; border-radius: 10px; background: rgba(16, 185, 129, .08); }
 .bp-umpan p { margin: 2px 0; }
 .bp-putuskan { margin-top: 10px; }
+
+/* R8 label jawaban AI (Tanya FIEZEL, pembimbing PAW, Pustaka) — docs/KEPATUHAN-AI-SEKOLAH.md */
+.ai-label { margin: 8px 0 0; font-size: .82rem; opacity: .8; font-style: italic; }

@@ -212,10 +212,14 @@ test('smoke DOM-stub: alur murid (terima → kerjakan → hasil → laporan w/s)
   sEl.fire('click', btn({ 'data-ch': 'open', 'data-id': a.id }));
   assert.ok(sEl.innerHTML.includes('class-runner') && sEl.innerHTML.includes('Soal 1 dari 2'));
   let lf = LF.load(); assert.ok(lf.doneAssign.some((x) => x.id === a.id && x.s === 1), 'status sedang mengerjakan dilaporkan');
-  sEl.fire('click', btn({ 'data-ch': 'answer', 'data-i': '0' })); // salah (bentuk dasar)
-  assert.ok(sEl.innerHTML.includes('class-feedback') && sEl.innerHTML.includes('Belum tepat'));
+  /* R4 (tugas berbeda per murid): urutan soal berbiji dari id tugas + nama murid, dan id tugas di
+     sini lahir acak — jadi soal pertama bisa tq-smoke1 ATAU tq-smoke2. Pilihan '0' salah untuk
+     smoke1 dan benar untuk smoke2; hasil akhirnya (c:1, w:[smoke1]) sama di kedua urutan. */
+  const pertamaSmoke1 = sEl.innerHTML.includes('She ___ to school yesterday.');
+  sEl.fire('click', btn({ 'data-ch': 'answer', 'data-i': '0' }));
+  assert.ok(sEl.innerHTML.includes('class-feedback') && sEl.innerHTML.includes(pertamaSmoke1 ? 'Belum tepat' : 'Benar!'));
   sEl.fire('click', btn({ 'data-ch': 'next' }));
-  sEl.fire('click', btn({ 'data-ch': 'answer', 'data-i': '0' })); // benar
+  sEl.fire('click', btn({ 'data-ch': 'answer', 'data-i': '0' }));
   sEl.fire('click', btn({ 'data-ch': 'next' }));
   assert.ok(sEl.innerHTML.includes('class-result') && sEl.innerHTML.includes('Bu Rina'));
   lf = LF.load(); const entry = lf.doneAssign.find((x) => x.id === a.id);

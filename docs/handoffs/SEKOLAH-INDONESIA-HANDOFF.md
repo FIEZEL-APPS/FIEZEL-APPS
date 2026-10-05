@@ -150,6 +150,34 @@ Kontrak:
 4. **Bank lama tidak disentuh.** `speaking-bank-v1.json` dikunci jumlahnya dan dibangun ulang
    oleh `tools/dev/rebuild-speaking-listening-data.js`; bank privat sengaja terpisah.
 
+## R8 — Kapasitas dan kepatuhan AI (m025-478)
+
+Dua dokumen keputusan: `docs/KAPASITAS-SEKOLAH.md` dan `docs/KEPATUHAN-AI-SEKOLAH.md`.
+
+| Bagian | Berkas |
+|---|---|
+| Alat hitung kapasitas yang membaca ritme polling & plafon AI dari kode | `tools/kapasitas-sekolah.mjs` |
+| Penjagaan AI terpusat: selama kunci ujian/tugas, hanya AI penilai yang lewat | `app.js` (`AI_TASKS_SAAT_DINILAI`, `aiTaskBlockedByLock`, baris pertama `askFiezelAIResult`) |
+| Tugas LATIHAN dari guru ikut mengunci AI; kabar terkunci menyebut tugas vs ujian | `fiezel-class-hub.js` (`startRunner`), `app.js` (`examLockNotice`) |
+| Label "Dibuat oleh AI" untuk jawaban yang benar-benar dari AI | `app.js` (Tanya FIEZEL, pembimbing), `fiezel-coach-bubble.js`, `fiezel-library-ui.js`, `.ai-label` di `learner-flow.css` |
+| Gerbang | `tests/kepatuhan-ai-sekolah-test.js` |
+
+Kontrak:
+1. **Penjagaan di jalan ke model, bukan hanya di pintu.** Pintu baru yang memanggil
+   `askFiezelAI*` otomatis ikut terkunci; menambah tugas ke `AI_TASKS_SAAT_DINILAI` hanya untuk
+   AI yang MENILAI karya murid, tidak pernah untuk yang membantu menjawab.
+2. **Label hanya untuk jawaban AI sungguhan.** Jawaban terdegradasi (`degraded:true`) dan
+   jawaban mesin lokal tidak diberi label AI.
+3. **Tabel di `KAPASITAS-SEKOLAH.md` = keluaran alat.** Mengubah ritme polling atau plafon
+   neuron membuat gerbang C1 merah sampai tabelnya ditempel ulang.
+
+Temuan untuk owner (belum dikerjakan, keputusan biaya/perilaku): paket gratis Cloudflare sudah
+lewat pada 250 murid aktif 30 menit/hari; plafon neuron AI cukup untuk ±88 murid; polling
+undangan Panggung Suara (tiap 12 dtk untuk semua murid) adalah ±⅓ permintaan.
+
+Ikut diperbaiki: `tests/class-hub-test.js` tidak lagi bergantung pada urutan soal (sejak R4
+urutannya berbiji dari id tugas yang lahir acak, jadi tes itu kadang merah).
+
 ## Gerbang Thai yang disesuaikan (keputusan owner, bertanggal)
 
 - `tests/th-coverage-test.js`: `UTANG_TANPA_TH` + `['sekolah', { sejak: '2026-10-05' }]`.
@@ -162,5 +190,5 @@ Kontrak:
 
 ## Belum dikerjakan
 
-R8 (lihat dokumen strategi). R6 belum punya "paket mingguan" dengan tanggal buka per tugas; guru masih mengirim tugas satu per satu. Bank TKA target ≥ 60 bacaan; sekarang 16. Pemetaan TP ke Capaian Pembelajaran Fase D resmi belum
+Semua R1–R8 sudah punya wujud kode atau dokumen keputusan. Lanjutan: R6 belum punya "paket mingguan" dengan tanggal buka per tugas; guru masih mengirim tugas satu per satu. Bank TKA target ≥ 60 bacaan; sekarang 16. Pemetaan TP ke Capaian Pembelajaran Fase D resmi belum
 ada: TP saat ini = keterampilan yang dilatih kelas.

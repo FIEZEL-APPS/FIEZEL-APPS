@@ -401,6 +401,7 @@ jobs:
           node tests/analisis-butir-test.js
           node tests/paket-offline-test.js
           node tests/bicara-privat-test.js
+          node tests/kepatuhan-ai-sekolah-test.js
           # m025-199: m025-84 memindahkan markup splash ke frame pertama, tetapi peramban
           # tetap menahan cat sampai style.css (286 KB) berlaku - separuh cacat yang sama
           # bertahan sampai pemilik melaporkannya lagi. Gerbang ini menjaga separuh kedua,

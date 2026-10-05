@@ -13,6 +13,8 @@
   if (!I18N) return; // urutan script salah — fiezel-i18n.js wajib dimuat lebih dulu
 
   I18N.registerCopy('id', {
+    'sekolah.ai-label': "Dibuat oleh AI — bisa keliru. Cocokkan dengan materi atau tanyakan gurumu.",
+    'sekolah.ai-terkunci-tugas': "AI FIEZEL nonaktif selama kamu mengerjakan tugas dari guru, karena hasilnya dinilai. Kerjakan dengan kemampuanmu sendiri — AI kembali begitu tugas selesai.",
     'sekolah.bicara-ajak-isi': "Latihan bicara privat: tanpa nilai, tanpa penonton, tidak direkam, tidak dikirim ke guru.",
     'sekolah.bicara-ajak-judul': "Malu bicara bahasa Inggris?",
     'sekolah.bicara-ajak-tombol': "Mulai latihan bicara",

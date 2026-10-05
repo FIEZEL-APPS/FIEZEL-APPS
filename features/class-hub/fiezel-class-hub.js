@@ -898,7 +898,10 @@
     u.focus = a.mode === 'ujian' && FG() ? FG().start(a.id, Date.now()) : null;
     /* Kunci ujian global: ia yang membuat pembimbing PAW dan layar Tanya FIEZEL menutup
        diri, dan ia sama untuk SEMUA permukaan ujian — bukan hanya runner ini. */
-    try { if (a.mode === 'ujian' && root.FiezelExamLock) root.FiezelExamLock.begin('assignment', { id: a.id }); } catch (_) {}
+    /* R8 (SKB AI di pendidikan): tugas LATIHAN dari guru juga dinilai — masuk rekap, rapor KKTP,
+       dan analisis butir — jadi AI ikut dikunci selama runner-nya terbuka. Misi yang dipilih
+       sendiri murid (isMission) bukan tugas guru dan tetap boleh dibantu AI. */
+    try { if ((a.mode === 'ujian' || !a.isMission) && root.FiezelExamLock) root.FiezelExamLock.begin('assignment', { id: a.id }); } catch (_) {}
     saveUi();
     try { LF() && LF().markAssignmentStarted(a.id); } catch (_) {}
     if (a.mode === 'ujian') { bindFocus(); } else { unbindFocus(); }
