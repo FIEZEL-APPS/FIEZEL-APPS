@@ -24,6 +24,15 @@
  *    dibuang workflow); patch jail juga melindungi `tests/` dan mesin gerbang
  *    (bot, guardians, bump-build, BUILD-VERSION) agar AI tak melemahkan gerbang;
  *    penanda pagar untrusted dinetralkan; komentar explain punya marker sendiri.
+ *  - v2.3 (review setara reviewer agentik):
+ *    · AI membaca ISI UTUH berkas yang berubah (bernomor baris), bukan hanya diff;
+ *      berkas besar dikirim sebagai jendela di sekitar perubahan, dalam anggaran
+ *      `FIEZEL_BOT_CONTEXT_CHARS`.
+ *    · Temuan AI wajib JSON {file, line, evidence}; `verifyFindings` mencocokkan
+ *      kutipan dengan kode sungguhan dan MEMBUANG yang tidak terbukti.
+ *    · Temuan terverifikasi diposting sebagai komentar inline di baris diff.
+ *    · Rantai model per tier (review: kuat → cepat; explain: cepat) diatur lewat
+ *      env `FIEZEL_BOT_GEMINI_REVIEW_MODELS` / `_FAST_MODELS` / `FIEZEL_BOT_GROQ_MODELS`.
  *
  * ARSITEKTUR v2:
  * ┌───────────────────────────────────────────────────────────────────────┐
@@ -43,6 +52,7 @@
  *   node tools/fiezel-bot.mjs self-test
  */
 
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -52,6 +62,41 @@ import { fileURLToPath } from 'node:url';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SH_MAX_BUFFER = 64 * 1024 * 1024;
 const LLM_TIMEOUT_MS = 45_000;
+/** Model kuat butuh waktu berpikir lebih lama daripada model cepat. */
+const LLM_REVIEW_TIMEOUT_MS = 150_000;
+
+/**
+ * RANTAI MODEL — bisa diatur lewat environment (di Actions: repository
+ * variables `vars.FIEZEL_BOT_*`), tanpa menyunting kode. Nilai: daftar nama
+ * model dipisah koma, dicoba berurutan sampai ada yang menjawab.
+ *  - tier `review`: review PR, fix, heal → model KUAT dulu, model cepat sebagai cadangan.
+ *  - tier `fast`  : explain → model cepat saja.
+ */
+const DEFAULT_MODEL_CHAINS = {
+  gemini: {
+    review: ['gemini-pro-latest', 'gemini-3.5-flash', 'gemini-3.8-flash', 'gemini-flash-latest'],
+    fast:   ['gemini-3.5-flash', 'gemini-3.8-flash', 'gemini-flash-lite-latest', 'gemini-flash-latest'],
+  },
+  groq: {
+    review: ['openai/gpt-oss-120b', 'qwen/qwen3.8-27b'],
+    fast:   ['openai/gpt-oss-120b', 'qwen/qwen3.8-27b'],
+  },
+};
+const MODEL_ENV = {
+  gemini: { review: 'FIEZEL_BOT_GEMINI_REVIEW_MODELS', fast: 'FIEZEL_BOT_GEMINI_FAST_MODELS' },
+  groq:   { review: 'FIEZEL_BOT_GROQ_MODELS',          fast: 'FIEZEL_BOT_GROQ_MODELS' },
+};
+
+function parseModelList(raw) {
+  return String(raw || '').split(',').map(m => m.trim()).filter(m => /^[A-Za-z0-9._\/-]+$/.test(m));
+}
+
+/** Rantai model untuk provider+tier: env bila diisi dan valid, selain itu bawaan. */
+function resolveModelChain(provider, tier, env = process.env) {
+  const t = tier === 'fast' ? 'fast' : 'review';
+  const fromEnv = parseModelList(env[MODEL_ENV[provider][t]]);
+  return fromEnv.length ? fromEnv : DEFAULT_MODEL_CHAINS[provider][t];
+}
 
 // KEAMANAN: Semua kunci API dibaca HANYA dari environment variable.
 // Di GitHub Actions, diisi oleh repository secrets (${{ secrets.GROQ_API_KEY }}).
@@ -429,21 +474,28 @@ function fenceUntrusted(label, text, maxChars) {
   ].join('\n');
 }
 
-async function queryLLM(prompt, systemInstruction = '') {
+/**
+ * Memanggil LLM dengan rantai model per tier. `opts.json` meminta keluaran
+ * JSON murni (dipakai review terstruktur agar temuan bisa diverifikasi).
+ */
+async function queryLLM(prompt, systemInstruction = '', opts = {}) {
+  const tier = opts.tier === 'fast' ? 'fast' : 'review';
+  const timeoutMs = opts.timeoutMs || (tier === 'review' ? LLM_REVIEW_TIMEOUT_MS : LLM_TIMEOUT_MS);
+  const maxOutputTokens = opts.maxOutputTokens || (tier === 'review' ? 16384 : 4096);
   const geminiKey = process.env.GEMINI_API_KEY || '';
   const groqKey = process.env.GROQ_API_KEY || '';
   const errors = [];
 
   // 1. Gemini — kunci lewat HEADER, bukan query URL.
   if (geminiKey) {
-    // Nama model harus yang benar-benar tersedia untuk kunci ini (gemini-2.5-pro
-    // mengembalikan 404 di akun ini, sehingga review kehilangan lapisan AI).
-    for (const model of ['gemini-3.5-flash', 'gemini-3.8-flash', 'gemini-flash-lite-latest', 'gemini-flash-latest']) {
+    for (const model of resolveModelChain('gemini', tier)) {
       const ctrl = new AbortController();
-      const timer = setTimeout(() => ctrl.abort(), LLM_TIMEOUT_MS);
+      const timer = setTimeout(() => ctrl.abort(), timeoutMs);
       try {
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
-        const body = { contents: [{ role: 'user', parts: [{ text: prompt }] }], generationConfig: { temperature: 0.15, maxOutputTokens: 4096 } };
+        const generationConfig = { temperature: 0.15, maxOutputTokens };
+        if (opts.json) generationConfig.responseMimeType = 'application/json';
+        const body = { contents: [{ role: 'user', parts: [{ text: prompt }] }], generationConfig };
         if (systemInstruction) body.systemInstruction = { parts: [{ text: systemInstruction }] };
         const res = await fetch(url, {
           method: 'POST',
@@ -453,8 +505,8 @@ async function queryLLM(prompt, systemInstruction = '') {
         });
         if (res.ok) {
           const data = await res.json();
-          const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-          if (text) return { text, provider: `Google Gemini (${model})` };
+          const text = (data.candidates?.[0]?.content?.parts || []).map(p => p.text || '').join('');
+          if (text) return { text, provider: `Google Gemini (${model})`, model };
           errors.push(`gemini/${model}: respons kosong`);
         } else {
           errors.push(`gemini/${model}: HTTP ${res.status}`);
@@ -469,23 +521,25 @@ async function queryLLM(prompt, systemInstruction = '') {
 
   // 2. Groq
   if (groqKey) {
-    for (const model of ['openai/gpt-oss-120b', 'qwen/qwen3.8-27b']) {
+    for (const model of resolveModelChain('groq', tier)) {
       const ctrl = new AbortController();
-      const timer = setTimeout(() => ctrl.abort(), LLM_TIMEOUT_MS);
+      const timer = setTimeout(() => ctrl.abort(), timeoutMs);
       try {
         const messages = [];
         if (systemInstruction) messages.push({ role: 'system', content: systemInstruction });
         messages.push({ role: 'user', content: prompt.slice(0, 16000) });
+        const payload = { model, messages, temperature: 0.15, max_tokens: Math.min(maxOutputTokens, 8000) };
+        if (opts.json) payload.response_format = { type: 'json_object' };
         const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${groqKey}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ model, messages, temperature: 0.15, max_tokens: 3500 }),
+          body: JSON.stringify(payload),
           signal: ctrl.signal,
         });
         if (res.ok) {
           const data = await res.json();
           const text = data.choices?.[0]?.message?.content;
-          if (text) return { text, provider: `Groq AI (${model})` };
+          if (text) return { text, provider: `Groq AI (${model})`, model };
           errors.push(`groq/${model}: respons kosong`);
         } else {
           errors.push(`groq/${model}: HTTP ${res.status}`);
@@ -499,7 +553,7 @@ async function queryLLM(prompt, systemInstruction = '') {
   }
 
   if (errors.length) console.warn('[Fiezel Bot v2] LLM tidak tersedia:', errors.join(' | '));
-  return { text: '', provider: 'Deterministic Heuristic Only' };
+  return { text: '', provider: 'Deterministic Heuristic Only', model: '' };
 }
 
 const FIEZEL_SYSTEM_PROMPT = `You are FIEZEL BOT v2, the elite AI-native Code Reviewer for FIEZEL-APPS, an educational PWA with Braincore adaptive learning (BKT, IRT 3PL, OLM, FSRS, Misconception Ledger).
@@ -567,6 +621,242 @@ function getDiffData(prNumber) {
   return { prTitle, prBody, diff, changedFiles, addedLines };
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// LAPISAN 2b: KONTEKS BERKAS UTUH + TEMUAN TERVERIFIKASI
+// ═══════════════════════════════════════════════════════════════════════════
+
+/** Ekstensi berkas teks yang layak dibaca AI; yang lain (gambar, audio, biner) dilewati. */
+const CONTEXT_CODE_EXT = /\.(m?js|cjs|ts|html|css|ya?ml|py|sh)$/i;
+const CONTEXT_TEXT_EXT = /\.(json|md)$/i;
+const CONTEXT_SKIP = /(^|\/)(vendor|node_modules|audio|assets)\/|\.min\.js$|package-lock\.json$/i;
+/** Berkas sebesar ini dikirim utuh; yang lebih besar hanya potongan di sekitar perubahan. */
+const CONTEXT_FULL_FILE_MAX = 40_000;
+const CONTEXT_WINDOW_LINES = 30;
+const CONTEXT_DEFAULT_BUDGET = 150_000;
+const MAX_AI_FINDINGS = 10;
+const SEVERITIES = ['high', 'medium', 'low'];
+const SEVERITY_ICON = { high: '🔴', medium: '🟠', low: '🟡' };
+
+const normalizeWs = (t) => String(t || '').replace(/\s+/g, ' ').trim();
+
+/**
+ * Membaca unified diff menjadi peta per berkas: baris baru yang DITAMBAHKAN dan
+ * semua baris sisi kanan (RIGHT) yang boleh dikomentari GitHub.
+ */
+function parseDiffFiles(diff) {
+  const files = new Map();
+  let cur = null, prevWasOldHeader = false;
+  let newLine = 0, oldLeft = 0, newLeft = 0;
+  for (const line of String(diff || '').split('\n')) {
+    if (oldLeft > 0 || newLeft > 0) {
+      if (line.startsWith('\\')) continue;
+      if (line.startsWith('+')) { if (cur) { cur.added.add(newLine); cur.right.add(newLine); } newLine++; newLeft--; continue; }
+      if (line.startsWith('-')) { oldLeft--; continue; }
+      if (cur) cur.right.add(newLine);
+      newLine++; newLeft--; oldLeft--;
+      continue;
+    }
+    if (line.startsWith('diff --git ')) { cur = null; prevWasOldHeader = false; continue; }
+    if (line.startsWith('--- ')) { prevWasOldHeader = true; continue; }
+    if (prevWasOldHeader && line.startsWith('+++ ')) {
+      prevWasOldHeader = false;
+      const target = line.slice(4).trim();
+      if (target === '/dev/null') { cur = null; continue; }
+      const file = target.replace(/^b\//, '');
+      cur = files.get(file) || { added: new Set(), right: new Set() };
+      files.set(file, cur);
+      continue;
+    }
+    const h = /^@@ -\d+(?:,(\d+))? \+(\d+)(?:,(\d+))? @@/.exec(line);
+    if (h) {
+      oldLeft = h[1] === undefined ? 1 : Number(h[1]);
+      newLine = Number(h[2]);
+      newLeft = h[3] === undefined ? 1 : Number(h[3]);
+    }
+  }
+  return files;
+}
+
+/**
+ * Path untuk DIBACA reviewer: cukup di dalam repo dan bukan `.git/`. Sengaja
+ * lebih longgar daripada patch jail (yang untuk MENULIS) — perubahan di `tests/`
+ * atau mesin bot justru paling perlu dibaca saat review.
+ */
+function resolveReadableRepoPath(relFile) {
+  const raw = String(relFile || '').trim().replace(/\\/g, '/');
+  if (!raw || raw.startsWith('/') || /^[A-Za-z]:/.test(raw)) return null;
+  const normalized = path.posix.normalize(raw);
+  if (normalized === '..' || normalized.startsWith('../') || /^\.git(\/|$)/i.test(normalized)) return null;
+  const abs = path.resolve(ROOT, normalized);
+  const rel = path.relative(ROOT, abs);
+  return rel && !rel.startsWith('..') && !path.isAbsolute(rel) ? abs : null;
+}
+
+function readRepoLines(rel) {
+  const abs = resolveReadableRepoPath(rel);
+  if (!abs || !fs.existsSync(abs) || !fs.statSync(abs).isFile()) return null;
+  if (fs.statSync(abs).size > 2 * 1024 * 1024) return null;
+  return fs.readFileSync(abs, 'utf8').split('\n');
+}
+
+/**
+ * Menyusun isi berkas yang berubah (bernomor baris, baris tambahan ditandai `+`)
+ * dalam batas anggaran karakter. Berkas kecil dikirim utuh; berkas besar hanya
+ * jendela ±CONTEXT_WINDOW_LINES di sekitar baris yang berubah.
+ */
+function buildFileContext(changedFiles, diffMap, opts = {}) {
+  const budget = opts.budget || Number(process.env.FIEZEL_BOT_CONTEXT_CHARS) || CONTEXT_DEFAULT_BUDGET;
+  const readLines = opts.readLines || readRepoLines;
+  const candidates = changedFiles
+    .filter(f => (CONTEXT_CODE_EXT.test(f) || CONTEXT_TEXT_EXT.test(f)) && !CONTEXT_SKIP.test(f))
+    .map(f => ({ file: f, added: diffMap.get(f)?.added || new Set() }))
+    .sort((a, b) => (CONTEXT_CODE_EXT.test(a.file) ? 0 : 1) - (CONTEXT_CODE_EXT.test(b.file) ? 0 : 1) || b.added.size - a.added.size);
+
+  const parts = [], included = [], omitted = [];
+  let used = 0;
+  for (const { file, added } of candidates) {
+    const lines = readLines(file);
+    if (!lines) continue;
+    const full = lines.join('\n').length <= CONTEXT_FULL_FILE_MAX;
+    let keep;
+    if (full) keep = lines.map((_, i) => i + 1);
+    else {
+      if (added.size === 0) { omitted.push(file); continue; }
+      const set = new Set();
+      for (const n of added) {
+        for (let k = Math.max(1, n - CONTEXT_WINDOW_LINES); k <= Math.min(lines.length, n + CONTEXT_WINDOW_LINES); k++) set.add(k);
+      }
+      keep = [...set].sort((a, b) => a - b);
+    }
+    const out = [`=== FILE: ${file} (${lines.length} baris${full ? '' : ', hanya potongan di sekitar perubahan'}) ===`];
+    let prev = 0;
+    for (const n of keep) {
+      if (prev && n !== prev + 1) out.push('  …');
+      out.push(`${String(n).padStart(5)}${added.has(n) ? '+' : ' '}| ${lines[n - 1].slice(0, 400)}`);
+      prev = n;
+    }
+    const chunk = out.join('\n');
+    if (used + chunk.length > budget) { omitted.push(file); continue; }
+    parts.push(chunk);
+    included.push(file);
+    used += chunk.length;
+  }
+  return { text: parts.join('\n\n'), included, omitted };
+}
+
+/** Mengurai jawaban JSON AI ({summary, findings[]} atau array langsung). */
+function parseFindingsJson(text) {
+  let t = String(text || '').trim().replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '');
+  const a = t.indexOf('{'), b = t.lastIndexOf('}');
+  const arrA = t.indexOf('['), arrB = t.lastIndexOf(']');
+  try {
+    if (a !== -1 && b > a && (arrA === -1 || a < arrA)) {
+      const obj = JSON.parse(t.slice(a, b + 1));
+      return { ok: true, summary: String(obj.summary || ''), findings: Array.isArray(obj.findings) ? obj.findings : [] };
+    }
+    if (arrA !== -1 && arrB > arrA) return { ok: true, summary: '', findings: JSON.parse(t.slice(arrA, arrB + 1)) };
+  } catch (_) { /* jatuh ke gagal */ }
+  return { ok: false, summary: '', findings: [] };
+}
+
+/** Membuang awalan nomor baris (`  12+| `) yang mungkin ikut tersalin AI. */
+function cleanEvidence(ev) {
+  return String(ev || '').split('\n').map(l => l.replace(/^\s*\d+[+ ]?\|\s?/, '')).join('\n');
+}
+
+/**
+ * VERIFIKASI — setiap temuan AI wajib menunjuk berkas yang berubah, nomor baris
+ * yang ada, dan kutipan `evidence` yang BENAR-BENAR tertulis di baris itu
+ * (toleransi ±8 baris; bila kutipan unik di tempat lain, barisnya dipindah ke
+ * sana). Temuan yang tidak bisa dibuktikan dibuang beserta alasannya.
+ */
+function verifyFindings(rawFindings, ctx) {
+  const changed = new Set(ctx.changedFiles);
+  const readLines = ctx.readLines || readRepoLines;
+  const diffMap = ctx.diffMap || new Map();
+  const verified = [], dropped = [], seen = new Set();
+  const drop = (f, reason) => dropped.push({ file: f?.file, line: f?.line, title: f?.title, reason });
+
+  for (const f of (Array.isArray(rawFindings) ? rawFindings : [])) {
+    if (!f || typeof f !== 'object') { drop(f, 'bukan objek'); continue; }
+    const file = String(f.file || '').trim().replace(/^\.\//, '').replace(/^[ab]\//, '');
+    if (!changed.has(file)) { drop(f, 'berkas tidak termasuk perubahan PR'); continue; }
+    const lines = readLines(file);
+    if (!lines) { drop(f, 'berkas tidak terbaca'); continue; }
+    const claimed = Number(f.line);
+    if (!Number.isInteger(claimed) || claimed < 1 || claimed > lines.length) { drop(f, 'nomor baris di luar berkas'); continue; }
+    const evLines = cleanEvidence(f.evidence).split('\n').map(normalizeWs).filter(Boolean);
+    if (evLines.join(' ').replace(/\s/g, '').length < 8) { drop(f, 'kutipan bukti terlalu pendek/kosong'); continue; }
+
+    const matchesAt = (i) => {
+      if (!normalizeWs(lines[i]).includes(evLines[0])) return false;
+      const windowText = normalizeWs(lines.slice(i, i + evLines.length + 2).join(' '));
+      return windowText.includes(evLines.join(' '));
+    };
+    let hit = -1;
+    for (let d = 0; d <= 8 && hit === -1; d++) {
+      for (const i of [claimed - 1 - d, claimed - 1 + d]) {
+        if (i >= 0 && i < lines.length && matchesAt(i)) { hit = i; break; }
+      }
+    }
+    if (hit === -1) {
+      const all = [];
+      for (let i = 0; i < lines.length; i++) if (matchesAt(i)) all.push(i);
+      if (all.length === 1) hit = all[0];
+    }
+    if (hit === -1) { drop(f, 'kutipan bukti tidak ditemukan di kode'); continue; }
+
+    const title = normalizeWs(f.title).slice(0, 160);
+    if (!title) { drop(f, 'judul kosong'); continue; }
+    const id = crypto.createHash('sha1').update(`${file}|${title.toLowerCase()}|${evLines.join(' ')}`).digest('hex').slice(0, 12);
+    if (seen.has(id)) continue;
+    seen.add(id);
+    const line = hit + 1;
+    verified.push({
+      id, file, line, title,
+      severity: SEVERITIES.includes(String(f.severity).toLowerCase()) ? String(f.severity).toLowerCase() : 'low',
+      explanation: String(f.explanation || '').trim().slice(0, 1500),
+      evidence: cleanEvidence(f.evidence).trim().slice(0, 600),
+      relocated: line !== claimed,
+      inDiff: !!diffMap.get(file)?.right.has(line),
+    });
+    if (verified.length >= MAX_AI_FINDINGS) break;
+  }
+  return { verified, dropped };
+}
+
+function composeInlineComment(v) {
+  const fence = v.evidence.includes('```') ? '~~~' : '```';
+  return [
+    `${SEVERITY_ICON[v.severity]} **${v.title}**`,
+    '',
+    v.explanation,
+    '',
+    `<details><summary>Bukti (terverifikasi di \`${v.file}:${v.line}\`)</summary>`,
+    '',
+    fence,
+    v.evidence,
+    fence,
+    '</details>',
+    '',
+    `<sub>Fiezel Bot v2 • temuan AI terverifikasi</sub>`,
+    `<!-- fiezel-bot-finding:${v.id} -->`,
+  ].join('\n');
+}
+
+/** Menulis temuan yang bisa ditempel di baris diff untuk diposting workflow sebagai review inline. */
+function writeInlineFindings(verified) {
+  const out = process.env.FIEZEL_INLINE_OUT;
+  if (!out) return;
+  const items = verified.filter(v => v.inDiff).map(v => ({ id: v.id, path: v.file, line: v.line, side: 'RIGHT', body: composeInlineComment(v) }));
+  try {
+    fs.writeFileSync(out, JSON.stringify(items, null, 2), 'utf8');
+    console.log(`[Fiezel Bot v2] ${items.length} temuan inline ditulis ke ${out}`);
+  } catch (e) {
+    console.warn(`[Fiezel Bot v2] Gagal menulis temuan inline: ${e.message}`);
+  }
+}
+
 /**
  * REVIEW — Gabungan Lapisan 1 (Deterministik) + Lapisan 2 (AI)
  */
@@ -603,29 +893,86 @@ async function runReview(prNumber) {
     }
   }
 
+  // ── LAPISAN 2b: Konteks berkas utuh + temuan terstruktur ──
+  const diffMap = parseDiffFiles(diff);
+  const fileContext = buildFileContext(changedFiles, diffMap);
+  console.log(`[Fiezel Bot v2] Konteks AI: ${fileContext.included.length} berkas utuh/terpotong, ${fileContext.omitted.length} dilewati (anggaran).`);
+
   const aiPrompt = `
 Review PR: "${prTitle}"
 PR Description (UNTRUSTED): ${fenceUntrusted('PR_BODY', (prBody || '(kosong)').slice(0, 1000), 1000)}
-Changed Files (${changedFiles.length}): ${changedFiles.slice(0, 30).join(', ')}${changedFiles.length > 30 ? ` ... +${changedFiles.length - 30} lainnya` : ''}
+Changed Files (${changedFiles.length}): ${changedFiles.slice(0, 40).join(', ')}${changedFiles.length > 40 ? ` ... +${changedFiles.length - 40} lainnya` : ''}
 
 Affected Subsystems:
 ${subsystems.map(s => `- ${s.icon} ${s.name} (${s.files.length} files)`).join('\n')}
 
 DETERMINISTIC SCANNER EVIDENCE (trust this — it's code-verified, not guessed):
 ${deterministicEvidence}
-${testContext ? `\n⚠️ TEST FAILURES DETECTED ON THIS PR:\n${testContext}\nPlease explain why these tests failed based on the diff.` : '\n✅ All pre-flight tests passed.'}
+${testContext ? `\n⚠️ TEST FAILURES DETECTED ON THIS PR:\n${testContext}` : '\n✅ All pre-flight tests passed.'}
+
+FULL CONTENT OF CHANGED FILES (format: "<line number><+ if added in this PR>| <code>"):
+${fenceUntrusted('CHANGED_FILES', fileContext.text || '(tidak ada berkas teks yang bisa dibaca)', 400000)}
+${fileContext.omitted.length ? `(Tidak dikirim karena anggaran konteks: ${fileContext.omitted.slice(0, 20).join(', ')})` : ''}
 
 ${fenceUntrusted('GIT_DIFF', diff.slice(0, 25000), 25000)}
 
-Generate ONLY the "### 🔬 Analisis Semantik AI" section with 2-5 findings about logic bugs, architecture, performance, or accessibility that the deterministic scanner CANNOT detect. Number each finding. Be concise.`;
+TASK: Find REAL defects introduced or exposed by this PR that the deterministic scanner cannot catch: logic bugs, broken edge cases, data loss, race conditions, security holes, accessibility, missing Thai twin for user-facing text (every user-visible string must go through FiezelI18n.t with paired copy-id/copy-th keys). Read the full files, not only the diff, to check callers and invariants.
 
-  const aiResult = await queryLLM(aiPrompt, FIEZEL_SYSTEM_PROMPT);
+Respond with ONLY a JSON object, no prose outside it:
+{"summary": "<1-2 kalimat ringkasan PR, Bahasa Indonesia>",
+ "findings": [{"file": "<path persis dari daftar FILE>", "line": <nomor baris dari daftar>, "severity": "high|medium|low",
+   "title": "<judul singkat, Bahasa Indonesia>", "explanation": "<mengapa ini bug + akibat konkret + saran perbaikan, Bahasa Indonesia>",
+   "evidence": "<salin PERSIS kode dari baris itu, tanpa awalan nomor baris>"}]}
+
+RULES: at most ${MAX_AI_FINDINGS} findings; every finding MUST point to a line shown above and quote it verbatim in "evidence" — findings whose evidence does not match the code are discarded automatically. Prefer lines marked "+". No style nits, no speculation ("might", "could potentially") without a concrete failing scenario. If you find nothing solid, return "findings": [].`;
+
+  const aiResult = await queryLLM(aiPrompt, FIEZEL_SYSTEM_PROMPT, { tier: 'review', json: true });
+  let aiReview = null;
+  if (aiResult.text) {
+    const parsed = parseFindingsJson(aiResult.text);
+    const { verified, dropped } = parsed.ok
+      ? verifyFindings(parsed.findings, { changedFiles, diffMap })
+      : { verified: [], dropped: [] };
+    aiReview = { parseError: !parsed.ok, summary: parsed.summary, verified, dropped, context: fileContext };
+    for (const d of dropped) console.log(`[Fiezel Bot v2] Temuan AI dibuang (${d.reason}): ${d.file}:${d.line} ${d.title || ''}`);
+    writeInlineFindings(verified);
+    // Temuan berat yang terbukti di kode tidak boleh dibungkus verdict hijau.
+    if (risk.verdict === 'APPROVED' && verified.some(v => v.severity === 'high')) {
+      Object.assign(risk, { verdict: 'READY FOR MASTER REVIEW', emoji: '🟡' });
+    }
+  }
 
   // ── Compose Final Review ──
-  const reviewMarkdown = composeReviewMarkdown(prTitle, changedFiles, subsystems, findings, risk, aiResult);
+  const reviewMarkdown = composeReviewMarkdown(prTitle, changedFiles, subsystems, findings, risk, aiResult, aiReview);
   console.log('\n--- HASIL REVIEW ---\n');
   console.log(reviewMarkdown);
   return reviewMarkdown;
+}
+
+/** Bagian "Analisis Semantik AI": hanya temuan yang lolos verifikasi. */
+function composeAiSection(aiResult, aiReview) {
+  if (!aiResult.text) return '_AI tidak tersedia. Review dilakukan 100% secara deterministik._';
+  if (!aiReview) return aiResult.text;
+  if (aiReview.parseError) return '_Jawaban AI tidak berformat JSON yang valid; tidak ada temuan AI yang dilaporkan._';
+  const out = [];
+  if (aiReview.summary) out.push(`> ${normalizeWs(aiReview.summary).slice(0, 500)}`, '');
+  const { verified, dropped, context } = aiReview;
+  out.push(`**${verified.length} temuan terverifikasi**${dropped.length ? ` · ${dropped.length} dibuang karena tidak terbukti di kode` : ''} · konteks: ${context.included.length} berkas dibaca utuh/terpotong${context.omitted.length ? `, ${context.omitted.length} dilewati` : ''}`);
+  if (!verified.length) {
+    out.push('', '_Tidak ada temuan AI yang bisa dibuktikan di kode._');
+  } else {
+    out.push('');
+    verified.forEach((v, i) => {
+      out.push(`${i + 1}. ${SEVERITY_ICON[v.severity]} **${v.title}** — \`${v.file}:${v.line}\`${v.inDiff ? ' _(komentar di baris)_' : ''}`);
+      if (v.explanation) out.push(`   ${v.explanation.replace(/\n+/g, ' ')}`);
+    });
+  }
+  if (dropped.length) {
+    out.push('', '<details><summary>Temuan yang dibuang verifikasi</summary>', '');
+    for (const d of dropped.slice(0, 15)) out.push(`- \`${d.file || '?'}:${d.line ?? '?'}\` ${normalizeWs(d.title).slice(0, 120)} — ${d.reason}`);
+    out.push('', '</details>');
+  }
+  return out.join('\n');
 }
 
 function formatDeterministicEvidence(findings, subsystems, risk) {
@@ -641,7 +988,7 @@ function formatDeterministicEvidence(findings, subsystems, risk) {
   return lines.join('\n');
 }
 
-function composeReviewMarkdown(prTitle, changedFiles, subsystems, findings, risk, aiResult) {
+function composeReviewMarkdown(prTitle, changedFiles, subsystems, findings, risk, aiResult, aiReview = null) {
   const LABELS = {
     security: 'Keamanan & Secrets', workflow: 'Workflow Security', hexaSync: 'PWA Hexa-Sync & Release Boundary',
     braincore: 'Braincore Engine Wiring', ghostAnswer: 'Anti-Ghost Answer & Input Murid', examLeak: 'Exam Leak Purity',
@@ -668,7 +1015,7 @@ ${Object.entries(findings).map(([key, cat], i) =>
 ).join('\n')}
 
 ### 🔬 Analisis Semantik AI
-${aiResult.text || '_AI tidak tersedia. Review dilakukan 100% secara deterministik._'}
+${composeAiSection(aiResult, aiReview)}
 
 ### 🏁 Verdict
 ${risk.emoji} **${risk.verdict}**
@@ -703,7 +1050,7 @@ Output ONLY replacement blocks:
 [new replacement lines]
 <<<END>>>`;
 
-  const aiResult = await queryLLM(prompt, FIEZEL_SYSTEM_PROMPT);
+  const aiResult = await queryLLM(prompt, FIEZEL_SYSTEM_PROMPT, { tier: 'review' });
   if (!aiResult.text) { console.log('[Fiezel Bot v2] AI tidak memberikan saran patch.'); return { changed: false, files: [] }; }
   const patchedFiles = applyReplacementBlocks(aiResult.text);
 
@@ -780,7 +1127,7 @@ Diagnose the root cause and provide exact code fixes:
 [fixed lines]
 <<<END>>>`;
 
-    const aiResult = await queryLLM(prompt, FIEZEL_SYSTEM_PROMPT);
+    const aiResult = await queryLLM(prompt, FIEZEL_SYSTEM_PROMPT, { tier: 'review' });
     if (aiResult.text) {
       const patchedFiles = applyReplacementBlocks(aiResult.text);
       if (patchedFiles.length > 0) {
@@ -835,7 +1182,7 @@ Struktur:
 3. 💡 Dampak Bagi Murid / Guru
 4. ⚠️ Hal yang Perlu Diperhatikan`;
 
-  const aiResult = await queryLLM(prompt, FIEZEL_SYSTEM_PROMPT);
+  const aiResult = await queryLLM(prompt, FIEZEL_SYSTEM_PROMPT, { tier: 'fast' });
   const text = composeExplainMarkdown(prTitle, aiResult);
   console.log('\n--- PENJELASAN PR ---\n');
   console.log(text);
@@ -1103,6 +1450,59 @@ function runSelfTest() {
   const explainMd = composeExplainMarkdown('Test', { text: 'OK', provider: 'test' });
   if (!explainMd.startsWith('<!-- FIEZEL_BOT_EXPLAIN -->')) throw new Error('T14 FAIL: marker explain');
   console.log('  ✅ T14: Daftar berkas bump & marker explain');
+  pass++;
+
+  // T15: Pembaca diff memetakan nomor baris baru & baris yang boleh dikomentari.
+  const sampleDiff = [
+    'diff --git a/src/a.js b/src/a.js', '--- a/src/a.js', '+++ b/src/a.js',
+    '@@ -1,3 +1,4 @@', ' const a = 1;', '-const b = 2;', '+const b = 3;', '+const c = 4;', ' module.exports = { a };',
+    'diff --git a/old.js b/old.js', 'deleted file mode 100644', '--- a/old.js', '+++ /dev/null', '@@ -1 +0,0 @@', '-gone();',
+  ].join('\n');
+  const dm = parseDiffFiles(sampleDiff);
+  const fa = dm.get('src/a.js');
+  if (!fa || [...fa.added].join() !== '2,3' || [...fa.right].sort().join() !== '1,2,3,4' || dm.has('old.js')) {
+    throw new Error(`T15 FAIL: parseDiffFiles ${JSON.stringify(fa && { added: [...fa.added], right: [...fa.right] })}`);
+  }
+  console.log('  ✅ T15: Pembaca diff (baris tambah & baris komentar RIGHT)');
+  pass++;
+
+  // T16: Verifikasi temuan — yang terbukti lolos, yang dikarang dibuang.
+  const fakeFiles = { 'src/a.js': ['const a = 1;', 'const b = 3;', 'const c = 4;', 'module.exports = { a };'] };
+  const ctx = { changedFiles: ['src/a.js'], diffMap: dm, readLines: (f) => fakeFiles[f] || null };
+  const { verified: okV, dropped: badV } = verifyFindings([
+    { file: 'src/a.js', line: 3, severity: 'high', title: 'c tidak diekspor', explanation: 'x', evidence: '  3+| const c = 4;' },
+    { file: 'src/a.js', line: 1, severity: 'medium', title: 'baris salah tapi kutipan unik', explanation: 'x', evidence: 'module.exports = { a };' },
+    { file: 'src/a.js', line: 2, severity: 'high', title: 'bug karangan', explanation: 'x', evidence: 'eval(userInput);' },
+    { file: 'src/b.js', line: 1, severity: 'low', title: 'berkas lain', explanation: 'x', evidence: 'const a = 1;' },
+    { file: 'src/a.js', line: 99, severity: 'low', title: 'baris fiktif', explanation: 'x', evidence: 'const a = 1;' },
+    { file: 'src/a.js', line: 1, severity: 'low', title: 'bukti pendek', explanation: 'x', evidence: '}' },
+  ], ctx);
+  if (okV.length !== 2 || badV.length !== 4) throw new Error(`T16 FAIL: verified=${okV.length} dropped=${badV.length}`);
+  if (okV[0].line !== 3 || !okV[0].inDiff || okV[1].line !== 4 || !okV[1].relocated) throw new Error('T16 FAIL: baris/inDiff/relokasi salah');
+  if (!composeInlineComment(okV[0]).includes(`fiezel-bot-finding:${okV[0].id}`)) throw new Error('T16 FAIL: marker inline');
+  console.log('  ✅ T16: Verifikasi temuan AI (2 terbukti, 4 karangan dibuang)');
+  pass++;
+
+  // T17: Rantai model diatur lewat env; nilai rusak jatuh ke bawaan.
+  const envChain = resolveModelChain('gemini', 'review', { FIEZEL_BOT_GEMINI_REVIEW_MODELS: 'model-kuat, model-cepat' });
+  if (envChain.join() !== 'model-kuat,model-cepat') throw new Error('T17 FAIL: env chain');
+  if (resolveModelChain('gemini', 'review', { FIEZEL_BOT_GEMINI_REVIEW_MODELS: ' , $(x)' }).join() !== DEFAULT_MODEL_CHAINS.gemini.review.join()) throw new Error('T17 FAIL: fallback');
+  if (resolveModelChain('gemini', 'fast', {}).join() !== DEFAULT_MODEL_CHAINS.gemini.fast.join()) throw new Error('T17 FAIL: fast tier');
+  console.log('  ✅ T17: Rantai model dari env (review kuat → cepat)');
+  pass++;
+
+  // T18: Konteks berkas — kecil utuh, besar hanya jendela di sekitar perubahan, bernomor baris.
+  const big = Array.from({ length: 3000 }, (_, i) => `line_${i + 1}_${'x'.repeat(20)}`);
+  const ctxRead = (f) => (f === 'big.js' ? big : f === 'small.js' ? ['let s = 1;'] : null);
+  const fc = buildFileContext(['small.js', 'big.js', 'pic.png'], new Map([['big.js', { added: new Set([1500]), right: new Set([1500]) }]]), { readLines: ctxRead, budget: 100000 });
+  if (fc.included.join() !== 'big.js,small.js' || !fc.text.includes(' 1500+| line_1500_') || fc.text.includes('line_1400_') || !fc.text.includes('    1 | let s = 1;')) {
+    throw new Error('T18 FAIL: buildFileContext');
+  }
+  const parsedJson = parseFindingsJson('```json\n{"summary":"s","findings":[{"file":"a"}]}\n```');
+  if (!parsedJson.ok || parsedJson.findings.length !== 1 || parseFindingsJson('bukan json').ok) throw new Error('T18 FAIL: parseFindingsJson');
+  // Reviewer harus bisa MEMBACA berkas yang dilindungi patch jail (tests/, mesin bot), tapi tidak .git/ atau luar repo.
+  if (!readRepoLines('tools/fiezel-bot.mjs') || readRepoLines('.git/config') || readRepoLines('../etc/passwd')) throw new Error('T18 FAIL: readRepoLines');
+  console.log('  ✅ T18: Konteks berkas utuh/terpotong, parser JSON temuan & akses baca reviewer');
   pass++;
 
   console.log(`\n✅ Fiezel Bot v2 Self-Test: PASS (${pass}/${pass} tests)`);

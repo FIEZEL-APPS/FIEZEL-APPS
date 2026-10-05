@@ -47,8 +47,8 @@ console.log('[T2] Menjalankan self-test tools/fiezel-bot.mjs...');
 {
   const r = sh('node', ['tools/fiezel-bot.mjs', 'self-test'], true);
   assert(r.out.includes('Self-Test: PASS'), 'Self-test harus mencetak PASS');
-  assert(/PASS \(14\/14 tests\)/.test(r.out), 'Self-test harus lulus 14/14');
-  console.log('  ok (14/14)');
+  assert(/PASS \(18\/18 tests\)/.test(r.out), 'Self-test harus lulus 18/18');
+  console.log('  ok (18/18)');
 }
 pass++;
 
@@ -171,6 +171,31 @@ console.log('[T14] [BUG] Memastikan review & heal tidak berbagi grup concurrency
   assert(!/^concurrency\s*:/m.test(wfContent), 'Concurrency tingkat workflow dilarang: heal yang antre bisa membatalkan review (check wajib)');
   assert(/concurrency:\s*\n\s*group: fiezel-bot-review-/.test(wfContent), 'Job review wajib punya grup concurrency sendiri');
   assert(/concurrency:\s*\n\s*group: fiezel-bot-heal-/.test(wfContent), 'Job heal wajib punya grup concurrency sendiri');
+}
+console.log('  ok');
+pass++;
+
+console.log('[T15] [KUALITAS] Review AI: konteks berkas utuh + temuan terverifikasi + komentar inline...');
+{
+  for (const comp of ['buildFileContext', 'verifyFindings', 'parseDiffFiles', 'writeInlineFindings']) {
+    assert(engineSrc.includes(`function ${comp}`), `Engine wajib punya ${comp}`);
+  }
+  const reviewBody = engineSrc.slice(engineSrc.indexOf('async function runReview'), engineSrc.indexOf('function composeAiSection'));
+  assert(reviewBody.includes('buildFileContext(') && reviewBody.includes('verifyFindings('), 'runReview wajib membaca berkas utuh dan memverifikasi temuan');
+  assert(/json:\s*true/.test(reviewBody), 'Review AI wajib meminta keluaran JSON terstruktur');
+  assert(wfContent.includes('FIEZEL_INLINE_OUT'), 'Workflow wajib meneruskan FIEZEL_INLINE_OUT ke engine');
+  assert(wfContent.includes('pulls.createReview') && wfContent.includes('listReviewComments'), 'Workflow wajib memposting review inline dan mencegah duplikat');
+}
+console.log('  ok');
+pass++;
+
+console.log('[T16] [KUALITAS] Rantai model diatur lewat variabel, bukan ditulis mati...');
+{
+  for (const v of ['FIEZEL_BOT_GEMINI_REVIEW_MODELS', 'FIEZEL_BOT_GEMINI_FAST_MODELS', 'FIEZEL_BOT_GROQ_MODELS']) {
+    assert(wfContent.includes(`\${{ vars.${v} }}`), `Workflow wajib meneruskan vars.${v}`);
+    assert(engineSrc.includes(`'${v}'`), `Engine wajib membaca ${v}`);
+  }
+  assert(/tier:\s*'review'/.test(engineSrc) && /tier:\s*'fast'/.test(engineSrc), 'Engine wajib memakai tier review (kuat) dan fast');
 }
 console.log('  ok');
 pass++;
