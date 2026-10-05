@@ -517,8 +517,25 @@ function getDiffData(prNumber) {
   }
 
   if (!diff) {
-    diff = (sh('git', ['diff', 'origin/main...HEAD'], { allowFailure: true }).stdout || sh('git', ['diff', 'HEAD~1...HEAD'], { allowFailure: true }).stdout || '');
-    changedFiles = (sh('git', ['diff', '--name-only', 'origin/main...HEAD'], { allowFailure: true }).stdout || '').split('\n').filter(Boolean);
+    // Fallback 1: bandingkan dengan remote-tracking main (paling andal).
+    let fallback = sh('git', ['diff', 'origin/main...HEAD'], { allowFailure: true });
+    if (!fallback.stdout) fallback = sh('git', ['diff', 'main...HEAD'], { allowFailure: true });
+    if (!fallback.stdout) fallback = sh('git', ['diff', 'HEAD~1...HEAD'], { allowFailure: true });
+    diff = fallback.stdout || '';
+    const names = sh('git', ['diff', '--name-only', 'origin/main...HEAD'], { allowFailure: true }).stdout
+      || sh('git', ['diff', '--name-only', 'main...HEAD'], { allowFailure: true }).stdout
+      || sh('git', ['diff', '--name-only', 'HEAD~1...HEAD'], { allowFailure: true }).stdout
+      || '';
+    const fromGit = names.split('\n').filter(Boolean);
+    if (fromGit.length) changedFiles = fromGit;
+  }
+
+  // Fallback 2: `gh pr view --json files` dibatasi 300 berkas dan bisa kosong
+  // untuk PR raksasa. Bila itu terjadi, ambil daftar berkas lewat API paginasi.
+  if (prNumber && changedFiles.length === 0) {
+    const api = sh('gh', ['api', `repos/${process.env.REPO || 'FIEZEL-APPS/FIEZEL-APPS'}/pulls/${prNumber}/files`, '--paginate', '--jq', '.[].filename'], { allowFailure: true });
+    const fromApi = (api.stdout || '').split('\n').filter(Boolean);
+    if (fromApi.length) changedFiles = fromApi;
   }
 
   const addedLines = diff.split('\n').filter(l => l.startsWith('+') && !l.startsWith('+++'));
