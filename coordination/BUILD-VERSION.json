@@ -1,7 +1,7 @@
 {
-  "version": "m025-487",
-  "claimedBy": "branch fix/quiz-retry-ui-and-pedagogical-hint-polish",
-  "claimedAt": "2026-10-05T15:33:51.853Z",
-  "reason": "fix(ui): eliminate PWA view-transition double pageIn flicker (m025-486)",
+  "version": "m025-488",
+  "claimedBy": "tidak tercatat (jalankan ulang di dalam git, atau set FIEZEL_BUILD_CLAIMER)",
+  "claimedAt": "2026-10-05T15:41:10.593Z",
+  "reason": "bot(heal): auto-synchronize release boundary",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
