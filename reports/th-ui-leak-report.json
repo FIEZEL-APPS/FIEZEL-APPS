@@ -1,6 +1,6 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-10-05T07:18:21.979Z",
+  "generatedAt": "2026-10-05T09:50:55.085Z",
   "files": {
     "app.js": {
       "leaks": 4,
@@ -19,7 +19,7 @@
           "text": "Nama kriteria: n/4 - satu kalimat alasan yang menunjuk bukti di tulisannya"
         },
         {
-          "line": 19384,
+          "line": 19399,
           "text": "Latihan"
         }
       ]
@@ -464,8 +464,8 @@
     }
   },
   "copyKeys": {
-    "id": 3762,
-    "th": 3764,
+    "id": 3767,
+    "th": 3769,
     "idTanpaTh": 0
   },
   "pass": true
