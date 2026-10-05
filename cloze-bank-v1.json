@@ -2996,7 +2996,7 @@
       ],
       "explain": {
         "why": "Kata kerja pelapornya “said”, jadi bentuknya lampau. Geseran baku dari “can” adalah “could”.",
-        "rule": "Kalau kalimat langsung (Direct): Memakai tanda petik persis saat diucapkan. Contoh: <i>He said, “I am happy”</i>.<br>Kalau dilaporkan kembali (Reported Speech) dengan kata pengantar lampau (said / told): Waktu ucapannya wajib mundur satu langkah ke masa lalu (backshift). Verb 1 mundur jadi Verb 2, “am/is” jadi “was”, “will” jadi “would”, dan “can” jadi “could”. Contoh: <b>He said that he was happy</b>.<br>Beda Say vs Tell: Kalau pakai “said”, langsung kalimatnya (<i>She said that...</i>). Kalau pakai “told”, WAJIB sebut orang yang diajak bicara (<i>She told me that...</i>).<br><br>💡 <b>RUMUS KILAT</b>:<br>Kata pelapor lampau (said/told) ➡️ Tenses di dalamnya <b>mundur satu langkah</b> (V1 ➡️ V2, will ➡️ would, can ➡️ could).<br>Ada orang yang diajak bicara ➡️ Pakai <b>told + orang</b> (contoh: <i>told me</i>, bukan <i>said me</i> ❌).<br>Tanpa menyebut orang ➡️ Pakai <b>said (that)</b>.",
+        "rule": "Di kalimat pelaporan sesudah kata kerja pelapor yang lampau, “can” biasanya digeser jadi “could”.",
         "memory": "Ada “said”, modalnya ikut digeser ke bentuk lampau.",
         "avoid": "Cek dulu tense kata kerja pelapornya, ya, sebelum ngegeser modalnya."
       }
@@ -5497,7 +5497,7 @@
       ],
       "explain": {
         "why": "Bagian kosongnya sesudah kata kerja “see” dan nunjuk Tom. Jadi pakai bentuk objek “him”.",
-        "rule": "Kalau sebagai pelaku di depan kata kerja: Pakai kata ganti subjek (I, you, he, she, it, we, they). Contoh: <b>She called me</b>.<br>Kalau sebagai penerima setelah kata kerja atau kata depan: Pakai kata ganti objek (me, you, him, her, it, us, them). Contoh: <b>The teacher helped her</b>.<br>Kalau menyatakan kepemilikan: Pakai “my/your/his/her/its/our/their” kalau ada nama bendanya (contoh: <b>her bag</b>, <b>my name</b>). Tapi kalau berdiri sendiri tanpa nama benda di belakangnya, pakai “mine/yours/his/hers/ours/theirs” (contoh: <b>This bag is hers</b>).<br><br>💡 <b>RUMUS KILAT</b>:<br>Di depan kata kerja (sebagai pelaku) ➡️ Pakai subjek (<b>I, He, She, We, They</b>).<br>Di belakang kata kerja / kata depan (sebagai penerima) ➡️ Pakai objek (<b>me, him, her, us, them</b>).<br>Diikuti nama benda ➡️ Pakai <b>my, your, his, her, their</b> (kalau berdiri sendiri tanpa benda, pakai <b>mine, hers, ours</b>).",
+        "rule": "Kata ganti subjek jadi subjek. Kata ganti objek berdiri sesudah kata kerja. Bentuk kepemilikan kayak his nunjukin punya.",
         "memory": "“I see him”, tapi “he sees me”.",
         "avoid": "Lihat posisi bagian kosongnya. Kalau sesudah kata kerja, pakai bentuk objek: me, him, her, us, them."
       }
@@ -5535,7 +5535,7 @@
       ],
       "explain": {
         "why": "Bukunya udah disebut di kalimat pertama. Penyebutan kedua pakai “the”.",
-        "rule": "Kalau baru pertama kali disebut atau bendanya sembarang/umum: Pakai “a” atau “an”. Bedanya, “a” untuk kata yang diawali bunyi konsonan (contoh: <b>a book</b>, <b>a university</b>), sedangkan “an” untuk kata yang diawali bunyi vokal (contoh: <b>an apple</b>, <b>an hour</b>).<br>Kalau bendanya sudah jelas yang mana atau sudah pernah disebut sebelumnya: Wajib pakai “the”. Contoh: <b>I bought a pen. The pen is blue</b> (Pena yang dimaksud sudah jelas, yaitu pena yang baru saja kubeli).<br><br>💡 <b>RUMUS KILAT</b>:<br>Baru disebut pertama kali / sembarang benda ➡️ Pakai <b>a</b> (bunyi konsonan) atau <b>an</b> (bunyi vokal).<br>Bendanya sudah jelas / sudah disebut lagi ➡️ Wajib pakai <b>the</b>.<br>Bunyi vokal vs konsonan ➡️ Dengarkan bunyinya saat diucapkan, bukan cuma melihat huruf pertamanya (contoh: <i>an hour</i>, <i>a university</i>).",
+        "rule": "Pakai a atau an buat penyebutan pertama. Pakai the kalau bendanya udah disebut atau udah jelas yang mana.",
         "memory": "Sebut pertama pakai “a”, sebut kedua pakai “the”.",
         "avoid": "Tanya dulu: bendanya udah pernah disebut atau belum? Kalau udah, pakai “the”."
       }
@@ -5649,7 +5649,7 @@
       ],
       "explain": {
         "why": "Subjeknya “you”, jadi pakai “have”. Buat nanya, “have” maju ke depan: “Have you got ...?”",
-        "rule": "Jika kalimatnya HANYA pakai \"have\" (tanpa \"got\"):<br><br>Positif: <i>I have money.</i><br>Negatif: <i>I don't have money.</i> (Kamu butuh \"don't\" / \"doesn't\")<br><br>Jika kalimatnya pakai \"have got\":<br><br>Positif: <i>I have got money.</i><br>Negatif: <i>I haven't got money.</i> (Kata \"have/has\" langsung digabung dengan \"not\" menjadi \"haven't/hasn't\". Tidak boleh pakai \"don't/doesn't\").<br><br>Karena itu, kalau di soal ada kata \"got\", pasangannya pasti <b>haven't / hasn't</b>. Kalau mau pakai \"don't / doesn't\", kata \"got\" nya harus dibuang.<br><br>💡 <b>RUMUS KILAT</b>:<br>Pakai got ➡️ <b>haven't / hasn't got</b><br>Tanpa got ➡️ <b>don't / doesn't have</b>",
+        "rule": "Pertanyaan have got: majuin have atau has ke depan subjek, got tetap di belakang. Jangan tambah do.",
         "memory": "“Have you got ...?”: nggak perlu “do”.",
         "avoid": "Kalau ada “got”, jangan pakai “do”. Majuin “have” atau “has” ke depan subjeknya."
       }
@@ -5692,7 +5692,7 @@
       ],
       "explain": {
         "why": "Kucingnya nggak kelihatan karena ada di bawah kasur. Buat posisi di bawah pakai “under”.",
-        "rule": "Kalau di dalam ruangan tertutup atau wilayah luas (kota, negara, wadah): Pakai “in”. Contoh: <b>in the classroom</b> (di dalam kelas), <b>in Jakarta</b>, <b>in the fridge</b> (di dalam kulkas).<br>Kalau menempel di atas permukaan, nama jalan (tanpa nomor), atau lantai gedung: Pakai “on”. Contoh: <b>on the table</b> (di atas meja), <b>on Sudirman Street</b>, <b>on the second floor</b> (di lantai dua).<br>Kalau titik lokasi tertentu, tempat kegiatan, atau alamat bernomor: Pakai “at”. Contoh: <b>at the bus stop</b> (di halte bus), <b>at school</b>, <b>at 25 Merdeka Street</b>.<br><br>💡 <b>RUMUS KILAT</b>:<br>Di dalam ruangan tertutup / area luas (kota/negara) ➡️ Pakai <b>in</b>.<br>Di atas permukaan / nama jalan tanpa nomor / lantai ➡️ Pakai <b>on</b>.<br>Titik lokasi tepat / alamat bernomor rumah ➡️ Pakai <b>at</b>.",
+        "rule": "Pakai in buat di dalam. Pakai on buat di permukaan. Pakai under buat di bawah sesuatu. Pakai at buat satu titik tempat.",
         "memory": "In a bag, on a table, under a bed.",
         "avoid": "Bayangin posisinya: di dalam, di atas, di bawah, atau di satu titik?"
       }
@@ -5920,7 +5920,7 @@
       ],
       "explain": {
         "why": "Syaratnya nyata dan soal satu malam tertentu. Jadi klausa akibatnya pakai “will watch”.",
-        "rule": "Kalau fakta pasti atau hukum alam: Dua-duanya pakai kata kerja biasa tanpa “will”. Contoh: <b>If you heat ice, it melts</b> (Es dipanaskan pasti mencair).<br>Kalau kemungkinan atau rencana masa depan: Bagian “if” pakai kata kerja biasa, akibatnya pakai “will”. Contoh: <b>If it rains tomorrow, we will stay home</b> (Kalau besok hujan, kita bakal di rumah).<br><br>💡 <b>RUMUS KILAT</b>:<br>Fakta pasti / selalu benar ➡️ <b>If + Verb 1, Verb 1</b> (tanpa will).<br>Kemungkinan masa depan ➡️ <b>If + Verb 1, will + Verb 1</b>.",
+        "rule": "First conditional: if + present simple, lalu will + kata kerja dasar. Zero conditional cuma buat hal yang selalu benar.",
         "memory": "Janji malam ini: if you finish, we WILL watch.",
         "avoid": "Tanya dulu: ini soal satu kejadian masa depan yang mungkin? Kalau iya, taruh “will” di klausa akibat."
       }
@@ -6034,7 +6034,7 @@
       ],
       "explain": {
         "why": "“Time” nggak bisa dihitung satu-satu dan kalimatnya negatif. Jadi pasangannya “much”.",
-        "rule": "Kalau bendanya bisa dihitung satu per satu (ada bentuk jamaknya dengan akhiran -s): Pasangkan dengan “many” (banyak) atau “few” (sedikit). Contoh: <b>many chairs</b> (banyak kursi), <b>few friends</b> (sedikit teman).<br>Kalau bendanya tidak bisa dihitung satu per satu (seperti air, waktu, gula, uang): Pasangkan dengan “much” (banyak) atau “little” (sedikit). Contoh: <b>much water</b> (banyak air), <b>little time</b> (sedikit waktu).<br><br>💡 <b>RUMUS KILAT</b>:<br>Bisa dihitung satu-satu (ada akhiran jamak <b>-s</b>) ➡️ Pakai <b>many</b> (banyak) atau <b>few</b> (sedikit).<br>Nggak bisa dihitung satu per satu (cairan, bubuk, waktu) ➡️ Pakai <b>much</b> (banyak) atau <b>little</b> (sedikit).",
+        "rule": "“Much” buat benda tak terhitung, “many” buat benda jamak yang bisa dihitung. Di kalimat negatif dan tanya, dua-duanya paling wajar.",
         "memory": "Not much time: waktu mengalir, kursi dihitung.",
         "avoid": "Tanya dua hal: bendanya bisa dihitung atau nggak, dan kalimatnya negatif atau nggak."
       }
@@ -6403,7 +6403,7 @@
       ],
       "explain": {
         "why": "“It has to stay a secret until Saturday” bikin cerita ke siapa pun jadi pelanggaran aturan, dan larangan beneran diungkap pakai “mustn't”.",
-        "rule": "Kalau sifatnya NGGAK WAJIB (bebas mau dilakukan atau nggak, tetap boleh): Pakai “needn't” atau “don't have to”. Contoh: <b>You needn't bring food</b> (Kamu nggak perlu bawa makanan, di sana sudah disediain).<br>Kalau DILARANG KERAS (jangan sekali-kali dilakukan karena ada aturan/bahaya): Pakai “mustn't”. Contoh: <b>You mustn't tell anyone</b> (Kamu dilarang bocorin rahasia ini ke siapa pun).<br><br>💡 <b>RUMUS KILAT</b>:<br>Nggak perlu / opsional ➡️ <b>needn't</b> (atau don't have to).<br>Dilarang keras / pantangan ➡️ <b>mustn't</b> (artinya “jangan / dilarang”).",
+        "rule": "“Mustn't” = dilarang, jangan lakukan. “Needn't” / “don't have to” = nggak perlu, bebas milih. Bentuk negatif ngebalik maknanya: “must” dan “have to” mirip, tapi “mustn't” dan “needn't” beda jauh.",
         "memory": "“Mustn't” berarti dilarang keras jangan lakukan. “Needn't” (atau don't have to) berarti tidak perlu atau bebas memilih.",
         "avoid": "Tanya: kalau tetap dilakukan, ada aturan yang dilanggar nggak? Kalau ada, pakai “mustn't”; kalau nggak ada yang dilanggar, baru “needn't”."
       }
@@ -6441,7 +6441,7 @@
       ],
       "explain": {
         "why": "“Unless it rains” artinya “kalau nggak hujan”. Negatifnya udah kebawa di “unless”, jadi kata kerjanya tetap positif dan present simple walau piknikannya besok.",
-        "rule": "Kalau pakai “if”: Butuh kata negatif “not” untuk pengandaian negatif. Contoh: <b>If you don't study, you won't pass</b>.<br>Kalau pakai “unless”: Artinya sudah otomatis “kecuali kalau” (if ... not), jadi kata kerja setelahnya WAJIB bentuk positif tanpa kata “not”. Contoh: <b>Unless you study, you won't pass</b>.<br><br>💡 <b>RUMUS KILAT</b>:<br>Ada kata “don't / not” ➡️ Pasangannya <b>If</b>.<br>Kalimatnya positif tapi bermakna mengecualikan ➡️ Pasangannya <b>Unless</b> (dilarang pakai not lagi!).",
+        "rule": "“Unless” + subjek + kata kerja positif bentuk present simple sama artinya dengan “if ... not” buat masa depan. Nggak boleh ada negatif kedua atau “will” di dalam anak kalimatnya.",
         "memory": "Habis “unless”, kata kerjanya positif dan present: unless it rains.",
         "avoid": "Ubah dulu jadi “if ... not” dalam hati. Kalau kata kerjamu masih negatif setelah “unless”, buang negatif tambahannya dan tetap pakai present simple."
       }
@@ -6479,7 +6479,7 @@
       ],
       "explain": {
         "why": "“The animals we saw there” nunjuk satu kelompok hewan tertentu, yaitu yang ada di peternakan itu. Jadi kata jamaknya wajib pakai “the”.",
-        "rule": "Kalau ngomongin hal atau jenis secara umum di dunia: Langsung sebut kata benda jamaknya TANPA kata “the”. Contoh: <b>Elephants are big animals</b> (Semua gajah pada umumnya, bukan gajah tertentu).<br>Kalau menunjuk kelompok benda yang spesifik atau ada penjelas khususnya: Wajib pakai “the”. Contoh: <b>The animals we saw at the zoo were friendly</b> (Khusus hewan-hewan tertentu yang kemarin kita lihat di kebun binatang).<br><br>💡 <b>RUMUS KILAT</b>:<br>Bicara hal umum / semua jenisnya di dunia ➡️ <b>Tanpa kata “the”</b> (langsung sebut kata jamaknya, misal: <i>Cats like fish</i>).<br>Bicara kelompok tertentu / ada kalimat penjelas ➡️ Wajib pakai <b>the + kata jamak</b> (misal: <i><b>The</b> books on the table</i>).",
+        "rule": "“The” + kata benda jamak nunjuk kelompok tertentu yang bisa dikenali, sering dijelasin anak kalimat kayak “we saw there”. Kata jamak tanpa artikel bicara soal kategorinya secara umum.",
         "memory": "Kelompok yang udah jelas pakai “the”; kategori umum tanpa artikel.",
         "avoid": "Tanya dulu: pembaca bisa nunjuk persis yang mana yang kumaksud? Kalau bisa, pakai “the”."
       }
@@ -6517,7 +6517,7 @@
       ],
       "explain": {
         "why": "“Good at” berakhir di kata depan “at”. Kata kerja sesudah kata depan wajib bentuk -ing, jadi “good at dealing” yang pas.",
-        "rule": "Kalau kata kerja berada persis SETELAH kata depan (preposisi seperti <i>at, in, on, of, for, about, without, before, after</i>): Kata kerjanya WAJIB bentuk -ing (Gerund)! Contoh: <b>She is good at drawing</b> (Dia jago menggambar — bukan <i>at draw</i> ❌), <b>Thank you for helping me</b> (Terima kasih sudah membantuku).<br>Bandingkan dengan menyatakan tujuan langsung: Pakai “to + kata kerja dasar” (contoh: <b>I came to meet you</b>). Tapi kalau diawali kata depan biasa, pantang memakai kata kerja polos!<br><br>💡 <b>RUMUS KILAT</b>:<br>Persis setelah kata depan (<i>at, in, on, of, for, about, without, by</i>) ➡️ Kata kerja WAJIB <b>Verb-ing</b>.<br>Dilarang keras ➡️ Menaruh kata kerja polos (<i>good at sing</i> ❌) atau mendobelkan <i>to</i> (<i>good at to sing</i> ❌).<br>Menyatakan tujuan langsung ➡️ Pakai <b>to + kata kerja dasar</b>.",
+        "rule": "Kata sifat + kata depan, kayak “good at”, “interested in”, atau “tired of”, disusul kata kerja bentuk -ing. Kata kerja sesudah kata depan selalu pakai -ing.",
         "memory": "Kata depan ketemu kata kerja, hasilnya -ing: good at dealing.",
         "avoid": "Lihat kata persis sebelum titik-titiknya. Kalau itu kata depan kayak “at”, “in”, “of”, atau “about”, kata kerjanya harus -ing."
       }
@@ -6555,7 +6555,7 @@
       ],
       "explain": {
         "why": "Kalimatnya udah punya “to see”. Dari semua modal saran, cuma “ought” yang polanya bawa “to”: “you ought to see a doctor”.",
-        "rule": "Kalau saran biasa yang santai: Pakai “should” (langsung kata kerja) atau “ought to” (wajib ada “to”). Contoh: <b>You should rest</b> atau <b>You ought to see a doctor</b>.<br>Kalau peringatan keras / mendesak (bakal kena masalah kalau diabaikan): Pakai “had better” (langsung kata kerja tanpa “to”). Contoh: <b>You had better leave now</b> (Mendingan kamu jalan sekarang, daripada ketinggalan kereta).<br><br>💡 <b>RUMUS KILAT</b>:<br>Ada kata “to” setelah titik-titik ➡️ Pilih <b>ought</b> (karena pasangannya <b>ought to</b>).<br>Peringatan gawat / darurat ➡️ Pakai <b>had better + kata kerja dasar</b>.<br>Saran biasa tanpa “to” ➡️ Pakai <b>should + kata kerja dasar</b>.",
+        "rule": "“Ought” + “to” + kata kerja dasar. “Should”, “had better”, dan “must” langsung disusul kata kerja telanjang. Makna sarannya mirip, tapi pola bakunya beda.",
         "memory": "“Ought” nggak pernah jalan tanpa “to”.",
         "avoid": "Sebelum milih modal, lihat kata sesudah titik-titiknya. Ada “to”? Berarti cuma “ought” yang muat. Kata kerjanya telanjang? Pakai “should”, “had better”, atau “must”."
       }
@@ -7219,7 +7219,7 @@
       ],
       "explain": {
         "why": "Ada orang yang berdiri di peron dari awal sampai akhir dan nggak pernah lihat Anna. Buktinya nyangkal kejadiannya dengan yakin, jadi “can't have” yang pas.",
-        "rule": "Kalau yakin 100% sesuatu PASTI sudah terjadi di masa lalu: Pakai “must have + Verb 3”. Contoh: <b>He must have left already</b> (Dia pasti sudah berangkat, mobilnya sudah nggak ada).<br>Kalau yakin 100% sesuatu MUSTAHIL / GAK MUNGKIN terjadi di masa lalu: Pakai “can't have + Verb 3”. Contoh: <b>She can't have taken that train</b> (Nggak mungkin dia naik kereta itu, aku nungguin di peron dan nggak lihat dia).<br><br>💡 <b>RUMUS KILAT</b>:<br>Yakin pasti sudah kejadian ➡️ <b>must have + Verb 3</b>.<br>Yakin mustahil / nggak mungkin kejadian ➡️ <b>can't have + Verb 3</b>.",
+        "rule": "“Can't have” + bentuk ke-3 berarti yakin sesuatu NGGAK kejadian. “Must have” berarti yakin kejadian, “might have” cuma kemungkinan, dan “needn't have” buat tindakan nyata yang ternyata nggak perlu.",
         "memory": "Bukti bilang mustahil: pakai “can't have”.",
         "avoid": "Tentuin dulu buktinya mbuktiin apa: yakin iya pakai “must have”, yakin nggak pakai “can't have”, ragu beneran baru “might have”."
       }
@@ -7257,7 +7257,7 @@
       ],
       "explain": {
         "why": "“On the last Friday of the month” plus saran yang berlaku sekarang nandain ini kebiasaan yang masih jalan. Subjek “everyone” itu tunggal, jadi “gets paid” yang pas.",
-        "rule": "Kalau kalimat aktif (pelaku melakukan aksi): Subjek di depan mengerjakan sesuatu. Contoh: <b>Budi repaired the bike</b> (Budi memperbaiki sepeda).<br>Kalau kalimat pasif (subjek yang kena aksi / berawalan di- atau ter-): Wajib ada bentuk “be” (is/am/are atau was/were) + kata kerja bentuk ketiga (Verb 3). Contoh: <b>The bike was repaired by Budi</b> (Sepeda diperbaiki oleh Budi). Pada percakapan santai, kata “be” kadang diganti “get” (contoh: <b>get paid</b>, <b>got caught</b>).<br><br>💡 <b>RUMUS KILAT</b>:<br>Kalimat aktif (me-) ➡️ Subjek melakukan aksi (contoh: <i>They built the house</i>).<br>Kalimat pasif (di-/ter-) ➡️ Wajib pakai <b>am/is/are/was/were + Verb 3</b> (contoh: <i>The house was built</i>).<br>Waktu sekarang pakai <b>is/am/are + Verb 3</b>, waktu lampau pakai <b>was/were + Verb 3</b>.",
+        "rule": "Pasif “get” itu get + past participle (bentuk ke-3 kata kerja). Di pernyataan rutin masa kini, “get”-nya harus bentuk present yang nyesuaiin subjek: everyone gets paid, they get paid.",
         "memory": "Rutinitas plus “everyone”: everyone gets + bentuk ke-3.",
         "avoid": "Di pasif “get”, cek dua hal berurutan: “get”-nya udah bentuk dan waktu yang bener, dan udah cocok sama subjeknya?"
       }
@@ -7371,7 +7371,7 @@
       ],
       "explain": {
         "why": "Timnya nggak pernah ngasih peringatan, kan “we kept quiet”. Kalimatnya nyesalin tindakan yang kelewat itu, jadi butuh “should have warned” tanpa negatif.",
-        "rule": "Kalau menyesal karena sesuatu NGGAK dilakukan (padahal harusnya iya): Pakai “should have + Verb 3”. Contoh: <b>We should have told them</b> (Harusnya kemarin kita kasih tahu mereka, tapi malah diam saja).<br>Kalau menyesal karena sesuatu SUDAH terlanjur dilakukan (padahal harusnya jangan): Pakai “shouldn't have + Verb 3”. Contoh: <b>He shouldn't have stayed up so late</b> (Harusnya semalam dia nggak begadang, sekarang jadi tepar).<br><br>💡 <b>RUMUS KILAT</b>:<br>Harusnya dilakuin tapi terlewat ➡️ <b>should have + Verb 3</b>.<br>Harusnya jangan tapi terlanjur dilakuin ➡️ <b>shouldn't have + Verb 3</b>.",
+        "rule": "“Should have” + bentuk ke-3 nyesalin kebaikan yang NGGAK jadi dilakuin. “Shouldn't have” + bentuk ke-3 negur tindakan keliru yang kejadian, dan “must have” buat nyimpulin, bukan nyesal.",
         "memory": "“We kept quiet” berarti peringatannya nggak pernah ada, jadi “should have warned”.",
         "avoid": "Tanya dulu: tindakannya kejadian atau nggak? Kalau kelewat dan pengin banget udah dilakuin, pakai “should have” + bentuk ke-3 tanpa negatif."
       }
@@ -7447,7 +7447,7 @@
       ],
       "explain": {
         "why": "Dia yang ngatur biar studionya motret, jadi kerangka nyuruh get + benda + bentuk ke-3 berlaku. Slot terakhirnya diisi “taken”.",
-        "rule": "Kalau mengerjakan sendiri: Subjek langsung melakukan pekerjaannya. Contoh: <b>I cleaned my shoes</b> (Aku mencuci sepatuku sendiri).<br>Kalau menyuruh orang lain / bayar jasa profesional (Causative): Pakai pola “have” atau “get” + nama benda + kata kerja bentuk ketiga (Verb 3). Artinya bukan kita yang repot ngerjain, tapi orang lain atau ahlinya yang mengerjakan buat kita. Contoh: <b>I had my hair cut</b> (Aku potong rambut di salon) atau <b>She got her laptop repaired</b> (Dia menyervis laptopnya ke tempat servis).<br><br>💡 <b>RUMUS KILAT</b>:<br>Kerjakan sendiri ➡️ Subjek + kata kerja biasa (contoh: <i>I cut my hair myself</i>).<br>Diserahkan ke ahlinya / orang lain ➡️ <b>have / get + benda + Verb 3</b> (contoh: <i>had my hair cut</i>, <i>got the roof repaired</i>).<br>Kata kerja di belakang benda ➡️ WAJIB selalu berbentuk <b>Verb 3</b>, apa pun tenses-nya!",
+        "rule": "Pola nyuruh pakai get: subjek + get + benda + past participle (bentuk ke-3 kata kerja), artinya ngatur biar jasanya dikerjain orang lain. Kata kerja habis bendanya selalu bentuk ke-3, apa pun waktunya “get”.",
         "memory": "Got + bendanya + bentuk ke-3: got her photo taken, got his hair cut.",
         "avoid": "Begitu ketemu get atau have + benda sebagai jasa yang diatur, bekuin kata kerja berikutnya jadi bentuk ke-3. Biar “get” aja yang bawa waktunya."
       }
@@ -7485,7 +7485,7 @@
       ],
       "explain": {
         "why": "Seluruh frasa “Taking short breaks between study sessions” jalan sebagai satu subjek tunggal. Jadi kata kerjanya “improves” dengan akhiran -s.",
-        "rule": "Kalau kata kerja yang difungsikan jadi kata benda atau setelah kata kerja seperti <i>enjoy, avoid, finish, keep, mind</i>: Pakai “Gerund” (Verb-ing). Contoh: <b>I enjoy reading comics</b> (Aku menikmati membaca komik) atau <b>Swimming is fun</b>.<br>Kalau menyatakan niat, rencana, atau setelah kata kerja seperti <i>want, decide, hope, promise, plan, need</i>: Pakai “to-Infinitive” (to + Verb 1). Contoh: <b>I decided to study harder</b> (Aku memutuskan untuk belajar lebih giat) atau <b>She wants to go</b>.<br><br>💡 <b>RUMUS KILAT</b>:<br>Setelah kata kerja <i>enjoy, finish, avoid, keep, mind</i> ➡️ Wajib <b>Verb-ing</b>.<br>Setelah kata kerja <i>want, decide, hope, promise, plan, need</i> ➡️ Wajib <b>to + Verb 1</b>.<br>Aktivitas umum sebagai subjek di depan kalimat ➡️ Pakai <b>Verb-ing</b> (misal: <i>Swimming is healthy</i>).",
+        "rule": "Frasa gerund (bentuk -ing) sebagai subjek dihitung tunggal dan minta kata kerja orang ketiga tunggal, berapa pun kata benda jamak di dalamnya. Subjek bentuk to yang formal (“To take short breaks...”) kelakuannya persis sama.",
         "memory": "Subjek bentuk -ing dihitung satu: Taking breaks improves.",
         "avoid": "Kupas subjeknya sampai kepalanya: kalau mulainya bentuk -ing, anggap sisanya hiasan dan kasih kata kerjanya akhiran -s."
       }
@@ -7599,7 +7599,7 @@
       ],
       "explain": {
         "why": "“Was given to” bikin “an award” jadi subjek pasif dan nyambungin penerimanya pakai “to”. Itu pola wajib waktu bendanya yang mimpin kalimat.",
-        "rule": "Kalau kalimat aktif (pelaku melakukan aksi): Subjek di depan mengerjakan sesuatu. Contoh: <b>Budi repaired the bike</b> (Budi memperbaiki sepeda).<br>Kalau kalimat pasif (subjek yang kena aksi / berawalan di- atau ter-): Wajib ada bentuk “be” (is/am/are atau was/were) + kata kerja bentuk ketiga (Verb 3). Contoh: <b>The bike was repaired by Budi</b> (Sepeda diperbaiki oleh Budi). Pada percakapan santai, kata “be” kadang diganti “get” (contoh: <b>get paid</b>, <b>got caught</b>).<br><br>💡 <b>RUMUS KILAT</b>:<br>Kalimat aktif (me-) ➡️ Subjek melakukan aksi (contoh: <i>They built the house</i>).<br>Kalimat pasif (di-/ter-) ➡️ Wajib pakai <b>am/is/are/was/were + Verb 3</b> (contoh: <i>The house was built</i>).<br>Waktu sekarang pakai <b>is/am/are + Verb 3</b>, waktu lampau pakai <b>was/were + Verb 3</b>.",
+        "rule": "Di kata kerja berobjek dua, kalau objek langsungnya alias bendanya yang jadi subjek pasif, penerimanya wajib disambung lagi pakai to. Contoh: A bonus was sent to the staff.",
         "memory": "Bendanya jadi subjek? Tambahin “to”: An award was given TO the scientist.",
         "avoid": "Tanya dulu objek mana yang mimpin kalimat pasifnya. Penerima di depan nggak butuh “to”; benda di depan butuh “to” sebelum penerimanya."
       }
@@ -7675,7 +7675,7 @@
       ],
       "explain": {
         "why": "“I was chatting to” naruh kata depan di akhir dan ngebuang kata penghubungnya. Itu persis pola obrolan santai yang diminta soalnya.",
-        "rule": "Kalau menjelaskan ORANG: Pakai kata penghubung “who” (atau “that”). Contoh: <b>The teacher who taught us is kind</b> (Guru yang mengajari kami sangat baik).<br>Kalau menjelaskan BENDA atau HEWAN: Pakai kata penghubung “which” (atau “that”). Contoh: <b>The phone which is on the table is mine</b> (Ponsel yang ada di meja itu milikku).<br>Trik hemat: Kalau setelah kata penghubung langsung ada subjek baru (posisinya sebagai objek), kata penghubungnya boleh dihilangkan sama sekali. Contoh: <b>The movie (that) we watched last night</b>.<br><br>💡 <b>RUMUS KILAT</b>:<br>Menjelaskan orang ➡️ Pakai <b>who</b> (atau that).<br>Menjelaskan benda / hewan ➡️ Pakai <b>which</b> (atau that).<br>Setelahnya langsung ada subjek baru ➡️ Kata penghubungnya <b>boleh dihapus</b> (contoh: <i>the song [that] you sang</i>).",
+        "rule": "Ragam santai naruh kata depannya di akhir anak kalimat dan boleh ngebuang kata penghubung objeknya: the neighbour I was chatting to. Ragam formal majuin kata depannya sebelum whom: the neighbour to whom I was chatting.",
         "memory": "Lagi ngobrol santai? Akhiri di kata depannya: “…the neighbour I was chatting to.”",
         "avoid": "Cocokkan polanya sama ragamnya dulu: obrolan santai berakhir di kata depan; tulisan formal majuin kata depan + whom."
       }
@@ -7946,7 +7946,7 @@
       ],
       "explain": {
         "why": "“Water” nggak bisa dihitung satu-satu dan nggak ada bentuk jamaknya di sini, jadi nanyanya pakai “How much”.",
-        "rule": "Kalau menanyakan jumlah benda yang bisa dihitung satu-satu: Pakai “How many” yang selalu diikuti kata benda jamak berakhiran -s. Contoh: <b>How many pens do you have?</b> (Berapa banyak pulpen yang kamu punya?).<br>Kalau menanyakan jumlah benda yang tidak bisa dihitung atau menanyakan harga barang: Pakai “How much”. Contoh: <b>How much water do you drink?</b> (Berapa banyak air yang kamu minum?) atau <b>How much is this shirt?</b> (Berapa harga baju ini?).<br><br>💡 <b>RUMUS KILAT</b>:<br>Setelah titik-titik ada kata jamak (berakhiran <b>-s</b>) ➡️ Tanya pakai <b>How many</b>.<br>Setelah titik-titik benda tak bisa dihitung (tanpa -s) atau tanya harga ➡️ Tanya pakai <b>How much</b>.",
+        "rule": "“How much” buat nomina tak tercacah; “How many” buat nomina jamak tercacah: “How much water”, “How many bottles”.",
         "memory": "“How much water, how many bottles”: nominanya yang nentuin kata tanyanya.",
         "avoid": "Lihat nominanya dulu: kalau nggak bisa dihitung satu-satu, tanyanya pakai “How much”."
       }
@@ -8028,7 +8028,7 @@
       ],
       "explain": {
         "why": "“She was very tired after work” jelasin kenapa Dewi tidur cepet, dan klausa alasan dibukanya pakai “because”.",
-        "rule": "Kalau alasan berupa kalimat lengkap (ada Subjek + Kata Kerja): Pakai “Because” atau “Since” (karena / berhubung). Contoh: <b>We stayed home because it was raining heavily</b>.<br>Kalau alasan HANYA berupa kata benda atau frasa benda (tanpa kata kerja): Wajib pakai “Due to” atau “Because of” (disebabkan oleh / karena). Contoh: <b>The flight was delayed due to bad weather</b> (Penerbangan ditunda karena cuaca buruk).<br>Kalau menyatakan AKIBAT (kebalikan dari alasan): Pakai “so” (jadi / sehingga). Contoh: <b>It rained, so we canceled the match</b>.<br><br>💡 <b>RUMUS KILAT</b>:<br>Diikuti kalimat utuh (Subjek + Verb) ➡️ Pakai <b>Because / Since</b>.<br>Diikuti kata benda saja (Noun / Noun phrase) ➡️ Pakai <b>Due to / Because of</b>.<br>Menunjukkan akibat / hasil dari alasan sebelumnya ➡️ Pakai <b>so</b> (Pola: Alasan, <i>so</i> + Akibat).",
+        "rule": "“Because” buat alasan; “so” buat akibat: alasan + “so” + akibat, atau akibat + “because” + alasan. Pakai salah satunya aja per kalimat.",
         "memory": "Alasan dapet “because”, akibat dapet “so”: pilih satu, jangan dua-duanya.",
         "avoid": "Tanya klausa mana yang jawab “kenapa?”: klausa itu mulainya pakai “because”; klausa hasilnya yang dapet “so”."
       }
@@ -8104,7 +8104,7 @@
       ],
       "explain": {
         "why": "Subjek “I” dan objeknya orang yang sama, jadi objeknya harus refleksif yang cocok: “myself”.",
-        "rule": "Kalau melakukan aksi ke DIRINYA SENDIRI (pelaku dan penerima aksinya orang yang sama): Pakai kata ganti berakhiran “-self” (tunggal: myself, yourself, himself, herself, itself) atau “-selves” (jamak: ourselves, yourselves, themselves). Contoh: <b>I taught myself to swim</b> (Aku belajar sendiri / mengajari diriku sendiri).<br>Kalau DUA ORANG ATAU LEBIH saling melakukan aksi satu sama lain (timbal balik): Wajib pakai “each other”. Contoh: <b>They help each other</b> (Mereka saling membantu satu sama lain).<br><br>💡 <b>RUMUS KILAT</b>:<br>Aksi mengenai diri sendiri ➡️ Pakai akhiran <b>-self / -selves</b> (contoh: <i>taught myself</i>, <i>looked at himself</i>).<br>Dua orang saling berinteraksi satu sama lain ➡️ Pakai <b>each other</b> (contoh: <i>help each other</i>).",
+        "rule": "Kalau subjek dan objek orangnya sama, pakai refleksif yang seiring sama subjeknya: “I” → “myself”, “he” → “himself”, “we” → “ourselves”. “Each other” butuh dua orang atau lebih yang saling.",
         "memory": "“I” ngaca dan lihat “myself”: bukan “me”, bukan “-self” punya orang lain.",
         "avoid": "Cocokin dulu objek ke subjek: orangnya sama berarti bentuk “-self”, dan bentuk “-self”-nya harus ngikutin orang si subjek."
       }
@@ -8186,7 +8186,7 @@
       ],
       "explain": {
         "why": "Yang bikin kesal itu kelakuan berulang orang lain yang bisa dia ubah sendiri, dan bingkainya memang “wish + subjek + would + kata dasar”: “I wish he would stop”.",
-        "rule": "Kalau berandai-andai soal situasi atau keinginan diri sendiri: Pakai “wish + Verb 2”. Contoh: <b>I wish I had a car</b>.<br>Kalau jengkel / kesal sama KELAKUAN ORANG LAIN dan pengin dia berhenti: Pakai “wish + orang lain + would” + kata kerja dasar. Contoh: <b>I wish he would turn down the music</b> (Bikin pusing, andai saja dia mau mengecilkan musiknya).<br><br>💡 <b>RUMUS KILAT</b>:<br>Kesal sama kelakuan orang lain ➡️ <b>wish + [orang itu] + would + kata kerja dasar</b>.<br>Bukan untuk diri sendiri ➡️ Dilarang pakai <i>I wish I would</i> (karena kelakuan sendiri bisa dikontrol langsung).",
+        "rule": "Pakai “wish + would” buat ngeluh soal kebiasaan orang lain yang kamu pengin berubah; “wish + past simple” buat keadaan, dan “I wish I would” nggak ada karena tindakanmu sendiri kamu yang pegang kendalinya.",
         "memory": "Kebiasaan nyebelin? “I wish they would stop”: “would” buat yang disengaja.",
         "avoid": "Kalau yang bikin sebal itu kelakuan yang diulang-ulang orang lain, ambil “wish + would”; simpan “wish + past simple” buat situasi, bukan perilaku."
       }
@@ -8224,7 +8224,7 @@
       ],
       "explain": {
         "why": "“Is used to” di sini artinya Laras sekarang udah terbiasa sama macetnya, dan di pola ini “to” itu preposisi, jadi kata kerja sesudahnya pakai -ing: “used to riding”.",
-        "rule": "Kalau kebiasaan masa lalu yang SEKARANG SUDAH BERHENTI: Pakai “used to” + kata kerja dasar (Verb 1). Contoh: <b>I used to play marbles</b> (Dulu aku sering main kelereng, tapi sekarang sudah nggak pernah lagi).<br>Kalau SEKARANG SUDAH TERBIASA (merasa wajar dan nggak asing lagi): Ada “be” (am/is/are) di depannya dan wajib diikuti kata kerja -ing. Contoh: <b>I am used to living in Jakarta</b> (Sekarang aku sudah terbiasa tinggal di Jakarta).<br>Kalau PROSES menjadi terbiasa: Pakai “get used to” + kata kerja -ing. Contoh: <b>He is getting used to waking up early</b> (Dia mulai terbiasa bangun pagi).<br><br>💡 <b>RUMUS KILAT</b>:<br>Dulu pernah tapi sekarang enggak (tanpa be) ➡️ <b>used to + Verb 1</b>.<br>Sekarang sudah terbiasa (ada <i>am/is/are</i> di depan) ➡️ <b>be used to + Verb-ing</b>.<br>Proses beradaptasi ➡️ <b>get used to + Verb-ing</b>.",
+        "rule": "“Be/get used to + -ing” artinya sekarang udah atau jadi terbiasa sama sesuatu; “used to + kata dasar” itu pola lain buat kebiasaan lampau yang udah berhenti.",
         "memory": "Ada “be” di depan, “to”-nya berubah jadi preposisi: “am used to doing”, “got used to doing”.",
         "avoid": "Cek apa yang berdiri di depan “used to”: kalau ada bentuk “be” atau “get”, artinya keterbiasaan, jadi kata kerja berikutnya pakai -ing; kalau nggak ada “be”, itu pola kebiasaan lampau dengan kata dasar."
       }
@@ -8479,7 +8479,7 @@
       ],
       "explain": {
         "why": "Majuin “No sooner” maksa kata bantunya pindah ke depan subjek, dan kejadian pertama dari dua peristiwa lampaunya pakai past perfect: “No sooner had we begun ... than the projector broke down”.",
-        "rule": "Kalau susunan normal: Keterangan waktu ditaruh di tengah kalimat. Contoh: <b>I have never seen such a view</b> (Aku belum pernah melihat pemandangan seperti itu).<br>Kalau susunan inversi (pembalikan untuk penekanan dramatis): Ketika kata keterangan negatif (Never, Rarely, Seldom, Hardly, Not only) atau frasa “Only after / Only when” ditaruh di AWAL kalimat, susunan kata bantu dan subjek WAJIB DIBALIK persis seperti kalimat tanya! Contoh: <b>Never have I seen such a view</b> atau <b>Rarely did she speak</b>.<br><br>💡 <b>RUMUS KILAT</b>:<br>Kata negatif di awal (Never, Rarely, Seldom, Not only) ➡️ Wajib dibalik: <b>Kata Negatif + Kata Bantu + Subjek + Verb</b>.<br>Kalimat lampau tanpa kata bantu ➡️ Munculkan <b>did + Subjek + Verb 1</b> (contoh: <i>Rarely did he come</i>).<br>Jangan susun normal jika kata negatif di depan ➡️ Salah besar: <i>Never I have seen</i> ❌!",
+        "rule": "“No sooner + had + subjek + past participle + than + past simple” ngelaporin dua kejadian yang beruntun rapat; pembuka negatif di depan bikin inversi subjek-kata bantu wajib, dan “no sooner” jodohnya “than”, nggak pernah “when”.",
         "memory": "“No sooner HAD I done ... THAN it happened.”",
         "avoid": "Lihat “No sooner” di depan dengan “than” menyusul? Balik “had” ke depan subjek dan tutup pakai participle."
       }
@@ -8870,7 +8870,7 @@
       ],
       "explain": {
         "why": "“Can't” menyatakan ketidakmampuan di masa sekarang: “I want to learn to ride a bike, but I can't”.",
-        "rule": "Kalau bisa melakukan sesuatu: Pakai “can” + kata kerja dasar polos tanpa tambahan apa pun. Contoh: <b>My sister can swim</b> (Bukan “she cans” dan bukan “can to swim”).<br>Kalau nggak bisa melakukan sesuatu: Pakai “can't” (cannot) + kata kerja dasar. Contoh: <b>I can't ride a bike</b> (Bukan “don't can”).<br><br>💡 <b>RUMUS KILAT</b>:<br>Bisa / mampu ➡️ <b>can + kata kerja dasar</b> (polos, tanpa -s dan tanpa to).<br>Nggak bisa ➡️ <b>can't + kata kerja dasar</b>.<br>Semua subjek sama ➡️ Tetap pakai <b>can</b> tanpa ditambah akhiran apa pun.",
+        "rule": "Nggak bisa: can't (cannot) + kata kerja dasar. Tanpa don't, tanpa to.",
         "memory": "Can't + kata kerja: can't ride, can't swim.",
         "avoid": "Anggap can kayak tombol: can atau can't, lalu langsung kata kerjanya."
       }
@@ -9060,7 +9060,7 @@
       ],
       "explain": {
         "why": "Mobilnya punya satu orang, ayahku, jadi pemiliknya dapet 's: my father's car.",
-        "rule": "Dalam bahasa Inggris, menyatakan kepemilikan orang TIDAK BISA cuma menggabungkan dua kata seperti bahasa Indonesia (salah: <i>Sinta bag</i> ❌ atau <i>Sinta her bag</i> ❌).<br>Kalau pemiliknya orang tunggal: Tambahkan tanda petik dan s (<b>'s</b>) pada nama pemiliknya sebelum barang yang dimiliki. Contoh: <b>Sinta's bag</b> (tas milik Sinta), <b>my father's car</b> (mobil ayahku).<br>Kalau pemiliknya jamak dan sudah berakhiran huruf -s: Cukup tambahkan tanda petik di paling ujung (<b>s'</b>). Contoh: <b>the students' books</b> (buku-buku para murid).<br><br>💡 <b>RUMUS KILAT</b>:<br>Pemilik tunggal ➡️ Beri akhiran <b>'s</b> pada nama pemilik (contoh: <i>Budi's phone</i>).<br>Pemilik jamak berakhiran -s ➡️ Cukup beri tanda petik di ujung kata <b>-s'</b> (contoh: <i>the teachers' room</i>).<br>Pantangan ➡️ Dilarang menempelkan nama langsung (<i>Budi phone</i> ❌) atau mendobelkan kata ganti (<i>Budi his phone</i> ❌).",
+        "rule": "Pemilik tunggal + 's + barangnya: father's car, Sinta's bag.",
         "memory": "Menyatakan kepemilikan orang tunggal: sebut nama pemilik ditambah apostrof s lalu barangnya (“Sinta's bag”).",
         "avoid": "Siapa pemiliknya? Taruh 's langsung sesudah orang itu, baru barangnya."
       }
@@ -9364,7 +9364,7 @@
       ],
       "explain": {
         "why": "“Brothers and sisters” bisa dihitung dan jamak, jadi pertanyaannya mulai dari “How many”.",
-        "rule": "Kalau menanyakan jumlah benda yang bisa dihitung satu-satu: Pakai “How many” yang selalu diikuti kata benda jamak berakhiran -s. Contoh: <b>How many pens do you have?</b> (Berapa banyak pulpen yang kamu punya?).<br>Kalau menanyakan jumlah benda yang tidak bisa dihitung atau menanyakan harga barang: Pakai “How much”. Contoh: <b>How much water do you drink?</b> (Berapa banyak air yang kamu minum?) atau <b>How much is this shirt?</b> (Berapa harga baju ini?).<br><br>💡 <b>RUMUS KILAT</b>:<br>Setelah titik-titik ada kata jamak (berakhiran <b>-s</b>) ➡️ Tanya pakai <b>How many</b>.<br>Setelah titik-titik benda tak bisa dihitung (tanpa -s) atau tanya harga ➡️ Tanya pakai <b>How much</b>.",
+        "rule": "How many + kata benda jamak yang bisa dihitung. How much + kata benda yang nggak bisa dihitung.",
         "memory": "Bisa dihitung → how many.",
         "avoid": "Bisa ditaruh angka di depannya (two brothers)? Tanyanya pakai “How many”."
       }
@@ -9478,7 +9478,7 @@
       ],
       "explain": {
         "why": "“If I had more free time” ngegambarin keadaan sekarang yang nggak nyata, jadi akibatnya pakai “would learn”.",
-        "rule": "Kalau kemungkinan nyata di masa depan: Pakai kalimat pengandaian biasa (If + Verb 1, will).<br>Kalau cuma khayalan atau mimpi yang mustahil saat ini: Bagian “if” pakai Verb 2, dan akibatnya pakai “would” + kata kerja dasar. Contoh: <b>If I won the lottery, I would travel the world</b> (Kenyataannya sekarang nggak menang dan nggak punya uangnya).<br><br>💡 <b>RUMUS KILAT</b>:<br>Khayalan yang nggak nyata sekarang ➡️ <b>If + Verb 2, would + Verb 1</b>.<br>Subjek ketemu kata “be” ➡️ Semuanya kompak pakai <b>were</b> (contoh: <i>If I were you</i>).",
+        "rule": "Second conditional: If + past simple, would + kata kerja dasar.",
         "memory": "Khayalan sekarang: If I had…, I would…",
         "avoid": "Ada klausa if bentuk lampau soal khayalan sekarang? Taruh “would” plus kata kerja polos di akibatnya."
       }
@@ -9554,7 +9554,7 @@
       ],
       "explain": {
         "why": "Di pertanyaan yang dilaporin, subjek duluan baru kata kerja, dan bentuk waktunya mundur: what time the shop opened.",
-        "rule": "Kalau pertanyaan langsung (Direct): Menggunakan susunan tanya dengan kata bantu di depan. Contoh: <i>“Do you like milk?”</i> atau <i>“Where do you live?”</i>.<br>Kalau dilaporkan kembali (Reported Question): Bentuk kalimatnya BERUBAH jadi kalimat berita biasa (Subjek + Kata Kerja) tanpa kata bantu do/does/did dan tanpa tanda tanya.<br>Pertanyaan Ya/Tidak: Sambung dengan “if” atau “whether” (artinya “apakah”). Contoh: <b>He asked me if I liked milk</b> (Bukan <i>if did I like</i> ❌).<br>Pertanyaan kata tanya (WH-): Pakai kata tanya itu lalu ikuti subjek + kata kerja lampau. Contoh: <b>She asked where I lived</b> (Bukan <i>where did I live</i> ❌).<br><br>💡 <b>RUMUS KILAT</b>:<br>Pertanyaan Ya/Tidak ➡️ Pakai <b>asked + if / whether + Subjek + Verb</b>.<br>Urutan kata ➡️ Wajib susunan kalimat biasa: <b>Subjek dulu, baru kata kerja</b> (dilarang pakai do/does/did!).<br>Tenses ➡️ Tetap mundur ke masa lalu (contoh: <i>is</i> jadi <i>was</i>, <i>like</i> jadi <i>liked</i>).",
+        "rule": "Pertanyaan wh- yang dilaporin: kata tanya + subjek + kata kerja (tanpa do/does/did), bentuk waktunya mundur sesudah kata pelapor lampau.",
         "memory": "Asked what time the shop opened: tanpa “did”.",
         "avoid": "Buang do/does/did, taruh subjek duluan, lalu geser kata kerjanya satu langkah ke lampau."
       }
@@ -9630,7 +9630,7 @@
       ],
       "explain": {
         "why": "Pembicara nggak bisa berenang sekarang dan berharap sebaliknya, jadi “wish” pakai bentuk lampau: could swim.",
-        "rule": "Kalau berharap hal yang mungkin terjadi nanti: Pakai “hope”. Contoh: <b>I hope you win tomorrow</b>.<br>Kalau mengkhayalkan keadaan SEKARANG yang beda dari kenyataan: Pakai “wish” + kata kerja lampau (Verb 2 / could). Contoh: <b>I wish I lived closer</b> (Andai rumahku dekat, padahal faktanya jauh banget).<br><br>💡 <b>RUMUS KILAT</b>:<br>Berharap kondisi sekarang berbeda ➡️ <b>wish + Verb 2</b> (atau were).<br>Pengin bisa sesuatu tapi sekarang belum bisa ➡️ <b>wish + could + Verb 1</b> (contoh: <i>I wish I could swim</i>).",
+        "rule": "Wish soal sekarang: wish + past simple (atau could). Can → could.",
         "memory": "Nggak bisa sekarang, jadi wish I could: can't swim → wish I could.",
         "avoid": "Balik kalimat nyatanya jadi kebalikannya, lalu geser kata kerjanya satu langkah ke lampau."
       }
@@ -9706,7 +9706,7 @@
       ],
       "explain": {
         "why": "Ceritanya dua arah antara dua orang, jadi “each other” yang pas.",
-        "rule": "Kalau melakukan aksi ke DIRINYA SENDIRI (pelaku dan penerima aksinya orang yang sama): Pakai kata ganti berakhiran “-self” (tunggal: myself, yourself, himself, herself, itself) atau “-selves” (jamak: ourselves, yourselves, themselves). Contoh: <b>I taught myself to swim</b> (Aku belajar sendiri / mengajari diriku sendiri).<br>Kalau DUA ORANG ATAU LEBIH saling melakukan aksi satu sama lain (timbal balik): Wajib pakai “each other”. Contoh: <b>They help each other</b> (Mereka saling membantu satu sama lain).<br><br>💡 <b>RUMUS KILAT</b>:<br>Aksi mengenai diri sendiri ➡️ Pakai akhiran <b>-self / -selves</b> (contoh: <i>taught myself</i>, <i>looked at himself</i>).<br>Dua orang saling berinteraksi satu sama lain ➡️ Pakai <b>each other</b> (contoh: <i>help each other</i>).",
+        "rule": "Each other = A → B dan B → A. -selves = subjek ngelakuin ke dirinya sendiri.",
         "memory": "Gunakan “each other” saat dua orang saling berinteraksi satu sama lain (hubungan timbal balik dua arah).",
         "avoid": "Gambar dua panah di antara orangnya. Dua arah? Pakai “each other”."
       }
@@ -9744,7 +9744,7 @@
       ],
       "explain": {
         "why": "Pestanya udah lewat dan pembicara nggak datang, jadi akibat khayalannya pakai “would have come”.",
-        "rule": "Kalau khayalan tentang kondisi sekarang: Pakai <i>If + Verb 2, would + Verb 1</i>.<br>Kalau penyesalan tentang kejadian masa lalu yang sudah lewat: Bagian “if” pakai “had + Verb 3”, akibatnya pakai “would have + Verb 3”. Contoh: <b>If she had woken up earlier, she wouldn't have missed the flight</b> (Faktanya kemarin dia bangun telat dan pesawatnya sudah terbang).<br><br>💡 <b>RUMUS KILAT</b>:<br>Nyesel kejadian kemarin / sudah lewat ➡️ <b>If + had + Verb 3</b>.<br>Hasil penyesalannya ➡️ <b>would have + Verb 3</b> (atau wouldn't have).",
+        "rule": "Third conditional: If + past perfect, would have + past participle.",
         "memory": "Pengandaian lampau: If you had told me, I would have come.",
         "avoid": "Past perfect di klausa if? Jawab pakai “would have” plus participle."
       }
@@ -9782,7 +9782,7 @@
       ],
       "explain": {
         "why": "Tiketnya yang dikenai aksi, jadi pasif modalnya “can be bought”.",
-        "rule": "Kalau modal di kalimat aktif: Setelah modal (can, must, should, will) langsung kata kerja dasar (Verb 1). Contoh: <b>You must sign this form</b> (Kamu harus menandatangani formulir ini).<br>Kalau modal di kalimat pasif (bermakna di- atau ter-): Setelah modal WAJIB disisipkan kata “be” polos lalu diikuti Verb 3. Contoh: <b>This form must be signed</b> (Formulir ini harus ditandatangani) atau <b>Tickets can be bought online</b> (Tiket bisa dibeli daring).<br><br>💡 <b>RUMUS KILAT</b>:<br>Aktif setelah modal ➡️ <b>modal + Verb 1</b> polos (contoh: <i>must sign</i>, <i>can do</i>).<br>Pasif setelah modal (di-/ter-) ➡️ <b>modal + be + Verb 3</b> (contoh: <i>must be signed</i>, <i>can be found</i>).<br>Kata “be” wajib bentuk dasar polos ➡️ Dilarang diubah jadi <i>is/am/are</i> atau <i>been</i> setelah modal!",
+        "rule": "Pasif modal: modal + be + past participle (must be signed, can be bought).",
         "memory": "Modal pasif itu tiga bagian: can + be + bought.",
         "avoid": "Tiga bagian, urutannya selalu: modal, be, participle."
       }
@@ -9820,7 +9820,7 @@
       ],
       "explain": {
         "why": "Tukang cukur yang bakal motong, jadi pakai causative “have it cut”.",
-        "rule": "Kalau mengerjakan sendiri: Subjek langsung melakukan pekerjaannya. Contoh: <b>I cleaned my shoes</b> (Aku mencuci sepatuku sendiri).<br>Kalau menyuruh orang lain / bayar jasa profesional (Causative): Pakai pola “have” atau “get” + nama benda + kata kerja bentuk ketiga (Verb 3). Artinya bukan kita yang repot ngerjain, tapi orang lain atau ahlinya yang mengerjakan buat kita. Contoh: <b>I had my hair cut</b> (Aku potong rambut di salon) atau <b>She got her laptop repaired</b> (Dia menyervis laptopnya ke tempat servis).<br><br>💡 <b>RUMUS KILAT</b>:<br>Kerjakan sendiri ➡️ Subjek + kata kerja biasa (contoh: <i>I cut my hair myself</i>).<br>Diserahkan ke ahlinya / orang lain ➡️ <b>have / get + benda + Verb 3</b> (contoh: <i>had my hair cut</i>, <i>got the roof repaired</i>).<br>Kata kerja di belakang benda ➡️ WAJIB selalu berbentuk <b>Verb 3</b>, apa pun tenses-nya!",
+        "rule": "Causative: have/get + objek + past participle = orang lain yang ngerjain buat kamu.",
         "memory": "Pola “have something done” (have it cut) dipakai ketika pekerjaan tersebut dikerjakan oleh orang lain atau ahlinya untuk kita.",
         "avoid": "Tanya siapa yang beneran ngerjain. Orang lain? Pakai have + benda + participle."
       }
@@ -9858,7 +9858,7 @@
       ],
       "explain": {
         "why": "Ayahnya itu ayah si teman, jadi kata ganti relatif kepemilikan “whose” yang nyambungin.",
-        "rule": "Kalau menghubungkan orang dengan BARANG MILIKNYA (artinya “yang ...-nya”): Wajib pakai “whose” dan langsung ditempel kata benda miliknya tanpa kata sandang a/the. Contoh: <b>That's the boy whose phone was lost</b> (Itu anak laki-laki yang ponselnya hilang).<br>Bandingkan dengan “who” (pelaku aksi: <b>the boy who called me</b>) dan “who's” (singkatan dari <i>who is / who has</i>: <b>the boy who's standing there</b>).<br><br>💡 <b>RUMUS KILAT</b>:<br>Ada kata benda milik setelah titik-titik ➡️ Wajib pilih <b>whose</b> (contoh: <i>whose car</i>, <i>whose father</i>).<br>Ada kata kerja aksi setelah titik-titik ➡️ Pilih <b>who</b>.<br>Ada tanda petik (who's) ➡️ Itu singkatan <i>who is</i>, BUKAN untuk kepemilikan benda!",
+        "rule": "Whose + kata benda nunjukin kata benda itu milik orang atau benda yang baru disebut.",
         "memory": "“Whose” itu “his/her” di dalam klausa relatif.",
         "avoid": "Bisa bilang “his/her/its” di depan kata benda berikutnya? Kata relatifnya “whose”."
       }
@@ -9896,7 +9896,7 @@
       ],
       "explain": {
         "why": "“She was tired” klausa utuh, jadi penghubung pertentangannya harus “although”.",
-        "rule": "Kalau setelahnya ada kalimat lengkap (Subjek + Kata Kerja): Pakai “Although” atau “Even though” (artinya meskipun). Contoh: <b>Although it was raining, we played soccer</b>.<br>Kalau setelahnya HANYA kata benda atau kata kerja -ing (tanpa subjek + predikat): Wajib pakai “Despite” atau “In spite of”. Contoh: <b>Despite the heavy rain, we played soccer</b> (Meskipun hujan deras).<br>Kalau memulai kalimat baru sebagai transisi pertentangan (wajib ada tanda koma setelahnya): Pakai “However”. Contoh: <b>We were tired. However, we finished the job</b>.<br><br>💡 <b>RUMUS KILAT</b>:<br>Diikuti kalimat lengkap (Subjek + Verb) ➡️ Pakai <b>Although / Even though</b>.<br>Diikuti kata benda / Verb-ing saja (tanpa subjek + verb) ➡️ Pakai <b>Despite / In spite of</b> (ingat: <i>despite</i> tanpa 'of'!).<br>Di awal kalimat baru & diikuti tanda koma (<b>However, ...</b>) ➡️ Pakai <b>However</b>.",
+        "rule": "Although + klausa. Despite + kata benda/-ing. However + koma, buka kalimat baru.",
         "memory": "Although ketemu klausa, despite ketemu kata benda: although she was… / despite being…",
         "avoid": "Lihat yang ngikut sesudah titik-titik: subjek + kata kerja berarti “although”."
       }
@@ -10086,7 +10086,7 @@
       ],
       "explain": {
         "why": "Larangan jadi “told + orang + not to + kata kerja”: told us not to touch.",
-        "rule": "Kalau kalimat perintah langsung: Memakai kata kerja perintah atau larangan. Contoh: <i>“Open the door!”</i> atau <i>“Don't touch that!”</i>.<br>Kalau dilaporkan kembali (Reported Command): Pakai kata “told” (menyuruh) atau “asked” (meminta) + orang yang disuruh + bentuk “to” (atau “not to”).<br>Perintah positif: Pakai “to + kata kerja dasar”. Contoh: <b>The teacher told us to open the book</b> (Guru menyuruh kami membuka buku).<br>Larangan negatif: Pakai “not to + kata kerja dasar” (posisi “not” wajib di depan “to”). Contoh: <b>Mum told me not to touch the wet paint</b> (Ibu menyuruhku untuk tidak menyentuh cat basah itu).<br><br>💡 <b>RUMUS KILAT</b>:<br>Menyuruh melakukan sesuatu ➡️ <b>told / asked + orang + to + Verb 1</b>.<br>Melarang / ada kata “Don't” ➡️ <b>told / asked + orang + not to + Verb 1</b> (posisi 'not' sebelum 'to').<br>Dilarang keras ➡️ Jangan pakai kata <i>don't to</i> atau <i>to don't</i> ❌!",
+        "rule": "Perintah yang dilaporin: tell/ask + objek + (not) to + kata kerja dasar.",
         "memory": "Perintah “Don't touch” dilaporin jadi “told us not to touch”.",
         "avoid": "Denger perintah? Susun ulang jadi “told someone (not) to do”."
       }
@@ -10238,7 +10238,7 @@
       ],
       "explain": {
         "why": "Janjinya dilaporin di masa lampau, jadi “will” jadi “would”: said he would help.",
-        "rule": "Kalau kalimat langsung (Direct): Memakai tanda petik persis saat diucapkan. Contoh: <i>He said, “I am happy”</i>.<br>Kalau dilaporkan kembali (Reported Speech) dengan kata pengantar lampau (said / told): Waktu ucapannya wajib mundur satu langkah ke masa lalu (backshift). Verb 1 mundur jadi Verb 2, “am/is” jadi “was”, “will” jadi “would”, dan “can” jadi “could”. Contoh: <b>He said that he was happy</b>.<br>Beda Say vs Tell: Kalau pakai “said”, langsung kalimatnya (<i>She said that...</i>). Kalau pakai “told”, WAJIB sebut orang yang diajak bicara (<i>She told me that...</i>).<br><br>💡 <b>RUMUS KILAT</b>:<br>Kata pelapor lampau (said/told) ➡️ Tenses di dalamnya <b>mundur satu langkah</b> (V1 ➡️ V2, will ➡️ would, can ➡️ could).<br>Ada orang yang diajak bicara ➡️ Pakai <b>told + orang</b> (contoh: <i>told me</i>, bukan <i>said me</i> ❌).<br>Tanpa menyebut orang ➡️ Pakai <b>said (that)</b>.",
+        "rule": "Mundurnya modal: will → would, can → could, may → might. Modal nggak pakai -s dan nggak pakai “to”.",
         "memory": "Will → would sesudah said.",
         "avoid": "Ada modal di kalimat langsungnya? Tuker sama pasangan lampaunya dan kata kerjanya tetap polos."
       }
@@ -10276,7 +10276,7 @@
       ],
       "explain": {
         "why": "Pertanyaan ya/tidak dilaporin pakai “if” plus urutan kalimat berita, dan “are” mundur jadi “was”.",
-        "rule": "Kalau pertanyaan langsung (Direct): Menggunakan susunan tanya dengan kata bantu di depan. Contoh: <i>“Do you like milk?”</i> atau <i>“Where do you live?”</i>.<br>Kalau dilaporkan kembali (Reported Question): Bentuk kalimatnya BERUBAH jadi kalimat berita biasa (Subjek + Kata Kerja) tanpa kata bantu do/does/did dan tanpa tanda tanya.<br>Pertanyaan Ya/Tidak: Sambung dengan “if” atau “whether” (artinya “apakah”). Contoh: <b>He asked me if I liked milk</b> (Bukan <i>if did I like</i> ❌).<br>Pertanyaan kata tanya (WH-): Pakai kata tanya itu lalu ikuti subjek + kata kerja lampau. Contoh: <b>She asked where I lived</b> (Bukan <i>where did I live</i> ❌).<br><br>💡 <b>RUMUS KILAT</b>:<br>Pertanyaan Ya/Tidak ➡️ Pakai <b>asked + if / whether + Subjek + Verb</b>.<br>Urutan kata ➡️ Wajib susunan kalimat biasa: <b>Subjek dulu, baru kata kerja</b> (dilarang pakai do/does/did!).<br>Tenses ➡️ Tetap mundur ke masa lalu (contoh: <i>is</i> jadi <i>was</i>, <i>like</i> jadi <i>liked</i>).",
+        "rule": "Pertanyaan ya/tidak yang dilaporin: asked + if/whether + subjek + kata kerja (dimundurin).",
         "memory": "Pertanyaan “Are you…?” dilaporin jadi “asked if I was…”.",
         "avoid": "Pertanyaan langsungnya bisa dijawab ya atau tidak? Mulai laporannya pakai “if”."
       }
@@ -10352,7 +10352,7 @@
       ],
       "explain": {
         "why": "“The film” itu benda dan objek dari “watched”, jadi “that” pas, bahkan bisa dibuang.",
-        "rule": "Kalau menjelaskan ORANG: Pakai kata penghubung “who” (atau “that”). Contoh: <b>The teacher who taught us is kind</b> (Guru yang mengajari kami sangat baik).<br>Kalau menjelaskan BENDA atau HEWAN: Pakai kata penghubung “which” (atau “that”). Contoh: <b>The phone which is on the table is mine</b> (Ponsel yang ada di meja itu milikku).<br>Trik hemat: Kalau setelah kata penghubung langsung ada subjek baru (posisinya sebagai objek), kata penghubungnya boleh dihilangkan sama sekali. Contoh: <b>The movie (that) we watched last night</b>.<br><br>💡 <b>RUMUS KILAT</b>:<br>Menjelaskan orang ➡️ Pakai <b>who</b> (atau that).<br>Menjelaskan benda / hewan ➡️ Pakai <b>which</b> (atau that).<br>Setelahnya langsung ada subjek baru ➡️ Kata penghubungnya <b>boleh dihapus</b> (contoh: <i>the song [that] you sang</i>).",
+        "rule": "Kata ganti relatif objek buat benda: that / which, atau nggak ada sama sekali: the film (that) we watched.",
         "memory": "Kata gantinya bisa hilang: “the film (that) we watched”.",
         "avoid": "Coba hapus kata gantinya. Kalau kalimatnya masih jalan, “that” atau kosong yang bener."
       }
@@ -10542,7 +10542,7 @@
       ],
       "explain": {
         "why": "Nggak ada yang ngangkat, dan “them” itu kata ganti, jadi bentuknya “none of them”.",
-        "rule": "Kalau kata penunjuk jumlah (seperti both, all, none, some, neither) ketemu langsung kata ganti orang berbentuk objek (them, us, you): WAJIB disisipkan kata “of” di tengahnya! Contoh: <b>both of them</b>, <b>all of us</b> (salah besar kalau menulis <i>both them</i> ❌ atau <i>all them</i> ❌).<br>Bedanya: Gunakan “both of” (dua-duanya) atau “neither of” (dua-duanya tidak) khusus untuk kelompok TEPAT DUA ORANG/BENDA. Gunakan “all of” atau “none of” jika jumlahnya TIGA ATAU LEBIH.<br><br>💡 <b>RUMUS KILAT</b>:<br>Kata jumlah + kata ganti objek (them, us, you) ➡️ WAJIB ada kata <b>of</b> di tengahnya (contoh: <i>both <b>of</b> them</i>, <i>all <b>of</b> us</i>).<br>Khusus kelompok 2 orang / benda ➡️ Pakai <b>both of</b> (positif) atau <b>neither of</b> (negatif).<br>Kelompok 3 orang atau lebih ➡️ Pakai <b>all of</b> atau <b>none of</b>.",
+        "rule": "Penanda jumlah + of + kata ganti objek: none of them, both of us, all of you, some of it.",
         "memory": "Di depan kata ganti selalu ada “of”: “none of them”, “both of us”.",
         "avoid": "Ada them / us / you / it sesudah penanda jumlahnya? Selipin “of”."
       }
@@ -10732,7 +10732,7 @@
       ],
       "explain": {
         "why": "Hasilnya yang kena aksi, jadi sesudah “expected” pakai infinitive pasif “to be published”.",
-        "rule": "Kalau modal di kalimat aktif: Setelah modal (can, must, should, will) langsung kata kerja dasar (Verb 1). Contoh: <b>You must sign this form</b> (Kamu harus menandatangani formulir ini).<br>Kalau modal di kalimat pasif (bermakna di- atau ter-): Setelah modal WAJIB disisipkan kata “be” polos lalu diikuti Verb 3. Contoh: <b>This form must be signed</b> (Formulir ini harus ditandatangani) atau <b>Tickets can be bought online</b> (Tiket bisa dibeli daring).<br><br>💡 <b>RUMUS KILAT</b>:<br>Aktif setelah modal ➡️ <b>modal + Verb 1</b> polos (contoh: <i>must sign</i>, <i>can do</i>).<br>Pasif setelah modal (di-/ter-) ➡️ <b>modal + be + Verb 3</b> (contoh: <i>must be signed</i>, <i>can be found</i>).<br>Kata “be” wajib bentuk dasar polos ➡️ Dilarang diubah jadi <i>is/am/are</i> atau <i>been</i> setelah modal!",
+        "rule": "Be expected / supposed / likely + to be + past participle kalau subjeknya yang dikenai aksi.",
         "memory": "Expected to be published.",
         "avoid": "Tanya: subjeknya ngelakuin aksi atau kena aksi? Kena → to be + participle."
       }
@@ -10884,7 +10884,7 @@
       ],
       "explain": {
         "why": "Kata benda “reason” selalu diikuti “for”: the reason for his decision.",
-        "rule": "Banyak kata kerja dan kata sifat dalam bahasa Inggris punya pasangan kata depan (preposisi) yang TETAP dan tidak bisa diterjemahkan asal-asalan dari bahasa Indonesia.<br>Contoh kata kerja: <b>listen to music</b> (bukan <i>listen music</i>), <b>wait for the bus</b> (bukan <i>wait the bus</i>), <b>depend on you</b> (bergantung padamu), <b>apologize for the mistake</b> (minta maaf atas kesalahan).<br>Contoh kata sifat: <b>good at math</b> (jago matematika — bukan <i>good in</i>), <b>interested in art</b> (tertarik seni), <b>proud of you</b> (bangga padamu), <b>afraid of spiders</b> (takut laba-laba).<br><br>💡 <b>RUMUS KILAT</b>:<br>Mendengarkan ➡️ <b>listen to</b> | Menunggu ➡️ <b>wait for</b> | Bergantung ➡️ <b>depend on</b>.<br>Jago / ahli ➡️ <b>good at</b> (bukan <i>good in</i> ❌).<br>Tertarik ➡️ <b>interested in</b> | Takut ➡️ <b>afraid of</b> | Bangga ➡️ <b>proud of</b>.",
+        "rule": "Pasangan tetap kata benda + kata depan: reason for, solution to, answer to, effect on.",
         "memory": "Reason for, solution to.",
         "avoid": "Simpan kata benda sama kata depannya sebagai satu paket: reason for."
       }
@@ -10922,7 +10922,7 @@
       ],
       "explain": {
         "why": "Ujiannya minggu lalu, jadi penyesalannya pakai past perfect: If only I had studied harder.",
-        "rule": "Kalau berandai-andai soal kondisi sekarang: Pakai “If only” + Verb 2. Contoh: <b>If only I had more time today</b>.<br>Kalau menyesali kejadian masa lalu yang sudah terlewat: Pakai “If only” + had + Verb 3. Contoh: <b>If only I had studied harder last week</b> (Seandainya minggu lalu aku belajar lebih rajin, tapi nyatanya nilaiku sudah keluar).<br><br>💡 <b>RUMUS KILAT</b>:<br>Nyesel kejadian lampau (ada kata: yesterday, last week, last year) ➡️ <b>If only + had + Verb 3</b>.<br>Nyesel karena terlanjur melakukan sesuatu ➡️ <b>If only + hadn't + Verb 3</b>.",
+        "rule": "If only / I wish + past perfect = penyesalan soal lampau. + past simple = harapan soal sekarang.",
         "memory": "Udah terlambat buat disesali: “If only I had…”.",
         "avoid": "Ada kata waktu lampau sama “if only”? Mundur satu langkah lagi: had + participle."
       }
@@ -10960,7 +10960,7 @@
       ],
       "explain": {
         "why": "Pembicara kesal sama kebiasaan tetangganya dan mau itu berubah, jadi pakai “wish he would turn”.",
-        "rule": "Kalau berandai-andai soal situasi atau keinginan diri sendiri: Pakai “wish + Verb 2”. Contoh: <b>I wish I had a car</b>.<br>Kalau jengkel / kesal sama KELAKUAN ORANG LAIN dan pengin dia berhenti: Pakai “wish + orang lain + would” + kata kerja dasar. Contoh: <b>I wish he would turn down the music</b> (Bikin pusing, andai saja dia mau mengecilkan musiknya).<br><br>💡 <b>RUMUS KILAT</b>:<br>Kesal sama kelakuan orang lain ➡️ <b>wish + [orang itu] + would + kata kerja dasar</b>.<br>Bukan untuk diri sendiri ➡️ Dilarang pakai <i>I wish I would</i> (karena kelakuan sendiri bisa dikontrol langsung).",
+        "rule": "Wish + would + kata kerja dasar = kesal sama kelakuan orang lain yang bisa dia ubah.",
         "memory": "Kesal sama kelakuan orang lain: “I wish he would stop!”.",
         "avoid": "Ngeluh soal yang terus dilakuin orang lain? “I wish they would…”"
       }
@@ -10998,7 +10998,7 @@
       ],
       "explain": {
         "why": "“Get used to” diikuti -ing: get used to getting up at five.",
-        "rule": "Kalau kebiasaan masa lalu yang SEKARANG SUDAH BERHENTI: Pakai “used to” + kata kerja dasar (Verb 1). Contoh: <b>I used to play marbles</b> (Dulu aku sering main kelereng, tapi sekarang sudah nggak pernah lagi).<br>Kalau SEKARANG SUDAH TERBIASA (merasa wajar dan nggak asing lagi): Ada “be” (am/is/are) di depannya dan wajib diikuti kata kerja -ing. Contoh: <b>I am used to living in Jakarta</b> (Sekarang aku sudah terbiasa tinggal di Jakarta).<br>Kalau PROSES menjadi terbiasa: Pakai “get used to” + kata kerja -ing. Contoh: <b>He is getting used to waking up early</b> (Dia mulai terbiasa bangun pagi).<br><br>💡 <b>RUMUS KILAT</b>:<br>Dulu pernah tapi sekarang enggak (tanpa be) ➡️ <b>used to + Verb 1</b>.<br>Sekarang sudah terbiasa (ada <i>am/is/are</i> di depan) ➡️ <b>be used to + Verb-ing</b>.<br>Proses beradaptasi ➡️ <b>get used to + Verb-ing</b>.",
+        "rule": "Be/get used to + -ing = terbiasa / jadi terbiasa. Used to + kata kerja dasar = kebiasaan lampau.",
         "memory": "Get used to getting up early.",
         "avoid": "Ada “be” atau “get” sebelum “used to”? Kata kerja berikutnya berakhiran -ing."
       }
@@ -11226,7 +11226,7 @@
       ],
       "explain": {
         "why": "Di gaya formal “if” hilang dan “had” pindah ke depan subjek: Had we received the warning.",
-        "rule": "Kalau susunan normal: Keterangan waktu ditaruh di tengah kalimat. Contoh: <b>I have never seen such a view</b> (Aku belum pernah melihat pemandangan seperti itu).<br>Kalau susunan inversi (pembalikan untuk penekanan dramatis): Ketika kata keterangan negatif (Never, Rarely, Seldom, Hardly, Not only) atau frasa “Only after / Only when” ditaruh di AWAL kalimat, susunan kata bantu dan subjek WAJIB DIBALIK persis seperti kalimat tanya! Contoh: <b>Never have I seen such a view</b> atau <b>Rarely did she speak</b>.<br><br>💡 <b>RUMUS KILAT</b>:<br>Kata negatif di awal (Never, Rarely, Seldom, Not only) ➡️ Wajib dibalik: <b>Kata Negatif + Kata Bantu + Subjek + Verb</b>.<br>Kalimat lampau tanpa kata bantu ➡️ Munculkan <b>did + Subjek + Verb 1</b> (contoh: <i>Rarely did he come</i>).<br>Jangan susun normal jika kata negatif di depan ➡️ Salah besar: <i>Never I have seen</i> ❌!",
+        "rule": "Inversi formal: Had + subjek + past participle, … would have + past participle.",
         "memory": "If we had → Had we.",
         "avoid": "Hapus “if”, lalu tuker posisi subjek sama “had”; yang lain nggak pindah."
       }
@@ -11264,7 +11264,7 @@
       ],
       "explain": {
         "why": "“Rarely” di depan memicu inversi: kata bantu “have” pindah ke depan “I”.",
-        "rule": "Kalau susunan normal: Keterangan waktu ditaruh di tengah kalimat. Contoh: <b>I have never seen such a view</b> (Aku belum pernah melihat pemandangan seperti itu).<br>Kalau susunan inversi (pembalikan untuk penekanan dramatis): Ketika kata keterangan negatif (Never, Rarely, Seldom, Hardly, Not only) atau frasa “Only after / Only when” ditaruh di AWAL kalimat, susunan kata bantu dan subjek WAJIB DIBALIK persis seperti kalimat tanya! Contoh: <b>Never have I seen such a view</b> atau <b>Rarely did she speak</b>.<br><br>💡 <b>RUMUS KILAT</b>:<br>Kata negatif di awal (Never, Rarely, Seldom, Not only) ➡️ Wajib dibalik: <b>Kata Negatif + Kata Bantu + Subjek + Verb</b>.<br>Kalimat lampau tanpa kata bantu ➡️ Munculkan <b>did + Subjek + Verb 1</b> (contoh: <i>Rarely did he come</i>).<br>Jangan susun normal jika kata negatif di depan ➡️ Salah besar: <i>Never I have seen</i> ❌!",
+        "rule": "Kata keterangan negatif di depan (never, rarely, seldom, not only) + kata bantu + subjek + kata kerja.",
         "memory": "Rarely have I…",
         "avoid": "Rarely/never di depan? Susun kayak pertanyaan: have I seen."
       }
@@ -11302,7 +11302,7 @@
       ],
       "explain": {
         "why": "“Only when…” di depan memicu inversi kata bantu: did the boats leave.",
-        "rule": "Kalau susunan normal: Keterangan waktu ditaruh di tengah kalimat. Contoh: <b>I have never seen such a view</b> (Aku belum pernah melihat pemandangan seperti itu).<br>Kalau susunan inversi (pembalikan untuk penekanan dramatis): Ketika kata keterangan negatif (Never, Rarely, Seldom, Hardly, Not only) atau frasa “Only after / Only when” ditaruh di AWAL kalimat, susunan kata bantu dan subjek WAJIB DIBALIK persis seperti kalimat tanya! Contoh: <b>Never have I seen such a view</b> atau <b>Rarely did she speak</b>.<br><br>💡 <b>RUMUS KILAT</b>:<br>Kata negatif di awal (Never, Rarely, Seldom, Not only) ➡️ Wajib dibalik: <b>Kata Negatif + Kata Bantu + Subjek + Verb</b>.<br>Kalimat lampau tanpa kata bantu ➡️ Munculkan <b>did + Subjek + Verb 1</b> (contoh: <i>Rarely did he come</i>).<br>Jangan susun normal jika kata negatif di depan ➡️ Salah besar: <i>Never I have seen</i> ❌!",
+        "rule": "Only + frasa waktu/syarat di depan → kata bantu + subjek + kata kerja dasar di klausa utama.",
         "memory": "Only when … did the boats leave.",
         "avoid": "Kalimatnya mulai dari “Only after/when/then”? Taruh did/does/have sebelum subjek."
       }
@@ -11378,7 +11378,7 @@
       ],
       "explain": {
         "why": "Buang “if” dan pindahin “were” ke depan jadi pengandaian formal: Were she to accept the offer.",
-        "rule": "Kalau susunan normal: Keterangan waktu ditaruh di tengah kalimat. Contoh: <b>I have never seen such a view</b> (Aku belum pernah melihat pemandangan seperti itu).<br>Kalau susunan inversi (pembalikan untuk penekanan dramatis): Ketika kata keterangan negatif (Never, Rarely, Seldom, Hardly, Not only) atau frasa “Only after / Only when” ditaruh di AWAL kalimat, susunan kata bantu dan subjek WAJIB DIBALIK persis seperti kalimat tanya! Contoh: <b>Never have I seen such a view</b> atau <b>Rarely did she speak</b>.<br><br>💡 <b>RUMUS KILAT</b>:<br>Kata negatif di awal (Never, Rarely, Seldom, Not only) ➡️ Wajib dibalik: <b>Kata Negatif + Kata Bantu + Subjek + Verb</b>.<br>Kalimat lampau tanpa kata bantu ➡️ Munculkan <b>did + Subjek + Verb 1</b> (contoh: <i>Rarely did he come</i>).<br>Jangan susun normal jika kata negatif di depan ➡️ Salah besar: <i>Never I have seen</i> ❌!",
+        "rule": "Pengandaian formal kecil kemungkinan: Were + subjek + to + kata kerja dasar, … would + kata kerja dasar.",
         "memory": "If she were to → Were she to.",
         "avoid": "Tulis “If she were to accept”, lalu hapus “if” dan tuker: Were she to accept."
       }
@@ -11416,7 +11416,7 @@
       ],
       "explain": {
         "why": "Titik-titiknya ada sesudah kata kerja “like” dan menunjuk “Ms. Rina”. Bentuk objeknya “her”.",
-        "rule": "Kalau sebagai pelaku di depan kata kerja: Pakai kata ganti subjek (I, you, he, she, it, we, they). Contoh: <b>She called me</b>.<br>Kalau sebagai penerima setelah kata kerja atau kata depan: Pakai kata ganti objek (me, you, him, her, it, us, them). Contoh: <b>The teacher helped her</b>.<br>Kalau menyatakan kepemilikan: Pakai “my/your/his/her/its/our/their” kalau ada nama bendanya (contoh: <b>her bag</b>, <b>my name</b>). Tapi kalau berdiri sendiri tanpa nama benda di belakangnya, pakai “mine/yours/his/hers/ours/theirs” (contoh: <b>This bag is hers</b>).<br><br>💡 <b>RUMUS KILAT</b>:<br>Di depan kata kerja (sebagai pelaku) ➡️ Pakai subjek (<b>I, He, She, We, They</b>).<br>Di belakang kata kerja / kata depan (sebagai penerima) ➡️ Pakai objek (<b>me, him, her, us, them</b>).<br>Diikuti nama benda ➡️ Pakai <b>my, your, his, her, their</b> (kalau berdiri sendiri tanpa benda, pakai <b>mine, hers, ours</b>).",
+        "rule": "Subjek: “I”, “he”, “she”. Sesudah kata kerja: “me”, “him”, “her”. Sebelum kata benda: “my”, “his”, “her”. Berdiri sendiri: “mine”, “his”, “hers”.",
         "memory": "Sesudah kata kerja: “me”, “him”, “her”, “us”, “them”.",
         "avoid": "Cek dulu posisi titik-titiknya: sebelum kata kerja, sesudah kata kerja, atau sebelum kata benda."
       }
@@ -11454,7 +11454,7 @@
       ],
       "explain": {
         "why": "Nggak ada kata benda sesudah titik-titik, jadi kata pemiliknya harus berdiri sendiri, yaitu “mine”.",
-        "rule": "Kalau sebagai pelaku di depan kata kerja: Pakai kata ganti subjek (I, you, he, she, it, we, they). Contoh: <b>She called me</b>.<br>Kalau sebagai penerima setelah kata kerja atau kata depan: Pakai kata ganti objek (me, you, him, her, it, us, them). Contoh: <b>The teacher helped her</b>.<br>Kalau menyatakan kepemilikan: Pakai “my/your/his/her/its/our/their” kalau ada nama bendanya (contoh: <b>her bag</b>, <b>my name</b>). Tapi kalau berdiri sendiri tanpa nama benda di belakangnya, pakai “mine/yours/his/hers/ours/theirs” (contoh: <b>This bag is hers</b>).<br><br>💡 <b>RUMUS KILAT</b>:<br>Di depan kata kerja (sebagai pelaku) ➡️ Pakai subjek (<b>I, He, She, We, They</b>).<br>Di belakang kata kerja / kata depan (sebagai penerima) ➡️ Pakai objek (<b>me, him, her, us, them</b>).<br>Diikuti nama benda ➡️ Pakai <b>my, your, his, her, their</b> (kalau berdiri sendiri tanpa benda, pakai <b>mine, hers, ours</b>).",
+        "rule": "Subjek: “I”, “he”, “she”. Sesudah kata kerja: “me”, “him”, “her”. Sebelum kata benda: “my”, “his”, “her”. Berdiri sendiri: “mine”, “his”, “hers”.",
         "memory": "“My bag”, tapi “the bag is mine”.",
         "avoid": "Cek dulu posisi titik-titiknya: sebelum kata kerja, sesudah kata kerja, atau sebelum kata benda."
       }
@@ -11606,7 +11606,7 @@
       ],
       "explain": {
         "why": "Kita sama-sama tahu pintu yang mana: pintu di ruangan ini. Jadi pakai “the”.",
-        "rule": "Kalau baru pertama kali disebut atau bendanya sembarang/umum: Pakai “a” atau “an”. Bedanya, “a” untuk kata yang diawali bunyi konsonan (contoh: <b>a book</b>, <b>a university</b>), sedangkan “an” untuk kata yang diawali bunyi vokal (contoh: <b>an apple</b>, <b>an hour</b>).<br>Kalau bendanya sudah jelas yang mana atau sudah pernah disebut sebelumnya: Wajib pakai “the”. Contoh: <b>I bought a pen. The pen is blue</b> (Pena yang dimaksud sudah jelas, yaitu pena yang baru saja kubeli).<br><br>💡 <b>RUMUS KILAT</b>:<br>Baru disebut pertama kali / sembarang benda ➡️ Pakai <b>a</b> (bunyi konsonan) atau <b>an</b> (bunyi vokal).<br>Bendanya sudah jelas / sudah disebut lagi ➡️ Wajib pakai <b>the</b>.<br>Bunyi vokal vs konsonan ➡️ Dengarkan bunyinya saat diucapkan, bukan cuma melihat huruf pertamanya (contoh: <i>an hour</i>, <i>a university</i>).",
+        "rule": "“A” sebelum bunyi konsonan (“a cat”). “An” sebelum bunyi vokal (“an apple”, “an hour”). “The” kalau sudah jelas yang mana.",
         "memory": "Sudah jelas yang mana? Pakai “the”, seperti “the door” di ruangan ini.",
         "avoid": "Ucapkan kata sesudahnya dan dengarkan bunyi awalnya, bukan huruf awalnya."
       }
@@ -11644,7 +11644,7 @@
       ],
       "explain": {
         "why": "“Box” berakhiran x, jadi jamaknya tambah -es. Hasilnya “boxes”.",
-        "rule": "Kalau bentuk jamak biasa (beraturan): Cukup tambahkan akhiran “-s” (contoh: <b>book jadi books</b>). Kalau katanya berakhiran bunyi mendesis (-s, -sh, -ch, -x), tambahkan “-es” (contoh: <b>box jadi boxes</b>, <b>watch jadi watches</b>). Kalau berakhiran konsonan + y, ubah jadi “-ies” (contoh: <b>city jadi cities</b>).<br>Kalau bentuk jamak khusus (tidak beraturan): Bentuk katanya berubah total tanpa tambahan -s, jadi wajib dihapal. Contoh: <b>child jadi children</b>, <b>man jadi men</b>, <b>foot jadi feet</b>, <b>tooth jadi teeth</b>.<br><br>💡 <b>RUMUS KILAT</b>:<br>Jamak biasa ➡️ Tambah <b>-s</b> (tambah <b>-es</b> jika akhiran mendesis -s/-sh/-ch/-x, atau ganti <b>-ies</b> jika konsonan + y).<br>Jamak khusus (tidak beraturan) ➡️ Bentuk katanya berubah (contoh: <i>child jadi children</i>, bukan <i>childs</i> ❌).",
+        "rule": "Kebanyakan kata benda tambah -s. Akhiran s, x, ch, sh tambah -es. Konsonan + y jadi -ies. Ada yang berubah: “child” jadi “children”, “man” jadi “men”.",
         "memory": "Sesudah x, s, ch, sh: tambah -es. “Box” jadi “boxes”.",
         "avoid": "Sesudah “two”, “three”, atau “many”, cek huruf terakhirnya, lalu pilih -s, -es, atau -ies."
       }
@@ -11682,7 +11682,7 @@
       ],
       "explain": {
         "why": "“Baby” berakhiran konsonan + y, jadi y berubah jadi i lalu tambah -es. Hasilnya “babies”.",
-        "rule": "Kalau bentuk jamak biasa (beraturan): Cukup tambahkan akhiran “-s” (contoh: <b>book jadi books</b>). Kalau katanya berakhiran bunyi mendesis (-s, -sh, -ch, -x), tambahkan “-es” (contoh: <b>box jadi boxes</b>, <b>watch jadi watches</b>). Kalau berakhiran konsonan + y, ubah jadi “-ies” (contoh: <b>city jadi cities</b>).<br>Kalau bentuk jamak khusus (tidak beraturan): Bentuk katanya berubah total tanpa tambahan -s, jadi wajib dihapal. Contoh: <b>child jadi children</b>, <b>man jadi men</b>, <b>foot jadi feet</b>, <b>tooth jadi teeth</b>.<br><br>💡 <b>RUMUS KILAT</b>:<br>Jamak biasa ➡️ Tambah <b>-s</b> (tambah <b>-es</b> jika akhiran mendesis -s/-sh/-ch/-x, atau ganti <b>-ies</b> jika konsonan + y).<br>Jamak khusus (tidak beraturan) ➡️ Bentuk katanya berubah (contoh: <i>child jadi children</i>, bukan <i>childs</i> ❌).",
+        "rule": "Kebanyakan kata benda tambah -s. Akhiran s, x, ch, sh tambah -es. Konsonan + y jadi -ies. Ada yang berubah: “child” jadi “children”, “man” jadi “men”.",
         "memory": "Konsonan + y jadi -ies: “baby” jadi “babies”.",
         "avoid": "Sesudah “two”, “three”, atau “many”, cek huruf terakhirnya, lalu pilih -s, -es, atau -ies."
       }
@@ -11720,7 +11720,7 @@
       ],
       "explain": {
         "why": "“Man” nggak beraturan: jamaknya “men”, tanpa -s.",
-        "rule": "Kalau bentuk jamak biasa (beraturan): Cukup tambahkan akhiran “-s” (contoh: <b>book jadi books</b>). Kalau katanya berakhiran bunyi mendesis (-s, -sh, -ch, -x), tambahkan “-es” (contoh: <b>box jadi boxes</b>, <b>watch jadi watches</b>). Kalau berakhiran konsonan + y, ubah jadi “-ies” (contoh: <b>city jadi cities</b>).<br>Kalau bentuk jamak khusus (tidak beraturan): Bentuk katanya berubah total tanpa tambahan -s, jadi wajib dihapal. Contoh: <b>child jadi children</b>, <b>man jadi men</b>, <b>foot jadi feet</b>, <b>tooth jadi teeth</b>.<br><br>💡 <b>RUMUS KILAT</b>:<br>Jamak biasa ➡️ Tambah <b>-s</b> (tambah <b>-es</b> jika akhiran mendesis -s/-sh/-ch/-x, atau ganti <b>-ies</b> jika konsonan + y).<br>Jamak khusus (tidak beraturan) ➡️ Bentuk katanya berubah (contoh: <i>child jadi children</i>, bukan <i>childs</i> ❌).",
+        "rule": "Kebanyakan kata benda tambah -s. Akhiran s, x, ch, sh tambah -es. Konsonan + y jadi -ies. Ada yang berubah: “child” jadi “children”, “man” jadi “men”.",
         "memory": "Satu “man”, dua “men”; satu “woman”, dua “women”.",
         "avoid": "Sesudah “two”, “three”, atau “many”, cek huruf terakhirnya, lalu pilih -s, -es, atau -ies."
       }
@@ -11758,7 +11758,7 @@
       ],
       "explain": {
         "why": "“How many” menanyakan jumlah yang lebih dari satu, dan kebanyakan kata benda cukup tambah -s. Hasilnya “students”.",
-        "rule": "Kalau bentuk jamak biasa (beraturan): Cukup tambahkan akhiran “-s” (contoh: <b>book jadi books</b>). Kalau katanya berakhiran bunyi mendesis (-s, -sh, -ch, -x), tambahkan “-es” (contoh: <b>box jadi boxes</b>, <b>watch jadi watches</b>). Kalau berakhiran konsonan + y, ubah jadi “-ies” (contoh: <b>city jadi cities</b>).<br>Kalau bentuk jamak khusus (tidak beraturan): Bentuk katanya berubah total tanpa tambahan -s, jadi wajib dihapal. Contoh: <b>child jadi children</b>, <b>man jadi men</b>, <b>foot jadi feet</b>, <b>tooth jadi teeth</b>.<br><br>💡 <b>RUMUS KILAT</b>:<br>Jamak biasa ➡️ Tambah <b>-s</b> (tambah <b>-es</b> jika akhiran mendesis -s/-sh/-ch/-x, atau ganti <b>-ies</b> jika konsonan + y).<br>Jamak khusus (tidak beraturan) ➡️ Bentuk katanya berubah (contoh: <i>child jadi children</i>, bukan <i>childs</i> ❌).",
+        "rule": "Kebanyakan kata benda tambah -s. Akhiran s, x, ch, sh tambah -es. Konsonan + y jadi -ies. Ada yang berubah: “child” jadi “children”, “man” jadi “men”.",
         "memory": "“How many” + jamak: “how many students?”",
         "avoid": "Sesudah “two”, “three”, atau “many”, cek huruf terakhirnya, lalu pilih -s, -es, atau -ies."
       }
@@ -12062,7 +12062,7 @@
       ],
       "explain": {
         "why": "“My grandparents” itu lebih dari satu orang, sama seperti “they”, jadi pakai “have got”.",
-        "rule": "Jika kalimatnya HANYA pakai \"have\" (tanpa \"got\"):<br><br>Positif: <i>I have money.</i><br>Negatif: <i>I don't have money.</i> (Kamu butuh \"don't\" / \"doesn't\")<br><br>Jika kalimatnya pakai \"have got\":<br><br>Positif: <i>I have got money.</i><br>Negatif: <i>I haven't got money.</i> (Kata \"have/has\" langsung digabung dengan \"not\" menjadi \"haven't/hasn't\". Tidak boleh pakai \"don't/doesn't\").<br><br>Karena itu, kalau di soal ada kata \"got\", pasangannya pasti <b>haven't / hasn't</b>. Kalau mau pakai \"don't / doesn't\", kata \"got\" nya harus dibuang.<br><br>💡 <b>RUMUS KILAT</b>:<br>Pakai got ➡️ <b>haven't / hasn't got</b><br>Tanpa got ➡️ <b>don't / doesn't have</b>",
+        "rule": "“I”, “you”, “we”, “they” pakai “have got”. “He”, “she”, “it” pakai “has got”. Untuk bertanya, “have/has” pindah ke depan. Negatifnya “haven't/hasn't got”.",
         "memory": "“They have got”, tapi “he has got”.",
         "avoid": "Cari subjeknya dulu: “he”, “she”, “it” pakai “has”, yang lain pakai “have”. Jangan tambah “do”."
       }
@@ -12100,7 +12100,7 @@
       ],
       "explain": {
         "why": "“Dimas” itu satu orang, sama seperti “he”, jadi pakai “has got”.",
-        "rule": "Jika kalimatnya HANYA pakai \"have\" (tanpa \"got\"):<br><br>Positif: <i>I have money.</i><br>Negatif: <i>I don't have money.</i> (Kamu butuh \"don't\" / \"doesn't\")<br><br>Jika kalimatnya pakai \"have got\":<br><br>Positif: <i>I have got money.</i><br>Negatif: <i>I haven't got money.</i> (Kata \"have/has\" langsung digabung dengan \"not\" menjadi \"haven't/hasn't\". Tidak boleh pakai \"don't/doesn't\").<br><br>Karena itu, kalau di soal ada kata \"got\", pasangannya pasti <b>haven't / hasn't</b>. Kalau mau pakai \"don't / doesn't\", kata \"got\" nya harus dibuang.<br><br>💡 <b>RUMUS KILAT</b>:<br>Pakai got ➡️ <b>haven't / hasn't got</b><br>Tanpa got ➡️ <b>don't / doesn't have</b>",
+        "rule": "“I”, “you”, “we”, “they” pakai “have got”. “He”, “she”, “it” pakai “has got”. Untuk bertanya, “have/has” pindah ke depan. Negatifnya “haven't/hasn't got”.",
         "memory": "“He”, “she”, “it”: “has got a cold”.",
         "avoid": "Cari subjeknya dulu: “he”, “she”, “it” pakai “has”, yang lain pakai “have”. Jangan tambah “do”."
       }
@@ -12138,7 +12138,7 @@
       ],
       "explain": {
         "why": "Subjeknya “I”, dan bentuk negatif “have got” adalah “haven't got”.",
-        "rule": "Jika kalimatnya HANYA pakai \"have\" (tanpa \"got\"):<br><br>Positif: <i>I have money.</i><br>Negatif: <i>I don't have money.</i> (Kamu butuh \"don't\" / \"doesn't\")<br><br>Jika kalimatnya pakai \"have got\":<br><br>Positif: <i>I have got money.</i><br>Negatif: <i>I haven't got money.</i> (Kata \"have/has\" langsung digabung dengan \"not\" menjadi \"haven't/hasn't\". Tidak boleh pakai \"don't/doesn't\").<br><br>Karena itu, kalau di soal ada kata \"got\", pasangannya pasti <b>haven't / hasn't</b>. Kalau mau pakai \"don't / doesn't\", kata \"got\" nya harus dibuang.<br><br>💡 <b>RUMUS KILAT</b>:<br>Pakai got ➡️ <b>haven't / hasn't got</b><br>Tanpa got ➡️ <b>don't / doesn't have</b>",
+        "rule": "“I”, “you”, “we”, “they” pakai “have got”. “He”, “she”, “it” pakai “has got”. Untuk bertanya, “have/has” pindah ke depan. Negatifnya “haven't/hasn't got”.",
         "memory": "“I haven't got”, tapi “she hasn't got”.",
         "avoid": "Cari subjeknya dulu: “he”, “she”, “it” pakai “has”, yang lain pakai “have”. Jangan tambah “do”."
       }
@@ -12252,7 +12252,7 @@
       ],
       "explain": {
         "why": "Kursi kosongnya ada di sampingku, jadi pakai “next to”.",
-        "rule": "Kalau di dalam ruangan tertutup atau wilayah luas (kota, negara, wadah): Pakai “in”. Contoh: <b>in the classroom</b> (di dalam kelas), <b>in Jakarta</b>, <b>in the fridge</b> (di dalam kulkas).<br>Kalau menempel di atas permukaan, nama jalan (tanpa nomor), atau lantai gedung: Pakai “on”. Contoh: <b>on the table</b> (di atas meja), <b>on Sudirman Street</b>, <b>on the second floor</b> (di lantai dua).<br>Kalau titik lokasi tertentu, tempat kegiatan, atau alamat bernomor: Pakai “at”. Contoh: <b>at the bus stop</b> (di halte bus), <b>at school</b>, <b>at 25 Merdeka Street</b>.<br><br>💡 <b>RUMUS KILAT</b>:<br>Di dalam ruangan tertutup / area luas (kota/negara) ➡️ Pakai <b>in</b>.<br>Di atas permukaan / nama jalan tanpa nomor / lantai ➡️ Pakai <b>on</b>.<br>Titik lokasi tepat / alamat bernomor rumah ➡️ Pakai <b>at</b>.",
+        "rule": "“In” artinya di dalam, “on” artinya menempel di permukaan, “under” artinya di bawah, dan “next to” artinya di samping. Contoh: “in the box”, “on the wall”.",
         "memory": "Di sampingmu, di kursi sebelah: “next to”.",
         "avoid": "Bayangkan dulu posisinya: di dalam, di permukaan, di bawah, atau di samping?"
       }
@@ -12290,7 +12290,7 @@
       ],
       "explain": {
         "why": "Pensil yang jatuh ada di lantai, di bawah kursi, jadi pakai “under”.",
-        "rule": "Kalau di dalam ruangan tertutup atau wilayah luas (kota, negara, wadah): Pakai “in”. Contoh: <b>in the classroom</b> (di dalam kelas), <b>in Jakarta</b>, <b>in the fridge</b> (di dalam kulkas).<br>Kalau menempel di atas permukaan, nama jalan (tanpa nomor), atau lantai gedung: Pakai “on”. Contoh: <b>on the table</b> (di atas meja), <b>on Sudirman Street</b>, <b>on the second floor</b> (di lantai dua).<br>Kalau titik lokasi tertentu, tempat kegiatan, atau alamat bernomor: Pakai “at”. Contoh: <b>at the bus stop</b> (di halte bus), <b>at school</b>, <b>at 25 Merdeka Street</b>.<br><br>💡 <b>RUMUS KILAT</b>:<br>Di dalam ruangan tertutup / area luas (kota/negara) ➡️ Pakai <b>in</b>.<br>Di atas permukaan / nama jalan tanpa nomor / lantai ➡️ Pakai <b>on</b>.<br>Titik lokasi tepat / alamat bernomor rumah ➡️ Pakai <b>at</b>.",
+        "rule": "“In” artinya di dalam, “on” artinya menempel di permukaan, “under” artinya di bawah, dan “next to” artinya di samping. Contoh: “in the box”, “on the wall”.",
         "memory": "Barangnya jatuh? Cari di bawah: “under”.",
         "avoid": "Bayangkan dulu posisinya: di dalam, di permukaan, di bawah, atau di samping?"
       }
@@ -12632,7 +12632,7 @@
       ],
       "explain": {
         "why": "Sesudah “can”, kata kerjanya bentuk dasar tanpa tambahan, jadi “can count”.",
-        "rule": "Kalau bisa melakukan sesuatu: Pakai “can” + kata kerja dasar polos tanpa tambahan apa pun. Contoh: <b>My sister can swim</b> (Bukan “she cans” dan bukan “can to swim”).<br>Kalau nggak bisa melakukan sesuatu: Pakai “can't” (cannot) + kata kerja dasar. Contoh: <b>I can't ride a bike</b> (Bukan “don't can”).<br><br>💡 <b>RUMUS KILAT</b>:<br>Bisa / mampu ➡️ <b>can + kata kerja dasar</b> (polos, tanpa -s dan tanpa to).<br>Nggak bisa ➡️ <b>can't + kata kerja dasar</b>.<br>Semua subjek sama ➡️ Tetap pakai <b>can</b> tanpa ditambah akhiran apa pun.",
+        "rule": "“Can” + kata kerja dasar, sama untuk semua subjek: “I can swim”, “she can swim”. Negatifnya “can't swim”. Untuk bertanya: “Can you swim?”",
         "memory": "“Can” + kata kerja bentuk dasar: “can count”, “can swim”.",
         "avoid": "Sesudah “can” atau “can't”, tulis kata kerjanya persis seperti di kamus: tanpa “to”, tanpa -s, tanpa -ing."
       }
@@ -12670,7 +12670,7 @@
       ],
       "explain": {
         "why": "Nadia nggak bisa main gitar, jadi pakai “can't” + kata kerja dasar. Hasilnya “can't play”.",
-        "rule": "Kalau bisa melakukan sesuatu: Pakai “can” + kata kerja dasar polos tanpa tambahan apa pun. Contoh: <b>My sister can swim</b> (Bukan “she cans” dan bukan “can to swim”).<br>Kalau nggak bisa melakukan sesuatu: Pakai “can't” (cannot) + kata kerja dasar. Contoh: <b>I can't ride a bike</b> (Bukan “don't can”).<br><br>💡 <b>RUMUS KILAT</b>:<br>Bisa / mampu ➡️ <b>can + kata kerja dasar</b> (polos, tanpa -s dan tanpa to).<br>Nggak bisa ➡️ <b>can't + kata kerja dasar</b>.<br>Semua subjek sama ➡️ Tetap pakai <b>can</b> tanpa ditambah akhiran apa pun.",
+        "rule": "“Can” + kata kerja dasar, sama untuk semua subjek: “I can swim”, “she can swim”. Negatifnya “can't swim”. Untuk bertanya: “Can you swim?”",
         "memory": "Nggak bisa? Cukup tambah n't: “can't play”.",
         "avoid": "Sesudah “can” atau “can't”, tulis kata kerjanya persis seperti di kamus: tanpa “to”, tanpa -s, tanpa -ing."
       }
@@ -12708,7 +12708,7 @@
       ],
       "explain": {
         "why": "Nenek masih mampu naik sepeda, jadi pakai “can” + kata kerja dasar. “Can” nggak pernah berubah bentuk.",
-        "rule": "Kalau bisa melakukan sesuatu: Pakai “can” + kata kerja dasar polos tanpa tambahan apa pun. Contoh: <b>My sister can swim</b> (Bukan “she cans” dan bukan “can to swim”).<br>Kalau nggak bisa melakukan sesuatu: Pakai “can't” (cannot) + kata kerja dasar. Contoh: <b>I can't ride a bike</b> (Bukan “don't can”).<br><br>💡 <b>RUMUS KILAT</b>:<br>Bisa / mampu ➡️ <b>can + kata kerja dasar</b> (polos, tanpa -s dan tanpa to).<br>Nggak bisa ➡️ <b>can't + kata kerja dasar</b>.<br>Semua subjek sama ➡️ Tetap pakai <b>can</b> tanpa ditambah akhiran apa pun.",
+        "rule": "“Can” + kata kerja dasar, sama untuk semua subjek: “I can swim”, “she can swim”. Negatifnya “can't swim”. Untuk bertanya: “Can you swim?”",
         "memory": "“Can” nggak pernah berubah: “I can”, “she can”, “they can”.",
         "avoid": "Sesudah “can” atau “can't”, tulis kata kerjanya persis seperti di kamus: tanpa “to”, tanpa -s, tanpa -ing."
       }
@@ -13544,7 +13544,7 @@
       ],
       "explain": {
         "why": "Mangkuknya milik si kucing, satu pemilik, jadi “cat” ditambah 's.",
-        "rule": "Dalam bahasa Inggris, menyatakan kepemilikan orang TIDAK BISA cuma menggabungkan dua kata seperti bahasa Indonesia (salah: <i>Sinta bag</i> ❌ atau <i>Sinta her bag</i> ❌).<br>Kalau pemiliknya orang tunggal: Tambahkan tanda petik dan s (<b>'s</b>) pada nama pemiliknya sebelum barang yang dimiliki. Contoh: <b>Sinta's bag</b> (tas milik Sinta), <b>my father's car</b> (mobil ayahku).<br>Kalau pemiliknya jamak dan sudah berakhiran huruf -s: Cukup tambahkan tanda petik di paling ujung (<b>s'</b>). Contoh: <b>the students' books</b> (buku-buku para murid).<br><br>💡 <b>RUMUS KILAT</b>:<br>Pemilik tunggal ➡️ Beri akhiran <b>'s</b> pada nama pemilik (contoh: <i>Budi's phone</i>).<br>Pemilik jamak berakhiran -s ➡️ Cukup beri tanda petik di ujung kata <b>-s'</b> (contoh: <i>the teachers' room</i>).<br>Pantangan ➡️ Dilarang menempelkan nama langsung (<i>Budi phone</i> ❌) atau mendobelkan kata ganti (<i>Budi his phone</i> ❌).",
+        "rule": "Pemilik + 's + barangnya (“Sinta's bag”). Pemilik jamak berakhiran s cukup ditambah apostrof (“my parents' car”). Jamak tanpa s tetap 's (“children's”).",
         "memory": "Pemilik + 's + barang: “the cat's bowl”.",
         "avoid": "Cari pemiliknya dulu. Satu pemilik? Tambah 's. Lebih dari satu dan berakhiran s? Cukup tambah apostrof."
       }
@@ -13582,7 +13582,7 @@
       ],
       "explain": {
         "why": "“Two brothers” jamak dan sudah berakhiran s, jadi cukup tambah apostrof sesudah huruf s.",
-        "rule": "Dalam bahasa Inggris, menyatakan kepemilikan orang TIDAK BISA cuma menggabungkan dua kata seperti bahasa Indonesia (salah: <i>Sinta bag</i> ❌ atau <i>Sinta her bag</i> ❌).<br>Kalau pemiliknya orang tunggal: Tambahkan tanda petik dan s (<b>'s</b>) pada nama pemiliknya sebelum barang yang dimiliki. Contoh: <b>Sinta's bag</b> (tas milik Sinta), <b>my father's car</b> (mobil ayahku).<br>Kalau pemiliknya jamak dan sudah berakhiran huruf -s: Cukup tambahkan tanda petik di paling ujung (<b>s'</b>). Contoh: <b>the students' books</b> (buku-buku para murid).<br><br>💡 <b>RUMUS KILAT</b>:<br>Pemilik tunggal ➡️ Beri akhiran <b>'s</b> pada nama pemilik (contoh: <i>Budi's phone</i>).<br>Pemilik jamak berakhiran -s ➡️ Cukup beri tanda petik di ujung kata <b>-s'</b> (contoh: <i>the teachers' room</i>).<br>Pantangan ➡️ Dilarang menempelkan nama langsung (<i>Budi phone</i> ❌) atau mendobelkan kata ganti (<i>Budi his phone</i> ❌).",
+        "rule": "Pemilik + 's + barangnya (“Sinta's bag”). Pemilik jamak berakhiran s cukup ditambah apostrof (“my parents' car”). Jamak tanpa s tetap 's (“children's”).",
         "memory": "Pemilik jamak berakhiran s cukup ditambah apostrof.",
         "avoid": "Cari pemiliknya dulu. Satu pemilik? Tambah 's. Lebih dari satu dan berakhiran s? Cukup tambah apostrof."
       }
@@ -13620,7 +13620,7 @@
       ],
       "explain": {
         "why": "“Children” sudah jamak tapi nggak berakhiran s, jadi tetap ditambah 's.",
-        "rule": "Dalam bahasa Inggris, menyatakan kepemilikan orang TIDAK BISA cuma menggabungkan dua kata seperti bahasa Indonesia (salah: <i>Sinta bag</i> ❌ atau <i>Sinta her bag</i> ❌).<br>Kalau pemiliknya orang tunggal: Tambahkan tanda petik dan s (<b>'s</b>) pada nama pemiliknya sebelum barang yang dimiliki. Contoh: <b>Sinta's bag</b> (tas milik Sinta), <b>my father's car</b> (mobil ayahku).<br>Kalau pemiliknya jamak dan sudah berakhiran huruf -s: Cukup tambahkan tanda petik di paling ujung (<b>s'</b>). Contoh: <b>the students' books</b> (buku-buku para murid).<br><br>💡 <b>RUMUS KILAT</b>:<br>Pemilik tunggal ➡️ Beri akhiran <b>'s</b> pada nama pemilik (contoh: <i>Budi's phone</i>).<br>Pemilik jamak berakhiran -s ➡️ Cukup beri tanda petik di ujung kata <b>-s'</b> (contoh: <i>the teachers' room</i>).<br>Pantangan ➡️ Dilarang menempelkan nama langsung (<i>Budi phone</i> ❌) atau mendobelkan kata ganti (<i>Budi his phone</i> ❌).",
+        "rule": "Pemilik + 's + barangnya (“Sinta's bag”). Pemilik jamak berakhiran s cukup ditambah apostrof (“my parents' car”). Jamak tanpa s tetap 's (“children's”).",
         "memory": "Jamak tanpa akhiran s tetap ditambah 's: “children's”, “men's”.",
         "avoid": "Cari pemiliknya dulu. Satu pemilik? Tambah 's. Lebih dari satu dan berakhiran s? Cukup tambah apostrof."
       }
@@ -13658,7 +13658,7 @@
       ],
       "explain": {
         "why": "Jawabannya menyebut pemiliknya, Maya, jadi namanya ditambah 's walaupun nggak ada kata benda sesudahnya.",
-        "rule": "Dalam bahasa Inggris, menyatakan kepemilikan orang TIDAK BISA cuma menggabungkan dua kata seperti bahasa Indonesia (salah: <i>Sinta bag</i> ❌ atau <i>Sinta her bag</i> ❌).<br>Kalau pemiliknya orang tunggal: Tambahkan tanda petik dan s (<b>'s</b>) pada nama pemiliknya sebelum barang yang dimiliki. Contoh: <b>Sinta's bag</b> (tas milik Sinta), <b>my father's car</b> (mobil ayahku).<br>Kalau pemiliknya jamak dan sudah berakhiran huruf -s: Cukup tambahkan tanda petik di paling ujung (<b>s'</b>). Contoh: <b>the students' books</b> (buku-buku para murid).<br><br>💡 <b>RUMUS KILAT</b>:<br>Pemilik tunggal ➡️ Beri akhiran <b>'s</b> pada nama pemilik (contoh: <i>Budi's phone</i>).<br>Pemilik jamak berakhiran -s ➡️ Cukup beri tanda petik di ujung kata <b>-s'</b> (contoh: <i>the teachers' room</i>).<br>Pantangan ➡️ Dilarang menempelkan nama langsung (<i>Budi phone</i> ❌) atau mendobelkan kata ganti (<i>Budi his phone</i> ❌).",
+        "rule": "Pemilik + 's + barangnya (“Sinta's bag”). Pemilik jamak berakhiran s cukup ditambah apostrof (“my parents' car”). Jamak tanpa s tetap 's (“children's”).",
         "memory": "Untuk menyatakan barang milik seseorang, tambahkan apostrof dan s pada namanya: “It's Maya's” (barang itu milik Maya).",
         "avoid": "Cari pemiliknya dulu. Satu pemilik? Tambah 's. Lebih dari satu dan berakhiran s? Cukup tambah apostrof."
       }
@@ -14304,7 +14304,7 @@
       ],
       "explain": {
         "why": "Sesudah “if” pakai present simple, walaupun kejadiannya besok, jadi “rains”.",
-        "rule": "Kalau fakta pasti atau hukum alam: Dua-duanya pakai kata kerja biasa tanpa “will”. Contoh: <b>If you heat ice, it melts</b> (Es dipanaskan pasti mencair).<br>Kalau kemungkinan atau rencana masa depan: Bagian “if” pakai kata kerja biasa, akibatnya pakai “will”. Contoh: <b>If it rains tomorrow, we will stay home</b> (Kalau besok hujan, kita bakal di rumah).<br><br>💡 <b>RUMUS KILAT</b>:<br>Fakta pasti / selalu benar ➡️ <b>If + Verb 1, Verb 1</b> (tanpa will).<br>Kemungkinan masa depan ➡️ <b>If + Verb 1, will + Verb 1</b>.",
+        "rule": "Selalu benar: “If” + present, present (“If you heat ice, it melts”). Akibat di masa depan: “If” + present, “will” + kata kerja. Sesudah “if” jangan pakai “will”.",
         "memory": "“If” + present, “will” + kata kerja: “If it rains, we will stay”.",
         "avoid": "Tanya: ini selalu benar, atau satu kejadian nanti? Lalu pastikan nggak ada “will” sesudah “if”."
       }
@@ -14342,7 +14342,7 @@
       ],
       "explain": {
         "why": "Merah dicampur biru selalu jadi ungu. Fakta yang selalu benar pakai present, jadi “get”.",
-        "rule": "Kalau fakta pasti atau hukum alam: Dua-duanya pakai kata kerja biasa tanpa “will”. Contoh: <b>If you heat ice, it melts</b> (Es dipanaskan pasti mencair).<br>Kalau kemungkinan atau rencana masa depan: Bagian “if” pakai kata kerja biasa, akibatnya pakai “will”. Contoh: <b>If it rains tomorrow, we will stay home</b> (Kalau besok hujan, kita bakal di rumah).<br><br>💡 <b>RUMUS KILAT</b>:<br>Fakta pasti / selalu benar ➡️ <b>If + Verb 1, Verb 1</b> (tanpa will).<br>Kemungkinan masa depan ➡️ <b>If + Verb 1, will + Verb 1</b>.",
+        "rule": "Selalu benar: “If” + present, present (“If you heat ice, it melts”). Akibat di masa depan: “If” + present, “will” + kata kerja. Sesudah “if” jangan pakai “will”.",
         "memory": "Selalu benar? Present ketemu present.",
         "avoid": "Tanya: ini selalu benar, atau satu kejadian nanti? Lalu pastikan nggak ada “will” sesudah “if”."
       }
@@ -14380,7 +14380,7 @@
       ],
       "explain": {
         "why": "Ini peringatan tentang satu akibat nanti, jadi bagian akibatnya pakai “will” + kata kerja dasar.",
-        "rule": "Kalau fakta pasti atau hukum alam: Dua-duanya pakai kata kerja biasa tanpa “will”. Contoh: <b>If you heat ice, it melts</b> (Es dipanaskan pasti mencair).<br>Kalau kemungkinan atau rencana masa depan: Bagian “if” pakai kata kerja biasa, akibatnya pakai “will”. Contoh: <b>If it rains tomorrow, we will stay home</b> (Kalau besok hujan, kita bakal di rumah).<br><br>💡 <b>RUMUS KILAT</b>:<br>Fakta pasti / selalu benar ➡️ <b>If + Verb 1, Verb 1</b> (tanpa will).<br>Kemungkinan masa depan ➡️ <b>If + Verb 1, will + Verb 1</b>.",
+        "rule": "Selalu benar: “If” + present, present (“If you heat ice, it melts”). Akibat di masa depan: “If” + present, “will” + kata kerja. Sesudah “if” jangan pakai “will”.",
         "memory": "Peringatan untuk nanti: “If you…, you will…”",
         "avoid": "Tanya: ini selalu benar, atau satu kejadian nanti? Lalu pastikan nggak ada “will” sesudah “if”."
       }
@@ -14418,7 +14418,7 @@
       ],
       "explain": {
         "why": "Ini selalu benar, jadi kedua bagiannya pakai present, dan “they” pakai “don't”.",
-        "rule": "Kalau fakta pasti atau hukum alam: Dua-duanya pakai kata kerja biasa tanpa “will”. Contoh: <b>If you heat ice, it melts</b> (Es dipanaskan pasti mencair).<br>Kalau kemungkinan atau rencana masa depan: Bagian “if” pakai kata kerja biasa, akibatnya pakai “will”. Contoh: <b>If it rains tomorrow, we will stay home</b> (Kalau besok hujan, kita bakal di rumah).<br><br>💡 <b>RUMUS KILAT</b>:<br>Fakta pasti / selalu benar ➡️ <b>If + Verb 1, Verb 1</b> (tanpa will).<br>Kemungkinan masa depan ➡️ <b>If + Verb 1, will + Verb 1</b>.",
+        "rule": "Selalu benar: “If” + present, present (“If you heat ice, it melts”). Akibat di masa depan: “If” + present, “will” + kata kerja. Sesudah “if” jangan pakai “will”.",
         "memory": "Fakta ilmiah pakai present di kedua bagian.",
         "avoid": "Tanya: ini selalu benar, atau satu kejadian nanti? Lalu pastikan nggak ada “will” sesudah “if”."
       }
@@ -14874,7 +14874,7 @@
       ],
       "explain": {
         "why": "“People” bisa dihitung, dan busnya penuh, jadi pakai “many”.",
-        "rule": "Kalau bendanya bisa dihitung satu per satu (ada bentuk jamaknya dengan akhiran -s): Pasangkan dengan “many” (banyak) atau “few” (sedikit). Contoh: <b>many chairs</b> (banyak kursi), <b>few friends</b> (sedikit teman).<br>Kalau bendanya tidak bisa dihitung satu per satu (seperti air, waktu, gula, uang): Pasangkan dengan “much” (banyak) atau “little” (sedikit). Contoh: <b>much water</b> (banyak air), <b>little time</b> (sedikit waktu).<br><br>💡 <b>RUMUS KILAT</b>:<br>Bisa dihitung satu-satu (ada akhiran jamak <b>-s</b>) ➡️ Pakai <b>many</b> (banyak) atau <b>few</b> (sedikit).<br>Nggak bisa dihitung satu per satu (cairan, bubuk, waktu) ➡️ Pakai <b>much</b> (banyak) atau <b>little</b> (sedikit).",
+        "rule": "Benda jamak yang bisa dihitung (“books”, “friends”): “many”, “few”. Benda yang nggak bisa dihitung (“water”, “money”, “time”): “much”, “little”.",
         "memory": "Orang bisa dihitung: “too many people”.",
         "avoid": "Bendanya bisa dihitung satu per satu? Bisa: “many/few”. Nggak bisa: “much/little”."
       }
@@ -14912,7 +14912,7 @@
       ],
       "explain": {
         "why": "“Water” nggak bisa dihitung, dan di kalimat negatif kita pakai “much”.",
-        "rule": "Kalau bendanya bisa dihitung satu per satu (ada bentuk jamaknya dengan akhiran -s): Pasangkan dengan “many” (banyak) atau “few” (sedikit). Contoh: <b>many chairs</b> (banyak kursi), <b>few friends</b> (sedikit teman).<br>Kalau bendanya tidak bisa dihitung satu per satu (seperti air, waktu, gula, uang): Pasangkan dengan “much” (banyak) atau “little” (sedikit). Contoh: <b>much water</b> (banyak air), <b>little time</b> (sedikit waktu).<br><br>💡 <b>RUMUS KILAT</b>:<br>Bisa dihitung satu-satu (ada akhiran jamak <b>-s</b>) ➡️ Pakai <b>many</b> (banyak) atau <b>few</b> (sedikit).<br>Nggak bisa dihitung satu per satu (cairan, bubuk, waktu) ➡️ Pakai <b>much</b> (banyak) atau <b>little</b> (sedikit).",
+        "rule": "Benda jamak yang bisa dihitung (“books”, “friends”): “many”, “few”. Benda yang nggak bisa dihitung (“water”, “money”, “time”): “much”, “little”.",
         "memory": "“Not much water”, “not many bottles”.",
         "avoid": "Bendanya bisa dihitung satu per satu? Bisa: “many/few”. Nggak bisa: “much/little”."
       }
@@ -14950,7 +14950,7 @@
       ],
       "explain": {
         "why": "“Cookies” bisa dihitung, jadi jumlah yang sedikit pakai “a few”.",
-        "rule": "Kalau bendanya bisa dihitung satu per satu (ada bentuk jamaknya dengan akhiran -s): Pasangkan dengan “many” (banyak) atau “few” (sedikit). Contoh: <b>many chairs</b> (banyak kursi), <b>few friends</b> (sedikit teman).<br>Kalau bendanya tidak bisa dihitung satu per satu (seperti air, waktu, gula, uang): Pasangkan dengan “much” (banyak) atau “little” (sedikit). Contoh: <b>much water</b> (banyak air), <b>little time</b> (sedikit waktu).<br><br>💡 <b>RUMUS KILAT</b>:<br>Bisa dihitung satu-satu (ada akhiran jamak <b>-s</b>) ➡️ Pakai <b>many</b> (banyak) atau <b>few</b> (sedikit).<br>Nggak bisa dihitung satu per satu (cairan, bubuk, waktu) ➡️ Pakai <b>much</b> (banyak) atau <b>little</b> (sedikit).",
+        "rule": "Benda jamak yang bisa dihitung (“books”, “friends”): “many”, “few”. Benda yang nggak bisa dihitung (“water”, “money”, “time”): “much”, “little”.",
         "memory": "“A few cookies”, “a little milk”.",
         "avoid": "Bendanya bisa dihitung satu per satu? Bisa: “many/few”. Nggak bisa: “much/little”."
       }
@@ -14988,7 +14988,7 @@
       ],
       "explain": {
         "why": "“Sugar” nggak bisa dihitung, jadi jumlah yang sedikit pakai “a little”.",
-        "rule": "Kalau bendanya bisa dihitung satu per satu (ada bentuk jamaknya dengan akhiran -s): Pasangkan dengan “many” (banyak) atau “few” (sedikit). Contoh: <b>many chairs</b> (banyak kursi), <b>few friends</b> (sedikit teman).<br>Kalau bendanya tidak bisa dihitung satu per satu (seperti air, waktu, gula, uang): Pasangkan dengan “much” (banyak) atau “little” (sedikit). Contoh: <b>much water</b> (banyak air), <b>little time</b> (sedikit waktu).<br><br>💡 <b>RUMUS KILAT</b>:<br>Bisa dihitung satu-satu (ada akhiran jamak <b>-s</b>) ➡️ Pakai <b>many</b> (banyak) atau <b>few</b> (sedikit).<br>Nggak bisa dihitung satu per satu (cairan, bubuk, waktu) ➡️ Pakai <b>much</b> (banyak) atau <b>little</b> (sedikit).",
+        "rule": "Benda jamak yang bisa dihitung (“books”, “friends”): “many”, “few”. Benda yang nggak bisa dihitung (“water”, “money”, “time”): “much”, “little”.",
         "memory": "“A little sugar”, “a little milk”, “a little time”.",
         "avoid": "Bendanya bisa dihitung satu per satu? Bisa: “many/few”. Nggak bisa: “much/little”."
       }
@@ -16812,7 +16812,7 @@
       ],
       "explain": {
         "why": "Telur bisa dihitung dan jawabannya angka, jadi bertanya dengan “How many”.",
-        "rule": "Kalau menanyakan jumlah benda yang bisa dihitung satu-satu: Pakai “How many” yang selalu diikuti kata benda jamak berakhiran -s. Contoh: <b>How many pens do you have?</b> (Berapa banyak pulpen yang kamu punya?).<br>Kalau menanyakan jumlah benda yang tidak bisa dihitung atau menanyakan harga barang: Pakai “How much”. Contoh: <b>How much water do you drink?</b> (Berapa banyak air yang kamu minum?) atau <b>How much is this shirt?</b> (Berapa harga baju ini?).<br><br>💡 <b>RUMUS KILAT</b>:<br>Setelah titik-titik ada kata jamak (berakhiran <b>-s</b>) ➡️ Tanya pakai <b>How many</b>.<br>Setelah titik-titik benda tak bisa dihitung (tanpa -s) atau tanya harga ➡️ Tanya pakai <b>How much</b>.",
+        "rule": "“How many” + benda jamak yang bisa dihitung (“How many eggs?”). “How much” + benda yang nggak bisa dihitung (“How much milk?”) atau harga.",
         "memory": "Bisa dihitung? “How many eggs”, “how many books”.",
         "avoid": "Lihat kata benda sesudah titik-titik: bisa dihitung satu per satu?"
       }
@@ -16850,7 +16850,7 @@
       ],
       "explain": {
         "why": "Jawabannya harga, dan harga ditanyakan dengan “How much”.",
-        "rule": "Kalau menanyakan jumlah benda yang bisa dihitung satu-satu: Pakai “How many” yang selalu diikuti kata benda jamak berakhiran -s. Contoh: <b>How many pens do you have?</b> (Berapa banyak pulpen yang kamu punya?).<br>Kalau menanyakan jumlah benda yang tidak bisa dihitung atau menanyakan harga barang: Pakai “How much”. Contoh: <b>How much water do you drink?</b> (Berapa banyak air yang kamu minum?) atau <b>How much is this shirt?</b> (Berapa harga baju ini?).<br><br>💡 <b>RUMUS KILAT</b>:<br>Setelah titik-titik ada kata jamak (berakhiran <b>-s</b>) ➡️ Tanya pakai <b>How many</b>.<br>Setelah titik-titik benda tak bisa dihitung (tanpa -s) atau tanya harga ➡️ Tanya pakai <b>How much</b>.",
+        "rule": "“How many” + benda jamak yang bisa dihitung (“How many eggs?”). “How much” + benda yang nggak bisa dihitung (“How much milk?”) atau harga.",
         "memory": "Menanyakan harga: “How much is it?”",
         "avoid": "Lihat kata benda sesudah titik-titik: bisa dihitung satu per satu?"
       }
@@ -16888,7 +16888,7 @@
       ],
       "explain": {
         "why": "Susu nggak bisa dihitung, jadi bertanya dengan “How much”.",
-        "rule": "Kalau menanyakan jumlah benda yang bisa dihitung satu-satu: Pakai “How many” yang selalu diikuti kata benda jamak berakhiran -s. Contoh: <b>How many pens do you have?</b> (Berapa banyak pulpen yang kamu punya?).<br>Kalau menanyakan jumlah benda yang tidak bisa dihitung atau menanyakan harga barang: Pakai “How much”. Contoh: <b>How much water do you drink?</b> (Berapa banyak air yang kamu minum?) atau <b>How much is this shirt?</b> (Berapa harga baju ini?).<br><br>💡 <b>RUMUS KILAT</b>:<br>Setelah titik-titik ada kata jamak (berakhiran <b>-s</b>) ➡️ Tanya pakai <b>How many</b>.<br>Setelah titik-titik benda tak bisa dihitung (tanpa -s) atau tanya harga ➡️ Tanya pakai <b>How much</b>.",
+        "rule": "“How many” + benda jamak yang bisa dihitung (“How many eggs?”). “How much” + benda yang nggak bisa dihitung (“How much milk?”) atau harga.",
         "memory": "Susu, air, gula: “How much?”",
         "avoid": "Lihat kata benda sesudah titik-titik: bisa dihitung satu per satu?"
       }
@@ -16926,7 +16926,7 @@
       ],
       "explain": {
         "why": "Air nggak bisa dihitung, jadi yang dihitung gelasnya, dan “how many” butuh bentuk jamak.",
-        "rule": "Kalau menanyakan jumlah benda yang bisa dihitung satu-satu: Pakai “How many” yang selalu diikuti kata benda jamak berakhiran -s. Contoh: <b>How many pens do you have?</b> (Berapa banyak pulpen yang kamu punya?).<br>Kalau menanyakan jumlah benda yang tidak bisa dihitung atau menanyakan harga barang: Pakai “How much”. Contoh: <b>How much water do you drink?</b> (Berapa banyak air yang kamu minum?) atau <b>How much is this shirt?</b> (Berapa harga baju ini?).<br><br>💡 <b>RUMUS KILAT</b>:<br>Setelah titik-titik ada kata jamak (berakhiran <b>-s</b>) ➡️ Tanya pakai <b>How many</b>.<br>Setelah titik-titik benda tak bisa dihitung (tanpa -s) atau tanya harga ➡️ Tanya pakai <b>How much</b>.",
+        "rule": "“How many” + benda jamak yang bisa dihitung (“How many eggs?”). “How much” + benda yang nggak bisa dihitung (“How much milk?”) atau harga.",
         "memory": "Hitung wadahnya: “glasses of water”, “cups of tea”.",
         "avoid": "Lihat kata benda sesudah titik-titik: bisa dihitung satu per satu?"
       }
@@ -17116,7 +17116,7 @@
       ],
       "explain": {
         "why": "“It was raining” adalah alasan kami tetap di dalam, jadi pakai “because”.",
-        "rule": "Kalau alasan berupa kalimat lengkap (ada Subjek + Kata Kerja): Pakai “Because” atau “Since” (karena / berhubung). Contoh: <b>We stayed home because it was raining heavily</b>.<br>Kalau alasan HANYA berupa kata benda atau frasa benda (tanpa kata kerja): Wajib pakai “Due to” atau “Because of” (disebabkan oleh / karena). Contoh: <b>The flight was delayed due to bad weather</b> (Penerbangan ditunda karena cuaca buruk).<br>Kalau menyatakan AKIBAT (kebalikan dari alasan): Pakai “so” (jadi / sehingga). Contoh: <b>It rained, so we canceled the match</b>.<br><br>💡 <b>RUMUS KILAT</b>:<br>Diikuti kalimat utuh (Subjek + Verb) ➡️ Pakai <b>Because / Since</b>.<br>Diikuti kata benda saja (Noun / Noun phrase) ➡️ Pakai <b>Due to / Because of</b>.<br>Menunjukkan akibat / hasil dari alasan sebelumnya ➡️ Pakai <b>so</b> (Pola: Alasan, <i>so</i> + Akibat).",
+        "rule": "Alasan dibuka dengan “because”, akibat dibuka dengan “so”, dan kata benda didahului “because of”.",
         "memory": "Akibat + “because” + alasan.",
         "avoid": "Tanya: bagian sesudahnya alasan atau akibat? Kalimat utuh atau cuma kata benda?"
       }
@@ -17154,7 +17154,7 @@
       ],
       "explain": {
         "why": "“The heavy rain” kata benda, bukan kalimat utuh, jadi pakai “because of”.",
-        "rule": "Kalau alasan berupa kalimat lengkap (ada Subjek + Kata Kerja): Pakai “Because” atau “Since” (karena / berhubung). Contoh: <b>We stayed home because it was raining heavily</b>.<br>Kalau alasan HANYA berupa kata benda atau frasa benda (tanpa kata kerja): Wajib pakai “Due to” atau “Because of” (disebabkan oleh / karena). Contoh: <b>The flight was delayed due to bad weather</b> (Penerbangan ditunda karena cuaca buruk).<br>Kalau menyatakan AKIBAT (kebalikan dari alasan): Pakai “so” (jadi / sehingga). Contoh: <b>It rained, so we canceled the match</b>.<br><br>💡 <b>RUMUS KILAT</b>:<br>Diikuti kalimat utuh (Subjek + Verb) ➡️ Pakai <b>Because / Since</b>.<br>Diikuti kata benda saja (Noun / Noun phrase) ➡️ Pakai <b>Due to / Because of</b>.<br>Menunjukkan akibat / hasil dari alasan sebelumnya ➡️ Pakai <b>so</b> (Pola: Alasan, <i>so</i> + Akibat).",
+        "rule": "Alasan dibuka dengan “because”, akibat dibuka dengan “so”, dan kata benda didahului “because of”.",
         "memory": "Sesudahnya kata benda? “because of the rain”.",
         "avoid": "Tanya: bagian sesudahnya alasan atau akibat? Kalimat utuh atau cuma kata benda?"
       }
@@ -17192,7 +17192,7 @@
       ],
       "explain": {
         "why": "“It was very hot” adalah alasan, dan alasan boleh ditaruh di depan dengan “Because”.",
-        "rule": "Kalau alasan berupa kalimat lengkap (ada Subjek + Kata Kerja): Pakai “Because” atau “Since” (karena / berhubung). Contoh: <b>We stayed home because it was raining heavily</b>.<br>Kalau alasan HANYA berupa kata benda atau frasa benda (tanpa kata kerja): Wajib pakai “Due to” atau “Because of” (disebabkan oleh / karena). Contoh: <b>The flight was delayed due to bad weather</b> (Penerbangan ditunda karena cuaca buruk).<br>Kalau menyatakan AKIBAT (kebalikan dari alasan): Pakai “so” (jadi / sehingga). Contoh: <b>It rained, so we canceled the match</b>.<br><br>💡 <b>RUMUS KILAT</b>:<br>Diikuti kalimat utuh (Subjek + Verb) ➡️ Pakai <b>Because / Since</b>.<br>Diikuti kata benda saja (Noun / Noun phrase) ➡️ Pakai <b>Due to / Because of</b>.<br>Menunjukkan akibat / hasil dari alasan sebelumnya ➡️ Pakai <b>so</b> (Pola: Alasan, <i>so</i> + Akibat).",
+        "rule": "Alasan dibuka dengan “because”, akibat dibuka dengan “so”, dan kata benda didahului “because of”.",
         "memory": "Alasan di depan: “Because it was hot, we swam”.",
         "avoid": "Tanya: bagian sesudahnya alasan atau akibat? Kalimat utuh atau cuma kata benda?"
       }
