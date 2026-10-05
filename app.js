@@ -13279,7 +13279,7 @@ function renderGrammarLesson(skill){const meta=GRAMMAR_ITEMS.find(x=>x.skill===s
   const lessonPawReady=(()=>{try{return !!self.FiezelPaw?.ready?.()}catch(_){return false}})();
   const lessonFace=lessonPawReady?'<fiezel-mascot class="lesson-mascot"></fiezel-mascot>':'<span class="fz-i" data-fz-icon="paw"></span>';
   const lessonPaw=`<div class="lesson-stage" aria-hidden="true"><span class="lesson-stage-paw">${lessonFace}</span><span class="lesson-bubble"><b>${esc(friendlySkillName(skill))}</b></span></div>`;
-  setApp(`<section class="fade grammar-lesson-page"><div class="skill-page-topbar"><button type="button" class="skill-back-btn" onclick="exitStage()"><i data-lucide="arrow-left"></i> <span>${FiezelI18n.t('grammar.kembali-grammar-hub')}</span></button><button type="button" class="skill-help-dot" onclick="openGrammarLessonHelp('${esc(skill)}')" aria-label="${esc(FiezelI18n.t('skills.bantuan'))}" title="${esc(FiezelI18n.t('skills.bantuan'))}"><span aria-hidden="true">?</span></button></div>${card(`<div class="grammar-start-hero"><span class="grammar-hero-badge">${esc(FiezelI18n.t('skill.grammar','TATA BAHASA').toUpperCase())} · ${esc(getActiveLevel())}</span><h2>${esc(friendlySkillName(skill))}</h2><p class="grammar-brief-rule">${esc(rule)}</p>${(()=>{/* Audit UX grammar U12: aturan abstrak tanpa contoh sulit dipahami murid A1. Satu kalimat dari soal pertama pelajaran ini, kata kuncinya ditebalkan. */const kalimat=String(base||'');if(!correct||!/_{2,}|\[\.\.\.\]/.test(kalimat))return '';const [kiri,kanan]=kalimat.split(/_{2,}|\[\.\.\.\]/);return `<p class="grammar-brief-example"><span>${esc(FiezelI18n.t('grammar.contoh-singkat'))}</span> ${esc(kiri)}<b>${esc(correct)}</b>${esc(kanan||'')}</p>`})()}<button onclick="practiceSkill('${esc(skill)}')" class="primary grammar-start-direct-btn">${FiezelI18n.t('grammar.start-item',{jumlahSoal:grammarLessonSessionTarget(skill)})} <i data-lucide="arrow-right"></i></button></div>`,'grammar-lesson-card')}</section>`);
+  setApp(`<section class="fade grammar-lesson-page"><div class="skill-page-topbar"><button type="button" class="skill-back-btn" onclick="exitStage()"><i data-lucide="arrow-left"></i> <span>${FiezelI18n.t('grammar.kembali-grammar-hub')}</span></button><button type="button" class="skill-help-dot" onclick="openGrammarLessonHelp('${esc(skill)}')" aria-label="${esc(FiezelI18n.t('skills.bantuan'))}" title="${esc(FiezelI18n.t('skills.bantuan'))}"><span aria-hidden="true">?</span></button></div>${card(`<div class="grammar-start-hero"><span class="grammar-hero-badge">${esc(FiezelI18n.t('skill.grammar','TATA BAHASA').toUpperCase())} · ${esc(getActiveLevel())}</span><h2>${esc(friendlySkillName(skill))}</h2><p class="grammar-brief-rule">${formatRuleForDisplay(esc(rule))}</p>${(()=>{/* Audit UX grammar U12: aturan abstrak tanpa contoh sulit dipahami murid A1. Satu kalimat dari soal pertama pelajaran ini, kata kuncinya ditebalkan. */const kalimat=String(base||'');if(!correct||!/_{2,}|\[\.\.\.\]/.test(kalimat))return '';const [kiri,kanan]=kalimat.split(/_{2,}|\[\.\.\.\]/);return `<p class="grammar-brief-example"><span>${esc(FiezelI18n.t('grammar.contoh-singkat'))}</span> ${esc(kiri)}<b>${esc(correct)}</b>${esc(kanan||'')}</p>`})()}<button onclick="practiceSkill('${esc(skill)}')" class="primary grammar-start-direct-btn">${FiezelI18n.t('grammar.start-item',{jumlahSoal:grammarLessonSessionTarget(skill)})} <i data-lucide="arrow-right"></i></button></div>`,'grammar-lesson-card')}</section>`);
   enhanceUI()}
 /* m025-375: SESI LESSON = GRAMMAR_LESSON_MODES, bergilir antar-templat.
  * Pengganti seleksi mode-coverage-first (m025-155) yang wajib mengisi ke-25 mode. Putaran k
@@ -14016,6 +14016,7 @@ function formatRuleForDisplay(txt) {
   s = s.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
   return s;
 }
+if (typeof self !== 'undefined') self.formatRuleForDisplay = formatRuleForDisplay;
 
 function grammarLessonExplain(item,why,distractors,familyRule,focus,mode='',targetWord='',correctWord=''){
   const meta=grammarMeta(item),own=v=>String(v||'').trim();
@@ -15747,7 +15748,7 @@ function quizLoop(cfg){
   answer.locked=true;
   $('quizNext').disabled=false;
   if(input)input.classList.add(ok?'correct':'wrong');
-  
+
   /* m025-186 (A16-F1): tanpa titipan ini, kedua tombol popup jatuh ke quizNext.click()
      dan MELOMPATI pembahasan yang barusan dicat. Kelanjutannya cukup menutup popup dan
      mengantar mata ke panel pembahasan di baliknya - persis yang dijanjikan tombolnya. */

@@ -4,7 +4,7 @@
   "explains": {
     "TA-001-cz0": {
       "why": "“Look!” dan “right now. You can smell it” nunjuk kejadian yang lagi jalan. Jadi “is preparing” yang pas.",
-      "rule": "Kejadian yang lagi jalan pakai am, is, atau are + kata kerja -ing. Kebiasaan yang berulang pakai bentuk sekarang biasa.",
+      "rule": "Bedakan RUTINITAS vs SEDANG BERLANGSUNG:<br>1. Rutinitas / kebiasaan berulang: Pakai Present Simple (Verb 1). Ditandai kata: every day, always, usually.<br>2. Sedang berlangsung saat ini: Pakai Present Continuous (am/is/are + Verb-ing). Ditandai kata: right now, at the moment, Look!, Listen!<br><br>💡 <b>RUMUS KILAT</b>:<br>Sedang terjadi SEKARANG ➡️ Pakai <b>am/is/are + Verb-ing</b> (contoh: <i>is eating right now</i>).<br>Kebiasaan / jadwal rutin ➡️ Pakai <b>Verb 1 (-s/-es)</b> (contoh: <i>eats every day</i>).<br>State verbs (know, like, want, understand) ➡️ Selalu pakai Present Simple, tidak boleh pakai -ing!",
       "memory": "Ada “Look!”, berarti lihat bentuk -ing-nya.",
       "avoid": "Tulis bentuk lengkapnya, jangan hanya kata dasarnya."
     },
@@ -16,7 +16,7 @@
     },
     "TA-003-cz0": {
       "why": "“Will” dipakai buat keputusan yang baru diambil pas ngomong, misalnya nawarin bantuan.",
-      "rule": "Pakai “will” buat keputusan mendadak dan tawaran bantuan. Pakai present continuous atau “going to” buat rencana yang udah disusun lebih dulu.",
+      "rule": "Membedakan rencana masa depan vs keputusan spontan / tebakan:<br>• “be going to” dipakai untuk rencana atau niat yang sudah diputuskan sebelumnya, atau ada bukti nyata di depan mata.<br>• “will” dipakai untuk keputusan spontan yang baru diambil saat berbicara, janji, atau tebakan tanpa bukti.<br><br>💡 <b>RUMUS KILAT</b>:<br>Sudah direncanakan / ada bukti di depan mata ➡️ Pakai <b>am/is/are going to</b>.<br>Keputusan mendadak / tawaran / tebakan pribadi ➡️ Pakai <b>will + Verb 1</b>.<br>Setelah keduanya ➡️ Kata kerja selalu kembali ke <b>Verb 1 polos</b>.",
       "memory": "Keputusan yang seketika, pakai “will” seketika.",
       "avoid": "Tulis bentuk lengkapnya, jangan hanya kata dasarnya."
     },
@@ -46,13 +46,13 @@
     },
     "PA-001-cz0": {
       "why": "Pasif tanpa bagian “by” lebih pas kalau pelakunya nggak diketahui atau nggak penting.",
-      "rule": "Kalimat pasif dibentuk dari be + bentuk ketiga kata kerja (past participle). Bagian “by + pelaku” dibuang kalau pelakunya nggak diketahui, udah jelas, atau nggak penting.",
+      "rule": "Kalau kalimat aktif (pelaku melakukan aksi): Subjek di depan mengerjakan sesuatu. Contoh: <b>Budi repaired the bike</b> (Budi memperbaiki sepeda).<br>Kalau kalimat pasif (subjek yang kena aksi / berawalan di- atau ter-): Wajib ada bentuk “be” (is/am/are atau was/were) + kata kerja bentuk ketiga (Verb 3). Contoh: <b>The bike was repaired by Budi</b> (Sepeda diperbaiki oleh Budi).<br><br>💡 <b>RUMUS KILAT</b>:<br>Kalimat aktif (me-) ➡️ Subjek melakukan aksi (contoh: <i>They built the house</i>).<br>Kalimat pasif (di-/ter-) ➡️ Wajib pakai <b>am/is/are/was/were + Verb 3</b> (contoh: <i>The house was built</i>).<br>Waktu sekarang pakai <b>is/am/are + Verb 3</b>, waktu lampau pakai <b>was/were + Verb 3</b>.",
       "memory": "Kalau nggak tahu siapa pelakunya, buang “by”-nya.",
       "avoid": "Tulis bentuk lengkapnya, jangan hanya kata dasarnya."
     },
     "RS-001-cz0": {
       "why": "Kata pelapornya “said” dan keterangan “Yesterday” naruh laporannya di lampau, dan keadaannya udah lewat. Jadi “am” mundur jadi “was”.",
-      "rule": "Kalau laporannya netral atau isinya udah nggak berlaku, tense-nya mundur satu langkah. Present simple jadi past simple. Present continuous jadi past continuous. Present perfect jadi past perfect.",
+      "rule": "Kalau kalimat langsung (Direct): Memakai tanda petik persis saat diucapkan. Contoh: <i>He said, “I am happy”</i>.<br>Kalau dilaporkan kembali (Reported Speech) dengan kata pengantar lampau (said / told): Waktu ucapannya wajib mundur satu langkah ke masa lalu (backshift). Verb 1 mundur jadi Verb 2, “am/is” jadi “was”, “will” jadi “would”, dan “can” jadi “could”. Contoh: <b>He said that he was happy</b>.<br>Beda Say vs Tell: Kalau pakai “said”, langsung kalimatnya (<i>She said that...</i>). Kalau pakai “told”, WAJIB sebut orang yang diajak bicara (<i>She told me that...</i>).<br><br>💡 <b>RUMUS KILAT</b>:<br>Kata pelapor lampau (said/told) ➡️ Tenses di dalamnya <b>mundur satu langkah</b> (V1 ➡️ V2, will ➡️ would, can ➡️ could).<br>Ada orang yang diajak bicara ➡️ Pakai <b>told + orang</b> (contoh: <i>told me</i>, bukan <i>said me</i> ❌).<br>Tanpa menyebut orang ➡️ Pakai <b>said (that)</b>.",
       "memory": "Laporan yang netral biasanya mundur satu langkah.",
       "avoid": "Tulis bentuk lengkapnya, jangan hanya kata dasarnya."
     },
@@ -142,13 +142,13 @@
     },
     "PA-003-cz0": {
       "why": "Pasif “get” khas bahasa santai. Biasanya buat kejadian nggak enak yang datang tiba-tiba. Itu pas sama nada seruan di kalimat ini.",
-      "rule": "Kalau kalimat aktif (pelaku melakukan aksi): Subjek di depan mengerjakan sesuatu. Contoh: <b>Budi repaired the bike</b> (Budi memperbaiki sepeda).<br>Kalau kalimat pasif (subjek yang kena aksi / berawalan di- atau ter-): Wajib ada bentuk “be” (is/am/are atau was/were) + kata kerja bentuk ketiga (Verb 3). Contoh: <b>The bike was repaired by Budi</b> (Sepeda diperbaiki oleh Budi). Pada percakapan santai, kata “be” kadang diganti “get” (contoh: <b>get paid</b>, <b>got caught</b>).<br><br>💡 <b>RUMUS KILAT</b>:<br>Kalimat aktif (me-) ➡️ Subjek melakukan aksi (contoh: <i>They built the house</i>).<br>Kalimat pasif (di-/ter-) ➡️ Wajib pakai <b>am/is/are/was/were + Verb 3</b> (contoh: <i>The house was built</i>).<br>Waktu sekarang pakai <b>is/am/are + Verb 3</b>, waktu lampau pakai <b>was/were + Verb 3</b>.",
+      "rule": "Kalimat pasif baku (formal / umum): Menggunakan bentuk “be” (is/am/are atau was/were) + Verb 3. Contoh: <b>The bridge was built in 1990</b> atau <b>The document was signed</b>.<br>Kalimat pasif santai (informal / percakapan): Menggunakan “get” + Verb 3, khusus untuk kejadian yang mendadak, tidak disengaja, sial, atau melibatkan aksi fisik. Contoh: <b>He got hurt</b> (Dia terluka), <b>The thief got caught</b> (Pencurinya tertangkap), atau <b>get paid</b> (gajian).<br><br>💡 <b>RUMUS KILAT</b>:<br>Situasi resmi, benda mati, atau umum ➡️ Pakai <b>be (am/is/are/was/were) + Verb 3</b>.<br>Percakapan santai, kejadian mendadak/sial/fisik ➡️ Pakai <b>get / got + Verb 3</b> (contoh: <i>got fired, get hurt</i>).<br>Perhatikan waktu ➡️ Waktu lampau pakai <b>got + Verb 3</b>, waktu sekarang pakai <b>get/gets + Verb 3</b>.",
       "memory": "Santai, mendadak, dan nggak enak: pakai pasif “get”.",
       "avoid": "Tulis bentuk lengkapnya, jangan hanya kata dasarnya."
     },
     "RS-002-cz0": {
       "why": "Pertanyaan yang dilaporin ngelepas susunan balik dan tanda tanyanya. Urutannya jadi kayak pernyataan, kata kerjanya mundur.",
-      "rule": "Kalau pertanyaan langsung (Direct): Menggunakan susunan tanya dengan kata bantu di depan. Contoh: <i>“Do you like milk?”</i> atau <i>“Where do you live?”</i>.<br>Kalau dilaporkan kembali (Reported Question): Bentuk kalimatnya BERUBAH jadi kalimat berita biasa (Subjek + Kata Kerja) tanpa kata bantu do/does/did dan tanpa tanda tanya.<br>Pertanyaan Ya/Tidak: Sambung dengan “if” atau “whether” (artinya “apakah”). Contoh: <b>He asked me if I liked milk</b> (Bukan <i>if did I like</i> ❌).<br>Pertanyaan kata tanya (WH-): Pakai kata tanya itu lalu ikuti subjek + kata kerja lampau. Contoh: <b>She asked where I lived</b> (Bukan <i>where did I live</i> ❌).<br><br>💡 <b>RUMUS KILAT</b>:<br>Pertanyaan Ya/Tidak ➡️ Pakai <b>asked + if / whether + Subjek + Verb</b>.<br>Urutan kata ➡️ Wajib susunan kalimat biasa: <b>Subjek dulu, baru kata kerja</b> (dilarang pakai do/does/did!).<br>Tenses ➡️ Tetap mundur ke masa lalu (contoh: <i>is</i> jadi <i>was</i>, <i>like</i> jadi <i>liked</i>).",
+      "rule": "Kalau pertanyaan kata tanya (WH- Questions seperti Where, What, Why, How):<br>Dalam kalimat langsung: Kata tanya diikuti kata bantu. Contoh: <i>“Where is the station?”</i> atau <i>“What did you buy?”</i>.<br>Saat dilaporkan kembali (Reported Question): Kata tanyanya tetap dipakai, tetapi susunan setelahnya BERUBAH menjadi susunan kalimat positif biasa: <b>Kata Tanya + Subjek + Kata Kerja</b> (tanpa tanda tanya dan tanpa kata bantu do/does/did). Contoh: <b>She asked where the station was</b> atau <b>He asked what I had bought</b>.<br><br>💡 <b>RUMUS KILAT</b>:<br>Susunan setelah kata tanya (WH-) ➡️ <b>Kata Tanya + Subjek + Kata Kerja</b> (bukan susunan tanya!).<br>Dilarang pakai kata bantu tanya ➡️ Jangan pakai <i>do/does/did</i> setelah kata tanya dalam reported question.<br>Tenses mundur ➡️ Kata kerjanya tetap mundur ke masa lalu.",
       "memory": "Pertanyaan yang dilaporin bunyinya kayak pernyataan.",
       "avoid": "Setelah kata kerja pelapornya, susun ulang anak kalimatnya kayak kalimat pernyataan."
     },
@@ -178,7 +178,7 @@
     },
     "GI-003-cz0": {
       "why": "“To have time to prepare” bilang alasan dia balik awal. Itu memang tugas bentuk to.",
-      "rule": "Kalau kata kerja berada persis SETELAH kata depan (preposisi seperti <i>at, in, on, of, for, about, without, before, after</i>): Kata kerjanya WAJIB bentuk -ing (Gerund)! Contoh: <b>She is good at drawing</b> (Dia jago menggambar — bukan <i>at draw</i> ❌), <b>Thank you for helping me</b> (Terima kasih sudah membantuku).<br>Bandingkan dengan menyatakan tujuan langsung: Pakai “to + kata kerja dasar” (contoh: <b>I came to meet you</b>). Tapi kalau diawali kata depan biasa, pantang memakai kata kerja polos!<br><br>💡 <b>RUMUS KILAT</b>:<br>Persis setelah kata depan (<i>at, in, on, of, for, about, without, by</i>) ➡️ Kata kerja WAJIB <b>Verb-ing</b>.<br>Dilarang keras ➡️ Menaruh kata kerja polos (<i>good at sing</i> ❌) atau mendobelkan <i>to</i> (<i>good at to sing</i> ❌).<br>Menyatakan tujuan langsung ➡️ Pakai <b>to + kata kerja dasar</b>.",
+      "rule": "Beda tujuan (Infinitive of Purpose) vs setelah kata depan (Preposition + Gerund):<br>1. Menyatakan tujuan langsung (“untuk/supaya”): Gunakan <b>to + kata kerja dasar</b>. Contoh: <b>I went to the store to buy milk</b> (Bukan <i>for buy</i> ❌ dan bukan <i>for buying</i> ❌).<br>2. Setelah kata depan selain 'to' (seperti for, about, without, after): Kata kerja wajib memakai akhiran <b>-ing</b>. Contoh: <b>This tool is used for cutting paper</b>.<br><br>💡 <b>RUMUS KILAT</b>:<br>Menyatakan tujuan seseorang melakukan aksi ➡️ <b>to + Verb 1</b> polos (contoh: <i>came to help</i>).<br>Setelah kata depan umum (for, without, about, by) ➡️ <b>kata depan + Verb-ing</b>.<br>Pantangan ➡️ Dilarang memakai <i>for + Verb 1</i> (salah: <i>came for help you</i> ❌).",
       "memory": "Tujuan cukup “to” plus kata kerja, tanpa kata depan.",
       "avoid": "Tulis bentuk lengkapnya, jangan hanya kata dasarnya."
     },
@@ -244,7 +244,7 @@
     },
     "CO-006-cz0": {
       "why": "“Had I known” itu bentuk formal terbalik dari “If I had known”, biasa dipakai di third conditional ragam formal.",
-      "rule": "Kalau susunan normal: Keterangan waktu ditaruh di tengah kalimat. Contoh: <b>I have never seen such a view</b> (Aku belum pernah melihat pemandangan seperti itu).<br>Kalau susunan inversi (pembalikan untuk penekanan dramatis): Ketika kata keterangan negatif (Never, Rarely, Seldom, Hardly, Not only) atau frasa “Only after / Only when” ditaruh di AWAL kalimat, susunan kata bantu dan subjek WAJIB DIBALIK persis seperti kalimat tanya! Contoh: <b>Never have I seen such a view</b> atau <b>Rarely did she speak</b>.<br><br>💡 <b>RUMUS KILAT</b>:<br>Kata negatif di awal (Never, Rarely, Seldom, Not only) ➡️ Wajib dibalik: <b>Kata Negatif + Kata Bantu + Subjek + Verb</b>.<br>Kalimat lampau tanpa kata bantu ➡️ Munculkan <b>did + Subjek + Verb 1</b> (contoh: <i>Rarely did he come</i>).<br>Jangan susun normal jika kata negatif di depan ➡️ Salah besar: <i>Never I have seen</i> ❌!",
+      "rule": "Kalau pengandaian masa lalu biasa (Third Conditional): Memakai “If” + had + Verb 3. Contoh: <b>If I had known about the test, I would have studied</b> (Seandainya kemarin aku tahu ada ujian).<br>Kalau versi formal/sastra (Inversi tanpa “if”): Kata “if” DIBUANG, dan kata bantu “Had” langsung dipindahkan ke paling depan sebelum subjek! Polanya: “Had” + Subjek + Verb 3. Contoh: <b>Had I known about the test, I would have studied</b> (maknanya persis sama, tapi gaya bahasanya lebih anggun dan formal).<br><br>💡 <b>RUMUS KILAT</b>:<br>Pakai “if” ➡️ <b>If + Subjek + had + Verb 3</b>.<br>Tanpa “if” (inversi pengandaian lampau) ➡️ <b>Had + Subjek + Verb 3</b> (kata 'if' dilarang muncul!).<br>Klausa akibatnya tetap sama ➡️ Tetap memakai <b>would have + Verb 3</b>.",
       "memory": "Buang “if”, balik urutannya: “Had I known” sama dengan “If I had known”.",
       "avoid": "Tulis bentuk lengkapnya, jangan hanya kata dasarnya."
     },
@@ -262,7 +262,7 @@
     },
     "PA-006-cz0": {
       "why": "Kebijakan itulah yang kena tindakan ngumumin, jadi bentuk to pasif “to be announced” diwajibin sesudah “is expected”.",
-      "rule": "Kalau modal di kalimat aktif: Setelah modal (can, must, should, will) langsung kata kerja dasar (Verb 1). Contoh: <b>You must sign this form</b> (Kamu harus menandatangani formulir ini).<br>Kalau modal di kalimat pasif (bermakna di- atau ter-): Setelah modal WAJIB disisipkan kata “be” polos lalu diikuti Verb 3. Contoh: <b>This form must be signed</b> (Formulir ini harus ditandatangani) atau <b>Tickets can be bought online</b> (Tiket bisa dibeli daring).<br><br>💡 <b>RUMUS KILAT</b>:<br>Aktif setelah modal ➡️ <b>modal + Verb 1</b> polos (contoh: <i>must sign</i>, <i>can do</i>).<br>Pasif setelah modal (di-/ter-) ➡️ <b>modal + be + Verb 3</b> (contoh: <i>must be signed</i>, <i>can be found</i>).<br>Kata “be” wajib bentuk dasar polos ➡️ Dilarang diubah jadi <i>is/am/are</i> atau <i>been</i> setelah modal!",
+      "rule": "Kalau setelah kata kerja yang membutuhkan infinitive (seperti <i>expect to, hope to, need to, deserve to</i>) dalam bentuk pasif:<br>Setelah kata “to”, WAJIB dipasangkan dengan “be” polos + kata kerja bentuk ketiga (Verb 3).<br>Bandingkan:<br>- Aktif: <b>I expect to meet them</b> (Aku berharap menemui mereka).<br>- Pasif: <b>Everyone expects to be treated fairly</b> (Setiap orang berharap diperlakukan secara adil — bukan <i>to treat</i> dan bukan <i>to being treated</i>).<br><br>💡 <b>RUMUS KILAT</b>:<br>Bermakna pasif (di-/ter-) setelah kata “to” ➡️ Wajib <b>to be + Verb 3</b>.<br>Bentuk aktif (melakukan aksi) ➡️ Pakai <b>to + Verb 1</b>.<br>Bentuk kata 'be' ➡️ Wajib polos <b>be</b> (dilarang pakai <i>to been</i> atau <i>to being</i>!).",
       "memory": "Kebijakannya diumumin, bukan ngumumin: “to be announced”.",
       "avoid": "Tulis bentuk lengkapnya, jangan hanya kata dasarnya."
     },
@@ -298,7 +298,7 @@
     },
     "RC-004-cz0": {
       "why": "“With whom” itu susunan formal yang bener: kata depan diikuti bentuk objek “whom” buat orang.",
-      "rule": "Kalau menjelaskan ORANG: Pakai kata penghubung “who” (atau “that”). Contoh: <b>The teacher who taught us is kind</b> (Guru yang mengajari kami sangat baik).<br>Kalau menjelaskan BENDA atau HEWAN: Pakai kata penghubung “which” (atau “that”). Contoh: <b>The phone which is on the table is mine</b> (Ponsel yang ada di meja itu milikku).<br>Trik hemat: Kalau setelah kata penghubung langsung ada subjek baru (posisinya sebagai objek), kata penghubungnya boleh dihilangkan sama sekali. Contoh: <b>The movie (that) we watched last night</b>.<br><br>💡 <b>RUMUS KILAT</b>:<br>Menjelaskan orang ➡️ Pakai <b>who</b> (atau that).<br>Menjelaskan benda / hewan ➡️ Pakai <b>which</b> (atau that).<br>Setelahnya langsung ada subjek baru ➡️ Kata penghubungnya <b>boleh dihapus</b> (contoh: <i>the song [that] you sang</i>).",
+      "rule": "Saat relative clause membutuhkan kata depan (preposisi seperti <i>to, with, for, about</i>):<br>1. Gaya Percakapan / Santai (Informal): Kata depan ditaruh di PALING BELAKANG klausa. Kata hubungnya boleh “who”, “that”, atau dihilangkan. Contoh: <b>The girl (who) I talked with</b> atau <b>The chair you sat on</b>.<br>2. Gaya Resmi / Formal: Kata depan dipindahkan ke DEPAN kata hubung. Jika untuk orang wajib pakai “whom” (bukan who), jika untuk benda wajib pakai “which” (tidak boleh pakai that). Contoh: <b>The girl with whom I talked</b> atau <b>The chair on which you sat</b>.<br><br>💡 <b>RUMUS KILAT</b>:<br>Kata depan ditaruh di depan untuk ORANG ➡️ Wajib <b>preposisi + whom</b> (contoh: <i>to whom, with whom</i>).<br>Kata depan ditaruh di depan untuk BENDA ➡️ Wajib <b>preposisi + which</b> (contoh: <i>in which, on which</i>).<br>Kata depan ditaruh di belakang (santai) ➡️ Kata hubungnya boleh <b>who / that / dihapus</b> (contoh: <i>the person I talked to</i>).",
       "memory": "Kata depan di depan minta “whom”, bukan “who”.",
       "avoid": "Tulis bentuk lengkapnya, jangan hanya kata dasarnya."
     },
@@ -358,7 +358,7 @@
     },
     "b4_006-cz0": {
       "why": "“Were I to resign” itu bentuk formal terbalik dari “If I were to resign”, dengan “were” dimajuin ke depan.",
-      "rule": "Kalau susunan normal: Keterangan waktu ditaruh di tengah kalimat. Contoh: <b>I have never seen such a view</b> (Aku belum pernah melihat pemandangan seperti itu).<br>Kalau susunan inversi (pembalikan untuk penekanan dramatis): Ketika kata keterangan negatif (Never, Rarely, Seldom, Hardly, Not only) atau frasa “Only after / Only when” ditaruh di AWAL kalimat, susunan kata bantu dan subjek WAJIB DIBALIK persis seperti kalimat tanya! Contoh: <b>Never have I seen such a view</b> atau <b>Rarely did she speak</b>.<br><br>💡 <b>RUMUS KILAT</b>:<br>Kata negatif di awal (Never, Rarely, Seldom, Not only) ➡️ Wajib dibalik: <b>Kata Negatif + Kata Bantu + Subjek + Verb</b>.<br>Kalimat lampau tanpa kata bantu ➡️ Munculkan <b>did + Subjek + Verb 1</b> (contoh: <i>Rarely did he come</i>).<br>Jangan susun normal jika kata negatif di depan ➡️ Salah besar: <i>Never I have seen</i> ❌!",
+      "rule": "Kalau pengandaian biasa (Second Conditional): Memakai kata “if” + Verb 2. Contoh: <b>If I were to win the lottery, I would travel</b> (Kalau aku sampai menang lotre).<br>Kalau versi formal/sastra (Inversi tanpa “if”): Kata “if” DIBUANG, dan kata “Were” langsung ditaruh di paling depan kalimat! Polanya: “Were” + Subjek + “to” + kata kerja dasar. Contoh: <b>Were I to win the lottery, I would travel</b> (maknanya persis sama, hanya jauh lebih formal).<br><br>💡 <b>RUMUS KILAT</b>:<br>Pakai “if” ➡️ <b>If + Subjek + were to + Verb 1</b>.<br>Tanpa “if” (inversi formal) ➡️ <b>Were + Subjek + to + Verb 1</b> (kata 'if' wajib dibuang!).<br>Ada kata “be” tanpa kata kerja aksi ➡️ <b>Were + Subjek + [kata sifat/benda]</b> (contoh: <i>Were I you</i>).",
       "memory": "“Were I to ...” itu bentuk formal terbalik dari “If I were to ...”.",
       "avoid": "Tulis bentuk lengkapnya, jangan hanya kata dasarnya."
     },
@@ -370,7 +370,7 @@
     },
     "b4_008-cz0": {
       "why": "“Had” pas sama kata kunci lampau “last week” dan nglengkapin kerangka nyuruh di sekitar “our roof repaired”. Semuanya dalam bentuk lampau.",
-      "rule": "Kalau mengerjakan sendiri: Subjek langsung melakukan pekerjaannya. Contoh: <b>I cleaned my shoes</b> (Aku mencuci sepatuku sendiri).<br>Kalau menyuruh orang lain / bayar jasa profesional (Causative): Pakai pola “have” atau “get” + nama benda + kata kerja bentuk ketiga (Verb 3). Artinya bukan kita yang repot ngerjain, tapi orang lain atau ahlinya yang mengerjakan buat kita. Contoh: <b>I had my hair cut</b> (Aku potong rambut di salon) atau <b>She got her laptop repaired</b> (Dia menyervis laptopnya ke tempat servis).<br><br>💡 <b>RUMUS KILAT</b>:<br>Kerjakan sendiri ➡️ Subjek + kata kerja biasa (contoh: <i>I cut my hair myself</i>).<br>Diserahkan ke ahlinya / orang lain ➡️ <b>have / get + benda + Verb 3</b> (contoh: <i>had my hair cut</i>, <i>got the roof repaired</i>).<br>Kata kerja di belakang benda ➡️ WAJIB selalu berbentuk <b>Verb 3</b>, apa pun tenses-nya!",
+      "rule": "Beda Pasif Biasa vs Kausatif (Causative):<br>1. Pasif Biasa (Simple Passive): Subjek adalah korban atau penerima aksi langsung. Polanya: “be + Verb 3”. Contoh: <b>My phone was stolen</b> (Ponselku dicuri) atau <b>The window was broken</b> (Jendelanya rusak/pecah).<br>2. Kausatif (Causative): Subjek meminta, membayar, atau menyuruh orang lain/ahli untuk mengerjakan sesuatu untuknya. Polanya: “have / get + benda + Verb 3”. Contoh: <b>I had my car repaired</b> (Aku menyervis mobilku ke bengkel — bukan mobilnya yang menyervis, tapi montir yang mengerjakannya).<br><br>💡 <b>RUMUS KILAT</b>:<br>Kejadian pasif biasa mengenai subjek ➡️ <b>was/were + Verb 3</b> (contoh: <i>My car was damaged</i>).<br>Menyuruh / membayar jasa orang lain ➡️ <b>have / get + benda + Verb 3</b> (contoh: <i>I got my car fixed</i>).<br>Di belakang benda pada causative ➡️ Kata kerjanya selalu <b>Verb 3</b>!",
       "memory": "Pasif biasa pakai was atau were; nyuruh orang lain pakai had + bendanya + past participle.",
       "avoid": "Tulis bentuk lengkapnya, jangan hanya kata dasarnya."
     },
@@ -382,7 +382,7 @@
     },
     "b4_011-cz0": {
       "why": "“Whether I had locked” nandain pertanyaan “yes” atau “no” yang dilaporin. Urutannya kayak pernyataan, dan tindakan yang lebih dulu ikut digeser.",
-      "rule": "Kalau pertanyaan langsung (Direct): Menggunakan susunan tanya dengan kata bantu di depan. Contoh: <i>“Do you like milk?”</i> atau <i>“Where do you live?”</i>.<br>Kalau dilaporkan kembali (Reported Question): Bentuk kalimatnya BERUBAH jadi kalimat berita biasa (Subjek + Kata Kerja) tanpa kata bantu do/does/did dan tanpa tanda tanya.<br>Pertanyaan Ya/Tidak: Sambung dengan “if” atau “whether” (artinya “apakah”). Contoh: <b>He asked me if I liked milk</b> (Bukan <i>if did I like</i> ❌).<br>Pertanyaan kata tanya (WH-): Pakai kata tanya itu lalu ikuti subjek + kata kerja lampau. Contoh: <b>She asked where I lived</b> (Bukan <i>where did I live</i> ❌).<br><br>💡 <b>RUMUS KILAT</b>:<br>Pertanyaan Ya/Tidak ➡️ Pakai <b>asked + if / whether + Subjek + Verb</b>.<br>Urutan kata ➡️ Wajib susunan kalimat biasa: <b>Subjek dulu, baru kata kerja</b> (dilarang pakai do/does/did!).<br>Tenses ➡️ Tetap mundur ke masa lalu (contoh: <i>is</i> jadi <i>was</i>, <i>like</i> jadi <i>liked</i>).",
+      "rule": "Kalau pertanyaan langsung (Direct): Menggunakan susunan tanya dengan kata bantu di depan. Contoh: <i>“Do you like milk?”</i> atau <i>“Where do you live?”</i>.<br>Kalau dilaporkan kembali (Reported Question): Bentuk kalimatnya BERUBAH jadi kalimat berita biasa (Subjek + Kata Kerja) tanpa kata bantu do/does/did dan tanpa tanda tanya.<br>Pertanyaan Ya/Tidak: Sambung dengan “if” atau “whether” (artinya “apakah”). Contoh: <b>He asked me if I liked milk</b> (Bukan <i>if did I like</i> ❌).<br><br>💡 <b>RUMUS KILAT</b>:<br>Pertanyaan Ya/Tidak ➡️ Pakai <b>asked + if / whether + Subjek + Verb</b>.<br>Urutan kata ➡️ Wajib susunan kalimat biasa: <b>Subjek dulu, baru kata kerja</b> (dilarang pakai do/does/did!).<br>Tenses ➡️ Tetap mundur ke masa lalu (contoh: <i>is</i> jadi <i>was</i>, <i>like</i> jadi <i>liked</i>).",
       "memory": "Pelaporan “yes” atau “no” pakai “whether” + subjek + kata kerja.",
       "avoid": "Tulis bentuk lengkapnya, jangan hanya kata dasarnya."
     },
@@ -412,7 +412,7 @@
     },
     "b4_016-cz0": {
       "why": "“Exercising” sebagai subjek bentuk -ing itu cara yang wajar buat bikin pernyataan umum soal sebuah kegiatan.",
-      "rule": "Kalau kata kerja yang difungsikan jadi kata benda atau setelah kata kerja seperti <i>enjoy, avoid, finish, keep, mind</i>: Pakai “Gerund” (Verb-ing). Contoh: <b>I enjoy reading comics</b> (Aku menikmati membaca komik) atau <b>Swimming is fun</b>.<br>Kalau menyatakan niat, rencana, atau setelah kata kerja seperti <i>want, decide, hope, promise, plan, need</i>: Pakai “to-Infinitive” (to + Verb 1). Contoh: <b>I decided to study harder</b> (Aku memutuskan untuk belajar lebih giat) atau <b>She wants to go</b>.<br><br>💡 <b>RUMUS KILAT</b>:<br>Setelah kata kerja <i>enjoy, finish, avoid, keep, mind</i> ➡️ Wajib <b>Verb-ing</b>.<br>Setelah kata kerja <i>want, decide, hope, promise, plan, need</i> ➡️ Wajib <b>to + Verb 1</b>.<br>Aktivitas umum sebagai subjek di depan kalimat ➡️ Pakai <b>Verb-ing</b> (misal: <i>Swimming is healthy</i>).",
+      "rule": "Dalam bahasa Inggris, aktivitas yang menjadi subjek kalimat:<br>Bentuk alami sehari-hari: Menggunakan Gerund (Verb-ing). Contoh: <b>Learning English is fun</b> (Belajar bahasa Inggris itu menyenangkan).<br>Bentuk sastra / sangat formal: Kadang memakai to-infinitive di awal (misal: <i>To err is human</i>), tetapi dalam percakapan dan tulisan normal, Gerund jauh lebih lazim.<br><br>💡 <b>RUMUS KILAT</b>:<br>Kata kerja di awal kalimat sebagai subjek ➡️ Wajib berbentuk <b>Verb-ing</b> (contoh: <i>Smoking is forbidden</i>).<br>Dilarang pakai kata kerja dasar polos di awal subjek ➡️ Salah: <i>Learn English is fun</i> ❌.<br>Kata kerja to-infinitive untuk subjek formal ➡️ Biasanya ditulis ulang dengan <b>It is ... to + Verb 1</b> (contoh: <i>It is important to study</i>).",
       "memory": "Kegiatan sebagai subjek pakai bentuk -ing: Exercising, Reading, Smoking, terus kata kerjanya.",
       "avoid": "Tulis bentuk lengkapnya, jangan hanya kata dasarnya."
     },
@@ -442,7 +442,7 @@
     },
     "b5_001-cz0": {
       "why": "“Live” itu kata kerja keadaan. “Used to live” nyatain keadaan lampau yang sekarang udah nggak berlaku.",
-      "rule": "“Used to” nyakup keadaan lampau dan tindakan berulang. “Would” cuma nyakup tindakan berulang, nggak pernah keadaan.",
+      "rule": "Kalau kebiasaan masa lalu yang SEKARANG SUDAH BERHENTI: Pakai “used to” + kata kerja dasar (Verb 1). Contoh: <b>I used to play marbles</b> (Dulu aku sering main kelereng, tapi sekarang sudah nggak pernah lagi).<br>Kalau SEKARANG SUDAH TERBIASA (merasa wajar dan nggak asing lagi): Ada “be” (am/is/are) di depannya dan wajib diikuti kata kerja -ing. Contoh: <b>I am used to living in Jakarta</b> (Sekarang aku sudah terbiasa tinggal di Jakarta).<br>Kalau PROSES menjadi terbiasa: Pakai “get used to” + kata kerja -ing. Contoh: <b>He is getting used to waking up early</b> (Dia mulai terbiasa bangun pagi).<br><br>💡 <b>RUMUS KILAT</b>:<br>Dulu pernah tapi sekarang enggak (tanpa be) ➡️ <b>used to + Verb 1</b>.<br>Sekarang sudah terbiasa (ada <i>am/is/are</i> di depan) ➡️ <b>be used to + Verb-ing</b>.<br>Proses beradaptasi ➡️ <b>get used to + Verb-ing</b>.",
       "memory": "Keadaan lampau cuma “used to”; tindakan berulang boleh dua-duanya.",
       "avoid": "Tulis bentuk lengkapnya, jangan hanya kata dasarnya."
     },
@@ -478,7 +478,7 @@
     },
     "b5_007-cz0": {
       "why": "“Were sent a bonus” bikin penerimanya, yaitu para karyawan, jadi subjek pasifnya. Objek langsungnya tetap berdiri sesudah kata kerjanya.",
-      "rule": "Kalau kalimat aktif (pelaku melakukan aksi): Subjek di depan mengerjakan sesuatu. Contoh: <b>Budi repaired the bike</b> (Budi memperbaiki sepeda).<br>Kalau kalimat pasif (subjek yang kena aksi / berawalan di- atau ter-): Wajib ada bentuk “be” (is/am/are atau was/were) + kata kerja bentuk ketiga (Verb 3). Contoh: <b>The bike was repaired by Budi</b> (Sepeda diperbaiki oleh Budi). Pada percakapan santai, kata “be” kadang diganti “get” (contoh: <b>get paid</b>, <b>got caught</b>).<br><br>💡 <b>RUMUS KILAT</b>:<br>Kalimat aktif (me-) ➡️ Subjek melakukan aksi (contoh: <i>They built the house</i>).<br>Kalimat pasif (di-/ter-) ➡️ Wajib pakai <b>am/is/are/was/were + Verb 3</b> (contoh: <i>The house was built</i>).<br>Waktu sekarang pakai <b>is/am/are + Verb 3</b>, waktu lampau pakai <b>was/were + Verb 3</b>.",
+      "rule": "Kata kerja tertentu (give, send, show, lend, pay) punya dua objek: orang yang menerima dan benda yang diberikan. Contoh aktif: <i>She gave me a book</i>.<br>Kalau diubah ke pasif, ada DUA pilihan:<br>1. Orang penerima jadi subjek pasif (paling alami): <b>I was given a book</b> (Aku diberi sebuah buku — tanpa kata 'to').<br>2. Benda yang diberikan jadi subjek pasif: <b>A book was given to me</b> (Sebuah buku diberikan kepadaku — WAJIB disambung kata depan “to” sebelum orangnya!).<br><br>💡 <b>RUMUS KILAT</b>:<br>Orang penerima jadi subjek (I/He/She/We) ➡️ Langsung: <b>Subjek + was/were + Verb 3 + nama benda</b> (contoh: <i>I was sent a letter</i>).<br>Benda jadi subjek ➡️ Wajib ada kata <b>to</b> sebelum orangnya (contoh: <i>The letter was sent <b>to</b> me</i>).<br>Pantangan ➡️ Dilarang menulis <i>The letter was sent me</i> tanpa kata 'to'!",
       "memory": "Penerimanya jadi subjek: “Employees were sent a bonus”, tanpa “to”.",
       "avoid": "Tulis bentuk lengkapnya, jangan hanya kata dasarnya."
     },
@@ -490,7 +490,7 @@
     },
     "b5_010-cz0": {
       "why": "“Apologized for being late” pakai pola tetap apologize + for + bentuk -ing buat nyebut alasan minta maafnya.",
-      "rule": "Apologize for + bentuk -ing buat nyebut alasannya; deny + bentuk -ing sebagai objek langsung. Dua-duanya beda dari pola kata kerja + anak kalimat that.",
+      "rule": "Banyak kata kerja yang membutuhkan pasangan kata depan (preposisi) tertentu sebelum objeknya:<br>1. Mendengarkan: Wajib pakai “to”! Contoh: <b>listen to music</b> (Bukan <i>listen music</i> ❌).<br>2. Menunggu: Wajib pakai “for”! Contoh: <b>wait for the bus</b> (Bukan <i>wait the bus</i> ❌).<br>3. Bergantung: Wajib pakai “on”! Contoh: <b>depend on your decision</b>.<br>4. Meminta maaf: Wajib pakai “for”! Contoh: <b>apologize for the mistake</b>.<br><br>💡 <b>RUMUS KILAT</b>:<br>Mendengarkan sesuatu ➡️ <b>listen to</b> (wajib ada 'to').<br>Menunggu seseorang / sesuatu ➡️ <b>wait for</b> (wajib ada 'for').<br>Bergantung pada ➡️ <b>depend on / rely on</b>.<br>Minta maaf atas ➡️ <b>apologize for</b>.",
       "memory": "“Apologize” FOR + bentuk -ing buat alasannya; “deny” + bentuk -ing tanpa kata depan.",
       "avoid": "Tulis bentuk lengkapnya, jangan hanya kata dasarnya."
     },
@@ -544,7 +544,7 @@
     },
     "b5_023-cz0": {
       "why": "“Never have I attended” majuin “Never” terus mbalik kata bantu “have” ke depan subjek “I”. Itu pola penekanan yang diwajibin.",
-      "rule": "Kalau susunan normal: Keterangan waktu ditaruh di tengah kalimat. Contoh: <b>I have never seen such a view</b> (Aku belum pernah melihat pemandangan seperti itu).<br>Kalau susunan inversi (pembalikan untuk penekanan dramatis): Ketika kata keterangan negatif (Never, Rarely, Seldom, Hardly, Not only) atau frasa “Only after / Only when” ditaruh di AWAL kalimat, susunan kata bantu dan subjek WAJIB DIBALIK persis seperti kalimat tanya! Contoh: <b>Never have I seen such a view</b> atau <b>Rarely did she speak</b>.<br><br>💡 <b>RUMUS KILAT</b>:<br>Kata negatif di awal (Never, Rarely, Seldom, Not only) ➡️ Wajib dibalik: <b>Kata Negatif + Kata Bantu + Subjek + Verb</b>.<br>Kalimat lampau tanpa kata bantu ➡️ Munculkan <b>did + Subjek + Verb 1</b> (contoh: <i>Rarely did he come</i>).<br>Jangan susun normal jika kata negatif di depan ➡️ Salah besar: <i>Never I have seen</i> ❌!",
+      "rule": "Kalau susunan normal: Keterangan waktu ditaruh di tengah kalimat. Contoh: <b>I have never seen such a view</b> (Aku belum pernah melihat pemandangan seperti itu).<br>Kalau susunan inversi (pembalikan untuk penekanan dramatis): Ketika kata keterangan negatif (Never, Rarely, Seldom, Hardly, Not only) ditaruh di AWAL kalimat, susunan kata bantu dan subjek WAJIB DIBALIK persis seperti kalimat tanya! Contoh: <b>Never have I seen such a view</b> atau <b>Rarely did she speak</b>.<br><br>💡 <b>RUMUS KILAT</b>:<br>Kata negatif di awal (Never, Rarely, Seldom, Not only) ➡️ Wajib dibalik: <b>Kata Negatif + Kata Bantu + Subjek + Verb</b>.<br>Kalimat lampau tanpa kata bantu ➡️ Munculkan <b>did + Subjek + Verb 1</b> (contoh: <i>Rarely did he come</i>).<br>Jangan susun normal jika kata negatif di depan ➡️ Salah besar: <i>Never I have seen</i> ❌!",
       "memory": "Never + kata bantu + subjek: “Never have I ...”, “Rarely does she ...”.",
       "avoid": "Tulis bentuk lengkapnya, jangan hanya kata dasarnya."
     },
@@ -556,25 +556,25 @@
     },
     "A1-003-cz0": {
       "why": "“My brother” sama kayak he. Kebiasaan tiap pagi, jadi kata kerjanya “drinks”.",
-      "rule": "Present simple positif buat he, she, dan it. Kata kerjanya dapat akhiran -s atau -es.",
+      "rule": "Fakta umum atau rutinitas sehari-hari menggunakan Present Simple (Verb 1). Subjek tunggal orang ketiga (He, She, It) wajib menambahkan akhiran <b>-s / -es</b> pada kata kerjanya.<br><br>💡 <b>RUMUS KILAT</b>:<br>Subjek tunggal (He/She/It) ➡️ Kata kerja wajib tambah <b>-s / -es</b> (contoh: <i>he plays, she watches</i>).<br>Subjek jamak (I/You/We/They) ➡️ Kata kerja polos <b>tanpa tambahan</b> (contoh: <i>they play</i>).<br>Negatif ➡️ <b>doesn't + Verb 1</b> (He/She/It) atau <b>don't + Verb 1</b> (I/You/We/They).",
       "memory": "He, she, it: kata kerjanya dapat -s.",
       "avoid": "Tulis bentuk lengkapnya, jangan hanya kata dasarnya."
     },
     "A1-004-cz0": {
       "why": "“They” itu jamak. Bentuk be buat jamak ya “are”.",
-      "rule": "Bentuk be sekarang: I am. He, she, it is. You, we, they are.",
+      "rule": "Menyesuaikan bentuk to be (am / is / are) dengan subjek dalam kalimat present:<br>• I berpasangan dengan “am”.<br>• He, She, It (dan subjek tunggal) berpasangan dengan “is”.<br>• You, We, They (dan subjek jamak) berpasangan dengan “are”.<br><br>💡 <b>RUMUS KILAT</b>:<br>Subjek <b>I</b> ➡️ <b>am</b>.<br>Subjek tunggal (He/She/It/Budi) ➡️ <b>is</b>.<br>Subjek jamak (You/We/They/Budi and Ani) ➡️ <b>are</b>.",
       "memory": "“They” selalu sama “are”: “they are at home”.",
       "avoid": "Tulis bentuk lengkapnya, jangan hanya kata dasarnya."
     },
     "A1-005-cz0": {
       "why": "Bendanya “two books”, jumlahnya lebih dari satu. Jadi pakai “are”.",
-      "rule": "There are plus kata benda jamak. There is plus kata benda tunggal.",
+      "rule": "Menyatakan keberadaan benda ('ada'):<br>• Pakai “There is” jika benda di belakangnya tunggal (cuma satu, diawali a/an) atau benda tak bisa dihitung (uncountable).<br>• Pakai “There are” jika benda di belakangnya jamak (lebih dari satu, berakhiran -s).<br><br>💡 <b>RUMUS KILAT</b>:<br>Benda setelahnya cuma SATU / tak terhitung ➡️ Pakai <b>There is</b> (contoh: <i>There is a cat / There is milk</i>).<br>Benda setelahnya BANYAK ➡️ Pakai <b>There are</b> (contoh: <i>There are three cats</i>).<br>Negatif ➡️ <b>There isn't / There aren't</b>.",
       "memory": "Banyak: “there are”. Satu: “there is”.",
       "avoid": "Tulis bentuk lengkapnya, jangan hanya kata dasarnya."
     },
     "A1-006-cz0": {
       "why": "Sesudah bagian kosong ada kata benda “brother”. “Her” bikin jelas brother-nya punya Anna.",
-      "rule": "Sebelum kata benda pakai kata kepemilikan. Contohnya my, your, his, her, its, our, their.",
+      "rule": "Kata sifat kepemilikan diletakkan tepat di depan kata benda yang dimiliki:<br>• I ➔ my (my book)<br>• You ➔ your (your book)<br>• He ➔ his (his book)<br>• She ➔ her (her book)<br>• We ➔ our (our book)<br>• They ➔ their (their book)<br>• It ➔ its (its tail — tanpa tanda petik!).<br><br>💡 <b>RUMUS KILAT</b>:<br>Di depan kata benda ➡️ Wajib pakai possessive adjective (<b>my, your, his, her, our, their, its</b>).<br>Pemberitahuan penting ➡️ <b>its</b> (milik) TIDAK pakai petik, beda dengan <b>it's</b> (singkatan dari it is).",
       "memory": "Her plus kata benda; hers jalan sendiri.",
       "avoid": "Tulis bentuk lengkapnya, jangan hanya kata dasarnya."
     },
@@ -598,7 +598,7 @@
     },
     "C2-004-cz0": {
       "why": "“Only after” di depan maksa “did” naik ke depan “the board”, dan “understand” tetap bentuk dasar.",
-      "rule": "Kalau susunan normal: Keterangan waktu ditaruh di tengah kalimat. Contoh: <b>I have never seen such a view</b> (Aku belum pernah melihat pemandangan seperti itu).<br>Kalau susunan inversi (pembalikan untuk penekanan dramatis): Ketika kata keterangan negatif (Never, Rarely, Seldom, Hardly, Not only) atau frasa “Only after / Only when” ditaruh di AWAL kalimat, susunan kata bantu dan subjek WAJIB DIBALIK persis seperti kalimat tanya! Contoh: <b>Never have I seen such a view</b> atau <b>Rarely did she speak</b>.<br><br>💡 <b>RUMUS KILAT</b>:<br>Kata negatif di awal (Never, Rarely, Seldom, Not only) ➡️ Wajib dibalik: <b>Kata Negatif + Kata Bantu + Subjek + Verb</b>.<br>Kalimat lampau tanpa kata bantu ➡️ Munculkan <b>did + Subjek + Verb 1</b> (contoh: <i>Rarely did he come</i>).<br>Jangan susun normal jika kata negatif di depan ➡️ Salah besar: <i>Never I have seen</i> ❌!",
+      "rule": "Kalau susunan kalimat normal: Frasa “only” berada di posisi biasa. Contoh: <b>We realized the truth only after reading the letter</b>.<br>Kalau frasa “Only” (Only after, Only when, Only then, Only by) ditaruh di AWAL kalimat: Klausa utama di belakangnya WAJIB DIBALIK (inversi) seperti susunan kalimat tanya (Kata Bantu + Subjek + Kata Kerja)! Contoh: <b>Only after reading the letter did we realize the truth</b> (Bukan <i>we realized</i> ❌).<br><br>💡 <b>RUMUS KILAT</b>:<br>Di awal kalimat ada <b>Only after / Only when / Only then</b> ➡️ Klausa utama setelahnya <b>wajib dibalik</b>.<br>Kalimat lampau ➡️ Pakai <b>did + Subjek + Verb 1</b> (contoh: <i>Only then did I know</i>).<br>Jangan susun biasa ➡️ Dilarang menulis subjek sebelum kata bantu setelah frasa 'Only' di depan!",
       "memory": "Only after ... did + subjek + kata kerja dasar.",
       "avoid": "Tulis bentuk lengkapnya, jangan hanya kata dasarnya."
     },
@@ -622,37 +622,37 @@
     },
     "A1-009-cz0": {
       "why": "“She” sekelompok sama he dan it. Kelompok itu pakai “has got”.",
-      "rule": "Jika kalimatnya HANYA pakai \"have\" (tanpa \"got\"):<br><br>Positif: <i>I have money.</i><br>Negatif: <i>I don't have money.</i> (Kamu butuh \"don't\" / \"doesn't\")<br><br>Jika kalimatnya pakai \"have got\":<br><br>Positif: <i>I have got money.</i><br>Negatif: <i>I haven't got money.</i> (Kata \"have/has\" langsung digabung dengan \"not\" menjadi \"haven't/hasn't\". Tidak boleh pakai \"don't/doesn't\").<br><br>Karena itu, kalau di soal ada kata \"got\", pasangannya pasti <b>haven't / hasn't</b>. Kalau mau pakai \"don't / doesn't\", kata \"got\" nya harus dibuang.<br><br>💡 <b>RUMUS KILAT</b>:<br>Pakai got ➡️ <b>haven't / hasn't got</b><br>Tanpa got ➡️ <b>don't / doesn't have</b>",
+      "rule": "Kalau kalimatnya HANYA pakai “have” (tanpa “got”):<br>• Positif: <b>I have money</b>.<br>• Negatif: <b>I don't have money</b> (kamu butuh “don't”).<br><br>Kalau kalimatnya pakai “have got”:<br>• Positif: <b>I have got money</b>.<br>• Negatif: <b>I haven't got money</b> (kata “have” langsung digabung dengan “not” menjadi “haven't”. Tidak boleh pakai “don't”).<br>Karena di kalimat ada kata “got”, pasangannya wajib “haven't / hasn't”. Kalau mau pakai “don't”, kata “got”-nya harus dibuang.<br><br>💡 <b>RUMUS KILAT</b>:<br>ADA kata <b>got</b> ➡️ Negatifnya pasti <b>haven't got / hasn't got</b>.<br>NGGAK ADA <b>got</b> ➡️ Negatifnya pakai <b>don't have / doesn't have</b>.<br>Subjek He/She/It ➡️ Pakai <b>has got / hasn't got</b>.",
       "memory": "“He”, “she”, “it”: has got. “I”, “you”, “we”, “they”: have got.",
       "avoid": "Tulis bentuk lengkapnya, jangan hanya kata dasarnya."
     },
     "A1-010-cz0": {
       "why": "“Yesterday” bilang kejadiannya udah selesai. Kata kerjanya jadi “played”.",
-      "rule": "Bentuk lampau beraturan biasanya nambah -ed. Sesudah did atau did not, kata kerjanya bentuk dasar.",
+      "rule": "Kejadian lampau yang sudah selesai di masa lalu menggunakan Verb 2 (untuk kata kerja beraturan, tambahkan akhiran <b>-ed</b>). Jika kalimat tanya atau negatif, bentuk lampau diambil alih oleh “did/didn't”, sehingga kata kerjanya wajib kembali ke bentuk dasar (Verb 1).<br><br>💡 <b>RUMUS KILAT</b>:<br>Kalimat positif lampau ➡️ Pakai <b>Verb 2</b> (contoh: <i>walked, visited</i>).<br>Ada kata <b>did / didn't</b> ➡️ Kata kerja WAJIB balik ke <b>dasar (Verb 1)</b>.<br>Pantangan ➡️ Dilarang mendobelkan lampau (salah: <i>didn't walked</i> ❌).",
       "memory": "Yesterday: play jadi played. Ingat did plus play.",
       "avoid": "Tulis bentuk lengkapnya, jangan hanya kata dasarnya."
     },
     "A1-011-cz0": {
       "why": "“They” itu jamak. Bentuk lampaunya “were”.",
-      "rule": "Pakai “was” buat “I”, “he”, “she”, dan “it”. Pakai “were” buat “you”, “we”, dan “they”.",
+      "rule": "Bentuk lampau dari to be (am/is/are) untuk kalimat yang tidak memiliki kata kerja aksi (menjelaskan sifat, profesi, atau lokasi di masa lalu):<br>• Subjek I, He, She, It memakai “was”.<br>• Subjek You, We, They memakai “were”.<br><br>💡 <b>RUMUS KILAT</b>:<br>Subjek tunggal (I / He / She / It) ➡️ Pakai <b>was</b> (negatif: <b>wasn't</b>).<br>Subjek jamak (You / We / They) ➡️ Pakai <b>were</b> (negatif: <b>weren't</b>).<br>Setelah was/were ➡️ Diikuti kata sifat, benda, atau tempat (contoh: <i>was tired, were at home</i>).",
       "memory": "“They” pakai “were”. “She” pakai “was”.",
       "avoid": "Tulis bentuk lengkapnya, jangan hanya kata dasarnya."
     },
     "A1-014-cz0": {
       "why": "“Right now” nunjuk saat ini juga. Jadi bentuknya “is cooking”.",
-      "rule": "Present continuous: am, is, atau are plus kata kerja -ing. Dipakai buat kejadian yang lagi berlangsung.",
+      "rule": "Kejadian yang sedang berlangsung saat berbicara atau situasi sementara wajib memakai pasangan to be (am/is/are) ditambah kata kerja berakhiran -ing.<br><br>💡 <b>RUMUS KILAT</b>:<br>Subjek I ➡️ <b>am + Verb-ing</b>.<br>Subjek He / She / It ➡️ <b>is + Verb-ing</b>.<br>Subjek You / We / They ➡️ <b>are + Verb-ing</b>.<br>Pantangan ➡️ Dilarang membuang to be (salah: <i>he eating</i> ❌) atau lupa -ing (salah: <i>he is eat</i> ❌).",
       "memory": "Lagi berlangsung: be plus -ing, kayak she is cooking.",
       "avoid": "Tulis bentuk lengkapnya, jangan hanya kata dasarnya."
     },
     "A1-015-cz0": {
       "why": "Jawaban buat kalimat ini nama tempat. Jadi kata tanyanya “Where”.",
-      "rule": "Who buat orang. What buat benda. Where buat tempat. When buat waktu. Why buat alasan.",
+      "rule": "Kata tanya untuk menanyakan informasi spesifik:<br>• What ➔ Apa (menanyakan benda/aksi)<br>• Who ➔ Siapa (menanyakan orang)<br>• Where ➔ Di mana / Ke mana (menanyakan tempat)<br>• When ➔ Kapan (menanyakan waktu)<br>• Why ➔ Mengapa (menanyakan alasan)<br>• How ➔ Bagaimana (menanyakan cara atau kondisi).<br><br>💡 <b>RUMUS KILAT</b>:<br>Tanya orang ➡️ <b>Who</b> | Tanya tempat ➡️ <b>Where</b>.<br>Tanya waktu ➡️ <b>When</b> | Tanya alasan ➡️ <b>Why</b>.<br>Tanya benda/hal ➡️ <b>What</b> | Tanya cara ➡️ <b>How</b>.",
       "memory": "Where buat tempat, when buat waktu, who buat orang.",
       "avoid": "Tulis bentuk lengkapnya, jangan hanya kata dasarnya."
     },
     "A1-016-cz0": {
       "why": "Ada “don’t”, jadi kalimatnya negatif. “Money” juga nggak bisa dihitung satu-satu. Pasangan buat dua-duanya “any”.",
-      "rule": "Some biasanya buat kalimat positif. Any buat kalimat negatif dan kalimat tanya. Many buat benda yang bisa dihitung, much buat yang nggak bisa.",
+      "rule": "Aturan pemakaian “some” vs “any” untuk menyatakan sejumlah barang:<br>• “Some” dipakai pada kalimat POSITIF dan tawaran sopan.<br>• “Any” dipakai pada kalimat NEGATIF (ada not/n't) dan kalimat TANYA biasa.<br><br>💡 <b>RUMUS KILAT</b>:<br>Kalimat POSITIF ➡️ Pakai <b>some</b> (contoh: <i>I have some apples</i>).<br>Kalimat NEGATIF (ada n't) ➡️ Wajib pakai <b>any</b> (contoh: <i>I don't have any apples</i>).<br>Kalimat TANYA biasa ➡️ Pakai <b>any</b> (contoh: <i>Do you have any questions?</i>).<br>Tawaran sopan (Would you like...?) ➡️ Pakai <b>some</b> (contoh: <i>Would you like some tea?</i>).",
       "memory": "Negatif plus nggak bisa dihitung: I do not have any money.",
       "avoid": "Tulis bentuk lengkapnya, jangan hanya kata dasarnya."
     },
@@ -664,13 +664,13 @@
     },
     "A1-018-cz0": {
       "why": "Gurunya lagi nyuruh seisi kelas buat buka buku sekarang, jadi perintahnya mulai dari bentuk dasar: “Open your books.”",
-      "rule": "Kalimat perintah pakai kata kerja bentuk dasar aja: tanpa subjek, tanpa -s, tanpa -ing, dan tanpa “to” di depan.",
+      "rule": "Kalimat perintah, ajakan, atau instruksi langsung:<br>• Kalimat perintah positif diawali langsung dengan kata kerja dasar polos (Verb 1), tanpa subjek, tanpa to, tanpa -ing atau -s.<br>• Kalimat larangan diawali dengan “Don't” + kata kerja dasar.<br><br>💡 <b>RUMUS KILAT</b>:<br>Perintah / suruhan ➡️ Langsung <b>Verb 1 polos</b> di awal (contoh: <i>Open the door!</i>, bukan <i>To open</i> atau <i>Opening</i> ❌).<br>Larangan ➡️ Awali dengan <b>Don't + Verb 1</b> (contoh: <i>Don't touch!</i>).",
       "memory": "Perintah itu polosan: “Open”, “Sit”, “Listen”.",
       "avoid": "Kalau kalimatnya nyuruh orang ngelakuin sesuatu, mulai dari kata kerja polos tanpa embel-embel."
     },
     "A1-019-cz0": {
       "why": "“Always” duduk sebelum kata kerja utama, dan “drinks” tetap pakai -s buat orang ketiga tunggal: “My sister always drinks tea.”",
-      "rule": "Kata frekuensi (“always”, “usually”, “often”, “never”) duduk sebelum kata kerja utama, dan kata kerjanya tetap nyocokin subjek.",
+      "rule": "Posisi kata keterangan frekuensi (always, usually, often, sometimes, rarely, never):<br>• Diletakkan SEBELUM kata kerja aksi biasa (contoh: <i>I always drink milk</i>).<br>• Diletakkan SETELAH to be (am, is, are, was, were) (contoh: <i>He is always late</i>).<br><br>💡 <b>RUMUS KILAT</b>:<br>Ada kata kerja aksi biasa ➡️ Taruh keterangan <b>SEBELUM</b> kata kerja (contoh: <i>She never eats meat</i>).<br>Ada to be (am/is/are) ➡️ Taruh keterangan <b>SETELAH</b> to be (contoh: <i>She is never angry</i>).",
       "memory": "Frekuensi dulu, kata kerja belakangan: “She always drinks”.",
       "avoid": "Selipkan kata frekuensi pas sebelum kata kerja utama, terus cek akhiran kata kerjanya ke subjek."
     },
@@ -688,7 +688,7 @@
     },
     "GI-006-cz0": {
       "why": "Sesudah kata kerja perasaan kayak “hates”, kegiatannya pakai -ing: “hates getting up early”.",
-      "rule": "“Like”, “love”, “hate”, dan “enjoy” diikuti kata kerja + -ing kalau ngomongin kegiatan secara umum.",
+      "rule": "Kalau setelah kata kerja seperti <i>enjoy, avoid, finish, keep, mind</i>: Wajib pakai “Gerund” (Verb-ing). Contoh: <b>I enjoy reading comics</b>.<br>Kalau menyatakan niat, rencana, atau setelah kata kerja seperti <i>want, decide, hope, promise, plan, need</i>: Wajib pakai “to-Infinitive” (to + Verb 1). Contoh: <b>I decided to study harder</b>.<br><br>💡 <b>RUMUS KILAT</b>:<br>Setelah kata kerja <i>enjoy, finish, avoid, keep, mind</i> ➡️ Wajib <b>Verb-ing</b>.<br>Setelah kata kerja <i>want, decide, hope, promise, plan, need</i> ➡️ Wajib <b>to + Verb 1</b>.<br>Aktivitas umum sebagai subjek di depan ➡️ Pakai <b>Verb-ing</b> (misal: <i>Swimming is healthy</i>).",
       "memory": "Perasaan doyan -ing: “love swimming”, “hate waiting”.",
       "avoid": "Sesudah “like”, “love”, atau “hate”, ubah kegiatan berikutnya jadi bentuk -ing."
     },
