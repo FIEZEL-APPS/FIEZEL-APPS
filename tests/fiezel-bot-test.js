@@ -47,8 +47,8 @@ console.log('[T2] Menjalankan self-test tools/fiezel-bot.mjs...');
 {
   const r = sh('node', ['tools/fiezel-bot.mjs', 'self-test'], true);
   assert(r.out.includes('Self-Test: PASS'), 'Self-test harus mencetak PASS');
-  assert(/PASS \(19\/19 tests\)/.test(r.out), 'Self-test harus lulus 19/19');
-  console.log('  ok (19/19)');
+  assert(/PASS \(21\/21 tests\)/.test(r.out), 'Self-test harus lulus 21/21');
+  console.log('  ok (21/21)');
 }
 pass++;
 
@@ -206,6 +206,31 @@ console.log('[T17] [OTOMASI] Review berjalan juga pada PR draft...');
 {
   const reviewJob = wfContent.slice(wfContent.indexOf('auto-pr-review:'), wfContent.indexOf('auto-ci-heal:'));
   assert(!/pull_request\.draft/.test(reviewJob), 'Job review tidak boleh melewati PR draft (PR agen selalu dibuka sebagai draft)');
+}
+console.log('  ok');
+pass++;
+
+console.log('[T18] [GERBANG] Check wajib review gagal pada pelanggaran invarian deterministik...');
+{
+  const reviewJob = wfContent.slice(wfContent.indexOf('auto-pr-review:'), wfContent.indexOf('auto-ci-heal:'));
+  assert(reviewJob.includes('FIEZEL_VERDICT_OUT'), 'Job review wajib meneruskan FIEZEL_VERDICT_OUT ke engine');
+  assert(/CHANGES REQUESTED[\s\S]{0,300}exit 1/.test(reviewJob), 'Job review wajib exit 1 bila verdict CHANGES REQUESTED');
+  assert(engineSrc.includes('function writeVerdict') && /writeVerdict\(risk\.verdict\)/.test(engineSrc), 'Engine wajib menulis verdict deterministik');
+}
+console.log('  ok');
+pass++;
+
+console.log('[T19] [KUALITAS] Kode pemanggil dikirim ke AI & ketepatan diukur harian...');
+{
+  const reviewBody = engineSrc.slice(engineSrc.indexOf('async function runReview'), engineSrc.indexOf('function writeVerdict'));
+  assert(reviewBody.includes('buildCallerContext(') && reviewBody.includes('extraFiles'), 'runReview wajib mengirim kode pemanggil dan mengizinkan temuan di berkas pemanggil');
+  const mPath = path.join(ROOT, '.github/workflows/fiezel-bot-metrics.yml');
+  assert(fs.existsSync(mPath), 'Workflow fiezel-bot-metrics.yml wajib ada');
+  const m = fs.readFileSync(mPath, 'utf8');
+  assert(/schedule:/.test(m) && /workflow_dispatch:/.test(m), 'Metrik wajib terjadwal dan bisa dipicu manual');
+  assert(/timeout-minutes:\s*\d+/.test(m), 'Metrik wajib punya timeout-minutes');
+  assert(!/secrets\./.test(m) && !/contents:\s*write/.test(m), 'Metrik tidak boleh memegang secrets atau izin tulis kode');
+  assert(m.includes('fiezel-bot.mjs metrics'), 'Metrik wajib menjalankan perintah metrics engine');
 }
 console.log('  ok');
 pass++;

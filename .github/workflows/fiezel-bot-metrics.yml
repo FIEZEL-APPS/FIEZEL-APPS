@@ -1,0 +1,51 @@
+name: FIEZEL Bot Metrics (Ketepatan Temuan AI)
+
+# Mengukur seberapa sering temuan AI Fiezel Bot benar, dari bukti di PR:
+# reaksi 👍/👎 pada komentar inline, baris yang lalu diubah (diterima), atau
+# thread yang di-resolve tanpa perubahan (ditolak). Hasilnya ditulis ke satu
+# issue tetap "📊 Fiezel Bot — ketepatan temuan AI" dan ke ringkasan job.
+# Hanya membaca PR dan menulis issue: tanpa secrets, tanpa push.
+
+on:
+  schedule:
+    - cron: '17 1 * * *'   # setiap hari 08:17 WIB
+  workflow_dispatch:
+    inputs:
+      days:
+        description: 'Jendela waktu (hari)'
+        required: false
+        default: '14'
+
+permissions:
+  contents: read
+  pull-requests: read
+  issues: write
+
+concurrency:
+  group: fiezel-bot-metrics
+  cancel-in-progress: true
+
+jobs:
+  metrics:
+    name: Hitung ketepatan temuan Fiezel Bot
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Hitung dan tulis laporan
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          FIEZEL_METRICS_DAYS: ${{ github.event.inputs.days || vars.FIEZEL_METRICS_DAYS }}
+        run: |
+          set -euo pipefail
+          node tools/fiezel-bot.mjs metrics

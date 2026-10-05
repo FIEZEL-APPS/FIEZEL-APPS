@@ -154,11 +154,13 @@ jobs:
           FIEZEL_BOT_GEMINI_FAST_MODELS: ${{ vars.FIEZEL_BOT_GEMINI_FAST_MODELS }}
           FIEZEL_BOT_GROQ_MODELS: ${{ vars.FIEZEL_BOT_GROQ_MODELS }}
           FIEZEL_BOT_CONTEXT_CHARS: ${{ vars.FIEZEL_BOT_CONTEXT_CHARS }}
+          FIEZEL_BOT_CALLER_CHARS: ${{ vars.FIEZEL_BOT_CALLER_CHARS }}
           FIEZEL_INLINE_OUT: /tmp/fiezel-bot/inline.json
+          FIEZEL_VERDICT_OUT: /tmp/fiezel-bot/verdict.txt
         run: |
           set -euo pipefail
           mkdir -p /tmp/fiezel-bot
-          rm -f "$FIEZEL_INLINE_OUT"
+          rm -f "$FIEZEL_INLINE_OUT" "$FIEZEL_VERDICT_OUT"
           if [[ "$EVENT_NAME" == "workflow_dispatch" && "$COMMAND" == "explain" ]]; then
             marker='<!-- FIEZEL_BOT_EXPLAIN -->'
             node tools/fiezel-bot.mjs explain --pr="$PR_NUM" > /tmp/fiezel-bot/raw.log 2>&1 || true
@@ -244,6 +246,26 @@ jobs:
                 }
               }
             }
+
+      # Check ini (Auto PR Review & Invariant Audit) adalah required check `main`.
+      # Dulu ia selalu hijau walau verdict 🔴, sehingga proteksi branch tidak
+      # menahan apa pun. Kini pelanggaran invarian DETERMINISTIK menggagalkannya.
+      # Temuan AI tidak pernah menggagalkan check (paling jauh verdict kuning).
+      - name: Tegakkan verdict deterministik (gagal bila CHANGES REQUESTED)
+        if: steps.meta.outputs.pr_number != ''
+        run: |
+          set -euo pipefail
+          f=/tmp/fiezel-bot/verdict.txt
+          if [[ ! -f "$f" ]]; then
+            echo "Tidak ada verdict (explain, atau tidak ada perubahan untuk direview)."
+            exit 0
+          fi
+          verdict="$(head -n1 "$f")"
+          echo "Verdict Fiezel Bot: $verdict"
+          if [[ "$verdict" == "CHANGES REQUESTED" ]]; then
+            echo "::error::Fiezel Bot menemukan pelanggaran invarian kritis (lihat tabel Audit Invarian di komentar review). Perbaiki sebelum merge."
+            exit 1
+          fi
 
   # 2. Otomatis Sembuhkan CI Ketika Gagal (Self-Healing Loop)
   auto-ci-heal:

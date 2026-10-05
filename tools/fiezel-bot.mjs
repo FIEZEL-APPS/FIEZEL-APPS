@@ -754,6 +754,7 @@ function buildFileContext(changedFiles, diffMap, opts = {}) {
     .sort((a, b) => (CONTEXT_CODE_EXT.test(a.file) ? 0 : 1) - (CONTEXT_CODE_EXT.test(b.file) ? 0 : 1) || b.added.size - a.added.size);
 
   const parts = [], included = [], omitted = [];
+  const sentLines = new Map(); // berkas → Set nomor baris yang sudah dikirim (dipakai pencari pemanggil)
   let used = 0;
   for (const { file, added } of candidates) {
     const lines = readLines(file);
@@ -780,9 +781,135 @@ function buildFileContext(changedFiles, diffMap, opts = {}) {
     if (used + chunk.length > budget) { omitted.push(file); continue; }
     parts.push(chunk);
     included.push(file);
+    sentLines.set(file, new Set(keep));
     used += chunk.length;
   }
-  return { text: parts.join('\n\n'), included, omitted };
+  return { text: parts.join('\n\n'), included, omitted, sentLines };
+}
+
+// ── KODE PEMANGGIL: siapa yang memakai fungsi yang diubah PR ini? ──
+
+const CALLER_DEFAULT_BUDGET = 40_000;
+const CALLER_MAX_SYMBOLS = 12;
+const CALLER_SITES_PER_SYMBOL = 4;
+const CALLER_WINDOW_LINES = 12;
+/** Simbol dengan pemakaian sebanyak ini terlalu generik untuk berguna sebagai konteks. */
+const CALLER_MAX_HITS = 80;
+const CALLER_CODE_EXT = /\.(m?js|cjs|html)$/i;
+const NOT_SYMBOLS = new Set(['if', 'for', 'while', 'switch', 'catch', 'function', 'return', 'constructor', 'else', 'try',
+  'async', 'await', 'new', 'typeof', 'this', 'const', 'let', 'var', 'true', 'false', 'null', 'undefined', 'default', 'case']);
+const DEF_PATTERNS = [
+  /\bfunction\s*\*?\s*([A-Za-z_$][\w$]*)\s*\(/,
+  /\b([A-Za-z_$][\w$]*)\s*[:=]\s*(?:async\s+)?function\b/,
+  /\b([A-Za-z_$][\w$]*)\s*=\s*(?:async\s*)?(?:\([^)]*\)|[A-Za-z_$][\w$]*)\s*=>/,
+  /\b(?:window|self|globalThis|exports|module\.exports)\.([A-Za-z_$][\w$]*)\s*=/,
+  /^\s*(?:static\s+)?(?:async\s+)?([A-Za-z_$][\w$]*)\s*\([^)]*\)\s*\{\s*$/,
+];
+
+function definedSymbol(text) {
+  for (const re of DEF_PATTERNS) {
+    const m = re.exec(text);
+    if (m && m[1] && m[1].length >= 4 && !NOT_SYMBOLS.has(m[1])) return m[1];
+  }
+  return null;
+}
+
+/**
+ * Nama fungsi yang disentuh PR: yang didefinisikan/diubah di baris +/- dan yang
+ * badannya berubah (konteks fungsi pada header hunk `@@ … @@ function x(`).
+ * Hanya berkas kode. Definisi yang diubah diprioritaskan di atas konteks hunk.
+ */
+function extractChangedSymbols(diff) {
+  const fromLines = [], fromHunks = [];  // { name, file }
+  let file = null;
+  for (const line of String(diff || '').split('\n')) {
+    if (line.startsWith('+++ ')) { const t = line.slice(4).trim().replace(/^b\//, ''); file = CALLER_CODE_EXT.test(t) ? t : null; continue; }
+    if (!file || line.startsWith('--- ')) continue;
+    if (line.startsWith('@@')) {
+      const ctx = line.replace(/^@@[^@]*@@\s?/, '');
+      const sym = ctx && definedSymbol(ctx);
+      if (sym) fromHunks.push({ name: sym, file });
+      continue;
+    }
+    if (line.startsWith('+') || line.startsWith('-')) {
+      const sym = definedSymbol(line.slice(1));
+      if (sym) fromLines.push({ name: sym, file });
+    }
+  }
+  const seen = new Set(), out = [];
+  for (const s of [...fromLines, ...fromHunks]) if (!seen.has(s.name)) { seen.add(s.name); out.push(s); }
+  return out.slice(0, CALLER_MAX_SYMBOLS);
+}
+
+/**
+ * Fungsi lokal sebuah MODUL (ESM/CommonJS) yang tidak diekspor tidak bisa
+ * dipanggil dari berkas lain; nama serupa di berkas lain adalah fungsi lain.
+ * Skrip browser biasa (app.js, features/*.js) berbagi ruang nama global.
+ */
+function isModuleLocalSymbol(file, name, readLines = readRepoLines) {
+  const text = (readLines(file) || []).join('\n');
+  // Modul tertutup: .mjs/.cjs, import/export statis, atau skrip Node yang `require` di
+  // tingkat atas. BUKAN: app.js (require berpenjaga di dalam fungsi) atau berkas UMD
+  // features/*.js (module.exports + global browser) — fungsinya global.
+  const isModule = /\.(mjs|cjs)$/i.test(file) || /^\s*(?:import|export)\s/m.test(text)
+    || /^(?:const|let|var)\s[^\n]*=\s*require\(['"]/m.test(text);
+  if (!isModule) return false;
+  const exported = new RegExp(`export\\s+(?:default\\s+)?(?:async\\s+)?(?:function\\*?|const|let|var|class)\\s+${name}\\b|export\\s*\\{[^}]*\\b${name}\\b|module\\.exports\\b[^\\n]*\\b${name}\\b|exports\\.${name}\\b`);
+  return !exported.test(text);
+}
+
+function gitGrepSymbol(name) {
+  const r = sh('git', ['grep', '-n', '-w', '-F', '-I', '-e', name, '--', '*.js', '*.mjs', '*.cjs', '*.html',
+    ':!vendor/**', ':!node_modules/**', ':!*.min.js', ':!.audit-tmp/**'], { allowFailure: true });
+  return (r.stdout || '').split('\n').map(l => /^(.+?):(\d+):(.*)$/.exec(l)).filter(Boolean)
+    .map(m => ({ file: m[1], line: Number(m[2]), text: m[3] }));
+}
+
+/**
+ * Mengumpulkan lokasi PEMAKAI simbol yang diubah (di luar baris yang sudah
+ * dikirim sebagai konteks berkas), ±CALLER_WINDOW_LINES baris, dalam anggaran.
+ * Inilah yang membuat reviewer bisa melihat "perubahan ini mematahkan pemanggil X".
+ */
+function buildCallerContext(symbols, sentLines, opts = {}) {
+  const budget = opts.budget || Number(process.env.FIEZEL_BOT_CALLER_CHARS) || CALLER_DEFAULT_BUDGET;
+  const grep = opts.grep || gitGrepSymbol;
+  const readLines = opts.readLines || readRepoLines;
+  const parts = [], files = new Set(), skipped = [];
+  let used = 0, sites = 0;
+  for (const entry of symbols) {
+    const sym = typeof entry === 'string' ? entry : entry.name;
+    const home = typeof entry === 'string' ? null : entry.file;
+    let hits = grep(sym);
+    if (home && isModuleLocalSymbol(home, sym, readLines)) hits = hits.filter(h => h.file === home);
+    if (hits.length > CALLER_MAX_HITS) { skipped.push(`${sym} (${hits.length} pemakaian, terlalu generik)`); continue; }
+    const defRe = new RegExp(`(?:function\\s*\\*?\\s*${sym}\\s*\\(|\\b${sym}\\s*[:=]\\s*(?:async\\s*)?(?:function\\b|\\(|[A-Za-z_$][\\w$]*\\s*=>))`);
+    const usable = hits.filter(h => !defRe.test(h.text) && !sentLines.get(h.file)?.has(h.line));
+    // Sebar ke berkas berbeda dulu (putaran per berkas), baru lokasi kedua di berkas yang sama.
+    const byFile = new Map();
+    for (const h of usable) { if (!byFile.has(h.file)) byFile.set(h.file, []); byFile.get(h.file).push(h); }
+    // Pemanggil di kode produk lebih berharga daripada di tests/ → didahulukan.
+    const lists = [...byFile.entries()].sort(([a], [b]) => /^tests\//.test(a) - /^tests\//.test(b)).map(([, l]) => l);
+    const picked = [];
+    for (let round = 0; picked.length < CALLER_SITES_PER_SYMBOL; round++) {
+      const before = picked.length;
+      for (const list of lists) if (list[round] && picked.length < CALLER_SITES_PER_SYMBOL) picked.push(list[round]);
+      if (picked.length === before) break;
+    }
+    for (const h of picked) {
+      const lines = readLines(h.file);
+      if (!lines) continue;
+      const from = Math.max(1, h.line - CALLER_WINDOW_LINES), to = Math.min(lines.length, h.line + CALLER_WINDOW_LINES);
+      const out = [`=== CALLER: ${h.file}:${h.line} (memakai \`${sym}\`) ===`];
+      for (let n = from; n <= to; n++) out.push(`${String(n).padStart(5)}${n === h.line ? '>' : ' '}| ${lines[n - 1].slice(0, 400)}`);
+      const chunk = out.join('\n');
+      if (used + chunk.length > budget) break;
+      parts.push(chunk);
+      files.add(h.file);
+      used += chunk.length;
+      sites++;
+    }
+  }
+  return { text: parts.join('\n\n'), files, sites, skipped };
 }
 
 /** Mengurai jawaban JSON AI ({summary, findings[]} atau array langsung). */
@@ -812,7 +939,8 @@ function cleanEvidence(ev) {
  * sana). Temuan yang tidak bisa dibuktikan dibuang beserta alasannya.
  */
 function verifyFindings(rawFindings, ctx) {
-  const changed = new Set(ctx.changedFiles);
+  // Berkas yang boleh ditunjuk temuan: yang berubah + berkas pemanggil yang ikut dikirim.
+  const changed = new Set([...ctx.changedFiles, ...(ctx.extraFiles || [])]);
   const readLines = ctx.readLines || readRepoLines;
   const diffMap = ctx.diffMap || new Map();
   const verified = [], dropped = [], seen = new Set();
@@ -821,7 +949,7 @@ function verifyFindings(rawFindings, ctx) {
   for (const f of (Array.isArray(rawFindings) ? rawFindings : [])) {
     if (!f || typeof f !== 'object') { drop(f, 'bukan objek'); continue; }
     const file = String(f.file || '').trim().replace(/^\.\//, '').replace(/^[ab]\//, '');
-    if (!changed.has(file)) { drop(f, 'berkas tidak termasuk perubahan PR'); continue; }
+    if (!changed.has(file)) { drop(f, 'berkas tidak ada di konteks review'); continue; }
     const lines = readLines(file);
     if (!lines) { drop(f, 'berkas tidak terbaca'); continue; }
     const claimed = Number(f.line);
@@ -880,7 +1008,7 @@ function composeInlineComment(v) {
     fence,
     '</details>',
     '',
-    `<sub>Fiezel Bot v2 • temuan AI terverifikasi</sub>`,
+    `<sub>Fiezel Bot v2 • temuan AI terverifikasi • beri 👍 bila benar, 👎 bila salah (dipakai mengukur ketepatan bot)</sub>`,
     `<!-- fiezel-bot-finding:${v.id} -->`,
   ].join('\n');
 }
@@ -938,6 +1066,10 @@ async function runReview(prNumber) {
   const diffMap = parseDiffFiles(diff);
   const fileContext = buildFileContext(changedFiles, diffMap);
   console.log(`[Fiezel Bot v2] Konteks AI: ${fileContext.included.length} berkas utuh/terpotong, ${fileContext.omitted.length} dilewati (anggaran).`);
+  const symbols = extractChangedSymbols(diff);
+  const callerContext = buildCallerContext(symbols, fileContext.sentLines);
+  fileContext.callerSites = callerContext.sites;
+  console.log(`[Fiezel Bot v2] Pemanggil: ${callerContext.sites} lokasi dari ${symbols.length} simbol (${symbols.map(s => s.name).join(', ') || '-'})${callerContext.skipped.length ? `; dilewati: ${callerContext.skipped.join(', ')}` : ''}.`);
 
   const aiPrompt = `
 Review PR: "${prTitle}"
@@ -955,9 +1087,12 @@ FULL CONTENT OF CHANGED FILES (format: "<line number><+ if added in this PR>| <c
 ${fenceUntrusted('CHANGED_FILES', fileContext.text || '(tidak ada berkas teks yang bisa dibaca)', 400000)}
 ${fileContext.omitted.length ? `(Tidak dikirim karena anggaran konteks: ${fileContext.omitted.slice(0, 20).join(', ')})` : ''}
 
+CALL SITES OF FUNCTIONS CHANGED BY THIS PR, in other places of the repo (read-only context; line marked ">" uses the symbol):
+${fenceUntrusted('CALLERS', callerContext.text || '(tidak ada pemanggil lain yang ditemukan)', 200000)}
+
 ${fenceUntrusted('GIT_DIFF', diff.slice(0, 25000), 25000)}
 
-TASK: Find REAL defects introduced or exposed by this PR that the deterministic scanner cannot catch: logic bugs, broken edge cases, data loss, race conditions, security holes, accessibility, missing Thai twin for user-facing text (every user-visible string must go through FiezelI18n.t with paired copy-id/copy-th keys). Read the full files, not only the diff, to check callers and invariants.
+TASK: Find REAL defects introduced or exposed by this PR that the deterministic scanner cannot catch: logic bugs, broken edge cases, data loss, race conditions, security holes, accessibility, missing Thai twin for user-facing text (every user-visible string must go through FiezelI18n.t with paired copy-id/copy-th keys). Read the full files, not only the diff. Use the CALL SITES to check that every caller still works with the changed signature, return value and behaviour (e.g. a caller that ignores a new failure value, or passes arguments the function no longer accepts); such a finding may point to the caller's line.
 
 Respond with ONLY a JSON object, no prose outside it:
 {"summary": "<1-2 kalimat ringkasan PR, Bahasa Indonesia>",
@@ -972,7 +1107,7 @@ RULES: at most ${MAX_AI_FINDINGS} findings; every finding MUST point to a line s
   if (aiResult.text) {
     const parsed = parseFindingsJson(aiResult.text);
     const { verified, dropped } = parsed.ok
-      ? verifyFindings(parsed.findings, { changedFiles, diffMap })
+      ? verifyFindings(parsed.findings, { changedFiles, diffMap, extraFiles: [...callerContext.files] })
       : { verified: [], dropped: [] };
     aiReview = { parseError: !parsed.ok, summary: parsed.summary, verified, dropped, context: fileContext };
     for (const d of dropped) console.log(`[Fiezel Bot v2] Temuan AI dibuang (${d.reason}): ${d.file}:${d.line} ${d.title || ''}`);
@@ -983,11 +1118,24 @@ RULES: at most ${MAX_AI_FINDINGS} findings; every finding MUST point to a line s
     }
   }
 
+  writeVerdict(risk.verdict);
+
   // ── Compose Final Review ──
   const reviewMarkdown = composeReviewMarkdown(prTitle, changedFiles, subsystems, findings, risk, aiResult, aiReview);
   console.log('\n--- HASIL REVIEW ---\n');
   console.log(reviewMarkdown);
   return reviewMarkdown;
+}
+
+/**
+ * Verdict untuk check wajib "Auto PR Review & Invariant Audit". Hanya pelanggaran
+ * DETERMINISTIK (CHANGES REQUESTED) yang menggagalkan check; temuan AI paling jauh
+ * menurunkan verdict ke kuning, sehingga AI tidak bisa memblokir merge sendirian.
+ */
+function writeVerdict(verdict) {
+  const out = process.env.FIEZEL_VERDICT_OUT;
+  if (!out) return;
+  try { fs.writeFileSync(out, `${verdict}\n`, 'utf8'); } catch (e) { console.warn(`[Fiezel Bot v2] Gagal menulis verdict: ${e.message}`); }
 }
 
 /** Bagian "Analisis Semantik AI": hanya temuan yang lolos verifikasi. */
@@ -998,7 +1146,7 @@ function composeAiSection(aiResult, aiReview) {
   const out = [];
   if (aiReview.summary) out.push(`> ${normalizeWs(aiReview.summary).slice(0, 500)}`, '');
   const { verified, dropped, context } = aiReview;
-  out.push(`**${verified.length} temuan terverifikasi**${dropped.length ? ` · ${dropped.length} dibuang karena tidak terbukti di kode` : ''} · konteks: ${context.included.length} berkas dibaca utuh/terpotong${context.omitted.length ? `, ${context.omitted.length} dilewati` : ''}`);
+  out.push(`**${verified.length} temuan terverifikasi**${dropped.length ? ` · ${dropped.length} dibuang karena tidak terbukti di kode` : ''} · konteks: ${context.included.length} berkas dibaca utuh/terpotong${context.omitted.length ? `, ${context.omitted.length} dilewati` : ''}, ${context.callerSites || 0} lokasi pemanggil`);
   if (!verified.length) {
     out.push('', '_Tidak ada temuan AI yang bisa dibuktikan di kode._');
   } else {
@@ -1268,6 +1416,176 @@ function runBump(reason = 'chore: bump build via Fiezel Bot') {
     console.error(`[Fiezel Bot v2] Gagal bump: ${err.message}`);
     return false;
   }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// METRICS — ketepatan temuan AI diukur dari reaksi & tindakan nyata di PR
+// ═══════════════════════════════════════════════════════════════════════════
+
+const METRICS_MARKER = '<!-- FIEZEL_BOT_METRICS -->';
+const METRICS_ISSUE_TITLE = '📊 Fiezel Bot — ketepatan temuan AI';
+const METRICS_DEFAULT_DAYS = 14;
+const FINDING_ID_RE = /<!-- fiezel-bot-finding:([0-9a-f]+) -->/;
+const SEVERITY_BY_ICON = { '🔴': 'high', '🟠': 'medium', '🟡': 'low' };
+
+/**
+ * Status satu temuan inline, dari bukti yang bisa dilihat di GitHub:
+ *  - 👎 dari manusia → ditolak; 👍 → diterima (label eksplisit menang).
+ *  - Baris yang dikomentari lalu berubah (thread outdated) → diterima: kodenya diperbaiki.
+ *  - Di-resolve tanpa perubahan kode → ditolak.
+ *  - PR sudah merge/tutup tanpa tindakan → diabaikan (dihitung sebagai bukan temuan berguna).
+ *  - Selain itu → terbuka.
+ */
+function classifyFindingThread(t) {
+  const reactions = (t.reactions || []).filter(r => !/\[bot\]$/i.test(r.user || ''));
+  if (reactions.some(r => r.content === 'THUMBS_DOWN')) return 'ditolak';
+  if (reactions.some(r => r.content === 'THUMBS_UP')) return 'diterima';
+  if (t.isOutdated) return 'diterima';
+  if (t.isResolved) return 'ditolak';
+  if (t.prState && t.prState !== 'OPEN') return 'diabaikan';
+  return 'terbuka';
+}
+
+/** Mengurai komentar temuan bot: id, tingkat, judul. Null bila bukan komentar temuan. */
+function parseFindingComment(body) {
+  const id = FINDING_ID_RE.exec(String(body || ''))?.[1];
+  if (!id) return null;
+  const first = String(body).trim().split('\n')[0];
+  const icon = [...first][0];
+  const title = /\*\*(.+?)\*\*/.exec(first)?.[1] || '(tanpa judul)';
+  return { id, severity: SEVERITY_BY_ICON[icon] || 'low', title };
+}
+
+/** Jumlah temuan terverifikasi & dibuang dari komentar ringkasan review terakhir di PR. */
+function parseReviewSummaryCounts(body) {
+  const b = String(body || '');
+  if (!b.includes('<!-- FIEZEL_BOT_REVIEW -->')) return null;
+  const verified = Number(/\*\*(\d+) temuan terverifikasi\*\*/.exec(b)?.[1] ?? NaN);
+  if (!Number.isFinite(verified)) return null;
+  const dropped = Number(/(\d+) dibuang karena tidak terbukti/.exec(b)?.[1] ?? 0);
+  return { verified, dropped };
+}
+
+const pct = (a, b) => (b > 0 ? `${Math.round((a / b) * 100)}%` : '—');
+
+function composeMetricsReport(rows, summaries, opts = {}) {
+  const days = opts.days || METRICS_DEFAULT_DAYS;
+  const count = (st, list = rows) => list.filter(r => r.status === st).length;
+  const decided = (list) => count('diterima', list) + count('ditolak', list) + count('diabaikan', list);
+  const proposed = summaries.reduce((n, s) => n + s.verified + s.dropped, 0);
+  const droppedTotal = summaries.reduce((n, s) => n + s.dropped, 0);
+  const STATUS_ICON = { diterima: '✅', ditolak: '❌', diabaikan: '💤', terbuka: '⏳' };
+  const lines = [
+    METRICS_MARKER,
+    `## ${METRICS_ISSUE_TITLE} (${days} hari terakhir)`,
+    '',
+    `_Diperbarui otomatis ${new Date().toISOString().slice(0, 16).replace('T', ' ')} UTC oleh workflow FIEZEL Bot Metrics._`,
+    '',
+    '| Metrik | Nilai |',
+    '|---|---|',
+    `| Temuan inline diposting | ${rows.length} |`,
+    `| ✅ Diterima (👍, atau baris yang dikomentari lalu diubah) | ${count('diterima')} |`,
+    `| ❌ Ditolak (👎, atau di-resolve tanpa perubahan kode) | ${count('ditolak')} |`,
+    `| 💤 Diabaikan (PR selesai tanpa tindakan) | ${count('diabaikan')} |`,
+    `| ⏳ Masih terbuka | ${count('terbuka')} |`,
+    `| **Ketepatan** = diterima ÷ (diterima + ditolak + diabaikan) | **${pct(count('diterima'), decided(rows))}** |`,
+    `| Usulan AI yang dibuang verifikasi (review terakhir tiap PR) | ${droppedTotal} dari ${proposed} (${pct(droppedTotal, proposed)}) |`,
+    `| PR yang direview | ${summaries.length} |`,
+    '',
+    '| Tingkat | Diterima | Ditolak | Diabaikan | Terbuka | Ketepatan |',
+    '|---|---|---|---|---|---|',
+  ];
+  for (const sev of SEVERITIES) {
+    const list = rows.filter(r => r.severity === sev);
+    lines.push(`| ${SEVERITY_ICON[sev]} ${sev} | ${count('diterima', list)} | ${count('ditolak', list)} | ${count('diabaikan', list)} | ${count('terbuka', list)} | ${pct(count('diterima', list), decided(list))} |`);
+  }
+  lines.push('', '**Cara memberi label:** beri 👍 pada komentar inline Fiezel Bot yang benar, 👎 yang salah. Tanpa reaksi, status ditebak dari tindakan: baris diubah = diterima, di-resolve tanpa perubahan = ditolak.');
+  if (rows.length) {
+    lines.push('', '<details><summary>Rincian temuan (terbaru dulu, maks. 40)</summary>', '', '| PR | Lokasi | Temuan | Status |', '|---|---|---|---|');
+    for (const r of [...rows].sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt))).slice(0, 40)) {
+      lines.push(`| #${r.pr} | \`${r.path}:${r.line ?? '?'}\` | ${SEVERITY_ICON[r.severity]} ${r.title.replace(/\|/g, '\\|').slice(0, 100)} | ${STATUS_ICON[r.status]} ${r.status} |`);
+    }
+    lines.push('', '</details>');
+  }
+  return lines.join('\n');
+}
+
+const METRICS_QUERY = `query($q: String!, $cursor: String) {
+  search(query: $q, type: ISSUE, first: 25, after: $cursor) {
+    pageInfo { hasNextPage endCursor }
+    nodes { ... on PullRequest {
+      number state
+      reviewThreads(first: 100) { nodes {
+        isResolved isOutdated path line originalLine
+        comments(first: 1) { nodes { body createdAt reactions(first: 50) { nodes { content user { login } } } } }
+      } }
+      comments(last: 50) { nodes { body } }
+    } }
+  }
+}`;
+
+function ghGraphql(query, vars) {
+  const args = ['api', 'graphql', '-f', `query=${query}`];
+  for (const [k, v] of Object.entries(vars)) if (v != null) args.push('-f', `${k}=${v}`);
+  return JSON.parse(sh('gh', args));
+}
+
+/** Mengumpulkan semua temuan inline bot + ringkasan review dari PR yang aktif dalam N hari. */
+function collectMetrics(opts = {}) {
+  const repo = opts.repo || process.env.REPO || 'FIEZEL-APPS/FIEZEL-APPS';
+  const days = opts.days || Number(process.env.FIEZEL_METRICS_DAYS) || METRICS_DEFAULT_DAYS;
+  const since = new Date(Date.now() - days * 86400_000).toISOString().slice(0, 10);
+  const gql = opts.graphql || ghGraphql;
+  const rows = [], summaries = [];
+  let cursor = null;
+  for (let page = 0; page < 8; page++) {
+    const data = gql(METRICS_QUERY, { q: `repo:${repo} is:pr updated:>=${since}`, cursor });
+    const search = data?.data?.search;
+    for (const pr of search?.nodes || []) {
+      if (!pr?.number) continue;
+      for (const th of pr.reviewThreads?.nodes || []) {
+        const c = th.comments?.nodes?.[0];
+        const f = parseFindingComment(c?.body);
+        if (!f) continue;
+        const reactions = (c.reactions?.nodes || []).map(r => ({ content: r.content, user: r.user?.login || '' }));
+        rows.push({ ...f, pr: pr.number, path: th.path, line: th.line ?? th.originalLine, createdAt: c.createdAt,
+          status: classifyFindingThread({ reactions, isOutdated: th.isOutdated, isResolved: th.isResolved, prState: pr.state }) });
+      }
+      const summaryBody = (pr.comments?.nodes || []).map(n => n.body).reverse().find(b => b?.includes('<!-- FIEZEL_BOT_REVIEW -->'));
+      const counts = parseReviewSummaryCounts(summaryBody);
+      if (counts) summaries.push({ pr: pr.number, ...counts });
+    }
+    if (!search?.pageInfo?.hasNextPage) break;
+    cursor = search.pageInfo.endCursor;
+  }
+  return { rows, summaries, days };
+}
+
+/** Menulis laporan ke satu issue tetap (dibuat sekali, lalu diperbarui). */
+function upsertMetricsIssue(body, opts = {}) {
+  const repo = opts.repo || process.env.REPO || 'FIEZEL-APPS/FIEZEL-APPS';
+  const file = path.join(os.tmpdir(), `fiezel-bot-metrics-${process.pid}.md`);
+  fs.writeFileSync(file, body, 'utf8');
+  // Daftar lengkap lalu cocokkan judul persis: pencarian GitHub tidak andal untuk judul
+  // beremoji, dan pencarian yang meleset akan membuat issue baru setiap hari.
+  const list = JSON.parse(sh('gh', ['issue', 'list', '--repo', repo, '--state', 'open', '--json', 'number,title', '--limit', '1000']) || '[]');
+  const existing = list.find(i => i.title === METRICS_ISSUE_TITLE);
+  if (existing) {
+    sh('gh', ['issue', 'edit', String(existing.number), '--repo', repo, '--body-file', file]);
+    console.log(`[Fiezel Bot v2] Laporan ketepatan diperbarui di issue #${existing.number}`);
+  } else {
+    console.log(sh('gh', ['issue', 'create', '--repo', repo, '--title', METRICS_ISSUE_TITLE, '--body-file', file]));
+  }
+}
+
+function runMetrics(opts = {}) {
+  const { rows, summaries, days } = collectMetrics(opts);
+  const report = composeMetricsReport(rows, summaries, { days });
+  console.log(report);
+  if (opts.dryRun) return report;
+  upsertMetricsIssue(report, opts);
+  if (process.env.GITHUB_STEP_SUMMARY) fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, report + '\n');
+  return report;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1583,6 +1901,86 @@ async function runSelfTest() {
   console.log('  ✅ T19: Coba-ulang 429/503 & turun ke model cadangan');
   pass++;
 
+  // T20: Simbol yang diubah ditemukan, pemanggilnya dikumpulkan (produk dulu, definisi & baris terkirim dilewati).
+  {
+    const d = [
+      'diff --git a/app.js b/app.js', '--- a/app.js', '+++ b/app.js',
+      '@@ -10,3 +10,3 @@ function renderHome(level){',
+      '-function startQuiz(level){', '+function startQuiz(level, opts){', '   return 1;',
+      'diff --git a/README.md b/README.md', '--- a/README.md', '+++ b/README.md', '@@ -1 +1 @@', '-function docOnly(x){', '+x',
+    ].join('\n');
+    const syms = extractChangedSymbols(d);
+    if (syms.map(x => `${x.name}@${x.file}`).join() !== 'startQuiz@app.js,renderHome@app.js') throw new Error(`T20 FAIL: simbol ${JSON.stringify(syms)}`);
+    const files = {
+      'app.js': Array.from({ length: 40 }, (_, i) => (i === 9 ? 'function startQuiz(level, opts){' : i === 29 ? 'btn.onclick=()=>startQuiz(lvl);' : `// baris ${i + 1}`)),
+      'features/quiz/a.js': ['x', 'startQuiz(2);', 'y'],
+      'tests/quiz-test.js': ['startQuiz(1);'],
+    };
+    const grep = (name) => name !== 'startQuiz' ? [] : [
+      { file: 'tests/quiz-test.js', line: 1, text: 'startQuiz(1);' },
+      { file: 'app.js', line: 10, text: 'function startQuiz(level, opts){' },
+      { file: 'app.js', line: 30, text: 'btn.onclick=()=>startQuiz(lvl);' },
+      { file: 'features/quiz/a.js', line: 2, text: 'startQuiz(2);' },
+    ];
+    const cc = buildCallerContext(['startQuiz'], new Map([['app.js', new Set([30])]]), { grep, readLines: f => files[f] || null, budget: 100000 });
+    const heads = cc.text.split('\n').filter(l => l.startsWith('=== CALLER'));
+    if (cc.sites !== 2 || !heads[0].includes('features/quiz/a.js:2') || !heads[1].includes('tests/quiz-test.js:1') || cc.text.includes('app.js:30') || cc.text.includes('app.js:10')) {
+      throw new Error(`T20 FAIL: ${heads.join(' | ')}`);
+    }
+    if (!cc.text.includes('    2>| startQuiz(2);')) throw new Error('T20 FAIL: penanda baris pemanggil');
+    const generic = buildCallerContext(['init'], new Map(), { grep: () => Array.from({ length: 81 }, (_, i) => ({ file: 'a.js', line: i + 1, text: 'init()' })), readLines: () => ['init()'] });
+    if (generic.sites !== 0 || !generic.skipped.length) throw new Error('T20 FAIL: simbol generik harus dilewati');
+    // Fungsi lokal modul: nama sama di berkas lain BUKAN pemanggil; yang diekspor tetap dicari lintas berkas.
+    if (isModuleLocalSymbol('app.js', 'go', () => ['function go(){', "  if(typeof require==='function'){const m=require('./x.js')}", '}'])) throw new Error('T20 FAIL: require berpenjaga bukan modul');
+    if (isModuleLocalSymbol('features/a/b.js', 'go', () => ['function go(){}', 'if (typeof module !== "undefined") module.exports = { go };'])) throw new Error('T20 FAIL: UMD bukan modul tertutup');
+    if (!isModuleLocalSymbol('tests/t.js', 'go', () => ["const fs = require('fs');", 'function go(){}'])) throw new Error('T20 FAIL: skrip Node require tingkat atas = modul');
+    const modFiles = {
+      'tools/x.mjs': ['import fs from "fs";', 'function sleep(ms){}', 'sleep(5);', 'export function pub(){}'],
+      'page.html': ['<script>', 'sleep(1);', 'pub();', '</script>'],
+    };
+    const modGrep = (n) => Object.entries(modFiles).flatMap(([f, ls]) => ls.map((t, i) => ({ file: f, line: i + 1, text: t })).filter(h => new RegExp(`\\b${n}\\b`).test(h.text)));
+    const loc = buildCallerContext([{ name: 'sleep', file: 'tools/x.mjs' }, { name: 'pub', file: 'tools/x.mjs' }], new Map(), { grep: modGrep, readLines: f => modFiles[f] || null, budget: 100000 });
+    const locHeads = loc.text.split('\n').filter(l => l.startsWith('=== CALLER')).join(' | ');
+    if (!locHeads.includes('tools/x.mjs:3') || locHeads.includes('page.html:2') || !locHeads.includes('page.html:3')) throw new Error(`T20 FAIL: cakupan modul ${locHeads}`);
+    const v = verifyFindings([{ file: 'features/quiz/a.js', line: 2, severity: 'high', title: 'pemanggil lupa opts', explanation: 'x', evidence: 'startQuiz(2);' }],
+      { changedFiles: ['app.js'], extraFiles: [...cc.files], diffMap: new Map(), readLines: f => files[f] || null });
+    if (v.verified.length !== 1 || v.verified[0].inDiff) throw new Error('T20 FAIL: temuan di berkas pemanggil harus terverifikasi (ringkasan, bukan inline)');
+  }
+  console.log('  ✅ T20: Kode pemanggil (simbol diubah → lokasi pemakai, produk didahulukan)');
+  pass++;
+
+  // T21: Ketepatan — klasifikasi thread, pengumpulan via GraphQL tiruan, dan laporan.
+  {
+    const cls = (o) => classifyFindingThread({ reactions: [], isOutdated: false, isResolved: false, prState: 'OPEN', ...o });
+    const cases = [
+      [cls({ reactions: [{ content: 'THUMBS_DOWN', user: 'FIEZEL-APPS' }], isOutdated: true }), 'ditolak'],
+      [cls({ reactions: [{ content: 'THUMBS_UP', user: 'FIEZEL-APPS' }] }), 'diterima'],
+      [cls({ reactions: [{ content: 'THUMBS_UP', user: 'github-actions[bot]' }] }), 'terbuka'],
+      [cls({ isOutdated: true }), 'diterima'],
+      [cls({ isResolved: true }), 'ditolak'],
+      [cls({ prState: 'MERGED' }), 'diabaikan'],
+      [cls({}), 'terbuka'],
+    ];
+    cases.forEach(([got, want], i) => { if (got !== want) throw new Error(`T21 FAIL: kasus ${i} = ${got}, harus ${want}`); });
+    const finding = (sev, title, id) => `${SEVERITY_ICON[sev]} **${title}**\n\nx\n<!-- fiezel-bot-finding:${id} -->`;
+    const fake = () => ({ data: { search: { pageInfo: { hasNextPage: false }, nodes: [
+      { number: 7, state: 'MERGED',
+        reviewThreads: { nodes: [
+          { isResolved: true, isOutdated: false, path: 'a.js', line: 3, comments: { nodes: [{ body: finding('low', 'console.log', 'aaa111'), createdAt: '2026-10-01', reactions: { nodes: [] } }] } },
+          { isResolved: false, isOutdated: true, path: 'b.js', line: 9, comments: { nodes: [{ body: finding('high', 'null deref', 'bbb222'), createdAt: '2026-10-02', reactions: { nodes: [] } }] } },
+          { isResolved: false, isOutdated: false, path: 'c.js', line: 1, comments: { nodes: [{ body: 'komentar manusia biasa', createdAt: '2026-10-02', reactions: { nodes: [] } }] } },
+        ] },
+        comments: { nodes: [{ body: '<!-- FIEZEL_BOT_REVIEW -->\n**2 temuan terverifikasi** · 3 dibuang karena tidak terbukti di kode' }] } },
+    ] } } });
+    const m = collectMetrics({ graphql: fake, days: 14, repo: 'o/r' });
+    const statuses = m.rows.map(r => `${r.severity}:${r.status}`).join();
+    if (statuses !== 'low:ditolak,high:diterima' || m.summaries[0]?.dropped !== 3) throw new Error(`T21 FAIL: collect ${statuses}`);
+    const report = composeMetricsReport(m.rows, m.summaries, { days: 14 });
+    if (!report.startsWith(METRICS_MARKER) || !report.includes('**50%**') || !report.includes('3 dari 5 (60%)')) throw new Error('T21 FAIL: laporan');
+  }
+  console.log('  ✅ T21: Ketepatan temuan (klasifikasi, pengumpulan, laporan)');
+  pass++;
+
   console.log(`\n✅ Fiezel Bot v2 Self-Test: PASS (${pass}/${pass} tests)`);
 }
 
@@ -1609,6 +2007,7 @@ async function main() {
       if (runBump(options.message || 'chore: automated build bump')) writePatchList(BUMP_FILES);
       break;
     case 'explain': await runExplain(options.pr); break;
+    case 'metrics': runMetrics({ dryRun: !!options['dry-run'], days: Number(options.days) || undefined }); break;
     case 'self-test': await runSelfTest(); break;
     default:
       console.log(`
@@ -1619,6 +2018,7 @@ FIEZEL BOT v2.1 — Elite Autonomous Code Review & Auto-Fix Agent
   node tools/fiezel-bot.mjs heal    [--pr=N] [--log=P] [--branch=B]  CI self-healing
   node tools/fiezel-bot.mjs bump    "message"         Version bump + hexa-sync
   node tools/fiezel-bot.mjs explain [--pr=N]          PR explanation (Indonesian)
+  node tools/fiezel-bot.mjs metrics [--days=14] [--dry-run]  Ketepatan temuan AI → issue
   node tools/fiezel-bot.mjs self-test                 Verify all components
       `);
   }
