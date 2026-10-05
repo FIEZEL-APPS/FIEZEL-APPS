@@ -7811,7 +7811,7 @@
       "whyCorrect": "'Only when…' หน้าประโยคทำให้ต้องสลับกริยาช่วย: did the boats leave",
       "whyOthersFail": "สองตัวเลือกคงลำดับปกติ และอีกหนึ่งย้ายคำกริยาหลักแทนกริยาช่วย",
       "howToAvoid": "ประโยคเริ่มด้วย 'Only after/when/then' ไหม? วาง did/does/have หน้าประธาน",
-      "memoryCue": "Only when … did the boats leave.",
+      "memoryCue": "สังเกตโครงสร้างประโยค: Only when … did the boats leave.",
       "distractors": {
         "the boats left": {
           "misconception": "คงลำดับประโยคบอกเล่าปกติไว้หลังวลีจำกัดความที่ย้ายมาหน้าประโยค",
@@ -7835,7 +7835,7 @@
       "whyCorrect": "'Insisted that' นำข้อเรียกร้อง คำกริยาจึงเป็น subjunctive รูปเปล่า: the patient stay",
       "whyOthersFail": "'stays' เติม -s 'stayed' เลื่อนกาล ส่วน 'would stay' เปลี่ยนความหมายเป็นการคาดการณ์",
       "howToAvoid": "หลังคำกริยาเรียกร้อง + that ให้เขียนคำกริยาตามรูปในพจนานุกรม",
-      "memoryCue": "Insisted that she stay.",
+      "memoryCue": "สังเกตรูปคำกริยา: Insisted that she stay.",
       "distractors": {
         "stays": {
           "misconception": "ทำให้ข้อเรียกร้องนุ่มลงด้วย “would” เชิงเงื่อนไข เหมือนอนุประโยคกำลังรายงานการสมมติ",

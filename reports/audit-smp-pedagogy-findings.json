@@ -1,0 +1,2684 @@
+{
+  "totalTemplates": 512,
+  "leakCount": 341,
+  "leaks": [
+    {
+      "id": "MO-001",
+      "level": "A2",
+      "subskill": "obligation_vs_permission",
+      "correct": "must",
+      "cue": "Kalau ini aturan, pakai “must”."
+    },
+    {
+      "id": "CO-002",
+      "level": "B1",
+      "subskill": "second_conditional_unreal_present",
+      "correct": "won",
+      "cue": "Khayalan yang mustahil sekarang: bagian if pakai bentuk lampau, pasangannya would."
+    },
+    {
+      "id": "AR-001",
+      "level": "A2",
+      "subskill": "first_vs_subsequent_mention",
+      "correct": "the",
+      "cue": "Baru muncul pakai a atau an, udah dikenal pakai the."
+    },
+    {
+      "id": "TA-005",
+      "level": "B2",
+      "subskill": "present_perfect_continuous_vs_present_perfect_simple",
+      "correct": "has written",
+      "cue": "Hasil kehitung pakai simple; proses yang masih jalan pakai continuous."
+    },
+    {
+      "id": "MO-004",
+      "level": "B2",
+      "subskill": "deduction_past_must_have_vs_cant_have",
+      "correct": "must have",
+      "cue": "Bukti kuat mendukung: “must have”. Bukti kuat nyangkal: “can’t have”."
+    },
+    {
+      "id": "CO-005",
+      "level": "B1",
+      "subskill": "unless_vs_if_not",
+      "correct": "unless",
+      "cue": "“Unless” udah berarti “if not”; jangan pernah nulis “unless not”."
+    },
+    {
+      "id": "PA-003",
+      "level": "B2",
+      "subskill": "get_passive_informal_vs_be_passive",
+      "correct": "got",
+      "cue": "Santai, mendadak, dan nggak enak: pakai pasif “get”."
+    },
+    {
+      "id": "RS-004",
+      "level": "B2",
+      "subskill": "reporting_verb_choice_suggest_vs_tell",
+      "correct": "suggested",
+      "cue": "“Suggest” diikuti bentuk -ing, nggak pernah “suggested me/us to ...”."
+    },
+    {
+      "id": "AR-003",
+      "level": "A2",
+      "subskill": "much_many_little_few_countability",
+      "correct": "many",
+      "cue": "Bisa dihitung: many atau few. Nggak bisa dihitung: much atau little."
+    },
+    {
+      "id": "RC-003",
+      "level": "B2",
+      "subskill": "relative_pronoun_whose_possession",
+      "correct": "whose",
+      "cue": "“Whose” berarti punya; “who’s” berarti who is atau who has."
+    },
+    {
+      "id": "CM-002",
+      "level": "A2",
+      "subskill": "as_as_equality_vs_comparative",
+      "correct": "as fast as",
+      "cue": "Sama persis berarti nggak ada selisih, jadi pakai as ... as."
+    },
+    {
+      "id": "MO-006",
+      "level": "B1",
+      "subskill": "advice_should_vs_ought_to_vs_had_better",
+      "correct": "had better",
+      "cue": "Kereta terakhir sampai besok, berarti “had better” hari ini."
+    },
+    {
+      "id": "MO-007",
+      "level": "B1",
+      "subskill": "speculation_scale_may_might_could_vs_will",
+      "correct": "might",
+      "cue": "“Not sure” pasangannya “might”, bukan “will”."
+    },
+    {
+      "id": "CO-006",
+      "level": "C1",
+      "subskill": "formal_inversion_had_i_known",
+      "correct": "had i",
+      "cue": "Buang “if”, balik urutannya: “Had I known” sama dengan “If I had known”."
+    },
+    {
+      "id": "PA-005",
+      "level": "B2",
+      "subskill": "impersonal_reporting_it_is_said_that",
+      "correct": "it is believed",
+      "cue": "Tanpa sumber yang disebut dan bernada resmi: “It is believed that ...”."
+    },
+    {
+      "id": "PA-006",
+      "level": "B2",
+      "subskill": "passive_infinitive_after_modal_expectation",
+      "correct": "to be announced",
+      "cue": "Kebijakannya diumumin, bukan ngumumin: “to be announced”."
+    },
+    {
+      "id": "RS-005",
+      "level": "B1",
+      "subskill": "time_and_place_reference_shift",
+      "correct": "that day",
+      "cue": "Kata kerjanya mundur, “today” pun ikut geser jadi “that day”."
+    },
+    {
+      "id": "AR-004",
+      "level": "A2",
+      "subskill": "definite_article_with_unique_referents_and_superlatives",
+      "correct": "the",
+      "cue": "Bentuk “paling” berarti cuma ada satu, jadi pakai “the”."
+    },
+    {
+      "id": "AR-005",
+      "level": "A1",
+      "subskill": "demonstrative_reference_distance_this_these_that_those",
+      "correct": "those",
+      "cue": "Banyak dan jauh: “those books over there”."
+    },
+    {
+      "id": "PR-004",
+      "level": "B1",
+      "subskill": "phrasal_verb_particle_changes_meaning",
+      "correct": "off",
+      "cue": "“Put off” sebuah rapat berarti ndorong jadwalnya lebih jauh ke depan."
+    },
+    {
+      "id": "PR-005",
+      "level": "A2",
+      "subskill": "movement_prepositions_through_across_along_over",
+      "correct": "through",
+      "cue": "Celah punya bagian dalam, jadi ditembus pakai “through”."
+    },
+    {
+      "id": "CM-004",
+      "level": "B1",
+      "subskill": "less_vs_fewer_countability_agreement",
+      "correct": "fewer",
+      "cue": "Telur bisa dihitung satu-satu, jadi pakai “fewer”."
+    },
+    {
+      "id": "QN-004",
+      "level": "A2",
+      "subskill": "double_negative_avoidance_single_negation_rule",
+      "correct": "anything",
+      "cue": "Satu kata negatif per kalimat: “didn’t ... anything”, bukan “didn’t ... nothing”."
+    },
+    {
+      "id": "TA-010",
+      "level": "B1",
+      "subskill": "present_simple_for_fixed_schedules_not_personal_plans",
+      "correct": "leaves",
+      "cue": "Jadwal ngomong pakai present simple."
+    },
+    {
+      "id": "b4_002",
+      "level": "B2",
+      "subskill": "narrative_past_perfect_flashback_vs_past_simple_sequence",
+      "correct": "had left",
+      "cue": "Kejadian lampau yang lebih dulu pakai had + past participle (bentuk ke-3 kata kerja)."
+    },
+    {
+      "id": "b4_005",
+      "level": "B1",
+      "subskill": "possibility_vs_permission_can_vs_may_formal_register",
+      "correct": "may",
+      "cue": "Pengumuman resmi pakai modal resmi."
+    },
+    {
+      "id": "b4_006",
+      "level": "C1",
+      "subskill": "conditional_inversion_were_i_to",
+      "correct": "were i to",
+      "cue": "“Were I to ...” itu bentuk formal terbalik dari “If I were to ...”."
+    },
+    {
+      "id": "b4_008",
+      "level": "B2",
+      "subskill": "passive_causative_vs_passive_simple_confusion",
+      "correct": "had",
+      "cue": "Pasif biasa pakai was atau were; nyuruh orang lain pakai had + bendanya + past participle."
+    },
+    {
+      "id": "b4_012",
+      "level": "B1",
+      "subskill": "article_with_institutions_school_prison_hospital",
+      "correct": "school",
+      "cue": "Belajar di sana sebagai murid pakai “go to school”."
+    },
+    {
+      "id": "b4_013",
+      "level": "B1",
+      "subskill": "possessive_determiner_vs_double_genitive_of_mine",
+      "correct": "a friend of mine",
+      "cue": "“A friend of mine” berarti salah satu temanku."
+    },
+    {
+      "id": "b4_014",
+      "level": "A2",
+      "subskill": "preposition_of_time_duration_for_vs_since_vs_during",
+      "correct": "during",
+      "cue": "Gunakan “during” sebelum kata benda (contoh: during the meeting). Gunakan “while” jika diikuti subjek dan kata kerja (contoh: while we were meeting)."
+    },
+    {
+      "id": "b4_015",
+      "level": "B1",
+      "subskill": "preposition_after_adjective_of_emotion_pleased_with_vs_about",
+      "correct": "with",
+      "cue": "Hasil pakai “with”, kabar pakai “about”, orang pakai “for”."
+    },
+    {
+      "id": "b4_016",
+      "level": "B2",
+      "subskill": "gerund_as_subject_vs_infinitive_as_subject_formality",
+      "correct": "exercising",
+      "cue": "Kegiatan sebagai subjek pakai bentuk -ing: Exercising, Reading, Smoking, terus kata kerjanya."
+    },
+    {
+      "id": "b4_019",
+      "level": "B1",
+      "subskill": "comparative_intensifiers_much_far_a_lot_before_comparative",
+      "correct": "much",
+      "cue": "Contohnya “much faster”, “far better”, dan “a lot cheaper”."
+    },
+    {
+      "id": "b4_022",
+      "level": "B2",
+      "subskill": "contrast_connectors_although_despite_however_distinction",
+      "correct": "despite",
+      "cue": "Gunakan “despite” (atau in spite of) sebelum frasa kata benda. Gunakan “although” jika diikuti klausa lengkap bersubjek dan berkata kerja."
+    },
+    {
+      "id": "b5_002",
+      "level": "B1",
+      "subskill": "present_perfect_for_unfinished_time_period_this_week",
+      "correct": "have sent",
+      "cue": "Rentang waktunya belum tutup, berarti pakai present perfect."
+    },
+    {
+      "id": "b5_003",
+      "level": "B2",
+      "subskill": "modal_of_criticism_should_have_vs_could_have_contrast",
+      "correct": "should have read",
+      "cue": "Ada penyesalan atas kelalaian di masa lalu? Pakai should have."
+    },
+    {
+      "id": "b5_004",
+      "level": "B1",
+      "subskill": "ability_nonfinite_forms_be_able_to",
+      "correct": "be able to",
+      "cue": "Nggak ada “to can”; ucapin “to be able to”."
+    },
+    {
+      "id": "b5_006",
+      "level": "B2",
+      "subskill": "conditional_with_unless_provided_that_as_long_as_distinction",
+      "correct": "provided that",
+      "cue": "“Provided that” berarti cuma kalau; “unless” berarti kecuali kalau."
+    },
+    {
+      "id": "b5_007",
+      "level": "B2",
+      "subskill": "passive_with_two_objects_verb_give_send_choice_of_subject",
+      "correct": "were sent",
+      "cue": "Penerimanya jadi subjek: “Employees were sent a bonus”, tanpa “to”."
+    },
+    {
+      "id": "b5_010",
+      "level": "B2",
+      "subskill": "reporting_verb_pattern_deny_admit_apologize_for",
+      "correct": "for being",
+      "cue": "Kata kerja “apologize” berpasangan dengan preposisi “for” lalu kata kerja -ing: “apologized for being late”."
+    },
+    {
+      "id": "b5_011",
+      "level": "B2",
+      "subskill": "zero_article_with_proper_nouns_exceptions_the_netherlands",
+      "correct": "the",
+      "cue": "Nama negara yang kedengeran jamak pakai “the”: “the Netherlands”, “the Philippines”, “the United States”."
+    },
+    {
+      "id": "b5_015",
+      "level": "C1",
+      "subskill": "verb_pattern_regret_mean_go_on_meaning_change",
+      "correct": "to inform",
+      "cue": "Regret TO INFORM you sekarang; regret DOING sesuatu di masa lalu."
+    },
+    {
+      "id": "b5_017",
+      "level": "C1",
+      "subskill": "relative_clause_with_quantifier_some_of_which_many_of_whom",
+      "correct": "many of whom",
+      "cue": "Many of whom dan some of which: kata jumlah dulu, terus “of”, terus kata penghubungnya."
+    },
+    {
+      "id": "b5_019",
+      "level": "A2",
+      "subskill": "subject_vs_object_questions_word_order",
+      "correct": "who broke",
+      "cue": "Pertanyaan menanyakan pelaku/subjek langsung menggunakan “Who + kata kerja lampau” (Who broke...), tanpa kata bantu did."
+    },
+    {
+      "id": "b5_021",
+      "level": "B1",
+      "subskill": "purpose_connectors_so_that_in_order_to_distinction",
+      "correct": "so that",
+      "cue": "Subjek beda pakai “so that”; subjek sama pakai “in order to”."
+    },
+    {
+      "id": "b5_022",
+      "level": "C1",
+      "subskill": "addition_connectors_furthermore_in_addition_moreover_register",
+      "correct": "furthermore",
+      "cue": "Penambahan buat ragam akademik: furthermore atau moreover."
+    },
+    {
+      "id": "b5_024",
+      "level": "C2",
+      "subskill": "fronting_for_emphasis_such_was_the_impact",
+      "correct": "such was the impact",
+      "cue": "Such was the impact that ...: “such” memimpin, kata kerjanya langsung nyusul."
+    },
+    {
+      "id": "A1-004",
+      "level": "A1",
+      "subskill": "be_subject_agreement",
+      "correct": "are",
+      "cue": "“They” selalu sama “are”: “they are at home”."
+    },
+    {
+      "id": "A1-005",
+      "level": "A1",
+      "subskill": "there_is_are",
+      "correct": "are",
+      "cue": "Banyak: “there are”. Satu: “there is”."
+    },
+    {
+      "id": "A1-006",
+      "level": "A1",
+      "subskill": "possessive_adjectives",
+      "correct": "her",
+      "cue": "Her plus kata benda; hers jalan sendiri."
+    },
+    {
+      "id": "A1-007",
+      "level": "A1",
+      "subskill": "can_ability",
+      "correct": "can",
+      "cue": "Can plus kata kerja dasar: can swim, can drive."
+    },
+    {
+      "id": "C2-003",
+      "level": "C2",
+      "subskill": "modal_deduction_past_progressive",
+      "correct": "must have been working",
+      "cue": "Bukti kuat plus kegiatan lampau yang sedang jalan: must have been working."
+    },
+    {
+      "id": "C2-005",
+      "level": "C2",
+      "subskill": "pseudo_cleft_what_clause_emphasis",
+      "correct": "was",
+      "cue": "What we needed was X: satu anak kalimat what, satu gagasan tunggal."
+    },
+    {
+      "id": "C2-006",
+      "level": "C1",
+      "subskill": "participle_clause",
+      "correct": "having reviewed",
+      "cue": "Tindakan aktif yang lebih dulu: “having reviewed”. Tindakan pasif yang lebih dulu: “having been reviewed”."
+    },
+    {
+      "id": "A1-009",
+      "level": "A1",
+      "subskill": "have_got_has_got",
+      "correct": "has",
+      "cue": "“He”, “she”, “it”: has got. “I”, “you”, “we”, “they”: have got."
+    },
+    {
+      "id": "A1-010",
+      "level": "A1",
+      "subskill": "past_simple_regular_forms",
+      "correct": "played",
+      "cue": "Yesterday: play jadi played. Ingat did plus play."
+    },
+    {
+      "id": "A1-011",
+      "level": "A1",
+      "subskill": "past_be_was_were",
+      "correct": "were",
+      "cue": "“They” pakai “were”. “She” pakai “was”."
+    },
+    {
+      "id": "A1-014",
+      "level": "A1",
+      "subskill": "present_continuous_basics",
+      "correct": "is cooking",
+      "cue": "Lagi berlangsung: be plus -ing, kayak she is cooking."
+    },
+    {
+      "id": "A1-015",
+      "level": "A1",
+      "subskill": "question_words_basic",
+      "correct": "where",
+      "cue": "Where buat tempat, when buat waktu, who buat orang."
+    },
+    {
+      "id": "A1-016",
+      "level": "A1",
+      "subskill": "some_any_countable_uncountable",
+      "correct": "any",
+      "cue": "Negatif plus nggak bisa dihitung: I do not have any money."
+    },
+    {
+      "id": "A1-017",
+      "level": "A1",
+      "subskill": "subject_object_pronouns_and_possessives",
+      "correct": "her",
+      "cue": "“Her name”, tapi “the name is hers”."
+    },
+    {
+      "id": "A1-018",
+      "level": "A2",
+      "subskill": "imperative_commands_base_form",
+      "correct": "open",
+      "cue": "Perintah itu polosan: “Open”, “Sit”, “Listen”."
+    },
+    {
+      "id": "A1-019",
+      "level": "A2",
+      "subskill": "adverbs_of_frequency_mid_position",
+      "correct": "always drinks",
+      "cue": "Frekuensi dulu, kata kerja belakangan: “She always drinks”."
+    },
+    {
+      "id": "A1-020",
+      "level": "A2",
+      "subskill": "possessive_s_noun_ownership",
+      "correct": "sinta's",
+      "cue": "Pemilik + apostrof s + barang: “Sinta's bag”."
+    },
+    {
+      "id": "A1-021",
+      "level": "A2",
+      "subskill": "would_like_polite_requests",
+      "correct": "would like",
+      "cue": "Pesenan sopan: “I would like ..., please.”"
+    },
+    {
+      "id": "TA-011",
+      "level": "A2",
+      "subskill": "present_perfect_experience_ever_never",
+      "correct": "been",
+      "cue": "“Ever” jalannya bareng “have been”, “have seen”, “have done”."
+    },
+    {
+      "id": "TA-012",
+      "level": "A2",
+      "subskill": "present_perfect_with_for_since_duration",
+      "correct": "have lived",
+      "cue": "“Since 2019” narik kata kerjanya jadi “have lived”."
+    },
+    {
+      "id": "CO-008",
+      "level": "B1",
+      "subskill": "wish_unreal_present_past_simple",
+      "correct": "lived",
+      "cue": "Menyatakan harapan atau pengandaian masa kini mundur satu tenses ke bentuk lampau: “I wish I lived closer”."
+    },
+    {
+      "id": "CO-009",
+      "level": "B2",
+      "subskill": "if_only_past_regret_past_perfect",
+      "correct": "had read",
+      "cue": "Menyatakan penyesalan atas kejadian lampau yang sudah berlalu gunakan past perfect: “If only I had read...”."
+    },
+    {
+      "id": "TA-013",
+      "level": "C2",
+      "subskill": "future_perfect_epistemic_past_assumption",
+      "correct": "will have heard",
+      "cue": "Pola future perfect “will have heard” menyatakan keyakinan kuat bahwa suatu kabar sudah sampai ke penerima saat ini."
+    },
+    {
+      "id": "PA-007",
+      "level": "C2",
+      "subskill": "perfect_passive_infinitive_anteriority_reported_events",
+      "correct": "to have been stolen",
+      "cue": "Untuk kejadian pasif yang berlangsung lebih awal dari waktu kabar, gunakan perfect infinitive pasif: “to have been stolen”."
+    },
+    {
+      "id": "RS-007",
+      "level": "C2",
+      "subskill": "mandative_subjunctive_after_demand_insist",
+      "correct": "resign",
+      "cue": "Tuntutan nelanjangin kata kerja: “demand that he resign”."
+    },
+    {
+      "id": "RC-005",
+      "level": "C2",
+      "subskill": "sentential_which_whole_clause_antecedent",
+      "correct": "which",
+      "cue": "Komentarin semuanya? Koma + “which”."
+    },
+    {
+      "id": "AR-006",
+      "level": "C2",
+      "subskill": "generic_the_species_class_predicates",
+      "correct": "the",
+      "cue": "Ngomongin spesies pakai “the”: “The tiger is endangered.”"
+    },
+    {
+      "id": "CM-005",
+      "level": "A2",
+      "subskill": "irregular_comparative_better_worse_forms",
+      "correct": "better",
+      "cue": "Good jadi better, bad jadi worse. Hafalin pasangannya kayak hafal lawan kata."
+    },
+    {
+      "id": "PD-001",
+      "level": "A1",
+      "subskill": "subject_object_pronouns_and_possessives",
+      "correct": "him",
+      "cue": "“I see him”, tapi “he sees me”."
+    },
+    {
+      "id": "AR-007",
+      "level": "A1",
+      "subskill": "articles_a_an_the",
+      "correct": "the",
+      "cue": "Sebut pertama pakai “a”, sebut kedua pakai “the”."
+    },
+    {
+      "id": "NN-001",
+      "level": "A1",
+      "subskill": "plural_nouns_basic",
+      "correct": "children",
+      "cue": "Kata benda tak beraturan (irregular noun): bentuk tunggalnya “child”, sedangkan bentuk jamaknya berubah menjadi “children” tanpa huruf s."
+    },
+    {
+      "id": "AR-008",
+      "level": "A1",
+      "subskill": "demonstrative_reference_distance_this_these_that_those",
+      "correct": "this",
+      "cue": "Satu dan dekat: “this photo in my hand”."
+    },
+    {
+      "id": "CG-002",
+      "level": "A1",
+      "subskill": "possessive_adjectives",
+      "correct": "their",
+      "cue": "“Their house”, tapi “the house is theirs”."
+    },
+    {
+      "id": "PS-001",
+      "level": "A1",
+      "subskill": "have_got_has_got",
+      "correct": "have",
+      "cue": "“Have you got ...?”: nggak perlu “do”."
+    },
+    {
+      "id": "PR-006",
+      "level": "A1",
+      "subskill": "place_prepositions_basic",
+      "correct": "under",
+      "cue": "In a bag, on a table, under a bed."
+    },
+    {
+      "id": "QF-001",
+      "level": "A1",
+      "subskill": "question_words_basic",
+      "correct": "when",
+      "cue": "When buat waktu, where buat tempat, who buat orang."
+    },
+    {
+      "id": "A1-111",
+      "level": "A1",
+      "subskill": "past_be_was_were",
+      "correct": "were",
+      "cue": "Tanya lampau pakai “be”: balik “were”-nya, lupakan “did”."
+    },
+    {
+      "id": "A1-116",
+      "level": "A1",
+      "subskill": "some_any_countable_uncountable",
+      "correct": "some",
+      "cue": "Positif plus jamak: We bought some bananas."
+    },
+    {
+      "id": "TA-101",
+      "level": "A2",
+      "subskill": "present_simple_vs_continuous",
+      "correct": "takes",
+      "cue": "Ada “every day”, pakai bentuk -s: she takes."
+    },
+    {
+      "id": "MO-101",
+      "level": "A2",
+      "subskill": "obligation_vs_permission",
+      "correct": "don't have to",
+      "cue": "Gunakan “don't have to” kalau bebas atau tidak ada keharusan membayar (gratis). Gunakan “mustn't” saat ada larangan keras."
+    },
+    {
+      "id": "CO-101",
+      "level": "A2",
+      "subskill": "zero_vs_first_conditional",
+      "correct": "will watch",
+      "cue": "Janji malam ini: if you finish, we WILL watch."
+    },
+    {
+      "id": "CM-101",
+      "level": "A2",
+      "subskill": "comparative_vs_superlative_scope",
+      "correct": "the cheapest",
+      "cue": "Ada “of the five”, pakai the + -est."
+    },
+    {
+      "id": "TA-104",
+      "level": "A2",
+      "subskill": "past_continuous_vs_past_simple_interrupted_action",
+      "correct": "started",
+      "cue": "Aktivitas latar yang sedang berlangsung pakai past continuous (“was walking”). Kejadian mendadak yang memotongnya pakai past simple (“started”)."
+    },
+    {
+      "id": "AR-103",
+      "level": "A2",
+      "subskill": "much_many_little_few_countability",
+      "correct": "much",
+      "cue": "Not much time: waktu mengalir, kursi dihitung."
+    },
+    {
+      "id": "CM-006",
+      "level": "A2",
+      "subskill": "as_as_equality_vs_comparative",
+      "correct": "not as funny as",
+      "cue": "as ... as itu pasangan kembar: buka pakai as, tutup pakai as. “Than” bukan kembarannya."
+    },
+    {
+      "id": "PR-009",
+      "level": "A2",
+      "subskill": "movement_prepositions_through_across_along_over",
+      "correct": "along",
+      "cue": "Bergerak menyusuri garis lurus seperti tepi pantai atau jalan tanpa menyeberang gunakan kata depan “along”."
+    },
+    {
+      "id": "PR-010",
+      "level": "A2",
+      "subskill": "preposition_of_time_duration_for_vs_since_vs_during",
+      "correct": "since",
+      "cue": "Gunakan “since” untuk menyebut titik awal waktu (since 2021). Gunakan “for” untuk lama durasi waktu (for three years)."
+    },
+    {
+      "id": "TA-016",
+      "level": "B1",
+      "subskill": "past_simple_vs_present_perfect",
+      "correct": "have drunk",
+      "cue": "Jika periode waktu belum selesai (“today”) dan jumlahnya masih bisa bertambah, gunakan present perfect (“have drunk”)."
+    },
+    {
+      "id": "MO-010",
+      "level": "B1",
+      "subskill": "deduction_present",
+      "correct": "must",
+      "cue": "Yakin pasti terjadi karena ada bukti nyata gunakan “must”. Yakin pasti tidak mungkin gunakan “can't”. Masih ragu gunakan “might”."
+    },
+    {
+      "id": "MO-011",
+      "level": "B1",
+      "subskill": "ability_past_could_vs_was_able_to",
+      "correct": "could",
+      "cue": "Kemampuan panca indera (mendengar, melihat) di masa lampau menggunakan “could + kata kerja dasar” tanpa “to”."
+    },
+    {
+      "id": "MO-012",
+      "level": "B1",
+      "subskill": "necessity_absence_neednt_vs_mustnt",
+      "correct": "mustn't",
+      "cue": "“Mustn't” berarti dilarang keras jangan lakukan. “Needn't” (atau don't have to) berarti tidak perlu atau bebas memilih."
+    },
+    {
+      "id": "CO-030",
+      "level": "B1",
+      "subskill": "unless_vs_if_not",
+      "correct": "rains",
+      "cue": "Habis “unless”, kata kerjanya positif dan present: unless it rains."
+    },
+    {
+      "id": "AR-031",
+      "level": "B1",
+      "subskill": "zero_article_generic_plural_vs_the_specific",
+      "correct": "the",
+      "cue": "Kelompok yang udah jelas pakai “the”; kategori umum tanpa artikel."
+    },
+    {
+      "id": "GI-032",
+      "level": "B1",
+      "subskill": "gerund_after_preposition_vs_infinitive_of_purpose",
+      "correct": "dealing",
+      "cue": "Kata depan ketemu kata kerja, hasilnya -ing: good at dealing."
+    },
+    {
+      "id": "MO-033",
+      "level": "B1",
+      "subskill": "advice_should_vs_ought_to_vs_had_better",
+      "correct": "ought",
+      "cue": "“Ought” nggak pernah jalan tanpa “to”."
+    },
+    {
+      "id": "MO-034",
+      "level": "B1",
+      "subskill": "speculation_scale_may_might_could_vs_will",
+      "correct": "will",
+      "cue": "“Completely sure” pasangannya “will”, bukan “might”."
+    },
+    {
+      "id": "PR-035",
+      "level": "B1",
+      "subskill": "phrasal_verb_particle_changes_meaning",
+      "correct": "down",
+      "cue": "Kegedean suaranya? “Turn it down”. Ada “a little”, berarti bukan “off”."
+    },
+    {
+      "id": "GI-036",
+      "level": "B1",
+      "subskill": "infinitive_after_too_enough_adjective",
+      "correct": "old enough",
+      "cue": "“Old enough”, tapi “too young”: “enough” di belakang, “too” di depan."
+    },
+    {
+      "id": "CM-037",
+      "level": "B1",
+      "subskill": "less_vs_fewer_countability_agreement",
+      "correct": "less",
+      "cue": "Zat yang dituang pakai “less”; barang yang dihitung pakai “fewer”."
+    },
+    {
+      "id": "QN-038",
+      "level": "B1",
+      "subskill": "agreement_structures_so_do_i_neither_do_i",
+      "correct": "so have",
+      "cue": "“I've seen” dibalas “So HAVE I”: salin kata bantunya, jangan otomatis “do”."
+    },
+    {
+      "id": "EC-039",
+      "level": "B1",
+      "subskill": "confusing_word_pair_affect_vs_effect",
+      "correct": "scientists are still studying the long-term effects of the new medicine.",
+      "cue": "Habis “the” butuh kata benda: kata bendanya “effect”, pakai E."
+    },
+    {
+      "id": "MO-015",
+      "level": "B1",
+      "subskill": "possibility_vs_permission_can_vs_may_formal_register",
+      "correct": "may",
+      "cue": "Ketemu orang asing plus “please”? Pakai “May I”."
+    },
+    {
+      "id": "PR-012",
+      "level": "B1",
+      "subskill": "preposition_after_adjective_of_emotion_pleased_with_vs_about",
+      "correct": "about",
+      "cue": "Khawatir soal situasi pakai “about”, puas sama hasil pakai “with”."
+    },
+    {
+      "id": "LD-001",
+      "level": "B1",
+      "subskill": "purpose_connectors_so_that_in_order_to_distinction",
+      "correct": "in order to",
+      "cue": "Nggak ada subjek baru? In order to. Ada subjek baru? So that."
+    },
+    {
+      "id": "TA-019",
+      "level": "B2",
+      "subskill": "present_perfect_continuous_vs_present_perfect_simple",
+      "correct": "has been baking",
+      "cue": "Tangan belepotan tepung dan belum ada yang jadi: pakai has been + -ing."
+    },
+    {
+      "id": "MO-016",
+      "level": "B2",
+      "subskill": "deduction_past_must_have_vs_cant_have",
+      "correct": "can't have",
+      "cue": "Bukti bilang mustahil: pakai “can't have”."
+    },
+    {
+      "id": "PA-008",
+      "level": "B2",
+      "subskill": "get_passive_informal_vs_be_passive",
+      "correct": "gets",
+      "cue": "Rutinitas plus “everyone”: everyone gets + bentuk ke-3."
+    },
+    {
+      "id": "TA-021",
+      "level": "B2",
+      "subskill": "future_in_the_past_would_vs_was_going_to",
+      "correct": "was going to",
+      "cue": "Rencana gagal di masa lalu: was going to ... but ..."
+    },
+    {
+      "id": "MO-017",
+      "level": "B2",
+      "subskill": "past_regret_should_have_vs_shouldnt_have",
+      "correct": "should have warned",
+      "cue": "“We kept quiet” berarti peringatannya nggak pernah ada, jadi “should have warned”."
+    },
+    {
+      "id": "TA-022",
+      "level": "B2",
+      "subskill": "narrative_past_perfect_flashback_vs_past_simple_sequence",
+      "correct": "opened",
+      "cue": "Langkah urut pakai past simple; lompatan mundur pakai past perfect."
+    },
+    {
+      "id": "PA-009",
+      "level": "B2",
+      "subskill": "passive_causative_vs_passive_simple_confusion",
+      "correct": "taken",
+      "cue": "Got + bendanya + bentuk ke-3: got her photo taken, got his hair cut."
+    },
+    {
+      "id": "GI-011",
+      "level": "B2",
+      "subskill": "gerund_as_subject_vs_infinitive_as_subject_formality",
+      "correct": "improves",
+      "cue": "Subjek bentuk -ing dihitung satu: Taking breaks improves."
+    },
+    {
+      "id": "CO-017",
+      "level": "B2",
+      "subskill": "conditional_with_unless_provided_that_as_long_as_distinction",
+      "correct": "unless",
+      "cue": "Kata “unless” berarti “kecuali jika” (sama dengan “if ... not”) sebagai syarat mencegah hal buruk terjadi."
+    },
+    {
+      "id": "PA-010",
+      "level": "B2",
+      "subskill": "passive_with_two_objects_verb_give_send_choice_of_subject",
+      "correct": "was given to",
+      "cue": "Bendanya jadi subjek? Tambahin “to”: An award was given TO the scientist."
+    },
+    {
+      "id": "RC-007",
+      "level": "C1",
+      "subskill": "preposition_placement_formal_vs_informal_relative_clause",
+      "correct": "i was chatting to",
+      "cue": "Lagi ngobrol santai? Akhiri di kata depannya: “…the neighbour I was chatting to.”"
+    },
+    {
+      "id": "GI-012",
+      "level": "C1",
+      "subskill": "verb_pattern_regret_mean_go_on_meaning_change",
+      "correct": "to become",
+      "cue": "Pola “go on + to do” dipakai saat berganti ke babak baru. Pola “go on + -ing” dipakai saat melanjutkan kegiatan yang sama."
+    },
+    {
+      "id": "GI-013",
+      "level": "C1",
+      "subskill": "perfect_gerund_vs_simple_gerund_time_reference",
+      "correct": "listening",
+      "cue": "Dua kegiatan yang berlangsung bersamaan cukup gunakan bentuk “-ing” sederhana (listening while cooking)."
+    },
+    {
+      "id": "RC-008",
+      "level": "C1",
+      "subskill": "relative_clause_with_quantifier_some_of_which_many_of_whom",
+      "correct": "some of which",
+      "cue": "Lukisan, buku, ide: “some of WHICH”; relawan, murid: “many of WHOM”."
+    },
+    {
+      "id": "CM-009",
+      "level": "A2",
+      "subskill": "comparative_formation_er_vs_more_no_double_marking",
+      "correct": "cheaper",
+      "cue": "Kata sifat pendek satu suku kata cukup diberi akhiran “-er” (“cheaper than”). Jangan gunakan “more cheaper” karena itu dobel komparatif."
+    },
+    {
+      "id": "A1-022",
+      "level": "A2",
+      "subskill": "adverb_of_manner_ly_vs_adjective_after_verb",
+      "correct": "carefully",
+      "cue": "Kata kerja aksi + “-ly”: “carry carefully”, “speak quietly”."
+    },
+    {
+      "id": "A1-023",
+      "level": "A2",
+      "subskill": "how_much_vs_how_many_quantity_questions",
+      "correct": "how much",
+      "cue": "“How much water, how many bottles”: nominanya yang nentuin kata tanyanya."
+    },
+    {
+      "id": "A1-024",
+      "level": "A2",
+      "subskill": "indefinite_compounds_something_anything_nothing",
+      "correct": "nothing",
+      "cue": "Satu negatif per kalimat: “wasn't anything” atau “was nothing”, jangan setengah-setengah."
+    },
+    {
+      "id": "A1-025",
+      "level": "A2",
+      "subskill": "cause_result_connectors_because_vs_so",
+      "correct": "because",
+      "cue": "Alasan dapet “because”, akibat dapet “so”: pilih satu, jangan dua-duanya."
+    },
+    {
+      "id": "TA-014",
+      "level": "B1",
+      "subskill": "present_perfect_just_already_yet_placement",
+      "correct": "yet",
+      "cue": "“Not ... yet” nempel di ujung; “already” dan “just” tinggal di tengah; “still” maju ke depan negatif."
+    },
+    {
+      "id": "b6_001",
+      "level": "B1",
+      "subskill": "reflexive_pronouns_myself_vs_each_other",
+      "correct": "myself",
+      "cue": "“I” ngaca dan lihat “myself”: bukan “me”, bukan “-self” punya orang lain."
+    },
+    {
+      "id": "b6_002",
+      "level": "B1",
+      "subskill": "substitution_one_ones_avoid_repetition",
+      "correct": "one",
+      "cue": "“A new one” buka kotak baru; “it” barang lama yang udah kamu kenal."
+    },
+    {
+      "id": "CO-010",
+      "level": "B2",
+      "subskill": "wish_would_annoyance_at_others_behaviour",
+      "correct": "would stop",
+      "cue": "Kebiasaan nyebelin? “I wish they would stop”: “would” buat yang disengaja."
+    },
+    {
+      "id": "GI-008",
+      "level": "B2",
+      "subskill": "would_rather_bare_infinitive_vs_prefer_to",
+      "correct": "stay",
+      "cue": "“Rather” anti sama “to”: yang benar “would rather stay”, bukan “would rather to stay”."
+    },
+    {
+      "id": "MO-009",
+      "level": "B2",
+      "subskill": "be_supposed_to_expectation_vs_obligation",
+      "correct": "is supposed to",
+      "cue": "Frasa “supposed to” wajib diawali to be: gunakan “is supposed to” untuk masa kini atau “was supposed to” untuk masa lalu."
+    },
+    {
+      "id": "CM-008",
+      "level": "B2",
+      "subskill": "as_if_as_though_unreal_past_form",
+      "correct": "were",
+      "cue": "“As if” yang tak nyata jodohnya “were”: “he talks as if he were the boss”."
+    },
+    {
+      "id": "MO-013",
+      "level": "C1",
+      "subskill": "neednt_have_vs_didnt_need_to",
+      "correct": "needn't have",
+      "cue": "Pola “needn't have + past participle” berarti suatu hal sudah terlanjur dikerjakan, padahal sebenarnya tidak diperlukan."
+    },
+    {
+      "id": "b6_004",
+      "level": "C1",
+      "subskill": "concessive_whatever_however_no_matter",
+      "correct": "however",
+      "cue": "“However hard, however carefully”: adverbia itu punyanya “however”."
+    },
+    {
+      "id": "b6_005",
+      "level": "C1",
+      "subskill": "verb_phrase_ellipsis_after_auxiliary",
+      "correct": "have",
+      "cue": "Ulangi kata bantu yang sama: dia “hasn't”, yang lain udah “have”."
+    },
+    {
+      "id": "CO-013",
+      "level": "C2",
+      "subskill": "but_for_noun_phrase_unreal_condition",
+      "correct": "but for",
+      "cue": "Frasa “but for” berarti “kalau bukan karena...”, digunakan untuk pengandaian syarat penting tanpa perlu klausa if yang panjang."
+    },
+    {
+      "id": "MO-014",
+      "level": "C2",
+      "subskill": "semi_modal_dare_bare_infinitive_negative",
+      "correct": "daren't",
+      "cue": "“daren't” satu keluarga sama “can't”: tanpa “to”, tanpa “do”, negasinya udah nempel."
+    },
+    {
+      "id": "PR-007",
+      "level": "C2",
+      "subskill": "marginal_prepositions_notwithstanding_pending_barring",
+      "correct": "barring",
+      "cue": "Frasa “barring ...” berarti “kecuali jika ada kendala / asalkan tidak ada aral melintang”."
+    },
+    {
+      "id": "CM-007",
+      "level": "C2",
+      "subskill": "all_the_more_intensified_comparative_with_cause",
+      "correct": "more",
+      "cue": "“All the more X because Y”: gara-gara Y, X-nya makin nambah."
+    },
+    {
+      "id": "QN-007",
+      "level": "C2",
+      "subskill": "negated_participle_clause_not_wishing_to",
+      "correct": "not wanting",
+      "cue": "“Not wanting to intrude, she left”: “not” selalu duluan, baru bentuk -ing."
+    },
+    {
+      "id": "C2-008",
+      "level": "C2",
+      "subskill": "albeit_reduced_concession_phrase",
+      "correct": "albeit",
+      "cue": "Kata “albeit” berarti “meskipun / walaupun”, menghubungkan penjelasan pelengkap yang berlawanan tanpa memerlukan kata kerja."
+    },
+    {
+      "id": "A1-202",
+      "level": "A1",
+      "subskill": "can_ability",
+      "correct": "can't",
+      "cue": "Can't + kata kerja: can't ride, can't swim."
+    },
+    {
+      "id": "A1-204",
+      "level": "A1",
+      "subskill": "present_continuous_basics",
+      "correct": "are playing",
+      "cue": "Ada “Look!”? Pakai are + -ing."
+    },
+    {
+      "id": "A1-205",
+      "level": "A2",
+      "subskill": "imperative_commands_base_form",
+      "correct": "don't run",
+      "cue": "Don't + kata kerja: Don't run, Don't touch."
+    },
+    {
+      "id": "A1-206",
+      "level": "A2",
+      "subskill": "adverbs_of_frequency_mid_position",
+      "correct": "is never late",
+      "cue": "Be dulu, baru never: is never late."
+    },
+    {
+      "id": "MO-201",
+      "level": "A2",
+      "subskill": "would_like_polite_requests",
+      "correct": "would you like",
+      "cue": "Gunakan ungkapan sopan “Would you like...?” saat menawarkan sesuatu kepada tamu atau orang lain."
+    },
+    {
+      "id": "GI-201",
+      "level": "A2",
+      "subskill": "like_love_hate_plus_gerund_preferences",
+      "correct": "listening",
+      "cue": "Enjoy selalu ketemu -ing: enjoy listening, enjoy cooking."
+    },
+    {
+      "id": "TA-201",
+      "level": "A2",
+      "subskill": "present_perfect_experience_ever_never",
+      "correct": "has never flown",
+      "cue": "Belum pernah seumur hidup → has never flown."
+    },
+    {
+      "id": "TA-202",
+      "level": "A2",
+      "subskill": "present_perfect_with_for_since_duration",
+      "correct": "for",
+      "cue": "Lamanya waktu pakai “for”, titik mulai pakai “since”: “for ten years”, “since 2015”."
+    },
+    {
+      "id": "CM-201",
+      "level": "A2",
+      "subskill": "irregular_comparative_better_worse_forms",
+      "correct": "worse",
+      "cue": "Hafalin pasangannya: good jadi better, bad jadi worse."
+    },
+    {
+      "id": "QT-201",
+      "level": "A2",
+      "subskill": "how_much_vs_how_many_quantity_questions",
+      "correct": "how many",
+      "cue": "Bisa dihitung → how many."
+    },
+    {
+      "id": "QN-201",
+      "level": "A2",
+      "subskill": "double_negative_avoidance_single_negation_rule",
+      "correct": "any",
+      "cue": "Satu negatif aja: don't … any, atau have … no."
+    },
+    {
+      "id": "AR-201",
+      "level": "A2",
+      "subskill": "definite_article_with_unique_referents_and_superlatives",
+      "correct": "the",
+      "cue": "Urutan dan bentuk paling selalu pakai the: the first, the last, the best."
+    },
+    {
+      "id": "QN-202",
+      "level": "B1",
+      "subskill": "question_tag_polarity",
+      "correct": "doesn't she",
+      "cue": "Kalimat positif, tag negatif: works → doesn't she?"
+    },
+    {
+      "id": "RS-201",
+      "level": "B1",
+      "subskill": "reported_questions_word_order",
+      "correct": "the shop opened",
+      "cue": "Asked what time the shop opened: tanpa “did”."
+    },
+    {
+      "id": "CO-202",
+      "level": "B1",
+      "subskill": "wish_unreal_present_past_simple",
+      "correct": "could",
+      "cue": "Nggak bisa sekarang, jadi wish I could: can't swim → wish I could."
+    },
+    {
+      "id": "TA-205",
+      "level": "B1",
+      "subskill": "present_perfect_just_already_yet_placement",
+      "correct": "have already washed",
+      "cue": "Positif pakai already di tengah, negatif pakai yet di ujung."
+    },
+    {
+      "id": "PD-201",
+      "level": "B1",
+      "subskill": "reflexive_pronouns_myself_vs_each_other",
+      "correct": "each other",
+      "cue": "Gunakan “each other” saat dua orang saling berinteraksi satu sama lain (hubungan timbal balik dua arah)."
+    },
+    {
+      "id": "CO-203",
+      "level": "B2",
+      "subskill": "third_conditional_unreal_past",
+      "correct": "would have come",
+      "cue": "Pengandaian lampau: If you had told me, I would have come."
+    },
+    {
+      "id": "PA-202",
+      "level": "B2",
+      "subskill": "causative_have_get_something_done",
+      "correct": "have it cut",
+      "cue": "Pola “have something done” (have it cut) dipakai ketika pekerjaan tersebut dikerjakan oleh orang lain atau ahlinya untuk kita."
+    },
+    {
+      "id": "RC-201",
+      "level": "B2",
+      "subskill": "relative_pronoun_whose_possession",
+      "correct": "whose",
+      "cue": "“Whose” itu “his/her” di dalam klausa relatif."
+    },
+    {
+      "id": "LD-202",
+      "level": "B2",
+      "subskill": "contrast_connectors_although_despite_however_distinction",
+      "correct": "although",
+      "cue": "Although ketemu klausa, despite ketemu kata benda: although she was… / despite being…"
+    },
+    {
+      "id": "LD-203",
+      "level": "B2",
+      "subskill": "result_connectors_so_such_that_therefore_distinction",
+      "correct": "such a",
+      "cue": "So ketemu kata sifat aja, such a ketemu kata sifat + kata benda: so good / such a good film."
+    },
+    {
+      "id": "QT-202",
+      "level": "A2",
+      "subskill": "indefinite_compounds_something_anything_nothing",
+      "correct": "anything",
+      "cue": "Didn't … anything / did … nothing."
+    },
+    {
+      "id": "PA-203",
+      "level": "B1",
+      "subskill": "agent_omission_when_irrelevant",
+      "correct": "was stolen",
+      "cue": "Pelaku nggak diketahui → was stolen (tanpa “by”)."
+    },
+    {
+      "id": "RS-202",
+      "level": "B1",
+      "subskill": "backshift_statement",
+      "correct": "lived",
+      "cue": "Live → lived sesudah said."
+    },
+    {
+      "id": "RS-203",
+      "level": "B1",
+      "subskill": "reported_commands_infinitive",
+      "correct": "not to touch",
+      "cue": "Perintah “Don't touch” dilaporin jadi “told us not to touch”."
+    },
+    {
+      "id": "QN-204",
+      "level": "B1",
+      "subskill": "negative_questions_expecting_agreement",
+      "correct": "isn't",
+      "cue": "Pertanyaan negatif seperti “Isn't it beautiful?” dipakai untuk meminta persetujuan saat kita yakin lawan bicara juga sependapat."
+    },
+    {
+      "id": "RS-204",
+      "level": "B1",
+      "subskill": "time_and_place_reference_shift",
+      "correct": "the next day",
+      "cue": "Tomorrow → the next day."
+    },
+    {
+      "id": "RS-205",
+      "level": "B1",
+      "subskill": "reported_speech_modal_shift_can_to_could",
+      "correct": "would",
+      "cue": "Will → would sesudah said."
+    },
+    {
+      "id": "RS-206",
+      "level": "B1",
+      "subskill": "reported_yes_no_questions_if_whether",
+      "correct": "if i was",
+      "cue": "Pertanyaan “Are you…?” dilaporin jadi “asked if I was…”."
+    },
+    {
+      "id": "AR-202",
+      "level": "B1",
+      "subskill": "article_with_institutions_school_prison_hospital",
+      "correct": "hospital",
+      "cue": "Frasa “in hospital” (tanpa “the”) berarti sedang dirawat sebagai pasien. Jika hanya berkunjung, gunakan “at the hospital”."
+    },
+    {
+      "id": "RC-202",
+      "level": "B1",
+      "subskill": "relative_clause_omitting_object_pronoun",
+      "correct": "that",
+      "cue": "Kata gantinya bisa hilang: “the film (that) we watched”."
+    },
+    {
+      "id": "CM-203",
+      "level": "B1",
+      "subskill": "comparative_intensifiers_much_far_a_lot_before_comparative",
+      "correct": "a lot",
+      "cue": "Very easy, tapi a lot easier."
+    },
+    {
+      "id": "QN-205",
+      "level": "B1",
+      "subskill": "echo_questions_for_clarification",
+      "correct": "where",
+      "cue": "He's moving where?"
+    },
+    {
+      "id": "TA-207",
+      "level": "B1",
+      "subskill": "present_perfect_for_unfinished_time_period_this_week",
+      "correct": "have read",
+      "cue": "This month (masih terbuka) → have read."
+    },
+    {
+      "id": "QT-203",
+      "level": "B1",
+      "subskill": "quantifier_of_before_object_pronoun",
+      "correct": "none of",
+      "cue": "Di depan kata ganti selalu ada “of”: “none of them”, “both of us”."
+    },
+    {
+      "id": "PD-202",
+      "level": "B1",
+      "subskill": "substitution_one_ones_avoid_repetition",
+      "correct": "ones",
+      "cue": "Gunakan kata “ones” sesudah kata sifat untuk menggantikan kata benda jamak yang sudah disebut sebelumnya (“bigger shoes”)."
+    },
+    {
+      "id": "GI-202",
+      "level": "B2",
+      "subskill": "verb_pattern_remember_forget_meaning_change",
+      "correct": "to lock",
+      "cue": "Pola “forget + to do” (forgot to lock) berarti lupa melakukan sesuatu sehingga pekerjaan itu tidak terlaksana."
+    },
+    {
+      "id": "CM-204",
+      "level": "B2",
+      "subskill": "double_comparative_progressive_change",
+      "correct": "more and more expensive",
+      "cue": "More and more expensive every year."
+    },
+    {
+      "id": "PA-204",
+      "level": "B2",
+      "subskill": "impersonal_reporting_it_is_said_that",
+      "correct": "it is said",
+      "cue": "Rumor atau keyakinan umum dibuka pakai “It is said that…”."
+    },
+    {
+      "id": "PA-205",
+      "level": "B2",
+      "subskill": "passive_infinitive_after_modal_expectation",
+      "correct": "to be published",
+      "cue": "Expected to be published."
+    },
+    {
+      "id": "GI-203",
+      "level": "B2",
+      "subskill": "verb_pattern_try_meaning_change",
+      "correct": "to lift",
+      "cue": "Tried to lift (usaha) vs. try restarting (cara)."
+    },
+    {
+      "id": "AR-203",
+      "level": "B2",
+      "subskill": "zero_article_with_proper_nouns_exceptions_the_netherlands",
+      "correct": "the",
+      "cue": "Nama negara jamak pakai “the”: “the Philippines”, “the Netherlands”."
+    },
+    {
+      "id": "PR-202",
+      "level": "B2",
+      "subskill": "dependent_preposition_after_noun_reason_for_solution_to",
+      "correct": "for",
+      "cue": "Reason for, solution to."
+    },
+    {
+      "id": "GI-204",
+      "level": "B2",
+      "subskill": "be_get_used_to_gerund_vs_used_to_infinitive",
+      "correct": "getting",
+      "cue": "Get used to getting up early."
+    },
+    {
+      "id": "GI-205",
+      "level": "B2",
+      "subskill": "would_rather_bare_infinitive_vs_prefer_to",
+      "correct": "drink",
+      "cue": "Sesudah “would rather” kata kerjanya polos: “I'd rather drink tea than coffee”."
+    },
+    {
+      "id": "CO-206",
+      "level": "B2",
+      "subskill": "its_high_time_past_simple_unreal",
+      "correct": "went",
+      "cue": "It's time we went."
+    },
+    {
+      "id": "CM-206",
+      "level": "B2",
+      "subskill": "as_if_as_though_unreal_past_form",
+      "correct": "lived",
+      "cue": "As if he lived there (padahal nggak)."
+    },
+    {
+      "id": "CO-207",
+      "level": "C1",
+      "subskill": "mixed_conditional_past_cause_present_result",
+      "correct": "would be",
+      "cue": "Sebab lampau, akibat “now” → would be."
+    },
+    {
+      "id": "QN-207",
+      "level": "C2",
+      "subskill": "inversion_after_only_restrictive_phrase",
+      "correct": "did the boats leave",
+      "cue": "Only when … did the boats leave."
+    },
+    {
+      "id": "RS-208",
+      "level": "C2",
+      "subskill": "mandative_subjunctive_after_demand_insist",
+      "correct": "stay",
+      "cue": "Insisted that she stay."
+    },
+    {
+      "id": "A1-302",
+      "level": "A1",
+      "subskill": "subject_object_pronouns_and_possessives",
+      "correct": "her",
+      "cue": "Sesudah kata kerja: “me”, “him”, “her”, “us”, “them”."
+    },
+    {
+      "id": "A1-304",
+      "level": "A1",
+      "subskill": "subject_object_pronouns_and_possessives",
+      "correct": "mine",
+      "cue": "“My bag”, tapi “the bag is mine”."
+    },
+    {
+      "id": "A1-306",
+      "level": "A1",
+      "subskill": "be_subject_agreement",
+      "correct": "are",
+      "cue": "Subjek gabungan “Rudi and I” (Rudi dan aku) setara dengan “we” (kami), sehingga to be yang tepat adalah “are”."
+    },
+    {
+      "id": "A1-307",
+      "level": "A1",
+      "subskill": "be_subject_agreement",
+      "correct": "are",
+      "cue": "“You are ready” jadi “Are you ready?”"
+    },
+    {
+      "id": "A1-311",
+      "level": "A1",
+      "subskill": "articles_a_an_the",
+      "correct": "the",
+      "cue": "Sudah jelas yang mana? Pakai “the”, seperti “the door” di ruangan ini."
+    },
+    {
+      "id": "A1-313",
+      "level": "A1",
+      "subskill": "plural_nouns_basic",
+      "correct": "boxes",
+      "cue": "Sesudah x, s, ch, sh: tambah -es. “Box” jadi “boxes”."
+    },
+    {
+      "id": "A1-314",
+      "level": "A1",
+      "subskill": "plural_nouns_basic",
+      "correct": "babies",
+      "cue": "Konsonan + y jadi -ies: “baby” jadi “babies”."
+    },
+    {
+      "id": "A1-315",
+      "level": "A1",
+      "subskill": "plural_nouns_basic",
+      "correct": "men",
+      "cue": "Satu “man”, dua “men”; satu “woman”, dua “women”."
+    },
+    {
+      "id": "A1-316",
+      "level": "A1",
+      "subskill": "plural_nouns_basic",
+      "correct": "students",
+      "cue": "“How many” + jamak: “how many students?”"
+    },
+    {
+      "id": "A1-317",
+      "level": "A1",
+      "subskill": "demonstrative_reference_distance_this_these_that_those",
+      "correct": "those",
+      "cue": "Jauh dan banyak: “those birds”."
+    },
+    {
+      "id": "A1-318",
+      "level": "A1",
+      "subskill": "demonstrative_reference_distance_this_these_that_those",
+      "correct": "these",
+      "cue": "Dekat dan banyak: “these shoes”."
+    },
+    {
+      "id": "A1-319",
+      "level": "A1",
+      "subskill": "demonstrative_reference_distance_this_these_that_those",
+      "correct": "that",
+      "cue": "Jauh dan satu: “that house”."
+    },
+    {
+      "id": "A1-320",
+      "level": "A1",
+      "subskill": "demonstrative_reference_distance_this_these_that_those",
+      "correct": "this",
+      "cue": "Dekat dan satu: “this pencil”."
+    },
+    {
+      "id": "A1-321",
+      "level": "A1",
+      "subskill": "possessive_adjectives",
+      "correct": "its",
+      "cue": "Gunakan “Its” (tanpa petik) untuk kepemilikan benda atau hewan (contoh: “Its tail” artinya ekornya). Jangan tertukar dengan “It's” (pakai petik) yang merupakan singkatan dari “it is” (dia adalah). Trik cepat: jika diganti kata 'it is' kalimatnya rancu, pasti jawabannya “Its” tanpa tanda petik!"
+    },
+    {
+      "id": "A1-322",
+      "level": "A1",
+      "subskill": "possessive_adjectives",
+      "correct": "our",
+      "cue": "“We” jadi “our”: “our class”, “our teacher”."
+    },
+    {
+      "id": "A1-323",
+      "level": "A1",
+      "subskill": "possessive_adjectives",
+      "correct": "their",
+      "cue": "“They” jadi “their”: “their bikes”."
+    },
+    {
+      "id": "A1-324",
+      "level": "A1",
+      "subskill": "possessive_adjectives",
+      "correct": "your",
+      "cue": "Sebelum kata benda gunakan “your” (“your pen”). Jika berdiri sendiri tanpa kata benda gunakan “yours” (“it's yours”). Sedangkan “you're” adalah singkatan dari “you are”."
+    },
+    {
+      "id": "A1-325",
+      "level": "A1",
+      "subskill": "have_got_has_got",
+      "correct": "have",
+      "cue": "“They have got”, tapi “he has got”."
+    },
+    {
+      "id": "A1-326",
+      "level": "A1",
+      "subskill": "have_got_has_got",
+      "correct": "has",
+      "cue": "“He”, “she”, “it”: “has got a cold”."
+    },
+    {
+      "id": "A1-327",
+      "level": "A1",
+      "subskill": "have_got_has_got",
+      "correct": "has",
+      "cue": "“He has got” jadi “Has he got?”"
+    },
+    {
+      "id": "A1-328",
+      "level": "A1",
+      "subskill": "have_got_has_got",
+      "correct": "haven't",
+      "cue": "“I haven't got”, tapi “she hasn't got”."
+    },
+    {
+      "id": "A1-330",
+      "level": "A1",
+      "subskill": "there_is_are",
+      "correct": "are",
+      "cue": "Lima orang atau banyak benda: “there are”."
+    },
+    {
+      "id": "A1-332",
+      "level": "A1",
+      "subskill": "there_is_are",
+      "correct": "are",
+      "cue": "Banyak benda: “Are there any…?”"
+    },
+    {
+      "id": "A1-334",
+      "level": "A1",
+      "subskill": "place_prepositions_basic",
+      "correct": "next to",
+      "cue": "Di sampingmu, di kursi sebelah: “next to”."
+    },
+    {
+      "id": "A1-336",
+      "level": "A1",
+      "subskill": "place_prepositions_basic",
+      "correct": "under",
+      "cue": "Barangnya jatuh? Cari di bawah: “under”."
+    },
+    {
+      "id": "A1-337",
+      "level": "A1",
+      "subskill": "present_simple_basics",
+      "correct": "watches",
+      "cue": "Akhiran ch, sh, s, x, o: tambah -es. “He watches”, “she goes”."
+    },
+    {
+      "id": "A1-338",
+      "level": "A1",
+      "subskill": "present_simple_basics",
+      "correct": "play",
+      "cue": "“They play”, tapi “he plays”."
+    },
+    {
+      "id": "A1-339",
+      "level": "A1",
+      "subskill": "present_simple_basics",
+      "correct": "goes",
+      "cue": "“Go” jadi “goes”, “do” jadi “does”."
+    },
+    {
+      "id": "A1-340",
+      "level": "A1",
+      "subskill": "present_simple_basics",
+      "correct": "cries",
+      "cue": "Konsonan + y: “cry” jadi “cries”, “study” jadi “studies”."
+    },
+    {
+      "id": "A1-341",
+      "level": "A1",
+      "subskill": "question_words_basic",
+      "correct": "who",
+      "cue": "Jawabannya orang? Tanya dengan “Who”."
+    },
+    {
+      "id": "A1-342",
+      "level": "A1",
+      "subskill": "question_words_basic",
+      "correct": "why",
+      "cue": "Ada “because” di jawabannya? Tanya dengan “Why”."
+    },
+    {
+      "id": "A1-343",
+      "level": "A1",
+      "subskill": "question_words_basic",
+      "correct": "how",
+      "cue": "“By bus”, “by bike”, “on foot”: tanya dengan “How”."
+    },
+    {
+      "id": "A1-344",
+      "level": "A1",
+      "subskill": "question_words_basic",
+      "correct": "what",
+      "cue": "Jawabannya benda? Tanya dengan “What”."
+    },
+    {
+      "id": "A1-345",
+      "level": "A1",
+      "subskill": "can_ability",
+      "correct": "count",
+      "cue": "“Can” + kata kerja bentuk dasar: “can count”, “can swim”."
+    },
+    {
+      "id": "A1-346",
+      "level": "A1",
+      "subskill": "can_ability",
+      "correct": "can",
+      "cue": "“You can ride” jadi “Can you ride?”"
+    },
+    {
+      "id": "A1-347",
+      "level": "A1",
+      "subskill": "can_ability",
+      "correct": "can't",
+      "cue": "Nggak bisa? Cukup tambah n't: “can't play”."
+    },
+    {
+      "id": "A1-348",
+      "level": "A1",
+      "subskill": "can_ability",
+      "correct": "can",
+      "cue": "“Can” nggak pernah berubah: “I can”, “she can”, “they can”."
+    },
+    {
+      "id": "A1-349",
+      "level": "A1",
+      "subskill": "present_continuous_basics",
+      "correct": "is sleeping",
+      "cue": "Seruan “Shh!” dan kata “now” menandakan aksi sedang berlangsung saat ini, jadi gunakan present continuous: “is sleeping”."
+    },
+    {
+      "id": "A1-351",
+      "level": "A1",
+      "subskill": "present_continuous_basics",
+      "correct": "am doing",
+      "cue": "“I am” + -ing: “I am doing”, “I am reading”."
+    },
+    {
+      "id": "A1-352",
+      "level": "A1",
+      "subskill": "present_continuous_basics",
+      "correct": "am looking",
+      "cue": "Jawab dengan pola yang sama: “are you doing?” → “I am looking”."
+    },
+    {
+      "id": "A1-353",
+      "level": "A1",
+      "subskill": "past_be_was_were",
+      "correct": "was",
+      "cue": "“Yesterday” + “I” jadi “I was”."
+    },
+    {
+      "id": "A1-354",
+      "level": "A1",
+      "subskill": "past_be_was_were",
+      "correct": "were",
+      "cue": "“We”, “you”, “they” di masa lalu: “were”."
+    },
+    {
+      "id": "A1-355",
+      "level": "A1",
+      "subskill": "past_be_was_were",
+      "correct": "was",
+      "cue": "Mau bertanya? Pindahkan “was” ke depan subjeknya."
+    },
+    {
+      "id": "A1-356",
+      "level": "A1",
+      "subskill": "past_be_was_were",
+      "correct": "was",
+      "cue": "Ada “ago”? Itu masa lalu: “it was”."
+    },
+    {
+      "id": "A1-357",
+      "level": "A1",
+      "subskill": "past_simple_regular_forms",
+      "correct": "danced",
+      "cue": "Berakhiran e? Cukup tambah -d: “dance” jadi “danced”."
+    },
+    {
+      "id": "A1-358",
+      "level": "A1",
+      "subskill": "past_simple_regular_forms",
+      "correct": "studied",
+      "cue": "Konsonan + y: “study” jadi “studied”, “cry” jadi “cried”."
+    },
+    {
+      "id": "A1-359",
+      "level": "A1",
+      "subskill": "past_simple_regular_forms",
+      "correct": "visit",
+      "cue": "“Did” + bentuk dasar: “Did you visit?”, “Did she play?”"
+    },
+    {
+      "id": "A1-360",
+      "level": "A1",
+      "subskill": "past_simple_regular_forms",
+      "correct": "opened",
+      "cue": "Ada “yesterday”? “Open” jadi “opened”."
+    },
+    {
+      "id": "A1-361",
+      "level": "A1",
+      "subskill": "some_any_countable_uncountable",
+      "correct": "any",
+      "cue": "Kalimat dengan “not” pakai “any”: “There isn't any bread”."
+    },
+    {
+      "id": "A1-362",
+      "level": "A1",
+      "subskill": "some_any_countable_uncountable",
+      "correct": "some",
+      "cue": "Positif + jamak: “I need some eggs”."
+    },
+    {
+      "id": "A1-363",
+      "level": "A1",
+      "subskill": "some_any_countable_uncountable",
+      "correct": "any",
+      "cue": "“Don't have any”, lalu “buy some”."
+    },
+    {
+      "id": "A1-364",
+      "level": "A1",
+      "subskill": "some_any_countable_uncountable",
+      "correct": "some",
+      "cue": "“Rice”, “milk”, “water” di kalimat positif: “some”."
+    },
+    {
+      "id": "A2-301",
+      "level": "A2",
+      "subskill": "imperative_commands_base_form",
+      "correct": "put on",
+      "cue": "Perintah dimulai dengan kata kerja bentuk dasar: “Put on”, “Sit down”, “Look”."
+    },
+    {
+      "id": "A2-303",
+      "level": "A2",
+      "subskill": "imperative_commands_base_form",
+      "correct": "don't eat",
+      "cue": "Mau melarang? “Don't” + kata kerja: “Don't eat”, “Don't touch”."
+    },
+    {
+      "id": "A2-305",
+      "level": "A2",
+      "subskill": "adverbs_of_frequency_mid_position",
+      "correct": "always brush",
+      "cue": "“Always” sebelum aksinya: “I always brush”, “I never eat”."
+    },
+    {
+      "id": "A2-306",
+      "level": "A2",
+      "subskill": "adverbs_of_frequency_mid_position",
+      "correct": "is often",
+      "cue": "Dengan “be”, kata frekuensi di belakangnya: “is often”, “are never”."
+    },
+    {
+      "id": "A2-307",
+      "level": "A2",
+      "subskill": "adverbs_of_frequency_mid_position",
+      "correct": "never does",
+      "cue": "“Never” sebelum aksinya: “he never does”, “she never eats”."
+    },
+    {
+      "id": "A2-308",
+      "level": "A2",
+      "subskill": "adverbs_of_frequency_mid_position",
+      "correct": "do you usually",
+      "cue": "Kalimat tanya: “Do you usually…?”, “Does she often…?”"
+    },
+    {
+      "id": "A2-309",
+      "level": "A2",
+      "subskill": "possessive_s_noun_ownership",
+      "correct": "cat's",
+      "cue": "Pemilik + 's + barang: “the cat's bowl”."
+    },
+    {
+      "id": "A2-311",
+      "level": "A2",
+      "subskill": "possessive_s_noun_ownership",
+      "correct": "children's",
+      "cue": "Jamak tanpa akhiran s tetap ditambah 's: “children's”, “men's”."
+    },
+    {
+      "id": "A2-312",
+      "level": "A2",
+      "subskill": "possessive_s_noun_ownership",
+      "correct": "maya's",
+      "cue": "Untuk menyatakan barang milik seseorang, tambahkan apostrof dan s pada namanya: “It's Maya's” (barang itu milik Maya)."
+    },
+    {
+      "id": "A2-313",
+      "level": "A2",
+      "subskill": "would_like_polite_requests",
+      "correct": "to book",
+      "cue": "“Would like” + “to” + kata kerja: “I'd like to book”."
+    },
+    {
+      "id": "A2-314",
+      "level": "A2",
+      "subskill": "would_like_polite_requests",
+      "correct": "would",
+      "cue": "Mau menawarkan sesuatu? “Would you like…?”"
+    },
+    {
+      "id": "A2-316",
+      "level": "A2",
+      "subskill": "would_like_polite_requests",
+      "correct": "would you like",
+      "cue": "Ungkapan sopan menanyakan keinginan seseorang adalah “What would you like?” (Apa yang kamu inginkan?)."
+    },
+    {
+      "id": "A2-317",
+      "level": "A2",
+      "subskill": "like_love_hate_plus_gerund_preferences",
+      "correct": "swimming",
+      "cue": "Kata pendek berakhiran satu vokal + satu konsonan: gandakan hurufnya. “Swim” jadi “swimming”, “run” jadi “running”."
+    },
+    {
+      "id": "A2-318",
+      "level": "A2",
+      "subskill": "like_love_hate_plus_gerund_preferences",
+      "correct": "waiting",
+      "cue": "“Hate” + -ing: “hate waiting”, “hate cleaning”."
+    },
+    {
+      "id": "A2-319",
+      "level": "A2",
+      "subskill": "like_love_hate_plus_gerund_preferences",
+      "correct": "dancing",
+      "cue": "Huruf e di akhir dibuang sebelum -ing: “dance” jadi “dancing”, “make” jadi “making”."
+    },
+    {
+      "id": "A2-320",
+      "level": "A2",
+      "subskill": "like_love_hate_plus_gerund_preferences",
+      "correct": "doing",
+      "cue": "“Enjoy” selalu + -ing: “enjoy doing”, “enjoy playing”."
+    },
+    {
+      "id": "A2-321",
+      "level": "A2",
+      "subskill": "present_simple_vs_continuous",
+      "correct": "walks",
+      "cue": "Kata “usually” menandakan kebiasaan rutin (present simple: “walks”). Kata “today” menandakan aktivitas yang sedang berjalan hari ini (present continuous: “is taking”)."
+    },
+    {
+      "id": "A2-322",
+      "level": "A2",
+      "subskill": "present_simple_vs_continuous",
+      "correct": "are taking",
+      "cue": "Keterangan waktu “at the moment” (saat ini) menandakan aksi yang sedang berlangsung, jadi gunakan rumus to be + kata kerja -ing (“are taking”)."
+    },
+    {
+      "id": "A2-323",
+      "level": "A2",
+      "subskill": "present_simple_vs_continuous",
+      "correct": "doesn't drink",
+      "cue": "Kebiasaan, bukan cuma saat ini: “she doesn't drink”."
+    },
+    {
+      "id": "A2-325",
+      "level": "A2",
+      "subskill": "obligation_vs_permission",
+      "correct": "mustn't",
+      "cue": "Gunakan “mustn't” untuk menyatakan larangan resmi atau hal yang melanggar aturan dan tidak boleh dilakukan."
+    },
+    {
+      "id": "A2-326",
+      "level": "A2",
+      "subskill": "obligation_vs_permission",
+      "correct": "don't have to",
+      "cue": "Gunakan “don't have to” untuk hal yang tidak wajib/tidak perlu dikerjakan. Berbeda dengan “mustn't” yang berarti dilarang keras."
+    },
+    {
+      "id": "A2-327",
+      "level": "A2",
+      "subskill": "obligation_vs_permission",
+      "correct": "can",
+      "cue": "Minta izin: “Can I…?” atau “May I…?”"
+    },
+    {
+      "id": "A2-328",
+      "level": "A2",
+      "subskill": "obligation_vs_permission",
+      "correct": "have to",
+      "cue": "Kewajiban berdasarkan hukum atau peraturan resmi dinyatakan dengan “have to” atau “must”."
+    },
+    {
+      "id": "A2-329",
+      "level": "A2",
+      "subskill": "zero_vs_first_conditional",
+      "correct": "rains",
+      "cue": "“If” + present, “will” + kata kerja: “If it rains, we will stay”."
+    },
+    {
+      "id": "A2-332",
+      "level": "A2",
+      "subskill": "zero_vs_first_conditional",
+      "correct": "don't get",
+      "cue": "Fakta ilmiah pakai present di kedua bagian."
+    },
+    {
+      "id": "A2-333",
+      "level": "A2",
+      "subskill": "first_vs_subsequent_mention",
+      "correct": "the",
+      "cue": "Sudah disebut? Pakai “the”."
+    },
+    {
+      "id": "A2-335",
+      "level": "A2",
+      "subskill": "first_vs_subsequent_mention",
+      "correct": "the",
+      "cue": "Bagian dari benda yang sudah disebut? Pakai “the”: “the ending”, “the actors”."
+    },
+    {
+      "id": "A2-336",
+      "level": "A2",
+      "subskill": "first_vs_subsequent_mention",
+      "correct": "the",
+      "cue": "Sudah disebut, satu atau banyak: “the”."
+    },
+    {
+      "id": "A2-337",
+      "level": "A2",
+      "subskill": "comparative_vs_superlative_scope",
+      "correct": "bigger",
+      "cue": "Pilih A atau B? Pakai -er: “big” jadi “bigger”, “fast” jadi “faster”."
+    },
+    {
+      "id": "A2-339",
+      "level": "A2",
+      "subskill": "comparative_vs_superlative_scope",
+      "correct": "cheaper",
+      "cue": "Kata perbandingan “than” membandingkan dua hal, gunakan akhiran “-er” untuk kata sifat pendek satu suku kata (“cheaper than”)."
+    },
+    {
+      "id": "A2-342",
+      "level": "A2",
+      "subskill": "past_continuous_vs_past_simple_interrupted_action",
+      "correct": "rang",
+      "cue": "Kata “suddenly” (tiba-tiba) menandakan aksi singkat mendadak yang memotong kejadian lain, jadi gunakan past simple (“rang”)."
+    },
+    {
+      "id": "A2-345",
+      "level": "A2",
+      "subskill": "much_many_little_few_countability",
+      "correct": "many",
+      "cue": "Orang bisa dihitung: “too many people”."
+    },
+    {
+      "id": "A2-346",
+      "level": "A2",
+      "subskill": "much_many_little_few_countability",
+      "correct": "much",
+      "cue": "“Not much water”, “not many bottles”."
+    },
+    {
+      "id": "A2-347",
+      "level": "A2",
+      "subskill": "much_many_little_few_countability",
+      "correct": "few",
+      "cue": "“A few cookies”, “a little milk”."
+    },
+    {
+      "id": "A2-348",
+      "level": "A2",
+      "subskill": "much_many_little_few_countability",
+      "correct": "little",
+      "cue": "“A little sugar”, “a little milk”, “a little time”."
+    },
+    {
+      "id": "A2-353",
+      "level": "A2",
+      "subskill": "as_as_equality_vs_comparative",
+      "correct": "as tall as",
+      "cue": "Tingginya sama: “as tall as”."
+    },
+    {
+      "id": "A2-354",
+      "level": "A2",
+      "subskill": "as_as_equality_vs_comparative",
+      "correct": "as fast as",
+      "cue": "Kalah? “not as … as”: “not as fast as”."
+    },
+    {
+      "id": "A2-356",
+      "level": "A2",
+      "subskill": "as_as_equality_vs_comparative",
+      "correct": "as expensive as",
+      "cue": "Harga sama: “as expensive as”. Kata sifat panjang pun tetap bentuk dasar di dalamnya."
+    },
+    {
+      "id": "A2-358",
+      "level": "A2",
+      "subskill": "article_omission_with_uncountable",
+      "correct": "some",
+      "cue": "Makanan yang nggak bisa dihitung: “some rice”, “some bread”, “some water”."
+    },
+    {
+      "id": "A2-359",
+      "level": "A2",
+      "subskill": "article_omission_with_uncountable",
+      "correct": "a piece of",
+      "cue": "Hitung potongan atau wadahnya: “a piece of bread”, “a glass of water”."
+    },
+    {
+      "id": "A2-360",
+      "level": "A2",
+      "subskill": "article_omission_with_uncountable",
+      "correct": "is",
+      "cue": "Benda yang nggak bisa dihitung pakai kata kerja tunggal, misalnya “information is” dan “news is”."
+    },
+    {
+      "id": "A2-362",
+      "level": "A2",
+      "subskill": "definite_article_with_unique_referents_and_superlatives",
+      "correct": "the",
+      "cue": "Benda yang cuma ada satu di dunia selalu pakai “the”, misalnya “the sun”."
+    },
+    {
+      "id": "A2-364",
+      "level": "A2",
+      "subskill": "definite_article_with_unique_referents_and_superlatives",
+      "correct": "the same as",
+      "cue": "“The same as”, bukan “same with”."
+    },
+    {
+      "id": "A2-365",
+      "level": "A2",
+      "subskill": "movement_prepositions_through_across_along_over",
+      "correct": "across",
+      "cue": "Dari satu sisi ke sisi lain: “across”."
+    },
+    {
+      "id": "A2-366",
+      "level": "A2",
+      "subskill": "movement_prepositions_through_across_along_over",
+      "correct": "through",
+      "cue": "Masuk dari satu sisi, keluar di sisi lain: “through”."
+    },
+    {
+      "id": "A2-367",
+      "level": "A2",
+      "subskill": "movement_prepositions_through_across_along_over",
+      "correct": "over",
+      "cue": "Lewat di atas lalu ke sisi lain: “over the wall”, “over my head”."
+    },
+    {
+      "id": "A2-368",
+      "level": "A2",
+      "subskill": "movement_prepositions_through_across_along_over",
+      "correct": "along",
+      "cue": "Menyusuri garis: “along the road”, “along the river”."
+    },
+    {
+      "id": "A2-369",
+      "level": "A2",
+      "subskill": "double_negative_avoidance_single_negation_rule",
+      "correct": "know nothing",
+      "cue": "Bahasa Inggris menghindari dobel negatif: pilih kalimat positif dengan nothing (“know nothing”) ATAU kalimat negatif dengan anything (“don't know anything”)."
+    },
+    {
+      "id": "A2-370",
+      "level": "A2",
+      "subskill": "double_negative_avoidance_single_negation_rule",
+      "correct": "nobody",
+      "cue": "Di posisi subjek: “nobody”, “nothing”."
+    },
+    {
+      "id": "A2-371",
+      "level": "A2",
+      "subskill": "double_negative_avoidance_single_negation_rule",
+      "correct": "eats",
+      "cue": "“Never” + kata kerja ber-s: “he never eats”."
+    },
+    {
+      "id": "A2-372",
+      "level": "A2",
+      "subskill": "double_negative_avoidance_single_negation_rule",
+      "correct": "any",
+      "cue": "Kalimat negatif berpasangan dengan “any” (“there aren't any buses”). Jangan gunakan kata negatif ganda seperti aren't no."
+    },
+    {
+      "id": "A2-373",
+      "level": "A2",
+      "subskill": "state_verbs_resist_continuous_form",
+      "correct": "understand",
+      "cue": "Kata kerja pikiran dan perasaan tetap bentuk biasa: “I understand”, “I know”."
+    },
+    {
+      "id": "A2-374",
+      "level": "A2",
+      "subskill": "state_verbs_resist_continuous_form",
+      "correct": "wants",
+      "cue": "“Want”, “need”, “like”: tanpa -ing. “She wants”."
+    },
+    {
+      "id": "A2-375",
+      "level": "A2",
+      "subskill": "state_verbs_resist_continuous_form",
+      "correct": "doesn't like",
+      "cue": "Perasaan tetap bentuk biasa: “she doesn't like”, “she loves”."
+    },
+    {
+      "id": "A2-376",
+      "level": "A2",
+      "subskill": "state_verbs_resist_continuous_form",
+      "correct": "have",
+      "cue": "“Have” untuk memiliki: tanpa -ing. “We have a cat”."
+    },
+    {
+      "id": "A2-377",
+      "level": "A2",
+      "subskill": "preposition_of_time_duration_for_vs_since_vs_during",
+      "correct": "for",
+      "cue": "Berapa lama? “for”: “for five years”, “for two hours”."
+    },
+    {
+      "id": "A2-378",
+      "level": "A2",
+      "subskill": "preposition_of_time_duration_for_vs_since_vs_during",
+      "correct": "since",
+      "cue": "Mulai waktu itu dan masih sampai sekarang: “since”."
+    },
+    {
+      "id": "A2-379",
+      "level": "A2",
+      "subskill": "preposition_of_time_duration_for_vs_since_vs_during",
+      "correct": "during",
+      "cue": "Di tengah suatu acara: “during the exam”, “during the film”."
+    },
+    {
+      "id": "A2-380",
+      "level": "A2",
+      "subskill": "preposition_of_time_duration_for_vs_since_vs_during",
+      "correct": "since",
+      "cue": "“Have been” + “since” + titik mulai: “since Monday”, “since 2020”."
+    },
+    {
+      "id": "A2-381",
+      "level": "A2",
+      "subskill": "subject_vs_object_questions_word_order",
+      "correct": "takes",
+      "cue": "“Who” pelakunya? “Who” + kata kerja ber-s: “Who takes you?”"
+    },
+    {
+      "id": "A2-383",
+      "level": "A2",
+      "subskill": "subject_vs_object_questions_word_order",
+      "correct": "happened",
+      "cue": "“What happened?” tanpa “did”, tanpa “was”."
+    },
+    {
+      "id": "A2-384",
+      "level": "A2",
+      "subskill": "subject_vs_object_questions_word_order",
+      "correct": "does he want",
+      "cue": "Menanyakan penerima: “Who does he want to call?”"
+    },
+    {
+      "id": "A2-385",
+      "level": "A2",
+      "subskill": "present_perfect_experience_ever_never",
+      "correct": "eaten",
+      "cue": "“eat”, “ate”, “eaten”: sesudah “have”, ambil yang ketiga."
+    },
+    {
+      "id": "A2-386",
+      "level": "A2",
+      "subskill": "present_perfect_experience_ever_never",
+      "correct": "have never been",
+      "cue": "Belum pernah seumur hidup: “I have never been”."
+    },
+    {
+      "id": "A2-387",
+      "level": "A2",
+      "subskill": "present_perfect_experience_ever_never",
+      "correct": "has",
+      "cue": "“He”, “she”, “it” + “ever”: “Has he ever…?”"
+    },
+    {
+      "id": "A2-388",
+      "level": "A2",
+      "subskill": "present_perfect_experience_ever_never",
+      "correct": "never",
+      "cue": "Belum pernah sekali pun: “never”."
+    },
+    {
+      "id": "A2-389",
+      "level": "A2",
+      "subskill": "present_perfect_with_for_since_duration",
+      "correct": "have been",
+      "cue": "“For” + rentang sampai sekarang: “have been”."
+    },
+    {
+      "id": "A2-390",
+      "level": "A2",
+      "subskill": "present_perfect_with_for_since_duration",
+      "correct": "have had",
+      "cue": "Dimiliki dari dulu sampai sekarang: “have had”."
+    },
+    {
+      "id": "A2-392",
+      "level": "A2",
+      "subskill": "present_perfect_with_for_since_duration",
+      "correct": "have loved",
+      "cue": "“Since” + titik mulai sampai sekarang: “have loved”, “have known”."
+    },
+    {
+      "id": "A2-393",
+      "level": "A2",
+      "subskill": "comparative_formation_er_vs_more_no_double_marking",
+      "correct": "hotter",
+      "cue": "“hot” → “hotter”, “big” → “bigger”: gandakan huruf terakhirnya."
+    },
+    {
+      "id": "A2-394",
+      "level": "A2",
+      "subskill": "comparative_formation_er_vs_more_no_double_marking",
+      "correct": "easier",
+      "cue": "“easy” → “easier”: y berubah jadi i sebelum -er."
+    },
+    {
+      "id": "A2-395",
+      "level": "A2",
+      "subskill": "comparative_formation_er_vs_more_no_double_marking",
+      "correct": "more beautiful",
+      "cue": "Kata panjang: “more beautiful”, “more expensive”."
+    },
+    {
+      "id": "A2-397",
+      "level": "A2",
+      "subskill": "adverb_of_manner_ly_vs_adjective_after_verb",
+      "correct": "fast",
+      "cue": "“fast” tetap “fast”, “good” jadi “well”: tanpa -ly."
+    },
+    {
+      "id": "A2-398",
+      "level": "A2",
+      "subskill": "adverb_of_manner_ly_vs_adjective_after_verb",
+      "correct": "beautiful",
+      "cue": "“Look”, “feel”, “be” + kata sifat: “you look beautiful”."
+    },
+    {
+      "id": "A2-399",
+      "level": "A2",
+      "subskill": "adverb_of_manner_ly_vs_adjective_after_verb",
+      "correct": "beautifully",
+      "cue": "Kata kerja aksi + -ly: “sings beautifully”, “drives carefully”."
+    },
+    {
+      "id": "A2-400",
+      "level": "A2",
+      "subskill": "adverb_of_manner_ly_vs_adjective_after_verb",
+      "correct": "quietly",
+      "cue": "Bagaimana caranya? Tambah -ly: “quietly”, “slowly”, “carefully”."
+    },
+    {
+      "id": "A2-401",
+      "level": "A2",
+      "subskill": "how_much_vs_how_many_quantity_questions",
+      "correct": "how many",
+      "cue": "Bisa dihitung? “How many eggs”, “how many books”."
+    },
+    {
+      "id": "A2-402",
+      "level": "A2",
+      "subskill": "how_much_vs_how_many_quantity_questions",
+      "correct": "how much",
+      "cue": "Menanyakan harga: “How much is it?”"
+    },
+    {
+      "id": "A2-403",
+      "level": "A2",
+      "subskill": "how_much_vs_how_many_quantity_questions",
+      "correct": "how much",
+      "cue": "Susu, air, gula: “How much?”"
+    },
+    {
+      "id": "A2-404",
+      "level": "A2",
+      "subskill": "how_much_vs_how_many_quantity_questions",
+      "correct": "glasses of water",
+      "cue": "Hitung wadahnya: “glasses of water”, “cups of tea”."
+    },
+    {
+      "id": "A2-405",
+      "level": "A2",
+      "subskill": "indefinite_compounds_something_anything_nothing",
+      "correct": "something",
+      "cue": "Positif dan benar-benar ada: “something”."
+    },
+    {
+      "id": "A2-406",
+      "level": "A2",
+      "subskill": "indefinite_compounds_something_anything_nothing",
+      "correct": "anything",
+      "cue": "Gunakan “hasn't eaten anything” atau “has eaten nothing”. Hindari menggabungkan dua kata negatif dalam satu kalimat."
+    },
+    {
+      "id": "A2-407",
+      "level": "A2",
+      "subskill": "indefinite_compounds_something_anything_nothing",
+      "correct": "nothing",
+      "cue": "Nggak ada kejadian + kata kerja positif: “Nothing happened”."
+    },
+    {
+      "id": "A2-408",
+      "level": "A2",
+      "subskill": "indefinite_compounds_something_anything_nothing",
+      "correct": "anything",
+      "cue": "Gunakan “can't see anything” (kalimat negatif + anything) atau “can see nothing”. Jangan pasangkan can't dengan nothing."
+    },
+    {
+      "id": "A2-409",
+      "level": "A2",
+      "subskill": "cause_result_connectors_because_vs_so",
+      "correct": "because",
+      "cue": "Akibat + “because” + alasan."
+    },
+    {
+      "id": "A2-411",
+      "level": "A2",
+      "subskill": "cause_result_connectors_because_vs_so",
+      "correct": "because of",
+      "cue": "Sesudahnya kata benda? “because of the rain”."
+    },
+    {
+      "id": "A2-412",
+      "level": "A2",
+      "subskill": "cause_result_connectors_because_vs_so",
+      "correct": "because",
+      "cue": "Alasan di depan: “Because it was hot, we swam”."
+    },
+    {
+      "id": "A2-413",
+      "level": "A2",
+      "subskill": "irregular_comparative_better_worse_forms",
+      "correct": "better",
+      "cue": "“good” → “better” → “the best”."
+    },
+    {
+      "id": "A2-414",
+      "level": "A2",
+      "subskill": "irregular_comparative_better_worse_forms",
+      "correct": "best",
+      "cue": "Nomor satu dari semuanya: “the best”."
+    },
+    {
+      "id": "A2-415",
+      "level": "A2",
+      "subskill": "irregular_comparative_better_worse_forms",
+      "correct": "worse",
+      "cue": "“bad” → “worse” → “the worst”."
+    },
+    {
+      "id": "A2-416",
+      "level": "A2",
+      "subskill": "irregular_comparative_better_worse_forms",
+      "correct": "better",
+      "cue": "“good” + “than”? “better than”."
+    }
+  ],
+  "jargonCount": 32,
+  "jargon": [
+    {
+      "id": "TA-006",
+      "level": "B1",
+      "subskill": "past_perfect_sequencing_two_past_events",
+      "terms": [
+        "participle"
+      ],
+      "ruleSnippet": "Past perfect pakai had + bentuk ketiga kata kerja (past participle). Bentuk ini nandain kejadian yang lebih dulu di antara dua kejadian lamp"
+    },
+    {
+      "id": "TA-007",
+      "level": "B2",
+      "subskill": "future_continuous_vs_future_perfect",
+      "terms": [
+        "participle"
+      ],
+      "ruleSnippet": "Future continuous “will be” + kata kerja -ing nggambarin tindakan yang masih jalan di waktu tertentu nanti. Future perfect “will have” + pas"
+    },
+    {
+      "id": "CO-006",
+      "level": "C1",
+      "subskill": "formal_inversion_had_i_known",
+      "terms": [
+        "inversi"
+      ],
+      "ruleSnippet": "Kalau pengandaian masa lalu biasa (Third Conditional): Memakai “If” + had + Verb 3. Contoh: <b>If I had known about the test, I would have s"
+    },
+    {
+      "id": "PA-005",
+      "level": "B2",
+      "subskill": "impersonal_reporting_it_is_said_that",
+      "terms": [
+        "participle"
+      ],
+      "ruleSnippet": "Pelaporan pasif tanpa pelaku: It + is atau was + past participle + anak kalimat that. Subjek semu “it” selalu tunggal."
+    },
+    {
+      "id": "b4_006",
+      "level": "C1",
+      "subskill": "conditional_inversion_were_i_to",
+      "terms": [
+        "inversi"
+      ],
+      "ruleSnippet": "Kalau pengandaian biasa (Second Conditional): Memakai kata “if” + Verb 2. Contoh: <b>If I were to win the lottery, I would travel</b> (Kalau"
+    },
+    {
+      "id": "b4_021",
+      "level": "C1",
+      "subskill": "dangling_modifier_correction",
+      "terms": [
+        "participle"
+      ],
+      "ruleSnippet": "Frasa pembuka bentuk participle wajib nerangin subjek yang berdiri persis sesudah komanya."
+    },
+    {
+      "id": "b5_005",
+      "level": "C1",
+      "subskill": "mixed_conditional_present_cause_past_result",
+      "terms": [
+        "participle"
+      ],
+      "ruleSnippet": "Mixed conditional sebab masa kini dan hasil masa lalu: If + past simple atau bentuk were, terus would have + past participle."
+    },
+    {
+      "id": "b5_008",
+      "level": "C1",
+      "subskill": "passive_gerund_vs_passive_infinitive_after_verb",
+      "terms": [
+        "participle"
+      ],
+      "ruleSnippet": "Bentuk -ing pasif being + past participle nyusul kata kerja atau kata depan yang minta pelengkap -ing. Contohnya resent, avoid, dan admit."
+    },
+    {
+      "id": "b5_016",
+      "level": "C1",
+      "subskill": "perfect_gerund_vs_simple_gerund_time_reference",
+      "terms": [
+        "participle"
+      ],
+      "ruleSnippet": "Bentuk -ing perfect having + past participle negesin tindakannya mendahului kata kerja utama. Bentuk -ing sederhana ninggalin urutannya ters"
+    },
+    {
+      "id": "b5_018",
+      "level": "B2",
+      "subskill": "superlative_with_ever_present_perfect_combination",
+      "terms": [
+        "participle"
+      ],
+      "ruleSnippet": "Superlative + kata benda + I have ever + past participle nyatain klaim terbaik atau terburuk sepanjang hidup yang masih berlaku. Kalau cerit"
+    },
+    {
+      "id": "b5_023",
+      "level": "C1",
+      "subskill": "negative_adverbial_inversion_never_rarely_not_only",
+      "terms": [
+        "inversi"
+      ],
+      "ruleSnippet": "Kalau susunan normal: Keterangan waktu ditaruh di tengah kalimat. Contoh: <b>I have never seen such a view</b> (Aku belum pernah melihat pem"
+    },
+    {
+      "id": "C2-004",
+      "level": "C2",
+      "subskill": "inversion_after_only_restrictive_phrase",
+      "terms": [
+        "inversi"
+      ],
+      "ruleSnippet": "Kalau susunan kalimat normal: Frasa “only” berada di posisi biasa. Contoh: <b>We realized the truth only after reading the letter</b>.<br>Ka"
+    },
+    {
+      "id": "C2-006",
+      "level": "C1",
+      "subskill": "participle_clause",
+      "terms": [
+        "participle"
+      ],
+      "ruleSnippet": "Anak kalimat participle bentuk perfect: having + past participle nandain tindakan yang lebih dulu dan udah selesai."
+    },
+    {
+      "id": "TA-011",
+      "level": "A2",
+      "subskill": "present_perfect_experience_ever_never",
+      "terms": [
+        "participle"
+      ],
+      "ruleSnippet": "Present perfect dengan “ever” dan “never” ngomongin pengalaman sampai sekarang: “have/has” + past participle."
+    },
+    {
+      "id": "TA-013",
+      "level": "C2",
+      "subskill": "future_perfect_epistemic_past_assumption",
+      "terms": [
+        "participle"
+      ],
+      "ruleSnippet": "“Will have” + past participle bisa nyatain dugaan yakin kalau sesuatu udah selesai, apalagi ada penanda kayak “by now”."
+    },
+    {
+      "id": "PA-007",
+      "level": "C2",
+      "subskill": "perfect_passive_infinitive_anteriority_reported_events",
+      "terms": [
+        "participle"
+      ],
+      "ruleSnippet": "Sesudah kata pelaporan kayak “is believed/said/thought”, pakai “to have been” + past participle buat kejadian lebih awal yang menimpa subjek"
+    },
+    {
+      "id": "TA-020",
+      "level": "B2",
+      "subskill": "future_continuous_vs_future_perfect",
+      "terms": [
+        "participle"
+      ],
+      "ruleSnippet": "Future perfect “will have” + past participle (bentuk ke-3 kata kerja) nandain tindakan yang udah kelar sebelum satu titik nanti, biasanya ad"
+    },
+    {
+      "id": "TA-014",
+      "level": "B1",
+      "subskill": "present_perfect_just_already_yet_placement",
+      "terms": [
+        "participle"
+      ],
+      "ruleSnippet": "“Yet” nutup kalimat negatif dan pertanyaan present perfect; “just” dan “already” duduk di antara “have” dan participle di kalimat positif; “"
+    },
+    {
+      "id": "MO-009",
+      "level": "B2",
+      "subskill": "be_supposed_to_expectation_vs_obligation",
+      "terms": [
+        "participle"
+      ],
+      "ruleSnippet": "“Be supposed to + kata dasar” ngelaporin apa yang diharapkan aturan, jadwal, atau kesepakatan, dan itu bisa aja nggak kejadian; kata bantu “"
+    },
+    {
+      "id": "MO-013",
+      "level": "C1",
+      "subskill": "neednt_have_vs_didnt_need_to",
+      "terms": [
+        "participle"
+      ],
+      "ruleSnippet": "“Needn't have + past participle” artinya seseorang terlanjur ngelakuin sesuatu yang ternyata nggak perlu; “didn't need to + kata dasar” cuma"
+    },
+    {
+      "id": "b6_003",
+      "level": "C1",
+      "subskill": "no_sooner_hardly_inversion_paired_correlatives",
+      "terms": [
+        "inversi"
+      ],
+      "ruleSnippet": "Untuk menceritakan dua kejadian beruntun di masa lalu (“baru saja ... langsung / ketika ...”):<br>Kalau pakai “No sooner”: Pembukanya negati"
+    },
+    {
+      "id": "b6_005",
+      "level": "C1",
+      "subskill": "verb_phrase_ellipsis_after_auxiliary",
+      "terms": [
+        "elipsis"
+      ],
+      "ruleSnippet": "Di elipsis frasa kerja, kata bantu yang digantung mewakili seluruh frasa kerja yang keulang dan wajib niru tense plus aspek klausa induknya:"
+    },
+    {
+      "id": "QN-007",
+      "level": "C2",
+      "subskill": "negated_participle_clause_not_wishing_to",
+      "terms": [
+        "klausa non-finit"
+      ],
+      "ruleSnippet": "Klausa non-finit dinegasi dengan “not” tepat sebelum bentuk -ing/-ed: “Not wanting...”, “Not having received...”."
+    },
+    {
+      "id": "TA-201",
+      "level": "A2",
+      "subskill": "present_perfect_experience_ever_never",
+      "terms": [
+        "participle"
+      ],
+      "ruleSnippet": "Pengalaman hidup tanpa waktu pasti: have/has + never/ever + past participle."
+    },
+    {
+      "id": "TA-204",
+      "level": "B1",
+      "subskill": "past_perfect_sequencing_two_past_events",
+      "terms": [
+        "participle"
+      ],
+      "ruleSnippet": "Past perfect (had + past participle) nandain yang lebih dulu dari dua kejadian lampau."
+    },
+    {
+      "id": "TA-205",
+      "level": "B1",
+      "subskill": "present_perfect_just_already_yet_placement",
+      "terms": [
+        "participle"
+      ],
+      "ruleSnippet": "Have + already/just + past participle di kalimat positif. “Yet” di ujung kalimat negatif dan pertanyaan."
+    },
+    {
+      "id": "MO-203",
+      "level": "B2",
+      "subskill": "modal_perfect_could_have_missed_opportunity",
+      "terms": [
+        "participle"
+      ],
+      "ruleSnippet": "Could have + past participle = kemungkinan lampau yang nggak dipakai. Should have = kritik."
+    },
+    {
+      "id": "CM-205",
+      "level": "B2",
+      "subskill": "superlative_with_ever_present_perfect_combination",
+      "terms": [
+        "participle"
+      ],
+      "ruleSnippet": "The + bentuk paling + (that) + subjek + have/has ever + past participle."
+    },
+    {
+      "id": "CO-208",
+      "level": "C1",
+      "subskill": "formal_inversion_had_i_known",
+      "terms": [
+        "inversi"
+      ],
+      "ruleSnippet": "Kalau pengandaian masa lalu biasa (Third Conditional): Memakai “If” + had + Verb 3. Contoh: <b>If I had known about the test, I would have s"
+    },
+    {
+      "id": "QN-206",
+      "level": "C1",
+      "subskill": "negative_adverbial_inversion_never_rarely_not_only",
+      "terms": [
+        "inversi"
+      ],
+      "ruleSnippet": "Kalau susunan normal: Keterangan waktu ditaruh di tengah kalimat. Contoh: <b>I have never seen such a view</b> (Aku belum pernah melihat pem"
+    },
+    {
+      "id": "QN-207",
+      "level": "C2",
+      "subskill": "inversion_after_only_restrictive_phrase",
+      "terms": [
+        "inversi"
+      ],
+      "ruleSnippet": "Kalau susunan kalimat normal: Frasa “only” berada di posisi biasa. Contoh: <b>We realized the truth only after reading the letter</b>.<br>Ka"
+    },
+    {
+      "id": "CO-209",
+      "level": "C1",
+      "subskill": "conditional_inversion_were_i_to",
+      "terms": [
+        "inversi"
+      ],
+      "ruleSnippet": "Kalau pengandaian biasa (Second Conditional): Memakai kata “if” + Verb 2. Contoh: <b>If I were to win the lottery, I would travel</b> (Kalau"
+    }
+  ]
+}

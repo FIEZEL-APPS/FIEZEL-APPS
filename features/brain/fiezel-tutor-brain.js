@@ -565,7 +565,7 @@
     'brain-tutor.probe-rotated': '{rotated}' + '. Coba renungkan lagi dari petunjuk ini ya.',
     'brain-tutor.probe-default': 'Sebelum lihat pilihannya lagi, coba cari kata di kalimat itu yang paling menentukan bentuk jawabannya. Kata yang mana?',
     'brain-tutor.hint-rotated': 'Coba lihat dari sudut ini: ' + '{rotated}' + '. Sekarang coba lagi yuk.',
-    'brain-tutor.hint-cue': 'Kunci ingatannya: ' + '{cue}' + '. Sekarang coba jawab lagi ya.',
+    'brain-tutor.hint-cue': 'Kunci ingatannya: ' + '{cue}' + '.',
     'brain-tutor.hint-default': 'Petunjuknya ada di kata-kata di sekitar bagian yang kosong. Baca lagi pelan-pelan, lalu coba lagi ya.',
     'brain-tutor.worked-intro': ' Aku contohkan satu yang mirip dulu ya, biar makin jelas langkahnya.',
     'brain-tutor.reveal-intro': ' Oke, aku buka pembahasannya ya.',
@@ -652,11 +652,24 @@
     // boleh memuat kunci jawabannya. Contoh nyata: soal "I can't see ___." diberi petunjuk
     // "'I see him', tapi 'he sees me'", sehingga kesempatan kedua praktis gratis tetapi tetap
     // dicatat benar. Kalimat yang memuat kunci (utuh, sebagai kata) diganti petunjuk umum.
-    var kunci = str(it.correctAnswer || ex.correct);
+    var kunci = str(it.keyGuard || it.correctAnswer || ex.correct);
+    var opsiList = (Array.isArray(it.options) ? it.options : []).map(function (o) { return str(o).trim(); }).filter(Boolean);
     var bocor = function (teks) {
-      if (!kunci || !teks) return false;
-      var pola = kunci.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      try { return new RegExp('(^|[^A-Za-z])' + pola + '([^A-Za-z]|$)', 'i').test(String(teks)); } catch (_) { return false; }
+      if (!teks) return false;
+      var t = String(teks);
+      if (kunci) {
+        var pola = kunci.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        try { if (new RegExp('(^|[^A-Za-z0-9])' + pola + '([^A-Za-z0-9]|$)', 'i').test(t)) return true; } catch (_) {}
+        if (kunci.length >= 3 && t.toLowerCase().includes(kunci.toLowerCase())) return true;
+      }
+      if (/pakai\s+-(ed|ing|s|es|ly|er|est)\b/i.test(t) || /akhiran\s+-(ed|ing|s|es|ly|er|est)\b/i.test(t)) return true;
+      for (var oi = 0; oi < opsiList.length; oi++) {
+        var op = opsiList[oi];
+        if (op.length >= 3 && (t.includes('“' + op + '”') || t.includes('"' + op + '"') || t.includes("'" + op + "'"))) {
+          if (kunci && op.toLowerCase() === kunci.toLowerCase()) return true;
+        }
+      }
+      return false;
     };
     // Rotasi varian (aturan, alasan, lalu kontras jawabanmu vs bentuk benar sesudah gagal
     // berulang) TIDAK disaring: kontras itu disengaja oleh gerbang tutor-brain-v3. Yang disaring

@@ -741,7 +741,7 @@
     // app.js:312 — GRAMMAR_FAMILY_RULES.modals
     'grammar.aturan-keluarga-modals': 'Kata seperti must, can, may, should, dan might membawa maksud yang berbeda, misalnya kewajiban, izin, saran, atau kemungkinan. Pilih yang paling cocok dengan maksud seluruh kalimat.',
     // app.js:314 — GRAMMAR_FAMILY_RULES.passive
-    'grammar.aturan-keluarga-passive': 'Dalam kalimat pasif, perhatian diarahkan ke tindakan atau hasilnya. Pola dasarnya adalah be ditambah past participle, lalu pelaku hanya disebut jika memang penting.',
+    'grammar.aturan-keluarga-passive': 'Dalam kalimat pasif, perhatian diarahkan ke tindakan atau hasilnya. Pola dasarnya adalah be ditambah kata kerja bentuk ketiga (Verb 3), lalu pelaku hanya disebut jika memang penting.',
     // app.js:317 — GRAMMAR_FAMILY_RULES.prepositions
     'grammar.aturan-keluarga-prepositions': 'Kata depan dipilih dari hubungan makna, bukan terjemahan kata per kata. Lihat apakah kalimat membicarakan waktu, tempat, arah, cara, atau hubungan tertentu.',
     // app.js:319 — GRAMMAR_FAMILY_RULES.question_negation
@@ -820,7 +820,7 @@
     // app.js:633 — grammarExercise v9-11 expl lain
     'grammar.mode-diagnose-expl-lain': `Ini penjelasan buat pilihan {opsiLainDikutip}, bukan buat {opsiDikutip}.`,
     // app.js:633 — grammarExercise v9-11 stem (diagnose_distractor)
-    'grammar.mode-diagnose-stem': `Temanmu memilih {opsiDikutip}. Kenapa pilihan itu salah?\n{stem}`,
+    'grammar.mode-diagnose-stem': `Pilihan {opsiDikutip} kurang tepat untuk kalimat ini. Mengapa?\n{stem}`,
     // app.js:644 — grammarExercise v21 expl
     'grammar.mode-family-expl': `Label {labelDikutip} itu keluarga grammar lain. Contoh ini lagi nguji pola keluarga {labelKeluargaDikutip}.`,
     // app.js:644 — grammarExercise v21 stem (classify_family)

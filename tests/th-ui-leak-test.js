@@ -59,9 +59,8 @@ const ALLOWLIST = Object.freeze({
      di permukaan guru; utang tetap tercatat di sini. */
   'app.js': 4,
   'features/brain/fiezel-olm.js': 1,                            // tabel copy id, padanan th di naskah-th-brain.js
-  /* 3 -> 4 (m025-314): satu kalimat umpan balik tutor ('Belum ada jawaban di sesi ini.')
-     ikut terlihat setelah daftar kata diperlebar. Naskahnya lama, matanya yang baru. */
-  'features/brain/fiezel-tutor-brain.js': 4,
+  /* 4 -> 3: eliminasi kalimat redundan '. Sekarang coba jawab lagi ya.' */
+  'features/brain/fiezel-tutor-brain.js': 3,
   /* 1 -> 5 (m025-314): empat label Tugas/Latihan di kartu kelas, semuanya naskah lama.
      5 -> 6 (m025-351): literal 'Tenggat ' di kartu tugas ZONE GURU (Ruang Guru) ikut
      terlihat setelah 'Tenggat' masuk daftar kata. Zona murid KelasKu sudah dwibahasa

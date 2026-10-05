@@ -1,25 +1,25 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-10-05T10:24:18.904Z",
+  "generatedAt": "2026-10-05T15:38:39.503Z",
   "files": {
     "app.js": {
       "leaks": 4,
       "budget": 4,
       "sample": [
         {
-          "line": 11060,
+          "line": 11086,
           "text": "Selesaikan ritme hari ini"
         },
         {
-          "line": 11896,
+          "line": 11922,
           "text": "— Penugasan latihan dan pemantauan capaian murid."
         },
         {
-          "line": 12508,
+          "line": 12534,
           "text": "Nama kriteria: n/4 - satu kalimat alasan yang menunjuk bukti di tulisannya"
         },
         {
-          "line": 19400,
+          "line": 19438,
           "text": "Latihan"
         }
       ]
@@ -63,8 +63,8 @@
       ]
     },
     "features/brain/fiezel-tutor-brain.js": {
-      "leaks": 4,
-      "budget": 4,
+      "leaks": 3,
+      "budget": 3,
       "sample": [
         {
           "line": 564,
@@ -73,10 +73,6 @@
         {
           "line": 567,
           "text": ". Sekarang coba lagi yuk."
-        },
-        {
-          "line": 568,
-          "text": ". Sekarang coba jawab lagi ya."
         },
         {
           "line": 579,
@@ -103,15 +99,15 @@
       "budget": 3,
       "sample": [
         {
-          "line": 2014,
+          "line": 2088,
           "text": "Latihan · ±"
         },
         {
-          "line": 2062,
+          "line": 2136,
           "text": "Tenggat"
         },
         {
-          "line": 2062,
+          "line": 2136,
           "text": "Latihan — umpan balik tiap soal"
         }
       ]
@@ -179,12 +175,28 @@
       ]
     },
     "features/learner-flow/fiezel-review-bank.js": {
-      "leaks": 1,
-      "budget": 1,
+      "leaks": 15,
+      "budget": 15,
       "sample": [
         {
-          "line": 215,
-          "text": "Sekarang buka."
+          "line": 37,
+          "text": "Cari kalimat di teks yang memuat jawabannya"
+        },
+        {
+          "line": 37,
+          "text": "Latihan Membaca TKA: tekstual"
+        },
+        {
+          "line": 38,
+          "text": "Latihan Membaca TKA: inferensial"
+        },
+        {
+          "line": 39,
+          "text": "Latihan Membaca TKA: fakta dan opini"
+        },
+        {
+          "line": 153,
+          "text": "Jawaban ini tidak tertulis kata per kata; ia disimpulkan dari petunjuk “will be closed ... will open again”."
         }
       ]
     },
@@ -360,6 +372,38 @@
         }
       ]
     },
+    "features/teacher/fiezel-analisis-butir.js": {
+      "leaks": 2,
+      "budget": 2,
+      "sample": [
+        {
+          "line": 72,
+          "text": "Belum cukup murid"
+        },
+        {
+          "line": 135,
+          "text": "Tingkat kesukaran (p)"
+        }
+      ]
+    },
+    "features/teacher/fiezel-rapor-kktp.js": {
+      "leaks": 3,
+      "budget": 3,
+      "sample": [
+        {
+          "line": 180,
+          "text": "Status KKTP"
+        },
+        {
+          "line": 180,
+          "text": "Capaian Kompetensi (tertinggi)"
+        },
+        {
+          "line": 180,
+          "text": "Capaian Kompetensi (perlu ditingkatkan)"
+        }
+      ]
+    },
     "features/teacher/fiezel-teacher-curriculum.js": {
       "leaks": 25,
       "budget": 25,
@@ -387,27 +431,27 @@
       ]
     },
     "features/teacher/fiezel-teacher-shell.js": {
-      "leaks": 7,
-      "budget": 7,
+      "leaks": 8,
+      "budget": 8,
       "sample": [
         {
-          "line": 1212,
+          "line": 1216,
           "text": "Penugasan Kontingen Pasukan Garuda ke wilayah konflik"
         },
         {
-          "line": 1292,
+          "line": 1296,
           "text": "Penugasan nilai (assignment)"
         },
         {
-          "line": 3324,
+          "line": 3328,
           "text": "Tenggat & tugas"
         },
         {
-          "line": 3342,
+          "line": 3346,
           "text": "Akurasi"
         },
         {
-          "line": 3423,
+          "line": 3427,
           "text": "Latihan ·"
         }
       ]
@@ -417,15 +461,15 @@
       "budget": 3,
       "sample": [
         {
-          "line": 474,
+          "line": 491,
           "text": ". Aku bangga. Lanjutkan ritmenya — 1 sesi kecil tiap hari lebih ampuh daripada 1 sesi panjang seminggu."
         },
         {
-          "line": 483,
+          "line": 500,
           "text": "• Akurasi keseluruhan:"
         },
         {
-          "line": 506,
+          "line": 523,
           "text": "Akurasi"
         }
       ]
@@ -464,7 +508,7 @@
     }
   },
   "copyKeys": {
-    "id": 3767,
+    "id": 3945,
     "th": 3769,
     "idTanpaTh": 0
   },

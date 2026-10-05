@@ -166,8 +166,8 @@
 /* m025-42: one scale, always. The viewport tag alone is ignored by iOS Safari, so the
    layout is pinned here as well and the gestures are refused in fiezel-zoom-lock.js.
    touch-action:manipulation is what removes the double-tap-to-zoom delay and action. */
-html{scroll-behavior:auto;touch-action:manipulation;-webkit-text-size-adjust:100%;text-size-adjust:100%;overflow-x:clip}
-html,body{touch-action:manipulation}
+html{scroll-behavior:auto;touch-action:manipulation;-webkit-text-size-adjust:100%;text-size-adjust:100%;overflow-x:clip;overscroll-behavior-x:none;overscroll-behavior-y:none;overscroll-behavior:none}
+html,body{touch-action:manipulation;overscroll-behavior-x:none;overscroll-behavior:none}
 /* m025-43 OWNER: a long press anywhere popped the iOS selection/copy callout on top
    of the lesson. Selection is off app-wide; real text fields keep it, because a
    field you cannot select text in is broken. */
@@ -955,8 +955,9 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
   color:#fff;transition:transform .15s ease,box-shadow .15s ease;
 }
 .quiz-floating-next-btn:active{transform:scale(.96);transition-duration:.08s}
-.quiz-floating-next-btn svg{width:20px;height:20px}
 .quiz-shell{padding-bottom:calc(92px + env(safe-area-inset-bottom, 0px))!important}/* audit F08: 52px tombol + 16px jarak + nafas, ditambah area aman iOS - pembahasan terakhir tidak pernah tertutup */
+.quiz-shell.has-retry-active,
+.quiz-shell:has(#tutorTurn:not(.hidden)){padding-bottom:calc(220px + env(safe-area-inset-bottom, 0px))!important}
 /* ==========================================================================
    Popup keyakinan (m025-133)
    ==========================================================================
@@ -2334,19 +2335,32 @@ body.reduce-motion .fiezel-ob-mascot *{animation:none!important;transition:none!
 }
 
 /* ========== MICRO-ANIMATIONS FOR TRANSITIONS & INTERACTIONS ========== */
-/* Page view transitions */
+/* Page view transitions.
+   m025-487 — CROSS-FADE YANG SALING MENUTUPI, BUKAN DUA ANIMASI TERPISAH.
+   Sebelum ini `old` memakai `pageOut` dan `new` memakai `pageIn` — dua kurva easing
+   yang BERBEDA, jadi di tengah transisi snapshot lama sudah hampir habis sementara
+   snapshot baru baru mulai muncul. Terukur di Chromium (tools/dev/fiezel-vt-audit.js):
+   cakupan layar jatuh ke 0.752 — seperempat layar meredup setiap pindah tab, dan murid
+   membacanya sebagai "berkedip seperti me-refresh halaman".
+   Sekarang keduanya LINEAR pada `--dur-l` yang sama: old 1->0 dan new 0->1 pada laju
+   yang sama persis, sehingga jumlah opacity keduanya KONSTAN 1 di sepanjang transisi —
+   nol kedipan, dan tetap satu bahasa masuk-layar. (.fade di dalam #app digerbangi lewat
+   `.is-repaint` ketika View Transition yang mengurusnya; lihat vtViewPaint di app.js.) */
 ::view-transition-old(root) {
-  animation: pageOut var(--dur-l) var(--ease) forwards;
+  animation: vtFadeOut var(--dur-l) linear forwards;
 }
 
 ::view-transition-new(root) {
-  animation: pageIn var(--dur-l) var(--ease) forwards;
+  animation: vtFadeIn var(--dur-l) linear forwards;
 }
 
 @keyframes pageOut {
   from { opacity: 1; }
   to { opacity: 0; }
 }
+
+@keyframes vtFadeOut { from { opacity: 1; } to { opacity: 0; } }
+@keyframes vtFadeIn { from { opacity: 0; } to { opacity: 1; } }
 
 /* [TOMBSTONE i15 2026-08-29, audit 12-003] @keyframes pageIn kedua (opacity-saja) DIHAPUS.
    Nama keyframe itu global; definisi belakangan menang, jadi kembar ini diam-diam MEMATIKAN

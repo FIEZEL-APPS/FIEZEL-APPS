@@ -1,0 +1,21 @@
+{
+  "timestamp": "2026-10-05T13:16:53.076Z",
+  "summary": {
+    "totalTemplates": 512,
+    "totalMemoryCueLeaks": 0,
+    "totalJargonOccurrences": 0,
+    "leakBreakdown": {
+      "exact_answer_key_mentioned": 0,
+      "direct_choice_instruction": 0,
+      "inflectional_suffix_spoil": 0,
+      "short_key_direct_instruction": 0
+    }
+  },
+  "diagnoseDistractorAnalysis": {
+    "issue": "Munculnya soal 'Temanmu memilih [X]. Kenapa pilihan itu salah?'",
+    "rootCause": "Mode diagnose_distractor_1..3 (variant 9-11 di app.js:911) memanggil FiezelI18n.t('grammar.mode-diagnose-stem') yang memformat stem 'Temanmu memilih {opsiDikutip}. Kenapa pilihan itu salah?'. Di PR #512 (commit 97a84524), mode ini sempat dikembalikan ke GRAMMAR_LESSON_MODES dan makeGrammarQuestionForMode.",
+    "solution": "Keluarkan secara permanen diagnose_distractor_* dari seluruh mode sesi grammar (GRAMMAR_LESSON_MODES, GRAMMAR_WHY_SLOT_MODES, makeGrammarQuestionForMode) sehingga 100% soal adalah latihan bentuk bahasa alami (apply_form, complete_sentence, repair_distractor_*), dan perbarui copy-id-app-a.js serta copy-th-app-a.js agar string stem tidak lagi memuat narasi teman/kenapa salah."
+  },
+  "memoryCueLeaks": [],
+  "universityJargon": []
+}
