@@ -1,7 +1,7 @@
 {
-  "version": "m025-476",
+  "version": "m025-477",
   "claimedBy": "branch main",
-  "claimedAt": "2026-10-05T05:33:50.017Z",
-  "reason": "fix(ui): perbaiki 6-kolom floating bottomnav dan gaya mandiri kartu game (m025-476)",
+  "claimedAt": "2026-10-05T06:32:34.569Z",
+  "reason": "feat(learner-flow): ubah UI Rencana Hari Ini jadi satu tombol Daily Mix dengan interleaving soal berdasar Braincore",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
