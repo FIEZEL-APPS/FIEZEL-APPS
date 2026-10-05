@@ -47,8 +47,8 @@ console.log('[T2] Menjalankan self-test tools/fiezel-bot.mjs...');
 {
   const r = sh('node', ['tools/fiezel-bot.mjs', 'self-test'], true);
   assert(r.out.includes('Self-Test: PASS'), 'Self-test harus mencetak PASS');
-  assert(/PASS \(18\/18 tests\)/.test(r.out), 'Self-test harus lulus 18/18');
-  console.log('  ok (18/18)');
+  assert(/PASS \(19\/19 tests\)/.test(r.out), 'Self-test harus lulus 19/19');
+  console.log('  ok (19/19)');
 }
 pass++;
 

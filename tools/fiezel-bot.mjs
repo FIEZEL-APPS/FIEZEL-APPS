@@ -98,6 +98,60 @@ function resolveModelChain(provider, tier, env = process.env) {
   return fromEnv.length ? fromEnv : DEFAULT_MODEL_CHAINS[provider][t];
 }
 
+/**
+ * Rantai yang benar-benar dicoba: tier review diikuti model cepat sebagai
+ * cadangan terakhir (model kuat sering kena kuota 429, model cepat kadang 503
+ * saat server Google sibuk — keduanya tidak boleh membuat review kehilangan AI).
+ */
+function modelChainFor(provider, tier, env = process.env) {
+  const chain = resolveModelChain(provider, tier, env);
+  if (tier === 'fast') return chain;
+  return [...new Set([...chain, ...resolveModelChain(provider, 'fast', env)])];
+}
+
+/** Galat sementara yang layak dicoba ulang: kuota/rate limit dan server sibuk. */
+const LLM_RETRYABLE_STATUS = new Set([429, 500, 502, 503, 504]);
+const LLM_RETRY_DELAYS_MS = [4_000, 12_000];
+/** Batas total semua percobaan LLM per perintah, agar job (timeout 20 menit) tidak macet. */
+const LLM_TOTAL_BUDGET_MS = 8 * 60_000;
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+/**
+ * Mencoba satu model dengan coba-ulang bertahap untuk galat sementara.
+ * `request(signal)` mengembalikan Response fetch; `extract(json)` mengambil teksnya.
+ */
+async function tryModel(label, request, extract, { timeoutMs, deadline, errors, retryDelays }) {
+  for (let attempt = 0; attempt <= retryDelays.length; attempt++) {
+    const left = deadline - Date.now();
+    if (left <= 0) { errors.push(`${label}: anggaran waktu LLM habis`); return ''; }
+    const tag = retryDelays.length ? ` (percobaan ${attempt + 1}/${retryDelays.length + 1})` : '';
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), Math.min(timeoutMs, left));
+    let retryAfterMs = 0;
+    try {
+      const res = await request(ctrl.signal);
+      if (res.ok) {
+        const text = extract(await res.json());
+        if (text) return text;
+        errors.push(`${label}: respons kosong${tag}`);
+        return '';
+      }
+      errors.push(`${label}: HTTP ${res.status}${tag}`);
+      if (!LLM_RETRYABLE_STATUS.has(res.status)) return '';
+      const ra = Number(res.headers?.get?.('retry-after'));
+      if (Number.isFinite(ra) && ra > 0) retryAfterMs = Math.min(ra * 1000, 30_000);
+    } catch (e) {
+      // Timeout tidak diulang (model lambat akan lambat lagi); galat jaringan diulang.
+      errors.push(`${label}: ${e.name === 'AbortError' ? 'timeout' : e.message}${tag}`);
+      if (e.name === 'AbortError') return '';
+    } finally {
+      clearTimeout(timer);
+    }
+    if (attempt < retryDelays.length) await sleep(Math.max(retryDelays[attempt], retryAfterMs));
+  }
+  return '';
+}
+
 // KEAMANAN: Semua kunci API dibaca HANYA dari environment variable.
 // Di GitHub Actions, diisi oleh repository secrets (${{ secrets.GROQ_API_KEY }}).
 // DILARANG KERAS menulis kunci di sini — scanner A9 akan mendeteksinya.
@@ -485,69 +539,55 @@ async function queryLLM(prompt, systemInstruction = '', opts = {}) {
   const geminiKey = process.env.GEMINI_API_KEY || '';
   const groqKey = process.env.GROQ_API_KEY || '';
   const errors = [];
+  const ctl = {
+    timeoutMs, errors,
+    deadline: Date.now() + (opts.totalBudgetMs || LLM_TOTAL_BUDGET_MS),
+    retryDelays: opts.retryDelays || LLM_RETRY_DELAYS_MS,
+  };
 
   // 1. Gemini — kunci lewat HEADER, bukan query URL.
   if (geminiKey) {
-    for (const model of resolveModelChain('gemini', tier)) {
-      const ctrl = new AbortController();
-      const timer = setTimeout(() => ctrl.abort(), timeoutMs);
-      try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
-        const generationConfig = { temperature: 0.15, maxOutputTokens };
-        if (opts.json) generationConfig.responseMimeType = 'application/json';
-        const body = { contents: [{ role: 'user', parts: [{ text: prompt }] }], generationConfig };
-        if (systemInstruction) body.systemInstruction = { parts: [{ text: systemInstruction }] };
-        const res = await fetch(url, {
+    const generationConfig = { temperature: 0.15, maxOutputTokens };
+    if (opts.json) generationConfig.responseMimeType = 'application/json';
+    const body = { contents: [{ role: 'user', parts: [{ text: prompt }] }], generationConfig };
+    if (systemInstruction) body.systemInstruction = { parts: [{ text: systemInstruction }] };
+    for (const model of modelChainFor('gemini', tier)) {
+      const text = await tryModel(`gemini/${model}`,
+        (signal) => fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'x-goog-api-key': geminiKey },
           body: JSON.stringify(body),
-          signal: ctrl.signal,
-        });
-        if (res.ok) {
-          const data = await res.json();
-          const text = (data.candidates?.[0]?.content?.parts || []).map(p => p.text || '').join('');
-          if (text) return { text, provider: `Google Gemini (${model})`, model };
-          errors.push(`gemini/${model}: respons kosong`);
-        } else {
-          errors.push(`gemini/${model}: HTTP ${res.status}`);
-        }
-      } catch (e) {
-        errors.push(`gemini/${model}: ${e.name === 'AbortError' ? 'timeout' : e.message}`);
-      } finally {
-        clearTimeout(timer);
+          signal,
+        }),
+        (data) => (data.candidates?.[0]?.content?.parts || []).map(p => p.text || '').join(''),
+        ctl);
+      if (text) {
+        if (errors.length) console.warn('[Fiezel Bot v2] LLM pulih setelah galat:', errors.join(' | '));
+        return { text, provider: `Google Gemini (${model})`, model };
       }
     }
   }
 
   // 2. Groq
   if (groqKey) {
-    for (const model of resolveModelChain('groq', tier)) {
-      const ctrl = new AbortController();
-      const timer = setTimeout(() => ctrl.abort(), timeoutMs);
-      try {
-        const messages = [];
-        if (systemInstruction) messages.push({ role: 'system', content: systemInstruction });
-        messages.push({ role: 'user', content: prompt.slice(0, 16000) });
-        const payload = { model, messages, temperature: 0.15, max_tokens: Math.min(maxOutputTokens, 8000) };
-        if (opts.json) payload.response_format = { type: 'json_object' };
-        const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    const messages = [];
+    if (systemInstruction) messages.push({ role: 'system', content: systemInstruction });
+    messages.push({ role: 'user', content: prompt.slice(0, 16000) });
+    for (const model of modelChainFor('groq', tier)) {
+      const payload = { model, messages, temperature: 0.15, max_tokens: Math.min(maxOutputTokens, 8000) };
+      if (opts.json) payload.response_format = { type: 'json_object' };
+      const text = await tryModel(`groq/${model}`,
+        (signal) => fetch('https://api.groq.com/openai/v1/chat/completions', {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${groqKey}`, 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
-          signal: ctrl.signal,
-        });
-        if (res.ok) {
-          const data = await res.json();
-          const text = data.choices?.[0]?.message?.content;
-          if (text) return { text, provider: `Groq AI (${model})`, model };
-          errors.push(`groq/${model}: respons kosong`);
-        } else {
-          errors.push(`groq/${model}: HTTP ${res.status}`);
-        }
-      } catch (e) {
-        errors.push(`groq/${model}: ${e.name === 'AbortError' ? 'timeout' : e.message}`);
-      } finally {
-        clearTimeout(timer);
+          signal,
+        }),
+        (data) => data.choices?.[0]?.message?.content || '',
+        ctl);
+      if (text) {
+        if (errors.length) console.warn('[Fiezel Bot v2] LLM pulih setelah galat:', errors.join(' | '));
+        return { text, provider: `Groq AI (${model})`, model };
       }
     }
   }
@@ -1333,7 +1373,7 @@ function applyReplacementBlocks(patchText) {
 // SELF-TEST
 // ═══════════════════════════════════════════════════════════════════════════
 
-function runSelfTest() {
+async function runSelfTest() {
   console.log('[Fiezel Bot v2] ═══ Self-Test Suite ═══');
   let pass = 0;
   const tmpFile = path.join(os.tmpdir(), `fiezel-bot-selftest-${process.pid}.tmp`);
@@ -1488,7 +1528,9 @@ function runSelfTest() {
   if (envChain.join() !== 'model-kuat,model-cepat') throw new Error('T17 FAIL: env chain');
   if (resolveModelChain('gemini', 'review', { FIEZEL_BOT_GEMINI_REVIEW_MODELS: ' , $(x)' }).join() !== DEFAULT_MODEL_CHAINS.gemini.review.join()) throw new Error('T17 FAIL: fallback');
   if (resolveModelChain('gemini', 'fast', {}).join() !== DEFAULT_MODEL_CHAINS.gemini.fast.join()) throw new Error('T17 FAIL: fast tier');
-  console.log('  ✅ T17: Rantai model dari env (review kuat → cepat)');
+  const merged = modelChainFor('gemini', 'review', { FIEZEL_BOT_GEMINI_REVIEW_MODELS: 'model-kuat' });
+  if (merged[0] !== 'model-kuat' || !merged.includes('gemini-flash-lite-latest') || new Set(merged).size !== merged.length) throw new Error('T17 FAIL: rantai review tidak berujung ke model cepat');
+  console.log('  ✅ T17: Rantai model dari env (review kuat → cepat sebagai cadangan)');
   pass++;
 
   // T18: Konteks berkas — kecil utuh, besar hanya jendela di sekitar perubahan, bernomor baris.
@@ -1503,6 +1545,38 @@ function runSelfTest() {
   // Reviewer harus bisa MEMBACA berkas yang dilindungi patch jail (tests/, mesin bot), tapi tidak .git/ atau luar repo.
   if (!readRepoLines('tools/fiezel-bot.mjs') || readRepoLines('.git/config') || readRepoLines('../etc/passwd')) throw new Error('T18 FAIL: readRepoLines');
   console.log('  ✅ T18: Konteks berkas utuh/terpotong, parser JSON temuan & akses baca reviewer');
+  pass++;
+
+  // T19: Galat sementara (429/503) dicoba ulang dan rantai turun ke model berikutnya.
+  {
+    const realFetch = globalThis.fetch, realKey = process.env.GEMINI_API_KEY, realGroq = process.env.GROQ_API_KEY;
+    const calls = [];
+    const resp = (status, body) => ({ ok: status === 200, status, headers: { get: () => null }, json: async () => body });
+    globalThis.fetch = async (url) => {
+      const model = String(url).match(/models\/([^:]+):/)?.[1] || 'groq';
+      calls.push(model);
+      const n = calls.filter(m => m === model).length;
+      if (model === 'kuat') return resp(429, {});
+      if (model === 'cepat' && n === 1) return resp(503, {});
+      return resp(200, { candidates: [{ content: { parts: [{ text: `ok dari ${model}` }] } }] });
+    };
+    process.env.GEMINI_API_KEY = 'uji';
+    delete process.env.GROQ_API_KEY;
+    const realChain = process.env.FIEZEL_BOT_GEMINI_REVIEW_MODELS, realFast = process.env.FIEZEL_BOT_GEMINI_FAST_MODELS;
+    process.env.FIEZEL_BOT_GEMINI_REVIEW_MODELS = 'kuat,cepat';
+    process.env.FIEZEL_BOT_GEMINI_FAST_MODELS = 'cepat';
+    let r;
+    try {
+      r = await queryLLM('p', '', { tier: 'review', retryDelays: [0, 0] });
+    } finally {
+      globalThis.fetch = realFetch;
+      const restore = (k, v) => { if (v === undefined) delete process.env[k]; else process.env[k] = v; };
+      restore('GEMINI_API_KEY', realKey); restore('GROQ_API_KEY', realGroq);
+      restore('FIEZEL_BOT_GEMINI_REVIEW_MODELS', realChain); restore('FIEZEL_BOT_GEMINI_FAST_MODELS', realFast);
+    }
+    if (r.text !== 'ok dari cepat' || calls.join() !== 'kuat,kuat,kuat,cepat,cepat') throw new Error(`T19 FAIL: ${r.text} / ${calls.join()}`);
+  }
+  console.log('  ✅ T19: Coba-ulang 429/503 & turun ke model cadangan');
   pass++;
 
   console.log(`\n✅ Fiezel Bot v2 Self-Test: PASS (${pass}/${pass} tests)`);
@@ -1531,7 +1605,7 @@ async function main() {
       if (runBump(options.message || 'chore: automated build bump')) writePatchList(BUMP_FILES);
       break;
     case 'explain': await runExplain(options.pr); break;
-    case 'self-test': runSelfTest(); break;
+    case 'self-test': await runSelfTest(); break;
     default:
       console.log(`
 FIEZEL BOT v2.1 — Elite Autonomous Code Review & Auto-Fix Agent
