@@ -130,9 +130,12 @@
     Object.keys(kertas).forEach(function (k) { var p = per[k] || (per[k] = { c: 0, n: 0 }); p.c += kertas[k].c; p.n += kertas[k].n; });
     var rows = (tps || daftarTP(c, env)).map(function (k) {
       var p = per[k] || { c: 0, n: 0 };
-      var cukup = p.n >= MIN_BUKTI;
-      var acc = p.n ? p.c / p.n : null;
-      return { skill: k, label: labelTP(k, env), tp: rumusanTP(k, env), acc: cukup ? acc : null, n: Math.round(p.n * 100) / 100, tingkat: tingkat(cukup ? acc : null, kktp) };
+      /* Porsi nilai kertas berupa pecahan (1/3 + 1/3 + 1/3 …); jumlahnya dibulatkan dulu supaya
+         galat floating point (4,999…) tidak menjatuhkan TP yang tepat 5 bukti ke "Belum cukup data". */
+      var n = Math.round(p.n * 1e6) / 1e6;
+      var cukup = n >= MIN_BUKTI;
+      var acc = n ? p.c / p.n : null;
+      return { skill: k, label: labelTP(k, env), tp: rumusanTP(k, env), acc: cukup ? acc : null, n: Math.round(n * 100) / 100, tingkat: tingkat(cukup ? acc : null, kktp) };
     });
     var dinilai = rows.filter(function (r) { return r.acc != null; });
     var nilai = dinilai.length ? Math.round(dinilai.reduce(function (x, r) { return x + r.acc; }, 0) / dinilai.length * 100) : null;

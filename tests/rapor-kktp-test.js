@@ -102,6 +102,10 @@ check('R8 nilai kertas (Kelas Tanpa HP) masuk rapor', () => {
   assert.strictEqual(rv.n, 4);
   assert.strictEqual(rv.tingkat, 'kurang-data', 'separuh lembar kertas (4 soal) belum cukup bukti untuk TP sendiri');
   assert.ok(r.nilai != null, 'murid tanpa HP tetap punya nilai rapor');
+  /* Galat pecahan: 0.1 × 50 dijumlah satu-satu = 4.999999999999998 di JS. */
+  const pecah = { students: [{ id: 'y', name: 'Yu', results: [] }], assignments: Array.from({ length: 50 }, (_, i) => ({ id: 'f' + i, skills: ['past_tense'], itemIds: [], done: { y: { c: 0.1, t: 0.1, src: 'kertas' } } })) };
+  assert.ok(0.1 * 50 === 5 && Array.from({ length: 50 }).reduce((x) => x + 0.1, 0) < 5, 'kasus uji memang memicu galat floating point');
+  assert.notStrictEqual(R.raporMurid(pecah, pecah.students[0]).rows[0].tingkat, 'kurang-data', 'tepat 5 bukti tidak jatuh ke "belum cukup data"');
   assert.ok(/var tps = daftarTP\(c, env\);\s*return \(c && c\.students \|\| \[\]\)\.map\(function \(s\) \{ var r = raporMurid\(c, s, env, tps\)/.test(fs.readFileSync(path.join(__fzRoot, 'features/teacher/fiezel-rapor-kktp.js'), 'utf8')), 'raporKelas menghitung daftar TP sekali per kelas');
   delete global.FiezelKelasTanpaHP;
 });
