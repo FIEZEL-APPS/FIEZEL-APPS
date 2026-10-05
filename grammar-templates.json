@@ -105,14 +105,14 @@
         "howToAvoid": "If you can attach a specific calendar date to it, use past simple.",
         "memoryCue": "A dated past = past simple, not perfect.",
         "ruleId": "Present perfect nggak bisa jalan bareng keterangan waktu lampau yang pasti. Contohnya “yesterday”, “in 2019”, atau “last week”.",
-        "whyCorrectId": "“in 2019” itu rentang yang udah tutup, jadi past simple yang dipakai, bukan present perfect.",
+        "whyCorrectId": "“in 2019” itu rentang yang udah tutup, jadi bentuk lampau (Verb 2) yang dipakai, bukan present perfect.",
         "whyOthersFailId": "Present perfect ngiket kejadian ke sekarang tanpa tanggal pasti. Past continuous bunyinya kayak latar yang lagi jalan. Present simple bilang hal yang nggak keiket waktu.",
-        "howToAvoidId": "Kalau kejadiannya bisa ditempelin tanggal di kalender, pakai past simple.",
+        "howToAvoidId": "Kalau kejadiannya bisa ditempelin tanggal di kalender, pakai bentuk lampau (Verb 2).",
         "memoryCueId": "Perhatikan titik waktunya: jika peristiwa terjadi di titik waktu lampau yang spesifik dan sudah selesai, terapkan bentuk lampau (Verb 2)."
       },
-      "pedagogicalObjectiveId": "Pilih past simple buat kejadian yang waktunya disebut jelas. Pakai present perfect kalau waktunya nggak disebut tapi efeknya masih kebawa sekarang.",
+      "pedagogicalObjectiveId": "Pilih bentuk lampau (Verb 2) buat kejadian yang waktunya disebut jelas. Pakai present perfect kalau waktunya nggak disebut tapi efeknya masih kebawa sekarang.",
       "misconceptionTargetedId": "Kamu ngira present perfect selalu berarti masih jalan sekarang. Padahal maknanya lampau tanpa waktu pasti yang masih nyambung ke sekarang.",
-      "reasoningOperationId": "temukan tanggal atau tahun yang pasti di kalimatnya → pilih past simple, bukan present perfect"
+      "reasoningOperationId": "temukan tanggal atau tahun yang pasti di kalimatnya → pilih bentuk lampau (Verb 2), bukan present perfect"
     },
     {
       "id": "TA-003",
@@ -385,9 +385,9 @@
         "howToAvoid": "If the speaker signals the situation is unreal or unlikely, use past simple in the if-clause even though the meaning is present/future.",
         "memoryCue": "Unreal now = past form, but not past meaning.",
         "ruleId": "Kalau kemungkinan nyata di masa depan: Pakai kalimat pengandaian biasa (If + Verb 1, will).<br>Kalau cuma khayalan atau mimpi yang mustahil saat ini: Bagian “if” pakai Verb 2, dan akibatnya pakai “would” + kata kerja dasar. Contoh: <b>If I won the lottery, I would travel the world</b> (Kenyataannya sekarang nggak menang dan nggak punya uangnya).<br><br>💡 <b>RUMUS KILAT</b>:<br>Khayalan yang nggak nyata sekarang ➡️ <b>If + Verb 2, would + Verb 1</b>.<br>Subjek ketemu kata “be” ➡️ Semuanya kompak pakai <b>were</b> (contoh: <i>If I were you</i>).",
-        "whyCorrectId": "Kalimatnya sendiri bilang menang lotre itu nggak akan kejadian. Keadaan kayak gini pakai past simple di anak kalimat if.",
+        "whyCorrectId": "Kalimatnya sendiri bilang menang lotre itu nggak akan kejadian. Keadaan kayak gini pakai bentuk lampau (Verb 2) di anak kalimat if.",
         "whyOthersFailId": "Bentuk first conditional nggak sejalan sama “would” di anak kalimat hasil. Pakai “would” dua kali bikin susunannya salah.",
-        "howToAvoidId": "Kalau pembicaranya nandain keadaannya nggak nyata, pakai past simple di anak kalimat if.",
+        "howToAvoidId": "Kalau pembicaranya nandain keadaannya nggak nyata, pakai bentuk lampau (Verb 2) di anak kalimat if.",
         "memoryCueId": "Periksa situasinya: untuk pengandaian yang bertolak belakang dengan kenyataan saat ini, bagian syarat mundur ke bentuk lampau (Verb 2)."
       },
       "pedagogicalObjectiveId": "Pakai second conditional buat keadaan sekarang yang nggak nyata. Bukan buat masa depan yang wajar kejadian.",
@@ -479,7 +479,7 @@
           "option": "has been",
           "misconception": "backshift target confused with present perfect",
           "whyFails": "Present simple in direct speech backshifts to past simple, not present perfect.",
-          "whyFailsId": "present simple mundurnya ke past simple, bukan ke present perfect.",
+          "whyFailsId": "present simple mundurnya ke bentuk lampau (Verb 2), bukan ke present perfect.",
           "misconceptionId": "bentuk sasaran gesernya ketuker sama present perfect."
         },
         {
@@ -815,7 +815,7 @@
           "option": "did you",
           "misconception": "wrong auxiliary borrowed from a different tense",
           "whyFails": "The main clause uses present perfect ('haven't'), so the tag must use 'have', not 'did'.",
-          "whyFailsId": "“did you” loncat ke kata bantu “did”, padahal nggak ada past simple di pernyataannya.",
+          "whyFailsId": "“did you” loncat ke kata bantu “did”, padahal nggak ada bentuk lampau (Verb 2) di pernyataannya.",
           "misconceptionId": "kata bantunya diambil dari bentuk waktu yang beda."
         },
         {
@@ -944,14 +944,14 @@
         "whyOthersFail": "Past simple for both loses the sense of one action being 'in progress'; present perfect has no place in a fixed-past narrative.",
         "howToAvoid": "Ask which action was already happening when the other one suddenly occurred.",
         "memoryCue": "Background = -ing, interruption = simple past.",
-        "ruleId": "Past continuous pakai was atau were + kata kerja -ing buat bangun latarnya. Past simple ngelaporin kejadian yang nyela.",
+        "ruleId": "Past continuous pakai was atau were + kata kerja -ing buat bangun latarnya. bentuk lampau (Verb 2) ngelaporin kejadian yang nyela.",
         "whyCorrectId": "Masak udah jalan sebagai latar waktu listrik tiba-tiba padam.",
-        "whyOthersFailId": "Past simple di dua-duanya bikin arti “lagi jalan” hilang. Present perfect nggak bisa masuk cerita berwaktu lampau pasti.",
+        "whyOthersFailId": "bentuk lampau (Verb 2) di dua-duanya bikin arti “lagi jalan” hilang. Present perfect nggak bisa masuk cerita berwaktu lampau pasti.",
         "howToAvoidId": "Tanya dulu: kegiatan mana yang udah jalan waktu kejadian lain muncul?",
         "memoryCueId": "Perhatikan latar waktunya: bedakan kegiatan yang sedang berlangsung di masa lalu dengan peristiwa mendadak yang memotongnya."
       },
-      "pedagogicalObjectiveId": "Pakai past continuous buat kejadian latar yang lebih panjang. Pakai past simple buat kejadian pendek yang nyela.",
-      "misconceptionTargetedId": "Kamu pakai past simple buat dua kejadiannya karena sama-sama lampau.",
+      "pedagogicalObjectiveId": "Pakai past continuous buat kejadian latar yang lebih panjang. Pakai bentuk lampau (Verb 2) buat kejadian pendek yang nyela.",
+      "misconceptionTargetedId": "Kamu pakai bentuk lampau (Verb 2) buat dua kejadiannya karena sama-sama lampau.",
       "reasoningOperationId": "tentuin mana kejadian latar dan mana yang nyela → pilih bentuk tiap kata kerjanya"
     },
     {
@@ -1002,7 +1002,7 @@
         "memoryCue": "Countable result -> simple; ongoing process -> continuous.",
         "ruleId": "Pakai present perfect simple buat tindakan yang udah kelar dan hasilnya masih kerasa sekarang. Pakai present perfect continuous kalau yang ditonjolin lamanya atau berulangnya kegiatan.",
         "whyCorrectId": "“three novels” ngitung hasil yang udah kelar, dan “already working on a fourth” nunjukin novel keempatnya baru mulai. Jadi present perfect simple yang pas.",
-        "whyOthersFailId": "“Has been writing” sah secara bahasa, tapi maknanya tiga novel itu masih dikerjain bareng, bukan tuntas. Past simple minta rentang waktu yang udah tutup, dan present simple nggambarin kebiasaan.",
+        "whyOthersFailId": "“Has been writing” sah secara bahasa, tapi maknanya tiga novel itu masih dikerjain bareng, bukan tuntas. bentuk lampau (Verb 2) minta rentang waktu yang udah tutup, dan present simple nggambarin kebiasaan.",
         "howToAvoidId": "Tanya dulu: kalimat ini ngitung hasil yang kelar, atau nggambarin kegiatan yang masih jalan?",
         "memoryCueId": "Perhatikan fokus kalimatnya: apakah menekankan proses yang masih terus berjalan atau hasil tuntas yang terhitung jumlahnya?"
       },
@@ -1033,7 +1033,7 @@
           "misconception": "uses past simple for the earlier event, flattening the sequence",
           "whyFails": "Without past perfect, 'by the time' loses its meaning of 'before this later point'.",
           "whyFailsId": "“already gave” naruh dua kejadian itu sejajar begitu aja, nggak nunjukin mana yang kelar duluan.",
-          "misconceptionId": "past simple dipakai buat kejadian yang lebih dulu, jadi urutannya rata."
+          "misconceptionId": "bentuk lampau (Verb 2) dipakai buat kejadian yang lebih dulu, jadi urutannya rata."
         },
         {
           "option": "are already giving",
@@ -1057,13 +1057,13 @@
         "howToAvoid": "When you see 'by the time X happened', make X the reference point, then ask what had already finished before X; that verb takes the past perfect.",
         "memoryCue": "'By the time X happened' -> the other action needs 'had' first.",
         "ruleId": "Past perfect memakai had + kata kerja bentuk ketiga (Verb 3). Bentuk ini menandai kejadian yang terjadi lebih dulu di antara dua peristiwa masa lampau.",
-        "whyCorrectId": "“By the time” plus kejadian past simple bikin titik acuan. Kejadian yang kelar sebelum titik itu pakai past perfect.",
-        "whyOthersFailId": "Past simple buat dua-duanya bikin urutannya rancu. Bentuk present malah tabrakan sama titik acuan lampau yang dipasang “arrived”.",
+        "whyCorrectId": "“By the time” plus kejadian bentuk lampau (Verb 2) bikin titik acuan. Kejadian yang kelar sebelum titik itu pakai past perfect.",
+        "whyOthersFailId": "bentuk lampau (Verb 2) buat dua-duanya bikin urutannya rancu. Bentuk present malah tabrakan sama titik acuan lampau yang dipasang “arrived”.",
         "howToAvoidId": "Begitu lihat “by the time X happened”, jadiin X titik acuannya. Terus tanya apa yang udah kelar sebelum X.",
         "memoryCueId": "Ada “by the time X happened”, kejadian satunya butuh “had” di depan."
       },
       "pedagogicalObjectiveId": "Pakai past perfect buat nandain kejadian yang lebih dulu di antara dua kejadian lampau.",
-      "misconceptionTargetedId": "Kamu pakai past simple buat dua kejadiannya dan cuma nyandar ke “before” atau “after”. Padahal urutannya perlu ditegasin.",
+      "misconceptionTargetedId": "Kamu pakai bentuk lampau (Verb 2) buat dua kejadiannya dan cuma nyandar ke “before” atau “after”. Padahal urutannya perlu ditegasin.",
       "reasoningOperationId": "temuin “by the time” yang naruh titik acuannya → tandain kejadian yang udah kelar sebelum titik itu"
     },
     {
@@ -1225,7 +1225,7 @@
         "howToAvoid": "First decide if the evidence points confidently 'yes' or confidently 'no', then pick must have / can't have accordingly.",
         "memoryCue": "Strong evidence FOR = must have; strong evidence AGAINST = can't have.",
         "ruleId": "Kalau yakin 100% sesuatu PASTI sudah terjadi di masa lalu: Pakai “must have + Verb 3”. Contoh: <b>He must have left already</b> (Dia pasti sudah berangkat, mobilnya sudah nggak ada).<br>Kalau yakin 100% sesuatu MUSTAHIL / GAK MUNGKIN terjadi di masa lalu: Pakai “can't have + Verb 3”. Contoh: <b>She can't have taken that train</b> (Nggak mungkin dia naik kereta itu, aku nungguin di peron dan nggak lihat dia).<br><br>💡 <b>RUMUS KILAT</b>:<br>Yakin pasti sudah kejadian ➡️ <b>must have + Verb 3</b>.<br>Yakin mustahil / nggak mungkin kejadian ➡️ <b>can't have + Verb 3</b>.",
-        "whyCorrectId": "Lampu mati dan mobilnya nggak ada itu bukti kuat, jadi pas sama “must have” + past participle.",
+        "whyCorrectId": "Lampu mati dan mobilnya nggak ada itu bukti kuat, jadi pas sama “must have” + bentuk ketiga (Verb 3).",
         "whyOthersFailId": "“Can’t have” mbalik arah kesimpulannya, “should have” pindah ke soal kewajiban, dan “might have” ngeremehin kekuatan buktinya.",
         "howToAvoidId": "Putusin dulu, ya: buktinya ngarah yakin iya atau yakin nggak? Baru pilih modalnya.",
         "memoryCueId": "Periksa bukti masa lalunya: bedakan kesimpulan kuat bahwa sesuatu pasti terjadi dengan kepastian bahwa sesuatu mustahil terjadi."
@@ -1312,8 +1312,8 @@
           "option": "left",
           "misconception": "uses second-conditional past simple in an if-clause that needs third-conditional past perfect",
           "whyFails": "The main clause 'wouldn't have missed' signals a third conditional, which requires 'had left' in the if-clause, not simple past.",
-          "whyFailsId": "“left” cuma past simple biasa, kurang satu langkah mundur buat pengandaian yang udah kelewat itu.",
-          "misconceptionId": "past simple punya second conditional dipakai di bagian yang minta past perfect."
+          "whyFailsId": "“left” cuma bentuk lampau (Verb 2) biasa, kurang satu langkah mundur buat pengandaian yang udah kelewat itu.",
+          "misconceptionId": "bentuk lampau (Verb 2) punya second conditional dipakai di bagian yang minta past perfect."
         },
         {
           "option": "would leave",
@@ -1338,12 +1338,12 @@
         "memoryCue": "Both halves look back: had... would have...",
         "ruleId": "Kalau khayalan tentang kondisi sekarang: Pakai <i>If + Verb 2, would + Verb 1</i>.<br>Kalau penyesalan tentang kejadian masa lalu yang sudah lewat: Bagian “if” pakai “had + Verb 3”, akibatnya pakai “would have + Verb 3”. Contoh: <b>If she had woken up earlier, she wouldn't have missed the flight</b> (Faktanya kemarin dia bangun telat dan pesawatnya sudah terbang).<br><br>💡 <b>RUMUS KILAT</b>:<br>Nyesel kejadian kemarin / sudah lewat ➡️ <b>If + had + Verb 3</b>.<br>Hasil penyesalannya ➡️ <b>would have + Verb 3</b> (atau wouldn't have).",
         "whyCorrectId": "Induk kalimatnya “wouldn’t have missed” nandain third conditional soal masa lalu yang nggak nyata. Jadi anak kalimat if-nya minta past perfect.",
-        "whyOthersFailId": "Past simple itu punya second conditional buat keadaan sekarang yang nggak nyata. “Would leave” salah naruh “would” di anak kalimat if, dan present simple punya syarat yang nyata.",
+        "whyOthersFailId": "bentuk lampau (Verb 2) itu punya second conditional buat keadaan sekarang yang nggak nyata. “Would leave” salah naruh “would” di anak kalimat if, dan present simple punya syarat yang nyata.",
         "howToAvoidId": "Cek dulu induk kalimatnya: kalau bunyinya “would have” + bentuk ke-3, anak kalimat if-nya minta “had” + bentuk ke-3.",
         "memoryCueId": "Dua-duanya nengok ke belakang: had ... would have ..."
       },
       "pedagogicalObjectiveId": "Kamu nyusun third conditional buat ngebayangin keadaan lampau yang sebenernya nggak kejadian.",
-      "misconceptionTargetedId": "Kamu nyampur bagian if bentuk past simple sama “would have”, padahal bagian if-nya minta past perfect.",
+      "misconceptionTargetedId": "Kamu nyampur bagian if bentuk bentuk lampau (Verb 2) sama “would have”, padahal bagian if-nya minta past perfect.",
       "reasoningOperationId": "kenali dua bagiannya sama-sama ngomongin masa lalu yang nggak nyata → pakai if + past perfect dan would have + bentuk ke-3"
     },
     {
@@ -1375,8 +1375,8 @@
           "option": "weren't",
           "misconception": "uses a past form without the modal required in the result clause",
           "whyFails": "'Weren't' is a bare past simple: it drops the modal 'would' that the result clause of this mixed conditional needs to mark the imagined present outcome.",
-          "whyFailsId": "“weren't” cuma past simple polos, jadi modal pengandai di induk kalimat ikut hilang.",
-          "misconceptionId": "past simple polos “weren't” dipakai di induk kalimat akibat tanpa modal pengandai."
+          "whyFailsId": "“weren't” cuma bentuk lampau (Verb 2) biasa, jadi modal pengandai di induk kalimat ikut hilang.",
+          "misconceptionId": "bentuk lampau (Verb 2) biasa “weren't” dipakai di induk kalimat akibat tanpa modal pengandai."
         },
         {
           "option": "hadn't been",
@@ -1505,14 +1505,14 @@
         "howToAvoid": "After any modal in the passive, check for exactly this pattern: modal + be + past participle.",
         "memoryCue": "Modal passive always needs 'be' glued in front of the past participle.",
         "ruleId": "Kalau modal di kalimat aktif: Setelah modal (can, must, should, will) langsung kata kerja dasar (Verb 1). Contoh: <b>You must sign this form</b> (Kamu harus menandatangani formulir ini).<br>Kalau modal di kalimat pasif (bermakna di- atau ter-): Setelah modal WAJIB disisipkan kata “be” polos lalu diikuti Verb 3. Contoh: <b>This form must be signed</b> (Formulir ini harus ditandatangani) atau <b>Tickets can be bought online</b> (Tiket bisa dibeli daring).<br><br>💡 <b>RUMUS KILAT</b>:<br>Aktif setelah modal ➡️ <b>modal + Verb 1</b> polos (contoh: <i>must sign</i>, <i>can do</i>).<br>Pasif setelah modal (di-/ter-) ➡️ <b>modal + be + Verb 3</b> (contoh: <i>must be signed</i>, <i>can be found</i>).<br>Kata “be” wajib bentuk dasar polos ➡️ Dilarang diubah jadi <i>is/am/are</i> atau <i>been</i> setelah modal!",
-        "whyCorrectId": "Formulirnya yang kena tindakan nandatangani, dan modal “must” minta “be” + past participle biar pasifnya bener.",
+        "whyCorrectId": "Formulirnya yang kena tindakan nandatangani, dan modal “must” minta “be” + bentuk ketiga (Verb 3) biar pasifnya bener.",
         "whyOthersFailId": "“Must sign” masih aktif, “must signed” kehilangan “be”, dan “must be signing” pakai bentuk -ing, bukan bentuk ke-3.",
-        "howToAvoidId": "Sesudah modal apa pun di kalimat pasif, pastiin polanya pas: modal + be + past participle.",
+        "howToAvoidId": "Sesudah modal apa pun di kalimat pasif, pastiin polanya pas: modal + be + bentuk ketiga (Verb 3).",
         "memoryCueId": "Pasif bermodal selalu butuh “be” nempel sebelum bentuk ke-3."
       },
-      "pedagogicalObjectiveId": "Kamu nyusun kalimat passive (fokusnya ke yang kena tindakan) pas ada modal, yaitu modal + be + past participle.",
+      "pedagogicalObjectiveId": "Kamu nyusun kalimat passive (fokusnya ke yang kena tindakan) pas ada modal, yaitu modal + be + bentuk ketiga (Verb 3).",
       "misconceptionTargetedId": "Kamu salah bentuk “be” atau malah ngilangin “be” sesudah modal waktu nyusun kalimat pasif.",
-      "reasoningOperationId": "biarin modalnya tetap → sisipin be + past participle buat bikin pasifnya"
+      "reasoningOperationId": "biarin modalnya tetap → sisipin be + bentuk ketiga (Verb 3) buat bikin pasifnya"
     },
     {
       "id": "PA-003",
@@ -1593,14 +1593,14 @@
           "misconception": "uses the base form instead of the past participle in the causative structure",
           "whyFails": "The causative pattern needs 'have + object + past participle', not the base verb form.",
           "whyFailsId": "“have / repair” ngebiarin kata kerja keduanya telanjang, jadi nggak kebaca kalau laptopnya digarap orang lain.",
-          "misconceptionId": "bentuk dasar dipakai ganti past participle di dalam pola causative."
+          "misconceptionId": "bentuk dasar dipakai ganti bentuk ketiga (Verb 3) di dalam pola causative."
         },
         {
           "option": "get / repairing",
           "misconception": "uses the -ing form instead of the past participle after 'get'",
           "whyFails": "The 'get' causative also requires the past participle ('get something repaired'), not the -ing form.",
           "whyFailsId": "“get / repairing” salah ekor: bentuk -ing bikin laptopnya kedengeran lagi ngerjain sendiri, bukan dikerjain tukang.",
-          "misconceptionId": "bentuk -ing dipakai sesudah “get”, padahal yang diminta past participle."
+          "misconceptionId": "bentuk -ing dipakai sesudah “get”, padahal yang diminta bentuk ketiga (Verb 3)."
         },
         {
           "option": "make / repair",
@@ -1617,14 +1617,14 @@
         "howToAvoid": "Ask: did the subject perform the action, or arrange for someone else to do it? The second case needs the causative pattern.",
         "memoryCue": "Have/get + thing + done (not do/doing).",
         "ruleId": "Kalau mengerjakan sendiri: Subjek langsung melakukan pekerjaannya. Contoh: <b>I cleaned my shoes</b> (Aku mencuci sepatuku sendiri).<br>Kalau menyuruh orang lain / bayar jasa profesional (Causative): Pakai pola “have” atau “get” + nama benda + kata kerja bentuk ketiga (Verb 3). Artinya bukan kita yang repot ngerjain, tapi orang lain atau ahlinya yang mengerjakan buat kita. Contoh: <b>I had my hair cut</b> (Aku potong rambut di salon) atau <b>She got her laptop repaired</b> (Dia menyervis laptopnya ke tempat servis).<br><br>💡 <b>RUMUS KILAT</b>:<br>Kerjakan sendiri ➡️ Subjek + kata kerja biasa (contoh: <i>I cut my hair myself</i>).<br>Diserahkan ke ahlinya / orang lain ➡️ <b>have / get + benda + Verb 3</b> (contoh: <i>had my hair cut</i>, <i>got the roof repaired</i>).<br>Kata kerja di belakang benda ➡️ WAJIB selalu berbentuk <b>Verb 3</b>, apa pun tenses-nya!",
-        "whyCorrectId": "“I don’t repair my own laptop” dan “by a professional” nunjukin orang lain yang ngerjain. Jadi dua celahnya diisi have + objek + past participle.",
-        "whyOthersFailId": "Bentuk dasar dan bentuk -ing sama-sama ngelanggar pola past participle yang diwajibin. “Make” masuk susunan lain dengan makna yang beda.",
+        "whyCorrectId": "“I don’t repair my own laptop” dan “by a professional” nunjukin orang lain yang ngerjain. Jadi dua celahnya diisi have + objek + bentuk ketiga (Verb 3).",
+        "whyOthersFailId": "Bentuk dasar dan bentuk -ing sama-sama ngelanggar pola bentuk ketiga (Verb 3) yang diwajibin. “Make” masuk susunan lain dengan makna yang beda.",
         "howToAvoidId": "Tanya: subjeknya ngerjain sendiri, atau ngatur orang lain yang ngerjain? Kalau yang kedua, pakai pola causative.",
         "memoryCueId": "“Have” atau “get” + bendanya + bentuk “done”, bukan “do” atau “doing”."
       },
-      "pedagogicalObjectiveId": "Kamu pakai pola causative (nyuruh orang lain ngerjain) “have” atau “get” + benda + past participle. Bentuknya aktif, bukan kalimat pasif.",
+      "pedagogicalObjectiveId": "Kamu pakai pola causative (nyuruh orang lain ngerjain) “have” atau “get” + benda + bentuk ketiga (Verb 3). Bentuknya aktif, bukan kalimat pasif.",
       "misconceptionTargetedId": "Kamu pakai kalimat aktif padahal maksudnya orang lain yang ngerjain pekerjaan itu.",
-      "reasoningOperationId": "kenali kebiasaan masa kini di mana subjeknya selalu bayar orang lain, bukan ngerjain sendiri → isi dua celahnya sekaligus: “have” atau “get” bentuk present di celah pertama, past participle di celah kedua"
+      "reasoningOperationId": "kenali kebiasaan masa kini di mana subjeknya selalu bayar orang lain, bukan ngerjain sendiri → isi dua celahnya sekaligus: “have” atau “get” bentuk present di celah pertama, bentuk ketiga (Verb 3) di celah kedua"
     },
     {
       "id": "RS-002",
@@ -2176,7 +2176,7 @@
         "whyOthersFail": "'Who developed' is correct but unreduced; 'which they developed' shifts the modified noun; 'developed by' wrongly applies passive reduction to an active agent.",
         "howToAvoid": "Check whether the noun being modified performed the action (present participle) or received it (past participle), then drop the relative pronoun and auxiliary.",
         "memoryCue": "Doer + active verb -> drop 'who' + auxiliary, add -ing.",
-        "ruleId": "Klausa relatif cuma bisa diringkas jadi -ing kalau maknanya sedang jalan, bareng, atau nyatain keadaan umum. Klausa past simple yang udah kelar, kayak “who broke the window”, nggak bisa jadi -ing.",
+        "ruleId": "Klausa relatif cuma bisa diringkas jadi -ing kalau maknanya sedang jalan, bareng, atau nyatain keadaan umum. Klausa bentuk lampau (Verb 2) yang udah kelar, kayak “who broke the window”, nggak bisa jadi -ing.",
         "whyCorrectId": "Klausa aslinya “who were developing”, yaitu tindakan lampau yang sedang jalan. Cuma keadaan itu yang boleh diringkas jadi “developing”.",
         "whyOthersFailId": "“Who developed” bener tapi belum diringkas. “Which they developed” mindahin kata benda yang diterangin, dan “developed by” maksa bentuk pasif buat pelaku aktif.",
         "howToAvoidId": "Cek dulu, ya: kata benda yang diterangin itu ngelakuin tindakannya atau nerima? Habis itu buang kata penghubung dan kata bantunya.",
@@ -2614,8 +2614,8 @@
           "option": "transformed",
           "misconception": "collapsing future-in-the-past into simple past",
           "whyFails": "Simple past would state the transformation as an established past fact, losing the 'seen from an earlier viewpoint' meaning the sentence needs.",
-          "whyFailsId": "past simple nyatain perubahannya sebagai fakta lampau biasa, jadi sudut pandangnya ilang.",
-          "misconceptionId": "masa depan dari sudut masa lalu diciutin jadi past simple."
+          "whyFailsId": "bentuk lampau (Verb 2) nyatain perubahannya sebagai fakta lampau biasa, jadi sudut pandangnya ilang.",
+          "misconceptionId": "masa depan dari sudut masa lalu diciutin jadi bentuk lampau (Verb 2)."
         }
       ],
       "explanation": {
@@ -2626,7 +2626,7 @@
         "memoryCue": "Past moment + 'would' = a future that has now already happened.",
         "ruleId": "Masa depan yang dilihat dari masa lalu pakai would atau was going to + kata kerja. Buat nggambarin apa yang nyusul sesudah satu titik lampau.",
         "whyCorrectId": "“Would” + kata kerja dasar nyatain kejadian yang saat itu masih di depan kalau diukur dari 2010. Diceritain dari sudut yang lebih belakangan.",
-        "whyOthersFailId": "Past continuous nandain tindakan yang masih jalan saat itu. “Will” yang berpijak di masa kini ngerusak bingkai lampaunya, dan past simple ngilangin sudut pandang “sesudah 2010”.",
+        "whyOthersFailId": "Past continuous nandain tindakan yang masih jalan saat itu. “Will” yang berpijak di masa kini ngerusak bingkai lampaunya, dan bentuk lampau (Verb 2) ngilangin sudut pandang “sesudah 2010”.",
         "howToAvoidId": "Tanya: dari titik lampau itu, kejadiannya masih bakal datang?",
         "memoryCueId": "Titik lampau ditambah “would” berarti masa depan yang sekarang udah kejadian."
       },
@@ -2664,7 +2664,7 @@
           "misconception": "using simple past for a state that must be shown as prior to another past moment",
           "whyFails": "This is correct English ('because' already marks the cause), but it reports the fact plainly instead of foregrounding how long the studying went on.",
           "whyFailsId": "bahasanya bener, tapi cuma nglaporin faktanya, nggak nonjolin lamanya belajar.",
-          "misconceptionId": "past simple dipakai buat keadaan yang harus ditunjukin lebih dulu dari titik lampau lain."
+          "misconceptionId": "bentuk lampau (Verb 2) dipakai buat keadaan yang harus ditunjukin lebih dulu dari titik lampau lain."
         },
         {
           "option": "was studying",
@@ -2682,7 +2682,7 @@
         "memoryCue": "Red eyes need a reason with duration: 'had been -ing'.",
         "ruleId": "Past perfect continuous bentuknya had been + kata kerja -ing. Dipakai buat durasi sebelum satu titik lampau, terutama kalau durasi itu nerangin akibat yang kelihatan.",
         "whyCorrectId": "Past perfect continuous nonjolin lamanya belajar sebagai sebab langsung dari mata yang memerah.",
-        "whyOthersFailId": "Past perfect simple nekanin tuntasnya, bukan durasi sebagai sebab. Past simple dan past continuous nggak naruh belajarnya jelas sebelum akibatnya.",
+        "whyOthersFailId": "Past perfect simple nekanin tuntasnya, bukan durasi sebagai sebab. bentuk lampau (Verb 2) dan past continuous nggak naruh belajarnya jelas sebelum akibatnya.",
         "howToAvoidId": "Tanya gini dulu, ya: lamanya tindakan yang lebih awal itu yang jadi alasan kejadian berikutnya?",
         "memoryCueId": "Mata memerah butuh sebab berdurasi: “had been -ing”."
       },
@@ -2910,7 +2910,7 @@
         "howToAvoidId": "Kalau kalimat dibuka “Had + subjek” tanpa “if”, baca aja sebagai anak kalimat “if I had ...”.",
         "memoryCueId": "Perhatikan gaya bahasanya: dalam situasi formal, pengandaian masa lalu dibentuk dengan memindahkan kata bantu lampau ke awal kalimat tanpa kata syarat."
       },
-      "pedagogicalObjectiveId": "Kamu ngenalin susunan pengandaian formal Had + subjek + past participle sebagai padanan “If I had known”.",
+      "pedagogicalObjectiveId": "Kamu ngenalin susunan pengandaian formal Had + subjek + bentuk ketiga (Verb 3) sebagai padanan “If I had known”.",
       "misconceptionTargetedId": "Kamu belum ngenalin pembalikan kata bantu dan subjek sebagai bentuk formal yang sah, dan ngira “if” wajib selalu ada.",
       "reasoningOperationId": "kenali urutan kata bantu mendahului subjek tanpa “if” → baca sebagai padanan third conditional yang formal"
     },
@@ -2943,7 +2943,7 @@
           "option": "was",
           "misconception": "treating the implied condition as a real past fact rather than a hypothetical one",
           "whyFails": "Simple past would claim the trip actually was shorter, contradicting the fact that the bridge was closed.",
-          "whyFailsId": "past simple bakal ngeklaim perjalanannya memang lebih singkat, padahal jembatannya ditutup.",
+          "whyFailsId": "bentuk lampau (Verb 2) bakal ngeklaim perjalanannya memang lebih singkat, padahal jembatannya ditutup.",
           "misconceptionId": "syarat yang tersirat diperlakukan sebagai fakta lampau yang nyata."
         },
         {
@@ -2964,7 +2964,7 @@
         "whyCorrectId": "“Otherwise” di sini nyimpen makna “kalau jembatannya nggak ditutup”. Jadi hasilnya minta bentuk third conditional.",
         "whyOthersFailId": "Bentuk masa depan dan masa kini nggak cocok sama keadaan lampau yang cuma dibayangin di balik jembatan yang ditutup.",
         "howToAvoidId": "Tulis ulang “otherwise” dalam hati jadi “kalau itu nggak terjadi”, terus cek bentuk pengandaian mana yang cocok.",
-        "memoryCueId": "“Otherwise” itu “if not” yang tersembunyi, jadi sering minta “would have + past participle”."
+        "memoryCueId": "“Otherwise” itu “if not” yang tersembunyi, jadi sering minta “would have + bentuk ketiga (Verb 3)”."
       },
       "pedagogicalObjectiveId": "Kamu baca “otherwise” sebagai penghubung yang nyimpen syarat tersirat, yaitu “kalau hal itu nggak terjadi”.",
       "misconceptionTargetedId": "Kamu ngira “otherwise” cuma kata pertentangan kayak “but”, jadi logika pengandaian yang kesimpen di dalamnya kelewat.",
@@ -3078,7 +3078,7 @@
         "howToAvoidId": "Tanya: subjeknya bisa beneran ngelakuin kata kerja ini, atau cuma nerima? Kebijakan nggak bisa ngumumin, dia diumumin.",
         "memoryCueId": "Perhatikan subjek penerima tindakannya: sesudah kata modal atau harapan, terapkan bentuk pasif dasar yang tepat."
       },
-      "pedagogicalObjectiveId": "Kamu pakai infinitive (to + kata kerja) bentuk pasif, yaitu to be + past participle, sesudah kata kerja harapan. Itu kepakai kalau subjeknya yang kena tindakan.",
+      "pedagogicalObjectiveId": "Kamu pakai infinitive (to + kata kerja) bentuk pasif, yaitu to be + bentuk ketiga (Verb 3), sesudah kata kerja harapan. Itu kepakai kalau subjeknya yang kena tindakan.",
       "misconceptionTargetedId": "Kamu nahan bentuk to aktif sesudah “expected to”, padahal subjeknya penerima tindakan, bukan pelakunya.",
       "reasoningOperationId": "kenali subjeknya sebagai penerima tindakan → pilih bentuk to yang pasif"
     },
@@ -3184,7 +3184,7 @@
         "whyOthersFail": "No backshift ignores standard reported-speech rules; full third-conditional backshift misrepresents a real condition as an impossible hypothetical; partial backshift breaks tense agreement between clauses.",
         "howToAvoid": "Backshift first conditionals one 'notch' in both clauses together: present->past, will->would.",
         "memoryCue": "First conditional reported = both clauses take one step back together.",
-        "ruleId": "First conditional yang dilaporin: if + present + will jadi if + past simple + would. Hubungan maknanya sama, cuma mundur satu langkah.",
+        "ruleId": "First conditional yang dilaporin: if + present + will jadi if + bentuk lampau (Verb 2) + would. Hubungan maknanya sama, cuma mundur satu langkah.",
         "whyCorrectId": "Kata pelapornya “He said” udah lampau, jadi “rains” mundur jadi “rained” dan “will cancel” jadi “would cancel”.",
         "whyOthersFailId": "Tanpa geseran, aturan pelaporannya diabaikan. Geseran penuh sampai third conditional bikin syarat nyata jadi pengandaian mustahil, dan geseran separuh bikin tense-nya nggak selaras.",
         "howToAvoidId": "Geser first conditional satu tingkat di kedua anak kalimatnya sekaligus: present jadi past, will jadi would.",
@@ -4001,7 +4001,7 @@
           "misconception": "Treats both events as equally sequential in past simple.",
           "whyFails": "It fails to mark the train's departure as happening before the arrival, collapsing the flashback into the main timeline.",
           "whyFailsId": "bentuk ini nggak nandain keretanya berangkat sebelum dia tiba.",
-          "misconceptionId": "dua kejadiannya diperlakuin setara sebagai rangkaian past simple."
+          "misconceptionId": "dua kejadiannya diperlakuin setara sebagai rangkaian bentuk lampau (Verb 2)."
         },
         {
           "option": "was leaving",
@@ -4026,12 +4026,12 @@
         "memoryCue": "Earlier past event = had + past participle.",
         "ruleId": "Pakai past perfect buat kejadian yang lebih dulu di antara dua kejadian lampau, pas urutannya perlu ditegasin.",
         "whyCorrectId": "Past perfect nandain keberangkatan keretanya udah kelar sebelum penuturnya tiba, jadi itu kejadian yang lebih dulu.",
-        "whyOthersFailId": "Past simple ngeratain garis waktunya. Past continuous bilang tindakannya belum tuntas, dan present perfect ngerusak bingkai lampau kalimatnya.",
+        "whyOthersFailId": "bentuk lampau (Verb 2) ngeratain garis waktunya. Past continuous bilang tindakannya belum tuntas, dan present perfect ngerusak bingkai lampau kalimatnya.",
         "howToAvoidId": "Gambarin garis waktunya: kejadian lampau mana pun yang lebih dulu, itu yang pakai past perfect.",
         "memoryCueId": "Perhatikan urutan ceritanya: terapkan bentuk waktu lebih lampau untuk kilas balik peristiwa yang mendahului jalan cerita utama."
       },
-      "pedagogicalObjectiveId": "Kamu bedain past perfect sebagai kilas balik sebelum alur utama. Past simple nandain rangkaian kejadian di alur utama.",
-      "misconceptionTargetedId": "Kamu pakai past simple buat semua kejadian lampau di cerita. Bedanya kilas balik dan urutan maju jadi ilang.",
+      "pedagogicalObjectiveId": "Kamu bedain past perfect sebagai kilas balik sebelum alur utama. bentuk lampau (Verb 2) nandain rangkaian kejadian di alur utama.",
+      "misconceptionTargetedId": "Kamu pakai bentuk lampau (Verb 2) buat semua kejadian lampau di cerita. Bedanya kilas balik dan urutan maju jadi ilang.",
       "reasoningOperationId": "tentuin kejadian mana yang lebih dulu terhadap alur utama cerita → tandain yang lebih dulu dengan past perfect"
     },
     {
@@ -4142,7 +4142,7 @@
         "howToAvoidId": "Tanya: kalimatnya cuma nyebut pilihan yang nggak diambil, atau nilai keputusannya? Kalau cuma nyebut, pakai could have.",
         "memoryCueId": "“Could have” berarti pintunya kebuka, tapi nggak ada yang lewat."
       },
-      "pedagogicalObjectiveId": "Kamu pakai could have + past participle (bentuk ke-3 kata kerja) buat peluang lampau yang nggak jadi diambil. Itu beda dari bentuk yang nyatain kewajiban.",
+      "pedagogicalObjectiveId": "Kamu pakai could have + bentuk ketiga (Verb 3) (bentuk ke-3 kata kerja) buat peluang lampau yang nggak jadi diambil. Itu beda dari bentuk yang nyatain kewajiban.",
       "misconceptionTargetedId": "Kamu nuker “could have” yang nyebut peluang terlewat sama “should have” yang negur. Kamu juga nukernya sama “was able to” yang nyatain kemampuan.",
       "reasoningOperationId": "pastiin kalimatnya cuma nyebut peluang lampau yang kebuka tapi nggak diambil, tanpa nilai keputusannya → pakai could have + bentuk ke-3 buat kemungkinan netral itu"
     },
@@ -4351,7 +4351,7 @@
           "misconception": "Attempts simple past passive but misapplies subject-verb agreement and structure.",
           "whyFails": "'We was' is a subject-verb agreement error, and simple passive still doesn't capture the causative 'arranged for someone' meaning.",
           "whyFailsId": "“we was” salah kesesuaian subjeknya, dan pasif biasa juga nggak nangkep makna ngatur.",
-          "misconceptionId": "nyoba pasif past simple tapi salah kesesuaian subjek sekaligus salah susunan."
+          "misconceptionId": "nyoba pasif bentuk lampau (Verb 2) tapi salah kesesuaian subjek sekaligus salah susunan."
         }
       ],
       "explanation": {
@@ -4363,12 +4363,12 @@
         "ruleId": "Beda Pasif Biasa vs Kausatif (Causative):<br>1. Pasif Biasa (Simple Passive): Subjek adalah korban atau penerima aksi langsung. Polanya: “be + Verb 3”. Contoh: <b>My phone was stolen</b> (Ponselku dicuri) atau <b>The window was broken</b> (Jendelanya rusak/pecah).<br>2. Kausatif (Causative): Subjek meminta, membayar, atau menyuruh orang lain/ahli untuk mengerjakan sesuatu untuknya. Polanya: “have / get + benda + Verb 3”. Contoh: <b>I had my car repaired</b> (Aku menyervis mobilku ke bengkel — bukan mobilnya yang menyervis, tapi montir yang mengerjakannya).<br><br>💡 <b>RUMUS KILAT</b>:<br>Kejadian pasif biasa mengenai subjek ➡️ <b>was/were + Verb 3</b> (contoh: <i>My car was damaged</i>).<br>Menyuruh / membayar jasa orang lain ➡️ <b>have / get + benda + Verb 3</b> (contoh: <i>I got my car fixed</i>).<br>Di belakang benda pada causative ➡️ Kata kerjanya selalu <b>Verb 3</b>!",
         "whyCorrectId": "“Had” pas sama kata kunci lampau “last week” dan nglengkapin kerangka nyuruh di sekitar “our roof repaired”. Semuanya dalam bentuk lampau.",
         "whyOthersFailId": "Pilihan lain bukan bentuk nyuruh yang sah, atau bentrok sama kerangka waktu lampau dan kesesuaian subjeknya.",
-        "howToAvoidId": "Kalau subjeknya nggak ngerjain sendiri melainkan ngaturnya, pakai have atau get + objek + past participle.",
+        "howToAvoidId": "Kalau subjeknya nggak ngerjain sendiri melainkan ngaturnya, pakai have atau get + objek + bentuk ketiga (Verb 3).",
         "memoryCueId": "Perhatikan siapa pelaksananya: bedakan kejadian yang menimpa subjek secara langsung dengan tindakan yang sengaja diserahkan ke pihak lain."
       },
       "pedagogicalObjectiveId": "Kamu bedain pola causative (nyuruh orang lain ngerjain) have something done dari kalimat pasif biasa.",
       "misconceptionTargetedId": "Kamu pakai pasif biasa padahal kalimatnya minta pola nyuruh, biar kelihatan subjeknya yang ngatur pekerjaan itu.",
-      "reasoningOperationId": "uji dulu kalimatnya pasif biasa dengan was atau were + past participle → kalau subjeknya sendiri yang ngatur jasanya, ganti kata bantunya jadi “had” dalam kerangka nyuruh had + benda + past participle"
+      "reasoningOperationId": "uji dulu kalimatnya pasif biasa dengan was atau were + bentuk ketiga (Verb 3) → kalau subjeknya sendiri yang ngatur jasanya, ganti kata bantunya jadi “had” dalam kerangka nyuruh had + benda + bentuk ketiga (Verb 3)"
     },
     {
       "id": "b4_009",
@@ -5315,7 +5315,7 @@
         "ruleId": "Kalau kebiasaan masa lalu yang SEKARANG SUDAH BERHENTI: Pakai “used to” + kata kerja dasar (Verb 1). Contoh: <b>I used to play marbles</b> (Dulu aku sering main kelereng, tapi sekarang sudah nggak pernah lagi).<br>Kalau SEKARANG SUDAH TERBIASA (merasa wajar dan nggak asing lagi): Ada “be” (am/is/are) di depannya dan wajib diikuti kata kerja -ing. Contoh: <b>I am used to living in Jakarta</b> (Sekarang aku sudah terbiasa tinggal di Jakarta).<br>Kalau PROSES menjadi terbiasa: Pakai “get used to” + kata kerja -ing. Contoh: <b>He is getting used to waking up early</b> (Dia mulai terbiasa bangun pagi).<br><br>💡 <b>RUMUS KILAT</b>:<br>Dulu pernah tapi sekarang enggak (tanpa be) ➡️ <b>used to + Verb 1</b>.<br>Sekarang sudah terbiasa (ada <i>am/is/are</i> di depan) ➡️ <b>be used to + Verb-ing</b>.<br>Proses beradaptasi ➡️ <b>get used to + Verb-ing</b>.",
         "whyCorrectId": "“Live” itu kata kerja keadaan. “Used to live” nyatain keadaan lampau yang sekarang udah nggak berlaku.",
         "whyOthersFailId": "“Would live” maksa modal khusus tindakan ke kata kerja keadaan. Dua pilihan lain sama sekali bukan bentuk kata kerja bertense yang sah.",
-        "howToAvoidId": "Buat kata kerja keadaan kayak “live” dan “know”, pakai “used to” atau past simple.",
+        "howToAvoidId": "Buat kata kerja keadaan kayak “live” dan “know”, pakai “used to” atau bentuk lampau (Verb 2).",
         "memoryCueId": "Keadaan lampau cuma “used to”; tindakan berulang boleh dua-duanya."
       },
       "pedagogicalObjectiveId": "Kamu ngenali “would” nggak bisa nyatain keadaan lampau. Kata itu cuma buat tindakan yang berulang.",
@@ -5345,7 +5345,7 @@
           "misconception": "Uses past simple because a specific number of emails is mentioned.",
           "whyFails": "'Sent' closes the time frame as finished, but 'so far this week' shows the week is still in progress (two emails are still to be written before Friday), so the finished frame it needs does not exist here.",
           "whyFailsId": "“so far” nandain rentang yang masih jalan, jadi bentuk lampau nggak pas.",
-          "misconceptionId": "past simple dipakai padahal rentang waktunya belum tutup."
+          "misconceptionId": "bentuk lampau (Verb 2) dipakai padahal rentang waktunya belum tutup."
         },
         {
           "option": "was sending",
@@ -5368,15 +5368,15 @@
         "whyOthersFail": "Past simple needs a finished time frame; past continuous misrepresents completed actions as in-progress; present simple isn't for specific past actions.",
         "howToAvoid": "Check if the named time period has ended yet: if not, present perfect is usually required.",
         "memoryCue": "Time period not over yet = present perfect, not past simple.",
-        "ruleId": "Pilih present perfect daripada past simple buat tindakan di dalam rentang yang belum berakhir. Bentuk lampau justru nutup rentang yang masih jalan.",
+        "ruleId": "Pilih present perfect daripada bentuk lampau (Verb 2) buat tindakan di dalam rentang yang belum berakhir. Bentuk lampau justru nutup rentang yang masih jalan.",
         "whyCorrectId": "“So far this week” nyebut rentang yang belum tutup, dan dua surel lagi belum kekirim. Jadi present perfect yang pas di sini.",
-        "whyOthersFailId": "Past simple nutup rentang yang masih jalan, dan “so far” ngunci pilihan itu. Past continuous nampilin tindakan tuntas kayak masih jalan. Present simple bukan buat tindakan lampau tertentu. Tanpa “so far”, ragam Amerika kadang masih nerima bentuk lampau.",
+        "whyOthersFailId": "bentuk lampau (Verb 2) nutup rentang yang masih jalan, dan “so far” ngunci pilihan itu. Past continuous nampilin tindakan tuntas kayak masih jalan. Present simple bukan buat tindakan lampau tertentu. Tanpa “so far”, ragam Amerika kadang masih nerima bentuk lampau.",
         "howToAvoidId": "Cek dulu rentang waktu yang disebut udah berakhir atau belum.",
         "memoryCueId": "Perhatikan periode waktunya: jika rentang waktu saat ini belum berakhir dan hasilnya masih bisa bertambah, terapkan bentuk selesai."
       },
       "pedagogicalObjectiveId": "Kamu pakai present perfect bareng rentang waktu yang belum berakhir, kayak “this week”.",
-      "misconceptionTargetedId": "Kamu langsung pakai past simple tiap ada kejadian tertentu yang disebut. Rentang waktunya yang masih jalan jadi kelewat.",
-      "reasoningOperationId": "cek rentang yang disebut masih jalan atau udah tutup → pilih present perfect atau past simple"
+      "misconceptionTargetedId": "Kamu langsung pakai bentuk lampau (Verb 2) tiap ada kejadian tertentu yang disebut. Rentang waktunya yang masih jalan jadi kelewat.",
+      "reasoningOperationId": "cek rentang yang disebut masih jalan atau udah tutup → pilih present perfect atau bentuk lampau (Verb 2)"
     },
     {
       "id": "b5_003",
@@ -5430,7 +5430,7 @@
         "howToAvoidId": "Kalau kalimatnya nyalahin seseorang atas kelalaian di masa lalu, pakai should have.",
         "memoryCueId": "Perhatikan nada bicaranya: bedakan kritik atas kewajiban yang diabaikan dengan penyesalan atas peluang yang tidak diambil."
       },
-      "pedagogicalObjectiveId": "Kamu bedain “should have” + past participle (bentuk ke-3 kata kerja) yang negur, dari “could have” yang netral.",
+      "pedagogicalObjectiveId": "Kamu bedain “should have” + bentuk ketiga (Verb 3) (bentuk ke-3 kata kerja) yang negur, dari “could have” yang netral.",
       "misconceptionTargetedId": "Kamu milih “could have” padahal konteksnya jelas nyiratin penyesalan dan teguran, bukan pilihan yang netral.",
       "reasoningOperationId": "temuin nada nyalahin di kalimatnya, akibat buruk yang sekarang disesalin → tandain teguran atas pilihan lampau itu dengan should have + bentuk ke-3"
     },
@@ -5520,7 +5520,7 @@
           "misconception": "Uses ordinary past simple negative instead of the subjunctive 'weren't' required in hypothetical conditionals.",
           "whyFails": "Formal hypothetical conditionals conventionally use 'were' (not 'was') for all subjects in the if-clause, especially in this fixed unreal-present pattern.",
           "whyFailsId": "pengandaian formal biasanya pakai “were” di anak kalimat if, bukan “was”.",
-          "misconceptionId": "past simple negatif biasa dipakai gantiin bentuk “were” yang baku di pengandaian."
+          "misconceptionId": "bentuk lampau (Verb 2) negatif biasa dipakai gantiin bentuk “were” yang baku di pengandaian."
         },
         {
           "option": "isn't",
@@ -5540,7 +5540,7 @@
         "whyCorrectId": "“Weren’t” berbentuk second conditional dan nyatain sifat sekarang yang nggak nyata, yaitu rasa takutnya. Itu yang nerangin kenapa hasil lampaunya nggak kejadian.",
         "whyOthersFailId": "“Hadn’t been” nyamain diri sama tense hasil yang past perfect. “Wasn’t” ngelewatin bentuk “were” yang baku, dan “isn’t” bikin syaratnya kayak kenyataan.",
         "howToAvoidId": "Pisahin dua anak kalimatnya: sebabnya sifat menetap sekarang, atau kejadian lampau tertentu? Tentuin tense-nya masing-masing.",
-        "memoryCueId": "Sebab masa kini dan hasil masa lalu: If + were ..., would have + past participle."
+        "memoryCueId": "Sebab masa kini dan hasil masa lalu: If + were ..., would have + bentuk ketiga (Verb 3)."
       },
       "pedagogicalObjectiveId": "Kamu nyusun mixed conditional dengan keadaan sekarang yang nggak nyata sebagai sebab dari hasil lampau yang nggak kejadian.",
       "misconceptionTargetedId": "Kamu maksa kedua anak kalimatnya pakai tense yang sama, padahal sebab masa kini dan hasil masa lalu minta bentuk beda.",
@@ -5695,7 +5695,7 @@
           "misconception": "Drops the auxiliary needed to mark the passive voice, leaving only the past participle.",
           "whyFails": "Without 'being', the sentence loses its passive marking entirely and becomes grammatically incomplete after 'resents'.",
           "whyFailsId": "tanda pasifnya hilang sama sekali, jadi kalimatnya nggak utuh sesudah “resents”.",
-          "misconceptionId": "kata bantu pasifnya hilang jadi tersisa past participle saja."
+          "misconceptionId": "kata bantu pasifnya hilang jadi tersisa bentuk ketiga (Verb 3) saja."
         }
       ],
       "explanation": {
@@ -5707,10 +5707,10 @@
         "ruleId": "Bentuk pasif being + kata kerja bentuk ketiga (Verb 3) menyusul kata kerja atau kata depan yang meminta pelengkap kata kerja -ing. Contohnya resent, avoid, dan admit.",
         "whyCorrectId": "“Being treated” itu bentuk -ing pasif yang pas jadi pelengkap “resent”, kata kerja yang minta objek bentuk -ing.",
         "whyOthersFailId": "“To be treated” keliru pakai pola bentuk to. “Be treated” dan “treated” sama-sama kehilangan “being” yang diwajibin.",
-        "howToAvoidId": "Cek dulu kata kerjanya minta pelengkap -ing atau nggak. Kalau iya, bentuk pasifnya wajib being + past participle.",
-        "memoryCueId": "Resent, avoid, dan admit diikuti being + past participle, nggak pernah “to be”."
+        "howToAvoidId": "Cek dulu kata kerjanya minta pelengkap -ing atau nggak. Kalau iya, bentuk pasifnya wajib being + bentuk ketiga (Verb 3).",
+        "memoryCueId": "Resent, avoid, dan admit diikuti being + bentuk ketiga (Verb 3), nggak pernah “to be”."
       },
-      "pedagogicalObjectiveId": "Kamu milih bentuk pasif being + past participle sesudah kata kerja atau kata depan yang minta pelengkap -ing.",
+      "pedagogicalObjectiveId": "Kamu milih bentuk pasif being + bentuk ketiga (Verb 3) sesudah kata kerja atau kata depan yang minta pelengkap -ing.",
       "misconceptionTargetedId": "Kamu pakai bentuk to pasif sesudah kata kerja yang justru minta pelengkap bentuk -ing.",
       "reasoningOperationId": "kenali jenis pelengkap yang dituntut kata kerjanya, bentuk -ing atau bentuk to → terapkan bentuk pasif yang cocok"
     },
@@ -6155,10 +6155,10 @@
         "ruleId": "Bentuk penjelas having + kata kerja bentuk ketiga (Verb 3) menegaskan bahwa tindakan tersebut terjadi lebih awal mendahului kata kerja utama. Bentuk -ing sederhana membiarkan urutan waktunya tersirat.",
         "whyCorrectId": "“Having broken” negesin bahwa pecahnya vas terjadi sebelum pengakuannya.",
         "whyOthersFailId": "“Breaking” ninggalin urutannya tersirat tanpa negesin. “To break” dan “break” bukan pelengkap yang sah buat “admit”.",
-        "howToAvoidId": "Baca syarat soalnya teliti. Kalau diminta negesin mana yang lebih dulu, pilih having + past participle.",
-        "memoryCueId": "Having + past participle berarti tegas lebih dulu."
+        "howToAvoidId": "Baca syarat soalnya teliti. Kalau diminta negesin mana yang lebih dulu, pilih having + bentuk ketiga (Verb 3).",
+        "memoryCueId": "Having + bentuk ketiga (Verb 3) berarti tegas lebih dulu."
       },
-      "pedagogicalObjectiveId": "Kamu pakai bentuk -ing perfect having + past participle buat nekanin tindakannya terjadi lebih dulu dari kata kerja utamanya.",
+      "pedagogicalObjectiveId": "Kamu pakai bentuk -ing perfect having + bentuk ketiga (Verb 3) buat nekanin tindakannya terjadi lebih dulu dari kata kerja utamanya.",
       "misconceptionTargetedId": "Kamu pakai bentuk -ing sederhana padahal kalimatnya perlu nekanin satu tindakan mendahului tindakan lain.",
       "reasoningOperationId": "cek hubungan waktunya perlu ditegesin sebagai lebih dulu atau nggak → pilih bentuk -ing perfect kalau perlu"
     },
@@ -6247,15 +6247,15 @@
           "option": "have; have",
           "misconception": "Repeats the auxiliary 'have' without the required past participle 'had' for the main verb 'eat/have (a meal)'.",
           "whyFails": "The second slot needs the past participle form of the main verb (had), not a repeated auxiliary without its main verb.",
-          "whyFailsId": "bagian keduanya minta past participle kata kerja utamanya, bukan ulangan kata bantu.",
-          "misconceptionId": "kata bantu “have” diulang tanpa past participle yang dibutuhin kata kerja utamanya."
+          "whyFailsId": "bagian keduanya minta bentuk ketiga (Verb 3) kata kerja utamanya, bukan ulangan kata bantu.",
+          "misconceptionId": "kata bantu “have” diulang tanpa bentuk ketiga (Verb 3) yang dibutuhin kata kerja utamanya."
         },
         {
           "option": "did; have",
           "misconception": "Mixes past simple auxiliary 'did' with present perfect 'have', producing an inconsistent structure.",
           "whyFails": "The fixed pattern uses a single consistent present perfect auxiliary 'have' throughout, not a mix of 'did' and 'have'.",
           "whyFailsId": "“did; have” nyampur kata bantu lampau sama perfect, jadi susunannya bentrok sendiri.",
-          "misconceptionId": "kata bantu past simple “did” dicampur sama present perfect jadi susunannya nggak selaras."
+          "misconceptionId": "kata bantu bentuk lampau (Verb 2) “did” dicampur sama present perfect jadi susunannya nggak selaras."
         }
       ],
       "explanation": {
@@ -6268,7 +6268,7 @@
         "whyCorrectId": "“This is” naruh klaimnya di waktu sekarang, jadi “have ever had” nyambungin pengalamannya sampai sekarang.",
         "whyOthersFailId": "Di kalimat ini bingkainya sekarang, jadi bentuk lampau motong klaim yang masih berlaku. Gabungan lain nggak selaras antara kata bantu dan kata kerjanya.",
         "howToAvoidId": "Kalau klaimnya masih berlaku sampai sekarang, pakai present perfect. Kalau ceritanya udah dibingkai lampau, past perfect yang pas.",
-        "memoryCueId": "Best atau worst ... I have ever + past participle. Kalau bingkainya lampau, jadi I had ever + past participle."
+        "memoryCueId": "Best atau worst ... I have ever + bentuk ketiga (Verb 3). Kalau bingkainya lampau, jadi I had ever + bentuk ketiga (Verb 3)."
       },
       "pedagogicalObjectiveId": "Kamu maduin superlative (bentuk paling) sama present perfect dan “ever” buat nyatain pengalaman sepanjang hidup.",
       "misconceptionTargetedId": "Kamu pakai bentuk lampau sesudah susunan superlative + ever. Kamu nggak lihat susunan ini minta present perfect kalau klaimnya masih berlaku sekarang.",
@@ -6926,8 +6926,8 @@
           "option": "started",
           "misconception": "uses simple past for an explicitly future consequence",
           "whyFails": "Simple past conflicts with 'next Monday' and fails to mark the hypothetical result.",
-          "whyFailsId": "past simple bentrok sama “next Monday” dan nggak nandain akibatnya cuma dibayangin.",
-          "misconceptionId": "past simple dipakai buat akibat yang jelas ada di masa depan."
+          "whyFailsId": "bentuk lampau (Verb 2) bentrok sama “next Monday” dan nggak nandain akibatnya cuma dibayangin.",
+          "misconceptionId": "bentuk lampau (Verb 2) dipakai buat akibat yang jelas ada di masa depan."
         }
       ],
       "explanation": {
@@ -7137,7 +7137,7 @@
           "misconception": "past participle alone",
           "whyFails": "Reviewed does not clearly mark the active prior action here.",
           "whyFailsId": "“reviewed” nggak nandain dengan jelas tindakan aktif yang lebih dulu di sini.",
-          "misconceptionId": "past participle sendirian dipakai buat nandain tindakan yang lebih dulu."
+          "misconceptionId": "bentuk ketiga (Verb 3) sendirian dipakai buat nandain tindakan yang lebih dulu."
         },
         {
           "option": "Having review",
@@ -7162,13 +7162,13 @@
         "memoryCue": "Earlier active action: having reviewed; earlier passive action: having been reviewed.",
         "ruleId": "Anak kalimat penjelas bentuk selesai: having + kata kerja bentuk ketiga (Verb 3) menandai tindakan yang terjadi lebih awal dan sudah tuntas dikerjakan.",
         "whyCorrectId": "“Having reviewed” naruh peninjauannya sebelum “the committee reopened”, jadi urutan waktunya jelas.",
-        "whyOthersFailId": "“Reviewed” ngasih kesan hubungan pasif, dan “having review” kehilangan bentuk past participle-nya. “To reviewing” nyatuin bentuk to sama bentuk -ing yang nggak bisa disatuin.",
-        "howToAvoidId": "Cek dua hal: pelakunya dan urutan waktunya. Subjek tersirat di anak kalimat participle wajib ngelakuin tindakannya, dan tindakan yang lebih dulu selesai pakai having + past participle.",
+        "whyOthersFailId": "“Reviewed” ngasih kesan hubungan pasif, dan “having review” kehilangan bentuk bentuk ketiga (Verb 3)-nya. “To reviewing” nyatuin bentuk to sama bentuk -ing yang nggak bisa disatuin.",
+        "howToAvoidId": "Cek dua hal: pelakunya dan urutan waktunya. Subjek tersirat di anak kalimat participle wajib ngelakuin tindakannya, dan tindakan yang lebih dulu selesai pakai having + bentuk ketiga (Verb 3).",
         "memoryCueId": "Perhatikan subjeknya: pastikan tindakan di anak kalimat penjelas mengacu langsung kepada subjek utama setelah tanda koma."
       },
-      "pedagogicalObjectiveId": "Kamu pakai bentuk having + past participle buat nandain tindakan yang lebih dulu sebelum kalimat utamanya.",
-      "misconceptionTargetedId": "Kamu nandain tindakan yang selesai lebih dulu pakai bentuk yang patah. Bisa past participle sendirian, kata kerja dasar sesudah “having”, atau campuran to + bentuk -ing. Pola having + past participle yang utuh malah nggak kerangkai.",
-      "reasoningOperationId": "pastiin komitenya ngelakuin kedua tindakan itu → taruh peninjauannya sebelum pembukaan kembali → tandai tindakan aktif yang lebih dulu pakai having + past participle"
+      "pedagogicalObjectiveId": "Kamu pakai bentuk having + bentuk ketiga (Verb 3) buat nandain tindakan yang lebih dulu sebelum kalimat utamanya.",
+      "misconceptionTargetedId": "Kamu nandain tindakan yang selesai lebih dulu pakai bentuk yang patah. Bisa bentuk ketiga (Verb 3) sendirian, kata kerja dasar sesudah “having”, atau campuran to + bentuk -ing. Pola having + bentuk ketiga (Verb 3) yang utuh malah nggak kerangkai.",
+      "reasoningOperationId": "pastiin komitenya ngelakuin kedua tindakan itu → taruh peninjauannya sebelum pembukaan kembali → tandai tindakan aktif yang lebih dulu pakai having + bentuk ketiga (Verb 3)"
     },
     {
       "id": "C2-007",
@@ -8089,7 +8089,7 @@
           "misconception": "using the past-simple form inside a present perfect question frame",
           "whyFails": "'Have you ever went' pairs 'have' with a finished-past form; the frame requires the participle 'been'.",
           "whyFailsId": "“Have you ever went” masangin “have” sama bentuk lampau selesai; kerangkanya minta “been”.",
-          "misconceptionId": "bentuk past simple dimasukin ke kerangka present perfect."
+          "misconceptionId": "bentuk bentuk lampau (Verb 2) dimasukin ke kerangka present perfect."
         },
         {
           "option": "be",
@@ -8113,14 +8113,14 @@
         "howToAvoid": "After 'have' or 'has', always reach for the third form of the verb, never the past simple.",
         "memoryCue": "'Ever' rides with 'have been', 'have seen', 'have done'.",
         "ruleId": "Present perfect dengan “ever” dan “never” membicarakan pengalaman hidup hingga saat ini: “have/has” + kata kerja bentuk ketiga (Verb 3).",
-        "whyCorrectId": "“Have you ever” nanyain pengalaman hidup, dan sesudah “have” kata kerjanya wajib past participle: “been”.",
+        "whyCorrectId": "“Have you ever” nanyain pengalaman hidup, dan sesudah “have” kata kerjanya wajib bentuk ketiga (Verb 3): “been”.",
         "whyOthersFailId": "“Went” itu bentuk lampau selesai yang nggak bisa ngikutin “have”; “be” masih polos padahal butuh participle; “was” nyelipin bentuk lampau kedua ke kerangka perfect.",
-        "howToAvoidId": "Sesudah “have” atau “has”, selalu ambil bentuk ketiga kata kerjanya, jangan past simple.",
+        "howToAvoidId": "Sesudah “have” atau “has”, selalu ambil bentuk ketiga kata kerjanya, jangan bentuk lampau (Verb 2).",
         "memoryCueId": "Perhatikan pengalamannya: membicarakan pengalaman hidup tanpa batasan waktu tertentu mengterapkan bentuk selesai dengan penanda pengalaman."
       },
       "pedagogicalObjectiveId": "Nanya dan jawab soal pengalaman hidup pakai present perfect plus “ever” atau “never”.",
       "misconceptionTargetedId": "Kamu naruh bentuk lampau selesai atau bentuk dasar sesudah “have”, jadi pertanyaan pengalamannya berubah kayak cerita lampau biasa.",
-      "reasoningOperationId": "kenali kerangka “Have you ever” → pilih past participle sesudah “have”"
+      "reasoningOperationId": "kenali kerangka “Have you ever” → pilih bentuk ketiga (Verb 3) sesudah “have”"
     },
     {
       "id": "TA-012",
@@ -8176,7 +8176,7 @@
       },
       "pedagogicalObjectiveId": "Ceritain keadaan yang belum kelar pakai present perfect plus “for” dan “since”.",
       "misconceptionTargetedId": "Kamu baca frasa “since” kayak kebiasaan sekarang atau bab masa lalu yang udah ketutup, padahal keadaannya jalan dari dulu sampai sekarang.",
-      "reasoningOperationId": "temuin durasi “since/for” yang masih bener sekarang → pilih “have/has” + past participle"
+      "reasoningOperationId": "temuin durasi “since/for” yang masih bener sekarang → pilih “have/has” + bentuk ketiga (Verb 3)"
     },
     {
       "id": "CO-008",
@@ -8207,7 +8207,7 @@
           "option": "would live",
           "misconception": "inserting 'would' for the speaker's own situation, as if the sentence were a result clause",
           "whyFails": "'Would' after 'wish' is reserved for other people's irritating behaviour or for result clauses; for your own state, use the past simple.",
-          "whyFailsId": "“would” sesudah “wish” jatahnya keluhan soal orang lain atau klausa hasil; buat keadaan sendiri pakai past simple.",
+          "whyFailsId": "“would” sesudah “wish” jatahnya keluhan soal orang lain atau klausa hasil; buat keadaan sendiri pakai bentuk lampau (Verb 2).",
           "misconceptionId": "“would” diselipin buat keadaan diri sendiri."
         },
         {
@@ -8225,14 +8225,14 @@
         "howToAvoid": "Wishing about now? Move the verb one step back, so the present becomes past simple.",
         "memoryCue": "Wish about now = one step back: 'wish I lived'.",
         "ruleId": "Kalau berharap hal yang mungkin terjadi nanti: Pakai “hope”. Contoh: <b>I hope you win tomorrow</b>.<br>Kalau mengkhayalkan keadaan SEKARANG yang beda dari kenyataan: Pakai “wish” + kata kerja lampau (Verb 2 / could). Contoh: <b>I wish I lived closer</b> (Andai rumahku dekat, padahal faktanya jauh banget).<br><br>💡 <b>RUMUS KILAT</b>:<br>Berharap kondisi sekarang berbeda ➡️ <b>wish + Verb 2</b> (atau were).<br>Pengin bisa sesuatu tapi sekarang belum bisa ➡️ <b>wish + could + Verb 1</b> (contoh: <i>I wish I could swim</i>).",
-        "whyCorrectId": "Harapan soal sekarang pakai past simple buat nandain ketidaknyataan: “I wish I lived closer.”",
+        "whyCorrectId": "Harapan soal sekarang pakai bentuk lampau (Verb 2) buat nandain ketidaknyataan: “I wish I lived closer.”",
         "whyOthersFailId": "“Live” ngejaga bentuk sekarang dan ngilangin makna pengandaian; “would live” jatahnya klausa hasil atau keluhan soal orang lain; “had lived” ndorong penyesalannya ke masa lalu yang udah kelar.",
-        "howToAvoidId": "Berharap soal sekarang? Mundurin kata kerjanya satu langkah: bentuk sekarang jadi past simple.",
+        "howToAvoidId": "Berharap soal sekarang? Mundurin kata kerjanya satu langkah: bentuk sekarang jadi bentuk lampau (Verb 2).",
         "memoryCueId": "Perhatikan kenyataan saat ini: menyatakan harapan atau impian masa kini yang belum terwujud diungkapkan dengan memundurkan bentuk waktu ke lampau."
       },
-      "pedagogicalObjectiveId": "Nyatain harapan soal keadaan sekarang yang nggak nyata pakai “wish” + past simple.",
+      "pedagogicalObjectiveId": "Nyatain harapan soal keadaan sekarang yang nggak nyata pakai “wish” + bentuk lampau (Verb 2).",
       "misconceptionTargetedId": "Kamu ngejaga bentuk sekarang sesudah “wish”, atau minjem “would” dan past perfect dari pola pengandaian lain.",
-      "reasoningOperationId": "kenali harapan soal situasi sekarang → mundurin kata kerjanya satu langkah ke past simple"
+      "reasoningOperationId": "kenali harapan soal situasi sekarang → mundurin kata kerjanya satu langkah ke bentuk lampau (Verb 2)"
     },
     {
       "id": "CO-009",
@@ -8257,7 +8257,7 @@
           "misconception": "staying with the past simple, which cannot mark the unreal past that regret needs",
           "whyFails": "With 'last year' anchoring the event, plain 'read' reports rather than regrets; the unreal past needs 'had read'.",
           "whyFailsId": "“last year” udah ngunci kejadiannya; “read” polos jadi laporan, bukan penyesalan.",
-          "misconceptionId": "past simple dipertahanin buat penyesalan lampau."
+          "misconceptionId": "bentuk lampau (Verb 2) dipertahanin buat penyesalan lampau."
         },
         {
           "option": "would have read",
@@ -8287,7 +8287,7 @@
         "memoryCueId": "Perhatikan penyesalannya: menyatakan penyesalan mendalam atas peristiwa yang sudah terlanjur terjadi di masa lalu mengterapkan bentuk waktu lampau sempurna."
       },
       "pedagogicalObjectiveId": "Nyatain penyesalan soal masa lalu yang udah kelar pakai “if only” + past perfect.",
-      "misconceptionTargetedId": "Kamu berhenti di past simple atau narik “would have” ke dalam klausa harapan pas nyeselin kejadian lampau.",
+      "misconceptionTargetedId": "Kamu berhenti di bentuk lampau (Verb 2) atau narik “would have” ke dalam klausa harapan pas nyeselin kejadian lampau.",
       "reasoningOperationId": "kenali penyesalan soal kejadian lampau yang selesai → pilih past perfect di dalam klausa harapannya"
     },
     {
@@ -8344,7 +8344,7 @@
       },
       "pedagogicalObjectiveId": "Pakai future perfect buat dugaan yakin soal sesuatu yang mestinya udah kejadian.",
       "misconceptionTargetedId": "Kamu anggep “will” murni soal masa depan, jadi dugaan soal kejadian yang udah selesai malah kebaca kayak ramalan yang belum terjadi.",
-      "reasoningOperationId": "deteksi “by now” yang nunjuk kejadian yang diduga udah selesai → pilih “will have” + past participle"
+      "reasoningOperationId": "deteksi “by now” yang nunjuk kejadian yang diduga udah selesai → pilih “will have” + bentuk ketiga (Verb 3)"
     },
     {
       "id": "PA-007",
@@ -8400,7 +8400,7 @@
       },
       "pedagogicalObjectiveId": "Nandain kejadian yang lebih dulu di struktur pelaporan pasif pakai perfect passive infinitive.",
       "misconceptionTargetedId": "Kamu laporin kejadian yang lebih dulu pakai bentuk sekarang atau bentuk aktif, jadi jarak waktunya dan peran korbannya sama-sama hilang.",
-      "reasoningOperationId": "cek apakah kejadiannya lebih dulu dari laporannya dan apakah subjeknya kena tindakan → pilih “to have been” + past participle"
+      "reasoningOperationId": "cek apakah kejadiannya lebih dulu dari laporannya dan apakah subjeknya kena tindakan → pilih “to have been” + bentuk ketiga (Verb 3)"
     },
     {
       "id": "RS-007",
@@ -9680,15 +9680,15 @@
         "whyOthersFail": "'Was starting' stretches a sudden event, 'starts' is present tense, and 'has started' pulls the story into the present.",
         "howToAvoid": "Find the 'when' clause: the sudden interrupter after 'when' usually takes past simple.",
         "memoryCue": "Long walk = was walking; sudden rain = started.",
-        "ruleId": "Past continuous buat aksi latar yang lebih lama. Kejadian pendek yang motong, biasanya setelah “when”, pakai past simple.",
+        "ruleId": "Past continuous buat aksi latar yang lebih lama. Kejadian pendek yang motong, biasanya setelah “when”, pakai bentuk lampau (Verb 2).",
         "whyCorrectId": "Hujan yang tiba-tiba mulai itu kejadian pendek yang motong jalannya Sara. Jadi pakai “started”.",
         "whyOthersFailId": "“Was starting” manjangin kejadian yang tiba-tiba. “Starts” bentuk sekarang. “Has started” narik cerita ke saat ini.",
-        "howToAvoidId": "Cari klausa “when”-nya. Kejadian tiba-tiba setelah “when” biasanya pakai past simple.",
+        "howToAvoidId": "Cari klausa “when”-nya. Kejadian tiba-tiba setelah “when” biasanya pakai bentuk lampau (Verb 2).",
         "memoryCueId": "Perhatikan peristiwa latarnya: bedakan kegiatan yang sedang berlangsung di masa lampau dengan peristiwa singkat mendadak yang memotongnya."
       },
-      "pedagogicalObjectiveId": "Pakai past simple buat kejadian pendek yang motong aksi latar past continuous",
+      "pedagogicalObjectiveId": "Pakai bentuk lampau (Verb 2) buat kejadian pendek yang motong aksi latar past continuous",
       "misconceptionTargetedId": "Kamu ikut manjangin kejadian pemotongnya jadi bentuk -ing, karena kalimat sekitarnya bentuk -ing.",
-      "reasoningOperationId": "temukan kejadian pendek yang motong → tandai dengan past simple"
+      "reasoningOperationId": "temukan kejadian pendek yang motong → tandai dengan bentuk lampau (Verb 2)"
     },
     {
       "id": "AR-103",
@@ -10049,7 +10049,7 @@
           "misconception": "closes an unfinished time period with the past simple",
           "whyFails": "'The day isn't over yet' keeps 'today' open, so the running total up to now needs the present perfect; 'drank' seals the period as finished.",
           "whyFailsId": "“The day isn't over yet” bikin “today” masih terbuka, jadi hitungan sampai sekarang butuh present perfect; “drank” malah nutup periodenya.",
-          "misconceptionId": "periode waktu yang belum selesai malah ditutup pakai past simple."
+          "misconceptionId": "periode waktu yang belum selesai malah ditutup pakai bentuk lampau (Verb 2)."
         },
         {
           "option": "was drinking",
@@ -10073,13 +10073,13 @@
         "howToAvoid": "Before choosing, ask: has the stated period ended? If it can still grow ('the day isn't over yet'), keep the present perfect even when a specific number appears.",
         "memoryCue": "Periode masih buka + hitungan berjalan = have/has + V3; angka pasti bukan alasan pindah ke past simple.",
         "whyCorrectId": "“Today, and the day isn't over yet” nandain periode yang belum selesai, dan total yang dihitung di dalam periode terbuka pakai present perfect: “have drunk three cups”.",
-        "ruleId": "Periode terbuka (today, this week, so far) + hitungan berjalan → present perfect. Periode tertutup (yesterday, in 2019, last week) → past simple.",
+        "ruleId": "Periode terbuka (today, this week, so far) + hitungan berjalan → present perfect. Periode tertutup (yesterday, in 2019, last week) → bentuk lampau (Verb 2).",
         "whyOthersFailId": "“Drank” nutup periode yang kata kalimatnya masih buka, “was drinking” ngelukisin satu aksi yang lagi jalan, dan “drink” ngubah hitungannya jadi kebiasaan.",
         "howToAvoidId": "Sebelum milih, tanya: periodenya udah selesai belum? Kalau masih bisa nambah (“the day isn't over yet”), tetap pakai present perfect walau ada angka pasti.",
         "memoryCueId": "Perhatikan periode waktunya: jika rentang waktu belum berakhir dan jumlah hasilnya masih bisa bertambah, terapkan bentuk waktu selesai yang relevan."
       },
       "pedagogicalObjectiveId": "Pilih present perfect buat hitungan aksi yang selesai di dalam periode waktu yang jelas-jelas masih terbuka.",
-      "misconceptionTargetedId": "Kamu denger angka pasti terus langsung ambil past simple, padahal periode “today”-nya belum tutup.",
+      "misconceptionTargetedId": "Kamu denger angka pasti terus langsung ambil bentuk lampau (Verb 2), padahal periode “today”-nya belum tutup.",
       "reasoningOperationId": "cek periode waktunya udah tutup atau masih buka → periode terbuka dengan hitungan berjalan pakai present perfect"
     },
     {
@@ -11175,7 +11175,7 @@
           "option": "would visit",
           "misconception": "uses habitual 'would' for a single dated past event",
           "whyFails": "Habitual 'would' needs a series of repeated past actions; a visit fixed to one dated afternoon is a single event, so past simple is required.",
-          "whyFailsId": "“Would” kebiasaan butuh rangkaian aksi yang berulang. Kunjungan yang kejadiannya cuma sekali di satu sore harus pakai past simple.",
+          "whyFailsId": "“Would” kebiasaan butuh rangkaian aksi yang berulang. Kunjungan yang kejadiannya cuma sekali di satu sore harus pakai bentuk lampau (Verb 2).",
           "misconceptionId": "“would” kebiasaan dipakai buat kejadian yang cuma sekali."
         },
         {
@@ -11193,14 +11193,14 @@
         "howToAvoid": "Look for a date or 'once/last...' marker: if the event happened one time, refuse 'used to' and 'would' automatically.",
         "memoryCue": "A date on it = plain past simple.",
         "ruleId": "Kalau kebiasaan masa lalu yang SEKARANG SUDAH BERHENTI: Pakai “used to” + kata kerja dasar (Verb 1). Contoh: <b>I used to play marbles</b> (Dulu aku sering main kelereng, tapi sekarang sudah nggak pernah lagi).<br>Kalau SEKARANG SUDAH TERBIASA (merasa wajar dan nggak asing lagi): Ada “be” (am/is/are) di depannya dan wajib diikuti kata kerja -ing. Contoh: <b>I am used to living in Jakarta</b> (Sekarang aku sudah terbiasa tinggal di Jakarta).<br>Kalau PROSES menjadi terbiasa: Pakai “get used to” + kata kerja -ing. Contoh: <b>He is getting used to waking up early</b> (Dia mulai terbiasa bangun pagi).<br><br>💡 <b>RUMUS KILAT</b>:<br>Dulu pernah tapi sekarang enggak (tanpa be) ➡️ <b>used to + Verb 1</b>.<br>Sekarang sudah terbiasa (ada <i>am/is/are</i> di depan) ➡️ <b>be used to + Verb-ing</b>.<br>Proses beradaptasi ➡️ <b>get used to + Verb-ing</b>.",
-        "whyCorrectId": "“Last Saturday afternoon” nyebut satu kejadian tertentu, dan kejadian lampau bertanggal pakai past simple: we visited.",
+        "whyCorrectId": "“Last Saturday afternoon” nyebut satu kejadian tertentu, dan kejadian lampau bertanggal pakai bentuk lampau (Verb 2): we visited.",
         "whyOthersFailId": "“Used to visit” dan “would visit” sama-sama ngaku ada pengulangan, padahal tanggalnya nolak itu. “Use to visit” cuma ada setelah did atau didn't.",
         "howToAvoidId": "Cari tanggal atau penanda kayak “once” dan “last...”: kalau kejadiannya sekali, langsung coret “used to” dan “would”.",
-        "memoryCueId": "Ada tanggalnya, berarti past simple polos."
+        "memoryCueId": "Ada tanggalnya, berarti bentuk lampau (Verb 2) biasa."
       },
-      "pedagogicalObjectiveId": "Pilih past simple, bukan “used to” atau “would”, buat satu kejadian lampau yang bertanggal.",
+      "pedagogicalObjectiveId": "Pilih bentuk lampau (Verb 2), bukan “used to” atau “would”, buat satu kejadian lampau yang bertanggal.",
       "misconceptionTargetedId": "Kamu nempelin “used to” atau “would” ke kejadian sekali karena kejadiannya terasa lama, padahal dua bentuk itu butuh kebiasaan berulang.",
-      "reasoningOperationId": "cek penanda waktunya → satu kejadian tertentu berarti past simple, kebiasaan lama yang berulang baru boleh used to atau would"
+      "reasoningOperationId": "cek penanda waktunya → satu kejadian tertentu berarti bentuk lampau (Verb 2), kebiasaan lama yang berulang baru boleh used to atau would"
     },
     {
       "id": "PR-013",
@@ -11864,15 +11864,15 @@
         "whyOthersFail": "'Had opened' fakes a flashback that isn't there; 'was opening' leaves a finished step hanging mid-action; 'has opened' breaks the past frame with a present-linked tense.",
         "howToAvoid": "Ask of each event: does it move the story forward, or did it happen before the story reached this point? Only the jump-back gets past perfect.",
         "memoryCue": "Steps in order = past simple; jump back = past perfect.",
-        "ruleId": "Di rangkaian cerita, past simple bawa tiap langkah maju sesuai urutan. Past perfect disimpen buat kejadian yang lebih dulu dari titik cerita saat itu.",
-        "whyCorrectId": "Buka jendela itu cuma langkah kedua dari tiga langkah setara di alur utama. Langkah maju di cerita tetap pakai past simple: unlocked, opened, switched on.",
+        "ruleId": "Di rangkaian cerita, bentuk lampau (Verb 2) bawa tiap langkah maju sesuai urutan. Past perfect disimpen buat kejadian yang lebih dulu dari titik cerita saat itu.",
+        "whyCorrectId": "Buka jendela itu cuma langkah kedua dari tiga langkah setara di alur utama. Langkah maju di cerita tetap pakai bentuk lampau (Verb 2): unlocked, opened, switched on.",
         "whyOthersFailId": "“Had opened” malsuin kilas balik yang nggak ada. “Was opening” ngegantungin langkah yang udah tuntas, dan “has opened” ngerusak bingkai lampau pakai bentuk masa kini.",
         "howToAvoidId": "Tanyain tiap kejadian: dia majuin cerita, atau kejadian sebelum cerita nyampe titik ini? Cuma yang lompat mundur yang dapet past perfect.",
         "memoryCueId": "Perhatikan urutan ceritanya: terapkan bentuk waktu lebih lampau untuk kilas balik peristiwa yang mendahului jalan cerita utama."
       },
-      "pedagogicalObjectiveId": "Kamu tahan past simple buat langkah-langkah setara yang maju berurutan di cerita. Jangan ada satu langkah yang dinaikin jadi past perfect.",
+      "pedagogicalObjectiveId": "Kamu tahan bentuk lampau (Verb 2) buat langkah-langkah setara yang maju berurutan di cerita. Jangan ada satu langkah yang dinaikin jadi past perfect.",
       "misconceptionTargetedId": "Kamu naburin past perfect ke kejadian berurutan biasa, dianggap bentuk lampau yang lebih keren. Padahal dia penanda kilas balik buat kejadian yang lebih dulu.",
-      "reasoningOperationId": "cek kejadiannya maju di alur utama atau lompat ke sebelumnya → langkah maju tetap past simple"
+      "reasoningOperationId": "cek kejadiannya maju di alur utama atau lompat ke sebelumnya → langkah maju tetap bentuk lampau (Verb 2)"
     },
     {
       "id": "PA-009",
@@ -12960,8 +12960,8 @@
           "option": "stopped",
           "misconception": "treats a complaint about repeated behaviour as a wished-for state with wish + past simple",
           "whyFails": "'Wish + past simple' pictures a present state the speaker would like to be different, as in 'I wish I lived closer'; pressing another person to change a repeated, willed action needs 'wish + would stop'.",
-          "whyFailsId": "“Wish + past simple” gambarin keadaan sekarang yang diharap beda, kayak “I wish I lived closer”; nuntut orang berhenti ngelakuin sesuatu yang diulang-ulang butuh “wish + would stop”.",
-          "misconceptionId": "keluhan soal kebiasaan orang lain dibungkus “wish + past simple”."
+          "whyFailsId": "“Wish + bentuk lampau (Verb 2)” gambarin keadaan sekarang yang diharap beda, kayak “I wish I lived closer”; nuntut orang berhenti ngelakuin sesuatu yang diulang-ulang butuh “wish + would stop”.",
+          "misconceptionId": "keluhan soal kebiasaan orang lain dibungkus “wish + bentuk lampau (Verb 2)”."
         },
         {
           "option": "stops",
@@ -12987,11 +12987,11 @@
         "ruleId": "Kalau berandai-andai soal situasi atau keinginan diri sendiri: Pakai “wish + Verb 2”. Contoh: <b>I wish I had a car</b>.<br>Kalau jengkel / kesal sama KELAKUAN ORANG LAIN dan pengin dia berhenti: Pakai “wish + orang lain + would” + kata kerja dasar. Contoh: <b>I wish he would turn down the music</b> (Bikin pusing, andai saja dia mau mengecilkan musiknya).<br><br>💡 <b>RUMUS KILAT</b>:<br>Kesal sama kelakuan orang lain ➡️ <b>wish + [orang itu] + would + kata kerja dasar</b>.<br>Bukan untuk diri sendiri ➡️ Dilarang pakai <i>I wish I would</i> (karena kelakuan sendiri bisa dikontrol langsung).",
         "whyCorrectId": "Yang bikin kesal itu kelakuan berulang orang lain yang bisa dia ubah sendiri, dan bingkainya memang “wish + subjek + would + kata dasar”: “I wish he would stop”.",
         "whyOthersFailId": "“Stopped” ngubah keluhan jadi keadaan yang diharap beda, cocoknya buat “I wish I lived closer”, bukan nuntut orang berubah; “stops” ninggalin bentuk kini nyata yang nggak pernah diterima “wish”; “will stop” jodohnya “hope”, bukan “wish”.",
-        "howToAvoidId": "Kalau yang bikin sebal itu kelakuan yang diulang-ulang orang lain, ambil “wish + would”; simpan “wish + past simple” buat situasi, bukan perilaku.",
+        "howToAvoidId": "Kalau yang bikin sebal itu kelakuan yang diulang-ulang orang lain, ambil “wish + would”; simpan “wish + bentuk lampau (Verb 2)” buat situasi, bukan perilaku.",
         "memoryCueId": "Perhatikan kekesalannya: menyatakan kekesalan atas kebiasaan buruk orang lain dan ingin mereka berubah diungkapkan dengan modal harapan perubahan."
       },
       "pedagogicalObjectiveId": "Ngeluh soal kebiasaan nyebelin orang lain pakai “wish + would”.",
-      "misconceptionTargetedId": "Kamu ngunci “wish” ke past simple atau bentuk kini biasa, jadi tuntutan supaya orang lain ngubah kebiasaannya malah kedengaran kayak keadaan yang diharap beda.",
+      "misconceptionTargetedId": "Kamu ngunci “wish” ke bentuk lampau (Verb 2) atau bentuk kini biasa, jadi tuntutan supaya orang lain ngubah kebiasaannya malah kedengaran kayak keadaan yang diharap beda.",
       "reasoningOperationId": "kenali sinyal kesal “keeps borrowing” + “drives me crazy” soal orang lain → pilih “wish + would + kata dasar” buat perubahan perilaku yang dituntut"
     },
     {
@@ -13184,7 +13184,7 @@
           "option": "repairs",
           "misconception": "keeps a present-tense verb after 'it's high time', calquing 'sudah waktunya' plus a present verb",
           "whyFails": "'It's high time the council repairs' uses the real present, but this idiom requires the unreal past simple even though the meaning is about now.",
-          "whyFailsId": "“It's high time the council repairs” pakai bentuk kini nyata, padahal idiom ini minta past simple tak nyata walaupun maknanya soal sekarang.",
+          "whyFailsId": "“It's high time the council repairs” pakai bentuk kini nyata, padahal idiom ini minta bentuk lampau (Verb 2) tak nyata walaupun maknanya soal sekarang.",
           "misconceptionId": "sesudah “it's high time” kata kerjanya dibiarin bentuk kini, kebawa pola “sudah waktunya” plus kata kerja biasa."
         },
         {
@@ -13208,15 +13208,15 @@
         "whyOthersFail": "'Repairs' matches the Indonesian feel of 'sudah waktunya' plus a present verb, but this idiom rejects the real present; 'will repair' adds a future marker the frame never allows; 'is repairing' would claim the work is already under way, which the complaint denies.",
         "howToAvoid": "After 'it's high time', push the verb one step back into the past even though you mean today.",
         "memoryCue": "'High time' = past form, present pressure.",
-        "ruleId": "“It's (high/about) time + subjek + past simple” bilang sebuah aksi udah telat sekarang atau mendesak banget; bentuk lampaunya nandain ketaknyataan, bukan waktu lampau.",
-        "whyCorrectId": "“It's high time” ngedesak sesuatu yang udah telat, dan klausa sesudahnya pakai past simple tak nyata walaupun maknanya sekarang: “it's high time the council repaired”.",
+        "ruleId": "“It's (high/about) time + subjek + bentuk lampau (Verb 2)” bilang sebuah aksi udah telat sekarang atau mendesak banget; bentuk lampaunya nandain ketaknyataan, bukan waktu lampau.",
+        "whyCorrectId": "“It's high time” ngedesak sesuatu yang udah telat, dan klausa sesudahnya pakai bentuk lampau (Verb 2) tak nyata walaupun maknanya sekarang: “it's high time the council repaired”.",
         "whyOthersFailId": "“Repairs” cocok sama rasa “sudah waktunya” plus kata kerja biasa, tapi idiom ini nolak bentuk kini nyata; “will repair” nambahin penanda masa depan yang nggak pernah diizinin bingkai ini; “is repairing” bakal ngeklaim kerjaannya udah jalan, padahal keluhannya bilang belum.",
         "howToAvoidId": "Sesudah “it's high time”, dorong kata kerjanya mundur satu langkah ke bentuk lampau walaupun maksudmu hari ini.",
         "memoryCueId": "Perhatikan urgensinya: ungkapan penegasan waktu mendesak selalu diikuti kalimat bermakna lampau untuk menunjukkan keterlambatan."
       },
-      "pedagogicalObjectiveId": "Pakai past simple tak nyata sesudah “it's high time” buat desakan yang udah telat.",
+      "pedagogicalObjectiveId": "Pakai bentuk lampau (Verb 2) tak nyata sesudah “it's high time” buat desakan yang udah telat.",
       "misconceptionTargetedId": "Kamu nyocokin tense ke rasa “sudah waktunya”, jadi sesudah “it's high time” malah naruh bentuk kini atau “will”.",
-      "reasoningOperationId": "kenali sinyal telat “complaining for months” sesudah “it's high time” → geser kata kerjanya ke past simple tak nyata"
+      "reasoningOperationId": "kenali sinyal telat “complaining for months” sesudah “it's high time” → geser kata kerjanya ke bentuk lampau (Verb 2) tak nyata"
     },
     {
       "id": "CM-008",
@@ -13264,7 +13264,7 @@
         "whyOthersFail": "'Is' presents the millionaire idea as possibly true, clashing with the stated denial; 'has been' asserts genuine experience up to now, which the sentence rules out; 'would be' drags a conditional-result form into the 'as if' clause, where it has no place.",
         "howToAvoid": "When the sentence itself tells you the comparison is false, shift the verb after 'as if' into the past: 'were' for 'be'.",
         "memoryCue": "Unreal 'as if' loves 'were': he talks as if he were the boss.",
-        "ruleId": "“As if / as though + past simple” nandain perbandingan yang disodorin sebagai tak nyata; bentuk kini sesudah “as if” jatahnya perbandingan yang mungkin beneran terjadi.",
+        "ruleId": "“As if / as though + bentuk lampau (Verb 2)” nandain perbandingan yang disodorin sebagai tak nyata; bentuk kini sesudah “as if” jatahnya perbandingan yang mungkin beneran terjadi.",
         "whyCorrectId": "Kalimatnya terang-terangan nyangkal perbandingannya (saldo banknya nunjukin dia bukan jutawan), jadi “as if” pakai past tak nyata: “as if he were a millionaire”.",
         "whyOthersFailId": "“Is” nyodorin ide jutawan itu sebagai mungkin benar, nabrak penyangkalan yang udah ditulis; “has been” ngeklaim pengalaman nyata sampai sekarang, yang justru ditutup kalimatnya; “would be” narik bentuk klausa hasil pengandaian ke dalam klausa “as if” yang bukan tempatnya.",
         "howToAvoidId": "Kalau kalimatnya sendiri ngasih tahu perbandingannya bohong, geser kata kerja sesudah “as if” ke bentuk lampau: “were” buat “be”.",
@@ -13311,7 +13311,7 @@
           "misconception": "uses present 'needn't' with a past participle, leaving the finished act unmarked",
           "whyFails": "'You needn't printed' has no 'have' to license the participle; plain 'needn't' pairs with a base form and points to present necessity, not a finished act.",
           "whyFailsId": "“You needn't printed” nggak punya “have” buat ngizinin participle-nya; “needn't” polos jodohnya kata dasar dan nunjuk keperluan sekarang, bukan tindakan yang udah selesai.",
-          "misconceptionId": "“needn't” polos dipasangin past participle, padahal tanpa “have” dia nunjuk keperluan sekarang."
+          "misconceptionId": "“needn't” polos dipasangin bentuk ketiga (Verb 3), padahal tanpa “have” dia nunjuk keperluan sekarang."
         }
       ],
       "explanation": {
@@ -13321,14 +13321,14 @@
         "howToAvoid": "Action already done and wasted? Reach for 'needn't have' plus the participle; if you only mean there was no obligation, use 'didn't need to' with the base form.",
         "memoryCue": "'Needn't have done' = did it for nothing.",
         "ruleId": "“Needn't have + kata kerja bentuk ketiga (Verb 3)” berarti seseorang sudah terlanjur melakukan sesuatu yang sesungguhnya tidak perlu; sedangkan “didn't need to + kata dasar” menyatakan ketiadaan keharusan tanpa memastikan apakah tindakan itu sempat dilakukan.",
-        "whyCorrectId": "Laporannya udah dicetak, dan baru belakangan ketahuan itu nggak perlu; “needn't have + past participle” persis bentuk buat bilang tindakan yang udah selesai itu sia-sia.",
+        "whyCorrectId": "Laporannya udah dicetak, dan baru belakangan ketahuan itu nggak perlu; “needn't have + bentuk ketiga (Verb 3)” persis bentuk buat bilang tindakan yang udah selesai itu sia-sia.",
         "whyOthersFailId": "“Didn't need to” minta kata dasar “print”, jadi nggak bisa berdiri di depan “printed”, dan dia ngegantungin apakah nyetaknya kejadian; “mustn't have” itu simpulan bahwa sesuatu nggak terjadi, nabrak laporan yang udah tercetak; “needn't” tanpa “have” jodohnya kata dasar dan nunjuk keperluan sekarang.",
         "howToAvoidId": "Tindakannya udah terlanjur dan sia-sia? Ambil “needn't have” plus participle; kalau maksudmu cuma nggak ada kewajiban, pakai “didn't need to” dengan kata dasar.",
         "memoryCueId": "Perhatikan keterlanjurannya: bedakan tindakan yang sudah terlanjur dikerjakan padahal tidak perlu dengan ketiadaan keharusan semata."
       },
-      "pedagogicalObjectiveId": "Bilang kalau tindakan yang terlanjur dilakukan ternyata nggak perlu pakai “needn't have + past participle”.",
+      "pedagogicalObjectiveId": "Bilang kalau tindakan yang terlanjur dilakukan ternyata nggak perlu pakai “needn't have + bentuk ketiga (Verb 3)”.",
       "misconceptionTargetedId": "Kamu nganggep “didn't need to” dan “needn't have” bisa saling tukar, jadi sinyal bahwa tindakannya terlanjur dilakukan sia-sia ikut hilang.",
-      "reasoningOperationId": "kenali bahwa tindakannya udah terjadi (“printed”) tapi sia-sia (“reads everything on screen”) → pilih “needn't have” di depan past participle"
+      "reasoningOperationId": "kenali bahwa tindakannya udah terjadi (“printed”) tapi sia-sia (“reads everything on screen”) → pilih “needn't have” di depan bentuk ketiga (Verb 3)"
     },
     {
       "id": "b6_003",
@@ -13367,7 +13367,7 @@
           "misconception": "uses plain past-simple statement order, ignoring both the inversion and the past perfect",
           "whyFails": "'No sooner we began' neither inverts nor uses the past perfect; the fronted 'no sooner ... than' frame demands 'had' before the subject plus a participle.",
           "whyFailsId": "“No sooner we began” nggak ngebalik urutan dan nggak pakai past perfect; bingkai “no sooner ... than” di depan nuntut “had” sebelum subjek plus participle.",
-          "misconceptionId": "dipakai urutan kalimat biasa dengan past simple, padahal “no sooner” di depan minta inversi plus past perfect."
+          "misconceptionId": "dipakai urutan kalimat biasa dengan bentuk lampau (Verb 2), padahal “no sooner” di depan minta pembalikan kata bantu plus past perfect."
         }
       ],
       "explanation": {
@@ -13378,11 +13378,11 @@
         "memoryCue": "No sooner HAD I done ... THAN it happened.",
         "ruleId": "Untuk menceritakan dua kejadian beruntun di masa lalu (“baru saja ... langsung / ketika ...”):<br>Kalau memakai “No sooner”: Pembukanya bermakna negatif lampau (No sooner had + Subjek + Verb 3) dan WAJIB dipasangkan dengan kata “than”! Contoh: <b>No sooner had I arrived than the rain started</b> (Baru saja aku sampai, langsung hujan turun).<br>Kalau memakai “Hardly / Scarcely”: Pembukanya (Hardly had + Subjek + Verb 3) dan WAJIB dipasangkan dengan kata “when”! Contoh: <b>Hardly had he sat down when the phone rang</b> (Baru saja dia duduk, seketika telepon berdering).<br><br>💡 <b>RUMUS KILAT</b>:<br>Pasangan <b>No sooner</b> ➡️ Wajib bergandengan dengan kata <b>than</b> (No sooner ... than).<br>Pasangan <b>Hardly / Scarcely</b> ➡️ Wajib bergandengan dengan kata <b>when</b> (Hardly ... when).<br>Susunan bagian pertama ➡️ Wajib dibalik (kata bantu di depan subjek): <b>Kata pembuka + had + Subjek + Verb 3</b>.",
         "whyCorrectId": "Majuin “No sooner” maksa kata bantunya pindah ke depan subjek, dan kejadian pertama dari dua peristiwa lampaunya pakai past perfect: “No sooner had we begun ... than the projector broke down”.",
-        "whyOthersFailId": "“We had begun” nahan urutan kalimat berita padahal “no sooner” di depan nuntut inversi; “had we begin” udah ngebalik tapi kata kerjanya dibiarin dasar padahal “had” butuh “begun”; “we began” ngelewatin dua-duanya, inversi dan past perfect.",
+        "whyOthersFailId": "“We had begun” nahan urutan kalimat berita padahal “no sooner” di depan nuntut pembalikan kata bantu; “had we begin” udah ngebalik tapi kata kerjanya dibiarin dasar padahal “had” butuh “begun”; “we began” ngelewatin dua-duanya, pembalikan kata bantu dan past perfect.",
         "howToAvoidId": "Lihat “No sooner” di depan dengan “than” menyusul? Balik “had” ke depan subjek dan tutup pakai participle.",
         "memoryCueId": "“No sooner HAD I done ... THAN it happened.”"
       },
-      "pedagogicalObjectiveId": "Ngerakit korelasi berpasangan “no sooner ... than” dengan inversi subjek-kata bantu plus past perfect.",
+      "pedagogicalObjectiveId": "Ngerakit korelasi berpasangan “no sooner ... than” dengan pembalikan kata bantu subjek-kata bantu plus past perfect.",
       "misconceptionTargetedId": "Kamu majuin “no sooner” buat penekanan tapi urutan subjek-kata kerjanya dibiarin biasa, karena bahasa Indonesia memang nggak pernah ngebalik urutan sesudah keterangan di depan.",
       "reasoningOperationId": "kenali “No sooner ... than” di depan → balik “had” ke depan subjek dan pertahankan participle past perfect"
     },
@@ -13478,7 +13478,7 @@
           "option": "had",
           "misconception": "shifts the stranded auxiliary into the past perfect although the sentence is anchored in the present",
           "whyFails": "'Already had' forms a past perfect pointing to a moment before some past reference time, but this sentence is anchored in the present by 'hasn't ... yet'; what works is present-perfect 'have' or, in informal AmE, past-simple 'did'.",
-          "whyFailsId": "“Already had” membentuk past perfect yang nunjuk ke titik sebelum suatu acuan lampau, padahal kalimat ini berpijak di masa kini lewat “hasn't ... yet”; yang berterima “have” (present perfect) atau, dalam AmE informal, “did” + past simple.",
+          "whyFailsId": "“Already had” membentuk past perfect yang nunjuk ke titik sebelum suatu acuan lampau, padahal kalimat ini berpijak di masa kini lewat “hasn't ... yet”; yang berterima “have” (present perfect) atau, dalam AmE informal, “did” + bentuk lampau (Verb 2).",
           "misconceptionId": "kata bantu gantungnya digeser ke past perfect, padahal kalimatnya masih berpijak di masa kini dengan “yet”."
         }
       ],
@@ -13495,7 +13495,7 @@
         "memoryCueId": "Saat meringkas kalimat, kata bantu pengganti mewakili seluruh kata kerja yang tidak diulang dan mengikuti bentuk waktu kalimat utamanya."
       },
       "pedagogicalObjectiveId": "Ganti frasa kerja yang keulang pakai kata bantu gantung yang cocok sama klausa induknya.",
-      "misconceptionTargetedId": "Kamu nutup klausa elipsis pakai “do” atau “be” serba-guna, bukan ngulang kata bantu yang dipakai klausa pertama.",
+      "misconceptionTargetedId": "Kamu nutup klausa penyingkatan kata yang sudah jelas pakai “do” atau “be” serba-guna, bukan ngulang kata bantu yang dipakai klausa pertama.",
       "reasoningOperationId": "kenali induk present perfect “hasn't submitted ... yet” → gemain kata bantu yang sama, “have”, di klausa elipsisnya"
     },
     {
@@ -14473,21 +14473,21 @@
           "misconception": "uses the past simple for a life experience without a time",
           "whyFails": "There is no finished time like 'last year'; the sentence covers her whole life up to now, so present perfect is needed.",
           "whyFailsId": "nggak ada waktu selesai kayak “last year”. Kalimatnya nyakup seumur hidup sampai sekarang, jadi butuh present perfect.",
-          "misconceptionId": "pakai past simple buat pengalaman hidup yang nggak disebut waktunya."
+          "misconceptionId": "pakai bentuk lampau (Verb 2) buat pengalaman hidup yang nggak disebut waktunya."
         },
         {
           "option": "has never fly",
           "misconception": "leaving the bare verb although 'have' needs the past participle after it",
           "whyFails": "After 'has', the verb must be the past participle 'flown', not the bare 'fly'.",
-          "whyFailsId": "sesudah “has” kata kerjanya harus past participle “flown”, bukan “fly” polos.",
-          "misconceptionId": "kata kerja dibiarin polos padahal sesudah have butuh past participle."
+          "whyFailsId": "sesudah “has” kata kerjanya harus bentuk ketiga (Verb 3) “flown”, bukan “fly” polos.",
+          "misconceptionId": "kata kerja dibiarin polos padahal sesudah have butuh bentuk ketiga (Verb 3)."
         },
         {
           "option": "never has flying",
           "misconception": "mixes 'have' with a finite past form of 'be' instead of the participle",
           "whyFails": "'Has' pairs with a past participle, not an -ing form, and 'never' goes after 'has'.",
-          "whyFailsId": "“has” berpasangan sama past participle, bukan -ing. “Never” juga tempatnya sesudah “has”.",
-          "misconceptionId": "have dicampur sama bentuk -ing, bukan past participle."
+          "whyFailsId": "“has” berpasangan sama bentuk ketiga (Verb 3), bukan -ing. “Never” juga tempatnya sesudah “has”.",
+          "misconceptionId": "have dicampur sama bentuk -ing, bukan bentuk ketiga (Verb 3)."
         }
       ],
       "explanation": {
@@ -14498,13 +14498,13 @@
         "memoryCue": "Never in my life → has never flown.",
         "ruleId": "Pengalaman hidup tanpa batasan waktu tertentu: have/has + never/ever + kata kerja bentuk ketiga (Verb 3).",
         "whyCorrectId": "Rentang waktunya seumur hidup sampai sekarang, dan “she always travels by train” nunjukin itu masih berlaku, jadi “has never flown” yang pas.",
-        "whyOthersFailId": "“Never flew” nutup waktunya di masa lampau. “Has never fly” kurang past participle. “Never has flying” pakai -ing dan urutannya salah.",
-        "howToAvoidId": "Nggak ada tanggal atau kata waktu selesai? Pakai have/has + past participle.",
+        "whyOthersFailId": "“Never flew” nutup waktunya di masa lampau. “Has never fly” kurang bentuk ketiga (Verb 3). “Never has flying” pakai -ing dan urutannya salah.",
+        "howToAvoidId": "Nggak ada tanggal atau kata waktu selesai? Pakai have/has + bentuk ketiga (Verb 3).",
         "memoryCueId": "Perhatikan pengalamannya: membicarakan pengalaman hidup tanpa batasan waktu tertentu mengterapkan bentuk selesai dengan penanda pengalaman."
       },
-      "pedagogicalObjectiveId": "Pakai “have never + past participle” buat pengalaman yang belum pernah terjadi seumur hidup.",
-      "misconceptionTargetedId": "Kamu pakai past simple buat pengalaman hidup yang nggak disebut waktunya.",
-      "reasoningOperationId": "nggak ada waktu yang disebut → pengalaman hidup → have/has + never + past participle"
+      "pedagogicalObjectiveId": "Pakai “have never + bentuk ketiga (Verb 3)” buat pengalaman yang belum pernah terjadi seumur hidup.",
+      "misconceptionTargetedId": "Kamu pakai bentuk lampau (Verb 2) buat pengalaman hidup yang nggak disebut waktunya.",
+      "reasoningOperationId": "nggak ada waktu yang disebut → pengalaman hidup → have/has + never + bentuk ketiga (Verb 3)"
     },
     {
       "id": "TA-202",
@@ -15039,7 +15039,7 @@
           "option": "learned",
           "misconception": "if-clause verb form mismatched with 'would' in the main clause",
           "whyFails": "The past simple belongs in the if-clause; the result clause needs 'would'.",
-          "whyFailsId": "past simple tempatnya di klausa if. Klausa akibat butuh “would”.",
+          "whyFailsId": "bentuk lampau (Verb 2) tempatnya di klausa if. Klausa akibat butuh “would”.",
           "misconceptionId": "bentuk klausa if nyasar ke klausa akibat."
         },
         {
@@ -15063,8 +15063,8 @@
         "memoryCueId": "Khayalan sekarang: If I had…, I would…"
       },
       "pedagogicalObjectiveId": "Pakai “would + kata kerja dasar” di klausa akibat pengandaian yang nggak nyata sekarang.",
-      "misconceptionTargetedId": "Kamu naruh “will” atau past simple di klausa akibat sesudah klausa if pengandaian.",
-      "reasoningOperationId": "klausa if past simple dan nggak nyata → klausa akibat pakai would + kata kerja dasar"
+      "misconceptionTargetedId": "Kamu naruh “will” atau bentuk lampau (Verb 2) di klausa akibat sesudah klausa if pengandaian.",
+      "reasoningOperationId": "klausa if bentuk lampau (Verb 2) dan nggak nyata → klausa akibat pakai would + kata kerja dasar"
     },
     {
       "id": "QN-202",
@@ -15158,8 +15158,8 @@
           "option": "did / start",
           "misconception": "uses past simple for the earlier event, flattening the sequence",
           "whyFails": "'Did start' is an emphatic past simple; it does not show that the start came before our arrival.",
-          "whyFailsId": "“did start” itu past simple penegas. Nggak nunjukin mulainya lebih dulu dari kedatangan kami.",
-          "misconceptionId": "past simple dipakai buat kejadian yang lebih dulu, urutannya jadi rata."
+          "whyFailsId": "“did start” itu bentuk lampau (Verb 2) penegas. Nggak nunjukin mulainya lebih dulu dari kedatangan kami.",
+          "misconceptionId": "bentuk lampau (Verb 2) dipakai buat kejadian yang lebih dulu, urutannya jadi rata."
         }
       ],
       "explanation": {
@@ -15175,8 +15175,8 @@
         "memoryCueId": "Kejadian pertama → had done."
       },
       "pedagogicalObjectiveId": "Pakai past perfect buat kejadian yang lebih dulu waktu “when” ngenalin kejadian lampau berikutnya.",
-      "misconceptionTargetedId": "Kamu pakai past simple atau present perfect buat kejadian yang lebih dulu dari dua kejadian lampau.",
-      "reasoningOperationId": "dua kejadian lampau → cari yang lebih dulu → had + past participle"
+      "misconceptionTargetedId": "Kamu pakai bentuk lampau (Verb 2) atau present perfect buat kejadian yang lebih dulu dari dua kejadian lampau.",
+      "reasoningOperationId": "dua kejadian lampau → cari yang lebih dulu → had + bentuk ketiga (Verb 3)"
     },
     {
       "id": "RS-201",
@@ -15215,7 +15215,7 @@
           "misconception": "produces an ungrammatical inversion not used in either direct or reported questions in this pattern",
           "whyFails": "This keeps both the inversion and the present tense of the direct question.",
           "whyFailsId": "ini masih nyimpen urutan pertanyaan sekaligus bentuk sekarang dari pertanyaan langsungnya.",
-          "misconceptionId": "inversi yang nggak dipakai di pertanyaan langsung maupun laporan."
+          "misconceptionId": "pembalikan kata bantu yang nggak dipakai di pertanyaan langsung maupun laporan."
         }
       ],
       "explanation": {
@@ -15320,7 +15320,7 @@
           "misconception": "uses 'would' in the wish clause about one's own situation",
           "whyFails": "'Wish + would' is for other people's annoying behaviour, not the speaker's own ability.",
           "whyFailsId": "“wish + would” buat kelakuan orang lain yang nyebelin, bukan kemampuan diri sendiri.",
-          "misconceptionId": "pakai “would” di klausa wish soal diri sendiri, padahal wish + past simple."
+          "misconceptionId": "pakai “would” di klausa wish soal diri sendiri, padahal wish + bentuk lampau (Verb 2)."
         },
         {
           "option": "will",
@@ -15398,7 +15398,7 @@
         "howToAvoidId": "Positif dan udah selesai? Selipin “already” langsung sesudah “have”.",
         "memoryCueId": "Perhatikan posisinya: letakkan penanda baru saja di tengah kata bantu dan kata kerja, serta letakkan penanda belum di ujung kalimat."
       },
-      "pedagogicalObjectiveId": "Taruh “already” di antara “have” dan past participle di kalimat positif.",
+      "pedagogicalObjectiveId": "Taruh “already” di antara “have” dan bentuk ketiga (Verb 3) di kalimat positif.",
       "misconceptionTargetedId": "Kamu pakai “yet” di kalimat positif atau ngedorong “already” ke ujung.",
       "reasoningOperationId": "kalimat positif soal aksi yang selesai → already → posisi tengah sesudah have"
     },
@@ -15488,7 +15488,7 @@
           "misconception": "uses the past simple in the result clause of a third conditional",
           "whyFails": "'Came' states a real past event, but the speaker did not come.",
           "whyFailsId": "“came” nyatain kejadian lampau nyata, padahal pembicaranya nggak datang.",
-          "misconceptionId": "pakai past simple di klausa akibat pengandaian lampau, padahal butuh would have + past participle."
+          "misconceptionId": "pakai bentuk lampau (Verb 2) di klausa akibat pengandaian lampau, padahal butuh would have + bentuk ketiga (Verb 3)."
         },
         {
           "option": "had come",
@@ -15510,9 +15510,9 @@
         "howToAvoidId": "Past perfect di klausa if? Jawab pakai “would have” plus participle.",
         "memoryCueId": "Perhatikan penyesalannya: pengandaian tentang peristiwa masa lalu yang sudah tuntas memakai bentuk lampau sempurna di bagian syarat."
       },
-      "pedagogicalObjectiveId": "Pakai “would have + past participle” di klausa akibat pengandaian lampau yang nggak nyata.",
-      "misconceptionTargetedId": "Kamu naruh past simple atau “would + kata kerja” di klausa akibat sesudah klausa if past perfect.",
-      "reasoningOperationId": "klausa if pakai past perfect → pengandaian lampau → akibatnya would have + past participle"
+      "pedagogicalObjectiveId": "Pakai “would have + bentuk ketiga (Verb 3)” di klausa akibat pengandaian lampau yang nggak nyata.",
+      "misconceptionTargetedId": "Kamu naruh bentuk lampau (Verb 2) atau “would + kata kerja” di klausa akibat sesudah klausa if past perfect.",
+      "reasoningOperationId": "klausa if pakai past perfect → pengandaian lampau → akibatnya would have + bentuk ketiga (Verb 3)"
     },
     {
       "id": "PA-201",
@@ -15550,8 +15550,8 @@
           "option": "can be buy",
           "misconception": "puts 'be' after the past participle in a modal passive",
           "whyFails": "After 'be' the verb must be the past participle 'bought', not the bare 'buy'.",
-          "whyFailsId": "sesudah “be” kata kerjanya harus past participle “bought”, bukan “buy” polos.",
-          "misconceptionId": "naruh “be” sesudah past participle, padahal urutannya modal + be + past participle."
+          "whyFailsId": "sesudah “be” kata kerjanya harus bentuk ketiga (Verb 3) “bought”, bukan “buy” polos.",
+          "misconceptionId": "naruh “be” sesudah bentuk ketiga (Verb 3), padahal urutannya modal + be + bentuk ketiga (Verb 3)."
         }
       ],
       "explanation": {
@@ -15566,9 +15566,9 @@
         "howToAvoidId": "Tiga bagian, urutannya selalu: modal, be, participle.",
         "memoryCueId": "Modal pasif itu tiga bagian: can + be + bought."
       },
-      "pedagogicalObjectiveId": "Bikin pasif dengan modal pakai “can be + past participle”.",
+      "pedagogicalObjectiveId": "Bikin pasif dengan modal pakai “can be + bentuk ketiga (Verb 3)”.",
       "misconceptionTargetedId": "Kamu ngilangin “be” sesudah modal atau naruhnya sesudah participle.",
-      "reasoningOperationId": "modal + makna pasif → modal + be + past participle"
+      "reasoningOperationId": "modal + makna pasif → modal + be + bentuk ketiga (Verb 3)"
     },
     {
       "id": "PA-202",
@@ -15599,8 +15599,8 @@
           "option": "have it cutting",
           "misconception": "uses the -ing form instead of the past participle after 'get'",
           "whyFails": "The causative needs the past participle 'cut', not '-ing'.",
-          "whyFailsId": "causative butuh past participle “cut”, bukan -ing.",
-          "misconceptionId": "bentuk -ing dipakai, bukan past participle."
+          "whyFailsId": "causative butuh bentuk ketiga (Verb 3) “cut”, bukan -ing.",
+          "misconceptionId": "bentuk -ing dipakai, bukan bentuk ketiga (Verb 3)."
         },
         {
           "option": "have cut it by me",
@@ -15622,9 +15622,9 @@
         "howToAvoidId": "Tanya siapa yang beneran ngerjain. Orang lain? Pakai have + benda + participle.",
         "memoryCueId": "Perhatikan siapa pelaksananya: jika suatu pekerjaan dikerjakan oleh orang lain atau ahlinya untuk kita, utamakan pola meminta bantuan."
       },
-      "pedagogicalObjectiveId": "Pakai “have + objek + past participle” kalau orang lain yang ngerjain buat kamu.",
+      "pedagogicalObjectiveId": "Pakai “have + objek + bentuk ketiga (Verb 3)” kalau orang lain yang ngerjain buat kamu.",
       "misconceptionTargetedId": "Kamu bilang subjeknya ngerjain sendiri, atau naruh “by” di depan orang yang nyuruh.",
-      "reasoningOperationId": "orang lain yang ngerjain → have + objek + past participle"
+      "reasoningOperationId": "orang lain yang ngerjain → have + objek + bentuk ketiga (Verb 3)"
     },
     {
       "id": "RC-201",
@@ -15935,7 +15935,7 @@
           "option": "has stole",
           "misconception": "malformed passive/perfect blend",
           "whyFails": "'Has stole' mixes a perfect auxiliary with a past simple form; neither the tense nor the form works here.",
-          "whyFailsId": "“has stole” nyampur kata bantu perfect sama bentuk past simple. Bentuk maupun waktunya nggak cocok.",
+          "whyFailsId": "“has stole” nyampur kata bantu perfect sama bentuk bentuk lampau (Verb 2). Bentuk maupun waktunya nggak cocok.",
           "misconceptionId": "campuran pasif dan perfect yang bentuknya rusak."
         },
         {
@@ -15991,7 +15991,7 @@
           "option": "has lived",
           "misconception": "backshift target confused with present perfect",
           "whyFails": "Present simple shifts to past simple, not to the present perfect.",
-          "whyFailsId": "present simple mundur ke past simple, bukan ke present perfect.",
+          "whyFailsId": "present simple mundur ke bentuk lampau (Verb 2), bukan ke present perfect.",
           "misconceptionId": "bentuk sasaran gesernya ketuker sama present perfect."
         },
         {
@@ -16014,9 +16014,9 @@
         "howToAvoidId": "Cari kata kerja aslinya, lalu geser tepat satu langkah ke lampau.",
         "memoryCueId": "Perhatikan pergeseran waktunya: dalam kalimat tidak langsung, bentuk waktu kata kerja bergeser mundur satu langkah ke masa lalu."
       },
-      "pedagogicalObjectiveId": "Mundurin present simple jadi past simple sesudah “said”.",
+      "pedagogicalObjectiveId": "Mundurin present simple jadi bentuk lampau (Verb 2) sesudah “said”.",
       "misconceptionTargetedId": "Kamu biarin bentuk sekarang atau loncat ke bentuk lampau yang salah sesudah kata pelapor lampau.",
-      "reasoningOperationId": "kenali kata pelapor lampau said → geser present simple satu langkah ke belakang → pilih past simple"
+      "reasoningOperationId": "kenali kata pelapor lampau said → geser present simple satu langkah ke belakang → pilih bentuk lampau (Verb 2)"
     },
     {
       "id": "EC-202",
@@ -16824,8 +16824,8 @@
           "option": "read",
           "misconception": "Uses past simple because a specific number of emails is mentioned.",
           "whyFails": "Past simple closes the period, but 'this month' is still going on.",
-          "whyFailsId": "past simple nutup periodenya, padahal “this month” masih jalan.",
-          "misconceptionId": "past simple dipakai padahal rentang waktunya belum tutup."
+          "whyFailsId": "bentuk lampau (Verb 2) nutup periodenya, padahal “this month” masih jalan.",
+          "misconceptionId": "bentuk lampau (Verb 2) dipakai padahal rentang waktunya belum tutup."
         },
         {
           "option": "was reading",
@@ -16851,11 +16851,11 @@
         "ruleId": "Present perfect sama periode yang belum selesai: today, this week, this month, this year.",
         "whyCorrectId": "“This month” belum berakhir, jadi aksi yang selesai di dalamnya pakai present perfect: have read.",
         "whyOthersFailId": "“Read” nganggap bulannya udah selesai. “Was reading” nunjukin proses. “Am reading” artinya saat ini.",
-        "howToAvoidId": "Tanya: periode waktunya masih terbuka? Kalau ya, pakai have/has + past participle.",
+        "howToAvoidId": "Tanya: periode waktunya masih terbuka? Kalau ya, pakai have/has + bentuk ketiga (Verb 3).",
         "memoryCueId": "Perhatikan periode waktunya: jika rentang waktu saat ini belum berakhir dan hasilnya masih bisa bertambah, terapkan bentuk selesai."
       },
       "pedagogicalObjectiveId": "Pakai present perfect sama “this month” karena periodenya masih jalan.",
-      "misconceptionTargetedId": "Kamu pakai past simple karena aksinya udah selesai, padahal periode waktunya masih lanjut.",
+      "misconceptionTargetedId": "Kamu pakai bentuk lampau (Verb 2) karena aksinya udah selesai, padahal periode waktunya masih lanjut.",
       "reasoningOperationId": "kenali periode yang belum selesai this month → pilih present perfect → hindari bentuk lampau tertutup"
     },
     {
@@ -17248,7 +17248,7 @@
       },
       "pedagogicalObjectiveId": "Pakai “It is said that” buat laporin pendapat umum tanpa nyebut siapa yang bilang.",
       "misconceptionTargetedId": "Kamu pakai “they say” aktif dengan bentuk salah, atau ngilangin subjek semu “it”.",
-      "reasoningOperationId": "kenali keyakinan umum tanpa sumber jelas → pilih it + is + past participle + that"
+      "reasoningOperationId": "kenali keyakinan umum tanpa sumber jelas → pilih it + is + bentuk ketiga (Verb 3) + that"
     },
     {
       "id": "PA-205",
@@ -17302,9 +17302,9 @@
         "howToAvoidId": "Tanya: subjeknya ngelakuin aksi atau kena aksi? Kena → to be + participle.",
         "memoryCueId": "Perhatikan subjek penerima tindakannya: sesudah kata modal atau harapan, terapkan bentuk pasif dasar yang tepat."
       },
-      "pedagogicalObjectiveId": "Pakai infinitive pasif “to be + past participle” sesudah “expected”.",
+      "pedagogicalObjectiveId": "Pakai infinitive pasif “to be + bentuk ketiga (Verb 3)” sesudah “expected”.",
       "misconceptionTargetedId": "Kamu pakai infinitive aktif atau -ing sesudah “is expected”.",
-      "reasoningOperationId": "kenali subjeknya yang kena aksi → pilih to be + past participle sesudah expected"
+      "reasoningOperationId": "kenali subjeknya yang kena aksi → pilih to be + bentuk ketiga (Verb 3) sesudah expected"
     },
     {
       "id": "GI-203",
@@ -17414,9 +17414,9 @@
         "howToAvoidId": "Tanya: mungkin tapi nggak dilakuin, dan nggak ada yang disalahin? Pakai “could have”.",
         "memoryCueId": "Could have, tapi nggak."
       },
-      "pedagogicalObjectiveId": "Pakai “could have + past participle” buat kesempatan lampau yang nggak diambil.",
+      "pedagogicalObjectiveId": "Pakai “could have + bentuk ketiga (Verb 3)” buat kesempatan lampau yang nggak diambil.",
       "misconceptionTargetedId": "Kamu pakai “should have” (kritik) atau modal sekarang buat kesempatan lampau yang kelewat.",
-      "reasoningOperationId": "kenali kesempatan lampau yang nggak diambil → pilih could have + past participle → hindari bentuk kritik"
+      "reasoningOperationId": "kenali kesempatan lampau yang nggak diambil → pilih could have + bentuk ketiga (Verb 3) → hindari bentuk kritik"
     },
     {
       "id": "AR-203",
@@ -17559,15 +17559,15 @@
           "option": "have; see",
           "misconception": "Repeats the auxiliary 'have' without the required past participle 'had' for the main verb 'eat/have (a meal)'.",
           "whyFails": "'Have' needs the past participle 'seen', not the base 'see'.",
-          "whyFailsId": "“have” butuh past participle “seen”, bukan “see” polos.",
-          "misconceptionId": "kata bantu “have” diulang tanpa past participle yang dibutuhin kata kerja utamanya."
+          "whyFailsId": "“have” butuh bentuk ketiga (Verb 3) “seen”, bukan “see” polos.",
+          "misconceptionId": "kata bantu “have” diulang tanpa bentuk ketiga (Verb 3) yang dibutuhin kata kerja utamanya."
         },
         {
           "option": "did; see",
           "misconception": "Mixes past simple auxiliary 'did' with present perfect 'have', producing an inconsistent structure.",
           "whyFails": "'Did' is past simple; it does not combine with 'ever' after a superlative.",
-          "whyFailsId": "“did” past simple. Nggak bisa digabung sama “ever” sesudah bentuk paling.",
-          "misconceptionId": "kata bantu past simple “did” dicampur sama present perfect jadi susunannya nggak selaras."
+          "whyFailsId": "“did” bentuk lampau (Verb 2). Nggak bisa digabung sama “ever” sesudah bentuk paling.",
+          "misconceptionId": "kata bantu bentuk lampau (Verb 2) “did” dicampur sama present perfect jadi susunannya nggak selaras."
         }
       ],
       "explanation": {
@@ -17582,9 +17582,9 @@
         "howToAvoidId": "Denger “the -est … ever”? Tutup pakai have/has + participle.",
         "memoryCueId": "Bentuk paling plus “ever” selalu ketemu present perfect: “the best I have ever seen”."
       },
-      "pedagogicalObjectiveId": "Pasangin bentuk paling sama “have ever + past participle”.",
-      "misconceptionTargetedId": "Kamu pakai past simple atau ngulang “have” tanpa participle sesudah bentuk paling + ever.",
-      "reasoningOperationId": "kenali bentuk paling + ever → pilih present perfect → terapin have + past participle"
+      "pedagogicalObjectiveId": "Pasangin bentuk paling sama “have ever + bentuk ketiga (Verb 3)”.",
+      "misconceptionTargetedId": "Kamu pakai bentuk lampau (Verb 2) atau ngulang “have” tanpa participle sesudah bentuk paling + ever.",
+      "reasoningOperationId": "kenali bentuk paling + ever → pilih present perfect → terapin have + bentuk ketiga (Verb 3)"
     },
     {
       "id": "EC-205",
@@ -17664,8 +17664,8 @@
           "option": "studied",
           "misconception": "staying with the past simple, which cannot mark the unreal past that regret needs",
           "whyFails": "Past simple after 'if only' is for a present wish; 'last week' makes this a past regret.",
-          "whyFailsId": "past simple sesudah “if only” buat harapan sekarang. “Last week” bikin ini penyesalan lampau.",
-          "misconceptionId": "past simple dipertahanin buat penyesalan lampau."
+          "whyFailsId": "bentuk lampau (Verb 2) sesudah “if only” buat harapan sekarang. “Last week” bikin ini penyesalan lampau.",
+          "misconceptionId": "bentuk lampau (Verb 2) dipertahanin buat penyesalan lampau."
         },
         {
           "option": "would have studied",
@@ -17695,8 +17695,8 @@
         "memoryCueId": "Udah terlambat buat disesali: “If only I had…”."
       },
       "pedagogicalObjectiveId": "Pakai past perfect sesudah “If only” buat penyesalan soal masa lampau.",
-      "misconceptionTargetedId": "Kamu pakai past simple atau “would have” sesudah “If only” soal kejadian lampau.",
-      "reasoningOperationId": "kenali penyesalan soal kejadian lampau yang selesai → pilih had + past participle sesudah If only"
+      "misconceptionTargetedId": "Kamu pakai bentuk lampau (Verb 2) atau “would have” sesudah “If only” soal kejadian lampau.",
+      "reasoningOperationId": "kenali penyesalan soal kejadian lampau yang selesai → pilih had + bentuk ketiga (Verb 3) sesudah If only"
     },
     {
       "id": "CO-205",
@@ -17720,8 +17720,8 @@
           "option": "turned",
           "misconception": "treats a complaint about repeated behaviour as a wished-for state with wish + past simple",
           "whyFails": "'Wish + past simple' describes a state; a complaint about repeated behaviour uses 'would'.",
-          "whyFailsId": "“wish + past simple” ngegambarin keadaan. Keluhan soal kelakuan berulang pakai “would”.",
-          "misconceptionId": "keluhan soal kebiasaan orang lain dibungkus “wish + past simple”."
+          "whyFailsId": "“wish + bentuk lampau (Verb 2)” ngegambarin keadaan. Keluhan soal kelakuan berulang pakai “would”.",
+          "misconceptionId": "keluhan soal kebiasaan orang lain dibungkus “wish + bentuk lampau (Verb 2)”."
         },
         {
           "option": "turns",
@@ -17751,7 +17751,7 @@
         "memoryCueId": "Kesal sama kelakuan orang lain: “I wish he would stop!”."
       },
       "pedagogicalObjectiveId": "Pakai “wish + would” buat ngeluh soal kelakuan orang lain yang berulang.",
-      "misconceptionTargetedId": "Kamu pakai past simple, bentuk sekarang, atau “will” sesudah “wish” waktu ngeluh soal kebiasaan orang lain.",
+      "misconceptionTargetedId": "Kamu pakai bentuk lampau (Verb 2), bentuk sekarang, atau “will” sesudah “wish” waktu ngeluh soal kebiasaan orang lain.",
       "reasoningOperationId": "kenali keluhan soal kebiasaan orang lain → pilih wish + would + kata kerja dasar"
     },
     {
@@ -17951,7 +17951,7 @@
           "option": "will go",
           "misconception": "marks the clause after 'it's high time' with future 'will' because the action is still to come",
           "whyFails": "'Will' does not follow 'it's time we'; the fixed form is past simple.",
-          "whyFailsId": "“will” nggak ngikut “it's time we”. Bentuk tetapnya past simple.",
+          "whyFailsId": "“will” nggak ngikut “it's time we”. Bentuk tetapnya bentuk lampau (Verb 2).",
           "misconceptionId": "“will” ditambahin sesudah “it's high time” karena aksinya memang belum terjadi."
         },
         {
@@ -17968,15 +17968,15 @@
         "whyOthersFail": "'Go', 'will go', and 'are going' all ignore the unreal-past rule after 'it's time we'.",
         "howToAvoid": "See 'it's time' with a subject after it? Put the verb in the past simple.",
         "memoryCue": "It's time we went.",
-        "ruleId": "It's (high) time + subjek + past simple = sesuatu harusnya terjadi sekarang atau udah seharusnya terjadi.",
+        "ruleId": "It's (high) time + subjek + bentuk lampau (Verb 2) = sesuatu harusnya terjadi sekarang atau udah seharusnya terjadi.",
         "whyCorrectId": "“It's time we” diikuti lampau tak nyata walau maknanya sekarang: it's time we went home.",
         "whyOthersFailId": "“Go”, “will go”, dan “are going” semuanya ngabaikan aturan lampau tak nyata sesudah “it's time we”.",
-        "howToAvoidId": "Lihat “it's time” dengan subjek sesudahnya? Taruh kata kerjanya di past simple.",
+        "howToAvoidId": "Lihat “it's time” dengan subjek sesudahnya? Taruh kata kerjanya di bentuk lampau (Verb 2).",
         "memoryCueId": "Perhatikan urgensinya: ungkapan penegasan waktu mendesak selalu diikuti kalimat bermakna lampau untuk menunjukkan keterlambatan."
       },
-      "pedagogicalObjectiveId": "Pakai past simple sesudah “It's time” walau ngomongin sekarang.",
+      "pedagogicalObjectiveId": "Pakai bentuk lampau (Verb 2) sesudah “It's time” walau ngomongin sekarang.",
       "misconceptionTargetedId": "Kamu pakai kata kerja sekarang atau masa depan sesudah “it's time” + subjek.",
-      "reasoningOperationId": "kenali it's time + subjek → ingat lampau tak nyata → pilih past simple"
+      "reasoningOperationId": "kenali it's time + subjek → ingat lampau tak nyata → pilih bentuk lampau (Verb 2)"
     },
     {
       "id": "CM-206",
@@ -18024,15 +18024,15 @@
         "whyOthersFail": "'Lives' and 'has lived' treat it as real, and 'would live' misplaces a conditional result form.",
         "howToAvoid": "Is the comparison clearly false? Move the verb one step back.",
         "memoryCue": "As if he lived there (he doesn't).",
-        "ruleId": "As if / as though + past simple = nggak nyata sekarang. + bentuk sekarang = mungkin benar.",
-        "whyCorrectId": "Dia nggak pernah tinggal di sana, jadi perbandingan nggak nyatanya pakai past simple: as if he lived there.",
+        "ruleId": "As if / as though + bentuk lampau (Verb 2) = nggak nyata sekarang. + bentuk sekarang = mungkin benar.",
+        "whyCorrectId": "Dia nggak pernah tinggal di sana, jadi perbandingan nggak nyatanya pakai bentuk lampau (Verb 2): as if he lived there.",
         "whyOthersFailId": "“Lives” dan “has lived” nganggap itu nyata. “Would live” salah naruh bentuk akibat pengandaian.",
         "howToAvoidId": "Perbandingannya jelas salah? Geser kata kerjanya satu langkah ke belakang.",
         "memoryCueId": "Perhatikan kenyataannya: pengandaian yang bertolak belakang dengan kenyataan mengterapkan bentuk waktu lampau di bagian penjelasnya."
       },
-      "pedagogicalObjectiveId": "Pakai past simple sesudah “as if” buat sesuatu yang jelas nggak benar.",
+      "pedagogicalObjectiveId": "Pakai bentuk lampau (Verb 2) sesudah “as if” buat sesuatu yang jelas nggak benar.",
       "misconceptionTargetedId": "Kamu biarin bentuk sekarang atau nambah “would” sesudah “as if” padahal perbandingannya nggak nyata.",
-      "reasoningOperationId": "kenali perbandingan nggak nyata sesudah as if → pilih past simple → hindari bentuk sekarang dan would"
+      "reasoningOperationId": "kenali perbandingan nggak nyata sesudah as if → pilih bentuk lampau (Verb 2) → hindari bentuk sekarang dan would"
     },
     {
       "id": "CO-207",
@@ -18064,7 +18064,7 @@
           "misconception": "uses a past form without the modal required in the result clause",
           "whyFails": "Plain past 'was' states a real fact; the situation is imaginary.",
           "whyFailsId": "“was” polos nyatain fakta nyata, padahal situasinya khayalan.",
-          "misconceptionId": "past simple polos “weren't” dipakai di induk kalimat akibat tanpa modal pengandai."
+          "misconceptionId": "bentuk lampau (Verb 2) biasa “weren't” dipakai di induk kalimat akibat tanpa modal pengandai."
         },
         {
           "option": "had been",
@@ -18119,7 +18119,7 @@
           "option": "We had received",
           "misconception": "using normal subject-verb order, missing the inversion signal",
           "whyFails": "Without 'if' or inversion, this is just a statement, not a condition.",
-          "whyFailsId": "tanpa “if” atau inversi, ini cuma kalimat berita, bukan pengandaian.",
+          "whyFailsId": "tanpa “if” atau pembalikan kata bantu, ini cuma kalimat berita, bukan pengandaian.",
           "misconceptionId": "urutan subjek dan kata kerja tetap biasa jadi tanda pembalikannya hilang."
         },
         {
@@ -18143,7 +18143,7 @@
         "memoryCueId": "If we had → Had we."
       },
       "pedagogicalObjectiveId": "Balik “had” dan subjek buat ngegantiin “if” di third conditional yang formal.",
-      "misconceptionTargetedId": "Kamu masih pakai “if” bareng inversi, atau lupa mindahin “had” ke depan.",
+      "misconceptionTargetedId": "Kamu masih pakai “if” bareng pembalikan kata bantu, atau lupa mindahin “had” ke depan.",
       "reasoningOperationId": "kenali pengandaian lampau nggak nyata yang formal → buang if → pindahin had ke depan subjek"
     },
     {
@@ -18175,14 +18175,14 @@
           "option": "I saw",
           "misconception": "Fronts 'Never' with no auxiliary at all, ignoring both the inversion rule and the need for 'have' with 'before'.",
           "whyFails": "No inversion and no auxiliary: the fronted adverb demands both.",
-          "whyFailsId": "nggak ada inversi dan nggak ada kata bantu. Kata keterangan di depan nuntut keduanya.",
+          "whyFailsId": "kata bantu belum dipindah ke depan subjek dan nggak ada kata bantu. Kata keterangan di depan nuntut keduanya.",
           "misconceptionId": "“Never” dimajuin tanpa kata bantu sama sekali, aturan pembalikan dan kebutuhan “have” sama-sama diabaikan."
         },
         {
           "option": "saw I",
           "misconception": "Places 'never' after the auxiliary instead of at the very front of the sentence.",
           "whyFails": "Inversion uses an auxiliary (have/do/did), not the main verb alone.",
-          "whyFailsId": "inversi pakai kata bantu (have/do/did), bukan kata kerja utama sendirian.",
+          "whyFailsId": "pembalikan kata bantu pakai kata bantu (have/do/did), bukan kata kerja utama sendirian.",
           "misconceptionId": "“never” ditaruh sesudah kata bantunya, bukan di posisi paling depan kalimat."
         }
       ],
@@ -18193,7 +18193,7 @@
         "howToAvoid": "Fronted rarely/never? Build it like a question: have I seen.",
         "memoryCue": "Rarely have I…",
         "ruleId": "Kalau susunan normal: Keterangan penegas ditaruh di tengah kalimat. Contoh: <b>I have never seen such a view</b> (Aku belum pernah melihat pemandangan seperti itu).<br>Kalau susunan dibalik (pembalikan kata bantu ke depan subjek untuk penekanan): Ketika kata penegas bernada negatif (Never, Rarely, Seldom, Hardly, Not only) ditaruh di AWAL kalimat, susunan kata bantu dan subjek WAJIB DIBALIK persis seperti kalimat tanya! Contoh: <b>Never have I seen such a view</b> atau <b>Rarely did she speak</b>.<br><br>💡 <b>RUMUS KILAT</b>:<br>Kata penegas di awal (Never, Rarely, Seldom, Not only) ➡️ Wajib dibalik: <b>Kata Penegas + Kata Bantu + Subjek + Verb</b>.<br>Kalimat lampau tanpa kata bantu ➡️ Munculkan <b>did + Subjek + Verb 1</b> (contoh: <i>Rarely did he come</i>).<br>Jangan susun normal jika kata penegas di depan ➡️ Salah besar: <i>Never I have seen</i> ❌!",
-        "whyCorrectId": "“Rarely” di depan memicu inversi: kata bantu “have” pindah ke depan “I”.",
+        "whyCorrectId": "“Rarely” di depan membuat kata bantu pindah ke depan subjek: kata bantu “have” pindah ke depan “I”.",
         "whyOthersFailId": "“I have seen” dan “I saw” urutannya biasa. “Saw I” ngebalik kata kerja utama, bukan kata bantu.",
         "howToAvoidId": "Rarely/never di depan? Susun kayak pertanyaan: have I seen.",
         "memoryCueId": "Rarely have I…"
@@ -18224,21 +18224,21 @@
           "option": "the boats left",
           "misconception": "keeps ordinary statement order after a fronted restrictive phrase",
           "whyFails": "A fronted 'Only when' clause forces inversion in the main clause.",
-          "whyFailsId": "klausa “Only when” di depan maksa inversi di klausa utama.",
+          "whyFailsId": "klausa “Only when” di depan membuat kata bantu pindah ke depan subjek di klausa utama.",
           "misconceptionId": "urutan pernyataan biasa dipertahanin sesudah frasa pembatas dimajuin."
         },
         {
           "option": "left the boats",
           "misconception": "inverts the lexical verb directly",
           "whyFails": "Inversion needs an auxiliary; the main verb alone cannot move in front.",
-          "whyFailsId": "inversi butuh kata bantu. Kata kerja utama sendirian nggak bisa pindah ke depan.",
+          "whyFailsId": "pembalikan kata bantu butuh kata bantu. Kata kerja utama sendirian nggak bisa pindah ke depan.",
           "misconceptionId": "kata kerja utamanya langsung dibalik."
         },
         {
           "option": "the boats did leave",
           "misconception": "adds emphatic do but does not invert it with the subject",
           "whyFails": "'Did' is present but stays after the subject, so there is no inversion.",
-          "whyFailsId": "“did” ada tapi tetap sesudah subjek, jadi nggak ada inversi.",
+          "whyFailsId": "“did” ada tapi tetap sesudah subjek, jadi kata bantu belum dipindah ke depan subjek.",
           "misconceptionId": "kata bantu penegas ditambahin tapi nggak dibalik sama subjeknya."
         }
       ],
@@ -18249,7 +18249,7 @@
         "howToAvoid": "Does the sentence start with 'Only after/when/then'? Put did/does/have before the subject.",
         "memoryCue": "Only when … did the boats leave.",
         "ruleId": "Kalau susunan kalimat normal: Frasa pembatas “only” berada di posisi biasa. Contoh: <b>We realized the truth only after reading the letter</b>.<br>Kalau frasa pembatas “Only” (Only after, Only when, Only then, Only by) ditaruh di AWAL kalimat: Kalimat utama di belakangnya WAJIB DIBALIK persis seperti susunan kalimat tanya (Kata Bantu + Subjek + Kata Kerja)! Contoh: <b>Only after reading the letter did we realize the truth</b> (Bukan <i>we realized</i> ❌).<br><br>💡 <b>RUMUS KILAT</b>:<br>Di awal kalimat ada <b>Only after / Only when / Only then</b> ➡️ Kalimat utama setelahnya <b>wajib dibalik</b> (kata bantu mendahului subjek).<br>Kalimat lampau ➡️ Pasang <b>did + Subjek + Verb 1</b> (contoh: <i>Only then did I know</i>).<br>Jangan susun biasa ➡️ Dilarang menulis subjek sebelum kata bantu jika ada frasa 'Only' di paling depan!",
-        "whyCorrectId": "“Only when…” di depan memicu inversi kata bantu: did the boats leave.",
+        "whyCorrectId": "“Only when…” di depan membuat kata bantu pindah ke depan subjek kata bantu: did the boats leave.",
         "whyOthersFailId": "Dua pilihan urutannya biasa, satu mindahin kata kerja utama, bukan kata bantu.",
         "howToAvoidId": "Kalimatnya mulai dari “Only after/when/then”? Taruh did/does/have sebelum subjek.",
         "memoryCueId": "Perhatikan letak frasanya: jika frasa pembatas ditaruh di paling depan kalimat, susunan kalimat utama setelahnya wajib dibalik."
@@ -18343,14 +18343,14 @@
           "option": "If were she to accept",
           "misconception": "Adds 'if' to a structure that already signals conditionality through inversion.",
           "whyFails": "'If' and the inversion cannot appear together; choose one.",
-          "whyFailsId": "“if” dan inversi nggak bisa muncul bareng. Pilih satu.",
+          "whyFailsId": "“if” dan pembalikan kata bantu nggak bisa muncul bareng. Pilih satu.",
           "misconceptionId": "“if” ditambahin ke susunan yang udah nandain pengandaian lewat pembalikan."
         },
         {
           "option": "She were to accept",
           "misconception": "Drops the inversion, leaving a non-inverted fragment without 'if'.",
           "whyFails": "Without inversion or 'if', this is not a conditional clause.",
-          "whyFailsId": "tanpa inversi atau “if”, ini bukan klausa pengandaian.",
+          "whyFailsId": "tanpa pembalikan kata bantu atau “if”, ini bukan klausa pengandaian.",
           "misconceptionId": "pembalikannya dihilangin jadi tersisa penggalan tanpa “if”."
         }
       ],
@@ -18362,12 +18362,12 @@
         "memoryCue": "If she were to → Were she to.",
         "ruleId": "Kalau pengandaian biasa (Second Conditional): Memakai kata “if” + Verb 2. Contoh: <b>If I were to win the lottery, I would travel</b> (Kalau aku sampai menang lotre).<br>Kalau versi formal/sastra (Pembalikan posisi kata bantu tanpa “if”): Kata “if” DIBUANG, dan kata “Were” langsung ditaruh di paling depan kalimat sebelum subjek! Polanya: “Were” + Subjek + “to” + kata kerja dasar. Contoh: <b>Were I to win the lottery, I would travel</b> (maknanya persis sama, hanya jauh lebih formal).<br><br>💡 <b>RUMUS KILAT</b>:<br>Pakai “if” ➡️ <b>If + Subjek + were to + Verb 1</b>.<br>Tanpa “if” (pembalikan kata kerja bantu ke depan) ➡️ <b>Were + Subjek + to + Verb 1</b> (kata 'if' wajib dibuang!).<br>Ada kata “be” tanpa kata kerja aksi ➡️ <b>Were + Subjek + [kata sifat/benda]</b> (contoh: <i>Were I you</i>).",
         "whyCorrectId": "Buang “if” dan pindahin “were” ke depan jadi pengandaian formal: Were she to accept the offer.",
-        "whyOthersFailId": "“Was” nggak dipakai di pola ini. “If were” penandanya dobel. “She were to” nggak ada inversi.",
+        "whyOthersFailId": "“Was” nggak dipakai di pola ini. “If were” penandanya dobel. “She were to” kata bantu belum dipindah ke depan subjek.",
         "howToAvoidId": "Tulis “If she were to accept”, lalu hapus “if” dan tuker: Were she to accept.",
         "memoryCueId": "If she were to → Were she to."
       },
       "pedagogicalObjectiveId": "Pakai “Were + subjek + to + kata kerja” buat pengandaian formal yang kecil kemungkinannya.",
-      "misconceptionTargetedId": "Kamu pakai “was” atau masih pakai “if” bareng inversi.",
+      "misconceptionTargetedId": "Kamu pakai “was” atau masih pakai “if” bareng pembalikan kata bantu.",
       "reasoningOperationId": "kenali pengandaian formal yang kecil kemungkinannya → buang if → taruh were di depan subjek dan tambah to"
     },
     {
@@ -24464,13 +24464,13 @@
         "whyOthersFail": "'Watched' makes it a short finished action, 'was watching' is for I, he, she, or it, and 'are watching' is present.",
         "howToAvoid": "Find the two actions: which was already happening, and which happened suddenly?",
         "memoryCue": "Long action: were + -ing. Short event: went out.",
-        "ruleId": "Kegiatan panjang yang sedang berlangsung pakai “was/were” + -ing. Kejadian singkat yang memotongnya pakai past simple.",
+        "ruleId": "Kegiatan panjang yang sedang berlangsung pakai “was/were” + -ing. Kejadian singkat yang memotongnya pakai bentuk lampau (Verb 2).",
         "whyCorrectId": "Menonton TV adalah kegiatan panjang yang sedang berlangsung, dan “we” pakai “were”, jadi “were watching”.",
         "whyOthersFailId": "“Watched” membuatnya jadi kejadian singkat yang selesai, “was watching” untuk “I”, “he”, “she”, atau “it”, dan “are watching” bentuk sekarang.",
         "howToAvoidId": "Cari dua kejadiannya: mana yang sedang berlangsung, dan mana yang terjadi tiba-tiba?",
         "memoryCueId": "Kegiatan panjang: “were” + -ing. Kejadian singkat: “went out”."
       },
-      "pedagogicalObjectiveId": "Pakai “was/were” + -ing untuk kegiatan panjang di masa lalu, dan past simple untuk kejadian singkat yang memotongnya. Contoh: “We were watching TV when the lights went out.”",
+      "pedagogicalObjectiveId": "Pakai “was/were” + -ing untuk kegiatan panjang di masa lalu, dan bentuk lampau (Verb 2) untuk kejadian singkat yang memotongnya. Contoh: “We were watching TV when the lights went out.”",
       "misconceptionTargetedId": "Kamu memakai bentuk yang sama untuk kedua kejadian, karena kata “sedang” sering dihilangkan.",
       "reasoningOperationId": "cari kejadian singkatnya, yaitu lampu padam → pastikan menonton TV kegiatan yang panjang → gabungkan “were” dengan -ing"
     },
@@ -24520,15 +24520,15 @@
         "whyOthersFail": "'Was ringing' makes it a long action, 'rings' is present, and 'ringed' is not the past of ring.",
         "howToAvoid": "Find the two actions: which was already happening, and which happened suddenly?",
         "memoryCue": "Suddenly = a short event = past simple.",
-        "ruleId": "Kegiatan panjang yang sedang berlangsung pakai “was/were” + -ing. Kejadian singkat yang memotongnya pakai past simple.",
-        "whyCorrectId": "“Suddenly” menunjukkan kejadian singkat yang memotong tidurku, jadi pakai past simple, yaitu “rang”.",
+        "ruleId": "Kegiatan panjang yang sedang berlangsung pakai “was/were” + -ing. Kejadian singkat yang memotongnya pakai bentuk lampau (Verb 2).",
+        "whyCorrectId": "“Suddenly” menunjukkan kejadian singkat yang memotong tidurku, jadi pakai bentuk lampau (Verb 2), yaitu “rang”.",
         "whyOthersFailId": "“Was ringing” membuatnya jadi kegiatan panjang, “rings” bentuk sekarang, dan “ringed” bukan bentuk lampau dari “ring”.",
         "howToAvoidId": "Cari dua kejadiannya: mana yang sedang berlangsung, dan mana yang terjadi tiba-tiba?",
         "memoryCueId": "Perhatikan sifat peristiwanya: kejadian singkat mendadak yang memotong kejadian lain dinyatakan dengan bentuk lampau."
       },
-      "pedagogicalObjectiveId": "Pakai “was/were” + -ing untuk kegiatan panjang di masa lalu, dan past simple untuk kejadian singkat yang memotongnya. Contoh: “I was sleeping when my phone suddenly rang.”",
+      "pedagogicalObjectiveId": "Pakai “was/were” + -ing untuk kegiatan panjang di masa lalu, dan bentuk lampau (Verb 2) untuk kejadian singkat yang memotongnya. Contoh: “I was sleeping when my phone suddenly rang.”",
       "misconceptionTargetedId": "Kamu memakai bentuk yang sama untuk kedua kejadian, karena kata “sedang” sering dihilangkan.",
-      "reasoningOperationId": "perhatikan kata “suddenly” → pastikan dering ponsel kejadian singkat → pilih bentuk past simple dari “ring”"
+      "reasoningOperationId": "perhatikan kata “suddenly” → pastikan dering ponsel kejadian singkat → pilih bentuk bentuk lampau (Verb 2) dari “ring”"
     },
     {
       "id": "A2-343",
@@ -24576,13 +24576,13 @@
         "whyOthersFail": "'Was you doing' uses the wrong be for you, 'you were doing' keeps statement order, and 'are you doing' is present.",
         "howToAvoid": "Find the two actions: which was already happening, and which happened suddenly?",
         "memoryCue": "In progress in the past? Were you + -ing?",
-        "ruleId": "Kegiatan panjang yang sedang berlangsung pakai “was/were” + -ing. Kejadian singkat yang memotongnya pakai past simple.",
+        "ruleId": "Kegiatan panjang yang sedang berlangsung pakai “was/were” + -ing. Kejadian singkat yang memotongnya pakai bentuk lampau (Verb 2).",
         "whyCorrectId": "Pertanyaannya menanyakan kegiatan yang sedang berlangsung saat guru masuk, dan “you” pakai “were”, jadi “were you doing”.",
         "whyOthersFailId": "“Was you doing” memakai bentuk “be” yang salah untuk “you”, “you were doing” memakai susunan kalimat berita, dan “are you doing” bentuk sekarang.",
         "howToAvoidId": "Cari dua kejadiannya: mana yang sedang berlangsung, dan mana yang terjadi tiba-tiba?",
         "memoryCueId": "Sedang berlangsung di masa lalu? “Were you” + -ing?"
       },
-      "pedagogicalObjectiveId": "Pakai “was/were” + -ing untuk kegiatan panjang di masa lalu, dan past simple untuk kejadian singkat yang memotongnya. Contoh: “What were you doing when the teacher came in?”",
+      "pedagogicalObjectiveId": "Pakai “was/were” + -ing untuk kegiatan panjang di masa lalu, dan bentuk lampau (Verb 2) untuk kejadian singkat yang memotongnya. Contoh: “What were you doing when the teacher came in?”",
       "misconceptionTargetedId": "Kamu memakai bentuk yang sama untuk kedua kejadian, karena kata “sedang” sering dihilangkan.",
       "reasoningOperationId": "perhatikan kata “when” → pastikan yang ditanya kegiatan yang sedang berlangsung → taruh “were” sebelum “you”"
     },
@@ -24632,13 +24632,13 @@
         "whyOthersFail": "'Was breaking' makes it a long action, 'breaked' is not a real past form, and 'has broken' does not go with a finished past time.",
         "howToAvoid": "Find the two actions: which was already happening, and which happened suddenly?",
         "memoryCue": "A short event inside a long one: past simple.",
-        "ruleId": "Kegiatan panjang yang sedang berlangsung pakai “was/were” + -ing. Kejadian singkat yang memotongnya pakai past simple.",
-        "whyCorrectId": "Patah tangan itu kejadian singkat di tengah permainan yang panjang, jadi pakai past simple, yaitu “broke”.",
+        "ruleId": "Kegiatan panjang yang sedang berlangsung pakai “was/were” + -ing. Kejadian singkat yang memotongnya pakai bentuk lampau (Verb 2).",
+        "whyCorrectId": "Patah tangan itu kejadian singkat di tengah permainan yang panjang, jadi pakai bentuk lampau (Verb 2), yaitu “broke”.",
         "whyOthersFailId": "“Was breaking” membuatnya jadi kegiatan panjang, “breaked” bukan bentuk lampau yang benar, dan “has broken” nggak cocok dengan waktu lampau yang sudah selesai.",
         "howToAvoidId": "Cari dua kejadiannya: mana yang sedang berlangsung, dan mana yang terjadi tiba-tiba?",
-        "memoryCueId": "Kejadian singkat di tengah kegiatan panjang: past simple."
+        "memoryCueId": "Kejadian singkat di tengah kegiatan panjang: bentuk lampau (Verb 2)."
       },
-      "pedagogicalObjectiveId": "Pakai “was/were” + -ing untuk kegiatan panjang di masa lalu, dan past simple untuk kejadian singkat yang memotongnya. Contoh: “Rani broke her arm while she was playing basketball.”",
+      "pedagogicalObjectiveId": "Pakai “was/were” + -ing untuk kegiatan panjang di masa lalu, dan bentuk lampau (Verb 2) untuk kejadian singkat yang memotongnya. Contoh: “Rani broke her arm while she was playing basketball.”",
       "misconceptionTargetedId": "Kamu memakai bentuk yang sama untuk kedua kejadian, karena kata “sedang” sering dihilangkan.",
       "reasoningOperationId": "cari kegiatan panjangnya, “was playing” → pastikan patahnya kejadian singkat → pilih bentuk lampau khusus dari “break”"
     },
