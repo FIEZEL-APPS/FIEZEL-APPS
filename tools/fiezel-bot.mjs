@@ -865,9 +865,17 @@ function buildFileContext(changedFiles, diffMap, opts = {}) {
   // Putaran 1: semua berkas yang muat UTUH (urutan prioritas). Putaran 2: sisa
   // anggaran untuk potongan berkas yang tidak muat — berkas kecil tidak boleh
   // terbuang hanya karena berkas besar di depannya menghabiskan anggaran.
+  // Putaran 1 memilih berkas TERKECIL dulu: satu berkas raksasa (mis. engine 150 ribu
+  // karakter) tidak boleh menghabiskan anggaran sehingga berkas kecil yang justru inti
+  // perubahan terbuang (kasus nyata PR #502, ujian #3). Urutan tampil tetap prioritas.
+  const fitsFully = new Set();
+  let planned = 0;
+  for (const p of [...prepared].sort((a, b) => a.size - b.size)) {
+    if (planned + p.size <= budget) { fitsFully.add(p); planned += p.size; }
+  }
   const deferred = [];
   for (const p of prepared) {
-    if (used + p.size <= budget) emit(p, p.rendered, false);
+    if (fitsFully.has(p)) emit(p, p.rendered, false);
     else deferred.push(p);
   }
   for (const p of deferred) {
@@ -2190,6 +2198,12 @@ async function runSelfTest() {
   // Anggaran sempit: berkas kedua dikirim TERPOTONG, bukan dibuang.
   const tight = buildFileContext(['big.js', 'small2.js'], new Map([['big.js', { added: new Set([1500]), right: new Set([1500]) }]]),
     { readLines: (f) => (f === 'big.js' ? big : f === 'small2.js' ? Array.from({ length: 400 }, (_, i) => `const v${i} = ${i};`) : null), budget: 12000 });
+  // Berkas raksasa tidak boleh membuang berkas kecil: dengan anggaran yang hanya muat
+  // satu, yang kecil masuk UTUH dan yang besar terpotong.
+  const giant = Array.from({ length: 2000 }, (_, i) => `const g${i} = ${i}; // ${'z'.repeat(40)}`);
+  const squeeze = buildFileContext(['giant.js', 'tiny.js'], new Map([['giant.js', { added: new Set(giant.map((_, i) => i + 1)), right: new Set() }], ['tiny.js', { added: new Set([1]), right: new Set([1]) }]]),
+    { readLines: (f) => (f === 'giant.js' ? giant : f === 'tiny.js' ? ['export const kecil = 1;'] : null), budget: 30000 });
+  if (!squeeze.included.includes('tiny.js') || squeeze.partial.join() !== 'giant.js' || squeeze.omitted.length) throw new Error(`T18 FAIL: berkas kecil terbuang ${JSON.stringify(squeeze)}`.slice(0, 300));
   if (tight.included.join() !== 'big.js,small2.js' || tight.partial.join() !== 'small2.js' || !tight.text.includes('terpotong: anggaran') || tight.text.length > 12000 || tight.sentLines.get('small2.js').has(400)) {
     throw new Error(`T18 FAIL: potongan anggaran ${tight.included}/${tight.partial}/${tight.text.length}`);
   }
