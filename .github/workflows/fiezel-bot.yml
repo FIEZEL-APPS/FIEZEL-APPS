@@ -1,5 +1,22 @@
 name: FIEZEL Bot (Autonomous AI Reviewer & Auto-Fix)
 
+# ─────────────────────────────────────────────────────────────────────────────
+# HARDENING v2.1 (audit keamanan 2026-10-05)
+#  - Trigger `issue_comment` DIHAPUS: sebelumnya aktor anonim mana pun bisa
+#    menulis `@fiezel-bot heal` dan memicu push (setiap job punya
+#    contents: write). Kini hanya peristiwa repo tepercaya (PR milik repo ini)
+#    atau dispatch manual oleh MASTER.
+#  - SEMUA ekspresi `${{ }}` di dalam blok `run:` dipindah ke `env:` agar tidak
+#    ada script injection lewat nama branch/PR dari fork.
+#  - PR dari FORK DITOLAK di kedua job (fork tidak boleh menjalankan bot ini).
+#  - Gate aktor keras: hanya `FIEZEL-APPS` (identitas MASTER) yang diizinkan.
+#  - Heal di-checkout pada COMMIT YANG GAGAL (head_sha), bukan ujung branch.
+#  - Push hanya berkas yang benar-benar dipatch (bukan `git add -A`) dan
+#    MENOLAK branch terproteksi (main/master).
+#  - Concurrency dikelompokkan per-branch PR (bukan per run) sehingga heal
+#    tidak balapan dengan dirinya sendiri.
+# ─────────────────────────────────────────────────────────────────────────────
+
 on:
   pull_request:
     branches: [main]
@@ -10,15 +27,13 @@ on:
       - FIEZEL A6 A7 Automated Verifiers
       - FIEZEL A9 A14 Autonomous Guardians
     types: [completed]
-  issue_comment:
-    types: [created]
   workflow_dispatch:
     inputs:
       pr_number:
         description: 'Nomor PR yang ingin diproses'
         required: true
       command:
-        description: 'Perintah bot (review / fix / heal / bump / explain)'
+        description: 'Perintah bot (review / explain / fix / heal / bump)'
         required: true
         default: 'review'
 
@@ -29,8 +44,10 @@ permissions:
   actions: read
 
 concurrency:
-  group: fiezel-bot-${{ github.event.issue.number || github.event.pull_request.number || github.event.workflow_run.id || github.run_id }}
-  cancel-in-progress: true
+  # Dikelompokkan per PR/branch agar tiga kegagalan pada PR yang sama tidak
+  # memicu tiga heal paralel yang saling menimpa push.
+  group: fiezel-bot-${{ github.event.pull_request.number || github.event.workflow_run.pull_requests[0].number || github.event.workflow_run.head_branch || github.event.inputs.pr_number || github.run_id }}
+  cancel-in-progress: false
 
 jobs:
   # 1. Otomatis Review Setiap PR Dibuka atau Diperbarui (Zero Manual Command)
@@ -38,60 +55,94 @@ jobs:
     name: Auto PR Review & Invariant Audit
     timeout-minutes: 20
     runs-on: ubuntu-latest
+    # KEAMANAN: tolak PR dari fork + wajib penulis OWNER/MEMBER. Hanya MASTER
+    # (FIEZEL-APPS) yang boleh memicu lewat workflow_dispatch.
     if: |
-      (github.event_name == 'pull_request' && !github.event.pull_request.draft) ||
-      (github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '@fiezel-bot') && !contains(github.event.comment.body, 'heal') && !contains(github.event.comment.body, 'fix'))
+      (github.event_name == 'pull_request' &&
+        !github.event.pull_request.draft &&
+        github.event.pull_request.head.repo.full_name == github.repository &&
+        (github.event.pull_request.author_association == 'OWNER' ||
+         github.event.pull_request.author_association == 'MEMBER')) ||
+      (github.event_name == 'workflow_dispatch' &&
+        github.actor == 'FIEZEL-APPS' &&
+        (github.event.inputs.command == 'review' || github.event.inputs.command == 'explain'))
     steps:
+      - name: Guard — assert actor is MASTER
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          ACTOR: ${{ github.actor }}
+          ASSOC: ${{ github.event.pull_request.author_association }}
+        run: |
+          set -euo pipefail
+          if [[ "$EVENT_NAME" == "pull_request" && "$ASSOC" != "OWNER" && "$ASSOC" != "MEMBER" ]]; then
+            echo "BLOCKED: PR author association '$ASSOC' has no execution authority."; exit 1
+          fi
+          if [[ "$EVENT_NAME" == "workflow_dispatch" && "$ACTOR" != "FIEZEL-APPS" ]]; then
+            echo "BLOCKED: dispatch actor '$ACTOR' is not MASTER."; exit 1
+          fi
+          echo "PASS: review authorized."
+
       - name: Resolve PR info
         id: meta
         env:
           GH_TOKEN: ${{ github.token }}
           EVENT_NAME: ${{ github.event_name }}
           REPO: ${{ github.repository }}
+          PR_EVENT_NUMBER: ${{ github.event.pull_request.number }}
+          INPUT_PR: ${{ github.event.inputs.pr_number }}
         run: |
           set -euo pipefail
           if [[ "$EVENT_NAME" == "pull_request" ]]; then
-            pr_num="${{ github.event.pull_request.number }}"
-            head_branch="${{ github.event.pull_request.head.ref }}"
+            pr_num="$PR_EVENT_NUMBER"
           else
-            pr_num="${{ github.event.issue.number }}"
-            head_branch="$(gh pr view "$pr_num" --repo "$REPO" --json headRefName -q .headRefName)"
+            pr_num="$INPUT_PR"
           fi
+          head_branch="$(gh pr view "$pr_num" --repo "$REPO" --json headRefName -q .headRefName)"
           echo "pr_number=$pr_num" >> "$GITHUB_OUTPUT"
           echo "head_branch=$head_branch" >> "$GITHUB_OUTPUT"
 
       - name: Checkout PR Branch
+        if: steps.meta.outputs.pr_number != '' && steps.meta.outputs.head_branch != ''
         uses: actions/checkout@v4
         with:
           ref: ${{ steps.meta.outputs.head_branch }}
           fetch-depth: 0
 
       - name: Setup Node.js 22
+        if: steps.meta.outputs.pr_number != ''
         uses: actions/setup-node@v4
         with:
           node-version: '22'
 
-      - name: Generate AI Code Review
+      - name: Generate AI Code Review / Explanation
+        if: steps.meta.outputs.pr_number != ''
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           GITHUB_TOKEN: ${{ github.token }}
           GH_TOKEN: ${{ github.token }}
           PR_NUM: ${{ steps.meta.outputs.pr_number }}
+          EVENT_NAME: ${{ github.event_name }}
+          COMMAND: ${{ github.event.inputs.command }}
         run: |
           set -euo pipefail
           mkdir -p /tmp/fiezel-bot
-          node tools/fiezel-bot.mjs review --pr="$PR_NUM" > /tmp/fiezel-bot/raw.log 2>&1 || true
-          sed -n '/<!-- FIEZEL_BOT_REVIEW -->/,$p' /tmp/fiezel-bot/raw.log > /tmp/fiezel-bot/review.md || cp /tmp/fiezel-bot/raw.log /tmp/fiezel-bot/review.md
+          if [[ "$EVENT_NAME" == "workflow_dispatch" && "$COMMAND" == "explain" ]]; then
+            node tools/fiezel-bot.mjs explain --pr="$PR_NUM" > /tmp/fiezel-bot/out.md 2>&1 || true
+          else
+            node tools/fiezel-bot.mjs review --pr="$PR_NUM" > /tmp/fiezel-bot/raw.log 2>&1 || true
+            sed -n '/<!-- FIEZEL_BOT_REVIEW -->/,$p' /tmp/fiezel-bot/raw.log > /tmp/fiezel-bot/out.md || cp /tmp/fiezel-bot/raw.log /tmp/fiezel-bot/out.md
+          fi
 
       - name: Upsert review comment on PR (No Spam, Single Living Comment)
+        if: steps.meta.outputs.pr_number != ''
         uses: actions/github-script@v7
         env:
           PR_NUMBER: ${{ steps.meta.outputs.pr_number }}
         with:
           script: |
             const fs = require('fs');
-            const path = '/tmp/fiezel-bot/review.md';
+            const path = '/tmp/fiezel-bot/out.md';
             if (!fs.existsSync(path)) return;
             const body = fs.readFileSync(path, 'utf8').trim();
             if (!body) return;
@@ -114,31 +165,71 @@ jobs:
     name: Auto CI Self-Healing & Fix
     timeout-minutes: 20
     runs-on: ubuntu-latest
+    # KEAMANAN: tolak fork, wajib run berasal dari repo ini, aktor MASTER saja.
     if: |
-      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'failure') ||
-      (github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '@fiezel-bot heal'))
+      (github.event_name == 'workflow_run' &&
+        github.event.workflow_run.conclusion == 'failure' &&
+        github.event.workflow_run.head_repository.full_name == github.repository &&
+        (github.actor == 'FIEZEL-APPS' ||
+         github.event.workflow_run.actor.login == 'FIEZEL-APPS')) ||
+      (github.event_name == 'workflow_dispatch' &&
+        github.actor == 'FIEZEL-APPS' &&
+        (github.event.inputs.command == 'heal' ||
+         github.event.inputs.command == 'fix' ||
+         github.event.inputs.command == 'bump'))
     steps:
+      - name: Guard — assert actor is MASTER and repo is not a fork
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          ACTOR: ${{ github.actor }}
+          WR_ACTOR: ${{ github.event.workflow_run.actor.login }}
+          HEAD_REPO: ${{ github.event.workflow_run.head_repository.full_name }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          if [[ "$EVENT_NAME" == "workflow_run" ]]; then
+            if [[ "$HEAD_REPO" != "$REPO" ]]; then
+              echo "BLOCKED: failed run originated from fork '$HEAD_REPO'."; exit 1
+            fi
+            if [[ "$ACTOR" != "FIEZEL-APPS" && "$WR_ACTOR" != "FIEZEL-APPS" ]]; then
+              echo "BLOCKED: heal actor '$ACTOR'/'$WR_ACTOR' is not MASTER."; exit 1
+            fi
+          else
+            if [[ "$ACTOR" != "FIEZEL-APPS" ]]; then
+              echo "BLOCKED: dispatch actor '$ACTOR' is not MASTER."; exit 1
+            fi
+          fi
+          echo "PASS: heal authorized."
+
       - name: Resolve Failed PR and Evidence
         id: collect
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
           EVENT_NAME: ${{ github.event_name }}
+          WR_RUN_ID: ${{ github.event.workflow_run.id }}
+          WR_HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+          WR_HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          INPUT_PR: ${{ github.event.inputs.pr_number }}
+          COMMAND: ${{ github.event.inputs.command }}
         run: |
           set -euo pipefail
           mkdir -p /tmp/fiezel-bot
+          pr_num=""; head_branch=""; head_sha=""
+
           if [[ "$EVENT_NAME" == "workflow_run" ]]; then
-            run_id="${{ github.event.workflow_run.id }}"
-            head_branch="${{ github.event.workflow_run.head_branch }}"
+            run_id="$WR_RUN_ID"
+            head_branch="$WR_HEAD_BRANCH"
+            head_sha="$WR_HEAD_SHA"
             pr_num="$(jq -r '.workflow_run.pull_requests[0].number // empty' "$GITHUB_EVENT_PATH")"
             if [[ -z "$pr_num" && -n "$head_branch" ]]; then
               pr_num="$(gh pr list --repo "$REPO" --head "$head_branch" --state open --json number --jq '.[0].number // empty')"
             fi
             gh run view "$run_id" --repo "$REPO" --log-failed > /tmp/fiezel-bot/failed.log 2>&1 || true
           else
-            pr_num="${{ github.event.issue.number }}"
+            pr_num="$INPUT_PR"
             head_branch="$(gh pr view "$pr_num" --repo "$REPO" --json headRefName -q .headRefName)"
-            # Ambil log kegagalan run terakhir di branch ini
+            head_sha="$(gh pr view "$pr_num" --repo "$REPO" --json headRefOid -q .headRefOid)"
             latest_run="$(gh run list --repo "$REPO" --branch "$head_branch" --status failure --limit 1 --json databaseId -q '.[0].databaseId // empty')"
             if [[ -n "$latest_run" ]]; then
               gh run view "$latest_run" --repo "$REPO" --log-failed > /tmp/fiezel-bot/failed.log 2>&1 || true
@@ -147,72 +238,128 @@ jobs:
 
           echo "pr_number=$pr_num" >> "$GITHUB_OUTPUT"
           echo "head_branch=$head_branch" >> "$GITHUB_OUTPUT"
+          echo "head_sha=$head_sha" >> "$GITHUB_OUTPUT"
 
-      - name: Checkout PR Branch
-        if: steps.collect.outputs.pr_number != '' && steps.collect.outputs.head_branch != ''
+      - name: Refuse protected branch
+        id: guard
+        if: steps.collect.outputs.head_branch != ''
+        env:
+          HEAD_BRANCH: ${{ steps.collect.outputs.head_branch }}
+        run: |
+          set -euo pipefail
+          case "$HEAD_BRANCH" in
+            main|master)
+              echo "⛔ Menolak heal pada branch terproteksi '$HEAD_BRANCH'."
+              echo "protected=true" >> "$GITHUB_OUTPUT"
+              ;;
+            *) echo "protected=false" >> "$GITHUB_OUTPUT" ;;
+          esac
+
+      - name: Checkout Failed Commit
+        if: steps.collect.outputs.pr_number != '' && steps.collect.outputs.head_sha != '' && steps.guard.outputs.protected == 'false'
         uses: actions/checkout@v4
         with:
-          ref: ${{ steps.collect.outputs.head_branch }}
+          # PENTING: checkout pada commit yang SEBENARNYA gagal (head_sha),
+          # bukan ujung branch yang mungkin sudah maju.
+          ref: ${{ steps.collect.outputs.head_sha }}
           fetch-depth: 0
 
       - name: Setup Node.js 22
-        if: steps.collect.outputs.pr_number != ''
+        if: steps.guard.outputs.protected == 'false'
         uses: actions/setup-node@v4
         with:
           node-version: '22'
 
       - name: Diagnose and Auto-Apply Fix
         id: heal
-        if: steps.collect.outputs.pr_number != ''
+        if: steps.collect.outputs.pr_number != '' && steps.guard.outputs.protected == 'false'
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           GITHUB_TOKEN: ${{ github.token }}
           GH_TOKEN: ${{ github.token }}
           PR_NUM: ${{ steps.collect.outputs.pr_number }}
+          HEAD_BRANCH: ${{ steps.collect.outputs.head_branch }}
+          COMMAND: ${{ github.event.inputs.command }}
+          FIEZEL_PATCH_LIST: /tmp/fiezel-bot/patched.txt
         run: |
           set -euo pipefail
-          node tools/fiezel-bot.mjs heal --pr="$PR_NUM" --log=/tmp/fiezel-bot/failed.log > /tmp/fiezel-bot/heal.log 2>&1 || true
+          rm -f /tmp/fiezel-bot/patched.txt
+          if [[ "$COMMAND" == "bump" ]]; then
+            node tools/fiezel-bot.mjs bump "bot(dispatch): manual build bump" > /tmp/fiezel-bot/heal.log 2>&1 || true
+          elif [[ "$COMMAND" == "fix" ]]; then
+            node tools/fiezel-bot.mjs fix --pr="$PR_NUM" > /tmp/fiezel-bot/heal.log 2>&1 || true
+          else
+            node tools/fiezel-bot.mjs heal --pr="$PR_NUM" --log=/tmp/fiezel-bot/failed.log --branch="$HEAD_BRANCH" > /tmp/fiezel-bot/heal.log 2>&1 || true
+          fi
           cat /tmp/fiezel-bot/heal.log
 
       - name: Commit and Push Self-Heal Fix
-        if: steps.collect.outputs.pr_number != '' && steps.collect.outputs.head_branch != ''
+        id: push
+        if: steps.collect.outputs.pr_number != '' && steps.guard.outputs.protected == 'false'
         env:
           HEAD_BRANCH: ${{ steps.collect.outputs.head_branch }}
+          PATCH_LIST: /tmp/fiezel-bot/patched.txt
         run: |
           set -euo pipefail
-          if [[ -n "$(git status --porcelain)" ]]; then
-            git config user.name "Fiezel Bot"
-            git config user.email "bot@fiezel.my.id"
-            git add -A
-            git commit -m "bot(heal): auto-healing CI failure by Fiezel Bot"
-            git push origin "HEAD:${HEAD_BRANCH}"
-            echo "patched=true" >> "$GITHUB_OUTPUT"
-          else
+          if [[ ! -f "$PATCH_LIST" || ! -s "$PATCH_LIST" ]]; then
             echo "patched=false" >> "$GITHUB_OUTPUT"
+            echo "Tidak ada berkas yang dipatch."
+            exit 0
           fi
+          case "$HEAD_BRANCH" in
+            main|master) echo "patched=false" >> "$GITHUB_OUTPUT"; echo "⛔ protected"; exit 0 ;;
+          esac
+          mapfile -t FILES < "$PATCH_LIST"
+          git config user.name "Fiezel Bot"
+          git config user.email "bot@fiezel.my.id"
+          # HANYA tambahkan berkas yang benar-benar dipatch — bukan `git add -A`.
+          git add -- "${FILES[@]}"
+          if [[ -z "$(git diff --cached --name-only)" ]]; then
+            echo "patched=false" >> "$GITHUB_OUTPUT"
+            echo "Tidak ada perubahan pada berkas yang dipatch."
+            exit 0
+          fi
+          git commit -m "bot(heal): auto-healing CI failure by Fiezel Bot"
+          git push origin "HEAD:${HEAD_BRANCH}"
+          echo "patched=true" >> "$GITHUB_OUTPUT"
+          echo "Berkas terpatch: ${FILES[*]}"
 
       - name: Post CI Heal Report on PR
         if: steps.collect.outputs.pr_number != ''
         uses: actions/github-script@v7
         env:
           PR_NUMBER: ${{ steps.collect.outputs.pr_number }}
+          PATCHED: ${{ steps.push.outputs.patched }}
+          PROTECTED: ${{ steps.guard.outputs.protected }}
         with:
           script: |
             const fs = require('fs');
             const logPath = '/tmp/fiezel-bot/heal.log';
-            const log = fs.existsSync(logPath) ? fs.readFileSync(logPath, 'utf8').trim() : 'Auto-heal selesai dijalankan.';
+            const log = fs.existsSync(logPath) ? fs.readFileSync(logPath, 'utf8').trim() : '';
+            const snippet = log ? log.slice(0, 4000) : 'Tidak ada catatan diagnosis (log kosong).';
+            const patched = process.env.PATCHED === 'true';
+            const protectedBranch = process.env.PROTECTED === 'true';
+
+            let outcome;
+            if (protectedBranch) {
+              outcome = '⛔ Branch terproteksi — bot menolak menulis. Perbaikan manual diperlukan.';
+            } else if (patched) {
+              outcome = '✅ Patch diterapkan dan di-push. Push memakai `GITHUB_TOKEN` sehingga **tidak memicu CI baru secara otomatis** — jalankan ulang workflow untuk memverifikasi.';
+            } else {
+              outcome = 'ℹ️ Tidak ada patch yang diterapkan (log kosong, tidak ada pola yang dikenal, atau patch gagal validasi). **Tidak ada perubahan yang dibuat.**';
+            }
 
             const marker = '<!-- FIEZEL_BOT_AUTO_HEAL -->';
             const body = `${marker}\n` +
               `## 🤖 Fiezel Bot CI Self-Healing\n\n` +
-              `Fiezel Bot mendeteksi adanya kegagalan verifikasi CI pada branch ini dan telah melakukan penanganan otomatis.\n\n` +
+              `Fiezel Bot menganalisis kegagalan verifikasi CI pada commit ini.\n\n` +
+              `**Hasil:** ${outcome}\n\n` +
               `<details><summary>Catatan Diagnosis & Tindakan</summary>\n\n` +
-              `\`\`\`text\n` +
-              `\${log.slice(0, 4000)}\n` +
-              `\`\`\`\n\n` +
-              `</details>\n\n` +
-              `*CI akan berjalan ulang secara otomatis untuk memvalidasi perbaikan ini.*`;
+              '```text\n' +
+              `${snippet}\n` +
+              '```\n\n' +
+              `</details>`;
 
             const { owner, repo } = context.repo;
             const issue_number = Number(process.env.PR_NUMBER);
