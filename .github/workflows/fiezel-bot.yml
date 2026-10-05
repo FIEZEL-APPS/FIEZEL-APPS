@@ -204,20 +204,15 @@ jobs:
             const log = fs.existsSync(logPath) ? fs.readFileSync(logPath, 'utf8').trim() : 'Auto-heal selesai dijalankan.';
 
             const marker = '<!-- FIEZEL_BOT_AUTO_HEAL -->';
-            const body = `${marker}
-## 🤖 Fiezel Bot CI Self-Healing
-
-Fiezel Bot mendeteksi adanya kegagalan verifikasi CI pada branch ini dan telah melakukan penanganan otomatis.
-
-<details><summary>Catatan Diagnosis & Tindakan</summary>
-
-\`\`\`text
-${log.slice(0, 4000)}
-\`\`\`
-
-</details>
-
-*CI akan berjalan ulang secara otomatis untuk memvalidasi perbaikan ini.*`;
+            const body = `${marker}\n` +
+              `## 🤖 Fiezel Bot CI Self-Healing\n\n` +
+              `Fiezel Bot mendeteksi adanya kegagalan verifikasi CI pada branch ini dan telah melakukan penanganan otomatis.\n\n` +
+              `<details><summary>Catatan Diagnosis & Tindakan</summary>\n\n` +
+              `\`\`\`text\n` +
+              `\${log.slice(0, 4000)}\n` +
+              `\`\`\`\n\n` +
+              `</details>\n\n` +
+              `*CI akan berjalan ulang secara otomatis untuk memvalidasi perbaikan ini.*`;
 
             const { owner, repo } = context.repo;
             const issue_number = Number(process.env.PR_NUMBER);
