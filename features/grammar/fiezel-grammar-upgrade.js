@@ -1,8 +1,8 @@
 /**
  * Fiezel Grammar UI/UX Upgrade Feature Module
  * File: fiezel-grammar-upgrade.js
- * 
- * Modul ini menyediakan antarmuka dan interaksi yang ditingkatkan untuk 
+ *
+ * Modul ini menyediakan antarmuka dan interaksi yang ditingkatkan untuk
  * fitur Grammar, termasuk latihan pengurutan token (Token Rail), highlight
  * sintaksis, popover 4-level progressive disclosure hint, umpan balik yang
  * diperkaya (bottom sheet), kotak kesalahan (Mistake Vault), dan kalkulator
@@ -106,7 +106,7 @@
     const tokens = [...(q.tokens || [])];
     const distractors = [...(q.distractors || [])];
     const allTokens = [...tokens, ...distractors];
-    
+
     // Fisher-Yates shuffle
     const shuffle = (array) => {
       let currentIndex = array.length, randomIndex;
@@ -286,7 +286,7 @@
       const correctText = (q.tokens || []).map(t => typeof t === 'object' && t.text ? t.text : String(t)).join(' ');
       const targets = [correctText, q.options?.[0], ...(q.alternates || [])].filter(Boolean);
       const isCorrect = userText === correctText || targets.some(tgt => norm(tgt) === userNorm);
-      
+
       const unplacedTokens = bankTokens.filter(t => !t.placed).map(t => t.text);
 
       // Kiriman SALAH langsung diteruskan ke answer() di app.js. Dulu widget menahan kiriman
@@ -327,7 +327,7 @@
     if (!sentence) return '';
     const isEsc = typeof self.esc === 'function';
     const esc = (str) => isEsc ? self.esc(str) : str;
-    
+
     if (annotations && Array.isArray(annotations) && annotations.length > 0) {
       let result = sentence;
       annotations.forEach(ann => {
@@ -339,7 +339,7 @@
       });
       return result;
     }
-    
+
     // Auto-highlight jika tidak ada anotasi manual
     const words = String(sentence).split(/(\s+)/);
     return words.map(w => {
@@ -539,10 +539,10 @@
         </div>
         <div class="hint-body">
           <p class="hint-body-title">${esc(cur.title)}</p>
-          <p class="hint-body-text">${esc(cur.text)}</p>
+          <p class="hint-body-text">${typeof self.formatRuleForDisplay === 'function' ? self.formatRuleForDisplay(esc(cur.text)) : esc(cur.text)}</p>
         </div>
         <div class="hint-popover-actions">
-          ${currentLvl < 4 
+          ${currentLvl < 4
             ? `<button type="button" class="hint-next-btn" id="hintNextBtn">${FiezelI18n.t('grammar.hint-next', 'Petunjuk Berikutnya')} <i data-lucide="arrow-right"></i></button>`
             : `<button type="button" class="hint-next-btn" id="hintNextBtn"><i data-lucide="check"></i> ${FiezelI18n.t('grammar.hint-close', 'Mengerti')}</button>`
           }
@@ -583,7 +583,7 @@
         document.removeEventListener('touchstart', dismiss);
       }
     };
-    
+
     setTimeout(() => {
       document.addEventListener('click', dismiss);
       document.addEventListener('touchstart', dismiss, { passive: true });
@@ -601,13 +601,13 @@
   FiezelGrammarUpgrade.buildFeedbackHTML = function(q, j, ok) {
     const isEsc = typeof self.esc === 'function';
     const esc = (str) => isEsc ? self.esc(str) : str;
-    
+
     const pickedOption = q.options ? q.options[j] : '';
     const correctOption = q.options ? q.options[q.answerIndex] : '';
-    
+
     const icon = ok ? 'circle-check-big' : 'circle-x';
     const title = ok ? FiezelI18n.t('quiz.verdict-correct', 'Tepat sekali!') : FiezelI18n.t('quiz.verdict-wrong', 'Belum tepat');
-    
+
     let pickedWhyFails = '';
     if (!ok && (q.type === 'grammar' || q.type === 'video-grammar') && q.explain && Array.isArray(q.explain.distractors)) {
       const dist = q.explain.distractors.find(x => x.option && pickedOption && String(x.option).toLowerCase() === String(pickedOption).toLowerCase());
@@ -622,9 +622,9 @@
       <div class="feedback-title">
         <i data-lucide="${icon}"></i><b>${title}</b>
       </div>
-      
+
       <div class="feedback-comparison">
-        ${ok 
+        ${ok
           ? `<p>${FiezelI18n.t('quiz.correct-answer', { answer: `<strong>${esc(pickedOption)}</strong>` })}</p>`
           : `<p class="wrong-pick"><i data-lucide="x"></i> ${FiezelI18n.t('quiz.jawabanmu', 'Jawabanmu:')} <strong>${esc(pickedOption)}</strong></p>
              <p class="correct-pick"><i data-lucide="check"></i> ${FiezelI18n.t('quiz.answer-paling-tepat-adalah', 'Yang benar:')} <strong>${esc(correctOption)}</strong></p>`
@@ -695,7 +695,7 @@
   FiezelGrammarUpgrade.renderVaultCard = function() {
     const count = this.getMistakeCount();
     if (!count || count <= 0) return '';
-    
+
     const cardHtml = `
       <div class="row">
         <b><i data-lucide="archive"></i> ${FiezelI18n.t('grammar.mistake-vault-title', 'Koleksi Kesalahan')}</b>
@@ -735,12 +735,12 @@
     } else if (self.state?.grammar?.[skill]?.mastery) {
       mastery = self.state.grammar[skill].mastery;
     }
-    
+
     if (mastery < 40) return 1; // Tier 1: Recognition
     if (mastery >= 40 && mastery < 70) return 2; // Tier 2: Practice
     if (mastery >= 70 && mastery < 90) return 3; // Tier 3: Production
     if (mastery >= 90) return 4; // Tier 4: Mastered
-    
+
     return 1;
   };
 
