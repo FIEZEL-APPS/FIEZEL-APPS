@@ -108,6 +108,26 @@ jobs:
           ref: ${{ steps.meta.outputs.head_branch }}
           fetch-depth: 0
 
+      - name: Sinkronkan mesin bot dari main (fallback branch lama)
+        if: steps.meta.outputs.pr_number != '' && steps.meta.outputs.head_branch != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          # Branch PR yang dibuat sebelum mesin bot ada di main tidak memuat
+          # tools/fiezel-bot.mjs. Tarik dari origin/main agar bot tetap bekerja
+          # pada SEMUA PR, apa pun basis branch-nya.
+          if [[ ! -f tools/fiezel-bot.mjs ]]; then
+            echo "Mesin bot tidak ada di branch PR; menarik dari origin/main..."
+            git fetch --depth 1 origin main -q || true
+            git checkout origin/main -- tools/fiezel-bot.mjs 2>/dev/null || true
+            git checkout origin/main -- tools/bump-build.mjs 2>/dev/null || true
+          fi
+          if [[ ! -f tools/fiezel-bot.mjs ]]; then
+            echo "⛔ tools/fiezel-bot.mjs tidak ditemukan di branch maupun di main."; exit 1
+          fi
+          echo "Engine bot siap."
+
       - name: Setup Node.js 22
         if: steps.meta.outputs.pr_number != ''
         uses: actions/setup-node@v4
@@ -263,6 +283,23 @@ jobs:
           # bukan ujung branch yang mungkin sudah maju.
           ref: ${{ steps.collect.outputs.head_sha }}
           fetch-depth: 0
+
+      - name: Sinkronkan mesin bot dari main (fallback branch lama)
+        if: steps.collect.outputs.pr_number != '' && steps.guard.outputs.protected == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if [[ ! -f tools/fiezel-bot.mjs ]]; then
+            echo "Mesin bot tidak ada di commit gagal; menarik dari origin/main..."
+            git fetch --depth 1 origin main -q || true
+            git checkout origin/main -- tools/fiezel-bot.mjs 2>/dev/null || true
+            git checkout origin/main -- tools/bump-build.mjs 2>/dev/null || true
+          fi
+          if [[ ! -f tools/fiezel-bot.mjs ]]; then
+            echo "⛔ tools/fiezel-bot.mjs tidak ditemukan di branch maupun di main."; exit 1
+          fi
+          echo "Engine bot siap."
 
       - name: Setup Node.js 22
         if: steps.guard.outputs.protected == 'false'
