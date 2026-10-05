@@ -3999,7 +3999,7 @@
       var units = C ? C.getUnits({ phaseId: curPhase }) : [];
       var selUnitId = ui.curriculumUnitId || (units[0] ? units[0].id : null);
       var curUnit = C && selUnitId ? C.getUnit(selUnitId) : (units[0] || null);
-      var skills = T.SKILL_ORDER.filter(function (k) { return k !== 'speaking'; }), pre = m.skill || 'past_tense', tgt = m.target ? [m.target] : [];
+      var skills = T.SKILL_ORDER.filter(function (k) { return k !== 'speaking'; }).concat(T.TKA_SKILLS || []), pre = m.skill || 'past_tense', tgt = m.target ? [m.target] : [];
       try {
         if (m.targets && Array.isArray(m.targets) && m.targets.length) tgt = m.targets.slice();
         else if (typeof m.targets === 'string' && m.targets) tgt = String(m.targets).split(',');

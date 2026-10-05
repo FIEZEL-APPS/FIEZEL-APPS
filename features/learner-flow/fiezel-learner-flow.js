@@ -615,6 +615,45 @@
       '<div class="lf-actions"><button type="button" class="lf-primary" data-lf="to-plan" data-testid="lf-to-plan">Susun rencana hari ini</button><button type="button" class="lf-ghost" data-lf="redo-diagnostic" data-testid="lf-redo-diagnostic">Ulangi diagnostic</button></div></div>';
   }
 
+  /* R3 Jalur Membaca TKA (docs/STRATEGI-SEKOLAH-INDONESIA-2026.md). Bahasa Inggris di TKA SMA
+     diuji lewat membaca: tekstual, inferensial, evaluatif. Peta ini JUJUR: ia hanya menghitung
+     latihan murid di tiap level dan tidak pernah memprediksi nilai TKA atau peluang lulus. */
+  var TKA_MIN = 6;
+  function tkaReadiness(st) {
+    var B = bank(), order = (B && B.TKA_ORDER) || [];
+    return order.map(function (k) {
+      var s = st.skills && st.skills[k], n = s ? s.total : 0, acc = n ? s.correct / s.total : null;
+      var status = n < TKA_MIN ? 'belum' : acc >= 0.8 ? 'kuat' : acc >= 0.6 ? 'sedang' : 'perlu';
+      return { id: k, meta: B.SKILLS[k], n: n, acc: acc, status: status };
+    });
+  }
+  function tkaMarkup(st) {
+    var rows = tkaReadiness(st); if (!rows.length) return '';
+    var LBL = {
+      belum: t('sekolah.tka-status-belum', 'Belum cukup latihan'),
+      kuat: t('sekolah.tka-status-kuat', 'Kuat'),
+      sedang: t('sekolah.tka-status-sedang', 'Sedang'),
+      perlu: t('sekolah.tka-status-perlu', 'Perlu latihan')
+    };
+    return '<div class="lf-card lf-tka" data-testid="lf-tka"><p class="lf-kicker">' + esc(t('sekolah.tka-kicker', 'Persiapan TKA')) + '</p>' +
+      '<h3>' + esc(t('sekolah.tka-judul', 'Latihan Membaca TKA')) + '</h3>' +
+      '<p class="lf-muted">' + esc(t('sekolah.tka-lead', 'Bahasa Inggris di TKA diuji lewat membaca. Latih tiga kemampuannya satu per satu.')) + '</p>' +
+      '<ul class="lf-tka-list">' + rows.map(function (r) {
+        return '<li data-testid="lf-tka-' + r.id + '"><div><b>' + esc(r.meta.short) + '</b><small>' + esc(r.meta.objective) + '</small></div>' +
+          '<span class="lf-tka-chip is-' + r.status + '" data-testid="lf-tka-status-' + r.id + '">' + esc(LBL[r.status]) + (r.n ? ' · ' + r.n + ' ' + esc(t('sekolah.tka-soal', 'soal')) : '') + '</span>' +
+          '<button type="button" class="lf-mini lf-start" data-lf="start-tka" data-skill="' + r.id + '" data-testid="lf-start-tka-' + r.id + '">' + esc(t('sekolah.tka-latih', 'Latih 6 soal')) + '</button></li>';
+      }).join('') + '</ul>' +
+      '<p class="lf-muted lf-tka-note">' + esc(t('sekolah.tka-catatan', 'Ini peta latihan, bukan prediksi nilai TKA. Status muncul setelah 6 soal per kemampuan.')) + '</p></div>';
+  }
+  function startTka(st, skill) {
+    var B = bank(); if (!B || !B.SKILLS[skill] || (B.TKA_ORDER || []).indexOf(skill) === -1) return false;
+    var avoid = (st.seen && st.seen[skill]) || [];
+    var ids = B.pickFresh(skill, 6, { avoid: avoid, seed: (Date.now() % 997) + 3 }).map(function (it) { return it.id; });
+    if (ids.length < 6) ids = B.pickFresh(skill, 6, { seed: (Date.now() % 991) + 5 }).map(function (it) { return it.id; });
+    startLesson(st, { id: 'tka-' + skill + '-' + Date.now().toString(36), kind: t('sekolah.tka-judul', 'Latihan Membaca TKA'), skill: skill, title: B.SKILLS[skill].lesson, minutes: 8, itemIds: ids });
+    return true;
+  }
+
   function planView() {
     var plan = ensurePlan(st), B = bank(), doneCount = plan.done.length;
 
@@ -647,6 +686,8 @@
       }).join('');
       html += '</ol>';
     }
+
+    html += tkaMarkup(st);
 
     html += '<div class="lf-assign-code" data-testid="lf-assign-code"><label class="lf-muted" for="lfAssignCode">Punya kode tugas dari guru?</label><div class="lf-actions"><input id="lfAssignCode" class="lf-code lf-code-input" placeholder="Tempel kode tugas di sini" autocomplete="off" data-testid="lf-assign-code-input"><button type="button" class="lf-mini" data-lf="accept-assign" data-testid="lf-accept-assign">Tambahkan ke rencana</button></div></div>' +
       '<div class="lf-actions">' +
@@ -767,6 +808,7 @@
         if (nb) startLesson(st, nb);
         break;
       }
+      case 'start-tka': { ensurePlan(st); startTka(st, btn.getAttribute('data-skill')); break; }
       case 'start-lesson': {
         var p2 = ensurePlan(st), blk = p2.blocks.filter(function (b) { return b.id === btn.getAttribute('data-block'); })[0];
         if (blk) startLesson(st, blk);

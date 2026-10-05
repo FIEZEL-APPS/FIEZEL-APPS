@@ -2020,7 +2020,7 @@
   }
   // ---- Buat tugas: 3 langkah (Sumber → Tinjauan Braincore → Kirim) ----------------------------
   function draft(c) { if (!tUi.draft) tUi.draft = { step: 1, source: 'bank', title: '', skills: ['past_tense'], count: 10, deadline: T().today(Date.now() + 2 * T().DAY), mode: 'latihan', targets: [], raw: '', items: [], bankIds: [], review: null, finals: [], approved: {}, useSuggest: {}, q_prompt: '', q_opts: ['', '', '', ''], q_answer: 0 }; return tUi.draft; }
-  function bankSkills() { var TS = T(); return TS.SKILL_ORDER.filter(function (k) { return k !== 'speaking' && B() && B().SKILLS[k]; }); }
+  function bankSkills() { var TS = T(); return TS.SKILL_ORDER.concat(TS.TKA_SKILLS || []).filter(function (k) { return k !== 'speaking' && B() && B().SKILLS[k]; }); }
   function tBuat(c, env) {
     var sc = env && env.scope;
     var isNonEng = (c && c.subject && c.subject !== 'ENG' && c.subject !== 'English') || (sc && sc.locked && sc.active !== 'ENG');

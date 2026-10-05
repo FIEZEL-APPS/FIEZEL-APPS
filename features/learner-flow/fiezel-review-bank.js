@@ -30,9 +30,16 @@
     past_questions: { id: 'past_questions', label: 'Questions in the past (did + verb 1)', short: 'Past questions', area: 'grammar', pattern: 'Did + subject + verb 1', objective: 'Membentuk pertanyaan lampau dengan did + verb 1 dan membedakannya dari was/were.', lesson: 'Mini lesson: Past Questions', minutesPer: 1 },
     vocab_a2: { id: 'vocab_a2', label: 'Vocabulary A2', short: 'Vocabulary A2', area: 'vocabulary', pattern: 'Makna kata dari petunjuk konteks', objective: 'Memilih kata A2 yang tepat dari petunjuk konteks kalimat.', lesson: 'Review: Vocabulary A2 dalam konteks', minutesPer: 0.6 },
     listening_detail: { id: 'listening_detail', label: 'Listening: detail dialog pendek', short: 'Listening detail', area: 'listening', pattern: 'Tangkap kata kunci tepat setelah pertanyaan', objective: 'Menangkap detail spesifik (waktu, jumlah, tempat) dari dialog pendek.', lesson: 'Sesi listening pendek', minutesPer: 1 },
-    reading_inference: { id: 'reading_inference', label: 'Reading inference', short: 'Reading inference', area: 'reading', pattern: 'Petunjuk teks → kesimpulan', objective: 'Menyimpulkan makna yang tidak tertulis langsung dari petunjuk teks.', lesson: 'Review: Reading inference', minutesPer: 1.2 }
+    reading_inference: { id: 'reading_inference', label: 'Reading inference', short: 'Reading inference', area: 'reading', pattern: 'Petunjuk teks → kesimpulan', objective: 'Menyimpulkan makna yang tidak tertulis langsung dari petunjuk teks.', lesson: 'Review: Reading inference', minutesPer: 1.2 },
+    /* R3 Jalur Membaca TKA (docs/STRATEGI-SEKOLAH-INDONESIA-2026.md): tiga level kognitif kisi-kisi
+       TKA Bahasa Inggris. SENGAJA tidak masuk SKILL_ORDER — SKILL_ORDER menentukan tes diagnostik
+       dan rencana harian semua murid; TKA punya urutan sendiri (TKA_ORDER) dan pintunya sendiri. */
+    tka_tekstual: { id: 'tka_tekstual', label: 'Membaca TKA: pemahaman tekstual', short: 'TKA tekstual', area: 'reading', pattern: 'Cari kalimat di teks yang memuat jawabannya', objective: 'Menemukan informasi yang tertulis langsung dalam teks bahasa Inggris.', lesson: 'Latihan Membaca TKA: tekstual', minutesPer: 1.3 },
+    tka_inferensial: { id: 'tka_inferensial', label: 'Membaca TKA: pemahaman inferensial', short: 'TKA inferensial', area: 'reading', pattern: 'Petunjuk teks → ide pokok, tujuan penulis, kesimpulan', objective: 'Menyimpulkan ide pokok, tujuan penulis, dan informasi tersirat dari teks bahasa Inggris.', lesson: 'Latihan Membaca TKA: inferensial', minutesPer: 1.4 },
+    tka_evaluatif: { id: 'tka_evaluatif', label: 'Membaca TKA: evaluasi fakta dan opini', short: 'TKA evaluatif', area: 'reading', pattern: 'Fakta bisa dibuktikan; opini memuat penilaian (best, I think, should)', objective: 'Membedakan fakta dan opini dalam teks bahasa Inggris.', lesson: 'Latihan Membaca TKA: fakta dan opini', minutesPer: 1.3 }
   };
   var SKILL_ORDER = ['past_tense', 'past_questions', 'vocab_a2', 'listening_detail', 'reading_inference'];
+  var TKA_ORDER = ['tka_tekstual', 'tka_inferensial', 'tka_evaluatif'];
 
   var V1 = 'adalah bentuk dasar (verb 1) — cocok untuk present, bukan untuk kalimat lampau.';
   var V3 = 'adalah verb 3 (past participle); bentuk ini butuh have/has/had di depannya.';
@@ -99,6 +106,1020 @@
     r('ri4', 'Sari put on her coat, scarf and gloves before going outside.', 'What can we infer about the weather?', ['It is hot.', 'It is cold.', 'It is rainy.', 'It is windy.'], 1, 'coat, scarf and gloves', { 0: 'Mantel, syal, dan sarung tangan bukan pakaian untuk cuaca panas.', 2: 'Tidak ada petunjuk hujan (payung/jas hujan).', 3: 'Angin tidak disebut; ketiga benda itu khas untuk dingin.' }),
     r('ri5', 'Nobody answered when Budi knocked, and the lights were off.', 'What can we infer?', ['People are at home.', 'Nobody is home.', 'It is morning.', 'Budi is late.'], 1, 'nobody answered + lights off', { 0: 'Tidak ada yang menjawab dan lampu mati — tanda rumah kosong.', 2: 'Lampu mati bisa saja malam; waktu tidak bisa disimpulkan.', 3: 'Tidak ada petunjuk tentang janji atau jam.' })
   ];
+
+  /* R3: 16 bacaan × 3 level = 48 soal TKA. Urutan pilihan sudah diacak berbiji saat ditulis
+     sehingga kunci tersebar rata di A–D (12 tiap huruf); `why` mengikuti urutan itu. */
+  var TKA_ITEMS = [
+    {
+    "id": "tka-t01",
+    "skill": "tka_tekstual",
+    "context": "NOTICE\nThe school library will be closed on Friday, 10 October, because the staff will attend a training. Students who want to return books may put them in the box next to the main office. The library will open again on Monday at 7 a.m. During the exam week, it will stay open until 4 p.m. We believe a quiet library is the best place to prepare for exams.",
+    "contextKind": "passage",
+    "prompt": "When will the library open again?",
+    "options": [
+    "On Monday at 4 p.m.",
+    "On Friday at 7 a.m.",
+    "Only during the exam week",
+    "On Monday at 7 a.m."
+    ],
+    "answer": 3,
+    "marker": "open again on Monday at 7 a.m.",
+    "why": {
+    "1": "Hari Jumat justru perpustakaan tutup.",
+    "0": "Pukul 4 sore adalah jam tutup saat minggu ujian.",
+    "2": "Teks tidak menyebut hanya buka saat minggu ujian."
+    },
+    "note": "Jawabannya tertulis langsung di teks: cari kalimat “open again on Monday at 7 a.m.”."
+    },
+    {
+    "id": "tka-i01",
+    "skill": "tka_inferensial",
+    "context": "NOTICE\nThe school library will be closed on Friday, 10 October, because the staff will attend a training. Students who want to return books may put them in the box next to the main office. The library will open again on Monday at 7 a.m. During the exam week, it will stay open until 4 p.m. We believe a quiet library is the best place to prepare for exams.",
+    "contextKind": "passage",
+    "prompt": "What is the main purpose of the notice?",
+    "options": [
+    "To explain the rules of the exam",
+    "To inform students about a change in the library schedule",
+    "To invite students to a training",
+    "To sell new books to students"
+    ],
+    "answer": 1,
+    "marker": "will be closed ... will open again",
+    "why": {
+    "2": "Yang ikut pelatihan adalah staf, bukan murid.",
+    "3": "Tidak ada penjualan buku.",
+    "0": "Ujian hanya disebut sekilas."
+    },
+    "note": "Jawaban ini tidak tertulis kata per kata; ia disimpulkan dari petunjuk “will be closed ... will open again”."
+    },
+    {
+    "id": "tka-e01",
+    "skill": "tka_evaluatif",
+    "context": "NOTICE\nThe school library will be closed on Friday, 10 October, because the staff will attend a training. Students who want to return books may put them in the box next to the main office. The library will open again on Monday at 7 a.m. During the exam week, it will stay open until 4 p.m. We believe a quiet library is the best place to prepare for exams.",
+    "contextKind": "passage",
+    "prompt": "Which sentence is an OPINION?",
+    "options": [
+    "The library will be closed on Friday.",
+    "During the exam week, it will stay open until 4 p.m.",
+    "We believe a quiet library is the best place to prepare for exams.",
+    "Students may put books in the box next to the main office."
+    ],
+    "answer": 2,
+    "marker": "We believe ... the best",
+    "why": {
+    "0": "Ini fakta yang bisa dicek, bukan pendapat penulis.",
+    "3": "Ini fakta yang bisa dicek, bukan pendapat penulis.",
+    "1": "Ini fakta yang bisa dicek, bukan pendapat penulis."
+    },
+    "note": "Fakta bisa dibuktikan; opini memuat penilaian seperti “best”, “I think”, atau “should”. Petunjuknya: “We believe ... the best”."
+    },
+    {
+    "id": "tka-t02",
+    "skill": "tka_tekstual",
+    "context": "Hi Rafi,\nI have big news! My family is moving to Bandung next month because my father got a new job there. Our new house is near a big park, so I can go jogging every morning. I will start at a new school in November. I am a little nervous, but I think Bandung is the most beautiful city in Indonesia. Please visit us during the holiday!\nDina",
+    "contextKind": "passage",
+    "prompt": "Why is Dina's family moving to Bandung?",
+    "options": [
+    "Dina wants to go jogging in a park.",
+    "Dina will start at a new school.",
+    "Rafi lives in Bandung.",
+    "Her father got a new job there."
+    ],
+    "answer": 3,
+    "marker": "because my father got a new job",
+    "why": {
+    "0": "Jogging adalah akibat rumah baru, bukan alasan pindah.",
+    "1": "Sekolah baru adalah akibat pindah.",
+    "2": "Pernyataan ini tidak ada di teks."
+    },
+    "note": "Jawabannya tertulis langsung di teks: cari kalimat “because my father got a new job”."
+    },
+    {
+    "id": "tka-i02",
+    "skill": "tka_inferensial",
+    "context": "Hi Rafi,\nI have big news! My family is moving to Bandung next month because my father got a new job there. Our new house is near a big park, so I can go jogging every morning. I will start at a new school in November. I am a little nervous, but I think Bandung is the most beautiful city in Indonesia. Please visit us during the holiday!\nDina",
+    "contextKind": "passage",
+    "prompt": "What can we infer about Dina?",
+    "options": [
+    "She does not want to move at all.",
+    "She is a little worried but still looks forward to living in Bandung.",
+    "She already knows her new classmates.",
+    "She has visited Rafi many times."
+    ],
+    "answer": 1,
+    "marker": "a little nervous, but ...",
+    "why": {
+    "0": "Ia gugup, tetapi memuji Bandung dan mengundang Rafi.",
+    "3": "Pernyataan ini tidak ada di teks.",
+    "2": "Ia baru akan mulai sekolah di November."
+    },
+    "note": "Jawaban ini tidak tertulis kata per kata; ia disimpulkan dari petunjuk “a little nervous, but ...”."
+    },
+    {
+    "id": "tka-e02",
+    "skill": "tka_evaluatif",
+    "context": "Hi Rafi,\nI have big news! My family is moving to Bandung next month because my father got a new job there. Our new house is near a big park, so I can go jogging every morning. I will start at a new school in November. I am a little nervous, but I think Bandung is the most beautiful city in Indonesia. Please visit us during the holiday!\nDina",
+    "contextKind": "passage",
+    "prompt": "Which sentence is an OPINION?",
+    "options": [
+    "Bandung is the most beautiful city in Indonesia.",
+    "I will start at a new school in November.",
+    "Our new house is near a big park.",
+    "My family is moving to Bandung next month."
+    ],
+    "answer": 0,
+    "marker": "I think ... the most beautiful",
+    "why": {
+    "3": "Ini fakta yang bisa dicek, bukan pendapat penulis.",
+    "2": "Ini fakta yang bisa dicek, bukan pendapat penulis.",
+    "1": "Ini fakta yang bisa dicek, bukan pendapat penulis."
+    },
+    "note": "Fakta bisa dibuktikan; opini memuat penilaian seperti “best”, “I think”, atau “should”. Petunjuknya: “I think ... the most beautiful”."
+    },
+    {
+    "id": "tka-t03",
+    "skill": "tka_tekstual",
+    "context": "Last month, the student council counted the plastic waste from the school canteen. They found about 300 plastic cups every day. Since then, the canteen has sold drinks in glasses, and students bring their own bottles. Now the canteen produces fewer than 50 plastic cups a day. Many students say the new rule is the smartest change the school has ever made.",
+    "contextKind": "passage",
+    "prompt": "How many plastic cups did the canteen produce every day before the new rule?",
+    "options": [
+    "Fewer than 50",
+    "About 150",
+    "About 300",
+    "More than 500"
+    ],
+    "answer": 2,
+    "marker": "about 300 plastic cups every day",
+    "why": {
+    "0": "Itu jumlah SESUDAH aturan baru.",
+    "1": "Pernyataan ini tidak ada di teks.",
+    "3": "Pernyataan ini tidak ada di teks."
+    },
+    "note": "Jawabannya tertulis langsung di teks: cari kalimat “about 300 plastic cups every day”."
+    },
+    {
+    "id": "tka-i03",
+    "skill": "tka_inferensial",
+    "context": "Last month, the student council counted the plastic waste from the school canteen. They found about 300 plastic cups every day. Since then, the canteen has sold drinks in glasses, and students bring their own bottles. Now the canteen produces fewer than 50 plastic cups a day. Many students say the new rule is the smartest change the school has ever made.",
+    "contextKind": "passage",
+    "prompt": "What is the main idea of the text?",
+    "options": [
+    "A new canteen rule reduced plastic waste at school.",
+    "The student council sells bottles at school.",
+    "Students do not like drinking from glasses.",
+    "The canteen stopped selling drinks."
+    ],
+    "answer": 0,
+    "marker": "300 → fewer than 50",
+    "why": {
+    "1": "Pernyataan ini tidak ada di teks.",
+    "2": "Teks justru menyebut murid memuji aturannya.",
+    "3": "Kantin tetap menjual minuman, dengan gelas."
+    },
+    "note": "Jawaban ini tidak tertulis kata per kata; ia disimpulkan dari petunjuk “300 → fewer than 50”."
+    },
+    {
+    "id": "tka-e03",
+    "skill": "tka_evaluatif",
+    "context": "Last month, the student council counted the plastic waste from the school canteen. They found about 300 plastic cups every day. Since then, the canteen has sold drinks in glasses, and students bring their own bottles. Now the canteen produces fewer than 50 plastic cups a day. Many students say the new rule is the smartest change the school has ever made.",
+    "contextKind": "passage",
+    "prompt": "Which sentence is an OPINION?",
+    "options": [
+    "The canteen has sold drinks in glasses.",
+    "The student council counted the plastic waste.",
+    "The new rule is the smartest change the school has ever made.",
+    "The canteen produces fewer than 50 plastic cups a day."
+    ],
+    "answer": 2,
+    "marker": "the smartest change",
+    "why": {
+    "1": "Ini fakta yang bisa dicek, bukan pendapat penulis.",
+    "0": "Ini fakta yang bisa dicek, bukan pendapat penulis.",
+    "3": "Ini fakta yang bisa dicek, bukan pendapat penulis."
+    },
+    "note": "Fakta bisa dibuktikan; opini memuat penilaian seperti “best”, “I think”, atau “should”. Petunjuknya: “the smartest change”."
+    },
+    {
+    "id": "tka-t04",
+    "skill": "tka_tekstual",
+    "context": "How to make sweet iced tea\nFirst, boil 500 ml of water. Then, put two tea bags into the hot water and wait for five minutes. Next, take out the tea bags and add three spoons of sugar. Stir until the sugar melts. Finally, pour the tea into a glass full of ice. Iced tea tastes best on a hot afternoon.",
+    "contextKind": "passage",
+    "prompt": "What should you do right after taking out the tea bags?",
+    "options": [
+    "Pour the tea into a glass of ice",
+    "Wait for five minutes",
+    "Add three spoons of sugar",
+    "Boil the water"
+    ],
+    "answer": 2,
+    "marker": "take out the tea bags and add three spoons of sugar",
+    "why": {
+    "3": "Merebus air adalah langkah pertama.",
+    "0": "Itu langkah terakhir.",
+    "1": "Menunggu lima menit terjadi sebelum kantong teh diangkat."
+    },
+    "note": "Jawabannya tertulis langsung di teks: cari kalimat “take out the tea bags and add three spoons of sugar”."
+    },
+    {
+    "id": "tka-i04",
+    "skill": "tka_inferensial",
+    "context": "How to make sweet iced tea\nFirst, boil 500 ml of water. Then, put two tea bags into the hot water and wait for five minutes. Next, take out the tea bags and add three spoons of sugar. Stir until the sugar melts. Finally, pour the tea into a glass full of ice. Iced tea tastes best on a hot afternoon.",
+    "contextKind": "passage",
+    "prompt": "The text is written to ...",
+    "options": [
+    "show readers the steps to make iced tea",
+    "describe a famous tea shop",
+    "tell a story about a hot afternoon",
+    "compare tea and coffee"
+    ],
+    "answer": 0,
+    "marker": "First ... Then ... Next ... Finally",
+    "why": {
+    "2": "Ini teks prosedur, bukan cerita.",
+    "1": "Pernyataan ini tidak ada di teks.",
+    "3": "Pernyataan ini tidak ada di teks."
+    },
+    "note": "Jawaban ini tidak tertulis kata per kata; ia disimpulkan dari petunjuk “First ... Then ... Next ... Finally”."
+    },
+    {
+    "id": "tka-e04",
+    "skill": "tka_evaluatif",
+    "context": "How to make sweet iced tea\nFirst, boil 500 ml of water. Then, put two tea bags into the hot water and wait for five minutes. Next, take out the tea bags and add three spoons of sugar. Stir until the sugar melts. Finally, pour the tea into a glass full of ice. Iced tea tastes best on a hot afternoon.",
+    "contextKind": "passage",
+    "prompt": "Which sentence is an OPINION?",
+    "options": [
+    "Iced tea tastes best on a hot afternoon.",
+    "Put two tea bags into the hot water.",
+    "Stir until the sugar melts.",
+    "Boil 500 ml of water."
+    ],
+    "answer": 0,
+    "marker": "tastes best",
+    "why": {
+    "3": "Ini perintah langkah, bukan pendapat.",
+    "1": "Ini perintah langkah, bukan pendapat.",
+    "2": "Ini perintah langkah, bukan pendapat."
+    },
+    "note": "Fakta bisa dibuktikan; opini memuat penilaian seperti “best”, “I think”, atau “should”. Petunjuknya: “tastes best”."
+    },
+    {
+    "id": "tka-t05",
+    "skill": "tka_tekstual",
+    "context": "The Komodo dragon is the largest lizard in the world. It lives on a few islands in East Nusa Tenggara, including Komodo and Rinca. An adult can grow up to three metres long. Komodo dragons can run fast for short distances and have a very good sense of smell. Many tourists say that seeing one in the wild is an unforgettable experience.",
+    "contextKind": "passage",
+    "prompt": "Where do Komodo dragons live?",
+    "options": [
+    "In the forests of Sumatra",
+    "On a few islands in East Nusa Tenggara",
+    "Only in zoos",
+    "On every island in Indonesia"
+    ],
+    "answer": 1,
+    "marker": "lives on a few islands in East Nusa Tenggara",
+    "why": {
+    "3": "Teks menyebut hanya beberapa pulau.",
+    "2": "Pernyataan ini tidak ada di teks.",
+    "0": "Pernyataan ini tidak ada di teks."
+    },
+    "note": "Jawabannya tertulis langsung di teks: cari kalimat “lives on a few islands in East Nusa Tenggara”."
+    },
+    {
+    "id": "tka-i05",
+    "skill": "tka_inferensial",
+    "context": "The Komodo dragon is the largest lizard in the world. It lives on a few islands in East Nusa Tenggara, including Komodo and Rinca. An adult can grow up to three metres long. Komodo dragons can run fast for short distances and have a very good sense of smell. Many tourists say that seeing one in the wild is an unforgettable experience.",
+    "contextKind": "passage",
+    "prompt": "What is the text mainly about?",
+    "options": [
+    "The food of lizards",
+    "The features of the Komodo dragon",
+    "Why tourists like East Nusa Tenggara",
+    "How to travel to Komodo Island"
+    ],
+    "answer": 1,
+    "marker": "largest ... three metres ... sense of smell",
+    "why": {
+    "3": "Pernyataan ini tidak ada di teks.",
+    "2": "Turis hanya disebut di kalimat terakhir.",
+    "0": "Pernyataan ini tidak ada di teks."
+    },
+    "note": "Jawaban ini tidak tertulis kata per kata; ia disimpulkan dari petunjuk “largest ... three metres ... sense of smell”."
+    },
+    {
+    "id": "tka-e05",
+    "skill": "tka_evaluatif",
+    "context": "The Komodo dragon is the largest lizard in the world. It lives on a few islands in East Nusa Tenggara, including Komodo and Rinca. An adult can grow up to three metres long. Komodo dragons can run fast for short distances and have a very good sense of smell. Many tourists say that seeing one in the wild is an unforgettable experience.",
+    "contextKind": "passage",
+    "prompt": "Which sentence is an OPINION?",
+    "options": [
+    "It lives on Komodo and Rinca.",
+    "The Komodo dragon is the largest lizard in the world.",
+    "Seeing one in the wild is an unforgettable experience.",
+    "An adult can grow up to three metres long."
+    ],
+    "answer": 2,
+    "marker": "unforgettable experience",
+    "why": {
+    "1": "Ini fakta yang bisa dicek, bukan pendapat penulis.",
+    "3": "Ini fakta yang bisa dicek, bukan pendapat penulis.",
+    "0": "Ini fakta yang bisa dicek, bukan pendapat penulis."
+    },
+    "note": "Fakta bisa dibuktikan; opini memuat penilaian seperti “best”, “I think”, atau “should”. Petunjuknya: “unforgettable experience”."
+    },
+    {
+    "id": "tka-t06",
+    "skill": "tka_tekstual",
+    "context": "On Saturday, Andi took the bus to the market. When he wanted to pay for some fruit, he could not find his wallet. He walked back to the bus stop, feeling worried. A bus driver was waiting there with the wallet in his hand. The driver had found it under a seat. Andi thanked him and offered him some money, but the driver refused. Andi thinks honest people are the real heroes of the city.",
+    "contextKind": "passage",
+    "prompt": "Where did the driver find the wallet?",
+    "options": [
+    "Under a seat",
+    "In the fruit shop",
+    "At the bus stop",
+    "At the market"
+    ],
+    "answer": 0,
+    "marker": "found it under a seat",
+    "why": {
+    "3": "Andi baru sadar dompetnya hilang di pasar.",
+    "2": "Halte adalah tempat sopir menunggu.",
+    "1": "Pernyataan ini tidak ada di teks."
+    },
+    "note": "Jawabannya tertulis langsung di teks: cari kalimat “found it under a seat”."
+    },
+    {
+    "id": "tka-i06",
+    "skill": "tka_inferensial",
+    "context": "On Saturday, Andi took the bus to the market. When he wanted to pay for some fruit, he could not find his wallet. He walked back to the bus stop, feeling worried. A bus driver was waiting there with the wallet in his hand. The driver had found it under a seat. Andi thanked him and offered him some money, but the driver refused. Andi thinks honest people are the real heroes of the city.",
+    "contextKind": "passage",
+    "prompt": "What does the story mainly tell us?",
+    "options": [
+    "Andi gave the driver a lot of money.",
+    "An honest driver returned Andi's lost wallet.",
+    "Andi likes buying fruit.",
+    "Buses in the city are always late."
+    ],
+    "answer": 1,
+    "marker": "waiting there with the wallet ... refused",
+    "why": {
+    "2": "Itu detail kecil, bukan isi utama.",
+    "3": "Pernyataan ini tidak ada di teks.",
+    "0": "Sopir justru menolak uangnya."
+    },
+    "note": "Jawaban ini tidak tertulis kata per kata; ia disimpulkan dari petunjuk “waiting there with the wallet ... refused”."
+    },
+    {
+    "id": "tka-e06",
+    "skill": "tka_evaluatif",
+    "context": "On Saturday, Andi took the bus to the market. When he wanted to pay for some fruit, he could not find his wallet. He walked back to the bus stop, feeling worried. A bus driver was waiting there with the wallet in his hand. The driver had found it under a seat. Andi thanked him and offered him some money, but the driver refused. Andi thinks honest people are the real heroes of the city.",
+    "contextKind": "passage",
+    "prompt": "Which sentence is an OPINION?",
+    "options": [
+    "Andi took the bus to the market.",
+    "Honest people are the real heroes of the city.",
+    "He could not find his wallet.",
+    "The driver refused the money."
+    ],
+    "answer": 1,
+    "marker": "Andi thinks ... real heroes",
+    "why": {
+    "0": "Ini fakta yang bisa dicek, bukan pendapat penulis.",
+    "2": "Ini fakta yang bisa dicek, bukan pendapat penulis.",
+    "3": "Ini fakta yang bisa dicek, bukan pendapat penulis."
+    },
+    "note": "Fakta bisa dibuktikan; opini memuat penilaian seperti “best”, “I think”, atau “should”. Petunjuknya: “Andi thinks ... real heroes”."
+    },
+    {
+    "id": "tka-t07",
+    "skill": "tka_tekstual",
+    "context": "ENGLISH SPEECH COMPETITION\nTopic: My Dream for Indonesia\nDate: 25 October 2026\nPlace: School hall\nParticipants: students of grades 7 to 9\nEach speech must be 3 to 5 minutes long. Register with Mrs. Lestari before 18 October. The winner will receive a trophy and books. Joining a competition like this is a great way to build confidence.",
+    "contextKind": "passage",
+    "prompt": "When should students register?",
+    "options": [
+    "On 25 October",
+    "Any day in November",
+    "Before 18 October",
+    "After the competition"
+    ],
+    "answer": 2,
+    "marker": "Register ... before 18 October",
+    "why": {
+    "0": "25 Oktober adalah hari lomba.",
+    "3": "Pendaftaran harus sebelum lomba.",
+    "1": "Pernyataan ini tidak ada di teks."
+    },
+    "note": "Jawabannya tertulis langsung di teks: cari kalimat “Register ... before 18 October”."
+    },
+    {
+    "id": "tka-i07",
+    "skill": "tka_inferensial",
+    "context": "ENGLISH SPEECH COMPETITION\nTopic: My Dream for Indonesia\nDate: 25 October 2026\nPlace: School hall\nParticipants: students of grades 7 to 9\nEach speech must be 3 to 5 minutes long. Register with Mrs. Lestari before 18 October. The winner will receive a trophy and books. Joining a competition like this is a great way to build confidence.",
+    "contextKind": "passage",
+    "prompt": "What can we infer about a student in grade 10?",
+    "options": [
+    "He will get a trophy automatically.",
+    "He must speak for more than 5 minutes.",
+    "He cannot join this competition.",
+    "He can join if he registers early."
+    ],
+    "answer": 2,
+    "marker": "Participants: students of grades 7 to 9",
+    "why": {
+    "3": "Peserta dibatasi kelas 7 sampai 9.",
+    "1": "Durasi 3–5 menit berlaku untuk semua.",
+    "0": "Pernyataan ini tidak ada di teks."
+    },
+    "note": "Jawaban ini tidak tertulis kata per kata; ia disimpulkan dari petunjuk “Participants: students of grades 7 to 9”."
+    },
+    {
+    "id": "tka-e07",
+    "skill": "tka_evaluatif",
+    "context": "ENGLISH SPEECH COMPETITION\nTopic: My Dream for Indonesia\nDate: 25 October 2026\nPlace: School hall\nParticipants: students of grades 7 to 9\nEach speech must be 3 to 5 minutes long. Register with Mrs. Lestari before 18 October. The winner will receive a trophy and books. Joining a competition like this is a great way to build confidence.",
+    "contextKind": "passage",
+    "prompt": "Which sentence is an OPINION?",
+    "options": [
+    "The competition is held in the school hall.",
+    "Each speech must be 3 to 5 minutes long.",
+    "The winner will receive a trophy and books.",
+    "Joining a competition like this is a great way to build confidence."
+    ],
+    "answer": 3,
+    "marker": "a great way",
+    "why": {
+    "0": "Ini fakta yang bisa dicek, bukan pendapat penulis.",
+    "1": "Ini fakta yang bisa dicek, bukan pendapat penulis.",
+    "2": "Ini fakta yang bisa dicek, bukan pendapat penulis."
+    },
+    "note": "Fakta bisa dibuktikan; opini memuat penilaian seperti “best”, “I think”, atau “should”. Petunjuknya: “a great way”."
+    },
+    {
+    "id": "tka-t08",
+    "skill": "tka_tekstual",
+    "context": "Teenagers need eight to ten hours of sleep every night. However, a survey at our school showed that most students sleep only six hours because they use their phones late at night. Lack of sleep can make it hard to concentrate in class. In my view, good sleep is more important than finishing one more video.",
+    "contextKind": "passage",
+    "prompt": "According to the survey, how long do most students sleep?",
+    "options": [
+    "Six hours",
+    "Four hours",
+    "Ten hours",
+    "Eight hours"
+    ],
+    "answer": 0,
+    "marker": "most students sleep only six hours",
+    "why": {
+    "1": "Pernyataan ini tidak ada di teks.",
+    "3": "Delapan sampai sepuluh jam adalah kebutuhan, bukan kenyataan.",
+    "2": "Delapan sampai sepuluh jam adalah kebutuhan, bukan kenyataan."
+    },
+    "note": "Jawabannya tertulis langsung di teks: cari kalimat “most students sleep only six hours”."
+    },
+    {
+    "id": "tka-i08",
+    "skill": "tka_inferensial",
+    "context": "Teenagers need eight to ten hours of sleep every night. However, a survey at our school showed that most students sleep only six hours because they use their phones late at night. Lack of sleep can make it hard to concentrate in class. In my view, good sleep is more important than finishing one more video.",
+    "contextKind": "passage",
+    "prompt": "What is the writer's purpose?",
+    "options": [
+    "To describe a school survey company",
+    "To tell a funny story",
+    "To persuade students to get enough sleep",
+    "To sell a new phone"
+    ],
+    "answer": 2,
+    "marker": "In my view, good sleep is more important",
+    "why": {
+    "3": "Pernyataan ini tidak ada di teks.",
+    "0": "Survei hanya bukti pendukung.",
+    "1": "Ini bukan teks cerita."
+    },
+    "note": "Jawaban ini tidak tertulis kata per kata; ia disimpulkan dari petunjuk “In my view, good sleep is more important”."
+    },
+    {
+    "id": "tka-e08",
+    "skill": "tka_evaluatif",
+    "context": "Teenagers need eight to ten hours of sleep every night. However, a survey at our school showed that most students sleep only six hours because they use their phones late at night. Lack of sleep can make it hard to concentrate in class. In my view, good sleep is more important than finishing one more video.",
+    "contextKind": "passage",
+    "prompt": "Which sentence is an OPINION?",
+    "options": [
+    "A survey at our school showed that most students sleep only six hours.",
+    "Good sleep is more important than finishing one more video.",
+    "Teenagers need eight to ten hours of sleep.",
+    "Students use their phones late at night."
+    ],
+    "answer": 1,
+    "marker": "In my view",
+    "why": {
+    "0": "Ini hasil survei, bisa dicek.",
+    "3": "Ini temuan survei, bisa dicek.",
+    "2": "Ini fakta kesehatan yang bisa dicek."
+    },
+    "note": "Fakta bisa dibuktikan; opini memuat penilaian seperti “best”, “I think”, atau “should”. Petunjuknya: “In my view”."
+    },
+    {
+    "id": "tka-t09",
+    "skill": "tka_tekstual",
+    "context": "Dear Mr. Hadi,\nI am sorry I cannot come to school today. I have a high fever and the doctor told me to rest for two days. Could you please tell me about the homework for English class? I will ask Sinta to bring my assignment to you tomorrow. Thank you for your understanding.\nRegards,\nBayu",
+    "contextKind": "passage",
+    "prompt": "How long does Bayu have to rest?",
+    "options": [
+    "Two days",
+    "One day",
+    "Until the holiday",
+    "One week"
+    ],
+    "answer": 0,
+    "marker": "rest for two days",
+    "why": {
+    "1": "Pernyataan ini tidak ada di teks.",
+    "3": "Pernyataan ini tidak ada di teks.",
+    "2": "Pernyataan ini tidak ada di teks."
+    },
+    "note": "Jawabannya tertulis langsung di teks: cari kalimat “rest for two days”."
+    },
+    {
+    "id": "tka-i09",
+    "skill": "tka_inferensial",
+    "context": "Dear Mr. Hadi,\nI am sorry I cannot come to school today. I have a high fever and the doctor told me to rest for two days. Could you please tell me about the homework for English class? I will ask Sinta to bring my assignment to you tomorrow. Thank you for your understanding.\nRegards,\nBayu",
+    "contextKind": "passage",
+    "prompt": "Why did Bayu write the message?",
+    "options": [
+    "To say he is absent and ask about homework",
+    "To ask Sinta to visit him",
+    "To complain about the English homework",
+    "To invite Mr. Hadi to his house"
+    ],
+    "answer": 0,
+    "marker": "cannot come ... tell me about the homework",
+    "why": {
+    "3": "Pernyataan ini tidak ada di teks.",
+    "2": "Ia bertanya, bukan mengeluh.",
+    "1": "Sinta disebut hanya untuk mengantar tugas."
+    },
+    "note": "Jawaban ini tidak tertulis kata per kata; ia disimpulkan dari petunjuk “cannot come ... tell me about the homework”."
+    },
+    {
+    "id": "tka-e09",
+    "skill": "tka_evaluatif",
+    "context": "Dear Mr. Hadi,\nI am sorry I cannot come to school today. I have a high fever and the doctor told me to rest for two days. Could you please tell me about the homework for English class? I will ask Sinta to bring my assignment to you tomorrow. Thank you for your understanding.\nRegards,\nBayu",
+    "contextKind": "passage",
+    "prompt": "Which statement is a FACT according to the text?",
+    "options": [
+    "Mr. Hadi is the kindest teacher in the school.",
+    "The doctor told Bayu to rest for two days.",
+    "Sinta is the best student in the class.",
+    "English homework is always too difficult."
+    ],
+    "answer": 1,
+    "marker": "the doctor told me to rest",
+    "why": {
+    "0": "Ini pendapat, dan tidak ada di teks.",
+    "3": "Ini pendapat, dan tidak ada di teks.",
+    "2": "Ini pendapat, dan tidak ada di teks."
+    },
+    "note": "Fakta bisa dibuktikan; opini memuat penilaian seperti “best”, “I think”, atau “should”. Petunjuknya: “the doctor told me to rest”."
+    },
+    {
+    "id": "tka-t10",
+    "skill": "tka_tekstual",
+    "context": "Heavy rain fell for six hours on Tuesday night in Sukamaju Village. The river overflowed and water entered about 120 houses. No one was injured, but many families had to stay at the village hall. Volunteers from the local school brought food and blankets. The village head said the river must be cleaned before the next rainy season.",
+    "contextKind": "passage",
+    "prompt": "How many houses did the water enter?",
+    "options": [
+    "About 120",
+    "About 1,200",
+    "About 12",
+    "About 6"
+    ],
+    "answer": 0,
+    "marker": "water entered about 120 houses",
+    "why": {
+    "3": "Enam adalah lamanya hujan dalam jam.",
+    "2": "Pernyataan ini tidak ada di teks.",
+    "1": "Pernyataan ini tidak ada di teks."
+    },
+    "note": "Jawabannya tertulis langsung di teks: cari kalimat “water entered about 120 houses”."
+    },
+    {
+    "id": "tka-i10",
+    "skill": "tka_inferensial",
+    "context": "Heavy rain fell for six hours on Tuesday night in Sukamaju Village. The river overflowed and water entered about 120 houses. No one was injured, but many families had to stay at the village hall. Volunteers from the local school brought food and blankets. The village head said the river must be cleaned before the next rainy season.",
+    "contextKind": "passage",
+    "prompt": "Why did many families stay at the village hall?",
+    "options": [
+    "The village head was sick.",
+    "There was a party there.",
+    "Their houses were not safe to stay in.",
+    "The volunteers asked them to cook."
+    ],
+    "answer": 2,
+    "marker": "water entered ... had to stay at the village hall",
+    "why": {
+    "1": "Pernyataan ini tidak ada di teks.",
+    "3": "Pernyataan ini tidak ada di teks.",
+    "0": "Pernyataan ini tidak ada di teks."
+    },
+    "note": "Jawaban ini tidak tertulis kata per kata; ia disimpulkan dari petunjuk “water entered ... had to stay at the village hall”."
+    },
+    {
+    "id": "tka-e10",
+    "skill": "tka_evaluatif",
+    "context": "Heavy rain fell for six hours on Tuesday night in Sukamaju Village. The river overflowed and water entered about 120 houses. No one was injured, but many families had to stay at the village hall. Volunteers from the local school brought food and blankets. The village head said the river must be cleaned before the next rainy season.",
+    "contextKind": "passage",
+    "prompt": "Which statement is a FACT according to the text?",
+    "options": [
+    "Volunteers brought food and blankets.",
+    "Sukamaju is the most beautiful village.",
+    "Rain is the worst thing in the world.",
+    "The volunteers were the bravest people in the village."
+    ],
+    "answer": 0,
+    "marker": "brought food and blankets",
+    "why": {
+    "3": "Ini pendapat yang tidak ada di teks.",
+    "1": "Ini pendapat yang tidak ada di teks.",
+    "2": "Ini pendapat yang tidak ada di teks."
+    },
+    "note": "Fakta bisa dibuktikan; opini memuat penilaian seperti “best”, “I think”, atau “should”. Petunjuknya: “brought food and blankets”."
+    },
+    {
+    "id": "tka-t11",
+    "skill": "tka_tekstual",
+    "context": "LEARN ENGLISH THE FUN WAY!\nBright Course opens new classes for junior high school students. Classes are on Tuesday and Thursday, 3-5 p.m. Small groups: maximum 10 students. Free trial class this Saturday! Our teachers are the friendliest teachers in town. Call 0812-0000-1234 to register.",
+    "contextKind": "passage",
+    "prompt": "When is the free trial class?",
+    "options": [
+    "On Thursday",
+    "Every day at 3 p.m.",
+    "On Tuesday",
+    "This Saturday"
+    ],
+    "answer": 3,
+    "marker": "Free trial class this Saturday",
+    "why": {
+    "2": "Selasa adalah jadwal kelas biasa.",
+    "0": "Kamis adalah jadwal kelas biasa.",
+    "1": "Pernyataan ini tidak ada di teks."
+    },
+    "note": "Jawabannya tertulis langsung di teks: cari kalimat “Free trial class this Saturday”."
+    },
+    {
+    "id": "tka-i11",
+    "skill": "tka_inferensial",
+    "context": "LEARN ENGLISH THE FUN WAY!\nBright Course opens new classes for junior high school students. Classes are on Tuesday and Thursday, 3-5 p.m. Small groups: maximum 10 students. Free trial class this Saturday! Our teachers are the friendliest teachers in town. Call 0812-0000-1234 to register.",
+    "contextKind": "passage",
+    "prompt": "Why does the course probably limit each group to 10 students?",
+    "options": [
+    "So that each student gets more attention",
+    "Because the classroom has no chairs",
+    "So that the class is cheaper",
+    "Because only 10 students called"
+    ],
+    "answer": 0,
+    "marker": "Small groups: maximum 10 students",
+    "why": {
+    "1": "Pernyataan ini tidak ada di teks.",
+    "3": "Pernyataan ini tidak ada di teks.",
+    "2": "Teks tidak menyebut harga."
+    },
+    "note": "Jawaban ini tidak tertulis kata per kata; ia disimpulkan dari petunjuk “Small groups: maximum 10 students”."
+    },
+    {
+    "id": "tka-e11",
+    "skill": "tka_evaluatif",
+    "context": "LEARN ENGLISH THE FUN WAY!\nBright Course opens new classes for junior high school students. Classes are on Tuesday and Thursday, 3-5 p.m. Small groups: maximum 10 students. Free trial class this Saturday! Our teachers are the friendliest teachers in town. Call 0812-0000-1234 to register.",
+    "contextKind": "passage",
+    "prompt": "Which sentence is an OPINION?",
+    "options": [
+    "Groups have a maximum of 10 students.",
+    "Our teachers are the friendliest teachers in town.",
+    "Classes are on Tuesday and Thursday.",
+    "Call 0812-0000-1234 to register."
+    ],
+    "answer": 1,
+    "marker": "the friendliest",
+    "why": {
+    "2": "Ini fakta yang bisa dicek, bukan pendapat penulis.",
+    "0": "Ini fakta yang bisa dicek, bukan pendapat penulis.",
+    "3": "Ini ajakan/informasi kontak, bukan pendapat."
+    },
+    "note": "Fakta bisa dibuktikan; opini memuat penilaian seperti “best”, “I think”, atau “should”. Petunjuknya: “the friendliest”."
+    },
+    {
+    "id": "tka-t12",
+    "skill": "tka_tekstual",
+    "context": "B.J. Habibie was born in Parepare, South Sulawesi, in 1936. He studied aircraft engineering in Germany and worked there for many years. He later returned to Indonesia and led the development of the national aircraft industry. In 1998, he became the third President of Indonesia. Many people think he was the most brilliant engineer Indonesia has ever had.",
+    "contextKind": "passage",
+    "prompt": "Where did Habibie study aircraft engineering?",
+    "options": [
+    "In Parepare",
+    "In Japan",
+    "In Jakarta",
+    "In Germany"
+    ],
+    "answer": 3,
+    "marker": "studied aircraft engineering in Germany",
+    "why": {
+    "0": "Parepare adalah tempat lahirnya.",
+    "2": "Pernyataan ini tidak ada di teks.",
+    "1": "Pernyataan ini tidak ada di teks."
+    },
+    "note": "Jawabannya tertulis langsung di teks: cari kalimat “studied aircraft engineering in Germany”."
+    },
+    {
+    "id": "tka-i12",
+    "skill": "tka_inferensial",
+    "context": "B.J. Habibie was born in Parepare, South Sulawesi, in 1936. He studied aircraft engineering in Germany and worked there for many years. He later returned to Indonesia and led the development of the national aircraft industry. In 1998, he became the third President of Indonesia. Many people think he was the most brilliant engineer Indonesia has ever had.",
+    "contextKind": "passage",
+    "prompt": "What is the text mainly about?",
+    "options": [
+    "The history of Parepare",
+    "Habibie's life and achievements",
+    "The election in 1998",
+    "How airplanes fly"
+    ],
+    "answer": 1,
+    "marker": "born ... studied ... became President",
+    "why": {
+    "3": "Pernyataan ini tidak ada di teks.",
+    "0": "Parepare hanya disebut sebagai tempat lahir.",
+    "2": "Tahun 1998 hanya satu bagian kisahnya."
+    },
+    "note": "Jawaban ini tidak tertulis kata per kata; ia disimpulkan dari petunjuk “born ... studied ... became President”."
+    },
+    {
+    "id": "tka-e12",
+    "skill": "tka_evaluatif",
+    "context": "B.J. Habibie was born in Parepare, South Sulawesi, in 1936. He studied aircraft engineering in Germany and worked there for many years. He later returned to Indonesia and led the development of the national aircraft industry. In 1998, he became the third President of Indonesia. Many people think he was the most brilliant engineer Indonesia has ever had.",
+    "contextKind": "passage",
+    "prompt": "Which sentence is an OPINION?",
+    "options": [
+    "He became the third President of Indonesia.",
+    "He worked in Germany for many years.",
+    "Habibie was born in 1936.",
+    "He was the most brilliant engineer Indonesia has ever had."
+    ],
+    "answer": 3,
+    "marker": "Many people think ... the most brilliant",
+    "why": {
+    "2": "Ini fakta yang bisa dicek, bukan pendapat penulis.",
+    "0": "Ini fakta yang bisa dicek, bukan pendapat penulis.",
+    "1": "Ini fakta yang bisa dicek, bukan pendapat penulis."
+    },
+    "note": "Fakta bisa dibuktikan; opini memuat penilaian seperti “best”, “I think”, atau “should”. Petunjuknya: “Many people think ... the most brilliant”."
+    },
+    {
+    "id": "tka-t13",
+    "skill": "tka_tekstual",
+    "context": "I just finished reading Laskar Pelangi by Andrea Hirata. The novel tells the story of ten poor children who study at a small school in Belitung. Their teachers, Bu Mus and Pak Harfan, never give up on them. The book was first published in 2005 and was later made into a film. In my opinion, every Indonesian teenager should read it.",
+    "contextKind": "passage",
+    "prompt": "Where do the children in the novel study?",
+    "options": [
+    "At a university",
+    "At a big school in Jakarta",
+    "At home with their parents",
+    "At a small school in Belitung"
+    ],
+    "answer": 3,
+    "marker": "a small school in Belitung",
+    "why": {
+    "1": "Pernyataan ini tidak ada di teks.",
+    "2": "Pernyataan ini tidak ada di teks.",
+    "0": "Pernyataan ini tidak ada di teks."
+    },
+    "note": "Jawabannya tertulis langsung di teks: cari kalimat “a small school in Belitung”."
+    },
+    {
+    "id": "tka-i13",
+    "skill": "tka_inferensial",
+    "context": "I just finished reading Laskar Pelangi by Andrea Hirata. The novel tells the story of ten poor children who study at a small school in Belitung. Their teachers, Bu Mus and Pak Harfan, never give up on them. The book was first published in 2005 and was later made into a film. In my opinion, every Indonesian teenager should read it.",
+    "contextKind": "passage",
+    "prompt": "What can we infer about Bu Mus and Pak Harfan?",
+    "options": [
+    "They wrote the novel.",
+    "They want to close the school.",
+    "They are strict and unkind.",
+    "They care deeply about their students."
+    ],
+    "answer": 3,
+    "marker": "never give up on them",
+    "why": {
+    "2": "Tidak menyerah pada murid menunjukkan kepedulian.",
+    "1": "Pernyataan ini tidak ada di teks.",
+    "0": "Penulisnya Andrea Hirata."
+    },
+    "note": "Jawaban ini tidak tertulis kata per kata; ia disimpulkan dari petunjuk “never give up on them”."
+    },
+    {
+    "id": "tka-e13",
+    "skill": "tka_evaluatif",
+    "context": "I just finished reading Laskar Pelangi by Andrea Hirata. The novel tells the story of ten poor children who study at a small school in Belitung. Their teachers, Bu Mus and Pak Harfan, never give up on them. The book was first published in 2005 and was later made into a film. In my opinion, every Indonesian teenager should read it.",
+    "contextKind": "passage",
+    "prompt": "Which sentence is an OPINION?",
+    "options": [
+    "The book was made into a film.",
+    "Every Indonesian teenager should read it.",
+    "The novel was written by Andrea Hirata.",
+    "The book was first published in 2005."
+    ],
+    "answer": 1,
+    "marker": "In my opinion",
+    "why": {
+    "2": "Ini fakta yang bisa dicek, bukan pendapat penulis.",
+    "3": "Ini fakta yang bisa dicek, bukan pendapat penulis.",
+    "0": "Ini fakta yang bisa dicek, bukan pendapat penulis."
+    },
+    "note": "Fakta bisa dibuktikan; opini memuat penilaian seperti “best”, “I think”, atau “should”. Petunjuknya: “In my opinion”."
+    },
+    {
+    "id": "tka-t14",
+    "skill": "tka_tekstual",
+    "context": "Why do we see lightning before we hear thunder? Light travels much faster than sound. Light moves about 300,000 kilometres per second, while sound moves only about 343 metres per second in air. So, when lightning strikes far away, its light reaches our eyes almost immediately, but the sound takes a few seconds. Watching a storm from a safe place is a fascinating experience.",
+    "contextKind": "passage",
+    "prompt": "How fast does sound move in air?",
+    "options": [
+    "About 300,000 kilometres per second",
+    "Faster than light",
+    "About 34 kilometres per hour",
+    "About 343 metres per second"
+    ],
+    "answer": 3,
+    "marker": "sound moves only about 343 metres per second",
+    "why": {
+    "0": "Itu kecepatan cahaya.",
+    "2": "Pernyataan ini tidak ada di teks.",
+    "1": "Teks menyatakan cahaya jauh lebih cepat."
+    },
+    "note": "Jawabannya tertulis langsung di teks: cari kalimat “sound moves only about 343 metres per second”."
+    },
+    {
+    "id": "tka-i14",
+    "skill": "tka_inferensial",
+    "context": "Why do we see lightning before we hear thunder? Light travels much faster than sound. Light moves about 300,000 kilometres per second, while sound moves only about 343 metres per second in air. So, when lightning strikes far away, its light reaches our eyes almost immediately, but the sound takes a few seconds. Watching a storm from a safe place is a fascinating experience.",
+    "contextKind": "passage",
+    "prompt": "You hear thunder three seconds after you see lightning. About how far away was the lightning?",
+    "options": [
+    "About 10 kilometres",
+    "About 100 metres",
+    "About 300,000 kilometres",
+    "About 1 kilometre"
+    ],
+    "answer": 3,
+    "marker": "343 metres per second × 3",
+    "why": {
+    "1": "Terlalu dekat: 3 detik × 343 m ≈ 1.000 m.",
+    "0": "Terlalu jauh: 3 detik × 343 m ≈ 1.000 m.",
+    "2": "Itu jarak tempuh cahaya per detik."
+    },
+    "note": "Jawaban ini tidak tertulis kata per kata; ia disimpulkan dari petunjuk “343 metres per second × 3”."
+    },
+    {
+    "id": "tka-e14",
+    "skill": "tka_evaluatif",
+    "context": "Why do we see lightning before we hear thunder? Light travels much faster than sound. Light moves about 300,000 kilometres per second, while sound moves only about 343 metres per second in air. So, when lightning strikes far away, its light reaches our eyes almost immediately, but the sound takes a few seconds. Watching a storm from a safe place is a fascinating experience.",
+    "contextKind": "passage",
+    "prompt": "Which sentence is an OPINION?",
+    "options": [
+    "Watching a storm from a safe place is a fascinating experience.",
+    "The sound takes a few seconds.",
+    "Light travels much faster than sound.",
+    "The light reaches our eyes almost immediately."
+    ],
+    "answer": 0,
+    "marker": "a fascinating experience",
+    "why": {
+    "2": "Ini fakta yang bisa dicek, bukan pendapat penulis.",
+    "3": "Ini fakta yang bisa dicek, bukan pendapat penulis.",
+    "1": "Ini fakta yang bisa dicek, bukan pendapat penulis."
+    },
+    "note": "Fakta bisa dibuktikan; opini memuat penilaian seperti “best”, “I think”, atau “should”. Petunjuknya: “a fascinating experience”."
+    },
+    {
+    "id": "tka-t15",
+    "skill": "tka_tekstual",
+    "context": "Breakfast gives your body energy after a long night without food. Students who eat breakfast usually find it easier to concentrate in the morning. A healthy breakfast can be simple: rice with eggs, bread with peanut butter, or a banana and a glass of milk. Skipping breakfast may make you feel tired and hungry before lunch. Personally, I think nasi uduk is the most delicious breakfast.",
+    "contextKind": "passage",
+    "prompt": "Which healthy breakfast is mentioned in the text?",
+    "options": [
+    "Fried noodles and soda",
+    "Cake and coffee",
+    "A banana and a glass of milk",
+    "Instant noodles"
+    ],
+    "answer": 2,
+    "marker": "a banana and a glass of milk",
+    "why": {
+    "0": "Pernyataan ini tidak ada di teks.",
+    "1": "Pernyataan ini tidak ada di teks.",
+    "3": "Pernyataan ini tidak ada di teks."
+    },
+    "note": "Jawabannya tertulis langsung di teks: cari kalimat “a banana and a glass of milk”."
+    },
+    {
+    "id": "tka-i15",
+    "skill": "tka_inferensial",
+    "context": "Breakfast gives your body energy after a long night without food. Students who eat breakfast usually find it easier to concentrate in the morning. A healthy breakfast can be simple: rice with eggs, bread with peanut butter, or a banana and a glass of milk. Skipping breakfast may make you feel tired and hungry before lunch. Personally, I think nasi uduk is the most delicious breakfast.",
+    "contextKind": "passage",
+    "prompt": "What is the text mainly about?",
+    "options": [
+    "How to buy peanut butter",
+    "The best time to eat lunch",
+    "Why breakfast is important and what to eat",
+    "How to cook nasi uduk"
+    ],
+    "answer": 2,
+    "marker": "energy ... concentrate ... healthy breakfast",
+    "why": {
+    "3": "Nasi uduk hanya disebut di akhir sebagai pendapat.",
+    "1": "Pernyataan ini tidak ada di teks.",
+    "0": "Pernyataan ini tidak ada di teks."
+    },
+    "note": "Jawaban ini tidak tertulis kata per kata; ia disimpulkan dari petunjuk “energy ... concentrate ... healthy breakfast”."
+    },
+    {
+    "id": "tka-e15",
+    "skill": "tka_evaluatif",
+    "context": "Breakfast gives your body energy after a long night without food. Students who eat breakfast usually find it easier to concentrate in the morning. A healthy breakfast can be simple: rice with eggs, bread with peanut butter, or a banana and a glass of milk. Skipping breakfast may make you feel tired and hungry before lunch. Personally, I think nasi uduk is the most delicious breakfast.",
+    "contextKind": "passage",
+    "prompt": "Which sentence is an OPINION?",
+    "options": [
+    "Skipping breakfast may make you feel tired.",
+    "A healthy breakfast can be rice with eggs.",
+    "Breakfast gives your body energy.",
+    "Nasi uduk is the most delicious breakfast."
+    ],
+    "answer": 3,
+    "marker": "Personally, I think",
+    "why": {
+    "2": "Ini fakta yang bisa dicek, bukan pendapat penulis.",
+    "0": "Ini fakta yang bisa dicek, bukan pendapat penulis.",
+    "1": "Ini fakta yang bisa dicek, bukan pendapat penulis."
+    },
+    "note": "Fakta bisa dibuktikan; opini memuat penilaian seperti “best”, “I think”, atau “should”. Petunjuknya: “Personally, I think”."
+    },
+    {
+    "id": "tka-t16",
+    "skill": "tka_tekstual",
+    "context": "Last Thursday, our class visited Borobudur Temple in Magelang. We left school at 6 a.m. and arrived at 9 a.m. A guide explained that the temple was built in the 9th century and has more than 500 Buddha statues. We climbed to the top and took many photos. On the way home, everybody agreed it was the best school trip ever.",
+    "contextKind": "passage",
+    "prompt": "When was Borobudur built, according to the guide?",
+    "options": [
+    "In the 19th century",
+    "In the 9th century",
+    "Last Thursday",
+    "In the 6th century"
+    ],
+    "answer": 1,
+    "marker": "built in the 9th century",
+    "why": {
+    "3": "Angka 6 adalah jam berangkat.",
+    "0": "Pernyataan ini tidak ada di teks.",
+    "2": "Kamis lalu adalah hari kunjungan."
+    },
+    "note": "Jawabannya tertulis langsung di teks: cari kalimat “built in the 9th century”."
+    },
+    {
+    "id": "tka-i16",
+    "skill": "tka_inferensial",
+    "context": "Last Thursday, our class visited Borobudur Temple in Magelang. We left school at 6 a.m. and arrived at 9 a.m. A guide explained that the temple was built in the 9th century and has more than 500 Buddha statues. We climbed to the top and took many photos. On the way home, everybody agreed it was the best school trip ever.",
+    "contextKind": "passage",
+    "prompt": "How long did the trip from school to the temple take?",
+    "options": [
+    "About six hours",
+    "About nine hours",
+    "About one hour",
+    "About three hours"
+    ],
+    "answer": 3,
+    "marker": "left at 6 a.m. and arrived at 9 a.m.",
+    "why": {
+    "2": "Hitung: pukul 6 sampai pukul 9.",
+    "0": "Hitung: pukul 6 sampai pukul 9.",
+    "1": "Pukul 9 adalah jam tiba, bukan lama perjalanan."
+    },
+    "note": "Jawaban ini tidak tertulis kata per kata; ia disimpulkan dari petunjuk “left at 6 a.m. and arrived at 9 a.m.”."
+    },
+    {
+    "id": "tka-e16",
+    "skill": "tka_evaluatif",
+    "context": "Last Thursday, our class visited Borobudur Temple in Magelang. We left school at 6 a.m. and arrived at 9 a.m. A guide explained that the temple was built in the 9th century and has more than 500 Buddha statues. We climbed to the top and took many photos. On the way home, everybody agreed it was the best school trip ever.",
+    "contextKind": "passage",
+    "prompt": "Which sentence is an OPINION?",
+    "options": [
+    "They took many photos.",
+    "The class visited Borobudur Temple.",
+    "It was the best school trip ever.",
+    "The temple has more than 500 Buddha statues."
+    ],
+    "answer": 2,
+    "marker": "the best school trip ever",
+    "why": {
+    "1": "Ini fakta yang bisa dicek, bukan pendapat penulis.",
+    "3": "Ini fakta yang bisa dicek, bukan pendapat penulis.",
+    "0": "Ini fakta yang bisa dicek, bukan pendapat penulis."
+    },
+    "note": "Fakta bisa dibuktikan; opini memuat penilaian seperti “best”, “I think”, atau “should”. Petunjuknya: “the best school trip ever”."
+    }
+    ];
+  ITEMS = ITEMS.concat(TKA_ITEMS);
 
   var BY_ID = {};
   ITEMS.forEach(function (it) { BY_ID[it.id] = it; });
@@ -278,6 +1299,7 @@
     }
     if (skill === 'listening_detail') return ldItem(s % LF.length);
     if (skill === 'reading_inference') return riItem(s % RF.length);
+    if (TKA_ORDER.indexOf(skill) !== -1) { var pool = itemsFor(skill); return pool[s % pool.length]; }
     var vi = s % GEN_VERBS.length, si = (Math.floor(s / 7)) % GEN_SUBJ.length, ti = (Math.floor(s / 53)) % GEN_TIME.length;
     return skill === 'past_questions' ? pastQItem(vi, si, ti) : pastTenseItem(vi, si, ti);
   }
@@ -353,6 +1375,8 @@
       body = item.contextKind === 'picture' ? 'Gambar menunjukkan ' + item.marker + ', jadi kata yang tepat adalah “' + right + '”.' : 'Petunjuk konteksnya “' + item.marker + '” menunjuk ke “' + right + '”.';
     } else if (item.skill === 'listening_detail') {
       body = 'Jawabannya “' + right + '” — dengarkan kata kunci “' + item.marker + '”.';
+    } else if (TKA_ORDER.indexOf(item.skill) !== -1) {
+      body = 'Jawaban yang didukung teks adalah “' + right + '”. Petunjuknya: “' + item.marker + '”.';
     } else {
       body = 'Kesimpulan yang paling didukung teks adalah “' + right + '” lewat petunjuk “' + item.marker + '”.';
     }
@@ -434,7 +1458,7 @@
 
   return {
     pictureHtml: pictureHtml,
-    AREAS: AREAS, SKILLS: SKILLS, SKILL_ORDER: SKILL_ORDER, ITEMS: ITEMS,
+    AREAS: AREAS, SKILLS: SKILLS, SKILL_ORDER: SKILL_ORDER, TKA_ORDER: TKA_ORDER, ITEMS: ITEMS,
     itemsFor: itemsFor, byId: byId, pick: pick, pickFresh: pickFresh, variant: variant, generated: generated, picItem: picItem, PIC: PIC,
     diagnosticSet: diagnosticSet, explain: explain, buildSession: buildSession, afterSessionNote: afterSessionNote
   };

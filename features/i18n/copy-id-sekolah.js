@@ -66,6 +66,16 @@
     'sekolah.status-belum-tercapai': "Belum tercapai",
     'sekolah.status-remedial': "Remedial",
     'sekolah.status-tercapai': "Tercapai",
-    'sekolah.tingkat-kurang-data': "Belum cukup data"
+    'sekolah.tingkat-kurang-data': "Belum cukup data",
+    'sekolah.tka-catatan': "Ini peta latihan, bukan prediksi nilai TKA. Status muncul setelah 6 soal per kemampuan.",
+    'sekolah.tka-judul': "Latihan Membaca TKA",
+    'sekolah.tka-kicker': "Persiapan TKA",
+    'sekolah.tka-latih': "Latih 6 soal",
+    'sekolah.tka-lead': "Bahasa Inggris di TKA diuji lewat membaca. Latih tiga kemampuannya satu per satu.",
+    'sekolah.tka-soal': "soal",
+    'sekolah.tka-status-belum': "Belum cukup latihan",
+    'sekolah.tka-status-kuat': "Kuat",
+    'sekolah.tka-status-perlu': "Perlu latihan",
+    'sekolah.tka-status-sedang': "Sedang"
   });
 }());

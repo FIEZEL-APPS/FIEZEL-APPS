@@ -46,7 +46,38 @@ Kontrak:
 4. **Suntingan guru disimpan** di `c.raporEdits` dan menang atas deskripsi otomatis di CSV.
    Mengubah KKTP menyusun ulang deskripsi (suntingan lama dibuang karena tingkatnya berubah).
 
+## R3 — Jalur Membaca TKA (m025-478)
+
+Masalah: Bahasa Inggris di TKA SMA diuji lewat membaca (tekstual, inferensial, evaluatif),
+sedangkan bank ujian membaca FIEZEL hanya 8 bacaan.
+
+| Bagian | Berkas |
+|---|---|
+| 3 keterampilan (`tka_tekstual`, `tka_inferensial`, `tka_evaluatif`) + 16 bacaan × 3 = 48 soal, kunci tersebar rata 12/12/12/12 | `features/learner-flow/fiezel-review-bank.js` (`TKA_ORDER`, `TKA_ITEMS`) |
+| Kartu "Latihan Membaca TKA" + peta kesiapan jujur (tanpa prediksi nilai) + sesi 6 soal | `features/learner-flow/fiezel-learner-flow.js` (`tkaMarkup`, `startTka`, `case 'start-tka'`) |
+| Guru bisa menugaskan keterampilan TKA | `fiezel-teacher-store.js` (`TKA_SKILLS`), modal tugas di shell, `bankSkills()` di class hub |
+| Gerbang | `tests/tka-membaca-test.js` |
+
+Kontrak:
+1. **TKA di luar `SKILL_ORDER`.** `SKILL_ORDER` menggerakkan tes diagnostik (5 soal), rencana
+   harian, risiko, dan laporan murid ke guru. Memasukkan TKA ke sana mengubah semuanya untuk
+   seluruh murid.
+2. **Kunci tidak boleh menumpuk di satu huruf.** Soal baru ditulis lalu diacak berbiji;
+   `tests/tka-membaca-test.js` T4 menjaga sebarannya.
+3. **Peta kesiapan bukan prediksi.** Status hanya muncul setelah 6 soal per level; tidak ada
+   angka peluang lulus.
+
+## Gerbang Thai yang disesuaikan (keputusan owner, bertanggal)
+
+- `tests/th-coverage-test.js`: `UTANG_TANPA_TH` + `['sekolah', { sejak: '2026-10-05' }]`.
+- `tests/teacher-i18n-lazy-test.js` dan `tests/th-ui-leak-test.js`: kunci `sekolah.*` dikecualikan
+  dari tuntutan th **hanya selama** entri utang di atas ada. Anggaran literal th-ui-leak naik
+  untuk `fiezel-review-bank.js` (1→15, naskah soal TKA), `fiezel-teacher-shell.js` (7→8), dan
+  `fiezel-rapor-kktp.js` (baru, 3: kepala kolom CSV e-Rapor).
+- `tests/teacher-lazy-load-test.js`: bundel guru boleh memuat modul `features/teacher/` di antara
+  kurikulum dan shell; urutan kurikulum-pertama/shell-terakhir tetap dijaga.
+
 ## Belum dikerjakan
 
-R3–R8 (lihat dokumen strategi). Pemetaan TP ke Capaian Pembelajaran Fase D resmi belum
+R4–R8 (lihat dokumen strategi). Bank TKA target ≥ 60 bacaan; sekarang 16. Pemetaan TP ke Capaian Pembelajaran Fase D resmi belum
 ada: TP saat ini = keterampilan yang dilatih kelas.

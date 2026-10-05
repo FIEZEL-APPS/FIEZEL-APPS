@@ -244,3 +244,14 @@
 .paw-story-item{display:flex;gap:10px;align-items:center;justify-content:space-between}
 .paw-story-snip{flex:1;min-width:0;font-style:italic;color:var(--ink,#2b2b2b);overflow:hidden;text-overflow:ellipsis}
 .paw-story-full{max-height:70vh;overflow:auto}
+/* R3 Latihan Membaca TKA */
+.lf-tka{margin-top:20px}
+.lf-tka-list{list-style:none;padding:0;margin:12px 0;display:grid;gap:10px}
+.lf-tka-list li{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:10px 12px;border:1.5px solid var(--line);border-radius:14px}
+.lf-tka-list li small{display:block;color:var(--muted);font-size:.8rem;margin-top:2px}
+.lf-tka-chip{font-size:.76rem;font-weight:700;padding:4px 10px;border-radius:999px;background:var(--panel-soft);white-space:nowrap}
+.lf-tka-chip.is-kuat{background:#dff3e8;color:#14593a}
+.lf-tka-chip.is-sedang{background:#fff1cc;color:#6b4a00}
+.lf-tka-chip.is-perlu{background:#fde2dd;color:#8a2a1a}
+.lf-tka-note{font-size:.8rem}
+@media (max-width:560px){.lf-tka-list li{grid-template-columns:1fr auto}.lf-tka-list li>div{grid-column:1/-1}}

@@ -170,8 +170,13 @@ const ALLOWLIST = Object.freeze({
   'features/brain/fiezel-step-tutor.js': 1,                     // idem
   'features/class-hub/fiezel-braincore-review.js': 2,           // nama dua latihan di kartu ulasan
   'features/learner-flow/fiezel-learner-flow.js': 1,            // satu kalimat transisi sesi
-  'features/learner-flow/fiezel-review-bank.js': 1,             // satu ajakan buka kartu
-  'features/teacher/fiezel-teacher-shell.js': 7,                // layar guru, naskah lama (+4 m025-351: label 'Tenggat & tugas', 'Mapel', 'Penugasan nilai (assignment)', dan contoh soal 'Penugasan Kontingen...' ikut terlihat setelah kosakata baru masuk daftar)
+  /* 1 -> 15 (2026-10-05): 14 kalimat Indonesia dari R3 Jalur Membaca TKA (label, pola, catatan dan
+     penjelasan soal TKA). Keputusan OWNER: fitur sekolah Indonesia dibangun dalam bahasa Indonesia
+     saja; utang th domain 'sekolah' tercatat di UTANG_TANPA_TH (tests/th-coverage-test.js). */
+  'features/learner-flow/fiezel-review-bank.js': 15,
+  /* 7 -> 8 (2026-10-05): satu label rekap Rapor KKTP (R2). Layar guru Indonesia; lihat keputusan owner di atas. */
+  'features/teacher/fiezel-rapor-kktp.js': 3,                   // kepala kolom CSV e-Rapor (format resmi berbahasa Indonesia)
+  'features/teacher/fiezel-teacher-shell.js': 8,                // layar guru, naskah lama (+4 m025-351: label 'Tenggat & tugas', 'Mapel', 'Penugasan nilai (assignment)', dan contoh soal 'Penugasan Kontingen...' ikut terlihat setelah kosakata baru masuk daftar)
   'features/teacher/fiezel-teacher-store.js': 3,                // idem
   'features/tutor-action-center/fiezel-tutor-action-center.js': 3, // idem
   'features/tutor-classroom/fiezel-tutor-v3.js': 2              // NASKAH AJAR MURID — lihat §C3 laporan audit (+1 m025-351: kalimat 'Kurikulum A1 lengkap dulu...' ikut terlihat setelah 'Kurikulum'/'Lengkap' masuk daftar; utang yang sama, matanya yang baru)
@@ -290,7 +295,11 @@ const root = { FiezelI18n: { registerCopy: (l, m) => Object.assign(store[l], m) 
 for (const f of fs.readdirSync(path.join(__fzRoot, 'features/i18n')).filter((f) => /^copy-(id|th)-.*\.js$/.test(f))) {
   new Function('self', fs.readFileSync(path.join(__fzRoot, 'features/i18n', f), 'utf8'))(root);
 }
-const noTh = Object.keys(store.id).filter((k) => !store.th[k]);
+/* Kunci domain 'sekolah.' dikecualikan HANYA selama utangnya tercatat resmi di UTANG_TANPA_TH
+   (tests/th-coverage-test.js) — keputusan OWNER 2026-10-05: fitur sekolah Indonesia dibangun dalam
+   bahasa Indonesia saja. Hapus entri utang itu dan kunci sekolah kembali dituntut di th. */
+const sekolahDitunda = /\['sekolah',\s*\{\s*sejak:/.test(fs.readFileSync(path.join(__fzRoot, 'tests/th-coverage-test.js'), 'utf8'));
+const noTh = Object.keys(store.id).filter((k) => !store.th[k] && !(sekolahDitunda && k.indexOf('sekolah.') === 0));
 report.copyKeys = { id: Object.keys(store.id).length, th: Object.keys(store.th).length, idTanpaTh: noTh.length };
 if (noTh.length) {
   failed = true;

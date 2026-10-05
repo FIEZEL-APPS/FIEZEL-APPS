@@ -24,7 +24,10 @@
   var KEY = 'fiezel-teacher-v1';
   var ASSIGN_KEY = 'fiezel-learner-assignments-v1';
   var DAY = 86400000;
-  var SKILL_LABEL = { past_tense: 'Past tense', past_questions: 'Past questions', vocab_a2: 'Vocabulary A2', listening_detail: 'Listening detail', reading_inference: 'Reading inference', speaking: 'Speaking' };
+  var SKILL_LABEL = { past_tense: 'Past tense', past_questions: 'Past questions', vocab_a2: 'Vocabulary A2', listening_detail: 'Listening detail', reading_inference: 'Reading inference', speaking: 'Speaking', tka_tekstual: 'TKA tekstual', tka_inferensial: 'TKA inferensial', tka_evaluatif: 'TKA evaluatif' };
+  /* R3: keterampilan Membaca TKA bisa ditugaskan guru, tetapi SENGAJA di luar SKILL_ORDER (yang
+     menggerakkan risiko, peta panas, dan laporan murid) supaya kelas tanpa latihan TKA tidak berubah. */
+  var TKA_SKILLS = ['tka_tekstual', 'tka_inferensial', 'tka_evaluatif'];
   var SKILL_ORDER = ['past_tense', 'past_questions', 'vocab_a2', 'listening_detail', 'reading_inference', 'speaking'];
   var MAPEL_NAMES = {
     MAT: 'Matematika',
@@ -714,7 +717,7 @@
     });
   }
 
-  return { KEY: KEY, ASSIGN_KEY: ASSIGN_KEY, SKILL_LABEL: SKILL_LABEL, SKILL_ORDER: SKILL_ORDER, MAPEL_NAMES: MAPEL_NAMES, ATT: ATT, DAY: DAY,
+  return { KEY: KEY, ASSIGN_KEY: ASSIGN_KEY, SKILL_LABEL: SKILL_LABEL, SKILL_ORDER: SKILL_ORDER, TKA_SKILLS: TKA_SKILLS, MAPEL_NAMES: MAPEL_NAMES, ATT: ATT, DAY: DAY,
     load: load, save: save, defaults: defaults, setPreview: setPreview, isPreview: isPreview, uid: uid, today: today, firstName: firstName, newClass: newClass, newStudent: newStudent, normalizeClass: normalizeClass, seedDemo: seedDemo, makeClassCode: makeClassCode, normalizeClassCode: normalizeClassCode,
     skillAcc: skillAcc, overallAcc: overallAcc, daysSince: daysSince, risk: risk, classStats: classStats, classSkillMap: classSkillMap, heatmap: heatmap, activeSkills: activeSkills, studyGroups: studyGroups, misconceptions: misconceptions, needsGreeting: needsGreeting, agenda: agenda, pendingAssignments: pendingAssignments, targeted: targeted, recentAttendance: recentAttendance, attendanceRate: attendanceRate, weakestSkill: weakestSkill,
     durasi: durasi, examLabel: examLabel, acceptJoin: acceptJoin, rejectJoin: rejectJoin, pendingJoins: pendingJoins, normalizeFocus: normalizeFocus, focusGrew: focusGrew, focusOf: focusOf, focusLabel: focusLabel, focusLevel: focusLevel,
