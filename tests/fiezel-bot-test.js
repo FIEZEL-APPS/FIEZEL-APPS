@@ -171,6 +171,8 @@ console.log('[T14] [BUG] Memastikan review & heal tidak berbagi grup concurrency
   assert(!/^concurrency\s*:/m.test(wfContent), 'Concurrency tingkat workflow dilarang: heal yang antre bisa membatalkan review (check wajib)');
   assert(/concurrency:\s*\n\s*group: fiezel-bot-review-/.test(wfContent), 'Job review wajib punya grup concurrency sendiri');
   assert(/concurrency:\s*\n\s*group: fiezel-bot-heal-/.test(wfContent), 'Job heal wajib punya grup concurrency sendiri');
+  const concCount = (wfContent.match(/^ {4}concurrency:/gm) || []).length;
+  assert(concCount === 2, `Tepat satu kunci concurrency per job (ditemukan ${concCount}); kunci ganda membuat YAML ambigu`);
 }
 console.log('  ok');
 pass++;

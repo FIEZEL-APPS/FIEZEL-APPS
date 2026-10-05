@@ -429,9 +429,14 @@ jobs:
             exit 0
           fi
           git commit -m "bot(heal): auto-healing CI failure by Fiezel Bot"
-          git push origin "HEAD:${HEAD_BRANCH}"
-          echo "patched=true" >> "$GITHUB_OUTPUT"
-          echo "Berkas terpatch: ${FILES[*]}"
+          if git push origin "HEAD:${HEAD_BRANCH}"; then
+            echo "patched=true" >> "$GITHUB_OUTPUT"
+            echo "Berkas terpatch: ${FILES[*]}"
+          else
+            echo "patched=false" >> "$GITHUB_OUTPUT"
+            echo "push_failed=true" >> "$GITHUB_OUTPUT"
+            echo "::warning::Gagal melakukan push (mungkin branch sudah maju). Laporan tetap dikirim."
+          fi
 
       - name: Post CI Heal Report on PR
         # !cancelled(): laporan tetap terposting walau step push gagal
@@ -442,6 +447,7 @@ jobs:
           PR_NUMBER: ${{ steps.collect.outputs.pr_number }}
           PATCHED: ${{ steps.push.outputs.patched }}
           PUSH_OUTCOME: ${{ steps.push.outcome }}
+          PUSH_FAILED: ${{ steps.push.outputs.push_failed }}
           PROTECTED: ${{ steps.guard.outputs.protected }}
         with:
           script: |
@@ -455,7 +461,7 @@ jobs:
             let outcome;
             if (protectedBranch) {
               outcome = '⛔ Branch terproteksi — bot menolak menulis. Perbaikan manual diperlukan.';
-            } else if (process.env.PUSH_OUTCOME === 'failure') {
+            } else if (process.env.PUSH_FAILED === 'true' || process.env.PUSH_OUTCOME === 'failure') {
               outcome = '⚠️ Patch dibuat tetapi **push gagal** (kemungkinan branch sudah maju sejak commit yang gagal). Tidak ada perubahan yang masuk ke branch.';
             } else if (patched) {
               outcome = '✅ Patch diterapkan dan di-push. Push memakai `GITHUB_TOKEN` sehingga **tidak memicu CI baru secara otomatis** — jalankan ulang workflow untuk memverifikasi.';

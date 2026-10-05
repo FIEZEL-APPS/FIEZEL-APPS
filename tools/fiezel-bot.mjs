@@ -78,8 +78,8 @@ const DEFAULT_MODEL_CHAINS = {
     fast:   ['gemini-3.5-flash', 'gemini-3.8-flash', 'gemini-flash-lite-latest', 'gemini-flash-latest'],
   },
   groq: {
-    review: ['openai/gpt-oss-120b', 'qwen/qwen3.8-27b'],
-    fast:   ['openai/gpt-oss-120b', 'qwen/qwen3.8-27b'],
+    review: ['openai/gpt-oss-120b'],
+    fast:   ['openai/gpt-oss-120b'],
   },
 };
 const MODEL_ENV = {
@@ -213,7 +213,8 @@ function resolveSafeRepoPath(relFile) {
   if (lower.startsWith('.github/')) return { ok: false, reason: '`.github/` dilindungi' };
   if (lower === 'node_modules' || lower.startsWith('node_modules/')) return { ok: false, reason: '`node_modules/` dilindungi' };
   if (lower.startsWith('tests/')) return { ok: false, reason: '`tests/` dilindungi (AI tidak boleh melemahkan gerbang)' };
-  if (PATCH_JAIL_PROTECTED_FILES.includes(lower)) return { ok: false, reason: 'berkas gerbang/mesin bot dilindungi' };
+  if (lower.startsWith('tools/')) return { ok: false, reason: '`tools/` dilindungi dari patch AI' };
+  if (PATCH_JAIL_PROTECTED_FILES.includes(lower)) return { ok: false, reason: 'berkas gerbang/build dilindungi' };
   const abs = path.resolve(ROOT, normalized);
   const rel = path.relative(ROOT, abs);
   if (rel.startsWith('..') || path.isAbsolute(rel)) return { ok: false, reason: 'keluar dari repo' };
@@ -1261,6 +1262,7 @@ function runBump(reason = 'chore: bump build via Fiezel Bot') {
       console.error('[Fiezel Bot v2] ❌ Hexa-Sync TIDAK selaras setelah bump. Bump dianggap gagal.');
       return false;
     }
+    // Pemanggil (runHeal, perintah bump) menulis BUMP_FILES sebagai daftar patch.
     return true;
   } catch (err) {
     console.error(`[Fiezel Bot v2] Gagal bump: ${err.message}`);
@@ -1446,14 +1448,14 @@ async function runSelfTest() {
 
   // T9: PATCH JAIL — path berbahaya WAJIB ditolak.
   const jailCases = ['../etc/passwd', '.git/config', '.github/workflows/fiezel-bot.yml', 'node_modules/x.js', '/etc/passwd', 'C:\\Windows\\x', 'a/../../b',
-    'tests/foo-test.js', 'tools/fiezel-bot.mjs', 'tools/bump-build.mjs', 'tools/fiezel-guardians.mjs', 'coordination/BUILD-VERSION.json'];
+    'tests/foo-test.js', 'tools/x.mjs', 'tools/fiezel-bot.mjs', 'tools/bump-build.mjs', 'tools/fiezel-guardians.mjs', 'coordination/BUILD-VERSION.json'];
   for (const bad of jailCases) {
     if (resolveSafeRepoPath(bad).ok) throw new Error(`T9 FAIL: patch jail meloloskan "${bad}"`);
   }
-  for (const good of ['tools/x.mjs', 'features/brain/a.js', 'app.js']) {
+  for (const good of ['features/brain/a.js', 'app.js']) {
     if (!resolveSafeRepoPath(good).ok) throw new Error(`T9 FAIL: patch jail menolak berkas sah "${good}"`);
   }
-  console.log('  ✅ T9: Patch jail (path traversal, .git/.github, tests/ & mesin gerbang ditolak)');
+  console.log('  ✅ T9: Patch jail (path traversal, .git/.github, tests/, tools/ & BUILD-VERSION ditolak)');
   pass++;
 
   // T10: Hexa-Sync membaca ENAM titik.
@@ -1486,6 +1488,8 @@ async function runSelfTest() {
   pass++;
 
   // T14: Daftar berkas bump = enam titik Hexa-Sync (dipakai fix/bump/heal untuk push).
+  // runBump WAJIB boolean: runHeal memakai nilainya langsung sebagai `changed`.
+  if (!/function runBump[\s\S]*?\n}\n/.exec(fs.readFileSync(fileURLToPath(import.meta.url), 'utf8'))[0].match(/return (true|false);/g)) throw new Error('T14 FAIL: runBump harus mengembalikan boolean');
   if (BUMP_FILES.length !== 6 || !BUMP_FILES.includes('coordination/BUILD-VERSION.json')) throw new Error('T14 FAIL: BUMP_FILES');
   const explainMd = composeExplainMarkdown('Test', { text: 'OK', provider: 'test' });
   if (!explainMd.startsWith('<!-- FIEZEL_BOT_EXPLAIN -->')) throw new Error('T14 FAIL: marker explain');
