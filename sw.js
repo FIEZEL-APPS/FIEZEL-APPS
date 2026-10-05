@@ -53,7 +53,7 @@ const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
 // dilayani dan kedua berkas baru tidak pernah sampai ke pengguna lama - aplikasi mereka
 // akan menjalankan app.js baru tanpa berkas benderanya, dan seluruh bendera jatuh ke
 // salinan bawaan di app.js. Naik SEKALI untuk seluruh gelombang.
-const SW_REV='m025-491-unified-grammar-20261002';
+const SW_REV='m025-492-unified-grammar-20261002';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
 // m025-61: health check menanyakan revisi shell langsung ke worker yang sedang aktif.
 // Menebaknya dari nama cache tidak cukup: cache lama bisa tertinggal, sedangkan jawaban ini
@@ -295,6 +295,19 @@ self.addEventListener('fetch',e=>{
   if(e.request.method!=='GET')return;
   const requestUrl=new URL(e.request.url);
   if(requestUrl.pathname.toLowerCase().endsWith('/version.json')){e.respondWith(fetch(e.request).then(r=>r&&r.ok?r:caches.match(e.request,{cacheName:SHELL_CACHE})).catch(()=>caches.match(e.request,{cacheName:SHELL_CACHE})));return}
+  // m025-492: penanda build halaman LIVE (`coordination/BUILD-VERSION.json`) WAJIB
+  // jaringan-dulu, tanpa salinan cache. Alasannya lebih keras daripada version.json di atas.
+  //
+  // Kartu "Versi baru" (features/ui/fiezel-update-prompt.js) memakai berkas ini sebagai
+  // sinyal UTAMA bahwa ada rilis lebih baru - VERSION.json semver tidak pernah maju di
+  // produksi. Tanpa cabang ini permintaannya jatuh ke jalur aset cangkang di bawah, yang
+  // CACHE-FIRST + ignoreSearch: begitu nilainya masuk shell cache generasi lama, ia BEKU di
+  // perangkat itu dan pemeriksa pembaruan membaca ajakan basi selamanya - persis kelas bug
+  // m025-492 yang hendak ditutup. Karena itu tidak ada `caches.match` yang boleh menang, dan
+  // tidak ada salinan yang ditulis: luring mengembalikan 503 (bukan nilai basi), sehingga
+  // modul memperlakukan sinyal ini sebagai tidak ada dan jatuh ke jaring pengaman
+  // kandidat-worker yang memang benar saat luring.
+  if(requestUrl.pathname.toLowerCase().endsWith('/coordination/build-version.json')){e.respondWith(fetch(e.request).then(r=>r&&r.ok?r:new Response('',{status:503})).catch(()=>new Response('',{status:503})));return}
   // m025-150 indeks audio TIDAK boleh cache-first.
   //
   // Batch aset mendarat di antara rilis, sedangkan SHELL_CACHE hanya berganti saat SW_REV

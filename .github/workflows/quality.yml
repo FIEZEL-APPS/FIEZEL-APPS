@@ -608,9 +608,19 @@ jobs:
           # pendengar fetch sungguhan dari sw.js, bukan mencocokkan pola teks.
           node tests/sw-nav-shell-first-test.js
           node tests/pwa-release-coherence-test.js
+          # m025-492: kartu pembaruan membaca coordination/BUILD-VERSION.json sebagai sinyal
+          # UTAMA. Gerbang ini menegakkan bahwa jalur aset cangkang yang cache-first tidak
+          # pernah membekukan penanda itu: jaringan selalu ditempuh, salinan tidak ditulis,
+          # dan luring menjawab 503 - bukan ajakan basi yang menyesatkan.
+          node tests/sw-build-marker-freshness-test.js
           # m025-212: kabar pembaruan wajib TERLIHAT murid - kartu di layar, tombolnya
           # yang memicu perpindahan generasi controller, bukan muat ulang diam-diam.
           node tests/update-prompt-test.js
+          # m025-492: gerbang di atas memeriksa BENTUK berkas; gerbang ini menjalankan
+          # modulnya di sandbox dan membuktikan SINYALNYA benar-benar bisa maju - dulu
+          # sinyalnya bersandar pada VERSION.json semver yang beku di produksi, sehingga
+          # PWA terpasang membeku tanpa satu pun tanda di layar.
+          node tests/update-prompt-signal-test.js
           # m025-246 gelombang penyederhanaan pengalaman. Tiga gerbang, tiga lapis:
           #   tests/ux-flags-test.js    - nilai bawaan sakelar + salinan app.js tidak menyimpang
           #   tests/ux-redesign-test.js - apa yang ada DI BALIK sakelar (nav 4 tab, Home Hari ini,

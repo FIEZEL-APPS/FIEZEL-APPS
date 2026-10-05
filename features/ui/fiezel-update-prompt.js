@@ -38,7 +38,31 @@
 
   var CHECK_MS = 60 * 1000;
   var APP_VERSION = String(self.FIEZEL_VERSION || '');
+  /* m025-492 — PENANDA YANG BENAR-BENAR MAJU ADALAH BUILD HALAMAN, BUKAN VERSI SEMVER.
+   *
+   * Kenapa ini ada. Kartu "Versi baru" dibangun di atas asumsi bahwa ./VERSION.json maju
+   * setiap rilis. Asumsi itu TIDAK PERNAH BENAR: berkas itu berisi versi semver pedagogi
+   * ('5.19.0') yang hanya berubah saat konten berubah, dan ia TIDAK PERNAH ditulis ulang di
+   * produksi (content-adoption.js:84 hanya menulisnya ke direktori STAGING). Jadi di
+   * perangkat yang sudah memasang build ini, fetchRemoteVersion() selalu mengembalikan
+   * string yang sama dengan APP_VERSION, isNewerVersion() selalu false, dan kartu tidak
+   * pernah muncul walau SW baru sudah menunggu - PWA yang sudah terpasang membeku diam-diam.
+   *
+   * Yang BENAR-BENAR berubah tiap rilis adalah nomor build halaman (m025-N). Ia sudah ada di
+   * dua tempat yang bisa dibandingkan tanpa menyentuh apa pun:
+   *   - salinan LOKAL yang dieksekusi  : self.FIEZEL_PAGE_BUILD  (core-config.js, di-precache)
+   *   - salinan LIVE di server         : coordination/BUILD-VERSION.json (diambil jaringan)
+   * Keduanya se-ruang (m025-N), jadi perbandingannya langsung dan tidak menyeret versi
+   * semver yang justru jadi nama cache neural stabil `fiezel-v${FIEZEL_VERSION}`.
+   *
+   * VERSION.json TIDAK dibuang: ia tetap dibaca sebagai pensinyal cadangan, sehingga perilaku
+   * kartu identik seperti sebelumnya bila suatu saat semver benar-benar maju. Yang berubah
+   * hanyalah pensinyal UTAMA. */
+  var APP_BUILD = String(self.FIEZEL_PAGE_BUILD || '');
   var started = false, reloadBound = false, shown = false, pendingWorker = null;
+  /* Kandidat terakhir yang sudah DIKONFIRMASI lebih baru, supaya perayapan berkala (yang
+   * sengaja dibuat ringan) tidak perlu membandingkan ulang setiap kali. */
+  var bestBuild = null, bestRemote = '';
 
   function el() { try { return document.getElementById('updateBanner'); } catch (_) { return null; } }
   function sfx(name) { try { if (typeof self.uiSfx === 'function') self.uiSfx(name); } catch (_) {} }
@@ -63,6 +87,26 @@
       if (rv < cv) return false;
     }
     return false;
+  }
+  /* Nomor build halaman ('m025-491') diparse jadi satu bilangan bulat supaya m025-1000
+   * tetap dinilai lebih baru daripada m025-999 (perbandingan string akan salah). Nomor
+   * build bertipe BEDA dari semver: keduanya tidak pernah dibandingkan silang. */
+  function parseBuild(v) {
+    var m = String(v == null ? '' : v).match(/^m(\d+)-(\d+)/i);
+    return m ? (parseInt(m[1], 10) * 100000 + parseInt(m[2], 10)) : null;
+  }
+  function isNewerBuild(remote, cur) {
+    var r = parseBuild(remote), c = parseBuild(cur);
+    if (r === null || c === null) return false;
+    return r > c;
+  }
+  /* Satu-satunya tempat "apakah ada yang lebih baru" diputuskan, supaya perayapan berkala,
+   * pemeriksaan paksa, dan show() tidak bisa menyimpang. Build halaman diprioritaskan; semver
+   * hanya dipakai bila build tidak diketahui di salah satu sisi (mis. berkas lama). */
+  function newerKind(remote) {
+    if (remote && remote.build && APP_BUILD) return isNewerBuild(remote.build, APP_BUILD) ? 'build' : '';
+    if (remote && remote.version && APP_VERSION) return isNewerVersion(remote.version, APP_VERSION) ? 'semver' : '';
+    return '';
   }
   function bindReload() {
     if (reloadBound || !navigator.serviceWorker || typeof navigator.serviceWorker.addEventListener !== 'function') return;
@@ -139,9 +183,13 @@
     deferred = null;
     return show(pending.worker, pending.remoteVersion);
   }
-  function show(worker, remoteVersion) {
+  function show(worker, remoteVersion, force) {
     if (worker) pendingWorker = worker;
-    if (!worker && remoteVersion && APP_VERSION && !isNewerVersion(remoteVersion, APP_VERSION)) return false;
+    if (!worker && remoteVersion && newerKind(remoteVersion)) {
+      if (remoteVersion.build) bestBuild = remoteVersion.build;
+      if (remoteVersion.version) bestRemote = remoteVersion.version;
+    }
+    if (!worker && !force && remoteVersion && !newerKind(remoteVersion) && !bestBuild && !bestRemote) return false;
     if (shown) return false;
     if (sess('fiezel-apply-update') === '1') {
       dropSess('fiezel-apply-update');
@@ -175,11 +223,13 @@
     } catch (_) {}
     var line = node.querySelector('#updateBannerVersion');
     if (line) {
-      if (remoteVersion && remoteVersion !== APP_VERSION) {
-        var vText = t('update.version-text', { newVersion: remoteVersion, curVersion: APP_VERSION || '' });
+      var newLabel = (remoteVersion && (remoteVersion.build || remoteVersion.version)) || bestBuild || bestRemote || '';
+      var curLabel = APP_BUILD || APP_VERSION || '';
+      if (newLabel && curLabel && newLabel !== curLabel) {
+        var vText = t('update.version-text', { newVersion: newLabel, curVersion: curLabel });
         line.textContent = (vText && vText !== 'update.version-text')
           ? vText
-          : ('Versi ' + remoteVersion + (APP_VERSION ? ' · kamu sekarang memakai ' + APP_VERSION : ''));
+          : ('Versi ' + newLabel + (curLabel ? ' · kamu sekarang memakai ' + curLabel : ''));
       } else {
         line.textContent = '';
       }
@@ -197,10 +247,19 @@
   }
 
   function fetchRemoteVersion() {
-    return fetch('./VERSION.json?t=' + Date.now(), { cache: 'no-store' })
-      .then(function (r) { return r && r.ok ? r.json() : null; })
-      .then(function (v) { return String((v && v.version) || ''); })
-      .catch(function () { return ''; });
+    var out = { version: '', build: '' };
+    return Promise.all([
+      fetch('./VERSION.json?t=' + Date.now(), { cache: 'no-store' })
+        .then(function (r) { return r && r.ok ? r.json() : null; })
+        .then(function (v) { out.version = String((v && v.version) || ''); })
+        .catch(function () {}),
+      /* Sinyal UTAMA: build halaman yang benar-benar terbit (lihat catatan APP_BUILD di atas).
+       * Gagal mengambilnya bukan kegagalan - VERSION.json masih jadi cadangan. */
+      fetch('./coordination/BUILD-VERSION.json?t=' + Date.now(), { cache: 'no-store' })
+        .then(function (r) { return r && r.ok ? r.json() : null; })
+        .then(function (v) { out.build = String((v && v.version) || ''); })
+        .catch(function () {})
+    ]).then(function () { return out; });
   }
 
   function watchRegistration(reg, remoteVersion) {
@@ -227,16 +286,70 @@
       if (!reg) return false;
       bindReload();
       return fetchRemoteVersion().then(function (remote) {
+        var kind = newerKind(remote);
+        /* Ingat kandidat terbaru supaya perayapan berkala tak perlu membandingkan ulang. */
+        if (kind === 'build') bestBuild = remote.build;
+        if (kind === 'semver') bestRemote = remote.version;
         if (watchRegistration(reg, remote)) return true;
         return Promise.resolve(reg.update()).catch(function () {}).then(function () {
           if (reg.waiting) return show(reg.waiting, remote);
-          // VERSION.json sudah maju tetapi service worker belum punya kandidat baru (mis.
-          // hanya berkas non-precache yang berubah). Kartunya tetap muncul; jalur "tanpa
-          // worker menunggu" di apply() menanganinya dengan muat ulang biasa.
-          if (remote && APP_VERSION && isNewerVersion(remote, APP_VERSION)) return show(null, remote);
-          return false;
+          // Sinyal REMOTE sudah lebih baru (build halaman atau VERSION.json) tetapi service
+          // worker belum punya kandidat baru (mis. hanya berkas non-precache yang berubah).
+          // Kartu tetap muncul; jalur "tanpa worker menunggu" di apply() menanganinya dengan
+          // muat ulang biasa.
+          if (kind) return show(null, remote);
+          /* JARING PENGAMAN D3 (m025-492) - KEBALIKAN DARI BUG DI ATAS.
+           *
+           * Bila ada KANDIDAT SW yang menunggu tetapi sinyal remote tidak terbaca (jaringan
+           * gagal, BUILD-VERSION.json tak terjangkau, atau perbandingan tidak meyakinkan),
+           * kartu WAJIB tetap muncul. Membandingkan remote dengan penanda LOKAL yang basi
+           * persis bug yang membuat PWA terpasang membeku: kandidat baru sudah ada di
+           * perangkat, tetapi halaman menyimpulkan "tidak ada yang baru" dan diam.
+           *
+           * kandidat-pelanggan yang lebih baru daripada controller sudah cukup untuk
+           * menyimpulkan ada build yang lebih baru; kita tidak perlu tahu angkanya untuk
+           * menawarkannya. `reg.waiting` sudah ditangani di atas, jadi di sini hanya
+           * `installing`/`installed` yang belum sempat menjadi waiting. */
+          try {
+            var cand = reg.installing;
+            if (cand && cand !== navigator.serviceWorker.controller && cand.state && cand.state !== 'activated') {
+              return show(cand, remote);
+            }
+          } catch (_) {}
+          /* Jaring pengaman terakhir & paling murah: kita TAHU dari health-check bahwa revisi
+           * shell yang aktif (SW_REV, berawalan 'm025-N') berbeda dari penanda halaman lokal.
+           * Itu bukti langsung ada build lain yang memuat aplikasi ini. Tidak bergantung pada
+           * jaringan sama sekali. */
+          return shellRevisionMismatch().then(function (rev) {
+            var revNum = parseBuild(rev), mine = parseBuild(APP_BUILD);
+            /* parseBuild mengurai 'm025-491-unified-…' menjadi m025*100000+491, jadi awalan
+             * 'm025' saja tidak pernah disalahartikan sebagai nomor build yang berbeda.
+             * force=true: bukti ketakcocokan datang dari worker yang MELAYANI halaman, bukan
+             * dari angka remote yang bisa saja tak terbaca - jadi penjaga di show() tak boleh
+             * menolaknya karena kebetulan remote kosong. */
+            if (revNum !== null && mine !== null && revNum !== mine) return show(null, remote, true);
+            return false;
+          });
         });
       });
+    });
+  }
+
+  /* Menanyakan revisi shell ke worker yang SEDANG melayani halaman (kontrak install-health
+   * yang sudah ada: pesan FIEZEL_HEALTH_PING -> balasan {swRev}). Selalu selesai (resolve),
+   * tidak pernah menggantung, dan tidak melempar - ini jaring pengaman, bukan jalur utama. */
+  function shellRevisionMismatch() {
+    return new Promise(function (resolve) {
+      try {
+        var ctrl = navigator.serviceWorker && navigator.serviceWorker.controller;
+        if (!ctrl || typeof MessageChannel === 'undefined') { resolve(''); return; }
+        var ch = new MessageChannel();
+        var done = false;
+        var finish = function (v) { if (done) return; done = true; resolve(String(v || '')); };
+        ch.port1.onmessage = function (e) { finish(e && e.data && e.data.swRev); };
+        setTimeout(function () { finish(''); }, 1200);
+        ctrl.postMessage({ type: 'FIEZEL_HEALTH_PING' }, [ch.port2]);
+      } catch (_) { resolve(''); }
     });
   }
 
