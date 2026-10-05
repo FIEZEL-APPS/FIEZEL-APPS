@@ -3182,7 +3182,7 @@
     var key = (st.view || 'briefing') + '|' + (st.activeClassId || '') + '|' + (ui.modal ? ui.modal.kind : '') + '|' + (ui.drawer || '');
     var repaint = key === lastPaintKey;
     lastPaintKey = key;
-    el.innerHTML = '<div class="tg' + (repaint ? ' is-repaint' : '') + (previewOn ? ' is-demo' : '') + (ui.modal && ui.modal.kind === 'board' ? ' tg-board-open' : '') + '" data-testid="teacher-shell">' + demoBanner() + sidebar(c) + '<div class="tg-main">' + topbar(c) + '<div class="tg-content">' + (st.classes.length || st.view === 'hub' || st.view === 'settings' ? (views[st.view] ? views[st.view](c) : views.briefing(c)) : welcome()) + '</div></div>' + mobileNav() + drawer(c) + modal(c) + '</div>';
+    el.innerHTML = '<div class="tg' + (repaint ? ' is-repaint' : '') + (previewOn ? ' is-demo' : '') + (ui.modal && (ui.modal.kind === 'board' || ui.modal.kind === 'warmup') ? ' tg-board-open' : '') + '" data-testid="teacher-shell">' + demoBanner() + sidebar(c) + '<div class="tg-main">' + topbar(c) + '<div class="tg-content">' + (st.classes.length || st.view === 'hub' || st.view === 'settings' ? (views[st.view] ? views[st.view](c) : views.briefing(c)) : welcome()) + '</div></div>' + mobileNav() + drawer(c) + modal(c) + '</div>';
     var hubEl = el.querySelector('#tgClassHub');
     /* Hub KelasKu menerima sistem kurikulum lewat env, bukan dengan menyalin mesinnya
        (m025-357). Yang menyeberang hanya TIGA fungsi: penjaga, perender, dan pemicu muat.
@@ -3423,7 +3423,7 @@
         return '<article class="tg-card tg-assign' + (a.mode === 'ujian' ? ' is-exam' : '') + '" data-testid="tg-assign-' + a.id + '"><div class="tg-card-head"><div><p class="tg-kicker">' + (a.mode === 'ujian' ? icon('shield') + ' Ujian · ' + a.timer + ' mnt · acak' : icon('pencil-ruler') + ' Latihan · ' + a.minutes + ' mnt') + '</p><h3>' + esc(a.title) + '</h3></div><button type="button" class="tg-icon-btn" data-tg="archive-assign" data-id="' + a.id + '" aria-label="' + esc(t('guru.siklus.arsipkan', 'Arsipkan')) + '" title="' + esc(t('guru.siklus.arsipkan', 'Arsipkan')) + '" data-testid="tg-archive-' + a.id + '">' + icon('archive') + '</button></div>' +
           '<p class="tg-muted">' + a.skills.map(function (k) { return mapelName(k) || T.SKILL_LABEL[k] || k; }).join(' + ') + ' · ' + a.itemIds.length + ' soal · ' + (a.targets ? tgt.length + ' siswa terpilih' : 'seluruh kelas') + '</p>' +
           '<div class="tg-progress"><div class="tg-progress-head"><span>' + done.length + '/' + tgt.length + ' selesai' + (avg != null ? ' · rata-rata ' + pct(avg) : '') + '</span><span class="' + (late ? 'tg-late' : '') + '">' + (a.deadline ? esc(t('guru.siklus.tenggat', 'Tenggat {tanggal}').replace('{tanggal}', T.fmtDate(a.deadline + 'T00:00:00'))) + (late ? ' ' + esc(t('guru.siklus.lewat-kurung', '(lewat)')) : '') : esc(t('kelas.tanpa-tenggat', 'Tanpa tenggat'))) + '</span></div>' + bar(tgt.length ? done.length / tgt.length : 0, avg != null && avg < 0.5 ? 'is-warn' : '') + '</div>' +
-          '<div class="tg-actions">' + (lewatTab ? '' : '<button type="button" class="tg-btn is-small is-primary" data-tg="send-assign" data-id="' + a.id + '" data-testid="tg-send-all-' + a.id + '"' + (ui.sending === a.id ? ' disabled' : '') + '>' + icon('send') + (a.targets ? (a.sent && a.sent.all ? ' ' + t('guru.kirim-ulang-ke', 'Kirim ulang ke') + ' ' : ' ' + t('guru.kirim-ke', 'Kirim ke') + ' ') + tgt.length + ' murid terpilih' : (a.sent && a.sent.all ? ' ' + t('guru.kirim-ulang-semua', 'Kirim ulang ke semua') : ' ' + t('guru.kirim-semua-murid', 'Kirim ke semua murid'))) + '</button><a class="tg-btn is-small is-wa-ghost" target="_blank" rel="noopener" href="' + T.waLink('', waMsgCard) + '" data-testid="tg-card-wa-' + a.id + '">' + icon('message-circle') + ' ' + esc(t('guru.bagikan-wa-singkat', 'WhatsApp')) + '</a><button type="button" class="tg-btn is-small is-ghost" data-tg="copy" data-text="' + esc(asgCode) + '" data-testid="tg-card-copy-' + a.id + '">' + icon('copy') + ' ' + esc(t('guru.salin-kode-singkat', 'Salin Kode')) + '</button><button type="button" class="tg-btn is-small is-ghost" data-tg="modal" data-kind="share-assign" data-id="' + a.id + '" data-testid="tg-share-assign-' + a.id + '">' + icon('users') + ' ' + t('guru.pilih-murid-kode', 'Pilih murid / kode') + '</button>') + '<button type="button" class="tg-btn is-small is-ghost" data-tg="modal" data-kind="assign-detail" data-id="' + a.id + '">' + icon('list-checks') + ' ' + esc(t('guru.siapa-belum', 'Siapa yang belum')) + '</button>' + (lewatTab ? '<button type="button" class="tg-btn is-small is-ghost" data-tg="archive-assign" data-id="' + a.id + '">' + icon('archive') + ' ' + esc(t('guru.siklus.arsipkan', 'Arsipkan')) + '</button>' : '') + tombolTarik(a) + '</div>' + barKonfirmasi('tarik', a) + (a.sent && a.sent.all ? '<p class="tg-muted tg-sent-note">' + icon('check') + ' Terkirim ke semua murid ' + esc(T.fmtDate(a.sent.all)) + '</p>' : '') + '</article>';
+          '<div class="tg-actions">' + (lewatTab ? '' : '<button type="button" class="tg-btn is-small is-primary" data-tg="send-assign" data-id="' + a.id + '" data-testid="tg-send-all-' + a.id + '"' + (ui.sending === a.id ? ' disabled' : '') + '>' + icon('send') + (a.targets ? (a.sent && a.sent.all ? ' ' + t('guru.kirim-ulang-ke', 'Kirim ulang ke') + ' ' : ' ' + t('guru.kirim-ke', 'Kirim ke') + ' ') + tgt.length + ' murid terpilih' : (a.sent && a.sent.all ? ' ' + t('guru.kirim-ulang-semua', 'Kirim ulang ke semua') : ' ' + t('guru.kirim-semua-murid', 'Kirim ke semua murid'))) + '</button><a class="tg-btn is-small is-wa-ghost" target="_blank" rel="noopener" href="' + T.waLink('', waMsgCard) + '" data-testid="tg-card-wa-' + a.id + '">' + icon('message-circle') + ' ' + esc(t('guru.bagikan-wa-singkat', 'WhatsApp')) + '</a><button type="button" class="tg-btn is-small is-ghost" data-tg="copy" data-text="' + esc(asgCode) + '" data-testid="tg-card-copy-' + a.id + '">' + icon('copy') + ' ' + esc(t('guru.salin-kode-singkat', 'Salin Kode')) + '</button><button type="button" class="tg-btn is-small is-ghost" data-tg="modal" data-kind="share-assign" data-id="' + a.id + '" data-testid="tg-share-assign-' + a.id + '">' + icon('users') + ' ' + t('guru.pilih-murid-kode', 'Pilih murid / kode') + '</button>') + '<button type="button" class="tg-btn is-small is-ghost" data-tg="modal" data-kind="assign-detail" data-id="' + a.id + '">' + icon('list-checks') + ' ' + esc(t('guru.siapa-belum', 'Siapa yang belum')) + '</button>' + '<button type="button" class="tg-btn is-small is-ghost" data-tg="print-sheet" data-id="' + a.id + '" data-testid="tg-print-sheet-' + a.id + '">' + icon('printer') + ' ' + esc(t('sekolah.cetak-lembar', 'Cetak lembar soal')) + '</button><button type="button" class="tg-btn is-small is-ghost" data-tg="modal" data-kind="paper-scores" data-id="' + a.id + '" data-testid="tg-paper-scores-' + a.id + '">' + icon('pencil') + ' ' + esc(t('sekolah.nilai-kertas', 'Nilai kertas')) + '</button>' + (lewatTab ? '<button type="button" class="tg-btn is-small is-ghost" data-tg="archive-assign" data-id="' + a.id + '">' + icon('archive') + ' ' + esc(t('guru.siklus.arsipkan', 'Arsipkan')) + '</button>' : '') + tombolTarik(a) + '</div>' + barKonfirmasi('tarik', a) + (a.sent && a.sent.all ? '<p class="tg-muted tg-sent-note">' + icon('check') + ' Terkirim ke semua murid ' + esc(T.fmtDate(a.sent.all)) + '</p>' : '') + '</article>';
       }).join('') + '</div>' : '<section class="tg-card tg-center tg-empty-state" data-testid="tg-empty-assignments"><div class="tg-empty-ill" aria-hidden="true">' + icon('clipboard-list') + '</div><h3>' + t('guru.belum-ada-tugas', 'Belum ada tugas') + '</h3><p class="tg-muted">' + ((sc && sc.locked) ? esc(t('guru.belum-tugas-scope', 'Belum ada tugas {mapel} di kelas ini. Buat tugas pertama dari bab {mapel} — hanya butuh 1 menit.').replace('{mapel}', sc.active)) : 'Buat tugas dari bank soal FIEZEL: pilih skill, jumlah soal, tenggat. Mode ujian mengacak urutan dan memberi timer.') + '</p><button type="button" class="tg-btn is-primary" data-tg="modal" data-kind="assign" data-testid="tg-empty-new-assign">' + icon('plus') + '<span>' + t('guru.buat-tugas-ujian', 'Buat tugas / ujian') + '</span></button></section>');
   }
 
@@ -4487,6 +4487,12 @@
         '<ul class="tg-att-list" data-testid="tg-att-list">' + c.students.map(function (s) { var v = (s.attendance || {})[date] || ''; return '<li>' + avatar(s, 'sm') + '<span>' + esc(s.name) + '</span><div class="tg-seg">' + ['H', 'I', 'S', 'A'].map(function (k) { return '<button type="button" class="tg-seg-btn is-' + k + (v === k ? ' is-on' : '') + '" data-tg="att" data-id="' + s.id + '" data-v="' + k + '" title="' + T.ATT[k] + '" data-testid="tg-att-' + s.id + '-' + k + '">' + k + '</button>'; }).join('') + '</div></li>'; }).join('') + '</ul><p class="tg-muted">H hadir · I izin · S sakit · A alpa. Dua alpa dalam seminggu menaikkan skor risiko siswa.</p>';
     } else if (m.kind === 'board') {
       return board(c);
+    } else if (m.kind === 'warmup') {
+      return warmup(c);
+    } else if (m.kind === 'paper-scores') {
+      var aP = (c.assignments || []).filter(function (x) { return x.id === m.id; })[0]; if (!aP) return '';
+      title = t('sekolah.nilai-kertas-judul', 'Nilai kertas — {judul}', { judul: aP.title }); wide = true;
+      body = paperScoresModal(c, aP);
     }
     return '<div class="tg-scrim" data-tg="close"></div><div class="tg-modal' + (wide ? ' is-wide' : '') + '" role="dialog" aria-modal="true" data-testid="tg-modal"><div class="tg-modal-head"><h3>' + esc(title) + '</h3><button type="button" class="tg-icon-btn" data-tg="close" aria-label="Tutup" data-testid="tg-modal-close">' + icon('x') + '</button></div><div class="tg-modal-body">' + body + '</div></div>';
   }
@@ -4496,7 +4502,33 @@
     return '<div class="tg-board" data-testid="tg-board"><button type="button" class="tg-board-close" data-tg="close" aria-label="' + t('guru.tutup-mode-papan', 'Tutup mode papan') + '">' + icon('x') + ' Tutup</button><p class="tg-board-kicker">' + esc(c.name) + ' · ' + esc(new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' })) + '</p><h2>Kemajuan kita minggu ini</h2>' +
       '<div class="tg-board-kpi"><div><b>' + stt.active7 + '<small>/' + stt.total + '</small></b><span>teman yang belajar minggu ini</span></div><div><b>' + pct(stt.avgAcc) + '</b><span>akurasi kelas</span></div><div><b>' + (ag.length ? ag[0].a.deadline || '—' : '—') + '</b><span>' + (ag.length ? 'tenggat: ' + esc(ag[0].a.title) : 'tidak ada tenggat') + '</span></div></div>' +
       '<div class="tg-board-skills">' + map.filter(function (m) { return m.acc != null; }).map(function (m) { return '<div><span>' + esc(m.label) + '</span>' + bar(m.acc, m.acc < 0.5 ? 'is-warn' : '') + '<b>' + pct(m.acc) + '</b></div>'; }).join('') + '</div>' +
-      (mis.length ? '<p class="tg-board-focus">' + icon('target') + ' Fokus hari ini: <b>' + esc(mis[0].label) + '</b> — ' + esc(mis[0].pattern) + '</p>' : '') + '</div>';
+      (mis.length ? '<p class="tg-board-focus">' + icon('target') + ' Fokus hari ini: <b>' + esc(mis[0].label) + '</b> — ' + esc(mis[0].pattern) + '</p>' : '') +
+      (root.FiezelKelasTanpaHP ? '<button type="button" class="tg-btn is-primary tg-board-warm-btn" data-tg="warm-start" data-testid="tg-warm-start">' + icon('sparkles') + ' ' + esc(t('sekolah.pemanasan-mulai', 'Mulai pemanasan 5 menit')) + '</button>' : '') + '</div>';
+  }
+  /* R1 Kelas Tanpa HP: pemanasan proyektor. Daftar soalnya dibekukan saat dibuka (ui.warm) supaya
+     urutan tidak bergeser di tengah pelajaran ketika laporan murid baru masuk. */
+  function warmup(c) {
+    var K = root.FiezelKelasTanpaHP, w = ui.warm || { ids: [], idx: 0, reveal: false };
+    var list = (w.list || []);
+    var last = w.idx >= list.length - 1;
+    return '<div class="tg-board tg-warm" data-testid="tg-warm"><button type="button" class="tg-board-close" data-tg="close" aria-label="' + esc(t('sekolah.pemanasan-tutup', 'Tutup pemanasan')) + '">' + icon('x') + ' ' + esc(t('umum.tutup', 'Tutup')) + '</button>' +
+      '<p class="tg-board-kicker">' + esc(c.name) + '</p>' + (K ? K.warmupSlideHtml(list, w.idx, w.reveal) : '') +
+      (list.length ? '<div class="tg-actions tg-warm-actions">' +
+        (w.reveal ? '' : '<button type="button" class="tg-btn is-primary" data-tg="warm-reveal" data-testid="tg-warm-reveal">' + icon('lightbulb') + ' ' + esc(t('sekolah.pemanasan-jawaban', 'Tampilkan jawaban')) + '</button>') +
+        (last ? '<button type="button" class="tg-btn is-ghost" data-tg="close" data-testid="tg-warm-done">' + icon('check') + ' ' + esc(t('sekolah.pemanasan-selesai', 'Selesai, lanjut pelajaran')) + '</button>' : '<button type="button" class="tg-btn is-ghost" data-tg="warm-next" data-testid="tg-warm-next">' + icon('chevron-right') + ' ' + esc(t('sekolah.pemanasan-berikutnya', 'Soal berikutnya')) + '</button>') +
+        '</div>' : '') + '</div>';
+  }
+  /* R1: modal nilai kertas — satu kotak angka per murid sasaran. */
+  function paperScoresModal(c, a) {
+    var K = root.FiezelKelasTanpaHP, total = K ? K.resolveItems(a).length : 0, T = S();
+    var tgt = c.students.filter(function (s) { return T.targeted(a, s); });
+    return '<form data-tg-form="paper-scores" data-id="' + a.id + '" class="tg-form" data-testid="tg-paper-form"><p class="tg-muted">' + esc(t('sekolah.nilai-kertas-penjelasan', 'Masukkan jumlah jawaban benar dari lembar kertas (0–{n}). Murid yang sudah mengerjakan lewat aplikasi tidak ditimpa.', { n: total })) + '</p>' +
+      '<ul class="tg-mini-list tg-paper-list">' + tgt.map(function (s) {
+        var d = a.done && a.done[s.id], fromApp = d && d.src !== 'kertas';
+        return '<li>' + avatar(s, 'sm') + '<span>' + esc(s.name) + '</span>' + (fromApp
+          ? '<small class="tg-muted">' + esc(t('sekolah.nilai-kertas-dari-aplikasi', 'sudah dari aplikasi')) + '</small>'
+          : '<input type="number" inputmode="numeric" min="0" max="' + total + '" name="' + esc(s.id) + '" value="' + (d && d.src === 'kertas' ? d.c : '') + '" aria-label="' + esc(t('sekolah.nilai-kertas-aria', 'Jumlah benar {nama}', { nama: s.name })) + '" data-testid="tg-paper-' + esc(s.id) + '">') + '</li>';
+      }).join('') + '</ul><div class="tg-actions"><button type="submit" class="tg-btn is-primary" data-testid="tg-paper-save">' + icon('check') + ' ' + esc(t('sekolah.nilai-kertas-simpan', 'Simpan nilai')) + '</button></div></form>';
   }
 
   // ---- events -----------------------------------------------------------------------------------------
@@ -4571,6 +4603,21 @@
       }
       case 'drawer': ui.drawer = id; ui.modal = null; break;
       case 'close': ui.modal = null; ui.drawer = null; ui.inbox = false; break;
+      case 'print-sheet': {
+        var Kp = root.FiezelKelasTanpaHP, aPr = (c.assignments || []).filter(function (x) { return x.id === btn.getAttribute('data-id'); })[0];
+        if (!Kp || !aPr) { toast(t('sekolah.cetak-gagal', 'Lembar soal belum bisa disiapkan.')); return; }
+        if (!Kp.resolveItems(aPr).length) { toast(t('sekolah.lembar-kosong', 'Tugas ini belum punya soal yang bisa dicetak.')); return; }
+        Kp.openPrint(Kp.worksheetHtml(c, aPr, { teacherName: st.teacher && st.teacher.name }), (aPr.title || 'lembar-soal').replace(/\W+/g, '-'));
+        saveMinutes(15); persist(); return;
+      }
+      case 'warm-start': {
+        var Kw = root.FiezelKelasTanpaHP; if (!Kw) return;
+        var misW = S().misconceptions(c);
+        ui.warm = { list: Kw.warmupItems(c, { count: 5, weakSkill: misW.length ? misW[0].skill : '' }), idx: 0, reveal: false };
+        ui.modal = { kind: 'warmup' }; break;
+      }
+      case 'warm-reveal': if (ui.warm) ui.warm.reveal = true; break;
+      case 'warm-next': if (ui.warm) { ui.warm.idx = Math.min((ui.warm.list || []).length - 1, ui.warm.idx + 1); ui.warm.reveal = false; } break;
       case 'pick-class': st.activeClassId = id; break;
       case 'insight-skill': ui.insightSkill = btn.getAttribute('data-skill'); break;
       case 'copy': copy(btn.getAttribute('data-text'), 'Tersalin.'); return;
@@ -4783,6 +4830,15 @@
     var form = e.target.closest ? e.target.closest('[data-tg-form]') : null; if (!form) return;
     e.preventDefault();
     var kind = form.getAttribute('data-tg-form'), fd = new FormData(form), c = cls(), T = S(), viaWa = e.submitter && e.submitter.name === 'wa';
+    if (kind === 'paper-scores') {
+      var Ks = root.FiezelKelasTanpaHP, aS = (c && c.assignments || []).filter(function (x) { return x.id === form.getAttribute('data-id'); })[0];
+      if (!Ks || !aS) return;
+      var scores = {}; fd.forEach(function (v, k) { scores[k] = v; });
+      var nS = Ks.recordPaperScores(c, aS, scores);
+      saveMinutes(Math.max(1, Math.round(nS / 3))); persist(); ui.modal = null;
+      toast(t('sekolah.nilai-kertas-tersimpan', 'Nilai kertas {n} murid tersimpan.', { n: nS }));
+      render(); return;
+    }
     if (kind === 'new-class') {
       var __reqSub = String(fd.get('subject') || '').trim().toUpperCase();
       try {

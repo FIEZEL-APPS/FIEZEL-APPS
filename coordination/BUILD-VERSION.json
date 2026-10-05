@@ -1,7 +1,7 @@
 {
-  "version": "m025-476",
-  "claimedBy": "branch main",
-  "claimedAt": "2026-10-05T05:33:50.017Z",
-  "reason": "fix(ui): perbaiki 6-kolom floating bottomnav dan gaya mandiri kartu game (m025-476)",
+  "version": "m025-478",
+  "claimedBy": "branch claude/exciting-ritchie-vyrs2e",
+  "claimedAt": "2026-10-05T07:44:08.810Z",
+  "reason": "R1 Kelas Tanpa HP: lembar soal cetak dua varian, nilai kertas, pemanasan proyektor dari kesalahan kelas",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
