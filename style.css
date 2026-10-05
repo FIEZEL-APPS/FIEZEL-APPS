@@ -166,8 +166,8 @@
 /* m025-42: one scale, always. The viewport tag alone is ignored by iOS Safari, so the
    layout is pinned here as well and the gestures are refused in fiezel-zoom-lock.js.
    touch-action:manipulation is what removes the double-tap-to-zoom delay and action. */
-html{scroll-behavior:auto;touch-action:manipulation;-webkit-text-size-adjust:100%;text-size-adjust:100%;overflow-x:clip}
-html,body{touch-action:manipulation}
+html{scroll-behavior:auto;touch-action:manipulation;-webkit-text-size-adjust:100%;text-size-adjust:100%;overflow-x:clip;overscroll-behavior-x:none;overscroll-behavior-y:none;overscroll-behavior:none}
+html,body{touch-action:manipulation;overscroll-behavior-x:none;overscroll-behavior:none}
 /* m025-43 OWNER: a long press anywhere popped the iOS selection/copy callout on top
    of the lesson. Selection is off app-wide; real text fields keep it, because a
    field you cannot select text in is broken. */
