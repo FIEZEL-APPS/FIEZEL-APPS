@@ -6718,13 +6718,11 @@ body.fz-view-game main.app {
   padding-top: calc(16px + env(safe-area-inset-top, 0px)) !important;
 }
 
-/* Ensure body and app container have sufficient bottom padding so content is never covered */
-body,
-body.fz-lux,
+/* Ensure body and app container have sufficient bottom padding so content is never covered by bottomnav */
 main.app,
 .view-container,
 #app {
-  padding-bottom: 0 !important;
+  padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)) !important;
 }
 
 /* Hide bottomnav when listening modal or detail sheet is active or in lesson mode */

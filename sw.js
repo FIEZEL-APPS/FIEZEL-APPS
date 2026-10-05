@@ -205,7 +205,7 @@ const isLocaleThAsset=request=>{
 };
 const shellScope=String(self.registration?.scope||`${self.location.origin}/`);
 const shellUrls=new Set(ASSETS.map(asset=>new URL(asset,shellScope).pathname));
-const isShellRequest=request=>request?.mode==='navigate'||(Boolean(request?.url)&&shellUrls.has(new URL(request.url).pathname));
+const isShellRequest=request=>request?.mode==='navigate'||(Boolean(request?.url)&&new URL(request.url).origin===self.location.origin&&shellUrls.has(new URL(request.url).pathname));
 
 // m025-83 OWNER: "puter jangan dialihkan ke web lagi, itu sangat mengganggu". This USED to
 // be engine-aware: Chromium got strict COOP:same-origin (crossOriginIsolated=true, so the
