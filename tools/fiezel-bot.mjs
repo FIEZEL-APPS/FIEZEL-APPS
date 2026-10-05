@@ -683,6 +683,17 @@ const SEVERITY_ICON = { high: '🔴', medium: '🟠', low: '🟡' };
 const normalizeWs = (t) => String(t || '').replace(/\s+/g, ' ').trim();
 
 /**
+ * Baris sangat panjang dipotong untuk menghemat konteks, DENGAN penanda eksplisit.
+ * Tanpa penanda, AI mengira kodenya memang terpotong (kasus nyata PR #502: temuan
+ * palsu "instruksi prompt terpotong" pada baris 624 karakter yang utuh).
+ */
+const CONTEXT_LINE_MAX = 400;
+function clipLine(line) {
+  const s = String(line ?? '');
+  return s.length <= CONTEXT_LINE_MAX ? s : `${s.slice(0, CONTEXT_LINE_MAX)} ⟪…+${s.length - CONTEXT_LINE_MAX} karakter tidak ditampilkan; baris aslinya utuh⟫`;
+}
+
+/**
  * Membaca unified diff menjadi peta per berkas: baris baru yang DITAMBAHKAN dan
  * semua baris sisi kanan (RIGHT) yang boleh dikomentari GitHub.
  */
@@ -777,7 +788,7 @@ function buildFileContext(changedFiles, diffMap, opts = {}) {
     const rendered = [];
     let prev = 0;
     for (const n of keep) {
-      rendered.push({ n, text: `${prev && n !== prev + 1 ? '  …\n' : ''}${String(n).padStart(5)}${added.has(n) ? '+' : ' '}| ${lines[n - 1].slice(0, 400)}` });
+      rendered.push({ n, text: `${prev && n !== prev + 1 ? '  …\n' : ''}${String(n).padStart(5)}${added.has(n) ? '+' : ' '}| ${clipLine(lines[n - 1])}` });
       prev = n;
     }
     prepared.push({ file, header, rendered, size: header.length + rendered.reduce((t, r) => t + r.text.length + 1, 0) });
@@ -922,7 +933,7 @@ function buildCallerContext(symbols, sentLines, opts = {}) {
       if (!lines) continue;
       const from = Math.max(1, h.line - CALLER_WINDOW_LINES), to = Math.min(lines.length, h.line + CALLER_WINDOW_LINES);
       const out = [`=== CALLER: ${h.file}:${h.line} (memakai \`${sym}\`) ===`];
-      for (let n = from; n <= to; n++) out.push(`${String(n).padStart(5)}${n === h.line ? '>' : ' '}| ${lines[n - 1].slice(0, 400)}`);
+      for (let n = from; n <= to; n++) out.push(`${String(n).padStart(5)}${n === h.line ? '>' : ' '}| ${clipLine(lines[n - 1])}`);
       const chunk = out.join('\n');
       if (used + chunk.length > budget) break;
       parts.push(chunk);
@@ -1080,7 +1091,7 @@ async function runReview(prNumber) {
   for (const t of preflight) {
     if (fs.existsSync(path.join(ROOT, t.args[0]))) {
       const res = sh(t.cmd, t.args, { allowFailure: true });
-      if (res.status !== 0) testContext += `\n❌ ${t.name} FAIL:\n${(res.stderr || res.stdout).slice(0, 500)}`;
+      if (res.status !== 0) testContext += `\n❌ ${t.name} FAIL:\n${(res.stderr || res.stdout || res.error?.message || '').slice(0, 500)}`;
     }
   }
 
@@ -1122,7 +1133,7 @@ Respond with ONLY a JSON object, no prose outside it:
    "title": "<judul singkat, Bahasa Indonesia>", "explanation": "<mengapa ini bug + akibat konkret + saran perbaikan, Bahasa Indonesia>",
    "evidence": "<salin PERSIS kode dari baris itu, tanpa awalan nomor baris>"}]}
 
-RULES: at most ${MAX_AI_FINDINGS} findings; every finding MUST point to a line shown above and quote it verbatim in "evidence" — findings whose evidence does not match the code are discarded automatically. Prefer lines marked "+". No style nits, no speculation ("might", "could potentially") without a concrete failing scenario. If you find nothing solid, return "findings": [].`;
+RULES: a line ending with "⟪…+N karakter tidak ditampilkan; baris aslinya utuh⟫" was shortened ONLY for this prompt — never report it as truncated or incomplete code. At most ${MAX_AI_FINDINGS} findings; every finding MUST point to a line shown above and quote it verbatim in "evidence" — findings whose evidence does not match the code are discarded automatically. Prefer lines marked "+". No style nits, no speculation ("might", "could potentially") without a concrete failing scenario. If you find nothing solid, return "findings": [].`;
 
   const aiResult = await queryLLM(aiPrompt, FIEZEL_SYSTEM_PROMPT, { tier: 'review', json: true });
   let aiReview = null;
@@ -1908,6 +1919,8 @@ async function runSelfTest() {
   if (fc.included.join() !== 'big.js,small.js' || !fc.text.includes(' 1500+| line_1500_') || fc.text.includes('line_1400_') || !fc.text.includes('    1 | let s = 1;')) {
     throw new Error('T18 FAIL: buildFileContext');
   }
+  // Baris panjang dipotong dengan penanda eksplisit (bukan dipotong diam-diam).
+  if (clipLine('x'.repeat(10)) !== 'x'.repeat(10) || !clipLine('y'.repeat(624)).endsWith('⟪…+224 karakter tidak ditampilkan; baris aslinya utuh⟫')) throw new Error('T18 FAIL: clipLine');
   // Anggaran sempit: berkas kedua dikirim TERPOTONG, bukan dibuang.
   const tight = buildFileContext(['big.js', 'small2.js'], new Map([['big.js', { added: new Set([1500]), right: new Set([1500]) }]]),
     { readLines: (f) => (f === 'big.js' ? big : f === 'small2.js' ? Array.from({ length: 400 }, (_, i) => `const v${i} = ${i};`) : null), budget: 12000 });
