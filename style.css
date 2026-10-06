@@ -547,13 +547,17 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 .nav:hover{transform:none;box-shadow:none;border-color:transparent}
 .nav.active{color:var(--black);background:var(--panel-soft);transform:translateY(-2px)}
 
-/* ---------- animations ---------- */
 .fade{animation:pageIn var(--dur-l) var(--ease)}
 .is-repaint,
+.is-repaint *,
 .is-repaint .fade,
+.is-repaint .fade > *,
 .fade.is-repaint,
+.fade.is-repaint > *,
 .is-repaint .card,
-.fade.is-repaint .card{animation:none !important}
+.fade.is-repaint .card,
+#app.is-repaint .fade,
+#app.is-repaint .fade > *{animation:none !important}
 @keyframes pageIn{from{opacity:0;transform:translateY(14px) scale(.99)}to{opacity:1;transform:none}}
 @keyframes riseIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 @keyframes pop{0%{transform:scale(.94)}55%{transform:scale(1.015)}100%{transform:scale(1)}}
@@ -2346,12 +2350,27 @@ body.reduce-motion .fiezel-ob-mascot *{animation:none!important;transition:none!
    yang sama persis, sehingga jumlah opacity keduanya KONSTAN 1 di sepanjang transisi —
    nol kedipan, dan tetap satu bahasa masuk-layar. (.fade di dalam #app digerbangi lewat
    `.is-repaint` ketika View Transition yang mengurusnya; lihat vtViewPaint di app.js.) */
+/* Isolasi app-shell (topbar & bottomnav) agar TIDAK ikut berkedip atau cross-fade saat pindah tab */
+.topbar {
+  view-transition-name: topbar;
+}
+.bottomnav {
+  view-transition-name: bottomnav;
+}
+::view-transition-old(topbar),
+::view-transition-new(topbar),
+::view-transition-old(bottomnav),
+::view-transition-new(bottomnav) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
 ::view-transition-old(root) {
-  animation: vtFadeOut var(--dur-l) linear forwards;
+  animation: vtFadeOut 0.16s linear forwards;
 }
 
 ::view-transition-new(root) {
-  animation: vtFadeIn var(--dur-l) linear forwards;
+  animation: vtFadeIn 0.16s linear forwards;
 }
 
 @keyframes pageOut {
@@ -2369,7 +2388,9 @@ body.reduce-motion .fiezel-ob-mascot *{animation:none!important;transition:none!
    satu bahasa masuk-layar. Reduced-motion: pseudo ::view-transition tidak kena selector `*`
    global, jadi digerbangi eksplisit di bawah. */
 @media (prefers-reduced-motion: reduce) {
-  ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
+  ::view-transition-old(root), ::view-transition-new(root),
+  ::view-transition-old(topbar), ::view-transition-new(topbar),
+  ::view-transition-old(bottomnav), ::view-transition-new(bottomnav) { animation: none; }
 }
 
 /* Card entrance animation */

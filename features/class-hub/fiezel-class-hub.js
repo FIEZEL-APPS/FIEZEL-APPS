@@ -1050,7 +1050,8 @@
     try { rapikanTerlewat(); } catch (_) {}
     var pend = assignments(), done = subs();
     var key = (u.runner && !u.paused ? 'runner|' + u.runner.aid + '|' + u.runner.idx : (u.review ? 'review|' + u.review : u.curriculumView ? 'curriculum|' + u.curriculumView : u.arsipView ? 'arsip' : u.tab)) + '|' + (classCode() || '') + '|' + (u.editCode ? '1' : '0');
-    var repaint = key === lastStudentPaintKey;
+    var isSubTabSwitch = !u.runner && !u.review && !u.curriculumView && !u.arsipView;
+    var repaint = key === lastStudentPaintKey || (isSubTabSwitch && Boolean(sEl.querySelector('.ch-student')));
     lastStudentPaintKey = key;
     var activeSaved = null;
     try {
@@ -2039,7 +2040,7 @@
     } else {
       body = tUi.tab === 'tugas' ? tTugas(c, env) : tUi.tab === 'buat' ? tBuat(c, env) : tUi.tab === 'hasil' ? tHasil(c, env) : tUi.tab === 'braincore' ? tBraincore(c, env) : tKelas(c, env);
     }
-    return '<div class="ch ch-teacher" data-testid="class-hub-teacher"><p class="ch-principle">' + icon('brain') + ' ' + t('kelas.braincore-alur-dot', 'Saran otomatis · Guru memutuskan · Murid belajar') + '</p><nav class="ch-tabs is-teacher" role="tablist" aria-label="' + esc(t('kelas.nav-guru-aria', 'Bagian Ruang Kelas Guru')) + '">' + teacherTabs(env).map(function (t) { var active = tUi.tab === t[0]; return '<button type="button" role="tab" id="chg-tab-' + t[0] + '" aria-controls="chg-panel-' + t[0] + '" aria-selected="' + (active ? 'true' : 'false') + '" tabindex="' + (active ? '0' : '-1') + '" class="ch-tab' + (active ? ' is-active' : '') + '" data-ch="ttab" data-tab="' + t[0] + '" data-testid="tclass-tab-' + t[0] + '">' + icon(t[2]) + '<span>' + t[1] + '</span></button>'; }).join('') + '</nav><div class="ch-tabpanel" role="tabpanel" id="chg-panel-' + tUi.tab + '" aria-label="' + esc(t('kelas.panel-guru-aria', 'Isi Ruang Kelas Guru')) + '">' + body + '</div></div>';
+    return '<div class="ch ch-teacher is-repaint" data-testid="class-hub-teacher"><p class="ch-principle">' + icon('brain') + ' ' + t('kelas.braincore-alur-dot', 'Saran otomatis · Guru memutuskan · Murid belajar') + '</p><nav class="ch-tabs is-teacher" role="tablist" aria-label="' + esc(t('kelas.nav-guru-aria', 'Bagian Ruang Kelas Guru')) + '">' + teacherTabs(env).map(function (t) { var active = tUi.tab === t[0]; return '<button type="button" role="tab" id="chg-tab-' + t[0] + '" aria-controls="chg-panel-' + t[0] + '" aria-selected="' + (active ? 'true' : 'false') + '" tabindex="' + (active ? '0' : '-1') + '" class="ch-tab' + (active ? ' is-active' : '') + '" data-ch="ttab" data-tab="' + t[0] + '" data-testid="tclass-tab-' + t[0] + '">' + icon(t[2]) + '<span>' + t[1] + '</span></button>'; }).join('') + '</nav><div class="ch-tabpanel" role="tabpanel" id="chg-panel-' + tUi.tab + '" aria-label="' + esc(t('kelas.panel-guru-aria', 'Isi Ruang Kelas Guru')) + '">' + body + '</div></div>';
   }
   /* Permintaan bergabung: murid sudah mengetik kode kelas ini, guru yang memutuskan ia masuk
      atau tidak. Kartunya hanya muncul kalau memang ada yang menunggu — kelas yang tidak

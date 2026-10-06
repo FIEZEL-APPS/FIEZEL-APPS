@@ -286,11 +286,14 @@ body.fz-lux [data-fz-student-hide]{display:none !important}
 
 /* ---------- gerak masuk yang bertahap ---------- */
 @media (prefers-reduced-motion:no-preference){
-  body.fz-lux .fade>*{animation:luxRise .5s var(--ease) both}
-  body.fz-lux .fade>*:nth-child(2){animation-delay:.05s}
-  body.fz-lux .fade>*:nth-child(3){animation-delay:.1s}
-  body.fz-lux .fade>*:nth-child(4){animation-delay:.15s}
-  body.fz-lux .fade>*:nth-child(n+5){animation-delay:.2s}
+  body.fz-lux:not(.reduce-motion) .fade>*{animation:luxRise .5s var(--ease) both}
+  body.fz-lux:not(.reduce-motion) .fade>*:nth-child(2){animation-delay:.05s}
+  body.fz-lux:not(.reduce-motion) .fade>*:nth-child(3){animation-delay:.1s}
+  body.fz-lux:not(.reduce-motion) .fade>*:nth-child(4){animation-delay:.15s}
+  body.fz-lux:not(.reduce-motion) .fade>*:nth-child(n+5){animation-delay:.2s}
+  body.fz-lux .is-repaint .fade>*,
+  body.fz-lux #app.is-repaint .fade>*,
+  body.fz-lux .is-repaint *{animation:none !important}
 }
 @keyframes luxRise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 @keyframes luxPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,199,0,.0)}50%{box-shadow:0 0 0 8px rgba(255,199,0,.18)}}
