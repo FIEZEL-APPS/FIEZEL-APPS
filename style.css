@@ -431,6 +431,7 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
    (resep tebal v6 di bawah kini mengecualikan .option); umpan hover cukup bayangan lembut. */
 .option{font-size:1rem}
 .option:not(:disabled):hover{background:var(--panel-soft);border-color:var(--sun-deep);box-shadow:var(--shadow-sm)}
+.option:not(:disabled):active{transform:scale(0.98)}
 .option.correct{border-color:var(--good-bright);background:var(--good-soft);animation:pop var(--dur-m) var(--ease-spring)}
 .option.wrong{border-color:var(--bad);background:var(--bad-soft);animation:shake var(--dur-m) var(--ease)}
 /* Mode review mematikan tombol pilihan. Resep disabled global mengubah permukaan +
@@ -2366,11 +2367,11 @@ body.reduce-motion .fiezel-ob-mascot *{animation:none!important;transition:none!
 }
 
 ::view-transition-old(root) {
-  animation: vtFadeOut 0.16s linear forwards;
+  animation: vtFadeOut 0.14s cubic-bezier(0.4, 0, 1, 1) forwards;
 }
 
 ::view-transition-new(root) {
-  animation: vtFadeIn 0.16s linear forwards;
+  animation: vtFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @keyframes pageOut {
@@ -2437,8 +2438,9 @@ body.reduce-motion .fiezel-ob-mascot *{animation:none!important;transition:none!
   50% { transform: scale(0.97); }
 }
 
-button:active {
-  animation: buttonPress 0.1s ease-out;
+button:active:not(.nav):not(:disabled) {
+  transform: scale(0.975);
+  transition: transform 0.08s ease-out;
 }
 
 /* Fade in for content reveal */
@@ -6919,6 +6921,26 @@ nav.bottomnav .nav[data-view="classroom"].active .fz-i,
   --fz-i-fill: #A7F3D0 !important;
   --fz-i-line: #047857 !important;
   filter: drop-shadow(0 1px 3px rgba(16, 185, 129, 0.35)) !important;
+}
+
+/* Tactile press feedback on touch & subtle spring pop on active tab */
+html body nav.bottomnav .nav:active,
+html body .bottomnav .nav:active,
+html body nav.bottomnav .nav.active:active,
+html body .bottomnav .nav.active:active,
+html body.fz-lux nav.bottomnav .nav:active,
+html body.fz-lux .bottomnav .nav:active,
+html body.fz-lang-ja nav.bottomnav .nav:active,
+html body.fz-lang-ja .bottomnav .nav:active,
+html body:has(.home-today) .bottomnav .nav:active,
+html body:has(.home-today) .bottomnav .nav.active:active {
+  transform: scale(0.93) translateY(1px) !important;
+  transition: transform 0.08s cubic-bezier(0.2, 0, 0, 1) !important;
+}
+
+html body nav.bottomnav .nav.active .fz-i,
+html body .bottomnav .nav.active .fz-i {
+  animation: fzNavPop 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) 1 !important;
 }
 
 /* ==========================================================================
