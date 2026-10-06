@@ -1,7 +1,7 @@
 {
-  "version": "m025-495",
-  "claimedBy": "branch fix/m025-497-swipe-back-splash-snapshot",
-  "claimedAt": "2026-10-06T12:29:23.576Z",
-  "reason": "fix(nav): swipe back tidak lagi mengintip splash gelap dan tidak jatuh ke reboot 3 detik",
+  "version": "m025-496",
+  "claimedBy": "branch feat/m025-495-pwa-flashcard-cream-polish",
+  "claimedAt": "2026-10-06T13:55:37.558Z",
+  "reason": "feat(m025-496): cerahkan tampilan flashcard krem daylight dan perbesar tipografi",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

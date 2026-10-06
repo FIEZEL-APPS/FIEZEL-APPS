@@ -4870,9 +4870,10 @@ html body .skill-page-hero button.active-level-control small {
 .result-stage .outcome-line,
 .result-stage .srl-line,
 .result-stage .tutor-line,
+.result-stage .tutor-report,
+.result-stage p.muted,
 .result-stage .session-summary,
 .result-stage .measure-review,
-.result-stage > p.muted,
 .result-stage .map-note,
 .result-stage h3 {
   display: none !important;
