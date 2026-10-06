@@ -471,8 +471,9 @@ html.fz-booting body{overflow:hidden}
         try { if (el.parentNode) el.parentNode.removeChild(el); } catch (e) {}
         window.__fiezelBootSplashDismissed = true;
         try {
-          if (window.history && window.history.replaceState && !(window.history.state && window.history.state.fiezelBackNav)) {
-            window.history.replaceState({ fiezelAppRoot: 1, view: 'home' }, document.title, location.href);
+          var h = window.history, hs = h ? h.state : null;
+          if (h && h.replaceState && (!hs || !hs.fiezelBackNav)) {
+            h.replaceState({ fiezelAppRoot: 1, view: 'home' }, document.title, location.href);
           }
         } catch (e) {}
       }
