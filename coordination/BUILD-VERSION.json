@@ -1,7 +1,7 @@
 {
-  "version": "m025-496",
-  "claimedBy": "branch feat/m025-495-pwa-flashcard-cream-polish",
-  "claimedAt": "2026-10-06T13:55:37.558Z",
-  "reason": "feat(m025-496): cerahkan tampilan flashcard krem daylight dan perbesar tipografi",
+  "version": "m025-497",
+  "claimedBy": "branch main",
+  "claimedAt": "2026-10-06T14:11:43.830Z",
+  "reason": "fix(nav): tuntaskan zero dark bleed dan zero reload swipe back",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

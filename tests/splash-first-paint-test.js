@@ -222,8 +222,8 @@ test('latar boot gelap, jadi frame sebelum CSS pun bukan putih', () => {
     'dokumen harus menandai dirinya sedang boot dengan lang dari locale yang didukung (' + SUPPORTED_LOCALES.join(', ') + ')');
   const critical = /<style id="fiezelBootCritical">([\s\S]*?)<\/style>/.exec(html);
   assert.ok(critical, 'CSS kritis splash harus disisipkan di <head>');
-  assert.ok(/html\.fz-booting,html\.fz-booting body\{background:#1B1418\}/.test(critical[1]),
-    'html dan body harus gelap selama boot; tanpa ini #fdf6f5 tetap menyembul di frame pertama');
+  assert.ok(/html\.fz-booting,html\.fz-booting body\{background:#FBF7F3\}/.test(critical[1]),
+    'html dan body harus Daylight Cream (#FBF7F3) selama boot; tanpa dark bleed saat gesture/overscroll');
   assert.ok(html.indexOf('<style id="fiezelBootCritical">') < html.indexOf('href="./style.css"'),
     'CSS kritis harus mendahului style.css supaya style.css tetap yang berwenang atas desainnya');
 });

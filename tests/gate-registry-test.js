@@ -142,6 +142,13 @@ const EXCLUSIONS = new Map([
       'Playwright lokal serta port web server aktif. Bukti kelulusan frame coverage 1.000 terdokumentasi ' +
       'di docs/handoffs/FIEZEL-M025487-PWA-FLICKER-REFRESH-FIX-HANDOFF.md.'
   }],
+  ['tools/dev/probe-swipe-zero-reload-audit.mjs', {
+    class: 'alat-pelaporan',
+    reason:
+      'BUKAN gerbang CI Linux: alat pelaporan audit empiris Playwright Chromium lokal untuk memverifikasi ' +
+      'zero dark bleed dan zero reload swipe back (m025-497). Memerlukan browser grafis Playwright lokal ' +
+      'serta port web server aktif. Bukti kelulusan terdokumentasi di docs/handoffs/FIEZEL-M025497-SWIPE-ZERO-RELOAD-FINAL-HANDOFF.md.'
+  }],
   ['tests/chokai-multi-voice-protocol-test.js', {
     class: 'gerbang-pra-rilis-fitur',
     reason:
