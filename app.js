@@ -13053,8 +13053,8 @@ function flashcards(level){
     $('speakWordBack')?.addEventListener('click',e=>{e.stopPropagation();audio.play(v.word,{contentType:'word',next:nextCard?nextCard.word:''})});
     $('speakSentence')?.addEventListener('click',e=>{e.stopPropagation();audio.play(v.example,{contentType:'sentence',next:nextCard?nextCard.example:''})});
     if($('aiWord'))$('aiWord').onclick=e=>{e.stopPropagation();explainWordWithAI(v)};
-    $('learning').onclick=e=>{e.stopPropagation();flyOutCard($('flashcard'),-1,()=>{markStillLearning('vocab',v.id);showToast(FiezelI18n.t('flash.toast-progres'),'success');i++;draw()})};
-    $('mastered').onclick=e=>{e.stopPropagation();flyOutCard($('flashcard'),1,()=>{markMastered('vocab',v.id);haptic('success');showToast(FiezelI18n.t('flash.toast-dikuasai'),'success');/* [FASE-4] 09 §3.3: kartu dikuasai = pengakuan → proud. */try{pawReact('badge-earned')}catch(_){}i++;draw()})};
+    $('learning').onclick=e=>{e.stopPropagation();markStillLearning('vocab',v.id);showToast(FiezelI18n.t('flash.toast-progres'),'success');flyOutCard($('flashcard'),-1,()=>{i++;draw()})};
+    $('mastered').onclick=e=>{e.stopPropagation();markMastered('vocab',v.id);haptic('success');showToast(FiezelI18n.t('flash.toast-dikuasai'),'success');/* [FASE-4] 09 §3.3: kartu dikuasai = pengakuan → proud. */try{pawReact('badge-earned')}catch(_){}flyOutCard($('flashcard'),1,()=>{i++;draw()})};
     bindSwipe($('flashcard'),()=>{audio.stop();i++;draw()},()=>{audio.stop();i=Math.max(0,i-1);draw()});
     try{if(v?.word)audio.prefetch(v.word,{contentType:'word'});if(v?.example)audio.prefetch(v.example,{contentType:'sentence'})}catch(_){}
   };
@@ -13077,8 +13077,8 @@ function reviewVocab(){
     $('reviewSpeakWord')?.addEventListener('click',e=>{e.stopPropagation();audio.play(v.word,{contentType:'word',next:nextCard?nextCard.word:''})});
     $('reviewSpeakWordBack')?.addEventListener('click',e=>{e.stopPropagation();audio.play(v.word,{contentType:'word',next:nextCard?nextCard.word:''})});
     $('reviewSpeakSentence')?.addEventListener('click',e=>{e.stopPropagation();audio.play(v.example,{contentType:'sentence',next:nextCard?nextCard.example:''})});
-    $('reviewLearning').onclick=e=>{e.stopPropagation();flyOutCard($('reviewCard'),-1,()=>{markStillLearning('vocab',v.id);i++;draw()})};
-    $('reviewMastered').onclick=e=>{e.stopPropagation();flyOutCard($('reviewCard'),1,()=>{markMastered('vocab',v.id);haptic('success');/* [FASE-4] 09 §3.3: dikuasai dari ulangan juga pengakuan → proud. */try{pawReact('badge-earned')}catch(_){}i++;draw()})};
+    $('reviewLearning').onclick=e=>{e.stopPropagation();markStillLearning('vocab',v.id);flyOutCard($('reviewCard'),-1,()=>{i++;draw()})};
+    $('reviewMastered').onclick=e=>{e.stopPropagation();markMastered('vocab',v.id);haptic('success');/* [FASE-4] 09 §3.3: dikuasai dari ulangan juga pengakuan → proud. */try{pawReact('badge-earned')}catch(_){}flyOutCard($('reviewCard'),1,()=>{i++;draw()})};
     bindSwipe($('reviewCard'),()=>{i++;draw()},()=>{i=Math.max(0,i-1);draw()});
     try{if(v?.word)audio.prefetch(v.word,{contentType:'word'});if(v?.example)audio.prefetch(v.example,{contentType:'sentence'})}catch(_){}
   };
