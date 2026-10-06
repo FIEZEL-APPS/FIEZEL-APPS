@@ -7798,7 +7798,7 @@ header.topbar {
 
 .topbar-brand-fiezel .fiezel-wordmark-text,
 #topBrandWrap .fiezel-wordmark-text {
-  font-family: var(--font-sans), 'Plus Jakarta Sans', sans-serif !important;
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
   font-size: 23px !important;
   font-weight: 800 !important;
   color: #0F172A !important;
@@ -7808,7 +7808,7 @@ header.topbar {
 
 .topbar-brand-fiezel .fiezel-brand-tag,
 #topBrandWrap .fiezel-brand-tag {
-  font-family: var(--font-sans), 'Plus Jakarta Sans', sans-serif !important;
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
   font-size: 10px !important;
   font-weight: 800 !important;
   color: #92400E !important;
@@ -7870,7 +7870,7 @@ header.topbar {
   align-items: center !important;
   justify-content: center !important;
   gap: 7px !important;
-  font-family: var(--font-sans), 'Plus Jakarta Sans', sans-serif !important;
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
   font-size: 13px !important;
   font-weight: 800 !important;
   color: #0F172A !important;
@@ -7923,7 +7923,7 @@ header.topbar {
 .topbar .btn-course-selector .course-switch-label,
 .topbar #fzCourseSwitchBtn .course-switch-label {
   display: inline-block !important;
-  font-family: var(--font-sans), 'Plus Jakarta Sans', sans-serif !important;
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
   font-size: 13px !important;
   font-weight: 800 !important;
   color: #0F172A !important;
