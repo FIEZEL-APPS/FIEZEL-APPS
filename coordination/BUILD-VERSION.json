@@ -1,7 +1,7 @@
 {
-  "version": "m025-503",
-  "claimedBy": "tidak tercatat (jalankan ulang di dalam git, atau set FIEZEL_BUILD_CLAIMER)",
-  "claimedAt": "2026-10-06T18:48:32.490Z",
-  "reason": "bot(heal): auto-synchronize release boundary",
+  "version": "m025-499",
+  "claimedBy": "branch feat/m025-499-dashboard-uiux-polish",
+  "claimedAt": "2026-10-06T19:01:18.745Z",
+  "reason": "fix(ui): unify topbar format across all panels matching kelasku [m025-499]",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
