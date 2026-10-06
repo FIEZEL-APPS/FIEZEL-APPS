@@ -1,7 +1,7 @@
 {
-  "version": "m025-500",
-  "claimedBy": "branch feat/m025-500-native-motion-tactile-physics",
-  "claimedAt": "2026-10-06T19:56:26.937Z",
-  "reason": "feat(ui): native overscroll rubberband bounce and flashcard tactile gesture engine [m025-500]",
+  "version": "m025-501",
+  "claimedBy": "branch feat/m025-501-unify-topbar-jitter-fix",
+  "claimedAt": "2026-10-06T20:56:51.975Z",
+  "reason": "fix(topbar): eliminate scroll jitter, remove duplicate kelasku card, unify topbar dimensions across all panels [m025-501]",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

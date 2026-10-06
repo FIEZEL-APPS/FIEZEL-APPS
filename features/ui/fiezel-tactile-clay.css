@@ -6554,3 +6554,40 @@ button.level-picker-card {
   margin-top: 4px !important;
   display: inline-block !important;
 }
+
+/* m025-501 TOPBAR AUTHORITY: satu aturan final untuk SEMUA panel.
+   Fixed (sama seperti .bottomnav) -> tidak ada sticky jitter saat scroll;
+   tinggi identik di semua tab -> tidak ada beda ukuran antar panel. */
+html body header.topbar,
+html body.fz-lux header.topbar,
+html body.fz-view-classroom header.topbar,
+html body.fz-view-game header.topbar,
+html body.fz-view-profile header.topbar,
+html body.fz-view-latihan header.topbar {
+  position: fixed !important;
+  top: 0 !important; left: 0 !important; right: 0 !important;
+  width: 100% !important; max-width: 100% !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+  height: calc(56px + env(safe-area-inset-top, 0px)) !important;
+  min-height: calc(56px + env(safe-area-inset-top, 0px)) !important;
+  max-height: calc(56px + env(safe-area-inset-top, 0px)) !important;
+  padding: env(safe-area-inset-top, 0px) 16px 0 16px !important;
+  border-radius: 0 !important;
+  border: 0 !important;
+  border-bottom: 1px solid #E2E8F0 !important;
+  box-shadow: none !important;
+  display: flex !important; align-items: center !important; justify-content: space-between !important;
+  gap: 12px !important;
+  z-index: 1000 !important;
+  transform: none !important;
+  view-transition-name: none !important;
+}
+html body main.app.app,html body.fz-lux main.app.app,html body.fz-lux.fz-view-game main.app.app,html body.fz-lux.fz-stage-home main.app.app {
+  padding-top: calc(56px + env(safe-area-inset-top, 0px) + 12px) !important;
+}
+html body.fz-lesson-mode main.app.app,html body.fz-lux.fz-lesson-mode main.app.app,html body.fz-lux.fz-stage-quiz main.app.app { padding-top: 12px !important; }
+html body.fz-lesson-mode header.topbar,
+html body.fz-teacher-mode header.topbar,
+html body.fz-auth-open header.topbar,
+html body.fz-stage-sl.fsl-session-active header.topbar { display: none !important; }
