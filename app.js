@@ -6146,7 +6146,7 @@ function setApp(html){
 // 2. iOS Safari has NO Vibration API at all, so on iPhone no web app can drive the
 //    Taptic Engine. There is no workaround to write; what the app can do is make sure
 //    the audible and visual feedback still fires, which answerFeedbackSignal does.
-function haptic(kind='tap'){if(state.preferences?.haptics===false)return false;if(typeof navigator==='undefined'||typeof navigator.vibrate!=='function')return false;const patterns={tap:10,navigate:14,confirm:[14,35,20],success:[18,40,30],error:[70,50,70,50,110]};try{return navigator.vibrate(patterns[kind]||patterns.tap)}catch{return false}}
+function haptic(kind='tap'){if(state.preferences?.haptics===false)return false;if(typeof navigator==='undefined'||typeof navigator.vibrate!=='function')return false;const patterns={tap:10,navigate:14,confirm:[18,40,28],success:[24,50,40],error:[90,60,90,60,140]};try{return navigator.vibrate(patterns[kind]||patterns.tap)}catch{return false}}
 // [ADAPTASI] OA-7 (20-sfx-system.md §4): osilator jawaban lama (fxCtx/feedbackTone) DIHAPUS.
 // Umpan balik jawaban sekarang sampel produksi answer_correct/answer_wrong lewat mesin
 // tunggal FiezelUiSfx - aturan satu-mesin audit 03 C.4. Nama fungsi dan kontraknya
