@@ -334,12 +334,16 @@ body:has(.quiz-shell) .bottomnav {
   margin-top: 1px !important;
 }
 
+.bottomnav .nav {
+  transition: transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.15s ease, color 0.15s ease !important;
+}
+
 .bottomnav .nav:hover {
   color: #334155 !important;
 }
 
 .bottomnav .nav:active {
-  transform: scale(0.95) !important;
+  transform: scale(0.90) translateY(1px) !important;
 }
 
 .bottomnav .nav.active {
@@ -348,6 +352,13 @@ body:has(.quiz-shell) .bottomnav {
   border-radius: 14px !important;
   box-shadow: 0 2px 0 #D97706 !important;
   color: #B45309 !important;
+  animation: fzTabBounce 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) both !important;
+}
+
+@keyframes fzTabBounce {
+  0% { transform: scale(0.92); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
 }
 
 .bottomnav .nav.active .fz-i {

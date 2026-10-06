@@ -337,14 +337,14 @@ html.fz-booting body{overflow:hidden}
       overflow-x: clip !important;
       overflow-y: auto !important;
       -webkit-overflow-scrolling: touch;
-      overscroll-behavior: none !important;
       overscroll-behavior-x: none !important;
+      overscroll-behavior-y: auto !important;
     }
     html:not(.fz-booting),
     html:not(.fz-booting) body {
       background: #FBF7F3 !important;
-      overscroll-behavior: none !important;
       overscroll-behavior-x: none !important;
+      overscroll-behavior-y: auto !important;
     }
     body:not(.fz-auth-open):not(.voice-bundle-locked):not(.fz-coach-open) {
       overflow-x: clip !important;
@@ -934,6 +934,9 @@ html.fz-booting body{overflow:hidden}
        bukan ekonomi hadiah; kill switch localStorage fzPawOutfits. Tanpa berkas
        ini PAW tampil polos - tidak ada yang patah. -->
   <script defer src="./features/mascot/fiezel-paw-outfit.js"></script>
+  <!-- 3D Viscoelastic Mochi Mascot Companion Engine & Practice Bridge -->
+  <script type="module" defer src="./mochi-mascot/fiezel-mochi.js"></script>
+  <script defer src="./features/mascot/fiezel-mochi-companion.js"></script>
   <!-- Living Intelligence: Braincore Presence Engine (FiezelPresenceEngine) -->
   <script defer src="./features/mascot/fiezel-presence-engine.js"></script>
   <script defer src="./features/ui/fiezel-coach-bubble.js"></script>

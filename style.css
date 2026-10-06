@@ -166,8 +166,8 @@
 /* m025-42: one scale, always. The viewport tag alone is ignored by iOS Safari, so the
    layout is pinned here as well and the gestures are refused in fiezel-zoom-lock.js.
    touch-action:manipulation is what removes the double-tap-to-zoom delay and action. */
-html{scroll-behavior:auto;touch-action:manipulation;-webkit-text-size-adjust:100%;text-size-adjust:100%;overflow-x:clip;overscroll-behavior-x:none;overscroll-behavior-y:none;overscroll-behavior:none}
-html,body{touch-action:manipulation;overscroll-behavior-x:none;overscroll-behavior:none}
+html{scroll-behavior:auto;touch-action:manipulation;-webkit-text-size-adjust:100%;text-size-adjust:100%;overflow-x:clip;overscroll-behavior-x:none;overscroll-behavior-y:auto}
+html,body{touch-action:manipulation;overscroll-behavior-x:none;overscroll-behavior-y:auto}
 /* m025-43 OWNER: a long press anywhere popped the iOS selection/copy callout on top
    of the lesson. Selection is off app-wide; real text fields keep it, because a
    field you cannot select text in is broken. */
@@ -583,10 +583,19 @@ body.fz-lux .card.card-flashcard{
   border:none !important;border-radius:28px !important;background:transparent !important;
   color:inherit;outline:none;
   box-shadow:none !important;position:relative;
+  animation: fzCardSpringIn 0.34s cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: transform, opacity;
+  user-select: none;
+  -webkit-user-select: none;
+}
+@keyframes fzCardSpringIn {
+  0% { opacity: 0; transform: scale(0.93) translateY(16px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
 }
 .flash-inner{
   position:relative;width:100%;height:100%;
-  transition:transform .55s cubic-bezier(0.2, 0.8, 0.2, 1);transform-style:preserve-3d;
+  transition:transform .52s cubic-bezier(0.34, 1.3, 0.64, 1);transform-style:preserve-3d;
+  will-change: transform;
 }
 .flashcard.flipped .flash-inner{transform:rotateY(180deg)}
 .flash-face{
