@@ -337,6 +337,14 @@ html.fz-booting body{overflow:hidden}
       overflow-x: clip !important;
       overflow-y: auto !important;
       -webkit-overflow-scrolling: touch;
+      overscroll-behavior: none !important;
+      overscroll-behavior-x: none !important;
+    }
+    html:not(.fz-booting),
+    html:not(.fz-booting) body {
+      background: #FFF9EE !important;
+      overscroll-behavior: none !important;
+      overscroll-behavior-x: none !important;
     }
     body:not(.fz-auth-open):not(.voice-bundle-locked):not(.fz-coach-open) {
       overflow-x: clip !important;
@@ -461,6 +469,12 @@ html.fz-booting body{overflow:hidden}
         try { doc.documentElement.classList.remove('fz-booting'); } catch (e) {}
         try { el.setAttribute('data-fiezel-boot-claimed', 'disposed'); } catch (e) {}
         try { if (el.parentNode) el.parentNode.removeChild(el); } catch (e) {}
+        window.__fiezelBootSplashDismissed = true;
+        try {
+          if (window.history && window.history.replaceState && !(window.history.state && window.history.state.fiezelBackNav)) {
+            window.history.replaceState({ fiezelAppRoot: 1, view: 'home' }, document.title, location.href);
+          }
+        } catch (e) {}
       }
       timer = setTimeout(function () {
         try { if (!el.parentNode) return; } catch (e) {}
@@ -510,6 +524,13 @@ html.fz-booting body{overflow:hidden}
         } catch (e) {}
       }
       window.__fiezelBootSplash = { at: startedAt, dismiss: dismiss, clearRecovery: clearRecovery };
+      try {
+        window.addEventListener('pageshow', function (e) {
+          if (!(e && e.persisted) && !window.__fiezelBootSplashDismissed) return;
+          try { doc.documentElement.classList.remove('fz-booting'); } catch (x) {}
+          try { var sp = doc.getElementById('fiezelBootSplash'); if (sp && sp.parentNode) sp.parentNode.removeChild(sp); } catch (x) {}
+        });
+      } catch (e) {}
     })();
   </script>
   <div id="globalSky" class="global-sky phase-day" aria-hidden="true">
