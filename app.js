@@ -19814,7 +19814,8 @@ function installBackNav(){
       onExit:()=>{try{showToast(FiezelI18n.t('nav.tekan-lagi-untuk-keluar'))}catch(_){}},
       // m025-495: penanda pertama baru didorong setelah splash boot benar-benar hilang, supaya
       // potret entri dokumen yang diintip gestur swipe back adalah Home, bukan splash gelap.
-      holdWhen:()=>{try{const d=document;return !d.documentElement.classList.contains('fz-booting')&&!d.querySelector('.fiezel-splash,#fiezelBootSplash')}catch{return true}}
+      holdWhen:()=>{try{const d=document;return !d.documentElement.classList.contains('fz-booting')&&!d.querySelector('.fiezel-splash,#fiezelBootSplash')}catch{return true}},
+      edgeSwipe:true
     })||null
   }catch{return null}
 }
