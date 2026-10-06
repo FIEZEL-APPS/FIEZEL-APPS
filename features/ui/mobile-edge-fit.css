@@ -79,10 +79,10 @@ html body.fz-lang-ja .topbar {
   border-left: none !important;
   border-right: none !important;
   border-top: none !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45) !important;
-  padding: max(10px, env(safe-area-inset-top)) 16px 10px 16px !important;
-  background: rgba(14, 14, 20, 0.94) !important;
+  border-bottom: 1px solid #E2E8F0 !important;
+  box-shadow: none !important;
+  padding: max(8px, env(safe-area-inset-top)) 16px 8px 16px !important;
+  background: rgba(253, 250, 243, 0.96) !important;
   backdrop-filter: blur(24px) !important;
   -webkit-backdrop-filter: blur(24px) !important;
   display: flex !important;
@@ -113,7 +113,7 @@ html body.fz-lang-ja .topbar {
   filter: drop-shadow(0 2px 8px rgba(255, 217, 79, 0.35)) !important;
 }
 
-/* 3. Bottom Navigation Bar: Tactile Clay Floating Dock (Daylight Premium) */
+/* 3. Bottom Navigation Bar: Native Docked Tab Bar (UITabBar / Material NavigationBar) */
 nav.bottomnav,
 .bottomnav,
 html body nav.bottomnav,
@@ -121,24 +121,26 @@ html body.fz-lang-ja nav.bottomnav,
 html body.fz-lux nav.bottomnav,
 html.fiezel-ui-v6 body.fz-lux .bottomnav {
   position: fixed !important;
-  bottom: max(14px, calc(env(safe-area-inset-bottom, 0px) + 10px)) !important;
-  left: 50% !important;
-  right: auto !important;
-  transform: translateX(-50%) !important;
-  width: min(500px, calc(100% - 20px)) !important;
-  max-width: 500px !important;
+  top: auto !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  transform: none !important;
   margin: 0 !important;
-  border-radius: 24px !important;
-  border: 2px solid #E2E8F0 !important;
-  background: rgba(255, 255, 255, 0.96) !important;
-  backdrop-filter: blur(16px) !important;
-  -webkit-backdrop-filter: blur(16px) !important;
-  box-shadow: 0 6px 0 #CBD5E1, 0 16px 32px rgba(15, 23, 42, 0.08) !important;
-  padding: 5px 6px !important;
+  border-radius: 0 !important;
+  border: none !important;
+  border-top: 1px solid #E2E8F0 !important;
+  background: rgba(253, 250, 243, 0.96) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  box-shadow: 0 -4px 16px rgba(15, 23, 42, 0.04) !important;
+  padding: 6px 12px calc(6px + env(safe-area-inset-bottom, 0px)) !important;
   display: grid !important;
   grid-template-columns: repeat(6, 1fr) !important;
   gap: 2px !important;
-  z-index: 200 !important;
+  z-index: 1000 !important;
   box-sizing: border-box !important;
 }
 
@@ -2050,22 +2052,22 @@ span.ch-badge,
   font-weight: 900 !important;
 }
 
-/* Quick practice section & Target Lang Chip (Zero Invisible Text) */
+/* Quick practice section & Target Lang Chip (Daylight Tactile) */
 .quick-practice-section .target-lang-chip,
 .target-lang-chip {
-  background: #181824 !important;
-  border: 1px solid rgba(255, 255, 255, 0.14) !important;
-  color: #FFFFFF !important;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+  background: #FFFFFF !important;
+  border: 2px solid #E2E8F0 !important;
+  color: #0F172A !important;
+  box-shadow: 0 3px 0 #CBD5E1 !important;
 }
 
 .target-lang-chip .chip-label {
-  color: #FFFFFF !important;
+  color: #0F172A !important;
   font-weight: 800 !important;
 }
 
 .target-lang-chip .chip-sub {
-  color: #94A3B8 !important;
+  color: #64748B !important;
   font-weight: 600 !important;
 }
 
@@ -3851,43 +3853,57 @@ html body .ja-kana .kana-tab[aria-selected="true"] {
 }
 
 /* ==========================================================================
-   AUDIT FIX 9: LEVEL PICKER MODAL HIGH CONTRAST DARK THEME
+   AUDIT FIX 9: LEVEL PICKER MODAL CLEAN DAYLIGHT TACTILE
    ========================================================================== */
 .level-picker-card,
 button.level-picker-card {
-  background: #181826 !important;
-  border: 1.5px solid rgba(255, 255, 255, 0.12) !important;
+  background: #FFFFFF !important;
+  border: 2px solid #E2E8F0 !important;
   border-radius: 16px !important;
-  color: #FFFFFF !important;
+  color: #0F172A !important;
+  box-shadow: 0 3px 0 #CBD5E1 !important;
 }
 .level-picker-card strong {
-  color: #FFE02E !important;
+  color: #0F172A !important;
   font-weight: 800 !important;
   font-size: 1.25rem !important;
 }
 .level-picker-card span {
-  color: #CBD5E1 !important;
+  color: #334155 !important;
+  font-weight: 600 !important;
 }
 .level-picker-card.is-active {
-  background: rgba(255, 224, 46, 0.12) !important;
-  border-color: #FFE02E !important;
-  box-shadow: 0 0 0 2px rgba(255, 224, 46, 0.25) !important;
+  background: #FEF9C3 !important;
+  border-color: #F59E0B !important;
+  box-shadow: 0 3px 0 #D97706 !important;
+}
+.level-picker-card.is-active strong {
+  color: #92400E !important;
+}
+.level-picker-card.is-active span {
+  color: #78350F !important;
+  font-weight: 700 !important;
 }
 .level-picker-card.is-locked {
-  background: #14141E !important;
-  border-color: rgba(255, 255, 255, 0.08) !important;
-  opacity: 0.65 !important;
+  background: #F8FAFC !important;
+  border-color: #E2E8F0 !important;
+  opacity: 0.55 !important;
+  box-shadow: none !important;
+}
+.level-picker-card.is-locked strong,
+.level-picker-card.is-locked span {
+  color: #94A3B8 !important;
 }
 .level-trust-badge {
-  background: #222234 !important;
-  color: #94A3B8 !important;
+  background: #F1F5F9 !important;
+  color: #475569 !important;
   border-radius: 6px !important;
   font-size: 0.68rem !important;
   font-weight: 700 !important;
 }
 .level-trust-badge.is-verified {
-  background: rgba(16, 185, 129, 0.2) !important;
-  color: #10B981 !important;
+  background: #D1FAE5 !important;
+  color: #065F46 !important;
 }
 .level-exam-cta {
   background: #181826 !important;
