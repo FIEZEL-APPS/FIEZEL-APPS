@@ -1,7 +1,7 @@
 {
-  "version": "m025-494",
-  "claimedBy": "branch feat/m025-494-native-touch-haptic-polish",
-  "claimedAt": "2026-10-06T11:09:31.144Z",
-  "reason": "feat(ui): umpan balik taktil natif, haptic tick, dan transisi tab asimetris",
+  "version": "m025-495",
+  "claimedBy": "branch feat/m025-495-pwa-flashcard-cream-polish",
+  "claimedAt": "2026-10-06T12:17:34.993Z",
+  "reason": "style(flashcard): cerahkan tema krem daylight kontras tinggi dan sejajarkan tombol audio",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

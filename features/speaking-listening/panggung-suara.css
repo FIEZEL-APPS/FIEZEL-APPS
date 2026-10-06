@@ -1152,7 +1152,18 @@
     opacity: 0;
     transform: translateY(-440px) scale(1) rotate(var(--rot-end, 15deg));
   }
+/* High-contrast fixes for dark theme cards in Listening & Speaking */
+html body .fsl-card h1,
+html body .fsl-card h2,
+html body .fsl-card h3,
+html body .fsl-card h4,
+html body .listening-modal h1,
+html body .listening-modal h2,
+html body .listening-modal h3,
+html body .listening-modal .listening-head-title,
+html body .listening-modal .jlpt-q-jp,
+html body .listening-modal .jlpt-sheet-title {
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
 }
-
-
 
