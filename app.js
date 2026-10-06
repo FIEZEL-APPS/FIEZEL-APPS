@@ -19811,7 +19811,10 @@ function installBackNav(){
       // sepatah kata pun, jeda itu terbaca sebagai tekanan yang tidak melakukan apa-apa;
       // dengan kalimat ini ia terbaca sebagai jaring pengaman, dan gestur tepi yang meleset
       // di beranda tidak lagi bisa membuang sesi belajar murid.
-      onExit:()=>{try{showToast(FiezelI18n.t('nav.tekan-lagi-untuk-keluar'))}catch(_){}}
+      onExit:()=>{try{showToast(FiezelI18n.t('nav.tekan-lagi-untuk-keluar'))}catch(_){}},
+      // m025-495: penanda pertama baru didorong setelah splash boot benar-benar hilang, supaya
+      // potret entri dokumen yang diintip gestur swipe back adalah Home, bukan splash gelap.
+      holdWhen:()=>{try{const d=document;return !d.documentElement.classList.contains('fz-booting')&&!d.querySelector('.fiezel-splash,#fiezelBootSplash')}catch{return true}}
     })||null
   }catch{return null}
 }
