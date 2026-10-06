@@ -594,6 +594,42 @@
     return null;
   }
 
+  function findActiveSwipeTarget(doc) {
+    if (!doc || typeof doc.getElementById !== 'function') return null;
+    try {
+      var modal = doc.getElementById('modal');
+      if (modal && !modal.classList.contains('hidden')) {
+        var panel = doc.getElementById('modalPanel') || modal.firstElementChild;
+        return { el: panel, backdrop: modal, isModal: true };
+      }
+      var drawer = doc.getElementById('fzStageDrawer');
+      if (drawer && drawer.classList.contains('show')) {
+        var dPanel = doc.getElementById('fzStageDrawerMount') || drawer.lastElementChild;
+        return { el: dPanel, backdrop: drawer.querySelector('.fz-stage-drawer-backdrop'), isModal: true };
+      }
+      var listeningModal = doc.getElementById('listeningPanelModal');
+      if (listeningModal && !listeningModal.classList.contains('hidden')) {
+        var lBox = listeningModal.querySelector('.listening-modal-box') || listeningModal;
+        return { el: lBox, backdrop: listeningModal, isModal: true };
+      }
+      var welcome = doc.getElementById('welcome');
+      if (welcome && !welcome.classList.contains('hidden')) {
+        var wPanel = welcome.querySelector('.welcome-panel') || welcome;
+        return { el: wPanel, backdrop: welcome, isModal: true };
+      }
+      var authGate = doc.getElementById('authGate');
+      if (authGate && !authGate.classList.contains('hidden')) {
+        var aPanel = authGate.querySelector('.auth-panel') || authGate;
+        return { el: aPanel, backdrop: authGate, isModal: true };
+      }
+      var app = doc.getElementById('app');
+      if (app) {
+        return { el: app, backdrop: null, isModal: false };
+      }
+    } catch (_) {}
+    return null;
+  }
+
   function installEdgeSwipe(env, onBack, options) {
     var target = env || null;
     var doc = target && target.document;
@@ -612,30 +648,155 @@
       lastFiredAt = at;
       try { if (typeof onBack === 'function') onBack(); } catch (_) {}
     }
+
+    var activeTarget = null;
+    var startX = 0;
+    var startY = 0;
+    var currentDx = 0;
+    var isSwiping = false;
+
+    function resetSwipeVisual(t) {
+      if (!t || !t.el || !t.el.style) return;
+      try {
+        t.el.style.transform = '';
+        t.el.style.transition = '';
+        t.el.style.willChange = '';
+        t.el.style.boxShadow = '';
+        t.el.style.opacity = '';
+        if (t.backdrop && t.backdrop.style) {
+          t.backdrop.style.opacity = '';
+          t.backdrop.style.transition = '';
+        }
+      } catch (_) {}
+    }
+
     function begin(event) {
       // Tetikus tidak boleh memicu ini: menyeret dari tepi kiri adalah hal biasa di desktop.
       if (usePointer && event && str(event.pointerType) === 'mouse') { gesture.reset(); return; }
-      gesture.start(pointFrom(event));
+      var p = pointFrom(event);
+      if (!p) return;
+      var ok = gesture.start(p);
+      if (ok) {
+        startX = Number(p.x) || 0;
+        startY = Number(p.y) || 0;
+        currentDx = 0;
+        isSwiping = false;
+        activeTarget = findActiveSwipeTarget(doc);
+      } else {
+        activeTarget = null;
+      }
     }
-    function drag(event) {
-      if (gesture.move(pointFrom(event))) fire();
-    }
-    function finish() { gesture.end(); }
 
-    // Semua pendengar pasif: modul ini tidak pernah membatalkan gestur pengguna, ia hanya
-    // mengamatinya. Pendengar non-pasif di touchmove akan ikut menahan gulir seluruh
-    // aplikasi setiap kali jari menyentuh dekat tepi kiri.
+    function drag(event) {
+      var p = pointFrom(event);
+      if (!p) return;
+      var moved = gesture.move(p);
+      if (gesture.isTracking()) {
+        var dx = Number(p.x) - startX;
+        var dy = Number(p.y) - startY;
+        if (dx > 6 && dx > Math.abs(dy)) {
+          isSwiping = true;
+          // PENTING: Mencegah overscroll peeling bawaan browser yang menyeret kanvas di balik dokumen
+          if (event && typeof event.preventDefault === 'function' && event.cancelable) {
+            try { event.preventDefault(); } catch (_) {}
+          }
+          currentDx = dx;
+          if (activeTarget && activeTarget.el && activeTarget.el.style) {
+            var depthVal = controller ? controller.depth() : 1;
+            if (activeTarget.isModal) {
+              activeTarget.el.style.transform = 'translate3d(' + dx + 'px,0,0)';
+              activeTarget.el.style.transition = 'none';
+              activeTarget.el.style.willChange = 'transform';
+              activeTarget.el.style.boxShadow = '-8px 0 28px rgba(0,0,0,0.22)';
+              if (activeTarget.backdrop && activeTarget.backdrop.style) {
+                var w = Number(target.innerWidth) || 360;
+                var op = Math.max(0.1, 1 - (dx / w) * 0.9);
+                activeTarget.backdrop.style.opacity = String(op);
+                activeTarget.backdrop.style.transition = 'none';
+              }
+            } else if (depthVal > 0) {
+              activeTarget.el.style.transform = 'translate3d(' + dx + 'px,0,0)';
+              activeTarget.el.style.transition = 'none';
+              activeTarget.el.style.willChange = 'transform';
+            } else {
+              var rubber = Math.min(24, dx * 0.14);
+              activeTarget.el.style.transform = 'translate3d(' + rubber + 'px,0,0)';
+              activeTarget.el.style.transition = 'none';
+            }
+          }
+        }
+      }
+      if (moved && (!activeTarget || !activeTarget.el || typeof doc.getElementById !== 'function')) {
+        fire();
+      }
+    }
+
+    function finish(event) {
+      var didFire = gesture.hasFired();
+      gesture.end();
+      if (isSwiping && activeTarget && activeTarget.el && activeTarget.el.style) {
+        var el = activeTarget.el;
+        var bd = activeTarget.backdrop;
+        var curTarget = activeTarget;
+        var depthVal = controller ? controller.depth() : 1;
+        var shouldPop = (didFire || currentDx >= MIN_DISTANCE_PX) && (curTarget.isModal || depthVal > 0);
+        if (shouldPop) {
+          el.style.transition = 'transform 0.20s cubic-bezier(0.2, 0.9, 0.3, 1), opacity 0.18s ease';
+          el.style.transform = 'translate3d(100%,0,0)';
+          if (bd && bd.style) {
+            bd.style.transition = 'opacity 0.18s ease';
+            bd.style.opacity = '0';
+          }
+          if (typeof target.setTimeout === 'function') {
+            target.setTimeout(function () {
+              resetSwipeVisual(curTarget);
+              fire();
+            }, 180);
+          } else {
+            resetSwipeVisual(curTarget);
+            fire();
+          }
+        } else {
+          el.style.transition = 'transform 0.18s cubic-bezier(0.25, 1, 0.5, 1)';
+          el.style.transform = 'translate3d(0,0,0)';
+          if (bd && bd.style) {
+            bd.style.transition = 'opacity 0.16s ease';
+            bd.style.opacity = '';
+          }
+          if (typeof target.setTimeout === 'function') {
+            target.setTimeout(function () {
+              resetSwipeVisual(curTarget);
+            }, 180);
+          } else {
+            resetSwipeVisual(curTarget);
+          }
+          if (depthVal === 0 && currentDx >= MIN_DISTANCE_PX && controller) {
+            controller.handlePop();
+          }
+        }
+      } else if (didFire) {
+        fire();
+      }
+      activeTarget = null;
+      isSwiping = false;
+      currentDx = 0;
+    }
+
+    var usePointer = typeof target.PointerEvent === 'function';
+    var hasTouch = (target && 'ontouchstart' in target) || (doc && 'ontouchstart' in doc) || !usePointer;
+
+    var nonPassive = { passive: false };
     var passive = { passive: true };
-    if (usePointer) {
-      doc.addEventListener('pointerdown', begin, passive);
-      doc.addEventListener('pointermove', drag, passive);
-      doc.addEventListener('pointerup', finish, passive);
-      doc.addEventListener('pointercancel', finish, passive);
-    } else {
+    if (hasTouch) {
       doc.addEventListener('touchstart', begin, passive);
-      doc.addEventListener('touchmove', drag, passive);
+      doc.addEventListener('touchmove', drag, nonPassive);
       doc.addEventListener('touchend', finish, passive);
       doc.addEventListener('touchcancel', finish, passive);
+    } else {
+      doc.addEventListener('pointerdown', begin, passive);
+      doc.addEventListener('pointermove', drag, nonPassive);
+      doc.addEventListener('pointerup', finish, passive);
+      doc.addEventListener('pointercancel', finish, passive);
     }
     return true;
   }
