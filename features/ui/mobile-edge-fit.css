@@ -4734,4 +4734,12 @@ html body:not(.fz-teacher-mode) .card-flashcard h3.flash-meaning {
 .flash-btn-mastered:active {
   transform: scale(0.98);
 }
-
+.topline #aiWord,
+.topline .flash-ai-btn {
+  width: auto !important;
+  margin-top: 0 !important;
+  padding: 6px 14px !important;
+  font-size: 0.84rem !important;
+  font-weight: 700 !important;
+  border-radius: 999px !important;
+}

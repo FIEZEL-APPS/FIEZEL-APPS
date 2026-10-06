@@ -1,8 +1,8 @@
 # FIEZEL Release Handoff Dossier — Build m025-495
-**Tanggal:** 2026-10-06  
-**Nomor Build:** `m025-495`  
-**Branch:** `feat/m025-495-pwa-flashcard-cream-polish`  
-**Author:** Antigravity AI  
+**Tanggal:** 2026-10-06
+**Nomor Build:** `m025-495`
+**Branch:** `feat/m025-495-pwa-flashcard-cream-polish`
+**Author:** Antigravity AI
 
 ---
 
