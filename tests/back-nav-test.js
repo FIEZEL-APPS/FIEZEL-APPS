@@ -143,7 +143,7 @@ test('tekanan kembali tidak pernah melepas penanda selama masih ada layar', () =
     assert.strictEqual(a.ctrl.holdsMarker(), true, 'penanda lepas di tengah jalan = boot loop');
   }
   assert.strictEqual(a.ctrl.handlePop().action, 'exit');
-  assert.strictEqual(a.ctrl.holdsMarker(), false, 'baru di sini murid memang boleh keluar');
+  assert.strictEqual(a.ctrl.holdsMarker(), true, 'penanda tetap dipasang kembali untuk zero-reload invariant');
 });
 
 test('gerbang wajib juga memasang ulang penanda, bukan hanya menahan view', () => {
@@ -165,13 +165,13 @@ test('kembali menuruni riwayat satu langkah tiap tekanan, bukan langsung ke akar
   assert.deepStrictEqual(a.applied, ['vocab', 'library', 'home']);
 });
 
-test('tumpukan kosong berarti keluar aplikasi, bukan murid terkurung', () => {
+test('tumpukan kosong memanggil onExit dan memasang ulang penanda (anti-reload)', () => {
   const a = makeApp();
   const result = a.ctrl.handlePop();
   assert.strictEqual(result.action, 'exit');
   assert.strictEqual(a.applied.length, 0);
-  assert.strictEqual(a.pushes, 0, 'menahan popstate di akar akan mengurung murid di dalam PWA');
-  assert.strictEqual(a.ctrl.holdsMarker(), false, 'penanda harus dilepas, kalau tidak PWA tidak bisa ditutup');
+  assert.strictEqual(a.pushes, 1, 'memasang kembali penanda agar swipe back di root tidak jatuh ke about:blank / reload');
+  assert.strictEqual(a.ctrl.holdsMarker(), true, 'penanda harus aktif agar zero-reload invariant terjaga');
 });
 
 test('aplikasi diberi tahu saat tekanan berikutnya benar-benar akan keluar', () => {
