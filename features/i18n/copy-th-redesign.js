@@ -342,7 +342,7 @@
     'game.mastery-label': 'ระดับความชำนาญ',
     'game.arena-kicker': 'โหมดดวลสุดมันส์',
     'game.arena-live': 'ผู้เล่นพร้อม',
-    'game.paw-arena-title': 'PAW ARENA',
+    'game.paw-arena-title': 'FIEZEL ARENA',
     'game.paw-arena-desc': 'ท้าบอทหรือเพื่อน: ทายความหมาย ต่อคำ และชิงถ้วยรางวัล!',
     'game.paw-arena-cta': 'เริ่มดวลอารีนา',
     'game.mode-story': 'Story Chain',

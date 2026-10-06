@@ -351,7 +351,7 @@
     'game.mastery-label': 'Level Mahir',
     'game.arena-kicker': 'Mode Duel Seru',
     'game.arena-live': 'Pemain Siap',
-    'game.paw-arena-title': 'PAW ARENA',
+    'game.paw-arena-title': 'FIEZEL ARENA',
     'game.paw-arena-desc': 'Tantang bot atau teman: adu tebak arti, sambung kata, dan rebut trophy!',
     'game.paw-arena-cta': 'Mulai Duel Arena',
     'game.mode-story': 'Story Chain',

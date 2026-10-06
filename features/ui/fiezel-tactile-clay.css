@@ -179,8 +179,8 @@ button.primary:disabled {
 }
 
 /* 6. TACTILE 3D SECONDARY BUTTONS */
-button:not(.primary):not(.nav):not(.token-chip):not(.fz-aurora-audio-btn):not(.option-btn):not(.fz-i):not(.brand-button):not(.icon-button):not(.course-switch-btn):not(.fzb-bug):not(.fzb-exit):not(.kelasku-strip-btn):not(.fz-drawer-toggle):not(.close-btn):not(#modalClose):not(.hero-cta-btn):not(.bug-raid-btn):not(.class-btn-3d):not(.audio-btn-3d):not(.today-cta-soft):not(.target-lang-chip):not(.btn-class-selector):not(.ch-segbar-btn):not(.ch-tab):not(.progress-tab):not(.active-level-control):not(.ch-btn-kerjakan):not(.ch-btn-mulai):not(.ch-btn-tuntas):not(.poster-action-btn):not(.paw-action-btn):not(.bug-raid-action-btn):not(.game-back-pill),
-.btn:not(.primary):not(.hero-cta-btn):not(.bug-raid-btn):not(.class-btn-3d):not(.target-lang-chip):not(.ch-btn-kerjakan):not(.ch-btn-mulai):not(.ch-btn-tuntas):not(.poster-action-btn):not(.paw-action-btn):not(.bug-raid-action-btn):not(.game-back-pill) {
+button:not(.primary):not(.nav):not(.token-chip):not(.fz-aurora-audio-btn):not(.option-btn):not(.fz-i):not(.brand-button):not(.icon-button):not(.course-switch-btn):not(.fzb-bug):not(.fzb-exit):not(.kelasku-strip-btn):not(.fz-drawer-toggle):not(.close-btn):not(#modalClose):not(.hero-cta-btn):not(.bug-raid-btn):not(.class-btn-3d):not(.audio-btn-3d):not(.today-cta-soft):not(.target-lang-chip):not(.btn-class-selector):not(.ch-segbar-btn):not(.ch-tab):not(.progress-tab):not(.active-level-control):not(.ch-btn-kerjakan):not(.ch-btn-mulai):not(.ch-btn-tuntas):not(.poster-action-btn):not(.paw-action-btn):not(.bug-raid-action-btn):not(.game-back-pill):not(.setup-link):not(.level-picker-card),
+.btn:not(.primary):not(.hero-cta-btn):not(.bug-raid-btn):not(.class-btn-3d):not(.target-lang-chip):not(.ch-btn-kerjakan):not(.ch-btn-mulai):not(.ch-btn-tuntas):not(.poster-action-btn):not(.paw-action-btn):not(.bug-raid-action-btn):not(.game-back-pill):not(.setup-link):not(.level-picker-card) {
   background: #FFFFFF !important;
   border: 2px solid var(--card-border) !important;
   border-radius: 14px !important;
@@ -192,10 +192,37 @@ button:not(.primary):not(.nav):not(.token-chip):not(.fz-aurora-audio-btn):not(.o
   transition: transform 0.1s ease, box-shadow 0.1s ease !important;
 }
 
-button:not(.primary):not(.nav):not(.token-chip):not(.fz-aurora-audio-btn):not(.option-btn):not(.fz-i):not(.brand-button):not(.icon-button):not(.course-switch-btn):not(.fzb-bug):not(.fzb-exit):not(.kelasku-strip-btn):not(.fz-drawer-toggle):not(.close-btn):not(#modalClose):not(.hero-cta-btn):not(.bug-raid-btn):not(.class-btn-3d):not(.audio-btn-3d):not(.today-cta-soft):not(.target-lang-chip):not(.btn-class-selector):not(.ch-segbar-btn):not(.ch-tab):not(.progress-tab):not(.active-level-control):not(.ch-btn-kerjakan):not(.ch-btn-mulai):not(.ch-btn-tuntas):not(.poster-action-btn):not(.paw-action-btn):not(.bug-raid-action-btn):not(.game-back-pill):active,
-.btn:not(.primary):not(.hero-cta-btn):not(.bug-raid-btn):not(.class-btn-3d):not(.target-lang-chip):not(.ch-btn-kerjakan):not(.ch-btn-mulai):not(.ch-btn-tuntas):not(.poster-action-btn):not(.paw-action-btn):not(.bug-raid-action-btn):not(.game-back-pill):active {
+button:not(.primary):not(.nav):not(.token-chip):not(.fz-aurora-audio-btn):not(.option-btn):not(.fz-i):not(.brand-button):not(.icon-button):not(.course-switch-btn):not(.fzb-bug):not(.fzb-exit):not(.kelasku-strip-btn):not(.fz-drawer-toggle):not(.close-btn):not(#modalClose):not(.hero-cta-btn):not(.bug-raid-btn):not(.class-btn-3d):not(.audio-btn-3d):not(.today-cta-soft):not(.target-lang-chip):not(.btn-class-selector):not(.ch-segbar-btn):not(.ch-tab):not(.progress-tab):not(.active-level-control):not(.ch-btn-kerjakan):not(.ch-btn-mulai):not(.ch-btn-tuntas):not(.poster-action-btn):not(.paw-action-btn):not(.bug-raid-action-btn):not(.game-back-pill):not(.setup-link):not(.level-picker-card):active,
+.btn:not(.primary):not(.hero-cta-btn):not(.bug-raid-btn):not(.class-btn-3d):not(.target-lang-chip):not(.ch-btn-kerjakan):not(.ch-btn-mulai):not(.ch-btn-tuntas):not(.poster-action-btn):not(.paw-action-btn):not(.bug-raid-action-btn):not(.game-back-pill):not(.setup-link):not(.level-picker-card):active {
   transform: translateY(2px) !important;
   box-shadow: 0 2px 0 var(--card-bevel) !important;
+}
+
+#accountSheet .setup-link,
+button.setup-link,
+.setup-link {
+  display: block !important;
+  width: 100% !important;
+  margin: 6px 0 !important;
+  padding: 10px 14px !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: #0284C7 !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  text-align: center !important;
+  cursor: pointer !important;
+  text-decoration: none !important;
+  border-radius: 8px !important;
+  transform: none !important;
+  box-sizing: border-box !important;
+}
+#accountSheet .setup-link:hover,
+button.setup-link:hover,
+.setup-link:hover {
+  text-decoration: underline !important;
+  background: rgba(2, 132, 199, 0.06) !important;
 }
 
 .topbar .brand-button,
@@ -228,22 +255,25 @@ button.brand-button {
   box-shadow: 0 1px 0 #BAE6FD !important;
 }
 
-/* 8. TACTILE DOCKED BOTTOM NAVIGATION (6-COLUMN BALANCED GRID) */
+/* 8. TACTILE DOCKED BOTTOM NAVIGATION (NATIVE MOBILE DOCK UITabBar) */
 .bottomnav {
   position: fixed !important;
-  bottom: max(14px, calc(env(safe-area-inset-bottom, 0px) + 10px)) !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-  width: min(500px, calc(100% - 20px)) !important;
-  max-width: 500px !important;
-  margin: 0 auto !important;
-  background: rgba(255, 255, 255, 0.96) !important;
+  top: auto !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  transform: none !important;
+  margin: 0 !important;
+  background: rgba(253, 250, 243, 0.96) !important;
   backdrop-filter: blur(20px) !important;
   -webkit-backdrop-filter: blur(20px) !important;
-  border: 2px solid #E2E8F0 !important;
-  border-radius: 24px !important;
-  box-shadow: 0 6px 0 #CBD5E1, 0 16px 32px rgba(15, 23, 42, 0.08) !important;
-  padding: 5px 6px !important;
+  border-radius: 0 !important;
+  border: none !important;
+  border-top: 1px solid #E2E8F0 !important;
+  box-shadow: 0 -4px 16px rgba(15, 23, 42, 0.04) !important;
+  padding: 6px 12px calc(6px + env(safe-area-inset-bottom, 0px)) !important;
   display: grid !important;
   grid-template-columns: repeat(6, 1fr) !important;
   align-items: center !important;
@@ -794,16 +824,53 @@ html body:not(.fz-teacher-mode) .fz-welcome-header .fz-greet-title,
 /* 14. TOPBAR: 100% TACTILE CLAY SPECIFICATION */
 header.topbar,
 .topbar {
-  background: rgba(250, 248, 245, 0.96) !important;
+  background: rgba(253, 250, 243, 0.96) !important;
   backdrop-filter: blur(16px) !important;
   -webkit-backdrop-filter: blur(16px) !important;
-  border-bottom: 2px solid #E2E8F0 !important;
-  box-shadow: 0 3px 0 #CBD5E1 !important;
-  padding: 10px 14px !important;
-  min-height: 56px !important;
+  border-bottom: 1px solid #E2E8F0 !important;
+  box-shadow: none !important;
+  padding: 8px 16px !important;
+  min-height: 52px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
+}
+
+.topbar-brand-fiezel,
+#topBrandWrap {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  cursor: pointer !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.topbar-brand-fiezel .fiezel-wordmark-text,
+#topBrandWrap .fiezel-wordmark-text {
+  font-family: var(--font-sans), 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 23px !important;
+  font-weight: 800 !important;
+  color: #0F172A !important;
+  letter-spacing: -0.025em !important;
+  line-height: 1 !important;
+}
+
+.topbar-brand-fiezel .fiezel-brand-tag,
+#topBrandWrap .fiezel-brand-tag {
+  font-family: var(--font-sans), 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  color: #92400E !important;
+  background: #FEF3C7 !important;
+  border: 1px solid #FDE68A !important;
+  padding: 2px 7px !important;
+  border-radius: 6px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.04em !important;
+  line-height: 1.2 !important;
 }
 
 .topbar .brand-button {
@@ -842,49 +909,77 @@ header.topbar,
   gap: 8px !important;
 }
 
-/* Circular 3D Tactile Buttons in Topbar */
-.topbar .course-switch-btn,
+/* Tactile Selector Pill Button in Topbar (Matching KelasKu .btn-class-selector) */
+.btn-course-selector,
+.topbar .btn-course-selector,
 .topbar #fzCourseSwitchBtn {
-  width: 34px !important;
-  height: 34px !important;
-  min-width: 34px !important;
-  min-height: 34px !important;
-  border-radius: 50% !important;
-  background: #012169 !important;
-  border: 2px solid #CBD5E1 !important;
-  box-shadow: 0 3px 0 #CBD5E1 !important;
+  background: #FFFFFF !important;
+  border: 2px solid #E2E8F0 !important;
+  border-radius: 9999px !important;
+  padding: 6px 14px !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  padding: 0 !important;
-  overflow: hidden !important;
+  gap: 7px !important;
+  font-family: var(--font-sans), 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  color: #0F172A !important;
+  box-shadow: 0 3px 0 #CBD5E1 !important;
   cursor: pointer !important;
-  transition: transform 0.12s ease, box-shadow 0.12s ease !important;
+  white-space: nowrap !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  width: auto !important;
+  min-width: auto !important;
+  flex-shrink: 0 !important;
+  line-height: 1 !important;
+  transition: all 0.12s ease !important;
+  overflow: visible !important;
 }
 
-.topbar .course-switch-btn:hover {
+.btn-course-selector:hover,
+.topbar #fzCourseSwitchBtn:hover {
   transform: translateY(-1px) !important;
   box-shadow: 0 4px 0 #CBD5E1 !important;
+  border-color: #CBD5E1 !important;
 }
 
-.topbar .course-switch-btn:active {
+.btn-course-selector:active,
+.topbar #fzCourseSwitchBtn:active {
   transform: translateY(2px) !important;
   box-shadow: 0 1px 0 #CBD5E1 !important;
 }
 
-.topbar .course-switch-btn .course-switch-flag {
-  width: 100% !important;
-  height: 100% !important;
-  display: flex !important;
+.btn-course-selector .course-switch-flag,
+.topbar #fzCourseSwitchBtn .course-switch-flag {
+  display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
+  width: auto !important;
+  height: auto !important;
+  flex-shrink: 0 !important;
 }
 
-.topbar .course-switch-btn svg.fiezel-flag-svg {
-  width: 100% !important;
-  height: 100% !important;
-  border-radius: 50% !important;
+.btn-course-selector .course-switch-flag svg,
+.topbar #fzCourseSwitchBtn .course-switch-flag svg {
+  width: 18px !important;
+  height: 13px !important;
+  border-radius: 2px !important;
+  display: block !important;
   object-fit: cover !important;
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0.4) !important;
+}
+
+.btn-course-selector .course-switch-label,
+.topbar #fzCourseSwitchBtn .course-switch-label {
+  display: inline-block !important;
+  font-family: var(--font-sans), 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  color: #0F172A !important;
+  white-space: nowrap !important;
+  line-height: 1 !important;
 }
 
 .topbar .icon-button {
@@ -4026,15 +4121,8 @@ body.fz-view-profile .active-level-control,
 body.fz-view-profile #cardIdPribadi,
 body.fz-view-profile #cardSuaraAudio,
 body.fz-view-profile .profile-section-card:not(#cardTargetHarian),
-body.fz-view-profile .btn-card-collapse,
 body.fz-view-profile .card-collapsed-pill,
-body.fz-view-profile .topbar-actions > button[onclick="openSettings()"],
 body.fz-view-classroom .topbar-actions > button[onclick="openSettings()"] {
-  display: none !important;
-}
-
-html body.fz-view-profile header.topbar,
-body.fz-view-profile header.topbar {
   display: none !important;
 }
 
@@ -4077,15 +4165,11 @@ span.sr-only,
 
 
 /* ==========================================================================
-   16. LATIHAN — compact centered launcher grid (no topbar, no lead text)
+   16. LATIHAN — compact centered launcher grid (with unified persistent topbar)
    ========================================================================== */
-html body.fz-view-latihan header.topbar,
-html body.fz-view-grammar header.topbar {
-  display: none !important;
-}
 html body.fz-view-latihan #app,
 html body.fz-view-grammar #app {
-  padding-top: 18px !important;
+  padding-top: 14px !important;
 }
 html body.fz-view-latihan #app .section-head > div > p,
 html body.fz-view-grammar #app .section-head > div > p {
@@ -6373,4 +6457,89 @@ div.jlpt-explain-tip-card b {
   color: #0C4A6E !important;
   -webkit-text-fill-color: #0C4A6E !important;
   font-weight: 800 !important;
+}
+
+/* 17. CLEAN DAYLIGHT MINIMALIST LEVEL PROGRESSION CARDS */
+.level-picker-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+  margin: 16px 0 !important;
+}
+
+.level-picker-card,
+button.level-picker-card {
+  background: #FFFFFF !important;
+  border: 2px solid #E2E8F0 !important;
+  border-radius: 16px !important;
+  padding: 14px 12px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 4px !important;
+  box-shadow: 0 3px 0 #CBD5E1 !important;
+  text-align: left !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.level-picker-card strong {
+  font-size: 1.25rem !important;
+  font-weight: 800 !important;
+  color: #0F172A !important;
+  -webkit-text-fill-color: #0F172A !important;
+  line-height: 1.1 !important;
+}
+
+.level-picker-card span {
+  font-size: 0.8rem !important;
+  font-weight: 600 !important;
+  line-height: 1.35 !important;
+  color: #334155 !important;
+  -webkit-text-fill-color: #334155 !important;
+}
+
+.level-picker-card.is-active {
+  background: #FEF9C3 !important;
+  border-color: #F59E0B !important;
+  box-shadow: 0 3px 0 #D97706 !important;
+}
+
+.level-picker-card.is-active strong {
+  color: #92400E !important;
+  -webkit-text-fill-color: #92400E !important;
+}
+
+.level-picker-card.is-active span {
+  color: #78350F !important;
+  -webkit-text-fill-color: #78350F !important;
+  font-weight: 700 !important;
+}
+
+.level-picker-card.is-locked {
+  background: #F8FAFC !important;
+  border-color: #E2E8F0 !important;
+  box-shadow: none !important;
+  opacity: 0.55 !important;
+  cursor: not-allowed !important;
+}
+
+.level-picker-card.is-locked strong,
+.level-picker-card.is-locked span {
+  color: #94A3B8 !important;
+  -webkit-text-fill-color: #94A3B8 !important;
+}
+
+.level-trust-badge {
+  background: #F1F5F9 !important;
+  color: #475569 !important;
+  -webkit-text-fill-color: #475569 !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  padding: 2px 6px !important;
+  border-radius: 6px !important;
+  margin-top: 4px !important;
+  display: inline-block !important;
 }
