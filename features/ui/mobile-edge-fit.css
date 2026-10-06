@@ -4743,3 +4743,276 @@ html body:not(.fz-teacher-mode) .card-flashcard h3.flash-meaning {
   font-weight: 700 !important;
   border-radius: 999px !important;
 }
+
+/* ==========================================================================
+   POLISH: GLOSSY WRITING HERO CARD & BADGE
+   ========================================================================== */
+.skill-page-hero.skill-writing,
+.skill-page-hero,
+.skill-writing {
+  background: linear-gradient(145deg, #181926 0%, #0F101A 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 24px !important;
+  padding: 24px 20px !important;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  color: #FFFFFF !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.skill-page-hero.skill-writing::before {
+  content: '';
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 140px;
+  height: 140px;
+  background: radial-gradient(circle, rgba(255, 215, 0, 0.18) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.skill-page-hero .skill-badge,
+.skill-writing .skill-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  background: linear-gradient(135deg, #FFE02E 0%, #F59E0B 100%) !important;
+  border: 1.5px solid #FEF08A !important;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+  color: #0F172A !important;
+  -webkit-text-fill-color: #0F172A !important;
+  font-size: 11px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  padding: 6px 14px !important;
+  border-radius: 9999px !important;
+  margin-bottom: 12px !important;
+  width: fit-content !important;
+}
+
+.skill-page-hero h1,
+.skill-writing h1 {
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  font-size: 28px !important;
+  font-weight: 800 !important;
+  margin: 4px 0 8px 0 !important;
+  letter-spacing: -0.02em !important;
+}
+
+.skill-page-hero p,
+.skill-writing p {
+  color: rgba(255, 255, 255, 0.72) !important;
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.72) !important;
+  font-size: 14px !important;
+  line-height: 1.45 !important;
+  margin-bottom: 16px !important;
+}
+
+html body section.writing-page .skill-page-hero button.active-level-control,
+html body .skill-page-hero button.active-level-control,
+html body .skill-writing button.active-level-control {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 18px !important;
+  padding: 12px 18px !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  margin-top: 14px !important;
+  cursor: pointer !important;
+}
+
+html body section.writing-page .skill-page-hero button.active-level-control span,
+html body .skill-page-hero button.active-level-control span {
+  color: #CBD5E1 !important;
+  -webkit-text-fill-color: #CBD5E1 !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.04em !important;
+}
+
+html body section.writing-page .skill-page-hero button.active-level-control strong,
+html body .skill-page-hero button.active-level-control strong {
+  color: #FFE02E !important;
+  -webkit-text-fill-color: #FFE02E !important;
+  font-size: 22px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+}
+
+html body section.writing-page .skill-page-hero button.active-level-control small,
+html body .skill-page-hero button.active-level-control small {
+  background: #FFE02E !important;
+  color: #0F172A !important;
+  -webkit-text-fill-color: #0F172A !important;
+  border: none !important;
+  border-radius: 9999px !important;
+  padding: 5px 14px !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.02em !important;
+  box-shadow: 0 2px 8px rgba(255, 224, 46, 0.4) !important;
+}
+
+/* ==========================================================================
+   POLISH: MINIMALIST PLACEMENT TEST DIAGNOSTIC RESULTS
+   ========================================================================== */
+.result-stage .result-level-scope,
+.result-stage .result-bands small,
+.result-stage .outcome-line,
+.result-stage .srl-line,
+.result-stage .tutor-line,
+.result-stage .session-summary,
+.result-stage .measure-review,
+.result-stage > p.muted,
+.result-stage .map-note,
+.result-stage h3 {
+  display: none !important;
+}
+
+.result-stage .result-level {
+  background: #0F172A !important;
+  color: #FFFFFF !important;
+  border-radius: 20px !important;
+  padding: 20px 20px !important;
+  margin: 16px 0 !important;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.15) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.result-stage .result-level-mark {
+  color: #94A3B8 !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  display: block !important;
+}
+
+.result-stage .result-level-name {
+  color: #FFE02E !important;
+  -webkit-text-fill-color: #FFE02E !important;
+  font-size: 42px !important;
+  font-weight: 800 !important;
+  line-height: 1.1 !important;
+  display: block !important;
+  margin: 6px 0 2px 0 !important;
+}
+
+.result-stage .result-level-desc {
+  color: #E2E8F0 !important;
+  -webkit-text-fill-color: #E2E8F0 !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  display: block !important;
+}
+
+.result-stage .result-bands {
+  margin: 16px 0 !important;
+}
+
+.result-stage .result-band-row {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: center !important;
+  gap: 8px !important;
+}
+
+.result-stage .band-chip {
+  background: #F1F5F9 !important;
+  color: #0F172A !important;
+  -webkit-text-fill-color: #0F172A !important;
+  border: 1.5px solid #CBD5E1 !important;
+  border-radius: 9999px !important;
+  padding: 5px 12px !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+}
+
+.result-stage .band-chip.is-active,
+.result-stage .band-chip.is-pass {
+  background: #FEF3C7 !important;
+  border-color: #F59E0B !important;
+  color: #92400E !important;
+  -webkit-text-fill-color: #92400E !important;
+}
+
+/* ==========================================================================
+   POLISH: VIBRANT LUXURY PRASASTI BADGES
+   ========================================================================== */
+.prasasti-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 12px !important;
+  margin-top: 14px !important;
+}
+
+.prasasti-badge,
+.prasasti-badge.is-locked,
+.prasasti-badge.is-earned {
+  opacity: 1 !important;
+  background: linear-gradient(145deg, #1C1B2A 0%, #12111E 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 20px !important;
+  padding: 18px 12px !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  text-align: center !important;
+  gap: 8px !important;
+}
+
+.prasasti-badge .prasasti-icon,
+.prasasti-badge.is-locked .prasasti-icon,
+.prasasti-badge.is-earned .prasasti-icon {
+  width: 56px !important;
+  height: 56px !important;
+  border-radius: 50% !important;
+  background: radial-gradient(circle, #383556 0%, #201E35 100%) !important;
+  border: 2px solid rgba(255, 224, 46, 0.45) !important;
+  box-shadow: 0 4px 16px rgba(255, 224, 46, 0.25), inset 0 1px 2px rgba(255, 255, 255, 0.3) !important;
+  display: grid !important;
+  place-items: center !important;
+  color: #FFE02E !important;
+  margin-bottom: 4px !important;
+}
+
+.prasasti-badge .prasasti-icon svg,
+.prasasti-badge.is-locked .prasasti-icon svg,
+.prasasti-badge.is-earned .prasasti-icon svg {
+  width: 28px !important;
+  height: 28px !important;
+  color: #FFE02E !important;
+  fill: #FFE02E !important;
+  filter: drop-shadow(0 2px 6px rgba(255, 224, 46, 0.5)) !important;
+}
+
+.prasasti-badge b,
+.prasasti-badge.is-locked b,
+.prasasti-badge.is-earned b {
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.01em !important;
+  line-height: 1.25 !important;
+}
+
+.prasasti-badge .prasasti-hint,
+.prasasti-badge.is-locked .prasasti-hint,
+.prasasti-badge.is-earned .prasasti-hint {
+  color: #CBD5E1 !important;
+  -webkit-text-fill-color: #CBD5E1 !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  line-height: 1.35 !important;
+}
