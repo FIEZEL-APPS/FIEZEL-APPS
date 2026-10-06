@@ -9813,55 +9813,21 @@ function jaPhonetic(phonetic,fallback){return jaCourseOn()?FiezelJaUi.phoneticMa
 function jaTogglesMarkup(){return jaCourseOn()?FiezelJaUi.togglesMarkup():''}
 function kanaView(){shell(FiezelI18n.t('jepang.kana-judul'),FiezelI18n.t('jepang.kana-lead'),jaCourseOn()?FiezelJaUi.kanaViewBody():'')}
 function latihanCards(){
+  const punyaSkillsJa=!targetLangSurfaceBlocked('skills');
   const cards=[
     {view:'vocab',icon:'vocab',label:FiezelI18n.t('skill.vocab'),note:FiezelI18n.t('latihan.vocab-note')},
-    {view:'grammar',icon:'grammar',label:FiezelI18n.t('skill.grammar'),note:FiezelI18n.t('latihan.grammar-note')},
-    {view:'reading',icon:'reading',label:FiezelI18n.t('skill.reading'),note:FiezelI18n.t('latihan.reading-note')}
+    {view:'grammar',icon:'grammar',label:FiezelI18n.t('skill.grammar'),note:FiezelI18n.t('latihan.grammar-note')}
   ];
-  /* Kartu bicara & dengar TETAP ADA di sini, dan itu bukan kelalaian terhadap
-     "Skills Lab sebagai tujuan terpisah - HAPUS". Yang dihapus adalah statusnya
-     sebagai TUJUAN SEJAJAR: ia tidak lagi punya tab sendiri dan tidak lagi punya
-     hub sendiri di beranda. Owner sendiri yang menunjukkan bahwa permukaannya
-     bertahan, di baris PERBAIKI pada brief yang sama: "'Skills Lab' -> 'Latihan
-     bicara & dengar'" - sebuah nama baru hanya berguna untuk sesuatu yang masih
-     dilihat murid. Porsi HARIANNYA sudah dilebur: todayPlanBlocks() menaruh blok
-     dengar/bicara di dalam kartu Hari ini, jadi murid yang hanya mengikuti sesi
-     harian tetap mendapatkannya tanpa pernah membuka kartu ini. */
-  /* Menyimak, berbicara, dan menulis BELUM punya bank Jepang: listening-bank-v1.json dan
-     speaking-bank-v1.json berbahasa Inggris, dan writing-prompts-v1.json meminta murid
-     menulis kalimat Inggris dengan fokus tata bahasa Inggris ("Describe your day...",
-     focus 'present simple'). Menawarkannya kepada murid yang memilih Jepang berarti
-     aplikasi mengatakan satu hal dan melakukan hal lain - dan peringatan di pemilih
-     bahasa memang sudah berjanji latihan itu belum ada. Kartunya disembunyikan sampai
-     banknya benar-benar dibuat; tests/japanese-surface-honesty-test.js mengikat penjaga
-     ini ke ADA-TIDAKNYA berkas di content/ja/, jadi ia menuntut dicabut begitu isinya siap. */
-  /* m025-312: PENJAGA INI DIPECAH, dan pemecahannya yang penting.
-     Menulis kini punya banknya sendiri (content/ja/writing-prompts-ja.json, 24 prompt N5,
-     dua untuk tiap keluarga silabus), jadi menyembunyikan kartunya dari murid Jepang
-     berarti fitur yang hilang diam-diam - sama buruknya dengan menawarkan yang kosong.
-     Menyimak dan berbicara TETAP dijaga, dan bukan karena banknya belum ditulis:
-     tumpukan audio dipaku ke en-US (fiezel-speaking-listening-addon.js language:'en-US',
-     dijaga tests/audio-locale-guard-test.js). Menawarkannya sekarang berarti aplikasi
-     MEMUTAR SUARA INGGRIS dan MENDENGARKAN UCAPAN INGGRIS sambil mengaku mengajar Jepang.
-     Bank tanpa suara yang benar bukan fitur, melainkan kebohongan baru. */
-  /* m025-314: syaratnya TIDAK berubah artinya, hanya pindah pemilik. Jawabannya kini
-     datang dari targetLangSurfaceBlocked() — penjaga yang sama yang menolak rutenya di
-     go() — supaya kartu dan rute mustahil berbeda pendapat. */
-  const punyaSkillsJa=!targetLangSurfaceBlocked('skills');
   if(punyaSkillsJa){
     cards.push({view:'skills',icon:'skills',label:FiezelI18n.t('latihan.bicara-dengar'),note:FiezelI18n.t('latihan.bicara-dengar-note')});
   }
+  cards.push({view:'reading',icon:'reading',label:FiezelI18n.t('skill.reading'),note:FiezelI18n.t('latihan.reading-note')});
   cards.push({view:'writing',icon:'writing',label:FiezelI18n.t('skill.writing'),note:FiezelI18n.t('latihan.writing-note')});
   cards.push({view:'library',icon:'library',label:FiezelI18n.t('home.library-card'),note:FiezelI18n.t('latihan.library-note')});
   /* Kursus Jepang membuka dengan tabel kana & chokai: pintu masuk belajar & listening JLPT. */
   const kanaCard=jaCourseOn()?FiezelJaUi.kanaCardMarkup():'';
   const chokaiCard=jaCourseOn()?FiezelJaUi.chokaiCardMarkup():'';
-  /* Panggung Suara Live (SLOT 13): kartu pintu masuk fitur duet belajar. Ia BUKAN rute
-     view baru, jadi tidak lewat go(): ketukannya memanggil openLiveVoiceStage() yang
-     membuka laci layar penuh. Kartunya tetap tampil walau flag server mati; laci yang
-     menutup dirinya dengan pesan jujur, persis pola kartu sosial. */
-  const stageCard=`<button class="launch-card stage-launch" onclick="openLiveVoiceStage()" data-testid="stage-launch-card"><span class="launch-icon"><i class="fz-i" data-fz-icon="speaking" aria-hidden="true"></i></span><span><small>${esc(FiezelI18n.t('latihan.panggung-note'))}</small><b>${esc(FiezelI18n.t('latihan.panggung'))}</b></span><i data-lucide="arrow-up-right"></i></button>`;
-  return kanaCard+chokaiCard+stageCard+cards.map(c=>{
+  return kanaCard+chokaiCard+cards.map(c=>{
     const iconSpan = `<span class="launch-icon"><i class="fz-i" data-fz-icon="${esc(c.icon)}" aria-hidden="true"></i></span>`;
     return `<button class="launch-card" onclick="go('${esc(c.view)}')" aria-label="${esc(c.label)}">${iconSpan}<span><small>${esc(c.note)}</small><b>${esc(c.label)}</b></span><i data-lucide="arrow-up-right"></i></button>`;
   }).join('');
@@ -12998,7 +12964,7 @@ function flashcards(level){
   let i=0,flipped=false;
   const draw=()=>{
     const v=pool[i];if(!v){audio.stop();return exitStage()}flipped=false;
-    setApp(`<section class="fade"><div class="topline"><button id="backVocab"><i data-lucide="arrow-left"></i> ${FiezelI18n.t('student.vocab-title')}</button><b>${i+1}/${pool.length}</b></div>${card(`<div class="flashcard ${flipped?'flipped':''}" id="flashcard" role="button" tabindex="0"><div class="flash-inner"><div class="flash-face flash-front"><div class="chips-row"><span class="chip chip-level">${esc(v.level)}</span><span class="chip chip-cat">${FiezelI18n.t('flash.kelas-kata')}<b>${esc(indonesianPartOfSpeech(v.partOfSpeech||'kata'))}</b></span></div><div class="flash-front-main"><h2 class="word">${jaWord(v.word,v.phonetic)}</h2><div class="phonetic">${jaPhonetic(v.phonetic,FiezelI18n.t('flash.pelafalan-kosong'))}</div>${jaTogglesMarkup()}</div><p class="muted flash-flip-hint"><i data-lucide="refresh-cw"></i> ${FiezelI18n.t('flash.tap-meaning')}</p></div><div class="flash-face flash-back"><span class="flash-kicker">${FiezelI18n.t('flash.arti')}</span><h3 class="flash-meaning">${esc(v.meaning)}</h3><div class="flash-example-box"><p class="flash-example-en">“${esc(v.example)}”</p>${v.exampleTranslation?`<p class="flash-example-id">${esc(v.exampleTranslation)}</p>`:''}</div><p class="muted flash-flip-hint"><i data-lucide="rotate-ccw"></i> ${FiezelI18n.t('flash.tap-back')}</p></div></div></div><div class="flash-mastery-bar"><button type="button" id="learning" class="flash-btn-learning"><i data-lucide="book-open"></i> ${FiezelI18n.t('flash.still-learning')}</button><button type="button" class="primary flash-btn-mastered" id="mastered"><i data-lucide="check-circle-2"></i> ${FiezelI18n.t('flash.sudah-dikuasai')}</button></div><div class="actions">${targetLangVoiceBlocked()?'':`<button id="speakWord"><i data-lucide="volume-2"></i> ${FiezelI18n.t('flash.dengar-kata')}</button><button id="speakSentence"><i data-lucide="audio-lines"></i> ${FiezelI18n.t('flash.dengar-kalimat')}</button>`}<button id="aiWord"><i data-lucide="sparkles"></i> ${FiezelI18n.t('flash.tanya-ai')}</button></div>${targetLangVoiceBlocked()?`<p class="muted flash-voice-note">${esc(FiezelI18n.t('flash.suara-belum-ada',{bahasa:courseLanguageLabel()}))}</p>`:''}<div class="swipe-hint">${FiezelI18n.t('flash.geser')}</div><div class="notice">${FiezelI18n.t('flash.status',{status:esc(FiezelI18n.t(state.vocab[v.id]?.mastery>=80?'flash.status-mastered':state.vocab[v.id]?.total?'flash.status-learning':'flash.status-new'))})}</div>`,'card-flashcard')} </section>`);
+    setApp(`<section class="fade"><div class="topline"><button id="backVocab"><i data-lucide="arrow-left"></i> ${FiezelI18n.t('student.vocab-title')}</button><b>${i+1}/${pool.length}</b><button id="aiWord" class="ai-btn flash-ai-btn" type="button"><i data-lucide="sparkles"></i> <span>${FiezelI18n.t('flash.tanya-ai')}</span></button></div><div class="card-flashcard"><div class="flashcard ${flipped?'flipped':''}" id="flashcard" role="button" tabindex="0"><div class="flash-inner"><div class="flash-face flash-front"><div class="chips-row"><span class="chip chip-level">${esc(v.level)}</span><span class="chip chip-cat">${FiezelI18n.t('flash.kelas-kata')}<b>${esc(indonesianPartOfSpeech(v.partOfSpeech||'kata'))}</b></span></div><div class="flash-front-main"><h2 class="word">${jaWord(v.word,v.phonetic)}</h2><div class="phonetic">${jaPhonetic(v.phonetic,FiezelI18n.t('flash.pelafalan-kosong'))}</div>${jaTogglesMarkup()}</div><div class="flash-front-actions">${targetLangVoiceBlocked()?'':`<button id="speakWord" class="flash-audio-btn" type="button"><i data-lucide="volume-2"></i> ${FiezelI18n.t('flash.dengar-kata')}</button>`}</div><p class="muted flash-flip-hint"><i data-lucide="refresh-cw"></i> ${FiezelI18n.t('flash.tap-meaning')}</p></div><div class="flash-face flash-back"><div class="chips-row"><span class="chip chip-level">${esc(v.level)}</span><span class="chip chip-cat">${FiezelI18n.t('flash.arti')}</span></div><div class="flash-back-main"><h3 class="flash-meaning">${esc(v.meaning)}</h3><div class="flash-example-box"><p class="flash-example-en">“${esc(v.example)}”</p>${v.exampleTranslation?`<p class="flash-example-id">${esc(v.exampleTranslation)}</p>`:''}</div></div>${targetLangVoiceBlocked()?'':`<div class="flash-back-actions"><button id="speakWordBack" class="flash-audio-btn" type="button"><i data-lucide="volume-2"></i> ${FiezelI18n.t('flash.dengar-kata')}</button><button id="speakSentence" class="flash-audio-btn" type="button"><i data-lucide="audio-lines"></i> ${FiezelI18n.t('flash.dengar-kalimat')}</button></div>`}<p class="muted flash-flip-hint"><i data-lucide="rotate-ccw"></i> ${FiezelI18n.t('flash.tap-back')}</p></div></div></div><div class="flash-mastery-bar"><button type="button" id="learning" class="flash-btn-learning"><i data-lucide="book-open"></i> ${FiezelI18n.t('flash.still-learning')}</button><button type="button" class="primary flash-btn-mastered" id="mastered"><i data-lucide="check-circle-2"></i> ${FiezelI18n.t('flash.sudah-dikuasai')}</button></div>${targetLangVoiceBlocked()?`<p class="muted flash-voice-note">${esc(FiezelI18n.t('flash.suara-belum-ada',{bahasa:courseLanguageLabel()}))}</p>`:''}</div></section>`);
     $('backVocab').onclick=()=>{audio.stop();exitStage()};
     const flip=()=>{flipped=!flipped;$('flashcard').classList.toggle('flipped',flipped);haptic('tap')};
     $('flashcard').onclick=flip;$('flashcard').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();flip()}};
@@ -13006,7 +12972,10 @@ function flashcards(level){
     // hampir selalu menekan "Dengar" lagi di kartu itu. Menghangatkan satu kartu ke depan
     // gratis secara UX; kalau ia menggeser kartu, stop() membatalkan yang masih menganggur.
     const nextCard=pool[i+1]||null;
-    $('speakWord')?.addEventListener('click',e=>{e.stopPropagation();audio.play(v.word,{contentType:'word',next:nextCard?nextCard.word:''})});$('speakSentence')?.addEventListener('click',e=>{e.stopPropagation();audio.play(v.example,{contentType:'sentence',next:nextCard?nextCard.example:''})});$('aiWord').onclick=e=>{e.stopPropagation();explainWordWithAI(v)};
+    $('speakWord')?.addEventListener('click',e=>{e.stopPropagation();audio.play(v.word,{contentType:'word',next:nextCard?nextCard.word:''})});
+    $('speakWordBack')?.addEventListener('click',e=>{e.stopPropagation();audio.play(v.word,{contentType:'word',next:nextCard?nextCard.word:''})});
+    $('speakSentence')?.addEventListener('click',e=>{e.stopPropagation();audio.play(v.example,{contentType:'sentence',next:nextCard?nextCard.example:''})});
+    if($('aiWord'))$('aiWord').onclick=e=>{e.stopPropagation();explainWordWithAI(v)};
     $('learning').onclick=e=>{e.stopPropagation();markStillLearning('vocab',v.id);showToast(FiezelI18n.t('flash.toast-progres'),'success');i++;draw()};
     $('mastered').onclick=e=>{e.stopPropagation();markMastered('vocab',v.id);haptic('success');showToast(FiezelI18n.t('flash.toast-dikuasai'),'success');/* [FASE-4] 09 §3.3: kartu dikuasai = pengakuan → proud. */try{pawReact('badge-earned')}catch(_){}i++;draw()};
     bindSwipe($('flashcard'),()=>{audio.stop();i++;draw()},()=>{audio.stop();i=Math.max(0,i-1);draw()});
@@ -13024,9 +12993,13 @@ function reviewVocab(){
   let i=0,flipped=false;
   const draw=()=>{
     const v=due[i];if(!v)return exitStage();flipped=false;
-    setApp(`<section class="fade"><div class="topline"><button id="backReview"><i data-lucide="arrow-left"></i> ${FiezelI18n.t('student.vocab-title')}</button><b>${FiezelI18n.t('ulangan.topline',{idx:i+1,total:due.length})}</b></div>${card(`<div class="flashcard ${flipped?'flipped':''}" id="reviewCard" role="button" tabindex="0"><div class="flash-inner"><div class="flash-face flash-front"><div class="eyebrow">${FiezelI18n.t('ulangan.eyebrow',{level:esc(v.level)})}</div><div class="flash-front-main"><h2 class="word">${jaWord(v.word,v.phonetic)}</h2><div class="phonetic">${jaPhonetic(v.phonetic,FiezelI18n.t('flash.pelafalan-kosong'))}</div>${jaTogglesMarkup()}</div><p class="muted flash-flip-hint"><i data-lucide="refresh-cw"></i> ${FiezelI18n.t('flash.tap-meaning')}</p></div><div class="flash-face flash-back"><span class="flash-kicker">${FiezelI18n.t('flash.arti')}</span><h3 class="flash-meaning">${esc(v.meaning)}</h3><div class="flash-example-box"><p class="flash-example-en">“${esc(v.example)}”</p>${v.exampleTranslation?`<p class="flash-example-id">${esc(v.exampleTranslation)}</p>`:''}</div><p class="muted flash-flip-hint"><i data-lucide="rotate-ccw"></i> ${FiezelI18n.t('flash.tap-back')}</p></div></div></div><div class="flash-mastery-bar"><button type="button" id="reviewLearning" class="flash-btn-learning"><i data-lucide="book-open"></i> ${FiezelI18n.t('flash.still-learning')}</button><button type="button" class="primary flash-btn-mastered" id="reviewMastered"><i data-lucide="check-circle-2"></i> ${FiezelI18n.t('flash.sudah-dikuasai')}</button></div><div class="swipe-hint">${FiezelI18n.t('flash.geser')}</div>`,'card-flashcard')} </section>`);
+    setApp(`<section class="fade"><div class="topline"><button id="backReview"><i data-lucide="arrow-left"></i> ${FiezelI18n.t('student.vocab-title')}</button><b>${FiezelI18n.t('ulangan.topline',{idx:i+1,total:due.length})}</b></div><div class="card-flashcard"><div class="flashcard ${flipped?'flipped':''}" id="reviewCard" role="button" tabindex="0"><div class="flash-inner"><div class="flash-face flash-front"><div class="eyebrow">${FiezelI18n.t('ulangan.eyebrow',{level:esc(v.level)})}</div><div class="flash-front-main"><h2 class="word">${jaWord(v.word,v.phonetic)}</h2><div class="phonetic">${jaPhonetic(v.phonetic,FiezelI18n.t('flash.pelafalan-kosong'))}</div>${jaTogglesMarkup()}</div><div class="flash-front-actions">${targetLangVoiceBlocked()?'':`<button id="reviewSpeakWord" class="flash-audio-btn" type="button"><i data-lucide="volume-2"></i> ${FiezelI18n.t('flash.dengar-kata')}</button>`}</div><p class="muted flash-flip-hint"><i data-lucide="refresh-cw"></i> ${FiezelI18n.t('flash.tap-meaning')}</p></div><div class="flash-face flash-back"><div class="eyebrow">${FiezelI18n.t('ulangan.eyebrow',{level:esc(v.level)})}</div><div class="flash-back-main"><h3 class="flash-meaning">${esc(v.meaning)}</h3><div class="flash-example-box"><p class="flash-example-en">“${esc(v.example)}”</p>${v.exampleTranslation?`<p class="flash-example-id">${esc(v.exampleTranslation)}</p>`:''}</div></div>${targetLangVoiceBlocked()?'':`<div class="flash-back-actions"><button id="reviewSpeakWordBack" class="flash-audio-btn" type="button"><i data-lucide="volume-2"></i> ${FiezelI18n.t('flash.dengar-kata')}</button><button id="reviewSpeakSentence" class="flash-audio-btn" type="button"><i data-lucide="audio-lines"></i> ${FiezelI18n.t('flash.dengar-kalimat')}</button></div>`}<p class="muted flash-flip-hint"><i data-lucide="rotate-ccw"></i> ${FiezelI18n.t('flash.tap-back')}</p></div></div></div><div class="flash-mastery-bar"><button type="button" id="reviewLearning" class="flash-btn-learning"><i data-lucide="book-open"></i> ${FiezelI18n.t('flash.still-learning')}</button><button type="button" class="primary flash-btn-mastered" id="reviewMastered"><i data-lucide="check-circle-2"></i> ${FiezelI18n.t('flash.sudah-dikuasai')}</button></div></div></section>`);
     $('backReview').onclick=()=>exitStage();const flip=()=>{flipped=!flipped;$('reviewCard').classList.toggle('flipped',flipped);haptic('tap')};
     $('reviewCard').onclick=flip;$('reviewCard').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();flip()}};
+    const nextCard=due[i+1]||null;
+    $('reviewSpeakWord')?.addEventListener('click',e=>{e.stopPropagation();audio.play(v.word,{contentType:'word',next:nextCard?nextCard.word:''})});
+    $('reviewSpeakWordBack')?.addEventListener('click',e=>{e.stopPropagation();audio.play(v.word,{contentType:'word',next:nextCard?nextCard.word:''})});
+    $('reviewSpeakSentence')?.addEventListener('click',e=>{e.stopPropagation();audio.play(v.example,{contentType:'sentence',next:nextCard?nextCard.example:''})});
     $('reviewLearning').onclick=e=>{e.stopPropagation();markStillLearning('vocab',v.id);i++;draw()};
     $('reviewMastered').onclick=e=>{e.stopPropagation();markMastered('vocab',v.id);haptic('success');/* [FASE-4] 09 §3.3: dikuasai dari ulangan juga pengakuan → proud. */try{pawReact('badge-earned')}catch(_){}i++;draw()};
     bindSwipe($('reviewCard'),()=>{i++;draw()},()=>{i=Math.max(0,i-1);draw()});

@@ -252,6 +252,13 @@ button.brand-button {
   box-sizing: border-box !important;
 }
 
+body.fz-lesson-mode .bottomnav,
+body.fz-stage-quiz .bottomnav,
+body:has(.card-flashcard) .bottomnav,
+body:has(.quiz-shell) .bottomnav {
+  display: none !important;
+}
+
 .bottomnav .nav {
   display: flex !important;
   flex-direction: column !important;
@@ -5353,20 +5360,48 @@ button.fiezel-language-choice {
   box-shadow: 0 8px 24px rgba(2, 132, 199, 0.18) !important;
 }
 
-.fiezel-language-country {
+.fiezel-language-copy,
+.fiezel-language-choice .fiezel-language-copy {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  width: 100% !important;
+  margin: 0 auto !important;
+  order: 1 !important;
+}
+
+.fiezel-language-copy b,
+.fiezel-language-choice .fiezel-language-copy b {
   display: block !important;
   color: #0F172A !important;
-  font-size: 16.5px !important;
+  -webkit-text-fill-color: #0F172A !important;
+  font-size: 15px !important;
   font-weight: 800 !important;
-  letter-spacing: -0.01em !important;
+  line-height: 1.3 !important;
   text-align: center !important;
-  order: 1 !important;
+  width: 100% !important;
+  margin: 0 auto 2px auto !important;
+}
+
+.fiezel-language-copy small,
+.fiezel-language-choice .fiezel-language-copy small {
+  display: block !important;
+  color: #64748B !important;
+  -webkit-text-fill-color: #64748B !important;
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+  text-align: center !important;
+  width: 100% !important;
+  margin: 0 auto !important;
 }
 
 .fiezel-language-flag {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
+  margin: 0 auto !important;
   order: 2 !important;
 }
 
@@ -6282,4 +6317,60 @@ html body #tutorTurn .tutor-turn-head b{color:#34D399!important;-webkit-text-fil
 .voice-card .arcade-play-hint { color: #B45309; }
 .nujum-card .arcade-play-hint { color: #DC2626; }
 
+/* JLPT Sheet Tabs in Dark Drawer (High Contrast) */
+.jlpt-sheet-tabs button.jlpt-tab-chip,
+.jlpt-sheet-tabs button.jlpt-sheet-tab-btn,
+.jlpt-sheet-tabs .jlpt-tab-chip,
+button.jlpt-tab-chip,
+button.jlpt-sheet-tab-btn {
+  background: #202032 !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: none !important;
+  color: #CBD5E1 !important;
+  -webkit-text-fill-color: #CBD5E1 !important;
+  font-weight: 700 !important;
+}
+.jlpt-sheet-tabs button.jlpt-tab-chip:hover,
+.jlpt-sheet-tabs button.jlpt-sheet-tab-btn:hover {
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+}
+.jlpt-sheet-tabs button.jlpt-tab-chip.active,
+.jlpt-sheet-tabs button.jlpt-sheet-tab-btn.active,
+.jlpt-sheet-tabs .jlpt-tab-chip.active,
+button.jlpt-tab-chip.active,
+button.jlpt-sheet-tab-btn.active {
+  background: #FFE02E !important;
+  border-color: #F59E0B !important;
+  color: #0F172A !important;
+  -webkit-text-fill-color: #0F172A !important;
+  font-weight: 800 !important;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.25) !important;
+}
+.jlpt-sheet-tab-count,
+.jlpt-sheet-tabs button.jlpt-tab-chip span,
+#jlptVocabCount {
+  color: inherit !important;
+  -webkit-text-fill-color: inherit !important;
+}
 
+/* JLPT Tips Box & Tip Card High Contrast */
+.jlpt-explain-tip-box,
+.jlpt-explain-tip-card,
+.listening-modal .jlpt-explain-tip-card,
+div.jlpt-explain-tip-card {
+  background: #EFF6FF !important;
+  border: 1.5px solid #BAE6FD !important;
+  color: #0369A1 !important;
+  -webkit-text-fill-color: #0369A1 !important;
+}
+.jlpt-explain-tip-box b,
+.jlpt-explain-tip-box strong,
+.jlpt-explain-tip-card b,
+.jlpt-explain-tip-card strong,
+.listening-modal .jlpt-explain-tip-card b,
+div.jlpt-explain-tip-card b {
+  color: #0C4A6E !important;
+  -webkit-text-fill-color: #0C4A6E !important;
+  font-weight: 800 !important;
+}

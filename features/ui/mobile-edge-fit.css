@@ -2422,8 +2422,27 @@ body.fz-lux .notification-panel,
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7) !important;
 }
 
-.fiezel-title {
+.fiezel-sheet:not(.fiezel-language-sheet) .fiezel-title,
+html body .fiezel-sheet:not(.fiezel-language-sheet) .fiezel-title,
+html body:not(.fz-teacher-mode) #app .fiezel-sheet:not(.fiezel-language-sheet) .fiezel-title,
+html body:not(.fz-teacher-mode) #app .fiezel-sheet:not(.fiezel-language-sheet) h2 {
   color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  font-weight: 800 !important;
+}
+
+/* Language Sheet Title on Daylight Background */
+.fiezel-language-sheet .fiezel-title,
+.fiezel-language-sheet h2.fiezel-title,
+.fiezel-language-sheet h2,
+html body .fiezel-language-sheet .fiezel-title,
+html body .fiezel-language-sheet h2,
+html body:not(.fz-teacher-mode) #app .fiezel-language-sheet .fiezel-title,
+html body:not(.fz-teacher-mode) #app .fiezel-language-sheet h2,
+#galleryLanguageSheetHost .fiezel-title,
+#galleryLanguageSheetHost h2 {
+  color: #0F172A !important;
+  -webkit-text-fill-color: #0F172A !important;
   font-weight: 800 !important;
 }
 
@@ -2435,31 +2454,127 @@ body.fz-lux .notification-panel,
   color: #94A3B8 !important;
 }
 
+/* Onboarding Carousel Pills (High Contrast Dark Cards) */
+.fiezel-carousel-item {
+  background: #202030 !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  border-radius: 14px !important;
+  color: #FFFFFF !important;
+  padding: 12px 14px !important;
+}
+
+.fiezel-carousel-item span {
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  font-weight: 700 !important;
+}
+
+.fiezel-carousel-item i,
+.fiezel-carousel-item .fiezel-glyph,
+.fiezel-carousel-item svg {
+  color: #F59E0B !important;
+  fill: #F59E0B !important;
+}
+
+.fiezel-carousel-arrow {
+  background: #202030 !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.18) !important;
+  color: #FFFFFF !important;
+}
+
+.fiezel-carousel-arrow[disabled] {
+  background: #181824 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: #64748B !important;
+  opacity: 0.6 !important;
+}
+
 .fiezel-language-kicker {
   color: #FFE02E !important;
 }
 
-.fiezel-goal-choice,
-.fiezel-language-grid button {
+.fiezel-goal-choice {
   background: #202030 !important;
   border: 1px solid rgba(255, 255, 255, 0.12) !important;
   color: #FFFFFF !important;
 }
 
-.fiezel-goal-choice.is-selected,
-.fiezel-language-grid button.is-selected {
+.fiezel-goal-choice.is-selected {
   border-color: #FFE02E !important;
   background: #2A2A40 !important;
 }
 
-.fiezel-goal-choice b,
-.fiezel-language-copy b {
+.fiezel-goal-choice b {
   color: #FFFFFF !important;
 }
 
-.fiezel-goal-choice small,
-.fiezel-language-copy small {
+.fiezel-goal-choice small {
   color: #94A3B8 !important;
+}
+
+/* Onboarding Language Choice Cards (Centered, Tactile White Cards with High-Contrast Obsidian Text) */
+.fiezel-language-choice,
+button.fiezel-language-choice {
+  background: #FFFFFF !important;
+  border: 1.5px solid #E2E8F0 !important;
+  border-bottom: 4px solid #CBD5E1 !important;
+  border-radius: 22px !important;
+  padding: 18px 14px 16px !important;
+  min-height: 136px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 12px !important;
+  cursor: pointer !important;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06) !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.fiezel-language-choice .fiezel-language-flag {
+  order: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 auto !important;
+}
+
+.fiezel-language-choice .fiezel-language-copy,
+.fiezel-language-copy {
+  order: 2 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  width: 100% !important;
+  margin: 0 auto !important;
+}
+
+.fiezel-language-choice .fiezel-language-copy b,
+.fiezel-language-sheet .fiezel-language-copy b {
+  display: block !important;
+  color: #0F172A !important;
+  -webkit-text-fill-color: #0F172A !important;
+  font-size: 15px !important;
+  font-weight: 800 !important;
+  line-height: 1.3 !important;
+  text-align: center !important;
+  width: 100% !important;
+  margin: 0 auto 2px auto !important;
+}
+
+.fiezel-language-choice .fiezel-language-copy small,
+.fiezel-language-sheet .fiezel-language-copy small {
+  display: block !important;
+  color: #64748B !important;
+  -webkit-text-fill-color: #64748B !important;
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+  text-align: center !important;
+  width: 100% !important;
+  margin: 0 auto !important;
 }
 
 .fiezel-field input {
@@ -2513,7 +2628,7 @@ button.primary,
   color: #64748B !important;
 }
 
-/* 2. Quiz Session: Hide bottom nav completely to prevent overlap and accidental tab switching */
+/* 2. Quiz & Flashcard Session: Hide bottom nav completely to prevent overlap and accidental tab switching */
 html body.fz-stage-quiz nav.bottomnav,
 html body.fz-stage-quiz .bottomnav,
 html body:has(.quiz-shell) nav.bottomnav,
@@ -2525,7 +2640,19 @@ html.fiezel-ui-v6 body:has(.quiz-shell) nav.bottomnav,
 body.fz-stage-quiz nav.bottomnav,
 body.fz-stage-quiz .bottomnav,
 body:has(.quiz-shell) nav.bottomnav,
-body:has(.quiz-shell) .bottomnav {
+body:has(.quiz-shell) .bottomnav,
+html body.fz-lesson-mode nav.bottomnav,
+html body.fz-lesson-mode .bottomnav,
+html body:has(.card-flashcard) nav.bottomnav,
+html body:has(.card-flashcard) .bottomnav,
+html body.fz-lux.fz-lesson-mode nav.bottomnav,
+html body.fz-lux.fz-lesson-mode .bottomnav,
+html.fiezel-ui-v6 body.fz-lesson-mode nav.bottomnav,
+html.fiezel-ui-v6 body:has(.card-flashcard) nav.bottomnav,
+body.fz-lesson-mode nav.bottomnav,
+body.fz-lesson-mode .bottomnav,
+body:has(.card-flashcard) nav.bottomnav,
+body:has(.card-flashcard) .bottomnav {
   display: none !important;
 }
 
@@ -2810,7 +2937,16 @@ html body #tutorStuck:active {
   font-weight: 800 !important;
 }
 
-/* JLPT Options Correct & Wrong States */
+/* JLPT Options Base, Correct & Wrong States */
+.jlpt-opt-btn .jlpt-opt-ja {
+  color: #0F172A !important;
+  font-weight: 800 !important;
+}
+.jlpt-opt-btn .jlpt-opt-id {
+  color: #475569 !important;
+  font-weight: 600 !important;
+}
+
 .jlpt-opt-btn.correct {
   background: rgba(16, 185, 129, 0.22) !important;
   border: 2px solid #10B981 !important;
@@ -2820,12 +2956,12 @@ html body #tutorStuck:active {
   color: #FFFFFF !important;
 }
 .jlpt-opt-btn.correct .jlpt-opt-ja {
-  color: #FFFFFF !important;
-  font-weight: 700 !important;
+  color: #065F46 !important;
+  font-weight: 800 !important;
 }
 .jlpt-opt-btn.correct .jlpt-opt-id {
-  color: #A7F3D0 !important;
-  font-weight: 500 !important;
+  color: #047857 !important;
+  font-weight: 600 !important;
 }
 
 .jlpt-opt-btn.wrong {
@@ -2837,10 +2973,12 @@ html body #tutorStuck:active {
   color: #FFFFFF !important;
 }
 .jlpt-opt-btn.wrong .jlpt-opt-ja {
-  color: #FFFFFF !important;
+  color: #991B1B !important;
+  font-weight: 800 !important;
 }
 .jlpt-opt-btn.wrong .jlpt-opt-id {
-  color: #FCA5A5 !important;
+  color: #B91C1C !important;
+  font-weight: 600 !important;
 }
 
 .jlpt-opt-btn.revealed-correct {
@@ -2900,14 +3038,29 @@ html body #tutorStuck:active {
   background: #181826 !important;
   border: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
-.jlpt-tab-chip {
-  background: transparent !important;
+.jlpt-tab-chip,
+.jlpt-sheet-tab-btn {
+  background: #202032 !important;
   color: #94A3B8 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
-.jlpt-tab-chip.active {
+.jlpt-sheet-tab-btn:hover {
+  color: #FFFFFF !important;
+}
+.jlpt-tab-chip.active,
+.jlpt-sheet-tab-btn.active {
   background: #FFE02E !important;
   color: #101018 !important;
   font-weight: 800 !important;
+  border-color: #F59E0B !important;
+}
+.jlpt-sheet-tab-count {
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #FFFFFF !important;
+}
+.jlpt-sheet-tab-btn.active .jlpt-sheet-tab-count {
+  background: #0F172A !important;
+  color: #FFE02E !important;
 }
 
 /* JLPT Sheet Naskah Tab */
@@ -2949,14 +3102,36 @@ html body #tutorStuck:active {
   font-weight: 800 !important;
 }
 .jlpt-explain-body {
-  color: #CBD5E1 !important;
+  background: #FFFFFF !important;
+  border: 1.5px solid #E2E8F0 !important;
+  border-radius: 12px !important;
+  color: #1E293B !important;
   line-height: 1.65 !important;
 }
+.jlpt-explain-title,
+.listening-modal .jlpt-explain-title {
+  color: #0F172A !important;
+  -webkit-text-fill-color: #0F172A !important;
+  font-weight: 800 !important;
+}
+.jlpt-explain-desc,
+.listening-modal .jlpt-explain-desc {
+  color: #1E293B !important;
+  -webkit-text-fill-color: #1E293B !important;
+  font-weight: 600 !important;
+  font-size: 13.5px !important;
+}
 .jlpt-explain-tip-box {
-  background: rgba(56, 189, 248, 0.1) !important;
-  border: 1px solid rgba(56, 189, 248, 0.25) !important;
+  background: #EFF6FF !important;
+  border: 1.5px solid #BAE6FD !important;
   border-radius: 10px !important;
-  color: #BAE6FD !important;
+  color: #0369A1 !important;
+  font-weight: 600 !important;
+}
+.jlpt-explain-tip-box strong,
+.jlpt-explain-tip-box b {
+  color: #0C4A6E !important;
+  font-weight: 800 !important;
 }
 
 /* JLPT Sheet Kosakata Tab */
@@ -3153,11 +3328,15 @@ article.fsl-card,
   border-radius: 20px !important;
   color: #FFFFFF !important;
 }
+html body:not(.fz-teacher-mode) #app .skill-page-hero h1,
+html body:not(.fz-teacher-mode) #app .skill-writing h1,
 .skill-page-hero h1,
+.skill-writing h1,
 .skill-page-hero h2,
 .skill-page-hero h3,
 .skill-help-panel h2 {
   color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
   font-weight: 800 !important;
 }
 .skill-page-hero p,
@@ -3169,6 +3348,16 @@ article.fsl-card,
   color: #FFE02E !important;
   border: 1px solid rgba(255, 224, 46, 0.3) !important;
   font-weight: 800 !important;
+}
+.card.writing-prompt .skill-badge,
+.writing-prompt .skill-badge {
+  color: #475569 !important;
+  -webkit-text-fill-color: #475569 !important;
+  font-weight: 800 !important;
+  font-size: 11px !important;
+  letter-spacing: 0.08em !important;
+  opacity: 1 !important;
+  display: inline-block !important;
 }
 .writing-prompt textarea,
 .writing-input,
@@ -3191,6 +3380,127 @@ textarea.writing-area:focus {
   background: #181826 !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
   color: #FFFFFF !important;
+}
+
+/* Reading Dark Card High-Contrast Headings */
+html body:not(.fz-teacher-mode) #app .passage-reading h3,
+html body:not(.fz-teacher-mode) #app .card-reading h3,
+html body:not(.fz-teacher-mode) #app #quizPassage h3,
+.passage-reading h3,
+.card-reading h3,
+#quizPassage h3 {
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  font-weight: 800 !important;
+}
+.passage-reading .eyebrow,
+.card-reading .eyebrow,
+#quizPassage .eyebrow {
+  color: #FFE02E !important;
+  -webkit-text-fill-color: #FFE02E !important;
+  font-weight: 800 !important;
+}
+
+/* Grammar Cloze Disabled Input High-Contrast */
+.cloze-input:disabled {
+  color: #0F172A !important;
+  -webkit-text-fill-color: #0F172A !important;
+  font-weight: 700 !important;
+  background: #F1F5F9 !important;
+  border-color: #CBD5E1 !important;
+  opacity: 1 !important;
+}
+
+/* Flashcard Level Badge High-Contrast */
+.chip-level,
+.flashcard .chip-level,
+.card .chip-level,
+.flash-level-chip {
+  background: #FEF3C7 !important;
+  color: #92400E !important;
+  -webkit-text-fill-color: #92400E !important;
+  border: 1.5px solid #F59E0B !important;
+  font-weight: 800 !important;
+  padding: 4px 10px !important;
+  border-radius: 9999px !important;
+}
+
+/* Placement Test Diagnostic Results High-Contrast */
+.result-card .score,
+.result-stage .score,
+#quizScoreCount {
+  color: #0F172A !important;
+  -webkit-text-fill-color: #0F172A !important;
+  font-weight: 800 !important;
+}
+.result-bands small {
+  color: #334155 !important;
+  -webkit-text-fill-color: #334155 !important;
+  font-weight: 600 !important;
+  opacity: 1 !important;
+}
+.result-band {
+  background: #FFFFFF !important;
+  border: 1.5px solid #CBD5E1 !important;
+  color: #0F172A !important;
+  -webkit-text-fill-color: #0F172A !important;
+  font-weight: 700 !important;
+  opacity: 1 !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06) !important;
+}
+
+/* Thai Step Guidance High-Contrast */
+.tutor-steps,
+#feedback .tutor-steps {
+  background: #FFF8EE !important;
+  border: 1.5px solid #FDE68A !important;
+}
+.tutor-steps p,
+.tutor-steps .tutor-step,
+#feedback .tutor-step {
+  color: #0F172A !important;
+  -webkit-text-fill-color: #0F172A !important;
+  font-weight: 600 !important;
+  font-size: 13.5px !important;
+  line-height: 1.55 !important;
+}
+.tutor-step::before,
+#feedback .tutor-step::before {
+  background: #FEF3C7 !important;
+  border: 1.5px solid #D97706 !important;
+  color: #92400E !important;
+  font-weight: 800 !important;
+}
+.tutor-step-final,
+#feedback .tutor-step-final {
+  color: #9A3412 !important;
+  -webkit-text-fill-color: #9A3412 !important;
+  font-weight: 700 !important;
+}
+
+/* Prasasti Rewards Badges & Gallery Note */
+.prasasti-badge.is-locked .prasasti-icon {
+  background: #2D2D42 !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: #FFE02E !important;
+}
+.prasasti-badge.is-locked .prasasti-icon svg {
+  color: #FFE02E !important;
+  fill: currentColor !important;
+}
+.prasasti-badge .prasasti-hint {
+  color: #CBD5E1 !important;
+  -webkit-text-fill-color: #CBD5E1 !important;
+  font-weight: 500 !important;
+}
+.map-note,
+.map-note span,
+p.map-note {
+  color: #475569 !important;
+  -webkit-text-fill-color: #475569 !important;
+  font-weight: 600 !important;
+  font-size: 13px !important;
+  line-height: 1.5 !important;
 }
 
 /* ==========================================================================
@@ -4031,4 +4341,679 @@ body.theme-dark .tutor-diagnostic-clue span,
 body.theme-dark #tutorTurn .tutor-diagnostic-clue span,
 body.theme-dark .card .tutor-diagnostic-clue span {
   color: #E0F2FE !important;
+}
+
+/* ==========================================================================
+   WARM CREAM & HIGH-COMFORT FLASHCARD THEME (Spacious & Simple Edition)
+   Latar cerah cream, tipografi besar & tajam, tanpa ruang kosong terbuang.
+   ========================================================================== */
+.card-flashcard,
+.card.card-flashcard,
+html body:not(.fz-teacher-mode) .card.card-flashcard,
+body.fz-lux .card.card-flashcard {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 auto !important;
+  max-width: min(520px, 100%) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  gap: 16px !important;
+  min-height: calc(100vh - 145px) !important;
+  box-sizing: border-box !important;
+}
+
+.flashcard {
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  height: clamp(400px, 58vh, 560px) !important;
+  min-height: 380px !important;
+  cursor: pointer;
+  perspective: 1400px;
+  border: none !important;
+  border-radius: 28px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  position: relative;
+}
+
+.flash-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transform-style: preserve-3d;
+}
+
+.flashcard.flipped .flash-inner {
+  transform: rotateY(180deg);
+}
+
+.flash-face,
+.flashcard .flash-face,
+.card-flashcard .flash-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 28px !important;
+  padding: 26px 22px !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background: #FFFDF8 !important;
+  background: linear-gradient(165deg, #FFFFFF 0%, #FFFDF5 55%, #FAF4E8 100%) !important;
+  border: 2px solid #EDE2CE !important;
+  box-shadow: 0 16px 36px -10px rgba(135, 105, 65, 0.14), 0 4px 14px rgba(135, 105, 65, 0.06), inset 0 1.5px 0 rgba(255, 255, 255, 0.95) !important;
+  color: #1E1B18 !important;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+@media(min-width: 640px) {
+  .flash-face, .flashcard .flash-face, .card-flashcard .flash-face {
+    padding: 30px 28px !important;
+  }
+}
+@media(max-width: 380px) {
+  .flash-face, .flashcard .flash-face, .card-flashcard .flash-face {
+    padding: 20px 16px !important;
+  }
+}
+
+.flash-front {
+  transform: rotateY(0deg);
+  justify-content: space-between;
+}
+
+.flash-front-main {
+  margin: auto 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+/* HUGE Front Word Typography */
+.flash-front .word,
+.flashcard .word,
+.card-flashcard .word,
+html body:not(.fz-teacher-mode) .flash-front h2.word,
+html body:not(.fz-teacher-mode) .flashcard h2.word,
+html body:not(.fz-teacher-mode) .card-flashcard h2.word {
+  font-family: var(--fz-heading, 'Plus Jakarta Sans', sans-serif) !important;
+  font-size: clamp(3.2rem, 11vw, 4.6rem) !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.03em !important;
+  line-height: 1.1 !important;
+  margin: 8px 0 2px !important;
+  color: #1A1715 !important;
+  word-break: break-word;
+}
+
+/* Large Phonetic */
+.flash-front .phonetic,
+.flashcard .phonetic {
+  font-size: clamp(1.25rem, 4.4vw, 1.6rem) !important;
+  color: #7D6B5A !important;
+  font-weight: 600 !important;
+  margin-top: 2px;
+}
+
+/* Audio button inside card */
+.flash-audio-btn {
+  margin-top: 12px !important;
+  background: #FAF4E8 !important;
+  border: 1.5px solid #E5D7C0 !important;
+  border-radius: 999px !important;
+  padding: 10px 22px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  font-size: 0.95rem !important;
+  font-weight: 700 !important;
+  color: #382E25 !important;
+  box-shadow: 0 3px 10px rgba(135, 105, 65, 0.08) !important;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.flash-audio-btn:hover {
+  background: #F3EBD8 !important;
+  transform: scale(1.02);
+}
+.flash-audio-btn:active {
+  transform: scale(0.98);
+}
+.flash-front-actions {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 100% !important;
+  margin: 12px 0 6px !important;
+}
+.flash-front-actions .flash-audio-btn {
+  margin: 0 !important;
+  padding: 10px 22px !important;
+}
+
+.flash-back-actions {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 12px !important;
+  width: 100% !important;
+  max-width: 380px !important;
+  margin: 12px 0 6px !important;
+  box-sizing: border-box !important;
+}
+.flash-back-actions .flash-audio-btn {
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  padding: 10px 14px !important;
+  font-size: 0.88rem !important;
+  white-space: nowrap !important;
+  justify-content: center !important;
+  margin: 0 !important;
+}
+
+/* Flip Hints */
+.flash-flip-hint,
+.flash-front .flash-flip-hint,
+.flash-back .flash-flip-hint,
+.flashcard .flash-flip-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.88rem !important;
+  font-weight: 600 !important;
+  color: #8E7B6C !important;
+  margin: 8px 0 0;
+}
+
+.flash-flip-hint svg,
+.flash-front .flash-flip-hint svg,
+.flash-back .flash-flip-hint svg {
+  width: 14px;
+  height: 14px;
+  stroke: #8E7B6C !important;
+}
+
+/* Chips on Front */
+.chips-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.flash-front .chip-level,
+.flashcard .chip-level {
+  background: #FEF3C7 !important;
+  color: #92400E !important;
+  border: 1.5px solid #FCD34D !important;
+  font-weight: 800 !important;
+  font-size: 0.88rem !important;
+  padding: 4px 12px !important;
+  border-radius: 999px !important;
+}
+
+.flash-front .chip-cat,
+.flashcard .chip-cat {
+  background: #F5EFEB !important;
+  color: #6B5E54 !important;
+  border: 1.5px solid #E5D9CE !important;
+  font-size: 0.88rem !important;
+  padding: 4px 12px !important;
+  border-radius: 999px !important;
+}
+
+.flash-front .chip-cat b,
+.flashcard .chip-cat b {
+  color: #2D241E !important;
+  font-weight: 800 !important;
+}
+
+/* Back Face */
+.flash-back {
+  transform: rotateY(180deg);
+  justify-content: space-between;
+}
+
+.flash-front-main {
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  width: 100% !important;
+}
+
+.flash-back-main {
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 16px !important;
+  width: 100% !important;
+}
+
+.flash-kicker,
+.flashcard .flash-kicker {
+  display: block;
+  font-size: 0.82rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.16em !important;
+  text-transform: uppercase;
+  color: #B45309 !important;
+  margin: 0 !important;
+}
+
+/* HUGE Back Meaning */
+.flash-meaning,
+.flashcard .flash-meaning,
+.card-flashcard .flash-meaning,
+html body:not(.fz-teacher-mode) .flash-back h3.flash-meaning,
+html body:not(.fz-teacher-mode) .flashcard h3.flash-meaning,
+html body:not(.fz-teacher-mode) .card-flashcard h3.flash-meaning {
+  font-family: var(--fz-heading, 'Plus Jakarta Sans', sans-serif) !important;
+  font-size: clamp(2.4rem, 8vw, 3.4rem) !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.025em !important;
+  line-height: 1.18 !important;
+  color: #1A1715 !important;
+  margin: 0 !important;
+  text-align: center !important;
+  word-break: break-word;
+}
+
+/* Large Example Box */
+.flash-example-box,
+.flashcard .flash-example-box {
+  width: 100% !important;
+  max-width: 440px !important;
+  background: #FDF9F0 !important;
+  border: 1.5px solid #EADECA !important;
+  border-radius: 20px !important;
+  padding: 14px 18px !important;
+  margin: 0 !important;
+  text-align: center;
+  box-sizing: border-box;
+  box-shadow: inset 0 1px 3px rgba(120, 95, 60, 0.04) !important;
+}
+
+.flash-example-en,
+.flashcard .flash-example-en {
+  font-size: 1.15rem !important;
+  line-height: 1.48 !important;
+  color: #1E293B !important;
+  font-style: italic !important;
+  font-weight: 600 !important;
+  margin: 0;
+}
+
+.flash-example-id,
+.flashcard .flash-example-id {
+  font-size: 1.02rem !important;
+  line-height: 1.42 !important;
+  color: #645649 !important;
+  font-weight: 500 !important;
+  margin: 6px 0 0 !important;
+}
+
+/* Japanese Display Toggles inside Flashcard */
+.flash-face .ja-toggle-btn {
+  background: #F5EFEB !important;
+  border-color: #E2D5C8 !important;
+  color: #5C4E43 !important;
+}
+.flash-face .ja-toggle-btn.active {
+  background: #FDE68A !important;
+  border-color: #F59E0B !important;
+  color: #92400E !important;
+}
+
+/* Mastery Buttons below Flashcard — ONLY 2 clean, large, tactile decision buttons */
+.flash-mastery-bar {
+  width: 100% !important;
+  max-width: 520px !important;
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 14px !important;
+  margin: 0 auto !important;
+  flex-shrink: 0 !important;
+}
+
+.flash-btn-learning,
+.flash-btn-mastered {
+  min-height: 56px !important;
+  border-radius: 20px !important;
+  font-size: 1.05rem !important;
+  font-weight: 800 !important;
+  padding: 0 18px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  cursor: pointer !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+.flash-btn-learning {
+  background: #FFFFFF !important;
+  border: 2px solid #E5D9CE !important;
+  color: #2D241E !important;
+  box-shadow: 0 4px 14px rgba(120, 95, 60, 0.08) !important;
+}
+.flash-btn-learning:hover {
+  background: #FAF5EA !important;
+  transform: translateY(-1px);
+}
+.flash-btn-learning:active {
+  transform: scale(0.98);
+}
+
+.flash-btn-mastered {
+  background: #FFD026 !important;
+  border: 2px solid #E5A800 !important;
+  color: #0F172A !important;
+  box-shadow: 0 6px 18px rgba(255, 208, 38, 0.4) !important;
+}
+.flash-btn-mastered:hover {
+  box-shadow: 0 8px 22px rgba(255, 208, 38, 0.5) !important;
+  transform: translateY(-1px);
+}
+.flash-btn-mastered:active {
+  transform: scale(0.98);
+}
+.topline #aiWord,
+.topline .flash-ai-btn {
+  width: auto !important;
+  margin-top: 0 !important;
+  padding: 6px 14px !important;
+  font-size: 0.84rem !important;
+  font-weight: 700 !important;
+  border-radius: 999px !important;
+}
+
+/* ==========================================================================
+   POLISH: GLOSSY WRITING HERO CARD & BADGE
+   ========================================================================== */
+.skill-page-hero.skill-writing,
+.skill-page-hero,
+.skill-writing {
+  background: linear-gradient(145deg, #181926 0%, #0F101A 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 24px !important;
+  padding: 24px 20px !important;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  color: #FFFFFF !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.skill-page-hero.skill-writing::before {
+  content: '';
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 140px;
+  height: 140px;
+  background: radial-gradient(circle, rgba(255, 215, 0, 0.18) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.skill-page-hero .skill-badge,
+.skill-writing .skill-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  background: linear-gradient(135deg, #FFE02E 0%, #F59E0B 100%) !important;
+  border: 1.5px solid #FEF08A !important;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+  color: #0F172A !important;
+  -webkit-text-fill-color: #0F172A !important;
+  font-size: 11px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  padding: 6px 14px !important;
+  border-radius: 9999px !important;
+  margin-bottom: 12px !important;
+  width: fit-content !important;
+}
+
+.skill-page-hero h1,
+.skill-writing h1 {
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  font-size: 28px !important;
+  font-weight: 800 !important;
+  margin: 4px 0 8px 0 !important;
+  letter-spacing: -0.02em !important;
+}
+
+.skill-page-hero p,
+.skill-writing p {
+  color: rgba(255, 255, 255, 0.72) !important;
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.72) !important;
+  font-size: 14px !important;
+  line-height: 1.45 !important;
+  margin-bottom: 16px !important;
+}
+
+html body section.writing-page .skill-page-hero button.active-level-control,
+html body .skill-page-hero button.active-level-control,
+html body .skill-writing button.active-level-control {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 18px !important;
+  padding: 12px 18px !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  margin-top: 14px !important;
+  cursor: pointer !important;
+}
+
+html body section.writing-page .skill-page-hero button.active-level-control span,
+html body .skill-page-hero button.active-level-control span {
+  color: #CBD5E1 !important;
+  -webkit-text-fill-color: #CBD5E1 !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.04em !important;
+}
+
+html body section.writing-page .skill-page-hero button.active-level-control strong,
+html body .skill-page-hero button.active-level-control strong {
+  color: #FFE02E !important;
+  -webkit-text-fill-color: #FFE02E !important;
+  font-size: 22px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+}
+
+html body section.writing-page .skill-page-hero button.active-level-control small,
+html body .skill-page-hero button.active-level-control small {
+  background: #FFE02E !important;
+  color: #0F172A !important;
+  -webkit-text-fill-color: #0F172A !important;
+  border: none !important;
+  border-radius: 9999px !important;
+  padding: 5px 14px !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.02em !important;
+  box-shadow: 0 2px 8px rgba(255, 224, 46, 0.4) !important;
+}
+
+/* ==========================================================================
+   POLISH: MINIMALIST PLACEMENT TEST DIAGNOSTIC RESULTS
+   ========================================================================== */
+.result-stage .result-level-scope,
+.result-stage .result-bands small,
+.result-stage .outcome-line,
+.result-stage .srl-line,
+.result-stage .tutor-line,
+.result-stage .tutor-report,
+.result-stage p.muted,
+.result-stage .session-summary,
+.result-stage .measure-review,
+.result-stage .map-note,
+.result-stage h3 {
+  display: none !important;
+}
+
+.result-stage .result-level {
+  background: #0F172A !important;
+  color: #FFFFFF !important;
+  border-radius: 20px !important;
+  padding: 20px 20px !important;
+  margin: 16px 0 !important;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.15) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.result-stage .result-level-mark {
+  color: #94A3B8 !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  display: block !important;
+}
+
+.result-stage .result-level-name {
+  color: #FFE02E !important;
+  -webkit-text-fill-color: #FFE02E !important;
+  font-size: 42px !important;
+  font-weight: 800 !important;
+  line-height: 1.1 !important;
+  display: block !important;
+  margin: 6px 0 2px 0 !important;
+}
+
+.result-stage .result-level-desc {
+  color: #E2E8F0 !important;
+  -webkit-text-fill-color: #E2E8F0 !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  display: block !important;
+}
+
+.result-stage .result-bands {
+  margin: 16px 0 !important;
+}
+
+.result-stage .result-band-row {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: center !important;
+  gap: 8px !important;
+}
+
+.result-stage .band-chip {
+  background: #F1F5F9 !important;
+  color: #0F172A !important;
+  -webkit-text-fill-color: #0F172A !important;
+  border: 1.5px solid #CBD5E1 !important;
+  border-radius: 9999px !important;
+  padding: 5px 12px !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+}
+
+.result-stage .band-chip.is-active,
+.result-stage .band-chip.is-pass {
+  background: #FEF3C7 !important;
+  border-color: #F59E0B !important;
+  color: #92400E !important;
+  -webkit-text-fill-color: #92400E !important;
+}
+
+/* ==========================================================================
+   POLISH: VIBRANT LUXURY PRASASTI BADGES
+   ========================================================================== */
+.prasasti-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 12px !important;
+  margin-top: 14px !important;
+}
+
+.prasasti-badge,
+.prasasti-badge.is-locked,
+.prasasti-badge.is-earned {
+  opacity: 1 !important;
+  background: linear-gradient(145deg, #1C1B2A 0%, #12111E 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 20px !important;
+  padding: 18px 12px !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  text-align: center !important;
+  gap: 8px !important;
+}
+
+.prasasti-badge .prasasti-icon,
+.prasasti-badge.is-locked .prasasti-icon,
+.prasasti-badge.is-earned .prasasti-icon {
+  width: 56px !important;
+  height: 56px !important;
+  border-radius: 50% !important;
+  background: radial-gradient(circle, #383556 0%, #201E35 100%) !important;
+  border: 2px solid rgba(255, 224, 46, 0.45) !important;
+  box-shadow: 0 4px 16px rgba(255, 224, 46, 0.25), inset 0 1px 2px rgba(255, 255, 255, 0.3) !important;
+  display: grid !important;
+  place-items: center !important;
+  color: #FFE02E !important;
+  margin-bottom: 4px !important;
+}
+
+.prasasti-badge .prasasti-icon svg,
+.prasasti-badge.is-locked .prasasti-icon svg,
+.prasasti-badge.is-earned .prasasti-icon svg {
+  width: 28px !important;
+  height: 28px !important;
+  color: #FFE02E !important;
+  fill: #FFE02E !important;
+  filter: drop-shadow(0 2px 6px rgba(255, 224, 46, 0.5)) !important;
+}
+
+.prasasti-badge b,
+.prasasti-badge.is-locked b,
+.prasasti-badge.is-earned b {
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.01em !important;
+  line-height: 1.25 !important;
+}
+
+.prasasti-badge .prasasti-hint,
+.prasasti-badge.is-locked .prasasti-hint,
+.prasasti-badge.is-earned .prasasti-hint {
+  color: #CBD5E1 !important;
+  -webkit-text-fill-color: #CBD5E1 !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  line-height: 1.35 !important;
 }
