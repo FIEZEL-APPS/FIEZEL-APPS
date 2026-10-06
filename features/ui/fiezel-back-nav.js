@@ -664,7 +664,32 @@
     // m025-237: penanda dipasang SEKARANG, sebelum navigasi apa pun. Tanpa ini, tekanan
     // kembali pertama di beranda mendarat langsung di entri dokumen dan menutup PWA - satu
     // gestur tepi yang meleset, dan murid sudah keluar dari aplikasi.
-    controller.hold();
+    // m025-495: penanda TIDAK lagi didorong selagi splash boot masih menutupi layar. Peramban
+    // memotret entri dokumen pada saat pushState meninggalkannya; kalau itu terjadi di tengah
+    // boot, potretnya adalah splash gelap - dan potret itulah yang diintip setiap gestur swipe
+    // back iOS/Android. config.holdWhen() menunda dorongan pertama sampai aplikasi asli sudah
+    // tercat, lalu entri dokumen dicap ulang (replaceState) sebelum penanda dipasang.
+    function stampAndHold() {
+      try {
+        var hs = target.history;
+        if (hs && typeof hs.replaceState === 'function' && !(hs.state && hs.state.fiezelBackNav)) {
+          hs.replaceState({ fiezelAppRoot: 1 }, (target.document && target.document.title) || '');
+        }
+      } catch (_) {}
+      controller.hold();
+    }
+    if (typeof config.holdWhen === 'function' && typeof target.setTimeout === 'function') {
+      var waited = 0;
+      (function poll() {
+        var ready = false;
+        try { ready = config.holdWhen() === true; } catch (_) { ready = true; }
+        if (ready || waited >= 20000 || controller.holdsMarker()) { if (!controller.holdsMarker()) stampAndHold(); return; }
+        waited += 120;
+        target.setTimeout(poll, 120);
+      })();
+    } else {
+      controller.hold();
+    }
 
     if (typeof target.addEventListener === 'function') {
       target.addEventListener('popstate', function () { controller.handlePop(); });

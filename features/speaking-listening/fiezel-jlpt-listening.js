@@ -81,10 +81,15 @@
 
   function openListeningPanel() {
     var modal = document.getElementById('listeningPanelModal');
+    var wasOpen = !!(modal && modal.classList.contains('open'));
     if (modal) {
       modal.classList.add('open');
       modal.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
+    }
+    // m025-495: swipe back / tombol kembali menutup modal ini, bukan menembus ke belakangnya.
+    if (modal && !wasOpen) {
+      try { self.FiezelBackNav && self.FiezelBackNav.pushLayer && self.FiezelBackNav.pushLayer({ id: 'jlpt-listening', close: function () { hideListeningPanel(); return true; } }); } catch (_) {}
     }
     curIndex = 0;
     selectedChoice = null;
@@ -97,7 +102,7 @@
     });
   }
 
-  function closeListeningPanel() {
+  function hideListeningPanel() {
     var modal = document.getElementById('listeningPanelModal');
     if (modal) {
       modal.classList.remove('open');
@@ -106,6 +111,11 @@
     }
     closeJlptDetailSheet();
     stopJlptAudio();
+  }
+
+  function closeListeningPanel() {
+    hideListeningPanel();
+    try { self.FiezelBackNav && self.FiezelBackNav.dismiss && self.FiezelBackNav.dismiss('jlpt-listening'); } catch (_) {}
   }
 
   function setListeningLevel(lvl) {
