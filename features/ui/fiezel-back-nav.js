@@ -287,14 +287,14 @@
         holdMarker();
         return { action: 'blocked', depth: stack.length };
       }
-      // Tumpukan kosong berarti murid memang sedang meninggalkan aplikasi. Menahan mereka
-      // di sini akan mengurung mereka di dalam PWA tanpa jalan keluar, jadi penanda TIDAK
-      // dipasang ulang: penunjuk dibiarkan beristirahat di entri dokumen, dan tekanan
-      // kembali berikutnya benar-benar keluar. Satu tekanan jeda itu disengaja - ia
-      // mengubah "swipe tak sengaja langsung membunuh aplikasi" menjadi pola tekan-lagi
-      // yang sudah dikenal murid Android, dan onExit() memberi aplikasi kesempatan
-      // mengatakannya dengan kata-kata.
-      if (!stack.length) { notifyExit(); return { action: 'exit', depth: 0 }; }
+      // Tumpukan kosong di beranda: panggil onExit() (toast peringatan) lalu PASANG ULANG penanda
+      // supaya gestur swipe back biasa tidak pernah menembus ke luar dokumen (about:blank) yang
+      // memicu reload dingin 3.5 detik. Navigasi tetap berada di Home dengan anggun.
+      if (!stack.length) {
+        notifyExit();
+        holdMarker();
+        return { action: 'exit', depth: 0 };
+      }
 
       var view = currentView();
       var skipped = 0;
