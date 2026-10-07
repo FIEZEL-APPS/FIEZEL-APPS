@@ -210,6 +210,8 @@
   'grammar.video.exercise': 'แบบฝึกหัดไวยากรณ์',
   'grammar.contoh-singkat': 'ตัวอย่าง:',
   'grammar.token-order-panduan': 'เรียงคำทั้งหมดด้านล่างให้เป็นประโยคที่สมบูรณ์ (เลือกคำที่ถูกต้องสำหรับช่องว่าง): {kalimat}',
+  'grammar.token-order-panduan-label': 'เติมคำและเรียงลำดับ:',
+  'grammar.token-order-translate-instruction': 'แปลเป็นภาษาอังกฤษ:',
   'grammar.video.no-video': 'ไม่มีวิดีโอ สลับไปใช้ข้อความ',
   'grammar.video.of': 'จาก',
   'grammar.video.open-source': 'เปิดใน YouTube',

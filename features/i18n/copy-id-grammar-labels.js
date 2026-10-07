@@ -210,6 +210,8 @@
   'grammar.video.exercise': 'Latihan tata bahasa',
   'grammar.contoh-singkat': 'Contoh:',
   'grammar.token-order-panduan': 'Susun semua kata di bawah menjadi kalimat utuh (pilih kata yang tepat untuk bagian rumpang): {kalimat}',
+  'grammar.token-order-panduan-label': 'Lengkapi & Susun Kata:',
+  'grammar.token-order-translate-instruction': 'Terjemahkan ke Bahasa Inggris:',
   'grammar.video.no-video': 'Video tidak tersedia, beralih ke teks.',
   'grammar.video.of': 'dari',
   'grammar.video.open-source': 'Buka di YouTube',
