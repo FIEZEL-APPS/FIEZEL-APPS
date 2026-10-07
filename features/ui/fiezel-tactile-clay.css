@@ -6661,7 +6661,7 @@ html body.fz-view-profile #fzCourseSwitchBtn {
 html body main.app.app,html body.fz-lux main.app.app,html body.fz-lux.fz-view-game main.app.app,html body.fz-lux.fz-stage-home main.app.app {
   padding-top: calc(56px + env(safe-area-inset-top, 0px) + 12px) !important;
 }
-html body.fz-lesson-mode main.app.app,html body.fz-lux.fz-lesson-mode main.app.app,html body.fz-lux.fz-stage-quiz main.app.app { padding-top: 12px !important; }
+html body.fz-lesson-mode main.app.app,html body.fz-lux.fz-lesson-mode main.app.app,html body.fz-lux.fz-stage-quiz main.app.app,html body:has(.quiz-shell) main.app.app { padding-top: 0 !important; }
 html body.fz-lesson-mode header.topbar,
 html body.fz-teacher-mode header.topbar,
 html body.fz-auth-open header.topbar,

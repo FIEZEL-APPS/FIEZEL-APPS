@@ -51,6 +51,158 @@
   to { opacity: 1; transform: scale(1) translateY(0); }
 }
 
+/* Minimalist Topbar (Like Quiz Stage) */
+.listening-topbar {
+  padding: 10px 16px;
+  background: #FFFDF9;
+  border-bottom: 1.5px solid var(--line, #E8DFD3);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  min-height: 52px;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 10;
+}
+
+.listening-top-progress {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.listening-top-counter {
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 800;
+  color: #1E293B;
+  letter-spacing: -0.01em;
+}
+
+.listening-filter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: #FAF6EF;
+  border: 1.5px solid var(--line, #E8DFD3);
+  box-shadow: 0 2px 0 #D8CEBF;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.listening-filter-btn:hover {
+  background: #F3ECE1;
+  transform: translateY(-1px);
+}
+
+.listening-filter-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 0.5px 0 #D8CEBF;
+}
+
+.jlpt-filter-arrow {
+  font-size: 10px;
+  opacity: 0.7;
+}
+
+/* Filter Sheet Modal for Level & Mondai Selector */
+.jlpt-filter-modal {
+  position: absolute !important;
+  inset: 0 !important;
+  background: rgba(30, 20, 12, 0.48) !important;
+  backdrop-filter: blur(4px) !important;
+  -webkit-backdrop-filter: blur(4px) !important;
+  z-index: 100 !important;
+  display: none !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+  padding: 16px !important;
+  box-sizing: border-box !important;
+  animation: fzFilterFadeIn 0.18s ease-out !important;
+}
+
+.jlpt-filter-modal.open {
+  display: flex !important;
+}
+
+@keyframes fzFilterFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.jlpt-filter-panel {
+  background: #FFFDF9 !important;
+  border-radius: 20px !important;
+  border: 1.5px solid var(--line, #E8DFD3) !important;
+  box-shadow: 0 16px 36px rgba(36, 26, 17, 0.22) !important;
+  width: min(100%, 440px) !important;
+  overflow: hidden !important;
+  animation: fzFilterPop 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  margin-top: 10px !important;
+}
+
+@keyframes fzFilterPop {
+  from { transform: scale(0.95) translateY(-8px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.jlpt-filter-head {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 12px 16px !important;
+  border-bottom: 1.5px solid var(--line, #E8DFD3) !important;
+  background: #FDF9F2 !important;
+}
+
+.jlpt-filter-title {
+  margin: 0 !important;
+  font-size: 14.5px !important;
+  font-weight: 800 !important;
+  color: #0F172A !important;
+}
+
+.jlpt-filter-close {
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 50% !important;
+  border: 1.5px solid var(--line, #E8DFD3) !important;
+  background: #FFFDF9 !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  color: #475569 !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.jlpt-filter-body {
+  padding: 14px 16px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  max-height: 70vh !important;
+  overflow-y: auto !important;
+}
+
+.jlpt-filter-group-label {
+  display: block !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  color: #64748B !important;
+  margin-bottom: 6px !important;
+}
+
 .listening-head {
   padding: 10px 16px;
   background: #FDF9F2;
@@ -403,128 +555,132 @@
 }
 
 /* Situasi Ringkas (1 Baris, Tactile Travertine) */
+/* Situasi Ringkas (Tactile Travertine) */
 .jlpt-situation-chip {
-  background: #FAF6EF;
-  border: 1.5px solid var(--line, #E8DFD3);
-  border-radius: 8px;
-  padding: 3px 8px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  line-height: 1.3;
-  color: #7A5F1B;
-  box-shadow: 0 1.5px 0 #D8CEBF;
-  min-height: 24px;
-  height: 24px;
-  box-sizing: border-box;
-  flex-shrink: 0;
+  background: #FAF6EF !important;
+  border: 1.5px solid var(--line, #E8DFD3) !important;
+  border-radius: 10px !important;
+  padding: 4px 10px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  font-size: 11.5px !important;
+  line-height: 1.35 !important;
+  color: #7A5F1B !important;
+  box-shadow: 0 1.5px 0 #D8CEBF !important;
+  min-height: 26px !important;
+  height: auto !important;
+  box-sizing: border-box !important;
+  flex-shrink: 0 !important;
 }
 
 .jlpt-sit-icon {
-  font-size: 11px;
-  flex-shrink: 0;
+  font-size: 11.5px !important;
+  flex-shrink: 0 !important;
 }
 
 .jlpt-sit-text {
-  flex: 1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-weight: 700;
+  flex: 1 !important;
+  font-weight: 700 !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
 }
 
 /* =========================================================================
-   PANGGUNG AUDIO TACTILE PILL (48-52px)
+   PANGGUNG AUDIO TACTILE PILL (44-48px)
    Equalizer gelombang hidup saat playing
    ========================================================================= */
 
 .jlpt-audio-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: #241A11;
-  padding: 5px 8px;
-  border-radius: 14px;
-  box-shadow: 0 3px 0 #18110A;
-  min-height: 48px;
-  height: 48px;
-  box-sizing: border-box;
-  flex-shrink: 0;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  background: transparent !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+  min-height: 44px !important;
+  height: 44px !important;
+  box-sizing: border-box !important;
+  flex-shrink: 0 !important;
 }
 
 .jlpt-primary-play-btn {
-  flex: 1;
-  height: 38px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  background: #FFD94F;
-  color: #241A11;
-  border: none;
-  border-radius: 10px;
-  padding: 0 14px;
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 800;
-  cursor: pointer;
-  box-shadow: 0 2px 0 #D69E2E;
-  transition: all 0.12s ease;
-  user-select: none;
+  flex: 1 !important;
+  height: 44px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px !important;
+  background: #FAF6EF !important;
+  color: #1E293B !important;
+  border: 1.5px solid var(--line, #E8DFD3) !important;
+  border-radius: 999px !important;
+  padding: 0 16px !important;
+  font-family: inherit !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  cursor: pointer !important;
+  box-shadow: 0 2.5px 0 #D8CEBF !important;
+  transition: all 0.12s ease !important;
+  user-select: none !important;
 }
 
 .jlpt-primary-play-btn:hover {
-  background: #FFE382;
-  transform: translateY(-1px);
+  background: #F3ECE1 !important;
+  transform: translateY(-1px) !important;
 }
 
 .jlpt-primary-play-btn:active {
-  transform: translateY(1px);
-  box-shadow: 0 1px 0 #D69E2E;
+  transform: translateY(1.5px) !important;
+  box-shadow: 0 0.5px 0 #D8CEBF !important;
 }
 
 .jlpt-primary-play-btn.playing {
-  background: #FFEAA7;
-  box-shadow: 0 0 12px rgba(255, 217, 79, 0.55);
+  background: #FFF8E7 !important;
+  border-color: #F59E0B !important;
+  color: #B45309 !important;
+  box-shadow: 0 2px 0 #D97706 !important;
 }
 
 .jlpt-play-icon {
-  font-size: 13px;
-  line-height: 1;
+  font-size: 13px !important;
+  line-height: 1 !important;
 }
 
 /* Mini Equalizer Wave Visualizer */
 .jlpt-mini-wave {
-  display: inline-flex;
-  align-items: center;
-  gap: 2.5px;
-  height: 16px;
-  opacity: 0.55;
-  transition: opacity 0.15s;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 2.5px !important;
+  height: 16px !important;
+  opacity: 0.55 !important;
+  transition: opacity 0.15s !important;
 }
 
 .jlpt-primary-play-btn.playing .jlpt-mini-wave {
-  opacity: 1;
+  opacity: 1 !important;
 }
 
 .jlpt-mini-wave span {
-  width: 2.5px;
-  height: 4px;
-  background: #241A11;
-  border-radius: 2px;
-  transition: height 0.15s ease;
+  width: 2.5px !important;
+  height: 4px !important;
+  background: currentColor !important;
+  border-radius: 2px !important;
+  transition: height 0.15s ease !important;
 }
 
 .jlpt-primary-play-btn.playing .jlpt-mini-wave span {
-  animation: fzEqWave 0.55s infinite ease-in-out alternate;
+  animation: fzEqWave 0.55s infinite ease-in-out alternate !important;
 }
 
-.jlpt-primary-play-btn.playing .jlpt-mini-wave span:nth-child(1) { animation-delay: 0.05s; }
-.jlpt-primary-play-btn.playing .jlpt-mini-wave span:nth-child(2) { animation-delay: 0.22s; }
-.jlpt-primary-play-btn.playing .jlpt-mini-wave span:nth-child(3) { animation-delay: 0.12s; }
-.jlpt-primary-play-btn.playing .jlpt-mini-wave span:nth-child(4) { animation-delay: 0.3s; }
-.jlpt-primary-play-btn.playing .jlpt-mini-wave span:nth-child(5) { animation-delay: 0.18s; }
+.jlpt-primary-play-btn.playing .jlpt-mini-wave span:nth-child(1) { animation-delay: 0.05s !important; }
+.jlpt-primary-play-btn.playing .jlpt-mini-wave span:nth-child(2) { animation-delay: 0.22s !important; }
+.jlpt-primary-play-btn.playing .jlpt-mini-wave span:nth-child(3) { animation-delay: 0.12s !important; }
+.jlpt-primary-play-btn.playing .jlpt-mini-wave span:nth-child(4) { animation-delay: 0.3s !important; }
+.jlpt-primary-play-btn.playing .jlpt-mini-wave span:nth-child(5) { animation-delay: 0.18s !important; }
 
 @keyframes fzEqWave {
   0% { height: 3px; }
@@ -533,33 +689,41 @@
 
 /* Secondary JEES Chip */
 .jlpt-jees-chip {
-  height: 38px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  color: #FFFDF9;
-  border-radius: 10px;
-  padding: 0 12px;
-  font-family: inherit;
-  font-size: 11.5px;
-  font-weight: 700;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all 0.15s ease;
+  height: 44px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  background: #FAF6EF !important;
+  color: #475569 !important;
+  border: 1.5px solid var(--line, #E8DFD3) !important;
+  border-radius: 999px !important;
+  padding: 0 14px !important;
+  font-family: inherit !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+  box-shadow: 0 2.5px 0 #D8CEBF !important;
+  transition: all 0.15s ease !important;
+  flex-shrink: 0 !important;
 }
 
 .jlpt-jees-chip:hover {
-  background: rgba(255, 255, 255, 0.18);
-  border-color: rgba(255, 255, 255, 0.35);
+  background: #F3ECE1 !important;
+  transform: translateY(-1px) !important;
+}
+
+.jlpt-jees-chip:active {
+  transform: translateY(1.5px) !important;
+  box-shadow: 0 0.5px 0 #D8CEBF !important;
 }
 
 .jlpt-jees-chip.playing {
-  background: rgba(255, 217, 79, 0.25);
-  border-color: #FFD94F;
-  color: #FFD94F;
-  box-shadow: 0 0 10px rgba(255, 217, 79, 0.4);
+  background: #FFF8E7 !important;
+  border-color: #F59E0B !important;
+  color: #B45309 !important;
+  box-shadow: 0 2px 0 #D97706 !important;
 }
 
 .jlpt-replay-pill {
@@ -839,6 +1003,39 @@
 
 .jlpt-fb-key-btn:hover {
   transform: translateY(-1px);
+}
+
+.jlpt-fb-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  flex-shrink: 0 !important;
+}
+
+.jlpt-fb-next-btn {
+  background: #0F172A !important;
+  color: #FFFFFF !important;
+  border: none !important;
+  border-radius: 6px !important;
+  padding: 4px 10px !important;
+  font-family: inherit !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+  box-shadow: 0 1.5px 0 #020617 !important;
+  transition: all 0.12s ease !important;
+  flex-shrink: 0 !important;
+}
+
+.jlpt-fb-next-btn:hover {
+  background: #1E293B !important;
+  transform: translateY(-1px) !important;
+}
+
+.jlpt-fb-next-btn:active {
+  transform: translateY(1px) !important;
+  box-shadow: 0 0.5px 0 #020617 !important;
 }
 
 /* Quick Bottom Sheet Triggers (Ergonomis & Ringkas) */
@@ -1682,6 +1879,23 @@
     flex-direction: column !important;
   }
 
+  .listening-topbar {
+    padding: max(8px, env(safe-area-inset-top, 8px)) 14px 8px !important;
+    min-height: 48px !important;
+    height: auto !important;
+    flex-shrink: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .listening-top-counter {
+    font-size: 14.5px !important;
+  }
+
+  .listening-filter-btn {
+    padding: 4px 10px !important;
+    font-size: 11px !important;
+  }
+
   .listening-head {
     padding: 6px 12px !important;
     min-height: 40px !important;
@@ -1700,8 +1914,8 @@
   }
 
   .listening-close-btn {
-    width: 28px !important;
-    height: 28px !important;
+    width: 30px !important;
+    height: 30px !important;
     font-size: 14px !important;
   }
 

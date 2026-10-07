@@ -302,6 +302,97 @@ html.fz-booting body{overflow:hidden}
       font-weight: 800 !important;
     }
 
+    /* Universal Fixed Session Topbar: Rock-solid, zero-void edge-to-edge topbar across all exercise sessions */
+    html body:has(.quiz-shell) main.app,
+    html body.fz-stage-quiz main.app,
+    html body.fz-lesson-mode main.app,
+    html body:has(.quiz-shell) .app,
+    html body.fz-stage-quiz .app,
+    html body.fz-lesson-mode .app,
+    html body:has(.quiz-shell) #app,
+    html body.fz-stage-quiz #app,
+    html body.fz-lesson-mode #app {
+      padding-top: 0 !important;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+      margin-top: 0 !important;
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+
+    .quiz-topbar,
+    .quiz-shell .quiz-topbar,
+    body.fz-stage-quiz .quiz-topbar,
+    body.fz-lux.fz-stage-quiz .quiz-topbar,
+    body.fz-lesson-mode .quiz-topbar,
+    body:has(.quiz-shell) .quiz-topbar {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      margin: 0 !important;
+      border-radius: 0 !important;
+      border: none !important;
+      border-bottom: 1.5px solid #E2E8F0 !important;
+      background: rgba(253, 250, 243, 0.98) !important;
+      backdrop-filter: blur(20px) !important;
+      -webkit-backdrop-filter: blur(20px) !important;
+      padding: max(10px, env(safe-area-inset-top, 10px)) 16px 10px 16px !important;
+      display: grid !important;
+      grid-template-columns: auto 1fr auto !important;
+      align-items: center !important;
+      gap: 12px !important;
+      z-index: 1000 !important;
+      box-sizing: border-box !important;
+    }
+
+    body.theme-dark .quiz-topbar,
+    body.scene-night .quiz-topbar {
+      background: rgba(27, 20, 24, 0.98) !important;
+      border-bottom-color: rgba(255, 255, 255, 0.1) !important;
+    }
+
+    #app > section.quiz-shell,
+    .quiz-shell {
+      padding-top: calc(64px + max(10px, env(safe-area-inset-top, 10px))) !important;
+      padding-left: 14px !important;
+      padding-right: 14px !important;
+      padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px)) !important;
+      margin: 0 auto !important;
+      max-width: 600px !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+    }
+
+    .skill-page-topbar {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      margin: 0 !important;
+      border-radius: 0 !important;
+      border: none !important;
+      border-bottom: 1.5px solid #E2E8F0 !important;
+      background: rgba(253, 250, 243, 0.98) !important;
+      backdrop-filter: blur(20px) !important;
+      -webkit-backdrop-filter: blur(20px) !important;
+      padding: max(10px, env(safe-area-inset-top, 10px)) 16px 10px 16px !important;
+      z-index: 1000 !important;
+      box-sizing: border-box !important;
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+    }
+
+    section.skills-page:has(.skill-page-topbar),
+    .skills-page {
+      padding-top: calc(64px + max(10px, env(safe-area-inset-top, 10px))) !important;
+    }
+
     /* Anti-Ruang Hampa (Zero Void Space): eliminate bottom void across all panels */
     body, body.fz-lux, body.fz-stage-map .app, body.fz-stage-quiz .app,
     body.fz-stage-sl .app, body.fz-stage-hub .app, main.app, .app, .view-container, #app {
@@ -659,42 +750,59 @@ html.fz-booting body{overflow:hidden}
   <!-- PANEL BANK SOAL LISTENING JLPT (N5 & N4) -->
   <div class="listening-modal" id="listeningPanelModal" onclick="if(event.target===this)closeListeningPanel()" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Bank Soal Listening JLPT N5 dan N4" data-i18n-aria-label="jlpt.modal-aria">
     <div class="listening-modal-box">
-      <div class="listening-head">
-        <div>
-          <div class="f-tag" style="background:var(--sun-soft);color:var(--gold);margin:0 0 4px;display:inline-block;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:700;" data-i18n="jlpt.official-tag">🎧 RESMI JAPAN FOUNDATION & JEES</div>
-          <h2 class="listening-head-title" data-i18n="jlpt.title">Bank Soal Listening (Chōkai / 聴解)</h2>
-          <span class="listening-head-sub" data-i18n="jlpt.subtitle">Simulasi Ujian Asli JLPT N5 & N4 Lengkap</span>
-        </div>
+      <!-- Sleek Minimalist Topbar (Like Quiz Stage) -->
+      <div class="listening-topbar">
         <button type="button" class="listening-close-btn" onclick="closeListeningPanel()" aria-label="Tutup Panel Listening" data-i18n-aria-label="jlpt.close-aria">✕</button>
+        <div class="listening-top-progress">
+          <span class="listening-top-counter" id="jlptTopCounter">1 / 7</span>
+        </div>
+        <button type="button" class="listening-filter-btn" id="jlptFilterBtn" onclick="toggleJlptFilterModal()" aria-label="Filter Level dan Mondai">
+          <span id="jlptTopFilterLabel">N5 · Semua</span>
+          <span class="jlpt-filter-arrow">▾</span>
+        </button>
       </div>
 
       <div class="listening-body">
-        <!-- Level Switcher -->
-        <div class="jlpt-level-tabs">
-          <button type="button" class="jlpt-lvl-btn active" id="btnLvlN5" onclick="setListeningLevel('N5')" data-i18n="jlpt.lvl-n5">⭐ JLPT N5 (Dasar)</button>
-          <button type="button" class="jlpt-lvl-btn" id="btnLvlN4" onclick="setListeningLevel('N4')" data-i18n="jlpt.lvl-n4">🌟 JLPT N4 (Menengah)</button>
-        </div>
-
-        <!-- Mondai Category Scroll -->
-        <div class="jlpt-mondai-scroll">
-          <button type="button" class="jlpt-mondai-chip active" data-mondai="all" onclick="setListeningMondai('all')" data-i18n="jlpt.mondai-all">Semua Mondai</button>
-          <button type="button" class="jlpt-mondai-chip" data-mondai="mondai_1" onclick="setListeningMondai('mondai_1')" data-i18n="jlpt.mondai-1">Mondai 1: Tugas (課題)</button>
-          <button type="button" class="jlpt-mondai-chip" data-mondai="mondai_2" onclick="setListeningMondai('mondai_2')" data-i18n="jlpt.mondai-2">Mondai 2: Poin (ポイント)</button>
-          <button type="button" class="jlpt-mondai-chip" data-mondai="mondai_3" onclick="setListeningMondai('mondai_3')" data-i18n="jlpt.mondai-3">Mondai 3: Ungkapan (発話)</button>
-          <button type="button" class="jlpt-mondai-chip" data-mondai="mondai_4" onclick="setListeningMondai('mondai_4')" data-i18n="jlpt.mondai-4">Mondai 4: Respon (即時)</button>
-        </div>
-
         <!-- Dynamic Question Card Slot -->
         <div id="listeningQuestionSlot"></div>
+      </div>
 
-        <!-- Official Download Section Footer -->
-        <div class="jlpt-download-box">
-          <b class="jlpt-download-title" data-i18n="jlpt.download-title">📥 Unduh Bahan Asli JLPT:</b>
-          <div class="jlpt-download-links">
-            <a href="https://www.jlpt.jp/samples/sample2018/pdf/N5L.pdf" target="_blank" rel="noopener noreferrer" class="jlpt-download-link" data-i18n="jlpt.download-n5-pdf">📄 PDF Soal N5</a> ·
-            <a href="https://www.jlpt.jp/samples/sample2018/pdf/N5script.pdf" target="_blank" rel="noopener noreferrer" class="jlpt-download-link" data-i18n="jlpt.download-n5-script">📝 Naskah N5</a> ·
-            <a href="https://www.jlpt.jp/samples/sample2018/pdf/N4L.pdf" target="_blank" rel="noopener noreferrer" class="jlpt-download-link" data-i18n="jlpt.download-n4-pdf">📄 PDF Soal N4</a> ·
-            <a href="https://www.jlpt.jp/samples/sample2018/pdf/N4script.pdf" target="_blank" rel="noopener noreferrer" class="jlpt-download-link" data-i18n="jlpt.download-n4-script">📝 Naskah N4</a>
+      <!-- Secluded Filter & Official Materials Modal Sheet -->
+      <div id="jlptFilterModal" class="jlpt-filter-modal" role="dialog" aria-modal="true" aria-hidden="true" style="display:none;">
+        <div class="jlpt-filter-backdrop" onclick="closeJlptFilterModal()"></div>
+        <div class="jlpt-filter-panel">
+          <div class="jlpt-filter-head">
+            <span class="jlpt-filter-title" data-i18n="jlpt.filter-title">Filter &amp; Bahan JLPT</span>
+            <button type="button" class="jlpt-filter-close" onclick="closeJlptFilterModal()" aria-label="Tutup Filter">✕</button>
+          </div>
+          <div class="jlpt-filter-body">
+            <!-- Level Switcher -->
+            <span class="jlpt-filter-group-label" data-i18n="jlpt.choose-level">Pilih Tingkat JLPT</span>
+            <div class="jlpt-level-tabs">
+              <button type="button" class="jlpt-lvl-btn active" id="btnLvlN5" onclick="setListeningLevel('N5');closeJlptFilterModal()" data-i18n="jlpt.lvl-n5">⭐ JLPT N5 (Dasar)</button>
+              <button type="button" class="jlpt-lvl-btn" id="btnLvlN4" onclick="setListeningLevel('N4');closeJlptFilterModal()" data-i18n="jlpt.lvl-n4">🌟 JLPT N4 (Menengah)</button>
+            </div>
+
+            <!-- Mondai Category Scroll -->
+            <span class="jlpt-filter-group-label" data-i18n="jlpt.choose-mondai" style="margin-top:8px;">Pilih Bagian Mondai</span>
+            <div class="jlpt-mondai-scroll">
+              <button type="button" class="jlpt-mondai-chip active" data-mondai="all" onclick="setListeningMondai('all');closeJlptFilterModal()" data-i18n="jlpt.mondai-all">Semua Mondai</button>
+              <button type="button" class="jlpt-mondai-chip" data-mondai="mondai_1" onclick="setListeningMondai('mondai_1');closeJlptFilterModal()" data-i18n="jlpt.mondai-1">Mondai 1: Tugas (課題)</button>
+              <button type="button" class="jlpt-mondai-chip" data-mondai="mondai_2" onclick="setListeningMondai('mondai_2');closeJlptFilterModal()" data-i18n="jlpt.mondai-2">Mondai 2: Poin (ポイント)</button>
+              <button type="button" class="jlpt-mondai-chip" data-mondai="mondai_3" onclick="setListeningMondai('mondai_3');closeJlptFilterModal()" data-i18n="jlpt.mondai-3">Mondai 3: Ungkapan (発話)</button>
+              <button type="button" class="jlpt-mondai-chip" data-mondai="mondai_4" onclick="setListeningMondai('mondai_4');closeJlptFilterModal()" data-i18n="jlpt.mondai-4">Mondai 4: Respon (即時)</button>
+            </div>
+
+            <!-- Official Download Section Footer -->
+            <span class="jlpt-filter-group-label" data-i18n="jlpt.download-title" style="margin-top:8px;">Unduh Bahan Asli JLPT:</span>
+            <div class="jlpt-download-box">
+              <div class="jlpt-download-links">
+                <a href="https://www.jlpt.jp/samples/sample2018/pdf/N5L.pdf" target="_blank" rel="noopener noreferrer" class="jlpt-download-link" data-i18n="jlpt.download-n5-pdf">📄 PDF Soal N5</a> ·
+                <a href="https://www.jlpt.jp/samples/sample2018/pdf/N5script.pdf" target="_blank" rel="noopener noreferrer" class="jlpt-download-link" data-i18n="jlpt.download-n5-script">📝 Naskah N5</a> ·
+                <a href="https://www.jlpt.jp/samples/sample2018/pdf/N4L.pdf" target="_blank" rel="noopener noreferrer" class="jlpt-download-link" data-i18n="jlpt.download-n4-pdf">📄 PDF Soal N4</a> ·
+                <a href="https://www.jlpt.jp/samples/sample2018/pdf/N4script.pdf" target="_blank" rel="noopener noreferrer" class="jlpt-download-link" data-i18n="jlpt.download-n4-script">📝 Naskah N4</a>
+              </div>
+            </div>
           </div>
         </div>
       </div>

@@ -772,45 +772,8 @@
       return;
     }
 
-    const meta = (typeof GRAMMAR_ITEMS !== 'undefined' && Array.isArray(GRAMMAR_ITEMS))
-      ? GRAMMAR_ITEMS.find(x => x.skill === skill)
-      : null;
-    const lessonTitle = meta ? (meta.title || meta.skill) : skill;
-
-    const html = `
-      <div class="lesson-prereq-gateway-sheet">
-        <div class="gateway-header">
-          <span class="gateway-badge"><i data-lucide="sparkles"></i> ${t('scaffold.gateway-title', 'Hafal Dulu Kosakata Ini!')}</span>
-          <h2>${esc(lessonTitle)}</h2>
-          <p class="muted">${t('scaffold.gateway-subtitle', 'Setelah kamu menghafalnya, latihan grammar otomatis terbuka!', { count: status.targetCount || (status.words ? status.words.length : 5) })}</p>
-        </div>
-
-        <div class="gateway-vocab-grid">
-          ${status.words.map(w => `
-            <div class="gateway-vocab-card">
-              <div class="gw-word-top">
-                <span class="gw-word"><b>${esc(w.word)}</b></span>
-                <button type="button" class="gw-audio-btn" onclick="FiezelGrammarVocabBridge.playVocabAudio('${esc(w.word)}')" aria-label="Audio ${esc(w.word)}">
-                  <i data-lucide="volume-2"></i>
-                </button>
-              </div>
-              <div class="gw-meaning">${esc(w.meaning.split(';')[0].trim())}</div>
-            </div>
-          `).join('')}
-        </div>
-
-        <div class="gateway-actions">
-          <button type="button" class="gateway-btn primary" onclick="FiezelGrammarVocabBridge.startVocabMiniGame('${skill}')">
-            <i data-lucide="play"></i>
-            <span>${t('scaffold.btn-start-game', 'Mulai Mini Game Seru 🎮')}</span>
-          </button>
-        </div>
-      </div>
-    `;
-
-    if (typeof openModal === 'function') {
-      openModal(html);
-    }
+    // User directive: Hapus total gateway sheet di semua sesi, langsung masuk ke sesi game
+    startVocabMiniGame(skill);
   }
 
   function skipToGrammar(skill) {

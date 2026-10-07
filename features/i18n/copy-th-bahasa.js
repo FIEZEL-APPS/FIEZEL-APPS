@@ -73,6 +73,7 @@
     'jlpt.sheet-trigger-label': 'บทพูดและคำอธิบาย',
     'jlpt.mundur': 'ก่อนหน้า',
     'jlpt.maju': 'ถัดไป',
+    'jlpt.selesai': 'เสร็จสิ้น',
     'jlpt.geser-kartu': 'เลื่อนการ์ด',
     'jlpt.dari': '{cur} จาก {total}',
     'jlpt.close-sheet': 'ปิด Sheet',

@@ -1597,10 +1597,13 @@ body .lesson-example h3,
 
   #app > section.quiz-shell,
   .quiz-shell {
-    padding: 6px 0 calc(24px + env(safe-area-inset-bottom, 0px)) 0 !important;
-    margin: 0 !important;
+    padding-top: calc(64px + max(10px, env(safe-area-inset-top, 10px))) !important;
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+    padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px)) !important;
+    margin: 0 auto !important;
     width: 100% !important;
-    max-width: 100% !important;
+    max-width: 600px !important;
     min-height: auto !important;
     display: flex !important;
     flex-direction: column !important;
@@ -1609,10 +1612,13 @@ body .lesson-example h3,
   }
 
   .quiz-shell .quiz-topbar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
     width: 100% !important;
     box-sizing: border-box !important;
-    padding: 0 4px 6px 4px !important;
-    margin-bottom: 4px !important;
+    margin: 0 !important;
   }
 
   .quiz-shell > .card,

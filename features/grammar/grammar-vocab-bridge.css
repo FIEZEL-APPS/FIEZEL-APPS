@@ -734,37 +734,39 @@ body:has(.modal-intensity-sheet) nav.bottomnav {
 .modal:has(.modal-mini-game-sheet) {
   z-index: 2147483000 !important;
   padding: 0 !important;
-  background: rgba(15, 23, 42, 0.75) !important;
-  backdrop-filter: blur(12px) !important;
-  -webkit-backdrop-filter: blur(12px) !important;
-  align-items: flex-end !important;
+  background: #FFFFFF !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  align-items: stretch !important;
+  justify-content: stretch !important;
 }
 
 @media (min-width: 641px) {
   #modal:has(.modal-mini-game-sheet),
   .modal:has(.modal-mini-game-sheet) {
     align-items: center !important;
-    padding: 20px !important;
+    justify-content: center !important;
+    padding: 0 !important;
   }
 }
 
-/* Modal Panel: Native App Sheet Layout (App Feel) */
+/* Modal Panel: Menutupi Seluruh Layar (Zero Space Kosong / Full Screen) */
 #modalPanel:has(.modal-mini-game-sheet),
 #modal:has(.modal-mini-game-sheet) #modalPanel,
 .modal-panel:has(.modal-mini-game-sheet) {
   background: #FFFFFF !important;
   color: #0F172A !important;
-  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.25) !important;
+  box-shadow: none !important;
   width: 100% !important;
-  max-width: 540px !important;
-  height: 94vh !important;
-  height: 94dvh !important;
-  max-height: 94dvh !important;
-  border-radius: 24px 24px 0 0 !important;
-  border: 1px solid rgba(226, 232, 240, 0.9) !important;
-  border-bottom: none !important;
+  max-width: 100% !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  max-height: 100vh !important;
+  max-height: 100dvh !important;
+  border-radius: 0 !important;
+  border: none !important;
   padding: 0 !important;
-  margin: 0 auto !important;
+  margin: 0 !important;
   display: flex !important;
   flex-direction: column !important;
   overflow: hidden !important;
@@ -776,11 +778,13 @@ body:has(.modal-intensity-sheet) nav.bottomnav {
   #modalPanel:has(.modal-mini-game-sheet),
   #modal:has(.modal-mini-game-sheet) #modalPanel,
   .modal-panel:has(.modal-mini-game-sheet) {
-    height: 88vh !important;
-    height: 88dvh !important;
-    max-height: 780px !important;
-    border-radius: 28px !important;
-    border-bottom: 1px solid rgba(226, 232, 240, 0.9) !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    max-height: 100vh !important;
+    max-height: 100dvh !important;
+    max-width: 540px !important;
+    border-radius: 0 !important;
+    border: none !important;
   }
 }
 
@@ -804,10 +808,10 @@ body:has(.modal-intensity-sheet) nav.bottomnav {
   overflow: hidden;
 }
 
-/* Header Statis - Selalu Menempel di Atas */
+/* Header Statis - Selalu Menempel di Atas dan Mengisi Notch/Safe-Area Penuh */
 .mini-game-header-fixed {
   flex: 0 0 auto;
-  padding: 14px 18px 10px 18px;
+  padding: max(14px, env(safe-area-inset-top, 14px)) 18px 10px 18px;
   background: #FFFFFF;
   border-bottom: 1px solid #F1F5F9;
   z-index: 10;
