@@ -173,7 +173,7 @@ function geminiKeyList(env = process.env) {
 /** Indeks kunci yang terakhir berhasil — panggilan berikutnya mulai dari sini. */
 let geminiKeyCursor = 0;
 /** Status yang berarti "kunci ini tidak bisa dipakai sekarang" → coba kunci lain, model sama. */
-const KEY_ROTATE_STATUS = new Set([401, 403, 429]);
+const KEY_ROTATE_STATUS = new Set([401, 402, 403, 429]);
 /** Kunci yang ditolak Google (401/403): dilewati sampai proses selesai. Isinya indeks, bukan kunci. */
 const geminiDeadKeys = new Set();
 /** "model|indeks" → waktu kunci itu boleh dicoba lagi untuk model itu setelah 429. */
