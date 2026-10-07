@@ -386,6 +386,11 @@ const HEURISTIC_PATH_ALLOWLIST = [
       + 'dipindahkan ke website/ supaya ter-deploy lewat cPanel. Alasannya sama persis: data URI '
       + 'PNG 1x1 bawaan pustaka, terdekode menjadi bita ajaib PNG. Pengecualian jalur lama '
       + 'tertinggal saat berkasnya pindah, dan itu membuat main merah di setiap PR.'
+  },
+  {
+    prefix: 'mochi-mascot/three.module.js',
+    reason: 'Pustaka 3D Three.js ES module resmi pihak ketiga untuk perenderan maskot 3D Mochi secara offline di PWA. '
+      + 'Entropi di dalamnya adalah string konstanta shader, encoding WebGL, dan tabel matematika matriks — bukan rahasia atau kredensial.'
   }
 ];
 
