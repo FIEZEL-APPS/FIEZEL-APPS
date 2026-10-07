@@ -1992,7 +1992,10 @@ div.card {
 
 .vocab-focus .phonetic,
 .card .vocab-focus .phonetic,
-#app .vocab-focus .phonetic {
+#app .vocab-focus .phonetic,
+.card .phonetic,
+#app .phonetic,
+.phonetic {
   background: transparent !important;
   border: none !important;
   outline: none !important;
@@ -2370,24 +2373,24 @@ body.fz-lux .notification-panel,
 }
 
 .listening-modal-box {
-  background: #121218 !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  color: #FFFFFF !important;
+  background: #FFFDF9 !important;
+  border: 1.5px solid var(--line, #E8DFD3) !important;
+  color: #241A11 !important;
 }
 
 .listening-modal-box .f-tag {
-  color: #FFE02E !important;
-  background: rgba(255, 224, 46, 0.15) !important;
+  color: #7A5F1B !important;
+  background: #FAF6EF !important;
 }
 
 .listening-modal-box b,
 .listening-modal-box strong {
-  color: #FFFFFF !important;
+  color: #241A11 !important;
 }
 
 .listening-modal-box p,
 .listening-modal-box span {
-  color: #CBD5E1 !important;
+  color: #382E25 !important;
 }
 
 /* 5. PRODUCT TOUR (High Contrast Dark Bubble) */
@@ -3279,6 +3282,24 @@ fiezel-mascot:has(canvas) .fz-svg,
   position: relative !important;
   overflow: visible !important;
 }
+.paw-hero-avatar .coach-strip-face {
+  width: 100% !important;
+  height: 100% !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: relative !important;
+}
+.paw-hero-avatar .coach-strip-face .coach-strip-mascot,
+.paw-hero-avatar fiezel-mascot {
+  width: 100% !important;
+  height: 100% !important;
+  display: block !important;
+  position: relative !important;
+}
 .paw-speech-bubble {
   display: flex !important;
   visibility: visible !important;
@@ -3617,125 +3638,137 @@ html:not(.fz-booting) #fiezelBootSplash {
 }
 
 /* ==========================================================================
-   AUDIT FIX 3: SKILLS LAB (BICARA & DENGAR) HIGH CONTRAST DARK THEME
+   AUDIT FIX 3: SKILLS LAB (BICARA & DENGAR) DAYLIGHT TRAVERTINE TACTILE THEME
    ========================================================================== */
 .fsl-card,
 article.fsl-card,
-.fsl-shell .fsl-card {
-  background: #181826 !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+.fsl-shell .fsl-card,
+.fsl-card-listening {
+  background: #FFFDF9 !important;
+  border: 1.5px solid #E8DFD3 !important;
   border-radius: 20px !important;
-  color: #FFFFFF !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+  color: #241A11 !important;
+  box-shadow: 0 4px 20px rgba(36, 26, 17, 0.06) !important;
 }
 .fsl-card h1,
 .fsl-card h2,
 .fsl-card h3,
-.fsl-head h1 {
-  color: #FFFFFF !important;
+.fsl-head h1,
+.fsl-card-listening h2 {
+  color: #0F172A !important;
   font-weight: 800 !important;
 }
 .fsl-card p,
 .fsl-head p,
 .fsl-card span:not(.fsl-kicker):not(.fsl-gem-mark) {
-  color: #CBD5E1 !important;
+  color: #475569 !important;
 }
 .fsl-card .fsl-kicker,
 .fsl-kicker {
-  color: #FFE02E !important;
+  color: #D97706 !important;
   font-weight: 800 !important;
 }
 .fsl-card button.fsl-primary,
 .fsl-primary,
-.fsl-actions button.fsl-primary {
+.fsl-actions button.fsl-primary,
+[data-next] {
   background: #FFE02E !important;
   color: #101018 !important;
   font-weight: 800 !important;
-  border: none !important;
+  border: 1.5px solid #241A11 !important;
   border-radius: 999px !important;
+  box-shadow: 0 4px 0 #241A11 !important;
 }
-.fsl-card button:not(.fsl-primary),
-.fsl-actions button:not(.fsl-primary) {
-  background: #222234 !important;
-  color: #FFFFFF !important;
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+.fsl-card button:not(.fsl-primary):not(.fsl-exit-btn):not(.fsl-option),
+.fsl-actions button:not(.fsl-primary):not(.fsl-exit-btn):not(.fsl-option) {
+  background: #FAF6EF !important;
+  color: #382E25 !important;
+  border: 1.5px solid #E8DFD3 !important;
   border-radius: 999px !important;
+  box-shadow: 0 2px 0 #D8CEBF !important;
 }
 .fsl-player {
-  background: #12121C !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  background: #FAF6EF !important;
+  border: 1.5px solid #E8DFD3 !important;
   border-radius: 16px !important;
 }
 .fsl-player .fsl-replays {
-  color: #94A3B8 !important;
+  color: #64748B !important;
 }
 .fsl-player .fsl-wave {
-  color: #FFE02E !important;
+  color: #D97706 !important;
 }
 .fsl-gem-chip {
-  background: #1E1E2E !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  color: #FFFFFF !important;
+  background: #FAF6EF !important;
+  border: 1.5px solid #E8DFD3 !important;
+  color: #241A11 !important;
 }
 .fsl-gem-chip b {
-  color: #FFE02E !important;
+  color: #D97706 !important;
 }
 .fsl-gem-chip small {
-  color: #94A3B8 !important;
+  color: #64748B !important;
 }
 .fsl-gem-toggle {
-  background: #1E1E2E !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  color: #CBD5E1 !important;
+  background: #FAF6EF !important;
+  border: 1.5px solid #E8DFD3 !important;
+  color: #382E25 !important;
 }
 .fsl-gem-toggle[aria-pressed="true"] {
-  background: rgba(255, 224, 46, 0.15) !important;
-  border-color: #FFE02E !important;
-  color: #FFE02E !important;
+  background: #FFF3DC !important;
+  border-color: #D97706 !important;
+  color: #78350F !important;
 }
 .fsl-gem-empty {
-  background: #181826 !important;
-  border: 1px dashed rgba(255, 255, 255, 0.15) !important;
-  color: #94A3B8 !important;
+  background: #FAF6EF !important;
+  border: 1px dashed #D8CEBF !important;
+  color: #64748B !important;
 }
 .fsl-gem-empty b {
-  color: #FFFFFF !important;
+  color: #241A11 !important;
 }
 .fsl-status,
 .fsl-feedback {
-  background: #141420 !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  color: #F8FAFC !important;
+  background: #FAF6EF !important;
+  border: 1.5px solid #E8DFD3 !important;
+  color: #241A11 !important;
+  box-shadow: 0 3px 0 #D8CEBF !important;
 }
 .fsl-option {
-  background: #1C1C2A !important;
-  border: 1.5px solid rgba(255, 255, 255, 0.12) !important;
-  color: #FFFFFF !important;
+  background: #FFFFFF !important;
+  border: 1.5px solid #E8DFD3 !important;
+  color: #0F172A !important;
+  box-shadow: 0 2px 0 #D8CEBF !important;
+}
+.fsl-option:hover:not(:disabled) {
+  background: #FFFDF8 !important;
+  border-color: #D6CBC0 !important;
 }
 .fsl-option.is-correct {
-  background: rgba(16, 185, 129, 0.2) !important;
-  border-color: #10B981 !important;
-  color: #FFFFFF !important;
+  background: #F0FDF4 !important;
+  border-color: #16A34A !important;
+  color: #14532D !important;
 }
 .fsl-option.is-wrong {
-  background: rgba(239, 68, 68, 0.2) !important;
+  background: #FEF2F2 !important;
   border-color: #EF4444 !important;
-  color: #FFFFFF !important;
+  color: #7F1D1D !important;
 }
 .fsl-work:disabled .fsl-input,
 .fsl-work:disabled .fsl-option {
-  background: #12121C !important;
-  color: #64748B !important;
-  border-color: rgba(255, 255, 255, 0.08) !important;
+  background: #FAF6EF !important;
+  color: #94A3B8 !important;
+  border-color: #E8DFD3 !important;
+  box-shadow: none !important;
 }
 .fsl-input {
-  background: #12121C !important;
-  border: 1.5px solid rgba(255, 255, 255, 0.16) !important;
-  color: #FFFFFF !important;
+  background: #FFFFFF !important;
+  border: 1.5px solid #CBD5E1 !important;
+  color: #0F172A !important;
   border-radius: 12px !important;
 }
 .fsl-prompt {
-  color: #FFFFFF !important;
+  color: #241A11 !important;
 }
 .fsl-transcript {
   background: #101018 !important;
@@ -4533,8 +4566,7 @@ section.fade,
 /* Modals & popup panels: snug fit without endless trailing void */
 .modal-panel,
 .welcome-panel,
-.notification-panel,
-.listening-modal-box {
+.notification-panel {
   max-height: min(720px, 86vh) !important;
   padding-bottom: 20px !important;
   margin-bottom: 0 !important;

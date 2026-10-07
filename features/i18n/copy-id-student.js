@@ -137,7 +137,7 @@
     'level.badge-titik-mulai': 'Titik mulai',
     'level.badge-terkunci': 'Terkunci · buka lewat ujian',
     'level.probation-judul': 'Level ini belum diuji',
-    'level.probation-isi': 'Ikuti Ujian Naik Level dulu. Paw menemani dari A1.',
+    'level.probation-isi': 'Ikuti Ujian Naik Level dulu. Mochi menemani dari A1.',
     'level.fitur-terkunci': 'Fitur ini dikunci sementara kamu menguatkan dasar di A1. Selesaikan materinya pelan-pelan, atau buka lebih cepat lewat Ujian Naik Level.',
     'level.toast-terkunci': 'Level {level} terbuka lewat Ujian Naik Level {ujian}.',
     'level.sumber-verif-awal': ' (dari tes awal — kokohkan lewat Ujian Naik Level)',

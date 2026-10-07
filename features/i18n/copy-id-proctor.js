@@ -31,7 +31,7 @@
     'ujian.keluar-tercatat': 'Kamu keluar dari layar ujian {n}× ({detik} detik terakhir). Catatannya sudah sampai ke gurumu.',
     // Audit F01/F03 (2026-09-22): murid tanpa kelas tidak punya guru yang menerima catatan,
     // dan tes awal dijanjikan "bukan ujian" - kalimatnya harus benar untuk keduanya.
-    'ujian.mode-aktif-tes-awal': 'Tes awal: kerjakan sendiri, PAW istirahat dulu. Tidak ada nilai dan tidak ada hukuman.',
+    'ujian.mode-aktif-tes-awal': 'Tes awal: kerjakan sendiri, Mochi istirahat dulu. Tidak ada nilai dan tidak ada hukuman.',
     'ujian.mode-aktif-tanpa-kelas': 'Mode ujian: pembimbing FIEZEL nonaktif sampai ujian selesai.',
     'ujian.keluar-tercatat-tanpa-kelas': 'Kamu keluar dari layar ujian {n}× ({detik} detik terakhir).'
   });

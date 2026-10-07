@@ -19,7 +19,7 @@
 
   I18N.registerCopy('id', {
     // route-legacy.js /api/ai/chat — dipakai saat binding AI tidak tersedia
-    'worker.chat.fallback': 'Halo! Saya PAW, asisten belajar FIEZEL.',
+    'worker.chat.fallback': 'Halo! Saya Mochi, asisten belajar FIEZEL.',
     // route-legacy.js /api/coach/context — teks bawaan sebelum model menjawab
     'worker.coach.default': 'Tetap semangat belajar! Kamu sudah membuat kemajuan yang baik.',
     // route-legacy.js /api/coach/context — dipakai saat panggilan model gagal

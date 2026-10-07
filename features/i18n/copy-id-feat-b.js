@@ -367,7 +367,7 @@
     // features/onboarding/fiezel-onboarding.js:552
     'onboarding.berapa-perkiraan-level-lang-inggrismu': '<p class="fiezel-note">Berapa perkiraan level bahasa Inggrismu sekarang?</p>',
     // features/onboarding/fiezel-onboarding.js:480
-    'onboarding.halo-me-fiezel-nama-you': '<h2 class="fiezel-title">Halo! Aku PAW. Nama kamu siapa?</h2>',
+    'onboarding.halo-me-fiezel-nama-you': '<h2 class="fiezel-title">Halo! Aku Mochi. Nama kamu siapa?</h2>',
     // features/onboarding/fiezel-onboarding.js:553
     'onboarding.ini-cuma-perkiraan-awal-darimu': '<p class="fiezel-note">Ini cuma perkiraan awal darimu sendiri, akan disesuaikan otomatis setelah kamu mengerjakan latihan - bukan hasil tes.</p>',
     // features/onboarding/fiezel-onboarding.js:570
