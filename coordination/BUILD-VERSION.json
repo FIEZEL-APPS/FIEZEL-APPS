@@ -1,7 +1,7 @@
 {
-  "version": "m025-503",
-  "claimedBy": "branch feat/m025-503-mochi-three-bundle-fix",
-  "claimedAt": "2026-10-07T02:05:57.775Z",
-  "reason": "fix(mascot): track three.module.js bundle, universal mochi attach & guard uiux invariants",
+  "version": "m025-504",
+  "claimedBy": "branch feat/m025-504-listening-tabs-profile-polish",
+  "claimedAt": "2026-10-07T17:30:22.153Z",
+  "reason": "fix(ui): instant tab switch, listening scroll & button fix, profile name sync & hide home braincore [m025-504]",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

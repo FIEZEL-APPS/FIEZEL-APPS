@@ -310,18 +310,45 @@ body.reduce-motion .fsl-card-listening .fsl-mascot-slot{animation:none}
    di renderComplete/exit/renderHub/destroy. Blok Lanjut yang mengambang tidak perlu lagi
    melompati bottomnav yang sudah tidak ada. */
 body.fz-stage-sl.fsl-session-active .topbar,
-body.fz-stage-sl.fsl-session-active .bottomnav{display:none}
-/* SATU LAYAR TANPA GULIR (OWNER 2026-08-31). Baris di atas sudah menyembunyikan topbar
-   DAN bottom-nav selama sesi - tetapi padding bawah .app tetap 112px + safe-area, ruang
-   yang HANYA ada untuk memberi tempat bottom-nav yang sekarang tidak ada. Terukur: 112px
-   ruang mati di bawah kartu, penyumbang tunggal terbesar dari 163px gulir di 390x844.
-   Ini dikembalikan lebih dulu karena ia tidak memotong apa pun yang dilihat murid. */
-body.fz-stage-sl.fsl-session-active .app{
-  padding-top:10px;
-  padding-bottom:calc(12px + env(safe-area-inset-bottom,0px));
+body.fsl-session-active .topbar,
+body.fz-stage-sl.fsl-session-active .bottomnav,
+body.fsl-session-active .bottomnav,
+body:has(.fsl-card-listening) .bottomnav,
+body:has(.fsl-feedback) .bottomnav {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
-body.fz-stage-sl.fsl-session-active .fsl-feedback .fsl-actions{bottom:calc(14px + env(safe-area-inset-bottom,0px))}
-body.fz-stage-sl.fsl-session-active .fsl-feedback{padding-bottom:84px}
+
+body.fz-stage-sl.fsl-session-active .app,
+body.fsl-session-active .app {
+  padding-top: 10px;
+  padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+body.fz-stage-sl.fsl-session-active .fsl-card-listening,
+body.fsl-session-active .fsl-card-listening {
+  padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px)) !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+.fsl-feedback .fsl-actions,
+body.fz-stage-sl.fsl-session-active .fsl-feedback .fsl-actions,
+body.fsl-session-active .fsl-feedback .fsl-actions {
+  position: fixed !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  bottom: calc(18px + env(safe-area-inset-bottom, 0px)) !important;
+  z-index: 9999 !important;
+  width: min(520px, calc(100vw - 28px)) !important;
+  justify-content: stretch !important;
+  pointer-events: auto !important;
+}
+body.fz-stage-sl.fsl-session-active .fsl-feedback,
+body.fsl-session-active .fsl-feedback {
+  padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px)) !important;
+}
 /* Pau sudah hadir di pemutar (.fsl-player) sebagai maskot dengar; FAB pembimbing di pojok
    menutupi teks soal pada 320px dan menjadi Pau KEDUA yang bersaing dengan soal (aturan
    skill: Pau tidak pernah menghalangi UI). Selama item sesi aktif ia disembunyikan;
