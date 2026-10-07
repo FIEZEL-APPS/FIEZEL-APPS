@@ -198,6 +198,50 @@
     }
   }
 
+  function notifyMascot(reaction) {
+    try {
+      var m = document.querySelector('.jlpt-mascot-slot fiezel-mascot, fiezel-mascot.jlpt-mascot, .jlpt-mascot');
+      if (m) {
+        if (!m.__mochiAttached && window.FiezelMochiCompanion && typeof window.FiezelMochiCompanion.attach === 'function') {
+          window.FiezelMochiCompanion.attach(m);
+        }
+        if (typeof m.react === 'function') {
+          m.react(reaction);
+        } else if (m.__mochiInstance) {
+          var inst = m.__mochiInstance;
+          if (reaction === 'correct') {
+            inst.setMood?.('happy');
+            inst.setAura?.('green');
+            inst.setFx?.('stars');
+            inst.triggerHop?.(0.38);
+            inst.triggerHandGesture?.('cheer', 1.8);
+          } else if (reaction === 'wrong') {
+            inst.setMood?.('pout');
+            inst.setAura?.('pink');
+            inst.triggerHandGesture?.('sulk', 2.0);
+          } else if (reaction === 'question-shown') {
+            inst.setMood?.('dots');
+            inst.setBadge?.('chat_purple');
+            inst.setAura?.('purple');
+            inst.triggerEarWiggle?.(1.3);
+            inst.retractHands?.();
+          } else if (reaction === 'listening-start') {
+            inst.setMood?.('dots');
+            inst.setBadge?.('chat_purple');
+            inst.setAura?.('purple');
+            inst.triggerHandGesture?.('wave', 1.2);
+            inst.triggerEarWiggle?.(1.3);
+          } else if (reaction === 'listening-stop') {
+            inst.setMood?.('dots');
+            inst.setBadge?.('chat_purple');
+            inst.setAura?.('purple');
+            inst.retractHands?.();
+          }
+        }
+      }
+    } catch (_) {}
+  }
+
   function stopJlptAudio() {
     if (audioObj) {
       try {
@@ -214,6 +258,7 @@
     audioPlaying = false;
     activeAudioSource = null;
     updateAudioUi();
+    notifyMascot('listening-stop');
   }
 
   function playJlptSpeech(text, source) {
@@ -237,16 +282,19 @@
         utt.onstart = function () {
           audioPlaying = true;
           updateAudioUi();
+          notifyMascot('listening-start');
         };
         utt.onend = function () {
           audioPlaying = false;
           activeAudioSource = null;
           updateAudioUi();
+          notifyMascot('listening-stop');
         };
         utt.onerror = function () {
           audioPlaying = false;
           activeAudioSource = null;
           updateAudioUi();
+          notifyMascot('listening-stop');
         };
         window.speechSynthesis.speak(utt);
       } catch (err) {
@@ -279,6 +327,7 @@
         audioPlaying = false;
         activeAudioSource = null;
         updateAudioUi();
+        notifyMascot('listening-stop');
       };
 
       audioObj.onerror = function () {
@@ -296,11 +345,13 @@
           activeAudioSource = source;
           replayCount++;
           updateAudioUi();
+          notifyMascot('listening-start');
         }).catch(function (e) {
           console.warn('[JLPT Audio] Play error, fallback ke Web Speech:', e);
           audioPlaying = false;
           activeAudioSource = null;
           updateAudioUi();
+          notifyMascot('listening-stop');
           playJlptSpeech(fallbackScript, source);
         });
       }
@@ -367,8 +418,10 @@
     var isRight = (optId === correctOptId);
     if (isRight) {
       if (window.uiSfx) { try { window.uiSfx('correct'); } catch (_) {} }
+      notifyMascot('correct');
     } else {
       if (window.uiSfx) { try { window.uiSfx('wrong'); } catch (_) {} }
+      notifyMascot('wrong');
     }
 
     // Refresh feedback and highlight sheet button
@@ -1056,6 +1109,9 @@
             '</div>'
           : '') +
 
+          '<!-- 3D Mochi Companion Slot -->' +
+          '<div class="jlpt-mascot-slot"><fiezel-mascot class="jlpt-mascot"></fiezel-mascot></div>' +
+
           '<!-- Streamlined Single Audio Player Strip -->' +
           '<div class="jlpt-audio-row">' +
             '<button type="button" class="jlpt-primary-play-btn" id="jlptMainPlayBtn" onclick="togglePlayJlptPrimaryAudio()" aria-label="' + escapeHtml(t('jlpt.play-audio', 'Putar Audio')) + '">' +
@@ -1123,6 +1179,7 @@
     // Pre-populate bottom sheet with current item
     populateDetailSheet(q, correctOptId);
     updateAudioUi();
+    notifyMascot('question-shown');
   }
 
   // Keyboard Navigation Support

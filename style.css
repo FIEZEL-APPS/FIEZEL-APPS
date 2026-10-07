@@ -4960,8 +4960,8 @@ body.fz-lesson-mode.fz-stage-quiz .quiz-shell{padding-bottom:calc(28px + env(saf
    angka minimum itu tidak jadi satu-satunya yang bekerja di layar lebih lebar.
    CATATAN kaskade: --fz-paw-size TIDAK berlaku di mode panggung - aturan width di
    sinilah yang menang, jadi menaikkan variabel itu di .quiz-shell tidak berefek. */
-.quiz-stage .fz-paw-above{flex:0 0 auto;height:auto;margin:0;width:clamp(120px,38%,156px)}
-.quiz-stage .fz-paw-above fiezel-mascot{width:100%;height:auto}
+.quiz-stage .fz-paw-above{flex:0 0 auto;height:auto;margin:0;width:clamp(140px,38vw,172px);min-height:140px;max-height:175px;aspect-ratio:16/15;overflow:visible;background:transparent;border:none;box-shadow:none}
+.quiz-stage .fz-paw-above fiezel-mascot{width:100%;height:100%;min-height:140px;overflow:visible;background:transparent;border:none;box-shadow:none}
 .quiz-bubble{
   position:relative;flex:1 1 auto;min-width:0;
   padding:12px 14px;border:1.5px solid var(--line);border-radius:18px;background:var(--panel-soft);
@@ -4971,20 +4971,28 @@ body.fz-lesson-mode.fz-stage-quiz .quiz-shell{padding-bottom:calc(28px + env(saf
 .quiz-bubble::before,.quiz-bubble::after{content:'';position:absolute;top:50%;transform:translateY(-50%);border:9px solid transparent}
 .quiz-bubble::before{left:-19px;border-right-color:var(--line)}
 .quiz-bubble::after{left:-16px;border-right-color:var(--panel-soft)}
-@media (max-height:640px){.quiz-stage .fz-paw-above{width:clamp(64px,20%,96px)}.quiz-stage{margin-bottom:8px}}
-/* Audit F11 (2026-09-23): di ponsel gelembung di samping maskot hanya ~45% lebar layar -
-   satu kalimat soal jadi tujuh baris dan pilihan D terdorong keluar layar. Di bawah 640px
-   soal kembali selebar kartu; maskot mengecil dan duduk DI ATAS gelembung, ekornya
-   menunjuk ke atas. Lebar maskot (bukan tinggi) yang dikunci, jadi ruang tetap dipesan
-   saat render (kontrak nol-CLS PAW C3). */
+@media (max-height:640px){.quiz-stage .fz-paw-above{width:clamp(120px,25%,140px);min-height:120px}.quiz-stage{margin-bottom:8px}}
+/* Audit F11 (2026-09-23) & Mochi PWA: di bawah 640px soal kembali selebar kartu; maskot duduk
+   DI ATAS gelembung di tengah kartu dengan ruang lega 140px-160px untuk Three.js mochi. */
 @media (max-width:640px){
-  .quiz-stage{flex-direction:column;align-items:flex-start;gap:12px}
-  .quiz-stage .fz-paw-above{width:clamp(72px,22%,96px)}
+  .quiz-stage{flex-direction:column;align-items:center;gap:8px}
+  .quiz-stage .fz-paw-above{width:clamp(140px,38vw,168px);height:clamp(140px,35vw,160px);min-height:140px;margin:0 auto}
   .quiz-bubble{width:100%}
-  .quiz-bubble::before,.quiz-bubble::after{top:auto;left:28px;transform:none}
+  .quiz-bubble::before,.quiz-bubble::after{top:auto;left:50%;transform:translateX(-50%)}
   .quiz-bubble::before{top:-19px;border-right-color:transparent;border-bottom-color:var(--line)}
   .quiz-bubble::after{top:-16px;border-right-color:transparent;border-bottom-color:var(--panel-soft)}
 }
+
+/* 3D Volumetric Mochi Mascot Viewport */
+.fz-mochi-viewport{
+  position:absolute;top:0;left:0;width:100%;height:100%;
+  overflow:visible;display:flex;align-items:center;justify-content:center;
+  pointer-events:auto;z-index:2;
+}
+.fz-mochi-viewport canvas{overflow:visible;display:block}
+.fz-paw-slot:has(.fz-mochi-viewport),
+.fsl-mascot-slot:has(.fz-mochi-viewport),
+fiezel-mascot:has(.fz-mochi-viewport){overflow:visible!important}
 
 /* URUTAN LAPIS: KARTU DI ATAS MASKOT.
    .fz-paw-slot memasang z-index:1 dan .fz-mascot .fz-svg memakai overflow:visible - jadi
@@ -5133,7 +5141,16 @@ body.reduce-motion .fz-coach-bubble.is-paw-birth{animation:fzBubbleBirthFade .24
    selektor berspesifisitas lebih tinggi (menang tanpa peduli urutan muat).
    Angka 178%/-8% identik dengan pola kanonik di fiezel-motion.css. */
 .fsl-mascot-slot{position:relative}
-.fsl-mascot-slot:has(fiezel-mascot){overflow:hidden;background:var(--cream,#FDFAF3)}
+.fsl-mascot-slot:has(fiezel-mascot):not(:has(.fz-mochi-viewport)){overflow:hidden;background:var(--cream,#FDFAF3)}
+.fsl-mascot-slot:has(.fz-mochi-viewport){
+  overflow:visible!important;background:transparent!important;
+  width:clamp(130px,30vw,160px);height:clamp(120px,28vw,150px);
+  min-width:130px;min-height:120px;aspect-ratio:16/15;
+}
+.fsl-mascot-slot:has(.fz-mochi-viewport) fiezel-mascot.fsl-mascot{
+  position:relative;left:0;top:0;width:100%;height:100%;
+  transform:none;pointer-events:auto;overflow:visible;
+}
 .fsl-mascot-slot fiezel-mascot.fsl-mascot{
   position:absolute;left:50%;top:-8%;width:178%;height:auto;
   transform:translateX(-50%);
@@ -10324,4 +10341,42 @@ body.theme-dark .tutor-diagnostic-clue span {
 body.scene-night .tutor-diagnostic-clue svg,
 body.theme-dark .tutor-diagnostic-clue svg {
   color: #38BDF8 !important;
+}
+
+
+/* ==========================================================================
+   TRAVERTINE CARD & ZERO ISOLATED BOX PALETTE FOR QUIZ STAGE
+   ========================================================================== */
+.quiz-shell > .card,
+body.fz-stage-quiz .quiz-shell > .card,
+.quiz-shell .card {
+  background: linear-gradient(180deg, #FDF8F1 0%, #F5ECE0 100%) !important;
+  border: 1.5px solid #E6D9C8 !important;
+  border-radius: var(--radius-lg, 28px) !important;
+  box-shadow: 0 12px 36px rgba(46, 39, 36, 0.08) !important;
+}
+
+/* ZERO isolated box around Mochi companion */
+.quiz-stage .fz-paw-slot,
+.quiz-stage .fz-paw-above,
+.quiz-stage fiezel-mascot,
+.quiz-shell .fz-paw-side,
+.quiz-shell .fz-paw-side fiezel-mascot,
+.fz-mochi-viewport {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Clean white tile options with delicate warm sand border */
+.quiz-shell .options button:not(.correct):not(.wrong):not(.is-correct):not(.is-selected),
+.quiz-shell .options .option:not(.correct):not(.wrong):not(.is-correct):not(.is-selected),
+.quiz-shell button.option:not(.correct):not(.wrong):not(.is-correct):not(.is-selected),
+.quiz-shell .option:not(.correct):not(.wrong):not(.is-correct):not(.is-selected) {
+  background: #FFFFFF !important;
+  border: 1.5px solid #E8DFD3 !important;
+  border-radius: 16px !important;
+  color: #1E293B !important;
+  box-shadow: 0 4px 10px rgba(46, 39, 36, 0.04) !important;
+  font-weight: 600 !important;
 }

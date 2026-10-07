@@ -3155,22 +3155,16 @@ html body #tutorStuck:active {
 }
 
 /* ==========================================================================
-   AUDIT FIX 1: ZERO MASCOT HARD ENFORCEMENT (ALL VIEWS)
+   AUDIT FIX 1: ZERO LEGACY MASCOT HARD ENFORCEMENT (NON-PRACTICE VIEWS)
+   Suppresses legacy flat 2D decorative paws on maps, account, and auth views.
    ========================================================================== */
 .path-mascot,
-.writing-stage,
 .writing-mascot,
 .fz2-level-paw,
-fiezel-mascot,
 .coach-strip-face,
-.fz-paw-slot,
 .fz-paw-peek,
 .fz-paw-head,
-.quiz-mascot,
-[data-mascot],
 .mascot-wrap,
-.fsl-mascot-slot,
-.fsl-mascot,
 .paw-avatar,
 .paw-face {
   display: none !important;
@@ -3179,6 +3173,332 @@ fiezel-mascot,
   height: 0 !important;
   opacity: 0 !important;
   pointer-events: none !important;
+}
+
+/* ==========================================================================
+   AUDIT FIX 1B: 3D MOCHI MASCOT COMPANION PRACTICE STAGE SLOTS & VIEWPORT
+   Enforces prominent, unclipped 3D Volumetric Jelly Mochi companion across
+   Practice Stages (Quiz, Chokai/Listening, Skills Lab, JLPT) on Mobile & Desktop.
+   ========================================================================== */
+.quiz-stage .fz-paw-slot,
+.quiz-stage .fz-paw-above,
+.quiz-stage fiezel-mascot,
+.quiz-stage .fz-paw-slot fiezel-mascot,
+.quiz-shell .fz-paw-side,
+.quiz-shell .fz-paw-side fiezel-mascot,
+.quiz-mascot,
+.quiz-mascot fiezel-mascot,
+.fsl-mascot-slot,
+.fsl-mascot,
+.fsl-player fiezel-mascot,
+.fsl-card fiezel-mascot,
+.jlpt-mascot-slot,
+.jlpt-mascot,
+.jlpt-mascot-slot fiezel-mascot,
+fiezel-mascot:has(.fz-mochi-viewport),
+.fz-paw-slot:has(.fz-mochi-viewport) {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  overflow: visible !important;
+}
+
+/* 3D Mochi Viewport: full dimensions, zero clipping on paws, badges, or ears */
+.fz-mochi-viewport,
+.quiz-stage .fz-mochi-viewport,
+.fsl-mascot-slot .fz-mochi-viewport,
+.jlpt-mascot-slot .fz-mochi-viewport {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  overflow: visible !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  pointer-events: auto !important;
+  z-index: 2 !important;
+}
+
+.fz-mochi-viewport canvas {
+  overflow: visible !important;
+  touch-action: pan-y !important;
+  pointer-events: auto !important;
+  display: block !important;
+}
+
+/* Quiz Stage Layout - Mobile (<640px) */
+@media (max-width: 640px) {
+  .quiz-stage {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    margin: 0 0 10px 0 !important;
+    width: 100% !important;
+  }
+
+  .quiz-stage .fz-paw-slot,
+  .quiz-stage .fz-paw-above {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    flex: 0 0 auto !important;
+    width: clamp(140px, 38vw, 172px) !important;
+    height: clamp(140px, 36vw, 165px) !important;
+    min-height: 140px !important;
+    max-height: 175px !important;
+    min-width: 140px !important;
+    aspect-ratio: 16/15 !important;
+    margin: 0 auto !important;
+    position: relative !important;
+    overflow: visible !important;
+    pointer-events: auto !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .quiz-stage fiezel-mascot,
+  .quiz-stage .fz-paw-slot fiezel-mascot {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 140px !important;
+    position: relative !important;
+    overflow: visible !important;
+    pointer-events: auto !important;
+  }
+
+  .quiz-bubble {
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .quiz-bubble::before,
+  .quiz-bubble::after {
+    top: auto !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+  }
+
+  .quiz-bubble::before {
+    top: -19px !important;
+    border-right-color: transparent !important;
+    border-bottom-color: var(--line, #E2E8F0) !important;
+  }
+
+  .quiz-bubble::after {
+    top: -16px !important;
+    border-right-color: transparent !important;
+    border-bottom-color: #181824 !important;
+  }
+}
+
+/* Unified Warm Travertine / Daifuku Card Theme for Whole Quiz Card */
+.quiz-shell > .card,
+body.fz-stage-quiz .quiz-shell > .card,
+.quiz-shell .card {
+  background: linear-gradient(180deg, #FDF8F1 0%, #F5ECE0 100%) !important;
+  border: 1.5px solid #E6D9C8 !important;
+  border-radius: var(--radius-lg, 28px) !important;
+  box-shadow: 0 12px 36px rgba(46, 39, 36, 0.08) !important;
+}
+
+/* ZERO isolated box around Mochi companion: seamless floating stage */
+.quiz-stage .fz-paw-slot,
+.quiz-stage .fz-paw-above,
+.quiz-stage fiezel-mascot,
+.quiz-stage .fz-paw-slot fiezel-mascot,
+.quiz-shell .fz-paw-side,
+.quiz-shell .fz-paw-side fiezel-mascot,
+.fz-mochi-viewport {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Answer option buttons: clean white tiles with delicate warm border */
+.quiz-shell .options button:not(.correct):not(.wrong):not(.is-correct):not(.is-selected),
+.quiz-shell .options .option:not(.correct):not(.wrong):not(.is-correct):not(.is-selected),
+.quiz-shell button.option:not(.correct):not(.wrong):not(.is-correct):not(.is-selected),
+.quiz-shell .option:not(.correct):not(.wrong):not(.is-correct):not(.is-selected) {
+  background: #FFFFFF !important;
+  border: 1.5px solid #E8DFD3 !important;
+  border-radius: 16px !important;
+  color: #1E293B !important;
+  box-shadow: 0 4px 10px rgba(46, 39, 36, 0.04) !important;
+  font-weight: 600 !important;
+  transition: transform 0.12s ease, background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+.quiz-shell .options button:not(.correct):not(.wrong):hover:not(:disabled),
+.quiz-shell .options .option:not(.correct):not(.wrong):hover:not(:disabled),
+.quiz-shell button.option:not(.correct):not(.wrong):hover:not(:disabled) {
+  background: #FAF8F4 !important;
+  border-color: #D1C2AF !important;
+  transform: translateY(-1px) !important;
+}
+
+.quiz-shell .options button:not(.correct):not(.wrong):active:not(:disabled),
+.quiz-shell .options .option:not(.correct):not(.wrong):active:not(:disabled) {
+  transform: scale(0.985) !important;
+}
+
+/* Quiz Stage Layout - Desktop & Tablets (>=641px) */
+@media (min-width: 641px) {
+  .quiz-stage {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 16px !important;
+    margin: 0 0 14px 0 !important;
+    width: 100% !important;
+  }
+
+  .quiz-stage .fz-paw-slot,
+  .quiz-stage .fz-paw-above {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    flex: 0 0 auto !important;
+    width: clamp(150px, 28%, 180px) !important;
+    height: clamp(140px, 24vw, 165px) !important;
+    min-height: 140px !important;
+    min-width: 150px !important;
+    aspect-ratio: 16/15 !important;
+    position: relative !important;
+    overflow: visible !important;
+    pointer-events: auto !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .quiz-stage fiezel-mascot,
+  .quiz-stage .fz-paw-slot fiezel-mascot {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 140px !important;
+    position: relative !important;
+    overflow: visible !important;
+    pointer-events: auto !important;
+  }
+
+  .quiz-bubble {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+}
+
+/* Desktop Side Mascot Column in Quiz Shell (>=980px) */
+@media (min-width: 980px) {
+  .quiz-shell .fz-paw-side {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    width: clamp(148px, 16vw, 192px) !important;
+    min-height: 148px !important;
+    overflow: visible !important;
+    pointer-events: auto !important;
+  }
+  .quiz-shell .fz-paw-side fiezel-mascot {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 148px !important;
+    overflow: visible !important;
+    pointer-events: auto !important;
+  }
+}
+
+/* Skills Lab (Chokai / Listening & Speaking) Mascot Slots */
+.fsl-mascot-slot {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  overflow: visible !important;
+  pointer-events: auto !important;
+  min-height: 130px !important;
+  min-width: 130px !important;
+  width: clamp(130px, 30vw, 160px) !important;
+  height: clamp(120px, 28vw, 150px) !important;
+  aspect-ratio: 16/15 !important;
+  background: transparent !important;
+  border-radius: 0 !important;
+}
+
+.fsl-mascot-slot:has(fiezel-mascot),
+.fsl-mascot-slot:has(.fz-mochi-viewport) {
+  overflow: visible !important;
+  background: transparent !important;
+}
+
+.fsl-mascot,
+.fsl-mascot-slot fiezel-mascot,
+.fsl-mascot-slot fiezel-mascot.fsl-mascot {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 120px !important;
+  overflow: visible !important;
+  pointer-events: auto !important;
+  left: 0 !important;
+  top: 0 !important;
+  transform: none !important;
+}
+
+/* JLPT Listening Exam Mascot Slot */
+.jlpt-mascot-slot {
+  position: relative !important;
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  min-height: 145px !important;
+  height: 165px !important;
+  overflow: visible !important;
+  pointer-events: auto !important;
+}
+
+@media (max-width: 480px) {
+  .jlpt-mascot-slot {
+    min-height: 140px !important;
+    height: 145px !important;
+  }
+}
+
+.jlpt-mascot,
+.jlpt-mascot-slot .jlpt-mascot,
+.jlpt-mascot-slot fiezel-mascot {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 260px !important;
+  position: relative !important;
+  overflow: visible !important;
+  pointer-events: auto !important;
 }
 
 /* ==========================================================================

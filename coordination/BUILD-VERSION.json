@@ -1,7 +1,7 @@
 {
-  "version": "m025-501",
-  "claimedBy": "branch feat/m025-501-unify-topbar-jitter-fix",
-  "claimedAt": "2026-10-06T20:56:51.975Z",
-  "reason": "fix(topbar): eliminate scroll jitter, remove duplicate kelasku card, unify topbar dimensions across all panels [m025-501]",
+  "version": "m025-502",
+  "claimedBy": "branch feat/m025-502-3d-mochi-companion",
+  "claimedAt": "2026-10-07T00:35:33.727Z",
+  "reason": "feat(mascot): 3d mochi companion, travertine card theme, and chokai integration",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
