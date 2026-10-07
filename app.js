@@ -8695,6 +8695,15 @@ function showAuthGate(at,next){
          menanyakannya lagi. Kode KelasKu dari layar masuk dipakai persis seperti kode yang
          dulu diketik di perkenalan - disimpan, lalu guru diberi tahu murid ini bergabung. */
       try{self.FiezelOnboarding?.markLocaleSelected?.(self,self.FiezelI18n?.getLocale?.()||'id')}catch(_){}
+      try{
+        const acc=self.FiezelAccount?.getAccount?.()||self.FiezelAccount?.state?.();
+        const h=acc?.handle||(typeof self.FiezelGoogle!=='undefined'&&self.FiezelGoogle?.rememberedEmail?self.FiezelGoogle.rememberedEmail().split('@')[0]:'');
+        if(h){
+          if(!state.userName||state.userName===FALLBACK_LEARNER_NAME||state.userName==='Rian Pratama')state.userName=h;
+          try{rememberSocialHandle(h)}catch(_){}
+          save();
+        }
+      }catch(_){}
       if(role==='murid'&&classCode){
         saveClassCode(classCode);
         try{self.FiezelLearnerFlow?.announceJoin?.()}catch(_){}
@@ -9225,7 +9234,7 @@ function examWatchSync(){
 }
 try{document.addEventListener('fiezel-exam-lock',examWatchSync)}catch(_){}
 
-function go(v,opts){if((v==='ask'||v==='search')&&!aiDoorAllowed())return false;if(isVerifiedTeacher()&&v!=='tutor'){v='tutor'}if(!VALID_VIEWS.has(v)){showToast(FiezelI18n.t('nav.halaman-tak-tersedia'));return false}/* m025-314: penolakan berbahasa duduk DI SINI, bukan di daftar kartu — setiap pintu ke permukaan yang belum punya isi bahasa target lewat go(), termasuk pintu yang belum ditulis. */if(targetLangSurfaceBlocked(v)){showToast(FiezelI18n.t('bahasa.permukaan-terkunci',{bahasa:FiezelI18n.t('bahasa.'+activeTargetLang())}));return false}if(opts?.viaHistory!==true)haptic('tap');uiSfx('nav');dropStages();if(opts?.viaHistory!==true)pushBackNavView(v);state.view=v;if(v==='classroom'||v==='home'){try{inboxPoll(v==='classroom')}catch(_){}if(v==='home'){try{const cur=Number(sessionStorage.getItem('fz_today_vocab_visit')||0);sessionStorage.setItem('fz_today_vocab_visit',String(cur+1))}catch(_){}}}const swap=()=>{save();render()};if(document.startViewTransition&&state.preferences?.motion!==false&&!prefersReducedMotion()){vtViewPaint=true;try{const __vt=document.startViewTransition(swap);const __done=()=>{vtViewPaint=false};if(__vt&&__vt.finished&&typeof __vt.finished.finally==='function')__vt.finished.finally(__done);else setTimeout(__done,300)}catch(_){try{swap()}finally{vtViewPaint=false}}}else swap();return true} window.go=go;
+function go(v,opts){if((v==='ask'||v==='search')&&!aiDoorAllowed())return false;if(isVerifiedTeacher()&&v!=='tutor'){v='tutor'}if(!VALID_VIEWS.has(v)){showToast(FiezelI18n.t('nav.halaman-tak-tersedia'));return false}/* m025-314: penolakan berbahasa duduk DI SINI, bukan di daftar kartu — setiap pintu ke permukaan yang belum punya isi bahasa target lewat go(), termasuk pintu yang belum ditulis. */if(targetLangSurfaceBlocked(v)){showToast(FiezelI18n.t('bahasa.permukaan-terkunci',{bahasa:FiezelI18n.t('bahasa.'+activeTargetLang())}));return false}if(opts?.viaHistory!==true)haptic('tap');uiSfx('nav');dropStages();if(opts?.viaHistory!==true)pushBackNavView(v);state.view=v;if(v==='classroom'||v==='home'){try{inboxPoll(v==='classroom')}catch(_){}if(v==='home'){try{const cur=Number(sessionStorage.getItem('fz_today_vocab_visit')||0);sessionStorage.setItem('fz_today_vocab_visit',String(cur+1))}catch(_){}}}const swap=()=>{save();render()};const isBottomTab=['home','latihan','classroom','game','progress','online','profile'].includes(v);if(!isBottomTab&&document.startViewTransition&&state.preferences?.motion!==false&&!prefersReducedMotion()){vtViewPaint=true;try{const __vt=document.startViewTransition(swap);const __done=()=>{vtViewPaint=false};if(__vt&&__vt.finished&&typeof __vt.finished.finally==='function')__vt.finished.finally(__done);else setTimeout(__done,300)}catch(_){try{swap()}finally{vtViewPaint=false}}}else swap();return true} window.go=go;
 function pushBackNavView(v){try{return self.FiezelBackNav?.pushView?.(v)===true}catch{return false}}
 /* ---- m025-117 lapisan layar-di-dalam-view (stage) ---------------------------------
  * OWNER: "misalnya sudah masuk ke dalam folder, dan ingin kembali, ketika swipe back malah
@@ -10911,6 +10920,7 @@ function braincoreFixBasics(){
 window.braincoreFixBasics=braincoreFixBasics;
 /** Kartu "Kata Braincore Hari Ini" di Beranda. */
 function braincoreHomeCardMarkup(){
+  return ''; /* User request: HILANGKAN SELURUH KARTU TENTANG KATA BRAINCORE HARI INI DI HALAMAN PANEL HOME */
   if(jaCourseOn())return '';
   if(!(Array.isArray(state.history)&&state.history.length))return '';
   let policy=null;try{policy=buildAdaptivePolicy()}catch{}
@@ -12039,6 +12049,11 @@ function openFiezelAuthModal(initialTab){
             const res=await self.FiezelAccount?.login?.({handle,password});
             if(res?.ok){
               const h=res.account?.handle||self.FiezelAccount?.getAccount?.()?.handle||handle;
+              if(h){
+                state.userName=h;
+                try{rememberSocialHandle(h)}catch(_){}
+                save();
+              }
               showToast(`Berhasil masuk sebagai @${h}`);
               closeModal();
               setTimeout(openSettings,100);
@@ -12055,6 +12070,11 @@ function openFiezelAuthModal(initialTab){
             const res=await self.FiezelAccount?.register?.({handle,password,confirmPassword});
             if(res?.ok){
               const h=res.account?.handle||self.FiezelAccount?.getAccount?.()?.handle||handle;
+              if(h){
+                state.userName=h;
+                try{rememberSocialHandle(h)}catch(_){}
+                save();
+              }
               showToast(FiezelI18n.t('account.toast-dibuat',{handle:h}),'success');
               closeModal();
               setTimeout(openSettings,100);
@@ -18172,14 +18192,27 @@ window.editProfileName=function(){
 function tactileProfileCockpitMarkup(opts={}){
   const t=(k,f)=>{const v=FiezelI18n.t(k);return(v===k||!v)?f:v};
   const rawName=learnerName();
-  const name=(rawName && rawName!=='murid' && rawName!=='Fitra' && rawName!=='Sobat')?rawName:'Rian Pratama';
-  const initials=(name==='Rian Pratama')?'RP':(()=>{
+  const acc=self.FiezelAccount?.getAccount?.()||self.FiezelAccount?.state?.();
+  const accHandle=acc?.handle||'';
+  const googleEmail=(typeof self.FiezelGoogle!=='undefined'&&self.FiezelGoogle?.rememberedEmail)?self.FiezelGoogle.rememberedEmail():'';
+  const socialH=storedSocialHandle()||'';
+  const resolvedHandle=accHandle||socialH||(googleEmail?googleEmail.split('@')[0]:'')||'murid';
+
+  let name=(rawName && rawName!=='murid' && rawName!=='Fitra' && rawName!=='Sobat' && rawName!=='Rian Pratama')?rawName:'';
+  if(!name&&acc?.teacherName)name=acc.teacherName;
+  if(!name&&accHandle)name=accHandle;
+  if(!name&&googleEmail)name=googleEmail.split('@')[0];
+  if(!name&&socialH)name=socialH;
+  if(!name&&rawName&&rawName!=='Rian Pratama')name=rawName;
+  if(!name)name=t('common.sapaan-netral','Murid');
+
+  const initials=(()=>{
     const parts=String(name||'').trim().split(/\s+/).filter(Boolean);
-    if(parts.length===0)return 'RP';
+    if(parts.length===0)return 'MU';
     if(parts.length===1)return parts[0].slice(0,2).toUpperCase();
     return (parts[0][0]+parts[parts.length-1][0]).toUpperCase();
   })();
-  const handle=(name==='Rian Pratama')?'rian_pratama':(storedSocialHandle()||(typeof socialHandleCandidates==='function'?socialHandleCandidates(name)[0]:'rian_pratama'));
+  const handle=resolvedHandle;
   const level=getActiveLevel()||'A1';
   const classCode=typeof learnerClassCode==='function'?learnerClassCode():'';
   const schoolName=classCode?(t('profile.class-prefix','Kelas')+' '+esc(classCode)):t('profile.school-default','SMA Negeri 1');
@@ -20000,20 +20033,31 @@ function installScrollRubberBand(){
   window.addEventListener('touchend',releaseRubberBand,{passive:true});
   window.addEventListener('touchcancel',releaseRubberBand,{passive:true});
 }
-function bootFiezel(){
-  try{installScrollRubberBand()}catch(_){}
+function syncLearnerAccountOnBoot(){
   try{
     if(self.FiezelAccount && self.FiezelAccount.getMe){
       self.FiezelAccount.getMe().then(function(res){
-        if(res && res.ok && res.account && res.account.role === 'teacher'){
-          try{localStorage.setItem('fz_teacher_mode','1')}catch(_){}
-          if(self.FiezelTeacherShell && typeof self.FiezelTeacherShell.render === 'function'){
-            self.FiezelTeacherShell.render();
+        if(res && res.ok && res.account){
+          const h=res.account.handle;
+          if(h&&(!state.userName||state.userName===FALLBACK_LEARNER_NAME||state.userName==='Rian Pratama')){
+            state.userName=h;
+            try{rememberSocialHandle(h)}catch(_){}
+            save();
+          }
+          if(res.account.role === 'teacher'){
+            try{localStorage.setItem('fz_teacher_mode','1')}catch(_){}
+            if(self.FiezelTeacherShell && typeof self.FiezelTeacherShell.render === 'function'){
+              self.FiezelTeacherShell.render();
+            }
           }
         }
       }).catch(function(){});
     }
   }catch(_){}
+}
+function bootFiezel(){
+  try{installScrollRubberBand()}catch(_){}
+  try{syncLearnerAccountOnBoot()}catch(_){}
   return maybeAutoDetectLocale().then(function(){return load()}).catch(e=>{dismissBootSplash();
   try{console.debug('FIEZEL boot error:',e)}catch(_){}
   const offline=typeof navigator!=='undefined'&&navigator.onLine===false,fileProto=typeof location!=='undefined'&&location.protocol==='file:';

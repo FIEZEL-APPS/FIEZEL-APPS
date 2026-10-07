@@ -2630,7 +2630,7 @@ button.primary,
   color: #64748B !important;
 }
 
-/* 2. Quiz & Flashcard Session: Hide bottom nav completely to prevent overlap and accidental tab switching */
+/* 2. Quiz, Flashcard & Skills Lab / Listening Session: Hide bottom nav completely to prevent overlap and accidental tab switching */
 html body.fz-stage-quiz nav.bottomnav,
 html body.fz-stage-quiz .bottomnav,
 html body:has(.quiz-shell) nav.bottomnav,
@@ -2643,6 +2643,24 @@ body.fz-stage-quiz nav.bottomnav,
 body.fz-stage-quiz .bottomnav,
 body:has(.quiz-shell) nav.bottomnav,
 body:has(.quiz-shell) .bottomnav,
+html body.fsl-session-active nav.bottomnav,
+html body.fsl-session-active .bottomnav,
+html body.fz-stage-sl nav.bottomnav,
+html body.fz-stage-sl .bottomnav,
+html body.fz-stage-sl.fsl-session-active nav.bottomnav,
+html body.fz-stage-sl.fsl-session-active .bottomnav,
+html body:has(.fsl-card-listening) nav.bottomnav,
+html body:has(.fsl-card-listening) .bottomnav,
+html body:has(.fsl-feedback) nav.bottomnav,
+html body:has(.fsl-feedback) .bottomnav,
+html body:has(#speakingListeningRoot .fsl-card-listening) nav.bottomnav,
+html body:has(#speakingListeningRoot .fsl-card-listening) .bottomnav,
+body.fsl-session-active nav.bottomnav,
+body.fsl-session-active .bottomnav,
+body:has(.fsl-card-listening) nav.bottomnav,
+body:has(.fsl-card-listening) .bottomnav,
+body:has(.fsl-feedback) nav.bottomnav,
+body:has(.fsl-feedback) .bottomnav,
 html body.fz-lesson-mode nav.bottomnav,
 html body.fz-lesson-mode .bottomnav,
 html body:has(.card-flashcard) nav.bottomnav,
@@ -2656,6 +2674,8 @@ body.fz-lesson-mode .bottomnav,
 body:has(.card-flashcard) nav.bottomnav,
 body:has(.card-flashcard) .bottomnav {
   display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
 /* Level Cards (e.g. Mulai latihan level A1, A2, etc.) */
@@ -3734,12 +3754,43 @@ html body:not(.fz-teacher-mode) #app #quizPassage h3,
   font-weight: 800 !important;
 }
 
-/* Grammar Cloze Disabled Input High-Contrast */
-.cloze-input:disabled {
+/* Grammar Cloze Input High-Contrast (While Typing & Disabled) */
+.cloze-input,
+input.cloze-input,
+#clozeInput {
+  color: #0F172A !important;
+  -webkit-text-fill-color: #0F172A !important;
+  background-color: #FFFFFF !important;
+  border: 1.5px solid #CBD5E1 !important;
+  font-weight: 600 !important;
+  font-size: 16px !important;
+  caret-color: #0F172A !important;
+}
+
+.cloze-input:focus,
+.cloze-input:focus-visible,
+#clozeInput:focus {
+  color: #0F172A !important;
+  -webkit-text-fill-color: #0F172A !important;
+  background-color: #FFFFFF !important;
+  border-color: #0284C7 !important;
+  outline: 2px solid rgba(2, 132, 199, 0.25) !important;
+  outline-offset: 2px !important;
+}
+
+.cloze-input::placeholder,
+#clozeInput::placeholder {
+  color: #64748B !important;
+  -webkit-text-fill-color: #64748B !important;
+  font-weight: 500 !important;
+}
+
+.cloze-input:disabled,
+#clozeInput:disabled {
   color: #0F172A !important;
   -webkit-text-fill-color: #0F172A !important;
   font-weight: 700 !important;
-  background: #F1F5F9 !important;
+  background-color: #F1F5F9 !important;
   border-color: #CBD5E1 !important;
   opacity: 1 !important;
 }

@@ -288,11 +288,39 @@ button.brand-button {
   mix-blend-mode: normal !important;
 }
 
+html body.fz-lesson-mode nav.bottomnav,
+html body.fz-lesson-mode .bottomnav,
+html body.fz-stage-quiz nav.bottomnav,
+html body.fz-stage-quiz .bottomnav,
+html body.fsl-session-active nav.bottomnav,
+html body.fsl-session-active .bottomnav,
+html body.fz-stage-sl.fsl-session-active nav.bottomnav,
+html body.fz-stage-sl.fsl-session-active .bottomnav,
+html body.fz-stage-sl nav.bottomnav,
+html body.fz-stage-sl .bottomnav,
+html body:has(#speakingListeningRoot .fsl-card-listening) nav.bottomnav,
+html body:has(#speakingListeningRoot .fsl-card-listening) .bottomnav,
+html body:has(.fsl-card-listening) nav.bottomnav,
+html body:has(.fsl-card-listening) .bottomnav,
+html body:has(.fsl-feedback) nav.bottomnav,
+html body:has(.fsl-feedback) .bottomnav,
+html body:has(.card-flashcard) nav.bottomnav,
+html body:has(.card-flashcard) .bottomnav,
+html body:has(.quiz-shell) nav.bottomnav,
+html body:has(.quiz-shell) .bottomnav,
 body.fz-lesson-mode .bottomnav,
 body.fz-stage-quiz .bottomnav,
+body.fsl-session-active .bottomnav,
+body.fz-stage-sl.fsl-session-active .bottomnav,
+body.fz-stage-sl .bottomnav,
+body:has(#speakingListeningRoot .fsl-card-listening) .bottomnav,
+body:has(.fsl-card-listening) .bottomnav,
+body:has(.fsl-feedback) .bottomnav,
 body:has(.card-flashcard) .bottomnav,
 body:has(.quiz-shell) .bottomnav {
   display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
 .bottomnav .nav {
@@ -5521,7 +5549,20 @@ button.fiezel-language-choice {
 /* m025-454 Gelombang 1 audit kabel BrainCore: kartu "Kata Braincore Hari Ini" (Beranda), panel
    bukti belajar (Progres), dan baris fokus hub Grammar. Teks gelap di atas kartu terang, tombol
    amber bertulisan gelap: kontras di atas 4,5:1 pada keduanya. */
-.fz-bc-card{margin:12px 0;padding:14px 16px;border-radius:20px;background:#FFFFFF;border:1px solid #F1E3C6;box-shadow:0 4px 0 #F1E3C6;color:#1F1A14;display:grid;gap:10px}
+/* User directive: HILANGKAN SELURUH KARTU TENTANG KATA BRAINCORE HARI INI DI HALAMAN PANEL HOME */
+.today-home-cockpit .fz-bc-card,
+[data-testid="braincore-home-card"],
+.fz-bc-card {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+}
 .fz-bc-head{display:flex;align-items:center;gap:8px;font-size:.82rem;letter-spacing:.04em;text-transform:uppercase;color:#7A4E00}
 .fz-bc-arah{margin:0;font-size:1rem;font-weight:700;line-height:1.35;color:#1F1A14}
 .fz-bc-row{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding-top:10px;border-top:1px dashed #F1E3C6}
