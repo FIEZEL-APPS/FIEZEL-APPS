@@ -77,6 +77,10 @@ const DEFAULT_MODEL_CHAINS = {
     review: ['gemini-pro-latest', 'gemini-3.5-flash', 'gemini-3.8-flash', 'gemini-flash-latest'],
     fast:   ['gemini-3.5-flash', 'gemini-3.8-flash', 'gemini-flash-lite-latest', 'gemini-flash-latest'],
   },
+  mam: {
+    review: ['mamcore/deepseek-v4-pro', 'mamcore/gemini-3.7-flash', 'mamcore/glm-5.3', 'mamcore/claude-sonnet-4.6'],
+    fast:   ['mamcore/deepseek-v4.1-flash', 'mamcore/gemini-3.7-flash', 'mamcore/glm-5.3-flash'],
+  },
   groq: {
     review: ['openai/gpt-oss-120b'],
     fast:   ['openai/gpt-oss-120b'],
@@ -84,6 +88,7 @@ const DEFAULT_MODEL_CHAINS = {
 };
 const MODEL_ENV = {
   gemini: { review: 'FIEZEL_BOT_GEMINI_REVIEW_MODELS', fast: 'FIEZEL_BOT_GEMINI_FAST_MODELS' },
+  mam:    { review: 'FIEZEL_BOT_MAM_REVIEW_MODELS',    fast: 'FIEZEL_BOT_MAM_FAST_MODELS' },
   groq:   { review: 'FIEZEL_BOT_GROQ_MODELS',          fast: 'FIEZEL_BOT_GROQ_MODELS' },
 };
 
@@ -168,7 +173,7 @@ function geminiKeyList(env = process.env) {
 /** Indeks kunci yang terakhir berhasil — panggilan berikutnya mulai dari sini. */
 let geminiKeyCursor = 0;
 /** Status yang berarti "kunci ini tidak bisa dipakai sekarang" → coba kunci lain, model sama. */
-const KEY_ROTATE_STATUS = new Set([401, 403, 429]);
+const KEY_ROTATE_STATUS = new Set([401, 402, 403, 429]);
 /** Kunci yang ditolak Google (401/403): dilewati sampai proses selesai. Isinya indeks, bukan kunci. */
 const geminiDeadKeys = new Set();
 /** "model|indeks" → waktu kunci itu boleh dicoba lagi untuk model itu setelah 429. */
@@ -186,6 +191,21 @@ const geminiModelStrikes = new Map();
 const geminiModelExhausted = new Set();
 
 /**
+ * Daftar kunci MAM AI: MAM_API_KEYS (dipisah koma/spasi/baris baru) lalu
+ * MAM_API_KEY, tanpa duplikat. Kunci TIDAK PERNAH dicetak; log hanya "kunci#N".
+ */
+function mamKeyList(env = process.env) {
+  const all = [...String(env.MAM_API_KEYS || '').split(/[\s,;]+/), String(env.MAM_API_KEY || '')]
+    .map(k => k.trim()).filter(Boolean);
+  return [...new Set(all)];
+}
+let mamKeyCursor = 0;
+const mamDeadKeys = new Set();
+const mamKeyCooldown = new Map();
+const mamModelStrikes = new Map();
+const mamModelExhausted = new Set();
+
+/**
  * Ringkasan galat LLM yang JUJUR dan tidak membanjiri log. Sebelum ini setiap kegagalan
  * dicetak satu per satu ("kunci#1 … kunci#23 …") sehingga laporan heal 4.000 karakter
  * habis oleh daftar kunci dan alasan sebenarnya tenggelam. Label tetap memuat `kunci#N`
@@ -195,7 +215,7 @@ function summarizeLlmErrors(errors) {
   const byModel = new Map();
   for (const raw of errors || []) {
     const e = String(raw);
-    const m = /^((?:gemini|groq)\/[^\s:]+)(?:\s+(kunci#\d+))?:/.exec(e);
+    const m = /^((?:gemini|mam|groq)\/[^\s:]+)(?:\s+(kunci#\d+))?:/.exec(e);
     const model = m ? m[1] : 'llm';
     const keyTag = m && m[2] ? m[2] : '';
     const status = (/HTTP (\d{3})/.exec(e) || [, (/timeout/i.test(e) ? 'timeout' : 'lain')])[1];
@@ -630,6 +650,7 @@ async function queryLLM(prompt, systemInstruction = '', opts = {}) {
   const timeoutMs = opts.timeoutMs || (tier === 'review' ? LLM_REVIEW_TIMEOUT_MS : LLM_TIMEOUT_MS);
   const maxOutputTokens = opts.maxOutputTokens || (tier === 'review' ? 16384 : 4096);
   const geminiKeys = geminiKeyList();
+  const mamKeys = mamKeyList();
   const groqKey = process.env.GROQ_API_KEY || '';
   const errors = [];
   const ctl = {
@@ -694,7 +715,72 @@ async function queryLLM(prompt, systemInstruction = '', opts = {}) {
     }
   }
 
-  // 2. Groq
+  // 2. MAM AI (Router OpenAI-Compatible: https://router.mamam.cc/v1)
+  if (mamKeys.length) {
+    const mamBaseUrl = (process.env.MAM_BASE_URL || 'https://router.mamam.cc/v1').replace(/\/+$/, '');
+    const messages = [];
+    if (systemInstruction) messages.push({ role: 'system', content: systemInstruction });
+    messages.push({ role: 'user', content: prompt });
+    const n = mamKeys.length;
+    const keyCtl = n > 1 ? { ...ctl, retryDelays: ctl.retryDelays.slice(0, 1), noRetryStatus: KEY_ROTATE_STATUS } : ctl;
+
+    for (const model of modelChainFor('mam', tier)) {
+      if (n > 1 && mamModelExhausted.has(model)) {
+        errors.push(`mam/${model}: dilewati (semua ${n} kunci telah dicoba pada run ini)`);
+        continue;
+      }
+      const strike = mamModelStrikes.get(model) || 0;
+      const cooldownMs = Math.min(KEY_COOLDOWN_MS * (strike + 1), KEY_COOLDOWN_MAX_MS);
+      let skipped = 0, saw429 = false, sawNonRotate = false;
+      for (let k = 0; k < n; k++) {
+        const idx = (mamKeyCursor + k) % n;
+        const coolKey = `${model}|${idx}`;
+        if (n > 1 && (mamDeadKeys.has(idx) || (mamKeyCooldown.get(coolKey) || 0) > Date.now())) { skipped++; continue; }
+        const state = {};
+        const payload = {
+          model,
+          messages,
+          temperature: 0.15,
+          max_tokens: Math.min(maxOutputTokens, 8192),
+        };
+        if (opts.json) payload.response_format = { type: 'json_object' };
+
+        const text = await tryModel(`mam/${model}${n > 1 ? ` kunci#${idx + 1}` : ''}`,
+          (signal) => fetch(`${mamBaseUrl}/chat/completions`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${mamKeys[idx]}`,
+            },
+            body: JSON.stringify(payload),
+            signal,
+          }),
+          (data) => {
+            const choice = data.choices?.[0];
+            return choice?.message?.content || choice?.message?.reasoning_content || '';
+          },
+          keyCtl, state);
+
+        if (text) {
+          mamKeyCursor = idx;
+          if (errors.length) console.warn('[Fiezel Bot v2] LLM pulih setelah galat:', summarizeLlmErrors(errors));
+          return { text, provider: `MAM AI (${model})`, model };
+        }
+        if (!KEY_ROTATE_STATUS.has(state.lastStatus)) { sawNonRotate = true; break; }
+        if (state.lastStatus === 429 || state.lastStatus === 402) {
+          saw429 = true;
+          mamKeyCooldown.set(coolKey, Date.now() + Math.max(cooldownMs, state.retryAfterMs));
+          mamModelStrikes.set(model, strike + 1);
+        } else {
+          mamDeadKeys.add(idx);
+        }
+      }
+      if (n > 1 && !sawNonRotate && saw429) mamModelExhausted.add(model);
+      if (skipped) errors.push(`mam/${model}: ${skipped} kunci dilewati (ditolak/masih kena kuota)`);
+    }
+  }
+
+  // 3. Groq
   if (groqKey) {
     const messages = [];
     if (systemInstruction) messages.push({ role: 'system', content: systemInstruction });
@@ -2934,6 +3020,37 @@ async function runSelfTest() {
   console.log('  ✅ T28: Laporan heal jujur, pemetaan probe, & temuan usang satu kali (idempoten)');
   pass++;
 
+  // T29: MAM AI router — parsing kunci, format OpenAI-compatible & fallback penyedia
+  {
+    if (mamKeyList({ MAM_API_KEYS: 'k1, k2\nk3;k1', MAM_API_KEY: 'k4' }).join() !== 'k1,k2,k3,k4') throw new Error('T29 FAIL: daftar kunci MAM');
+    const realFetch = globalThis.fetch, saved = { ...process.env };
+    const hits = [];
+    globalThis.fetch = async (url, init) => {
+      const body = JSON.parse(init.body);
+      hits.push(`${body.model}:${init.headers.Authorization}`);
+      return { ok: true, status: 200, headers: { get: () => null }, json: async () => ({ choices: [{ message: { content: 'ok dari mam' } }] }) };
+    };
+    delete process.env.GEMINI_API_KEY; delete process.env.GEMINI_API_KEYS;
+    delete process.env.GROQ_API_KEY;
+    process.env.MAM_API_KEY = 'kunci-uji';
+    process.env.FIEZEL_BOT_MAM_REVIEW_MODELS = 'mamcore/deepseek-v4-pro';
+    process.env.FIEZEL_BOT_MAM_FAST_MODELS = 'mamcore/deepseek-v4-pro';
+    let r;
+    try {
+      r = await queryLLM('halo', '', { tier: 'review', retryDelays: [0, 0] });
+    } finally {
+      globalThis.fetch = realFetch;
+      for (const k of ['GEMINI_API_KEY', 'GEMINI_API_KEYS', 'GROQ_API_KEY', 'MAM_API_KEY', 'MAM_API_KEYS', 'FIEZEL_BOT_MAM_REVIEW_MODELS', 'FIEZEL_BOT_MAM_FAST_MODELS']) {
+        if (saved[k] === undefined) delete process.env[k]; else process.env[k] = saved[k];
+      }
+    }
+    if (r.text !== 'ok dari mam' || !r.provider.includes('MAM AI') || hits.join() !== 'mamcore/deepseek-v4-pro:Bearer kunci-uji') {
+      throw new Error(`T29 FAIL: panggilan MAM ${JSON.stringify(r)} hits=${hits.join()}`);
+    }
+  }
+  console.log('  ✅ T29: MAM AI router (OpenAI-compatible, kunci Bearer, & fallback penyedia)');
+  pass++;
+
   console.log(`\n✅ Fiezel Bot v2 Self-Test: PASS (${pass}/${pass} tests)`);
 }
 
@@ -2941,8 +3058,23 @@ async function runSelfTest() {
 // MAIN
 // ═══════════════════════════════════════════════════════════════════════════
 
+function loadLocalOpencodeMamKey() {
+  try {
+    const opencodeCfg = path.join(os.homedir(), '.config', 'opencode', 'opencode.json');
+    if (fs.existsSync(opencodeCfg)) {
+      const parsed = JSON.parse(fs.readFileSync(opencodeCfg, 'utf8'));
+      return parsed?.provider?.mam?.options?.apiKey || '';
+    }
+  } catch (_) {}
+  return '';
+}
+
 async function main() {
   const { mode, options } = parseCliArgs();
+  if (!process.env.MAM_API_KEY && !process.env.MAM_API_KEYS && mode !== 'self-test') {
+    const localKey = loadLocalOpencodeMamKey();
+    if (localKey) process.env.MAM_API_KEY = localKey;
+  }
   switch (mode) {
     case 'review':  await runReview(options.pr); break;
     case 'fix': {

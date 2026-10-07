@@ -49,8 +49,8 @@ console.log('[T2] Menjalankan self-test tools/fiezel-bot.mjs...');
 {
   const r = sh('node', ['tools/fiezel-bot.mjs', 'self-test'], true);
   assert(r.out.includes('Self-Test: PASS'), 'Self-test harus mencetak PASS');
-  assert(/PASS \(28\/28 tests\)/.test(r.out), 'Self-test harus lulus 28/28');
-  console.log('  ok (28/28)');
+  assert(/PASS \(29\/29 tests\)/.test(r.out), 'Self-test harus lulus 29/29');
+  console.log('  ok (29/29)');
 }
 pass++;
 
@@ -200,7 +200,7 @@ pass++;
 
 console.log('[T16] [KUALITAS] Rantai model diatur lewat variabel, bukan ditulis mati...');
 {
-  for (const v of ['FIEZEL_BOT_GEMINI_REVIEW_MODELS', 'FIEZEL_BOT_GEMINI_FAST_MODELS', 'FIEZEL_BOT_GROQ_MODELS']) {
+  for (const v of ['FIEZEL_BOT_GEMINI_REVIEW_MODELS', 'FIEZEL_BOT_GEMINI_FAST_MODELS', 'FIEZEL_BOT_MAM_REVIEW_MODELS', 'FIEZEL_BOT_MAM_FAST_MODELS', 'FIEZEL_BOT_GROQ_MODELS']) {
     assert(wfContent.includes(`\${{ vars.${v} }}`), `Workflow wajib meneruskan vars.${v}`);
     assert(engineSrc.includes(`'${v}'`), `Engine wajib membaca ${v}`);
   }
@@ -253,11 +253,15 @@ console.log('[T20] [KUALITAS] Review kritis: multi-lensa + uji skeptis + skenari
 console.log('  ok');
 pass++;
 
-console.log('[T21] [KUOTA] Rotasi banyak kunci Gemini tersambung di workflow...');
+console.log('[T21] [KUOTA] Rotasi banyak kunci Gemini & MAM AI tersambung di workflow...');
 {
-  const passes = (wfContent.match(/GEMINI_API_KEYS: \$\{\{ secrets\.GEMINI_API_KEYS \}\}/g) || []).length;
-  assert(passes === 2, `Job review dan heal wajib meneruskan secrets.GEMINI_API_KEYS (ditemukan ${passes})`);
+  const passesGemini = (wfContent.match(/GEMINI_API_KEYS: \$\{\{ secrets\.GEMINI_API_KEYS \}\}/g) || []).length;
+  assert(passesGemini === 2, `Job review dan heal wajib meneruskan secrets.GEMINI_API_KEYS (ditemukan ${passesGemini})`);
   assert(engineSrc.includes('function geminiKeyList') && engineSrc.includes('KEY_ROTATE_STATUS'), 'Engine wajib merotasi kunci Gemini');
+
+  const passesMam = (wfContent.match(/MAM_API_KEYS: \$\{\{ secrets\.MAM_API_KEYS \}\}/g) || []).length;
+  assert(passesMam === 2, `Job review dan heal wajib meneruskan secrets.MAM_API_KEYS (ditemukan ${passesMam})`);
+  assert(engineSrc.includes('function mamKeyList'), 'Engine wajib memiliki fungsi mamKeyList');
 }
 console.log('  ok');
 pass++;
