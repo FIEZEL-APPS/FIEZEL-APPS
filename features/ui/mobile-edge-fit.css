@@ -3347,9 +3347,12 @@ fiezel-mascot:has(canvas) .fz-svg,
   z-index: 2 !important;
 }
 
+.fz-mochi-viewport,
 .fz-mochi-viewport canvas {
   overflow: visible !important;
-  touch-action: pan-y !important;
+  touch-action: none !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
   pointer-events: auto !important;
   display: block !important;
 }

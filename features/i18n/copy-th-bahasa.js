@@ -93,7 +93,18 @@
     'jlpt.tab-script-aria': 'เปิดบทพูดบทสนทนา',
     'jlpt.wrong-title': 'ยังไม่ถูกต้อง',
     'jlpt.play-audio': 'เล่นเสียง',
-    'jlpt.pause-audio': 'หยุดชั่วคราว'
+    'jlpt.pause-audio': 'หยุดชั่วคราว',
+    'speaker.instructor': 'ผู้บรรยาย',
+    'speaker.female': 'ผู้หญิง',
+    'speaker.mother': 'ผู้หญิง (แม่)',
+    'speaker.male': 'ผู้ชาย',
+    'speaker.father': 'ผู้ชาย (พ่อ)',
+    'speaker.teacher': 'ครู',
+    'speaker.student': 'นักเรียน',
+    'speaker.shopkeeper': 'พนักงานร้าน',
+    'speaker.receptionist': 'พนักงานต้อนรับ',
+    'speaker.station_staff': 'เจ้าหน้าที่สถานี',
+    'speaker.doctor': 'แพทย์'
   });
   /* Lapisan kursus Bahasa Jepang (FiezelI18n.setCourse('ja')): saat kursus Jepang aktif,
      kunci 'kursus-ja.<kunci>' menang atas <kunci>. Nama bagian memakai istilah Jepang yang

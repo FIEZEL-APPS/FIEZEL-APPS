@@ -467,7 +467,7 @@
             '<div class="jlpt-fb-sub">' + sub + '</div>' +
           '</div>' +
         '</div>' +
-        '<button type="button" class="jlpt-fb-key-btn" onclick="openJlptDetailSheet(\'explain\')">' + t('jlpt.view-key', 'Lihat Kunci ↗') + '</button>' +
+        '<button type="button" class="jlpt-fb-key-btn" onclick="openJlptDetailSheet(\'explain\')">' + t('jlpt.lihat-kunci', 'Lihat Kunci ↗') + '</button>' +
       '</div>';
   }
 

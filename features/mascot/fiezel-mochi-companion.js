@@ -95,7 +95,10 @@
     viewport.style.justifyContent = 'center';
     viewport.style.overflow = 'visible';
     viewport.style.pointerEvents = 'auto';
-    viewport.style.cursor = 'pointer';
+    viewport.style.cursor = 'grab';
+    viewport.style.touchAction = 'none';
+    viewport.style.userSelect = 'none';
+    viewport.style.webkitUserSelect = 'none';
     viewport.style.zIndex = '2';
 
     // Ensure host has relative positioning so viewport covers it

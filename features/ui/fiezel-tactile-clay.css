@@ -4704,14 +4704,14 @@ html body:not(.fz-teacher-mode) #app #quizScaffoldNudge svg,
 
 /* 5. Step Guidance inside Feedback Sheet */
 #feedback .tutor-steps {
-  background: #1E293B !important;
-  border: 1px solid rgba(245, 158, 11, 0.4) !important;
+  background: #FFF8EE !important;
+  border: 1.5px solid #FDE68A !important;
   border-radius: 14px !important;
   padding: 14px 16px !important;
   margin: 12px 0 !important;
 }
 #feedback .tutor-steps .eyebrow {
-  color: #FCD34D !important;
+  color: #B45309 !important;
   font-weight: 800 !important;
   font-size: 11px !important;
   letter-spacing: 0.08em !important;
@@ -4719,20 +4719,23 @@ html body:not(.fz-teacher-mode) #app #quizScaffoldNudge svg,
   margin-bottom: 8px !important;
 }
 #feedback .tutor-step {
-  color: #F1F5F9 !important;
-  font-size: 13px !important;
-  line-height: 1.5 !important;
+  color: #0F172A !important;
+  -webkit-text-fill-color: #0F172A !important;
+  font-size: 13.5px !important;
+  line-height: 1.55 !important;
   margin-bottom: 8px !important;
 }
 #feedback .tutor-step::before {
-  background: #334155 !important;
-  border: 1.5px solid #F59E0B !important;
-  color: #FCD34D !important;
+  background: #FEF3C7 !important;
+  border: 1.5px solid #D97706 !important;
+  color: #92400E !important;
+  font-weight: 800 !important;
 }
 #feedback .tutor-step-final {
-  color: #FEF08A !important;
-  border-top: 1px dashed rgba(245, 158, 11, 0.4) !important;
-  font-size: 13px !important;
+  color: #9A3412 !important;
+  -webkit-text-fill-color: #9A3412 !important;
+  border-top: 1px dashed rgba(217, 119, 6, 0.4) !important;
+  font-size: 13.5px !important;
   padding-top: 8px !important;
   margin-top: 8px !important;
 }
@@ -5110,8 +5113,12 @@ html body .tutor-speed-pill,
   font-weight: 800 !important;
   letter-spacing: -0.01em !important;
 }
+.card .tutor-card-why,
+.card .tutor-card .tutor-card-why,
+.tutor-card .tutor-card-why,
 .tutor-card-why {
   color: #1E293B !important;
+  -webkit-text-fill-color: #1E293B !important;
   background: #F8FAFC !important;
   border: 1px solid #E2E8F0 !important;
   border-left: 4px solid #10B981 !important;
@@ -5121,15 +5128,24 @@ html body .tutor-speed-pill,
   line-height: 1.55 !important;
   margin: 0 !important;
 }
+.card .tutor-card p,
+.card .tutor-card-rule,
+.card .tutor-card .tutor-card-rule,
+.tutor-card .tutor-card-rule,
 .tutor-card-rule {
   color: #0F172A !important;
+  -webkit-text-fill-color: #0F172A !important;
   font-weight: 700 !important;
   font-size: 15px !important;
   line-height: 1.55 !important;
   margin: 0 !important;
 }
+.card .tutor-card-cue,
+.card .tutor-card .tutor-card-cue,
+.tutor-card .tutor-card-cue,
 .tutor-card-cue {
   color: #334155 !important;
+  -webkit-text-fill-color: #334155 !important;
   font-weight: 600 !important;
   font-size: 13.5px !important;
   line-height: 1.5 !important;
@@ -6650,3 +6666,297 @@ html body.fz-lesson-mode header.topbar,
 html body.fz-teacher-mode header.topbar,
 html body.fz-auth-open header.topbar,
 html body.fz-stage-sl.fsl-session-active header.topbar { display: none !important; }
+
+/* ==========================================================================
+   18. IN-QUIZ LISTENING QUESTION & SKILLS LAB TACTILE CLAY HARMONY
+   Physical 3D bevels, Solar Gold audio CTA, animated wave visualizer,
+   and clean docked header with tactile help dot for Skills Lab.
+   ========================================================================== */
+
+/* Hero In-Quiz Listening Card */
+.quiz-listen-hero {
+  background: #FFFFFF !important;
+  border: 2px solid #E2E8F0 !important;
+  border-radius: 24px !important;
+  box-shadow: 0 5px 0 #CBD5E1, 0 12px 24px rgba(15, 23, 42, 0.05) !important;
+  padding: 22px 18px 18px !important;
+  margin: 10px 0 16px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 12px !important;
+  box-sizing: border-box !important;
+}
+
+.quiz-listen-controls {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 12px !important;
+  width: 100% !important;
+}
+
+/* Solar Gold Tactile Clay Audio Button */
+#quizListen,
+.quiz-listen-btn,
+button.quiz-listen-btn,
+.quiz-listen-btn-hero {
+  background: linear-gradient(180deg, #FFE054 0%, #FFB703 100%) !important;
+  border: 2px solid #F59E0B !important;
+  border-radius: 999px !important;
+  color: #2E1800 !important;
+  font-family: var(--font-sans) !important;
+  font-size: 1.05rem !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  letter-spacing: -0.01em !important;
+  padding: 14px 28px !important;
+  min-height: 48px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px !important;
+  box-shadow: 0 4px 0 #D97706, 0 10px 20px rgba(245, 158, 11, 0.25) !important;
+  cursor: pointer !important;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.15s ease !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
+
+#quizListen:hover:not(:disabled),
+.quiz-listen-btn:hover:not(:disabled) {
+  background: linear-gradient(180deg, #FFEA78 0%, #FFC11E 100%) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 5px 0 #D97706, 0 12px 24px rgba(245, 158, 11, 0.3) !important;
+}
+
+#quizListen:active:not(:disabled),
+.quiz-listen-btn:active:not(:disabled) {
+  transform: translateY(3px) !important;
+  box-shadow: 0 1px 0 #D97706, 0 4px 8px rgba(245, 158, 11, 0.2) !important;
+}
+
+#quizListen:focus-visible,
+.quiz-listen-btn:focus-visible {
+  outline: 3px solid rgba(245, 158, 11, 0.45) !important;
+  outline-offset: 3px !important;
+}
+
+#quizListen.is-playing {
+  animation: fzListenPulse 1.2s ease-in-out infinite alternate !important;
+}
+
+@keyframes fzListenPulse {
+  0% { box-shadow: 0 4px 0 #D97706, 0 0 0 0 rgba(245, 158, 11, 0.4); }
+  100% { box-shadow: 0 4px 0 #D97706, 0 0 0 10px rgba(245, 158, 11, 0); }
+}
+
+#quizListen:disabled,
+.quiz-listen-btn:disabled,
+#quizListen.is-depleted {
+  background: #F1F5F9 !important;
+  border-color: #CBD5E1 !important;
+  color: #94A3B8 !important;
+  box-shadow: 0 3px 0 #CBD5E1 !important;
+  transform: none !important;
+  cursor: not-allowed !important;
+  opacity: 0.8 !important;
+}
+
+#quizListen svg,
+.quiz-listen-btn svg {
+  width: 20px !important;
+  height: 20px !important;
+  stroke-width: 2.5 !important;
+}
+
+/* Speed Toggle Button (1.0x / 0.8x) */
+#quizListenSpeed,
+.quiz-listen-speed-btn,
+button.quiz-listen-speed-btn {
+  background: #FFFFFF !important;
+  border: 2px solid #E2E8F0 !important;
+  border-radius: 999px !important;
+  padding: 8px 14px !important;
+  min-height: 48px !important;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace) !important;
+  font-size: 0.88rem !important;
+  font-weight: 800 !important;
+  color: #0F172A !important;
+  box-shadow: 0 3px 0 #CBD5E1 !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.12s ease !important;
+}
+
+#quizListenSpeed:hover,
+.quiz-listen-speed-btn:hover {
+  background: #F8FAFC !important;
+  border-color: #CBD5E1 !important;
+  transform: translateY(-1px) !important;
+}
+
+#quizListenSpeed:active,
+.quiz-listen-speed-btn:active {
+  transform: translateY(2px) !important;
+  box-shadow: 0 1px 0 #CBD5E1 !important;
+}
+
+#quizListenSpeed.is-slow,
+.quiz-listen-speed-btn.is-slow {
+  background: #FEF9C3 !important;
+  border-color: #F59E0B !important;
+  color: #92400E !important;
+  box-shadow: 0 3px 0 #D97706 !important;
+}
+
+/* Visual Wave Equalizer */
+#quizAudioWave,
+.quiz-audio-wave {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 5px !important;
+  height: 28px !important;
+  margin: 6px 0 4px !important;
+}
+
+#quizAudioWave.hidden,
+.quiz-audio-wave.hidden {
+  display: none !important;
+}
+
+#quizAudioWave span,
+.quiz-audio-wave span {
+  display: inline-block !important;
+  width: 5px !important;
+  background: linear-gradient(180deg, #F59E0B 0%, #D97706 100%) !important;
+  border-radius: 999px !important;
+  animation: quizTactileWaveBounce 0.75s ease-in-out infinite alternate !important;
+}
+
+#quizAudioWave span:nth-child(1), .quiz-audio-wave span:nth-child(1) { height: 35% !important; animation-delay: 0.1s !important; }
+#quizAudioWave span:nth-child(2), .quiz-audio-wave span:nth-child(2) { height: 80% !important; animation-delay: 0.28s !important; }
+#quizAudioWave span:nth-child(3), .quiz-audio-wave span:nth-child(3) { height: 100% !important; animation-delay: 0.15s !important; }
+#quizAudioWave span:nth-child(4), .quiz-audio-wave span:nth-child(4) { height: 65% !important; animation-delay: 0.4s !important; }
+#quizAudioWave span:nth-child(5), .quiz-audio-wave span:nth-child(5) { height: 45% !important; animation-delay: 0.22s !important; }
+
+@keyframes quizTactileWaveBounce {
+  0% { transform: scaleY(0.25); opacity: 0.65; }
+  100% { transform: scaleY(1); opacity: 1; }
+}
+
+/* High Contrast Audio Note */
+#quizListenNote,
+.quiz-listen .muted,
+.quiz-listen-hero .muted {
+  color: #334155 !important;
+  font-size: 0.84rem !important;
+  font-weight: 700 !important;
+  line-height: 1.35 !important;
+  text-align: center !important;
+  display: block !important;
+  margin: 2px 0 0 !important;
+}
+
+/* Skills Lab Topbar & Tactile Clay Help Dot */
+.skill-page-topbar {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  margin: 0 0 14px !important;
+  position: relative !important;
+  top: auto !important;
+  z-index: 20 !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.skill-topbar-actions {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin-left: auto !important;
+}
+
+.skill-back-btn,
+button.skill-back-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  padding: 0 14px !important;
+  border-radius: 999px !important;
+  background: #FFFFFF !important;
+  border: 2px solid #E2E8F0 !important;
+  box-shadow: 0 3px 0 #CBD5E1 !important;
+  color: #0F172A !important;
+  font-family: var(--font-sans) !important;
+  font-size: 0.88rem !important;
+  font-weight: 800 !important;
+  cursor: pointer !important;
+  transition: all 0.12s ease !important;
+}
+
+.skill-back-btn:hover,
+button.skill-back-btn:hover {
+  background: #F8FAFC !important;
+  border-color: #CBD5E1 !important;
+  transform: translateY(-1px) !important;
+}
+
+.skill-back-btn:active,
+button.skill-back-btn:active {
+  transform: translateY(2px) !important;
+  box-shadow: 0 1px 0 #CBD5E1 !important;
+}
+
+.skill-back-btn svg {
+  width: 16px !important;
+  height: 16px !important;
+  stroke-width: 2.5 !important;
+}
+
+.skill-help-dot,
+button.skill-help-dot,
+html.fiezel-ui-v6 .skill-help-dot {
+  width: 40px !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  border-radius: 50% !important;
+  background: #FFFFFF !important;
+  border: 2px solid #E2E8F0 !important;
+  box-shadow: 0 3px 0 #CBD5E1 !important;
+  color: #0F172A !important;
+  font-family: var(--font-sans) !important;
+  font-size: 1.1rem !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  cursor: pointer !important;
+  transition: all 0.12s ease !important;
+}
+
+.skill-help-dot:hover,
+button.skill-help-dot:hover {
+  background: #FEF9C3 !important;
+  border-color: #F59E0B !important;
+  color: #92400E !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 0 #D97706 !important;
+}
+
+.skill-help-dot:active,
+button.skill-help-dot:active {
+  transform: translateY(2px) !important;
+  box-shadow: 0 1px 0 #CBD5E1 !important;
+}
+
