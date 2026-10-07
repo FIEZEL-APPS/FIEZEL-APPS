@@ -280,6 +280,12 @@ button.brand-button {
   gap: 2px !important;
   z-index: 1000 !important;
   box-sizing: border-box !important;
+  view-transition-name: bottomnav !important;
+}
+::view-transition-old(bottomnav),
+::view-transition-new(bottomnav) {
+  animation: none !important;
+  mix-blend-mode: normal !important;
 }
 
 body.fz-lesson-mode .bottomnav,
@@ -6585,6 +6591,15 @@ html body.fz-view-latihan header.topbar {
 ::view-transition-new(topbar) {
   animation: none !important;
   mix-blend-mode: normal !important;
+}
+#topSettingsBtn {
+  display: none !important;
+}
+html body.fz-view-profile #topSettingsBtn {
+  display: inline-flex !important;
+}
+html body.fz-view-profile #fzCourseSwitchBtn {
+  display: none !important;
 }
 html body main.app.app,html body.fz-lux main.app.app,html body.fz-lux.fz-view-game main.app.app,html body.fz-lux.fz-stage-home main.app.app {
   padding-top: calc(56px + env(safe-area-inset-top, 0px) + 12px) !important;

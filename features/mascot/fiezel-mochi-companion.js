@@ -56,28 +56,23 @@
   ];
 
   function isPracticeHost(host) {
-    if (!host || !host.closest) return false;
-    for (var i = 0; i < PRACTICE_CONTAINER_SELECTORS.length; i++) {
-      if (host.closest(PRACTICE_CONTAINER_SELECTORS[i])) return true;
-    }
-    // Also attach if host has specific classes
-    if (host.classList.contains('fz-paw-panel') ||
-        host.classList.contains('fsl-mascot') ||
-        host.classList.contains('jlpt-mascot') ||
-        host.classList.contains('writing-mascot') ||
-        host.classList.contains('lesson-mascot')) {
-      return true;
-    }
-    return false;
+    if (!host) return false;
+    // Universally replace all old SVG PAW mascots across all surfaces:
+    // practice sessions, onboarding, coach bubbles, lesson stages, and home.
+    return true;
   }
 
   function attachMochi(host) {
     if (!host || host.__mochiAttached) return;
     if (!motionAllowed()) return;
-    if (!global.FiezelMochi) return;
+    if (!global.FiezelMochi) {
+      ensureMochiModule();
+      return;
+    }
     if (!isPracticeHost(host)) return;
 
     host.__mochiAttached = true;
+    host.classList.add('mochi-active');
 
     // Detect if this is a listening practice or question
     var isListening = !!(host.closest('.fsl-player') ||
@@ -141,7 +136,10 @@
 
       // Hide the 2D SVG visually while preserving it in the DOM for a11y & tests
       var svg = host.querySelector('.fz-svg');
-      if (svg) svg.style.opacity = '0';
+      if (svg) {
+        svg.style.opacity = '0';
+        svg.style.display = 'none';
+      }
 
       host.appendChild(viewport);
 
@@ -439,10 +437,17 @@
       scanAndAttach();
       return;
     }
+    var base = '';
+    try {
+      base = new URL('.', window.location.href).href;
+    } catch (_) {
+      base = './';
+    }
     var candidatePaths = [
       './mochi-mascot/fiezel-mochi.js',
-      '/mochi-mascot/fiezel-mochi.js',
-      '../../mochi-mascot/fiezel-mochi.js'
+      base + 'mochi-mascot/fiezel-mochi.js',
+      new URL('mochi-mascot/fiezel-mochi.js', window.location.href).href,
+      '/app/mochi-mascot/fiezel-mochi.js'
     ];
     function tryNext(idx) {
       if (idx >= candidatePaths.length) return;

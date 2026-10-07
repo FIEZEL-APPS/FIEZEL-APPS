@@ -943,6 +943,10 @@ jobs:
           # 'memperbaiki' zoom dengan user-scalable=no — regresi WCAG 1.4.4/1.4.10 yang
           # sudah pernah dicabut audit D16.
           node tests/app-interaction-policy-test.js
+          # m025-503: penjaga invarian UI/UX anti-kedipan & isolasi shell View Transition
+          # Menjaga agar .is-repaint tidak dicabut asinkron, topbar/bottomnav memegang VT terisolasi
+          # tanpa animasi dissolve, dan tombol pengaturan di panel profil selalu aktif & fungsional.
+          node tests/anti-flicker-uiux-invariant-test.js
           node tests/deploy-site-gate-test.js
           # m025-314: sepupu deploy-site-gate. Yang di atas menjaga CARA berkas diterbitkan;
           # yang ini menjaga agar berkasnya tidak BERBOHONG tentang alamat hasilnya. Repo
