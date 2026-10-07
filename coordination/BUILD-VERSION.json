@@ -1,7 +1,7 @@
 {
-  "version": "m025-502",
-  "claimedBy": "branch feat/m025-502-3d-mochi-companion",
-  "claimedAt": "2026-10-07T00:35:33.727Z",
-  "reason": "feat(mascot): 3d mochi companion, travertine card theme, and chokai integration",
+  "version": "m025-503",
+  "claimedBy": "branch feat/m025-503-mochi-three-bundle-fix",
+  "claimedAt": "2026-10-07T02:05:57.775Z",
+  "reason": "fix(mascot): track three.module.js bundle, universal mochi attach & guard uiux invariants",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
