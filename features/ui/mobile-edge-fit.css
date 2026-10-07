@@ -3204,6 +3204,17 @@ fiezel-mascot:has(.fz-mochi-viewport),
   overflow: visible !important;
 }
 
+/* Hide legacy 2D SVG rig when 3D Mochi is active */
+fiezel-mascot.mochi-active .fz-svg,
+fiezel-mascot:has(.fz-mochi-viewport) .fz-svg,
+fiezel-mascot:has(canvas) .fz-svg,
+.fz-mochi-viewport ~ .fz-svg {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
 /* 3D Mochi Viewport: full dimensions, zero clipping on paws, badges, or ears */
 .fz-mochi-viewport,
 .quiz-stage .fz-mochi-viewport,
