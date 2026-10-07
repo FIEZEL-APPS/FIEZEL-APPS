@@ -1,7 +1,7 @@
 {
-  "version": "m025-507",
-  "claimedBy": "branch feat/m025-505-phonetic-clean-mochi-companion",
-  "claimedAt": "2026-10-07T20:03:34.686Z",
-  "reason": "fix(ui): eliminate phonetic red border box, universalize 3D Mochi companion & resolve i18n keys [m025-507]",
+  "version": "m025-508",
+  "claimedBy": "tidak tercatat (jalankan ulang di dalam git, atau set FIEZEL_BUILD_CLAIMER)",
+  "claimedAt": "2026-10-07T20:15:47.321Z",
+  "reason": "bot(heal): auto-synchronize release boundary",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
