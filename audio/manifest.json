@@ -1,7 +1,7 @@
 {
   "schema": "fiezel-audio-manifest-v1",
-  "version": 301,
-  "generatedAt": "2026-10-07T22:03:32.863Z",
+  "version": 302,
+  "generatedAt": "2026-10-07T22:09:21.485Z",
   "assetBaseUrl": "https://fiezel-audio.fitrajft.workers.dev",
   "voiceProfile": {
     "voiceId": "4KH3q7xDXbPdY3S5yw0Y",
@@ -17236,6 +17236,66 @@
       "checksum": "3167db68a29b031fa83959b47e2f2f9e4746c1c59c95064af810eb30a5de36d1",
       "sourceRef": "a1_curated_0088",
       "createdAt": "2026-10-07T22:03:25.243Z",
+      "status": "ready"
+    },
+    "5c66bc233827f2c2cd195c13f6013d1f3d04802422eda250b586760cf9d8fa28": {
+      "url": "a/5c66bc233827f2c2cd195c13f6013d1f3d04802422eda250b586760cf9d8fa28.mp3",
+      "contentType": "word",
+      "locale": "en-US",
+      "voiceId": "Aoede",
+      "modelId": "gemini-tts-gemini-2.5-flash-preview-tts",
+      "bytes": 40890,
+      "checksum": "2d81f4b8fd8e1916f5f1243bfe512fa9d5594fad89dd9b0ff8155adf73555b7c",
+      "sourceRef": "a1_curated_0089",
+      "createdAt": "2026-10-07T22:06:24.078Z",
+      "status": "ready"
+    },
+    "5444b5b66aa52f5be76a4523957b2b0b8829f98d368037a398ca5b67d804538a": {
+      "url": "a/5444b5b66aa52f5be76a4523957b2b0b8829f98d368037a398ca5b67d804538a.mp3",
+      "contentType": "word",
+      "locale": "en-US",
+      "voiceId": "Aoede",
+      "modelId": "gemini-tts-gemini-2.5-flash-preview-tts",
+      "bytes": 37050,
+      "checksum": "627613247a0d7926785a189f7dcd81b24edb7ce6bac8d5adf06b0a3a4e21095f",
+      "sourceRef": "a1_curated_0090",
+      "createdAt": "2026-10-07T22:06:36.870Z",
+      "status": "ready"
+    },
+    "29fb21f4478d406659d00a5afd565760b8507e33aa9835dc8f7296e907820cf5": {
+      "url": "a/29fb21f4478d406659d00a5afd565760b8507e33aa9835dc8f7296e907820cf5.mp3",
+      "contentType": "word",
+      "locale": "en-US",
+      "voiceId": "Aoede",
+      "modelId": "gemini-tts-gemini-2.5-flash-preview-tts",
+      "bytes": 31290,
+      "checksum": "1ed0dacca70cfd356b9b0ed02ac43903683a6717e3e39bf0a3baa2ef5e2f9623",
+      "sourceRef": "a1_curated_0091",
+      "createdAt": "2026-10-07T22:06:46.640Z",
+      "status": "ready"
+    },
+    "33c39f68110321a8655fb358ec50aab2760dfae814ecd357fc4a3f3ba90d43d6": {
+      "url": "a/33c39f68110321a8655fb358ec50aab2760dfae814ecd357fc4a3f3ba90d43d6.mp3",
+      "contentType": "word",
+      "locale": "en-US",
+      "voiceId": "Aoede",
+      "modelId": "gemini-tts-gemini-2.5-flash-preview-tts",
+      "bytes": 54330,
+      "checksum": "b81c0f770227acfb8b6e9004960d139e4162b48b03b4f357c19c38c402a0bf1f",
+      "sourceRef": "a1_curated_0092",
+      "createdAt": "2026-10-07T22:06:57.065Z",
+      "status": "ready"
+    },
+    "09188a1e8c9762530d41b6b54dc742b985e56eff009cf3b14df57d45d8cf141c": {
+      "url": "a/09188a1e8c9762530d41b6b54dc742b985e56eff009cf3b14df57d45d8cf141c.mp3",
+      "contentType": "word",
+      "locale": "en-US",
+      "voiceId": "Aoede",
+      "modelId": "gemini-tts-gemini-2.5-flash-preview-tts",
+      "bytes": 50490,
+      "checksum": "a70bfa7459ef0120d0b3e17bd7367a9c279dde0c62b34662c1528b3e357822e5",
+      "sourceRef": "a1_curated_0093",
+      "createdAt": "2026-10-07T22:07:11.054Z",
       "status": "ready"
     }
   },
