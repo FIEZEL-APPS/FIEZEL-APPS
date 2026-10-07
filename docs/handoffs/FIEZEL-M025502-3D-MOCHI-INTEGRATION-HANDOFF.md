@@ -1,18 +1,18 @@
 # FIEZEL HANDOFF DOSSIER: BUILD m025-502
-## 3D Mochi Mascot Companion, Travertine Unified Card Palette, and JLPT Chōkai Event Integration
+## 3D Mochi Mascot Companion, Travertine Unified Card Palette, JLPT Chōkai Event Integration, and Complete Nav Tab Flicker Elimination
 
 **Tanggal Rilis**: 2026-10-07
 **Nomor Build**: `m025-502`
 **Branch Fitur**: `feat/m025-502-3d-mochi-companion`
-**Otoritas Arbiter**: `coordination/BUILD-VERSION.json`
+**Otoritas Arbiter**: `coordination/BUILD-VERSION.json` (OWNER/MASTER Authority Confirmed)
 **Status Gerbang Mutu**: 100% HIJAU (Semua Gerbang PASS)
 
 ---
 
 ### 1. Ringkasan Eksekutif & Latar Belakang Perubahan
-Pembaruan ini menuntaskan integrasi 3D Mochi Daifuku Companion ke dalam shell PWA FIEZEL di seluruh mode latihan (Grammar, Kosakata, Reading, Writing, dan JLPT Chōkai Listening), sekaligus menyelesaikan permasalahan estetika dan kontras kartu kuis yang dilaporkan oleh pengguna.
+Pembaruan ini menuntaskan integrasi 3D Mochi Daifuku Companion ke dalam shell PWA FIEZEL di seluruh mode latihan (Grammar, Kosakata, Reading, Writing, dan JLPT Chōkai Listening), sekaligus menyelesaikan permasalahan estetika dan kontras kartu kuis, serta **mengeliminasi secara tuntas regresi kedipan layar (flicker/white-blink) saat berpindah tab navigasi**.
 
-Tiga pilar utama dalam rilis ini:
+Empat pilar utama dalam rilis ini:
 1. **Perbesaran & Velvet PBR Lighting 3D Mochi (+36.4% Scale)**:
    - Skala mochi diperbesar +36.4% dengan posisi kamera diperdekat ($Z = 5.35$, $\text{FOV} = 44^\circ$, `THREE.NoToneMapping`).
    - Material `MeshPhysicalMaterial` dikalibrasi ke `roughness: 0.28` (tekstur beludru tepung ketan daifuku lembut, menghapus pantulan silau berminyak di dagu).
@@ -27,11 +27,17 @@ Tiga pilar utama dalam rilis ini:
    - **Kibasan Telinga Dinamis**: Animasi pegas harmonik 2 tahap (`triggerEarWiggle(1.3)`) dipicu otomatis pada transisi masuk sesi, pergantian soal baru (`question-shown`), dan pemutaran audio Chokai.
    - **Ekspresi Balita**: Cemberut balita (*toddler pout*) pada jawaban salah dan lompatan gembira (*joyful hop*) bertabur bintang pada jawaban benar.
    - **Stabilisasi Fisika**: Menambahkan batas aman osilasi pegas (`jiggleAmp <= 1.0`, `jiggleOffset <= 0.35`) dan batas non-negatif `dt` pada `fiezel-mochi.js` agar animasi tidak meledak saat frame drop atau perpindahan tab peramban.
+4. **Eliminasi Total Kedipan Layar Navigasi & Isolasi Shell Topbar (Anti-Regression Invariant)**:
+   - **Akar Masalah Regresi**: Pada commit `d17dd309` (m025-500) ditambahkan pencabutan kelas `.is-repaint` secara asinkron di akhir `renderInner()` (`classList.remove('is-repaint')`). Akibatnya, pada frame berikutnya CSS `.fade` (`animation: pageIn 0.5s`) dan `body.fz-lux .fade > *` (`animation: luxRise 0.5s`) terpicu kembali dari `opacity: 0`, menjatuhkan opacity layar dan menimbulkan kilatan putih/kedipan ganda (*double-blink*). Diperparah pada commit `cc0671b2` (m025-501) di mana `header.topbar` diberi `view-transition-name: none !important;` sehingga ikut larut (*dissolve*) dalam transisi `root` sementara bottom bar diam.
+   - **Perbaikan**:
+     a) Menghapus pembersihan `classList.remove('is-repaint')` pada `app.js` sehingga `#app` secara permanen memegang `.is-repaint` selama siklus render/transisi, memastikan supresi `pageIn` dan `luxRise` 100% konsisten tanpa kedip.
+     b) Mengembalikan `view-transition-name: topbar !important;` pada `header.topbar` dan menyetel `animation: none !important; mix-blend-mode: normal !important;` pada `::view-transition-old(topbar)` dan `::view-transition-new(topbar)` agar topbar berdiri sebagai lapisan terisolasi yang kokoh bersama `bottomnav` tanpa goyang atau glitch.
 
 ---
 
 ### 2. Bukti Pengujian Empiris & Lintas Perangkat (Playwright)
 
+#### A. Uji Responsif Layout & Zero-Box Mochi
 | Perangkat / Viewport | Dimensi Maskot | Posisi Bawah Opsi D | Status Viewport | Zero-Box Verification |
 |---|---|---|---|---|
 | **iPhone SE (375 × 667)** | 142.5px × 140.0px | 650.8px (Batas: 667px) | PASS (Muat Nyaman) | Transparan 100%, Border 0 |
@@ -40,6 +46,15 @@ Tiga pilar utama dalam rilis ini:
 | **Android Pixel 7 (412 × 915)** | 156.5px × 148.3px | 623.0px (Margin: >290px) | PASS (Muat Nyaman) | Transparan 100%, Border 0 |
 | **iPad / Tablet (768 × 1024)** | 150.0px × 165.0px | Layout berdampingan | PASS (Muat Nyaman) | Transparan 100%, Border 0 |
 | **Desktop HD (1280 × 800)** | 192.0px × 148.0px | Kolom samping lapang | PASS (Muat Nyaman) | Transparan 100%, Border 0 |
+
+#### B. Uji Anti-Kedip & Isolasi View Transition (`tools/dev/probe-flicker-empirical.mjs` & `tools/dev/probe-subtabs-empirical.mjs`)
+- `home -> latihan`: Opacity drop < 0.95 = **0 sample** (Op=1.0, Anim=none).
+- `latihan -> classroom`: Opacity drop < 0.95 = **0 sample** (Op=1.0, Anim=none).
+- `classroom -> progress`: Opacity drop < 0.95 = **0 sample** (Op=1.0, Anim=none).
+- `progress -> home`: Opacity drop < 0.95 = **0 sample** (Op=1.0, Anim=none).
+- Subtabs KelasKu (`tugas -> papan kelas -> paspor -> tugas`): Opacity drop < 0.95 = **0 sample** (Op=1.0, Anim=none).
+- Subtabs Progres (`peta -> ringkasan`): Opacity drop < 0.95 = **0 sample** (Op=1.0, Anim=none).
+- Lapisan View Transition: `tbVt=topbar`, `bnVt=bottomnav`, `appCls=is-repaint` konsisten 100% pada setiap frame transisi tanpa deformasi atau dissolve.
 
 ---
 
@@ -57,6 +72,8 @@ Tiga pilar utama dalam rilis ini:
 11. `mochi-mascot/index.html` — Playground visual Mochi 3D.
 12. `features/speaking-listening/fiezel-jlpt-listening.js` — Integrasi slot companion ke kartu modal Chōkai JLPT, sinyal reaksi benar/salah, audio start/stop.
 13. `features/speaking-listening/jlpt-listening.css` — Penyesuaian layout `.jlpt-mascot-slot`.
+14. `app.js` — Pemusnahan asynchronous removal `is-repaint` pada `renderInner()`.
+15. `features/ui/fiezel-tactile-clay.css` — Pengembalian `view-transition-name: topbar !important;` dan penetapan `animation: none !important; mix-blend-mode: normal !important;` untuk isolasi shell topbar.
 
 ---
 
@@ -70,3 +87,9 @@ Tiga pilar utama dalam rilis ini:
 - `node tests/pawprint-geometry-gate-test.js` -> **PASS (5/5)**
 - `node tests/mascot-reduced-motion-test.js` -> **PASS (19 state, 14 ekspresi)**
 - `node tools/bump-build.mjs --check` -> **SELARAS (m025-502)**
+
+---
+
+### 5. Roadmap & Rencana Tindak Lanjut (Next-Steps)
+- Pantau metrik stabilitas transisi PWA di lapangan paska rilis m025-502.
+- Pertahankan invarian supresi animasi masuk (`pageIn` / `luxRise`) via `#app.is-repaint` di seluruh rilis mendatang agar regresi double-blink tidak pernah muncul kembali.
