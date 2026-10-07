@@ -223,6 +223,13 @@ async function synthesizeGemini(text, voiceName, apiKey) {
   const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(apiKey)}`;
   
   const payload = {
+    systemInstruction: {
+      parts: [
+        {
+          text: 'You are a Text-to-Speech synthesizer. Read the following text transcript exactly as written and convert it to audio. Do not respond with commentary, explanations, or any text.'
+        }
+      ]
+    },
     contents: [
       {
         role: 'user',
@@ -278,8 +285,15 @@ async function synthesizeGemini(text, voiceName, apiKey) {
     if (!response.ok) {
       let detail = '';
       try { detail = (await response.text()).slice(0, 300); } catch (_) {}
-      if (response.status === 400 || response.status === 403) {
-        return { fatal: `Gemini API Key bermasalah / ditolak (HTTP ${response.status}: ${detail})` };
+      if (response.status === 400) {
+        if (/Model tried to generate text/i.test(detail)) {
+          lastError = `model_generated_text: ${detail}`;
+          break;
+        }
+        return { fatal: `Gemini API Key bermasalah / ditolak (HTTP 400: ${detail})` };
+      }
+      if (response.status === 403) {
+        return { fatal: `Gemini API Key bermasalah / ditolak (HTTP 403: ${detail})` };
       }
       lastError = `http_${response.status}: ${detail}`;
       await new Promise((r) => setTimeout(r, attempt * 2000));
