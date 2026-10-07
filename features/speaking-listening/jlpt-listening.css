@@ -1,12 +1,13 @@
 /* =========================================================================
    PANEL BANK SOAL LISTENING JLPT (N5 & N4) - FIEZEL APPS
    Resmi Japan Foundation & JEES Listening Exam Simulation
+   Tactile Travertine Single-Screen Hero Engine (390×844 px)
    ========================================================================= */
 
 .listening-modal {
   position: fixed;
   inset: 0;
-  background: rgba(36, 26, 17, 0.78);
+  background: rgba(36, 26, 17, 0.72);
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
   z-index: 2500;
@@ -35,88 +36,112 @@
   position: relative;
   background: #FFFDF9;
   width: min(100%, 540px);
-  max-height: 90vh;
+  max-height: 94vh;
   border-radius: 24px;
-  box-shadow: 0 24px 48px rgba(36, 26, 17, 0.32);
+  box-shadow: 0 24px 48px rgba(36, 26, 17, 0.28);
   border: 1.5px solid var(--line, #E8DFD3);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  animation: fzModalPop 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: fzJlptModalPop 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes fzModalPop {
-  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+@keyframes fzJlptModalPop {
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
   to { opacity: 1; transform: scale(1) translateY(0); }
 }
 
 .listening-head {
-  padding: 16px 20px;
-  background: #F9F3E6;
+  padding: 10px 16px;
+  background: #FDF9F2;
   border-bottom: 1.5px solid var(--line, #E8DFD3);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-shrink: 0;
+  min-height: 44px;
+  box-sizing: border-box;
 }
 
 .listening-head-title {
   margin: 0;
-  font-size: 17px;
+  font-size: 15.5px;
   font-weight: 800;
-  color: #241A11;
+  color: #0F172A;
+  line-height: 1.25;
 }
 
 .listening-head-sub {
-  font-size: 11.5px;
+  font-size: 11px;
   color: var(--text-muted, #7A6F64);
+  font-weight: 600;
   display: block;
 }
 
 .listening-close-btn {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   border: 1.5px solid var(--line, #E8DFD3);
   background: #FFFDF9;
-  color: #241A11;
-  font-size: 18px;
-  font-weight: 700;
+  box-shadow: 0 2px 0 #D8CEBF;
+  color: #0F172A;
+  font-size: 15px;
+  font-weight: 800;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.15s, transform 0.1s;
+  transition: all 0.12s ease;
+  flex-shrink: 0;
 }
 
 .listening-close-btn:hover {
-  background: #F3EBDD;
-  transform: scale(1.05);
+  background: #FAF6EF;
+  border-color: #D6CBC0;
+  transform: translateY(-1px);
+}
+
+.listening-close-btn:active {
+  transform: translateY(1.5px);
+  box-shadow: 0 0.5px 0 #D8CEBF;
 }
 
 .listening-body {
-  padding: 16px 18px;
+  padding: 8px 12px 12px;
   overflow-y: auto;
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 6px;
+  -webkit-overflow-scrolling: touch;
 }
+
+/* =========================================================================
+   LEVEL TABS & MONDAI CHIPS SCROLL
+   Fixed bug fatal: Mondai chips tergencet 6px
+   ========================================================================= */
 
 .jlpt-level-tabs {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   background: #EFE6D8;
-  padding: 4px;
+  padding: 2.5px;
   border-radius: 12px;
+  min-height: 34px;
+  height: 34px;
+  box-sizing: border-box;
+  flex-shrink: 0;
 }
 
 .jlpt-lvl-btn {
   flex: 1;
-  padding: 8px 12px;
+  padding: 0 8px;
+  height: 29px;
   border: none;
   background: transparent;
   font-family: inherit;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   color: var(--text-muted, #7A6F64);
   border-radius: 9px;
@@ -130,124 +155,110 @@
 
 .jlpt-lvl-btn.active {
   background: #FFFFFF;
-  color: #241A11;
-  box-shadow: 0 2px 6px rgba(36, 26, 17, 0.1);
+  color: #0F172A;
+  font-weight: 800;
+  box-shadow: 0 2px 0 #D8CEBF;
 }
 
+/* Bug Fatal Fix: Bilah Mondai Chips Wajib min-height: 42px; height: 42px; flex-shrink: 0; */
 .jlpt-mondai-scroll {
-  display: flex;
-  gap: 6px;
-  overflow-x: auto;
-  padding: 2px 0 4px;
+  min-height: 42px !important;
+  height: 42px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  overflow-x: auto !important;
+  padding: 4px 2px !important;
+  box-sizing: border-box !important;
+  flex-shrink: 0 !important;
+  -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
 }
 
 .jlpt-mondai-chip {
-  padding: 6px 12px;
-  background: #FAF5EB;
-  border: 1px solid var(--line, #E8DFD3);
-  border-radius: 20px;
+  padding: 0 14px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #FAF6EF;
+  border: 1.5px solid var(--line, #E8DFD3);
+  border-radius: 999px;
   font-size: 11.5px;
-  font-weight: 600;
-  color: var(--text, #241A11);
+  font-weight: 700;
+  color: #382E25;
   white-space: nowrap;
   cursor: pointer;
-  transition: all 0.15s;
+  box-shadow: 0 2px 0 #D8CEBF;
+  transition: all 0.12s ease;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.jlpt-mondai-chip:hover {
+  background: #FFFDF9;
+  border-color: #D6CBC0;
+  transform: translateY(-1px);
+}
+
+.jlpt-mondai-chip:active {
+  transform: translateY(1.5px);
+  box-shadow: 0 0.5px 0 #D8CEBF;
 }
 
 .jlpt-mondai-chip.active {
   background: #241A11;
   color: #FFD94F;
   border-color: #241A11;
+  box-shadow: 0 2px 0 #18110A;
+  font-weight: 800;
 }
 
 /* =========================================================================
-   SIMPLIFIED JLPT MOBILE CARD & TOUCH ENGINE
-   Native Mobile App Experience (Duolingo/Busuu/Tinder Card Style)
+   SINGLE-SCREEN HERO LAYOUT: MOBILE CARD & TOUCH ENGINE
+   Seluruh 4 pilihan jawaban terlihat 100% di layar pandang pertama (390×844)
    ========================================================================= */
 
 .jlpt-mobile-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 6px;
   position: relative;
   user-select: none;
   -webkit-user-select: none;
+  width: 100%;
 }
 
-/* Touch Card with Gestures & Tilt Physics */
+/* Touch Card with Gestures */
 .jlpt-mobile-card {
   position: relative;
-  background: linear-gradient(180deg, #FDF8F1 0%, #F5ECE0 100%) !important;
-  border: 1.5px solid #E6D9C8 !important;
-  box-shadow: 0 12px 36px rgba(46, 39, 36, 0.08) !important;
-  border: 1.5px solid var(--line, #E8DFD3);
-  border-radius: 20px;
-  padding: 16px 18px;
-  box-shadow: 0 4px 16px rgba(36, 26, 17, 0.06);
+  background: #FFFDF9 !important;
+  border: 1.5px solid #E8DFD3 !important;
+  border-radius: 20px !important;
+  padding: 10px 12px 12px !important;
+  box-shadow: 0 3px 0 #D8CEBF, 0 10px 24px rgba(36, 26, 17, 0.05) !important;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 6px;
   touch-action: pan-y;
   cursor: grab;
   transform-origin: center center;
-  will-change: transform, opacity;
-  animation: fzCardIn 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+  animation: fzCardIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 .jlpt-mobile-card:active {
   cursor: grabbing;
 }
 
-/* =========================================================================
-   3D MOCHI MASCOT COMPANION SLOT IN JLPT CARD
-   ========================================================================= */
+/* Zero Mascot Avatar Prohibited Rule */
 .jlpt-mascot-slot {
-  position: relative;
-  width: 100%;
-  height: 165px;
-  min-height: 145px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto;
-  border-radius: 16px;
-  background: radial-gradient(circle at 50% 65%, rgba(254, 243, 199, 0.4) 0%, rgba(255, 255, 255, 0) 72%);
-  overflow: visible;
-  touch-action: pan-y;
+  display: none !important;
 }
 
-.jlpt-mascot-slot .jlpt-mascot {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  max-width: 260px;
-  display: block;
-  overflow: visible;
-}
-
-.jlpt-mascot-slot .fz-mochi-viewport {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-
-@media (max-width: 480px) {
-  .jlpt-mascot-slot {
-    height: 145px;
-    min-height: 140px;
-  }
-}
-
-
-/* =========================================================================
-   CARD SWIPE & DRAG GESTURE ENGINE CLASSES
-   Hardware-accelerated CSS transforms, slide transitions, spring physics
-   ========================================================================= */
-
+/* Gestures & Swipe Physics */
 .swiping,
 .jlpt-mobile-card.swiping {
   cursor: grabbing !important;
@@ -260,24 +271,24 @@
 
 .slide-out-left,
 .jlpt-mobile-card.slide-out-left {
-  animation: fzSlideOutLeft 0.22s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
+  animation: fzSlideOutLeft 0.2s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
   pointer-events: none !important;
 }
 
 .slide-out-right,
 .jlpt-mobile-card.slide-out-right {
-  animation: fzSlideOutRight 0.22s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
+  animation: fzSlideOutRight 0.2s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
   pointer-events: none !important;
 }
 
 .slide-in-right,
 .jlpt-mobile-card.slide-in-right {
-  animation: fzSlideInRight 0.26s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  animation: fzSlideInRight 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
 }
 
 .slide-in-left,
 .jlpt-mobile-card.slide-in-left {
-  animation: fzSlideInLeft 0.26s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  animation: fzSlideInLeft 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
 }
 
 @keyframes fzSlideOutLeft {
@@ -286,7 +297,7 @@
     opacity: 1;
   }
   100% {
-    transform: translate3d(-120%, 0, 0) rotate(-12deg);
+    transform: translate3d(-120%, 0, 0) rotate(-10deg);
     opacity: 0;
   }
 }
@@ -297,14 +308,14 @@
     opacity: 1;
   }
   100% {
-    transform: translate3d(120%, 0, 0) rotate(12deg);
+    transform: translate3d(120%, 0, 0) rotate(10deg);
     opacity: 0;
   }
 }
 
 @keyframes fzSlideInRight {
   0% {
-    transform: translate3d(100%, 0, 0) rotate(8deg);
+    transform: translate3d(100%, 0, 0) rotate(6deg);
     opacity: 0;
   }
   100% {
@@ -315,7 +326,7 @@
 
 @keyframes fzSlideInLeft {
   0% {
-    transform: translate3d(-100%, 0, 0) rotate(-8deg);
+    transform: translate3d(-100%, 0, 0) rotate(-6deg);
     opacity: 0;
   }
   100% {
@@ -327,7 +338,7 @@
 @keyframes fzCardIn {
   from {
     opacity: 0;
-    transform: translateY(10px) scale(0.98);
+    transform: translateY(8px) scale(0.98);
   }
   to {
     opacity: 1;
@@ -335,24 +346,29 @@
   }
 }
 
-/* Card Header: Mondai & Counter */
+/* Card Header: Sangat Ringkas (Satu Baris Elegan) */
 .jlpt-card-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
+  min-height: 26px;
+  height: 26px;
+  flex-shrink: 0;
 }
 
 .jlpt-badge-mondai {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: #F8F1E5;
+  background: #FAF6EF;
   color: #7A5F1B;
   font-size: 11.5px;
-  font-weight: 700;
-  padding: 4px 10px;
-  border-radius: 20px;
-  border: 1px solid #EEDFCA;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1.5px solid var(--line, #E8DFD3);
+  box-shadow: 0 1.5px 0 #D8CEBF;
 }
 
 .jlpt-badge-dot {
@@ -360,68 +376,101 @@
   height: 6px;
   border-radius: 50%;
   background: #D97706;
+  flex-shrink: 0;
+}
+
+.jlpt-badge-lvl {
+  font-weight: 800;
+}
+
+.jlpt-badge-sep {
+  opacity: 0.45;
+}
+
+.jlpt-badge-mondai-txt {
+  font-weight: 700;
 }
 
 .jlpt-counter-pill {
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 800;
-  color: var(--text-muted, #7A6F64);
-  background: #FAF8F4;
-  padding: 3px 9px;
-  border-radius: 12px;
-  border: 1px solid var(--line, #E8DFD3);
+  color: #0F172A;
+  background: #FAF6EF;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1.5px solid var(--line, #E8DFD3);
+  box-shadow: 0 1.5px 0 #D8CEBF;
 }
 
-/* Compact Situation Chip */
+/* Situasi Ringkas (1 Baris, Tactile Travertine) */
 .jlpt-situation-chip {
-  background: #1C1A24;
-  border: 1px solid rgba(255, 224, 46, 0.25);
-  border-radius: 10px;
-  padding: 7px 10px;
+  background: #FAF6EF;
+  border: 1.5px solid var(--line, #E8DFD3);
+  border-radius: 8px;
+  padding: 3px 8px;
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 6px;
-  font-size: 12px;
-  line-height: 1.4;
-  color: #FDE68A;
+  font-size: 11px;
+  line-height: 1.3;
+  color: #7A5F1B;
+  box-shadow: 0 1.5px 0 #D8CEBF;
+  min-height: 24px;
+  height: 24px;
+  box-sizing: border-box;
+  flex-shrink: 0;
 }
 
 .jlpt-sit-icon {
-  font-size: 12px;
+  font-size: 11px;
   flex-shrink: 0;
 }
 
 .jlpt-sit-text {
   flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 700;
 }
 
-/* Streamlined Single Audio Player Bar */
+/* =========================================================================
+   PANGGUNG AUDIO TACTILE PILL (48-52px)
+   Equalizer gelombang hidup saat playing
+   ========================================================================= */
+
 .jlpt-audio-row {
   display: flex;
   align-items: center;
   gap: 8px;
   background: #241A11;
-  padding: 6px 8px;
+  padding: 5px 8px;
   border-radius: 14px;
-  box-shadow: 0 2px 8px rgba(36, 26, 17, 0.12);
+  box-shadow: 0 3px 0 #18110A;
+  min-height: 48px;
+  height: 48px;
+  box-sizing: border-box;
+  flex-shrink: 0;
 }
 
 .jlpt-primary-play-btn {
   flex: 1;
+  height: 38px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 9px;
+  gap: 8px;
   background: #FFD94F;
   color: #241A11;
   border: none;
   border-radius: 10px;
-  padding: 9px 16px;
+  padding: 0 14px;
   font-family: inherit;
   font-size: 13px;
   font-weight: 800;
   cursor: pointer;
-  transition: all 0.15s ease;
+  box-shadow: 0 2px 0 #D69E2E;
+  transition: all 0.12s ease;
   user-select: none;
 }
 
@@ -431,12 +480,13 @@
 }
 
 .jlpt-primary-play-btn:active {
-  transform: scale(0.98);
+  transform: translateY(1px);
+  box-shadow: 0 1px 0 #D69E2E;
 }
 
 .jlpt-primary-play-btn.playing {
   background: #FFEAA7;
-  box-shadow: 0 0 10px rgba(255, 217, 79, 0.5);
+  box-shadow: 0 0 12px rgba(255, 217, 79, 0.55);
 }
 
 .jlpt-play-icon {
@@ -444,13 +494,13 @@
   line-height: 1;
 }
 
-/* 4-bar mini wave visualizer */
+/* Mini Equalizer Wave Visualizer */
 .jlpt-mini-wave {
   display: inline-flex;
   align-items: center;
   gap: 2.5px;
-  height: 12px;
-  opacity: 0.5;
+  height: 16px;
+  opacity: 0.55;
   transition: opacity 0.15s;
 }
 
@@ -467,26 +517,31 @@
 }
 
 .jlpt-primary-play-btn.playing .jlpt-mini-wave span {
-  animation: fzWaveBar 0.55s infinite ease-in-out alternate;
+  animation: fzEqWave 0.55s infinite ease-in-out alternate;
 }
 
 .jlpt-primary-play-btn.playing .jlpt-mini-wave span:nth-child(1) { animation-delay: 0.05s; }
-.jlpt-primary-play-btn.playing .jlpt-mini-wave span:nth-child(2) { animation-delay: 0.2s; }
-.jlpt-primary-play-btn.playing .jlpt-mini-wave span:nth-child(3) { animation-delay: 0.1s; }
-.jlpt-primary-play-btn.playing .jlpt-mini-wave span:nth-child(4) { animation-delay: 0.25s; }
+.jlpt-primary-play-btn.playing .jlpt-mini-wave span:nth-child(2) { animation-delay: 0.22s; }
+.jlpt-primary-play-btn.playing .jlpt-mini-wave span:nth-child(3) { animation-delay: 0.12s; }
+.jlpt-primary-play-btn.playing .jlpt-mini-wave span:nth-child(4) { animation-delay: 0.3s; }
+.jlpt-primary-play-btn.playing .jlpt-mini-wave span:nth-child(5) { animation-delay: 0.18s; }
 
-@keyframes fzWaveBar {
+@keyframes fzEqWave {
   0% { height: 3px; }
-  100% { height: 12px; }
+  100% { height: 14px; }
 }
 
 /* Secondary JEES Chip */
 .jlpt-jees-chip {
-  background: rgba(255, 255, 255, 0.08);
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.22);
   color: #FFFDF9;
-  border-radius: 8px;
-  padding: 7px 11px;
+  border-radius: 10px;
+  padding: 0 12px;
   font-family: inherit;
   font-size: 11.5px;
   font-weight: 700;
@@ -497,14 +552,14 @@
 
 .jlpt-jees-chip:hover {
   background: rgba(255, 255, 255, 0.18);
-  border-color: rgba(255, 255, 255, 0.4);
+  border-color: rgba(255, 255, 255, 0.35);
 }
 
 .jlpt-jees-chip.playing {
   background: rgba(255, 217, 79, 0.25);
   border-color: #FFD94F;
   color: #FFD94F;
-  box-shadow: 0 0 8px rgba(255, 217, 79, 0.35);
+  box-shadow: 0 0 10px rgba(255, 217, 79, 0.4);
 }
 
 .jlpt-replay-pill {
@@ -520,245 +575,319 @@
   display: inline-block;
 }
 
-/* Clean Question Typography */
+/* =========================================================================
+   TYPOGRAPHY SOAL JEPANG
+   Plus Jakarta Sans, 18-20px, bold 800, warna slate gelap kontras tinggi #0F172A
+   ========================================================================= */
+
 .jlpt-question-block {
-  padding: 2px 2px 2px;
+  padding: 1px 0;
+  flex-shrink: 0;
 }
 
 .jlpt-question-ja {
-  font-size: 16px;
+  font-family: inherit;
+  font-size: 17.5px;
   font-weight: 800;
-  color: #FFFFFF;
-  line-height: 1.45;
-  margin: 0 0 4px;
+  color: #0F172A;
+  line-height: 1.32;
+  margin: 0 0 2px 0;
 }
 
 .jlpt-question-id {
-  font-size: 12.5px;
-  color: #CBD5E1;
-  line-height: 1.4;
+  font-size: 11.5px;
+  color: #475569;
+  font-weight: 600;
+  line-height: 1.3;
   margin: 0;
 }
 
-/* Tactile 4 Options List */
+/* =========================================================================
+   4 KARTU PILIHAN GANDA TACTILE CLAY RAMPING (48-54px)
+   Badge nomor 1-4 tajam, teks Jepang + terjemahan proporsional
+   ========================================================================= */
+
 .jlpt-options-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 5px;
+  flex-shrink: 0;
 }
 
 .jlpt-opt-btn {
   width: 100%;
+  min-height: 48px;
+  max-height: 52px;
+  height: 48px;
   text-align: left;
-  padding: 12px 14px;
+  padding: 4px 10px;
   border: 1.5px solid #E8DFD3 !important;
-  border-radius: 14px;
+  border-radius: 12px;
   background: #FFFFFF !important;
-  box-shadow: 0 4px 10px rgba(46, 39, 36, 0.04) !important;
+  box-shadow: 0 3px 0 #D8CEBF !important;
   font-family: inherit;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 12px;
-  transition: transform 0.12s ease, background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  gap: 8px;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.15s ease, border-color 0.15s ease;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
 }
 
 .jlpt-opt-btn:hover:not(.locked) {
-  background: #F4EFE6;
-  border-color: #D8CAB6;
+  background: #FFFDF8 !important;
+  border-color: #D6CBC0 !important;
   transform: translateY(-1px);
+  box-shadow: 0 4px 0 #D8CEBF !important;
 }
 
 .jlpt-opt-btn:active:not(.locked) {
-  transform: scale(0.985);
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #D8CEBF !important;
 }
 
 .jlpt-opt-badge {
   width: 26px;
   height: 26px;
-  border-radius: 50%;
-  background: #252536;
-  color: #FFFFFF;
+  min-width: 26px;
+  border-radius: 8px;
+  background: #F4ECE1;
+  color: #382E25;
   font-weight: 800;
-  font-size: 12px;
+  font-size: 12.5px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid #E0D4C3;
+  box-shadow: 0 1px 0 #D8CEBF;
   transition: all 0.15s ease;
 }
 
 .jlpt-opt-texts {
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  justify-content: center;
+  gap: 1px;
 }
 
 .jlpt-opt-ja {
-  font-size: 14.5px;
+  font-size: 13.5px;
   font-weight: 800;
   color: #0F172A;
-  line-height: 1.35;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .jlpt-opt-id {
-  font-size: 12px;
+  font-size: 10.5px;
   color: #475569;
   font-weight: 600;
-  line-height: 1.3;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* Locked & Correct / Wrong States */
+/* Locked & Correct / Wrong States (Tactile Clay) */
 .jlpt-opt-btn.locked {
   cursor: default;
 }
 
 .jlpt-opt-btn.correct {
-  background: #E8F5E9 !important;
-  border-color: #2E8B69 !important;
-  box-shadow: 0 2px 8px rgba(46, 139, 105, 0.15);
+  background: #F0FDF4 !important;
+  border-color: #16A34A !important;
+  box-shadow: 0 3px 0 #15803D !important;
 }
 
 .jlpt-opt-btn.correct .jlpt-opt-badge {
-  background: #2E8B69;
+  background: #16A34A;
   color: #FFFFFF;
+  border-color: #15803D;
+  box-shadow: 0 1px 0 #15803D;
 }
 
 .jlpt-opt-btn.correct .jlpt-opt-ja {
-  color: #1B5E20;
+  color: #14532D;
+}
+
+.jlpt-opt-btn.correct .jlpt-opt-id {
+  color: #15803D;
 }
 
 .jlpt-opt-btn.wrong {
-  background: #FFEBEE !important;
-  border-color: #D32F2F !important;
+  background: #FEF2F2 !important;
+  border-color: #EF4444 !important;
+  box-shadow: 0 3px 0 #DC2626 !important;
 }
 
 .jlpt-opt-btn.wrong .jlpt-opt-badge {
-  background: #D32F2F;
+  background: #EF4444;
   color: #FFFFFF;
+  border-color: #DC2626;
+  box-shadow: 0 1px 0 #DC2626;
 }
 
 .jlpt-opt-btn.wrong .jlpt-opt-ja {
-  color: #B71C1C;
+  color: #7F1D1D;
 }
 
-.jlpt-opt-btn.revealed-correct {
-  border-color: #2E8B69 !important;
-  background: #F1F8F3 !important;
+.jlpt-opt-btn.wrong .jlpt-opt-id {
+  color: #B91C1C;
 }
 
-.jlpt-opt-btn.revealed-correct .jlpt-opt-badge {
-  background: #2E8B69;
-  color: #FFFFFF;
-}
-
-/* Inline Feedback Banner */
+/* Inline Feedback Banner (Compact, Viewport-Safe) */
 .jlpt-feedback-banner {
-  border-radius: 12px;
-  padding: 10px 12px;
+  border-radius: 10px;
+  padding: 6px 10px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  animation: fzFeedbackPop 0.2s ease;
+  animation: fzFeedbackPop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.05);
+  min-height: 34px;
+  flex-shrink: 0;
 }
 
 @keyframes fzFeedbackPop {
-  from { opacity: 0; transform: translateY(-4px); }
+  from { opacity: 0; transform: translateY(-3px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 .jlpt-feedback-banner.correct {
-  background: #E8F5E9;
-  border: 1px solid #2E8B69;
-  color: #1B5E20;
+  background: #F0FDF4;
+  border: 1.5px solid #22C55E;
+  color: #15803D;
 }
 
 .jlpt-feedback-banner.wrong {
-  background: #FFEBEE;
-  border: 1px solid #D32F2F;
-  color: #B71C1C;
+  background: #FEF2F2;
+  border: 1.5px solid #EF4444;
+  color: #B91C1C;
+}
+
+.jlpt-fb-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.jlpt-fb-badge {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.jlpt-feedback-banner.correct .jlpt-fb-badge {
+  background: #22C55E;
+  color: #FFFFFF;
+}
+
+.jlpt-feedback-banner.wrong .jlpt-fb-badge {
+  background: #EF4444;
+  color: #FFFFFF;
+}
+
+.jlpt-fb-text-col {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
 .jlpt-fb-title {
-  font-size: 12.5px;
+  font-size: 11.5px;
   font-weight: 800;
+  line-height: 1.2;
 }
 
 .jlpt-fb-sub {
-  font-size: 11px;
+  font-size: 10.5px;
   opacity: 0.9;
+  line-height: 1.2;
 }
 
-/* Card Footer: Drawer Trigger Button & Hint */
-.jlpt-card-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-top: 4px;
-  padding-top: 10px;
-  border-top: 1px dashed var(--line, #E8DFD3);
-}
-
-.jlpt-btn-sheet-trigger {
-  flex: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  background: #FAF5EB;
-  color: #241A11;
-  border: 1.5px solid var(--line, #E8DFD3);
-  border-radius: 12px;
-  padding: 10px 14px;
+.jlpt-fb-key-btn {
+  background: #FFFFFF;
+  border: 1px solid currentColor;
+  border-radius: 6px;
+  padding: 3px 8px;
   font-family: inherit;
-  font-size: 12.5px;
+  font-size: 11px;
   font-weight: 800;
+  color: inherit;
   cursor: pointer;
-  transition: all 0.15s ease;
+  white-space: nowrap;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08);
+  transition: all 0.12s ease;
+  flex-shrink: 0;
 }
 
-.jlpt-btn-sheet-trigger:hover {
-  background: #241A11;
-  color: #FFD94F;
-  border-color: #241A11;
+.jlpt-fb-key-btn:hover {
   transform: translateY(-1px);
 }
 
-.jlpt-btn-sheet-trigger.pulse-hint {
-  background: #FFF3C4;
-  border-color: #FFD94F;
-  color: #7A5F1B;
-  box-shadow: 0 0 10px rgba(255, 217, 79, 0.4);
+/* Quick Bottom Sheet Triggers (Ergonomis & Ringkas) */
+.jlpt-sheet-triggers {
+  display: flex;
+  gap: 5px;
+  margin-top: 1px;
+  flex-shrink: 0;
 }
 
-.jlpt-btn-pill-arrow {
-  font-size: 13px;
-  transition: transform 0.15s ease;
-}
-
-.jlpt-btn-sheet-trigger:hover .jlpt-btn-pill-arrow {
-  transform: translateX(2px) translateY(-2px);
-}
-
-.jlpt-swipe-hint {
+.jlpt-sheet-trigger-btn {
+  flex: 1;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: #FAF6EF;
+  border: 1.5px solid var(--line, #E8DFD3);
+  border-radius: 10px;
+  box-shadow: 0 2px 0 #D8CEBF;
+  font-family: inherit;
   font-size: 11px;
-  color: var(--text-muted, #7A6F64);
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.jlpt-hint-arrows {
-  color: #B45309;
   font-weight: 800;
+  color: #241A11;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  user-select: none;
 }
 
-/* Swipe Cue Overlay (visible during drag) */
+.jlpt-sheet-trigger-btn:hover {
+  background: #FFFDF9;
+  border-color: #D6CBC0;
+  transform: translateY(-1px);
+}
+
+.jlpt-sheet-trigger-btn:active {
+  transform: translateY(1.5px);
+  box-shadow: 0 0.5px 0 #D8CEBF;
+}
+
+.jlpt-sheet-trigger-btn.pulse-hint {
+  background: #FEF3C7;
+  border-color: #F59E0B;
+  color: #B45309;
+  box-shadow: 0 2px 0 #D97706, 0 0 10px rgba(245, 158, 11, 0.35);
+}
+
+/* Dynamic Swipe Cues (Visible during drag) */
 .jlpt-swipe-cue {
   position: absolute;
   top: 50%;
@@ -794,36 +923,54 @@
   transform: translateY(-50%) scale(1.05);
 }
 
-/* Bottom Nav Bar (Prev / Next Buttons) */
+/* =========================================================================
+   BOTTOM NAV BAR (MUNDUR, COUNTER, MAJU)
+   Menempel rapi dan proporsional
+   ========================================================================= */
+
 .jlpt-bottom-nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 0 4px;
+  gap: 8px;
+  padding: 1px 0;
+  margin-top: 2px;
+  flex-shrink: 0;
 }
 
 .jlpt-nav-pill {
-  padding: 8px 16px;
-  border-radius: 12px;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 11px;
   border: 1.5px solid var(--line, #E8DFD3);
   background: #FFFDF9;
+  box-shadow: 0 2.5px 0 #D8CEBF;
   font-family: inherit;
-  font-size: 12.5px;
+  font-size: 11.5px;
   font-weight: 800;
   color: #241A11;
   cursor: pointer;
-  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.12s ease;
+  user-select: none;
 }
 
 .jlpt-nav-pill:hover:not(:disabled) {
-  background: #241A11;
-  color: #FFD94F;
-  border-color: #241A11;
+  background: #FAF6EF;
+  border-color: #D6CBC0;
+  transform: translateY(-1px);
+}
+
+.jlpt-nav-pill:active:not(:disabled) {
+  transform: translateY(1.5px);
+  box-shadow: 0 1px 0 #D8CEBF;
 }
 
 .jlpt-nav-pill:disabled {
-  opacity: 0.35;
+  opacity: 0.38;
+  box-shadow: none;
   cursor: not-allowed;
 }
 
@@ -832,34 +979,39 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: 1px;
 }
 
 .jlpt-nav-counter {
-  font-size: 12.5px;
+  font-size: 11.5px;
   font-weight: 800;
-  color: var(--text, #241A11);
-  letter-spacing: 0.02em;
+  color: #0F172A;
 }
 
 .jlpt-swipe-subhint {
-  font-size: 10.5px;
+  font-size: 9.5px;
   font-weight: 700;
   color: var(--text-muted, #7A6F64);
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 2.5px;
+}
+
+.jlpt-hint-arrows {
+  color: #B45309;
+  font-weight: 800;
 }
 
 /* =========================================================================
-   BOTTOM SHEET DRAWER (#jlptDetailSheet)
-   iOS / Android Style Sheet for Transcript, Explanation & Vocabulary
+   SPRING BOTTOM SHEET DRAWER (#jlptDetailSheet & .jlpt-detail-sheet)
+   Drawer native bersih dengan 3 tab rapi: 📝 Naskah, 💡 Pembahasan, 📚 Kosakata
    ========================================================================= */
 
+#jlptDetailSheet,
 .jlpt-detail-sheet {
-  position: absolute;
+  position: fixed;
   inset: 0;
-  z-index: 100;
+  z-index: 2600;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -868,6 +1020,7 @@
   transition: visibility 0.25s ease;
 }
 
+#jlptDetailSheet.open,
 .jlpt-detail-sheet.open {
   pointer-events: auto;
   visibility: visible;
@@ -877,14 +1030,14 @@
 .jlpt-sheet-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(36, 26, 17, 0.58);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  background: rgba(36, 26, 17, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   opacity: 0;
-  transition: opacity 0.22s ease;
+  transition: opacity 0.24s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.jlpt-detail-sheet.open #jlptSheetBackdrop,
+#jlptDetailSheet.open #jlptSheetBackdrop,
 .jlpt-detail-sheet.open .jlpt-sheet-backdrop {
   opacity: 1;
 }
@@ -893,18 +1046,21 @@
   position: relative;
   z-index: 2;
   background: #FFFDF9;
-  border-top-left-radius: 22px;
-  border-top-right-radius: 22px;
-  box-shadow: 0 -12px 32px rgba(36, 26, 17, 0.22);
-  border-top: 1.5px solid var(--line, #E8DFD3);
-  max-height: 85%;
-  height: 85%;
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  box-shadow: 0 -12px 38px rgba(36, 26, 17, 0.22);
+  border: 1.5px solid var(--line, #E8DFD3);
+  border-bottom: none;
+  max-height: 85vh;
+  height: 85vh;
   display: flex;
   flex-direction: column;
-  transform: translateY(100%);
-  transition: transform 0.26s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateY(105%);
+  transition: transform 0.32s cubic-bezier(0.175, 0.885, 0.32, 1.15); /* Spring drawer */
+  overflow: hidden;
 }
 
+#jlptDetailSheet.open .jlpt-sheet-container,
 .jlpt-detail-sheet.open .jlpt-sheet-container {
   transform: translateY(0);
 }
@@ -915,50 +1071,58 @@
   align-items: center;
   justify-content: center;
   padding: 10px 0 6px;
-  cursor: pointer;
+  cursor: grab;
   touch-action: none;
+  user-select: none;
+  flex-shrink: 0;
 }
 
 .sheet-drag-handle,
 .jlpt-sheet-handle-bar {
   width: 44px;
-  height: 4.5px;
-  border-radius: 3px;
-  background: #D8CAB8;
-  transition: background 0.15s ease;
+  height: 5px;
+  border-radius: 999px;
+  background: #D8CEBF;
+  transition: background 0.15s ease, transform 0.15s ease;
 }
 
 .sheet-drag-handle-wrapper:hover .sheet-drag-handle,
 .jlpt-sheet-handle-zone:hover .jlpt-sheet-handle-bar {
   background: #B6A795;
+  transform: scaleY(1.2);
 }
 
-.jlpt-sheet-header {
+.jlpt-sheet-header,
+.jlpt-sheet-head {
   padding: 6px 18px 10px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid var(--line, #E8DFD3);
+  border-bottom: 1.5px solid var(--line, #E8DFD3);
+  background: #FFFDF9;
+  flex-shrink: 0;
 }
 
 .jlpt-sheet-title {
   font-size: 15px;
   font-weight: 800;
-  color: #241A11;
+  color: #0F172A;
   margin: 0;
 }
 
 .jlpt-sheet-subtitle {
   font-size: 11px;
   color: var(--text-muted, #7A6F64);
+  font-weight: 600;
 }
 
-.jlpt-sheet-close {
-  width: 30px;
-  height: 30px;
+.jlpt-sheet-close,
+.jlpt-sheet-close-btn {
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  border: 1px solid var(--line, #E8DFD3);
-  background: #F6EFE3;
+  border: 1.5px solid var(--line, #E8DFD3);
+  background: #FAF6EF;
   color: #241A11;
   font-size: 14px;
   font-weight: 700;
@@ -966,28 +1130,33 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.15s;
+  box-shadow: 0 1.5px 0 #D8CEBF;
+  transition: all 0.12s ease;
 }
 
-.jlpt-sheet-close:hover {
+.jlpt-sheet-close:hover,
+.jlpt-sheet-close-btn:hover {
   background: #241A11;
   color: #FFD94F;
+  border-color: #241A11;
 }
 
+/* 3 Tabs Rapi: 📝 Naskah, 💡 Pembahasan, 📚 Kosakata */
 .jlpt-sheet-tabs {
   display: flex;
   gap: 6px;
-  padding: 10px 16px;
-  background: #F8F3EA;
+  padding: 8px 16px;
+  background: #F4EFE6;
   border-bottom: 1px solid var(--line, #E8DFD3);
-  overflow-x: auto;
+  flex-shrink: 0;
 }
 
 .jlpt-tab-chip {
   flex: 1;
-  padding: 7px 10px;
+  height: 34px;
+  padding: 0 10px;
   border-radius: 10px;
-  border: 1px solid transparent;
+  border: 1.5px solid transparent;
   background: transparent;
   font-family: inherit;
   font-size: 12px;
@@ -995,29 +1164,38 @@
   color: var(--text-muted, #7A6F64);
   white-space: nowrap;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
   transition: all 0.15s ease;
-  text-align: center;
 }
 
 .jlpt-tab-chip:hover {
-  color: #241A11;
+  color: #0F172A;
 }
 
 .jlpt-tab-chip.active {
   background: #FFFFFF;
-  color: #241A11;
+  color: #0F172A;
+  font-weight: 800;
   border-color: var(--line, #E8DFD3);
-  box-shadow: 0 2px 6px rgba(36, 26, 17, 0.08);
+  box-shadow: 0 2px 0 #D8CEBF;
 }
 
-.jlpt-sheet-content {
+.jlpt-sheet-content,
+.jlpt-sheet-body {
   flex: 1;
   overflow-y: auto;
-  padding: 14px 18px;
+  padding: 14px 16px 28px;
   -webkit-overflow-scrolling: touch;
 }
 
-/* TAB 1: SCRIPT FORMATTED BUBBLES */
+/* =========================================================================
+   TAB 1: NASKAH PERCAKAPAN DENGAN BADGE PILL PENUTUR PROFESIONAL
+   Zero Generic Emojis (No 👩, 👨, 👔), Tema Indigo / Amber / Emerald Elegan
+   ========================================================================= */
+
 .jlpt-transcript-header {
   display: flex;
   align-items: center;
@@ -1027,11 +1205,12 @@
 
 .jlpt-transcript-tag {
   font-size: 11.5px;
-  font-weight: 700;
+  font-weight: 800;
   color: #7A5F1B;
-  background: #FFF3C4;
+  background: #FAF6EF;
+  border: 1px solid #E8DFD3;
   padding: 3px 8px;
-  border-radius: 6px;
+  border-radius: 8px;
 }
 
 .jlpt-transcript-play-btn {
@@ -1044,6 +1223,7 @@
   font-size: 11.5px;
   font-weight: 800;
   cursor: pointer;
+  box-shadow: 0 2px 0 #18110A;
   transition: background 0.15s;
 }
 
@@ -1054,13 +1234,18 @@
 .jlpt-dialogue-bubbles {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .jlpt-dialogue-turn {
+  background: #FFFFFF;
+  border: 1.5px solid var(--line, #E8DFD3);
+  border-radius: 14px;
+  padding: 10px 12px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
+  box-shadow: 0 2px 0 #D8CEBF;
 }
 
 .jlpt-turn-meta {
@@ -1069,169 +1254,257 @@
   justify-content: space-between;
 }
 
+/* Professional Speaker Badge Pills */
 .jlpt-speaker-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 999px;
   font-size: 11px;
   font-weight: 800;
-  padding: 2px 8px;
-  border-radius: 6px;
-  background: #F0E8DC;
-  color: #241A11;
+  letter-spacing: 0.3px;
 }
 
-.jlpt-dialogue-turn.speaker-teacher .jlpt-speaker-chip {
-  background: #EDE9FE;
-  color: #5B21B6;
+.jlpt-speaker-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
 }
 
-.jlpt-dialogue-turn.speaker-female .jlpt-speaker-chip {
-  background: #FFE4E6;
-  color: #9F1239;
+/* Personas: Indigo / Amber / Emerald Palettes */
+.jlpt-speaker-chip.speaker-instructor {
+  background: #EEF2FF;
+  color: #4338CA;
+  border: 1px solid #C7D2FE;
 }
 
-.jlpt-dialogue-turn.speaker-male .jlpt-speaker-chip {
-  background: #DBEAFE;
-  color: #1E40AF;
-}
-
-.jlpt-dialogue-turn.speaker-student .jlpt-speaker-chip {
-  background: #CCFBF1;
-  color: #115E59;
-}
-
-.jlpt-dialogue-turn.speaker-staff .jlpt-speaker-chip {
+.jlpt-speaker-chip.speaker-male {
   background: #FEF3C7;
-  color: #92400E;
+  color: #B45309;
+  border: 1px solid #FDE68A;
+}
+
+.jlpt-speaker-chip.speaker-female {
+  background: #ECFDF5;
+  color: #047857;
+  border: 1px solid #A7F3D0;
+}
+
+.jlpt-speaker-chip.speaker-teacher {
+  background: #EDE9FE;
+  color: #6D28D9;
+  border: 1px solid #DDD6FE;
+}
+
+.jlpt-speaker-chip.speaker-student {
+  background: #CCFBF1;
+  color: #0F766E;
+  border: 1px solid #99F6E4;
+}
+
+.jlpt-speaker-chip.speaker-staff,
+.jlpt-speaker-chip.speaker-neutral {
+  background: #F4EFEA;
+  color: #4A3E34;
+  border: 1px solid #E8DFD3;
+}
+
+.jlpt-speaker-raw {
+  font-size: 10px;
+  opacity: 0.75;
+  font-weight: 600;
 }
 
 .jlpt-line-speak-btn {
-  background: transparent;
-  border: none;
+  background: #FAF6EF;
+  border: 1px solid #E8DFD3;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 13px;
-  padding: 2px 4px;
-  opacity: 0.7;
+  font-size: 12px;
+  padding: 3px 6px;
+  color: #7A5F1B;
+  transition: transform 0.1s;
 }
 
 .jlpt-line-speak-btn:hover {
-  opacity: 1;
+  transform: scale(1.1);
+  background: #241A11;
+  color: #FFD94F;
 }
 
 .jlpt-turn-bubble {
-  background: #FAF8F4;
-  border: 1px solid var(--line, #E8DFD3);
-  border-radius: 12px;
-  padding: 10px 12px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
 }
 
 .jlpt-bubble-ja {
   font-size: 14.5px;
   font-weight: 700;
-  color: #241A11;
-  line-height: 1.5;
+  color: #0F172A;
+  line-height: 1.45;
+  word-break: break-word;
 }
 
 .jlpt-bubble-ro {
   font-size: 11.5px;
   font-style: italic;
-  color: #7A6F64;
+  color: #64748B;
   line-height: 1.35;
 }
 
 .jlpt-bubble-id {
-  font-size: 12.5px;
-  color: #382B20;
+  font-size: 12px;
   line-height: 1.4;
-  padding-top: 4px;
+  color: #334155;
+  background: #FAF6EF;
+  border-left: 3px solid #D97706;
+  padding: 5px 8px;
+  border-radius: 0 6px 6px 0;
   margin-top: 2px;
-  border-top: 1px dashed #E8DFD3;
 }
 
-/* TAB 2: EXPLAIN PANEL */
+/* =========================================================================
+   TAB 2: PEMBAHASAN PANEL (TACTILE CLAY)
+   ========================================================================= */
+
 .jlpt-explain-panel {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
 .jlpt-key-card {
-  background: #E8F5E9;
-  border: 1.5px solid #2E8B69;
+  background: #F0FDF4;
+  border: 1.5px solid #22C55E;
   border-radius: 12px;
-  padding: 12px 14px;
+  padding: 10px 12px;
+  box-shadow: 0 2px 0 #15803D;
 }
 
 .jlpt-key-badge {
   font-size: 11px;
   font-weight: 800;
-  color: #1B5E20;
-  letter-spacing: 0.5px;
-  margin-bottom: 4px;
+  color: #15803D;
+  letter-spacing: 0.3px;
+}
+
+.jlpt-status-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.jlpt-status-badge.status-correct {
+  background: #DCFCE7;
+  color: #15803D;
+}
+
+.jlpt-status-badge.status-wrong {
+  background: #FEE2E2;
+  color: #B91C1C;
+}
+
+.jlpt-status-badge.status-pending {
+  background: #EFE6D8;
+  color: #7A6F64;
 }
 
 .jlpt-key-choice {
-  font-size: 14px;
-  color: #241A11;
-  line-height: 1.4;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #0F172A;
+  line-height: 1.35;
 }
 
 .jlpt-explain-body {
-  background: #FAF8F4;
-  border: 1px solid var(--line, #E8DFD3);
+  background: #FFFFFF;
+  border: 1.5px solid var(--line, #E8DFD3);
   border-radius: 12px;
   padding: 12px 14px;
+  box-shadow: 0 2px 0 #D8CEBF;
 }
 
 .jlpt-explain-title {
   margin: 0 0 6px;
-  font-size: 13.5px;
+  font-size: 13px;
   font-weight: 800;
-  color: #241A11;
+  color: #0F172A;
 }
 
 .jlpt-explain-desc {
   margin: 0;
-  font-size: 13px;
-  line-height: 1.6;
-  color: #382B20;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: #334155;
   white-space: pre-wrap;
 }
 
-/* TAB 3: VOCAB PANEL */
+.jlpt-explain-tip-card {
+  background: #F0F7FF;
+  border: 1.5px solid #BFDBFE;
+  border-radius: 10px;
+  padding: 9px 12px;
+  font-size: 12px;
+  color: #1E40AF;
+  line-height: 1.45;
+  box-shadow: 0 1.5px 0 #93C5FD;
+}
+
+/* =========================================================================
+   TAB 3: KOSAKATA PANEL
+   ========================================================================= */
+
 .jlpt-vocab-grid {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
+.jlpt-vocab-card-item,
 .jlpt-vocab-item {
-  background: #FAF8F4;
-  border: 1px solid var(--line, #E8DFD3);
+  background: #FFFFFF;
+  border: 1.5px solid var(--line, #E8DFD3);
   border-radius: 10px;
-  padding: 10px 12px;
+  padding: 8px 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+  box-shadow: 0 2px 0 #D8CEBF;
+  transition: all 0.12s ease;
+}
+
+.jlpt-vocab-card-item:hover,
+.jlpt-vocab-item:hover {
+  background: #FAF6EF;
+  border-color: #D6CBC0;
+}
+
+.jlpt-vocab-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .jlpt-vocab-word {
   font-size: 13.5px;
   font-weight: 800;
-  color: #241A11;
+  color: #0F172A;
 }
 
 .jlpt-vocab-meaning {
   font-size: 12px;
-  color: var(--text-muted, #7A6F64);
-  margin-top: 1px;
+  color: #64748B;
+  font-weight: 600;
 }
 
 .jlpt-vocab-speak {
-  background: #EDE4D5;
-  border: none;
+  background: #FAF6EF;
+  border: 1px solid #E8DFD3;
   width: 28px;
   height: 28px;
   border-radius: 50%;
@@ -1241,11 +1514,14 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  transition: background 0.15s;
+  box-shadow: 0 1px 0 #D8CEBF;
+  transition: transform 0.1s;
 }
 
 .jlpt-vocab-speak:hover {
-  background: #DFD3C0;
+  transform: scale(1.1);
+  background: #241A11;
+  color: #FFD94F;
 }
 
 .jlpt-vocab-empty {
@@ -1253,6 +1529,45 @@
   padding: 24px;
   font-size: 13px;
   color: var(--text-muted, #7A6F64);
+}
+
+/* =========================================================================
+   TACTILE TRAVERTINE DOWNLOAD SECTION (ANTI-BLACK MONOLITH)
+   ========================================================================= */
+
+.jlpt-download-box {
+  background: #FAF6EF;
+  border: 1.5px solid var(--line, #E8DFD3);
+  border-radius: 14px;
+  padding: 10px 14px;
+  box-shadow: 0 3px 0 #D8CEBF;
+  margin-top: 4px;
+  flex-shrink: 0;
+}
+
+.jlpt-download-title {
+  font-size: 12px;
+  font-weight: 800;
+  color: #0F172A;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.jlpt-download-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 11.5px;
+}
+
+.jlpt-download-link {
+  color: #B45309;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.jlpt-download-link:hover {
+  text-decoration: underline;
 }
 
 /* Banner di Beranda */
@@ -1321,940 +1636,270 @@
   white-space: nowrap;
 }
 
-/* Kartu Renshu */
-.ja-chokai-card {
-  border: 1.5px solid var(--line, #E8DFD3);
-}
-
 /* =========================================================================
-   JLPT BOTTOM SHEET DRAWER (Naskah, Pembahasan, Kosakata)
+   RESPONSIVE MULTI-DEVICE VIEWPORTS (390×844 IPHONE & ANDROID COMPAT)
    ========================================================================= */
 
-#jlptSheetBackdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(26, 18, 12, 0.65);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  z-index: 2600;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-#jlptSheetBackdrop.open {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-#jlptDetailSheet {
-  position: fixed;
-  left: 50%;
-  bottom: 0;
-  transform: translate(-50%, 105%);
-  width: 100%;
-  max-width: 540px;
-  max-height: 85vh;
-  min-height: 300px;
-  background: #FFFDF9;
-  border-radius: 24px 24px 0 0;
-  box-shadow: 0 -12px 38px rgba(36, 26, 17, 0.28);
-  border: 1.5px solid var(--line, #E8DFD3);
-  border-bottom: none;
-  z-index: 2610;
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
-  overflow: hidden;
-  pointer-events: none;
-  visibility: hidden;
-  will-change: transform;
-}
-
-#jlptDetailSheet.open {
-  transform: translate(-50%, 0);
-  pointer-events: auto;
-  visibility: visible;
-}
-
-#jlptDetailSheet.dragging {
-  transition: none !important;
-}
-
-/* Drag Handle Bar */
-.sheet-drag-handle-wrapper {
-  padding: 10px 0 6px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: grab;
-  touch-action: none;
-  user-select: none;
-  flex-shrink: 0;
-}
-
-.sheet-drag-handle-wrapper:active {
-  cursor: grabbing;
-}
-
-.sheet-drag-handle {
-  width: 44px;
-  height: 5px;
-  border-radius: 999px;
-  background: #D6CBC2;
-  transition: background 0.15s ease, transform 0.15s ease;
-}
-
-.sheet-drag-handle-wrapper:hover .sheet-drag-handle {
-  background: #B3A495;
-  transform: scaleY(1.2);
-}
-
-/* Sheet Header */
-.jlpt-sheet-head {
-  padding: 4px 18px 12px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  border-bottom: 1px solid var(--line, #E8DFD3);
-  background: #FFFDF9;
-  flex-shrink: 0;
-}
-
-.jlpt-sheet-head-left {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
-.jlpt-sheet-badge {
-  font-size: 11px;
-  font-weight: 700;
-  color: #B45309;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.jlpt-sheet-title {
-  margin: 0;
-  font-size: 15px;
-  font-weight: 800;
-  color: #241A11;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.jlpt-sheet-close-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: 1px solid var(--line, #E8DFD3);
-  background: #FAF5EB;
-  color: #241A11;
-  font-size: 15px;
-  font-weight: 700;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  transition: all 0.15s ease;
-}
-
-.jlpt-sheet-close-btn:hover {
-  background: #EFE6D8;
-  transform: scale(1.06);
-}
-
-/* Tabs */
-.jlpt-sheet-tabs {
-  display: flex;
-  gap: 6px;
-  padding: 4px;
-  background: #EFE6D8;
-  border-radius: 12px;
-  margin: 10px 18px;
-  flex-shrink: 0;
-}
-
-.jlpt-sheet-tab-btn {
-  flex: 1;
-  padding: 8px 10px;
-  border: none;
-  background: transparent;
-  font-family: inherit;
-  font-size: 12.5px;
-  font-weight: 700;
-  color: var(--text-muted, #7A6F64);
-  border-radius: 9px;
-  cursor: pointer;
-  transition: all 0.16s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-}
-
-.jlpt-sheet-tab-btn:hover:not(.active) {
-  color: #241A11;
-}
-
-.jlpt-sheet-tab-btn.active {
-  background: #FFFFFF;
-  color: #241A11;
-  font-weight: 800;
-  box-shadow: 0 2px 6px rgba(36, 26, 17, 0.1);
-}
-
-.jlpt-sheet-tab-count {
-  font-size: 11px;
-  font-weight: 700;
-  background: #F3EBDD;
-  color: #7A5F1B;
-  padding: 1px 6px;
-  border-radius: 8px;
-}
-
-.jlpt-sheet-tab-btn.active .jlpt-sheet-tab-count {
-  background: #FFD94F;
-  color: #241A11;
-}
-
-/* Body / Scrollable Content */
-.jlpt-sheet-body {
-  flex: 1;
-  overflow-y: auto;
-  padding: 4px 18px 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  -webkit-overflow-scrolling: touch;
-}
-
-.jlpt-sheet-panel {
-  display: none;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.jlpt-sheet-panel.active {
-  display: flex;
-}
-
-/* Naskah Tab Styling (Calibrated typography, zero raw pre) */
-.jlpt-script-header-card {
-  background: #F9F4EB;
-  border: 1px solid var(--line, #E8DFD3);
-  border-radius: 12px;
-  padding: 10px 12px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.jlpt-situation-badge {
-  background: #FFF9E6;
-  border: 1px solid #FFEBAA;
-  border-radius: 10px;
-  padding: 8px 12px;
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  font-size: 12px;
-  color: #7A5F1B;
-  line-height: 1.45;
-}
-
-.jlpt-situation-badge .sit-icon {
-  font-size: 14px;
-  flex-shrink: 0;
-}
-
-.jlpt-script-actions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 4px 2px;
-}
-
-.jlpt-script-status {
-  font-size: 11.5px;
-  font-weight: 700;
-  color: #7A6F64;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.jlpt-script-listen-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: #241A11;
-  color: #FFD94F;
-  border: none;
-  border-radius: 8px;
-  padding: 6px 12px;
-  font-family: inherit;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.jlpt-script-listen-btn:hover {
-  background: #3A2B1D;
-  transform: translateY(-1px);
-}
-
-.jlpt-dialogue-turn {
-  background: #FFFFFF;
-  border: 1.5px solid var(--line, #E8DFD3);
-  border-radius: 14px;
-  padding: 12px 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  box-shadow: 0 2px 6px rgba(36, 26, 17, 0.03);
-}
-
-.jlpt-turn-speaker {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.jlpt-speaker-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 2px 8px;
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 800;
-  background: #EFE6D8;
-  color: #3B2E24;
-}
-
-.jlpt-speaker-chip.instructor {
-  background: #E0E7FF;
-  color: #3730A3;
-}
-
-.jlpt-speaker-chip.male {
-  background: #E0F2FE;
-  color: #075985;
-}
-
-.jlpt-speaker-chip.female {
-  background: #FCE7F3;
-  color: #9D174D;
-}
-
-.jlpt-turn-audio-btn {
-  background: transparent;
-  border: none;
-  font-size: 14px;
-  cursor: pointer;
-  padding: 2px 4px;
-  color: #7A5F1B;
-  transition: transform 0.1s;
-}
-
-.jlpt-turn-audio-btn:hover {
-  transform: scale(1.15);
-}
-
-.jlpt-dialogue-ja {
-  font-size: 14.5px;
-  line-height: 1.6;
-  font-weight: 600;
-  color: #241A11;
-  word-break: break-word;
-}
-
-.jlpt-dialogue-romaji {
-  font-size: 11.5px;
-  font-style: italic;
-  color: #7A6F64;
-  line-height: 1.45;
-}
-
-.jlpt-dialogue-id {
-  font-size: 12.5px;
-  line-height: 1.5;
-  color: #4A3E34;
-  background: #FAF6EF;
-  border-left: 3px solid #D69E2E;
-  padding: 6px 10px;
-  border-radius: 0 8px 8px 0;
-  margin-top: 2px;
-}
-
-/* Pembahasan Tab Styling */
-.jlpt-explain-hero-card {
-  background: linear-gradient(135deg, #FFFDF8 0%, #FFF9E9 100%);
-  border: 1.5px solid #F6D886;
-  border-radius: 14px;
-  padding: 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.jlpt-explain-hero-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.jlpt-explain-hero-badge {
-  font-size: 10.5px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: #B45309;
-  background: #FEF3C7;
-  padding: 2px 8px;
-  border-radius: 6px;
-}
-
-.jlpt-explain-hero-status {
-  font-size: 11px;
-  font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 6px;
-}
-
-.jlpt-explain-hero-status.correct {
-  background: #E8F5E9;
-  color: #1B5E20;
-}
-
-.jlpt-explain-hero-status.wrong {
-  background: #FFEBEE;
-  color: #B71C1C;
-}
-
-.jlpt-explain-hero-status.pending {
-  background: #EFE6D8;
-  color: #7A6F64;
-}
-
-.jlpt-correct-answer-box {
-  background: #FFFFFF;
-  border: 1px solid #E8DFD3;
-  border-radius: 10px;
-  padding: 10px 12px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.jlpt-answer-opt-num {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  background: #2E8B69;
-  color: #FFFFFF;
-  font-weight: 800;
-  font-size: 13px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.jlpt-answer-opt-details {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.jlpt-answer-opt-details .opt-ja {
-  font-weight: 700;
-  font-size: 13.5px;
-  color: #FFFFFF;
-}
-
-.jlpt-answer-opt-details .opt-id {
-  font-size: 11.5px;
-  color: #CBD5E1;
-}
-
-.jlpt-explain-article {
-  background: #FFFFFF;
-  border: 1.5px solid var(--line, #E8DFD3);
-  border-radius: 14px;
-  padding: 14px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.jlpt-explain-article-title {
-  font-size: 12px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: #7A6F64;
-}
-
-.jlpt-explain-body {
-  font-size: 13px;
-  line-height: 1.65;
-  color: #2C2219;
-}
-
-.jlpt-explain-tip-box {
-  background: #F4F7FB;
-  border: 1px solid #D0DFEE;
-  border-radius: 10px;
-  padding: 10px 12px;
-  font-size: 12px;
-  line-height: 1.5;
-  color: #1E3A8A;
-}
-
-/* Kosakata Tab Styling */
-.jlpt-vocab-header-info {
-  font-size: 12px;
-  color: var(--text-muted, #7A6F64);
-  padding: 2px 4px;
-}
-
-.jlpt-vocab-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.jlpt-vocab-card-item {
-  background: #FFFFFF;
-  border: 1.5px solid var(--line, #E8DFD3);
-  border-radius: 12px;
-  padding: 10px 14px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  transition: all 0.15s ease;
-}
-
-.jlpt-vocab-card-item:hover {
-  background: #FAF8F4;
-  border-color: #D1C2AF;
-}
-
-.jlpt-vocab-term {
-  font-size: 14px;
-  font-weight: 700;
-  color: #241A11;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.jlpt-vocab-meaning {
-  font-size: 12.5px;
-  color: var(--text-muted, #7A6F64);
-  text-align: right;
-}
-
-.jlpt-vocab-play {
-  background: transparent;
-  border: none;
-  font-size: 14px;
-  cursor: pointer;
-  padding: 2px 4px;
-  color: #7A5F1B;
-}
-
-.jlpt-vocab-empty {
-  text-align: center;
-  color: var(--text-muted, #7A6F64);
-  padding: 28px 16px;
-  font-size: 13px;
-}
-
-/* Trigger Buttons on Main Question Card */
-.jlpt-sheet-triggers {
-  display: flex;
-  gap: 8px;
-  margin-top: 14px;
-}
-
-.jlpt-sheet-trigger-btn {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 9px 10px;
-  background: #FAF5EB;
-  border: 1px solid var(--line, #E8DFD3);
-  border-radius: 10px;
-  font-family: inherit;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--text, #241A11);
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.jlpt-sheet-trigger-btn:hover {
-  background: #241A11;
-  color: #FFD94F;
-  border-color: #241A11;
-  transform: translateY(-1px);
-}
-
-.jlpt-sheet-trigger-badge {
-  background: #EFE6D8;
-  color: #7A5F1B;
-  font-size: 10.5px;
-  font-weight: 800;
-  padding: 1px 6px;
-  border-radius: 8px;
-}
-
-.jlpt-sheet-trigger-btn:hover .jlpt-sheet-trigger-badge {
-  background: #FFD94F;
-  color: #241A11;
-}
-
-/* Answer feedback banner in Question Card */
-.jlpt-answer-banner {
-  margin-top: 12px;
-  padding: 10px 14px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  animation: fzModalPop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.jlpt-answer-banner.correct {
-  background: #E8F5E9;
-  border: 1.5px solid #A5D6A7;
-  color: #1B5E20;
-}
-
-.jlpt-answer-banner.wrong {
-  background: #FFEBEE;
-  border: 1.5px solid #FFCDD2;
-  color: #B71C1C;
-}
-
-.jlpt-banner-btn {
-  background: #FFFFFF;
-  border: 1px solid currentColor;
-  color: inherit;
-  border-radius: 8px;
-  padding: 5px 10px;
-  font-family: inherit;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all 0.12s ease;
-}
-
-.jlpt-banner-btn:hover {
-  opacity: 0.85;
-  transform: scale(1.03);
-}
-
-/* =========================================================================
-   RESPONSIVE MULTI-GADGET ENGINE: DESKTOP, TABLET (TAB), IPHONE, ANDROID
-   Pixel-perfect adaptation across viewports & hardware standards
-   ========================================================================= */
-
-/* --- 1. DESKTOP SCREENS (>= 1024px) --- */
-@media (min-width: 1024px) {
+@media (min-width: 641px) {
   .listening-modal {
-    padding: 32px 24px;
+    padding: 4px 14px !important;
   }
   .listening-modal-box {
-    width: 580px;
-    max-height: 88vh;
-    border-radius: 24px;
-    box-shadow: 0 32px 64px rgba(36, 26, 17, 0.28), 0 0 0 1px var(--line, #E8DFD3);
+    max-height: 98.5vh !important;
   }
   .listening-head {
-    padding: 16px 22px;
+    min-height: 38px !important;
+    padding: 6px 14px !important;
   }
   .listening-body {
-    padding: 16px 22px;
-    gap: 14px;
+    padding: 4px 12px 6px !important;
+    gap: 3px !important;
   }
   .jlpt-mobile-card {
-    padding: 18px 22px;
-    border-radius: 20px;
-    gap: 11px;
-  }
-  .jlpt-question-ja {
-    font-size: 16.5px;
-    line-height: 1.45;
-  }
-  .jlpt-opt-btn {
-    padding: 10px 14px;
-    border-radius: 12px;
-    min-height: 48px;
-  }
-  .jlpt-opt-ja {
-    font-size: 14.5px;
-  }
-  .jlpt-sheet-container {
-    max-height: 80%;
-  }
-  .jlpt-sheet-content {
-    padding: 18px 24px;
+    padding: 6px 12px 8px !important;
+    gap: 4px !important;
   }
 }
 
-/* --- 2. TABLET / TAB DEVICES (641px - 1023px, iPad, Galaxy Tab) --- */
-@media (min-width: 641px) and (max-width: 1023px) {
-  .listening-modal {
-    padding: 20px;
-  }
-  .listening-modal-box {
-    width: min(92vw, 540px);
-    max-height: 88vh;
-    border-radius: 22px;
-  }
-  .listening-head {
-    padding: 14px 18px;
-  }
-  .listening-body {
-    padding: 14px 18px;
-    gap: 12px;
-  }
-  .jlpt-mobile-card {
-    padding: 16px 18px;
-    border-radius: 18px;
-    gap: 10px;
-  }
-  .jlpt-opt-btn {
-    padding: 10px 14px;
-    min-height: 48px;
-  }
-  .jlpt-sheet-container {
-    max-height: 82%;
-  }
-}
-
-/* --- 3. SMARTPHONES: IPHONE & ANDROID (<= 640px) --- */
 @media (max-width: 640px) {
   .listening-modal {
-    padding: 0;
-    align-items: flex-end;
+    padding: 0 !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
     background: rgba(20, 14, 10, 0.72);
   }
+
   .listening-modal-box {
-    width: 100%;
-    max-width: 100%;
-    height: 94dvh;
-    max-height: 94dvh;
-    border-radius: 22px 22px 0 0;
-    border-bottom: none;
-    box-shadow: 0 -12px 36px rgba(0, 0, 0, 0.35);
-    padding-bottom: max(16px, env(safe-area-inset-bottom, 16px));
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    border-radius: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding-bottom: max(6px, env(safe-area-inset-bottom, 6px)) !important;
+    display: flex !important;
+    flex-direction: column !important;
   }
+
   .listening-head {
-    padding: 14px 16px;
+    padding: 6px 12px !important;
+    min-height: 40px !important;
+    height: 40px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .listening-head .f-tag,
+  .listening-head-sub {
+    display: none !important;
+  }
+
+  .listening-head-title {
+    font-size: 14px !important;
+    line-height: 1.2 !important;
+  }
+
+  .listening-close-btn {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 14px !important;
+  }
+
+  .listening-body {
+    padding: 6px 10px 8px !important;
+    gap: 6px !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .jlpt-level-tabs {
+    min-height: 30px !important;
+    height: 30px !important;
+    padding: 2px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .jlpt-lvl-btn {
+    font-size: 11px !important;
+    height: 26px !important;
+    padding: 0 8px !important;
+  }
+
+  .jlpt-mondai-scroll {
+    min-height: 40px !important;
+    height: 40px !important;
+    flex-shrink: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 2px 0 !important;
+  }
+
+  .jlpt-mondai-chip {
+    padding: 0 10px !important;
+    font-size: 11px !important;
+    height: 30px !important;
+    min-height: 30px !important;
+    flex-shrink: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+  }
+
+  .jlpt-mobile-card {
+    padding: 8px 10px !important;
+    gap: 5px !important;
+    border-radius: 14px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .jlpt-card-header {
+    min-height: 22px !important;
+    height: 22px !important;
+    margin-bottom: 2px !important;
+  }
+
+  .jlpt-situation-chip {
+    padding: 2px 8px !important;
+    font-size: 10px !important;
+    min-height: 20px !important;
+    height: 20px !important;
+  }
+
+  .jlpt-audio-row {
+    min-height: 36px !important;
+    height: 36px !important;
+    padding: 2px 6px !important;
+    gap: 6px !important;
+  }
+
+  .jlpt-primary-play-btn {
+    height: 30px !important;
+    font-size: 11.5px !important;
+    padding: 0 10px !important;
+  }
+
+  .jlpt-jees-chip {
+    height: 30px !important;
+    font-size: 10.5px !important;
+    padding: 0 8px !important;
+  }
+
+  .jlpt-question-block {
+    padding: 1px 0 !important;
+  }
+
+  .jlpt-question-ja {
+    font-size: 14px !important;
+    line-height: 1.25 !important;
+    margin: 0 0 2px 0 !important;
+  }
+
+  .jlpt-question-id {
+    font-size: 10px !important;
+    line-height: 1.15 !important;
+    margin: 0 !important;
+  }
+
+  .jlpt-options-list {
+    gap: 5px !important;
+  }
+
+  .jlpt-opt-btn {
+    min-height: 42px !important;
+    max-height: 46px !important;
+    height: 44px !important;
+    padding: 4px 8px !important;
+    gap: 8px !important;
+  }
+
+  .jlpt-opt-badge {
+    width: 24px !important;
+    height: 24px !important;
+    min-width: 24px !important;
+    font-size: 11px !important;
+  }
+
+  .jlpt-opt-ja {
+    font-size: 12.5px !important;
+    line-height: 1.15 !important;
+  }
+
+  .jlpt-opt-id {
+    font-size: 9.5px !important;
+    line-height: 1.1 !important;
+  }
+
+  .jlpt-feedback-banner {
+    padding: 6px 10px !important;
+    font-size: 11px !important;
+    margin: 3px 0 !important;
+  }
+
+  .jlpt-sheet-triggers {
+    gap: 4px !important;
+    margin-top: 4px !important;
+  }
+
+  .jlpt-sheet-trigger-btn {
+    height: 28px !important;
+    min-height: 28px !important;
+    padding: 0 6px !important;
+    font-size: 10px !important;
+  }
+
+  .jlpt-bottom-nav {
+    padding: 3px 0 !important;
+  }
+
+  .jlpt-nav-pill {
+    min-height: 30px !important;
+    height: 30px !important;
+    padding: 0 10px !important;
+    font-size: 11px !important;
+  }
+
+  .jlpt-sheet-container {
+    max-height: 90vh;
+    height: 90vh;
     border-top-left-radius: 22px;
     border-top-right-radius: 22px;
-  }
-  .listening-head-title {
-    font-size: 15.5px;
-  }
-  .listening-head-sub {
-    font-size: 11px;
-  }
-  .listening-close-btn {
-    width: 34px;
-    height: 34px;
-    font-size: 16px;
-  }
-  .listening-body {
-    padding: 12px 14px;
-    gap: 12px;
-    -webkit-overflow-scrolling: touch;
-  }
-  .jlpt-level-tabs {
-    padding: 3px;
-    border-radius: 10px;
-  }
-  .jlpt-lvl-btn {
-    padding: 7px 10px;
-    font-size: 12px;
-  }
-  .jlpt-mondai-chip {
-    padding: 5px 10px;
-    font-size: 11px;
-  }
-  .jlpt-mobile-card {
-    padding: 14px 14px 16px;
-    border-radius: 16px;
-  }
-  .jlpt-card-header {
-    margin-bottom: 8px;
-  }
-  .jlpt-badge-mondai {
-    font-size: 11px;
-    padding: 3px 8px;
-  }
-  .jlpt-counter-pill {
-    font-size: 11px;
-    padding: 3px 8px;
-  }
-  .jlpt-audio-row {
-    margin-bottom: 12px;
-    gap: 8px;
-  }
-  .jlpt-primary-play-btn {
-    padding: 9px 14px;
-    font-size: 13px;
-  }
-  .jlpt-jees-chip {
-    padding: 8px 10px;
-    font-size: 11.5px;
-  }
-  .jlpt-question-block {
-    margin-bottom: 12px;
-  }
-  .jlpt-question-ja {
-    font-size: 15.5px;
-    line-height: 1.45;
-  }
-  .jlpt-question-id {
-    font-size: 12px;
-  }
-  .jlpt-options-list {
-    gap: 8px;
-    margin-bottom: 12px;
-  }
-  .jlpt-opt-btn {
-    padding: 10px 12px;
-    border-radius: 12px;
-    min-height: 48px;
-    gap: 10px;
-  }
-  .jlpt-opt-badge {
-    width: 24px;
-    height: 24px;
-    font-size: 11.5px;
-  }
-  .jlpt-opt-ja {
-    font-size: 13.5px;
-  }
-  .jlpt-opt-id {
-    font-size: 11px;
-  }
-  .jlpt-sheet-triggers {
-    gap: 6px;
-    margin-top: 8px;
-  }
-  .jlpt-sheet-trigger-btn {
-    padding: 8px 8px;
-    font-size: 11px;
-    border-radius: 9px;
-    min-height: 38px;
-  }
-  .jlpt-bottom-nav {
-    padding: 4px 2px 2px;
-  }
-  .jlpt-nav-pill {
-    padding: 8px 14px;
-    font-size: 12px;
-    min-height: 38px;
-  }
-  .jlpt-nav-counter {
-    font-size: 11.5px;
-  }
-  .jlpt-swipe-subhint {
-    font-size: 10px;
-  }
-  .jlpt-sheet-container {
-    max-height: 90%;
-    height: 90%;
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
-    padding-bottom: max(16px, env(safe-area-inset-bottom, 16px));
-  }
-  .jlpt-sheet-header {
-    padding: 6px 14px 8px;
-  }
-  .jlpt-sheet-tabs {
-    padding: 8px 12px;
-    gap: 4px;
-  }
-  .jlpt-tab-chip {
-    padding: 6px 8px;
-    font-size: 11px;
-  }
-  .jlpt-sheet-content {
-    padding: 12px 14px;
+    padding-bottom: max(12px, env(safe-area-inset-bottom, 12px));
   }
 }
 
-/* --- 4. COMPACT SMARTPHONES (<= 375px: iPhone SE, Compact Android) --- */
 @media (max-width: 375px) {
   .listening-head {
-    padding: 12px 14px;
+    padding: 4px 10px;
+    min-height: 38px;
   }
+
   .listening-head-title {
-    font-size: 14.5px;
+    font-size: 14px;
   }
+
   .listening-body {
-    padding: 10px 12px;
-    gap: 10px;
+    padding: 4px 8px 6px;
+    gap: 5px;
   }
-  .jlpt-lvl-btn {
-    padding: 6px 8px;
-    font-size: 11px;
-  }
-  .jlpt-mobile-card {
-    padding: 12px 10px 14px;
-  }
-  .jlpt-question-ja {
-    font-size: 14.5px;
-  }
-  .jlpt-primary-play-btn {
-    padding: 8px 10px;
-    font-size: 12px;
-  }
+
   .jlpt-opt-btn {
-    padding: 9px 10px;
-    min-height: 44px;
+    min-height: 46px;
+    max-height: 50px;
+    height: 46px;
+    padding: 4px 8px;
   }
+
   .jlpt-opt-ja {
-    font-size: 12.5px;
+    font-size: 13px;
   }
+
   .jlpt-opt-id {
-    font-size: 10.5px;
-  }
-  .jlpt-sheet-triggers {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 4px;
-  }
-  .jlpt-sheet-trigger-btn {
-    padding: 6px 4px;
     font-size: 10px;
   }
-  .jlpt-swipe-hint {
+
+  .jlpt-swipe-subhint {
     display: none;
   }
 }
-
-

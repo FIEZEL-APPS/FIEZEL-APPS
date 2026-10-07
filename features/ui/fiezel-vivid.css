@@ -386,10 +386,15 @@ html body:not(.fz-teacher-mode) #app .vocab-focus-word {
   font-weight: 800 !important;
 }
 
-html body:not(.fz-teacher-mode) #app .vocab-focus .phonetic {
-  color: #0F172A !important;
-  background: #FDE4E8 !important;
-  border: 1.5px solid rgba(94, 20, 32, 0.2) !important;
+html body:not(.fz-teacher-mode) #app .vocab-focus .phonetic,
+html body:not(.fz-teacher-mode) #app .phonetic,
+html body:not(.fz-teacher-mode) .phonetic {
+  color: #64748B !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  padding: 0 !important;
 }
 
 html body:not(.fz-teacher-mode) #app .options .option {

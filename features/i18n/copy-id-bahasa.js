@@ -103,7 +103,18 @@
     'jlpt.tab-script-aria': 'Buka Naskah Dialog',
     'jlpt.wrong-title': 'Belum Tepat',
     'jlpt.play-audio': 'Putar Audio',
-    'jlpt.pause-audio': 'Jeda Audio'
+    'jlpt.pause-audio': 'Jeda Audio',
+    'speaker.instructor': 'Instruktor',
+    'speaker.female': 'Wanita',
+    'speaker.mother': 'Wanita (Ibu)',
+    'speaker.male': 'Pria',
+    'speaker.father': 'Pria (Ayah)',
+    'speaker.teacher': 'Guru',
+    'speaker.student': 'Murid',
+    'speaker.shopkeeper': 'Petugas Toko',
+    'speaker.receptionist': 'Resepsionis',
+    'speaker.station_staff': 'Petugas Stasiun',
+    'speaker.doctor': 'Dokter'
   });
   /* Lapisan kursus Bahasa Jepang (FiezelI18n.setCourse('ja')): saat kursus Jepang aktif,
      kunci 'kursus-ja.<kunci>' menang atas <kunci>. Nama bagian memakai istilah Jepang yang

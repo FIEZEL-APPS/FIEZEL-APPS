@@ -10,7 +10,7 @@
   if (!I18N) return;
 
   I18N.registerCopy('th', {
-    'worker.chat.fallback': 'สวัสดี! ฉันชื่อ PAW ผู้ช่วยเรียนของ FIEZEL',
+    'worker.chat.fallback': 'สวัสดี! ฉันชื่อ Mochi ผู้ช่วยเรียนของ FIEZEL',
     'worker.coach.default': 'ตั้งใจเรียนต่อไปนะ! เธอก้าวหน้าขึ้นมากแล้ว',
     'worker.coach.fallback': 'ฝึกต่อไปเพื่อให้เข้าใจแน่นขึ้นนะ!'
   });

@@ -86,10 +86,16 @@
       modal.classList.add('open');
       modal.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
+      try {
+        var appEl = document.getElementById('app');
+        if (appEl) { appEl.setAttribute('aria-hidden', 'true'); if ('inert' in appEl) appEl.inert = true; }
+        var nav = document.querySelector('.bottomnav,.nav-bar');
+        if (nav) { nav.setAttribute('aria-hidden', 'true'); if ('inert' in nav) nav.inert = true; }
+      } catch (_) {}
     }
     // m025-495: swipe back / tombol kembali menutup modal ini, bukan menembus ke belakangnya.
     if (modal && !wasOpen) {
-      try { self.FiezelBackNav && self.FiezelBackNav.pushLayer && self.FiezelBackNav.pushLayer({ id: 'jlpt-listening', close: function () { hideListeningPanel(); return true; } }); } catch (_) {}
+      try { self.FiezelBackNav && self.FiezelBackNav.pushLayer && self.FiezelBackNav.pushLayer({ id: 'jlpt-listening', close: function () { closeListeningPanel(); return true; } }); } catch (_) {}
     }
     curIndex = 0;
     selectedChoice = null;
@@ -108,6 +114,12 @@
       modal.classList.remove('open');
       modal.setAttribute('aria-hidden', 'true');
       document.body.style.overflow = '';
+      try {
+        var appEl = document.getElementById('app');
+        if (appEl) { appEl.removeAttribute('aria-hidden'); if ('inert' in appEl) appEl.inert = false; }
+        var nav = document.querySelector('.bottomnav,.nav-bar');
+        if (nav) { nav.removeAttribute('aria-hidden'); if ('inert' in nav) nav.inert = false; }
+      } catch (_) {}
     }
     closeJlptDetailSheet();
     stopJlptAudio();
@@ -442,20 +454,20 @@
     var container = document.getElementById('jlptFeedbackSlot');
     if (!container) return;
     var cls = isRight ? 'jlpt-feedback-banner correct' : 'jlpt-feedback-banner wrong';
-    var icon = isRight ? '🎉' : '💡';
-    var title = isRight ? t('jlpt.correct-title', 'Jawaban Benar!') : t('jlpt.wrong-title', 'Belum Tepat');
-    var sub = isRight ? 'Hebat, pemahaman dialogmu akurat.' : ('Kunci tepat: Pilihan ' + correctOptId);
+    var icon = isRight ? '✓' : '✗';
+    var title = isRight ? t('jlpt.correct-title', 'Jawaban Tepat!') : t('jlpt.wrong-title', 'Belum Tepat');
+    var sub = isRight ? 'Pemahaman dialog akurat.' : ('Kunci jawaban: Pilihan ' + correctOptId);
 
     container.innerHTML =
       '<div class="' + cls + '">' +
-        '<div style="display:flex;align-items:center;gap:8px;">' +
-          '<span style="font-size:16px;">' + icon + '</span>' +
-          '<div>' +
+        '<div class="jlpt-fb-left">' +
+          '<span class="jlpt-fb-badge">' + icon + '</span>' +
+          '<div class="jlpt-fb-text-col">' +
             '<div class="jlpt-fb-title">' + title + '</div>' +
             '<div class="jlpt-fb-sub">' + sub + '</div>' +
           '</div>' +
         '</div>' +
-        '<button type="button" onclick="openJlptDetailSheet(\'explain\')" style="background:transparent;border:none;font-weight:800;font-size:11.5px;color:currentColor;cursor:pointer;text-decoration:underline;">Lihat Kunci ↗</button>' +
+        '<button type="button" class="jlpt-fb-key-btn" onclick="openJlptDetailSheet(\'explain\')">' + t('jlpt.lihat-kunci', 'Lihat Kunci ↗') + '</button>' +
       '</div>';
   }
 
@@ -488,32 +500,47 @@
       var mId = rawId.match(/^([^:：]{1,15})[:：]\s*(.*)$/);
       if (mId) textId = mId[2].trim();
 
-      var avatarIcon = '💬';
-      var badgeClass = 'speaker-neutral';
-      var speakerLabel = speaker || 'Percakapan';
+      var personaType = 'neutral';
+      var personaLabel = speaker || 'Instruktor';
 
-      if (/女|女性|お母さん|母親|彼女|女子/.test(speaker)) {
-        avatarIcon = '👩';
-        badgeClass = 'speaker-female';
-      } else if (/男|男性|男の子|父親|彼|男子|山田|たけし/.test(speaker)) {
-        avatarIcon = '👨';
-        badgeClass = 'speaker-male';
+      if (/インストラクター|ナレーション|アナウンス|問題|質問|放送|指示/.test(speaker)) {
+        personaType = 'instructor';
+        personaLabel = t('speaker.instructor', 'Instruktor');
+      } else if (/女|女性|お母さん|母親|彼女|女子|妹|姉/.test(speaker)) {
+        personaType = 'female';
+        personaLabel = t('speaker.female', 'Wanita');
+        if (/お母さん|母親/.test(speaker)) personaLabel = t('speaker.mother', 'Wanita (Ibu)');
+      } else if (/男|男性|男の子|父親|彼|男子|山田|たけし|兄|弟/.test(speaker)) {
+        personaType = 'male';
+        personaLabel = t('speaker.male', 'Pria');
+        if (/お父さん|父親/.test(speaker)) personaLabel = t('speaker.father', 'Pria (Ayah)');
       } else if (/先生|教授|講師/.test(speaker)) {
-        avatarIcon = '👨‍🏫';
-        badgeClass = 'speaker-teacher';
+        personaType = 'teacher';
+        personaLabel = t('speaker.teacher', 'Guru');
       } else if (/学生|生徒|留学生/.test(speaker)) {
-        avatarIcon = '🧑';
-        badgeClass = 'speaker-student';
+        personaType = 'student';
+        personaLabel = t('speaker.student', 'Murid');
       } else if (/店長|店員|受付|駅員|医者/.test(speaker)) {
-        avatarIcon = '👔';
-        badgeClass = 'speaker-staff';
+        personaType = 'staff';
+        personaLabel = t('speaker.instructor', 'Instruktor');
+        if (/店員|店長/.test(speaker)) personaLabel = t('speaker.shopkeeper', 'Petugas Toko');
+        else if (/受付/.test(speaker)) personaLabel = t('speaker.receptionist', 'Resepsionis');
+        else if (/駅員/.test(speaker)) personaLabel = t('speaker.station_staff', 'Petugas Stasiun');
+        else if (/医者/.test(speaker)) personaLabel = t('speaker.doctor', 'Dokter');
+      } else if (!speaker) {
+        personaType = 'instructor';
+        personaLabel = t('speaker.instructor', 'Instruktor');
       }
 
       var safeLineJa = escapeJs(textJa);
 
-      return '<div class="jlpt-dialogue-turn ' + badgeClass + '">' +
+      return '<div class="jlpt-dialogue-turn speaker-' + personaType + '">' +
         '<div class="jlpt-turn-meta">' +
-          '<span class="jlpt-speaker-chip">' + avatarIcon + ' ' + escapeHtml(speakerLabel) + '</span>' +
+          '<span class="jlpt-speaker-chip speaker-' + personaType + '">' +
+            '<span class="jlpt-speaker-dot"></span>' +
+            '<span class="jlpt-speaker-name">' + escapeHtml(personaLabel) + '</span>' +
+            (speaker && speaker !== personaLabel ? ' <span class="jlpt-speaker-raw">(' + escapeHtml(speaker) + ')</span>' : '') +
+          '</span>' +
           '<button type="button" class="jlpt-line-speak-btn" onclick="playJlptSpeech(\'' + safeLineJa + '\')" title="Dengarkan baris ini" aria-label="Audio Baris">🔊</button>' +
         '</div>' +
         '<div class="jlpt-turn-bubble">' +
@@ -729,6 +756,14 @@
 
     sheet.classList.add('open');
     sheet.setAttribute('aria-hidden', 'false');
+    if (!sheetOpen) {
+      try {
+        self.FiezelBackNav && self.FiezelBackNav.pushLayer && self.FiezelBackNav.pushLayer({
+          id: 'jlpt-sheet',
+          close: function () { closeJlptDetailSheet(); return true; }
+        });
+      } catch (_) {}
+    }
     sheetOpen = true;
 
     var targetTab = tabName || (selectedChoice !== null ? 'explain' : 'script');
@@ -742,6 +777,9 @@
       sheet.setAttribute('aria-hidden', 'true');
       var container = sheet.querySelector('#jlptSheetContainer');
       if (container) container.style.transform = '';
+    }
+    if (sheetOpen) {
+      try { self.FiezelBackNav && self.FiezelBackNav.dismiss && self.FiezelBackNav.dismiss('jlpt-sheet'); } catch (_) {}
     }
     sheetOpen = false;
   }
@@ -825,9 +863,20 @@
         if (absX < 6 && absY < 6) return;
 
         if (absY >= absX) {
-          // Gerakan vertikal lebih dominan -> serahkan ke native vertical scroll
+          // Gerakan vertikal lebih dominan -> serahkan sepenuhnya ke native vertical scroll seketika tanpa pointer capture atau tilt jitter
           isScrolling = true;
           directionLocked = true;
+          isDragging = false;
+          suppressClick = false;
+          cardEl.classList.remove('swiping');
+          cardEl.style.transition = '';
+          cardEl.style.transform = '';
+          cardEl.style.boxShadow = '';
+          try {
+            if (cardEl.releasePointerCapture && pointerId !== null && pointerId !== undefined && cardEl.hasPointerCapture && cardEl.hasPointerCapture(pointerId)) {
+              cardEl.releasePointerCapture(pointerId);
+            }
+          } catch (_) {}
           return;
         } else {
           // Gerakan horizontal lebih dominan -> kunci sebagai gesture card swipe
@@ -919,7 +968,7 @@
       isPointerDown = false;
 
       try {
-        if (cardEl.releasePointerCapture && pointerId !== null && pointerId !== undefined) {
+        if (cardEl.releasePointerCapture && pointerId !== null && pointerId !== undefined && cardEl.hasPointerCapture && cardEl.hasPointerCapture(pointerId)) {
           cardEl.releasePointerCapture(pointerId);
         }
       } catch (_) {}
@@ -931,6 +980,16 @@
       if (cuePrev) {
         cuePrev.style.opacity = '0';
         cuePrev.classList.remove('active');
+      }
+
+      if (isScrolling) {
+        isScrolling = false;
+        directionLocked = false;
+        suppressClick = false;
+        cardEl.style.transition = '';
+        cardEl.style.transform = '';
+        cardEl.style.boxShadow = '';
+        return;
       }
 
       if (!isDragging) {
@@ -1092,16 +1151,18 @@
       '<div class="jlpt-mobile-wrapper">' +
         '<!-- Touch Card with Gestures -->' +
         '<div class="jlpt-mobile-card" id="jlptMobileCard">' +
-          '<!-- Header Row -->' +
+          '<!-- Topbar Kartu Sangat Ringkas -->' +
           '<div class="jlpt-card-header">' +
             '<div class="jlpt-badge-mondai">' +
               '<span class="jlpt-badge-dot"></span>' +
-              '<span>' + escapeHtml(q.level) + ' · ' + escapeHtml(mondaiShortLabel) + '</span>' +
+              '<span class="jlpt-badge-lvl">' + escapeHtml(q.level) + '</span>' +
+              '<span class="jlpt-badge-sep">·</span>' +
+              '<span class="jlpt-badge-mondai-txt">' + escapeHtml(mondaiShortLabel) + '</span>' +
             '</div>' +
             '<div class="jlpt-counter-pill">' + (curIndex + 1) + ' / ' + qs.length + '</div>' +
           '</div>' +
 
-          '<!-- Compact Situation Info Chip -->' +
+          '<!-- Situasi Ringkas (1 Baris) -->' +
           (qSituation ?
             '<div class="jlpt-situation-chip">' +
               '<span class="jlpt-sit-icon">📌</span>' +
@@ -1109,16 +1170,13 @@
             '</div>'
           : '') +
 
-          '<!-- 3D Mochi Companion Slot -->' +
-          '<div class="jlpt-mascot-slot"><fiezel-mascot class="jlpt-mascot"></fiezel-mascot></div>' +
-
-          '<!-- Streamlined Single Audio Player Strip -->' +
+          '<!-- Panggung Audio Tactile Pill (48-52px) -->' +
           '<div class="jlpt-audio-row">' +
             '<button type="button" class="jlpt-primary-play-btn" id="jlptMainPlayBtn" onclick="togglePlayJlptPrimaryAudio()" aria-label="' + escapeHtml(t('jlpt.play-audio', 'Putar Audio')) + '">' +
               '<span class="jlpt-play-icon" id="jlptPlayIcon">▶</span>' +
               '<span id="jlptPlayText">' + escapeHtml(t('jlpt.play-audio', 'Putar Audio')) + '</span>' +
               '<span class="jlpt-mini-wave" id="jlptMiniWave">' +
-                '<span></span><span></span><span></span><span></span>' +
+                '<span></span><span></span><span></span><span></span><span></span>' +
               '</span>' +
             '</button>' +
             (hasJees ?
@@ -1129,13 +1187,13 @@
             '<span class="jlpt-replay-pill" id="jlptReplayPill"></span>' +
           '</div>' +
 
-          '<!-- Question Typography (No clunky labels) -->' +
+          '<!-- Typography Soal Jepang (Plus Jakarta Sans, Slate Gelap Kontras Tinggi) -->' +
           '<div class="jlpt-question-block">' +
             '<h3 class="jlpt-question-ja">' + escapeHtml(qJa) + '</h3>' +
             (qId ? '<p class="jlpt-question-id">' + escapeHtml(qId) + '</p>' : '') +
           '</div>' +
 
-          '<!-- Tactile Options -->' +
+          '<!-- 4 Kartu Pilihan Ganda Tactile Clay (48-54px) -->' +
           '<div class="jlpt-options-list">' +
             optionsHtml +
           '</div>' +
@@ -1143,7 +1201,7 @@
           '<!-- Feedback Slot -->' +
           '<div id="jlptFeedbackSlot"></div>' +
 
-          '<!-- Quick Bottom Sheet Triggers (Ergonomis, Multi-Device) -->' +
+          '<!-- Quick Bottom Sheet Triggers (Ergonomis & Ringkas) -->' +
           '<div class="jlpt-sheet-triggers">' +
             '<button type="button" class="jlpt-sheet-trigger-btn" onclick="openJlptDetailSheet(\'script\')" aria-label="' + t('jlpt.tab-script-aria', 'Buka Naskah Dialog') + '">' +
               '<span>' + t('jlpt.tab-script', '📝 Naskah') + '</span>' +
@@ -1161,7 +1219,7 @@
           '<div class="jlpt-swipe-cue jlpt-cue-next" id="jlptCueNext">' + t('jlpt.next-question', 'Soal Berikutnya ▶') + '</div>' +
         '</div>' +
 
-        '<!-- Bottom Clickable Navigation with Multi-Device Indicators -->' +
+        '<!-- Navigasi Bawah Menempel Rapi (Mundur, Counter, Maju) -->' +
         '<div class="jlpt-bottom-nav">' +
           '<button type="button" class="jlpt-nav-pill" ' + (curIndex === 0 ? 'disabled' : '') + ' onclick="prevListeningQuestion()" aria-label="' + t('jlpt.soal-sebelumnya', '◀ Soal Sebelumnya') + '">← ' + t('jlpt.mundur', 'Mundur') + '</button>' +
           '<div class="jlpt-nav-status">' +

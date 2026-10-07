@@ -110,7 +110,11 @@ export class FiezelMochi {
     this.renderer.domElement.style.height = '100%';
     this.renderer.domElement.style.display = 'block';
     this.renderer.domElement.style.objectFit = 'contain';
-    this.renderer.domElement.style.pointerEvents = 'none';
+    this.renderer.domElement.style.pointerEvents = 'auto';
+    this.renderer.domElement.style.touchAction = 'none';
+    this.renderer.domElement.style.userSelect = 'none';
+    this.renderer.domElement.style.webkitUserSelect = 'none';
+    this.renderer.domElement.style.cursor = 'grab';
 
     this.container.innerHTML = '';
     this.container.appendChild(this.renderer.domElement);
@@ -1637,8 +1641,41 @@ export class FiezelMochi {
 
   bindEvents() {
     const dom = this.renderer.domElement;
+    this.isDragging = false;
+    this.dragStartX = 0;
+    this.dragStartY = 0;
+    this.rotStartX = 0;
+    this.rotStartY = 0;
+
+    const onPointerDown = (e) => {
+      this.isDragging = true;
+      this.dragStartX = e.clientX;
+      this.dragStartY = e.clientY;
+      this.rotStartX = this.targetRot.x;
+      this.rotStartY = this.targetRot.y;
+      dom.style.cursor = 'grabbing';
+      try { dom.setPointerCapture(e.pointerId); } catch (_) {}
+      // Tactile squish on press
+      this.squish.y = 0.70;
+      this.squish.x = 1.20;
+      this.squish.z = 1.20;
+      this.squish.velY = 0;
+      clearTimeout(this._restoreRotTimeout);
+      e.stopPropagation();
+    };
 
     const onPointerMove = (e) => {
+      if (this.isDragging) {
+        const dx = e.clientX - this.dragStartX;
+        const dy = e.clientY - this.dragStartY;
+        // Smooth 3D yaw (rotation around Y) and pitch (tilt around X)
+        this.targetRot.y = this.rotStartY + dx * 0.024;
+        this.targetRot.x = Math.max(-0.65, Math.min(0.65, this.rotStartX - dy * 0.018));
+        e.stopPropagation();
+        return;
+      }
+
+      // Gentle cursor-following hover tilt
       const rect = dom.getBoundingClientRect();
       const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
       const y = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
@@ -1647,24 +1684,11 @@ export class FiezelMochi {
       this.targetRot.x = -y * 0.24;
     };
 
-    dom.addEventListener('pointermove', onPointerMove);
-    dom.addEventListener('pointerleave', () => {
-      this.targetRot.x = 0;
-      this.targetRot.y = 0;
-      this.squish.targetX = 1;
-      this.squish.targetY = 1;
-      this.squish.targetZ = 1;
-    });
-
-    dom.addEventListener('pointerdown', () => {
-      // Tactile squish on press
-      this.squish.y = 0.68;
-      this.squish.x = 1.22;
-      this.squish.z = 1.22;
-      this.squish.velY = 0;
-    });
-
-    dom.addEventListener('pointerup', () => {
+    const onPointerUp = (e) => {
+      if (!this.isDragging) return;
+      this.isDragging = false;
+      dom.style.cursor = 'grab';
+      try { dom.releasePointerCapture(e.pointerId); } catch (_) {}
       // Explosive jelly release recoil
       this.squish.y = 1.28;
       this.squish.x = 0.86;
@@ -1675,7 +1699,42 @@ export class FiezelMochi {
         this.squish.targetY = 1;
         this.squish.targetZ = 1;
       }, 80);
-    });
+
+      // Smoothly return to neutral forward-facing orientation after 1200ms
+      clearTimeout(this._restoreRotTimeout);
+      this._restoreRotTimeout = setTimeout(() => {
+        if (!this.isDragging) {
+          this.targetRot.x = 0;
+          this.targetRot.y = 0;
+        }
+      }, 1200);
+      e.stopPropagation();
+    };
+
+    const onPointerLeave = () => {
+      if (!this.isDragging) {
+        this.targetRot.x = 0;
+        this.targetRot.y = 0;
+        this.squish.targetX = 1;
+        this.squish.targetY = 1;
+        this.squish.targetZ = 1;
+      }
+    };
+
+    dom.addEventListener('pointerdown', onPointerDown);
+    dom.addEventListener('pointermove', onPointerMove);
+    dom.addEventListener('pointerup', onPointerUp);
+    dom.addEventListener('pointercancel', onPointerUp);
+    dom.addEventListener('pointerleave', onPointerLeave);
+
+    // Explicit touch event isolation to prevent browser page scrolling
+    const stopTouch = (e) => {
+      if (e.cancelable) e.preventDefault();
+      e.stopPropagation();
+    };
+    dom.addEventListener('touchstart', stopTouch, { passive: false });
+    dom.addEventListener('touchmove', stopTouch, { passive: false });
+    dom.addEventListener('touchend', (e) => { e.stopPropagation(); }, { passive: false });
   }
 
   update(dt) {

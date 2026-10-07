@@ -261,7 +261,8 @@
         railEl.appendChild(vacantEl);
       }
 
-      submitBtn.disabled = placedTokens.length === 0;
+      const targetCount = Array.isArray(q.tokens) && q.tokens.length > 0 ? q.tokens.length : 1;
+      submitBtn.disabled = placedTokens.length < targetCount;
       if (q.__scaffoldAttempt) {
         submitBtn.classList.add('token-submit-retry');
         submitBtn.innerHTML = `<i data-lucide="rotate-ccw"></i> <span>${FiezelI18n.t('quiz.periksa-ulang', 'Periksa Ulang')}</span>`;
