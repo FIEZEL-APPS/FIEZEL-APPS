@@ -6579,9 +6579,12 @@ html body.fz-view-latihan header.topbar {
   box-shadow: none !important;
   display: flex !important; align-items: center !important; justify-content: space-between !important;
   gap: 12px !important;
-  z-index: 1000 !important;
-  transform: none !important;
-  view-transition-name: none !important;
+  view-transition-name: topbar !important;
+}
+::view-transition-old(topbar),
+::view-transition-new(topbar) {
+  animation: none !important;
+  mix-blend-mode: normal !important;
 }
 html body main.app.app,html body.fz-lux main.app.app,html body.fz-lux.fz-view-game main.app.app,html body.fz-lux.fz-stage-home main.app.app {
   padding-top: calc(56px + env(safe-area-inset-top, 0px) + 12px) !important;

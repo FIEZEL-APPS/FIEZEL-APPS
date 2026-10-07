@@ -37,9 +37,13 @@ server.listen(PORT, '127.0.0.1', async () => {
     localStorage.setItem('fz_onboarding_done', '1');
     localStorage.setItem('fz_auth_skip', '1');
     localStorage.setItem('fiezel-auth-v1', JSON.stringify({ v: 1, signedIn: true, at: Date.now(), role: 'murid', via: 'akun' }));
+    localStorage.setItem('fiezel-onboarding-v1', JSON.stringify({ done: true, at: Date.now(), via: 'finish', locale: 'id', name: 'Budi Santoso', goal: 'general', level: 'A1', role: 'murid', course: 'en' }));
+    localStorage.setItem('fiezel-tour-v1', 'finish');
     sessionStorage.setItem('fiezel_boot_count', '2');
     setInterval(() => {
-      document.querySelectorAll('.fz-tour, .fz-tour-scrim, #fzPrasasti, #fzRitual').forEach(e => e.remove());
+      document.querySelectorAll('.fz-tour, .fz-tour-scrim, #fzPrasasti, #fzRitual, .fz-auth').forEach(e => e.remove());
+      document.documentElement.classList.remove('fz-booting');
+      document.body.classList.remove('fz-auth-open');
     }, 50);
   });
 
