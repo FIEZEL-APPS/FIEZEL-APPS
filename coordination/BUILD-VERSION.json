@@ -1,7 +1,7 @@
 {
-  "version": "m025-511",
-  "claimedBy": "branch feat/m025-505-phonetic-clean-mochi-companion",
-  "claimedAt": "2026-10-07T20:39:03.768Z",
-  "reason": "fix(listening): overhaul total UI/UX sesi latihan listening single-screen tactile travertine",
+  "version": "m025-512",
+  "claimedBy": "tidak tercatat (jalankan ulang di dalam git, atau set FIEZEL_BUILD_CLAIMER)",
+  "claimedAt": "2026-10-07T20:42:24.027Z",
+  "reason": "bot(heal): auto-synchronize release boundary",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
