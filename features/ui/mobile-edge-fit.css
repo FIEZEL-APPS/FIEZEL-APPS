@@ -40,13 +40,17 @@
     box-sizing: border-box !important;
   }
 
-  /* Quiz Shell: Edge-to-edge mobile fit with sleek 6px margin, ZERO VOID */
+  /* Quiz Shell: Edge-to-edge mobile fit, ZERO VOID */
   body:has(.quiz-shell) main.app,
   body.fz-stage-quiz main.app,
+  body.fz-lesson-mode main.app,
   body:has(.quiz-shell) .app,
-  body.fz-stage-quiz .app {
+  body.fz-stage-quiz .app,
+  body.fz-lesson-mode .app {
+    padding-top: 0 !important;
     padding-left: 0 !important;
     padding-right: 0 !important;
+    margin: 0 !important;
     width: 100% !important;
     max-width: 100% !important;
     box-sizing: border-box !important;
@@ -54,11 +58,62 @@
 
   body:has(.quiz-shell) #app,
   body.fz-stage-quiz #app,
+  body.fz-lesson-mode #app,
   .app > #app:has(.quiz-shell) {
-    padding-left: 6px !important;
-    padding-right: 6px !important;
+    padding-top: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin: 0 !important;
     width: 100% !important;
     max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Universal Fixed Topbar across ALL quiz/practice sessions */
+  .quiz-topbar,
+  .quiz-shell .quiz-topbar,
+  body.fz-stage-quiz .quiz-topbar,
+  body.fz-lux.fz-stage-quiz .quiz-topbar,
+  body.fz-lesson-mode .quiz-topbar,
+  body:has(.quiz-shell) .quiz-topbar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    border: none !important;
+    border-bottom: 1.5px solid #E2E8F0 !important;
+    background: rgba(253, 250, 243, 0.98) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    box-shadow: 0 2px 12px rgba(15, 23, 42, 0.05) !important;
+    padding: max(10px, env(safe-area-inset-top, 10px)) 16px 10px 16px !important;
+    display: grid !important;
+    grid-template-columns: auto 1fr auto !important;
+    align-items: center !important;
+    gap: 12px !important;
+    z-index: 1000 !important;
+    box-sizing: border-box !important;
+  }
+
+  body.theme-dark .quiz-topbar,
+  body.scene-night .quiz-topbar {
+    background: rgba(27, 20, 24, 0.98) !important;
+    border-bottom-color: rgba(255, 255, 255, 0.1) !important;
+  }
+
+  #app > section.quiz-shell,
+  .quiz-shell {
+    padding-top: calc(64px + max(10px, env(safe-area-inset-top, 10px))) !important;
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+    padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px)) !important;
+    margin: 0 auto !important;
+    max-width: 600px !important;
+    width: 100% !important;
     box-sizing: border-box !important;
   }
 }

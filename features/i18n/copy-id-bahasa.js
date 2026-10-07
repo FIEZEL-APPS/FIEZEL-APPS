@@ -83,6 +83,7 @@
     'jlpt.sheet-trigger-label': 'Naskah & Pembahasan',
     'jlpt.mundur': 'Mundur',
     'jlpt.maju': 'Maju',
+    'jlpt.selesai': 'Selesai',
     'jlpt.geser-kartu': 'Geser kartu',
     'jlpt.dari': '{cur} dari {total}',
     'jlpt.close-sheet': 'Tutup Sheet',
