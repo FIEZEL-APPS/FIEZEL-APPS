@@ -222,20 +222,17 @@ function saveManifest(manifest) {
 async function synthesizeGemini(text, voiceName, apiKey) {
   const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(apiKey)}`;
   
+  const promptText = text.trim().split(/\s+/).length === 1
+    ? `Please read the following word aloud: "${text.trim()}"`
+    : text.trim();
+
   const payload = {
-    systemInstruction: {
-      parts: [
-        {
-          text: 'You are a Text-to-Speech synthesizer. Read the following text transcript exactly as written and convert it to audio. Do not respond with commentary, explanations, or any text.'
-        }
-      ]
-    },
     contents: [
       {
         role: 'user',
         parts: [
           {
-            text: text
+            text: promptText
           }
         ]
       }
