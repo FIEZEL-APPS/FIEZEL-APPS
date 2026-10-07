@@ -13570,17 +13570,24 @@ function makeGrammarTokenOrderQuestion(skill, item, idx, level){
   });
   const whyCorrectText=gMeta.whyCorrect||'';
   const cleanWhy=(typeof grammarSanitizeContext==='function'?grammarSanitizeContext(whyCorrectText,'token-order','',correct):whyCorrectText)||FiezelI18n.t('grammar.susunan-kalimat-tepat','Urutan kata dan bentuk tata bahasa yang tepat.');
+  const templateId=String(item?.[8]||'');
+  const idTranslation=(self.FiezelGrammarTranslations&&self.FiezelGrammarTranslations[templateId])?self.FiezelGrammarTranslations[templateId]:null;
+  const tokenInstruction=idTranslation
+    ? FiezelI18n.t('grammar.token-order-translate-instruction','Terjemahkan ke Bahasa Inggris:')
+    : FiezelI18n.t('grammar.token-order-panduan-label','Lengkapi & Susun Kata:');
+  const tokenQuestion=idTranslation
+    ? idTranslation
+    : (base&&/_{2,}|\[\.\.\.\]/.test(base)?FiezelI18n.t('grammar.token-order-panduan',{kalimat:base}):FiezelI18n.t('grammar.token-order-prompt','Susun kata-kata berikut menjadi kalimat yang tepat:'));
   return {
     id: 'token-' + skill + '-' + idx,
     type:'token-order',
-    sourceId:String(item?.[8]||''),
+    sourceId:templateId,
     level:activeLvl,
     skill:skill,
     lessonSkill:skill,
-    /* Audit UX grammar U5: tanpa kalimat tujuan, susunan lain yang sama benarnya ("Where is he? I can't
-       see Tom.") dinilai salah. Kalimat rumpang aslinya kini jadi panduan; yang diuji tetap urutan
-       kata dan pilihan kata untuk bagian kosongnya. */
-    question:base&&/_{2,}|\[\.\.\.\]/.test(base)?FiezelI18n.t('grammar.token-order-panduan',{kalimat:base}):FiezelI18n.t('grammar.token-order-prompt','Susun kata-kata berikut menjadi kalimat yang tepat:'),
+    instruction:tokenInstruction,
+    question:tokenQuestion,
+    fullSentence:fullSentence,
     tokens:rawTokens,
     gloss:tokenGlossMap([...rawTokens,...distractors]),
     distractors:distractors,
