@@ -1642,18 +1642,22 @@
 
 @media (min-width: 641px) {
   .listening-modal {
-    padding: 8px 14px !important;
+    padding: 4px 14px !important;
   }
   .listening-modal-box {
-    max-height: 98vh !important;
+    max-height: 98.5vh !important;
+  }
+  .listening-head {
+    min-height: 38px !important;
+    padding: 6px 14px !important;
   }
   .listening-body {
-    padding: 6px 12px 8px !important;
-    gap: 4px !important;
+    padding: 4px 12px 6px !important;
+    gap: 3px !important;
   }
   .jlpt-mobile-card {
-    padding: 8px 12px 10px !important;
-    gap: 5px !important;
+    padding: 6px 12px 8px !important;
+    gap: 4px !important;
   }
 }
 
