@@ -163,6 +163,8 @@ jobs:
           # Opsional: beberapa kunci dipisah koma; dirotasi otomatis saat satu kunci habis (429).
           GEMINI_API_KEYS: ${{ secrets.GEMINI_API_KEYS }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          MAM_API_KEY: ${{ secrets.MAM_API_KEY }}
+          MAM_API_KEYS: ${{ secrets.MAM_API_KEYS }}
           GITHUB_TOKEN: ${{ github.token }}
           GH_TOKEN: ${{ github.token }}
           PR_NUM: ${{ steps.meta.outputs.pr_number }}
@@ -174,6 +176,8 @@ jobs:
           # (daftar dipisah koma; kosong = bawaan di tools/fiezel-bot.mjs).
           FIEZEL_BOT_GEMINI_REVIEW_MODELS: ${{ vars.FIEZEL_BOT_GEMINI_REVIEW_MODELS }}
           FIEZEL_BOT_GEMINI_FAST_MODELS: ${{ vars.FIEZEL_BOT_GEMINI_FAST_MODELS }}
+          FIEZEL_BOT_MAM_REVIEW_MODELS: ${{ vars.FIEZEL_BOT_MAM_REVIEW_MODELS }}
+          FIEZEL_BOT_MAM_FAST_MODELS: ${{ vars.FIEZEL_BOT_MAM_FAST_MODELS }}
           FIEZEL_BOT_GROQ_MODELS: ${{ vars.FIEZEL_BOT_GROQ_MODELS }}
           FIEZEL_BOT_CONTEXT_CHARS: ${{ vars.FIEZEL_BOT_CONTEXT_CHARS }}
           FIEZEL_BOT_CALLER_CHARS: ${{ vars.FIEZEL_BOT_CALLER_CHARS }}
@@ -441,6 +445,8 @@ jobs:
           # Opsional: beberapa kunci dipisah koma; dirotasi otomatis saat satu kunci habis (429).
           GEMINI_API_KEYS: ${{ secrets.GEMINI_API_KEYS }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          MAM_API_KEY: ${{ secrets.MAM_API_KEY }}
+          MAM_API_KEYS: ${{ secrets.MAM_API_KEYS }}
           GITHUB_TOKEN: ${{ github.token }}
           GH_TOKEN: ${{ github.token }}
           PR_NUM: ${{ steps.collect.outputs.pr_number }}
@@ -448,6 +454,7 @@ jobs:
           COMMAND: ${{ github.event.inputs.command }}
           FIEZEL_PATCH_LIST: /tmp/fiezel-bot/patched.txt
           FIEZEL_BOT_GEMINI_REVIEW_MODELS: ${{ vars.FIEZEL_BOT_GEMINI_REVIEW_MODELS }}
+          FIEZEL_BOT_MAM_REVIEW_MODELS: ${{ vars.FIEZEL_BOT_MAM_REVIEW_MODELS }}
           FIEZEL_BOT_GROQ_MODELS: ${{ vars.FIEZEL_BOT_GROQ_MODELS }}
         run: |
           set -euo pipefail
