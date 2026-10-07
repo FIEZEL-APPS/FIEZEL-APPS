@@ -1,9 +1,10 @@
 # FIEZEL Build m025-504 Handoff Dossier
 
-**Judul**: Polish UI/UX — Perbaikan Scroll & Tombol Lanjut Listening, Instant Tab Switching, Sinkronisasi Nama Profil Akun, Sembunyikan Kartu Braincore Beranda, dan Kontras Input Cloze  
-**Versi**: `m025-504`  
-**Tanggal**: 2026-10-08  
-**Status**: 100% Verified via Playwright Empirical Probe & Local Quality Gates  
+**Judul**: Polish UI/UX — Perbaikan Scroll & Tombol Lanjut Listening, Instant Tab Switching, Sinkronisasi Nama Profil Akun, Sembunyikan Kartu Braincore Beranda, dan Kontras Input Cloze
+**Versi**: `m025-504`
+**Otoritas**: MASTER & OWNER Directive
+**Tanggal**: 2026-10-08
+**Status**: 100% Verified via Playwright Empirical Probe & Local Quality Gates
 
 ---
 

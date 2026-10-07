@@ -1977,10 +1977,28 @@ div.card {
   color: #CBD5E1 !important;
 }
 
-.card > span:not([class*="lvl"]):not(.feedback-memory-kicker):not(#feedback *):not(#quizScaffoldNudge *):not(.quiz-scaffold-nudge *):not(.tutor-diagnostic-clue *):not(#tutorTurn *):not(.tutor-turn *),
-.card p > span:not([class*="lvl"]):not(#feedback *):not(#quizScaffoldNudge *):not(.quiz-scaffold-nudge *):not(.tutor-diagnostic-clue *):not(#tutorTurn *):not(.tutor-turn *),
-.card div > span:not([class*="badge"]):not([class*="tag"]):not([class*="btn"]):not([class*="act"]):not([class*="avatar"]):not([class*="lvl"]):not(.is-now):not(.is-done):not(.feedback-memory-kicker):not(#feedback *):not(#quizScaffoldNudge *):not(.quiz-scaffold-nudge *):not(.tutor-diagnostic-clue *):not(#tutorTurn *):not(.tutor-turn *) {
+.card > span:not([class*="lvl"]):not(.vocab-focus-word):not(.phonetic):not(.feedback-memory-kicker):not(#feedback *):not(#quizScaffoldNudge *):not(.quiz-scaffold-nudge *):not(.tutor-diagnostic-clue *):not(#tutorTurn *):not(.tutor-turn *),
+.card p > span:not([class*="lvl"]):not(.vocab-focus-word):not(.phonetic):not(#feedback *):not(#quizScaffoldNudge *):not(.quiz-scaffold-nudge *):not(.tutor-diagnostic-clue *):not(#tutorTurn *):not(.tutor-turn *),
+.card div > span:not([class*="badge"]):not([class*="tag"]):not([class*="btn"]):not([class*="act"]):not([class*="avatar"]):not([class*="lvl"]):not(.is-now):not(.is-done):not(.vocab-focus-word):not(.phonetic):not(.feedback-memory-kicker):not(#feedback *):not(#quizScaffoldNudge *):not(.quiz-scaffold-nudge *):not(.tutor-diagnostic-clue *):not(#tutorTurn *):not(.tutor-turn *) {
   color: #CBD5E1 !important;
+}
+
+.vocab-focus-word,
+.card .vocab-focus-word,
+#app .vocab-focus-word {
+  color: #0F172A !important;
+  font-weight: 800 !important;
+}
+
+.vocab-focus .phonetic,
+.card .vocab-focus .phonetic,
+#app .vocab-focus .phonetic {
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  color: #64748B !important;
+  padding: 0 4px !important;
 }
 
 /* Ensure feedback memory box and kicker retain their high-contrast colors */
@@ -3224,15 +3242,70 @@ fiezel-mascot:has(.fz-mochi-viewport),
   overflow: visible !important;
 }
 
-/* Hide legacy 2D SVG rig when 3D Mochi is active */
+/* Universal Anti-Ghost PAW Invariant: NEVER show legacy 2D SVG cat mascot anywhere */
+fiezel-mascot .fz-svg,
 fiezel-mascot.mochi-active .fz-svg,
 fiezel-mascot:has(.fz-mochi-viewport) .fz-svg,
 fiezel-mascot:has(canvas) .fz-svg,
+.fiezel-ob-mascot .fz-svg,
+.fiezel-ob-paw .fz-svg,
+.fz-coach-mascot .fz-svg,
+.coach-strip-mascot .fz-svg,
+.coach-strip-face .fz-svg,
+.paw-hero-avatar .fz-svg,
+.lesson-mascot .fz-svg,
+.writing-stage .fz-svg,
 .fz-mochi-viewport ~ .fz-svg {
   display: none !important;
   opacity: 0 !important;
   visibility: hidden !important;
   pointer-events: none !important;
+}
+
+/* Home Cockpit & Onboarding: 3D Mochi companion allowed and active */
+.paw-hero-cockpit {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+.paw-hero-avatar {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  width: 76px !important;
+  height: 76px !important;
+  position: relative !important;
+  overflow: visible !important;
+}
+.paw-speech-bubble {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.fiezel-ob-mascot {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  width: 170px !important;
+  height: 155px !important;
+  min-height: 140px !important;
+  position: relative !important;
+  overflow: visible !important;
+}
+.fiezel-ob-mascot fiezel-mascot,
+.fiezel-ob-mascot .fiezel-ob-paw {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  width: 100% !important;
+  height: 100% !important;
+  position: relative !important;
+  overflow: visible !important;
 }
 
 /* 3D Mochi Viewport: full dimensions, zero clipping on paws, badges, or ears */

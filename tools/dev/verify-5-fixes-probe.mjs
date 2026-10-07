@@ -119,7 +119,7 @@ server.listen(PORT, '127.0.0.1', async () => {
       const actions = container.querySelector('.fsl-actions');
       const actZIndex = actions ? window.getComputedStyle(actions).zIndex : '0';
       const actPointer = actions ? window.getComputedStyle(actions).pointerEvents : 'none';
-      
+
       const rules = [];
       for (const sheet of Array.from(document.styleSheets)) {
         try {
