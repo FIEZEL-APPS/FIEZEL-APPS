@@ -134,10 +134,10 @@ html body.fz-lang-ja .topbar {
   border-left: none !important;
   border-right: none !important;
   border-top: none !important;
-  border-bottom: 1px solid #E2E8F0 !important;
+  border-bottom: none !important;
   box-shadow: none !important;
   padding: max(8px, env(safe-area-inset-top)) 16px 8px 16px !important;
-  background: rgba(253, 250, 243, 0.96) !important;
+  background: var(--bgDay, #FDFAF3) !important;
   backdrop-filter: blur(24px) !important;
   -webkit-backdrop-filter: blur(24px) !important;
   display: flex !important;

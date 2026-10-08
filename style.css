@@ -7850,7 +7850,7 @@ main.app {
 section.fade,
 .classroom-page,
 .home-page {
-  background: #FAF8F5 !important;
+  background: var(--bgDay, #FDFAF3) !important;
   color: #0F172A !important;
   min-height: auto !important;
   padding-bottom: calc(80px + env(safe-area-inset-bottom, 12px)) !important;
@@ -7863,10 +7863,11 @@ section.fade,
 
 /* 2. Universal Tactile Clay Daylight Topbar */
 header.topbar {
-  background: rgba(253, 250, 243, 0.96) !important;
+  background: var(--bgDay, #FDFAF3) !important;
   backdrop-filter: blur(20px) !important;
   -webkit-backdrop-filter: blur(20px) !important;
-  border-bottom: 1px solid #E2E8F0 !important;
+  border: none !important;
+  border-bottom: none !important;
   box-shadow: none !important;
   position: sticky !important;
   top: 0 !important;
@@ -10441,12 +10442,116 @@ body.fz-stage-quiz .quiz-shell > .card,
   gap: 8px;
 }
 
+/* Compact Active Level Pill inside Topbar (Zero Card Bloat) */
+html body header.topbar .active-level-control,
+header.topbar .active-level-control,
+header.topbar #topContextActions .active-level-control,
+#topContextActions .active-level-control,
+.topbar-context-actions .active-level-control {
+  display: inline-flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center !important;
+  align-self: center !important;
+  flex-shrink: 0 !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  max-height: 32px !important;
+  padding: 2px 8px 2px 10px !important;
+  margin: 0 !important;
+  border-radius: 9999px !important;
+  border: 1.5px solid #E2E8F0 !important;
+  background: #FFFFFF !important;
+  box-shadow: 0 2px 0 #CBD5E1 !important;
+  gap: 6px !important;
+  cursor: pointer !important;
+  box-sizing: border-box !important;
+  transition: transform 0.1s ease, box-shadow 0.1s ease !important;
+}
+
+html body header.topbar .active-level-control:active,
+header.topbar .active-level-control:active,
+#topContextActions .active-level-control:active {
+  transform: translateY(1px) scale(0.97) !important;
+  box-shadow: 0 1px 0 #CBD5E1 !important;
+}
+
+html body header.topbar .active-level-control > span,
+header.topbar .active-level-control > span,
+#topContextActions .active-level-control > span {
+  display: none !important;
+}
+
+html body header.topbar .active-level-control strong,
+header.topbar .active-level-control strong,
+#topContextActions .active-level-control strong {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  color: #D97706 !important;
+  line-height: 1 !important;
+  letter-spacing: normal !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html body header.topbar .active-level-control small,
+header.topbar .active-level-control small,
+#topContextActions .active-level-control small {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 10.5px !important;
+  font-weight: 800 !important;
+  color: #0F172A !important;
+  background: #FDE047 !important;
+  border: 1px solid #FACC15 !important;
+  border-radius: 9999px !important;
+  padding: 2px 7px !important;
+  line-height: 1 !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+}
+
+html body header.topbar .active-level-control b,
+html body header.topbar .active-level-control .active-level-val,
+header.topbar .active-level-control b,
+header.topbar .active-level-control .active-level-val,
+#topContextActions .active-level-control b,
+#topContextActions .active-level-control .active-level-val {
+  background: transparent !important;
+  color: #D97706 !important;
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
 /* Eliminate duplicate page titles on panels where topbar handles it */
+html body.fz-view-latihan #app .section-head,
+html body.fz-view-grammar #app .section-head,
+html body.fz-view-vocab #app .section-head,
+html body.fz-stage-sl #app .section-head,
+html body.fz-view-reading #app .section-head,
+html body.fz-view-writing #app .section-head,
+html body.fz-view-library #app .section-head,
 body.fz-view-latihan .section-head,
 body.fz-view-grammar .section-head,
 body.fz-view-vocab .section-head,
-body.fz-stage-sl .section-head {
+body.fz-stage-sl .section-head,
+body.fz-view-reading .section-head,
+body.fz-view-writing .section-head,
+body.fz-view-library .section-head,
+#view-latihan > .section-head,
+#view-grammar > .section-head {
   display: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
 }
 
 /* ==========================================================================

@@ -1,7 +1,7 @@
 {
-  "version": "m025-519",
-  "claimedBy": "branch fix/m025-519-universal-contextual-topbar-vocab-overhaul",
-  "claimedAt": "2026-10-08T07:57:43.121Z",
-  "reason": "fix(ui-ux): m025-519 universal contextual topbar, vocab hub overhaul, and full-screen quiz viewport",
+  "version": "m025-520",
+  "claimedBy": "branch fix/m025-520-compact-topbar-pill-and-seamless-edge",
+  "claimedAt": "2026-10-08T10:41:53.766Z",
+  "reason": "fix(ui-ux): compact topbar level pill, seamless topbar edge, and remove duplicate latihan header",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
