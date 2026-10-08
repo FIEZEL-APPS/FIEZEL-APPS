@@ -19021,7 +19021,7 @@ async function openFriendConnectModal(initialTab='my-qr'){
             <i data-lucide="user-plus" style="width:15px;height:15px;"></i> ${t('social2.add-btn','Tambahkan')}
           </button>
           <div style="display:flex;align-items:center;gap:8px;padding:9px 12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:12px;font-size:11.5px;color:#CBD5E1;">
-            <i data-lucide="camera" style="width:15px;height:15px;color:#38BDF8;flex-shrink:0;"></i>
+            <i data-lucide="qr-code" style="width:15px;height:15px;color:#38BDF8;flex-shrink:0;"></i>
             <span>${t('social3.qr-desc','Minta teman memindai kode ini dengan kamera ponselnya. Kalian langsung terhubung.')}</span>
           </div>
         </div>
