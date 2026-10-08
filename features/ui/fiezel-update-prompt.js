@@ -134,6 +134,44 @@
     setSess('fiezel-update-later-time', String(Date.now()));
   }
 
+  /* Membersihkan cache peramban saat murid menekan tombol pembaruan.
+   * Cangkang lama (fiezel-shell-*) dan berkas runtime basi dihilangkan
+   * agar rilis baru dimuat bersih tanpa tertinggal aset CSS/JS usang.
+   * Aset suara neural (/vendor/) tetap dijaga agar unduhan 152 MB tidak terbuang. */
+  function purgeStaleCaches() {
+    if (typeof caches === 'undefined' || !caches.keys) return Promise.resolve();
+    return caches.keys().then(function (names) {
+      var target = bestBuild || '';
+      return Promise.all(names.map(function (name) {
+        // Cangkang shell versi lama yang bukan target rilis baru
+        if (name.indexOf('fiezel-shell-') === 0) {
+          if (target && name.indexOf(target) !== -1) {
+            return Promise.resolve();
+          }
+          if (!target && APP_BUILD && name.indexOf(APP_BUILD) === -1) {
+            return Promise.resolve();
+          }
+          return caches.delete(name);
+        }
+        // Cache runtime data (fiezel-v*): hapus berkas non-neural basi
+        if (name.indexOf('fiezel-v') === 0) {
+          return caches.open(name).then(function (cache) {
+            return cache.keys().then(function (requests) {
+              return Promise.all(requests.map(function (req) {
+                var url = (req && req.url) ? req.url : String(req || '');
+                if (url.indexOf('/vendor/') === -1) {
+                  return cache.delete(req);
+                }
+                return Promise.resolve();
+              }));
+            });
+          }).catch(function () {});
+        }
+        return Promise.resolve();
+      }));
+    }).catch(function () {});
+  }
+
   function apply() {
     bindReload();
     var node = el(), btn = node && node.querySelector('#updateBannerApply');
@@ -144,11 +182,30 @@
     }
     setSess('fiezel-apply-update', '1');
     hide();
-    if (pendingWorker && typeof pendingWorker.postMessage === 'function') {
-      try { pendingWorker.postMessage({ type: 'FIEZEL_SKIP_WAITING' }); } catch (_) {}
-      setTimeout(reloadIfApproved, 3500);
-    } else {
-      reloadIfApproved();
+    var proceed = function () {
+      if (pendingWorker && typeof pendingWorker.postMessage === 'function') {
+        try { pendingWorker.postMessage({ type: 'FIEZEL_SKIP_WAITING' }); } catch (_) {}
+        setTimeout(reloadIfApproved, 3500);
+      } else {
+        reloadIfApproved();
+      }
+    };
+    try {
+      var p = purgeStaleCaches();
+      if (p && typeof p.then === 'function') {
+        var timer = setTimeout(proceed, 1500);
+        p.then(function () {
+          clearTimeout(timer);
+          proceed();
+        }).catch(function () {
+          clearTimeout(timer);
+          proceed();
+        });
+      } else {
+        proceed();
+      }
+    } catch (_) {
+      proceed();
     }
   }
 
