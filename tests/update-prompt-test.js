@@ -126,6 +126,15 @@ test('penundaan murid tidak abadi: hanya sepanjang sesi tab', () => {
   assert.ok(!/localStorage/.test(prompt), 'penundaan tidak boleh permanen');
 });
 
+test('pembersihan cache peramban ikut dipicu saat murid menekan tombol pembaruan', () => {
+  assert.ok(/function purgeStaleCaches\(\)/.test(prompt), 'fungsi purgeStaleCaches wajib ada');
+  const applyAt = prompt.indexOf('function apply()');
+  const applyBody = applyAt < 0 ? '' : prompt.slice(applyAt, prompt.indexOf('\n  }', applyAt));
+  assert.ok(/purgeStaleCaches/.test(applyBody), 'purgeStaleCaches wajib dipanggil di dalam apply()');
+  assert.ok(/fiezel-shell-/.test(prompt), 'pembersihan wajib menyentuh cangkang fiezel-shell-');
+  assert.ok(/caches\.delete/.test(prompt), 'pembersihan wajib memanggil caches.delete');
+});
+
 for (const [name, fn] of tests) {
   try { fn(); console.log(`  ok  ${name}`); }
   catch (e) { failures++; console.log(`FAIL  ${name}\n      ${e.message}`); }
