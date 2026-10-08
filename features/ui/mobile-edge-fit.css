@@ -4924,20 +4924,47 @@ body.fz-lux .card.card-flashcard {
   gap: 16px !important;
   min-height: calc(100vh - 145px) !important;
   box-sizing: border-box !important;
+  position: relative !important;
 }
 
 .flashcard {
   flex: 1 1 auto !important;
   width: 100% !important;
-  height: clamp(400px, 58vh, 560px) !important;
-  min-height: 380px !important;
+  height: clamp(380px, 56vh, 540px) !important;
+  min-height: 360px !important;
   cursor: pointer;
   perspective: 1400px;
   border: none !important;
   border-radius: 28px !important;
   background: transparent !important;
   box-shadow: none !important;
-  position: relative;
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+/* Card Deck Layering: physical stack effect beneath card */
+.flashcard::before,
+.flashcard::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 28px !important;
+  pointer-events: none;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+}
+.flashcard::before {
+  background: linear-gradient(165deg, #FFFFFF 0%, #FAF3E6 100%) !important;
+  border: 2px solid #E6D8C3 !important;
+  transform: translateY(7px) scale(0.965);
+  z-index: -1;
+  box-shadow: 0 10px 24px -8px rgba(135, 105, 65, 0.12) !important;
+}
+.flashcard::after {
+  background: linear-gradient(165deg, #FFFFFF 0%, #F5ECDB 100%) !important;
+  border: 2px solid #DED0BA !important;
+  transform: translateY(14px) scale(0.93);
+  z-index: -2;
+  box-shadow: 0 14px 28px -10px rgba(135, 105, 65, 0.08) !important;
 }
 
 .flash-inner {
@@ -5139,6 +5166,23 @@ html body:not(.fz-teacher-mode) .card-flashcard h2.word {
 .flashcard .chip-cat b {
   color: #2D241E !important;
   font-weight: 800 !important;
+}
+
+.flash-face .eyebrow,
+.flashcard .eyebrow {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: #FEF3C7 !important;
+  color: #92400E !important;
+  border: 1.5px solid #FCD34D !important;
+  font-weight: 800 !important;
+  font-size: 0.84rem !important;
+  padding: 4px 14px !important;
+  border-radius: 999px !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+  margin: 0 0 8px 0 !important;
 }
 
 /* Back Face */
