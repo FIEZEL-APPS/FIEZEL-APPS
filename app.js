@@ -19043,7 +19043,7 @@ async function openFriendConnectModal(initialTab='my-qr'){
       <div class="modal-mark">TEMAN & KOMUNITAS</div>
       <h2 style="font-size:1.45rem;margin:6px 0 4px;font-weight:800;">${t('social2.add-title','Tambah teman lewat ID')}</h2>
       <p class="muted" style="font-size:12px;margin:0 0 12px;line-height:1.4;">${t('social2.add-desc','Minta ID (nama samaran) temanmu, lalu ketik di sini.')}</p>
-      
+
       <!-- Minimalist Segmented Tabs -->
       <div class="connect-segmented-nav" style="display:flex;gap:4px;background:rgba(255,255,255,0.08);padding:4px;border-radius:12px;margin-bottom:12px;">
         <button type="button" onclick="window._switchConnectModalTab('my-qr')" style="flex:1;padding:8px 4px;font-size:11px;font-weight:800;border-radius:9px;border:none;cursor:pointer;background:${activeTab==='my-qr'?'#FFC800 !important':'transparent !important'};color:${activeTab==='my-qr'?'#1B1418 !important':'#94A3B8 !important'};box-shadow:${activeTab==='my-qr'?'0 2px 8px rgba(255,200,0,0.3)':'none'};display:flex;align-items:center;justify-content:center;gap:4px;">
