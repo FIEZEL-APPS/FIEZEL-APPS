@@ -201,8 +201,10 @@ function freshCore(opts={}){
  assert(!/error_system/.test(b1.elements.onlineRoot.innerHTML),'flag mati diperlakukan sebagai error sistem');
  // navigasi keluar-masuk tetap hidup setelah flag mati (aplikasi tidak patah)
  assert(b1.ctx.go('home')===true&&b1.ctx.go('progress')===true,'navigasi patah setelah flag mati');
- assert(/socialSummaryCard/.test(b1.elements.app.innerHTML),'kartu ringkas Online & Teman tidak ada di Peta Belajar → Ringkasan');
+ assert(b1.ctx.go('profile')===true,'navigasi ke profil gagal');
  await sleep(120);
+ const profileHtml=b1.elements.app.innerHTML+b1.elements.onlineRoot.innerHTML;
+ assert(/socialSummaryCard|cardOnlineTeman/.test(profileHtml),'kartu ringkas Online & Teman tidak ada di Profil');
  assert(/belum aktif/i.test(b1.elements.socialSummaryCard.innerHTML),'kartu ringkas tidak jujur saat flag mati');
  // pintu masuk Pengaturan + sakelar Mode Privat papan
  b1.ctx.openSettings();

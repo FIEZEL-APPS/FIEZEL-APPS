@@ -5499,16 +5499,17 @@ html[data-fz-input="touch"] :focus{outline-color:transparent!important}
 .notif-readall{font-size:.8rem;padding:6px 10px}
 .notif-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;max-height:min(56vh,520px);overflow:auto;padding-right:2px}
 .notif-section{font-size:.7rem;text-transform:uppercase;letter-spacing:.12em;font-weight:700;color:var(--muted);padding:8px 4px 0}
-.notif-item{display:grid;grid-template-columns:40px 1fr;gap:10px 12px;align-items:start;padding:12px 14px;border-radius:var(--radius-lg,18px);background:var(--panel-soft,rgba(255,255,255,.6));border:1px solid var(--line-soft,var(--line));transition:background-color .2s,transform .2s}
-.notif-item.is-unread{background:var(--accent-soft);border-color:var(--accent-soft)}
-.notif-item .notif-icon{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--panel,#fff);color:var(--accent-strong);box-shadow:var(--shadow-sm)}
-.notif-item.is-teacher .notif-icon{background:var(--gold);color:var(--text)}
+.notif-item{display:grid;grid-template-columns:40px 1fr;gap:10px 12px;align-items:start;padding:12px 14px;border-radius:var(--radius-lg,18px);background:#FFFFFF !important;border:1.5px solid #E2E8F0 !important;box-shadow:0 2px 4px rgba(0,0,0,0.05);transition:background-color .2s,transform .2s}
+.notif-item.is-unread{background:#F8FAFC !important;border-color:#CBD5E1 !important}
+.notif-item .notif-icon{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:#F1F5F9;color:#0284C7;box-shadow:var(--shadow-sm)}
+.notif-item.is-teacher .notif-icon{background:#FEF3C7;color:#D97706}
 .notif-body{display:flex;flex-direction:column;gap:2px;min-width:0}
-.notif-body b{font-weight:600;line-height:1.35;font-size:.95rem}
-.notif-body small{color:var(--muted);font-size:.78rem}
-.notif-cta{grid-column:2;justify-self:start;display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;border:0;background:var(--accent-strong);color:#fff;font:inherit;font-size:.85rem;font-weight:600;cursor:pointer;transition:transform .15s,background-color .2s}
-.notif-cta:hover{transform:translateY(-1px)}
-.notif-cta.is-ghost{background:transparent;color:var(--accent-strong);border:1px solid var(--line)}
+.notif-body b{font-weight:700;line-height:1.35;font-size:.95rem;color:#0F172A !important}
+.notif-body small{color:#64748B !important;font-size:.78rem}
+.notif-cta{grid-column:2;justify-self:start;display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;border:0;background:#0284C7;color:#FFFFFF !important;font:inherit;font-size:.85rem;font-weight:700;cursor:pointer;transition:transform .15s,background-color .2s}
+.notif-cta:hover{transform:translateY(-1px);background:#0369A1}
+.notif-cta.is-ghost{background:transparent;color:#0F172A !important;border:1.5px solid #CBD5E1 !important}
+.notif-cta.is-ghost:hover{background:#F1F5F9}
 .notif-cta i,.notif-cta svg{width:1em;height:1em}
 .notif-empty{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;color:var(--muted);padding:26px 12px;font-size:.92rem}
 .notif-empty i,.notif-empty svg{width:32px;height:32px;opacity:.6}
@@ -10776,7 +10777,8 @@ body.fz-view-library .section-head,
 
 /* Contextual Topbar Display Guard across panels */
 body:not(.fz-stage-home) header.topbar #topBrandWrap,
-body:not(.fz-stage-home) header.topbar #fzCourseSwitchBtn {
+body:not(.fz-stage-home) header.topbar #fzCourseSwitchBtn,
+body:not(.fz-stage-home) header.topbar #fzNotifBtn {
   display: none !important;
 }
 body.fz-stage-home header.topbar #topBrandWrap {
@@ -10785,10 +10787,33 @@ body.fz-stage-home header.topbar #topBrandWrap {
 body.fz-stage-home header.topbar #fzCourseSwitchBtn {
   display: inline-flex !important;
 }
+body.fz-stage-home header.topbar #fzNotifBtn {
+  display: inline-flex !important;
+}
+body.fz-stage-home header.topbar #topProfileFriendBtn,
+body.fz-stage-home header.topbar #topSettingsBtn {
+  display: none !important;
+}
 body.fz-stage-home header.topbar #topContextWrap,
 body.fz-stage-home header.topbar #topContextActions {
   display: none !important;
 }
+
+body:not(.fz-view-profile) header.topbar #topProfileFriendBtn,
+body:not(.fz-view-profile) header.topbar #topSettingsBtn {
+  display: none !important;
+}
+body.fz-view-profile header.topbar #topProfileFriendBtn {
+  display: inline-flex !important;
+}
+body.fz-view-profile header.topbar #topSettingsBtn {
+  display: inline-flex !important;
+}
+body.fz-view-profile header.topbar #fzNotifBtn,
+body.fz-view-profile header.topbar #fzCourseSwitchBtn {
+  display: none !important;
+}
+
 body.fz-view-classroom header.topbar #topContextWrap,
 body.fz-view-classroom header.topbar #topContextActions,
 body.fz-view-classroom header.topbar #topGamifyCluster {

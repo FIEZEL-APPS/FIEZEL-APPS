@@ -8896,7 +8896,7 @@ const TAB_PARENT={nujum:'home',kana:'latihan',test:'home',vocab:'latihan',gramma
 function syncNavActivePill(targetEl){try{const pill=document.getElementById('navActivePill'),nav=document.querySelector('.bottomnav');if(!pill||!nav)return;let activeEl=targetEl;if(!activeEl||!activeEl.getBoundingClientRect||!nav.contains(activeEl)){const curV=(typeof state!=='undefined'&&state?.view)?state.view:'home';activeEl=nav.querySelector('.nav.active')||nav.querySelector(`[data-view="${curV}"]`)||(TAB_PARENT[curV]?nav.querySelector(`[data-view="${TAB_PARENT[curV]}"]`):null)||(curV==='profile'?nav.querySelector('[data-view="online"]'):null)||(curV==='home'?nav.querySelector('[data-view="home"]'):null)}if(!activeEl){pill.style.setProperty('opacity','0','important');return}const navRect=nav.getBoundingClientRect();if(navRect.width===0){pill.style.setProperty('opacity','0','important');return}const elRect=activeEl.getBoundingClientRect();if(elRect.width===0){activeEl._pillRetries=(activeEl._pillRetries||0)+1;if(activeEl._pillRetries<=8){requestAnimationFrame(()=>syncNavActivePill(activeEl))}return}activeEl._pillRetries=0;const left=elRect.left-navRect.left;pill.style.setProperty('width',elRect.width+'px','important');pill.style.setProperty('transform',`translateX(${left}px)`,'important');pill.style.setProperty('opacity','1','important');nav.classList.add('pill-synced')}catch(_){}}
 window.syncNavActivePill=syncNavActivePill;
 try{window.addEventListener('resize',()=>syncNavActivePill(),{passive:true});window.addEventListener('orientationchange',()=>{syncNavActivePill();setTimeout(syncNavActivePill,120)},{passive:true})}catch(_){}
-function renderInner(){if(isVerifiedTeacher()&&state.view!=='tutor'){state.view='tutor'}/* Kursus Jepang berbicara dengan istilahnya sendiri (Kotoba, Bunpō, Renshū): lapisan kunci 'kursus-ja.*' di FiezelI18n dinyalakan SEBELUM layar dilukis, dan tabel/elemen statis yang sudah memegang kalimat lama disegarkan sekali saat kursus berganti. */try{const __course=activeTargetLang()==='ja'&&!isVerifiedTeacher()?'ja':null;if(self.FiezelI18n?.getCourse&&FiezelI18n.getCourse()!==__course){FiezelI18n.setCourse(__course);__fzRefreshI18nTables();/* Soal, jawaban, dan pembahasan kursus Jepang diberi furigana + romaji dari bank kosakata, dan tiap kuis mendapat tombol ふりがな/ローマ字. */try{if(__course==='ja')self.FiezelJaUi?.observe?.($('app'),()=>V);else self.FiezelJaUi?.unobserve?.()}catch(_){}}}catch(_){}/* m025-314: go() menolak permukaan yang salah bahasa, tetapi state.view juga bisa datang dari sesi SEBELUM murid berganti kursus (ia tersimpan dan dipulihkan saat boot) — jadi pemulihan itu ikut dijepit di sini, bukan hanya jalur navigasi. */if(targetLangSurfaceBlocked(state.view)){state.view='home'}if(document.body?.classList?.contains?.('fz-teacher-mode')&&state.view!=='tutor'){try{self.FiezelTeacherShell?.unmount?.()}catch(_){}}isViewChange=state.view!==lastRenderedView;lastRenderedView=state.view;const appContainer=$('app'),savedActive=captureActiveElement(appContainer);if(appContainer)appContainer.classList.add('is-repaint');speakingListeningMountToken++;if(speakingListeningController){speakingListeningController.destroy();speakingListeningController=null;/* m026-01: satu-satunya tempat sesi dengar benar-benar bubar. Di dalam if, bukan di luar - kalau tidak, tiap navigasi biasa akan memaksa maskot kembali idle dan memotong selebrasi yang sedang jalan. */pawReact('listening-stop')}document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));if(state.view==='home')home();if(state.view==='latihan')latihan();if(state.view==='vocab')vocab();if(state.view==='grammar')grammar();if(state.view==='reading')reading();if(state.view==='skills')skillsLab();if(state.view==='listening')skillsLab('listening');if(state.view==='speaking')skillsLab('speaking');if(state.view==='writing')writing();if(state.view==='classroom')classHubView();if(state.view==='library')library();if(state.view==='ask'||state.view==='search')askView();if(state.view==='test')placement();if(state.view==='progress')progress();if(state.view==='online'||state.view==='profile')onlineView();if(state.view==='learn')learnerFlowView();if(state.view==='arena')arenaView();if(state.view==='tutor')tutorCenterView();if(state.view==='kana')kanaView();if(state.view==='nujum')nujumView();if(state.view==='game')gameView();/* merge SLOT 7 sosial 2026-08-29 *//* Audit F12: layar tanpa tab sendiri tetap menandai tab induknya - Tes awal milik Hari ini, hub latihan milik Latihan. */const TAB_PARENT={nujum:'home',kana:'latihan',test:'home',vocab:'latihan',grammar:'latihan',reading:'latihan',writing:'latihan',library:'latihan',skills:'latihan',listening:'latihan',speaking:'latihan',learn:'home',arena:'game',game:'game',profile:'online'};const activeTabEl=document.querySelector(`[data-view="${state.view}"]`)||(state.view==='profile'?document.querySelector('[data-view="online"]'):state.view==='online'?document.querySelector('[data-view="profile"]'):TAB_PARENT[state.view]?document.querySelector(`.bottomnav [data-view="${TAB_PARENT[state.view]}"]`):null);activeTabEl?.classList.add('active');syncNavActivePill(activeTabEl);/* m028 fase3: bendera panggung Skills Lab. Addon listening memaku blok tombolnya ke dasar layar (speaking-listening-addon.css), jadi ia panggung kedua yang bisa ditutupi gelembung. */document.body?.classList?.toggle?.('fz-stage-sl',['skills','listening','speaking'].includes(state.view));/* m028 fase3 (QA §9): Peta Belajar ikut jadi panggung ber-kontrol sejak panel NEXT SESSION punya tombol "Mulai sesi" di dekat dasar layar - screenshot QA menunjukkan gelembung PAW menutupinya utuh. Aturannya sama dengan kuis: peek dilarang, dok mengecil, layar diberi ruang bawah. */document.body?.classList?.toggle?.('fz-stage-map',state.view==='progress');/* 2026-08-29 overhaul I12 (O6 #10): bendera panggung Home. Wajah coach-strip adalah SATU-SATUNYA Pau di Home; gelembung FAB pengambang (Pau kedua, terukur menimpa lipatan hero/skill-hub di 390px) disembunyikan lewat CSS body.fz-stage-home — pola yang sama dengan fz-stage-sl/fz-stage-map, modul gelembung tidak disentuh. */document.body?.classList?.toggle?.('fz-stage-home',state.view==='home');/* q16-P2-2 2026-08-29: hub juga panggung ber-CTA-dekat-dasar (Review Due, Buka flashcards, Mulai 25 soal) \u2014 peek dilarang, dok mengecil, pola sama dengan sl/map. */document.body?.classList?.toggle?.('fz-stage-hub',['vocab','grammar','reading','library','test'].includes(state.view));document.body?.classList?.toggle?.('fz-stage-writing',state.view==='writing');/* v24-F2 2026-08-29: Writing = layar mengarang; FAB disembunyikan via CSS (pola fz-stage-home), modul gelembung tidak disentuh. *//* Kursus Jepang berpakaian sendiri: palet shu/ai/washi di fiezel-2.css menempel lewat bendera ini, jadi layar Inggris tidak tersentuh sama sekali; KelasKu guru punya palet sendiri (teacher-shell.css). */document.body?.classList?.toggle?.('fz-lang-ja',self.FiezelI18n?.getCourse?.()==='ja');document.body?.classList?.toggle?.('fz-view-classroom',state.view==='classroom');document.body?.classList?.toggle?.('fz-view-profile',state.view==='online'||state.view==='profile');document.body?.classList?.toggle?.('fz-view-latihan',state.view==='latihan');document.body?.classList?.toggle?.('fz-view-grammar',state.view==='grammar');document.body?.classList?.toggle?.('fz-view-vocab',state.view==='vocab');document.body?.classList?.toggle?.('fz-view-game',state.view==='game');try{const _topBrandNormal=$('topBrandWrap'),_topBrandK=$('topBrandKelasKu'),_topContextWrap=$('topContextWrap'),_topContextBackBtn=$('topContextBackBtn'),_topContextTitle=$('topContextTitle'),_topContextActions=$('topContextActions'),_topActionsNormal=$('topGamifyCluster'),_topClusterK=$('topKelasKuCluster'),_isHome=state.view==='home',_isK=state.view==='classroom',_isP=state.view==='online'||state.view==='profile',_setBtn=$('topSettingsBtn'),_cBtn=$('fzCourseSwitchBtn');if(_isHome){if(_topBrandNormal)_topBrandNormal.style.display='flex';if(_topBrandK)_topBrandK.style.display='none';if(_topContextWrap)_topContextWrap.style.display='none';if(_topContextActions)_topContextActions.style.display='none';if(_topActionsNormal)_topActionsNormal.style.display='flex';if(_topClusterK)_topClusterK.style.display='none';if(_cBtn)_cBtn.style.display='inline-flex';if(_setBtn)_setBtn.style.display='none';}else if(_isK){if(_topBrandNormal)_topBrandNormal.style.display='none';if(_topBrandK)_topBrandK.style.display='flex';if(_topContextWrap)_topContextWrap.style.display='none';if(_topContextActions)_topContextActions.style.display='none';if(_topActionsNormal)_topActionsNormal.style.display='none';if(_topClusterK){_topClusterK.style.display='flex';const _code=(typeof learnerClassCode==='function'?learnerClassCode():'')||'X IPA 2',_lbl=$('topKelasKuCodeLabel');if(_lbl)_lbl.textContent=_code+' ▾';}}else if(_isP){if(_topBrandNormal)_topBrandNormal.style.display='none';if(_topBrandK)_topBrandK.style.display='none';if(_topContextWrap){_topContextWrap.style.display='flex';if(_topContextBackBtn)_topContextBackBtn.style.display='none';if(_topContextTitle)_topContextTitle.textContent=FiezelI18n.t('nav.profile','Profil');}if(_topContextActions)_topContextActions.style.display='none';if(_topActionsNormal)_topActionsNormal.style.display='flex';if(_topClusterK)_topClusterK.style.display='none';if(_cBtn)_cBtn.style.display='none';if(_setBtn)_setBtn.style.display='inline-flex';}else{if(_topBrandNormal)_topBrandNormal.style.display='none';if(_topBrandK)_topBrandK.style.display='none';if(_topActionsNormal)_topActionsNormal.style.display='none';if(_topClusterK)_topClusterK.style.display='none';if(_cBtn)_cBtn.style.display='none';if(_setBtn)_setBtn.style.display='none';if(_topContextWrap){_topContextWrap.style.display='flex';const _hasBack=['grammar','vocab','reading','writing','skills','listening','speaking','library','kana','ask','search'].includes(state.view);if(_topContextBackBtn)_topContextBackBtn.style.display=_hasBack?'inline-flex':'none';let _title='Latihan';if(state.view==='latihan')_title=FiezelI18n.t('nav.latihan','Latihan');else if(state.view==='grammar')_title=FiezelI18n.t('student.grammar-title','Grammar');else if(state.view==='vocab')_title=FiezelI18n.t('student.vocab-title','Kosakata');else if(state.view==='skills'||state.view==='listening'||state.view==='speaking')_title=state.view==='listening'?'Listening':state.view==='speaking'?'Speaking':FiezelI18n.t('student.skills-title','Bicara & Dengar');else if(state.view==='reading')_title=FiezelI18n.t('skill.reading','Membaca');else if(state.view==='writing')_title=FiezelI18n.t('skill.writing','Menulis');else if(state.view==='library')_title=FiezelI18n.t('library.title','Perpustakaan');else if(state.view==='progress')_title=FiezelI18n.t('nav.progres','Progres');else if(state.view==='game'||state.view==='arena')_title=FiezelI18n.t('nav.game','Game');else if(state.view==='tutor')_title='Pusat Tutor';else if(state.view==='kana')_title='Karakter Kana';else if(state.view==='nujum')_title='Nujum Mentor';else if(state.view==='ask'||state.view==='search')_title=FiezelI18n.t('ask.judul','Tanya FIEZEL');if(_topContextTitle)_topContextTitle.textContent=_title;}if(_topContextActions){const _hasLevel=['latihan','grammar','vocab','reading','writing','skills','listening','speaking','progress','library'].includes(state.view);if(_hasLevel){_topContextActions.style.display='flex';_topContextActions.innerHTML=levelControlMarkup();}else{_topContextActions.style.display='none';}}}const _bTag=$('topBrandTag')||document.querySelector('#topBrandWrap .fiezel-brand-tag');if(_bTag){let _t='AKTIF';if(state.view==='latihan'||['vocab','grammar','reading','skills','listening','speaking','writing','library','kana','ask','search'].includes(state.view)||TAB_PARENT[state.view]==='latihan')_t='LATIHAN';else if(state.view==='progress')_t='PROGRES';else if(state.view==='game'||state.view==='arena'||TAB_PARENT[state.view]==='game')_t='ARENA';else if(state.view==='online'||state.view==='profile')_t='PROFIL';else if(state.view==='classroom')_t='KELAS';else if(state.view==='tutor')_t='TUTOR';else if(state.view==='nujum')_t='MENTOR';_bTag.textContent=_t;}const _sVal=$('topbarStreakVal'),_xVal=$('topbarXpVal');if(_sVal)_sVal.textContent=String(state.streak||3);if(_xVal)_xVal.textContent=String(state.xp||(state.gems?.balance)||120);}catch(_){}try{self.FiezelJaUi?.applyPrefs?.()}catch(_){}enhanceUI();syncExamLockForView();syncCoachBubble();try{refreshNotifBadge()}catch(_){}try{updateTopbarCourseButton()}catch(_){}restoreActiveElement($('app'),savedActive);if(isViewChange){try{const _rEl=document.getElementById('fzRitual');if(_rEl&&state.view!=='home'){clearTimeout(_rEl._fzAutoClose);_rEl.remove()}}catch(_){}window.scrollTo(0,0)}}
+function renderInner(){if(isVerifiedTeacher()&&state.view!=='tutor'){state.view='tutor'}/* Kursus Jepang berbicara dengan istilahnya sendiri (Kotoba, Bunpō, Renshū): lapisan kunci 'kursus-ja.*' di FiezelI18n dinyalakan SEBELUM layar dilukis, dan tabel/elemen statis yang sudah memegang kalimat lama disegarkan sekali saat kursus berganti. */try{const __course=activeTargetLang()==='ja'&&!isVerifiedTeacher()?'ja':null;if(self.FiezelI18n?.getCourse&&FiezelI18n.getCourse()!==__course){FiezelI18n.setCourse(__course);__fzRefreshI18nTables();/* Soal, jawaban, dan pembahasan kursus Jepang diberi furigana + romaji dari bank kosakata, dan tiap kuis mendapat tombol ふりがな/ローマ字. */try{if(__course==='ja')self.FiezelJaUi?.observe?.($('app'),()=>V);else self.FiezelJaUi?.unobserve?.()}catch(_){}}}catch(_){}/* m025-314: go() menolak permukaan yang salah bahasa, tetapi state.view juga bisa datang dari sesi SEBELUM murid berganti kursus (ia tersimpan dan dipulihkan saat boot) — jadi pemulihan itu ikut dijepit di sini, bukan hanya jalur navigasi. */if(targetLangSurfaceBlocked(state.view)){state.view='home'}if(document.body?.classList?.contains?.('fz-teacher-mode')&&state.view!=='tutor'){try{self.FiezelTeacherShell?.unmount?.()}catch(_){}}isViewChange=state.view!==lastRenderedView;lastRenderedView=state.view;const appContainer=$('app'),savedActive=captureActiveElement(appContainer);if(appContainer)appContainer.classList.add('is-repaint');speakingListeningMountToken++;if(speakingListeningController){speakingListeningController.destroy();speakingListeningController=null;/* m026-01: satu-satunya tempat sesi dengar benar-benar bubar. Di dalam if, bukan di luar - kalau tidak, tiap navigasi biasa akan memaksa maskot kembali idle dan memotong selebrasi yang sedang jalan. */pawReact('listening-stop')}document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));if(state.view==='home')home();if(state.view==='latihan')latihan();if(state.view==='vocab')vocab();if(state.view==='grammar')grammar();if(state.view==='reading')reading();if(state.view==='skills')skillsLab();if(state.view==='listening')skillsLab('listening');if(state.view==='speaking')skillsLab('speaking');if(state.view==='writing')writing();if(state.view==='classroom')classHubView();if(state.view==='library')library();if(state.view==='ask'||state.view==='search')askView();if(state.view==='test')placement();if(state.view==='progress')progress();if(state.view==='online'||state.view==='profile')onlineView();if(state.view==='learn')learnerFlowView();if(state.view==='arena')arenaView();if(state.view==='tutor')tutorCenterView();if(state.view==='kana')kanaView();if(state.view==='nujum')nujumView();if(state.view==='game')gameView();/* merge SLOT 7 sosial 2026-08-29 *//* Audit F12: layar tanpa tab sendiri tetap menandai tab induknya - Tes awal milik Hari ini, hub latihan milik Latihan. */const TAB_PARENT={nujum:'home',kana:'latihan',test:'home',vocab:'latihan',grammar:'latihan',reading:'latihan',writing:'latihan',library:'latihan',skills:'latihan',listening:'latihan',speaking:'latihan',learn:'home',arena:'game',game:'game',profile:'online'};const activeTabEl=document.querySelector(`[data-view="${state.view}"]`)||(state.view==='profile'?document.querySelector('[data-view="online"]'):state.view==='online'?document.querySelector('[data-view="profile"]'):TAB_PARENT[state.view]?document.querySelector(`.bottomnav [data-view="${TAB_PARENT[state.view]}"]`):null);activeTabEl?.classList.add('active');syncNavActivePill(activeTabEl);/* m028 fase3: bendera panggung Skills Lab. Addon listening memaku blok tombolnya ke dasar layar (speaking-listening-addon.css), jadi ia panggung kedua yang bisa ditutupi gelembung. */document.body?.classList?.toggle?.('fz-stage-sl',['skills','listening','speaking'].includes(state.view));/* m028 fase3 (QA §9): Peta Belajar ikut jadi panggung ber-kontrol sejak panel NEXT SESSION punya tombol "Mulai sesi" di dekat dasar layar - screenshot QA menunjukkan gelembung PAW menutupinya utuh. Aturannya sama dengan kuis: peek dilarang, dok mengecil, layar diberi ruang bawah. */document.body?.classList?.toggle?.('fz-stage-map',state.view==='progress');/* 2026-08-29 overhaul I12 (O6 #10): bendera panggung Home. Wajah coach-strip adalah SATU-SATUNYA Pau di Home; gelembung FAB pengambang (Pau kedua, terukur menimpa lipatan hero/skill-hub di 390px) disembunyikan lewat CSS body.fz-stage-home — pola yang sama dengan fz-stage-sl/fz-stage-map, modul gelembung tidak disentuh. */document.body?.classList?.toggle?.('fz-stage-home',state.view==='home');/* q16-P2-2 2026-08-29: hub juga panggung ber-CTA-dekat-dasar (Review Due, Buka flashcards, Mulai 25 soal) \u2014 peek dilarang, dok mengecil, pola sama dengan sl/map. */document.body?.classList?.toggle?.('fz-stage-hub',['vocab','grammar','reading','library','test'].includes(state.view));document.body?.classList?.toggle?.('fz-stage-writing',state.view==='writing');/* v24-F2 2026-08-29: Writing = layar mengarang; FAB disembunyikan via CSS (pola fz-stage-home), modul gelembung tidak disentuh. *//* Kursus Jepang berpakaian sendiri: palet shu/ai/washi di fiezel-2.css menempel lewat bendera ini, jadi layar Inggris tidak tersentuh sama sekali; KelasKu guru punya palet sendiri (teacher-shell.css). */document.body?.classList?.toggle?.('fz-lang-ja',self.FiezelI18n?.getCourse?.()==='ja');document.body?.classList?.toggle?.('fz-view-classroom',state.view==='classroom');document.body?.classList?.toggle?.('fz-view-profile',state.view==='online'||state.view==='profile');document.body?.classList?.toggle?.('fz-view-latihan',state.view==='latihan');document.body?.classList?.toggle?.('fz-view-grammar',state.view==='grammar');document.body?.classList?.toggle?.('fz-view-vocab',state.view==='vocab');document.body?.classList?.toggle?.('fz-view-game',state.view==='game');try{const _topBrandNormal=$('topBrandWrap'),_topBrandK=$('topBrandKelasKu'),_topContextWrap=$('topContextWrap'),_topContextBackBtn=$('topContextBackBtn'),_topContextTitle=$('topContextTitle'),_topContextActions=$('topContextActions'),_topActionsNormal=$('topGamifyCluster'),_topClusterK=$('topKelasKuCluster'),_isHome=state.view==='home',_isK=state.view==='classroom',_isP=state.view==='online'||state.view==='profile',_setBtn=$('topSettingsBtn'),_cBtn=$('fzCourseSwitchBtn'),_frBtn=$('topProfileFriendBtn'),_notifBtn=$('fzNotifBtn');if(_isP&&_frBtn){const _fb=$('topProfileFriendBadge');if(_fb){if(socialRequestCount>0){_fb.textContent=String(socialRequestCount);_fb.classList.remove('hidden');}else{_fb.classList.add('hidden');}}}if(_isHome){if(_topBrandNormal)_topBrandNormal.style.display='flex';if(_topBrandK)_topBrandK.style.display='none';if(_topContextWrap)_topContextWrap.style.display='none';if(_topContextActions)_topContextActions.style.display='none';if(_topActionsNormal)_topActionsNormal.style.display='flex';if(_topClusterK)_topClusterK.style.display='none';if(_cBtn)_cBtn.style.display='inline-flex';if(_setBtn)_setBtn.style.display='none';if(_notifBtn)_notifBtn.style.display='inline-flex';if(_frBtn)_frBtn.style.display='none';}else if(_isK){if(_topBrandNormal)_topBrandNormal.style.display='none';if(_topBrandK)_topBrandK.style.display='flex';if(_topContextWrap)_topContextWrap.style.display='none';if(_topContextActions)_topContextActions.style.display='none';if(_topActionsNormal)_topActionsNormal.style.display='none';if(_topClusterK){_topClusterK.style.display='flex';const _code=(typeof learnerClassCode==='function'?learnerClassCode():'')||'X IPA 2',_lbl=$('topKelasKuCodeLabel');if(_lbl)_lbl.textContent=_code+' ▾';}if(_cBtn)_cBtn.style.display='none';if(_setBtn)_setBtn.style.display='none';if(_notifBtn)_notifBtn.style.display='none';if(_frBtn)_frBtn.style.display='none';}else if(_isP){if(_topBrandNormal)_topBrandNormal.style.display='none';if(_topBrandK)_topBrandK.style.display='none';if(_topContextWrap){_topContextWrap.style.display='flex';if(_topContextBackBtn)_topContextBackBtn.style.display='none';if(_topContextTitle)_topContextTitle.textContent=FiezelI18n.t('nav.profile','Profil');}if(_topContextActions)_topContextActions.style.display='none';if(_topActionsNormal)_topActionsNormal.style.display='flex';if(_topClusterK)_topClusterK.style.display='none';if(_cBtn)_cBtn.style.display='none';if(_setBtn)_setBtn.style.display='inline-flex';if(_notifBtn)_notifBtn.style.display='none';if(_frBtn)_frBtn.style.display='inline-flex';}else{if(_topBrandNormal)_topBrandNormal.style.display='none';if(_topBrandK)_topBrandK.style.display='none';if(_topActionsNormal)_topActionsNormal.style.display='none';if(_topClusterK)_topClusterK.style.display='none';if(_cBtn)_cBtn.style.display='none';if(_setBtn)_setBtn.style.display='none';if(_notifBtn)_notifBtn.style.display='none';if(_frBtn)_frBtn.style.display='none';if(_topContextWrap){_topContextWrap.style.display='flex';const _hasBack=['grammar','vocab','reading','writing','skills','listening','speaking','library','kana','ask','search'].includes(state.view);if(_topContextBackBtn)_topContextBackBtn.style.display=_hasBack?'inline-flex':'none';let _title='Latihan';if(state.view==='latihan')_title=FiezelI18n.t('nav.latihan','Latihan');else if(state.view==='grammar')_title=FiezelI18n.t('student.grammar-title','Grammar');else if(state.view==='vocab')_title=FiezelI18n.t('student.vocab-title','Kosakata');else if(state.view==='skills'||state.view==='listening'||state.view==='speaking')_title=state.view==='listening'?'Listening':state.view==='speaking'?'Speaking':FiezelI18n.t('student.skills-title','Bicara & Dengar');else if(state.view==='reading')_title=FiezelI18n.t('skill.reading','Membaca');else if(state.view==='writing')_title=FiezelI18n.t('skill.writing','Menulis');else if(state.view==='library')_title=FiezelI18n.t('library.title','Perpustakaan');else if(state.view==='progress')_title=FiezelI18n.t('nav.progres','Progres');else if(state.view==='game'||state.view==='arena')_title=FiezelI18n.t('nav.game','Game');else if(state.view==='tutor')_title='Pusat Tutor';else if(state.view==='kana')_title='Karakter Kana';else if(state.view==='nujum')_title='Nujum Mentor';else if(state.view==='ask'||state.view==='search')_title=FiezelI18n.t('ask.judul','Tanya FIEZEL');if(_topContextTitle)_topContextTitle.textContent=_title;}if(_topContextActions){const _hasLevel=['latihan','grammar','vocab','reading','writing','skills','listening','speaking','progress','library'].includes(state.view);if(_hasLevel){_topContextActions.style.display='flex';_topContextActions.innerHTML=levelControlMarkup();}else{_topContextActions.style.display='none';}}}const _bTag=$('topBrandTag')||document.querySelector('#topBrandWrap .fiezel-brand-tag');if(_bTag){let _t='AKTIF';if(state.view==='latihan'||['vocab','grammar','reading','skills','listening','speaking','writing','library','kana','ask','search'].includes(state.view)||TAB_PARENT[state.view]==='latihan')_t='LATIHAN';else if(state.view==='progress')_t='PROGRES';else if(state.view==='game'||state.view==='arena'||TAB_PARENT[state.view]==='game')_t='ARENA';else if(state.view==='online'||state.view==='profile')_t='PROFIL';else if(state.view==='classroom')_t='KELAS';else if(state.view==='tutor')_t='TUTOR';else if(state.view==='nujum')_t='MENTOR';_bTag.textContent=_t;}const _sVal=$('topbarStreakVal'),_xVal=$('topbarXpVal');if(_sVal)_sVal.textContent=String(state.streak||3);if(_xVal)_xVal.textContent=String(state.xp||(state.gems?.balance)||120);}catch(_){}try{self.FiezelJaUi?.applyPrefs?.()}catch(_){}enhanceUI();syncExamLockForView();syncCoachBubble();try{refreshNotifBadge()}catch(_){}try{updateTopbarCourseButton()}catch(_){}restoreActiveElement($('app'),savedActive);if(isViewChange){try{const _rEl=document.getElementById('fzRitual');if(_rEl&&state.view!=='home'){clearTimeout(_rEl._fzAutoClose);_rEl.remove()}}catch(_){}window.scrollTo(0,0)}}
 // m025-115 - pembimbing yang ikut ke mana pun murid pergi (brief bagian 7).
 //
 // Gelembungnya dipasang SEKALI ke <body> dan tidak pernah ikut dicat ulang; yang dikirim
@@ -17024,7 +17024,7 @@ function progress(){
  /* m025-463 audit kabel BrainCore D7: peta kekeliruan antar-pelajaran dari matriks BrainCore ikut tampil di
     tab Analisis, tempat murid membaca kesalahannya, bukan hanya di tab ke-4. */
  const tabContent={
-  overview:`<div class="grid progress-grid">${cefrRoadmapMarkup()}${weeklyActivityChartMarkup()}${nextSessionPanelMarkup()}${braincoreProofPanelMarkup()}${uxOn('personalJourneyTab')?journeyMarkup():''}${socialSummaryCardMarkup()}${/* Audit F15: modul kosong disembunyikan sampai ada bukti; murid baru membaca ringkasan di atas + satu kalimat di bawah, bukan belasan 0%. */progressFresh?'':`<div><h3>${FiezelI18n.t('progress.peta-study')}</h3>${mapCards}</div>`}
+  overview:`<div class="grid progress-grid">${cefrRoadmapMarkup()}${weeklyActivityChartMarkup()}${nextSessionPanelMarkup()}${braincoreProofPanelMarkup()}${uxOn('personalJourneyTab')?journeyMarkup():''}${/* Audit F15: modul kosong disembunyikan sampai ada bukti; murid baru membaca ringkasan di atas + satu kalimat di bawah, bukan belasan 0%. */progressFresh?'':`<div><h3>${FiezelI18n.t('progress.peta-study')}</h3>${mapCards}</div>`}
    ${progressFresh&&!due.length?'':card(`<h3>${FiezelI18n.t('progress.ulangan-pintar')}</h3>${due.length?due.map(([k,x])=>`<div class="row"><span>${esc(friendlySkillName(k))}</span><span>${FiezelI18n.t('progress.dikuasai-risiko-lupa',{mastery:x.mastery||0,x:Math.round(forgettingProbability(x)*100)})}</span></div>`).join('<hr>')+`<div style="margin-top:12px"><button class="primary" onclick="reviewVocab()"><i data-lucide="history"></i> ${FiezelI18n.t('progress.mulai-review-btn',{jumlah:due.length})}</button></div>`:'<p class="muted">'+FiezelI18n.t('progress.belum-ada-materi-perlu-diulang')+'</p>'}`)}
    ${card(`<details class="prasasti-fold"><summary><h3>${FiezelI18n.t('progress.prasasti-judul')}</h3><i data-lucide="chevron-down" aria-hidden="true"></i></summary><p class="muted">${FiezelI18n.t('progress.lencana-bukti-study-redup-menunjukkan')}</p>${prasastiGalleryMarkup()}</details>`,'prasasti-gallery-card')}
    </div>`,
@@ -18323,16 +18323,64 @@ function tactileProfileCockpitMarkup(opts={}){
       </div>
     </div>
 
-    <!-- 1b. Kartu ID Pribadi & Kode QR Profil (Sistem Pertemanan ala LINE) -->
-    <div class="profile-section-card" id="cardIdPribadi">
-      <div class="section-card-header">
+    <!-- 1b. Slot Online & Teman (Dipindahkan ke Panel Profil, Minimalis & Mudah Dijangkau) -->
+    <div class="profile-section-card profile-social-card" id="cardOnlineTeman">
+      <div class="section-card-header" style="flex-direction:row;justify-content:space-between;align-items:center;cursor:default;">
         <div class="header-text-group">
-          <div class="section-card-title">${t('social3.my-id-title','ID pribadimu')}</div>
-          <div class="section-card-desc">${t('social3.qr-desc','Minta teman memindai kode ini dengan kamera ponselnya. Kalian langsung terhubung.')}</div>
+          <div class="section-card-title" style="display:flex;align-items:center;gap:6px;font-size:14px;font-weight:800;color:#0F172A;">
+            <i data-lucide="users" style="width:17px;height:17px;color:#0284C7;"></i>
+            <span>${t('social2.panel-title','Online & Teman')}</span>
+          </div>
+        </div>
+        <div class="profile-online-badge-pill" style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;background:#ECFDF5;color:#059669;border:1px solid #A7F3D0;">
+          <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#10B981;"></span>
+          <span>Online</span>
         </div>
       </div>
-      <div class="section-card-body">
-        ${(()=>{const myHandle=storedSocialHandle();if(!myHandle)return `<p class="muted" data-testid="my-social-id-empty">${t('social3.qr-need-profile','Buat ID online dulu supaya kode QR kamu bisa tampil.')}</p>`;return `<p class="fz2-myid" data-testid="my-social-id">@${esc(myHandle)}</p><div class="modal-actions"><button type="button" onclick="socialCopyId()" data-testid="copy-id-btn"><i data-lucide="copy"></i> ${t('social3.copy-id','Salin ID')}</button><button type="button" class="primary" onclick="openProfileQr()" data-testid="show-qr-btn"><i data-lucide="qr-code"></i> ${t('social3.show-qr','Tampilkan Kode QR Saya')}</button></div>`})()}
+      <div class="section-card-body" style="display:flex;flex-direction:column;gap:10px;">
+        <div class="profile-id-tactile-row" style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#F8FAFC;border:1.5px solid #E2E8F0;border-radius:12px;gap:8px;">
+          <div style="display:flex;flex-direction:column;min-width:0;">
+            <span style="font-size:10px;font-weight:700;color:#64748B;letter-spacing:0.04em;text-transform:uppercase;">ID Kamu</span>
+            <span class="fz2-myid" data-testid="my-social-id" style="font-size:13.5px;font-weight:800;color:#0F172A;font-family:monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">@${esc(handle||'murid')}</span>
+          </div>
+          <div style="display:flex;gap:6px;flex-shrink:0;">
+            <button class="btn-copy-code" type="button" onclick="socialCopyId()" data-testid="copy-id-btn" title="Salin ID" style="padding:6px 10px;font-size:11px;font-weight:700;border-radius:8px;">
+              <i data-lucide="copy" style="width:12px;height:12px;vertical-align:-1px;margin-right:2px;"></i> Salin
+            </button>
+            <button class="btn-copy-code" type="button" onclick="openProfileQr()" data-testid="show-qr-btn" title="Tampilkan QR" style="padding:6px 10px;font-size:11px;font-weight:700;border-radius:8px;background:#F0FDF4;color:#166534;border-color:#BBF7D0;">
+              <i data-lucide="qr-code" style="width:12px;height:12px;vertical-align:-1px;margin-right:2px;"></i> QR
+            </button>
+          </div>
+        </div>
+
+        ${socialRequestCount>0?`
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#FEF2F2;border:1.5px solid #FECACA;border-radius:12px;">
+          <span style="font-size:11.5px;font-weight:700;color:#DC2626;display:flex;align-items:center;gap:6px;">
+            <i data-lucide="bell" style="width:14px;height:14px;"></i> ${socialRequestCount} Permintaan Teman Baru
+          </span>
+          <button type="button" onclick="openFriendConnectModal('requests')" style="font-size:11px;font-weight:800;padding:4px 10px;border-radius:8px;background:#DC2626;color:#FFF;border:none;cursor:pointer;">Lihat</button>
+        </div>`:''}
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <button class="profile-action-btn secondary" type="button" onclick="openFriendConnectModal('invite')" style="padding:9px 8px;font-size:12px;font-weight:700;justify-content:center;margin:0;border-radius:10px;">
+            <i data-lucide="user-plus" style="width:14px;height:14px;vertical-align:-2px;margin-right:4px;color:#0284C7;"></i> Hubungkan
+          </button>
+          <button class="profile-action-btn secondary" type="button" onclick="openFriendConnectModal('my-qr')" style="padding:9px 8px;font-size:12px;font-weight:700;justify-content:center;margin:0;border-radius:10px;">
+            <i data-lucide="qr-code" style="width:14px;height:14px;vertical-align:-2px;margin-right:4px;color:#10B981;"></i> Scan & QR
+          </button>
+        </div>
+
+        <div style="display:flex;gap:6px;">
+          <button type="button" onclick="switchOnlineTab('teman')" style="flex:1;padding:7px;border-radius:9px;background:#F1F5F9;border:1px solid #E2E8F0;font-size:11px;font-weight:700;color:#475569;display:flex;align-items:center;justify-content:center;gap:4px;cursor:pointer;">
+            <i data-lucide="users" style="width:12px;height:12px;"></i> Daftar Teman
+          </button>
+          <button type="button" onclick="switchOnlineTab('papan')" style="flex:1;padding:7px;border-radius:9px;background:#F1F5F9;border:1px solid #E2E8F0;font-size:11px;font-weight:700;color:#475569;display:flex;align-items:center;justify-content:center;gap:4px;cursor:pointer;">
+            <i data-lucide="trophy" style="width:12px;height:12px;"></i> Papan Skor
+          </button>
+        </div>
+
+        <div id="socialSummaryCard" style="display:none;" aria-hidden="true">${socialSummaryBody()}</div>
+        <div id="cardIdPribadi" style="display:none;" aria-hidden="true"></div>
       </div>
     </div>
 
@@ -18495,7 +18543,7 @@ function socialOfflineCard(){const pending=(()=>{try{return socialCore()?.outbox
 function socialFlagOffCard(flag){return flag==='offline'?socialOfflineCard():card(`<div class="social-soon" data-testid="social-soon"><span class="social-soon-icon"><i class="fz-i" data-fz-icon="speaking" aria-hidden="true"></i></span><h3>${FiezelI18n.t('social.flag-off-title')}</h3><p class="muted">${FiezelI18n.t('social.segera-body')}</p><button class="primary" onclick="go('latihan')" data-testid="social-soon-cta">${FiezelI18n.t('social.segera-cta')}</button></div>`,'social-card')}
 async function renderOnlineTab(){
   const seq=++onlineSeq;
-  const put=html=>{if(seq!==onlineSeq||state.view!=='online')return;const el=$('onlineRoot');if(el){el.innerHTML=html;enhanceUI()}};
+  const put=html=>{if(seq!==onlineSeq||(state.view!=='online'&&state.view!=='profile'))return;const el=$('onlineRoot');if(el){el.innerHTML=html;enhanceUI()}};
   const core=socialCore();
   const extra=onlineTab==='teman'?socialClassCardMarkup():'';
   if(onlineTab==='profil'){
@@ -18866,7 +18914,7 @@ async function refreshSocialSummaryCard(){
   socialSummaryAt=Date.now();
   socialSummaryPaint();
 }
-function socialSummaryPaint(){const el=$('socialSummaryCard');if(el&&state.view==='progress'){el.innerHTML=socialSummaryBody();enhanceUI()}const home=$('socialHomeSlot');if(home&&state.view==='home'){home.innerHTML=socialHomeBody();enhanceUI()}updateTemanBadge()}
+function socialSummaryPaint(){const el=$('socialSummaryCard');if(el&&(state.view==='online'||state.view==='profile'||state.view==='progress')){el.innerHTML=socialSummaryBody();enhanceUI()}const home=$('socialHomeSlot');if(home&&state.view==='home'){home.innerHTML=socialHomeBody();enhanceUI()}updateTemanBadge()}
 /* ---------------------------------------------------------------- pintu masuk Online & Teman di Home */
 // Kenapa Home, bukan slot nav keenam: bottom nav lima slot itu hasil penataan yang disengaja
 // (m029 FOCUS), dan di 390px slot keenam memampatkan labelnya. Kartu ini memakai pola launcher
@@ -18920,6 +18968,182 @@ function openAddFriendModal(){
   setTimeout(()=>{try{$('socialAddInput')?.focus()}catch(_){}},60);
 }
 window.openAddFriendModal=openAddFriendModal;
+
+async function openFriendConnectModal(initialTab='my-qr'){
+  try{if(feedbackSoundsOn())uiSfx('click')}catch(_){}
+  const handle=socialProfileCache?.handle||storedSocialHandle()||'murid';
+  try{await refreshFriendRequestCount()}catch(_){}
+  let activeTab=initialTab;
+
+  function renderModalBody(){
+    const qr=socialQrCore();
+    let qrSvg='';
+    try{qrSvg=qr?qr.svg(socialProfileUrl(handle),{px:175,level:'M',label:'QR @'+handle}):'';}catch(_){qrSvg='';}
+    const reqCount=Number(socialRequestCount)||0;
+
+    let bodyHtml='';
+    if(activeTab==='my-qr'){
+      bodyHtml=`
+        <div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:6px 0;">
+          <div class="fz3-qr" data-testid="profile-qr" style="padding:10px;background:#FFF;border:2px solid #E2E8F0;border-radius:18px;box-shadow:0 6px 16px rgba(0,0,0,0.05);display:flex;justify-content:center;">
+            ${qrSvg||'<p class="muted">Kode QR belum tersedia</p>'}
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span class="fz2-myid" style="font-size:15px;font-weight:800;color:#0F172A;font-family:monospace;">@${esc(handle)}</span>
+            <button type="button" class="btn-copy-code" onclick="socialCopyId()" data-testid="copy-id-btn" style="padding:4px 8px;font-size:11px;font-weight:700;border-radius:8px;">
+              <i data-lucide="copy" style="width:12px;height:12px;vertical-align:-1px;margin-right:2px;"></i> Salin ID
+            </button>
+          </div>
+          <p class="muted" style="text-align:center;font-size:12px;margin:0;max-width:280px;line-height:1.5;">
+            Minta teman memindai QR ini atau masukkan ID kamu untuk berteman.
+          </p>
+          <div style="display:flex;gap:8px;width:100%;max-width:280px;margin-top:2px;">
+            <button type="button" onclick="socialDownloadQr()" style="flex:1;padding:8px 10px;font-size:12px;font-weight:700;border-radius:10px;background:#F1F5F9;border:1px solid #CBD5E1;color:#334155;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;">
+              <i data-lucide="download" style="width:13px;height:13px;"></i> Unduh QR
+            </button>
+            <button type="button" class="primary" onclick="socialShareProfile()" style="flex:1;padding:8px 10px;font-size:12px;font-weight:700;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;">
+              <i data-lucide="share-2" style="width:13px;height:13px;"></i> Bagikan
+            </button>
+          </div>
+        </div>
+      `;
+    }else if(activeTab==='invite'){
+      bodyHtml=`
+        <div style="display:flex;flex-direction:column;gap:12px;padding:6px 0;">
+          <p class="muted" style="font-size:12.5px;margin:0;line-height:1.5;">
+            Ketik ID teman untuk mengirimkan undangan pertemanan.
+          </p>
+          <label class="endpoint-label" style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700;color:#CBD5E1;">
+            ID Teman (Handle)
+            <input id="connectFriendInput" type="text" maxlength="21" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="@nama_teman" style="padding:10px 12px;border-radius:12px;border:1.5px solid #CBD5E1;font-size:14px;background:#FFF;color:#0F172A !important;font-family:monospace;" onkeydown="if(event.key==='Enter')socialAddByInput()">
+          </label>
+          <button class="primary" id="btnConnectFriendSubmit" type="button" onclick="socialAddByInput()" style="padding:11px;font-size:13px;font-weight:800;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:6px;">
+            <i data-lucide="user-plus" style="width:15px;height:15px;"></i> ${t('social2.add-btn','Tambahkan')}
+          </button>
+          <div style="display:flex;align-items:center;gap:8px;padding:9px 12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:12px;font-size:11.5px;color:#CBD5E1;">
+            <i data-lucide="qr-code" style="width:15px;height:15px;color:#38BDF8;flex-shrink:0;"></i>
+            <span>${t('social3.qr-desc','Minta teman memindai kode ini dengan kamera ponselnya. Kalian langsung terhubung.')}</span>
+          </div>
+        </div>
+      `;
+    }else if(activeTab==='requests'){
+      bodyHtml=`
+        <div style="display:flex;flex-direction:column;gap:10px;padding:6px 0;">
+          <p class="muted" style="font-size:12.5px;margin:0;line-height:1.5;">
+            ${t('social3.req-section-desc','Terima untuk mulai berteman.')}
+          </p>
+          <div id="connectRequestsList" style="display:flex;flex-direction:column;gap:8px;min-height:80px;">
+            <p class="muted" style="text-align:center;padding:16px 0;">${t('social.loading','Memuat...')}</p>
+          </div>
+        </div>
+      `;
+    }
+
+    return `
+      <div class="modal-mark">TEMAN & KOMUNITAS</div>
+      <h2 style="font-size:1.45rem;margin:6px 0 4px;font-weight:800;">${t('social2.add-title','Tambah teman lewat ID')}</h2>
+      <p class="muted" style="font-size:12px;margin:0 0 12px;line-height:1.4;">${t('social2.add-desc','Minta ID (nama samaran) temanmu, lalu ketik di sini.')}</p>
+
+      <!-- Minimalist Segmented Tabs -->
+      <div class="connect-segmented-nav" style="display:flex;gap:4px;background:rgba(255,255,255,0.08);padding:4px;border-radius:12px;margin-bottom:12px;">
+        <button type="button" onclick="window._switchConnectModalTab('my-qr')" style="flex:1;padding:8px 4px;font-size:11px;font-weight:800;border-radius:9px;border:none;cursor:pointer;background:${activeTab==='my-qr'?'#FFC800 !important':'transparent !important'};color:${activeTab==='my-qr'?'#1B1418 !important':'#94A3B8 !important'};box-shadow:${activeTab==='my-qr'?'0 2px 8px rgba(255,200,0,0.3)':'none'};display:flex;align-items:center;justify-content:center;gap:4px;">
+          <i data-lucide="qr-code" style="width:13px;height:13px;"></i> ID & QR
+        </button>
+        <button type="button" onclick="window._switchConnectModalTab('invite')" style="flex:1;padding:8px 4px;font-size:11px;font-weight:800;border-radius:9px;border:none;cursor:pointer;background:${activeTab==='invite'?'#FFC800 !important':'transparent !important'};color:${activeTab==='invite'?'#1B1418 !important':'#94A3B8 !important'};box-shadow:${activeTab==='invite'?'0 2px 8px rgba(255,200,0,0.3)':'none'};display:flex;align-items:center;justify-content:center;gap:4px;">
+          <i data-lucide="user-plus" style="width:13px;height:13px;"></i> Tambah ID
+        </button>
+        <button type="button" onclick="window._switchConnectModalTab('requests')" style="flex:1;padding:8px 4px;font-size:11px;font-weight:800;border-radius:9px;border:none;cursor:pointer;background:${activeTab==='requests'?'#FFC800 !important':'transparent !important'};color:${activeTab==='requests'?'#1B1418 !important':'#94A3B8 !important'};box-shadow:${activeTab==='requests'?'0 2px 8px rgba(255,200,0,0.3)':'none'};display:flex;align-items:center;justify-content:center;gap:4px;">
+          <i data-lucide="bell" style="width:13px;height:13px;"></i> Terima ${reqCount>0?`<span style="background:#EF4444;color:#FFF;border-radius:99px;padding:0 5px;font-size:10px;font-weight:800;">${reqCount}</span>`:''}
+        </button>
+      </div>
+
+      <div id="connectModalBodyContent">${bodyHtml}</div>
+      <div class="modal-actions" style="margin-top:14px;"><button type="button" onclick="closeModal()">${t('coach.close-aria','Tutup')}</button></div>
+    `;
+  }
+
+  window._switchConnectModalTab=async(t)=>{
+    activeTab=t;
+    const panel=$('modalPanel');
+    if(panel){
+      panel.innerHTML=renderModalBody();
+      enhanceUI();
+      if(t==='requests'){await loadConnectRequests();}
+      else if(t==='invite'){setTimeout(()=>{$('connectFriendInput')?.focus()},60);}
+    }
+  };
+
+  openModal(renderModalBody());
+  if(initialTab==='requests'){await loadConnectRequests();}
+  else if(initialTab==='invite'){setTimeout(()=>{$('connectFriendInput')?.focus()},60);}
+}
+window.openFriendConnectModal=openFriendConnectModal;
+
+async function socialAddByInput(){
+  const core=socialCore();if(!core)return;
+  const raw=String($('connectFriendInput')?.value||'').trim().replace(/^@/,'').toLowerCase();
+  if(!raw)return showToast(t('social2.add-empty','Ketik ID teman terlebih dahulu.'));
+  const btn=$('btnConnectFriendSubmit');if(btn)btn.disabled=true;
+  const res=await core.api.friendAdd(raw);
+  if(res.ok){
+    const h=res.data?.friend?.handle||raw;
+    showToast(FiezelI18n.t(res.data?.status==='friends'?'social2.add-ok':'social2.add-pending',{handle:h}));
+    socialSummaryAt=0;
+    try{socialMicroMoment('friend')}catch(_){}
+    closeModal();
+    if(state.view==='online'||state.view==='profile')render();
+    return;
+  }
+  if(btn)btn.disabled=false;
+  showToast(res.error==='code_invalid'||res.status===400?t('social2.add-invalid','ID teman tidak ditemukan.'):res.message);
+}
+window.socialAddByInput=socialAddByInput;
+
+async function loadConnectRequests(){
+  const core=socialCore(),box=$('connectRequestsList');if(!core||!box)return;
+  const res=await core.api.friendRequests();
+  const list=res.ok&&Array.isArray(res.data?.requests)?res.data.requests:[];
+  notifCachedRequests=list;
+  socialRequestCount=list.length;
+  updateTemanBadge();
+  refreshNotifBadge();
+  if(!list.length){
+    box.innerHTML=`
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 0;text-align:center;gap:6px;">
+        <i data-lucide="check-circle-2" style="width:26px;height:26px;color:#10B981;"></i>
+        <span style="font-size:13px;font-weight:800;color:#F8FAFC !important;">${t('social2.req-empty','Belum ada permintaan teman yang menunggu.')}</span>
+      </div>
+    `;
+  }else{
+    box.innerHTML=list.map(r=>{
+      const h=esc(String(r.handle||''));
+      const name=esc(String(r.displayName||r.handle||''));
+      return `
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:#F8FAFC;border:1.5px solid #E2E8F0;border-radius:14px;gap:8px;">
+          <div style="display:flex;align-items:center;gap:8px;min-width:0;">
+            <span class="social-avatar" style="width:30px;height:30px;border-radius:50%;background:#0284C7;color:#FFF;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;">${h.charAt(0).toUpperCase()}</span>
+            <div style="display:flex;flex-direction:column;min-width:0;">
+              <b style="font-size:12.5px;color:#0F172A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${name}</b>
+              <small style="font-size:11px;color:#64748B;">@${h}</small>
+            </div>
+          </div>
+          <div style="display:flex;gap:6px;flex-shrink:0;">
+            <button type="button" class="text-button" onclick="decideFriendRequestInModal('${h}',false)" style="padding:5px 8px;font-size:11px;font-weight:700;">${t('social2.req-reject','Tolak')}</button>
+            <button type="button" class="primary" onclick="decideFriendRequestInModal('${h}',true)" style="padding:5px 10px;font-size:11px;font-weight:800;border-radius:8px;">${t('social2.req-accept','Terima')}</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+  enhanceUI();
+}
+window.loadConnectRequests=loadConnectRequests;
+
+async function decideFriendRequestInModal(handle,accept){
+  await decideFriendRequest(handle,accept);
+  await loadConnectRequests();
+}
+window.decideFriendRequestInModal=decideFriendRequestInModal;
 async function socialAddByHandle(){
   const core=socialCore();if(!core)return;
   const raw=String($('socialAddInput')?.value||'').trim().replace(/^@/,'').toLowerCase();
@@ -18937,12 +19161,21 @@ window.socialAddByHandle=socialAddByHandle;
    supaya tombolnya cuma muncul ketika memang ada yang menunggu - kalau tidak, ia
    hanya menambah satu tombol mati di panel yang sudah padat. */
 let socialRequestCount=0;
+let notifCachedRequests=[];
+try{Object.defineProperty(window,'notifCachedRequests',{get:()=>notifCachedRequests,set:(v)=>{notifCachedRequests=Array.isArray(v)?v:[];socialRequestCount=notifCachedRequests.length},configurable:true})}catch(_){}
 async function refreshFriendRequestCount(){
   const core=socialCore();if(!core)return 0;
   try{
     const res=await core.api.friendRequests();
-    socialRequestCount=res.ok&&Array.isArray(res.data?.requests)?res.data.requests.length:0;
-  }catch(_){socialRequestCount=0}
+    if(res.ok&&Array.isArray(res.data?.requests)){
+      notifCachedRequests=res.data.requests;
+      socialRequestCount=res.data.requests.length;
+    }else{
+      notifCachedRequests=[];
+      socialRequestCount=0;
+    }
+  }catch(_){notifCachedRequests=[];socialRequestCount=0}
+  try{updateTemanBadge();refreshNotifBadge()}catch(_){}
   return socialRequestCount;
 }
 window.refreshFriendRequestCount=refreshFriendRequestCount;
@@ -18970,7 +19203,9 @@ async function renderFriendRequests(){
   const core=socialCore(),box=$('socialRequestList');if(!core||!box)return;
   const res=await core.api.friendRequests();
   const list=res.ok&&Array.isArray(res.data?.requests)?res.data.requests:[];
+  notifCachedRequests=list;
   socialRequestCount=list.length;
+  try{updateTemanBadge();refreshNotifBadge()}catch(_){}
   box.innerHTML=list.length?list.map(friendRequestRow).join(''):`<p class="muted">${FiezelI18n.t('social2.req-empty')}</p>`;
   try{enhanceUI()}catch(_){}
 }
@@ -18982,8 +19217,11 @@ async function decideFriendRequest(handle,accept){
   if(!res.ok)return showToast(res.error==='code_invalid'||res.status===400?FiezelI18n.t('social2.add-invalid'):res.message);
   showToast(FiezelI18n.t(accept?'social2.req-accepted':'social2.req-rejected',{handle:h}));
   socialSummaryAt=0;
+  notifCachedRequests=notifCachedRequests.filter(x=>String(x&&x.handle||'').toLowerCase()!==h);
+  socialRequestCount=notifCachedRequests.length;
   await renderFriendRequests();
   updateTemanBadge();
+  refreshNotifBadge();
   if(accept){try{socialMicroMoment('friend')}catch(_){}}
   if(state.view==='home')render();
 }
@@ -19113,10 +19351,18 @@ window.socialAjakVoice=socialAjakVoice;
 /* ---------------------------------------------------------------- lencana tab Teman */
 function updateTemanBadge(){
   try{
-    const b=$('fz3TemanBadge');if(!b)return;
     const n=Number(socialRequestCount)||0;
-    b.textContent=n>9?'9+':String(n);
-    b.classList.toggle('hidden',n<=0);
+    const b=$('fz3TemanBadge');
+    if(b){
+      b.textContent=n>9?'9+':String(n);
+      b.classList.toggle('hidden',n<=0);
+    }
+    const tb=$('topProfileFriendBadge');
+    if(tb){
+      tb.textContent=n>9?'9+':String(n);
+      tb.classList.toggle('hidden',n<=0);
+    }
+    refreshNotifBadge();
   }catch(_){}
 }
 window.updateTemanBadge=updateTemanBadge;
@@ -19424,8 +19670,10 @@ async function socialNotifyPoll(force){
     let reqHandles=null;
     try{const rq=await core.api.friendRequests();
       if(rq.ok&&Array.isArray(rq.data?.requests)){
+        notifCachedRequests=rq.data.requests;
         reqHandles=rq.data.requests.map(x=>String(x&&x.handle||''));
         socialRequestCount=reqHandles.length;
+        try{updateTemanBadge();refreshNotifBadge()}catch(_){}
       }}catch(_){}
     const next=notify.snapshotOf(fr.data,undefined,reqHandles);
     const prev=notify.readSnapshot();
@@ -19528,7 +19776,17 @@ window.socialNotifyPoll=socialNotifyPoll;
  * dan undangan teman yang menunggu. Ketuk tugas = sesinya langsung terbuka di Belajar hari ini;
  * hasilnya kembali ke guru lewat jalur class-report yang sudah ada. */
 function inboxCore(){try{return self.FiezelInbox||null}catch(_){return null}}
-function notifUnreadTotal(){let n=0;try{n+=inboxCore()?.unread()||0}catch(_){}n+=socialUnreadCount();if(socialPendingInvite())n+=1;return n}
+function notifUnreadTotal(){
+  let n=0;
+  try{n+=inboxCore()?.unread()||0}catch(_){}
+  try{
+    const box=socialNotifyCore()?.inbox()||[];
+    n+=box.filter(e=>!e.read&&e.kind!=='friend_request').length;
+  }catch(_){n+=socialUnreadCount()}
+  n+=Math.max(0,Number(socialRequestCount)||0);
+  if(socialPendingInvite())n+=1;
+  return n;
+}
 let lastGlobalInputAt=0;
 try{
   if(typeof document!=='undefined'){
@@ -19547,33 +19805,102 @@ function isInputActive(){
   }catch(_){return false}
 }
 function refreshNotifBadge(){try{if(state.view==='classroom'&&$('fzClassHub')&&!$('fzClassHub').querySelector('[data-testid="class-runner"]')){if(!isInputActive())self.FiezelClassHub?.renderStudent?.({quiet:true})}}catch(_){}const b=$('fzNotifBadge');if(!b)return false;const n=notifUnreadTotal();b.textContent=n>9?'9+':String(n);b.classList.toggle('hidden',n<=0);$('fzNotifBtn')?.classList.toggle('has-new',n>0);return true}
-function notifTimeLabel(ts){try{const d=new Date(Number(ts)||Date.now()),diff=Date.now()-d.getTime();if(diff<60000)return 'baru saja';if(diff<3600000)return Math.round(diff/60000)+' mnt lalu';if(diff<86400000)return Math.round(diff/3600000)+' jam lalu';return d.toLocaleDateString('id-ID',{day:'numeric',month:'short'})}catch(_){return ''}}
+function notifTimeLabel(ts){try{const d=new Date(Number(ts)||Date.now()),diff=Date.now()-d.getTime();if(diff<60000)return t('sinkron.baru-saja','baru saja');if(diff<3600000)return t('sinkron.menit-lalu',{n:Math.max(1,Math.round(diff/60000))});if(diff<86400000)return t('sinkron.jam-lalu',{n:Math.max(1,Math.round(diff/3600000))});return d.toLocaleDateString('id-ID',{day:'numeric',month:'short'})}catch(_){return ''}}
 function notifItemMarkup(e){
   const time=`<small>${esc(notifTimeLabel(e.at))}</small>`;
   if(e.kind==='teacher_assignment'){
-    const meta=[(e.mode==='ujian'?'Ujian mini':'Latihan'),e.count?e.count+' soal':'',e.minutes?'±'+e.minutes+' mnt':'',e.deadline?'tenggat '+e.deadline:''].filter(Boolean).join(' · ');
-    return `<li class="notif-item is-teacher${e.read?'':' is-unread'}" data-testid="notif-item-${esc(e.id)}"><span class="notif-icon"><i data-lucide="${e.mode==='ujian'?'shield-check':'clipboard-list'}" aria-hidden="true"></i></span><div class="notif-body"><b>${esc(inboxCore()?.text(e)||e.title||'')}</b><small>${esc(meta)}</small>${time}</div><button type="button" class="notif-cta" onclick="openAssignmentFromNotif('${esc(e.id)}')" data-testid="notif-open-${esc(e.id)}">${FiezelI18n.t('notif.open-assignment')} <i data-lucide="arrow-right" aria-hidden="true"></i></button></li>`;
+    const meta=[(e.mode==='ujian'?t('notif.ujian-mini-label','Ujian mini'):t('nav.practice','Latihan')),e.count?`${e.count} ${t('guru.soal-count','soal')}`:'',e.minutes?t('guru.n-menit',{n:e.minutes}):'',e.deadline?`${t('guru.tenggat-label','Tenggat')}: ${e.deadline}`:''].filter(Boolean).join(' · ');
+    return `<li class="notif-item is-teacher${e.read?'':' is-unread'}" data-testid="notif-item-${esc(e.id)}"><span class="notif-icon"><i data-lucide="${e.mode==='ujian'?'shield-check':'clipboard-list'}" aria-hidden="true"></i></span><div class="notif-body"><b>${esc(inboxCore()?.text(e)||e.title||'')}</b><small>${esc(meta)}</small>${time}</div><button type="button" class="notif-cta" onclick="openAssignmentFromNotif('${esc(e.id)}')" data-testid="notif-open-${esc(e.id)}">${t('notif.open-assignment','Kerjakan sekarang')} <i data-lucide="arrow-right" aria-hidden="true"></i></button></li>`;
   }
-  const icon=e.kind==='cheer_received'?'party-popper':e.kind==='friend_milestone'?'trophy':'user-plus';
-  return `<li class="notif-item is-social${e.read?'':' is-unread'}" data-testid="notif-item-social"><span class="notif-icon"><i data-lucide="${icon}" aria-hidden="true"></i></span><div class="notif-body"><b>${esc(socialNotifyText(e))}</b>${time}</div><button type="button" class="notif-cta is-ghost" onclick="closeModal();socialHomeOpenOnline()">${FiezelI18n.t('social.home-open')}</button></li>`;
+  const icon=e.kind==='cheer_received'?'party-popper':e.kind==='friend_milestone'?'trophy':e.kind==='friend_accepted'?'user-check':'user-plus';
+  return `<li class="notif-item is-social${e.read?'':' is-unread'}" data-testid="notif-item-social"><span class="notif-icon"><i data-lucide="${icon}" aria-hidden="true"></i></span><div class="notif-body"><b>${esc(socialNotifyText(e))}</b>${time}</div><button type="button" class="notif-cta is-ghost" onclick="closeModal();go('profile')">${t('social.home-open','Buka')}</button></li>`;
 }
-function openNotifications(){
+function renderNotifListMarkup(teacher,requests,social,invite){
+  let list='';
+  if(invite)list+=`<li class="notif-item is-invite is-unread" data-testid="notif-item-invite"><span class="notif-icon"><i data-lucide="mail-open" aria-hidden="true"></i></span><div class="notif-body"><b>${t('notif.invite-pending','Undangan teman menunggu — ketuk untuk menerima.')}</b></div><button type="button" class="notif-cta" onclick="closeModal();socialHomeOpenInvite()">${t('social.home-open','Buka')}</button></li>`;
+  if(requests.length){
+    list+=`<li class="notif-section">${t('social3.req-section-title','Permintaan Pertemanan Masuk')}</li>`+requests.map(r=>{
+      const h=esc(String(r.handle||''));
+      const name=esc(String(r.displayName||r.handle||''));
+      const time=r.at?`<small>${esc(notifTimeLabel(r.at))}</small>`:'';
+      return `<li class="notif-item is-friend-req is-unread" data-testid="notif-item-req-${h}"><span class="notif-icon" style="background:#0284C7;color:#fff;font-weight:800;font-size:14px;">${h.charAt(0).toUpperCase()}</span><div class="notif-body"><b>${name}</b><small>@${h} · ${t('social2.req-title','Permintaan teman')}</small>${time}</div><div style="grid-column:2;display:flex;gap:8px;margin-top:2px;"><button type="button" class="notif-cta is-ghost" onclick="notifRejectFriend('${h}')" style="padding:6px 12px;font-size:.82rem;" data-testid="notif-reject-${h}">${t('social2.req-reject','Tolak')}</button><button type="button" class="notif-cta" onclick="notifAcceptFriend('${h}')" style="padding:6px 14px;font-size:.82rem;background:#0284C7;color:#fff;" data-testid="notif-accept-${h}">${t('social2.req-accept','Terima')}</button></div></li>`;
+    }).join('');
+  }
+  if(teacher.length)list+=`<li class="notif-section">${t('notif.section-teacher','Dari guru')}</li>`+teacher.map(notifItemMarkup).join('');
+  if(social.length){
+    const activeHandles=new Set(requests.map(r=>String(r.handle||'').toLowerCase()));
+    const filteredSocial=social.filter(e=>!(e.kind==='friend_request'&&activeHandles.has(String(e.handle||'').toLowerCase())));
+    if(filteredSocial.length){
+      list+=`<li class="notif-section">${t('notif.section-social','Teman')}</li>`+filteredSocial.slice(0,20).map(notifItemMarkup).join('');
+    }
+  }
+  return list;
+}
+function renderNotifSheet(){
   const inbox=inboxCore(),notify=socialNotifyCore();
   const teacher=(inbox?inbox.items():[]).filter(e=>e.kind==='teacher_assignment');
+  const requests=Array.isArray(notifCachedRequests)?notifCachedRequests:[];
   const social=notify?notify.inbox():[];
   const invite=socialPendingInvite();
-  const total=teacher.length+social.length+(invite?1:0);
-  let list='';
-  if(invite)list+=`<li class="notif-item is-invite is-unread" data-testid="notif-item-invite"><span class="notif-icon"><i data-lucide="mail-open" aria-hidden="true"></i></span><div class="notif-body"><b>${FiezelI18n.t('notif.invite-pending')}</b></div><button type="button" class="notif-cta" onclick="closeModal();socialHomeOpenInvite()">${FiezelI18n.t('social.home-open')}</button></li>`;
-  if(teacher.length)list+=`<li class="notif-section">${FiezelI18n.t('notif.section-teacher')}</li>`+teacher.map(notifItemMarkup).join('');
-  if(social.length)list+=`<li class="notif-section">${FiezelI18n.t('notif.section-social')}</li>`+social.slice(0,20).map(notifItemMarkup).join('');
-  const html=`<div class="modal-mark">FIEZEL</div><div class="notif-sheet" data-testid="notif-sheet"><div class="notif-head"><h2>${FiezelI18n.t('notif.title')}</h2>${total?`<button type="button" class="text-button notif-readall" onclick="notifMarkAllRead()" data-testid="notif-mark-all">${FiezelI18n.t('notif.mark-read')}</button>`:''}</div>`+
-    (total?`<ul class="notif-list">${list}</ul>`:`<p class="notif-empty" data-testid="notif-empty"><i data-lucide="bell-off" aria-hidden="true"></i>${FiezelI18n.t('notif.empty')}</p>`)+
-    `<div class="modal-actions"><button type="button" class="text-button" onclick="closeModal()" data-testid="notif-close">${FiezelI18n.t('modal.tutup')}</button></div></div>`;
-  openModal(html);
+  const total=teacher.length+requests.length+social.length+(invite?1:0);
+  const list=renderNotifListMarkup(teacher,requests,social,invite);
+  const html=`<div class="modal-mark">FIEZEL</div><div class="notif-sheet" data-testid="notif-sheet"><div class="notif-head"><h2>${t('notif.title','Notifikasi')}</h2>${total?`<button type="button" class="text-button notif-readall" onclick="notifMarkAllRead()" data-testid="notif-mark-all">${t('notif.mark-read','Tandai semua dibaca')}</button>`:''}</div>`+
+    (total?`<ul class="notif-list">${list}</ul>`:`<p class="notif-empty" data-testid="notif-empty"><i data-lucide="bell-off" aria-hidden="true"></i>${t('notif.empty','Belum ada kabar. Tugas dari guru, teman baru, dan sorakan akan muncul di sini.')}</p>`)+
+    `<div class="modal-actions"><button type="button" class="text-button" onclick="closeModal()" data-testid="notif-close">${t('modal.tutup','Tutup')}</button></div></div>`;
+  const sheet=$('modalPanel')?.querySelector('.notif-sheet');
+  if(sheet){
+    $('modalPanel').innerHTML=html;
+    enhanceUI();
+  }else{
+    openModal(html);
+  }
+}
+async function notifAcceptFriend(handle){
+  const h=String(handle||'').trim().replace(/^@/,'').toLowerCase();
+  if(!h)return;
+  await decideFriendRequest(h,true);
+  notifCachedRequests=notifCachedRequests.filter(x=>String(x&&x.handle||'').toLowerCase()!==h);
+  socialRequestCount=notifCachedRequests.length;
+  updateTemanBadge();
+  refreshNotifBadge();
+  if(modalOpen&&$('modalPanel')?.querySelector('.notif-sheet')){
+    renderNotifSheet();
+  }
+}
+async function notifRejectFriend(handle){
+  const h=String(handle||'').trim().replace(/^@/,'').toLowerCase();
+  if(!h)return;
+  await decideFriendRequest(h,false);
+  notifCachedRequests=notifCachedRequests.filter(x=>String(x&&x.handle||'').toLowerCase()!==h);
+  socialRequestCount=notifCachedRequests.length;
+  updateTemanBadge();
+  refreshNotifBadge();
+  if(modalOpen&&$('modalPanel')?.querySelector('.notif-sheet')){
+    renderNotifSheet();
+  }
+}
+function openNotifications(){
+  const notify=socialNotifyCore();
+  renderNotifSheet();
   try{notify?.markAllRead()}catch(_){}
   refreshNotifBadge();
-  try{inbox?.poll(true).then(r=>{if(r&&r.added&&r.added.length&&modalOpen&&$('modalPanel')?.querySelector('.notif-sheet'))openNotifications()})}catch(_){}
+  const core=socialCore();
+  Promise.allSettled([
+    inboxPoll(true),
+    socialNotifyPoll(true),
+    core?core.api.friendRequests().then(res=>{
+      if(res&&res.ok&&Array.isArray(res.data?.requests)){
+        notifCachedRequests=res.data.requests;
+        socialRequestCount=notifCachedRequests.length;
+        updateTemanBadge();
+        refreshNotifBadge();
+      }
+    }):Promise.resolve()
+  ]).then(()=>{
+    if(modalOpen&&$('modalPanel')?.querySelector('.notif-sheet')){
+      renderNotifSheet();
+    }
+  }).catch(_=>{});
   return true;
 }
 function openAssignmentFromNotif(id){
@@ -19652,15 +19979,11 @@ function startNotifPolling(){
     const plan=notifSyncPlan();
     if(plan==='reset'){notifSyncing=false;notifSyncingSince=0}
     if(plan==='sync'||plan==='reset'){notifSyncRound();socialNotifyPoll(false)}
-    /* 'wait' (belum ada kode kelas / offline) dan 'skip' TIDAK mematikan timer: begitu murid
-       memasukkan kode kelas atau jaringannya kembali, ronde berikutnya jalan sendiri. */
+    else if(typeof document==='undefined'||document.visibilityState==='visible'){
+      try{if(navigator&&navigator.onLine!==false)socialNotifyPoll(false)}catch(_){}
+    }
   },NOTIF_POLL_MS);
   notifPollTimer?.unref?.();
-  /* Timer di atas SENGAJA diam saat aplikasi tidak terlihat - menanyai server untuk layar
-     yang tidak dipandang hanya membakar baterai. Tapi tanpa baris di bawah ini, murid yang
-     kembali ke aplikasi harus menunggu sampai tick 60 detik berikutnya, dan itulah sebab
-     kabar terasa "baru muncul setelah keluar-masuk PWA, itu pun lama". Kembali terlihat =
-     satu tanya SEGERA, dengan force supaya jeda 90 detik socialNotifyPoll tidak menahannya. */
   try{
     document.addEventListener('visibilitychange',()=>{
       try{if(document.visibilityState!=='visible')return}catch(_){return}
@@ -19671,7 +19994,7 @@ function startNotifPolling(){
   inboxPoll(true);
   return true;
 }
-window.openNotifications=openNotifications;window.openAssignmentFromNotif=openAssignmentFromNotif;window.notifMarkAllRead=notifMarkAllRead;window.refreshNotifBadge=refreshNotifBadge;window.inboxPoll=inboxPoll;
+window.openNotifications=openNotifications;window.renderNotifSheet=renderNotifSheet;window.notifAcceptFriend=notifAcceptFriend;window.notifRejectFriend=notifRejectFriend;window.openAssignmentFromNotif=openAssignmentFromNotif;window.notifMarkAllRead=notifMarkAllRead;window.refreshNotifBadge=refreshNotifBadge;window.inboxPoll=inboxPoll;
 /* ---------------------------------------------------------------- LAPIS AKUN (§21/§22/§27) */
 /**
  * Lembar akun: masuk, daftar, dan aktivasi guru. SATU lembar tiga mode, bukan tiga layar —
