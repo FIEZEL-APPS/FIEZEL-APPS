@@ -18329,7 +18329,7 @@ function tactileProfileCockpitMarkup(opts={}){
         <div class="header-text-group">
           <div class="section-card-title" style="display:flex;align-items:center;gap:6px;font-size:14px;font-weight:800;color:#0F172A;">
             <i data-lucide="users" style="width:17px;height:17px;color:#0284C7;"></i>
-            <span>${t('social.online-friends-title','Online & Teman')}</span>
+            <span>${t('social2.panel-title','Online & Teman')}</span>
           </div>
         </div>
         <div class="profile-online-badge-pill" style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;background:#ECFDF5;color:#059669;border:1px solid #A7F3D0;">
@@ -19018,11 +19018,11 @@ async function openFriendConnectModal(initialTab='my-qr'){
             <input id="connectFriendInput" type="text" maxlength="21" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="@nama_teman" style="padding:10px 12px;border-radius:12px;border:1.5px solid #CBD5E1;font-size:14px;background:#FFF;color:#0F172A !important;font-family:monospace;" onkeydown="if(event.key==='Enter')socialAddByInput()">
           </label>
           <button class="primary" id="btnConnectFriendSubmit" type="button" onclick="socialAddByInput()" style="padding:11px;font-size:13px;font-weight:800;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:6px;">
-            <i data-lucide="user-plus" style="width:15px;height:15px;"></i> ${t('social2.send-invite-btn','Kirim Undangan Pertemanan')}
+            <i data-lucide="user-plus" style="width:15px;height:15px;"></i> ${t('social2.add-btn','Tambahkan')}
           </button>
           <div style="display:flex;align-items:center;gap:8px;padding:9px 12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:12px;font-size:11.5px;color:#CBD5E1;">
             <i data-lucide="camera" style="width:15px;height:15px;color:#38BDF8;flex-shrink:0;"></i>
-            <span>${t('social2.qr-scan-hint','Teman juga bisa langsung terhubung dengan memindai kode QR kamu di tab')} <b>ID & QR Saya</b>.</span>
+            <span>${t('social3.qr-desc','Minta teman memindai kode ini dengan kamera ponselnya. Kalian langsung terhubung.')}</span>
           </div>
         </div>
       `;
@@ -19030,7 +19030,7 @@ async function openFriendConnectModal(initialTab='my-qr'){
       bodyHtml=`
         <div style="display:flex;flex-direction:column;gap:10px;padding:6px 0;">
           <p class="muted" style="font-size:12.5px;margin:0;line-height:1.5;">
-            ${t('social2.requests-lead','Daftar permintaan pertemanan yang masuk ke akunmu:')}
+            ${t('social3.req-section-desc','Terima untuk mulai berteman.')}
           </p>
           <div id="connectRequestsList" style="display:flex;flex-direction:column;gap:8px;min-height:80px;">
             <p class="muted" style="text-align:center;padding:16px 0;">${t('social.loading','Memuat...')}</p>
@@ -19041,8 +19041,8 @@ async function openFriendConnectModal(initialTab='my-qr'){
 
     return `
       <div class="modal-mark">TEMAN & KOMUNITAS</div>
-      <h2 style="font-size:1.45rem;margin:6px 0 4px;font-weight:800;">${t('social.connect-title','Hubungkan Teman')}</h2>
-      <p class="muted" style="font-size:12px;margin:0 0 12px;line-height:1.4;">${t('social.connect-desc','Undang dan terima teman lewat ID atau kode QR.')}</p>
+      <h2 style="font-size:1.45rem;margin:6px 0 4px;font-weight:800;">${t('social2.add-title','Tambah teman lewat ID')}</h2>
+      <p class="muted" style="font-size:12px;margin:0 0 12px;line-height:1.4;">${t('social2.add-desc','Minta ID (nama samaran) temanmu, lalu ketik di sini.')}</p>
       
       <!-- Minimalist Segmented Tabs -->
       <div class="connect-segmented-nav" style="display:flex;gap:4px;background:rgba(255,255,255,0.08);padding:4px;border-radius:12px;margin-bottom:12px;">
@@ -19111,8 +19111,7 @@ async function loadConnectRequests(){
     box.innerHTML=`
       <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 0;text-align:center;gap:6px;">
         <i data-lucide="check-circle-2" style="width:26px;height:26px;color:#10B981;"></i>
-        <span style="font-size:13px;font-weight:800;color:#F8FAFC !important;">${t('social2.requests-empty','Tidak ada permintaan baru')}</span>
-        <span class="muted" style="font-size:11.5px;">${t('social2.requests-empty-desc','Undangan yang kamu terima akan muncul di sini.')}</span>
+        <span style="font-size:13px;font-weight:800;color:#F8FAFC !important;">${t('social2.req-empty','Belum ada permintaan teman yang menunggu.')}</span>
       </div>
     `;
   }else{
@@ -19806,11 +19805,11 @@ function isInputActive(){
   }catch(_){return false}
 }
 function refreshNotifBadge(){try{if(state.view==='classroom'&&$('fzClassHub')&&!$('fzClassHub').querySelector('[data-testid="class-runner"]')){if(!isInputActive())self.FiezelClassHub?.renderStudent?.({quiet:true})}}catch(_){}const b=$('fzNotifBadge');if(!b)return false;const n=notifUnreadTotal();b.textContent=n>9?'9+':String(n);b.classList.toggle('hidden',n<=0);$('fzNotifBtn')?.classList.toggle('has-new',n>0);return true}
-function notifTimeLabel(ts){try{const d=new Date(Number(ts)||Date.now()),diff=Date.now()-d.getTime();if(diff<60000)return t('notif.just-now','baru saja');if(diff<3600000)return Math.round(diff/60000)+t('notif.min-ago',' mnt lalu');if(diff<86400000)return Math.round(diff/3600000)+t('notif.hours-ago',' jam lalu');return d.toLocaleDateString('id-ID',{day:'numeric',month:'short'})}catch(_){return ''}}
+function notifTimeLabel(ts){try{const d=new Date(Number(ts)||Date.now()),diff=Date.now()-d.getTime();if(diff<60000)return t('sinkron.baru-saja','baru saja');if(diff<3600000)return t('sinkron.menit-lalu',{n:Math.max(1,Math.round(diff/60000))});if(diff<86400000)return t('sinkron.jam-lalu',{n:Math.max(1,Math.round(diff/3600000))});return d.toLocaleDateString('id-ID',{day:'numeric',month:'short'})}catch(_){return ''}}
 function notifItemMarkup(e){
   const time=`<small>${esc(notifTimeLabel(e.at))}</small>`;
   if(e.kind==='teacher_assignment'){
-    const meta=[(e.mode==='ujian'?t('notif.ujian-mini-label','Ujian mini'):t('notif.latihan-label','Latihan')),e.count?e.count+t('notif.count-soal',' soal'):'',e.minutes?'±'+e.minutes+t('notif.minutes-label',' mnt'):'',e.deadline?t('notif.tenggat-label','tenggat ')+e.deadline:''].filter(Boolean).join(' · ');
+    const meta=[(e.mode==='ujian'?t('notif.ujian-mini-label','Ujian mini'):t('nav.practice','Latihan')),e.count?`${e.count} ${t('guru.soal-count','soal')}`:'',e.minutes?t('guru.n-menit',{n:e.minutes}):'',e.deadline?`${t('guru.tenggat-label','Tenggat')}: ${e.deadline}`:''].filter(Boolean).join(' · ');
     return `<li class="notif-item is-teacher${e.read?'':' is-unread'}" data-testid="notif-item-${esc(e.id)}"><span class="notif-icon"><i data-lucide="${e.mode==='ujian'?'shield-check':'clipboard-list'}" aria-hidden="true"></i></span><div class="notif-body"><b>${esc(inboxCore()?.text(e)||e.title||'')}</b><small>${esc(meta)}</small>${time}</div><button type="button" class="notif-cta" onclick="openAssignmentFromNotif('${esc(e.id)}')" data-testid="notif-open-${esc(e.id)}">${t('notif.open-assignment','Kerjakan sekarang')} <i data-lucide="arrow-right" aria-hidden="true"></i></button></li>`;
   }
   const icon=e.kind==='cheer_received'?'party-popper':e.kind==='friend_milestone'?'trophy':e.kind==='friend_accepted'?'user-check':'user-plus';
@@ -19820,11 +19819,11 @@ function renderNotifListMarkup(teacher,requests,social,invite){
   let list='';
   if(invite)list+=`<li class="notif-item is-invite is-unread" data-testid="notif-item-invite"><span class="notif-icon"><i data-lucide="mail-open" aria-hidden="true"></i></span><div class="notif-body"><b>${t('notif.invite-pending','Undangan teman menunggu — ketuk untuk menerima.')}</b></div><button type="button" class="notif-cta" onclick="closeModal();socialHomeOpenInvite()">${t('social.home-open','Buka')}</button></li>`;
   if(requests.length){
-    list+=`<li class="notif-section">${t('notif.section-requests','Permintaan Pertemanan')}</li>`+requests.map(r=>{
+    list+=`<li class="notif-section">${t('social3.req-section-title','Permintaan Pertemanan Masuk')}</li>`+requests.map(r=>{
       const h=esc(String(r.handle||''));
       const name=esc(String(r.displayName||r.handle||''));
       const time=r.at?`<small>${esc(notifTimeLabel(r.at))}</small>`:'';
-      return `<li class="notif-item is-friend-req is-unread" data-testid="notif-item-req-${h}"><span class="notif-icon" style="background:#0284C7;color:#fff;font-weight:800;font-size:14px;">${h.charAt(0).toUpperCase()}</span><div class="notif-body"><b>${name}</b><small>@${h} · ${t('social2.requests-item-desc','Mengirim permintaan pertemanan')}</small>${time}</div><div style="grid-column:2;display:flex;gap:8px;margin-top:2px;"><button type="button" class="notif-cta is-ghost" onclick="notifRejectFriend('${h}')" style="padding:6px 12px;font-size:.82rem;" data-testid="notif-reject-${h}">${t('social2.req-reject','Tolak')}</button><button type="button" class="notif-cta" onclick="notifAcceptFriend('${h}')" style="padding:6px 14px;font-size:.82rem;background:#0284C7;color:#fff;" data-testid="notif-accept-${h}">${t('social2.req-accept','Terima')}</button></div></li>`;
+      return `<li class="notif-item is-friend-req is-unread" data-testid="notif-item-req-${h}"><span class="notif-icon" style="background:#0284C7;color:#fff;font-weight:800;font-size:14px;">${h.charAt(0).toUpperCase()}</span><div class="notif-body"><b>${name}</b><small>@${h} · ${t('social2.req-title','Permintaan teman')}</small>${time}</div><div style="grid-column:2;display:flex;gap:8px;margin-top:2px;"><button type="button" class="notif-cta is-ghost" onclick="notifRejectFriend('${h}')" style="padding:6px 12px;font-size:.82rem;" data-testid="notif-reject-${h}">${t('social2.req-reject','Tolak')}</button><button type="button" class="notif-cta" onclick="notifAcceptFriend('${h}')" style="padding:6px 14px;font-size:.82rem;background:#0284C7;color:#fff;" data-testid="notif-accept-${h}">${t('social2.req-accept','Terima')}</button></div></li>`;
     }).join('');
   }
   if(teacher.length)list+=`<li class="notif-section">${t('notif.section-teacher','Dari guru')}</li>`+teacher.map(notifItemMarkup).join('');
