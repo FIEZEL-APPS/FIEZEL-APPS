@@ -195,12 +195,9 @@ async function run() {
   assert(!isDark, 'Bottomnav background is NOT dark theme (not rgba(22, 22, 26, ...))');
   assert(isButterGradient, 'Bottomnav has butter yellow frosted gradient background');
 
-  // 2. Border radius (must be 9999px or fully rounded capsule >= 30px)
-  const isCapsuleRadius = navStyles.nav.borderRadius.includes('9999px') || parseFloat(navStyles.nav.borderRadius) >= 30;
-  assert(isCapsuleRadius, `Bottomnav border radius is capsule (computed: ${navStyles.nav.borderRadius})`);
-
-  // 3. Floating position (bottom margin >= 14px above screen bottom)
-  assert(navStyles.nav.bottomGap >= 13.5, `Bottomnav is floating above screen bottom (gap: ${navStyles.nav.bottomGap}px >= 14px)`);
+  // 2. Stay-fixed dock docked firmly at bottom 0 and full width (NO floating gap, NO see-through)
+  assert(navStyles.nav.bottomGap <= 1, `Bottomnav is stay-fixed docked at bottom edge (gap: ${navStyles.nav.bottomGap}px <= 1px)`);
+  assert(navStyles.nav.width >= 380, `Bottomnav is full-width docked bar (width: ${navStyles.nav.width}px >= 380px)`);
 
   // 4. Active pill exists and has rounded radius
   assert(!!navStyles.pill, '#navActivePill element exists inside bottomnav');
