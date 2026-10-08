@@ -10775,7 +10775,7 @@ function todayHomeMarkup(){
         </div>
 
         <!-- Card 4: Listening -->
-        <div class="grid-tile" onclick="if(window.openListeningPanel)openListeningPanel();else go('skills');">
+        <div class="grid-tile" onclick="if(activeTargetLang()==='ja'&&window.openListeningPanel)openListeningPanel();else go('listening');">
           <div class="tile-top">
             <div class="tile-icon-3d listening">
               <svg viewBox="0 0 24 24" width="27" height="27" aria-hidden="true" focusable="false" style="display:block;">
