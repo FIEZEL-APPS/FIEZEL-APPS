@@ -5011,6 +5011,22 @@ body.fz-lux .card.card-flashcard {
     padding: 20px 16px !important;
   }
 }
+@media(max-height: 560px) {
+  .card-flashcard,
+  .card.card-flashcard,
+  html body:not(.fz-teacher-mode) .card.card-flashcard,
+  body.fz-lux .card.card-flashcard {
+    min-height: calc(100vh - 90px) !important;
+    gap: 8px !important;
+  }
+  .flashcard {
+    height: clamp(260px, 50vh, 340px) !important;
+    min-height: 240px !important;
+  }
+  .flash-face, .flashcard .flash-face, .card-flashcard .flash-face {
+    padding: 14px 16px !important;
+  }
+}
 
 .flash-front {
   transform: rotateY(0deg);
