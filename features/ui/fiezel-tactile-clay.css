@@ -883,14 +883,19 @@ header.topbar,
 
 .topbar-brand-fiezel,
 #topBrandWrap {
-  display: flex !important;
-  align-items: center !important;
-  gap: 8px !important;
-  cursor: pointer !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
   padding: 0 !important;
+}
+
+#topBrandWrap[style*="display: none"],
+#topBrandWrap[style*="display:none"] {
+  display: none !important;
 }
 
 .topbar-brand-fiezel .fiezel-wordmark-text,
@@ -962,10 +967,10 @@ header.topbar,
   border: 2px solid #E2E8F0 !important;
   border-radius: 9999px !important;
   padding: 6px 14px !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 7px !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
   font-family: var(--font-sans), 'Plus Jakarta Sans', sans-serif !important;
   font-size: 13px !important;
   font-weight: 800 !important;
@@ -973,6 +978,17 @@ header.topbar,
   box-shadow: 0 3px 0 #CBD5E1 !important;
   cursor: pointer !important;
   white-space: nowrap !important;
+}
+
+#fzCourseSwitchBtn[style*="display: none"],
+#fzCourseSwitchBtn[style*="display:none"] {
+  display: none !important;
+}
+
+#topGamifyCluster[style*="display: none"],
+#topGamifyCluster[style*="display:none"] {
+  display: none !important;
+}
   height: 36px !important;
   min-height: 36px !important;
   width: auto !important;

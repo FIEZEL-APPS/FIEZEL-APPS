@@ -620,30 +620,30 @@ body.fsl-session-active .fsl-feedback .fsl-actions {
 /* 8. SINGLE-SCREEN VIEWPORT FIT & CLEAN LAYOUT */
 body.fz-stage-sl.fsl-session-active .app,
 body.fsl-session-active .app {
-  min-height: 100dvh;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  padding-top: calc(56px + max(10px, env(safe-area-inset-top, 10px))) !important;
-  padding-left: 14px !important;
-  padding-right: 14px !important;
-  padding-bottom: calc(20px + env(safe-area-inset-bottom, 10px)) !important;
-  box-sizing: border-box;
+  min-height: 100dvh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  padding-top: max(8px, env(safe-area-inset-top, 8px)) !important;
+  padding-left: 12px !important;
+  padding-right: 12px !important;
+  padding-bottom: max(12px, env(safe-area-inset-bottom, 12px)) !important;
+  box-sizing: border-box !important;
 }
 body.fz-stage-sl.fsl-session-active #app,
 body.fz-stage-sl.fsl-session-active .skills-page,
 body.fz-stage-sl.fsl-session-active #speakingListeningRoot,
 body.fz-stage-sl.fsl-session-active .fsl-shell {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 0 !important;
 }
 body.fz-stage-sl.fsl-session-active .fsl-card-listening,
 body.fsl-session-active .fsl-card-listening {
   flex: 0 1 auto !important;
   min-height: 0 !important;
-  padding: 14px 16px !important;
+  padding: 12px 14px !important;
   overflow-y: visible !important;
 }
 body.fz-stage-sl.fsl-session-active .fsl-card-listening:has(.fsl-feedback),
@@ -651,12 +651,15 @@ body.fsl-session-active .fsl-card-listening:has(.fsl-feedback) {
   padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px)) !important;
 }
 
-/* Hide global navbars during session */
+/* Hide global navbars and background hub headers during session */
 body.fz-stage-sl.fsl-session-active .topbar,
 body.fsl-session-active .topbar,
 body.fz-stage-sl.fsl-session-active .bottomnav,
 body.fsl-session-active .bottomnav,
+body.fz-stage-sl.fsl-session-active .section-head,
+body.fsl-session-active .section-head,
 body:has(.fsl-card-listening) .bottomnav,
+body:has(.fsl-card-listening) .section-head,
 body:has(.fsl-feedback) .bottomnav {
   display: none !important;
   visibility: hidden !important;
