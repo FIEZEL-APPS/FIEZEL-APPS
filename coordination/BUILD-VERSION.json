@@ -1,7 +1,7 @@
 {
-  "version": "m025-516",
-  "claimedBy": "branch fix/english-listening-ui-and-routing-m025-516",
-  "claimedAt": "2026-10-08T01:48:28.545Z",
-  "reason": "fix(listening): repair english listening routing, 3D mochi stage, and single-screen travertine layout",
+  "version": "m025-517",
+  "claimedBy": "branch main",
+  "claimedAt": "2026-10-08T05:06:11.327Z",
+  "reason": "fix(ui-ux): contextual topbar per panel, remove capability cards, fit flashcard deck, and zero-void layout",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
