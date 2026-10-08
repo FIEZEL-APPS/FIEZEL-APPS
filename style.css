@@ -7877,14 +7877,19 @@ header.topbar {
 
 .topbar-brand-fiezel,
 #topBrandWrap {
-  display: flex !important;
-  align-items: center !important;
-  gap: 8px !important;
-  cursor: pointer !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
   padding: 0 !important;
+}
+
+#topBrandWrap[style*="display: none"],
+#topBrandWrap[style*="display:none"] {
+  display: none !important;
 }
 
 .topbar-brand-fiezel .fiezel-wordmark-text,
@@ -7957,10 +7962,10 @@ header.topbar {
   border: 2px solid #E2E8F0 !important;
   border-radius: 9999px !important;
   padding: 6px 14px !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 7px !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
   font-family: 'Plus Jakarta Sans', sans-serif !important;
   font-size: 13px !important;
   font-weight: 800 !important;
@@ -7968,6 +7973,17 @@ header.topbar {
   box-shadow: 0 3px 0 #CBD5E1 !important;
   cursor: pointer !important;
   white-space: nowrap !important;
+}
+
+#fzCourseSwitchBtn[style*="display: none"],
+#fzCourseSwitchBtn[style*="display:none"] {
+  display: none !important;
+}
+
+#topGamifyCluster[style*="display: none"],
+#topGamifyCluster[style*="display:none"] {
+  display: none !important;
+}
   height: 36px !important;
   min-height: 36px !important;
   width: auto !important;
@@ -10380,4 +10396,232 @@ body.fz-stage-quiz .quiz-shell > .card,
   color: #1E293B !important;
   box-shadow: 0 4px 10px rgba(46, 39, 36, 0.04) !important;
   font-weight: 600 !important;
+}
+
+/* ==========================================================================
+   DYNAMIC CONTEXTUAL TOPBAR PER PANEL & ZERO-DUPLICATE HEADERS
+   ========================================================================== */
+.topbar-context-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.topbar-context-back-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  color: var(--text, #111827);
+  flex-shrink: 0;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.topbar-context-back-btn:active {
+  transform: scale(0.92);
+}
+.topbar-context-title {
+  font-size: 20px !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.025em !important;
+  color: var(--text, #111827) !important;
+  margin: 0 !important;
+  line-height: 1.1 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+.topbar-context-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Eliminate duplicate page titles on panels where topbar handles it */
+body.fz-view-latihan .section-head,
+body.fz-view-grammar .section-head,
+body.fz-view-vocab .section-head,
+body.fz-stage-sl .section-head {
+  display: none !important;
+}
+
+/* ==========================================================================
+   KOSAKATA HUB OVERHAUL (IMG_2620 Clean Cohesive Layout)
+   ========================================================================== */
+.vocab-hub-page {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 8px 0 24px;
+  box-sizing: border-box;
+}
+.vocab-hero-card {
+  background: #FFFFFF !important;
+  border-radius: 24px !important;
+  padding: 20px 20px 18px !important;
+  border: 1.5px solid #EAE3D9 !important;
+  box-shadow: 0 8px 24px rgba(46, 39, 36, 0.06) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 14px !important;
+}
+.vocab-hero-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.vocab-level-chip {
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  color: #B45309 !important;
+  background: #FEF3C7 !important;
+  border: 1px solid #FDE68A !important;
+  padding: 4px 10px !important;
+  border-radius: 999px !important;
+  letter-spacing: 0.03em !important;
+  text-transform: uppercase !important;
+}
+.vocab-count-badge {
+  font-size: 12.5px !important;
+  font-weight: 700 !important;
+  color: #64748B !important;
+}
+.vocab-progress-track {
+  width: 100%;
+  height: 9px;
+  background: #F1E9DE;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.vocab-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #F59E0B, #10B981);
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+.vocab-hero-desc {
+  font-size: 14px !important;
+  line-height: 1.5 !important;
+  color: #475569 !important;
+  margin: 0 !important;
+}
+.vocab-hero-desc b {
+  color: #0F172A !important;
+  font-weight: 800 !important;
+}
+.vocab-main-flashcard-btn {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  padding: 15px 18px !important;
+  border-radius: 18px !important;
+  background: linear-gradient(135deg, #FFB800, #F59E0B) !important;
+  color: #1A1A1A !important;
+  border: none !important;
+  cursor: pointer !important;
+  box-shadow: 0 6px 18px rgba(245, 158, 11, 0.35) !important;
+  transition: transform 0.15s ease, filter 0.15s ease !important;
+  box-sizing: border-box !important;
+}
+.vocab-main-flashcard-btn:active {
+  transform: scale(0.98);
+}
+.vmf-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+}
+.vmf-icon {
+  font-size: 24px;
+  line-height: 1;
+}
+.vmf-text strong {
+  display: block;
+  font-size: 15.5px !important;
+  font-weight: 800 !important;
+  color: #1A1A1A !important;
+  line-height: 1.2 !important;
+}
+.vmf-text small {
+  display: block;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: rgba(26, 26, 26, 0.75) !important;
+  margin-top: 2px !important;
+}
+.vmf-arrow {
+  font-size: 20px;
+  font-weight: 800;
+  color: #1A1A1A;
+}
+.vocab-quick-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  width: 100%;
+}
+.vocab-quick-btn {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding: 14px 14px !important;
+  border-radius: 18px !important;
+  background: #FFFFFF !important;
+  border: 1.5px solid #EAE3D9 !important;
+  box-shadow: 0 4px 12px rgba(46, 39, 36, 0.04) !important;
+  cursor: pointer !important;
+  text-align: left !important;
+  transition: transform 0.15s ease, background 0.15s ease !important;
+  box-sizing: border-box !important;
+}
+.vocab-quick-btn:active {
+  transform: scale(0.97);
+}
+.vq-icon {
+  font-size: 20px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.vq-text strong {
+  display: block;
+  font-size: 13.5px !important;
+  font-weight: 800 !important;
+  color: #0F172A !important;
+  line-height: 1.25 !important;
+}
+.vq-text small {
+  display: block;
+  font-size: 11px !important;
+  color: #64748B !important;
+  margin-top: 3px !important;
+}
+
+/* Contextual Topbar Display Guard across panels */
+body:not(.fz-stage-home) header.topbar #topBrandWrap,
+body:not(.fz-stage-home) header.topbar #fzCourseSwitchBtn {
+  display: none !important;
+}
+body.fz-stage-home header.topbar #topBrandWrap {
+  display: flex !important;
+}
+body.fz-stage-home header.topbar #fzCourseSwitchBtn {
+  display: inline-flex !important;
+}
+body.fz-stage-home header.topbar #topContextWrap,
+body.fz-stage-home header.topbar #topContextActions {
+  display: none !important;
+}
+body.fz-view-classroom header.topbar #topContextWrap,
+body.fz-view-classroom header.topbar #topContextActions,
+body.fz-view-classroom header.topbar #topGamifyCluster {
+  display: none !important;
 }

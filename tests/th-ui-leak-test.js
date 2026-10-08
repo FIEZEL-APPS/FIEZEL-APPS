@@ -57,7 +57,7 @@ const ALLOWLIST = Object.freeze({
      3 -> 4 (m025-351): baris '— Penugasan latihan dan pemantauan capaian murid.' di modal
      "KelasKu untuk Guru" ikut terlihat setelah 'Penugasan' masuk daftar kata. Naskah lama
      di permukaan guru; utang tetap tercatat di sini. */
-  'app.js': 4,
+  'app.js': 3,
   'features/brain/fiezel-olm.js': 1,                            // tabel copy id, padanan th di naskah-th-brain.js
   /* 4 -> 3: eliminasi kalimat redundan '. Sekarang coba jawab lagi ya.' */
   'features/brain/fiezel-tutor-brain.js': 3,

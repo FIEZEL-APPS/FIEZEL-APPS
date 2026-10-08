@@ -640,6 +640,17 @@ html.fz-booting body{overflow:hidden}
         <span class="fiezel-brand-tag" id="topBrandTag">Aktif</span>
       </div>
 
+      <!-- Contextual Panel Brand / Title (Visible in Latihan, Grammar, Kosakata, Bicara & Dengar, Progres, Arena, Profil, etc.) -->
+      <div class="topbar-context-wrap" id="topContextWrap" style="display:none; align-items:center; gap:8px;">
+        <button type="button" class="topbar-context-back-btn" id="topContextBackBtn" onclick="handleTopbarBack()" style="display:none;" aria-label="Kembali">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
+        <h1 class="topbar-context-title" id="topContextTitle">Latihan</h1>
+      </div>
+
+      <!-- Contextual Action Slot (Level pill A1 [Ganti] on right side of topbar for Latihan, Grammar, Kosakata, Bicara & Dengar) -->
+      <div class="topbar-context-actions" id="topContextActions" style="display:none; align-items:center; gap:8px;"></div>
+
       <!-- KelasKu Official Wordmark (Visible ONLY in KelasKu panel) -->
       <div class="kelasku-top-brand" id="topBrandKelasKu" style="display:none; align-items:center; gap:8px;" onclick="go('home')" role="button" tabindex="0" aria-label="KelasKu">
         <span class="kelasku-wordmark" style="font-size:23px; font-weight:800; color:var(--kelasku-emerald, #1F7A63); letter-spacing:-0.025em; line-height:1;">KelasKu</span>
