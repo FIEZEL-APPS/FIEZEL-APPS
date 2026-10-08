@@ -168,7 +168,7 @@ html body.fz-lang-ja .topbar {
   filter: drop-shadow(0 2px 8px rgba(255, 217, 79, 0.35)) !important;
 }
 
-/* 3. Bottom Navigation Bar: Native Docked Tab Bar (UITabBar / Material NavigationBar) */
+/* 3. Bottom Navigation Bar: Butter Yellow & Glossy Floating Capsule Dock */
 nav.bottomnav,
 .bottomnav,
 html body nav.bottomnav,
@@ -177,65 +177,104 @@ html body.fz-lux nav.bottomnav,
 html.fiezel-ui-v6 body.fz-lux .bottomnav {
   position: fixed !important;
   top: auto !important;
-  bottom: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  width: 100% !important;
-  max-width: 100% !important;
-  transform: none !important;
+  bottom: calc(14px + env(safe-area-inset-bottom, 0px)) !important;
+  left: 50% !important;
+  right: auto !important;
+  transform: translateX(-50%) !important;
+  width: min(440px, calc(100% - 24px)) !important;
+  max-width: 440px !important;
+  height: 64px !important;
+  min-height: 64px !important;
+  max-height: 64px !important;
   margin: 0 !important;
-  border-radius: 0 !important;
-  border: none !important;
-  border-top: 1px solid #E2E8F0 !important;
-  background: rgba(253, 250, 243, 0.96) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-  box-shadow: 0 -4px 16px rgba(15, 23, 42, 0.04) !important;
-  padding: 6px 12px calc(6px + env(safe-area-inset-bottom, 0px)) !important;
-  display: grid !important;
-  grid-template-columns: repeat(6, 1fr) !important;
+  border-radius: 9999px !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.85) !important;
+  background: linear-gradient(180deg, rgba(255, 253, 240, 0.94) 0%, rgba(254, 243, 199, 0.90) 100%) !important;
+  backdrop-filter: blur(28px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(190%) !important;
+  box-shadow: inset 0 2px 2px rgba(255, 255, 255, 0.9), inset 0 -2px 3px rgba(217, 119, 6, 0.15), 0 16px 36px -4px rgba(180, 83, 9, 0.18), 0 6px 16px rgba(0, 0, 0, 0.08) !important;
+  padding: 6px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-around !important;
   gap: 2px !important;
   z-index: 1000 !important;
   box-sizing: border-box !important;
+  overflow: visible !important;
+}
+
+/* Sliding Liquid Pill Indicator */
+.nav-active-pill,
+#navActivePill {
+  position: absolute !important;
+  top: 6px !important;
+  bottom: 6px !important;
+  height: calc(100% - 12px) !important;
+  border-radius: 9999px !important;
+  background: linear-gradient(180deg, #FFFFFF 0%, #FEF08A 65%, #FDE047 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.95) !important;
+  box-shadow: inset 0 2px 3px #FFFFFF, inset 0 -1.5px 2px rgba(217, 119, 6, 0.3), 0 4px 12px rgba(217, 119, 6, 0.22) !important;
+  pointer-events: none !important;
+  z-index: 1 !important;
+  box-sizing: border-box !important;
+  transition: transform 0.32s cubic-bezier(0.25, 1, 0.5, 1), width 0.28s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.2s ease !important;
+  will-change: transform, width !important;
+  left: 0;
+  width: 0;
+  opacity: 0;
 }
 
 nav.bottomnav .nav,
 .bottomnav .nav,
 html body.fz-lang-ja nav.bottomnav .nav {
+  position: relative !important;
+  z-index: 2 !important;
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  width: auto !important;
+  height: 100% !important;
+  min-height: 48px !important;
+  padding: 4px 1px !important;
+  margin: 0 !important;
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
   justify-content: center !important;
   gap: 2px !important;
-  padding: 4px 1px 3px 1px !important;
-  min-height: 50px !important;
-  height: 50px !important;
   background: transparent !important;
-  border: 1.5px solid transparent !important;
-  border-radius: 14px !important;
+  border: none !important;
+  border-radius: 9999px !important;
   transform: none !important;
   box-shadow: none !important;
-  color: #64748B !important;
+  color: #78350F !important;
   cursor: pointer !important;
   outline: none !important;
-  transition: all 0.15s ease !important;
+  transition: color 0.18s ease, transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
   box-sizing: border-box !important;
   overflow: visible !important;
 }
 
+nav.bottomnav .nav:hover,
+.bottomnav .nav:hover {
+  color: #78350F !important;
+  background: transparent !important;
+}
+
 nav.bottomnav .nav:active,
 .bottomnav .nav:active {
-  transform: scale(0.95) !important;
+  transform: scale(0.92) !important;
+  background: transparent !important;
 }
 
 nav.bottomnav .nav.active,
 .bottomnav .nav.active,
 html body.fz-lang-ja nav.bottomnav .nav.active {
-  background: #FEF3C7 !important;
-  border-color: #F59E0B !important;
-  box-shadow: 0 2px 0 #D97706 !important;
-  border-radius: 14px !important;
-  color: #B45309 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 9999px !important;
+  color: #78350F !important;
+  font-weight: 800 !important;
   transform: none !important;
 }
 
@@ -247,17 +286,43 @@ html body.fz-lang-ja nav.bottomnav .nav .fz-i {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  --fz-i-fill: #E2E8F0 !important;
-  --fz-i-line: #64748B !important;
-  transition: all 0.15s ease !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  --fz-i-fill: transparent !important;
+  --fz-i-line: #78350F !important;
+  opacity: 0.70 !important;
+  filter: none !important;
+  transition: filter 0.2s ease, transform 0.15s ease, opacity 0.18s ease !important;
+}
+
+nav.bottomnav .nav svg,
+.bottomnav .nav svg,
+html body.fz-lang-ja nav.bottomnav .nav svg {
+  width: 20px !important;
+  height: 20px !important;
+  stroke: #78350F !important;
+  stroke-width: 1.8 !important;
+  fill: none !important;
+  opacity: 0.70 !important;
 }
 
 nav.bottomnav .nav.active .fz-i,
 .bottomnav .nav.active .fz-i,
 html body.fz-lang-ja nav.bottomnav .nav.active .fz-i {
-  --fz-i-fill: #FFD21E !important;
+  --fz-i-fill: #FEF08A !important;
   --fz-i-line: #92400E !important;
-  filter: drop-shadow(0 1px 3px rgba(245, 158, 11, 0.35)) !important;
+  opacity: 1 !important;
+  filter: drop-shadow(0 1px 2px rgba(255, 255, 255, 0.8)) !important;
+}
+
+nav.bottomnav .nav.active svg,
+.bottomnav .nav.active svg,
+html body.fz-lang-ja nav.bottomnav .nav.active svg {
+  stroke: #92400E !important;
+  stroke-width: 2.2 !important;
+  opacity: 1 !important;
+  filter: drop-shadow(0 1px 2px rgba(255, 255, 255, 0.8)) !important;
 }
 
 nav.bottomnav .nav span,
@@ -267,28 +332,32 @@ html body.fz-lang-ja nav.bottomnav .nav span {
   font-weight: 700 !important;
   letter-spacing: -0.01em !important;
   line-height: 1.25 !important;
-  color: #64748B !important;
+  color: #78350F !important;
+  opacity: 0.75 !important;
   margin-top: 1px !important;
   overflow: visible !important;
   white-space: nowrap !important;
   text-align: center !important;
+  transition: color 0.18s ease, transform 0.18s ease, opacity 0.18s ease !important;
 }
 
 nav.bottomnav .nav.active span,
 .bottomnav .nav.active span,
 html body.fz-lang-ja nav.bottomnav .nav.active span {
-  color: #B45309 !important;
+  color: #78350F !important;
+  opacity: 1 !important;
   font-weight: 800 !important;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8) !important;
 }
 
-/* KelasKu signature Emerald Green active state */
+/* KelasKu signature Emerald Green active state inside capsule */
 nav.bottomnav .nav[data-view="classroom"].active,
 .bottomnav .nav[data-view="classroom"].active,
 html body.fz-lang-ja nav.bottomnav .nav[data-view="classroom"].active {
-  background: #EAF5F1 !important;
-  border-color: #10B981 !important;
-  box-shadow: 0 2px 0 #059669 !important;
-  color: #047857 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: #065F46 !important;
 }
 
 nav.bottomnav .nav[data-view="classroom"].active .fz-i,
@@ -296,7 +365,17 @@ nav.bottomnav .nav[data-view="classroom"].active .fz-i,
 html body.fz-lang-ja nav.bottomnav .nav[data-view="classroom"].active .fz-i {
   --fz-i-fill: #A7F3D0 !important;
   --fz-i-line: #047857 !important;
-  filter: drop-shadow(0 1px 3px rgba(16, 185, 129, 0.35)) !important;
+  opacity: 1 !important;
+  filter: drop-shadow(0 1px 2px rgba(255, 255, 255, 0.8)) !important;
+}
+
+nav.bottomnav .nav[data-view="classroom"].active svg,
+.bottomnav .nav[data-view="classroom"].active svg,
+html body.fz-lang-ja nav.bottomnav .nav[data-view="classroom"].active svg {
+  stroke: #047857 !important;
+  stroke-width: 2.2 !important;
+  opacity: 1 !important;
+  filter: drop-shadow(0 1px 2px rgba(255, 255, 255, 0.8)) !important;
 }
 
 nav.bottomnav .nav[data-view="classroom"].active span,
@@ -304,8 +383,10 @@ nav.bottomnav .nav[data-view="classroom"].active span,
 nav.bottomnav .nav[data-view="classroom"].active .kelasku-wordmark,
 .bottomnav .nav[data-view="classroom"].active .kelasku-wordmark,
 html body.fz-lang-ja nav.bottomnav .nav[data-view="classroom"].active span {
-  color: #047857 !important;
+  color: #065F46 !important;
+  opacity: 1 !important;
   font-weight: 800 !important;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8) !important;
 }
 
 /* ==========================================================================
@@ -1328,48 +1409,67 @@ html.fz-booting header.topbar {
   text-align: center !important;
 }
 
-/* 6. Topbar Flag Switch Button (media_1790431262884.jpg) */
+/* 6. Topbar Flag Switch Button (Tactile Pill Harmony) */
 .course-switch-btn,
-#fzCourseSwitchBtn {
-  width: 44px !important;
-  height: 44px !important;
-  min-width: 44px !important;
-  border-radius: 50% !important;
-  background: #181822 !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+#fzCourseSwitchBtn,
+.btn-course-selector {
+  width: auto !important;
+  min-width: auto !important;
+  height: 36px !important;
+  border-radius: 999px !important;
+  background: #FFFFFF !important;
+  border: 1.5px solid #E2E8F0 !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  padding: 0 !important;
+  gap: 6px !important;
+  padding: 6px 12px 6px 8px !important;
   cursor: pointer !important;
   outline: none !important;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35) !important;
-  transition: all 0.2s ease !important;
+  box-shadow: 0 2px 0 #CBD5E1, 0 4px 8px rgba(15, 23, 42, 0.04) !important;
+  transition: transform 0.1s ease, box-shadow 0.1s ease !important;
 }
 
-.course-switch-btn:hover {
-  background: #222230 !important;
-  border-color: rgba(255, 224, 46, 0.4) !important;
+.course-switch-btn:hover,
+#fzCourseSwitchBtn:hover,
+.btn-course-selector:hover {
+  background: #F8FAFC !important;
+  border-color: #CBD5E1 !important;
+  transform: translateY(-1px) !important;
+}
+
+.course-switch-btn:active,
+#fzCourseSwitchBtn:active,
+.btn-course-selector:active {
+  transform: translateY(2px) !important;
+  box-shadow: 0 1px 0 #CBD5E1 !important;
 }
 
 .course-switch-flag {
-  display: flex !important;
+  display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  width: 100% !important;
-  height: 100% !important;
+  width: auto !important;
+  height: auto !important;
+  flex-shrink: 0 !important;
 }
 
 .course-switch-flag svg {
   display: block !important;
-  width: 22px !important;
-  height: 15px !important;
+  width: 18px !important;
+  height: 13px !important;
   border-radius: 2px !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0.4) !important;
 }
 
 .course-switch-label {
-  display: none !important;
+  display: inline-block !important;
+  font-family: var(--font-sans), 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  color: #0F172A !important;
+  white-space: nowrap !important;
+  line-height: 1 !important;
 }
 
 /* 7. Stadium Match Cards (media_1790431262884.jpg) */

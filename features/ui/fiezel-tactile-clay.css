@@ -255,37 +255,69 @@ button.brand-button {
   box-shadow: 0 1px 0 #BAE6FD !important;
 }
 
-/* 8. TACTILE DOCKED BOTTOM NAVIGATION (NATIVE MOBILE DOCK UITabBar) */
+/* 8. BUTTER YELLOW & GLOSSY FLOATING CAPSULE DOCK (FIEZEL LIQUID UITabBar) */
+html body nav.bottomnav,
+html body .bottomnav,
+html body.fz-lux nav.bottomnav,
+html body.fz-lux .bottomnav,
+html body.fz-lang-ja nav.bottomnav,
+html body.fz-lang-ja .bottomnav,
+html body:has(.home-today) nav.bottomnav,
+html body:has(.home-today) .bottomnav,
 .bottomnav {
   position: fixed !important;
   top: auto !important;
-  bottom: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  width: 100% !important;
-  max-width: 100% !important;
-  transform: none !important;
+  bottom: calc(14px + env(safe-area-inset-bottom, 0px)) !important;
+  left: 50% !important;
+  right: auto !important;
+  transform: translateX(-50%) !important;
+  width: min(440px, calc(100% - 24px)) !important;
+  max-width: 440px !important;
+  height: 64px !important;
+  min-height: 64px !important;
+  max-height: 64px !important;
   margin: 0 !important;
-  background: rgba(253, 250, 243, 0.96) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-  border-radius: 0 !important;
-  border: none !important;
-  border-top: 1px solid #E2E8F0 !important;
-  box-shadow: 0 -4px 16px rgba(15, 23, 42, 0.04) !important;
-  padding: 6px 12px calc(6px + env(safe-area-inset-bottom, 0px)) !important;
-  display: grid !important;
-  grid-template-columns: repeat(6, 1fr) !important;
+  padding: 6px !important;
+  background: linear-gradient(180deg, rgba(255, 253, 240, 0.94) 0%, rgba(254, 243, 199, 0.90) 100%) !important;
+  backdrop-filter: blur(28px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(190%) !important;
+  border-radius: 9999px !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.85) !important;
+  box-shadow: inset 0 2px 2px rgba(255, 255, 255, 0.9), inset 0 -2px 3px rgba(217, 119, 6, 0.15), 0 16px 36px -4px rgba(180, 83, 9, 0.18), 0 6px 16px rgba(0, 0, 0, 0.08) !important;
+  display: flex !important;
   align-items: center !important;
+  justify-content: space-around !important;
   gap: 2px !important;
   z-index: 1000 !important;
   box-sizing: border-box !important;
   view-transition-name: bottomnav !important;
+  overflow: visible !important;
 }
 ::view-transition-old(bottomnav),
 ::view-transition-new(bottomnav) {
   animation: none !important;
   mix-blend-mode: normal !important;
+}
+
+/* Sliding Liquid Pill Indicator */
+.nav-active-pill,
+#navActivePill {
+  position: absolute !important;
+  top: 6px !important;
+  bottom: 6px !important;
+  height: calc(100% - 12px) !important;
+  border-radius: 9999px !important;
+  background: linear-gradient(180deg, #FFFFFF 0%, #FEF08A 65%, #FDE047 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.95) !important;
+  box-shadow: inset 0 2px 3px #FFFFFF, inset 0 -1.5px 2px rgba(217, 119, 6, 0.3), 0 4px 12px rgba(217, 119, 6, 0.22) !important;
+  pointer-events: none !important;
+  z-index: 1 !important;
+  box-sizing: border-box !important;
+  transition: transform 0.32s cubic-bezier(0.25, 1, 0.5, 1), width 0.28s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.2s ease !important;
+  will-change: transform, width !important;
+  left: 0;
+  width: 0;
+  opacity: 0;
 }
 
 html body.fz-lesson-mode nav.bottomnav,
@@ -323,104 +355,178 @@ body:has(.quiz-shell) .bottomnav {
   pointer-events: none !important;
 }
 
+html body nav.bottomnav .nav,
+html body .bottomnav .nav,
 .bottomnav .nav {
+  position: relative !important;
+  z-index: 2 !important;
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  width: auto !important;
+  height: 100% !important;
+  min-height: 48px !important;
+  padding: 4px 1px !important;
+  margin: 0 !important;
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
   justify-content: center !important;
   gap: 2px !important;
-  padding: 4px 1px 3px 1px !important;
-  min-height: 50px !important;
-  height: 50px !important;
-  border-radius: 14px !important;
-  border: 1.5px solid transparent !important;
+  border-radius: 9999px !important;
+  border: none !important;
   background: transparent !important;
   box-shadow: none !important;
-  font-weight: 700 !important;
-  font-family: var(--font-sans) !important;
-  color: #64748B !important;
-  transition: all 0.15s ease !important;
+  color: #78350F !important;
   cursor: pointer !important;
   overflow: visible !important;
   box-sizing: border-box !important;
+  transform: none !important;
+  transition: color 0.18s ease, transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  animation: none !important;
 }
 
+html body nav.bottomnav .nav:hover,
+html body .bottomnav .nav:hover,
+.bottomnav .nav:hover {
+  color: #78350F !important;
+  background: transparent !important;
+}
+
+html body nav.bottomnav .nav:active,
+html body .bottomnav .nav:active,
+.bottomnav .nav:active {
+  transform: scale(0.92) !important;
+  background: transparent !important;
+}
+
+html body nav.bottomnav .nav .fz-i,
+html body .bottomnav .nav .fz-i,
 .bottomnav .nav .fz-i {
   width: 22px !important;
   height: 22px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  --fz-i-fill: #E2E8F0;
-  --fz-i-line: #94A3B8;
-  transition: transform 0.15s ease !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  --fz-i-fill: transparent !important;
+  --fz-i-line: #78350F !important;
+  opacity: 0.70 !important;
+  filter: none !important;
+  transition: filter 0.2s ease, transform 0.15s ease, opacity 0.18s ease !important;
 }
 
+html body nav.bottomnav .nav svg,
+html body .bottomnav .nav svg,
+.bottomnav .nav svg {
+  width: 20px !important;
+  height: 20px !important;
+  stroke: #78350F !important;
+  stroke-width: 1.8 !important;
+  fill: none !important;
+  opacity: 0.70 !important;
+}
+
+html body nav.bottomnav .nav span,
+html body .bottomnav .nav span,
 .bottomnav .nav span {
+  display: block !important;
   font-size: 10px !important;
   font-weight: 700 !important;
-  line-height: 1.25 !important;
+  line-height: 1.2 !important;
   letter-spacing: -0.01em !important;
+  color: #78350F !important;
+  opacity: 0.75 !important;
+  text-align: center !important;
   white-space: nowrap !important;
   overflow: visible !important;
   max-width: 100% !important;
-  color: inherit !important;
   margin-top: 1px !important;
+  transition: color 0.18s ease, font-weight 0.18s ease, opacity 0.18s ease !important;
 }
 
-.bottomnav .nav {
-  transition: transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.15s ease, color 0.15s ease !important;
-}
-
-.bottomnav .nav:hover {
-  color: #334155 !important;
-}
-
-.bottomnav .nav:active {
-  transform: scale(0.90) translateY(1px) !important;
-}
-
+html body nav.bottomnav .nav.active,
+html body .bottomnav .nav.active,
+html body:has(.home-today) .bottomnav .nav.active,
 .bottomnav .nav.active {
-  background: #FEF3C7 !important;
-  border: 1.5px solid #F59E0B !important;
-  border-radius: 14px !important;
-  box-shadow: 0 2px 0 #D97706 !important;
-  color: #B45309 !important;
-  animation: fzTabBounce 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) both !important;
+  color: #78350F !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  animation: none !important;
+  transform: none !important;
 }
 
-@keyframes fzTabBounce {
-  0% { transform: scale(0.92); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
+/* Fallback before pill synchronizes */
+.bottomnav:not(.pill-synced) .nav.active {
+  background: linear-gradient(180deg, #FFFFFF 0%, #FEF08A 65%, #FDE047 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.95) !important;
+  box-shadow: inset 0 2px 3px #FFFFFF, inset 0 -1.5px 2px rgba(217, 119, 6, 0.3), 0 4px 12px rgba(217, 119, 6, 0.22) !important;
 }
 
+html body nav.bottomnav .nav.active .fz-i,
+html body .bottomnav .nav.active .fz-i,
 .bottomnav .nav.active .fz-i {
-  --fz-i-fill: #FFD21E !important;
+  --fz-i-fill: #FEF08A !important;
   --fz-i-line: #92400E !important;
-  filter: drop-shadow(0 1px 3px rgba(245, 158, 11, 0.4)) !important;
+  opacity: 1 !important;
+  filter: drop-shadow(0 1px 2px rgba(255, 255, 255, 0.8)) !important;
 }
 
+html body nav.bottomnav .nav.active svg,
+html body .bottomnav .nav.active svg,
+.bottomnav .nav.active svg {
+  stroke: #92400E !important;
+  stroke-width: 2.2 !important;
+  opacity: 1 !important;
+  filter: drop-shadow(0 1px 2px rgba(255, 255, 255, 0.8)) !important;
+}
+
+html body nav.bottomnav .nav.active span,
+html body .bottomnav .nav.active span,
 .bottomnav .nav.active span {
-  color: #B45309 !important;
+  color: #78350F !important;
+  opacity: 1 !important;
   font-weight: 800 !important;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8) !important;
 }
 
+/* KelasKu emerald active */
+html body nav.bottomnav .nav[data-view="classroom"].active,
+html body .bottomnav .nav[data-view="classroom"].active,
 .bottomnav .nav[data-view="classroom"].active {
-  background: #EAF5F1 !important;
-  border: 1px solid #10B981 !important;
-  box-shadow: 0 2px 0 #059669 !important;
-  color: #047857 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: #065F46 !important;
 }
 
+html body nav.bottomnav .nav[data-view="classroom"].active .fz-i,
+html body .bottomnav .nav[data-view="classroom"].active .fz-i,
 .bottomnav .nav[data-view="classroom"].active .fz-i {
   --fz-i-fill: #A7F3D0 !important;
   --fz-i-line: #047857 !important;
-  filter: drop-shadow(0 1px 3px rgba(16, 185, 129, 0.35)) !important;
+  opacity: 1 !important;
+  filter: drop-shadow(0 1px 2px rgba(255, 255, 255, 0.8)) !important;
 }
 
+html body nav.bottomnav .nav[data-view="classroom"].active svg,
+html body .bottomnav .nav[data-view="classroom"].active svg,
+.bottomnav .nav[data-view="classroom"].active svg {
+  stroke: #047857 !important;
+  stroke-width: 2.2 !important;
+  opacity: 1 !important;
+  filter: drop-shadow(0 1px 2px rgba(255, 255, 255, 0.8)) !important;
+}
+
+html body nav.bottomnav .nav[data-view="classroom"].active span,
+html body .bottomnav .nav[data-view="classroom"].active span,
 .bottomnav .nav[data-view="classroom"].active span {
-  color: #047857 !important;
+  color: #065F46 !important;
+  opacity: 1 !important;
+  font-weight: 800 !important;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8) !important;
 }
 
 
