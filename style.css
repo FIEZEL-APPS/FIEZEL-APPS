@@ -7850,7 +7850,7 @@ main.app {
 section.fade,
 .classroom-page,
 .home-page {
-  background: var(--bgDay, #FDFAF3) !important;
+  background: #FAF8F5 !important;
   color: #0F172A !important;
   min-height: auto !important;
   padding-bottom: calc(80px + env(safe-area-inset-bottom, 12px)) !important;
