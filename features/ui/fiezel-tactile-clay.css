@@ -4377,12 +4377,15 @@ body.fz-view-profile .progress-tabs,
 body.fz-view-profile nav.progress-tabs,
 body.fz-view-profile .section-head,
 body.fz-view-profile .active-level-control,
-body.fz-view-profile #cardIdPribadi,
 body.fz-view-profile #cardSuaraAudio,
-body.fz-view-profile .profile-section-card:not(#cardTargetHarian),
+body.fz-view-profile .profile-section-card:not(#cardTargetHarian):not(#cardOnlineTeman):not(#cardIdPribadi),
 body.fz-view-profile .card-collapsed-pill,
 body.fz-view-classroom .topbar-actions > button[onclick="openSettings()"] {
   display: none !important;
+}
+
+body.fz-view-profile #cardOnlineTeman {
+  display: flex !important;
 }
 
 body.fz-view-profile #app {

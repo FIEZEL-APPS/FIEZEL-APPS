@@ -1,7 +1,7 @@
 {
-  "version": "m025-523",
+  "version": "m025-524",
   "claimedBy": "branch main",
-  "claimedAt": "2026-10-08T14:19:38.225Z",
-  "reason": "fix(ui): stay-fixed solid butter yellow bottom navigation bar",
+  "claimedAt": "2026-10-08T17:16:08.036Z",
+  "reason": "feat(notif): satukan lonceng notifikasi di topbar home dan aksi permintaan teman",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
