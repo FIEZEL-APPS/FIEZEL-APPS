@@ -180,67 +180,62 @@ body.fz-stage-sl.fsl-session-active .fsl-card-listening>h2 {
   transform: scale(0.95) !important;
 }
 
-/* 3. PANGGUNG AUDIO RAMPIK (COMPACT HERO STAGE, ~64px) */
+/* 3. PANGGUNG 3D MOCHI COMPANION UNCLIPPED & LIVELY (~120px) */
 .fsl-card-listening .fsl-player,
 body.fz-stage-sl.fsl-session-active .fsl-card-listening .fsl-player {
-  height: 64px !important;
-  min-height: 60px !important;
-  max-height: 68px !important;
+  position: relative !important;
+  width: 100% !important;
+  height: 125px !important;
+  min-height: 110px !important;
+  max-height: 135px !important;
   flex: 0 0 auto !important;
   display: flex !important;
-  flex-direction: row !important;
   align-items: center !important;
-  gap: 12px !important;
-  margin: 4px 0 10px 0 !important;
-  padding: 8px 12px !important;
-  background: #FFF9EE !important;
-  border: 1.5px solid #F0E4CF !important;
-  border-radius: 18px !important;
+  justify-content: center !important;
+  margin: 2px 0 6px 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  overflow: visible !important;
   box-sizing: border-box !important;
 }
 .fsl-card-listening .fsl-mascot-slot,
 body.fz-stage-sl.fsl-session-active .fsl-card-listening .fsl-mascot-slot {
-  flex: 0 0 44px !important;
-  width: 44px !important;
-  height: 44px !important;
-  min-height: 44px !important;
-  max-height: 44px !important;
-  border-radius: 50% !important;
-  background: #FFF3C4 !important;
-  border: 1.5px solid #E8DFD3 !important;
-  display: grid !important;
-  place-items: center !important;
-  overflow: hidden !important;
-  box-shadow: 0 2px 6px rgba(36, 26, 17, 0.06) !important;
-  aspect-ratio: 1/1 !important;
-  max-width: 44px !important;
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 110px !important;
+  max-height: 135px !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  overflow: visible !important;
   align-self: center !important;
+  max-width: 100% !important;
+  aspect-ratio: auto !important;
 }
-.fsl-card-listening .fsl-mascot-slot .fsl-mascot {
-  width: 38px !important;
-  height: 38px !important;
+.fsl-card-listening .fsl-mascot-slot .fsl-mascot,
+.fsl-card-listening .fsl-mascot-slot fiezel-mascot {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 220px !important;
+  position: relative !important;
+  overflow: visible !important;
+  pointer-events: auto !important;
 }
 .fsl-card-listening .fsl-mascot-slot .fz-i {
-  width: 24px !important;
-  height: 24px !important;
-  color: #8C2233 !important;
+  display: none !important;
 }
-.fsl-card-listening .fsl-bubble,
-body.fz-stage-sl.fsl-session-active .fsl-card-listening .fsl-bubble {
-  flex: 1 1 auto !important;
-  min-width: 0 !important;
-  height: auto !important;
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  gap: 8px !important;
-  padding: 0 !important;
-  border: none !important;
-  background: transparent !important;
-}
-.fsl-card-listening .fsl-bubble::before,
-.fsl-card-listening .fsl-bubble::after {
+.fsl-card-listening .fsl-player .fsl-bubble {
   display: none !important;
 }
 .fsl-card-listening .fsl-wave {
@@ -381,16 +376,17 @@ body.reduce-motion .fsl-player.is-playing .fsl-eq i { animation: none; transform
   display: flex !important;
   align-items: center !important;
   gap: 12px !important;
-  min-height: 48px !important;
-  max-height: 52px !important;
-  height: 50px !important;
-  padding: 0 16px !important;
+  min-height: 46px !important;
+  max-height: none !important;
+  height: auto !important;
+  padding: 10px 14px !important;
   background: #FFFDF9 !important;
   border: 1.5px solid #E8DFD3 !important;
   border-radius: 16px !important;
   color: #1E1B18 !important;
-  font-size: 15px !important;
+  font-size: 14.5px !important;
   font-weight: 650 !important;
+  line-height: 1.35 !important;
   text-align: left !important;
   cursor: pointer !important;
   box-shadow: 0 2px 0 #E2D7C8, 0 4px 10px rgba(36,26,17,0.04) !important;
@@ -420,14 +416,17 @@ body.reduce-motion .fsl-player.is-playing .fsl-eq i { animation: none; transform
   font-size: 13px !important;
   font-weight: 800 !important;
   color: #6E5E47 !important;
+  align-self: flex-start !important;
+  margin-top: 1px !important;
   transition: all 0.15s ease !important;
 }
 .fsl-option-text {
   flex: 1 1 auto !important;
   min-width: 0 !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  word-break: break-word !important;
 }
 .fsl-option.is-correct {
   border-color: #10B981 !important;
@@ -466,26 +465,26 @@ body.reduce-motion .fsl-player.is-playing .fsl-eq i { animation: none; transform
 
 /* 6. PERBAIKAN GEM FOOTER (ANTI-CLIPPING PADA VIEWPORT 390PX) */
 .fsl-card-listening .fsl-gem-footer {
-  margin-top: 10px !important;
-  padding-top: 10px !important;
+  margin-top: 8px !important;
+  padding-top: 8px !important;
   border-top: 1px solid #E8DFD3 !important;
 }
 .fsl-card-listening .fsl-gem-bar {
   display: flex !important;
   flex-direction: row !important;
+  flex-wrap: nowrap !important;
   align-items: stretch !important;
   gap: 8px !important;
   margin: 0 !important;
 }
 .fsl-card-listening .fsl-gem-chip {
   flex: 0 0 auto !important;
-  min-width: 105px !important;
   display: flex !important;
   align-items: center !important;
-  gap: 8px !important;
-  min-height: 44px !important;
-  padding: 6px 12px !important;
-  border-radius: 14px !important;
+  gap: 6px !important;
+  min-height: 38px !important;
+  padding: 4px 10px !important;
+  border-radius: 12px !important;
   background: #FFF3C4 !important;
   border: 1px solid #F0E4CF !important;
   color: #241A11 !important;
@@ -503,9 +502,9 @@ body.reduce-motion .fsl-player.is-playing .fsl-eq i { animation: none; transform
   display: flex !important;
   flex-direction: column !important;
   justify-content: center !important;
-  min-height: 44px !important;
-  padding: 6px 12px !important;
-  border-radius: 14px !important;
+  min-height: 38px !important;
+  padding: 4px 10px !important;
+  border-radius: 12px !important;
   border: 1.5px solid #F0E4CF !important;
   background: #FFF8EB !important;
   color: #241A11 !important;
@@ -625,7 +624,10 @@ body.fsl-session-active .app {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  padding: 10px 14px 20px !important;
+  padding-top: calc(56px + max(10px, env(safe-area-inset-top, 10px))) !important;
+  padding-left: 14px !important;
+  padding-right: 14px !important;
+  padding-bottom: calc(20px + env(safe-area-inset-bottom, 10px)) !important;
   box-sizing: border-box;
 }
 body.fz-stage-sl.fsl-session-active #app,
@@ -641,7 +643,7 @@ body.fz-stage-sl.fsl-session-active .fsl-card-listening,
 body.fsl-session-active .fsl-card-listening {
   flex: 0 1 auto !important;
   min-height: 0 !important;
-  padding: 16px !important;
+  padding: 14px 16px !important;
   overflow-y: visible !important;
 }
 body.fz-stage-sl.fsl-session-active .fsl-card-listening:has(.fsl-feedback),

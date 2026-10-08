@@ -72,7 +72,7 @@
     'fsl.explain-dictation': 'ประโยคที่พูดในเสียงคือ: “',
     'fsl.explain-dictation-prompt': 'พิมพ์ประโยคที่คุณได้ยิน ข้อความคำตอบจะไม่ถูกบันทึกหลังตรวจ',
     'gems.price-hint': '1 gem ต่อเซสชัน · ยอดคงเหลือ: {balance} gem',
-    'gems.chip-balance': '1 gem ต่อเซสชัน · ยอดคงเหลือ: {balance} gem',
+    'gems.chip-balance': '{balance} gem',
     'gems.chip-aria-balance': 'Gem แปลภาษาของคุณ: {balance} ได้ฟรีจาก streak ตอบถูก ใช้สำหรับคำแปลอัตโนมัติ',
     'gems.streak-prefix': 'สตรีค ',
     'gems.streak-progress': 'สตรีค {current}/{target}',
