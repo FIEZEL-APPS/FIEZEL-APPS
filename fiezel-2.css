@@ -349,7 +349,7 @@ body.fz-lang-ja :is(.card,.panel,.lux-card,.today-card,.setting-card){background
 /* Kartu Hari ini: washi dengan matahari terbit samar di belakang lencana level. */
 html body.fz-lang-ja .today-card{background:radial-gradient(circle at calc(100% - 66px) 64px,rgba(179,55,42,.13) 0 62px,transparent 63px),linear-gradient(160deg,#FFFBF4 0%,#F4E3D8 100%)}
 /* Topbar: garis bawah nila tipis seperti noren. */
-body.fz-lang-ja .topbar{border-bottom:1px solid rgba(30,43,69,.12)}
+body.fz-lang-ja .topbar{border-bottom:none}
 /* Tombol utama: shu padat, sudut sedikit lebih tegas. */
 body.fz-lang-ja :is(.btn-primary,.primary,.fiezel-btn-primary,.quiz-next):not([disabled]){background:var(--accent);border-color:var(--accent);color:#fff}
 body.fz-lang-ja :is(.btn-primary,.primary,.fiezel-btn-primary,.quiz-next):not([disabled]):hover{background:var(--accent-strong)}

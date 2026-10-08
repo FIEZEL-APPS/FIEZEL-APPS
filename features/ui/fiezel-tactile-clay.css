@@ -3517,6 +3517,100 @@ html body .active-level-control,
   box-shadow: 0 2px 0 #F59E0B !important;
 }
 
+/* Compact Active Level Pill inside Topbar (Zero Card Bloat) */
+html body header.topbar .active-level-control,
+html body #topContextActions .active-level-control,
+header.topbar .active-level-control,
+#topContextActions .active-level-control,
+.topbar-context-actions .active-level-control {
+  display: inline-flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center !important;
+  align-self: center !important;
+  flex-shrink: 0 !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  max-height: 32px !important;
+  padding: 2px 8px 2px 10px !important;
+  margin: 0 !important;
+  border-radius: 9999px !important;
+  border: 1.5px solid #E2E8F0 !important;
+  background: #FFFFFF !important;
+  box-shadow: 0 2px 0 #CBD5E1 !important;
+  gap: 6px !important;
+  cursor: pointer !important;
+  box-sizing: border-box !important;
+  transition: transform 0.1s ease, box-shadow 0.1s ease !important;
+}
+
+html body header.topbar .active-level-control:active,
+html body #topContextActions .active-level-control:active,
+header.topbar .active-level-control:active,
+#topContextActions .active-level-control:active {
+  transform: translateY(1px) scale(0.97) !important;
+  box-shadow: 0 1px 0 #CBD5E1 !important;
+}
+
+html body header.topbar .active-level-control > span,
+html body #topContextActions .active-level-control > span,
+header.topbar .active-level-control > span,
+#topContextActions .active-level-control > span {
+  display: none !important;
+}
+
+html body header.topbar .active-level-control strong,
+html body #topContextActions .active-level-control strong,
+header.topbar .active-level-control strong,
+#topContextActions .active-level-control strong {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  color: #D97706 !important;
+  line-height: 1 !important;
+  letter-spacing: normal !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html body header.topbar .active-level-control small,
+html body #topContextActions .active-level-control small,
+header.topbar .active-level-control small,
+#topContextActions .active-level-control small {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 10.5px !important;
+  font-weight: 800 !important;
+  color: #0F172A !important;
+  background: #FDE047 !important;
+  border: 1px solid #FACC15 !important;
+  border-radius: 9999px !important;
+  padding: 2px 7px !important;
+  line-height: 1 !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+}
+
+html body header.topbar .active-level-control b,
+html body header.topbar .active-level-control .active-level-val,
+html body #topContextActions .active-level-control b,
+html body #topContextActions .active-level-control .active-level-val,
+header.topbar .active-level-control b,
+header.topbar .active-level-control .active-level-val,
+#topContextActions .active-level-control b,
+#topContextActions .active-level-control .active-level-val {
+  background: transparent !important;
+  color: #D97706 !important;
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
 /* 8. PROGRES 2x2 TACTILE STAT GRID & GEM CARD */
 html body #app .progress-stats,
 .progress-stats {
@@ -4230,31 +4324,21 @@ span.sr-only,
    ========================================================================== */
 html body.fz-view-latihan #app,
 html body.fz-view-grammar #app {
-  padding-top: 14px !important;
-}
-html body.fz-view-latihan #app .section-head > div > p,
-html body.fz-view-grammar #app .section-head > div > p {
-  display: none !important;
-}
-html body.fz-view-latihan #app .section-head h1,
-html body.fz-view-grammar #app .section-head h1 {
-  font-size: 26px !important;
-  font-weight: 800 !important;
-  letter-spacing: -0.02em !important;
-  margin: 0 !important;
+  padding-top: 4px !important;
 }
 html body.fz-view-latihan #app .section-head,
-html body.fz-view-grammar #app .section-head {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  gap: 10px !important;
-  margin-bottom: 14px !important;
-}
-html body.fz-view-latihan #app .section-head > div,
-html body.fz-view-grammar #app .section-head > div {
-  flex: 0 1 auto !important;
+html body.fz-view-grammar #app .section-head,
+html body.fz-view-vocab #app .section-head,
+html body.fz-stage-sl #app .section-head,
+html body.fz-view-reading #app .section-head,
+html body.fz-view-writing #app .section-head,
+html body.fz-view-library #app .section-head,
+html body #app .section-head {
+  display: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
 }
 /* level control becomes a small pill beside the title */
 html body.fz-view-latihan #app .section-head .active-level-control,
@@ -6654,8 +6738,9 @@ html body.fz-view-latihan header.topbar {
   padding: env(safe-area-inset-top, 0px) 16px 0 16px !important;
   border-radius: 0 !important;
   border: 0 !important;
-  border-bottom: 1px solid #E2E8F0 !important;
+  border-bottom: none !important;
   box-shadow: none !important;
+  background: var(--bgDay, #FDFAF3) !important;
   display: flex !important; align-items: center !important; justify-content: space-between !important;
   gap: 12px !important;
   view-transition-name: topbar !important;
@@ -6675,7 +6760,7 @@ html body.fz-view-profile #fzCourseSwitchBtn {
   display: none !important;
 }
 html body main.app.app,html body.fz-lux main.app.app,html body.fz-lux.fz-view-game main.app.app,html body.fz-lux.fz-stage-home main.app.app {
-  padding-top: calc(56px + env(safe-area-inset-top, 0px) + 12px) !important;
+  padding-top: calc(56px + env(safe-area-inset-top, 0px) + 4px) !important;
 }
 html body.fz-lesson-mode main.app.app,html body.fz-lux.fz-lesson-mode main.app.app,html body.fz-lux.fz-stage-quiz main.app.app,html body:has(.quiz-shell) main.app.app { padding-top: 0 !important; }
 html body.fz-lesson-mode header.topbar,
