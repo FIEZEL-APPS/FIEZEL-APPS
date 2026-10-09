@@ -5076,29 +5076,11 @@ body.fz-lux .card.card-flashcard {
   z-index: 2 !important;
 }
 
-/* Card Deck Layering: physical stack effect beneath card */
+/* Card Deck Layering: disabled to prevent static card penetration in 3D flip */
 .flashcard::before,
 .flashcard::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 28px !important;
-  pointer-events: none;
-  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
-}
-.flashcard::before {
-  background: linear-gradient(165deg, #FFFFFF 0%, #FAF3E6 100%) !important;
-  border: 2px solid #E6D8C3 !important;
-  transform: translateY(7px) scale(0.965);
-  z-index: -1;
-  box-shadow: 0 10px 24px -8px rgba(135, 105, 65, 0.12) !important;
-}
-.flashcard::after {
-  background: linear-gradient(165deg, #FFFFFF 0%, #F5ECDB 100%) !important;
-  border: 2px solid #DED0BA !important;
-  transform: translateY(14px) scale(0.93);
-  z-index: -2;
-  box-shadow: 0 14px 28px -10px rgba(135, 105, 65, 0.08) !important;
+  display: none !important;
+  content: none !important;
 }
 
 .flash-inner {
@@ -5174,21 +5156,11 @@ body.fz-lux .card.card-flashcard {
   justify-content: space-between;
 }
 
-.flashcard:not(.flipped) .flash-front {
-  opacity: 1 !important;
-  pointer-events: auto !important;
-}
 .flashcard:not(.flipped) .flash-back {
-  opacity: 0 !important;
   pointer-events: none !important;
 }
 .flashcard.flipped .flash-front {
-  opacity: 0 !important;
   pointer-events: none !important;
-}
-.flashcard.flipped .flash-back {
-  opacity: 1 !important;
-  pointer-events: auto !important;
 }
 
 .flash-front-main {

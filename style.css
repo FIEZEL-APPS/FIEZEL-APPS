@@ -593,22 +593,8 @@ body.fz-lux .card.card-flashcard{
 }
 .flashcard::before,
 .flashcard::after{
-  content:'';position:absolute;inset:0;border-radius:28px !important;pointer-events:none;
-  transition:transform 0.25s cubic-bezier(0.16,1,0.3,1), opacity 0.25s ease;
-}
-.flashcard::before{
-  background:linear-gradient(165deg,#FFFFFF 0%,#FAF3E6 100%) !important;
-  border:2px solid #E6D8C3 !important;
-  transform:translateY(7px) scale(0.965);
-  z-index:-1;
-  box-shadow:0 10px 24px -8px rgba(135,105,65,.12) !important;
-}
-.flashcard::after{
-  background:linear-gradient(165deg,#FFFFFF 0%,#F5ECDB 100%) !important;
-  border:2px solid #DED0BA !important;
-  transform:translateY(14px) scale(0.93);
-  z-index:-2;
-  box-shadow:0 14px 28px -10px rgba(135,105,65,.08) !important;
+  display:none !important;
+  content:none !important;
 }
 @keyframes fzCardSpringIn {
   0% { opacity: 0; transform: scale(0.93) translateY(16px); }
@@ -662,10 +648,8 @@ body.fz-lux .card.card-flashcard{
   -webkit-transform:rotateY(180deg) translateZ(1px);
   justify-content:space-between;
 }
-.flashcard:not(.flipped) .flash-front{opacity:1 !important;pointer-events:auto !important}
-.flashcard:not(.flipped) .flash-back{opacity:0 !important;pointer-events:none !important}
-.flashcard.flipped .flash-front{opacity:0 !important;pointer-events:none !important}
-.flashcard.flipped .flash-back{opacity:1 !important;pointer-events:auto !important}
+.flashcard:not(.flipped) .flash-back{pointer-events:none !important}
+.flashcard.flipped .flash-front{pointer-events:none !important}
 .flash-front-main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;width:100%}
 .flash-front .word,
 html body:not(.fz-teacher-mode) .flash-front h2.word,
