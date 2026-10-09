@@ -713,6 +713,7 @@
       + '<input type="text" data-ob-name value="' + escapeHtml(typed || '') + '" maxlength="' + NAME_MAX + '"'
       + ' placeholder="' + T('onboarding.name-placeholder') + '" autocomplete="given-name" autocapitalize="words"'
       + ' spellcheck="false" enterkeyhint="go" aria-label="' + T('onboarding.name-aria') + '"></label>'
+      + '<div class="fiezel-name-error" data-ob-name-error style="display:none;color:#ef4444;font-size:0.85rem;margin-top:6px;font-weight:600;line-height:1.4;"></div>'
       // m025-242: kalimat panjang soal penyimpanan nama dilepas dari layar - ia benar, tapi
       // ia juga yang membuat langkah pertama harus digulir. Janji yang sama tetap ada di
       // Pengaturan, tempat nama itu bisa diganti.
@@ -1443,6 +1444,46 @@
         // Tombolnya memang sudah nonaktif tanpa nama; penjagaan kedua di sini menutup jalur
         // Enter pada papan ketik, yang tidak melewati tombol sama sekali.
         if (!typedName) return;
+        if (typeof opts.validateName === 'function') {
+          var nextBtn = host.querySelector('[data-ob-advance]');
+          var prevBtnText = nextBtn ? nextBtn.textContent : '';
+          if (nextBtn) {
+            nextBtn.setAttribute('disabled', 'disabled');
+            nextBtn.textContent = T('onboarding.checking', 'Memeriksa...');
+          }
+          var valResult = opts.validateName(typedName);
+          var onResult = function (res) {
+            if (res && res.ok === false) {
+              if (nextBtn) {
+                nextBtn.removeAttribute('disabled');
+                nextBtn.textContent = prevBtnText || T('onboarding.next');
+              }
+              var errEl = host.querySelector('[data-ob-name-error]');
+              if (errEl) {
+                if (errEl.style) errEl.style.display = 'block';
+                errEl.removeAttribute('hidden');
+                errEl.textContent = res.message || T('social.error-handle-taken', 'Nama itu sudah dipakai orang lain — coba variasi lain.');
+              }
+              var inp = host.querySelector('[data-ob-name]');
+              if (inp && typeof inp.focus === 'function') inp.focus();
+              return;
+            }
+            if (nextBtn) {
+              nextBtn.removeAttribute('disabled');
+              nextBtn.textContent = prevBtnText || T('onboarding.next');
+            }
+            commitName();
+            if (nameOnly) { finish('name'); return; }
+            if (selectedRole === 'guru') { finish('finish'); return; }
+            goStep(sequenceStep(1));
+          };
+          if (valResult && typeof valResult.then === 'function') {
+            valResult.then(onResult, function () { onResult({ ok: true }); });
+          } else {
+            onResult(valResult);
+          }
+          return;
+        }
         commitName();
         if (nameOnly) { finish('name'); return; }
         if (selectedRole === 'guru') { finish('finish'); return; }
@@ -1512,6 +1553,8 @@
           // ketik di tengah kata. Jadi hanya keadaan TOMBOL yang disegarkan di sini.
           var sync = function () {
             typedName = String(nameInput.value == null ? '' : nameInput.value);
+            var errEl = host.querySelector('[data-ob-name-error]');
+            if (errEl) { if (errEl.style) errEl.style.display = 'none'; errEl.setAttribute('hidden', 'hidden'); }
             var next = host.querySelector('[data-ob-advance]');
             if (!next) return;
             if (normalizeName(typedName)) next.removeAttribute('disabled');

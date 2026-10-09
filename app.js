@@ -8966,7 +8966,7 @@ function syncCoachBubble(){
    tautan dalam layar, dan tur semuanya membawa nama view yang sudah ada, dan menghapus
    satu nama dari himpunan ini akan membuat go() menampilkan toast "halaman tak tersedia"
    pada perjalanan yang benar-benar valid. */
-const VALID_VIEWS=new Set(['kana','home','latihan','game','vocab','grammar','reading','skills','listening','speaking','writing','test','progress','classroom','library','ask','search','online','profile','learn','tutor','arena','nujum','undercover']);
+const VALID_VIEWS=new Set(['kana','home','latihan','game','vocab','grammar','reading','skills','listening','speaking','writing','test','progress','classroom','library','ask','search','online','profile','learn','tutor','arena','nujum']);
 function prefersReducedMotion(){try{return !!(self.matchMedia&&self.matchMedia('(prefers-reduced-motion: reduce)').matches)}catch(_){return false}}
 // m026-01 - maskot PAW. Tiga pembungkus di bawah ini adalah SATU-SATUNYA cara app.js
 // berbicara dengan <fiezel-mascot>. Alasannya:
@@ -9252,7 +9252,7 @@ function examWatchSync(){
 }
 try{document.addEventListener('fiezel-exam-lock',examWatchSync)}catch(_){}
 
-function go(v,opts){if((v==='ask'||v==='search')&&!aiDoorAllowed())return false;if(v==='undercover'){window.location.href='./undercover.html';return true}if(isVerifiedTeacher()&&v!=='tutor'){v='tutor'}if(!VALID_VIEWS.has(v)){showToast(FiezelI18n.t('nav.halaman-tak-tersedia'));return false}/* m025-314: penolakan berbahasa duduk DI SINI, bukan di daftar kartu — setiap pintu ke permukaan yang belum punya isi bahasa target lewat go(), termasuk pintu yang belum ditulis. */if(targetLangSurfaceBlocked(v)){showToast(FiezelI18n.t('bahasa.permukaan-terkunci',{bahasa:FiezelI18n.t('bahasa.'+activeTargetLang())}));return false}if(opts?.viaHistory!==true)haptic('tap');uiSfx('nav');dropStages();if(opts?.viaHistory!==true)pushBackNavView(v);state.view=v;if(v==='classroom'||v==='home'){try{inboxPoll(v==='classroom')}catch(_){}if(v==='home'){try{const cur=Number(sessionStorage.getItem('fz_today_vocab_visit')||0);sessionStorage.setItem('fz_today_vocab_visit',String(cur+1))}catch(_){}}}try{const _targetView=(typeof TAB_PARENT!=='undefined'&&TAB_PARENT[v])?TAB_PARENT[v]:v;const _targetBtn=document.querySelector(`.bottomnav [data-view="${_targetView}"]`);if(_targetBtn)syncNavActivePill(_targetBtn)}catch(_){}const swap=()=>{save();render()};const isBottomTab=['home','latihan','classroom','game','progress','online','profile'].includes(v);if(!isBottomTab&&document.startViewTransition&&state.preferences?.motion!==false&&!prefersReducedMotion()){vtViewPaint=true;try{const __vt=document.startViewTransition(swap);const __done=()=>{vtViewPaint=false};if(__vt&&__vt.finished&&typeof __vt.finished.finally==='function')__vt.finished.finally(__done);else setTimeout(__done,300)}catch(_){try{swap()}finally{vtViewPaint=false}}}else swap();return true} window.go=go;
+function go(v,opts){if((v==='ask'||v==='search')&&!aiDoorAllowed())return false;if(isVerifiedTeacher()&&v!=='tutor'){v='tutor'}if(!VALID_VIEWS.has(v)){showToast(FiezelI18n.t('nav.halaman-tak-tersedia'));return false}/* m025-314: penolakan berbahasa duduk DI SINI, bukan di daftar kartu — setiap pintu ke permukaan yang belum punya isi bahasa target lewat go(), termasuk pintu yang belum ditulis. */if(targetLangSurfaceBlocked(v)){showToast(FiezelI18n.t('bahasa.permukaan-terkunci',{bahasa:FiezelI18n.t('bahasa.'+activeTargetLang())}));return false}if(opts?.viaHistory!==true)haptic('tap');uiSfx('nav');dropStages();if(opts?.viaHistory!==true)pushBackNavView(v);state.view=v;if(v==='classroom'||v==='home'){try{inboxPoll(v==='classroom')}catch(_){}if(v==='home'){try{const cur=Number(sessionStorage.getItem('fz_today_vocab_visit')||0);sessionStorage.setItem('fz_today_vocab_visit',String(cur+1))}catch(_){}}}try{const _targetView=(typeof TAB_PARENT!=='undefined'&&TAB_PARENT[v])?TAB_PARENT[v]:v;const _targetBtn=document.querySelector(`.bottomnav [data-view="${_targetView}"]`);if(_targetBtn)syncNavActivePill(_targetBtn)}catch(_){}const swap=()=>{save();render()};const isBottomTab=['home','latihan','classroom','game','progress','online','profile'].includes(v);if(!isBottomTab&&document.startViewTransition&&state.preferences?.motion!==false&&!prefersReducedMotion()){vtViewPaint=true;try{const __vt=document.startViewTransition(swap);const __done=()=>{vtViewPaint=false};if(__vt&&__vt.finished&&typeof __vt.finished.finally==='function')__vt.finished.finally(__done);else setTimeout(__done,300)}catch(_){try{swap()}finally{vtViewPaint=false}}}else swap();return true} window.go=go;
 function handleTopbarBack(){if(typeof go!=='function')return;const subViews=['grammar','vocab','skills','listening','speaking','reading','writing','library','kana','ask','search'];if(subViews.includes(state.view)){go('latihan')}else{go('home')}} window.handleTopbarBack=handleTopbarBack;
 function pushBackNavView(v){try{return self.FiezelBackNav?.pushView?.(v)===true}catch{return false}}
 /* ---- m025-117 lapisan layar-di-dalam-view (stage) ---------------------------------
@@ -11604,6 +11604,37 @@ window.showBrandSplash=showBrandSplash;
 // pernah selesai atau belum; di sini hanya disambungkan ke bagian aplikasi yang benar-benar
 // ada - goal ASLI dari FiezelPersonalJourney, tes penempatan yang sungguhan 25 soal, level
 // self-report yang tidak menimpa state.level.
+async function validateLearnerNameAvailability(name){
+  const clean=String(name||'').trim();
+  if(!clean)return {ok:false,message:FiezelI18n.t('social.error-schema-invalid','Isian belum sesuai aturan. Periksa lagi ya.')};
+  const cand=(typeof socialHandleCandidates==='function')
+    ? socialHandleCandidates(clean)[0]
+    : clean.toLowerCase().replace(/[^a-z0-9_]/g,'_');
+  const core=socialCore();
+  if(!core)return {ok:true};
+  if(typeof navigator!=='undefined'&&navigator.onLine===false)return {ok:true};
+  try{await core.ensureAnon()}catch(_){}
+  try{
+    const me=await core.api.profileMe();
+    if(me&&me.ok&&me.data?.profile?.handle&&me.data.profile.handle.toLowerCase()===cand.toLowerCase()){
+      return {ok:true};
+    }
+  }catch(_){}
+  try{
+    const chk=await core.api.profileCheck(cand);
+    const avail=(chk?.data?.available!==undefined)?chk.data.available:(chk?.data?.data?.available!==undefined?chk.data.data.available:(chk?.available!==undefined?chk.available:true));
+    if(chk&&chk.ok&&avail===false){
+      return {
+        ok:false,
+        error:'handle_taken',
+        message:FiezelI18n.t('social.error-handle-taken','Nama itu sudah dipakai orang lain — coba variasi lain.')
+      };
+    }
+  }catch(_){}
+  return {ok:true};
+}
+window.validateLearnerNameAvailability=validateLearnerNameAvailability;
+
 function showOnboarding(now=Date.now()){
   /* Audit F23 (2026-09-23): "Buka Demo Guru" (?teacher=preview) dan guru terverifikasi tidak
      pernah melihat perkenalan MURID. openApp() memanggil showBrandSplash() tanpa argumen,
@@ -11625,6 +11656,8 @@ function showOnboarding(now=Date.now()){
         try{self.FiezelI18n?.setLocale?.(value)}catch(_){}
         return value
       },
+      // Validasi server: menolak nama jika ID/handle yang dibentuk sudah terdaftar di server
+      validateName:validateLearnerNameAvailability,
       // m025-117: langkah pertama perkenalan. Namanya masuk ke state SEKETIKA, bukan di
       // ujung alur - murid yang menutup aplikasi di tengah perkenalan tetap punya namanya
       // saat kembali, dan Home tidak pernah tercat dengan sapaan netral setelah dijawab.
@@ -11675,6 +11708,7 @@ function askLearnerNameIfMissing(now=Date.now()){
   if(!onboarding||typeof onboarding.show!=='function')return false;
   try{
     return onboarding.show(self,{now,nameOnly:true,
+      validateName:validateLearnerNameAvailability,
       onName:({name})=>{setLearnerName(name)},
       onFinish:()=>{try{render()}catch{}afterOnboardingExit('home')}
     })?.shown===true
@@ -18320,13 +18354,27 @@ window.toggleAutoAudio=function(checkbox){
   const t=(k,f)=>{const v=FiezelI18n.t(k);return(v===k||!v)?f:v};
   showToast(on?t('profile.auto-audio-on','Putar audio soal otomatis aktif'):t('profile.auto-audio-off','Putar audio soal otomatis dimatikan'),'success');
 };
-window.editProfileName=function(){
+window.editProfileName=async function(){
   try{if(feedbackSoundsOn())uiSfx('click')}catch(_){}
   const t=(k,f)=>{const v=FiezelI18n.t(k);return(v===k||!v)?f:v};
   const current=learnerName();
   const next=prompt(t('profile.prompt-name','Masukkan nama lengkap baru:'),current);
   if(next&&next.trim()&&next.trim()!==current){
     const clean=next.trim();
+    const cand=(typeof socialHandleCandidates==='function')?socialHandleCandidates(clean)[0]:'';
+    const core=socialCore();
+    if(cand&&core&&typeof navigator!=='undefined'&&navigator.onLine!==false){
+      try{
+        const me=await core.api.profileMe();
+        if(!me.ok||!me.data?.profile||me.data.profile.handle.toLowerCase()!==cand.toLowerCase()){
+          const chk=await core.api.profileCheck(cand);
+          if(chk&&chk.ok&&chk.data?.available===false){
+            showToast(t('social.error-handle-taken','Nama itu sudah dipakai orang lain — coba variasi lain.'),'warn');
+            return;
+          }
+        }
+      }catch(_){}
+    }
     setLearnerName(clean);
     showToast(t('profile.name-updated','Nama profil berhasil diperbarui!'),'success');
     render();
@@ -18731,20 +18779,31 @@ function registerStudentOnce(opts){
     }catch(_){}
     const name=String(opts?.name||'').trim()||learnerName();
     let lastMessage='';
-    for(const cand of socialHandleCandidates(name)){
-      const v=core.validateHandle(cand);
-      if(!v.ok)continue;
+    const candidates=(typeof socialHandleCandidates==='function')?socialHandleCandidates(name):[name];
+    const cand=candidates.find(c=>core.validateHandle(c).ok)||candidates[0];
+    const v=core.validateHandle(cand);
+    if(v.ok){
       let free=false;
-      try{const chk=await core.api.profileCheck(v.handle);free=!!(chk.ok&&chk.data?.available===true);if(!chk.ok)lastMessage=chk.message||lastMessage}catch(_){}
-      if(!free)continue;
-      const res=await core.api.profileCreate({handle:v.handle,friendsVisible:true,leagueOptIn:true});
-      if(res.ok){socialProfileCache=res.data?.profile||null;socialSummaryAt=0;try{queueSocialEvidence()}catch(_){}return {ok:true,handle:rememberSocialHandle(v.handle),profile:socialProfileCache}}
-      if(res.error==='profile_exists'){
-        try{const me2=await core.api.profileMe();if(me2.ok&&me2.data?.profile){socialProfileCache=me2.data.profile;return {ok:true,handle:rememberSocialHandle(me2.data.profile.handle),profile:me2.data.profile}}}catch(_){}
-        return {ok:true,handle:rememberSocialHandle(v.handle)};
+      try{
+        const chk=await core.api.profileCheck(v.handle);
+        const avail=(chk?.data?.available!==undefined)?chk.data.available:(chk?.data?.data?.available!==undefined?chk.data.data.available:(chk?.available!==undefined?chk.available:false));
+        free=!!(chk.ok&&avail===true);
+        if(!chk.ok)lastMessage=chk.message||lastMessage;
+      }catch(_){}
+      if(free){
+        const res=await core.api.profileCreate({handle:v.handle,friendsVisible:true,leagueOptIn:true});
+        if(res.ok){socialProfileCache=res.data?.profile||null;socialSummaryAt=0;try{queueSocialEvidence()}catch(_){}return {ok:true,handle:rememberSocialHandle(v.handle),profile:socialProfileCache}}
+        if(res.error==='profile_exists'){
+          try{const me2=await core.api.profileMe();if(me2.ok&&me2.data?.profile){socialProfileCache=me2.data.profile;return {ok:true,handle:rememberSocialHandle(me2.data.profile.handle),profile:me2.data.profile}}}catch(_){}
+          return {ok:true,handle:rememberSocialHandle(v.handle)};
+        }
+        if(res.error==='handle_taken'){
+          return {ok:false,error:'handle_taken',handle:v.handle,message:FiezelI18n.t('social.error-handle-taken','Nama itu sudah dipakai orang lain — coba variasi lain.')};
+        }
+        return {ok:false,message:res.message};
+      }else{
+        return {ok:false,error:'handle_taken',handle:v.handle,message:FiezelI18n.t('social.error-handle-taken','Nama itu sudah dipakai orang lain — coba variasi lain.')};
       }
-      if(res.error==='handle_taken'){lastMessage=res.message;continue}
-      return {ok:false,message:res.message};
     }
     return {ok:false,message:lastMessage||FiezelI18n.t('social.degraded-body')};
   })().finally(()=>{studentRegistrationPromise=null});

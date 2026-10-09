@@ -1,7 +1,7 @@
 {
-  "version": "m025-532",
+  "version": "m025-533",
   "claimedBy": "branch feat/undercover-multiplayer-game",
-  "claimedAt": "2026-10-09T13:46:04.007Z",
-  "reason": "feat(undercover): rilis game multiplayer undercover deduksi kata bahasa inggris (m025-532)",
+  "claimedAt": "2026-10-09T14:21:13.562Z",
+  "reason": "perf(mobile): optimasi ekstrim latensi tap 300ms, 3d mochi three.js, memoize grammar sequence, dan layout reflow",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
