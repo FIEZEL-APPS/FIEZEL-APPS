@@ -1,7 +1,7 @@
 {
-  "version": "m025-525",
-  "claimedBy": "branch feat/qr-camera-scanner-and-gallery",
-  "claimedAt": "2026-10-09T06:35:20.948Z",
-  "reason": "feat(qr): scanner kamera dan unggah galeri untuk tambah teman",
+  "version": "m025-526",
+  "claimedBy": "branch fix/notif-autosync-qr-compact",
+  "claimedAt": "2026-10-09T07:51:35.713Z",
+  "reason": "fix(notif,qr): auto-sync notifikasi dan layout modal qr kompak bebas scroll (m025-526)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
