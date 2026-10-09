@@ -19008,9 +19008,10 @@ if(typeof document!=='undefined'){
 
 async function ensureQrDecoderLoaded(){
   if(typeof jsQR==='function'||(typeof window!=='undefined'&&typeof window.jsQR==='function'))return true;
-  if(typeof window!=='undefined'&&window.FiezelLazyLoader&&typeof window.FiezelLazyLoader.load==='function'){
+  const lazy=typeof self!=='undefined'?(self.FiezelLazy||self.FiezelLazyLoader):(typeof window!=='undefined'?(window.FiezelLazy||window.FiezelLazyLoader):null);
+  if(lazy&&typeof lazy.load==='function'){
     try{
-      await window.FiezelLazyLoader.load('qr');
+      await lazy.load('qr');
       return typeof jsQR==='function'||(typeof window!=='undefined'&&typeof window.jsQR==='function');
     }catch(_){return false;}
   }

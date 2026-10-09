@@ -209,6 +209,7 @@
       boot: boot
     });
     target.FiezelLazy = api;
+    target.FiezelLazyLoader = api;
     boot();
     return api;
   }
