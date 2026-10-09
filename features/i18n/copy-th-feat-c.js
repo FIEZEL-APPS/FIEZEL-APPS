@@ -241,6 +241,20 @@
     'profile.speech-speed-title': 'ความเร็วเสียงบทสนทนา',
     'profile.speed-set': 'ตั้งค่าความเร็วเสียงแล้ว',
     'profile.sync-desc': 'ข้อมูลความคืบหน้าการเรียนถูกบันทึกอย่างปลอดภัยบนคลาวด์',
-    'profile.sync-title': 'การซิงค์และรหัสนักเรียน'
+    'profile.sync-title': 'การซิงค์และรหัสนักเรียน',
+    'profile.status-independent': 'ผู้เรียนอิสระ',
+    'profile.level-prefix': 'ระดับ',
+    'profile.level-basic': 'พื้นฐาน',
+    'profile.min-unit': 'นาที',
+    'profile.your-id': 'รหัสของคุณ',
+    'profile.qr-btn': 'QR',
+    'profile.requests-count': 'คำขอเป็นเพื่อนใหม่',
+    'profile.btn-connect': 'เชื่อมต่อ',
+    'profile.btn-scan-qr': 'สแกน & QR',
+    'profile.btn-friend-list': 'รายชื่อเพื่อน',
+    'profile.btn-leaderboard': 'กระดานผู้นำ',
+    'profile.chime-active': 'เปิดเสียงสั่น',
+    'profile.chime-inactive': 'ปิดเสียงสั่น',
+    'profile.online-status-badge': 'ออนไลน์'
   });
 }());

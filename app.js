@@ -18525,8 +18525,8 @@ function tactileProfileCockpitMarkup(opts={}){
           </div>
           <div class="profile-handle">@${esc(handle)}</div>
           <div class="profile-badges-row">
-            <span class="profile-level-chip">Level ${esc(level)} Dasar</span>
-            <span class="profile-status-chip">Pelajar Mandiri</span>
+            <span class="profile-level-chip">${t('profile.level-prefix','Level')} ${esc(level)} ${t('profile.level-basic','Dasar')}</span>
+            <span class="profile-status-chip">${t('profile.status-independent','Pelajar Mandiri')}</span>
           </div>
         </div>
       </div>
@@ -18559,21 +18559,21 @@ function tactileProfileCockpitMarkup(opts={}){
         </div>
         <div class="profile-online-badge-pill" style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;background:#ECFDF5;color:#059669;border:1px solid #A7F3D0;">
           <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#10B981;"></span>
-          <span>Online</span>
+          <span>${t('profile.online-status-badge','Online')}</span>
         </div>
       </div>
       <div class="section-card-body" style="display:flex;flex-direction:column;gap:10px;">
         <div class="profile-id-tactile-row" style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#F8FAFC;border:1.5px solid #E2E8F0;border-radius:12px;gap:8px;">
           <div style="display:flex;flex-direction:column;min-width:0;">
-            <span style="font-size:10px;font-weight:700;color:#64748B;letter-spacing:0.04em;text-transform:uppercase;">ID Kamu</span>
+            <span style="font-size:10px;font-weight:700;color:#64748B;letter-spacing:0.04em;text-transform:uppercase;">${t('profile.your-id','ID Kamu')}</span>
             <span class="fz2-myid" data-testid="my-social-id" style="font-size:13.5px;font-weight:800;color:#0F172A;font-family:monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">@${esc(handle||'murid')}</span>
           </div>
           <div style="display:flex;gap:6px;flex-shrink:0;">
-            <button class="btn-copy-code" type="button" onclick="socialCopyId()" data-testid="copy-id-btn" title="Salin ID" style="padding:6px 10px;font-size:11px;font-weight:700;border-radius:8px;">
-              <i data-lucide="copy" style="width:12px;height:12px;vertical-align:-1px;margin-right:2px;"></i> Salin
+            <button class="btn-copy-code" type="button" onclick="socialCopyId()" data-testid="copy-id-btn" title="${t('profile.copy-btn','Salin')}" style="padding:6px 10px;font-size:11px;font-weight:700;border-radius:8px;">
+              <i data-lucide="copy" style="width:12px;height:12px;vertical-align:-1px;margin-right:2px;"></i> ${t('profile.copy-btn','Salin')}
             </button>
-            <button class="btn-copy-code" type="button" onclick="openProfileQr()" data-testid="show-qr-btn" title="Tampilkan QR" style="padding:6px 10px;font-size:11px;font-weight:700;border-radius:8px;background:#F0FDF4;color:#166534;border-color:#BBF7D0;">
-              <i data-lucide="qr-code" style="width:12px;height:12px;vertical-align:-1px;margin-right:2px;"></i> QR
+            <button class="btn-copy-code" type="button" onclick="openProfileQr()" data-testid="show-qr-btn" title="${t('profile.qr-btn','QR')}" style="padding:6px 10px;font-size:11px;font-weight:700;border-radius:8px;background:#F0FDF4;color:#166534;border-color:#BBF7D0;">
+              <i data-lucide="qr-code" style="width:12px;height:12px;vertical-align:-1px;margin-right:2px;"></i> ${t('profile.qr-btn','QR')}
             </button>
           </div>
         </div>
@@ -18581,26 +18581,26 @@ function tactileProfileCockpitMarkup(opts={}){
         ${socialRequestCount>0?`
         <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#FEF2F2;border:1.5px solid #FECACA;border-radius:12px;">
           <span style="font-size:11.5px;font-weight:700;color:#DC2626;display:flex;align-items:center;gap:6px;">
-            <i data-lucide="bell" style="width:14px;height:14px;"></i> ${socialRequestCount} Permintaan Teman Baru
+            <i data-lucide="bell" style="width:14px;height:14px;"></i> ${socialRequestCount} ${t('profile.requests-count','Permintaan Teman Baru')}
           </span>
-          <button type="button" onclick="openFriendConnectModal('requests')" style="font-size:11px;font-weight:800;padding:4px 10px;border-radius:8px;background:#DC2626;color:#FFF;border:none;cursor:pointer;">Lihat</button>
+          <button type="button" onclick="openFriendConnectModal('requests')" style="font-size:11px;font-weight:800;padding:4px 10px;border-radius:8px;background:#DC2626;color:#FFF;border:none;cursor:pointer;">${t('common.view','Lihat')}</button>
         </div>`:''}
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
           <button class="profile-action-btn secondary" type="button" onclick="openFriendConnectModal('invite')" style="padding:9px 8px;font-size:12px;font-weight:700;justify-content:center;margin:0;border-radius:10px;">
-            <i data-lucide="user-plus" style="width:14px;height:14px;vertical-align:-2px;margin-right:4px;color:#0284C7;"></i> Hubungkan
+            <i data-lucide="user-plus" style="width:14px;height:14px;vertical-align:-2px;margin-right:4px;color:#0284C7;"></i> ${t('profile.btn-connect','Hubungkan')}
           </button>
           <button class="profile-action-btn secondary" type="button" onclick="openFriendConnectModal('scan')" style="padding:9px 8px;font-size:12px;font-weight:700;justify-content:center;margin:0;border-radius:10px;">
-            <i data-lucide="camera" style="width:14px;height:14px;vertical-align:-2px;margin-right:4px;color:#10B981;"></i> Scan & QR
+            <i data-lucide="camera" style="width:14px;height:14px;vertical-align:-2px;margin-right:4px;color:#10B981;"></i> ${t('profile.btn-scan-qr','Scan & QR')}
           </button>
         </div>
 
         <div style="display:flex;gap:6px;">
           <button type="button" onclick="switchOnlineTab('teman')" style="flex:1;padding:7px;border-radius:9px;background:#F1F5F9;border:1px solid #E2E8F0;font-size:11px;font-weight:700;color:#475569;display:flex;align-items:center;justify-content:center;gap:4px;cursor:pointer;">
-            <i data-lucide="users" style="width:12px;height:12px;"></i> Daftar Teman
+            <i data-lucide="users" style="width:12px;height:12px;"></i> ${t('profile.btn-friend-list','Daftar Teman')}
           </button>
           <button type="button" onclick="switchOnlineTab('papan')" style="flex:1;padding:7px;border-radius:9px;background:#F1F5F9;border:1px solid #E2E8F0;font-size:11px;font-weight:700;color:#475569;display:flex;align-items:center;justify-content:center;gap:4px;cursor:pointer;">
-            <i data-lucide="trophy" style="width:12px;height:12px;"></i> Papan Skor
+            <i data-lucide="trophy" style="width:12px;height:12px;"></i> ${t('profile.btn-leaderboard','Papan Skor')}
           </button>
         </div>
 
@@ -18619,15 +18619,15 @@ function tactileProfileCockpitMarkup(opts={}){
       <div class="section-card-body">
         <div class="goal-pills-row" id="profileGoalPills">
           <div class="goal-pill-btn${dailyGoal===5?' active':''}" onclick="selectDailyGoal(this, 5)">
-            <span class="goal-time">5 Mnt</span>
+            <span class="goal-time">5 ${t('profile.min-unit','Mnt')}</span>
             <span class="goal-label">${t('profile.goal-easy','Santai')}</span>
           </div>
           <div class="goal-pill-btn${dailyGoal===15?' active':''}" onclick="selectDailyGoal(this, 15)">
-            <span class="goal-time">15 Mnt</span>
+            <span class="goal-time">15 ${t('profile.min-unit','Mnt')}</span>
             <span class="goal-label">${t('profile.goal-std','Standar')}</span>
           </div>
           <div class="goal-pill-btn${dailyGoal===30?' active':''}" onclick="selectDailyGoal(this, 30)">
-            <span class="goal-time">30 Mnt</span>
+            <span class="goal-time">30 ${t('profile.min-unit','Mnt')}</span>
             <span class="goal-label">${t('profile.goal-hard','Intensif')}</span>
           </div>
         </div>
@@ -18651,7 +18651,7 @@ function tactileProfileCockpitMarkup(opts={}){
           <div class="section-card-desc">${t('profile.audio-desc','Atur tempo suara percakapan dan efek chime haptik')}</div>
         </div>
         <div class="header-action-group">
-          <span class="card-collapsed-pill" id="pillAudioSummary">${currentSpeed}x · ${chimeOn?'Chime Aktif':'Chime Nonaktif'}</span>
+          <span class="card-collapsed-pill" id="pillAudioSummary">${currentSpeed}x · ${chimeOn?t('profile.chime-active','Chime Aktif'):t('profile.chime-inactive','Chime Nonaktif')}</span>
           <button class="btn-card-collapse" type="button" id="btnMinimizeSuaraAudio" aria-label="Minimize atau Buka" onclick="event.stopPropagation();toggleCardCollapse('cardSuaraAudio')">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="chevron-icon">
               <polyline points="18 15 12 9 6 15"></polyline>

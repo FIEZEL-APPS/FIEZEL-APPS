@@ -241,6 +241,20 @@
     'profile.speech-speed-title': 'Kecepatan Suara Percakapan',
     'profile.speed-set': 'Kecepatan audio diatur',
     'profile.sync-desc': 'Data progres belajarmu tersimpan aman di cloud',
-    'profile.sync-title': 'Sinkronisasi & ID Akun Murid'
+    'profile.sync-title': 'Sinkronisasi & ID Akun Murid',
+    'profile.status-independent': 'Pelajar Mandiri',
+    'profile.level-prefix': 'Level',
+    'profile.level-basic': 'Dasar',
+    'profile.min-unit': 'Mnt',
+    'profile.your-id': 'ID Kamu',
+    'profile.qr-btn': 'QR',
+    'profile.requests-count': 'Permintaan Teman Baru',
+    'profile.btn-connect': 'Hubungkan',
+    'profile.btn-scan-qr': 'Scan & QR',
+    'profile.btn-friend-list': 'Daftar Teman',
+    'profile.btn-leaderboard': 'Papan Skor',
+    'profile.chime-active': 'Chime Aktif',
+    'profile.chime-inactive': 'Chime Nonaktif',
+    'profile.online-status-badge': 'Online'
   });
 }());
