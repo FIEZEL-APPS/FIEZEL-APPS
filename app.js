@@ -18974,8 +18974,12 @@ let _qrStream=null;
 let _qrScanAnimId=null;
 let _qrScanningActive=false;
 let _qrOffscreenCanvas=null;
+let _qrScanGen=0;
+let _qrLastScannedText='';
+let _qrLastScannedAt=0;
 
 function stopQrScanner(){
+  _qrScanGen++;
   _qrScanningActive=false;
   if(_qrScanAnimId){
     cancelAnimationFrame(_qrScanAnimId);
@@ -18992,12 +18996,23 @@ function stopQrScanner(){
 }
 window.stopQrScanner=stopQrScanner;
 
+if(typeof document!=='undefined'){
+  try{
+    document.addEventListener('visibilitychange',()=>{
+      if(document.visibilityState==='hidden'){
+        stopQrScanner();
+      }
+    });
+  }catch(_){}
+}
+
 async function startQrVideoScan(){
   stopQrScanner();
+  const currentGen=++_qrScanGen;
   const video=$('qrScanVideo');
   const fallback=$('fzQrCamFallback');
   const reticle=$('fzQrReticle');
-  if(!video)return;
+  if(!video||!modalOpen)return;
 
   if(!navigator?.mediaDevices?.getUserMedia){
     if(fallback)fallback.style.display='flex';
@@ -19011,14 +19026,24 @@ async function startQrVideoScan(){
       video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}},
       audio:false
     });
+    if(currentGen!==_qrScanGen||!modalOpen||!$('qrScanVideo')){
+      try{stream.getTracks().forEach(t=>t.stop());}catch(_){}
+      return;
+    }
     _qrStream=stream;
     video.srcObject=stream;
     await video.play().catch(()=>{});
+    if(currentGen!==_qrScanGen||!modalOpen||!$('qrScanVideo')){
+      try{stream.getTracks().forEach(t=>t.stop());}catch(_){}
+      _qrStream=null;
+      return;
+    }
     _qrScanningActive=true;
     if(fallback)fallback.style.display='none';
     if(reticle)reticle.style.display='block';
     _qrScanAnimId=requestAnimationFrame(tickQrScan);
   }catch(err){
+    if(currentGen!==_qrScanGen)return;
     console.warn('[Fiezel QR] Kamera tidak dapat dibuka:', err);
     if(fallback)fallback.style.display='flex';
     if(reticle)reticle.style.display='none';
@@ -19030,7 +19055,11 @@ window.startQrVideoScan=startQrVideoScan;
 function tickQrScan(){
   if(!_qrScanningActive)return;
   const video=$('qrScanVideo');
-  if(!video||video.paused||video.ended){
+  if(!video||!modalOpen){
+    _qrScanningActive=false;
+    return;
+  }
+  if(video.paused||video.ended){
     _qrScanAnimId=requestAnimationFrame(tickQrScan);
     return;
   }
@@ -19065,30 +19094,38 @@ function tickQrScan(){
 function parseFriendHandleFromQr(text){
   if(!text)return null;
   const s=String(text).trim();
-  const mUrl=s.match(/[?&]friend=@?([a-zA-Z0-9_]{3,24})/i);
+  const mUrl=s.match(/[?&]friend=@?([a-zA-Z0-9_]{3,20})(?:&|#|$)/i);
   if(mUrl)return mUrl[1].toLowerCase();
-  const mDeep=s.match(/(?:(?:https?:\/\/)?[^/]+\/(?:app\/)?(?:#|\?)?friend\/|@)([a-zA-Z0-9_]{3,24})/i);
+  const mDeep=s.match(/(?:^|\/)(?:app\/)?(?:#|\?)?friend\/@?([a-zA-Z0-9_]{3,20})(?:[/?#]|$)/i);
   if(mDeep)return mDeep[1].toLowerCase();
-  if(/^[a-zA-Z0-9_]{3,24}$/.test(s))return s.toLowerCase();
+  const mAt=s.match(/(?:^|\s)@([a-zA-Z0-9_]{3,20})$/);
+  if(mAt)return mAt[1].toLowerCase();
+  if(/^[a-zA-Z0-9_]{3,20}$/.test(s))return s.toLowerCase();
   return null;
 }
 window.parseFriendHandleFromQr=parseFriendHandleFromQr;
 
 function handleScannedQrResult(text){
-  try{if(feedbackSoundsOn())uiSfx('success')}catch(_){}
-  stopQrScanner();
+  const now=Date.now();
+  const raw=String(text||'').trim();
+  if(raw&&raw===_qrLastScannedText&&now-_qrLastScannedAt<3000){
+    return;
+  }
+  _qrLastScannedText=raw;
+  _qrLastScannedAt=now;
+
   const myHandle=(socialProfileCache?.handle||storedSocialHandle()||'').toLowerCase();
   const target=parseFriendHandleFromQr(text);
   if(!target){
     showToast(FiezelI18n.t('social3.scan-invalid'));
-    if(modalOpen&&$('qrScanVideo'))startQrVideoScan();
     return;
   }
   if(myHandle&&target===myHandle){
     showToast(FiezelI18n.t('social3.scan-self'));
-    if(modalOpen&&$('qrScanVideo'))startQrVideoScan();
     return;
   }
+  try{if(feedbackSoundsOn())uiSfx('success')}catch(_){}
+  stopQrScanner();
   closeModalNow();
   setTimeout(()=>socialFriendLinkSheet(target),160);
 }
@@ -19103,15 +19140,28 @@ async function handleQrFilePicked(event){
       const img=new Image();
       img.onload=function(){
         const canvas=document.createElement('canvas');
-        canvas.width=img.naturalWidth||img.width;
-        canvas.height=img.naturalHeight||img.height;
+        const nw=img.naturalWidth||img.width;
+        const nh=img.naturalHeight||img.height;
+        if(!nw||!nh){
+          showToast(FiezelI18n.t('social3.scan-not-found'));
+          return;
+        }
+        const maxDim=1024;
+        let scale=1;
+        if(nw>maxDim||nh>maxDim){
+          scale=Math.min(maxDim/nw,maxDim/nh);
+        }
+        const cw=Math.round(nw*scale);
+        const ch=Math.round(nh*scale);
+        canvas.width=cw;
+        canvas.height=ch;
         const ctx=canvas.getContext('2d');
-        ctx.drawImage(img,0,0);
-        const imgData=ctx.getImageData(0,0,canvas.width,canvas.height);
+        ctx.drawImage(img,0,0,cw,ch);
+        const imgData=ctx.getImageData(0,0,cw,ch);
         const decoder=typeof jsQR==='function'?jsQR:(typeof window.jsQR==='function'?window.jsQR:null);
         let code=null;
         if(decoder){
-          code=decoder(imgData.data,canvas.width,canvas.height,{inversionAttempts:'attemptBoth'});
+          code=decoder(imgData.data,cw,ch,{inversionAttempts:'attemptBoth'});
         }
         if(code&&code.data){
           handleScannedQrResult(code.data);
@@ -19136,7 +19186,6 @@ window.handleQrFilePicked=handleQrFilePicked;
 async function openFriendConnectModal(initialTab='scan'){
   try{if(feedbackSoundsOn())uiSfx('click')}catch(_){}
   const handle=socialProfileCache?.handle||storedSocialHandle()||'murid';
-  try{await refreshFriendRequestCount()}catch(_){}
   let activeTab=initialTab;
 
   function renderModalBody(){
@@ -19246,7 +19295,7 @@ async function openFriendConnectModal(initialTab='scan'){
           <i data-lucide="user-plus" style="width:11px;height:11px;flex-shrink:0;"></i> Tambah ID
         </button>
         <button type="button" onclick="window._switchConnectModalTab('requests')" style="flex:1;padding:6px 2px;font-size:10px;font-weight:800;border-radius:8px;border:none;cursor:pointer;background:${activeTab==='requests'?'#FFC800 !important':'transparent !important'};color:${activeTab==='requests'?'#1B1418 !important':'#94A3B8 !important'};box-shadow:${activeTab==='requests'?'0 2px 8px rgba(255,200,0,0.3)':'none'};display:flex;align-items:center;justify-content:center;gap:3px;overflow:hidden;white-space:nowrap;">
-          <i data-lucide="bell" style="width:11px;height:11px;flex-shrink:0;"></i> Terima ${reqCount>0?`<span style="background:#EF4444;color:#FFF;border-radius:99px;padding:0 3px;font-size:9px;font-weight:800;">${reqCount}</span>`:''}
+          <i data-lucide="bell" style="width:11px;height:11px;flex-shrink:0;"></i> Terima <span id="connectBadgeCount" style="background:#EF4444;color:#FFF;border-radius:99px;padding:0 3px;font-size:9px;font-weight:800;display:${reqCount>0?'inline-block':'none'};">${reqCount>0?reqCount:''}</span>
         </button>
       </div>
 
@@ -19271,6 +19320,17 @@ async function openFriendConnectModal(initialTab='scan'){
 
   openModal(renderModalBody());
   $('modalPanel')?.classList.add('modal-connect-panel');
+  try{
+    refreshFriendRequestCount(false).then(cnt=>{
+      const c=Number(cnt)||0;
+      const b=$('connectBadgeCount');
+      if(b){
+        b.textContent=c>0?String(c):'';
+        b.style.display=c>0?'inline-block':'none';
+      }
+    }).catch(()=>{});
+  }catch(_){}
+
   if(initialTab==='scan'){await startQrVideoScan();}
   else if(initialTab==='requests'){await loadConnectRequests();}
   else if(initialTab==='invite'){setTimeout(()=>{$('connectFriendInput')?.focus()},60);}
@@ -19377,8 +19437,15 @@ function saveNotifCachedRequests(list){
   try{localStorage.setItem('fz_notif_cached_requests',JSON.stringify(notifCachedRequests))}catch(_){}
 }
 try{Object.defineProperty(window,'notifCachedRequests',{get:()=>notifCachedRequests,set:(v)=>saveNotifCachedRequests(v),configurable:true})}catch(_){}
-async function refreshFriendRequestCount(){
+let _lastFriendReqPollAt=0;
+const FRIEND_REQ_MIN_GAP_MS=60000;
+async function refreshFriendRequestCount(force){
   const core=socialCore();if(!core)return socialRequestCount;
+  const now=Date.now();
+  if(!force&&(now-_lastFriendReqPollAt<FRIEND_REQ_MIN_GAP_MS)){
+    return socialRequestCount;
+  }
+  _lastFriendReqPollAt=now;
   try{
     const res=await core.api.friendRequests();
     if(res.ok&&Array.isArray(res.data?.requests)){
@@ -20180,14 +20247,11 @@ async function notifSyncRound(){
   }catch(_){notifFailStreak++}
   finally{notifSyncing=false;notifSyncingSince=0}
 }
-/* 15 detik, turun dari 60. Sisi guru menyegarkan dirinya tiap 10 detik (SYNC_EVERY_MS di
-   fiezel-teacher-shell.js), jadi pada angka lama papan guru hidup sementara layar murid
-   tertinggal satu menit penuh: tugas yang baru dikirim guru baru muncul setelah murid
-   menutup-buka aplikasi, dan itu terbaca sebagai "aplikasinya lambat", bukan sebagai jeda
-   polling. Lantai server untuk tanya ini 5 detik (ASSIGN_LIMITS.LEARNER_POLL_MIN_INTERVAL_MS),
-   jadi 15 detik masih tiga kali lipat di atasnya - dan timer ini SUDAH diam total saat
-   aplikasi tidak terlihat, sehingga biayanya hanya jatuh pada murid yang benar-benar sedang
-   memandang layarnya. */
+/* 6 detik (NOTIF_POLL_MS=6000), diselaraskan untuk sinkronisasi tugas guru secara responsif.
+   Permintaan teman dijaga throttle terpisah (FRIEND_REQ_MIN_GAP_MS=60000) dan notifikasi sosial
+   oleh SOCIAL_NOTIFY_MIN_GAP_MS=90000 agar tidak membebani kueri D1. Lantai server penugasan
+   adalah 5 detik (ASSIGN_LIMITS.LEARNER_POLL_MIN_INTERVAL_MS), dan timer ini diam total saat
+   aplikasi tidak terlihat (visibilitychange). */
 const NOTIF_POLL_MS=6000;
 function startNotifPolling(){
   if(notifPollTimer)return false;
