@@ -114,9 +114,10 @@
     var initialBadge = 'chat_purple';
     var initialAura = 'purple';
 
-    var rect = host.getBoundingClientRect();
-    var w = rect.width > 20 ? rect.width : (host.offsetWidth > 20 ? host.offsetWidth : 380);
-    var h = rect.height > 20 ? rect.height : (host.offsetHeight > 20 ? host.offsetHeight : 360);
+    var w = host.offsetWidth > 20 ? host.offsetWidth : (host.getBoundingClientRect ? host.getBoundingClientRect().width : 380);
+    var h = host.offsetHeight > 20 ? host.offsetHeight : (host.getBoundingClientRect ? host.getBoundingClientRect().height : 360);
+    if (w <= 20) w = 380;
+    if (h <= 20) h = 360;
 
     try {
       var mochi = new global.FiezelMochi(viewport, {
@@ -387,6 +388,7 @@
       };
 
       // Monitor detachment to clean up WebGL resources
+      var removeObserver = null;
       var checkRemoval = function () {
         if (!global.document.contains(host)) {
           if (host.__mochiInstance) {
@@ -394,10 +396,14 @@
             host.__mochiInstance = null;
           }
           host.__mochiAttached = false;
+          if (removeObserver) {
+            removeObserver.disconnect();
+            removeObserver = null;
+          }
         }
       };
 
-      var removeObserver = new MutationObserver(checkRemoval);
+      removeObserver = new MutationObserver(checkRemoval);
       removeObserver.observe(global.document.body || global.document.documentElement, {
         childList: true,
         subtree: true
@@ -467,8 +473,9 @@
   function init() {
     ensureMochiModule();
 
-    // DOM MutationObserver for dynamically inserted quiz stages and practice panels
+    // DOM MutationObserver for dynamically inserted quiz stages and practice panels (debounced)
     try {
+      var moTimer = null;
       var mo = new MutationObserver(function (mutations) {
         var hasAdded = false;
         for (var i = 0; i < mutations.length; i++) {
@@ -477,7 +484,10 @@
             break;
           }
         }
-        if (hasAdded) scanAndAttach();
+        if (hasAdded) {
+          if (moTimer) clearTimeout(moTimer);
+          moTimer = setTimeout(scanAndAttach, 60);
+        }
       });
       mo.observe(global.document.body || global.document.documentElement, {
         childList: true,

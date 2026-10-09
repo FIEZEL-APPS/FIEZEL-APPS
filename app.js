@@ -100,7 +100,20 @@ function setLearnerName(value){
   try{name=self.FiezelOnboarding?.normalizeName?.(name)??name}catch{}
   if(!name)return false;
   if(name===state.userName)return true;
-  state.userName=name;save();
+  state.userName=name;
+  try{
+    if(typeof socialHandleCandidates==='function'){
+      const cand=socialHandleCandidates(name)[0];
+      const gEmail=self.FiezelGoogle?.rememberedEmail?.()||'';
+      const emailPrefix=gEmail?gEmail.split('@')[0].toLowerCase():'';
+      if(cand&&(!socialProfileCache?.handle||!state.preferences?.socialHandle||state.preferences?.socialHandle===emailPrefix)){
+        if(state.preferences?.socialHandle!==cand){
+          state.preferences={...(state.preferences||{}),socialHandle:cand};
+        }
+      }
+    }
+  }catch(_){}
+  save();
   // Nama BARU didorong ke server segera (force), bukan menunggu rem harian: owner yang
   // melihat nama lama untuk murid yang sudah menggantinya adalah cara termudah membuat
   // dashboard terasa berbohong. Senyap dan tidak pernah menahan perkenalan.
@@ -8698,9 +8711,9 @@ function showAuthGate(at,next){
       try{self.FiezelOnboarding?.markLocaleSelected?.(self,self.FiezelI18n?.getLocale?.()||'id')}catch(_){}
       try{
         const acc=self.FiezelAccount?.getAccount?.()||self.FiezelAccount?.state?.();
-        const h=acc?.handle||(typeof self.FiezelGoogle!=='undefined'&&self.FiezelGoogle?.rememberedEmail?self.FiezelGoogle.rememberedEmail().split('@')[0]:'');
+        const h=acc?.handle;
         if(h){
-          if(!state.userName||state.userName===FALLBACK_LEARNER_NAME||state.userName==='Rian Pratama')state.userName=h;
+          if(!state.userName||state.userName===FALLBACK_LEARNER_NAME)state.userName=h;
           try{rememberSocialHandle(h)}catch(_){}
           save();
         }
@@ -11591,6 +11604,37 @@ window.showBrandSplash=showBrandSplash;
 // pernah selesai atau belum; di sini hanya disambungkan ke bagian aplikasi yang benar-benar
 // ada - goal ASLI dari FiezelPersonalJourney, tes penempatan yang sungguhan 25 soal, level
 // self-report yang tidak menimpa state.level.
+async function validateLearnerNameAvailability(name){
+  const clean=String(name||'').trim();
+  if(!clean)return {ok:false,message:FiezelI18n.t('social.error-schema-invalid','Isian belum sesuai aturan. Periksa lagi ya.')};
+  const cand=(typeof socialHandleCandidates==='function')
+    ? socialHandleCandidates(clean)[0]
+    : clean.toLowerCase().replace(/[^a-z0-9_]/g,'_');
+  const core=socialCore();
+  if(!core)return {ok:true};
+  if(typeof navigator!=='undefined'&&navigator.onLine===false)return {ok:true};
+  try{await core.ensureAnon()}catch(_){}
+  try{
+    const me=await core.api.profileMe();
+    if(me&&me.ok&&me.data?.profile?.handle&&me.data.profile.handle.toLowerCase()===cand.toLowerCase()){
+      return {ok:true};
+    }
+  }catch(_){}
+  try{
+    const chk=await core.api.profileCheck(cand);
+    const avail=(chk?.data?.available!==undefined)?chk.data.available:(chk?.data?.data?.available!==undefined?chk.data.data.available:(chk?.available!==undefined?chk.available:true));
+    if(chk&&chk.ok&&avail===false){
+      return {
+        ok:false,
+        error:'handle_taken',
+        message:FiezelI18n.t('social.error-handle-taken','Nama itu sudah dipakai orang lain — coba variasi lain.')
+      };
+    }
+  }catch(_){}
+  return {ok:true};
+}
+window.validateLearnerNameAvailability=validateLearnerNameAvailability;
+
 function showOnboarding(now=Date.now()){
   /* Audit F23 (2026-09-23): "Buka Demo Guru" (?teacher=preview) dan guru terverifikasi tidak
      pernah melihat perkenalan MURID. openApp() memanggil showBrandSplash() tanpa argumen,
@@ -11612,6 +11656,8 @@ function showOnboarding(now=Date.now()){
         try{self.FiezelI18n?.setLocale?.(value)}catch(_){}
         return value
       },
+      // Validasi server: menolak nama jika ID/handle yang dibentuk sudah terdaftar di server
+      validateName:validateLearnerNameAvailability,
       // m025-117: langkah pertama perkenalan. Namanya masuk ke state SEKETIKA, bukan di
       // ujung alur - murid yang menutup aplikasi di tengah perkenalan tetap punya namanya
       // saat kembali, dan Home tidak pernah tercat dengan sapaan netral setelah dijawab.
@@ -11662,6 +11708,7 @@ function askLearnerNameIfMissing(now=Date.now()){
   if(!onboarding||typeof onboarding.show!=='function')return false;
   try{
     return onboarding.show(self,{now,nameOnly:true,
+      validateName:validateLearnerNameAvailability,
       onName:({name})=>{setLearnerName(name)},
       onFinish:()=>{try{render()}catch{}afterOnboardingExit('home')}
     })?.shown===true
@@ -16918,6 +16965,19 @@ function gameHubMarkup(){
           <span class="arcade-play-hint">${esc(FiezelI18n.t('game.nujum-cta'))} ➔</span>
         </div>
       </div>
+
+      <!-- Undercover: Tactical Deduction Multiplayer -->
+      <div class="game-arcade-card undercover-card" style="border: 1px solid #d97706; background: linear-gradient(135deg, #181922 0%, #111216 100%);" onclick="window.location.href='./undercover.html'">
+        <div class="arcade-card-top">
+          <span class="arcade-badge" style="background:#2d2012; color:#fbbf24; border:1px solid #78350f;">【潜入】2–5P ONLINE</span>
+          <span class="arcade-icon-wrap" style="color:#f59e0b;"><i data-lucide="shield-check"></i></span>
+        </div>
+        <h4 class="arcade-card-title" style="color:#fff;">UNDERCOVER</h4>
+        <p class="arcade-card-desc" style="color:#94a3b8;">Investigasi semantik kata rahasia & adu deduksi lawan bot stealth.</p>
+        <div class="arcade-card-footer">
+          <span class="arcade-play-hint" style="color:#f59e0b; font-weight:700;">${esc(FiezelI18n.t('game.play-cta'))} ➔</span>
+        </div>
+      </div>
     </div>
   </div>`;
 }
@@ -18294,15 +18354,28 @@ window.toggleAutoAudio=function(checkbox){
   const t=(k,f)=>{const v=FiezelI18n.t(k);return(v===k||!v)?f:v};
   showToast(on?t('profile.auto-audio-on','Putar audio soal otomatis aktif'):t('profile.auto-audio-off','Putar audio soal otomatis dimatikan'),'success');
 };
-window.editProfileName=function(){
+window.editProfileName=async function(){
   try{if(feedbackSoundsOn())uiSfx('click')}catch(_){}
   const t=(k,f)=>{const v=FiezelI18n.t(k);return(v===k||!v)?f:v};
   const current=learnerName();
   const next=prompt(t('profile.prompt-name','Masukkan nama lengkap baru:'),current);
   if(next&&next.trim()&&next.trim()!==current){
-    state.userName=next.trim();
-    save();
-    try{learnerNameSyncToServer(state.userName)}catch(_){}
+    const clean=next.trim();
+    const cand=(typeof socialHandleCandidates==='function')?socialHandleCandidates(clean)[0]:'';
+    const core=socialCore();
+    if(cand&&core&&typeof navigator!=='undefined'&&navigator.onLine!==false){
+      try{
+        const me=await core.api.profileMe();
+        if(!me.ok||!me.data?.profile||me.data.profile.handle.toLowerCase()!==cand.toLowerCase()){
+          const chk=await core.api.profileCheck(cand);
+          if(chk&&chk.ok&&chk.data?.available===false){
+            showToast(t('social.error-handle-taken','Nama itu sudah dipakai orang lain — coba variasi lain.'),'warn');
+            return;
+          }
+        }
+      }catch(_){}
+    }
+    setLearnerName(clean);
     showToast(t('profile.name-updated','Nama profil berhasil diperbarui!'),'success');
     render();
   }
@@ -18313,16 +18386,24 @@ function tactileProfileCockpitMarkup(opts={}){
   const acc=self.FiezelAccount?.getAccount?.()||self.FiezelAccount?.state?.();
   const accHandle=acc?.handle||'';
   const googleEmail=(typeof self.FiezelGoogle!=='undefined'&&self.FiezelGoogle?.rememberedEmail)?self.FiezelGoogle.rememberedEmail():'';
-  const socialH=storedSocialHandle()||'';
-  const resolvedHandle=accHandle||socialH||(googleEmail?googleEmail.split('@')[0]:'')||'murid';
+  const emailPrefix=(googleEmail?googleEmail.split('@')[0].toLowerCase():'');
 
-  let name=(rawName && rawName!=='murid' && rawName!=='Fitra' && rawName!=='Sobat' && rawName!=='Rian Pratama')?rawName:'';
+  let name=(rawName && rawName.toLowerCase()!=='murid' && rawName!==FALLBACK_LEARNER_NAME)?rawName:'';
   if(!name&&acc?.teacherName)name=acc.teacherName;
   if(!name&&accHandle)name=accHandle;
-  if(!name&&googleEmail)name=googleEmail.split('@')[0];
-  if(!name&&socialH)name=socialH;
-  if(!name&&rawName&&rawName!=='Rian Pratama')name=rawName;
+  if(!name&&emailPrefix)name=emailPrefix;
   if(!name)name=t('common.sapaan-netral','Murid');
+
+  const serverHandle=socialProfileCache?.handle||'';
+  const candidateFromName=(name && name.toLowerCase()!=='murid' && typeof socialHandleCandidates==='function')
+    ? socialHandleCandidates(name)[0]
+    : '';
+  let storedH=storedSocialHandle()||'';
+  if(storedH && emailPrefix && storedH.toLowerCase()===emailPrefix && candidateFromName && !serverHandle){
+    storedH=candidateFromName;
+    try{rememberSocialHandle(candidateFromName)}catch(_){}
+  }
+  const handle=serverHandle||accHandle||candidateFromName||storedH||emailPrefix||'murid';
 
   const initials=(()=>{
     const parts=String(name||'').trim().split(/\s+/).filter(Boolean);
@@ -18330,7 +18411,6 @@ function tactileProfileCockpitMarkup(opts={}){
     if(parts.length===1)return parts[0].slice(0,2).toUpperCase();
     return (parts[0][0]+parts[parts.length-1][0]).toUpperCase();
   })();
-  const handle=resolvedHandle;
   const level=getActiveLevel()||'A1';
   const classCode=typeof learnerClassCode==='function'?learnerClassCode():'';
   const schoolName=classCode?(t('profile.class-prefix','Kelas')+' '+esc(classCode)):t('profile.school-default','SMA Negeri 1');
@@ -18699,20 +18779,31 @@ function registerStudentOnce(opts){
     }catch(_){}
     const name=String(opts?.name||'').trim()||learnerName();
     let lastMessage='';
-    for(const cand of socialHandleCandidates(name)){
-      const v=core.validateHandle(cand);
-      if(!v.ok)continue;
+    const candidates=(typeof socialHandleCandidates==='function')?socialHandleCandidates(name):[name];
+    const cand=candidates.find(c=>core.validateHandle(c).ok)||candidates[0];
+    const v=core.validateHandle(cand);
+    if(v.ok){
       let free=false;
-      try{const chk=await core.api.profileCheck(v.handle);free=!!(chk.ok&&chk.data?.available===true);if(!chk.ok)lastMessage=chk.message||lastMessage}catch(_){}
-      if(!free)continue;
-      const res=await core.api.profileCreate({handle:v.handle,friendsVisible:true,leagueOptIn:true});
-      if(res.ok){socialProfileCache=res.data?.profile||null;socialSummaryAt=0;try{queueSocialEvidence()}catch(_){}return {ok:true,handle:rememberSocialHandle(v.handle),profile:socialProfileCache}}
-      if(res.error==='profile_exists'){
-        try{const me2=await core.api.profileMe();if(me2.ok&&me2.data?.profile){socialProfileCache=me2.data.profile;return {ok:true,handle:rememberSocialHandle(me2.data.profile.handle),profile:me2.data.profile}}}catch(_){}
-        return {ok:true,handle:rememberSocialHandle(v.handle)};
+      try{
+        const chk=await core.api.profileCheck(v.handle);
+        const avail=(chk?.data?.available!==undefined)?chk.data.available:(chk?.data?.data?.available!==undefined?chk.data.data.available:(chk?.available!==undefined?chk.available:false));
+        free=!!(chk.ok&&avail===true);
+        if(!chk.ok)lastMessage=chk.message||lastMessage;
+      }catch(_){}
+      if(free){
+        const res=await core.api.profileCreate({handle:v.handle,friendsVisible:true,leagueOptIn:true});
+        if(res.ok){socialProfileCache=res.data?.profile||null;socialSummaryAt=0;try{queueSocialEvidence()}catch(_){}return {ok:true,handle:rememberSocialHandle(v.handle),profile:socialProfileCache}}
+        if(res.error==='profile_exists'){
+          try{const me2=await core.api.profileMe();if(me2.ok&&me2.data?.profile){socialProfileCache=me2.data.profile;return {ok:true,handle:rememberSocialHandle(me2.data.profile.handle),profile:me2.data.profile}}}catch(_){}
+          return {ok:true,handle:rememberSocialHandle(v.handle)};
+        }
+        if(res.error==='handle_taken'){
+          return {ok:false,error:'handle_taken',handle:v.handle,message:FiezelI18n.t('social.error-handle-taken','Nama itu sudah dipakai orang lain — coba variasi lain.')};
+        }
+        return {ok:false,message:res.message};
+      }else{
+        return {ok:false,error:'handle_taken',handle:v.handle,message:FiezelI18n.t('social.error-handle-taken','Nama itu sudah dipakai orang lain — coba variasi lain.')};
       }
-      if(res.error==='handle_taken'){lastMessage=res.message;continue}
-      return {ok:false,message:res.message};
     }
     return {ok:false,message:lastMessage||FiezelI18n.t('social.degraded-body')};
   })().finally(()=>{studentRegistrationPromise=null});
@@ -18742,7 +18833,17 @@ async function registerStudentFromSettings(){
 window.registerStudentFromSettings=registerStudentFromSettings;
 /** Kartu pendaftaran di Pengaturan -> Profil. Sudah terdaftar = hanya menampilkan ID. */
 function studentRegistrationMarkup(){
-  const handle=storedSocialHandle()||socialProfileCache?.handle||'';
+  const gEmail=self.FiezelGoogle?.rememberedEmail?.()||'';
+  const emailPrefix=gEmail?gEmail.split('@')[0].toLowerCase():'';
+  let handle=socialProfileCache?.handle||storedSocialHandle()||'';
+  const candName=(state.userName && state.userName.toLowerCase()!=='murid' && typeof socialHandleCandidates==='function')
+    ? socialHandleCandidates(state.userName)[0]
+    : '';
+  if(handle && emailPrefix && handle.toLowerCase()===emailPrefix && candName && !socialProfileCache?.handle){
+    handle=candName;
+    try{rememberSocialHandle(candName)}catch(_){}
+  }
+  if(!handle && candName)handle=candName;
   if(handle)return `<div class="setting-row"><span class="setting-icon"><i data-lucide="at-sign"></i></span><span><b>${esc(FiezelI18n.t('social2.my-id',{handle}))}</b><small>${esc(FiezelI18n.t('social.profile-desc'))}</small></span></div>`;
   return `<div class="setting-row"><span class="setting-icon"><i data-lucide="user-plus"></i></span><span><b>${esc(FiezelI18n.t('social.create-title'))}</b><small>${esc(FiezelI18n.t('social.create-desc'))}</small></span></div><div class="actions"><button type="button" class="primary" id="studentRegisterBtn" onclick="registerStudentFromSettings()"><i data-lucide="user-plus"></i> ${FiezelI18n.t('social.create-btn')}</button></div>`;
 }
@@ -19618,13 +19719,34 @@ function socialCopyWithFallback(text,doneKey,failKey,params){
   fail();return false;
 }
 function socialCopyId(){
-  const handle=socialProfileCache?.handle||storedSocialHandle();
+  const candName=(state.userName && state.userName.toLowerCase()!=='murid' && typeof socialHandleCandidates==='function')
+    ? socialHandleCandidates(state.userName)[0]
+    : '';
+  const gEmail=self.FiezelGoogle?.rememberedEmail?.()||'';
+  const emailPrefix=gEmail?gEmail.split('@')[0].toLowerCase():'';
+  let handle=socialProfileCache?.handle||storedSocialHandle()||'';
+  if(handle && emailPrefix && handle.toLowerCase()===emailPrefix && candName && !socialProfileCache?.handle){
+    handle=candName;
+    try{rememberSocialHandle(candName)}catch(_){}
+  }
+  if(!handle && candName)handle=candName;
   if(!handle)return false;
   return socialCopyWithFallback(handle,'social3.copy-id-done','social3.copy-id-fail',{handle});
 }
 window.socialCopyId=socialCopyId;
 function openProfileQr(){
-  const handle=socialProfileCache?.handle||storedSocialHandle()||(state.userName?String(state.userName).trim().toLowerCase().replace(/[^a-z0-9_]/g,'_'):'');
+  const candName=(state.userName && state.userName.toLowerCase()!=='murid' && typeof socialHandleCandidates==='function')
+    ? socialHandleCandidates(state.userName)[0]
+    : '';
+  const gEmail=self.FiezelGoogle?.rememberedEmail?.()||'';
+  const emailPrefix=gEmail?gEmail.split('@')[0].toLowerCase():'';
+  let handle=socialProfileCache?.handle||storedSocialHandle()||'';
+  if(handle && emailPrefix && handle.toLowerCase()===emailPrefix && candName && !socialProfileCache?.handle){
+    handle=candName;
+    try{rememberSocialHandle(candName)}catch(_){}
+  }
+  if(!handle && candName)handle=candName;
+  if(!handle && state.userName)handle=String(state.userName).trim().toLowerCase().replace(/[^a-z0-9_]/g,'_');
   if(!handle)return showToast(FiezelI18n.t('social3.qr-need-profile','Profil sosial belum terdaftar.'));
   const qr=socialQrCore();
   if(!qr)return showToast(FiezelI18n.t('social3.qr-fail','Gagal membuat kode QR.'));
@@ -20785,7 +20907,7 @@ function syncLearnerAccountOnBoot(){
       self.FiezelAccount.getMe().then(function(res){
         if(res && res.ok && res.account){
           const h=res.account.handle;
-          if(h&&(!state.userName||state.userName===FALLBACK_LEARNER_NAME||state.userName==='Rian Pratama')){
+          if(h&&(!state.userName||state.userName===FALLBACK_LEARNER_NAME)){
             state.userName=h;
             try{rememberSocialHandle(h)}catch(_){}
             save();

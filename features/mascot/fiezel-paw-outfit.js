@@ -331,8 +331,21 @@
   /* ---------- ukuran render host (tier dikunci saat pasang, 19 §6.5) ---------- */
   function ukuranHost(host) {
     try {
-      var r = host.getBoundingClientRect();
-      return Math.min(r.width || 0, (r.height || 0) / 0.9375) || 0;
+      if (host.__fzUkuran && (Date.now() - (host.__fzUkuranTime || 0) < 1000)) {
+        return host.__fzUkuran;
+      }
+      var w = host.offsetWidth, h = host.offsetHeight;
+      if (!w || !h) {
+        var r = host.getBoundingClientRect();
+        w = r.width || 0;
+        h = r.height || 0;
+      }
+      var val = Math.min(w || 0, (h || 0) / 0.9375) || 0;
+      if (val > 0) {
+        host.__fzUkuran = val;
+        host.__fzUkuranTime = Date.now();
+      }
+      return val;
     } catch (_) { return 0; }
   }
 

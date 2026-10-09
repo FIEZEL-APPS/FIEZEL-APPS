@@ -96,15 +96,21 @@ export class FiezelMochi {
     this.camera.position.set(0, 0.08, 5.35); // Close-up framing: plush, prominent Daifuku Mochi with generous bounds
 
 
+    const isMobile = typeof window !== 'undefined' && (
+      window.innerWidth <= 768 ||
+      ('ontouchstart' in window) ||
+      (navigator.maxTouchPoints > 0)
+    );
+
     this.renderer = new THREE.WebGLRenderer({
-      antialias: true,
+      antialias: !isMobile,
       alpha: true,
       powerPreference: 'high-performance'
     });
     // Tone mapping is strictly NoToneMapping to banish dark/black edge fringes along transparent alpha borders!
     this.renderer.toneMapping = THREE.NoToneMapping;
     this.renderer.setSize(this.width, this.height);
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 2));
 
     this.renderer.domElement.style.width = '100%';
     this.renderer.domElement.style.height = '100%';
@@ -179,7 +185,14 @@ export class FiezelMochi {
    * Ultra-dense 128x96 subdivision for mathematically silky smooth antialiased contours.
    */
   createMochiMesh() {
-    const geo = new THREE.SphereGeometry(1.22, 128, 96);
+    const isMobile = typeof window !== 'undefined' && (
+      window.innerWidth <= 768 ||
+      ('ontouchstart' in window) ||
+      (navigator.maxTouchPoints > 0)
+    );
+    const segW = isMobile ? 56 : 128;
+    const segH = isMobile ? 42 : 96;
+    const geo = new THREE.SphereGeometry(1.22, segW, segH);
     const pos = geo.attributes.position;
 
     for (let i = 0; i < pos.count; i++) {
@@ -231,8 +244,9 @@ export class FiezelMochi {
     // AUTHENTIC GLOSSY DAIFUKU MOCHI WITH AIRBRUSHED ROSY CHEEK CONTOURS
     // Paints soft, delectable rosy blushes directly onto the daifuku rice skin texture
     this.skinCanvas = document.createElement('canvas');
-    this.skinCanvas.width = 1024;
-    this.skinCanvas.height = 1024;
+    const skinRes = isMobile ? 512 : 1024;
+    this.skinCanvas.width = skinRes;
+    this.skinCanvas.height = skinRes;
     this.sCtx = this.skinCanvas.getContext('2d');
     this.mochiSkinTexture = new THREE.CanvasTexture(this.skinCanvas);
 
@@ -1838,7 +1852,11 @@ export class FiezelMochi {
     this.badgeGroup.position.y += this.badgeLag.velY;
 
     if (this.badge === 'chat_purple' || this.badge === 'chat_blue') {
-      this.drawBadge();
+      this._badgeTimer = (this._badgeTimer || 0) + dt;
+      if (this._badgeTimer >= 0.05) {
+        this._badgeTimer = 0;
+        this.drawBadge();
+      }
     }
 
     // 7. Natural Eye Blinking Cycle
@@ -2152,7 +2170,24 @@ export class FiezelMochi {
 
   start() {
     let lastTime = performance.now();
+    this.isVisible = true;
+    if (this.container && typeof IntersectionObserver !== 'undefined' && !this._visibilityObserver) {
+      try {
+        this._visibilityObserver = new IntersectionObserver((entries) => {
+          this.isVisible = !!(entries[0] && entries[0].isIntersecting);
+        }, { threshold: 0.02 });
+        this._visibilityObserver.observe(this.container);
+      } catch (_) {}
+    }
+
     const loop = (now) => {
+      if (!this.rafId) return;
+      if (this.isVisible === false) {
+        this.rafId = setTimeout(() => {
+          this.rafId = requestAnimationFrame(loop);
+        }, 250);
+        return;
+      }
       const dt = Math.max(0, Math.min((now - lastTime) / 1000, 0.1));
       lastTime = now;
       this.update(dt);
@@ -2163,8 +2198,16 @@ export class FiezelMochi {
   }
 
   destroy() {
+    if (this._visibilityObserver) {
+      try { this._visibilityObserver.disconnect(); } catch (_) {}
+      this._visibilityObserver = null;
+    }
     if (this.rafId) {
-      cancelAnimationFrame(this.rafId);
+      if (typeof this.rafId === 'number' && typeof cancelAnimationFrame === 'function') {
+        cancelAnimationFrame(this.rafId);
+      } else {
+        clearTimeout(this.rafId);
+      }
       this.rafId = null;
     }
     if (this.scene) {

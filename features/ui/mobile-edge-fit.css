@@ -4,6 +4,12 @@
    viewport-fitted login screen for mobile devices.
    ========================================================================== */
 
+/* 0. Mobile Touch Responsiveness & Tap Delay Elimination (Duolingo & Apple Native Grade) */
+button, a, [role="button"], .launch-card, .quiz-option, .choice-btn, .token-chip, .tappable, .fz-tactile-btn {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
 /* 1. Viewport & App Container */
 @media (max-width: 768px) {
   html {
@@ -87,8 +93,8 @@
     border: none !important;
     border-bottom: 1.5px solid #E2E8F0 !important;
     background: rgba(253, 250, 243, 0.98) !important;
-    backdrop-filter: blur(20px) !important;
-    -webkit-backdrop-filter: blur(20px) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
     box-shadow: 0 2px 12px rgba(15, 23, 42, 0.05) !important;
     padding: max(10px, env(safe-area-inset-top, 10px)) 16px 10px 16px !important;
     display: grid !important;
