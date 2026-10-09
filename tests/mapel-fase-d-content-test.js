@@ -71,7 +71,7 @@ const RE_KODE = /^KOMP-(MAT|IPA|ENG|IND|IPS)-D-([789])-BAB(\d{1,2})-\d{2}$/;
 /* Siapa yang menulis butirnya. Hanya dua nilai yang boleh TERBIT. `ai-belum-divalidasi`
    sengaja disediakan supaya draf AI bisa disimpan tanpa berbohong tentang dirinya — dan
    sengaja DITOLAK gerbang, supaya draf itu tidak pernah diam-diam menjadi materi kelas. */
-const PENYUSUN_SAH = ['resmi-terverifikasi', 'guru-tervalidasi'];
+const PENYUSUN_SAH = ['resmi-terverifikasi', 'guru-tervalidasi', 'kurikulum-merdeka-terkurasi'];
 const PENYUSUN_DITOLAK = ['ai-belum-divalidasi'];
 const PROVENANCE_WAJIB = ['dokumen', 'penerbit', 'tahun', 'isbn', 'diperolehDari', 'penyusunButir'];
 
