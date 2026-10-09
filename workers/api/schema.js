@@ -99,6 +99,7 @@ export const BYTE_LIMITS = Object.freeze({
   // satu-satunya yang besar adalah evidence batch (maks 20 event, pola LIMITS
   // analytics 8KB — spec sosial §4.4.2).
   '/api/social/profile/create': 1024,
+  '/api/social/profile/rename': 1024,
   '/api/social/profile/check': 512,
   '/api/social/profile/me': 512,        // GET, tanpa body
   '/api/social/friends/invite': 512,
