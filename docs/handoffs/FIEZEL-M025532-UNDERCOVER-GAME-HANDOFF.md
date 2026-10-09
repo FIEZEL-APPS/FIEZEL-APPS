@@ -1,7 +1,7 @@
 # Berkas Serah Terima: FIEZEL-M025532-UNDERCOVER-GAME-HANDOFF
 
 ## 1. Ringkasan Temuan Audit & Solusi
-Rilis build **m025-533** menghadirkan modul permainan deduksi kata multiplayer taktis **UNDERCOVER: Tactical Deduction Studio Edition** serta penguatan performa seluler dan validasi nama murid ke dalam ekosistem FIEZEL PWA:
+Rilis build **m025-532** menghadirkan modul permainan deduksi kata multiplayer taktis **UNDERCOVER: Tactical Deduction Studio Edition** serta penguatan performa seluler dan validasi nama murid ke dalam ekosistem FIEZEL PWA:
 
 1. **Eliminasi Format Kuis Statis (Zero AI Slop)**:
    - Menggantikan kuis pilihan ganda ABCD biasa dengan game deduksi sosial rahasia (*Undercover / Spy Fall*).
@@ -46,18 +46,26 @@ Rilis build **m025-533** menghadirkan modul permainan deduksi kata multiplayer t
 2. **Pembersihan Race Condition Timer**:
    - Menjamin seluruh interval (`acceptCountdownTimer`, `searchTimerInterval`, `showdownInterval`) di-clear secara bersih saat reset permainan agar tidak terjadi memory leak atau eksekusi berganda.
 
+3. **Validasi Handle Server & Profil Nama**:
+   ```bash
+   node tools/dev/probe-auth-profile-name.mjs
+   node tools/dev/probe-name-server-check.mjs
+   ```
+   *Hasil*:
+   - Lulus 100%: nama profil dan handle sinkron, penolakan handle duplikat tervalidasi via API server.
+
 ---
 
 ## 3. Berkas yang Dimodifikasi & Ditambahkan
 - `undercover.html` (Baru): Implementasi lengkap antarmuka studio 100dvh dan logika permainan Undercover.
 - `features/learner-flow/fiezel-paw-arena.js`: Kartu Undercover pada lobby PAW Arena dengan pembungkus i18n `t('pawarena.start', 'Mulai')`.
 - `app.js`: Kartu arcade Undercover di `gameView()`, ikon `shield-check`, perbaikan rute `go()`, dan validasi nama onboarding.
-- `sw.js`: Pendaftaran `'./undercover.html'` pada `ASSETS` cache PWA dan pembaruan `SW_REV` ke `m025-533`.
-- `core-config.js`: Pembaruan `self.FIEZEL_PAGE_BUILD` ke `m025-533`.
-- `features/neural-voice/fiezel-diag-panel.js`: Pembaruan `DIAG_BUILD` ke `m025-533`.
-- `kurikulum.html`: Pembaruan string versi ke `m025-533`.
-- `misi.html`: Pembaruan string versi ke `m025-533`.
-- `coordination/BUILD-VERSION.json`: Pembaruan nomor versi ke `m025-533`.
+- `sw.js`: Pendaftaran `'./undercover.html'` pada `ASSETS` cache PWA dan pembaruan `SW_REV` ke `m025-532`.
+- `core-config.js`: Pembaruan `self.FIEZEL_PAGE_BUILD` ke `m025-532`.
+- `features/neural-voice/fiezel-diag-panel.js`: Pembaruan `DIAG_BUILD` ke `m025-532`.
+- `kurikulum.html`: Pembaruan string versi ke `m025-532`.
+- `misi.html`: Pembaruan string versi ke `m025-532`.
+- `coordination/BUILD-VERSION.json`: Pembaruan nomor versi ke `m025-532`.
 - `id-golden-baseline.json`: Pembaruan baseline naskah teks murid Indonesia.
 - `features/onboarding/fiezel-onboarding.js`: Validasi nama murid online.
 - `features/mascot/fiezel-mochi-companion.js` & `fiezel-paw-outfit.js`: Penyelarasan outfit maskot.
@@ -70,11 +78,11 @@ Rilis build **m025-533** menghadirkan modul permainan deduksi kata multiplayer t
 - Hexa-Sync Arbiter (`node tools/bump-build.mjs --check`):
   ```json
   {
-    "sumber": "m025-533",
+    "sumber": "m025-532",
     "terpasang": {
-      "sw.js": "m025-533",
-      "core-config.js": "m025-533",
-      "features/neural-voice/fiezel-diag-panel.js": "m025-533"
+      "sw.js": "m025-532",
+      "core-config.js": "m025-532",
+      "features/neural-voice/fiezel-diag-panel.js": "m025-532"
     },
     "selaras": true
   }
@@ -85,7 +93,7 @@ Rilis build **m025-533** menghadirkan modul permainan deduksi kata multiplayer t
 - `node tests/lucide-icon-coverage-test.js`: **PASS (FIEZEL cakupan ikon lucide: PASS)**
 - `node tests/i18n-kunci-hantu-test.js`: **PASS (KunciHantu: PASS)**
 - `node tests/view-reachability-test.js`: **PASS (view-reachability: 65/65 lulus; 19 layar, 23 nama view)**
-- `node tests/curriculum-cache-version-test.js`: **PASS (26 penegasan, 2 halaman, build m025-533)**
+- `node tests/curriculum-cache-version-test.js`: **PASS (26 penegasan, 2 halaman, build m025-532)**
 - `node tests/gate-registry-test.js`: **PASS (10 pass, 0 fail)**
 - `node tests/braincore-purity-test.js`: **PASS (32 modul murni)**
 - `node tests/paw-arena-rules-card-test.js`: **PASS (semua hijau)**
@@ -94,5 +102,11 @@ Rilis build **m025-533** menghadirkan modul permainan deduksi kata multiplayer t
 ---
 
 ## 5. Otoritas OWNER/MASTER & Status Rilis
-- **Status Mutu**: READY FOR PULL REQUEST & DEPLOY (Semua gerbang hijau, hexa-sync m025-533 selaras).
+- **Status Mutu**: READY FOR PULL REQUEST & DEPLOY (Semua gerbang hijau, hexa-sync m025-532 selaras).
 - **Git Protection Compliance**: Wajib melalui Pull Request (PR) ke `main` dan diverifikasi via CI GitHub Actions sebelum merge.
+
+---
+
+## 6. Langkah Lanjut (Roadmap & Next Steps)
+- Pantau metrik retensi sesi Undercover studio di produksi (`fz_undercover_stats`).
+- Integrasi variasi kartu kata tematik tingkat lanjut (B1/B2 Vocabulary Lexicon) pada siklus sprint berikutnya.
