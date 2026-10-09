@@ -253,6 +253,60 @@ function evidenceBody(jti, day, events) {
     const noProfile = await callSocial(app, 'GET', '/api/social/profile/me', { cookie: other });
     assert(noProfile.status === 404 && noProfile.json.error === 'profile_required',
       'identitas tanpa profil => 404 profile_required');
+
+    // Rename profil:
+    // (a) Tanpa profil => 404 profile_required
+    const renNoProf = await callSocial(app, 'POST', '/api/social/profile/rename', {
+      body: { handle: 'rida_nama_baru' }, cookie: other
+    });
+    assert(renNoProf.status === 404 && renNoProf.json.error === 'profile_required',
+      'rename tanpa profil => 404 profile_required');
+
+    // (b) Handle tidak sah => 400 schema_invalid
+    const renBad = await callSocial(app, 'POST', '/api/social/profile/rename', {
+      body: { handle: 'bad__handle' }, cookie
+    });
+    assert(renBad.status === 400 && renBad.json.error === 'schema_invalid',
+      'rename handle tidak sah => 400 schema_invalid');
+
+    // (c) Rename ke handle sendiri yang sama => 200 unchanged
+    const renSame = await callSocial(app, 'POST', '/api/social/profile/rename', {
+      body: { handle: 'rida_belajar9' }, cookie
+    });
+    assert(renSame.status === 200 && renSame.json.profile.handle === 'rida_belajar9' && renSame.json.unchanged === true,
+      'rename ke handle yang sama => 200 unchanged:true');
+
+    // (d) Buat pengguna lain dengan handle 'fitrah_test'
+    const userFitrah = await app.issueIdentity();
+    await callSocial(app, 'POST', '/api/social/profile/create', {
+      body: { handle: 'fitrah_test', displayName: 'Fitrah' }, cookie: userFitrah
+    });
+
+    // Coba rename alice ke handle yang sudah dipakai orang lain => 409 handle_taken
+    const renConflict = await callSocial(app, 'POST', '/api/social/profile/rename', {
+      body: { handle: 'fitrah_test' }, cookie
+    });
+    assert(renConflict.status === 409 && renConflict.json.error === 'handle_taken',
+      'rename ke handle terpakai => 409 handle_taken');
+
+    // (e) Sukses migrasi/rename: userFitrah rename dari 'fitrah_test' ke 'kargasasa'
+    const renSuccess = await callSocial(app, 'POST', '/api/social/profile/rename', {
+      body: { handle: 'kargasasa', displayName: 'Kargasasa' }, cookie: userFitrah
+    });
+    assert(renSuccess.status === 200 && renSuccess.json.profile.handle === 'kargasasa',
+      'rename sukses ubah handle ke kargasasa');
+
+    // Handle lama 'fitrah_test' sekarang harus bebas lagi di social_handle!
+    const checkOldFreed = await callSocial(app, 'POST', '/api/social/profile/check', {
+      body: { handle: 'fitrah_test' }, cookie
+    });
+    assert(checkOldFreed.json.available === true,
+      'handle lama terbebas setelah rename (social_handle di-swap atomik)');
+
+    // /profile/me membaca handle baru
+    const meRenamed = await callSocial(app, 'GET', '/api/social/profile/me', { cookie: userFitrah });
+    assert(meRenamed.status === 200 && meRenamed.json.profile.handle === 'kargasasa',
+      '/profile/me membaca handle kargasasa yang baru');
   }
 
   /* ---------- 4. Undangan: single-use, TTL, anti-oracle, dua arah ----------- */

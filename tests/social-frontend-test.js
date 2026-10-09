@@ -76,6 +76,7 @@ function freshCore(opts={}){
  assert(core.milestoneLabel('exam_passed')==='Lulus ujian level','label milestone salah');
  assert(/belum aktif/i.test(core.errorCopy('social_disabled')),'naskah social_disabled tidak jujur');
  assert(/offline/i.test(core.errorCopy('offline')),'naskah offline salah');
+ assert(typeof core.api.profileRename==='function','core.api.profileRename tidak terdaftar');
  // ---- outbox: antre = enum disaring, count di-clamp, jti uuid, day WIB
  const q=freshCore({now:t});
  const entry=q.core.queueEvidence([
@@ -213,6 +214,8 @@ function freshCore(opts={}){
  assert(/Mode privat papan/.test(settingsHtml)&&/settingBoardHidden/.test(settingsHtml),'sakelar opt-out papan tidak ada di Pengaturan');
  assert(/seketika/.test(settingsHtml),'naskah opt-out tidak menjanjikan efek seketika (kontrak spec §4.3)');
  b1.ctx.closeModal();
+ assert(typeof b1.ctx.effectiveLearnerSocialHandle==='function','effectiveLearnerSocialHandle tidak terdaftar');
+ assert(typeof b1.ctx.maybeSyncLearnerSocialHandle==='function','maybeSyncLearnerSocialHandle tidak terdaftar');
  // ---- B2: OFFLINE → kartu "kamu sedang offline", nol permintaan sosial
  const netDown={onLine:false,calls:[],handler:async()=>{throw new Error('offline: tidak boleh ada permintaan')}};
  const b2=bootApp(netDown);

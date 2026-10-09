@@ -286,6 +286,74 @@ async function routeProfileCreate(ctx) {
   return jsonResponse({ profile: profileBody(row, gate.day) }, { ...gate.opt, status: 201 });
 }
 
+const SCHEMA_PROFILE_RENAME = {
+  allow: {
+    handle: { type: 'string', max: 64, required: true },
+    displayName: { type: 'string', max: 64 }
+  }
+};
+
+async function routeProfileRename(ctx) {
+  const gate = await socialGate(ctx);
+  if (gate.deny) return gate.deny;
+  const body = await readJsonFromCtx(ctx, gate.opt);
+  if (!body.ok) return body.response;
+  const shape = validateShape(body.value, SCHEMA_PROFILE_RENAME);
+  if (!shape.ok) return jsonError(400, ERR.SCHEMA_INVALID, {}, gate.opt);
+
+  const existing = await readProfile(gate.db, gate.sub);
+  if (!existing) return jsonError(404, ERR.PROFILE_REQUIRED, {}, gate.opt);
+
+  const newHandle = String(body.value.handle).toLowerCase().trim();
+  if (handleProblem(newHandle)) return jsonError(400, ERR.SCHEMA_INVALID, {}, gate.opt);
+
+  let displayName = existing.display_name;
+  if (body.value.displayName !== undefined) {
+    displayName = cleanDisplayName(body.value.displayName);
+    if (displayName === null) return jsonError(400, ERR.SCHEMA_INVALID, {}, gate.opt);
+  }
+
+  if (newHandle === existing.handle) {
+    if (body.value.displayName !== undefined && displayName !== existing.display_name) {
+      await gate.db
+        .prepare('UPDATE social_profile SET display_name = ?1 WHERE sub = ?2')
+        .bind(displayName, gate.sub)
+        .run();
+    }
+    const row = await readProfile(gate.db, gate.sub);
+    return jsonResponse({ profile: profileBody(row, gate.day), unchanged: true }, gate.opt);
+  }
+
+  const taken = await gate.db
+    .prepare('SELECT sub FROM social_handle WHERE handle = ?1')
+    .bind(newHandle)
+    .first();
+  if (taken && taken.sub !== gate.sub) {
+    return jsonError(409, ERR.HANDLE_TAKEN, {}, gate.opt);
+  }
+
+  try {
+    const writes = [
+      gate.db.prepare('DELETE FROM social_handle WHERE handle = ?1 AND sub = ?2')
+        .bind(existing.handle, gate.sub),
+      gate.db.prepare('INSERT INTO social_handle (handle, sub) VALUES (?1, ?2)')
+        .bind(newHandle, gate.sub),
+      gate.db.prepare('UPDATE social_profile SET handle = ?1, display_name = ?2 WHERE sub = ?3')
+        .bind(newHandle, displayName, gate.sub)
+    ];
+    if (typeof gate.db.batch === 'function') {
+      await gate.db.batch(writes);
+    } else {
+      for (const w of writes) await w.run();
+    }
+  } catch {
+    return jsonError(409, ERR.HANDLE_TAKEN, {}, gate.opt);
+  }
+
+  const row = await readProfile(gate.db, gate.sub);
+  return jsonResponse({ profile: profileBody(row, gate.day) }, gate.opt);
+}
+
 const SCHEMA_PROFILE_CHECK = { allow: { handle: { type: 'string', max: 64, required: true } } };
 
 async function routeProfileCheck(ctx) {
@@ -1119,6 +1187,7 @@ async function routeRankOptout(ctx) {
 
 export const ROUTES = [
   ['POST', '/api/social/profile/create', routeProfileCreate],
+  ['POST', '/api/social/profile/rename', routeProfileRename],
   ['POST', '/api/social/profile/check', routeProfileCheck],
   ['GET', '/api/social/profile/me', routeProfileMe],
   ['POST', '/api/social/friends/invite', routeFriendsInvite],
