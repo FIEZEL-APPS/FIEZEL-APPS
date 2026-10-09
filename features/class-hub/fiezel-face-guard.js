@@ -121,18 +121,22 @@
       if (state.absentSince) {
         var duration = now - state.absentSince;
         state.absentSince = 0;
+        state.episoded = false;
         if (typeof opts.onPresent === 'function') opts.onPresent(duration);
       }
     } else {
       if (!state.absentSince) {
         state.absentSince = now;
+        state.episoded = false;
+        if (typeof opts.onAbsent === 'function') opts.onAbsent(now);
       }
       var elapsed = now - state.absentSince;
       if (elapsed >= WARN_THRESHOLD_MS && !state.warned) {
         state.warned = true;
         if (typeof opts.onWarning === 'function') opts.onWarning(true, elapsed);
       }
-      if (elapsed >= ABSENT_THRESHOLD_MS) {
+      if (elapsed >= ABSENT_THRESHOLD_MS && !state.episoded) {
+        state.episoded = true;
         if (typeof opts.onAbsentEpisode === 'function') opts.onAbsentEpisode(elapsed);
       }
     }
@@ -143,6 +147,7 @@
     state.options = opts || {};
     state.absentSince = 0;
     state.warned = false;
+    state.episoded = false;
 
     if (!isSupported()) {
       return Promise.resolve({ ok: false, reason: 'unsupported' });
@@ -218,6 +223,7 @@
     state.active = false;
     state.absentSince = 0;
     state.warned = false;
+    state.episoded = false;
     state.options = null;
   }
 

@@ -337,7 +337,9 @@
     if (!raw.vn) return raw;
     return Object.assign({}, raw, {
       n: (raw.n || 0) + (raw.vn || 0),
-      appN: raw.n || 0
+      appN: raw.n || 0,
+      s: (raw.s || 0) + (raw.vs || 0),
+      appS: raw.s || 0
     });
   }
   /* Kembaran EXAM_KINDS di klien dan server. Nilai yang tidak dikenal jatuh ke 'ujian' —
@@ -355,8 +357,8 @@
   }
   function focusLevel(f) {
     if (!f || (!f.n && !f.vn)) return 'bersih';
-    var totalN = (Number(f.n) || 0) + (Number(f.vn) || 0);
-    var totalS = (Number(f.s) || 0) + (Number(f.vs) || 0);
+    var totalN = f.appN !== undefined ? (Number(f.n) || 0) : ((Number(f.n) || 0) + (Number(f.vn) || 0));
+    var totalS = f.appS !== undefined ? (Number(f.s) || 0) : ((Number(f.s) || 0) + (Number(f.vs) || 0));
     return totalN >= 3 || totalS >= 30 ? 'berat' : 'ringan';
   }
   /** Masukkan hasil murid ke kelas: perbarui murid yang ada (nama depan sama) atau tambah baru. Skill digabung per-skill. */

@@ -895,13 +895,20 @@
     var face = FaceG(); if (!face || !isExamRunner()) return;
     try {
       face.start({
+        onAbsent: function (at) {
+          var u = ui(), st = u.focus; if (!st || !FG() || !isExamRunner()) return;
+          FG().leaveFace(st, at || Date.now());
+          saveFocus(st);
+        },
         onWarning: function (warn) {
           ui().faceWarn = !!warn;
           if (sEl) renderStudent();
         },
-        onAbsentEpisode: function () {
+        onAbsentEpisode: function (elapsed) {
           var u = ui(), st = u.focus; if (!st || !FG() || !isExamRunner()) return;
-          FG().leaveFace(st, Date.now());
+          if (!st.faceAwaySince) {
+            FG().leaveFace(st, Date.now() - (elapsed || 10000));
+          }
           saveFocus(st);
           reportFocus(st);
         },
