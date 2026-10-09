@@ -294,7 +294,7 @@
     var undercoverCard = '<div class="lf-card paw-lobby-card" style="border:1px solid #d97706;background:#15161b;color:#f0f1f4;" data-testid="paw-lobby-undercover">' +
       '<div style="display:flex;justify-content:space-between;align-items:center;"><b>UNDERCOVER</b><span style="font-size:10px;font-family:monospace;padding:1px 5px;border-radius:4px;background:#2d2012;color:#f59e0b;border:1px solid #78350f;">2-5P ONLINE</span></div>' +
       '<small class="lf-muted">Deduksi semantik kata rahasia & investigasi bot stealth.</small>' +
-      '<div class="paw-lobby-actions" style="margin-top:8px;"><a href="./undercover.html" class="lf-mini paw-lobby-cta" style="background:#f59e0b;color:#0f172a;text-decoration:none;font-weight:700;display:inline-block;text-align:center;">' + esc(t('pawarena.enter', 'Masuk Arena ➔')) + '</a></div></div>';
+      '<div class="paw-lobby-actions" style="margin-top:8px;"><a href="./undercover.html" class="lf-mini paw-lobby-cta" style="background:#f59e0b;color:#0f172a;text-decoration:none;font-weight:700;display:inline-block;text-align:center;">' + esc(t('pawarena.start', 'Mulai')) + ' ➔</a></div></div>';
     return '<div class="lf-card duel-hero"><p class="lf-kicker">' + esc(t('pawarena.title', 'PAW ARENA')) + '</p>' +
       '<h2>' + esc(t('pawarena.pick-game', 'Pilih permainan')) + '</h2>' +
       '<p class="lf-muted">' + esc(t('pawarena.subtitle', '')) + '</p>' +
