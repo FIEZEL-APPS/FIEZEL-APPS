@@ -100,7 +100,20 @@ function setLearnerName(value){
   try{name=self.FiezelOnboarding?.normalizeName?.(name)??name}catch{}
   if(!name)return false;
   if(name===state.userName)return true;
-  state.userName=name;save();
+  state.userName=name;
+  try{
+    if(typeof socialHandleCandidates==='function'){
+      const cand=socialHandleCandidates(name)[0];
+      const gEmail=self.FiezelGoogle?.rememberedEmail?.()||'';
+      const emailPrefix=gEmail?gEmail.split('@')[0].toLowerCase():'';
+      if(cand&&(!socialProfileCache?.handle||!state.preferences?.socialHandle||state.preferences?.socialHandle===emailPrefix)){
+        if(state.preferences?.socialHandle!==cand){
+          state.preferences={...(state.preferences||{}),socialHandle:cand};
+        }
+      }
+    }
+  }catch(_){}
+  save();
   // Nama BARU didorong ke server segera (force), bukan menunggu rem harian: owner yang
   // melihat nama lama untuk murid yang sudah menggantinya adalah cara termudah membuat
   // dashboard terasa berbohong. Senyap dan tidak pernah menahan perkenalan.
@@ -8698,9 +8711,9 @@ function showAuthGate(at,next){
       try{self.FiezelOnboarding?.markLocaleSelected?.(self,self.FiezelI18n?.getLocale?.()||'id')}catch(_){}
       try{
         const acc=self.FiezelAccount?.getAccount?.()||self.FiezelAccount?.state?.();
-        const h=acc?.handle||(typeof self.FiezelGoogle!=='undefined'&&self.FiezelGoogle?.rememberedEmail?self.FiezelGoogle.rememberedEmail().split('@')[0]:'');
+        const h=acc?.handle;
         if(h){
-          if(!state.userName||state.userName===FALLBACK_LEARNER_NAME||state.userName==='Rian Pratama')state.userName=h;
+          if(!state.userName||state.userName===FALLBACK_LEARNER_NAME)state.userName=h;
           try{rememberSocialHandle(h)}catch(_){}
           save();
         }
@@ -8953,7 +8966,7 @@ function syncCoachBubble(){
    tautan dalam layar, dan tur semuanya membawa nama view yang sudah ada, dan menghapus
    satu nama dari himpunan ini akan membuat go() menampilkan toast "halaman tak tersedia"
    pada perjalanan yang benar-benar valid. */
-const VALID_VIEWS=new Set(['kana','home','latihan','game','vocab','grammar','reading','skills','listening','speaking','writing','test','progress','classroom','library','ask','search','online','profile','learn','tutor','arena','nujum']);
+const VALID_VIEWS=new Set(['kana','home','latihan','game','vocab','grammar','reading','skills','listening','speaking','writing','test','progress','classroom','library','ask','search','online','profile','learn','tutor','arena','nujum','undercover']);
 function prefersReducedMotion(){try{return !!(self.matchMedia&&self.matchMedia('(prefers-reduced-motion: reduce)').matches)}catch(_){return false}}
 // m026-01 - maskot PAW. Tiga pembungkus di bawah ini adalah SATU-SATUNYA cara app.js
 // berbicara dengan <fiezel-mascot>. Alasannya:
@@ -9239,7 +9252,7 @@ function examWatchSync(){
 }
 try{document.addEventListener('fiezel-exam-lock',examWatchSync)}catch(_){}
 
-function go(v,opts){if((v==='ask'||v==='search')&&!aiDoorAllowed())return false;if(isVerifiedTeacher()&&v!=='tutor'){v='tutor'}if(!VALID_VIEWS.has(v)){showToast(FiezelI18n.t('nav.halaman-tak-tersedia'));return false}/* m025-314: penolakan berbahasa duduk DI SINI, bukan di daftar kartu — setiap pintu ke permukaan yang belum punya isi bahasa target lewat go(), termasuk pintu yang belum ditulis. */if(targetLangSurfaceBlocked(v)){showToast(FiezelI18n.t('bahasa.permukaan-terkunci',{bahasa:FiezelI18n.t('bahasa.'+activeTargetLang())}));return false}if(opts?.viaHistory!==true)haptic('tap');uiSfx('nav');dropStages();if(opts?.viaHistory!==true)pushBackNavView(v);state.view=v;if(v==='classroom'||v==='home'){try{inboxPoll(v==='classroom')}catch(_){}if(v==='home'){try{const cur=Number(sessionStorage.getItem('fz_today_vocab_visit')||0);sessionStorage.setItem('fz_today_vocab_visit',String(cur+1))}catch(_){}}}try{const _targetView=(typeof TAB_PARENT!=='undefined'&&TAB_PARENT[v])?TAB_PARENT[v]:v;const _targetBtn=document.querySelector(`.bottomnav [data-view="${_targetView}"]`);if(_targetBtn)syncNavActivePill(_targetBtn)}catch(_){}const swap=()=>{save();render()};const isBottomTab=['home','latihan','classroom','game','progress','online','profile'].includes(v);if(!isBottomTab&&document.startViewTransition&&state.preferences?.motion!==false&&!prefersReducedMotion()){vtViewPaint=true;try{const __vt=document.startViewTransition(swap);const __done=()=>{vtViewPaint=false};if(__vt&&__vt.finished&&typeof __vt.finished.finally==='function')__vt.finished.finally(__done);else setTimeout(__done,300)}catch(_){try{swap()}finally{vtViewPaint=false}}}else swap();return true} window.go=go;
+function go(v,opts){if(v==='undercover'){window.location.href='./undercover.html';return true}if((v==='ask'||v==='search')&&!aiDoorAllowed())return false;if(isVerifiedTeacher()&&v!=='tutor'){v='tutor'}if(!VALID_VIEWS.has(v)){showToast(FiezelI18n.t('nav.halaman-tak-tersedia'));return false}/* m025-314: penolakan berbahasa duduk DI SINI, bukan di daftar kartu — setiap pintu ke permukaan yang belum punya isi bahasa target lewat go(), termasuk pintu yang belum ditulis. */if(targetLangSurfaceBlocked(v)){showToast(FiezelI18n.t('bahasa.permukaan-terkunci',{bahasa:FiezelI18n.t('bahasa.'+activeTargetLang())}));return false}if(opts?.viaHistory!==true)haptic('tap');uiSfx('nav');dropStages();if(opts?.viaHistory!==true)pushBackNavView(v);state.view=v;if(v==='classroom'||v==='home'){try{inboxPoll(v==='classroom')}catch(_){}if(v==='home'){try{const cur=Number(sessionStorage.getItem('fz_today_vocab_visit')||0);sessionStorage.setItem('fz_today_vocab_visit',String(cur+1))}catch(_){}}}try{const _targetView=(typeof TAB_PARENT!=='undefined'&&TAB_PARENT[v])?TAB_PARENT[v]:v;const _targetBtn=document.querySelector(`.bottomnav [data-view="${_targetView}"]`);if(_targetBtn)syncNavActivePill(_targetBtn)}catch(_){}const swap=()=>{save();render()};const isBottomTab=['home','latihan','classroom','game','progress','online','profile'].includes(v);if(!isBottomTab&&document.startViewTransition&&state.preferences?.motion!==false&&!prefersReducedMotion()){vtViewPaint=true;try{const __vt=document.startViewTransition(swap);const __done=()=>{vtViewPaint=false};if(__vt&&__vt.finished&&typeof __vt.finished.finally==='function')__vt.finished.finally(__done);else setTimeout(__done,300)}catch(_){try{swap()}finally{vtViewPaint=false}}}else swap();return true} window.go=go;
 function handleTopbarBack(){if(typeof go!=='function')return;const subViews=['grammar','vocab','skills','listening','speaking','reading','writing','library','kana','ask','search'];if(subViews.includes(state.view)){go('latihan')}else{go('home')}} window.handleTopbarBack=handleTopbarBack;
 function pushBackNavView(v){try{return self.FiezelBackNav?.pushView?.(v)===true}catch{return false}}
 /* ---- m025-117 lapisan layar-di-dalam-view (stage) ---------------------------------
@@ -16918,6 +16931,19 @@ function gameHubMarkup(){
           <span class="arcade-play-hint">${esc(FiezelI18n.t('game.nujum-cta'))} ➔</span>
         </div>
       </div>
+
+      <!-- Undercover: Tactical Deduction Multiplayer -->
+      <div class="game-arcade-card undercover-card" style="border: 1px solid #d97706; background: linear-gradient(135deg, #181922 0%, #111216 100%);" onclick="window.location.href='./undercover.html'">
+        <div class="arcade-card-top">
+          <span class="arcade-badge" style="background:#2d2012; color:#fbbf24; border:1px solid #78350f;">【潜入】2–5P ONLINE</span>
+          <span class="arcade-icon-wrap" style="color:#f59e0b;"><i data-lucide="shield-alert"></i></span>
+        </div>
+        <h4 class="arcade-card-title" style="color:#fff;">UNDERCOVER</h4>
+        <p class="arcade-card-desc" style="color:#94a3b8;">Investigasi semantik kata rahasia & adu deduksi lawan bot stealth.</p>
+        <div class="arcade-card-footer">
+          <span class="arcade-play-hint" style="color:#f59e0b; font-weight:700;">${esc(FiezelI18n.t('game.play-cta'))} ➔</span>
+        </div>
+      </div>
     </div>
   </div>`;
 }
@@ -18300,9 +18326,8 @@ window.editProfileName=function(){
   const current=learnerName();
   const next=prompt(t('profile.prompt-name','Masukkan nama lengkap baru:'),current);
   if(next&&next.trim()&&next.trim()!==current){
-    state.userName=next.trim();
-    save();
-    try{learnerNameSyncToServer(state.userName)}catch(_){}
+    const clean=next.trim();
+    setLearnerName(clean);
     showToast(t('profile.name-updated','Nama profil berhasil diperbarui!'),'success');
     render();
   }
@@ -18313,16 +18338,24 @@ function tactileProfileCockpitMarkup(opts={}){
   const acc=self.FiezelAccount?.getAccount?.()||self.FiezelAccount?.state?.();
   const accHandle=acc?.handle||'';
   const googleEmail=(typeof self.FiezelGoogle!=='undefined'&&self.FiezelGoogle?.rememberedEmail)?self.FiezelGoogle.rememberedEmail():'';
-  const socialH=storedSocialHandle()||'';
-  const resolvedHandle=accHandle||socialH||(googleEmail?googleEmail.split('@')[0]:'')||'murid';
+  const emailPrefix=(googleEmail?googleEmail.split('@')[0].toLowerCase():'');
 
-  let name=(rawName && rawName!=='murid' && rawName!=='Fitra' && rawName!=='Sobat' && rawName!=='Rian Pratama')?rawName:'';
+  let name=(rawName && rawName.toLowerCase()!=='murid' && rawName!==FALLBACK_LEARNER_NAME)?rawName:'';
   if(!name&&acc?.teacherName)name=acc.teacherName;
   if(!name&&accHandle)name=accHandle;
-  if(!name&&googleEmail)name=googleEmail.split('@')[0];
-  if(!name&&socialH)name=socialH;
-  if(!name&&rawName&&rawName!=='Rian Pratama')name=rawName;
+  if(!name&&emailPrefix)name=emailPrefix;
   if(!name)name=t('common.sapaan-netral','Murid');
+
+  const serverHandle=socialProfileCache?.handle||'';
+  const candidateFromName=(name && name.toLowerCase()!=='murid' && typeof socialHandleCandidates==='function')
+    ? socialHandleCandidates(name)[0]
+    : '';
+  let storedH=storedSocialHandle()||'';
+  if(storedH && emailPrefix && storedH.toLowerCase()===emailPrefix && candidateFromName && !serverHandle){
+    storedH=candidateFromName;
+    try{rememberSocialHandle(candidateFromName)}catch(_){}
+  }
+  const handle=serverHandle||accHandle||candidateFromName||storedH||emailPrefix||'murid';
 
   const initials=(()=>{
     const parts=String(name||'').trim().split(/\s+/).filter(Boolean);
@@ -18330,7 +18363,6 @@ function tactileProfileCockpitMarkup(opts={}){
     if(parts.length===1)return parts[0].slice(0,2).toUpperCase();
     return (parts[0][0]+parts[parts.length-1][0]).toUpperCase();
   })();
-  const handle=resolvedHandle;
   const level=getActiveLevel()||'A1';
   const classCode=typeof learnerClassCode==='function'?learnerClassCode():'';
   const schoolName=classCode?(t('profile.class-prefix','Kelas')+' '+esc(classCode)):t('profile.school-default','SMA Negeri 1');
@@ -18742,7 +18774,17 @@ async function registerStudentFromSettings(){
 window.registerStudentFromSettings=registerStudentFromSettings;
 /** Kartu pendaftaran di Pengaturan -> Profil. Sudah terdaftar = hanya menampilkan ID. */
 function studentRegistrationMarkup(){
-  const handle=storedSocialHandle()||socialProfileCache?.handle||'';
+  const gEmail=self.FiezelGoogle?.rememberedEmail?.()||'';
+  const emailPrefix=gEmail?gEmail.split('@')[0].toLowerCase():'';
+  let handle=socialProfileCache?.handle||storedSocialHandle()||'';
+  const candName=(state.userName && state.userName.toLowerCase()!=='murid' && typeof socialHandleCandidates==='function')
+    ? socialHandleCandidates(state.userName)[0]
+    : '';
+  if(handle && emailPrefix && handle.toLowerCase()===emailPrefix && candName && !socialProfileCache?.handle){
+    handle=candName;
+    try{rememberSocialHandle(candName)}catch(_){}
+  }
+  if(!handle && candName)handle=candName;
   if(handle)return `<div class="setting-row"><span class="setting-icon"><i data-lucide="at-sign"></i></span><span><b>${esc(FiezelI18n.t('social2.my-id',{handle}))}</b><small>${esc(FiezelI18n.t('social.profile-desc'))}</small></span></div>`;
   return `<div class="setting-row"><span class="setting-icon"><i data-lucide="user-plus"></i></span><span><b>${esc(FiezelI18n.t('social.create-title'))}</b><small>${esc(FiezelI18n.t('social.create-desc'))}</small></span></div><div class="actions"><button type="button" class="primary" id="studentRegisterBtn" onclick="registerStudentFromSettings()"><i data-lucide="user-plus"></i> ${FiezelI18n.t('social.create-btn')}</button></div>`;
 }
@@ -20785,7 +20827,7 @@ function syncLearnerAccountOnBoot(){
       self.FiezelAccount.getMe().then(function(res){
         if(res && res.ok && res.account){
           const h=res.account.handle;
-          if(h&&(!state.userName||state.userName===FALLBACK_LEARNER_NAME||state.userName==='Rian Pratama')){
+          if(h&&(!state.userName||state.userName===FALLBACK_LEARNER_NAME)){
             state.userName=h;
             try{rememberSocialHandle(h)}catch(_){}
             save();

@@ -291,11 +291,15 @@
         '<b>' + esc(t(base + '.name', g.id)) + '</b><small class="lf-muted">' + esc(t(base + '.tag', '')) + '</small>' +
         '<div class="paw-lobby-actions"><button type="button" class="lf-mini paw-lobby-cta" data-arena="pick" data-game="' + g.id + '" data-testid="paw-pick-' + g.id + '">' + esc(t('pawarena.solo-vs-bot', 'Main sendiri lawan bot')) + '</button>' + friend + '</div></div>';
     }).join('');
+    var undercoverCard = '<div class="lf-card paw-lobby-card" style="border:1px solid #d97706;background:#15161b;color:#f0f1f4;" data-testid="paw-lobby-undercover">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;"><b>UNDERCOVER</b><span style="font-size:10px;font-family:monospace;padding:1px 5px;border-radius:4px;background:#2d2012;color:#f59e0b;border:1px solid #78350f;">2-5P ONLINE</span></div>' +
+      '<small class="lf-muted">Deduksi semantik kata rahasia & investigasi bot stealth.</small>' +
+      '<div class="paw-lobby-actions" style="margin-top:8px;"><a href="./undercover.html" class="lf-mini paw-lobby-cta" style="background:#f59e0b;color:#0f172a;text-decoration:none;font-weight:700;display:inline-block;text-align:center;">' + esc(t('pawarena.enter', 'Masuk Arena ➔')) + '</a></div></div>';
     return '<div class="lf-card duel-hero"><p class="lf-kicker">' + esc(t('pawarena.title', 'PAW ARENA')) + '</p>' +
       '<h2>' + esc(t('pawarena.pick-game', 'Pilih permainan')) + '</h2>' +
       '<p class="lf-muted">' + esc(t('pawarena.subtitle', '')) + '</p>' +
       '<div class="lf-actions"><button type="button" class="lf-ghost" data-arena="join-open" data-testid="paw-have-code">' + esc(t('pawarena.have-code', 'Punya kode teman?')) + '</button></div></div>' +
-      '<div class="paw-lobby-grid">' + cards + '</div>' + storiesHtml();
+      '<div class="paw-lobby-grid">' + cards + undercoverCard + '</div>' + storiesHtml();
   }
 
   function joinHtml() {
