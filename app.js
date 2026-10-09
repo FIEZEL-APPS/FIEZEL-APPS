@@ -18371,8 +18371,8 @@ window.editProfileName=function(){
         onkeydown="if(event.key==='Enter'){event.preventDefault();document.getElementById('btnEditProfileSave')?.click()}" />
       <div id="editProfileNameErr" style="font-size:12px;font-weight:700;color:#EF4444;display:none;"></div>
       <div class="modal-actions" style="display:flex;gap:8px;margin-top:6px;">
-        <button class="secondary" type="button" onclick="closeModal()" style="flex:1;">${t('common.batal','Batal')}</button>
-        <button class="primary" type="button" id="btnEditProfileSave" style="flex:1;">${t('common.simpan','Simpan')}</button>
+        <button class="secondary" type="button" onclick="closeModal()" style="flex:1;">${t('profile.modal-cancel','Batal')}</button>
+        <button class="primary" type="button" id="btnEditProfileSave" style="flex:1;">${t('profile.modal-save','Simpan')}</button>
       </div>
     </div>
   `;
@@ -18391,7 +18391,7 @@ window.editProfileName=function(){
         }
         if(nextVal===current){closeModal();return}
         saveBtn.disabled=true;
-        saveBtn.textContent=t('common.simpan','Simpan')+'...';
+        saveBtn.textContent=t('profile.modal-save','Simpan')+'...';
         const clean=nextVal;
         const cand=(typeof socialHandleCandidates==='function')?socialHandleCandidates(clean)[0]:'';
         const core=socialCore();
@@ -18403,7 +18403,7 @@ window.editProfileName=function(){
               if(chk&&chk.ok&&chk.data?.available===false){
                 if(errEl){errEl.textContent=t('social.error-handle-taken','Nama itu sudah dipakai orang lain — coba variasi lain.');errEl.style.display='block'}
                 saveBtn.disabled=false;
-                saveBtn.textContent=t('common.simpan','Simpan');
+                saveBtn.textContent=t('profile.modal-save','Simpan');
                 return;
               }
             }
@@ -18436,7 +18436,7 @@ window.openProfileLogoutModal=function(){
     <h2>${FiezelI18n.t('profile.logout-device','Keluar dari Perangkat Ini')}</h2>
     <p class="muted" style="margin-bottom:16px;">${FiezelI18n.t('profile.logout-confirm','Keluar dari sesi ini? Progres belajarmu tetap tersimpan aman di cloud.')}</p>
     <div class="modal-actions" style="display:flex;gap:8px;">
-      <button class="secondary" type="button" id="btnLogoutCancel" onclick="closeModal()" style="flex:1;">${t('common.batal','Batal')}</button>
+      <button class="secondary" type="button" id="btnLogoutCancel" onclick="closeModal()" style="flex:1;">${t('profile.modal-cancel','Batal')}</button>
       <button class="primary danger" type="button" id="btnLogoutConfirm" style="flex:1;background:#EF4444;border-color:#DC2626;color:#FFF;">${FiezelI18n.t('profile.logout-device','Keluar')}</button>
     </div>
   `;
@@ -18583,7 +18583,7 @@ function tactileProfileCockpitMarkup(opts={}){
           <span style="font-size:11.5px;font-weight:700;color:#DC2626;display:flex;align-items:center;gap:6px;">
             <i data-lucide="bell" style="width:14px;height:14px;"></i> ${socialRequestCount} ${t('profile.requests-count','Permintaan Teman Baru')}
           </span>
-          <button type="button" onclick="openFriendConnectModal('requests')" style="font-size:11px;font-weight:800;padding:4px 10px;border-radius:8px;background:#DC2626;color:#FFF;border:none;cursor:pointer;">${t('common.view','Lihat')}</button>
+          <button type="button" onclick="openFriendConnectModal('requests')" style="font-size:11px;font-weight:800;padding:4px 10px;border-radius:8px;background:#DC2626;color:#FFF;border:none;cursor:pointer;">${t('profile.btn-view-requests','Lihat')}</button>
         </div>`:''}
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">

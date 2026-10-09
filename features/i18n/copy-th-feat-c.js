@@ -255,6 +255,9 @@
     'profile.btn-leaderboard': 'กระดานผู้นำ',
     'profile.chime-active': 'เปิดเสียงสั่น',
     'profile.chime-inactive': 'ปิดเสียงสั่น',
-    'profile.online-status-badge': 'ออนไลน์'
+    'profile.online-status-badge': 'ออนไลน์',
+    'profile.modal-cancel': 'ยกเลิก',
+    'profile.modal-save': 'บันทึก',
+    'profile.btn-view-requests': 'ดู'
   });
 }());

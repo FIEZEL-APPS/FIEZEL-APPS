@@ -255,6 +255,9 @@
     'profile.btn-leaderboard': 'Papan Skor',
     'profile.chime-active': 'Chime Aktif',
     'profile.chime-inactive': 'Chime Nonaktif',
-    'profile.online-status-badge': 'Online'
+    'profile.online-status-badge': 'Online',
+    'profile.modal-cancel': 'Batal',
+    'profile.modal-save': 'Simpan',
+    'profile.btn-view-requests': 'Lihat'
   });
 }());
