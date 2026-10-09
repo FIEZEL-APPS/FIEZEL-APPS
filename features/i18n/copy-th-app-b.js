@@ -152,6 +152,7 @@
     'topbar.notif-aria': 'การแจ้งเตือน',
     'notif.title': 'การแจ้งเตือน',
     'notif.empty': 'ยังไม่มีข่าว งานจากครู เพื่อนใหม่ และเสียงเชียร์จะแสดงที่นี่',
+    'notif.loading': 'กำลังโหลดข่าวสารล่าสุด...',
     'notif.mark-read': 'ทำเครื่องหมายว่าอ่านแล้วทั้งหมด',
     'notif.open-assignment': 'ทำเลย',
     'notif.section-teacher': 'จากครู',

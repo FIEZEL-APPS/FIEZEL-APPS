@@ -223,6 +223,7 @@
     'topbar.notif-aria': 'Notifikasi',
     'notif.title': 'Notifikasi',
     'notif.empty': 'Belum ada kabar. Tugas dari guru, teman baru, dan sorakan akan muncul di sini.',
+    'notif.loading': 'Memuat kabar terbaru...',
     'notif.mark-read': 'Tandai semua dibaca',
     'notif.open-assignment': 'Kerjakan sekarang',
     'notif.section-teacher': 'Dari guru',

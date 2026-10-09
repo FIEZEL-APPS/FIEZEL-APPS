@@ -7636,6 +7636,7 @@ function openApp(){
   try{fzStageAutoJoin()}catch(_){}
   try{pollStageInvites();setInterval(pollStageInvites,12000)}catch(_){}
   armSocialInviteSheet();
+  try{refreshFriendRequestCount()}catch(_){}
   // Sesi akun ditanyakan di gelombang yang sama: sesudah sambutan selesai, sebelum murid
   // menyentuh Pengaturan. 401 = anonim dan itu normal, jadi jalur ini senyap.
   try{accountBootRefresh()}catch(_){}
@@ -17578,7 +17579,7 @@ function openModal(html){const wasOpen=modalOpen;modalOpen=true;uiSfx('open');mo
 // bila memang tidak ada modal terbuka, supaya jalur kembali tahu tekanan itu belum terpakai
 // dan boleh meneruskannya ke lapisan di bawahnya.
 let modalReturnFocus=null;
-function closeModalNow(){if(!modalOpen)return false;try{if(typeof stopQrScanner==='function')stopQrScanner()}catch(_){}modalOpen=false;uiSfx('close');modalEpoch++;clearTimeout(modalCloseTimer);const modal=$('modal');modal.classList.remove('show');modalCloseTimer=setTimeout(()=>modal.classList.add('hidden'),320);try{const appEl=$('app');if(appEl){appEl.removeAttribute('aria-hidden');if('inert' in appEl)appEl.inert=false}const nav=document.querySelector?.('.bottomnav,.nav-bar');if(nav){nav.removeAttribute('aria-hidden');if('inert' in nav)nav.inert=false}}catch(_){}/* q17-S1: kembalikan fokus ke pemicu supaya pengguna keyboard tidak terdampar di body. */try{if(modalReturnFocus&&document.contains(modalReturnFocus))modalReturnFocus.focus({preventScroll:true})}catch(_){}modalReturnFocus=null;return true}
+function closeModalNow(){if(!modalOpen)return false;try{if(typeof stopQrScanner==='function')stopQrScanner()}catch(_){}try{$('modalPanel')?.classList.remove('modal-connect-panel')}catch(_){}modalOpen=false;uiSfx('close');modalEpoch++;clearTimeout(modalCloseTimer);const modal=$('modal');modal.classList.remove('show');modalCloseTimer=setTimeout(()=>modal.classList.add('hidden'),320);try{const appEl=$('app');if(appEl){appEl.removeAttribute('aria-hidden');if('inert' in appEl)appEl.inert=false}const nav=document.querySelector?.('.bottomnav,.nav-bar');if(nav){nav.removeAttribute('aria-hidden');if('inert' in nav)nav.inert=false}}catch(_){}/* q17-S1: kembalikan fokus ke pemicu supaya pengguna keyboard tidak terdampar di body. */try{if(modalReturnFocus&&document.contains(modalReturnFocus))modalReturnFocus.focus({preventScroll:true})}catch(_){}modalReturnFocus=null;return true}
 // Ditutup oleh aplikasi sendiri (tombol Batal/Tutup/Escape): layarnya berubah seketika, dan
 // entri riwayatnya dibuang supaya tekanan kembali berikutnya tidak jatuh pada modal yang
 // sudah tidak ada.
@@ -19141,26 +19142,26 @@ async function openFriendConnectModal(initialTab='scan'){
   function renderModalBody(){
     const qr=socialQrCore();
     let qrSvg='';
-    try{qrSvg=qr?qr.svg(socialProfileUrl(handle),{px:175,level:'M',label:'QR @'+handle}):'';}catch(_){qrSvg='';}
+    try{qrSvg=qr?qr.svg(socialProfileUrl(handle),{px:135,level:'M',label:'QR @'+handle}):'';}catch(_){qrSvg='';}
     const reqCount=Number(socialRequestCount)||0;
 
-    let modalTitle=FiezelI18n.t('social3.scan-title');
-    let modalDesc=FiezelI18n.t('social3.scan-desc');
+    let modalTitle=FiezelI18n.t('social3.scan-title','Pindai QR Teman');
+    let modalDesc=FiezelI18n.t('social3.scan-desc','Arahkan kamera ke QR teman atau pilih file dari galeri.');
     if(activeTab==='my-qr'){
-      modalTitle=FiezelI18n.t('social3.qr-title');
-      modalDesc=FiezelI18n.t('social3.qr-desc');
+      modalTitle=FiezelI18n.t('social3.qr-title','Kode QR & ID Profil');
+      modalDesc=FiezelI18n.t('social3.qr-desc','Minta teman memindai QR ini atau cari ID kamu.');
     }else if(activeTab==='invite'){
-      modalTitle=FiezelI18n.t('social2.add-title');
-      modalDesc=FiezelI18n.t('social2.add-desc');
+      modalTitle=FiezelI18n.t('social2.add-title','Tambah Teman');
+      modalDesc=FiezelI18n.t('social2.add-desc','Ketik ID teman untuk mengirim undangan.');
     }else if(activeTab==='requests'){
-      modalTitle=FiezelI18n.t('social3.req-section-title');
-      modalDesc=FiezelI18n.t('social3.req-section-desc');
+      modalTitle=FiezelI18n.t('social3.req-section-title','Permintaan Masuk');
+      modalDesc=FiezelI18n.t('social3.req-section-desc','Terima untuk mulai berteman.');
     }
 
     let bodyHtml='';
     if(activeTab==='scan'){
       bodyHtml=`
-        <div style="display:flex;flex-direction:column;gap:12px;padding:4px 0;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:2px 0;">
           <div class="fz-qr-scanner-box" id="fzQrScannerBox" data-testid="qr-scanner-box">
             <video id="qrScanVideo" class="fz-qr-video" playsinline autoplay muted></video>
             <div class="fz-qr-reticle" id="fzQrReticle">
@@ -19171,99 +19172,86 @@ async function openFriendConnectModal(initialTab='scan'){
               <div class="fz-qr-laser"></div>
             </div>
             <div class="fz-qr-cam-fallback" id="fzQrCamFallback" style="display:none;">
-              <i data-lucide="camera" style="width:36px;height:36px;color:#64748B;"></i>
-              <p style="font-size:12px;line-height:1.4;margin:0;color:#CBD5E1;">${FiezelI18n.t('social3.scan-cam-err')}</p>
+              <i data-lucide="camera" style="width:30px;height:30px;color:#64748B;"></i>
+              <p style="font-size:11px;line-height:1.3;margin:0;color:#CBD5E1;">${FiezelI18n.t('social3.scan-cam-err','Kamera belum aktif.')}</p>
             </div>
           </div>
-          <p class="muted" style="text-align:center;font-size:12px;margin:0;line-height:1.4;">
-            ${FiezelI18n.t('social3.scan-desc')}
-          </p>
           <input type="file" id="qrFileInput" accept="image/*" style="display:none;" onchange="handleQrFilePicked(event)">
-          <button type="button" class="btn-scan-gallery" onclick="$('qrFileInput')?.click()" data-testid="qr-gallery-btn" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;border-radius:12px;background:#F8FAFC;border:1.5px solid #CBD5E1;color:#0F172A !important;font-weight:700;font-size:12.5px;cursor:pointer;">
-            <i data-lucide="image" style="width:16px;height:16px;color:#0284C7;"></i> ${FiezelI18n.t('social3.scan-from-gallery')}
+          <button type="button" class="btn-scan-gallery" onclick="$('qrFileInput')?.click()" data-testid="qr-gallery-btn" style="display:flex;align-items:center;justify-content:center;gap:6px;width:100%;max-width:260px;padding:8px 12px;border-radius:10px;background:#F8FAFC;border:1.5px solid #CBD5E1;color:#0F172A !important;font-weight:700;font-size:12px;cursor:pointer;">
+            <i data-lucide="image" style="width:15px;height:15px;color:#0284C7;"></i> ${FiezelI18n.t('social3.scan-from-gallery','Pilih dari Galeri Foto')}
           </button>
         </div>
       `;
     }else if(activeTab==='my-qr'){
       bodyHtml=`
-        <div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:6px 0;">
-          <div class="fz3-qr" data-testid="profile-qr" style="padding:10px;background:#FFF;border:2px solid #E2E8F0;border-radius:18px;box-shadow:0 6px 16px rgba(0,0,0,0.05);display:flex;justify-content:center;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:2px 0;">
+          <div class="fz3-qr" data-testid="profile-qr" style="padding:8px;background:#FFF;border:2px solid #E2E8F0;border-radius:14px;box-shadow:0 4px 12px rgba(0,0,0,0.06);display:flex;justify-content:center;">
             ${qrSvg||'<p class="muted">Kode QR belum tersedia</p>'}
           </div>
           <div style="display:flex;align-items:center;gap:6px;">
-            <span class="fz2-myid" style="font-size:15px;font-weight:800;color:#0F172A;font-family:monospace;">@${esc(handle)}</span>
-            <button type="button" class="btn-copy-code" onclick="socialCopyId()" data-testid="copy-id-btn" style="padding:4px 8px;font-size:11px;font-weight:700;border-radius:8px;">
-              <i data-lucide="copy" style="width:12px;height:12px;vertical-align:-1px;margin-right:2px;"></i> Salin ID
+            <span class="fz2-myid" style="font-size:14px;font-weight:800;color:#0F172A;font-family:monospace;">@${esc(handle)}</span>
+            <button type="button" class="btn-copy-code" onclick="socialCopyId()" data-testid="copy-id-btn" style="padding:3px 8px;font-size:10.5px;font-weight:700;border-radius:7px;">
+              <i data-lucide="copy" style="width:11px;height:11px;vertical-align:-1px;margin-right:2px;"></i> Salin ID
             </button>
           </div>
-          <p class="muted" style="text-align:center;font-size:12px;margin:0;max-width:280px;line-height:1.5;">
-            Minta teman memindai QR ini atau masukkan ID kamu untuk berteman.
-          </p>
-          <div style="display:flex;gap:8px;width:100%;max-width:280px;margin-top:2px;">
-            <button type="button" onclick="socialDownloadQr()" style="flex:1;padding:8px 10px;font-size:12px;font-weight:700;border-radius:10px;background:#F1F5F9;border:1px solid #CBD5E1;color:#334155;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;">
-              <i data-lucide="download" style="width:13px;height:13px;"></i> Unduh QR
+          <div style="display:flex;gap:6px;width:100%;max-width:260px;margin-top:2px;">
+            <button type="button" onclick="socialDownloadQr()" style="flex:1;padding:7px 8px;font-size:11.5px;font-weight:700;border-radius:9px;background:#F1F5F9;border:1px solid #CBD5E1;color:#334155;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;">
+              <i data-lucide="download" style="width:12px;height:12px;"></i> Unduh QR
             </button>
-            <button type="button" class="primary" onclick="socialShareProfile()" style="flex:1;padding:8px 10px;font-size:12px;font-weight:700;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;">
-              <i data-lucide="share-2" style="width:13px;height:13px;"></i> Bagikan
+            <button type="button" class="primary" onclick="socialShareProfile()" style="flex:1;padding:7px 8px;font-size:11.5px;font-weight:700;border-radius:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;">
+              <i data-lucide="share-2" style="width:12px;height:12px;"></i> Bagikan
             </button>
           </div>
         </div>
       `;
     }else if(activeTab==='invite'){
       bodyHtml=`
-        <div style="display:flex;flex-direction:column;gap:12px;padding:6px 0;">
-          <p class="muted" style="font-size:12.5px;margin:0;line-height:1.5;">
-            Ketik ID teman untuk mengirimkan undangan pertemanan.
-          </p>
-          <label class="endpoint-label" style="display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700;color:#CBD5E1;">
+        <div style="display:flex;flex-direction:column;gap:8px;padding:2px 0;">
+          <label class="endpoint-label" style="display:flex;flex-direction:column;gap:4px;font-size:11.5px;font-weight:700;color:#CBD5E1;">
             ID Teman (Handle)
-            <input id="connectFriendInput" type="text" maxlength="21" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="@nama_teman" style="padding:10px 12px;border-radius:12px;border:1.5px solid #CBD5E1;font-size:14px;background:#FFF;color:#0F172A !important;font-family:monospace;" onkeydown="if(event.key==='Enter')socialAddByInput()">
+            <input id="connectFriendInput" type="text" maxlength="21" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="@nama_teman" style="padding:9px 12px;border-radius:10px;border:1.5px solid #CBD5E1;font-size:13.5px;background:#FFF;color:#0F172A !important;font-family:monospace;" onkeydown="if(event.key==='Enter')socialAddByInput()">
           </label>
-          <button class="primary" id="btnConnectFriendSubmit" type="button" onclick="socialAddByInput()" style="padding:11px;font-size:13px;font-weight:800;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:6px;">
-            <i data-lucide="user-plus" style="width:15px;height:15px;"></i> ${t('social2.add-btn','Tambahkan')}
+          <button class="primary" id="btnConnectFriendSubmit" type="button" onclick="socialAddByInput()" style="padding:9px;font-size:12.5px;font-weight:800;border-radius:10px;display:flex;align-items:center;justify-content:center;gap:5px;">
+            <i data-lucide="user-plus" style="width:14px;height:14px;"></i> ${t('social2.add-btn','Tambahkan')}
           </button>
-          <div style="display:flex;align-items:center;gap:8px;padding:9px 12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:12px;font-size:11.5px;color:#CBD5E1;">
-            <i data-lucide="qr-code" style="width:15px;height:15px;color:#38BDF8;flex-shrink:0;"></i>
-            <span>${t('social3.qr-desc','Minta teman memindai kode ini dengan kamera ponselnya. Kalian langsung terhubung.')}</span>
+          <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;font-size:11px;color:#CBD5E1;">
+            <i data-lucide="qr-code" style="width:14px;height:14px;color:#38BDF8;flex-shrink:0;"></i>
+            <span>Minta teman memindai QR atau cari lewat ID kalian.</span>
           </div>
         </div>
       `;
     }else if(activeTab==='requests'){
       bodyHtml=`
-        <div style="display:flex;flex-direction:column;gap:10px;padding:6px 0;">
-          <p class="muted" style="font-size:12.5px;margin:0;line-height:1.5;">
-            ${t('social3.req-section-desc','Terima untuk mulai berteman.')}
-          </p>
-          <div id="connectRequestsList" style="display:flex;flex-direction:column;gap:8px;min-height:80px;">
-            <p class="muted" style="text-align:center;padding:16px 0;">${t('social.loading','Memuat...')}</p>
+        <div style="display:flex;flex-direction:column;gap:8px;padding:2px 0;">
+          <div id="connectRequestsList" style="display:flex;flex-direction:column;gap:6px;min-height:70px;">
+            <p class="muted" style="text-align:center;padding:12px 0;font-size:12px;">${t('social.loading','Memuat...')}</p>
           </div>
         </div>
       `;
     }
 
     return `
-      <div class="modal-mark">TEMAN & KOMUNITAS</div>
-      <h2 style="font-size:1.45rem;margin:6px 0 4px;font-weight:800;">${modalTitle}</h2>
-      <p class="muted" style="font-size:12px;margin:0 0 12px;line-height:1.4;">${modalDesc}</p>
+      <div class="modal-mark" style="font-size:0.68rem;letter-spacing:0.12em;margin-bottom:2px;">TEMAN & KOMUNITAS</div>
+      <h2 style="font-size:1.2rem;margin:2px 0 4px;font-weight:800;letter-spacing:-0.02em;">${modalTitle}</h2>
+      <p class="muted" style="font-size:11.5px;margin:0 0 8px;line-height:1.3;">${modalDesc}</p>
 
-      <!-- Minimalist Segmented Tabs -->
-      <div class="connect-segmented-nav" style="display:flex;gap:3px;background:rgba(255,255,255,0.08);padding:4px;border-radius:12px;margin-bottom:12px;">
-        <button type="button" onclick="window._switchConnectModalTab('scan')" style="flex:1;padding:8px 2px;font-size:10.5px;font-weight:800;border-radius:9px;border:none;cursor:pointer;background:${activeTab==='scan'?'#FFC800 !important':'transparent !important'};color:${activeTab==='scan'?'#1B1418 !important':'#94A3B8 !important'};box-shadow:${activeTab==='scan'?'0 2px 8px rgba(255,200,0,0.3)':'none'};display:flex;align-items:center;justify-content:center;gap:3px;overflow:hidden;white-space:nowrap;">
-          <i data-lucide="camera" style="width:12px;height:12px;flex-shrink:0;"></i> ${FiezelI18n.t('social3.scan-btn')}
+      <div class="connect-segmented-nav" style="display:flex;gap:3px;background:rgba(255,255,255,0.08);padding:3px;border-radius:10px;margin-bottom:8px;">
+        <button type="button" onclick="window._switchConnectModalTab('scan')" style="flex:1;padding:6px 2px;font-size:10px;font-weight:800;border-radius:8px;border:none;cursor:pointer;background:${activeTab==='scan'?'#FFC800 !important':'transparent !important'};color:${activeTab==='scan'?'#1B1418 !important':'#94A3B8 !important'};box-shadow:${activeTab==='scan'?'0 2px 8px rgba(255,200,0,0.3)':'none'};display:flex;align-items:center;justify-content:center;gap:3px;overflow:hidden;white-space:nowrap;">
+          <i data-lucide="camera" style="width:11px;height:11px;flex-shrink:0;"></i> ${FiezelI18n.t('social3.scan-btn','Pindai')}
         </button>
-        <button type="button" onclick="window._switchConnectModalTab('my-qr')" style="flex:1;padding:8px 2px;font-size:10.5px;font-weight:800;border-radius:9px;border:none;cursor:pointer;background:${activeTab==='my-qr'?'#FFC800 !important':'transparent !important'};color:${activeTab==='my-qr'?'#1B1418 !important':'#94A3B8 !important'};box-shadow:${activeTab==='my-qr'?'0 2px 8px rgba(255,200,0,0.3)':'none'};display:flex;align-items:center;justify-content:center;gap:3px;overflow:hidden;white-space:nowrap;">
-          <i data-lucide="qr-code" style="width:12px;height:12px;flex-shrink:0;"></i> ID & QR
+        <button type="button" onclick="window._switchConnectModalTab('my-qr')" style="flex:1;padding:6px 2px;font-size:10px;font-weight:800;border-radius:8px;border:none;cursor:pointer;background:${activeTab==='my-qr'?'#FFC800 !important':'transparent !important'};color:${activeTab==='my-qr'?'#1B1418 !important':'#94A3B8 !important'};box-shadow:${activeTab==='my-qr'?'0 2px 8px rgba(255,200,0,0.3)':'none'};display:flex;align-items:center;justify-content:center;gap:3px;overflow:hidden;white-space:nowrap;">
+          <i data-lucide="qr-code" style="width:11px;height:11px;flex-shrink:0;"></i> ID & QR
         </button>
-        <button type="button" onclick="window._switchConnectModalTab('invite')" style="flex:1;padding:8px 2px;font-size:10.5px;font-weight:800;border-radius:9px;border:none;cursor:pointer;background:${activeTab==='invite'?'#FFC800 !important':'transparent !important'};color:${activeTab==='invite'?'#1B1418 !important':'#94A3B8 !important'};box-shadow:${activeTab==='invite'?'0 2px 8px rgba(255,200,0,0.3)':'none'};display:flex;align-items:center;justify-content:center;gap:3px;overflow:hidden;white-space:nowrap;">
-          <i data-lucide="user-plus" style="width:12px;height:12px;flex-shrink:0;"></i> Tambah ID
+        <button type="button" onclick="window._switchConnectModalTab('invite')" style="flex:1;padding:6px 2px;font-size:10px;font-weight:800;border-radius:8px;border:none;cursor:pointer;background:${activeTab==='invite'?'#FFC800 !important':'transparent !important'};color:${activeTab==='invite'?'#1B1418 !important':'#94A3B8 !important'};box-shadow:${activeTab==='invite'?'0 2px 8px rgba(255,200,0,0.3)':'none'};display:flex;align-items:center;justify-content:center;gap:3px;overflow:hidden;white-space:nowrap;">
+          <i data-lucide="user-plus" style="width:11px;height:11px;flex-shrink:0;"></i> Tambah ID
         </button>
-        <button type="button" onclick="window._switchConnectModalTab('requests')" style="flex:1;padding:8px 2px;font-size:10.5px;font-weight:800;border-radius:9px;border:none;cursor:pointer;background:${activeTab==='requests'?'#FFC800 !important':'transparent !important'};color:${activeTab==='requests'?'#1B1418 !important':'#94A3B8 !important'};box-shadow:${activeTab==='requests'?'0 2px 8px rgba(255,200,0,0.3)':'none'};display:flex;align-items:center;justify-content:center;gap:3px;overflow:hidden;white-space:nowrap;">
-          <i data-lucide="bell" style="width:12px;height:12px;flex-shrink:0;"></i> Terima ${reqCount>0?`<span style="background:#EF4444;color:#FFF;border-radius:99px;padding:0 4px;font-size:9.5px;font-weight:800;">${reqCount}</span>`:''}
+        <button type="button" onclick="window._switchConnectModalTab('requests')" style="flex:1;padding:6px 2px;font-size:10px;font-weight:800;border-radius:8px;border:none;cursor:pointer;background:${activeTab==='requests'?'#FFC800 !important':'transparent !important'};color:${activeTab==='requests'?'#1B1418 !important':'#94A3B8 !important'};box-shadow:${activeTab==='requests'?'0 2px 8px rgba(255,200,0,0.3)':'none'};display:flex;align-items:center;justify-content:center;gap:3px;overflow:hidden;white-space:nowrap;">
+          <i data-lucide="bell" style="width:11px;height:11px;flex-shrink:0;"></i> Terima ${reqCount>0?`<span style="background:#EF4444;color:#FFF;border-radius:99px;padding:0 3px;font-size:9px;font-weight:800;">${reqCount}</span>`:''}
         </button>
       </div>
 
       <div id="connectModalBodyContent">${bodyHtml}</div>
-      <div class="modal-actions" style="margin-top:14px;"><button type="button" onclick="stopQrScanner();closeModal();">${t('coach.close-aria','Tutup')}</button></div>
+      <div class="modal-actions" style="margin-top:8px;"><button type="button" style="padding:8px 14px;font-size:12px;min-height:36px;" onclick="stopQrScanner();closeModal();">${t('coach.close-aria','Tutup')}</button></div>
     `;
   }
 
@@ -19272,6 +19260,7 @@ async function openFriendConnectModal(initialTab='scan'){
     activeTab=t;
     const panel=$('modalPanel');
     if(panel){
+      panel.classList.add('modal-connect-panel');
       panel.innerHTML=renderModalBody();
       enhanceUI();
       if(t==='scan'){await startQrVideoScan();}
@@ -19281,6 +19270,7 @@ async function openFriendConnectModal(initialTab='scan'){
   };
 
   openModal(renderModalBody());
+  $('modalPanel')?.classList.add('modal-connect-panel');
   if(initialTab==='scan'){await startQrVideoScan();}
   else if(initialTab==='requests'){await loadConnectRequests();}
   else if(initialTab==='invite'){setTimeout(()=>{$('connectFriendInput')?.focus()},60);}
@@ -19374,20 +19364,29 @@ window.socialAddByHandle=socialAddByHandle;
    supaya tombolnya cuma muncul ketika memang ada yang menunggu - kalau tidak, ia
    hanya menambah satu tombol mati di panel yang sudah padat. */
 let socialRequestCount=0;
-let notifCachedRequests=[];
-try{Object.defineProperty(window,'notifCachedRequests',{get:()=>notifCachedRequests,set:(v)=>{notifCachedRequests=Array.isArray(v)?v:[];socialRequestCount=notifCachedRequests.length},configurable:true})}catch(_){}
+let notifCachedRequests=(()=>{
+  try{
+    const saved=JSON.parse(localStorage.getItem('fz_notif_cached_requests')||'[]');
+    if(Array.isArray(saved)){socialRequestCount=saved.length;return saved;}
+  }catch(_){}
+  return [];
+})();
+function saveNotifCachedRequests(list){
+  notifCachedRequests=Array.isArray(list)?list:[];
+  socialRequestCount=notifCachedRequests.length;
+  try{localStorage.setItem('fz_notif_cached_requests',JSON.stringify(notifCachedRequests))}catch(_){}
+}
+try{Object.defineProperty(window,'notifCachedRequests',{get:()=>notifCachedRequests,set:(v)=>saveNotifCachedRequests(v),configurable:true})}catch(_){}
 async function refreshFriendRequestCount(){
-  const core=socialCore();if(!core)return 0;
+  const core=socialCore();if(!core)return socialRequestCount;
   try{
     const res=await core.api.friendRequests();
     if(res.ok&&Array.isArray(res.data?.requests)){
-      notifCachedRequests=res.data.requests;
-      socialRequestCount=res.data.requests.length;
-    }else{
-      notifCachedRequests=[];
-      socialRequestCount=0;
+      saveNotifCachedRequests(res.data.requests);
+    }else if(res.error==='profile_required'){
+      saveNotifCachedRequests([]);
     }
-  }catch(_){notifCachedRequests=[];socialRequestCount=0}
+  }catch(_){}
   try{updateTemanBadge();refreshNotifBadge()}catch(_){}
   return socialRequestCount;
 }
@@ -19416,8 +19415,7 @@ async function renderFriendRequests(){
   const core=socialCore(),box=$('socialRequestList');if(!core||!box)return;
   const res=await core.api.friendRequests();
   const list=res.ok&&Array.isArray(res.data?.requests)?res.data.requests:[];
-  notifCachedRequests=list;
-  socialRequestCount=list.length;
+  saveNotifCachedRequests(list);
   try{updateTemanBadge();refreshNotifBadge()}catch(_){}
   box.innerHTML=list.length?list.map(friendRequestRow).join(''):`<p class="muted">${FiezelI18n.t('social2.req-empty')}</p>`;
   try{enhanceUI()}catch(_){}
@@ -19430,8 +19428,7 @@ async function decideFriendRequest(handle,accept){
   if(!res.ok)return showToast(res.error==='code_invalid'||res.status===400?FiezelI18n.t('social2.add-invalid'):res.message);
   showToast(FiezelI18n.t(accept?'social2.req-accepted':'social2.req-rejected',{handle:h}));
   socialSummaryAt=0;
-  notifCachedRequests=notifCachedRequests.filter(x=>String(x&&x.handle||'').toLowerCase()!==h);
-  socialRequestCount=notifCachedRequests.length;
+  saveNotifCachedRequests(notifCachedRequests.filter(x=>String(x&&x.handle||'').toLowerCase()!==h));
   await renderFriendRequests();
   updateTemanBadge();
   refreshNotifBadge();
@@ -19472,14 +19469,15 @@ function socialCopyId(){
 }
 window.socialCopyId=socialCopyId;
 function openProfileQr(){
-  const handle=socialProfileCache?.handle||storedSocialHandle();
-  if(!handle)return showToast(FiezelI18n.t('social3.qr-need-profile'));
+  const handle=socialProfileCache?.handle||storedSocialHandle()||(state.userName?String(state.userName).trim().toLowerCase().replace(/[^a-z0-9_]/g,'_'):'');
+  if(!handle)return showToast(FiezelI18n.t('social3.qr-need-profile','Profil sosial belum terdaftar.'));
   const qr=socialQrCore();
-  if(!qr)return showToast(FiezelI18n.t('social3.qr-fail'));
+  if(!qr)return showToast(FiezelI18n.t('social3.qr-fail','Gagal membuat kode QR.'));
   let svg='';
-  try{svg=qr.svg(socialProfileUrl(handle),{level:'M',label:FiezelI18n.t('social3.qr-aria',{handle})})}catch(_){svg=''}
-  if(!svg)return showToast(FiezelI18n.t('social3.qr-fail'));
-  openModal(`<div class="modal-mark">${FiezelI18n.t('social3.link-mark')}</div><h2>${FiezelI18n.t('social3.qr-title')}</h2><p class="muted">${FiezelI18n.t('social3.qr-desc')}</p><div class="fz3-qr" data-testid="profile-qr">${svg}</div><p class="fz2-myid" data-testid="profile-qr-id">@${esc(handle)}</p><div class="modal-actions"><button onclick="closeModal()">${FiezelI18n.t('coach.close-aria')}</button><button onclick="socialDownloadQr()"><i data-lucide="download"></i> ${FiezelI18n.t('social3.qr-download')}</button><button class="primary" onclick="socialShareProfile()"><i data-lucide="share-2"></i> ${FiezelI18n.t('social3.qr-share')}</button></div>`);
+  try{svg=qr.svg(socialProfileUrl(handle),{px:140,level:'M',label:FiezelI18n.t('social3.qr-aria',{handle})})}catch(_){svg=''}
+  if(!svg)return showToast(FiezelI18n.t('social3.qr-fail','Gagal membuat kode QR.'));
+  openModal(`<div class="modal-mark" style="font-size:0.68rem;letter-spacing:0.12em;margin-bottom:2px;">${FiezelI18n.t('social3.link-mark','KARTU PROFIL')}</div><h2 style="font-size:1.25rem;margin:2px 0 4px;font-weight:800;letter-spacing:-0.02em;">${FiezelI18n.t('social3.qr-title','Kode QR & ID Profil')}</h2><p class="muted" style="font-size:11.5px;margin:0 0 8px;line-height:1.3;">${FiezelI18n.t('social3.qr-desc','Minta teman memindai QR ini atau cari ID kamu.')}</p><div class="fz3-qr" data-testid="profile-qr" style="padding:8px;background:#FFF;border:2px solid #E2E8F0;border-radius:14px;box-shadow:0 4px 12px rgba(0,0,0,0.06);display:inline-flex;margin:4px auto;">${svg}</div><p class="fz2-myid" data-testid="profile-qr-id" style="font-size:14px;font-weight:800;color:#0F172A;font-family:monospace;margin:6px 0;">@${esc(handle)}</p><div class="modal-actions" style="margin-top:8px;display:flex;gap:6px;width:100%;max-width:280px;margin-left:auto;margin-right:auto;"><button type="button" style="flex:1;padding:7px 8px;font-size:11.5px;min-height:36px;" onclick="closeModal()">${FiezelI18n.t('coach.close-aria','Tutup')}</button><button type="button" style="flex:1;padding:7px 8px;font-size:11.5px;min-height:36px;" onclick="socialDownloadQr()"><i data-lucide="download" style="width:12px;height:12px;"></i> ${FiezelI18n.t('social3.qr-download','Unduh')}</button><button type="button" class="primary" style="flex:1;padding:7px 8px;font-size:11.5px;min-height:36px;" onclick="socialShareProfile()"><i data-lucide="share-2" style="width:12px;height:12px;"></i> ${FiezelI18n.t('social3.qr-share','Bagikan')}</button></div>`);
+  $('modalPanel')?.classList.add('modal-connect-panel');
   try{socialMicroMoment('profile')}catch(_){}
   return true;
 }
@@ -20018,7 +20016,7 @@ function isInputActive(){
   }catch(_){return false}
 }
 function refreshNotifBadge(){try{if(state.view==='classroom'&&$('fzClassHub')&&!$('fzClassHub').querySelector('[data-testid="class-runner"]')){if(!isInputActive())self.FiezelClassHub?.renderStudent?.({quiet:true})}}catch(_){}const b=$('fzNotifBadge');if(!b)return false;const n=notifUnreadTotal();b.textContent=n>9?'9+':String(n);b.classList.toggle('hidden',n<=0);$('fzNotifBtn')?.classList.toggle('has-new',n>0);return true}
-function notifTimeLabel(ts){try{const d=new Date(Number(ts)||Date.now()),diff=Date.now()-d.getTime();if(diff<60000)return t('sinkron.baru-saja','baru saja');if(diff<3600000)return t('sinkron.menit-lalu',{n:Math.max(1,Math.round(diff/60000))});if(diff<86400000)return t('sinkron.jam-lalu',{n:Math.max(1,Math.round(diff/3600000))});return d.toLocaleDateString('id-ID',{day:'numeric',month:'short'})}catch(_){return ''}}
+function notifTimeLabel(ts){try{const d=new Date(Number(ts)||Date.now()),diff=Date.now()-d.getTime();if(diff<60000)return t('sinkron.baru-saja','baru saja');if(diff<3600000)return t('sinkron.menit-lalu','{n} menit lalu',{n:Math.max(1,Math.round(diff/60000))});if(diff<86400000)return t('sinkron.jam-lalu','{n} jam lalu',{n:Math.max(1,Math.round(diff/3600000))});return d.toLocaleDateString('id-ID',{day:'numeric',month:'short'})}catch(_){return ''}}
 function notifItemMarkup(e){
   const time=`<small>${esc(notifTimeLabel(e.at))}</small>`;
   if(e.kind==='teacher_assignment'){
@@ -20049,6 +20047,7 @@ function renderNotifListMarkup(teacher,requests,social,invite){
   }
   return list;
 }
+let notifLoading=false;
 function renderNotifSheet(){
   const inbox=inboxCore(),notify=socialNotifyCore();
   const teacher=(inbox?inbox.items():[]).filter(e=>e.kind==='teacher_assignment');
@@ -20057,11 +20056,15 @@ function renderNotifSheet(){
   const invite=socialPendingInvite();
   const total=teacher.length+requests.length+social.length+(invite?1:0);
   const list=renderNotifListMarkup(teacher,requests,social,invite);
-  const html=`<div class="modal-mark">FIEZEL</div><div class="notif-sheet" data-testid="notif-sheet"><div class="notif-head"><h2>${t('notif.title','Notifikasi')}</h2>${total?`<button type="button" class="text-button notif-readall" onclick="notifMarkAllRead()" data-testid="notif-mark-all">${t('notif.mark-read','Tandai semua dibaca')}</button>`:''}</div>`+
-    (total?`<ul class="notif-list">${list}</ul>`:`<p class="notif-empty" data-testid="notif-empty"><i data-lucide="bell-off" aria-hidden="true"></i>${t('notif.empty','Belum ada kabar. Tugas dari guru, teman baru, dan sorakan akan muncul di sini.')}</p>`)+
+  const loadingHtml=`<div class="notif-loading" data-testid="notif-loading"><span class="notif-spinner"></span><p style="font-size:13px;margin:0;font-weight:600;">${t('notif.loading','Memuat kabar terbaru...')}</p></div>`;
+  const emptyHtml=`<p class="notif-empty" data-testid="notif-empty"><i data-lucide="bell-off" aria-hidden="true"></i>${t('notif.empty','Belum ada kabar. Tugas dari guru, teman baru, dan sorakan akan muncul di sini.')}</p>`;
+  const mainContent=total?`<ul class="notif-list">${list}</ul>`:(notifLoading?loadingHtml:emptyHtml);
+  const syncPill=notifLoading?`<span class="notif-spinner" style="width:13px;height:13px;border-width:2px;display:inline-block;vertical-align:middle;margin-left:6px;" title="Menyinkronkan..."></span>`:'';
+  const html=`<div class="modal-mark">FIEZEL</div><div class="notif-sheet" data-testid="notif-sheet"><div class="notif-head"><h2 style="display:flex;align-items:center;">${t('notif.title','Notifikasi')}${syncPill}</h2>${total?`<button type="button" class="text-button notif-readall" onclick="notifMarkAllRead()" data-testid="notif-mark-all">${t('notif.mark-read','Tandai semua dibaca')}</button>`:''}</div>`+
+    mainContent+
     `<div class="modal-actions"><button type="button" class="text-button" onclick="closeModal()" data-testid="notif-close">${t('modal.tutup','Tutup')}</button></div></div>`;
   const sheet=$('modalPanel')?.querySelector('.notif-sheet');
-  if(sheet){
+  if(modalOpen&&sheet){
     $('modalPanel').innerHTML=html;
     enhanceUI();
   }else{
@@ -20072,8 +20075,7 @@ async function notifAcceptFriend(handle){
   const h=String(handle||'').trim().replace(/^@/,'').toLowerCase();
   if(!h)return;
   await decideFriendRequest(h,true);
-  notifCachedRequests=notifCachedRequests.filter(x=>String(x&&x.handle||'').toLowerCase()!==h);
-  socialRequestCount=notifCachedRequests.length;
+  saveNotifCachedRequests(notifCachedRequests.filter(x=>String(x&&x.handle||'').toLowerCase()!==h));
   updateTemanBadge();
   refreshNotifBadge();
   if(modalOpen&&$('modalPanel')?.querySelector('.notif-sheet')){
@@ -20084,36 +20086,36 @@ async function notifRejectFriend(handle){
   const h=String(handle||'').trim().replace(/^@/,'').toLowerCase();
   if(!h)return;
   await decideFriendRequest(h,false);
-  notifCachedRequests=notifCachedRequests.filter(x=>String(x&&x.handle||'').toLowerCase()!==h);
-  socialRequestCount=notifCachedRequests.length;
+  saveNotifCachedRequests(notifCachedRequests.filter(x=>String(x&&x.handle||'').toLowerCase()!==h));
   updateTemanBadge();
   refreshNotifBadge();
   if(modalOpen&&$('modalPanel')?.querySelector('.notif-sheet')){
     renderNotifSheet();
   }
 }
-function openNotifications(){
+async function openNotifications(){
+  notifLoading=true;
   const notify=socialNotifyCore();
   renderNotifSheet();
   try{notify?.markAllRead()}catch(_){}
   refreshNotifBadge();
   const core=socialCore();
-  Promise.allSettled([
-    inboxPoll(true),
-    socialNotifyPoll(true),
-    core?core.api.friendRequests().then(res=>{
-      if(res&&res.ok&&Array.isArray(res.data?.requests)){
-        notifCachedRequests=res.data.requests;
-        socialRequestCount=notifCachedRequests.length;
-        updateTemanBadge();
-        refreshNotifBadge();
-      }
-    }):Promise.resolve()
-  ]).then(()=>{
+  try{
+    if(core&&typeof core.ensureAnon==='function')await core.ensureAnon();
+  }catch(_){}
+  try{
+    await Promise.allSettled([
+      inboxPoll(true),
+      socialNotifyPoll(true),
+      refreshFriendRequestCount()
+    ]);
+  }catch(_){}
+  finally{
+    notifLoading=false;
     if(modalOpen&&$('modalPanel')?.querySelector('.notif-sheet')){
       renderNotifSheet();
     }
-  }).catch(_=>{});
+  }
   return true;
 }
 function openAssignmentFromNotif(id){
@@ -20174,6 +20176,7 @@ async function notifSyncRound(){
   try{
     const r=await inboxPoll(false);
     notifFailStreak=r===null?notifFailStreak:0;
+    try{await refreshFriendRequestCount()}catch(_){}
   }catch(_){notifFailStreak++}
   finally{notifSyncing=false;notifSyncingSince=0}
 }
@@ -20191,20 +20194,25 @@ function startNotifPolling(){
   notifPollTimer=setInterval(()=>{
     const plan=notifSyncPlan();
     if(plan==='reset'){notifSyncing=false;notifSyncingSince=0}
-    if(plan==='sync'||plan==='reset'){notifSyncRound();socialNotifyPoll(false)}
+    if(plan==='sync'||plan==='reset'){
+      notifSyncRound();
+      socialNotifyPoll(false);
+      try{refreshFriendRequestCount()}catch(_){}
+    }
     else if(typeof document==='undefined'||document.visibilityState==='visible'){
-      try{if(navigator&&navigator.onLine!==false)socialNotifyPoll(false)}catch(_){}
+      try{if(navigator&&navigator.onLine!==false){socialNotifyPoll(false);refreshFriendRequestCount()}}catch(_){}
     }
   },NOTIF_POLL_MS);
   notifPollTimer?.unref?.();
   try{
     document.addEventListener('visibilitychange',()=>{
       try{if(document.visibilityState!=='visible')return}catch(_){return}
-      inboxPoll(true);socialNotifyPoll(true);
+      inboxPoll(true);socialNotifyPoll(true);try{refreshFriendRequestCount()}catch(_){}
     });
-    self.addEventListener?.('focus',()=>{inboxPoll(true);socialNotifyPoll(true)});
+    self.addEventListener?.('focus',()=>{inboxPoll(true);socialNotifyPoll(true);try{refreshFriendRequestCount()}catch(_){}});
   }catch(_){}
   inboxPoll(true);
+  try{refreshFriendRequestCount()}catch(_){}
   return true;
 }
 window.openNotifications=openNotifications;window.renderNotifSheet=renderNotifSheet;window.notifAcceptFriend=notifAcceptFriend;window.notifRejectFriend=notifRejectFriend;window.openAssignmentFromNotif=openAssignmentFromNotif;window.notifMarkAllRead=notifMarkAllRead;window.refreshNotifBadge=refreshNotifBadge;window.inboxPoll=inboxPoll;
