@@ -18505,8 +18505,8 @@
         {
           "option": "Mine",
           "misconception": "stand-alone-possessive-before-noun",
-          "whyFails": "It stands alone at the end of a sentence, never before a noun.",
-          "whyFailsId": "dipakai berdiri sendiri di akhir kalimat, bukan sebelum kata benda.",
+          "whyFails": "It stands alone without a following noun, never directly before a noun.",
+          "whyFailsId": "dipakai berdiri sendiri tanpa diikuti kata benda, bukan sebelum kata benda.",
           "misconceptionId": "bentuk pemilik yang berdiri sendiri ditaruh sebelum kata benda."
         },
         {
@@ -19681,8 +19681,8 @@
         {
           "option": "yours",
           "misconception": "possessive pronoun",
-          "whyFails": "It stands alone at the end of a sentence, not before 'pen'.",
-          "whyFailsId": "dipakai berdiri sendiri di akhir kalimat, bukan sebelum “pen”.",
+          "whyFails": "It stands alone without a following noun, not before 'pen'.",
+          "whyFailsId": "dipakai berdiri sendiri tanpa diikuti kata benda, bukan sebelum “pen”.",
           "misconceptionId": "bentuk pemilik yang berdiri sendiri ditaruh sebelum kata benda."
         },
         {
@@ -28686,6 +28686,6 @@
   "indonesianCoverage": {
     "translated": 512,
     "total": 512,
-    "updatedAt": "2026-10-05"
+    "updatedAt": "2026-10-09"
   }
 }

@@ -283,6 +283,7 @@
     'quiz.answer-paling-tepat-adalah': ' คำตอบที่เหมาะที่สุดคือ',
     'quiz.answer-right-pada-percobaan-pertama': 'ตอบถูกครั้งแรก {skor} จาก {total} ข้อ',
     'quiz.bandingkan-pilihan-lain': 'เทียบตัวเลือกอื่น',
+    'quiz.lihat-aturan-lengkap': 'ดูกฎไวยากรณ์ฉบับเต็ม',
     'quiz.bentuk-tepat': 'รูปที่ถูกต้อง: "{clozeAnswer}"',
     'quiz.bikin-tadi-keliru': 'สิ่งที่ทำให้เมื่อกี้พลาด: {s}',
     'quiz.bukti-diterima-right-ditandai-finish': 'รับหลักฐานแล้ว: ถูก {skor}/{total} “{title}” ถูกทำเครื่องหมายว่าเสร็จ — lesson ถัดไปเปิดแล้ว',

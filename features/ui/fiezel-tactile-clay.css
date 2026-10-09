@@ -1773,24 +1773,24 @@ button.target-lang-chip:active,
   justify-content: center !important;
 }
 
-.tile-icon-3d.vocab { 
-  background: #E0F2FE !important; 
-  border: 1.5px solid #BAE6FD !important; 
+.tile-icon-3d.vocab {
+  background: #E0F2FE !important;
+  border: 1.5px solid #BAE6FD !important;
   box-shadow: 0 3px 0 #BAE6FD !important;
 }
-.tile-icon-3d.grammar { 
-  background: #EEF2FF !important; 
-  border: 1.5px solid #C7D2FE !important; 
+.tile-icon-3d.grammar {
+  background: #EEF2FF !important;
+  border: 1.5px solid #C7D2FE !important;
   box-shadow: 0 3px 0 #C7D2FE !important;
 }
-.tile-icon-3d.reading { 
-  background: #DCFCE7 !important; 
-  border: 1.5px solid #BBF7D0 !important; 
+.tile-icon-3d.reading {
+  background: #DCFCE7 !important;
+  border: 1.5px solid #BBF7D0 !important;
   box-shadow: 0 3px 0 #BBF7D0 !important;
 }
-.tile-icon-3d.listening { 
-  background: #FEF3C7 !important; 
-  border: 1.5px solid #FDE68A !important; 
+.tile-icon-3d.listening {
+  background: #FEF3C7 !important;
+  border: 1.5px solid #FDE68A !important;
   box-shadow: 0 3px 0 #FDE68A !important;
 }
 
@@ -4620,16 +4620,16 @@ html body.fz-view-grammar #app .grammar-hub-tools .path-view-toggle > button {
   flex: 0 0 auto !important;
   display: inline-flex !important;
   align-items: center !important;
-  gap: 5px !important;
+  gap: 6px !important;
   width: auto !important;
-  min-height: 0 !important;
+  min-height: 44px !important;
   margin: 0 !important;
-  padding: 7px 11px !important;
+  padding: 10px 14px !important;
   border-radius: 9999px !important;
   border: 1.5px solid #E2E8F0 !important;
   background: #FFFFFF !important;
   box-shadow: 0 2px 0 #E2E8F0 !important;
-  font-size: 11.5px !important;
+  font-size: 12.5px !important;
   font-weight: 800 !important;
   color: #0F172A !important;
   white-space: nowrap !important;
@@ -5413,8 +5413,27 @@ html body .tutor-speed-pill,
 .grammar-brief-rule {
   font-size: 14.5px !important;
   line-height: 1.55 !important;
-  color: #475569 !important;
+  color: #334155 !important;
+  margin: 0 0 20px !important;
+}
+.grammar-lesson-card b,
+.grammar-lesson-card strong,
+.grammar-brief-rule b,
+.grammar-brief-rule strong,
+.grammar-brief-example b,
+.grammar-brief-example strong {
+  color: #0F172A !important;
+  font-weight: 800 !important;
+}
+.grammar-brief-example {
+  color: #334155 !important;
+  font-size: 14px !important;
+  line-height: 1.5 !important;
   margin: 0 0 24px !important;
+}
+.grammar-brief-example span {
+  color: #64748B !important;
+  font-weight: 700 !important;
 }
 .grammar-start-direct-btn {
   width: 100% !important;
@@ -5491,9 +5510,9 @@ html body .tutor-speed-pill,
   height: 48px !important;
   padding: 0 16px !important;
   background: #F8FAFC !important;
-  color: #334155 !important;
-  border: 1.5px solid #E2E8F0 !important;
-  border-bottom: 3.5px solid #CBD5E1 !important;
+  color: #0F172A !important;
+  border: 1.5px solid #CBD5E1 !important;
+  border-bottom: 3.5px solid #94A3B8 !important;
   border-radius: 16px !important;
   font-size: 14.5px !important;
   font-weight: 700 !important;
@@ -5510,14 +5529,14 @@ html body .tutor-speed-pill,
 #tokenResetBtn svg {
   width: 16px !important;
   height: 16px !important;
-  color: #64748B !important;
+  color: #0F172A !important;
 }
 
 .token-reset-btn:not(:disabled):hover,
 #tokenResetBtn:not(:disabled):hover {
   background: #F1F5F9 !important;
   color: #0F172A !important;
-  border-color: #CBD5E1 !important;
+  border-color: #94A3B8 !important;
 }
 
 .token-reset-btn:not(:disabled):active,
@@ -5528,12 +5547,12 @@ html body .tutor-speed-pill,
 
 .token-reset-btn:disabled,
 #tokenResetBtn:disabled {
-  opacity: 0.45 !important;
+  opacity: 0.5 !important;
   cursor: not-allowed !important;
   background: #F8FAFC !important;
   border-color: #E2E8F0 !important;
   border-bottom-color: #E2E8F0 !important;
-  color: #94A3B8 !important;
+  color: #475569 !important;
 }
 
 .token-submit-btn,
@@ -6064,203 +6083,284 @@ html body #tutorTurn .tutor-turn-head b{color:#34D399!important;-webkit-text-fil
 }
 
 /* ==========================================================================
-   GAME POSTER CARDS: SHARED & PAW ARENA
+   2D FLAT VECTOR ANIME GAME HUB REDESIGN
+   Authentic Japanese Anime UI: Sharp outlines, cel-shaded contrast,
+   manga screentone halftone dots, solid offset depth, vibrant flat palette.
    ========================================================================== */
+
+.game-hub-container {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 20px !important;
+  padding: 8px 16px 120px !important;
+  max-width: 680px !important;
+  margin: 0 auto !important;
+  box-sizing: border-box !important;
+}
+
+.game-hub-header-titles {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+  margin-bottom: 2px !important;
+}
+
+.game-brand-heading {
+  font-size: 28px !important;
+  font-weight: 900 !important;
+  color: #0F172A !important;
+  -webkit-text-fill-color: #0F172A !important;
+  letter-spacing: -0.02em !important;
+  margin: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.game-brand-heading::before {
+  content: '★';
+  color: #F59E0B;
+  font-size: 22px;
+}
+
+.game-brand-sub {
+  font-size: 13.5px !important;
+  color: #475569 !important;
+  -webkit-text-fill-color: #475569 !important;
+  margin: 0 !important;
+  font-weight: 500 !important;
+}
+
+.game-section-header {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+  margin-top: 10px !important;
+}
+
+.game-section-header h4 {
+  font-size: 14.5px !important;
+  font-weight: 900 !important;
+  color: #0F172A !important;
+  -webkit-text-fill-color: #0F172A !important;
+  margin: 0 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+.game-section-header .section-sub {
+  font-size: 12px !important;
+  color: #64748B !important;
+  -webkit-text-fill-color: #64748B !important;
+  font-weight: 500 !important;
+}
+
+/* CARD 1: FIEZEL ARENA (2D FLAT VECTOR ANIME DUEL POSTER) */
 .game-poster-card {
-  position: relative;
-  background:
-    radial-gradient(110% 120% at 90% 10%, rgba(255, 170, 0, 0.45) 0%, rgba(168, 85, 247, 0.3) 40%, transparent 70%),
-    radial-gradient(90% 90% at 10% 90%, rgba(59, 130, 246, 0.35) 0%, transparent 65%),
-    linear-gradient(145deg, #090514 0%, #150B33 35%, #231245 70%, #381259 100%) !important;
-  border-radius: 24px !important;
-  border: 2px solid rgba(255, 215, 0, 0.55) !important;
-  box-shadow: 0 18px 44px -8px rgba(112, 0, 255, 0.48), 0 0 28px rgba(255, 180, 0, 0.25), inset 0 2px 0 rgba(255, 255, 255, 0.35), inset 0 -4px 14px rgba(0, 0, 0, 0.7) !important;
+  position: relative !important;
+  border-radius: 22px !important;
+  border: 2.5px solid #0F172A !important;
+  box-shadow: 0 8px 0 #0F172A, 0 16px 28px rgba(15, 23, 42, 0.12) !important;
   color: #FFFFFF !important;
   overflow: hidden !important;
   cursor: pointer !important;
-  transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+  transition: transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.12s ease !important;
   box-sizing: border-box !important;
   display: flex !important;
   flex-direction: column !important;
   gap: 16px !important;
-  padding: 24px 20px 22px !important;
+  padding: 22px 20px 20px !important;
 }
 
 .game-poster-card:active {
-  transform: translateY(2px) !important;
-  box-shadow: 0 8px 24px -4px rgba(112, 0, 255, 0.45), 0 0 16px rgba(255, 180, 0, 0.2) !important;
+  transform: translateY(3px) !important;
+  box-shadow: 0 4px 0 #0F172A, 0 8px 16px rgba(15, 23, 42, 0.1) !important;
 }
 
-.poster-cyber-grid {
-  position: absolute;
-  inset: 0;
+.game-poster-card.paw-poster-card {
+  background: #1E1B4B !important;
   background-image:
-    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
-  background-size: 20px 20px;
-  pointer-events: none;
-  mask-image: radial-gradient(ellipse at 80% 20%, black 40%, transparent 80%);
-  -webkit-mask-image: radial-gradient(ellipse at 80% 20%, black 40%, transparent 80%);
+    radial-gradient(rgba(255, 255, 255, 0.14) 1.5px, transparent 1.5px),
+    linear-gradient(135deg, #2E1065 0%, #1E1B4B 55%, #172554 100%) !important;
+  background-size: 14px 14px, 100% 100% !important;
 }
 
-.poster-light-ray {
-  position: absolute;
-  top: -30px;
-  right: -20px;
-  width: 170px;
-  height: 170px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 220, 50, 0.35) 0%, transparent 70%);
-  pointer-events: none;
+.poster-cyber-grid,
+.poster-light-ray,
+.poster-magma-glow {
+  display: none !important;
+}
+
+.anime-manga-accents {
+  position: absolute !important;
+  top: 0 !important;
+  right: 0 !important;
+  width: 140px !important;
+  height: 140px !important;
+  pointer-events: none !important;
+  background: radial-gradient(circle at 100% 0%, rgba(254, 240, 138, 0.15) 0%, transparent 70%) !important;
+  z-index: 1 !important;
 }
 
 .poster-badge-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  position: relative;
-  z-index: 2;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  position: relative !important;
+  z-index: 2 !important;
+  gap: 8px !important;
 }
 
 .poster-kicker {
-  background: linear-gradient(90deg, rgba(239, 68, 68, 0.35), rgba(245, 158, 11, 0.35)) !important;
-  border: 1.5px solid #F59E0B !important;
-  color: #FFE57F !important;
-  -webkit-text-fill-color: #FFE57F !important;
+  background: #FDE047 !important;
+  border: 2px solid #0F172A !important;
+  color: #0F172A !important;
+  -webkit-text-fill-color: #0F172A !important;
   font-size: 11px !important;
-  font-weight: 800 !important;
+  font-weight: 900 !important;
   letter-spacing: 0.05em !important;
   padding: 4px 12px !important;
-  border-radius: 20px !important;
+  border-radius: 12px !important;
   display: inline-flex !important;
   align-items: center !important;
   gap: 6px !important;
-  box-shadow: 0 0 14px rgba(245, 158, 11, 0.35) !important;
+  box-shadow: 0 2.5px 0 #0F172A !important;
   text-transform: uppercase !important;
 }
 
 .poster-kicker svg {
-  width: 14px;
-  height: 14px;
-  stroke: #FFE57F;
+  width: 13px !important;
+  height: 13px !important;
+  stroke: #0F172A !important;
+  stroke-width: 2.5 !important;
 }
 
 .poster-live-tag {
-  background: rgba(34, 197, 94, 0.2) !important;
-  border: 1px solid rgba(74, 222, 128, 0.5) !important;
-  color: #86EFAC !important;
-  -webkit-text-fill-color: #86EFAC !important;
+  background: #DCFCE7 !important;
+  border: 2px solid #0F172A !important;
+  color: #14532D !important;
+  -webkit-text-fill-color: #14532D !important;
   font-size: 11px !important;
   font-weight: 800 !important;
   padding: 4px 11px !important;
-  border-radius: 20px !important;
+  border-radius: 12px !important;
   display: inline-flex !important;
   align-items: center !important;
   gap: 6px !important;
+  box-shadow: 0 2.5px 0 #0F172A !important;
 }
 
 .live-pulse-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #22C55E;
-  box-shadow: 0 0 10px #22C55E;
+  width: 8px !important;
+  height: 8px !important;
+  border-radius: 50% !important;
+  background: #22C55E !important;
+  border: 1.5px solid #0F172A !important;
+  box-shadow: none !important;
 }
 
 .poster-body {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  position: relative;
-  z-index: 2;
-  gap: 12px;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  position: relative !important;
+  z-index: 2 !important;
+  gap: 14px !important;
 }
 
 .poster-titles {
-  flex: 1;
+  flex: 1 !important;
 }
 
 .poster-sub-brand {
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: #FBBF24 !important;
-  -webkit-text-fill-color: #FBBF24 !important;
-  display: block;
-  margin-bottom: 3px;
+  font-size: 10.5px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  color: #FDE047 !important;
+  -webkit-text-fill-color: #FDE047 !important;
+  display: block !important;
+  margin-bottom: 3px !important;
 }
 
 .poster-main-title {
   font-size: 26px !important;
   font-weight: 900 !important;
   line-height: 1.1 !important;
-  margin: 0 0 8px !important;
-  letter-spacing: 0.03em !important;
+  margin: 0 0 6px !important;
+  letter-spacing: 0.02em !important;
   text-transform: uppercase !important;
-  background: linear-gradient(180deg, #FFFFFF 0%, #FFF3B0 35%, #FFD000 70%, #FF8800 100%) !important;
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  filter: drop-shadow(0 3px 10px rgba(255, 136, 0, 0.5)) !important;
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  background: none !important;
+  filter: none !important;
+  text-shadow: 2px 2px 0 #0F172A !important;
 }
 
 .poster-tagline {
   font-size: 12.5px !important;
   line-height: 1.45 !important;
-  color: #CBD5E1 !important;
-  -webkit-text-fill-color: #CBD5E1 !important;
+  color: #E2E8F0 !important;
+  -webkit-text-fill-color: #E2E8F0 !important;
   margin: 0 !important;
+  font-weight: 500 !important;
 }
 
 .poster-graphic {
-  flex-shrink: 0;
-  filter: drop-shadow(0 8px 20px rgba(255, 170, 0, 0.45));
+  flex-shrink: 0 !important;
+  filter: drop-shadow(0 4px 0 #0F172A) !important;
 }
 
 .poster-modes-strip {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  position: relative;
-  z-index: 2;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+  position: relative !important;
+  z-index: 2 !important;
 }
 
 .poster-mode-pill {
-  background: rgba(255, 255, 255, 0.08) !important;
-  border: 1px solid rgba(255, 255, 255, 0.18) !important;
-  padding: 5px 12px !important;
-  border-radius: 12px !important;
+  background: #312E81 !important;
+  border: 1.5px solid #0F172A !important;
+  padding: 4px 11px !important;
+  border-radius: 10px !important;
   font-size: 11.5px !important;
   font-weight: 700 !important;
-  color: #F1F5F9 !important;
-  -webkit-text-fill-color: #F1F5F9 !important;
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
   display: inline-flex !important;
   align-items: center !important;
   gap: 5px !important;
-  backdrop-filter: blur(8px) !important;
+  box-shadow: 0 2px 0 #0F172A !important;
+  backdrop-filter: none !important;
 }
 
 .poster-mode-pill svg {
-  width: 12px;
-  height: 12px;
-  stroke: #FBBF24;
+  width: 12px !important;
+  height: 12px !important;
+  stroke: #FDE047 !important;
+  stroke-width: 2.2 !important;
 }
 
 .poster-cta-wrap {
-  position: relative;
-  z-index: 2;
-  margin-top: 4px;
+  position: relative !important;
+  z-index: 2 !important;
+  margin-top: 4px !important;
 }
 
-.poster-action-btn {
+.poster-action-btn,
+.paw-action-btn {
   width: 100% !important;
-  background: linear-gradient(180deg, #FFE033 0%, #FFB300 50%, #FF8000 100%) !important;
-  border: 2px solid #FFF3B0 !important;
+  background: #FACC15 !important;
+  border: 2.5px solid #0F172A !important;
   border-radius: 16px !important;
   padding: 13px 24px !important;
-  color: #2D0C00 !important;
-  -webkit-text-fill-color: #2D0C00 !important;
-  font-family: var(--font-sans) !important;
+  color: #0F172A !important;
+  -webkit-text-fill-color: #0F172A !important;
+  font-family: inherit !important;
   font-size: 14px !important;
   font-weight: 900 !important;
   letter-spacing: 0.05em !important;
@@ -6269,90 +6369,101 @@ html body #tutorTurn .tutor-turn-head b{color:#34D399!important;-webkit-text-fil
   align-items: center !important;
   justify-content: center !important;
   gap: 10px !important;
-  box-shadow: 0 6px 0 #9E4500, 0 14px 28px rgba(255, 128, 0, 0.5) !important;
+  box-shadow: 0 5px 0 #0F172A !important;
   cursor: pointer !important;
-  transition: all 0.12s ease !important;
-}
-
-.poster-action-btn:active {
-  transform: translateY(3px) !important;
-  box-shadow: 0 3px 0 #9E4500, 0 6px 14px rgba(255, 128, 0, 0.4) !important;
-}
-
-.poster-action-btn svg {
-  width: 17px;
-  height: 17px;
-  stroke: #2D0C00;
-  stroke-width: 2.8;
-}
-
-/* ==========================================================================
-   GAME POSTER CARD: BUG ARENA (Volcanic Magma Boss Raid Poster)
-   ========================================================================== */
-.bug-poster-card {
-  position: relative;
-  background:
-    radial-gradient(110% 120% at 85% 15%, rgba(239, 68, 68, 0.45) 0%, rgba(185, 28, 28, 0.3) 45%, rgba(15, 23, 42, 0.95) 85%),
-    radial-gradient(90% 90% at 10% 90%, rgba(220, 38, 38, 0.3) 0%, transparent 65%),
-    linear-gradient(155deg, #180306 0%, #28070E 35%, #350812 70%, #150205 100%) !important;
-  border-radius: 24px !important;
-  border: 2px solid rgba(239, 68, 68, 0.65) !important;
-  box-shadow: 0 18px 44px -8px rgba(220, 38, 38, 0.45), 0 0 28px rgba(239, 68, 68, 0.22), inset 0 2px 0 rgba(255, 255, 255, 0.3), inset 0 -4px 14px rgba(0, 0, 0, 0.7) !important;
-  color: #FFFFFF !important;
-  overflow: hidden !important;
-  cursor: pointer !important;
-  transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+  transition: transform 0.1s ease, box-shadow 0.1s ease !important;
   box-sizing: border-box !important;
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 16px !important;
-  padding: 24px 20px 22px !important;
 }
 
-.bug-poster-card:active {
-  transform: translateY(2px) !important;
-  box-shadow: 0 8px 24px -4px rgba(220, 38, 38, 0.4), 0 0 16px rgba(239, 68, 68, 0.18) !important;
+.poster-action-btn:active,
+.paw-action-btn:active {
+  transform: translateY(3px) !important;
+  box-shadow: 0 2px 0 #0F172A !important;
 }
 
-.poster-magma-glow {
-  position: absolute;
-  top: -30px;
-  right: -20px;
-  width: 170px;
-  height: 170px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(239, 68, 68, 0.4) 0%, transparent 70%);
-  pointer-events: none;
+.poster-action-btn span,
+.paw-action-btn span {
+  color: #0F172A !important;
+  -webkit-text-fill-color: #0F172A !important;
+  font-weight: 900 !important;
+}
+
+.poster-action-btn svg,
+.paw-action-btn svg {
+  width: 17px !important;
+  height: 17px !important;
+  stroke: #0F172A !important;
+  stroke-width: 2.8 !important;
+}
+
+/* CARD 2: BUG ARENA (2D FLAT VECTOR ANIME BOSS RAID) */
+.game-poster-card.bug-poster-card {
+  background: #881337 !important;
+  background-image:
+    radial-gradient(rgba(255, 255, 255, 0.12) 1.5px, transparent 1.5px),
+    linear-gradient(145deg, #4C0519 0%, #881337 50%, #9F1239 100%) !important;
+  background-size: 14px 14px, 100% 100% !important;
+  border: 2.5px solid #0F172A !important;
+  box-shadow: 0 8px 0 #0F172A, 0 16px 28px rgba(15, 23, 42, 0.12) !important;
+}
+
+.game-poster-card.bug-poster-card:active {
+  transform: translateY(3px) !important;
+  box-shadow: 0 4px 0 #0F172A, 0 8px 16px rgba(15, 23, 42, 0.1) !important;
+}
+
+.anime-hazard-tape {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 6px !important;
+  background: repeating-linear-gradient(
+    45deg,
+    #FACC15,
+    #FACC15 10px,
+    #0F172A 10px,
+    #0F172A 20px
+  ) !important;
+  z-index: 3 !important;
+  border-bottom: 1.5px solid #0F172A !important;
 }
 
 .bug-kicker {
-  background: linear-gradient(90deg, rgba(220, 38, 38, 0.4), rgba(239, 68, 68, 0.35)) !important;
-  border: 1.5px solid #EF4444 !important;
-  color: #FCA5A5 !important;
-  -webkit-text-fill-color: #FCA5A5 !important;
-  box-shadow: 0 0 14px rgba(239, 68, 68, 0.35) !important;
+  background: #F43F5E !important;
+  border: 2px solid #0F172A !important;
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  box-shadow: 0 2.5px 0 #0F172A !important;
+}
+
+.bug-kicker svg {
+  stroke: #FFFFFF !important;
+  stroke-width: 2.5 !important;
 }
 
 .poster-threat-tag {
-  background: rgba(239, 68, 68, 0.22) !important;
-  border: 1px solid rgba(248, 113, 113, 0.6) !important;
-  color: #FCA5A5 !important;
-  -webkit-text-fill-color: #FCA5A5 !important;
+  background: #FEE2E2 !important;
+  border: 2px solid #0F172A !important;
+  color: #991B1B !important;
+  -webkit-text-fill-color: #991B1B !important;
   font-size: 11px !important;
-  font-weight: 800 !important;
+  font-weight: 900 !important;
   padding: 4px 11px !important;
-  border-radius: 20px !important;
+  border-radius: 12px !important;
   display: inline-flex !important;
   align-items: center !important;
   gap: 6px !important;
+  box-shadow: 0 2.5px 0 #0F172A !important;
 }
 
 .threat-pulse-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #EF4444;
-  box-shadow: 0 0 10px #EF4444;
+  width: 8px !important;
+  height: 8px !important;
+  border-radius: 50% !important;
+  background: #EF4444 !important;
+  border: 1.5px solid #0F172A !important;
+  box-shadow: none !important;
 }
 
 .bug-sub-brand {
@@ -6361,326 +6472,273 @@ html body #tutorTurn .tutor-turn-head b{color:#34D399!important;-webkit-text-fil
 }
 
 .bug-title {
-  background: linear-gradient(180deg, #FFFFFF 0%, #FED7AA 35%, #F87171 70%, #DC2626 100%) !important;
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  filter: drop-shadow(0 3px 10px rgba(220, 38, 38, 0.6)) !important;
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  background: none !important;
+  filter: none !important;
+  text-shadow: 2px 2px 0 #0F172A !important;
 }
 
 .bug-boss-graphic {
-  filter: drop-shadow(0 8px 24px rgba(220, 38, 38, 0.55));
+  filter: drop-shadow(0 4px 0 #0F172A) !important;
 }
 
-/* Boss Tactical HP Stack */
 .boss-hp-stack {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  position: relative;
-  z-index: 2;
-  background: rgba(0, 0, 0, 0.32);
-  border: 1px solid rgba(239, 68, 68, 0.35);
-  border-radius: 16px;
-  padding: 12px 14px;
-  backdrop-filter: blur(8px);
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  position: relative !important;
+  z-index: 2 !important;
+  background: #0F172A !important;
+  border: 2px solid #0F172A !important;
+  border-radius: 14px !important;
+  padding: 12px 14px !important;
+  box-shadow: 0 4px 0 #000000 !important;
+  backdrop-filter: none !important;
 }
 
 .boss-hp-unit {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
 }
 
 .boss-hp-meta {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 8px;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: baseline !important;
+  gap: 8px !important;
 }
 
 .boss-hp-meta .boss-name {
-  font-size: 12.5px;
-  color: #F1F5F9;
+  font-size: 12.5px !important;
+  color: #F1F5F9 !important;
 }
 
 .boss-hp-meta .boss-name b {
-  color: #FFFFFF;
-  font-weight: 800;
-  display: inline-block;
-  margin-right: 4px;
+  color: #FFFFFF !important;
+  font-weight: 800 !important;
+  display: inline-block !important;
+  margin-right: 4px !important;
 }
 
 .boss-hp-meta .boss-name small {
-  color: #FCA5A5;
-  font-size: 11px;
-  font-style: italic;
+  color: #94A3B8 !important;
+  font-size: 11px !important;
+  font-style: normal !important;
 }
 
 .boss-hp-badge {
-  font-size: 11px;
-  font-weight: 800;
-  padding: 2px 7px;
-  border-radius: 6px;
-  letter-spacing: 0.02em;
+  font-size: 11px !important;
+  font-weight: 900 !important;
+  padding: 2px 8px !important;
+  border-radius: 8px !important;
+  border: 1.5px solid #0F172A !important;
+  box-shadow: 0 1.5px 0 #0F172A !important;
+  letter-spacing: 0.02em !important;
 }
 
 .boss-hp-badge.crimson {
-  background: rgba(220, 38, 38, 0.35);
-  border: 1px solid #EF4444;
-  color: #FCA5A5;
+  background: #E11D48 !important;
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
 }
 
 .boss-hp-badge.amber {
-  background: rgba(217, 119, 6, 0.35);
-  border: 1px solid #F59E0B;
-  color: #FDE68A;
+  background: #F59E0B !important;
+  color: #0F172A !important;
+  -webkit-text-fill-color: #0F172A !important;
 }
 
 .boss-hp-track {
-  width: 100%;
-  height: 8px;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.1);
-  overflow: hidden;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+  width: 100% !important;
+  height: 10px !important;
+  border-radius: 6px !important;
+  background: #1E293B !important;
+  border: 1.5px solid #0F172A !important;
+  overflow: hidden !important;
+  box-shadow: none !important;
 }
 
 .boss-hp-bar {
-  height: 100%;
-  border-radius: 6px;
-  transition: width 0.4s ease;
+  height: 100% !important;
+  border-radius: 4px !important;
+  transition: width 0.3s ease !important;
 }
 
 .boss-hp-bar.crimson {
-  background: linear-gradient(90deg, #DC2626, #EF4444, #F87171);
-  box-shadow: 0 0 10px rgba(239, 68, 68, 0.7);
+  background: repeating-linear-gradient(
+    90deg,
+    #F43F5E 0px,
+    #F43F5E 10px,
+    #E11D48 10px,
+    #E11D48 13px
+  ) !important;
+  box-shadow: none !important;
 }
 
 .boss-hp-bar.amber {
-  background: linear-gradient(90deg, #D97706, #F59E0B, #FDE68A);
-  box-shadow: 0 0 10px rgba(245, 158, 11, 0.7);
+  background: repeating-linear-gradient(
+    90deg,
+    #FBBF24 0px,
+    #FBBF24 10px,
+    #F59E0B 10px,
+    #F59E0B 13px
+  ) !important;
+  box-shadow: none !important;
 }
 
 .bug-raid-action-btn {
-  background: linear-gradient(180deg, #EF4444 0%, #DC2626 50%, #991B1B 100%) !important;
-  border: 2px solid #FCA5A5 !important;
+  background: #E11D48 !important;
+  border: 2.5px solid #0F172A !important;
+  border-radius: 16px !important;
+  padding: 13px 24px !important;
   color: #FFFFFF !important;
   -webkit-text-fill-color: #FFFFFF !important;
-  box-shadow: 0 6px 0 #7F1D1D, 0 14px 28px rgba(220, 38, 38, 0.45) !important;
-  font-family: var(--font-sans) !important;
-  font-size: 13.5px !important;
-  font-weight: 800 !important;
+  box-shadow: 0 5px 0 #0F172A !important;
+  font-family: inherit !important;
+  font-size: 14px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.05em !important;
+  box-sizing: border-box !important;
+  cursor: pointer !important;
+  transition: transform 0.1s ease, box-shadow 0.1s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px !important;
+  width: 100% !important;
+  text-transform: uppercase !important;
 }
 
 .bug-raid-action-btn:active {
-  box-shadow: 0 3px 0 #7F1D1D, 0 6px 14px rgba(220, 38, 38, 0.35) !important;
+  transform: translateY(3px) !important;
+  box-shadow: 0 2px 0 #0F172A !important;
 }
 
 .bug-raid-action-btn span {
   color: #FFFFFF !important;
   -webkit-text-fill-color: #FFFFFF !important;
-  font-weight: 800 !important;
+  font-weight: 900 !important;
 }
 
 .bug-raid-action-btn svg {
   stroke: #FFFFFF !important;
   fill: #FFFFFF !important;
+  width: 17px !important;
+  height: 17px !important;
 }
 
-.paw-action-btn {
-  background: linear-gradient(180deg, #FFE033 0%, #FFB300 50%, #FF8000 100%) !important;
-  border: 2px solid #FFF3B0 !important;
-  color: #2D0C00 !important;
-  -webkit-text-fill-color: #2D0C00 !important;
-  box-shadow: 0 6px 0 #9E4500, 0 14px 28px rgba(255, 128, 0, 0.5) !important;
-}
-
-.paw-action-btn span {
-  color: #2D0C00 !important;
-  -webkit-text-fill-color: #2D0C00 !important;
-  font-weight: 900 !important;
-}
-
-/* Backward compatibility aliases */
-.game-hero-card { display: none !important; }
-.game-cta-btn { display: none !important; }
-
-.game-section-header {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  margin-top: 8px;
-}
-
-.game-section-header h4 {
-  font-size: 15px;
-  font-weight: 800;
-  color: #0F172A !important;
-  -webkit-text-fill-color: #0F172A !important;
-  margin: 0;
-  letter-spacing: -0.01em;
-}
-
-.game-section-header .section-sub {
-  font-size: 12px;
-  color: #64748B;
-  font-weight: 500;
-}
-
-/* ==========================================================================
-   ARCADE MINI-GAMES POSTER GRID
-   ========================================================================== */
+/* ARCADE MINI GAMES GRID (2D FLAT ANIME POP CARDS) */
 .game-arcade-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 14px;
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 14px !important;
 }
 
 @media (max-width: 540px) {
   .game-arcade-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
   }
 }
 
 .game-arcade-card {
-  position: relative;
-  border-radius: 20px;
-  border: 2px solid #E2E8F0;
-  box-shadow: 0 6px 0 var(--card-bevel), 0 12px 24px rgba(15, 23, 42, 0.05);
-  padding: 18px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-  box-sizing: border-box;
-  overflow: hidden;
+  position: relative !important;
+  border-radius: 18px !important;
+  border: 2.5px solid #0F172A !important;
+  box-shadow: 0 5px 0 #0F172A, 0 10px 20px rgba(15, 23, 42, 0.06) !important;
+  padding: 18px 16px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+  cursor: pointer !important;
+  transition: transform 0.12s ease, box-shadow 0.12s ease !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
 }
 
 .game-arcade-card:active {
-  transform: translateY(3px);
-  box-shadow: 0 3px 0 var(--card-bevel), 0 6px 12px rgba(15, 23, 42, 0.06);
+  transform: translateY(3px) !important;
+  box-shadow: 0 2px 0 #0F172A, 0 4px 8px rgba(15, 23, 42, 0.06) !important;
 }
 
 .game-arcade-card.mochi-card {
-  background: radial-gradient(120% 120% at 90% 10%, rgba(56, 189, 248, 0.25) 0%, transparent 60%), linear-gradient(150deg, #F0F9FF 0%, #E0F2FE 100%);
-  border-color: #BAE6FD;
-  box-shadow: 0 6px 0 #7DD3FC, 0 12px 24px rgba(2, 132, 199, 0.08);
+  background: #E0F2FE !important;
 }
 
 .game-arcade-card.puzzle-card {
-  background: radial-gradient(120% 120% at 90% 10%, rgba(168, 85, 247, 0.25) 0%, transparent 60%), linear-gradient(150deg, #FAF5FF 0%, #F3E8FF 100%);
-  border-color: #DDD6FE;
-  box-shadow: 0 6px 0 #C4B5FD, 0 12px 24px rgba(124, 58, 237, 0.08);
+  background: #F3E8FF !important;
 }
 
 .game-arcade-card.voice-card {
-  background: radial-gradient(120% 120% at 90% 10%, rgba(245, 158, 11, 0.25) 0%, transparent 60%), linear-gradient(150deg, #FFFBEB 0%, #FEF3C7 100%);
-  border-color: #FDE68A;
-  box-shadow: 0 6px 0 #FCD34D, 0 12px 24px rgba(217, 119, 6, 0.08);
+  background: #FEF3C7 !important;
 }
 
 .game-arcade-card.nujum-card {
-  background: radial-gradient(120% 120% at 90% 10%, rgba(239, 68, 68, 0.25) 0%, transparent 60%), linear-gradient(150deg, #FEF2F2 0%, #FEE2E2 100%);
-  border-color: #FECACA;
-  box-shadow: 0 6px 0 #FCA5A5, 0 12px 24px rgba(220, 38, 38, 0.08);
+  background: #FEE2E2 !important;
 }
 
 .game-arcade-card .arcade-card-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
 }
 
 .arcade-badge {
-  font-size: 10.5px;
-  font-weight: 800;
-  padding: 4px 9px;
-  border-radius: 8px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-size: 10.5px !important;
+  font-weight: 900 !important;
+  padding: 3px 9px !important;
+  border-radius: 8px !important;
+  border: 1.5px solid #0F172A !important;
+  box-shadow: 0 1.5px 0 #0F172A !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+  background: #FFFFFF !important;
+  color: #0F172A !important;
 }
 
-.arcade-badge.bubble {
-  background: #E0F2FE;
-  border: 1px solid #7DD3FC;
-  color: #0369A1;
-}
-
-.arcade-badge.puzzle {
-  background: #F3E8FF;
-  border: 1px solid #C4B5FD;
-  color: #6D28D9;
-}
-
-.arcade-badge.voice {
-  background: #FEF3C7;
-  border: 1px solid #FCD34D;
-  color: #B45309;
-}
-
-.arcade-badge.nujum {
-  background: #FEE2E2;
-  border: 1px solid #FCA5A5;
-  color: #B91C1C;
-}
-
-.arcade-icon-wrap {
-  width: 36px;
-  height: 36px;
-  border-radius: 12px;
-  background: #FFFFFF;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
-}
-
-.mochi-card .arcade-icon-wrap { color: #0284C7; }
-.puzzle-card .arcade-icon-wrap { color: #7C3AED; }
-.voice-card .arcade-icon-wrap { color: #D97706; }
-.nujum-card .arcade-icon-wrap { color: #DC2626; }
-
-.arcade-icon-wrap svg {
-  width: 20px;
-  height: 20px;
+.game-arcade-card .arcade-icon-wrap {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 12px !important;
+  border: 2px solid #0F172A !important;
+  box-shadow: 0 2.5px 0 #0F172A !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: #FFFFFF !important;
 }
 
 .arcade-card-title {
-  font-size: 16px;
-  font-weight: 800;
+  font-size: 16px !important;
+  font-weight: 900 !important;
   color: #0F172A !important;
   -webkit-text-fill-color: #0F172A !important;
-  margin: 4px 0 0;
+  margin: 0 !important;
 }
 
 .arcade-card-desc {
-  font-size: 12.5px;
-  color: #475569 !important;
-  -webkit-text-fill-color: #475569 !important;
-  line-height: 1.45;
-  margin: 0;
-  flex-grow: 1;
+  font-size: 12px !important;
+  line-height: 1.4 !important;
+  color: #334155 !important;
+  -webkit-text-fill-color: #334155 !important;
+  margin: 0 !important;
+  font-weight: 500 !important;
 }
 
 .arcade-card-footer {
-  display: flex;
-  justify-content: flex-end;
-  padding-top: 6px;
+  margin-top: 4px !important;
 }
 
 .arcade-play-hint {
-  font-size: 12px;
-  font-weight: 800;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
+  font-size: 12px !important;
+  font-weight: 900 !important;
+  color: #0F172A !important;
+  -webkit-text-fill-color: #0F172A !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
 }
-
-.mochi-card .arcade-play-hint { color: #0284C7; }
-.puzzle-card .arcade-play-hint { color: #7C3AED; }
-.voice-card .arcade-play-hint { color: #B45309; }
-.nujum-card .arcade-play-hint { color: #DC2626; }
 
 /* JLPT Sheet Tabs in Dark Drawer (High Contrast) */
 .jlpt-sheet-tabs button.jlpt-tab-chip,

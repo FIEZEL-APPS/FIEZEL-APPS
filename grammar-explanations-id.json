@@ -7934,7 +7934,7 @@
       "distractors": {
         "Mine": {
           "misconception": "bentuk pemilik yang berdiri sendiri ditaruh sebelum kata benda.",
-          "whyFails": "dipakai berdiri sendiri di akhir kalimat, bukan sebelum kata benda."
+          "whyFails": "dipakai berdiri sendiri tanpa diikuti kata benda, bukan sebelum kata benda."
         },
         "Me": {
           "misconception": "bentuk objek dipakai untuk menyebut pemilik.",
@@ -8438,7 +8438,7 @@
       "distractors": {
         "yours": {
           "misconception": "bentuk pemilik yang berdiri sendiri ditaruh sebelum kata benda.",
-          "whyFails": "dipakai berdiri sendiri di akhir kalimat, bukan sebelum “pen”."
+          "whyFails": "dipakai berdiri sendiri tanpa diikuti kata benda, bukan sebelum “pen”."
         },
         "you": {
           "misconception": "kata ganti subjek ditaruh sebelum kata benda.",
