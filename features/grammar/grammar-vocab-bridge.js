@@ -212,35 +212,60 @@
     if (!wordObj) return 'Please use your words.';
     const w = String(wordObj.word || '').toLowerCase();
     
-    // Coba cari dari bank soal grammar aktif (G atau GRAMMAR_ITEMS)
+    // G4: Cari kalimat asli dari bank grammar aktif (G atau GRAMMAR_ITEMS)
+    const grammarPool = [];
     if (typeof G !== 'undefined' && G && G[skill] && Array.isArray(G[skill])) {
       for (const item of G[skill]) {
-        // item[0] adalah stem kalimat, misal: "My cat ___ very small." atau "They ___ at home today."
         const stem = String(item[0] || '');
         const correctOpt = Array.isArray(item[1]) && Number.isInteger(item[2]) ? item[1][item[2]] : '';
         if (stem && correctOpt && stem.includes('___')) {
-          const filled = stem.replace('___', correctOpt).replace(/[.!?]/g, '').trim();
-          const tokens = filled.split(/\s+/);
-          // Cek apakah kalimat soal memuat kata kosakata ini
-          const matchWord = tokens.some(tok => tok.toLowerCase().replace(/[^a-z]/g, '') === w);
-          if (matchWord && tokens.length <= 7) {
-            return filled + '.';
+          const filled = stem.replace('___', correctOpt).replace(/[.!?]+$/, '').trim();
+          const tokens = filled.split(/\s+/).filter(Boolean);
+          if (tokens.length >= 3 && tokens.length <= 9) {
+            const hasWord = w && tokens.some(tok => tok.toLowerCase().replace(/[^a-z0-9']/g, '') === w);
+            grammarPool.push({ sentence: filled + '.', tokens, hasWord, len: tokens.length });
           }
         }
       }
     }
 
-    // Jika tidak ditemukan kecocokan persis di bank grammar aktif, periksa apakah word.example ringkas
+    // 1. Jika ada kalimat bank grammar yang memuat kata kunci secara alami:
+    const matched = grammarPool.filter(x => x.hasWord);
+    if (matched.length) {
+      matched.sort((a, b) => a.len - b.len);
+      return matched[0].sentence;
+    }
+
+    // 2. Cek contoh alami di kamus kosakata bila ringkas dan bermakna (<= 8 kata)
     if (wordObj.example && typeof wordObj.example === 'string') {
       const exClean = wordObj.example.trim();
-      const exTokens = exClean.replace(/[.!?]/g, '').trim().split(/\s+/).filter(Boolean);
-      // Gunakan kalimat contoh kamus bila ringkas (<= 7 kata) dan utuh
-      if (exTokens.length >= 3 && exTokens.length <= 7) {
-        return /[.!?]$/.test(exClean) ? exClean : exClean + '.';
+      const firstSentence = exClean.split(/[.!?]/)[0].trim();
+      const exTokens = firstSentence.split(/\s+/).filter(Boolean);
+      if (exTokens.length >= 3 && exTokens.length <= 8) {
+        return firstSentence + '.';
       }
     }
 
-    return 'We study ' + wordObj.word + ' here.';
+    // 3. Gunakan kalimat grammar riil terpendek dari materi aktif (mengajarkan pola grammar sebenarnya)
+    if (grammarPool.length) {
+      grammarPool.sort((a, b) => a.len - b.len);
+      return grammarPool[0].sentence;
+    }
+
+    // 4. Contoh dari meta materi kurikulum
+    const meta = (typeof GRAMMAR_ITEMS !== 'undefined' && Array.isArray(GRAMMAR_ITEMS))
+      ? GRAMMAR_ITEMS.find(x => x.skill === skill)
+      : null;
+    if (meta && meta.example && typeof meta.example === 'string') {
+      const mEx = meta.example.trim().split(/[.!?]/)[0].trim();
+      const mTokens = mEx.split(/\s+/).filter(Boolean);
+      if (mTokens.length >= 3 && mTokens.length <= 9) {
+        return mEx + '.';
+      }
+    }
+
+    // Kalimat cadangan gramatikal tanpa templat kaku "We study ... here"
+    return 'This is the right sentence.';
   }
 
   /**
@@ -253,16 +278,29 @@
   function getVocabForLesson(skill, intensityId, stateRef) {
     const targetCount = getIntensityVocabTarget(intensityId, stateRef);
     const map = loadGrammarVocabMap() || _grammarVocabMapCache;
+    const isTh = (typeof self !== 'undefined' && self.FiezelI18n?.getLocale?.() === 'th') ||
+                 (typeof FiezelI18n !== 'undefined' && FiezelI18n.getLocale?.() === 'th');
+    const thEntries = isTh ? ((typeof self !== 'undefined' && self.FiezelThData?.vocab?.entries) ||
+                             (typeof window !== 'undefined' && window.FiezelThData?.vocab?.entries) || null) : null;
     
+    // G2: Pastikan overlay Thai di V aktif bila locale th
+    if (isTh && typeof applyContentLocale === 'function') {
+      try { applyContentLocale(); } catch (_) {}
+    }
+
     if (map && map.lessons && map.lessons[skill]) {
       const lessonEntry = map.lessons[skill];
       const details = lessonEntry.vocabDetails || [];
       if (details.length) {
-        /* Audit UX grammar U6: arti di peta ini hanya berbahasa Indonesia. V sudah ditimpa arti
-           sesuai locale (vocabForLocale di app.js), jadi murid Thai membaca arti Thai. */
         const bank = (typeof V !== 'undefined' && Array.isArray(V)) ? V : [];
         return details.slice(0, targetCount).map(d => {
+          let thMeaning = null;
+          if (isTh && thEntries) {
+            const thItem = thEntries[String(d.id || '')] || thEntries[String(d.word || '')];
+            if (thItem && thItem.meaning) thMeaning = thItem.meaning;
+          }
           const v = bank.find(x => x && x.id === d.id);
+          if (thMeaning) return Object.assign({}, d, { meaning: thMeaning });
           return v && v.meaning ? Object.assign({}, d, { meaning: v.meaning }) : d;
         });
       }
@@ -276,14 +314,21 @@
       const level = meta?.level || (typeof getActiveLevel === 'function' ? getActiveLevel() : 'A1');
       const sameLevel = V.filter(v => v.level === level);
       const fallbackList = sameLevel.length >= targetCount ? sameLevel : V;
-      return fallbackList.slice(0, targetCount).map(v => ({
-        id: v.id,
-        word: v.word,
-        meaning: v.meaning || (v.meanings?.[0]?.meaning || ''),
-        level: v.level,
-        partOfSpeech: v.partOfSpeech || 'noun',
-        example: v.example || ''
-      }));
+      return fallbackList.slice(0, targetCount).map(v => {
+        let m = v.meaning || (v.meanings?.[0]?.meaning || '');
+        if (isTh && thEntries) {
+          const thItem = thEntries[String(v.id || '')] || thEntries[String(v.word || '')];
+          if (thItem && thItem.meaning) m = thItem.meaning;
+        }
+        return {
+          id: v.id,
+          word: v.word,
+          meaning: m,
+          level: v.level,
+          partOfSpeech: v.partOfSpeech || 'noun',
+          example: v.example || ''
+        };
+      });
     }
 
     return [];
@@ -811,6 +856,11 @@
    */
   function startVocabMiniGame(skill) {
     const s = typeof state !== 'undefined' ? state : null;
+    const isTh = (typeof self !== 'undefined' && self.FiezelI18n?.getLocale?.() === 'th') ||
+                 (typeof FiezelI18n !== 'undefined' && FiezelI18n.getLocale?.() === 'th');
+    if (isTh && typeof applyContentLocale === 'function') {
+      try { applyContentLocale(); } catch (_) {}
+    }
     const status = getVocabPrerequisiteStatus(skill, s);
     const words = status.words.slice(0, status.targetCount);
 
@@ -819,11 +869,21 @@
       return;
     }
 
+    const thEntries = isTh ? ((typeof self !== 'undefined' && self.FiezelThData?.vocab?.entries) ||
+                             (typeof window !== 'undefined' && window.FiezelThData?.vocab?.entries) || null) : null;
+
     // Prepare matching game arrays for Round 1
     const enCards = words.map(w => ({ id: w.id, text: w.word, word: w.word }));
-    const idCards = words.map(w => ({ id: w.id, text: w.meaning.split(';')[0].trim(), word: w.word }));
+    const idCards = words.map(w => {
+      let m = w.meaning;
+      if (isTh && thEntries) {
+        const thItem = thEntries[String(w.id || '')] || thEntries[String(w.word || '')];
+        if (thItem && thItem.meaning) m = thItem.meaning;
+      }
+      return { id: w.id, text: String(m || '').split(';')[0].trim(), word: w.word };
+    });
 
-    // Shuffle Indonesian cards
+    // Shuffle Indonesian/Thai cards
     for (let i = idCards.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [idCards[i], idCards[j]] = [idCards[j], idCards[i]];
@@ -969,7 +1029,16 @@
       const word = g.words[g.puzzleIndex] || g.words[0];
       const targetSentence = getAlignedSentenceForPuzzle(g.skill, word);
       if (!g.cachedTokens || g.cachedWord !== word.word) {
-        const tokens = targetSentence.replace(/[.!?]/g, '').split(/\s+/).filter(Boolean);
+        const rawTokens = targetSentence.replace(/[.!?]/g, '').split(/\s+/).filter(Boolean);
+        // G13: Desensitisasi huruf kapital kata pertama agar tidak membocorkan urutan kalimat
+        const tokens = rawTokens.map((tok, i) => {
+          if (tok.toLowerCase() === 'i') return 'I';
+          if (i === 0 && tok.length > 1) {
+            // Kecilkan huruf pertama jika bukan "I"
+            return tok.charAt(0).toLowerCase() + tok.slice(1);
+          }
+          return tok;
+        });
         const shuffled = [...tokens];
         for (let i = shuffled.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
@@ -985,7 +1054,10 @@
       const meta = (typeof GRAMMAR_ITEMS !== 'undefined' && Array.isArray(GRAMMAR_ITEMS))
         ? GRAMMAR_ITEMS.find(x => x.skill === g.skill)
         : null;
-      const grammarRuleText = meta ? (meta.title || meta.skill) : 'Pola Tata Bahasa';
+      // G11: Gunakan friendlySkillName agar murid Thai mendapat judul dalam aksara Thai
+      const grammarRuleText = (typeof friendlySkillName === 'function' ? friendlySkillName(g.skill) : '') ||
+                              (typeof FiezelI18n !== 'undefined' && FiezelI18n.t?.('grammar.title.' + g.skill)) ||
+                              (meta ? (meta.title || meta.skill) : 'Pola Tata Bahasa');
       const maxPuzzles = Math.min(2, g.words.length);
 
       stageHtml = `
@@ -1015,12 +1087,20 @@
 
           <div class="puzzle-sentence-stage" id="puzzleSentenceStage">
             <div class="puzzle-slot-line" id="puzzleSlotLine">
-              ${g.placedTokens.map((tok, idx) => `
-                <button type="button" class="puzzle-placed-chip" onclick="FiezelGrammarVocabBridge.removePuzzleToken(${idx})" title="Ketuk untuk melepas">
-                  <span class="tok-text">${esc(tok)}</span>
-                  <i data-lucide="x" class="chip-remove-icon"></i>
-                </button>
-              `).join('')}
+              ${g.placedTokens.map((tok, idx) => {
+                let displayTok = tok;
+                if (idx === 0 && displayTok.length > 0 && displayTok !== 'i') {
+                  displayTok = displayTok.charAt(0).toUpperCase() + displayTok.slice(1);
+                } else if (displayTok.toLowerCase() === 'i') {
+                  displayTok = 'I';
+                }
+                return `
+                  <button type="button" class="puzzle-placed-chip" onclick="FiezelGrammarVocabBridge.removePuzzleToken(${idx})" title="Ketuk untuk melepas">
+                    <span class="tok-text">${esc(displayTok)}</span>
+                    <i data-lucide="x" class="chip-remove-icon"></i>
+                  </button>
+                `;
+              }).join('')}
               ${g.placedTokens.length === 0 ? '<span class="puzzle-empty-hint">' + t('scaffold.hint-ketuk-keping', 'Ketuk keping di bawah...') + '</span>' : ''}
             </div>
           </div>
@@ -1038,15 +1118,16 @@
           <div class="puzzle-bank-wrapper">
             <span class="bank-label">${t('scaffold.bank-label', 'Pilihan Kata:')}</span>
             <div class="puzzle-bank-tiles">
-              ${shuffledTokens.map(tok => {
-                const usedCount = g.placedTokens.filter(t => t === tok).length;
-                const totalInTokens = tokens.filter(t => t === tok).length;
+              ${shuffledTokens.map((tok, idx) => {
+                const usedCount = g.placedTokens.filter(t => t.toLowerCase() === tok.toLowerCase()).length;
+                const totalInTokens = tokens.filter(t => t.toLowerCase() === tok.toLowerCase()).length;
                 const isUsed = usedCount >= totalInTokens;
                 return `
                   <button type="button" 
                           class="puzzle-tile${isUsed ? ' is-used' : ''}" 
                           ${isUsed ? 'disabled aria-disabled="true"' : ''}
-                          onclick="FiezelGrammarVocabBridge.addPuzzleToken('${esc(tok)}')">
+                          data-token-index="${idx}"
+                          onclick="FiezelGrammarVocabBridge.addPuzzleTokenIndex(${idx})">
                     ${esc(tok)}
                   </button>
                 `;
@@ -1267,6 +1348,15 @@
     renderMiniGameModal();
   }
 
+  function addPuzzleTokenIndex(idx) {
+    if (!_activeMiniGame || (_activeMiniGame.round !== 2 && _activeMiniGame.round !== 3)) return;
+    const g = _activeMiniGame;
+    const tok = g.cachedShuffledTokens?.[idx];
+    if (tok !== undefined) {
+      addPuzzleToken(tok);
+    }
+  }
+
   function removePuzzleToken(idx) {
     if (!_activeMiniGame || (_activeMiniGame.round !== 2 && _activeMiniGame.round !== 3)) return;
     _activeMiniGame.placedTokens.splice(idx, 1);
@@ -1320,7 +1410,7 @@
       triggerHaptic('light');
 
       // Analisis token yang tertinggal atau salah posisi
-      const missingTokens = targetTokens.filter(t => !g.placedTokens.includes(t));
+      const missingTokens = targetTokens.filter(t => !g.placedTokens.some(p => p.toLowerCase() === t.toLowerCase()));
       let feedbackMsg = '';
       if (g.placedTokens.length < targetTokens.length) {
         if (missingTokens.length > 0) {
@@ -1455,6 +1545,7 @@
     handleCardClick,
     handleRapidChoice,
     addPuzzleToken,
+    addPuzzleTokenIndex,
     removePuzzleToken,
     checkSentencePuzzle,
     requestPuzzleHint,

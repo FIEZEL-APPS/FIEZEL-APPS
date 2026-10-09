@@ -1511,7 +1511,7 @@ body:has(.modal-intensity-sheet) nav.bottomnav {
   flex-wrap: wrap;
   gap: 6px;
   justify-content: center;
-  max-height: 120px;
+  max-height: 200px;
   overflow-y: auto;
 }
 

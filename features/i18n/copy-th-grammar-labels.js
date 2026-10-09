@@ -221,6 +221,7 @@
   'grammar.video.progress': 'ความคืบหน้าวิดีโอ',
   'grammar.video.q-num': 'ข้อ',
   'grammar.video.question': 'ชมวิดีโอและเติมคำในช่องว่าง',
+  'grammar.dialogue.question': 'ดูบทสนทนาและเติมคำในช่องว่าง',
   'grammar.video.speed': 'ความเร็วในการเล่น',
   'grammar.hint-level-1': 'จุดเน้น',
   'grammar.hint-level-2': 'กฎไวยากรณ์',

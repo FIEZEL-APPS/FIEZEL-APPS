@@ -2126,6 +2126,33 @@ div.card {
   color: #FFFFFF !important;
 }
 
+/* G1: Kartu materi pelajaran (.grammar-lesson-card) berlatar putih/terang, teks b/strong/p wajib gelap */
+.grammar-lesson-card,
+.card.grammar-lesson-card {
+  background: #FFFFFF !important;
+  color: #0F172A !important;
+}
+.grammar-lesson-card h1,
+.grammar-lesson-card h2,
+.grammar-lesson-card h3,
+.grammar-lesson-card h4,
+.grammar-lesson-card b,
+.grammar-lesson-card strong,
+.card.grammar-lesson-card b,
+.card.grammar-lesson-card strong,
+.grammar-brief-rule b,
+.grammar-brief-rule strong,
+.grammar-brief-example b,
+.grammar-brief-example strong {
+  color: #0F172A !important;
+}
+.grammar-lesson-card p,
+.card.grammar-lesson-card p,
+.grammar-brief-rule,
+.grammar-brief-example {
+  color: #334155 !important;
+}
+
 .card p {
   color: #CBD5E1 !important;
 }
@@ -5032,6 +5059,9 @@ body.fz-lux .card.card-flashcard {
   min-height: 360px !important;
   cursor: pointer;
   perspective: 1400px;
+  -webkit-perspective: 1400px;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
   border: none !important;
   border-radius: 28px !important;
   background: transparent !important;
@@ -5071,10 +5101,13 @@ body.fz-lux .card.card-flashcard {
   height: 100%;
   transition: transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1);
   transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  will-change: transform;
 }
 
 .flashcard.flipped .flash-inner {
   transform: rotateY(180deg);
+  -webkit-transform: rotateY(180deg);
 }
 
 .flash-face,
@@ -5084,6 +5117,8 @@ body.fz-lux .card.card-flashcard {
   inset: 0;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
   border-radius: 28px !important;
   padding: 26px 22px !important;
   display: flex;
@@ -5096,7 +5131,8 @@ body.fz-lux .card.card-flashcard {
   box-shadow: 0 16px 36px -10px rgba(135, 105, 65, 0.14), 0 4px 14px rgba(135, 105, 65, 0.06), inset 0 1.5px 0 rgba(255, 255, 255, 0.95) !important;
   color: #1E1B18 !important;
   box-sizing: border-box;
-  overflow: hidden;
+  overflow: visible !important;
+  transition: opacity 0.22s ease;
 }
 
 @media(min-width: 640px) {
@@ -5127,8 +5163,26 @@ body.fz-lux .card.card-flashcard {
 }
 
 .flash-front {
-  transform: rotateY(0deg);
+  transform: rotateY(0deg) translateZ(1px);
+  -webkit-transform: rotateY(0deg) translateZ(1px);
   justify-content: space-between;
+}
+
+.flashcard:not(.flipped) .flash-front {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+.flashcard:not(.flipped) .flash-back {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+.flashcard.flipped .flash-front {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+.flashcard.flipped .flash-back {
+  opacity: 1 !important;
+  pointer-events: auto !important;
 }
 
 .flash-front-main {
@@ -5301,7 +5355,8 @@ html body:not(.fz-teacher-mode) .card-flashcard h2.word {
 
 /* Back Face */
 .flash-back {
-  transform: rotateY(180deg);
+  transform: rotateY(180deg) translateZ(1px);
+  -webkit-transform: rotateY(180deg) translateZ(1px);
   justify-content: space-between;
 }
 

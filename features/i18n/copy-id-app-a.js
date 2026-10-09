@@ -800,7 +800,7 @@
     // app.js:630 — grammarExercise v8 stem
     'grammar.mode-avoid-stem': `Strategi apa yang mencegah kesalahan di {judulLesson}?`,
     // app.js:581 — grammarExercise v1 stem
-    'grammar.mode-complete-stem': `Pilih kalimat yang benar:\n{stem}`,
+    'grammar.mode-complete-stem': `Lengkapi kalimat ini:\n{stem}`,
     // app.js:636 — grammarExercise v18-20 correctWhy
     'grammar.mode-contrast-benar': `Perbandingan yang bener nunjukin {kunciDikutip} jawabannya, terus nunjuk di mana {opsiDikutip} melesetnya.`,
     // app.js:636 — grammarExercise v18-20 expl

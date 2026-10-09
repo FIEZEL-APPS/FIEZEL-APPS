@@ -221,6 +221,7 @@
   'grammar.video.progress': 'Kemajuan video',
   'grammar.video.q-num': 'Soal',
   'grammar.video.question': 'Perhatikan video dan lengkapi bagian yang kosong.',
+  'grammar.dialogue.question': 'Perhatikan percakapan dan lengkapi bagian yang kosong.',
   'grammar.video.speed': 'Kecepatan pemutaran',
   'grammar.hint-level-1': 'Arah Fokus',
   'grammar.hint-level-2': 'Aturan Pola',

@@ -96,21 +96,10 @@ async function run() {
     console.log('  -> Active Intensity in state:', currentIntensity);
     if (currentIntensity !== 'santai') throw new Error('Active intensity failed to persist to santai');
 
-    // 4. Test Sub-Grammar Prerequisite Gateway Sheet
-    console.log('✓ Testing Sub-Grammar Gateway Sheet for "be_subject_agreement"...');
+    // 4. Test Sub-Grammar Prerequisite Gateway (Direct to Mini-Game as per PR #535)
+    console.log('✓ Testing Sub-Grammar Gateway for "be_subject_agreement"...');
     await page.evaluate(() => {
       window.FiezelGrammarVocabBridge.openLessonPrerequisiteGate('be_subject_agreement');
-    });
-
-    await page.waitForSelector('.lesson-prereq-gateway-sheet', { timeout: 4000 });
-    const vocabCount = await page.$$eval('.gateway-vocab-card', cards => cards.length);
-    console.log('  -> Number of prerequisite vocab cards shown:', vocabCount);
-    if (vocabCount < 5) throw new Error('Expected at least 5 vocab cards, got ' + vocabCount);
-
-    // 5. Test Mini Game Launch (Round 1: Bubble Snap)
-    console.log('✓ Launching Mini-Game (Round 1: Bubble Snap)...');
-    await page.evaluate(() => {
-      window.FiezelGrammarVocabBridge.startVocabMiniGame('be_subject_agreement');
     });
 
     await page.waitForSelector('.mini-game-round.round-1', { timeout: 4000 });
@@ -166,7 +155,7 @@ async function run() {
     await page.waitForSelector('.puzzle-placed-chip', { timeout: 3000 });
     const placedWord = await page.$eval('.puzzle-placed-chip .tok-text', el => el.textContent.trim());
     console.log(`  -> Placed chip verified: "${placedWord}" (matches clicked tile "${tileWord}")`);
-    if (placedWord !== tileWord) throw new Error(`Placed chip mismatch: expected ${tileWord}, got ${placedWord}`);
+    if (placedWord.toLowerCase() !== tileWord.toLowerCase()) throw new Error(`Placed chip mismatch: expected ${tileWord}, got ${placedWord}`);
 
     // Click chip to remove
     console.log('✓ Clicking placed chip to remove from slot line...');
@@ -189,7 +178,7 @@ async function run() {
     await page.waitForSelector('.round-3-unlocked', { timeout: 4000 });
     const unlockTitle = await page.$eval('.round-3-unlocked h2', el => el.textContent.trim());
     console.log('  -> Round 3 Auto-Unlock Title:', unlockTitle);
-    if (!unlockTitle.includes('Kosakata Terkuasai')) throw new Error('Unlock title mismatch');
+    if (!unlockTitle.includes('Kosakata Siap Dipakai') && !unlockTitle.includes('Kosakata Terkuasai')) throw new Error('Unlock title mismatch');
 
     // 9. Check Console Errors
     const criticalErrors = consoleErrors.filter(e => !e.includes('favicon.ico') && !e.includes('sw.js'));

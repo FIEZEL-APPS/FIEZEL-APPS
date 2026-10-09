@@ -463,9 +463,9 @@ body:not(.fz-dark) .token-chip.placed.placeholder {
   height: 48px !important;
   min-height: 48px !important;
   background: #f1f5f9 !important;
-  color: #334155 !important;
-  border: 1.5px solid #e2e8f0 !important;
-  border-bottom: 3.5px solid #cbd5e1 !important;
+  color: #0f172a !important;
+  border: 1.5px solid #cbd5e1 !important;
+  border-bottom: 3.5px solid #94a3b8 !important;
   border-radius: 16px !important;
   padding: 0 16px !important;
   font-size: 14.5px !important;
@@ -482,7 +482,7 @@ body:not(.fz-dark) .token-chip.placed.placeholder {
 .token-reset-btn svg {
   width: 16px !important;
   height: 16px !important;
-  color: #64748b !important;
+  color: #0f172a !important;
 }
 
 .token-reset-btn:not(:disabled):hover {

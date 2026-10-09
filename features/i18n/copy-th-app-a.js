@@ -419,7 +419,7 @@
     'grammar.keluarga-reported-speech': 'ประโยคเล่าความ',
     'grammar.keluarga-tense-aspect': 'เวลาและลักษณะของการกระทำ',
     'grammar.mode-avoid-stem': 'วิธีใดช่วยป้องกันข้อผิดพลาดใน {judulLesson}?',
-    'grammar.mode-complete-stem': 'เลือกประโยคที่ถูกต้อง:\n{stem}',
+    'grammar.mode-complete-stem': 'เติมคำในประโยคให้สมบูรณ์:\n{stem}',
     'grammar.mode-contrast-benar': 'การเปรียบเทียบที่ถูกต้องชี้ว่า {kunciDikutip} คือคำตอบ แล้วบอกด้วยว่า {opsiDikutip} พลาดตรงไหน',
     'grammar.mode-contrast-expl-kebalik': 'กลับกันเลย: {kunciDikutip} ต่างหากที่รักษาความหมายของประโยคไว้ ส่วน {opsiDikutip} คือตัวที่พลาด',
     'grammar.mode-contrast-expl-keliru': 'ยังไม่ใช่: lesson นี้ทดสอบการเปรียบเทียบนั้นจริง ๆ และ {kunciDikutip} คือคำตอบที่ถูกต้อง',

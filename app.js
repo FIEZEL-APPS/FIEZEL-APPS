@@ -13000,9 +13000,9 @@ function bindSwipe(el,onLeft,onRight){
     if(!e.touches||e.touches.length!==1)return;
     const t=e.touches[0],dx=t.clientX-sx,dy=t.clientY-sy;
     if(!isSwiping){
-      if(Math.abs(dx)>7&&Math.abs(dx)>Math.abs(dy)*0.75){
+      if(Math.abs(dx)>12&&Math.abs(dx)>Math.abs(dy)*0.75){
         isSwiping=true;
-      }else if(Math.abs(dy)>10){
+      }else if(Math.abs(dy)>15){
         return;
       }
     }
@@ -13042,6 +13042,9 @@ function bindSwipe(el,onLeft,onRight){
       el.style.transition='transform 0.38s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.28s ease';
       el.style.transform='translate3d(0,0,0) rotate(0deg) scale(1)';
       el.style.opacity='1';
+      if(Math.abs(dx)<25){
+        hasMoved=false;
+      }
       setTimeout(()=>{
         try{el.style.transition='';el.style.transform='';el.style.opacity=''}catch(_){}
       },380);
@@ -13052,6 +13055,8 @@ function bindSwipe(el,onLeft,onRight){
       e.stopPropagation();
       e.preventDefault();
     }
+    hasMoved=false;
+    isSwiping=false;
   },true);
 }
 function flashcards(level){
@@ -13096,7 +13101,7 @@ function reviewVocab(){
   let i=0,flipped=false;
   const draw=()=>{
     const v=due[i];if(!v)return exitStage();flipped=false;
-    setApp(`<section class="fade"><div class="topline"><button id="backReview"><i data-lucide="arrow-left"></i> ${FiezelI18n.t('student.vocab-title')}</button><b>${FiezelI18n.t('ulangan.topline',{idx:i+1,total:due.length})}</b></div><div class="card-flashcard"><div class="flashcard ${flipped?'flipped':''}" id="reviewCard" role="button" tabindex="0"><div class="flash-inner"><div class="flash-face flash-front"><div class="eyebrow">${FiezelI18n.t('ulangan.eyebrow',{level:esc(v.level)})}</div><div class="flash-front-main"><h2 class="word">${jaWord(v.word,v.phonetic)}</h2><div class="phonetic">${jaPhonetic(v.phonetic,FiezelI18n.t('flash.pelafalan-kosong'))}</div>${jaTogglesMarkup()}</div><div class="flash-front-actions">${targetLangVoiceBlocked()?'':`<button id="reviewSpeakWord" class="flash-audio-btn" type="button"><i data-lucide="volume-2"></i> ${FiezelI18n.t('flash.dengar-kata')}</button>`}</div><p class="muted flash-flip-hint"><i data-lucide="refresh-cw"></i> ${FiezelI18n.t('flash.tap-meaning')}</p></div><div class="flash-face flash-back"><div class="eyebrow">${FiezelI18n.t('ulangan.eyebrow',{level:esc(v.level)})}</div><div class="flash-back-main"><h3 class="flash-meaning">${esc(v.meaning)}</h3><div class="flash-example-box"><p class="flash-example-en">“${esc(v.example)}”</p>${v.exampleTranslation?`<p class="flash-example-id">${esc(v.exampleTranslation)}</p>`:''}</div></div>${targetLangVoiceBlocked()?'':`<div class="flash-back-actions"><button id="reviewSpeakWordBack" class="flash-audio-btn" type="button"><i data-lucide="volume-2"></i> ${FiezelI18n.t('flash.dengar-kata')}</button><button id="reviewSpeakSentence" class="flash-audio-btn" type="button"><i data-lucide="audio-lines"></i> ${FiezelI18n.t('flash.dengar-kalimat')}</button></div>`}<p class="muted flash-flip-hint"><i data-lucide="rotate-ccw"></i> ${FiezelI18n.t('flash.tap-back')}</p></div></div></div><div class="flash-mastery-bar"><button type="button" id="reviewLearning" class="flash-btn-learning"><i data-lucide="book-open"></i> ${FiezelI18n.t('flash.still-learning')}</button><button type="button" class="primary flash-btn-mastered" id="reviewMastered"><i data-lucide="check-circle-2"></i> ${FiezelI18n.t('flash.sudah-dikuasai')}</button></div></div></section>`);
+    setApp(`<section class="fade"><div class="topline"><button id="backReview"><i data-lucide="arrow-left"></i> ${FiezelI18n.t('student.vocab-title')}</button><b>${FiezelI18n.t('ulangan.topline',{idx:i+1,total:due.length})}</b></div><div class="card-flashcard"><div class="flashcard ${flipped?'flipped':''}" id="reviewCard" role="button" tabindex="0"><div class="flash-inner"><div class="flash-face flash-front"><div class="chips-row"><span class="chip chip-level">${esc(v.level)}</span><span class="chip chip-cat">${FiezelI18n.t('flash.kelas-kata')}<b>${esc(indonesianPartOfSpeech(v.partOfSpeech||'kata'))}</b></span></div><div class="flash-front-main"><h2 class="word">${jaWord(v.word,v.phonetic)}</h2><div class="phonetic">${jaPhonetic(v.phonetic,FiezelI18n.t('flash.pelafalan-kosong'))}</div>${jaTogglesMarkup()}</div><div class="flash-front-actions">${targetLangVoiceBlocked()?'':`<button id="reviewSpeakWord" class="flash-audio-btn" type="button"><i data-lucide="volume-2"></i> ${FiezelI18n.t('flash.dengar-kata')}</button>`}</div><p class="muted flash-flip-hint"><i data-lucide="refresh-cw"></i> ${FiezelI18n.t('flash.tap-meaning')}</p></div><div class="flash-face flash-back"><div class="chips-row"><span class="chip chip-level">${esc(v.level)}</span><span class="chip chip-cat">${FiezelI18n.t('flash.arti')}</span></div><div class="flash-back-main"><h3 class="flash-meaning">${esc(v.meaning)}</h3><div class="flash-example-box"><p class="flash-example-en">“${esc(v.example)}”</p>${v.exampleTranslation?`<p class="flash-example-id">${esc(v.exampleTranslation)}</p>`:''}</div></div>${targetLangVoiceBlocked()?'':`<div class="flash-back-actions"><button id="reviewSpeakWordBack" class="flash-audio-btn" type="button"><i data-lucide="volume-2"></i> ${FiezelI18n.t('flash.dengar-kata')}</button><button id="reviewSpeakSentence" class="flash-audio-btn" type="button"><i data-lucide="audio-lines"></i> ${FiezelI18n.t('flash.dengar-kalimat')}</button></div>`}<p class="muted flash-flip-hint"><i data-lucide="rotate-ccw"></i> ${FiezelI18n.t('flash.tap-back')}</p></div></div></div><div class="flash-mastery-bar"><button type="button" id="reviewLearning" class="flash-btn-learning"><i data-lucide="book-open"></i> ${FiezelI18n.t('flash.still-learning')}</button><button type="button" class="primary flash-btn-mastered" id="reviewMastered"><i data-lucide="check-circle-2"></i> ${FiezelI18n.t('flash.sudah-dikuasai')}</button></div></div></section>`);
     $('backReview').onclick=()=>exitStage();const flip=()=>{flipped=!flipped;$('reviewCard').classList.toggle('flipped',flipped);haptic('tap')};
     $('reviewCard').onclick=flip;$('reviewCard').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();flip()}};
     const nextCard=due[i+1]||null;
@@ -13640,14 +13645,14 @@ function getOrMakeVideoGrammarQuestion(skill, level, fallbackItem, idx, usedVgId
     const activeLvl=level||meta?.level||getActiveLevel();
     const base=fallbackItem[0]||'',opts=fallbackItem[1]||[],correctIdx=fallbackItem[2]||0;
     const rule=grammarLessonRule(fallbackItem);
-    const qPrompt=FiezelI18n.t('grammar.video.question','Perhatikan video dan lengkapi bagian yang kosong.');
+    const qPrompt=FiezelI18n.t('grammar.dialogue.question','Perhatikan percakapan dan lengkapi bagian yang kosong.');
     return {
       id:`vg-${skill}-${idx}`,
       type:'video-grammar',
       level:activeLvl,
       skill:skill,
       lessonSkill:skill,
-      question:`${qPrompt} ${base}`,
+      question:qPrompt,
       options:opts,
       answerIndex:correctIdx,
       videoConfig:{
@@ -13721,10 +13726,35 @@ function weaveGrammarSessionVariety(list, skill, activeLevel, ownTemplates, revi
   }
 
   const usedVgIds=new Set();
+  const normRaw=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+  const usedStems=new Set();
+  list.forEach(q=>{
+    if(!q)return;
+    const s=normRaw(q.sourceId||q.question||'');
+    if(s)usedStems.add(s);
+  });
+
   let vIdx=0;
   for(const slot of videoSlots){
     if(slot<list.length){
-      const fallbackItem=(ownTemplates&&ownTemplates.length>1)?ownTemplates[1+(vIdx%(ownTemplates.length-1))]:ownTemplates?.[0];
+      let fallbackItem=null;
+      if(Array.isArray(ownTemplates)&&ownTemplates.length){
+        const unused=ownTemplates.filter(tpl=>{
+          const r=normRaw(tpl?.[0]);
+          return r&&!usedStems.has(r);
+        });
+        if(unused.length){
+          fallbackItem=unused[vIdx%unused.length];
+        }else if(ownTemplates.length>1){
+          fallbackItem=ownTemplates[1+(vIdx%(ownTemplates.length-1))];
+        }else{
+          fallbackItem=ownTemplates[0];
+        }
+      }
+      if(fallbackItem){
+        const r=normRaw(fallbackItem[0]);
+        if(r)usedStems.add(r);
+      }
       vIdx++;
       const vq=getOrMakeVideoGrammarQuestion(skill,activeLevel,fallbackItem,slot,usedVgIds);
       if(vq)list[slot]=vq;
@@ -14150,10 +14180,29 @@ function grammarLessonExplain(item,why,distractors,familyRule,focus,mode='',targ
   let memoryText=grammarSanitizeContext(own(meta.memory)||FiezelI18n.t('grammar.inget-fokus-ya-cek-kenapa',{focus}),mode,targetWord,cw);
   let distractorText=grammarSanitizeContext(own(meta.whyOthers)||FiezelI18n.t('grammar.tiap-pilihan-salah-bawa-jebakan'),mode,targetWord,cw);
 
-  const cleanDistractors=(Array.isArray(distractors)?distractors:[]).map(d=>({
-    ...d,
-    reason:grammarSanitizeContext(d.reason,mode,targetWord,cw)
-  }));
+  const isTh = (typeof self !== 'undefined' && self.FiezelI18n?.getLocale?.() === 'th') ||
+               (typeof FiezelI18n !== 'undefined' && FiezelI18n.getLocale?.() === 'th');
+  const tplId = item?.[8] || '';
+  const thTemplate = isTh ? ((typeof self !== 'undefined' && self.FiezelThData?.grammar?.templates?.[tplId]) ||
+                            (typeof window !== 'undefined' && window.FiezelThData?.grammar?.templates?.[tplId]) || null) : null;
+  if(thTemplate){
+    if(thTemplate.whyCorrect) whyText = thTemplate.whyCorrect;
+    if(thTemplate.rule) ruleText = thTemplate.rule;
+    if(thTemplate.howToAvoid) avoidText = thTemplate.howToAvoid;
+    if(thTemplate.memoryCue) memoryText = thTemplate.memoryCue;
+    if(thTemplate.whyOthersFail) distractorText = thTemplate.whyOthersFail;
+  }
+
+  const cleanDistractors=(Array.isArray(distractors)?distractors:[]).map(d=>{
+    let reason = d.reason;
+    if(thTemplate && thTemplate.distractors && d.option && thTemplate.distractors[d.option]?.whyFails){
+      reason = thTemplate.distractors[d.option].whyFails;
+    }
+    return {
+      ...d,
+      reason: grammarSanitizeContext(reason,mode,targetWord,cw)
+    };
+  });
 
   return{
     why:whyText,
@@ -15447,7 +15496,7 @@ function quizLoop(cfg){
    whyText = stripDash(whyText);
    if(pickedWhyFails) pickedWhyFails = stripDash(pickedWhyFails);
    const ruleText = q.explain?.rule ? stripDash(q.explain.rule) : '';
-   f.innerHTML=`<div class="feedback-title"><i data-lucide="${verdictIcon}"></i><b>${verdictTitle}</b></div><p>${ok?FiezelI18n.t('quiz.correct-answer',{answer:`<strong>${esc(cleanCorrect)}</strong>`}):`${FiezelI18n.t('quiz.jawabanmu')} ${userPickRender}${FiezelI18n.t('quiz.answer-paling-tepat-adalah')} ${correctPickRender}.`}</p>${pickedWhyFails?`<p class="feedback-your-pick"><strong>${FiezelI18n.t('quiz.mengapa-salah','Mengapa kurang tepat?')}</strong> ${esc(pickedWhyFails)}</p>`:''}${stepGuidanceHtml}${(q.type==='grammar'||q.type==='token-order'||q.type==='video-grammar')&&ruleText/* m025-375: alasan dan aturan grammar di dua baris, bukan satu paragraf panjang */?`<p><strong>${FiezelI18n.t('quiz.intinya')}</strong> ${esc(whyText)}</p><p class="feedback-rule feedback-rule-pill"><strong>${FiezelI18n.t('quiz.aturannya')}</strong> ${formatRuleForDisplay(esc(ruleText))}</p>`:`<p><strong>${FiezelI18n.t('quiz.intinya')}</strong> ${esc(whyText)} ${ruleText?formatRuleForDisplay(esc(ruleText)):''}</p>`}<details class="acc"><summary>${FiezelI18n.t(q.explain?.distractors?'quiz.bandingkan-pilihan-lain':'quiz.pembahasan-lengkap')}</summary><p class="muted">${esc(q.explain?.distractor||FiezelI18n.t('quiz.fallback-unsupported'))} ${esc(q.explain?.avoid||FiezelI18n.t('quiz.fallback-hint-check'))}</p>${q.explain?.distractors?`<div class="distractor-breakdown">${q.explain.distractors.map(x=>`<p><b>${esc(x.option)}:</b> ${esc(stripDash(x.reason))}</p>`).join('')}</div>`:''}</details><div class="feedback-memory-box memory-tip"><div class="feedback-memory-header"><i data-lucide="lightbulb"></i><span class="feedback-memory-kicker">${FiezelI18n.t('quiz.trik-ingat','Trik Cepat Ingat')}</span></div><div class="feedback-memory-content">${formatMemoryTipForDisplay(esc(stripDash(q.explain?.memory||FiezelI18n.t('quiz.fallback-hint-connect'))))}</div></div><button class="ai-btn" id="aiExplainBtn"><i data-lucide="sparkles"></i> ${FiezelI18n.t('quiz.jelaskan-dengan-cara-lebih-sederhana')}</button>`;
+    f.innerHTML=`<div class="feedback-title"><i data-lucide="${verdictIcon}"></i><b>${verdictTitle}</b></div><p>${ok?FiezelI18n.t('quiz.correct-answer',{answer:`<strong>${esc(cleanCorrect)}</strong>`}):`${FiezelI18n.t('quiz.jawabanmu')} ${userPickRender}${FiezelI18n.t('quiz.answer-paling-tepat-adalah')} ${correctPickRender}.`}</p>${pickedWhyFails?`<p class="feedback-your-pick"><strong>${FiezelI18n.t('quiz.mengapa-salah','Mengapa kurang tepat?')}</strong> ${esc(pickedWhyFails)}</p>`:''}${stepGuidanceHtml}<p><strong>${FiezelI18n.t('quiz.intinya')}</strong> ${esc(whyText)}</p>${ruleText?`<details class="acc feedback-rule-details"><summary><i data-lucide="book-open"></i> ${FiezelI18n.t('quiz.lihat-aturan-lengkap','Lihat aturan lengkap')}</summary><div class="feedback-rule-body"><p class="feedback-rule feedback-rule-pill"><strong>${FiezelI18n.t('quiz.aturannya')}</strong> ${formatRuleForDisplay(esc(ruleText))}</p></div></details>`:''}<details class="acc"><summary>${FiezelI18n.t(q.explain?.distractors?'quiz.bandingkan-pilihan-lain':'quiz.pembahasan-lengkap')}</summary><p class="muted">${esc(q.explain?.distractor||FiezelI18n.t('quiz.fallback-unsupported'))} ${esc(q.explain?.avoid||FiezelI18n.t('quiz.fallback-hint-check'))}</p>${q.explain?.distractors?`<div class="distractor-breakdown">${q.explain.distractors.map(x=>`<p><b>${esc(x.option)}:</b> ${esc(stripDash(x.reason))}</p>`).join('')}</div>`:''}</details><div class="feedback-memory-box memory-tip"><div class="feedback-memory-header"><i data-lucide="lightbulb"></i><span class="feedback-memory-kicker">${FiezelI18n.t('quiz.trik-ingat','Trik Cepat Ingat')}</span></div><div class="feedback-memory-content">${formatMemoryTipForDisplay(esc(stripDash(q.explain?.memory||FiezelI18n.t('quiz.fallback-hint-connect'))))}</div></div><button class="ai-btn" id="aiExplainBtn"><i data-lucide="sparkles"></i> ${FiezelI18n.t('quiz.jelaskan-dengan-cara-lebih-sederhana')}</button>`;
   /* Audit G6: sesudah pembahasan jawaban SALAH dibuka, giliran tutor dulu (a) mengulang
      kalimat "Mengapa kurang tepat?" yang sama persis di kotak pembahasan tepat di atasnya,
      dan (b) pada tangga probe/hint menutup dengan "Sekarang coba jawab lagi ya" padahal semua
@@ -15511,6 +15560,10 @@ function quizLoop(cfg){
   document.querySelectorAll('.option.retry-available').forEach(b=>b.classList.remove('retry-available'));
   if($('quizFloatingBar')?.querySelector('.quiz-floating-retry'))$('quizFloatingBar')?.remove();
   const ok=j===q.answerIndex,ms=Date.now()-start,firstTry=answer.retryOf!==q.id;
+  if(!firstTry){
+    const ttHost=$('tutorTurn');
+    if(ttHost){ttHost.classList.add('hidden');ttHost.innerHTML=''}
+  }
   answer.lastPick=j;
   /* W1 P1-1: mode ukur menandai pilihan secara NETRAL (tanpa warna vonis) dan berbunyi
      netral \u2014 umpan balik taktil/bunyi tetap hidup, verdiknya yang tidak bocor.
@@ -15725,8 +15778,6 @@ function quizLoop(cfg){
      optContainer.parentNode.insertBefore(nudgeEl,optContainer);
    }
 
-   showQuizFloatingRetry(q,j);
-
    const mirip=answer.scaffold==='worked'?grammarSimilarExample(q):null;
    speak(tutorCompose(q,j,false,answer.scaffold,answer.move,answer.timing,{session:tutor,similar:mirip}),{retry:true,similar:!!mirip});
    setTimeout(()=>{try{pawReact('hint')}catch(_){}},1100);
@@ -15739,6 +15790,10 @@ function quizLoop(cfg){
   // reveal() membuka popup tepat setelah panel "FIEZEL menyiapkan pembahasannya" tercat,
   // dan scrim popup menutupinya. Pilihan dimatikan sekarang juga supaya tidak ada jendela
   // ketukan kedua selama popup hidup (answer.locked baru true di dalam reveal()).
+  const ttHost=$('tutorTurn');
+  if(ttHost){ttHost.classList.add('hidden');ttHost.innerHTML=''}
+  document.getElementById('quizScaffoldNudge')?.remove();
+  $('quizFloatingBar')?.remove();
   document.querySelectorAll('.option').forEach(b=>{b.disabled=true});
   /* W1 P1-1: mode ukur melompati popup keyakinan (verdiknya tertulis di popup itu) DAN
      teater analyzing 700ms \u2014 langsung ke tanda terima netral. */
@@ -16223,7 +16278,7 @@ function finishQuiz(cfg,score,total,tutorReport){
     if(flushPendingLevelGuardWarn()){pendingHomeReOffer=true;return}
     if(checkPrasasti('session').length){pendingHomeReOffer=true;return}
     maybeReOfferNotifications();
-  }catch(_){}},1600);postResultMoment?.unref?.();
+  }catch(_){}},4800);postResultMoment?.unref?.();
   sendCreatorReport('session_complete');
   if(typeof cfg?.onComplete==='function'){try{cfg.onComplete({score,total,accuracy,session})}catch(_){}}
 }
@@ -16643,16 +16698,16 @@ function startSentencePuzzleArcade(){
   go('grammar');
 }
 
-/* Bug Arena (Epic Volcanic Boss Raid Poster) - ditempatkan di panel Game */
+/* Bug Arena (2D Flat Vector Anime Boss Raid Poster) - ditempatkan di panel Game */
 function bugArenaCardMarkup() {
   return `
     <div class="game-poster-card bug-poster-card" onclick="if(window.FiezelBug&&FiezelBug.view)FiezelBug.view();else go('grammar');">
-      <div class="poster-magma-glow" aria-hidden="true"></div>
-      <div class="poster-cyber-grid" aria-hidden="true"></div>
+      <div class="anime-hazard-tape" aria-hidden="true"></div>
+      <div class="anime-manga-accents" aria-hidden="true"></div>
       <div class="poster-badge-row">
         <span class="poster-kicker bug-kicker">
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" fill="currentColor"/>
           </svg>
           <span>BOSS RAID SINTAKSIS</span>
         </span>
@@ -16660,32 +16715,41 @@ function bugArenaCardMarkup() {
       </div>
       <div class="poster-body">
         <div class="poster-titles">
-          <span class="poster-sub-brand bug-sub-brand">MISI ELIMINASI SINTAKSIS</span>
+          <span class="poster-sub-brand bug-sub-brand">TARGET ELIMINASI // 討伐ミッション</span>
           <h2 class="poster-main-title bug-title">BUG ARENA</h2>
           <p class="poster-tagline">Pola grammar yang sering keliru telah bermutasi menjadi Monster Bug! Tumbangkan segera sebelum menguras HP belajarmu.</p>
         </div>
         <div class="poster-graphic bug-boss-graphic" aria-hidden="true">
-          <svg viewBox="0 0 100 100" class="bug-boss-svg" width="84" height="84">
-            <defs>
-              <linearGradient id="pstScarabGrad" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stop-color="#FF6B6B"/>
-                <stop offset="50%" stop-color="#DC2626"/>
-                <stop offset="100%" stop-color="#7F1D1D"/>
-              </linearGradient>
-              <radialGradient id="pstScarabEye" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stop-color="#FFF066"/>
-                <stop offset="100%" stop-color="#EA580C"/>
-              </radialGradient>
-            </defs>
-            <circle cx="50" cy="50" r="44" fill="rgba(220, 38, 38, 0.15)" stroke="rgba(239, 68, 68, 0.4)" stroke-width="2"/>
-            <path d="M22 36 L10 26 M18 50 L6 50 M22 64 L10 74 M78 36 L90 26 M82 50 L94 50 M78 64 L90 74" stroke="#EF4444" stroke-width="4" stroke-linecap="round"/>
-            <path d="M42 20 Q34 10 38 6 Q46 12 46 22 M58 20 Q66 10 62 6 Q54 12 54 22" fill="#991B1B" stroke="#EF4444" stroke-width="2"/>
-            <rect x="32" y="24" width="36" height="56" rx="18" fill="url(#pstScarabGrad)" stroke="#F87171" stroke-width="2.5"/>
-            <line x1="50" y1="36" x2="50" y2="76" stroke="#450A0A" stroke-width="2.5"/>
-            <path d="M38 40 Q40 58 46 68" stroke="rgba(255,255,255,0.4)" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-            <ellipse cx="50" cy="28" rx="13" ry="10" fill="#7F1D1D"/>
-            <circle cx="43" cy="27" r="3.5" fill="url(#pstScarabEye)"/>
-            <circle cx="57" cy="27" r="3.5" fill="url(#pstScarabEye)"/>
+          <svg viewBox="0 0 100 100" class="bug-boss-svg" width="86" height="86">
+            <!-- Comic Reticle Brackets -->
+            <circle cx="50" cy="50" r="44" fill="none" stroke="#FDA4AF" stroke-width="2" stroke-dasharray="6 5"/>
+            <path d="M20 20 L12 20 L12 28 M80 20 L88 20 L88 28 M20 80 L12 80 L12 72 M80 80 L88 80 L88 72" fill="none" stroke="#F43F5E" stroke-width="3" stroke-linecap="square"/>
+            <!-- Mecha Legs with Angular Joints -->
+            <path d="M30 36 L12 28 M26 50 L8 50 M30 64 L12 72" stroke="#0F172A" stroke-width="4.5" stroke-linecap="round"/>
+            <path d="M30 36 L12 28 M26 50 L8 50 M30 64 L12 72" stroke="#E11D48" stroke-width="2.2" stroke-linecap="round"/>
+            <path d="M70 36 L88 28 M74 50 L92 50 M70 64 L88 72" stroke="#0F172A" stroke-width="4.5" stroke-linecap="round"/>
+            <path d="M70 36 L88 28 M74 50 L92 50 M70 64 L88 72" stroke="#E11D48" stroke-width="2.2" stroke-linecap="round"/>
+            <!-- Antennae -->
+            <path d="M42 22 L36 8 M58 22 L64 8" stroke="#0F172A" stroke-width="4" stroke-linecap="round"/>
+            <path d="M42 22 L36 8 M58 22 L64 8" stroke="#FDE047" stroke-width="2" stroke-linecap="round"/>
+            <polygon points="36,8 31,5 36,2 41,5" fill="#FACC15" stroke="#0F172A" stroke-width="1.5"/>
+            <polygon points="64,8 59,5 64,2 69,5" fill="#FACC15" stroke="#0F172A" stroke-width="1.5"/>
+            <!-- Main Carapace Armor (Cel-shaded) -->
+            <rect x="30" y="26" width="40" height="54" rx="14" fill="#E11D48" stroke="#0F172A" stroke-width="2.8"/>
+            <path d="M50 26 H56 C63.7 26 70 32.3 70 40 V66 C70 73.7 63.7 80 56 80 H50 Z" fill="#9F1239"/>
+            <line x1="50" y1="26" x2="50" y2="80" stroke="#0F172A" stroke-width="2.5"/>
+            <!-- Mecha Head Unit -->
+            <path d="M36 28 C36 18 64 18 64 28 Z" fill="#BE123C" stroke="#0F172A" stroke-width="2.5"/>
+            <!-- Glowing Cyan Anime Mecha Eyes -->
+            <polygon points="40,24 46,24 44,28 38,28" fill="#38BDF8" stroke="#0F172A" stroke-width="1.5"/>
+            <polygon points="60,24 54,24 56,28 62,28" fill="#38BDF8" stroke="#0F172A" stroke-width="1.5"/>
+            <!-- Armor Vent Lines -->
+            <line x1="38" y1="46" x2="44" y2="46" stroke="#0F172A" stroke-width="2" stroke-linecap="round"/>
+            <line x1="38" y1="56" x2="44" y2="56" stroke="#0F172A" stroke-width="2" stroke-linecap="round"/>
+            <line x1="56" y1="46" x2="62" y2="46" stroke="#0F172A" stroke-width="2" stroke-linecap="round"/>
+            <line x1="56" y1="56" x2="62" y2="56" stroke="#0F172A" stroke-width="2" stroke-linecap="round"/>
+            <!-- Danger Alert Spark -->
+            <path d="M78 14 L81 18 L86 16 L83 21 L87 24 L81 24 L80 29 L77 24 L72 24 L76 21 L73 16 L77 18 Z" fill="#FACC15" stroke="#0F172A" stroke-width="1.5"/>
           </svg>
         </div>
       </div>
@@ -16714,7 +16778,7 @@ function bugArenaCardMarkup() {
 
       <div class="poster-cta-wrap">
         <button type="button" class="poster-action-btn bug-raid-action-btn" onclick="event.stopPropagation();if(window.FiezelBug&&FiezelBug.view)FiezelBug.view();else go('grammar');">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
             <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" fill="currentColor"/>
           </svg>
           <span>SERANG &amp; ELIMINASI BUG (±2 MNT)</span>
@@ -16731,41 +16795,48 @@ function gameHubMarkup(){
       <p class="game-brand-sub">${esc(FiezelI18n.t('game.subtitle'))}</p>
     </div>
 
-    <!-- 1. POSTER GAME CARD: PAW ARENA (Multiplayer Esports 1v1) -->
+    <!-- 1. POSTER GAME CARD: FIEZEL ARENA (2D Flat Vector Anime Duel 1v1) -->
     <div class="game-section-header">
-      <h4>DUEL MULTIPLAYER 1V1</h4>
+      <h4>【対戦】DUEL MULTIPLAYER 1V1</h4>
       <span class="section-sub">Adu kecepatan &amp; ketangkasan bahasa bersama kawan</span>
     </div>
     <div class="game-poster-card paw-poster-card" onclick="go('arena')">
-      <div class="poster-cyber-grid" aria-hidden="true"></div>
-      <div class="poster-light-ray" aria-hidden="true"></div>
+      <div class="anime-manga-accents" aria-hidden="true"></div>
       <div class="poster-badge-row">
         <span class="poster-kicker"><i data-lucide="swords"></i> <span>${esc(FiezelI18n.t('game.arena-kicker'))}</span></span>
         <span class="poster-live-tag"><span class="live-pulse-dot"></span> ${esc(FiezelI18n.t('game.arena-live'))}</span>
       </div>
       <div class="poster-body">
         <div class="poster-titles">
-          <span class="poster-sub-brand">CHAMPIONS LEAGUE 1V1</span>
+          <span class="poster-sub-brand">ARENA LEAGUE // 対戦リーグ</span>
           <h2 class="poster-main-title">${esc(FiezelI18n.t('game.paw-arena-title'))}</h2>
           <p class="poster-tagline">${esc(FiezelI18n.t('game.paw-arena-desc'))}</p>
         </div>
         <div class="poster-graphic" aria-hidden="true">
-          <svg viewBox="0 0 100 100" class="poster-trophy-svg" width="84" height="84">
-            <defs>
-              <linearGradient id="pstGoldGrad" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stop-color="#FFF5C0"/>
-                <stop offset="50%" stop-color="#FFD700"/>
-                <stop offset="100%" stop-color="#FF8A00"/>
-              </linearGradient>
-            </defs>
-            <path d="M50 10 L82 24 V52 C82 72 50 90 50 90 C50 90 18 72 18 52 V24 Z" fill="rgba(255, 215, 0, 0.15)" stroke="url(#pstGoldGrad)" stroke-width="2.5"/>
-            <path d="M30 70 L70 30 M28 32 L34 26 L74 66 L68 72 Z" fill="#FFE082" opacity="0.85"/>
-            <path d="M70 70 L30 30 M72 32 L66 26 L26 66 L32 72 Z" fill="#FFCA28" opacity="0.85"/>
-            <path d="M38 38 h24 v14 c0 8 -5 14 -12 14 s-12 -6 -12 -14 Z" fill="url(#pstGoldGrad)"/>
-            <path d="M34 42 c-5 0 -8 4 -8 9 s4 8 8 8 h4 v-4 h-4 c-2 0 -4 -2 -4 -4 s2 -4 4 -4 h4 v-5 Z" fill="url(#pstGoldGrad)"/>
-            <path d="M66 42 c5 0 8 4 8 9 s-4 8 -8 8 h-4 v-4 h4 c2 0 4 -2 4 -4 s-2 -4 -4 -4 h-4 v-5 Z" fill="url(#pstGoldGrad)"/>
-            <rect x="47" y="66" width="6" height="10" fill="url(#pstGoldGrad)"/>
-            <rect x="40" y="76" width="20" height="5" rx="2.5" fill="url(#pstGoldGrad)"/>
+          <svg viewBox="0 0 100 100" class="poster-trophy-svg" width="86" height="86">
+            <!-- Comic Action Starburst Accent -->
+            <polygon points="50,2 62,32 94,36 68,58 76,90 50,72 24,90 32,58 6,36 38,32" fill="#FDE047" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round"/>
+            <!-- Inner Anime Shield -->
+            <path d="M50 16 L78 28 V54 C78 72 50 86 50 86 C50 86 22 72 22 54 V28 Z" fill="#2563EB" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round"/>
+            <!-- Shield Cel-shade Highlight -->
+            <path d="M50 16 L22 28 V54 C22 72 50 86 50 86 Z" fill="#3B82F6"/>
+            <!-- Crossed Anime Blades -->
+            <line x1="28" y1="28" x2="72" y2="72" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round"/>
+            <line x1="28" y1="28" x2="72" y2="72" stroke="#0F172A" stroke-width="2" stroke-linecap="round"/>
+            <line x1="25" y1="25" x2="35" y2="35" stroke="#F59E0B" stroke-width="6" stroke-linecap="round"/>
+            <line x1="72" y1="28" x2="28" y2="72" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round"/>
+            <line x1="72" y1="28" x2="28" y2="72" stroke="#0F172A" stroke-width="2" stroke-linecap="round"/>
+            <line x1="75" y1="25" x2="65" y2="35" stroke="#F59E0B" stroke-width="6" stroke-linecap="round"/>
+            <!-- Center Golden Cup Trophy Cel-Shaded -->
+            <path d="M38 38 H62 V50 C62 57 56 62 50 62 C44 62 38 57 38 50 Z" fill="#FACC15" stroke="#0F172A" stroke-width="2.2" stroke-linejoin="round"/>
+            <path d="M50 38 H62 V50 C62 57 56 62 50 62 Z" fill="#F59E0B"/>
+            <path d="M38 42 C32 42 32 50 38 50" fill="none" stroke="#0F172A" stroke-width="2.2" stroke-linecap="round"/>
+            <path d="M62 42 C68 42 68 50 62 50" fill="none" stroke="#0F172A" stroke-width="2.2" stroke-linecap="round"/>
+            <rect x="47" y="62" width="6" height="8" fill="#F59E0B" stroke="#0F172A" stroke-width="2"/>
+            <rect x="40" y="70" width="20" height="5" rx="1.5" fill="#FACC15" stroke="#0F172A" stroke-width="2"/>
+            <!-- Manga Sparkles -->
+            <path d="M78 20 L80 14 L82 20 L88 22 L82 24 L80 30 L78 24 L72 22 Z" fill="#FFFFFF" stroke="#0F172A" stroke-width="1.2"/>
+            <path d="M18 64 L20 60 L22 64 L26 65 L22 66 L20 70 L18 66 L14 65 Z" fill="#FDE047" stroke="#0F172A" stroke-width="1.2"/>
           </svg>
         </div>
       </div>
@@ -16784,14 +16855,14 @@ function gameHubMarkup(){
 
     <!-- 2. POSTER GAME CARD: BUG ARENA (Boss Raid Tracker) -->
     <div class="game-section-header">
-      <h4>BOSS RAID SINTAKSIS</h4>
+      <h4>【討伐】BOSS RAID SINTAKSIS</h4>
       <span class="section-sub">Eliminasi kelemahan tata bahasa sebelum menguras HP</span>
     </div>
     ${bugArenaCardMarkup()}
 
     <!-- 3. ARCADE MINI-GAMES POSTER GRID -->
     <div class="game-section-header">
-      <h4>${esc(FiezelI18n.t('game.section-title'))}</h4>
+      <h4>【遊戯】${esc(FiezelI18n.t('game.section-title'))}</h4>
       <span class="section-sub">${esc(FiezelI18n.t('game.section-sub'))}</span>
     </div>
 
@@ -16799,7 +16870,7 @@ function gameHubMarkup(){
       <!-- Mochi Crunch -->
       <div class="game-arcade-card mochi-card" onclick="startVocabArcade()">
         <div class="arcade-card-top">
-          <span class="arcade-badge bubble">${esc(FiezelI18n.t('game.bubble-badge'))}</span>
+          <span class="arcade-badge bubble">【速度】${esc(FiezelI18n.t('game.bubble-badge'))}</span>
           <span class="arcade-icon-wrap"><i data-lucide="sparkles"></i></span>
         </div>
         <h4 class="arcade-card-title">${esc(FiezelI18n.t('game.bubble-title'))}</h4>
@@ -16812,7 +16883,7 @@ function gameHubMarkup(){
       <!-- Sentence Puzzle Forge -->
       <div class="game-arcade-card puzzle-card" onclick="startSentencePuzzleArcade()">
         <div class="arcade-card-top">
-          <span class="arcade-badge puzzle">${esc(FiezelI18n.t('game.puzzle-badge'))}</span>
+          <span class="arcade-badge puzzle">【構文】${esc(FiezelI18n.t('game.puzzle-badge'))}</span>
           <span class="arcade-icon-wrap"><i data-lucide="layers"></i></span>
         </div>
         <h4 class="arcade-card-title">${esc(FiezelI18n.t('game.puzzle-title'))}</h4>
@@ -16825,7 +16896,7 @@ function gameHubMarkup(){
       <!-- Panggung Suara Live -->
       <div class="game-arcade-card voice-card" onclick="try{openLiveVoiceStage()}catch(_){go('skills')}">
         <div class="arcade-card-top">
-          <span class="arcade-badge voice">${esc(FiezelI18n.t('game.voice-badge'))}</span>
+          <span class="arcade-badge voice">【発音】${esc(FiezelI18n.t('game.voice-badge'))}</span>
           <span class="arcade-icon-wrap"><i data-lucide="mic"></i></span>
         </div>
         <h4 class="arcade-card-title">${esc(FiezelI18n.t('game.voice-title'))}</h4>
@@ -16838,7 +16909,7 @@ function gameHubMarkup(){
       <!-- Nujum Voice Mentor -->
       <div class="game-arcade-card nujum-card" onclick="go('nujum')">
         <div class="arcade-card-top">
-          <span class="arcade-badge nujum">${esc(FiezelI18n.t('game.nujum-badge'))}</span>
+          <span class="arcade-badge nujum">【師範】${esc(FiezelI18n.t('game.nujum-badge'))}</span>
           <span class="arcade-icon-wrap"><i data-lucide="flame"></i></span>
         </div>
         <h4 class="arcade-card-title">${esc(FiezelI18n.t('game.nujum-title'))}</h4>
