@@ -166,13 +166,19 @@
       fallbackTimer = null;
       var groups = idleGroups();
       if (!groups.length) return false;
-      whenIdle(function () {
+      function launch() {
+        var splash = doc.getElementById('fiezelBootSplash') || doc.querySelector('[data-fiezel-boot-splash]');
+        if (splash && splash.parentNode && !target.__fiezelBootSplashDismissed && !splash.classList.contains('is-leaving')) {
+          if (typeof target.setTimeout === 'function') target.setTimeout(launch, 300);
+          return;
+        }
         // Berurutan antar-grup supaya suara (yang dipakai lebih dulu) tidak berebut pita
         // dengan tumpukan tutor.
         groups.reduce(function (chain, name) {
           return chain.then(function () { return load(name); });
         }, Promise.resolve());
-      });
+      }
+      whenIdle(launch);
       return true;
     }
 

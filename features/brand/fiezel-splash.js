@@ -497,15 +497,19 @@
 
     /* FRAME — semua opasitas/transform dihitung MURNI dari t (parametrik):
        scrub, lompat, dan adopsi-terlambat selalu konsisten. */
+    var _lastF = '', _lastB = '', _lastWO = '', _lastWT = '';
     function perFrame(t, dt) {
       particles.update(t, dt);
-      fGroup.style.opacity = easeOutCubic(ramp(t, TL.F_IN0, TL.F_IN1)).toFixed(3);
-      barsGroup.style.opacity = ramp(t, TL.B_IN0, TL.B_IN1).toFixed(3);
+      var sF = easeOutCubic(ramp(t, TL.F_IN0, TL.F_IN1)).toFixed(3);
+      if (sF !== _lastF) { fGroup.style.opacity = sF; _lastF = sF; }
+      var sB = ramp(t, TL.B_IN0, TL.B_IN1).toFixed(3);
+      if (sB !== _lastB) { barsGroup.style.opacity = sB; _lastB = sB; }
       equalizer.update(t, dt);
       var pw = easeOutCubic(ramp(t, TL.WORD0, TL.WORD1));
-      wordSlot.style.opacity = pw.toFixed(3);
-      /* Hanya translateY: pemusatan horizontal milik CSS (margin:0 auto). */
-      wordSlot.style.transform = 'translateY(' + ((1 - pw) * 14).toFixed(2) + 'px)';
+      var sWO = pw.toFixed(3);
+      if (sWO !== _lastWO) { wordSlot.style.opacity = sWO; _lastWO = sWO; }
+      var sWT = 'translateY(' + ((1 - pw) * 14).toFixed(2) + 'px)';
+      if (sWT !== _lastWT) { wordSlot.style.transform = sWT; _lastWT = sWT; }
     }
 
     /* JADWAL — ketukan bersuara dibaca dari tabel koreografi (sumber tunggal
@@ -730,6 +734,12 @@
       if (closed) return;
       closed = true;
       ctl.closed = true;
+      try {
+        target.__fiezelBootSplashDismissed = true;
+        if (typeof target.dispatchEvent === 'function' && typeof target.CustomEvent === 'function') {
+          target.dispatchEvent(new target.CustomEvent('fiezel:splash-dismissed'));
+        }
+      } catch (_) {}
       if (timer && target.clearTimeout) target.clearTimeout(timer);
       for (var i = 0; i < ctl.cleanup.length; i++) { try { ctl.cleanup[i](); } catch (_) {} }
       markSeen(target, now);
@@ -747,6 +757,7 @@
       else remove();
     }
     function remove() {
+      try { target.__fiezelBootSplashDismissed = true; } catch (_) {}
       try { if (host.parentNode) host.parentNode.removeChild(host); } catch (_) {}
     }
 
