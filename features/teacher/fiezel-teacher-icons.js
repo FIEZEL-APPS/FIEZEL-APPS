@@ -53,7 +53,9 @@
     'library': 'm16 6 4 14M12 6v14M8 8v12M4 4v16',
     'key': 'm21 2-2 2m-1.5 1.5L13 10m-3-3 3 3m-2-2 2 2m-7 3a5 5 0 1 0 0-7 5 5 0 0 0 0 7z',
     'x': 'M18 6 6 18M6 6l12 12',
-    'more-horizontal': 'M5 12h.01M12 12h.01M19 12h.01'
+    'more-horizontal': 'M5 12h.01M12 12h.01M19 12h.01',
+    'plus-circle': 'M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 6v8m-4-4h8',
+    'file-up': 'M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7zm-1 0v4a2 2 0 0 0 2 2h4m-4 4v6m3-3l-3-3-3 3'
   };
   function svg(name) {
     var d = P[name]; if (!d) return '';
