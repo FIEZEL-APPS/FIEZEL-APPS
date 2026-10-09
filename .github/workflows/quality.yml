@@ -317,6 +317,7 @@ jobs:
           # ajak main suara, paritas kunci i18n ID/TH, naskah bebas tanda hubung).
           node tests/friend-qr-contract-test.js
           node tests/friend-system-contract-test.js
+          node tests/qr-scanner-test.js
           node tests/student-single-registration-test.js
           node tests/th-ui-leak-test.js
           node tests/i18n-kunci-hantu-test.js

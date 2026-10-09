@@ -585,9 +585,20 @@ async function routeFriendsRequests(ctx) {
 
   const { pending } = await friendEdges(gate.db, gate.sub);
   const requests = [];
-  for (const row of pending) {
-    const profile = await readProfile(gate.db, row.a);
-    if (profile) requests.push({ ...friendPayload(profile), sinceDay: row.since_day });
+  if (pending.length) {
+    const subs = pending.map((r) => r.a);
+    const profileRows = await gate.db
+      .prepare(
+        'SELECT ' + PROFILE_COLUMNS + ' FROM social_profile WHERE sub IN (' +
+        placeholders(subs.length, 1) + ')'
+      )
+      .bind(...subs)
+      .all();
+    const profiles = new Map(((profileRows && profileRows.results) || []).map((p) => [p.sub, p]));
+    for (const row of pending) {
+      const profile = profiles.get(row.a);
+      if (profile) requests.push({ ...friendPayload(profile), sinceDay: row.since_day });
+    }
   }
   return jsonResponse({ requests }, gate.opt);
 }
