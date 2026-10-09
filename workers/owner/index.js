@@ -1163,6 +1163,7 @@ function sanitizeLearnerRow(raw) {
       ? String(raw.nameSource) : 'none',
     displayName: safeName(raw.displayName, 64),
     handle: safeName(raw.handle, 64),
+    email: typeof raw.email === 'string' && raw.email.includes('@') ? raw.email.trim().slice(0, 120) : null,
     firstDay: safeDay(raw.firstDay),
     lastDay: safeDay(raw.lastDay),
     evidenceCount: safeInt(raw.evidenceCount),
@@ -2854,8 +2855,12 @@ function renderLearnerDirectory(m) {
     // Nama yang BUKAN dari perkenalan ditandai, bukan disamarkan: owner berhak tahu
     // bahwa yang ia baca adalah handle sosial atau tidak ada nama sama sekali.
     const mark = x.nameSource === 'onboarding' ? '' : ' <span class="muted-mark">(bukan nama perkenalan)</span>';
+    const emailCell = x.email
+      ? `<span style="font-size:11.5px;color:#0f172a;font-weight:600;background:#f8fafc;padding:2px 8px;border-radius:6px;border:1px solid #cbd5e1;display:inline-flex;align-items:center;gap:4px;">✉️ ${esc(x.email)}</span>`
+      : '<span style="color:#94a3b8;font-size:11px;">—</span>';
     return `<tr${selected ? ' class="sel"' : ''}>
       <td><a href="${href}">${esc(learnerLabel(x))}</a>${mark}</td>
+      <td>${emailCell}</td>
       <td>${esc(x.lastDay || '—')}</td>
       <td>${esc(fmtInt(x.evidenceCount))}</td>
       <td>${esc(fmtInt(x.decisionCount))}</td>
@@ -2864,12 +2869,12 @@ function renderLearnerDirectory(m) {
       <td>${esc(x.lastTrend || '—')}</td>
     </tr>`;
   }).join('');
-  return `<div class="table-wrap"><table><tr><th>murid</th><th>aktivitas terakhir</th><th>bukti</th><th>keputusan</th>
+  return `<div class="table-wrap"><table><tr><th>murid</th><th>email (gmail)</th><th>aktivitas terakhir</th><th>bukti</th><th>keputusan</th>
     <th>level</th><th>mastery</th><th>tren</th></tr>${rows}</table></div>
     <div class="note">Nama diambil dari yang DIKETIK murid di langkah pertama perkenalan
-      (<code>learner_name</code>, wajib diisi, terikat <code>identity.sub</code>). Profil sosial
-      (<code>social_profile</code>) hanya cadangan untuk murid lama. Baris "murid &lt;8 hex sub&gt;"
-      berarti murid itu mendaftar sebelum nama disimpan di server, atau namanya belum sampai —
+      (<code>learner_name</code>, wajib diisi, terikat <code>identity.sub</code>). Email/Gmail berasal dari
+      autentikasi resmi Google (<code>auth_email</code>). Profil sosial (<code>social_profile</code>)
+      menjadi pelengkap. Baris "murid &lt;8 hex sub&gt;" berarti murid itu mendaftar sebelum nama disimpan di server, atau namanya belum sampai —
       bukan perilaku normal untuk murid baru.</div>`;
 }
 
@@ -2904,11 +2909,18 @@ function renderLearnerDetail(m) {
   const masteryMove = s2.masteryFirst && s2.masteryLast
     ? `${esc(s2.masteryFirst)} &rarr; ${esc(s2.masteryLast)}`
     : NO_DATA_TEXT;
+  const emailBadge = (d.learner && d.learner.email)
+    ? `<div style="margin:4px 0 12px 0;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:6px 12px;display:inline-flex;align-items:center;gap:6px;">
+        <span style="font-size:13px;">✉️</span>
+        <span style="font-size:12px;color:#166534;font-weight:600;">Akun Google (Gmail): <b style="color:#14532d;">${esc(d.learner.email)}</b></span>
+       </div>`
+    : '';
   return `<div class="evidence-box" style="margin-top:16px;">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:12px;">
       <h3 style="margin:0;font-size:16px;">${name}</h3>
       <span class="sub-chip">Target Profil</span>
     </div>
+    ${emailBadge}
     <div class="big">${esc(fmtInt(s2.decisionCount))}</div>
     ${row('Keputusan Braincore (periode)', fmtInt(s2.decisionCount))}
     ${row('Bukti belajar (periode)', fmtInt(s2.evidenceCount))}

@@ -475,9 +475,22 @@ async function babK() {
   check('(K) murid TANPA profil sosial tetap punya nama (tidak lagi bergantung social_profile)',
     budi.displayName === null && budi.handle === null && budi.name === 'Budi');
 
+  // --- email Google (auth_email) masuk ke direktori & detail murid owner ----
+  await app.core.prepare('CREATE TABLE IF NOT EXISTS auth_email (sub TEXT PRIMARY KEY, email TEXT NOT NULL, verified INTEGER, source TEXT, updated_at INTEGER)').run();
+  await app.core.prepare('INSERT INTO auth_email (sub, email, verified, source, updated_at) VALUES (?1, ?2, 1, ?3, ?4)')
+    .bind(budi.sub, 'budi@gmail.com', 'google', Date.now()).run();
+
+  const dirWithEmail = await app.call('GET', '/api/owner/learners?days=30', { headers: ownerHeaders });
+  const budiWithEmail = dirWithEmail.json.learners.find((x) => x.sub === budi.sub);
+  check('(K) owner melihat GMAIL murid dari auth_email di direktori',
+    budiWithEmail && budiWithEmail.email === 'budi@gmail.com', JSON.stringify(budiWithEmail));
+
   const detail = await app.call('GET', `/api/owner/learner-evidence?sub=${budi.sub}`, { headers: ownerHeaders });
   check('(K) halaman satu murid juga memakai nama perkenalan',
     detail.json.learner.name === 'Budi' && detail.json.learner.nameSource === 'onboarding',
+    JSON.stringify(detail.json.learner));
+  check('(K) halaman detail satu murid memuat akun Google (Gmail) murid',
+    detail.json.learner.email === 'budi@gmail.com' && detail.json.learner.emailVerified === true,
     JSON.stringify(detail.json.learner));
 
   // --- GANTI NAMA: bukti tetap melekat pada sub yang sama --------------------
@@ -861,8 +874,13 @@ async function babDashboard() {
     mod.sanitizeLearnerRow({ sub: 'bukan-uuid', displayName: 'X' }) === null);
   check('(E) field asing dari API dibuang sanitizer',
     (() => {
-      const r = mod.sanitizeLearnerRow({ sub: '11111111-1111-4111-8111-111111111111', email: 'a@b.c', cohort: '0123456789abcdef' });
-      return r && r.email === undefined && r.cohort === undefined;
+      const r = mod.sanitizeLearnerRow({ sub: '11111111-1111-4111-8111-111111111111', unknown_field: 'x', cohort: '0123456789abcdef' });
+      return r && r.unknown_field === undefined && r.cohort === undefined;
+    })());
+  check('(E) email sah murid diizinkan sanitizer',
+    (() => {
+      const r = mod.sanitizeLearnerRow({ sub: '11111111-1111-4111-8111-111111111111', email: 'murid@gmail.com' });
+      return r && r.email === 'murid@gmail.com';
     })());
 }
 
