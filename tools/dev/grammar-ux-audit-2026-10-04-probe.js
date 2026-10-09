@@ -115,6 +115,9 @@ async function run() {
   const pw = loadPlaywright();
   if (!pw) { console.error('Playwright tidak tersedia'); process.exitCode = 1; return; }
   const browser = await pw.chromium.launch({ args: ['--no-sandbox'], ...(process.env.FIEZEL_CHROMIUM ? { executablePath: process.env.FIEZEL_CHROMIUM } : {}) });
+  /* Galat di tengah alur tidak boleh meninggalkan Chromium hidup: proses browser menahan Node
+     sehingga probe menggantung alih-alih keluar dengan kode galat. */
+  try {
   const shoot = async (page, name, note, opts = {}) => {
     await page.waitForTimeout(450);
     const file = path.join(OUT, name + '.png');
@@ -327,8 +330,10 @@ async function run() {
     }
     await context.close();
   }
-  await browser.close();
   fs.writeFileSync(path.join(OUT, 'findings.json'), JSON.stringify(findings, null, 2));
   console.log('\nselesai ->', path.relative(ROOT, OUT));
+  } finally {
+    await browser.close().catch(() => {});
+  }
 }
 run().catch(e => { console.error(e); process.exitCode = 1; });
