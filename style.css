@@ -10819,3 +10819,113 @@ body.fz-view-classroom header.topbar #topContextActions,
 body.fz-view-classroom header.topbar #topGamifyCluster {
   display: none !important;
 }
+
+/* -------------------------------------------------------------------------
+   SISTEM SCAN QRIS / TEMAN (KAMERA LIVE & UNGGAH GAMBAR GALERI)
+   ------------------------------------------------------------------------- */
+.fz-qr-scanner-box {
+  position: relative;
+  width: 100%;
+  height: 270px;
+  max-height: 52vh;
+  background: #090D16;
+  border-radius: 18px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.8), 0 8px 24px rgba(0, 0, 0, 0.2);
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+}
+
+.fz-qr-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.fz-qr-reticle {
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  box-shadow: 0 0 0 9999px rgba(10, 14, 23, 0.52);
+  border-radius: 16px;
+  pointer-events: none;
+}
+
+.fz-qr-corner {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border-color: #FFC800;
+  border-style: solid;
+  pointer-events: none;
+}
+
+.fz-qr-corner-tl {
+  top: 0;
+  left: 0;
+  border-width: 3.5px 0 0 3.5px;
+  border-top-left-radius: 12px;
+}
+
+.fz-qr-corner-tr {
+  top: 0;
+  right: 0;
+  border-width: 3.5px 3.5px 0 0;
+  border-top-right-radius: 12px;
+}
+
+.fz-qr-corner-bl {
+  bottom: 0;
+  left: 0;
+  border-width: 0 0 3.5px 3.5px;
+  border-bottom-left-radius: 12px;
+}
+
+.fz-qr-corner-br {
+  bottom: 0;
+  right: 0;
+  border-width: 0 3.5px 3.5px 0;
+  border-bottom-right-radius: 12px;
+}
+
+.fz-qr-laser {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(255,200,0,0) 0%, #FFC800 50%, rgba(255,200,0,0) 100%);
+  box-shadow: 0 0 10px #FFC800, 0 0 4px #FFF;
+  border-radius: 2px;
+  animation: fzQrScanLaser 2s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes fzQrScanLaser {
+  0% {
+    top: 8px;
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    top: calc(100% - 10px);
+    opacity: 0.4;
+  }
+}
+
+.fz-qr-cam-fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 20px;
+  text-align: center;
+  color: #94A3B8;
+  width: 100%;
+  height: 100%;
+}
