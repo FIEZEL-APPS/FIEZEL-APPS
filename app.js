@@ -16936,7 +16936,7 @@ function gameHubMarkup(){
       <div class="game-arcade-card undercover-card" style="border: 1px solid #d97706; background: linear-gradient(135deg, #181922 0%, #111216 100%);" onclick="window.location.href='./undercover.html'">
         <div class="arcade-card-top">
           <span class="arcade-badge" style="background:#2d2012; color:#fbbf24; border:1px solid #78350f;">【潜入】2–5P ONLINE</span>
-          <span class="arcade-icon-wrap" style="color:#f59e0b;"><i data-lucide="shield-alert"></i></span>
+          <span class="arcade-icon-wrap" style="color:#f59e0b;"><i data-lucide="shield-check"></i></span>
         </div>
         <h4 class="arcade-card-title" style="color:#fff;">UNDERCOVER</h4>
         <p class="arcade-card-desc" style="color:#94a3b8;">Investigasi semantik kata rahasia & adu deduksi lawan bot stealth.</p>
