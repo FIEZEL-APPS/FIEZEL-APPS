@@ -1,7 +1,7 @@
 {
-  "version": "m025-536",
-  "claimedBy": "branch feat/undercover-gameplay-redesign-m025-536",
-  "claimedAt": "2026-10-09T17:47:55.390Z",
-  "reason": "feat(undercover): redesign gameplay, turn timeline, petunjuk bilingual, dan meja debat",
+  "version": "m025-537",
+  "claimedBy": "branch fix/profile-ui-ux-audit-repair-m025-538",
+  "claimedAt": "2026-10-09T18:36:07.608Z",
+  "reason": "fix(profile): overhaul ui-ux panel profil, hapus kelasku, safe zone dan kontras wcag",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

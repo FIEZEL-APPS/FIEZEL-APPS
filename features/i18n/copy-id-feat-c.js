@@ -182,7 +182,7 @@
     /* Profile cockpit keys */
     'profile.class-prefix': 'Kelas',
     'profile.school-default': 'SMA Negeri 1',
-    'profile.sync-realtime': 'Tersinkronisasi Real-Time ke Dasbor Guru',
+    'profile.sync-realtime': 'Tersinkronisasi Real-Time ke Cloud',
     'profile.offline-status': 'Kamu sedang offline · Mode belajar mandiri aktif',
     'profile.flag-off-status': 'Fitur online belum aktif · Progres tersimpan lokal',
     'profile.active-study': 'Aktif Belajar',
@@ -230,6 +230,7 @@
     'profile.logged-out': 'Sesi diamankan.',
     'profile.logout-confirm': 'Keluar dari sesi ini? Progres belajarmu tetap tersimpan aman di cloud.',
     'profile.logout-device': 'Keluar dari Perangkat Ini',
+    'profile.name-empty': 'Nama tidak boleh kosong',
     'profile.name-updated': 'Nama profil berhasil diperbarui!',
     'profile.prompt-name': 'Masukkan nama lengkap baru:',
     'profile.reminder-off': 'Pengingat harian dinonaktifkan',
@@ -239,7 +240,24 @@
     'profile.speech-speed-desc': 'Disesuaikan untuk kenyamanan telinga murid',
     'profile.speech-speed-title': 'Kecepatan Suara Percakapan',
     'profile.speed-set': 'Kecepatan audio diatur',
-    'profile.sync-desc': 'Data tersimpan aman dan terhubung otomatis ke guru',
-    'profile.sync-title': 'Sinkronisasi & ID Akun Murid'
+    'profile.sync-desc': 'Data progres belajarmu tersimpan aman di cloud',
+    'profile.sync-title': 'Sinkronisasi & ID Akun Murid',
+    'profile.status-independent': 'Pelajar Mandiri',
+    'profile.level-prefix': 'Level',
+    'profile.level-basic': 'Dasar',
+    'profile.min-unit': 'Mnt',
+    'profile.your-id': 'ID Kamu',
+    'profile.qr-btn': 'QR',
+    'profile.requests-count': 'Permintaan Teman Baru',
+    'profile.btn-connect': 'Hubungkan',
+    'profile.btn-scan-qr': 'Scan & QR',
+    'profile.btn-friend-list': 'Daftar Teman',
+    'profile.btn-leaderboard': 'Papan Skor',
+    'profile.chime-active': 'Chime Aktif',
+    'profile.chime-inactive': 'Chime Nonaktif',
+    'profile.online-status-badge': 'Online',
+    'profile.modal-cancel': 'Batal',
+    'profile.modal-save': 'Simpan',
+    'profile.btn-view-requests': 'Lihat'
   });
 }());

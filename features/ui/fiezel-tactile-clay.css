@@ -2375,7 +2375,7 @@ html body:not(.fz-teacher-mode) .section-head h1::after,
   display: flex !important;
   flex-direction: column !important;
   gap: 14px !important;
-  padding: 0 0 24px 0 !important;
+  padding: 0 0 36px 0 !important;
   width: 100% !important;
 }
 
@@ -2499,6 +2499,7 @@ html body:not(.fz-teacher-mode) .section-head h1::after,
   border-radius: 6px !important;
 }
 
+.profile-status-chip,
 .profile-school-chip {
   background: #ECFDF5 !important;
   border: 1px solid #A7F3D0 !important;
@@ -2507,6 +2508,8 @@ html body:not(.fz-teacher-mode) .section-head h1::after,
   font-weight: 800 !important;
   padding: 2px 8px !important;
   border-radius: 6px !important;
+  display: inline-flex !important;
+  align-items: center !important;
 }
 
 /* 3-Stat Tactile Blocks */
@@ -4370,21 +4373,26 @@ html body #app .ch-btn-tuntas,
   line-height: 1 !important;
 }
 
-/* 15. PROFILE & KELASKU PRESENTATION (Exact Mockup Alignment) */
-html body.fz-view-profile #app .progress-tabs,
-html body.fz-view-profile .progress-tabs,
-body.fz-view-profile .progress-tabs,
-body.fz-view-profile nav.progress-tabs,
-body.fz-view-profile .section-head,
+/* 15. PROFILE PRESENTATION (Tactile Cockpit Design System) */
 body.fz-view-profile .active-level-control,
-body.fz-view-profile #cardSuaraAudio,
-body.fz-view-profile .profile-section-card:not(#cardTargetHarian):not(#cardOnlineTeman):not(#cardIdPribadi),
-body.fz-view-profile .card-collapsed-pill,
+body.fz-view-profile .section-head,
 body.fz-view-classroom .topbar-actions > button[onclick="openSettings()"] {
   display: none !important;
 }
 
-body.fz-view-profile #cardOnlineTeman {
+/* Ensure Progress Tabs (Profil, Teman, Papan) stay visible & accessible */
+html body.fz-view-profile #app .progress-tabs,
+html body.fz-view-profile .progress-tabs,
+body.fz-view-profile .progress-tabs,
+body.fz-view-profile nav.progress-tabs {
+  display: flex !important;
+  margin: 6px 0 16px 0 !important;
+}
+
+body.fz-view-profile #cardOnlineTeman,
+body.fz-view-profile #cardTargetHarian,
+body.fz-view-profile #cardSuaraAudio,
+body.fz-view-profile #cardSyncAkun {
   display: flex !important;
 }
 
@@ -4392,17 +4400,36 @@ body.fz-view-profile #app {
   padding-top: 14px !important;
 }
 
-/* Zero newspaper disclaimer text - keep UI ultra-clean and modern */
-html body.fz-view-profile .section-card-desc,
-body.fz-view-profile .section-card-desc,
-html body.fz-view-profile .setting-item-desc,
-body.fz-view-profile .setting-item-desc,
-html body.fz-view-profile .profile-version-foot,
-body.fz-view-profile .profile-version-foot,
+/* Clear, elegant contextual typography for card & settings descriptions */
 .section-card-desc,
+html body.fz-view-profile .section-card-desc,
+body.fz-view-profile .section-card-desc {
+  display: block !important;
+  font-size: 11.5px !important;
+  font-weight: 500 !important;
+  color: #64748B !important;
+  line-height: 1.35 !important;
+  margin-top: 2px !important;
+}
+
 .setting-item-desc,
-.profile-version-foot {
-  display: none !important;
+html body.fz-view-profile .setting-item-desc,
+body.fz-view-profile .setting-item-desc {
+  display: block !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  color: #64748B !important;
+  line-height: 1.3 !important;
+  margin-top: 2px !important;
+}
+
+.profile-version-foot,
+html body.fz-view-profile .profile-version-foot,
+body.fz-view-profile .profile-version-foot {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  padding: 12px 0 4px !important;
 }
 
 /* Zero leak screen reader utility */
