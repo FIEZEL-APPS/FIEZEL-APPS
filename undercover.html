@@ -3,25 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>FIEZEL — Undercover: Tactical Investigation</title>
+  <title>FIEZEL — WePlay Party Undercover (谁是卧底)</title>
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" type="image/png" href="./favicon-64.png">
   <link rel="apple-touch-icon" href="./apple-touch-icon.png">
-  <meta name="theme-color" content="#0f1013">
+  <meta name="theme-color" content="#0d0b1e">
   <script src="./lucide.min.js"></script>
   <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@600;700;800&display=swap');
 
     :root {
-      --bg: #0f1013;
-      --surface: #15161b;
-      --surface-elevated: #1d1f26;
-      --border: #262833;
-      --border-subtle: #1e2029;
-      --text-main: #f1f2f6;
-      --text-muted: #8b8f9e;
-      --accent: #d97706;
+      --wp-bg: #0d0b1e;
+      --wp-surface: #161331;
+      --wp-surface-card: #1f1a42;
+      --wp-border: #2e265c;
+      --wp-primary: #7928ca;
+      --wp-neon-cyan: #00f0ff;
+      --wp-neon-amber: #ffb800;
+      --wp-neon-pink: #ff2e63;
+      --wp-neon-green: #00e676;
+      --text-main: #f5f4fb;
+      --text-muted: #9590b8;
     }
 
     html, body {
@@ -32,7 +35,7 @@
       margin: 0;
       padding: 0;
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-      background-color: var(--bg);
+      background-color: var(--wp-bg);
       color: var(--text-main);
       -webkit-font-smoothing: antialiased;
       user-select: none;
@@ -43,372 +46,350 @@
     }
 
     .btn-tactile {
-      transition: transform 90ms ease, background-color 120ms ease, border-color 120ms ease;
+      transition: transform 80ms ease, filter 120ms ease, box-shadow 120ms ease;
     }
     .btn-tactile:active {
-      transform: scale(0.97);
+      transform: scale(0.96);
     }
 
-    ::-webkit-scrollbar {
-      width: 4px;
-      height: 4px;
+    /* WePlay Mic Sound Waves Ripple Animation */
+    @keyframes weplayRipples {
+      0% {
+        box-shadow: 0 0 0 0 rgba(0, 240, 255, 0.7), 0 0 0 0 rgba(255, 184, 0, 0.4);
+      }
+      50% {
+        box-shadow: 0 0 0 8px rgba(0, 240, 255, 0.25), 0 0 0 14px rgba(255, 184, 0, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(0, 240, 255, 0), 0 0 0 0 rgba(255, 184, 0, 0);
+      }
     }
-    ::-webkit-scrollbar-thumb {
-      background: #2a2d39;
-      border-radius: 4px;
+    .mic-speaking-ring {
+      animation: weplayRipples 1.25s infinite cubic-bezier(0, 0.2, 0.8, 1);
+      border-color: #00f0ff !important;
     }
 
-    @keyframes pulseSoft {
-      0%, 100% { opacity: 0.5; }
-      50% { opacity: 1; }
+    /* WePlay Speech Bubble Arrow */
+    .speech-bubble {
+      position: relative;
+      background: #25204e;
+      border: 1px solid #483d8b;
+      border-radius: 12px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+      animation: bubblePop 220ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
-    .animate-pulse-soft {
-      animation: pulseSoft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    .speech-bubble::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 6px 6px 0;
+      border-style: solid;
+      border-color: #25204e transparent transparent transparent;
+      display: block;
+      width: 0;
+    }
+    @keyframes bubblePop {
+      0% { transform: scale(0.8) translateY(4px); opacity: 0; }
+      100% { transform: scale(1) translateY(0); opacity: 1; }
     }
 
-    .turn-glow {
-      box-shadow: 0 0 15px -2px rgba(245, 158, 11, 0.4);
+    /* Floating Gifting / Emojis animation */
+    @keyframes floatUpFade {
+      0% { transform: scale(0.4) translateY(0); opacity: 0; }
+      20% { transform: scale(1.2) translateY(-6px); opacity: 1; }
+      80% { transform: scale(1) translateY(-25px); opacity: 1; }
+      100% { transform: scale(0.9) translateY(-40px); opacity: 0; }
+    }
+    .animate-float-gift {
+      animation: floatUpFade 1.6s forwards ease-out;
+    }
+
+    /* Card 3D Flip */
+    .flip-card-container {
+      perspective: 1000px;
+    }
+    .flip-card-inner {
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-style: preserve-3d;
+    }
+    .flip-card-inner.is-flipped {
+      transform: rotateY(180deg);
+    }
+    .flip-card-front, .flip-card-back {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      border-radius: 20px;
+    }
+    .flip-card-back {
+      transform: rotateY(180deg);
+    }
+
+    /* Custom scrollbar hide */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
     }
   </style>
 </head>
-<body class="h-full flex flex-col justify-between p-2.5 sm:p-4 max-w-4xl mx-auto w-full box-border">
+<body class="h-full flex flex-col justify-between p-2 sm:p-4 max-w-3xl mx-auto w-full box-border">
 
   <!-- ========================================================================= -->
-  <!-- SCREEN 1: FULLSCREEN LOBBY (FIT SELURUH LAYAR, ZERO SCROLL) -->
+  <!-- SCREEN 1: WEPLAY PARTY LOBBY (MEJA BUNDAR KAMAR #8842) -->
   <!-- ========================================================================= -->
-  <main id="screen-lobby" class="h-full flex flex-col justify-between bg-[#15161b] border border-[#262833] rounded-2xl p-4 sm:p-5 shadow-sm overflow-hidden">
+  <main id="screen-lobby" class="h-full flex flex-col justify-between bg-[#161331]/95 border border-[#2e265c] rounded-3xl p-3 sm:p-5 shadow-2xl backdrop-blur-xl overflow-hidden">
 
-    <!-- Top Header -->
-    <div class="flex flex-col gap-2 pb-2.5 border-b border-[#20222a]">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <a href="./index.html" class="btn-tactile flex items-center justify-center w-7 h-7 rounded-lg bg-[#1f222c] border border-[#2c2f3d] text-slate-300 hover:text-white" title="Kembali ke Beranda FIEZEL">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-          </a>
-          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-          <span class="text-xs font-mono font-bold tracking-wider text-slate-100 uppercase">
-            FIEZEL UNDERCOVER
-          </span>
-          <span class="text-[10px] text-[#6b6f7d] font-mono hidden sm:inline">STUDIO ED.</span>
-        </div>
-
-        <div class="flex items-center gap-2">
-          <!-- Cara Main Button -->
-          <button id="btn-open-rules-lobby" onclick="openRulesModal()" class="btn-tactile flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold hover:bg-amber-500/20">
-            <span>📖</span>
-            <span>Cara Main</span>
-          </button>
-          <span class="text-[10px] font-mono text-emerald-400 font-bold hidden sm:inline">24ms · Jakarta</span>
+    <!-- Top Bar: Room Info & Controls -->
+    <div class="flex items-center justify-between pb-2 border-b border-[#282154]">
+      <div class="flex items-center gap-2">
+        <a href="./index.html" class="btn-tactile flex items-center justify-center w-8 h-8 rounded-xl bg-[#211b49] border border-[#372d73] text-slate-300 hover:text-white" title="Kembali ke Beranda">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
+        </a>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            <span class="text-xs font-black tracking-wider text-white uppercase font-mono">
+              WEPLAY UNDERCOVER
+            </span>
+          </div>
+          <div class="text-[10px] text-[#9590b8] font-mono">Kamar #8842 · Suara Aktif</div>
         </div>
       </div>
 
-      <!-- Controls Row: Role and Capacity -->
-      <div class="flex items-center justify-between gap-2">
-        <!-- Role Preference Toggle -->
-        <div class="flex items-center gap-1.5">
-          <span class="text-[10px] font-mono text-[#6b6f7d]">PERAN:</span>
-          <div class="flex bg-[#0f1013] p-0.5 rounded-xl border border-[#22242c] text-[11px]">
-            <button id="pref-role-random" onclick="setRolePref('random')" class="px-2.5 py-0.5 rounded-lg font-semibold bg-[#262833] text-white transition">Acak</button>
-            <button id="pref-role-civ" onclick="setRolePref('civilian')" class="px-2.5 py-0.5 rounded-lg font-semibold text-[#8b8f9e] hover:text-white transition">Warga</button>
-            <button id="pref-role-spy" onclick="setRolePref('undercover')" class="px-2.5 py-0.5 rounded-lg font-semibold text-[#8b8f9e] hover:text-white transition">Penyusup</button>
-          </div>
-        </div>
+      <div class="flex items-center gap-2">
+        <button id="btn-open-rules-lobby" onclick="openRulesModal()" class="btn-tactile flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500/20 to-pink-500/20 border border-amber-500/40 text-amber-300 text-xs font-bold hover:brightness-125">
+          <span>📖</span>
+          <span>Aturan Main</span>
+        </button>
+        <span class="text-[10px] font-mono font-bold px-2 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hidden sm:inline">24ms</span>
+      </div>
+    </div>
 
-        <!-- Capacity Selector -->
-        <div class="flex items-center gap-1.5">
-          <span class="text-[10px] font-mono text-[#6b6f7d]">SLOT:</span>
-          <div class="flex bg-[#0f1013] p-0.5 rounded-xl border border-[#22242c]">
-            <button id="cap-2" onclick="setCap(2)" class="px-2 py-0.5 rounded-lg text-xs font-semibold text-[#8b8f9e] hover:text-white transition">2P</button>
-            <button id="cap-4" onclick="setCap(4)" class="px-2 py-0.5 rounded-lg text-xs font-semibold bg-[#262833] text-white transition">4P</button>
-            <button id="cap-5" onclick="setCap(5)" class="px-2 py-0.5 rounded-lg text-xs font-semibold text-[#8b8f9e] hover:text-white transition">5P</button>
-          </div>
+    <!-- Mode & Settings Row -->
+    <div class="flex items-center justify-between gap-2 py-1.5 px-2 rounded-2xl bg-[#0f0c24] border border-[#282154] text-[11px]">
+      <div class="flex items-center gap-1">
+        <span class="text-[10px] font-mono text-[#9590b8]">MODE:</span>
+        <div class="flex bg-[#1b153d] p-0.5 rounded-xl border border-[#31266e]">
+          <button id="mode-std" onclick="setPlayMode('standard')" class="px-2.5 py-0.5 rounded-lg font-bold bg-[#ffb800] text-slate-950 transition">Klasik (Warga vs Spy)</button>
+          <button id="mode-white" onclick="setPlayMode('whiteboard')" class="px-2.5 py-0.5 rounded-lg font-bold text-[#9590b8] hover:text-white transition">Si Polos (Mr. White)</button>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-1">
+        <span class="text-[10px] font-mono text-[#9590b8]">KURSI:</span>
+        <div class="flex bg-[#1b153d] p-0.5 rounded-xl border border-[#31266e]">
+          <button id="cap-4" onclick="setLobbyCap(4)" class="px-2.5 py-0.5 rounded-lg font-bold bg-[#7928ca] text-white transition">4P</button>
+          <button id="cap-6" onclick="setLobbyCap(6)" class="px-2.5 py-0.5 rounded-lg font-bold text-[#9590b8] hover:text-white transition">6P</button>
         </div>
       </div>
     </div>
 
-    <!-- Center Stage: Player Slots -->
-    <div class="flex-1 flex flex-col justify-center py-2 sm:py-3">
-      <div class="flex items-center justify-between text-[11px] font-mono uppercase tracking-wider text-[#6b6f7d] mb-2">
-        <span>Slot Pemain (<span id="slot-count">1/4</span>)</span>
-        <span class="text-emerald-400 font-bold">24ms · Jakarta Pusat</span>
+    <!-- Center Stage: Circular Mic Seats (WePlay Room Style) -->
+    <div class="flex-1 flex flex-col justify-center py-2">
+      <div class="flex items-center justify-between text-[11px] font-mono text-[#9590b8] mb-2 px-1">
+        <span class="flex items-center gap-1.5">
+          <span>🎙️ KURSI MIC RUANG PESTA (<span id="seat-filled-count">4/4</span>)</span>
+        </span>
+        <span class="text-amber-400 font-bold">Tekan kursi kosong untuk isi bot</span>
       </div>
 
-      <div id="lobby-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+      <!-- WePlay Horseshoe / Grid Table Layout -->
+      <div id="weplay-lobby-seats" class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
         <!-- Rendered dynamically -->
       </div>
     </div>
 
     <!-- Bottom Action Bar -->
-    <div class="pt-3 border-t border-[#20222a] flex flex-col sm:flex-row items-center justify-between gap-2.5">
-      <div class="text-[11px] text-[#8b8f9e] text-center sm:text-left leading-tight">
-        <span class="font-semibold text-slate-300">Taktik Deduksi Bahasa Inggris:</span> Giliran bertahap, analisa petunjuk lawan, dan bongkar kata penyusup!
+    <div class="pt-2.5 border-t border-[#282154] flex flex-col sm:flex-row items-center justify-between gap-2">
+      <div class="text-[11px] text-[#9590b8] text-center sm:text-left leading-tight">
+        <span class="font-bold text-white">Aturan WePlay:</span> Bicara bergiliran dengan mic, analisa kata yang beda, lalu voting eliminasi!
       </div>
 
-      <button id="btn-start-matchmaking" onclick="startSearch()" class="btn-tactile w-full sm:w-auto px-7 py-2.5 rounded-xl bg-white text-[#0f1013] font-bold text-xs uppercase tracking-wider hover:bg-slate-200 transition shadow-sm">
-        Cari Pertandingan
+      <button id="btn-start-matchmaking" onclick="startWePlayMatch()" class="btn-tactile w-full sm:w-auto px-8 py-3 rounded-2xl bg-gradient-to-r from-[#ff007a] via-[#7928ca] to-[#00f0ff] text-white font-black text-xs uppercase tracking-wider hover:brightness-110 shadow-lg shadow-pink-500/25">
+        Mulai Permainan (Cari Kamar)
       </button>
     </div>
 
   </main>
 
   <!-- ========================================================================= -->
-  <!-- MATCHMAKING SEARCH MODAL -->
+  <!-- SCREEN 2: WEPLAY ARENA (ROUND TABLE VOICES & SEATS) -->
   <!-- ========================================================================= -->
-  <div id="modal-search" class="fixed inset-0 bg-[#0a0b0e]/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-[#15161b] border border-[#262833] rounded-2xl p-5 max-w-xs w-full text-center shadow-2xl">
-      <div class="relative w-12 h-12 mx-auto mb-3 flex items-center justify-center">
-        <div class="absolute inset-0 rounded-full border border-slate-700 animate-ping opacity-25"></div>
-        <div class="w-9 h-9 border-2 border-slate-700 border-t-amber-500 rounded-full animate-spin"></div>
-      </div>
-      <div class="text-sm font-bold text-white mb-0.5">Mencari Pemain Online...</div>
-      <div id="search-timer" class="text-xs font-mono text-[#8b8f9e] mb-1">00:02</div>
-      <div id="search-subtext" class="text-[10px] text-[#6b6f7d] font-mono mb-4">Menghubungkan ke server Jakarta...</div>
-      <button onclick="cancelSearch()" class="btn-tactile px-4 py-1.5 rounded-lg bg-[#1e2027] border border-[#2b2e3a] text-xs font-semibold text-[#8b8f9e] hover:text-white">
-        Batalkan
-      </button>
-    </div>
-  </div>
+  <main id="screen-game" class="h-full flex flex-col justify-between bg-[#161331]/95 border border-[#2e265c] rounded-3xl p-3 sm:p-4 shadow-2xl backdrop-blur-xl overflow-hidden hidden">
 
-  <!-- ========================================================================= -->
-  <!-- MATCH FOUND (ACCEPT) MODAL -->
-  <!-- ========================================================================= -->
-  <div id="modal-found" class="fixed inset-0 bg-[#0a0b0e]/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-[#15161b] border border-[#2d303c] rounded-2xl p-5 max-w-sm w-full text-center shadow-2xl">
-      <div class="text-[10px] font-mono uppercase tracking-wider text-amber-500 font-bold mb-1">Pertandingan Ditemukan</div>
-      <div class="text-base font-bold text-white mb-2.5">Semua Pemain Siap</div>
-
-      <div id="found-avatars" class="flex justify-center gap-2 mb-4">
-        <!-- Rendered dynamically -->
-      </div>
-
-      <button id="btn-accept-match" onclick="acceptGame()" class="btn-tactile w-full py-2.5 rounded-xl bg-amber-500 text-slate-950 font-bold text-xs uppercase tracking-wider hover:bg-amber-400">
-        Masuk Arena (<span id="accept-sec">6</span>s)
-      </button>
-    </div>
-  </div>
-
-  <!-- ========================================================================= -->
-  <!-- PANDUAN CARA BERMAIN MODAL (HOW TO PLAY MODAL) -->
-  <!-- ========================================================================= -->
-  <div id="modal-rules" class="fixed inset-0 bg-[#0a0b0e]/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-3 sm:p-4">
-    <div class="bg-[#15161b] border border-[#2d303c] rounded-2xl max-w-md w-full p-4 sm:p-5 shadow-2xl flex flex-col justify-between max-h-[90vh] overflow-y-auto">
-      <div>
-        <div class="flex items-center justify-between pb-2 border-b border-[#20222a] mb-3">
-          <div class="flex items-center gap-2">
-            <span class="text-lg">📖</span>
-            <div class="text-sm font-bold text-white">Panduan Resmi Undercover FIEZEL</div>
-          </div>
-          <button onclick="closeRulesModal()" class="w-6 h-6 rounded-lg bg-[#20222a] text-[#8b8f9e] hover:text-white flex items-center justify-center text-xs">✕</button>
+    <!-- Top Header: Card Quick View & Phase -->
+    <div class="flex items-center justify-between pb-2 border-b border-[#282154]">
+      <!-- Left: Secret Word Pill -->
+      <div class="flex items-center gap-2">
+        <div id="btn-peek-word" onclick="peekSecretCard()" class="btn-tactile flex items-center gap-1.5 px-3 py-1 rounded-xl bg-gradient-to-r from-[#2a1e5c] to-[#1d1640] border border-[#483794] cursor-pointer" title="Sentuh untuk intip kartu katamu">
+          <span class="text-[10px]">🃏</span>
+          <span id="secret-word-display" class="text-xs sm:text-sm font-black font-mono text-[#00f0ff] tracking-wide">
+            BICYCLE
+          </span>
+          <span class="text-[9px] text-[#9590b8]">👁</span>
         </div>
-
-        <!-- 3 Step Rules Bento -->
-        <div class="space-y-2.5 text-xs">
-          <!-- Step 1: Peran & Kata -->
-          <div class="bg-[#0f1014] border border-[#22242d] rounded-xl p-3">
-            <div class="flex items-center gap-1.5 text-amber-400 font-bold mb-1">
-              <span>1. Peran & Kata Rahasia</span>
-            </div>
-            <p class="text-[#8b8f9e] leading-relaxed">
-              • <strong class="text-white">WARGA (Mayoritas):</strong> Menerima kata rahasia yang sama (contoh: <span class="text-amber-300 font-mono">BICYCLE</span>).<br>
-              • <strong class="text-amber-400">PENYUSUP (Minoritas):</strong> Menerima kata yang mirip semantiknya (contoh: <span class="text-amber-300 font-mono">MOTORCYCLE</span>).<br>
-              <em class="text-[#686b77] text-[11px]">*Kamu tidak tahu apakah kamu Warga atau Penyusup sampai mendengar petunjuk pemain lain!</em>
-            </p>
-          </div>
-
-          <!-- Step 2: Urutan Berbicara -->
-          <div class="bg-[#0f1014] border border-[#22242d] rounded-xl p-3">
-            <div class="flex items-center gap-1.5 text-emerald-400 font-bold mb-1">
-              <span>2. Urutan Giliran Bergilir (Turn-by-Turn)</span>
-            </div>
-            <p class="text-[#8b8f9e] leading-relaxed">
-              • Setiap pemain berbicara <strong class="text-white">SATU PER SATU</strong> secara berurutan sesuai timeline giliran di atas layar.<br>
-              • Rangkai petunjuk bahasa Inggris yang <strong class="text-white">cukup jelas bagi sesama warga</strong>, tapi <strong class="text-white">tidak membocorkan kata ke penyusup</strong>.<br>
-              • Setiap tombol petunjuk sudah dilengkapi <strong class="text-slate-300">arti Bahasa Indonesia</strong>.
-            </p>
-          </div>
-
-          <!-- Step 3: Debat, Voting & Tebak Terakhir -->
-          <div class="bg-[#0f1014] border border-[#22242d] rounded-xl p-3">
-            <div class="flex items-center gap-1.5 text-sky-400 font-bold mb-1">
-              <span>3. Debat, Voting, & Sudut Balik (Turnabout)</span>
-            </div>
-            <p class="text-[#8b8f9e] leading-relaxed">
-              • Setelah semua orang bersuara, masuk ke <strong class="text-white">Meja Debat</strong> untuk menuduh kejanggalan kata lawan.<br>
-              • Voting bersama untuk mengeliminasi tersangka utama.<br>
-              • Jika <strong class="text-amber-400">Penyusup tertangkap</strong>, ia mendapat <strong class="text-white">1 kesempatan terakhir</strong> menebak kata warga untuk membalikkan kemenangan!
-            </p>
-          </div>
-        </div>
+        <span id="role-badge" class="px-2 py-0.5 rounded-lg text-[10px] font-mono font-black uppercase bg-[#ffb800]/20 text-[#ffb800] border border-[#ffb800]/40">
+          WARGA
+        </span>
       </div>
 
-      <div class="pt-3 border-t border-[#20222a] mt-3">
-        <button id="btn-close-rules" onclick="closeRulesModal()" class="btn-tactile w-full py-2 rounded-xl bg-white text-[#0f1013] font-bold text-xs uppercase tracking-wider hover:bg-slate-200">
-          Saya Mengerti, Mulai Main
+      <!-- Right: Phase Pills & Sound Toggle -->
+      <div class="flex items-center gap-2">
+        <button onclick="toggleAudioMute()" id="btn-audio-toggle" class="btn-tactile px-2 py-1 rounded-lg bg-[#211b49] border border-[#372d73] text-[11px] text-amber-300 font-mono">
+          🔊 SFX ON
+        </button>
+        <button onclick="openRulesModal()" class="btn-tactile px-2 py-1 rounded-lg bg-[#211b49] border border-[#372d73] text-[10px] text-[#9590b8] hover:text-white font-mono">
+          📖 Aturan
         </button>
       </div>
     </div>
-  </div>
 
-  <!-- ========================================================================= -->
-  <!-- SCREEN 2: GAME ARENA (TACTICAL INVESTIGATION, ZERO SCROLL) -->
-  <!-- ========================================================================= -->
-  <main id="screen-game" class="h-full flex flex-col justify-between bg-[#15161b] border border-[#262833] rounded-2xl p-3 sm:p-5 shadow-sm overflow-hidden hidden">
+    <!-- Active Speaker Spotlight Bar -->
+    <div class="py-1.5 px-3 rounded-2xl bg-[#0f0c24] border border-[#2b215a] flex items-center justify-between text-xs my-1">
+      <div class="flex items-center gap-2">
+        <span id="turn-speaker-badge" class="font-mono text-[10px] font-black px-2 py-0.5 rounded-md bg-[#00f0ff] text-slate-950 uppercase">
+          KURSI 1
+        </span>
+        <span id="turn-speaker-name" class="font-bold text-white text-[11px] truncate">
+          Kamu sedang mendeskripsikan...
+        </span>
+      </div>
+      <div class="flex items-center gap-1 font-mono font-black text-amber-400 text-xs">
+        <span>⏱️</span>
+        <span id="turn-timer-text">15s</span>
+      </div>
+    </div>
 
-    <!-- Top HUD: Secret Word & Controls -->
-    <div class="flex flex-col gap-2 pb-2 border-b border-[#20222a]">
-      <div class="flex items-center justify-between">
-        <!-- Left: Secret Word & Privacy Peek -->
-        <div class="flex items-center gap-2">
-          <span class="text-[9px] font-mono text-[#6b6f7d] uppercase hidden sm:inline">KATAMU:</span>
-          <div id="secret-word-container" class="flex items-center gap-1.5 cursor-pointer bg-[#0e1014] px-2 py-0.5 rounded-lg border border-[#22242d]" onclick="toggleWordPrivacy()" title="Klik untuk sembunyikan/tampilkan kata">
-            <span id="secret-word-display" class="text-xs sm:text-sm font-black text-amber-400 font-mono tracking-wide">
-              BICYCLE
-            </span>
-            <span id="secret-word-hide-icon" class="text-[10px] text-[#6b6f7d]">👁</span>
-          </div>
-          <span id="role-badge" class="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold uppercase bg-[#1f222b] text-slate-300 border border-[#2b2e3b]">
-            WARGA
-          </span>
-        </div>
+    <!-- Center Stage: WePlay Round Table 4/6 Seats with Animated Speech Bubbles -->
+    <div class="flex-1 flex flex-col justify-center py-1 overflow-hidden relative">
+      <div id="weplay-arena-seats" class="grid grid-cols-2 sm:grid-cols-4 gap-2 flex-1 min-h-0">
+        <!-- Rendered dynamically: Seats 1 to 4 with Avatars, Soundwaves, Speech Bubbles & Gifts -->
+      </div>
+    </div>
 
-        <!-- Right: Rules & Phase Indicator -->
-        <div class="flex items-center gap-2">
-          <button id="btn-open-rules-arena" onclick="openRulesModal()" class="btn-tactile px-2 py-0.5 rounded-md bg-[#1f222b] text-[#8b8f9e] hover:text-white text-[10px] font-mono border border-[#2b2e3b]">
-            📖 Aturan
+    <!-- Floating Interactive Gift Reaction Overlay Box (Click on any seat to launch) -->
+    <div id="gift-tray-modal" class="hidden absolute inset-0 bg-black/60 backdrop-blur-sm z-30 flex items-center justify-center p-4">
+      <div class="bg-[#1f1a42] border border-[#483794] rounded-2xl p-4 w-full max-w-xs shadow-2xl text-center">
+        <div class="text-xs font-bold text-white mb-2">Interaksi Meja ke <span id="gift-target-name" class="text-cyan-400">Pemain</span>:</div>
+        <div class="grid grid-cols-5 gap-2 py-2">
+          <button onclick="sendTableGift('egg')" class="btn-tactile p-2 rounded-xl bg-[#2a225a] hover:bg-[#382d7a] text-xl flex flex-col items-center">
+            <span>🥚</span>
+            <span class="text-[8px] text-[#9590b8] mt-1">Telur</span>
           </button>
-          <div class="flex items-center gap-1 font-mono text-[9px]">
-            <span id="phase-pill-1" class="px-1.5 py-0.5 rounded font-bold bg-amber-500 text-slate-950">1. PETUNJUK</span>
-            <span class="text-[#3a3d4a]">·</span>
-            <span id="phase-pill-2" class="px-1.5 py-0.5 rounded bg-[#1e2027] text-[#6b6f7d]">2. DEBAT</span>
-            <span class="text-[#3a3d4a]">·</span>
-            <span id="phase-pill-3" class="px-1.5 py-0.5 rounded bg-[#1e2027] text-[#6b6f7d]">3. SIDANG</span>
-          </div>
+          <button onclick="sendTableGift('tomato')" class="btn-tactile p-2 rounded-xl bg-[#2a225a] hover:bg-[#382d7a] text-xl flex flex-col items-center">
+            <span>🍅</span>
+            <span class="text-[8px] text-[#9590b8] mt-1">Tomat</span>
+          </button>
+          <button onclick="sendTableGift('rose')" class="btn-tactile p-2 rounded-xl bg-[#2a225a] hover:bg-[#382d7a] text-xl flex flex-col items-center">
+            <span>🌹</span>
+            <span class="text-[8px] text-[#9590b8] mt-1">Mawar</span>
+          </button>
+          <button onclick="sendTableGift('sus')" class="btn-tactile p-2 rounded-xl bg-[#2a225a] hover:bg-[#382d7a] text-xl flex flex-col items-center">
+            <span>🔍</span>
+            <span class="text-[8px] text-[#9590b8] mt-1">Tuduh</span>
+          </button>
+          <button onclick="sendTableGift('coffee')" class="btn-tactile p-2 rounded-xl bg-[#2a225a] hover:bg-[#382d7a] text-xl flex flex-col items-center">
+            <span>☕</span>
+            <span class="text-[8px] text-[#9590b8] mt-1">Kopi</span>
+          </button>
         </div>
-      </div>
-
-      <!-- Turn Timeline Track Bar (Sequential Visualizer) -->
-      <div class="bg-[#0e1014] border border-[#20222a] rounded-xl px-2.5 py-1.5 flex items-center justify-between">
-        <div class="flex items-center gap-1.5 text-[10px] font-mono text-[#6b6f7d]">
-          <span>URUTAN GILIRAN:</span>
-        </div>
-        <div id="turn-timeline" class="flex items-center gap-1 sm:gap-2 overflow-x-auto no-scrollbar">
-          <!-- Rendered dynamically: [1. Dimas] -> [2. Kamu] -> [3. Nadia] -> [4. Kevin] -->
-        </div>
-      </div>
-    </div>
-
-    <!-- Center Stage: The Dossier & Table Cards -->
-    <div class="flex-1 flex flex-col justify-between py-2 sm:py-3 overflow-hidden">
-      <!-- Status Turn Banner -->
-      <div class="flex items-center justify-between text-[11px] font-mono pb-1 text-[#6b6f7d]">
-        <div class="flex items-center gap-2">
-          <span id="turn-indicator" class="text-amber-400 font-bold uppercase">GILIRAN 1: DIMAS PRATAMA</span>
-          <span id="typing-indicator" class="hidden text-amber-400 text-[10px] animate-pulse-soft font-normal">● sedang berpikir...</span>
-        </div>
-        <span class="text-[10px] text-[#555866]">DOSSIER INVESTIGASI MEJA</span>
-      </div>
-
-      <!-- Players Table Grid (Fits perfectly, zero scroll) -->
-      <div id="table-cards" class="grid grid-cols-2 sm:grid-cols-4 gap-2 flex-1 min-h-0">
-        <!-- Dynamic Player Dossier Cards -->
-      </div>
-
-      <!-- Live Dialogue / Banter Log Box -->
-      <div id="dossier-banner" class="mt-2 bg-[#0e1014] border border-[#22242d] rounded-xl px-3 py-1.5 flex items-center justify-between text-xs">
-        <div class="flex items-center gap-2 truncate">
-          <span class="text-[10px] font-mono text-amber-500 font-bold uppercase">LOG RUANG:</span>
-          <span id="dossier-banner-text" class="text-[11px] text-[#8b8f9e] truncate">
-            Amati petunjuk teman dan carilah kontradiksi kata yang janggal!
-          </span>
-        </div>
-        <span id="dossier-timer" class="text-[10px] font-mono text-[#6b6f7d] shrink-0">Ronde 1</span>
+        <button onclick="closeGiftTray()" class="mt-2 text-[10px] text-[#9590b8] hover:text-white">Batal</button>
       </div>
     </div>
 
-    <!-- Bottom Action Console (Dynamic based on phase) -->
-    <div class="pt-2 border-t border-[#20222a]">
+    <!-- Bottom Action Console (Dynamic per WePlay phase) -->
+    <div class="pt-2 border-t border-[#282154]">
 
-      <!-- Console Phase 1: Bilingual Semantic Clue Synthesizer -->
+      <!-- Console Phase 1: Mic Description & Clue Synthesizer -->
       <div id="console-phase-1" class="space-y-1.5">
         <div class="flex items-center justify-between">
-          <span id="synth-instruction-text" class="text-[11px] text-amber-300 font-semibold">
-            🔔 Giliranmu! Rangkai petunjuk semantik Bahasa Inggris:
+          <span id="synth-instruction-text" class="text-[11px] text-amber-300 font-bold flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            <span>🎙️ GILIRAN MIC KAMU! Pilih 1 Sifat & 1 Ciri Bahasa Inggris:</span>
           </span>
-          <span class="text-[10px] font-mono text-[#6b6f7d]">Pilih 1 Sifat & 1 Ciri</span>
+          <span class="text-[10px] font-mono text-[#9590b8]">WePlay English Deck</span>
         </div>
 
-        <!-- Clue Synthesizer Selector Grid with Indonesian Translations -->
+        <!-- Clue Synthesizer Selection Chips (Bilingual English + Indonesian gloss) -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
           <!-- Dimension A: Sifat (Functional) -->
-          <div class="flex items-center gap-1.5 bg-[#0e1014] p-1.5 rounded-xl border border-[#22242d]">
-            <span class="text-[10px] font-mono text-[#6b6f7d] pl-1 uppercase shrink-0">Sifat:</span>
+          <div class="flex items-center gap-1.5 bg-[#0f0c24] p-1.5 rounded-xl border border-[#2b215a]">
+            <span class="text-[10px] font-mono text-[#9590b8] pl-1 uppercase shrink-0 font-bold">SIFAT:</span>
             <div id="synth-group-a" class="flex-1 flex gap-1 overflow-x-auto no-scrollbar">
               <!-- Dynamically populated buttons -->
             </div>
           </div>
 
           <!-- Dimension B: Ciri (Feature) -->
-          <div class="flex items-center gap-1.5 bg-[#0e1014] p-1.5 rounded-xl border border-[#22242d]">
-            <span class="text-[10px] font-mono text-[#6b6f7d] pl-1 uppercase shrink-0">Ciri:</span>
+          <div class="flex items-center gap-1.5 bg-[#0f0c24] p-1.5 rounded-xl border border-[#2b215a]">
+            <span class="text-[10px] font-mono text-[#9590b8] pl-1 uppercase shrink-0 font-bold">CIRI:</span>
             <div id="synth-group-b" class="flex-1 flex gap-1 overflow-x-auto no-scrollbar">
               <!-- Dynamically populated buttons -->
             </div>
           </div>
         </div>
 
-        <!-- Clue Preview & Submit Button -->
+        <!-- Clue Preview & Instant Pass Button -->
         <div class="flex items-center justify-between gap-2 pt-0.5">
-          <div class="flex-1 bg-[#1a1c24] border border-[#262835] rounded-xl px-2.5 py-1.5 flex items-center justify-between min-w-0">
-            <div class="truncate text-xs font-mono font-bold text-slate-200">
-              Petunjuk: <span id="synth-preview-text" class="text-amber-400">Pilih dua kartu di atas...</span>
+          <div class="flex-1 bg-[#1a153d] border border-[#34276e] rounded-xl px-2.5 py-1.5 flex items-center justify-between min-w-0">
+            <div class="truncate text-xs font-mono font-bold text-white">
+              Petunjuk: <span id="synth-preview-text" class="text-[#00f0ff]">Pilih dua kartu di atas...</span>
             </div>
-            <span id="synth-risk-badge" class="hidden text-[9px] font-mono px-1.5 py-0.5 rounded uppercase font-semibold shrink-0 ml-1"></span>
+            <span id="synth-risk-badge" class="hidden text-[9px] font-mono px-1.5 py-0.5 rounded uppercase font-bold shrink-0 ml-1"></span>
           </div>
 
-          <button id="btn-submit-clue" onclick="submitUserClue()" disabled class="btn-tactile px-4 sm:px-6 py-2 rounded-xl bg-white text-[#0f1013] font-bold text-xs uppercase tracking-wider disabled:opacity-30 disabled:pointer-events-none hover:bg-slate-200 shrink-0">
-            Kirim Petunjuk
+          <button id="btn-submit-clue" onclick="submitWePlayClue()" disabled class="btn-tactile px-5 sm:px-7 py-2.5 rounded-xl bg-gradient-to-r from-[#00f0ff] to-[#7928ca] text-slate-950 font-black text-xs uppercase tracking-wider disabled:opacity-30 disabled:pointer-events-none hover:brightness-110 shadow-md shrink-0">
+            Kirim & Selesai (Pass)
           </button>
         </div>
       </div>
 
-      <!-- Console Phase 2: Live Debate & Cross-Examination Challenge -->
+      <!-- Console Phase 2: WePlay Free Discussion & Quick Shouts -->
       <div id="console-phase-2" class="hidden space-y-1.5">
         <div class="flex items-center justify-between">
-          <span class="text-[11px] text-amber-400 font-semibold font-mono">
-            ⚖️ FASE 2: MEJA DEBAT & TUDUHAN
+          <span class="text-[11px] text-amber-300 font-bold font-mono flex items-center gap-1.5">
+            <span>🗣️ MEJA DISKUSI BEBAS — Ketuk balon seruan cepat:</span>
           </span>
-          <span class="text-[10px] font-mono text-[#8b8f9e]">Pilih aksi debatmu:</span>
+          <span class="text-[10px] font-mono text-[#9590b8]">WePlay Banter</span>
         </div>
 
-        <div class="grid grid-cols-3 gap-1.5">
-          <!-- Challenge Option 1: Point Out Contradiction -->
-          <button id="btn-debate-contradiction" onclick="triggerDebateAction('contradiction')" class="btn-tactile text-left bg-[#181a22] border border-[#2b2e3c] hover:border-amber-500 rounded-xl p-2 flex flex-col justify-between">
-            <div class="text-[11px] font-bold text-amber-400 leading-tight">🚨 Tuduh Anomali</div>
-            <div class="text-[9px] text-[#8b8f9e] leading-snug mt-0.5">Bongkar kata janggal</div>
+        <div class="grid grid-cols-4 gap-1.5">
+          <button onclick="sendQuickShout('No. 1 sangat aneh kata-katanya! 🚨')" class="btn-tactile text-center bg-[#211a4b] border border-[#3e307e] hover:border-amber-400 rounded-xl p-1.5">
+            <div class="text-[10px] font-bold text-amber-300">🚨 Tuduh Anomali</div>
           </button>
-
-          <!-- Challenge Option 2: Defend Self -->
-          <button id="btn-debate-defend" onclick="triggerDebateAction('defend')" class="btn-tactile text-left bg-[#181a22] border border-[#2b2e3c] hover:border-emerald-500 rounded-xl p-2 flex flex-col justify-between">
-            <div class="text-[11px] font-bold text-emerald-400 leading-tight">🛡️ Bela Diri</div>
-            <div class="text-[9px] text-[#8b8f9e] leading-snug mt-0.5">Perkuat alibi katamu</div>
+          <button onclick="sendQuickShout('Aku warga asli 100%! 🛡️')" class="btn-tactile text-center bg-[#211a4b] border border-[#3e307e] hover:border-emerald-400 rounded-xl p-1.5">
+            <div class="text-[10px] font-bold text-emerald-300">🛡️ Bela Diri</div>
           </button>
+          <button onclick="sendQuickShout('Jelaskan maksud petunjukmu dong! 🔍')" class="btn-tactile text-center bg-[#211a4b] border border-[#3e307e] hover:border-cyan-400 rounded-xl p-1.5">
+            <div class="text-[10px] font-bold text-cyan-300">🔍 Uji Alibi</div>
+          </button>
+          <button onclick="sendQuickShout('Hahaha ngakak wkwk 😂')" class="btn-tactile text-center bg-[#211a4b] border border-[#3e307e] hover:border-pink-400 rounded-xl p-1.5">
+            <div class="text-[10px] font-bold text-pink-300">😂 Santai Dulu</div>
+          </button>
+        </div>
 
-          <!-- Challenge Option 3: Demand Explanation -->
-          <button id="btn-debate-demand" onclick="triggerDebateAction('demand')" class="btn-tactile text-left bg-[#181a22] border border-[#2b2e3c] hover:border-sky-500 rounded-xl p-2 flex flex-col justify-between">
-            <div class="text-[11px] font-bold text-sky-400 leading-tight">🔍 Uji Alibi</div>
-            <div class="text-[9px] text-[#8b8f9e] leading-snug mt-0.5">Desak penjelasan lawan</div>
+        <div class="flex items-center justify-between pt-1">
+          <span class="text-[10px] text-[#9590b8]">Diskusi selesai? Mulai pemungutan suara bersama:</span>
+          <button onclick="startWePlayVotingPhase()" class="btn-tactile px-5 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-pink-500 text-slate-950 font-black text-xs uppercase tracking-wider hover:brightness-110 shadow-md">
+            Mulai Pungut Suara (Voting)
           </button>
         </div>
       </div>
 
-      <!-- Console Phase 3 Ready Button -->
-      <div id="console-phase-3-trigger" class="hidden flex items-center justify-between pt-0.5">
-        <div class="text-xs text-[#8b8f9e]">
-          Debat selesai! Bukti kejanggalan telah terkumpul di berkas perkara.
+      <!-- Console Phase 3: Voting Mode Banner -->
+      <div id="console-phase-3" class="hidden flex items-center justify-between py-1">
+        <div class="flex items-center gap-1.5">
+          <span class="text-amber-400 font-bold text-xs">🗳️ MODE VOTING:</span>
+          <span class="text-[11px] text-white">Ketuk tombol <span class="text-cyan-400 font-bold">VOTE</span> di kursi pemain yang kamu curigai!</span>
         </div>
-        <button id="btn-to-vote" onclick="openVoteScreen()" class="btn-tactile px-6 py-2 rounded-xl bg-white text-[#0f1013] font-bold text-xs uppercase tracking-wider hover:bg-slate-200">
-          Masuk Sidang Eliminasi
-        </button>
+        <div class="text-[10px] font-mono text-pink-400 font-bold px-2 py-0.5 rounded-lg bg-pink-500/10 border border-pink-500/30">
+          Sisa: <span id="voting-countdown-num">10s</span>
+        </div>
       </div>
 
     </div>
@@ -416,144 +397,338 @@
   </main>
 
   <!-- ========================================================================= -->
-  <!-- SCREEN 3: COUNCIL TRIAL (VOTING & EVIDENCE LEDGER) -->
+  <!-- MODAL: WEPLAY 3D SECRET CARD OPENING (REVEAL KARTU AWAL) -->
   <!-- ========================================================================= -->
-  <main id="screen-vote" class="h-full flex flex-col justify-between bg-[#15161b] border border-[#262833] rounded-2xl p-4 sm:p-5 shadow-sm overflow-hidden hidden">
-
-    <div class="text-center pb-2 border-b border-[#20222a]">
-      <div class="text-[10px] font-mono uppercase text-amber-500 font-bold">SIDANG ELIMINASI INVESTIGASI</div>
-      <h2 class="text-sm sm:text-base font-bold text-white">Berdasarkan Bukti, Siapa Pemegang Kata Berbeda?</h2>
-    </div>
-
-    <!-- Center: Comparative Dossier Cards for Voting -->
-    <div class="flex-1 flex flex-col justify-center py-2 sm:py-3 overflow-hidden">
-      <div id="vote-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-        <!-- Rendered dynamically with statements comparison -->
+  <div id="modal-card-reveal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div class="flex flex-col items-center max-w-xs w-full text-center">
+      <div class="text-xs font-mono uppercase font-bold text-cyan-400 mb-2 tracking-wider">
+        KARTU RAHASIA WEPLAY
       </div>
-    </div>
-
-    <!-- Bottom Action -->
-    <div class="pt-2.5 border-t border-[#20222a] flex flex-col sm:flex-row items-center justify-between gap-2.5">
-      <div class="text-[11px] text-[#8b8f9e] text-center sm:text-left">
-        Pilih 1 pemain yang perkataannya tidak sinkron. Penyusup akan diberi 1 kesempatan menebak kata warga!
+      <div class="text-sm font-bold text-slate-200 mb-4">
+        Ketuk kartu di bawah untuk membuka peranmu!
       </div>
-      <button id="btn-confirm-vote" onclick="submitVote()" disabled class="btn-tactile w-full sm:w-auto px-7 py-2.5 rounded-xl bg-white text-[#0f1013] font-bold text-xs uppercase tracking-wider disabled:opacity-30 disabled:pointer-events-none hover:bg-slate-200">
-        Konfirmasi Suara
+
+      <!-- 3D Flipping Card -->
+      <div id="weplay-flip-card" onclick="flipSecretCard()" class="flip-card-container w-56 h-72 cursor-pointer btn-tactile">
+        <div id="flip-card-inner" class="flip-card-inner w-full h-full relative">
+          <!-- Front Cover (Hidden state) -->
+          <div class="flip-card-front bg-gradient-to-br from-[#2f1f6d] via-[#1f1648] to-[#120d2d] border-2 border-[#5a42b0] flex flex-col items-center justify-center p-4 shadow-2xl">
+            <div class="w-16 h-16 rounded-full bg-gradient-to-tr from-amber-400 to-pink-500 flex items-center justify-center text-3xl shadow-lg mb-3">
+              🃏
+            </div>
+            <div class="text-xs font-mono font-black text-amber-400 uppercase tracking-widest">FIEZEL WEPLAY</div>
+            <div class="text-[10px] text-[#9590b8] mt-1 font-mono">Sentuh Untuk Buka</div>
+          </div>
+
+          <!-- Back Cover (Revealed state) -->
+          <div class="flip-card-back bg-gradient-to-br from-[#1b153b] via-[#241a54] to-[#110d29] border-2 border-cyan-400 flex flex-col items-center justify-between p-5 shadow-2xl">
+            <div id="reveal-role-tag" class="px-3 py-1 rounded-full text-xs font-mono font-black uppercase bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
+              WARGA
+            </div>
+            <div>
+              <div class="text-[10px] text-[#9590b8] font-mono uppercase mb-1">Kata Rahasiamu:</div>
+              <div id="reveal-word-text" class="text-2xl font-black text-amber-300 font-mono tracking-wide">
+                BICYCLE
+              </div>
+              <div id="reveal-word-id" class="text-xs text-white/80 font-medium mt-1">
+                (Sepeda)
+              </div>
+            </div>
+            <div class="text-[10px] text-[#9590b8] font-mono leading-tight">
+              Ingat katamu baik-baik! Jangan sampai dibocorkan ke penyusup.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button id="btn-close-reveal" onclick="closeSecretCardModal()" class="mt-6 px-6 py-2.5 rounded-xl bg-white text-slate-950 font-bold text-xs uppercase tracking-wider hover:bg-slate-200">
+        Saya Siap, Masuk Meja!
       </button>
     </div>
+  </div>
 
+  <!-- ========================================================================= -->
+  <!-- SCREEN 3: SHOWDOWN / TEBAKAN BALIK (SUDDEN DEATH) -->
+  <!-- ========================================================================= -->
+  <main id="screen-showdown" class="h-full flex flex-col justify-between bg-[#161331] border border-pink-500/50 rounded-3xl p-4 sm:p-5 shadow-2xl overflow-hidden hidden">
+    <div class="text-center pb-2 border-b border-[#2e265c]">
+      <div class="text-[10px] font-mono uppercase text-pink-400 font-black tracking-widest">KESEMPATAN TERAKHIR WEPLAY</div>
+      <h2 class="text-base sm:text-lg font-black text-white">TEBAK KATA RAHASIA WARGA</h2>
+      <p class="text-xs text-[#9590b8] mt-0.5">Penyusup tertangkap! Jika tebakannya tepat, ia mencuri kemenangan!</p>
+    </div>
+
+    <div class="flex-1 flex flex-col items-center justify-center py-4">
+      <div id="showdown-role-text" class="text-center mb-4">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <div id="showdown-guess-grid" class="grid grid-cols-2 gap-2.5 w-full max-w-sm">
+        <!-- Rendered guess options -->
+      </div>
+
+      <div class="mt-4 text-xs font-mono text-[#9590b8]">
+        Waktu Berpikir: <span id="showdown-timer" class="text-amber-400 font-black">08s</span>
+      </div>
+    </div>
+
+    <div class="pt-3 border-t border-[#2e265c] text-center text-[10px] text-[#9590b8] font-mono">
+      ATURAN RESMI: TEBAKAN BENAR = PENYUSUP MENANG MUTLAK
+    </div>
   </main>
 
   <!-- ========================================================================= -->
-  <!-- SCREEN 4: SHOWDOWN / SUDDEN DEATH GUESS (CLIMAX) -->
+  <!-- SCREEN 4: HASIL AKHIR & TELEMETRI BRAINCORE BKT -->
   <!-- ========================================================================= -->
-  <main id="screen-showdown" class="h-full flex flex-col justify-between bg-[#15161b] border border-amber-600/50 rounded-2xl p-4 sm:p-5 shadow-2xl overflow-hidden hidden">
-
-    <div class="text-center pb-2 border-b border-[#20222a]">
-      <div class="text-[10px] font-mono uppercase text-amber-500 font-bold">KESEMPATAN TERAKHIR PENYUSUP</div>
-      <h2 class="text-base font-bold text-white">TEBAK KATA RAHASIA WARGA</h2>
-      <p class="text-xs text-[#8b8f9e] mt-0.5">Penyusup tertangkap! Jika ia bisa menebak kata warga, kemenangan tercuri!</p>
-    </div>
-
-    <!-- Center Guess Console -->
-    <div class="flex-1 flex flex-col justify-center max-w-md mx-auto w-full py-2">
-      <div id="showdown-role-text" class="text-center mb-3">
-        <!-- Text for civilian viewing or undercover guessing -->
-      </div>
-
-      <div id="showdown-guess-grid" class="grid grid-cols-2 gap-2 mb-3">
-        <!-- Word choices -->
-      </div>
-
-      <div class="text-center text-xs font-mono text-[#8b8f9e]">
-        Waktu Berpikir: <span id="showdown-timer" class="text-amber-400 font-bold">08</span>s
-      </div>
-    </div>
-
-    <div class="pt-2 border-t border-[#20222a] text-center">
-      <span class="text-[10px] font-mono text-[#6b6f7d]">PERATURAN RESMI: TEBAKAN BENAR = PENYUSUP MENANG TOTAL</span>
-    </div>
-
-  </main>
-
-  <!-- ========================================================================= -->
-  <!-- SCREEN 5: FINAL RESULT & BRAINCORE TELEMETRY -->
-  <!-- ========================================================================= -->
-  <main id="screen-result" class="h-full flex flex-col justify-between bg-[#15161b] border border-[#262833] rounded-2xl p-4 sm:p-5 shadow-sm overflow-hidden hidden">
-
-    <!-- Top Result Banner -->
-    <div class="text-center pt-1">
-      <div id="res-badge" class="inline-block px-3 py-0.5 rounded-full text-xs font-mono uppercase tracking-wider mb-1.5 font-bold">
+  <main id="screen-result" class="h-full flex flex-col justify-between bg-[#161331] border border-[#2e265c] rounded-3xl p-4 sm:p-5 shadow-2xl overflow-hidden hidden">
+    <div class="text-center py-2">
+      <div id="res-badge" class="inline-block px-4 py-1 rounded-full text-xs font-mono uppercase tracking-wider mb-2 font-black bg-amber-500/20 text-amber-300 border border-amber-500/40">
         VICTORY
       </div>
-      <h2 id="res-heading" class="text-base sm:text-lg font-bold text-white mb-0.5">Warga Berhasil Menang</h2>
-      <p id="res-note" class="text-xs text-[#8b8f9e]">Penyusup gagal memalsukan keselarasan semantik kata.</p>
+      <h1 id="res-heading" class="text-xl sm:text-2xl font-black text-white">
+        Warga Sukses Mengeliminasi!
+      </h1>
+      <p id="res-note" class="text-xs text-[#9590b8] mt-1 max-w-sm mx-auto">
+        Penyusup gagal menebak kata warga! Tim Warga menang mutlak!
+      </p>
     </div>
 
-    <!-- Word Reveal & Stats Bento (Centered) -->
-    <div class="max-w-md mx-auto w-full space-y-2 py-2">
-      <!-- Word Comparison Box -->
-      <div class="bg-[#0e1014] border border-[#22242d] rounded-xl p-3 text-xs space-y-1.5 font-mono">
-        <div class="flex justify-between py-0.5 border-b border-[#1c1e27]">
-          <span class="text-[#6b6f7d]">KATA WARGA:</span>
-          <span id="res-civ-word" class="font-bold text-slate-100">BICYCLE</span>
-        </div>
-        <div class="flex justify-between py-0.5 border-b border-[#1c1e27]">
-          <span class="text-[#6b6f7d]">KATA PENYUSUP:</span>
-          <span id="res-spy-word" class="font-bold text-amber-500">MOTORCYCLE</span>
-        </div>
-        <div class="flex justify-between py-0.5">
-          <span class="text-[#6b6f7d]">PENYUSUP SEBENARNYA:</span>
-          <span id="res-spy-name" class="font-bold text-white">Kevin Saputra</span>
-        </div>
+    <!-- Dossier Kartu Rahasia -->
+    <div class="bg-[#0f0c24] border border-[#282154] rounded-2xl p-3.5 space-y-2 text-xs">
+      <div class="flex items-center justify-between pb-1.5 border-b border-[#211b49]">
+        <span class="text-[#9590b8] font-mono text-[10px] uppercase">KATA WARGA:</span>
+        <span id="res-civ-word" class="font-bold text-white font-mono">BICYCLE (Sepeda)</span>
       </div>
-
-      <!-- Braincore Mastery Telemetry -->
-      <div class="bg-[#181a22] border border-[#262936] rounded-xl p-3 text-xs space-y-2">
-        <div class="flex items-center justify-between text-[11px] font-mono text-[#8b8f9e]">
-          <span>BRAINCORE TELEMETRY GAIN</span>
-          <span class="text-emerald-400 font-bold">+42 XP</span>
-        </div>
-        <div class="grid grid-cols-2 gap-2 text-center">
-          <div class="bg-[#101116] p-2 rounded-lg border border-[#20222b]">
-            <div class="text-[10px] text-[#6b6f7d]">Semantic Deductions</div>
-            <div id="stat-deduction" class="text-sm font-bold text-white font-mono">94% Akurat</div>
-          </div>
-          <div class="bg-[#101116] p-2 rounded-lg border border-[#20222b]">
-            <div class="text-[10px] text-[#6b6f7d]">Vocabulary Fluency</div>
-            <div class="text-sm font-bold text-emerald-400 font-mono">BKT +0.18</div>
-          </div>
-        </div>
+      <div class="flex items-center justify-between pb-1.5 border-b border-[#211b49]">
+        <span class="text-[#9590b8] font-mono text-[10px] uppercase">KATA PENYUSUP:</span>
+        <span id="res-spy-word" class="font-bold text-pink-400 font-mono">MOTORCYCLE (Sepeda Motor)</span>
+      </div>
+      <div class="flex items-center justify-between">
+        <span class="text-[#9590b8] font-mono text-[10px] uppercase">PENYUSUP SEBENARNYA:</span>
+        <span id="res-spy-name" class="font-bold text-amber-300 font-mono">Dimas Pratama (Bot)</span>
       </div>
     </div>
 
-    <!-- Return Actions -->
-    <div class="pt-2.5 border-t border-[#20222a] flex items-center justify-center gap-2">
-      <button onclick="resetToLobby()" class="btn-tactile px-6 py-2.5 rounded-xl bg-white text-[#0f1013] font-bold text-xs uppercase tracking-wider hover:bg-slate-200">
+    <!-- Braincore Telemetry Widget -->
+    <div class="bg-[#1b153d] border border-[#34276e] rounded-2xl p-3">
+      <div class="flex items-center justify-between text-[10px] font-mono text-[#9590b8] mb-2 uppercase">
+        <span>Braincore Telemetry Gain</span>
+        <span class="text-emerald-400 font-bold">+42 XP</span>
+      </div>
+      <div class="grid grid-cols-2 gap-2 text-center">
+        <div class="bg-[#0f0c24] p-2 rounded-xl">
+          <div class="text-[9px] text-[#9590b8]">Semantic Deductions</div>
+          <div class="text-sm font-bold text-white mt-0.5">94% Akurat</div>
+        </div>
+        <div class="bg-[#0f0c24] p-2 rounded-xl">
+          <div class="text-[9px] text-[#9590b8]">Vocabulary Fluency</div>
+          <div class="text-sm font-bold text-emerald-400 font-mono mt-0.5">BKT +0.18</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Actions -->
+    <div class="pt-3 border-t border-[#282154] flex gap-2">
+      <button onclick="resetToWePlayLobby()" class="btn-tactile flex-1 py-3 rounded-2xl bg-white text-slate-950 font-black text-xs uppercase tracking-wider hover:bg-slate-200">
         Main Lagi
       </button>
-      <a href="./index.html" class="btn-tactile px-6 py-2.5 rounded-xl bg-[#20222b] border border-[#2d303c] text-white font-semibold text-xs tracking-wider hover:bg-[#282a36]">
-        Kembali ke Beranda
+      <a href="./index.html" class="btn-tactile px-5 py-3 rounded-2xl bg-[#211b49] border border-[#372d73] text-[#9590b8] hover:text-white font-bold text-xs uppercase text-center">
+        Kembali
       </a>
     </div>
-
   </main>
 
   <!-- ========================================================================= -->
-  <!-- GAME ENGINE & DYNAMIC LOGIC SCRIPT -->
+  <!-- MODAL: ATURAN RESMI WEPLAY -->
+  <!-- ========================================================================= -->
+  <div id="modal-rules" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4 hidden">
+    <div class="bg-[#161331] border border-[#3d3278] rounded-3xl max-w-sm w-full p-4 sm:p-5 shadow-2xl flex flex-col gap-3">
+      <div class="flex items-center justify-between border-b border-[#282154] pb-2">
+        <div class="flex items-center gap-2">
+          <span class="text-lg">📖</span>
+          <h3 class="text-sm font-bold text-white">Panduan WePlay Undercover</h3>
+        </div>
+        <button onclick="closeRulesModal()" class="text-[#9590b8] hover:text-white text-lg font-mono">✕</button>
+      </div>
+
+      <div class="space-y-2.5 text-xs text-slate-300">
+        <div class="bg-[#100d27] p-2.5 rounded-xl border border-[#282154]">
+          <div class="font-bold text-amber-400 mb-0.5">1. Peran & Pembagian Kata</div>
+          <p class="text-[11px] text-[#9590b8]">
+            • <b>Warga (Mayoritas)</b>: Menerima kata rahasia yang sama (misal: <i>BICYCLE</i>).<br>
+            • <b>Penyusup (Minoritas)</b>: Menerima kata mirip (misal: <i>MOTORCYCLE</i>).<br>
+            • <b>Si Polos (Whiteboard)</b>: Tidak menerima kata sama sekali (???), harus menyamar berdasarkan kata orang lain!
+          </p>
+        </div>
+
+        <div class="bg-[#100d27] p-2.5 rounded-xl border border-[#282154]">
+          <div class="font-bold text-cyan-400 mb-0.5">2. Giliran Mic & Petunjuk</div>
+          <p class="text-[11px] text-[#9590b8]">
+            Setiap pemain bergiliran mendeskripsikan katanya memakai 1 Sifat & 1 Ciri Bahasa Inggris. Jangan terlalu blak-blakan agar Penyusup tidak tahu kata Warga!
+          </p>
+        </div>
+
+        <div class="bg-[#100d27] p-2.5 rounded-xl border border-[#282154]">
+          <div class="font-bold text-pink-400 mb-0.5">3. Debat, Lempar Hadiah, & Voting</div>
+          <p class="text-[11px] text-[#9590b8]">
+            Bisa saling melempar telur/tomat/bunga ke kursi pemain, saling tuduh di meja diskusi, dan voting siapa yang paling mencurigakan. Pemain terbanyak suara akan dieliminasi!
+          </p>
+        </div>
+      </div>
+
+      <button onclick="closeRulesModal()" class="w-full py-2.5 rounded-xl bg-white text-slate-950 font-bold text-xs uppercase tracking-wider">
+        Paham, Tutup
+      </button>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- GAME ENGINE JAVASCRIPT (WEPLAY CORE & WEB AUDIO SYNTHESIZER) -->
   <!-- ========================================================================= -->
   <script>
-    // State Variables
-    var capacity = 4;
-    var preferredRole = 'random';
-    var userRole = 'civilian';
-    var wordPrivacyHidden = false;
-    var acceptCountdownTimer = null;
-    var searchTimerInterval = null;
-    var showdownInterval = null;
+    // Audio Context Synthesizer (Zero-Asset Arcade Audio)
+    var audioCtx = null;
+    var audioMuted = false;
 
-    // Word Clash Pairs (Rich Braincore Semantic Datasets with Indonesian Gloss)
+    function getAudioCtx() {
+      if (!audioCtx) {
+        var AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) audioCtx = new AudioContextClass();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    function playSfx(type) {
+      if (audioMuted) return;
+      try {
+        var ctx = getAudioCtx();
+        if (!ctx) return;
+        var now = ctx.currentTime;
+
+        if (type === 'tap') {
+          var osc = ctx.createOscillator();
+          var gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(600, now);
+          osc.frequency.exponentialRampToValueAtTime(300, now + 0.06);
+          gain.gain.setValueAtTime(0.15, now);
+          gain.gain.linearRampToValueAtTime(0.01, now + 0.06);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.06);
+        } else if (type === 'turn') {
+          var osc = ctx.createOscillator();
+          var gain = ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(440, now);
+          osc.frequency.setValueAtTime(880, now + 0.08);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.25);
+        } else if (type === 'speech') {
+          var osc = ctx.createOscillator();
+          var gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(520, now);
+          osc.frequency.exponentialRampToValueAtTime(660, now + 0.12);
+          gain.gain.setValueAtTime(0.18, now);
+          gain.gain.linearRampToValueAtTime(0.01, now + 0.15);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.15);
+        } else if (type === 'splat') {
+          var osc = ctx.createOscillator();
+          var gain = ctx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(220, now);
+          osc.frequency.exponentialRampToValueAtTime(80, now + 0.15);
+          gain.gain.setValueAtTime(0.25, now);
+          gain.gain.linearRampToValueAtTime(0.01, now + 0.18);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.18);
+        } else if (type === 'sparkle') {
+          var osc = ctx.createOscillator();
+          var gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(880, now);
+          osc.frequency.exponentialRampToValueAtTime(1760, now + 0.2);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.linearRampToValueAtTime(0.01, now + 0.22);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.22);
+        } else if (type === 'victory') {
+          [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+            var o = ctx.createOscillator();
+            var g = ctx.createGain();
+            o.type = 'triangle';
+            o.frequency.value = freq;
+            var t = now + (idx * 0.1);
+            g.gain.setValueAtTime(0.2, t);
+            g.gain.linearRampToValueAtTime(0.01, t + 0.35);
+            o.connect(g);
+            g.connect(ctx.destination);
+            o.start(t);
+            o.stop(t + 0.35);
+          });
+        }
+      } catch (e) {
+        // AudioContext may be blocked before user gesture
+      }
+    }
+
+    function toggleAudioMute() {
+      audioMuted = !audioMuted;
+      var btn = document.getElementById('btn-audio-toggle');
+      if (btn) {
+        btn.innerText = audioMuted ? '🔇 SFX OFF' : '🔊 SFX ON';
+        btn.className = audioMuted ? 'btn-tactile px-2 py-1 rounded-lg bg-[#211b49] border border-[#372d73] text-[11px] text-slate-400 font-mono' : 'btn-tactile px-2 py-1 rounded-lg bg-[#211b49] border border-[#372d73] text-[11px] text-amber-300 font-mono';
+      }
+    }
+
+    // Game State Variables
+    var playMode = 'standard'; // 'standard' or 'whiteboard'
+    var roomCap = 4; // 4 or 6
+    var players = [];
+    var activePair = null;
+    var activeSpeakerSeat = 1;
+    var turnCountdown = 15;
+    var turnInterval = null;
+    var votingInterval = null;
+    var selectedSynthA = null;
+    var selectedSynthB = null;
+    var myVotedTarget = null;
+    var giftTargetSeat = null;
+
+    // Rich Braincore Semantic Datasets with Indonesian Gloss
     var WORD_PAIRS = [
+      {
+        civWord: 'BICYCLE',
+        civWordId: 'Sepeda Gowes',
+        spyWord: 'MOTORCYCLE',
+        spyWordId: 'Sepeda Motor',
+        dimA: [
+          { label: 'Tenaga', civText: 'Human Muscle Pedal', civId: 'Pedal Tenaga Otot', spyText: 'Internal Combustion', spyId: 'Mesin Bensin Gas', risk: 'High' },
+          { label: 'Jumlah Roda', civText: 'Two Wheels', civId: 'Dua Buah Roda', spyText: 'Two Wheels', spyId: 'Dua Buah Roda', risk: 'Safe' },
+          { label: 'Laju', civText: 'Moderate Cadence', civId: 'Kayuhan Santai', spyText: 'High Acceleration', spyId: 'Tarikan Gas Cepat', risk: 'Medium' }
+        ],
+        dimB: [
+          { label: 'Emisi', civText: 'Zero Carbon', civId: 'Bebas Polusi Udara', spyText: 'Exhaust Pipe', spyId: 'Pipa Knalpot Berasap', risk: 'High' },
+          { label: 'Bobot', civText: 'Lightweight Frame', civId: 'Rangka Ringan', spyText: 'Heavy Metal Chassis', spyId: 'Sasis Besi Berat', risk: 'Medium' },
+          { label: 'Suara', civText: 'Quiet Bell Click', civId: 'Kring Bel Halus', spyText: 'Engine Roar', spyId: 'Deru Suara Mesin', risk: 'High' }
+        ],
+        guessOptions: ['MOTORCYCLE', 'BICYCLE', 'SKATEBOARD', 'ELECTRIC CAR']
+      },
       {
         civWord: 'AIRPLANE',
         civWordId: 'Pesawat Terbang',
@@ -561,32 +736,15 @@
         spyWordId: 'Helikopter',
         dimA: [
           { label: 'Bentuk Sayap', civText: 'Fixed Wings', civId: 'Sayap Lebar Tetap', spyText: 'Rotary Blades', spyId: 'Baling-baling Putar', risk: 'High' },
-          { label: 'Ketinggian Terbang', civText: 'High Altitude', civId: 'Ketinggian Awan Tinggi', spyText: 'Low/Mid Altitude', spyId: 'Ketinggian Rendah-Sedang', risk: 'Low' },
-          { label: 'Gaya Lepas Landas', civText: 'Needs Runway', civId: 'Butuh Landasan Pacu', spyText: 'Vertical Takeoff', spyId: 'Lepas Landas Vertikal', risk: 'High' }
+          { label: 'Ketinggian', civText: 'High Altitude', civId: 'Awan Lapisan Atas', spyText: 'Low/Mid Altitude', spyId: 'Ketinggian Sedang', risk: 'Low' },
+          { label: 'Lepas Landas', civText: 'Needs Runway', civId: 'Butuh Landasan Pacu', spyText: 'Vertical Takeoff', spyId: 'Lepas Landas Vertikal', risk: 'High' }
         ],
         dimB: [
           { label: 'Kecepatan', civText: 'Jet Cruise Speed', civId: 'Kecepatan Jet Jelajah', spyText: 'Hovering Capacity', spyId: 'Bisa Diam di Udara', risk: 'High' },
           { label: 'Kapasitas', civText: 'Large Commercial', civId: 'Komersial Ratusan Orang', spyText: 'Small Crew', spyId: 'Awak Kecil Fleksibel', risk: 'Medium' },
-          { label: 'Mesin', civText: 'Turbofan Jets', civId: 'Mesin Jet Turbofan', spyText: 'Rotor Mast Engine', spyId: 'Mesin Rotor Tiang', risk: 'Medium' }
+          { label: 'Mesin', civText: 'Turbofan Jets', civId: 'Mesin Turbofan', spyText: 'Rotor Mast Engine', spyId: 'Mesin Rotor Tiang', risk: 'Medium' }
         ],
         guessOptions: ['HELICOPTER', 'AIRPLANE', 'SUBMARINE', 'DRONE']
-      },
-      {
-        civWord: 'BICYCLE',
-        civWordId: 'Sepeda Gowes',
-        spyWord: 'MOTORCYCLE',
-        spyWordId: 'Sepeda Motor',
-        dimA: [
-          { label: 'Tenaga Penggerak', civText: 'Human Muscle Pedal', civId: 'Pedal Tenaga Otot', spyText: 'Internal Combustion', spyId: 'Mesin Pembakaran Internal', risk: 'High' },
-          { label: 'Jumlah Roda', civText: 'Two Wheels', civId: 'Dua Buah Roda', spyText: 'Two Wheels', spyId: 'Dua Buah Roda', risk: 'Safe' },
-          { label: 'Laju Kecepatan', civText: 'Moderate Cadence', civId: 'Kayuhan Santai', spyText: 'High Acceleration', spyId: 'Akselerasi Tarikan Gas', risk: 'Medium' }
-        ],
-        dimB: [
-          { label: 'Emisi Gas', civText: 'Zero Carbon', civId: 'Bebas Polusi Udara', spyText: 'Exhaust Pipe', spyId: 'Pipa Knalpot Berasap', risk: 'High' },
-          { label: 'Bobot', civText: 'Lightweight Frame', civId: 'Rangka Ringan Dijinjing', spyText: 'Heavy Metal Chassis', spyId: 'Sasis Besi Berat', risk: 'Medium' },
-          { label: 'Suara', civText: 'Quiet Bell Click', civId: 'Kring Bel Halus', spyText: 'Engine Roar', spyId: 'Deru Suara Mesin', risk: 'High' }
-        ],
-        guessOptions: ['MOTORCYCLE', 'BICYCLE', 'SKATEBOARD', 'ELECTRIC CAR']
       },
       {
         civWord: 'COFFEE',
@@ -594,772 +752,838 @@
         spyWord: 'TEA',
         spyWordId: 'Teh',
         dimA: [
-          { label: 'Bahan Baku', civText: 'Roasted Ground Beans', civId: 'Biji Sangrai Digiling', spyText: 'Dried Plant Leaves', spyId: 'Seduhan Daun Kering', risk: 'High' },
-          { label: 'Wadah Penyajian', civText: 'Hot Brew Mug', civId: 'Cangkir Seduh Hangat', spyText: 'Hot Steeped Cup', spyId: 'Cangkir Celup Hangat', risk: 'Safe' },
-          { label: 'Efek Kafein', civText: 'High Caffeine Kick', civId: 'Tendangan Kafein Kuat', spyText: 'Mild Theanine Soothe', spyId: 'Menenangkan Pikiran', risk: 'Medium' }
+          { label: 'Bahan Baku', civText: 'Roasted Ground Beans', civId: 'Biji Sangrai Giling', spyText: 'Dried Plant Leaves', spyId: 'Seduhan Daun Kering', risk: 'High' },
+          { label: 'Penyajian', civText: 'Hot Brew Mug', civId: 'Cangkir Seduh Hangat', spyText: 'Hot Steeped Cup', spyId: 'Cangkir Celup Hangat', risk: 'Safe' },
+          { label: 'Efek', civText: 'High Caffeine Kick', civId: 'Kafein Penahan Kantuk', spyText: 'Mild Theanine Soothe', spyId: 'Menenangkan Pikiran', risk: 'Medium' }
         ],
         dimB: [
-          { label: 'Warna Seduhan', civText: 'Dark Brown/Black', civId: 'Hitam Pekat/Cokelat', spyText: 'Amber Golden Translucent', civId: 'Kuning Bening Transparan', risk: 'High' },
-          { label: 'Aroma Utama', civText: 'Roasty Earthy', civId: 'Aroma Panggang Kuat', spyText: 'Floral Herbal Delicate', civId: 'Wangi Bunga/Herbal', risk: 'Medium' },
-          { label: 'Cara Olah', civText: 'Espresso Extraction', civId: 'Ekstraksi Tekanan Tinggi', spyText: 'Bag Infusion', civId: 'Dicelup / Diseduh', risk: 'High' }
+          { label: 'Warna Seduh', civText: 'Dark Black Crema', civId: 'Hitam Pekat Berbusa', spyText: 'Amber Golden Clear', spyId: 'Kuning Jingga Bening', risk: 'High' },
+          { label: 'Rasa Dominan', civText: 'Bitter Aromatic', civId: 'Pahit Semerbak', spyText: 'Subtle Tannic Tart', spyId: 'Kelat Wangi Sepat', risk: 'Medium' },
+          { label: 'Asal Daerah', civText: 'Tropical Highlands', civId: 'Dataran Tinggi Tropis', spyText: 'Mountain Terraces', spyId: 'Perkebunan Lereng Bukit', risk: 'Safe' }
         ],
-        guessOptions: ['TEA', 'COFFEE', 'HOT CHOCOLATE', 'ENERGY DRINK']
-      },
-      {
-        civWord: 'SUBWAY',
-        civWordId: 'Kereta Bawah Tanah (MRT)',
-        spyWord: 'TRAIN',
-        spyWordId: 'Kereta Luar Kota (KAI)',
-        dimA: [
-          { label: 'Jalur Lintasan', civText: 'Underground Tunnel', civId: 'Terowongan Bawah Tanah', spyText: 'Open Surface Rail', civId: 'Rel Terbuka Antar Kota', risk: 'High' },
-          { label: 'Jarak Tempuh', civText: 'Inner City Commute', civId: 'Komuter Dalam Kota', spyText: 'Cross Country Long', civId: 'Jarak Jauh Lintas Provinsi', risk: 'Medium' },
-          { label: 'Interval Jadwal', civText: 'Arrives Every 3 Mins', civId: 'Tiba Tiap 3 Menit', spyText: 'Fixed Departure Time', civId: 'Jadwal Jam Tertentu', risk: 'Safe' }
-        ],
-        dimB: [
-          { label: 'Cahaya Sekitar', civText: 'Subterranean Dim', civId: 'Lampu Terowongan Gelap', spyText: 'Scenic Window View', civId: 'Pemandangan Jendela Sawah', risk: 'High' },
-          { label: 'Tiket/Akses', civText: 'Tap Card Gate', civId: 'Tap Kartu Elektrik', spyText: 'Assigned Seat Ticket', civId: 'Tiket Duduk Sesuai Kursi', risk: 'Medium' },
-          { label: 'Tenaga Listrik', civText: 'Third Rail Power', civId: 'Rel Listrik Aliran Ketiga', spyText: 'Overhead Catenary', civId: 'Kabel Listrik Atas / Diesel', risk: 'Low' }
-        ],
-        guessOptions: ['TRAIN', 'SUBWAY', 'BUSWAY', 'TRAM']
+        guessOptions: ['TEA', 'COFFEE', 'HOT CHOCOLATE', 'MATCHA LATTE']
       }
     ];
 
     var BOT_NAMES = [
-      { name: 'Dimas Pratama', rank: 'BKT Master · Lv.18', ping: '22ms' },
-      { name: 'Nadia Rahma', rank: 'Grammar Elite · Lv.24', ping: '28ms' },
-      { name: 'Kevin Saputra', rank: 'Fluency Prodigy · Lv.15', ping: '31ms' },
-      { name: 'Alya Kirana', rank: 'Syntax Sleuth · Lv.20', ping: '19ms' }
+      'Dimas Pratama', 'Siti Rahma', 'Budi Santoso', 
+      'Rian Surya', 'Alya Zahra', 'Kenji Sato'
     ];
 
-    // Current Active Match State
-    var activePair = null;
-    var matchPlayers = [];
-    var turnSequence = []; // Array of indices: [0, 1, 2, 3] representing sequential speech order
-    var currentTurnStep = 0; // Current step index in turnSequence (0, 1, 2, ...)
-    var activePhase = 1; // 1: Clue Round, 2: Debate, 3: Council, 4: Showdown, 5: Result
-    var selectedSynthA = null;
-    var selectedSynthB = null;
-    var selectedVoteName = null;
-
-    // Initialization
     function init() {
+      setupLobbySeats();
       renderLobby();
-      registerServiceWorker();
     }
 
-    function registerServiceWorker() {
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js').catch(function() {});
+    function setPlayMode(mode) {
+      playMode = mode;
+      document.getElementById('mode-std').className = mode === 'standard' ? 'px-2.5 py-0.5 rounded-lg font-bold bg-[#ffb800] text-slate-950 transition' : 'px-2.5 py-0.5 rounded-lg font-bold text-[#9590b8] hover:text-white transition';
+      document.getElementById('mode-white').className = mode === 'whiteboard' ? 'px-2.5 py-0.5 rounded-lg font-bold bg-[#ffb800] text-slate-950 transition' : 'px-2.5 py-0.5 rounded-lg font-bold text-[#9590b8] hover:text-white transition';
+      setupLobbySeats();
+      playSfx('tap');
+    }
+
+    function setLobbyCap(cap) {
+      roomCap = cap;
+      document.getElementById('cap-4').className = cap === 4 ? 'px-2.5 py-0.5 rounded-lg font-bold bg-[#7928ca] text-white transition' : 'px-2.5 py-0.5 rounded-lg font-bold text-[#9590b8] hover:text-white transition';
+      document.getElementById('cap-6').className = cap === 6 ? 'px-2.5 py-0.5 rounded-lg font-bold bg-[#7928ca] text-white transition' : 'px-2.5 py-0.5 rounded-lg font-bold text-[#9590b8] hover:text-white transition';
+      setupLobbySeats();
+      playSfx('tap');
+    }
+
+    function setupLobbySeats() {
+      players = [
+        { seat: 1, name: 'Kamu (Penyelidik)', isMe: true, isBot: false, alive: true, clue: '', votesReceived: 0 }
+      ];
+
+      for (var i = 2; i <= roomCap; i++) {
+        players.push({
+          seat: i,
+          name: BOT_NAMES[i - 2],
+          isMe: false,
+          isBot: true,
+          alive: true,
+          clue: '',
+          votesReceived: 0
+        });
       }
-    }
-
-    function syncStateTelemetry(xpGained) {
-      try {
-        var raw = localStorage.getItem('fz_state');
-        if (raw) {
-          var state = JSON.parse(raw);
-          state.xp = (Number(state.xp) || 0) + xpGained;
-          localStorage.setItem('fz_state', JSON.stringify(state));
-        }
-      } catch (_) {}
-    }
-
-    // Modal Rules (How to play)
-    function openRulesModal() {
-      document.getElementById('modal-rules').classList.remove('hidden');
-    }
-
-    function closeRulesModal() {
-      document.getElementById('modal-rules').classList.add('hidden');
-    }
-
-    function setCap(c) {
-      capacity = c;
-      [2, 4, 5].forEach(num => {
-        var el = document.getElementById('cap-' + num);
-        if (el) {
-          el.className = (num === c)
-            ? 'px-2 py-0.5 rounded-lg text-xs font-semibold bg-[#262833] text-white transition'
-            : 'px-2 py-0.5 rounded-lg text-xs font-semibold text-[#8b8f9e] hover:text-white transition';
-        }
-      });
       renderLobby();
-    }
-
-    function setRolePref(pref) {
-      preferredRole = pref;
-      ['random', 'civ', 'spy'].forEach(k => {
-        var el = document.getElementById('pref-role-' + k);
-        if (!el) return;
-        var isMatch = (k === 'random' && pref === 'random') ||
-                      (k === 'civ' && pref === 'civilian') ||
-                      (k === 'spy' && pref === 'undercover');
-        el.className = isMatch
-          ? 'px-2.5 py-0.5 rounded-lg font-semibold bg-[#262833] text-white transition'
-          : 'px-2.5 py-0.5 rounded-lg font-semibold text-[#8b8f9e] hover:text-white transition';
-      });
     }
 
     function renderLobby() {
-      var grid = document.getElementById('lobby-grid');
-      grid.innerHTML = '';
-      document.getElementById('slot-count').innerText = '1/' + capacity;
+      var container = document.getElementById('weplay-lobby-seats');
+      if (!container) return;
+      container.innerHTML = '';
 
-      for (var i = 0; i < capacity; i++) {
-        var d = document.createElement('div');
-        if (i === 0) {
-          d.className = 'bg-[#1a1c24] border border-[#2b2e3c] rounded-xl p-3 text-center flex flex-col justify-between h-24 sm:h-28';
-          d.innerHTML = `
-            <div class="text-[10px] font-mono text-[#6b6f7d] text-left flex justify-between">
-              <span>HOST</span>
-              <span class="text-emerald-400 font-bold">READY</span>
+      var countEl = document.getElementById('seat-filled-count');
+      if (countEl) countEl.innerText = players.length + '/' + roomCap;
+
+      for (var i = 1; i <= roomCap; i++) {
+        var p = players.find(x => x.seat === i);
+        var card = document.createElement('div');
+        card.className = 'bg-[#1b163d] border border-[#30256e] rounded-2xl p-3 flex flex-col items-center justify-between text-center relative overflow-hidden min-h-[105px]';
+
+        if (p) {
+          var initial = p.isMe ? '👤' : p.name.charAt(0);
+          card.innerHTML = `
+            <span class="absolute top-2 left-2 text-[9px] font-mono font-bold text-[#9590b8]">#${p.seat}</span>
+            <span class="absolute top-2 right-2 text-[9px] font-mono text-emerald-400">SIAP</span>
+            <div class="w-11 h-11 rounded-full bg-gradient-to-tr from-[#7928ca] to-[#00f0ff] p-0.5 my-1">
+              <div class="w-full h-full bg-[#120e2e] rounded-full flex items-center justify-center text-sm font-black text-white">
+                ${initial}
+              </div>
             </div>
-            <div class="w-8 h-8 mx-auto rounded-full bg-[#272b39] text-white font-bold flex items-center justify-center text-xs">
-              K
-            </div>
-            <div class="text-xs font-semibold text-slate-200">Kamu</div>
+            <div class="text-[11px] font-bold text-white truncate max-w-[100px]">${p.name}</div>
+            <div class="text-[9px] font-mono text-cyan-300">${p.isMe ? 'Pemain Utama' : 'Bot AI'}</div>
           `;
         } else {
-          d.className = 'bg-[#121317] border border-dashed border-[#20222a] rounded-xl p-3 text-center flex flex-col items-center justify-center h-24 sm:h-28 text-[#525562]';
-          d.innerHTML = `
-            <div class="text-xs font-medium text-[#5a5e6f]">Slot Kosong</div>
-            <div class="text-[10px] text-[#42444f] mt-1 font-mono">Auto-Match</div>
+          card.innerHTML = `
+            <span class="absolute top-2 left-2 text-[9px] font-mono text-[#9590b8]">KURSI ${i}</span>
+            <div class="w-10 h-10 rounded-full border border-dashed border-[#443884] flex items-center justify-center text-xs text-[#9590b8] my-2">
+              +
+            </div>
+            <div class="text-[10px] text-[#9590b8]">Kosong</div>
           `;
         }
-        grid.appendChild(d);
+        container.appendChild(card);
       }
     }
 
-    function startSearch() {
-      if (searchTimerInterval) clearInterval(searchTimerInterval);
-      document.getElementById('modal-search').classList.remove('hidden');
-      var s = 1;
-      var el = document.getElementById('search-timer');
-      var sub = document.getElementById('search-subtext');
-      searchTimerInterval = setInterval(function() {
-        s++;
-        if (el) el.innerText = '00:0' + s;
-        if (s === 2 && sub) sub.innerText = 'Menemukan ' + (capacity - 1) + ' pemain cocok...';
-        if (s >= 3) {
-          clearInterval(searchTimerInterval);
-          searchTimerInterval = null;
-          foundMatch();
-        }
-      }, 1000);
+    function openRulesModal() {
+      var modal = document.getElementById('modal-rules');
+      if (modal) modal.classList.remove('hidden');
+      playSfx('tap');
     }
 
-    function cancelSearch() {
-      if (searchTimerInterval) {
-        clearInterval(searchTimerInterval);
-        searchTimerInterval = null;
-      }
-      document.getElementById('modal-search').classList.add('hidden');
+    function closeRulesModal() {
+      var modal = document.getElementById('modal-rules');
+      if (modal) modal.classList.add('hidden');
+      playSfx('tap');
     }
 
-    function foundMatch() {
-      if (searchTimerInterval) {
-        clearInterval(searchTimerInterval);
-        searchTimerInterval = null;
-      }
-      document.getElementById('modal-search').classList.add('hidden');
-      document.getElementById('modal-found').classList.remove('hidden');
-
+    function startWePlayMatch() {
+      playSfx('tap');
       activePair = WORD_PAIRS[Math.floor(Math.random() * WORD_PAIRS.length)];
 
-      if (preferredRole === 'random') {
-        userRole = (Math.random() > 0.45) ? 'civilian' : 'undercover';
-      } else {
-        userRole = preferredRole;
-      }
+      var spySeat = Math.floor(Math.random() * roomCap) + 1;
+      var whiteSeat = (playMode === 'whiteboard') ? ((spySeat % roomCap) + 1) : -1;
 
-      matchPlayers = [
-        {
-          name: 'Kamu',
-          isHost: true,
-          role: userRole,
-          secretWord: (userRole === 'civilian') ? activePair.civWord : activePair.spyWord,
-          secretWordId: (userRole === 'civilian') ? activePair.civWordId : activePair.spyWordId,
-          cluePhase1: null,
-          cluePhase1Id: null,
-          defensePhase2: null,
-          susScore: 10,
-          ping: '24ms'
+      players.forEach(p => {
+        p.alive = true;
+        p.clue = '';
+        p.votesReceived = 0;
+        if (p.seat === spySeat) {
+          p.role = 'spy';
+          p.secretWord = activePair.spyWord;
+          p.secretWordId = activePair.spyWordId;
+        } else if (p.seat === whiteSeat) {
+          p.role = 'whiteboard';
+          p.secretWord = '???';
+          p.secretWordId = 'Si Polos (Tanpa Kata)';
+        } else {
+          p.role = 'civilian';
+          p.secretWord = activePair.civWord;
+          p.secretWordId = activePair.civWordId;
         }
-      ];
-
-      var spyBotIndex = (userRole === 'civilian') ? (Math.floor(Math.random() * (capacity - 1)) + 1) : -1;
-
-      var bIdx = 0;
-      while (matchPlayers.length < capacity) {
-        var botInfo = BOT_NAMES[bIdx % BOT_NAMES.length];
-        var isThisSpy = (matchPlayers.length === spyBotIndex);
-        var r = isThisSpy ? 'undercover' : 'civilian';
-
-        matchPlayers.push({
-          name: botInfo.name,
-          isHost: false,
-          role: r,
-          secretWord: (r === 'civilian') ? activePair.civWord : activePair.spyWord,
-          secretWordId: (r === 'civilian') ? activePair.civWordId : activePair.spyWordId,
-          cluePhase1: null,
-          cluePhase1Id: null,
-          defensePhase2: null,
-          susScore: isThisSpy ? 35 : 12,
-          ping: botInfo.ping
-        });
-        bIdx++;
-      }
-
-      // Generate randomized, fair Turn Sequence order: [p0, p1, p2, p3]
-      turnSequence = [];
-      for (var ti = 0; ti < matchPlayers.length; ti++) {
-        turnSequence.push(ti);
-      }
-      // Shuffle turn sequence so who starts first is dynamic & natural
-      for (var si = turnSequence.length - 1; si > 0; si--) {
-        var sj = Math.floor(Math.random() * (si + 1));
-        var temp = turnSequence[si];
-        turnSequence[si] = turnSequence[sj];
-        turnSequence[sj] = temp;
-      }
-
-      var avBox = document.getElementById('found-avatars');
-      avBox.innerHTML = '';
-      matchPlayers.forEach(p => {
-        var av = document.createElement('div');
-        av.className = 'w-8 h-8 rounded-full bg-[#272b38] border border-[#3b3f50] text-white text-xs font-bold flex items-center justify-center';
-        av.innerText = p.name.charAt(0);
-        avBox.appendChild(av);
       });
 
-      if (acceptCountdownTimer) clearInterval(acceptCountdownTimer);
-      var sec = 6;
-      var cEl = document.getElementById('accept-sec');
-      acceptCountdownTimer = setInterval(function() {
-        sec--;
-        if (cEl) cEl.innerText = sec;
-        if (sec <= 0) {
-          clearInterval(acceptCountdownTimer);
-          acceptCountdownTimer = null;
-          acceptGame();
+      var myPlayer = players.find(p => p.isMe);
+
+      var cardInner = document.getElementById('flip-card-inner');
+      if (cardInner) cardInner.classList.remove('is-flipped');
+
+      var revealWordText = document.getElementById('reveal-word-text');
+      if (revealWordText) revealWordText.innerText = myPlayer.secretWord;
+
+      var revealWordId = document.getElementById('reveal-word-id');
+      if (revealWordId) revealWordId.innerText = '(' + myPlayer.secretWordId + ')';
+
+      var roleTag = document.getElementById('reveal-role-tag');
+      if (roleTag) {
+        if (myPlayer.role === 'spy') {
+          roleTag.innerText = 'PENYUSUP';
+          roleTag.className = 'px-3 py-1 rounded-full text-xs font-mono font-black uppercase bg-pink-500/20 text-pink-400 border border-pink-500/40';
+        } else if (myPlayer.role === 'whiteboard') {
+          roleTag.innerText = 'SI POLOS (MR. WHITE)';
+          roleTag.className = 'px-3 py-1 rounded-full text-xs font-mono font-black uppercase bg-amber-500/20 text-amber-300 border border-amber-500/40';
+        } else {
+          roleTag.innerText = 'WARGA';
+          roleTag.className = 'px-3 py-1 rounded-full text-xs font-mono font-black uppercase bg-emerald-500/20 text-emerald-400 border border-emerald-500/40';
         }
-      }, 1000);
+      }
+
+      var headWord = document.getElementById('secret-word-display');
+      if (headWord) headWord.innerText = myPlayer.secretWord;
+
+      var headBadge = document.getElementById('role-badge');
+      if (headBadge) {
+        if (myPlayer.role === 'spy') {
+          headBadge.innerText = 'PENYUSUP';
+          headBadge.className = 'px-2 py-0.5 rounded-lg text-[10px] font-mono font-black uppercase bg-pink-500/20 text-pink-400 border border-pink-500/40';
+        } else if (myPlayer.role === 'whiteboard') {
+          headBadge.innerText = 'SI POLOS';
+          headBadge.className = 'px-2 py-0.5 rounded-lg text-[10px] font-mono font-black uppercase bg-amber-500/20 text-amber-300 border border-amber-500/40';
+        } else {
+          headBadge.innerText = 'WARGA';
+          headBadge.className = 'px-2 py-0.5 rounded-lg text-[10px] font-mono font-black uppercase bg-emerald-500/20 text-emerald-400 border border-emerald-500/40';
+        }
+      }
+
+      document.getElementById('modal-card-reveal').classList.remove('hidden');
     }
 
-    function acceptGame() {
-      if (acceptCountdownTimer) {
-        clearInterval(acceptCountdownTimer);
-        acceptCountdownTimer = null;
+    function flipSecretCard() {
+      var cardInner = document.getElementById('flip-card-inner');
+      if (cardInner) {
+        cardInner.classList.toggle('is-flipped');
+        playSfx('tap');
       }
-      document.getElementById('modal-found').classList.add('hidden');
+    }
+
+    function closeSecretCardModal() {
+      document.getElementById('modal-card-reveal').classList.add('hidden');
       document.getElementById('screen-lobby').classList.add('hidden');
       document.getElementById('screen-game').classList.remove('hidden');
 
-      activePhase = 1;
-      currentTurnStep = 0;
-      selectedSynthA = null;
-      selectedSynthB = null;
-
-      var myPlayer = matchPlayers[0];
-      document.getElementById('secret-word-display').innerText = myPlayer.secretWord;
-      var roleBadge = document.getElementById('role-badge');
-      if (myPlayer.role === 'civilian') {
-        roleBadge.innerText = 'WARGA';
-        roleBadge.className = 'px-1.5 py-0.5 rounded text-[9px] font-mono font-bold uppercase bg-[#1f222b] text-slate-300 border border-[#2b2e3b]';
-      } else {
-        roleBadge.innerText = 'PENYUSUP';
-        roleBadge.className = 'px-1.5 py-0.5 rounded text-[9px] font-mono font-bold uppercase bg-amber-950/80 text-amber-400 border border-amber-600/60';
-      }
-
-      renderTurnTimeline();
-      setupClueSynthesizer();
-      renderTableCards();
-      runNextSequentialTurn();
+      renderArenaSeats();
+      populateSynthesizerChips();
+      startWePlayRound();
     }
 
-    function toggleWordPrivacy() {
-      wordPrivacyHidden = !wordPrivacyHidden;
-      var disp = document.getElementById('secret-word-display');
-      var ico = document.getElementById('secret-word-hide-icon');
-      if (wordPrivacyHidden) {
-        disp.innerText = '••••••••';
-        ico.innerText = '🔒';
-      } else {
-        disp.innerText = matchPlayers[0].secretWord;
-        ico.innerText = '👁';
-      }
+    function peekSecretCard() {
+      var cardInner = document.getElementById('flip-card-inner');
+      if (cardInner) cardInner.classList.add('is-flipped');
+      document.getElementById('modal-card-reveal').classList.remove('hidden');
+      playSfx('tap');
     }
 
-    // Render the visual turn timeline track at the top
-    function renderTurnTimeline() {
-      var tl = document.getElementById('turn-timeline');
-      tl.innerHTML = '';
+    function renderArenaSeats() {
+      var container = document.getElementById('weplay-arena-seats');
+      if (!container) return;
+      container.innerHTML = '';
 
-      turnSequence.forEach((pIdx, stepIdx) => {
-        var p = matchPlayers[pIdx];
-        var isCurrent = (stepIdx === currentTurnStep);
-        var isPassed = (stepIdx < currentTurnStep);
+      players.forEach(p => {
+        var isMe = p.isMe;
+        var initial = isMe ? '👤' : p.name.charAt(0);
 
-        var pill = document.createElement('div');
-        pill.id = 'timeline-pill-' + stepIdx;
+        var seatBox = document.createElement('div');
+        seatBox.id = 'seat-card-' + p.seat;
+        seatBox.className = 'bg-[#1a153d] border border-[#2e2466] rounded-2xl p-2 flex flex-col items-center justify-between text-center relative cursor-pointer min-h-[110px] transition-all';
+        seatBox.onclick = function() { openGiftTray(p.seat); };
 
-        var baseStyle = 'flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-mono transition-all duration-200 ';
-        if (isCurrent) {
-          pill.className = baseStyle + 'bg-amber-500 text-slate-950 font-bold border border-amber-400 turn-glow';
-        } else if (isPassed) {
-          pill.className = baseStyle + 'bg-[#181a22] text-slate-400 border border-[#272938]';
-        } else {
-          pill.className = baseStyle + 'bg-[#111217] text-[#555866] border border-[#1b1c23]';
-        }
+        seatBox.innerHTML = `
+          <!-- Float Gifting Zone -->
+          <div id="float-fx-${p.seat}" class="absolute top-0 pointer-events-none z-20"></div>
 
-        var iconPrefix = isPassed ? '✓ ' : (isCurrent ? '▶ ' : (stepIdx + 1) + '. ');
-        pill.innerHTML = `<span>${iconPrefix}${p.name}</span>`;
-        tl.appendChild(pill);
+          <!-- Top Mic & Status -->
+          <div class="w-full flex items-center justify-between">
+            <span class="text-[9px] font-mono font-bold text-white bg-[#251e54] px-1.5 py-0.5 rounded">
+              #${p.seat}
+            </span>
+            <span id="mic-badge-${p.seat}" class="text-[9px] font-mono text-[#9590b8]">
+              🎙️
+            </span>
+          </div>
+
+          <!-- Avatar with Speaking Ring -->
+          <div class="relative my-1">
+            <div id="avatar-ring-${p.seat}" class="w-11 h-11 rounded-full bg-gradient-to-tr from-cyan-400 to-indigo-600 p-0.5 transition-all">
+              <div class="w-full h-full bg-[#120e2e] rounded-full flex items-center justify-center text-sm font-black text-white">
+                ${initial}
+              </div>
+            </div>
+            ${isMe ? '<span class="absolute -bottom-1 -right-1 text-[8px] bg-amber-400 text-slate-950 font-black px-1 rounded-full">YOU</span>' : ''}
+          </div>
+
+          <!-- Player Name -->
+          <div class="text-[11px] font-bold text-white truncate max-w-[90px]">${p.name}</div>
+
+          <!-- Speech Bubble Direct Pop -->
+          <div id="speech-bubble-${p.seat}" class="speech-bubble hidden w-full p-1 my-1 text-center">
+            <div class="text-[10px] font-bold text-[#00f0ff] line-clamp-2 leading-tight" id="bubble-text-${p.seat}">
+              ...
+            </div>
+          </div>
+
+          <!-- Vote Action Button (Voting Phase) -->
+          <div id="vote-action-${p.seat}" class="hidden w-full mt-1">
+            <button onclick="event.stopPropagation(); castVoteForSeat(${p.seat})" class="btn-tactile w-full py-1 rounded-lg bg-pink-500 hover:bg-pink-400 text-white font-mono font-black text-[10px] uppercase shadow-sm">
+              VOTE
+            </button>
+          </div>
+
+          <!-- Vote Tally Badge -->
+          <div id="vote-tally-${p.seat}" class="hidden text-[9px] font-mono font-bold text-pink-400 mt-0.5">
+            🗳️ <span id="tally-count-${p.seat}">0</span> Suara
+          </div>
+        `;
+
+        container.appendChild(seatBox);
       });
     }
 
-    // Bilingual Clue Synthesizer (English + Indonesian)
-    function setupClueSynthesizer() {
-      var grpA = document.getElementById('synth-group-a');
-      var grpB = document.getElementById('synth-group-b');
-      grpA.innerHTML = '';
-      grpB.innerHTML = '';
+    function populateSynthesizerChips() {
+      var groupA = document.getElementById('synth-group-a');
+      var groupB = document.getElementById('synth-group-b');
+      if (!groupA || !groupB || !activePair) return;
 
-      var isCiv = (matchPlayers[0].role === 'civilian');
+      groupA.innerHTML = '';
+      groupB.innerHTML = '';
 
+      var myPlayer = players.find(p => p.isMe);
+      var isSpy = myPlayer && myPlayer.role === 'spy';
+
+      // Dimension A
       activePair.dimA.forEach((item, idx) => {
-        var txtEn = isCiv ? item.civText : item.spyText;
-        var txtId = isCiv ? item.civId : item.spyId;
+        var textEn = isSpy ? item.spyText : item.civText;
+        var textId = isSpy ? item.spyId : item.civId;
+
         var btn = document.createElement('button');
-        btn.className = 'btn-tactile px-2.5 py-1 rounded-lg bg-[#181a22] border border-[#272935] text-left hover:border-slate-400 shrink-0';
-        btn.innerHTML = `
-          <div class="text-[11px] font-bold text-slate-200">${txtEn}</div>
-          <div class="text-[9px] text-[#8b8f9e] font-sans">${txtId}</div>
-        `;
-        btn.onclick = function() {
-          selectedSynthA = { text: txtEn, textId: txtId, risk: item.risk };
-          highlightSynthSelection('a', idx);
-          updateSynthPreview();
-        };
-        grpA.appendChild(btn);
+        btn.id = 'synth-btn-a-' + idx;
+        btn.className = 'btn-tactile px-2.5 py-1 rounded-lg bg-[#1e1747] border border-[#362a78] hover:border-cyan-400 flex flex-col items-start text-left shrink-0 transition';
+        btn.onclick = function() { selectSynthOption('A', idx, item, textEn, textId); };
+        btn.innerHTML = `<span class="text-[11px] font-bold text-white">${textEn}</span><span class="text-[9px] text-cyan-300">${textId}</span>`;
+        groupA.appendChild(btn);
       });
 
+      // Dimension B
       activePair.dimB.forEach((item, idx) => {
-        var txtEn = isCiv ? item.civText : item.spyText;
-        var txtId = isCiv ? item.civId : item.spyId;
+        var textEn = isSpy ? item.spyText : item.civText;
+        var textId = isSpy ? item.spyId : item.civId;
+
         var btn = document.createElement('button');
-        btn.className = 'btn-tactile px-2.5 py-1 rounded-lg bg-[#181a22] border border-[#272935] text-left hover:border-slate-400 shrink-0';
-        btn.innerHTML = `
-          <div class="text-[11px] font-bold text-slate-200">${txtEn}</div>
-          <div class="text-[9px] text-[#8b8f9e] font-sans">${txtId}</div>
-        `;
-        btn.onclick = function() {
-          selectedSynthB = { text: txtEn, textId: txtId, risk: item.risk };
-          highlightSynthSelection('b', idx);
-          updateSynthPreview();
-        };
-        grpB.appendChild(btn);
+        btn.id = 'synth-btn-b-' + idx;
+        btn.className = 'btn-tactile px-2.5 py-1 rounded-lg bg-[#1e1747] border border-[#362a78] hover:border-cyan-400 flex flex-col items-start text-left shrink-0 transition';
+        btn.onclick = function() { selectSynthOption('B', idx, item, textEn, textId); };
+        btn.innerHTML = `<span class="text-[11px] font-bold text-white">${textEn}</span><span class="text-[9px] text-cyan-300">${textId}</span>`;
+        groupB.appendChild(btn);
       });
     }
 
-    function highlightSynthSelection(group, chosenIdx) {
-      var container = document.getElementById('synth-group-' + group);
-      Array.from(container.children).forEach((btn, idx) => {
-        if (idx === chosenIdx) {
-          btn.classList.add('border-amber-500', 'bg-[#252835]');
-        } else {
-          btn.classList.remove('border-amber-500', 'bg-[#252835]');
+    function selectSynthOption(dimension, idx, item, textEn, textId) {
+      playSfx('tap');
+      if (dimension === 'A') {
+        selectedSynthA = { text: textEn, textId: textId, risk: item.risk };
+        for (var i = 0; i < 3; i++) {
+          var b = document.getElementById('synth-btn-a-' + i);
+          if (b) {
+            b.className = (i === idx) 
+              ? 'btn-tactile px-2.5 py-1 rounded-lg bg-cyan-500 text-slate-950 font-bold border border-cyan-300 flex flex-col items-start text-left shrink-0'
+              : 'btn-tactile px-2.5 py-1 rounded-lg bg-[#1e1747] border border-[#362a78] flex flex-col items-start text-left shrink-0 opacity-60';
+          }
         }
-      });
-    }
+      } else {
+        selectedSynthB = { text: textEn, textId: textId, risk: item.risk };
+        for (var j = 0; j < 3; j++) {
+          var c = document.getElementById('synth-btn-b-' + j);
+          if (c) {
+            c.className = (j === idx) 
+              ? 'btn-tactile px-2.5 py-1 rounded-lg bg-cyan-500 text-slate-950 font-bold border border-cyan-300 flex flex-col items-start text-left shrink-0'
+              : 'btn-tactile px-2.5 py-1 rounded-lg bg-[#1e1747] border border-[#362a78] flex flex-col items-start text-left shrink-0 opacity-60';
+          }
+        }
+      }
 
-    function updateSynthPreview() {
       var prev = document.getElementById('synth-preview-text');
-      var riskBadge = document.getElementById('synth-risk-badge');
-      var submitBtn = document.getElementById('btn-submit-clue');
+      var btnSubmit = document.getElementById('btn-submit-clue');
 
       if (selectedSynthA && selectedSynthB) {
-        prev.innerText = `“${selectedSynthA.text} & ${selectedSynthB.text}”`;
-        submitBtn.disabled = false;
-
-        var isHigh = (selectedSynthA.risk === 'High' || selectedSynthB.risk === 'High');
-        riskBadge.classList.remove('hidden');
-        if (isHigh) {
-          riskBadge.innerText = 'Risiko Bocor: Tinggi';
-          riskBadge.className = 'text-[9px] font-mono px-1.5 py-0.5 rounded uppercase font-semibold bg-red-950/70 text-red-400 border border-red-800/50 shrink-0';
-        } else {
-          riskBadge.innerText = 'Taktik: Stealth Aman';
-          riskBadge.className = 'text-[9px] font-mono px-1.5 py-0.5 rounded uppercase font-semibold bg-emerald-950/70 text-emerald-400 border border-emerald-800/50 shrink-0';
-        }
-      } else {
-        prev.innerText = 'Pilih satu tombol dari Sifat & satu tombol dari Ciri...';
-        riskBadge.classList.add('hidden');
-        submitBtn.disabled = true;
+        prev.innerText = selectedSynthA.text + ' & ' + selectedSynthB.text;
+        btnSubmit.disabled = false;
+      } else if (selectedSynthA) {
+        prev.innerText = selectedSynthA.text + ' & ...';
+      } else if (selectedSynthB) {
+        prev.innerText = '... & ' + selectedSynthB.text;
       }
     }
 
-    function renderTableCards() {
-      var tray = document.getElementById('table-cards');
-      tray.innerHTML = '';
-
-      matchPlayers.forEach((p, idx) => {
-        var card = document.createElement('div');
-        card.id = 'player-card-' + idx;
-        card.className = 'bg-[#171820] border border-[#262835] rounded-xl p-2.5 sm:p-3 flex flex-col justify-between transition-all duration-200';
-
-        var pInitial = p.name.charAt(0);
-        var clueDisplay = p.cluePhase1
-          ? `<div class="text-[11px] font-mono font-bold text-amber-300 py-0.5 leading-tight line-clamp-2 overflow-hidden h-8">“${p.cluePhase1}”</div>
-             <div class="text-[9px] text-[#8b8f9e] truncate">(${p.cluePhase1Id || ''})</div>`
-          : `<div class="text-[11px] font-mono text-[#525565] italic py-1 leading-tight h-10 flex items-center">Belum ada petunjuk</div>`;
-
-        var defenseDisplay = p.defensePhase2
-          ? `<div class="mt-1 pt-1 border-t border-[#20222e] text-[10px] text-[#8b8f9e] truncate"><span class="text-amber-400 font-mono">Alibi:</span> ${p.defensePhase2}</div>`
-          : '';
-
-        card.innerHTML = `
-          <div>
-            <div class="flex items-center justify-between pb-1.5 border-b border-[#20222e]">
-              <div class="flex items-center gap-1.5 truncate">
-                <div class="w-5 h-5 rounded-full bg-[#272a38] text-white text-[10px] font-bold flex items-center justify-center shrink-0">
-                  ${pInitial}
-                </div>
-                <span class="text-xs font-semibold text-slate-200 truncate">${p.name}</span>
-              </div>
-              <span class="text-[9px] font-mono text-[#6b6f7d]">${p.ping}</span>
-            </div>
-            <div class="pt-1.5">
-              <span class="text-[9px] font-mono uppercase text-[#6b6f7d]">PETUNJUK RONDE 1:</span>
-              ${clueDisplay}
-              ${defenseDisplay}
-            </div>
-          </div>
-
-          <div class="pt-1.5 border-t border-[#20222e]">
-            <div class="flex justify-between text-[10px] font-mono mb-0.5">
-              <span class="text-[#6b6f7d]">Indeks Anomali</span>
-              <span id="sus-val-${idx}" class="text-slate-400 font-bold">${p.susScore}%</span>
-            </div>
-            <div class="w-full bg-[#0f1013] rounded-full h-1 overflow-hidden">
-              <div id="sus-bar-${idx}" class="bg-slate-500 h-1 rounded-full transition-all duration-300" style="width: ${p.susScore}%;"></div>
-            </div>
-          </div>
-        `;
-        tray.appendChild(card);
-      });
+    function startWePlayRound() {
+      activeSpeakerSeat = 1;
+      runTurnForSeat(activeSpeakerSeat);
     }
 
-    // Sequential Turn Execution
-    function runNextSequentialTurn() {
-      if (currentTurnStep >= turnSequence.length) {
-        transitionToDebatePhase();
+    function runTurnForSeat(seat) {
+      if (turnInterval) clearInterval(turnInterval);
+
+      activeSpeakerSeat = seat;
+      var activeP = players.find(p => p.seat === seat);
+      if (!activeP || !activeP.alive) {
+        nextTurn();
         return;
       }
 
-      renderTurnTimeline();
+      var badge = document.getElementById('turn-speaker-badge');
+      var nameEl = document.getElementById('turn-speaker-name');
+      if (badge) badge.innerText = 'KURSI #' + activeP.seat;
+      if (nameEl) {
+        nameEl.innerText = activeP.isMe ? 'Kamu sedang mendeskripsikan...' : activeP.name + ' sedang mendeskripsikan...';
+      }
 
-      var currentPIdx = turnSequence[currentTurnStep];
-      var activeP = matchPlayers[currentPIdx];
-
-      document.getElementById('turn-indicator').innerText = `GILIRAN ${currentTurnStep + 1}/${turnSequence.length}: ${activeP.name.toUpperCase()}`;
-
-      // Highlight active player card
-      matchPlayers.forEach((_, i) => {
-        var c = document.getElementById('player-card-' + i);
-        if (c) {
-          if (i === currentPIdx) {
-            c.classList.add('border-amber-500', 'bg-[#1e202b]', 'turn-glow');
+      players.forEach(p => {
+        var ring = document.getElementById('avatar-ring-' + p.seat);
+        var mic = document.getElementById('mic-badge-' + p.seat);
+        if (ring) {
+          if (p.seat === seat) {
+            ring.classList.add('mic-speaking-ring');
           } else {
-            c.classList.remove('border-amber-500', 'bg-[#1e202b]', 'turn-glow');
+            ring.classList.remove('mic-speaking-ring');
           }
+        }
+        if (mic) {
+          mic.innerText = (p.seat === seat) ? '🔴 MIC ON' : '🎙️';
+          mic.className = (p.seat === seat) ? 'text-[9px] font-mono text-[#00f0ff] font-bold' : 'text-[9px] font-mono text-[#9590b8]';
         }
       });
 
-      if (activeP.isHost) {
-        // It's the human student's turn!
-        document.getElementById('typing-indicator').classList.add('hidden');
-        document.getElementById('console-phase-1').classList.remove('opacity-30', 'pointer-events-none');
-        document.getElementById('synth-instruction-text').innerText = `🔔 Giliranmu sekarang (Pemain ke-${currentTurnStep + 1})! Susun petunjuk semantik:`;
-        document.getElementById('dossier-banner-text').innerText = 'Giliranmu! Susun dua dimensi petunjuk semantik untuk dilempar ke meja investigasi.';
+      var console1 = document.getElementById('console-phase-1');
+      if (console1) console1.classList.remove('hidden');
+      var console2 = document.getElementById('console-phase-2');
+      if (console2) console2.classList.add('hidden');
+      var console3 = document.getElementById('console-phase-3');
+      if (console3) console3.classList.add('hidden');
+
+      var instructionText = document.getElementById('synth-instruction-text');
+      var btnSubmit = document.getElementById('btn-submit-clue');
+
+      if (activeP.isMe) {
+        instructionText.innerHTML = `
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          <span>🎙️ GILIRAN MIC KAMU! Pilih 1 Sifat & 1 Ciri Bahasa Inggris:</span>
+        `;
+        if (btnSubmit) btnSubmit.disabled = !(selectedSynthA && selectedSynthB);
+        playSfx('turn');
       } else {
-        // It's a bot's turn
-        document.getElementById('console-phase-1').classList.add('opacity-30', 'pointer-events-none');
-        document.getElementById('typing-indicator').classList.remove('hidden');
-        document.getElementById('synth-instruction-text').innerText = `⏳ Menunggu giliran ${activeP.name} berbicara...`;
-        document.getElementById('dossier-banner-text').innerText = activeP.name + ' sedang memikirkan petunjuk deskripsi semantik...';
+        instructionText.innerHTML = `
+          <span>⏳ Menyimak ${activeP.name} (Kursi #${activeP.seat})...</span>
+        `;
+        if (btnSubmit) btnSubmit.disabled = true;
 
-        var botThinkingTime = 1400 + Math.floor(Math.random() * 800);
-        setTimeout(function() {
-          var isBotCiv = (activeP.role === 'civilian');
-          var chosenDimA = activePair.dimA[Math.floor(Math.random() * activePair.dimA.length)];
-          var chosenDimB = activePair.dimB[Math.floor(Math.random() * activePair.dimB.length)];
-
-          var clueTextEn = '';
-          var clueTextId = '';
-          if (isBotCiv) {
-            clueTextEn = chosenDimA.civText + ' & ' + chosenDimB.civText;
-            clueTextId = chosenDimA.civId + ' + ' + chosenDimB.civId;
-          } else {
-            clueTextEn = chosenDimA.spyText + ' & ' + chosenDimB.spyText;
-            clueTextId = chosenDimA.spyId + ' + ' + chosenDimB.spyId;
-            activeP.susScore += 25; // Anomaly increases for spy
+        var botThinkDelay = 2200;
+        setTimeout(() => {
+          if (activeSpeakerSeat === seat) {
+            botSpeak(activeP);
           }
-
-          activeP.cluePhase1 = clueTextEn;
-          activeP.cluePhase1Id = clueTextId;
-          renderTableCards();
-
-          currentTurnStep++;
-          runNextSequentialTurn();
-        }, botThinkingTime);
+        }, botThinkDelay);
       }
-    }
 
-    function submitUserClue() {
-      if (!selectedSynthA || !selectedSynthB) return;
+      turnCountdown = 15;
+      var timerEl = document.getElementById('turn-timer-text');
+      if (timerEl) timerEl.innerText = turnCountdown + 's';
 
-      var myP = matchPlayers[0];
-      myP.cluePhase1 = `${selectedSynthA.text} & ${selectedSynthB.text}`;
-      myP.cluePhase1Id = `${selectedSynthA.textId} + ${selectedSynthB.textId}`;
+      turnInterval = setInterval(() => {
+        turnCountdown--;
+        if (timerEl) timerEl.innerText = turnCountdown + 's';
 
-      renderTableCards();
-      currentTurnStep++;
-      runNextSequentialTurn();
-    }
-
-    // Transition to Phase 2: Live Debate & Banter
-    function transitionToDebatePhase() {
-      activePhase = 2;
-      document.getElementById('phase-pill-1').className = 'px-1.5 py-0.5 rounded bg-[#1e2027] text-[#6b6f7d]';
-      document.getElementById('phase-pill-2').className = 'px-1.5 py-0.5 rounded font-bold bg-amber-500 text-slate-950';
-
-      document.getElementById('console-phase-1').classList.add('hidden');
-      document.getElementById('console-phase-2').classList.remove('hidden');
-
-      document.getElementById('turn-indicator').innerText = 'FASE 2: DEBAT MEJA TERBUKA';
-      document.getElementById('typing-indicator').classList.add('hidden');
-
-      // Identify bot with highest sus score
-      var suspect = matchPlayers.slice(1).sort((a,b) => b.susScore - a.susScore)[0];
-      document.getElementById('dossier-banner-text').innerText = `Debat dimulai! Perhatikan petunjuk ${suspect.name} yang tampak berbeda dari yang lain.`;
-
-      // Trigger automatic dynamic banter between bots
-      setTimeout(function() {
-        var bot1 = matchPlayers[1];
-        if (bot1) {
-          bot1.defensePhase2 = '“Petunjuk ' + suspect.name + ' mencurigakan!”';
-          renderTableCards();
+        if (turnCountdown <= 0) {
+          clearInterval(turnInterval);
+          if (activeP.isMe) {
+            autoSubmitUserClue();
+          } else {
+            nextTurn();
+          }
         }
       }, 1000);
     }
 
-    function triggerDebateAction(actionType) {
-      var suspect = matchPlayers.slice(1).sort((a,b) => b.susScore - a.susScore)[0];
-      var myP = matchPlayers[0];
-
-      if (actionType === 'contradiction') {
-        myP.defensePhase2 = `“Petunjuk ${suspect.name} ada kontradiksi semantik!”`;
-        suspect.susScore += 25;
-        suspect.defensePhase2 = '“Mungkin sudut pandang teknis kita beda!”';
-        document.getElementById('dossier-banner-text').innerText = `Kamu menuduh ${suspect.name}! Indeks anomali dia meningkat pesat.`;
-      } else if (actionType === 'defend') {
-        myP.defensePhase2 = '“Petunjukku konsisten dengan ciri mayoritas.”';
-        myP.susScore = Math.max(5, myP.susScore - 10);
-        document.getElementById('dossier-banner-text').innerText = 'Kamu memperkuat alibi! Kecurigaan terhadapmu menurun.';
-      } else {
-        myP.defensePhase2 = `“Tolong ${suspect.name} jelaskan maksud petunjukmu!”`;
-        suspect.defensePhase2 = '“Maksudku karakteristik umumnya mirip kok!”';
-        document.getElementById('dossier-banner-text').innerText = `Kamu mendesak ${suspect.name} untuk klarifikasi!`;
-      }
-
-      renderTableCards();
-      document.getElementById('console-phase-2').classList.add('hidden');
-      document.getElementById('console-phase-3-trigger').classList.remove('hidden');
-    }
-
-    function openVoteScreen() {
-      document.getElementById('screen-game').classList.add('hidden');
-      document.getElementById('screen-vote').classList.remove('hidden');
-
-      var grid = document.getElementById('vote-grid');
-      grid.innerHTML = '';
-      selectedVoteName = null;
-      document.getElementById('btn-confirm-vote').disabled = true;
-
-      matchPlayers.forEach(p => {
-        var card = document.createElement('div');
-        card.className = 'bg-[#181a22] border border-[#272938] rounded-xl p-3 text-center cursor-pointer hover:border-slate-500 transition flex flex-col justify-between';
-        card.onclick = function() {
-          selectedVoteName = p.name;
-          Array.from(grid.children).forEach(ch => ch.classList.remove('border-amber-500', 'bg-[#1f222e]'));
-          card.classList.add('border-amber-500', 'bg-[#1f222e]');
-          document.getElementById('btn-confirm-vote').disabled = false;
+    function autoSubmitUserClue() {
+      if (!selectedSynthA) {
+        var myP = players.find(p => p.isMe);
+        var isSpy = myP && myP.role === 'spy';
+        selectedSynthA = {
+          text: isSpy ? activePair.dimA[0].spyText : activePair.dimA[0].civText,
+          textId: isSpy ? activePair.dimA[0].spyId : activePair.dimA[0].civId
         };
-
-        var initial = p.name.charAt(0);
-        var clueSnippet = p.cluePhase1 ? `“${p.cluePhase1}”` : '—';
-        var defenseSnippet = p.defensePhase2 ? `<div class="text-[9px] text-amber-400 mt-1 truncate">${p.defensePhase2}</div>` : '';
-
-        card.innerHTML = `
-          <div>
-            <div class="w-8 h-8 mx-auto rounded-full bg-[#272b38] text-white font-bold flex items-center justify-center text-xs mb-1.5">
-              ${initial}
-            </div>
-            <div class="text-xs font-semibold text-slate-200 truncate">${p.name}</div>
-            <div class="text-[10px] font-mono text-[#6b6f7d] mt-1 line-clamp-2">${clueSnippet}</div>
-            ${defenseSnippet}
-          </div>
-          <div class="pt-2 border-t border-[#222430] mt-2">
-            <span class="text-[10px] font-mono text-[#8b8f9e]">Indeks Sus: ${p.susScore}%</span>
-          </div>
-        `;
-        grid.appendChild(card);
-      });
+      }
+      if (!selectedSynthB) {
+        var myP2 = players.find(p => p.isMe);
+        var isSpy2 = myP2 && myP2.role === 'spy';
+        selectedSynthB = {
+          text: isSpy2 ? activePair.dimB[0].spyText : activePair.dimB[0].civText,
+          textId: isSpy2 ? activePair.dimB[0].spyId : activePair.dimB[0].civId
+        };
+      }
+      submitWePlayClue();
     }
 
-    function submitVote() {
-      if (!selectedVoteName) return;
+    function submitWePlayClue() {
+      if (turnInterval) clearInterval(turnInterval);
+      playSfx('speech');
 
-      var spyPlayer = matchPlayers.find(p => p.role === 'undercover');
-      var isUserSpy = (matchPlayers[0].role === 'undercover');
-      var accusedIsSpy = (selectedVoteName === spyPlayer.name);
+      var userP = players.find(p => p.isMe);
+      var clueEn = (selectedSynthA && selectedSynthB) ? (selectedSynthA.text + ' & ' + selectedSynthB.text) : 'Two Wheels & Zero Carbon';
 
-      if (accusedIsSpy) {
-        // Spy caught! Enter Sudden Death Showdown
-        triggerShowdown(spyPlayer);
+      userP.clue = clueEn;
+      showSpeechBubble(userP.seat, clueEn);
+
+      setTimeout(() => {
+        nextTurn();
+      }, 1500);
+    }
+
+    function botSpeak(bot) {
+      var isSpy = bot.role === 'spy';
+      var isWhite = bot.role === 'whiteboard';
+
+      var optA = activePair.dimA[Math.floor(Math.random() * activePair.dimA.length)];
+      var optB = activePair.dimB[Math.floor(Math.random() * activePair.dimB.length)];
+
+      var clue = '';
+      if (isWhite) {
+        clue = 'Versatile Body & Smooth Handling';
+      } else if (isSpy) {
+        clue = optA.spyText + ' & ' + optB.spyText;
       } else {
-        // Innocent player accused!
-        // If user was the spy: Spy wins!
-        // If user was civilian: Civilians failed!
-        if (isUserSpy) {
-          showResult(true, 'Warga salah menuduh ' + selectedVoteName + '! Kamu berhasil menyamar dan memenangkan permainan!');
-        } else {
-          showResult(false, 'Warga salah menuduh ' + selectedVoteName + '! Penyusup sebenarnya (' + spyPlayer.name + ') sukses menyamar.');
-        }
+        clue = optA.civText + ' & ' + optB.civText;
+      }
+
+      bot.clue = clue;
+      playSfx('speech');
+      showSpeechBubble(bot.seat, clue);
+
+      setTimeout(() => {
+        nextTurn();
+      }, 1800);
+    }
+
+    function showSpeechBubble(seat, text) {
+      var bubble = document.getElementById('speech-bubble-' + seat);
+      var bubbleText = document.getElementById('bubble-text-' + seat);
+      if (bubble && bubbleText) {
+        bubbleText.innerText = text;
+        bubble.classList.remove('hidden');
       }
     }
 
-    function triggerShowdown(spy) {
-      document.getElementById('screen-vote').classList.add('hidden');
+    function nextTurn() {
+      if (turnInterval) clearInterval(turnInterval);
+
+      var nextSeat = activeSpeakerSeat + 1;
+      while (nextSeat <= roomCap && !players.find(p => p.seat === nextSeat && p.alive)) {
+        nextSeat++;
+      }
+
+      if (nextSeat > roomCap) {
+        startWePlayDiscussionPhase();
+      } else {
+        runTurnForSeat(nextSeat);
+      }
+    }
+
+    function startWePlayDiscussionPhase() {
+      if (turnInterval) clearInterval(turnInterval);
+
+      players.forEach(p => {
+        var ring = document.getElementById('avatar-ring-' + p.seat);
+        if (ring) ring.classList.remove('mic-speaking-ring');
+        var mic = document.getElementById('mic-badge-' + p.seat);
+        if (mic) mic.innerText = '🎙️ OPEN';
+      });
+
+      var badge = document.getElementById('turn-speaker-badge');
+      var nameEl = document.getElementById('turn-speaker-name');
+      if (badge) badge.innerText = 'MEJA DEBAT';
+      if (nameEl) nameEl.innerText = 'Semua pemain menganalisa kejanggalan kata...';
+
+      var console1 = document.getElementById('console-phase-1');
+      if (console1) console1.classList.add('hidden');
+      var console2 = document.getElementById('console-phase-2');
+      if (console2) console2.classList.remove('hidden');
+      var console3 = document.getElementById('console-phase-3');
+      if (console3) console3.classList.add('hidden');
+
+      playSfx('sparkle');
+    }
+
+    function sendQuickShout(text) {
+      playSfx('tap');
+      showSpeechBubble(1, text);
+
+      var otherAliveBots = players.filter(p => !p.isMe && p.alive);
+      if (otherAliveBots.length > 0) {
+        setTimeout(() => {
+          var bot = otherAliveBots[Math.floor(Math.random() * otherAliveBots.length)];
+          var botReactions = [
+            'Setuju banget sama kamu! 🎯',
+            'Tunggu, alasanku logis kok! 🤔',
+            'Jangan salah tuduh dong warga! 😅'
+          ];
+          showSpeechBubble(bot.seat, botReactions[Math.floor(Math.random() * botReactions.length)]);
+        }, 900);
+      }
+    }
+
+    function openGiftTray(seat) {
+      var p = players.find(x => x.seat === seat);
+      if (!p || p.isMe) return;
+
+      giftTargetSeat = seat;
+      var nameEl = document.getElementById('gift-target-name');
+      if (nameEl) nameEl.innerText = p.name + ' (#' + p.seat + ')';
+
+      var modal = document.getElementById('gift-tray-modal');
+      if (modal) modal.classList.remove('hidden');
+      playSfx('tap');
+    }
+
+    function closeGiftTray() {
+      var modal = document.getElementById('gift-tray-modal');
+      if (modal) modal.classList.add('hidden');
+      giftTargetSeat = null;
+    }
+
+    function sendTableGift(type) {
+      if (!giftTargetSeat) return;
+      var targetSeat = giftTargetSeat;
+      closeGiftTray();
+
+      var emojis = {
+        egg: '🥚',
+        tomato: '🍅',
+        rose: '🌹',
+        sus: '🔍',
+        coffee: '☕'
+      };
+
+      var sfxMap = {
+        egg: 'splat',
+        tomato: 'splat',
+        rose: 'sparkle',
+        sus: 'tap',
+        coffee: 'sparkle'
+      };
+
+      playSfx(sfxMap[type] || 'splat');
+
+      var floatContainer = document.getElementById('float-fx-' + targetSeat);
+      if (floatContainer) {
+        var el = document.createElement('div');
+        el.className = 'text-3xl animate-float-gift absolute left-1/2 -translate-x-1/2';
+        el.innerText = emojis[type] || '🎉';
+        floatContainer.appendChild(el);
+
+        setTimeout(() => {
+          if (el.parentNode) el.parentNode.removeChild(el);
+        }, 1700);
+      }
+    }
+
+    function startWePlayVotingPhase() {
+      if (turnInterval) clearInterval(turnInterval);
+      if (votingInterval) clearInterval(votingInterval);
+
+      playSfx('turn');
+      var console1 = document.getElementById('console-phase-1');
+      if (console1) console1.classList.add('hidden');
+      var console2 = document.getElementById('console-phase-2');
+      if (console2) console2.classList.add('hidden');
+      var console3 = document.getElementById('console-phase-3');
+      if (console3) console3.classList.remove('hidden');
+
+      var badge = document.getElementById('turn-speaker-badge');
+      var nameEl = document.getElementById('turn-speaker-name');
+      if (badge) badge.innerText = 'VOTING TIKET';
+      if (nameEl) nameEl.innerText = 'Pilih pemain yang akan dieliminasi!';
+
+      players.forEach(p => {
+        p.votesReceived = 0;
+        var ring = document.getElementById('avatar-ring-' + p.seat);
+        if (ring) ring.classList.remove('mic-speaking-ring');
+
+        var voteAction = document.getElementById('vote-action-' + p.seat);
+        var voteTally = document.getElementById('vote-tally-' + p.seat);
+        var tallyCount = document.getElementById('tally-count-' + p.seat);
+
+        if (voteAction) {
+          if (p.isMe || !p.alive) {
+            voteAction.classList.add('hidden');
+          } else {
+            voteAction.classList.remove('hidden');
+          }
+        }
+        if (voteTally) voteTally.classList.remove('hidden');
+        if (tallyCount) tallyCount.innerText = '0';
+      });
+
+      var vCount = 10;
+      var vTimerEl = document.getElementById('voting-countdown-num');
+      if (vTimerEl) vTimerEl.innerText = vCount + 's';
+
+      votingInterval = setInterval(() => {
+        vCount--;
+        if (vTimerEl) vTimerEl.innerText = vCount + 's';
+        if (vCount <= 0) {
+          clearInterval(votingInterval);
+          concludeWePlayVoting();
+        }
+      }, 1000);
+    }
+
+    function castVoteForSeat(seat) {
+      if (myVotedTarget !== null) return;
+      myVotedTarget = seat;
+      playSfx('tap');
+
+      players.forEach(p => {
+        var action = document.getElementById('vote-action-' + p.seat);
+        if (action) action.classList.add('hidden');
+      });
+
+      var votedP = players.find(p => p.seat === seat);
+      if (votedP) votedP.votesReceived++;
+
+      var spyP = players.find(p => p.role === 'spy');
+      players.filter(p => !p.isMe && p.alive).forEach(bot => {
+        var targetSeat = seat;
+        if (bot.role === 'spy') {
+          var civs = players.filter(x => x.role === 'civilian' && x.alive);
+          targetSeat = civs[Math.floor(Math.random() * civs.length)].seat;
+        } else {
+          targetSeat = (Math.random() < 0.7 && spyP && spyP.alive) ? spyP.seat : seat;
+        }
+        var targetP = players.find(x => x.seat === targetSeat);
+        if (targetP) targetP.votesReceived++;
+      });
+
+      players.forEach(p => {
+        var count = document.getElementById('tally-count-' + p.seat);
+        if (count) count.innerText = p.votesReceived;
+      });
+
+      setTimeout(() => {
+        concludeWePlayVoting();
+      }, 1500);
+    }
+
+    function concludeWePlayVoting() {
+      if (votingInterval) clearInterval(votingInterval);
+      if (turnInterval) clearInterval(turnInterval);
+
+      var maxVotes = -1;
+      var eliminatedPlayer = null;
+
+      players.filter(p => p.alive).forEach(p => {
+        if (p.votesReceived > maxVotes) {
+          maxVotes = p.votesReceived;
+          eliminatedPlayer = p;
+        }
+      });
+
+      if (!eliminatedPlayer) {
+        eliminatedPlayer = players.find(p => p.role === 'spy') || players[1];
+      }
+
+      eliminatedPlayer.alive = false;
+
+      if (eliminatedPlayer.role === 'spy') {
+        triggerSpyShowdown(eliminatedPlayer);
+      } else {
+        showFinalResult(false, 'Warga salah mengeliminasi ' + eliminatedPlayer.name + ' (' + (eliminatedPlayer.isMe ? 'Kamu' : 'Warga') + ')!');
+      }
+    }
+
+    function triggerSpyShowdown(spy) {
+      playSfx('turn');
+      document.getElementById('screen-game').classList.add('hidden');
       document.getElementById('screen-showdown').classList.remove('hidden');
 
       var roleText = document.getElementById('showdown-role-text');
-      var grid = document.getElementById('showdown-guess-grid');
-      grid.innerHTML = '';
-
-      var isUserSpy = (matchPlayers[0].role === 'undercover');
+      var isUserSpy = spy.isMe;
 
       if (isUserSpy) {
         roleText.innerHTML = `
-          <div class="text-xs text-amber-400 font-bold mb-1">KAMU TERTANGKAP SEBAGAI PENYUSUP!</div>
-          <p class="text-[11px] text-[#8b8f9e]">Pilih tebakan kata rahasia warga di bawah. Jika benar, kamu menang!</p>
+          <div class="text-sm text-pink-400 font-black mb-1">KAMU TERELIMINASI SEBAGAI PENYUSUP!</div>
+          <p class="text-xs text-white">Ini kesempatan terakhirmu: Tebak kata rahasia tim Warga!</p>
         `;
-
-        activePair.guessOptions.forEach(opt => {
-          var btn = document.createElement('button');
-          btn.className = 'btn-tactile py-2.5 px-3 rounded-xl bg-[#1e2029] border border-[#2d303f] hover:border-amber-400 text-xs font-mono font-bold text-white transition';
-          btn.innerText = opt;
-          btn.onclick = function() {
-            if (showdownInterval) clearInterval(showdownInterval);
-            var isCorrect = (opt === activePair.civWord);
-            if (isCorrect) {
-              showResult(true, 'Tebakanmu tepat (' + activePair.civWord + ')! Kamu berhasil mencuri kemenangan dari warga!');
-            } else {
-              showResult(false, 'Tebakanmu salah (' + opt + ')! Kata warga sebenarnya adalah ' + activePair.civWord + '. Tim Warga menang!');
-            }
-          };
-          grid.appendChild(btn);
-        });
-
-        var sTimer = 8;
-        var sEl = document.getElementById('showdown-timer');
-        if (showdownInterval) clearInterval(showdownInterval);
-        showdownInterval = setInterval(function() {
-          sTimer--;
-          if (sEl) sEl.innerText = (sTimer < 10 ? '0' : '') + sTimer;
-          if (sTimer <= 0) {
-            clearInterval(showdownInterval);
-            showdownInterval = null;
-            showResult(false, 'Waktu habis! Kamu gagal menebak kata warga. Tim Warga menang mutlak!');
-          }
-        }, 1000);
       } else {
         roleText.innerHTML = `
-          <div class="text-xs text-emerald-400 font-bold mb-1">${spy.name} (PENYUSUP) TERTANGKAP!</div>
-          <p class="text-[11px] text-[#8b8f9e]">Menunggu tebakan terakhir ${spy.name}...</p>
+          <div class="text-sm text-emerald-400 font-black mb-1">${spy.name} (PENYUSUP) TERTANGKAP!</div>
+          <p class="text-[11px] text-[#9590b8]">Menunggu tebakan terakhir ${spy.name}...</p>
         `;
+      }
 
-        activePair.guessOptions.forEach(opt => {
-          var d = document.createElement('div');
-          d.className = 'py-2 px-3 rounded-xl bg-[#15171e] border border-[#22242e] text-xs font-mono text-center text-[#6b6f7d]';
-          d.innerText = opt;
-          grid.appendChild(d);
-        });
+      var guessGrid = document.getElementById('showdown-guess-grid');
+      guessGrid.innerHTML = '';
 
-        var sTimer = 4;
-        var sEl = document.getElementById('showdown-timer');
-        if (showdownInterval) clearInterval(showdownInterval);
-        showdownInterval = setInterval(function() {
-          sTimer--;
-          if (sEl) sEl.innerText = '0' + sTimer;
-          if (sTimer <= 0) {
-            clearInterval(showdownInterval);
-            showdownInterval = null;
-            var botGuessCorrect = (Math.random() < 0.25);
-            if (botGuessCorrect) {
-              showResult(false, spy.name + ' berhasil menebak kata warga (' + activePair.civWord + ') di detik terakhir!');
-            } else {
-              showResult(true, spy.name + ' gagal menebak kata warga! Tim Warga menang mutlak!');
-            }
-          }
-        }, 1000);
+      activePair.guessOptions.forEach(opt => {
+        var btn = document.createElement('button');
+        btn.className = 'btn-tactile p-3 rounded-2xl bg-[#211b49] border border-[#3e317c] hover:border-pink-400 font-mono font-bold text-xs text-white';
+        btn.innerText = opt;
+        btn.onclick = function() { submitShowdownGuess(opt, spy); };
+        guessGrid.appendChild(btn);
+      });
+
+      if (!isUserSpy) {
+        setTimeout(() => {
+          var correct = activePair.civWord;
+          var botPick = (Math.random() < 0.3) ? correct : activePair.guessOptions.find(x => x !== correct);
+          submitShowdownGuess(botPick, spy);
+        }, 2200);
       }
     }
 
-    function showResult(userVictorious, detailMessage) {
-      if (showdownInterval) {
-        clearInterval(showdownInterval);
-        showdownInterval = null;
+    function submitShowdownGuess(guess, spy) {
+      var isCorrect = (guess === activePair.civWord);
+      var isUserSpy = spy.isMe;
+
+      if (isCorrect) {
+        var msg = isUserSpy ? 'Tebakanmu tepat! Kamu mencuri kemenangan dari tim Warga!' : spy.name + ' berhasil menebak kata warga! Penyusup mencuri kemenangan!';
+        showFinalResult(isUserSpy, msg);
+      } else {
+        var msg2 = isUserSpy ? 'Tebakanmu salah! Tim Warga menang mutlak!' : spy.name + ' gagal menebak kata warga! Tim Warga menang mutlak!';
+        showFinalResult(!isUserSpy, msg2);
       }
-      document.getElementById('screen-vote').classList.add('hidden');
+    }
+
+    function showFinalResult(userWon, detailMessage) {
+      document.getElementById('screen-game').classList.add('hidden');
       document.getElementById('screen-showdown').classList.add('hidden');
       document.getElementById('screen-result').classList.remove('hidden');
 
       var badge = document.getElementById('res-badge');
       var heading = document.getElementById('res-heading');
       var note = document.getElementById('res-note');
+      var spyPlayer = players.find(p => p.role === 'spy') || players[1];
+      var isUserSpy = (spyPlayer.seat === 1);
 
-      var spyPlayer = matchPlayers.find(p => p.role === 'undercover');
-      var isUserSpy = (matchPlayers[0].role === 'undercover');
-
-      if (userVictorious) {
+      if (userWon) {
+        playSfx('victory');
         badge.innerText = 'VICTORY';
-        badge.className = 'inline-block px-3 py-0.5 rounded-full text-xs font-mono uppercase tracking-wider mb-1.5 font-bold bg-amber-950/80 text-amber-400 border border-amber-600/50';
-        heading.innerText = isUserSpy ? 'Penyusup Berjaya!' : 'Warga Sukses Mengeliminasi!';
-        syncStateTelemetry(42);
+        badge.className = 'inline-block px-4 py-1 rounded-full text-xs font-mono uppercase tracking-wider mb-2 font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
+        heading.innerText = isUserSpy ? 'Penyusup Mengelabui Semua Orang!' : 'Warga Sukses Mengeliminasi!';
       } else {
+        playSfx('splat');
         badge.innerText = 'DEFEAT';
-        badge.className = 'inline-block px-3 py-0.5 rounded-full text-xs font-mono uppercase tracking-wider mb-1.5 font-bold bg-red-950/80 text-red-400 border border-red-600/50';
+        badge.className = 'inline-block px-4 py-1 rounded-full text-xs font-mono uppercase tracking-wider mb-2 font-black bg-pink-500/20 text-pink-400 border border-pink-500/40';
         heading.innerText = isUserSpy ? 'Penyusup Tertangkap' : 'Misi Investigasi Gagal';
       }
 
       note.innerText = detailMessage;
-
-      document.getElementById('res-civ-word').innerText = `${activePair.civWord} (${activePair.civWordId})`;
-      document.getElementById('res-spy-word').innerText = `${activePair.spyWord} (${activePair.spyWordId})`;
+      document.getElementById('res-civ-word').innerText = activePair.civWord + ' (' + activePair.civWordId + ')';
+      document.getElementById('res-spy-word').innerText = activePair.spyWord + ' (' + activePair.spyWordId + ')';
       document.getElementById('res-spy-name').innerText = spyPlayer.name + ' (' + (isUserSpy ? 'Kamu' : 'Bot') + ')';
     }
 
-    function resetToLobby() {
+    function resetToWePlayLobby() {
+      if (votingInterval) clearInterval(votingInterval);
+      if (turnInterval) clearInterval(turnInterval);
+
       document.getElementById('screen-result').classList.add('hidden');
       document.getElementById('screen-game').classList.add('hidden');
-      document.getElementById('screen-vote').classList.add('hidden');
       document.getElementById('screen-showdown').classList.add('hidden');
       document.getElementById('screen-lobby').classList.remove('hidden');
-      renderLobby();
+
+      selectedSynthA = null;
+      selectedSynthB = null;
+      myVotedTarget = null;
+      setupLobbySeats();
     }
 
-    window.onload = init;
+    // Run init on DOMContentLoaded or immediate
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
   </script>
 </body>
 </html>
