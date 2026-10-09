@@ -184,7 +184,7 @@ test('tumpukan berat ditandai malas, dan tidak diambil browser saat mengurai', (
                        Prasyaratnya: pasang pola `coreBrainAvailable` dulu di delapan titik itu.
        - diag-panel  : DITOLAK oleh gerbang di bawah ini sendiri ('Diagnostics TIDAK ikut
                        malas - nilainya justru ada lebih dulu'). */
-  assert.deepStrictEqual(groups, ['voice', 'classroom', 'library'], 'grup malas: ' + groups.join(', '));
+  assert.deepStrictEqual(groups, ['voice', 'classroom', 'library', 'qr'], 'grup malas: ' + groups.join(', '));
 });
 
 test('urutan di dalam grup suara adalah kontrak, bukan selera', () => {
