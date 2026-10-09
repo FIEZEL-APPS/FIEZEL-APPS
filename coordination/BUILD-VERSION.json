@@ -1,7 +1,7 @@
 {
-  "version": "m025-538",
-  "claimedBy": "branch feat/weplay-party-undercover-m025-538",
-  "claimedAt": "2026-10-09T20:09:44.383Z",
-  "reason": "feat(undercover): duplikasi gameplay weplay party game (m025-538)",
+  "version": "m025-539",
+  "claimedBy": "branch feat/owner-dashboard-student-gmail-directory",
+  "claimedAt": "2026-10-09T20:42:29.968Z",
+  "reason": "feat(owner): sinkronisasi data akun murid dan email gmail ke dashboard owner (m025-539)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

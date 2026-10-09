@@ -309,6 +309,41 @@ export async function readLearnerDirectory(db, sinceDay, limit) {
       rows.sort((a, b) => (b.last_day > a.last_day ? 1 : b.last_day < a.last_day ? -1 : 0));
       if (rows.length > cap) rows = rows.slice(0, cap);
     }
+
+    // Sertakan akun murid yang masuk lewat Google (auth_email)
+    try {
+      const emailRes = await db.prepare('SELECT sub, email, updated_at FROM auth_email ORDER BY updated_at DESC LIMIT ?1').bind(cap).all();
+      const emailCandidates = ((emailRes && emailRes.results) || []).filter((er) => !knownSubs.has(er.sub));
+      if (emailCandidates.length > 0) {
+        const revokedSubs = new Set();
+        try {
+          const cSql = 'SELECT sub, revoked_at FROM learner_evidence_consent WHERE sub IN (' + placeholders(emailCandidates.length, 1) + ')';
+          const cRes = await db.prepare(cSql).bind(...emailCandidates.map((c) => c.sub)).all();
+          for (const c of (cRes && cRes.results) || []) {
+            if (c.revoked_at !== null && c.revoked_at !== undefined) revokedSubs.add(c.sub);
+          }
+        } catch (_) {}
+        for (const er of emailCandidates) {
+          if (!revokedSubs.has(er.sub)) {
+            knownSubs.add(er.sub);
+            const day = new Date(er.updated_at || Date.now()).toISOString().slice(0, 10);
+            rows.push({
+              sub: er.sub,
+              first_day: day,
+              last_day: day,
+              evidence_n: 0,
+              decision_n: 0,
+              last_level: null,
+              last_mastery: null,
+              last_trend: null,
+              last_outcome: null
+            });
+          }
+        }
+        rows.sort((a, b) => (b.last_day > a.last_day ? 1 : b.last_day < a.last_day ? -1 : 0));
+        if (rows.length > cap) rows = rows.slice(0, cap);
+      }
+    } catch { /* auth_email belum ada atau gagal = fail-soft */ }
   } catch { /* learner_name belum ada atau gagal = fail-soft */ }
 
   if (!rows.length) return rows;
@@ -324,12 +359,20 @@ export async function readLearnerDirectory(db, sinceDay, limit) {
     for (const p of (got && got.results) || []) profiles.set(p.sub, p);
   } catch { /* lane sosial belum ada = cadangan tidak tersedia, bukan direktori gagal */ }
 
+  const emails = new Map();
+  try {
+    const sql = 'SELECT sub, email FROM auth_email WHERE sub IN (' + placeholders(subs.length, 1) + ')';
+    const got = await db.prepare(sql).bind(...subs).all();
+    for (const em of (got && got.results) || []) emails.set(em.sub, em.email);
+  } catch { /* auth_email belum ada = fail-soft */ }
+
   return rows.map((r) => {
     const p = profiles.get(r.sub);
     return Object.assign({}, r, {
       learner_name: names.get(r.sub) || null,
       handle: (p && p.handle) || null,
-      display_name: (p && p.display_name) || null
+      display_name: (p && p.display_name) || null,
+      email: emails.get(r.sub) || null
     });
   });
 }

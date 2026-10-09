@@ -359,6 +359,7 @@ export async function handleOwnerLearners(ctx) {
     learners: rows.map((r) => ({
       sub: r.sub,
       ...displayFrom({ name: r.learner_name }, r),
+      email: r.email || null,
       firstDay: r.first_day || null,
       lastDay: r.last_day || null,
       evidenceCount: Number(r.evidence_n) || 0,
@@ -406,12 +407,14 @@ export async function handleOwnerLearnerEvidence(ctx) {
   let profile = null;
   let state = null;
   let nameRow = null;
+  let emailRow = null;
   try {
     rows = await readLearnerEvidenceRows(db, sub, from, to, LIMITS.MAX_ROWS_PER_READ);
     nameRow = await readLearnerName(db, sub);
     // Profil sosial hanya CADANGAN nama; kegagalannya (lane sosial belum ada)
     // tidak boleh menjatuhkan halaman murid yang namanya sudah ada di server.
     try { profile = await readLearnerProfile(db, sub); } catch { profile = null; }
+    try { emailRow = await db.prepare('SELECT email, verified FROM auth_email WHERE sub = ?1').bind(sub).first(); } catch (_) {}
     state = await readLearnerState(db, sub);
   } catch {
     return jsonResponse({ ok: true, migrated: false, schema: LEARNER_EVIDENCE_SUMMARY_SCHEMA, range: { from, to }, learner: null, summary: null });
@@ -425,6 +428,8 @@ export async function handleOwnerLearnerEvidence(ctx) {
     learner: {
       sub,
       ...displayFrom(nameRow, profile),
+      email: (emailRow && emailRow.email) || null,
+      emailVerified: !!(emailRow && emailRow.verified),
       firstDay: (state && state.first_day) || null,
       lastDay: (state && state.last_day) || null,
       evidenceCountAllTime: (state && Number(state.evidence_n)) || 0,
