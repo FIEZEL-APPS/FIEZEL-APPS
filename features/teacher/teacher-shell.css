@@ -6,9 +6,27 @@
    di SETIAP halaman (berkas ini juga dimuat untuk murid). Sesuai kebijakan offline-first,
    dasbor guru kini memakai fon yang sudah di-self-host aplikasi (@font-face di style.css). */
 
-body.fz-teacher-mode{--tg-ink:#12211F;--tg-ink-2:#1B2F2C;--tg-ink-3:#284440;--tg-paper:#F3EFE6;--tg-paper-2:#FBF9F4;--tg-line:#E2DCCE;--tg-text:#182220;--tg-muted:#4E5C58;--tg-sage:#1F7A63;--tg-sage-2:#166052;--tg-sage-soft:#DDEFE7;--tg-amber:#D98E1F;--tg-amber-soft:#FBEBCF;--tg-brick:#B93F2A;--tg-brick-soft:#F7DDD6;--tg-mist:#A9C4BC;--tg-display:'FZ Instrument Serif',Georgia,serif;--tg-body:'FZ Plus Jakarta Sans',-apple-system,'Segoe UI',sans-serif;--tg-mono:ui-monospace,SFMono-Regular,Menlo,monospace;--tg-r:14px;--tg-r-lg:22px;--tg-shadow:0 10px 30px -18px rgba(18,33,31,.35);background:var(--tg-paper);color:var(--tg-text)}
+body.fz-teacher-mode{--tg-ink:#0F172A;--tg-ink-2:#1E293B;--tg-ink-3:#334155;--tg-paper:#F8FAFC;--tg-paper-2:#FFFFFF;--tg-line:#E2E8F0;--tg-text:#0F172A;--tg-muted:#64748B;--tg-sage:#059669;--tg-sage-2:#047857;--tg-sage-soft:#ECFDF5;--tg-amber:#D97706;--tg-amber-soft:#FEF3C7;--tg-brick:#DC2626;--tg-brick-soft:#FEE2E2;--tg-mist:#94A3B8;--tg-display:'FZ Instrument Serif',Georgia,serif;--tg-body:'FZ Plus Jakarta Sans',-apple-system,'Segoe UI',sans-serif;--tg-mono:ui-monospace,SFMono-Regular,Menlo,monospace;--tg-r:14px;--tg-r-lg:22px;--tg-shadow:0 10px 30px -18px rgba(15,23,42,.35);background:var(--tg-paper);color:var(--tg-text)}
 body.fz-teacher-mode .topbar,body.fz-teacher-mode .bottomnav,body.fz-teacher-mode .nav-scrim,body.fz-teacher-mode #globalSky,body.fz-teacher-mode .fz-coach-bubble,body.fz-teacher-mode .fz-coach-mascot,body.fz-teacher-mode .fz-coach-panel,body.fz-teacher-mode [class^=fz-coach],body.fz-teacher-mode .voice-bundle-pill{display:none!important}
-body.fz-teacher-mode .app{max-width:none;padding:0;margin:0}
+body.fz-teacher-mode main.app,
+body.fz-teacher-mode .app {
+  max-width: 100% !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  min-height: 100vh !important;
+}
+body.fz-teacher-mode #app,
+body.fz-teacher-mode .teacher-shell-root {
+  max-width: 100% !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
 body.fz-teacher-mode #app{font-family:var(--tg-body)}
 .tg{display:grid;grid-template-columns:264px 1fr;min-height:100vh;font-family:var(--tg-body);color:var(--tg-text);line-height:1.5;-webkit-font-smoothing:antialiased}
 .tg *{box-sizing:border-box}
@@ -150,7 +168,7 @@ body.fz-teacher-mode #app{font-family:var(--tg-body)}
 .tg-class-meta{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
 .tg-class-meta small{display:block;color:var(--tg-muted);margin-top:6px;font-size:.85rem}
 .tg-class-meta .tg-actions{margin:0}
-.tg-table-wrap{background:var(--tg-paper-2);border:1px solid var(--tg-line);border-radius:var(--tg-r-lg);overflow:auto;box-shadow:var(--tg-shadow)}
+.tg-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;width:100%;border:1px solid var(--tg-line);border-radius:var(--tg-r);background:#FFFFFF;box-shadow:var(--tg-shadow)}
 .tg-table{width:100%;border-collapse:collapse;font-size:.9rem}
 .tg-table th{text-align:left;font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--tg-muted);padding:14px 16px;border-bottom:1px solid var(--tg-line);font-weight:600;white-space:nowrap}
 .tg-table td{padding:12px 16px;border-bottom:1px solid var(--tg-line);vertical-align:middle}
@@ -222,10 +240,12 @@ body.fz-teacher-mode #app{font-family:var(--tg-body)}
 .tg-drawer-head{display:flex;align-items:center;gap:14px;padding:22px 22px 16px;border-bottom:1px solid var(--tg-line)}.tg-drawer-head .tg-icon-btn{margin-left:auto}
 .tg-drawer-body{padding:18px 22px 30px;overflow:auto;flex:1}
 .tg-drawer-foot{border-top:1px solid var(--tg-line);padding-top:16px;margin-top:24px}
-.tg-modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(560px,calc(100% - 24px));max-height:calc(100vh - 32px);background:var(--tg-paper-2);border-radius:var(--tg-r-lg);z-index:62;display:flex;flex-direction:column;box-shadow:0 40px 90px -30px rgba(0,0,0,.55);animation:tg-pop .24s cubic-bezier(.2,.8,.2,1)}
-.tg-modal.is-wide{width:min(720px,calc(100% - 24px))}
-.tg-modal-head{display:flex;justify-content:space-between;align-items:center;padding:20px 22px 12px}
-.tg-modal-body{padding:4px 22px 22px;overflow:auto}
+.tg-modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(580px,calc(100% - 24px));max-height:calc(100vh - 48px);background:#FFFFFF;border-radius:var(--tg-r-lg);z-index:62;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 60px -15px rgba(15,23,42,.35);border:1px solid var(--tg-line);animation:tg-pop .24s cubic-bezier(.2,.8,.2,1)}
+.tg-modal.is-wide{width:min(880px,calc(100% - 24px))}
+.tg-modal-head{display:flex;justify-content:space-between;align-items:center;padding:18px 24px 14px;border-bottom:1px solid var(--tg-line);flex-shrink:0;background:#FFFFFF}
+.tg-modal-body{padding:18px 24px;overflow-y:auto;flex:1 1 auto;-webkit-overflow-scrolling:touch}
+.tg-modal form{display:flex;flex-direction:column;flex:1 1 auto;overflow:hidden;min-height:0}
+.tg-modal-foot{flex-shrink:0;padding:14px 24px;border-top:1px solid var(--tg-line);background:#FFFFFF;display:flex;justify-content:flex-end;align-items:center;gap:10px;border-bottom-left-radius:inherit;border-bottom-right-radius:inherit}
 .tg-board{position:fixed;inset:0;z-index:70;background:var(--tg-ink);color:#EAF1EE;padding:56px clamp(24px,6vw,90px);display:flex;flex-direction:column;gap:26px;animation:tg-fade .3s ease}
 .tg-board h2{font-size:clamp(2rem,5vw,4rem);font-weight:600}
 .tg-board-kicker{font-size:1rem;text-transform:uppercase;letter-spacing:.16em;color:var(--tg-mist)}
@@ -257,13 +277,18 @@ body.reduce-motion .tg-rise,body.reduce-motion .tg-drawer,body.reduce-motion .tg
 @media (max-width:1100px){.tg-grid-kpi{grid-template-columns:repeat(2,1fr)}.tg-grid-2{grid-template-columns:1fr}.tg-grid-skill{grid-template-columns:repeat(3,1fr)}.tg-quick-row{grid-template-columns:repeat(3,1fr)}}
 @media (max-width:820px){
   .tg{grid-template-columns:1fr}.tg-side{display:none}
-  .tg-top{padding:22px 18px 14px;flex-direction:column;align-items:flex-start}.tg-content{padding:16px 16px calc(96px + env(safe-area-inset-bottom))}
+  .tg-top{padding:18px 16px 12px;flex-direction:column;align-items:flex-start}
+  .tg-top h1{font-size:clamp(1.3rem,4vw,1.65rem);line-height:1.2}
+  .tg-content{padding:16px 16px calc(96px + env(safe-area-inset-bottom))}
+  .ch-tabs,.ch-seg{overflow-x:auto;scrollbar-width:none;flex-wrap:nowrap;-webkit-overflow-scrolling:touch}
+  .ch-tabs::-webkit-scrollbar,.ch-seg::-webkit-scrollbar{display:none}
   .tg-btn span{display:none}.tg-btn.is-primary span,.tg-modal .tg-btn span,.tg-card .tg-btn span,.tg-welcome .tg-btn span{display:inline}
   .tg-mnav{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;background:var(--tg-ink);padding:8px 6px calc(8px + env(safe-area-inset-bottom));z-index:50;overflow:visible}
   .tg-mnav button{display:flex;flex-direction:column;align-items:center;gap:3px;background:transparent;border:0;color:#C8D6D1;font:inherit;font-size:.62rem;font-weight:600;padding:6px 2px;border-radius:10px}.tg-mnav button svg{width:18px;height:18px}.tg-mnav button.is-active{color:#fff;background:var(--tg-sage)}
   .tg-quick-row{grid-template-columns:repeat(2,1fr)}.tg-grid-skill{grid-template-columns:repeat(2,1fr)}.tg-welcome-list{grid-template-columns:1fr}.tg-form-row,.tg-mode{grid-template-columns:1fr}
   .tg-board-kpi{grid-template-columns:1fr}.tg-board-skills div{grid-template-columns:1fr 3fr 60px;gap:10px}.tg-board{padding:70px 20px 24px}
   .tg-row{flex-wrap:wrap}.tg-row-actions{flex-direction:row;width:100%;justify-content:flex-start;padding-left:48px}
+  .tg-modal{max-height:calc(100vh - 24px);width:calc(100% - 16px)}
 }
 
 /* Penawar dekorasi `html.fiezel-ui-v6 body button:not(...)` (style.css:2464, dipasang tutor-v3 saat idle) yang menimpa tombol KelasKu untuk Guru. Specificity disamakan lalu dinaikkan lewat body.fz-teacher-mode .tg. */
@@ -704,85 +729,87 @@ html.fiezel-ui-v6 body.fz-teacher-mode .tg button.tg-seg-btn:not(.primary):not(.
    Kontras hasil (WCAG): teks #182220 di #FFFFFF 16,6:1 · muted #4E5C58 di #FFFFFF 6,9:1 ·
    status amber #8A5A0B di #FBEBCF 5,6:1 · merah #9A2F1E di #F7DDD6 6,3:1 · hijau #145C4B di #DDEFE7 7,1:1.
    ========================================================================== */
-html:has(body.fz-teacher-mode),html body.fz-teacher-mode{background:#F6F4EE!important;color:#182220!important}
+html:has(body.fz-teacher-mode),html body.fz-teacher-mode{background:#F8FAFC!important;color:#0F172A!important}
 html body.fz-teacher-mode{
-  --bg:#F6F4EE!important;--text:#182220!important;--ink:#182220!important;--black:#12211F!important;
-  --muted:#4E5C58!important;--muted-soft:#56645F!important;--ambient-text:#182220!important;--ambient-muted:#4E5C58!important;
-  --panel:#FFFFFF!important;--panel-soft:#F4F1EA!important;--surface:#FFFFFF!important;--surface-solid:#FFFFFF!important;
-  --line:#E2DCCE!important;--line-soft:#ECE7DC!important;--line-strong:#CFC7B6!important;
-  --tg-paper:#F6F4EE;--tg-paper-2:#FFFFFF}
-html body.fz-teacher-mode .tg,html body.fz-teacher-mode .tg-main{background:#F6F4EE!important;color:#182220!important}
-html body.fz-teacher-mode .tg-top{background:#FFFFFF!important;border-bottom-color:#E2DCCE!important}
-html body.fz-teacher-mode .tg :is(h1,h2,h3,h5,h6){color:#12211F!important}
+  --bg:#F8FAFC!important;--text:#0F172A!important;--ink:#0F172A!important;--black:#0F172A!important;
+  --muted:#64748B!important;--muted-soft:#94A3B8!important;--ambient-text:#0F172A!important;--ambient-muted:#64748B!important;
+  --panel:#FFFFFF!important;--panel-soft:#F1F5F9!important;--surface:#FFFFFF!important;--surface-solid:#FFFFFF!important;
+  --line:#E2E8F0!important;--line-soft:#F1F5F9!important;--line-strong:#CBD5E1!important;
+  --tg-paper:#F8FAFC;--tg-paper-2:#FFFFFF;
+  --tg-ink:#0F172A;--tg-ink-2:#1E293B;--tg-ink-3:#334155;
+  --tg-line:#E2E8F0;--tg-text:#0F172A;--tg-muted:#64748B;
+  --tg-sage:#059669;--tg-sage-2:#047857;--tg-sage-soft:#ECFDF5;
+  --tg-amber:#D97706;--tg-amber-soft:#FEF3C7;
+  --tg-brick:#DC2626;--tg-brick-soft:#FEE2E2;
+  --tg-mist:#94A3B8}
+html body.fz-teacher-mode .tg,html body.fz-teacher-mode .tg-main{background:#F8FAFC!important;color:#0F172A!important}
+html body.fz-teacher-mode .tg-top{background:#FFFFFF!important;border-bottom-color:#E2E8F0!important}
+html body.fz-teacher-mode .tg :is(h1,h2,h3,h5,h6){color:#0F172A!important}
 html body.fz-teacher-mode .tg h4,html body.fz-teacher-mode .tg .tg-kicker,html body.fz-teacher-mode .tg .ch-kicker,
-html body.fz-teacher-mode .tg .ch-principle{color:#4E5C58!important}
-html body.fz-teacher-mode .tg :is(p.muted,span.muted,small.muted,.ch-muted){color:#4E5C58!important}
+html body.fz-teacher-mode .tg .ch-principle{color:#64748B!important}
+html body.fz-teacher-mode .tg :is(p.muted,span.muted,small.muted,.ch-muted){color:#64748B!important}
 
-/* kartu .ch-* & input: dulu #14141E (dari --panel gelap) */
-html body.fz-teacher-mode .tg :is(.ch-card,.ch-kpi,.ch-student){background:#FFFFFF!important;color:#182220!important;border-color:#E2DCCE!important}
+/* kartu .ch-* & input */
+html body.fz-teacher-mode .tg :is(.ch-card,.ch-kpi,.ch-student){background:#FFFFFF!important;color:#0F172A!important;border-color:#E2E8F0!important}
 html body.fz-teacher-mode .tg :is(.ch-card,.ch-kpi,.ch-student) :is(b,strong,span:not(.ch-status):not(.tg-avatar),small){color:inherit}
-html body.fz-teacher-mode .tg :is(.ch-card,.ch-kpi,.ch-student) small{color:#4E5C58!important}
-html body.fz-teacher-mode .tg :is(select,input,textarea){background:#FFFFFF!important;color:#182220!important;border-color:#CFC7B6!important}
-html body.fz-teacher-mode .tg :is(input,textarea)::placeholder{color:#6B7773!important}
+html body.fz-teacher-mode .tg :is(.ch-card,.ch-kpi,.ch-student) small{color:#64748B!important}
+html body.fz-teacher-mode .tg :is(select,input,textarea){background:#FFFFFF!important;color:#0F172A!important;border-color:#CBD5E1!important}
+html body.fz-teacher-mode .tg :is(input,textarea)::placeholder{color:#94A3B8!important}
 html body.fz-teacher-mode .tg li:not(.tg-nav-item){color:inherit}
-html body.fz-teacher-mode .tg .ch-bar{background:#ECE7DC!important}
-html body.fz-teacher-mode .tg .ch-sync{color:#4E5C58!important}
+html body.fz-teacher-mode .tg .ch-bar{background:#E2E8F0!important}
+html body.fz-teacher-mode .tg .ch-sync{color:#64748B!important}
 
-/* status: teks dipergelap supaya ≥4,5:1 di atas bidang lembutnya */
-html body.fz-teacher-mode .tg .ch-status{background:#EFEBE2!important;color:#4E5C58!important}
-html body.fz-teacher-mode .tg .ch-status.is-selesai{background:#DDEFE7!important;color:#145C4B!important}
-html body.fz-teacher-mode .tg .ch-status.is-sedang{background:#FBEBCF!important;color:#8A5A0B!important}
-html body.fz-teacher-mode .tg .ch-status.is-terlambat{background:#F7DDD6!important;color:#9A2F1E!important}
-html body.fz-teacher-mode .tg-demo-tag{background:#8A5A0B!important;color:#FFFFFF!important}
+/* status */
+html body.fz-teacher-mode .tg .ch-status{background:#F1F5F9!important;color:#475569!important}
+html body.fz-teacher-mode .tg .ch-status.is-selesai{background:#ECFDF5!important;color:#047857!important}
+html body.fz-teacher-mode .tg .ch-status.is-sedang{background:#FEF3C7!important;color:#B45309!important}
+html body.fz-teacher-mode .tg .ch-status.is-terlambat{background:#FEE2E2!important;color:#B91C1C!important}
+html body.fz-teacher-mode .tg-demo-tag{background:#D97706!important;color:#FFFFFF!important}
 
-/* sidebar: dari hijau-tinta pekat jadi putih bersih, tinta hijau-gelap */
-html body.fz-teacher-mode .tg-side{background:#FFFFFF!important;color:#182220!important;border-right:1px solid #E2DCCE!important}
-html body.fz-teacher-mode .tg-side .kelasku-brand .kelasku-main{color:#1F7A63!important}
+/* sidebar: bersih putih, border abu-abu, aksen emerald */
+html body.fz-teacher-mode .tg-side{background:#FFFFFF!important;color:#0F172A!important;border-right:1px solid #E2E8F0!important}
+html body.fz-teacher-mode .tg-side .kelasku-brand .kelasku-main{color:#059669!important}
 html body.fz-teacher-mode .tg-side .kelasku-brand .kelasku-tag,
 html body.fz-teacher-mode .tg-side .tg-kicker,html body.fz-teacher-mode .tg-class-switch,
-html body.fz-teacher-mode .tg-teacher small,html body.fz-teacher-mode .tg-saved small{color:#4E5C58!important}
-html body.fz-teacher-mode .tg-teacher,html body.fz-teacher-mode .tg-saved{background:#F4F1EA!important;border-color:#E2DCCE!important;color:#182220!important}
-html body.fz-teacher-mode .tg-teacher svg{color:#1F7A63!important}
-html body.fz-teacher-mode .tg-class-switch select{background:#FFFFFF!important;color:#182220!important;border-color:#CFC7B6!important}
-html body.fz-teacher-mode .tg-nav-item{background:transparent!important;color:#2C3B38!important}
-html body.fz-teacher-mode .tg-nav-item:hover{background:#EEF6F2!important;color:#12211F!important}
-html body.fz-teacher-mode .tg-nav-item.is-active{background:#1F7A63!important;color:#FFFFFF!important}
-html body.fz-teacher-mode .tg-exit{background:#FFFFFF!important;color:#2C3B38!important;border-color:#CFC7B6!important}
-html body.fz-teacher-mode .tg-exit:hover{background:#F4F1EA!important;color:#12211F!important}
+html body.fz-teacher-mode .tg-teacher small,html body.fz-teacher-mode .tg-saved small{color:#64748B!important}
+html body.fz-teacher-mode .tg-teacher,html body.fz-teacher-mode .tg-saved{background:#F8FAFC!important;border-color:#E2E8F0!important;color:#0F172A!important}
+html body.fz-teacher-mode .tg-teacher svg{color:#059669!important}
+html body.fz-teacher-mode .tg-class-switch select{background:#FFFFFF!important;color:#0F172A!important;border-color:#CBD5E1!important}
+html body.fz-teacher-mode .tg-nav-item{background:transparent!important;color:#334155!important}
+html body.fz-teacher-mode .tg-nav-item:hover{background:#F1F5F9!important;color:#0F172A!important}
+html body.fz-teacher-mode .tg-nav-item.is-active{background:#059669!important;color:#FFFFFF!important}
+html body.fz-teacher-mode .tg-exit{background:#FFFFFF!important;color:#334155!important;border-color:#CBD5E1!important}
+html body.fz-teacher-mode .tg-exit:hover{background:#F8FAFC!important;color:#0F172A!important}
 
-/* kartu "ink" (sorotan): dari hitam-hijau jadi bidang sage lembut, teks gelap */
-html body.fz-teacher-mode .tg :is(.tg-card-ink,.ch-card-ink){background:#E9F4EF!important;color:#12211F!important;border-color:#BFDCCF!important}
-html body.fz-teacher-mode .tg :is(.tg-card-ink,.ch-card-ink) :is(p,.tg-kicker,.ch-kicker,.ch-muted){color:#2F4A44!important}
-html body.fz-teacher-mode .tg .tg-card-ink h3 span{color:#8A5A0B!important}
-html body.fz-teacher-mode .tg .tg-card-ink .tg-bar{background:#CFE5DB!important}
-html body.fz-teacher-mode .tg .tg-card-ink .tg-bar i{background:#1F7A63!important}
-html body.fz-teacher-mode .tg .tg-plan{background:#FFFFFF!important;color:#182220!important;border:1px solid #BFDCCF}
-html body.fz-teacher-mode .tg .tg-plan svg{color:#8A5A0B!important}
-html body.fz-teacher-mode .tg .tg-count{background:#1F7A63!important;color:#FFFFFF!important}
-html body.fz-teacher-mode .tg .tg-tab.is-active{background:#1F7A63!important;color:#FFFFFF!important}
-/* sisa temuan audit kontras */
+/* kartu ink (sorotan) */
+html body.fz-teacher-mode .tg :is(.tg-card-ink,.ch-card-ink){background:#ECFDF5!important;color:#064E3B!important;border-color:#A7F3D0!important}
+html body.fz-teacher-mode .tg :is(.tg-card-ink,.ch-card-ink) :is(p,.tg-kicker,.ch-kicker,.ch-muted){color:#047857!important}
+html body.fz-teacher-mode .tg .tg-card-ink h3 span{color:#B45309!important}
+html body.fz-teacher-mode .tg .tg-card-ink .tg-bar{background:#D1FAE5!important}
+html body.fz-teacher-mode .tg .tg-card-ink .tg-bar i{background:#059669!important}
+html body.fz-teacher-mode .tg .tg-plan{background:#FFFFFF!important;color:#0F172A!important;border:1px solid #A7F3D0}
+html body.fz-teacher-mode .tg .tg-plan svg{color:#D97706!important}
+html body.fz-teacher-mode .tg .tg-count{background:#059669!important;color:#FFFFFF!important}
+html body.fz-teacher-mode .tg .tg-tab.is-active{background:#059669!important;color:#FFFFFF!important}
 html body.fz-teacher-mode .tg .tg-avatar{background:hsl(var(--h) 38% 32%)!important;color:#FFFFFF!important}
-html body.fz-teacher-mode .tg .tg-pill.is-risiko{color:#9A2F1E!important}
-html body.fz-teacher-mode .tg .tg-pill.is-aman{color:#145C4B!important}
-html body.fz-teacher-mode .tg .tg-btn.is-ghost-light{background:#FFFFFF!important;color:#1F7A63!important;border-color:#1F7A63!important}
-html body.fz-teacher-mode .tg :is(.tg-card-ink,.ch-card-ink) :is(h2,h3,h4) span:not(.tg-pill):not(.tg-count){color:#8A5A0B!important}
-html body.fz-teacher-mode .tg :is(.tg-card-ink,.ch-card-ink) :is(small,em){color:#2F4A44!important}
-html body.fz-teacher-mode .tg :is(.ch-card,.ch-body) p:not([class]){color:#4E5C58!important}
-html body.fz-teacher-mode .tg .ch-mini-list li{background:#F4F1EA!important;color:#182220!important}
-html body.fz-teacher-mode .tg :is(h1,h2,h3,.ch-h2) small{color:#4E5C58!important}
-/* bar navigasi murid gelap ikut tampil di Ruang Guru (aturan display:none di atas kalah oleh
-   mobile-edge-fit). Dikembalikan ke niat asli: tidak tampil. */
+html body.fz-teacher-mode .tg .tg-pill.is-risiko{color:#DC2626!important}
+html body.fz-teacher-mode .tg .tg-pill.is-aman{color:#059669!important}
+html body.fz-teacher-mode .tg .tg-btn.is-ghost-light{background:#FFFFFF!important;color:#059669!important;border-color:#059669!important}
+html body.fz-teacher-mode .tg :is(.tg-card-ink,.ch-card-ink) :is(h2,h3,h4) span:not(.tg-pill):not(.tg-count){color:#B45309!important}
+html body.fz-teacher-mode .tg :is(.tg-card-ink,.ch-card-ink) :is(small,em){color:#047857!important}
+html body.fz-teacher-mode .tg :is(.ch-card,.ch-body) p:not([class]){color:#64748B!important}
+html body.fz-teacher-mode .tg .ch-mini-list li{background:#F8FAFC!important;color:#0F172A!important}
+html body.fz-teacher-mode .tg :is(h1,h2,h3,.ch-h2) small{color:#64748B!important}
 html body.fz-teacher-mode nav.bottomnav.bottomnav{display:none!important}
-/* nav bawah guru (mobile): dari hijau-tinta pekat jadi putih bersih */
-html body.fz-teacher-mode .tg .tg-mnav{background:#FFFFFF!important;border-top:1px solid #E2DCCE!important;box-shadow:0 -8px 24px -18px rgba(18,33,31,.35)!important}
-html body.fz-teacher-mode .tg .tg-mnav button{background:transparent!important;color:#2C3B38!important;border-color:transparent!important;box-shadow:none!important}
+html body.fz-teacher-mode .tg .tg-mnav{background:#FFFFFF!important;border-top:1px solid #E2E8F0!important;box-shadow:0 -8px 24px -18px rgba(15,23,42,.35)!important}
+html body.fz-teacher-mode .tg .tg-mnav button{background:transparent!important;color:#475569!important;border-color:transparent!important;box-shadow:none!important}
 html body.fz-teacher-mode .tg .tg-mnav button :is(span,small,b){color:inherit!important}
-html body.fz-teacher-mode .tg .tg-mnav button:is(.is-active,[aria-current="page"]){background:#1F7A63!important;color:#FFFFFF!important}
-html body.fz-teacher-mode .tg .tg-mnav-more>summary{color:#2C3B38!important}
-html body.fz-teacher-mode .tg .tg-mnav-more:is(.is-active,[open])>summary{background:#E9F4EF!important;color:#12211F!important}
-html body.fz-teacher-mode .tg .tg-mnav-more .tg-mnav-sheet{background:#FFFFFF!important;border:1px solid #E2DCCE!important}
-html body.fz-teacher-mode .tg .tg-mnav-more .tg-mnav-sheet button{color:#182220!important}
-html body.fz-teacher-mode .tg .tg-mnav-more .tg-mnav-sheet button.is-active{background:#1F7A63!important;color:#FFFFFF!important}
+html body.fz-teacher-mode .tg .tg-mnav button:is(.is-active,[aria-current="page"]){background:#059669!important;color:#FFFFFF!important}
+html body.fz-teacher-mode .tg .tg-mnav-more>summary{color:#475569!important}
+html body.fz-teacher-mode .tg .tg-mnav-more:is(.is-active,[open])>summary{background:#ECFDF5!important;color:#047857!important}
+html body.fz-teacher-mode .tg .tg-mnav-more .tg-mnav-sheet{background:#FFFFFF!important;border:1px solid #E2E8F0!important}
+html body.fz-teacher-mode .tg .tg-mnav-more .tg-mnav-sheet button{color:#0F172A!important}
+html body.fz-teacher-mode .tg .tg-mnav-more .tg-mnav-sheet button.is-active{background:#059669!important;color:#FFFFFF!important}
 
 /* R1 Kelas Tanpa HP — pemanasan proyektor dan nilai kertas (m025, strategi sekolah 2026). */
 .tg-board-warm-btn{margin-top:28px;font-size:18px;padding:14px 22px}

@@ -1,7 +1,7 @@
 {
-  "version": "m025-527",
-  "claimedBy": "branch fix/m025-527-qr-notif-fased-audit",
-  "claimedAt": "2026-10-09T10:13:45.553Z",
-  "reason": "fix(qr,notif,mapel): hotfix race condition kamera qr, polling throttle, dan kurasi butir fase d (m025-527)",
+  "version": "m025-528",
+  "claimedBy": "branch fix/m025-528-teacher-dashboard-uiux-overhaul",
+  "claimedAt": "2026-10-09T10:43:20.468Z",
+  "reason": "fix(teacher): overhaul ui/ux dashboard guru emerald palette and universal layout",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
