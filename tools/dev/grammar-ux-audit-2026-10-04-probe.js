@@ -159,7 +159,7 @@ async function run() {
       window.__q = null;
       const U = self.FiezelGrammarUpgrade, show = U.showGrammarHint, rt = U.renderTokenOrder;
       U.renderTokenOrder = function (q) { window.__q = q; return rt.apply(this, arguments); };
-      window.__peek = () => { const keep = U.showGrammarHint; U.showGrammarHint = q => { window.__q = q; }; document.getElementById('quizGrammarHint')?.click(); U.showGrammarHint = keep; return window.__q; };
+      window.__peek = () => { window.__q = null; const keep = U.showGrammarHint; U.showGrammarHint = q => { window.__q = q; }; document.getElementById('quizGrammarHint')?.click(); U.showGrammarHint = keep; return window.__q; };
     });
     return { context, page };
   };
