@@ -40,6 +40,17 @@
     'social3.qr-fail': 'Kode QR tidak bisa dibuat sekarang. Coba lagi nanti.',
     'social3.qr-need-profile': 'Buat ID online dulu supaya kode QR kamu bisa tampil.',
 
+    /* ── Pindai QR kamera & unggah galeri ────────────────────────────────────── */
+    'social3.scan-title': 'Pindai Kode QR',
+    'social3.scan-desc': 'Arahkan kamera ke kode QR teman atau pilih gambar dari galeri.',
+    'social3.scan-btn': 'Pindai QR',
+    'social3.scan-from-gallery': 'Pilih dari Galeri',
+    'social3.scan-my-qr': 'Kode QR Saya',
+    'social3.scan-cam-err': 'Kamera tidak dapat diakses atau izin belum diberikan.',
+    'social3.scan-not-found': 'Kode QR tidak ditemukan pada gambar ini. Pastikan gambar jelas.',
+    'social3.scan-self': 'Ini adalah kode QR profil kamu sendiri.',
+    'social3.scan-invalid': 'Kode QR ini bukan tautan profil atau ID teman FIEZEL.',
+
     /* ── Deteksi tautan masuk ?friend=@handle ────────────────────────────────── */
     'social3.link-mark': 'Undangan teman',
     'social3.link-title': 'Tambahkan @{handle} sebagai teman?',

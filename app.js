@@ -17578,7 +17578,7 @@ function openModal(html){const wasOpen=modalOpen;modalOpen=true;uiSfx('open');mo
 // bila memang tidak ada modal terbuka, supaya jalur kembali tahu tekanan itu belum terpakai
 // dan boleh meneruskannya ke lapisan di bawahnya.
 let modalReturnFocus=null;
-function closeModalNow(){if(!modalOpen)return false;modalOpen=false;uiSfx('close');modalEpoch++;clearTimeout(modalCloseTimer);const modal=$('modal');modal.classList.remove('show');modalCloseTimer=setTimeout(()=>modal.classList.add('hidden'),320);try{const appEl=$('app');if(appEl){appEl.removeAttribute('aria-hidden');if('inert' in appEl)appEl.inert=false}const nav=document.querySelector?.('.bottomnav,.nav-bar');if(nav){nav.removeAttribute('aria-hidden');if('inert' in nav)nav.inert=false}}catch(_){}/* q17-S1: kembalikan fokus ke pemicu supaya pengguna keyboard tidak terdampar di body. */try{if(modalReturnFocus&&document.contains(modalReturnFocus))modalReturnFocus.focus({preventScroll:true})}catch(_){}modalReturnFocus=null;return true}
+function closeModalNow(){if(!modalOpen)return false;try{if(typeof stopQrScanner==='function')stopQrScanner()}catch(_){}modalOpen=false;uiSfx('close');modalEpoch++;clearTimeout(modalCloseTimer);const modal=$('modal');modal.classList.remove('show');modalCloseTimer=setTimeout(()=>modal.classList.add('hidden'),320);try{const appEl=$('app');if(appEl){appEl.removeAttribute('aria-hidden');if('inert' in appEl)appEl.inert=false}const nav=document.querySelector?.('.bottomnav,.nav-bar');if(nav){nav.removeAttribute('aria-hidden');if('inert' in nav)nav.inert=false}}catch(_){}/* q17-S1: kembalikan fokus ke pemicu supaya pengguna keyboard tidak terdampar di body. */try{if(modalReturnFocus&&document.contains(modalReturnFocus))modalReturnFocus.focus({preventScroll:true})}catch(_){}modalReturnFocus=null;return true}
 // Ditutup oleh aplikasi sendiri (tombol Batal/Tutup/Escape): layarnya berubah seketika, dan
 // entri riwayatnya dibuang supaya tekanan kembali berikutnya tidak jatuh pada modal yang
 // sudah tidak ada.
@@ -18365,8 +18365,8 @@ function tactileProfileCockpitMarkup(opts={}){
           <button class="profile-action-btn secondary" type="button" onclick="openFriendConnectModal('invite')" style="padding:9px 8px;font-size:12px;font-weight:700;justify-content:center;margin:0;border-radius:10px;">
             <i data-lucide="user-plus" style="width:14px;height:14px;vertical-align:-2px;margin-right:4px;color:#0284C7;"></i> Hubungkan
           </button>
-          <button class="profile-action-btn secondary" type="button" onclick="openFriendConnectModal('my-qr')" style="padding:9px 8px;font-size:12px;font-weight:700;justify-content:center;margin:0;border-radius:10px;">
-            <i data-lucide="qr-code" style="width:14px;height:14px;vertical-align:-2px;margin-right:4px;color:#10B981;"></i> Scan & QR
+          <button class="profile-action-btn secondary" type="button" onclick="openFriendConnectModal('scan')" style="padding:9px 8px;font-size:12px;font-weight:700;justify-content:center;margin:0;border-radius:10px;">
+            <i data-lucide="camera" style="width:14px;height:14px;vertical-align:-2px;margin-right:4px;color:#10B981;"></i> Scan & QR
           </button>
         </div>
 
@@ -18969,7 +18969,170 @@ function openAddFriendModal(){
 }
 window.openAddFriendModal=openAddFriendModal;
 
-async function openFriendConnectModal(initialTab='my-qr'){
+let _qrStream=null;
+let _qrScanAnimId=null;
+let _qrScanningActive=false;
+let _qrOffscreenCanvas=null;
+
+function stopQrScanner(){
+  _qrScanningActive=false;
+  if(_qrScanAnimId){
+    cancelAnimationFrame(_qrScanAnimId);
+    _qrScanAnimId=null;
+  }
+  if(_qrStream){
+    try{_qrStream.getTracks().forEach(t=>t.stop());}catch(_){}
+    _qrStream=null;
+  }
+  const video=$('qrScanVideo');
+  if(video){
+    try{video.srcObject=null;}catch(_){}
+  }
+}
+window.stopQrScanner=stopQrScanner;
+
+async function startQrVideoScan(){
+  stopQrScanner();
+  const video=$('qrScanVideo');
+  const fallback=$('fzQrCamFallback');
+  const reticle=$('fzQrReticle');
+  if(!video)return;
+
+  if(!navigator?.mediaDevices?.getUserMedia){
+    if(fallback)fallback.style.display='flex';
+    if(reticle)reticle.style.display='none';
+    enhanceUI();
+    return;
+  }
+
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({
+      video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}},
+      audio:false
+    });
+    _qrStream=stream;
+    video.srcObject=stream;
+    await video.play().catch(()=>{});
+    _qrScanningActive=true;
+    if(fallback)fallback.style.display='none';
+    if(reticle)reticle.style.display='block';
+    _qrScanAnimId=requestAnimationFrame(tickQrScan);
+  }catch(err){
+    console.warn('[Fiezel QR] Kamera tidak dapat dibuka:', err);
+    if(fallback)fallback.style.display='flex';
+    if(reticle)reticle.style.display='none';
+    enhanceUI();
+  }
+}
+window.startQrVideoScan=startQrVideoScan;
+
+function tickQrScan(){
+  if(!_qrScanningActive)return;
+  const video=$('qrScanVideo');
+  if(!video||video.paused||video.ended){
+    _qrScanAnimId=requestAnimationFrame(tickQrScan);
+    return;
+  }
+  if(video.readyState>=video.HAVE_CURRENT_DATA){
+    const vw=video.videoWidth,vh=video.videoHeight;
+    if(vw>0&&vh>0){
+      if(!_qrOffscreenCanvas)_qrOffscreenCanvas=document.createElement('canvas');
+      const maxDim=640;
+      let scale=1;
+      if(vw>maxDim||vh>maxDim)scale=Math.min(maxDim/vw,maxDim/vh);
+      const cw=Math.round(vw*scale);
+      const ch=Math.round(vh*scale);
+      _qrOffscreenCanvas.width=cw;
+      _qrOffscreenCanvas.height=ch;
+      const ctx=_qrOffscreenCanvas.getContext('2d',{willReadFrequently:true});
+      ctx.drawImage(video,0,0,cw,ch);
+      const imgData=ctx.getImageData(0,0,cw,ch);
+      const decoder=typeof jsQR==='function'?jsQR:(typeof window.jsQR==='function'?window.jsQR:null);
+      let code=null;
+      if(decoder){
+        code=decoder(imgData.data,cw,ch,{inversionAttempts:'dontInvert'});
+      }
+      if(code&&code.data){
+        handleScannedQrResult(code.data);
+        return;
+      }
+    }
+  }
+  _qrScanAnimId=requestAnimationFrame(tickQrScan);
+}
+
+function parseFriendHandleFromQr(text){
+  if(!text)return null;
+  const s=String(text).trim();
+  const mUrl=s.match(/[?&]friend=@?([a-zA-Z0-9_]{3,24})/i);
+  if(mUrl)return mUrl[1].toLowerCase();
+  const mDeep=s.match(/(?:(?:https?:\/\/)?[^/]+\/(?:app\/)?(?:#|\?)?friend\/|@)([a-zA-Z0-9_]{3,24})/i);
+  if(mDeep)return mDeep[1].toLowerCase();
+  if(/^[a-zA-Z0-9_]{3,24}$/.test(s))return s.toLowerCase();
+  return null;
+}
+window.parseFriendHandleFromQr=parseFriendHandleFromQr;
+
+function handleScannedQrResult(text){
+  try{if(feedbackSoundsOn())uiSfx('success')}catch(_){}
+  stopQrScanner();
+  const myHandle=(socialProfileCache?.handle||storedSocialHandle()||'').toLowerCase();
+  const target=parseFriendHandleFromQr(text);
+  if(!target){
+    showToast(FiezelI18n.t('social3.scan-invalid'));
+    if(modalOpen&&$('qrScanVideo'))startQrVideoScan();
+    return;
+  }
+  if(myHandle&&target===myHandle){
+    showToast(FiezelI18n.t('social3.scan-self'));
+    if(modalOpen&&$('qrScanVideo'))startQrVideoScan();
+    return;
+  }
+  closeModalNow();
+  setTimeout(()=>socialFriendLinkSheet(target),160);
+}
+window.handleScannedQrResult=handleScannedQrResult;
+
+async function handleQrFilePicked(event){
+  const file=event?.target?.files?.[0];
+  if(!file)return;
+  try{
+    const reader=new FileReader();
+    reader.onload=function(e){
+      const img=new Image();
+      img.onload=function(){
+        const canvas=document.createElement('canvas');
+        canvas.width=img.naturalWidth||img.width;
+        canvas.height=img.naturalHeight||img.height;
+        const ctx=canvas.getContext('2d');
+        ctx.drawImage(img,0,0);
+        const imgData=ctx.getImageData(0,0,canvas.width,canvas.height);
+        const decoder=typeof jsQR==='function'?jsQR:(typeof window.jsQR==='function'?window.jsQR:null);
+        let code=null;
+        if(decoder){
+          code=decoder(imgData.data,canvas.width,canvas.height,{inversionAttempts:'attemptBoth'});
+        }
+        if(code&&code.data){
+          handleScannedQrResult(code.data);
+        }else{
+          showToast(FiezelI18n.t('social3.scan-not-found'));
+        }
+      };
+      img.onerror=function(){
+        showToast(FiezelI18n.t('social3.scan-not-found'));
+      };
+      img.src=e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }catch(err){
+    console.error('[Fiezel QR] Galat pemrosesan galeri:', err);
+    showToast(FiezelI18n.t('social3.scan-not-found'));
+  }
+  if(event?.target)event.target.value='';
+}
+window.handleQrFilePicked=handleQrFilePicked;
+
+async function openFriendConnectModal(initialTab='scan'){
   try{if(feedbackSoundsOn())uiSfx('click')}catch(_){}
   const handle=socialProfileCache?.handle||storedSocialHandle()||'murid';
   try{await refreshFriendRequestCount()}catch(_){}
@@ -18981,8 +19144,47 @@ async function openFriendConnectModal(initialTab='my-qr'){
     try{qrSvg=qr?qr.svg(socialProfileUrl(handle),{px:175,level:'M',label:'QR @'+handle}):'';}catch(_){qrSvg='';}
     const reqCount=Number(socialRequestCount)||0;
 
-    let bodyHtml='';
+    let modalTitle=FiezelI18n.t('social3.scan-title');
+    let modalDesc=FiezelI18n.t('social3.scan-desc');
     if(activeTab==='my-qr'){
+      modalTitle=FiezelI18n.t('social3.qr-title');
+      modalDesc=FiezelI18n.t('social3.qr-desc');
+    }else if(activeTab==='invite'){
+      modalTitle=FiezelI18n.t('social2.add-title');
+      modalDesc=FiezelI18n.t('social2.add-desc');
+    }else if(activeTab==='requests'){
+      modalTitle=FiezelI18n.t('social3.req-section-title');
+      modalDesc=FiezelI18n.t('social3.req-section-desc');
+    }
+
+    let bodyHtml='';
+    if(activeTab==='scan'){
+      bodyHtml=`
+        <div style="display:flex;flex-direction:column;gap:12px;padding:4px 0;">
+          <div class="fz-qr-scanner-box" id="fzQrScannerBox" data-testid="qr-scanner-box">
+            <video id="qrScanVideo" class="fz-qr-video" playsinline autoplay muted></video>
+            <div class="fz-qr-reticle" id="fzQrReticle">
+              <div class="fz-qr-corner fz-qr-corner-tl"></div>
+              <div class="fz-qr-corner fz-qr-corner-tr"></div>
+              <div class="fz-qr-corner fz-qr-corner-bl"></div>
+              <div class="fz-qr-corner fz-qr-corner-br"></div>
+              <div class="fz-qr-laser"></div>
+            </div>
+            <div class="fz-qr-cam-fallback" id="fzQrCamFallback" style="display:none;">
+              <i data-lucide="camera" style="width:36px;height:36px;color:#64748B;"></i>
+              <p style="font-size:12px;line-height:1.4;margin:0;color:#CBD5E1;">${FiezelI18n.t('social3.scan-cam-err')}</p>
+            </div>
+          </div>
+          <p class="muted" style="text-align:center;font-size:12px;margin:0;line-height:1.4;">
+            ${FiezelI18n.t('social3.scan-desc')}
+          </p>
+          <input type="file" id="qrFileInput" accept="image/*" style="display:none;" onchange="handleQrFilePicked(event)">
+          <button type="button" class="btn-scan-gallery" onclick="$('qrFileInput')?.click()" data-testid="qr-gallery-btn" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;border-radius:12px;background:#F8FAFC;border:1.5px solid #CBD5E1;color:#0F172A !important;font-weight:700;font-size:12.5px;cursor:pointer;">
+            <i data-lucide="image" style="width:16px;height:16px;color:#0284C7;"></i> ${FiezelI18n.t('social3.scan-from-gallery')}
+          </button>
+        </div>
+      `;
+    }else if(activeTab==='my-qr'){
       bodyHtml=`
         <div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:6px 0;">
           <div class="fz3-qr" data-testid="profile-qr" style="padding:10px;background:#FFF;border:2px solid #E2E8F0;border-radius:18px;box-shadow:0 6px 16px rgba(0,0,0,0.05);display:flex;justify-content:center;">
@@ -19041,43 +19243,54 @@ async function openFriendConnectModal(initialTab='my-qr'){
 
     return `
       <div class="modal-mark">TEMAN & KOMUNITAS</div>
-      <h2 style="font-size:1.45rem;margin:6px 0 4px;font-weight:800;">${t('social2.add-title','Tambah teman lewat ID')}</h2>
-      <p class="muted" style="font-size:12px;margin:0 0 12px;line-height:1.4;">${t('social2.add-desc','Minta ID (nama samaran) temanmu, lalu ketik di sini.')}</p>
+      <h2 style="font-size:1.45rem;margin:6px 0 4px;font-weight:800;">${modalTitle}</h2>
+      <p class="muted" style="font-size:12px;margin:0 0 12px;line-height:1.4;">${modalDesc}</p>
 
       <!-- Minimalist Segmented Tabs -->
-      <div class="connect-segmented-nav" style="display:flex;gap:4px;background:rgba(255,255,255,0.08);padding:4px;border-radius:12px;margin-bottom:12px;">
-        <button type="button" onclick="window._switchConnectModalTab('my-qr')" style="flex:1;padding:8px 4px;font-size:11px;font-weight:800;border-radius:9px;border:none;cursor:pointer;background:${activeTab==='my-qr'?'#FFC800 !important':'transparent !important'};color:${activeTab==='my-qr'?'#1B1418 !important':'#94A3B8 !important'};box-shadow:${activeTab==='my-qr'?'0 2px 8px rgba(255,200,0,0.3)':'none'};display:flex;align-items:center;justify-content:center;gap:4px;">
-          <i data-lucide="qr-code" style="width:13px;height:13px;"></i> ID & QR
+      <div class="connect-segmented-nav" style="display:flex;gap:3px;background:rgba(255,255,255,0.08);padding:4px;border-radius:12px;margin-bottom:12px;">
+        <button type="button" onclick="window._switchConnectModalTab('scan')" style="flex:1;padding:8px 2px;font-size:10.5px;font-weight:800;border-radius:9px;border:none;cursor:pointer;background:${activeTab==='scan'?'#FFC800 !important':'transparent !important'};color:${activeTab==='scan'?'#1B1418 !important':'#94A3B8 !important'};box-shadow:${activeTab==='scan'?'0 2px 8px rgba(255,200,0,0.3)':'none'};display:flex;align-items:center;justify-content:center;gap:3px;overflow:hidden;white-space:nowrap;">
+          <i data-lucide="camera" style="width:12px;height:12px;flex-shrink:0;"></i> ${FiezelI18n.t('social3.scan-btn')}
         </button>
-        <button type="button" onclick="window._switchConnectModalTab('invite')" style="flex:1;padding:8px 4px;font-size:11px;font-weight:800;border-radius:9px;border:none;cursor:pointer;background:${activeTab==='invite'?'#FFC800 !important':'transparent !important'};color:${activeTab==='invite'?'#1B1418 !important':'#94A3B8 !important'};box-shadow:${activeTab==='invite'?'0 2px 8px rgba(255,200,0,0.3)':'none'};display:flex;align-items:center;justify-content:center;gap:4px;">
-          <i data-lucide="user-plus" style="width:13px;height:13px;"></i> Tambah ID
+        <button type="button" onclick="window._switchConnectModalTab('my-qr')" style="flex:1;padding:8px 2px;font-size:10.5px;font-weight:800;border-radius:9px;border:none;cursor:pointer;background:${activeTab==='my-qr'?'#FFC800 !important':'transparent !important'};color:${activeTab==='my-qr'?'#1B1418 !important':'#94A3B8 !important'};box-shadow:${activeTab==='my-qr'?'0 2px 8px rgba(255,200,0,0.3)':'none'};display:flex;align-items:center;justify-content:center;gap:3px;overflow:hidden;white-space:nowrap;">
+          <i data-lucide="qr-code" style="width:12px;height:12px;flex-shrink:0;"></i> ID & QR
         </button>
-        <button type="button" onclick="window._switchConnectModalTab('requests')" style="flex:1;padding:8px 4px;font-size:11px;font-weight:800;border-radius:9px;border:none;cursor:pointer;background:${activeTab==='requests'?'#FFC800 !important':'transparent !important'};color:${activeTab==='requests'?'#1B1418 !important':'#94A3B8 !important'};box-shadow:${activeTab==='requests'?'0 2px 8px rgba(255,200,0,0.3)':'none'};display:flex;align-items:center;justify-content:center;gap:4px;">
-          <i data-lucide="bell" style="width:13px;height:13px;"></i> Terima ${reqCount>0?`<span style="background:#EF4444;color:#FFF;border-radius:99px;padding:0 5px;font-size:10px;font-weight:800;">${reqCount}</span>`:''}
+        <button type="button" onclick="window._switchConnectModalTab('invite')" style="flex:1;padding:8px 2px;font-size:10.5px;font-weight:800;border-radius:9px;border:none;cursor:pointer;background:${activeTab==='invite'?'#FFC800 !important':'transparent !important'};color:${activeTab==='invite'?'#1B1418 !important':'#94A3B8 !important'};box-shadow:${activeTab==='invite'?'0 2px 8px rgba(255,200,0,0.3)':'none'};display:flex;align-items:center;justify-content:center;gap:3px;overflow:hidden;white-space:nowrap;">
+          <i data-lucide="user-plus" style="width:12px;height:12px;flex-shrink:0;"></i> Tambah ID
+        </button>
+        <button type="button" onclick="window._switchConnectModalTab('requests')" style="flex:1;padding:8px 2px;font-size:10.5px;font-weight:800;border-radius:9px;border:none;cursor:pointer;background:${activeTab==='requests'?'#FFC800 !important':'transparent !important'};color:${activeTab==='requests'?'#1B1418 !important':'#94A3B8 !important'};box-shadow:${activeTab==='requests'?'0 2px 8px rgba(255,200,0,0.3)':'none'};display:flex;align-items:center;justify-content:center;gap:3px;overflow:hidden;white-space:nowrap;">
+          <i data-lucide="bell" style="width:12px;height:12px;flex-shrink:0;"></i> Terima ${reqCount>0?`<span style="background:#EF4444;color:#FFF;border-radius:99px;padding:0 4px;font-size:9.5px;font-weight:800;">${reqCount}</span>`:''}
         </button>
       </div>
 
       <div id="connectModalBodyContent">${bodyHtml}</div>
-      <div class="modal-actions" style="margin-top:14px;"><button type="button" onclick="closeModal()">${t('coach.close-aria','Tutup')}</button></div>
+      <div class="modal-actions" style="margin-top:14px;"><button type="button" onclick="stopQrScanner();closeModal();">${t('coach.close-aria','Tutup')}</button></div>
     `;
   }
 
   window._switchConnectModalTab=async(t)=>{
+    try{stopQrScanner()}catch(_){}
     activeTab=t;
     const panel=$('modalPanel');
     if(panel){
       panel.innerHTML=renderModalBody();
       enhanceUI();
-      if(t==='requests'){await loadConnectRequests();}
+      if(t==='scan'){await startQrVideoScan();}
+      else if(t==='requests'){await loadConnectRequests();}
       else if(t==='invite'){setTimeout(()=>{$('connectFriendInput')?.focus()},60);}
     }
   };
 
   openModal(renderModalBody());
-  if(initialTab==='requests'){await loadConnectRequests();}
+  if(initialTab==='scan'){await startQrVideoScan();}
+  else if(initialTab==='requests'){await loadConnectRequests();}
   else if(initialTab==='invite'){setTimeout(()=>{$('connectFriendInput')?.focus()},60);}
 }
 window.openFriendConnectModal=openFriendConnectModal;
+
+function openQrScanner(){
+  return openFriendConnectModal('scan');
+}
+window.openQrScanner=openQrScanner;
 
 async function socialAddByInput(){
   const core=socialCore();if(!core)return;
