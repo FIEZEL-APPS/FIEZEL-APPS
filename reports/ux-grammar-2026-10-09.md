@@ -35,9 +35,10 @@ di `findings.json`.
 | G14 | Rendah | Layar menang (id) bilang "5 kosakata" tapi hanya 4 chip yang terlihat | Quest menang |
 | G15 | Rendah | Klaim "Kosakata Terkuasai · 100% siap latihan" sesudah satu putaran mencocokkan | Quest menang |
 | G16 | Rendah | Chip di Grammar Hub (Ujian, Sesi Kilat, Video) setinggi 32 px (< 44 px); "Hapus" di susun kata kontras 2,9:1 | Hub, susun kata |
+| G17 | Sedang | Penjelasan per pilihan ("Bandingkan pilihan lain") di pembahasan Thai masih berbahasa Indonesia | Pembahasan (th) |
 
 Yang sudah baik: soal pilihan ganda bersih dan mudah dibaca. Alur salah → coba lagi →
-pembahasan berjalan. Pembahasan Thai lengkap dan tanpa kebocoran bahasa Indonesia. Tidak
+pembahasan berjalan. Pembahasan Thai hampir seluruhnya Thai (kecuali G17). Tidak
 ada luapan horizontal di layar mana pun. Mode gelap sistem tidak merusak tampilan (aplikasi
 tetap terang secara konsisten).
 
@@ -175,6 +176,12 @@ menutupi panel "PEGANGAN INGATAN". Cukup satu pesan + petunjuk.
 - **G16** Chip "Ujian Naik Level", "Sesi Kilat", "Video Grammar Lab", "Buka materi" di hub
   setinggi 32 px (pedoman 44 px). Tombol "Hapus" di soal susun kata kontras 2,9:1 (< 4,5:1).
   ![susun kata](ux-grammar-2026-10-09/08-jenis-token-order.jpg)
+
+- **G17** Di pembahasan Thai, isi "Bandingkan pilihan lain" masih Indonesia: *"He" dan "she"
+  bentuk subjek, dan "she" buat perempuan. "His…"*. Bagian lain pembahasan Thai sudah Thai.
+  Temuan ini muncul sesudah regex deteksi bocoran di probe dibuat tidak peka huruf
+  besar/kecil. Sebelumnya teks ini lolos karena kata Indonesia di dalamnya ditulis berhuruf
+  kecil, sedangkan regexnya hanya mencocokkan bentuk berhuruf kapital.
 
 ## Prioritas yang disarankan
 

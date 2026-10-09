@@ -105,7 +105,7 @@ function inspectPage(opts) {
     if ((r.width < 44 || r.height < 44) && r.top < innerHeight * 2) smallTargets.push({ label: (el.getAttribute('aria-label') || el.textContent || el.id || el.className || '').trim().slice(0, 40), w: Math.round(r.width), h: Math.round(r.height) });
   }
   const overflowX = document.documentElement.scrollWidth > innerWidth + 1;
-  const idWords = /\b(Pilihan|kurang|tepat|Coba|Petunjuk|Kesempatan|Lanjut|Benar|Salah|Mulai|Soal|Latihan|Pembahasan|Kembali|Penjelasan|Keyakinan|TATA BAHASA|Jawaban|Lihat)\b/;
+  const idWords = /\b(Pilihan|kurang|tepat|Coba|Petunjuk|Kesempatan|Lanjut|Benar|Salah|Mulai|Soal|Latihan|Pembahasan|Kembali|Penjelasan|Keyakinan|TATA BAHASA|Jawaban|Lihat)\b/i;
   const idLeaks = opts && opts.locale === 'th' ? [...new Set([...document.querySelectorAll('body *')].filter(e => visible(e) && [...e.childNodes].some(n => n.nodeType === 3 && idWords.test(n.textContent))).map(e => [...e.childNodes].filter(n => n.nodeType === 3).map(n => n.textContent.trim()).join(' ').slice(0, 60)))].slice(0, 12) : [];
   const fonts = [...new Set([...document.querySelectorAll('#app *')].filter(visible).map(e => Math.round(parseFloat(getComputedStyle(e).fontSize))))].sort((a, b) => a - b);
   return { lowContrast: lowContrast.slice(0, 25), lowContrastCount: lowContrast.length, smallTargets: smallTargets.slice(0, 15), smallTargetCount: smallTargets.length, overflowX, idLeaks, fontSizes: fonts, scrollHeight: document.documentElement.scrollHeight };
@@ -113,7 +113,7 @@ function inspectPage(opts) {
 
 async function run() {
   const pw = loadPlaywright();
-  if (!pw) { console.log('Playwright tidak tersedia'); return; }
+  if (!pw) { console.error('Playwright tidak tersedia'); process.exitCode = 1; return; }
   const browser = await pw.chromium.launch({ args: ['--no-sandbox'], ...(process.env.FIEZEL_CHROMIUM ? { executablePath: process.env.FIEZEL_CHROMIUM } : {}) });
   const shoot = async (page, name, note, opts = {}) => {
     await page.waitForTimeout(450);
