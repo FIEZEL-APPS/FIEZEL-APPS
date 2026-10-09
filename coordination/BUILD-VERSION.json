@@ -1,7 +1,7 @@
 {
-  "version": "m025-535",
-  "claimedBy": "branch fix/splash-screen-smooth-perf-m025-535",
-  "claimedAt": "2026-10-09T17:06:59.814Z",
-  "reason": "fix(splash): eliminasi jank partikel, tunda inisialisasi 3d mochi & lazy loader hingga splash tuntas (m025-535)",
+  "version": "m025-536",
+  "claimedBy": "branch feat/undercover-gameplay-redesign-m025-536",
+  "claimedAt": "2026-10-09T17:47:55.390Z",
+  "reason": "feat(undercover): redesign gameplay, turn timeline, petunjuk bilingual, dan meja debat",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
