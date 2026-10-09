@@ -31,7 +31,7 @@
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (m) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[m]; }); }
   function pct(v) { return v == null ? '—' : Math.round(v * 100) + '%'; }
   function today() { var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
-  function icon(n) { return '<i data-lucide="' + n + '" aria-hidden="true"></i>'; }
+  function icon(n) { var I = root.FiezelTeacherIcons; return (I && typeof I.has === 'function' && I.has(n)) ? I.svg(n) : '<i data-lucide="' + n + '" aria-hidden="true"></i>'; }
   function fmtDate(v) { try { var d = typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v) ? new Date(v + 'T00:00:00') : new Date(v); var I = (typeof self !== 'undefined' ? self : this).FiezelI18n; var loc = I && I.getLocale && I.getLocale() === 'th' ? 'th-TH' : 'id-ID'; return d.toLocaleDateString(loc, { weekday: 'short', day: 'numeric', month: 'short' }); } catch (_) { return String(v || ''); } }
   function phaseLabelOf(u) { var p = u && u.phaseId; return p === 'fase_d' ? t('kelas.fase-d', 'Fase D (SMP)') : p === 'fase_e' ? t('kelas.fase-e', 'Fase E (SMA 10)') : t('kelas.fase-f', 'Fase F (SMA 11-12)'); }
   /* 'curriculum' adalah kunci mesin milik misi kurikulum dan tidak ada di tabel skill mana
