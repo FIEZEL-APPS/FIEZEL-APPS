@@ -18355,40 +18355,109 @@ window.toggleAutoAudio=function(checkbox){
   const t=(k,f)=>{const v=FiezelI18n.t(k);return(v===k||!v)?f:v};
   showToast(on?t('profile.auto-audio-on','Putar audio soal otomatis aktif'):t('profile.auto-audio-off','Putar audio soal otomatis dimatikan'),'success');
 };
-window.editProfileName=async function(){
+window.editProfileName=function(){
   try{if(feedbackSoundsOn())uiSfx('click')}catch(_){}
   const t=(k,f)=>{const v=FiezelI18n.t(k);return(v===k||!v)?f:v};
   const current=learnerName();
-  const next=prompt(t('profile.prompt-name','Masukkan nama lengkap baru:'),current);
-  if(next&&next.trim()&&next.trim()!==current){
-    const clean=next.trim();
-    const cand=(typeof socialHandleCandidates==='function')?socialHandleCandidates(clean)[0]:'';
-    const core=socialCore();
-    if(cand&&core&&typeof navigator!=='undefined'&&navigator.onLine!==false){
-      try{
-        const me=await core.api.profileMe();
-        if(!me.ok||!me.data?.profile||me.data.profile.handle.toLowerCase()!==cand.toLowerCase()){
-          const chk=await core.api.profileCheck(cand);
-          if(chk&&chk.ok&&chk.data?.available===false){
-            showToast(t('social.error-handle-taken','Nama itu sudah dipakai orang lain — coba variasi lain.'),'warn');
-            return;
+  const bodyHtml=`
+    <div class="modal-mark">PROFIL</div>
+    <h2>${t('profile.edit-btn','Ubah Nama Profil')}</h2>
+    <p class="muted" style="margin-bottom:14px;">${t('profile.prompt-name','Masukkan nama lengkap baru:')}</p>
+    <div style="display:flex;flex-direction:column;gap:12px;width:100%;">
+      <input type="text" id="editProfileNameInput" value="${esc(current)}" maxlength="32" autocomplete="off"
+        style="width:100%;box-sizing:border-box;padding:12px 14px;border:2px solid #CBD5E1;border-radius:12px;font-size:15px;font-weight:700;color:#0F172A;background:#F8FAFC;outline:none;"
+        onfocus="this.style.borderColor='#3B82F6';this.style.background='#FFFFFF'"
+        onblur="this.style.borderColor='#CBD5E1';this.style.background='#F8FAFC'"
+        onkeydown="if(event.key==='Enter'){event.preventDefault();document.getElementById('btnEditProfileSave')?.click()}" />
+      <div id="editProfileNameErr" style="font-size:12px;font-weight:700;color:#EF4444;display:none;"></div>
+      <div class="modal-actions" style="display:flex;gap:8px;margin-top:6px;">
+        <button class="secondary" type="button" onclick="closeModal()" style="flex:1;">${t('common.batal','Batal')}</button>
+        <button class="primary" type="button" id="btnEditProfileSave" style="flex:1;">${t('common.simpan','Simpan')}</button>
+      </div>
+    </div>
+  `;
+  openModal(bodyHtml);
+  setTimeout(()=>{
+    const input=document.getElementById('editProfileNameInput');
+    if(input){input.focus();input.select()}
+    const saveBtn=document.getElementById('btnEditProfileSave');
+    if(saveBtn){
+      saveBtn.onclick=async()=>{
+        const nextVal=(input?input.value:'').trim();
+        const errEl=document.getElementById('editProfileNameErr');
+        if(!nextVal){
+          if(errEl){errEl.textContent=t('profile.name-empty','Nama tidak boleh kosong');errEl.style.display='block'}
+          return;
+        }
+        if(nextVal===current){closeModal();return}
+        saveBtn.disabled=true;
+        saveBtn.textContent=t('common.simpan','Simpan')+'...';
+        const clean=nextVal;
+        const cand=(typeof socialHandleCandidates==='function')?socialHandleCandidates(clean)[0]:'';
+        const core=socialCore();
+        if(cand&&core&&typeof navigator!=='undefined'&&navigator.onLine!==false){
+          try{
+            const me=await core.api.profileMe();
+            if(!me.ok||!me.data?.profile||me.data.profile.handle.toLowerCase()!==cand.toLowerCase()){
+              const chk=await core.api.profileCheck(cand);
+              if(chk&&chk.ok&&chk.data?.available===false){
+                if(errEl){errEl.textContent=t('social.error-handle-taken','Nama itu sudah dipakai orang lain — coba variasi lain.');errEl.style.display='block'}
+                saveBtn.disabled=false;
+                saveBtn.textContent=t('common.simpan','Simpan');
+                return;
+              }
+            }
+          }catch(_){}
+        }
+        setLearnerName(clean);
+        if(cand&&core&&typeof core.api?.profileRename==='function'&&typeof navigator!=='undefined'&&navigator.onLine!==false){
+          try{
+            const ren=await core.api.profileRename(cand,clean);
+            if(ren&&ren.ok&&ren.data?.profile){
+              socialProfileCache=ren.data.profile;
+              rememberSocialHandle(ren.data.profile.handle);
+            }
+          }catch(_){}
+        }
+        closeModal();
+        try{if(feedbackSoundsOn())uiSfx('notif_achievement')}catch(_){}
+        showToast(t('profile.name-updated','Nama profil berhasil diperbarui!'),'success');
+        render();
+      };
+    }
+  },50);
+};
+
+window.openProfileLogoutModal=function(){
+  try{if(feedbackSoundsOn())uiSfx('click')}catch(_){}
+  const t=(k,f)=>{const v=FiezelI18n.t(k);return(v===k||!v)?f:v};
+  const bodyHtml=`
+    <div class="modal-mark">SESI AKUN</div>
+    <h2>${FiezelI18n.t('profile.logout-device','Keluar dari Perangkat Ini')}</h2>
+    <p class="muted" style="margin-bottom:16px;">${FiezelI18n.t('profile.logout-confirm','Keluar dari sesi ini? Progres belajarmu tetap tersimpan aman di cloud.')}</p>
+    <div class="modal-actions" style="display:flex;gap:8px;">
+      <button class="secondary" type="button" id="btnLogoutCancel" onclick="closeModal()" style="flex:1;">${t('common.batal','Batal')}</button>
+      <button class="primary danger" type="button" id="btnLogoutConfirm" style="flex:1;background:#EF4444;border-color:#DC2626;color:#FFF;">${FiezelI18n.t('profile.logout-device','Keluar')}</button>
+    </div>
+  `;
+  openModal(bodyHtml);
+  setTimeout(()=>{
+    const confirmBtn=document.getElementById('btnLogoutConfirm');
+    if(confirmBtn){
+      confirmBtn.onclick=async()=>{
+        confirmBtn.disabled=true;
+        closeModal();
+        try{
+          if(self.FiezelAccount?.logout){
+            await self.FiezelAccount.logout();
           }
-        }
-      }catch(_){}
+        }catch(_){}
+        try{if(feedbackSoundsOn())uiSfx('click')}catch(_){}
+        showToast(FiezelI18n.t('profile.logged-out','Sesi diamankan.'),'success');
+        render();
+      };
     }
-    setLearnerName(clean);
-    if(cand&&core&&typeof core.api?.profileRename==='function'&&typeof navigator!=='undefined'&&navigator.onLine!==false){
-      try{
-        const ren=await core.api.profileRename(cand,clean);
-        if(ren&&ren.ok&&ren.data?.profile){
-          socialProfileCache=ren.data.profile;
-          rememberSocialHandle(ren.data.profile.handle);
-        }
-      }catch(_){}
-    }
-    showToast(t('profile.name-updated','Nama profil berhasil diperbarui!'),'success');
-    render();
-  }
+  },50);
 };
 function tactileProfileCockpitMarkup(opts={}){
   const t=(k,f)=>{const v=FiezelI18n.t(k);return(v===k||!v)?f:v};
@@ -18419,17 +18488,14 @@ function tactileProfileCockpitMarkup(opts={}){
     return (parts[0][0]+parts[parts.length-1][0]).toUpperCase();
   })();
   const level=getActiveLevel()||'A1';
-  const classCode=typeof learnerClassCode==='function'?learnerClassCode():'';
-  const schoolName=classCode?(t('profile.class-prefix','Kelas')+' '+esc(classCode)):t('profile.school-default','SMA Negeri 1');
-  const streak=Number(state.streak)||7;
-  const xp=Number(state.xp)||340;
-  const mins=85;
-  const timeLabel='85m';
-  const classCodeDisplay=classCode||'FZ-8821';
-  const studentId=state.ownerUuid?('FZ-STU-'+state.ownerUuid.replace(/[^a-zA-Z0-9]/g,'').slice(0,4).toUpperCase()):'FZ-STU-8842';
+  const streak=Number(state.streak)||0;
+  const xp=Number(state.xp)||0;
+  const timeMins=(Array.isArray(state.history)&&state.history.length>0)?Math.max(1,Math.round(state.history.length*1.5)):(Number(state.totalAnswered)>0?Math.max(1,Math.round(Number(state.totalAnswered)*1.5)):0);
+  const timeLabel=timeMins>0?(timeMins+'m'):'0m';
+  const studentId=state.ownerUuid?('FZ-STU-'+state.ownerUuid.replace(/[^a-zA-Z0-9]/g,'').slice(0,4).toUpperCase()):(handle?('FZ-'+handle.replace(/[^a-zA-Z0-9]/g,'').slice(0,6).toUpperCase()):'FZ-MURID');
   const flagStatus=opts.flag||'on';
   const isOffNet=typeof navigator!=='undefined'&&navigator.onLine===false;
-  let syncStatusText=t('profile.sync-realtime','Tersinkronisasi Real-Time ke Dasbor Guru');
+  let syncStatusText=t('profile.sync-realtime','Tersinkronisasi Real-Time ke Cloud');
   let syncDotColor='#10B981';
   if(isOffNet){
     syncStatusText=t('profile.offline-status','Kamu sedang offline · Mode belajar mandiri aktif');
@@ -18460,7 +18526,7 @@ function tactileProfileCockpitMarkup(opts={}){
           <div class="profile-handle">@${esc(handle)}</div>
           <div class="profile-badges-row">
             <span class="profile-level-chip">Level ${esc(level)} Dasar</span>
-            <span class="profile-school-chip">${esc(schoolName)}</span>
+            <span class="profile-status-chip">Pelajar Mandiri</span>
           </div>
         </div>
       </div>
@@ -18543,39 +18609,7 @@ function tactileProfileCockpitMarkup(opts={}){
       </div>
     </div>
 
-    <!-- 2. Hubungan Resmi Sekolah (KelasKu) -->
-    <div class="profile-kelasku-card">
-      <div class="kelasku-head-row">
-        <span style="font-size:10.5px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:#047857;">${t('profile.kelasku-heading','Sambungan KelasKu')}</span>
-        <span class="kelasku-badge-online">● ${t('profile.connected','Terhubung')}</span>
-      </div>
-      <div class="kelasku-title-wrap">
-        <div class="kelasku-icon-circle">
-          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false" style="display:block;">
-            <rect x="3.5" y="4" width="17" height="11.5" rx="2" fill="none" stroke="var(--kelasku-emerald, #1F7A63)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <line x1="6.8" y1="8" x2="13.2" y2="8" stroke="var(--kelasku-emerald, #1F7A63)" stroke-width="2" stroke-linecap="round"/>
-            <line x1="6.8" y1="11.5" x2="10.8" y2="11.5" stroke="var(--kelasku-emerald, #1F7A63)" stroke-width="2" stroke-linecap="round"/>
-            <path d="M7 15.5v4.5M17 15.5v4.5M9.5 20h5" stroke="var(--kelasku-emerald, #1F7A63)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-        <div class="kelasku-info-content">
-          <div class="kelasku-class-name">${esc(classCode ? (t('profile.class-prefix','Kelas')+' '+classCode) : t('profile.class-demo','Kelas X IPA 2'))}</div>
-          <div class="kelasku-teacher-sub">${t('profile.teacher-sub','Wali Kelas / Guru: Bu Sari')}</div>
-        </div>
-      </div>
-      <div class="kelasku-code-bar">
-        <div class="code-label-group">
-          <span style="font-size:11px;font-weight:700;color:#065F46;">${t('profile.class-code-label','Kode Kelas:')}</span>
-          <span class="code-txt">${esc(classCodeDisplay)}</span>
-        </div>
-        <button class="btn-copy-code" type="button" onclick="navigator.clipboard?.writeText('${esc(classCodeDisplay)}');showToast(FiezelI18n.t('profile.copied','Kode kelas disalin!'),'success')">${t('profile.copy-btn','Salin')}</button>
-      </div>
-      <button class="profile-action-btn secondary" type="button" onclick="openJoinClassModal()" style="font-size:12px;padding:10px;display:flex;align-items:center;justify-content:center;gap:6px;">
-        ${t('profile.change-class','Ganti atau Tambah Kelas Lain')} <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      </button>
-    </div>
-
-    <!-- 3. Target Latihan Harian -->
+    <!-- 2. Target Latihan Harian -->
     <div class="profile-section-card" id="cardTargetHarian">
       <div class="section-card-header" style="cursor:default;">
         <div class="header-text-group">
@@ -18609,7 +18643,7 @@ function tactileProfileCockpitMarkup(opts={}){
       </div>
     </div>
 
-    <!-- 4. Pengalaman Suara & Audio Belajar -->
+    <!-- 3. Pengalaman Suara & Audio Belajar -->
     <div class="profile-section-card" id="cardSuaraAudio">
       <div class="section-card-header is-collapsible" onclick="toggleCardCollapse('cardSuaraAudio')">
         <div class="header-text-group">
@@ -18660,11 +18694,11 @@ function tactileProfileCockpitMarkup(opts={}){
       </div>
     </div>
 
-    <!-- 5. Keamanan & Sinkronisasi Belajar -->
-    <div class="profile-section-card">
+    <!-- 4. Keamanan & Sinkronisasi Belajar -->
+    <div class="profile-section-card" id="cardSyncAkun">
       <div class="section-card-header">
         <div class="section-card-title">${t('profile.sync-title','Sinkronisasi & ID Akun Murid')}</div>
-        <div class="section-card-desc">${t('profile.sync-desc','Data tersimpan aman dan terhubung otomatis ke guru')}</div>
+        <div class="section-card-desc">${t('profile.sync-desc','Data progres belajarmu tersimpan aman di cloud')}</div>
       </div>
       <div class="profile-sync-box">
         <div class="sync-status-row" style="color:${syncDotColor}">
@@ -18680,7 +18714,7 @@ function tactileProfileCockpitMarkup(opts={}){
       <button class="profile-action-btn" type="button" onclick="openSettings()">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:4px;"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>${t('profile.settings-full','Buka Pengaturan Akun Lengkap')}
       </button>
-      <button class="profile-action-btn danger" type="button" onclick="if(confirm(FiezelI18n.t('profile.logout-confirm','Keluar dari sesi ini? Progres belajarmu tetap tersimpan aman di cloud.'))){showToast(FiezelI18n.t('profile.logged-out','Sesi diamankan.'));render();}">
+      <button class="profile-action-btn danger" type="button" onclick="openProfileLogoutModal()">
         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:4px;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>${t('profile.logout-device','Keluar dari Perangkat Ini')}
       </button>
     </div>

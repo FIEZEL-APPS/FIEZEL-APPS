@@ -182,7 +182,7 @@
     /* Profile cockpit keys */
     'profile.class-prefix': 'ชั้นเรียน',
     'profile.school-default': 'โรงเรียนสาธิต 1',
-    'profile.sync-realtime': 'ซิงค์แบบเรียลไทม์กับแดชบอร์ดครู',
+    'profile.sync-realtime': 'ซิงค์แบบเรียลไทม์กับคลาวด์',
     'profile.offline-status': 'คุณกำลังออฟไลน์ · โหมดเรียนรู้ด้วยตนเองเปิดอยู่',
     'profile.flag-off-status': 'ฟีเจอร์ออนไลน์ยังไม่เปิดใช้งาน · ความคืบหน้าบันทึกในเครื่อง',
     'profile.active-study': 'กำลังเรียนอย่างต่อเนื่อง',
@@ -230,6 +230,7 @@
     'profile.logged-out': 'รักษาความปลอดภัยเซสชันแล้ว',
     'profile.logout-confirm': 'ออกจากเซสชันนี้หรือไม่? ความคืบหน้าการเรียนของคุณยังคงบันทึกไว้อย่างปลอดภัยบนคลาวด์',
     'profile.logout-device': 'ออกจากอุปกรณ์นี้',
+    'profile.name-empty': 'กรุณากรอกชื่อ',
     'profile.name-updated': 'อัปเดตชื่อโปรไฟล์สำเร็จแล้ว!',
     'profile.prompt-name': 'กรอกชื่อนามสกุลใหม่:',
     'profile.reminder-off': 'ปิดการแจ้งเตือนประจำวันแล้ว',
@@ -239,7 +240,7 @@
     'profile.speech-speed-desc': 'ปรับให้เหมาะกับการฟังของนักเรียน',
     'profile.speech-speed-title': 'ความเร็วเสียงบทสนทนา',
     'profile.speed-set': 'ตั้งค่าความเร็วเสียงแล้ว',
-    'profile.sync-desc': 'ข้อมูลถูกบันทึกอย่างปลอดภัยและเชื่อมต่อกับครูโดยอัตโนมัติ',
+    'profile.sync-desc': 'ข้อมูลความคืบหน้าการเรียนถูกบันทึกอย่างปลอดภัยบนคลาวด์',
     'profile.sync-title': 'การซิงค์และรหัสนักเรียน'
   });
 }());
