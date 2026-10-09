@@ -49,6 +49,7 @@ async function runProbe() {
   });
 
   const page = await context.newPage();
+  page.on('pageerror', err => console.error('PAGE ERROR:', err));
   await page.goto('http://localhost/index.html');
   await page.waitForTimeout(1000);
 

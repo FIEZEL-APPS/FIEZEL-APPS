@@ -19006,8 +19006,21 @@ if(typeof document!=='undefined'){
   }catch(_){}
 }
 
+async function ensureQrDecoderLoaded(){
+  if(typeof jsQR==='function'||(typeof window!=='undefined'&&typeof window.jsQR==='function'))return true;
+  if(typeof window!=='undefined'&&window.FiezelLazyLoader&&typeof window.FiezelLazyLoader.load==='function'){
+    try{
+      await window.FiezelLazyLoader.load('qr');
+      return typeof jsQR==='function'||(typeof window!=='undefined'&&typeof window.jsQR==='function');
+    }catch(_){return false;}
+  }
+  return false;
+}
+window.ensureQrDecoderLoaded=ensureQrDecoderLoaded;
+
 async function startQrVideoScan(){
   stopQrScanner();
+  ensureQrDecoderLoaded();
   const currentGen=++_qrScanGen;
   const video=$('qrScanVideo');
   const fallback=$('fzQrCamFallback');
@@ -19138,7 +19151,7 @@ async function handleQrFilePicked(event){
     const reader=new FileReader();
     reader.onload=function(e){
       const img=new Image();
-      img.onload=function(){
+      img.onload=async function(){
         const canvas=document.createElement('canvas');
         const nw=img.naturalWidth||img.width;
         const nh=img.naturalHeight||img.height;
@@ -19158,6 +19171,7 @@ async function handleQrFilePicked(event){
         const ctx=canvas.getContext('2d');
         ctx.drawImage(img,0,0,cw,ch);
         const imgData=ctx.getImageData(0,0,cw,ch);
+        await ensureQrDecoderLoaded();
         const decoder=typeof jsQR==='function'?jsQR:(typeof window.jsQR==='function'?window.jsQR:null);
         let code=null;
         if(decoder){
@@ -19185,6 +19199,7 @@ window.handleQrFilePicked=handleQrFilePicked;
 
 async function openFriendConnectModal(initialTab='scan'){
   try{if(feedbackSoundsOn())uiSfx('click')}catch(_){}
+  if(initialTab==='scan')ensureQrDecoderLoaded();
   const handle=socialProfileCache?.handle||storedSocialHandle()||'murid';
   let activeTab=initialTab;
 
@@ -19235,20 +19250,20 @@ async function openFriendConnectModal(initialTab='scan'){
       bodyHtml=`
         <div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:2px 0;">
           <div class="fz3-qr" data-testid="profile-qr" style="padding:8px;background:#FFF;border:2px solid #E2E8F0;border-radius:14px;box-shadow:0 4px 12px rgba(0,0,0,0.06);display:flex;justify-content:center;">
-            ${qrSvg||'<p class="muted">Kode QR belum tersedia</p>'}
+            ${qrSvg||`<p class="muted">${FiezelI18n.t('social3.qr-unavailable','Kode QR belum tersedia')}</p>`}
           </div>
           <div style="display:flex;align-items:center;gap:6px;">
             <span class="fz2-myid" style="font-size:14px;font-weight:800;color:#0F172A;font-family:monospace;">@${esc(handle)}</span>
             <button type="button" class="btn-copy-code" onclick="socialCopyId()" data-testid="copy-id-btn" style="padding:3px 8px;font-size:10.5px;font-weight:700;border-radius:7px;">
-              <i data-lucide="copy" style="width:11px;height:11px;vertical-align:-1px;margin-right:2px;"></i> Salin ID
+              <i data-lucide="copy" style="width:11px;height:11px;vertical-align:-1px;margin-right:2px;"></i> ${FiezelI18n.t('social3.copy-id','Salin ID')}
             </button>
           </div>
           <div style="display:flex;gap:6px;width:100%;max-width:260px;margin-top:2px;">
             <button type="button" onclick="socialDownloadQr()" style="flex:1;padding:7px 8px;font-size:11.5px;font-weight:700;border-radius:9px;background:#F1F5F9;border:1px solid #CBD5E1;color:#334155;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;">
-              <i data-lucide="download" style="width:12px;height:12px;"></i> Unduh QR
+              <i data-lucide="download" style="width:12px;height:12px;"></i> ${FiezelI18n.t('social3.download-qr','Unduh QR')}
             </button>
             <button type="button" class="primary" onclick="socialShareProfile()" style="flex:1;padding:7px 8px;font-size:11.5px;font-weight:700;border-radius:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;">
-              <i data-lucide="share-2" style="width:12px;height:12px;"></i> Bagikan
+              <i data-lucide="share-2" style="width:12px;height:12px;"></i> ${FiezelI18n.t('social3.share-profile','Bagikan')}
             </button>
           </div>
         </div>
@@ -19257,7 +19272,7 @@ async function openFriendConnectModal(initialTab='scan'){
       bodyHtml=`
         <div style="display:flex;flex-direction:column;gap:8px;padding:2px 0;">
           <label class="endpoint-label" style="display:flex;flex-direction:column;gap:4px;font-size:11.5px;font-weight:700;color:#CBD5E1;">
-            ID Teman (Handle)
+            ${FiezelI18n.t('social3.handle-label','ID Teman (Handle)')}
             <input id="connectFriendInput" type="text" maxlength="21" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="@nama_teman" style="padding:9px 12px;border-radius:10px;border:1.5px solid #CBD5E1;font-size:13.5px;background:#FFF;color:#0F172A !important;font-family:monospace;" onkeydown="if(event.key==='Enter')socialAddByInput()">
           </label>
           <button class="primary" id="btnConnectFriendSubmit" type="button" onclick="socialAddByInput()" style="padding:9px;font-size:12.5px;font-weight:800;border-radius:10px;display:flex;align-items:center;justify-content:center;gap:5px;">
@@ -19265,7 +19280,7 @@ async function openFriendConnectModal(initialTab='scan'){
           </button>
           <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;font-size:11px;color:#CBD5E1;">
             <i data-lucide="qr-code" style="width:14px;height:14px;color:#38BDF8;flex-shrink:0;"></i>
-            <span>Minta teman memindai QR atau cari lewat ID kalian.</span>
+            <span>${FiezelI18n.t('social3.find-hint','Minta teman memindai QR atau cari lewat ID kalian.')}</span>
           </div>
         </div>
       `;
@@ -19280,7 +19295,7 @@ async function openFriendConnectModal(initialTab='scan'){
     }
 
     return `
-      <div class="modal-mark" style="font-size:0.68rem;letter-spacing:0.12em;margin-bottom:2px;">TEMAN & KOMUNITAS</div>
+      <div class="modal-mark" style="font-size:0.68rem;letter-spacing:0.12em;margin-bottom:2px;">${FiezelI18n.t('social2.panel-title','TEMAN & KOMUNITAS')}</div>
       <h2 style="font-size:1.2rem;margin:2px 0 4px;font-weight:800;letter-spacing:-0.02em;">${modalTitle}</h2>
       <p class="muted" style="font-size:11.5px;margin:0 0 8px;line-height:1.3;">${modalDesc}</p>
 
@@ -19289,13 +19304,13 @@ async function openFriendConnectModal(initialTab='scan'){
           <i data-lucide="camera" style="width:11px;height:11px;flex-shrink:0;"></i> ${FiezelI18n.t('social3.scan-btn','Pindai')}
         </button>
         <button type="button" onclick="window._switchConnectModalTab('my-qr')" style="flex:1;padding:6px 2px;font-size:10px;font-weight:800;border-radius:8px;border:none;cursor:pointer;background:${activeTab==='my-qr'?'#FFC800 !important':'transparent !important'};color:${activeTab==='my-qr'?'#1B1418 !important':'#94A3B8 !important'};box-shadow:${activeTab==='my-qr'?'0 2px 8px rgba(255,200,0,0.3)':'none'};display:flex;align-items:center;justify-content:center;gap:3px;overflow:hidden;white-space:nowrap;">
-          <i data-lucide="qr-code" style="width:11px;height:11px;flex-shrink:0;"></i> ID & QR
+          <i data-lucide="qr-code" style="width:11px;height:11px;flex-shrink:0;"></i> ${FiezelI18n.t('social3.tab-id-qr','ID & QR')}
         </button>
         <button type="button" onclick="window._switchConnectModalTab('invite')" style="flex:1;padding:6px 2px;font-size:10px;font-weight:800;border-radius:8px;border:none;cursor:pointer;background:${activeTab==='invite'?'#FFC800 !important':'transparent !important'};color:${activeTab==='invite'?'#1B1418 !important':'#94A3B8 !important'};box-shadow:${activeTab==='invite'?'0 2px 8px rgba(255,200,0,0.3)':'none'};display:flex;align-items:center;justify-content:center;gap:3px;overflow:hidden;white-space:nowrap;">
-          <i data-lucide="user-plus" style="width:11px;height:11px;flex-shrink:0;"></i> Tambah ID
+          <i data-lucide="user-plus" style="width:11px;height:11px;flex-shrink:0;"></i> ${FiezelI18n.t('social3.tab-add-id','Tambah ID')}
         </button>
         <button type="button" onclick="window._switchConnectModalTab('requests')" style="flex:1;padding:6px 2px;font-size:10px;font-weight:800;border-radius:8px;border:none;cursor:pointer;background:${activeTab==='requests'?'#FFC800 !important':'transparent !important'};color:${activeTab==='requests'?'#1B1418 !important':'#94A3B8 !important'};box-shadow:${activeTab==='requests'?'0 2px 8px rgba(255,200,0,0.3)':'none'};display:flex;align-items:center;justify-content:center;gap:3px;overflow:hidden;white-space:nowrap;">
-          <i data-lucide="bell" style="width:11px;height:11px;flex-shrink:0;"></i> Terima <span id="connectBadgeCount" style="background:#EF4444;color:#FFF;border-radius:99px;padding:0 3px;font-size:9px;font-weight:800;display:${reqCount>0?'inline-block':'none'};">${reqCount>0?reqCount:''}</span>
+          <i data-lucide="bell" style="width:11px;height:11px;flex-shrink:0;"></i> ${FiezelI18n.t('social3.tab-requests','Terima')} <span id="connectBadgeCount" style="background:#EF4444;color:#FFF;border-radius:99px;padding:0 3px;font-size:9px;font-weight:800;display:${reqCount>0?'inline-block':'none'};">${reqCount>0?reqCount:''}</span>
         </button>
       </div>
 
@@ -19307,6 +19322,7 @@ async function openFriendConnectModal(initialTab='scan'){
   window._switchConnectModalTab=async(t)=>{
     try{stopQrScanner()}catch(_){}
     activeTab=t;
+    if(t==='scan')ensureQrDecoderLoaded();
     const panel=$('modalPanel');
     if(panel){
       panel.classList.add('modal-connect-panel');

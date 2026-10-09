@@ -39,6 +39,14 @@
     'social3.qr-share-body': 'Ayo berteman di FIEZEL. Pindai atau buka tautan ini:',
     'social3.qr-fail': 'Kode QR tidak bisa dibuat sekarang. Coba lagi nanti.',
     'social3.qr-need-profile': 'Buat ID online dulu supaya kode QR kamu bisa tampil.',
+    'social3.qr-unavailable': 'Kode QR belum tersedia',
+    'social3.download-qr': 'Unduh QR',
+    'social3.share-profile': 'Bagikan',
+    'social3.handle-label': 'ID Teman (Handle)',
+    'social3.find-hint': 'Minta teman memindai QR atau cari lewat ID kalian.',
+    'social3.tab-id-qr': 'ID & QR',
+    'social3.tab-add-id': 'Tambah ID',
+    'social3.tab-requests': 'Terima',
 
     /* ── Pindai QR kamera & unggah galeri ────────────────────────────────────── */
     'social3.scan-title': 'Pindai Kode QR',
