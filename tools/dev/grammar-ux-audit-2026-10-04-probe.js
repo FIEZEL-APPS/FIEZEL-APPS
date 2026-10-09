@@ -114,7 +114,7 @@ function inspectPage(opts) {
 async function run() {
   const pw = loadPlaywright();
   if (!pw) { console.log('Playwright tidak tersedia'); return; }
-  const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+  const browser = await pw.chromium.launch({ args: ['--no-sandbox'], ...(process.env.FIEZEL_CHROMIUM ? { executablePath: process.env.FIEZEL_CHROMIUM } : {}) });
   const shoot = async (page, name, note, opts = {}) => {
     await page.waitForTimeout(450);
     const file = path.join(OUT, name + '.png');
@@ -236,7 +236,10 @@ async function run() {
     findings[prefix + 'AfterOpen'] = await page.evaluate(() => ({ modal: (document.querySelector('.modal.show')?.innerText || '').replace(/\s+/g, ' ').slice(0, 160), lessonHero: !!document.querySelector('.grammar-start-hero') }));
     await shoot(page, `${prefix}-buka-materi`, 'Sesudah mengetuk "Buka materi"', opts);
     await dismissTour(page, prefix, opts);
-    if (await tap(page, /Mini Game|มินิเกม/)) { await page.waitForTimeout(1300); await playQuest(page, prefix, opts); }
+    /* m025-526: FIEZEL QUEST kini terbuka LANGSUNG sesudah "Buka materi" (tanpa tombol Mini Game).
+       Tanpa cabang pertama ini probe berhenti di tahap 1 dan memotret layar yang sama berulang. */
+    if (await page.evaluate(() => !!(self.FiezelGrammarVocabBridge && FiezelGrammarVocabBridge.getActiveMiniGame()))) await playQuest(page, prefix, opts);
+    else if (await tap(page, /Mini Game|มินิเกม/)) { await page.waitForTimeout(1300); await playQuest(page, prefix, opts); }
     await page.waitForTimeout(800);
     await shoot(page, `${prefix}-sesudah-quest`, 'Sesudah FIEZEL QUEST selesai', opts);
     if (await page.evaluate(() => !!document.querySelector('.grammar-start-hero'))) {
