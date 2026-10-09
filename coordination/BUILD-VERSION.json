@@ -1,7 +1,7 @@
 {
-  "version": "m025-537",
-  "claimedBy": "branch fix/profile-ui-ux-audit-repair-m025-538",
-  "claimedAt": "2026-10-09T18:36:07.608Z",
-  "reason": "fix(profile): overhaul ui-ux panel profil, hapus kelasku, safe zone dan kontras wcag",
+  "version": "m025-538",
+  "claimedBy": "branch feat/weplay-party-undercover-m025-538",
+  "claimedAt": "2026-10-09T20:09:44.383Z",
+  "reason": "feat(undercover): duplikasi gameplay weplay party game (m025-538)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
