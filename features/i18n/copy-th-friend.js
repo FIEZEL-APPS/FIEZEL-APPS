@@ -39,7 +39,7 @@
     'social3.share-profile': 'แชร์',
     'social3.handle-label': 'ID เพื่อน (Handle)',
     'social3.find-hint': 'ให้เพื่อนสแกน QR หรือค้นหาผ่าน ID ของคุณ',
-    'social3.tab-id-qr': 'ID & QR',
+    'social3.tab-id-qr': 'ID และ QR',
     'social3.tab-add-id': 'เพิ่ม ID',
     'social3.tab-requests': 'คำขอ',
 
