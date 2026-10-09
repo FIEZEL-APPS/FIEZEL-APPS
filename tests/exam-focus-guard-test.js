@@ -44,6 +44,19 @@ test('guard: kepergian di bawah masa tenggang dibuang, di atasnya dihitung', () 
   assert.strictEqual(s.episodes.length, 1);
 });
 
+test('guard: wajah hilang di bawah masa tenggang 10 detik dibuang, di atasnya dicatat', () => {
+  const s = FG.start('a1', 0);
+  FG.leaveFace(s, 1000);
+  assert.strictEqual(FG.backFace(s, 1000 + FG.FACE_GRACE_MS - 1), null, 'gerakan wajar di bawah 10 detik tidak dicatat');
+  assert.strictEqual(s.faceN, 0);
+  FG.leaveFace(s, 5000);
+  const ep = FG.backFace(s, 5000 + 15000);
+  assert.ok(ep && ep.ms === 15000);
+  assert.strictEqual(s.faceN, 1);
+  const p = FG.payload(s, 25000);
+  assert.deepStrictEqual(p, { n: 0, s: 0, x: 0, vn: 1, vs: 15, vx: 15 });
+});
+
 test('guard: blur + visibilitychange untuk satu kepergian hanya dihitung sekali', () => {
   const s = FG.start('a1', 0);
   FG.leave(s, 1000, 'blur');

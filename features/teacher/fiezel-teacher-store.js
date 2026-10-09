@@ -314,14 +314,32 @@
    * jadi angkanya dinormalkan lagi di sini. */
   function normalizeFocus(f) {
     var n = Math.max(0, Math.round(Number(f && f.n) || 0)), sec = Math.max(0, Math.round(Number(f && f.s) || 0));
-    return { n: n, s: sec, x: Math.max(0, Math.min(sec, Math.round(Number(f && f.x) || 0))), at: Date.now() };
+    var out = { n: n, s: sec, x: Math.max(0, Math.min(sec, Math.round(Number(f && f.x) || 0))), at: Date.now() };
+    if (f && (f.vn !== undefined || f.vs !== undefined)) {
+      var vn = Math.max(0, Math.round(Number(f.vn) || 0)), vsec = Math.max(0, Math.round(Number(f.vs) || 0));
+      out.vn = vn;
+      out.vs = vsec;
+      out.vx = Math.max(0, Math.min(vsec, Math.round(Number(f.vx) || 0)));
+    }
+    return out;
   }
   /** Laporan murid dikirim ulang berkali-kali; guru hanya perlu dibangunkan saat angkanya NAIK. */
   function focusGrew(prev, next) {
     var pn = Number(prev && prev.n) || 0, ps = Number(prev && prev.s) || 0;
-    return (Number(next && next.n) || 0) > pn || (Number(next && next.s) || 0) > ps;
+    var grewScreen = (Number(next && next.n) || 0) > pn || (Number(next && next.s) || 0) > ps;
+    var pvn = Number(prev && prev.vn) || 0, pvs = Number(prev && prev.vs) || 0;
+    var grewFace = (Number(next && next.vn) || 0) > pvn || (Number(next && next.vs) || 0) > pvs;
+    return grewScreen || grewFace;
   }
-  function focusOf(a, s) { return (a && a.focus && s && a.focus[s.id]) || null; }
+  function focusOf(a, s) {
+    var raw = (a && a.focus && s && a.focus[s.id]) || null;
+    if (!raw) return null;
+    if (!raw.vn) return raw;
+    return Object.assign({}, raw, {
+      n: (raw.n || 0) + (raw.vn || 0),
+      appN: raw.n || 0
+    });
+  }
   /* Kembaran EXAM_KINDS di klien dan server. Nilai yang tidak dikenal jatuh ke 'ujian' —
      bukan ditolak: kabar dengan label generik masih berguna, kabar yang hilang tidak. */
   var EXAM_LABEL = { assignment: 'ujian dari guru', reading_exam: 'ujian membaca', listening_exam: 'ujian menyimak', speaking_exam: 'ujian berbicara', writing_exam: 'ujian menulis', placement: 'tes penempatan', level_exam: 'ujian naik level' };
@@ -329,10 +347,18 @@
   function durasi(sec) { var n = Math.max(0, Math.round(Number(sec) || 0)); return n >= 60 ? Math.round(n / 60) + ' mnt' : n + ' dtk'; }
   /** Kalimat pendek untuk chip di layar guru. Menyebut fakta, tidak menuduh. */
   function focusLabel(f) {
-    if (!f || !f.n) return 'Tidak keluar layar';
-    return 'Keluar layar ' + f.n + '× · ' + durasi(f.s);
+    if (!f || (!f.n && !f.vn)) return 'Tidak keluar layar';
+    var appN = f.appN !== undefined ? f.appN : f.n;
+    if (appN && f.vn) return 'Keluar layar ' + appN + '× (' + durasi(f.s) + ') · Wajah tak terlihat ' + f.vn + '× (' + durasi(f.vs) + ')';
+    if (f.vn && !appN) return 'Wajah tak terlihat ' + f.vn + '× · ' + durasi(f.vs);
+    return 'Keluar layar ' + appN + '× · ' + durasi(f.s);
   }
-  function focusLevel(f) { return !f || !f.n ? 'bersih' : (f.n >= 3 || f.s >= 30 ? 'berat' : 'ringan'); }
+  function focusLevel(f) {
+    if (!f || (!f.n && !f.vn)) return 'bersih';
+    var totalN = (Number(f.n) || 0) + (Number(f.vn) || 0);
+    var totalS = (Number(f.s) || 0) + (Number(f.vs) || 0);
+    return totalN >= 3 || totalS >= 30 ? 'berat' : 'ringan';
+  }
   /** Masukkan hasil murid ke kelas: perbarui murid yang ada (nama depan sama) atau tambah baru. Skill digabung per-skill. */
   function ingest(c, parsed) {
     var s = c.students.filter(function (x) { return x.name.toLowerCase() === parsed.name.toLowerCase(); })[0], isNew = false;
@@ -596,8 +622,12 @@
       // Kotak masuk guru bertahan 30 hari dan dibaca ulang tiap render; satu entri lama tanpa
       // `f` tidak boleh mematikan seluruh panel, jadi bentuknya dijamin di sini, bukan diandaikan.
       var f = e.f || { n: 0, s: 0 }, berat = focusLevel(f) === 'berat';
+      var bagian = [];
+      if (f.n) bagian.push((Number(f.n) || 0) + '× keluar layar (' + durasi(f.s) + ')');
+      if (f.vn) bagian.push((Number(f.vn) || 0) + '× wajah tak terlihat (' + durasi(f.vs) + ')');
+      var ringkas = bagian.length > 1 ? bagian.join(', ') : (f.vn ? (Number(f.vn) || 0) + '× wajah tak terlihat · ' + durasi(f.vs) : (Number(f.n) || 0) + '× · ' + durasi(f.s));
       return (berat ? '⚠ Perlu ditengok: ' : '⚠ ') + e.student + ' keluar dari layar saat mengerjakan ' +
-        (e.mode === 'ujian' ? 'ujian' : 'tugas') + ' “' + e.title + '” — ' + (Number(f.n) || 0) + '× · ' + durasi(f.s) +
+        (e.mode === 'ujian' ? 'ujian' : 'tugas') + ' “' + e.title + '” — ' + ringkas +
         (berat ? '. Tanyakan ke muridnya sebelum menilai.' : '');
     }
     return e.text || '';
