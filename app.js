@@ -9252,7 +9252,7 @@ function examWatchSync(){
 }
 try{document.addEventListener('fiezel-exam-lock',examWatchSync)}catch(_){}
 
-function go(v,opts){if(v==='undercover'){window.location.href='./undercover.html';return true}if((v==='ask'||v==='search')&&!aiDoorAllowed())return false;if(isVerifiedTeacher()&&v!=='tutor'){v='tutor'}if(!VALID_VIEWS.has(v)){showToast(FiezelI18n.t('nav.halaman-tak-tersedia'));return false}/* m025-314: penolakan berbahasa duduk DI SINI, bukan di daftar kartu — setiap pintu ke permukaan yang belum punya isi bahasa target lewat go(), termasuk pintu yang belum ditulis. */if(targetLangSurfaceBlocked(v)){showToast(FiezelI18n.t('bahasa.permukaan-terkunci',{bahasa:FiezelI18n.t('bahasa.'+activeTargetLang())}));return false}if(opts?.viaHistory!==true)haptic('tap');uiSfx('nav');dropStages();if(opts?.viaHistory!==true)pushBackNavView(v);state.view=v;if(v==='classroom'||v==='home'){try{inboxPoll(v==='classroom')}catch(_){}if(v==='home'){try{const cur=Number(sessionStorage.getItem('fz_today_vocab_visit')||0);sessionStorage.setItem('fz_today_vocab_visit',String(cur+1))}catch(_){}}}try{const _targetView=(typeof TAB_PARENT!=='undefined'&&TAB_PARENT[v])?TAB_PARENT[v]:v;const _targetBtn=document.querySelector(`.bottomnav [data-view="${_targetView}"]`);if(_targetBtn)syncNavActivePill(_targetBtn)}catch(_){}const swap=()=>{save();render()};const isBottomTab=['home','latihan','classroom','game','progress','online','profile'].includes(v);if(!isBottomTab&&document.startViewTransition&&state.preferences?.motion!==false&&!prefersReducedMotion()){vtViewPaint=true;try{const __vt=document.startViewTransition(swap);const __done=()=>{vtViewPaint=false};if(__vt&&__vt.finished&&typeof __vt.finished.finally==='function')__vt.finished.finally(__done);else setTimeout(__done,300)}catch(_){try{swap()}finally{vtViewPaint=false}}}else swap();return true} window.go=go;
+function go(v,opts){if((v==='ask'||v==='search')&&!aiDoorAllowed())return false;if(v==='undercover'){window.location.href='./undercover.html';return true}if(isVerifiedTeacher()&&v!=='tutor'){v='tutor'}if(!VALID_VIEWS.has(v)){showToast(FiezelI18n.t('nav.halaman-tak-tersedia'));return false}/* m025-314: penolakan berbahasa duduk DI SINI, bukan di daftar kartu — setiap pintu ke permukaan yang belum punya isi bahasa target lewat go(), termasuk pintu yang belum ditulis. */if(targetLangSurfaceBlocked(v)){showToast(FiezelI18n.t('bahasa.permukaan-terkunci',{bahasa:FiezelI18n.t('bahasa.'+activeTargetLang())}));return false}if(opts?.viaHistory!==true)haptic('tap');uiSfx('nav');dropStages();if(opts?.viaHistory!==true)pushBackNavView(v);state.view=v;if(v==='classroom'||v==='home'){try{inboxPoll(v==='classroom')}catch(_){}if(v==='home'){try{const cur=Number(sessionStorage.getItem('fz_today_vocab_visit')||0);sessionStorage.setItem('fz_today_vocab_visit',String(cur+1))}catch(_){}}}try{const _targetView=(typeof TAB_PARENT!=='undefined'&&TAB_PARENT[v])?TAB_PARENT[v]:v;const _targetBtn=document.querySelector(`.bottomnav [data-view="${_targetView}"]`);if(_targetBtn)syncNavActivePill(_targetBtn)}catch(_){}const swap=()=>{save();render()};const isBottomTab=['home','latihan','classroom','game','progress','online','profile'].includes(v);if(!isBottomTab&&document.startViewTransition&&state.preferences?.motion!==false&&!prefersReducedMotion()){vtViewPaint=true;try{const __vt=document.startViewTransition(swap);const __done=()=>{vtViewPaint=false};if(__vt&&__vt.finished&&typeof __vt.finished.finally==='function')__vt.finished.finally(__done);else setTimeout(__done,300)}catch(_){try{swap()}finally{vtViewPaint=false}}}else swap();return true} window.go=go;
 function handleTopbarBack(){if(typeof go!=='function')return;const subViews=['grammar','vocab','skills','listening','speaking','reading','writing','library','kana','ask','search'];if(subViews.includes(state.view)){go('latihan')}else{go('home')}} window.handleTopbarBack=handleTopbarBack;
 function pushBackNavView(v){try{return self.FiezelBackNav?.pushView?.(v)===true}catch{return false}}
 /* ---- m025-117 lapisan layar-di-dalam-view (stage) ---------------------------------
@@ -19660,13 +19660,34 @@ function socialCopyWithFallback(text,doneKey,failKey,params){
   fail();return false;
 }
 function socialCopyId(){
-  const handle=socialProfileCache?.handle||storedSocialHandle();
+  const candName=(state.userName && state.userName.toLowerCase()!=='murid' && typeof socialHandleCandidates==='function')
+    ? socialHandleCandidates(state.userName)[0]
+    : '';
+  const gEmail=self.FiezelGoogle?.rememberedEmail?.()||'';
+  const emailPrefix=gEmail?gEmail.split('@')[0].toLowerCase():'';
+  let handle=socialProfileCache?.handle||storedSocialHandle()||'';
+  if(handle && emailPrefix && handle.toLowerCase()===emailPrefix && candName && !socialProfileCache?.handle){
+    handle=candName;
+    try{rememberSocialHandle(candName)}catch(_){}
+  }
+  if(!handle && candName)handle=candName;
   if(!handle)return false;
   return socialCopyWithFallback(handle,'social3.copy-id-done','social3.copy-id-fail',{handle});
 }
 window.socialCopyId=socialCopyId;
 function openProfileQr(){
-  const handle=socialProfileCache?.handle||storedSocialHandle()||(state.userName?String(state.userName).trim().toLowerCase().replace(/[^a-z0-9_]/g,'_'):'');
+  const candName=(state.userName && state.userName.toLowerCase()!=='murid' && typeof socialHandleCandidates==='function')
+    ? socialHandleCandidates(state.userName)[0]
+    : '';
+  const gEmail=self.FiezelGoogle?.rememberedEmail?.()||'';
+  const emailPrefix=gEmail?gEmail.split('@')[0].toLowerCase():'';
+  let handle=socialProfileCache?.handle||storedSocialHandle()||'';
+  if(handle && emailPrefix && handle.toLowerCase()===emailPrefix && candName && !socialProfileCache?.handle){
+    handle=candName;
+    try{rememberSocialHandle(candName)}catch(_){}
+  }
+  if(!handle && candName)handle=candName;
+  if(!handle && state.userName)handle=String(state.userName).trim().toLowerCase().replace(/[^a-z0-9_]/g,'_');
   if(!handle)return showToast(FiezelI18n.t('social3.qr-need-profile','Profil sosial belum terdaftar.'));
   const qr=socialQrCore();
   if(!qr)return showToast(FiezelI18n.t('social3.qr-fail','Gagal membuat kode QR.'));
