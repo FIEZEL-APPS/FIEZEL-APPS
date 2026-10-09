@@ -68,4 +68,7 @@ check(!pkgSrc.includes('"jsqr"'), 'package.json tidak boleh memuat dependensi js
 const indexHtml = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 check(indexHtml.includes('type="fiezel/lazy"') && indexHtml.includes('data-fiezel-lazy="qr"'), 'index.html harus memuat jsqr.js via lazy loader');
 
+// Test 8: Verifikasi pengikatan FiezelLazy pada ensureQrDecoderLoaded
+check(appSrc.includes('ensureQrDecoderLoaded') && appSrc.includes('FiezelLazy'), 'ensureQrDecoderLoaded harus memeriksa FiezelLazy');
+
 console.log(`qr-scanner-test: ${pass}/${pass} assert PASS`);
