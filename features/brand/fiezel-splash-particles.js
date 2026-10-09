@@ -127,12 +127,12 @@
   }
 
   /* Jumlah partikel adaptif: layar luas + DPR tinggi → mendekati 2200;
-     layar sempit (ponsel) / DPR rendah → turun mendekati 1400 agar 60fps. */
+     layar sempit (ponsel) / DPR rendah → adaptif hemat fill-rate agar 60fps mulus. */
   function adaptiveCount(w, h, ratio) {
     var n = Math.round((w * h) / 640);
     if (ratio < 1.5) n = Math.round(n * 0.85);
     var lo = 1400, hi = 2200;
-    if (Math.min(w, h) < 480) { lo = 1400; hi = 1700; } // ponsel: hemat fill-rate
+    if (Math.min(w, h) < 480) { lo = 480; hi = 680; } // ponsel: hemat fill-rate & CPU untuk 60fps
     return Math.max(lo, Math.min(hi, n));
   }
 
@@ -287,9 +287,10 @@
       ctx = cv.getContext('2d');
       if (!ctx) return false;
       _emit = typeof opts.emit === 'function' ? opts.emit : null;
-      dpr = Math.max(1, Math.min(2, (root && root.devicePixelRatio) || 1));
       cssW = cv.clientWidth || cv.width;
       cssH = cv.clientHeight || cv.height;
+      var maxDpr = Math.min(cssW, cssH) < 480 ? 1.5 : 2;
+      dpr = Math.max(1, Math.min(maxDpr, (root && root.devicePixelRatio) || 1));
       cv.width = Math.round(cssW * dpr);
       cv.height = Math.round(cssH * dpr);
 
@@ -420,9 +421,15 @@
         else spr = sprites[lastCol];
 
         // Transform per titik: rotasi searah kecepatan + skala len×wid.
-        var kx = len / 24 * dpr, ky = wid / 24 * dpr;
-        ctx.setTransform(cs * kx, sn * kx, -sn * ky, cs * ky, x * dpr, y * dpr);
-        ctx.drawImage(spr, -12, -12);
+        if (sp2 <= 0.09) {
+          var kx = s / 24 * dpr;
+          ctx.setTransform(kx, 0, 0, kx, x * dpr, y * dpr);
+          ctx.drawImage(spr, -12, -12);
+        } else {
+          var kx = len / 24 * dpr, ky = wid / 24 * dpr;
+          ctx.setTransform(cs * kx, sn * kx, -sn * ky, cs * ky, x * dpr, y * dpr);
+          ctx.drawImage(spr, -12, -12);
+        }
       }
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.globalAlpha = 1;

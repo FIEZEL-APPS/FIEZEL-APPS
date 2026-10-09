@@ -470,34 +470,76 @@
     tryNext(0);
   }
 
+  function isSplashActive() {
+    if (global.__fiezelBootSplashDismissed) return false;
+    var sp = global.document.getElementById('fiezelBootSplash') ||
+             global.document.querySelector('[data-fiezel-boot-splash]:not([data-fiezel-boot-claimed="disposed"])');
+    return !!(sp && sp.parentNode && !sp.classList.contains('is-leaving'));
+  }
+
   function init() {
-    ensureMochiModule();
+    function start() {
+      ensureMochiModule();
 
-    // DOM MutationObserver for dynamically inserted quiz stages and practice panels (debounced)
-    try {
-      var moTimer = null;
-      var mo = new MutationObserver(function (mutations) {
-        var hasAdded = false;
-        for (var i = 0; i < mutations.length; i++) {
-          if (mutations[i].addedNodes && mutations[i].addedNodes.length > 0) {
-            hasAdded = true;
-            break;
+      // DOM MutationObserver for dynamically inserted quiz stages and practice panels (debounced)
+      try {
+        var moTimer = null;
+        var mo = new MutationObserver(function (mutations) {
+          var hasAdded = false;
+          for (var i = 0; i < mutations.length; i++) {
+            if (mutations[i].addedNodes && mutations[i].addedNodes.length > 0) {
+              hasAdded = true;
+              break;
+            }
           }
-        }
-        if (hasAdded) {
-          if (moTimer) clearTimeout(moTimer);
-          moTimer = setTimeout(scanAndAttach, 60);
-        }
-      });
-      mo.observe(global.document.body || global.document.documentElement, {
-        childList: true,
-        subtree: true
-      });
-    } catch (_) {}
+          if (hasAdded) {
+            if (moTimer) clearTimeout(moTimer);
+            moTimer = setTimeout(scanAndAttach, 60);
+          }
+        });
+        mo.observe(global.document.body || global.document.documentElement, {
+          childList: true,
+          subtree: true
+        });
+      } catch (_) {}
 
-    // Global custom element defined hook
-    if (global.customElements && typeof global.customElements.whenDefined === 'function') {
-      global.customElements.whenDefined('fiezel-mascot').then(scanAndAttach).catch(function () {});
+      // Global custom element defined hook
+      if (global.customElements && typeof global.customElements.whenDefined === 'function') {
+        global.customElements.whenDefined('fiezel-mascot').then(scanAndAttach).catch(function () {});
+      }
+    }
+
+    if (isSplashActive()) {
+      var started = false;
+      var checkTimer = null;
+      var fallbackTimer = null;
+      function onceStart() {
+        if (started) return;
+        started = true;
+        if (checkTimer) clearInterval(checkTimer);
+        if (fallbackTimer) clearTimeout(fallbackTimer);
+        start();
+      }
+      checkTimer = setInterval(function () {
+        if (!isSplashActive()) onceStart();
+      }, 100);
+      try {
+        global.addEventListener('fiezel:splash-dismissed', onceStart, { once: true });
+      } catch (_) {}
+      fallbackTimer = setTimeout(function () {
+        if (!isSplashActive()) {
+          onceStart();
+        } else {
+          var safety = setInterval(function () {
+            if (!isSplashActive()) {
+              clearInterval(safety);
+              onceStart();
+            }
+          }, 200);
+        }
+      }, 5000);
+    } else {
+      start();
     }
   }
 
