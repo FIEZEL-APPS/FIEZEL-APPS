@@ -351,9 +351,10 @@
   function focusLabel(f) {
     if (!f || (!f.n && !f.vn)) return 'Tidak keluar layar';
     var appN = f.appN !== undefined ? f.appN : f.n;
-    if (appN && f.vn) return 'Keluar layar ' + appN + '× (' + durasi(f.s) + ') · Wajah tak terlihat ' + f.vn + '× (' + durasi(f.vs) + ')';
+    var appS = f.appS !== undefined ? f.appS : f.s;
+    if (appN && f.vn) return 'Keluar layar ' + appN + '× (' + durasi(appS) + ') · Wajah tak terlihat ' + f.vn + '× (' + durasi(f.vs) + ')';
     if (f.vn && !appN) return 'Wajah tak terlihat ' + f.vn + '× · ' + durasi(f.vs);
-    return 'Keluar layar ' + appN + '× · ' + durasi(f.s);
+    return 'Keluar layar ' + appN + '× · ' + durasi(appS);
   }
   function focusLevel(f) {
     if (!f || (!f.n && !f.vn)) return 'bersih';

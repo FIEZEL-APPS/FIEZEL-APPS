@@ -78,9 +78,8 @@
           skinHits++;
         }
       }
-      var avgBr = totalBright / count;
-      // Jika kamera tertutup total atau sangat gelap (< 8) atau tanpa pola (skinHits < 2%)
-      if (avgBr < 8 || (skinHits / count < 0.02 && avgBr < 20)) {
+      // Jika kamera tertutup total atau sangat gelap (< 8) atau tanpa pola kulit (< 2%)
+      if (avgBr < 8 || skinHits / count < 0.02) {
         return false;
       }
       return true;
@@ -164,7 +163,12 @@
       audio: false
     };
 
+    state.stopping = false;
     return navigator.mediaDevices.getUserMedia(constraints).then(function (mediaStream) {
+      if (state.stopping || !state.options) {
+        try { mediaStream.getTracks().forEach(function (t) { t.stop(); }); } catch (_) {}
+        return { ok: false, reason: 'aborted' };
+      }
       state.stream = mediaStream;
       state.active = true;
 
@@ -202,6 +206,7 @@
   }
 
   function stop() {
+    state.stopping = true;
     if (state.timer) {
       clearInterval(state.timer);
       state.timer = null;
