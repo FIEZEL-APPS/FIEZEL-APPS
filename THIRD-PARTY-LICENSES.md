@@ -26,6 +26,15 @@ Project: https://lucide.dev/
 License: ISC. Salinan lisensi tersedia di `LUCIDE-LICENSE.txt`.
 
 
+## jsQR 1.4.0
+
+FIEZEL membundel pustaka pembaca kode QR murni JavaScript `jsQR` di `features/social/jsqr.js` untuk pemindaian kamera dan galeri (dimuat secara malas / lazy-loaded).
+
+Project: https://github.com/cozmo/jsQR
+Copyright (c) 2017 Cosmo Wolfe
+License: Apache-2.0. Teks lisensi disertakan pada header berkas `features/social/jsqr.js`.
+
+
 ## web-push 3.6.7
 Used only by the scheduled push dispatcher. License: MPL-2.0. Source package: web-push-libs/web-push.
 

@@ -34,6 +34,14 @@
     'social3.qr-share-body': 'มาเป็นเพื่อนกันบน FIEZEL สแกนหรือเปิดลิงก์นี้:',
     'social3.qr-fail': 'ตอนนี้สร้าง QR โค้ดไม่ได้ ลองใหม่ภายหลัง',
     'social3.qr-need-profile': 'สร้าง ID ออนไลน์ก่อน เพื่อให้ QR โค้ดของคุณแสดงได้',
+    'social3.qr-unavailable': 'ยังไม่มี QR โค้ด',
+    'social3.download-qr': 'ดาวน์โหลด QR',
+    'social3.share-profile': 'แชร์',
+    'social3.handle-label': 'ID เพื่อน (Handle)',
+    'social3.find-hint': 'ให้เพื่อนสแกน QR หรือค้นหาผ่าน ID ของคุณ',
+    'social3.tab-id-qr': 'ID & QR',
+    'social3.tab-add-id': 'เพิ่ม ID',
+    'social3.tab-requests': 'คำขอ',
 
     /* ── สแกน QR กล้อง & อัปโหลดจากคลังภาพ ──────────────────────────────────── */
     'social3.scan-title': 'สแกน QR โค้ด',

@@ -1,7 +1,7 @@
 {
-  "version": "m025-528",
-  "claimedBy": "branch fix/m025-528-teacher-dashboard-uiux-overhaul",
-  "claimedAt": "2026-10-09T10:43:20.468Z",
-  "reason": "fix(teacher): overhaul ui/ux dashboard guru emerald palette and universal layout",
+  "version": "m025-529",
+  "claimedBy": "branch fix/m025-528-audit-social-qr-cleanup",
+  "claimedAt": "2026-10-09T11:15:45.644Z",
+  "reason": "fix(social,qr,i18n): batching d1 worker, lazy load jsqr, i18n thai modal qr, dan deploy filter (m025-528)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

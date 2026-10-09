@@ -1165,8 +1165,8 @@ html.fz-booting body{overflow:hidden}
        Inti mandiri (tidak menyentuh DOM saat dimuat); app.js membacanya di belakang
        try/catch saat modal QR dibuka. Dimuat sebelum app.js. -->
   <script defer src="./features/social/fiezel-qr.js"></script>
-  <!-- SISTEM SCAN QRIS / TEMAN: dekoder QR universal jsQR untuk pemindaian kamera & galeri -->
-  <script defer src="./features/social/jsqr.js"></script>
+  <!-- SISTEM SCAN QRIS / TEMAN: dekoder QR universal jsQR untuk pemindaian kamera & galeri (dimuat malas saat fitur Pindai aktif) -->
+  <script type="fiezel/lazy" data-fiezel-lazy="qr" src="./features/social/jsqr.js"></script>
   <!-- PANGGUNG SUARA LIVE (SLOT 13): mesin permainan Sarang Tabu + transport WebRTC P2P.
        Keduanya inti mandiri (pola gems-core/fiezel-social: tanpa import, tanpa menyentuh
        state app.js) dan dimuat SEBELUM app.js supaya kait buka drawer menemukannya sejak

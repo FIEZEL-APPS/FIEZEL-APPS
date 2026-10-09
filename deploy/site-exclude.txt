@@ -27,7 +27,10 @@ php.ini
 .user.ini
 
 # --- infrastruktur repo, bukan aplikasi ---
-.git/
+.git*
+.emergent/
+.assetsignore
+.cpanel.yml
 .github/
 node_modules/
 coordination/
@@ -116,6 +119,9 @@ release-audit.py
 # --- artefak yang dihasilkan ulang, bergantung lingkungan ---
 *-REPORT.json
 FINAL-AUDIT-REPORT.json
+batch-*.json
+id-golden-baseline.json
+*-state.json
 package.json
 package-lock.json
 *.bak
