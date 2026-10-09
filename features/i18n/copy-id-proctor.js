@@ -19,6 +19,9 @@
   if (!I18N || typeof I18N.registerCopy !== 'function') return;
   I18N.registerCopy('id', {
     'proctor.aktif': 'Mode ujian: kalau kamu keluar dari layar ini, gurumu menerima catatannya.',
+    'proctor.kamera-aktif': 'Kamera ujian aktif',
+    'proctor.wajah-peringatan': 'Wajah tidak terdeteksi di kamera depan. Harap menghadap layar HP agar ujian tidak ditandai pengawas.',
+    'proctor.wajah-tercatat': 'Wajah tidak terlihat {vn}× ({detik} detik). Catatannya terkirim ke gurumu.',
     'proctor.tercatat': 'Tercatat keluar layar {n}× ({detik} detik). Gurumu sudah menerima catatannya.',
     'proctor.kembali-toast': 'Kamu keluar dari layar ujian {n}× ({detik} detik terakhir). Catatannya sudah sampai ke gurumu.',
     'proctor.guru-chip': 'Keluar layar {n}×',

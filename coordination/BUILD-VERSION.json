@@ -1,7 +1,7 @@
 {
-  "version": "m025-539",
-  "claimedBy": "branch feat/owner-dashboard-student-gmail-directory",
-  "claimedAt": "2026-10-09T20:42:29.968Z",
-  "reason": "feat(owner): sinkronisasi data akun murid dan email gmail ke dashboard owner (m025-539)",
+  "version": "m025-540",
+  "claimedBy": "branch feat/kelasku-exam-face-presence-guard-m025-539",
+  "claimedAt": "2026-10-09T21:02:03.761Z",
+  "reason": "feat(proctor): detektor kehadiran wajah kamera kelasku dan telemetri pengawas guru (m025-540)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

@@ -39,6 +39,8 @@
   var SCHEMA = 'fiezel-focus-guard-v1';
   // Di bawah ini = gangguan sistem, bukan kepergian. Lihat catatan kepala berkas.
   var GRACE_MS = 1500;
+  // Masa tenggang wajah tidak terlihat (10 detik): menunduk singkat atau jeda wajar bukan pelanggaran.
+  var FACE_GRACE_MS = 10000;
   // Bukti per-episode yang disimpan lokal (guru hanya menerima agregatnya).
   var EPISODES_MAX = 20;
   // Sebuah episode tunggal tidak mungkin lebih lama dari satu sesi ujian yang wajar.
@@ -53,7 +55,11 @@
 
   /** State awal untuk satu sesi ujian. `aid` = id tugas, dipakai saat melapor. */
   function start(aid, at) {
-    return { schema: SCHEMA, aid: String(aid || ''), startedAt: Math.round(num(at)), awaySince: 0, awayReason: '', n: 0, ms: 0, longestMs: 0, episodes: [] };
+    return {
+      schema: SCHEMA, aid: String(aid || ''), startedAt: Math.round(num(at)),
+      awaySince: 0, awayReason: '', n: 0, ms: 0, longestMs: 0, episodes: [],
+      faceAwaySince: 0, faceN: 0, faceMs: 0, faceLongestMs: 0, faceEpisodes: []
+    };
   }
 
   /** Terima state dari localStorage. Bentuk yang tidak dikenal -> null (pemanggil mulai baru). */
@@ -64,7 +70,13 @@
       awaySince: Math.round(num(raw.awaySince)), awayReason: raw.awaySince ? reasonOf(raw.awayReason) : '',
       n: Math.max(0, Math.round(num(raw.n))), ms: clampSpan(raw.ms), longestMs: clampSpan(raw.longestMs),
       episodes: (Array.isArray(raw.episodes) ? raw.episodes : []).slice(-EPISODES_MAX)
-        .map(function (e) { return { at: Math.round(num(e && e.at)), ms: clampSpan(e && e.ms), r: reasonOf(e && e.r) }; })
+        .map(function (e) { return { at: Math.round(num(e && e.at)), ms: clampSpan(e && e.ms), r: reasonOf(e && e.r) }; }),
+      faceAwaySince: Math.round(num(raw.faceAwaySince)),
+      faceN: Math.max(0, Math.round(num(raw.faceN))),
+      faceMs: clampSpan(raw.faceMs),
+      faceLongestMs: clampSpan(raw.faceLongestMs),
+      faceEpisodes: (Array.isArray(raw.faceEpisodes) ? raw.faceEpisodes : []).slice(-EPISODES_MAX)
+        .map(function (e) { return { at: Math.round(num(e && e.at)), ms: clampSpan(e && e.ms) }; })
     };
   }
 
@@ -98,33 +110,68 @@
   }
 
   /**
+   * Wajah tidak terdeteksi di kamera depan.
+   */
+  function leaveFace(state, at) {
+    if (!state || state.faceAwaySince) return state;
+    state.faceAwaySince = Math.round(num(at));
+    return state;
+  }
+
+  /**
+   * Wajah kembali terdeteksi. Hanya dicatat bila melewati masa tenggang FACE_GRACE_MS (10 detik).
+   */
+  function backFace(state, at) {
+    if (!state || !state.faceAwaySince) return null;
+    var span = clampSpan(Math.round(num(at)) - state.faceAwaySince);
+    var episode = { at: state.faceAwaySince, ms: span };
+    state.faceAwaySince = 0;
+    if (span < FACE_GRACE_MS) return null;
+    state.faceN = Math.max(0, Math.round(num(state.faceN))) + 1;
+    state.faceMs = clampSpan((state.faceMs || 0) + span);
+    if (span > (state.faceLongestMs || 0)) state.faceLongestMs = span;
+    state.faceEpisodes = (state.faceEpisodes || []).concat([episode]).slice(-EPISODES_MAX);
+    return episode;
+  }
+
+  /**
    * Ringkasan saat ini. `at` dipakai untuk menghitung episode yang MASIH berjalan supaya
    * guru melihat "sedang di luar layar 40 detik", bukan menunggu murid kembali dulu —
    * itulah bagian realtime-nya.
    */
   function summary(state, at) {
-    if (!state) return { n: 0, ms: 0, longestMs: 0, away: false, awayMs: 0 };
+    if (!state) return { n: 0, ms: 0, longestMs: 0, away: false, awayMs: 0, vn: 0, vs: 0, vx: 0, faceAway: false, faceAwayMs: 0 };
     var live = state.awaySince ? clampSpan(Math.round(num(at)) - state.awaySince) : 0;
     var counted = live >= GRACE_MS;
+    var faceLive = state.faceAwaySince ? clampSpan(Math.round(num(at)) - state.faceAwaySince) : 0;
+    var faceCounted = faceLive >= FACE_GRACE_MS;
     return {
       n: state.n + (counted ? 1 : 0),
       ms: clampSpan(state.ms + (counted ? live : 0)),
       longestMs: counted && live > state.longestMs ? live : state.longestMs,
       away: !!state.awaySince,
-      awayMs: live
+      awayMs: live,
+      vn: (state.faceN || 0) + (faceCounted ? 1 : 0),
+      vs: clampSpan((state.faceMs || 0) + (faceCounted ? faceLive : 0)),
+      vx: faceCounted && faceLive > (state.faceLongestMs || 0) ? faceLive : (state.faceLongestMs || 0),
+      faceAway: !!state.faceAwaySince,
+      faceAwayMs: faceLive
     };
   }
 
   /**
-   * Bentuk yang dikirim ke guru (assign.f pada class-report): TIGA BILANGAN dan tidak
-   * lebih — berapa kali (n), total detik di luar (s), dan kepergian terlama (x). Tanpa
-   * jam presisi, tanpa nama aplikasi, tanpa teks bebas: guru perlu tahu ada celah yang
-   * terbuka, bukan mengintip isi ponsel murid. Detik, bukan milidetik, karena presisi
-   * milidetik hanya menambah kesan pengawasan tanpa menambah keputusan yang bisa diambil.
+   * Bentuk yang dikirim ke guru (assign.f pada class-report): TIGA BILANGAN standar (n, s, x)
+   * ditambah tiga bilangan visual (vn, vs, vx) HANYA BILA ada catatan wajah hilang.
    */
   function payload(state, at) {
     var s = summary(state, at);
-    return { n: s.n, s: Math.round(s.ms / 1000), x: Math.round(s.longestMs / 1000) };
+    var p = { n: s.n, s: Math.round(s.ms / 1000), x: Math.round(s.longestMs / 1000) };
+    if (s.vn > 0 || s.vs > 0) {
+      p.vn = s.vn;
+      p.vs = Math.round(s.vs / 1000);
+      p.vx = Math.round(s.vx / 1000);
+    }
+    return p;
   }
 
   /**
@@ -134,14 +181,15 @@
    * yang cukup untuk membuka sumber lain. Keputusannya tetap milik guru.
    */
   function severity(sum) {
-    var n = Math.max(0, Math.round(num(sum && sum.n))), ms = clampSpan(sum && sum.ms);
+    var n = Math.max(0, Math.round(num(sum && sum.n))) + Math.max(0, Math.round(num(sum && sum.vn)));
+    var ms = clampSpan(sum && sum.ms) + clampSpan(sum && sum.vs);
     if (!n) return 'bersih';
     if (n >= 3 || ms >= 30000) return 'berat';
     return 'ringan';
   }
 
   return {
-    SCHEMA: SCHEMA, GRACE_MS: GRACE_MS, EPISODES_MAX: EPISODES_MAX, EPISODE_MS_MAX: EPISODE_MS_MAX, REASONS: REASONS,
-    start: start, restore: restore, leave: leave, back: back, summary: summary, payload: payload, severity: severity
+    SCHEMA: SCHEMA, GRACE_MS: GRACE_MS, FACE_GRACE_MS: FACE_GRACE_MS, EPISODES_MAX: EPISODES_MAX, EPISODE_MS_MAX: EPISODE_MS_MAX, REASONS: REASONS,
+    start: start, restore: restore, leave: leave, back: back, leaveFace: leaveFace, backFace: backFace, summary: summary, payload: payload, severity: severity
   };
 });

@@ -25,6 +25,7 @@
   var SUB_KEY = 'fiezel-class-submissions-v1', UI_KEY = 'fiezel-class-hub-v1';
   function R() { return root.FiezelBraincoreReview; }
   function FG() { return root.FiezelFocusGuard; }
+  function FaceG() { return root.FiezelFaceGuard; }
   function T() { return root.FiezelTeacherStore; }
   function B() { return root.FiezelReviewBank; }
   function LF() { return root.FiezelLearnerFlow; }
@@ -890,6 +891,47 @@
     if (sEl) renderStudent();
     if (sEnv.toast) sEnv.toast(t('proctor.kembali-toast', 'Kamu keluar dari layar ujian {n}× ({detik} detik terakhir). Catatannya sudah sampai ke gurumu.', { n: sum.n, detik: Math.round(ep.ms / 1000) }));
   }
+  function startFaceGuard() {
+    var face = FaceG(); if (!face || !isExamRunner()) return;
+    try {
+      face.start({
+        onAbsent: function (at) {
+          var u = ui(), st = u.focus; if (!st || !FG() || !isExamRunner()) return;
+          FG().leaveFace(st, at || Date.now());
+          saveFocus(st);
+        },
+        onWarning: function (warn) {
+          ui().faceWarn = !!warn;
+          if (sEl) renderStudent();
+        },
+        onAbsentEpisode: function (elapsed) {
+          var u = ui(), st = u.focus; if (!st || !FG() || !isExamRunner()) return;
+          if (!st.faceAwaySince) {
+            FG().leaveFace(st, Date.now() - (elapsed || 10000));
+          }
+          saveFocus(st);
+          reportFocus(st);
+        },
+        onPresent: function () {
+          var u = ui(), st = u.focus; if (!st || !FG()) return;
+          var ep = FG().backFace(st, Date.now());
+          ui().faceWarn = false;
+          saveFocus(st);
+          if (ep) {
+            reportFocus(st);
+            var sum = FG().summary(st, Date.now());
+            if (sEl) renderStudent();
+            if (sEnv.toast) sEnv.toast(t('proctor.wajah-tercatat', 'Wajah tidak terlihat {vn}× ({detik} detik). Catatannya terkirim ke gurumu.', { vn: sum.vn, detik: Math.round(ep.ms / 1000) }));
+          }
+        }
+      });
+    } catch (_) {}
+  }
+  function stopFaceGuard() {
+    var face = FaceG(); if (!face) return;
+    try { face.stop(); } catch (_) {}
+    ui().faceWarn = false;
+  }
   function bindFocus() {
     if (focusBound || !root.document || !root.addEventListener) return;
     focusBound = {
@@ -902,8 +944,10 @@
     root.addEventListener('pagehide', focusBound.hide);
     root.addEventListener('blur', focusBound.blur);
     root.addEventListener('focus', focusBound.focus);
+    startFaceGuard();
   }
   function unbindFocus() {
+    stopFaceGuard();
     if (focusGraceTimer) { clearTimeout(focusGraceTimer); focusGraceTimer = null; }
     if (focusTrailTimer) { clearTimeout(focusTrailTimer); focusTrailTimer = null; }
     if (!focusBound) return;
@@ -929,8 +973,16 @@
   }
   function focusBanner() {
     var st = ui().focus, sum = st && FG() ? FG().summary(st, Date.now()) : null;
-    if (!sum || !sum.n) return '<p class="ch-proctor" data-testid="class-proctor-notice">' + icon('shield-check') + ' ' + esc(t('proctor.aktif', 'Mode ujian: kalau kamu keluar dari layar ini, gurumu menerima catatannya.')) + '</p>';
-    return '<p class="ch-proctor is-warn" data-testid="class-proctor-warn">' + icon('eye-off') + ' ' + esc(t('proctor.tercatat', 'Tercatat keluar layar {n}× ({detik} detik). Gurumu sudah menerima catatannya.', { n: sum.n, detik: Math.round(sum.ms / 1000) })) + '</p>';
+    var face = FaceG(), faceActive = face && face.isActive();
+    var facePill = faceActive ? ' <span class="ch-camera-pill" data-testid="class-camera-pill">● ' + esc(t('proctor.kamera-aktif', 'Kamera ujian aktif')) + '</span>' : '';
+    if (ui().faceWarn) {
+      return '<p class="ch-proctor is-warn ch-proctor-face" data-testid="class-proctor-face-warn">' + icon('alert-triangle') + ' ' + esc(t('proctor.wajah-peringatan', 'Wajah tidak terdeteksi di kamera depan. Harap menghadap layar HP agar ujian tidak ditandai pengawas.')) + '</p>';
+    }
+    if (!sum || (!sum.n && !sum.vn)) return '<p class="ch-proctor" data-testid="class-proctor-notice">' + icon('shield-check') + ' ' + esc(t('proctor.aktif', 'Mode ujian: kalau kamu keluar dari layar ini, gurumu menerima catatannya.')) + facePill + '</p>';
+    var catatan = [];
+    if (sum.n) catatan.push(t('proctor.tercatat', 'Tercatat keluar layar {n}× ({detik} detik). Gurumu sudah menerima catatannya.', { n: sum.n, detik: Math.round(sum.ms / 1000) }));
+    if (sum.vn) catatan.push(t('proctor.wajah-tercatat', 'Wajah tidak terlihat {vn}× ({detik} detik). Catatannya terkirim ke gurumu.', { vn: sum.vn, detik: Math.round(sum.vs / 1000) }));
+    return '<p class="ch-proctor is-warn" data-testid="class-proctor-warn">' + icon('eye-off') + ' ' + esc(catatan.join(' ')) + facePill + '</p>';
   }
   function startRunner(a) {
     var u = ui(), order = a.itemIds.map(function (_, i) { return i; });
@@ -2062,11 +2114,11 @@
      padahal yang perlu dilihat guru hanya baris yang menyimpang. */
   function focusChip(a, s) {
     var TS = T(), f = TS.focusOf ? TS.focusOf(a, s) : null;
-    if (!f || !f.n) return '';
+    if (!f || (!f.n && !f.vn)) return '';
     return '<span class="ch-focus is-' + TS.focusLevel(f) + '" title="Terdeteksi meninggalkan layar saat mengerjakan" data-testid="tclass-focus-' + esc(a.id) + '-' + esc(s.id) + '">' + icon('eye-off') + ' ' + esc(TS.focusLabel(f)) + '</span>';
   }
   /** Ringkasan satu tugas: berapa murid yang terdeteksi keluar layar. */
-  function focusCount(c, a) { var TS = T(); return c.students.filter(function (s) { var f = TS.focusOf ? TS.focusOf(a, s) : null; return f && f.n; }).length; }
+  function focusCount(c, a) { var TS = T(); return c.students.filter(function (s) { var f = TS.focusOf ? TS.focusOf(a, s) : null; return f && (f.n || f.vn); }).length; }
   function statusCounts(c, a) { var TS = T(), out = { belum: 0, sedang: 0, selesai: 0, terlambat: 0, total: 0 }; c.students.filter(function (s) { return TS.targeted(a, s); }).forEach(function (s) { out.total++; out[statusOf(a, studentRec(a, s)).id]++; }); return out; }
   function tKelas(c, env) {
     var TS = T(), stt = TS.classStats(c), sync = TS.syncLabel(c);

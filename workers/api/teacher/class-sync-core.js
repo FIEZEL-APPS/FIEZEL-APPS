@@ -111,6 +111,15 @@ export function normalizeReport(body, nowMs) {
         const fx = a.f.x === undefined ? 0 : intIn(a.f.x, LIMITS.FOCUS_SEC_MAX);
         if (fn == null || fs == null || fx == null || fx > fs) return { ok: false, reason: 'bad_assign_focus' };
         entry.f = { n: fn, s: fs, x: fx };
+        if (a.f.vn !== undefined || a.f.vs !== undefined) {
+          const v_n = a.f.vn === undefined ? 0 : intIn(a.f.vn, LIMITS.FOCUS_N_MAX);
+          const v_s = a.f.vs === undefined ? 0 : intIn(a.f.vs, LIMITS.FOCUS_SEC_MAX);
+          const v_x = a.f.vx === undefined ? 0 : intIn(a.f.vx, LIMITS.FOCUS_SEC_MAX);
+          if (v_n == null || v_s == null || v_x == null || v_x > v_s) return { ok: false, reason: 'bad_assign_focus' };
+          entry.f.vn = v_n;
+          entry.f.vs = v_s;
+          entry.f.vx = v_x;
+        }
       }
       if (a.w !== undefined) {
         if (!Array.isArray(a.w) || a.w.length > LIMITS.WRONG_MAX) return { ok: false, reason: 'bad_assign_wrong' };
