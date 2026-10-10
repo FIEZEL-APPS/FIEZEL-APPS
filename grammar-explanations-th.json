@@ -7763,7 +7763,7 @@
       "whyCorrect": "ในแบบเป็นทางการ 'if' หายไปและ 'had' ย้ายไปหน้าประธาน: Had we received the warning",
       "whyOthersFail": "'If we had' เป็นแบบกลาง 'we had' เป็นประโยคบอกเล่า ส่วน 'had received we' วางประธานผิดที่",
       "howToAvoid": "ลบ 'if' แล้วสลับประธานกับ 'had' โดยส่วนอื่นไม่ต้องย้าย",
-      "memoryCue": "If we had → Had we",
+      "memoryCue": "If we had → Had we: การละ if และสลับ Had ขึ้นหน้า",
       "distractors": {
         "If we had received": {
           "misconception": "ผสมการสลับตำแหน่งแบบทางการเข้ากับคำเชื่อม 'if' พร้อมกัน",
@@ -7787,7 +7787,7 @@
       "whyCorrect": "'Rarely' หน้าประโยคทำให้ต้องสลับที่: กริยาช่วย 'have' ย้ายไปหน้า 'I'",
       "whyOthersFail": "'I have seen' และ 'I saw' คงลำดับปกติ ส่วน 'saw I' สลับคำกริยาหลักแทนกริยาช่วย",
       "howToAvoid": "rarely/never อยู่หน้า? สร้างเหมือนคำถาม: have I seen",
-      "memoryCue": "Rarely have I…",
+      "memoryCue": "Rarely have I…: สลับกริยาช่วยขึ้นหน้าเมื่อมีคำปฏิเสธต้นประโยค",
       "distractors": {
         "I have seen": {
           "misconception": "ยกคำวิเศษณ์เชิงปฏิเสธขึ้นต้นแล้ว แต่ไม่ได้สลับประธานกับกริยาช่วยตามที่บังคับ",
@@ -7859,7 +7859,7 @@
       "whyCorrect": "ตัด 'if' และย้าย 'were' ไปหน้าได้เงื่อนไขทางการ: Were she to accept the offer",
       "whyOthersFail": "'was' ไม่ใช้ในแบบแผนนี้ 'if were' ใช้ตัวบ่งชี้ซ้ำ ส่วน 'she were to' ไม่มีการสลับที่",
       "howToAvoid": "เขียน 'If she were to accept' แล้วลบ 'if' และสลับ: Were she to accept",
-      "memoryCue": "If she were to → Were she to",
+      "memoryCue": "If she were to → Were she to: การละ if ในประโยคเงื่อนไข",
       "distractors": {
         "Was she to accept": {
           "misconception": "ใช้ “was” แทน “were” แบบ subjunctive ที่การสลับลำดับเชิงสมมติแบบทางการต้องการ",

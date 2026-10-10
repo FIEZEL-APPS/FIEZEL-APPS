@@ -613,14 +613,15 @@
    * hanya membuka alasan jawaban benar tanpa langkah.
    */
   function workedExample(ex, it, ruleOverride, conceptLabel, T) {
-    var steps = [];
     var rule = clause(ruleOverride) || clause(ex.rule);
-    if (rule) steps.push(fill(lineFor(T, 'brain-tutor.worked-step1'), { rule: rule }));
+    if (!rule) return fill(lineFor(T, 'brain-tutor.worked-fallback'), { concept: conceptLabel });
+    var steps = [];
+    steps.push(fill(lineFor(T, 'brain-tutor.worked-step1'), { rule: rule }));
     var contoh = clause(it.sentence || ex.example);
     if (contoh) steps.push(fill(lineFor(T, 'brain-tutor.worked-step2'), { sentence: contoh }));
     var benar = clause(it.correctAnswer || ex.correct);
     if (benar) steps.push(fill(lineFor(T, 'brain-tutor.worked-step3'), { answer: benar }));
-    if (!steps.length) return fill(lineFor(T, 'brain-tutor.worked-fallback'), { concept: conceptLabel });
+    if (steps.length < 3) return fill(lineFor(T, 'brain-tutor.worked-fallback'), { concept: rule || conceptLabel });
     return steps.join(' ');
   }
 

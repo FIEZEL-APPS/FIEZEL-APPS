@@ -2759,13 +2759,14 @@ function record(q,ok,ms,selectedIndex){
   const now=Date.now();state.totalAnswered++;if(ok)state.totalCorrect++;state.totalTimeMs+=ms||0;if(state.activeSession)state.activeSession.answered=Math.min(Number(state.activeSession.planned||10000),Number(state.activeSession.answered||0)+1);
   /* W1 P1-2: cermin answered ke penanda percobaan-berjalan (lihat beginLearningSession). */
   if(state.inflightAttempt&&state.activeSession)state.inflightAttempt.answered=Number(state.activeSession.answered||0);
-  const selected=(q.type==='token-order'&&q.__userTokenAnswer)?q.__userTokenAnswer:q.options?.[selectedIndex];
+  const selected=(q.type==='token-order'&&q.__userTokenAnswer)?q.__userTokenAnswer:(q.type==='cloze'&&q.__typedAnswer)?q.__typedAnswer:q.options?.[selectedIndex];
   /* Ember dan kunci ulangan DITULIS di riwayat, tidak ditebak ulang belakangan. Dulu
      setConfidence menebaknya dengan "kalau bukan vocab dan bukan grammar, berarti reading" -
      jadi jawaban listening/speaking diam-diam menulis ke state.reading. */
   const reviewBucket=q.type==='vocab'?'vocab':q.type==='grammar'?'grammar':q.type==='reading'?'reading':'';
   const reviewKey=q.type==='grammar'?(q.lessonSkill||q.skill||''):(q.target||q.id||'');
-  const h={attemptId:nextAttemptId(now),id:q.id||sigQ(q),type:q.type||'unknown',level:q.level||getActiveLevel(),skill:q.skill||'general',target:q.target||q.lessonSkill||q.skill||q.id||'',reviewBucket,reviewKey,difficulty:q.difficulty||null,ok,ms:Math.max(0,ms||0),confidence:null,selectedIndex,selectedAnswer:selected||null,correctAnswer:q.options?.[q.answerIndex]||null,errorTag:q.errorTag||q.skill||q.type||'general',at:now};
+  const corrAnswer=(q.type==='cloze'&&q.answer)?q.answer:(q.type==='token-order'&&Array.isArray(q.tokens))?q.tokens.join(' '):(q.options?.[q.answerIndex]||null);
+  const h={attemptId:nextAttemptId(now),id:q.id||sigQ(q),type:q.type||'unknown',level:q.level||getActiveLevel(),skill:q.skill||'general',target:q.target||q.lessonSkill||q.skill||q.id||'',reviewBucket,reviewKey,difficulty:q.difficulty||null,ok,ms:Math.max(0,ms||0),confidence:null,selectedIndex,selectedAnswer:selected||null,correctAnswer:corrAnswer,errorTag:q.errorTag||q.skill||q.type||'general',at:now};
   /* Fase 2 (B3 butir 1): prediksi P saat PENYAJIAN (ditulis draw() ke q.__predicted) dan
      bobot kredibilitas kappa disimpan di baris riwayat itu sendiri - coreBrainAttempts
      meneruskannya ke momentum (residual) dan estimateAbility (credibility). Dihitung di
@@ -5557,7 +5558,7 @@ function tutorObserve(session,q,pickedIndex,ok,ms,ctx={}){
 }
 // Penanda kasar untuk memisahkan naskah Indonesia dari teks bank soal yang berbahasa Inggris.
 // Sengaja hanya kata fungsi: kata isi bisa sama di kedua bahasa, kata fungsi hampir tidak pernah.
-const TUTOR_ID_MARKERS=/\b(yang|tidak|belum|bukan|karena|dengan|untuk|kalimat|bentuk|makna|jawaban|pilihan|ini|itu|dan|atau|harus|bisa|sudah|pada|dari|jadi|kata|waktu|agar|saat|lalu)\b/gi;
+const TUTOR_ID_MARKERS=/\b(yang|tidak|belum|bukan|karena|dengan|untuk|kalimat|bentuk|makna|jawaban|pilihan|ini|itu|dan|atau|harus|bisa|sudah|pada|dari|jadi|kata|waktu|agar|saat|lalu|di|ke|kalau|jika|bila|adalah|yaitu|seperti|contoh|pakai|gunakan|artinya|posisi|tempat|bawah|atas|dalam|luar|depan|belakang|hanya|tetap|sedang|akan|selalu|sering|pernah|jangan|wajib|boleh|sebab|maka|sehingga|supaya|tetapi|namun|melainkan|lebih|paling|sangat|cukup|juga|pola|rumus|aturan|buat|sama|tanpa|susunan|klausa|kebanyakan|nama|jadwal|pelaporan)\b/gi;
 const TUTOR_EN_MARKERS=/\b(the|is|are|was|were|this|that|with|because|verb|noun|tense|sentence|answer|option|when|which|requires|implies|signals|does|doesn't|must|should)\b/gi;
 /**
  * Menjaga tutor tetap berbahasa Indonesia.
@@ -5579,8 +5580,9 @@ function tutorIndonesian(text){
       return letters>0&&thai*2>=letters?value:''
     }
   }catch{}
-  const id=(value.match(TUTOR_ID_MARKERS)||[]).length,en=(value.match(TUTOR_EN_MARKERS)||[]).length;
-  return en>=3&&en>id?'':value
+  const clean=value.replace(/<[^>]+>/g,' ');
+  const id=(clean.match(TUTOR_ID_MARKERS)||[]).length,en=(clean.match(TUTOR_EN_MARKERS)||[]).length;
+  return (en>=3&&id===0)||(en>=5&&en>id*2)?'':value
 }
 /**
  * Menamai POLA urutan yang tertukar, bukan sekadar "urutan belum tepat".
@@ -5660,7 +5662,8 @@ function diagnoseTokenOrderMistake(q){
   const normWord=w=>String(w||'').toLowerCase().replace(/^[^\w\s]+|[^\w\s]+$/g,'').trim();
 
   // Kasus 2: Memilih Token Pengecoh (Distractor / Typo / Morfologi)
-  const chosenDistractor=placed.find(t=>distractors.some(d=>normWord(d)===normWord(t)));
+  const getOpt=d=>typeof d==='object'&&d?d.option:d;
+  const chosenDistractor=placed.find(t=>distractors.some(d=>normWord(getOpt(d))===normWord(t)));
   if(chosenDistractor){
     const distInfo=(q.explain?.distractors||[]).find(d=>normWord(d.option)===normWord(chosenDistractor));
     let reason=String(distInfo?.whyFailsId||distInfo?.whyFails||distInfo?.reason||'').trim();
@@ -5796,6 +5799,7 @@ function tutorCompose(q,pickedIndex,ok,scaffold,move,timing='',opts={}){
 function grammarSimilarExample(q){
   try{
     const skill=String(q?.lessonSkill||q?.skill||'');
+    if(/preposition/i.test(skill)||String(q?.family||'')==='prepositions')return null;
     const items=(G&&G[skill])||[];
     if(!items.length)return null;
     const n=v=>String(v??'').toLowerCase().replace(/[^a-z0-9' ]+/g,' ').replace(/\s+/g,' ').trim();
@@ -15827,6 +15831,7 @@ function quizLoop(cfg){
    }
 
    const mirip=answer.scaffold==='worked'?grammarSimilarExample(q):null;
+   showQuizFloatingRetry(q,j);
    speak(tutorCompose(q,j,false,answer.scaffold,answer.move,answer.timing,{session:tutor,similar:mirip}),{retry:true,similar:!!mirip});
    setTimeout(()=>{try{pawReact('hint')}catch(_){}},1100);
    enhanceUI();
@@ -15906,6 +15911,7 @@ function quizLoop(cfg){
   if(MEASURE){haptic('tap');uiSfx('button_tap')}else answerFeedbackSignal(ok);
   if(ok)score++;
   if(MEASURE)(cfg.__measureReview??=[]).push({q,typed});
+  q.__typedAnswer=typed;
   record(q,ok,ms,-1);
   // Efek grader: distraktor cocok -> ledger miskonsepsi (guarded di helper).
   try{clozeProductionRecord(state.activeSession,q,res,ok)}catch{}

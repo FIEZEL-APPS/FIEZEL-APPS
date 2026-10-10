@@ -2262,11 +2262,11 @@
       "objective": "Kamu ngenali “would” nggak bisa nyatain keadaan lampau. Kata itu cuma buat tindakan yang berulang.",
       "misconception": "Kamu nganggep “used to” dan “would” bisa saling gantiin buat semua kebiasaan lampau, termasuk keadaan.",
       "reasoning": "cek kalimatnya nyebut keadaan lampau atau tindakan berulang → pilih bentuk yang boleh dipakai",
-      "rule": "Kalau kebiasaan masa lalu yang SEKARANG SUDAH BERHENTI: Pakai “used to” + kata kerja dasar (Verb 1). Contoh: <b>I used to play marbles</b> (Dulu aku sering main kelereng, tapi sekarang sudah nggak pernah lagi).<br>Kalau SEKARANG SUDAH TERBIASA (merasa wajar dan nggak asing lagi): Ada “be” (am/is/are) di depannya dan wajib diikuti kata kerja -ing. Contoh: <b>I am used to living in Jakarta</b> (Sekarang aku sudah terbiasa tinggal di Jakarta).<br>Kalau PROSES menjadi terbiasa: Pakai “get used to” + kata kerja -ing. Contoh: <b>He is getting used to waking up early</b> (Dia mulai terbiasa bangun pagi).<br><br>💡 <b>RUMUS KILAT</b>:<br>Dulu pernah tapi sekarang enggak (tanpa be) ➡️ <b>used to + Verb 1</b>.<br>Sekarang sudah terbiasa (ada <i>am/is/are</i> di depan) ➡️ <b>be used to + Verb-ing</b>.<br>Proses beradaptasi ➡️ <b>get used to + Verb-ing</b>.",
+      "rule": "Membedakan “used to” vs “would” untuk masa lalu:<br>• <b>used to + Verb 1</b>: Bisa dipakai untuk KEBIASAAN AKSI berulang (contoh: <i>used to play</i>) MAUPUN KEADAAN MENETAP / STATIVE VERBS (contoh: <i>used to live, used to have, used to be</i>).<br>• <b>would + Verb 1</b>: HANYA bisa dipakai untuk KEBIASAAN AKSI berulang (contoh: <i>would go fishing every summer</i>). DILARANG KERAS dipakai untuk kata kerja keadaan (stative verbs) seperti <i>live, have, be, know</i> ❌.<br><br>💡 <b>RUMUS KILAT</b>:<br>Kata kerja keadaan / tempat tinggal (live, be, have, like) ➡️ Wajib <b>used to</b> (bukan <i>would</i> ❌).<br>Aksi kegiatan berulang ➡️ Boleh <b>used to</b> atau <b>would</b>.<br>Ingat: <i>would live</i> atau <i>would be</i> itu keliru untuk kebiasaan lampau!",
       "whyCorrect": "“Live” itu kata kerja keadaan. “Used to live” nyatain keadaan lampau yang sekarang udah nggak berlaku.",
       "whyOthersFail": "“Would live” maksa modal khusus tindakan ke kata kerja keadaan. Dua pilihan lain sama sekali bukan bentuk kata kerja bertense yang sah.",
       "howToAvoid": "Buat kata kerja keadaan kayak “live” dan “know”, pakai “used to” atau bentuk lampau (Verb 2).",
-      "memoryCue": "Keadaan lampau cuma “used to”; tindakan berulang boleh dua-duanya.",
+      "memoryCue": "Kata kerja keadaan (live, have, be)? Selalu \"used to\", jangan pernah \"would\"!",
       "distractors": {
         "would live in": {
           "misconception": "“would” diterapin ke kata kerja keadaan seolah itu tindakan berulang.",
@@ -2578,7 +2578,7 @@
       "whyCorrect": "“Solution to” itu pola kata depan tetap pas sebuah jalan keluar ngejawab satu masalah tertentu.",
       "whyOthersFail": "“For”, “of”, dan “with” dipinjem dari pasangan kata lain. Ketiganya nggak cocok sama pasangan tetap punya “solution”.",
       "howToAvoid": "Hafalin pasangan kata benda dan kata depannya sebagai satu kesatuan, bukan nurunin dari kata kerjanya.",
-      "memoryCue": "Solution TO a problem; reason FOR a decision; answer TO a question.",
+      "memoryCue": "Pasangan tetap kata benda: solution TO (solusi untuk), reason FOR (alasan atas), answer TO (jawaban untuk).",
       "distractors": {
         "for": {
           "misconception": "pola kata depan dari ungkapan berkaitan kayak “search for” dibawa ke “solution”.",
@@ -3222,11 +3222,11 @@
       "objective": "Milih in, on, atau at buat nunjukin letak benda",
       "misconception": "Kamu gampang nerjemahin langsung dari kata “di”. Bahasa Indonesia cuma punya satu kata buat tiga-tiganya.",
       "reasoning": "bayangin posisi bendanya → pilih kata depannya",
-      "rule": "Kalau di dalam ruangan tertutup atau wilayah luas (kota, negara, wadah): Pakai “in”. Contoh: <b>in the classroom</b> (di dalam kelas), <b>in Jakarta</b>, <b>in the fridge</b> (di dalam kulkas).<br>Kalau menempel di atas permukaan, nama jalan (tanpa nomor), atau lantai gedung: Pakai “on”. Contoh: <b>on the table</b> (di atas meja), <b>on Sudirman Street</b>, <b>on the second floor</b> (di lantai dua).<br>Kalau titik lokasi tertentu, tempat kegiatan, atau alamat bernomor: Pakai “at”. Contoh: <b>at the bus stop</b> (di halte bus), <b>at school</b>, <b>at 25 Merdeka Street</b>.<br><br>💡 <b>RUMUS KILAT</b>:<br>Di dalam ruangan tertutup / area luas (kota/negara) ➡️ Pakai <b>in</b>.<br>Di atas permukaan / nama jalan tanpa nomor / lantai ➡️ Pakai <b>on</b>.<br>Titik lokasi tepat / alamat bernomor rumah ➡️ Pakai <b>at</b>.",
+      "rule": "Menentukan kata depan tempat dasar (in, on, at):<br>• <b>in</b>: di dalam wadah atau ruangan.<br>• <b>on</b>: di atas permukaan meja atau dinding.<br>• <b>at</b>: di titik lokasi tertentu.<br><br>💡 <b>RUMUS KILAT</b>:<br>Di atas permukaan meja (the table) ➡️ Wajib pakai <b>on</b>.",
       "whyCorrect": "Bukunya nempel di permukaan meja. Buat permukaan pakai “on”.",
       "whyOthersFail": "“In” bikin artinya di dalam meja. “At” nunjuk satu titik. “To” nunjuk gerakan.",
       "howToAvoid": "Tanya satu hal: bendanya di dalam, di permukaan, atau di satu titik?",
-      "memoryCue": "In a bag, on a table, at a bus stop.",
+      "memoryCue": "Di dalam tas (in), di atas meja (on), di titik halte bus (at).",
       "distractors": {
         "in": {
           "misconception": "letak di permukaan dibaca sebagai di dalam.",
@@ -3894,11 +3894,11 @@
       "objective": "Pakai under buat benda yang letaknya di bawah benda lain",
       "misconception": "Kamu gampang nerjemahin langsung dari kata “di”. Bahasa Indonesia sering nggak misahin di atas dan di bawah sejelas ini.",
       "reasoning": "bayangin posisi kucingnya yang nggak kelihatan → pilih kata depan buat posisi di bawah",
-      "rule": "Kalau di dalam ruangan tertutup atau wilayah luas (kota, negara, wadah): Pakai “in”. Contoh: <b>in the classroom</b> (di dalam kelas), <b>in Jakarta</b>, <b>in the fridge</b> (di dalam kulkas).<br>Kalau menempel di atas permukaan, nama jalan (tanpa nomor), atau lantai gedung: Pakai “on”. Contoh: <b>on the table</b> (di atas meja), <b>on Sudirman Street</b>, <b>on the second floor</b> (di lantai dua).<br>Kalau titik lokasi tertentu, tempat kegiatan, atau alamat bernomor: Pakai “at”. Contoh: <b>at the bus stop</b> (di halte bus), <b>at school</b>, <b>at 25 Merdeka Street</b>.<br><br>💡 <b>RUMUS KILAT</b>:<br>Di dalam ruangan tertutup / area luas (kota/negara) ➡️ Pakai <b>in</b>.<br>Di atas permukaan / nama jalan tanpa nomor / lantai ➡️ Pakai <b>on</b>.<br>Titik lokasi tepat / alamat bernomor rumah ➡️ Pakai <b>at</b>.",
+      "rule": "Menentukan posisi letak benda:<br>• <b>under</b>: di bawah sesuatu (contoh: <b>under the bed</b>).<br>• <b>on</b>: di atas permukaan.<br>• <b>at</b>: di titik lokasi tertentu.<br>• <b>to</b>: arah pergerakan.<br><br>💡 <b>RUMUS KILAT</b>:<br>Di bagian bawah tempat tidur ➡️ Pakai <b>under</b>.",
       "whyCorrect": "Kucingnya nggak kelihatan karena ada di bawah kasur. Buat posisi di bawah pakai “under”.",
       "whyOthersFail": "“On” bikin kucingnya kelihatan di atas kasur. “At” nunjuk satu titik. “To” nunjuk gerakan.",
       "howToAvoid": "Bayangin posisinya: di dalam, di atas, di bawah, atau di satu titik?",
-      "memoryCue": "Perhatikan posisi letaknya: cocokkan kata depan tempat dengan posisi benda terhadap ruang di sekelilingnya.",
+      "memoryCue": "Kucing bersembunyi di lantai? Cari di bawah ranjang: \"under the bed\"!",
       "distractors": {
         "on": {
           "misconception": "letak tersembunyi di bawah dibaca sebagai di permukaan.",
@@ -4782,11 +4782,11 @@
       "objective": "Pilih bentuk lampau (Verb 2), bukan “used to” atau “would”, buat satu kejadian lampau yang bertanggal.",
       "misconception": "Kamu nempelin “used to” atau “would” ke kejadian sekali karena kejadiannya terasa lama, padahal dua bentuk itu butuh kebiasaan berulang.",
       "reasoning": "cek penanda waktunya → satu kejadian tertentu berarti bentuk lampau (Verb 2), kebiasaan lama yang berulang baru boleh used to atau would",
-      "rule": "Kalau kebiasaan masa lalu yang SEKARANG SUDAH BERHENTI: Pakai “used to” + kata kerja dasar (Verb 1). Contoh: <b>I used to play marbles</b> (Dulu aku sering main kelereng, tapi sekarang sudah nggak pernah lagi).<br>Kalau SEKARANG SUDAH TERBIASA (merasa wajar dan nggak asing lagi): Ada “be” (am/is/are) di depannya dan wajib diikuti kata kerja -ing. Contoh: <b>I am used to living in Jakarta</b> (Sekarang aku sudah terbiasa tinggal di Jakarta).<br>Kalau PROSES menjadi terbiasa: Pakai “get used to” + kata kerja -ing. Contoh: <b>He is getting used to waking up early</b> (Dia mulai terbiasa bangun pagi).<br><br>💡 <b>RUMUS KILAT</b>:<br>Dulu pernah tapi sekarang enggak (tanpa be) ➡️ <b>used to + Verb 1</b>.<br>Sekarang sudah terbiasa (ada <i>am/is/are</i> di depan) ➡️ <b>be used to + Verb-ing</b>.<br>Proses beradaptasi ➡️ <b>get used to + Verb-ing</b>.",
+      "rule": "Membedakan kejadian lampau tunggal vs kebiasaan masa lalu:<br>• <b>Past Simple (Verb 2)</b>: Dipakai untuk kejadian tunggal yang selesai pada waktu tertentu di masa lalu (ada penanda waktu spesifik seperti <i>last Saturday afternoon, yesterday, in 2020</i>). Contoh: <b>We visited our grandmother last Saturday</b>.<br>• <b>used to + Verb 1</b>: Dipakai untuk kebiasaan berulang atau keadaan menetap di masa lalu yang kini sudah berhenti. TIDAK BISA dipakai untuk kejadian tunggal satu kali.<br>• <b>would + Verb 1</b>: Dipakai untuk kebiasaan aksi berulang di masa lalu. TIDAK BISA dipakai untuk kejadian tunggal satu kali.<br><br>💡 <b>RUMUS KILAT</b>:<br>Kejadian tunggal satu kali pada waktu lampau tertentu ➡️ Wajib <b>Past Simple (Verb 2)</b>.<br>Kebiasaan berulang di masa lalu ➡️ Boleh <b>used to</b>.<br>Dilarang memakai <i>used to</i> atau <i>would</i> untuk peristiwa satu kali ❌!",
       "whyCorrect": "“Last Saturday afternoon” nyebut satu kejadian tertentu, dan kejadian lampau bertanggal pakai bentuk lampau (Verb 2): we visited.",
       "whyOthersFail": "“Used to visit” dan “would visit” sama-sama ngaku ada pengulangan, padahal tanggalnya nolak itu. “Use to visit” cuma ada setelah did atau didn't.",
       "howToAvoid": "Cari tanggal atau penanda kayak “once” dan “last...”: kalau kejadiannya sekali, langsung coret “used to” dan “would”.",
-      "memoryCue": "Ada tanggalnya, berarti bentuk lampau (Verb 2) biasa.",
+      "memoryCue": "Peristiwa terjadi satu kali pada waktu tertentu (last Saturday)? Pakai Past Simple (visited), bukan used to!",
       "distractors": {
         "used to visit": {
           "misconception": "satu kejadian bertanggal dibaca kayak kebiasaan lama.",
@@ -6922,7 +6922,7 @@
       "whyCorrect": "“Good” pakai kata depan tetap “at” kalau ngomongin keahlian: good at maths.",
       "whyOthersFail": "“In” salah terjemah. “About” buat perasaan. “For” ngubah maknanya jadi “baik buat”.",
       "howToAvoid": "Hafalin kata sifat sama kata depannya sebagai satu paket: good at.",
-      "memoryCue": "Good at, bad at.",
+      "memoryCue": "Pintar atau mahir di bidang sesuatu: selalu \"good at\" (bukan good in)!",
       "distractors": {
         "in": {
           "misconception": "“about” dijadiin kata depan bawaan setelah kata sifat perasaan.",
@@ -7234,7 +7234,7 @@
       "whyCorrect": "“Will” udah ngisi slot modal, jadi kemampuannya pakai “be able to”: will be able to speak.",
       "whyOthersFail": "“Will can” dan “will could” numpuk dua modal. “Will being” salah bentuk kata kerja.",
       "howToAvoid": "Butuh “can” sesudah will, must, atau to? Tuker sama “be able to”.",
-      "memoryCue": "Will + be able to.",
+      "memoryCue": "Menyatakan kemampuan di masa depan: setelah \"will\", wajib pakai \"be able to\" (jangan \"will can\")!",
       "distractors": {
         "will can": {
           "misconception": "modal bertense ditaruh sesudah “to”.",
@@ -7762,7 +7762,7 @@
       "whyCorrect": "Di gaya formal “if” hilang dan “had” pindah ke depan subjek: Had we received the warning.",
       "whyOthersFail": "“If we had” versi netral. “We had” kalimat berita. “Had received we” salah naruh subjek.",
       "howToAvoid": "Hapus “if”, lalu tuker posisi subjek sama “had”; yang lain nggak pindah.",
-      "memoryCue": "If we had → Had we.",
+      "memoryCue": "Inversi conditional tipe 3: buang \"If\", balik subjek jadi \"Had we known\"!",
       "distractors": {
         "If we had received": {
           "misconception": "pembalikan formal dan kata sambung “if” dipakai bersamaan.",
@@ -7786,7 +7786,7 @@
       "whyCorrect": "“Rarely” di depan membuat kata bantu pindah ke depan subjek: kata bantu “have” pindah ke depan “I”.",
       "whyOthersFail": "“I have seen” dan “I saw” urutannya biasa. “Saw I” ngebalik kata kerja utama, bukan kata bantu.",
       "howToAvoid": "Rarely/never di depan? Susun kayak pertanyaan: have I seen.",
-      "memoryCue": "Rarely have I…",
+      "memoryCue": "Inversi kata negatif di awal kalimat (Rarely): balik kata bantu di depan subjek: \"Rarely have I seen\"!",
       "distractors": {
         "I have seen": {
           "misconception": "keterangan negatifnya dimajuin, tapi kata bantu “have” yang udah ada dibiarin di belakang subjek.",
@@ -7858,7 +7858,7 @@
       "whyCorrect": "Buang “if” dan pindahin “were” ke depan jadi pengandaian formal: Were she to accept the offer.",
       "whyOthersFail": "“Was” nggak dipakai di pola ini. “If were” penandanya dobel. “She were to” kata bantu belum dipindah ke depan subjek.",
       "howToAvoid": "Tulis “If she were to accept”, lalu hapus “if” dan tuker: Were she to accept.",
-      "memoryCue": "If she were to → Were she to.",
+      "memoryCue": "Inversi conditional tipe 2: \"If she were to\" menjadi \"Were she to resign\"!",
       "distractors": {
         "Was she to accept": {
           "misconception": "“was” dipakai gantiin “were” yang diwajibin di pembalikan pengandaian formal.",
@@ -8646,11 +8646,11 @@
       "objective": "Pilih “in”, “on”, “under”, atau “next to” dari letak bendanya. Contoh: “Your keys are in your bag. Look inside!”",
       "misconception": "Kamu menerjemahkan semua “di” dengan satu kata yang sama, atau memakai “to” untuk tempat yang diam.",
       "reasoning": "cari petunjuk “Look inside!” → tentukan posisinya di dalam → pilih kata untuk “di dalam”",
-      "rule": "Kalau di dalam ruangan tertutup atau wilayah luas (kota, negara, wadah): Pakai “in”. Contoh: <b>in the classroom</b> (di dalam kelas), <b>in Jakarta</b>, <b>in the fridge</b> (di dalam kulkas).<br>Kalau menempel di atas permukaan, nama jalan (tanpa nomor), atau lantai gedung: Pakai “on”. Contoh: <b>on the table</b> (di atas meja), <b>on Sudirman Street</b>, <b>on the second floor</b> (di lantai dua).<br>Kalau titik lokasi tertentu, tempat kegiatan, atau alamat bernomor: Pakai “at”. Contoh: <b>at the bus stop</b> (di halte bus), <b>at school</b>, <b>at 25 Merdeka Street</b>.<br><br>💡 <b>RUMUS KILAT</b>:<br>Di dalam ruangan tertutup / area luas (kota/negara) ➡️ Pakai <b>in</b>.<br>Di atas permukaan / nama jalan tanpa nomor / lantai ➡️ Pakai <b>on</b>.<br>Titik lokasi tepat / alamat bernomor rumah ➡️ Pakai <b>at</b>.",
+      "rule": "Menentukan posisi letak benda (kata depan tempat):<br>• <b>in</b>: di dalam ruang tertutup atau wadah (contoh: <b>in the bag</b>).<br>• <b>on</b>: menempel di atas permukaan (contoh: <b>on the table</b>, <b>on the wall</b>).<br>• <b>under</b>: di bagian bawah sesuatu (contoh: <b>under the chair</b>).<br>• <b>to</b>: menunjukkan arah gerak ke suatu tujuan, bukan posisi diam.<br><br>💡 <b>RUMUS KILAT</b>:<br>Di dalam wadah ➡️ <b>in</b>.<br>Di atas permukaan ➡️ <b>on</b>.<br>Di bagian bawah ➡️ <b>under</b>.<br>Bukan tempat diam melainkan arah gerak ➡️ <b>to</b>.",
       "whyCorrect": "“Look inside!” menunjukkan kuncinya ada di dalam tas, jadi pakai “in”.",
       "whyOthersFail": "“On” artinya di atas permukaan, “under” artinya di bawah, dan “to” menunjukkan gerak ke suatu tempat.",
       "howToAvoid": "Bayangkan dulu posisinya: di dalam, di permukaan, di bawah, atau di samping?",
-      "memoryCue": "Di dalam tas atau kotak: “in”.",
+      "memoryCue": "Di dalam tas atau kotak: pakai \"in\"!",
       "distractors": {
         "on": {
           "misconception": "kata untuk “di atas permukaan” dipakai untuk benda yang ada di dalam.",
@@ -8670,11 +8670,11 @@
       "objective": "Pilih “in”, “on”, “under”, atau “next to” dari letak bendanya. Contoh: “Sit next to me, Rina. This chair is empty.”",
       "misconception": "Kamu menerjemahkan semua “di” dengan satu kata yang sama, atau memakai “to” untuk tempat yang diam.",
       "reasoning": "cari kursi kosongnya → tentukan posisinya di sampingku → pilih kata untuk “di samping”",
-      "rule": "Kalau di dalam ruangan tertutup atau wilayah luas (kota, negara, wadah): Pakai “in”. Contoh: <b>in the classroom</b> (di dalam kelas), <b>in Jakarta</b>, <b>in the fridge</b> (di dalam kulkas).<br>Kalau menempel di atas permukaan, nama jalan (tanpa nomor), atau lantai gedung: Pakai “on”. Contoh: <b>on the table</b> (di atas meja), <b>on Sudirman Street</b>, <b>on the second floor</b> (di lantai dua).<br>Kalau titik lokasi tertentu, tempat kegiatan, atau alamat bernomor: Pakai “at”. Contoh: <b>at the bus stop</b> (di halte bus), <b>at school</b>, <b>at 25 Merdeka Street</b>.<br><br>💡 <b>RUMUS KILAT</b>:<br>Di dalam ruangan tertutup / area luas (kota/negara) ➡️ Pakai <b>in</b>.<br>Di atas permukaan / nama jalan tanpa nomor / lantai ➡️ Pakai <b>on</b>.<br>Titik lokasi tepat / alamat bernomor rumah ➡️ Pakai <b>at</b>.",
+      "rule": "Menentukan posisi di samping atau sebelah:<br>• <b>next to</b>: di samping atau di sebelah objek lain (contoh: <b>sit next to me</b>).<br>• <b>on</b>: di atas permukaan.<br>• <b>in</b>: di dalam ruang tertutup.<br>• <b>under</b>: di bagian bawah.<br><br>💡 <b>RUMUS KILAT</b>:<br>Di sebelah atau di samping orang/benda ➡️ Pakai <b>next to</b>.",
       "whyCorrect": "Kursi kosongnya ada di sampingku, jadi pakai “next to”.",
       "whyOthersFail": "“On me” artinya di atas badanku, “in me” artinya di dalam badanku, dan “under me” artinya di bawahku.",
       "howToAvoid": "Bayangkan dulu posisinya: di dalam, di permukaan, di bawah, atau di samping?",
-      "memoryCue": "Perhatikan posisi letaknya: cocokkan kata depan tempat dengan posisi benda terhadap ruang di sekelilingnya.",
+      "memoryCue": "Ada kursi kosong di sebelah? Duduk di sampingku: \"sit next to me\"!",
       "distractors": {
         "on": {
           "misconception": "kata untuk “di atas permukaan” dipakai untuk posisi di samping.",
@@ -8694,11 +8694,11 @@
       "objective": "Pilih “in”, “on”, “under”, atau “next to” dari letak bendanya. Contoh: “There is a big picture on the wall.”",
       "misconception": "Kamu menerjemahkan semua “di” dengan satu kata yang sama, atau memakai “to” untuk tempat yang diam.",
       "reasoning": "kenali dinding sebagai permukaan → cek lukisannya menempel di situ → pilih kata untuk permukaan",
-      "rule": "Kalau di dalam ruangan tertutup atau wilayah luas (kota, negara, wadah): Pakai “in”. Contoh: <b>in the classroom</b> (di dalam kelas), <b>in Jakarta</b>, <b>in the fridge</b> (di dalam kulkas).<br>Kalau menempel di atas permukaan, nama jalan (tanpa nomor), atau lantai gedung: Pakai “on”. Contoh: <b>on the table</b> (di atas meja), <b>on Sudirman Street</b>, <b>on the second floor</b> (di lantai dua).<br>Kalau titik lokasi tertentu, tempat kegiatan, atau alamat bernomor: Pakai “at”. Contoh: <b>at the bus stop</b> (di halte bus), <b>at school</b>, <b>at 25 Merdeka Street</b>.<br><br>💡 <b>RUMUS KILAT</b>:<br>Di dalam ruangan tertutup / area luas (kota/negara) ➡️ Pakai <b>in</b>.<br>Di atas permukaan / nama jalan tanpa nomor / lantai ➡️ Pakai <b>on</b>.<br>Titik lokasi tepat / alamat bernomor rumah ➡️ Pakai <b>at</b>.",
+      "rule": "Menentukan posisi letak benda (kata depan tempat):<br>• <b>in</b>: di dalam ruang tertutup atau wadah (contoh: <b>in the bag</b>).<br>• <b>on</b>: menempel di atas permukaan (contoh: <b>on the table</b>, <b>on the wall</b>).<br>• <b>under</b>: di bagian bawah sesuatu (contoh: <b>under the chair</b>).<br>• <b>to</b>: menunjukkan arah gerak ke suatu tujuan, bukan posisi diam.<br><br>💡 <b>RUMUS KILAT</b>:<br>Di dalam wadah ➡️ <b>in</b>.<br>Di atas permukaan ➡️ <b>on</b>.<br>Di bagian bawah ➡️ <b>under</b>.<br>Bukan tempat diam melainkan arah gerak ➡️ <b>to</b>.",
       "whyCorrect": "Lukisan menempel di permukaan dinding, jadi pakai “on”.",
       "whyOthersFail": "“In” artinya di dalam dinding, “under” artinya di bawahnya, dan “to” menunjukkan gerak.",
       "howToAvoid": "Bayangkan dulu posisinya: di dalam, di permukaan, di bawah, atau di samping?",
-      "memoryCue": "Dinding dan meja itu permukaan: “on the wall”, “on the table”.",
+      "memoryCue": "Dinding dan meja itu permukaan: \"on the wall\", \"on the table\"!",
       "distractors": {
         "in": {
           "misconception": "dinding dianggap wadah, padahal lukisannya menempel di permukaan.",
@@ -8718,11 +8718,11 @@
       "objective": "Pilih “in”, “on”, “under”, atau “next to” dari letak bendanya. Contoh: “Your pencil fell. Look under your chair!”",
       "misconception": "Kamu menerjemahkan semua “di” dengan satu kata yang sama, atau memakai “to” untuk tempat yang diam.",
       "reasoning": "perhatikan kata “fell” → tentukan letak pensilnya di bawah kursi → pilih kata untuk “di bawah”",
-      "rule": "Kalau di dalam ruangan tertutup atau wilayah luas (kota, negara, wadah): Pakai “in”. Contoh: <b>in the classroom</b> (di dalam kelas), <b>in Jakarta</b>, <b>in the fridge</b> (di dalam kulkas).<br>Kalau menempel di atas permukaan, nama jalan (tanpa nomor), atau lantai gedung: Pakai “on”. Contoh: <b>on the table</b> (di atas meja), <b>on Sudirman Street</b>, <b>on the second floor</b> (di lantai dua).<br>Kalau titik lokasi tertentu, tempat kegiatan, atau alamat bernomor: Pakai “at”. Contoh: <b>at the bus stop</b> (di halte bus), <b>at school</b>, <b>at 25 Merdeka Street</b>.<br><br>💡 <b>RUMUS KILAT</b>:<br>Di dalam ruangan tertutup / area luas (kota/negara) ➡️ Pakai <b>in</b>.<br>Di atas permukaan / nama jalan tanpa nomor / lantai ➡️ Pakai <b>on</b>.<br>Titik lokasi tepat / alamat bernomor rumah ➡️ Pakai <b>at</b>.",
+      "rule": "Menentukan posisi letak benda (kata depan tempat):<br>• <b>in</b>: di dalam ruang tertutup atau wadah (contoh: <b>in the bag</b>).<br>• <b>on</b>: menempel di atas permukaan (contoh: <b>on the table</b>, <b>on the wall</b>).<br>• <b>under</b>: di bagian bawah sesuatu (contoh: <b>under the chair</b>).<br>• <b>to</b>: menunjukkan arah gerak ke suatu tujuan, bukan posisi diam.<br><br>💡 <b>RUMUS KILAT</b>:<br>Di dalam wadah ➡️ <b>in</b>.<br>Di atas permukaan ➡️ <b>on</b>.<br>Di bagian bawah ➡️ <b>under</b>.<br>Bukan tempat diam melainkan arah gerak ➡️ <b>to</b>.",
       "whyCorrect": "Pensil yang jatuh ada di lantai, di bawah kursi, jadi pakai “under”.",
       "whyOthersFail": "“On” artinya di atas dudukan kursi, “in” artinya di dalam, dan “to” menunjukkan gerak.",
       "howToAvoid": "Bayangkan dulu posisinya: di dalam, di permukaan, di bawah, atau di samping?",
-      "memoryCue": "Perhatikan posisi letaknya: cocokkan kata depan tempat dengan posisi benda terhadap ruang di sekelilingnya.",
+      "memoryCue": "Jatuh ke lantai? Cari di bagian bawah (under) kursi!",
       "distractors": {
         "on": {
           "misconception": "letak di bawah kursi dibaca sebagai di atas kursi.",
