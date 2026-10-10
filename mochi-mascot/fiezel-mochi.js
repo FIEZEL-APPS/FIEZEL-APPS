@@ -96,21 +96,15 @@ export class FiezelMochi {
     this.camera.position.set(0, 0.08, 5.35); // Close-up framing: plush, prominent Daifuku Mochi with generous bounds
 
 
-    const isMobile = typeof window !== 'undefined' && (
-      window.innerWidth <= 768 ||
-      ('ontouchstart' in window) ||
-      (navigator.maxTouchPoints > 0)
-    );
-
     this.renderer = new THREE.WebGLRenderer({
-      antialias: !isMobile,
+      antialias: true,
       alpha: true,
       powerPreference: 'high-performance'
     });
     // Tone mapping is strictly NoToneMapping to banish dark/black edge fringes along transparent alpha borders!
     this.renderer.toneMapping = THREE.NoToneMapping;
     this.renderer.setSize(this.width, this.height);
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 2));
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 
     this.renderer.domElement.style.width = '100%';
     this.renderer.domElement.style.height = '100%';
@@ -185,14 +179,7 @@ export class FiezelMochi {
    * Ultra-dense 128x96 subdivision for mathematically silky smooth antialiased contours.
    */
   createMochiMesh() {
-    const isMobile = typeof window !== 'undefined' && (
-      window.innerWidth <= 768 ||
-      ('ontouchstart' in window) ||
-      (navigator.maxTouchPoints > 0)
-    );
-    const segW = isMobile ? 56 : 128;
-    const segH = isMobile ? 42 : 96;
-    const geo = new THREE.SphereGeometry(1.22, segW, segH);
+    const geo = new THREE.SphereGeometry(1.22, 128, 96);
     const pos = geo.attributes.position;
 
     for (let i = 0; i < pos.count; i++) {
@@ -244,9 +231,8 @@ export class FiezelMochi {
     // AUTHENTIC GLOSSY DAIFUKU MOCHI WITH AIRBRUSHED ROSY CHEEK CONTOURS
     // Paints soft, delectable rosy blushes directly onto the daifuku rice skin texture
     this.skinCanvas = document.createElement('canvas');
-    const skinRes = isMobile ? 512 : 1024;
-    this.skinCanvas.width = skinRes;
-    this.skinCanvas.height = skinRes;
+    this.skinCanvas.width = 1024;
+    this.skinCanvas.height = 1024;
     this.sCtx = this.skinCanvas.getContext('2d');
     this.mochiSkinTexture = new THREE.CanvasTexture(this.skinCanvas);
 
