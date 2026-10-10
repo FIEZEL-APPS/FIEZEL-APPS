@@ -1,21 +1,21 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-10-09T19:10:56.820Z",
+  "generatedAt": "2026-10-10T01:56:54.256Z",
   "files": {
     "app.js": {
       "leaks": 3,
       "budget": 3,
       "sample": [
         {
-          "line": 11082,
+          "line": 11086,
           "text": "Selesaikan ritme hari ini"
         },
         {
-          "line": 11949,
+          "line": 11953,
           "text": "— Penugasan latihan dan pemantauan capaian murid."
         },
         {
-          "line": 12571,
+          "line": 12575,
           "text": "Nama kriteria: n/4 - satu kalimat alasan yang menunjuk bukti di tulisannya"
         }
       ]
@@ -95,15 +95,15 @@
       "budget": 3,
       "sample": [
         {
-          "line": 2089,
+          "line": 2141,
           "text": "Latihan · ±"
         },
         {
-          "line": 2137,
+          "line": 2189,
           "text": "Tenggat"
         },
         {
-          "line": 2137,
+          "line": 2189,
           "text": "Latihan — umpan balik tiap soal"
         }
       ]
@@ -457,15 +457,15 @@
       "budget": 3,
       "sample": [
         {
-          "line": 491,
+          "line": 520,
           "text": ". Aku bangga. Lanjutkan ritmenya — 1 sesi kecil tiap hari lebih ampuh daripada 1 sesi panjang seminggu."
         },
         {
-          "line": 500,
+          "line": 529,
           "text": "• Akurasi keseluruhan:"
         },
         {
-          "line": 523,
+          "line": 552,
           "text": "Akurasi"
         }
       ]
@@ -504,8 +504,8 @@
     }
   },
   "copyKeys": {
-    "id": 3993,
-    "th": 3817,
+    "id": 3996,
+    "th": 3820,
     "idTanpaTh": 0
   },
   "pass": true

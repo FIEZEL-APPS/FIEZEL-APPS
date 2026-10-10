@@ -603,8 +603,8 @@
     const isEsc = typeof self.esc === 'function';
     const esc = (str) => isEsc ? self.esc(str) : str;
 
-    const pickedOption = q.options ? q.options[j] : '';
-    const correctOption = q.options ? q.options[q.answerIndex] : '';
+    const pickedOption = q.__userTokenAnswer || (q.options ? q.options[j] : '');
+    const correctOption = (q.tokens ? q.tokens.join(' ') : '') || (q.options ? q.options[q.answerIndex] : '');
 
     const icon = ok ? 'circle-check-big' : 'circle-x';
     const title = ok ? FiezelI18n.t('quiz.verdict-correct', 'Tepat sekali!') : FiezelI18n.t('quiz.verdict-wrong', 'Belum tepat');
