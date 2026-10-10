@@ -78,6 +78,8 @@
 
       var totalY = 0, minBr = 255, maxBr = 0;
       var skinCount = 0, centerSkin = 0, centerTotal = 0;
+      var sumX = 0, sumY = 0;
+      var minX = w, maxX = 0, minY = h, maxY = 0;
       var cX1 = 16, cX2 = 48, cY1 = 8, cY2 = 40;
 
       var Ygrid = new Float32Array(w * h);
@@ -95,10 +97,30 @@
           if (yLum < minBr) minBr = yLum;
           if (yLum > maxBr) maxBr = yLum;
 
-          // Klaster kromatisitas kulit universal (YCbCr + batasan melanin/hemoglobin)
-          var isSkin = (cb >= 75 && cb <= 130 && cr >= 133 && cr <= 175 && r > g && r > b && (r - g) >= 8 && yLum >= 25 && yLum <= 245);
+          var rgbSum = r + g + b;
+          var normR = rgbSum > 0 ? (r / rgbSum) : 0;
+          var normG = rgbSum > 0 ? (g / rgbSum) : 0;
+
+          // Model kromatisitas kulit presisi tinggi (YCbCr + normalized RGB)
+          var isSkin = (
+            cb >= 80 && cb <= 133 &&
+            cr >= 133 && cr <= 178 &&
+            r > g && g >= b &&
+            (r - g) >= 8 &&
+            normR >= 0.35 && normR <= 0.62 &&
+            normG >= 0.25 && normG <= 0.39 &&
+            (normR - normG) >= 0.04 &&
+            yLum >= 25 && yLum <= 242
+          );
+
           if (isSkin) {
             skinCount++;
+            sumX += x;
+            sumY += y;
+            if (x < minX) minX = x;
+            if (x > maxX) maxX = x;
+            if (y < minY) minY = y;
+            if (y > maxY) maxY = y;
           }
 
           if (x >= cX1 && x <= cX2 && y >= cY1 && y <= cY2) {
@@ -118,13 +140,30 @@
       // 2. Silau ekstrem tanpa kontras
       if (avgBr > 240 && contrastRange < 15) return false;
 
-      // 3. Wajah tidak ada di tengah frame (dinding, langit-langit, berpaling dari layar)
+      // 3. Wajah tidak ada di tengah frame
       if (centerSkinRatio < 0.14) return false;
 
-      // 4. Hitung gradien tekstur mikro di area tengah (mata, alis, hidung, bibir)
+      // 4. Jumlah piksel kulit wajar (menolak meja/dinding raksasa yang memenuhi frame)
+      if (skinCount < 80 || skinCount > 2000) return false;
+
+      // 5. Centroid posisi wajah harus di tengah (menolak murid menoleh ke samping atau di tepi)
+      var cX = Math.round(sumX / skinCount);
+      var cY = Math.round(sumY / skinCount);
+      if (cX < 18 || cX > 46 || cY < 10 || cY > 38) return false;
+
+      // 6. Bounding box & proporsi oval wajah
+      var boxW = (maxX - minX) + 1;
+      var boxH = (maxY - minY) + 1;
+      if (boxW < 10 || boxH < 10) return false;
+      var aspect = boxH / boxW;
+      if (aspect < 0.65 || aspect > 2.8) return false; // Menolak meja kayu horizontal lebar
+
+      // 7. Hitung gradien tekstur mikro di area wajah
       var gradSum = 0, gradCount = 0, maxLocalGrad = 0;
-      for (var gy = cY1 + 1; gy < cY2 - 1; gy++) {
-        for (var gx = cX1 + 1; gx < cX2 - 1; gx++) {
+      var gy1 = Math.max(1, minY), gy2 = Math.min(h - 2, maxY);
+      var gx1 = Math.max(1, minX), gx2 = Math.min(w - 2, maxX);
+      for (var gy = gy1; gy <= gy2; gy++) {
+        for (var gx = gx1; gx <= gx2; gx++) {
           var dx = Math.abs(Ygrid[gy * w + (gx + 1)] - Ygrid[gy * w + (gx - 1)]);
           var dy = Math.abs(Ygrid[(gy + 1) * w + gx] - Ygrid[(gy - 1) * w + gx]);
           var gMag = dx + dy;
@@ -134,32 +173,56 @@
         }
       }
       var avgGrad = gradCount > 0 ? (gradSum / gradCount) : 0;
+      if (avgGrad < 2.0 && maxLocalGrad < 14) return false;
 
-      // 5. Kontras Haar vertikal (Dahi vs Cekungan Mata vs Pipi)
+      // 8. Haar cascade dahi vs mata vs pipi (Bilateral Dual-Eye)
       var fSum = 0, fCount = 0;
       var eSum = 0, eCount = 0;
       var cSum = 0, cCount = 0;
-      for (var hy1 = 12; hy1 <= 18; hy1++) {
-        for (var hx1 = 22; hx1 <= 42; hx1++) { fSum += Ygrid[hy1 * w + hx1]; fCount++; }
+      var eLSum = 0, eLCount = 0, eRSum = 0, eRCount = 0;
+
+      var fhY1 = Math.max(0, cY - 12), fhY2 = Math.max(0, cY - 6);
+      for (var fy = fhY1; fy <= fhY2; fy++) {
+        for (var fx = Math.max(0, cX - 8); fx <= Math.min(w - 1, cX + 8); fx++) {
+          fSum += Ygrid[fy * w + fx]; fCount++;
+        }
       }
-      for (var hy2 = 20; hy2 <= 26; hy2++) {
-        for (var hx2 = 22; hx2 <= 42; hx2++) { eSum += Ygrid[hy2 * w + hx2]; eCount++; }
+
+      var eyeY1 = Math.max(0, cY - 5), eyeY2 = Math.min(h - 1, cY + 1);
+      for (var ey = eyeY1; ey <= eyeY2; ey++) {
+        for (var ex = Math.max(0, cX - 10); ex <= Math.max(0, cX - 2); ex++) {
+          eLSum += Ygrid[ey * w + ex]; eLCount++;
+          eSum += Ygrid[ey * w + ex]; eCount++;
+        }
+        for (var ex = Math.min(w - 1, cX + 2); ex <= Math.min(w - 1, cX + 10); ex++) {
+          eRSum += Ygrid[ey * w + ex]; eRCount++;
+          eSum += Ygrid[ey * w + ex]; eCount++;
+        }
       }
-      for (var hy3 = 28; hy3 <= 34; hy3++) {
-        for (var hx3 = 22; hx3 <= 42; hx3++) { cSum += Ygrid[hy3 * w + hx3]; cCount++; }
+
+      var chkY1 = Math.min(h - 1, cY + 3), chkY2 = Math.min(h - 1, cY + 9);
+      for (var cy = chkY1; cy <= chkY2; cy++) {
+        for (var cx = Math.max(0, cX - 8); cx <= Math.min(w - 1, cX + 8); cx++) {
+          cSum += Ygrid[cy * w + cx]; cCount++;
+        }
       }
-      var fAvg = fSum / fCount;
-      var eAvg = eSum / eCount;
-      var cAvg = cSum / cCount;
+
+      var fAvg = fCount > 0 ? fSum / fCount : 0;
+      var eAvg = eCount > 0 ? eSum / eCount : 0;
+      var cAvg = cCount > 0 ? cSum / cCount : 0;
       var eyeDip = (fAvg - eAvg) + (cAvg - eAvg);
 
-      // 6. Penolakan meja kayu / telapak tangan polos yang menutupi kamera:
-      // Meja kayu atau telapak tangan tanpa fitur wajah memiliki eye dip sangat rendah dan tepi lokal rendah
-      var isFlatObject = (eyeDip < 0.5 && maxLocalGrad < 16) || (centerSkinRatio > 0.95 && eyeDip < 1.0);
-      if (isFlatObject) return false;
+      // Penolakan permukaan datar / meja / telapak tangan:
+      if (centerSkinRatio > 0.92 && eyeDip < 0.8) return false;
 
-      // Harus memiliki gradien tekstur fitur wajah atau kontras tepi yang memadai
-      return (avgGrad >= 2.5 || maxLocalGrad >= 18);
+      // Jika murid menoleh tajam ke samping (asimetri mata ekstrem):
+      if (eLCount > 0 && eRCount > 0) {
+        var eLAvg = eLSum / eLCount;
+        var eRAvg = eRSum / eRCount;
+        if (Math.abs(eLAvg - eRAvg) > 35) return false;
+      }
+
+      return true;
     } catch (_) {
       return false;
     }
@@ -170,17 +233,32 @@
     var vid = state.videoEl;
     if (vid.readyState < 2) return;
 
+    if (vid.paused) {
+      try {
+        var p = vid.play();
+        if (p && typeof p.catch === 'function') p.catch(function () {});
+      } catch (_) {}
+    }
+
     if (state.detector) {
       try {
         state.detector.detect(vid).then(function (faces) {
           if (faces && faces.length > 0) {
-            state.lastNativeFace = true;
-            state.lastNativeFaceTime = Date.now();
-            handleResult(true);
+            var f = faces[0].boundingBox || {};
+            var vW = vid.videoWidth || 320;
+            var midX = (f.x || 0) + (f.width || 0) / 2;
+            var isCentered = !f.width || (midX >= vW * 0.15 && midX <= vW * 0.85);
+            if (isCentered) {
+              state.lastNativeFace = true;
+              state.lastNativeFaceTime = Date.now();
+              handleResult(true);
+            } else {
+              state.lastNativeFace = false;
+              handleResult(false);
+            }
           } else {
             state.lastNativeFace = false;
-            // Native detector menemukan 0 wajah - verifikasi dengan algoritma CV
-            handleResult(fallbackCheck(vid, state.canvasEl, state.ctx));
+            handleResult(false);
           }
         }).catch(function () {
           handleResult(fallbackCheck(vid, state.canvasEl, state.ctx));
@@ -230,6 +308,9 @@
       if (opts) state.options = Object.assign({}, state.options || {}, opts);
       state.absentSince = 0;
       state.warned = false;
+      if (state.videoEl && state.videoEl.paused) {
+        try { var p = state.videoEl.play(); if (p && typeof p.catch === 'function') p.catch(function () {}); } catch (_) {}
+      }
       return Promise.resolve({ ok: true, active: true, stream: state.stream });
     }
     state.options = opts || {};
@@ -269,16 +350,16 @@
       vid.webkitPlaysInline = true;
       vid.muted = true;
       vid.autoplay = true;
-      vid.width = 160;
-      vid.height = 120;
+      vid.width = 320;
+      vid.height = 240;
       vid.style.position = 'fixed';
-      vid.style.top = '0';
-      vid.style.left = '0';
-      vid.style.width = '4px';
-      vid.style.height = '4px';
-      vid.style.opacity = '0.05';
+      vid.style.top = '-9999px';
+      vid.style.left = '-9999px';
+      vid.style.width = '320px';
+      vid.style.height = '240px';
+      vid.style.opacity = '0.01';
       vid.style.pointerEvents = 'none';
-      vid.style.zIndex = '999999';
+      vid.style.zIndex = '-9999';
       vid.srcObject = mediaStream;
 
       function triggerPlay() {
