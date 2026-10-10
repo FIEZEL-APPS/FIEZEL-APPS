@@ -892,10 +892,10 @@ test('face-guard: anti-spoofing menolak layar HP, layar laptop, wallpaper statis
     return { video: { readyState: 2 }, cvs: { width: w, height: h }, ctx: { drawImage() {}, getImageData: () => ({ data }) } };
   };
 
-  // 1. Gambar wajah di layar HP / Laptop dengan pantulan kaca (glass specular glare: titik putih murni jenuh R,G,B > 230)
+  // 1. Gambar wajah di layar HP / Laptop dengan pantulan kaca luas (glass specular glare: >= 30 px jenuh R,G,B > 235)
   const screenWithGlare = mkCanvas((x, y) => {
     if (x >= 18 && x <= 46 && y >= 12 && y <= 36) {
-      if (x >= 28 && x <= 32 && y >= 16 && y <= 18) {
+      if (x >= 24 && x <= 40 && y >= 15 && y <= 18) {
         return [245, 245, 245]; // Glare pantulan lampu pada kaca layar
       }
       if (y >= 20 && y <= 26 && x >= 22 && x <= 42) return [40, 30, 25];
@@ -905,21 +905,21 @@ test('face-guard: anti-spoofing menolak layar HP, layar laptop, wallpaper statis
   });
   assert.strictEqual(FaceGuard.fallbackCheck(screenWithGlare.video, screenWithGlare.cvs, screenWithGlare.ctx), false, 'foto di layar HP / laptop dengan glare kaca HARUS ditolak');
 
-  // 2. Gambar wajah di layar LCD dengan backlight bleed (rongga mata tidak bisa hitam pekat, eyeDarkMin > 52)
-  const screenBacklight = mkCanvas((x, y) => {
+  // 2. Wajah manusia asli di ruangan normal dengan pencahayaan ruangan alami (rongga mata realistis Y ~ 65) WAJIB diterima
+  const realFaceNormalRoom = mkCanvas((x, y) => {
     if (x >= 18 && x <= 46 && y >= 12 && y <= 36) {
-      if (y >= 20 && y <= 26 && x >= 22 && x <= 42) return [65, 58, 55]; // Hitam bocor backlight LCD (Y > 52)
+      if (y >= 20 && y <= 26 && x >= 22 && x <= 42) return [75, 65, 60]; // Rongga mata manusia di ruangan normal
       return [180, 130, 100];
     }
     return [80, 85, 90];
   });
-  assert.strictEqual(FaceGuard.fallbackCheck(screenBacklight.video, screenBacklight.cvs, screenBacklight.ctx), false, 'layar LCD dengan backlight bleed di rongga mata HARUS ditolak');
+  assert.strictEqual(FaceGuard.fallbackCheck(realFaceNormalRoom.video, realFaceNormalRoom.cvs, realFaceNormalRoom.ctx), true, 'wajah manusia asli di ruangan normal HARUS diterima');
 
   // 3. Foto kertas diam / wallpaper dinding (statis total tanpa dinamika biologis)
   FaceGuard.resetLiveness();
   const staticPhoto = mkCanvas((x, y) => {
     if (x >= 18 && x <= 46 && y >= 12 && y <= 36) {
-      if (y >= 20 && y <= 26 && x >= 22 && x <= 42) return [40, 30, 25];
+      if (y >= 20 && y <= 26 && x >= 22 && x <= 42) return [75, 65, 60];
       return [180, 130, 100];
     }
     return [80, 85, 90];

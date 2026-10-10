@@ -1,7 +1,7 @@
 {
-  "version": "m025-553",
-  "claimedBy": "branch feat/proctor-anti-spoof-liveness-m025-554",
-  "claimedAt": "2026-10-10T12:39:09.122Z",
-  "reason": "fix(proctor): deteksi wajah manusia asli instan, anti-spoofing layar hp, laptop, wallpaper, dan anti-cahaya palsu (m025-553)",
+  "version": "m025-554",
+  "claimedBy": "branch fix/preflight-face-verification-m025-554",
+  "claimedAt": "2026-10-10T13:21:36.733Z",
+  "reason": "fix(proctor): deteksi wajah instan di verifikasi wajah & eliminasi false-positive anti-spoofing (m025-554)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
