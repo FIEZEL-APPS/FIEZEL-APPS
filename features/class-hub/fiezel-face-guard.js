@@ -22,8 +22,8 @@
   'use strict';
 
   var SAMPLE_INTERVAL_MS = 250;
-  var WARN_THRESHOLD_MS = 2500;
-  var ABSENT_THRESHOLD_MS = 10000;
+  var WARN_THRESHOLD_MS = 1000;
+  var ABSENT_THRESHOLD_MS = 2000;
 
   var state = {
     active: false,

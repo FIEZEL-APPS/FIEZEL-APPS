@@ -44,10 +44,10 @@ test('guard: kepergian di bawah masa tenggang dibuang, di atasnya dihitung', () 
   assert.strictEqual(s.episodes.length, 1);
 });
 
-test('guard: wajah hilang di bawah masa tenggang 10 detik dibuang, di atasnya dicatat', () => {
+test('guard: wajah hilang di bawah masa tenggang dibuang, di atasnya dicatat', () => {
   const s = FG.start('a1', 0);
   FG.leaveFace(s, 1000);
-  assert.strictEqual(FG.backFace(s, 1000 + FG.FACE_GRACE_MS - 1), null, 'gerakan wajar di bawah 10 detik tidak dicatat');
+  assert.strictEqual(FG.backFace(s, 1000 + FG.FACE_GRACE_MS - 1), null, 'gerakan wajar di bawah masa tenggang tidak dicatat');
   assert.strictEqual(s.faceN, 0);
   FG.leaveFace(s, 5000);
   const ep = FG.backFace(s, 5000 + 15000);
@@ -396,8 +396,8 @@ test('face-guard: fallbackCheck membedakan wajah vs kamera tertutup vs langit-la
   const FaceGuard = require('../features/class-hub/fiezel-face-guard.js');
   assert.ok(FaceGuard && typeof FaceGuard.fallbackCheck === 'function');
   assert.strictEqual(FaceGuard.SAMPLE_INTERVAL_MS, 250);
-  assert.strictEqual(FaceGuard.WARN_THRESHOLD_MS, 2500);
-  assert.strictEqual(FaceGuard.ABSENT_THRESHOLD_MS, 10000);
+  assert.strictEqual(FaceGuard.WARN_THRESHOLD_MS, 1000);
+  assert.strictEqual(FaceGuard.ABSENT_THRESHOLD_MS, 2000);
 
   function makeMockCanvas(pixelFn) {
     const w = 64, h = 48;
@@ -933,6 +933,41 @@ test('face-guard: anti-spoofing menolak layar HP, layar laptop, wallpaper statis
     assert.strictEqual(res.stage, 'challenge', 'foto di wallpaper/kertas harus tertahan di challenge');
   }
   assert.strictEqual(FaceGuard.isLivenessVerified(), false, 'foto wallpaper/kertas tidak boleh lolos liveness');
+});
+
+test('proctor: pencatatan instan keluar layar dan wajah hilang bahkan hanya 1 detik tanpa delay atau desinkronisasi', () => {
+  const s = FG.start('a1', 0);
+
+  // 1. Keluar layar 1 detik (1000ms) langsung tercatat
+  FG.leave(s, 1000, 'hidden');
+  const sumLive = FG.summary(s, 1600);
+  assert.strictEqual(sumLive.n, 1, 'kepergian live >= 500ms langsung masuk hitungan ringkasan');
+  const ep1 = FG.back(s, 2000);
+  assert.ok(ep1 && ep1.ms === 1000, 'episode keluar layar 1 detik tidak dibuang');
+  assert.strictEqual(s.n, 1, 's.n bertambah menjadi 1');
+  assert.strictEqual(s.ms, 1000, 's.ms tercatat 1000ms');
+
+  // 2. Wajah hilang 1 detik (1000ms) langsung tercatat
+  FG.leaveFace(s, 3000);
+  const sumFaceLive = FG.summary(s, 4000);
+  assert.strictEqual(sumFaceLive.vn, 1, 'wajah hilang live >= 1000ms langsung masuk hitungan ringkasan');
+  const epFace1 = FG.backFace(s, 4000);
+  assert.ok(epFace1 && epFace1.ms === 1000, 'episode wajah hilang 1 detik tidak dibuang');
+  assert.strictEqual(s.faceN, 1, 's.faceN bertambah menjadi 1');
+  assert.strictEqual(s.faceMs, 1000, 's.faceMs tercatat 1000ms');
+
+  // 3. Kepergian ke-2 kali secara berulang langsung menaikkan angka tanpa nyangkut
+  FG.leave(s, 5000, 'blur');
+  const ep2 = FG.back(s, 6000);
+  assert.ok(ep2 && ep2.ms === 1000);
+  assert.strictEqual(s.n, 2, 'kepergian ke-2 langsung menaikkan hitungan ke 2x');
+  assert.strictEqual(s.ms, 2000);
+
+  FG.leaveFace(s, 7000);
+  const epFace2 = FG.backFace(s, 8000);
+  assert.ok(epFace2 && epFace2.ms === 1000);
+  assert.strictEqual(s.faceN, 2, 'wajah hilang ke-2 langsung menaikkan hitungan ke 2x');
+  assert.strictEqual(s.faceMs, 2000);
 });
 
 (async () => {

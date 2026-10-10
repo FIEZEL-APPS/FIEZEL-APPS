@@ -1,7 +1,7 @@
 {
-  "version": "m025-556",
-  "claimedBy": "branch main",
-  "claimedAt": "2026-10-10T15:47:41.854Z",
-  "reason": "fix(proctor): perbaikan akar liveness kedip mata perlahan & ketahanan temporal anti-spoofing (m025-556)",
+  "version": "m025-557",
+  "claimedBy": "branch fix/instant-proctor-recording-m025-557",
+  "claimedAt": "2026-10-10T16:17:57.970Z",
+  "reason": "fix(proctor): pencatatan instan keluar layar & wajah keluar layar bahkan 1 detik (m025-557)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
