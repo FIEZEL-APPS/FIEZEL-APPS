@@ -21,8 +21,8 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
 
-  var SAMPLE_INTERVAL_MS = 1000;
-  var WARN_THRESHOLD_MS = 2000;
+  var SAMPLE_INTERVAL_MS = 250;
+  var WARN_THRESHOLD_MS = 750;
   var ABSENT_THRESHOLD_MS = 10000;
 
   var state = {
@@ -35,6 +35,8 @@
     detector: null,
     absentSince: 0,
     warned: false,
+    lastNativeFace: false,
+    lastNativeFaceTime: 0,
     options: null
   };
 
@@ -59,85 +61,107 @@
   }
 
   /**
-   * Analisis piksel fallback saat browser belum memiliki FaceDetector bawaan.
-   * Mengukur variasi kontras, kecerahan, dan rentang spektrum warna kulit pada frame 64x48.
+   * Analisis computer vision presisi tinggi pada frame 64x48.
+   * Mengukur klaster kromatisitas YCbCr kulit manusia, konsentrasi oval tengah,
+   * gradien mikro-tekstur fitur wajah (mata/alis/hidung/mulut), serta kontras Haar vertikal (eye-dip).
+   * Mampu menolak secara akurat: ruangan gelap, silau, dinding kosong, meja kayu,
+   * telapak tangan penutup kamera, dan pengguna yang berpaling/meninggalkan layar.
    */
   function fallbackCheck(video, canvas, ctx) {
-    if (!video || !canvas || !ctx) return true;
-    if (video.readyState < 2) return true;
+    if (!video || !canvas || !ctx) return false;
+    if (video.readyState < 2) return false;
     try {
       var w = 64, h = 48;
       ctx.drawImage(video, 0, 0, w, h);
       var imgData = ctx.getImageData(0, 0, w, h);
       var d = imgData.data;
-      var totalBright = 0, totalSkin = 0, centerSkin = 0;
-      var minBr = 255, maxBr = 0;
-      var count = w * h;
-      var centerCount = 0;
 
-      // Area tengah kamera depan (persegi 50% di mana wajah murid berada saat menghadap layar)
-      var cX1 = 16, cX2 = 48, cY1 = 10, cY2 = 38;
+      var totalY = 0, minBr = 255, maxBr = 0;
+      var skinCount = 0, centerSkin = 0, centerTotal = 0;
+      var cX1 = 16, cX2 = 48, cY1 = 8, cY2 = 40;
+
+      var Ygrid = new Float32Array(w * h);
 
       for (var y = 0; y < h; y++) {
-        var isCenterY = (y >= cY1 && y <= cY2);
         for (var x = 0; x < w; x++) {
           var idx = (y * w + x) * 4;
           var r = d[idx], g = d[idx + 1], b = d[idx + 2];
-          var br = (r + g + b) / 3;
-          totalBright += br;
-          if (br < minBr) minBr = br;
-          if (br > maxBr) maxBr = br;
+          var yLum = 0.299 * r + 0.587 * g + 0.114 * b;
+          var cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b;
+          var cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b;
 
-          var isCenter = isCenterY && (x >= cX1 && x <= cX2);
-          if (isCenter) centerCount++;
+          Ygrid[y * w + x] = yLum;
+          totalY += yLum;
+          if (yLum < minBr) minBr = yLum;
+          if (yLum > maxBr) maxBr = yLum;
 
-          // Deteksi spektrum warna kulit universal (melanin & hemoglobin menyerap hijau & biru)
-          var isSkin = false;
-          if (r > 38 && g > 25 && b > 15 && r > g && r > b) {
-            var diffRG = r - g;
-            var diffRB = r - b;
-            var maxC = Math.max(r, Math.max(g, b));
-            var minC = Math.min(r, Math.min(g, b));
-            if (diffRG >= 5 && diffRB >= 8 && (maxC - minC) >= 10) {
-              isSkin = true;
-            }
+          // Klaster kromatisitas kulit universal (YCbCr + batasan melanin/hemoglobin)
+          var isSkin = (cb >= 75 && cb <= 130 && cr >= 133 && cr <= 175 && r > g && r > b && (r - g) >= 8 && yLum >= 25 && yLum <= 245);
+          if (isSkin) {
+            skinCount++;
           }
 
-          if (isSkin) {
-            totalSkin++;
-            if (isCenter) centerSkin++;
+          if (x >= cX1 && x <= cX2 && y >= cY1 && y <= cY2) {
+            centerTotal++;
+            if (isSkin) centerSkin++;
           }
         }
       }
 
-      var avgBr = totalBright / count;
+      var avgBr = totalY / (w * h);
       var contrastRange = maxBr - minBr;
-      var skinRatio = totalSkin / count;
-      var centerSkinRatio = centerCount > 0 ? (centerSkin / centerCount) : skinRatio;
+      var centerSkinRatio = centerTotal > 0 ? (centerSkin / centerTotal) : 0;
 
-      // 1. Kamera tertutup rapat (jari, meja, kantong, lakban) -> sangat gelap
-      if (avgBr < 14) {
-        return false;
+      // 1. Kamera tertutup rapat (hitam / gelap)
+      if (avgBr < 14) return false;
+
+      // 2. Silau ekstrem tanpa kontras
+      if (avgBr > 240 && contrastRange < 15) return false;
+
+      // 3. Wajah tidak ada di tengah frame (dinding, langit-langit, berpaling dari layar)
+      if (centerSkinRatio < 0.14) return false;
+
+      // 4. Hitung gradien tekstur mikro di area tengah (mata, alis, hidung, bibir)
+      var gradSum = 0, gradCount = 0, maxLocalGrad = 0;
+      for (var gy = cY1 + 1; gy < cY2 - 1; gy++) {
+        for (var gx = cX1 + 1; gx < cX2 - 1; gx++) {
+          var dx = Math.abs(Ygrid[gy * w + (gx + 1)] - Ygrid[gy * w + (gx - 1)]);
+          var dy = Math.abs(Ygrid[(gy + 1) * w + gx] - Ygrid[(gy - 1) * w + gx]);
+          var gMag = dx + dy;
+          gradSum += gMag;
+          gradCount++;
+          if (gMag > maxLocalGrad) maxLocalGrad = gMag;
+        }
       }
+      var avgGrad = gradCount > 0 ? (gradSum / gradCount) : 0;
 
-      // 2. Kamera tersorot lampu langsung / silau ekstrem tanpa kontras wajah
-      if (avgBr > 240 && contrastRange < 15) {
-        return false;
+      // 5. Kontras Haar vertikal (Dahi vs Cekungan Mata vs Pipi)
+      var fSum = 0, fCount = 0;
+      var eSum = 0, eCount = 0;
+      var cSum = 0, cCount = 0;
+      for (var hy1 = 12; hy1 <= 18; hy1++) {
+        for (var hx1 = 22; hx1 <= 42; hx1++) { fSum += Ygrid[hy1 * w + hx1]; fCount++; }
       }
-
-      // 3. Kamera ditutup jempol tembus cahaya (flat merah pekat tanpa kontras fitur wajah)
-      if (contrastRange < 12 && skinRatio > 0.5) {
-        return false;
+      for (var hy2 = 20; hy2 <= 26; hy2++) {
+        for (var hx2 = 22; hx2 <= 42; hx2++) { eSum += Ygrid[hy2 * w + hx2]; eCount++; }
       }
-
-      // 4. Kamera menghadap langit-langit / dinding kosong / meja / laptop (tanpa kulit di tengah atau frame)
-      if (skinRatio < 0.025 && centerSkinRatio < 0.03) {
-        return false;
+      for (var hy3 = 28; hy3 <= 34; hy3++) {
+        for (var hx3 = 22; hx3 <= 42; hx3++) { cSum += Ygrid[hy3 * w + hx3]; cCount++; }
       }
+      var fAvg = fSum / fCount;
+      var eAvg = eSum / eCount;
+      var cAvg = cSum / cCount;
+      var eyeDip = (fAvg - eAvg) + (cAvg - eAvg);
 
-      return true;
+      // 6. Penolakan meja kayu / telapak tangan polos yang menutupi kamera:
+      // Meja kayu atau telapak tangan tanpa fitur wajah memiliki eye dip sangat rendah dan tepi lokal rendah
+      var isFlatObject = (eyeDip < 0.5 && maxLocalGrad < 16) || (centerSkinRatio > 0.95 && eyeDip < 1.0);
+      if (isFlatObject) return false;
+
+      // Harus memiliki gradien tekstur fitur wajah atau kontras tepi yang memadai
+      return (avgGrad >= 2.5 || maxLocalGrad >= 18);
     } catch (_) {
-      return true; // Asumsikan hadir bila kanvas gagal
+      return false;
     }
   }
 
@@ -150,9 +174,12 @@
       try {
         state.detector.detect(vid).then(function (faces) {
           if (faces && faces.length > 0) {
+            state.lastNativeFace = true;
+            state.lastNativeFaceTime = Date.now();
             handleResult(true);
           } else {
-            // Verifikasi ganda dengan fallback agar tidak keliru memvonis saat minim cahaya
+            state.lastNativeFace = false;
+            // Native detector menemukan 0 wajah - verifikasi dengan algoritma CV
             handleResult(fallbackCheck(vid, state.canvasEl, state.ctx));
           }
         }).catch(function () {
@@ -245,13 +272,13 @@
       vid.width = 160;
       vid.height = 120;
       vid.style.position = 'fixed';
+      vid.style.top = '0';
       vid.style.left = '0';
-      vid.style.bottom = '0';
-      vid.style.width = '160px';
-      vid.style.height = '120px';
-      vid.style.opacity = '0.001';
+      vid.style.width = '4px';
+      vid.style.height = '4px';
+      vid.style.opacity = '0.05';
       vid.style.pointerEvents = 'none';
-      vid.style.zIndex = '-9999';
+      vid.style.zIndex = '999999';
       vid.srcObject = mediaStream;
 
       function triggerPlay() {
@@ -333,9 +360,11 @@
   }
 
   function checkNow() {
-    if (!state.active) return false;
-    checkFrame();
-    return !state.absentSince;
+    if (!state.active || !state.videoEl || state.videoEl.readyState < 2) return false;
+    if (state.lastNativeFace && (Date.now() - state.lastNativeFaceTime < 1000)) return true;
+    var ok = fallbackCheck(state.videoEl, state.canvasEl, state.ctx);
+    handleResult(ok);
+    return ok;
   }
 
   return {

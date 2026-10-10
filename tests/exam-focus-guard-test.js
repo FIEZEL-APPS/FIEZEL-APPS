@@ -395,8 +395,8 @@ test('pemasangan: modul terdaftar di index.html + sw.js, dan teks murid lahir du
 test('face-guard: fallbackCheck membedakan wajah vs kamera tertutup vs langit-langit / meja', () => {
   const FaceGuard = require('../features/class-hub/fiezel-face-guard.js');
   assert.ok(FaceGuard && typeof FaceGuard.fallbackCheck === 'function');
-  assert.strictEqual(FaceGuard.SAMPLE_INTERVAL_MS, 1000);
-  assert.strictEqual(FaceGuard.WARN_THRESHOLD_MS, 2000);
+  assert.strictEqual(FaceGuard.SAMPLE_INTERVAL_MS, 250);
+  assert.strictEqual(FaceGuard.WARN_THRESHOLD_MS, 750);
   assert.strictEqual(FaceGuard.ABSENT_THRESHOLD_MS, 10000);
 
   function makeMockCanvas(pixelFn) {
@@ -436,6 +436,21 @@ test('face-guard: fallbackCheck membedakan wajah vs kamera tertutup vs langit-la
     return [80, 85, 90];
   });
   assert.strictEqual(FaceGuard.fallbackCheck(face.video, face.cvs, face.ctx), true, 'wajah murid di depan kamera harus terdeteksi hadir');
+
+  // 4. Meja kayu / perabot warna hangat (tidak boleh lolos sebagai wajah!)
+  const wood = makeMockCanvas(() => [160, 110, 65]);
+  assert.strictEqual(FaceGuard.fallbackCheck(wood.video, wood.cvs, wood.ctx), false, 'meja kayu / permukaan datar harus ditolak');
+
+  // 5. Telapak tangan menutupi kamera secara merata (tanpa fitur mata/wajah)
+  const palm = makeMockCanvas(() => [175, 125, 95]);
+  assert.strictEqual(FaceGuard.fallbackCheck(palm.video, palm.cvs, palm.ctx), false, 'telapak tangan menutupi lensa harus ditolak');
+
+  // 6. Murid berpaling / meninggalkan kamera (hanya tersisa ujung rambut di tepi)
+  const away = makeMockCanvas((x, y) => {
+    if (x >= 55 && y >= 40) return [40, 35, 30];
+    return [130, 130, 130];
+  });
+  assert.strictEqual(FaceGuard.fallbackCheck(away.video, away.cvs, away.ctx), false, 'murid berpaling / tidak menghadap kamera harus terdeteksi absen');
 });
 
 test('face-guard: modal ramah popup instan saat wajah tak terdeteksi dan auto-dismiss saat kembali', () => {
