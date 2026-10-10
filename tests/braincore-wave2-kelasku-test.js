@@ -16,6 +16,8 @@
 const fs = require('fs');
 const path = require('path');
 
+const { pathToFileURL } = require('url');
+
 const __fzRoot = path.join(__dirname, '..');
 const read = p => fs.readFileSync(path.join(__fzRoot, p), 'utf8');
 let pass = 0;
@@ -26,7 +28,7 @@ function check(name, ok, detail) {
 
 (async () => {
   // ---- K1: server ----
-  const core = await import(path.join(__fzRoot, 'workers/api/teacher/class-sync-core.js'));
+  const core = await import(pathToFileURL(path.join(__fzRoot, 'workers/api/teacher/class-sync-core.js')).href);
   const now = Date.now();
   const base = { cls: 'FZ-ABC234', name: 'Rani', skills: { grammar: { c: 3, t: 5 } } };
   const ok = core.normalizeReport(Object.assign({}, base, { bc: { lv: 'A1', dir: 'up', due: 4, weak: ['subject_object_pronouns_and_possessives'], fix: 'time_prepositions_in_on_at' } }), now);
