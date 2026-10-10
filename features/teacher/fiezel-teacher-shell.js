@@ -4305,16 +4305,23 @@
           var whyKey = qItem.answer;
           var mainWhy = (qItem.why && (qItem.why[whyKey] || qItem.why[String(whyKey)])) || '';
           var trapHtml = '';
-          if (qItem.distractorWhy) {
-            var traps = [];
-            for (var dKey in qItem.distractorWhy) {
-              if (qItem.distractorWhy.hasOwnProperty(dKey) && Number(dKey) !== whyKey) {
-                var dLetter = String.fromCharCode(65 + Number(dKey));
-                traps.push('<div><span class="tg-trap-note">⚠️ ' + esc(t('guru.jebakan-opsi', 'Miskonsepsi Opsi')) + ' ' + dLetter + ':</span> ' + esc(qItem.distractorWhy[dKey]) + '</div>');
+          var trapsSource = qItem.distractorWhy || {};
+          var traps = [];
+          for (var dKey in trapsSource) {
+            if (Object.prototype.hasOwnProperty.call(trapsSource, dKey) && Number(dKey) !== whyKey) {
+              var dLetter = String.fromCharCode(65 + Number(dKey));
+              traps.push('<div><span class="tg-trap-note">⚠️ ' + esc(t('guru.jebakan-opsi', 'Miskonsepsi Opsi')) + ' ' + dLetter + ':</span> ' + esc(trapsSource[dKey]) + '</div>');
+            }
+          }
+          if (qItem.why && typeof qItem.why === 'object') {
+            for (var wKey in qItem.why) {
+              if (Object.prototype.hasOwnProperty.call(qItem.why, wKey) && Number(wKey) !== whyKey && !trapsSource[wKey]) {
+                var wLetter = String.fromCharCode(65 + Number(wKey));
+                traps.push('<div><span class="tg-trap-note">⚠️ ' + esc(t('guru.jebakan-opsi', 'Miskonsepsi Opsi')) + ' ' + wLetter + ':</span> ' + esc(qItem.why[wKey]) + '</div>');
               }
             }
-            if (traps.length) trapHtml = traps.join('');
           }
+          if (traps.length) trapHtml = traps.join('');
 
           var explanationHtml = (mainWhy || trapHtml) ? (
             '<details class="tg-q-explanation">' +
@@ -4670,7 +4677,7 @@
           ui.sending = null;
           if (r.ok) asg.retractedAt = null;
           if (r.ok) { saveMinutes(sid ? 1 : 5); toast(sid ? t('guru.toast-kirim-satu', 'Tugas dikirim ke {nama} — muncul di notifikasinya.').replace('{nama}', (student(sid) || {}).name) : t('guru.toast-kirim-banyak', 'Tugas dikirim ke {jumlah} murid — muncul di notifikasi mereka.').replace('{jumlah}', r.count)); }
-          else toast(r.error === 'class_code_taken' ? 'Kode kelas dipakai guru lain — ubah kode kelas dulu.' : r.error === 'not_found' ? t('guru.kelas-belum-sinkron', 'Kelas belum terdaftar di server — tekan Sinkron lalu coba lagi.') : t('guru.toast-gagal-kirim', 'Gagal mengirim ({sebab}). Coba lagi.').replace('{sebab}', r.error || 'unknown'));
+          else toast(r.error === 'payload too large' ? t('guru.payload-terlalu-besar', 'Ukuran tugas melebihi batas server — kurangi jumlah soal atau bagikan lewat kode kelas.') : r.error === 'class_code_taken' ? 'Kode kelas dipakai guru lain — ubah kode kelas dulu.' : r.error === 'not_found' ? t('guru.kelas-belum-sinkron', 'Kelas belum terdaftar di server — tekan Sinkron lalu coba lagi.') : t('guru.toast-gagal-kirim', 'Gagal mengirim ({sebab}). Coba lagi.').replace('{sebab}', r.error || 'unknown'));
           persist(); render();
         });
         return;
@@ -5135,6 +5142,8 @@
             a.retractedAt = null;
             var count = (targets && targets.length) || (r && r.count) || (c.students || []).length || 'semua';
             toast(t('guru.toast-kirim-banyak', 'Tugas dikirim ke {jumlah} murid — muncul di notifikasi mereka.').replace('{jumlah}', count));
+          } else if (r && !r.ok) {
+            toast(r.error === 'payload too large' ? t('guru.payload-terlalu-besar', 'Ukuran tugas melebihi batas server — kurangi jumlah soal atau bagikan lewat kode kelas.') : r.error === 'class_code_taken' ? 'Kode kelas dipakai guru lain — ubah kode kelas dulu.' : r.error === 'not_found' ? t('guru.kelas-belum-sinkron', 'Kelas belum terdaftar di server — tekan Sinkron lalu coba lagi.') : t('guru.toast-gagal-kirim', 'Gagal mengirim ({sebab}). Coba lagi.').replace('{sebab}', r.error || 'unknown'));
           }
           persist();
           render();

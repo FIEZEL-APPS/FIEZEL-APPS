@@ -99,7 +99,7 @@ test('server class-sync-core: payload menerima items[]+teacher; laporan menerima
   assert.strictEqual(rep.report.assign[1].w.length, 2);
   assert.strictEqual(core.normalizeReport({ v: 1, cls: 'FZ-ABC234', name: 'Ani', at: Date.now(), skills: {}, assign: [{ id: 'as-2', c: 1, t: 1, w: [{ i: 'x', o: 99 }] }] }, Date.now()).reason, 'bad_assign_wrong');
   const schema = read('workers/api/schema.js');
-  assert.ok(/'\/api\/teacher\/class\/assign': 32768/.test(schema) && /'\/api\/learner\/class-report': 8192/.test(schema), 'byte limit menampung items & w');
+  assert.ok(/'\/api\/teacher\/class\/assign': (?:32768|262144)/.test(schema) && /'\/api\/learner\/class-report': 8192/.test(schema), 'byte limit menampung items & w');
 });
 
 test('teacher store: payload membawa teacher/items; ingest membaca s (sedang) dan w (bukti per-soal)', () => {

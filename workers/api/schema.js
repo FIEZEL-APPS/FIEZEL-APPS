@@ -93,7 +93,7 @@ export const BYTE_LIMITS = Object.freeze({
   '/api/teacher/class/claim': 1024,
   '/api/teacher/class/list': 512,          // GET
   '/api/teacher/class/reports': 512,       // GET
-  '/api/teacher/class/assign': 32768,      // 40 itemIds + 80 nama target + ≤40 soal kustom (class-hub) + amplop
+  '/api/teacher/class/assign': 262144,     // 40 itemIds + 80 nama target + ≤40 soal kustom (class-hub) + amplop (256 KB)
   '/api/teacher/class/retract': 512,       // { code, id } — m025-365
   // --- SLOT 7: lapisan sosial (route-social.js). Payload kecil = CPU kecil;
   // satu-satunya yang besar adalah evidence batch (maks 20 event, pola LIMITS

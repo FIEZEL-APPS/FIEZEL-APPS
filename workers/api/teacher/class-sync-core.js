@@ -197,9 +197,18 @@ export function normalizeCustomItems(items) {
     const skill = /^[a-z0-9_]{1,32}$/.test(rawSkill) ? rawSkill : 'grammar';
     const item = { id, prompt, options, answer, skill };
     if (typeof q.context === 'string' && q.context.trim()) item.context = q.context.trim().slice(0, ASSIGN_LIMITS.CONTEXT_MAX);
-    if (q.why && typeof q.why === 'object' && !Array.isArray(q.why)) {
+    const whySource = Object.assign(
+      {},
+      (q.why && typeof q.why === 'object' && !Array.isArray(q.why)) ? q.why : (typeof q.why === 'string' && q.why.trim() ? { [answer]: q.why.trim() } : {}),
+      (q.distractorWhy && typeof q.distractorWhy === 'object' && !Array.isArray(q.distractorWhy)) ? q.distractorWhy : {}
+    );
+    if (Object.keys(whySource).length) {
       const why = {};
-      for (const k of Object.keys(q.why)) { const ki = intIn(k, options.length - 1); const txt = String(q.why[k] || '').trim().slice(0, ASSIGN_LIMITS.WHY_MAX); if (ki != null && txt) why[ki] = txt; }
+      for (const k of Object.keys(whySource)) {
+        const ki = intIn(k, options.length - 1);
+        const txt = String(whySource[k] || '').trim().slice(0, ASSIGN_LIMITS.WHY_MAX);
+        if (ki != null && txt) why[ki] = txt;
+      }
       if (Object.keys(why).length) item.why = why;
     }
     out.push(item);
@@ -239,13 +248,16 @@ export function normalizeAssignment(body) {
   const payload = { v: 1, t: 'assign', id, title, skills: cleanSkills, itemIds: a.itemIds.slice(), minutes, from, cls: code, deadline, mode, timer, shuffle: !!a.shuffle };
   const teacher = String(a.teacher || '').trim().slice(0, ASSIGN_LIMITS.TEACHER_MAX);
   if (teacher) payload.teacher = teacher;
-  const rawSubject = a.subjectId || a.subject_id;
+  const rawSubject = a.subjectId || a.subject_id || (a.source && (a.source.subjectId || a.source.subject_id));
   if (typeof rawSubject === 'string' && rawSubject.trim()) {
     payload.subjectId = rawSubject.trim().toUpperCase().slice(0, 16);
   }
-  const rawSubjectName = a.subjectName || a.subject_name;
+  const rawSubjectName = a.subjectName || a.subject_name || (a.source && (a.source.subjectName || a.source.subject_name));
   if (typeof rawSubjectName === 'string' && rawSubjectName.trim()) {
     payload.subjectName = rawSubjectName.trim().slice(0, 60);
+  }
+  if (a.source && typeof a.source === 'object' && !Array.isArray(a.source)) {
+    payload.source = Object.assign({}, a.source);
   }
   if (a.items !== undefined) {
     const ci = normalizeCustomItems(a.items);

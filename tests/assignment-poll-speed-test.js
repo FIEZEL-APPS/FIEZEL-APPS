@@ -73,6 +73,40 @@ test('8. Teacher store assignmentPayload memuat subjectId, subjectName, Broadcas
   assert.ok(storeSrc.includes('broadcastAssignmentSync: broadcastAssignmentSync'), 'broadcastAssignmentSync diekspor');
   assert.ok(shellSrc.includes('T.sendAssignment(c, a, targets)'), 'auto-dispatch aktif saat terbitkan tugas');
   assert.ok(shellSrc.includes("T.broadcastAssignmentSync('assignment-created', a.id)"), 'BroadcastChannel dipanggil di cangkang guru');
+  assert.ok(shellSrc.includes("r.error === 'payload too large'"), 'penanganan payload too large terpasang di teacher-shell');
+
+  // Evaluasi dinamis penyatuan why & distractorWhy serta keutuhan subjectId, subjectName, source
+  const TS = require('../features/teacher/fiezel-teacher-store.js');
+  const dummyCls = { name: 'Kelas 8B', code: 'FZ-8BTEST', subject: 'MAT' };
+  const dummyAsg = {
+    id: 'asg-test-opt',
+    title: 'Uji Optimasi Payload',
+    skills: ['MAT'],
+    itemIds: ['q-t1'],
+    subjectId: 'MAT',
+    subjectName: 'Matematika',
+    source: { subjectId: 'MAT', subjectName: 'Matematika' },
+    items: [{
+      id: 'q-t1',
+      prompt: 'Berapa 10 + 5?',
+      options: ['15', '14', '13', '12'],
+      answer: 0,
+      skill: 'mat',
+      why: { 0: '10 + 5 = 15' },
+      distractorWhy: { 1: '14 kurang 1', 2: '13 kurang 2', 3: '12 kurang 3' }
+    }]
+  };
+  const payload = TS.assignmentPayload(dummyCls, dummyAsg);
+  assert.strictEqual(payload.subjectId, 'MAT', 'subjectId utuh');
+  assert.strictEqual(payload.subjectName, 'Matematika', 'subjectName utuh');
+  assert.deepStrictEqual(payload.source, { subjectId: 'MAT', subjectName: 'Matematika' }, 'source utuh');
+  assert.strictEqual(payload.items[0].distractorWhy, undefined, 'distractorWhy tidak dikirim ganda');
+  assert.deepStrictEqual(payload.items[0].why, {
+    0: '10 + 5 = 15',
+    1: '14 kurang 1',
+    2: '13 kurang 2',
+    3: '12 kurang 3'
+  }, 'seluruh alasan why dan distractorWhy bersatu di o.why');
 });
 
 (async () => {

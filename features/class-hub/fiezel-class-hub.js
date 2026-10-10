@@ -893,7 +893,7 @@
      (selalu membawa angka terbaru, bukan selisih), satu kiriman menyusul di ujung jendela
      pembatas sudah cukup: yang tertinggal bukan satu peristiwa, melainkan keterlambatan. */
   var REPORT_GAP_MS = 16000;
-  function isExamRunner() { var u = ui(), a = currentAssignment(); return !!(u.runner && !u.runner.finished && a && a.mode === 'ujian'); }
+  function isExamRunner() { var u = ui(), a = currentAssignment(); return !!(u.runner && !u.runner.finished && a && (a.mode === 'ujian' || a.isExam || (a.timer && a.timer > 0))); }
   function saveFocus(st) { ui().focus = st; saveUi(); }
   /** Kirim ringkasan ke guru sekarang juga (lewat learner-flow -> class-report). */
   function reportFocus(st) {
@@ -946,8 +946,16 @@
           saveFocus(st);
         },
         onWarning: function (warn) {
+          var prevWarn = !!ui().faceWarn;
           ui().faceWarn = !!warn;
           if (sEl) renderStudent();
+          if (warn && !prevWarn) {
+            try {
+              if (typeof navigator !== 'undefined' && navigator.vibrate) {
+                navigator.vibrate([100, 50, 100]);
+              }
+            } catch (_) {}
+          }
         },
         onAbsentEpisode: function (elapsed) {
           var u = ui(), st = u.focus; if (!st || !FG() || !isExamRunner()) return;
@@ -960,6 +968,7 @@
         onPresent: function () {
           var u = ui(), st = u.focus; if (!st || !FG()) return;
           var ep = FG().backFace(st, Date.now());
+          var wasWarned = !!ui().faceWarn;
           ui().faceWarn = false;
           saveFocus(st);
           if (ep) {
@@ -967,6 +976,9 @@
             var sum = FG().summary(st, Date.now());
             if (sEl) renderStudent();
             if (sEnv.toast) sEnv.toast(t('proctor.wajah-tercatat', 'Wajah tidak terlihat {vn}× ({detik} detik). Catatannya terkirim ke gurumu.', { vn: sum.vn, detik: Math.round(ep.ms / 1000) }));
+          } else if (wasWarned) {
+            if (sEl) renderStudent();
+            if (sEnv.toast) sEnv.toast(t('proctor.wajah-kembali', 'Wajah terdeteksi kembali! Selamat melanjutkan ujian.'));
           }
         }
       });
@@ -1021,7 +1033,7 @@
     var face = FaceG(), faceActive = face && face.isActive();
     var facePill = faceActive ? ' <span class="ch-camera-pill" data-testid="class-camera-pill">● ' + esc(t('proctor.kamera-aktif', 'Kamera ujian aktif')) + '</span>' : '';
     if (ui().faceWarn) {
-      return '<p class="ch-proctor is-warn ch-proctor-face" data-testid="class-proctor-face-warn">' + icon('alert-triangle') + ' ' + esc(t('proctor.wajah-peringatan', 'Wajah tidak terdeteksi di kamera depan. Harap menghadap layar HP agar ujian tidak ditandai pengawas.')) + '</p>';
+      return '<p class="ch-proctor is-warn ch-proctor-face" data-testid="class-proctor-face-warn">' + icon('alert-triangle') + ' ' + esc(t('proctor.wajah-peringatan', 'Wajah tidak terdeteksi di kamera depan. Harap menghadap layar HP agar ujian tidak ditandai pengawas.')) + facePill + '</p>';
     }
     if (!sum || (!sum.n && !sum.vn)) return '<p class="ch-proctor" data-testid="class-proctor-notice">' + icon('shield-check') + ' ' + esc(t('proctor.aktif', 'Mode ujian: kalau kamu keluar dari layar ini, gurumu menerima catatannya.')) + facePill + '</p>';
     var catatan = [];
@@ -1031,20 +1043,21 @@
   }
   function startRunner(a) {
     var u = ui(), order = a.itemIds.map(function (_, i) { return i; });
-    if (a.shuffle || a.mode === 'ujian') order = shuffle(order, a.id.length * 7 + Date.now() % 1000);
+    var isExam = a.mode === 'ujian' || a.isExam || (a.timer && a.timer > 0);
+    if (a.shuffle || isExam) order = shuffle(order, a.id.length * 7 + Date.now() % 1000);
     else if (a.variant !== false && !a.isMission) order = shuffle(order, variantSeed(a)); /* R4: urutan soal per murid */
-    u.runner = { aid: a.id, idx: 0, order: order, answers: [], chosen: null, revealed: false, startedAt: Date.now(), timerEnd: a.mode === 'ujian' && a.timer ? Date.now() + a.timer * 60000 : 0, finished: false, result: null };
+    u.runner = { aid: a.id, idx: 0, order: order, answers: [], chosen: null, revealed: false, startedAt: Date.now(), timerEnd: isExam && a.timer ? Date.now() + a.timer * 60000 : 0, finished: false, result: null };
     u.tab = 'tugas'; u.review = null;
-    u.focus = a.mode === 'ujian' && FG() ? FG().start(a.id, Date.now()) : null;
+    u.focus = isExam && FG() ? FG().start(a.id, Date.now()) : null;
     /* Kunci ujian global: ia yang membuat pembimbing PAW dan layar Tanya FIEZEL menutup
        diri, dan ia sama untuk SEMUA permukaan ujian — bukan hanya runner ini. */
     /* R8 (SKB AI di pendidikan): tugas LATIHAN dari guru juga dinilai — masuk rekap, rapor KKTP,
        dan analisis butir — jadi AI ikut dikunci selama runner-nya terbuka. Misi yang dipilih
        sendiri murid (isMission) bukan tugas guru dan tetap boleh dibantu AI. */
-    try { if ((a.mode === 'ujian' || !a.isMission) && root.FiezelExamLock) root.FiezelExamLock.begin('assignment', { id: a.id }); } catch (_) {}
+    try { if ((isExam || !a.isMission) && root.FiezelExamLock) root.FiezelExamLock.begin('assignment', { id: a.id }); } catch (_) {}
     saveUi();
     try { LF() && LF().markAssignmentStarted(a.id); } catch (_) {}
-    if (a.mode === 'ujian') { bindFocus(); } else { unbindFocus(); }
+    if (isExam) { bindFocus(); } else { unbindFocus(); }
     if (u.runner.timerEnd) { if (timerTick) clearInterval(timerTick); timerTick = setInterval(function () { var rr = ui().runner; if (!rr || rr.finished || !sEl) { clearInterval(timerTick); timerTick = null; return; } if (Date.now() >= rr.timerEnd) { finishRunner(); return; } var t = sEl.querySelector('[data-ch-timer]'); if (t) t.textContent = timerText(rr); }, 1000); }
     renderStudent();
   }
@@ -2002,6 +2015,26 @@
     var order = Array.isArray(perm) && perm.length === item.options.length ? perm : item.options.map(function (_, i) { return i; });
     return '<div class="ch-options">' + order.map(function (i, pos) { var o = item.options[i]; var cls = 'ch-option'; if (revealed) { if (i === item.answer) cls += ' is-correct'; else if (i === chosen) cls += ' is-wrong'; } else if (i === chosen) cls += ' is-chosen'; return '<button type="button" class="' + cls + '" data-ch="answer" data-i="' + i + '"' + (revealed ? ' disabled' : '') + ' data-testid="class-option-' + i + '"><span class="ch-opt-key">' + String.fromCharCode(65 + pos) + '</span>' + esc(o) + '</button>'; }).join('') + '</div>';
   }
+  function faceAlertModal() {
+    return '<div class="ch-face-modal-backdrop" data-testid="class-face-alert-modal">' +
+      '<div class="ch-face-modal-card" role="alertdialog" aria-modal="true" aria-labelledby="ch-face-modal-title">' +
+        '<div class="ch-face-modal-icon-wrap">' +
+          '<div class="ch-face-modal-pulsar"></div>' +
+          '<div class="ch-face-modal-icon">' + icon('camera') + '</div>' +
+        '</div>' +
+        '<h3 id="ch-face-modal-title" class="ch-face-modal-title">' + esc(t('proctor.modal-judul', 'Yuk, Kembali Menghadap Layar!')) + '</h3>' +
+        '<p class="ch-face-modal-desc">' + esc(t('proctor.modal-pesan', 'Halo! Wajahmu belum terdeteksi di kamera depan. Pastikan kamu tetap menghadap ke layar HP ya, agar ujianmu lancar dan tidak ditandai oleh guru.')) + '</p>' +
+        '<div class="ch-face-modal-status">' +
+          '<span class="ch-face-live-pill"><span class="ch-face-live-dot"></span> ' + esc(t('proctor.modal-status', 'Memeriksa kamera depan...')) + '</span>' +
+        '</div>' +
+        '<div class="ch-face-modal-actions">' +
+          '<button type="button" class="ch-btn is-primary ch-face-recheck-btn" data-ch="recheck-face" data-testid="class-face-recheck-btn">' +
+            esc(t('proctor.modal-tombol', 'Saya Sudah Menghadap Layar')) +
+          '</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }
   function runnerView() {
     var r = ui().runner;
     if (r.finished) { var res = r.result; return '<div class="ch-body"><section class="ch-card ch-result" data-testid="class-result"><p class="ch-kicker">' + t('umum.selesai', 'Selesai') + '</p><h2>' + esc(res.title) + '</h2><p class="ch-score">' + res.c + '<small>/' + res.t + '</small></p><p class="ch-muted">' + (res.teacher ? statusKirim(res)  : icon('award') + ' ' + esc(t('kelas.hasil-misi-mandiri', 'Tersimpan di Paspor Kompetensimu. Ini misi yang kamu pilih sendiri, jadi ia tidak dilaporkan sebagai tugas dari guru.'))) + '</p><div class="ch-actions"><button type="button" class="ch-btn is-primary" data-ch="review" data-id="' + esc(r.aid) + '">Lihat pembahasan</button><button type="button" class="ch-btn is-ghost" data-ch="close-runner">' + t('kelas.kembali-ke-tugas', 'Kembali ke Tugas') + '</button></div></section></div>'; }
@@ -2011,9 +2044,12 @@
     if (r.idx >= r.order.length) { setTimeout(finishRunner, 0); return '<div class="ch-body"><p class="ch-muted">Menyimpan hasil…</p></div>'; }
     var id = a.itemIds[r.order[r.idx]], item = resolveItem(a, id);
     var fb = '';
-    if (r.revealed) { var ok = r.chosen === item.answer, why = item.why && item.why[r.chosen]; fb = '<div class="ch-feedback ' + (ok ? 'is-ok' : 'is-no') + '" data-testid="class-feedback"><b>' + (ok ? 'Benar!' : t('kelas.belum-tepat', 'Belum tepat.')) + '</b> ' + (ok ? esc(item.note || '') : esc(why || ('Jawaban yang benar: ' + item.options[item.answer] + '.' + (item.note ? ' ' + item.note : '')))) + '</div>'; }
-    return '<div class="ch-body ch-runner" data-testid="class-runner"><div class="ch-runner-top"><button type="button" class="ch-btn is-ghost is-small" data-ch="close-runner">' + icon('chevron-left') + ' ' + t('kelas.simpan-keluar', 'Simpan & keluar') + '</button><span class="ch-muted">' + esc(a.teacher ? 'Dari ' + a.teacher : a.from || '') + '</span>' + (r.timerEnd ? '<span class="ch-timer" data-ch-timer>' + timerText(r) + '</span>' : '') + '</div>' +
-      (a.mode === 'ujian' ? focusBanner() : '') +
+    if (r.revealed) { var ok = r.chosen === item.answer, why = (item.why && item.why[r.chosen]) || (item.distractorWhy && item.distractorWhy[r.chosen]); fb = '<div class="ch-feedback ' + (ok ? 'is-ok' : 'is-no') + '" data-testid="class-feedback"><b>' + (ok ? 'Benar!' : t('kelas.belum-tepat', 'Belum tepat.')) + '</b> ' + (ok ? esc(item.note || '') : esc(why || ('Jawaban yang benar: ' + item.options[item.answer] + '.' + (item.note ? ' ' + item.note : '')))) + '</div>'; }
+    var isExam = a.mode === 'ujian' || a.isExam || (a.timer && a.timer > 0);
+    return '<div class="ch-body ch-runner' + (ui().faceWarn ? ' has-face-alert' : '') + '" data-testid="class-runner">' +
+      (ui().faceWarn ? faceAlertModal() : '') +
+      '<div class="ch-runner-top"><button type="button" class="ch-btn is-ghost is-small" data-ch="close-runner">' + icon('chevron-left') + ' ' + t('kelas.simpan-keluar', 'Simpan & keluar') + '</button><span class="ch-muted">' + esc(a.teacher ? 'Dari ' + a.teacher : a.from || '') + '</span>' + (r.timerEnd ? '<span class="ch-timer" data-ch-timer>' + timerText(r) + '</span>' : '') + '</div>' +
+      (isExam ? focusBanner() : '') +
       '<p class="ch-progress-text">' + t('flow.soal-progress', 'Soal {n} dari {total}').replace('{n}', r.idx + 1).replace('{total}', r.order.length) + '</p><span class="ch-bar is-thin"><i style="width:' + Math.round(r.idx / r.order.length * 100) + '%"></i></span>' +
       /* Gambar soal HARUS ikut tercetak. Soal `contextKind:'picture'` menaruh
          pertanyaannya sepenuhnya pada gambarnya; tanpa itu murid membaca "Kata Inggris apa
@@ -2026,7 +2062,7 @@
     var s = subs().filter(function (x) { return x.id === id; })[0]; if (!s) { ui().review = null; return tugasView(assignments(), subs()); }
     return '<div class="ch-body"><button type="button" class="ch-btn is-ghost is-small" data-ch="back">' + icon('chevron-left') + ' ' + t('umum.kembali', 'Kembali') + '</button><section class="ch-card"><p class="ch-kicker">Pembahasan · dari ' + esc(s.teacher || s.from || 'guru') + '</p><h2>' + esc(s.title) + '</h2><p class="ch-score">' + s.c + '<small>/' + s.t + '</small></p></section>' +
       (Array.isArray(s.results) ? '' : '<p class="ch-note" data-testid="class-review-summary-only">' + icon('info') + ' ' + esc(t('kelas.siklus.pembahasan-ringkas', 'Pembahasan per soal hanya disimpan untuk {n} tugas terakhir. Skornya tetap tercatat.', { n: RIWAYAT_LENGKAP })) + '</p>') +
-      '<ol class="ch-review-list">' + (s.results || []).map(function (r, i) { var item = resolveItem(s, r.itemId); if (!item) return ''; var why = item.why && item.why[r.chosen]; return '<li class="ch-card ' + (r.correct ? 'is-ok' : 'is-no') + '"><p class="ch-muted">' + t('umum.soal', 'Soal') + ' ' + (i + 1) + ' · ' + esc(skillLabel(item.skill || s.skills[0])) + '</p><b>' + esc(item.prompt) + '</b><p>Jawabanmu: <span class="' + (r.correct ? 'ch-ok' : 'ch-no') + '">' + esc(item.options[r.chosen] || '—') + '</span>' + (r.correct ? '' : ' · Benar: <b>' + esc(item.options[item.answer]) + '</b>') + '</p>' + (!r.correct && (why || item.note) ? '<p class="ch-muted">' + esc(why || item.note) + '</p>' : '') + '</li>'; }).join('') + '</ol></div>';
+      '<ol class="ch-review-list">' + (s.results || []).map(function (r, i) { var item = resolveItem(s, r.itemId); if (!item) return ''; var why = (item.why && item.why[r.chosen]) || (item.distractorWhy && item.distractorWhy[r.chosen]); return '<li class="ch-card ' + (r.correct ? 'is-ok' : 'is-no') + '"><p class="ch-muted">' + t('umum.soal', 'Soal') + ' ' + (i + 1) + ' · ' + esc(skillLabel(item.skill || s.skills[0])) + '</p><b>' + esc(item.prompt) + '</b><p>Jawabanmu: <span class="' + (r.correct ? 'ch-ok' : 'ch-no') + '">' + esc(item.options[r.chosen] || '—') + '</span>' + (r.correct ? '' : ' · Benar: <b>' + esc(item.options[item.answer]) + '</b>') + '</p>' + (!r.correct && (why || item.note) ? '<p class="ch-muted">' + esc(why || item.note) + '</p>' : '') + '</li>'; }).join('') + '</ol></div>';
   }
   var CURRICULUM_LAYER = 'kelasku-curriculum';
   /* K12 (m025-351): kartu kurikulum mengganti seluruh isi hub dan menyembunyikan tab bar.
@@ -2072,7 +2108,24 @@
       case 'arsip-selesai': if (arsipkanSelesai(id) && sEnv.toast) sEnv.toast(t('kelas.siklus.toast-diarsip', 'Dipindah ke Arsip. Kamu bisa memulihkannya kapan saja.')); break;
       case 'arsip-terlewat': if (arsipkanTerlewat(id) && sEnv.toast) sEnv.toast(t('kelas.siklus.toast-diarsip', 'Dipindah ke Arsip. Kamu bisa memulihkannya kapan saja.')); break;
       case 'pulihkan': if (pulihkan(id) && sEnv.toast) sEnv.toast(t('kelas.siklus.toast-dipulihkan', 'Dikembalikan ke daftar tugas.')); break;
+      case 'buka-tugas':
+      case 'open-assignment':
       case 'open': { var a = assignments().filter(function (x) { return x.id === id; })[0]; if (!a) return; if (u.runner && u.runner.aid === id && !u.runner.finished) { u.paused = false; saveUi(); renderStudent(); return; } startRunner(a); return; }
+      case 'recheck-face': {
+        var fg = FaceG();
+        if (fg && typeof fg.checkNow === 'function') {
+          var ok = fg.checkNow();
+          if (ok) {
+            u.faceWarn = false;
+            saveUi();
+            renderStudent();
+            if (sEnv.toast) sEnv.toast(t('proctor.wajah-kembali', 'Wajah terdeteksi kembali! Selamat melanjutkan ujian.'));
+            return;
+          }
+        }
+        if (sEnv.toast) sEnv.toast(t('proctor.wajah-belum', 'Wajah belum terdeteksi. Pastikan pencahayaan cukup dan wajah menghadap kamera.'));
+        return;
+      }
       case 'answer': answerRunner(b.getAttribute('data-i')); return;
       case 'dengar': {
         var rr = ui().runner, aa = currentAssignment(); if (!rr || !aa) return;
