@@ -1,7 +1,7 @@
 {
   "version": "m025-542",
-  "claimedBy": "branch fix/mascot-full-hd-crystal-restoration-m025-542",
-  "claimedAt": "2026-10-10T03:04:35.280Z",
-  "reason": "fix(kelasku): perbaikan transmisi penugasan guru, auto-dispatch, dan notifikasi murid",
+  "claimedBy": "branch fix/kelasku-assignment-notif-delivery",
+  "claimedAt": "2026-10-10T03:12:30.472Z",
+  "reason": "fix(mascot): restore Full HD crystal quality, antialiasing, Retina 2.0 DPR, and 128x96 mesh subdivision for 3D Mochi",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
