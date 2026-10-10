@@ -60,6 +60,162 @@
     return null;
   }
 
+  // Buffer temporal untuk evaluasi kelangsungan hidup (anti-wallpaper, anti-kertas diam, anti-layar)
+  var temporalHistory = [];
+  var MAX_TEMPORAL_FRAMES = 8;
+  var STATIC_PHOTO_MAX_MAE = 0.85;
+
+  /**
+   * Deteksi Artefak Layar Digital & Glare Kaca (Anti-Phone Screen & Anti-Laptop).
+   */
+  function detectScreenArtifacts(d, w, h, Ygrid, minX, maxX, minY, maxY, cX, cY, eyeDip) {
+    var glareCount = 0;
+
+    for (var y = minY; y <= maxY; y++) {
+      for (var x = minX; x <= maxX; x++) {
+        var idx = (y * w + x) * 4;
+        var r = d[idx], g = d[idx + 1], b = d[idx + 2];
+
+        // Glass Specular Glare: pantulan lampu pada kaca HP / laptop
+        // R, G, B > 230 dengan saturasi mendekati nol (|R-G| <= 12, |G-B| <= 12, |R-B| <= 12)
+        if (r > 230 && g > 230 && b > 230 && Math.abs(r - g) <= 12 && Math.abs(g - b) <= 12 && Math.abs(r - b) <= 12) {
+          glareCount++;
+        }
+      }
+    }
+
+    var hasGlassGlare = (glareCount >= 5);
+
+    // Cari nilai luminansi minimum pada rongga mata (hanya jika ada fitur mata)
+    var eyeDarkMin = 255, totalEyePixels = 0;
+    var eyeY1 = Math.max(0, cY - 5), eyeY2 = Math.min(h - 1, cY + 1);
+    for (var ey = eyeY1; ey <= eyeY2; ey++) {
+      for (var ex = Math.max(0, cX - 10); ex <= Math.min(w - 1, cX + 10); ex++) {
+        var yLum = Ygrid[ey * w + ex];
+        if (yLum < eyeDarkMin) eyeDarkMin = yLum;
+        totalEyePixels++;
+      }
+    }
+
+    // Backlight Bleed pada layar LCD: jika mata terdeteksi nyata (eyeDip >= 1.5),
+    // tapi rongga mata tidak bisa hitam pekat (eyeDarkMin > 52 pada ruangan normal/terang)
+    var hasBacklightBleed = (eyeDip >= 1.5 && eyeDarkMin > 52 && totalEyePixels > 0);
+
+    // Moiré / Subpixel Aliasing pada Pipi murni (cY + 4 s.d. cY + 9)
+    var chkLapSum = 0, chkLapCount = 0;
+    var cy1 = Math.min(h - 2, cY + 4), cy2 = Math.min(h - 2, cY + 9);
+    var cx1L = Math.max(1, cX - 10), cx2L = Math.max(1, cX - 4);
+    var cx1R = Math.min(w - 2, cX + 4), cx2R = Math.min(w - 2, cX + 10);
+
+    for (var cy = cy1; cy <= cy2; cy++) {
+      for (var cx = cx1L; cx <= cx2L; cx++) {
+        var center = Ygrid[cy * w + cx];
+        var lap = Math.abs(4 * center - Ygrid[cy * w + (cx - 1)] - Ygrid[cy * w + (cx + 1)] - Ygrid[(cy - 1) * w + cx] - Ygrid[(cy + 1) * w + cx]);
+        chkLapSum += lap;
+        chkLapCount++;
+      }
+      for (var cx = cx1R; cx <= cx2R; cx++) {
+        var center = Ygrid[cy * w + cx];
+        var lap = Math.abs(4 * center - Ygrid[cy * w + (cx - 1)] - Ygrid[cy * w + (cx + 1)] - Ygrid[(cy - 1) * w + cx] - Ygrid[(cy + 1) * w + cx]);
+        chkLapSum += lap;
+        chkLapCount++;
+      }
+    }
+    var avgCheekLap = chkLapCount > 0 ? (chkLapSum / chkLapCount) : 0;
+    var hasMoire = (avgCheekLap > 15.0);
+
+    return {
+      isScreen: hasGlassGlare || hasBacklightBleed || hasMoire,
+      hasGlassGlare: hasGlassGlare,
+      hasBacklightBleed: hasBacklightBleed,
+      hasMoire: hasMoire
+    };
+  }
+
+  function recordTemporalFrame(now, cX, cY, boxW, boxH, eyeDip, asym, Ygrid, w, h) {
+    var sig = new Float32Array(192);
+    var stepX = w / 16;
+    var stepY = h / 12;
+    for (var sy = 0; sy < 12; sy++) {
+      for (var sx = 0; sx < 16; sx++) {
+        var px = Math.min(w - 1, Math.floor(sx * stepX));
+        var py = Math.min(h - 1, Math.floor(sy * stepY));
+        sig[sy * 16 + sx] = Ygrid[py * w + px];
+      }
+    }
+
+    temporalHistory.push({
+      t: now,
+      cX: cX,
+      cY: cY,
+      boxW: boxW,
+      boxH: boxH,
+      eyeDip: eyeDip,
+      asym: asym,
+      sig: sig
+    });
+
+    while (temporalHistory.length > MAX_TEMPORAL_FRAMES) {
+      temporalHistory.shift();
+    }
+  }
+
+  function checkTemporalLiveness(now) {
+    if (temporalHistory.length < 4) {
+      return { isStatic: false, isRigidWobble: false, isSpoof: false };
+    }
+
+    var oldest = temporalHistory[0];
+    var newest = temporalHistory[temporalHistory.length - 1];
+    var timeSpan = newest.t - oldest.t;
+
+    var totalMae = 0;
+    var comparisons = 0;
+    var dipSum = 0;
+    for (var i = 1; i < temporalHistory.length; i++) {
+      var prevSig = temporalHistory[i - 1].sig;
+      var curSig = temporalHistory[i].sig;
+      var fMae = 0;
+      for (var k = 0; k < 192; k++) {
+        fMae += Math.abs(curSig[k] - prevSig[k]);
+      }
+      fMae /= 192;
+      totalMae += fMae;
+      comparisons++;
+      dipSum += temporalHistory[i].eyeDip;
+    }
+    var avgMae = comparisons > 0 ? (totalMae / comparisons) : 3.0;
+
+    var avgDip = dipSum / (temporalHistory.length - 1);
+    var dipVar = 0;
+    for (var i = 1; i < temporalHistory.length; i++) {
+      var diff = temporalHistory[i].eyeDip - avgDip;
+      dipVar += diff * diff;
+    }
+    dipVar /= (temporalHistory.length - 1);
+
+    var isStatic = (timeSpan >= 1800 && avgMae < STATIC_PHOTO_MAX_MAE && dipVar < 0.08);
+
+    var asymChange = 0;
+    var maxDx = 0, maxDy = 0;
+    for (var i = 1; i < temporalHistory.length; i++) {
+      var dAsym = Math.abs(temporalHistory[i].asym - temporalHistory[i - 1].asym);
+      if (dAsym > asymChange) asymChange = dAsym;
+      var dx = Math.abs(temporalHistory[i].cX - temporalHistory[i - 1].cX);
+      var dy = Math.abs(temporalHistory[i].cY - temporalHistory[i - 1].cY);
+      if (dx > maxDx) maxDx = dx;
+      if (dy > maxDy) maxDy = dy;
+    }
+
+    var isRigidWobble = (timeSpan >= 1800 && (maxDx >= 1.0 || maxDy >= 1.0) && asymChange < 1.0 && dipVar < 0.05);
+
+    return {
+      isStatic: isStatic,
+      isRigidWobble: isRigidWobble,
+      isSpoof: isStatic || isRigidWobble
+    };
+  }
+
   /**
    * Analisis computer vision presisi tinggi pada frame 64x48.
    * Mengukur klaster kromatisitas YCbCr kulit manusia, konsentrasi oval tengah,
@@ -67,9 +223,9 @@
    * Mampu menolak secara akurat: ruangan gelap, silau, dinding kosong, meja kayu,
    * telapak tangan penutup kamera, dan pengguna yang berpaling/meninggalkan layar.
    */
-  function fallbackCheck(video, canvas, ctx) {
-    if (!video || !canvas || !ctx) return false;
-    if (video.readyState < 2) return false;
+  function analyzeFrame(video, canvas, ctx, nativeBox) {
+    if (!video || !canvas || !ctx) return { present: false, isSpoof: false };
+    if (video.readyState < 2) return { present: false, isSpoof: false };
     try {
       var w = 64, h = 48;
       ctx.drawImage(video, 0, 0, w, h);
@@ -99,19 +255,35 @@
 
           var rgbSum = r + g + b;
           var normR = rgbSum > 0 ? (r / rgbSum) : 0;
-          var normG = rgbSum > 0 ? (g / rgbSum) : 0;
+          var normB = rgbSum > 0 ? (b / rgbSum) : 0;
 
-          // Model kromatisitas kulit presisi tinggi (YCbCr + normalized RGB)
-          // Mendukung pencahayaan ruangan, lampu fluoresen, dan refleksi layar cool-white
-          var isSkin = (
-            cb >= 75 && cb <= 138 &&
-            cr >= 128 && cr <= 180 &&
-            r > g && r > (b - 10) &&
-            (r - g) >= 4 &&
-            normR >= 0.33 && normR <= 0.65 &&
-            normG >= 0.23 && normG <= 0.42 &&
-            yLum >= 20 && yLum <= 245
-          );
+          // Model kromatisitas kulit manusia adaptif & bebas manipulasi cahaya:
+          // 1. Manusia asli SELALU memiliki R > B (melanin menyerap cahaya biru/ungu).
+          //    Lampu putih, neon, daylight, kertas putih, dan dinding putih memiliki B >= R - 5.
+          // 2. Di ruangan redup (yLum < 60), kamera mereduksi perbedaan warna, sehingga R >= B + 4.
+          // 3. Di pencahayaan normal (yLum >= 60), R >= B + 10 dan R > G.
+          // 4. Sumber cahaya silau / lampu jenuh (R, G, B > 235) ditolak mutlak dari hitungan kulit.
+          var isPureLightGlare = (r > 235 && g > 235 && b > 235);
+          var isSkin = false;
+
+          if (!isPureLightGlare && cb >= 75 && cb <= 140 && cr >= 125 && cr <= 185 && r > g) {
+            if (yLum < 60) {
+              isSkin = (
+                (r - g) >= 1 &&
+                r >= (b + 4) &&
+                normB <= 0.33 &&
+                yLum >= 10
+              );
+            } else {
+              isSkin = (
+                (r - g) >= 3 &&
+                r >= (b + 10) &&
+                normR >= 0.34 &&
+                normB <= 0.31 &&
+                yLum <= 240
+              );
+            }
+          }
 
           if (isSkin) {
             skinCount++;
@@ -134,29 +306,30 @@
       var contrastRange = maxBr - minBr;
       var centerSkinRatio = centerTotal > 0 ? (centerSkin / centerTotal) : 0;
 
-      // 1. Kamera tertutup rapat (hitam / gelap)
-      if (avgBr < 14) return false;
+      // 1. Kamera tertutup rapat (hitam / gelap pekat)
+      if (avgBr < 8) return { present: false, isSpoof: false, reason: 'camera_covered' };
 
-      // 2. Silau ekstrem tanpa kontras
-      if (avgBr > 240 && contrastRange < 15) return false;
+      // 2. Silau ekstrem tanpa kontras (disorot lampu tembak tanpa wajah)
+      if (avgBr > 245 && contrastRange < 10) return { present: false, isSpoof: false, reason: 'blinding_glare' };
 
-      // 3. Wajah tidak ada di tengah frame
-      if (centerSkinRatio < 0.12) return false;
+      // 3. Jumlah piksel kulit wajar (ruang redup toleran >= 50, normal >= 70)
+      var minSkinReq = avgBr < 40 ? 50 : 70;
+      if (skinCount < minSkinReq || skinCount > 2200) return { present: false, isSpoof: false, reason: 'skin_count_out_of_range' };
 
-      // 4. Jumlah piksel kulit wajar (menolak meja/dinding raksasa yang memenuhi frame)
-      if (skinCount < 70 || skinCount > 2000) return false;
+      // 4. Konsentrasi kulit di tengah
+      if (centerSkinRatio < 0.12) return { present: false, isSpoof: false, reason: 'not_centered' };
 
-      // 5. Centroid posisi wajah harus di tengah (menolak murid menoleh ke samping atau di tepi)
+      // 5. Centroid posisi wajah harus di area tengah
       var cX = Math.round(sumX / skinCount);
       var cY = Math.round(sumY / skinCount);
-      if (cX < 12 || cX > 52 || cY < 8 || cY > 40) return false;
+      if (cX < 12 || cX > 52 || cY < 8 || cY > 40) return { present: false, isSpoof: false, reason: 'centroid_out_of_bounds' };
 
       // 6. Bounding box & proporsi oval wajah
       var boxW = (maxX - minX) + 1;
       var boxH = (maxY - minY) + 1;
-      if (boxW < 10 || boxH < 10) return false;
+      if (boxW < 10 || boxH < 10) return { present: false, isSpoof: false, reason: 'box_too_small' };
       var aspect = boxH / boxW;
-      if (aspect < 0.60 || aspect > 2.8) return false; // Menolak meja kayu horizontal lebar
+      if (aspect < 0.60 || aspect > 2.8) return { present: false, isSpoof: false, reason: 'aspect_ratio_invalid' };
 
       // 7. Hitung gradien tekstur mikro di area wajah
       var gradSum = 0, gradCount = 0, maxLocalGrad = 0;
@@ -164,16 +337,16 @@
       var gx1 = Math.max(1, minX), gx2 = Math.min(w - 2, maxX);
       for (var gy = gy1; gy <= gy2; gy++) {
         for (var gx = gx1; gx <= gx2; gx++) {
-          var dx = Math.abs(Ygrid[gy * w + (gx + 1)] - Ygrid[gy * w + (gx - 1)]);
-          var dy = Math.abs(Ygrid[(gy + 1) * w + gx] - Ygrid[(gy - 1) * w + gx]);
-          var gMag = dx + dy;
+          var gdx = Math.abs(Ygrid[gy * w + (gx + 1)] - Ygrid[gy * w + (gx - 1)]);
+          var gdy = Math.abs(Ygrid[(gy + 1) * w + gx] - Ygrid[(gy - 1) * w + gx]);
+          var gMag = gdx + gdy;
           gradSum += gMag;
           gradCount++;
           if (gMag > maxLocalGrad) maxLocalGrad = gMag;
         }
       }
       var avgGrad = gradCount > 0 ? (gradSum / gradCount) : 0;
-      if (avgGrad < 2.0 && maxLocalGrad < 14) return false;
+      if (avgGrad < 2.0 && maxLocalGrad < 14) return { present: false, isSpoof: false, reason: 'flat_texture' };
 
       // 8. Haar cascade dahi vs mata vs pipi (Bilateral Dual-Eye)
       var fSum = 0, fCount = 0;
@@ -211,21 +384,54 @@
       var eAvg = eCount > 0 ? eSum / eCount : 0;
       var cAvg = cCount > 0 ? cSum / cCount : 0;
       var eyeDip = (fAvg - eAvg) + (cAvg - eAvg);
+      var eLAvg = eLCount > 0 ? (eLSum / eLCount) : eAvg;
+      var eRAvg = eRCount > 0 ? (eRSum / eRCount) : eAvg;
+      var asym = Math.abs(eLAvg - eRAvg);
 
-      // Penolakan permukaan datar / meja / telapak tangan:
-      if (centerSkinRatio > 0.92 && eyeDip < 0.8) return false;
-
-      // Jika murid menoleh tajam ke samping (asimetri mata ekstrem):
-      if (eLCount > 0 && eRCount > 0) {
-        var eLAvg = eLSum / eLCount;
-        var eRAvg = eRSum / eRCount;
-        if (Math.abs(eLAvg - eRAvg) > 35) return false;
+      // Penolakan permukaan datar / lampu / meja / telapak tangan:
+      // Lampu terang atau permukaan datar memiliki eyeDip mendekati nol atau negatif
+      if ((centerSkinRatio > 0.85 || avgBr > 130) && eyeDip < 0.6) {
+        return { present: false, isSpoof: false, reason: 'flat_light_or_surface' };
       }
 
-      return true;
+      // Jika murid menoleh tajam ke samping (asimetri mata ekstrem > 35)
+      if (asym > 35) return { present: false, isSpoof: false, reason: 'extreme_asymmetry' };
+
+      // 9. Deteksi Artefak Layar Kaca & Backlight HP / Laptop (Anti-Spoofing Layar)
+      var screenCheck = detectScreenArtifacts(d, w, h, Ygrid, minX, maxX, minY, maxY, cX, cY, eyeDip);
+      if (screenCheck.isScreen) {
+        return { present: false, isSpoof: true, reason: 'spoof_screen' };
+      }
+
+      var now = Date.now();
+      recordTemporalFrame(now, cX, cY, boxW, boxH, eyeDip, asym, Ygrid, w, h);
+      var tempCheck = checkTemporalLiveness(now);
+      if (tempCheck.isSpoof) {
+        return { present: false, isSpoof: true, reason: tempCheck.isStatic ? 'spoof_static' : 'spoof_rigid' };
+      }
+
+      return {
+        present: true,
+        isSpoof: false,
+        cX: cX,
+        cY: cY,
+        centroidX: sumX / skinCount,
+        centroidY: sumY / skinCount,
+        boxW: boxW,
+        boxH: boxH,
+        eyeDip: eyeDip,
+        asym: asym,
+        eLAvg: eLAvg,
+        eRAvg: eRAvg
+      };
     } catch (_) {
-      return false;
+      return { present: false, isSpoof: false, reason: 'error' };
     }
+  }
+
+  function fallbackCheck(video, canvas, ctx) {
+    var res = analyzeFrame(video, canvas, ctx, null);
+    return !!(res && res.present && !res.isSpoof);
   }
 
   function checkFrame() {
@@ -248,7 +454,15 @@
             var vW = vid.videoWidth || 320;
             var midX = (f.x || 0) + (f.width || 0) / 2;
             var isCentered = !f.width || (midX >= vW * 0.15 && midX <= vW * 0.85);
-            if (isCentered) {
+            if (!isCentered) {
+              state.lastNativeFace = false;
+              handleResult(false);
+              return;
+            }
+            // CRITICAL ANTI-SPOOFING & LIVENESS GATE:
+            // Meskipun native FaceDetector menemukan wajah, wajib lolos uji anti-layar dan anti-kertas
+            var cvCheck = analyzeFrame(vid, state.canvasEl, state.ctx, f);
+            if (cvCheck && cvCheck.present && !cvCheck.isSpoof) {
               state.lastNativeFace = true;
               state.lastNativeFaceTime = Date.now();
               handleResult(true);
@@ -257,21 +471,22 @@
               handleResult(false);
             }
           } else {
-            // Ketika native FaceDetector drop frame atau kondisi pencahayaan redup,
-            // validasi dengan fallbackCheck agar tidak memicu alarm palsu
-            var ok = fallbackCheck(vid, state.canvasEl, state.ctx);
+            var fb = analyzeFrame(vid, state.canvasEl, state.ctx, null);
+            var ok = !!(fb && fb.present && !fb.isSpoof);
             state.lastNativeFace = ok;
             if (ok) state.lastNativeFaceTime = Date.now();
             handleResult(ok);
           }
         }).catch(function () {
-          handleResult(fallbackCheck(vid, state.canvasEl, state.ctx));
+          var fb = analyzeFrame(vid, state.canvasEl, state.ctx, null);
+          handleResult(!!(fb && fb.present && !fb.isSpoof));
         });
         return;
       } catch (_) {}
     }
 
-    handleResult(fallbackCheck(vid, state.canvasEl, state.ctx));
+    var fb2 = analyzeFrame(vid, state.canvasEl, state.ctx, null);
+    handleResult(!!(fb2 && fb2.present && !fb2.isSpoof));
   }
 
   function handleResult(present) {
@@ -445,6 +660,9 @@
     eyeDips: [],
     baselineEyeDip: 0,
     baselineCentroidX: 32,
+    baselineCentroidY: 24,
+    peakEyeDip: 0,
+    baselineAsym: 0,
     blinkClosing: false,
     blinkCloseStart: 0,
     blinkCount: 0,
@@ -453,11 +671,15 @@
   };
 
   function resetLiveness() {
+    temporalHistory = [];
     liveness.calibrated = false;
     liveness.calibTicks = 0;
     liveness.eyeDips = [];
     liveness.baselineEyeDip = 0;
     liveness.baselineCentroidX = 32;
+    liveness.baselineCentroidY = 24;
+    liveness.peakEyeDip = 0;
+    liveness.baselineAsym = 0;
     liveness.blinkClosing = false;
     liveness.blinkCloseStart = 0;
     liveness.blinkCount = 0;
@@ -472,7 +694,7 @@
   /**
    * Deteksi Kehidupan Biometrik Aktif (Active Liveness Verification).
    * Menantang pengguna melakukan kedipan mata atau tolehan kepala kecil secara interaktif.
-   * Menolak mutlak foto cetak, foto diam di HP lain, atau video beku.
+   * Menolak mutlak foto cetak, foto diam di HP lain, wallpaper dinding, dan lampu silau.
    */
   function checkLiveness(video, canvas, ctx) {
     var vid = video || state.videoEl;
@@ -481,12 +703,15 @@
     if (!vid || !cvs || !c) return { stage: 'no_face', ok: false };
     if (vid.readyState < 2) return { stage: 'no_face', ok: false };
 
-    var isPresent = fallbackCheck(vid, cvs, c);
-    if (!isPresent) {
+    var frameRes = analyzeFrame(vid, cvs, c, null);
+    if (!frameRes.present) {
       liveness.calibrated = false;
       liveness.calibTicks = 0;
       liveness.eyeDips = [];
       liveness.blinkClosing = false;
+      if (frameRes.isSpoof) {
+        return { stage: 'spoof_detected', ok: false, reason: frameRes.reason };
+      }
       return { stage: 'no_face', ok: false };
     }
 
@@ -494,122 +719,70 @@
       return { stage: 'verified', ok: true, blinkCount: liveness.blinkCount, turn: liveness.turnDetected };
     }
 
-    try {
-      var w = 64, h = 48;
-      var imgData = c.getImageData(0, 0, w, h);
-      var d = imgData.data;
+    var now = Date.now();
+    var curDip = frameRes.eyeDip;
+    var centroidX = frameRes.centroidX;
+    var centroidY = frameRes.centroidY;
 
-      var sumX = 0, sumY = 0, skinCount = 0;
-
-      for (var y = 8; y < 42; y++) {
-        for (var x = 12; x < 52; x++) {
-          var idx = (y * w + x) * 4;
-          var r = d[idx], g = d[idx + 1], b = d[idx + 2];
-          var cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b;
-          var cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b;
-
-          var isSkin = (cb >= 75 && cb <= 138 && cr >= 128 && cr <= 180 && r > g && r > (b - 10));
-          if (isSkin) {
-            sumX += x;
-            sumY += y;
-            skinCount++;
-          }
-        }
+    if (!liveness.calibrated) {
+      liveness.eyeDips.push(curDip);
+      liveness.calibTicks++;
+      if (liveness.calibTicks >= 2) {
+        var sumD = 0;
+        for (var i = 0; i < liveness.eyeDips.length; i++) sumD += liveness.eyeDips[i];
+        liveness.baselineEyeDip = sumD / liveness.eyeDips.length;
+        liveness.baselineCentroidX = centroidX;
+        liveness.baselineCentroidY = centroidY;
+        liveness.peakEyeDip = Math.max(liveness.baselineEyeDip, 1.0);
+        liveness.baselineAsym = frameRes.asym;
+        liveness.calibrated = true;
       }
-
-      if (skinCount < 60) {
-        return { stage: 'no_face', ok: false };
-      }
-
-      var cX = Math.round(sumX / skinCount);
-      var cY = Math.round(sumY / skinCount);
-      cX = Math.max(22, Math.min(42, cX));
-      cY = Math.max(16, Math.min(32, cY));
-
-      var fSum = 0, fCount = 0;
-      var eSum = 0, eCount = 0;
-      var cSum = 0, cCount = 0;
-
-      var fhY1 = Math.max(0, cY - 10), fhY2 = Math.max(0, cY - 5);
-      var eyeY1 = Math.max(0, cY - 4), eyeY2 = Math.min(h - 1, cY + 1);
-      var chkY1 = Math.min(h - 1, cY + 3), chkY2 = Math.min(h - 1, cY + 8);
-      var x1 = Math.max(0, cX - 9), x2 = Math.min(w - 1, cX + 9);
-
-      for (var y = fhY1; y <= chkY2; y++) {
-        for (var x = x1; x <= x2; x++) {
-          var idx = (y * w + x) * 4;
-          var yLum = 0.299 * d[idx] + 0.587 * d[idx + 1] + 0.114 * d[idx + 2];
-          if (y >= fhY1 && y <= fhY2) { fSum += yLum; fCount++; }
-          else if (y >= eyeY1 && y <= eyeY2) { eSum += yLum; eCount++; }
-          else if (y >= chkY1 && y <= chkY2) { cSum += yLum; cCount++; }
-        }
-      }
-
-      if (fCount === 0 || eCount === 0 || cCount === 0) {
-        return { stage: 'no_face', ok: false };
-      }
-
-      var fAvg = fSum / fCount;
-      var eAvg = eSum / eCount;
-      var cAvg = cSum / cCount;
-      var eyeDip = (fAvg - eAvg) + (cAvg - eAvg);
-      var centroidX = sumX / skinCount;
-      var centroidY = sumY / skinCount;
-      var now = Date.now();
-
-      if (!liveness.calibrated) {
-        liveness.eyeDips.push(eyeDip);
-        liveness.calibTicks++;
-        if (liveness.calibTicks >= 2) {
-          var sumD = 0;
-          for (var i = 0; i < liveness.eyeDips.length; i++) sumD += liveness.eyeDips[i];
-          liveness.baselineEyeDip = sumD / liveness.eyeDips.length;
-          liveness.baselineCentroidX = centroidX;
-          liveness.baselineCentroidY = centroidY;
-          liveness.calibrated = true;
-        }
-        return { stage: 'aligning', ok: true };
-      }
-
-      var curDip = eyeDip;
-      var baseDip = liveness.baselineEyeDip;
-      var dipDrop = baseDip - curDip;
-
-      // Deteksi penutupan mata (blink closing):
-      var isClosed = (baseDip >= 4.0 && (curDip <= baseDip * 0.70 || dipDrop >= 2.5)) ||
-                     (baseDip < 4.0 && dipDrop >= 1.5);
-
-      if (isClosed) {
-        if (!liveness.blinkClosing) {
-          liveness.blinkClosing = true;
-          liveness.blinkCloseStart = now;
-        }
-      } else if (liveness.blinkClosing) {
-        var isReopened = (curDip >= baseDip * 0.80) || (baseDip - curDip <= 1.5);
-        if (isReopened) {
-          var dur = now - liveness.blinkCloseStart;
-          if (dur >= 40 && dur <= 950) {
-            liveness.blinkCount++;
-          }
-          liveness.blinkClosing = false;
-        }
-      }
-
-      // Deteksi tolehan kepala atau gerakan wajah
-      if (Math.abs(centroidX - liveness.baselineCentroidX) >= 2.5 ||
-          Math.abs(centroidY - (liveness.baselineCentroidY || centroidY)) >= 2.5) {
-        liveness.turnDetected = true;
-      }
-
-      if (liveness.blinkCount >= 1 || liveness.turnDetected) {
-        liveness.verified = true;
-        return { stage: 'verified', ok: true, blinkCount: liveness.blinkCount, turn: liveness.turnDetected };
-      }
-
-      return { stage: 'challenge', ok: true, blinkCount: liveness.blinkCount };
-    } catch (_) {
-      return { stage: 'no_face', ok: false };
+      return { stage: 'aligning', ok: true };
     }
+
+    if (curDip > liveness.peakEyeDip) {
+      liveness.peakEyeDip = curDip;
+    } else {
+      liveness.peakEyeDip = liveness.peakEyeDip * 0.995 + curDip * 0.005;
+    }
+
+    var baseOpen = Math.max(liveness.peakEyeDip, liveness.baselineEyeDip, 1.0);
+    var dipDrop = baseOpen - curDip;
+
+    // Deteksi penutupan mata (blink closing) adaptif & instan:
+    var isClosed = (curDip <= baseOpen * 0.75) || (dipDrop >= Math.max(0.8, baseOpen * 0.22));
+
+    if (isClosed) {
+      if (!liveness.blinkClosing) {
+        liveness.blinkClosing = true;
+        liveness.blinkCloseStart = now;
+      }
+    } else if (liveness.blinkClosing) {
+      var isReopened = (curDip >= baseOpen * 0.80) || (dipDrop <= Math.max(0.5, baseOpen * 0.15));
+      if (isReopened) {
+        var dur = now - liveness.blinkCloseStart;
+        if (dur >= 40 && dur <= 800) {
+          liveness.blinkCount++;
+        }
+        liveness.blinkClosing = false;
+      }
+    }
+
+    // Deteksi tolehan kepala 3D (bukan getaran kertas / hand tremor):
+    var dX = Math.abs(centroidX - liveness.baselineCentroidX);
+    var dY = Math.abs(centroidY - (liveness.baselineCentroidY || centroidY));
+    var asymChange = Math.abs(frameRes.asym - (liveness.baselineAsym || frameRes.asym));
+
+    if (dX >= 4.0 || dY >= 4.0 || asymChange >= 5.0) {
+      liveness.turnDetected = true;
+    }
+
+    if (liveness.blinkCount >= 1 || liveness.turnDetected) {
+      liveness.verified = true;
+      return { stage: 'verified', ok: true, blinkCount: liveness.blinkCount, turn: liveness.turnDetected };
+    }
+
+    return { stage: 'challenge', ok: true, blinkCount: liveness.blinkCount };
   }
 
   function verifyPresence() {
