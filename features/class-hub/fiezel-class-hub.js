@@ -666,12 +666,9 @@
     var TS = T(), c = TS ? TS.normalizeClassCode(code) : String(code || '').toUpperCase();
     if (!c) return false;
     var ob = readJson('fiezel-onboarding-v1', {}) || {}; ob.classCode = c; writeJson('fiezel-onboarding-v1', ob);
-    try { if (typeof root.updateTopbarClassState === 'function') root.updateTopbarClassState(c); } catch (_) {}
-    /* Ketukan ke guru dikirim SEKARANG, bukan menunggu tugas pertama selesai. Sebelum ini,
-       murid yang sudah mengetik kode tetap tidak terlihat oleh gurunya sampai ia menyelesaikan
-       sesuatu — dan murid yang salah ketik kode mengira dirinya sudah tergabung padahal tidak
-       ada siapa pun di ujung sana. */
+    /* Ketukan ke guru dikirim SEKARANG, bukan menunggu tugas pertama selesai. */
     try { LF() && LF().announceJoin(); } catch (_) {}
+    try { if (typeof root.updateTopbarClassState === 'function') root.updateTopbarClassState(c); } catch (_) {}
     try { fetchClassTeachers(); } catch (_) {}
     try {
       var pollFn = (typeof root.inboxPoll === 'function') ? root.inboxPoll : (root.FiezelInbox && root.FiezelInbox.poll);
