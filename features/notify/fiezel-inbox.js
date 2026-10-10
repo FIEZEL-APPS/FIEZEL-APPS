@@ -45,14 +45,36 @@
 
   function items() { return prune(load().items); }
   function unread() { return items().filter(function (e) { return !e.read; }).length; }
-  function get(id) { return items().filter(function (e) { return e.id === id; })[0] || null; }
-  function markRead(id) { var d = load(); d.items.forEach(function (e) { if (e.id === id) e.read = true; }); return save(d); }
+  function get(id) {
+    if (!id) return null;
+    var sId = String(id);
+    return items().filter(function (e) {
+      return e.id === sId || e.aid === sId || e.id === ('ta-' + sId) || ('ta-' + e.aid) === sId || (sId.startsWith('ta-') && e.aid === sId.slice(3));
+    })[0] || null;
+  }
+  function markRead(id) { var d = load(); d.items.forEach(function (e) { if (e.id === id || e.aid === id || ('ta-' + e.aid) === id) e.read = true; }); return save(d); }
   function markAllRead() { var d = load(); d.items.forEach(function (e) { e.read = true; }); return save(d); }
-  function remove(id) { var d = load(); d.items = d.items.filter(function (e) { return e.id !== id; }); return save(d); }
+  function remove(id) { var d = load(); d.items = d.items.filter(function (e) { return e.id !== id && e.aid !== id; }); return save(d); }
   function clear() { return save({ items: [], cursor: load().cursor }); }
   /** Tambah/segarkan satu kabar. Kabar lama dengan id sama dan `at` lebih baru dibangunkan lagi (belum dibaca). */
   function add(entry) {
     if (!entry || !entry.id) return null;
+    var TS = root.FiezelTeacherStore;
+    if (TS && TS.acceptAssignmentPayload && entry.kind === 'teacher_assignment') {
+      var payload = entry.assignment || {
+        v: 1, t: 'assign',
+        id: entry.aid || String(entry.id).replace(/^ta-/, ''),
+        title: entry.title || 'Tugas',
+        from: entry.from || 'Guru',
+        skills: entry.skills || ['past_tense'],
+        itemIds: entry.itemIds || ['demo-1'],
+        minutes: entry.minutes || 10,
+        deadline: entry.deadline || null,
+        mode: entry.mode || 'latihan',
+        source: entry.source
+      };
+      try { TS.acceptAssignmentPayload(payload); } catch (_) {}
+    }
     var d = load(), cur = d.items.filter(function (e) { return e.id === entry.id; })[0];
     if (cur) { if (Number(entry.at || 0) > Number(cur.at || 0)) { Object.assign(cur, entry, { read: false }); save(d); return cur; } return null; }
     var e = Object.assign({ at: Date.now(), read: false }, entry);
@@ -102,13 +124,56 @@
     try { storage().setItem(ARCH_KEY, JSON.stringify(arch)); } catch (_) {}
   }
 
-  function classCode() { try { return String(JSON.parse(storage().getItem('fiezel-onboarding-v1') || '{}').classCode || ''); } catch (_) { return ''; } }
+  function classCode() {
+    var c = '';
+    try { c = String(JSON.parse(storage().getItem('fiezel-onboarding-v1') || '{}').classCode || ''); } catch (_) {}
+    if (!c && root.state && root.state.classCode) c = String(root.state.classCode || '');
+    if (!c) {
+      try { var st = JSON.parse(storage().getItem('fiezel-v4-state') || '{}'); if (st && st.classCode) c = String(st.classCode); } catch (_) {}
+    }
+    if (!c && root.FiezelAccount && typeof root.FiezelAccount.state === 'function') {
+      try { var acc = root.FiezelAccount.state(); if (acc && acc.classCode) c = String(acc.classCode); } catch (_) {}
+    }
+    if (!c) {
+      try {
+        var m = (typeof document !== 'undefined' && document.cookie) ? document.cookie.match(/(?:^|;\s*)fz_cls=([^;]+)/) : null;
+        if (m && m[1]) c = decodeURIComponent(m[1]);
+      } catch (_) {}
+    }
+    if (!c) {
+      try {
+        var asg = JSON.parse(storage().getItem(assignKey()) || '[]');
+        if (Array.isArray(asg) && asg.length) {
+          for (var i = asg.length - 1; i >= 0; i--) { if (asg[i] && asg[i].cls) { c = String(asg[i].cls); break; } }
+        }
+      } catch (_) {}
+    }
+    c = String(c || '').trim().toUpperCase();
+    if (c && c !== 'FZ-MERDEKA1') {
+      try {
+        var ob = JSON.parse(storage().getItem('fiezel-onboarding-v1') || '{}');
+        if (!ob.classCode) { ob.classCode = c; storage().setItem('fiezel-onboarding-v1', JSON.stringify(ob)); }
+      } catch (_) {}
+      return c;
+    }
+    return '';
+  }
   function learnerName() {
     var n = '';
     try { if (typeof root.learnerName === 'function') n = String(root.learnerName() || ''); } catch (_) {}
     if (!n || /^(sobat|murid|teman)(\s+.*)?$/i.test(n)) {
       try { var onb = String(JSON.parse(storage().getItem('fiezel-onboarding-v1') || '{}').name || '').trim(); if (onb) n = onb; } catch (_) {}
     }
+    if (!n || /^(sobat|murid|teman)(\s+.*)?$/i.test(n)) {
+      try { if (root.state && root.state.userName) n = String(root.state.userName).trim(); } catch (_) {}
+    }
+    if (!n || /^(sobat|murid|teman)(\s+.*)?$/i.test(n)) {
+      try { var st = JSON.parse(storage().getItem('fiezel-v4-state') || '{}'); if (st && st.userName) n = String(st.userName).trim(); } catch (_) {}
+    }
+    if (!n || /^(sobat|murid|teman)(\s+.*)?$/i.test(n)) {
+      try { var acc = root.FiezelAccount && typeof root.FiezelAccount.state === 'function' && root.FiezelAccount.state(); if (acc && acc.handle) n = String(acc.handle).trim(); } catch (_) {}
+    }
+    if (/^(sobat|murid|teman)(\s+.*)?$/i.test(n)) n = '';
     var first = (n || '').trim().split(/\s+/)[0] || '';
     return first || t('inbox.default_student_name', 'Murid');
   }
@@ -134,8 +199,11 @@
         var a = row && row.assignment; if (!a || !a.id) return;
         if (a.t === 'retract') { var x = tarik(a); if (x) retracted.push(x); return; }
         hidupkanLagi(a.id);
+        if (!a.source && a.subjectId) {
+          a.source = { subjectId: a.subjectId, subjectName: a.subjectName || ((TS && TS.MAPEL_NAMES && TS.MAPEL_NAMES[a.subjectId]) || a.subjectId) };
+        }
         if (TS && TS.acceptAssignmentPayload) { try { TS.acceptAssignmentPayload(a); } catch (_) {} }
-        var e = add({ id: 'ta-' + a.id, kind: 'teacher_assignment', at: Number(row.at) || Date.now(), aid: a.id, title: a.title, from: a.from, mode: a.mode, count: (a.itemIds || []).length, minutes: a.minutes, deadline: a.deadline || null, assignment: a });
+        var e = add({ id: 'ta-' + a.id, kind: 'teacher_assignment', at: Number(row.at) || Date.now(), aid: a.id, title: a.title, from: a.from, mode: a.mode, count: (a.itemIds || []).length, minutes: a.minutes, deadline: a.deadline || null, assignment: a, source: a.source, subjectId: a.subjectId, subjectName: a.subjectName });
         if (e) added.push(e);
       });
       var fresh = load(); fresh.cursor[cls] = Number(r.data.cursor) || since; save(fresh);
@@ -160,14 +228,22 @@
       var bc = new BroadcastChannel('fiezel-assignment-sync');
       bc.onmessage = function (ev) {
         if (ev && ev.data && (ev.data.type === 'assignment-created' || ev.data.type === 'assignment-retracted' || ev.data.type === 'poll-now')) {
-          poll(true);
+          if (typeof root.inboxPoll === 'function') {
+            root.inboxPoll(true);
+          } else {
+            poll(true);
+          }
         }
       };
     }
     if (root.addEventListener) {
       root.addEventListener('storage', function (ev) {
         if (ev && (ev.key === 'fiezel-onboarding-v1' || ev.key === 'fiezel-assignment-sync')) {
-          poll(true);
+          if (typeof root.inboxPoll === 'function') {
+            root.inboxPoll(true);
+          } else {
+            poll(true);
+          }
         }
       });
     }

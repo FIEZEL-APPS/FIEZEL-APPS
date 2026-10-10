@@ -276,6 +276,8 @@ export function retractPayload(json, r) {
   try { old = JSON.parse(json); } catch { old = null; }
   const p = { v: 1, t: 'retract', id: r.id, cls: r.code, title: String((old && old.title) || '').slice(0, ASSIGN_LIMITS.TITLE_MAX) };
   if (old && old.teacher) p.teacher = String(old.teacher).slice(0, ASSIGN_LIMITS.TEACHER_MAX);
+  if (old && old.subjectId) p.subjectId = String(old.subjectId).slice(0, 16);
+  if (old && old.subjectName) p.subjectName = String(old.subjectName).slice(0, 60);
   return p;
 }
 

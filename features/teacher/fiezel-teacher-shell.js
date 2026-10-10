@@ -5099,6 +5099,7 @@
          Tugas yang sama (items/skills/mode/deadline identik, id baru) diterbitkan ke
          tiap kelas paralel yang dicentang dalam 1 klik. Idempoten per kelas. */
       var publishedTo = [c.id];
+      var parallelPairs = [];
       try {
         var tcIds = fd.getAll ? fd.getAll('target_classes') : [];
         if (tcIds && tcIds.length) {
@@ -5117,9 +5118,34 @@
             k.assignments.push(clone);
             k.sentItemIds = (k.sentItemIds || []).concat(clone.itemIds).slice(-120);
             publishedTo.push(k.id);
+            parallelPairs.push({ cls: k, asg: clone });
           });
         }
       } catch (_) {}
+
+      // Instant wakeup tab murid di peramban yang sama via BroadcastChannel
+      if (T.broadcastAssignmentSync) T.broadcastAssignmentSync('assignment-created', a.id);
+
+      // Auto-dispatch ke server di latar belakang jika akun guru aktif & online
+      if (T.syncAvailable() === 'ok') {
+        ui.sending = a.id;
+        T.sendAssignment(c, a, targets).then(function (r) {
+          ui.sending = null;
+          if (r && r.ok) {
+            a.retractedAt = null;
+            var count = (targets && targets.length) || (r && r.count) || (c.students || []).length || 'semua';
+            toast(t('guru.toast-kirim-banyak', 'Tugas dikirim ke {jumlah} murid — muncul di notifikasi mereka.').replace('{jumlah}', count));
+          }
+          persist();
+          render();
+        });
+        if (parallelPairs.length) {
+          parallelPairs.forEach(function (pair) {
+            T.sendAssignment(pair.cls, pair.asg, null).catch(function () {});
+          });
+        }
+      }
+
       st.view = 'assignments';
       ui.modal = { kind: 'share-assign', id: a.id };
       ui.drawer = null;
