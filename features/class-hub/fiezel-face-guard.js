@@ -99,6 +99,10 @@
   }
 
   function recordTemporalFrame(now, cX, cY, boxW, boxH, eyeDip, asym, Ygrid, w, h) {
+    if (temporalHistory.length > 0) {
+      var last = temporalHistory[temporalHistory.length - 1];
+      if (now - last.t < 100) return; // hindari buffer flooding pada pemindaian cepat
+    }
     var sig = new Float32Array(192);
     var stepX = w / 16;
     var stepY = h / 12;
@@ -121,7 +125,7 @@
       sig: sig
     });
 
-    while (temporalHistory.length > MAX_TEMPORAL_FRAMES) {
+    while (temporalHistory.length > 24 || (temporalHistory.length > 1 && (now - temporalHistory[0].t) > 4000)) {
       temporalHistory.shift();
     }
   }
@@ -160,7 +164,7 @@
     }
     dipVar /= (temporalHistory.length - 1);
 
-    var isStatic = (timeSpan >= 4500 && avgMae < 0.25 && dipVar < 0.03);
+    var isStatic = (timeSpan >= 2000 && avgMae < 0.28 && dipVar < 0.035);
 
     var asymChange = 0;
     var maxDx = 0, maxDy = 0;
@@ -173,7 +177,7 @@
       if (dy > maxDy) maxDy = dy;
     }
 
-    var isRigidWobble = (timeSpan >= 4500 && (maxDx >= 1.0 || maxDy >= 1.0) && asymChange < 0.8 && dipVar < 0.02);
+    var isRigidWobble = (timeSpan >= 2000 && (maxDx >= 1.0 || maxDy >= 1.0) && asymChange < 0.8 && dipVar < 0.02);
 
     return {
       isStatic: isStatic,
@@ -512,6 +516,8 @@
     state.absentSince = 0;
     state.warned = false;
     state.episoded = false;
+    temporalHistory = [];
+    resetLiveness();
 
     if (!isSupported()) {
       return Promise.resolve({ ok: false, reason: 'unsupported' });
@@ -609,6 +615,8 @@
     state.warned = false;
     state.episoded = false;
     state.options = null;
+    temporalHistory = [];
+    resetLiveness();
   }
 
   function isActive() { return !!state.active; }
@@ -618,12 +626,16 @@
   function attachPreview(vidEl) {
     if (!vidEl || !state.stream) return false;
     try {
-      vidEl.srcObject = state.stream;
+      if (vidEl.srcObject !== state.stream) {
+        vidEl.srcObject = state.stream;
+      }
       vidEl.muted = true;
       vidEl.playsInline = true;
       vidEl.autoplay = true;
-      var p = vidEl.play();
-      if (p && typeof p.catch === 'function') p.catch(function () {});
+      if (vidEl.paused) {
+        var p = vidEl.play();
+        if (p && typeof p.catch === 'function') p.catch(function () {});
+      }
       return true;
     } catch (_) {
       return false;
@@ -741,7 +753,7 @@
       var isReopened = (curDip >= baseOpen * 0.80) || (dipDrop <= Math.max(0.5, baseOpen * 0.15));
       if (isReopened) {
         var dur = now - liveness.blinkCloseStart;
-        if (dur >= 40 && dur <= 800) {
+        if (dur >= 40 && dur <= 1600) {
           liveness.blinkCount++;
         }
         liveness.blinkClosing = false;
