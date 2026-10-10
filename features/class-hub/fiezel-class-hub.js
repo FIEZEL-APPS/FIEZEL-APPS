@@ -984,7 +984,7 @@
       onAbsentEpisode: function (elapsed) {
         var u = ui(), st = u.focus; if (!st || !FG() || !isExamRunner()) return;
         if (!st.faceAwaySince) {
-          FG().leaveFace(st, Date.now() - (elapsed || 2000));
+          FG().leaveFace(st, Date.now() - (elapsed || 3000));
         }
         saveFocus(st);
         reportFocus(st);
@@ -2225,8 +2225,9 @@
         '<span class="ch-preflight-status-badge is-challenge"><span class="ch-face-live-dot"></span> ' + icon('eye') + ' ' + esc(t('proctor.verifikasi-liveness-panduan', 'Langkah 2/2: Kedipkan matamu perlahan atau tolehkan kepalamu')) + '</span>' +
       '</div>';
     } else if (isScanning) {
+      var progressText = (pf.progress != null && pf.progress < 100) ? ' (' + pf.progress + '%)' : '';
       statusHtml = '<div class="ch-preflight-status-row is-scanning" data-testid="class-face-status-scanning">' +
-        '<span class="ch-preflight-status-badge is-scanning"><span class="ch-face-live-dot"></span> ' + esc(t('proctor.verifikasi-memindai', 'Memindai wajah... Harap tetap menghadap kamera')) + '</span>' +
+        '<span class="ch-preflight-status-badge is-scanning"><span class="ch-face-live-dot"></span> ' + esc(t('proctor.verifikasi-memindai', 'Memindai wajah... Harap tetap menghadap kamera')) + progressText + '</span>' +
       '</div>';
     } else if (isStarting) {
       statusHtml = '<div class="ch-preflight-status-row is-starting">' +
@@ -2453,6 +2454,13 @@
                 renderStudent();
                 var pVidC = sEl ? sEl.querySelector('[data-face-preview]') : null;
                 if (pVidC && face.attachPreview) face.attachPreview(pVidC);
+              } else if (live && (live.stage === 'aligning' || live.stage === 'enrolling')) {
+                if (live.progress != null && cu.facePreflight.progress !== live.progress) {
+                  cu.facePreflight.progress = live.progress;
+                  renderStudent();
+                  var pVidE = sEl ? sEl.querySelector('[data-face-preview]') : null;
+                  if (pVidE && face.attachPreview) face.attachPreview(pVidE);
+                }
               }
             } else {
               var ok = face.checkNow ? face.checkNow() : false;
