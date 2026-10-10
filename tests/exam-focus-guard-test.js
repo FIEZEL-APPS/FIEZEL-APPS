@@ -439,15 +439,20 @@ test('face-guard: fallbackCheck membedakan wajah vs kamera tertutup vs langit-la
 });
 
 test('face-guard: modal ramah popup instan saat wajah tak terdeteksi dan auto-dismiss saat kembali', () => {
-  const Hub = globalThis.FiezelClassHub;
-  assert.ok(Hub);
-  const u = Hub._studentUi();
-  // Set faceWarn = true
-  u.faceWarn = true;
+  const Hub = globalThis.FiezelClassHub, TS = globalThis.FiezelTeacherStore, Bank = globalThis.FiezelReviewBank;
+  assert.ok(Hub && TS && Bank);
+  const ids = Bank.pick('past_tense', 3, 7).map((x) => x.id);
+  assert.ok(TS.acceptAssignmentPayload({ v: 1, t: 'assign', id: 'ujian-2', title: 'Ujian mini 2', skills: ['past_tense'], itemIds: ids, minutes: 5, from: 'Kelas 8A', cls: 'FZ-AB2C3D', mode: 'ujian', timer: 5 }));
+
   const sEl = { innerHTML: '', _h: {}, addEventListener(t, fn) { (this._h[t] = this._h[t] || []).push(fn); }, querySelector: () => null, fire(t, target) { (this._h[t] || []).forEach((fn) => fn({ target, preventDefault() {} })); } };
   const senv = { toast(t) { senv.last = t; }, go() {}, afterRender() {} };
   Hub.mountStudent(sEl, senv);
-  Hub.openAssignment('ujian-1');
+  Hub.openAssignment('ujian-2');
+
+  const u = Hub._studentUi();
+  // Set faceWarn = true (simulasi deteksi wajah tak terlihat)
+  u.faceWarn = true;
+  Hub.renderStudent();
 
   assert.ok(sEl.innerHTML.includes('class-face-alert-modal'), 'modal popup ramah muncul di layar saat wajah tak terlihat');
   assert.ok(sEl.innerHTML.includes('class-face-recheck-btn'), 'tombol periksa ulang tersedia');
@@ -457,9 +462,9 @@ test('face-guard: modal ramah popup instan saat wajah tak terdeteksi dan auto-di
   const btn = { getAttribute: (k) => (k === 'data-ch' ? 'recheck-face' : null), closest: (sel) => (sel === '[data-ch]' ? btn : null) };
   sEl.fire('click', btn);
 
-  // Saat wajah kembali, faceWarn disetel false
+  // Saat wajah kembali, faceWarn disetel false dan modal auto-dismiss
   u.faceWarn = false;
-  Hub.openAssignment('ujian-1');
+  Hub.renderStudent();
   assert.ok(!sEl.innerHTML.includes('class-face-alert-modal'), 'modal otomatis tertutup saat wajah terdeteksi kembali');
 });
 
