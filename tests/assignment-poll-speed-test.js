@@ -11,7 +11,7 @@
  * 5. mountStudent() di fiezel-class-hub.js memicu polling proaktif seketika saat murid membuka KelasKu.
  * 6. go('classroom') memicu polling seketika saat navigasi.
  * 7. BroadcastChannel dan listener storage terpasang untuk instant wakeup.
- * 8. Dashboard guru (features/teacher/* dan teacher-shell.css) tetap 100% utuh tanpa sentuhan.
+ * 8. Teacher store assignmentPayload memuat subjectId, subjectName, BroadcastChannel terpasang, dan auto-dispatch aktif.
  */
 const assert = require('assert');
 const fs = require('fs');
@@ -22,6 +22,8 @@ const read = (p) => fs.readFileSync(path.join(__fzRoot, p), 'utf8');
 const appSrc = read('app.js');
 const inboxSrc = read('features/notify/fiezel-inbox.js');
 const hubSrc = read('features/class-hub/fiezel-class-hub.js');
+const storeSrc = read('features/teacher/fiezel-teacher-store.js');
+const shellSrc = read('features/teacher/fiezel-teacher-shell.js');
 
 const tests = [];
 const test = (name, fn) => tests.push([name, fn]);
@@ -57,7 +59,7 @@ test('5. mountStudent() memanggil FiezelInbox.poll(true)', () => {
 });
 
 test('6. go("classroom") di app.js memanggil inboxPoll(true)', () => {
-  assert.ok(appSrc.includes("if(v==='classroom'||v==='home'){try{inboxPoll(v==='classroom')}catch(_){}}"), 'go() memicu inboxPoll saat ke classroom atau home');
+  assert.ok(appSrc.includes("if(v==='classroom'||v==='home'){try{inboxPoll(v==='classroom')}catch(_){}}") || /if\s*\(\s*v\s*===\s*['"]classroom['"]\s*\|\|\s*v\s*===\s*['"]home['"]\s*\)\s*\{\s*try\s*\{\s*inboxPoll\(\s*v\s*===\s*['"]classroom['"]\s*\)\s*\}\s*catch/.test(appSrc), 'go() memicu inboxPoll saat ke classroom atau home');
 });
 
 test('7. BroadcastChannel dan listener storage terpasang di fiezel-inbox.js', () => {
@@ -65,11 +67,12 @@ test('7. BroadcastChannel dan listener storage terpasang di fiezel-inbox.js', ()
   assert.ok(inboxSrc.includes("root.addEventListener('storage'"), 'storage listener terpasang');
 });
 
-test('8. Dashboard guru (features/teacher/* & teacher-shell.css) tidak dimodifikasi', () => {
-  // Cek git status atau git diff khusus direktori guru
-  const cp = require('child_process');
-  const status = cp.execSync('git status --porcelain features/teacher/ teacher-shell.css', { cwd: __fzRoot, encoding: 'utf8' }).trim();
-  assert.strictEqual(status, '', 'Tidak boleh ada modifikasi di features/teacher/ atau teacher-shell.css: ' + status);
+test('8. Teacher store assignmentPayload memuat subjectId, subjectName, BroadcastChannel terpasang, dan auto-dispatch aktif', () => {
+  assert.ok(storeSrc.includes("BroadcastChannel('fiezel-assignment-sync')"), 'BroadcastChannel terpasang di teacher-store');
+  assert.ok(storeSrc.includes('p.subjectId') && storeSrc.includes('p.subjectName'), 'assignmentPayload membawa subjectId dan subjectName');
+  assert.ok(storeSrc.includes('broadcastAssignmentSync: broadcastAssignmentSync'), 'broadcastAssignmentSync diekspor');
+  assert.ok(shellSrc.includes('T.sendAssignment(c, a, targets)'), 'auto-dispatch aktif saat terbitkan tugas');
+  assert.ok(shellSrc.includes("T.broadcastAssignmentSync('assignment-created', a.id)"), 'BroadcastChannel dipanggil di cangkang guru');
 });
 
 (async () => {

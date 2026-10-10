@@ -428,6 +428,21 @@
     return sebelum !== c.pending.length;
   }
   function pendingJoins(c) { return (c && Array.isArray(c.pending) ? c.pending : []).slice().sort(function (a, b) { return (b.at || 0) - (a.at || 0); }); }
+  function broadcastAssignmentSync(type, id) {
+    try {
+      if (typeof BroadcastChannel !== 'undefined') {
+        var bc = new BroadcastChannel('fiezel-assignment-sync');
+        bc.postMessage({ type: type || 'assignment-created', id: id, at: Date.now() });
+        try { bc.close(); } catch (_) {}
+      }
+    } catch (_) {}
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('fiezel-assignment-sync', JSON.stringify({ type: type || 'assignment-created', id: id, at: Date.now() }));
+      }
+    } catch (_) {}
+  }
+
   /** Bentuk payload tugas yang dikirim ke server = isi kode tugas (tanpa base64). */
   function assignmentPayload(c, a) {
     var cleanSkills = (a.skills || []).map(function (k) {
@@ -437,6 +452,27 @@
     var p = { v: 1, t: 'assign', id: a.id, title: a.title, skills: cleanSkills, itemIds: a.itemIds, minutes: a.minutes, from: c.name, cls: c.code, deadline: a.deadline || null, mode: a.mode || 'latihan', timer: a.timer || 0, shuffle: !!a.shuffle };
     p.teacher = a.teacher || (c && c.teacher) || 'Guru';
     if (a.teacher) p.teacher = String(a.teacher);
+
+    var subId = (a && a.source && a.source.subjectId) || (a && a.subjectId) || (c && c.subject) || null;
+    if (!subId && a && Array.isArray(a.skills)) {
+      for (var si = 0; si < a.skills.length; si++) {
+        var skUpper = String(a.skills[si] || '').toUpperCase();
+        if (MAPEL_NAMES[skUpper]) { subId = skUpper; break; }
+        var mKomp = skUpper.match(/KOMP[-_]([A-Z]{3})/);
+        if (mKomp && MAPEL_NAMES[mKomp[1]]) { subId = mKomp[1]; break; }
+      }
+    }
+    if (subId) {
+      p.subjectId = String(subId).trim().toUpperCase().slice(0, 16);
+      var subName = (a && a.source && a.source.subjectName) || (a && a.subjectName) || MAPEL_NAMES[p.subjectId] || p.subjectId;
+      p.subjectName = String(subName).trim().slice(0, 60);
+    }
+    if (a && a.source) {
+      p.source = Object.assign({}, a.source);
+    } else if (p.subjectId) {
+      p.source = { subjectId: p.subjectId, subjectName: p.subjectName };
+    }
+
     if (Array.isArray(a.items) && a.items.length) {
       p.items = a.items.map(function (q) {
         var rawSk = typeof q.skill === 'string' ? q.skill.trim().toLowerCase().replace(/[^a-z0-9_]/g, '_').slice(0, 32) : '';
@@ -444,6 +480,7 @@
         var o = { id: q.id, prompt: q.prompt, options: q.options, answer: q.answer, skill: sk };
         if (q.context) o.context = q.context;
         if (q.why && Object.keys(q.why).length) o.why = q.why;
+        if (q.distractorWhy && Object.keys(q.distractorWhy).length) o.distractorWhy = q.distractorWhy;
         return o;
       });
     }
@@ -461,7 +498,14 @@
     if (!p || p.t !== 'assign' || !Array.isArray(p.itemIds)) return null;
     try {
       var a = JSON.parse(localStorage.getItem(ASSIGN_KEY)) || [];
-      if (!a.some(function (x) { return x.id === p.id; })) a.push({ id: p.id, title: p.title, skills: p.skills, itemIds: p.itemIds, minutes: p.minutes, from: p.from, teacher: p.teacher || '', cls: p.cls || '', items: Array.isArray(p.items) ? p.items : undefined, timer: p.timer || 0, shuffle: !!p.shuffle, at: Date.now(), deadline: p.deadline, mode: p.mode });
+      if (!a.some(function (x) { return x.id === p.id; })) {
+        var entry = { id: p.id, title: p.title, skills: p.skills, itemIds: p.itemIds, minutes: p.minutes, from: p.from, teacher: p.teacher || '', cls: p.cls || '', items: Array.isArray(p.items) ? p.items : undefined, timer: p.timer || 0, shuffle: !!p.shuffle, at: Date.now(), deadline: p.deadline, mode: p.mode };
+        if (p.subjectId) entry.subjectId = p.subjectId;
+        if (p.subjectName) entry.subjectName = p.subjectName;
+        if (p.source) entry.source = p.source;
+        else if (p.subjectId) entry.source = { subjectId: p.subjectId, subjectName: p.subjectName };
+        a.push(entry);
+      }
       localStorage.setItem(ASSIGN_KEY, JSON.stringify(a.slice(-12)));
       if (p.cls) { var ob = JSON.parse(localStorage.getItem('fiezel-onboarding-v1') || '{}'); if (!ob.classCode) { ob.classCode = p.cls; localStorage.setItem('fiezel-onboarding-v1', JSON.stringify(ob)); } }
     } catch (_) {}
@@ -580,6 +624,7 @@
         if (!res.ok) return { ok: false, error: res.error || 'unknown' };
         a.sent = a.sent || { all: null, to: {} };
         if (!names) a.sent.all = Date.now(); else (studentIds || []).forEach(function (id) { a.sent.to[id] = Date.now(); });
+        broadcastAssignmentSync('assignment-created', a.id);
         return { ok: true, count: names ? names.length : c.students.length };
       });
     }).catch(function () { return { ok: false, error: 'unavailable' }; });
@@ -597,6 +642,7 @@
     return A.api(SYNC_PATHS.retract, { code: c.code, id: a.id }).then(function (res) {
       if (!res.ok && res.error !== 'not_found') return { ok: false, error: res.error || 'unknown' };
       a.retractedAt = Date.now();
+      broadcastAssignmentSync('assignment-retracted', a.id);
       return { ok: true, remote: !!res.ok };
     }).catch(function () { return { ok: false, error: 'unavailable' }; });
   }
@@ -769,7 +815,7 @@
     skillAcc: skillAcc, overallAcc: overallAcc, daysSince: daysSince, risk: risk, classStats: classStats, classSkillMap: classSkillMap, heatmap: heatmap, activeSkills: activeSkills, studyGroups: studyGroups, misconceptions: misconceptions, needsGreeting: needsGreeting, agenda: agenda, pendingAssignments: pendingAssignments, targeted: targeted, recentAttendance: recentAttendance, attendanceRate: attendanceRate, weakestSkill: weakestSkill,
     durasi: durasi, examLabel: examLabel, acceptJoin: acceptJoin, rejectJoin: rejectJoin, pendingJoins: pendingJoins, normalizeFocus: normalizeFocus, focusGrew: focusGrew, focusOf: focusOf, focusLabel: focusLabel, focusLevel: focusLevel,
     parseLearnerCode: parseLearnerCode, parseLearnerPayload: parseLearnerPayload, ingest: ingest, assignmentCode: assignmentCode, assignmentPayload: assignmentPayload, parseAssignmentCode: parseAssignmentCode, acceptAssignmentCode: acceptAssignmentCode, acceptAssignmentPayload: acceptAssignmentPayload, buildAssignment: buildAssignment,
-    SYNC_PATHS: SYNC_PATHS, syncAvailable: syncAvailable, claimClass: claimClass, pullReports: pullReports, syncClass: syncClass, syncClassList: syncClassList, reportToClass: reportToClass, syncLabel: syncLabel, sendAssignment: sendAssignment, retractAssignment: retractAssignment, sentTo: sentTo,
+    SYNC_PATHS: SYNC_PATHS, syncAvailable: syncAvailable, claimClass: claimClass, pullReports: pullReports, syncClass: syncClass, syncClassList: syncClassList, reportToClass: reportToClass, syncLabel: syncLabel, sendAssignment: sendAssignment, retractAssignment: retractAssignment, sentTo: sentTo, broadcastAssignmentSync: broadcastAssignmentSync,
     notify: notify, inboxUnread: inboxUnread, inboxMarkAllRead: inboxMarkAllRead, inboxText: inboxText,
     greetingCard: greetingCard, parentReport: parentReport, weeklyClassReport: weeklyClassReport, csvStudents: csvStudents, parseNames: parseNames, waLink: waLink, fmtDate: fmtDate, pct: pct };
 });

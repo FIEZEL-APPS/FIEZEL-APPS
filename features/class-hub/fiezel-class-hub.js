@@ -180,13 +180,12 @@
   function isStudentBusy() {
     try {
       if (!sEl || typeof document === 'undefined') return false;
-      if (Date.now() - lastStudentInputAt < 2500) return true;
+      var a = document.activeElement;
+      var inputActive = !!(a && a !== document.body && (/^(INPUT|TEXTAREA|SELECT)$/i.test(a.tagName || '') || a.isContentEditable));
+      if (inputActive && Date.now() - lastStudentInputAt < 2500) return true;
       var u = sUi;
       if (u && u.runner && !u.runner.finished && !u.paused) return true;
-      var a = document.activeElement;
-      if (!a || a === document.body) return false;
-      if (a.isContentEditable) return true;
-      return /^(INPUT|TEXTAREA|SELECT)$/i.test(a.tagName || '');
+      return inputActive;
     } catch (_) { return false; }
   }
   function studentDataFingerprint() {
@@ -325,11 +324,25 @@
     return done.filter(function (s) { return selesaiDiarsip(s, arch, now); }).length + arch.missed.length;
   }
   function lokal() { try { var I = root.FiezelI18n; return I && I.getLocale && I.getLocale() === 'th' ? 'th-TH' : 'id-ID'; } catch (_) { return 'id-ID'; } }
+  function assignmentSubjectId(a) {
+    if (a && a.source && a.source.subjectId) return String(a.source.subjectId).toUpperCase();
+    if (a && a.subjectId) return String(a.subjectId).toUpperCase();
+    if (a && a.subject) return String(a.subject).toUpperCase();
+    if (a && Array.isArray(a.skills)) {
+      for (var i = 0; i < SUBJECTS_17.length; i++) {
+        var sid = SUBJECTS_17[i].id;
+        if (a.skills.indexOf(sid) !== -1 || a.skills.indexOf(sid.toLowerCase()) !== -1) {
+          return sid;
+        }
+      }
+    }
+    return 'ENG';
+  }
   /* Nama mapel pendek untuk baris sempit: singkatan di dalam kurung bila ada. */
   function mapelOf(a) {
-    var id = (a && a.source && a.source.subjectId) || '';
-    var s = id ? SUBJECTS_17.filter(function (x) { return x.id === id; })[0] : null;
-    var nama = (a && a.source && a.source.subjectName) || (s && s.name) || '';
+    var id = (a && a.source && a.source.subjectId) || (a && a.subjectId) || assignmentSubjectId(a) || '';
+    var s = id ? SUBJECTS_17.filter(function (x) { return x.id === id.toUpperCase(); })[0] : null;
+    var nama = (a && a.source && a.source.subjectName) || (a && a.subjectName) || (s && s.name) || '';
     if (!nama) return null;
     var m = /\(([^)]+)\)\s*$/.exec(nama);
     return { id: id, nama: m ? m[1] : nama.split(' & ')[0], color: s ? s.color : '' };
@@ -659,7 +672,13 @@
        ada siapa pun di ujung sana. */
     try { LF() && LF().announceJoin(); } catch (_) {}
     try { fetchClassTeachers(); } catch (_) {}
-    try { root.FiezelInbox && root.FiezelInbox.poll(true).then(function () { renderStudent({ quiet: true }); }); } catch (_) {}
+    try {
+      var pollFn = (typeof root.inboxPoll === 'function') ? root.inboxPoll : (root.FiezelInbox && root.FiezelInbox.poll);
+      if (pollFn) {
+        var p = pollFn(true);
+        if (p && typeof p.then === 'function') p.then(function () { renderStudent({ quiet: true }); });
+      }
+    } catch (_) {}
     return true;
   }
   function latestMeta() { var all = assignments().concat(subs()).sort(function (a, b) { return (b.at || 0) - (a.at || 0); }); return all[0] || null; }
@@ -823,9 +842,37 @@
   function openAssignment(id) {
     if (!id) return false;
     if (!sEl) { pendingOpen = id; return true; }
-    var a = assignments().filter(function (x) { return x.id === id; })[0];
-    if (!a) { var arsipan = arsip().missed.filter(function (x) { return x.id === id && x.oleh !== 'guru'; })[0]; if (arsipan && pulihkan(id)) a = assignments().filter(function (x) { return x.id === id; })[0]; }
-    if (!a) { var done = subs().filter(function (x) { return x.id === id; })[0]; if (done) { ui().tab = 'tugas'; ui().review = id; saveUi(); renderStudent(); return true; } if (sEnv.toast) sEnv.toast(t('kelas.tugas-tidak-ditemukan', 'Tugas ini tidak ditemukan atau sudah selesai.')); return false; }
+    var cleanId = String(id).replace(/^ta-/, '');
+    var a = assignments().filter(function (x) { return x.id === id || x.id === cleanId || ('ta-' + x.id) === id; })[0];
+    if (!a) { var arsipan = arsip().missed.filter(function (x) { return (x.id === id || x.id === cleanId) && x.oleh !== 'guru'; })[0]; if (arsipan && pulihkan(arsipan.id)) a = assignments().filter(function (x) { return x.id === arsipan.id; })[0]; }
+    if (!a && root.FiezelInbox && typeof root.FiezelInbox.get === 'function') {
+      var inb = root.FiezelInbox.get(id) || root.FiezelInbox.get('ta-' + cleanId) || root.FiezelInbox.get(cleanId);
+      if (inb) {
+        if (inb.assignment && T() && T().acceptAssignmentPayload) {
+          try { T().acceptAssignmentPayload(inb.assignment); } catch (_) {}
+          a = assignments().filter(function (x) { return x.id === inb.aid || x.id === cleanId || x.id === id; })[0];
+        }
+        if (!a) {
+          var asgObj = {
+            v: 1, t: 'assign',
+            id: inb.aid || cleanId,
+            title: inb.title || (t('kelas.guru', 'Guru') + ' ' + t('umum.tugas', 'Tugas')),
+            skills: (inb.assignment && inb.assignment.skills) || inb.skills || ['past_tense'],
+            itemIds: (inb.assignment && inb.assignment.itemIds) || inb.itemIds || ['demo-1'],
+            minutes: inb.minutes || 10,
+            mode: inb.mode || 'latihan',
+            from: inb.from || t('kelas.guru', 'Guru'),
+            teacher: inb.from || t('kelas.guru', 'Guru'),
+            deadline: inb.deadline || null,
+            items: inb.assignment && inb.assignment.items,
+            source: inb.source
+          };
+          if (T() && T().acceptAssignmentPayload) { try { T().acceptAssignmentPayload(asgObj); } catch (_) {} }
+          a = assignments().filter(function (x) { return x.id === asgObj.id; })[0] || asgObj;
+        }
+      }
+    }
+    if (!a) { var done = subs().filter(function (x) { return x.id === id || x.id === cleanId; })[0]; if (done) { ui().tab = 'tugas'; ui().review = done.id; saveUi(); renderStudent(); return true; } if (sEnv.toast) sEnv.toast(t('kelas.tugas-tidak-ditemukan', 'Tugas ini tidak ditemukan atau sudah selesai.')); return false; }
     startRunner(a); return true;
   }
   /* ===================================================================================== */
@@ -1088,6 +1135,12 @@
     if (!sEl) return;
     if (opts && opts.quiet && isStudentBusy()) {
       pendingStudentRender = true;
+      setTimeout(function () {
+        if (pendingStudentRender && !isStudentBusy()) {
+          pendingStudentRender = false;
+          renderStudent({ quiet: true });
+        }
+      }, 2600);
       return;
     }
     var fp = studentDataFingerprint();
@@ -1277,8 +1330,12 @@
 
     var activeSubjects = SUBJECTS_17.filter(function (s) {
       if (tMap[s.id]) return true;
-      var hasPend = pend.some(function (a) { return (a.source && a.source.subjectId === s.id) || (Array.isArray(a.skills) && a.skills.indexOf(s.id) !== -1); });
-      var hasDone = done.some(function (a) { return (a.source && a.source.subjectId === s.id) || (Array.isArray(a.skills) && a.skills.indexOf(s.id) !== -1); });
+      var hasPend = pend.some(function (a) {
+        return assignmentSubjectId(a) === s.id || (a.source && a.source.subjectId === s.id) || (Array.isArray(a.skills) && (a.skills.indexOf(s.id) !== -1 || a.skills.indexOf(s.id.toLowerCase()) !== -1));
+      });
+      var hasDone = done.some(function (a) {
+        return assignmentSubjectId(a) === s.id || (a.source && a.source.subjectId === s.id) || (Array.isArray(a.skills) && (a.skills.indexOf(s.id) !== -1 || a.skills.indexOf(s.id.toLowerCase()) !== -1));
+      });
       return hasPend || hasDone;
     });
 
@@ -1288,7 +1345,7 @@
 
     var chipsHtml = activeSubjects.map(function (s) {
       var taskCount = pend.filter(function (a) {
-        return (a.source && a.source.subjectId === s.id) || (Array.isArray(a.skills) && a.skills.indexOf(s.id) !== -1);
+        return assignmentSubjectId(a) === s.id || (a.source && a.source.subjectId === s.id) || (Array.isArray(a.skills) && (a.skills.indexOf(s.id) !== -1 || a.skills.indexOf(s.id.toLowerCase()) !== -1));
       }).length;
       var isSelected = (curFilter === s.id);
       return '<button type="button" class="ch-chip' + (isSelected ? ' is-active' : '') + '" data-ch="filter-subject" data-subject="' + esc(s.id) + '" data-testid="chip-' + esc(s.id) + '" style="--chip-color:' + s.color + '">' +
@@ -1324,7 +1381,23 @@
 
   function tugasView(pend, done) {
     var u = ui(), now = Date.now(), arch = arsip(), curFilter = u.filterSubject || null;
-    function cocok(a) { return !curFilter || (a.source && a.source.subjectId === curFilter) || (Array.isArray(a.skills) && a.skills.indexOf(curFilter) !== -1); }
+    function cocok(a) {
+      if (!curFilter) return true;
+      var f = String(curFilter).toUpperCase();
+      if (assignmentSubjectId(a) === f) return true;
+      if (a.source && (String(a.source.subjectId).toUpperCase() === f || a.source.subjectName === curFilter)) return true;
+      if (a.subjectId && String(a.subjectId).toUpperCase() === f) return true;
+      if (Array.isArray(a.skills) && (a.skills.indexOf(curFilter) !== -1 || a.skills.indexOf(curFilter.toLowerCase()) !== -1 || a.skills.indexOf(f) !== -1)) return true;
+      return false;
+    }
+    if (curFilter && (pend.length > 0 || done.length > 0)) {
+      var anyMatch = pend.some(cocok) || done.some(function (s) { return !selesaiDiarsip(s, arch, now) && cocok(s); });
+      if (!anyMatch) {
+        u.filterSubject = null;
+        curFilter = null;
+        saveUi();
+      }
+    }
     var kerjakan = pend.filter(function (a) { return !hariLewat(a) && cocok(a); })
       .sort(function (a, b) { return String(a.deadline || '9').localeCompare(String(b.deadline || '9')); });
     var terlewat = pend.filter(function (a) { return hariLewat(a) > 0 && cocok(a); })
@@ -2414,5 +2487,5 @@
     if (field === 'prompt') q.prompt = t.value; else if (field === 'answer') q.answer = Number(t.value); else if (field === 'opt') q.options[Number(t.getAttribute('data-j'))] = t.value;
   }
 
-  root.FiezelClassHub = { mountStudent: mountStudent, unmountStudent: unmountStudent, renderStudent: renderStudent, openAssignment: openAssignment, mountTeacher: mountTeacher, SUB_KEY: SUB_KEY, _teacherUi: function () { return tUi; }, _studentUi: ui, _focusEvents: function () { return focusBound; }, PASS_KEY: PASS_KEY, _passport: { record: passportRecord, of: passportOf, all: passport } };
+  root.FiezelClassHub = { mountStudent: mountStudent, unmountStudent: unmountStudent, renderStudent: renderStudent, openAssignment: openAssignment, setClassCode: setClassCode, _setClassCode: setClassCode, mountTeacher: mountTeacher, SUB_KEY: SUB_KEY, _teacherUi: function () { return tUi; }, _studentUi: ui, _focusEvents: function () { return focusBound; }, PASS_KEY: PASS_KEY, _passport: { record: passportRecord, of: passportOf, all: passport } };
 })(typeof window !== 'undefined' ? window : null);

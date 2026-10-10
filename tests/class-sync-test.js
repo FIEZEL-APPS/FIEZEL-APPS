@@ -203,8 +203,13 @@ async function json(res) { return { status: res.status, body: JSON.parse(await r
   assert(rGt.status === 200 && Array.isArray(rGt.body.teachers) && rGt.body.teachers.length >= 1, 'murid dapat menarik daftar guru & kartu mapel di kelasnya');
 
   // Guru t2 sekarang BISA mengirim tugas ke kelas FZ-AB2C3D karena sudah terdaftar di tc_class_teacher
-  let rAsg2 = await json(await routes.routeClassAssign(ctxOf(db, { sub: 't2', method: 'POST', pathname: '/api/teacher/class/assign', body: { code: 'FZ-AB2C3D', assignment: { ...asgBody, id: 'as-mat-101', title: 'Aljabar Dasar' } }, now: 1_700_000_070_000 })));
+  let rAsg2 = await json(await routes.routeClassAssign(ctxOf(db, { sub: 't2', method: 'POST', pathname: '/api/teacher/class/assign', body: { code: 'FZ-AB2C3D', assignment: { ...asgBody, id: 'as-mat-101', title: 'Aljabar Dasar', subjectId: 'MAT', subjectName: 'Matematika', teacher: 'Pak Budi' } }, now: 1_700_000_070_000 })));
   assert(rAsg2.status === 200 && rAsg2.body.ok, 'guru t2 berhasil mengirim tugas matematika ke kelas FZ-AB2C3D');
+
+  let rCheckAsg = await json(await routes.routeLearnerClassAssignments(ctxOf(db, { sub: 'anon-6', method: 'GET', pathname: '/api/learner/class-assignments', query: { cls: 'FZ-AB2C3D', name: 'Dimas', since: '1700000069000' }, now: 1_700_000_071_000 })));
+  assert(rCheckAsg.status === 200 && rCheckAsg.body.assignments.length === 1, 'murid menerima tugas baru guru t2');
+  const matAsg = rCheckAsg.body.assignments[0].assignment;
+  assert(matAsg.subjectId === 'MAT' && matAsg.subjectName === 'Matematika' && matAsg.teacher === 'Pak Budi', 'data subjectId, subjectName, dan teacher dipertahankan dan dikembalikan utuh ke murid');
 
   // Guru t3 (IPA) juga mengklaim kelas yang sama FZ-AB2C3D tanpa konflik
   db._accounts.set('t3', { sub: 't3', role: 'teacher', status: 'active' });

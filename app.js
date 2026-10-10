@@ -9257,7 +9257,7 @@ function examWatchSync(){
 }
 try{document.addEventListener('fiezel-exam-lock',examWatchSync)}catch(_){}
 
-function go(v,opts){if((v==='ask'||v==='search')&&!aiDoorAllowed())return false;if(isVerifiedTeacher()&&v!=='tutor'){v='tutor'}if(!VALID_VIEWS.has(v)){showToast(FiezelI18n.t('nav.halaman-tak-tersedia'));return false}/* m025-314: penolakan berbahasa duduk DI SINI, bukan di daftar kartu — setiap pintu ke permukaan yang belum punya isi bahasa target lewat go(), termasuk pintu yang belum ditulis. */if(targetLangSurfaceBlocked(v)){showToast(FiezelI18n.t('bahasa.permukaan-terkunci',{bahasa:FiezelI18n.t('bahasa.'+activeTargetLang())}));return false}if(opts?.viaHistory!==true)haptic('tap');uiSfx('nav');dropStages();if(opts?.viaHistory!==true)pushBackNavView(v);state.view=v;if(v==='classroom'||v==='home'){try{inboxPoll(v==='classroom')}catch(_){}if(v==='home'){try{const cur=Number(sessionStorage.getItem('fz_today_vocab_visit')||0);sessionStorage.setItem('fz_today_vocab_visit',String(cur+1))}catch(_){}}}try{const _targetView=(typeof TAB_PARENT!=='undefined'&&TAB_PARENT[v])?TAB_PARENT[v]:v;const _targetBtn=document.querySelector(`.bottomnav [data-view="${_targetView}"]`);if(_targetBtn)syncNavActivePill(_targetBtn)}catch(_){}const swap=()=>{save();render()};const isBottomTab=['home','latihan','classroom','game','progress','online','profile'].includes(v);if(!isBottomTab&&document.startViewTransition&&state.preferences?.motion!==false&&!prefersReducedMotion()){vtViewPaint=true;try{const __vt=document.startViewTransition(swap);const __done=()=>{vtViewPaint=false};if(__vt&&__vt.finished&&typeof __vt.finished.finally==='function')__vt.finished.finally(__done);else setTimeout(__done,300)}catch(_){try{swap()}finally{vtViewPaint=false}}}else swap();return true} window.go=go;
+function go(v,opts){if((v==='ask'||v==='search')&&!aiDoorAllowed())return false;if(isVerifiedTeacher()&&v!=='tutor'){v='tutor'}if(!VALID_VIEWS.has(v)){showToast(FiezelI18n.t('nav.halaman-tak-tersedia'));return false}/* m025-314: penolakan berbahasa duduk DI SINI, bukan di daftar kartu — setiap pintu ke permukaan yang belum punya isi bahasa target lewat go(), termasuk pintu yang belum ditulis. */if(targetLangSurfaceBlocked(v)){showToast(FiezelI18n.t('bahasa.permukaan-terkunci',{bahasa:FiezelI18n.t('bahasa.'+activeTargetLang())}));return false}if(opts?.viaHistory!==true)haptic('tap');uiSfx('nav');dropStages();if(opts?.viaHistory!==true)pushBackNavView(v);state.view=v;if(v==='classroom'||v==='home'){try{inboxPoll(v==='classroom')}catch(_){}}if(v==='home'){try{const cur=Number(sessionStorage.getItem('fz_today_vocab_visit')||0);sessionStorage.setItem('fz_today_vocab_visit',String(cur+1))}catch(_){}}try{const _targetView=(typeof TAB_PARENT!=='undefined'&&TAB_PARENT[v])?TAB_PARENT[v]:v;const _targetBtn=document.querySelector(`.bottomnav [data-view="${_targetView}"]`);if(_targetBtn)syncNavActivePill(_targetBtn)}catch(_){}const swap=()=>{save();render()};const isBottomTab=['home','latihan','classroom','game','progress','online','profile'].includes(v);if(!isBottomTab&&document.startViewTransition&&state.preferences?.motion!==false&&!prefersReducedMotion()){vtViewPaint=true;try{const __vt=document.startViewTransition(swap);const __done=()=>{vtViewPaint=false};if(__vt&&__vt.finished&&typeof __vt.finished.finally==='function')__vt.finished.finally(__done);else setTimeout(__done,300)}catch(_){try{swap()}finally{vtViewPaint=false}}}else swap();return true} window.go=go;
 function handleTopbarBack(){if(typeof go!=='function')return;const subViews=['grammar','vocab','skills','listening','speaking','reading','writing','library','kana','ask','search'];if(subViews.includes(state.view)){go('latihan')}else{go('home')}} window.handleTopbarBack=handleTopbarBack;
 function pushBackNavView(v){try{return self.FiezelBackNav?.pushView?.(v)===true}catch{return false}}
 /* ---- m025-117 lapisan layar-di-dalam-view (stage) ---------------------------------
@@ -20429,12 +20429,12 @@ try{
 }catch(_){}
 function isInputActive(){
   try{
-    if(Date.now()-lastGlobalInputAt<2000)return true;
     if(typeof modalOpen!=='undefined'&&modalOpen)return true;
     const a=document.activeElement;
     if(!a||a===document.body)return false;
-    if(a.isContentEditable)return true;
-    return /^(INPUT|TEXTAREA|SELECT)$/i.test(a.tagName||'');
+    const isField=/^(INPUT|TEXTAREA|SELECT)$/i.test(a.tagName||'')||Boolean(a.isContentEditable);
+    if(isField&&Date.now()-lastGlobalInputAt<2000)return true;
+    return isField;
   }catch(_){return false}
 }
 function refreshNotifBadge(){try{if(state.view==='classroom'&&$('fzClassHub')&&!$('fzClassHub').querySelector('[data-testid="class-runner"]')){if(!isInputActive())self.FiezelClassHub?.renderStudent?.({quiet:true})}}catch(_){}const b=$('fzNotifBadge');if(!b)return false;const n=notifUnreadTotal();b.textContent=n>9?'9+':String(n);b.classList.toggle('hidden',n<=0);$('fzNotifBtn')?.classList.toggle('has-new',n>0);return true}
@@ -20541,14 +20541,24 @@ async function openNotifications(){
   return true;
 }
 function openAssignmentFromNotif(id){
-  const inbox=inboxCore(),e=inbox?inbox.get(id):null;
-  try{inbox?.markRead(id)}catch(_){}
+  const inbox=inboxCore(),e=inbox?(inbox.get(id)||inbox.get(String(id).replace(/^ta-/,''))):null;
+  const aid=e?.aid||(e?.id?e.id.replace(/^ta-/,''):String(id).replace(/^ta-/,''));
+  try{inbox?.markRead(e?.id||id)}catch(_){}
   closeModal();refreshNotifBadge();
-  if(!e)return false;
+  if(!e&&!aid)return false;
   /* Class-hub: tugas guru dibuka DI DALAM Kelas (runner), bukan dilempar ke Rencana hari ini. */
-  if(self.FiezelClassHub){try{self.FiezelClassHub.openAssignment(e.aid)}catch(_){}go('classroom');return true}
-  try{self.FiezelLearnerFlow?.openAssignment?.(e.aid)}catch(_){}
-  go('learn');
+  if(e&&!e.aid&&aid)e.aid=aid;
+  if(self.FiezelClassHub){
+    try{
+      if(e?.assignment&&self.FiezelTeacherStore?.acceptAssignmentPayload){
+        self.FiezelTeacherStore.acceptAssignmentPayload(e.assignment);
+      }
+      self.FiezelClassHub.openAssignment(e.aid);
+    }catch(_){}
+    go('classroom');return true
+  }
+  try{self.FiezelLearnerFlow?.openAssignment?.(aid)}catch(_){}
+  if(state.view!=='learn')go('learn');
   return true;
 }
 function notifMarkAllRead(){try{inboxCore()?.markAllRead()}catch(_){}try{socialNotifyCore()?.markAllRead()}catch(_){}closeModal();refreshNotifBadge();return true}
@@ -20560,16 +20570,22 @@ async function inboxPoll(force){
     const text=FiezelI18n.t('notif.assignment-toast',{from:e.from||'guru',title:e.title||''});
     const visible=(()=>{try{return document.visibilityState==='visible'}catch(_){return true}})();
     if(visible)showToast(text);else socialNotifySystem(text,{kind:'teacher_assignment'});
-    try{uiSfx('open')}catch(_){}
+    try{uiSfx('notif_general')||uiSfx('notif')||uiSfx('open')}catch(_){}
     try{if((state.view==='learn'||state.view==='home')&&!isInputActive()&&!modalOpen)render()}catch(_){}
-    try{if(state.view==='classroom'&&!isInputActive())self.FiezelClassHub?.renderStudent?.({quiet:true})}catch(_){}
+    try{if(state.view==='classroom'&&!isInputActive())self.FiezelClassHub?.renderStudent?.()}catch(_){}
+    if(modalOpen&&$('modalPanel')?.querySelector('.notif-sheet')){
+      try{renderNotifSheet()}catch(_){}
+    }
   }
   /* m025-365: tugas yang ditarik guru sudah keluar dari antrean (fiezel-inbox.js tarik()).
      Murid diberi satu kalimat, bukan dibiarkan bertanya ke mana tugasnya pergi. */
   if(r&&r.retracted&&r.retracted.length){
     const x=r.retracted[0];
     try{showToast(FiezelI18n.t('notif.tugas-ditarik',{title:x.title||''}))}catch(_){}
-    try{if(state.view==='classroom'&&!isInputActive())self.FiezelClassHub?.renderStudent?.({quiet:true})}catch(_){}
+    try{if(state.view==='classroom'&&!isInputActive())self.FiezelClassHub?.renderStudent?.()}catch(_){}
+    if(modalOpen&&$('modalPanel')?.querySelector('.notif-sheet')){
+      try{renderNotifSheet()}catch(_){}
+    }
   }
   refreshNotifBadge();
   return r;
@@ -20582,7 +20598,10 @@ let notifPollTimer=null;
 let notifSyncing=false,notifSyncingSince=0,notifFailStreak=0;
 function notifReady(){
   try{if(navigator&&navigator.onLine===false)return false}catch(_){}
-  try{return !!JSON.parse(localStorage.getItem('fiezel-onboarding-v1')||'{}').classCode}catch(_){return false}
+  try{
+    const code=self.FiezelInbox?.classCode?.()||JSON.parse(localStorage.getItem('fiezel-onboarding-v1')||'{}').classCode;
+    return !!code;
+  }catch(_){return false}
 }
 function notifSyncPlan(){
   const o={mounted:!!document.body,syncing:notifSyncing,syncingSince:notifSyncingSince,hidden:(()=>{try{return document.visibilityState!=='visible'}catch(_){return false}})(),ready:notifReady(),failStreak:notifFailStreak,tickIndex:(Date.now()/NOTIF_POLL_MS|0),now:Date.now()};
@@ -20629,6 +20648,19 @@ function startNotifPolling(){
       inboxPoll(true);socialNotifyPoll(true);try{refreshFriendRequestCount()}catch(_){}
     });
     self.addEventListener?.('focus',()=>{inboxPoll(true);socialNotifyPoll(true);try{refreshFriendRequestCount()}catch(_){}});
+    if(typeof BroadcastChannel!=='undefined'){
+      const bc=new BroadcastChannel('fiezel-assignment-sync');
+      bc.onmessage=(ev)=>{
+        if(ev&&ev.data&&(ev.data.type==='assignment-created'||ev.data.type==='assignment-retracted'||ev.data.type==='poll-now')){
+          inboxPoll(true);
+        }
+      };
+    }
+    window.addEventListener?.('storage',(ev)=>{
+      if(ev&&(ev.key==='fiezel-assignment-sync'||ev.key==='fiezel-inbox-v1'||ev.key==='fiezel-onboarding-v1')){
+        inboxPoll(true);
+      }
+    });
   }catch(_){}
   inboxPoll(true);
   try{refreshFriendRequestCount()}catch(_){}
