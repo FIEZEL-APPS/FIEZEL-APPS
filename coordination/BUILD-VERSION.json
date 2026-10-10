@@ -1,7 +1,7 @@
 {
-  "version": "m025-544",
-  "claimedBy": "branch fix/proctoring-visual-face-guard-retention",
-  "claimedAt": "2026-10-10T04:03:12.698Z",
-  "reason": "fix(proctoring): pelestarian telemetri visual face guard dan sinkronisasi proctoring utuh",
+  "version": "m025-545",
+  "claimedBy": "branch fix/disable-audio-subtitles-m545",
+  "claimedAt": "2026-10-10T04:53:06.600Z",
+  "reason": "fix(audio): nonaktifkan subtitle audio total dan hilangkan delay audio",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

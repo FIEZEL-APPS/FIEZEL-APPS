@@ -2623,6 +2623,7 @@ button:active:not(.nav):not(:disabled) {
    pekat sendiri supaya kontras tidak bergantung pada apa pun yang ada di belakangnya,
    dan lebar dibatasi supaya matanya tidak menyeberangi layar tiap baris. */
 .fiezel-subtitle{
+  display:none !important;
   position:fixed;
   left:50%;
   transform:translateX(-50%);

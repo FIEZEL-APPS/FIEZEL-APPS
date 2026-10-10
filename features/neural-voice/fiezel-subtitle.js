@@ -165,8 +165,9 @@
 
     function show(text) {
       if (!host) return;
-      host.textContent = String(text == null ? '' : text);
-      host.hidden = !host.textContent;
+      host.textContent = '';
+      host.hidden = true;
+      host.style.display = 'none';
     }
 
     return {
