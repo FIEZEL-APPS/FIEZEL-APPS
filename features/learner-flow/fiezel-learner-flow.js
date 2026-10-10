@@ -442,6 +442,11 @@
        ujiannya masih hangat, dan laporan yang mengulang catatan pekan lalu hanya kebisingan. */
     if (st.examFocus && Date.now() - Number(st.examFocus.at || 0) < 86400000) {
       payload.fx = { k: st.examFocus.k, n: st.examFocus.n, s: st.examFocus.s, x: st.examFocus.x };
+      if (st.examFocus.vn !== undefined || st.examFocus.vs !== undefined) {
+        payload.fx.vn = st.examFocus.vn;
+        payload.fx.vs = st.examFocus.vs;
+        payload.fx.vx = st.examFocus.vx;
+      }
     }
     try { return btoa(unescape(encodeURIComponent(JSON.stringify(payload)))); } catch (_) { return ''; }
   }
@@ -460,8 +465,15 @@
     if (!kind || !focus) return false;
     var s = ensureState();
     var n = Math.max(0, Math.round(Number(focus.n) || 0));
-    if (!n) return false;
-    s.examFocus = { k: String(kind).slice(0, 24), n: n, s: Math.max(0, Math.round(Number(focus.s) || 0)), x: Math.max(0, Math.round(Number(focus.x) || 0)), at: Date.now() };
+    var vn = Math.max(0, Math.round(Number(focus.vn) || 0));
+    if (!n && !vn) return false;
+    var fx = { k: String(kind).slice(0, 24), n: n, s: Math.max(0, Math.round(Number(focus.s) || 0)), x: Math.max(0, Math.round(Number(focus.x) || 0)), at: Date.now() };
+    if (focus.vn !== undefined || focus.vs !== undefined) {
+      fx.vn = vn;
+      fx.vs = Math.max(0, Math.round(Number(focus.vs) || 0));
+      fx.vx = Math.max(0, Math.round(Number(focus.vx) || 0));
+    }
+    s.examFocus = fx;
     save(s); pushToClass(); return true;
   }
   function announceJoin() {
@@ -492,6 +504,11 @@
     var list = (s.doneAssign || []).slice();
     var cur = list.filter(function (x) { return x.id === id; })[0];
     var f = { n: Math.max(0, Math.round(Number(focus.n) || 0)), s: Math.max(0, Math.round(Number(focus.s) || 0)), x: Math.max(0, Math.round(Number(focus.x) || 0)) };
+    if (focus.vn !== undefined || focus.vs !== undefined) {
+      f.vn = Math.max(0, Math.round(Number(focus.vn) || 0));
+      f.vs = Math.max(0, Math.round(Number(focus.vs) || 0));
+      f.vx = Math.max(0, Math.round(Number(focus.vx) || 0));
+    }
     if (cur) cur.f = f;
     else list.push({ id: id, at: Date.now(), s: 1, f: f });
     s.doneAssign = list.slice(-8);
@@ -513,8 +530,14 @@
     // entri hasil MENIMPA entri "sedang mengerjakan" dan bukti pengawasan hilang persis
     // pada saat guru paling membutuhkannya (saat menilai).
     var prevFocus = (s.doneAssign || []).filter(function (x) { return x.id === res.id; })[0];
-    if (res.focus && Number(res.focus.n) > 0) entry.f = { n: Math.round(Number(res.focus.n) || 0), s: Math.round(Number(res.focus.s) || 0), x: Math.round(Number(res.focus.x) || 0) };
-    else if (prevFocus && prevFocus.f) entry.f = prevFocus.f;
+    if (res.focus && (Number(res.focus.n) > 0 || Number(res.focus.vn) > 0)) {
+      entry.f = { n: Math.round(Number(res.focus.n) || 0), s: Math.round(Number(res.focus.s) || 0), x: Math.round(Number(res.focus.x) || 0) };
+      if (res.focus.vn !== undefined || res.focus.vs !== undefined) {
+        entry.f.vn = Math.max(0, Math.round(Number(res.focus.vn) || 0));
+        entry.f.vs = Math.max(0, Math.round(Number(res.focus.vs) || 0));
+        entry.f.vx = Math.max(0, Math.round(Number(res.focus.vx) || 0));
+      }
+    } else if (prevFocus && prevFocus.f) entry.f = prevFocus.f;
     /* `doneAssign` adalah persis yang dikirim ke guru (lihat tutorCode: `assign`). Misi
        mandiri tidak masuk ke sana: guru yang membaca laporan berhak yakin bahwa setiap
        baris di situ adalah tugas yang IA kirim. Peta skill dan jurnal tetap terisi —

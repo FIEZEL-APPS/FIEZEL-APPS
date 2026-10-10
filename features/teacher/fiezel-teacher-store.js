@@ -305,7 +305,7 @@
         var key = function (x) { return typeof x === 'string' && /^[a-z0-9_]{1,64}$/.test(x) ? x : null; };
         bc = { lv: String(p.bc.lv), dir: String(p.bc.dir), due: Math.max(0, Math.min(100000, Number(p.bc.due) || 0)), weak: (Array.isArray(p.bc.weak) ? p.bc.weak : []).map(key).filter(Boolean).slice(0, 3), fix: key(p.bc.fix) || '' };
       }
-      return { braincore: bc, name: firstName(p.name), lastActiveAt: Number(p.at) || Date.now(), targetDone: (p.lessons || 0) >= 3, results: results, goal: p.goal || null, cls: normalizeClassCode(p.cls) || null, join: p.j === 1 || p.j === true, examFocus: (p.fx && typeof p.fx === 'object' && !Array.isArray(p.fx) && p.fx.k) ? { k: String(p.fx.k).slice(0, 24), n: Number(p.fx.n) || 0, s: Number(p.fx.s) || 0, x: Number(p.fx.x) || 0 } : null, assignments: Array.isArray(p.assign) ? p.assign : (p.assign ? [{ id: p.assign }] : []) };
+      return { braincore: bc, name: firstName(p.name), lastActiveAt: Number(p.at) || Date.now(), targetDone: (p.lessons || 0) >= 3, results: results, goal: p.goal || null, cls: normalizeClassCode(p.cls) || null, join: p.j === 1 || p.j === true, examFocus: (p.fx && typeof p.fx === 'object' && !Array.isArray(p.fx) && p.fx.k) ? { k: String(p.fx.k).slice(0, 24), n: Number(p.fx.n) || 0, s: Number(p.fx.s) || 0, x: Number(p.fx.x) || 0, vn: Number(p.fx.vn) || 0, vs: Number(p.fx.vs) || 0, vx: Number(p.fx.vx) || 0 } : null, assignments: Array.isArray(p.assign) ? p.assign : (p.assign ? [{ id: p.assign }] : []) };
     } catch (_) { return null; }
   }
   /* ---- pendeteksi keluar layar (assign.f dari murid) ------------------------------------
@@ -401,11 +401,11 @@
        muridnya. Sama seperti assign.f, kabarnya hanya lahir saat angkanya NAIK — laporan kelas
        adalah upsert yang dikirim berulang, dan tanpa syarat ini satu kepergian akan
        membangunkan guru setiap 15 detik sampai laporannya berganti. */
-    if (parsed.examFocus && parsed.examFocus.n > 0) {
+    if (parsed.examFocus && ((parsed.examFocus.n > 0) || (parsed.examFocus.vn > 0))) {
       var prev = s.examFocus || null;
       if (focusGrew(prev, parsed.examFocus) || !prev || prev.k !== parsed.examFocus.k) {
         s.examFocus = Object.assign({ at: Date.now() }, parsed.examFocus);
-        focusEvents.push({ kind: 'focus_exit', student: s.name, sid: s.id, title: examLabel(parsed.examFocus.k), aid: '', f: { n: parsed.examFocus.n, s: parsed.examFocus.s, x: parsed.examFocus.x }, mode: 'ujian' });
+        focusEvents.push({ kind: 'focus_exit', student: s.name, sid: s.id, title: examLabel(parsed.examFocus.k), aid: '', f: { n: parsed.examFocus.n, s: parsed.examFocus.s, x: parsed.examFocus.x, vn: parsed.examFocus.vn, vs: parsed.examFocus.vs, vx: parsed.examFocus.vx }, mode: 'ujian' });
       }
     }
     return { student: s, graded: graded, isNew: isNew, focusEvents: focusEvents };

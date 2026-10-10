@@ -205,6 +205,7 @@ async function main() {
         role: 'murid',
         handle: 'budi_siswa'
       }));
+      localStorage.setItem('fiezel-tour-v1', JSON.stringify({ done: true }));
     } catch (_) {}
   });
 
@@ -215,7 +216,7 @@ async function main() {
     await page.evaluate(() => {
       document.getElementById('fiezelBootSplash')?.remove();
       document.documentElement.classList.remove('fz-booting');
-      document.querySelectorAll('.fiezel-ob, .fz-coach-bubble, .coach-step-modal, .fz-auth, #welcome, #authGate').forEach((el) => el.remove());
+      document.querySelectorAll('.fiezel-ob, .fz-coach-bubble, .coach-step-modal, .fz-auth, #welcome, #authGate, .fz-tour').forEach((el) => el.remove());
     });
   }
 
@@ -323,8 +324,9 @@ async function main() {
     const submitSelector = '[data-testid="class-code-submit"]';
 
     // Buka tab kelas / paspor untuk memunculkan formulir kode kelas
+    await dismissOverlays();
     await page.waitForSelector(tabKelasSelector, { timeout: 5000 });
-    await page.click(tabKelasSelector);
+    await page.click(tabKelasSelector, { force: true });
 
     // Tunggu input kode kelas
     await page.waitForSelector(inputSelector, { timeout: 5000 });

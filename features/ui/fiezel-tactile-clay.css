@@ -3966,6 +3966,14 @@ body.fz-view-classroom header.topbar #topKelasKuCluster {
   border-radius: 6px !important;
   text-transform: uppercase !important;
   letter-spacing: 0.04em !important;
+  transition: all 0.15s ease !important;
+}
+
+.kelasku-top-brand .kelasku-brand-tag.is-unjoined,
+.kelasku-top-brand .kelasku-brand-tag.is-inactive {
+  color: #475569 !important;
+  background: #F1F5F9 !important;
+  border: 1px solid #CBD5E1 !important;
 }
 
 .btn-class-selector {

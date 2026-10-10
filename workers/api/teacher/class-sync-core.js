@@ -88,6 +88,15 @@ export function normalizeReport(body, nowMs) {
     const x = fx.x === undefined ? 0 : intIn(fx.x, LIMITS.FOCUS_SEC_MAX);
     if (n == null || sec == null || x == null || x > sec) return { ok: false, reason: 'bad_exam_focus' };
     examFocus = { k: fx.k, n, s: sec, x };
+    if (fx.vn !== undefined || fx.vs !== undefined) {
+      const v_n = fx.vn === undefined ? 0 : intIn(fx.vn, LIMITS.FOCUS_N_MAX);
+      const v_s = fx.vs === undefined ? 0 : intIn(fx.vs, LIMITS.FOCUS_SEC_MAX);
+      const v_x = fx.vx === undefined ? 0 : intIn(fx.vx, LIMITS.FOCUS_SEC_MAX);
+      if (v_n == null || v_s == null || v_x == null || v_x > v_s) return { ok: false, reason: 'bad_exam_focus' };
+      examFocus.vn = v_n;
+      examFocus.vs = v_s;
+      examFocus.vx = v_x;
+    }
   }
   const goal = typeof body.goal === 'string' && /^[a-z_]{1,24}$/.test(body.goal) ? body.goal : undefined;
   let assign;

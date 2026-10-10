@@ -666,6 +666,7 @@
     var TS = T(), c = TS ? TS.normalizeClassCode(code) : String(code || '').toUpperCase();
     if (!c) return false;
     var ob = readJson('fiezel-onboarding-v1', {}) || {}; ob.classCode = c; writeJson('fiezel-onboarding-v1', ob);
+    try { if (typeof root.updateTopbarClassState === 'function') root.updateTopbarClassState(c); } catch (_) {}
     /* Ketukan ke guru dikirim SEKARANG, bukan menunggu tugas pertama selesai. Sebelum ini,
        murid yang sudah mengetik kode tetap tidak terlihat oleh gurunya sampai ia menyelesaikan
        sesuatu — dan murid yang salah ketik kode mengira dirinya sudah tergabung padahal tidak
@@ -1191,6 +1192,7 @@
       } catch (_) {}
     }
     if (sEnv.afterRender) try { sEnv.afterRender(); } catch (_) {}
+    try { if (typeof root.updateTopbarClassState === 'function') root.updateTopbarClassState(classCode()); } catch (_) {}
   }
   /* ===== TARGET MINGGU INI (m025-349, fitur F6) ========================================
      Lima belas kartu misi sejajar adalah KATALOG, bukan jalur. Murid yang membukanya
