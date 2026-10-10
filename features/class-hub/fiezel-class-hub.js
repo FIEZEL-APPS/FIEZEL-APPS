@@ -1125,26 +1125,49 @@
     var st = ui().focus, sum = st && FG() ? FG().summary(st, Date.now()) : null;
     var face = FaceG(), faceActive = face && typeof face.isActive === 'function' && face.isActive();
     var isFaceWarn = !!ui().faceWarn;
-    var hasLeave = !!(sum && sum.n > 0);
-    var hasAbsent = !!(sum && sum.vn > 0);
-    var isWarn = isFaceWarn || hasLeave || hasAbsent;
+
+    // 1. Evaluasi real-time instan status Keluar Layar
+    var isLeaveLive = !!(st && st.awaySince);
+    var liveLeaveSec = isLeaveLive ? Math.max(1, Math.round((Date.now() - st.awaySince) / 1000)) : 0;
+    var leaveCount = (sum ? sum.n : 0) + (isLeaveLive && (!sum || sum.n === 0) ? 1 : 0);
+    var leaveTotalSec = isLeaveLive ? (Math.round((sum ? sum.ms : 0) / 1000) + liveLeaveSec) : Math.round((sum ? sum.ms : 0) / 1000);
+    var hasLeaveEver = isLeaveLive || (sum && sum.n > 0);
+
+    // 2. Evaluasi real-time instan status Wajah Tak Terdeteksi Kamera
+    var isFaceLive = !!(st && st.faceAwaySince) || isFaceWarn;
+    var liveFaceSec = (st && st.faceAwaySince) ? Math.max(1, Math.round((Date.now() - st.faceAwaySince) / 1000)) : (isFaceWarn ? 1 : 0);
+    var faceCount = (sum ? sum.vn : 0) + (isFaceLive && (!sum || sum.vn === 0) ? 1 : 0);
+    var faceTotalSec = isFaceLive ? (Math.round((sum ? sum.vs : 0) / 1000) + liveFaceSec) : Math.round((sum ? sum.vs : 0) / 1000);
+    var hasFaceEver = isFaceLive || (sum && sum.vn > 0);
+
+    var isWarn = hasLeaveEver || hasFaceEver;
 
     var facePill = faceActive
       ? '<span class="ch-camera-pill" data-testid="class-camera-pill"><video class="ch-camera-pip-video" data-face-pip autoplay playsinline muted></video><span class="ch-camera-dot">●</span> ' + esc(t('proctor.kamera-aktif', 'Kamera aktif')) + '</span>'
       : '';
 
     var slots = [];
-    if (isFaceWarn) {
-      slots.push('<span class="ch-proctor-slot is-alert" data-testid="class-proctor-face-warn">' + icon('alert-triangle') + ' ' + esc(t('proctor.wajah-peringatan-ringkas', 'Wajah di luar kamera!')) + '</span>');
+
+    // SLOT 1 (DEDIKASI): Keluar Layar
+    if (isLeaveLive) {
+      slots.push('<span class="ch-proctor-slot is-alert" data-testid="class-proctor-leave-slot">⚠️ ' + esc(t('proctor.keluar-layar-slot', 'Keluar layar')) + ': <b>' + leaveCount + '×</b> (' + leaveTotalSec + 's)</span>');
+    } else if (sum && sum.n > 0) {
+      slots.push('<span class="ch-proctor-slot is-warn" data-testid="class-proctor-leave-slot">⚠️ ' + esc(t('proctor.keluar-layar-slot', 'Keluar layar')) + ': <b>' + sum.n + '×</b> (' + Math.round(sum.ms / 1000) + 's)</span>');
+    } else {
+      slots.push('<span class="ch-proctor-slot is-clean" data-testid="class-proctor-leave-slot">' + icon('shield-check') + ' ' + esc(t('proctor.keluar-layar-slot', 'Keluar layar')) + ': 0×</span>');
     }
-    if (hasLeave) {
-      slots.push('<span class="ch-proctor-slot is-warn" data-testid="class-proctor-leave-slot">📱 ' + esc(t('proctor.keluar-layar-slot', 'Keluar layar')) + ': <b>' + sum.n + '×</b> (' + Math.round(sum.ms / 1000) + 'd)</span>');
+
+    // SLOT 2 (DEDIKASI): Wajah Tidak Terdeteksi Kamera
+    if (isFaceLive) {
+      slots.push('<span class="ch-proctor-slot is-alert" data-testid="class-proctor-absent-slot"><span data-testid="class-proctor-face-warn" style="display:none"></span>⚠️ ' + esc(t('proctor.wajah-hilang-slot', 'Wajah tak terlihat')) + ': <b>' + faceCount + '×</b> (' + faceTotalSec + 's)</span>');
+    } else if (sum && sum.vn > 0) {
+      slots.push('<span class="ch-proctor-slot is-warn" data-testid="class-proctor-absent-slot">⚠️ ' + esc(t('proctor.wajah-hilang-slot', 'Wajah tak terlihat')) + ': <b>' + sum.vn + '×</b> (' + Math.round(sum.vs / 1000) + 's)</span>');
+    } else {
+      slots.push('<span class="ch-proctor-slot is-clean" data-testid="class-proctor-absent-slot">' + icon('camera') + ' ' + esc(t('proctor.wajah-hilang-slot', 'Wajah tak terlihat')) + ': 0×</span>');
     }
-    if (hasAbsent) {
-      slots.push('<span class="ch-proctor-slot is-warn" data-testid="class-proctor-absent-slot">👤 ' + esc(t('proctor.wajah-hilang-slot', 'Wajah tak terlihat')) + ': <b>' + sum.vn + '×</b> (' + Math.round(sum.vs / 1000) + 'd)</span>');
-    }
+
     if (!isWarn) {
-      slots.push('<span class="ch-proctor-slot is-clean" data-testid="class-proctor-clean-slot">' + icon('shield-check') + ' ' + esc(t('proctor.mode-ujian-ringkas', 'Mode ujian aktif')) + '</span>');
+      slots.push('<span class="ch-proctor-slot is-clean" data-testid="class-proctor-clean-slot" style="display:none">' + icon('shield-check') + ' ' + esc(t('proctor.mode-ujian-ringkas', 'Mode ujian aktif')) + '</span>');
     }
 
     var bannerClass = 'ch-proctor ch-proctor-banner' + (isWarn ? ' is-warn' : '');
