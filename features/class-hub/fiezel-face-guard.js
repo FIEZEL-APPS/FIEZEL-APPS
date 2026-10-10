@@ -22,8 +22,53 @@
   'use strict';
 
   var SAMPLE_INTERVAL_MS = 250;
-  var WARN_THRESHOLD_MS = 1000;
-  var ABSENT_THRESHOLD_MS = 2000;
+  var WARN_THRESHOLD_MS = 3000;
+  var ABSENT_THRESHOLD_MS = 4500;
+
+  var enrolledProfile = {
+    valid: false,
+    sampleCount: 0,
+    cbMean: 0,
+    crMean: 0,
+    cbMin: 70,
+    cbMax: 145,
+    crMin: 125,
+    crMax: 185,
+    normRMean: 0.40,
+    normBMean: 0.25,
+    boxWMean: 30,
+    boxHMean: 36,
+    skinCountMean: 350,
+    cXMean: 32,
+    cYMean: 24,
+    eyeDipMean: 1.2,
+    asymMean: 2.0,
+    avgBrMean: 100
+  };
+
+  function resetEnrolledProfile() {
+    enrolledProfile.valid = false;
+    enrolledProfile.sampleCount = 0;
+    enrolledProfile.cbMean = 0;
+    enrolledProfile.crMean = 0;
+    enrolledProfile.cbMin = 70;
+    enrolledProfile.cbMax = 145;
+    enrolledProfile.crMin = 125;
+    enrolledProfile.crMax = 185;
+    enrolledProfile.normRMean = 0.40;
+    enrolledProfile.normBMean = 0.25;
+    enrolledProfile.boxWMean = 30;
+    enrolledProfile.boxHMean = 36;
+    enrolledProfile.skinCountMean = 350;
+    enrolledProfile.cXMean = 32;
+    enrolledProfile.cYMean = 24;
+    enrolledProfile.eyeDipMean = 1.2;
+    enrolledProfile.asymMean = 2.0;
+    enrolledProfile.avgBrMean = 100;
+  }
+
+  var absentStreak = 0;
+  var ABSENT_DEBOUNCE_FRAMES = 8; // 8 frames x 250ms = 2.0 detik
 
   var state = {
     active: false,
@@ -182,7 +227,7 @@
     return {
       isStatic: isStatic,
       isRigidWobble: isRigidWobble,
-      isSpoof: isStatic || isRigidWobble
+      isSpoof: isStatic
     };
   }
 
@@ -205,6 +250,7 @@
       var totalY = 0, minBr = 255, maxBr = 0;
       var skinCount = 0, centerSkin = 0, centerTotal = 0;
       var sumX = 0, sumY = 0;
+      var skinSumCb = 0, skinSumCr = 0, skinSumNormR = 0, skinSumNormB = 0;
       var minX = w, maxX = 0, minY = h, maxY = 0;
       var cX1 = 16, cX2 = 48, cY1 = 8, cY2 = 40;
 
@@ -227,40 +273,58 @@
           var normR = rgbSum > 0 ? (r / rgbSum) : 0;
           var normB = rgbSum > 0 ? (b / rgbSum) : 0;
 
-          // Model kromatisitas kulit manusia adaptif & bebas manipulasi cahaya:
-          // 1. Manusia asli SELALU memiliki R > B (melanin menyerap cahaya biru/ungu).
-          //    Lampu putih, neon, daylight, kertas putih, dan dinding putih memiliki B >= R - 5.
-          // 2. Di ruangan redup (yLum < 60), kamera mereduksi perbedaan warna, sehingga R >= B + 4.
-          // 3. Di pencahayaan normal (yLum >= 60), R >= B + 10 dan R > G.
-          // 4. Sumber cahaya silau / lampu jenuh (R, G, B > 235) ditolak mutlak dari hitungan kulit.
           var isPureLightGlare = (r > 240 && g > 240 && b > 240);
           var isSkin = false;
 
-          // Model kromatisitas kulit manusia adaptif:
-          // 1. Manusia asli memiliki melanin & hemoglobin (Cr > Cb).
-          //    Lampu putih, neon, daylight, kertas putih, dan dinding putih memiliki Cr ~ 128, Cb ~ 128 (Cr - Cb < 4).
-          // 2. Di ruangan redup (yLum < 60), sensor kamera mengompresi warna (r >= b + 2).
-          // 3. Di pencahayaan normal (yLum >= 60), r >= b + 3, (r + 4) >= g, cr - cb >= 4, dan normB <= 0.33.
-          // 4. Kecerahan kulit normal dibatasi yLum <= 215 (lampu senter/bohlam > 220 ditolak).
-          if (!isPureLightGlare && cb >= 70 && cb <= 145 && cr >= 125 && cr <= 185) {
-            var crCbDiff = cr - cb;
-            if (yLum < 60) {
-              isSkin = (
-                r >= (b + 2) &&
-                (r + 3) >= g &&
-                crCbDiff >= 2 &&
-                normB <= 0.35 &&
-                yLum >= 8
-              );
+          if (!isPureLightGlare) {
+            if (enrolledProfile.valid) {
+              // Profil Terkalibrasi Spesifik Murid: adaptif terhadap warna kulit dan pencahayaan ruangan
+              var cbDiffFromBase = Math.abs(cb - enrolledProfile.cbMean);
+              var crDiffFromBase = Math.abs(cr - enrolledProfile.crMean);
+              var crCbDiff = cr - cb;
+              if (yLum < 60) {
+                isSkin = (
+                  cbDiffFromBase <= 32 &&
+                  crDiffFromBase <= 32 &&
+                  r >= (b + 1) &&
+                  (r + 3) >= g &&
+                  crCbDiff >= 1 &&
+                  yLum >= 6
+                );
+              } else {
+                isSkin = (
+                  cbDiffFromBase <= 30 &&
+                  crDiffFromBase <= 30 &&
+                  r >= (b + 2) &&
+                  (r + 4) >= g &&
+                  crCbDiff >= 2 &&
+                  normB <= Math.min(0.38, enrolledProfile.normBMean + 0.12) &&
+                  yLum <= 230
+                );
+              }
             } else {
-              isSkin = (
-                r >= (b + 3) &&
-                (r + 4) >= g &&
-                crCbDiff >= 4 &&
-                normR >= 0.33 &&
-                normB <= 0.33 &&
-                yLum <= 215
-              );
+              // Model kromatisitas kulit universal pra-kalibrasi
+              if (cb >= 70 && cb <= 145 && cr >= 125 && cr <= 185) {
+                var crCbDiff = cr - cb;
+                if (yLum < 60) {
+                  isSkin = (
+                    r >= (b + 2) &&
+                    (r + 3) >= g &&
+                    crCbDiff >= 2 &&
+                    normB <= 0.35 &&
+                    yLum >= 8
+                  );
+                } else {
+                  isSkin = (
+                    r >= (b + 3) &&
+                    (r + 4) >= g &&
+                    crCbDiff >= 4 &&
+                    normR >= 0.33 &&
+                    normB <= 0.33 &&
+                    yLum <= 215
+                  );
+                }
+              }
             }
           }
 
@@ -268,6 +332,10 @@
             skinCount++;
             sumX += x;
             sumY += y;
+            skinSumCb += cb;
+            skinSumCr += cr;
+            skinSumNormR += normR;
+            skinSumNormB += normB;
             if (x < minX) minX = x;
             if (x > maxX) maxX = x;
             if (y < minY) minY = y;
@@ -285,6 +353,10 @@
       var contrastRange = maxBr - minBr;
       var centerFillFraction = centerTotal > 0 ? (centerSkin / centerTotal) : 0;
       var skinInCenterFraction = skinCount > 0 ? (centerSkin / skinCount) : 0;
+      var avgSkinCb = skinCount > 0 ? (skinSumCb / skinCount) : 128;
+      var avgSkinCr = skinCount > 0 ? (skinSumCr / skinCount) : 128;
+      var avgSkinNormR = skinCount > 0 ? (skinSumNormR / skinCount) : 0.33;
+      var avgSkinNormB = skinCount > 0 ? (skinSumNormB / skinCount) : 0.33;
 
       // 1. Kamera tertutup rapat (hitam / gelap pekat)
       if (avgBr < 8) return { present: false, isSpoof: false, reason: 'camera_covered' };
@@ -292,24 +364,28 @@
       // 2. Silau ekstrem tanpa kontras (disorot lampu tembak tanpa wajah)
       if (avgBr > 245 && contrastRange < 10) return { present: false, isSpoof: false, reason: 'blinding_glare' };
 
-      // 3. Jumlah piksel kulit wajar (ruang redup toleran >= 30, normal >= 40)
-      var minSkinReq = avgBr < 40 ? 30 : 40;
-      if (skinCount < minSkinReq || skinCount > 2400) return { present: false, isSpoof: false, reason: 'skin_count_out_of_range' };
+      // 3. Jumlah piksel kulit wajar (toleransi jarak maju/mundur)
+      var minSkinReq = enrolledProfile.valid ? Math.max(16, Math.round(enrolledProfile.skinCountMean * 0.20)) : (avgBr < 40 ? 25 : 35);
+      var maxSkinReq = enrolledProfile.valid ? Math.min(2600, Math.round(enrolledProfile.skinCountMean * 3.5)) : 2400;
+      if (skinCount < minSkinReq || skinCount > maxSkinReq) return { present: false, isSpoof: false, reason: 'skin_count_out_of_range' };
 
-      // 4. Konsentrasi kulit di tengah: minimal 35% kulit berada di dalam kotak pemandu tengah
-      if (skinInCenterFraction < 0.35) return { present: false, isSpoof: false, reason: 'not_centered' };
+      // 4. Konsentrasi kulit di area kamera
+      var minCenterFraction = enrolledProfile.valid ? 0.15 : 0.30;
+      if (skinInCenterFraction < minCenterFraction) return { present: false, isSpoof: false, reason: 'not_centered' };
 
-      // 5. Centroid posisi wajah harus di area tengah
+      // 5. Centroid posisi wajah harus di area kamera (toleransi sudut/kemiringan HP)
       var cX = Math.round(sumX / skinCount);
       var cY = Math.round(sumY / skinCount);
-      if (cX < 10 || cX > 54 || cY < 6 || cY > 42) return { present: false, isSpoof: false, reason: 'centroid_out_of_bounds' };
+      var minCX = enrolledProfile.valid ? 4 : 8, maxCX = enrolledProfile.valid ? 60 : 56;
+      var minCY = enrolledProfile.valid ? 4 : 6, maxCY = enrolledProfile.valid ? 44 : 42;
+      if (cX < minCX || cX > maxCX || cY < minCY || cY > maxCY) return { present: false, isSpoof: false, reason: 'centroid_out_of_bounds' };
 
       // 6. Bounding box & proporsi oval wajah
       var boxW = (maxX - minX) + 1;
       var boxH = (maxY - minY) + 1;
-      if (boxW < 8 || boxH < 8) return { present: false, isSpoof: false, reason: 'box_too_small' };
+      if (boxW < 6 || boxH < 6) return { present: false, isSpoof: false, reason: 'box_too_small' };
       var aspect = boxH / boxW;
-      if (aspect < 0.50 || aspect > 3.0) return { present: false, isSpoof: false, reason: 'aspect_ratio_invalid' };
+      if (aspect < 0.40 || aspect > 3.2) return { present: false, isSpoof: false, reason: 'aspect_ratio_invalid' };
 
       // 7. Hitung gradien tekstur mikro di area wajah
       var gradSum = 0, gradCount = 0, maxLocalGrad = 0;
@@ -370,7 +446,7 @@
 
       // Penolakan permukaan datar / lampu / meja / telapak tangan:
       // Lampu terang (avgBr > 110) atau cahaya datar yang mendominasi tengah (> 80%) tanpa rongga mata
-      if ((centerFillFraction > 0.80 || avgBr > 110) && eyeDip < 0.4) {
+      if (!enrolledProfile.valid && (centerFillFraction > 0.80 || avgBr > 110) && eyeDip < 0.4) {
         return { present: false, isSpoof: false, reason: 'flat_light_or_surface' };
       }
 
@@ -402,7 +478,13 @@
         eyeDip: eyeDip,
         asym: asym,
         eLAvg: eLAvg,
-        eRAvg: eRAvg
+        eRAvg: eRAvg,
+        skinCount: skinCount,
+        avgBr: avgBr,
+        avgSkinCb: avgSkinCb,
+        avgSkinCr: avgSkinCr,
+        avgSkinNormR: avgSkinNormR,
+        avgSkinNormB: avgSkinNormB
       };
     } catch (_) {
       return { present: false, isSpoof: false, reason: 'error' };
@@ -474,6 +556,7 @@
     var now = Date.now(), opts = state.options || {};
 
     if (present) {
+      absentStreak = 0;
       if (state.warned) {
         state.warned = false;
         if (typeof opts.onWarning === 'function') opts.onWarning(false);
@@ -485,19 +568,24 @@
         if (typeof opts.onPresent === 'function') opts.onPresent(duration);
       }
     } else {
-      if (!state.absentSince) {
-        state.absentSince = now;
-        state.episoded = false;
-        if (typeof opts.onAbsent === 'function') opts.onAbsent(now);
-      }
-      var elapsed = now - state.absentSince;
-      if (elapsed >= WARN_THRESHOLD_MS && !state.warned) {
-        state.warned = true;
-        if (typeof opts.onWarning === 'function') opts.onWarning(true, elapsed);
-      }
-      if (elapsed >= ABSENT_THRESHOLD_MS && !state.episoded) {
-        state.episoded = true;
-        if (typeof opts.onAbsentEpisode === 'function') opts.onAbsentEpisode(elapsed);
+      absentStreak++;
+      // Temporal Debounce: Butuh akumulasi absentStreak >= ABSENT_DEBOUNCE_FRAMES (8 frames x 250ms = 2.0s terus-menerus hilang)
+      // sebelum absentSince diaktifkan. Ini mencegah false alarm akibat kedipan, micro-jiggle HP, atau menunduk sekejap!
+      if (absentStreak >= ABSENT_DEBOUNCE_FRAMES) {
+        if (!state.absentSince) {
+          state.absentSince = now - (ABSENT_DEBOUNCE_FRAMES * SAMPLE_INTERVAL_MS);
+          state.episoded = false;
+          if (typeof opts.onAbsent === 'function') opts.onAbsent(state.absentSince);
+        }
+        var elapsed = now - state.absentSince;
+        if (elapsed >= WARN_THRESHOLD_MS && !state.warned) {
+          state.warned = true;
+          if (typeof opts.onWarning === 'function') opts.onWarning(true, elapsed);
+        }
+        if (elapsed >= ABSENT_THRESHOLD_MS && !state.episoded) {
+          state.episoded = true;
+          if (typeof opts.onAbsentEpisode === 'function') opts.onAbsentEpisode(elapsed);
+        }
       }
     }
   }
@@ -506,6 +594,7 @@
     if (state.active) {
       if (opts) state.options = Object.assign({}, state.options || {}, opts);
       state.absentSince = 0;
+      absentStreak = 0;
       state.warned = false;
       if (state.videoEl && state.videoEl.paused) {
         try { var p = state.videoEl.play(); if (p && typeof p.catch === 'function') p.catch(function () {}); } catch (_) {}
@@ -514,6 +603,7 @@
     }
     state.options = opts || {};
     state.absentSince = 0;
+    absentStreak = 0;
     state.warned = false;
     state.episoded = false;
     temporalHistory = [];
@@ -612,6 +702,7 @@
     state.ctx = null;
     state.active = false;
     state.absentSince = 0;
+    absentStreak = 0;
     state.warned = false;
     state.episoded = false;
     state.options = null;
@@ -719,7 +810,41 @@
     if (!liveness.calibrated) {
       liveness.eyeDips.push(curDip);
       liveness.calibTicks++;
-      if (liveness.calibTicks >= 2) {
+
+      if (frameRes.avgSkinCb && frameRes.avgSkinCr) {
+        if (enrolledProfile.sampleCount === 0) {
+          enrolledProfile.cbMean = frameRes.avgSkinCb;
+          enrolledProfile.crMean = frameRes.avgSkinCr;
+          enrolledProfile.normRMean = frameRes.avgSkinNormR || 0.40;
+          enrolledProfile.normBMean = frameRes.avgSkinNormB || 0.25;
+          enrolledProfile.boxWMean = frameRes.boxW;
+          enrolledProfile.boxHMean = frameRes.boxH;
+          enrolledProfile.skinCountMean = frameRes.skinCount;
+          enrolledProfile.cXMean = frameRes.cX;
+          enrolledProfile.cYMean = frameRes.cY;
+          enrolledProfile.eyeDipMean = curDip;
+          enrolledProfile.asymMean = frameRes.asym;
+          enrolledProfile.avgBrMean = frameRes.avgBr;
+        } else {
+          var n = enrolledProfile.sampleCount;
+          enrolledProfile.cbMean = (enrolledProfile.cbMean * n + frameRes.avgSkinCb) / (n + 1);
+          enrolledProfile.crMean = (enrolledProfile.crMean * n + frameRes.avgSkinCr) / (n + 1);
+          enrolledProfile.normRMean = (enrolledProfile.normRMean * n + (frameRes.avgSkinNormR || 0.40)) / (n + 1);
+          enrolledProfile.normBMean = (enrolledProfile.normBMean * n + (frameRes.avgSkinNormB || 0.25)) / (n + 1);
+          enrolledProfile.boxWMean = (enrolledProfile.boxWMean * n + frameRes.boxW) / (n + 1);
+          enrolledProfile.boxHMean = (enrolledProfile.boxHMean * n + frameRes.boxH) / (n + 1);
+          enrolledProfile.skinCountMean = (enrolledProfile.skinCountMean * n + frameRes.skinCount) / (n + 1);
+          enrolledProfile.cXMean = (enrolledProfile.cXMean * n + frameRes.cX) / (n + 1);
+          enrolledProfile.cYMean = (enrolledProfile.cYMean * n + frameRes.cY) / (n + 1);
+          enrolledProfile.eyeDipMean = (enrolledProfile.eyeDipMean * n + curDip) / (n + 1);
+          enrolledProfile.asymMean = (enrolledProfile.asymMean * n + frameRes.asym) / (n + 1);
+          enrolledProfile.avgBrMean = (enrolledProfile.avgBrMean * n + frameRes.avgBr) / (n + 1);
+        }
+        enrolledProfile.sampleCount++;
+      }
+
+      var targetTicks = 2;
+      if (liveness.calibTicks >= targetTicks) {
         var sumD = 0;
         for (var i = 0; i < liveness.eyeDips.length; i++) sumD += liveness.eyeDips[i];
         liveness.baselineEyeDip = sumD / liveness.eyeDips.length;
@@ -728,8 +853,17 @@
         liveness.peakEyeDip = Math.max(liveness.baselineEyeDip, 1.0);
         liveness.baselineAsym = frameRes.asym;
         liveness.calibrated = true;
+
+        if (enrolledProfile.sampleCount > 0) {
+          enrolledProfile.valid = true;
+          enrolledProfile.cbMin = Math.max(60, enrolledProfile.cbMean - 25);
+          enrolledProfile.cbMax = Math.min(155, enrolledProfile.cbMean + 25);
+          enrolledProfile.crMin = Math.max(115, enrolledProfile.crMean - 25);
+          enrolledProfile.crMax = Math.min(195, enrolledProfile.crMean + 25);
+        }
       }
-      return { stage: 'aligning', ok: true };
+      var calibPct = Math.min(100, Math.round((liveness.calibTicks / targetTicks) * 100));
+      return { stage: 'aligning', ok: true, progress: calibPct };
     }
 
     if (curDip > liveness.peakEyeDip) {
@@ -801,9 +935,14 @@
     verifyPresence: verifyPresence,
     checkNow: checkNow,
     fallbackCheck: fallbackCheck,
+    analyzeFrame: analyzeFrame,
     checkLiveness: checkLiveness,
     resetLiveness: resetLiveness,
     isLivenessVerified: isLivenessVerified,
+    getEnrolledProfile: function () { return Object.assign({}, enrolledProfile); },
+    setEnrolledProfile: function (p) { if (p) Object.assign(enrolledProfile, p); },
+    isEnrolled: function () { return !!enrolledProfile.valid; },
+    resetEnrolledProfile: resetEnrolledProfile,
     SAMPLE_INTERVAL_MS: SAMPLE_INTERVAL_MS,
     WARN_THRESHOLD_MS: WARN_THRESHOLD_MS,
     ABSENT_THRESHOLD_MS: ABSENT_THRESHOLD_MS

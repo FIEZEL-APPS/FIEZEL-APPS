@@ -396,8 +396,8 @@ test('face-guard: fallbackCheck membedakan wajah vs kamera tertutup vs langit-la
   const FaceGuard = require('../features/class-hub/fiezel-face-guard.js');
   assert.ok(FaceGuard && typeof FaceGuard.fallbackCheck === 'function');
   assert.strictEqual(FaceGuard.SAMPLE_INTERVAL_MS, 250);
-  assert.strictEqual(FaceGuard.WARN_THRESHOLD_MS, 1000);
-  assert.strictEqual(FaceGuard.ABSENT_THRESHOLD_MS, 2000);
+  assert.strictEqual(FaceGuard.WARN_THRESHOLD_MS, 3000);
+  assert.strictEqual(FaceGuard.ABSENT_THRESHOLD_MS, 4500);
 
   function makeMockCanvas(pixelFn) {
     const w = 64, h = 48;
@@ -935,10 +935,10 @@ test('face-guard: anti-spoofing menolak layar HP, layar laptop, wallpaper statis
   assert.strictEqual(FaceGuard.isLivenessVerified(), false, 'foto wallpaper/kertas tidak boleh lolos liveness');
 });
 
-test('proctor: pencatatan instan keluar layar dan wajah hilang bahkan hanya 1 detik tanpa delay atau desinkronisasi', () => {
+test('proctor: pencatatan instan keluar layar dan toleransi biometrik wajah tanpa tuduhan keliru', () => {
   const s = FG.start('a1', 0);
 
-  // 1. Keluar layar 1 detik (1000ms) langsung tercatat
+  // 1. Keluar layar 1 detik (1000ms) langsung tercatat (kepastian digital OS, GRACE_MS = 500ms)
   FG.leave(s, 1000, 'hidden');
   const sumLive = FG.summary(s, 1600);
   assert.strictEqual(sumLive.n, 1, 'kepergian live >= 500ms langsung masuk hitungan ringkasan');
@@ -947,27 +947,97 @@ test('proctor: pencatatan instan keluar layar dan wajah hilang bahkan hanya 1 de
   assert.strictEqual(s.n, 1, 's.n bertambah menjadi 1');
   assert.strictEqual(s.ms, 1000, 's.ms tercatat 1000ms');
 
-  // 2. Wajah hilang 1 detik (1000ms) langsung tercatat
+  // 2. Micro-movement / kedipan mata / menunduk < 3000ms (FACE_GRACE_MS): TIDAK dituduh curang
   FG.leaveFace(s, 3000);
-  const sumFaceLive = FG.summary(s, 4000);
-  assert.strictEqual(sumFaceLive.vn, 1, 'wajah hilang live >= 1000ms langsung masuk hitungan ringkasan');
-  const epFace1 = FG.backFace(s, 4000);
-  assert.ok(epFace1 && epFace1.ms === 1000, 'episode wajah hilang 1 detik tidak dibuang');
-  assert.strictEqual(s.faceN, 1, 's.faceN bertambah menjadi 1');
-  assert.strictEqual(s.faceMs, 1000, 's.faceMs tercatat 1000ms');
+  const sumFaceMicro = FG.summary(s, 4500); // 1500ms < 3000ms
+  assert.strictEqual(sumFaceMicro.vn, 0, 'micro-movement < 3000ms tidak dicatat');
+  const epIgnored = FG.backFace(s, 5000); // 2000ms < 3000ms
+  assert.strictEqual(epIgnored, null, 'micro-movement di bawah masa tenggang dibuang');
+  assert.strictEqual(s.faceN, 0, 's.faceN tetap 0');
 
-  // 3. Kepergian ke-2 kali secara berulang langsung menaikkan angka tanpa nyangkut
-  FG.leave(s, 5000, 'blur');
-  const ep2 = FG.back(s, 6000);
+  // 3. Wajah hilang nyata di atas masa tenggang (>= 3000ms, contoh 3500ms) langsung tercatat
+  FG.leaveFace(s, 6000);
+  const sumFaceLive = FG.summary(s, 9500); // 3500ms >= 3000ms
+  assert.strictEqual(sumFaceLive.vn, 1, 'wajah hilang live >= 3000ms masuk hitungan ringkasan');
+  const epFace1 = FG.backFace(s, 9500);
+  assert.ok(epFace1 && epFace1.ms === 3500, 'episode wajah hilang 3.5 detik tercatat');
+  assert.strictEqual(s.faceN, 1, 's.faceN bertambah menjadi 1');
+  assert.strictEqual(s.faceMs, 3500, 's.faceMs tercatat 3500ms');
+
+  // 4. Kepergian ke-2 kali secara berulang menaikkan angka tanpa desinkronisasi
+  FG.leave(s, 10000, 'blur');
+  const ep2 = FG.back(s, 11000);
   assert.ok(ep2 && ep2.ms === 1000);
   assert.strictEqual(s.n, 2, 'kepergian ke-2 langsung menaikkan hitungan ke 2x');
   assert.strictEqual(s.ms, 2000);
 
-  FG.leaveFace(s, 7000);
-  const epFace2 = FG.backFace(s, 8000);
-  assert.ok(epFace2 && epFace2.ms === 1000);
+  FG.leaveFace(s, 12000);
+  const epFace2 = FG.backFace(s, 16000); // 4000ms
+  assert.ok(epFace2 && epFace2.ms === 4000);
   assert.strictEqual(s.faceN, 2, 'wajah hilang ke-2 langsung menaikkan hitungan ke 2x');
-  assert.strictEqual(s.faceMs, 2000);
+  assert.strictEqual(s.faceMs, 7500);
+});
+
+test('face-guard: enrollment profil biometrik awal mengunci ciri wajah dan kebal goncangan/gerakan wajar', () => {
+  const FaceGuard = require('../features/class-hub/fiezel-face-guard.js');
+  const w = 64, h = 48;
+  const mkCanvas = (fn) => {
+    const data = new Uint8ClampedArray(w * h * 4);
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const idx = (y * w + x) * 4;
+        const [r, g, b] = fn(x, y);
+        data[idx] = r; data[idx + 1] = g; data[idx + 2] = b; data[idx + 3] = 255;
+      }
+    }
+    return { video: { readyState: 2 }, cvs: { width: w, height: h }, ctx: { drawImage() {}, getImageData: () => ({ data }) } };
+  };
+
+  FaceGuard.resetLiveness();
+  FaceGuard.resetEnrolledProfile();
+  assert.strictEqual(FaceGuard.isEnrolled(), false, 'awal: belum ter-enroll');
+
+  // Buat kanvas wajah murid di bawah pencahayaan hangat (lampu bohlam)
+  const warmStudentFace = mkCanvas((x, y) => {
+    if (x >= 18 && x <= 46 && y >= 12 && y <= 36) {
+      if (y >= 20 && y <= 25 && x >= 22 && x <= 42) return [80, 60, 40]; // Mata
+      return [195, 140, 95]; // Kulit hangat
+    }
+    return [70, 75, 80];
+  });
+
+  // Kalibrasi tahap 1 & 2
+  const t1 = FaceGuard.checkLiveness(warmStudentFace.video, warmStudentFace.cvs, warmStudentFace.ctx);
+  assert.strictEqual(t1.stage, 'aligning');
+  const t2 = FaceGuard.checkLiveness(warmStudentFace.video, warmStudentFace.cvs, warmStudentFace.ctx);
+  assert.strictEqual(t2.stage, 'aligning');
+
+  // Enrolled profile kini valid dan merekam warna kulit murid
+  assert.strictEqual(FaceGuard.isEnrolled(), true, 'setelah kalibrasi: profil biometrik murid terkunci');
+  const profile = FaceGuard.getEnrolledProfile();
+  assert.ok(profile.valid, 'profile.valid = true');
+  assert.ok(profile.cbMean > 0 && profile.crMean > 0, 'chrominance tersimpan');
+
+  // Uji toleransi gerakan:
+  // 1. Gerakan maju-mundur (skala wajah mengecil sedikit karena murid mundur)
+  const studentLeanBack = mkCanvas((x, y) => {
+    if (x >= 22 && x <= 42 && y >= 16 && y <= 32) {
+      if (y >= 21 && y <= 24 && x >= 25 && x <= 39) return [80, 60, 40];
+      return [195, 140, 95];
+    }
+    return [70, 75, 80];
+  });
+  assert.strictEqual(FaceGuard.fallbackCheck(studentLeanBack.video, studentLeanBack.cvs, studentLeanBack.ctx), true, 'mundur sedikit tetap terdeteksi hadir berkat profil adaptif');
+
+  // 2. Tangan gemetar / kemiringan HP (centroid bergeser ke pinggir)
+  const studentTilt = mkCanvas((x, y) => {
+    if (x >= 10 && x <= 38 && y >= 14 && y <= 38) {
+      if (y >= 22 && y <= 27 && x >= 14 && x <= 34) return [80, 60, 40];
+      return [195, 140, 95];
+    }
+    return [70, 75, 80];
+  });
+  assert.strictEqual(FaceGuard.fallbackCheck(studentTilt.video, studentTilt.cvs, studentTilt.ctx), true, 'kemiringan wajar tetap terdeteksi');
 });
 
 (async () => {
