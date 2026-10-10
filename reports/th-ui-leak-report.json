@@ -1,6 +1,6 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-10-10T03:29:55.861Z",
+  "generatedAt": "2026-10-10T04:19:23.671Z",
   "files": {
     "app.js": {
       "leaks": 3,
@@ -95,15 +95,15 @@
       "budget": 3,
       "sample": [
         {
-          "line": 2214,
+          "line": 2213,
           "text": "Latihan · ±"
         },
         {
-          "line": 2262,
+          "line": 2261,
           "text": "Tenggat"
         },
         {
-          "line": 2262,
+          "line": 2261,
           "text": "Latihan — umpan balik tiap soal"
         }
       ]
@@ -504,8 +504,8 @@
     }
   },
   "copyKeys": {
-    "id": 3996,
-    "th": 3820,
+    "id": 3999,
+    "th": 3823,
     "idTanpaTh": 0
   },
   "pass": true
