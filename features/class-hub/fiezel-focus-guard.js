@@ -38,9 +38,9 @@
 
   var SCHEMA = 'fiezel-focus-guard-v1';
   // Di bawah ini = gangguan sistem, bukan kepergian. Lihat catatan kepala berkas.
-  var GRACE_MS = 1500;
-  // Masa tenggang wajah tidak terlihat (10 detik): menunduk singkat atau jeda wajar bukan pelanggaran.
-  var FACE_GRACE_MS = 10000;
+  var GRACE_MS = 500;
+  // Masa tenggang wajah tidak terlihat (1 detik): kedip wajar bukan pelanggaran, 1 detik ke atas langsung dicatat.
+  var FACE_GRACE_MS = 1000;
   // Bukti per-episode yang disimpan lokal (guru hanya menerima agregatnya).
   var EPISODES_MAX = 20;
   // Sebuah episode tunggal tidak mungkin lebih lama dari satu sesi ujian yang wajar.
@@ -119,7 +119,7 @@
   }
 
   /**
-   * Wajah kembali terdeteksi. Hanya dicatat bila melewati masa tenggang FACE_GRACE_MS (10 detik).
+   * Wajah kembali terdeteksi. Hanya dicatat bila melewati masa tenggang FACE_GRACE_MS (1 detik).
    */
   function backFace(state, at) {
     if (!state || !state.faceAwaySince) return null;
