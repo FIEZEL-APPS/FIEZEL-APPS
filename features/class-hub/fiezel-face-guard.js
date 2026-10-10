@@ -199,7 +199,12 @@
   }
 
   function start(opts) {
-    if (state.active) return Promise.resolve({ ok: true, active: true });
+    if (state.active) {
+      if (opts) state.options = Object.assign({}, state.options || {}, opts);
+      state.absentSince = 0;
+      state.warned = false;
+      return Promise.resolve({ ok: true, active: true, stream: state.stream });
+    }
     state.options = opts || {};
     state.absentSince = 0;
     state.warned = false;
@@ -269,7 +274,7 @@
       state.ctx = cvs.getContext('2d', { willReadFrequently: true });
 
       state.timer = setInterval(checkFrame, SAMPLE_INTERVAL_MS);
-      return { ok: true, active: true };
+      return { ok: true, active: true, stream: mediaStream };
     }).catch(function (err) {
       state.active = false;
       return { ok: false, reason: (err && err.name) || 'permission_denied' };
@@ -305,6 +310,27 @@
 
   function isActive() { return !!state.active; }
   function isWarning() { return !!state.warned; }
+  function getStream() { return state.stream; }
+
+  function attachPreview(vidEl) {
+    if (!vidEl || !state.stream) return false;
+    try {
+      vidEl.srcObject = state.stream;
+      vidEl.muted = true;
+      vidEl.playsInline = true;
+      vidEl.autoplay = true;
+      var p = vidEl.play();
+      if (p && typeof p.catch === 'function') p.catch(function () {});
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function verifyPresence() {
+    if (!state.active || !state.videoEl || state.videoEl.readyState < 2) return false;
+    return fallbackCheck(state.videoEl, state.canvasEl, state.ctx);
+  }
 
   function checkNow() {
     if (!state.active) return false;
@@ -318,6 +344,9 @@
     stop: stop,
     isActive: isActive,
     isWarning: isWarning,
+    getStream: getStream,
+    attachPreview: attachPreview,
+    verifyPresence: verifyPresence,
     checkNow: checkNow,
     fallbackCheck: fallbackCheck,
     SAMPLE_INTERVAL_MS: SAMPLE_INTERVAL_MS,

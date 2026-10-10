@@ -1160,3 +1160,35 @@ body.reduce-motion .ch-student,body.reduce-motion .ch-body,body.reduce-motion .c
 .ch-listen{display:flex;flex-direction:column;gap:8px;margin:0 0 12px}
 .ch-listen .ch-btn{align-self:flex-start}
 .ch-transcript summary{cursor:pointer;font-weight:600}
+
+/* ---- Preflight Face Verification (m025-548) ---- */
+.ch-preflight-body{max-width:480px;margin:0 auto;padding:16px 12px 32px}
+.ch-face-preflight-card{display:flex;flex-direction:column;align-items:center;text-align:center;padding:24px 20px;border-radius:var(--ch-r);background:var(--ch-card,#fff);box-shadow:0 4px 24px rgba(0,0,0,0.06);border:1px solid var(--ch-line)}
+.ch-preflight-badge{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:6px 12px;border-radius:999px;background:var(--ch-info-soft,rgba(56,189,248,0.12));color:var(--ch-info,#0284c7);margin-bottom:12px}
+.ch-preflight-badge svg,.ch-preflight-badge i{width:15px;height:15px}
+.ch-preflight-title{margin:0 0 8px;font-size:1.22rem;font-weight:800;line-height:1.3;color:var(--ch-text)}
+.ch-preflight-desc{margin:0 0 20px;font-size:.88rem;line-height:1.5;color:var(--ch-muted);max-width:380px}
+.ch-face-verify-box{position:relative;width:200px;height:200px;border-radius:50%;overflow:hidden;background:var(--ch-soft,#f8fafc);border:3px dashed var(--ch-line);margin:0 auto 18px;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 2px 8px rgba(0,0,0,0.05);transition:border-color .3s ease,box-shadow .3s ease}
+.ch-face-verify-box.is-scanning{border-color:var(--ch-accent,#10b981);border-style:solid;animation:chFacePulse 2s infinite ease-in-out}
+.ch-face-verify-box.is-verified{border-color:var(--ch-ok,#10b981);border-style:solid;border-width:4px;box-shadow:0 0 0 6px var(--ch-ok-soft,rgba(16,185,129,0.18)),0 4px 16px rgba(16,185,129,0.25)}
+.ch-face-verify-box.is-error{border-color:var(--ch-bad,#ef4444);border-style:solid;box-shadow:0 0 0 4px var(--ch-bad-soft,rgba(239,68,68,0.15))}
+.ch-face-preview-video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+.ch-face-oval-guide{position:absolute;top:10%;left:15%;width:70%;height:80%;border-radius:50%;border:2px dashed rgba(255,255,255,0.65);pointer-events:none;box-sizing:border-box}
+.ch-face-verify-box.is-verified .ch-face-oval-guide{border-color:rgba(16,185,129,0.8);border-style:solid}
+.ch-face-placeholder{position:absolute;display:flex;align-items:center;justify-content:center;color:var(--ch-muted)}
+.ch-face-placeholder svg,.ch-face-placeholder i{width:48px;height:48px;opacity:.6}
+.ch-face-verified-stamp{position:absolute;bottom:8px;right:8px;width:38px;height:38px;border-radius:50%;background:var(--ch-ok,#10b981);color:#fff;display:grid;place-items:center;box-shadow:0 3px 10px rgba(0,0,0,0.2);animation:chStampPop .35s cubic-bezier(0.175,0.885,0.32,1.275)}
+.ch-face-verified-stamp svg,.ch-face-verified-stamp i{width:22px;height:22px;stroke-width:3}
+.ch-preflight-status-row{width:100%;border-radius:12px;padding:10px 14px;margin-bottom:20px;display:flex;flex-direction:column;gap:4px;align-items:center}
+.ch-preflight-status-row p{margin:0;display:flex;align-items:center;gap:6px;font-size:.88rem;font-weight:600}
+.ch-preflight-status-row.is-ok{background:var(--ch-ok-soft,rgba(16,185,129,0.12));color:var(--ch-ok,#059669)}
+.ch-preflight-status-row.is-warn{background:var(--ch-warn-soft,rgba(245,158,11,0.12));color:var(--ch-warn,#d97706)}
+.ch-preflight-status-row.is-err{background:var(--ch-bad-soft,rgba(239,68,68,0.12));color:var(--ch-bad,#dc2626)}
+.ch-preflight-status-row.is-idle{background:var(--ch-soft,#f1f5f9);color:var(--ch-muted,#64748b)}
+.ch-preflight-actions{width:100%;display:flex;flex-direction:column;gap:10px}
+.ch-preflight-actions .ch-btn{width:100%;justify-content:center;font-size:1rem;padding:14px 20px;font-weight:700;border-radius:12px}
+.ch-btn-verified{background:var(--ch-ok,#10b981)!important;box-shadow:0 4px 14px rgba(16,185,129,0.35)!important}
+.ch-col-actions{display:flex;flex-direction:column;gap:8px;width:100%}
+@keyframes chFacePulse{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,0.4)}50%{box-shadow:0 0 0 10px rgba(16,185,129,0)}}
+@keyframes chStampPop{0%{transform:scale(0.3);opacity:0}70%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+

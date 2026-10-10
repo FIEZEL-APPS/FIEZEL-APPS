@@ -450,6 +450,8 @@
     }).filter(function (k) { return /^[a-z0-9_]{1,32}$/.test(k); });
     if (!cleanSkills.length) cleanSkills = ['grammar'];
     var p = { v: 1, t: 'assign', id: a.id, title: a.title, skills: cleanSkills, itemIds: a.itemIds, minutes: a.minutes, from: c.name, cls: c.code, deadline: a.deadline || null, mode: a.mode || 'latihan', timer: a.timer || 0, shuffle: !!a.shuffle };
+    if (a.faceGuard !== undefined) p.faceGuard = !!a.faceGuard;
+    if (a.isExam !== undefined) p.isExam = !!a.isExam;
     p.teacher = a.teacher || (c && c.teacher) || 'Guru';
     if (a.teacher) p.teacher = String(a.teacher);
 
@@ -538,6 +540,8 @@
         if (a[i] && a[i].id === p.id) { existingIndex = i; break; }
       }
       var entry = { id: p.id, title: p.title, skills: p.skills, itemIds: p.itemIds, minutes: p.minutes, from: p.from, teacher: p.teacher || '', cls: p.cls || '', items: Array.isArray(p.items) ? cleanItems : undefined, timer: p.timer || 0, shuffle: !!p.shuffle, at: Date.now(), deadline: p.deadline, mode: p.mode };
+      if (p.faceGuard !== undefined) entry.faceGuard = !!p.faceGuard;
+      if (p.isExam !== undefined) entry.isExam = !!p.isExam;
       if (p.subjectId) entry.subjectId = p.subjectId;
       if (p.subjectName) entry.subjectName = p.subjectName;
       if (p.source) entry.source = p.source;
@@ -599,7 +603,7 @@
     custom.forEach(function (q) { if (ids.indexOf(q.id) === -1) ids.push(q.id); });
     ids = ids.slice(0, 40);
     var minutes = Math.max(3, Math.round(ids.length * 0.9));
-    var a = { id: uid('as'), title: String(opts.title || ('Latihan ' + skills.map(function (k) { return SKILL_LABEL[k] || k; }).join(' + '))).slice(0, 80), skills: skills, itemIds: ids, minutes: minutes, mode: opts.mode || 'latihan', timer: opts.mode === 'ujian' ? (Number(opts.timer) || minutes) : 0, shuffle: opts.mode === 'ujian', deadline: opts.deadline || null, createdAt: Date.now(), targets: opts.targets && opts.targets.length ? opts.targets : null, done: {}, progress: {} };
+    var a = { id: uid('as'), title: String(opts.title || ('Latihan ' + skills.map(function (k) { return SKILL_LABEL[k] || k; }).join(' + '))).slice(0, 80), skills: skills, itemIds: ids, minutes: minutes, mode: opts.mode || 'latihan', timer: opts.mode === 'ujian' ? (Number(opts.timer) || minutes) : (Number(opts.timer) || 0), faceGuard: opts.faceGuard !== undefined ? !!opts.faceGuard : (opts.mode === 'ujian'), shuffle: opts.mode === 'ujian', deadline: opts.deadline || null, createdAt: Date.now(), targets: opts.targets && opts.targets.length ? opts.targets : null, done: {}, progress: {} };
     if (custom.length) a.items = custom;
     var st; try { st = load(); } catch (_) {}
     a.teacher = opts.teacher || (st && st.teacher && st.teacher.name) || '';

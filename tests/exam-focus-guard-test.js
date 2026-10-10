@@ -468,6 +468,66 @@ test('face-guard: modal ramah popup instan saat wajah tak terdeteksi dan auto-di
   assert.ok(!sEl.innerHTML.includes('class-face-alert-modal'), 'modal otomatis tertutup saat wajah terdeteksi kembali');
 });
 
+test('face-guard: tahapan verifikasi wajah (preflight) sebelum mulai ujian', async () => {
+  const Hub = globalThis.FiezelClassHub, TS = globalThis.FiezelTeacherStore, Bank = globalThis.FiezelReviewBank;
+  assert.ok(Hub && TS && Bank);
+  const ids = Bank.pick('past_tense', 3, 8).map((x) => x.id);
+  assert.ok(TS.acceptAssignmentPayload({ v: 1, t: 'assign', id: 'ujian-preflight', title: 'Ujian Akhir Semester', skills: ['past_tense'], itemIds: ids, minutes: 10, from: 'Kelas 8A', cls: 'FZ-AB2C3D', mode: 'ujian', faceGuard: true, timer: 10 }));
+
+  const origFaceG = globalThis.FiezelFaceGuard;
+  const mockStream = { getTracks: () => [{ stop: () => {} }] };
+  globalThis.FiezelFaceGuard = {
+    isSupported: () => true,
+    isActive: () => true,
+    start: async () => ({ ok: true, stream: mockStream }),
+    stop: () => {},
+    getStream: () => mockStream,
+    attachPreview: () => {},
+    verifyPresence: async () => ({ present: true }),
+    checkNow: () => true,
+    checkFace: () => ({ present: true, ratio: 0.15 })
+  };
+
+  try {
+    const sEl = { innerHTML: '', _h: {}, addEventListener(t, fn) { (this._h[t] = this._h[t] || []).push(fn); }, querySelector: () => null, fire(t, target) { (this._h[t] || []).forEach((fn) => fn({ target, preventDefault() {} })); } };
+    const senv = { toast(t) { senv.last = t; }, go() {}, afterRender() {} };
+    Hub.mountStudent(sEl, senv);
+    Hub.openAssignment('ujian-preflight');
+
+    const u = Hub._studentUi();
+    Hub.renderStudent();
+
+    // 1. Tahap verifikasi wajah harus aktif, soal belum muncul
+    assert.strictEqual(u.runner.faceVerified, false, 'status faceVerified harus false di awal');
+    assert.ok(sEl.innerHTML.includes('class-face-preflight'), 'layar preflight verifikasi wajah tampil');
+    assert.ok(sEl.innerHTML.includes('btn-verify-face'), 'tombol aktifkan kamera & pindai wajah tersedia');
+    assert.ok(!sEl.innerHTML.includes('ch-question'), 'soal ujian TIDAK bocor sebelum verifikasi');
+
+    // 2. Klik tombol verifikasi wajah
+    const btnScan = { getAttribute: (k) => (k === 'data-ch' ? 'start-face-verify' : null), closest: (sel) => (sel === '[data-ch]' ? btnScan : null) };
+    sEl.fire('click', btnScan);
+
+    // Tunggu proses start + verifyPresence async
+    await new Promise((r) => setTimeout(r, 60));
+    Hub.renderStudent();
+
+    assert.strictEqual(u.facePreflight.status, 'verified', 'wajah terverifikasi di preflight');
+    assert.ok(sEl.innerHTML.includes('btn-proceed-exam'), 'tombol mulai kerjakan ujian muncul');
+
+    // 3. Klik tombol Mulai Kerjakan Ujian
+    const btnProceed = { getAttribute: (k) => (k === 'data-ch' ? 'proceed-exam' : null), closest: (sel) => (sel === '[data-ch]' ? btnProceed : null) };
+    sEl.fire('click', btnProceed);
+    Hub.renderStudent();
+
+    assert.strictEqual(u.runner.faceVerified, true, 'status runner faceVerified true setelah proceed');
+    // 4. Masuk ke soal ujian dan timer berjalan
+    assert.ok(sEl.innerHTML.includes('ch-question'), 'soal ujian 1 kini tampil setelah verifikasi sukses');
+    assert.ok(u.runner.timerEnd > 0, 'timer ujian mulai berjalan');
+  } finally {
+    globalThis.FiezelFaceGuard = origFaceG;
+  }
+});
+
 (async () => {
   let fail = 0;
   for (const [name, fn] of tests) {
