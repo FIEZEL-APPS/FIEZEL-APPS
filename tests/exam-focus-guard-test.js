@@ -697,6 +697,244 @@ test('face-guard: pengawasan mid-exam mendeteksi saat murid menoleh / menjauh da
   }
 });
 
+/* -------------------------------------- 10 · dedicated proctor slots & fatal exit & arsip --- */
+
+test('proctor: dedicated slots tidak saling menimpa saat keluar layar dan wajah tidak terdeteksi', () => {
+  const store = {};
+  globalThis.localStorage = {
+    getItem: (k) => (k in store ? store[k] : null),
+    setItem: (k, v) => { store[k] = String(v); },
+    removeItem: (k) => { delete store[k]; }
+  };
+  const Hub = globalThis.FiezelClassHub, TS = globalThis.FiezelTeacherStore, Bank = globalThis.FiezelReviewBank;
+  const mkEl = () => { const el = { innerHTML: '', _h: {}, addEventListener(t, fn) { (el._h[t] = el._h[t] || []).push(fn); }, querySelector: () => null, fire(t, target) { (el._h[t] || []).forEach((fn) => fn({ target, preventDefault() {} })); } }; return el; };
+  const ids = Bank.pick('past_tense', 3, 7).map((x) => x.id);
+
+  store['fiezel-onboarding-v1'] = JSON.stringify({ name: 'Budi', classCode: 'FZ-TEST01' });
+  assert.ok(TS.acceptAssignmentPayload({ v: 1, t: 'assign', id: 'ujian-slots-1', title: 'Ujian Slots', skills: ['past_tense'], itemIds: ids, minutes: 5, from: 'Guru', cls: 'FZ-TEST01', mode: 'ujian' }));
+  const sEl = mkEl();
+  const senv = { toast() {}, go() {}, afterRender() {} };
+  Hub.mountStudent(sEl, senv);
+  Hub.openAssignment('ujian-slots-1');
+
+  // Bersih: slot default mode ujian
+  assert.ok(sEl.innerHTML.includes('class-proctor-clean-slot'), 'slot bersih tampil');
+  assert.ok(sEl.innerHTML.includes('class-proctor-notice'), 'banner dalam status notice');
+
+  const u = Hub._studentUi();
+  // Simulasi 1: keluar layar 5 detik
+  u.focus.n = 1;
+  u.focus.ms = 5000;
+  // Simulasi 2: wajah tak terlihat 10 detik
+  u.focus.faceN = 1;
+  u.focus.faceMs = 10000;
+  // Simulasi 3: wajah sedang tidak di depan kamera sekarang
+  u.faceWarn = true;
+
+  Hub.renderStudent();
+
+  // Verifikasi dedicated slots muncul BERSAMAAN tanpa saling menimpa
+  assert.ok(sEl.innerHTML.includes('class-proctor-warn'), 'banner dalam status warn');
+  assert.ok(sEl.innerHTML.includes('class-proctor-face-warn'), 'slot peringatan wajah langsung ada');
+  assert.ok(sEl.innerHTML.includes('class-proctor-leave-slot'), 'slot catatan keluar layar ada');
+  assert.ok(sEl.innerHTML.includes('class-proctor-absent-slot'), 'slot catatan wajah hilang ada');
+  assert.ok(sEl.innerHTML.includes('1×'), 'jumlah keluar layar dan wajah hilang tercetak jelas');
+});
+
+test('runner: ujian memakai tombol Keluar Ujian, konfirmasi modal, dan selesai permanen', () => {
+  const store = {};
+  globalThis.localStorage = {
+    getItem: (k) => (k in store ? store[k] : null),
+    setItem: (k, v) => { store[k] = String(v); },
+    removeItem: (k) => { delete store[k]; }
+  };
+  const Hub = globalThis.FiezelClassHub, TS = globalThis.FiezelTeacherStore, Bank = globalThis.FiezelReviewBank;
+  const mkEl = () => { const el = { innerHTML: '', _h: {}, addEventListener(t, fn) { (el._h[t] = el._h[t] || []).push(fn); }, querySelector: () => null, fire(t, target) { (el._h[t] || []).forEach((fn) => fn({ target, preventDefault() {} })); } }; return el; };
+  const btn = (attrs) => { const b = { getAttribute: (k) => (k in attrs ? attrs[k] : null) }; b.closest = (sel) => (sel === '[data-ch]' ? b : null); return b; };
+  const ids = Bank.pick('past_tense', 3, 7).map((x) => x.id);
+
+  store['fiezel-onboarding-v1'] = JSON.stringify({ name: 'Siti', classCode: 'FZ-TEST02' });
+  assert.ok(TS.acceptAssignmentPayload({ v: 1, t: 'assign', id: 'ujian-exit-1', title: 'Ujian Fatal Exit', skills: ['past_tense'], itemIds: ids, minutes: 5, from: 'Guru', cls: 'FZ-TEST02', mode: 'ujian' }));
+  const sEl = mkEl();
+  const senv = { toast() {}, go() {}, afterRender() {} };
+  Hub.mountStudent(sEl, senv);
+  Hub.openAssignment('ujian-exit-1');
+
+  // 1. Verifikasi tombol di topbar adalah 'class-exit-exam' (Keluar ujian), BUKAN 'close-runner' (Simpan & keluar)
+  assert.ok(sEl.innerHTML.includes('class-exit-exam'), 'tombol Keluar Ujian ada di mode ujian');
+  assert.ok(!sEl.innerHTML.includes('Simpan &amp; keluar') && !sEl.innerHTML.includes('Simpan & keluar'), 'tombol Simpan & keluar dilarang di mode ujian');
+
+  // 2. Klik tombol Keluar Ujian -> memicu modal konfirmasi
+  sEl.fire('click', btn({ 'data-ch': 'exit-exam' }));
+  assert.ok(sEl.innerHTML.includes('class-exit-exam-modal'), 'modal konfirmasi keluar ujian muncul');
+  assert.ok(sEl.innerHTML.includes('class-confirm-exit-exam'), 'tombol konfirmasi keluar ada');
+  assert.ok(sEl.innerHTML.includes('class-cancel-exit-exam'), 'tombol batal keluar ada');
+
+  // 3. Klik batal -> kembali ke ujian
+  sEl.fire('click', btn({ 'data-ch': 'cancel-exit-exam' }));
+  assert.ok(!sEl.innerHTML.includes('class-exit-exam-modal'), 'modal tertutup setelah klik batal');
+  assert.strictEqual(Hub._studentUi().runner.finished, false, 'ujian belum selesai');
+
+  // 4. Klik konfirmasi keluar -> ujian diselesaikan permanen
+  sEl.fire('click', btn({ 'data-ch': 'exit-exam' }));
+  sEl.fire('click', btn({ 'data-ch': 'confirm-exit-exam' }));
+  assert.strictEqual(Hub._studentUi().runner.finished, true, 'ujian langsung diselesaikan');
+  assert.ok(sEl.innerHTML.includes('class-result'), 'layar hasil ditampilkan');
+});
+
+test('siklus: tugas selesai memiliki tombol Arsipkan dan dapat dipulihkan dari Arsip', () => {
+  const store = {};
+  globalThis.localStorage = {
+    getItem: (k) => (k in store ? store[k] : null),
+    setItem: (k, v) => { store[k] = String(v); },
+    removeItem: (k) => { delete store[k]; }
+  };
+  const Hub = globalThis.FiezelClassHub, TS = globalThis.FiezelTeacherStore, Bank = globalThis.FiezelReviewBank;
+  const mkEl = () => { const el = { innerHTML: '', _h: {}, addEventListener(t, fn) { (el._h[t] = el._h[t] || []).push(fn); }, querySelector: () => null, fire(t, target) { (el._h[t] || []).forEach((fn) => fn({ target, preventDefault() {} })); } }; return el; };
+  const btn = (attrs) => { const b = { getAttribute: (k) => (k in attrs ? attrs[k] : null) }; b.closest = (sel) => (sel === '[data-ch]' ? b : null); return b; };
+  const ids = Bank.pick('past_tense', 2, 5).map((x) => x.id);
+
+  store['fiezel-onboarding-v1'] = JSON.stringify({ name: 'Rian', classCode: 'FZ-TEST03' });
+  assert.ok(TS.acceptAssignmentPayload({ v: 1, t: 'assign', id: 'tugas-arsip-1', title: 'Tugas Arsip Test', skills: ['past_tense'], itemIds: ids, minutes: 5, from: 'Guru', cls: 'FZ-TEST03', mode: 'latihan' }));
+  const sEl = mkEl();
+  const senv = { toast() {}, go() {}, afterRender() {} };
+  Hub.mountStudent(sEl, senv);
+  Hub.openAssignment('tugas-arsip-1');
+
+  // Kerjakan sampai selesai
+  for (let i = 0; i < ids.length; i++) {
+    sEl.fire('click', btn({ 'data-ch': 'answer', 'data-i': '0' }));
+    sEl.fire('click', btn({ 'data-ch': 'next' }));
+  }
+
+  // Di layar hasil, ada tombol Arsipkan
+  assert.ok(sEl.innerHTML.includes('class-result-archive'), 'tombol arsipkan ada di layar hasil');
+
+  // Tutup runner kembali ke tab tugas
+  sEl.fire('click', btn({ 'data-ch': 'close-runner' }));
+
+  // Masuk ke tab 'selesai'
+  sEl.fire('click', btn({ 'data-ch': 'seg', 'data-seg': 'selesai' }));
+  assert.ok(sEl.innerHTML.includes('class-done-tugas-arsip-1'), 'baris selesai ada');
+  assert.ok(sEl.innerHTML.includes('class-archive-tugas-arsip-1'), 'tombol arsipkan ada di baris selesai');
+
+  // Klik tombol arsipkan
+  sEl.fire('click', btn({ 'data-ch': 'arsip-selesai', 'data-id': 'tugas-arsip-1' }));
+  assert.ok(!sEl.innerHTML.includes('class-done-tugas-arsip-1'), 'tugas hilang dari daftar selesai aktif');
+
+  // Buka arsip
+  sEl.fire('click', btn({ 'data-ch': 'buka-arsip' }));
+  assert.ok(sEl.innerHTML.includes('class-archive'), 'tampilan arsip terbuka');
+  assert.ok(sEl.innerHTML.includes('class-unarchive-tugas-arsip-1'), 'tombol pulihkan ada di arsip');
+
+  // Klik pulihkan
+  sEl.fire('click', btn({ 'data-ch': 'pulihkan', 'data-id': 'tugas-arsip-1' }));
+  sEl.fire('click', btn({ 'data-ch': 'tutup-arsip' }));
+  assert.ok(sEl.innerHTML.includes('class-done-tugas-arsip-1'), 'tugas kembali ke daftar selesai');
+});
+
+/* --------------------------------- 11 · anti-spoofing layar hp/laptop & anti-cahaya palsu --- */
+
+test('face-guard: menolak sumber cahaya / lampu / senter dan menerima wajah di ruangan redup', () => {
+  const FaceGuard = require('../features/class-hub/fiezel-face-guard.js');
+  const w = 64, h = 48;
+  const mkCanvas = (fn) => {
+    const data = new Uint8ClampedArray(w * h * 4);
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const idx = (y * w + x) * 4;
+        const [r, g, b] = fn(x, y);
+        data[idx] = r; data[idx + 1] = g; data[idx + 2] = b; data[idx + 3] = 255;
+      }
+    }
+    return { video: { readyState: 2 }, cvs: { width: w, height: h }, ctx: { drawImage() {}, getImageData: () => ({ data }) } };
+  };
+
+  // 1. Lampu sorot / senter terang benderang di depan kamera (Bukan wajah! R,G,B > 235 tanpa eye-dip)
+  const lamp = mkCanvas((x, y) => {
+    if (x >= 20 && x <= 44 && y >= 12 && y <= 36) return [245, 240, 220];
+    return [40, 40, 45];
+  });
+  assert.strictEqual(FaceGuard.fallbackCheck(lamp.video, lamp.cvs, lamp.ctx), false, 'sumber cahaya / lampu terang HARUS ditolak (bukan wajah)');
+
+  // 2. Lampu neon putih / LED dingin (R <= B)
+  const neon = mkCanvas((x, y) => {
+    if (x >= 20 && x <= 44 && y >= 12 && y <= 36) return [210, 215, 225];
+    return [30, 30, 35];
+  });
+  assert.strictEqual(FaceGuard.fallbackCheck(neon.video, neon.cvs, neon.ctx), false, 'lampu neon / cahaya putih dingin HARUS ditolak');
+
+  // 3. Wajah manusia asli di ruangan malam redup (low-light, yLum ~36, dengan lekukan mata ~24)
+  const dimFace = mkCanvas((x, y) => {
+    if (x >= 18 && x <= 46 && y >= 12 && y <= 36) {
+      if (y >= 20 && y <= 25 && x >= 22 && x <= 42) {
+        return [28, 24, 18]; // Rongga mata lebih gelap
+      }
+      return [42, 36, 26]; // Kulit wajah di ruangan redup (R > G > B)
+    }
+    return [15, 15, 18]; // Latar belakang gelap
+  });
+  assert.strictEqual(FaceGuard.fallbackCheck(dimFace.video, dimFace.cvs, dimFace.ctx), true, 'wajah manusia asli di ruangan redup HARUS tetap terdeteksi');
+});
+
+test('face-guard: anti-spoofing menolak layar HP, layar laptop, wallpaper statis, dan kertas foto', () => {
+  const FaceGuard = require('../features/class-hub/fiezel-face-guard.js');
+  const w = 64, h = 48;
+  const mkCanvas = (fn) => {
+    const data = new Uint8ClampedArray(w * h * 4);
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const idx = (y * w + x) * 4;
+        const [r, g, b] = fn(x, y);
+        data[idx] = r; data[idx + 1] = g; data[idx + 2] = b; data[idx + 3] = 255;
+      }
+    }
+    return { video: { readyState: 2 }, cvs: { width: w, height: h }, ctx: { drawImage() {}, getImageData: () => ({ data }) } };
+  };
+
+  // 1. Gambar wajah di layar HP / Laptop dengan pantulan kaca (glass specular glare: titik putih murni jenuh R,G,B > 230)
+  const screenWithGlare = mkCanvas((x, y) => {
+    if (x >= 18 && x <= 46 && y >= 12 && y <= 36) {
+      if (x >= 28 && x <= 32 && y >= 16 && y <= 18) {
+        return [245, 245, 245]; // Glare pantulan lampu pada kaca layar
+      }
+      if (y >= 20 && y <= 26 && x >= 22 && x <= 42) return [40, 30, 25];
+      return [180, 130, 100];
+    }
+    return [80, 85, 90];
+  });
+  assert.strictEqual(FaceGuard.fallbackCheck(screenWithGlare.video, screenWithGlare.cvs, screenWithGlare.ctx), false, 'foto di layar HP / laptop dengan glare kaca HARUS ditolak');
+
+  // 2. Gambar wajah di layar LCD dengan backlight bleed (rongga mata tidak bisa hitam pekat, eyeDarkMin > 52)
+  const screenBacklight = mkCanvas((x, y) => {
+    if (x >= 18 && x <= 46 && y >= 12 && y <= 36) {
+      if (y >= 20 && y <= 26 && x >= 22 && x <= 42) return [65, 58, 55]; // Hitam bocor backlight LCD (Y > 52)
+      return [180, 130, 100];
+    }
+    return [80, 85, 90];
+  });
+  assert.strictEqual(FaceGuard.fallbackCheck(screenBacklight.video, screenBacklight.cvs, screenBacklight.ctx), false, 'layar LCD dengan backlight bleed di rongga mata HARUS ditolak');
+
+  // 3. Foto kertas diam / wallpaper dinding (statis total tanpa dinamika biologis)
+  FaceGuard.resetLiveness();
+  const staticPhoto = mkCanvas((x, y) => {
+    if (x >= 18 && x <= 46 && y >= 12 && y <= 36) {
+      if (y >= 20 && y <= 26 && x >= 22 && x <= 42) return [40, 30, 25];
+      return [180, 130, 100];
+    }
+    return [80, 85, 90];
+  });
+
+  // Uji liveness: foto diam di dinding tertahan di stage challenge dan TIDAK PERNAH terverifikasi
+  FaceGuard.checkLiveness(staticPhoto.video, staticPhoto.cvs, staticPhoto.ctx);
+  FaceGuard.checkLiveness(staticPhoto.video, staticPhoto.cvs, staticPhoto.ctx);
+  for (let i = 0; i < 5; i++) {
+    const res = FaceGuard.checkLiveness(staticPhoto.video, staticPhoto.cvs, staticPhoto.ctx);
+    assert.strictEqual(res.stage, 'challenge', 'foto di wallpaper/kertas harus tertahan di challenge');
+  }
+  assert.strictEqual(FaceGuard.isLivenessVerified(), false, 'foto wallpaper/kertas tidak boleh lolos liveness');
+});
+
 (async () => {
   let fail = 0;
   for (const [name, fn] of tests) {
