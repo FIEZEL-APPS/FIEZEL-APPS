@@ -2079,7 +2079,7 @@
       '</div>';
     } else {
       statusHtml = '<div class="ch-preflight-status-row is-idle">' +
-        '<p class="ch-muted ch-small">' + icon('smile') + ' ' + esc(t('proctor.verifikasi-panduan', 'Posisikan wajahmu di dalam lingkaran')) + '</p>' +
+        '<p class="ch-muted ch-small">' + icon('camera') + ' ' + esc(t('proctor.verifikasi-panduan', 'Posisikan wajahmu di dalam lingkaran')) + '</p>' +
       '</div>';
     }
 
