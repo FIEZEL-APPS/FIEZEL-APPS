@@ -130,7 +130,7 @@ test('X5 — misi tidak lagi memasang guru palsu', () => {
 
 test('X5 — misi mandiri TIDAK masuk laporan tugas yang dibaca guru', () => {
   const i = FLOW.indexOf('function recordAssignmentResult');
-  const fn = FLOW.slice(i, i + 2600);
+  const fn = FLOW.slice(i, i + 3500);
   assert.ok(/var mandiri = !!res\.selfDirected/.test(fn), 'bendera selfDirected tidak dibaca');
   assert.ok(/if \(!mandiri\) \{[\s\S]*doneAssign/.test(fn),
     'doneAssign diisi tanpa memeriksa selfDirected. doneAssign adalah persis yang dikirim ke guru ' +

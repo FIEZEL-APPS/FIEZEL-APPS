@@ -1,7 +1,7 @@
 {
-  "version": "m025-543",
-  "claimedBy": "branch fix/kelasku-assignment-notif-delivery",
-  "claimedAt": "2026-10-10T03:29:12.454Z",
-  "reason": "fix(kelasku): perbaikan transmisi penugasan guru, auto-dispatch, dan notifikasi murid",
+  "version": "m025-544",
+  "claimedBy": "branch fix/proctoring-visual-face-guard-retention",
+  "claimedAt": "2026-10-10T04:03:12.698Z",
+  "reason": "fix(proctoring): pelestarian telemetri visual face guard dan sinkronisasi proctoring utuh",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

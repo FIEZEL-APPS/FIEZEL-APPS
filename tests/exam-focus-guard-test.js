@@ -207,6 +207,12 @@ test('class-sync-core: f = tiga bilangan diterima; bentuk lain ditolak', async (
   });
   const asing = core.normalizeReport(Object.assign({ assign: [{ id: 'ujian-1', f: { n: 1, s: 10, x: 1, catatan: 'buka google' } }] }, base), now);
   assert.ok(asing.ok && asing.report.assign[0].f.catatan === undefined, 'tanpa teks bebas: field asing tidak tersimpan');
+  const visualF = core.normalizeReport(Object.assign({ assign: [{ id: 'ujian-1', s: 1, f: { n: 0, s: 0, x: 0, vn: 1, vs: 15, vx: 15 } }] }, base), now);
+  assert.ok(visualF.ok, 'assign.f dengan visual vn/vs/vx diterima');
+  assert.deepStrictEqual(visualF.report.assign[0].f, { n: 0, s: 0, x: 0, vn: 1, vs: 15, vx: 15 });
+  const visualFx = core.normalizeReport(Object.assign({ fx: { k: 'assignment', n: 0, s: 0, x: 0, vn: 2, vs: 25, vx: 15 } }, base), now);
+  assert.ok(visualFx.ok, 'body.fx dengan visual vn/vs/vx diterima');
+  assert.deepStrictEqual(visualFx.report.fx, { k: 'assignment', n: 0, s: 0, x: 0, vn: 2, vs: 25, vx: 15 });
 });
 
 /* ------------------------------------------- 3b · kiriman yang ditolak server --- */
@@ -261,6 +267,12 @@ test('teacher store: f tersimpan per murid dan kabar hanya lahir saat angkanya n
   assert.ok(/^⚠/.test(kabar), 'kabar dibaca sebagai PERINGATAN, bukan catatan administratif: ' + kabar);
   assert.ok(/Ani/.test(kabar) && /Ujian mini/.test(kabar) && /2×/.test(kabar), 'menyebut siapa, sedang apa, seberapa sering: ' + kabar);
   assert.ok(!/curang|menyontek/i.test(kabar), 'menyebut fakta, tidak memvonis');
+
+  // Wajah tak terlihat (visual proctoring) juga melahirkan kabar peringatan mandiri
+  const rFace = TS.ingest(c, laporan({ n: 2, s: 75, x: 55, vn: 1, vs: 15, vx: 15 }));
+  assert.strictEqual(rFace.focusEvents.length, 1, 'wajah tak terlihat naik = kabar baru');
+  const kabarFace = TS.inboxText(Object.assign({ at: Date.now() }, rFace.focusEvents[0]));
+  assert.ok(/wajah tak terlihat/i.test(kabarFace), 'kabar menyebut fakta wajah tak terlihat: ' + kabarFace);
 
   // Kabar generik tidak boleh lahir bersama peringatan untuk murid yang sama — dulu ia yang
   // terbaca duluan di kotak masuk, dan peringatannya tertutup.
