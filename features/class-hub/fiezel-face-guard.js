@@ -70,65 +70,31 @@
    */
   function detectScreenArtifacts(d, w, h, Ygrid, minX, maxX, minY, maxY, cX, cY, eyeDip) {
     var glareCount = 0;
+    var boxW = (maxX - minX) + 1;
+    var boxH = (maxY - minY) + 1;
+    var boxArea = boxW * boxH;
 
     for (var y = minY; y <= maxY; y++) {
       for (var x = minX; x <= maxX; x++) {
         var idx = (y * w + x) * 4;
         var r = d[idx], g = d[idx + 1], b = d[idx + 2];
 
-        // Glass Specular Glare: pantulan lampu pada kaca HP / laptop
-        // R, G, B > 230 dengan saturasi mendekati nol (|R-G| <= 12, |G-B| <= 12, |R-B| <= 12)
-        if (r > 230 && g > 230 && b > 230 && Math.abs(r - g) <= 12 && Math.abs(g - b) <= 12 && Math.abs(r - b) <= 12) {
+        // Glass Specular Glare: pantulan lampu intensif pada kaca layar HP / laptop
+        // R, G, B > 235 dengan saturasi mendekati nol (|R-G| <= 10, |G-B| <= 10, |R-B| <= 10)
+        if (r > 235 && g > 235 && b > 235 && Math.abs(r - g) <= 10 && Math.abs(g - b) <= 10 && Math.abs(r - b) <= 10) {
           glareCount++;
         }
       }
     }
 
-    var hasGlassGlare = (glareCount >= 5);
-
-    // Cari nilai luminansi minimum pada rongga mata (hanya jika ada fitur mata)
-    var eyeDarkMin = 255, totalEyePixels = 0;
-    var eyeY1 = Math.max(0, cY - 5), eyeY2 = Math.min(h - 1, cY + 1);
-    for (var ey = eyeY1; ey <= eyeY2; ey++) {
-      for (var ex = Math.max(0, cX - 10); ex <= Math.min(w - 1, cX + 10); ex++) {
-        var yLum = Ygrid[ey * w + ex];
-        if (yLum < eyeDarkMin) eyeDarkMin = yLum;
-        totalEyePixels++;
-      }
-    }
-
-    // Backlight Bleed pada layar LCD: jika mata terdeteksi nyata (eyeDip >= 1.5),
-    // tapi rongga mata tidak bisa hitam pekat (eyeDarkMin > 52 pada ruangan normal/terang)
-    var hasBacklightBleed = (eyeDip >= 1.5 && eyeDarkMin > 52 && totalEyePixels > 0);
-
-    // Moiré / Subpixel Aliasing pada Pipi murni (cY + 4 s.d. cY + 9)
-    var chkLapSum = 0, chkLapCount = 0;
-    var cy1 = Math.min(h - 2, cY + 4), cy2 = Math.min(h - 2, cY + 9);
-    var cx1L = Math.max(1, cX - 10), cx2L = Math.max(1, cX - 4);
-    var cx1R = Math.min(w - 2, cX + 4), cx2R = Math.min(w - 2, cX + 10);
-
-    for (var cy = cy1; cy <= cy2; cy++) {
-      for (var cx = cx1L; cx <= cx2L; cx++) {
-        var center = Ygrid[cy * w + cx];
-        var lap = Math.abs(4 * center - Ygrid[cy * w + (cx - 1)] - Ygrid[cy * w + (cx + 1)] - Ygrid[(cy - 1) * w + cx] - Ygrid[(cy + 1) * w + cx]);
-        chkLapSum += lap;
-        chkLapCount++;
-      }
-      for (var cx = cx1R; cx <= cx2R; cx++) {
-        var center = Ygrid[cy * w + cx];
-        var lap = Math.abs(4 * center - Ygrid[cy * w + (cx - 1)] - Ygrid[cy * w + (cx + 1)] - Ygrid[(cy - 1) * w + cx] - Ygrid[(cy + 1) * w + cx]);
-        chkLapSum += lap;
-        chkLapCount++;
-      }
-    }
-    var avgCheekLap = chkLapCount > 0 ? (chkLapSum / chkLapCount) : 0;
-    var hasMoire = (avgCheekLap > 15.0);
+    // Glare kaca layar: pantulan cermin kaca layar menutupi area signifikan (>= 25 px dan >= 7% area wajah)
+    var hasGlassGlare = (glareCount >= 25 && boxArea > 0 && (glareCount / boxArea) >= 0.07);
 
     return {
-      isScreen: hasGlassGlare || hasBacklightBleed || hasMoire,
+      isScreen: hasGlassGlare,
       hasGlassGlare: hasGlassGlare,
-      hasBacklightBleed: hasBacklightBleed,
-      hasMoire: hasMoire
+      hasBacklightBleed: false,
+      hasMoire: false
     };
   }
 
@@ -194,7 +160,7 @@
     }
     dipVar /= (temporalHistory.length - 1);
 
-    var isStatic = (timeSpan >= 1800 && avgMae < STATIC_PHOTO_MAX_MAE && dipVar < 0.08);
+    var isStatic = (timeSpan >= 4500 && avgMae < 0.25 && dipVar < 0.03);
 
     var asymChange = 0;
     var maxDx = 0, maxDy = 0;
@@ -207,7 +173,7 @@
       if (dy > maxDy) maxDy = dy;
     }
 
-    var isRigidWobble = (timeSpan >= 1800 && (maxDx >= 1.0 || maxDy >= 1.0) && asymChange < 1.0 && dipVar < 0.05);
+    var isRigidWobble = (timeSpan >= 4500 && (maxDx >= 1.0 || maxDy >= 1.0) && asymChange < 0.8 && dipVar < 0.02);
 
     return {
       isStatic: isStatic,
@@ -263,24 +229,33 @@
           // 2. Di ruangan redup (yLum < 60), kamera mereduksi perbedaan warna, sehingga R >= B + 4.
           // 3. Di pencahayaan normal (yLum >= 60), R >= B + 10 dan R > G.
           // 4. Sumber cahaya silau / lampu jenuh (R, G, B > 235) ditolak mutlak dari hitungan kulit.
-          var isPureLightGlare = (r > 235 && g > 235 && b > 235);
+          var isPureLightGlare = (r > 240 && g > 240 && b > 240);
           var isSkin = false;
 
-          if (!isPureLightGlare && cb >= 75 && cb <= 140 && cr >= 125 && cr <= 185 && r > g) {
+          // Model kromatisitas kulit manusia adaptif:
+          // 1. Manusia asli memiliki melanin & hemoglobin (Cr > Cb).
+          //    Lampu putih, neon, daylight, kertas putih, dan dinding putih memiliki Cr ~ 128, Cb ~ 128 (Cr - Cb < 4).
+          // 2. Di ruangan redup (yLum < 60), sensor kamera mengompresi warna (r >= b + 2).
+          // 3. Di pencahayaan normal (yLum >= 60), r >= b + 3, (r + 4) >= g, cr - cb >= 4, dan normB <= 0.33.
+          // 4. Kecerahan kulit normal dibatasi yLum <= 215 (lampu senter/bohlam > 220 ditolak).
+          if (!isPureLightGlare && cb >= 70 && cb <= 145 && cr >= 125 && cr <= 185) {
+            var crCbDiff = cr - cb;
             if (yLum < 60) {
               isSkin = (
-                (r - g) >= 1 &&
-                r >= (b + 4) &&
-                normB <= 0.33 &&
-                yLum >= 10
+                r >= (b + 2) &&
+                (r + 3) >= g &&
+                crCbDiff >= 2 &&
+                normB <= 0.35 &&
+                yLum >= 8
               );
             } else {
               isSkin = (
-                (r - g) >= 3 &&
-                r >= (b + 10) &&
-                normR >= 0.34 &&
-                normB <= 0.31 &&
-                yLum <= 240
+                r >= (b + 3) &&
+                (r + 4) >= g &&
+                crCbDiff >= 4 &&
+                normR >= 0.33 &&
+                normB <= 0.33 &&
+                yLum <= 215
               );
             }
           }
@@ -304,7 +279,8 @@
 
       var avgBr = totalY / (w * h);
       var contrastRange = maxBr - minBr;
-      var centerSkinRatio = centerTotal > 0 ? (centerSkin / centerTotal) : 0;
+      var centerFillFraction = centerTotal > 0 ? (centerSkin / centerTotal) : 0;
+      var skinInCenterFraction = skinCount > 0 ? (centerSkin / skinCount) : 0;
 
       // 1. Kamera tertutup rapat (hitam / gelap pekat)
       if (avgBr < 8) return { present: false, isSpoof: false, reason: 'camera_covered' };
@@ -312,24 +288,24 @@
       // 2. Silau ekstrem tanpa kontras (disorot lampu tembak tanpa wajah)
       if (avgBr > 245 && contrastRange < 10) return { present: false, isSpoof: false, reason: 'blinding_glare' };
 
-      // 3. Jumlah piksel kulit wajar (ruang redup toleran >= 50, normal >= 70)
-      var minSkinReq = avgBr < 40 ? 50 : 70;
-      if (skinCount < minSkinReq || skinCount > 2200) return { present: false, isSpoof: false, reason: 'skin_count_out_of_range' };
+      // 3. Jumlah piksel kulit wajar (ruang redup toleran >= 30, normal >= 40)
+      var minSkinReq = avgBr < 40 ? 30 : 40;
+      if (skinCount < minSkinReq || skinCount > 2400) return { present: false, isSpoof: false, reason: 'skin_count_out_of_range' };
 
-      // 4. Konsentrasi kulit di tengah
-      if (centerSkinRatio < 0.12) return { present: false, isSpoof: false, reason: 'not_centered' };
+      // 4. Konsentrasi kulit di tengah: minimal 35% kulit berada di dalam kotak pemandu tengah
+      if (skinInCenterFraction < 0.35) return { present: false, isSpoof: false, reason: 'not_centered' };
 
       // 5. Centroid posisi wajah harus di area tengah
       var cX = Math.round(sumX / skinCount);
       var cY = Math.round(sumY / skinCount);
-      if (cX < 12 || cX > 52 || cY < 8 || cY > 40) return { present: false, isSpoof: false, reason: 'centroid_out_of_bounds' };
+      if (cX < 10 || cX > 54 || cY < 6 || cY > 42) return { present: false, isSpoof: false, reason: 'centroid_out_of_bounds' };
 
       // 6. Bounding box & proporsi oval wajah
       var boxW = (maxX - minX) + 1;
       var boxH = (maxY - minY) + 1;
-      if (boxW < 10 || boxH < 10) return { present: false, isSpoof: false, reason: 'box_too_small' };
+      if (boxW < 8 || boxH < 8) return { present: false, isSpoof: false, reason: 'box_too_small' };
       var aspect = boxH / boxW;
-      if (aspect < 0.60 || aspect > 2.8) return { present: false, isSpoof: false, reason: 'aspect_ratio_invalid' };
+      if (aspect < 0.50 || aspect > 3.0) return { present: false, isSpoof: false, reason: 'aspect_ratio_invalid' };
 
       // 7. Hitung gradien tekstur mikro di area wajah
       var gradSum = 0, gradCount = 0, maxLocalGrad = 0;
@@ -389,8 +365,8 @@
       var asym = Math.abs(eLAvg - eRAvg);
 
       // Penolakan permukaan datar / lampu / meja / telapak tangan:
-      // Lampu terang atau permukaan datar memiliki eyeDip mendekati nol atau negatif
-      if ((centerSkinRatio > 0.85 || avgBr > 130) && eyeDip < 0.6) {
+      // Lampu terang (avgBr > 110) atau cahaya datar yang mendominasi tengah (> 80%) tanpa rongga mata
+      if ((centerFillFraction > 0.80 || avgBr > 110) && eyeDip < 0.4) {
         return { present: false, isSpoof: false, reason: 'flat_light_or_surface' };
       }
 
@@ -705,15 +681,19 @@
 
     var frameRes = analyzeFrame(vid, cvs, c, null);
     if (!frameRes.present) {
-      liveness.calibrated = false;
-      liveness.calibTicks = 0;
-      liveness.eyeDips = [];
-      liveness.blinkClosing = false;
+      liveness.absentTicks = (liveness.absentTicks || 0) + 1;
+      if (liveness.absentTicks >= 6) {
+        liveness.calibrated = false;
+        liveness.calibTicks = 0;
+        liveness.eyeDips = [];
+        liveness.blinkClosing = false;
+      }
       if (frameRes.isSpoof) {
         return { stage: 'spoof_detected', ok: false, reason: frameRes.reason };
       }
       return { stage: 'no_face', ok: false };
     }
+    liveness.absentTicks = 0;
 
     if (liveness.verified) {
       return { stage: 'verified', ok: true, blinkCount: liveness.blinkCount, turn: liveness.turnDetected };
