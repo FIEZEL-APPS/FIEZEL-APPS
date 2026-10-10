@@ -354,6 +354,149 @@
     }
   }
 
+  var liveness = {
+    calibrated: false,
+    calibTicks: 0,
+    eyeDips: [],
+    baselineEyeDip: 0,
+    baselineCentroidX: 32,
+    blinkClosing: false,
+    blinkCloseStart: 0,
+    blinkCount: 0,
+    turnDetected: false,
+    verified: false
+  };
+
+  function resetLiveness() {
+    liveness.calibrated = false;
+    liveness.calibTicks = 0;
+    liveness.eyeDips = [];
+    liveness.baselineEyeDip = 0;
+    liveness.baselineCentroidX = 32;
+    liveness.blinkClosing = false;
+    liveness.blinkCloseStart = 0;
+    liveness.blinkCount = 0;
+    liveness.turnDetected = false;
+    liveness.verified = false;
+  }
+
+  function isLivenessVerified() {
+    return !!liveness.verified;
+  }
+
+  /**
+   * Deteksi Kehidupan Biometrik Aktif (Active Liveness Verification).
+   * Menantang pengguna melakukan kedipan mata atau tolehan kepala kecil secara interaktif.
+   * Menolak mutlak foto cetak, foto diam di HP lain, atau video beku.
+   */
+  function checkLiveness(video, canvas, ctx) {
+    var vid = video || state.videoEl;
+    var cvs = canvas || state.canvasEl;
+    var c = ctx || state.ctx;
+    if (!vid || !cvs || !c) return { stage: 'no_face', ok: false };
+    if (vid.readyState < 2) return { stage: 'no_face', ok: false };
+
+    var isPresent = fallbackCheck(vid, cvs, c);
+    if (!isPresent) {
+      liveness.calibrated = false;
+      liveness.calibTicks = 0;
+      liveness.eyeDips = [];
+      liveness.blinkClosing = false;
+      return { stage: 'no_face', ok: false };
+    }
+
+    if (liveness.verified) {
+      return { stage: 'verified', ok: true, blinkCount: liveness.blinkCount, turn: liveness.turnDetected };
+    }
+
+    try {
+      var w = 64, h = 48;
+      var imgData = c.getImageData(0, 0, w, h);
+      var d = imgData.data;
+
+      var fSum = 0, fCount = 0;
+      var eSum = 0, eCount = 0;
+      var cSum = 0, cCount = 0;
+      var sumX = 0, skinCount = 0;
+
+      for (var y = 10; y < 40; y++) {
+        for (var x = 12; x < 52; x++) {
+          var idx = (y * w + x) * 4;
+          var r = d[idx], g = d[idx + 1], b = d[idx + 2];
+          var yLum = 0.299 * r + 0.587 * g + 0.114 * b;
+          var cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b;
+          var cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b;
+
+          var isSkin = (cb >= 75 && cb <= 130 && cr >= 133 && cr <= 175 && r > g && r > b);
+          if (isSkin) {
+            sumX += x;
+            skinCount++;
+          }
+
+          if (x >= 22 && x <= 42) {
+            if (y >= 12 && y <= 18) { fSum += yLum; fCount++; }
+            else if (y >= 20 && y <= 26) { eSum += yLum; eCount++; }
+            else if (y >= 28 && y <= 34) { cSum += yLum; cCount++; }
+          }
+        }
+      }
+
+      if (skinCount < 80 || fCount === 0 || eCount === 0 || cCount === 0) {
+        return { stage: 'no_face', ok: false };
+      }
+
+      var fAvg = fSum / fCount;
+      var eAvg = eSum / eCount;
+      var cAvg = cSum / cCount;
+      var eyeDip = (fAvg - eAvg) + (cAvg - eAvg);
+      var centroidX = sumX / skinCount;
+      var now = Date.now();
+
+      if (!liveness.calibrated) {
+        liveness.eyeDips.push(eyeDip);
+        liveness.calibTicks++;
+        if (liveness.calibTicks >= 2) {
+          var sumD = 0;
+          for (var i = 0; i < liveness.eyeDips.length; i++) sumD += liveness.eyeDips[i];
+          liveness.baselineEyeDip = sumD / liveness.eyeDips.length;
+          liveness.baselineCentroidX = centroidX;
+          liveness.calibrated = true;
+        }
+        return { stage: 'aligning', ok: true };
+      }
+
+      var curDip = eyeDip;
+      var baseDip = liveness.baselineEyeDip;
+      if (baseDip >= 10) {
+        if (curDip <= baseDip * 0.45) {
+          if (!liveness.blinkClosing) {
+            liveness.blinkClosing = true;
+            liveness.blinkCloseStart = now;
+          }
+        } else if (liveness.blinkClosing && curDip >= baseDip * 0.75) {
+          var dur = now - liveness.blinkCloseStart;
+          if (dur >= 60 && dur <= 900) {
+            liveness.blinkCount++;
+          }
+          liveness.blinkClosing = false;
+        }
+      }
+
+      if (Math.abs(centroidX - liveness.baselineCentroidX) >= 4.0) {
+        liveness.turnDetected = true;
+      }
+
+      if (liveness.blinkCount >= 1 || liveness.turnDetected) {
+        liveness.verified = true;
+        return { stage: 'verified', ok: true, blinkCount: liveness.blinkCount, turn: liveness.turnDetected };
+      }
+
+      return { stage: 'challenge', ok: true, blinkCount: liveness.blinkCount };
+    } catch (_) {
+      return { stage: 'no_face', ok: false };
+    }
+  }
+
   function verifyPresence() {
     if (!state.active || !state.videoEl || state.videoEl.readyState < 2) return false;
     return fallbackCheck(state.videoEl, state.canvasEl, state.ctx);
@@ -378,6 +521,9 @@
     verifyPresence: verifyPresence,
     checkNow: checkNow,
     fallbackCheck: fallbackCheck,
+    checkLiveness: checkLiveness,
+    resetLiveness: resetLiveness,
+    isLivenessVerified: isLivenessVerified,
     SAMPLE_INTERVAL_MS: SAMPLE_INTERVAL_MS,
     WARN_THRESHOLD_MS: WARN_THRESHOLD_MS,
     ABSENT_THRESHOLD_MS: ABSENT_THRESHOLD_MS

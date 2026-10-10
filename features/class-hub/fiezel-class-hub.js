@@ -2058,12 +2058,17 @@
     var isScanning = st === 'scanning';
     var isStarting = st === 'starting';
     var isErr = st === 'error' || st === 'timeout';
+    var isChallenge = isScanning && pf.step === 'challenge';
 
     var statusHtml = '';
     if (isVerified) {
       statusHtml = '<div class="ch-preflight-status-row is-verified" data-testid="class-face-status-verified">' +
         '<span class="ch-preflight-status-badge is-verified">' + icon('check-circle') + ' ' + esc(t('proctor.verifikasi-sukses', 'Wajah Terverifikasi!')) + '</span>' +
-        '<p class="ch-muted ch-small">' + esc(t('proctor.verifikasi-sukses-sub', 'Kamera siap menjaga integritas ujianmu. Silakan mulai pengerjaan.')) + '</p>' +
+        '<p class="ch-muted ch-small">' + esc(t('proctor.verifikasi-liveness-sukses', 'Wajah Hidup Terverifikasi')) + ' · ' + esc(t('proctor.verifikasi-sukses-sub', 'Kamera siap menjaga integritas ujianmu. Silakan mulai pengerjaan.')) + '</p>' +
+      '</div>';
+    } else if (isChallenge) {
+      statusHtml = '<div class="ch-preflight-status-row is-challenge" data-testid="class-face-status-challenge">' +
+        '<span class="ch-preflight-status-badge is-challenge"><span class="ch-face-live-dot"></span> ' + icon('eye') + ' ' + esc(t('proctor.verifikasi-liveness-panduan', 'Langkah 2/2: Kedipkan matamu perlahan atau tolehkan kepalamu')) + '</span>' +
       '</div>';
     } else if (isScanning) {
       statusHtml = '<div class="ch-preflight-status-row is-scanning" data-testid="class-face-status-scanning">' +
@@ -2089,8 +2094,13 @@
         icon('play') + ' ' + esc(t('proctor.verifikasi-btn-lanjut', 'Mulai Kerjakan Ujian')) + ' ' + icon('arrow-right') +
       '</button>';
     } else if (isStarting || isScanning) {
+      var scanLabel = isStarting
+        ? esc(t('proctor.verifikasi-menghubungkan', 'Menghubungkan kamera...'))
+        : isChallenge
+          ? esc(t('proctor.verifikasi-liveness-panduan', 'Langkah 2/2: Kedipkan matamu perlahan atau tolehkan kepalamu'))
+          : esc(t('proctor.verifikasi-memindai', 'Memindai wajah...'));
       actionsHtml = '<button type="button" class="ch-btn is-primary ch-btn-lg is-loading" disabled data-testid="btn-verify-face-loading">' +
-        icon('refresh-cw') + ' ' + (isStarting ? esc(t('proctor.verifikasi-menghubungkan', 'Menghubungkan kamera...')) : esc(t('proctor.verifikasi-memindai', 'Memindai wajah...'))) +
+        icon(isChallenge ? 'eye' : 'refresh-cw') + ' ' + scanLabel +
       '</button>';
     } else if (isErr) {
       actionsHtml = '<div class="ch-actions ch-col-actions">' +
@@ -2116,7 +2126,7 @@
         '<div class="ch-preflight-badge">' + icon('shield-check') + ' ' + esc(t('proctor.verifikasi-kicker', 'Verifikasi Wajah & Kamera Ujian')) + '</div>' +
         '<h2 class="ch-preflight-title">' + esc(a.title || t('proctor.verifikasi-judul', 'Verifikasi Wajah Sebelum Mulai')) + '</h2>' +
         '<p class="ch-preflight-desc">' + esc(t('proctor.verifikasi-desc', 'Pastikan wajahmu terlihat jelas di kamera depan, pencahayaan cukup, dan tidak memakai masker/penutup wajah. Kamera akan menjaga integritas ujianmu secara otomatis.')) + '</p>' +
-        '<div class="ch-face-verify-box' + (isVerified ? ' is-verified' : isScanning ? ' is-scanning' : isErr ? ' is-error' : '') + '" data-testid="class-face-preview-box">' +
+        '<div class="ch-face-verify-box' + (isVerified ? ' is-verified' : isChallenge ? ' is-challenge' : isScanning ? ' is-scanning' : isErr ? ' is-error' : '') + '" data-testid="class-face-preview-box">' +
           '<video class="ch-face-preview-video" data-face-preview data-testid="class-face-preview-video" autoplay playsinline muted></video>' +
           '<div class="ch-face-oval-guide"></div>' +
           (!isScanning && !isVerified ? '<div class="ch-face-placeholder">' + icon('camera') + '</div>' : '') +
@@ -2226,6 +2236,7 @@
       case 'start-face-verify': {
         var a = currentAssignment(); if (!a) return;
         var face = FaceG(); if (!face) return;
+        if (typeof face.resetLiveness === 'function') face.resetLiveness();
         u.facePreflight = { status: 'starting' };
         renderStudent();
         face.start(faceGuardOptions()).then(function (res) {
@@ -2234,7 +2245,7 @@
             renderStudent();
             return;
           }
-          ui().facePreflight = { status: 'scanning', passes: 0 };
+          ui().facePreflight = { status: 'scanning', passes: 0, step: 'align' };
           renderStudent();
           var pVid = sEl ? sEl.querySelector('[data-face-preview]') : null;
           if (pVid && face.attachPreview) face.attachPreview(pVid);
@@ -2247,18 +2258,40 @@
               return;
             }
             pollCount++;
-            var ok = face.checkNow ? face.checkNow() : false;
-            if (ok) consecutivePasses++;
-            else consecutivePasses = 0;
 
-            if (consecutivePasses >= 1) {
-              if (verifyTimer) clearInterval(verifyTimer);
-              cu.facePreflight = { status: 'verified' };
-              renderStudent();
-              var pVid2 = sEl ? sEl.querySelector('[data-face-preview]') : null;
-              if (pVid2 && face.attachPreview) face.attachPreview(pVid2);
-              if (sEnv.toast) sEnv.toast(t('proctor.verifikasi-sukses-toast', 'Wajah terverifikasi! Kamera siap menjaga ujianmu.'));
-            } else if (pollCount >= 60) {
+            if (typeof face.checkLiveness === 'function') {
+              var live = face.checkLiveness();
+              if (live && live.stage === 'verified') {
+                if (verifyTimer) clearInterval(verifyTimer);
+                cu.facePreflight = { status: 'verified', step: 'verified' };
+                renderStudent();
+                var pVid2 = sEl ? sEl.querySelector('[data-face-preview]') : null;
+                if (pVid2 && face.attachPreview) face.attachPreview(pVid2);
+                if (sEnv.toast) sEnv.toast(t('proctor.verifikasi-sukses-toast', 'Wajah terverifikasi! Kamera siap menjaga ujianmu.'));
+                return;
+              } else if (live && live.stage === 'challenge' && cu.facePreflight.step !== 'challenge') {
+                cu.facePreflight.step = 'challenge';
+                renderStudent();
+                var pVidC = sEl ? sEl.querySelector('[data-face-preview]') : null;
+                if (pVidC && face.attachPreview) face.attachPreview(pVidC);
+              }
+            } else {
+              var ok = face.checkNow ? face.checkNow() : false;
+              if (ok) consecutivePasses++;
+              else consecutivePasses = 0;
+
+              if (consecutivePasses >= 1) {
+                if (verifyTimer) clearInterval(verifyTimer);
+                cu.facePreflight = { status: 'verified', step: 'verified' };
+                renderStudent();
+                var pVid2 = sEl ? sEl.querySelector('[data-face-preview]') : null;
+                if (pVid2 && face.attachPreview) face.attachPreview(pVid2);
+                if (sEnv.toast) sEnv.toast(t('proctor.verifikasi-sukses-toast', 'Wajah terverifikasi! Kamera siap menjaga ujianmu.'));
+                return;
+              }
+            }
+
+            if (pollCount >= 75) {
               if (verifyTimer) clearInterval(verifyTimer);
               cu.facePreflight = { status: 'error', reason: 'face_not_detected' };
               renderStudent();

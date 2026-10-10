@@ -483,6 +483,94 @@ test('face-guard: modal ramah popup instan saat wajah tak terdeteksi dan auto-di
   assert.ok(!sEl.innerHTML.includes('class-face-alert-modal'), 'modal otomatis tertutup saat wajah terdeteksi kembali');
 });
 
+test('face-guard: active liveness menolak foto statis dan meluluskan kedip mata / toleh kepala', () => {
+  const FaceGuard = require('../features/class-hub/fiezel-face-guard.js');
+  assert.ok(typeof FaceGuard.checkLiveness === 'function');
+  assert.ok(typeof FaceGuard.resetLiveness === 'function');
+
+  function makeFaceCanvas(opts) {
+    const w = 64, h = 48;
+    const { eyesOpen = true, shiftX = 0 } = opts || {};
+    const data = new Uint8ClampedArray(w * h * 4);
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const idx = (y * w + x) * 4;
+        const adjustedX = x - shiftX;
+        if (adjustedX >= 18 && adjustedX <= 46 && y >= 12 && y <= 36) {
+          if (y >= 20 && y <= 26 && adjustedX >= 22 && adjustedX <= 42) {
+            if (eyesOpen) {
+              data[idx] = 40; data[idx + 1] = 30; data[idx + 2] = 25;
+            } else {
+              data[idx] = 180; data[idx + 1] = 130; data[idx + 2] = 100;
+            }
+          } else {
+            data[idx] = 180; data[idx + 1] = 130; data[idx + 2] = 100;
+          }
+        } else {
+          data[idx] = 80; data[idx + 1] = 85; data[idx + 2] = 90;
+        }
+        data[idx + 3] = 255;
+      }
+    }
+    const ctx = {
+      drawImage() {},
+      getImageData: () => ({ data })
+    };
+    const video = { readyState: 2 };
+    const cvs = { width: w, height: h };
+    return { video, cvs, ctx };
+  }
+
+  // 1. Uji Foto Statis (kamera melihat foto/kertas cetak diam)
+  FaceGuard.resetLiveness();
+  const staticPhoto = makeFaceCanvas({ eyesOpen: true, shiftX: 0 });
+
+  // Panggilan ke-1 & ke-2: kalibrasi baseline (aligning)
+  let res1 = FaceGuard.checkLiveness(staticPhoto.video, staticPhoto.cvs, staticPhoto.ctx);
+  assert.strictEqual(res1.stage, 'aligning');
+  let res2 = FaceGuard.checkLiveness(staticPhoto.video, staticPhoto.cvs, staticPhoto.ctx);
+  assert.strictEqual(res2.stage, 'aligning');
+
+  // Panggilan ke-3 sampai ke-10: foto statis tidak berkedip dan tidak menoleh -> TETAP di stage challenge
+  for (let i = 0; i < 8; i++) {
+    let res = FaceGuard.checkLiveness(staticPhoto.video, staticPhoto.cvs, staticPhoto.ctx);
+    assert.strictEqual(res.stage, 'challenge', 'foto statis harus tertahan di stage challenge');
+    assert.strictEqual(res.ok, true);
+  }
+  assert.strictEqual(FaceGuard.isLivenessVerified(), false, 'foto statis tidak boleh lolos liveness');
+
+  // 2. Uji Kedip Mata Manusia
+  FaceGuard.resetLiveness();
+  const openFace = makeFaceCanvas({ eyesOpen: true });
+  const closedFace = makeFaceCanvas({ eyesOpen: false });
+
+  FaceGuard.checkLiveness(openFace.video, openFace.cvs, openFace.ctx);
+  FaceGuard.checkLiveness(openFace.video, openFace.cvs, openFace.ctx);
+  let rC = FaceGuard.checkLiveness(openFace.video, openFace.cvs, openFace.ctx);
+  assert.strictEqual(rC.stage, 'challenge');
+
+  FaceGuard.checkLiveness(closedFace.video, closedFace.cvs, closedFace.ctx);
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      let rBlink = FaceGuard.checkLiveness(openFace.video, openFace.cvs, openFace.ctx);
+      assert.strictEqual(rBlink.stage, 'verified', 'kedipan mata biologis harus meluluskan verifikasi liveness');
+      assert.strictEqual(FaceGuard.isLivenessVerified(), true);
+
+      // 3. Uji Toleh Kepala
+      FaceGuard.resetLiveness();
+      const centerFace = makeFaceCanvas({ eyesOpen: true, shiftX: 0 });
+      const turnedFace = makeFaceCanvas({ eyesOpen: true, shiftX: 5 });
+
+      FaceGuard.checkLiveness(centerFace.video, centerFace.video, centerFace.ctx);
+      FaceGuard.checkLiveness(centerFace.video, centerFace.video, centerFace.ctx);
+      let rTurn = FaceGuard.checkLiveness(turnedFace.video, turnedFace.video, turnedFace.ctx);
+      assert.strictEqual(rTurn.stage, 'verified', 'toleh kepala harus meluluskan verifikasi liveness');
+      assert.strictEqual(rTurn.turn, true);
+      resolve();
+    }, 100);
+  });
+});
+
 test('face-guard: tahapan verifikasi wajah (preflight) sebelum mulai ujian', async () => {
   const Hub = globalThis.FiezelClassHub, TS = globalThis.FiezelTeacherStore, Bank = globalThis.FiezelReviewBank;
   assert.ok(Hub && TS && Bank);
@@ -491,15 +579,25 @@ test('face-guard: tahapan verifikasi wajah (preflight) sebelum mulai ujian', asy
 
   const origFaceG = globalThis.FiezelFaceGuard;
   const mockStream = { getTracks: () => [{ stop: () => {} }] };
+  let livenessStep = 'challenge';
   globalThis.FiezelFaceGuard = {
     isSupported: () => true,
     isActive: () => true,
     start: async () => ({ ok: true, stream: mockStream }),
     stop: () => {},
+    resetLiveness: () => { livenessStep = 'challenge'; },
+    isLivenessVerified: () => livenessStep === 'verified',
     getStream: () => mockStream,
     attachPreview: () => {},
     verifyPresence: async () => ({ present: true }),
     checkNow: () => true,
+    checkLiveness: () => {
+      if (livenessStep === 'challenge') {
+        livenessStep = 'verified';
+        return { stage: 'challenge', ok: true };
+      }
+      return { stage: 'verified', ok: true, blinkCount: 1 };
+    },
     checkFace: () => ({ present: true, ratio: 0.15 })
   };
 
@@ -523,7 +621,7 @@ test('face-guard: tahapan verifikasi wajah (preflight) sebelum mulai ujian', asy
     sEl.fire('click', btnScan);
 
     // Tunggu proses start + verifyPresence async
-    await new Promise((r) => setTimeout(r, 60));
+    await new Promise((r) => setTimeout(r, 600));
     Hub.renderStudent();
 
     assert.strictEqual(u.facePreflight.status, 'verified', 'wajah terverifikasi di preflight');

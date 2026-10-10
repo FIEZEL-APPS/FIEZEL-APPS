@@ -1,7 +1,7 @@
 {
-  "version": "m025-549",
-  "claimedBy": "branch feat/realtime-face-cv-m025-549",
-  "claimedAt": "2026-10-10T08:43:53.493Z",
-  "reason": "feat(proctor): deteksi wajah real-time responsif dan computer vision autentik (m025-549)",
+  "version": "m025-550",
+  "claimedBy": "branch feat/active-liveness-challenge-m025-550",
+  "claimedAt": "2026-10-10T09:27:54.327Z",
+  "reason": "feat(proctor): verifikasi liveness aktif pra-ujian (kedip mata & toleh kepala) (m025-550)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
