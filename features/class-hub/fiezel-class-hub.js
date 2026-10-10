@@ -936,6 +936,24 @@
     if (sEl) renderStudent();
     if (sEnv.toast) sEnv.toast(t('proctor.kembali-toast', 'Kamu keluar dari layar ujian {n}× ({detik} detik terakhir). Catatannya sudah sampai ke gurumu.', { n: sum.n, detik: Math.round(ep.ms / 1000) }));
   }
+  function playProctorBeep() {
+    try {
+      var AudioCtx = root.AudioContext || root.webkitAudioContext;
+      if (!AudioCtx) return;
+      var ctx = new AudioCtx();
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(440, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(330, ctx.currentTime + 0.18);
+      gain.gain.setValueAtTime(0.12, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.22);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.23);
+    } catch (_) {}
+  }
   function faceGuardOptions() {
     return {
       onAbsent: function (at) {
@@ -952,6 +970,9 @@
             if (typeof navigator !== 'undefined' && navigator.vibrate) {
               navigator.vibrate([100, 50, 100]);
             }
+          } catch (_) {}
+          try {
+            playProctorBeep();
           } catch (_) {}
         }
       },

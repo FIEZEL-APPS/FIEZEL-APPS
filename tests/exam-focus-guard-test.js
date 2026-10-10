@@ -641,6 +641,62 @@ test('face-guard: tahapan verifikasi wajah (preflight) sebelum mulai ujian', asy
   }
 });
 
+test('face-guard: pengawasan mid-exam mendeteksi saat murid menoleh / menjauh dan auto-dismiss saat kembali', async () => {
+  const Hub = globalThis.FiezelClassHub, TS = globalThis.FiezelTeacherStore, Bank = globalThis.FiezelReviewBank;
+  const ids = Bank.pick('past_tense', 3, 7).map((x) => x.id);
+  assert.ok(TS.acceptAssignmentPayload({ v: 1, t: 'assign', id: 'ujian-mid-1', title: 'Ujian mid-exam', skills: ['past_tense'], itemIds: ids, minutes: 10, from: 'Guru', cls: 'FZ-TEST', mode: 'ujian', timer: 10, faceGuard: true }));
+
+  const sEl = { innerHTML: '', _h: {}, addEventListener(t, fn) { (this._h[t] = this._h[t] || []).push(fn); }, querySelector: () => null, fire(t, target) { (this._h[t] || []).forEach((fn) => fn({ target, preventDefault() {} })); } };
+  const senv = { toast: () => {}, go: () => {}, afterRender: () => {} };
+
+  let registeredOptions = null;
+  const mockFaceGuard = {
+    isSupported: () => true,
+    isActive: () => true,
+    isWarning: () => false,
+    start: async (opts) => { registeredOptions = opts; return { ok: true, active: true }; },
+    stop: () => {},
+    checkNow: () => true,
+    resetLiveness: () => {},
+    checkLiveness: () => ({ stage: 'verified', ok: true }),
+    attachPreview: () => true
+  };
+
+  const origFaceG = globalThis.FiezelFaceGuard;
+  globalThis.FiezelFaceGuard = mockFaceGuard;
+
+  try {
+    Hub.mountStudent(sEl, senv);
+    Hub.openAssignment('ujian-mid-1');
+
+    // 1. Lewati preflight
+    const u = Hub._studentUi();
+    u.facePreflight = { status: 'verified', step: 'verified' };
+    const btnProceed = { getAttribute: (k) => (k === 'data-ch' ? 'proceed-exam' : null), closest: (sel) => (sel === '[data-ch]' ? btnProceed : null) };
+    sEl.fire('click', btnProceed);
+    Hub.renderStudent();
+
+    assert.ok(u.runner && u.runner.faceVerified, 'runner aktif');
+    assert.ok(registeredOptions, 'opsi pengawasan face guard terdaftar');
+    assert.strictEqual(u.faceWarn, false, 'awal ujian: modal peringatan belum muncul');
+
+    // 2. Simulasi murid menoleh / menjauh dari layar (callback onWarning dipanggil oleh FaceGuard)
+    assert.ok(typeof registeredOptions.onWarning === 'function', 'onWarning callback tersedia');
+    registeredOptions.onWarning(true);
+
+    assert.strictEqual(u.faceWarn, true, 'ui.faceWarn menjadi true saat murid menoleh / tidak terlihat');
+    assert.ok(sEl.innerHTML.includes('class-face-alert-modal'), 'modal peringatan ramah muncul di layar ujian');
+    assert.ok(sEl.innerHTML.includes('Yuk, Kembali Menghadap Layar!'), 'judul modal ramah tampil');
+
+    // 3. Simulasi murid kembali menghadap layar
+    registeredOptions.onWarning(false);
+    assert.strictEqual(u.faceWarn, false, 'ui.faceWarn kembali false saat wajah terlihat');
+    assert.ok(!sEl.innerHTML.includes('class-face-alert-modal'), 'modal otomatis tertutup tanpa mengganggu ujian');
+  } finally {
+    globalThis.FiezelFaceGuard = origFaceG;
+  }
+});
+
 (async () => {
   let fail = 0;
   for (const [name, fn] of tests) {
