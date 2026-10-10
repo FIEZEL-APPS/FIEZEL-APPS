@@ -1447,31 +1447,38 @@
       '<button type="button" class="ch-card ch-link-card" data-ch="learn" data-testid="class-open-learn"><span class="ch-link-icon">' + icon('route') + '</span><div><b>' + esc(t('kelas.belajar-mandiri', 'Belajar mandiri hari ini')) + '</b><small>' + esc(t('kelas.belajar-mandiri-sub', 'Rencana harian dari peta kemampuanmu — tugas guru ikut masuk ke sana.')) + '</small></div>' + icon('arrow-up-right') + '</button>' +
     '</section>';
 
-    return '<div class="ch-body">' +
-      '<section class="ch-card ch-class-card" data-testid="class-my-class">' +
-        (classCode()
-          ? '<p class="ch-kicker">' + WM + ' ' + esc(t('kelas.terhubung', 'terhubung')) + '</p>' +
-            '<h3>' + esc(className() || '') + (className() ? '' : WM + ' ' + esc(classCode())) + '</h3>' +
-            '<p class="ch-muted">' + esc(t('kelas.kode-label', 'Kode')) + ' ' + WM + ' <b class="ch-mono">' + esc(classCode()) + '</b>' + (teacherName() ? ' · ' + esc(t('kelas.guru', 'Guru')) + ' <b>' + esc(teacherName()) + '</b>' : '') + '</p>' +
-            (rep
-              ? '<p class="ch-muted ch-small">' +
-                  (rep.ok
-                    ? icon('check') + ' ' + esc(t('kelas.laporan-terkirim', 'Laporan terakhir terkirim ke guru')) + ' ' + esc(fmtDate(rep.at))
-                    : icon('clock') + ' ' + esc(t('kelas.laporan-belum-terkirim', 'Laporan terakhir belum terkirim')) + ' (' + esc(rep.error || 'offline') + ') — ' + esc(t('kelas.dikirim-ulang', 'dikirim ulang otomatis saat online.'))) +
-                '</p>'
-              : '') +
-            teacherLine +
-            '<div class="ch-actions">' +
-              '<button type="button" class="ch-btn is-ghost" data-ch="change-code">' + icon('refresh-cw') + ' ' + esc(t('kelas.ganti-kode', 'Ganti kode')) + '</button>' +
-            '</div>'
-          : '<p class="ch-kicker">' + esc(t('kelas.gabung', 'Gabung')) + ' ' + WM + '</p>' +
-            '<h3><span class="kelasku-wordmark">' + esc(t('kelas.masukkan-kode', 'Masukkan kode dari KelasKu')) + '</span></h3>' +
-            '<p class="ch-muted">' + esc(t('kelas.kode-jelas', 'Kode berbentuk FZ-XXXXXX. Setelah tergabung, tugas guru masuk otomatis dan hasilmu kembali ke guru.')) + '</p>') +
-        (!classCode() || ui().editCode
+    var classSection = '';
+    if (classCode()) {
+      classSection = '<section class="ch-card ch-class-card" data-testid="class-my-class">' +
+        '<p class="ch-kicker">' + WM + ' ' + esc(t('kelas.terhubung', 'terhubung')) + '</p>' +
+        '<h3>' + esc(className() || '') + (className() ? '' : WM + ' ' + esc(classCode())) + '</h3>' +
+        '<p class="ch-muted">' + esc(t('kelas.kode-label', 'Kode')) + ' ' + WM + ' <b class="ch-mono">' + esc(classCode()) + '</b>' + (teacherName() ? ' · ' + esc(t('kelas.guru', 'Guru')) + ' <b>' + esc(teacherName()) + '</b>' : '') + '</p>' +
+        (rep
+          ? '<p class="ch-muted ch-small">' +
+              (rep.ok
+                ? icon('check') + ' ' + esc(t('kelas.laporan-terkirim', 'Laporan terakhir terkirim ke guru')) + ' ' + esc(fmtDate(rep.at))
+                : icon('clock') + ' ' + esc(t('kelas.laporan-belum-terkirim', 'Laporan terakhir belum terkirim')) + ' (' + esc(rep.error || 'offline') + ') — ' + esc(t('kelas.dikirim-ulang', 'dikirim ulang otomatis saat online.'))) +
+            '</p>'
+          : '') +
+        teacherLine +
+        '<div class="ch-actions">' +
+          '<button type="button" class="ch-btn is-ghost" data-ch="change-code">' + icon('refresh-cw') + ' ' + esc(t('kelas.ganti-kode', 'Ganti kode')) + '</button>' +
+        '</div>' +
+        (ui().editCode
           ? '<form class="ch-form" data-ch-form="join"><input name="code" value="' + esc(studentDraftCode) + '" placeholder="FZ-ABC234" maxlength="9" autocomplete="off" required data-testid="class-code-input"><button type="submit" class="ch-btn is-primary" data-testid="class-code-submit">' + esc(t('kelas.gabung-btn', 'Gabung')) + '</button></form>'
           : '') +
-      '</section>' +
-      papanSection() +
+      '</section>';
+    } else if (ui().editCode) {
+      classSection = '<section class="ch-card ch-class-card" data-testid="class-my-class">' +
+        '<p class="ch-kicker">' + esc(t('kelas.gabung', 'Gabung')) + ' ' + WM + '</p>' +
+        '<h3><span class="kelasku-wordmark">' + esc(t('kelas.masukkan-kode', 'Masukkan kode dari KelasKu')) + '</span></h3>' +
+        '<p class="ch-muted">' + esc(t('kelas.kode-jelas', 'Kode berbentuk FZ-XXXXXX. Setelah tergabung, tugas guru masuk otomatis dan hasilmu kembali ke guru.')) + '</p>' +
+        '<form class="ch-form" data-ch-form="join"><input name="code" value="' + esc(studentDraftCode) + '" placeholder="FZ-ABC234" maxlength="9" autocomplete="off" required data-testid="class-code-input"><button type="submit" class="ch-btn is-primary" data-testid="class-code-submit">' + esc(t('kelas.gabung-btn', 'Gabung')) + '</button></form>' +
+      '</section>';
+    }
+
+    return '<div class="ch-body">' +
+      classSection +
       linkCards +
     '</div>';
   }
@@ -1550,6 +1557,7 @@
     var weekAvg = weekDone.length ? weekDone.reduce(function (m, s) { return m + (s.t ? s.c / s.t : 0); }, 0) / weekDone.length : null;
 
     return '<div class="ch-body">' +
+      papanSection() +
       braincoreCardMarkup() +
       /* Streak card */
       '<section class="ch-card ch-streak-card" data-testid="class-streak">' +
@@ -1611,10 +1619,11 @@
     { bg: '#F9E3DE', text: '#A03A30' }
   ];
 
-  /* PAPAN KELAS PINDAH KE TAB KELAS (m025-364). Sebagai tab sendiri ia hampir selalu berisi
-     satu nama — murid itu sendiri — karena daftar teman hanya ada di HP guru. Tab kosong
-     yang tampak seperti fitur hanya menambah satu pintu yang harus dicoba murid. Sekarang
-     ia muncul di tab Kelas, dan HANYA bila teman sekelasnya benar-benar ada. */
+  /* PAPAN KELAS LEADERBOARD (tab Papan Kelas / progresView).
+     Ditampilkan pada tab Papan Kelas:
+     - Bila belum terhubung kode kelas: tampilkan kartu ramah ajakan gabung.
+     - Bila terhubung dan ada aktivitas kelas: tampilkan daftar ranking XP minggu ini.
+     - Bila solo: tampilkan skor sendiri + catatan edukatif ramah. */
   function papanSection() {
     var ob = readJson('fiezel-onboarding-v1', {}) || {};
     var myName = ob.name || ob.nama || '';
@@ -1626,6 +1635,25 @@
       return sum + (s.c || 0) * 15 + 10;
     }, 0);
     var myScore = completedScore;
+
+    if (!classCode()) {
+      return '<section class="ch-card ch-papan-card is-unjoined" data-testid="class-papan-unjoined">' +
+        '<div class="ch-card-top">' +
+          '<div>' +
+            '<p class="ch-kicker">' + WM + '</p>' +
+            '<h3 style="font-size:18px;margin:0;">' + esc(t('kelas.papan-kelas', 'Papan Kelas')) + '</h3>' +
+          '</div>' +
+        '</div>' +
+        '<p class="ch-muted ch-small" style="margin-top:6px;">' +
+          esc(t('kelas.papan-unjoined-msg', 'Hubungkan kode kelas dari gurumu untuk melihat papan peringkat teman sekelasmu minggu ini.')) +
+        '</p>' +
+        '<div class="ch-actions" style="margin-top:12px;">' +
+          '<button type="button" class="ch-btn is-primary is-small" onclick="if(window.openJoinClassModal)window.openJoinClassModal();" data-testid="btn-papan-gabung">' +
+            icon('user-plus') + ' ' + esc(t('kelas.gabung-kelas-btn', 'Gabung Kelas Sekarang')) +
+          '</button>' +
+        '</div>' +
+      '</section>';
+    }
 
     var c = activeClass();
     var studentsList = [];
@@ -1645,20 +1673,18 @@
               score += (d.c || 0) * 15 + 10;
             }
           });
-          /* AUDIT 2026-09-22: tidak lagi memakai hash palsu. Skor 0 = belum ada data,
-             jujur lebih baik daripada angka karang. */
         }
         studentsList.push({ name: s.name, score: score, isMe: isMe });
       });
       if (myName && !studentsList.some(function (x) { return x.isMe; })) {
         studentsList.push({ name: myName, score: myScore, isMe: true });
       }
-    } else if (myName && myScore > 0) {
-      /* Kelas belum ada / belum ada teman: tampilkan hanya skor sendiri */
+    } else if (myName) {
+      /* Kelas terhubung tapi belum ada teman / solo */
       studentsList = [{ name: myName, score: myScore, isMe: true }];
     }
 
-    if (!hasRealData || !studentsList.length) return '';
+    if (!studentsList.length) return '';
 
     studentsList.sort(function (a, b) { return b.score - a.score; });
 
@@ -1677,6 +1703,10 @@
     var myRank = 1;
     studentsList.forEach(function (st, idx) { if (st.isMe) myRank = idx + 1; });
 
+    var soloNote = (!hasRealData && studentsList.length === 1)
+      ? '<p class="ch-muted ch-small" style="margin-top:8px;" data-testid="class-papan-solo">' + icon('info') + ' ' + esc(t('kelas.papan-solo-note', 'Belum ada aktivitas teman sekelas minggu ini. Skor tugas pribadimu sudah tercatat!')) + '</p>'
+      : '';
+
     return '<section class="ch-card ch-papan-card" data-testid="class-papan">' +
         '<div class="ch-card-top">' +
           '<div>' +
@@ -1692,6 +1722,7 @@
         '<div class="ch-papan-list" data-testid="class-leaderboard-list">' +
           rowsHtml +
         '</div>' +
+        soloNote +
       '</section>';
   }
 

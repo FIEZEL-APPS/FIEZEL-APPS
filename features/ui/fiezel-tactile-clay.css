@@ -3535,6 +3535,122 @@ html body #app .ch-btn.is-primary:active,
   box-shadow: 0 1px 0 #0F372D !important;
 }
 
+/* 5B. PAPAN KELAS LEADERBOARD & FORM INPUT (Tactile Clay High Contrast WCAG AAA) */
+html body #app .ch-papan-card,
+html body .ch-papan-card,
+.ch-papan-card {
+  background: #FFFFFF !important;
+  border: 1.5px solid #E2E8F0 !important;
+  border-radius: 20px !important;
+  box-shadow: 0 4px 0 #CBD5E1, 0 10px 24px rgba(15, 23, 42, 0.04) !important;
+  padding: 16px !important;
+  color: #0F172A !important;
+  margin-bottom: 12px !important;
+}
+
+html body #app .ch-papan-card h3,
+html body .ch-papan-card h3,
+.ch-papan-card h3 {
+  color: #0F172A !important;
+  font-weight: 800 !important;
+}
+
+html body #app .ch-papan-period,
+html body .ch-papan-period,
+.ch-papan-period {
+  color: #0D9488 !important;
+  font-weight: 700 !important;
+}
+
+html body #app .ch-papan-row,
+html body .ch-papan-row,
+.ch-papan-row {
+  background: #F8FAFC !important;
+  border: 1px solid #E2E8F0 !important;
+  border-radius: 14px !important;
+  padding: 10px 14px !important;
+  margin-bottom: 6px !important;
+  color: #0F172A !important;
+  transition: transform 0.15s ease, background 0.15s ease !important;
+}
+
+html body #app .ch-papan-row.is-me,
+html body .ch-papan-row.is-me,
+.ch-papan-row.is-me {
+  background: #ECFDF5 !important;
+  border: 1.5px solid #A7F3D0 !important;
+  box-shadow: 0 2px 0 #6EE7B7 !important;
+}
+
+html body #app .ch-papan-rank,
+html body .ch-papan-rank,
+.ch-papan-rank {
+  font-weight: 800 !important;
+  font-size: 13px !important;
+  color: #64748B !important;
+}
+
+html body #app .ch-papan-row.is-me .ch-papan-rank,
+html body .ch-papan-row.is-me .ch-papan-rank,
+.ch-papan-row.is-me .ch-papan-rank {
+  color: #059669 !important;
+}
+
+html body #app .ch-papan-name,
+html body .ch-papan-name,
+.ch-papan-name {
+  color: #0F172A !important;
+  font-weight: 700 !important;
+  font-size: 14px !important;
+}
+
+html body #app .ch-papan-row.is-me .ch-papan-name,
+html body .ch-papan-row.is-me .ch-papan-name,
+.ch-papan-row.is-me .ch-papan-name {
+  color: #065F46 !important;
+}
+
+html body #app .ch-papan-badge,
+html body .ch-papan-badge,
+.ch-papan-badge {
+  color: #059669 !important;
+  font-weight: 800 !important;
+}
+
+html body #app .ch-papan-score,
+html body .ch-papan-score,
+.ch-papan-score {
+  color: #0F172A !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  font-weight: 800 !important;
+  font-size: 14px !important;
+}
+
+html body #app .ch-papan-row.is-me .ch-papan-score,
+html body .ch-papan-row.is-me .ch-papan-score,
+.ch-papan-row.is-me .ch-papan-score {
+  color: #059669 !important;
+}
+
+/* Form input in tactile clay */
+html body #app .ch-form input,
+html body .ch-form input,
+.ch-form input {
+  background: #FFFFFF !important;
+  border: 1.5px solid #CBD5E1 !important;
+  color: #0F172A !important;
+  box-shadow: inset 0 2px 4px rgba(15, 23, 42, 0.05) !important;
+  border-radius: 14px !important;
+  padding: 10px 14px !important;
+  font-weight: 700 !important;
+}
+
+html body #app .ch-form input::placeholder,
+html body .ch-form input::placeholder,
+.ch-form input::placeholder {
+  color: #94A3B8 !important;
+}
+
 /* 6. LEVEL CONTROL BANNER: HIGH CONTRAST DARK BADGE WITH YELLOW A1 */
 html body #app .active-level-control,
 .active-level-control {
