@@ -5133,9 +5133,8 @@
           ui.sending = null;
           if (r && r.ok) {
             a.retractedAt = null;
-            toast(targets && targets.length
-              ? t('guru.toast-kirim-banyak', 'Tugas dikirim ke {jumlah} murid — muncul di notifikasi mereka.').replace('{jumlah}', targets.length)
-              : t('guru.toast-otomatis-terkirim', 'Tugas otomatis terkirim ke semua murid di server.'));
+            var count = (targets && targets.length) || (r && r.count) || (c.students || []).length || 'semua';
+            toast(t('guru.toast-kirim-banyak', 'Tugas dikirim ke {jumlah} murid — muncul di notifikasi mereka.').replace('{jumlah}', count));
           }
           persist();
           render();

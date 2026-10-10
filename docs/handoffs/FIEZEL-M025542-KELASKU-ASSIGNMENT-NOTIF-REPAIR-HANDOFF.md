@@ -1,8 +1,8 @@
 # Perbaikan Menyeluruh: Penugasan Guru, Auto-Dispatch, dan Notifikasi KelasKu Murid
 
-**Build:** `m025-542`  
-**Otoritas:** User Request / Anti-Ghost-Deploy Invariant  
-**Tanggal:** 2026-10-10  
+**Build:** `m025-542`
+**Otoritas:** User Request / Anti-Ghost-Deploy Invariant
+**Tanggal:** 2026-10-10
 **Metodologi:** Probe-Driven Empirical Audit (Chromium Headless Playwright) + 5-Subagent Orchestration
 
 ---
