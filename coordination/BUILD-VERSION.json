@@ -1,7 +1,7 @@
 {
-  "version": "m025-543",
-  "claimedBy": "branch fix/kelasku-assignment-notif-delivery",
-  "claimedAt": "2026-10-10T03:05:56.470Z",
-  "reason": "fix(mascot): restore Full HD crystal quality, antialiasing, Retina 2.0 DPR, and 128x96 mesh subdivision for 3D Mochi",
+  "version": "m025-544",
+  "claimedBy": "tidak tercatat (jalankan ulang di dalam git, atau set FIEZEL_BUILD_CLAIMER)",
+  "claimedAt": "2026-10-10T03:10:29.375Z",
+  "reason": "bot(heal): auto-synchronize release boundary",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
