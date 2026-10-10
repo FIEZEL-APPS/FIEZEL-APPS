@@ -1054,7 +1054,7 @@
     /* R8 (SKB AI di pendidikan): tugas LATIHAN dari guru juga dinilai — masuk rekap, rapor KKTP,
        dan analisis butir — jadi AI ikut dikunci selama runner-nya terbuka. Misi yang dipilih
        sendiri murid (isMission) bukan tugas guru dan tetap boleh dibantu AI. */
-    try { if ((isExam || !a.isMission) && root.FiezelExamLock) root.FiezelExamLock.begin('assignment', { id: a.id }); } catch (_) {}
+    try { if ((a.mode === 'ujian' || !a.isMission) && root.FiezelExamLock) root.FiezelExamLock.begin('assignment', { id: a.id }); } catch (_) {}
     saveUi();
     try { LF() && LF().markAssignmentStarted(a.id); } catch (_) {}
     if (isExam) { bindFocus(); } else { unbindFocus(); }
