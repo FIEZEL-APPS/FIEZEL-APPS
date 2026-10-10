@@ -967,18 +967,7 @@
         updateProctorBanner();
       },
       onWarning: function (warn) {
-        var prevWarn = !!ui().faceWarn;
         ui().faceWarn = !!warn;
-        if (warn && !prevWarn) {
-          try {
-            if (typeof navigator !== 'undefined' && navigator.vibrate) {
-              navigator.vibrate([100, 50, 100]);
-            }
-          } catch (_) {}
-          try {
-            playProctorBeep();
-          } catch (_) {}
-        }
         updateProctorBanner();
       },
       onAbsentEpisode: function (elapsed) {
@@ -1116,6 +1105,21 @@
           var pip = fresh.querySelector('[data-face-pip]');
           if (pip) face.attachPreview(pip);
         }
+        var alertCard = typeof sEl.querySelector === 'function' ? sEl.querySelector('[data-testid="class-face-alert-modal"]') : null;
+        if (ui().faceWarn) {
+          if (!alertCard) {
+            var mTemp = document.createElement('div');
+            mTemp.innerHTML = faceAlertModal();
+            var mFresh = mTemp.firstElementChild;
+            if (mFresh && sEl.firstChild) {
+              sEl.insertBefore(mFresh, sEl.firstChild);
+            } else if (mFresh) {
+              sEl.appendChild(mFresh);
+            }
+          }
+        } else if (alertCard && alertCard.parentNode) {
+          alertCard.parentNode.removeChild(alertCard);
+        }
         return;
       }
     }
@@ -1129,15 +1133,15 @@
     // 1. Evaluasi real-time instan status Keluar Layar
     var isLeaveLive = !!(st && st.awaySince);
     var liveLeaveSec = isLeaveLive ? Math.max(1, Math.round((Date.now() - st.awaySince) / 1000)) : 0;
-    var leaveCount = (st ? (st.n || 0) : 0) + (isLeaveLive ? 1 : 0);
-    var leaveTotalSec = (st ? Math.round((st.ms || 0) / 1000) : 0) + (isLeaveLive ? liveLeaveSec : 0);
+    var leaveCount = sum ? sum.n : ((st ? (st.n || 0) : 0) + (isLeaveLive ? 1 : 0));
+    var leaveTotalSec = sum ? Math.round(sum.ms / 1000) : ((st ? Math.round((st.ms || 0) / 1000) : 0) + (isLeaveLive ? liveLeaveSec : 0));
     var hasLeaveEver = isLeaveLive || leaveCount > 0;
 
     // 2. Evaluasi real-time instan status Wajah Tak Terdeteksi Kamera
     var isFaceLive = !!(st && st.faceAwaySince) || isFaceWarn;
     var liveFaceSec = (st && st.faceAwaySince) ? Math.max(1, Math.round((Date.now() - st.faceAwaySince) / 1000)) : (isFaceWarn ? 1 : 0);
-    var faceCount = (st ? (st.faceN || 0) : 0) + (isFaceLive ? 1 : 0);
-    var faceTotalSec = (st ? Math.round((st.faceMs || 0) / 1000) : 0) + (isFaceLive ? liveFaceSec : 0);
+    var faceCount = sum ? sum.vn : ((st ? (st.faceN || 0) : 0) + (isFaceLive ? 1 : 0));
+    var faceTotalSec = sum ? Math.round(sum.vs / 1000) : ((st ? Math.round((st.faceMs || 0) / 1000) : 0) + (isFaceLive ? liveFaceSec : 0));
     var hasFaceEver = isFaceLive || faceCount > 0;
 
     var isWarn = hasLeaveEver || hasFaceEver;
@@ -2179,8 +2183,10 @@
           '<div class="ch-face-modal-pulsar"></div>' +
           '<div class="ch-face-modal-icon">' + icon('camera') + '</div>' +
         '</div>' +
-        '<h3 id="ch-face-modal-title" class="ch-face-modal-title">' + esc(t('proctor.modal-judul', 'Yuk, Kembali Menghadap Layar!')) + '</h3>' +
-        '<p class="ch-face-modal-desc">' + esc(t('proctor.modal-pesan', 'Halo! Wajahmu belum terdeteksi di kamera depan. Pastikan kamu tetap menghadap ke layar HP ya, agar ujianmu lancar dan tidak ditandai oleh guru.')) + '</p>' +
+        '<div class="ch-face-modal-content">' +
+          '<h3 id="ch-face-modal-title" class="ch-face-modal-title">' + esc(t('proctor.modal-judul', 'Yuk, Kembali Menghadap Layar!')) + '</h3>' +
+          '<p class="ch-face-modal-desc">' + esc(t('proctor.modal-pesan', 'Halo! Wajahmu belum terdeteksi di kamera depan. Pastikan kamu tetap menghadap ke layar HP ya, agar ujianmu lancar dan tidak ditandai oleh guru.')) + '</p>' +
+        '</div>' +
         '<div class="ch-face-modal-status">' +
           '<span class="ch-face-live-pill"><span class="ch-face-live-dot"></span> ' + esc(t('proctor.modal-status', 'Memeriksa kamera depan...')) + '</span>' +
         '</div>' +
@@ -2288,6 +2294,7 @@
           (!isScanning && !isVerified ? '<div class="ch-face-placeholder">' + icon('camera') + '</div>' : '') +
           (isVerified ? '<div class="ch-face-verified-stamp">' + icon('check') + '</div>' : '') +
         '</div>' +
+        '<div class="ch-face-progress-track"><div class="ch-face-progress-fill" style="width:' + (pf.progress || (isVerified ? 100 : 0)) + '%;"></div></div>' +
         statusHtml +
         '<div class="ch-preflight-actions">' +
           actionsHtml +
@@ -2439,28 +2446,29 @@
             }
             pollCount++;
 
+            var currentPct = Math.min(100, Math.round((pollCount / 25) * 100));
+            cu.facePreflight.progress = currentPct;
+
+            var fillEl = (sEl && typeof sEl.querySelector === 'function') ? sEl.querySelector('.ch-face-progress-fill') : null;
+            if (fillEl && fillEl.style) fillEl.style.width = currentPct + '%';
+
+            var badgeEl = (sEl && typeof sEl.querySelector === 'function') ? sEl.querySelector('.ch-preflight-status-badge.is-scanning') : null;
+            if (badgeEl) {
+              badgeEl.innerHTML = '<span class="ch-face-live-dot"></span> ' + esc(t('proctor.verifikasi-memindai', 'Memindai wajah... Harap tetap menghadap kamera')) + ' (' + currentPct + '%)';
+            }
+
             if (typeof face.checkLiveness === 'function') {
               var live = face.checkLiveness();
               if (live && live.stage === 'verified') {
                 if (verifyTimer) clearInterval(verifyTimer);
-                cu.facePreflight = { status: 'verified', step: 'verified' };
+                cu.facePreflight = { status: 'verified', step: 'verified', progress: 100 };
                 renderStudent();
                 var pVid2 = sEl ? sEl.querySelector('[data-face-preview]') : null;
                 if (pVid2 && face.attachPreview) face.attachPreview(pVid2);
                 if (sEnv.toast) sEnv.toast(t('proctor.verifikasi-sukses-toast', 'Wajah terverifikasi! Kamera siap menjaga ujianmu.'));
                 return;
-              } else if (live && live.stage === 'challenge' && cu.facePreflight.step !== 'challenge') {
+              } else if (live && live.stage === 'challenge') {
                 cu.facePreflight.step = 'challenge';
-                renderStudent();
-                var pVidC = sEl ? sEl.querySelector('[data-face-preview]') : null;
-                if (pVidC && face.attachPreview) face.attachPreview(pVidC);
-              } else if (live && (live.stage === 'aligning' || live.stage === 'enrolling')) {
-                if (live.progress != null && cu.facePreflight.progress !== live.progress) {
-                  cu.facePreflight.progress = live.progress;
-                  renderStudent();
-                  var pVidE = sEl ? sEl.querySelector('[data-face-preview]') : null;
-                  if (pVidE && face.attachPreview) face.attachPreview(pVidE);
-                }
               }
             } else {
               var ok = face.checkNow ? face.checkNow() : false;
@@ -2469,7 +2477,7 @@
 
               if (consecutivePasses >= 1) {
                 if (verifyTimer) clearInterval(verifyTimer);
-                cu.facePreflight = { status: 'verified', step: 'verified' };
+                cu.facePreflight = { status: 'verified', step: 'verified', progress: 100 };
                 renderStudent();
                 var pVid2 = sEl ? sEl.querySelector('[data-face-preview]') : null;
                 if (pVid2 && face.attachPreview) face.attachPreview(pVid2);

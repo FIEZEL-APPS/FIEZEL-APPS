@@ -365,27 +365,27 @@
       if (avgBr > 245 && contrastRange < 10) return { present: false, isSpoof: false, reason: 'blinding_glare' };
 
       // 3. Jumlah piksel kulit wajar (toleransi jarak maju/mundur)
-      var minSkinReq = enrolledProfile.valid ? Math.max(16, Math.round(enrolledProfile.skinCountMean * 0.20)) : (avgBr < 40 ? 25 : 35);
-      var maxSkinReq = enrolledProfile.valid ? Math.min(2600, Math.round(enrolledProfile.skinCountMean * 3.5)) : 2400;
+      var minSkinReq = enrolledProfile.valid ? Math.max(12, Math.round(enrolledProfile.skinCountMean * 0.15)) : (avgBr < 40 ? 25 : 35);
+      var maxSkinReq = enrolledProfile.valid ? Math.min(2800, Math.round(enrolledProfile.skinCountMean * 4.2)) : 2400;
       if (skinCount < minSkinReq || skinCount > maxSkinReq) return { present: false, isSpoof: false, reason: 'skin_count_out_of_range' };
 
       // 4. Konsentrasi kulit di area kamera
-      var minCenterFraction = enrolledProfile.valid ? 0.15 : 0.30;
+      var minCenterFraction = enrolledProfile.valid ? 0.10 : 0.30;
       if (skinInCenterFraction < minCenterFraction) return { present: false, isSpoof: false, reason: 'not_centered' };
 
       // 5. Centroid posisi wajah harus di area kamera (toleransi sudut/kemiringan HP)
       var cX = Math.round(sumX / skinCount);
       var cY = Math.round(sumY / skinCount);
-      var minCX = enrolledProfile.valid ? 4 : 8, maxCX = enrolledProfile.valid ? 60 : 56;
-      var minCY = enrolledProfile.valid ? 4 : 6, maxCY = enrolledProfile.valid ? 44 : 42;
+      var minCX = enrolledProfile.valid ? 2 : 8, maxCX = enrolledProfile.valid ? 62 : 56;
+      var minCY = enrolledProfile.valid ? 2 : 6, maxCY = enrolledProfile.valid ? 46 : 42;
       if (cX < minCX || cX > maxCX || cY < minCY || cY > maxCY) return { present: false, isSpoof: false, reason: 'centroid_out_of_bounds' };
 
       // 6. Bounding box & proporsi oval wajah
       var boxW = (maxX - minX) + 1;
       var boxH = (maxY - minY) + 1;
-      if (boxW < 6 || boxH < 6) return { present: false, isSpoof: false, reason: 'box_too_small' };
+      if (boxW < 5 || boxH < 5) return { present: false, isSpoof: false, reason: 'box_too_small' };
       var aspect = boxH / boxW;
-      if (aspect < 0.40 || aspect > 3.2) return { present: false, isSpoof: false, reason: 'aspect_ratio_invalid' };
+      if (aspect < 0.35 || aspect > 3.6) return { present: false, isSpoof: false, reason: 'aspect_ratio_invalid' };
 
       // 7. Hitung gradien tekstur mikro di area wajah
       var gradSum = 0, gradCount = 0, maxLocalGrad = 0;
@@ -461,9 +461,13 @@
 
       var now = Date.now();
       recordTemporalFrame(now, cX, cY, boxW, boxH, eyeDip, asym, Ygrid, w, h);
-      var tempCheck = checkTemporalLiveness(now);
-      if (tempCheck.isSpoof) {
-        return { present: false, isSpoof: true, reason: tempCheck.isStatic ? 'spoof_static' : 'spoof_rigid' };
+      // Murid yang sudah terkalibrasi (enrolledProfile.valid) sedang membaca soal dengan tenang di ruang ujian.
+      // Bebaskan dari tuduhan foto kertas (spoof_static) hanya karena duduk tenang membaca selama 2 detik.
+      if (!enrolledProfile.valid) {
+        var tempCheck = checkTemporalLiveness(now);
+        if (tempCheck.isSpoof) {
+          return { present: false, isSpoof: true, reason: tempCheck.isStatic ? 'spoof_static' : 'spoof_rigid' };
+        }
       }
 
       return {
@@ -521,8 +525,15 @@
               handleResult(false);
               return;
             }
-            // CRITICAL ANTI-SPOOFING & LIVENESS GATE:
-            // Meskipun native FaceDetector menemukan wajah, wajib lolos uji anti-layar dan anti-kertas
+            // Jika profil murid sudah terkalibrasi (enrolledProfile.valid), percayai native hardware ML detector
+            if (enrolledProfile.valid) {
+              state.lastNativeFace = true;
+              state.lastNativeFaceTime = Date.now();
+              handleResult(true);
+              return;
+            }
+            // CRITICAL ANTI-SPOOFING & LIVENESS GATE (pra-enrollment):
+            // Sebelum terkalibrasi, wajib lolos uji anti-layar dan anti-kertas
             var cvCheck = analyzeFrame(vid, state.canvasEl, state.ctx, f);
             if (cvCheck && cvCheck.present && !cvCheck.isSpoof) {
               state.lastNativeFace = true;
@@ -746,11 +757,13 @@
     blinkCloseStart: 0,
     blinkCount: 0,
     turnDetected: false,
+    steadyHoldTicks: 0,
     verified: false
   };
 
   function resetLiveness() {
     temporalHistory = [];
+    resetEnrolledProfile();
     liveness.calibrated = false;
     liveness.calibTicks = 0;
     liveness.eyeDips = [];
@@ -763,6 +776,7 @@
     liveness.blinkCloseStart = 0;
     liveness.blinkCount = 0;
     liveness.turnDetected = false;
+    liveness.steadyHoldTicks = 0;
     liveness.verified = false;
   }
 
@@ -903,12 +917,15 @@
       liveness.turnDetected = true;
     }
 
-    if (liveness.blinkCount >= 1 || liveness.turnDetected) {
+    liveness.steadyHoldTicks = (liveness.steadyHoldTicks || 0) + 1;
+
+    // Verifikasi sukses jika murid berkedip, menoleh, atau menatap kamera dengan tenang (steady hold >= 22 ticks)
+    if (liveness.blinkCount >= 1 || liveness.turnDetected || liveness.steadyHoldTicks >= 22) {
       liveness.verified = true;
-      return { stage: 'verified', ok: true, blinkCount: liveness.blinkCount, turn: liveness.turnDetected };
+      return { stage: 'verified', ok: true, blinkCount: liveness.blinkCount, turn: liveness.turnDetected, steady: liveness.steadyHoldTicks >= 22 };
     }
 
-    return { stage: 'challenge', ok: true, blinkCount: liveness.blinkCount };
+    return { stage: 'challenge', ok: true, blinkCount: liveness.blinkCount, steadyTicks: liveness.steadyHoldTicks };
   }
 
   function verifyPresence() {
