@@ -1,7 +1,7 @@
 {
-  "version": "m025-558",
-  "claimedBy": "branch feat/face-enrollment-calibration-m025-558",
-  "claimedAt": "2026-10-10T17:16:49.108Z",
-  "reason": "feat(proctor): kalibrasi profil wajah awal 3s & toleransi biometrik manusia (m025-558)",
+  "version": "m025-559",
+  "claimedBy": "branch fix/calm-proctor-intelligence-m025-559",
+  "claimedAt": "2026-10-10T18:35:43.040Z",
+  "reason": "fix(proctor): kalibrasi wajah tenang 3s, non-blocking alert & zero-flicker (m025-559)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
