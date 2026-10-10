@@ -2247,20 +2247,25 @@
               return;
             }
             pollCount++;
-            var ok = face.checkNow ? face.checkNow() : true;
+            var ok = face.checkNow ? face.checkNow() : false;
             if (ok) consecutivePasses++;
             else consecutivePasses = 0;
 
-            if (consecutivePasses >= 1 || pollCount >= 4) {
+            if (consecutivePasses >= 1) {
               if (verifyTimer) clearInterval(verifyTimer);
               cu.facePreflight = { status: 'verified' };
               renderStudent();
               var pVid2 = sEl ? sEl.querySelector('[data-face-preview]') : null;
               if (pVid2 && face.attachPreview) face.attachPreview(pVid2);
               if (sEnv.toast) sEnv.toast(t('proctor.verifikasi-sukses-toast', 'Wajah terverifikasi! Kamera siap menjaga ujianmu.'));
+            } else if (pollCount >= 60) {
+              if (verifyTimer) clearInterval(verifyTimer);
+              cu.facePreflight = { status: 'error', reason: 'face_not_detected' };
+              renderStudent();
+              if (sEnv.toast) sEnv.toast(t('proctor.wajah-belum', 'Wajah belum terdeteksi. Pastikan pencahayaan cukup dan wajah menghadap kamera.'));
             }
           }
-          var verifyTimer = setInterval(doScan, 150);
+          var verifyTimer = setInterval(doScan, 200);
           doScan();
         }).catch(function (err) {
           ui().facePreflight = { status: 'error', reason: (err && err.name) || 'error' };

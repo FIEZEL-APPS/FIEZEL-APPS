@@ -1,6 +1,6 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-10-10T07:17:20.222Z",
+  "generatedAt": "2026-10-10T08:44:43.157Z",
   "files": {
     "app.js": {
       "leaks": 3,
@@ -95,15 +95,15 @@
       "budget": 3,
       "sample": [
         {
-          "line": 2484,
+          "line": 2489,
           "text": "Latihan · ±"
         },
         {
-          "line": 2532,
+          "line": 2537,
           "text": "Tenggat"
         },
         {
-          "line": 2532,
+          "line": 2537,
           "text": "Latihan — umpan balik tiap soal"
         }
       ]
