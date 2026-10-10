@@ -532,11 +532,7 @@
     var prevFocus = (s.doneAssign || []).filter(function (x) { return x.id === res.id; })[0];
     if (res.focus && (Number(res.focus.n) > 0 || Number(res.focus.vn) > 0)) {
       entry.f = { n: Math.round(Number(res.focus.n) || 0), s: Math.round(Number(res.focus.s) || 0), x: Math.round(Number(res.focus.x) || 0) };
-      if (res.focus.vn !== undefined || res.focus.vs !== undefined) {
-        entry.f.vn = Math.max(0, Math.round(Number(res.focus.vn) || 0));
-        entry.f.vs = Math.max(0, Math.round(Number(res.focus.vs) || 0));
-        entry.f.vx = Math.max(0, Math.round(Number(res.focus.vx) || 0));
-      }
+      if (res.focus.vn || res.focus.vs) { entry.f.vn = Math.round(Number(res.focus.vn) || 0); entry.f.vs = Math.round(Number(res.focus.vs) || 0); entry.f.vx = Math.round(Number(res.focus.vx) || 0); }
     } else if (prevFocus && prevFocus.f) entry.f = prevFocus.f;
     /* `doneAssign` adalah persis yang dikirim ke guru (lihat tutorCode: `assign`). Misi
        mandiri tidak masuk ke sana: guru yang membaca laporan berhak yakin bahwa setiap
