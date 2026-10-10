@@ -1,9 +1,9 @@
 # FIEZEL — Berkas Serah Terima: Detektor Wajah Real-Time CV Murni (m025-549)
 
-**ID Build**: `m025-549`  
-**Cakupan**: Proctoring Kelasku Ujian (Deteksi Kehadiran Wajah Real-Time & Pra-Ujian Anti-Fake)  
-**Tanggal**: 10 Oktober 2026  
-**Status**: Lulus 100% Seluruh Gerbang Mutu Lokal & Probe Playwright  
+**ID Build**: `m025-549`<br>
+**Cakupan**: Proctoring Kelasku Ujian (Deteksi Kehadiran Wajah Real-Time & Pra-Ujian Anti-Fake)<br>
+**Tanggal**: 10 Oktober 2026<br>
+**Status**: Lulus 100% Seluruh Gerbang Mutu Lokal & Probe Playwright<br>
 
 ---
 
