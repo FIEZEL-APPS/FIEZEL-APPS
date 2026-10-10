@@ -22,7 +22,7 @@
   'use strict';
 
   var SAMPLE_INTERVAL_MS = 250;
-  var WARN_THRESHOLD_MS = 750;
+  var WARN_THRESHOLD_MS = 2500;
   var ABSENT_THRESHOLD_MS = 10000;
 
   var state = {
@@ -102,15 +102,15 @@
           var normG = rgbSum > 0 ? (g / rgbSum) : 0;
 
           // Model kromatisitas kulit presisi tinggi (YCbCr + normalized RGB)
+          // Mendukung pencahayaan ruangan, lampu fluoresen, dan refleksi layar cool-white
           var isSkin = (
-            cb >= 80 && cb <= 133 &&
-            cr >= 133 && cr <= 178 &&
-            r > g && g >= b &&
-            (r - g) >= 8 &&
-            normR >= 0.35 && normR <= 0.62 &&
-            normG >= 0.25 && normG <= 0.39 &&
-            (normR - normG) >= 0.04 &&
-            yLum >= 25 && yLum <= 242
+            cb >= 75 && cb <= 138 &&
+            cr >= 128 && cr <= 180 &&
+            r > g && r > (b - 10) &&
+            (r - g) >= 4 &&
+            normR >= 0.33 && normR <= 0.65 &&
+            normG >= 0.23 && normG <= 0.42 &&
+            yLum >= 20 && yLum <= 245
           );
 
           if (isSkin) {
@@ -141,22 +141,22 @@
       if (avgBr > 240 && contrastRange < 15) return false;
 
       // 3. Wajah tidak ada di tengah frame
-      if (centerSkinRatio < 0.14) return false;
+      if (centerSkinRatio < 0.12) return false;
 
       // 4. Jumlah piksel kulit wajar (menolak meja/dinding raksasa yang memenuhi frame)
-      if (skinCount < 80 || skinCount > 2000) return false;
+      if (skinCount < 70 || skinCount > 2000) return false;
 
       // 5. Centroid posisi wajah harus di tengah (menolak murid menoleh ke samping atau di tepi)
       var cX = Math.round(sumX / skinCount);
       var cY = Math.round(sumY / skinCount);
-      if (cX < 18 || cX > 46 || cY < 10 || cY > 38) return false;
+      if (cX < 12 || cX > 52 || cY < 8 || cY > 40) return false;
 
       // 6. Bounding box & proporsi oval wajah
       var boxW = (maxX - minX) + 1;
       var boxH = (maxY - minY) + 1;
       if (boxW < 10 || boxH < 10) return false;
       var aspect = boxH / boxW;
-      if (aspect < 0.65 || aspect > 2.8) return false; // Menolak meja kayu horizontal lebar
+      if (aspect < 0.60 || aspect > 2.8) return false; // Menolak meja kayu horizontal lebar
 
       // 7. Hitung gradien tekstur mikro di area wajah
       var gradSum = 0, gradCount = 0, maxLocalGrad = 0;
@@ -257,8 +257,12 @@
               handleResult(false);
             }
           } else {
-            state.lastNativeFace = false;
-            handleResult(false);
+            // Ketika native FaceDetector drop frame atau kondisi pencahayaan redup,
+            // validasi dengan fallbackCheck agar tidak memicu alarm palsu
+            var ok = fallbackCheck(vid, state.canvasEl, state.ctx);
+            state.lastNativeFace = ok;
+            if (ok) state.lastNativeFaceTime = Date.now();
+            handleResult(ok);
           }
         }).catch(function () {
           handleResult(fallbackCheck(vid, state.canvasEl, state.ctx));
@@ -353,13 +357,13 @@
       vid.width = 320;
       vid.height = 240;
       vid.style.position = 'fixed';
-      vid.style.top = '-9999px';
-      vid.style.left = '-9999px';
-      vid.style.width = '320px';
-      vid.style.height = '240px';
-      vid.style.opacity = '0.01';
+      vid.style.bottom = '4px';
+      vid.style.right = '4px';
+      vid.style.width = '24px';
+      vid.style.height = '24px';
+      vid.style.opacity = '0.005';
       vid.style.pointerEvents = 'none';
-      vid.style.zIndex = '-9999';
+      vid.style.zIndex = '99999';
       vid.srcObject = mediaStream;
 
       function triggerPlay() {
@@ -495,34 +499,53 @@
       var imgData = c.getImageData(0, 0, w, h);
       var d = imgData.data;
 
-      var fSum = 0, fCount = 0;
-      var eSum = 0, eCount = 0;
-      var cSum = 0, cCount = 0;
-      var sumX = 0, skinCount = 0;
+      var sumX = 0, sumY = 0, skinCount = 0;
 
-      for (var y = 10; y < 40; y++) {
+      for (var y = 8; y < 42; y++) {
         for (var x = 12; x < 52; x++) {
           var idx = (y * w + x) * 4;
           var r = d[idx], g = d[idx + 1], b = d[idx + 2];
-          var yLum = 0.299 * r + 0.587 * g + 0.114 * b;
           var cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b;
           var cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b;
 
-          var isSkin = (cb >= 75 && cb <= 130 && cr >= 133 && cr <= 175 && r > g && r > b);
+          var isSkin = (cb >= 75 && cb <= 138 && cr >= 128 && cr <= 180 && r > g && r > (b - 10));
           if (isSkin) {
             sumX += x;
+            sumY += y;
             skinCount++;
-          }
-
-          if (x >= 22 && x <= 42) {
-            if (y >= 12 && y <= 18) { fSum += yLum; fCount++; }
-            else if (y >= 20 && y <= 26) { eSum += yLum; eCount++; }
-            else if (y >= 28 && y <= 34) { cSum += yLum; cCount++; }
           }
         }
       }
 
-      if (skinCount < 80 || fCount === 0 || eCount === 0 || cCount === 0) {
+      if (skinCount < 60) {
+        return { stage: 'no_face', ok: false };
+      }
+
+      var cX = Math.round(sumX / skinCount);
+      var cY = Math.round(sumY / skinCount);
+      cX = Math.max(22, Math.min(42, cX));
+      cY = Math.max(16, Math.min(32, cY));
+
+      var fSum = 0, fCount = 0;
+      var eSum = 0, eCount = 0;
+      var cSum = 0, cCount = 0;
+
+      var fhY1 = Math.max(0, cY - 10), fhY2 = Math.max(0, cY - 5);
+      var eyeY1 = Math.max(0, cY - 4), eyeY2 = Math.min(h - 1, cY + 1);
+      var chkY1 = Math.min(h - 1, cY + 3), chkY2 = Math.min(h - 1, cY + 8);
+      var x1 = Math.max(0, cX - 9), x2 = Math.min(w - 1, cX + 9);
+
+      for (var y = fhY1; y <= chkY2; y++) {
+        for (var x = x1; x <= x2; x++) {
+          var idx = (y * w + x) * 4;
+          var yLum = 0.299 * d[idx] + 0.587 * d[idx + 1] + 0.114 * d[idx + 2];
+          if (y >= fhY1 && y <= fhY2) { fSum += yLum; fCount++; }
+          else if (y >= eyeY1 && y <= eyeY2) { eSum += yLum; eCount++; }
+          else if (y >= chkY1 && y <= chkY2) { cSum += yLum; cCount++; }
+        }
+      }
+
+      if (fCount === 0 || eCount === 0 || cCount === 0) {
         return { stage: 'no_face', ok: false };
       }
 
@@ -531,6 +554,7 @@
       var cAvg = cSum / cCount;
       var eyeDip = (fAvg - eAvg) + (cAvg - eAvg);
       var centroidX = sumX / skinCount;
+      var centroidY = sumY / skinCount;
       var now = Date.now();
 
       if (!liveness.calibrated) {
@@ -541,6 +565,7 @@
           for (var i = 0; i < liveness.eyeDips.length; i++) sumD += liveness.eyeDips[i];
           liveness.baselineEyeDip = sumD / liveness.eyeDips.length;
           liveness.baselineCentroidX = centroidX;
+          liveness.baselineCentroidY = centroidY;
           liveness.calibrated = true;
         }
         return { stage: 'aligning', ok: true };
@@ -548,22 +573,31 @@
 
       var curDip = eyeDip;
       var baseDip = liveness.baselineEyeDip;
-      if (baseDip >= 10) {
-        if (curDip <= baseDip * 0.45) {
-          if (!liveness.blinkClosing) {
-            liveness.blinkClosing = true;
-            liveness.blinkCloseStart = now;
-          }
-        } else if (liveness.blinkClosing && curDip >= baseDip * 0.75) {
+      var dipDrop = baseDip - curDip;
+
+      // Deteksi penutupan mata (blink closing):
+      var isClosed = (baseDip >= 4.0 && (curDip <= baseDip * 0.70 || dipDrop >= 2.5)) ||
+                     (baseDip < 4.0 && dipDrop >= 1.5);
+
+      if (isClosed) {
+        if (!liveness.blinkClosing) {
+          liveness.blinkClosing = true;
+          liveness.blinkCloseStart = now;
+        }
+      } else if (liveness.blinkClosing) {
+        var isReopened = (curDip >= baseDip * 0.80) || (baseDip - curDip <= 1.5);
+        if (isReopened) {
           var dur = now - liveness.blinkCloseStart;
-          if (dur >= 60 && dur <= 900) {
+          if (dur >= 40 && dur <= 950) {
             liveness.blinkCount++;
           }
           liveness.blinkClosing = false;
         }
       }
 
-      if (Math.abs(centroidX - liveness.baselineCentroidX) >= 4.0) {
+      // Deteksi tolehan kepala atau gerakan wajah
+      if (Math.abs(centroidX - liveness.baselineCentroidX) >= 2.5 ||
+          Math.abs(centroidY - (liveness.baselineCentroidY || centroidY)) >= 2.5) {
         liveness.turnDetected = true;
       }
 

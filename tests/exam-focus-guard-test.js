@@ -396,7 +396,7 @@ test('face-guard: fallbackCheck membedakan wajah vs kamera tertutup vs langit-la
   const FaceGuard = require('../features/class-hub/fiezel-face-guard.js');
   assert.ok(FaceGuard && typeof FaceGuard.fallbackCheck === 'function');
   assert.strictEqual(FaceGuard.SAMPLE_INTERVAL_MS, 250);
-  assert.strictEqual(FaceGuard.WARN_THRESHOLD_MS, 750);
+  assert.strictEqual(FaceGuard.WARN_THRESHOLD_MS, 2500);
   assert.strictEqual(FaceGuard.ABSENT_THRESHOLD_MS, 10000);
 
   function makeMockCanvas(pixelFn) {

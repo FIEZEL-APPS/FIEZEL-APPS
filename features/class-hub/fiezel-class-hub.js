@@ -1007,7 +1007,15 @@
     var u = ui();
     if (u.runner && !u.runner.faceVerified) return; // Tunggu verifikasi pra-ujian selesai
     try {
-      face.start(faceGuardOptions());
+      var p = face.start(faceGuardOptions());
+      if (p && typeof p.then === 'function') {
+        p.then(function () {
+          if (sEl) {
+            var pipVid = sEl.querySelector('[data-face-pip]');
+            if (pipVid && face.attachPreview) face.attachPreview(pipVid);
+          }
+        }).catch(function () {});
+      }
     } catch (_) {}
   }
   function stopFaceGuard() {
@@ -1057,7 +1065,7 @@
   function focusBanner() {
     var st = ui().focus, sum = st && FG() ? FG().summary(st, Date.now()) : null;
     var face = FaceG(), faceActive = face && typeof face.isActive === 'function' && face.isActive();
-    var facePill = faceActive ? ' <span class="ch-camera-pill" data-testid="class-camera-pill">● ' + esc(t('proctor.kamera-aktif', 'Kamera ujian aktif')) + '</span>' : '';
+    var facePill = faceActive ? ' <span class="ch-camera-pill" data-testid="class-camera-pill"><video class="ch-camera-pip-video" data-face-pip autoplay playsinline muted></video>● ' + esc(t('proctor.kamera-aktif', 'Kamera ujian aktif')) + '</span>' : '';
     if (ui().faceWarn) {
       return '<p class="ch-proctor is-warn ch-proctor-face" data-testid="class-proctor-face-warn">' + icon('alert-triangle') + ' ' + esc(t('proctor.wajah-peringatan', 'Wajah tidak terdeteksi di kamera depan. Harap menghadap layar HP agar ujian tidak ditandai pengawas.')) + facePill + '</p>';
     }
@@ -1236,6 +1244,13 @@
         var pVid = sEl.querySelector('[data-face-preview]');
         var face = FaceG();
         if (pVid && face && typeof face.attachPreview === 'function') face.attachPreview(pVid);
+      } catch (_) {}
+    }
+    if (u.runner && isExamRunner()) {
+      try {
+        var pipVid = sEl.querySelector('[data-face-pip]');
+        var faceG = FaceG();
+        if (pipVid && faceG && typeof faceG.attachPreview === 'function') faceG.attachPreview(pipVid);
       } catch (_) {}
     }
     if (sEnv.afterRender) try { sEnv.afterRender(); } catch (_) {}
@@ -2312,14 +2327,14 @@
               }
             }
 
-            if (pollCount >= 75) {
+            if (pollCount >= 150) {
               if (verifyTimer) clearInterval(verifyTimer);
               cu.facePreflight = { status: 'error', reason: 'face_not_detected' };
               renderStudent();
               if (sEnv.toast) sEnv.toast(t('proctor.wajah-belum', 'Wajah belum terdeteksi. Pastikan pencahayaan cukup dan wajah menghadap kamera.'));
             }
           }
-          var verifyTimer = setInterval(doScan, 200);
+          var verifyTimer = setInterval(doScan, 60);
           doScan();
         }).catch(function (err) {
           ui().facePreflight = { status: 'error', reason: (err && err.name) || 'error' };
