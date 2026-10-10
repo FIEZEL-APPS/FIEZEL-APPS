@@ -132,24 +132,44 @@ async function runProbe() {
 
     const activeBefore = FaceG.isActive();
 
-    // Verifikasi video element terpasang di DOM
+    // Verifikasi video element terpasang di DOM dengan dimensi aktif (anti-throttling)
     const videoTag = document.querySelector('video[playsinline]');
+    const vidWidth = videoTag ? videoTag.width : 0;
+    const vidHeight = videoTag ? videoTag.height : 0;
+    const vidOpacity = videoTag ? videoTag.style.opacity : '';
 
     // Stop FaceGuard
     FaceG.stop();
     const activeAfter = FaceG.isActive();
 
+    // Verifikasi fallbackCheck membedakan gelap vs wajah
+    const mockVid = document.createElement('canvas');
+    mockVid.width = 64; mockVid.height = 48;
+    mockVid.readyState = 2;
+    const mockCtx = mockVid.getContext('2d');
+    mockCtx.fillStyle = '#000000';
+    mockCtx.fillRect(0, 0, 64, 48);
+
+    const cvs = document.createElement('canvas');
+    cvs.width = 64; cvs.height = 48;
+    const ctx = cvs.getContext('2d');
+    const darkAbsent = FaceG.fallbackCheck(mockVid, cvs, ctx) === false;
+
     return {
       startOk: startRes.ok,
       activeBefore,
       activeAfter,
-      hasVideoTag: !!videoTag
+      hasVideoTag: !!videoTag,
+      vidWidth,
+      vidHeight,
+      vidOpacity,
+      darkAbsent
     };
   });
 
   console.log('[PROBE-FACE-GUARD] Hasil lifecycle kamera Playwright:', lifecycleResult);
-  if (!lifecycleResult.startOk || !lifecycleResult.activeBefore || lifecycleResult.activeAfter) {
-    throw new Error('Lifecycle kamera gagal (start/stop tidak selaras)!');
+  if (!lifecycleResult.startOk || !lifecycleResult.activeBefore || lifecycleResult.activeAfter || !lifecycleResult.darkAbsent) {
+    throw new Error('Lifecycle kamera atau deteksi fallback gagal!');
   }
 
   // 3. Verifikasi simulasi state machine di sisi klien
@@ -184,6 +204,60 @@ async function runProbe() {
   console.log('[PROBE-FACE-GUARD] Hasil simulasi state machine di PWA:', simulationResult);
   if (!simulationResult.epBatalIsNull || simulationResult.epSahMs !== 15000 || simulationResult.vn !== 1) {
     throw new Error('State machine face presence menghasilkan data yang tidak valid!');
+  }
+
+  // 4. Verifikasi perenderan modal ramah di antarmuka KelasKu Murid
+  const modalDomResult = await page.evaluate(() => {
+    const Hub = window.FiezelClassHub;
+    const TS = window.FiezelTeacherStore;
+    const Bank = window.FiezelReviewBank;
+    if (!Hub || !TS || !Bank) return { ok: false, reason: 'missing_modules' };
+
+    const ids = Bank.pick('past_tense', 3, 7).map((x) => x.id);
+    TS.acceptAssignmentPayload({
+      v: 1, t: 'assign', id: 'ujian-probe-1', title: 'Ujian Mini Probe',
+      skills: ['past_tense'], itemIds: ids, minutes: 5, from: 'Kelas 8A',
+      cls: 'FZ-PROBE', mode: 'ujian', timer: 5
+    });
+
+    const rootEl = document.createElement('div');
+    rootEl.id = 'probe-student-root';
+    document.body.appendChild(rootEl);
+
+    Hub.mountStudent(rootEl, { toast() {}, go() {}, afterRender() {} });
+    Hub.openAssignment('ujian-probe-1');
+
+    // Trigger face warning
+    const u = Hub._studentUi();
+    u.faceWarn = true;
+    Hub.renderStudent();
+
+    const modalEl = rootEl.querySelector('[data-testid="class-face-alert-modal"]');
+    const modalBtn = rootEl.querySelector('[data-testid="class-face-recheck-btn"]');
+    const modalTitle = rootEl.querySelector('#ch-face-modal-title');
+
+    const modalVisible = !!modalEl && !!modalBtn;
+    const titleText = modalTitle ? modalTitle.textContent : '';
+
+    // Auto-dismiss saat wajah kembali
+    u.faceWarn = false;
+    Hub.renderStudent();
+    const modalGone = !rootEl.querySelector('[data-testid="class-face-alert-modal"]');
+
+    Hub.unmountStudent();
+    document.body.removeChild(rootEl);
+
+    return {
+      ok: true,
+      modalVisible,
+      titleText,
+      modalGone
+    };
+  });
+
+  console.log('[PROBE-FACE-GUARD] Hasil uji DOM modal ramah:', modalDomResult);
+  if (!modalDomResult.ok || !modalDomResult.modalVisible || !modalDomResult.modalGone || !modalDomResult.titleText.includes('Yuk, Kembali Menghadap Layar')) {
+    throw new Error('Uji DOM modal ramah gagal atau tidak selaras!');
   }
 
   await browser.close();

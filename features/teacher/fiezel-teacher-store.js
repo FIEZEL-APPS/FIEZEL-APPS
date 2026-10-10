@@ -468,7 +468,11 @@
       p.subjectName = String(subName).trim().slice(0, 60);
     }
     if (a && a.source) {
-      p.source = Object.assign({}, a.source);
+      p.source = typeof a.source === 'object' ? Object.assign({}, a.source) : a.source;
+      if (typeof p.source === 'object' && p.subjectId && !p.source.subjectId) {
+        p.source.subjectId = p.subjectId;
+        if (p.subjectName && !p.source.subjectName) p.source.subjectName = p.subjectName;
+      }
     } else if (p.subjectId) {
       p.source = { subjectId: p.subjectId, subjectName: p.subjectName };
     }
@@ -479,8 +483,29 @@
         var sk = /^[a-z0-9_]{1,32}$/.test(rawSk) ? rawSk : cleanSkills[0];
         var o = { id: q.id, prompt: q.prompt, options: q.options, answer: q.answer, skill: sk };
         if (q.context) o.context = q.context;
-        if (q.why && Object.keys(q.why).length) o.why = q.why;
-        if (q.distractorWhy && Object.keys(q.distractorWhy).length) o.distractorWhy = q.distractorWhy;
+        var mergedWhy = {};
+        if (q.why) {
+          if (typeof q.why === 'object' && !Array.isArray(q.why)) {
+            for (var wk in q.why) {
+              if (Object.prototype.hasOwnProperty.call(q.why, wk) && q.why[wk] != null && q.why[wk] !== '') {
+                mergedWhy[wk] = q.why[wk];
+              }
+            }
+          } else if (typeof q.why === 'string' && q.why.trim()) {
+            var ansKey = q.answer != null ? q.answer : 0;
+            mergedWhy[ansKey] = q.why.trim();
+          }
+        }
+        if (q.distractorWhy && typeof q.distractorWhy === 'object' && !Array.isArray(q.distractorWhy)) {
+          for (var dk in q.distractorWhy) {
+            if (Object.prototype.hasOwnProperty.call(q.distractorWhy, dk) && q.distractorWhy[dk] != null && q.distractorWhy[dk] !== '') {
+              if (mergedWhy[dk] === undefined) {
+                mergedWhy[dk] = q.distractorWhy[dk];
+              }
+            }
+          }
+        }
+        if (Object.keys(mergedWhy).length) o.why = mergedWhy;
         return o;
       });
     }
@@ -498,15 +523,46 @@
     if (!p || p.t !== 'assign' || !Array.isArray(p.itemIds)) return null;
     try {
       var a = JSON.parse(localStorage.getItem(ASSIGN_KEY)) || [];
-      if (!a.some(function (x) { return x.id === p.id; })) {
-        var entry = { id: p.id, title: p.title, skills: p.skills, itemIds: p.itemIds, minutes: p.minutes, from: p.from, teacher: p.teacher || '', cls: p.cls || '', items: Array.isArray(p.items) ? p.items : undefined, timer: p.timer || 0, shuffle: !!p.shuffle, at: Date.now(), deadline: p.deadline, mode: p.mode };
-        if (p.subjectId) entry.subjectId = p.subjectId;
-        if (p.subjectName) entry.subjectName = p.subjectName;
-        if (p.source) entry.source = p.source;
-        else if (p.subjectId) entry.source = { subjectId: p.subjectId, subjectName: p.subjectName };
+      var cleanItems = Array.isArray(p.items) ? p.items.filter(function (q) {
+        return q && q.prompt && Array.isArray(q.options) && q.options.length >= 2;
+      }).slice(0, 50).map(function (q) {
+        var it = { id: String(q.id || ('it-' + Math.random().toString(36).slice(2))), prompt: String(q.prompt).slice(0, 500), options: q.options.map(function (o) { return String(o).slice(0, 200); }), answer: Number(q.answer) || 0, skill: String(q.skill || (p.skills && p.skills[0]) || 'custom') };
+        if (q.context) it.context = String(q.context).slice(0, 1000);
+        if (q.why && typeof q.why === 'object') it.why = q.why;
+        if (q.distractorWhy && typeof q.distractorWhy === 'object') it.distractorWhy = q.distractorWhy;
+        if (q.note) it.note = String(q.note).slice(0, 500);
+        return it;
+      }) : undefined;
+      var existingIndex = -1;
+      for (var i = 0; i < a.length; i++) {
+        if (a[i] && a[i].id === p.id) { existingIndex = i; break; }
+      }
+      var entry = { id: p.id, title: p.title, skills: p.skills, itemIds: p.itemIds, minutes: p.minutes, from: p.from, teacher: p.teacher || '', cls: p.cls || '', items: Array.isArray(p.items) ? cleanItems : undefined, timer: p.timer || 0, shuffle: !!p.shuffle, at: Date.now(), deadline: p.deadline, mode: p.mode };
+      if (p.subjectId) entry.subjectId = p.subjectId;
+      if (p.subjectName) entry.subjectName = p.subjectName;
+      if (p.source) entry.source = p.source;
+      else if (p.subjectId) entry.source = { subjectId: p.subjectId, subjectName: p.subjectName };
+
+      if (existingIndex !== -1) {
+        if (!entry.items && a[existingIndex].items) entry.items = a[existingIndex].items;
+        a[existingIndex] = Object.assign({}, a[existingIndex], entry);
+      } else {
         a.push(entry);
       }
-      localStorage.setItem(ASSIGN_KEY, JSON.stringify(a.slice(-12)));
+
+      var toSave = a.slice(-12);
+      try {
+        localStorage.setItem(ASSIGN_KEY, JSON.stringify(toSave));
+      } catch (err) {
+        for (var k = 0; k < toSave.length - 1; k++) {
+          if (toSave[k] && toSave[k].items) delete toSave[k].items;
+        }
+        try {
+          localStorage.setItem(ASSIGN_KEY, JSON.stringify(toSave));
+        } catch (_) {
+          try { localStorage.setItem(ASSIGN_KEY, JSON.stringify([entry])); } catch (_) {}
+        }
+      }
       if (p.cls) { var ob = JSON.parse(localStorage.getItem('fiezel-onboarding-v1') || '{}'); if (!ob.classCode) { ob.classCode = p.cls; localStorage.setItem('fiezel-onboarding-v1', JSON.stringify(ob)); } }
     } catch (_) {}
     return p;

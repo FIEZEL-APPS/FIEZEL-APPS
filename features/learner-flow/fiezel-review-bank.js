@@ -1364,10 +1364,12 @@
   function explain(item, chosen) {
     var correct = chosen === item.answer;
     var picked = optionText(item, chosen), right = optionText(item, item.answer);
+    var sk = (item && item.skill && SKILLS[item.skill]) || null;
+    var pattern = sk && sk.pattern ? sk.pattern : '';
     if (correct) {
-      return { correct: true, text: 'Tepat. “' + right + '” — ' + item.note + ' Pola: ' + SKILLS[item.skill].pattern + '.' };
+      return { correct: true, text: 'Tepat. “' + right + '” — ' + (item.note || '') + (pattern ? ' Pola: ' + pattern + '.' : '') };
     }
-    var reason = (item.why && item.why[chosen]) || '';
+    var reason = (item.why && item.why[chosen]) || (item.distractorWhy && item.distractorWhy[chosen]) || '';
     var body;
     if (item.skill === 'past_tense' || item.skill === 'past_questions') {
       body = 'Dalam kalimat ini diperlukan “' + right + '” karena ' + (item.marker === 'did' ? 'sudah ada “did” di depannya.' : 'terdapat penanda “' + item.marker + '”.');
@@ -1377,12 +1379,15 @@
       body = 'Jawabannya “' + right + '” — dengarkan kata kunci “' + item.marker + '”.';
     } else if (TKA_ORDER.indexOf(item.skill) !== -1) {
       body = 'Jawaban yang didukung teks adalah “' + right + '”. Petunjuknya: “' + item.marker + '”.';
-    } else {
+    } else if (item.marker) {
       body = 'Kesimpulan yang paling didukung teks adalah “' + right + '” lewat petunjuk “' + item.marker + '”.';
+    } else {
+      body = t('review.kunci-jawaban-tepat', 'Jawaban yang tepat: ') + '“' + right + '”.' + (item.note ? ' ' + item.note : '');
     }
+    var patternTail = pattern ? t('review.coba-pola', ' Coba lagi dengan pola: {pola}.').replace('{pola}', pattern) : '';
     return {
       correct: false,
-      text: t('review.belum-tepat-pilih', 'Belum tepat. Kamu memilih “{pilihan}”. ').replace('{pilihan}', picked) + (reason ? reason + ' ' : '') + body + t('review.coba-pola', ' Coba lagi dengan pola: {pola}.').replace('{pola}', SKILLS[item.skill].pattern)
+      text: t('review.belum-tepat-pilih', 'Belum tepat. Kamu memilih “{pilihan}”. ').replace('{pilihan}', picked) + (reason ? reason + ' ' : '') + body + (patternTail ? ' ' + patternTail : '')
     };
   }
 

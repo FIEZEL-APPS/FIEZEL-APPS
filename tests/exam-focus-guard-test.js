@@ -390,6 +390,84 @@ test('pemasangan: modul terdaftar di index.html + sw.js, dan teks murid lahir du
   assert.deepStrictEqual(thKeys, idKeys, 'kunci id dan th sama persis');
 });
 
+/* -------------------------------------- 6 · detektor wajah & modal ramah instan --- */
+
+test('face-guard: fallbackCheck membedakan wajah vs kamera tertutup vs langit-langit / meja', () => {
+  const FaceGuard = require('../features/class-hub/fiezel-face-guard.js');
+  assert.ok(FaceGuard && typeof FaceGuard.fallbackCheck === 'function');
+  assert.strictEqual(FaceGuard.SAMPLE_INTERVAL_MS, 1000);
+  assert.strictEqual(FaceGuard.WARN_THRESHOLD_MS, 2000);
+  assert.strictEqual(FaceGuard.ABSENT_THRESHOLD_MS, 10000);
+
+  function makeMockCanvas(pixelFn) {
+    const w = 64, h = 48;
+    const data = new Uint8ClampedArray(w * h * 4);
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const idx = (y * w + x) * 4;
+        const [r, g, b, a] = pixelFn(x, y);
+        data[idx] = r; data[idx + 1] = g; data[idx + 2] = b; data[idx + 3] = a !== undefined ? a : 255;
+      }
+    }
+    const ctx = {
+      drawImage() {},
+      getImageData: () => ({ data })
+    };
+    const video = { readyState: 2 };
+    const cvs = { width: w, height: h };
+    return { video, cvs, ctx };
+  }
+
+  // 1. Kamera tertutup rapat (hitam pekat / gelap)
+  const dark = makeMockCanvas(() => [5, 5, 5]);
+  assert.strictEqual(FaceGuard.fallbackCheck(dark.video, dark.cvs, dark.ctx), false, 'kamera tertutup harus terdeteksi absen');
+
+  // 2. Langit-langit putih / tembok abu-abu (tidak ada spektrum warna kulit di tengah)
+  const ceiling = makeMockCanvas(() => [200, 202, 205]);
+  assert.strictEqual(FaceGuard.fallbackCheck(ceiling.video, ceiling.cvs, ceiling.ctx), false, 'langit-langit / dinding kosong harus terdeteksi absen');
+
+  // 3. Wajah murid di tengah (kulit sawo matang / cerah di tengah frame 16-48 x 10-38)
+  const face = makeMockCanvas((x, y) => {
+    if (x >= 18 && x <= 46 && y >= 12 && y <= 36) {
+      // Kulit wajah manusia: R > G > B
+      return [180, 130, 100];
+    }
+    // Latar belakang ruangan
+    return [80, 85, 90];
+  });
+  assert.strictEqual(FaceGuard.fallbackCheck(face.video, face.cvs, face.ctx), true, 'wajah murid di depan kamera harus terdeteksi hadir');
+});
+
+test('face-guard: modal ramah popup instan saat wajah tak terdeteksi dan auto-dismiss saat kembali', () => {
+  const Hub = globalThis.FiezelClassHub, TS = globalThis.FiezelTeacherStore, Bank = globalThis.FiezelReviewBank;
+  assert.ok(Hub && TS && Bank);
+  const ids = Bank.pick('past_tense', 3, 7).map((x) => x.id);
+  assert.ok(TS.acceptAssignmentPayload({ v: 1, t: 'assign', id: 'ujian-2', title: 'Ujian mini 2', skills: ['past_tense'], itemIds: ids, minutes: 5, from: 'Kelas 8A', cls: 'FZ-AB2C3D', mode: 'ujian', timer: 5 }));
+
+  const sEl = { innerHTML: '', _h: {}, addEventListener(t, fn) { (this._h[t] = this._h[t] || []).push(fn); }, querySelector: () => null, fire(t, target) { (this._h[t] || []).forEach((fn) => fn({ target, preventDefault() {} })); } };
+  const senv = { toast(t) { senv.last = t; }, go() {}, afterRender() {} };
+  Hub.mountStudent(sEl, senv);
+  Hub.openAssignment('ujian-2');
+
+  const u = Hub._studentUi();
+  // Set faceWarn = true (simulasi deteksi wajah tak terlihat)
+  u.faceWarn = true;
+  Hub.renderStudent();
+
+  assert.ok(sEl.innerHTML.includes('class-face-alert-modal'), 'modal popup ramah muncul di layar saat wajah tak terlihat');
+  assert.ok(sEl.innerHTML.includes('class-face-recheck-btn'), 'tombol periksa ulang tersedia');
+  assert.ok(sEl.innerHTML.includes('Yuk, Kembali Menghadap Layar'), 'kalimat judul ramah dan tidak menuduh');
+
+  // Simulasi klik tombol Saya Sudah Menghadap Layar
+  const btn = { getAttribute: (k) => (k === 'data-ch' ? 'recheck-face' : null), closest: (sel) => (sel === '[data-ch]' ? btn : null) };
+  sEl.fire('click', btn);
+
+  // Saat wajah kembali, faceWarn disetel false dan modal auto-dismiss
+  u.faceWarn = false;
+  Hub.renderStudent();
+  assert.ok(!sEl.innerHTML.includes('class-face-alert-modal'), 'modal otomatis tertutup saat wajah terdeteksi kembali');
+});
+
 (async () => {
   let fail = 0;
   for (const [name, fn] of tests) {

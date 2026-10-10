@@ -211,7 +211,7 @@
   function buildPlan(st, now) {
     var B = bank(), ranked = rankedSkills(st), blocks = [], used = {};
     loadAssignments().slice(-3).reverse().forEach(function (a) {
-      blocks.push({ id: 'assign-' + a.id, kind: a.mode === 'ujian' ? 'Ujian dari guru' : t('flow.tugas-guru', 'Tugas dari guru'), skill: a.skills[0], title: a.title, minutes: a.minutes, itemIds: a.itemIds, from: a.teacher ? a.teacher + ' · ' + a.from : a.from });
+      blocks.push({ id: 'assign-' + a.id, kind: a.mode === 'ujian' ? 'Ujian dari guru' : t('flow.tugas-guru', 'Tugas dari guru'), skill: a.skills[0], title: a.title, minutes: a.minutes, itemIds: a.itemIds, items: a.items, from: a.teacher ? a.teacher + ' · ' + a.from : a.from });
       a.skills.forEach(function (s) { used[s] = true; });
     });
 
@@ -247,24 +247,54 @@
     return st.plan;
   }
 
+  function resolveLessonItem(L, id) {
+    if (L && Array.isArray(L.items)) {
+      var found = L.items.filter(function (x) { return x && String(x.id) === String(id); })[0];
+      if (found) return found;
+    }
+    var B = bank();
+    return (B && B.byId && B.byId(id)) || null;
+  }
+
   function startLesson(st, block) {
     var B = bank();
     // Tugas guru dikerjakan DI DALAM Kelas (class-hub): satu tempat, mendukung soal kustom guru + bukti per-soal.
     if (block.id.indexOf('assign-') === 0 && root.FiezelClassHub && typeof root.go === 'function') { root.FiezelClassHub.openAssignment(block.id.slice(7)); root.go('classroom'); return; }
     var ids = block.itemIds || allocateIds(st, block);
+    var customItems = block.items || [];
+    if (!customItems.length && block.id.indexOf('assign-') === 0) {
+      var rawA = loadAssignments().filter(function (x) { return ('assign-' + x.id) === block.id || x.id === block.id.slice(7); })[0];
+      if (rawA && rawA.items) customItems = rawA.items;
+    }
     /* markSeen TETAP dipanggil: st.seen masih dipakai diagnosticSet di bawah. Membuangnya
        adalah perubahan tersendiri, bukan bagian penyambungan ini. */
     ids.forEach(function (id) {
-      var it = B.byId(id);
+      var it = resolveLessonItem({ items: customItems }, id);
       markSeen(it ? it.skill : block.skill, id);
     });
-    st.activeLesson = { blockId: block.id, skill: block.skill, title: block.title, kind: block.kind, minutes: block.minutes, itemIds: ids, index: 0, attempt: 0, results: [], feedback: null, revealed: false, startedAt: Date.now() };
+    st.activeLesson = { blockId: block.id, skill: block.skill, title: block.title, kind: block.kind, minutes: block.minutes, itemIds: ids, items: customItems, index: 0, attempt: 0, results: [], feedback: null, revealed: false, startedAt: Date.now() };
     st.step = 'lesson';
   }
 
   function answerLesson(st, chosen) {
-    var B = bank(), L = st.activeLesson, item = B.byId(L.itemIds[L.index]);
-    var fb = B.explain(item, chosen);
+    var B = bank(), L = st.activeLesson, item = resolveLessonItem(L, L.itemIds[L.index]);
+    if (!item) return;
+    var fb = null;
+    if (B && B.SKILLS && B.SKILLS[item.skill]) {
+      fb = B.explain(item, chosen);
+    } else {
+      var correct = Number(chosen) === Number(item.answer);
+      var right = (item.options && item.options[item.answer]) != null ? String(item.options[item.answer]) : '';
+      var picked = (item.options && item.options[chosen]) != null ? String(item.options[chosen]) : '';
+      var why = (item.why && item.why[chosen]) || (item.distractorWhy && item.distractorWhy[chosen]) || '';
+      fb = correct
+        ? { correct: true, text: 'Tepat. “' + right + '” — ' + (item.note || '') }
+        : {
+            correct: false,
+            text: t('review.belum-tepat-pilih', 'Belum tepat. Kamu memilih “{pilihan}”. ').replace('{pilihan}', picked) + (why ? why + ' ' : '') + ('Jawaban yang benar: “' + right + '”.' + (item.note ? ' ' + item.note : ''))
+          };
+    }
+    L.lastChoice = Number(chosen);
     L.attempt += 1;
     if (fb.correct || L.attempt >= 2) {
       var firstTry = fb.correct && L.attempt === 1;
@@ -564,7 +594,8 @@
     if (!st.diagnostic) st.diagnostic = { at: Date.now(), answers: [], skipped: true };
     var plan = ensurePlan(st), bid = 'assign-' + a.id;
     var block = plan.blocks.filter(function (b) { return b.id === bid; })[0];
-    if (!block) { block = { id: bid, kind: a.mode === 'ujian' ? 'Ujian dari guru' : t('flow.tugas-guru', 'Tugas dari guru'), skill: a.skills[0], title: a.title, minutes: a.minutes, itemIds: a.itemIds, from: a.from }; plan.blocks.unshift(block); plan.minutes += block.minutes; }
+    if (!block) { block = { id: bid, kind: a.mode === 'ujian' ? 'Ujian dari guru' : t('flow.tugas-guru', 'Tugas dari guru'), skill: a.skills[0], title: a.title, minutes: a.minutes, itemIds: a.itemIds, items: a.items, from: a.from }; plan.blocks.unshift(block); plan.minutes += block.minutes; }
+    else if (a.items && (!block.items || !block.items.length)) { block.items = a.items; if (a.itemIds) block.itemIds = a.itemIds; }
     if (plan.done.indexOf(bid) !== -1) { if (env.toast) env.toast(t('flow.tugas-selesai', 'Tugas ini sudah kamu selesaikan.')); st.tab = 'flow'; st.step = 'plan'; save(st); render(); return true; }
     st.tab = 'flow';
     startLesson(st, block);
@@ -636,6 +667,7 @@
   }
 
   function contextBlock(item, showTranscript) {
+    if (!item) return '';
     if (item.contextKind === 'picture' && item.picture) {
       return '<div class="lf-picture" role="img" aria-label="Gambar: ' + esc(item.pictureAlt || '') + '" data-testid="lf-picture"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + item.picture + '</svg></div>';
     }
@@ -650,12 +682,15 @@
   }
 
   function questionCard(item, opts) {
-    var o = opts || {}, fb = o.feedback;
+    if (!item) return '';
+    var o = opts || {}, fb = o.feedback, B = bank();
+    var sk = (item.skill && B && B.SKILLS && B.SKILLS[item.skill]) || null;
+    var areaLabel = (sk && B.AREAS && B.AREAS[sk.area]) || item.area || item.skill || t('sekolah.area-tugas', 'TUGAS');
     return '<div class="lf-card lf-question" data-testid="lf-question">' +
-      '<div class="lf-q-meta"><span class="lf-chip">' + esc(bank().AREAS[bank().SKILLS[item.skill].area]) + '</span><span class="lf-muted">' + esc(o.progress || '') + '</span></div>' +
+      '<div class="lf-q-meta"><span class="lf-chip">' + esc(areaLabel) + '</span><span class="lf-muted">' + esc(o.progress || '') + '</span></div>' +
       contextBlock(item, o.showTranscript) +
       '<p class="lf-prompt">' + esc(item.prompt) + '</p>' +
-      '<div class="lf-options">' + item.options.map(function (op, i) {
+      '<div class="lf-options">' + (item.options || []).map(function (op, i) {
         var cls = 'lf-option';
         if (fb && o.revealed && i === item.answer) cls += ' is-correct';
         if (fb && !fb.correct && i === o.chosen) cls += ' is-wrong';
@@ -781,7 +816,7 @@
   }
 
   function lessonView() {
-    var L = st.activeLesson, B = bank(), item = B.byId(L.itemIds[L.index]), fb = L.feedback;
+    var L = st.activeLesson, B = bank(), item = resolveLessonItem(L, L.itemIds[L.index]), fb = L.feedback;
     var footer = '';
     if (fb && !L.revealed) footer = '<div class="lf-actions"><button type="button" class="lf-primary" data-lf="retry" data-testid="lf-retry">' + t('umum.coba-lagi', 'Coba lagi') + '</button></div>';
     else if (fb && L.revealed) footer = '<div class="lf-actions"><button type="button" class="lf-primary" data-lf="lesson-next" data-testid="lf-lesson-next">' + (L.index + 1 >= L.itemIds.length ? 'Selesaikan lesson' : t('flow.soal-berikutnya', 'Soal berikutnya')) + '</button></div>';
@@ -908,7 +943,7 @@
       case 'abandon': st.activeLesson = null; st.step = 'plan'; break;
       case 'transcript': if (st.activeLesson) st.activeLesson.transcript = true; else if (st.diagRun) st.diagRun.transcript = true; break;
       case 'listen': {
-        var cur = st.activeLesson ? B.byId(st.activeLesson.itemIds[st.activeLesson.index]) : st.diagRun ? B.byId(st.diagRun.itemIds[st.diagRun.index]) : null;
+        var cur = st.activeLesson ? resolveLessonItem(st.activeLesson, st.activeLesson.itemIds[st.activeLesson.index]) : st.diagRun ? B.byId(st.diagRun.itemIds[st.diagRun.index]) : null;
         if (cur && !speak(cur.context)) { toast(t('flow.suara-tidak-ada', 'Suara tidak tersedia di perangkat ini — buka transkrip.')); if (st.activeLesson) st.activeLesson.transcript = true; else if (st.diagRun) st.diagRun.transcript = true; }
         else return;
         break;

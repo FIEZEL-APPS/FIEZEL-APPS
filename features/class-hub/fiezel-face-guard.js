@@ -21,8 +21,8 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
 
-  var SAMPLE_INTERVAL_MS = 1500;
-  var WARN_THRESHOLD_MS = 5000;
+  var SAMPLE_INTERVAL_MS = 1000;
+  var WARN_THRESHOLD_MS = 2000;
   var ABSENT_THRESHOLD_MS = 10000;
 
   var state = {
@@ -60,28 +60,81 @@
 
   /**
    * Analisis piksel fallback saat browser belum memiliki FaceDetector bawaan.
-   * Mengukur variasi kontras dan rentang warna kulit pada frame 64x48.
+   * Mengukur variasi kontras, kecerahan, dan rentang spektrum warna kulit pada frame 64x48.
    */
   function fallbackCheck(video, canvas, ctx) {
-    if (!video || !canvas || !ctx || video.readyState < 2) return true;
+    if (!video || !canvas || !ctx) return true;
+    if (video.readyState < 2) return true;
     try {
-      ctx.drawImage(video, 0, 0, 64, 48);
-      var imgData = ctx.getImageData(0, 0, 64, 48);
+      var w = 64, h = 48;
+      ctx.drawImage(video, 0, 0, w, h);
+      var imgData = ctx.getImageData(0, 0, w, h);
       var d = imgData.data;
-      var totalBright = 0, skinHits = 0, count = d.length / 4;
-      for (var i = 0; i < d.length; i += 4) {
-        var r = d[i], g = d[i + 1], b = d[i + 2];
-        var br = (r + g + b) / 3;
-        totalBright += br;
-        // Deteksi rentang spektrum warna kulit universal (YCbCr sederhana)
-        if (r > 60 && g > 40 && b > 20 && r > g && r > b && Math.abs(r - g) > 10) {
-          skinHits++;
+      var totalBright = 0, totalSkin = 0, centerSkin = 0;
+      var minBr = 255, maxBr = 0;
+      var count = w * h;
+      var centerCount = 0;
+
+      // Area tengah kamera depan (persegi 50% di mana wajah murid berada saat menghadap layar)
+      var cX1 = 16, cX2 = 48, cY1 = 10, cY2 = 38;
+
+      for (var y = 0; y < h; y++) {
+        var isCenterY = (y >= cY1 && y <= cY2);
+        for (var x = 0; x < w; x++) {
+          var idx = (y * w + x) * 4;
+          var r = d[idx], g = d[idx + 1], b = d[idx + 2];
+          var br = (r + g + b) / 3;
+          totalBright += br;
+          if (br < minBr) minBr = br;
+          if (br > maxBr) maxBr = br;
+
+          var isCenter = isCenterY && (x >= cX1 && x <= cX2);
+          if (isCenter) centerCount++;
+
+          // Deteksi spektrum warna kulit universal (melanin & hemoglobin menyerap hijau & biru)
+          var isSkin = false;
+          if (r > 38 && g > 25 && b > 15 && r > g && r > b) {
+            var diffRG = r - g;
+            var diffRB = r - b;
+            var maxC = Math.max(r, Math.max(g, b));
+            var minC = Math.min(r, Math.min(g, b));
+            if (diffRG >= 5 && diffRB >= 8 && (maxC - minC) >= 10) {
+              isSkin = true;
+            }
+          }
+
+          if (isSkin) {
+            totalSkin++;
+            if (isCenter) centerSkin++;
+          }
         }
       }
-      // Jika kamera tertutup total atau sangat gelap (< 8) atau tanpa pola kulit (< 2%)
-      if (avgBr < 8 || skinHits / count < 0.02) {
+
+      var avgBr = totalBright / count;
+      var contrastRange = maxBr - minBr;
+      var skinRatio = totalSkin / count;
+      var centerSkinRatio = centerCount > 0 ? (centerSkin / centerCount) : skinRatio;
+
+      // 1. Kamera tertutup rapat (jari, meja, kantong, lakban) -> sangat gelap
+      if (avgBr < 14) {
         return false;
       }
+
+      // 2. Kamera tersorot lampu langsung / silau ekstrem tanpa kontras wajah
+      if (avgBr > 240 && contrastRange < 15) {
+        return false;
+      }
+
+      // 3. Kamera ditutup jempol tembus cahaya (flat merah pekat tanpa kontras fitur wajah)
+      if (contrastRange < 12 && skinRatio > 0.5) {
+        return false;
+      }
+
+      // 4. Kamera menghadap langit-langit / dinding kosong / meja / laptop (tanpa kulit di tengah atau frame)
+      if (skinRatio < 0.025 && centerSkinRatio < 0.03) {
+        return false;
+      }
+
       return true;
     } catch (_) {
       return true; // Asumsikan hadir bila kanvas gagal
@@ -96,9 +149,13 @@
     if (state.detector) {
       try {
         state.detector.detect(vid).then(function (faces) {
-          handleResult(faces && faces.length > 0);
+          if (faces && faces.length > 0) {
+            handleResult(true);
+          } else {
+            // Verifikasi ganda dengan fallback agar tidak keliru memvonis saat minim cahaya
+            handleResult(fallbackCheck(vid, state.canvasEl, state.ctx));
+          }
         }).catch(function () {
-          // Fallback bila inferensi gagal
           handleResult(fallbackCheck(vid, state.canvasEl, state.ctx));
         });
         return;
@@ -174,22 +231,36 @@
 
       var vid = document.createElement('video');
       vid.setAttribute('playsinline', '');
+      vid.setAttribute('webkit-playsinline', '');
       vid.setAttribute('autoplay', '');
+      vid.playsInline = true;
+      vid.webkitPlaysInline = true;
       vid.muted = true;
+      vid.autoplay = true;
+      vid.width = 160;
+      vid.height = 120;
       vid.style.position = 'fixed';
-      vid.style.top = '-9999px';
-      vid.style.left = '-9999px';
-      vid.style.width = '1px';
-      vid.style.height = '1px';
-      vid.style.opacity = '0';
+      vid.style.left = '0';
+      vid.style.bottom = '0';
+      vid.style.width = '160px';
+      vid.style.height = '120px';
+      vid.style.opacity = '0.001';
       vid.style.pointerEvents = 'none';
+      vid.style.zIndex = '-9999';
       vid.srcObject = mediaStream;
 
-      vid.onloadedmetadata = function () {
-        try { vid.play(); } catch (_) {}
-      };
+      function triggerPlay() {
+        try {
+          var p = vid.play();
+          if (p && typeof p.catch === 'function') p.catch(function () {});
+        } catch (_) {}
+      }
+      vid.onloadedmetadata = triggerPlay;
+      vid.onloadeddata = triggerPlay;
+      vid.oncanplay = triggerPlay;
       document.body.appendChild(vid);
       state.videoEl = vid;
+      triggerPlay();
 
       var cvs = document.createElement('canvas');
       cvs.width = 64;
@@ -235,12 +306,20 @@
   function isActive() { return !!state.active; }
   function isWarning() { return !!state.warned; }
 
+  function checkNow() {
+    if (!state.active) return false;
+    checkFrame();
+    return !state.absentSince;
+  }
+
   return {
     isSupported: isSupported,
     start: start,
     stop: stop,
     isActive: isActive,
     isWarning: isWarning,
+    checkNow: checkNow,
+    fallbackCheck: fallbackCheck,
     SAMPLE_INTERVAL_MS: SAMPLE_INTERVAL_MS,
     WARN_THRESHOLD_MS: WARN_THRESHOLD_MS,
     ABSENT_THRESHOLD_MS: ABSENT_THRESHOLD_MS

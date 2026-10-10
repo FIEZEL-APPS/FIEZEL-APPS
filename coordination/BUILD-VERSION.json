@@ -1,7 +1,7 @@
 {
-  "version": "m025-546",
-  "claimedBy": "branch fix/disable-audio-subtitles-m545",
-  "claimedAt": "2026-10-10T04:57:15.846Z",
-  "reason": "fix(kelasku): perbaiki kontras papan kelas dan bersihkan kartu gabung kelas redundan",
+  "version": "m025-547",
+  "claimedBy": "branch feat/proctor-instant-friendly-modal-m025-547",
+  "claimedAt": "2026-10-10T05:41:33.424Z",
+  "reason": "fix(kelasku): perbesar batas payload tugas ke 256KB, dukung soal mapel besar IPA, dan optimasi hidrasi murid (m025-547)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
