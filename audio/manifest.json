@@ -1,7 +1,7 @@
 {
   "schema": "fiezel-audio-manifest-v1",
-  "version": 339,
-  "generatedAt": "2026-10-10T03:38:20.646Z",
+  "version": 342,
+  "generatedAt": "2026-10-10T03:42:48.557Z",
   "assetBaseUrl": "https://fiezel-audio.fitrajft.workers.dev",
   "voiceProfile": {
     "voiceId": "4KH3q7xDXbPdY3S5yw0Y",
@@ -17307,7 +17307,7 @@
       "bytes": 35130,
       "checksum": "e2f339796db03ca3c32a2b332f219347df1717b5309ac1600cfce5b2813970f8",
       "sourceRef": "a1_curated_0095",
-      "createdAt": "2026-10-08T11:59:44.530Z",
+      "createdAt": "2026-10-10T03:39:21.289Z",
       "status": "ready"
     },
     "67f9dd5277b40b241d7087cfea78e0133b43f64c02f1d96fd84b83f306eb1e70": {
@@ -17319,7 +17319,7 @@
       "bytes": 54330,
       "checksum": "d573c88ea0434139077d261a37bc59472b9e7c5b674c7e2e67798865bc3f801c",
       "sourceRef": "a1_curated_0097",
-      "createdAt": "2026-10-08T12:00:06.375Z",
+      "createdAt": "2026-10-10T03:39:33.506Z",
       "status": "ready"
     },
     "31979220a576723137b41ec25a9584bff6ef81ef0d4f4935bfeaad6888de2dbe": {
@@ -17331,7 +17331,7 @@
       "bytes": 54330,
       "checksum": "06e4af9ea7436cdbe90233de82a6a5d91fa7a65a9df95769a5569a29ff93c122",
       "sourceRef": "a1_curated_0098",
-      "createdAt": "2026-10-08T12:00:16.045Z",
+      "createdAt": "2026-10-10T03:39:33.966Z",
       "status": "ready"
     },
     "99f6cc89b6c291b0113c1a328570580b1a4e2ce9dd41920c54920bea4a41fd0e": {
@@ -17343,7 +17343,7 @@
       "bytes": 48570,
       "checksum": "7f2ad71cfd9d9d5d91b343937e59e7ed10b4e3c776a12099761a507fc55dd5e2",
       "sourceRef": "a1_curated_0099",
-      "createdAt": "2026-10-08T12:00:25.664Z",
+      "createdAt": "2026-10-10T03:39:34.432Z",
       "status": "ready"
     },
     "29e7ab21545be337114db03514226acf998f8a02e4940c2564c0dc79bfaddcee": {
@@ -17355,7 +17355,7 @@
       "bytes": 52410,
       "checksum": "e25e8671b21b035ec88e1e9e082c1a36ada0fd9ea359a42938da08c8acdd3115",
       "sourceRef": "a1_curated_0100",
-      "createdAt": "2026-10-08T12:00:36.415Z",
+      "createdAt": "2026-10-10T03:39:34.793Z",
       "status": "ready"
     },
     "15ab82148a8b3d4362cd7620bb19f20524665f3a1369a898e5002a292af184e2": {
@@ -17367,7 +17367,7 @@
       "bytes": 58170,
       "checksum": "8199255a778c66e9775364248a180d48c773749c871584097d9f0166dd72f798",
       "sourceRef": "a1_curated_0102",
-      "createdAt": "2026-10-08T12:00:53.783Z",
+      "createdAt": "2026-10-10T03:39:46.760Z",
       "status": "ready"
     },
     "ad039750d333efcbedbef974247e749da6782616f9112daff01a24c0f2d7d9a9": {
@@ -17379,7 +17379,7 @@
       "bytes": 58170,
       "checksum": "1cb40b3b5d9bcc69738c9fc833eaeff1b99ed5fbaf3d3ff2b5371fbc21920b77",
       "sourceRef": "a1_curated_0103",
-      "createdAt": "2026-10-08T12:01:49.237Z",
+      "createdAt": "2026-10-10T03:39:47.176Z",
       "status": "ready"
     },
     "61d3614a5f4767e7ea0a55e2af618eb8c6be9d20eb00c1d6354bb70e5ae52fe0": {
@@ -17391,7 +17391,7 @@
       "bytes": 58170,
       "checksum": "88da5cb3da88ff4762f12eca929a5498360caf45e7dcdf7b3c654e21ea9fb153",
       "sourceRef": "a1_curated_0104",
-      "createdAt": "2026-10-08T12:01:59.455Z",
+      "createdAt": "2026-10-10T03:39:47.582Z",
       "status": "ready"
     },
     "971a1bbf459fb96cd27b9fecf6ebeb509709e7445542c56e61099c69b80602ff": {
@@ -17403,7 +17403,7 @@
       "bytes": 48570,
       "checksum": "5fdb1c2be1b514241ce1fcaed06809b4191ce016f5a245bd9222d2006006e746",
       "sourceRef": "a1_curated_0105",
-      "createdAt": "2026-10-08T12:02:09.030Z",
+      "createdAt": "2026-10-10T03:39:48.008Z",
       "status": "ready"
     },
     "7618925d7d598364c956fd4431610a813d0ad7e81f9d331a2cc694428b46ab61": {
@@ -17415,7 +17415,7 @@
       "bytes": 48570,
       "checksum": "2c1a3652f28387ab0d5b3b74c1c1f85a225184b30231e3cdd4c416ecfe3e69ec",
       "sourceRef": "a1_curated_0106",
-      "createdAt": "2026-10-08T12:02:18.906Z",
+      "createdAt": "2026-10-10T03:39:48.466Z",
       "status": "ready"
     },
     "8af651d54548b03009ada611b0e4b574aeeb8217fa94f90a8f20f59498cde9f8": {
@@ -17427,7 +17427,7 @@
       "bytes": 42810,
       "checksum": "0c431643aeefb07781f506ce10e3cecba39da12cacd7f8c2c559b62af3ea0ce9",
       "sourceRef": "a1_curated_0107",
-      "createdAt": "2026-10-08T12:02:28.461Z",
+      "createdAt": "2026-10-10T03:39:48.947Z",
       "status": "ready"
     },
     "6b45cfb648727e3fc278f99d4d98f2ee4cdc4fec2850d302daac71f1b03133d5": {
@@ -17439,7 +17439,7 @@
       "bytes": 48570,
       "checksum": "add23f48662a37694624f7cc1192c360b4ad11de3c1e84f46bc38fa0b6438766",
       "sourceRef": "a1_curated_0108",
-      "createdAt": "2026-10-08T12:02:40.575Z",
+      "createdAt": "2026-10-10T03:39:49.411Z",
       "status": "ready"
     },
     "15246defcff37cbe74e6a8693a258d24d4298f6a318caf998ce3ebd90d2e04b3": {
@@ -17451,7 +17451,7 @@
       "bytes": 50490,
       "checksum": "36b14b5aa78d40eab119962e7bcd6b4ed35df21c6995f3dadbf0a172fe291b5c",
       "sourceRef": "a1_curated_0109",
-      "createdAt": "2026-10-08T12:02:50.633Z",
+      "createdAt": "2026-10-10T03:39:49.828Z",
       "status": "ready"
     },
     "fecc79a539d7e6c435541801171b5d8597a42222faae0a6d1a159f8eed7ef6fe": {
@@ -17463,7 +17463,7 @@
       "bytes": 46650,
       "checksum": "b919ec7b4477e97cb81891d4e71de3b8c19c9bee9fbc00675782d0c465e41cee",
       "sourceRef": "a1_curated_0110",
-      "createdAt": "2026-10-08T12:03:00.503Z",
+      "createdAt": "2026-10-10T03:39:50.558Z",
       "status": "ready"
     },
     "d527c5fd80fa123a4ecc4f2e8a989fb76b90e84bf296b3a8ef603c2d70bd85f2": {
@@ -17475,7 +17475,7 @@
       "bytes": 56250,
       "checksum": "599dab8f81f53f9caa5710739f180dbb5bba4b41834259b071261cc4d27c4493",
       "sourceRef": "a1_curated_0111",
-      "createdAt": "2026-10-08T12:03:09.777Z",
+      "createdAt": "2026-10-10T03:39:50.954Z",
       "status": "ready"
     },
     "e442e69ca2c9952ba53d22ebc35bfd2f5b17dcd8dedf85999eb0929e8504db53": {
@@ -17487,7 +17487,7 @@
       "bytes": 48570,
       "checksum": "8cfa896d64927ce9e586137d8d61d1113befa2395a2ad5cc3e00594b4f062ae2",
       "sourceRef": "a1_curated_0112",
-      "createdAt": "2026-10-08T12:03:19.659Z",
+      "createdAt": "2026-10-10T03:39:51.389Z",
       "status": "ready"
     },
     "a758d18655c65dcab3864899f669b19d78287e26826af85cb217fd9bf88850bd": {
@@ -17499,7 +17499,7 @@
       "bytes": 54330,
       "checksum": "1628e99e26db9fb570cfa22123c7de1d5598ef1966c0c082d35478a7ca172a7e",
       "sourceRef": "a1_curated_0113",
-      "createdAt": "2026-10-08T12:03:29.850Z",
+      "createdAt": "2026-10-10T03:39:51.757Z",
       "status": "ready"
     },
     "0d4984d1a7289f29eb35ab5eb2843e708833de4201bb20c6dd1c5838cc8bf576": {
@@ -17511,7 +17511,7 @@
       "bytes": 52410,
       "checksum": "ab0d3da3bcdb55e11c825ac58e5a7a72d220370baf6dcae1cc7295632e5a5276",
       "sourceRef": "a1_curated_0114",
-      "createdAt": "2026-10-08T12:03:39.315Z",
+      "createdAt": "2026-10-10T03:39:52.234Z",
       "status": "ready"
     },
     "40ab87f27063be6b3c7d069243b4bb92f2c753e1e49c315d4040e2755d3626f0": {
@@ -17523,7 +17523,7 @@
       "bytes": 44730,
       "checksum": "4575110a6a7f0a1160639f4b2279837f55c3a2de6ff82cf8e59e183e77097d74",
       "sourceRef": "a1_curated_0115",
-      "createdAt": "2026-10-08T12:03:48.526Z",
+      "createdAt": "2026-10-10T03:39:52.672Z",
       "status": "ready"
     },
     "cf447601086d2bc9838ae2569b63552e6c23e6c2490bf54c5e96a0d022f79978": {
@@ -17535,7 +17535,7 @@
       "bytes": 44730,
       "checksum": "5e8d7264e1b5be3c5a169032e6f015d9c17355f70efb89ae0cb70b7ba48d38d1",
       "sourceRef": "a1_curated_0116",
-      "createdAt": "2026-10-08T12:03:58.323Z",
+      "createdAt": "2026-10-10T03:39:53.299Z",
       "status": "ready"
     },
     "5144753943234833c2e9c4425a4fb3105bff9c02c2bde066fc98f75c05554046": {
@@ -17547,7 +17547,7 @@
       "bytes": 48570,
       "checksum": "d4592ecb7c85e15faa37cb462fd6b7840e4609508a194ae30c7f41eba03a57ba",
       "sourceRef": "a1_curated_0117",
-      "createdAt": "2026-10-08T12:04:08.392Z",
+      "createdAt": "2026-10-10T03:39:53.618Z",
       "status": "ready"
     },
     "bd3ff018a19e29286548da00f96456233c34cba077ae7236270c02ca5c435a80": {
@@ -17559,7 +17559,7 @@
       "bytes": 48570,
       "checksum": "0114fc11a34e270bb27b0ad17054a7e3a17d85d8d90e6ff728521c4d5fe65230",
       "sourceRef": "a1_curated_0118",
-      "createdAt": "2026-10-08T12:04:18.542Z",
+      "createdAt": "2026-10-10T03:39:53.936Z",
       "status": "ready"
     },
     "2187cfc405bb635d3962f303f7d91ba572feb3f400d8558f3ea4cb841e879987": {
@@ -17571,7 +17571,7 @@
       "bytes": 40890,
       "checksum": "844e3247e3793b4e4af348cb092f6dc1744d12da33fbef1ce8bea8df0fae11bd",
       "sourceRef": "a1_curated_0119",
-      "createdAt": "2026-10-08T12:04:28.274Z",
+      "createdAt": "2026-10-10T03:39:54.300Z",
       "status": "ready"
     },
     "5a928402ca5f07f8ee5be38e71ebfa3f4f2fde429db7544e45c02faaeade3df9": {
@@ -17583,7 +17583,7 @@
       "bytes": 46650,
       "checksum": "43657e0272b1cbfa136b48a5fb3709037b4ef088faf1981dadbe77bf4a8c0bc6",
       "sourceRef": "a1_curated_0120",
-      "createdAt": "2026-10-08T12:04:37.898Z",
+      "createdAt": "2026-10-10T03:39:54.720Z",
       "status": "ready"
     },
     "dd91a9f545f1f1216a4e63b48feef8f570d7ce568f1ee5c06beb1dff6c460527": {
@@ -17595,7 +17595,7 @@
       "bytes": 48570,
       "checksum": "d3fb745a8d04d55b250eb6cd875fea11dec1598d643dd31b02c9443439293bf5",
       "sourceRef": "a1_curated_0121",
-      "createdAt": "2026-10-08T12:04:47.558Z",
+      "createdAt": "2026-10-10T03:39:55.110Z",
       "status": "ready"
     },
     "d99dd7ccc040a73bfa65e57e545c8157ec48a115d10a5a27972ae0594af51a07": {
@@ -17607,7 +17607,7 @@
       "bytes": 44730,
       "checksum": "1fb5ffbfd5026a35a6414fd9c55f268e6f88e53126ef0f2394e6a48cf3228e35",
       "sourceRef": "a1_curated_0122",
-      "createdAt": "2026-10-08T12:04:56.951Z",
+      "createdAt": "2026-10-10T03:39:55.869Z",
       "status": "ready"
     },
     "1b61ebeb7306901fb283d74df501ba420bf261f249e226389f5e863aba454049": {
@@ -17619,7 +17619,7 @@
       "bytes": 40890,
       "checksum": "3adc5ec2d60e427d32ab6a030de5fcb46398784bcc1939fb1b07f764a08a65cd",
       "sourceRef": "a1_curated_0123",
-      "createdAt": "2026-10-08T12:05:07.958Z",
+      "createdAt": "2026-10-10T03:39:56.215Z",
       "status": "ready"
     },
     "a0f26b9e3ec03523f51086adcee4c131feba8dfbffe1169ab69499736f200f76": {
@@ -17631,7 +17631,7 @@
       "bytes": 46650,
       "checksum": "863bc6b2565f97cda55693367840301e78e9620f1662a6cd8d749aabfd657ab3",
       "sourceRef": "a1_curated_0124",
-      "createdAt": "2026-10-08T12:05:17.694Z",
+      "createdAt": "2026-10-10T03:39:56.666Z",
       "status": "ready"
     },
     "bc915c637a5f7314aea1a6f28967d8a49dce1e344622319aaced7801c1259488": {
@@ -17643,7 +17643,7 @@
       "bytes": 38970,
       "checksum": "bf4a4d5498905448846702168b5062e4b1fbb5907f82117aa8ebc51e50fc1481",
       "sourceRef": "a1_curated_0125",
-      "createdAt": "2026-10-08T12:05:27.274Z",
+      "createdAt": "2026-10-10T03:39:57.122Z",
       "status": "ready"
     },
     "23fe3a648f5d427f8c042fa065bd7f40474a496c440c9b6357d061087b1464d7": {
@@ -17655,7 +17655,7 @@
       "bytes": 48570,
       "checksum": "1e9fb263af96ef984fa8146fb0a5a9a32c872a8da314b647f6b07aec0fd213f0",
       "sourceRef": "a1_curated_0126",
-      "createdAt": "2026-10-08T12:05:37.240Z",
+      "createdAt": "2026-10-10T03:39:57.586Z",
       "status": "ready"
     },
     "91ad937bd1bbff9f2fb23bf21bf0dc65a49d1a8552890c64aabe6b52deb43761": {
@@ -17667,7 +17667,7 @@
       "bytes": 48570,
       "checksum": "12b0d86abdf6970fa005d28004f510b78e74961d7215ea737ef9731f2e4e44e7",
       "sourceRef": "a1_curated_0127",
-      "createdAt": "2026-10-08T12:05:46.550Z",
+      "createdAt": "2026-10-10T03:39:57.990Z",
       "status": "ready"
     },
     "e933d03ddb61634551e527e85c5b61dfe04fec0473a15db02c3002b0d8b7ce4c": {
@@ -17679,7 +17679,211 @@
       "bytes": 56250,
       "checksum": "ee98f110c01a8cc43e5dd4690369762a39b753c4668c2c3affc624d34c15d502",
       "sourceRef": "a1_curated_0128",
-      "createdAt": "2026-10-08T12:05:56.094Z",
+      "createdAt": "2026-10-10T03:39:58.346Z",
+      "status": "ready"
+    },
+    "96f64bc63954f20a089a3dc4cb9b8b8f4d0f22c03b34f118d3855fe7a0122b10": {
+      "url": "a/96f64bc63954f20a089a3dc4cb9b8b8f4d0f22c03b34f118d3855fe7a0122b10.mp3",
+      "contentType": "word",
+      "locale": "en-US",
+      "voiceId": "Aoede",
+      "modelId": "gemini-tts-gemini-2.5-flash-preview-tts",
+      "bytes": 44730,
+      "checksum": "b6589113dd68470231faa1e3549a514cc16f13bc7008ef9439b8aed215b3a92d",
+      "sourceRef": "a1_curated_0094",
+      "createdAt": "2026-10-10T03:39:14.318Z",
+      "status": "ready"
+    },
+    "cfad28911acce0d3391192b7a5d1e001d8424d2ebacf27ea2471bec96000d655": {
+      "url": "a/cfad28911acce0d3391192b7a5d1e001d8424d2ebacf27ea2471bec96000d655.mp3",
+      "contentType": "word",
+      "locale": "en-US",
+      "voiceId": "Aoede",
+      "modelId": "gemini-tts-gemini-2.5-flash-preview-tts",
+      "bytes": 52410,
+      "checksum": "89e7fea9a68869e64e5aa871b3f64b00d6aee24803f4eb0ce24ed4c4320a2158",
+      "sourceRef": "a1_curated_0096",
+      "createdAt": "2026-10-10T03:39:26.577Z",
+      "status": "ready"
+    },
+    "97eda3e49b931ddd0c43a72977befb83f2d2a3d852d10f00c4285698b4b095f0": {
+      "url": "a/97eda3e49b931ddd0c43a72977befb83f2d2a3d852d10f00c4285698b4b095f0.mp3",
+      "contentType": "word",
+      "locale": "en-US",
+      "voiceId": "Aoede",
+      "modelId": "gemini-tts-gemini-2.5-flash-preview-tts",
+      "bytes": 40890,
+      "checksum": "6057e48f25c558f52dd6452a64c96a4dc4827ae2063560a4395d8b85e3691576",
+      "sourceRef": "a1_curated_0101",
+      "createdAt": "2026-10-10T03:39:39.861Z",
+      "status": "ready"
+    },
+    "f2bf173dcc91380002c9b83be75b8df3f8c6f6e3873461b501e73e3b1aab0502": {
+      "url": "a/f2bf173dcc91380002c9b83be75b8df3f8c6f6e3873461b501e73e3b1aab0502.mp3",
+      "contentType": "word",
+      "locale": "en-US",
+      "voiceId": "Aoede",
+      "modelId": "gemini-tts-gemini-2.5-flash-preview-tts",
+      "bytes": 48570,
+      "checksum": "b46bc9ad3f97c8c66052743209f201e158d51af53bb42b8aaf86763ee0c1bbb6",
+      "sourceRef": "a1_curated_0129",
+      "createdAt": "2026-10-10T03:40:01.079Z",
+      "status": "ready"
+    },
+    "4b72f3c3feaaff7896dca0abb1fbb77c172b024a114950c8ae8ca3958ceb7874": {
+      "url": "a/4b72f3c3feaaff7896dca0abb1fbb77c172b024a114950c8ae8ca3958ceb7874.mp3",
+      "contentType": "sentence",
+      "locale": "en-US",
+      "voiceId": "Aoede",
+      "modelId": "gemini-tts-gemini-2.5-flash-preview-tts",
+      "bytes": 148410,
+      "checksum": "be3266d30be7be21bc2a18ce61d2e1e612c8145a6c25517f35584b756142d93f",
+      "sourceRef": "vocab_00007",
+      "createdAt": "2026-10-10T03:40:21.839Z",
+      "status": "ready"
+    },
+    "d40ce4a48fcde99191f07517585e65623d64acdbfbb1aa59f8bf1d0af27856ba": {
+      "url": "a/d40ce4a48fcde99191f07517585e65623d64acdbfbb1aa59f8bf1d0af27856ba.mp3",
+      "contentType": "sentence",
+      "locale": "en-US",
+      "voiceId": "Aoede",
+      "modelId": "gemini-tts-gemini-2.5-flash-preview-tts",
+      "bytes": 159930,
+      "checksum": "e3b0e37354482d5b42418650d4c48905d00ce50c6012757e67cadf9b78b57b79",
+      "sourceRef": "vocab_00115",
+      "createdAt": "2026-10-10T03:40:34.201Z",
+      "status": "ready"
+    },
+    "26cd148b2209268c89cb7223ada29386566a42fb2d01cd25e0d608ebd2a543a7": {
+      "url": "a/26cd148b2209268c89cb7223ada29386566a42fb2d01cd25e0d608ebd2a543a7.mp3",
+      "contentType": "sentence",
+      "locale": "en-US",
+      "voiceId": "Aoede",
+      "modelId": "gemini-tts-gemini-2.5-flash-preview-tts",
+      "bytes": 111930,
+      "checksum": "dcaa6cc769e5f3654c071ede7e0f30648f3abfed4ec502ae233b0d37a9660e48",
+      "sourceRef": "vocab_00124",
+      "createdAt": "2026-10-10T03:40:44.249Z",
+      "status": "ready"
+    },
+    "09d2480049e65692d5c0fe9ec594aebf6778e04e82285e39a9449e692ec743c1": {
+      "url": "a/09d2480049e65692d5c0fe9ec594aebf6778e04e82285e39a9449e692ec743c1.mp3",
+      "contentType": "sentence",
+      "locale": "en-US",
+      "voiceId": "Aoede",
+      "modelId": "gemini-tts-gemini-2.5-flash-preview-tts",
+      "bytes": 121530,
+      "checksum": "8ff05c646548e251a034aeba36fd6a75a36013339246724e8b216c66f10552ba",
+      "sourceRef": "vocab_00138",
+      "createdAt": "2026-10-10T03:40:54.282Z",
+      "status": "ready"
+    },
+    "f096eb3927a008731c9d4b0850177258a5ad43659c64ea951d0decc4b5847420": {
+      "url": "a/f096eb3927a008731c9d4b0850177258a5ad43659c64ea951d0decc4b5847420.mp3",
+      "contentType": "sentence",
+      "locale": "en-US",
+      "voiceId": "Aoede",
+      "modelId": "gemini-tts-gemini-2.5-flash-preview-tts",
+      "bytes": 179130,
+      "checksum": "f6184e3cd0037899228cf584a3dc70636b1676c99f6962fc3356f06b576a11e6",
+      "sourceRef": "vocab_00172",
+      "createdAt": "2026-10-10T03:41:05.019Z",
+      "status": "ready"
+    },
+    "bdd81583d12e2a47dcbb1dc86395aaa569877145d53572f993f6bd2fd403e9f8": {
+      "url": "a/bdd81583d12e2a47dcbb1dc86395aaa569877145d53572f993f6bd2fd403e9f8.mp3",
+      "contentType": "sentence",
+      "locale": "en-US",
+      "voiceId": "Aoede",
+      "modelId": "gemini-tts-gemini-2.5-flash-preview-tts",
+      "bytes": 86970,
+      "checksum": "a5c3268933baeffbb6cb4da74abbbd898b4e6aeacb09437151d1f70fac6db3c0",
+      "sourceRef": "vocab_00543",
+      "createdAt": "2026-10-10T03:41:14.637Z",
+      "status": "ready"
+    },
+    "3a6c3dbcdd3960437df709d4717685b56f557f4f530236ce7d8e8d8de83986bf": {
+      "url": "a/3a6c3dbcdd3960437df709d4717685b56f557f4f530236ce7d8e8d8de83986bf.mp3",
+      "contentType": "sentence",
+      "locale": "en-US",
+      "voiceId": "Aoede",
+      "modelId": "gemini-tts-gemini-2.5-flash-preview-tts",
+      "bytes": 129210,
+      "checksum": "22780551a1736bb52067c7ee4c36dda95ec7df3ef8d3efd3f399a82f50bead16",
+      "sourceRef": "vocab_00709",
+      "createdAt": "2026-10-10T03:41:27.452Z",
+      "status": "ready"
+    },
+    "c5fdc788b33c5e5334f7e48e830fad8a4c0467c555a2ad40ea95b15c52206415": {
+      "url": "a/c5fdc788b33c5e5334f7e48e830fad8a4c0467c555a2ad40ea95b15c52206415.mp3",
+      "contentType": "sentence",
+      "locale": "en-US",
+      "voiceId": "Aoede",
+      "modelId": "gemini-tts-gemini-2.5-flash-preview-tts",
+      "bytes": 104250,
+      "checksum": "2cb9a3f57e21876b22e051b9fc4b2514662993ac0d00db39c5ad539162408a55",
+      "sourceRef": "a1_curated_0001",
+      "createdAt": "2026-10-10T03:41:37.061Z",
+      "status": "ready"
+    },
+    "b4f712127c9ef4c0e7fac7af2b8d678491ae2ab3723ab8dcc0dc1acacc3d3589": {
+      "url": "a/b4f712127c9ef4c0e7fac7af2b8d678491ae2ab3723ab8dcc0dc1acacc3d3589.mp3",
+      "contentType": "sentence",
+      "locale": "en-US",
+      "voiceId": "Aoede",
+      "modelId": "gemini-tts-gemini-2.5-flash-preview-tts",
+      "bytes": 111930,
+      "checksum": "acf57b1e9bdefdf90d801aea98c9cc8bf465e300c0214ade0d404ebb77203fd2",
+      "sourceRef": "a1_curated_0002",
+      "createdAt": "2026-10-10T03:41:46.917Z",
+      "status": "ready"
+    },
+    "c4c2495a7bdbcb0eaaf0106b0b578c73b9581c22d06effd19c0dd720b46d58b7": {
+      "url": "a/c4c2495a7bdbcb0eaaf0106b0b578c73b9581c22d06effd19c0dd720b46d58b7.mp3",
+      "contentType": "sentence",
+      "locale": "en-US",
+      "voiceId": "Aoede",
+      "modelId": "gemini-tts-gemini-2.5-flash-preview-tts",
+      "bytes": 111930,
+      "checksum": "000ef6b1ea89ab95fb98de6b2af0f70894eda1fc3d7f05e43e7d1fb681820ff7",
+      "sourceRef": "a1_curated_0003",
+      "createdAt": "2026-10-10T03:41:57.558Z",
+      "status": "ready"
+    },
+    "65da63eeae6ca3bd0799aa0766eed5ba354a0a2e6e31db5b2ccffeafe92ed297": {
+      "url": "a/65da63eeae6ca3bd0799aa0766eed5ba354a0a2e6e31db5b2ccffeafe92ed297.mp3",
+      "contentType": "sentence",
+      "locale": "en-US",
+      "voiceId": "Aoede",
+      "modelId": "gemini-tts-gemini-2.5-flash-preview-tts",
+      "bytes": 83130,
+      "checksum": "4fe56d0dc9bacf939e239f1eab59947aa9e6c6c5d582414c6c7d76062cc49d14",
+      "sourceRef": "a1_curated_0004",
+      "createdAt": "2026-10-10T03:42:07.096Z",
+      "status": "ready"
+    },
+    "d9eb1727eacb8f1c19c1c7f2befa25e938aba40e5935ceb66289a8f532fd34b8": {
+      "url": "a/d9eb1727eacb8f1c19c1c7f2befa25e938aba40e5935ceb66289a8f532fd34b8.mp3",
+      "contentType": "sentence",
+      "locale": "en-US",
+      "voiceId": "Aoede",
+      "modelId": "gemini-tts-gemini-2.5-flash-preview-tts",
+      "bytes": 113850,
+      "checksum": "59f9b75e8ff6c877acac296bcd2208989bf988f0bde76d71442f2be9fc9e4629",
+      "sourceRef": "a1_curated_0005",
+      "createdAt": "2026-10-10T03:42:32.151Z",
+      "status": "ready"
+    },
+    "06cb5c81be57a90e63f10fa367a376f03fdd9ef405639e14b0d4a0d3c01c345b": {
+      "url": "a/06cb5c81be57a90e63f10fa367a376f03fdd9ef405639e14b0d4a0d3c01c345b.mp3",
+      "contentType": "sentence",
+      "locale": "en-US",
+      "voiceId": "Aoede",
+      "modelId": "gemini-tts-gemini-2.5-flash-preview-tts",
+      "bytes": 127290,
+      "checksum": "b89855ee231c21b9b21f8298c13454d1b15214d0cf2cdce161d24cf9ac7edd4b",
+      "sourceRef": "a1_curated_0006",
+      "createdAt": "2026-10-10T03:42:42.049Z",
       "status": "ready"
     }
   },
