@@ -1,6 +1,6 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-10-10T05:57:23.954Z",
+  "generatedAt": "2026-10-10T07:17:20.222Z",
   "files": {
     "app.js": {
       "leaks": 3,
@@ -95,15 +95,15 @@
       "budget": 3,
       "sample": [
         {
-          "line": 2297,
+          "line": 2484,
           "text": "Latihan · ±"
         },
         {
-          "line": 2345,
+          "line": 2532,
           "text": "Tenggat"
         },
         {
-          "line": 2345,
+          "line": 2532,
           "text": "Latihan — umpan balik tiap soal"
         }
       ]
@@ -457,15 +457,15 @@
       "budget": 3,
       "sample": [
         {
-          "line": 620,
+          "line": 624,
           "text": ". Aku bangga. Lanjutkan ritmenya — 1 sesi kecil tiap hari lebih ampuh daripada 1 sesi panjang seminggu."
         },
         {
-          "line": 629,
+          "line": 633,
           "text": "• Akurasi keseluruhan:"
         },
         {
-          "line": 652,
+          "line": 656,
           "text": "Akurasi"
         }
       ]
@@ -504,8 +504,8 @@
     }
   },
   "copyKeys": {
-    "id": 4010,
-    "th": 3834,
+    "id": 4023,
+    "th": 3847,
     "idTanpaTh": 0
   },
   "pass": true

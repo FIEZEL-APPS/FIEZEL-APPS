@@ -4455,6 +4455,7 @@
           '<div class="tg-form-row"><label class="tg-label">' + t('guru.jumlah-soal', 'Jumlah soal') + (tab === 'mapel' && mapelAvailable ? (' <small class="tg-muted">(' + esc(t('guru.tersedia-label', 'tersedia')) + ' ' + mapelAvailable + ' ' + esc(t('guru.soal-di-bab-ini', 'soal di bab ini')) + ')</small>') : (tab === 'curriculum' && curUnit ? ' <small class="tg-muted">(tersedia ' + tersedia + ')</small>' : '')) + '<select name="count">' + countOptions.map(function (n) { return '<option' + (n === (tab === 'mapel' && mapelAvailable ? Math.min(mapelAvailable, 5) : tab === 'curriculum' && curUnit ? Math.min(tersedia, 8) : 5) ? ' selected' : '') + '>' + n + '</option>'; }).join('') + '</select></label><label class="tg-label">' + t('guru.tenggat-label', 'Tenggat') + '<input type="date" name="deadline" value="' + T.today(Date.now() + 2 * T.DAY) + '" data-testid="tg-assign-deadline"></label></div>' +
           '<label class="tg-label">' + esc(t('guru.langkah-2-mode', '2. Atur Mode & Waktu')) + '</label><div class="tg-mode"><label class="tg-mode-opt"><input type="radio" name="mode" value="latihan"' + (curAssignMode !== 'ujian' ? ' checked' : '') + '><div><b>🟢 ' + esc(t('guru.mode-latihan-title', 'Mode Latihan Mandiri')) + '</b><small>' + esc(t('guru.mode-latihan-sub', 'Kunci & pembahasan langsung terbuka setelah murid menjawab tiap soal. Cocok untuk PR & belajar mandiri.')) + '</small></div></label><label class="tg-mode-opt"><input type="radio" name="mode" value="ujian"' + (curAssignMode === 'ujian' ? ' checked' : '') + ' data-testid="tg-assign-mode-exam"><div><b>🛡️ ' + esc(t('guru.mode-ujian-title', 'Mode Ujian / Kuis Terjadwal')) + '</b><small>' + esc(t('guru.mode-ujian-sub', 'Ada timer hitung mundur, urutan soal diacak otomatis (anti-contek), nilai terekam otomatis ke rekap guru.')) + '</small></div></label></div>' +
           '<div class="tg-form-row"><label class="tg-label">' + t('guru.durasi-timer-ujian', 'Durasi Timer (khusus Ujian)') + '<select name="timer"><option value="10">10 Menit</option><option value="15" selected>15 Menit</option><option value="20">20 Menit</option><option value="30">30 Menit</option><option value="45">45 Menit</option><option value="60">60 Menit</option></select></label></div>' +
+          '<label class="tg-label ch-face-guard-toggle" style="display:flex;align-items:center;gap:10px;margin:8px 0;cursor:pointer;"><input type="checkbox" name="face_guard" value="1" checked data-testid="tg-assign-face-guard"> <span><b>🛡️ Wajibkan Verifikasi Wajah & Kamera Pengawas</b> (deteksi otomatis saat murid meninggalkan layar ujian)</span></label>' +
           '<label class="tg-label">' + t('guru.target-kelas-paralel', 'Terapkan ke kelas paralel (1 klik untuk banyak kelas)') + '</label><div class="tg-chips tg-chips-select" data-testid="tg-assign-classes">' + st.classes.map(function (k) { return '<label class="tg-chip is-check"><input type="checkbox" name="target_classes" value="' + k.id + '"' + (k.id === (c && c.id) ? ' checked' : '') + ' data-testid="tg-assign-class-' + k.id + '"><span>' + esc(k.name) + ' <b>(' + (k.students ? k.students.length : 0) + ')</b></span></label>'; }).join('') + '</div>' +
           '<label class="tg-label">Untuk siapa</label><div class="tg-chips tg-chips-select tg-chips-scroll"><label class="tg-chip is-check"><input type="radio" name="scope" value="all"' + (tgt.length ? '' : ' checked') + '><span>Seluruh kelas</span></label>' + c.students.map(function (s) { return '<label class="tg-chip is-check"><input type="checkbox" name="targets" value="' + s.id + '"' + (tgt.indexOf(s.id) !== -1 ? ' checked' : '') + '><span>' + esc(s.name) + '</span></label>'; }).join('') + '</div>' +
         '</div>' +
@@ -4995,6 +4996,7 @@
       var count = Number(fd.get('count')) || 5;
       var mode = fd.get('mode') || 'latihan';
       var timer = mode === 'ujian' ? (Number(fd.get('timer')) || 15) : 0;
+      var faceGuard = (mode === 'ujian') || (fd.get('face_guard') === '1');
       var deadline = fd.get('deadline');
       var targets = fd.get('scope') === 'all' ? null : fd.getAll('targets');
       var customItems = [];
@@ -5081,6 +5083,7 @@
         deadline: deadline,
         mode: mode,
         timer: timer,
+        faceGuard: faceGuard,
         targets: targets,
         teacher: (st && st.teacher && st.teacher.name) || 'Guru',
         avoid: c.sentItemIds,
@@ -5116,6 +5119,7 @@
             var clone = T.buildAssignment({
               title: title, skills: skills.slice(), items: (customItems || []).slice(),
               count: count, deadline: deadline, mode: mode, timer: timer,
+              faceGuard: faceGuard,
               targets: null, teacher: (st && st.teacher && st.teacher.name) || 'Guru',
               avoid: k.sentItemIds, curriculumOnly: kurikulumOnly, source: sourceMeta
             });

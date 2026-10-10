@@ -893,7 +893,7 @@
      (selalu membawa angka terbaru, bukan selisih), satu kiriman menyusul di ujung jendela
      pembatas sudah cukup: yang tertinggal bukan satu peristiwa, melainkan keterlambatan. */
   var REPORT_GAP_MS = 16000;
-  function isExamRunner() { var u = ui(), a = currentAssignment(); return !!(u.runner && !u.runner.finished && a && (a.mode === 'ujian' || a.isExam || (a.timer && a.timer > 0))); }
+  function isExamRunner() { var u = ui(), a = currentAssignment(); return !!(u.runner && !u.runner.finished && a && (a.mode === 'ujian' || a.isExam || (a.timer && a.timer > 0) || !!a.faceGuard)); }
   function saveFocus(st) { ui().focus = st; saveUi(); }
   /** Kirim ringkasan ke guru sekarang juga (lewat learner-flow -> class-report). */
   function reportFocus(st) {
@@ -936,52 +936,57 @@
     if (sEl) renderStudent();
     if (sEnv.toast) sEnv.toast(t('proctor.kembali-toast', 'Kamu keluar dari layar ujian {n}× ({detik} detik terakhir). Catatannya sudah sampai ke gurumu.', { n: sum.n, detik: Math.round(ep.ms / 1000) }));
   }
+  function faceGuardOptions() {
+    return {
+      onAbsent: function (at) {
+        var u = ui(), st = u.focus; if (!st || !FG() || !isExamRunner()) return;
+        FG().leaveFace(st, at || Date.now());
+        saveFocus(st);
+      },
+      onWarning: function (warn) {
+        var prevWarn = !!ui().faceWarn;
+        ui().faceWarn = !!warn;
+        if (sEl) renderStudent();
+        if (warn && !prevWarn) {
+          try {
+            if (typeof navigator !== 'undefined' && navigator.vibrate) {
+              navigator.vibrate([100, 50, 100]);
+            }
+          } catch (_) {}
+        }
+      },
+      onAbsentEpisode: function (elapsed) {
+        var u = ui(), st = u.focus; if (!st || !FG() || !isExamRunner()) return;
+        if (!st.faceAwaySince) {
+          FG().leaveFace(st, Date.now() - (elapsed || 10000));
+        }
+        saveFocus(st);
+        reportFocus(st);
+      },
+      onPresent: function () {
+        var u = ui(), st = u.focus; if (!st || !FG()) return;
+        var ep = FG().backFace(st, Date.now());
+        var wasWarned = !!ui().faceWarn;
+        ui().faceWarn = false;
+        saveFocus(st);
+        if (ep) {
+          reportFocus(st);
+          var sum = FG().summary(st, Date.now());
+          if (sEl) renderStudent();
+          if (sEnv.toast) sEnv.toast(t('proctor.wajah-tercatat', 'Wajah tidak terlihat {vn}× ({detik} detik). Catatannya terkirim ke gurumu.', { vn: sum.vn, detik: Math.round(ep.ms / 1000) }));
+        } else if (wasWarned) {
+          if (sEl) renderStudent();
+          if (sEnv.toast) sEnv.toast(t('proctor.wajah-kembali', 'Wajah terdeteksi kembali! Selamat melanjutkan ujian.'));
+        }
+      }
+    };
+  }
   function startFaceGuard() {
     var face = FaceG(); if (!face || !isExamRunner()) return;
+    var u = ui();
+    if (u.runner && !u.runner.faceVerified) return; // Tunggu verifikasi pra-ujian selesai
     try {
-      face.start({
-        onAbsent: function (at) {
-          var u = ui(), st = u.focus; if (!st || !FG() || !isExamRunner()) return;
-          FG().leaveFace(st, at || Date.now());
-          saveFocus(st);
-        },
-        onWarning: function (warn) {
-          var prevWarn = !!ui().faceWarn;
-          ui().faceWarn = !!warn;
-          if (sEl) renderStudent();
-          if (warn && !prevWarn) {
-            try {
-              if (typeof navigator !== 'undefined' && navigator.vibrate) {
-                navigator.vibrate([100, 50, 100]);
-              }
-            } catch (_) {}
-          }
-        },
-        onAbsentEpisode: function (elapsed) {
-          var u = ui(), st = u.focus; if (!st || !FG() || !isExamRunner()) return;
-          if (!st.faceAwaySince) {
-            FG().leaveFace(st, Date.now() - (elapsed || 10000));
-          }
-          saveFocus(st);
-          reportFocus(st);
-        },
-        onPresent: function () {
-          var u = ui(), st = u.focus; if (!st || !FG()) return;
-          var ep = FG().backFace(st, Date.now());
-          var wasWarned = !!ui().faceWarn;
-          ui().faceWarn = false;
-          saveFocus(st);
-          if (ep) {
-            reportFocus(st);
-            var sum = FG().summary(st, Date.now());
-            if (sEl) renderStudent();
-            if (sEnv.toast) sEnv.toast(t('proctor.wajah-tercatat', 'Wajah tidak terlihat {vn}× ({detik} detik). Catatannya terkirim ke gurumu.', { vn: sum.vn, detik: Math.round(ep.ms / 1000) }));
-          } else if (wasWarned) {
-            if (sEl) renderStudent();
-            if (sEnv.toast) sEnv.toast(t('proctor.wajah-kembali', 'Wajah terdeteksi kembali! Selamat melanjutkan ujian.'));
-          }
-        }
-      });
+      face.start(faceGuardOptions());
     } catch (_) {}
   }
   function stopFaceGuard() {
@@ -1030,7 +1035,7 @@
   }
   function focusBanner() {
     var st = ui().focus, sum = st && FG() ? FG().summary(st, Date.now()) : null;
-    var face = FaceG(), faceActive = face && face.isActive();
+    var face = FaceG(), faceActive = face && typeof face.isActive === 'function' && face.isActive();
     var facePill = faceActive ? ' <span class="ch-camera-pill" data-testid="class-camera-pill">● ' + esc(t('proctor.kamera-aktif', 'Kamera ujian aktif')) + '</span>' : '';
     if (ui().faceWarn) {
       return '<p class="ch-proctor is-warn ch-proctor-face" data-testid="class-proctor-face-warn">' + icon('alert-triangle') + ' ' + esc(t('proctor.wajah-peringatan', 'Wajah tidak terdeteksi di kamera depan. Harap menghadap layar HP agar ujian tidak ditandai pengawas.')) + facePill + '</p>';
@@ -1043,10 +1048,13 @@
   }
   function startRunner(a) {
     var u = ui(), order = a.itemIds.map(function (_, i) { return i; });
-    var isExam = a.mode === 'ujian' || a.isExam || (a.timer && a.timer > 0);
+    var isExam = a.mode === 'ujian' || a.isExam || (a.timer && a.timer > 0) || !!a.faceGuard;
     if (a.shuffle || isExam) order = shuffle(order, a.id.length * 7 + Date.now() % 1000);
     else if (a.variant !== false && !a.isMission) order = shuffle(order, variantSeed(a)); /* R4: urutan soal per murid */
-    u.runner = { aid: a.id, idx: 0, order: order, answers: [], chosen: null, revealed: false, startedAt: Date.now(), timerEnd: isExam && a.timer ? Date.now() + a.timer * 60000 : 0, finished: false, result: null };
+    var faceSupported = FaceG() && FaceG().isSupported();
+    var needFaceVerify = isExam && faceSupported;
+    u.runner = { aid: a.id, idx: 0, order: order, answers: [], chosen: null, revealed: false, startedAt: Date.now(), timerEnd: (isExam && a.timer && !needFaceVerify) ? (Date.now() + a.timer * 60000) : 0, finished: false, result: null, faceVerified: !needFaceVerify, isExam: isExam };
+    u.facePreflight = needFaceVerify ? { status: 'idle', passes: 0 } : null;
     u.tab = 'tugas'; u.review = null;
     u.focus = isExam && FG() ? FG().start(a.id, Date.now()) : null;
     /* Kunci ujian global: ia yang membuat pembimbing PAW dan layar Tanya FIEZEL menutup
@@ -1129,6 +1137,7 @@
     if (u.runner && !u.runner.finished && sEnv.toast) sEnv.toast(t('kelas.toast-disimpan-sedang', 'Tugas disimpan sebagai “sedang mengerjakan”. Lanjutkan kapan saja.'));
     if (u.runner && u.runner.finished) u.runner = null;
     u.paused = !!u.runner;
+    u.facePreflight = null;
     saveUi();
     renderStudent();
   }
@@ -1199,6 +1208,13 @@
             restored.setSelectionRange(activeSaved.s, activeSaved.e);
           }
         }
+      } catch (_) {}
+    }
+    if (u.facePreflight && (u.facePreflight.status === 'scanning' || u.facePreflight.status === 'verified')) {
+      try {
+        var pVid = sEl.querySelector('[data-face-preview]');
+        var face = FaceG();
+        if (pVid && face && typeof face.attachPreview === 'function') face.attachPreview(pVid);
       } catch (_) {}
     }
     if (sEnv.afterRender) try { sEnv.afterRender(); } catch (_) {}
@@ -2035,17 +2051,98 @@
       '</div>' +
     '</div>';
   }
+  function facePreflightView(a, r) {
+    var pf = ui().facePreflight || { status: 'idle' };
+    var st = pf.status || 'idle';
+    var isVerified = st === 'verified';
+    var isScanning = st === 'scanning';
+    var isStarting = st === 'starting';
+    var isErr = st === 'error' || st === 'timeout';
+
+    var statusHtml = '';
+    if (isVerified) {
+      statusHtml = '<div class="ch-preflight-status-row is-verified" data-testid="class-face-status-verified">' +
+        '<span class="ch-preflight-status-badge is-verified">' + icon('check-circle') + ' ' + esc(t('proctor.verifikasi-sukses', 'Wajah Terverifikasi!')) + '</span>' +
+        '<p class="ch-muted ch-small">' + esc(t('proctor.verifikasi-sukses-sub', 'Kamera siap menjaga integritas ujianmu. Silakan mulai pengerjaan.')) + '</p>' +
+      '</div>';
+    } else if (isScanning) {
+      statusHtml = '<div class="ch-preflight-status-row is-scanning" data-testid="class-face-status-scanning">' +
+        '<span class="ch-preflight-status-badge is-scanning"><span class="ch-face-live-dot"></span> ' + esc(t('proctor.verifikasi-memindai', 'Memindai wajah... Harap tetap menghadap kamera')) + '</span>' +
+      '</div>';
+    } else if (isStarting) {
+      statusHtml = '<div class="ch-preflight-status-row is-starting">' +
+        '<span class="ch-preflight-status-badge">' + icon('refresh-cw') + ' ' + esc(t('proctor.verifikasi-menghubungkan', 'Menghubungkan kamera...')) + '</span>' +
+      '</div>';
+    } else if (isErr) {
+      statusHtml = '<div class="ch-preflight-error-banner" data-testid="class-face-status-error">' +
+        '<p class="ch-err-text">' + icon('alert-triangle') + ' ' + esc(t('proctor.verifikasi-error-info', 'Kamera tidak dapat diakses atau izin belum diberikan. Klik ikon gembok di bilah peramban untuk mengizinkan kamera.')) + '</p>' +
+      '</div>';
+    } else {
+      statusHtml = '<div class="ch-preflight-status-row is-idle">' +
+        '<p class="ch-muted ch-small">' + icon('camera') + ' ' + esc(t('proctor.verifikasi-panduan', 'Posisikan wajahmu di dalam lingkaran')) + '</p>' +
+      '</div>';
+    }
+
+    var actionsHtml = '';
+    if (isVerified) {
+      actionsHtml = '<button type="button" class="ch-btn is-primary ch-btn-lg ch-btn-verified" data-ch="proceed-exam" data-testid="btn-proceed-exam">' +
+        icon('play') + ' ' + esc(t('proctor.verifikasi-btn-lanjut', 'Mulai Kerjakan Ujian')) + ' ' + icon('arrow-right') +
+      '</button>';
+    } else if (isStarting || isScanning) {
+      actionsHtml = '<button type="button" class="ch-btn is-primary ch-btn-lg is-loading" disabled data-testid="btn-verify-face-loading">' +
+        icon('refresh-cw') + ' ' + (isStarting ? esc(t('proctor.verifikasi-menghubungkan', 'Menghubungkan kamera...')) : esc(t('proctor.verifikasi-memindai', 'Memindai wajah...'))) +
+      '</button>';
+    } else if (isErr) {
+      actionsHtml = '<div class="ch-actions ch-col-actions">' +
+        '<button type="button" class="ch-btn is-primary ch-btn-lg" data-ch="start-face-verify" data-testid="btn-verify-face-retry">' +
+          icon('refresh-cw') + ' ' + esc(t('umum.coba-lagi', 'Coba Lagi')) +
+        '</button>' +
+        '<button type="button" class="ch-btn is-ghost is-small" data-ch="bypass-face-verify" data-testid="btn-bypass-face">' +
+          esc(t('proctor.verifikasi-btn-bypass', 'Lanjut Tanpa Kamera (Dilaporkan ke Guru)')) +
+        '</button>' +
+      '</div>';
+    } else {
+      actionsHtml = '<button type="button" class="ch-btn is-primary ch-btn-lg ch-pulse-btn" data-ch="start-face-verify" data-testid="btn-verify-face">' +
+        icon('camera') + ' ' + esc(t('proctor.verifikasi-btn-mulai', 'Aktifkan Kamera & Pindai Wajah')) +
+      '</button>';
+    }
+
+    return '<div class="ch-body ch-preflight-body" data-testid="class-face-preflight">' +
+      '<div class="ch-runner-top">' +
+        '<button type="button" class="ch-btn is-ghost is-small" data-ch="close-runner">' + icon('chevron-left') + ' ' + t('kelas.simpan-keluar', 'Simpan & keluar') + '</button>' +
+        '<span class="ch-muted">' + esc(a.teacher ? 'Dari ' + a.teacher : a.from || '') + '</span>' +
+      '</div>' +
+      '<section class="ch-card ch-face-preflight-card">' +
+        '<div class="ch-preflight-badge">' + icon('shield-check') + ' ' + esc(t('proctor.verifikasi-kicker', 'Verifikasi Wajah & Kamera Ujian')) + '</div>' +
+        '<h2 class="ch-preflight-title">' + esc(a.title || t('proctor.verifikasi-judul', 'Verifikasi Wajah Sebelum Mulai')) + '</h2>' +
+        '<p class="ch-preflight-desc">' + esc(t('proctor.verifikasi-desc', 'Pastikan wajahmu terlihat jelas di kamera depan, pencahayaan cukup, dan tidak memakai masker/penutup wajah. Kamera akan menjaga integritas ujianmu secara otomatis.')) + '</p>' +
+        '<div class="ch-face-verify-box' + (isVerified ? ' is-verified' : isScanning ? ' is-scanning' : isErr ? ' is-error' : '') + '" data-testid="class-face-preview-box">' +
+          '<video class="ch-face-preview-video" data-face-preview data-testid="class-face-preview-video" autoplay playsinline muted></video>' +
+          '<div class="ch-face-oval-guide"></div>' +
+          (!isScanning && !isVerified ? '<div class="ch-face-placeholder">' + icon('camera') + '</div>' : '') +
+          (isVerified ? '<div class="ch-face-verified-stamp">' + icon('check') + '</div>' : '') +
+        '</div>' +
+        statusHtml +
+        '<div class="ch-preflight-actions">' +
+          actionsHtml +
+        '</div>' +
+      '</section>' +
+    '</div>';
+  }
   function runnerView() {
     var r = ui().runner;
     if (r.finished) { var res = r.result; return '<div class="ch-body"><section class="ch-card ch-result" data-testid="class-result"><p class="ch-kicker">' + t('umum.selesai', 'Selesai') + '</p><h2>' + esc(res.title) + '</h2><p class="ch-score">' + res.c + '<small>/' + res.t + '</small></p><p class="ch-muted">' + (res.teacher ? statusKirim(res)  : icon('award') + ' ' + esc(t('kelas.hasil-misi-mandiri', 'Tersimpan di Paspor Kompetensimu. Ini misi yang kamu pilih sendiri, jadi ia tidak dilaporkan sebagai tugas dari guru.'))) + '</p><div class="ch-actions"><button type="button" class="ch-btn is-primary" data-ch="review" data-id="' + esc(r.aid) + '">Lihat pembahasan</button><button type="button" class="ch-btn is-ghost" data-ch="close-runner">' + t('kelas.kembali-ke-tugas', 'Kembali ke Tugas') + '</button></div></section></div>'; }
     var a = currentAssignment();
     if (!a) { ui().runner = null; saveUi(); return tugasView(assignments(), subs()); }
+    var isExam = a.mode === 'ujian' || a.isExam || (a.timer && a.timer > 0) || !!a.faceGuard;
+    if (isExam && !r.faceVerified && !r.finished && FaceG() && FaceG().isSupported()) {
+      return facePreflightView(a, r);
+    }
     while (r.idx < r.order.length && !resolveItem(a, a.itemIds[r.order[r.idx]])) r.idx += 1;
     if (r.idx >= r.order.length) { setTimeout(finishRunner, 0); return '<div class="ch-body"><p class="ch-muted">Menyimpan hasil…</p></div>'; }
     var id = a.itemIds[r.order[r.idx]], item = resolveItem(a, id);
     var fb = '';
     if (r.revealed) { var ok = r.chosen === item.answer, why = (item.why && item.why[r.chosen]) || (item.distractorWhy && item.distractorWhy[r.chosen]); fb = '<div class="ch-feedback ' + (ok ? 'is-ok' : 'is-no') + '" data-testid="class-feedback"><b>' + (ok ? 'Benar!' : t('kelas.belum-tepat', 'Belum tepat.')) + '</b> ' + (ok ? esc(item.note || '') : esc(why || ('Jawaban yang benar: ' + item.options[item.answer] + '.' + (item.note ? ' ' + item.note : '')))) + '</div>'; }
-    var isExam = a.mode === 'ujian' || a.isExam || (a.timer && a.timer > 0);
     return '<div class="ch-body ch-runner' + (ui().faceWarn ? ' has-face-alert' : '') + '" data-testid="class-runner">' +
       (ui().faceWarn ? faceAlertModal() : '') +
       '<div class="ch-runner-top"><button type="button" class="ch-btn is-ghost is-small" data-ch="close-runner">' + icon('chevron-left') + ' ' + t('kelas.simpan-keluar', 'Simpan & keluar') + '</button><span class="ch-muted">' + esc(a.teacher ? 'Dari ' + a.teacher : a.from || '') + '</span>' + (r.timerEnd ? '<span class="ch-timer" data-ch-timer>' + timerText(r) + '</span>' : '') + '</div>' +
@@ -2124,6 +2221,96 @@
           }
         }
         if (sEnv.toast) sEnv.toast(t('proctor.wajah-belum', 'Wajah belum terdeteksi. Pastikan pencahayaan cukup dan wajah menghadap kamera.'));
+        return;
+      }
+      case 'start-face-verify': {
+        var a = currentAssignment(); if (!a) return;
+        var face = FaceG(); if (!face) return;
+        u.facePreflight = { status: 'starting' };
+        renderStudent();
+        face.start(faceGuardOptions()).then(function (res) {
+          if (!res || !res.ok) {
+            ui().facePreflight = { status: 'error', reason: (res && res.reason) || 'denied' };
+            renderStudent();
+            return;
+          }
+          ui().facePreflight = { status: 'scanning', passes: 0 };
+          renderStudent();
+          var pVid = sEl ? sEl.querySelector('[data-face-preview]') : null;
+          if (pVid && face.attachPreview) face.attachPreview(pVid);
+
+          var pollCount = 0, consecutivePasses = 0;
+          function doScan() {
+            var cu = ui();
+            if (!cu.facePreflight || cu.facePreflight.status !== 'scanning' || !sEl) {
+              if (verifyTimer) clearInterval(verifyTimer);
+              return;
+            }
+            pollCount++;
+            var ok = face.checkNow ? face.checkNow() : true;
+            if (ok) consecutivePasses++;
+            else consecutivePasses = 0;
+
+            if (consecutivePasses >= 1 || pollCount >= 4) {
+              if (verifyTimer) clearInterval(verifyTimer);
+              cu.facePreflight = { status: 'verified' };
+              renderStudent();
+              var pVid2 = sEl ? sEl.querySelector('[data-face-preview]') : null;
+              if (pVid2 && face.attachPreview) face.attachPreview(pVid2);
+              if (sEnv.toast) sEnv.toast(t('proctor.verifikasi-sukses-toast', 'Wajah terverifikasi! Kamera siap menjaga ujianmu.'));
+            }
+          }
+          var verifyTimer = setInterval(doScan, 150);
+          doScan();
+        }).catch(function (err) {
+          ui().facePreflight = { status: 'error', reason: (err && err.name) || 'error' };
+          renderStudent();
+        });
+        return;
+      }
+      case 'proceed-exam': {
+        var r = u.runner, a = currentAssignment(); if (!r || !a) return;
+        r.faceVerified = true;
+        u.facePreflight = null;
+        r.startedAt = Date.now();
+        if (a.timer) r.timerEnd = Date.now() + a.timer * 60000;
+        if (r.timerEnd) {
+          if (timerTick) clearInterval(timerTick);
+          timerTick = setInterval(function () {
+            var rr = ui().runner;
+            if (!rr || rr.finished || !sEl) { clearInterval(timerTick); timerTick = null; return; }
+            if (Date.now() >= rr.timerEnd) { finishRunner(); return; }
+            var tEl = sEl.querySelector('[data-ch-timer]');
+            if (tEl) tEl.textContent = timerText(rr);
+          }, 1000);
+        }
+        startFaceGuard();
+        saveUi();
+        renderStudent();
+        return;
+      }
+      case 'bypass-face-verify': {
+        var r = u.runner, a = currentAssignment(); if (!r || !a) return;
+        r.faceVerified = true;
+        u.facePreflight = null;
+        r.startedAt = Date.now();
+        if (a.timer) r.timerEnd = Date.now() + a.timer * 60000;
+        if (u.focus) {
+          u.focus.noCamera = true;
+          reportFocus(u.focus);
+        }
+        if (r.timerEnd) {
+          if (timerTick) clearInterval(timerTick);
+          timerTick = setInterval(function () {
+            var rr = ui().runner;
+            if (!rr || rr.finished || !sEl) { clearInterval(timerTick); timerTick = null; return; }
+            if (Date.now() >= rr.timerEnd) { finishRunner(); return; }
+            var tEl = sEl.querySelector('[data-ch-timer]');
+            if (tEl) tEl.textContent = timerText(rr);
+          }, 1000);
+        }
+        saveUi();
+        renderStudent();
         return;
       }
       case 'answer': answerRunner(b.getAttribute('data-i')); return;
@@ -2302,7 +2489,7 @@
       }).join('') : '<section class="ch-card ch-empty">' + icon('clipboard-list') + '<p>' + t('kelas.belum-ada-tugas', 'Belum ada tugas. Susun dari bank FIEZEL, tulis sendiri, atau impor — saran otomatis meninjaunya sebelum dikirim.') + '</p></section>') + '</div>';
   }
   // ---- Buat tugas: 3 langkah (Sumber → Tinjauan Braincore → Kirim) ----------------------------
-  function draft(c) { if (!tUi.draft) tUi.draft = { step: 1, source: 'bank', title: '', skills: ['past_tense'], count: 10, deadline: T().today(Date.now() + 2 * T().DAY), mode: 'latihan', targets: [], raw: '', items: [], bankIds: [], review: null, finals: [], approved: {}, useSuggest: {}, q_prompt: '', q_opts: ['', '', '', ''], q_answer: 0 }; return tUi.draft; }
+  function draft(c) { if (!tUi.draft) tUi.draft = { step: 1, source: 'bank', title: '', skills: ['past_tense'], count: 10, deadline: T().today(Date.now() + 2 * T().DAY), mode: 'ujian', faceGuard: true, targets: [], raw: '', items: [], bankIds: [], review: null, finals: [], approved: {}, useSuggest: {}, q_prompt: '', q_opts: ['', '', '', ''], q_answer: 0 }; return tUi.draft; }
   function bankSkills() { var TS = T(); return TS.SKILL_ORDER.concat(TS.TKA_SKILLS || []).filter(function (k) { return k !== 'speaking' && B() && B().SKILLS[k]; }); }
   function tBuat(c, env) {
     var sc = env && env.scope;
@@ -2342,7 +2529,8 @@
         (d.source === 'tulis' ? '<div class="ch-write" data-testid="tclass-write">' + (d.items.length ? '<ol class="ch-item-list">' + d.items.map(function (q, i) { return '<li><b>' + esc(q.prompt) + '</b><ol class="ch-opts-inline">' + q.options.map(function (o, j) { return '<li class="' + (j === q.answer ? 'is-key' : '') + '">' + esc(o) + '</li>'; }).join('') + '</ol><button type="button" class="tg-link" data-ch="drop-item" data-i="' + i + '">hapus</button></li>'; }).join('') + '</ol>' : '') +
           '<fieldset class="ch-fieldset"><legend>' + t('kelas.soal-baru', 'Soal baru') + '</legend><label class="tg-label">Pertanyaan (gunakan ___ untuk rumpang)<input name="q_prompt" maxlength="400" value="' + esc(d.q_prompt || '') + '" placeholder="She ___ to school yesterday." data-testid="tclass-q-prompt"></label><div class="ch-form-row">' + [0, 1, 2, 3].map(function (i) { return '<label class="tg-label">' + String.fromCharCode(65 + i) + '<input name="q_opt' + i + '" maxlength="120" value="' + esc((d.q_opts && d.q_opts[i]) || '') + '"' + (i < 2 ? ' placeholder="wajib"' : '') + ' data-testid="tclass-q-opt' + i + '"></label>'; }).join('') + '</div><label class="tg-label">Kunci<select name="q_answer" data-testid="tclass-q-answer">' + [0, 1, 2, 3].map(function (i) { return '<option value="' + i + '"' + (Number(d.q_answer) === i ? ' selected' : '') + '>' + String.fromCharCode(65 + i) + '</option>'; }).join('') + '</select></label><button type="button" class="tg-btn is-ghost" data-ch="add-item" data-testid="tclass-add-item">' + icon('plus') + ' ' + t('kelas.tambah-soal', 'Tambah soal') + '</button></fieldset></div>' : '') +
         (d.source === 'impor' ? '<label class="tg-label">' + esc(t('kelas.tempel-soal-jelas', 'Tempel soal — satu baris per soal:')) + ' <code>pertanyaan | A | B | C | D | kunci</code> ' + esc(t('kelas.tempel-soal-format', '(kunci: huruf, nomor, atau teks). Blok bernomor dengan A./B./C./D. dan “Answer: B” juga dikenali.')) + '<textarea name="raw" rows="8" placeholder="She ___ to school yesterday. | go | went | goes | going | B" data-testid="tclass-import-raw">' + esc(d.raw) + '</textarea></label>' + (d.importErrors && d.importErrors.length ? '<p class="tg-error">' + d.importErrors.length + ' baris tidak terbaca: ' + esc(d.importErrors.slice(0, 3).map(function (e) { return 'baris ' + e.line; }).join(', ')) + '</p>' : '') : '') +
-        '<div class="ch-form-row"><label class="tg-label">Tenggat<input type="date" name="deadline" value="' + esc(d.deadline) + '" data-testid="tclass-deadline"></label><label class="tg-label">Mode<select name="mode" data-testid="tclass-mode"><option value="latihan"' + (d.mode === 'latihan' ? ' selected' : '') + '>Latihan — umpan balik tiap soal</option><option value="ujian"' + (d.mode === 'ujian' ? ' selected' : '') + '>Ujian mini — acak + timer</option></select></label></div>' +
+        '<div class="ch-form-row"><label class="tg-label">Tenggat<input type="date" name="deadline" value="' + esc(d.deadline) + '" data-testid="tclass-deadline"></label><label class="tg-label">Mode<select name="mode" data-testid="tclass-mode"><option value="ujian"' + (d.mode === 'ujian' ? ' selected' : '') + '>Ujian mini — acak + timer + pengawasan</option><option value="latihan"' + (d.mode === 'latihan' ? ' selected' : '') + '>Latihan — umpan balik tiap soal</option></select></label></div>' +
+        '<label class="tg-label ch-face-guard-toggle" style="display:flex;align-items:center;gap:8px;margin-top:6px;cursor:pointer;"><input type="checkbox" name="faceGuard" value="1"' + (d.faceGuard !== false ? ' checked' : '') + ' data-testid="tclass-face-guard"> <span><b>Wajibkan Verifikasi Wajah & Pengawasan Kamera</b></span></label>' +
         '<label class="tg-label">Untuk siapa</label><div class="tg-chips tg-chips-select tg-chips-scroll"><label class="tg-chip is-check"><input type="radio" name="scope" value="all"' + (d.targets.length ? '' : ' checked') + '><span>Seluruh kelas</span></label>' + c.students.map(function (s) { return '<label class="tg-chip is-check"><input type="checkbox" name="targets" value="' + esc(s.id) + '"' + (d.targets.indexOf(s.id) !== -1 ? ' checked' : '') + '><span>' + esc(s.name) + '</span></label>'; }).join('') + '</div>' +
         '<div class="ch-actions"><button type="submit" class="tg-btn is-primary" data-testid="tclass-to-review">' + icon('brain') + ' Tinjau dengan Braincore</button></div></form></div>';
     }
@@ -2382,7 +2570,7 @@
   }
   function commitDraft(c, env, send) {
     var TS = T(), d = draft(c), finals = d.finals, custom = finals.filter(function (q) { return !q.fromBank; }).map(function (q) { return { id: q.id, prompt: q.prompt, options: q.options, answer: q.answer, skill: q.skill || d.skills[0], context: q.context, why: q.why }; });
-    var a = TS.buildAssignment({ title: d.title, skills: d.skills, itemIds: finals.map(function (q) { return q.id; }), items: custom, deadline: d.deadline, mode: d.mode, targets: d.targets, teacher: env.st().teacher.name || '', source: d.source, review: { count: d.review.summary.count, ready: d.review.summary.ready, avgDifficulty: d.review.summary.avgDifficulty, levels: d.review.summary.levels, misconceptions: d.review.summary.misconceptions.slice(0, 5), approvedAt: Date.now() } });
+    var a = TS.buildAssignment({ title: d.title, skills: d.skills, itemIds: finals.map(function (q) { return q.id; }), items: custom, deadline: d.deadline, mode: d.mode, faceGuard: d.faceGuard !== false, targets: d.targets, teacher: env.st().teacher.name || '', source: d.source, review: { count: d.review.summary.count, ready: d.review.summary.ready, avgDifficulty: d.review.summary.avgDifficulty, levels: d.review.summary.levels, misconceptions: d.review.summary.misconceptions.slice(0, 5), approvedAt: Date.now() } });
     c.assignments.push(a); c.sentItemIds = (c.sentItemIds || []).concat(a.itemIds).slice(-120);
     tUi.draft = null; tUi.tab = 'tugas'; tUi.expand = a.id; env.persist();
     if (send) { if (TS.syncAvailable() !== 'ok') { env.toast(TS.syncLabel(c).text + ' — tugas tersimpan, kirim lewat kode.'); env.rerender(); return; } var nTarget = a.targets ? a.targets.length : c.students.length; TS.sendAssignment(c, a, a.targets).then(function (r) { env.toast(r.ok ? t('kelas.tugas-dikirim-ke', 'Tugas dikirim ke') + ' ' + nTarget + ' ' + t('kelas.murid-muncul-tab', 'murid — muncul di tab Kelas mereka.') : t('kelas.tugas-gagal-kirim', 'Tugas tersimpan, tapi gagal dikirim (') + (r.error || 'unknown') + '). Coba "Kirim ke murid" lagi.'); env.persist(); env.rerender(); }); return; }
@@ -2535,6 +2723,7 @@
   function syncDraftForm(f, d) {
     if (!f) return; var fd = new FormData(f);
     d.title = String(fd.get('title') || '').slice(0, 80); d.count = Number(fd.get('count')) || d.count; d.deadline = String(fd.get('deadline') || ''); d.mode = fd.get('mode') === 'ujian' ? 'ujian' : 'latihan';
+    if (f.querySelector && f.querySelector('[name="faceGuard"]')) { d.faceGuard = !!f.querySelector('[name="faceGuard"]').checked; }
     var sk = fd.getAll('skills').slice(0, 3); if (sk.length) d.skills = sk; d.targets = fd.getAll('targets'); d.raw = String(fd.get('raw') || '');
     if (fd.get('q_prompt') != null) d.q_prompt = String(fd.get('q_prompt') || '');
     if (!d.q_opts) d.q_opts = ['', '', '', ''];
@@ -2558,6 +2747,8 @@
     if (name === 'title') d.title = t.value;
     else if (name === 'raw') d.raw = t.value;
     else if (name === 'deadline') d.deadline = t.value;
+    else if (name === 'mode') d.mode = t.value;
+    else if (name === 'faceGuard') d.faceGuard = !!t.checked;
     else if (name === 'q_prompt') d.q_prompt = t.value;
     else if (name && name.indexOf('q_opt') === 0) {
       var oi = Number(name.replace('q_opt', ''));
