@@ -1,7 +1,7 @@
 {
   "schema": "fiezel-audio-manifest-v1",
-  "version": 408,
-  "generatedAt": "2026-10-10T04:08:29.083Z",
+  "version": 415,
+  "generatedAt": "2026-10-10T04:14:53.139Z",
   "assetBaseUrl": "https://fiezel-audio.fitrajft.workers.dev",
   "voiceProfile": {
     "voiceId": "4KH3q7xDXbPdY3S5yw0Y",
@@ -18556,6 +18556,42 @@
       "checksum": "54f2d0cf29ff8660d0fc8c8ed0cb3ca6e5552c228bcf121fbb4713b4820dd400",
       "sourceRef": "a1_curated_0062",
       "createdAt": "2026-10-10T04:08:21.544Z",
+      "status": "ready"
+    },
+    "0d25da762187362af200dc7d39ae55a32b124fdf0163d38ff95f2a525c880a81": {
+      "url": "a/0d25da762187362af200dc7d39ae55a32b124fdf0163d38ff95f2a525c880a81.mp3",
+      "contentType": "sentence",
+      "locale": "en-US",
+      "voiceId": "Aoede",
+      "modelId": "gemini-tts-gemini-2.5-flash-preview-tts",
+      "bytes": 106170,
+      "checksum": "9008ba2517b6697c490af3cf28cf941de4edd31162b5991bf91305d7c1f9cc94",
+      "sourceRef": "a1_curated_0063",
+      "createdAt": "2026-10-10T04:14:21.013Z",
+      "status": "ready"
+    },
+    "2055cfc7c011dfec53dd9ccf975a7ac9e646dd0d3d23e8d0ae9a03567d3aed4d": {
+      "url": "a/2055cfc7c011dfec53dd9ccf975a7ac9e646dd0d3d23e8d0ae9a03567d3aed4d.mp3",
+      "contentType": "sentence",
+      "locale": "en-US",
+      "voiceId": "Aoede",
+      "modelId": "gemini-tts-gemini-2.5-flash-preview-tts",
+      "bytes": 83130,
+      "checksum": "17196edf5b6d3e6a5eb958987cbf30d626821446b3723971dd0caa245157aab0",
+      "sourceRef": "a1_curated_0064",
+      "createdAt": "2026-10-10T04:14:30.822Z",
+      "status": "ready"
+    },
+    "3d2c0a5e8c6c687c452050508335d1ead8831b5dc195c862a538e27b4e6e1491": {
+      "url": "a/3d2c0a5e8c6c687c452050508335d1ead8831b5dc195c862a538e27b4e6e1491.mp3",
+      "contentType": "sentence",
+      "locale": "en-US",
+      "voiceId": "Aoede",
+      "modelId": "gemini-tts-gemini-2.5-flash-preview-tts",
+      "bytes": 119610,
+      "checksum": "fcbc6f560f4edaad6f7b0503debad0b0dc5eb842cc907d1d4d7008065248b22a",
+      "sourceRef": "a1_curated_0065",
+      "createdAt": "2026-10-10T04:14:45.714Z",
       "status": "ready"
     }
   },
