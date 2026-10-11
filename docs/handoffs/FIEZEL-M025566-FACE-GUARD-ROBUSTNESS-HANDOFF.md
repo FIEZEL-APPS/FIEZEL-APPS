@@ -1,4 +1,4 @@
-# FIEZEL HANDOFF: AUDIT & STRESS-TEST PENJAGA WAJAH UJIAN — KAMERA SINTETIS 3D (m025-565)
+# FIEZEL HANDOFF: AUDIT & STRESS-TEST PENJAGA WAJAH UJIAN — KAMERA SINTETIS 3D (m025-566)
 
 ## 1. Ringkasan
 
@@ -126,4 +126,4 @@ Gerbang lama yang disesuaikan, dengan alasan:
 - `tools/dev/probe-face-robustness.mjs`, `tools/dev/probe-face-browser.mjs` — probe empiris.
 - `tests/exam-focus-guard-test.js` — 5 gerbang baru, 2 disesuaikan.
 - `reports/face-robustness-m025-56{3,5}.json`, `reports/face-browser-m025-56{3,5}.json`.
-- Bump build m025-565 via `tools/bump-build.mjs`.
+- Bump build m025-566 via `tools/bump-build.mjs`.
