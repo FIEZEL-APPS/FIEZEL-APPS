@@ -117,7 +117,7 @@ async function runEmpiricalProbe() {
   await browser.close();
   server.close();
 
-  if (results.sampleInterval !== 250) throw new Error('SAMPLE_INTERVAL_MS bukan 250: ' + results.sampleInterval);
+  if (results.sampleInterval !== 500) throw new Error('SAMPLE_INTERVAL_MS bukan 500: ' + results.sampleInterval);
   if (results.warnThreshold !== 750) throw new Error('WARN_THRESHOLD_MS bukan 750: ' + results.warnThreshold);
   if (results.darkRes !== false) throw new Error('Dark room gagal ditolak: ' + results.darkRes);
   if (results.wallRes !== false) throw new Error('Wall gagal ditolak: ' + results.wallRes);

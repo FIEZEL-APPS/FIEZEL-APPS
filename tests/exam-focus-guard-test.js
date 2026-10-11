@@ -395,7 +395,8 @@ test('pemasangan: modul terdaftar di index.html + sw.js, dan teks murid lahir du
 test('face-guard: fallbackCheck membedakan wajah vs kamera tertutup vs langit-langit / meja', () => {
   const FaceGuard = require('../features/class-hub/fiezel-face-guard.js');
   assert.ok(FaceGuard && typeof FaceGuard.fallbackCheck === 'function');
-  assert.strictEqual(FaceGuard.SAMPLE_INTERVAL_MS, 250);
+  // m025-565: 2 sampel/dtk (dulu 4/dtk dengan dua readback kanvas per tick) — hemat baterai murid.
+  assert.strictEqual(FaceGuard.SAMPLE_INTERVAL_MS, 500);
   assert.strictEqual(FaceGuard.WARN_THRESHOLD_MS, 3000);
   assert.strictEqual(FaceGuard.ABSENT_THRESHOLD_MS, 4500);
 
@@ -426,9 +427,13 @@ test('face-guard: fallbackCheck membedakan wajah vs kamera tertutup vs langit-la
   const ceiling = makeMockCanvas(() => [200, 202, 205]);
   assert.strictEqual(FaceGuard.fallbackCheck(ceiling.video, ceiling.cvs, ceiling.ctx), false, 'langit-langit / dinding kosong harus terdeteksi absen');
 
-  // 3. Wajah murid di tengah (kulit sawo matang / cerah di tengah frame 16-48 x 10-38)
+  // 3. Wajah murid di tengah (kulit sawo matang / cerah di tengah frame 16-48 x 10-38).
+  //    m025-565: fixture ini dulu persegi kulit TANPA mata — bentuk yang oleh gerbang m025-562
+  //    sendiri disebut kardus. Mesin kini menuntut pita mata di model universal juga, jadi
+  //    "wajah" di sini memang punya mata.
   const face = makeMockCanvas((x, y) => {
     if (x >= 18 && x <= 46 && y >= 12 && y <= 36) {
+      if (y >= 20 && y <= 25 && x >= 22 && x <= 42) return [75, 62, 55]; // Alis & rongga mata
       // Kulit wajah manusia: R > G > B
       return [180, 130, 100];
     }
@@ -1440,6 +1445,213 @@ test('face-guard (m025-562): diskriminasi wajah nyata vs bukan wajah (kardus, di
     return [70, 75, 80];
   });
   assert.strictEqual(FaceGuard.fallbackCheck(ceilingLitCardboard.video, ceilingLitCardboard.cvs, ceilingLitCardboard.ctx), false, 'kardus bergradien cahaya harus ditolak');
+});
+
+/* ------------------- 12 · m025-565: kamera sintetis 3D (tools/face-synth.js) & temporal --- */
+
+/* Gerbang di atas memakai "wajah" berupa persegi kulit + satu pita gelap. Bentuk itu lolos
+   semua ambang m025-563 — padahal probe tools/dev/probe-face-robustness.mjs membuktikan
+   mesin yang sama menolak 35 dari 37 wajah 3D realistis (rambut hitam terbaca kulit, leher
+   & kusen kayu memanjangkan kotak, jendela Haar proporsi tetap). Gerbang di bawah memakai
+   renderer yang sama dengan probe, dengan seed tetap — deterministik. */
+const FaceSynth = require('../tools/face-synth.js');
+const synthCache = new Map();
+function synth(sc) {
+  const k = JSON.stringify(sc);
+  if (!synthCache.has(k)) synthCache.set(k, FaceSynth.mockFrame(sc));
+  return synthCache.get(k);
+}
+const SYN_BASE = { bg: 'kamar', face: { skin: 'sawo' }, seed: 1 };
+const SYN_DIM = { bg: 'gelap', exposure: 0.34, wb: [1.12, 1, 0.78], noise: { luma: 4, chroma: 3 } };
+const SYN_BACKLIT = { bg: 'jendela', light: { amb: 0.22, dif: 0.26 }, bloom: 0.5, noise: { luma: 2.5, chroma: 1.5 } };
+const SYN_FACES = {
+  'frontal (rambut hitam pendek)': SYN_BASE,
+  'menunduk membaca 25°': FaceSynth.variant(SYN_BASE, { face: { pitch: 25 } }),
+  'menoleh kiri 30°': FaceSynth.variant(SYN_BASE, { face: { yaw: -30 } }),
+  'menoleh kanan 30°': FaceSynth.variant(SYN_BASE, { face: { yaw: 30 } }),
+  'membaca: nunduk 20° + toleh 15°': FaceSynth.variant(SYN_BASE, { face: { pitch: 20, yaw: 15 } }),
+  'poni menutup dahi': FaceSynth.variant(SYN_BASE, { face: { hair: 'poni' } }),
+  'kerudung hitam': FaceSynth.variant(SYN_BASE, { face: { hijab: [36, 38, 50], hair: null } }),
+  'kerudung putih': FaceSynth.variant(SYN_BASE, { face: { hijab: [226, 226, 228], hair: null } }),
+  'kacamata + pantulan layar': FaceSynth.variant(SYN_BASE, { face: { glasses: { glare: 0.85 } } }),
+  'backlight jendela': FaceSynth.variant(SYN_BASE, SYN_BACKLIT),
+  'ruangan redup malam': FaceSynth.variant(SYN_BASE, SYN_DIM),
+  'lampu bohlam kuning': FaceSynth.variant(SYN_BASE, { wb: [1.12, 1, 0.8] }),
+  'dinding krem di belakang': FaceSynth.variant(SYN_BASE, { bg: 'kamar-krem' }),
+  'kulit terang': FaceSynth.variant(SYN_BASE, { face: { skin: 'terang' } }),
+  'kulit sangat gelap': FaceSynth.variant(SYN_BASE, { face: { skin: 'sangat-gelap' } })
+};
+const SYN_OBJECTS = {
+  'kardus dipegang di depan kamera': { bg: 'kamar', occluders: [{ kind: 'buku', x0: 12, y0: 5, x1: 52, y1: 44, color: [184, 140, 96] }, { kind: 'tangan', cx: 10, cy: 38, r: 7 }] },
+  'kardus penuh': { object: { kind: 'kardus', tape: true, print: true } },
+  'dinding krem': { object: { kind: 'dinding' } },
+  'meja kayu': { object: { kind: 'meja-kayu' } },
+  'gorden': { object: { kind: 'gorden' } },
+  'telapak menempel di lensa': { object: { kind: 'telapak-dekat' } },
+  'telapak menutupi wajah': FaceSynth.variant(SYN_BASE, { occluders: [{ kind: 'tangan', cx: 31, cy: 25, r: 15 }] }),
+  'buku menutup bagian mata': FaceSynth.variant(SYN_BASE, { occluders: [{ kind: 'buku', x0: 0, y0: 0, x1: 64, y1: 27, color: [150, 60, 50] }] }),
+  'kursi kosong': { bg: 'kamar' },
+  'kamar krem kosong': { bg: 'kamar-krem' }
+};
+/** Kunci profil murid lewat checkLiveness sungguhan (jam tiruan, tick 60 ms). */
+function synthEnroll(FaceGuard, sc) {
+  const realNow = Date.now;
+  let now = 2e12;
+  Date.now = () => now;
+  try {
+    FaceGuard.resetLiveness();
+    for (let i = 0; i < 120; i++) {
+      const f = synth(Object.assign({}, sc, { seed: 40 + (i % 12), face: Object.assign({}, sc.face, { cx: 32 + ((i * 7) % 5 - 2) * 0.2 }) }));
+      if (FaceGuard.checkLiveness(f.video, f.cvs, f.ctx).stage === 'verified') return true;
+      now += 60;
+    }
+    return false;
+  } finally { Date.now = realNow; }
+}
+function synthPresent(FaceGuard, sc, seed) {
+  const f = synth(Object.assign({}, sc, { seed }));
+  return FaceGuard.analyzeFrame(f.video, f.cvs, f.ctx, null);
+}
+
+test('face-guard (m025-565): wajah 3D realistis terdeteksi — rambut, poni, kerudung, kacamata berpantulan, menunduk/menoleh, backlight, redup', () => {
+  const FaceGuard = require('../features/class-hub/fiezel-face-guard.js');
+  for (const [name, sc] of Object.entries(SYN_FACES)) {
+    for (const seed of [1, 2, 3]) {
+      FaceGuard.resetLiveness();
+      const r = synthPresent(FaceGuard, sc, seed);
+      assert.ok(r.present && !r.isSpoof, `pra-ujian: "${name}" (seed ${seed}) harus hadir, ditolak: ${r.reason}`);
+    }
+  }
+  // Mode ujian: profil dikunci pada wajah frontal, lalu murid membaca/menoleh/kacamata memantul.
+  assert.ok(synthEnroll(FaceGuard, SYN_BASE), 'wajah frontal lolos verifikasi');
+  for (const name of ['menunduk membaca 25°', 'menoleh kiri 30°', 'menoleh kanan 30°', 'membaca: nunduk 20° + toleh 15°']) {
+    for (const seed of [4, 5]) {
+      const r = synthPresent(FaceGuard, SYN_FACES[name], seed);
+      assert.ok(r.present, `ujian: "${name}" (seed ${seed}) harus hadir, ditolak: ${r.reason}`);
+    }
+  }
+  // Cahaya berubah SESUDAH verifikasi (matahari pindah ke jendela di belakang murid).
+  for (const seed of [6, 7]) {
+    const r = synthPresent(FaceGuard, FaceSynth.variant(SYN_FACES['backlight jendela'], { face: { pitch: 20 } }), seed);
+    assert.ok(r.present, 'ujian: backlight sesudah verifikasi tetap hadir, ditolak: ' + r.reason);
+  }
+  FaceGuard.resetLiveness();
+});
+
+test('face-guard (m025-565): rambut hitam bukan kulit — kotak wajah berhenti di garis rambut & dagu', () => {
+  const FaceGuard = require('../features/class-hub/fiezel-face-guard.js');
+  FaceGuard.resetLiveness();
+  const r = synthPresent(FaceGuard, SYN_BASE, 1);
+  // Wajah sintetis: lebar ±21 px, garis rambut → dagu ±17 px. m025-563 mengukur kotak 33x46
+  // (rambut sampai ubun-ubun + kusen pintu kayu di tepi + leher sampai seragam).
+  assert.ok(r.boxW >= 17 && r.boxW <= 24, 'lebar kotak = lebar wajah, bukan sampai kusen: ' + r.boxW);
+  assert.ok(r.boxH >= 13 && r.boxH <= 22, 'tinggi kotak = dahi sampai dagu, tanpa rambut & leher: ' + r.boxH);
+  const src = read('features/class-hub/fiezel-face-guard.js');
+  assert.ok(/function detectScreenArtifacts\(d, w, minY, maxY, rMin, rMax\)/.test(src), 'silau layar dihitung di dalam siluet wajah');
+  const back = synthPresent(FaceGuard, SYN_FACES['backlight jendela'], 1);
+  assert.notStrictEqual(back.reason, 'spoof_screen', 'jendela terang di belakang murid bukan "foto di layar HP"');
+});
+
+test('face-guard (m025-565): bukan wajah ditolak — kardus, dinding, meja, gorden, telapak, buku, kursi kosong', () => {
+  const FaceGuard = require('../features/class-hub/fiezel-face-guard.js');
+  const check = (mode) => {
+    for (const [name, sc] of Object.entries(SYN_OBJECTS)) {
+      for (const seed of [1, 2]) {
+        const r = synthPresent(FaceGuard, sc, seed);
+        assert.ok(!r.present, `${mode}: "${name}" (seed ${seed}) harus ditolak`);
+      }
+    }
+  };
+  FaceGuard.resetLiveness();
+  check('pra-ujian');
+  assert.ok(synthEnroll(FaceGuard, SYN_BASE));
+  check('ujian');
+  const yawFar = synthPresent(FaceGuard, FaceSynth.variant(SYN_BASE, { face: { yaw: 75 } }), 1);
+  assert.strictEqual(yawFar.present, false, 'menoleh jauh 75° (wajah tampak samping) di mode ujian');
+  assert.strictEqual(yawFar.reason, 'face_turned_away');
+  FaceGuard.resetLiveness();
+});
+
+test('face-guard (m025-565): foto berderau tidak lolos liveness lewat kedip/toleh palsu', () => {
+  const FaceGuard = require('../features/class-hub/fiezel-face-guard.js');
+  // m025-563: lokalisasi yang melompat pada wajah kecil di foto terbaca sebagai "toleh" —
+  // foto cetak lolos dalam 240 ms. Kini kedip/toleh hanya dari bingkai yang stabil, jadi foto
+  // paling cepat hanya bisa mencapai jalur diam-tenang (batas jujur 64x48, lihat handoff).
+  const PHOTO = { bg: 'kamar', face: { skin: 'sawo' }, photo: { kind: 'cetak', x0: 14, y0: 4, x1: 50, y1: 44 }, noise: { luma: 1.2, chroma: 0.8 } };
+  const r = runLiveness(FaceGuard, (i) => synth(Object.assign({}, PHOTO, { seed: 1 + (i % 16) })), FaceGuard.STEADY_HOLD_MS - 200);
+  assert.strictEqual(r.ms, null, 'foto tidak boleh lolos sebelum jalur diam-tenang selesai: ' + JSON.stringify(r.res));
+  FaceGuard.resetLiveness();
+});
+
+test('face-guard (m025-565): 2 sampel/dtk, satu readback per tick, debounce jam dinding + konfirmasi dua sampel', async () => {
+  const FaceGuard = require('../features/class-hub/fiezel-face-guard.js');
+  assert.ok(synthEnroll(FaceGuard, SYN_BASE));
+  const profile = FaceGuard.getEnrolledProfile();
+  const face = (t) => synth(Object.assign({}, FaceSynth.variant(SYN_BASE, { face: { pitch: 20 } }), { seed: 1 + Math.floor(t / 500) % 6 }));
+  const black = synth({ bg: [0, 0, 0], noise: { luma: 0.5, chroma: 0 } });
+  const away = synth({ bg: 'kamar' });
+
+  const origNav = Object.getOwnPropertyDescriptor(globalThis, 'navigator');
+  const origDoc = globalThis.document, origSI = globalThis.setInterval, origCI = globalThis.clearInterval, realNow = Date.now;
+  let current = face(0), tick = null, tickMs = 0, draws = 0, reads = 0, now = 3e12;
+  const track = { readyState: 'live', muted: false, stop() {} };
+  const stream = { getTracks: () => [track], getVideoTracks: () => [track] };
+  Object.defineProperty(globalThis, 'navigator', { value: { mediaDevices: { getUserMedia: () => Promise.resolve(stream) } }, configurable: true, writable: true });
+  globalThis.document = { visibilityState: 'visible', body: { appendChild() {} }, createElement: (tag) => (tag === 'canvas'
+    ? { getContext: () => ({ drawImage() { draws++; }, getImageData() { reads++; return { data: current.data }; } }) }
+    : { style: {}, readyState: 4, paused: false, setAttribute() {}, play: () => Promise.resolve(), parentNode: { removeChild() {} } }) };
+  globalThis.setInterval = (fn, ms) => { tick = fn; tickMs = ms; return 1; };
+  globalThis.clearInterval = () => {};
+  Date.now = () => now;
+  async function run(label, ms, frameAt) {
+    const ev = { warn: [], absent: [], episode: [], present: [] };
+    FaceGuard.stop();
+    const t0 = now;
+    const res = await FaceGuard.start({
+      profile,
+      onWarning: (w) => { if (w) ev.warn.push(now - t0); },
+      onAbsent: () => ev.absent.push(now - t0),
+      onAbsentEpisode: () => ev.episode.push(now - t0),
+      onPresent: (d) => ev.present.push(now - t0)
+    });
+    assert.ok(res.ok, label + ': start');
+    for (let t = 0; t <= ms; t += tickMs) { now = t0 + t; current = frameAt(t); tick(); }
+    FaceGuard.stop();
+    now += 1000;
+    return ev;
+  }
+  try {
+    const calm = await run('tenang', 20000, face);
+    assert.strictEqual(FaceGuard.SAMPLE_INTERVAL_MS, 500);
+    assert.strictEqual(tickMs, 500, 'penjaga ujian berdetak 2x/dtk, bukan 4x');
+    assert.strictEqual(draws, reads);
+    assert.strictEqual(reads, Math.floor(20000 / 500) + 1, 'tepat satu drawImage + getImageData per tick');
+    assert.deepStrictEqual(calm.warn, [], 'murid membaca tenang: nol peringatan');
+
+    const drops = await run('frame drop', 20000, (t) => ((t >= 5000 && t < 5500) || (t >= 10000 && t < 11000) ? black : face(t)));
+    assert.deepStrictEqual(drops.absent, [], '1–2 bingkai gagal (lag kamera) bahkan tidak membuka episode');
+    assert.deepStrictEqual(drops.warn, []);
+
+    const flaky = await run('tersendat', 20000, (t) => (Math.floor(t / 500) % 2 ? black : face(t)));
+    assert.deepStrictEqual(flaky.warn, [], 'deteksi tersendat 50% tidak pernah memunculkan peringatan');
+
+    const gone = await run('pergi', 16000, (t) => (t >= 4000 && t < 12000 ? away : face(t)));
+    assert.strictEqual(gone.warn.length, 1);
+    assert.ok(gone.warn[0] - 4000 >= 3000 && gone.warn[0] - 4000 <= 3500, 'peringatan 3 dtk sesudah wajah hilang: ' + gone.warn[0]);
+    assert.strictEqual(gone.episode.length, 1, 'episode tercatat sesudah 4,5 dtk');
+    assert.ok(gone.present.length === 1 && gone.present[0] >= 12000 && gone.present[0] <= 13000, 'kembali = episode ditutup: ' + gone.present);
+
+    const flash = await run('kilasan', 16000, (t) => (t >= 4000 && t < 12000 ? (t % 2000 === 0 ? face(t) : away) : face(t)));
+    assert.strictEqual(flash.warn.length, 1, 'kilasan "hadir" tunggal tiap 2 dtk tidak memutar balik jam');
+    assert.ok(flash.warn[0] - 4000 <= 4000, 'peringatan tetap muncul: ' + flash.warn[0]);
+  } finally {
+    FaceGuard.stop();
+    Date.now = realNow;
+    globalThis.setInterval = origSI; globalThis.clearInterval = origCI;
+    if (origNav) Object.defineProperty(globalThis, 'navigator', origNav); else delete globalThis.navigator;
+    globalThis.document = origDoc;
+    FaceGuard.resetLiveness();
+  }
 });
 
 (async () => {
