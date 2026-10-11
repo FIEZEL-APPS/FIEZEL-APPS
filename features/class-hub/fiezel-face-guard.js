@@ -277,7 +277,7 @@
     }
     dipVar /= (temporalHistory.length - 1);
 
-    var isStatic = (timeSpan >= TEMPORAL_MIN_SPAN_MS && avgMae < 0.28 && dipVar < 0.035);
+    var isStatic = (timeSpan >= TEMPORAL_MIN_SPAN_MS && avgMae < 0.05 && dipVar < 0.001);
 
     var asymChange = 0;
     var maxDx = 0, maxDy = 0;
@@ -295,7 +295,7 @@
     return {
       isStatic: isStatic,
       isRigidWobble: isRigidWobble,
-      isSpoof: isStatic,
+      isSpoof: isStatic || isRigidWobble,
       span: timeSpan
     };
   }
@@ -372,25 +372,25 @@
                 );
               }
             } else {
-              // Model kromatisitas kulit universal pra-kalibrasi
-              if (cb >= 70 && cb <= 145 && cr >= 125 && cr <= 185) {
+              // Model kromatisitas kulit universal pra-kalibrasi (inklusif terhadap beragam warna kulit & pencahayaan lampu/ruangan)
+              if (cb >= 70 && cb <= 148 && cr >= 122 && cr <= 188) {
                 var crCbDiff = cr - cb;
                 if (yLum < 60) {
+                  isSkin = (
+                    r >= (b + 1) &&
+                    (r + 2) >= g &&
+                    crCbDiff >= 1 &&
+                    normB <= 0.36 &&
+                    yLum >= 6
+                  );
+                } else {
                   isSkin = (
                     r >= (b + 2) &&
                     (r + 3) >= g &&
                     crCbDiff >= 2 &&
+                    normR >= 0.30 &&
                     normB <= 0.35 &&
-                    yLum >= 8
-                  );
-                } else {
-                  isSkin = (
-                    r >= (b + 3) &&
-                    (r + 4) >= g &&
-                    crCbDiff >= 4 &&
-                    normR >= 0.33 &&
-                    normB <= 0.33 &&
-                    yLum <= 215
+                    yLum <= 230
                   );
                 }
               }
@@ -439,14 +439,14 @@
       if (skinCount < minSkinReq || skinCount > maxSkinReq) return { present: false, isSpoof: false, reason: 'skin_count_out_of_range' };
 
       // 4. Konsentrasi kulit di area kamera
-      var minCenterFraction = enrolledProfile.valid ? 0.10 : 0.30;
+      var minCenterFraction = enrolledProfile.valid ? 0.10 : 0.20;
       if (skinInCenterFraction < minCenterFraction) return { present: false, isSpoof: false, reason: 'not_centered' };
 
       // 5. Centroid posisi wajah harus di area kamera (toleransi sudut/kemiringan HP)
       var cX = Math.round(sumX / skinCount);
       var cY = Math.round(sumY / skinCount);
-      var minCX = enrolledProfile.valid ? 2 : 8, maxCX = enrolledProfile.valid ? 62 : 56;
-      var minCY = enrolledProfile.valid ? 2 : 6, maxCY = enrolledProfile.valid ? 46 : 42;
+      var minCX = enrolledProfile.valid ? 2 : 5, maxCX = enrolledProfile.valid ? 62 : 59;
+      var minCY = enrolledProfile.valid ? 2 : 4, maxCY = enrolledProfile.valid ? 46 : 44;
       if (cX < minCX || cX > maxCX || cY < minCY || cY > maxCY) return { present: false, isSpoof: false, reason: 'centroid_out_of_bounds' };
 
       // 6. Bounding box & proporsi oval wajah
@@ -513,9 +513,9 @@
       var eRAvg = eRCount > 0 ? (eRSum / eRCount) : eAvg;
       var asym = Math.abs(eLAvg - eRAvg);
 
-      // Penolakan permukaan datar / lampu / meja / telapak tangan:
-      // Lampu terang (avgBr > 110) atau cahaya datar yang mendominasi tengah (> 80%) tanpa rongga mata
-      if (!enrolledProfile.valid && (centerFillFraction > 0.80 || avgBr > 110) && eyeDip < 0.4) {
+      // Penolakan permukaan datar / meja / telapak tangan:
+      // Permukaan datar yang mendominasi tengah (> 75%) tanpa rongga mata
+      if (!enrolledProfile.valid && centerFillFraction > 0.75 && eyeDip < 0.25) {
         return { present: false, isSpoof: false, reason: 'flat_light_or_surface' };
       }
 
@@ -530,14 +530,6 @@
 
       var now = Date.now();
       recordTemporalFrame(now, cX, cY, boxW, boxH, eyeDip, asym, Ygrid, w, h);
-      // Murid yang sudah terkalibrasi (enrolledProfile.valid) sedang membaca soal dengan tenang di ruang ujian.
-      // Bebaskan dari tuduhan foto kertas (spoof_static) hanya karena duduk tenang membaca selama 2 detik.
-      if (!enrolledProfile.valid) {
-        var tempCheck = checkTemporalLiveness(now);
-        if (tempCheck.isSpoof) {
-          return { present: false, isSpoof: true, reason: tempCheck.isStatic ? 'spoof_static' : 'spoof_rigid' };
-        }
-      }
 
       return {
         present: true,
@@ -1005,7 +997,7 @@
    *   digeser. Kini tolehan wajib membawa isyarat 3D: perubahan asimetri kedua mata.
    */
   function checkLiveness(video, canvas, ctx) {
-    var vid = video || state.videoEl;
+    var vid = (video && video.readyState >= 2) ? video : state.videoEl;
     var cvs = canvas || state.canvasEl;
     var c = ctx || state.ctx;
     if (!vid || !cvs || !c) return { stage: 'no_face', ok: false, progress: 0 };

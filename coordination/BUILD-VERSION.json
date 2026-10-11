@@ -1,7 +1,7 @@
 {
-  "version": "m025-560",
-  "claimedBy": "branch claude/zen-feynman-61ddsk",
-  "claimedAt": "2026-10-11T06:22:15.028Z",
-  "reason": "fix(proctor): audit verifikasi wajah — tutup celah liveness foto, laporan tanpa-kamera ke guru, kamera beku (m025-560)",
+  "version": "m025-561",
+  "claimedBy": "branch fix/real-face-detection-robustness-m025-561",
+  "claimedAt": "2026-10-11T08:33:09.530Z",
+  "reason": "fix(proctor): robust face detection & anti-spoofing calibration (m025-561)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
