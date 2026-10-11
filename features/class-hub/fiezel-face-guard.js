@@ -3,16 +3,21 @@
  *
  * TUJUAN:
  * Memastikan murid hadir menghadap layar selama ujian resmi dari guru (mode 'ujian').
- * Didesain sangat hemat daya (throttled 0.67 FPS / 1.5 detik per sampel) agar tidak
- * membebani baterai atau CPU ponsel murid, dengan resolusi kamera mini (320x240).
+ * Sampel tiap 250 ms pada bingkai mini 64x48 dari kamera 320x240 — ringan untuk ponsel.
+ *
+ * BATAS JUJUR MODUL INI: ia memeriksa KEHADIRAN wajah yang hidup, BUKAN identitas. Profil
+ * "enrollment" hanyalah statistik warna kulit & posisi untuk menstabilkan deteksi; ia tidak
+ * bisa membedakan murid A dari murid B. Semua pemeriksaan berjalan di perangkat murid.
  *
  * PRINSIP:
  * 1. Tanpa Crash / Graceful: Jika izin kamera ditolak atau perangkat tidak memiliki kamera,
- *    ujian tetap berjalan dan status dicatat tanpa mengunci murid.
- * 2. Peringatan Halus: Mulai detik ke-5 wajah tidak terlihat, sistem memberi sinyal
- *    peringatan visual ke murid.
- * 3. Batas Pelanggaran 10 Detik: Jika wajah tetap tidak terlihat > 10 detik, episode dicatat
- *    ke FiezelFocusGuard (vn, vs, vx) dan dilaporkan ke guru.
+ *    ujian tetap berjalan — dan guru menerima tanda "tanpa kamera" (lihat class-hub).
+ * 2. Peringatan Halus: wajah hilang > 2 dtk (debounce) membuka episode; 3 dtk memunculkan
+ *    kartu peringatan; episode di bawah FACE_GRACE_MS (focus-guard) dibuang.
+ * 3. Liveness pra-ujian: kedip, toleh kepala 3D, atau diam tenang >= 3 dtk YANG MASIH
+ *    menunjukkan dinamika hidup. Profil baru dikunci SETELAH liveness lulus — sebelum itu
+ *    pemeriksaan anti-foto tetap menyala.
+ * 4. Kamera beku / terputus (track ended/muted, bingkai identik) = wajah tidak terlihat.
  */
 (function (root, factory) {
   var api = factory();
@@ -24,6 +29,18 @@
   var SAMPLE_INTERVAL_MS = 250;
   var WARN_THRESHOLD_MS = 3000;
   var ABSENT_THRESHOLD_MS = 4500;
+  // Jalur "diam tenang": hadir terus-menerus selama ini (jam dinding, bukan hitungan tick —
+  // tick preflight 60 ms dulu membuat "3 detik" sebenarnya 1,3 detik).
+  var STEADY_HOLD_MS = 3000;
+  // Jendela temporal minimum sebelum vonis statis/hidup boleh dipercaya.
+  var TEMPORAL_MIN_SPAN_MS = 2000;
+  // Kamera nyata selalu membawa derau sensor; bingkai yang IDENTIK selama ini = stream beku.
+  var FROZEN_MS = 3000;
+  var FROZEN_DIFF_SUM = 1.0;
+  // Kamera terputus di tengah ujian: coba sambung ulang tiap 5 dtk; gagal 3x = lapor hilang.
+  var REACQUIRE_GAP_MS = 5000;
+  var REACQUIRE_FAILS_LOST = 3;
+  var PROFILE_KEYS = ['sampleCount', 'cbMean', 'crMean', 'cbMin', 'cbMax', 'crMin', 'crMax', 'normRMean', 'normBMean', 'boxWMean', 'boxHMean', 'skinCountMean', 'cXMean', 'cYMean', 'eyeDipMean', 'asymMean', 'avgBrMean'];
 
   var enrolledProfile = {
     valid: false,
@@ -67,6 +84,50 @@
     enrolledProfile.avgBrMean = 100;
   }
 
+  /**
+   * Pulihkan profil dari state ujian yang disimpan (memuat ulang halaman di tengah ujian).
+   * Hanya kunci numerik yang dikenal dan bernilai hingga; bentuk lain diabaikan.
+   */
+  function applyProfile(p) {
+    if (!p || typeof p !== 'object') return false;
+    for (var i = 0; i < PROFILE_KEYS.length; i++) {
+      var k = PROFILE_KEYS[i], v = Number(p[k]);
+      if (p[k] !== undefined && isFinite(v)) enrolledProfile[k] = v;
+    }
+    if (p.valid === true && enrolledProfile.sampleCount > 0 && enrolledProfile.cbMean > 0 && enrolledProfile.crMean > 0) {
+      enrolledProfile.valid = true;
+    }
+    return enrolledProfile.valid;
+  }
+
+  function lockEnrollment() {
+    if (enrolledProfile.sampleCount <= 0) return;
+    enrolledProfile.valid = true;
+    enrolledProfile.cbMin = Math.max(60, enrolledProfile.cbMean - 25);
+    enrolledProfile.cbMax = Math.min(155, enrolledProfile.cbMean + 25);
+    enrolledProfile.crMin = Math.max(115, enrolledProfile.crMean - 25);
+    enrolledProfile.crMax = Math.min(195, enrolledProfile.crMean + 25);
+  }
+
+  function accumulateProfile(frameRes) {
+    if (!frameRes.avgSkinCb || !frameRes.avgSkinCr) return;
+    var n = enrolledProfile.sampleCount;
+    function mix(cur, v) { return n === 0 ? v : (cur * n + v) / (n + 1); }
+    enrolledProfile.cbMean = mix(enrolledProfile.cbMean, frameRes.avgSkinCb);
+    enrolledProfile.crMean = mix(enrolledProfile.crMean, frameRes.avgSkinCr);
+    enrolledProfile.normRMean = mix(enrolledProfile.normRMean, frameRes.avgSkinNormR || 0.40);
+    enrolledProfile.normBMean = mix(enrolledProfile.normBMean, frameRes.avgSkinNormB || 0.25);
+    enrolledProfile.boxWMean = mix(enrolledProfile.boxWMean, frameRes.boxW);
+    enrolledProfile.boxHMean = mix(enrolledProfile.boxHMean, frameRes.boxH);
+    enrolledProfile.skinCountMean = mix(enrolledProfile.skinCountMean, frameRes.skinCount);
+    enrolledProfile.cXMean = mix(enrolledProfile.cXMean, frameRes.cX);
+    enrolledProfile.cYMean = mix(enrolledProfile.cYMean, frameRes.cY);
+    enrolledProfile.eyeDipMean = mix(enrolledProfile.eyeDipMean, frameRes.eyeDip);
+    enrolledProfile.asymMean = mix(enrolledProfile.asymMean, frameRes.asym);
+    enrolledProfile.avgBrMean = mix(enrolledProfile.avgBrMean, frameRes.avgBr);
+    enrolledProfile.sampleCount = n + 1;
+  }
+
   var absentStreak = 0;
   var ABSENT_DEBOUNCE_FRAMES = 8; // 8 frames x 250ms = 2.0 detik
 
@@ -82,7 +143,14 @@
     warned: false,
     lastNativeFace: false,
     lastNativeFaceTime: 0,
-    options: null
+    options: null,
+    gen: 0,
+    constraints: null,
+    freeze: { sig: null, t: 0, since: 0 },
+    reacquiring: false,
+    lastReacquireAt: 0,
+    reacquireFails: 0,
+    cameraLost: false
   };
 
   function isSupported() {
@@ -177,7 +245,7 @@
 
   function checkTemporalLiveness(now) {
     if (temporalHistory.length < 4) {
-      return { isStatic: false, isRigidWobble: false, isSpoof: false };
+      return { isStatic: false, isRigidWobble: false, isSpoof: false, span: 0 };
     }
 
     var oldest = temporalHistory[0];
@@ -209,7 +277,7 @@
     }
     dipVar /= (temporalHistory.length - 1);
 
-    var isStatic = (timeSpan >= 2000 && avgMae < 0.28 && dipVar < 0.035);
+    var isStatic = (timeSpan >= TEMPORAL_MIN_SPAN_MS && avgMae < 0.28 && dipVar < 0.035);
 
     var asymChange = 0;
     var maxDx = 0, maxDy = 0;
@@ -222,12 +290,13 @@
       if (dy > maxDy) maxDy = dy;
     }
 
-    var isRigidWobble = (timeSpan >= 2000 && (maxDx >= 1.0 || maxDy >= 1.0) && asymChange < 0.8 && dipVar < 0.02);
+    var isRigidWobble = (timeSpan >= TEMPORAL_MIN_SPAN_MS && (maxDx >= 1.0 || maxDy >= 1.0) && asymChange < 0.8 && dipVar < 0.02);
 
     return {
       isStatic: isStatic,
       isRigidWobble: isRigidWobble,
-      isSpoof: isStatic
+      isSpoof: isStatic,
+      span: timeSpan
     };
   }
 
@@ -500,10 +569,124 @@
     return !!(res && res.present && !res.isSpoof);
   }
 
+  function freshFreeze() { return { sig: null, t: 0, since: 0 }; }
+
+  function stopTracks(ms) {
+    try { if (ms) ms.getTracks().forEach(function (t) { t.stop(); }); } catch (_) {}
+  }
+
+  /** 'ok' | 'ended' | 'muted'. Stream tanpa API track (peramban lama/mock) dinilai 'ok'. */
+  function cameraHealth() {
+    var tr = null;
+    try { tr = state.stream && typeof state.stream.getVideoTracks === 'function' ? state.stream.getVideoTracks()[0] : null; } catch (_) {}
+    if (!tr) return 'ok';
+    if (tr.readyState === 'ended') return 'ended';
+    if (tr.muted) return 'muted';
+    return 'ok';
+  }
+
+  /** 192 titik luminans dari bingkai 64x48 — cukup untuk membedakan stream hidup dari stream beku. */
+  function frameSignature(vid, ctx) {
+    if (!vid || !ctx) return null;
+    try {
+      ctx.drawImage(vid, 0, 0, 64, 48);
+      var d = ctx.getImageData(0, 0, 64, 48).data;
+      var sig = new Float32Array(192);
+      for (var sy = 0; sy < 12; sy++) {
+        for (var sx = 0; sx < 16; sx++) {
+          var i = ((sy * 4) * 64 + sx * 4) * 4;
+          sig[sy * 16 + sx] = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+        }
+      }
+      return sig;
+    } catch (_) { return null; }
+  }
+
+  /**
+   * Satu langkah pelacak beku. Mengembalikan true bila bingkai sudah identik (derau sensor
+   * nol) selama >= FROZEN_MS. Kamera hidup — bahkan yang menatap murid yang diam total —
+   * tidak pernah menghasilkan 192 titik yang sama persis berdetik-detik; stream yang
+   * berhenti (track dibisukan OS, kamera direbut aplikasi lain, kamera virtual gambar diam)
+   * menghasilkannya.
+   */
+  function freezeStep(tracker, sig, now) {
+    if (!tracker || !sig) return false;
+    if (tracker.sig && tracker.sig.length === sig.length) {
+      var diff = 0;
+      for (var k = 0; k < sig.length; k++) diff += Math.abs(sig[k] - tracker.sig[k]);
+      if (diff < FROZEN_DIFF_SUM) { if (!tracker.since) tracker.since = tracker.t; }
+      else tracker.since = 0;
+    }
+    tracker.sig = sig;
+    tracker.t = now;
+    return !!tracker.since && (now - tracker.since) >= FROZEN_MS;
+  }
+
+  function maybeReacquire() {
+    var now = Date.now();
+    if (state.reacquiring || now - state.lastReacquireAt < REACQUIRE_GAP_MS || !isSupported()) return;
+    state.reacquiring = true;
+    state.lastReacquireAt = now;
+    var gen = state.gen;
+    var p;
+    try { p = navigator.mediaDevices.getUserMedia(state.constraints); } catch (e) { p = Promise.reject(e); }
+    Promise.resolve(p).then(function (ms) {
+      state.reacquiring = false;
+      if (gen !== state.gen || !state.active) { stopTracks(ms); return; }
+      var old = state.stream;
+      state.stream = ms;
+      stopTracks(old);
+      if (state.videoEl) {
+        try {
+          state.videoEl.srcObject = ms;
+          var pp = state.videoEl.play();
+          if (pp && typeof pp.catch === 'function') pp.catch(function () {});
+        } catch (_) {}
+      }
+      state.reacquireFails = 0;
+      state.cameraLost = false;
+      state.freeze = freshFreeze();
+      var opts = state.options || {};
+      if (typeof opts.onStream === 'function') { try { opts.onStream(ms); } catch (_) {} }
+    }).catch(function () {
+      state.reacquiring = false;
+      if (gen !== state.gen || !state.active) return;
+      state.reacquireFails++;
+      if (state.reacquireFails >= REACQUIRE_FAILS_LOST && !state.cameraLost) {
+        state.cameraLost = true;
+        var opts = state.options || {};
+        if (typeof opts.onCameraLost === 'function') { try { opts.onCameraLost(); } catch (_) {} }
+      }
+    });
+  }
+
   function checkFrame() {
     if (!state.active || !state.videoEl) return;
+    // Halaman tersembunyi sudah dicatat focus-guard sebagai "keluar layar". Menghitungnya juga
+    // sebagai "wajah tak terlihat" melipatgandakan satu kepergian di layar guru.
+    if (typeof document !== 'undefined' && document.visibilityState === 'hidden') {
+      state.freeze = freshFreeze();
+      // Episode wajah yang sedang berjalan ditutup di titik layar ditinggalkan; sisanya milik
+      // focus-guard. Tanpa ini 60 dtk di aplikasi lain terhitung dua kali.
+      if (state.absentSince) handleResult(true);
+      absentStreak = 0;
+      return;
+    }
     var vid = state.videoEl;
+    var health = cameraHealth();
+    if (health !== 'ok') {
+      state.lastNativeFace = false;
+      handleResult(false);
+      if (health === 'ended') maybeReacquire();
+      return;
+    }
     if (vid.readyState < 2) return;
+
+    if (freezeStep(state.freeze, frameSignature(vid, state.ctx), Date.now())) {
+      state.lastNativeFace = false;
+      handleResult(false);
+      return;
+    }
 
     if (vid.paused) {
       try {
@@ -602,11 +785,16 @@
   }
 
   function start(opts) {
-    if (state.active) {
+    if (state.active || state.pending) {
       if (opts) state.options = Object.assign({}, state.options || {}, opts);
+      if (opts && opts.profile && !enrolledProfile.valid && applyProfile(opts.profile)) liveness.verified = true;
+      // Panggilan kedua saat getUserMedia masih menunggu: bagikan janji yang sama, jangan
+      // membuka stream kedua (stream pertama bocor dan lampu kamera tidak pernah padam).
+      if (state.pending) return state.pending;
       state.absentSince = 0;
       absentStreak = 0;
       state.warned = false;
+      state.episoded = false;
       if (state.videoEl && state.videoEl.paused) {
         try { var p = state.videoEl.play(); if (p && typeof p.catch === 'function') p.catch(function () {}); } catch (_) {}
       }
@@ -619,6 +807,14 @@
     state.episoded = false;
     temporalHistory = [];
     resetLiveness();
+    // Ujian yang dimuat ulang: profil hasil verifikasi pra-ujian dipulihkan, supaya murid yang
+    // sudah lulus liveness tidak kembali diperiksa dengan model universal yang paranoid.
+    if (opts && opts.profile && applyProfile(opts.profile)) liveness.verified = true;
+    state.freeze = freshFreeze();
+    state.reacquiring = false;
+    state.lastReacquireAt = 0;
+    state.reacquireFails = 0;
+    state.cameraLost = false;
 
     if (!isSupported()) {
       return Promise.resolve({ ok: false, reason: 'unsupported' });
@@ -636,9 +832,13 @@
     };
 
     state.stopping = false;
-    return navigator.mediaDevices.getUserMedia(constraints).then(function (mediaStream) {
-      if (state.stopping || !state.options) {
-        try { mediaStream.getTracks().forEach(function (t) { t.stop(); }); } catch (_) {}
+    state.constraints = constraints;
+    var gen = ++state.gen;
+    state.pending = navigator.mediaDevices.getUserMedia(constraints).then(function (mediaStream) {
+      if (gen === state.gen) state.pending = null;
+      // gen berubah = stop() (atau start baru sesudah stop) terjadi selama izin ditunggu.
+      if (gen !== state.gen || state.stopping || !state.options) {
+        stopTracks(mediaStream);
         return { ok: false, reason: 'aborted' };
       }
       state.stream = mediaStream;
@@ -686,13 +886,17 @@
       state.timer = setInterval(checkFrame, SAMPLE_INTERVAL_MS);
       return { ok: true, active: true, stream: mediaStream };
     }).catch(function (err) {
-      state.active = false;
+      if (gen === state.gen) { state.pending = null; state.active = false; }
       return { ok: false, reason: (err && err.name) || 'permission_denied' };
     });
+    return state.pending;
   }
 
   function stop() {
     state.stopping = true;
+    state.gen++;
+    state.pending = null;
+    state.reacquiring = false;
     if (state.timer) {
       clearInterval(state.timer);
       state.timer = null;
@@ -757,7 +961,8 @@
     blinkCloseStart: 0,
     blinkCount: 0,
     turnDetected: false,
-    steadyHoldTicks: 0,
+    steadySince: 0,
+    absentTicks: 0,
     verified: false
   };
 
@@ -776,7 +981,8 @@
     liveness.blinkCloseStart = 0;
     liveness.blinkCount = 0;
     liveness.turnDetected = false;
-    liveness.steadyHoldTicks = 0;
+    liveness.steadySince = 0;
+    liveness.absentTicks = 0;
     liveness.verified = false;
   }
 
@@ -786,19 +992,30 @@
 
   /**
    * Deteksi Kehidupan Biometrik Aktif (Active Liveness Verification).
-   * Menantang pengguna melakukan kedipan mata atau tolehan kepala kecil secara interaktif.
-   * Menolak mutlak foto cetak, foto diam di HP lain, wallpaper dinding, dan lampu silau.
+   * Lulus lewat SALAH SATU: kedipan mata, tolehan kepala 3D, atau diam tenang >= STEADY_HOLD_MS
+   * yang jendela temporalnya (>= 2 dtk) masih menunjukkan dinamika hidup.
+   *
+   * Dua celah yang ditutup di sini (dibuktikan di tests/exam-focus-guard-test.js):
+   * - Profil dulu dikunci (enrolledProfile.valid) sesudah 2 tick kalibrasi, dan profil yang
+   *   terkunci MEMATIKAN pemeriksaan spoof_static di analyzeFrame. Lalu 22 tick "diam tenang"
+   *   (~1,3 dtk pada tick preflight 60 ms) meluluskan foto cetak. Kini profil baru dikunci
+   *   SESUDAH liveness lulus, dan diam tenang diukur dengan jam dinding serta wajib lolos uji
+   *   temporal (tidak statis, tidak bergoyang kaku seperti kertas di tangan).
+   * - "Tolehan" dulu cukup berupa pergeseran centroid >= 4 px — persis yang terjadi saat foto
+   *   digeser. Kini tolehan wajib membawa isyarat 3D: perubahan asimetri kedua mata.
    */
   function checkLiveness(video, canvas, ctx) {
     var vid = video || state.videoEl;
     var cvs = canvas || state.canvasEl;
     var c = ctx || state.ctx;
-    if (!vid || !cvs || !c) return { stage: 'no_face', ok: false };
-    if (vid.readyState < 2) return { stage: 'no_face', ok: false };
+    if (!vid || !cvs || !c) return { stage: 'no_face', ok: false, progress: 0 };
+    if (vid.readyState < 2) return { stage: 'no_face', ok: false, progress: 0 };
 
     var frameRes = analyzeFrame(vid, cvs, c, null);
     if (!frameRes.present) {
       liveness.absentTicks = (liveness.absentTicks || 0) + 1;
+      // Diam tenang harus TERUS-MENERUS hadir; satu bingkai hilang memulai hitungan dari nol.
+      liveness.steadySince = 0;
       if (liveness.absentTicks >= 6) {
         liveness.calibrated = false;
         liveness.calibTicks = 0;
@@ -806,14 +1023,14 @@
         liveness.blinkClosing = false;
       }
       if (frameRes.isSpoof) {
-        return { stage: 'spoof_detected', ok: false, reason: frameRes.reason };
+        return { stage: 'spoof_detected', ok: false, reason: frameRes.reason, progress: 0 };
       }
-      return { stage: 'no_face', ok: false };
+      return { stage: 'no_face', ok: false, progress: 0 };
     }
     liveness.absentTicks = 0;
 
     if (liveness.verified) {
-      return { stage: 'verified', ok: true, blinkCount: liveness.blinkCount, turn: liveness.turnDetected };
+      return { stage: 'verified', ok: true, blinkCount: liveness.blinkCount, turn: liveness.turnDetected, progress: 100 };
     }
 
     var now = Date.now();
@@ -821,41 +1038,12 @@
     var centroidX = frameRes.centroidX;
     var centroidY = frameRes.centroidY;
 
+    // Profil dikumpulkan dari setiap bingkai hadir selama verifikasi, tetapi BELUM dikunci.
+    accumulateProfile(frameRes);
+
     if (!liveness.calibrated) {
       liveness.eyeDips.push(curDip);
       liveness.calibTicks++;
-
-      if (frameRes.avgSkinCb && frameRes.avgSkinCr) {
-        if (enrolledProfile.sampleCount === 0) {
-          enrolledProfile.cbMean = frameRes.avgSkinCb;
-          enrolledProfile.crMean = frameRes.avgSkinCr;
-          enrolledProfile.normRMean = frameRes.avgSkinNormR || 0.40;
-          enrolledProfile.normBMean = frameRes.avgSkinNormB || 0.25;
-          enrolledProfile.boxWMean = frameRes.boxW;
-          enrolledProfile.boxHMean = frameRes.boxH;
-          enrolledProfile.skinCountMean = frameRes.skinCount;
-          enrolledProfile.cXMean = frameRes.cX;
-          enrolledProfile.cYMean = frameRes.cY;
-          enrolledProfile.eyeDipMean = curDip;
-          enrolledProfile.asymMean = frameRes.asym;
-          enrolledProfile.avgBrMean = frameRes.avgBr;
-        } else {
-          var n = enrolledProfile.sampleCount;
-          enrolledProfile.cbMean = (enrolledProfile.cbMean * n + frameRes.avgSkinCb) / (n + 1);
-          enrolledProfile.crMean = (enrolledProfile.crMean * n + frameRes.avgSkinCr) / (n + 1);
-          enrolledProfile.normRMean = (enrolledProfile.normRMean * n + (frameRes.avgSkinNormR || 0.40)) / (n + 1);
-          enrolledProfile.normBMean = (enrolledProfile.normBMean * n + (frameRes.avgSkinNormB || 0.25)) / (n + 1);
-          enrolledProfile.boxWMean = (enrolledProfile.boxWMean * n + frameRes.boxW) / (n + 1);
-          enrolledProfile.boxHMean = (enrolledProfile.boxHMean * n + frameRes.boxH) / (n + 1);
-          enrolledProfile.skinCountMean = (enrolledProfile.skinCountMean * n + frameRes.skinCount) / (n + 1);
-          enrolledProfile.cXMean = (enrolledProfile.cXMean * n + frameRes.cX) / (n + 1);
-          enrolledProfile.cYMean = (enrolledProfile.cYMean * n + frameRes.cY) / (n + 1);
-          enrolledProfile.eyeDipMean = (enrolledProfile.eyeDipMean * n + curDip) / (n + 1);
-          enrolledProfile.asymMean = (enrolledProfile.asymMean * n + frameRes.asym) / (n + 1);
-          enrolledProfile.avgBrMean = (enrolledProfile.avgBrMean * n + frameRes.avgBr) / (n + 1);
-        }
-        enrolledProfile.sampleCount++;
-      }
 
       var targetTicks = 2;
       if (liveness.calibTicks >= targetTicks) {
@@ -867,17 +1055,9 @@
         liveness.peakEyeDip = Math.max(liveness.baselineEyeDip, 1.0);
         liveness.baselineAsym = frameRes.asym;
         liveness.calibrated = true;
-
-        if (enrolledProfile.sampleCount > 0) {
-          enrolledProfile.valid = true;
-          enrolledProfile.cbMin = Math.max(60, enrolledProfile.cbMean - 25);
-          enrolledProfile.cbMax = Math.min(155, enrolledProfile.cbMean + 25);
-          enrolledProfile.crMin = Math.max(115, enrolledProfile.crMean - 25);
-          enrolledProfile.crMax = Math.min(195, enrolledProfile.crMean + 25);
-        }
+        liveness.steadySince = now;
       }
-      var calibPct = Math.min(100, Math.round((liveness.calibTicks / targetTicks) * 100));
-      return { stage: 'aligning', ok: true, progress: calibPct };
+      return { stage: 'aligning', ok: true, progress: 0 };
     }
 
     if (curDip > liveness.peakEyeDip) {
@@ -908,24 +1088,32 @@
       }
     }
 
-    // Deteksi tolehan kepala 3D (bukan getaran kertas / hand tremor):
-    var dX = Math.abs(centroidX - liveness.baselineCentroidX);
-    var dY = Math.abs(centroidY - (liveness.baselineCentroidY || centroidY));
-    var asymChange = Math.abs(frameRes.asym - (liveness.baselineAsym || frameRes.asym));
-
-    if (dX >= 4.0 || dY >= 4.0 || asymChange >= 5.0) {
+    // Tolehan kepala 3D: rotasi wajah mengubah terang rongga mata kiri vs kanan relatif
+    // terhadap centroid kulit. Foto yang digeser/dimiringkan di bidang datar hanya berpindah
+    // tempat — asimetrinya tetap — jadi pergeseran centroid saja TIDAK dihitung tolehan.
+    // (Baseline 0 itu sah — wajah simetris sempurna; jangan jatuh ke nilai saat ini lewat `||`.)
+    var asymChange = Math.abs(frameRes.asym - (Number(liveness.baselineAsym) || 0));
+    if (asymChange >= 5.0) {
       liveness.turnDetected = true;
     }
 
-    liveness.steadyHoldTicks = (liveness.steadyHoldTicks || 0) + 1;
-
-    // Verifikasi sukses jika murid berkedip, menoleh, atau menatap kamera dengan tenang (steady hold >= 22 ticks)
-    if (liveness.blinkCount >= 1 || liveness.turnDetected || liveness.steadyHoldTicks >= 22) {
-      liveness.verified = true;
-      return { stage: 'verified', ok: true, blinkCount: liveness.blinkCount, turn: liveness.turnDetected, steady: liveness.steadyHoldTicks >= 22 };
+    if (!liveness.steadySince) liveness.steadySince = now;
+    var steadyMs = now - liveness.steadySince;
+    var steadyOk = false;
+    if (steadyMs >= STEADY_HOLD_MS) {
+      var tc = checkTemporalLiveness(now);
+      steadyOk = tc.span >= TEMPORAL_MIN_SPAN_MS && !tc.isStatic && !tc.isRigidWobble;
     }
 
-    return { stage: 'challenge', ok: true, blinkCount: liveness.blinkCount, steadyTicks: liveness.steadyHoldTicks };
+    if (liveness.blinkCount >= 1 || liveness.turnDetected || steadyOk) {
+      liveness.verified = true;
+      lockEnrollment();
+      return { stage: 'verified', ok: true, blinkCount: liveness.blinkCount, turn: liveness.turnDetected, steady: steadyOk, progress: 100 };
+    }
+
+    // Progres jalur diam tenang dibatasi 95%: bar penuh hanya untuk verifikasi yang benar-benar lulus.
+    var pct = Math.min(95, Math.round((steadyMs / STEADY_HOLD_MS) * 95));
+    return { stage: 'challenge', ok: true, blinkCount: liveness.blinkCount, steadyMs: steadyMs, progress: pct };
   }
 
   function verifyPresence() {
@@ -957,11 +1145,14 @@
     resetLiveness: resetLiveness,
     isLivenessVerified: isLivenessVerified,
     getEnrolledProfile: function () { return Object.assign({}, enrolledProfile); },
-    setEnrolledProfile: function (p) { if (p) Object.assign(enrolledProfile, p); },
+    setEnrolledProfile: applyProfile,
     isEnrolled: function () { return !!enrolledProfile.valid; },
     resetEnrolledProfile: resetEnrolledProfile,
+    freezeStep: freezeStep,
     SAMPLE_INTERVAL_MS: SAMPLE_INTERVAL_MS,
     WARN_THRESHOLD_MS: WARN_THRESHOLD_MS,
-    ABSENT_THRESHOLD_MS: ABSENT_THRESHOLD_MS
+    ABSENT_THRESHOLD_MS: ABSENT_THRESHOLD_MS,
+    STEADY_HOLD_MS: STEADY_HOLD_MS,
+    FROZEN_MS: FROZEN_MS
   };
 });

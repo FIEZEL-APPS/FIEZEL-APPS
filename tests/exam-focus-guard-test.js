@@ -490,7 +490,7 @@ test('face-guard: active liveness menolak foto statis dan meluluskan kedip mata 
 
   function makeFaceCanvas(opts) {
     const w = 64, h = 48;
-    const { eyesOpen = true, shiftX = 0 } = opts || {};
+    const { eyesOpen = true, shiftX = 0, leftEye = null } = opts || {};
     const data = new Uint8ClampedArray(w * h * 4);
     for (let y = 0; y < h; y++) {
       for (let x = 0; x < w; x++) {
@@ -498,7 +498,9 @@ test('face-guard: active liveness menolak foto statis dan meluluskan kedip mata 
         const adjustedX = x - shiftX;
         if (adjustedX >= 18 && adjustedX <= 46 && y >= 12 && y <= 36) {
           if (y >= 20 && y <= 26 && adjustedX >= 22 && adjustedX <= 42) {
-            if (eyesOpen) {
+            if (leftEye && adjustedX < 32) {
+              data[idx] = leftEye[0]; data[idx + 1] = leftEye[1]; data[idx + 2] = leftEye[2];
+            } else if (eyesOpen) {
               data[idx] = 40; data[idx + 1] = 30; data[idx + 2] = 25;
             } else {
               data[idx] = 180; data[idx + 1] = 130; data[idx + 2] = 100;
@@ -550,24 +552,33 @@ test('face-guard: active liveness menolak foto statis dan meluluskan kedip mata 
   assert.strictEqual(rC.stage, 'challenge');
 
   FaceGuard.checkLiveness(closedFace.video, closedFace.cvs, closedFace.ctx);
-  return new Promise((resolve) => {
-    setTimeout(() => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => { try {
       let rBlink = FaceGuard.checkLiveness(openFace.video, openFace.cvs, openFace.ctx);
       assert.strictEqual(rBlink.stage, 'verified', 'kedipan mata biologis harus meluluskan verifikasi liveness');
       assert.strictEqual(FaceGuard.isLivenessVerified(), true);
 
-      // 3. Uji Toleh Kepala
+      // 3. Foto yang DIGESER (translasi 2D) bukan tolehan kepala — dulu ini meluluskan
+      //    verifikasi, persis cara foto cetak digerakkan di depan kamera (m025-560).
       FaceGuard.resetLiveness();
       const centerFace = makeFaceCanvas({ eyesOpen: true, shiftX: 0 });
-      const turnedFace = makeFaceCanvas({ eyesOpen: true, shiftX: 5 });
+      const slidPhoto = makeFaceCanvas({ eyesOpen: true, shiftX: 5 });
+      FaceGuard.checkLiveness(centerFace.video, centerFace.video, centerFace.ctx);
+      FaceGuard.checkLiveness(centerFace.video, centerFace.video, centerFace.ctx);
+      let rSlide = FaceGuard.checkLiveness(slidPhoto.video, slidPhoto.video, slidPhoto.ctx);
+      assert.notStrictEqual(rSlide.stage, 'verified', 'foto yang digeser tidak boleh dihitung tolehan kepala');
+      assert.strictEqual(FaceGuard.isLivenessVerified(), false);
 
+      // 4. Toleh kepala 3D: rotasi wajah mengubah terang rongga mata kiri vs kanan.
+      FaceGuard.resetLiveness();
+      const turnedFace = makeFaceCanvas({ eyesOpen: true, leftEye: [75, 65, 60] });
       FaceGuard.checkLiveness(centerFace.video, centerFace.video, centerFace.ctx);
       FaceGuard.checkLiveness(centerFace.video, centerFace.video, centerFace.ctx);
       let rTurn = FaceGuard.checkLiveness(turnedFace.video, turnedFace.video, turnedFace.ctx);
-      assert.strictEqual(rTurn.stage, 'verified', 'toleh kepala harus meluluskan verifikasi liveness');
+      assert.strictEqual(rTurn.stage, 'verified', 'toleh kepala 3D harus meluluskan verifikasi liveness');
       assert.strictEqual(rTurn.turn, true);
       resolve();
-    }, 100);
+    } catch (e) { reject(e); } }, 100);
   });
 });
 
@@ -1012,8 +1023,24 @@ test('face-guard: enrollment profil biometrik awal mengunci ciri wajah dan kebal
   const t2 = FaceGuard.checkLiveness(warmStudentFace.video, warmStudentFace.cvs, warmStudentFace.ctx);
   assert.strictEqual(t2.stage, 'aligning');
 
+  // m025-560: kalibrasi saja BELUM mengunci profil. Profil yang terkunci mematikan uji
+  // anti-foto (spoof_static), jadi ia baru boleh terkunci sesudah liveness lulus.
+  assert.strictEqual(FaceGuard.isEnrolled(), false, 'kalibrasi saja tidak boleh mengunci profil (anti-foto harus tetap menyala)');
+  const blinkClosed = mkCanvas((x, y) => {
+    if (x >= 18 && x <= 46 && y >= 12 && y <= 36) return [195, 140, 95];
+    return [70, 75, 80];
+  });
+  FaceGuard.checkLiveness(warmStudentFace.video, warmStudentFace.cvs, warmStudentFace.ctx);
+  FaceGuard.checkLiveness(blinkClosed.video, blinkClosed.cvs, blinkClosed.ctx);
+  const realNow = Date.now;
+  const t0 = realNow();
+  Date.now = () => t0 + 120;
+  let tBlink;
+  try { tBlink = FaceGuard.checkLiveness(warmStudentFace.video, warmStudentFace.cvs, warmStudentFace.ctx); } finally { Date.now = realNow; }
+  assert.strictEqual(tBlink.stage, 'verified', 'kedipan meluluskan liveness');
+
   // Enrolled profile kini valid dan merekam warna kulit murid
-  assert.strictEqual(FaceGuard.isEnrolled(), true, 'setelah kalibrasi: profil biometrik murid terkunci');
+  assert.strictEqual(FaceGuard.isEnrolled(), true, 'setelah liveness lulus: profil biometrik murid terkunci');
   const profile = FaceGuard.getEnrolledProfile();
   assert.ok(profile.valid, 'profile.valid = true');
   assert.ok(profile.cbMean > 0 && profile.crMean > 0, 'chrominance tersimpan');
@@ -1038,6 +1065,274 @@ test('face-guard: enrollment profil biometrik awal mengunci ciri wajah dan kebal
     return [70, 75, 80];
   });
   assert.strictEqual(FaceGuard.fallbackCheck(studentTilt.video, studentTilt.cvs, studentTilt.ctx), true, 'kemiringan wajar tetap terdeteksi');
+});
+
+/* ---------------------------- 11 · audit m025-560: celah liveness, kamera, laporan nc --- */
+
+/* Kanvas 64x48 dengan derau sensor deterministik — kamera nyata tidak pernah menghasilkan
+   dua bingkai identik; foto cetak di depan kamera pun tetap berderau, tetapi derau saja
+   tidak cukup untuk lolos (lihat uji di bawah). */
+function mkFaceFrame(opts) {
+  const { shiftX = 0, noise = 0, leftEye = null, seed = 1 } = opts || {};
+  let st = seed;
+  const rnd = () => { st = (st * 1103515245 + 12345) & 0x7fffffff; return st / 0x7fffffff; };
+  const w = 64, h = 48, data = new Uint8ClampedArray(w * h * 4);
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const i = (y * w + x) * 4, ax = x - shiftX;
+      let c = [80, 85, 90];
+      if (ax >= 18 && ax <= 46 && y >= 12 && y <= 36) {
+        c = (y >= 20 && y <= 26 && ax >= 22 && ax <= 42) ? ((leftEye && ax < 32) ? leftEye : [75, 65, 60]) : [180, 130, 100];
+      }
+      const n = noise ? Math.round((rnd() - 0.5) * 2 * noise) : 0;
+      data[i] = c[0] + n; data[i + 1] = c[1] + n; data[i + 2] = c[2] + n; data[i + 3] = 255;
+    }
+  }
+  return { video: { readyState: 2 }, cvs: { width: w, height: h }, ctx: { drawImage() {}, getImageData: () => ({ data }) } };
+}
+/** Jalankan checkLiveness dengan jam tiruan (tick preflight 60 ms) sampai lulus atau habis. */
+function runLiveness(FaceGuard, frameAt, maxMs) {
+  const realNow = Date.now;
+  let now = 1e12;
+  Date.now = () => now;
+  try {
+    FaceGuard.resetLiveness();
+    let res = null;
+    for (let i = 0; now - 1e12 <= maxMs; i++) {
+      const f = frameAt(i);
+      res = FaceGuard.checkLiveness(f.video, f.cvs, f.ctx);
+      if (res.stage === 'verified') return { res, ms: now - 1e12 };
+      now += 60;
+    }
+    return { res, ms: null };
+  } finally { Date.now = realNow; }
+}
+
+test('face-guard (m025-560): foto diam & foto digeser yang ditahan 10 dtk TIDAK PERNAH lolos liveness', () => {
+  const FaceGuard = require('../features/class-hub/fiezel-face-guard.js');
+  // Dulu: profil terkunci sesudah 2 tick mematikan spoof_static, lalu 22 tick (~1,3 dtk)
+  // "diam tenang" meluluskan foto cetak. Foto yang digeser 5 px dulu lolos sebagai "toleh".
+  const diam = runLiveness(FaceGuard, () => mkFaceFrame(), 10000);
+  assert.strictEqual(diam.ms, null, 'foto diam tidak boleh lolos: ' + JSON.stringify(diam.res));
+  assert.strictEqual(FaceGuard.isEnrolled(), false, 'profil tidak terkunci untuk foto');
+  const geser = runLiveness(FaceGuard, (i) => mkFaceFrame({ shiftX: i < 3 ? 0 : 5 }), 10000);
+  assert.strictEqual(geser.ms, null, 'foto digeser sekali tidak boleh lolos sebagai tolehan');
+  const goyang = runLiveness(FaceGuard, (i) => mkFaceFrame({ shiftX: (i % 10) < 5 ? 0 : 3 }), 10000);
+  assert.strictEqual(goyang.ms, null, 'foto yang digoyang kaku di tangan tidak boleh lolos');
+});
+
+test('face-guard (m025-560): wajah hidup lolos — diam tenang >= 3 dtk (jam dinding), kedip, atau toleh 3D', () => {
+  const FaceGuard = require('../features/class-hub/fiezel-face-guard.js');
+  const tenang = runLiveness(FaceGuard, (i) => mkFaceFrame({ noise: 4, seed: i + 1 }), 10000);
+  assert.ok(tenang.ms !== null, 'wajah hidup yang diam tenang harus lolos: ' + JSON.stringify(tenang.res));
+  assert.ok(tenang.ms >= FaceGuard.STEADY_HOLD_MS, 'diam tenang butuh >= 3 dtk nyata, bukan 1,3 dtk: ' + tenang.ms);
+  assert.strictEqual(tenang.res.steady, true);
+  assert.strictEqual(FaceGuard.isEnrolled(), true, 'profil baru terkunci SESUDAH liveness lulus');
+  const toleh = runLiveness(FaceGuard, (i) => mkFaceFrame({ noise: 4, seed: i + 1, leftEye: i >= 6 ? [110, 95, 85] : null }), 10000);
+  assert.ok(toleh.ms !== null && toleh.res.turn === true, 'toleh kepala 3D lolos: ' + JSON.stringify(toleh.res));
+  // Progres preflight mengikuti liveness sebenarnya (dibatasi 95% sebelum lulus).
+  const realNow = Date.now; let now = 1e12; Date.now = () => now;
+  try {
+    FaceGuard.resetLiveness();
+    let last = null;
+    for (let i = 0; i < 20; i++) { const f = mkFaceFrame({ noise: 4, seed: i + 1 }); last = FaceGuard.checkLiveness(f.video, f.cvs, f.ctx); now += 60; }
+    assert.ok(last.stage === 'challenge' && last.progress > 0 && last.progress <= 95, 'progres jujur: ' + JSON.stringify(last));
+  } finally { Date.now = realNow; }
+});
+
+test('face-guard (m025-560): kamera beku (bingkai identik >= 3 dtk) terdeteksi; derau kamera hidup tidak', () => {
+  const FaceGuard = require('../features/class-hub/fiezel-face-guard.js');
+  const sig = () => { const a = new Float32Array(192); for (let k = 0; k < 192; k++) a[k] = 100 + (k % 7); return a; };
+  const beku = { sig: null, t: 0, since: 0 };
+  let frozen = false;
+  for (let t = 0; t <= 3500; t += 250) frozen = FaceGuard.freezeStep(beku, sig(), t);
+  assert.strictEqual(frozen, true, 'stream yang berhenti (track dibisukan, kamera direbut, kamera virtual gambar diam) = tidak hadir');
+  const hidup = { sig: null, t: 0, since: 0 };
+  let st = 3, anyFrozen = false;
+  for (let t = 0; t <= 10000; t += 250) {
+    const a = sig();
+    for (let k = 0; k < 192; k++) { st = (st * 1103515245 + 12345) & 0x7fffffff; if (st % 9 === 0) a[k] += 1; }
+    anyFrozen = FaceGuard.freezeStep(hidup, a, t) || anyFrozen;
+  }
+  assert.strictEqual(anyFrozen, false, 'derau sensor sekecil apa pun = kamera hidup');
+  const src = read('features/class-hub/fiezel-face-guard.js');
+  assert.ok(/visibilityState === 'hidden'/.test(src), 'halaman tersembunyi tidak dihitung dua kali sebagai wajah hilang');
+  assert.ok(/readyState === 'ended'/.test(src) && /tr\.muted/.test(src), 'track ended/muted = kamera tidak mengawasi');
+  assert.ok(/onCameraLost/.test(src), 'kamera yang tidak bisa disambung ulang dilaporkan');
+});
+
+test('face-guard (m025-560): profil yang dipulihkan hanya menerima kunci numerik', () => {
+  const FaceGuard = require('../features/class-hub/fiezel-face-guard.js');
+  FaceGuard.resetLiveness();
+  assert.strictEqual(FaceGuard.setEnrolledProfile({ valid: true, sampleCount: 0, cbMean: 110, crMean: 150 }), false, 'profil tanpa sampel tidak valid');
+  FaceGuard.resetLiveness();
+  assert.strictEqual(FaceGuard.setEnrolledProfile({ valid: true, sampleCount: 9, cbMean: 110, crMean: 150, skinCountMean: 'x', evil: '<img>' }), true);
+  const p = FaceGuard.getEnrolledProfile();
+  assert.strictEqual(p.cbMean, 110);
+  assert.strictEqual(p.evil, undefined, 'kunci asing tidak ikut');
+  assert.strictEqual(p.skinCountMean, 350, 'nilai non-numerik diabaikan');
+  FaceGuard.resetLiveness();
+});
+
+test('face-guard (m025-560): start() ganda berbagi satu stream; stop() saat izin ditunggu tidak membocorkan kamera', async () => {
+  const FaceGuard = require('../features/class-hub/fiezel-face-guard.js');
+  const origNav = Object.getOwnPropertyDescriptor(globalThis, 'navigator');
+  const origDoc = globalThis.document;
+  let calls = 0; const pending = [];
+  const mkStream = () => { const s = { stopped: 0, getTracks: () => [{ stop: () => { s.stopped++; } }] }; return s; };
+  Object.defineProperty(globalThis, 'navigator', { value: { mediaDevices: { getUserMedia: () => { calls++; return new Promise((r) => pending.push(r)); } } }, configurable: true, writable: true });
+  const el = () => ({ style: {}, setAttribute() {}, play: () => Promise.resolve(), getContext: () => ({ drawImage() {}, getImageData: () => ({ data: new Uint8ClampedArray(64 * 48 * 4) }) }) });
+  globalThis.document = Object.assign({}, origDoc || {}, { visibilityState: 'visible', createElement: el, body: { appendChild() {} } });
+  try {
+    FaceGuard.stop();
+    const p1 = FaceGuard.start({}), p2 = FaceGuard.start({});
+    assert.strictEqual(calls, 1, 'panggilan kedua tidak membuka stream kedua');
+    assert.strictEqual(p1, p2, 'kedua pemanggil menunggu janji yang sama');
+    const s1 = mkStream(); pending[0](s1);
+    const r = await p1;
+    assert.ok(r.ok && FaceGuard.isActive());
+    FaceGuard.stop();
+    assert.strictEqual(s1.stopped, 1, 'stop mematikan track');
+
+    const p3 = FaceGuard.start({});
+    FaceGuard.stop();                       // murid keluar saat dialog izin masih terbuka
+    const p4 = FaceGuard.start({});         // lalu masuk lagi
+    const sLate = mkStream(), sNew = mkStream();
+    pending[1](sLate); pending[2](sNew);
+    const r3 = await p3, r4 = await p4;
+    assert.strictEqual(r3.ok, false, 'stream yang datang sesudah stop dibuang');
+    assert.strictEqual(sLate.stopped, 1, 'dan track-nya dimatikan (lampu kamera padam)');
+    assert.ok(r4.ok && sNew.stopped === 0, 'start yang baru tetap jalan');
+  } finally {
+    FaceGuard.stop();
+    if (origNav) Object.defineProperty(globalThis, 'navigator', origNav); else delete globalThis.navigator;
+    globalThis.document = origDoc;
+  }
+});
+
+test('laporan nc (m025-560): "Lanjut Tanpa Kamera" benar-benar sampai ke guru', async () => {
+  // Dulu tombol berjanji "Dilaporkan ke Guru", tetapi noCamera tidak pernah masuk payload.
+  const s = FG.start('a-nc', 0);
+  assert.strictEqual(FG.payload(s, 1000).nc, undefined, 'tanpa bendera: bentuk payload lama tidak berubah');
+  FG.markNoCamera(s);
+  assert.strictEqual(FG.payload(s, 1000).nc, 1);
+  assert.strictEqual(FG.restore(JSON.parse(JSON.stringify(s))).noCamera, true, 'bendera tahan muat ulang');
+
+  const core = await import('../workers/api/teacher/class-sync-core.js');
+  const base = { cls: 'FZ-AB2C3D', name: 'Ani', skills: { past_tense: { c: 2, t: 3 } } };
+  const ok = core.normalizeReport(Object.assign({ assign: [{ id: 'ujian-nc', s: 1, f: { n: 0, s: 0, x: 0, nc: 1 } }] }, base), Date.now());
+  assert.ok(ok.ok, JSON.stringify(ok));
+  assert.deepStrictEqual(ok.report.assign[0].f, { n: 0, s: 0, x: 0, nc: 1 });
+  const bad = core.normalizeReport(Object.assign({ assign: [{ id: 'ujian-nc', f: { n: 0, s: 0, x: 0, nc: 'kamera rusak' } }] }, base), Date.now());
+  assert.ok(!bad.ok && bad.reason === 'bad_assign_focus', 'nc hanya bendera 1 — bukan teks bebas');
+
+  const TS = globalThis.FiezelTeacherStore;
+  const c = TS.normalizeClass({ id: 'c-nc', code: 'FZ-AB2C3D', name: 'Kelas 8A', level: 'A2', students: [TS.newStudent('Ani')], assignments: [] });
+  const a = TS.buildAssignment({ title: 'Ujian kamera', skills: ['past_tense'], itemIds: ['x1'], mode: 'ujian' });
+  c.assignments.push(a);
+  const laporan = (f) => TS.parseLearnerPayload({ v: 1, name: 'Ani', at: Date.now(), skills: { past_tense: { c: 1, t: 1 } }, lessons: 1, cls: 'FZ-AB2C3D', assign: [{ id: a.id, s: 1, f: f }] });
+  const r1 = TS.ingest(c, laporan({ n: 0, s: 0, x: 0, nc: 1 }));
+  assert.strictEqual(r1.focusEvents.length, 1, 'ujian tanpa kamera membangunkan guru walau keluar layar 0×');
+  const f = c.assignments[0].focus[r1.student.id];
+  assert.strictEqual(f.nc, 1);
+  assert.strictEqual(TS.focusLevel(f), 'ringan', 'tanpa kamera tidak dilabeli bersih');
+  assert.ok(/kamera/i.test(TS.focusLabel(f)), TS.focusLabel(f));
+  const kabar = TS.inboxText(Object.assign({ at: Date.now() }, r1.focusEvents[0]));
+  assert.ok(/Ani/.test(kabar) && /Ujian kamera/.test(kabar) && /kamera/i.test(kabar), kabar);
+  assert.ok(!/keluar dari layar/.test(kabar), 'tidak menuduh keluar layar yang tidak terjadi: ' + kabar);
+  assert.strictEqual(TS.ingest(c, laporan({ n: 0, s: 0, x: 0, nc: 1 })).focusEvents.length, 0, 'laporan ulang tidak membangunkan guru dua kali');
+  const hub = read('features/class-hub/fiezel-class-hub.js'), shell = read('features/teacher/fiezel-teacher-shell.js');
+  assert.ok(/f\.n && !f\.vn && !f\.nc/.test(hub), 'chip guru muncul untuk ujian tanpa kamera');
+  assert.ok(/f && \(f\.n \|\| f\.nc\)/.test(shell), 'laci murid memuat ujian tanpa kamera');
+});
+
+test('class-hub (m025-560): preflight tidak dicatat sebagai pelanggaran; bypass mematikan kamera & melapor nc', async () => {
+  const Hub = globalThis.FiezelClassHub, TS = globalThis.FiezelTeacherStore, LF = globalThis.FiezelLearnerFlow, Bank = globalThis.FiezelReviewBank;
+  const ids = Bank.pick('past_tense', 3, 5).map((x) => x.id);
+  assert.ok(TS.acceptAssignmentPayload({ v: 1, t: 'assign', id: 'ujian-audit-nc', title: 'Ujian audit', skills: ['past_tense'], itemIds: ids, minutes: 10, from: 'Guru', cls: 'FZ-AB2C3D', mode: 'ujian', timer: 10, faceGuard: true }));
+  let opts = null, stops = 0, active = false;
+  const origFaceG = globalThis.FiezelFaceGuard;
+  globalThis.FiezelFaceGuard = {
+    isSupported: () => true, isActive: () => active,
+    start: async (o) => { opts = o; active = true; return { ok: true, active: true }; },
+    stop: () => { stops++; active = false; },
+    resetLiveness: () => {}, checkNow: () => false, attachPreview: () => true,
+    checkLiveness: () => ({ stage: 'challenge', ok: true, progress: 10 })
+  };
+  const sEl = { innerHTML: '', _h: {}, addEventListener(t, fn) { (this._h[t] = this._h[t] || []).push(fn); }, querySelector: () => null, fire(t, target) { (this._h[t] || []).forEach((fn) => fn({ target, preventDefault() {} })); } };
+  const btn = (k) => { const b = { getAttribute: (a) => (a === 'data-ch' ? k : null) }; b.closest = (sel) => (sel === '[data-ch]' ? b : null); return b; };
+  const senv = { toast(t) { senv.last = t; }, go() {}, afterRender() {} };
+  try {
+    Hub.mountStudent(sEl, senv);
+    Hub.openAssignment('ujian-audit-nc');
+    const u = Hub._studentUi();
+    sEl.fire('click', btn('start-face-verify'));
+    await new Promise((r) => setTimeout(r, 30));
+    assert.strictEqual(u.facePreflight.status, 'scanning');
+    // Murid masih membetulkan posisi di oval: kamera melapor "tidak ada wajah".
+    opts.onAbsent(Date.now() - 6000);
+    opts.onWarning(true, 6000);
+    opts.onAbsentEpisode(6000);
+    assert.strictEqual(u.focus.faceAwaySince, 0, 'preflight bukan bagian ujian — tidak membuka episode');
+    assert.strictEqual(u.faceWarn, false, 'tidak ada kartu peringatan di layar preflight');
+    assert.strictEqual(FG.summary(u.focus, Date.now()).vn, 0);
+
+    u.facePreflight = { status: 'error', reason: 'face_not_detected' };
+    const stopsBefore = stops;
+    sEl.fire('click', btn('bypass-face-verify'));
+    assert.ok(stops > stopsBefore, '"Lanjut Tanpa Kamera" benar-benar mematikan kamera');
+    assert.strictEqual(u.runner.noCamera, true);
+    assert.strictEqual(u.focus.noCamera, true);
+    const lap = (LF._state().doneAssign || []).filter((x) => x.id === 'ujian-audit-nc')[0];
+    assert.ok(lap && lap.f && lap.f.nc === 1, 'nc = 1 masuk laporan ke guru: ' + JSON.stringify(lap));
+  } finally {
+    Hub.unmountStudent();
+    globalThis.FiezelFaceGuard = origFaceG;
+  }
+});
+
+test('class-hub (m025-560): muat ulang — preflight basi direset, profil verifikasi dipulihkan', async () => {
+  const Hub = globalThis.FiezelClassHub, TS = globalThis.FiezelTeacherStore, Bank = globalThis.FiezelReviewBank;
+  const ids = Bank.pick('past_tense', 3, 5).map((x) => x.id);
+  assert.ok(TS.acceptAssignmentPayload({ v: 1, t: 'assign', id: 'ujian-audit-prof', title: 'Ujian profil', skills: ['past_tense'], itemIds: ids, minutes: 10, from: 'Guru', cls: 'FZ-AB2C3D', mode: 'ujian', timer: 10, faceGuard: true }));
+  const startOpts = []; let active = false;
+  const profile = { valid: true, sampleCount: 12, cbMean: 108, crMean: 152 };
+  const origFaceG = globalThis.FiezelFaceGuard;
+  globalThis.FiezelFaceGuard = {
+    isSupported: () => true, isActive: () => active,
+    start: async (o) => { startOpts.push(o); active = true; return { ok: true, active: true }; },
+    stop: () => { active = false; },
+    resetLiveness: () => {}, checkNow: () => true, attachPreview: () => true,
+    checkLiveness: () => ({ stage: 'verified', ok: true, progress: 100 }),
+    isEnrolled: () => true, getEnrolledProfile: () => Object.assign({}, profile)
+  };
+  const sEl = { innerHTML: '', _h: {}, addEventListener(t, fn) { (this._h[t] = this._h[t] || []).push(fn); }, querySelector: () => null, fire(t, target) { (this._h[t] || []).forEach((fn) => fn({ target, preventDefault() {} })); } };
+  const btn = (k) => { const b = { getAttribute: (a) => (a === 'data-ch' ? k : null) }; b.closest = (sel) => (sel === '[data-ch]' ? b : null); return b; };
+  const senv = { toast() {}, go() {}, afterRender() {} };
+  try {
+    Hub.mountStudent(sEl, senv);
+    Hub.openAssignment('ujian-audit-prof');
+    const u = Hub._studentUi();
+    // Halaman dimuat ulang saat preflight "memindai": kamera & pemindainya sudah tiada.
+    u.facePreflight = { status: 'scanning', step: 'align' };
+    Hub.unmountStudent(); Hub.mountStudent(sEl, senv);
+    assert.strictEqual(u.facePreflight.status, 'idle', 'tombol tidak terkunci "Memindai wajah..." selamanya');
+
+    sEl.fire('click', btn('start-face-verify'));
+    await new Promise((r) => setTimeout(r, 30));
+    assert.strictEqual(u.facePreflight.status, 'verified');
+    sEl.fire('click', btn('proceed-exam'));
+    assert.deepStrictEqual(u.runner.faceProfile, profile, 'profil hasil verifikasi disimpan bersama ujian');
+
+    active = false;                       // muat ulang: kamera mati, modul hidup lagi
+    const before = startOpts.length;
+    Hub.unmountStudent(); Hub.mountStudent(sEl, senv);
+    assert.ok(startOpts.length > before, 'pengawasan kamera dinyalakan lagi');
+    assert.deepStrictEqual(startOpts[startOpts.length - 1].profile, profile, 'dengan profil murid, bukan model universal yang paranoid');
+  } finally {
+    Hub.unmountStudent();
+    globalThis.FiezelFaceGuard = origFaceG;
+  }
 });
 
 (async () => {

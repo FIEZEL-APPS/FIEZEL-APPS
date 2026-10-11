@@ -539,6 +539,7 @@
       f.vs = Math.max(0, Math.round(Number(focus.vs) || 0));
       f.vx = Math.max(0, Math.round(Number(focus.vx) || 0));
     }
+    if (focus.nc === 1 || focus.nc === true) f.nc = 1;
     if (cur) cur.f = f;
     else list.push({ id: id, at: Date.now(), s: 1, f: f });
     s.doneAssign = list.slice(-8);

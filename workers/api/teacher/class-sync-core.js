@@ -129,6 +129,12 @@ export function normalizeReport(body, nowMs) {
           entry.f.vs = v_s;
           entry.f.vx = v_x;
         }
+        // nc = ujian berjalan TANPA kamera (murid memilih lanjut tanpa kamera, izin ditolak,
+        // atau kamera terputus). Bendera bernilai tunggal 1 — sama ketatnya dengan j.
+        if (a.f.nc !== undefined) {
+          if (a.f.nc !== 1 && a.f.nc !== true) return { ok: false, reason: 'bad_assign_focus' };
+          entry.f.nc = 1;
+        }
       }
       if (a.w !== undefined) {
         if (!Array.isArray(a.w) || a.w.length > LIMITS.WRONG_MAX) return { ok: false, reason: 'bad_assign_wrong' };
