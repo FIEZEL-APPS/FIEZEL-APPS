@@ -1,9 +1,9 @@
 # FIEZEL Handoff Dossier — m025-567: Perbaikan Performa Boot & Animasi Splash PWA (PR #595)
 
-**Tanggal**: 2026-10-12  
-**Versi Build**: `m025-567`  
-**PR**: `#595` (`claude/pensive-brahmagupta-zp9fy3`)  
-**Laporan Audit Rujukan**: `reports/AUDIT-PERFORMA-BOOT-SPLASH-2026-10-11.md`
+- **Tanggal**: 2026-10-12
+- **Versi Build**: `m025-567`
+- **PR**: `#595` (`claude/pensive-brahmagupta-zp9fy3`)
+- **Laporan Audit Rujukan**: `reports/AUDIT-PERFORMA-BOOT-SPLASH-2026-10-11.md`
 
 ---
 

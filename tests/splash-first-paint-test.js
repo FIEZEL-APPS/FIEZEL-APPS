@@ -611,6 +611,19 @@ test('preferensi murid berkuasa juga atas playOnce/prepare', () => {
   assert.strictEqual(env._ctx, null, 'suara yang dimatikan murid tidak boleh membuat konteks diam-diam');
 });
 
+test('watchdog 15 detik: menjaga kartu pemulihan dan mencegah splash kedua bila load() selesai terlambat', () => {
+  assert.ok(/if \(!keepingRecovery\) clearRecovery\(\);/.test(html),
+    'dismiss() pada watchdog 15 detik tidak boleh menghapus kartu pemulihan yang baru ditampilkan showRecovery()');
+  assert.ok(/window\.__fiezelBootWatchdogFired = true;/.test(html),
+    'watchdog 15 detik harus mencatat __fiezelBootWatchdogFired agar show() tidak memutar splash kedua');
+  const env = fakeEnv({ bootSplash: false, bootElapsedMs: 16000 });
+  env.__fiezelBootWatchdogFired = true;
+  const shown = splash.show(env, { now: NOW, silent: true });
+  assert.strictEqual(shown.shown, false, 'boot > 15 detik yang sudah melewati watchdog tidak boleh membuat splash kedua');
+  assert.strictEqual(shown.reason, 'watchdog_elapsed');
+  assert.strictEqual(env._body.children.length, 0, 'tidak ada elemen splash kedua yang dipasang ke body');
+});
+
 process.on('exit', () => {
   if (failures) {
     console.error('FIEZEL m025-84 splash first-paint + SFX: FAIL (' + failures + ')');
