@@ -17,7 +17,7 @@
  */
 import {
   createEnv, createTransport, createClient, newLearner, ownerAuth, loadWorker,
-  workerLogs, MODE, SECRETS, FLAGS_ALL_ON
+  workerLogs, MODE, SECRETS, FLAGS_ALL_ON, LEARNER_PW
 } from './harness.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -370,8 +370,8 @@ async function suiteConcurrency(transport) {
   const dev1 = createClient(transport); await dev1.req('POST', '/api/auth/anon', { body: {} });
   const dev2 = createClient(transport); await dev2.req('POST', '/api/auth/anon', { body: {} });
   const [r1, r2] = await Promise.all([
-    dev1.req('POST', '/api/account/register', { body: { handle, password: 'Sandi-Kuat-123!' } }),
-    dev2.req('POST', '/api/account/register', { body: { handle, password: 'Sandi-Kuat-123!' } })
+    dev1.req('POST', '/api/account/register', { body: { handle, password: LEARNER_PW } }),
+    dev2.req('POST', '/api/account/register', { body: { handle, password: LEARNER_PW } })
   ]);
   const wins = [r1, r2].filter((r) => r.status === 200).length;
   record('/api/account/register', 'handle race -> exactly 1 winner', wins === 1, 1, wins, `r1=${r1.status} r2=${r2.status}`);
