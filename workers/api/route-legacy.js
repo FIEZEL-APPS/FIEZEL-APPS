@@ -129,14 +129,18 @@ export function projectBrainAttempt(att) {
 }
 
 async function readJson(ctx) {
+  let val = null;
   if (ctx.bodyText !== undefined) {
-    try { return JSON.parse(ctx.bodyText); } catch { return {}; }
+    try { val = JSON.parse(ctx.bodyText); } catch { return {}; }
+  } else {
+    try {
+      val = await ctx.request.json();
+    } catch {
+      return {};
+    }
   }
-  try {
-    return await ctx.request.json();
-  } catch {
-    return {};
-  }
+  if (val === null || typeof val !== 'object' || Array.isArray(val)) return {};
+  return val;
 }
 
 // ── BATAS PENYIMPANAN FEEDBACK (m025-308) ────────────────────────────────────────────

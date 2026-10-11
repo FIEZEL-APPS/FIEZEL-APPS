@@ -1,7 +1,7 @@
 {
   "version": "m025-565",
   "claimedBy": "branch claude/zealous-davinci-ekag7u",
-  "claimedAt": "2026-10-11T16:55:13.444Z",
+  "claimedAt": "2026-10-11T16:56:56.737Z",
   "reason": "penjaga wajah ujian: lokalisasi wajah, debounce temporal, 2 FPS (m025-565)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
