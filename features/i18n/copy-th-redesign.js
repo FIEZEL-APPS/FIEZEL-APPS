@@ -332,6 +332,19 @@
     'bc.bukti-kosong': 'ทำอีกสักสองสามรอบ แล้วหลักฐานจะขึ้นที่นี่',
     'bc.fokus-pasangan': 'โฟกัสตอนนี้: แยก {a} กับ {b} ให้ออก',
     'bc.fokus-materi': 'โฟกัสตอนนี้: {materi}',
+    // m025-565 Stempel Ingatan: kembaran th dari copy-id-redesign.js (kunci + {placeholder} sama).
+    // {hari} diisi Intl th-TH weekday long, yang sudah memuat "วัน" (mis. วันจันทร์), jadi
+    // stempel.sejak-hari sengaja berisi placeholder saja.
+    'stempel.pertama': 'Fiezel จดกับดักเบื้องหลัง “{pilihan}” ไว้แล้ว ถ้ามันโผล่มาอีก Fiezel จะจำได้',
+    'stempel.sesi-ini': 'กับดักเบื้องหลัง “{pilihan}” จับคุณได้ {kali} ครั้งแล้วในรอบนี้',
+    'stempel.lagi': 'เจออีกแล้ว กับดักเบื้องหลัง “{pilihan}” จับคุณได้ {kali} ครั้งแล้ว ครั้งแรกคือ{sejak}',
+    'stempel.lagi-polos': 'เจออีกแล้ว กับดักเบื้องหลัง “{pilihan}” จับคุณได้ {kali} ครั้งแล้ว ใน {sesi} รอบที่ต่างกัน',
+    'stempel.lolos': 'กับดักเบื้องหลัง “{pilihan}” เคยจับคุณได้ {kali} ครั้ง รอบนี้คุณไม่หลงกล',
+    'stempel.jinak': 'ตามบันทึกของ Fiezel กับดักที่เคยจับคุณได้ {kali} ครั้งในบทนี้ ตอนนี้ปราบได้แล้ว',
+    'stempel.sejak-tadi': 'รอบก่อนหน้าในวันนี้',
+    'stempel.sejak-kemarin': 'เมื่อวานนี้',
+    'stempel.sejak-hari': '{hari}',
+    'stempel.sejak-tanggal': 'วันที่ {tanggal}',
 
     /* ── Game Hub Arcade ────────────────────────────────────────────────────── */
     'game.title': 'อาร์เคดและเกม',

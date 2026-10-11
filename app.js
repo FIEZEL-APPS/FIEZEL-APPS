@@ -17,7 +17,7 @@ const APP_VERSION=self.FIEZEL_VERSION||'5.19.0';
    FIEZEL_UX_FLAGS milik berkas benderanya, kunci demi kunci, dan MERAH kalau
    keduanya menyimpang satu nilai pun. Jadi ini duplikasi berpagar, bukan dua
    sumber kebenaran yang saling bersaing. */
-const UX_FALLBACK_FLAGS={curriculumConsole:true,scenePhases:false,skillExams:false,skillsLabDestination:false,personalJourneyTab:false,voicePackGate:false,tutorRole:false,todayHome:true,fourTabNav:true,leanIntro:true,placementLite:true,sessionSummary:true,funnelTelemetry:true};
+const UX_FALLBACK_FLAGS={curriculumConsole:true,scenePhases:false,skillExams:false,skillsLabDestination:false,personalJourneyTab:false,voicePackGate:false,tutorRole:false,todayHome:true,fourTabNav:true,leanIntro:true,placementLite:true,sessionSummary:true,funnelTelemetry:true,memoryStamp:true};
 /* Nama tak dikenal -> false di KEDUA jalur: salah ketik mematikan fitur (aman),
    bukan menyalakannya diam-diam. */
 function uxOn(flag){
@@ -3758,6 +3758,166 @@ function misconceptionLedgerRecord(session,q,diagnosis,ok){
       }
     }
   }catch{}
+}
+/* ---- Stempel Ingatan (m025-565): buku besar miskonsepsi BICARA di kotak umpan balik -----
+ *
+ * KENAPA. Buku besar di atas sudah lama mengingat setiap jebakan lintas sesi (berapa kali,
+ * di sesi mana, kapan pertama), tetapi ingatan itu hanya menggerakkan tutor diam-diam. Murid
+ * tidak pernah mendengarnya pada detik yang paling menentukan, tepat sesudah ia menjawab,
+ * sehingga FIEZEL terbaca sebagai kuis biasa: kuis biasa juga tidak pernah berkata "ini
+ * ketiga kalinya". Stempel ini SATU baris kecil di kotak umpan balik yang sudah ada.
+ * Kekuatannya ada di ketepatan kalimatnya, bukan di visualnya, jadi tidak ada bar, ikon,
+ * atau animasi baru.
+ *
+ * ATURAN KEJUJURAN (turunan prinsip OLM: tanpa klaim di bawah ambang bukti):
+ *  - Hanya miskonsepsi BERNAMA (precision 'misconception'). 'unclassified:*' adalah tumpukan
+ *    jawaban salah tanpa nama; menyebutnya "jebakan yang sama" adalah kebohongan.
+ *  - Setiap angka di kalimat diambil langsung dari entri ledger (hits, sessions). Tidak ada
+ *    persentase, tidak ada statistik murid lain.
+ *  - Tebakan (< GUESS_FLOOR_MS) tidak distempel. Yang salah sudah ditegur tutor lewat
+ *    'brain-tutor.timing-guess', dan dua kalimat tentang satu jawaban adalah keramaian; yang
+ *    benar karena menebak bukan kemenangan atas jebakan.
+ *  - "Lolos" (benar padahal pengecoh jebakannya ada di layar) hanya sekali per jebakan per
+ *    sesi dan berhenti begitu jebakannya jinak. Pujian yang diulang di setiap soal berhenti
+ *    terbaca sebagai pengamatan.
+ *  - Hanya latihan mandiri: lihat memoryStampAllowed. */
+function memoryStampAllowed(cfg,measure){
+  if(measure||!cfg||cfg.placement||cfg.noHints||cfg.examKind)return false;
+  if(['level-exam','grammar-skip','placement'].includes(String(cfg.type||'')))return false;
+  /* Kunci ujian adalah satu-satunya jawaban resmi atas "apakah murid sedang diuji?", termasuk
+     tugas guru yang dinilai (kind 'assignment'). Stempel "jebakan" pada jawaban salah adalah
+     vonis, dan vonis di tengah alat ukur membocorkan kunci ke percobaan berikutnya. */
+  if(examLockActive())return false;
+  return uxOn('memoryStamp');
+}
+/** Pengecoh yang BENAR-BENAR tampil di layar beserta nama miskonsepsinya, [{text, name}];
+ *  bukan seluruh peta templat, yang juga memuat pengecoh yang tidak pernah disajikan. */
+function memoryStampShownOptions(q){
+  const map=q?.optionMisconceptions;
+  if(!map||typeof map!=='object'||!Array.isArray(q?.options))return [];
+  const out=[];
+  q.options.forEach((o,i)=>{
+    if(i===q.answerIndex)return;
+    const text=String(o??'').trim(),name=text?map[text]:'';
+    if(name)out.push({text,name:String(name)});
+  });
+  return out;
+}
+/**
+ * Keputusan stempel, murni: dua potret ledger (sebelum dan sesudah jawaban ini dicatat) plus
+ * fakta jawaban. Mengembalikan {kind, kali, pilihan, ...} atau null. Tidak menyentuh state
+ * maupun DOM. `pilihan` adalah teks pengecoh yang dibicarakan stempel: pembahasan yang dibuka
+ * sesudah percobaan kedua membahas pilihan KEDUA, sedangkan stempel selalu tentang percobaan
+ * pertama, jadi "jebakan ini" tanpa nama pilihan akan menunjuk pilihan yang salah.
+ *   pertama  - jebakan ini baru pertama kali menangkap murid
+ *   sesi-ini - sudah berulang, tetapi semuanya di sesi ini
+ *   lagi     - pernah menangkap di sesi lain; firstMs = awal sesi paling tua yang tercatat
+ *   jinak    - jawaban benar ini yang membuat jebakan yang pernah aktif dinyatakan jinak
+ *   lolos    - benar, padahal pengecoh jebakan yang sudah >=2 kali menangkap ada di layar
+ */
+function memoryStampDecide(L,before,after,ev,now=Date.now()){
+  if(!L||!ev||!after||typeof after!=='object'||!after.entries||typeof after.entries!=='object')return null;
+  const concept=String(ev.concept||'');
+  if(!concept||String(ev.timing||'')==='guess')return null;
+  const named=m=>{const s=String(m||'');return !!s&&!s.startsWith('unclassified:')};
+  const entries=Object.values(after.entries).filter(e=>e&&e.concept===concept&&named(e.misconception));
+  if(ev.correct!==true){
+    const pilihan=String(ev.picked||'').trim();
+    if(!pilihan||String(ev.precision||'')!=='misconception'||!named(ev.misconception))return null;
+    const e=entries.find(x=>x.misconception===String(ev.misconception));
+    if(!e)return null;
+    const kali=Math.max(1,Math.floor(Number(e.hits)||0));
+    if(kali===1)return{kind:'pertama',kali,pilihan};
+    const sid=String(ev.sessionId||'');
+    const sesi=(Array.isArray(e.sessions)?e.sessions:[]).map(String);
+    const lain=sesi.filter(s=>s!==sid);
+    if(!lain.length)return{kind:'sesi-ini',kali,pilihan};
+    // Id sesi adalah startedAt sesi tutor (ms). Yang tidak bisa dibaca sebagai waktu yang
+    // masuk akal tidak dikarang menjadi tanggal: kalimatnya turun ke versi tanpa tanggal.
+    const waktu=lain.map(Number).filter(t=>Number.isFinite(t)&&t>0&&t<=now);
+    return{kind:'lagi',kali,pilihan,sesi:new Set(sesi).size,firstMs:waktu.length?Math.min(...waktu):null};
+  }
+  if(typeof L.summarize!=='function')return null;
+  const kunci=r=>r.concept+'::'+r.misconception;
+  const S0=L.summarize(before,now),S1=L.summarize(after,now);
+  const jinakLama=new Set((S0?.resolved||[]).map(kunci));
+  const jinakKini=(S1?.resolved||[]).filter(r=>r&&r.concept===concept&&named(r.misconception));
+  /* Jinak dinilai per KONSEP, bukan per pengecoh yang tampil, karena begitulah ledger
+     bernalar: jawaban benar pada konsep ini menurunkan semua miskonsepsinya. */
+  const baru=jinakKini.filter(r=>!jinakLama.has(kunci(r))).sort((a,b)=>(Number(b.evidenceCount)||0)-(Number(a.evidenceCount)||0));
+  if(baru.length)return{kind:'jinak',kali:Math.max(1,Math.floor(Number(baru[0].evidenceCount)||0)),trap:kunci(baru[0])};
+  const tampil=new Map();
+  for(const o of (Array.isArray(ev.shownOptions)?ev.shownOptions:[])){
+    const name=String(o?.name||''),text=String(o?.text||'').trim();
+    if(named(name)&&text&&!tampil.has(name))tampil.set(name,text);
+  }
+  if(!tampil.size)return null;
+  const sudahJinak=new Set(jinakKini.map(kunci));
+  const sudahDipuji=new Set((Array.isArray(ev.celebrated)?ev.celebrated:[]).map(String));
+  let best=null;
+  for(const e of entries){
+    const k=kunci(e),hits=Math.floor(Number(e.hits)||0);
+    if(!tampil.has(e.misconception)||sudahJinak.has(k)||sudahDipuji.has(k)||hits<2)continue;
+    if(!best||hits>best.kali)best={kind:'lolos',kali:hits,pilihan:tampil.get(e.misconception),trap:k};
+  }
+  return best;
+}
+/** "kapan pertama" dalam bahasa murid, dihitung dalam HARI BELAJAR murid (zona waktunya
+ *  sendiri), bukan selisih jam: sesi pukul 23.00 kemarin tetap "kemarin". '' bila tak pasti. */
+function memoryStampWhen(firstMs,now=Date.now()){
+  const t=Number(firstMs);
+  if(!Number.isFinite(t)||t<=0||t>now)return '';
+  const utc=k=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(k||''));return m?Date.UTC(+m[1],+m[2]-1,+m[3]):NaN};
+  const hari=Math.round((utc(studyDayKey(now))-utc(studyDayKey(t)))/86400000);
+  if(!Number.isFinite(hari)||hari<0)return '';
+  if(hari===0)return FiezelI18n.t('stempel.sejak-tadi');
+  if(hari===1)return FiezelI18n.t('stempel.sejak-kemarin');
+  const loc=FiezelI18n.getLocale()==='th'?'th-TH':'id-ID';
+  let tz='';try{tz=studyTimeZone()}catch{}
+  try{
+    if(hari<7)return FiezelI18n.t('stempel.sejak-hari',{hari:new Intl.DateTimeFormat(loc,{weekday:'long',...(tz?{timeZone:tz}:{})}).format(t)});
+    return FiezelI18n.t('stempel.sejak-tanggal',{tanggal:new Intl.DateTimeFormat(loc,{day:'numeric',month:'short',...(tz?{timeZone:tz}:{})}).format(t)});
+  }catch{return ''}
+}
+function memoryStampText(s,now=Date.now()){
+  if(!s||!s.kind)return '';
+  // Satu baris: pilihan sepanjang kalimat (jarang, tapi mungkin) dipotong, bukan dibiarkan
+  // mendorong stempel menjadi paragraf.
+  const raw=String(s.pilihan||'').replace(/\s+/g,' ').trim();
+  const pilihan=raw.length>40?raw.slice(0,39).trimEnd()+'\u2026':raw;
+  try{
+    if(s.kind==='jinak')return FiezelI18n.t('stempel.jinak',{kali:s.kali});
+    if(!pilihan)return '';
+    if(s.kind==='pertama')return FiezelI18n.t('stempel.pertama',{pilihan});
+    if(s.kind==='sesi-ini')return FiezelI18n.t('stempel.sesi-ini',{kali:s.kali,pilihan});
+    if(s.kind==='lagi'){
+      const sejak=memoryStampWhen(s.firstMs,now);
+      return sejak?FiezelI18n.t('stempel.lagi',{kali:s.kali,pilihan,sejak}):FiezelI18n.t('stempel.lagi-polos',{kali:s.kali,pilihan,sesi:s.sesi});
+    }
+    if(s.kind==='lolos')return FiezelI18n.t('stempel.lolos',{kali:s.kali,pilihan});
+  }catch{}
+  return '';
+}
+/** Jembatan app: dipanggil SEKALI per jawaban ternilai, tepat sesudah tutorObserve menulis
+ *  ledger. `before` adalah potret ledger yang dibaca tepat sebelum tutorObserve. */
+function memoryStampForAnswer(before,q,diagnosis,ok,session,cfg,pickedIndex){
+  if(!misconceptionLedgerAvailable()||!diagnosis||!q)return null;
+  try{
+    const celebrated=cfg?(cfg.__memoryStampCelebrated??=[]):[];
+    const stamp=memoryStampDecide(self.FiezelMisconceptionLedger,before,misconceptionLedgerRead(),{
+      concept:quizConcept(q),
+      misconception:String(diagnosis.misconception||''),
+      precision:String(diagnosis.precision||''),
+      correct:!!ok,
+      timing:String(diagnosis.timing||''),
+      sessionId:String(session?.startedAt||''),
+      picked:String(q.options?.[pickedIndex]??'').trim(),
+      shownOptions:memoryStampShownOptions(q),
+      celebrated
+    },Date.now());
+    if(stamp?.kind==='lolos'&&stamp.trap)celebrated.push(stamp.trap);
+    return stamp;
+  }catch{return null}
 }
 /* ---- Fase 2 (B3): kredibilitas bukti, BKT, confusion matrix, afek, listening adaptif ----
  * Semua state baru hidup di kunci localStorage BARU ('fiezel-mastery-bkt-v1',
@@ -15592,7 +15752,12 @@ function quizLoop(cfg){
    whyText = stripDash(whyText);
    if(pickedWhyFails) pickedWhyFails = stripDash(pickedWhyFails);
    const ruleText = q.explain?.rule ? stripDash(q.explain.rule) : '';
-    f.innerHTML=`<div class="feedback-title"><i data-lucide="${verdictIcon}"></i><b>${verdictTitle}</b></div><p>${ok?FiezelI18n.t('quiz.correct-answer',{answer:`<strong>${esc(cleanCorrect)}</strong>`}):`${FiezelI18n.t('quiz.jawabanmu')} ${userPickRender}${FiezelI18n.t('quiz.answer-paling-tepat-adalah')} ${correctPickRender}.`}</p>${pickedWhyFails?`<p class="feedback-your-pick"><strong>${FiezelI18n.t('quiz.mengapa-salah','Mengapa kurang tepat?')}</strong> ${esc(pickedWhyFails)}</p>`:''}${stepGuidanceHtml}<p><strong>${FiezelI18n.t('quiz.intinya')}</strong> ${esc(whyText)}</p>${ruleText?`<details class="acc feedback-rule-details"><summary><i data-lucide="book-open"></i> ${FiezelI18n.t('quiz.lihat-aturan-lengkap','Lihat aturan lengkap')}</summary><div class="feedback-rule-body"><p class="feedback-rule feedback-rule-pill"><strong>${FiezelI18n.t('quiz.aturannya')}</strong> ${formatRuleForDisplay(esc(ruleText))}</p></div></details>`:''}<details class="acc"><summary>${FiezelI18n.t(q.explain?.distractors?'quiz.bandingkan-pilihan-lain':'quiz.pembahasan-lengkap')}</summary><p class="muted">${esc(q.explain?.distractor||FiezelI18n.t('quiz.fallback-unsupported'))} ${esc(q.explain?.avoid||FiezelI18n.t('quiz.fallback-hint-check'))}</p>${q.explain?.distractors?`<div class="distractor-breakdown">${q.explain.distractors.map(x=>`<p><b>${esc(x.option)}:</b> ${esc(stripDash(x.reason))}</p>`).join('')}</div>`:''}</details><div class="feedback-memory-box memory-tip"><div class="feedback-memory-header"><i data-lucide="lightbulb"></i><span class="feedback-memory-kicker">${FiezelI18n.t('quiz.trik-ingat','Trik Cepat Ingat')}</span></div><div class="feedback-memory-content">${formatMemoryTipForDisplay(esc(stripDash(q.explain?.memory||FiezelI18n.t('quiz.fallback-hint-connect'))))}</div></div><button class="ai-btn" id="aiExplainBtn"><i data-lucide="sparkles"></i> ${FiezelI18n.t('quiz.jelaskan-dengan-cara-lebih-sederhana')}</button>`;
+   /* m025-565 Stempel Ingatan: satu baris meta tepat di bawah vonis. Bukan <p> supaya tidak
+      ikut aturan warna paragraf pembahasan; gerbang memoryStampAllowed ditanya ulang di sini
+      karena kunci ujian bisa menyala di antara jawaban dan pembahasan. */
+   const stampText=(q.__memoryStamp&&memoryStampAllowed(cfg,MEASURE))?memoryStampText(q.__memoryStamp):'';
+   const stampHtml=stampText?`<div class="feedback-stamp" data-testid="memory-stamp" data-stamp="${esc(q.__memoryStamp.kind)}">${esc(stampText)}</div>`:'';
+    f.innerHTML=`<div class="feedback-title"><i data-lucide="${verdictIcon}"></i><b>${verdictTitle}</b></div>${stampHtml}<p>${ok?FiezelI18n.t('quiz.correct-answer',{answer:`<strong>${esc(cleanCorrect)}</strong>`}):`${FiezelI18n.t('quiz.jawabanmu')} ${userPickRender}${FiezelI18n.t('quiz.answer-paling-tepat-adalah')} ${correctPickRender}.`}</p>${pickedWhyFails?`<p class="feedback-your-pick"><strong>${FiezelI18n.t('quiz.mengapa-salah','Mengapa kurang tepat?')}</strong> ${esc(pickedWhyFails)}</p>`:''}${stepGuidanceHtml}<p><strong>${FiezelI18n.t('quiz.intinya')}</strong> ${esc(whyText)}</p>${ruleText?`<details class="acc feedback-rule-details"><summary><i data-lucide="book-open"></i> ${FiezelI18n.t('quiz.lihat-aturan-lengkap','Lihat aturan lengkap')}</summary><div class="feedback-rule-body"><p class="feedback-rule feedback-rule-pill"><strong>${FiezelI18n.t('quiz.aturannya')}</strong> ${formatRuleForDisplay(esc(ruleText))}</p></div></details>`:''}<details class="acc"><summary>${FiezelI18n.t(q.explain?.distractors?'quiz.bandingkan-pilihan-lain':'quiz.pembahasan-lengkap')}</summary><p class="muted">${esc(q.explain?.distractor||FiezelI18n.t('quiz.fallback-unsupported'))} ${esc(q.explain?.avoid||FiezelI18n.t('quiz.fallback-hint-check'))}</p>${q.explain?.distractors?`<div class="distractor-breakdown">${q.explain.distractors.map(x=>`<p><b>${esc(x.option)}:</b> ${esc(stripDash(x.reason))}</p>`).join('')}</div>`:''}</details><div class="feedback-memory-box memory-tip"><div class="feedback-memory-header"><i data-lucide="lightbulb"></i><span class="feedback-memory-kicker">${FiezelI18n.t('quiz.trik-ingat','Trik Cepat Ingat')}</span></div><div class="feedback-memory-content">${formatMemoryTipForDisplay(esc(stripDash(q.explain?.memory||FiezelI18n.t('quiz.fallback-hint-connect'))))}</div></div><button class="ai-btn" id="aiExplainBtn"><i data-lucide="sparkles"></i> ${FiezelI18n.t('quiz.jelaskan-dengan-cara-lebih-sederhana')}</button>`;
   /* Audit G6: sesudah pembahasan jawaban SALAH dibuka, giliran tutor dulu (a) mengulang
      kalimat "Mengapa kurang tepat?" yang sama persis di kotak pembahasan tepat di atasnya,
      dan (b) pada tangga probe/hint menutup dengan "Sekarang coba jawab lagi ya" padahal semua
@@ -15723,7 +15888,13 @@ function quizLoop(cfg){
     if(!state.listening)state.listening={};
     updateMastery('listening',q.target||q.skill||q.id,ok,h.ms,h.confidence,h.at);
    }
+   /* m025-565 Stempel Ingatan: potret ledger SEBELUM jawaban ini dicatat dibaca di sini,
+      karena tutorObserve-lah yang menulisnya; stempelnya ditentukan dari percobaan pertama
+      (bukti yang benar-benar masuk ledger) dan dibawa q sampai pembahasan dibuka, termasuk
+      bila pembahasan itu baru terbuka sesudah percobaan kedua. */
+   const stampOn=memoryStampAllowed(cfg,MEASURE),stampBefore=stampOn?misconceptionLedgerRead():null;
    const decision=tutorObserve(tutor,q,j,ok,ms,{remaining:remaining.length,scored:true});
+   q.__memoryStamp=stampOn?memoryStampForAnswer(stampBefore,q,decision.diagnosis,ok,tutor,cfg,j):null;
    answer.move=decision.move;answer.scaffold=decision.scaffold;answer.timing=decision.diagnosis?.timing||'';
    // m025-126: `reteach` sekarang benar-benar mengajar. Kartunya disusun dari soal yang
    // BARU SAJA keliru dan ditahan sampai murid menekan Lanjut, jadi urutannya menjadi
