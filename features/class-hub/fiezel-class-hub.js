@@ -2497,7 +2497,8 @@
             }
 
             if (typeof face.checkLiveness === 'function') {
-              var live = face.checkLiveness();
+              var pVidNow = (sEl && typeof sEl.querySelector === 'function') ? sEl.querySelector('[data-face-preview]') : null;
+              var live = face.checkLiveness(pVidNow && pVidNow.readyState >= 2 ? pVidNow : undefined);
               // Bar mengikuti kemajuan liveness yang SEBENARNYA — dulu ia penuh dalam 1,5 dtk
               // apa pun yang dilihat kamera.
               paintScanProgress(live && typeof live.progress === 'number' ? live.progress : 0);
