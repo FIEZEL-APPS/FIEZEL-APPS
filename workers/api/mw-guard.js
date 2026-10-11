@@ -141,7 +141,11 @@ export async function readJsonLimited(request, limit, opt) {
   if (!read.ok) return read;
   if (!read.text) return { ok: true, value: {} };
   try {
-    return { ok: true, value: JSON.parse(read.text) };
+    const value = JSON.parse(read.text);
+    if (value === null || typeof value !== 'object' || Array.isArray(value)) {
+      return { ok: true, value: {} };
+    }
+    return { ok: true, value };
   } catch {
     return { ok: false, response: badRequest('invalid_json', opt) };
   }
@@ -158,7 +162,11 @@ export async function readJsonFromCtx(ctx, opt) {
   if (typeof ctx.bodyText === 'string') {
     if (!ctx.bodyText) return { ok: true, value: {} };
     try {
-      return { ok: true, value: JSON.parse(ctx.bodyText) };
+      const value = JSON.parse(ctx.bodyText);
+      if (value === null || typeof value !== 'object' || Array.isArray(value)) {
+        return { ok: true, value: {} };
+      }
+      return { ok: true, value };
     } catch {
       return { ok: false, response: badRequest('invalid_json', opt) };
     }

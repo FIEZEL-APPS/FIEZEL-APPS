@@ -1,18 +1,11 @@
 {
   "mode": "in-process",
-  "generatedAt": "2026-10-11T14:24:53.650Z",
+  "generatedAt": "2026-10-11T14:37:21.733Z",
   "routeCount": 119,
   "checks": 655,
-  "passed": 642,
-  "failed": 13,
+  "passed": 654,
+  "failed": 1,
   "findings": [
-    {
-      "severity": "MEDIUM",
-      "endpoint": "/api/policy/next, /api/policy/outcome, /api/brain/attempts, /api/feedback, /api/push/subscribe, /api/activity, /api/account/register, /api/account/login, /api/account/teacher-activate",
-      "title": "Body JSON non-objek (`null`) -> HTTP 500 tak tertangani, bukan 400",
-      "payload": "null",
-      "detail": "9 rute POST. Akar: readJsonLimited()/readJsonFromCtx (workers/api/mw-guard.js) mengembalikan {ok:true,value:JSON.parse(text)} tanpa memastikan value adalah objek; handler lalu mengakses value.field pada null -> TypeError. Tiap hit mencetak \"fiezel-api unhandled\" + stack ke log Worker (observability noise; murid ber-identitas bisa memancingnya berulang). Perbaikan di satu titik: di readJsonLimited/readJsonFromCtx, bila hasil JSON.parse bukan objek-biasa, kembalikan {ok:true,value:{}} (atau 400) sehingga setiap handler memakai jalur validasi 400-nya sendiri."
-    },
     {
       "severity": "LOW",
       "endpoint": "/api/learner/class-report",
@@ -1019,7 +1012,7 @@
       "test": "array body no-5xx",
       "pass": true,
       "expected": "<500",
-      "got": "400",
+      "got": "200",
       "detail": ""
     },
     {
@@ -1027,7 +1020,7 @@
       "test": "scalar/null body no-5xx",
       "pass": true,
       "expected": "<500",
-      "got": "null=400 42=400",
+      "got": "null=200 42=200",
       "detail": ""
     },
     {
@@ -1313,9 +1306,9 @@
     {
       "endpoint": "/api/ai/chat",
       "test": "scalar/null body no-5xx",
-      "pass": false,
+      "pass": true,
       "expected": "<500",
-      "got": "null=502 42=200",
+      "got": "null=200 42=200",
       "detail": ""
     },
     {
@@ -1345,9 +1338,9 @@
     {
       "endpoint": "/api/ai/translate",
       "test": "scalar/null body no-5xx",
-      "pass": false,
+      "pass": true,
       "expected": "<500",
-      "got": "null=502 42=400",
+      "got": "null=400 42=400",
       "detail": ""
     },
     {
@@ -1377,9 +1370,9 @@
     {
       "endpoint": "/api/coach/context",
       "test": "scalar/null body no-5xx",
-      "pass": false,
+      "pass": true,
       "expected": "<500",
-      "got": "null=502 42=200",
+      "got": "null=200 42=200",
       "detail": ""
     },
     {
@@ -1505,9 +1498,9 @@
     {
       "endpoint": "/api/policy/next",
       "test": "scalar/null body no-5xx",
-      "pass": false,
+      "pass": true,
       "expected": "<500",
-      "got": "null=500 42=200",
+      "got": "null=200 42=200",
       "detail": ""
     },
     {
@@ -1537,9 +1530,9 @@
     {
       "endpoint": "/api/policy/outcome",
       "test": "scalar/null body no-5xx",
-      "pass": false,
+      "pass": true,
       "expected": "<500",
-      "got": "null=500 42=200",
+      "got": "null=200 42=200",
       "detail": ""
     },
     {
@@ -1569,9 +1562,9 @@
     {
       "endpoint": "/api/brain/attempts",
       "test": "scalar/null body no-5xx",
-      "pass": false,
+      "pass": true,
       "expected": "<500",
-      "got": "null=500 42=200",
+      "got": "null=200 42=200",
       "detail": ""
     },
     {
@@ -1633,9 +1626,9 @@
     {
       "endpoint": "/api/feedback",
       "test": "scalar/null body no-5xx",
-      "pass": false,
+      "pass": true,
       "expected": "<500",
-      "got": "null=500 42=200",
+      "got": "null=200 42=200",
       "detail": ""
     },
     {
@@ -1697,9 +1690,9 @@
     {
       "endpoint": "/api/push/subscribe",
       "test": "scalar/null body no-5xx",
-      "pass": false,
+      "pass": true,
       "expected": "<500",
-      "got": "null=500 42=400",
+      "got": "null=400 42=400",
       "detail": ""
     },
     {
@@ -1729,9 +1722,9 @@
     {
       "endpoint": "/api/activity",
       "test": "scalar/null body no-5xx",
-      "pass": false,
+      "pass": true,
       "expected": "<500",
-      "got": "null=500 42=200",
+      "got": "null=200 42=200",
       "detail": ""
     },
     {
@@ -1979,7 +1972,7 @@
       "test": "array body no-5xx",
       "pass": true,
       "expected": "<500",
-      "got": "400",
+      "got": "404",
       "detail": ""
     },
     {
@@ -1987,7 +1980,7 @@
       "test": "scalar/null body no-5xx",
       "pass": true,
       "expected": "<500",
-      "got": "null=400 42=400",
+      "got": "null=404 42=404",
       "detail": ""
     },
     {
@@ -2337,9 +2330,9 @@
     {
       "endpoint": "/api/account/register",
       "test": "scalar/null body no-5xx",
-      "pass": false,
+      "pass": true,
       "expected": "<500",
-      "got": "null=500 42=400",
+      "got": "null=400 42=400",
       "detail": ""
     },
     {
@@ -2369,9 +2362,9 @@
     {
       "endpoint": "/api/account/login",
       "test": "scalar/null body no-5xx",
-      "pass": false,
+      "pass": true,
       "expected": "<500",
-      "got": "null=500 42=401",
+      "got": "null=401 42=401",
       "detail": ""
     },
     {
@@ -2433,9 +2426,9 @@
     {
       "endpoint": "/api/account/teacher-activate",
       "test": "scalar/null body no-5xx",
-      "pass": false,
+      "pass": true,
       "expected": "<500",
-      "got": "null=500 42=400",
+      "got": "null=400 42=400",
       "detail": ""
     },
     {
@@ -3259,7 +3252,7 @@
       "test": "array body no-5xx",
       "pass": true,
       "expected": "<500",
-      "got": "400",
+      "got": "200",
       "detail": ""
     },
     {
@@ -3267,7 +3260,7 @@
       "test": "scalar/null body no-5xx",
       "pass": true,
       "expected": "<500",
-      "got": "null=400 42=400",
+      "got": "null=200 42=200",
       "detail": ""
     },
     {
@@ -5188,7 +5181,7 @@
       "pass": true,
       "expected": 1,
       "got": "1",
-      "detail": "r1=409 r2=200"
+      "detail": "r1=200 r2=409"
     },
     {
       "endpoint": "/api/auth/anon",
@@ -5212,7 +5205,7 @@
       "pass": true,
       "expected": "<=1",
       "got": "1",
-      "detail": "200/403"
+      "detail": "403/200"
     },
     {
       "endpoint": "/api/learner/class-report",
@@ -5259,7 +5252,7 @@
       "test": "unhandled errors logged server-side only",
       "pass": true,
       "expected": "info",
-      "got": "9 logged",
+      "got": "0 logged",
       "detail": ""
     }
   ]
