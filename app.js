@@ -925,7 +925,7 @@ function grammarExercise(skill,item,variant){const meta=grammarMeta(item),correc
   if(variant>=9&&variant<=11){const target=wrong[variant-9],others=wrong.filter(x=>x!==target);return direct(FiezelI18n.t('grammar.mode-diagnose-stem',{opsiDikutip:quoteEmbed(target.option),stem:base}),[target.reason,meta.whyCorrect,...others.map(x=>x.reason)].map(grammarCapFirst)/* m025-375 */,0,grammarReasonForLearner(target.option,target.reason,self.FiezelI18n?.getLocale?.()==='th')/* m025-375: kuncinya adalah alasan kartu ini - pembahasan menegaskannya, bukan diagnosis umum yang bisa salah alamat */||grammarOptionReason(target.option,false,target.reason,target.detail?.misconceptionKey),[],[],['',FiezelI18n.t('grammar.mode-diagnose-expl-kunci',{kunciDikutip:quoteEmbedShort(correct),opsiDikutip:quoteEmbedShort(target.option)}),...others.map(x=>FiezelI18n.t('grammar.mode-diagnose-expl-lain',{opsiLainDikutip:quoteEmbedShort(x.option),opsiDikutip:quoteEmbedShort(target.option)}))]);}
   if(variant>=12&&variant<=14){const target=wrong[variant-12],others=wrong.filter(x=>x!==target),labels=others.map(x=>String(x.detail.misconception||x.reason));return direct(FiezelI18n.t('grammar.mode-label-stem',{opsiDikutip:quoteEmbed(target.option),stem:base}),[String(target.detail.misconception||target.reason),FiezelI18n.t('grammar.mode-label-opsi-benar'),...labels],0,FiezelI18n.t('grammar.mode-label-benar',{opsiDikutip:quoteEmbedShort(target.option)}),[],[],['',FiezelI18n.t('grammar.mode-label-expl-keliru',{opsiDikutip:quoteEmbed(target.option)}),...others.map(x=>FiezelI18n.t('grammar.mode-label-expl-lain',{opsiLainDikutip:quoteEmbedShort(x.option),opsiDikutip:quoteEmbedShort(target.option)}))]);}
   if(variant>=15&&variant<=17){const target=wrong[variant-15],targetWord=target?.option||'',repairSentence=completeGrammarStem(base,targetWord);const qObj=direct(FiezelI18n.t('grammar.mode-repair-stem',{stem:repairSentence}),meta.options,meta.correctIndex,joinQuoteReason(FiezelI18n.t('grammar.mode-repair-benar-head',{kunciDikutip:quoteEmbedShort(correct)}),causalKey||FiezelI18n.t('grammar.mode-repair-benar-tail'))/* m025-375: sebab kausal kartu, bukan "bentuk itu yang cocok" */,reasons);qObj.targetWord=targetWord;return qObj;}
-  if(variant>=18&&variant<=20){const target=wrong[variant-18],failure=grammarOptionReason(target.option,false,target.reason,target.detail?.misconceptionKey);return direct(FiezelI18n.t('grammar.mode-contrast-stem',{kunciDikutip:quoteEmbed(correct),opsiDikutip:quoteEmbed(target.option),stem:base}),[joinQuoteReason(FiezelI18n.t('grammar.mode-contrast-opsi-benar-head',{kunciDikutip:quoteEmbed(correct)}),failure),FiezelI18n.t('grammar.mode-contrast-opsi-kebalik',{opsiDikutip:quoteEmbed(target.option),kunciDikutip:quoteEmbed(correct)}),FiezelI18n.t('grammar.mode-contrast-opsi-bolak-balik'),FiezelI18n.t('grammar.mode-contrast-opsi-none')],0,FiezelI18n.t('grammar.mode-contrast-benar',{kunciDikutip:quoteEmbed(correct),opsiDikutip:quoteEmbed(target.option)})/* m025-156 (D5): rumusan bebas-posisi - opsi diacak, "pertama" tidak menunjuk apa pun; m025-161 (F1-2): registernya disantaikan tanpa mengubah posisi */,[],[],['',FiezelI18n.t('grammar.mode-contrast-expl-kebalik',{kunciDikutip:quoteEmbed(correct),opsiDikutip:quoteEmbed(target.option)}),FiezelI18n.t('grammar.mode-contrast-expl-sepadan',{kunciDikutip:quoteEmbed(correct)}),FiezelI18n.t('grammar.mode-contrast-expl-keliru',{kunciDikutip:quoteEmbed(correct)})]);}
+  if(variant>=18&&variant<=20){const target=wrong[variant-18],failure=grammarOptionReason(target.option,false,target.reason,target.detail?.misconceptionKey);return direct(FiezelI18n.t('grammar.mode-contrast-stem',{kunciDikutip:quoteEmbed(correct),opsiDikutip:quoteEmbed(target.option),stem:base}),[joinQuoteReason(FiezelI18n.t('grammar.mode-contrast-opsi-benar-head',{kunciDikutip:quoteEmbed(correct)}),failure),FiezelI18n.t('grammar.mode-contrast-opsi-kebalik',{opsiDikutip:quoteEmbed(target.option),kunciDikutip:quoteEmbed(correct)}),FiezelI18n.t('grammar.mode-contrast-opsi-bolak-balik'),FiezelI18n.t('grammar.mode-contrast-opsi-none')],0,FiezelI18n.t('grammar.mode-contrast-benar',{kunciDikutip:quoteEmbed(correct),opsiDikutip:quoteEmbed(target.option)})/* m025-156 (D5): rumusan bebas-posisi - opsi diacak, "pertama" tidak menunjuk apa pun; m025-161 (F1-2): registernya disantaikan tanpa mengubah posisi */,[],[],['',FiezelI18n.t('grammar.mode-contrast-expl-kebalik',{alasan:failure}),FiezelI18n.t('grammar.mode-contrast-expl-sepadan',{alasan:failure}),FiezelI18n.t('grammar.mode-contrast-expl-keliru',{alasan:failure})]/* audit pedagogi 2026-10-11 (P6): alasan nyata pilihan itu, bukan "cuma kunci yang cocok" */);}
   // m025-155: label keluarga pengecoh adalah taksonomi global, bukan konten lesson mana pun -
   // stempel origin 'taxonomy' plus penjelasan verbatim yang jujur, supaya murid tidak lagi
   // membaca heuristik bentuk kata kerja untuk sebuah label keluarga.
@@ -5845,7 +5845,7 @@ function tokenOrderInversionClue(placed,required){
  * metakognitif pilihan itu adalah kalimat Inggris mentah dari bank soal, jadi bagian kutipannya
  * dibuang lebih dulu. Yang tersisa adalah diagnosis ramah yang didengar murid.
  */
-function diagnoseTokenOrderMistake(q){
+function diagnoseTokenOrderMistake(q,opts={}){
   if(!q||q.type!=='token-order')return '';
   const isThai=typeof FiezelI18n!=='undefined'&&FiezelI18n.getLocale()==='th';
   const placed=(Array.isArray(q.__placedTokens)&&q.__placedTokens.length)
@@ -5863,11 +5863,19 @@ function diagnoseTokenOrderMistake(q){
   const normWord=w=>String(w||'').toLowerCase().replace(/^[^\w\s]+|[^\w\s]+$/g,'').trim();
 
   // Kasus 2: Memilih Token Pengecoh (Distractor / Typo / Morfologi)
+  /* Audit pedagogi 2026-10-11 (P1): pengecoh dihitung dari KELEBIHAN kata, bukan dari
+     kemunculannya. Di 75 soal kata pengecoh juga kata sah kalimatnya ("a" di "in a box",
+     "The" di kalimat kedua), dan pencocok lama menuduh murid memasang pengecoh setiap kali ia
+     keliru urutan di mana pun - lalu menjelaskan bunyi vokal untuk kata yang ia pasang dengan
+     benar. Kata baru dianggap pengecoh bila jumlahnya di rel melebihi yang dibutuhkan kalimat. */
   const getOpt=d=>typeof d==='object'&&d?d.option:d;
-  const chosenDistractor=placed.find(t=>distractors.some(d=>normWord(getOpt(d))===normWord(t)));
+  const need=new Map();for(const w of requiredTokens){const k=normWord(w);need.set(k,(need.get(k)||0)+1)}
+  const seen=new Map();
+  const chosenDistractor=placed.find(t=>{const k=normWord(t);seen.set(k,(seen.get(k)||0)+1);return seen.get(k)>(need.get(k)||0)&&distractors.some(d=>normWord(getOpt(d))===k)});
   if(chosenDistractor){
     const distInfo=(q.explain?.distractors||[]).find(d=>normWord(d.option)===normWord(chosenDistractor));
     let reason=String(distInfo?.whyFailsId||distInfo?.whyFails||distInfo?.reason||'').trim();
+    if(opts.hideKey)reason=grammarHideKey(reason,q.blankAnswer,chosenDistractor);
     if(isThai){
       if(reason){
         return `คำว่า “${chosenDistractor}” ยังไม่ค่อยเข้ากับประโยคนี้นะ: ${reason}`;
@@ -5875,7 +5883,10 @@ function diagnoseTokenOrderMistake(q){
       return `คำว่า “${chosenDistractor}” ยังไม่ใช่ตัวเลือกที่ถูกสำหรับประโยคนี้จ้ะ`;
     }
     if(reason){
-      if(/^kata\s+/i.test(reason)){
+      /* Audit pedagogi 2026-10-11: hanya alasan yang SUDAH menamai katanya ("Kata “X” ...") yang
+         dikembalikan apa adanya. "kata kerja telanjang nggak bisa ..." juga berawalan "kata", dan
+         dulu murid tidak pernah diberi tahu kata mana yang dimaksud. */
+      if(/^kata\s+[\u201c"]/i.test(reason)){
         return reason;
       }
       return `Kata “${chosenDistractor}” kurang pas di sini ya: ${reason}`;
@@ -5913,17 +5924,18 @@ function diagnoseTokenOrderMistake(q){
   }
 
   // Kasus 3: Salah Urutan Kata (Word-Order Inversion)
-  const correctSentence=(q.options&&q.options[q.answerIndex])||requiredTokens.join(' ');
+  /* Audit pedagogi 2026-10-11 (P4): aturan lesson TIDAK lagi ditempel ke diagnosis urutan.
+     Aturannya tentang bentuk ("Bedakan RUTINITAS vs SEDANG BERLANGSUNG..."), padahal kesalahan
+     di cabang ini murni posisi - murid yang menukar dua kata disuruh memperhatikan tense. Ia juga
+     berisi markup (<br>, <b>) yang di kotak "Mengapa kurang tepat?" ter-escape menjadi teks
+     mentah. Petunjuk posisinya sudah presisi; aturan lengkap tetap ada di "Lihat aturan lengkap". */
   const inversion=tokenOrderInversionClue(placed,requiredTokens);
-  if(inversion){
-    const polaHint=q.explain?.rule?(isThai?` รูปแบบที่ถูกต้องคือ: ${q.explain.rule}`:` Pola yang pas: ${q.explain.rule}`):'';
-    return `${inversion}${polaHint}`;
-  }
+  if(inversion)return inversion;
   if(isThai){
-    const patternHint=q.explain?.rule?` ลองสังเกตรูปแบบนี้นะ: ${q.explain.rule}`:` สังเกตการเรียงประโยคที่ถูกต้องดูนะ`;
+    const patternHint=` สังเกตการเรียงประโยคที่ถูกต้องดูนะ`;
     return `เรียงลำดับคำยังไม่ถูกจ้ะ${patternHint}`;
   }
-  const patternHint=q.explain?.rule?` Coba perhatikan polanya ya: ${q.explain.rule}`:` Perhatikan susunan kalimat yang pas ya.`;
+  const patternHint=` Perhatikan susunan kalimat yang pas ya.`;
   return `Urutan katanya belum tepat nih.${patternHint}`;
 }
 
@@ -5949,6 +5961,29 @@ function grammarReasonEntry(q,picked){
   const near=list.filter(x=>{const o=nw(x?.option);return o&&o!==key&&((' '+p+' ').includes(' '+o+' ')||(' '+o+' ').includes(' '+p+' '))});
   return near.length===1?near[0]:null;
 }
+/**
+ * Audit pedagogi 2026-10-11 (P2): alasan pilihan salah yang tampil SEBELUM jawaban dibuka
+ * (nudge retry, diagnosis susun kata di percobaan kedua, kalimat tutor) tidak boleh menyebut
+ * kuncinya. ±100 alasan bank dan ±90 alasan overlay th ditutup dengan kunci ("...; bentuk
+ * lampaunya “could”"), jadi kesempatan kedua praktis gratis tetapi tetap tercatat sebagai
+ * jawaban murid sendiri. Kuncinya tidak dibuang (kalimatnya jadi patah) melainkan diganti "…":
+ * "bentuk lampaunya “…”" justru meminta murid MENGINGAT bentuk itu sendiri. Teks pilihan yang
+ * diambil murid dilindungi dulu - alasan untuk "To open" memang menyebut "To open", dan kunci
+ * "Open" ada di dalamnya. Pembahasan sesudah jawaban dibuka tetap memakai alasan utuh.
+ */
+function grammarHideKey(text,key,ownOption=''){
+  const src=String(text||''),k=String(key||'').trim();
+  if(!src||!k)return src;
+  const rx=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  const edge="[^A-Za-z0-9'\u2019]";
+  const word=s=>new RegExp(`(^|${edge})(${rx(s)})(?=${edge}|$)`,'gi');
+  const parts=[k,...k.split(/\s*[;/]\s*/).filter(x=>x.length>=3&&x!==k)];
+  const own=String(ownOption||'').trim(),kept=[];
+  let s=src;
+  if(own&&!word(own).test(k))s=s.replace(word(own),(m,a,b)=>{kept.push(b);return `${a}\u0000${kept.length-1}\u0000`});
+  for(const p of parts)s=s.replace(word(p),(m,a)=>`${a}\u2026`);
+  return s.replace(/\u0000(\d+)\u0000/g,(m,i)=>kept[Number(i)]);
+}
 function tutorWhyFails(q,chosen){
   const match=grammarReasonEntry(q,chosen);
   const raw=String(match?.reason||match?.whyFailsId||match?.whyFails||'').trim();
@@ -5968,7 +6003,9 @@ function tutorCompose(q,pickedIndex,ok,scaffold,move,timing='',opts={}){
     const tutorSesi=(opts&&opts.session)||null;
     const mirip=(!ok&&scaffold==='worked'&&opts&&opts.similar)?opts.similar:null;
     const chosenText=(q?.type==='token-order'&&q?.__userTokenAnswer)?q.__userTokenAnswer:String(q?.options?.[pickedIndex]??'');
-    const tokenWhy=(!ok&&q?.type==='token-order')?diagnoseTokenOrderMistake(q):'';
+    // Audit pedagogi 2026-10-11 (P2): sebelum `tell`, alasan yang diucapkan tutor tidak menyebut kunci.
+    const preReveal=!ok&&scaffold!=='tell';
+    const tokenWhy=(!ok&&q?.type==='token-order')?diagnoseTokenOrderMistake(q,{hideKey:preReveal}):'';
     // Penjelasan yang dipakai tutor SELALU bidang `explain` hasil olahan FIEZEL, tidak pernah
     // objek asli dari bank soal: bank menyimpannya dalam bahasa Inggris.
     const cleanKeyGuard=String((q?.options&&q.options[q.answerIndex])||q?.targetWord||'');
@@ -5980,7 +6017,7 @@ function tutorCompose(q,pickedIndex,ok,scaffold,move,timing='',opts={}){
         ...(mirip?{example:String(mirip.sentence),correct:String(mirip.answer)}:{})
       },
       ...(tutorSesi?{concept:quizConcept(q)}:{}),
-      whyFails:ok?'':(tokenWhy||tutorWhyFails(q,chosenText)),
+      whyFails:ok?'':(tokenWhy||(preReveal?grammarHideKey(tutorWhyFails(q,chosenText),q?.options?.[q?.answerIndex],chosenText):tutorWhyFails(q,chosenText))),
       conceptLabel:friendlySkillName(q?.lessonSkill||q?.skill||q?.type),
       timing:String(timing||''),
       keyGuard:cleanKeyGuard,
@@ -13757,6 +13794,50 @@ function tokenGlossMap(words){
   }catch{}
   return out;
 }
+/**
+ * Audit pedagogi 2026-10-11 (P3): URUTAN LAIN YANG SAMA SAHNYA.
+ *
+ * Sejak m025-513 soal susun kata adalah "Terjemahkan ke Bahasa Inggris" - urutan Inggrisnya
+ * TIDAK terlihat murid. "Semalam aku nonton film bareng keluarga" dijawab "I watched a film
+ * with my family last night": kalimat Inggris yang benar, tetapi penilai hanya mengenal
+ * "Last night I watched...", lalu diagnosisnya menyebut urutannya salah - dan tuntunan
+ * langkahnya sendiri menyuruh menaruh keterangan waktu di akhir. Fungsi murni ini menurunkan
+ * permutasi yang sah dengan pola yang KONSERVATIF: keterangan waktu di awal/akhir klausa, dan
+ * anak kalimat (if/when/because/although/despite/...) yang dipindah ke depan atau ke belakang.
+ * Setiap pola menolak klausa yang masih bercabang (koma, because, that, than ...) karena di
+ * sana perpindahan bisa menggeser makna; lebih baik menolak satu jawaban sah daripada menerima
+ * kalimat yang maknanya berubah. Kalimat tanya tidak disentuh.
+ */
+function tokenOrderMovableAlternates(fullSentence){
+  const text=String(fullSentence||'').trim();
+  if(!text)return [];
+  const out=new Set(),sentences=text.split(/(?<=[.!?])\s+/);
+  const DAYS='monday|tuesday|wednesday|thursday|friday|saturday|sunday';
+  const TIME=`these days|nowadays|yesterday|today|tomorrow|tonight|last (?:night|week|weekend|month|year|summer|winter|${DAYS})|this (?:morning|afternoon|evening|week|weekend|month|year)|next (?:week|weekend|month|year|summer|${DAYS})|every (?:day|morning|afternoon|evening|night|week|weekday|weekend|month|year|${DAYS})|on (?:${DAYS})s?|in the (?:morning|afternoon|evening)|at night|at the weekend`;
+  const FRONT=new RegExp(`^(${TIME}),?\\s+(.+)$`,'i');
+  const BACK=new RegExp(`^(.+?)\\s+(${TIME})$`,'i');
+  const SUBFRONT=/^((?:if|when|whenever|because|although|though|even though|before|after|as soon as|by the time|while|unless|once|despite|in spite of|during)\b[^,]+),\s+(.+)$/i;
+  const SUBBACK=/^(.+?)\s+((?:if|when|because|although|unless|as soon as)\s+(?:i|you|he|she|it|we|they|my|your|his|her|our|their|the|a|an|this|that)\b.+)$/i;
+  const VERBISH=/^(is|are|was|were|am|be|has|have|had|will|would|can|could|should|must|may|might|does|do|did)\b/i;
+  const SUBJ=/^(i|you|he|she|it|we|they|my|your|his|her|our|their|the|a|an|this|that|these|those)\b/i;
+  const BRANCHED=/\b(because|but|when|if|that|which|who|while|although|unless|until|before|after|since|so)\b|[,;:]/i;
+  sentences.forEach((s,i)=>{
+    if(/\?$/.test(s))return;
+    const m=s.match(/^(.*?)([.!?]*)$/),body=String(m?.[1]||'').trim(),end=m?.[2]||'';
+    if(!body)return;
+    const variants=[];
+    const f=body.match(FRONT);
+    if(f&&!VERBISH.test(f[2])&&!BRANCHED.test(f[2]))variants.push(`${f[2]} ${f[1]}`);
+    const b=body.match(BACK);
+    if(b&&SUBJ.test(b[1])&&!BRANCHED.test(b[1])&&!VERBISH.test(b[1])&&!FRONT.test(b[1])&&!/\b(than|as|since|from|until|till|of|for|by)$/i.test(b[1]))variants.push(`${b[2]} ${b[1]}`);
+    const sf=body.match(SUBFRONT);
+    if(sf&&!/^if only\b/i.test(sf[1])&&!BRANCHED.test(sf[2]))variants.push(`${sf[2]} ${sf[1]}`);
+    const sb=body.match(SUBBACK);
+    if(sb&&SUBJ.test(sb[1])&&!BRANCHED.test(sb[1])&&!/[,;:]/.test(sb[2]))variants.push(`${sb[2]} ${sb[1]}`);
+    for(const v of variants){const copy=sentences.slice();copy[i]=v+end;out.add(copy.join(' '))}
+  });
+  return [...out];
+}
 function makeGrammarTokenOrderQuestion(skill, item, idx, level){
   if(!item)return null;
   const base=String(item[0]||'').trim();
@@ -13797,6 +13878,7 @@ function makeGrammarTokenOrderQuestion(skill, item, idx, level){
       alternates.push(cleanWord(parts[1]) + ' but ' + cleanWord(parts[0]));
     }
   }
+  for(const alt of tokenOrderMovableAlternates(fullSentence))if(!alternates.includes(alt))alternates.push(alt); // audit pedagogi 2026-10-11 (P3)
   const rule=grammarLessonRule(item);
   const gMeta=grammarMeta(item);
   const rawDistList=Array.isArray(item?.[17])?item[17]:[];
@@ -13821,7 +13903,12 @@ function makeGrammarTokenOrderQuestion(skill, item, idx, level){
   const whyCorrectText=gMeta.whyCorrect||'';
   const cleanWhy=(typeof grammarSanitizeContext==='function'?grammarSanitizeContext(whyCorrectText,'token-order','',correct):whyCorrectText)||FiezelI18n.t('grammar.susunan-kalimat-tepat','Urutan kata dan bentuk tata bahasa yang tepat.');
   const templateId=String(item?.[8]||'');
-  const idTranslation=(self.FiezelGrammarTranslations&&self.FiezelGrammarTranslations[templateId])?self.FiezelGrammarTranslations[templateId]:null;
+  /* Audit pedagogi 2026-10-11 (P5): peta terjemahan m025-513 hanya berbahasa INDONESIA. Murid
+     Thai dulu membaca "แปลเป็นภาษาอังกฤษ:" disusul "Kemarin aku nemu foto lama..." - soal yang
+     tidak bisa ia baca. Selama terjemahan Thai belum ada, locale th memakai mode "Lengkapi &
+     Susun Kata" dengan kerangka kalimat Inggrisnya (petunjuk dan labelnya sudah dua bahasa). */
+  let localeTh=false;try{localeTh=FiezelI18n.getLocale()==='th'}catch(_){}
+  const idTranslation=(!localeTh&&self.FiezelGrammarTranslations&&self.FiezelGrammarTranslations[templateId])?self.FiezelGrammarTranslations[templateId]:null;
   const tokenInstruction=idTranslation
     ? FiezelI18n.t('grammar.token-order-translate-instruction','Terjemahkan ke Bahasa Inggris:')
     : FiezelI18n.t('grammar.token-order-panduan-label','Lengkapi & Susun Kata:');
@@ -13838,6 +13925,7 @@ function makeGrammarTokenOrderQuestion(skill, item, idx, level){
     instruction:tokenInstruction,
     question:tokenQuestion,
     fullSentence:fullSentence,
+    blankAnswer:correct, // audit pedagogi 2026-10-11 (P2): kunci rumpang, disamarkan dari diagnosis sebelum pembahasan
     tokens:rawTokens,
     gloss:tokenGlossMap([...rawTokens,...distractors]),
     distractors:distractors,
@@ -13902,12 +13990,27 @@ function getOrMakeVideoGrammarQuestion(skill, level, fallbackItem, idx, usedVgId
     const base=fallbackItem[0]||'',opts=fallbackItem[1]||[],correctIdx=fallbackItem[2]||0;
     const rule=grammarLessonRule(fallbackItem);
     const qPrompt=FiezelI18n.t('grammar.dialogue.question','Perhatikan percakapan dan lengkapi bagian yang kosong.');
+    /* Audit pedagogi 2026-10-11 (P7): soal percakapan ini dirakit dari template bank yang SUDAH
+       membawa alasan per pilihan, tetapi alasannya dibuang di sini. Akibatnya murid yang memilih
+       "on" untuk "Look ___ your chair!" tidak pernah membaca kenapa "on" gagal (nudge retry jatuh
+       ke "Coba lagi — pilih jawaban lain", pembahasan tanpa "Mengapa kurang tepat?"), dan tanpa
+       sourceId tuntunan langkahnya jatuh ke naskah umum "cocokkan subjek dengan bentuk kata kerja"
+       untuk soal kata depan. Alasannya kini dirakit lewat jalur yang sama dengan pilihan ganda
+       (termasuk overlay th di grammarLessonExplain). */
+    let vgDistractors;
+    try{
+      const focus=friendlySkillName(skill).toLowerCase(),misMap=grammarMisconceptionKeys(fallbackItem)||{},reasons=Array.isArray(fallbackItem[4])?fallbackItem[4]:[];
+      const whyCorrect=String(grammarMeta(fallbackItem).whyCorrect||'').trim();
+      const raw=opts.map((o,i)=>({option:String(o),reason:i===correctIdx?grammarCorrectOptionReason(String(o),'video-grammar',focus,whyCorrect):grammarOptionReason(String(o),false,String(reasons[i]||''),misMap[String(o)])}));
+      vgDistractors=grammarLessonExplain(fallbackItem,whyCorrect,raw,rule,focus,'video-grammar','',String(opts[correctIdx]??'')).distractors;
+    }catch(_){vgDistractors=undefined}
     return {
       id:`vg-${skill}-${idx}`,
       type:'video-grammar',
       level:activeLvl,
       skill:skill,
       lessonSkill:skill,
+      sourceId:String(fallbackItem[8]||''),
       question:qPrompt,
       options:opts,
       answerIndex:correctIdx,
@@ -13936,7 +14039,8 @@ function getOrMakeVideoGrammarQuestion(skill, level, fallbackItem, idx, usedVgId
       explain:{
         rule:rule,
         why:(typeof grammarSanitizeContext==='function'?grammarSanitizeContext(String(grammarMeta(fallbackItem).whyCorrect||'').trim(),'video-grammar','',opts[correctIdx]):String(grammarMeta(fallbackItem).whyCorrect||'').trim())||FiezelI18n.t('grammar.susunan-kalimat-tepat','Urutan kata dan bentuk tata bahasa yang tepat.'),
-        memory:String(grammarMeta(fallbackItem).memory||'').trim()||FiezelI18n.t('grammar.ingat-pola-kalimat','Perhatikan urutan subjek, kata kerja, dan objek.')
+        memory:String(grammarMeta(fallbackItem).memory||'').trim()||FiezelI18n.t('grammar.ingat-pola-kalimat','Perhatikan urutan subjek, kata kerja, dan objek.'),
+        ...(Array.isArray(vgDistractors)&&vgDistractors.length===opts.length?{distractors:vgDistractors}:{})
       }
     };
   }
@@ -14460,13 +14564,25 @@ function grammarLessonExplain(item,why,distractors,familyRule,focus,mode='',targ
     };
   });
 
+  /* Audit pedagogi 2026-10-11 (P8): petunjuk tingkat 1 ("Arah Fokus") membaca explain.clue, yang
+     tidak pernah diisi - jadi SETIAP soal grammar menerima "Perhatikan subjek kalimat dan penanda
+     waktu", termasuk soal kata depan, artikel, dan kata ganti yang tidak punya penanda waktu apa
+     pun. Langkah pertama penalaran template ini (reasoningId: Indonesia, atau Thai lewat overlay)
+     adalah arah fokus yang sebenarnya: "perhatikan kata “fell”", "lihat kata sesudah titik-titik". */
+  /* Sumbernya item[16].reasoningId, BUKAN meta.reasoning: yang terakhir jatuh ke reasoningOperation
+     berbahasa Inggris bila slot itu kosong. reasoningId selalu ditulis dalam bahasa murid (Indonesia
+     dari bank, Thai lewat overlay); di th yang masih Indonesia ditolak supaya tidak bocor. */
+  const firstStep=String(item?.[16]?.reasoningId||'').split(/\s*(?:→|->|;)\s*/)[0].trim();
+  const clueOk=firstStep&&(isTh?/[\u0E00-\u0E7F]/.test(firstStep):true);
+  const clueText=clueOk?grammarCapFirst(firstStep).replace(/[.!?]+$/,'')+(isTh?'':'.'):'';
   return{
     why:whyText,
     rule:ruleText,
     avoid:avoidText,
     memory:memoryText,
     distractors:cleanDistractors,
-    distractor:distractorText
+    distractor:distractorText,
+    ...(clueText?{clue:clueText}:{})
   };
 }
 /* Audit braincore-feedback #2: MODE META KEKURANGAN IDENTITAS MISKONSEPSI.
@@ -15989,14 +16105,19 @@ function quizLoop(cfg){
      const distractorWords=new Set();
      if(Array.isArray(q.distractors))q.distractors.forEach(d=>{if(d?.option)distractorWords.add(norm(String(d.option)))});
      if(Array.isArray(q.explain?.distractors))q.explain.distractors.forEach(d=>{if(d?.option)distractorWords.add(norm(String(d.option)))});
+     /* Audit pedagogi 2026-10-11 (P1): yang digoyang hanya keping KELEBIHAN. Kata pengecoh
+        yang juga kata sah kalimatnya ("a" di "in a box") dulu ikut digoyang di posisi yang benar. */
+     const tokenNeed=new Map();(q.tokens||[]).forEach(t=>{const k=norm(String(t));tokenNeed.set(k,(tokenNeed.get(k)||0)+1)});
+     const tokenSeen=new Map();
      railChips.forEach(chip=>{
-       if(distractorWords.has(norm(chip.textContent))){
+       const k=norm(chip.textContent);tokenSeen.set(k,(tokenSeen.get(k)||0)+1);
+       if(distractorWords.has(k)&&tokenSeen.get(k)>(tokenNeed.get(k)||0)){
          chip.classList.add('token-nudge-shake');
          setTimeout(()=>chip.classList.remove('token-nudge-shake'),1200);
        }
      });
 
-     q.__diagnosticClue=diagnoseTokenOrderMistake(q);
+     q.__diagnosticClue=diagnoseTokenOrderMistake(q,{hideKey:true});
    }else{
      button.disabled=true;
      button.classList.add('was-tried');
@@ -16018,7 +16139,15 @@ function quizLoop(cfg){
          rawReason=tutorWhy;
        }
      }
-     const cleanReason=String(rawReason||'').trim().replace(/\.+$/,'');
+     /* Audit pedagogi 2026-10-11 (P2): nudge ini tampil SEBELUM jawaban dibuka, jadi kuncinya
+        disamarkan; dan pada kalimat "Pilihan “X” kurang tepat:" kutipan pembuka “X” di awal
+        alasan tidak diulang ("Pilihan “can” kurang tepat: “can” “last night” ..."). */
+     let cleanReason=grammarHideKey(String(rawReason||'').trim(),q.options?.[q.answerIndex],userChoice).replace(/\.+$/,'');
+     const pickQuoted=`“${String(userChoice??'').trim()}”`;
+     if(answer.scaffold!=='probe'&&cleanReason.toLowerCase().startsWith(pickQuoted.toLowerCase())){
+       const rest=cleanReason.slice(pickQuoted.length).trim();
+       if(rest.length>=12)cleanReason=rest;
+     }
      if(cleanReason){
        nudgeText=FiezelI18n.t(answer.scaffold==='probe'?'quiz.retry-why-probe':'quiz.retry-why-hint',{pilihan:userChoice,alasan:cleanReason});
      }
@@ -16211,7 +16340,7 @@ function quizLoop(cfg){
   const detail=ok&&rationale==='brain3_production_near_match'
    ?FiezelI18n.t('quiz.hampir-persis-me-hitung-right',{answer:`<strong>${esc(q.clozeAnswer)}</strong>`})
    :ok?FiezelI18n.t('quiz.cloze-correct',{answer:`<strong>${esc(q.clozeAnswer)}</strong>`})
-   :res?.matchedDistractor?FiezelI18n.t('quiz.cloze-distractor',{misconception:esc(res.matchedDistractor.misconceptionId||res.matchedDistractor.whyFailsId||res.matchedDistractor.misconception||FiezelI18n.t('quiz.cloze-distractor-default')),answer:`<strong>${esc(q.clozeAnswer)}</strong>`})
+   :res?.matchedDistractor?FiezelI18n.t('quiz.cloze-distractor',{misconception:esc(String(res.matchedDistractor.misconceptionId||res.matchedDistractor.whyFailsId||res.matchedDistractor.misconception||FiezelI18n.t('quiz.cloze-distractor-default')).replace(/[.\s]+$/,'')/* audit pedagogi 2026-10-11: naskahnya sudah memberi titik, dulu tercetak "jalan.. Yang tepat" */),answer:`<strong>${esc(q.clozeAnswer)}</strong>`})
    :rationale==='brain3_production_morpheme_miss'?FiezelI18n.t('quiz.kata-dasarnya-right-bentuknya-pending',{answer:`<strong>${esc(q.clozeAnswer)}</strong>`})
    :FiezelI18n.t('quiz.tepat-strong-strong',{clozeAnswer:esc(q.clozeAnswer)});
   const f=$('feedback');f.classList.remove('hidden');f.classList.add(ok?'feedback-success':'feedback-error');

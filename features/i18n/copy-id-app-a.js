@@ -804,11 +804,11 @@
     // app.js:636 — grammarExercise v18-20 correctWhy
     'grammar.mode-contrast-benar': `Perbandingan yang bener nunjukin {kunciDikutip} jawabannya, terus nunjuk di mana {opsiDikutip} melesetnya.`,
     // app.js:636 — grammarExercise v18-20 expl
-    'grammar.mode-contrast-expl-kebalik': `Kebalik: justru {kunciDikutip} yang jaga maksud kalimatnya, {opsiDikutip} yang meleset.`,
+    'grammar.mode-contrast-expl-kebalik': `Justru kebalik. {alasan}`,
     // app.js:636 — grammarExercise v18-20 expl
-    'grammar.mode-contrast-expl-keliru': `Keliru: lesson ini memang nguji perbandingan itu, dan {kunciDikutip} jawaban yang bener.`,
+    'grammar.mode-contrast-expl-keliru': `Lesson ini justru nguji beda dua bentuk itu. {alasan}`,
     // app.js:636 — grammarExercise v18-20 expl
-    'grammar.mode-contrast-expl-sepadan': `Dua-duanya nggak sepadan; cuma {kunciDikutip} yang cocok sama kalimat ini.`,
+    'grammar.mode-contrast-expl-sepadan': `Dua bentuk ini nggak bisa ditukar. {alasan}`,
     // app.js:636 — grammarExercise v18-20 OPSI distraktor
     'grammar.mode-contrast-opsi-kebalik': `{opsiDikutip} pas, dan {kunciDikutip} malah ngubah maksud kalimatnya.`,
     // app.js:636 — grammarExercise v18-20 stem (contrast_distractor)

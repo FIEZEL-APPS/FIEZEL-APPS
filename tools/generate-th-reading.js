@@ -83,7 +83,9 @@ const TWHY = {
   vocabulary: (a, e) => `จากประโยค“${e}”ความหมายคือ“${a}”`
 };
 const TWHY_DEFAULT = (a, e) => `คำตอบได้รับการสนับสนุนจากเนื้อเรื่อง:“${e}”จึงตอบว่า“${a}”`;
-const TOF = (e) => `ตัวเลือกอื่นไม่ปรากฏในเนื้อเรื่องและเนื้อเรื่องเขียนไว้ว่า“${e}”ซึ่งตรงกับคำตอบที่ถูกต้อง`;
+// Audit pedagogi 2026-10-11: "ไม่ปรากฏในเนื้อเรื่อง" (tidak muncul di bacaan) bohong untuk pengecoh yang
+// memang disebut bacaan; "ไม่มีข้อความในเนื้อเรื่องรองรับ" (tidak didukung bacaan) selalu benar.
+const TOF = (e) => `ตัวเลือกอื่นไม่มีข้อความในเนื้อเรื่องรองรับ และเนื้อเรื่องเขียนไว้ว่า“${e}”ซึ่งตรงกับคำตอบที่ถูกต้อง`;
 // Ortografi Thai tidak memakai spasi antar-kata. Beberapa pilihan lama berupa daftar ber-spasi
 // ("ข้าว ไข่ และซุป"); saat disisipkan ke kalimat, spasi itu memicu detektor kata-per-kata.
 // Rapatkan spasi yang diapit aksara Thai saja — spasi di sekitar kutip/Inggris dibiarkan.

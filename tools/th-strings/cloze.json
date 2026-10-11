@@ -4647,5 +4647,12 @@
   "Dua hal dibandingkan dengan “than”, dan bentuk “lebih” dari “good” adalah “better”.": "เปรียบเทียบสองสิ่งด้วย 'than' และขั้นกว่าของ 'good' คือ 'better'",
   "“good” + “than”? “better than”.": "'good' ที่ตามด้วย 'than' ต้องเป็น 'better than'",
   "memakai “more”, padahal “good” punya bentuk “lebih” yang khusus.": "ใช้ 'more' แต่ 'good' มีขั้นกว่าแบบพิเศษของตัวเอง",
-  "“more” dipakai untuk “good”.": "ใช้ 'more' กับ 'good'"
+  "“more” dipakai untuk “good”.": "ใช้ 'more' กับ 'good'",
+  "“an” tetap artikel tak tentu, jadi gunungnya kebaca sebagai salah satu dari banyak, padahal “tallest” cuma punya satu juara. Lagi pula “an” cuma dipakai sebelum bunyi vokal, padahal “tallest” diawali bunyi /t/.": "'An' ผิดสองต่อ: มันเป็น article ไม่เจาะจงจึงชี้สมาชิกหนึ่งเดียวของหมวดหมู่ไม่ได้ และมันถูกเลือกตามเสียงสระที่ตามมาเท่านั้น ไม่ใช่ตามความหมายของวลี",
+  "“no thing” bukan bentuk baku (yang baku ditulis satu kata), dan apa pun bentuknya, “no” di sini tetap bikin negatif dobel bareng “didn't”.": "“no thing” ไม่ใช่รูปมาตรฐาน (รูปมาตรฐานเขียนติดกันเป็นคำเดียว) และไม่ว่าจะเขียนแบบไหน “no” ตรงนี้ก็ยังทำให้ปฏิเสธซ้อนกับ “didn't” อยู่ดี",
+  "“suggested to hand” nggak sah, karena “suggest” nggak pernah diikuti bentuk to; pasangannya bentuk -ing atau anak kalimat that. Lagian ucapan aslinya perintah, bukan usulan.": "“suggested to hand” ใช้ไม่ได้ เพราะ “suggest” ไม่เคยตามด้วยรูป to แต่ตามด้วยรูป -ing หรือ that-clause แถมคำพูดต้นฉบับก็เป็นคำสั่ง ไม่ใช่ข้อเสนอ",
+  "“does” itu kata bantu yang selalu diikuti kata kerja bentuk dasar (does have), padahal sesudahnya di sini ada “got”. Pola punya “have got” cuma bisa dibuka kata bantu dari keluarga “have”.": "“does” เป็นกริยาช่วยที่ต้องตามด้วยกริยารูปฐาน (does have) แต่ตรงนี้ตามด้วย “got” รูปแบบแสดงความเป็นเจ้าของ “have got” ใช้ได้แค่กริยาช่วยในกลุ่ม “have” เท่านั้น",
+  "“gone” itu bentuk ketiga (V3) yang cuma dipakai di susunan pasif atau perfect, padahal “let her” di kalimat aktif ini butuh kata kerja bentuk dasar.": "“Gone” จะเข้าได้เฉพาะโครงสร้าง passive หรือ perfect เท่านั้น ไม่ใช่รูปแบบ causative แบบ active “let someone + กริยารูปฐาน”",
+  "past continuous cocok buat tindakan yang lagi jalan di satu saat lampau, padahal tiga surel ini udah tuntas terkirim di minggu yang masih berjalan (“so far this week”).": "Past continuous เหมาะกับการกระทำที่กำลังดำเนินอยู่ ณ จุดหนึ่งในอดีต ไม่ใช่การกระทำที่เสร็จแล้วนับจำนวนได้ 3 ครั้งในช่วงเวลาที่ยังดำเนินอยู่",
+  "present simple nggambarin kebiasaan atau fakta umum, padahal di sini kamu ngitung surel yang udah terkirim “so far this week”.": "Present simple ใช้กับนิสัยหรือข้อเท็จจริง ไม่ใช่การกระทำเจาะจงที่เกิดขึ้นไปแล้วก่อนหน้านี้ในสัปดาห์ที่ยังไม่จบ"
 }

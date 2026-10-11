@@ -1386,7 +1386,7 @@
         },
         "an": {
           "misconception": "salah yang sama kayak “a”, plus bingung soal bunyi vokal.",
-          "whyFails": "sama salahnya kayak “a”, ditambah salah timbang bunyi vokal."
+          "whyFails": "“an” tetap artikel tak tentu, jadi gunungnya kebaca sebagai salah satu dari banyak, padahal “tallest” cuma punya satu juara. Lagi pula “an” cuma dipakai sebelum bunyi vokal, padahal “tallest” diawali bunyi /t/."
         },
         "(no article)": {
           "misconception": "frasa di sebelah nama diri dikira nggak pernah pakai kata di depannya.",
@@ -1582,7 +1582,7 @@
         },
         "no thing": {
           "misconception": "kata ganti negatif yang satu kata dipenggal jadi dua.",
-          "whyFails": "“nothing” itu satu kata, dipenggal jadi nggak baku."
+          "whyFails": "“no thing” bukan bentuk baku (yang baku ditulis satu kata), dan apa pun bentuknya, “no” di sini tetap bikin negatif dobel bareng “didn't”."
         }
       }
     },
@@ -2086,7 +2086,7 @@
         },
         "gone": {
           "misconception": "bentuk ketiga kata kerja dipakai menggantikan bentuk dasar.",
-          "whyFails": "bentuk ini cuma cocok di susunan pasif atau perfect."
+          "whyFails": "“gone” itu bentuk ketiga (V3) yang cuma dipakai di susunan pasif atau perfect, padahal “let her” di kalimat aktif ini butuh kata kerja bentuk dasar."
         }
       }
     },
@@ -2298,11 +2298,11 @@
         },
         "was sending": {
           "misconception": "past continuous dipakai buat nggambarin serangkaian tindakan yang udah tuntas.",
-          "whyFails": "past continuous cocok buat tindakan yang lagi jalan di satu saat lampau."
+          "whyFails": "past continuous cocok buat tindakan yang lagi jalan di satu saat lampau, padahal tiga surel ini udah tuntas terkirim di minggu yang masih berjalan (“so far this week”)."
         },
         "send": {
           "misconception": "present simple dipakai padahal kalimatnya nyebut tindakan lampau tertentu.",
-          "whyFails": "present simple nggambarin kebiasaan atau fakta."
+          "whyFails": "present simple nggambarin kebiasaan atau fakta umum, padahal di sini kamu ngitung surel yang udah terkirim “so far this week”."
         }
       }
     },
@@ -3142,7 +3142,7 @@
         },
         "does": {
           "misconception": "dua kata bantu ditumpuk.",
-          "whyFails": "does got nggak pernah bener di bahasa Inggris."
+          "whyFails": "“does” itu kata bantu yang selalu diikuti kata kerja bentuk dasar (does have), padahal sesudahnya di sini ada “got”. Pola punya “have got” cuma bisa dibuka kata bantu dari keluarga “have”."
         }
       }
     },
@@ -5014,7 +5014,7 @@
         },
         "suggested to hand": {
           "misconception": "bentuk to dipasang di belakang kata kerja yang maunya bentuk -ing.",
-          "whyFails": "sama kayak “admit”, kata “suggest” minta bentuk -ing atau anak kalimat that, bukan bentuk to; lagian ucapan aslinya perintah, bukan usulan."
+          "whyFails": "“suggested to hand” nggak sah, karena “suggest” nggak pernah diikuti bentuk to; pasangannya bentuk -ing atau anak kalimat that. Lagian ucapan aslinya perintah, bukan usulan."
         }
       }
     },
