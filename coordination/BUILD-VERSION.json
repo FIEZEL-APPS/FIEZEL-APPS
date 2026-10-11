@@ -1,7 +1,7 @@
 {
-  "version": "m025-565",
-  "claimedBy": "branch claude/nice-feynman-1umhv5",
-  "claimedAt": "2026-10-11T16:41:31.774Z",
-  "reason": "feat(braincore): Stempel Ingatan di kotak umpan balik latihan mandiri",
+  "version": "m025-566",
+  "claimedBy": "branch claude/zealous-davinci-ekag7u",
+  "claimedAt": "2026-10-11T17:39:29.934Z",
+  "reason": "fix(proctor): penjaga wajah ujian tahan pose/aksesoris/cahaya + kamera sintetis 3D",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
