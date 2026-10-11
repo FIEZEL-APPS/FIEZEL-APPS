@@ -78,9 +78,13 @@ async function runEmpiricalProbe() {
     const wall = makeCanvas(() => [200, 202, 205]);
     const wallRes = fg.fallbackCheck(wall.vid, wall.cv, wall.ctx);
 
-    // 3. Real face
+    // 3. Real face — m025-565: dengan alis & rongga mata. Persegi kulit tanpa mata adalah
+    //    definisi kardus di gerbang m025-562, dan mesin kini menuntut pita mata di semua mode.
     const face = makeCanvas((x, y) => {
-      if (x >= 18 && x <= 46 && y >= 12 && y <= 36) return [180, 130, 100];
+      if (x >= 18 && x <= 46 && y >= 12 && y <= 36) {
+        if (y >= 20 && y <= 25 && x >= 22 && x <= 42) return [75, 62, 55];
+        return [180, 130, 100];
+      }
       return [80, 85, 90];
     });
     const faceRes = fg.fallbackCheck(face.vid, face.cv, face.ctx);
@@ -117,8 +121,8 @@ async function runEmpiricalProbe() {
   await browser.close();
   server.close();
 
-  if (results.sampleInterval !== 250) throw new Error('SAMPLE_INTERVAL_MS bukan 250: ' + results.sampleInterval);
-  if (results.warnThreshold !== 750) throw new Error('WARN_THRESHOLD_MS bukan 750: ' + results.warnThreshold);
+  if (results.sampleInterval !== 500) throw new Error('SAMPLE_INTERVAL_MS bukan 500: ' + results.sampleInterval);
+  if (results.warnThreshold !== 3000) throw new Error('WARN_THRESHOLD_MS bukan 3000: ' + results.warnThreshold);
   if (results.darkRes !== false) throw new Error('Dark room gagal ditolak: ' + results.darkRes);
   if (results.wallRes !== false) throw new Error('Wall gagal ditolak: ' + results.wallRes);
   if (results.woodRes !== false) throw new Error('Wood desk gagal ditolak: ' + results.woodRes);
