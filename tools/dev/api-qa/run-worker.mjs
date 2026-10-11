@@ -21,7 +21,7 @@ import {
 } from './harness.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(HERE, '..', '..', '..');
@@ -91,7 +91,7 @@ function scanLeak(endpoint, label, res, payload) {
 
 async function allRoutes() {
   const worker = await loadWorker();
-  const mod = await import(path.join(REPO_ROOT, 'workers', 'api', 'index.js'));
+  const mod = await import(pathToFileURL(path.join(REPO_ROOT, 'workers', 'api', 'index.js')).href);
   return mod.ROUTES.map(([method, p]) => ({ method, path: p }));
 }
 
