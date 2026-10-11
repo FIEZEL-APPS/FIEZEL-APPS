@@ -1,7 +1,7 @@
 {
-  "version": "m025-561",
-  "claimedBy": "branch fix/real-face-detection-robustness-m025-561",
-  "claimedAt": "2026-10-11T08:33:09.530Z",
-  "reason": "fix(proctor): robust face detection & anti-spoofing calibration (m025-561)",
+  "version": "m025-562",
+  "claimedBy": "branch fix/exam-face-precision-m025-562",
+  "claimedAt": "2026-10-11T10:13:32.710Z",
+  "reason": "fix(proctor): diskriminasi presisi wajah nyata vs bukan wajah di sesi ujian (m025-562)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

@@ -1344,6 +1344,104 @@ test('class-hub (m025-560): muat ulang — preflight basi direset, profil verifi
   }
 });
 
+test('face-guard (m025-562): diskriminasi wajah nyata vs bukan wajah (kardus, dinding, telapak tangan, perabot) di sesi ujian', () => {
+  const FaceGuard = require('../features/class-hub/fiezel-face-guard.js');
+  const w = 64, h = 48;
+  const mkCanvas = (fn) => {
+    const data = new Uint8ClampedArray(w * h * 4);
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const idx = (y * w + x) * 4;
+        const [r, g, b] = fn(x, y);
+        data[idx] = r; data[idx + 1] = g; data[idx + 2] = b; data[idx + 3] = 255;
+      }
+    }
+    return { video: { readyState: 2 }, cvs: { width: w, height: h }, ctx: { drawImage() {}, getImageData: () => ({ data }) } };
+  };
+
+  // 1. Enrollment profil murid saat preflight verifikasi
+  FaceGuard.resetLiveness();
+  FaceGuard.resetEnrolledProfile();
+
+  const studentFace = mkCanvas((x, y) => {
+    if (x >= 18 && x <= 46 && y >= 12 && y <= 36) {
+      if (y >= 20 && y <= 25 && x >= 22 && x <= 42) return [80, 60, 40]; // Lekukan mata
+      return [195, 140, 95]; // Kulit hangat murid
+    }
+    return [70, 75, 80];
+  });
+  const blinkClosed = mkCanvas((x, y) => {
+    if (x >= 18 && x <= 46 && y >= 12 && y <= 36) return [195, 140, 95];
+    return [70, 75, 80];
+  });
+
+  FaceGuard.checkLiveness(studentFace.video, studentFace.cvs, studentFace.ctx);
+  FaceGuard.checkLiveness(studentFace.video, studentFace.cvs, studentFace.ctx);
+  FaceGuard.checkLiveness(blinkClosed.video, blinkClosed.cvs, blinkClosed.ctx);
+  const realNow = Date.now;
+  Date.now = () => realNow() + 120;
+  try { FaceGuard.checkLiveness(studentFace.video, studentFace.cvs, studentFace.ctx); } finally { Date.now = realNow; }
+
+  assert.strictEqual(FaceGuard.isEnrolled(), true, 'profil murid wajib terkunci setelah preflight');
+
+  // 2. Di dalam sesi ujian (isEnrolled = true):
+  // A. Wajah murid yang menghadap layar: WAJIB DITERIMA
+  assert.strictEqual(FaceGuard.fallbackCheck(studentFace.video, studentFace.cvs, studentFace.ctx), true, 'wajah murid nyata di sesi ujian wajib diterima');
+
+  // B. Gerakan mundur / menjauh sedikit (skala wajah mengecil): WAJIB DITERIMA
+  const studentLeanBack = mkCanvas((x, y) => {
+    if (x >= 22 && x <= 42 && y >= 16 && y <= 32) {
+      if (y >= 21 && y <= 24 && x >= 25 && x <= 39) return [80, 60, 40];
+      return [195, 140, 95];
+    }
+    return [70, 75, 80];
+  });
+  assert.strictEqual(FaceGuard.fallbackCheck(studentLeanBack.video, studentLeanBack.cvs, studentLeanBack.ctx), true, 'murid mundur sedikit tetap terdeteksi');
+
+  // C. Kemiringan kepala / ponsel (tilt): WAJIB DITERIMA
+  const studentTilt = mkCanvas((x, y) => {
+    if (x >= 10 && x <= 38 && y >= 14 && y <= 38) {
+      if (y >= 22 && y <= 27 && x >= 14 && x <= 34) return [80, 60, 40];
+      return [195, 140, 95];
+    }
+    return [70, 75, 80];
+  });
+  assert.strictEqual(FaceGuard.fallbackCheck(studentTilt.video, studentTilt.cvs, studentTilt.ctx), true, 'kemiringan kepala wajar tetap terdeteksi');
+
+  // D. Kardus cokelat di depan kamera (warna mirip kulit tetapi tanpa rongga mata): HARUS DITOLAK
+  const cardboard = mkCanvas((x, y) => {
+    if (x >= 18 && x <= 46 && y >= 12 && y <= 36) return [190, 140, 95];
+    return [70, 75, 80];
+  });
+  const resCardboard = FaceGuard.analyzeFrame(cardboard.video, cardboard.cvs, cardboard.ctx, null);
+  assert.strictEqual(resCardboard.present, false, 'kardus di depan kamera harus ditolak');
+  assert.strictEqual(resCardboard.reason, 'no_facial_features', 'alasan penolakan kardus adalah ketiadaan rongga mata');
+
+  // E. Dinding / gorden warna krem/tan (permukaan luas tanpa mata): HARUS DITOLAK
+  const tanWall = mkCanvas((x, y) => {
+    if (x >= 10 && x <= 54 && y >= 8 && y <= 40) return [185, 138, 92];
+    return [70, 75, 80];
+  });
+  assert.strictEqual(FaceGuard.fallbackCheck(tanWall.video, tanWall.cvs, tanWall.ctx), false, 'dinding krem di tengah harus ditolak');
+
+  // F. Telapak tangan menutupi kamera: HARUS DITOLAK
+  const handPalm = mkCanvas((x, y) => {
+    if (x >= 20 && x <= 44 && y >= 10 && y <= 38) return [192, 138, 94];
+    return [70, 75, 80];
+  });
+  assert.strictEqual(FaceGuard.fallbackCheck(handPalm.video, handPalm.cvs, handPalm.ctx), false, 'telapak tangan harus ditolak');
+
+  // G. Kardus dengan gradien cahaya plafon (top-lit): HARUS DITOLAK
+  const ceilingLitCardboard = mkCanvas((x, y) => {
+    if (x >= 18 && x <= 46 && y >= 12 && y <= 36) {
+      const val = 210 - (y - 12) * 2;
+      return [val, Math.round(val * 0.72), Math.round(val * 0.5)];
+    }
+    return [70, 75, 80];
+  });
+  assert.strictEqual(FaceGuard.fallbackCheck(ceilingLitCardboard.video, ceilingLitCardboard.cvs, ceilingLitCardboard.ctx), false, 'kardus bergradien cahaya harus ditolak');
+});
+
 (async () => {
   let fail = 0;
   for (const [name, fn] of tests) {
