@@ -504,6 +504,7 @@ jobs:
           # dan menuntut keduanya merah, plus meng-assert modul arena tidak bersandar pada
           # modul tur sekali-seumur-hidup (fiezel-tour). Bug persis yang diminta owner cegah.
           node tests/paw-arena-rules-card-test.js
+          node tests/undercover-game-test.js
           node tests/back-nav-test.js
           node grammar-quality-audit.js
           node content-integrity-audit.js

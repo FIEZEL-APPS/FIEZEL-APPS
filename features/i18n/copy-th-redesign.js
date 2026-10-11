@@ -364,6 +364,8 @@
     'game.stage-cta': 'เปิดเวที',
     'game.nujum-badge': 'เมนเทอร์สุดโหด',
     'game.nujum-title': 'NUJUM',
+    'game.undercover-badge': '4–6 ที่นั่ง · เล่นกับบอท',
+    'game.undercover-desc': 'เกมปาร์ตี้ไขคำลับ: ให้คำใบ้ภาษาอังกฤษ แล้วจับผู้แฝงตัวให้ได้',
     'game.nujum-desc': 'คุยกับเมนเทอร์จอมเข้มงวดที่พร้อมชี้จุดผิดแบบตรงไปตรงมา',
     'game.nujum-cta': 'เผชิญหน้ากับ NUJUM'
   });

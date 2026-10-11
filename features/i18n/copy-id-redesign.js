@@ -373,6 +373,8 @@
     'game.stage-cta': 'Buka Panggung',
     'game.nujum-badge': 'Mentor Keras',
     'game.nujum-title': 'NUJUM',
+    'game.undercover-badge': '4–6 kursi · lawan bot',
+    'game.undercover-desc': 'Deduksi kata rahasia ala pesta: beri petunjuk bahasa Inggris, lalu tangkap penyusupnya.',
     'game.nujum-desc': 'Bicara dengan mentor galak yang siap mengoreksi kesalahanmu.',
     'game.nujum-cta': 'Hadapi NUJUM'
   });
