@@ -76,8 +76,19 @@
       faceMs: clampSpan(raw.faceMs),
       faceLongestMs: clampSpan(raw.faceLongestMs),
       faceEpisodes: (Array.isArray(raw.faceEpisodes) ? raw.faceEpisodes : []).slice(-EPISODES_MAX)
-        .map(function (e) { return { at: Math.round(num(e && e.at)), ms: clampSpan(e && e.ms) }; })
+        .map(function (e) { return { at: Math.round(num(e && e.at)), ms: clampSpan(e && e.ms) }; }),
+      noCamera: raw.noCamera === true
     };
+  }
+
+  /**
+   * Ujian ini (sebagian) berjalan TANPA kamera: murid memilih lanjut tanpa kamera, izin
+   * kamera ditolak/dicabut, atau kamera terputus dan tidak bisa disambung ulang. Satu bendera,
+   * bukan hitungan — guru perlu tahu pengawasan kamera tidak berjalan, bukan rinciannya.
+   */
+  function markNoCamera(state) {
+    if (state) state.noCamera = true;
+    return state;
   }
 
   /**
@@ -161,7 +172,8 @@
 
   /**
    * Bentuk yang dikirim ke guru (assign.f pada class-report): TIGA BILANGAN standar (n, s, x)
-   * ditambah tiga bilangan visual (vn, vs, vx) HANYA BILA ada catatan wajah hilang.
+   * ditambah tiga bilangan visual (vn, vs, vx) HANYA BILA ada catatan wajah hilang, dan
+   * bendera nc = 1 HANYA BILA ujian berjalan tanpa kamera.
    */
   function payload(state, at) {
     var s = summary(state, at);
@@ -171,6 +183,7 @@
       p.vs = Math.round(s.vs / 1000);
       p.vx = Math.round(s.vx / 1000);
     }
+    if (state && state.noCamera) p.nc = 1;
     return p;
   }
 
@@ -190,6 +203,6 @@
 
   return {
     SCHEMA: SCHEMA, GRACE_MS: GRACE_MS, FACE_GRACE_MS: FACE_GRACE_MS, EPISODES_MAX: EPISODES_MAX, EPISODE_MS_MAX: EPISODE_MS_MAX, REASONS: REASONS,
-    start: start, restore: restore, leave: leave, back: back, leaveFace: leaveFace, backFace: backFace, summary: summary, payload: payload, severity: severity
+    start: start, restore: restore, leave: leave, back: back, leaveFace: leaveFace, backFace: backFace, markNoCamera: markNoCamera, summary: summary, payload: payload, severity: severity
   };
 });

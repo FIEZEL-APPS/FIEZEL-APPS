@@ -321,6 +321,7 @@
       out.vs = vsec;
       out.vx = Math.max(0, Math.min(vsec, Math.round(Number(f.vx) || 0)));
     }
+    if (f && (f.nc === 1 || f.nc === true)) out.nc = 1;
     return out;
   }
   /** Laporan murid dikirim ulang berkali-kali; guru hanya perlu dibangunkan saat angkanya NAIK. */
@@ -329,7 +330,10 @@
     var grewScreen = (Number(next && next.n) || 0) > pn || (Number(next && next.s) || 0) > ps;
     var pvn = Number(prev && prev.vn) || 0, pvs = Number(prev && prev.vs) || 0;
     var grewFace = (Number(next && next.vn) || 0) > pvn || (Number(next && next.vs) || 0) > pvs;
-    return grewScreen || grewFace;
+    // Kamera yang baru saja dinyatakan mati juga kabar: tanpa ini guru tidak pernah tahu
+    // pengawasan wajah berhenti, karena angka keluar-layarnya bisa saja tetap nol.
+    var grewNoCam = !!(next && next.nc) && !(prev && prev.nc);
+    return grewScreen || grewFace || grewNoCam;
   }
   function focusOf(a, s) {
     var raw = (a && a.focus && s && a.focus[s.id]) || null;
@@ -349,14 +353,19 @@
   function durasi(sec) { var n = Math.max(0, Math.round(Number(sec) || 0)); return n >= 60 ? Math.round(n / 60) + ' mnt' : n + ' dtk'; }
   /** Kalimat pendek untuk chip di layar guru. Menyebut fakta, tidak menuduh. */
   function focusLabel(f) {
-    if (!f || (!f.n && !f.vn)) return 'Tidak keluar layar';
+    var noCam = f && f.nc ? t('proctor.guru-tanpa-kamera', 'Tanpa kamera') : '';
+    if (!f || (!f.n && !f.vn)) return noCam || 'Tidak keluar layar';
     var appN = f.appN !== undefined ? f.appN : f.n;
     var appS = f.appS !== undefined ? f.appS : f.s;
-    if (appN && f.vn) return 'Keluar layar ' + appN + '× (' + durasi(appS) + ') · Wajah tak terlihat ' + f.vn + '× (' + durasi(f.vs) + ')';
-    if (f.vn && !appN) return 'Wajah tak terlihat ' + f.vn + '× · ' + durasi(f.vs);
-    return 'Keluar layar ' + appN + '× · ' + durasi(appS);
+    var label;
+    if (appN && f.vn) label = 'Keluar layar ' + appN + '× (' + durasi(appS) + ') · Wajah tak terlihat ' + f.vn + '× (' + durasi(f.vs) + ')';
+    else if (f.vn && !appN) label = 'Wajah tak terlihat ' + f.vn + '× · ' + durasi(f.vs);
+    else label = 'Keluar layar ' + appN + '× · ' + durasi(appS);
+    return noCam ? label + ' · ' + noCam : label;
   }
   function focusLevel(f) {
+    // Ujian tanpa kamera tanpa kepergian lain tetap TIDAK bersih: pengawasannya tidak berjalan.
+    if (f && f.nc && !f.n && !f.vn) return 'ringan';
     if (!f || (!f.n && !f.vn)) return 'bersih';
     var totalN = f.appN !== undefined ? (Number(f.n) || 0) : ((Number(f.n) || 0) + (Number(f.vn) || 0));
     var totalS = f.appS !== undefined ? (Number(f.s) || 0) : ((Number(f.s) || 0) + (Number(f.vs) || 0));
@@ -731,10 +740,15 @@
       // Kotak masuk guru bertahan 30 hari dan dibaca ulang tiap render; satu entri lama tanpa
       // `f` tidak boleh mematikan seluruh panel, jadi bentuknya dijamin di sini, bukan diandaikan.
       var f = e.f || { n: 0, s: 0 }, berat = focusLevel(f) === 'berat';
+      if (f.nc && !f.n && !f.vn) {
+        return t('proctor.guru-kabar-tanpa-kamera', '⚠ {murid} mengerjakan ujian “{judul}” tanpa kamera — pengawasan wajah tidak berjalan. Tanyakan ke muridnya sebelum menilai.')
+          .replace('{murid}', e.student).replace('{judul}', e.title);
+      }
       var bagian = [];
       if (f.n) bagian.push((Number(f.n) || 0) + '× keluar layar (' + durasi(f.s) + ')');
       if (f.vn) bagian.push((Number(f.vn) || 0) + '× wajah tak terlihat (' + durasi(f.vs) + ')');
       var ringkas = bagian.length > 1 ? bagian.join(', ') : (f.vn ? (Number(f.vn) || 0) + '× wajah tak terlihat · ' + durasi(f.vs) : (Number(f.n) || 0) + '× · ' + durasi(f.s));
+      if (f.nc) ringkas += ' · ' + t('proctor.guru-tanpa-kamera', 'Tanpa kamera');
       return (berat ? '⚠ Perlu ditengok: ' : '⚠ ') + e.student + ' keluar dari layar saat mengerjakan ' +
         (e.mode === 'ujian' ? 'ujian' : 'tugas') + ' “' + e.title + '” — ' + ringkas +
         (berat ? '. Tanyakan ke muridnya sebelum menilai.' : '');

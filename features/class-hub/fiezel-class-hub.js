@@ -958,20 +958,44 @@
       osc.stop(ctx.currentTime + 0.23);
     } catch (_) {}
   }
+  /* Kamera sudah menyala sejak verifikasi pra-ujian, tetapi ujian BELUM dimulai sampai murid
+     menekan tombol mulai kerjakan ujian (runner.faceVerified). Wajah yang belum pas di oval selama
+     preflight bukan pelanggaran — dulu ia tercatat dan terkirim ke guru, dan panggilan
+     updateProctorBanner di layar preflight (tanpa banner) memicu renderStudent yang
+     menghancurkan video pratinjau. */
+  function faceMonitoring() { var r = ui().runner; return isExamRunner() && !!(r && r.faceVerified); }
+  /** Pengawasan kamera tidak berjalan: tandai untuk guru, kirim, dan beri tahu murid sekali. */
+  function markExamNoCamera() {
+    var u = ui(), st = u.focus; if (!st || !FG()) return;
+    var already = !!st.noCamera;
+    if (FG().markNoCamera) FG().markNoCamera(st); else st.noCamera = true;
+    saveFocus(st);
+    reportFocus(st);
+    if (!already && sEnv.toast) sEnv.toast(t('proctor.kamera-terputus', 'Kamera ujian tidak aktif. Gurumu akan melihat bahwa ujian ini berjalan tanpa kamera.'));
+  }
+  function attachPip() {
+    var face = FaceG();
+    if (!sEl || !face || typeof face.attachPreview !== 'function' || typeof sEl.querySelector !== 'function') return;
+    var pipVid = sEl.querySelector('[data-face-pip]');
+    if (pipVid) face.attachPreview(pipVid);
+  }
   function faceGuardOptions() {
     return {
+      onStream: function () { attachPip(); },
+      onCameraLost: function () { if (faceMonitoring()) markExamNoCamera(); },
       onAbsent: function (at) {
-        var u = ui(), st = u.focus; if (!st || !FG() || !isExamRunner()) return;
+        var u = ui(), st = u.focus; if (!st || !FG() || !faceMonitoring()) return;
         FG().leaveFace(st, at || Date.now());
         saveFocus(st);
         updateProctorBanner();
       },
       onWarning: function (warn) {
+        if (warn && !faceMonitoring()) return;
         ui().faceWarn = !!warn;
         updateProctorBanner();
       },
       onAbsentEpisode: function (elapsed) {
-        var u = ui(), st = u.focus; if (!st || !FG() || !isExamRunner()) return;
+        var u = ui(), st = u.focus; if (!st || !FG() || !faceMonitoring()) return;
         if (!st.faceAwaySince) {
           FG().leaveFace(st, Date.now() - (elapsed || 3000));
         }
@@ -980,7 +1004,7 @@
         updateProctorBanner();
       },
       onPresent: function () {
-        var u = ui(), st = u.focus; if (!st || !FG()) return;
+        var u = ui(), st = u.focus; if (!st || !FG() || !faceMonitoring()) return;
         var ep = FG().backFace(st, Date.now());
         var wasWarned = !!ui().faceWarn;
         ui().faceWarn = false;
@@ -1000,14 +1024,19 @@
     var face = FaceG(); if (!face || !isExamRunner()) return;
     var u = ui();
     if (u.runner && !u.runner.faceVerified) return; // Tunggu verifikasi pra-ujian selesai
+    if (u.runner && u.runner.noCamera) return; // Murid memilih lanjut tanpa kamera — sudah dilaporkan
     try {
-      var p = face.start(faceGuardOptions());
+      var opts = faceGuardOptions();
+      // Profil hasil verifikasi pra-ujian ikut dipulihkan saat ujian dimuat ulang.
+      if (u.runner && u.runner.faceProfile) opts.profile = u.runner.faceProfile;
+      var p = face.start(opts);
       if (p && typeof p.then === 'function') {
-        p.then(function () {
-          if (sEl) {
-            var pipVid = typeof sEl.querySelector === 'function' ? sEl.querySelector('[data-face-pip]') : null;
-            if (pipVid && face.attachPreview) face.attachPreview(pipVid);
-          }
+        p.then(function (res) {
+          /* Kamera gagal menyala di tengah ujian (izin dicabut, ujian dibuka ulang dan izin
+             ditolak, kamera dipakai aplikasi lain). Dulu ini diam: ujian berlanjut tanpa
+             pengawasan dan guru tidak pernah tahu. */
+          if (res && res.ok === false && res.reason !== 'aborted' && faceMonitoring()) { markExamNoCamera(); return; }
+          attachPip();
         }).catch(function () {});
       }
     } catch (_) {}
@@ -1049,6 +1078,15 @@
   /** Dipanggil saat sesi ujian dibuka DAN saat modul dipasang ulang (mis. sesudah reload). */
   function resumeFocus() {
     var u = ui(), a = currentAssignment();
+    /* Preflight yang tersimpan sedang-memindai/terverifikasi sesudah halaman dimuat ulang
+       tidak punya kamera maupun pemindai lagi: tombolnya terkunci di status memindai selamanya
+       dan satu-satunya jalan keluar adalah Keluar ujian (ujian selesai dengan 0 jawaban).
+       Kembalikan ke awal supaya murid bisa memindai ulang. */
+    var pf = u.facePreflight, faceNow = FaceG();
+    if (pf && /^(starting|scanning|verified)$/.test(pf.status || '') && !(faceNow && typeof faceNow.isActive === 'function' && faceNow.isActive())) {
+      u.facePreflight = { status: 'idle', passes: 0 };
+      saveUi();
+    }
     if (!isExamRunner() || !FG()) { unbindFocus(); return; }
     var st = FG().restore(u.focus);
     if (!st || st.aid !== a.id) st = FG().start(a.id, u.runner.startedAt || Date.now());
@@ -2437,28 +2475,32 @@
           var pVid = sEl ? sEl.querySelector('[data-face-preview]') : null;
           if (pVid && face.attachPreview) face.attachPreview(pVid);
 
-          var pollCount = 0, consecutivePasses = 0;
+          /* Batas waktu memakai jam dinding, bukan hitungan tick: liveness kini butuh >= 3 dtk
+             diam tenang (atau satu kedip/toleh), jadi 9 dtk dulu terlalu sempit untuk murid
+             yang perlu membetulkan posisi dulu. */
+          var SCAN_TIMEOUT_MS = 20000, scanStartedAt = Date.now(), consecutivePasses = 0;
+          function paintScanProgress(pct) {
+            var cu2 = ui();
+            if (cu2.facePreflight) cu2.facePreflight.progress = pct;
+            var fillEl = (sEl && typeof sEl.querySelector === 'function') ? sEl.querySelector('.ch-face-progress-fill') : null;
+            if (fillEl && fillEl.style) fillEl.style.width = pct + '%';
+            var badgeEl = (sEl && typeof sEl.querySelector === 'function') ? sEl.querySelector('.ch-preflight-status-badge.is-scanning') : null;
+            if (badgeEl) {
+              badgeEl.innerHTML = '<span class="ch-face-live-dot"></span> ' + esc(t('proctor.verifikasi-memindai', 'Memindai wajah... Harap tetap menghadap kamera')) + ' (' + pct + '%)';
+            }
+          }
           function doScan() {
             var cu = ui();
             if (!cu.facePreflight || cu.facePreflight.status !== 'scanning' || !sEl) {
               if (verifyTimer) clearInterval(verifyTimer);
               return;
             }
-            pollCount++;
-
-            var currentPct = Math.min(100, Math.round((pollCount / 25) * 100));
-            cu.facePreflight.progress = currentPct;
-
-            var fillEl = (sEl && typeof sEl.querySelector === 'function') ? sEl.querySelector('.ch-face-progress-fill') : null;
-            if (fillEl && fillEl.style) fillEl.style.width = currentPct + '%';
-
-            var badgeEl = (sEl && typeof sEl.querySelector === 'function') ? sEl.querySelector('.ch-preflight-status-badge.is-scanning') : null;
-            if (badgeEl) {
-              badgeEl.innerHTML = '<span class="ch-face-live-dot"></span> ' + esc(t('proctor.verifikasi-memindai', 'Memindai wajah... Harap tetap menghadap kamera')) + ' (' + currentPct + '%)';
-            }
 
             if (typeof face.checkLiveness === 'function') {
               var live = face.checkLiveness();
+              // Bar mengikuti kemajuan liveness yang SEBENARNYA — dulu ia penuh dalam 1,5 dtk
+              // apa pun yang dilihat kamera.
+              paintScanProgress(live && typeof live.progress === 'number' ? live.progress : 0);
               if (live && live.stage === 'verified') {
                 if (verifyTimer) clearInterval(verifyTimer);
                 cu.facePreflight = { status: 'verified', step: 'verified', progress: 100 };
@@ -2471,6 +2513,7 @@
                 cu.facePreflight.step = 'challenge';
               }
             } else {
+              paintScanProgress(Math.min(95, Math.round(((Date.now() - scanStartedAt) / SCAN_TIMEOUT_MS) * 95)));
               var ok = face.checkNow ? face.checkNow() : false;
               if (ok) consecutivePasses++;
               else consecutivePasses = 0;
@@ -2486,8 +2529,10 @@
               }
             }
 
-            if (pollCount >= 150) {
+            if (Date.now() - scanStartedAt >= SCAN_TIMEOUT_MS) {
               if (verifyTimer) clearInterval(verifyTimer);
+              // Kamera dimatikan selama layar galat; tombol coba lagi menyalakannya kembali.
+              try { face.stop(); } catch (_) {}
               cu.facePreflight = { status: 'error', reason: 'face_not_detected' };
               renderStudent();
               if (sEnv.toast) sEnv.toast(t('proctor.wajah-belum', 'Wajah belum terdeteksi. Pastikan pencahayaan cukup dan wajah menghadap kamera.'));
@@ -2505,6 +2550,12 @@
         var r = u.runner, a = currentAssignment(); if (!r || !a) return;
         r.faceVerified = true;
         u.facePreflight = null;
+        /* Simpan profil hasil verifikasi (statistik warna kulit & posisi — BUKAN gambar wajah)
+           supaya ujian yang dimuat ulang memakai profil yang sama, bukan model universal. */
+        try {
+          var fgp = FaceG();
+          if (fgp && typeof fgp.isEnrolled === 'function' && fgp.isEnrolled() && typeof fgp.getEnrolledProfile === 'function') r.faceProfile = fgp.getEnrolledProfile();
+        } catch (_) {}
         r.startedAt = Date.now();
         if (a.timer) r.timerEnd = Date.now() + a.timer * 60000;
         if (r.timerEnd) {
@@ -2525,11 +2576,17 @@
       case 'bypass-face-verify': {
         var r = u.runner, a = currentAssignment(); if (!r || !a) return;
         r.faceVerified = true;
+        r.noCamera = true;
         u.facePreflight = null;
         r.startedAt = Date.now();
         if (a.timer) r.timerEnd = Date.now() + a.timer * 60000;
+        /* Tombolnya berjanji lanjut tanpa kamera DAN dilaporkan ke guru. Dulu kamera dari
+           preflight yang gagal tetap menyala, dan bendera noCamera tidak pernah ikut payload —
+           guru tidak menerima apa pun. Kini kamera dimatikan dan nc = 1 sampai ke guru. */
+        stopFaceGuard();
         if (u.focus) {
-          u.focus.noCamera = true;
+          if (FG() && FG().markNoCamera) FG().markNoCamera(u.focus); else u.focus.noCamera = true;
+          saveFocus(u.focus);
           reportFocus(u.focus);
         }
         if (r.timerEnd) {
@@ -2690,11 +2747,11 @@
      padahal yang perlu dilihat guru hanya baris yang menyimpang. */
   function focusChip(a, s) {
     var TS = T(), f = TS.focusOf ? TS.focusOf(a, s) : null;
-    if (!f || (!f.n && !f.vn)) return '';
+    if (!f || (!f.n && !f.vn && !f.nc)) return '';
     return '<span class="ch-focus is-' + TS.focusLevel(f) + '" title="Terdeteksi meninggalkan layar saat mengerjakan" data-testid="tclass-focus-' + esc(a.id) + '-' + esc(s.id) + '">' + icon('eye-off') + ' ' + esc(TS.focusLabel(f)) + '</span>';
   }
   /** Ringkasan satu tugas: berapa murid yang terdeteksi keluar layar. */
-  function focusCount(c, a) { var TS = T(); return c.students.filter(function (s) { var f = TS.focusOf ? TS.focusOf(a, s) : null; return f && (f.n || f.vn); }).length; }
+  function focusCount(c, a) { var TS = T(); return c.students.filter(function (s) { var f = TS.focusOf ? TS.focusOf(a, s) : null; return f && (f.n || f.vn || f.nc); }).length; }
   function statusCounts(c, a) { var TS = T(), out = { belum: 0, sedang: 0, selesai: 0, terlambat: 0, total: 0 }; c.students.filter(function (s) { return TS.targeted(a, s); }).forEach(function (s) { out.total++; out[statusOf(a, studentRec(a, s)).id]++; }); return out; }
   function tKelas(c, env) {
     var TS = T(), stt = TS.classStats(c), sync = TS.syncLabel(c);

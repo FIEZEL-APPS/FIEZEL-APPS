@@ -559,7 +559,9 @@ const MIG16 = path.join(root, 'workers/api/migrations/0016_item_pool_probe.sql')
   await test('A5 · tabel gabungan diterapkan lewat itemCalibrationEffective; tabel kosong = perilaku lama', async () => {
     const it = q('PR-101', 'apply_form');
     const prior = A.itemPoolCanonicalPrior(it);
-    reply = (url) => ({ status: 200, body: { schema: 'fiezel-item-difficulty-v1', day: '2026-09-27', items: { 'PR-101:apply_form': { d: 0.5, n: 44 } } } });
+    // Tanggal tabel = hari ini: itemPoolTable() menilai umur tabel dengan jam nyata
+    // (TABLE_MAX_AGE_DAYS 14), jadi tanggal tetap '2026-09-27' basi sejak 2026-10-11.
+    reply = (url) => ({ status: 200, body: { schema: 'fiezel-item-difficulty-v1', day: new Date().toISOString().slice(0, 10), items: { 'PR-101:apply_form': { d: 0.5, n: 44 } } } });
     await A.itemPoolRefreshTable(NOW);
     assert.strictEqual(calls[calls.length - 1].init.credentials, 'omit');
     assert.ok(Math.abs(A.itemCalibrationEffective(it, prior) - (prior + 0.5)) < 1e-9);

@@ -3928,7 +3928,7 @@
      untuk menolong satu murid, dan menambahkan baris "0 kali keluar layar" pada setiap laci
      akan mengubah alat bantu menjadi rapor kecurigaan. */
   function focusPanel(c, s) {
-    var T = S(), rows = (c.assignments || []).map(function (a) { var f = T.focusOf ? T.focusOf(a, s) : null; return f && f.n ? { a: a, f: f } : null; }).filter(Boolean);
+    var T = S(), rows = (c.assignments || []).map(function (a) { var f = T.focusOf ? T.focusOf(a, s) : null; return f && (f.n || f.nc) ? { a: a, f: f } : null; }).filter(Boolean);
     if (!rows.length) return '';
     return '<h4>Keluar layar saat mengerjakan</h4><ul class="tg-mini-list" data-testid="tg-focus-list">' + rows.map(function (r) {
       return '<li><span class="tg-focus is-' + T.focusLevel(r.f) + '">' + icon('eye-off') + ' ' + esc(T.focusLabel(r.f)) + '</span> ' + esc(r.a.title) + '</li>';

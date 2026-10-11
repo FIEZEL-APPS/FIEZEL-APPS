@@ -57,6 +57,10 @@
     'proctor.keluar-ujian-desc': 'Ujian akan diselesaikan dan kamu tidak bisa melanjutkan lagi. Yakin ingin keluar?',
     'proctor.keluar-dan-selesaikan': 'Keluar & Selesaikan',
     'proctor.lanjut-ujian': 'Lanjut Ujian',
+    /* m025-560 — ujian tanpa kamera kini benar-benar sampai ke guru (nc = 1). */
+    'proctor.kamera-terputus': 'Kamera ujian tidak aktif. Gurumu akan melihat bahwa ujian ini berjalan tanpa kamera.',
+    'proctor.guru-tanpa-kamera': 'Tanpa kamera',
+    'proctor.guru-kabar-tanpa-kamera': '⚠ {murid} mengerjakan ujian “{judul}” tanpa kamera — pengawasan wajah tidak berjalan. Tanyakan ke muridnya sebelum menilai.',
     /* m025-273 — kunci ujian berlaku di SELURUH permukaan ujian, bukan hanya tugas Kelas. */
     'ujian.mode-aktif': 'Mode ujian: pembimbing FIEZEL nonaktif, dan kalau kamu keluar dari layar ini gurumu menerima catatannya.',
     'ujian.ai-terkunci': 'Pembimbing FIEZEL nonaktif selama sesi ujian. Kerjakan dengan kemampuanmu sendiri — ia kembali begitu ujian selesai.',
