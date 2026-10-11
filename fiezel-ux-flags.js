@@ -126,7 +126,11 @@
     /* "Instrumentasi funnel (opt-in, agregat, tanpa PII)". Bendera ini hanya
        membuka KEMUNGKINAN mengirim; persetujuan murid tetap syarat terpisah dan
        diperiksa di features/telemetry/fiezel-funnel.js. */
-    funnelTelemetry: true
+    funnelTelemetry: true,
+    /* "Stempel Ingatan: satu baris kecil di kotak umpan balik yang membuktikan FIEZEL
+       ingat jebakan murid lintas sesi" (owner, 11 Okt 2026, m025-565). Hanya latihan
+       mandiri; mode ukur dan kunci ujian tidak pernah distempel (memoryStampAllowed). */
+    memoryStamp: true
   };
 
   var DEFAULTS = {};

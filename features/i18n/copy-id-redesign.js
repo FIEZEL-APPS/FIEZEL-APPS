@@ -341,6 +341,21 @@
     'bc.bukti-kosong': 'Selesaikan beberapa sesi lagi. Buktinya akan muncul di sini.',
     'bc.fokus-pasangan': 'Fokus saat ini: membedakan {a} dan {b}',
     'bc.fokus-materi': 'Fokus saat ini: {materi}',
+    // m025-565 Stempel Ingatan: SATU baris meta di kotak umpan balik latihan mandiri. Setiap
+    // angka berasal dari buku besar miskonsepsi (hits/sessions); persona "Fiezel", tanpa
+    // istilah mesin, tanpa tanda pisah. {pilihan} = teks pengecoh yang dibicarakan (stempel selalu
+    // tentang percobaan PERTAMA, sedangkan pembahasan bisa membahas pilihan kedua), {sejak} diisi
+    // salah satu kunci stempel.sejak-*.
+    'stempel.pertama': 'Fiezel mencatat jebakan di balik “{pilihan}”. Kalau muncul lagi, Fiezel akan ingat.',
+    'stempel.sesi-ini': 'Jebakan di balik “{pilihan}” sudah {kali} kali menangkapmu di sesi ini.',
+    'stempel.lagi': 'Ketemu lagi. Jebakan di balik “{pilihan}” sudah {kali} kali menangkapmu, pertama kali {sejak}.',
+    'stempel.lagi-polos': 'Ketemu lagi. Jebakan di balik “{pilihan}” sudah {kali} kali menangkapmu, di {sesi} sesi berbeda.',
+    'stempel.lolos': 'Jebakan di balik “{pilihan}” sudah {kali} kali menangkapmu. Kali ini kamu tidak terpancing.',
+    'stempel.jinak': 'Menurut catatan Fiezel, jebakan yang dulu {kali} kali menangkapmu di materi ini kini sudah jinak.',
+    'stempel.sejak-tadi': 'tadi, di sesi sebelumnya',
+    'stempel.sejak-kemarin': 'kemarin',
+    'stempel.sejak-hari': 'hari {hari}',
+    'stempel.sejak-tanggal': 'tanggal {tanggal}',
 
     /* ── Game Hub Arcade ────────────────────────────────────────────────────── */
     'game.title': 'Arcade & Game',
