@@ -1,6 +1,6 @@
-# FIEZEL HANDOFF · m025-561 — UNDERCOVER "NEON CYBER-AGENCY LOUNGE"
+# FIEZEL HANDOFF · m025-563 — UNDERCOVER "NEON CYBER-AGENCY LOUNGE"
 
-- **Build**: `m025-561` (arbiter `node tools/bump-build.mjs` → `--check`: **Selaras**, 6 titik: `coordination/BUILD-VERSION.json`, `sw.js`, `core-config.js`, `features/neural-voice/fiezel-diag-panel.js`, `kurikulum.html`, `misi.html`)
+- **Build yang terbit**: `m025-563` — PR #583, squash `9a94bd5`. Nomor `m025-561` dan `m025-562` lebih dulu diklaim rilis proctor (#584, #586) saat PR ini terbuka, jadi arbiter dinaikkan dua kali sebelum merge; nama berkas handoff ini tetap memakai nomor awalnya. (arbiter `node tools/bump-build.mjs` → `--check`: **Selaras**, 6 titik: `coordination/BUILD-VERSION.json`, `sw.js`, `core-config.js`, `features/neural-voice/fiezel-diag-panel.js`, `kurikulum.html`, `misi.html`)
 - **Branch**: `claude/bold-wright-2o64cl` → Pull Request ke `main` (tidak ada push langsung ke `main`)
 - **Lingkup**: perombakan total `undercover.html` menjadi game deduksi pesta 6 babak bertema Cyber-Noir, dengan jembatan bukti belajar sungguhan ke Braincore.
 
@@ -113,7 +113,8 @@ Formasi 6 kursi sengaja lebih keras untuk warga (dua penyusup = dua kesempatan m
 - `sw.js` (precache 4 skrip baru), `features/i18n/locale-assets-th.json` (copy-th-undercover, contentRev 8).
 - `tests/undercover-game-test.js` (baru, terdaftar di `.github/workflows/quality.yml`), `tests/probe-undercover-redesign.mjs` (ditulis ulang), `tests/probe-weplay-undercover.mjs` (dihapus — menunjuk UI yang sudah tidak ada).
 - `id-golden-baseline.json` — diregenerasi sadar: +naskah Undercover baru, −1 pseudo-literal yang bergeser karena sisipan kode di dekat `bktRecord()`; nol berkas terkunci berubah.
-- Hexa-sync `m025-561`.
+- `tests/reset-side-state-test.js` + `resetProgress()` di `app.js` — antrean bukti (`fiezel-undercover-evidence-v1`) dan tanda terima (`fiezel-undercover-receipt-v1`) ikut dihapus saat reset progres, supaya lobi tidak menampilkan penguasaan akun sebelum reset; `fiezel-ui-locale-hint` sengaja DIKECUALIKAN dengan alasan tertulis (preferensi bahasa UI, bukan progres belajar). Celah ini ditangkap CI pada commit pertama PR (gerbang R2: "tidak ada kunci localStorage yang lolos tanpa keputusan") dan ditutup di PR yang sama.
+- Hexa-sync `m025-563`.
 
 ## 8. Utang dan catatan jujur
 
