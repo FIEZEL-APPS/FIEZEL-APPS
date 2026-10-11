@@ -54,6 +54,7 @@ const REQUIRED = {
   placementLite: [true, 'placement-lite 8-12 soal'],
   sessionSummary: [true, 'Ringkasan akhir sesi'],
   funnelTelemetry: [true, 'Instrumentasi funnel (opt-in, agregat, tanpa PII)'],
+  memoryStamp: [true, 'Stempel Ingatan: satu baris di kotak umpan balik, latihan mandiri saja (m025-565)'],
   /* Diperiksa owner di fiezel.my.id (7 Sep 2026): /api/health 404, /kurikulum.html 404.
      Konsol kurikulum dilayani '/api/...' relatif origin, dan repo tidak punya
      passenger_wsgi.py / Procfile / requirements.txt di akar - backend-nya memang belum
@@ -143,6 +144,7 @@ for (const name of Object.keys(REQUIRED)) {
     ['todayHome', APP],
     ['placementLite', APP],
     ['sessionSummary', APP],
+    ['memoryStamp', APP],
     ['leanIntro', fs.readFileSync(path.join(__fzRoot, 'features/onboarding/fiezel-onboarding.js'), 'utf8')]
   ];
   for (const [name, source] of readers) {

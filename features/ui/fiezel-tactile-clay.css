@@ -4979,6 +4979,22 @@ html body:not(.fz-teacher-mode) #app #quizScaffoldNudge svg,
   font-size: 17px !important;
   font-weight: 800 !important;
 }
+/* m025-565 Stempel Ingatan: baris meta tipis tepat di bawah vonis, warna muted lembar ini
+   (sama dengan details p.muted). Ditarik mendekati judul seperti dateline, bukan blok baru. */
+#feedback .feedback-stamp {
+  margin: -6px 0 10px !important;
+  font-size: 12px !important;
+  line-height: 1.45 !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.01em !important;
+  color: #94A3B8 !important;
+  -webkit-text-fill-color: #94A3B8 !important;
+}
+:lang(th) #feedback .feedback-stamp {
+  font-size: 13px !important;
+  line-height: 1.6 !important;
+  letter-spacing: normal !important;
+}
 #feedback p {
   color: #F1F5F9 !important;
   font-size: 13.5px !important;
