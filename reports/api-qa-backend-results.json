@@ -1,6 +1,6 @@
 {
   "mode": "in-process-mongomock",
-  "generatedAt": "2026-10-11T14:18:38Z",
+  "generatedAt": "2026-10-11T14:21:12Z",
   "checks": 63,
   "passed": 63,
   "failed": 0,
@@ -480,10 +480,10 @@
     },
     {
       "endpoint": "/api/learning/events",
-      "test": "duplicate event_id no-5xx + idempotent",
+      "test": "duplicate event_id deduped (handler reached)",
       "pass": true,
-      "expected": "<500 x2",
-      "got": "422/422",
+      "expected": "stored=True then False",
+      "got": "200:True/200:False",
       "detail": ""
     },
     {

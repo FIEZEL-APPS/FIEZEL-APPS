@@ -241,7 +241,7 @@ def suite_auth(client):
         # B menanam event unik; A lalu MENCOBA membacanya lewat ?student_id=B.
         secret_eid = "idor-probe-" + uuid.uuid4().hex[:8]
         client.post("/api/learning/events",
-                    json={"type": "lesson_opened", "payload": {"session_id": "s", "seq": 1}, "event_id": secret_eid},
+                    json={"type": "lesson_started", "payload": {"session_id": "s", "seq": 1}, "event_id": secret_eid},
                     headers=hdr(b))
         r = client.get("/api/learning/events", params={"student_id": ub["user_id"]}, headers=hdr(a))
         # Isolasi benar = respons A TIDAK memuat event milik B (handler memaksa sid=A).
@@ -297,18 +297,27 @@ def suite_concurrency(client):
     if r1.status_code == 200 and r2.status_code == 200:
         finding(SEV["HIGH"], "/api/auth/kelasku", "Tiket KelasKu bisa di-replay (jti tidak dibakar)", "", "200/200")
 
-    # Idempotency attempts: submit jawaban dengan idempotency_key sama 2x -> satu attempt.
-    # Butuh sesi; alur penuh berat. Kita uji lapisan: dua event dengan event_id sama -> dedup.
+    # Idempotensi event: event_id stabil -> record_event dedup (stored:false kedua kali).
+    # EventIn (learning.py): {type, payload, event_id}. student_id DITURUNKAN server dari
+    # identitas, bukan dari body — jadi mengirim student_id/event_type akan 422 dan uji
+    # TIDAK PERNAH menyentuh handler dedup (temuan Fiezel Bot v2). Pakai skema yang benar
+    # dan assert dedup-nya BENAR-BENAR terjadi, bukan sekadar "< 500".
     tok = login(client, "sub_idem_student", "student", "Idem")
     if tok:
-        ev = {"event_type": "lesson_opened", "student_id": None, "payload": {"session_id": "s1", "seq": 1}}
-        me = client.get("/api/auth/me", headers=hdr(tok)).json()
-        ev["student_id"] = me["user_id"]
-        ev["event_id"] = "dup-event-001"
+        ev = {"type": "lesson_started", "payload": {"session_id": "s1", "seq": 1},
+              "event_id": "dedup-" + uuid.uuid4().hex[:8]}
         e1 = client.post("/api/learning/events", json=ev, headers=hdr(tok))
         e2 = client.post("/api/learning/events", json=ev, headers=hdr(tok))
-        rec("/api/learning/events", "duplicate event_id no-5xx + idempotent",
-            e1.status_code < 500 and e2.status_code < 500, "<500 x2", f"{e1.status_code}/{e2.status_code}")
+        reached = e1.status_code == 200 and e2.status_code == 200
+        j1 = e1.json() if reached else {}
+        j2 = e2.json() if reached else {}
+        deduped = reached and j1.get("stored") is True and j2.get("stored") is False
+        rec("/api/learning/events", "duplicate event_id deduped (handler reached)",
+            deduped, "stored=True then False", f"{e1.status_code}:{j1.get('stored')}/{e2.status_code}:{j2.get('stored')}")
+        if reached and not deduped:
+            finding(SEV["MED"], "/api/learning/events",
+                    "Idempotensi event_id tidak men-dedup (handler tercapai tapi tak terdedup)",
+                    ev["event_id"], f"e1={j1} e2={j2}")
 
 
 # ========================= 5. LEAKS / RESILIENCE ============================
