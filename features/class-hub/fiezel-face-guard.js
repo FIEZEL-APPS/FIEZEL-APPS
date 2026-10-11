@@ -474,33 +474,63 @@
       if (avgGrad < 2.0 && maxLocalGrad < 14) return { present: false, isSpoof: false, reason: 'flat_texture' };
 
       // 8. Haar cascade dahi vs mata vs pipi (Bilateral Dual-Eye)
-      var fSum = 0, fCount = 0;
-      var eSum = 0, eCount = 0;
-      var cSum = 0, cCount = 0;
-      var eLSum = 0, eLCount = 0, eRSum = 0, eRCount = 0;
+      var fhY1, fhY2, fhX1, fhX2;
+      var eyeY1, eyeY2, eLX1, eLX2, eRX1, eRX2;
+      var chkY1, chkY2, chkX1, chkX2;
 
-      var fhY1 = Math.max(0, cY - 12), fhY2 = Math.max(0, cY - 6);
+      if (boxW >= 10 && boxH >= 10) {
+        // Koordinat anatomis adaptif berbasis proporsi oval wajah:
+        // Skala mengikuti pergerakan maju-mundur atau kemiringan perangkat
+        fhY1 = Math.max(0, minY + Math.round(boxH * 0.08));
+        fhY2 = Math.min(h - 1, minY + Math.round(boxH * 0.28));
+        fhX1 = Math.max(0, minX + Math.round(boxW * 0.20));
+        fhX2 = Math.min(w - 1, maxX - Math.round(boxW * 0.20));
+
+        eyeY1 = Math.max(0, minY + Math.round(boxH * 0.32));
+        eyeY2 = Math.min(h - 1, minY + Math.round(boxH * 0.54));
+        eLX1 = Math.max(0, minX + Math.round(boxW * 0.10));
+        eLX2 = Math.min(w - 1, minX + Math.round(boxW * 0.44));
+        eRX1 = Math.max(0, maxX - Math.round(boxW * 0.44));
+        eRX2 = Math.min(w - 1, maxX - Math.round(boxW * 0.10));
+
+        chkY1 = Math.max(0, minY + Math.round(boxH * 0.58));
+        chkY2 = Math.min(h - 1, minY + Math.round(boxH * 0.82));
+        chkX1 = Math.max(0, minX + Math.round(boxW * 0.18));
+        chkX2 = Math.min(w - 1, maxX - Math.round(boxW * 0.18));
+      } else {
+        // Fallback untuk kotak berdimensi kecil
+        fhY1 = Math.max(0, cY - 12); fhY2 = Math.max(0, cY - 6);
+        fhX1 = Math.max(0, cX - 8);  fhX2 = Math.min(w - 1, cX + 8);
+        eyeY1 = Math.max(0, cY - 5); eyeY2 = Math.min(h - 1, cY + 1);
+        eLX1 = Math.max(0, cX - 10); eLX2 = Math.max(0, cX - 2);
+        eRX1 = Math.min(w - 1, cX + 2); eRX2 = Math.min(w - 1, cX + 10);
+        chkY1 = Math.min(h - 1, cY + 3); chkY2 = Math.min(h - 1, cY + 9);
+        chkX1 = Math.max(0, cX - 8);  chkX2 = Math.min(w - 1, cX + 8);
+      }
+
+      var fSum = 0, fCount = 0;
       for (var fy = fhY1; fy <= fhY2; fy++) {
-        for (var fx = Math.max(0, cX - 8); fx <= Math.min(w - 1, cX + 8); fx++) {
+        for (var fx = fhX1; fx <= fhX2; fx++) {
           fSum += Ygrid[fy * w + fx]; fCount++;
         }
       }
 
-      var eyeY1 = Math.max(0, cY - 5), eyeY2 = Math.min(h - 1, cY + 1);
+      var eSum = 0, eCount = 0;
+      var eLSum = 0, eLCount = 0, eRSum = 0, eRCount = 0;
       for (var ey = eyeY1; ey <= eyeY2; ey++) {
-        for (var ex = Math.max(0, cX - 10); ex <= Math.max(0, cX - 2); ex++) {
+        for (var ex = eLX1; ex <= eLX2; ex++) {
           eLSum += Ygrid[ey * w + ex]; eLCount++;
           eSum += Ygrid[ey * w + ex]; eCount++;
         }
-        for (var ex = Math.min(w - 1, cX + 2); ex <= Math.min(w - 1, cX + 10); ex++) {
+        for (var ex = eRX1; ex <= eRX2; ex++) {
           eRSum += Ygrid[ey * w + ex]; eRCount++;
           eSum += Ygrid[ey * w + ex]; eCount++;
         }
       }
 
-      var chkY1 = Math.min(h - 1, cY + 3), chkY2 = Math.min(h - 1, cY + 9);
+      var cSum = 0, cCount = 0;
       for (var cy = chkY1; cy <= chkY2; cy++) {
-        for (var cx = Math.max(0, cX - 8); cx <= Math.min(w - 1, cX + 8); cx++) {
+        for (var cx = chkX1; cx <= chkX2; cx++) {
           cSum += Ygrid[cy * w + cx]; cCount++;
         }
       }
@@ -515,8 +545,23 @@
 
       // Penolakan permukaan datar / lampu / meja / telapak tangan:
       // Lampu terang (avgBr > 110) atau cahaya datar yang mendominasi tengah (> 80%) tanpa rongga mata
-      if (!enrolledProfile.valid && (centerFillFraction > 0.80 || avgBr > 110) && eyeDip < 0.4) {
+      if ((centerFillFraction > 0.80 || avgBr > 110) && eyeDip < 0.4) {
         return { present: false, isSpoof: false, reason: 'flat_light_or_surface' };
+      }
+
+      // DISKRIMINATOR WAJAH NYATA VS BUKAN WAJAH DI SESI UJIAN:
+      // Objek bukan wajah (kardus, dinding, meja kayu, bantal, telapak tangan, latar kosong)
+      // yang memiliki warna mirip kulit TIDAK MEMILIKI kontur rongga mata (eyeDip <= 0.4).
+      // Wajah manusia asli selalu memiliki lekukan rongga mata (eyeDip positif nyata).
+      if (enrolledProfile.valid) {
+        var minEyeDipReq = Math.min(2.0, Math.max(0.6, (enrolledProfile.eyeDipMean || 10) * 0.08));
+        if (eyeDip < minEyeDipReq) {
+          return { present: false, isSpoof: false, reason: 'no_facial_features' };
+        }
+        // Validasi ukuran terhadap profil murid (menolak dinding atau permukaan latar yang terlalu masif)
+        if (enrolledProfile.boxWMean > 0 && boxW > enrolledProfile.boxWMean * 2.6) {
+          return { present: false, isSpoof: false, reason: 'box_too_large' };
+        }
       }
 
       // Jika murid menoleh tajam ke samping (asimetri mata ekstrem > 35)
