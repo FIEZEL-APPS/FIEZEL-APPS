@@ -552,7 +552,7 @@
         // Rujukan selalu menunjuk instance terbaru yang hidup (paling akurat
         // saat panel kuis diganti soal berikutnya).
         PAW_MEM_RUJUKAN = this._mem;
-        this._state = "idle";
+        this._state = "";
         this._stGen = 0;                          // generasi timer transien
         this._confettiLive = 0;                   // [P1-3]
         this.setState("idle");

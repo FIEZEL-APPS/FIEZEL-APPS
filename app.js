@@ -271,7 +271,8 @@ const ACCOUNT_STATE_PREFIX='fiezel-v5-state:';
 const LEGACY_STATE_OWNER_KEY='fiezel-v5-legacy-owner';
 const FIEZEL_TARGET_COURSE_KEY='fz_target_course';
 function accountStateKey(uuid){const id=String(uuid||'').replace(/[^A-Za-z0-9_-]/g,'').slice(0,128);return id?ACCOUNT_STATE_PREFIX+id:''}
-function detectedTimeZone(){try{return Intl.DateTimeFormat().resolvedOptions().timeZone||'Asia/Jakarta'}catch{return'Asia/Jakarta'}}
+let _detectedTzMemo='';
+function detectedTimeZone(){if(_detectedTzMemo)return _detectedTzMemo;try{_detectedTzMemo=Intl.DateTimeFormat().resolvedOptions().timeZone||'Asia/Jakarta'}catch{_detectedTzMemo='Asia/Jakarta'}return _detectedTzMemo}
 /* D4 bottleneck #1 (sisa yang belum tertutup): validasi zona waktu di-MEMO.
    studyDayKey sudah memo hasilnya, TETAPI kunci memonya sendiri dibangun dari
    studyTimeZone() -> validTimeZone(), dan versi lama membangun `new Intl.DateTimeFormat`
@@ -6001,7 +6002,7 @@ async function load(opts){const root=document.baseURI;/* W1 P0-1 (16-001): fetch
    berjalan dan #app kosong selamanya di balik chrome yang terlihat hidup. 20 detik cukup
    longgar untuk 3G nyata; lewat itu murid berhak diberi kartu galat + tombol Coba lagi. */
  const bankTimeout=()=>{try{return typeof AbortSignal!=='undefined'&&typeof AbortSignal.timeout==='function'?{signal:AbortSignal.timeout(20000)}:{}}catch(_){return{}}};
- const get=async f=>{const r=await fetch(new URL(f,root),bankTimeout());if(!r.ok)throw Error(`${f}: ${r.status}`);return r.json()};const optional=async(f,fallback)=>{try{return await get(f)}catch{return fallback}};let grammarMaster,vgBankRaw,_misconceptions,grammarVocabMapRaw;[V,R,grammarMaster,GRAMMAR_CURRICULUM,WRITING_BANK,READING_EXAM,_misconceptions,vgBankRaw,grammarVocabMapRaw]=await Promise.all([...DATA.map(get),optional('grammar-curriculum-v1.json',{schema:'fiezel-grammar-curriculum-v1',lessons:[]}),optional('writing-prompts-v1.json',null),optional('reading-exam-v1.json',null),loadMisconceptionDiagnoses(root),optional('content/video-grammar-bank-v1.json',null),optional('content/grammar-vocab-map-v1.json',null)]);if(vgBankRaw&&Array.isArray(vgBankRaw.videoGrammarBank))self.__videoGrammarBankCache=vgBankRaw.videoGrammarBank;if(grammarVocabMapRaw&&self.FiezelGrammarVocabBridge?.setGrammarVocabMap)self.FiezelGrammarVocabBridge.setGrammarVocabMap(grammarVocabMapRaw);GRAMMAR_CURRICULUM_INDEX=buildGrammarCurriculumIndex(GRAMMAR_CURRICULUM);/* m025-161 (F1-1): satu pembangun indeks, dipakai load() dan pembaca pertama */// m025-143 (B-06): graph prasyarat Core Brain disuntik dari kurikulum yang SAMA dengan yang
+ const get=async f=>{const r=await fetch(new URL(f,root),bankTimeout());if(!r.ok)throw Error(`${f}: ${r.status}`);return r.json()};const optional=async(f,fallback)=>{try{return await get(f)}catch{return fallback}};let grammarMaster,vgBankRaw,_misconceptions,grammarVocabMapRaw;[V,R,grammarMaster,GRAMMAR_CURRICULUM,WRITING_BANK,READING_EXAM,_misconceptions,vgBankRaw,grammarVocabMapRaw]=await Promise.all([...DATA.map(get),optional('grammar-curriculum-v1.json',{schema:'fiezel-grammar-curriculum-v1',lessons:[]}),optional('writing-prompts-v1.json',null),optional('reading-exam-v1.json',null),loadMisconceptionDiagnoses(root),optional('content/video-grammar-bank-v1.json',null),optional('content/grammar-vocab-map-v1.json',null)]);if(grammarMaster&&Array.isArray(grammarMaster.templates))self.__grammarTemplatesCache=grammarMaster.templates;if(vgBankRaw&&Array.isArray(vgBankRaw.videoGrammarBank))self.__videoGrammarBankCache=vgBankRaw.videoGrammarBank;if(grammarVocabMapRaw&&self.FiezelGrammarVocabBridge?.setGrammarVocabMap)self.FiezelGrammarVocabBridge.setGrammarVocabMap(grammarVocabMapRaw);GRAMMAR_CURRICULUM_INDEX=buildGrammarCurriculumIndex(GRAMMAR_CURRICULUM);/* m025-161 (F1-1): satu pembangun indeks, dipakai load() dan pembaca pertama */// m025-143 (B-06): graph prasyarat Core Brain disuntik dari kurikulum yang SAMA dengan yang
   // dipakai Grammar Hub. Sebelumnya Core Brain hanya punya graph keluarga - lima keluarga
   // bahkan hilang darinya - jadi diagnosis akar masalah tidak pernah bisa menunjuk lesson.
   try{self.FiezelCoreBrain?.setCurriculumGraph?.(GRAMMAR_CURRICULUM)}catch{}
@@ -9376,8 +9377,9 @@ function enterStage(kind,spec){
   if(pushed)syncLessonMode();
   return pushed
 }
+function _bootSplashBlockingAppRender(){try{return !appOpened&&!stageStack.length&&typeof document!=='undefined'&&!!(document.documentElement?.classList?.contains?.('fz-booting')&&document.getElementById?.('fiezelBootSplash'))}catch(_){return false}}
 /** Menggambar layar yang SEKARANG berada di puncak: stage teratas, atau view-nya sendiri. */
-function drawTopScreen(){const top=stageStack[stageStack.length-1];if(top){try{top.draw();return true}catch{}}render();return true}
+function drawTopScreen(){const top=stageStack[stageStack.length-1];if(top){try{top.draw();return true}catch{}}if(_bootSplashBlockingAppRender())return false;render();return true}
 function runStageLeave(entries){for(const entry of entries){try{entry.leave?.()}catch{}}if(!stageStack.length&&deferWelcomeUntilStageExit){const t=setTimeout(resumeDeferredWelcome,700);t?.unref?.()}}
 /* Audit F01 (2026-09-22): "Mulai tes awal" di perkenalan membuka tes SEKETIKA, dan dua hal
    yang dulu menyerbu layarnya menunggu di belakang: tawaran pengingat ("Mau diingatkan?")
@@ -9399,7 +9401,7 @@ function resumeDeferredWelcome(){
    Chromium: satu render() di tengah tes awal = kuis hilang, fz-stage-quiz lepas. Selama
    ada stage, tidak ada yang perlu digambar ulang: stage teratas memegang layarnya sendiri,
    dan view dasar dicat ulang saat stage terakhir ditinggalkan. */
-function repaintQuietly(){if(stageStack.length)return false;try{render()}catch(_){}return true}
+function repaintQuietly(){if(stageStack.length||_bootSplashBlockingAppRender())return false;try{render()}catch(_){}return true}
 /**
  * Dipanggil HANYA oleh jalur riwayat. False berarti stage ini sudah tidak ada di layar
  * (murid meninggalkannya lewat navigasi bawah, misalnya), sehingga tekanan kembali tidak
@@ -13564,12 +13566,6 @@ try{
     const _fs=require('fs'),_path=require('path');
     const _p=_path.join(typeof __fzRoot!=='undefined'?__fzRoot:(typeof root!=='undefined'?root:process.cwd()),'content','video-grammar-bank-v1.json');
     if(_fs.existsSync(_p))self.__videoGrammarBankCache=JSON.parse(_fs.readFileSync(_p,'utf8')).videoGrammarBank||[];
-  }
-  if(!self.__videoGrammarBankCache&&typeof fetch==='function'&&typeof document!=='undefined'){
-    fetch(new URL('content/video-grammar-bank-v1.json',document.baseURI||location.href))
-      .then(r=>r.ok?r.json():null)
-      .then(d=>{if(d&&Array.isArray(d.videoGrammarBank))self.__videoGrammarBankCache=d.videoGrammarBank})
-      .catch(()=>{});
   }
 }catch(_){}
 

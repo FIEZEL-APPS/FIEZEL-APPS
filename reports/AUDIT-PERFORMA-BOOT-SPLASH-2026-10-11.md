@@ -253,3 +253,80 @@ Performance saat membuka PWA dari layar utama.
   animasi). Handoff itu mencatat 48,6 fps di CPU 4x; pengukuran ini mendapat 23–32 fps di 4x
   dengan harness berbeda (termasuk service worker). Angkanya tidak bisa dibandingkan satu lawan
   satu, tetapi arahnya cocok dengan pertumbuhan JS/CSS/JSON di §4.2.
+
+---
+
+## 7. Realisasi Perbaikan & Verifikasi Empiris (`m025-567`)
+
+Seluruh temuan **P0** dan titik panas utama (**§3.1–§3.4, §4.3, §4.4, §4.6, §4.7**) telah
+diperbaiki pada cabang ini (`m025-567`) dan diverifikasi ulang memakai harness yang sama
+(`node tools/dev/probe-boot-splash-perf.js`):
+
+### 7.1 Rincian Perbaikan yang Diterapkan
+
+1. **Perbaikan Bug Watchdog 15 Detik & Pencegahan Splash Ganda (§3.4 / P0 #1)**:
+   - Di `index.html:559-588`, menambahkan penjaga `keepingRecovery` agar panggilan
+     `showRecovery(); dismiss();` pada batas waktu 15 detik tidak menghapus kartu pemulihan
+     yang baru saja dipasang, serta menandai `window.__fiezelBootWatchdogFired = true`.
+   - Di `features/brand/fiezel-splash.js` (`show()`), jika `target.__fiezelBootWatchdogFired`
+     sudah aktif saat `load()` terlambat selesai (>15 dtk), `show()` langsung membersihkan
+     kartu pemulihan dan mengembalikan `{ shown: false, reason: 'watchdog_elapsed' }` sehingga
+     aplikasi langsung masuk tanpa memutar splash kedua dari awal.
+2. **Pengungkapan Logo & Wordmark Sejak Frame Pertama + Isolasi Layout Boot (§3.1 / P0 #2)**:
+   - Di `index.html` (`#fiezelBootCritical`), menambahkan `contain: layout style paint` pada
+     `#fiezelBootSplash`, `content-visibility: hidden; contain: strict` pada
+     `html.fz-booting main.app, html.fz-booting #globalSky`, serta animasi CSS compositor
+     (`fz-fade-in`) untuk `.fz-fgroup`, `.fz-barsgroup`, dan `.fiezel-splash-word` selama
+     `#fiezelBootSplash:not([data-fiezel-boot-claimed="shown"]):not(.fiezel-splash-still)`.
+   - Di `features/brand/fiezel-splash.js` (`startMotion`), menyinkronkan status opasitas awal
+     begitu splash diadopsi (`adoptedRevealed`) agar tidak terjadi kedipan 1 frame saat atribut
+     `data-fiezel-boot-claimed="shown"` dipasang.
+3. **Penghapusan 3 Fetch JSON Ganda & 3 Fetch Non-Boot Eager (§4.3 / P0 #3)**:
+   - `features/nujum/fiezel-nujum.js`: menghapus `loadGrammarTemplatesAsync()` saat evaluasi
+     skrip dan memakai kembali `root.__grammarTemplatesCache` yang diisi `app.js` `load()`
+     (menghemat fetch ganda **2,1 MB** `grammar-templates.json`).
+   - `features/grammar/grammar-vocab-bridge.js`: tidak lagi memanggil `loadGrammarVocabMap()`
+     saat evaluasi skrip di peramban karena `app.js` `load()` sudah mengunduh dan menyuntikkan
+     `content/grammar-vocab-map-v1.json`.
+   - `app.js:13568`: menghapus `fetch('content/video-grammar-bank-v1.json')` tingkat atas yang
+     menduplikasi `optional('content/video-grammar-bank-v1.json')` di dalam `load()`.
+   - `features/bug/fiezel-bug.js` & `features/speaking-listening/fiezel-jlpt-listening.js`:
+     menunda pemuatan `bug-species.json`, `misconception-taxonomy-v1.json`, dan
+     `jlpt-listening-bank-v1.json` sampai sesudah splash selesai atau saat fitur dibuka.
+4. **Penghapusan Render Beranda Prematur di Balik Splash (§3.2, §4.4 / P0 #4)**:
+   - Mencegah `grammar-vocab-bridge.js`, `fiezel-bug.js`, `drawTopScreen()`, dan
+     `repaintQuietly()` memicu `render()` beranda penuh di balik layar splash sebelum
+     `openApp()` dipanggil.
+5. **Optimasi Titik Panas Animasi Splash & Maskot (§3.3, §4.6, §4.7 / P1 #9)**:
+   - `features/mascot/fiezel-mascot.js` (dan kembarnya `website/assets/mascot/fiezel-mascot.js`):
+     menginisialisasi `this._state = ""` sebelum `this.setState("idle")` di `connectedCallback()`
+     sehingga pemasangan awal tidak memicu `_restartAnimations()` → `getAnimations({subtree:true})`
+     (**147,2 ms** style recalculation).
+   - `app.js`: mememoisasi `detectedTimeZone()` sehingga tidak menginstansiasi ulang
+     `Intl.DateTimeFormat()` berulang kali (**90,6 ms**).
+   - `features/brand/fiezel-splash-pawstamp.js`: hanya memanggil `void o.offsetHeight` di
+     `resetOverlay()` apabila overlay pernah diputar sebelumnya (menghilangkan paksaan layout
+     sinkron **64 ms** tepat di awal animasi cap PAW).
+   - `features/brand/fiezel-splash-particles.js` & `fiezel-splash.js`: melewati pembuatan
+     sprite dan sampling partikel (`skipBuild`) bila `startOffset >= T.DONE` (adopsi lambat),
+     serta menghentikan `ctx.clearRect()` berulang di setiap frame sesudah `t >= T.DONE`.
+   - `fiezel-lazy-loader.js`: menahan gelombang 18 skrip lazy sampai elemen `#fiezelBootSplash`
+     benar-benar lepas dari DOM (termasuk 320 ms animasi keluar `is-leaving`).
+
+### 7.2 Tabel Perbandingan Metrik Empiris (Sebelum vs Sesudah)
+
+| Skenario & Metrik | Sebelum (`m025-564`) | Sesudah (`m025-567`) | Perubahan |
+|---|---:|---:|---:|
+| **Warm, CPU 4x**: FCP | 864 ms | **320 ms** | **-63%** |
+| **Warm, CPU 4x**: `splashShow` | 4.274 ms | **3.538 ms** | **-736 ms** |
+| **Warm, CPU 4x**: `splashGone` (total waktu splash) | 5.320 ms | **4.533 ms** | **-787 ms** |
+| **Warm, CPU 4x**: Long task selama boot (`staticSplash.longtaskMs`) | 1.863 ms | **1.004 ms** | **-46%** |
+| **Warm, CPU 4x**: Long task tunggal terpanjang | 429 ms | **143 ms** | **-67%** |
+| **Warm, CPU 4x**: FPS selama boot (`staticSplash.fps`) | 24,2 fps | **37,3 fps** | **+54%** |
+| **Warm, CPU 4x**: FPS animasi cap PAW (`animation.fps`) | 25,7 fps | **36,0 fps** | **+40%** |
+| **Warm, CPU 4x**: Waktu beku animasi (`animation.frozenMs`) | 384 ms | **200 ms** | **-48%** |
+| **Warm, CPU 6x**: `splashShow` | 5.654 ms | **2.640 ms** | **-53%** |
+| **Warm, CPU 6x**: `splashGone` (total waktu splash) | 6.846 ms | **3.699 ms** | **-46%** |
+| **Warm, CPU 6x**: Long task selama boot (`staticSplash.longtaskMs`) | 2.752 ms | **648 ms** | **-76%** |
+| **Warm**: Jumlah fetch JSON saat boot | 17 (3 duplikat) | **11 (0 duplikat)** | **-6 fetch** |
+| **Cold, CPU 4x + Slow 4G**: Bug `secondSplash` (>15 dtk) | Muncul di 25.356 ms | **0 (Teratasi)** | **100% hilang** |
