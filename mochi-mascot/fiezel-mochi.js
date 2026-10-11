@@ -15,6 +15,19 @@
  */
 import * as THREE from './three.module.js';
 
+// Phones and tablets get a lighter render budget (m025-567). m025-542 removed this guard to
+// restore sharpness, which put full-desktop cost (MSAA, DPR 2, 128x96 mesh, 1024px skin
+// repainted on every mood change) on every mobile frame and made the PWA lag. The skin is
+// now painted in 1024-unit coordinates scaled onto the smaller canvas, so the 512px texture
+// keeps the full blush layout instead of only its top-left quarter.
+const IS_MOBILE = typeof window !== 'undefined' && (
+  window.innerWidth <= 768 ||
+  ('ontouchstart' in window) ||
+  (navigator.maxTouchPoints > 0)
+);
+const SKIN_RES = IS_MOBILE ? 512 : 1024;
+const BADGE_SCALE = IS_MOBILE ? 0.5 : 1;
+
 export class FiezelMochi {
   constructor(container, options = {}) {
     this.container = typeof container === 'string' ? document.querySelector(container) : container;
@@ -97,14 +110,14 @@ export class FiezelMochi {
 
 
     this.renderer = new THREE.WebGLRenderer({
-      antialias: true,
+      antialias: !IS_MOBILE,
       alpha: true,
       powerPreference: 'high-performance'
     });
     // Tone mapping is strictly NoToneMapping to banish dark/black edge fringes along transparent alpha borders!
     this.renderer.toneMapping = THREE.NoToneMapping;
     this.renderer.setSize(this.width, this.height);
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, IS_MOBILE ? 1.5 : 2));
 
     this.renderer.domElement.style.width = '100%';
     this.renderer.domElement.style.height = '100%';
@@ -179,7 +192,7 @@ export class FiezelMochi {
    * Ultra-dense 128x96 subdivision for mathematically silky smooth antialiased contours.
    */
   createMochiMesh() {
-    const geo = new THREE.SphereGeometry(1.22, 128, 96);
+    const geo = new THREE.SphereGeometry(1.22, IS_MOBILE ? 56 : 128, IS_MOBILE ? 42 : 96);
     const pos = geo.attributes.position;
 
     for (let i = 0; i < pos.count; i++) {
@@ -231,8 +244,8 @@ export class FiezelMochi {
     // AUTHENTIC GLOSSY DAIFUKU MOCHI WITH AIRBRUSHED ROSY CHEEK CONTOURS
     // Paints soft, delectable rosy blushes directly onto the daifuku rice skin texture
     this.skinCanvas = document.createElement('canvas');
-    this.skinCanvas.width = 1024;
-    this.skinCanvas.height = 1024;
+    this.skinCanvas.width = SKIN_RES;
+    this.skinCanvas.height = SKIN_RES;
     this.sCtx = this.skinCanvas.getContext('2d');
     this.mochiSkinTexture = new THREE.CanvasTexture(this.skinCanvas);
 
@@ -348,6 +361,8 @@ export class FiezelMochi {
   updateSkinBlush() {
     if (!this.sCtx || !this.skinCanvas) return;
     const sCtx = this.sCtx;
+    // All painting below is authored in 1024-unit coordinates.
+    sCtx.setTransform(SKIN_RES / 1024, 0, 0, SKIN_RES / 1024, 0, 0);
     const bgGrad = sCtx.createLinearGradient(0, 0, 0, 1024);
     bgGrad.addColorStop(0.00, '#FFFFFF');
     bgGrad.addColorStop(0.50, '#FFFDF9');
@@ -1161,8 +1176,8 @@ export class FiezelMochi {
     this.mochiGroup.add(this.badgeGroup);
 
     this.badgeCanvas = document.createElement('canvas');
-    this.badgeCanvas.width = 512;
-    this.badgeCanvas.height = 320;
+    this.badgeCanvas.width = 512 * BADGE_SCALE;
+    this.badgeCanvas.height = 320 * BADGE_SCALE;
     this.badgeCtx = this.badgeCanvas.getContext('2d');
     this.badgeTex = new THREE.CanvasTexture(this.badgeCanvas);
 
@@ -1188,6 +1203,8 @@ export class FiezelMochi {
     this.badgeGroup.visible = true;
 
     const ctx = this.badgeCtx;
+    // The typing badge redraws ~20x/s; it is authored at 512x320 and drawn scaled.
+    ctx.setTransform(BADGE_SCALE, 0, 0, BADGE_SCALE, 0, 0);
     const w = 512;
     const h = 320;
     ctx.clearRect(0, 0, w, h);
@@ -1456,9 +1473,12 @@ export class FiezelMochi {
 
   // --- Public Modular Controls (Bongkar-Pasang) ---
   setMood(m) {
+    const wasPout = (this.mood === 'pout' || this.mood === 'sleepy');
     this.mood = m;
     this.updateFaceVisibility();
-    this.updateSkinBlush();
+    // The skin texture only differs between pout/sleepy and every other mood; repainting and
+    // re-uploading it on each same-look mood call stalled answer taps on phones.
+    if (wasPout !== (m === 'pout' || m === 'sleepy')) this.updateSkinBlush();
     this.triggerJiggle(0.18);
 
     // Dynamic hand emergence matching mood!
@@ -2157,6 +2177,7 @@ export class FiezelMochi {
   start() {
     let lastTime = performance.now();
     this.isVisible = true;
+    this._running = true;
     if (this.container && typeof IntersectionObserver !== 'undefined' && !this._visibilityObserver) {
       try {
         this._visibilityObserver = new IntersectionObserver((entries) => {
@@ -2167,10 +2188,14 @@ export class FiezelMochi {
     }
 
     const loop = (now) => {
-      if (!this.rafId) return;
-      if (this.isVisible === false) {
-        this.rafId = setTimeout(() => {
-          this.rafId = requestAnimationFrame(loop);
+      this.rafId = null;
+      if (!this._running) return;
+      // Offscreen or parked by the companion pool: poll at 4 Hz instead of rendering at 60 fps.
+      // The sleep timer is kept apart from rafId so destroy() can cancel each with its own API.
+      if (this.isVisible === false || this._paused) {
+        this._sleepTimer = setTimeout(() => {
+          this._sleepTimer = null;
+          if (this._running) this.rafId = requestAnimationFrame(loop);
         }, 250);
         return;
       }
@@ -2183,19 +2208,29 @@ export class FiezelMochi {
     this.rafId = requestAnimationFrame(loop);
   }
 
+  pause() {
+    this._paused = true;
+  }
+
+  resume() {
+    this._paused = false;
+  }
+
   destroy() {
+    this._running = false;
     if (this._visibilityObserver) {
       try { this._visibilityObserver.disconnect(); } catch (_) {}
       this._visibilityObserver = null;
     }
-    if (this.rafId) {
-      if (typeof this.rafId === 'number' && typeof cancelAnimationFrame === 'function') {
-        cancelAnimationFrame(this.rafId);
-      } else {
-        clearTimeout(this.rafId);
-      }
-      this.rafId = null;
+    if (this.rafId != null && typeof cancelAnimationFrame === 'function') {
+      cancelAnimationFrame(this.rafId);
     }
+    this.rafId = null;
+    if (this._sleepTimer) {
+      clearTimeout(this._sleepTimer);
+      this._sleepTimer = null;
+    }
+    clearTimeout(this._restoreRotTimeout);
     if (this.scene) {
       this.scene.traverse((obj) => {
         if (obj.geometry) {
@@ -2218,6 +2253,9 @@ export class FiezelMochi {
       if (this.renderer.domElement && this.renderer.domElement.parentNode) {
         this.renderer.domElement.parentNode.removeChild(this.renderer.domElement);
       }
+      // dispose() alone leaves the GL context alive until GC; iOS caps live contexts and keeps
+      // their memory, so release it now.
+      try { this.renderer.forceContextLoss(); } catch (_) {}
       try { this.renderer.dispose(); } catch (_) {}
       this.renderer = null;
     }

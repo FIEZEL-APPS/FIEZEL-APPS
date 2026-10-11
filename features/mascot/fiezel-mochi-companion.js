@@ -62,26 +62,18 @@
     return true;
   }
 
-  function attachMochi(host) {
-    if (!host || host.__mochiAttached) return;
-    if (!motionAllowed()) return;
-    if (!global.FiezelMochi) {
-      ensureMochiModule();
-      return;
-    }
-    if (!isPracticeHost(host)) return;
+  /* ONE live Mochi for the whole app (m025-567).
+     Every <fiezel-mascot> used to get its own WebGL renderer, 60 fps loop and body-wide
+     MutationObserver, and every quiz question re-render (setApp) threw that renderer away
+     and built a new one: new GL context, new geometry, new skin texture, shader compile -
+     the lag students felt on each "Lanjut" tap on phones. Now a single instance is moved
+     between hosts: the newest rendered host wins, the others keep the 2D rig, and with no
+     host left the instance is parked (paused) and freed after PARK_TTL_MS. */
+  var PARK_TTL_MS = 45000;
+  var pool = { mochi: null, viewport: null, host: null, ro: null, parkTimer: null, failed: false };
+  var seenSeq = 0;
 
-    host.__mochiAttached = true;
-    host.classList.add('mochi-active');
-
-    // Detect if this is a listening practice or question
-    var isListening = !!(host.closest('.fsl-player') ||
-                         host.closest('.quiz-listen-hero') ||
-                         host.closest('.jlpt-mobile-card') ||
-                         host.closest('.jlpt-mascot-slot') ||
-                         global.document.getElementById('quizListen'));
-
-    // Create 3D viewport mount element
+  function createViewport() {
     var viewport = global.document.createElement('div');
     viewport.className = 'fz-mochi-viewport';
     viewport.setAttribute('aria-hidden', 'true');
@@ -100,6 +92,303 @@
     viewport.style.userSelect = 'none';
     viewport.style.webkitUserSelect = 'none';
     viewport.style.zIndex = '2';
+    return viewport;
+  }
+
+  function measureHost(host) {
+    var w = host.offsetWidth > 20 ? host.offsetWidth : (host.getBoundingClientRect ? host.getBoundingClientRect().width : 380);
+    var h = host.offsetHeight > 20 ? host.offsetHeight : (host.getBoundingClientRect ? host.getBoundingClientRect().height : 360);
+    if (w <= 20) w = 380;
+    if (h <= 20) h = 360;
+    return { w: Math.round(w), h: Math.round(h) };
+  }
+
+  function createPoolInstance(size) {
+    var viewport = createViewport();
+    var mochi = new global.FiezelMochi(viewport, {
+      mood: 'dots',
+      badge: 'chat_purple',
+      aura: 'purple',
+      showHands: true,
+      showEars: true,
+      showTail: false,
+      width: size.w,
+      height: size.h
+    });
+
+    // Interactive tactile tap/click feedback
+    viewport.addEventListener('click', function (e) {
+      e.stopPropagation();
+      try {
+        mochi.triggerHop(0.28);
+        mochi.triggerHandGesture('wave', 1.2);
+        if (typeof mochi.triggerEarWiggle === 'function') mochi.triggerEarWiggle(1.3);
+      } catch (_) {}
+    });
+
+    // Responsive ResizeObserver, re-pointed at whichever host holds the viewport
+    var ro = null;
+    if (typeof global.ResizeObserver !== 'undefined') {
+      ro = new global.ResizeObserver(function (entries) {
+        for (var r = 0; r < entries.length; r++) {
+          var cr = entries[r].contentRect;
+          if (entries[r].target === pool.host && cr.width > 0 && cr.height > 0 && pool.mochi) {
+            pool.mochi.updateSize(cr.width, cr.height);
+          }
+        }
+      });
+    }
+
+    pool.mochi = mochi;
+    pool.viewport = viewport;
+    pool.ro = ro;
+  }
+
+  function hookHost(host) {
+    if (host.__mochiHooked) return;
+    host.__mochiHooked = true;
+
+    // Hook element react method
+    var origReact = typeof host.react === 'function' ? host.react.bind(host) : null;
+    host.react = function (evt, detail) {
+      var ret = true;
+      var isCustom3dEvent = (evt === 'question-shown' || evt === 'listening-start' || evt === 'listening-stop' || evt === 'hover-answer' || evt === 'hover-leave' || evt === 'answer-picked' || evt === 'idle');
+      // A host that shows the 2D rig again (Mochi moved to a newer host) gets every event.
+      if (origReact && (!isCustom3dEvent || !host.__mochiInstance)) {
+        try { ret = origReact(evt, detail); } catch (_) {}
+      }
+      if (!host.__mochiInstance) return ret;
+      var m = host.__mochiInstance;
+
+      switch (evt) {
+        case 'correct':
+          host.__mochiHoldUntil = Date.now() + 2200;
+          m.setMood('happy');
+          m.setAura('green');
+          m.setFx('stars');
+          m.triggerHop(0.38);
+          m.triggerHandGesture('cheer', 1.8);
+          setTimeout(function () {
+            if (Date.now() >= (host.__mochiHoldUntil || 0) && host.__mochiInstance) {
+              m.setMood('dots');
+              m.setBadge('chat_purple');
+              m.setAura('purple');
+              m.setFx(null);
+              m.retractHands();
+            }
+          }, 2300);
+          break;
+        case 'wrong':
+          // Toddler pout (manyun) on wrong answers!
+          host.__mochiHoldUntil = Date.now() + 2000;
+          m.setMood('pout');
+          m.setAura('pink');
+          m.setFx(null);
+          m.triggerHandGesture('sulk', 2.0);
+          setTimeout(function () {
+            if (Date.now() >= (host.__mochiHoldUntil || 0) && host.__mochiInstance) {
+              m.setMood('dots');
+              m.setBadge('chat_purple');
+              m.setAura('purple');
+              m.setFx(null);
+              m.retractHands();
+            }
+          }, 2100);
+          break;
+        case 'listening-start':
+          m.setMood('dots');
+          m.setBadge('chat_purple');
+          m.setAura('purple');
+          m.triggerHandGesture('wave', 1.2);
+          if (typeof m.triggerEarWiggle === 'function') m.triggerEarWiggle(1.3);
+          break;
+        case 'listening-stop':
+          m.setMood('dots');
+          m.setBadge('chat_purple'); // Keep indicator badge active
+          m.setAura('purple');
+          m.retractHands();
+          break;
+        case 'question-shown':
+          host.__mochiHoldUntil = 0;
+          m.setMood('dots');
+          m.setBadge('chat_purple'); // Always show indicator badge
+          m.setAura('purple');
+          m.retractHands();
+          if (typeof m.triggerEarWiggle === 'function') m.triggerEarWiggle(1.3);
+          break;
+        case 'idle':
+          host.__mochiHoldUntil = 0;
+          m.setMood('dots');
+          m.setBadge('chat_purple');
+          m.setAura('purple');
+          m.setFx(null);
+          m.retractHands();
+          break;
+        case 'hover-answer':
+          m.triggerHandGesture('wave', 1.5);
+          if (typeof m.triggerEarWiggle === 'function') m.triggerEarWiggle(0.8);
+          break;
+        case 'hover-leave':
+          m.retractHands();
+          break;
+        case 'answer-picked':
+          m.setMood('dots');
+          m.setBadge('chat_purple');
+          m.setAura('purple');
+          if (typeof m.triggerEarWiggle === 'function') m.triggerEarWiggle(1.0);
+          break;
+        case 'reward':
+        case 'milestone':
+        case 'level-up':
+        case 'completion':
+        case 'lesson-complete':
+          host.__mochiHoldUntil = Date.now() + 2500;
+          m.setMood('happy');
+          m.setAura('amber');
+          m.setFx('stars');
+          m.triggerHop(0.35);
+          m.triggerHandGesture('cheer', 1.8);
+          if (typeof m.triggerEarWiggle === 'function') m.triggerEarWiggle(1.6);
+          setTimeout(function () {
+            if (Date.now() >= (host.__mochiHoldUntil || 0) && host.__mochiInstance) {
+              m.setMood('dots');
+              m.setBadge('chat_purple');
+              m.setAura('purple');
+              m.setFx(null);
+              m.retractHands();
+            }
+          }, 2600);
+          break;
+        case 'lesson-start':
+        case 'session-start':
+        case 'greeting':
+        case 'welcome-back':
+        case 'onboard':
+          host.__mochiHoldUntil = 0;
+          m.setMood('dots');
+          m.setBadge('chat_purple');
+          m.setAura('purple');
+          m.triggerHop(0.25);
+          m.triggerHandGesture('wave', 1.4);
+          if (typeof m.triggerEarWiggle === 'function') m.triggerEarWiggle(1.3);
+          break;
+        case 'curious':
+        case 'encouraging':
+          host.__mochiHoldUntil = 0;
+          m.setMood('dots');
+          m.setBadge('chat_purple');
+          m.setAura('purple');
+          if (typeof m.triggerEarWiggle === 'function') m.triggerEarWiggle(1.3);
+          break;
+        case 'wake':
+          m.setMood('dots');
+          m.setBadge('chat_purple');
+          m.setAura('purple');
+          m.triggerHop(0.22);
+          if (typeof m.triggerEarWiggle === 'function') m.triggerEarWiggle(1.3);
+          break;
+      }
+      return ret;
+    };
+
+    // Hook element setState method
+    var origSetState = typeof host.setState === 'function' ? host.setState.bind(host) : null;
+    host.setState = function (name, opts) {
+      var ret = true;
+      if (origSetState) {
+        try { ret = origSetState(name, opts); } catch (_) {}
+      }
+      if (!host.__mochiInstance) return ret;
+      var m = host.__mochiInstance;
+
+      // If hold timer is active, do not let low-priority states stomp active mood
+      if (Date.now() < (host.__mochiHoldUntil || 0) &&
+          (name === 'idle' || name === 'encouraging' || name === 'curious')) {
+        return ret;
+      }
+
+      switch (name) {
+        case 'celebrating':
+        case 'proud':
+        case 'love':
+          m.setMood('happy');
+          m.setAura('green');
+          m.setFx('stars');
+          m.triggerHop(0.35);
+          m.triggerHandGesture('cheer', 1.8);
+          if (typeof m.triggerEarWiggle === 'function') m.triggerEarWiggle(1.3);
+          break;
+        case 'sad':
+        case 'confused':
+          m.setMood('pout');
+          m.setAura('pink');
+          m.setFx(null);
+          m.triggerHandGesture('sulk', 2.0);
+          break;
+        case 'listening':
+          m.setMood('dots');
+          m.setBadge('chat_purple');
+          m.setAura('purple');
+          if (typeof m.triggerEarWiggle === 'function') m.triggerEarWiggle(1.3);
+          break;
+        case 'curious':
+        case 'encouraging':
+          m.setMood('dots');
+          m.setBadge('chat_purple');
+          m.setAura('purple');
+          if (typeof m.triggerEarWiggle === 'function') m.triggerEarWiggle(1.3);
+          break;
+        case 'lesson-start':
+        case 'session-start':
+        case 'greeting':
+        case 'welcome-back':
+        case 'onboard':
+          m.setMood('dots');
+          m.setBadge('chat_purple');
+          m.setAura('purple');
+          m.triggerHop(0.25);
+          m.triggerHandGesture('wave', 1.4);
+          if (typeof m.triggerEarWiggle === 'function') m.triggerEarWiggle(1.3);
+          break;
+        case 'sleepy':
+          m.setMood('sleepy');
+          m.setBadge(null);
+          m.setAura(null);
+          break;
+        case 'idle':
+          m.setMood('dots');
+          m.setBadge('chat_purple'); // ALWAYS KEEP INDICATOR BADGE VISIBLE ON IDLE/DIAM!
+          m.setAura('purple');
+          m.setFx(null);
+          m.retractHands();
+          if (typeof m.triggerEarWiggle === 'function') m.triggerEarWiggle(0.9);
+          break;
+      }
+      return ret;
+    };
+
+  }
+
+  function releaseHost(host) {
+    if (!host) return;
+    host.__mochiInstance = null;
+    host.__mochiAttached = false;
+    host.__mochiHoldUntil = 0;
+    try { host.classList.remove('mochi-active'); } catch (_) {}
+    var svg = host.querySelector ? host.querySelector('.fz-svg') : null;
+    if (svg) {
+      svg.style.opacity = '';
+      svg.style.display = '';
+    }
+    if (pool.ro) {
+      try { pool.ro.unobserve(host); } catch (_) {}
+    }
+    if (pool.viewport && pool.viewport.parentNode === host) host.removeChild(pool.viewport);
+    if (pool.host === host) pool.host = null;
+  }
+
+  function mountOn(host) {
+    if (pool.host === host && host.__mochiInstance) return;
 
     // Ensure host has relative positioning so viewport covers it
     host.style.position = 'relative';
@@ -108,344 +397,162 @@
       host.style.width = '100%';
       host.style.height = '100%';
     }
+    var size = measureHost(host);
 
-    // Instantiate 3D Mochi mascot
-    var initialMood = 'dots';
-    var initialBadge = 'chat_purple';
-    var initialAura = 'purple';
-
-    var w = host.offsetWidth > 20 ? host.offsetWidth : (host.getBoundingClientRect ? host.getBoundingClientRect().width : 380);
-    var h = host.offsetHeight > 20 ? host.offsetHeight : (host.getBoundingClientRect ? host.getBoundingClientRect().height : 360);
-    if (w <= 20) w = 380;
-    if (h <= 20) h = 360;
-
-    try {
-      var mochi = new global.FiezelMochi(viewport, {
-        mood: initialMood,
-        badge: initialBadge,
-        aura: initialAura,
-        showHands: true,
-        showEars: true,
-        showTail: false,
-        width: Math.round(w),
-        height: Math.round(h)
-      });
-
-      host.__mochiInstance = mochi;
-
-      // Trigger initial welcoming ear wiggle on entry
+    if (!pool.mochi) {
       try {
-        if (typeof mochi.triggerEarWiggle === 'function') mochi.triggerEarWiggle(1.3);
-      } catch (_) {}
-
-      // Hide the 2D SVG visually while preserving it in the DOM for a11y & tests
-      var svg = host.querySelector('.fz-svg');
-      if (svg) {
-        svg.style.opacity = '0';
-        svg.style.display = 'none';
+        createPoolInstance(size);
+      } catch (err) {
+        // No WebGL here: every host keeps its 2D rig, and we stop retrying on each scan.
+        console.warn('[FiezelMochiCompanion] Failed to initialize 3D Mochi:', err);
+        pool.failed = true;
+        return;
       }
-
-      host.appendChild(viewport);
-
-      // Re-calibrate size after CSS modal/card pop animations settle (280ms)
-      setTimeout(function () {
-        try {
-          if (host && host.__mochiInstance) {
-            var r = host.getBoundingClientRect();
-            if (r.width > 20 && r.height > 20) {
-              host.__mochiInstance.updateSize(Math.round(r.width), Math.round(r.height));
-            }
-          }
-        } catch (_) {}
-      }, 280);
-
-      // Interactive tactile tap/click feedback
-      viewport.addEventListener('click', function (e) {
-        e.stopPropagation();
-        try {
-          mochi.triggerHop(0.28);
-          mochi.triggerHandGesture('wave', 1.2);
-          if (typeof mochi.triggerEarWiggle === 'function') mochi.triggerEarWiggle(1.3);
-        } catch (_) {}
-      });
-
-      // Hook element react method
-      var origReact = typeof host.react === 'function' ? host.react.bind(host) : null;
-      host.react = function (evt, detail) {
-        var ret = true;
-        var isCustom3dEvent = (evt === 'question-shown' || evt === 'listening-start' || evt === 'listening-stop' || evt === 'hover-answer' || evt === 'hover-leave' || evt === 'answer-picked' || evt === 'idle');
-        if (origReact && !isCustom3dEvent) {
-          try { ret = origReact(evt, detail); } catch (_) {}
-        }
-        if (!host.__mochiInstance) return ret;
-        var m = host.__mochiInstance;
-
-        switch (evt) {
-          case 'correct':
-            host.__mochiHoldUntil = Date.now() + 2200;
-            m.setMood('happy');
-            m.setAura('green');
-            m.setFx('stars');
-            m.triggerHop(0.38);
-            m.triggerHandGesture('cheer', 1.8);
-            setTimeout(function () {
-              if (Date.now() >= (host.__mochiHoldUntil || 0) && host.__mochiInstance) {
-                m.setMood('dots');
-                m.setBadge('chat_purple');
-                m.setAura('purple');
-                m.setFx(null);
-                m.retractHands();
-              }
-            }, 2300);
-            break;
-          case 'wrong':
-            // Toddler pout (manyun) on wrong answers!
-            host.__mochiHoldUntil = Date.now() + 2000;
-            m.setMood('pout');
-            m.setAura('pink');
-            m.setFx(null);
-            m.triggerHandGesture('sulk', 2.0);
-            setTimeout(function () {
-              if (Date.now() >= (host.__mochiHoldUntil || 0) && host.__mochiInstance) {
-                m.setMood('dots');
-                m.setBadge('chat_purple');
-                m.setAura('purple');
-                m.setFx(null);
-                m.retractHands();
-              }
-            }, 2100);
-            break;
-          case 'listening-start':
-            m.setMood('dots');
-            m.setBadge('chat_purple');
-            m.setAura('purple');
-            m.triggerHandGesture('wave', 1.2);
-            if (typeof m.triggerEarWiggle === 'function') m.triggerEarWiggle(1.3);
-            break;
-          case 'listening-stop':
-            m.setMood('dots');
-            m.setBadge('chat_purple'); // Keep indicator badge active
-            m.setAura('purple');
-            m.retractHands();
-            break;
-          case 'question-shown':
-            host.__mochiHoldUntil = 0;
-            m.setMood('dots');
-            m.setBadge('chat_purple'); // Always show indicator badge
-            m.setAura('purple');
-            m.retractHands();
-            if (typeof m.triggerEarWiggle === 'function') m.triggerEarWiggle(1.3);
-            break;
-          case 'idle':
-            host.__mochiHoldUntil = 0;
-            m.setMood('dots');
-            m.setBadge('chat_purple');
-            m.setAura('purple');
-            m.setFx(null);
-            m.retractHands();
-            break;
-          case 'hover-answer':
-            m.triggerHandGesture('wave', 1.5);
-            if (typeof m.triggerEarWiggle === 'function') m.triggerEarWiggle(0.8);
-            break;
-          case 'hover-leave':
-            m.retractHands();
-            break;
-          case 'answer-picked':
-            m.setMood('dots');
-            m.setBadge('chat_purple');
-            m.setAura('purple');
-            if (typeof m.triggerEarWiggle === 'function') m.triggerEarWiggle(1.0);
-            break;
-          case 'reward':
-          case 'milestone':
-          case 'level-up':
-          case 'completion':
-          case 'lesson-complete':
-            host.__mochiHoldUntil = Date.now() + 2500;
-            m.setMood('happy');
-            m.setAura('amber');
-            m.setFx('stars');
-            m.triggerHop(0.35);
-            m.triggerHandGesture('cheer', 1.8);
-            if (typeof m.triggerEarWiggle === 'function') m.triggerEarWiggle(1.6);
-            setTimeout(function () {
-              if (Date.now() >= (host.__mochiHoldUntil || 0) && host.__mochiInstance) {
-                m.setMood('dots');
-                m.setBadge('chat_purple');
-                m.setAura('purple');
-                m.setFx(null);
-                m.retractHands();
-              }
-            }, 2600);
-            break;
-          case 'lesson-start':
-          case 'session-start':
-          case 'greeting':
-          case 'welcome-back':
-          case 'onboard':
-            host.__mochiHoldUntil = 0;
-            m.setMood('dots');
-            m.setBadge('chat_purple');
-            m.setAura('purple');
-            m.triggerHop(0.25);
-            m.triggerHandGesture('wave', 1.4);
-            if (typeof m.triggerEarWiggle === 'function') m.triggerEarWiggle(1.3);
-            break;
-          case 'curious':
-          case 'encouraging':
-            host.__mochiHoldUntil = 0;
-            m.setMood('dots');
-            m.setBadge('chat_purple');
-            m.setAura('purple');
-            if (typeof m.triggerEarWiggle === 'function') m.triggerEarWiggle(1.3);
-            break;
-          case 'wake':
-            m.setMood('dots');
-            m.setBadge('chat_purple');
-            m.setAura('purple');
-            m.triggerHop(0.22);
-            if (typeof m.triggerEarWiggle === 'function') m.triggerEarWiggle(1.3);
-            break;
-        }
-        return ret;
-      };
-
-      // Hook element setState method
-      var origSetState = typeof host.setState === 'function' ? host.setState.bind(host) : null;
-      host.setState = function (name, opts) {
-        var ret = true;
-        if (origSetState) {
-          try { ret = origSetState(name, opts); } catch (_) {}
-        }
-        if (!host.__mochiInstance) return ret;
-        var m = host.__mochiInstance;
-
-        // If hold timer is active, do not let low-priority states stomp active mood
-        if (Date.now() < (host.__mochiHoldUntil || 0) &&
-            (name === 'idle' || name === 'encouraging' || name === 'curious')) {
-          return ret;
-        }
-
-        switch (name) {
-          case 'celebrating':
-          case 'proud':
-          case 'love':
-            m.setMood('happy');
-            m.setAura('green');
-            m.setFx('stars');
-            m.triggerHop(0.35);
-            m.triggerHandGesture('cheer', 1.8);
-            if (typeof m.triggerEarWiggle === 'function') m.triggerEarWiggle(1.3);
-            break;
-          case 'sad':
-          case 'confused':
-            m.setMood('pout');
-            m.setAura('pink');
-            m.setFx(null);
-            m.triggerHandGesture('sulk', 2.0);
-            break;
-          case 'listening':
-            m.setMood('dots');
-            m.setBadge('chat_purple');
-            m.setAura('purple');
-            if (typeof m.triggerEarWiggle === 'function') m.triggerEarWiggle(1.3);
-            break;
-          case 'curious':
-          case 'encouraging':
-            m.setMood('dots');
-            m.setBadge('chat_purple');
-            m.setAura('purple');
-            if (typeof m.triggerEarWiggle === 'function') m.triggerEarWiggle(1.3);
-            break;
-          case 'lesson-start':
-          case 'session-start':
-          case 'greeting':
-          case 'welcome-back':
-          case 'onboard':
-            m.setMood('dots');
-            m.setBadge('chat_purple');
-            m.setAura('purple');
-            m.triggerHop(0.25);
-            m.triggerHandGesture('wave', 1.4);
-            if (typeof m.triggerEarWiggle === 'function') m.triggerEarWiggle(1.3);
-            break;
-          case 'sleepy':
-            m.setMood('sleepy');
-            m.setBadge(null);
-            m.setAura(null);
-            break;
-          case 'idle':
-            m.setMood('dots');
-            m.setBadge('chat_purple'); // ALWAYS KEEP INDICATOR BADGE VISIBLE ON IDLE/DIAM!
-            m.setAura('purple');
-            m.setFx(null);
-            m.retractHands();
-            if (typeof m.triggerEarWiggle === 'function') m.triggerEarWiggle(0.9);
-            break;
-        }
-        return ret;
-      };
-
-      // Monitor detachment to clean up WebGL resources
-      var removeObserver = null;
-      var checkRemoval = function () {
-        if (!global.document.contains(host)) {
-          if (host.__mochiInstance) {
-            host.__mochiInstance.destroy();
-            host.__mochiInstance = null;
-          }
-          host.__mochiAttached = false;
-          if (removeObserver) {
-            removeObserver.disconnect();
-            removeObserver = null;
-          }
-        }
-      };
-
-      removeObserver = new MutationObserver(checkRemoval);
-      removeObserver.observe(global.document.body || global.document.documentElement, {
-        childList: true,
-        subtree: true
-      });
-
-      // Responsive ResizeObserver
-      if (typeof global.ResizeObserver !== 'undefined') {
-        var ro = new global.ResizeObserver(function (entries) {
-          for (var r = 0; r < entries.length; r++) {
-            var cr = entries[r].contentRect;
-            if (cr.width > 0 && cr.height > 0 && host.__mochiInstance) {
-              host.__mochiInstance.updateSize(cr.width, cr.height);
-            }
-          }
-        });
-        ro.observe(host);
-      }
-
-    } catch (err) {
-      console.warn('[FiezelMochiCompanion] Failed to initialize 3D Mochi:', err);
-      // Fallback: restore 2D SVG visibility
-      var origSvg = host.querySelector('.fz-svg');
-      if (origSvg) origSvg.style.opacity = '1';
-      host.__mochiAttached = false;
     }
+
+    if (pool.host && pool.host !== host) releaseHost(pool.host);
+    if (pool.parkTimer) {
+      clearTimeout(pool.parkTimer);
+      pool.parkTimer = null;
+    }
+
+    var m = pool.mochi;
+    host.__mochiAttached = true;
+    host.__mochiInstance = m;
+    host.__mochiHoldUntil = 0;
+    host.classList.add('mochi-active');
+    hookHost(host);
+
+    // Hide the 2D SVG visually while preserving it in the DOM for a11y & tests
+    var svg = host.querySelector('.fz-svg');
+    if (svg) {
+      svg.style.opacity = '0';
+      svg.style.display = 'none';
+    }
+
+    host.appendChild(pool.viewport);
+    pool.host = host;
+    if (pool.ro) pool.ro.observe(host);
+    m.updateSize(size.w, size.h);
+
+    // Same entrance a freshly built Mochi used to make on a new host
+    try {
+      if (m.mood !== 'dots') m.setMood('dots');
+      m.setBadge('chat_purple');
+      m.setAura('purple');
+      m.setFx(null);
+      m.retractHands();
+      m.resume();
+      if (typeof m.triggerEarWiggle === 'function') m.triggerEarWiggle(1.3);
+    } catch (_) {}
+
+    // Re-calibrate size after CSS modal/card pop animations settle (280ms)
+    setTimeout(function () {
+      try {
+        if (pool.host === host && pool.mochi) {
+          var r = host.getBoundingClientRect();
+          if (r.width > 20 && r.height > 20) {
+            pool.mochi.updateSize(Math.round(r.width), Math.round(r.height));
+          }
+        }
+      } catch (_) {}
+    }, 280);
+  }
+
+  function destroyPool() {
+    if (pool.parkTimer) {
+      clearTimeout(pool.parkTimer);
+      pool.parkTimer = null;
+    }
+    if (pool.host) releaseHost(pool.host);
+    if (pool.ro) {
+      try { pool.ro.disconnect(); } catch (_) {}
+    }
+    if (pool.mochi) {
+      try { pool.mochi.destroy(); } catch (_) {}
+    }
+    pool.mochi = null;
+    pool.viewport = null;
+    pool.ro = null;
+  }
+
+  function park() {
+    if (pool.host) releaseHost(pool.host);
+    if (!pool.mochi) return;
+    pool.mochi.pause();
+    if (!pool.parkTimer) pool.parkTimer = setTimeout(destroyPool, PARK_TTL_MS);
+  }
+
+  // Judge the slot, not the host: CSS keeps some hosts (.writing-mascot, .path-mascot)
+  // display:none until they hold the viewport, so the host alone would never qualify.
+  function isRendered(el) {
+    return (el.parentElement || el).getClientRects().length > 0;
+  }
+
+  // Is host `a` a better home for Mochi than host `b`? Rendered beats display:none, then
+  // the most recently discovered host, then the larger one. Ties keep the current host.
+  function outranks(a, b) {
+    var ra = isRendered(a), rb = isRendered(b);
+    if (ra !== rb) return ra;
+    if (a.__mochiSeen !== b.__mochiSeen) return a.__mochiSeen > b.__mochiSeen;
+    return a.offsetWidth * a.offsetHeight > b.offsetWidth * b.offsetHeight;
+  }
+
+  function pickHost() {
+    var mascots = global.document.querySelectorAll('fiezel-mascot');
+    var stamp = 0;
+    var best = (pool.host && pool.host.isConnected) ? pool.host : null;
+    for (var i = 0; i < mascots.length; i++) {
+      var el = mascots[i];
+      if (!el.__mochiSeen) {
+        // Hosts that appear in the same scan share a stamp; size breaks the tie.
+        if (!stamp) stamp = ++seenSeq;
+        el.__mochiSeen = stamp;
+      }
+      if (el === best || !isPracticeHost(el)) continue;
+      if (!best || outranks(el, best)) best = el;
+    }
+    return best;
   }
 
   function scanAndAttach() {
     try {
-      var mascots = global.document.querySelectorAll('fiezel-mascot');
-      for (var i = 0; i < mascots.length; i++) {
-        attachMochi(mascots[i]);
+      if (!motionAllowed()) {
+        if (pool.mochi) destroyPool();
+        return;
       }
+      if (!global.FiezelMochi) {
+        ensureMochiModule();
+        return;
+      }
+      if (pool.failed) return;
+      var best = pickHost();
+      if (best) mountOn(best);
+      else park();
     } catch (_) {}
   }
 
+  function attachMochi(host) {
+    if (!host || !motionAllowed() || !isPracticeHost(host)) return;
+    // An explicit attach outranks every host discovered so far.
+    host.__mochiSeen = ++seenSeq;
+    if (!global.FiezelMochi) {
+      ensureMochiModule();
+      return;
+    }
+    if (pool.failed) return;
+    try { mountOn(host); } catch (_) {}
+  }
+
   // Load FiezelMochi module if not yet loaded
+  var moduleLoading = false;
   function ensureMochiModule() {
     if (global.FiezelMochi) {
       scanAndAttach();
       return;
     }
+    if (moduleLoading) return;
+    moduleLoading = true;
     var base = '';
     try {
       base = new URL('.', window.location.href).href;
@@ -459,15 +566,34 @@
       '/app/mochi-mascot/fiezel-mochi.js'
     ];
     function tryNext(idx) {
-      if (idx >= candidatePaths.length) return;
+      if (idx >= candidatePaths.length) {
+        moduleLoading = false;
+        return;
+      }
       import(candidatePaths[idx]).then(function (mod) {
         if (mod && mod.FiezelMochi) global.FiezelMochi = mod.FiezelMochi;
+        moduleLoading = false;
         scanAndAttach();
       }).catch(function () {
         tryNext(idx + 1);
       });
     }
     tryNext(0);
+  }
+
+  // Only a new <fiezel-mascot> or the loss of the current host can change who holds Mochi.
+  function needsRescan(mutations) {
+    if (pool.host && !pool.host.isConnected) return true;
+    for (var i = 0; i < mutations.length; i++) {
+      var added = mutations[i].addedNodes;
+      if (!added) continue;
+      for (var j = 0; j < added.length; j++) {
+        var n = added[j];
+        if (n.nodeType !== 1) continue;
+        if (n.localName === 'fiezel-mascot' || (n.firstElementChild && n.querySelector('fiezel-mascot'))) return true;
+      }
+    }
+    return false;
   }
 
   function isSplashActive() {
@@ -481,21 +607,11 @@
     function start() {
       ensureMochiModule();
 
-      // DOM MutationObserver for dynamically inserted quiz stages and practice panels (debounced)
+      // One body-wide MutationObserver hands Mochi to new quiz stages and practice panels.
+      // It runs before paint, so a re-rendered question never flashes the 2D rig first.
       try {
-        var moTimer = null;
         var mo = new MutationObserver(function (mutations) {
-          var hasAdded = false;
-          for (var i = 0; i < mutations.length; i++) {
-            if (mutations[i].addedNodes && mutations[i].addedNodes.length > 0) {
-              hasAdded = true;
-              break;
-            }
-          }
-          if (hasAdded) {
-            if (moTimer) clearTimeout(moTimer);
-            moTimer = setTimeout(scanAndAttach, 60);
-          }
+          if (needsRescan(mutations)) scanAndAttach();
         });
         mo.observe(global.document.body || global.document.documentElement, {
           childList: true,
