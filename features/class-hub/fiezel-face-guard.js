@@ -3,7 +3,8 @@
  *
  * TUJUAN:
  * Memastikan murid hadir menghadap layar selama ujian resmi dari guru (mode 'ujian').
- * Sampel tiap 250 ms pada bingkai mini 64x48 dari kamera 320x240 — ringan untuk ponsel.
+ * Sampel tiap 500 ms (2 FPS, satu readback kanvas) pada bingkai mini 64x48 dari kamera
+ * 320x240 @ ±15 fps — ringan untuk baterai ponsel murid.
  *
  * BATAS JUJUR MODUL INI: ia memeriksa KEHADIRAN wajah yang hidup, BUKAN identitas. Profil
  * "enrollment" hanyalah statistik warna kulit & posisi untuk menstabilkan deteksi; ia tidak
@@ -12,8 +13,10 @@
  * PRINSIP:
  * 1. Tanpa Crash / Graceful: Jika izin kamera ditolak atau perangkat tidak memiliki kamera,
  *    ujian tetap berjalan — dan guru menerima tanda "tanpa kamera" (lihat class-hub).
- * 2. Peringatan Halus: wajah hilang > 2 dtk (debounce) membuka episode; 3 dtk memunculkan
- *    kartu peringatan; episode di bawah FACE_GRACE_MS (focus-guard) dibuang.
+ * 2. Peringatan Halus: wajah hilang > 2 dtk (debounce jam dinding) membuka episode; 3 dtk
+ *    memunculkan kartu peringatan; episode di bawah FACE_GRACE_MS (focus-guard) dibuang.
+ *    Satu-dua bingkai gagal tidak memicu apa pun; satu kilasan "hadir" di tengah kehilangan
+ *    harus dikonfirmasi bingkai kedua sebelum jamnya direset.
  * 3. Liveness pra-ujian: kedip, toleh kepala 3D, atau diam tenang >= 3 dtk YANG MASIH
  *    menunjukkan dinamika hidup. Profil baru dikunci SETELAH liveness lulus — sebelum itu
  *    pemeriksaan anti-foto tetap menyala.
@@ -26,7 +29,9 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
 
-  var SAMPLE_INTERVAL_MS = 250;
+  // 2 sampel/dtk selama ujian (m025-565; dulu 4/dtk dengan DUA readback kanvas per tick).
+  // Peringatan butuh >= 3 dtk hilang, jadi 500 ms masih memberi 6 sampel per jendela itu.
+  var SAMPLE_INTERVAL_MS = 500;
   var WARN_THRESHOLD_MS = 3000;
   var ABSENT_THRESHOLD_MS = 4500;
   // Jalur "diam tenang": hadir terus-menerus selama ini (jam dinding, bukan hitungan tick —
@@ -40,7 +45,7 @@
   // Kamera terputus di tengah ujian: coba sambung ulang tiap 5 dtk; gagal 3x = lapor hilang.
   var REACQUIRE_GAP_MS = 5000;
   var REACQUIRE_FAILS_LOST = 3;
-  var PROFILE_KEYS = ['sampleCount', 'cbMean', 'crMean', 'cbMin', 'cbMax', 'crMin', 'crMax', 'normRMean', 'normBMean', 'boxWMean', 'boxHMean', 'skinCountMean', 'cXMean', 'cYMean', 'eyeDipMean', 'asymMean', 'avgBrMean'];
+  var PROFILE_KEYS = ['sampleCount', 'cbMean', 'crMean', 'cbMin', 'cbMax', 'crMin', 'crMax', 'normRMean', 'normBMean', 'boxWMean', 'boxHMean', 'skinCountMean', 'cXMean', 'cYMean', 'eyeDipMean', 'asymMean', 'avgBrMean', 'dipNMean'];
 
   var enrolledProfile = {
     valid: false,
@@ -60,7 +65,10 @@
     cYMean: 24,
     eyeDipMean: 1.2,
     asymMean: 2.0,
-    avgBrMean: 100
+    avgBrMean: 100,
+    // Kontras pita mata ternormalisasi saat verifikasi (m025-565). 0 = belum diketahui
+    // (profil lama yang dipulihkan) → ambang ujian memakai batas atas yang aman.
+    dipNMean: 0
   };
 
   function resetEnrolledProfile() {
@@ -82,6 +90,7 @@
     enrolledProfile.eyeDipMean = 1.2;
     enrolledProfile.asymMean = 2.0;
     enrolledProfile.avgBrMean = 100;
+    enrolledProfile.dipNMean = 0;
   }
 
   /**
@@ -125,11 +134,20 @@
     enrolledProfile.eyeDipMean = mix(enrolledProfile.eyeDipMean, frameRes.eyeDip);
     enrolledProfile.asymMean = mix(enrolledProfile.asymMean, frameRes.asym);
     enrolledProfile.avgBrMean = mix(enrolledProfile.avgBrMean, frameRes.avgBr);
+    enrolledProfile.dipNMean = mix(enrolledProfile.dipNMean, frameRes.dipN || 0);
     enrolledProfile.sampleCount = n + 1;
   }
 
-  var absentStreak = 0;
-  var ABSENT_DEBOUNCE_FRAMES = 8; // 8 frames x 250ms = 2.0 detik
+  // Debounce temporal berbasis JAM, bukan hitungan bingkai (dulu 8 bingkai x 250 ms — dan
+  // tick yang diperlambat peramban membuat "2 dtk" jadi 8 dtk). Wajah dianggap hilang hanya
+  // bila tidak ada kehadiran TERKONFIRMASI sejak bingkai gagal pertama:
+  // - onAbsent setelah ABSENT_DEBOUNCE_MS, peringatan setelah WARN_THRESHOLD_MS, episode
+  //   setelah ABSENT_THRESHOLD_MS — semuanya dihitung dari bingkai gagal PERTAMA;
+  // - satu bingkai "hadir" di tengah kehilangan harus dikonfirmasi bingkai hadir kedua dalam
+  //   CONFIRM_PRESENT_MS. Satu kilasan lolos (kardus yang sesaat mirip wajah) tidak lagi
+  //   memutar balik jam; satu-dua bingkai gagal (lag, blur) tidak pernah memicu apa pun.
+  var ABSENT_DEBOUNCE_MS = 2000;
+  var CONFIRM_PRESENT_MS = 1500;
 
   var state = {
     active: false,
@@ -140,6 +158,8 @@
     timer: null,
     detector: null,
     absentSince: 0,
+    firstMissAt: 0,
+    lastHitAt: 0,
     warned: false,
     lastNativeFace: false,
     lastNativeFaceTime: 0,
@@ -181,17 +201,17 @@
   /**
    * Deteksi Artefak Layar Digital & Glare Kaca (Anti-Phone Screen & Anti-Laptop).
    */
-  function detectScreenArtifacts(d, w, h, Ygrid, minX, maxX, minY, maxY, cX, cY, eyeDip) {
-    var glareCount = 0;
-    var boxW = (maxX - minX) + 1;
-    var boxH = (maxY - minY) + 1;
-    var boxArea = boxW * boxH;
-
+  function detectScreenArtifacts(d, w, minY, maxY, rMin, rMax) {
+    // Hanya di dalam SILUET wajah (rentang kulit per baris), bukan kotak persegi: sudut kotak
+    // di luar oval wajah berisi latar — jendela terang di belakang murid (backlight) dulu
+    // terhitung "silau kaca layar" dan murid dituduh memakai foto di layar HP.
+    var glareCount = 0, area = 0;
     for (var y = minY; y <= maxY; y++) {
-      for (var x = minX; x <= maxX; x++) {
+      if (rMax[y] < rMin[y]) continue;
+      for (var x = rMin[y]; x <= rMax[y]; x++) {
         var idx = (y * w + x) * 4;
         var r = d[idx], g = d[idx + 1], b = d[idx + 2];
-
+        area++;
         // Glass Specular Glare: pantulan lampu intensif pada kaca layar HP / laptop
         // R, G, B > 235 dengan saturasi mendekati nol (|R-G| <= 10, |G-B| <= 10, |R-B| <= 10)
         if (r > 235 && g > 235 && b > 235 && Math.abs(r - g) <= 10 && Math.abs(g - b) <= 10 && Math.abs(r - b) <= 10) {
@@ -199,16 +219,9 @@
         }
       }
     }
-
     // Glare kaca layar: pantulan cermin kaca layar menutupi area signifikan (>= 25 px dan >= 7% area wajah)
-    var hasGlassGlare = (glareCount >= 25 && boxArea > 0 && (glareCount / boxArea) >= 0.07);
-
-    return {
-      isScreen: hasGlassGlare,
-      hasGlassGlare: hasGlassGlare,
-      hasBacklightBleed: false,
-      hasMoire: false
-    };
+    var hasGlassGlare = (glareCount >= 25 && area > 0 && (glareCount / area) >= 0.07);
+    return { isScreen: hasGlassGlare, hasGlassGlare: hasGlassGlare, hasBacklightBleed: false, hasMoire: false };
   }
 
   function recordTemporalFrame(now, cX, cY, boxW, boxH, eyeDip, asym, Ygrid, w, h) {
@@ -300,313 +313,433 @@
     };
   }
 
-  /**
-   * Analisis computer vision presisi tinggi pada frame 64x48.
-   * Mengukur klaster kromatisitas YCbCr kulit manusia, konsentrasi oval tengah,
-   * gradien mikro-tekstur fitur wajah (mata/alis/hidung/mulut), serta kontras Haar vertikal (eye-dip).
-   * Mampu menolak secara akurat: ruangan gelap, silau, dinding kosong, meja kayu,
-   * telapak tangan penutup kamera, dan pengguna yang berpaling/meninggalkan layar.
-   */
+  /* ==========================================================================
+   * ANALISIS BINGKAI 64x48 (m025-565)
+   * --------------------------------------------------------------------------
+   * Probe tools/dev/probe-face-robustness.mjs (kamera sintetis 3D, tools/face-synth.js)
+   * membuktikan mesin m025-563 menolak 35 dari 37 wajah sungguhan — termasuk wajah frontal
+   * biasa — karena tiga cacat lokalisasi, bukan karena ambang yang kurang longgar:
+   *
+   * 1. RAMBUT HITAM DIHITUNG KULIT. Cabang "kulit redup" (yLum < 60) menerima piksel hangat
+   *    gelap apa pun, dan rambut hitam (≈ 42,35,32) memang hangat. Kotak kulit membengkak
+   *    sampai ubun-ubun, jendela dahi jatuh di rambut, eyeDip negatif → ditolak.
+   *    Kini kulit dinormalisasi terhadap terang & saturasi-relatif klaster kulit di bingkai
+   *    itu sendiri: rambut tetap gelap & pucat relatif terhadap kulit di cahaya apa pun.
+   * 2. KOTAK = SEMUA PIKSEL KULIT DI BINGKAI. Kusen pintu / lemari kayu di tepi, leher yang
+   *    terlihat, dan seragam cokelat ikut melebarkan/memanjangkan kotak. Kini kotak = komponen
+   *    terhubung kulit yang paling besar & paling tengah, dipotong di dagu (lebar baris
+   *    menyempit ke leher).
+   * 3. JENDELA HAAR PROPORSI TETAP. Poni, kerudung, dan kepala menunduk menggeser letak mata
+   *    di dalam kotak, sehingga jendela "dahi" jatuh di mata dan jendela "mata" jatuh di
+   *    hidung. Kini pita mata DICARI: lembah lokal (dahi → alis/mata → pipi) di dua kolom
+   *    mata, dibandingkan dengan baris kulit tercerah di bawahnya. Kontrasnya dinormalisasi
+   *    terhadap terang kulit (dipN), jadi wajah redup dan wajah backlight dinilai sama.
+   *
+   * Permukaan bukan-wajah (kardus, dinding, meja) tidak punya pita gelap yang diapit kulit
+   * terang; telapak tangan punya "pita" di sela jari tetapi tanpa struktur wajah bawah;
+   * buku/kardus yang didekatkan lebih lebar dari 70% bingkai. Silau layar dihitung di dalam
+   * siluet wajah saja (dulu jendela terang di belakang murid = "foto di layar HP").
+   * ========================================================================== */
+  var FW = 64, FH = 48, FN = FW * FH;
+  // Model kulit universal bebas-cahaya: sudut rona (hue) & saturasi relatif di bidang CbCr.
+  var SKIN_HUE_MIN = 100, SKIN_HUE_MAX = 158, SKIN_SAT_MIN = 0.05, SKIN_SAT_MAX = 0.75;
+  // Kontras pita mata minimum (dipN = (pipi − pita mata) / terang kulit).
+  var DIP_MIN_UNIVERSAL = 0.05;
+  var DIP_MIN_ENROLLED_FLOOR = 0.03;
+  var DIP_MIN_ENROLLED_CEIL = 0.05;
+  // Pita mata di bawah ini baru dipercaya bila ada struktur wajah bawah (MOUTH_MIN_N).
+  var STRONG_BAND_N = 0.25, MOUTH_MIN_N = 0.15;
+  // Rasio tinggi/lebar kotak terhadap profil di atas ini = wajah tampak samping.
+  var TURNED_ASPECT_RATIO = 1.4;
+  // Buffer dipakai ulang tiap bingkai — tanpa alokasi per tick (GC ponsel murah).
+  var bufY = new Float32Array(FN), bufSat = new Float32Array(FN), bufCb = new Float32Array(FN), bufCr = new Float32Array(FN);
+  var bufCand = new Uint8Array(FN), bufMask = new Uint8Array(FN), bufLabel = new Int32Array(FN), bufQueue = new Int32Array(FN);
+  var histY = new Uint32Array(64), histS = new Uint32Array(80);
+  var rowMin = new Int32Array(FH), rowMax = new Int32Array(FH), rowCnt = new Int32Array(FH), rowSm = new Float32Array(FH), rowRaw = new Float32Array(FH);
+  var rowSkin = new Float32Array(FH), rowCen = new Float32Array(FH);
+
+  function histPick(hist, total, p) {
+    var target = total * p, acc = 0;
+    for (var i = 0; i < hist.length; i++) { acc += hist[i]; if (acc >= target) return i + 0.5; }
+    return hist.length - 0.5;
+  }
+
+  /** Satu readback kanvas per tick. */
+  function grabPixels(video, ctx) {
+    ctx.drawImage(video, 0, 0, FW, FH);
+    return ctx.getImageData(0, 0, FW, FH).data;
+  }
+
+  /** 192 titik luminans (grid 16x12) dari data yang sudah diambil — tanpa readback kedua. */
+  function signatureOf(d) {
+    var sig = new Float32Array(192);
+    for (var sy = 0; sy < 12; sy++) {
+      for (var sx = 0; sx < 16; sx++) {
+        var i = ((sy * 4) * FW + sx * 4) * 4;
+        sig[sy * 16 + sx] = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+      }
+    }
+    return sig;
+  }
+
   function analyzeFrame(video, canvas, ctx, nativeBox) {
     if (!video || !canvas || !ctx) return { present: false, isSpoof: false };
     if (video.readyState < 2) return { present: false, isSpoof: false };
     try {
-      var w = 64, h = 48;
-      ctx.drawImage(video, 0, 0, w, h);
-      var imgData = ctx.getImageData(0, 0, w, h);
-      var d = imgData.data;
-
-      var totalY = 0, minBr = 255, maxBr = 0;
-      var skinCount = 0, centerSkin = 0, centerTotal = 0;
-      var sumX = 0, sumY = 0;
-      var skinSumCb = 0, skinSumCr = 0, skinSumNormR = 0, skinSumNormB = 0;
-      var minX = w, maxX = 0, minY = h, maxY = 0;
-      var cX1 = 16, cX2 = 48, cY1 = 8, cY2 = 40;
-
-      var Ygrid = new Float32Array(w * h);
-
-      for (var y = 0; y < h; y++) {
-        for (var x = 0; x < w; x++) {
-          var idx = (y * w + x) * 4;
-          var r = d[idx], g = d[idx + 1], b = d[idx + 2];
-          var yLum = 0.299 * r + 0.587 * g + 0.114 * b;
-          var cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b;
-          var cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b;
-
-          Ygrid[y * w + x] = yLum;
-          totalY += yLum;
-          if (yLum < minBr) minBr = yLum;
-          if (yLum > maxBr) maxBr = yLum;
-
-          var rgbSum = r + g + b;
-          var normR = rgbSum > 0 ? (r / rgbSum) : 0;
-          var normB = rgbSum > 0 ? (b / rgbSum) : 0;
-
-          var isPureLightGlare = (r > 240 && g > 240 && b > 240);
-          var isSkin = false;
-
-          if (!isPureLightGlare) {
-            if (enrolledProfile.valid) {
-              // Profil Terkalibrasi Spesifik Murid: adaptif terhadap warna kulit dan pencahayaan ruangan
-              var cbDiffFromBase = Math.abs(cb - enrolledProfile.cbMean);
-              var crDiffFromBase = Math.abs(cr - enrolledProfile.crMean);
-              var crCbDiff = cr - cb;
-              if (yLum < 60) {
-                isSkin = (
-                  cbDiffFromBase <= 32 &&
-                  crDiffFromBase <= 32 &&
-                  r >= (b + 1) &&
-                  (r + 3) >= g &&
-                  crCbDiff >= 1 &&
-                  yLum >= 6
-                );
-              } else {
-                isSkin = (
-                  cbDiffFromBase <= 30 &&
-                  crDiffFromBase <= 30 &&
-                  r >= (b + 2) &&
-                  (r + 4) >= g &&
-                  crCbDiff >= 2 &&
-                  normB <= Math.min(0.38, enrolledProfile.normBMean + 0.12) &&
-                  yLum <= 230
-                );
-              }
-            } else {
-              // Model kromatisitas kulit universal pra-kalibrasi
-              if (cb >= 70 && cb <= 145 && cr >= 125 && cr <= 185) {
-                var crCbDiff = cr - cb;
-                if (yLum < 60) {
-                  isSkin = (
-                    r >= (b + 2) &&
-                    (r + 3) >= g &&
-                    crCbDiff >= 2 &&
-                    normB <= 0.35 &&
-                    yLum >= 8
-                  );
-                } else {
-                  isSkin = (
-                    r >= (b + 3) &&
-                    (r + 4) >= g &&
-                    crCbDiff >= 4 &&
-                    normR >= 0.33 &&
-                    normB <= 0.33 &&
-                    yLum <= 215
-                  );
-                }
-              }
-            }
-          }
-
-          if (isSkin) {
-            skinCount++;
-            sumX += x;
-            sumY += y;
-            skinSumCb += cb;
-            skinSumCr += cr;
-            skinSumNormR += normR;
-            skinSumNormB += normB;
-            if (x < minX) minX = x;
-            if (x > maxX) maxX = x;
-            if (y < minY) minY = y;
-            if (y > maxY) maxY = y;
-          }
-
-          if (x >= cX1 && x <= cX2 && y >= cY1 && y <= cY2) {
-            centerTotal++;
-            if (isSkin) centerSkin++;
-          }
-        }
-      }
-
-      var avgBr = totalY / (w * h);
-      var contrastRange = maxBr - minBr;
-      var centerFillFraction = centerTotal > 0 ? (centerSkin / centerTotal) : 0;
-      var skinInCenterFraction = skinCount > 0 ? (centerSkin / skinCount) : 0;
-      var avgSkinCb = skinCount > 0 ? (skinSumCb / skinCount) : 128;
-      var avgSkinCr = skinCount > 0 ? (skinSumCr / skinCount) : 128;
-      var avgSkinNormR = skinCount > 0 ? (skinSumNormR / skinCount) : 0.33;
-      var avgSkinNormB = skinCount > 0 ? (skinSumNormB / skinCount) : 0.33;
-
-      // 1. Kamera tertutup rapat (hitam / gelap pekat)
-      if (avgBr < 8) return { present: false, isSpoof: false, reason: 'camera_covered' };
-
-      // 2. Silau ekstrem tanpa kontras (disorot lampu tembak tanpa wajah)
-      if (avgBr > 245 && contrastRange < 10) return { present: false, isSpoof: false, reason: 'blinding_glare' };
-
-      // 3. Jumlah piksel kulit wajar (toleransi jarak maju/mundur)
-      var minSkinReq = enrolledProfile.valid ? Math.max(12, Math.round(enrolledProfile.skinCountMean * 0.15)) : (avgBr < 40 ? 25 : 35);
-      var maxSkinReq = enrolledProfile.valid ? Math.min(2800, Math.round(enrolledProfile.skinCountMean * 4.2)) : 2400;
-      if (skinCount < minSkinReq || skinCount > maxSkinReq) return { present: false, isSpoof: false, reason: 'skin_count_out_of_range' };
-
-      // 4. Konsentrasi kulit di area kamera
-      var minCenterFraction = enrolledProfile.valid ? 0.10 : 0.30;
-      if (skinInCenterFraction < minCenterFraction) return { present: false, isSpoof: false, reason: 'not_centered' };
-
-      // 5. Centroid posisi wajah harus di area kamera (toleransi sudut/kemiringan HP)
-      var cX = Math.round(sumX / skinCount);
-      var cY = Math.round(sumY / skinCount);
-      var minCX = enrolledProfile.valid ? 2 : 8, maxCX = enrolledProfile.valid ? 62 : 56;
-      var minCY = enrolledProfile.valid ? 2 : 6, maxCY = enrolledProfile.valid ? 46 : 42;
-      if (cX < minCX || cX > maxCX || cY < minCY || cY > maxCY) return { present: false, isSpoof: false, reason: 'centroid_out_of_bounds' };
-
-      // 6. Bounding box & proporsi oval wajah
-      var boxW = (maxX - minX) + 1;
-      var boxH = (maxY - minY) + 1;
-      if (boxW < 5 || boxH < 5) return { present: false, isSpoof: false, reason: 'box_too_small' };
-      var aspect = boxH / boxW;
-      if (aspect < 0.35 || aspect > 3.6) return { present: false, isSpoof: false, reason: 'aspect_ratio_invalid' };
-
-      // 7. Hitung gradien tekstur mikro di area wajah
-      var gradSum = 0, gradCount = 0, maxLocalGrad = 0;
-      var gy1 = Math.max(1, minY), gy2 = Math.min(h - 2, maxY);
-      var gx1 = Math.max(1, minX), gx2 = Math.min(w - 2, maxX);
-      for (var gy = gy1; gy <= gy2; gy++) {
-        for (var gx = gx1; gx <= gx2; gx++) {
-          var gdx = Math.abs(Ygrid[gy * w + (gx + 1)] - Ygrid[gy * w + (gx - 1)]);
-          var gdy = Math.abs(Ygrid[(gy + 1) * w + gx] - Ygrid[(gy - 1) * w + gx]);
-          var gMag = gdx + gdy;
-          gradSum += gMag;
-          gradCount++;
-          if (gMag > maxLocalGrad) maxLocalGrad = gMag;
-        }
-      }
-      var avgGrad = gradCount > 0 ? (gradSum / gradCount) : 0;
-      if (avgGrad < 2.0 && maxLocalGrad < 14) return { present: false, isSpoof: false, reason: 'flat_texture' };
-
-      // 8. Haar cascade dahi vs mata vs pipi (Bilateral Dual-Eye)
-      var fhY1, fhY2, fhX1, fhX2;
-      var eyeY1, eyeY2, eLX1, eLX2, eRX1, eRX2;
-      var chkY1, chkY2, chkX1, chkX2;
-
-      if (boxW >= 10 && boxH >= 10) {
-        // Koordinat anatomis adaptif berbasis proporsi oval wajah:
-        // Skala mengikuti pergerakan maju-mundur atau kemiringan perangkat
-        fhY1 = Math.max(0, minY + Math.round(boxH * 0.08));
-        fhY2 = Math.min(h - 1, minY + Math.round(boxH * 0.28));
-        fhX1 = Math.max(0, minX + Math.round(boxW * 0.20));
-        fhX2 = Math.min(w - 1, maxX - Math.round(boxW * 0.20));
-
-        eyeY1 = Math.max(0, minY + Math.round(boxH * 0.32));
-        eyeY2 = Math.min(h - 1, minY + Math.round(boxH * 0.54));
-        eLX1 = Math.max(0, minX + Math.round(boxW * 0.10));
-        eLX2 = Math.min(w - 1, minX + Math.round(boxW * 0.44));
-        eRX1 = Math.max(0, maxX - Math.round(boxW * 0.44));
-        eRX2 = Math.min(w - 1, maxX - Math.round(boxW * 0.10));
-
-        chkY1 = Math.max(0, minY + Math.round(boxH * 0.58));
-        chkY2 = Math.min(h - 1, minY + Math.round(boxH * 0.82));
-        chkX1 = Math.max(0, minX + Math.round(boxW * 0.18));
-        chkX2 = Math.min(w - 1, maxX - Math.round(boxW * 0.18));
-      } else {
-        // Fallback untuk kotak berdimensi kecil
-        fhY1 = Math.max(0, cY - 12); fhY2 = Math.max(0, cY - 6);
-        fhX1 = Math.max(0, cX - 8);  fhX2 = Math.min(w - 1, cX + 8);
-        eyeY1 = Math.max(0, cY - 5); eyeY2 = Math.min(h - 1, cY + 1);
-        eLX1 = Math.max(0, cX - 10); eLX2 = Math.max(0, cX - 2);
-        eRX1 = Math.min(w - 1, cX + 2); eRX2 = Math.min(w - 1, cX + 10);
-        chkY1 = Math.min(h - 1, cY + 3); chkY2 = Math.min(h - 1, cY + 9);
-        chkX1 = Math.max(0, cX - 8);  chkX2 = Math.min(w - 1, cX + 8);
-      }
-
-      var fSum = 0, fCount = 0;
-      for (var fy = fhY1; fy <= fhY2; fy++) {
-        for (var fx = fhX1; fx <= fhX2; fx++) {
-          fSum += Ygrid[fy * w + fx]; fCount++;
-        }
-      }
-
-      var eSum = 0, eCount = 0;
-      var eLSum = 0, eLCount = 0, eRSum = 0, eRCount = 0;
-      for (var ey = eyeY1; ey <= eyeY2; ey++) {
-        for (var ex = eLX1; ex <= eLX2; ex++) {
-          eLSum += Ygrid[ey * w + ex]; eLCount++;
-          eSum += Ygrid[ey * w + ex]; eCount++;
-        }
-        for (var ex = eRX1; ex <= eRX2; ex++) {
-          eRSum += Ygrid[ey * w + ex]; eRCount++;
-          eSum += Ygrid[ey * w + ex]; eCount++;
-        }
-      }
-
-      var cSum = 0, cCount = 0;
-      for (var cy = chkY1; cy <= chkY2; cy++) {
-        for (var cx = chkX1; cx <= chkX2; cx++) {
-          cSum += Ygrid[cy * w + cx]; cCount++;
-        }
-      }
-
-      var fAvg = fCount > 0 ? fSum / fCount : 0;
-      var eAvg = eCount > 0 ? eSum / eCount : 0;
-      var cAvg = cCount > 0 ? cSum / cCount : 0;
-      var eyeDip = (fAvg - eAvg) + (cAvg - eAvg);
-      var eLAvg = eLCount > 0 ? (eLSum / eLCount) : eAvg;
-      var eRAvg = eRCount > 0 ? (eRSum / eRCount) : eAvg;
-      var asym = Math.abs(eLAvg - eRAvg);
-
-      // Penolakan permukaan datar / lampu / meja / telapak tangan:
-      // Lampu terang (avgBr > 110) atau cahaya datar yang mendominasi tengah (> 80%) tanpa rongga mata
-      if ((centerFillFraction > 0.80 || avgBr > 110) && eyeDip < 0.4) {
-        return { present: false, isSpoof: false, reason: 'flat_light_or_surface' };
-      }
-
-      // DISKRIMINATOR WAJAH NYATA VS BUKAN WAJAH DI SESI UJIAN:
-      // Objek bukan wajah (kardus, dinding, meja kayu, bantal, telapak tangan, latar kosong)
-      // yang memiliki warna mirip kulit TIDAK MEMILIKI kontur rongga mata (eyeDip <= 0.4).
-      // Wajah manusia asli selalu memiliki lekukan rongga mata (eyeDip positif nyata).
-      if (enrolledProfile.valid) {
-        var minEyeDipReq = Math.min(2.0, Math.max(0.6, (enrolledProfile.eyeDipMean || 10) * 0.08));
-        if (eyeDip < minEyeDipReq) {
-          return { present: false, isSpoof: false, reason: 'no_facial_features' };
-        }
-        // Validasi ukuran terhadap profil murid (menolak dinding atau permukaan latar yang terlalu masif)
-        if (enrolledProfile.boxWMean > 0 && boxW > enrolledProfile.boxWMean * 2.6) {
-          return { present: false, isSpoof: false, reason: 'box_too_large' };
-        }
-      }
-
-      // Jika murid menoleh tajam ke samping (asimetri mata ekstrem > 35)
-      if (asym > 35) return { present: false, isSpoof: false, reason: 'extreme_asymmetry' };
-
-      // 9. Deteksi Artefak Layar Kaca & Backlight HP / Laptop (Anti-Spoofing Layar)
-      var screenCheck = detectScreenArtifacts(d, w, h, Ygrid, minX, maxX, minY, maxY, cX, cY, eyeDip);
-      if (screenCheck.isScreen) {
-        return { present: false, isSpoof: true, reason: 'spoof_screen' };
-      }
-
-      var now = Date.now();
-      recordTemporalFrame(now, cX, cY, boxW, boxH, eyeDip, asym, Ygrid, w, h);
-      // Murid yang sudah terkalibrasi (enrolledProfile.valid) sedang membaca soal dengan tenang di ruang ujian.
-      // Bebaskan dari tuduhan foto kertas (spoof_static) hanya karena duduk tenang membaca selama 2 detik.
-      if (!enrolledProfile.valid) {
-        var tempCheck = checkTemporalLiveness(now);
-        if (tempCheck.isSpoof) {
-          return { present: false, isSpoof: true, reason: tempCheck.isStatic ? 'spoof_static' : 'spoof_rigid' };
-        }
-      }
-
-      return {
-        present: true,
-        isSpoof: false,
-        cX: cX,
-        cY: cY,
-        centroidX: sumX / skinCount,
-        centroidY: sumY / skinCount,
-        boxW: boxW,
-        boxH: boxH,
-        eyeDip: eyeDip,
-        asym: asym,
-        eLAvg: eLAvg,
-        eRAvg: eRAvg,
-        skinCount: skinCount,
-        avgBr: avgBr,
-        avgSkinCb: avgSkinCb,
-        avgSkinCr: avgSkinCr,
-        avgSkinNormR: avgSkinNormR,
-        avgSkinNormB: avgSkinNormB
-      };
+      return analyzePixels(grabPixels(video, ctx));
     } catch (_) {
       return { present: false, isSpoof: false, reason: 'error' };
     }
+  }
+
+  function analyzePixels(d) {
+    var w = FW, h = FH, i, x, y;
+    if (!d || d.length < FN * 4) return { present: false, isSpoof: false, reason: 'error' };
+
+    // --- 1. Luminans, krominans, kandidat kulit (rona & saturasi relatif, bebas eksposur).
+    var totalY = 0, minBr = 255, maxBr = 0;
+    for (i = 0; i < FN; i++) {
+      var o = i * 4, r = d[o], g = d[o + 1], b = d[o + 2];
+      var yl = 0.299 * r + 0.587 * g + 0.114 * b;
+      var cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b;
+      var cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b;
+      bufY[i] = yl; bufCb[i] = cb; bufCr[i] = cr;
+      totalY += yl;
+      if (yl < minBr) minBr = yl;
+      if (yl > maxBr) maxBr = yl;
+      var cbn = cb - 128, crn = cr - 128;
+      var sat = yl > 1 ? Math.sqrt(cbn * cbn + crn * crn) / yl : 0;
+      bufSat[i] = sat;
+      var cand = 0;
+      if (!(r > 240 && g > 240 && b > 240) && yl >= 8 && yl <= 238 && r >= b && crn > 0 && sat >= SKIN_SAT_MIN && sat <= SKIN_SAT_MAX) {
+        var hue = Math.atan2(crn, cbn) * 57.29578;
+        if (hue >= SKIN_HUE_MIN && hue <= SKIN_HUE_MAX) cand = 1;
+      }
+      bufCand[i] = cand;
+    }
+    var avgBr = totalY / FN;
+    var contrastRange = maxBr - minBr;
+
+    // Kamera tertutup rapat (hitam / gelap pekat) & silau ekstrem tanpa kontras.
+    if (avgBr < 8) return { present: false, isSpoof: false, reason: 'camera_covered' };
+    if (avgBr > 245 && contrastRange < 10) return { present: false, isSpoof: false, reason: 'blinding_glare' };
+
+    // --- 2. Klaster kulit bingkai ini. Rambut panjang, dinding krem, atau dinding putih di
+    //        bawah lampu kuning ikut lolos uji rona — tetapi saturasi relatifnya jauh di bawah
+    //        kulit. Bila kandidat terbelah dua klaster saturasi (Otsu), klaster atas = kulit.
+    //        Terang acuan (Ys) & saturasi acuan (Ss) diambil dari klaster itu.
+    histS.fill(0);
+    var nC = 0, k;
+    for (y = 2; y < h - 2; y++) {
+      for (x = 6; x < w - 6; x++) {
+        i = y * w + x;
+        if (bufCand[i]) { histS[Math.min(79, Math.floor(bufSat[i] * 100))]++; nC++; }
+      }
+    }
+    if (nC < 12) return { present: false, isSpoof: false, reason: 'skin_count_out_of_range', avgBr: avgBr };
+    var sumAll = 0, sq = 0;
+    for (k = 0; k < 80; k++) sumAll += k * histS[k];
+    var meanAll = sumAll / nC;
+    for (k = 0; k < 80; k++) sq += histS[k] * (k - meanAll) * (k - meanAll);
+    var varAll = sq / nC, w0 = 0, s0 = 0, bestB = 0, bestT = -1, bm0 = 0, bm1 = 0, bn1 = 0;
+    for (k = 0; k < 79; k++) {
+      w0 += histS[k]; s0 += k * histS[k];
+      var w1n = nC - w0;
+      if (!w0) continue;
+      if (!w1n) break;
+      var m0 = s0 / w0, m1 = (sumAll - s0) / w1n;
+      var bvar = (w0 / nC) * (w1n / nC) * (m0 - m1) * (m0 - m1);
+      if (bvar > bestB) { bestB = bvar; bestT = k; bm0 = m0; bm1 = m1; bn1 = w1n; }
+    }
+    var satCut = 0;
+    if (bestT >= 0 && varAll > 0 && bestB / varAll >= 0.75 && bm1 >= 1.5 * Math.max(1, bm0) && bn1 >= 15) satCut = (bestT + 1) / 100;
+    var Ys = 0, Ss = 0, best = 0, bestArea = 0, bMinX = 0, bMaxX = 0, bMinY = 0, bMaxY = 0;
+    segment(satCut);
+    // Di bingkai redup derau kroma bisa membuat Otsu memotong kulit wajah sendiri jadi
+    // serpihan. Pemisahan hanya dipertahankan bila masih menyisakan gumpalan yang layak.
+    if (satCut > 0 && bestArea < 40) segment(0);
+
+    function segment(cut) {
+      histY.fill(0);
+      var nY0 = 0;
+      for (y = 2; y < h - 2; y++) {
+        for (x = 6; x < w - 6; x++) {
+          i = y * w + x;
+          if (bufCand[i] && bufSat[i] >= cut) { histY[Math.min(63, bufY[i] >> 2)]++; nY0++; }
+        }
+      }
+      // Jangkar terang di persentil-85: di ruangan redup berlampu kuning, derau latar gelap yang
+      // hangat bisa 80% kandidat — persentil-60 dulu jatuh di latar (Ys 18, wajah Y 90).
+      var ys0 = histPick(histY, nY0, 0.85) * 4;
+      histS.fill(0);
+      histY.fill(0);
+      var nS = 0, nY = 0;
+      for (y = 2; y < h - 2; y++) {
+        for (x = 6; x < w - 6; x++) {
+          i = y * w + x;
+          if (!bufCand[i] || bufSat[i] < cut) continue;
+          if (bufY[i] >= 0.6 * ys0) { histS[Math.min(79, Math.floor(bufSat[i] * 100))]++; nS++; }
+          if (bufY[i] >= 0.5 * ys0) { histY[Math.min(63, bufY[i] >> 2)]++; nY++; }
+        }
+      }
+      Ss = nS >= 6 ? histPick(histS, nS, 0.5) / 100 : 0.15;
+      Ys = nY > 0 ? histPick(histY, nY, 0.5) * 4 : ys0;
+
+      // --- 3. Masker kulit final: rambut hitam, kayu gelap, bayangan pucat dibuang relatif Ys/Ss.
+      var yHi = Math.min(238, 1.8 * Ys + 25), yLo = 0.3 * Ys, yMid = 0.5 * Ys;
+      var sLo = Math.max(cut, (Ys >= 60 ? 0.5 : 0.3) * Ss), sMid = 0.75 * Ss;
+      for (i = 0; i < FN; i++) {
+        var yv = bufY[i], sv = bufSat[i];
+        bufMask[i] = (bufCand[i] && yv <= yHi && yv >= yLo && sv >= sLo && (yv >= yMid || sv >= sMid)) ? 1 : 0;
+        bufLabel[i] = 0;
+      }
+
+      // --- 4. Komponen terhubung: pilih gumpalan kulit terbesar yang paling dekat ke tengah.
+      var bestScore = 0, label = 0;
+      best = 0; bestArea = 0;
+      for (i = 0; i < FN; i++) {
+        if (!bufMask[i] || bufLabel[i]) continue;
+        label++;
+        var head = 0, tail = 0, area = 0, sx = 0, sy = 0, mnx = w, mxx = 0, mny = h, mxy = 0;
+        bufQueue[tail++] = i; bufLabel[i] = label;
+        while (head < tail) {
+          var p = bufQueue[head++], px = p % w, py = (p - px) / w;
+          area++; sx += px; sy += py;
+          if (px < mnx) mnx = px; if (px > mxx) mxx = px; if (py < mny) mny = py; if (py > mxy) mxy = py;
+          if (px > 0 && bufMask[p - 1] && !bufLabel[p - 1]) { bufLabel[p - 1] = label; bufQueue[tail++] = p - 1; }
+          if (px < w - 1 && bufMask[p + 1] && !bufLabel[p + 1]) { bufLabel[p + 1] = label; bufQueue[tail++] = p + 1; }
+          if (py > 0 && bufMask[p - w] && !bufLabel[p - w]) { bufLabel[p - w] = label; bufQueue[tail++] = p - w; }
+          if (py < h - 1 && bufMask[p + w] && !bufLabel[p + w]) { bufLabel[p + w] = label; bufQueue[tail++] = p + w; }
+        }
+        var dist = Math.sqrt(Math.pow(sx / area - 32, 2) + Math.pow(sy / area - 24, 2));
+        var score = area * (1 - 0.5 * Math.min(1, dist / 40));
+        if (score > bestScore) { bestScore = score; best = label; bestArea = area; bMinX = mnx; bMaxX = mxx; bMinY = mny; bMaxY = mxy; }
+      }
+    }
+    if (!best || bestArea < 6) return { present: false, isSpoof: false, reason: 'skin_count_out_of_range', avgBr: avgBr };
+
+    // --- 5. Kotak wajah: dari ubun-kulit (dahi/garis rambut/tepi kerudung) sampai dagu.
+    for (y = bMinY; y <= bMaxY; y++) { rowMin[y] = w; rowMax[y] = -1; rowCnt[y] = 0; }
+    for (y = bMinY; y <= bMaxY; y++) {
+      for (x = bMinX; x <= bMaxX; x++) {
+        if (bufLabel[y * w + x] === best) {
+          rowCnt[y]++;
+          if (x < rowMin[y]) rowMin[y] = x;
+          if (x > rowMax[y]) rowMax[y] = x;
+        }
+      }
+    }
+    var top = bMinY, faceBottom = bMaxY, maxW = 0, maxWRow = bMinY;
+    for (y = bMinY; y <= bMaxY; y++) {
+      var rw = rowCnt[y] ? rowMax[y] - rowMin[y] + 1 : 0;
+      if (rw > maxW) { maxW = rw; maxWRow = y; }
+      // Dagu → leher: lebar baris turun di bawah 62% lebar wajah dua baris berturut-turut.
+      if (y > maxWRow && rw <= 0.62 * maxW && y + 1 <= bMaxY) {
+        var rw2 = rowCnt[y + 1] ? rowMax[y + 1] - rowMin[y + 1] + 1 : 0;
+        if (rw2 <= 0.62 * maxW) { faceBottom = y - 1; break; }
+      }
+    }
+    faceBottom = Math.max(top, Math.min(faceBottom, top + Math.round(1.6 * maxW)));
+    var minX = w, maxX = -1, minY = top, maxY = faceBottom;
+    var skinCount = 0, sumX = 0, sumY = 0, centerSkin = 0;
+    var skinSumCb = 0, skinSumCr = 0, skinSumNormR = 0, skinSumNormB = 0;
+    for (y = top; y <= faceBottom; y++) {
+      for (x = bMinX; x <= bMaxX; x++) {
+        i = y * w + x;
+        if (bufLabel[i] !== best) continue;
+        skinCount++; sumX += x; sumY += y;
+        if (x < minX) minX = x;
+        if (x > maxX) maxX = x;
+        if (x >= 16 && x <= 48 && y >= 8 && y <= 40) centerSkin++;
+        skinSumCb += bufCb[i]; skinSumCr += bufCr[i];
+        var o2 = i * 4, s3 = d[o2] + d[o2 + 1] + d[o2 + 2];
+        if (s3 > 0) { skinSumNormR += d[o2] / s3; skinSumNormB += d[o2 + 2] / s3; }
+      }
+    }
+    if (!skinCount) return { present: false, isSpoof: false, reason: 'skin_count_out_of_range', avgBr: avgBr };
+    var skinInCenterFraction = centerSkin / skinCount;
+    var avgSkinCb = skinSumCb / skinCount, avgSkinCr = skinSumCr / skinCount;
+    var avgSkinNormR = skinSumNormR / skinCount, avgSkinNormB = skinSumNormB / skinCount;
+    var cX = Math.round(sumX / skinCount), cY = Math.round(sumY / skinCount);
+    var boxW = (maxX - minX) + 1, boxH = (maxY - minY) + 1;
+    var geo = { avgBr: avgBr, skinBr: Ys, skinCount: skinCount, cX: cX, cY: cY, boxW: boxW, boxH: boxH };
+    function reject(reason, extra) {
+      var out = { present: false, isSpoof: false, reason: reason };
+      for (var k in geo) out[k] = geo[k];
+      if (extra) for (var k2 in extra) out[k2] = extra[k2];
+      return out;
+    }
+
+    // --- 6. Jumlah piksel kulit wajar (toleransi jarak maju/mundur).
+    var minSkinReq = enrolledProfile.valid ? Math.max(12, Math.round(enrolledProfile.skinCountMean * 0.15)) : (avgBr < 40 ? 25 : 35);
+    var maxSkinReq = enrolledProfile.valid ? Math.min(2800, Math.round(enrolledProfile.skinCountMean * 4.2)) : 2400;
+    if (skinCount < minSkinReq || skinCount > maxSkinReq) return reject('skin_count_out_of_range');
+
+    // --- 7. Konsentrasi & posisi wajah di area kamera (toleransi sudut/kemiringan HP).
+    var minCenterFraction = enrolledProfile.valid ? 0.10 : 0.25;
+    if (skinInCenterFraction < minCenterFraction) return reject('not_centered');
+    var minCX = enrolledProfile.valid ? 2 : 6, maxCX = enrolledProfile.valid ? 62 : 58;
+    var minCY = enrolledProfile.valid ? 2 : 4, maxCY = enrolledProfile.valid ? 46 : 44;
+    if (cX < minCX || cX > maxCX || cY < minCY || cY > maxCY) return reject('centroid_out_of_bounds');
+
+    // --- 8. Proporsi kotak.
+    if (boxW < 5 || boxH < 5) return reject('box_too_small');
+    var aspect = boxH / boxW;
+    if (aspect < 0.35 || aspect > 3.6) return reject('aspect_ratio_invalid');
+
+    // --- 9. Tekstur mikro (gradien) di area wajah — permukaan rata tanpa tepi ditolak.
+    var gradSum = 0, gradCount = 0, maxLocalGrad = 0;
+    var gy1 = Math.max(1, minY), gy2 = Math.min(h - 2, maxY);
+    var gx1 = Math.max(1, minX), gx2 = Math.min(w - 2, maxX);
+    for (var gy = gy1; gy <= gy2; gy++) {
+      for (var gx = gx1; gx <= gx2; gx++) {
+        var gMag = Math.abs(bufY[gy * w + gx + 1] - bufY[gy * w + gx - 1]) + Math.abs(bufY[(gy + 1) * w + gx] - bufY[(gy - 1) * w + gx]);
+        gradSum += gMag; gradCount++;
+        if (gMag > maxLocalGrad) maxLocalGrad = gMag;
+      }
+    }
+    var avgGrad = gradCount > 0 ? (gradSum / gradCount) : 0;
+    if (avgGrad < 2.0 && maxLocalGrad < 14) return reject('flat_texture');
+
+    // --- 10. Pita mata: lembah gelap (alis + rongga mata) di kolom mata, diapit baris lebih
+    //         terang. Profil baris dihitung HANYA di dua jendela mata — tulang hidung di
+    //         tengah tidak ikut mengencerkan kontrasnya.
+    var lx1 = minX + Math.round(boxW * 0.10), lx2 = minX + Math.round(boxW * 0.42);
+    var rx1 = maxX - Math.round(boxW * 0.42), rx2 = maxX - Math.round(boxW * 0.10);
+    if (rx1 <= lx2) rx1 = lx2 + 1;
+    var cx1 = minX + Math.round(boxW * 0.3), cx2 = maxX - Math.round(boxW * 0.3);
+    for (y = minY; y <= maxY; y++) {
+      var es = 0, en = 0, sk = 0, cs = 0, cn = 0;
+      for (x = lx1; x <= lx2; x++) { es += bufY[y * w + x]; en++; if (bufLabel[y * w + x] === best) sk++; }
+      for (x = rx1; x <= rx2; x++) { es += bufY[y * w + x]; en++; if (bufLabel[y * w + x] === best) sk++; }
+      for (x = cx1; x <= cx2; x++) { cs += bufY[y * w + x]; cn++; }
+      rowRaw[y] = en ? es / en : 0;
+      rowSkin[y] = en ? sk / en : 0;
+      rowCen[y] = cn ? cs / cn : 0;
+    }
+    for (y = minY; y <= maxY; y++) {
+      rowSm[y] = (rowRaw[Math.max(minY, y - 1)] + 2 * rowRaw[y] + rowRaw[Math.min(maxY, y + 1)]) / 4;
+    }
+    var span = Math.max(2, Math.round(boxW * 0.25));
+    var searchEnd = Math.min(maxY - 2, minY + Math.round(boxW * 0.72));
+    // Acuan terang hanya dari baris yang memang KULIT (pipi, dahi) — garis judul putih di
+    // sampul buku atau kardus berlabel tidak boleh menjadi "pipi".
+    function peakBelow(yy) { var m = -Infinity; for (var k = yy + 1; k <= Math.min(maxY, yy + span); k++) if (rowSkin[k] >= 0.5 && rowSm[k] > m) m = rowSm[k]; return m; }
+    function peakAbove(yy) { var m = -Infinity; for (var k = Math.max(minY, yy - span); k < yy; k++) if (rowSkin[k] >= 0.5 && rowSm[k] > m) m = rowSm[k]; return m; }
+    // Minimum lokal interior (dahi → mata → pipi). Baris paling atas sengaja dilewati: di sana
+    // garis rambut / tepi kerudung selalu gelap, dan dulu tepi itulah yang terbaca sebagai "mata".
+    var eyeRow = -1, bestDip = -Infinity, atTop = false;
+    for (y = minY + 1; y <= searchEnd; y++) {
+      if (rowSm[y] > rowSm[y - 1] || rowSm[y] > rowSm[y + 1]) continue;
+      if (peakAbove(y) <= rowSm[y]) continue;
+      var dB = peakBelow(y) - rowSm[y];
+      if (dB > bestDip) { bestDip = dB; eyeRow = y; }
+    }
+    // Poni / kerudung rendah: alis & mata menempel di tepi atas kulit, tidak ada dahi di atasnya.
+    var topDip = peakBelow(minY) - rowSm[minY];
+    if (eyeRow < 0 || (bestDip < 0.5 * topDip && bestDip / Math.max(20, Ys) < DIP_MIN_UNIVERSAL)) {
+      if (topDip > bestDip) { eyeRow = minY; bestDip = topDip; atTop = true; }
+    }
+    var dipN = 0, eyeDip = 0, bandY = 0, belowY = 0, aboveY = null, mouthDipN = null;
+    var eLAvg = 0, eRAvg = 0, asym = 0;
+    if (eyeRow >= 0) {
+      bandY = rowSm[eyeRow];
+      belowY = peakBelow(eyeRow);
+      if (!atTop) aboveY = peakAbove(eyeRow);
+      dipN = (belowY - bandY) / Math.max(20, Ys);
+      eyeDip = (belowY - bandY) + (aboveY !== null ? Math.max(0, aboveY - bandY) : 0);
+      // Struktur wajah bawah: di kolom tengah, di bawah pita mata, ada baris yang jauh lebih
+      // gelap dari batang hidung (bayangan bawah hidung, bibir, bawah dagu). Telapak tangan
+      // justru paling terang di tengahnya (lekuk ≈ 0 atau negatif). Lembah mulut lokal saja
+      // terlalu halus di 64x48 (±0,07) — diukur, ditolak sebagai penentu.
+      var mStart = eyeRow + Math.max(2, Math.round(boxW * 0.25)), mEnd = Math.min(maxY, eyeRow + Math.round(boxW * 0.9));
+      var mMin = Infinity, mRow = -1;
+      for (y = mStart; y <= mEnd; y++) if (rowCen[y] < mMin) { mMin = rowCen[y]; mRow = y; }
+      if (mRow > eyeRow + 1) {
+        var nosePeak = -Infinity;
+        for (y = eyeRow + 1; y < mRow; y++) if (rowCen[y] > nosePeak) nosePeak = rowCen[y];
+        mouthDipN = (nosePeak - mMin) / Math.max(20, Ys);
+      }
+      var ls = 0, ln = 0, rs2 = 0, rn = 0;
+      for (y = Math.max(minY, eyeRow - 1); y <= Math.min(maxY, eyeRow + 1); y++) {
+        for (x = lx1; x <= lx2; x++) { ls += bufY[y * w + x]; ln++; }
+        for (x = rx1; x <= rx2; x++) { rs2 += bufY[y * w + x]; rn++; }
+      }
+      eLAvg = ln ? ls / ln : bandY;
+      eRAvg = rn ? rs2 / rn : bandY;
+      asym = Math.abs(eLAvg - eRAvg);
+    }
+    geo.eyeDip = eyeDip; geo.dipN = dipN; geo.asym = asym; geo.mouthDipN = mouthDipN; geo.eyeRowRel = eyeRow >= 0 ? (eyeRow - minY) / boxW : -1;
+
+    // DISKRIMINATOR WAJAH VS BUKAN WAJAH: kardus, dinding, meja kayu, gorden, telapak tangan,
+    // dan buku tidak punya pita gelap yang diapit kulit lebih terang di bawahnya.
+    var minDipReq = DIP_MIN_UNIVERSAL;
+    if (enrolledProfile.valid) {
+      minDipReq = enrolledProfile.dipNMean > 0
+        ? Math.max(DIP_MIN_ENROLLED_FLOOR, Math.min(DIP_MIN_ENROLLED_CEIL, enrolledProfile.dipNMean * 0.25))
+        : DIP_MIN_ENROLLED_CEIL;
+    }
+    if (eyeRow < 0 || dipN < minDipReq) return reject('no_facial_features');
+    // Pita yang lemah wajib ditemani struktur wajah bawah. Telapak tangan yang menutupi wajah
+    // punya "pita" di sela jari, tetapi telapaknya rata (lekuk ≈ 0, paling tinggi 0,124 di
+    // probe); wajah sungguhan yang membutuhkannya ≥ 0,197 di semua pose/cahaya probe.
+    if (dipN < STRONG_BAND_N && mouthDipN !== null && mouthDipN < MOUTH_MIN_N) return reject('no_facial_features');
+
+    // Benda selebar bingkai (buku/kardus/tangan yang didekatkan) — wajah murid tidak pernah
+    // memenuhi > 70% lebar bingkai pada jarak membaca.
+    if (boxW > FW * 0.7) return reject('box_too_large');
+    // Validasi ukuran terhadap profil murid (menolak permukaan latar yang terlalu masif).
+    if (enrolledProfile.valid && enrolledProfile.boxWMean > 0 && boxW > enrolledProfile.boxWMean * 2.6) {
+      return reject('box_too_large');
+    }
+    // Menoleh jauh (wajah tampak samping): lebar kulit menyusut, tingginya tidak. Hanya untuk
+    // profil yang dibuat mesin ini (dipNMean > 0) — kotak profil lama berisi rambut.
+    if (enrolledProfile.valid && enrolledProfile.dipNMean > 0 && enrolledProfile.boxWMean > 0 && enrolledProfile.boxHMean > 0) {
+      var aspectRef = enrolledProfile.boxHMean / enrolledProfile.boxWMean;
+      if (aspect > aspectRef * TURNED_ASPECT_RATIO) return reject('face_turned_away');
+    }
+
+    // --- 11. Deteksi artefak layar kaca & backlight HP / laptop (anti-spoofing layar).
+    var screenCheck = detectScreenArtifacts(d, w, minY, maxY, rowMin, rowMax);
+    if (screenCheck.isScreen) {
+      return { present: false, isSpoof: true, reason: 'spoof_screen' };
+    }
+
+    var now = Date.now();
+    recordTemporalFrame(now, cX, cY, boxW, boxH, eyeDip, asym, bufY, w, h);
+    // Murid yang sudah terkalibrasi (enrolledProfile.valid) sedang membaca soal dengan tenang di ruang ujian.
+    // Bebaskan dari tuduhan foto kertas (spoof_static) hanya karena duduk tenang membaca selama 2 detik.
+    if (!enrolledProfile.valid) {
+      var tempCheck = checkTemporalLiveness(now);
+      if (tempCheck.isSpoof) {
+        return { present: false, isSpoof: true, reason: tempCheck.isStatic ? 'spoof_static' : 'spoof_rigid' };
+      }
+    }
+
+    return {
+      present: true,
+      isSpoof: false,
+      cX: cX,
+      cY: cY,
+      centroidX: sumX / skinCount,
+      centroidY: sumY / skinCount,
+      boxW: boxW,
+      boxH: boxH,
+      eyeDip: eyeDip,
+      dipN: dipN,
+      mouthDipN: mouthDipN,
+      eyeRowRel: (eyeRow - minY) / boxW,
+      asym: asym,
+      eLAvg: eLAvg,
+      eRAvg: eRAvg,
+      skinCount: skinCount,
+      skinBr: Ys,
+      avgBr: avgBr,
+      avgSkinCb: avgSkinCb,
+      avgSkinCr: avgSkinCr,
+      avgSkinNormR: avgSkinNormR,
+      avgSkinNormB: avgSkinNormB
+    };
   }
 
   function fallbackCheck(video, canvas, ctx) {
@@ -628,23 +761,6 @@
     if (tr.readyState === 'ended') return 'ended';
     if (tr.muted) return 'muted';
     return 'ok';
-  }
-
-  /** 192 titik luminans dari bingkai 64x48 — cukup untuk membedakan stream hidup dari stream beku. */
-  function frameSignature(vid, ctx) {
-    if (!vid || !ctx) return null;
-    try {
-      ctx.drawImage(vid, 0, 0, 64, 48);
-      var d = ctx.getImageData(0, 0, 64, 48).data;
-      var sig = new Float32Array(192);
-      for (var sy = 0; sy < 12; sy++) {
-        for (var sx = 0; sx < 16; sx++) {
-          var i = ((sy * 4) * 64 + sx * 4) * 4;
-          sig[sy * 16 + sx] = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
-        }
-      }
-      return sig;
-    } catch (_) { return null; }
   }
 
   /**
@@ -713,8 +829,8 @@
       state.freeze = freshFreeze();
       // Episode wajah yang sedang berjalan ditutup di titik layar ditinggalkan; sisanya milik
       // focus-guard. Tanpa ini 60 dtk di aplikasi lain terhitung dua kali.
-      if (state.absentSince) handleResult(true);
-      absentStreak = 0;
+      if (state.absentSince) handleResult(true, true);
+      state.firstMissAt = 0;
       return;
     }
     var vid = state.videoEl;
@@ -727,7 +843,11 @@
     }
     if (vid.readyState < 2) return;
 
-    if (freezeStep(state.freeze, frameSignature(vid, state.ctx), Date.now())) {
+    // SATU readback kanvas per tick: pelacak beku & analisis wajah memakai data yang sama
+    // (dulu frameSignature + analyzeFrame = dua drawImage/getImageData tiap 250 ms).
+    var data = null;
+    try { data = grabPixels(vid, state.ctx); } catch (_) {}
+    if (freezeStep(state.freeze, data ? signatureOf(data) : null, Date.now())) {
       state.lastNativeFace = false;
       handleResult(false);
       return;
@@ -738,6 +858,11 @@
         var p = vid.play();
         if (p && typeof p.catch === 'function') p.catch(function () {});
       } catch (_) {}
+    }
+
+    function cvPresent() {
+      var res = data ? analyzePixels(data) : null;
+      return !!(res && res.present && !res.isSpoof);
     }
 
     if (state.detector) {
@@ -762,40 +887,39 @@
             }
             // CRITICAL ANTI-SPOOFING & LIVENESS GATE (pra-enrollment):
             // Sebelum terkalibrasi, wajib lolos uji anti-layar dan anti-kertas
-            var cvCheck = analyzeFrame(vid, state.canvasEl, state.ctx, f);
-            if (cvCheck && cvCheck.present && !cvCheck.isSpoof) {
-              state.lastNativeFace = true;
-              state.lastNativeFaceTime = Date.now();
-              handleResult(true);
-            } else {
-              state.lastNativeFace = false;
-              handleResult(false);
-            }
+            var okCv = cvPresent();
+            state.lastNativeFace = okCv;
+            if (okCv) state.lastNativeFaceTime = Date.now();
+            handleResult(okCv);
           } else {
-            var fb = analyzeFrame(vid, state.canvasEl, state.ctx, null);
-            var ok = !!(fb && fb.present && !fb.isSpoof);
+            var ok = cvPresent();
             state.lastNativeFace = ok;
             if (ok) state.lastNativeFaceTime = Date.now();
             handleResult(ok);
           }
         }).catch(function () {
-          var fb = analyzeFrame(vid, state.canvasEl, state.ctx, null);
-          handleResult(!!(fb && fb.present && !fb.isSpoof));
+          handleResult(cvPresent());
         });
         return;
       } catch (_) {}
     }
 
-    var fb2 = analyzeFrame(vid, state.canvasEl, state.ctx, null);
-    handleResult(!!(fb2 && fb2.present && !fb2.isSpoof));
+    handleResult(cvPresent());
   }
 
-  function handleResult(present) {
+  /**
+   * present: hasil satu sampel. confirmed: kehadiran yang tidak perlu menunggu sampel kedua
+   * (periksa ulang manual oleh murid, atau penutupan episode saat halaman disembunyikan).
+   */
+  function handleResult(present, confirmed) {
     if (!state.active) return;
     var now = Date.now(), opts = state.options || {};
 
     if (present) {
-      absentStreak = 0;
+      var hitOk = confirmed || !state.firstMissAt || (state.lastHitAt && now - state.lastHitAt <= CONFIRM_PRESENT_MS);
+      state.lastHitAt = now;
+      if (!hitOk) return;
+      state.firstMissAt = 0;
       if (state.warned) {
         state.warned = false;
         if (typeof opts.onWarning === 'function') opts.onWarning(false);
@@ -807,16 +931,14 @@
         if (typeof opts.onPresent === 'function') opts.onPresent(duration);
       }
     } else {
-      absentStreak++;
-      // Temporal Debounce: Butuh akumulasi absentStreak >= ABSENT_DEBOUNCE_FRAMES (8 frames x 250ms = 2.0s terus-menerus hilang)
-      // sebelum absentSince diaktifkan. Ini mencegah false alarm akibat kedipan, micro-jiggle HP, atau menunduk sekejap!
-      if (absentStreak >= ABSENT_DEBOUNCE_FRAMES) {
+      if (!state.firstMissAt) state.firstMissAt = now;
+      var elapsed = now - state.firstMissAt;
+      if (elapsed >= ABSENT_DEBOUNCE_MS) {
         if (!state.absentSince) {
-          state.absentSince = now - (ABSENT_DEBOUNCE_FRAMES * SAMPLE_INTERVAL_MS);
+          state.absentSince = state.firstMissAt;
           state.episoded = false;
           if (typeof opts.onAbsent === 'function') opts.onAbsent(state.absentSince);
         }
-        var elapsed = now - state.absentSince;
         if (elapsed >= WARN_THRESHOLD_MS && !state.warned) {
           state.warned = true;
           if (typeof opts.onWarning === 'function') opts.onWarning(true, elapsed);
@@ -837,7 +959,8 @@
       // membuka stream kedua (stream pertama bocor dan lampu kamera tidak pernah padam).
       if (state.pending) return state.pending;
       state.absentSince = 0;
-      absentStreak = 0;
+      state.firstMissAt = 0;
+    state.lastHitAt = 0;
       state.warned = false;
       state.episoded = false;
       if (state.videoEl && state.videoEl.paused) {
@@ -847,7 +970,8 @@
     }
     state.options = opts || {};
     state.absentSince = 0;
-    absentStreak = 0;
+    state.firstMissAt = 0;
+    state.lastHitAt = 0;
     state.warned = false;
     state.episoded = false;
     temporalHistory = [];
@@ -871,7 +995,10 @@
       video: {
         facingMode: 'user',
         width: { ideal: 320, max: 640 },
-        height: { ideal: 240, max: 480 }
+        height: { ideal: 240, max: 480 },
+        // Penjaga hanya mengambil 2 sampel/dtk; sensor 30 fps menguras baterai tanpa guna.
+        // Hanya 'ideal' (bukan max/exact) supaya kamera yang tidak mendukungnya tidak menolak.
+        frameRate: { ideal: 15 }
       },
       audio: false
     };
@@ -962,7 +1089,8 @@
     state.ctx = null;
     state.active = false;
     state.absentSince = 0;
-    absentStreak = 0;
+    state.firstMissAt = 0;
+    state.lastHitAt = 0;
     state.warned = false;
     state.episoded = false;
     state.options = null;
@@ -996,15 +1124,13 @@
   var liveness = {
     calibrated: false,
     calibTicks: 0,
-    eyeDips: [],
-    baselineEyeDip: 0,
-    baselineCentroidX: 32,
-    baselineCentroidY: 24,
-    peakEyeDip: 0,
-    baselineAsym: 0,
+    calib: [],
+    base: null,
+    openRef: 0,
     blinkClosing: false,
     blinkCloseStart: 0,
     blinkCount: 0,
+    turnRun: 0,
     turnDetected: false,
     steadySince: 0,
     absentTicks: 0,
@@ -1016,15 +1142,13 @@
     resetEnrolledProfile();
     liveness.calibrated = false;
     liveness.calibTicks = 0;
-    liveness.eyeDips = [];
-    liveness.baselineEyeDip = 0;
-    liveness.baselineCentroidX = 32;
-    liveness.baselineCentroidY = 24;
-    liveness.peakEyeDip = 0;
-    liveness.baselineAsym = 0;
+    liveness.calib = [];
+    liveness.base = null;
+    liveness.openRef = 0;
     liveness.blinkClosing = false;
     liveness.blinkCloseStart = 0;
     liveness.blinkCount = 0;
+    liveness.turnRun = 0;
     liveness.turnDetected = false;
     liveness.steadySince = 0;
     liveness.absentTicks = 0;
@@ -1049,6 +1173,37 @@
    * - "Tolehan" dulu cukup berupa pergeseran centroid >= 4 px — persis yang terjadi saat foto
    *   digeser. Kini tolehan wajib membawa isyarat 3D: perubahan asimetri kedua mata.
    */
+  /**
+   * Bingkai ini dibaca dari tempat yang sama dengan baseline kalibrasi? Pada wajah kecil
+   * (foto cetak, wajah jauh) derau kadang memindahkan pita mata ke baris lain atau mengubah
+   * lebar kotak — dulu lompatan itu terbaca sebagai "kedip" atau "toleh" dan foto lolos
+   * dalam 240 ms (probe m025-565). Kedip & toleh kini hanya dihitung dari bingkai stabil.
+   */
+  function sameLocalization(r, base, ignoreEyeRow) {
+    if (!base || !r || !(r.boxW > 0)) return false;
+    if (Math.abs(r.boxW / base.boxW - 1) > 0.2) return false;
+    if (Math.abs(r.cX - base.cX) > 3 || Math.abs(r.cY - base.cY) > 3) return false;
+    // Mata terpejam: pita matanya lenyap, jadi barisnya tidak bermakna — cukup gumpalannya.
+    if (ignoreEyeRow) return true;
+    return typeof r.eyeRowRel !== 'number' || r.eyeRowRel < 0 || Math.abs(r.eyeRowRel - base.eyeRowRel) <= 0.12;
+  }
+
+  /**
+   * Deteksi Kehidupan Biometrik Aktif (Active Liveness Verification).
+   * Lulus lewat SALAH SATU: kedipan mata, tolehan kepala 3D, atau diam tenang >= STEADY_HOLD_MS
+   * yang jendela temporalnya (>= 2 dtk) masih menunjukkan dinamika hidup.
+   *
+   * Dua celah yang ditutup di m025-560 (dibuktikan di tests/exam-focus-guard-test.js):
+   * - Profil baru dikunci SESUDAH liveness lulus; diam tenang diukur jam dinding dan wajib
+   *   lolos uji temporal (tidak statis, tidak bergoyang kaku seperti kertas di tangan).
+   * - "Tolehan" wajib membawa isyarat 3D (perubahan asimetri kedua mata), bukan translasi.
+   * m025-565: kedip & toleh dinormalisasi terhadap terang kulit dan hanya dihitung dari
+   * bingkai yang lokalisasinya stabil (sameLocalization).
+   *
+   * BATAS JUJUR (diukur, tools/dev/probe-face-robustness.mjs): di bingkai 64x48 kedipan nyaris
+   * tak terlihat (iris ±1,5 px) dan foto cetak berderau tidak bisa dibedakan dari wajah yang
+   * diam — jalur diam tenang tetap bisa diluluskan foto yang ditahan >= 3 dtk.
+   */
   function checkLiveness(video, canvas, ctx) {
     var vid = video || state.videoEl;
     var cvs = canvas || state.canvasEl;
@@ -1057,14 +1212,21 @@
     if (vid.readyState < 2) return { stage: 'no_face', ok: false, progress: 0 };
 
     var frameRes = analyzeFrame(vid, cvs, c, null);
-    if (!frameRes.present) {
+    var now = Date.now();
+    var base = liveness.base;
+    // Mata terpejam pada wajah yang tetap di tempatnya: pita mata lenyap sesaat, tetapi
+    // gumpalan kulitnya sama — itu kedipan, bukan wajah yang hilang.
+    var closedFrame = !frameRes.present && frameRes.reason === 'no_facial_features' && liveness.calibrated && !liveness.verified && sameLocalization(frameRes, base, true);
+    if (!frameRes.present && !closedFrame) {
       liveness.absentTicks = (liveness.absentTicks || 0) + 1;
       // Diam tenang harus TERUS-MENERUS hadir; satu bingkai hilang memulai hitungan dari nol.
       liveness.steadySince = 0;
+      liveness.turnRun = 0;
       if (liveness.absentTicks >= 6) {
         liveness.calibrated = false;
         liveness.calibTicks = 0;
-        liveness.eyeDips = [];
+        liveness.calib = [];
+        liveness.base = null;
         liveness.blinkClosing = false;
       }
       if (frameRes.isSpoof) {
@@ -1078,68 +1240,58 @@
       return { stage: 'verified', ok: true, blinkCount: liveness.blinkCount, turn: liveness.turnDetected, progress: 100 };
     }
 
-    var now = Date.now();
-    var curDip = frameRes.eyeDip;
-    var centroidX = frameRes.centroidX;
-    var centroidY = frameRes.centroidY;
+    var Ys = Math.max(20, frameRes.skinBr || 0);
+    var dipN = typeof frameRes.dipN === 'number' ? frameRes.dipN : 0;
+    var asymN = (frameRes.asym || 0) / Ys;
 
     // Profil dikumpulkan dari setiap bingkai hadir selama verifikasi, tetapi BELUM dikunci.
-    accumulateProfile(frameRes);
+    if (frameRes.present) accumulateProfile(frameRes);
 
     if (!liveness.calibrated) {
-      liveness.eyeDips.push(curDip);
+      if (!frameRes.present) return { stage: 'aligning', ok: true, progress: 0 };
+      liveness.calib.push({ boxW: frameRes.boxW, cX: frameRes.cX, cY: frameRes.cY, eyeRowRel: frameRes.eyeRowRel, dipN: dipN, asymN: asymN });
       liveness.calibTicks++;
-
-      var targetTicks = 2;
-      if (liveness.calibTicks >= targetTicks) {
-        var sumD = 0;
-        for (var i = 0; i < liveness.eyeDips.length; i++) sumD += liveness.eyeDips[i];
-        liveness.baselineEyeDip = sumD / liveness.eyeDips.length;
-        liveness.baselineCentroidX = centroidX;
-        liveness.baselineCentroidY = centroidY;
-        liveness.peakEyeDip = Math.max(liveness.baselineEyeDip, 1.0);
-        liveness.baselineAsym = frameRes.asym;
+      if (liveness.calibTicks >= 2) {
+        var k0 = liveness.calib[liveness.calib.length - 2], k1 = liveness.calib[liveness.calib.length - 1];
+        liveness.base = {
+          boxW: (k0.boxW + k1.boxW) / 2, cX: k1.cX, cY: k1.cY,
+          eyeRowRel: (k0.eyeRowRel + k1.eyeRowRel) / 2,
+          dipN: (k0.dipN + k1.dipN) / 2, asymN: (k0.asymN + k1.asymN) / 2
+        };
+        liveness.openRef = liveness.base.dipN;
         liveness.calibrated = true;
         liveness.steadySince = now;
       }
       return { stage: 'aligning', ok: true, progress: 0 };
     }
+    base = liveness.base;
+    var stable = closedFrame || sameLocalization(frameRes, base);
 
-    if (curDip > liveness.peakEyeDip) {
-      liveness.peakEyeDip = curDip;
-    } else {
-      liveness.peakEyeDip = liveness.peakEyeDip * 0.995 + curDip * 0.005;
-    }
-
-    var baseOpen = Math.max(liveness.peakEyeDip, liveness.baselineEyeDip, 1.0);
-    var dipDrop = baseOpen - curDip;
-
-    // Deteksi penutupan mata (blink closing) adaptif & instan:
-    var isClosed = (curDip <= baseOpen * 0.75) || (dipDrop >= Math.max(0.8, baseOpen * 0.22));
-
-    if (isClosed) {
-      if (!liveness.blinkClosing) {
-        liveness.blinkClosing = true;
-        liveness.blinkCloseStart = now;
-      }
-    } else if (liveness.blinkClosing) {
-      var isReopened = (curDip >= baseOpen * 0.80) || (dipDrop <= Math.max(0.5, baseOpen * 0.15));
-      if (isReopened) {
-        var dur = now - liveness.blinkCloseStart;
-        if (dur >= 40 && dur <= 1600) {
-          liveness.blinkCount++;
+    if (stable) {
+      // Kedip: kontras pita mata turun ke <= 60% acuan mata terbuka (dan minimal 0,03 terang
+      // kulit — di atas derau sensor), lalu kembali >= 80% dalam 80–1600 ms.
+      var isClosed = closedFrame || (dipN <= liveness.openRef * 0.6 && (liveness.openRef - dipN) >= 0.03);
+      if (isClosed) {
+        if (!liveness.blinkClosing) {
+          liveness.blinkClosing = true;
+          liveness.blinkCloseStart = now;
         }
-        liveness.blinkClosing = false;
+      } else {
+        if (liveness.blinkClosing && dipN >= liveness.openRef * 0.8) {
+          var dur = now - liveness.blinkCloseStart;
+          if (dur >= 80 && dur <= 1600) liveness.blinkCount++;
+          liveness.blinkClosing = false;
+        }
+        if (!liveness.blinkClosing) liveness.openRef = liveness.openRef * 0.9 + dipN * 0.1;
       }
-    }
-
-    // Tolehan kepala 3D: rotasi wajah mengubah terang rongga mata kiri vs kanan relatif
-    // terhadap centroid kulit. Foto yang digeser/dimiringkan di bidang datar hanya berpindah
-    // tempat — asimetrinya tetap — jadi pergeseran centroid saja TIDAK dihitung tolehan.
-    // (Baseline 0 itu sah — wajah simetris sempurna; jangan jatuh ke nilai saat ini lewat `||`.)
-    var asymChange = Math.abs(frameRes.asym - (Number(liveness.baselineAsym) || 0));
-    if (asymChange >= 5.0) {
-      liveness.turnDetected = true;
+      // Tolehan 3D: asimetri terang kedua mata berubah (cahaya jatuh berbeda ke mata dekat &
+      // jauh). Foto yang digeser/dimiringkan membawa asimetrinya sendiri — tidak berubah.
+      // Perubahan besar (>= 0,15) cukup sekali; perubahan sedang (>= 0,08) wajib 3 bingkai.
+      var asymChange = closedFrame ? 0 : Math.abs(asymN - base.asymN);
+      liveness.turnRun = asymChange >= 0.08 ? liveness.turnRun + 1 : 0;
+      if (asymChange >= 0.15 || liveness.turnRun >= 3) liveness.turnDetected = true;
+    } else {
+      liveness.turnRun = 0;
     }
 
     if (!liveness.steadySince) liveness.steadySince = now;
@@ -1170,7 +1322,8 @@
     if (!state.active || !state.videoEl || state.videoEl.readyState < 2) return false;
     if (state.lastNativeFace && (Date.now() - state.lastNativeFaceTime < 1000)) return true;
     var ok = fallbackCheck(state.videoEl, state.canvasEl, state.ctx);
-    handleResult(ok);
+    // Periksa ulang yang diminta murid sendiri: kehadirannya langsung terkonfirmasi.
+    handleResult(ok, ok);
     return ok;
   }
 
