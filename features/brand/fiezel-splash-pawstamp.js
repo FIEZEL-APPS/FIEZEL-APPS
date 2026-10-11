@@ -316,12 +316,13 @@
   /* Reset overlay ke keadaan siap (untuk replay). */
   function resetOverlay() {
     var o = state.overlay;
+    var wasPlaying = o.classList.contains('fzps-play') || o.classList.contains('fzps-leaving') || o.classList.contains('fzps-frozen') || o.classList.contains('fzps-reduced');
     o.classList.remove('fzps-play', 'fzps-leaving', 'fzps-frozen', 'fzps-reduced');
     o.style.setProperty('--fzps-t', '0ms');
     o.style.setProperty('--fzps-exit-d', '0ms');
     o.style.display = 'none';
-    /* Trik restart animasi CSS milik v2: cabut dari render tree satu frame. */
-    void o.offsetHeight;
+    /* Trik restart animasi CSS milik v2: cabut dari render tree satu frame (hanya saat replay). */
+    if (wasPlaying) void o.offsetHeight;
   }
 
   /**

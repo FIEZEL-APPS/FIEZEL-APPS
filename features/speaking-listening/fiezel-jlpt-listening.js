@@ -1323,10 +1323,25 @@
     closeSheet: closeJlptDetailSheet
   };
 
-  // Pre-fetch bank saat idle
-  if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
-    window.requestIdleCallback(function () { initBank(); });
-  } else {
-    setTimeout(initBank, 1500);
+  // Pre-fetch bank saat idle setelah splash selesai (dan hanya bila kursus aktif adalah bahasa Jepang)
+  function maybePrefetchJlptListening() {
+    try {
+      var course = (window.FiezelI18n && typeof window.FiezelI18n.getCourse === 'function')
+        ? window.FiezelI18n.getCourse()
+        : '';
+      if (course !== 'ja') return;
+      if ('requestIdleCallback' in window) {
+        window.requestIdleCallback(function () { initBank(); });
+      } else {
+        setTimeout(initBank, 1500);
+      }
+    } catch (_) {}
+  }
+  if (typeof window !== 'undefined') {
+    if (window.__fiezelBootSplashDismissed) {
+      maybePrefetchJlptListening();
+    } else if (typeof window.addEventListener === 'function') {
+      window.addEventListener('fiezel:splash-dismissed', maybePrefetchJlptListening, { once: true });
+    }
   }
 })();
