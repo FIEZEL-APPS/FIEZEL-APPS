@@ -1285,6 +1285,15 @@ test('class-hub (m025-560): preflight tidak dicatat sebagai pelanggaran; bypass 
     assert.strictEqual(u.focus.noCamera, true);
     const lap = (LF._state().doneAssign || []).filter((x) => x.id === 'ujian-audit-nc')[0];
     assert.ok(lap && lap.f && lap.f.nc === 1, 'nc = 1 masuk laporan ke guru: ' + JSON.stringify(lap));
+
+    // Hasil akhir MENIMPA entri sedang-mengerjakan: nc tidak boleh hilang di sana, baik tanpa
+    // kepergian (n = 0) maupun bersama kepergian (n > 0).
+    const akhir0 = LF.recordAssignmentResult({ id: 'nc-akhir-0', title: 'x', skill: 'past_tense', mode: 'ujian', results: [{ itemId: 'i1', skill: 'past_tense', correct: true, chosen: 0 }], focus: { n: 0, s: 0, x: 0, nc: 1 } });
+    assert.strictEqual(akhir0.entry.f && akhir0.entry.f.nc, 1, 'hasil akhir tanpa kepergian tetap membawa nc');
+    const akhir2 = LF.recordAssignmentResult({ id: 'nc-akhir-2', title: 'x', skill: 'past_tense', mode: 'ujian', results: [{ itemId: 'i1', skill: 'past_tense', correct: true, chosen: 0 }], focus: { n: 2, s: 30, x: 20, nc: 1 } });
+    assert.deepStrictEqual(akhir2.entry.f, { n: 2, s: 30, x: 20, nc: 1 }, 'hasil akhir dengan kepergian tetap membawa nc');
+    const akhirBersih = LF.recordAssignmentResult({ id: 'nc-akhir-b', title: 'x', skill: 'past_tense', mode: 'ujian', results: [{ itemId: 'i1', skill: 'past_tense', correct: true, chosen: 0 }], focus: { n: 0, s: 0, x: 0 } });
+    assert.strictEqual(akhirBersih.entry.f, undefined, 'ujian bersih berkamera: bentuk lama tidak berubah');
   } finally {
     Hub.unmountStudent();
     globalThis.FiezelFaceGuard = origFaceG;

@@ -561,9 +561,13 @@
     // entri hasil MENIMPA entri "sedang mengerjakan" dan bukti pengawasan hilang persis
     // pada saat guru paling membutuhkannya (saat menilai).
     var prevFocus = (s.doneAssign || []).filter(function (x) { return x.id === res.id; })[0];
-    if (res.focus && (Number(res.focus.n) > 0 || Number(res.focus.vn) > 0)) {
+    // nc (ujian tanpa kamera) ikut dihitung: tanpa itu ujian bypass yang tidak pernah keluar
+    // layar kehilangan tandanya di hasil akhir, dan entri dengan kepergian membuangnya.
+    var focusNc = !!(res.focus && (res.focus.nc === 1 || res.focus.nc === true));
+    if (res.focus && (Number(res.focus.n) > 0 || Number(res.focus.vn) > 0 || focusNc)) {
       entry.f = { n: Math.round(Number(res.focus.n) || 0), s: Math.round(Number(res.focus.s) || 0), x: Math.round(Number(res.focus.x) || 0) };
       if (res.focus.vn || res.focus.vs) { entry.f.vn = Math.round(Number(res.focus.vn) || 0); entry.f.vs = Math.round(Number(res.focus.vs) || 0); entry.f.vx = Math.round(Number(res.focus.vx) || 0); }
+      if (focusNc) entry.f.nc = 1;
     } else if (prevFocus && prevFocus.f) entry.f = prevFocus.f;
     /* `doneAssign` adalah persis yang dikirim ke guru (lihat tutorCode: `assign`). Misi
        mandiri tidak masuk ke sana: guru yang membaca laporan berhak yakin bahwa setiap
