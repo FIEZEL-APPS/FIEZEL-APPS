@@ -953,6 +953,10 @@ jobs:
           # m025-573: status bar HP (theme-color) sewarna topbar, dan topbar memberi tepi saat
           # isi halaman lewat di bawahnya - dua akar "topbar tampak terpotong".
           node tests/topbar-status-bar-seam-test.js
+          # m025-574: kenyamanan multi-device - soal kuis di kartu terang, teks kartu tak lagi
+          # putih/redup di kartu putih, petak hari terang, dan kolom 720/760 + dok tengah di >=768px
+          # tanpa kunci 100dvh (pelajaran #602/#603).
+          node tests/multi-device-comfort-test.js
           node tests/deploy-site-gate-test.js
           # m025-314: sepupu deploy-site-gate. Yang di atas menjaga CARA berkas diterbitkan;
           # yang ini menjaga agar berkasnya tidak BERBOHONG tentang alamat hasilnya. Repo

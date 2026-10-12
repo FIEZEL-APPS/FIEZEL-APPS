@@ -785,9 +785,10 @@ html body:not(.fz-teacher-mode) .card:not(.quiz-shell *):not(.card-quiz *):not(#
   color: #7A686B !important;
 }
 
-html body:not(.fz-teacher-mode) .card:not(.quiz-shell *):not(.card-quiz *):not(#feedback *):not(.feedback *) > span:not([class*="lvl"]):not(#feedback *):not(.feedback *),
-html body:not(.fz-teacher-mode) .card:not(.quiz-shell *):not(.card-quiz *):not(#feedback *):not(.feedback *) p:not(#feedback *):not(.feedback *) > span:not([class*="lvl"]),
-html body:not(.fz-teacher-mode) .card:not(.quiz-shell *):not(.card-quiz *):not(#feedback *):not(.feedback *) div > span:not([class*="badge"]):not([class*="tag"]):not([class*="btn"]):not([class*="act"]):not([class*="avatar"]):not([class*="lvl"]):not(.is-now):not(.is-done):not(#feedback *):not(.feedback *):not(.feedback-memory-kicker) {
+/* m025-574: pil gelap ("0/7 hari aktif") dan petunjuk lencana Prasasti terkunci berlatar gelap - dikecualikan supaya memakai warnanya sendiri. */
+html body:not(.fz-teacher-mode) .card:not(.quiz-shell *):not(.card-quiz *):not(#feedback *):not(.feedback *) > span:not([class*="lvl"]):not(#feedback *):not(.feedback *):not([class*="pill"]):not(.prasasti-badge *),
+html body:not(.fz-teacher-mode) .card:not(.quiz-shell *):not(.card-quiz *):not(#feedback *):not(.feedback *) p:not(#feedback *):not(.feedback *) > span:not([class*="lvl"]):not([class*="pill"]):not(.prasasti-badge *),
+html body:not(.fz-teacher-mode) .card:not(.quiz-shell *):not(.card-quiz *):not(#feedback *):not(.feedback *) div > span:not([class*="badge"]):not([class*="tag"]):not([class*="btn"]):not([class*="act"]):not([class*="avatar"]):not([class*="lvl"]):not(.is-now):not(.is-done):not(#feedback *):not(.feedback *):not(.feedback-memory-kicker):not([class*="pill"]):not(.prasasti-badge *) {
   color: #7A686B !important;
 }
 
