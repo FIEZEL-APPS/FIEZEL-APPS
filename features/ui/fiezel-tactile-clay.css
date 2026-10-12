@@ -7077,6 +7077,18 @@ html body.fz-view-latihan header.topbar {
   gap: 12px !important;
   view-transition-name: topbar !important;
 }
+/* m025-570: tepi topbar muncul HANYA saat isi halaman lewat di bawahnya (kelas .is-scrolled
+   dipasang app.js syncTopbarScrolled). Aturan di atas sengaja tanpa garis dan bayangan, dan
+   latarnya nyaris sama dengan latar halaman, jadi saat di-scroll kartu tampak terpotong garis
+   tak terlihat. Di puncak halaman topbar tetap rata menyatu dengan status bar. */
+html body header.topbar.is-scrolled,
+html body.fz-lux header.topbar.is-scrolled {
+  box-shadow: 0 1px 0 rgba(94, 20, 32, 0.08), 0 8px 18px -12px rgba(36, 26, 17, 0.28) !important;
+}
+@media (prefers-reduced-motion: no-preference) {
+  html body header.topbar,
+  html body.fz-lux header.topbar { transition: box-shadow .18s ease !important; }
+}
 ::view-transition-old(topbar),
 ::view-transition-new(topbar) {
   animation: none !important;
