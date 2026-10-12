@@ -1,7 +1,7 @@
 {
-  "version": "m025-574",
-  "claimedBy": "branch claude/multi-device-comfort",
-  "claimedAt": "2026-10-12T08:22:34.295Z",
-  "reason": "fix(ui): kenyamanan multi-device iPhone/iPad/desktop",
+  "version": "m025-575",
+  "claimedBy": "branch claude/adaptive-layout-fix",
+  "claimedAt": "2026-10-12T09:36:01.141Z",
+  "reason": "tata letak adaptif multi-device: rail tablet, sidebar desktop, isi multi-kolom",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

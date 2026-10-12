@@ -15,8 +15,16 @@
  *   C. Teks redup kartu #CBD5E1 (1,48:1 di putih) di mobile-edge-fit diganti #5B6472, dan
  *      pil gelap + lencana Prasasti dikecualikan (mobile-edge-fit dan vivid).
  *   D. Kotak hari "Minggu ini" kosong digambar hitam pekat -> petak terang.
- *   E. >=768px: kolom isi 720/760px (bukan kolom HP 440px), tab bawah jadi dok mengambang di
- *      tengah, topbar sejajar kolom isi - TANPA mengunci scroll 100dvh (pelajaran #602/#603).
+ *   E. Tata letak ADAPTIF per perangkat (m025-575; OWNER sesudah #605: "MULTI ADAPTIVE DEVICE
+ *      UI NYA TIDAK BERFUNGSI" - #605 hanya melebarkan kolom HP):
+ *        - 768-1023px: rail navigasi kiri 88px (ikon di atas label);
+ *        - >=1024px: sidebar kiri 232px (baris ikon + label);
+ *        - >=1100px: isi multi-kolom (Hari ini 2 kolom, Latihan/Perpustakaan 3 kolom,
+ *          Progres statistik + detail);
+ *        - lebar rail kembali 0 saat navigasi disembunyikan (kuis/pelajaran/sesi dengar);
+ *        - pil aktif di app.js bergerak 2D saat navigasi vertikal;
+ *      semuanya TANPA mengunci scroll 100dvh / overflow:hidden / height:100% (pelajaran
+ *      #602/#603: scroll mati, kartu terjepit).
  *   F. Bukti negatif: tiap pemeriksaan MERAH pada stub yang melanggar.
  */
 'use strict';
@@ -31,6 +39,7 @@ const indexHtml = read('index.html');
 const clay = read('features/ui/fiezel-tactile-clay.css');
 const edge = read('features/ui/mobile-edge-fit.css');
 const vivid = read('features/ui/fiezel-vivid.css');
+const appJs = read('app.js');
 
 let passCount = 0;
 const failures = [];
@@ -89,21 +98,58 @@ function assertWeekTiles(css) {
   assert.ok(/background:\s*#F3EEE7 !important/i.test(body), 'petak hari kosong harus terang, bukan hitam pekat');
 }
 
-function wideBlock(css) {
+function adaptiveBlock(css) {
   const s = section15(css);
-  const i = s.indexOf('@media (min-width: 768px)');
-  assert.ok(i >= 0, 'blok @media (min-width: 768px) tidak ditemukan di Section 15');
-  return s.slice(i);
+  const i = s.indexOf('15.8 ADAPTIF MULTI-DEVICE');
+  assert.ok(i >= 0, 'blok "15.8 ADAPTIF MULTI-DEVICE" tidak ditemukan di Section 15');
+  return s.slice(s.lastIndexOf('/*', i)); // mulai dari pembuka komentarnya, agar komentar bisa dibuang utuh
 }
 
-function assertWideLayout(css) {
-  const w = wideBlock(css);
-  assert.ok(/html body #app \{[^}]*max-width:\s*720px !important/.test(w), '>=768px: kolom isi #app harus 720px');
-  assert.ok(/@media \(min-width: 1200px\)\s*\{\s*html body #app \{\s*max-width:\s*760px !important/.test(w), '>=1200px: kolom isi #app harus 760px');
-  const nav = (w.match(/html\.fiezel-ui-v6 body\.fz-lux nav\.bottomnav,[^{]*\{([^}]*)\}/) || [])[1] || '';
-  assert.ok(/left:\s*50% !important/.test(nav) && /transform:\s*translateX\(-50%\) !important/.test(nav) && /border-radius:\s*24px !important/.test(nav),
-    '>=768px: tab bawah harus dok mengambang di tengah (left 50%, translateX(-50%), radius 24px) dengan spesifisitas html.fiezel-ui-v6 body.fz-lux');
-  assert.ok(/padding-left:\s*max\(16px, calc\(50% - 344px\)\) !important/.test(w), '>=768px: isi topbar harus sejajar kolom isi (50% - 344px)');
+function mediaBodies(css, query) {
+  // Isi setiap blok @media dengan kueri persis ini (kurung kurawal diseimbangkan).
+  const out = [];
+  let from = 0;
+  for (;;) {
+    const at = css.indexOf('@media ' + query + ' {', from);
+    if (at < 0) return out;
+    let k = css.indexOf('{', at) + 1, depth = 1;
+    const start = k;
+    while (depth && k < css.length) { if (css[k] === '{') depth++; else if (css[k] === '}') depth--; k++; }
+    out.push(css.slice(start, k - 1));
+    from = k;
+  }
+}
+
+const NAV = 'html body:not(.fz-teacher-mode) nav.bottomnav.bottomnav.bottomnav';
+
+function assertAdaptiveLayout(css) {
+  const a = adaptiveBlock(css);
+  const tab = mediaBodies(a, '(min-width: 768px)').join('\n');
+  const desk = mediaBodies(a, '(min-width: 1024px)').join('\n');
+  const wide = mediaBodies(a, '(min-width: 1100px)').join('\n');
+  assert.ok(/html body:not\(\.fz-teacher-mode\) \{[^}]*--fz-rail:\s*88px/.test(tab), '>=768px: --fz-rail harus 88px (rail tablet)');
+  assert.ok(/html body:not\(\.fz-teacher-mode\) \{[^}]*--fz-rail:\s*232px/.test(desk), '>=1024px: --fz-rail harus 232px (sidebar desktop)');
+  assert.ok(/fz-stage-quiz[^{]*\.quiz-shell[^{]*\{[^}]*--fz-rail:\s*0px !important/.test(tab),
+    'saat kuis/pelajaran (navigasi disembunyikan) --fz-rail harus 0 agar isi tidak menyisakan lajur kosong');
+  const navTab = rule(tab, new RegExp(NAV.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+  assert.ok(navTab && /width:\s*var\(--fz-rail\) !important/.test(navTab) && /flex-direction:\s*column !important/.test(navTab) && /left:\s*0 !important/.test(navTab),
+    '>=768px: navigasi harus rail kiri vertikal selebar --fz-rail (' + NAV + ')');
+  const navDeskItem = rule(desk, new RegExp((NAV + ' .nav').replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+  assert.ok(navDeskItem && /flex-direction:\s*row !important/.test(navDeskItem), '>=1024px: item sidebar harus baris ikon + label');
+  assert.ok(/main\.app\.app \{[^}]*padding-left:\s*var\(--fz-rail\) !important/.test(tab), 'isi (main.app) harus bergeser sebesar --fz-rail');
+  assert.ok(/html body #app \{[^}]*max-width:\s*var\(--fz-col\) !important/.test(tab), 'kolom isi #app harus dibatasi --fz-col dengan spesifisitas (1,0,2)');
+  assert.ok(/\.today-home-cockpit\.today-home-cockpit \{[^}]*grid-template-columns:\s*minmax\(0, 1fr\) minmax\(0, 1fr\)/.test(wide), '>=1100px: Hari ini harus 2 kolom');
+  assert.ok(/\.learning-launcher\.learning-launcher[^{]*\{[^}]*repeat\(3, minmax\(0, 1fr\)\)/.test(wide), '>=1100px: Latihan harus 3 kolom');
+  assert.ok(/fz-stage-map #app > section\.fade \{[^}]*grid-template-columns:\s*340px minmax\(0, 1fr\)/.test(wide), '>=1100px: Progres harus statistik + detail');
+}
+
+function assertPill2D(js) {
+  const m = js.match(/function syncNavActivePill\(targetEl\)\{[^\n]*/);
+  assert.ok(m, 'syncNavActivePill tidak ditemukan di app.js');
+  const f = m[0];
+  assert.ok(/getComputedStyle\(nav\)\.flexDirection==='column'/.test(f) && /translate3d\(\$\{left\}px,\$\{top\}px,0\)/.test(f),
+    'pil aktif harus bergerak 2D (translate3d) saat navigasi vertikal (rail/sidebar)');
+  assert.ok(/translateX\(\$\{left\}px\)/.test(f) && /removeProperty\('top'\)/.test(f), 'di dok HP pil tetap translateX dan tinggi/top dikembalikan ke CSS');
 }
 
 function assertNoViewportLock(css) {
@@ -111,6 +157,8 @@ function assertNoViewportLock(css) {
   assert.ok(!/100dvh/.test(s), 'Section 15 tidak boleh memakai 100dvh - pelajaran #602 (scroll mati, kartu terjepit)');
   assert.ok(!/html[^{]*\{[^}]*overflow:\s*hidden/.test(s) && !/body[^{,]*\{[^}]*overflow:\s*hidden/.test(s),
     'Section 15 tidak boleh mengunci overflow html/body');
+  assert.ok(!/height:\s*100%/.test(adaptiveBlock(css).replace(/\/\*[\s\S]*?\*\//g, '')),
+    'tata letak adaptif tidak boleh memaku height:100% (kartu terjepit seperti #602)');
 }
 
 console.log('FIEZEL Multi-Device Comfort Gate:');
@@ -118,8 +166,9 @@ check('A. soal kuis di kartu terang bertinta gelap', () => assertQuiz(clay));
 check('B. teks tebal kartu mewarisi warna kartu, dimuat sesudah mobile-edge-fit', () => assertCardInherit(clay, indexHtml));
 check('C. teks redup kartu bukan #CBD5E1, pil gelap dikecualikan', () => assertMutedSource(edge, vivid));
 check('D. petak hari kosong terang', () => assertWeekTiles(clay));
-check('E1. >=768px: kolom 720/760, dok tengah, topbar sejajar', () => assertWideLayout(clay));
-check('E2. tanpa kunci viewport 100dvh / overflow hidden', () => assertNoViewportLock(clay));
+check('E1. adaptif: rail 768-1023, sidebar >=1024, multi-kolom >=1100, rail 0 saat kuis', () => assertAdaptiveLayout(clay));
+check('E2. tanpa kunci viewport 100dvh / overflow hidden / height 100%', () => assertNoViewportLock(clay));
+check('E3. pil aktif navigasi bergerak 2D di rail/sidebar', () => assertPill2D(appJs));
 
 check('F. bukti negatif: gerbang MERAH pada stub yang melanggar', () => {
   const mustThrow = (label, fn) => assert.throws(fn, Error, 'stub "' + label + '" seharusnya merah');
@@ -129,7 +178,12 @@ check('F. bukti negatif: gerbang MERAH pada stub yang melanggar', () => {
   mustThrow('redup lama', () => assertMutedSource(edge.replace(/(\n\.card p \{\s*color:\s*)#5B6472/, '$1#CBD5E1'), vivid));
   mustThrow('pil tak dikecualikan', () => assertMutedSource(edge, vivid.replace(':not([class*="pill"]):not(.prasasti-badge *)', '')));
   mustThrow('petak hitam', () => assertWeekTiles(clay.replace(/(html body \.fz2-day i \{\s*background:\s*)#F3EEE7/, '$1#181824')));
-  mustThrow('kolom HP', () => assertWideLayout(clay.replace(/(html body #app \{\s*max-width:\s*)720px/, '$1440px')));
+  mustThrow('tanpa rail', () => assertAdaptiveLayout(clay.replace('--fz-rail: 88px;', '--fz-rail: 0px;')));
+  mustThrow('dok bawah di desktop', () => assertAdaptiveLayout(clay.replace(/(nav\.bottomnav\.bottomnav\.bottomnav \{[^}]*flex-direction:\s*)column/, '$1row')));
+  mustThrow('rail tetap saat kuis', () => assertAdaptiveLayout(clay.replace('--fz-rail: 0px !important;', '--fz-rail: 88px !important;')));
+  mustThrow('Latihan 2 kolom', () => assertAdaptiveLayout(clay.replace(/(\.learning-launcher\.learning-launcher[^{]*\{[^}]*)repeat\(3,/, '$1repeat(2,')));
+  mustThrow('kunci tinggi 100%', () => assertNoViewportLock(clay + '\nhtml body #app > section.fade { height: 100% !important; }'));
+  mustThrow('pil hanya horizontal', () => assertPill2D(appJs.replace("getComputedStyle(nav).flexDirection==='column'", 'false')));
   mustThrow('kunci 100dvh', () => assertNoViewportLock(clay + '\nhtml body { height: 100dvh !important; overflow: hidden !important; }'));
 });
 
