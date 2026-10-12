@@ -1,6 +1,6 @@
 # Audit pedagogis & kognitif umpan balik BrainCore — 2026-10-11
 
-**Basis:** `main` @ `c541d5b` (build `m025-566`) · **Perbaikan:** build `m025-567`, branch
+**Basis:** `main` @ `c541d5b` (build `m025-566`) · **Perbaikan:** build `m025-568`, branch
 `claude/elegant-gates-lhkilc`.
 
 **Cakupan:** semua teks yang dilihat murid antara "jawaban salah" dan "soal berikutnya":
@@ -337,4 +337,4 @@ belum diperbaiki dicatat sebagai utang di §5.
 | `tests/braincore-pedagogy-audit-2026-10-11-test.js` | gerbang baru (15 cek), terdaftar di `quality.yml` |
 | `tools/dev/braincore-pedagogy-audit-2026-10-11-probe.js` | pemindai forensik (bukan gerbang) |
 | `id-golden-baseline.json` | diregenerasi sadar (`--write-baseline`) |
-| `sw.js`, `core-config.js`, `fiezel-diag-panel.js`, `kurikulum.html`, `misi.html`, `coordination/BUILD-VERSION.json` | build `m025-567` |
+| `sw.js`, `core-config.js`, `fiezel-diag-panel.js`, `kurikulum.html`, `misi.html`, `coordination/BUILD-VERSION.json` | build `m025-568` |

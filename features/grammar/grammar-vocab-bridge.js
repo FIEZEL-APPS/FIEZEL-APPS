@@ -109,7 +109,7 @@
             if (data && data.lessons) {
               _grammarVocabMapCache = data;
               try {
-                if (typeof window !== 'undefined' && typeof window.drawTopScreen === 'function') {
+                if (typeof window !== 'undefined' && window.__fiezelBootSplashDismissed && typeof window.drawTopScreen === 'function') {
                   window.drawTopScreen();
                 }
               } catch (_) {}
@@ -122,9 +122,12 @@
     return null;
   }
 
-  // Pre-load map if synchronous loader is available
+  // Pre-load map if synchronous loader is available (Node test environment);
+  // in browser, app.js load() already fetches and injects setGrammarVocabMap().
   try {
-    loadGrammarVocabMap();
+    if (typeof require === 'function' && typeof process !== 'undefined') {
+      loadGrammarVocabMap();
+    }
   } catch (_) {}
 
   /**

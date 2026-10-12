@@ -168,7 +168,7 @@
       if (!groups.length) return false;
       function launch() {
         var splash = doc.getElementById('fiezelBootSplash') || doc.querySelector('[data-fiezel-boot-splash]');
-        if (splash && splash.parentNode && !target.__fiezelBootSplashDismissed && !splash.classList.contains('is-leaving')) {
+        if (splash && splash.parentNode) {
           if (typeof target.setTimeout === 'function') target.setTimeout(launch, 300);
           return;
         }

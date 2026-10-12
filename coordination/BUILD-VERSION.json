@@ -1,7 +1,7 @@
 {
-  "version": "m025-567",
+  "version": "m025-568",
   "claimedBy": "branch claude/elegant-gates-lhkilc",
-  "claimedAt": "2026-10-11T21:34:13.753Z",
+  "claimedAt": "2026-10-12T03:21:58.918Z",
   "reason": "audit pedagogi BrainCore: umpan balik jujur susun kata, retry tanpa bocoran kunci",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
