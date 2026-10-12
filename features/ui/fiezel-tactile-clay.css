@@ -7518,70 +7518,238 @@ header.topbar .active-level-control::after,
   inset: -6px;
 }
 
-/* 15.8 Tablet & desktop (>=768px). HP (<768px) TIDAK disentuh, dan scroll halaman tetap
-   milik jendela (pelajaran #602/#603: jangan kunci 100dvh). Sebelumnya seluruh isi dipaku
-   kolom HP 440px (29% lebar layar 1440), tab bawah membentang 1440px dengan jarak antar-ikon
-   ~240px, topbar tidak sejajar dengan isi, dan latar berganti putih/krem per layar. */
+/* 15.8 ADAPTIF MULTI-DEVICE (m025-575): dok bawah di HP, rail kiri di tablet, sidebar kiri
+   + isi multi-kolom di iPad mendatar/laptop/desktop.
+   OWNER sesudah #605: "MULTI ADAPTIVE DEVICE UI NYA TIDAK BERFUNGSI". #602 membawa tiga
+   tingkat perangkat, tetapi juga mengunci html/body/#app setinggi 100dvh dengan
+   overflow:hidden, sehingga scroll mati dan kartu terjepit. Revert #603 ikut membuang tingkat
+   perangkatnya, dan #605 hanya melebarkan kolom HP. Di sini tingkat perangkat kembali TANPA
+   kunci tinggi: scroll tetap milik jendela, kartu bertinggi alami (align-items:start), dan
+   tidak ada height:100%/overflow:hidden pada section. HP (<768px) tidak disentuh.
+
+   Tiga variabel di <body> mengatur geometri:
+     --fz-rail  lebar navigasi kiri: 88px di tablet, 232px di desktop. Nilainya 0 saat
+                navigasi disembunyikan (kuis, pelajaran, sesi bicara/dengar, kartu hafalan),
+                supaya isi tidak menyisakan lajur kosong.
+     --fz-col   lebar maksimum kolom isi: 760px di tablet, 900px di desktop, dan 1160px di
+                layar yang punya tata letak multi-kolom (Hari ini, Latihan, Progres, Profil,
+                Perpustakaan).
+     --fz-gut   jarak tepi isi.
+   Mode guru punya cangkangnya sendiri (teacher-shell.css), jadi selalu dikecualikan. */
 @media (min-width: 768px) {
-  /* Latar = latar section (#FFF9EE) supaya kolom isi tidak tampak sebagai pita samar. */
-  html,
-  html body {
+  html body:not(.fz-teacher-mode) {
+    --fz-rail: 88px;
+    --fz-col: 760px;
+    --fz-gut: 20px;
+  }
+}
+@media (min-width: 1024px) {
+  html body:not(.fz-teacher-mode) {
+    --fz-rail: 232px;
+    --fz-col: 900px;
+    --fz-gut: 28px;
+  }
+}
+@media (min-width: 1100px) {
+  html body:is(.fz-stage-home, .fz-view-latihan, .fz-stage-map, .fz-view-profile):not(.fz-teacher-mode),
+  html body:has(#app > .library-page):not(.fz-teacher-mode) {
+    --fz-col: 1160px;
+  }
+}
+@media (min-width: 768px) {
+  /* Navigasi disembunyikan di keadaan ini oleh aturan di Section 8 dan mobile-edge-fit. */
+  html body:is(.fz-lesson-mode, .fz-stage-quiz, .fsl-session-active, .fz-stage-sl),
+  html body:has(.fsl-card-listening, .fsl-feedback, .card-flashcard, .quiz-shell) {
+    --fz-rail: 0px !important;
+    --fz-col: 880px !important;
+  }
+
+  /* Latar halaman = latar section (#FFF9EE) supaya kolom isi tidak tampak sebagai pita samar.
+     Spesifisitas (0,2,2) karena index.html memaku `html:not(.fz-booting) body` #FBF7F3. */
+  html:not(.fz-booting),
+  html:not(.fz-booting) body:not(.fz-teacher-mode) {
     background: #FFF9EE !important;
   }
-  html body main.app.app,
-  html body.fz-lux main.app.app {
+
+  /* Cangkang: isi bergeser sebesar lebar navigasi kiri. Hanya padding kiri/kanan/bawah yang
+     diubah; padding atas (ruang topbar fixed) tetap milik aturan lama. */
+  html body:not(.fz-teacher-mode) main.app.app {
     max-width: none !important;
     width: 100% !important;
     margin: 0 !important;
+    padding-left: var(--fz-rail) !important;
+    padding-right: 0 !important;
+    padding-bottom: calc(40px + env(safe-area-inset-bottom, 0px)) !important;
     background: transparent !important;
     border: 0 !important;
     box-shadow: none !important;
-    padding-bottom: calc(112px + env(safe-area-inset-bottom, 0px)) !important;
+    box-sizing: border-box !important;
   }
+  /* Spesifisitas sengaja sama dengan aturan lama (1,0,2): aturan kuis/pelajaran
+     `body.fz-stage-quiz #app` dan mode guru `body.fz-teacher-mode #app` tetap menang. */
   html body #app {
-    max-width: 720px !important;
+    max-width: var(--fz-col) !important;
     width: 100% !important;
     margin: 0 auto !important;
     background: transparent !important;
   }
   html body #app > :is(.home-today, section.fade, #fzClassHub, .classroom-page, .progress-page, .profile-page, .ch-student, .game-view-shell) {
     max-width: 100% !important;
-    padding-left: 16px !important;
-    padding-right: 16px !important;
+    padding-left: var(--fz-gut) !important;
+    padding-right: var(--fz-gut) !important;
   }
   html body #app :is(.today-home-cockpit, section.ch-student) {
     max-width: 100% !important;
   }
-  /* Isi topbar sejajar dengan tepi kolom isi (720 - 2x16 = 688 -> setengahnya 344). */
-  html body header.topbar,
-  html body.fz-lux header.topbar {
-    padding-left: max(16px, calc(50% - 344px)) !important;
-    padding-right: max(16px, calc(50% - 344px)) !important;
+
+  /* Topbar tetap selebar layar; logonya duduk di atas rail/sidebar, tombolnya di kanan. */
+  html body:not(.fz-teacher-mode) header.topbar.topbar {
+    padding-left: var(--fz-gut) !important;
+    padding-right: var(--fz-gut) !important;
   }
-  /* Tab bawah menjadi dok mengambang di tengah, selebar yang dibutuhkan enam tab. */
-  html body nav.bottomnav,
-  html.fiezel-ui-v6 body.fz-lux nav.bottomnav,
-  html.fiezel-ui-v6 body:has(.home-today) nav.bottomnav {
-    left: 50% !important;
+
+  /* RAIL (tablet): navigasi menempel di kiri, di bawah topbar, ikon di atas label. */
+  html body:not(.fz-teacher-mode) nav.bottomnav.bottomnav.bottomnav {
+    top: calc(56px + env(safe-area-inset-top, 0px)) !important;
+    bottom: 0 !important;
+    left: 0 !important;
     right: auto !important;
-    width: min(560px, calc(100% - 48px)) !important;
-    max-width: 560px !important;
-    transform: translateX(-50%) !important;
-    bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
+    width: var(--fz-rail) !important;
+    max-width: var(--fz-rail) !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    transform: none !important;
+    margin: 0 !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 16px 8px calc(16px + env(safe-area-inset-bottom, 0px)) !important;
+    border: 0 !important;
+    border-right: 1.5px solid rgba(217, 119, 6, 0.16) !important;
+    border-radius: 0 !important;
+    background: linear-gradient(180deg, #FFFDF4 0%, #FEF6C7 100%) !important;
+    box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.9), 8px 0 24px -18px rgba(120, 53, 15, 0.30) !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain !important;
+  }
+  html body:not(.fz-teacher-mode) nav.bottomnav.bottomnav.bottomnav .nav {
+    flex: 0 0 auto !important;
+    width: 72px !important;
     height: 64px !important;
     min-height: 64px !important;
     max-height: 64px !important;
-    padding: 6px !important;
-    border-radius: 24px !important;
-    border: 1.5px solid rgba(217, 119, 6, 0.18) !important;
-    box-shadow: inset 0 1.5px 2px #FFFFFF, 0 14px 34px -14px rgba(120, 53, 15, 0.30) !important;
+    padding: 8px 4px !important;
+    border-radius: 18px !important;
+  }
+  /* Pil aktif: app.js syncNavActivePill() menulis posisi 2D saat navigasi vertikal. */
+  html body:not(.fz-teacher-mode) nav.bottomnav.bottomnav.bottomnav #navActivePill {
+    border-radius: 18px !important;
   }
 }
-@media (min-width: 1200px) {
-  html body #app { max-width: 760px !important; }
-  html body header.topbar,
-  html body.fz-lux header.topbar {
-    padding-left: max(16px, calc(50% - 364px)) !important;
-    padding-right: max(16px, calc(50% - 364px)) !important;
+
+@media (min-width: 1024px) {
+  /* SIDEBAR (iPad mendatar, laptop, desktop): baris ikon + label. */
+  html body:not(.fz-teacher-mode) nav.bottomnav.bottomnav.bottomnav {
+    align-items: stretch !important;
+    gap: 4px !important;
+    padding: 20px 14px calc(20px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  html body:not(.fz-teacher-mode) nav.bottomnav.bottomnav.bottomnav .nav {
+    width: 100% !important;
+    height: 48px !important;
+    min-height: 48px !important;
+    max-height: 48px !important;
+    flex-direction: row !important;
+    justify-content: flex-start !important;
+    gap: 14px !important;
+    padding: 0 16px !important;
+    border-radius: 14px !important;
+  }
+  html body:not(.fz-teacher-mode) nav.bottomnav.bottomnav.bottomnav .nav span {
+    font-size: 14px !important;
+    text-align: left !important;
+    margin-top: 0 !important;
+  }
+  html body:not(.fz-teacher-mode) nav.bottomnav.bottomnav.bottomnav #navActivePill {
+    border-radius: 14px !important;
+  }
+}
+
+/* ISI MULTI-KOLOM. Semua grid ber-align-items:start dan tanpa tinggi tetap: kartu memakai
+   tinggi alaminya, halaman tetap digulir jendela. */
+@media (min-width: 768px) {
+  html body.fz-view-game .game-hub-container .game-arcade-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+@media (min-width: 1100px) {
+  /* Hari ini: misi + KelasKu di kiri, Latihan Singkat di kanan. Kartu lain (mis. kartu
+     BrainCore) tetap selebar penuh di bawahnya. */
+  html body #app .today-home-cockpit.today-home-cockpit {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    /* Baris ke-3 lentur: tinggi Latihan Singkat yang melebihi misi diserap baris KelasKu,
+       jadi KelasKu menempel tepat di bawah misi. */
+    grid-template-rows: auto auto 1fr !important;
+    column-gap: 24px !important;
+    row-gap: 16px !important;
+    align-items: start !important;
+  }
+  html body #app .today-home-cockpit.today-home-cockpit > * {
+    grid-column: 1 / -1 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+  html body #app .today-home-cockpit.today-home-cockpit > .tactile-welcome-bar { grid-row: 1 !important; }
+  html body #app .today-home-cockpit.today-home-cockpit > #heroCard { grid-column: 1 !important; grid-row: 2 !important; }
+  html body #app .today-home-cockpit.today-home-cockpit > .class-bar { grid-column: 1 !important; grid-row: 3 !important; }
+  html body #app .today-home-cockpit.today-home-cockpit > .quick-practice-section {
+    grid-column: 2 !important;
+    grid-row: 2 / span 2 !important;
+  }
+
+  /* Latihan dan Perpustakaan: tiga kolom. */
+  html body #app .learning-launcher.learning-launcher,
+  html body #app .library-page .library-grid.library-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  /* Progres: statistik di kiri (ikut menempel saat digulir), tab + isinya di kanan. */
+  html body.fz-stage-map #app > section.fade {
+    display: grid !important;
+    grid-template-columns: 340px minmax(0, 1fr) !important;
+    column-gap: 24px !important;
+    row-gap: 16px !important;
+    align-items: start !important;
+  }
+  html body.fz-stage-map #app > section.fade > * {
+    grid-column: 1 / -1 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+  html body.fz-stage-map #app > section.fade > .card:has(.progress-stats) {
+    grid-column: 1 !important;
+    grid-row: 1 / span 2 !important;
+    position: sticky !important;
+    top: calc(72px + env(safe-area-inset-top, 0px)) !important;
+  }
+  html body.fz-stage-map #app > section.fade > .progress-tabs { grid-column: 2 !important; grid-row: 1 !important; }
+  html body.fz-stage-map #app > section.fade > #progressTabPane { grid-column: 2 !important; grid-row: 2 !important; }
+
+  /* Profil: kartu profil selebar penuh, kartu pengaturan mengalir di dua kolom. */
+  html body.fz-view-profile #onlineRoot #viewProfile {
+    display: block !important;
+    column-count: 2 !important;
+    column-gap: 24px !important;
+  }
+  html body.fz-view-profile #onlineRoot #viewProfile > * {
+    break-inside: avoid !important;
+    margin: 0 0 24px !important;
+  }
+  html body.fz-view-profile #onlineRoot #viewProfile > .profile-hero-card {
+    column-span: all !important;
   }
 }
