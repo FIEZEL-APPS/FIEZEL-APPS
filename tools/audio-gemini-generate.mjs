@@ -268,13 +268,16 @@ async function synthesizeGemini(text, voiceName, apiKey) {
       let detail = '';
       try { detail = await response.text(); } catch (_) {}
       lastError = `http_${response.status}: ${detail.slice(0, 200)}`;
-      const isDailyExhausted = /GenerateContentRequestsPerDayPerProject|exceeded your current quota/i.test(detail);
-      if (isDailyExhausted) {
-        return { fatal: `Kuota harian Gemini tercapai (HTTP 429: ${detail.slice(0, 200)})` };
+      if (response.status === 429) {
+        const hasPerMinute = /PerMinute|RequestsPerMinute/i.test(detail);
+        const hasPerDay = /PerDay|RequestsPerDay|DayPerProject/i.test(detail);
+        if (hasPerDay && !hasPerMinute) {
+          return { dailyExhausted: true, fatal: `Kuota harian Gemini tercapai (HTTP 429: ${detail.slice(0, 240)})` };
+        }
+        return { rpmLimited: true, detail: detail.slice(0, 240), error: lastError };
       }
-      // Batas RPM (Requests Per Minute) pada Gemini Free Tier
-      const waitMs = 30000;
-      console.warn(`[Gemini HTTP ${response.status}] Terkena rate limit. Percobaan ${attempt}/${MAX_RETRIES}, detail: ${detail.slice(0, 100)}, menunggu 30 detik...`);
+      const waitMs = 15000;
+      console.warn(`[Gemini HTTP ${response.status}] Server sibuk. Percobaan ${attempt}/${MAX_RETRIES}, menunggu 15 detik...`);
       await new Promise((r) => setTimeout(r, waitMs));
       continue;
     }
@@ -430,6 +433,32 @@ async function main() {
     manifest.voiceProfiles = [currentProfile, ...(manifest.voiceProfiles || [])];
   }
 
+  const keyStates = apiKeys.map(() => ({ exhausted: false, cooldownUntil: 0, lastUsedAt: 0 }));
+
+  function pickAvailableKey() {
+    const now = Date.now();
+    for (let offset = 0; offset < apiKeys.length; offset++) {
+      const idx = (currentKeyIndex + offset) % apiKeys.length;
+      const st = keyStates[idx];
+      if (!st.exhausted && st.cooldownUntil <= now) {
+        currentKeyIndex = (idx + 1) % apiKeys.length;
+        return { idx, waitMs: 0 };
+      }
+    }
+    let earliestIdx = -1;
+    let earliestTime = Infinity;
+    for (let idx = 0; idx < apiKeys.length; idx++) {
+      const st = keyStates[idx];
+      if (!st.exhausted && st.cooldownUntil < earliestTime) {
+        earliestTime = st.cooldownUntil;
+        earliestIdx = idx;
+      }
+    }
+    if (earliestIdx === -1) return null;
+    currentKeyIndex = (earliestIdx + 1) % apiKeys.length;
+    return { idx: earliestIdx, waitMs: Math.max(0, earliestTime - now) };
+  }
+
   for (let i = 0; i < queue.length; i++) {
     const job = queue[i];
     const { identity, sourceRef } = job;
@@ -446,19 +475,32 @@ async function main() {
 
     console.log(`[GENERATING] (${i + 1}/${queue.length}) Level ${job.identity.contentType}: "${identity.canonicalText.slice(0, 40)}..."`);
     let result;
-    while (currentKeyIndex < apiKeys.length) {
-      result = await synthesizeGemini(identity.canonicalText, voiceId, apiKeys[currentKeyIndex]);
-      if (result.fatal && result.fatal.includes('Kuota harian')) {
-        console.warn(`[KEY EXHAUSTED] Key ${currentKeyIndex + 1}/${apiKeys.length} mencapai batas kuota harian.`);
-        currentKeyIndex++;
-        if (currentKeyIndex < apiKeys.length) {
-          console.log(`[ROTATING KEY] Beralih ke Key ${currentKeyIndex + 1}/${apiKeys.length}...`);
-          continue;
-        } else {
-          console.error(`[FATAL ERROR] Seluruh ${apiKeys.length} Gemini API Key telah mencapai batas kuota harian.`);
-          break;
-        }
+    while (true) {
+      const picked = pickAvailableKey();
+      if (!picked) {
+        console.error(`[FATAL ERROR] Seluruh ${apiKeys.length} Gemini API Key telah mencapai batas kuota harian.`);
+        result = { fatal: `Seluruh ${apiKeys.length} Gemini API Key telah mencapai batas kuota harian.` };
+        break;
       }
+      if (picked.waitMs > 0) {
+        console.log(`[RPM COOLDOWN] Menunggu ${Math.ceil(picked.waitMs / 1000)} detik hingga kuota per-menit Key ${picked.idx + 1}/${apiKeys.length} pulih...`);
+        await new Promise((r) => setTimeout(r, picked.waitMs));
+      }
+      const st = keyStates[picked.idx];
+      const sinceLastUse = st.lastUsedAt > 0 ? (Date.now() - st.lastUsedAt) : Infinity;
+      result = await synthesizeGemini(identity.canonicalText, voiceId, apiKeys[picked.idx]);
+      if (result.dailyExhausted || (result.rpmLimited && sinceLastUse > 65000)) {
+        st.exhausted = true;
+        const activeLeft = keyStates.filter((k) => !k.exhausted).length;
+        console.warn(`[KEY EXHAUSTED] Key ${picked.idx + 1}/${apiKeys.length} mencapai batas kuota harian (tersisa ${activeLeft} key aktif).`);
+        continue;
+      }
+      if (result.rpmLimited) {
+        st.cooldownUntil = Date.now() + 62000;
+        console.warn(`[RPM LIMIT] Key ${picked.idx + 1}/${apiKeys.length} terkena batas RPM, masuk cooldown 62s dan beralih ke key berikutnya...`);
+        continue;
+      }
+      st.lastUsedAt = Date.now();
       break;
     }
 
@@ -496,8 +538,8 @@ async function main() {
     // Simpan progres manifest secara langsung agar setiap audio yang berhasil langsung tercatat
     saveManifest(manifest);
 
-    // Jeda 6.5 detik antar request agar konsisten aman di bawah batas RPM Gemini Preview TTS
-    await new Promise((r) => setTimeout(r, 6500));
+    // Jeda singkat antar request (rotasi round-robin + cooldown per-key sudah menjaga RPM)
+    await new Promise((r) => setTimeout(r, 2000));
   }
 
   saveManifest(manifest);
