@@ -1,4 +1,4 @@
-# FIEZEL-M025571 — Topbar "terpotong": status bar sewarna topbar + tepi saat scroll (`m025-571`)
+# FIEZEL-M025572 — Topbar "terpotong": status bar sewarna topbar + tepi saat scroll (`m025-572`)
 
 **Status:** siap review OWNER (PR #601). Tidak ada teks baru yang dilihat murid, jadi i18n id/th tidak tersentuh.
 **Otoritas:** keputusan merge dan rilis tetap di tangan OWNER/MASTER.
@@ -33,7 +33,7 @@ tepat di bawah blok yang menang.
   - `syncTopbarScrolled(source)` mengatur kelas `.is-scrolled` di `header.topbar`.
     Listener `scroll` dipasang di document dengan fase capture (pasif, dibatasi rAF),
     sehingga menangkap scroll jendela **maupun** panel dalam `#app`. Ini diperlukan
-    karena cangkang 100dvh (PR #602) menggulir `#app > section`, bukan jendela.
+    karena cangkang 100dvh (#602, sudah di main sebagai `m025-571`) menggulir `#app > section`, bukan jendela.
   - Penggulir horizontal dan penggulir di luar `#app` diabaikan.
   - `renderInner()` mereset tepi saat pindah layar.
 - `index.html` (`meta theme-color`) dan `manifest.json` (`theme_color`): `#FBF7F3` → `#FDFAF3`.
@@ -47,7 +47,7 @@ tepat di bawah blok yang menang.
     luar `#app`);
   - bukti negatif untuk tiap jalur.
 - `id-golden-baseline.json`: hash `manifest.json` diperbarui (hanya `theme_color`).
-- Build `m025-571` lewat `node tools/bump-build.mjs`. Ini juga menyentuh
+- Build `m025-572` lewat `node tools/bump-build.mjs` (main sudah memakai `m025-570` untuk #600 dan `m025-571` untuk #602). Ini juga menyentuh
   `features/neural-voice/fiezel-diag-panel.js` (`DIAG_BUILD`), itulah sebabnya handoff ini
   diwajibkan A13.
 
@@ -56,7 +56,7 @@ tepat di bawah blok yang menang.
 | Tata letak | Hasil |
 |---|---|
 | Sekarang (jendela yang digulir) | Home, Progres, Grammar, Profil: tepi muncul setelah scroll, hilang setelah pindah layar |
-| Digabung dengan #602 (panel dalam) | `ol.lesson-path`, `#onlineRoot`, `#progressTabPane`, `.game-hub-container` di-scroll 400 px → `is-scrolled`; tercabut saat ke Home |
+| Cangkang 100dvh #602 (panel dalam) | `ol.lesson-path`, `#onlineRoot`, `#progressTabPane`, `.game-hub-container` di-scroll 400 px → `is-scrolled`; tercabut saat ke Home |
 | `theme-color` di semua layar | `#FDFAF3` |
 | Sesi kuis dan Listening/Speaking | Bar sendiri yang sudah bergaris bawah dan berlatar `#FDFAF3`, tidak diubah |
 
@@ -66,9 +66,6 @@ di sandbox.
 
 ## 5. Langkah berikutnya
 
-- **Tabrakan nomor build:** PR #602 juga mengklaim `m025-571`. Yang di-merge kedua menjalankan
-  `node tools/bump-build.mjs "<alasan>"` lagi. Konfliknya hanya di
-  `coordination/BUILD-VERSION.json`.
 - Utang yang dicatat jujur, belum dikerjakan: merampingkan sekitar 12 aturan `.topbar`
   menjadi satu definisi. Selama itu belum dilakukan, warna topbar wajib diubah serempak di
   TOPBAR AUTHORITY, `TOPBAR_THEME_COLOR`, `index.html`, dan `manifest.json`. Gerbang seam

@@ -950,7 +950,7 @@ jobs:
           # Menjaga agar .is-repaint tidak dicabut asinkron, topbar/bottomnav memegang VT terisolasi
           # tanpa animasi dissolve, dan tombol pengaturan di panel profil selalu aktif & fungsional.
           node tests/anti-flicker-uiux-invariant-test.js
-          # m025-571: status bar HP (theme-color) sewarna topbar, dan topbar memberi tepi saat
+          # m025-572: status bar HP (theme-color) sewarna topbar, dan topbar memberi tepi saat
           # isi halaman lewat di bawahnya - dua akar "topbar tampak terpotong".
           node tests/topbar-status-bar-seam-test.js
           node tests/deploy-site-gate-test.js
