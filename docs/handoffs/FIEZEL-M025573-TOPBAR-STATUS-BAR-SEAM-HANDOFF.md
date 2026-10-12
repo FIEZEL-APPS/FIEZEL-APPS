@@ -26,6 +26,26 @@ mobile-edge-fit, vivid, tutor-v3, tactile-clay). Yang menang adalah tactile-clay
 dimuat paling akhir. PR ini tidak membereskan tumpukan itu. Perubahan hanya ditambahkan
 tepat di bawah blok yang menang.
 
+## 2b. Lanjutan: status bar saat splash, layar masuk, dan tur
+
+OWNER: *"KAMU TIDAK MEMPERBAIKI TOPBAR SAAT SPLASH ATAU BOOT PWA, KARENA MASIH TAMPAK SEPERTI TERPOTONG"*.
+
+Rekaman boot di Chromium 393x852 (notch tiruan 59 px) menunjukkan status bar tetap krem
+`#FDFAF3`, padahal yang tampil paling atas gelap: splash `#1B1418` (0–3,5 dtk), hero layar
+masuk `#1B1418` (murid baru), dan peredup tur `rgba(10,5,8,.78)`. Pita krem memotong layar
+gelap. Perbaikannya:
+
+- `statusBarSurfaceColor()` mengkomposit warna latar tumpukan `elementsFromPoint` di puncak
+  layar, ditambah peredup tur yang `pointer-events:none`. `syncStatusBarColor()` menulis hasil
+  itu ke `meta theme-color` (dibatasi rAF).
+- Fungsi itu dipanggil oleh observer dangkal pada anak `<body>` dan kelas `<html>`/`<body>`
+  (splash, layar masuk, dan tur menempel di sana), juga oleh `load`, `resize`, dan jam celestial.
+- Warna awal `index.html` dan `manifest.json` (`theme_color` serta `background_color`, yaitu
+  splash OS Android) = `#1B1418`. Urutannya: splash OS gelap → splash halaman gelap → app krem,
+  tanpa kedip krem→gelap.
+- Bukti sesudah perbaikan: splash 150–3000 ms `#1B1418`; layar masuk `#1B1418`; tur `#3F3B3C`;
+  app `#FDFAF3`/`#FFF9EE`, sesuai latar paling atas.
+
 ## 3. Perubahan
 
 - `app.js`

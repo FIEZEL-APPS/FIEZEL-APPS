@@ -4,18 +4,26 @@
  * OWNER: "KENAPA TAMPILAN UI PWA FIEZEL TAMPAK TERLIHAT TERPOTONG DI TOPBAR TIDAK SEPERTI
  * APLIKASI GENERIK?"
  *
- * Dua akar, keduanya terukur di Chromium 390 px, bukan dugaan dari membaca kode:
- *   1. Status bar HP digambar OS dengan meta theme-color. app.js menimpanya dengan palet
- *      langit (#F4EDE6) yang lebih gelap dari topbar (#FDFAF3), jadi puncak layar tampil dua
- *      pita warna dan topbar terlihat seperti potongan terpisah dari status bar.
+ * OWNER (lanjutan): "KAMU TIDAK MEMPERBAIKI TOPBAR SAAT SPLASH ATAU BOOT PWA, KARENA MASIH
+ * TAMPAK SEPERTI TERPOTONG"
+ *
+ * Akar, semuanya terukur di Chromium 393x852 dengan notch tiruan, bukan dugaan dari kode:
+ *   1. Status bar HP digambar OS dengan meta theme-color. app.js dulu menimpanya dengan palet
+ *      langit (#F4EDE6), lalu dengan satu warna topbar (#FDFAF3). Keduanya salah di saat
+ *      berbeda: di app terang palet langit lebih gelap dari topbar, dan saat splash (#1B1418),
+ *      layar masuk (hero #1B1418), serta tur (peredup .78) status bar krem memotong layar
+ *      gelap. Kini theme-color mengikuti permukaan paling atas (statusBarSurfaceColor).
  *   2. "TOPBAR AUTHORITY" (fiezel-tactile-clay.css) mencabut garis dan bayangan topbar, dan
  *      latarnya nyaris sama dengan latar halaman. Saat di-scroll, kartu hilang di garis yang
  *      tidak terlihat - tampak terpotong.
  *
  * Gerbang ini menjaga:
- *   A. theme-color di index.html, manifest.json, dan TOPBAR_THEME_COLOR di app.js SAMA
- *      dengan latar topbar di TOPBAR AUTHORITY;
- *   B. app.js tidak lagi menulis palet langit ke theme-color;
+ *   A. TOPBAR_THEME_COLOR = latar topbar TOPBAR AUTHORITY; warna awal index.html + manifest
+ *      (theme_color dan background_color) = STATUS_BAR_CORE = medan splash .fiezel-splash-dark,
+ *      karena splash adalah cat pertama setiap boot;
+ *   B. app.js tidak menulis palet langit; updateCelestialClock memanggil syncStatusBarColor;
+ *      observer memantau anak <body> + kelas <html>/<body> (splash/layar masuk/tur menempel
+ *      di sana); perilaku statusBarSurfaceColor diuji di atas tumpukan elemen tiruan;
  *   C. app.js memasang kelas .is-scrolled di header.topbar lewat listener scroll capture+pasif
  *      (jendela ATAU panel dalam #app), dan mencabutnya saat pindah layar - diuji bentuk DAN
  *      perilakunya di atas DOM tiruan;
@@ -66,17 +74,56 @@ function metaThemeColor(html) {
   return norm(m[1]);
 }
 
-function appThemeColor(js) {
-  const m = js.match(/const TOPBAR_THEME_COLOR='(#[0-9A-Fa-f]{6})';/);
-  assert.ok(m, 'const TOPBAR_THEME_COLOR tidak ditemukan di app.js');
+function appConst(js, name) {
+  const m = js.match(new RegExp('const ' + name + "='(#[0-9A-Fa-f]{6})';"));
+  assert.ok(m, 'const ' + name + ' tidak ditemukan di app.js');
   return norm(m[1]);
 }
 
-function assertNoSkyThemeColor(js) {
+function splashCore(html) {
+  const m = html.match(/\.fiezel-splash-dark\{background:(#[0-9A-Fa-f]{6})/);
+  assert.ok(m, '.fiezel-splash-dark{background:#RRGGBB} tidak ditemukan di CSS kritis index.html');
+  return norm(m[1]);
+}
+
+function assertStatusBarWiring(js) {
   assert.ok(!/meta\[name="theme-color"\]['"]\)\?*\.setAttribute\?*\.\(['"]content['"],\s*c\.palette/.test(js),
-    'app.js menulis palet langit ke theme-color - status bar akan berbeda warna dari topbar');
-  assert.ok(/meta\[name="theme-color"\]['"]\)\?*\.setAttribute\?*\.\(['"]content['"],\s*TOPBAR_THEME_COLOR\)/.test(js),
-    'app.js harus menulis TOPBAR_THEME_COLOR ke theme-color');
+    'app.js menulis palet langit ke theme-color - status bar akan berbeda warna dari permukaan');
+  const clock = (js.match(/function updateCelestialClock\(input=new Date\(\)\)\{[\s\S]*?\n\}/) || [''])[0];
+  assert.ok(/syncStatusBarColor\(\)/.test(clock), 'updateCelestialClock harus memanggil syncStatusBarColor()');
+  assert.ok(!/setAttribute\?*\.\(['"]content['"],\s*TOPBAR_THEME_COLOR\)/.test(clock),
+    'updateCelestialClock tidak boleh memaku theme-color ke satu warna - splash/layar masuk/tur akan terpotong');
+  assert.ok(/statusBarObserver\.observe\(document\.body,\{attributes:true,attributeFilter:\['class'\],childList:true\}\)/.test(js),
+    'observer status bar harus memantau anak <body> (splash/layar masuk/tur) dan kelasnya');
+  assert.ok(/statusBarObserver\.observe\(document\.documentElement,\{attributes:true,attributeFilter:\['class'\]\}\)/.test(js),
+    'observer status bar harus memantau kelas <html> (fz-booting)');
+}
+
+/* Perilaku: statusBarSurfaceColor asli dijalankan di atas tumpukan elemen tiruan (urutan elementsFromPoint, atas ke bawah). */
+function runSurface(js, stack, opts) {
+  const m = js.match(/const TOPBAR_THEME_COLOR=[\s\S]*?\nlet statusBarRaf=0;/);
+  assert.ok(m, 'blok TOPBAR_THEME_COLOR..statusBarSurfaceColor tidak bisa diekstrak dari app.js');
+  const tour = opts && opts.tour ? { contains: (el) => el.inTour === true, display: 'block' } : null;
+  const ctx = {
+    window: { innerWidth: 393 },
+    document: {
+      querySelector: (sel) => (sel === '.fz-tour' ? tour : null),
+      elementsFromPoint: () => stack
+    },
+    getComputedStyle: (el) => (el === tour ? { display: 'block' } : { backgroundColor: el.bg, opacity: el.opacity == null ? '1' : String(el.opacity), display: 'block' })
+  };
+  return vm.runInNewContext(m[0].replace(/\nlet statusBarRaf=0;$/, '') + '\nstatusBarSurfaceColor();', ctx);
+}
+
+function assertSurfaceBehaviour(js) {
+  const T = 'rgb(253, 250, 243)', CORE = 'rgb(27, 20, 24)', BODY = 'rgb(251, 247, 243)';
+  assert.strictEqual(runSurface(js, [{ bg: 'rgba(0, 0, 0, 0)' }, { bg: CORE }, { bg: BODY }]), '#1B1418', 'splash menutup puncak: status bar = #1B1418');
+  assert.strictEqual(runSurface(js, [{ bg: CORE }, { bg: BODY }]), '#1B1418', 'hero layar masuk: status bar = #1B1418');
+  assert.strictEqual(runSurface(js, [{ bg: 'rgba(0, 0, 0, 0)' }, { bg: T }, { bg: BODY }]), '#FDFAF3', 'app biasa: status bar = latar topbar');
+  assert.strictEqual(runSurface(js, [{ bg: T }, { bg: BODY }], { tour: true }), '#3F3B3C', 'tur aktif: status bar = topbar di bawah peredup .78');
+  assert.strictEqual(runSurface(js, [{ bg: 'rgba(0, 0, 0, 0.5)' }, { bg: T }]), '#7F7D7A', 'peredup modal 50%: dikomposit, bukan diabaikan');
+  assert.strictEqual(runSurface(js, [{ bg: CORE, opacity: 0 }, { bg: T }]), '#FDFAF3', 'splash yang sudah pudar (opacity 0) tidak boleh menahan warna gelap');
+  assert.strictEqual(runSurface(js, []), '#FDFAF3', 'tanpa elemen terbaca: cadangan latar topbar');
 }
 
 function assertScrollWiring(js) {
@@ -129,14 +176,22 @@ function assertScrolledEdge(css) {
 
 console.log('FIEZEL Topbar & Status Bar Seam Gate:');
 
-check('A. theme-color index.html = manifest.json = TOPBAR_THEME_COLOR = latar topbar', () => {
+check('A1. TOPBAR_THEME_COLOR = latar topbar TOPBAR AUTHORITY', () => {
   const bar = topbarAuthorityBg(clayCss);
-  assert.strictEqual(metaThemeColor(indexHtml), bar, 'index.html meta theme-color berbeda dari latar topbar ' + bar);
-  assert.strictEqual(norm(manifest.theme_color), bar, 'manifest.json theme_color berbeda dari latar topbar ' + bar);
-  assert.strictEqual(appThemeColor(appJs), bar, 'app.js TOPBAR_THEME_COLOR berbeda dari latar topbar ' + bar);
+  assert.strictEqual(appConst(appJs, 'TOPBAR_THEME_COLOR'), bar, 'app.js TOPBAR_THEME_COLOR berbeda dari latar topbar ' + bar);
 });
 
-check('B. app.js tidak menulis palet langit ke theme-color', () => assertNoSkyThemeColor(appJs));
+check('A2. warna awal (index.html, manifest theme/background) = STATUS_BAR_CORE = medan splash', () => {
+  const core = splashCore(indexHtml);
+  assert.strictEqual(appConst(appJs, 'STATUS_BAR_CORE'), core, 'STATUS_BAR_CORE berbeda dari .fiezel-splash-dark ' + core);
+  assert.strictEqual(metaThemeColor(indexHtml), core, 'meta theme-color awal harus = medan splash ' + core + ' - splash adalah cat pertama');
+  assert.strictEqual(norm(manifest.theme_color), core, 'manifest theme_color harus = medan splash ' + core);
+  assert.strictEqual(norm(manifest.background_color), core, 'manifest background_color (splash OS Android) harus = medan splash ' + core + ' agar tidak berkedip krem->gelap');
+});
+
+check('B1. theme-color disinkronkan dari permukaan, bukan palet langit atau satu warna mati', () => assertStatusBarWiring(appJs));
+
+check('B2. perilaku: splash, layar masuk, app, tur, peredup modal, splash pudar, cadangan', () => assertSurfaceBehaviour(appJs));
 
 check('C1. app.js memasang .is-scrolled lewat scroll capture+pasif dan mereset saat pindah layar', () => assertScrollWiring(appJs));
 
@@ -146,11 +201,16 @@ check('D. header.topbar.is-scrolled punya tepi (box-shadow)', () => assertScroll
 
 check('E. bukti negatif: gerbang MERAH pada stub yang melanggar', () => {
   const mustThrow = (label, fn) => assert.throws(fn, Error, 'stub "' + label + '" seharusnya merah');
-  mustThrow('meta abu-abu', () => assert.strictEqual(
-    metaThemeColor(indexHtml.replace(/(<meta name="theme-color" content=")#[0-9A-Fa-f]{6}/, '$1#F4EDE6')),
-    topbarAuthorityBg(clayCss)));
-  mustThrow('palet langit', () => assertNoSkyThemeColor(
-    appJs.replace("setAttribute?.('content',TOPBAR_THEME_COLOR)", "setAttribute?.('content',c.palette.top)")));
+  mustThrow('meta awal krem', () => assert.strictEqual(
+    metaThemeColor(indexHtml.replace(/(<meta name="theme-color" content=")#[0-9A-Fa-f]{6}/, '$1#FDFAF3')),
+    splashCore(indexHtml)));
+  mustThrow('palet langit', () => assertStatusBarWiring(
+    appJs.replace(/(function updateCelestialClock\(input=new Date\(\)\)\{[\s\S]*?)syncStatusBarColor\(\);/, "$1document.querySelector?.('meta[name=\"theme-color\"]')?.setAttribute?.('content',c.palette.top);")));
+  mustThrow('satu warna mati', () => assertStatusBarWiring(
+    appJs.replace(/(function updateCelestialClock\(input=new Date\(\)\)\{[\s\S]*?)syncStatusBarColor\(\);/, "$1document.querySelector?.('meta[name=\"theme-color\"]')?.setAttribute?.('content',TOPBAR_THEME_COLOR);")));
+  mustThrow('observer tanpa anak body', () => assertStatusBarWiring(appJs.replace("attributeFilter:['class'],childList:true}", "attributeFilter:['class']}")));
+  mustThrow('abaikan tur', () => assertSurfaceBehaviour(appJs.replace('if(tour&&getComputedStyle(tour).display!==\'none\')layers.push(STATUS_BAR_TOUR_SCRIM);', '')));
+  mustThrow('abaikan opacity', () => assertSurfaceBehaviour(appJs.replace("const a=c.a*(cs.opacity===''?1:Number(cs.opacity));", 'const a=c.a;')));
   mustThrow('tanpa listener', () => assertScrollWiring(appJs.replace(/function syncTopbarScrolled\(source\)/, 'function _gone(source)')));
   mustThrow('listener di window saja', () => assertScrollWiring(appJs.replace("document.addEventListener('scroll',", "window.addEventListener('scroll',")));
   mustThrow('tanpa reset pindah layar', () => assertScrollWiring(appJs.replace('window.scrollTo(0,0);syncTopbarScrolled()}}', 'window.scrollTo(0,0)}}')));

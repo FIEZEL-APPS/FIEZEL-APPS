@@ -6338,8 +6338,33 @@ function mixHex(a,b,ratio){const x=hexRgb(a),y=hexRgb(b),t=Math.max(0,Math.min(1
    Interpolasi 9 perhentian di bawah tetap utuh dan tetap diuji; ia hanya tidak
    lagi dipanggil dari jalur murid. */
 const SCENE_STATIC_PALETTE=Object.freeze({top:'#F4EDE6',bottom:'#FBF7F3'});
-/* m025-573: warna status bar HP (meta theme-color) = warna TOPBAR, bukan palet langit. Palet langit (#F4EDE6) lebih gelap dari topbar (#FDFAF3, fiezel-tactile-clay.css "TOPBAR AUTHORITY"), jadi puncak layar PWA tampil dua pita dan topbar terlihat terpotong dari status bar. Ganti warna topbar = ganti nilai ini, index.html, dan manifest.json bersamaan. */
+/* m025-573: warna status bar HP (meta theme-color) mengikuti PERMUKAAN PALING ATAS yang sedang tampil, bukan palet langit dan bukan satu warna mati.
+   Status bar digambar OS dengan theme-color. Dulu nilainya palet langit (#F4EDE6), lalu satu warna topbar - keduanya membuat pita terang memotong layar gelap
+   saat splash (#1B1418), layar masuk (hero #1B1418), dan tur (peredup rgba(10,5,8,.78)): topbar/puncak layar tampak terpotong.
+   Sekarang warnanya dihitung dari tumpukan elemen di titik puncak layar (elementsFromPoint), dikomposit dari atas sampai ketemu lapisan buram.
+   TOPBAR_THEME_COLOR = latar topbar (fiezel-tactile-clay.css "TOPBAR AUTHORITY"), cadangan bila tidak ada yang bisa dibaca.
+   STATUS_BAR_CORE = medan splash/--fz-core; index.html dan manifest.json memakainya sebagai warna awal karena splash adalah cat pertama setiap boot. */
 const TOPBAR_THEME_COLOR='#FDFAF3';
+const STATUS_BAR_CORE='#1B1418';
+const STATUS_BAR_TOUR_SCRIM={r:10,g:5,b:8,a:.78};
+function statusBarSurfaceColor(){
+  const parse=v=>{const m=String(v||'').match(/rgba?\(([^)]+)\)/);if(!m)return null;const p=m[1].split(/[\s,\/]+/).filter(Boolean).map(Number);if(p.length<3||p.some(n=>Number.isNaN(n)))return null;return{r:p[0],g:p[1],b:p[2],a:p.length>3?p[3]:1}};
+  const layers=[],tour=document.querySelector('.fz-tour');
+  /* Sorotan tur = box-shadow raksasa pada .fz-tour-hole yang pointer-events:none, jadi tidak pernah muncul di elementsFromPoint; peredupnya ditambahkan sendiri. */
+  if(tour&&getComputedStyle(tour).display!=='none')layers.push(STATUS_BAR_TOUR_SCRIM);
+  const stack=document.elementsFromPoint?document.elementsFromPoint(Math.round((window.innerWidth||0)/2),1):[];
+  for(const el of stack){if(tour&&tour.contains(el))continue;const cs=getComputedStyle(el),c=parse(cs.backgroundColor);if(!c||c.a<=0)continue;const a=c.a*(cs.opacity===''?1:Number(cs.opacity));if(!(a>0))continue;layers.push({r:c.r,g:c.g,b:c.b,a});if(a>=.98)break}
+  if(!layers.length)return TOPBAR_THEME_COLOR;
+  let o={r:255,g:255,b:255};
+  for(let i=layers.length-1;i>=0;i--){const l=layers[i],a=Math.min(1,l.a);o={r:l.r*a+o.r*(1-a),g:l.g*a+o.g*(1-a),b:l.b*a+o.b*(1-a)}}
+  const hx=v=>Math.round(Math.max(0,Math.min(255,v))).toString(16).padStart(2,'0');
+  return('#'+hx(o.r)+hx(o.g)+hx(o.b)).toUpperCase();
+}
+let statusBarRaf=0;
+function syncStatusBarColor(){if(statusBarRaf)return;const run=()=>{statusBarRaf=0;try{const meta=document.querySelector('meta[name="theme-color"]');if(!meta)return;const c=statusBarSurfaceColor();if(meta.getAttribute('content')!==c)meta.setAttribute('content',c)}catch(_){}};statusBarRaf=typeof requestAnimationFrame==='function'?requestAnimationFrame(run):(run(),0)}
+/* Splash, layar masuk, dan tur menempel/lepas sebagai anak <body> (fiezel-splash.js, fiezel-auth-screen.js, fiezel-tour.js) dan mengubah kelas <html>/<body>;
+   satu observer dangkal cukup. Cek kedua 450 ms kemudian menangkap akhir transisi pudar splash. */
+try{const statusBarObserver=new MutationObserver(()=>{syncStatusBarColor();setTimeout(syncStatusBarColor,450)});statusBarObserver.observe(document.documentElement,{attributes:true,attributeFilter:['class']});if(document.body)statusBarObserver.observe(document.body,{attributes:true,attributeFilter:['class'],childList:true});window.addEventListener('load',syncStatusBarColor);window.addEventListener('resize',syncStatusBarColor,{passive:true})}catch(_){}
 const SCENE_STATIC_PHASE='day';
 /* Mode gelap dihapus sesuai permintaan OWNER: aplikasi terkunci ke tampilan terang cream. */
 function activeThemeMode(){ return 'light'; }
@@ -6363,7 +6388,7 @@ function updateCelestialClock(input=new Date()){
   if(sky)sky.className=`global-sky phase-${c.phase}`;
   const body=$('globalCelestial');if(body){body.className=`global-celestial ${c.body}`;if(body.dataset?.kind!==c.body){if(body.dataset)body.dataset.kind=c.body;body.innerHTML=`<i data-lucide="${c.body}"></i>`}}
   document.body?.classList?.remove?.('scene-dawn','scene-day','scene-dusk','scene-night');document.body?.classList?.add?.(`scene-${c.phase}`);
-  document.querySelector?.('meta[name="theme-color"]')?.setAttribute?.('content',TOPBAR_THEME_COLOR);
+  syncStatusBarColor();
   if($('celestialTime'))$('celestialTime').textContent=c.time;if($('celestialDetail'))$('celestialDetail').textContent=FiezelI18n.t('home.celestial-status',{benda:FiezelI18n.t(c.body==='sun'?'home.celestial-matahari':'home.celestial-bulan'),posisi:c.position});if($('celestialStatus'))$('celestialStatus').title=c.detail;refreshIcons();return c
 }
 let celestialTimer=null;
