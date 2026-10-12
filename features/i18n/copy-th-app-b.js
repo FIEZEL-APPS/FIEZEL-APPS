@@ -142,6 +142,7 @@
     'nav.back-home-aria': 'กลับไปที่หน้าแรก',
     'nav.open-settings-aria': 'เปิดการตั้งค่า',
     'nav.main-aria': 'การนำทางหลัก',
+    'nav.sidebar-heading': 'FIEZEL · เมนูหลัก',
     'nav.home-aria': 'หน้าแรก',
     'nav.vocab-aria': 'คำศัพท์',
     'nav.grammar-aria': 'ไวยากรณ์',
