@@ -8223,7 +8223,19 @@ function startWelcomeExperience(){
       /* m025-367 LOGIN WAJIB: sesudah splash, SEBELUM perkenalan - dan juga untuk murid lama
          yang perkenalannya sudah selesai. Lihat authGateNeeded(). */
       if(authGateNeeded()){showAuthGate(at,proceed);return null}
-      setTimeout(verifyAuthSession,1500);
+      /* m025-576: penanda lokal bilang "sudah masuk", tetapi server boleh berkata lain
+         (penanda sisa kunjungan di browser, sesi kedaluwarsa). Jawabannya sudah ditanyakan
+         sejak boot (primeBootAuthVerdict), jadi biasanya sudah tiba saat splash menutup:
+         "belum masuk" langsung ke layar masuk, TANPA membuka menu utama dulu 5-7 detik. */
+      const bootAuth=bootAuthVerdict();
+      if(bootAuth==='pending'&&!bootAuthWaited){
+        bootAuthWaited=true;
+        Promise.race([bootAuthVerdictPromise,new Promise(r=>setTimeout(r,BOOT_AUTH_WAIT_MS))]).then(proceed,proceed);
+        return null;
+      }
+      bootAuthVerdictUsed=true;
+      if(bootAuth==='signed-out'){forgetLocalAuth();showAuthGate(at,proceed);return null}
+      followUpAuthCheck(bootAuth);
       if(!onboardingDone&&showOnboarding(at)?.shown===true)return null;
       if(askLearnerNameIfMissing(at))return null;
       maybeSyncLearnerName(at);
@@ -8975,6 +8987,9 @@ function authGateNeeded(){
   return true;
 }
 function showAuthGate(at,next){
+  /* m025-576: murid sedang melewati layar masuk, jadi jawaban server dari awal boot sudah basi -
+     proceed() sesudah masuk tidak boleh menunggunya lagi. */
+  bootAuthVerdictUsed=true;
   const A=self.FiezelAuthScreen;
   if(!A)return typeof next==='function'?next():null;
   try{dismissBootSplash()}catch(_){}
@@ -9009,6 +9024,61 @@ function showAuthGate(at,next){
       try{if(typeof next==='function')next()}catch(_){}
     }
   });
+}
+/* m025-576 OWNER (Android, instal pertama): "setelah splash ... malah dialihkan ke menu utama
+   sekitar 5-7 detik", lalu layar berkedip dan muncul layar masuk. Penyebabnya: penanda lokal
+   (sisa kunjungan di browser, akun/Google yang diingat) meloloskan authGateNeeded(), aplikasi
+   dibuka, dan baru verifyAuthSession() 1,5 detik kemudian bertanya ke server, yang menjawab
+   "belum masuk" beberapa detik sesudahnya. Sekarang pertanyaan yang sama dikirim SEKALI di awal
+   boot, sejajar dengan unduhan konten dan splash; proceed() di startWelcomeExperience() memakai
+   jawabannya sebelum membuka apa pun, dan menunggu paling lama BOOT_AUTH_WAIT_MS bila belum tiba.
+   Aturannya tetap aturan verifyAuthSession(): hanya jawaban TEGAS signedIn:false yang mencabut
+   penanda; offline, galat, atau server lama (null) tetap meloloskan murid. */
+const BOOT_AUTH_WAIT_MS=1500;
+let bootAuthVerdictPromise=null,bootAuthVerdictValue=null,bootAuthVerdictUsed=false,bootAuthWaited=false;
+function localAuthHint(A){
+  try{if(A.readSession(self))return true}catch(_){}
+  try{if(self.FiezelAccount?.signedIn?.())return true}catch(_){}
+  try{if(self.FiezelGoogle?.rememberedEmail?.())return true}catch(_){}
+  return false;
+}
+function primeBootAuthVerdict(){
+  if(bootAuthVerdictPromise||bootAuthVerdictUsed)return bootAuthVerdictPromise;
+  const A=self.FiezelAuthScreen;
+  if(!A||typeof A.checkServer!=='function'||teacherPreviewActive())return null;
+  try{if(navigator.onLine===false)return null}catch(_){}
+  if(!localAuthHint(A))return null;
+  bootAuthVerdictPromise=Promise.resolve().then(()=>A.checkServer(self)).then(r=>{bootAuthVerdictValue=r||{ok:false};return bootAuthVerdictValue},()=>{bootAuthVerdictValue={ok:false};return bootAuthVerdictValue});
+  return bootAuthVerdictPromise;
+}
+/** 'signed-out' = server tegas berkata belum masuk; 'pending' = jawaban belum tiba; 'none' = lanjut. */
+function bootAuthVerdict(){
+  if(bootAuthVerdictUsed)return 'none';
+  if(!bootAuthVerdictPromise)primeBootAuthVerdict();
+  if(!bootAuthVerdictPromise)return 'none';
+  if(bootAuthVerdictValue===null)return 'pending';
+  return bootAuthVerdictValue.ok===true&&bootAuthVerdictValue.signedIn===false?'signed-out':'none';
+}
+/** Sesudah proceed() memutuskan lanjut: jawaban boot yang masih di jalan dipakai begitu tiba
+    (tanpa pertanyaan kedua ke server); jawaban "sudah masuk" tidak perlu ditanyakan ulang. */
+function followUpAuthCheck(verdict){
+  if(verdict==='pending'&&bootAuthVerdictPromise){
+    bootAuthVerdictPromise.then(v=>{
+      if(v&&v.ok===true&&v.signedIn===false){
+        const A=self.FiezelAuthScreen;
+        if(A&&A.readSession(self)){forgetLocalAuth();showAuthGate(Date.now(),()=>{try{render()}catch(_){}})}
+      }else if(!(v&&v.ok===true))setTimeout(verifyAuthSession,1500);
+    });
+    return;
+  }
+  if(bootAuthVerdictValue&&bootAuthVerdictValue.ok===true)return;
+  setTimeout(verifyAuthSession,1500);
+}
+function forgetLocalAuth(){
+  const A=self.FiezelAuthScreen;
+  deactivateAccountState();
+  try{A&&A.clearSession(self)}catch(_){}
+  try{self.FiezelGoogle?.forget?.()}catch(_){}
 }
 /** Penanda lokal hanya tampilan; server yang tahu. Jawaban TEGAS "belum masuk" (cookie hilang,
     data situs dihapus sebagian) membuka layar masuk lagi. Galat jaringan tidak mengubah apa pun. */
@@ -9172,7 +9242,7 @@ function openFeedback(prefill){
   };
   enhanceUI();
 }
-function render(){const __renderStartedAt=Date.now();try{const __r=renderInner();try{updateTopbarCourseButton()}catch(_){}return __r}finally{window.__fiezelLastRenderMs=Date.now()-__renderStartedAt;/* [FASE-4] pasang ulang timer kantuk 90 dtk tiap layar dicat (mati sendiri di luar layar santai). */try{pawIdleArm()}catch(_){}/* [OUTFIT G5'] konteks layar untuk resolver outfit (19 §6.1) */try{self.FiezelPawOutfit?.screen?.(state.view)}catch(_){}}}
+function render(){const __renderStartedAt=Date.now();try{document.documentElement.classList.add('fz-app-open')}catch(_){}try{const __r=renderInner();try{updateTopbarCourseButton()}catch(_){}return __r}finally{window.__fiezelLastRenderMs=Date.now()-__renderStartedAt;/* [FASE-4] pasang ulang timer kantuk 90 dtk tiap layar dicat (mati sendiri di luar layar santai). */try{pawIdleArm()}catch(_){}/* [OUTFIT G5'] konteks layar untuk resolver outfit (19 §6.1) */try{self.FiezelPawOutfit?.screen?.(state.view)}catch(_){}}}
 // m025-41: render duration is recorded so the diagnostic scanner can see a slow screen,
 // which is how OWNER experienced the Classroom regression before any error was logged.
 let isViewChange=true,lastRenderedView=null;
@@ -21516,6 +21586,7 @@ function syncLearnerAccountOnBoot(){
 function bootFiezel(){
   try{installScrollRubberBand()}catch(_){}
   try{syncLearnerAccountOnBoot()}catch(_){}
+  try{primeBootAuthVerdict()}catch(_){}
   return maybeAutoDetectLocale().then(function(){return load()}).catch(e=>{dismissBootSplash();
   try{console.debug('FIEZEL boot error:',e)}catch(_){}
   const offline=typeof navigator!=='undefined'&&navigator.onLine===false,fileProto=typeof location!=='undefined'&&location.protocol==='file:';
