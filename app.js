@@ -17,7 +17,7 @@ const APP_VERSION=self.FIEZEL_VERSION||'5.19.0';
    FIEZEL_UX_FLAGS milik berkas benderanya, kunci demi kunci, dan MERAH kalau
    keduanya menyimpang satu nilai pun. Jadi ini duplikasi berpagar, bukan dua
    sumber kebenaran yang saling bersaing. */
-const UX_FALLBACK_FLAGS={curriculumConsole:true,scenePhases:false,skillExams:false,skillsLabDestination:false,personalJourneyTab:false,voicePackGate:false,tutorRole:false,todayHome:true,fourTabNav:true,leanIntro:true,placementLite:true,sessionSummary:true,funnelTelemetry:true,memoryStamp:true,alasanSoal:true};
+const UX_FALLBACK_FLAGS={curriculumConsole:true,scenePhases:false,skillExams:false,skillsLabDestination:false,personalJourneyTab:false,voicePackGate:false,tutorRole:false,todayHome:true,fourTabNav:true,leanIntro:true,placementLite:true,sessionSummary:true,funnelTelemetry:true,memoryStamp:true,alasanSoal:true,buktiIngatan:true};
 /* Nama tak dikenal -> false di KEDUA jalur: salah ketik mematikan fitur (aman),
    bukan menyalakannya diam-diam. */
 function uxOn(flag){
@@ -15464,35 +15464,48 @@ function alasanSoalTag(q,cfg,measure){
 function alasanRekapModel(log,history){
   const rows=new Map();
   for(const h of (Array.isArray(history)?history:[]).slice(-400))if(h&&h.attemptId)rows.set(String(h.attemptId),h);
-  const counts={},seen=new Set();let fokusNama='',pSum=0,pN=0,okN=0;
+  const counts={},seen=new Set();let fokusNama='',pSum=0,pN=0,okN=0,ingat=0,lolos=0;const jinak=[];
   for(const q of (Array.isArray(log)?log:[])){
     const id=String(q?.__attemptId||'');
     if(!id||seen.has(id)||!rows.has(id))continue;
     seen.add(id);
+    const ok=rows.get(id).ok===true;
     const a=q.__alasan;
-    if(a&&a.kind){counts[a.kind]=(counts[a.kind]||0)+1;if(a.kind==='fokus'&&!fokusNama)fokusNama=String(a.materi||'')}
+    if(a&&a.kind){counts[a.kind]=(counts[a.kind]||0)+1;if(a.kind==='fokus'&&!fokusNama)fokusNama=String(a.materi||'');if(a.kind==='lupa'&&ok)ingat++}
+    /* Kemenangan dibaca dari Stempel Ingatan yang SUDAH diucapkan sesudah menjawab: rekap
+       tidak menghitung ulang ledger, ia hanya mengumpulkan apa yang sudah terbukti di sesi. */
+    const st=q.__memoryStamp;
+    if(st&&st.kind==='jinak')jinak.push(Math.max(1,Math.floor(Number(st.kali)||0)));
+    else if(st&&st.kind==='lolos')lolos++;
     const p=q.__predicted==null?NaN:Number(q.__predicted);
-    if(Number.isFinite(p)&&p>=0&&p<=1){pSum+=p;pN++;if(rows.get(id).ok)okN++}
+    if(Number.isFinite(p)&&p>=0&&p<=1){pSum+=p;pN++;if(ok)okN++}
   }
   let prediksi=null;
   if(pN>=ALASAN_REKAP_MIN_PREDIKSI){
     const perkiraan=Math.round(pSum);
     prediksi={perkiraan,total:pN,skor:okN,arah:okN>perkiraan?'atas':okN<perkiraan?'bawah':'pas'};
   }
-  if(!Object.keys(counts).length&&!prediksi)return null;
-  return{counts,fokusNama,prediksi};
+  const menang=jinak.length?{kind:'jinak',n:jinak.length,kali:Math.max(...jinak)}:lolos?{kind:'lolos',n:lolos}:null;
+  if(!Object.keys(counts).length&&!prediksi&&!menang)return null;
+  return{counts,fokusNama,prediksi,ingat,menang};
 }
-/** Paling banyak tiga baris: dua "yang diatur" (urutan kekuatan sebab) + satu perkiraan. */
+/** Paling banyak tiga baris: satu kemenangan (jebakan jinak > jebakan dilewati) bila ada,
+ *  lalu "yang diatur" (urutan kekuatan sebab) sampai dua baris, lalu satu perkiraan.
+ *  Kemenangan didahulukan karena itulah momen yang tidak bisa dibuat kuis biasa: bukti bahwa
+ *  murid mengalahkan kesalahannya sendiri dari sesi-sesi lalu. */
 function alasanRekapLines(m){
   if(!m)return [];
-  const out=[],c=m.counts||{};
+  const out=[],c=m.counts||{},w=m.menang;
+  if(w&&w.kind==='jinak')out.push(w.n>1?FiezelI18n.t('rekap.jinak-banyak',{n:w.n}):FiezelI18n.t('rekap.jinak',{kali:w.kali}));
+  else if(w&&w.kind==='lolos'&&w.n>0)out.push(FiezelI18n.t('rekap.lolos',{n:w.n}));
+  const ingat=Math.max(0,Math.min(Number(c.lupa)||0,Number(m.ingat)||0));
   const atur=[
-    c.lupa?FiezelI18n.t('rekap.lupa',{n:c.lupa}):'',
+    c.lupa?(ingat===c.lupa?FiezelI18n.t('rekap.lupa-semua',{n:c.lupa}):ingat===0?FiezelI18n.t('rekap.lupa-pudar',{n:c.lupa}):FiezelI18n.t('rekap.lupa',{n:c.lupa,ingat})):'',
     c.fokus&&m.fokusNama?FiezelI18n.t('rekap.fokus',{n:c.fokus,materi:m.fokusNama}):'',
     c.produksi?FiezelI18n.t('rekap.produksi',{n:c.produksi}):'',
     c['ukur-ulang']?FiezelI18n.t('rekap.ukur-ulang',{n:c['ukur-ulang']}):''
   ].filter(Boolean);
-  out.push(...atur.slice(0,2));
+  out.push(...atur.slice(0,Math.max(0,2-out.length)));
   const p=m.prediksi;
   /* Kunci ditulis UTUH, bukan disambung dari arah: gerbang i18n-kunci-hantu membaca literal
      t('...') dan potongan 'rekap.prediksi-' terbaca sebagai kunci yang tidak terdaftar. */
@@ -15507,6 +15520,81 @@ function alasanRekapMarkup(cfg){
     if(!lines.length)return '';
     return `<section class="result-alasan" data-testid="result-alasan" aria-label="${esc(FiezelI18n.t('rekap.aria'))}"><b class="result-alasan-head"><i class="fz-i" data-fz-icon="paw" aria-hidden="true"></i> ${esc(FiezelI18n.t('rekap.judul'))}</b><ul>${lines.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></section>`;
   }catch{return ''}
+}
+/* ---- BUKTI INGATAN: momen aha di detik vonis (m025-577) ------------------------------------
+ *
+ * KENAPA. Label "Waktunya diulang: terakhir kamu latih 5 hari lalu" adalah JANJI: Fiezel tahu
+ * kapan ingatanmu perlu disegarkan. Janji itu baru terasa cerdas kalau ada bayarannya, dan
+ * bayarannya hanya bisa diucapkan sesudah murid menjawab: ingatannya ternyata bertahan lima
+ * hari, jadi jarak ulangan berikutnya Fiezel perpanjang; atau ingatannya mulai pudar, jadi
+ * ulangannya Fiezel majukan. Itulah satu-satunya bukti yang bisa DILIHAT murid bahwa jadwal
+ * ulangan bukan acak, dan ia muncul di popup vonis, satu-satunya layar yang pasti dilihat
+ * (jawaban benar menawarkan "Lanjut" yang melompati pembahasan).
+ *
+ * KEJUJURAN:
+ *  - Hanya soal yang tadi berlabel 'lupa' (alasan yang sama, hari yang sama). Soal tanpa
+ *    label tidak mendapat bayaran yang tidak pernah dijanjikan; probe retensi tetap diam.
+ *  - Vonis ingatan dari PERCOBAAN PERTAMA (baris riwayat __attemptId), karena hanya jawaban
+ *    itulah yang menulis jadwal. Popup sesudah percobaan kedua tetap benar: "mulai pudar"
+ *    tentang percobaan pertama, "Benar" tentang percobaan kedua.
+ *  - Jarak berikutnya dibaca dari nextReview SESUDAH settleReviewScheduleSilently() (dipanggil
+ *    di dalam openConfidencePop), bukan diramal ulang di sini: satu penulis jadwal.
+ *  - Salah yang ditebak (< 1800 ms, ambang Tutor Brain) tidak disebut "pudar": murid yang
+ *    tidak mencoba tidak sedang menunjukkan ingatannya. Benar yang cepat TETAP dihitung ingat:
+ *    kata yang dikenal memang dijawab cepat.
+ *  - Sakelar sendiri ('buktiIngatan') di atas gerbang Alasan Soal. */
+const BUKTI_INGATAN_TEBAKAN_MS=1800;
+function buktiIngatanAllowed(cfg,measure){return alasanSoalAllowed(cfg,measure)&&uxOn('buktiIngatan')}
+/** Keputusan murni. h = baris riwayat percobaan pertama soal ini, b = ember ingatannya
+ *  sesudah jadwal diselesaikan. {kind:'masih'|'pudar', hari, jeda} atau null. jeda = selisih
+ *  hari belajar sampai ulangan berikutnya (0 = masih hari ini). */
+function buktiIngatanDecide(q,h,b,now=Date.now()){
+  const a=q?.__alasan;
+  if(!a||a.kind!=='lupa'||!h||!q.__attemptId||String(h.attemptId)!==String(q.__attemptId))return null;
+  const ok=h.ok===true;
+  if(!ok&&Number(h.ms)>0&&Number(h.ms)<BUKTI_INGATAN_TEBAKAN_MS)return null;
+  const next=Number(b?.nextReview);
+  if(!Number.isFinite(next)||next<now-60000)return null;
+  let jeda=null;
+  try{
+    const x=Date.parse(studyDayKey(now)+'T00:00:00Z'),y=Date.parse(studyDayKey(next)+'T00:00:00Z');
+    if(Number.isFinite(x)&&Number.isFinite(y))jeda=Math.max(0,Math.round((y-x)/86400000));
+  }catch{}
+  if(jeda===null)return null;
+  const hari=Math.max(0,Math.floor(Number(a.hari)||0));
+  return{kind:ok?'masih':'pudar',hari,jeda};
+}
+function buktiIngatanSejak(hari){return hari===0?FiezelI18n.t('ingat.sejak-tadi'):hari===1?FiezelI18n.t('ingat.sejak-kemarin'):FiezelI18n.t('ingat.sejak-hari',{n:hari})}
+function buktiIngatanKapan(jeda){return jeda===0?FiezelI18n.t('ingat.kapan-nanti'):jeda===1?FiezelI18n.t('ingat.kapan-besok'):FiezelI18n.t('ingat.kapan-hari',{n:jeda})}
+/** Kalimat + garis jarak. Garisnya dua ruas: jarak yang BARU SAJA ditempuh ingatan dan jarak
+ *  ke ulangan berikutnya, lebar sebanding hari (dengan lantai supaya labelnya terbaca). Garis
+ *  yang memanjang adalah gambar spaced repetition yang paling ringkas: tanpa istilah, tanpa
+ *  angka persen. */
+function buktiIngatanMarkup(d){
+  if(!d)return '';
+  try{
+    const kalimat=FiezelI18n.t(d.kind==='masih'?'ingat.masih':'ingat.pudar',{sejak:buktiIngatanSejak(d.hari),kapan:buktiIngatanKapan(d.jeda)});
+    const lalu=Math.max(.5,d.hari),depan=Math.max(.5,d.jeda),total=lalu+depan;
+    const w=x=>Math.round(Math.max(28,Math.min(72,x/total*100)));
+    const wl=w(lalu),wd=100-wl;
+    const lbl=(n,kunci)=>n===0?FiezelI18n.t('ingat.garis-hari-ini'):FiezelI18n.t(kunci,{n});
+    return `<div class="cp-ingatan is-${esc(d.kind)}" data-testid="bukti-ingatan" data-ingatan="${esc(d.kind)}"><p class="cp-ingatan-line"><i class="fz-i" data-fz-icon="paw" aria-hidden="true"></i>${esc(kalimat)}</p><div class="cp-ingatan-track" aria-hidden="true"><span class="cp-seg is-lalu" style="width:${wl}%">${esc(lbl(d.hari,'ingat.garis-lalu'))}</span><span class="cp-seg is-depan" style="width:${wd}%">${esc(lbl(d.jeda,'ingat.garis-depan'))}</span></div></div>`;
+  }catch{return ''}
+}
+/** Jembatan app: dipanggil tepat SESUDAH openConfidencePop (jadwal sudah final). Menyisipkan
+ *  bukti di bawah vonis, dan mencatatnya di soal untuk rekap. */
+function buktiIngatanAttach(q,cfg,measure){
+  if(!q||!buktiIngatanAllowed(cfg,measure))return;
+  const id=String(q.__attemptId||'');
+  if(!id)return;
+  const hist=Array.isArray(state.history)?state.history:[];
+  let h=null;for(let i=hist.length-1;i>=0&&i>=hist.length-40;i--){if(hist[i]&&String(hist[i].attemptId)===id){h=hist[i];break}}
+  const d=buktiIngatanDecide(q,h,alasanSoalBucket(q));
+  q.__buktiIngatan=d;
+  const html=buktiIngatanMarkup(d);
+  if(!html)return;
+  const verdict=document.querySelector('#confidencePop .confidence-verdict');
+  if(verdict)verdict.insertAdjacentHTML('afterend',html);
 }
 function quizLoop(cfg){
  if(document.body?.classList?.contains?.('auth-locked')){pendingAfterGateFn=()=>quizLoop(cfg);return}
@@ -16517,6 +16605,9 @@ function quizLoop(cfg){
   confidencePopThen=()=>showCoreAnalyzing(()=>reveal(q,j,ok));
   confidencePopSkipThen=ok?()=>{reveal(q,j,ok);$('quizNext')?.click()}:null;
   openConfidencePop(ok);
+  /* m025-577 Bukti Ingatan: SESUDAH openConfidencePop, karena di dalamnya jadwal ulangan
+     diselesaikan (settleReviewScheduleSilently) - jarak yang diucapkan = jarak yang ditulis. */
+  try{buktiIngatanAttach(q,cfg,MEASURE);enhanceUI()}catch{}
  }
 
  /* Fase 3 (C5 butir 2): jalur jawaban CLOZE - produksi ketik, SATU percobaan (yang diukur

@@ -11091,3 +11091,18 @@ html body #app .quiz-bubble .quiz-alasan .fz-i,html body #app .quiz-bubble .quiz
 .result-alasan li{margin:2px 0;font-size:.84rem;line-height:1.45;font-weight:500}
 html body #app .result-alasan li{color:#4B5563 !important}
 :lang(th) .result-alasan li{line-height:1.65}
+/* m025-577 Bukti Ingatan: satu kalimat + garis dua ruas di popup vonis (kartu putih). Ruas kiri
+   = jarak yang baru saja ditempuh ingatan, ruas kanan = jarak ke ulangan berikutnya. "Masih
+   ingat" memanjangkan ruas kanan (hijau), "pudar" memendekkannya (amber). Tanpa animasi:
+   gambar yang diam sudah cukup bicara, dan popup ini sudah punya animasi masuknya sendiri. */
+/* Latar SOLID, bukan rgba: kartu vonis sedikit tembus pandang, dan latar transparan membuat
+   teks pilihan di balik popup terbaca samar di dalam kotak ini (terlihat di probe 390px). */
+.cp-ingatan{margin:-4px 0 12px;padding:10px 12px;border-radius:12px;background:#F0F6FF;border:1px solid #D6E4FF}
+.cp-ingatan-line{display:flex;align-items:flex-start;gap:6px;margin:0 0 8px;font-size:.84rem;line-height:1.45;font-weight:600;color:#334155}
+.cp-ingatan-line .fz-i,.cp-ingatan-line svg{width:15px;height:15px;flex:0 0 15px;margin-top:1px;--fz-i-line:var(--info,#2979FF)}
+.cp-ingatan-track{display:flex;gap:3px;height:20px}
+.cp-seg{display:flex;align-items:center;justify-content:center;min-width:0;border-radius:6px;font-size:.7rem;font-weight:800;letter-spacing:.02em;white-space:nowrap;overflow:hidden}
+.cp-seg.is-lalu{background:#E2E8F0;color:#475569}
+.cp-ingatan.is-masih .cp-seg.is-depan{background:#D1FAE5;color:#047857}
+.cp-ingatan.is-pudar .cp-seg.is-depan{background:#FEF3C7;color:#B45309}
+:lang(th) .cp-ingatan-line{font-size:.88rem;line-height:1.6}

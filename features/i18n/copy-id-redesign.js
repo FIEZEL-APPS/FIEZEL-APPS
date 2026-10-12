@@ -372,9 +372,27 @@
     // Rekap layar hasil: maksimal dua baris "yang diatur" + satu baris perkiraan vs hasil.
     // Perkiraan SENGAJA menyebut "percobaan pertama": skor besar di layar hasil memberi kredit
     // 0,75 untuk percobaan kedua, sedangkan prediksi Core Brain adalah peluang benar langsung.
+    // m025-577 Bukti Ingatan: bayaran label "Waktunya diulang" di popup vonis. {sejak} diisi
+    // ingat.sejak-*, {kapan} diisi ingat.kapan-*; garis jarak memakai ingat.garis-*.
+    'ingat.masih': 'Masih ingat dari latihan {sejak}. Ulangan berikutnya {kapan}.',
+    'ingat.pudar': 'Mulai pudar sejak latihan {sejak}, jadi Fiezel memajukan ulangannya: {kapan}.',
+    'ingat.sejak-tadi': 'tadi',
+    'ingat.sejak-kemarin': 'kemarin',
+    'ingat.sejak-hari': '{n} hari lalu',
+    'ingat.kapan-nanti': 'nanti hari ini',
+    'ingat.kapan-besok': 'besok',
+    'ingat.kapan-hari': 'sekitar {n} hari lagi',
+    'ingat.garis-lalu': '{n} hari lalu',
+    'ingat.garis-depan': '{n} hari lagi',
+    'ingat.garis-hari-ini': 'hari ini',
     'rekap.aria': 'Ringkasan keputusan Fiezel di sesi ini',
     'rekap.judul': 'Yang Fiezel atur untukmu',
-    'rekap.lupa': '{n} soal diulang sesuai jadwal ingatanmu',
+    'rekap.lupa': '{n} materi waktunya diulang, {ingat} masih kamu ingat',
+    'rekap.lupa-semua': '{n} materi waktunya diulang, semuanya masih kamu ingat',
+    'rekap.lupa-pudar': '{n} materi waktunya diulang dan mulai pudar, jadi Fiezel memajukan jadwalnya',
+    'rekap.jinak': 'Jebakan yang dulu {kali} kali menangkapmu kini jinak',
+    'rekap.jinak-banyak': '{n} jebakan lama kini jinak',
+    'rekap.lolos': 'Kamu lolos dari {n} jebakan yang pernah menangkapmu',
     'rekap.fokus': '{n} soal fokus pada {materi}',
     'rekap.produksi': '{n} soal menulis sendiri, naik dari pilihan ganda',
     'rekap.ukur-ulang': '{n} soal mengukur ulang materi yang kamu sanggah',

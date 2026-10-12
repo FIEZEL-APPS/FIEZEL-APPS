@@ -62,7 +62,8 @@ function sandbox(opts = {}) {
     state: st,
     studyDayKey: ts => dayKey(ts),
     examLockActive: () => !!opts.examLock,
-    uxOn: flag => flag === 'alasanSoal' ? opts.flag !== false : false,
+    uxOn: flag => flag === 'alasanSoal' ? opts.flag !== false : flag === 'buktiIngatan' ? opts.buktiFlag !== false : false,
+    document: opts.document || { querySelector: () => null },
     quizConcept: q => String(q?.lessonSkill || q?.conceptId || q?.skill || q?.type || ''),
     olmNegotiationRead: () => opts.neg || null,
     retentionProbeDueLessons: () => new Set(opts.probeDue || []),
@@ -166,7 +167,8 @@ test('B2 jebakan lama tidak pernah diumumkan sebelum menjawab: blok tidak membac
   assert.ok(!/misconceptionLedger|FiezelMisconceptionLedger|ledger\./.test(BLOCK.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '')), 'kode blok tidak boleh membaca ledger');
   const src = read('features/i18n/copy-id-redesign.js') + read('features/i18n/copy-th-redesign.js');
   assert.ok(!/'alasan\.(jebakan|trap|retensi|ingatan)/.test(src), 'tidak ada kunci alasan untuk jebakan/retensi');
-  const kinds = new Set([...BLOCK.matchAll(/kind:'([a-z-]+)'/g)].map(m => m[1]));
+  const decideSrc = BLOCK.slice(BLOCK.indexOf('function alasanSoalDecide('), BLOCK.indexOf('function alasanSoalText('));
+  const kinds = new Set([...decideSrc.matchAll(/kind:'([a-z-]+)'/g)].map(m => m[1]));
   assert.deepStrictEqual([...kinds].sort(), ['fokus', 'lupa', 'produksi', 'ukur-ulang']);
 });
 
@@ -268,9 +270,9 @@ test('D2 perkiraan butuh >= 5 soal berprediksi; arah atas / pas / bawah dari per
 test('D3 baris: paling banyak dua "yang diatur" (urutan sebab) + satu perkiraan', () => {
   I18N.setLocale('id');
   const sb = sandbox();
-  const lines = sb.alasanRekapLines({ counts: { 'ukur-ulang': 1, produksi: 2, fokus: 3, lupa: 4 }, fokusNama: 'Artikel a, an, dan the', prediksi: { perkiraan: 7, total: 10, skor: 8, arah: 'atas' } });
+  const lines = sb.alasanRekapLines({ counts: { 'ukur-ulang': 1, produksi: 2, fokus: 3, lupa: 4 }, ingat: 3, fokusNama: 'Artikel a, an, dan the', prediksi: { perkiraan: 7, total: 10, skor: 8, arah: 'atas' } });
   assert.deepStrictEqual(Array.from(lines), [
-    '4 soal diulang sesuai jadwal ingatanmu',
+    '4 materi waktunya diulang, 3 masih kamu ingat',
     '3 soal fokus pada Artikel a, an, dan the',
     'Perkiraan Fiezel: sekitar 7 dari 10 soal benar di percobaan pertama. Kamu 8, di atas perkiraan.'
   ]);
@@ -284,7 +286,7 @@ test('D4 markup rekap: gerbang mode, kosong saat tidak ada baris', () => {
   const sb = sandbox({ state: { vocab: {}, grammar: {}, reading: {}, history: s.history } });
   const html = sb.alasanRekapMarkup({ type: 'adaptive', __alasanLog: s.log });
   assert.match(html, /^<section class="result-alasan" data-testid="result-alasan" aria-label="Ringkasan keputusan Fiezel di sesi ini"><b class="result-alasan-head">/);
-  assert.match(html, /<li>2 soal diulang sesuai jadwal ingatanmu<\/li><li>Perkiraan Fiezel: sekitar 3 dari 5 soal benar di percobaan pertama\. Kamu 3, tepat sesuai perkiraan\.<\/li><\/ul><\/section>$/);
+  assert.match(html, /<li>2 materi waktunya diulang, 1 masih kamu ingat<\/li><li>Perkiraan Fiezel: sekitar 3 dari 5 soal benar di percobaan pertama\. Kamu 3, tepat sesuai perkiraan\.<\/li><\/ul><\/section>$/);
   assert.strictEqual(sb.alasanRekapMarkup({ type: 'level', __alasanLog: s.log }), '');
   assert.strictEqual(sb.alasanRekapMarkup({ type: 'adaptive', __alasanLog: [] }), '');
 });
@@ -299,7 +301,11 @@ test('E1 naskah dua bahasa untuk setiap jenis: tanpa placeholder bocor, th ber-a
     I18N.setLocale(loc);
     try {
       const semua = contoh.map(a => sb.alasanSoalText(a));
-      semua.push(...sb.alasanRekapLines({ counts: { lupa: 2, fokus: 2, produksi: 1, 'ukur-ulang': 1 }, fokusNama: 'Artikel', prediksi: null }));
+      semua.push(...sb.alasanRekapLines({ counts: { lupa: 2, fokus: 2, produksi: 1, 'ukur-ulang': 1 }, ingat: 1, fokusNama: 'Artikel', prediksi: null }));
+      semua.push(...sb.alasanRekapLines({ counts: { lupa: 2 }, ingat: 2, menang: { kind: 'jinak', n: 1, kali: 4 } }));
+      semua.push(...sb.alasanRekapLines({ counts: { lupa: 2 }, ingat: 0, menang: { kind: 'jinak', n: 2, kali: 4 } }));
+      semua.push(...sb.alasanRekapLines({ counts: {}, menang: { kind: 'lolos', n: 2 } }));
+      for (const d of [{ kind: 'masih', hari: 5, jeda: 12 }, { kind: 'masih', hari: 1, jeda: 1 }, { kind: 'pudar', hari: 0, jeda: 0 }]) semua.push(sb.buktiIngatanMarkup(d).replace(/<[^>]+>/g, ' '));
       for (const arah of ['atas', 'pas', 'bawah']) semua.push(...sb.alasanRekapLines({ counts: {}, prediksi: { perkiraan: 7, total: 10, skor: 6, arah } }));
       for (const t of semua) {
         assert.ok(t && !/[{}]/.test(t), loc + ' placeholder bocor / kosong: ' + t);
@@ -315,8 +321,8 @@ test('E1 naskah dua bahasa untuk setiap jenis: tanpa placeholder bocor, th ber-a
 
 test('E2 persona "Fiezel", tanpa istilah mesin, tanpa persentase, tanpa tanda pisah', () => {
   const src = read('features/i18n/copy-id-redesign.js') + read('features/i18n/copy-th-redesign.js');
-  const nilai = [...src.matchAll(/'(?:alasan|rekap)\.[a-z-]+':\s*'([^']*)'/g)].map(m => m[1]);
-  assert.strictEqual(nilai.length, 32, '16 kunci x 2 bahasa, ketemu ' + nilai.length);
+  const nilai = [...src.matchAll(/'(?:alasan|rekap|ingat)\.[a-z-]+':\s*'([^']*)'/g)].map(m => m[1]);
+  assert.strictEqual(nilai.length, 64, '32 kunci x 2 bahasa, ketemu ' + nilai.length);
   for (const v of nilai) {
     assert.ok(!/\bpaw\b/i.test(v), 'persona harus Fiezel: ' + v);
     assert.ok(!/[—–%]/.test(v), 'tanpa tanda pisah / persen: ' + v);
@@ -354,6 +360,114 @@ test('E7 bendera alasanSoal terdaftar di sumber dan salinan app.js', () => {
   assert.strictEqual(flags.DEFAULTS.alasanSoal, true);
   assert.match(APP, /const UX_FALLBACK_FLAGS=\{[^}]*alasanSoal:true[^}]*\}/);
   assert.match(BLOCK, /return uxOn\('alasanSoal'\);/);
+});
+
+// =====================================================================================
+// F. BUKTI INGATAN (momen aha di popup vonis) + KEMENANGAN DI REKAP
+// =====================================================================================
+const lupaQ = (hari = 5) => Object.assign(vocabQ('vocab_7'), { __alasan: { kind: 'lupa', hari }, __attemptId: 'att-1' });
+const row = (ok, ms = 4000) => ({ attemptId: 'att-1', ok, ms });
+
+test('F1 masih ingat: jarak berikutnya dibaca dari nextReview yang SUDAH ditulis, dalam hari belajar', () => {
+  const sb = sandbox();
+  assert.deepStrictEqual(plain(sb.buktiIngatanDecide(lupaQ(5), row(true), { nextReview: NOW + 12 * DAY }, NOW)), { kind: 'masih', hari: 5, jeda: 12 });
+  assert.deepStrictEqual(plain(sb.buktiIngatanDecide(lupaQ(5), row(true, 900), { nextReview: NOW + DAY }, NOW)), { kind: 'masih', hari: 5, jeda: 1 }, 'benar cepat = ingat lancar, tetap dihitung');
+  assert.deepStrictEqual(plain(sb.buktiIngatanDecide(lupaQ(3), row(false), { nextReview: NOW + 3 * 3600e3 }, NOW)), { kind: 'pudar', hari: 3, jeda: 0 });
+});
+
+test('F2 diam bila janji tidak pernah diucapkan, baris bukan percobaan pertama, tebakan salah, atau jadwal basi', () => {
+  const sb = sandbox();
+  const b = { nextReview: NOW + 5 * DAY };
+  assert.strictEqual(sb.buktiIngatanDecide(Object.assign(lupaQ(), { __alasan: { kind: 'fokus', materi: 'x' } }), row(true), b, NOW), null, 'bukan soal berlabel lupa');
+  assert.strictEqual(sb.buktiIngatanDecide(Object.assign(lupaQ(), { __alasan: null }), row(true), b, NOW), null);
+  assert.strictEqual(sb.buktiIngatanDecide(lupaQ(), { attemptId: 'lain', ok: true, ms: 4000 }, b, NOW), null, 'baris milik soal lain');
+  assert.strictEqual(sb.buktiIngatanDecide(Object.assign(lupaQ(), { __attemptId: '' }), row(true), b, NOW), null);
+  assert.strictEqual(sb.buktiIngatanDecide(lupaQ(), row(false, 900), b, NOW), null, 'salah ditebak bukan bukti pudar');
+  assert.strictEqual(sb.buktiIngatanDecide(lupaQ(), row(true), { nextReview: NOW - DAY }, NOW), null, 'jadwal di masa lalu: tidak dikarang');
+  assert.strictEqual(sb.buktiIngatanDecide(lupaQ(), row(true), null, NOW), null);
+});
+
+test('F3 markup: kalimat dua bahasa + garis dua ruas yang lebarnya sebanding hari (dengan lantai)', () => {
+  I18N.setLocale('id');
+  const sb = sandbox();
+  const masih = sb.buktiIngatanMarkup({ kind: 'masih', hari: 5, jeda: 12 });
+  assert.match(masih, /data-testid="bukti-ingatan" data-ingatan="masih"/);
+  assert.match(masih, /Masih ingat dari latihan 5 hari lalu\. Ulangan berikutnya sekitar 12 hari lagi\./);
+  const w = [...masih.matchAll(/width:(\d+)%/g)].map(m => Number(m[1]));
+  assert.deepStrictEqual(w, [29, 71], 'ruas depan lebih panjang: 5 vs 12 hari');
+  assert.match(masih, />5 hari lalu<\/span><span class="cp-seg is-depan"[^>]*>12 hari lagi</);
+  const pudar = sb.buktiIngatanMarkup({ kind: 'pudar', hari: 30, jeda: 0 });
+  assert.match(pudar, /Mulai pudar sejak latihan 30 hari lalu, jadi Fiezel memajukan ulangannya: nanti hari ini\./);
+  assert.deepStrictEqual([...pudar.matchAll(/width:(\d+)%/g)].map(m => Number(m[1])), [72, 28], 'lantai 28% supaya label terbaca');
+  assert.match(pudar, />hari ini</);
+  assert.match(sb.buktiIngatanMarkup({ kind: 'masih', hari: 1, jeda: 1 }), /Masih ingat dari latihan kemarin\. Ulangan berikutnya besok\./);
+  assert.strictEqual(sb.buktiIngatanMarkup(null), '');
+});
+
+test('F4 attach: disisipkan tepat sesudah vonis popup, dicatat di soal, mati bila gerbang/bendera mati', () => {
+  I18N.setLocale('id');
+  const calls = [];
+  const verdict = { insertAdjacentHTML: (pos, html) => calls.push([pos, html]) };
+  const document = { querySelector: sel => sel === '#confidencePop .confidence-verdict' ? verdict : null };
+  const st = { vocab: { vocab_7: { total: 4, nextReview: NOW + 9 * DAY } }, grammar: {}, reading: {}, history: [{ attemptId: 'x' }, { attemptId: 'att-1', ok: true, ms: 3000 }] };
+  const sb = sandbox({ state: st, document });
+  const q = lupaQ(4);
+  sb.buktiIngatanAttach(q, { type: 'adaptive' }, false);
+  assert.strictEqual(calls.length, 1);
+  assert.strictEqual(calls[0][0], 'afterend');
+  assert.match(calls[0][1], /Ulangan berikutnya sekitar 9 hari lagi/);
+  assert.strictEqual(q.__buktiIngatan.kind, 'masih');
+  for (const [opts, cfg, measure, why] of [
+    [{ buktiFlag: false }, { type: 'adaptive' }, false, 'bendera buktiIngatan mati'],
+    [{ flag: false }, { type: 'adaptive' }, false, 'alasanSoal mati: tidak ada janji, tidak ada bayaran'],
+    [{}, { type: 'adaptive' }, true, 'MEASURE'],
+    [{}, { type: 'level' }, false, 'bukan sesi adaptif']
+  ]) {
+    const c2 = [];
+    const sb2 = sandbox(Object.assign({ state: st, document: { querySelector: () => ({ insertAdjacentHTML: (a, b) => c2.push(b) }) } }, opts));
+    sb2.buktiIngatanAttach(lupaQ(4), cfg, measure);
+    assert.strictEqual(c2.length, 0, why);
+  }
+});
+
+test('F5 kabel: Bukti Ingatan dipasang SESUDAH openConfidencePop (jadwal sudah diselesaikan di dalamnya)', () => {
+  const at = APP.indexOf("confidencePopSkipThen=ok?()=>{reveal(q,j,ok);$('quizNext')?.click()}:null;");
+  const open = APP.indexOf('openConfidencePop(ok);', at);
+  const attach = APP.indexOf('try{buktiIngatanAttach(q,cfg,MEASURE);enhanceUI()}catch{}', at);
+  assert.ok(at > 0 && open > at && attach > open && attach - open < 400, 'urutan open -> attach');
+  const pop = APP.slice(APP.indexOf('function openConfidencePop('), APP.indexOf('function confidencePopAnswered('));
+  assert.ok(pop.includes('settleReviewScheduleSilently()'), 'jadwal memang diselesaikan di dalam openConfidencePop');
+  assert.strictEqual((APP.match(/buktiIngatanAttach\(/g) || []).length, 2, 'satu definisi + satu pemanggil');
+});
+
+test('F6 rekap: kemenangan dari Stempel yang sudah diucapkan, "masih kamu ingat" dari percobaan pertama', () => {
+  I18N.setLocale('id');
+  const sb = sandbox();
+  const s = sesi([{ kind: 'lupa', ok: true }, { kind: 'lupa', ok: false }, { kind: 'lupa', ok: true }, {}, {}]);
+  s.log[3].__memoryStamp = { kind: 'lolos', kali: 3 };
+  s.log[4].__memoryStamp = { kind: 'jinak', kali: 4 };
+  const m = plain(sb.alasanRekapModel(s.log, s.history));
+  assert.strictEqual(m.ingat, 2);
+  assert.deepStrictEqual(m.menang, { kind: 'jinak', n: 1, kali: 4 }, 'jinak didahulukan atas lolos');
+  assert.deepStrictEqual(Array.from(sb.alasanRekapLines(m)), ['Jebakan yang dulu 4 kali menangkapmu kini jinak', '3 materi waktunya diulang, 2 masih kamu ingat']);
+  const lolos = sesi([{}, {}]); lolos.log.forEach(q => { q.__memoryStamp = { kind: 'lolos', kali: 2 }; });
+  assert.deepStrictEqual(Array.from(sb.alasanRekapLines(sb.alasanRekapModel(lolos.log, lolos.history))), ['Kamu lolos dari 2 jebakan yang pernah menangkapmu']);
+  assert.deepStrictEqual(Array.from(sb.alasanRekapLines({ counts: { lupa: 3 }, ingat: 3 })), ['3 materi waktunya diulang, semuanya masih kamu ingat']);
+  assert.deepStrictEqual(Array.from(sb.alasanRekapLines({ counts: { lupa: 3 }, ingat: 0 })), ['3 materi waktunya diulang dan mulai pudar, jadi Fiezel memajukan jadwalnya']);
+  const penuh = sb.alasanRekapLines({ counts: { lupa: 2, fokus: 2 }, ingat: 1, fokusNama: 'X', menang: { kind: 'lolos', n: 1 }, prediksi: { perkiraan: 5, total: 8, skor: 5, arah: 'pas' } });
+  assert.strictEqual(penuh.length, 3, 'tetap maksimal tiga baris: kemenangan + satu "diatur" + perkiraan');
+  assert.match(penuh[1], /masih kamu ingat/);
+});
+
+test('F7 CSS Bukti Ingatan: tenang (tanpa animasi), ruas depan hijau saat ingat, amber saat pudar', () => {
+  const style = read('style.css');
+  const blok = [...style.matchAll(/[^{}]*cp-(?:ingatan|seg)[^{}]*\{([^}]*)\}/g)].map(m => m[1]).join('\n');
+  assert.ok(blok && !/animation|transition/.test(blok), 'tanpa animasi');
+  assert.match(style, /\.cp-ingatan\.is-masih \.cp-seg\.is-depan\{background:#D1FAE5;color:#047857\}/);
+  assert.match(style, /\.cp-ingatan\.is-pudar \.cp-seg\.is-depan\{background:#FEF3C7;color:#B45309\}/);
+  const flags = require('../fiezel-ux-flags.js');
+  assert.strictEqual(flags.DEFAULTS.buktiIngatan, true);
+  assert.match(APP, /const UX_FALLBACK_FLAGS=\{[^}]*buktiIngatan:true[^}]*\}/);
 });
 
 console.log('\nAlasan Soal: ' + pass + '/' + (pass + fail) + ' PASS');

@@ -136,7 +136,12 @@
        mengucapkan KENAPA soal itu dipilih, plus rekap "yang Fiezel atur untukmu" di layar
        hasil. Hanya sesi adaptif; mode ukur dan kunci ujian tidak pernah diberi alasan
        (alasanSoalAllowed). */
-    alasanSoal: true
+    alasanSoal: true,
+    /* "Coba pikirkan momen aha UI di UX yang bisa kamu redesign dan tambahkan" (owner, 12 Okt
+       2026, m025-577). Bukti Ingatan: di popup vonis, soal berlabel "Waktunya diulang" diberi
+       bayarannya, yaitu ingatan murid bertahan N hari dan jarak ulangan berikutnya. Bergantung
+       pada alasanSoal (bayaran hanya untuk janji yang pernah diucapkan). */
+    buktiIngatan: true
   };
 
   var DEFAULTS = {};
