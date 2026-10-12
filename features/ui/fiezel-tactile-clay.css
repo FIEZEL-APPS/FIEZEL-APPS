@@ -7404,3 +7404,184 @@ button.skill-help-dot:active {
   transform: translateY(2px) !important;
   box-shadow: 0 1px 0 #CBD5E1 !important;
 }
+
+/* ==========================================================================
+   15. MULTI-DEVICE COMFORT (m025-574)
+   OWNER: "PERBAIKI SEMUA, AGAR TAMPILAN DI MULTI DEVICE NYAMAN DI PANDANG MATA".
+   Temuan audit di 5 ukuran (iPhone SE/15, iPad tegak/mendatar, desktop 1440), masing-masing
+   terukur di Chromium dan diperiksa visual. Semua aturan di sini dijaga
+   tests/multi-device-comfort-test.js.
+   ========================================================================== */
+
+/* 15.1 Soal kuis yang TIDAK duduk di gelembung gelap. fiezel-paw-slot.js memakai anchor
+   'side' (>=980px) dan 'peek' (ponsel mendatar), dan di kedua anchor itu #quizStem langsung
+   berada di kartu terang. Aturan style.css / grammar-upgrade.css yang memaku .question-main
+   menjadi #FFFFFF membuat soalnya putih di atas krem: TIDAK TERBACA di iPad mendatar dan
+   desktop. Penolakan "light surface" lama ditulis body:not(.fz-lux), padahal body selalu fz-lux. */
+.quiz-shell .question-main:not(.quiz-bubble *):not(.quiz-stage *):not(.speech-bubble *) {
+  color: #241A11 !important;
+}
+.quiz-shell .question-instruction:not(.quiz-bubble *):not(.quiz-stage *):not(.speech-bubble *) {
+  color: #475569 !important;
+  background: rgba(100, 116, 139, 0.10) !important;
+}
+
+/* 15.2 Teks tebal di kartu mewarisi warna kartunya. mobile-edge-fit.css memaku
+   `.card b/strong/h1-h4` menjadi #FFFFFF untuk tema kartu gelap yang sudah lama diganti kartu
+   putih, jadi judul kartu hilang (Membaca "Materi level A1", Menulis, Perpustakaan, Tes Level,
+   Progres "Minggu ini"). Spesifisitas SAMA dengan aturan itu dan dimuat sesudahnya: aturan
+   yang lebih spesifik tetap menang seperti sebelumnya, dan petak gelap di dalam kartu
+   (statistik Progres, lencana Prasasti terkunci) tetap putih karena warnanya diwarisi. */
+.card :is(h1, h2, h3, h4, b, strong) {
+  color: inherit !important;
+}
+.progress-stats > div { color: #FFFFFF !important; }
+.prasasti-badge.is-locked { color: #FFFFFF !important; }
+
+/* 15.3 Kontras teks kecil (WCAG AA 4.5:1). Diawali `html body #app` karena warna lamanya
+   dipaku aturan berlapis !important yang lebih spesifik; nilai lama -> rasio baru di latarnya. */
+html body #app .progress-stats > div small { color: #CBD5E1 !important; }                   /* di petak gelap */
+html body #app .fz2-level-head .eyebrow { color: #6B5F55 !important; }                       /* 1.48 -> 5.9 */
+html body #app .fz2-day span { color: #6B5F55 !important; }                                  /* label hari */
+html body #app .map-note, html body #app .map-note span { color: #6B5F55 !important; }
+html body #app .tile-badge { color: #475569 !important; }                                    /* 2.34 -> 7.0 */
+html body #app .library-card .library-meta b { color: #241A11 !important; }                  /* putih -> tinta */
+html body #app .library-meta small, html body #app .library-meta em { color: #5B6472 !important; }
+html body #app .writing-rubric li span,
+html body #app .writing-meta span,
+html body #app .writing-prompt .skill-badge { color: #5B6472 !important; }
+html body #app .card:has(> button[onclick^="openReadingLevel"]) > .row > span { color: #5B6472 !important; }
+html body #app .lf-goal b { color: #241A11 !important; }
+html body #app .lf-goal small { color: #475569 !important; }
+html body #app .lf-card > h2 { color: #FFF4DA !important; }
+html body #app .undercover-card .arcade-card-title { color: #FFFFFF !important; }
+html body #app .undercover-card .arcade-card-desc { color: #CBD5E1 !important; }
+html body #app .undercover-card .arcade-play-hint { color: #FBBF24 !important; }
+html body #app .hero-tag span, html body #app .tactile-streak-lbl { color: #B45309 !important; }   /* amber 3.2 -> 5.0 */
+html body header.topbar #topContextActions .active-level-control strong,
+html body header.topbar .active-level-control strong,
+html body #app .fsl-gem-chip b { color: #B45309 !important; }
+html body #app .fsl-gem-chip small { color: #475569 !important; }
+html body #app .word-ipa, html body #app .section-see-all { color: #0369A1 !important; }   /* biru 3.9 -> 5.9 */
+html body #app .profile-online-badge-pill span { color: #047857 !important; }
+html body #app .class-badge-tag { color: #17624F !important; }
+html body #app .ch-tab, html body #app .game-brand-sub, html body #app .game-section-header .section-sub { color: #475569 !important; }
+/* Label tab bawah yang tidak aktif: abu-merah 75% di atas kuning = 3.1:1 pada 10px. */
+html body nav.bottomnav .nav:not(.active) span,
+html body nav.bottomnav .nav:not(.active) .kelasku-wordmark {
+  color: #6B5658 !important;
+  opacity: 1 !important;
+}
+
+/* 15.4 Kotak hari "Minggu ini": dirancang untuk kartu gelap, jadi di kartu putih tujuh hari
+   KOSONG tampil hitam pekat - terbaca seperti tujuh hari selesai. Kosong = petak terang
+   bergaris, aktif = emas, hari ini = garis putus amber. */
+html body .fz2-day i {
+  background: #F3EEE7 !important;
+  border: 1.5px solid #E5DCCF !important;
+  box-shadow: none !important;
+}
+html body .fz2-day i.is-on { background: #FFE02E !important; border-color: #E8C200 !important; }
+html body .fz2-day i.is-big { background: #F59E0B !important; border-color: #D97706 !important; }
+html body .fz2-day i.is-today { background: #FFFBEB !important; border: 2px dashed #D97706 !important; }
+
+/* 15.5 Baris geser horizontal (alat Grammar, tab Progres/Profil): tepi kanannya memotong
+   tombol tanpa tanda bisa digeser. Tepi memudar + ruang akhir supaya tombol terakhir bisa
+   digulir keluar dari bayang pudarnya. */
+.grammar-hub-tools,
+.progress-tabs {
+  -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 28px), transparent);
+  mask-image: linear-gradient(90deg, #000 calc(100% - 28px), transparent);
+  padding-right: 28px !important;
+  scroll-padding-inline-end: 28px;
+}
+
+/* 15.6 Teks label yang terlalu kecil (10-10.5px) dinaikkan ke 11.5-12px. */
+html body nav.bottomnav .nav span { font-size: 11px !important; }
+.tactile-kicker-text, .tactile-streak-lbl, .tile-badge, .library-badge,
+.profile-stat-lbl, .ch-segbar-btn, .poster-sub-brand, .progress-stats > div small {
+  font-size: 11.5px !important;
+}
+
+/* 15.7 Target sentuh: tombol ikon topbar 34px dan pil level 32px diberi area ketuk 44px
+   tanpa mengubah rupanya (outline tak terlihat di luar tombol). */
+header.topbar .icon-button,
+header.topbar .active-level-control,
+#app .active-level-control {
+  position: relative;
+}
+header.topbar .icon-button::after,
+header.topbar .active-level-control::after,
+#app .active-level-control::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+}
+
+/* 15.8 Tablet & desktop (>=768px). HP (<768px) TIDAK disentuh, dan scroll halaman tetap
+   milik jendela (pelajaran #602/#603: jangan kunci 100dvh). Sebelumnya seluruh isi dipaku
+   kolom HP 440px (29% lebar layar 1440), tab bawah membentang 1440px dengan jarak antar-ikon
+   ~240px, topbar tidak sejajar dengan isi, dan latar berganti putih/krem per layar. */
+@media (min-width: 768px) {
+  /* Latar = latar section (#FFF9EE) supaya kolom isi tidak tampak sebagai pita samar. */
+  html,
+  html body {
+    background: #FFF9EE !important;
+  }
+  html body main.app.app,
+  html body.fz-lux main.app.app {
+    max-width: none !important;
+    width: 100% !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    padding-bottom: calc(112px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  html body #app {
+    max-width: 720px !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+    background: transparent !important;
+  }
+  html body #app > :is(.home-today, section.fade, #fzClassHub, .classroom-page, .progress-page, .profile-page, .ch-student, .game-view-shell) {
+    max-width: 100% !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+  html body #app :is(.today-home-cockpit, section.ch-student) {
+    max-width: 100% !important;
+  }
+  /* Isi topbar sejajar dengan tepi kolom isi (720 - 2x16 = 688 -> setengahnya 344). */
+  html body header.topbar,
+  html body.fz-lux header.topbar {
+    padding-left: max(16px, calc(50% - 344px)) !important;
+    padding-right: max(16px, calc(50% - 344px)) !important;
+  }
+  /* Tab bawah menjadi dok mengambang di tengah, selebar yang dibutuhkan enam tab. */
+  html body nav.bottomnav,
+  html.fiezel-ui-v6 body.fz-lux nav.bottomnav,
+  html.fiezel-ui-v6 body:has(.home-today) nav.bottomnav {
+    left: 50% !important;
+    right: auto !important;
+    width: min(560px, calc(100% - 48px)) !important;
+    max-width: 560px !important;
+    transform: translateX(-50%) !important;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
+    height: 64px !important;
+    min-height: 64px !important;
+    max-height: 64px !important;
+    padding: 6px !important;
+    border-radius: 24px !important;
+    border: 1.5px solid rgba(217, 119, 6, 0.18) !important;
+    box-shadow: inset 0 1.5px 2px #FFFFFF, 0 14px 34px -14px rgba(120, 53, 15, 0.30) !important;
+  }
+}
+@media (min-width: 1200px) {
+  html body #app { max-width: 760px !important; }
+  html body header.topbar,
+  html body.fz-lux header.topbar {
+    padding-left: max(16px, calc(50% - 364px)) !important;
+    padding-right: max(16px, calc(50% - 364px)) !important;
+  }
+}

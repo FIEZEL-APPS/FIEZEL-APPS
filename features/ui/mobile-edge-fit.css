@@ -2159,14 +2159,18 @@ div.card {
   color: #334155 !important;
 }
 
+/* m025-574: dua aturan di bawah ditulis untuk tema kartu GELAP (#151520). Kartu sekarang putih
+   (style.css "body.fz-lux .card"), jadi #CBD5E1 = 1,48:1 - paragraf dan label kartu nyaris hilang
+   (Progres "Level kamu"/label hari, Membaca "53 bacaan", Menulis "TOPIK A1"/"0 kata").
+   Nilai sekarang #5B6472 (5,9:1 di putih); kartu yang memang gelap memakai aturannya sendiri. */
 .card p {
-  color: #CBD5E1 !important;
+  color: #5B6472 !important;
 }
 
-.card > span:not([class*="lvl"]):not(.vocab-focus-word):not(.phonetic):not(.feedback-memory-kicker):not(#feedback *):not(#quizScaffoldNudge *):not(.quiz-scaffold-nudge *):not(.tutor-diagnostic-clue *):not(#tutorTurn *):not(.tutor-turn *),
-.card p > span:not([class*="lvl"]):not(.vocab-focus-word):not(.phonetic):not(#feedback *):not(#quizScaffoldNudge *):not(.quiz-scaffold-nudge *):not(.tutor-diagnostic-clue *):not(#tutorTurn *):not(.tutor-turn *),
-.card div > span:not([class*="badge"]):not([class*="tag"]):not([class*="btn"]):not([class*="act"]):not([class*="avatar"]):not([class*="lvl"]):not(.is-now):not(.is-done):not(.vocab-focus-word):not(.phonetic):not(.feedback-memory-kicker):not(#feedback *):not(#quizScaffoldNudge *):not(.quiz-scaffold-nudge *):not(.tutor-diagnostic-clue *):not(#tutorTurn *):not(.tutor-turn *) {
-  color: #CBD5E1 !important;
+.card > span:not([class*="lvl"]):not(.vocab-focus-word):not(.phonetic):not(.feedback-memory-kicker):not(#feedback *):not(#quizScaffoldNudge *):not(.quiz-scaffold-nudge *):not(.tutor-diagnostic-clue *):not(#tutorTurn *):not(.tutor-turn *):not([class*="pill"]):not(.prasasti-badge *),
+.card p > span:not([class*="lvl"]):not(.vocab-focus-word):not(.phonetic):not(#feedback *):not(#quizScaffoldNudge *):not(.quiz-scaffold-nudge *):not(.tutor-diagnostic-clue *):not(#tutorTurn *):not(.tutor-turn *):not([class*="pill"]):not(.prasasti-badge *),
+.card div > span:not([class*="badge"]):not([class*="tag"]):not([class*="btn"]):not([class*="act"]):not([class*="avatar"]):not([class*="lvl"]):not(.is-now):not(.is-done):not(.vocab-focus-word):not(.phonetic):not(.feedback-memory-kicker):not(#feedback *):not(#quizScaffoldNudge *):not(.quiz-scaffold-nudge *):not(.tutor-diagnostic-clue *):not(#tutorTurn *):not(.tutor-turn *):not([class*="pill"]):not(.prasasti-badge *) {
+  color: #5B6472 !important;
 }
 
 .vocab-focus-word,
