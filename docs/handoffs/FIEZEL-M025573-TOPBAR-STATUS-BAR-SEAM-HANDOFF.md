@@ -1,4 +1,4 @@
-# FIEZEL-M025572 — Topbar "terpotong": status bar sewarna topbar + tepi saat scroll (`m025-572`)
+# FIEZEL-M025573 — Topbar "terpotong": status bar sewarna topbar + tepi saat scroll (`m025-573`)
 
 **Status:** siap review OWNER (PR #601). Tidak ada teks baru yang dilihat murid, jadi i18n id/th tidak tersentuh.
 **Otoritas:** keputusan merge dan rilis tetap di tangan OWNER/MASTER.
@@ -33,7 +33,7 @@ tepat di bawah blok yang menang.
   - `syncTopbarScrolled(source)` mengatur kelas `.is-scrolled` di `header.topbar`.
     Listener `scroll` dipasang di document dengan fase capture (pasif, dibatasi rAF),
     sehingga menangkap scroll jendela **maupun** panel dalam `#app`. Ini diperlukan
-    karena cangkang 100dvh (#602, sudah di main sebagai `m025-571`) menggulir `#app > section`, bukan jendela.
+    agar tetap benar bila suatu saat ada cangkang yang menggulir `#app > section`, bukan jendela (seperti #602, yang sudah di-revert lewat #603).
   - Penggulir horizontal dan penggulir di luar `#app` diabaikan.
   - `renderInner()` mereset tepi saat pindah layar.
 - `index.html` (`meta theme-color`) dan `manifest.json` (`theme_color`): `#FBF7F3` → `#FDFAF3`.
@@ -47,7 +47,7 @@ tepat di bawah blok yang menang.
     luar `#app`);
   - bukti negatif untuk tiap jalur.
 - `id-golden-baseline.json`: hash `manifest.json` diperbarui (hanya `theme_color`).
-- Build `m025-572` lewat `node tools/bump-build.mjs` (main sudah memakai `m025-570` untuk #600 dan `m025-571` untuk #602). Ini juga menyentuh
+- Build `m025-573` lewat `node tools/bump-build.mjs` (main memakai `m025-570` #600, `m025-571` #602, `m025-572` revert #603). Ini juga menyentuh
   `features/neural-voice/fiezel-diag-panel.js` (`DIAG_BUILD`), itulah sebabnya handoff ini
   diwajibkan A13.
 
@@ -56,7 +56,7 @@ tepat di bawah blok yang menang.
 | Tata letak | Hasil |
 |---|---|
 | Sekarang (jendela yang digulir) | Home, Progres, Grammar, Profil: tepi muncul setelah scroll, hilang setelah pindah layar |
-| Cangkang 100dvh #602 (panel dalam) | `ol.lesson-path`, `#onlineRoot`, `#progressTabPane`, `.game-hub-container` di-scroll 400 px → `is-scrolled`; tercabut saat ke Home |
+| Cangkang 100dvh #602 sebelum di-revert (panel dalam) | `ol.lesson-path`, `#onlineRoot`, `#progressTabPane`, `.game-hub-container` di-scroll 400 px → `is-scrolled`; tercabut saat ke Home |
 | `theme-color` di semua layar | `#FDFAF3` |
 | Sesi kuis dan Listening/Speaking | Bar sendiri yang sudah bergaris bawah dan berlatar `#FDFAF3`, tidak diubah |
 

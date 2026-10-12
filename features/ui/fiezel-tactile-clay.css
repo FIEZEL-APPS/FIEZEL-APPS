@@ -7077,7 +7077,7 @@ html body.fz-view-latihan header.topbar {
   gap: 12px !important;
   view-transition-name: topbar !important;
 }
-/* m025-572: tepi topbar muncul HANYA saat isi halaman lewat di bawahnya (kelas .is-scrolled
+/* m025-573: tepi topbar muncul HANYA saat isi halaman lewat di bawahnya (kelas .is-scrolled
    dipasang app.js syncTopbarScrolled). Aturan di atas sengaja tanpa garis dan bayangan, dan
    latarnya nyaris sama dengan latar halaman, jadi saat di-scroll kartu tampak terpotong garis
    tak terlihat. Di puncak halaman topbar tetap rata menyatu dengan status bar. */

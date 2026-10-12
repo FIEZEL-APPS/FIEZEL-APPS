@@ -1,5 +1,5 @@
 /**
- * FIEZEL — gerbang "topbar terpotong" (m025-572).
+ * FIEZEL — gerbang "topbar terpotong" (m025-573).
  *
  * OWNER: "KENAPA TAMPILAN UI PWA FIEZEL TAMPAK TERLIHAT TERPOTONG DI TOPBAR TIDAK SEPERTI
  * APLIKASI GENERIK?"
