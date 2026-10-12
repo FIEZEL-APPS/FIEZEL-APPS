@@ -17,7 +17,7 @@ const APP_VERSION=self.FIEZEL_VERSION||'5.19.0';
    FIEZEL_UX_FLAGS milik berkas benderanya, kunci demi kunci, dan MERAH kalau
    keduanya menyimpang satu nilai pun. Jadi ini duplikasi berpagar, bukan dua
    sumber kebenaran yang saling bersaing. */
-const UX_FALLBACK_FLAGS={curriculumConsole:true,scenePhases:false,skillExams:false,skillsLabDestination:false,personalJourneyTab:false,voicePackGate:false,tutorRole:false,todayHome:true,fourTabNav:true,leanIntro:true,placementLite:true,sessionSummary:true,funnelTelemetry:true,memoryStamp:true,alasanSoal:true,buktiIngatan:true};
+const UX_FALLBACK_FLAGS={curriculumConsole:true,scenePhases:false,skillExams:false,skillsLabDestination:false,personalJourneyTab:false,voicePackGate:false,tutorRole:false,todayHome:true,fourTabNav:true,leanIntro:true,placementLite:true,sessionSummary:true,funnelTelemetry:true,memoryStamp:true,alasanSoal:true,buktiIngatan:true,heroRencana:true};
 /* Nama tak dikenal -> false di KEDUA jalur: salah ketik mematikan fitur (aman),
    bukan menyalakannya diam-diam. */
 function uxOn(flag){
@@ -10511,6 +10511,69 @@ function homeVocabStats(now=Date.now()){
   for(const [key,x] of Object.entries(state.vocab||{})){const lvl=contentLevelFor('vocab',key);if(!lvl)continue;if(x?.total&&lvl===level)practised++;if(x?.nextReview&&x.nextReview<=now&&reviewLevelOk(lvl,level))due++}
   return{practised,due}
 }
+/* ---- HERO "RENCANA FIEZEL HARI INI" (m025-577) ------------------------------------------
+ *
+ * OWNER: "Bagaimana dengan tampilan Home hero?" Kartu hero adalah layar pertama setiap hari,
+ * dan sampai rilis ini ia memuat tiga hal yang membuat FIEZEL terbaca sebagai kuis biasa:
+ *   1. "Kata Hari Ini" yang SAMA untuk semua murid (indeks dari tanggal), padahal Fiezel tahu
+ *      kata mana yang paling rawan dilupakan murid INI.
+ *   2. Baris "Sesi Adaptif: Vocab {level} + Audio Listening" yang ditulis mati di templat:
+ *      kalimat yang sama apa pun rencana sesinya, termasuk saat sesi itu tanpa listening.
+ *   3. Teks Indonesia telanjang ("TARGET HARIAN", "MULAI SESI HARI INI") yang sampai ke murid
+ *      Thai, dan label tombol yang mengabaikan status sesi tertunda / ujian level.
+ *
+ * Kartunya TIDAK bertambah dan tombolnya tetap satu: owner pernah meminta kartu "Kata Braincore
+ * Hari Ini" dihapus dari Home, jadi kecerdasannya dipindah ke DALAM kartu yang memang sudah
+ * ada, menggantikan isi yang palsu. Model di bawah murni (masukan -> struktur), supaya
+ * gerbang bisa menguji setiap keadaan murid tanpa DOM.
+ *
+ * KEJUJURAN: pil rencana hanya menyebut yang memang akan dikerjakan tombolnya. Sesi adaptif
+ * memasukkan materi jatuh tempo dan lesson fokus ke kolamnya (buildAdaptivePool), latihan
+ * level tidak - jadi murid yang belum adaptiveReady tidak dijanjikan "materi waktunya
+ * diulang". Saat level terkunci tombolnya membuka ujian, dan pil rencana sesi tidak tampil. */
+const HERO_RENCANA_MAX_PIL=2;
+/** Model hero, murni. masukan: {placementDone, adaptiveReady, locked, ja, due, fokusNama, soal,
+ *  menit, level, menitTes, rawan:{word,phonetic,meaning,hari}|null}. Keluaran: {kicker,
+ *  pil:[{kind,icon,text}], kata:{mode:'rawan'|'harian', meta}} - teks sudah diterjemahkan. */
+function heroRencanaModel(m){
+  const t=(k,p)=>FiezelI18n.t(k,p);
+  const pil=[];let kicker='hero.kicker-rencana';
+  if(!m.placementDone&&!m.ja){
+    kicker='hero.kicker-awal';
+    pil.push({kind:'tes',icon:'compass',text:t('hero.rencana-tes',{menit:m.menitTes})});
+  }else if(m.locked){
+    kicker='hero.kicker-rencana';
+  }else if(!m.adaptiveReady){
+    kicker='hero.kicker-latihan';
+    pil.push({kind:'level',icon:'compass',text:t('hero.rencana-level',{level:m.level})});
+  }else{
+    const due=Math.max(0,Math.floor(Number(m.due)||0));
+    if(due>0)pil.push({kind:'ulang',icon:'rotate-ccw',text:t('hero.rencana-ulang',{n:due})});
+    if(m.fokusNama)pil.push({kind:'fokus',icon:'crosshair',text:t('hero.rencana-fokus',{materi:m.fokusNama})});
+    if(!pil.length)pil.push({kind:'umum',icon:'sparkles',text:t('hero.rencana-umum',{soal:m.soal})});
+  }
+  /* Kata "paling rawan lupa" hanya untuk murid adaptif: angkanya datang dari jadwal ingatan
+     yang sama dengan antrean review (vocabReviewQueue, risiko lupa tertinggi lebih dulu).
+     Murid lain tetap mendapat kata hari ini, dengan label yang mengatakannya apa adanya. */
+  const r=m.adaptiveReady&&!m.locked&&m.rawan&&m.rawan.word&&Number.isFinite(Number(m.rawan.hari))?m.rawan:null;
+  const sejak=r?(r.hari===0?t('ingat.sejak-tadi'):r.hari===1?t('ingat.sejak-kemarin'):t('ingat.sejak-hari',{n:r.hari})):'';
+  return{
+    kicker:t(kicker),
+    pil:pil.slice(0,HERO_RENCANA_MAX_PIL),
+    kata:r?{mode:'rawan',judul:t('hero.kata-rawan'),meta:t('hero.kata-rawan-meta',{sejak})}:{mode:'harian',judul:'',meta:t('hero.kata-harian')}
+  };
+}
+/** Kata dengan risiko lupa tertinggi milik murid ini, atau null. */
+function heroKataRawan(now=Date.now()){
+  try{
+    const v=vocabReviewQueue()[0];
+    const b=v?state.vocab?.[v.id]:null;
+    if(!v||!b)return null;
+    const hari=alasanSoalHariLalu(b.lastSeen,now);
+    if(hari===null)return null;
+    return{word:String(v.word||''),phonetic:String(v.phonetic||''),meaning:String(v.meaning||''),hari};
+  }catch{return null}
+}
 function todayHomeMarkup(){
   const trust=levelTrustState(state),locked=trust.locked===true;
   const examLevel=nextVerifiableLevel(state)||verifiedLevel(state);
@@ -10690,11 +10753,14 @@ function todayHomeMarkup(){
     + `</div>`
     + `<div class="fz-greet-title">${esc(FiezelI18n.t('home.sapa', { nama: currentLearner }))}</div>`
     + `</div>`
-    + `<div class="tactile-streak-badge" title="${esc(FiezelI18n.t('today.streak', { days: currentStreak }))}">`
+    /* m025-577: runtun NOL tidak ditulis "1 HARI". Audit Home 2026-09-27 sudah mencabut `|| 1`
+       dari kartu-kartu, lencana ini tertinggal; angka karangan di layar pertama justru yang
+       membuat murid berhenti percaya angka lain di layar yang sama. */
+    + (currentStreak > 0 ? `<div class="tactile-streak-badge" title="${esc(FiezelI18n.t('today.streak', { days: currentStreak }))}">`
     + flameSvg
-    + `<span class="tactile-streak-val">${currentStreak > 0 ? currentStreak : 1}</span>`
+    + `<span class="tactile-streak-val">${currentStreak}</span>`
     + `<span class="tactile-streak-lbl">${isTh ? 'วัน' : 'HARI'}</span>`
-    + `</div>`
+    + `</div>` : '')
     + `</div>`
     + `</div>`;
   /* UX-BRIEF §1: tombol aksi utama yang mencolok di lipatan pertama - "Mulai Belajar Sekarang"
@@ -10985,9 +11051,29 @@ function todayHomeMarkup(){
     </button>
   </section>`;
 
-  /* Hero Quest Card (Tactile Clay Quest Card) */
-  const heroQuestCard = `
-    <section class="hero-card" id="heroCard">
+  /* Hero Quest Card (Tactile Clay Quest Card) - m025-577 "Rencana Fiezel hari ini".
+     Lihat blok HERO di atas todayHomeMarkup: kata paling rawan lupa menggantikan kata hari
+     ini yang sama untuk semua murid, pil rencana nyata menggantikan baris "Sesi Adaptif:
+     Vocab + Audio Listening" yang ditulis mati, dan semua teks lewat FiezelI18n. */
+  const heroOn=uxOn('heroRencana');
+  let heroFokus='';try{heroFokus=heroOn?alasanFokusDariPolicy(buildAdaptivePolicy()).nama:''}catch(_){}
+  const heroRawan=(heroOn&&state.adaptiveReady&&!locked)?heroKataRawan():null;
+  const heroModel=heroOn?heroRencanaModel({
+    placementDone:!!state.placementDone,adaptiveReady:!!state.adaptiveReady,locked,ja:jaCourseOn(),
+    due:todayReview,fokusNama:heroFokus,soal:shape.soal||10,menit:shape.menit||10,level:todayLevel,
+    menitTes:placementMinutes(),rawan:heroRawan
+  }):{kicker:FiezelI18n.t('hero.kicker-target'),pil:[],kata:{mode:'harian',judul:'',meta:FiezelI18n.t('hero.kata-harian')}};
+  /* Kata hero: kata rawan (bila model memilihnya) atau kata hari ini. Tombol suaranya memutar
+     kata yang TAMPIL, bukan kata hari ini yang mungkin sudah diganti. */
+  const heroKata=heroModel.kata.mode==='rawan'&&heroRawan?{word:heroRawan.word,phonetic:heroRawan.phonetic,meaning:heroRawan.meaning}:dailyWord;
+  try{if(heroKata!==dailyWord&&typeof audio!=='undefined'&&audio.prefetch&&heroKata.word)audio.prefetch(heroKata.word,{contentType:'word'})}catch(_){}
+  if(typeof window!=='undefined')window.playHeroWordAudio=function(){try{if(typeof audio!=='undefined'&&audio.play&&heroKata&&heroKata.word)audio.play(heroKata.word,{contentType:'word'})}catch(_){}};
+  const heroIpa=heroKata.phonetic&&heroKata.phonetic.includes('/')?heroKata.phonetic.split('•')[0].trim():(heroKata.phonetic||'');
+  /* Label tombol mengikuti aksi yang SUNGGUH dijalankan: ujian level saat terkunci, "lanjutkan"
+     saat sesi tertunda. Dulu teksnya selalu "MULAI SESI HARI INI" apa pun aksinya. */
+  const heroCtaText=!hasTestedLevel?primaryBtnText:(locked||(state.activeSession&&state.adaptiveReady))?label:FiezelI18n.t('hero.cta-mulai',{menit:shape.menit||12});
+  const heroCard = `
+    <section class="hero-card${heroModel.kata.mode==='rawan'?' is-rawan':''}" id="heroCard" data-testid="hero-rencana">
       <div class="hero-header-row">
         <div class="hero-tag">
           <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false" style="display:block;flex-shrink:0;">
@@ -10995,10 +11081,10 @@ function todayHomeMarkup(){
             <circle cx="12" cy="12" r="5.8" fill="#FDE68A" stroke="#B45309" stroke-width="1.4"/>
             <circle cx="12" cy="12" r="2.5" fill="#EF4444"/>
           </svg>
-          <span>TARGET HARIAN</span>
+          <span>${esc(heroModel.kicker)}</span>
         </div>
         <div class="hero-rhythm-badge" id="heroRhythmText">
-          Ritme: <span>${rhythmShown}/${rhythmTarget}</span> (${rhythmPct}%)
+          ${esc(FiezelI18n.t('hero.ritme'))} <span>${rhythmShown}/${rhythmTarget}</span> (${rhythmPct}%)
         </div>
       </div>
 
@@ -11007,23 +11093,20 @@ function todayHomeMarkup(){
         <div class="hero-progress-fill" id="heroProgressFill" style="width: ${Math.max(10, rhythmPct)}%"></div>
       </div>
 
-      <!-- Word of the Day Micro-Learning Tile -->
-      <div class="hero-micro-bite">
+      <!-- Kata: paling rawan lupa (murid adaptif) atau kata hari ini -->
+      <div class="hero-micro-bite" data-kata="${esc(heroModel.kata.mode)}">
         <div class="micro-text-group">
+          ${heroModel.kata.judul?`<div class="hero-kata-judul">${esc(heroModel.kata.judul)}</div>`:''}
           <div class="micro-word-title">
-            <span class="word-en">${esc(dailyWord.word)}</span>
-            <span class="word-ipa">${esc(dailyWord.phonetic && dailyWord.phonetic.includes('/') ? dailyWord.phonetic.split('•')[0].trim() : (dailyWord.phonetic || ''))}</span>
+            <span class="word-en">${esc(heroKata.word)}</span>
+            <span class="word-ipa">${esc(heroIpa)}</span>
           </div>
-          <div class="word-id">${esc(dailyWord.meaning)} • Kata Hari Ini</div>
-          <div class="adaptive-sub">
-            <svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true" focusable="false" style="display:block;flex-shrink:0;">
-              <polygon points="13 2, 4 13.5, 11.5 13.5, 10.2 21.5, 20 10.5, 13 10.5" fill="#D97706"/>
-            </svg>
-            <span>Sesi Adaptif: Vocab ${esc(todayLevel || 'A2')} + Audio Listening</span>
-          </div>
+          ${heroModel.kata.mode==='rawan'
+            ?`<div class="word-id">${esc(heroKata.meaning)}</div><div class="hero-kata-meta">${esc(heroModel.kata.meta)}</div>`
+            :`<div class="word-id">${esc(heroKata.meaning)} • ${esc(heroModel.kata.meta)}</div>`}
         </div>
 
-        <button type="button" class="audio-btn-3d" id="audioToggleBtn" title="Dengarkan pengucapan audio" onclick="event.stopPropagation();if(window.playTodayVocabAudio)window.playTodayVocabAudio();">
+        <button type="button" class="audio-btn-3d" id="audioToggleBtn" title="${esc(FiezelI18n.t('hero.dengar'))}" aria-label="${esc(FiezelI18n.t('hero.dengar'))}" onclick="event.stopPropagation();if(window.playHeroWordAudio)window.playHeroWordAudio();">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor" fill-opacity="0.2"/>
             <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
@@ -11036,6 +11119,8 @@ function todayHomeMarkup(){
         </button>
       </div>
 
+      ${heroModel.pil.length?`<div class="hero-plan" data-testid="hero-plan">${heroModel.pil.map(x=>`<span class="adaptive-sub hero-pil" data-pil="${esc(x.kind)}"><i data-lucide="${esc(x.icon)}" aria-hidden="true"></i><span>${esc(x.text)}</span></span>`).join('')}</div>`:''}
+
       <!-- Chunky Tactile 3D Action CTA (Solar Gold Clay) -->
       <button type="button" class="hero-cta-btn" id="btnStartSession" onclick="event.stopPropagation();${primaryBtnAction}">
         <span class="fz-i" style="width: 18px; height: 18px; color: var(--gold-text);">
@@ -11043,10 +11128,11 @@ function todayHomeMarkup(){
             <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" fill="currentColor"/>
           </svg>
         </span>
-        <span>${hasTestedLevel ? `MULAI SESI HARI INI (${shape.menit || 12} MENIT)` : esc(primaryBtnText)}</span>
+        <span>${esc(heroCtaText)}</span>
         <span>→</span>
       </button>
     </section>`;
+  const heroQuestCard = heroCard;
 
   /* Quick Practice (Tactile Clay 4-Grid) */
   const quickPracticeCard = `
@@ -15408,23 +15494,27 @@ function alasanSoalText(a){
   }catch{}
   return '';
 }
+/** Lesson fokus rencana adaptif yang LAYAK disebut ke murid: {skill, nama}, keduanya '' bila
+ *  tidak ada. Dipakai label soal DAN hero Home, supaya dua layar tidak pernah menyebut fokus
+ *  yang berbeda untuk sesi yang sama. */
+function alasanFokusDariPolicy(policy){
+  let skill=String(policy?.targetSkill||'');
+  /* Sasaran yang hanya nama RANAH ('vocab', 'grammar', ...) bukan fokus: "Fokus hari ini:
+     Vocab" di atas setiap soal kosakata tidak mengatakan apa pun yang tidak sudah terlihat.
+     Yang layak disebut fokus adalah lesson bernama. */
+  if(ALASAN_FOKUS_RANAH.includes(skill.toLowerCase()))skill='';
+  const n=skill?String(friendlySkillName(skill)||''):'';
+  /* Nama mentah (id lesson) bukan nama: "Fokus hari ini: present_simple_be" adalah istilah
+     mesin. Pagar yang sama dengan braincoreFocusName, tanpa peduli huruf besar. */
+  return n&&n.toLowerCase()!==skill.toLowerCase()?{skill,nama:n}:{skill,nama:''};
+}
 /** Jembatan app: konteks dari state hidup, lalu keputusan. Dipanggil draw() SETELAH soal
  *  dipilih dan SEBELUM olmProbeConsume (sesudahnya antrean probe sudah berkurang). */
 function alasanSoalForQuestion(q,cfg,now=Date.now()){
   let probeHit=false,retensi=new Set(),fokusSkill='',fokusNama='';
   try{const concept=quizConcept(q),neg=olmNegotiationRead();probeHit=!!concept&&(neg?.probeQueue||[]).some(x=>x&&String(x.skill)===concept&&Number(x.remaining)>0)}catch{}
   try{for(const s of retentionProbeDueLessons(now))retensi.add(s);for(const s of retentionFragileLessons(now))retensi.add(s)}catch{}
-  try{
-    fokusSkill=String(cfg?.policy?.targetSkill||'');
-    /* Sasaran yang hanya nama RANAH ('vocab', 'grammar', ...) bukan fokus: "Fokus hari ini:
-       Vocab" di atas setiap soal kosakata tidak mengatakan apa pun yang tidak sudah terlihat.
-       Yang layak disebut fokus adalah lesson bernama. */
-    if(ALASAN_FOKUS_RANAH.includes(fokusSkill.toLowerCase()))fokusSkill='';
-    const n=fokusSkill?String(friendlySkillName(fokusSkill)||''):'';
-    /* Nama mentah (id lesson) bukan nama: "Fokus hari ini: present_simple_be" adalah
-       istilah mesin. Pagar yang sama dengan braincoreFocusName, tanpa peduli huruf besar. */
-    if(n&&n.toLowerCase()!==fokusSkill.toLowerCase())fokusNama=n;
-  }catch{}
+  try{const f=alasanFokusDariPolicy(cfg?.policy);fokusSkill=f.skill;fokusNama=f.nama}catch{}
   return alasanSoalDecide(q,{now,probeHit,retensi,fokusSkill,fokusNama,bucket:alasanSoalBucket(q)});
 }
 /** Catat alasan soal yang tersaji + putuskan apakah labelnya tampil (fokus: sekali). */

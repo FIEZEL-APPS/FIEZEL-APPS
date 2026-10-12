@@ -57,6 +57,7 @@ const REQUIRED = {
   memoryStamp: [true, 'Stempel Ingatan: satu baris di kotak umpan balik, latihan mandiri saja (m025-565)'],
   alasanSoal: [true, 'Alasan Soal: kenapa soal ini dipilih + rekap keputusan Fiezel, sesi adaptif saja (m025-577)'],
   buktiIngatan: [true, 'Bukti Ingatan: momen aha di popup vonis untuk soal berlabel Waktunya diulang (m025-577)'],
+  heroRencana: [true, 'Home hero Rencana Fiezel: kata paling rawan lupa + pil rencana nyata, satu kartu satu tombol (m025-577)'],
   /* Diperiksa owner di fiezel.my.id (7 Sep 2026): /api/health 404, /kurikulum.html 404.
      Konsol kurikulum dilayani '/api/...' relatif origin, dan repo tidak punya
      passenger_wsgi.py / Procfile / requirements.txt di akar - backend-nya memang belum
@@ -149,6 +150,7 @@ for (const name of Object.keys(REQUIRED)) {
     ['memoryStamp', APP],
     ['alasanSoal', APP],
     ['buktiIngatan', APP],
+    ['heroRencana', APP],
     ['leanIntro', fs.readFileSync(path.join(__fzRoot, 'features/onboarding/fiezel-onboarding.js'), 'utf8')]
   ];
   for (const [name, source] of readers) {

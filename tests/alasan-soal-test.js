@@ -44,6 +44,11 @@ const START = APP.indexOf('/* ---- ALASAN SOAL + REKAP KEPUTUSAN');
 const END = APP.indexOf('function quizLoop(cfg){', START);
 assert.ok(START > 0 && END > START, 'blok Alasan Soal tidak ditemukan di app.js');
 const BLOCK = APP.slice(START, END);
+const H_START = APP.indexOf('/* ---- HERO "RENCANA FIEZEL HARI INI"');
+const H_END = APP.indexOf('function todayHomeMarkup(){', H_START);
+assert.ok(H_START > 0 && H_END > H_START, 'blok hero Rencana Fiezel tidak ditemukan di app.js');
+const HERO = APP.slice(H_START, H_END);
+const TODAY = APP.slice(H_END, APP.indexOf('\nfunction ', H_END + 30));
 
 const TZ = 'Asia/Jakarta';
 const dayKey = ts => new Intl.DateTimeFormat('en-CA', { timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit' }).format(ts);
@@ -64,6 +69,7 @@ function sandbox(opts = {}) {
     examLockActive: () => !!opts.examLock,
     uxOn: flag => flag === 'alasanSoal' ? opts.flag !== false : flag === 'buktiIngatan' ? opts.buktiFlag !== false : false,
     document: opts.document || { querySelector: () => null },
+    vocabReviewQueue: () => opts.queue || [],
     quizConcept: q => String(q?.lessonSkill || q?.conceptId || q?.skill || q?.type || ''),
     olmNegotiationRead: () => opts.neg || null,
     retentionProbeDueLessons: () => new Set(opts.probeDue || []),
@@ -75,6 +81,7 @@ function sandbox(opts = {}) {
   ctx.Date.prototype = Date.prototype;
   vm.createContext(ctx);
   vm.runInContext(BLOCK, ctx, { filename: 'app.js#alasan-soal' });
+  vm.runInContext(HERO, ctx, { filename: 'app.js#hero-rencana' });
   return ctx;
 }
 const plain = x => JSON.parse(JSON.stringify(x));
@@ -468,6 +475,106 @@ test('F7 CSS Bukti Ingatan: tenang (tanpa animasi), ruas depan hijau saat ingat,
   const flags = require('../fiezel-ux-flags.js');
   assert.strictEqual(flags.DEFAULTS.buktiIngatan, true);
   assert.match(APP, /const UX_FALLBACK_FLAGS=\{[^}]*buktiIngatan:true[^}]*\}/);
+});
+
+// =====================================================================================
+// H. HOME HERO "RENCANA FIEZEL HARI INI"
+// =====================================================================================
+const heroIn = extra => Object.assign({ placementDone: true, adaptiveReady: true, locked: false, ja: false, due: 0, fokusNama: '', soal: 12, menit: 12, level: 'A1', menitTes: 5, rawan: null }, extra);
+const pilKinds = m => m.pil.map(x => x.kind);
+
+test('H1 murid baru: "Langkah pertama" + pil tes awal, kata hari ini (bukan kata rawan)', () => {
+  I18N.setLocale('id');
+  const sb = sandbox();
+  const m = plain(sb.heroRencanaModel(heroIn({ placementDone: false, adaptiveReady: false, rawan: { word: 'x', hari: 3 } })));
+  assert.strictEqual(m.kicker, 'Langkah pertama');
+  assert.deepStrictEqual(m.pil, [{ kind: 'tes', icon: 'compass', text: 'Tes awal ±5 menit: Fiezel memetakan levelmu dulu' }]);
+  assert.deepStrictEqual(m.kata, { mode: 'harian', judul: '', meta: 'Kata Hari Ini' });
+});
+
+test('H2 sesudah tes, belum adaptif: pil latihan level, TIDAK dijanjikan "materi waktunya diulang"', () => {
+  const sb = sandbox();
+  const m = plain(sb.heroRencanaModel(heroIn({ adaptiveReady: false, due: 7, fokusNama: 'Artikel', rawan: { word: 'x', hari: 2 } })));
+  assert.strictEqual(m.kicker, 'Latihan hari ini');
+  assert.deepStrictEqual(pilKinds(m), ['level'], 'latihan level mengacak bank level, tidak membaca jadwal ingatan');
+  assert.strictEqual(m.kata.mode, 'harian');
+});
+
+test('H3 level terkunci: tombolnya ujian, jadi tidak ada pil rencana sesi dan tidak ada kata rawan', () => {
+  const sb = sandbox();
+  const m = plain(sb.heroRencanaModel(heroIn({ locked: true, due: 7, fokusNama: 'Artikel', rawan: { word: 'x', hari: 2 } })));
+  assert.deepStrictEqual(m.pil, []);
+  assert.strictEqual(m.kata.mode, 'harian');
+});
+
+test('H4 murid adaptif: pil dari rencana nyata (ulang, fokus), cadangan "disesuaikan", maks. dua', () => {
+  const sb = sandbox();
+  const dua = plain(sb.heroRencanaModel(heroIn({ due: 9, fokusNama: 'Subjek dan to be' })));
+  assert.strictEqual(dua.kicker, 'Rencana Fiezel hari ini');
+  assert.deepStrictEqual(dua.pil.map(x => x.text), ['9 materi waktunya diulang', 'Fokus: Subjek dan to be']);
+  assert.deepStrictEqual(pilKinds(plain(sb.heroRencanaModel(heroIn({ due: 0 })))), ['umum']);
+  assert.strictEqual(plain(sb.heroRencanaModel(heroIn({ due: 0 }))).pil[0].text, '12 soal disesuaikan dengan jawabanmu');
+  assert.deepStrictEqual(pilKinds(plain(sb.heroRencanaModel(heroIn({ due: -3, fokusNama: '' })))), ['umum'], 'angka rusak tidak jadi "-3 materi"');
+});
+
+test('H5 kata paling rawan lupa: hanya murid adaptif, dengan "terakhir kamu latih" dari hari belajar', () => {
+  const sb = sandbox();
+  assert.deepStrictEqual(plain(sb.heroRencanaModel(heroIn({ rawan: { word: 'along', hari: 6 } }))).kata, { mode: 'rawan', judul: 'Paling rawan lupa hari ini', meta: 'Terakhir kamu latih 6 hari lalu' });
+  assert.strictEqual(plain(sb.heroRencanaModel(heroIn({ rawan: { word: 'along', hari: 1 } }))).kata.meta, 'Terakhir kamu latih kemarin');
+  assert.strictEqual(plain(sb.heroRencanaModel(heroIn({ rawan: { word: 'along', hari: NaN } }))).kata.mode, 'harian', 'waktu tak terbaca: tidak dikarang');
+  assert.strictEqual(plain(sb.heroRencanaModel(heroIn({ rawan: { word: '', hari: 2 } }))).kata.mode, 'harian');
+});
+
+test('H6 heroKataRawan membaca antrean review yang SAMA (risiko lupa tertinggi lebih dulu)', () => {
+  const st = { vocab: { v1: { lastSeen: NOW - 5 * DAY }, v2: { lastSeen: 0 } }, grammar: {}, reading: {}, history: [] };
+  const sb = sandbox({ state: st, queue: [{ id: 'v1', word: 'along', phonetic: '/əˈlɒŋ/', meaning: 'sepanjang' }] });
+  assert.deepStrictEqual(plain(sb.heroKataRawan(NOW)), { word: 'along', phonetic: '/əˈlɒŋ/', meaning: 'sepanjang', hari: 5 });
+  assert.strictEqual(sandbox({ state: st, queue: [] }).heroKataRawan(NOW), null);
+  assert.strictEqual(sandbox({ state: st, queue: [{ id: 'v2', word: 'x' }] }).heroKataRawan(NOW), null, 'lastSeen kosong');
+});
+
+test('H7 naskah hero dua bahasa: kunci sama, th ber-aksara Thai, tanpa placeholder bocor', () => {
+  const sb = sandbox();
+  for (const loc of ['id', 'th']) {
+    I18N.setLocale(loc);
+    try {
+      const semua = [];
+      for (const extra of [{ placementDone: false, adaptiveReady: false }, { adaptiveReady: false }, { due: 4, fokusNama: 'Artikel', rawan: { word: 'a', hari: 3 } }, { rawan: { word: 'a', hari: 0 } }]) {
+        const m = sb.heroRencanaModel(heroIn(extra));
+        semua.push(m.kicker, m.kata.meta, m.kata.judul, ...m.pil.map(x => x.text));
+      }
+      semua.push(I18N.t('hero.cta-mulai', { menit: 12 }), I18N.t('hero.dengar'), I18N.t('hero.ritme'), I18N.t('hero.kicker-target'));
+      for (const t of semua.filter(Boolean)) {
+        assert.ok(!/[{}]/.test(t) && !/^hero\./.test(t), loc + ' placeholder/kunci bocor: ' + t);
+        if (loc === 'th') assert.ok(/[฀-๿]/.test(t), 'harus ber-aksara Thai: ' + t);
+      }
+    } finally { I18N.setLocale('id'); }
+  }
+  const src = read('features/i18n/copy-id-redesign.js') + read('features/i18n/copy-th-redesign.js');
+  assert.strictEqual([...src.matchAll(/'hero\.[a-z-]+':/g)].length, 30, '15 kunci hero x 2 bahasa');
+});
+
+test('H8 templat hero: baris palsu dan teks Indonesia telanjang hilang, label tombol mengikuti aksi', () => {
+  const at = TODAY.indexOf('const heroCard = `');
+  const tpl = TODAY.slice(at, TODAY.indexOf('const heroQuestCard = heroCard;', at));
+  assert.ok(at > 0 && tpl.length > 200, 'templat hero ditemukan');
+  for (const palsu of ['Audio Listening', 'TARGET HARIAN', 'MULAI SESI HARI INI', 'Kata Hari Ini', 'Ritme:', 'Dengarkan pengucapan audio']) {
+    assert.ok(!tpl.includes(palsu), 'teks lama masih ditulis langsung: ' + palsu);
+  }
+  assert.strictEqual((tpl.match(/class="hero-cta-btn"/g) || []).length, 1, 'tetap SATU tombol');
+  assert.match(TODAY, /const heroCtaText=!hasTestedLevel\?primaryBtnText:\(locked\|\|\(state\.activeSession&&state\.adaptiveReady\)\)\?label:FiezelI18n\.t\('hero\.cta-mulai'/);
+  assert.match(tpl, /window\.playHeroWordAudio/, 'tombol suara memutar kata yang tampil');
+  assert.match(TODAY, /const heroRawan=\(heroOn&&state\.adaptiveReady&&!locked\)\?heroKataRawan\(\):null;/);
+  assert.match(TODAY, /alasanFokusDariPolicy\(buildAdaptivePolicy\(\)\)\.nama/, 'fokus hero = fokus label soal');
+});
+
+test('H9 runtun nol tidak ditulis "1 HARI"; bendera heroRencana terdaftar', () => {
+  assert.ok(!/currentStreak > 0 \? currentStreak : 1/.test(TODAY), 'angka karangan runtun kembali');
+  assert.match(TODAY, /\(currentStreak > 0 \? `<div class="tactile-streak-badge"/);
+  const flags = require('../fiezel-ux-flags.js');
+  assert.strictEqual(flags.DEFAULTS.heroRencana, true);
+  assert.match(APP, /const UX_FALLBACK_FLAGS=\{[^}]*heroRencana:true[^}]*\}/);
+  assert.match(TODAY, /const heroOn=uxOn\('heroRencana'\);/);
 });
 
 console.log('\nAlasan Soal: ' + pass + '/' + (pass + fail) + ' PASS');

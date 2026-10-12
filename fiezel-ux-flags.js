@@ -141,7 +141,13 @@
        2026, m025-577). Bukti Ingatan: di popup vonis, soal berlabel "Waktunya diulang" diberi
        bayarannya, yaitu ingatan murid bertahan N hari dan jarak ulangan berikutnya. Bergantung
        pada alasanSoal (bayaran hanya untuk janji yang pernah diucapkan). */
-    buktiIngatan: true
+    buktiIngatan: true,
+    /* "Bagaimana dengan tampilan Home hero?" (owner, 12 Okt 2026, m025-577). Kartu hero yang
+       SAMA (tetap satu kartu, satu tombol) berisi rencana Fiezel: kata paling rawan lupa milik
+       murid, pil rencana nyata (materi waktunya diulang / fokus). Mati = kata hari ini + kicker
+       "Target harian"; baris "Sesi Adaptif: Vocab + Audio Listening" yang ditulis mati tetap
+       hilang di kedua keadaan karena ia tidak benar. */
+    heroRencana: true
   };
 
   var DEFAULTS = {};

@@ -11106,3 +11106,14 @@ html body #app .result-alasan li{color:#4B5563 !important}
 .cp-ingatan.is-masih .cp-seg.is-depan{background:#D1FAE5;color:#047857}
 .cp-ingatan.is-pudar .cp-seg.is-depan{background:#FEF3C7;color:#B45309}
 :lang(th) .cp-ingatan-line{font-size:.88rem;line-height:1.6}
+/* m025-577 Hero "Rencana Fiezel hari ini". Hanya elemen BARU; kartu, ubin kata, pil
+   (.adaptive-sub) dan tombol tetap memakai aturan tactile-clay yang sudah ada. */
+.hero-kata-judul{margin:0 0 3px;font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#B45309}
+.hero-kata-meta{margin-top:3px;font-size:11.5px;font-weight:700;color:#475569}
+.hero-card.is-rawan .hero-micro-bite{border-color:#FDE68A !important;background:#FFFBEB !important}
+.hero-plan{display:flex;flex-wrap:wrap;gap:6px;margin-top:-4px}
+.hero-plan .hero-pil{margin-top:0 !important;max-width:100%}
+.hero-plan .hero-pil > span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hero-plan .hero-pil svg{width:12px;height:12px;flex:0 0 12px}
+:lang(th) .hero-kata-judul{letter-spacing:normal;font-size:11.5px}
+:lang(th) .hero-kata-meta,:lang(th) .hero-plan .hero-pil{line-height:1.5}

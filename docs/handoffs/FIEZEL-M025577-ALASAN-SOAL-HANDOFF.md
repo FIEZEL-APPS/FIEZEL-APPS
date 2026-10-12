@@ -21,6 +21,7 @@ membuat murid percaya adalah kalimat yang tepat di detik yang tepat.
 
 | Detik | Yang diucapkan FIEZEL | Status |
 |---|---|---|
+| **Membuka aplikasi (Home hero)** | "Rencana Fiezel hari ini": kata PALING RAWAN LUPA milik murid ("along · terakhir kamu latih 6 hari lalu") + pil rencana nyata ("9 materi waktunya diulang", "Fokus: Subjek dan to be") | **m025-577 (ini): Hero Rencana** |
 | **Sebelum menjawab** | Kenapa soal ini muncul ("Waktunya diulang: terakhir kamu latih 5 hari lalu.") | **m025-577 (ini)** |
 | **Vonis** | Bayaran janji itu: "Masih ingat dari latihan 5 hari lalu. Ulangan berikutnya sekitar 10 hari lagi." + garis `5 hari lalu │ 10 hari lagi` | **m025-577 (ini): Bukti Ingatan** |
 | **Sesudah menjawab** | Ingatan jebakan lintas sesi ("Ketemu lagi. Jebakan di balik 'at' sudah 3 kali menangkapmu...") | m025-565 Stempel Ingatan |
@@ -60,6 +61,34 @@ satu istilah pun: ingat = ruas kanan memanjang (hijau), pudar = ruas kanan memen
    alat pemasaran yang jujur karena angkanya milik murid sendiri.
 
 ## 4. Perilaku m025-577
+
+### Home hero "Rencana Fiezel hari ini" (`#heroCard`, bendera `heroRencana`)
+
+Owner: "Bagaimana dengan tampilan Home hero?" Kartu hero memuat tiga hal yang membuat FIEZEL
+terbaca sebagai kuis biasa: "Kata Hari Ini" yang sama untuk semua murid (indeks dari tanggal),
+baris **"Sesi Adaptif: Vocab {level} + Audio Listening" yang ditulis mati** (kalimat yang sama
+apa pun rencananya, termasuk sesi tanpa listening), dan teks Indonesia telanjang ("TARGET
+HARIAN", "Ritme:", "MULAI SESI HARI INI (n MENIT)", "Kata Hari Ini") yang sampai ke murid Thai,
+plus label tombol yang mengabaikan status sesi tertunda dan ujian level.
+
+Kartunya TIDAK bertambah, tombolnya tetap satu (owner pernah meminta kartu "Kata Braincore Hari
+Ini" dihapus): isi palsunya yang diganti.
+
+| Keadaan murid | Kicker | Ubin kata | Pil rencana |
+|---|---|---|---|
+| belum tes awal | Langkah pertama | kata hari ini | "Tes awal ±5 menit: Fiezel memetakan levelmu dulu" |
+| sudah tes, belum adaptif | Latihan hari ini | kata hari ini | "Latihan level A1 sampai Fiezel cukup mengenal pola jawabanmu" |
+| level terkunci | Rencana Fiezel hari ini | kata hari ini | (tidak ada: tombolnya membuka ujian) |
+| adaptif | Rencana Fiezel hari ini | **PALING RAWAN LUPA HARI INI** · kata teratas `vocabReviewQueue` · "Terakhir kamu latih 6 hari lalu" | "{n} materi waktunya diulang" (angka `dueReviews` yang sama dengan keping review), "Fokus: {lesson}" (`alasanFokusDariPolicy`, aturan yang sama dengan label soal), cadangan "{n} soal disesuaikan dengan jawabanmu"; maks. dua |
+
+Murid yang belum adaptif TIDAK dijanjikan "materi waktunya diulang": latihan level mengacak bank
+level, tidak membaca jadwal ingatan. Tombol suara memutar kata yang tampil
+(`playHeroWordAudio`). Label tombol: "Lanjutkan sesi" saat sesi tertunda, ujian level saat
+terkunci, "MULAI SESI HARI INI (n MENIT)" lewat i18n selain itu. Lencana runtun di kepala Home
+tidak lagi menulis "1 HARI" untuk runtun nol (sisa `|| 1` yang lolos dari audit 2026-09-27).
+Bendera mati = kicker "Target harian" + kata hari ini; baris "Audio Listening" tetap hilang di
+kedua keadaan karena ia tidak benar.
+
 
 ### Label di atas soal (`.quiz-alasan`)
 
@@ -133,20 +162,25 @@ Di luar lipatan "Lihat rincian sesi", di bawah peek P2-4. Paling banyak tiga bar
   Kabel: `alasanSoalServe` di `draw()` sesudah soal dipilih dan sebelum `olmProbeConsume`;
   `alasanSoalTag` di kedua posisi stem; `alasanRekapMarkup` di `finishQuiz` (luar lipatan).
   Blok `/* ---- BUKTI INGATAN` menyusul tepat sesudahnya; `buktiIngatanAttach` dipanggil sesudah
-  `openConfidencePop(ok)` di jalur jawaban pilihan. Kedua bendera di `UX_FALLBACK_FLAGS`.
-- `features/i18n/copy-id-redesign.js` + `copy-th-redesign.js`: 32 kunci `alasan.*` / `rekap.*` /
-  `ingat.*`, id + th.
+  `openConfidencePop(ok)` di jalur jawaban pilihan. Blok `/* ---- HERO "RENCANA FIEZEL HARI INI"`
+  tepat sebelum `todayHomeMarkup`; templat hero di dalamnya. Ketiga bendera di `UX_FALLBACK_FLAGS`.
+- `features/i18n/copy-id-redesign.js` + `copy-th-redesign.js`: 47 kunci `alasan.*` / `rekap.*` /
+  `ingat.*` / `hero.*`, id + th.
 - `style.css`: `.quiz-alasan` (12px/13px th), `.result-alasan`, `.cp-ingatan` (latar solid: kartu
-  vonis sedikit tembus pandang). Teks label sengaja simpul teks
+  vonis sedikit tembus pandang), `.hero-kata-judul` / `.hero-kata-meta` / `.hero-plan` (kartu,
+  ubin, pil dan tombol hero tetap memakai aturan tactile-clay yang ada). Teks label sengaja simpul teks
   telanjang, bukan `<span>`: `mobile-edge-fit.css` mengunci `.card p > span` ke `#5B6472` dengan
   selektor ber-`:not(#id)`, jadi span di gelembung soal gelap terbaca ~3:1.
-- `fiezel-ux-flags.js`, `tests/ux-flags-test.js`: bendera `alasanSoal` dan `buktiIngatan`.
-- `tests/alasan-soal-test.js` (baru, terdaftar di `quality.yml`): 30 uji.
+- `fiezel-ux-flags.js`, `tests/ux-flags-test.js`: bendera `alasanSoal`, `buktiIngatan`, `heroRencana`.
+- `tests/alasan-soal-test.js` (baru, terdaftar di `quality.yml`): 39 uji.
 - Trio build lewat `node tools/bump-build.mjs` ke `m025-577`.
 
 ## 7. Verifikasi
 
-- `node tests/alasan-soal-test.js`: 30/30. Diuji mutasi: membuang pagar probe retensi, kunci
+- `node tests/alasan-soal-test.js`: 39/39 (H1-H9 untuk hero; mutasi: membuang cabang terkunci,
+  menjanjikan ulangan ke murid belum adaptif, kata rawan untuk murid belum adaptif, runtun `|| 1`,
+  label tombol yang mengabaikan status, batas dua pil: masing-masing merah).
+- Sebelumnya, untuk label + Bukti Ingatan + rekap: 30/30. Diuji mutasi: membuang pagar probe retensi, kunci
   ujian, pagar "fokus sekali", pagar ranah, ambang 5 prediksi, kabel sebelum `olmProbeConsume`,
   melebarkan jenis sesi ke `level`, membuang pagar tebakan / pencocokan `__attemptId` / jadwal
   basi Bukti Ingatan, memasangnya sebelum popup, membalik prioritas jinak > lolos, atau
@@ -169,7 +203,16 @@ Di luar lipatan "Lihat rincian sesi", di bawah peek P2-4. Paling banyak tiga bar
 - Harness probe ada di scratchpad sesi, polanya `tools/dev/probe-grammar-retry-screenshot.js`:
   seed 8 kata A1 jatuh tempo + riwayat, `startAdaptive()`, jawab semua soal, baca label dan rekap.
 
+- Home hero di Chromium (390x844): murid baru -> "LANGKAH PERTAMA" + "Tes awal ±5 menit: Fiezel
+  memetakan levelmu dulu"; murid dengan 9 materi jatuh tempo -> "RENCANA FIEZEL HARI INI", ubin
+  "PALING RAWAN LUPA HARI INI · along · Terakhir kamu latih 6 hari lalu", pil "9 materi waktunya
+  diulang". Locale th seluruhnya Thai ("แผนของ FIEZEL วันนี้", "เสี่ยงลืมที่สุดวันนี้",
+  "เริ่มเซสชันวันนี้ (12 นาที)"). Tinggi kartu hero: murid adaptif 258px -> 282px, murid baru
+  243px -> 255px (pil rencana pindah ke baris sendiri di bawah ubin kata).
+
 ## 8. Temuan di luar cakupan (belum disentuh)
+
+- "Semua Modul →" di kepala Latihan Singkat Home masih teks Indonesia telanjang (bocor ke murid Thai).
 
 - `quiz.result-score` berbunyi "{score} dari {total} soal kamu jawab **benar langsung**", padahal
   `score` memuat kredit 0,75 untuk benar di percobaan kedua ("5.75 dari 12 ... benar langsung").
