@@ -7808,7 +7808,7 @@ html.fiezel-ui-v6 body.fsl-session-active nav.bottomnav {
   }
 
   html body nav.bottomnav::before {
-    content: "FIEZEL · MENU UTAMA" !important;
+    content: attr(data-menu-label) !important; /* teks dari kunci i18n nav.sidebar-heading (id/th), dipasang app.js */
     display: block !important;
     font-size: 11px !important;
     font-weight: 800 !important;

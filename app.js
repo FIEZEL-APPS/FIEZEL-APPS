@@ -75,6 +75,14 @@ function __fzSyncShellElements(){
         if(text&&text!==k)el.setAttribute('aria-label',text);
       }
     });
+    /* m025-571: judul sidebar desktop (nav.bottomnav::before) dibaca CSS lewat attr(data-menu-label), jadi ikut bahasa murid. */
+    document.querySelectorAll('[data-i18n-menu-label]').forEach(el=>{
+      const k=el.getAttribute('data-i18n-menu-label');
+      if(k&&self.FiezelI18n&&typeof self.FiezelI18n.t==='function'){
+        const text=self.FiezelI18n.t(k);
+        if(text&&text!==k)el.setAttribute('data-menu-label',text);
+      }
+    });
     document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{
       const k=el.getAttribute('data-i18n-placeholder');
       if(k&&self.FiezelI18n&&typeof self.FiezelI18n.t==='function'){
