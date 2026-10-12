@@ -504,7 +504,7 @@
     /* FRAME — semua opasitas/transform dihitung MURNI dari t (parametrik):
        scrub, lompat, dan adopsi-terlambat selalu konsisten. */
     var _lastF = '', _lastB = '', _lastWO = '', _lastWT = '';
-    var adoptedRevealed = !!(ctl.adopted && !frozenMode && ctl.startOffset >= 500);
+    var adoptedRevealed = !!(ctl.adopted && !frozenMode);
     function applyVisualState(t) {
       var sF = (adoptedRevealed ? 1 : easeOutCubic(ramp(t, TL.F_IN0, TL.F_IN1))).toFixed(3);
       if (sF !== _lastF) { fGroup.style.opacity = sF; _lastF = sF; }
@@ -593,7 +593,7 @@
       layout();
       particles.init(canvas, {
         emit: events.emit,
-        skipBuild: !frozenMode && ctl.startOffset >= (particles.T ? particles.T.DONE : 1320)
+        skipBuild: !frozenMode && (adoptedRevealed || ctl.startOffset >= (particles.T ? particles.T.DONE : 1320))
       });
       equalizer.init(logoSvg, {
         beats: CHOREO.BEATS,
@@ -601,8 +601,10 @@
         getLevels: makeGetLevels(CHOREO.BEATS),
         idleShimmer: true
       });
-      /* Equalizer mulai tepat saat batang partikel memadat — event modul P. */
+      /* Equalizer mulai tepat saat batang partikel memadat — event modul P,
+         atau langsung aktif bila logo sudah terungkap dari CSS boot. */
       events.on('bars-solid', function () { equalizer.start(clock.now()); });
+      if (adoptedRevealed) equalizer.start(ctl.startOffset);
       pawstamp.arm(null, {
         root: host,
         reducedMotion: false,
@@ -629,6 +631,7 @@
     if (frozenMode) {
       bootMotion(); // QA beku: tanpa penundaan — frame harus deterministik
     } else {
+      layout();
       applyVisualState(ctl.startOffset);
       env.requestAnimationFrame(function () { env.setTimeout(bootMotion, 0); });
     }
@@ -766,12 +769,13 @@
       // Bunyi yang belum sempat berbunyi mati bersama splash — mencegahnya
       // muncul lagi nanti sebagai bunyi liar di tekanan tombol pertama.
       cancelChime(target);
+      // Pemanggil perlu tahu KAPAN sapaan selesai, bukan menebaknya dengan
+      // pewaktu kedua. Dipanggil SEBELUM latar boot dilepas dan animasi keluar
+      // mulai, supaya beranda/gerbang sudah ter-render di balik splash.
+      if (typeof opts.onClose === 'function') { try { opts.onClose({ via: 'close' }); } catch (_) {} }
       // Latar gelap boot dilepas di AWAL penutupan, bukan setelah animasi
       // keluar: yang tersingkap harus sudah berwarna aplikasi.
       endBootBackground(target);
-      // Pemanggil perlu tahu KAPAN sapaan selesai, bukan menebaknya dengan
-      // pewaktu kedua. Dipanggil sebelum animasi keluar supaya menyambung.
-      if (typeof opts.onClose === 'function') { try { opts.onClose({ via: 'close' }); } catch (_) {} }
       try { host.classList.add('is-leaving'); } catch (_) {}
       if (typeof target.setTimeout === 'function') target.setTimeout(remove, 320);
       else remove();

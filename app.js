@@ -7830,8 +7830,14 @@ async function checkUrlTeacherToken(){
   }catch(_){return null}
 }
 let roleResolutionPromise=null;
+let roleResolutionDone=false;
+let pendingUrlTeacherToken=false;
 function startRoleResolution(){
   if(roleResolutionPromise)return roleResolutionPromise;
+  try{
+    const u=new URL(location.href);
+    pendingUrlTeacherToken=!!(u.searchParams.get('token')||u.searchParams.get('teacher_token')||u.searchParams.get('guru_token')||u.searchParams.get('invite_teacher'));
+  }catch(_){pendingUrlTeacherToken=false}
   roleResolutionPromise=(async()=>{
     try{
       const tokRes=await checkUrlTeacherToken();
@@ -7850,6 +7856,8 @@ function startRoleResolution(){
             state.preferences={...state.preferences,role:'guru'};
             state.view='tutor';
             try{save()}catch(_){}
+            if(appOpened&&state.view!=='tutor')go('tutor');
+            else if(appOpened)render();
             return 'teacher';
           }else if(core.role()==='learner'){
             if(!self.FiezelTeacherShell?.previewAllowed?.()){
@@ -7864,7 +7872,7 @@ function startRoleResolution(){
       }
     }catch(_){}
     return isVerifiedTeacher()?'teacher':'learner';
-  })();
+  })().finally(()=>{roleResolutionDone=true;pendingUrlTeacherToken=false});
   return roleResolutionPromise;
 }
 function openApp(){
@@ -8196,7 +8204,7 @@ function startWelcomeExperience(){
       maybeSyncLearnerName(at);
       return startNotificationInvitation()
     };
-    if(roleResolutionPromise){
+    if(pendingUrlTeacherToken&&!roleResolutionDone&&roleResolutionPromise){
       Promise.race([roleResolutionPromise,new Promise(r=>setTimeout(r,1200))]).then(proceed).catch(proceed);
       return null;
     }
