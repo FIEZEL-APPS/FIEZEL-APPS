@@ -7753,3 +7753,18 @@ header.topbar .active-level-control::after,
     column-span: all !important;
   }
 }
+
+/* ==========================================================================
+   16. SELUBUNG CANGKANG SAAT BOOT (m025-576)
+   OWNER (Android, instal pertama): sesudah splash muncul "semacam menu utama tapi seluruh
+   layarnya warna cream dan bottom barnya muncul" selama 5-7 detik, lalu berkedip ke layar
+   masuk. Topbar dan tab bawah adalah markup statis index.html, jadi mereka sudah tampil
+   begitu splash terangkat, walau belum ada satu layar pun yang digambar (sementara layar
+   masuk/perkenalan belum terpasang, atau jaring pengaman boot sudah menutup splash). Keduanya
+   kini baru tampil sesudah render() pertama memasang html.fz-app-open, jadi celah itu hanya
+   berupa latar krem polos, bukan menu yang belum bisa dipakai.
+   ========================================================================== */
+html:not(.fz-app-open) body nav.bottomnav,
+html:not(.fz-app-open) body header.topbar {
+  visibility: hidden !important;
+}
