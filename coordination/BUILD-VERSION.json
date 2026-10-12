@@ -1,7 +1,7 @@
 {
-  "version": "m025-572",
-  "claimedBy": "branch claude/revert-602-viewport-shell",
-  "claimedAt": "2026-10-12T06:04:29.689Z",
-  "reason": "revert(ui): batalkan cangkang 100dvh #602 - scroll mati & kartu terjepit",
+  "version": "m025-573",
+  "claimedBy": "branch claude/magical-fermi-j36vy4",
+  "claimedAt": "2026-10-12T06:34:48.505Z",
+  "reason": "fix(topbar): status bar sewarna topbar + tepi saat scroll",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
