@@ -11069,3 +11069,51 @@ body.fz-view-classroom header.topbar #topGamifyCluster {
 @keyframes notifSpin {
   to { transform: rotate(360deg); }
 }
+
+/* m025-577 Alasan Soal: satu baris di atas soal sesi adaptif yang mengucapkan KENAPA soal itu
+   dipilih. Sengaja setenang Stempel Ingatan (12px, muted) supaya tidak bersaing dengan soal;
+   yang membuatnya terlihat adalah ikon Pau kecil dan ketepatan kalimatnya, bukan bobotnya. */
+.quiz-alasan{display:flex;align-items:flex-start;gap:6px;margin:0 0 8px;font-size:12px;line-height:1.45;font-weight:600;letter-spacing:.01em;color:var(--muted,#6E635C);text-align:left}
+.quiz-alasan .fz-i,.quiz-alasan svg{width:14px;height:14px;flex:0 0 14px;margin-top:1px;--fz-i-line:var(--info,#2979FF)}
+/* Di gelembung soal gelap (slot Pau 'above') warna muted bawaan hanya ~2:1 terhadap latarnya:
+   naik ke slate terang, ikon emas brand. */
+html body #app .quiz-bubble p.quiz-alasan{color:#CBD5E1 !important;-webkit-text-fill-color:#CBD5E1 !important}
+html body #app .quiz-bubble .quiz-alasan .fz-i,html body #app .quiz-bubble .quiz-alasan svg{--fz-i-line:#FFD54A}
+:lang(th) .quiz-alasan{font-size:13px;line-height:1.6;letter-spacing:normal}
+/* Rekap "Yang Fiezel atur untukmu" di layar hasil, di luar lipatan Detail. Rata kiri di dalam
+   kartu hasil yang rata tengah: daftar tiga kalimat terbaca sebagai laporan, bukan slogan. */
+.result-alasan{margin:10px auto 4px;max-width:360px;padding:10px 14px;border-radius:14px;background:rgba(41,121,255,.06);border:1px solid rgba(41,121,255,.16);text-align:left}
+.result-alasan-head{display:flex;align-items:center;gap:6px;font-size:.8rem;font-weight:800;letter-spacing:.02em;color:var(--text,#1F2937)}
+.result-alasan-head .fz-i,.result-alasan-head svg{width:14px;height:14px;flex:0 0 14px;--fz-i-line:var(--info,#2979FF)}
+.result-alasan ul{margin:6px 0 0;padding:0 0 0 18px}
+/* --muted di kartu hasil jatuh ke #94A3B8 (~2,5:1 di atas latar biru muda): terlalu pucat untuk
+   kalimat yang justru ingin dibaca. */
+.result-alasan li{margin:2px 0;font-size:.84rem;line-height:1.45;font-weight:500}
+html body #app .result-alasan li{color:#4B5563 !important}
+:lang(th) .result-alasan li{line-height:1.65}
+/* m025-577 Bukti Ingatan: satu kalimat + garis dua ruas di popup vonis (kartu putih). Ruas kiri
+   = jarak yang baru saja ditempuh ingatan, ruas kanan = jarak ke ulangan berikutnya. "Masih
+   ingat" memanjangkan ruas kanan (hijau), "pudar" memendekkannya (amber). Tanpa animasi:
+   gambar yang diam sudah cukup bicara, dan popup ini sudah punya animasi masuknya sendiri. */
+/* Latar SOLID, bukan rgba: kartu vonis sedikit tembus pandang, dan latar transparan membuat
+   teks pilihan di balik popup terbaca samar di dalam kotak ini (terlihat di probe 390px). */
+.cp-ingatan{margin:-4px 0 12px;padding:10px 12px;border-radius:12px;background:#F0F6FF;border:1px solid #D6E4FF}
+.cp-ingatan-line{display:flex;align-items:flex-start;gap:6px;margin:0 0 8px;font-size:.84rem;line-height:1.45;font-weight:600;color:#334155}
+.cp-ingatan-line .fz-i,.cp-ingatan-line svg{width:15px;height:15px;flex:0 0 15px;margin-top:1px;--fz-i-line:var(--info,#2979FF)}
+.cp-ingatan-track{display:flex;gap:3px;height:20px}
+.cp-seg{display:flex;align-items:center;justify-content:center;min-width:0;border-radius:6px;font-size:.7rem;font-weight:800;letter-spacing:.02em;white-space:nowrap;overflow:hidden}
+.cp-seg.is-lalu{background:#E2E8F0;color:#475569}
+.cp-ingatan.is-masih .cp-seg.is-depan{background:#D1FAE5;color:#047857}
+.cp-ingatan.is-pudar .cp-seg.is-depan{background:#FEF3C7;color:#B45309}
+:lang(th) .cp-ingatan-line{font-size:.88rem;line-height:1.6}
+/* m025-577 Hero "Rencana Fiezel hari ini". Hanya elemen BARU; kartu, ubin kata, pil
+   (.adaptive-sub) dan tombol tetap memakai aturan tactile-clay yang sudah ada. */
+.hero-kata-judul{margin:0 0 3px;font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#B45309}
+.hero-kata-meta{margin-top:3px;font-size:11.5px;font-weight:700;color:#475569}
+.hero-card.is-rawan .hero-micro-bite{border-color:#FDE68A !important;background:#FFFBEB !important}
+.hero-plan{display:flex;flex-wrap:wrap;gap:6px;margin-top:-4px}
+.hero-plan .hero-pil{margin-top:0 !important;max-width:100%}
+.hero-plan .hero-pil > span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hero-plan .hero-pil svg{width:12px;height:12px;flex:0 0 12px}
+:lang(th) .hero-kata-judul{letter-spacing:normal;font-size:11.5px}
+:lang(th) .hero-kata-meta,:lang(th) .hero-plan .hero-pil{line-height:1.5}

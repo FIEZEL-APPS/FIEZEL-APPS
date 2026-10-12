@@ -1,7 +1,7 @@
 {
-  "version": "m025-576",
-  "claimedBy": "branch claude/magical-fermi-j36vy4",
-  "claimedAt": "2026-10-12T10:43:47.664Z",
-  "reason": "boot: layar masuk langsung sesudah splash, tanpa menu utama 5-7 detik",
+  "version": "m025-577",
+  "claimedBy": "branch claude/inspiring-hopper-h5wnut",
+  "claimedAt": "2026-10-12T14:45:54.303Z",
+  "reason": "Alasan Soal: BrainCore terlihat di soal dan layar hasil",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

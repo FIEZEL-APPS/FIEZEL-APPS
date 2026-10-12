@@ -1115,6 +1115,8 @@ jobs:
           node tests/misconception-ledger-test.js
           # m025-565 Stempel Ingatan: ledger miskonsepsi bicara di kotak umpan balik latihan mandiri
           node tests/memory-stamp-test.js
+          # m025-577 Alasan Soal: kenapa soal ini dipilih + rekap keputusan Fiezel, sesi adaptif saja
+          node tests/alasan-soal-test.js
           node tests/misconception-taxonomy-test.js
           node tests/olm-test.js
           node tests/p1-game-layer-smoke-test.js
