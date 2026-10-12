@@ -2508,7 +2508,7 @@
         {
           "text": "no thing",
           "misconception": "incorrectly splitting the compound negative pronoun into two words",
-          "whyFailsId": "“nothing” itu satu kata, dipenggal jadi nggak baku.",
+          "whyFailsId": "“no thing” bukan bentuk baku (yang baku ditulis satu kata), dan apa pun bentuknya, “no” di sini tetap bikin negatif dobel bareng “didn't”.",
           "misconceptionId": "kata ganti negatif yang satu kata dipenggal jadi dua."
         }
       ],
@@ -3473,13 +3473,13 @@
         {
           "text": "was sending",
           "misconception": "Uses past continuous to describe a series of completed actions.",
-          "whyFailsId": "past continuous cocok buat tindakan yang lagi jalan di satu saat lampau.",
+          "whyFailsId": "past continuous cocok buat tindakan yang lagi jalan di satu saat lampau, padahal tiga surel ini udah tuntas terkirim di minggu yang masih berjalan (“so far this week”).",
           "misconceptionId": "past continuous dipakai buat nggambarin serangkaian tindakan yang udah tuntas."
         },
         {
           "text": "send",
           "misconception": "Uses present simple, ignoring that the sentence reports completed past actions within the current period.",
-          "whyFailsId": "present simple nggambarin kebiasaan atau fakta.",
+          "whyFailsId": "present simple nggambarin kebiasaan atau fakta umum, padahal di sini kamu ngitung surel yang udah terkirim “so far this week”.",
           "misconceptionId": "present simple dipakai padahal kalimatnya nyebut tindakan lampau tertentu."
         }
       ],
@@ -4643,7 +4643,7 @@
         {
           "text": "does",
           "misconception": "double-auxiliary construction",
-          "whyFailsId": "does got nggak pernah bener di bahasa Inggris.",
+          "whyFailsId": "“does” itu kata bantu yang selalu diikuti kata kerja bentuk dasar (does have), padahal sesudahnya di sini ada “got”. Pola punya “have got” cuma bisa dibuka kata bantu dari keluarga “have”.",
           "misconceptionId": "dua kata bantu ditumpuk."
         }
       ],
@@ -7289,7 +7289,7 @@
         {
           "text": "suggested to hand",
           "misconception": "Uses an infinitive complement after 'admit', a verb that takes a gerund, not an infinitive.",
-          "whyFailsId": "sama kayak “admit”, kata “suggest” minta bentuk -ing atau anak kalimat that, bukan bentuk to; lagian ucapan aslinya perintah, bukan usulan.",
+          "whyFailsId": "“suggested to hand” nggak sah, karena “suggest” nggak pernah diikuti bentuk to; pasangannya bentuk -ing atau anak kalimat that. Lagian ucapan aslinya perintah, bukan usulan.",
           "misconceptionId": "bentuk to dipasang di belakang kata kerja yang maunya bentuk -ing."
         }
       ],

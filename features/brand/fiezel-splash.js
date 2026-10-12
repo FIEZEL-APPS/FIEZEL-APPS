@@ -167,6 +167,12 @@
     var target = env || (typeof globalThis !== 'undefined' ? globalThis : {});
     var node = bootSplashElement(target);
     endBootBackground(target);
+    try {
+      target.__fiezelBootSplashDismissed = true;
+      if (typeof target.dispatchEvent === 'function' && typeof target.CustomEvent === 'function') {
+        target.dispatchEvent(new target.CustomEvent('fiezel:splash-dismissed'));
+      }
+    } catch (_) {}
     if (!node) return false;
     try { if (typeof node.setAttribute === 'function') node.setAttribute(BOOT_CLAIMED_ATTR, 'disposed'); } catch (_) {}
     try { if (node.parentNode) node.parentNode.removeChild(node); } catch (_) {}
@@ -498,18 +504,22 @@
     /* FRAME — semua opasitas/transform dihitung MURNI dari t (parametrik):
        scrub, lompat, dan adopsi-terlambat selalu konsisten. */
     var _lastF = '', _lastB = '', _lastWO = '', _lastWT = '';
-    function perFrame(t, dt) {
-      particles.update(t, dt);
-      var sF = easeOutCubic(ramp(t, TL.F_IN0, TL.F_IN1)).toFixed(3);
+    var adoptedRevealed = !!(ctl.adopted && !frozenMode && ctl.startOffset >= 500);
+    function applyVisualState(t) {
+      var sF = (adoptedRevealed ? 1 : easeOutCubic(ramp(t, TL.F_IN0, TL.F_IN1))).toFixed(3);
       if (sF !== _lastF) { fGroup.style.opacity = sF; _lastF = sF; }
-      var sB = ramp(t, TL.B_IN0, TL.B_IN1).toFixed(3);
+      var sB = (adoptedRevealed ? 1 : ramp(t, TL.B_IN0, TL.B_IN1)).toFixed(3);
       if (sB !== _lastB) { barsGroup.style.opacity = sB; _lastB = sB; }
-      equalizer.update(t, dt);
-      var pw = easeOutCubic(ramp(t, TL.WORD0, TL.WORD1));
+      var pw = adoptedRevealed ? 1 : easeOutCubic(ramp(t, TL.WORD0, TL.WORD1));
       var sWO = pw.toFixed(3);
       if (sWO !== _lastWO) { wordSlot.style.opacity = sWO; _lastWO = sWO; }
       var sWT = 'translateY(' + ((1 - pw) * 14).toFixed(2) + 'px)';
       if (sWT !== _lastWT) { wordSlot.style.transform = sWT; _lastWT = sWT; }
+    }
+    function perFrame(t, dt) {
+      particles.update(t, dt);
+      applyVisualState(t);
+      equalizer.update(t, dt);
     }
 
     /* JADWAL — ketukan bersuara dibaca dari tabel koreografi (sumber tunggal
@@ -581,7 +591,10 @@
     function bootMotion() {
       if (ctl.closed) return;
       layout();
-      particles.init(canvas, { emit: events.emit });
+      particles.init(canvas, {
+        emit: events.emit,
+        skipBuild: !frozenMode && ctl.startOffset >= (particles.T ? particles.T.DONE : 1320)
+      });
       equalizer.init(logoSvg, {
         beats: CHOREO.BEATS,
         beatsAbsolute: true,
@@ -616,6 +629,7 @@
     if (frozenMode) {
       bootMotion(); // QA beku: tanpa penundaan — frame harus deterministik
     } else {
+      applyVisualState(ctl.startOffset);
       env.requestAnimationFrame(function () { env.setTimeout(bootMotion, 0); });
     }
     return true;
@@ -664,6 +678,11 @@
     try {
       if (target.__fiezelBootSplash && typeof target.__fiezelBootSplash.clearRecovery === 'function') target.__fiezelBootSplash.clearRecovery();
     } catch (_) {}
+    if (opts.force !== true && target.__fiezelBootWatchdogFired) {
+      disposeBootSplash(target);
+      markSeen(target, now);
+      return { shown: false, reason: 'watchdog_elapsed' };
+    }
     if (opts.force !== true && seenToday(target, now)) {
       // Splash frame-pertama TIDAK boleh tertinggal hanya karena sapaan hari ini dilewati.
       disposeBootSplash(target);
@@ -713,6 +732,7 @@
       /* Jam koreografi mulai dari sini: bagian yang sudah "dipakai" boot
          diloncati, bukan diulang (adopsi lambat → langsung dekat cap). */
       startOffset: Math.max(0, VISIBLE_MS - visibleMs),
+      adopted: !!adopted,
       ready: false, stampStarted: false, frozen: false, closed: false,
       introRequested: false,
       clock: null, skip: null, cleanup: [],

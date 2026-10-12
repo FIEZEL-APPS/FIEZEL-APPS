@@ -1,7 +1,7 @@
 {
-  "version": "m025-567",
+  "version": "m025-569",
   "claimedBy": "branch claude/sharp-keller-dv3hgd",
-  "claimedAt": "2026-10-11T21:43:11.055Z",
-  "reason": "perf(mascot): satu Mochi 3D bersama + pengaman HP (atasi lag PWA)",
+  "claimedAt": "2026-10-12T04:32:30.466Z",
+  "reason": "perf(mascot): satu Mochi 3D bersama + pengaman HP, atasi lag PWA",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

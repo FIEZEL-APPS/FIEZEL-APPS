@@ -304,6 +304,13 @@
       offY = (cssH - 512 * scale) / 2;
 
       if (typeof opts.seed === 'number') seed = opts.seed >>> 0;
+      this._clearedDone = false;
+      if (opts.skipBuild) {
+        N = 0;
+        emitF = false;
+        emitB = false;
+        return true;
+      }
       makeSprites();
       build();
       if (typeof opts.count === 'number') { /* count eksplisit menimpa adaptif */
@@ -359,9 +366,18 @@
         if (_emit) _emit('bars-solid');
       }
 
+      if (t >= T.DONE) {
+        if (!this._clearedDone) {
+          this._clearedDone = true;
+          ctx.setTransform(1, 0, 0, 1, 0, 0);
+          ctx.clearRect(0, 0, cv.width, cv.height);
+        }
+        return; // semua partikel sudah bersih — hemat GPU
+      }
+      this._clearedDone = false;
+      if (!N) { makeSprites(); build(); }
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.clearRect(0, 0, cv.width, cv.height);
-      if (t >= T.DONE) return; // semua partikel sudah bersih — hemat GPU
 
       var aF = groupAlpha(0, t), aB = groupAlpha(2, t);
       var i, gAlpha, spr;

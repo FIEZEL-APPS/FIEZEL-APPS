@@ -293,9 +293,9 @@
     'tutor-step.listening-detail-step-3': 'Pilih jawaban yang langsung merespons situasi audio tersebut.',
     'tutor-step.listening-detail-final': 'Sekarang satukan pemahaman audio di atas, apa jawaban paling tepat menurutmu?',
 
-    'tutor-step.token-step-1': 'Temukan subjek pelaku atau topik utama untuk ditempatkan di awal kalimat.',
-    'tutor-step.token-step-2': 'Letakkan kata kerja atau kata bantu tepat setelah subjek sesuai aturan tata bahasa.',
-    'tutor-step.token-step-3': 'Susun objek serta keterangan waktu atau tempat di bagian akhir kalimat.',
+    'tutor-step.token-step-1': 'Baca lagi soalnya, lalu cari siapa pelakunya (subjek) dan apa kata kerja utamanya.',
+    'tutor-step.token-step-2': 'Kalimat berita: subjek dulu, baru kata kerjanya. Kalimat tanya: kata bantunya (do, is, can, dan sejenisnya) maju ke depan subjek.',
+    'tutor-step.token-step-3': 'Pasang objek dan keterangannya. Kata berhuruf kapital di bank kata (selain “I” dan nama) biasanya pembuka kalimat.',
     'tutor-step.token-final': 'Sekarang rangkai semua bagian di atas, bagaimana susunan kalimat yang benar?',
 
     'tutor-step.cloze-step-1': 'Cermati kata sebelum dan sesudah bagian rumpang untuk mengetahui jenis kata yang dibutuhkan.',

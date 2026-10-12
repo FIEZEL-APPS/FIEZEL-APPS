@@ -22,10 +22,13 @@
     loading = Promise.all([
       fetch('./features/bug/bug-species.json').then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }),
       fetch('./misconception-taxonomy-v1.json').then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })
-    ]).then(function (res) { SPECIES = res[0] || { species: {}, taunts: { id: {} } }; TAX = (res[1] && res[1].map) || {}; if (appState() && appState().view === 'home') call('renderInner'); });
+    ]).then(function (res) {
+      SPECIES = res[0] || { species: {}, taunts: { id: {} } };
+      TAX = (res[1] && res[1].map) || {};
+      if (root.__fiezelBootSplashDismissed && appState() && appState().view === 'home') call('renderInner');
+    });
     return loading;
   }
-  load();
 
   /* ---------------- engine bridge ---------------- */
   function masteryOf(lesson, now) {
@@ -77,6 +80,7 @@
   /* ---------------- HOME: adegan Sarang ---------------- */
   var POS = [[20, 45], [80, 52], [27, 72]];
   function homeMarkup() {
+    if (!SPECIES) load();
     var list = bugs(), shown = alive(list).slice(0, 3), fosil = list.filter(function (b) { return b.fosil; }).length, tg = shown[0] || null, out = '';
     shown.forEach(function (b, i) {
       var isT = tg && tg.id === b.id;

@@ -314,6 +314,10 @@
     if (Array.isArray(nujumState.cachedTemplates) && nujumState.cachedTemplates.length > 0) {
       return Promise.resolve(nujumState.cachedTemplates);
     }
+    if (Array.isArray(root.__grammarTemplatesCache) && root.__grammarTemplatesCache.length > 0) {
+      nujumState.cachedTemplates = root.__grammarTemplatesCache;
+      return Promise.resolve(nujumState.cachedTemplates);
+    }
     try {
       if (typeof root.fetch === 'function') {
         return fetch('./grammar-templates.json')
@@ -321,6 +325,7 @@
           .then(function (data) {
             if (data && Array.isArray(data.templates) && data.templates.length > 0) {
               nujumState.cachedTemplates = data.templates;
+              root.__grammarTemplatesCache = data.templates;
             }
             return nujumState.cachedTemplates;
           })
@@ -329,7 +334,6 @@
     } catch (_) {}
     return Promise.resolve(nujumState.cachedTemplates);
   }
-  loadGrammarTemplatesAsync();
 
   /** Membaca parameter IRT 3PL untuk menghitung persentase taruhan */
   function calculateBetPercentage(template, theta) {

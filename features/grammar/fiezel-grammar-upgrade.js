@@ -480,6 +480,12 @@
 
     const q = (typeof qOrRule === 'object' && qOrRule !== null) ? qOrRule : { explain: { rule: String(qOrRule || '') } };
     const exp = q.explain || {};
+    // Audit pedagogi 2026-10-11 (P2): petunjuk ini dibuka SEBELUM murid menjawab. Saran
+    // menghindar (106 templat) dan pegangan ingatan (36 templat) sering ditutup dengan kuncinya
+    // ("Kalau iya, cuma “whose” yang bisa dipakai"), jadi kuncinya disamarkan jadi "…" lewat
+    // grammarHideKey() milik app.js - aturannya tetap terbaca, bentuknya harus diingat sendiri.
+    const keyText = (Array.isArray(q.options) && Number.isInteger(q.answerIndex)) ? String(q.options[q.answerIndex] || '') : '';
+    const hideKey = (t) => (t && keyText && typeof self.grammarHideKey === 'function') ? self.grammarHideKey(t, keyText) : t;
 
     const levels = [
       {
@@ -495,7 +501,7 @@
       {
         num: 3,
         title: FiezelI18n.t('grammar.hint-level-3', 'Waspada Jebakan'),
-        text: exp.avoid || (exp.distractors && exp.distractors.length ? exp.distractors[0].reason : FiezelI18n.t('quiz.fallback-hint-check', 'Hati-hati dengan pilihan pengecoh yang mirip tapi tidak sesuai konteks kalimat.'))
+        text: hideKey(exp.avoid) || FiezelI18n.t('quiz.fallback-hint-check', 'Hati-hati dengan pilihan pengecoh yang mirip tapi tidak sesuai konteks kalimat.')
       },
       {
         num: 4,
@@ -503,7 +509,7 @@
         // Audit G8: dulu tingkat ini membuka `explain.why` - kalimat "kenapa jawaban benar itu
         // benar" yang pada ±78% soal menyebut kuncinya, SEBELUM murid menjawab. Kini hanya
         // pegangan ingatan; alasan lengkapnya tetap ada di pembahasan sesudah menjawab.
-        text: exp.memory ? `💡 ${exp.memory}` : FiezelI18n.t('quiz.fallback-hint-connect', 'Ingat pola kalimat dan hubungannya dengan subjek.')
+        text: exp.memory ? `💡 ${hideKey(exp.memory)}` : FiezelI18n.t('quiz.fallback-hint-connect', 'Ingat pola kalimat dan hubungannya dengan subjek.')
       }
     ];
 
