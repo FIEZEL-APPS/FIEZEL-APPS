@@ -309,8 +309,17 @@ Ini*. Aturannya:
 
 - Saat ada masalah aktif, langkah Jalan Keluar **mengisi blok `focus`** di `buildTodayPlan()`
   (`features/personal-journey/fiezel-personal-journey.js`). Blok review wajib tetap ada.
-- Tombol utama Home tetap satu (kontrak `tests/ux-redesign-test.js` B2). Kartu Jalan Keluar memakai
-  gaya kartu sekunder, seperti blok learner-flow di `docs/handoffs/HOME-PATHWAY-ENTRY-HANDOFF.md`.
+- Tombol utama Home tetap satu (kontrak `tests/ux-redesign-test.js` B2), dan kartu hero
+  *Rencana Fiezel hari ini* (m025-577) tetap satu kartu dengan satu tombol. Pintu
+  *Ceritakan masalahmu* adalah kartu sekunder tepat di bawah hero, seperti blok learner-flow di
+  `docs/handoffs/HOME-PATHWAY-ENTRY-HANDOFF.md`.
+- Saat ada masalah aktif, kemajuannya tampil sebagai **salah satu pil rencana hero** di
+  `heroRencanaModel()` (maks. dua pil): *"Jalan Keluar: listening cepat · langkah 3/6"*,
+  menggantikan pil *"Fokus: {lesson}"* karena fokus sesi memang sedang diambil Jalan Keluar.
+- Soal yang dipilih karena langkah Jalan Keluar mendapat jenis alasan baru di label
+  `.quiz-alasan` (m025-577): *"Langkah 3 Jalan Keluar-mu: dengar di kecepatan normal."* Aturan
+  yang sama berlaku: hanya bila cabang itu benar-benar memilih soalnya, dan tetap diam pada probe
+  pembuktian supaya pengumuman tidak mencemari bukti.
 - Kalau murid kembali setelah lama tidak belajar, `buildRecoveryPlan()` tetap berkuasa: sesi
   dipendekkan, Jalan Keluar menunggu, tidak menagih.
 
@@ -416,6 +425,8 @@ m025-376, yang menemukan angka akurasi palsu di layar murid baru.
 | Modul | Peran di Jalan Keluar | Perubahan |
 |---|---|---|
 | `features/personal-journey/fiezel-personal-journey.js` | Rencana Hari Ini, rencana pemulihan | Kecil: blok `focus` bisa diisi langkah Jalan Keluar |
+| `app.js` `heroRencanaModel()` (m025-577) | Pil kemajuan Jalan Keluar di hero Home | Kecil: satu jenis pil baru |
+| `app.js` `alasanSoalDecide()` (m025-577) | Label "kenapa soal ini" untuk soal langkah Jalan Keluar | Kecil: satu jenis alasan baru, naskah id + th |
 | `features/brain/fiezel-core-brain.js` | Graf prasyarat, kemampuan laten, jadwal memori | Tidak ada |
 | `features/brain/fiezel-mastery-bkt.js` | Syarat selesai K5/K6 (L ≥ 0,95, n ≥ 5) | Tidak ada |
 | `features/brain/fiezel-misconception-ledger.js` | Bukti K7, masalah yang tidak disadari | Tidak ada |
@@ -498,7 +509,7 @@ backup cloud dan telemetri.
 2. **Deterministik.** Masukan sama → rencana byte-identik.
 3. **Taksonomi tertutup.** Setiap keluhan → ≥ 1 akar; setiap akar → ≥ 1 probe dan ≥ 1 resep;
    setiap resep → aktivitas yang benar-benar ada di aplikasi (fungsi/rute dicek oleh gerbang).
-4. **Satu tombol primer di Home tetap satu.**
+4. **Satu tombol primer di Home tetap satu**, dan kartu hero tetap satu kartu dengan satu tombol.
 5. **Satu masalah aktif.**
 6. **Tidak ada label pada orang.** Gerbang leksikon menolak kata seperti *bodoh*, *malas*,
    *pintar* di naskah keluaran (kecuali di dalam kutipan keluhan murid sendiri).
@@ -557,8 +568,9 @@ Fase 1 sudah berguna sendirian. Fase 2 dan 3 yang membuatnya brilian.
 ## 16. Keputusan yang perlu owner ambil
 
 1. **Nama.** *Jalan Keluar* (th: *ทางออก*), atau nama lain?
-2. **Posisi tombol.** Kartu sekunder di bawah CTA hero (disarankan, menjaga kontrak satu tombol
-   primer), atau ikut ditanyakan di onboarding sebagai langkah opsional?
+2. **Posisi tombol.** Kartu sekunder tepat di bawah kartu hero *Rencana Fiezel* (disarankan,
+   menjaga kontrak satu kartu hero dengan satu tombol), atau ikut ditanyakan di onboarding sebagai
+   langkah opsional?
 3. **Berbagi ke guru.** Default *mati* (disarankan) atau *nyala* untuk murid yang tergabung di kelas?
 4. **Model bahasa (Fase 5).** Dipakai untuk cerita bebas, atau FIEZEL tetap 100% tanpa model di
    jalur murid?
