@@ -5621,37 +5621,8 @@ html body .tutor-speed-pill,
 
 /* ========================================================
    12. WIDE-SCREEN DESKTOP & TABLET COHESIVE FRAMING
-   Eliminates left-right empty void feeling across the app
+   (Superseded by Section 14: Adaptive Multi-Form-Factor & 100dvh Fixed-Stay App Shell)
    ======================================================== */
-@media (min-width: 768px) {
-  body {
-    background: radial-gradient(circle at 50% 15%, #FFFDF8 0%, #F5EFEB 100%) !important;
-    background-attachment: fixed !important;
-  }
-  .app,
-  main.app {
-    max-width: 680px !important;
-    margin: 20px auto !important;
-    padding: 24px 28px calc(60px + env(safe-area-inset-bottom)) 28px !important;
-    background: #FFFFFF !important;
-    border: 1.5px solid #EFE8DF !important;
-    border-radius: 28px !important;
-    box-shadow: 0 20px 60px rgba(46, 39, 36, 0.08), 0 4px 16px rgba(46, 39, 36, 0.04) !important;
-    min-height: calc(100vh - 40px) !important;
-    box-sizing: border-box !important;
-    position: relative !important;
-    z-index: 2 !important;
-  }
-  body::before {
-    content: "" !important;
-    position: fixed !important;
-    inset: 0 !important;
-    background: radial-gradient(circle at 10% 25%, rgba(254, 243, 199, 0.4) 0%, transparent 50%),
-                radial-gradient(circle at 90% 75%, rgba(209, 250, 229, 0.3) 0%, transparent 50%) !important;
-    pointer-events: none !important;
-    z-index: 0 !important;
-  }
-}
 
 /* ========================================================
    13. TOKEN ORDER (SUSUN KATA) PRECISE BALANCED ACTIONS
@@ -7392,4 +7363,853 @@ button.skill-help-dot:active {
   transform: translateY(2px) !important;
   box-shadow: 0 1px 0 #CBD5E1 !important;
 }
+
+/* ==========================================================================
+   14. ADAPTIVE MULTI-FORM-FACTOR & 100dvh FIXED-STAY APP SHELL ARCHITECTURE
+   - Mobile (< 768px): 100dvh Fixed-Stay Compact Shell + Bottom UITabBar Dock
+   - Tablet / iPad (768px - 1023px): Left Navigation Rail (88px) + 2-Col Split-View
+   - Desktop (>= 1024px): Full Left Sidebar (232px) + Widescreen Bento Dashboard
+   ========================================================================== */
+
+/* 14.1 Global 100dvh Viewport Lock (Zero Window Scroll Spill) */
+html:not(.fz-booting),
+html:not(.fz-booting) body {
+  height: 100vh !important;
+  height: 100dvh !important;
+  max-height: 100vh !important;
+  max-height: 100dvh !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+}
+
+html:not(.fz-booting) main.app,
+html:not(.fz-booting) .app {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  max-height: 100vh !important;
+  max-height: 100dvh !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+html:not(.fz-booting) header.topbar {
+  flex: 0 0 auto !important;
+  position: relative !important;
+}
+
+html:not(.fz-booting) #app {
+  flex: 1 1 0% !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  box-sizing: border-box !important;
+}
+
+html:not(.fz-booting) #app > section,
+html:not(.fz-booting) #app > div,
+html:not(.fz-booting) #app > article {
+  flex: 1 1 0% !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain !important;
+  box-sizing: border-box !important;
+  margin-bottom: 0 !important;
+}
+
+/* Hide creator footer card on Progress view so it does not push fixed-stay layout */
+body.fz-stage-map #app > section.fade > .card:last-of-type:has(.creator-link) {
+  display: none !important;
+}
+
+/* Ensure bottomnav / rail / sidebar is strictly hidden during active quiz/lesson/flashcard sessions */
+html body.fz-lesson-mode nav.bottomnav,
+html body.fz-stage-quiz nav.bottomnav,
+html.fiezel-ui-v6 body.fz-lesson-mode nav.bottomnav,
+html.fiezel-ui-v6 body.fz-stage-quiz nav.bottomnav,
+html.fiezel-ui-v6 body.fz-lux.fz-lesson-mode nav.bottomnav,
+html.fiezel-ui-v6 body.fz-lux.fz-stage-quiz nav.bottomnav,
+html.fiezel-ui-v6 body:has(.quiz-shell) nav.bottomnav,
+html.fiezel-ui-v6 body:has(.card-flashcard) nav.bottomnav,
+html.fiezel-ui-v6 body.fsl-session-active nav.bottomnav {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* --------------------------------------------------------------------------
+   14.2 TIER 1: MOBILE / IPHONE (< 768px) — COMPACT FIXED-STAY SHELL
+   -------------------------------------------------------------------------- */
+@media (max-width: 767px) {
+  html:not(.fz-booting) body main.app.app,
+  html:not(.fz-booting) body.fz-lux main.app.app,
+  html:not(.fz-booting) body.fz-lux.fz-view-game main.app.app,
+  html:not(.fz-booting) body.fz-lux.fz-stage-home main.app.app,
+  html:not(.fz-booting) main.app,
+  html:not(.fz-booting) .app {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: calc(56px + env(safe-area-inset-top, 0px)) 0 calc(58px + env(safe-area-inset-bottom, 0px)) 0 !important;
+  }
+
+  html body.fz-lesson-mode main.app.app,
+  html body.fz-lux.fz-lesson-mode main.app.app,
+  html body.fz-lux.fz-stage-quiz main.app.app,
+  html body:has(.quiz-shell) main.app.app {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  html body nav.bottomnav,
+  html body .bottomnav,
+  html.fiezel-ui-v6 body.fz-lux nav.bottomnav,
+  html.fiezel-ui-v6 body.fz-lux .bottomnav {
+    height: calc(58px + env(safe-area-inset-bottom, 0px)) !important;
+    min-height: calc(58px + env(safe-area-inset-bottom, 0px)) !important;
+    max-height: calc(64px + env(safe-area-inset-bottom, 0px)) !important;
+    padding: 4px 6px calc(4px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  html:not(.fz-booting) #app {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+
+  /* Mobile Home Cockpit: 100% Fixed-Stay Zero-Scroll Fit (including iPhone SE 375x667) */
+  html:not(.fz-booting) #app > section.home-today {
+    padding: 4px 12px 6px 12px !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    max-width: 100% !important;
+  }
+
+  html body #app .home-today .today-home-cockpit,
+  html body #app .today-home-cockpit,
+  html body #app .tactile-home-cockpit,
+  .home-today .today-home-cockpit,
+  .today-home-cockpit,
+  .tactile-home-cockpit {
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
+    max-height: 100% !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    gap: 6px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .tactile-welcome-bar {
+    padding: 7px 12px !important;
+    border-radius: 16px !important;
+    flex: 0 0 auto !important;
+    margin: 0 !important;
+  }
+
+  .tactile-welcome-bar .fz-greet-title {
+    font-size: 14.5px !important;
+    line-height: 1.2 !important;
+  }
+
+  #heroCard.hero-card {
+    padding: 10px 12px !important;
+    gap: 6px !important;
+    border-radius: 18px !important;
+    flex: 0 0 auto !important;
+    margin: 0 !important;
+  }
+
+  #heroCard .hero-micro-bite {
+    padding: 7px 10px !important;
+    gap: 8px !important;
+    border-radius: 14px !important;
+  }
+
+  #heroCard .word-en {
+    font-size: 15.5px !important;
+  }
+
+  #heroCard .word-id,
+  #heroCard .adaptive-sub {
+    font-size: 11px !important;
+    line-height: 1.22 !important;
+  }
+
+  #heroCard .hero-cta-btn {
+    min-height: 40px !important;
+    height: 40px !important;
+    padding: 0 12px !important;
+    font-size: 12.5px !important;
+    border-radius: 14px !important;
+  }
+
+  .quick-practice-section.fz-stitch-section {
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .quick-practice-section .quick-grid {
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    grid-auto-rows: 1fr !important;
+    gap: 7px !important;
+    margin-top: 2px !important;
+  }
+
+  .quick-practice-section .grid-tile {
+    padding: 7px 10px !important;
+    gap: 3px !important;
+    min-height: 0 !important;
+    border-radius: 15px !important;
+    justify-content: space-between !important;
+  }
+
+  .quick-practice-section .tile-icon-3d {
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: 8px !important;
+  }
+
+  .quick-practice-section .tile-icon-3d svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  .quick-practice-section .tile-name {
+    font-size: 12.5px !important;
+    line-height: 1.15 !important;
+  }
+
+  .quick-practice-section .tile-meta {
+    font-size: 10px !important;
+    line-height: 1.15 !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 1 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+  }
+
+  .today-home-cockpit .class-bar {
+    padding: 7px 12px !important;
+    border-radius: 15px !important;
+    flex: 0 0 auto !important;
+    margin: 0 !important;
+  }
+
+  /* Mobile Latihan: 2-Column Bento Grid so all 6 modules fit 100% with 0 scroll */
+  body.fz-view-latihan #app > section.fade {
+    padding: 8px 12px !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    gap: 10px !important;
+  }
+
+  body.fz-view-latihan .learning-launcher {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+    width: 100% !important;
+  }
+
+  body.fz-view-latihan .learning-launcher .launch-card {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+    padding: 12px !important;
+    min-height: 82px !important;
+    gap: 6px !important;
+    margin: 0 !important;
+  }
+
+  /* Mobile Bounded Inner Panes for Progres, Profil, Grammar, Game */
+  body.fz-stage-map #app > section.fade,
+  body.fz-view-profile #app > section.fade,
+  body.fz-view-grammar #app > section.fade,
+  body.fz-view-game .game-view-shell {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    overflow: hidden !important;
+    padding: 6px 12px 8px 12px !important;
+    gap: 8px !important;
+  }
+
+  body.fz-stage-map #app > section.fade > .card:first-of-type,
+  body.fz-stage-map .progress-tabs,
+  body.fz-view-profile .progress-tabs,
+  body.fz-view-grammar .grammar-level-note,
+  body.fz-view-grammar .grammar-hub-tools {
+    flex: 0 0 auto !important;
+    margin-bottom: 0 !important;
+  }
+
+  body.fz-stage-map #progressTabPane,
+  body.fz-view-profile #onlineRoot,
+  body.fz-view-grammar ol.lesson-path,
+  body.fz-view-game .game-hub-container {
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain !important;
+    padding-bottom: 14px !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   14.3 TIER 2: TABLET / IPAD (768px - 1023px) — NAVIGATION RAIL + SPLIT-VIEW
+   -------------------------------------------------------------------------- */
+@media (min-width: 768px) and (max-width: 1023px) {
+  html body nav.bottomnav,
+  html body .bottomnav,
+  html body.fz-lux nav.bottomnav,
+  html.fiezel-ui-v6 body nav.bottomnav,
+  html.fiezel-ui-v6 body .bottomnav,
+  html.fiezel-ui-v6 body.fz-lux nav.bottomnav,
+  html.fiezel-ui-v6 body.fz-lux .bottomnav,
+  html.fiezel-ui-v6 body.fz-lang-ja nav.bottomnav,
+  html body.fz-lang-ja nav.bottomnav,
+  html body:has(.home-today) nav.bottomnav,
+  html body:has(.home-today) .bottomnav {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    right: auto !important;
+    width: 88px !important;
+    max-width: 88px !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    max-height: 100dvh !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 10px !important;
+    padding: 20px 6px !important;
+    border-top: none !important;
+    border-right: 2px solid #E5DEC9 !important;
+    box-shadow: 4px 0 20px rgba(15, 23, 42, 0.05) !important;
+  }
+
+  html body nav.bottomnav .nav,
+  html body .bottomnav .nav,
+  html.fiezel-ui-v6 body nav.bottomnav .nav,
+  html.fiezel-ui-v6 body.fz-lux nav.bottomnav .nav,
+  html body.fz-lang-ja nav.bottomnav .nav {
+    flex: 0 0 62px !important;
+    width: 74px !important;
+    height: 62px !important;
+    min-height: 62px !important;
+    max-height: 62px !important;
+    border-radius: 16px !important;
+    padding: 6px 4px !important;
+  }
+
+  html body header.topbar,
+  html body.fz-lux header.topbar,
+  html body.fz-view-classroom header.topbar,
+  html body.fz-view-game header.topbar,
+  html body.fz-view-profile header.topbar,
+  html body.fz-view-latihan header.topbar {
+    left: 88px !important;
+    width: calc(100vw - 88px) !important;
+    max-width: calc(100vw - 88px) !important;
+    padding: env(safe-area-inset-top, 0px) 20px 0 20px !important;
+  }
+
+  html:not(.fz-booting) body main.app.app,
+  html:not(.fz-booting) body.fz-lux main.app.app,
+  html:not(.fz-booting) body.fz-lux.fz-view-game main.app.app,
+  html:not(.fz-booting) body.fz-lux.fz-stage-home main.app.app,
+  html:not(.fz-booting) main.app,
+  html:not(.fz-booting) .app {
+    margin: 0 0 0 88px !important;
+    width: calc(100vw - 88px) !important;
+    max-width: calc(100vw - 88px) !important;
+    padding: calc(56px + env(safe-area-inset-top, 0px)) 0 0 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  html:not(.fz-booting) body:has(.home-today) #app,
+  html:not(.fz-booting) #app:has(.home-today),
+  html:not(.fz-booting) #app {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 12px 20px !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   14.4 TIER 3: DESKTOP / LAPTOP (>= 1024px) — FULL LEFT SIDEBAR + DASHBOARD
+   -------------------------------------------------------------------------- */
+@media (min-width: 1024px) {
+  html body nav.bottomnav,
+  html body .bottomnav,
+  html body.fz-lux nav.bottomnav,
+  html.fiezel-ui-v6 body nav.bottomnav,
+  html.fiezel-ui-v6 body .bottomnav,
+  html.fiezel-ui-v6 body.fz-lux nav.bottomnav,
+  html.fiezel-ui-v6 body.fz-lux .bottomnav,
+  html.fiezel-ui-v6 body.fz-lang-ja nav.bottomnav,
+  html body.fz-lang-ja nav.bottomnav,
+  html body:has(.home-today) nav.bottomnav,
+  html body:has(.home-today) .bottomnav {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    right: auto !important;
+    width: 232px !important;
+    max-width: 232px !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    max-height: 100dvh !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+    padding: 24px 14px !important;
+    border-top: none !important;
+    border-right: 2px solid #E5DEC9 !important;
+    box-shadow: 6px 0 24px rgba(15, 23, 42, 0.05) !important;
+  }
+
+  html body nav.bottomnav::before {
+    content: "FIEZEL · MENU UTAMA" !important;
+    display: block !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.1em !important;
+    color: #92400E !important;
+    padding: 4px 12px 14px 12px !important;
+    border-bottom: 1.5px solid rgba(217, 119, 6, 0.18) !important;
+    margin-bottom: 6px !important;
+  }
+
+  html body nav.bottomnav .nav,
+  html body .bottomnav .nav,
+  html.fiezel-ui-v6 body nav.bottomnav .nav,
+  html.fiezel-ui-v6 body.fz-lux nav.bottomnav .nav,
+  html body.fz-lang-ja nav.bottomnav .nav {
+    flex: 0 0 48px !important;
+    width: 100% !important;
+    height: 48px !important;
+    min-height: 48px !important;
+    max-height: 48px !important;
+    flex-direction: row !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding: 0 16px !important;
+    border-radius: 14px !important;
+  }
+
+  html body nav.bottomnav .nav span,
+  html body .bottomnav .nav span,
+  html.fiezel-ui-v6 body.fz-lux nav.bottomnav .nav span {
+    font-size: 13.5px !important;
+    font-weight: 800 !important;
+    text-align: left !important;
+  }
+
+  html body header.topbar,
+  html body.fz-lux header.topbar,
+  html body.fz-view-classroom header.topbar,
+  html body.fz-view-game header.topbar,
+  html body.fz-view-profile header.topbar,
+  html body.fz-view-latihan header.topbar {
+    left: 232px !important;
+    width: calc(100vw - 232px) !important;
+    max-width: calc(100vw - 232px) !important;
+    padding: env(safe-area-inset-top, 0px) 28px 0 28px !important;
+  }
+
+  html:not(.fz-booting) body main.app.app,
+  html:not(.fz-booting) body.fz-lux main.app.app,
+  html:not(.fz-booting) body.fz-lux.fz-view-game main.app.app,
+  html:not(.fz-booting) body.fz-lux.fz-stage-home main.app.app,
+  html:not(.fz-booting) main.app,
+  html:not(.fz-booting) .app {
+    margin: 0 0 0 232px !important;
+    width: calc(100vw - 232px) !important;
+    max-width: calc(100vw - 232px) !important;
+    padding: calc(56px + env(safe-area-inset-top, 0px)) 0 0 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  html:not(.fz-booting) body:has(.home-today) #app,
+  html:not(.fz-booting) #app:has(.home-today),
+  html:not(.fz-booting) #app {
+    width: 100% !important;
+    max-width: 1360px !important;
+    margin: 0 auto !important;
+    padding: 16px 28px !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   14.5 TABLET & DESKTOP (>= 768px) MULTI-COLUMN & SPLIT-VIEW STAGE LAYOUTS
+   -------------------------------------------------------------------------- */
+@media (min-width: 768px) {
+  /* Unlock mobile 440px/520px/680px single-column caps on all views */
+  html:not(.fz-booting) #app > section,
+  html:not(.fz-booting) #app > div,
+  .home-today,
+  section.fade,
+  #fzClassHub,
+  .classroom-page,
+  .progress-page,
+  .profile-page,
+  .ch-student,
+  .game-view-shell,
+  .game-hub-container {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* When in Quiz / Lesson mode (.bottomnav hidden), expand main.app to full viewport */
+  html:not(.fz-booting) body.fz-lesson-mode main.app.app,
+  html:not(.fz-booting) body.fz-lux.fz-lesson-mode main.app.app,
+  html:not(.fz-booting) body.fz-lux.fz-stage-quiz main.app.app,
+  html:not(.fz-booting) body:has(.quiz-shell) main.app.app,
+  html body.fz-lesson-mode main.app,
+  html body.fz-stage-quiz main.app,
+  html body:has(.quiz-shell) main.app,
+  html body:has(.card-flashcard) main.app {
+    margin-left: 0 !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  /* A. HOME COCKPIT: 2-Column Split-View Dashboard (Zero Scroll) */
+  html:not(.fz-booting) #app > section.home-today {
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+  }
+
+  html body #app .home-today .today-home-cockpit,
+  html body #app .today-home-cockpit,
+  html body #app .tactile-home-cockpit,
+  .home-today .today-home-cockpit,
+  .today-home-cockpit,
+  .tactile-home-cockpit {
+    max-width: 100% !important;
+    width: 100% !important;
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
+    display: grid !important;
+    grid-template-columns: 1.08fr 1fr !important;
+    grid-template-rows: auto 1fr auto !important;
+    gap: 14px 22px !important;
+    align-items: stretch !important;
+    overflow: hidden !important;
+  }
+
+  html body #app .today-home-cockpit > .tactile-welcome-bar,
+  .today-home-cockpit > .tactile-welcome-bar {
+    grid-column: 1 / -1 !important;
+    grid-row: 1 / 2 !important;
+    margin: 0 !important;
+  }
+
+  html body #app .today-home-cockpit > #heroCard.hero-card,
+  .today-home-cockpit > #heroCard.hero-card {
+    grid-column: 1 / 2 !important;
+    grid-row: 2 / 3 !important;
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+  }
+
+  html body #app .today-home-cockpit > .class-bar,
+  .today-home-cockpit > .class-bar {
+    grid-column: 1 / 2 !important;
+    grid-row: 3 / 4 !important;
+    margin: 0 !important;
+  }
+
+  html body #app .today-home-cockpit > .quick-practice-section,
+  .today-home-cockpit > .quick-practice-section {
+    grid-column: 2 / 3 !important;
+    grid-row: 2 / 4 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+    min-height: 0 !important;
+  }
+
+  html body #app .today-home-cockpit > .quick-practice-section .quick-grid,
+  .today-home-cockpit > .quick-practice-section .quick-grid {
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    grid-auto-rows: 1fr !important;
+    gap: 14px !important;
+  }
+
+  html body #app .today-home-cockpit > .quick-practice-section .grid-tile,
+  .today-home-cockpit > .quick-practice-section .grid-tile {
+    height: 100% !important;
+    justify-content: space-between !important;
+  }
+
+  /* B. LATIHAN HUB: Multi-Column Bento Grid (2-col on iPad, 3-col on Desktop) */
+  body.fz-view-latihan #app > section.fade {
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+
+  html body.fz-view-latihan #app .learning-launcher,
+  body.fz-view-latihan .learning-launcher {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 16px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* C. PROGRES VIEW: 2-Column Master-Detail Split-View */
+  body.fz-stage-map #app > section.fade {
+    display: grid !important;
+    grid-template-columns: 300px 1fr !important;
+    grid-template-rows: max-content 1fr !important;
+    gap: 14px 22px !important;
+    height: 100% !important;
+    align-items: start !important;
+    overflow: hidden !important;
+  }
+
+  html body.fz-stage-map #app > section.fade > .card:has(.progress-stats),
+  body.fz-stage-map #app > section.fade > .card:not(#progressTabPane) {
+    grid-column: 1 / 2 !important;
+    grid-row: 1 / 3 !important;
+    margin: 0 !important;
+    align-self: start !important;
+  }
+
+  html body.fz-stage-map #app > section.fade > .progress-tabs,
+  body.fz-stage-map #app > section.fade > .progress-tabs {
+    grid-column: 2 / 3 !important;
+    grid-row: 1 / 2 !important;
+    margin: 0 !important;
+    align-self: start !important;
+    height: auto !important;
+    max-height: 48px !important;
+  }
+
+  body.fz-stage-map #app > section.fade > #progressTabPane {
+    grid-column: 2 / 3 !important;
+    grid-row: 2 / 3 !important;
+    min-height: 0 !important;
+    max-height: 100% !important;
+    height: 100% !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain !important;
+    padding-bottom: 16px !important;
+  }
+
+  /* D. PROFIL VIEW: Fixed Tabs + 2-Column Split-View Cockpit */
+  body.fz-view-profile #app > section.fade {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+    overflow: hidden !important;
+    gap: 14px !important;
+  }
+
+  body.fz-view-profile .progress-tabs {
+    flex: 0 0 auto !important;
+    margin: 0 !important;
+  }
+
+  body.fz-view-profile #onlineRoot {
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain !important;
+    padding-bottom: 16px !important;
+  }
+
+  body.fz-view-profile #onlineRoot .tactile-profile-cockpit {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 16px 20px !important;
+    max-width: 100% !important;
+    align-items: start !important;
+  }
+
+  /* E. GAME HUB: Widescreen Dual-Poster + 3-Col Arcade Bento */
+  body.fz-view-game .game-view-shell {
+    height: 100% !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  body.fz-view-game .game-hub-container {
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 14px 18px !important;
+    padding: 4px 4px 20px 4px !important;
+    align-content: start !important;
+  }
+
+  body.fz-view-game .game-hub-header-titles,
+  body.fz-view-game .game-arcade-grid {
+    grid-column: 1 / -1 !important;
+  }
+
+  body.fz-view-game .game-hub-container > .game-section-header {
+    display: none !important;
+  }
+
+  body.fz-view-game .game-arcade-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 14px !important;
+  }
+
+  /* F. VOCAB HUB: 2-Column Split-View */
+  body.fz-view-vocab section.vocab-hub-page {
+    display: grid !important;
+    grid-template-columns: 1.15fr 1fr !important;
+    gap: 20px !important;
+    align-items: start !important;
+    overflow: hidden !important;
+  }
+
+  /* G. GRAMMAR HUB: Fixed Header + 2-Column Lesson Grid */
+  body.fz-view-grammar #app > section.fade {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+    overflow: hidden !important;
+    gap: 12px !important;
+  }
+
+  body.fz-view-grammar ol.lesson-path {
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px 16px !important;
+    align-content: start !important;
+    padding-bottom: 20px !important;
+  }
+
+  /* H. WRITING STUDIO: 2-Column Split-View (Brief/Rubric Left, Editor Right) */
+  body.fz-stage-writing section.writing-page {
+    display: grid !important;
+    grid-template-columns: 320px 1fr !important;
+    grid-template-rows: auto 1fr !important;
+    gap: 16px 22px !important;
+    height: 100% !important;
+    overflow: hidden !important;
+  }
+
+  body.fz-stage-writing section.writing-page > .skill-page-hero {
+    grid-column: 1 / 2 !important;
+    grid-row: 1 / 2 !important;
+    margin: 0 !important;
+  }
+
+  body.fz-stage-writing section.writing-page > .writing-rubric {
+    grid-column: 1 / 2 !important;
+    grid-row: 2 / 3 !important;
+    margin: 0 !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+  }
+
+  body.fz-stage-writing section.writing-page > .writing-prompt {
+    grid-column: 2 / 3 !important;
+    grid-row: 1 / 3 !important;
+    margin: 0 !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  html body.fz-view-latihan #app .learning-launcher,
+  body.fz-view-latihan .learning-launcher {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 18px !important;
+  }
+
+  html body.fz-view-latihan #app .learning-launcher .launch-card:last-child:nth-child(odd) {
+    grid-column: auto !important;
+    max-width: 100% !important;
+  }
+
+  body.fz-stage-map #app > section.fade {
+    grid-template-columns: 340px 1fr !important;
+    gap: 16px 26px !important;
+  }
+
+  body.fz-stage-map #progressTabPane .progress-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 16px !important;
+    align-items: start !important;
+  }
+
+  body.fz-view-grammar ol.lesson-path {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+
 
