@@ -94,7 +94,9 @@ function othersFail(wrongs, evidence) {
   const w = wrongs.map((x) => String(x == null ? '' : x).trim()).filter(Boolean);
   const kutip = w.slice(0, 3).map((x) => `“${x}”`).join(', ');
   if (!w.length) return `Pilihan lain tidak didukung teks; teks justru menyebut “${evidence}”.`;
-  return `Pilihan ${kutip} tidak ada di teks. Yang tertulis justru “${evidence}”, dan itu cocok dengan jawaban yang benar.`;
+  // Audit pedagogi 2026-10-11: "tidak ada di teks" bohong untuk pengecoh yang memang disebut bacaan
+  // (orang/tempat/benda lain dari teks yang sama); "tidak didukung teks" selalu benar.
+  return `Pilihan ${kutip} tidak didukung teks. Yang tertulis justru “${evidence}”, dan itu cocok dengan jawaban yang benar.`;
 }
 const hasText = (s) => String(s == null ? '' : s).trim().length > 0;
 
