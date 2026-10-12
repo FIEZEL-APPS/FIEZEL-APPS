@@ -213,7 +213,6 @@
     'nav.back-home-aria': 'Kembali ke Home',
     'nav.open-settings-aria': 'Buka pengaturan',
     'nav.main-aria': 'Navigasi utama',
-    'nav.sidebar-heading': 'FIEZEL · MENU UTAMA',
     'nav.home-aria': 'Beranda',
     'nav.vocab-aria': 'Vocabulary',
     'nav.grammar-aria': 'Grammar',
