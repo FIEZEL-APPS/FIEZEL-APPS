@@ -1,5 +1,5 @@
 /**
- * FIEZEL — gerbang "topbar terpotong" (m025-570).
+ * FIEZEL — gerbang "topbar terpotong" (m025-571).
  *
  * OWNER: "KENAPA TAMPILAN UI PWA FIEZEL TAMPAK TERLIHAT TERPOTONG DI TOPBAR TIDAK SEPERTI
  * APLIKASI GENERIK?"
@@ -16,7 +16,9 @@
  *   A. theme-color di index.html, manifest.json, dan TOPBAR_THEME_COLOR di app.js SAMA
  *      dengan latar topbar di TOPBAR AUTHORITY;
  *   B. app.js tidak lagi menulis palet langit ke theme-color;
- *   C. app.js memasang kelas .is-scrolled di header.topbar lewat listener scroll pasif;
+ *   C. app.js memasang kelas .is-scrolled di header.topbar lewat listener scroll capture+pasif
+ *      (jendela ATAU panel dalam #app), dan mencabutnya saat pindah layar - diuji bentuk DAN
+ *      perilakunya di atas DOM tiruan;
  *   D. CSS memberi header.topbar.is-scrolled tepi (box-shadow bukan none);
  *   E. bukti negatif: tiap pemeriksaan di atas MERAH pada stub yang melanggar.
  */
@@ -25,6 +27,7 @@
 const fs = require('fs');
 const path = require('path');
 const assert = require('assert');
+const vm = require('vm');
 
 const ROOT = path.join(__dirname, '..');
 const appJs = fs.readFileSync(path.join(ROOT, 'app.js'), 'utf8');
@@ -77,10 +80,43 @@ function assertNoSkyThemeColor(js) {
 }
 
 function assertScrollWiring(js) {
-  assert.ok(/function syncTopbarScrolled\(\)\{[^}]*header\.topbar[^}]*classList\.toggle\('is-scrolled'/.test(js),
-    'syncTopbarScrolled() harus men-toggle .is-scrolled pada header.topbar');
-  assert.ok(/addEventListener\('scroll',[\s\S]{0,200}?syncTopbarScrolled\(\)[\s\S]{0,40}?\{passive:true\}/.test(js),
-    'syncTopbarScrolled() harus dipanggil dari listener scroll {passive:true}');
+  assert.ok(/function syncTopbarScrolled\(source\)\{[\s\S]{0,400}?header\.topbar[\s\S]{0,400}?classList\.toggle\('is-scrolled'/.test(js),
+    'syncTopbarScrolled(source) harus men-toggle .is-scrolled pada header.topbar');
+  assert.ok(/document\.addEventListener\('scroll',[\s\S]{0,240}?syncTopbarScrolled\([\s\S]{0,60}?\{capture:true,passive:true\}/.test(js),
+    'syncTopbarScrolled() harus dipanggil dari listener scroll document {capture:true,passive:true} - panel dalam #app tidak menggelembungkan scroll');
+  assert.ok(/window\.scrollTo\(0,0\);syncTopbarScrolled\(\)\}\}/.test(js),
+    'renderInner() harus memanggil syncTopbarScrolled() saat pindah layar agar tepi layar lama tidak tertinggal');
+}
+
+/* Perilaku, bukan hanya bentuk: fungsi aslinya dijalankan di atas DOM tiruan. */
+function runSyncTopbarScrolled(js, scenario) {
+  const m = js.match(/function syncTopbarScrolled\(source\)\{[\s\S]*?\n(?=try\{let topbarScrollRaf)/);
+  assert.ok(m, 'badan syncTopbarScrolled tidak bisa diekstrak dari app.js');
+  const classes = new Set(scenario.initial || []);
+  const bar = { classList: { toggle: (c, on) => { if (on) classes.add(c); else classes.delete(c); } } };
+  const appEl = { contains: (el) => !!el && el.insideApp === true };
+  const ctx = {
+    window: { scrollY: scenario.windowY || 0 },
+    document: {
+      documentElement: { scrollTop: scenario.windowY || 0 },
+      querySelector: (sel) => (sel === 'header.topbar' ? bar : null),
+      getElementById: (id) => (id === 'app' ? appEl : null)
+    }
+  };
+  vm.runInNewContext(m[0] + '\nsyncTopbarScrolled(__src);', Object.assign(ctx, { __src: scenario.source }));
+  return classes.has('is-scrolled');
+}
+
+function assertScrollBehaviour(js) {
+  const pane = (top, extra) => Object.assign({ nodeType: 1, insideApp: true, scrollTop: top, scrollHeight: 2000, clientHeight: 600 }, extra || {});
+  assert.strictEqual(runSyncTopbarScrolled(js, { windowY: 0 }), false, 'puncak jendela: tanpa tepi');
+  assert.strictEqual(runSyncTopbarScrolled(js, { windowY: 300 }), true, 'jendela digulir: tepi muncul');
+  assert.strictEqual(runSyncTopbarScrolled(js, { source: pane(250) }), true, 'panel dalam #app digulir (cangkang 100dvh): tepi muncul');
+  assert.strictEqual(runSyncTopbarScrolled(js, { source: pane(0), initial: ['is-scrolled'] }), false, 'panel dalam kembali ke puncak: tepi hilang');
+  assert.strictEqual(runSyncTopbarScrolled(js, { source: pane(0, { scrollHeight: 48, clientHeight: 48 }), initial: ['is-scrolled'] }), true,
+    'penggulir horizontal (tinggi tak bisa digulir) tidak boleh mencabut tepi');
+  assert.strictEqual(runSyncTopbarScrolled(js, { source: pane(400, { insideApp: false }) }), false,
+    'penggulir di luar #app (modal, panel notifikasi) tidak boleh memasang tepi');
 }
 
 function assertScrolledEdge(css) {
@@ -102,7 +138,9 @@ check('A. theme-color index.html = manifest.json = TOPBAR_THEME_COLOR = latar to
 
 check('B. app.js tidak menulis palet langit ke theme-color', () => assertNoSkyThemeColor(appJs));
 
-check('C. app.js memasang .is-scrolled di header.topbar lewat scroll pasif', () => assertScrollWiring(appJs));
+check('C1. app.js memasang .is-scrolled lewat scroll capture+pasif dan mereset saat pindah layar', () => assertScrollWiring(appJs));
+
+check('C2. perilaku: jendela, panel dalam #app, penggulir horizontal, dan luar #app', () => assertScrollBehaviour(appJs));
 
 check('D. header.topbar.is-scrolled punya tepi (box-shadow)', () => assertScrolledEdge(clayCss));
 
@@ -113,7 +151,11 @@ check('E. bukti negatif: gerbang MERAH pada stub yang melanggar', () => {
     topbarAuthorityBg(clayCss)));
   mustThrow('palet langit', () => assertNoSkyThemeColor(
     appJs.replace("setAttribute?.('content',TOPBAR_THEME_COLOR)", "setAttribute?.('content',c.palette.top)")));
-  mustThrow('tanpa listener', () => assertScrollWiring(appJs.replace(/function syncTopbarScrolled\(\)/, 'function _gone()')));
+  mustThrow('tanpa listener', () => assertScrollWiring(appJs.replace(/function syncTopbarScrolled\(source\)/, 'function _gone(source)')));
+  mustThrow('listener di window saja', () => assertScrollWiring(appJs.replace("document.addEventListener('scroll',", "window.addEventListener('scroll',")));
+  mustThrow('tanpa reset pindah layar', () => assertScrollWiring(appJs.replace('window.scrollTo(0,0);syncTopbarScrolled()}}', 'window.scrollTo(0,0)}}')));
+  mustThrow('abai panel dalam', () => assertScrollBehaviour(appJs.replace('y=Math.max(y,source.scrollTop||0)', 'y=y')));
+  mustThrow('horizontal mencabut tepi', () => assertScrollBehaviour(appJs.replace('if(source.scrollHeight<=source.clientHeight+1||', 'if(')));
   mustThrow('tepi none', () => assertScrolledEdge(
     clayCss.replace(/(html body header\.topbar\.is-scrolled[^{]*\{[^}]*box-shadow:\s*)[^;]+;/, '$1none !important;')));
 });
