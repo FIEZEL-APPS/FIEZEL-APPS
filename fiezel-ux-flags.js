@@ -130,7 +130,24 @@
     /* "Stempel Ingatan: satu baris kecil di kotak umpan balik yang membuktikan FIEZEL
        ingat jebakan murid lintas sesi" (owner, 11 Okt 2026, m025-565). Hanya latihan
        mandiri; mode ukur dan kunci ujian tidak pernah distempel (memoryStampAllowed). */
-    memoryStamp: true
+    memoryStamp: true,
+    /* "FIEZEL masih terlihat seperti aplikasi kuis biasa ... murid hanya melihat dari luarnya"
+       (owner, 12 Okt 2026, m025-577). Alasan Soal: satu baris di atas soal sesi adaptif yang
+       mengucapkan KENAPA soal itu dipilih, plus rekap "yang Fiezel atur untukmu" di layar
+       hasil. Hanya sesi adaptif; mode ukur dan kunci ujian tidak pernah diberi alasan
+       (alasanSoalAllowed). */
+    alasanSoal: true,
+    /* "Coba pikirkan momen aha UI di UX yang bisa kamu redesign dan tambahkan" (owner, 12 Okt
+       2026, m025-577). Bukti Ingatan: di popup vonis, soal berlabel "Waktunya diulang" diberi
+       bayarannya, yaitu ingatan murid bertahan N hari dan jarak ulangan berikutnya. Bergantung
+       pada alasanSoal (bayaran hanya untuk janji yang pernah diucapkan). */
+    buktiIngatan: true,
+    /* "Bagaimana dengan tampilan Home hero?" (owner, 12 Okt 2026, m025-577). Kartu hero yang
+       SAMA (tetap satu kartu, satu tombol) berisi rencana Fiezel: kata paling rawan lupa milik
+       murid, pil rencana nyata (materi waktunya diulang / fokus). Mati = kata hari ini + kicker
+       "Target harian"; baris "Sesi Adaptif: Vocab + Audio Listening" yang ditulis mati tetap
+       hilang di kedua keadaan karena ia tidak benar. */
+    heroRencana: true
   };
 
   var DEFAULTS = {};
