@@ -356,6 +356,31 @@
     'stempel.sejak-kemarin': 'kemarin',
     'stempel.sejak-hari': 'hari {hari}',
     'stempel.sejak-tanggal': 'tanggal {tanggal}',
+    // m025-577 Alasan Soal: SATU baris di atas soal sesi adaptif, mengucapkan alasan yang
+    // benar-benar dipakai BrainCore memilih soal itu. Angka hanya hari dan hitungan soal dari
+    // state; tanpa persentase, tanpa tanda pisah, persona "Fiezel" sama dengan stempel.*.
+    // Jebakan lama dan probe retensi SENGAJA tidak punya kunci di sini (lihat app.js).
+    // Bukan "tepat waktu" / "sebelum terlupa": materi yang lewat jadwal berminggu-minggu (murid
+    // lama absen) tidak diulang tepat waktu. "Waktunya diulang" benar di kedua kasus.
+    'alasan.judul': 'Kenapa soal ini muncul',
+    'alasan.lupa': 'Waktunya diulang: terakhir kamu latih {hari} hari lalu.',
+    'alasan.lupa-kemarin': 'Waktunya diulang: terakhir kamu latih kemarin.',
+    'alasan.lupa-hari-ini': 'Waktunya diulang: jadwal ingatmu jatuh hari ini.',
+    'alasan.fokus': 'Fokus hari ini: {materi}. Fiezel memilihnya dari jawaban-jawabanmu.',
+    'alasan.produksi': 'Naik tingkat: kamu sudah stabil memilih jawaban di materi ini. Sekarang tulis sendiri.',
+    'alasan.ukur-ulang': 'Kamu menyanggah penilaian Fiezel di materi ini. Soal ini mengukurnya ulang.',
+    // Rekap layar hasil: maksimal dua baris "yang diatur" + satu baris perkiraan vs hasil.
+    // Perkiraan SENGAJA menyebut "percobaan pertama": skor besar di layar hasil memberi kredit
+    // 0,75 untuk percobaan kedua, sedangkan prediksi Core Brain adalah peluang benar langsung.
+    'rekap.aria': 'Ringkasan keputusan Fiezel di sesi ini',
+    'rekap.judul': 'Yang Fiezel atur untukmu',
+    'rekap.lupa': '{n} soal diulang sesuai jadwal ingatanmu',
+    'rekap.fokus': '{n} soal fokus pada {materi}',
+    'rekap.produksi': '{n} soal menulis sendiri, naik dari pilihan ganda',
+    'rekap.ukur-ulang': '{n} soal mengukur ulang materi yang kamu sanggah',
+    'rekap.prediksi-atas': 'Perkiraan Fiezel: sekitar {perkiraan} dari {total} soal benar di percobaan pertama. Kamu {skor}, di atas perkiraan.',
+    'rekap.prediksi-pas': 'Perkiraan Fiezel: sekitar {perkiraan} dari {total} soal benar di percobaan pertama. Kamu {skor}, tepat sesuai perkiraan.',
+    'rekap.prediksi-bawah': 'Perkiraan Fiezel: sekitar {perkiraan} dari {total} soal benar di percobaan pertama. Kamu {skor}, jadi soal berikutnya ikut disesuaikan.',
 
     /* ── Game Hub Arcade ────────────────────────────────────────────────────── */
     'game.title': 'Arcade & Game',

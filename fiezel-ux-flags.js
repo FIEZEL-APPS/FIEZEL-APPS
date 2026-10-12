@@ -130,7 +130,13 @@
     /* "Stempel Ingatan: satu baris kecil di kotak umpan balik yang membuktikan FIEZEL
        ingat jebakan murid lintas sesi" (owner, 11 Okt 2026, m025-565). Hanya latihan
        mandiri; mode ukur dan kunci ujian tidak pernah distempel (memoryStampAllowed). */
-    memoryStamp: true
+    memoryStamp: true,
+    /* "FIEZEL masih terlihat seperti aplikasi kuis biasa ... murid hanya melihat dari luarnya"
+       (owner, 12 Okt 2026, m025-577). Alasan Soal: satu baris di atas soal sesi adaptif yang
+       mengucapkan KENAPA soal itu dipilih, plus rekap "yang Fiezel atur untukmu" di layar
+       hasil. Hanya sesi adaptif; mode ukur dan kunci ujian tidak pernah diberi alasan
+       (alasanSoalAllowed). */
+    alasanSoal: true
   };
 
   var DEFAULTS = {};
