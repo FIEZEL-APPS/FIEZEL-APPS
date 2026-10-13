@@ -7597,7 +7597,21 @@ async function coreBrainHealth(){
 async function fetchRemoteVapidPublicKey(){const r=await fetch(CORE_WORKER_URL+'/api/push/public-key',{cache:'no-store'});if(!r.ok)throw new Error(`push_public_key_${r.status}`);const data=await r.json();if(!data?.vapidPublicKey)throw new Error('push_public_key_missing');return data.vapidPublicKey}
 async function ensureRemotePushSubscription(){
   if(!CORE_WORKER_URL)return {ok:false,reason:'not_configured'};if(!pushSupported())return {ok:false,reason:'unsupported'};if(notificationPermission()!=='granted')return {ok:false,reason:'permission'};
-  try{try{await identityEvidenceEnsureAnon()}catch{}const reg=await navigator.serviceWorker.ready;let sub=await reg.pushManager.getSubscription();if(!sub){const key=await fetchRemoteVapidPublicKey();sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:base64UrlBytes(key)})}
+  try{
+    try{await identityEvidenceEnsureAnon()}catch{}
+    const reg=await navigator.serviceWorker.ready;
+    const key=await fetchRemoteVapidPublicKey();
+    const targetKeyBytes=base64UrlBytes(key);
+    let sub=await reg.pushManager.getSubscription();
+    if(sub&&sub.options?.applicationServerKey){
+      const currKeyBytes=new Uint8Array(sub.options.applicationServerKey);
+      let match=currKeyBytes.length===targetKeyBytes.length;
+      if(match){for(let i=0;i<targetKeyBytes.length;i++){if(currKeyBytes[i]!==targetKeyBytes[i]){match=false;break}}}
+      if(!match){try{await sub.unsubscribe()}catch(_){}sub=null}
+    }
+    if(!sub){
+      sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:targetKeyBytes});
+    }
     const response=await coreWorkerExec('/api/push/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({subscription:sub.toJSON?sub.toJSON():sub})});if(!response.ok)throw new Error(`push_subscribe_${response.status}`);localStorage.setItem('fiezel-remote-push','active');return {ok:true,subscription:sub}
   }catch(error){localStorage.setItem('fiezel-remote-push','error');return {ok:false,reason:String(error?.message||error)}}
 }
