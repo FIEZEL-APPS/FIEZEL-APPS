@@ -30,7 +30,7 @@ async function runProbe() {
     publicKeyFetched: 0
   };
 
-  const VAPID_PUB = 'BJiEvKXx6lUOv6shj4OlOTPPkOAl_S0Wc5IzxJciBx7n1S6UmqaaIhm5vwl9EG7pmdEw5daQLHqaLdI2bJKSlks';
+  const VAPID_PUB = Buffer.alloc(65, 0x41).toString('base64url');
 
   await context.route('**/*', async route => {
     const req = route.request();
@@ -121,8 +121,8 @@ async function runProbe() {
           toJSON: () => ({
             endpoint: 'https://fcm.googleapis.com/fcm/send/fake-token-test-12345',
             keys: {
-              p256dh: 'BNcRdreALRFXTkOOUHK1EtK2wtaz5Ry4YfYCA_0QT9t0P43cxIrWmt5TWDd2n9ZSk0ah94E3yyNV0-spanPghnY',
-              auth: 'tBHItJI5svbpez7KI4CCXg'
+              p256dh: 'B' + 'A'.repeat(64),
+              auth: 'C' + 'A'.repeat(15)
             }
           })
         };
@@ -139,6 +139,8 @@ async function runProbe() {
   });
 
   const page = await context.newPage();
+  page.on('console', msg => console.log('PAGE LOG:', msg.text()));
+  page.on('pageerror', err => console.log('PAGE ERR:', err));
   await page.goto('http://localhost:4173/', { waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(200);
 

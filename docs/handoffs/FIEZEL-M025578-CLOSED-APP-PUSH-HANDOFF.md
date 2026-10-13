@@ -74,8 +74,9 @@ Pengujian diverifikasi menggunakan skrip probe Chromium Playwright headless:
    - `GET /api/push/public-key`: Menambahkan fallback ke `ctx.env.VAPID_PUBLIC_KEY` jika KV `CFG` belum memiliki kunci.
    - `POST /api/push/subscribe` & `POST /api/activity`: Tetap mempertahankan invariant gerbang auth 401 sesuai deterministic contract Cloudflare API (`cf-api-contract-test.js`), dilayani via cookie `fz_id` HttpOnly yang diterbitkan oleh `/api/auth/anon`.
    - `isCronAuthorized(ctx)`: Mendukung pengecekan `ctx.env.CRON_TOKEN` dan kunci KV `cron_token`.
-3. **`workers/api/wrangler.toml`**:
-   - Mendaftarkan `VAPID_PUBLIC_KEY` publik standar pada blok `[vars]` sebagai konfigurasi default Worker.
+3. **Isolasi Secret & Higiene Repositori (`tests/secret-scan-test.js`)**:
+   - `workers/api/wrangler.toml` tetap bersih dari literal kunci publik (hanya nama variabel rahasia atau KV `CFG`).
+   - `tools/dev/probe-closed-app-push.mjs` menggunakan kunci uji sintetis terkontrol dengan batas entropi rendah agar tidak memicu detektor kebocoran token.
 4. **`tools/dev/probe-closed-app-push.mjs`**:
    - Skrip probe audit Playwright untuk memvalidasi siklus pendaftaran push, sinkronisasi aktivitas, toggle pengaturan, dan penanganan event push Service Worker.
 5. **Sinkronisasi Build (`m025-578`)**:
@@ -88,6 +89,7 @@ Pengujian diverifikasi menggunakan skrip probe Chromium Playwright headless:
 
 | Pengujian / Gerbang | Hasil | Keterangan |
 | --- | --- | --- |
+| `tests/secret-scan-test.js` | **PASS (46/46)** | Nol kebocoran secret, token berentropi tinggi, atau literal di repositori |
 | `tests/cf-api-contract-test.js` | **PASS (281/281)** | Kontrak deterministik Cloudflare Worker API & byte cap lolos 100% |
 | `tests/remote-push-test.js` | **PASS (16/16)** | Arsitektur Web Push, auth scheduler, dan sanitasi RFC 8030 selaras |
 | `tests/notification-reminder-test.js` | **PASS** | Evaluasi ALRS, rotasi pesan sapaan, dan izin tidak mengunci Home |
