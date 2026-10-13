@@ -8125,11 +8125,17 @@ function settleNotificationInvitation(status){
      identitas murid sudah lahir di onboarding. */
   return true
 }
-function acceptStudyNotifications(){
+async function acceptStudyNotifications(){
   state.preferences={...state.preferences,reminders:true};save();
   writeReminderInvite({acceptedAt:Date.now()});
   startReminderEngine();
   settleNotificationInvitation('granted');
+  try{
+    if(CORE_WORKER_URL&&self.navigator?.onLine!==false){
+      const result=await ensureRemotePushSubscription();
+      if(result?.ok)await syncRemoteLearningActivity();
+    }
+  }catch(_){}
   return true
 }
 // "Nanti saja" adalah jawaban yang sah, bukan kegagalan: tidak ada yang dikunci, tidak ada
@@ -8146,7 +8152,7 @@ async function requestStudyNotificationPermission(){
   if(!notificationsSupported()){settleNotificationInvitation('unsupported');return false}
   let permission=Notification.permission;
   if(permission==='default'){try{permission=await Notification.requestPermission()}catch{permission=Notification.permission}}
-  if(permission==='granted'){haptic('confirm');acceptStudyNotifications();showToast(FiezelI18n.t('notif.toast-aktif'),'success');return true}
+  if(permission==='granted'){haptic('confirm');await acceptStudyNotifications();showToast(FiezelI18n.t('notif.toast-aktif'),'success');return true}
   // Ditolak di dialog browser: aplikasi tetap terbuka penuh, panelnya menjelaskan itu lalu
   // menutup diri. Ini persis kalimat OWNER: "tetap bisa dipakai kalau ditolak".
   settleNotificationInvitation(permission==='denied'?'denied':'declined');
@@ -18447,7 +18453,14 @@ function reminderSettingHint(){
 // sendiri saat aplikasi dibuka.
 async function toggleStudyReminders(input){
   const wantOn=!!input?.checked;
-  if(!wantOn){state.preferences={...state.preferences,reminders:false};save();startReminderEngine();showToast(FiezelI18n.t('settings.pengingat-study-dimatikan'));return false}
+  if(!wantOn){
+    state.preferences={...state.preferences,reminders:false};save();startReminderEngine();showToast(FiezelI18n.t('settings.pengingat-study-dimatikan'));
+    try{
+      navigator.serviceWorker?.ready?.then(reg=>reg.pushManager.getSubscription()).then(sub=>sub?.unsubscribe?.()).catch(()=>{});
+      localStorage.removeItem('fiezel-remote-push');
+    }catch(_){}
+    return false
+  }
   if(notificationPermission()!=='granted'){
     if(!notificationsSupported()){if(input)input.checked=false;showToast(FiezelI18n.t('settings.browser-belum-mendukung-notifikasi-web-2'));return false}
     let permission=Notification.permission;
@@ -18456,6 +18469,13 @@ async function toggleStudyReminders(input){
   }
   state.preferences={...state.preferences,reminders:true};save();startReminderEngine();haptic('confirm');showToast(FiezelI18n.t('settings.pengingat-study-aktif'),'success');
   if(input)input.checked=true;
+  try{
+    if(CORE_WORKER_URL&&self.navigator?.onLine!==false){
+      ensureRemotePushSubscription().then(result=>{
+        if(result?.ok)syncRemoteLearningActivity();
+      }).catch(()=>{});
+    }
+  }catch(_){}
   return true
 }
 // m025-121: tombol "Simpan untuk offline" beserta prepareNeuralVoice() dan

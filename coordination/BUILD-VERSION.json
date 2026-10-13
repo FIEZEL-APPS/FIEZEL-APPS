@@ -1,7 +1,7 @@
 {
-  "version": "m025-577",
-  "claimedBy": "branch claude/inspiring-hopper-h5wnut",
-  "claimedAt": "2026-10-12T14:45:54.303Z",
-  "reason": "Alasan Soal: BrainCore terlihat di soal dan layar hasil",
+  "version": "m025-578",
+  "claimedBy": "branch fix/closed-app-push-notifications",
+  "claimedAt": "2026-10-13T12:54:23.066Z",
+  "reason": "fix(push): aktivasi siklus hidup remote push saat pwa tertutup dan auto-anon identity",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

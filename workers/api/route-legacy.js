@@ -10,6 +10,7 @@
  */
 
 import { jsonResponse, jsonError } from './errors.js';
+import { issueAnonIdentity } from './mw-identity.js';
 /* m025-310: perakitan tanda terima dan resolver umd() DULU disalin ke berkas ini dari
    route-wiring.js. Dua salinan bebas menyimpang, dan yang menyimpang adalah jalur biaya.
    Keduanya kini tinggal di ai/neuron-reservation.js - satu tempat, dipakai kedua jalur. */
@@ -178,10 +179,18 @@ async function isOwner(ctx) {
 }
 
 // Helper otentikasi Cron
-function isCronAuthorized(ctx) {
+async function isCronAuthorized(ctx) {
   const authHeader = ctx.request.headers.get('authorization') || '';
   const token = authHeader.replace(/^Bearer\s+/i, '').trim();
-  return !!(token && ctx.env.CRON_TOKEN && token === ctx.env.CRON_TOKEN);
+  if (!token) return false;
+  if (ctx.env.CRON_TOKEN && token === ctx.env.CRON_TOKEN) return true;
+  if (ctx.env.CFG) {
+    try {
+      const kvToken = (await ctx.env.CFG.get('cron_token')) || (await ctx.env.CFG.get('cfg:cron_token'));
+      if (kvToken && token === kvToken) return true;
+    } catch (_) {}
+  }
+  return false;
 }
 
 // m025-310: pembatas laju in-memory (`allowAiRequest`, 40/jam per sub) DIHAPUS, bukan
@@ -624,6 +633,9 @@ const RAW_ROUTES = [
     if (ctx.env.CFG) {
       vapidPublicKey = (await ctx.env.CFG.get('vapid_public_key')) || (await ctx.env.CFG.get('cfg:vapid_public_key')) || '';
     }
+    if (!vapidPublicKey && ctx.env.VAPID_PUBLIC_KEY) {
+      vapidPublicKey = String(ctx.env.VAPID_PUBLIC_KEY || '');
+    }
     return jsonResponse({
       configured: !!vapidPublicKey,
       vapidPublicKey,
@@ -634,7 +646,13 @@ const RAW_ROUTES = [
   // 15. POST /api/push/subscribe
   ['POST', '/api/push/subscribe', async (ctx) => {
     const opt = { headers: ctx.corsHeaders };
-    const sub = ctx.identity?.sub;
+    let sub = ctx.identity?.sub;
+    if (!sub) {
+      try {
+        const anon = await issueAnonIdentity(ctx);
+        sub = anon?.sub;
+      } catch (_) {}
+    }
     if (!sub) return jsonError(401, 'unauthorized', {}, opt);
     
     const body = await readJson(ctx);
@@ -661,7 +679,13 @@ const RAW_ROUTES = [
   // 16. POST /api/activity
   ['POST', '/api/activity', async (ctx) => {
     const opt = { headers: ctx.corsHeaders };
-    const sub = ctx.identity?.sub;
+    let sub = ctx.identity?.sub;
+    if (!sub) {
+      try {
+        const anon = await issueAnonIdentity(ctx);
+        sub = anon?.sub;
+      } catch (_) {}
+    }
     if (!sub) return jsonError(401, 'unauthorized', {}, opt);
     
     const body = await readJson(ctx);
@@ -729,7 +753,7 @@ const RAW_ROUTES = [
   // 19. POST /api/reminders/due
   ['POST', '/api/reminders/due', async (ctx) => {
     const opt = { headers: ctx.corsHeaders };
-    if (!isCronAuthorized(ctx)) return jsonError(403, 'forbidden', {}, opt);
+    if (!(await isCronAuthorized(ctx))) return jsonError(403, 'forbidden', {}, opt);
     
     const now = ctx.now || Date.now();
     const eighteenHoursAgo = now - (18 * 60 * 60 * 1000);
@@ -775,7 +799,7 @@ const RAW_ROUTES = [
   // 20. POST /api/reminders/ack
   ['POST', '/api/reminders/ack', async (ctx) => {
     const opt = { headers: ctx.corsHeaders };
-    if (!isCronAuthorized(ctx)) return jsonError(403, 'forbidden', {}, opt);
+    if (!(await isCronAuthorized(ctx))) return jsonError(403, 'forbidden', {}, opt);
     
     const body = await readJson(ctx);
     const { id, status } = body;
