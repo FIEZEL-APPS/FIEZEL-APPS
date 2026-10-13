@@ -4,6 +4,22 @@ on:
   schedule:
     - cron: '17 * * * *'
   workflow_dispatch:
+    inputs:
+      custom_body:
+        description: 'Teks notifikasi (opsional, misal: selamat malam semuanya, selamat beristirahat)'
+        required: false
+        type: string
+        default: ''
+      custom_title:
+        description: 'Judul notifikasi (opsional)'
+        required: false
+        type: string
+        default: ''
+      force:
+        description: 'Kirim segera ke semua perangkat (abaikan jeda 18 jam)'
+        required: false
+        type: boolean
+        default: true
 
 permissions:
   contents: read
@@ -32,3 +48,6 @@ jobs:
           VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
           VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
           VAPID_SUBJECT: ${{ secrets.VAPID_SUBJECT }}
+          REMINDER_CUSTOM_BODY: ${{ inputs.custom_body }}
+          REMINDER_CUSTOM_TITLE: ${{ inputs.custom_title }}
+          REMINDER_FORCE: ${{ inputs.force }}

@@ -19,6 +19,7 @@ import { runMeteredModel } from './ai/neuron-reservation.js';
    dengan jalur berpipa - bukan salinan kedua, dengan alasan yang sama seperti komentar
    di atas: dua mekanisme untuk satu maksud adalah cara celah berikutnya lahir. */
 import { aiSpendGate } from './route-wiring.js';
+import { ensureLegacySchema } from './legacy-schema.js';
 
 // == PANGGILAN MODEL DI BERKAS INI WAJIB BERPLAFON (m025-308) =========================
 //
@@ -659,6 +660,7 @@ const RAW_ROUTES = [
     const now = ctx.now || Date.now();
     
     if (ctx.env.CORE_DB) {
+      await ensureLegacySchema(ctx.env.CORE_DB).catch(() => {});
       await ctx.env.CORE_DB.prepare(
         `INSERT OR REPLACE INTO push_subscriptions 
          (sub, endpoint, keys_p256dh, keys_auth, activity, created_at, updated_at) 
@@ -680,6 +682,7 @@ const RAW_ROUTES = [
     const now = ctx.now || Date.now();
     
     if (ctx.env.CORE_DB) {
+      await ensureLegacySchema(ctx.env.CORE_DB).catch(() => {});
       await ctx.env.CORE_DB.prepare(
         `UPDATE push_subscriptions SET activity = ?, updated_at = ? WHERE sub = ?`
       ).bind(JSON.stringify(activity), now, sub).run().catch(() => {});
@@ -721,6 +724,7 @@ const RAW_ROUTES = [
     let subscriptionCount = 0;
     if (ctx.env.CORE_DB) {
       try {
+        await ensureLegacySchema(ctx.env.CORE_DB).catch(() => {});
         const { results } = await ctx.env.CORE_DB.prepare(`SELECT count(*) as cnt FROM push_subscriptions`).all();
         subscriptionCount = results?.[0]?.cnt || 0;
       } catch (_) {}
@@ -742,19 +746,34 @@ const RAW_ROUTES = [
     const opt = { headers: ctx.corsHeaders };
     if (!(await isCronAuthorized(ctx))) return jsonError(403, 'forbidden', {}, opt);
     
+    const body = await readJson(ctx).catch(() => ({}));
+    const force = Boolean(body?.force);
+    const customTitle = body?.customTitle || body?.title || '';
+    const customBody = body?.customBody || body?.body || '';
+
     const now = ctx.now || Date.now();
     const eighteenHoursAgo = now - (18 * 60 * 60 * 1000);
     
     let due = [];
     if (ctx.env.CORE_DB) {
       try {
-        const { results } = await ctx.env.CORE_DB.prepare(
-          `SELECT sub, endpoint, keys_p256dh, keys_auth, activity, learner_name, last_push_at 
-           FROM push_subscriptions 
-           WHERE (last_push_at IS NULL OR last_push_at <= ?) 
-             AND endpoint IS NOT NULL AND endpoint != ''
-           LIMIT 50`
-        ).bind(eighteenHoursAgo).all();
+        await ensureLegacySchema(ctx.env.CORE_DB).catch(() => {});
+        const query = force
+          ? `SELECT sub, endpoint, keys_p256dh, keys_auth, activity, learner_name, last_push_at 
+             FROM push_subscriptions 
+             WHERE endpoint IS NOT NULL AND endpoint != ''
+             LIMIT 50`
+          : `SELECT sub, endpoint, keys_p256dh, keys_auth, activity, learner_name, last_push_at 
+             FROM push_subscriptions 
+             WHERE (last_push_at IS NULL OR last_push_at <= ?) 
+               AND endpoint IS NOT NULL AND endpoint != ''
+             LIMIT 50`;
+
+        const stmt = force
+          ? ctx.env.CORE_DB.prepare(query)
+          : ctx.env.CORE_DB.prepare(query).bind(eighteenHoursAgo);
+
+        const { results } = await stmt.all();
         
         due = (results || []).map(r => {
           let act = {};
@@ -766,8 +785,9 @@ const RAW_ROUTES = [
               keys: { p256dh: r.keys_p256dh, auth: r.keys_auth }
             },
             notification: {
-              title: 'Waktunya Belajar FIEZEL! ✨',
-              kind: 'daily_reminder',
+              title: customTitle || 'Waktunya Belajar FIEZEL! ✨',
+              body: customBody || 'Waktunya kembali ke sesi belajar.',
+              kind: customBody ? 'broadcast_reminder' : 'daily_reminder',
               tag: 'fiezel-study-daily',
               meta: {
                 learnerName: r.learner_name || '',

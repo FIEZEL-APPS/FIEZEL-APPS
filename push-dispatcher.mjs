@@ -9,7 +9,12 @@ if (!cronToken) throw new Error('Missing CRON_TOKEN or FIEZEL_REMINDER_CRON_TOKE
 const safeTopic = (t) => { const s = String(t || 'fiezel').replace(/[^A-Za-z0-9_-]+/g, '-').slice(0, 32).replace(/^[-_]+/, ''); return s || 'fiezel'; };
 const auth = { Authorization: `Bearer ${cronToken}`, 'Content-Type': 'application/json' };
 webpush.setVapidDetails(process.env.VAPID_SUBJECT,process.env.VAPID_PUBLIC_KEY,process.env.VAPID_PRIVATE_KEY);
-const dueRes=await fetch(`${base}/api/reminders/due`,{method:'POST',headers:auth});if(!dueRes.ok)throw new Error(`due endpoint ${dueRes.status}: ${await dueRes.text()}`);
+const dueBody = {
+  force: process.env.REMINDER_FORCE === 'true' || process.env.REMINDER_FORCE === '1',
+  customTitle: process.env.REMINDER_CUSTOM_TITLE || '',
+  customBody: process.env.REMINDER_CUSTOM_BODY || ''
+};
+const dueRes=await fetch(`${base}/api/reminders/due`,{method:'POST',headers:auth,body:JSON.stringify(dueBody)});if(!dueRes.ok)throw new Error(`due endpoint ${dueRes.status}: ${await dueRes.text()}`);
 const payload=await dueRes.json();let sent=0,failed=0,suppressed=0;
 for(const item of payload.due||[]){
   const notification=item?.notification||{},meta=notification?.meta||{};
