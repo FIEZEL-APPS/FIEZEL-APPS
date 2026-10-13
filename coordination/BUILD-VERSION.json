@@ -1,7 +1,7 @@
 {
-  "version": "m025-578",
-  "claimedBy": "branch fix/closed-app-push-notifications",
-  "claimedAt": "2026-10-13T12:54:23.066Z",
-  "reason": "fix(push): aktivasi siklus hidup remote push saat pwa tertutup dan auto-anon identity",
+  "version": "m025-579",
+  "claimedBy": "branch main",
+  "claimedAt": "2026-10-13T13:58:52.397Z",
+  "reason": "fix(push): provisi otomatis VAPID_PUBLIC_KEY dan cron_token pada deploy fiezel-api",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
