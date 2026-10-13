@@ -65,13 +65,14 @@ Pengujian diverifikasi menggunakan skrip probe Chromium Playwright headless:
 ## 3. Daftar Berkas yang Disentuh & Perubahan
 
 1. **`app.js`**:
+   - `identityEvidenceEnsureAnon()` dilengkapi fallback endpoint `(CORE_WORKER_URL ? CORE_WORKER_URL + '/api/auth/anon' : '')` untuk menjamin cookie identitas `fz_id` selalu terbit sebelum memanggil rute terproteksi.
+   - `ensureRemotePushSubscription()` dan `syncRemoteLearningActivity()` memastikan identitas anonim siap (`await identityEvidenceEnsureAnon()`) sebelum menembak `/api/push/subscribe` dan `/api/activity`.
    - `acceptStudyNotifications()` dijadikan `async` dan memicu `await ensureRemotePushSubscription()` serta `await syncRemoteLearningActivity()` saat izin diberikan.
    - `requestStudyNotificationPermission()` meng-await penyelesaian `acceptStudyNotifications()`.
    - `toggleStudyReminders(input)` memicu `ensureRemotePushSubscription()` saat diaktifkan, dan melakukan `unsubscribe()` push serta membersihkan penanda `fiezel-remote-push` saat dimatikan.
 2. **`workers/api/route-legacy.js`**:
-   - Mengimpor `issueAnonIdentity` dari `./mw-identity.js`.
    - `GET /api/push/public-key`: Menambahkan fallback ke `ctx.env.VAPID_PUBLIC_KEY` jika KV `CFG` belum memiliki kunci.
-   - `POST /api/push/subscribe` & `POST /api/activity`: Secara otomatis menerbitkan identitas anonim bertanda (`issueAnonIdentity`) bila murid belum memiliki sesi, sehingga langganan push tersimpan sukses.
+   - `POST /api/push/subscribe` & `POST /api/activity`: Tetap mempertahankan invariant gerbang auth 401 sesuai deterministic contract Cloudflare API (`cf-api-contract-test.js`), dilayani via cookie `fz_id` HttpOnly yang diterbitkan oleh `/api/auth/anon`.
    - `isCronAuthorized(ctx)`: Mendukung pengecekan `ctx.env.CRON_TOKEN` dan kunci KV `cron_token`.
 3. **`workers/api/wrangler.toml`**:
    - Mendaftarkan `VAPID_PUBLIC_KEY` publik standar pada blok `[vars]` sebagai konfigurasi default Worker.
@@ -87,6 +88,7 @@ Pengujian diverifikasi menggunakan skrip probe Chromium Playwright headless:
 
 | Pengujian / Gerbang | Hasil | Keterangan |
 | --- | --- | --- |
+| `tests/cf-api-contract-test.js` | **PASS (281/281)** | Kontrak deterministik Cloudflare Worker API & byte cap lolos 100% |
 | `tests/remote-push-test.js` | **PASS (16/16)** | Arsitektur Web Push, auth scheduler, dan sanitasi RFC 8030 selaras |
 | `tests/notification-reminder-test.js` | **PASS** | Evaluasi ALRS, rotasi pesan sapaan, dan izin tidak mengunci Home |
 | `tests/config-consistency-test.js` | **PASS (23/23)** | Penyelarasan kuota & vars `wrangler.toml` hijau |

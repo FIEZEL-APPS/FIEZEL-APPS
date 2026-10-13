@@ -2614,7 +2614,7 @@ function identityEvidenceMirror(event,nowMs=Date.now()){
  */
 function identityEvidenceEnsureAnon(){
   if(__identityAnonReady)return Promise.resolve(true);
-  const url=String(identityEvidenceCfg()?.anonEndpoint||'');
+  const url=String(identityEvidenceCfg()?.anonEndpoint||(CORE_WORKER_URL?CORE_WORKER_URL+'/api/auth/anon':''));
   if(!url)return Promise.resolve(false);
   return fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:'{}',credentials:'include',mode:'cors',cache:'no-store'})
     .then(r=>{__identityAnonReady=!!(r&&(r.ok||r.status===409));return __identityAnonReady})
@@ -7597,7 +7597,7 @@ async function coreBrainHealth(){
 async function fetchRemoteVapidPublicKey(){const r=await fetch(CORE_WORKER_URL+'/api/push/public-key',{cache:'no-store'});if(!r.ok)throw new Error(`push_public_key_${r.status}`);const data=await r.json();if(!data?.vapidPublicKey)throw new Error('push_public_key_missing');return data.vapidPublicKey}
 async function ensureRemotePushSubscription(){
   if(!CORE_WORKER_URL)return {ok:false,reason:'not_configured'};if(!pushSupported())return {ok:false,reason:'unsupported'};if(notificationPermission()!=='granted')return {ok:false,reason:'permission'};
-  try{const reg=await navigator.serviceWorker.ready;let sub=await reg.pushManager.getSubscription();if(!sub){const key=await fetchRemoteVapidPublicKey();sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:base64UrlBytes(key)})}
+  try{try{await identityEvidenceEnsureAnon()}catch{}const reg=await navigator.serviceWorker.ready;let sub=await reg.pushManager.getSubscription();if(!sub){const key=await fetchRemoteVapidPublicKey();sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:base64UrlBytes(key)})}
     const response=await coreWorkerExec('/api/push/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({subscription:sub.toJSON?sub.toJSON():sub})});if(!response.ok)throw new Error(`push_subscribe_${response.status}`);localStorage.setItem('fiezel-remote-push','active');return {ok:true,subscription:sub}
   }catch(error){localStorage.setItem('fiezel-remote-push','error');return {ok:false,reason:String(error?.message||error)}}
 }
@@ -7608,7 +7608,7 @@ function remoteActivitySnapshot(){const snap=buildLearningSnapshot(),reviews=due
   // dengan bukti belajarnya - bukan pihak ketiga mana pun.
   learnerName:String(state.userName||'').trim().slice(0,24),
   evidence:remoteLearnerEvidenceSnapshot()}}
-async function syncRemoteLearningActivity(){if(!CORE_WORKER_URL||localStorage.getItem('fiezel-remote-push')!=='active')return false;try{const r=await coreWorkerExec('/api/activity',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({activity:remoteActivitySnapshot()})});return !!r.ok}catch{return false}}
+async function syncRemoteLearningActivity(){if(!CORE_WORKER_URL||localStorage.getItem('fiezel-remote-push')!=='active')return false;try{try{await identityEvidenceEnsureAnon()}catch{}const r=await coreWorkerExec('/api/activity',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({activity:remoteActivitySnapshot()})});return !!r.ok}catch{return false}}
 function queueRemoteActivitySync(){if(!CORE_WORKER_URL)return;clearTimeout(remoteActivitySyncTimer);remoteActivitySyncTimer=setTimeout(()=>syncRemoteLearningActivity(),1800);remoteActivitySyncTimer?.unref?.()}
 
 async function showStudyNotification(kind,body){

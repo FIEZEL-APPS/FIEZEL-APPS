@@ -10,7 +10,6 @@
  */
 
 import { jsonResponse, jsonError } from './errors.js';
-import { issueAnonIdentity } from './mw-identity.js';
 /* m025-310: perakitan tanda terima dan resolver umd() DULU disalin ke berkas ini dari
    route-wiring.js. Dua salinan bebas menyimpang, dan yang menyimpang adalah jalur biaya.
    Keduanya kini tinggal di ai/neuron-reservation.js - satu tempat, dipakai kedua jalur. */
@@ -646,13 +645,7 @@ const RAW_ROUTES = [
   // 15. POST /api/push/subscribe
   ['POST', '/api/push/subscribe', async (ctx) => {
     const opt = { headers: ctx.corsHeaders };
-    let sub = ctx.identity?.sub;
-    if (!sub) {
-      try {
-        const anon = await issueAnonIdentity(ctx);
-        sub = anon?.sub;
-      } catch (_) {}
-    }
+    const sub = ctx.identity?.sub;
     if (!sub) return jsonError(401, 'unauthorized', {}, opt);
     
     const body = await readJson(ctx);
@@ -679,13 +672,7 @@ const RAW_ROUTES = [
   // 16. POST /api/activity
   ['POST', '/api/activity', async (ctx) => {
     const opt = { headers: ctx.corsHeaders };
-    let sub = ctx.identity?.sub;
-    if (!sub) {
-      try {
-        const anon = await issueAnonIdentity(ctx);
-        sub = anon?.sub;
-      } catch (_) {}
-    }
+    const sub = ctx.identity?.sub;
     if (!sub) return jsonError(401, 'unauthorized', {}, opt);
     
     const body = await readJson(ctx);
