@@ -2614,7 +2614,7 @@ function identityEvidenceMirror(event,nowMs=Date.now()){
  */
 function identityEvidenceEnsureAnon(){
   if(__identityAnonReady)return Promise.resolve(true);
-  const url=String(identityEvidenceCfg()?.anonEndpoint||'');
+  const url=String(identityEvidenceCfg()?.anonEndpoint||(CORE_WORKER_URL?CORE_WORKER_URL+'/api/auth/anon':''));
   if(!url)return Promise.resolve(false);
   return fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:'{}',credentials:'include',mode:'cors',cache:'no-store'})
     .then(r=>{__identityAnonReady=!!(r&&(r.ok||r.status===409));return __identityAnonReady})
@@ -7597,7 +7597,7 @@ async function coreBrainHealth(){
 async function fetchRemoteVapidPublicKey(){const r=await fetch(CORE_WORKER_URL+'/api/push/public-key',{cache:'no-store'});if(!r.ok)throw new Error(`push_public_key_${r.status}`);const data=await r.json();if(!data?.vapidPublicKey)throw new Error('push_public_key_missing');return data.vapidPublicKey}
 async function ensureRemotePushSubscription(){
   if(!CORE_WORKER_URL)return {ok:false,reason:'not_configured'};if(!pushSupported())return {ok:false,reason:'unsupported'};if(notificationPermission()!=='granted')return {ok:false,reason:'permission'};
-  try{const reg=await navigator.serviceWorker.ready;let sub=await reg.pushManager.getSubscription();if(!sub){const key=await fetchRemoteVapidPublicKey();sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:base64UrlBytes(key)})}
+  try{try{await identityEvidenceEnsureAnon()}catch{}const reg=await navigator.serviceWorker.ready;let sub=await reg.pushManager.getSubscription();if(!sub){const key=await fetchRemoteVapidPublicKey();sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:base64UrlBytes(key)})}
     const response=await coreWorkerExec('/api/push/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({subscription:sub.toJSON?sub.toJSON():sub})});if(!response.ok)throw new Error(`push_subscribe_${response.status}`);localStorage.setItem('fiezel-remote-push','active');return {ok:true,subscription:sub}
   }catch(error){localStorage.setItem('fiezel-remote-push','error');return {ok:false,reason:String(error?.message||error)}}
 }
@@ -7608,7 +7608,7 @@ function remoteActivitySnapshot(){const snap=buildLearningSnapshot(),reviews=due
   // dengan bukti belajarnya - bukan pihak ketiga mana pun.
   learnerName:String(state.userName||'').trim().slice(0,24),
   evidence:remoteLearnerEvidenceSnapshot()}}
-async function syncRemoteLearningActivity(){if(!CORE_WORKER_URL||localStorage.getItem('fiezel-remote-push')!=='active')return false;try{const r=await coreWorkerExec('/api/activity',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({activity:remoteActivitySnapshot()})});return !!r.ok}catch{return false}}
+async function syncRemoteLearningActivity(){if(!CORE_WORKER_URL||localStorage.getItem('fiezel-remote-push')!=='active')return false;try{try{await identityEvidenceEnsureAnon()}catch{}const r=await coreWorkerExec('/api/activity',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({activity:remoteActivitySnapshot()})});return !!r.ok}catch{return false}}
 function queueRemoteActivitySync(){if(!CORE_WORKER_URL)return;clearTimeout(remoteActivitySyncTimer);remoteActivitySyncTimer=setTimeout(()=>syncRemoteLearningActivity(),1800);remoteActivitySyncTimer?.unref?.()}
 
 async function showStudyNotification(kind,body){
@@ -8125,11 +8125,17 @@ function settleNotificationInvitation(status){
      identitas murid sudah lahir di onboarding. */
   return true
 }
-function acceptStudyNotifications(){
+async function acceptStudyNotifications(){
   state.preferences={...state.preferences,reminders:true};save();
   writeReminderInvite({acceptedAt:Date.now()});
   startReminderEngine();
   settleNotificationInvitation('granted');
+  try{
+    if(CORE_WORKER_URL&&self.navigator?.onLine!==false){
+      const result=await ensureRemotePushSubscription();
+      if(result?.ok)await syncRemoteLearningActivity();
+    }
+  }catch(_){}
   return true
 }
 // "Nanti saja" adalah jawaban yang sah, bukan kegagalan: tidak ada yang dikunci, tidak ada
@@ -8146,7 +8152,7 @@ async function requestStudyNotificationPermission(){
   if(!notificationsSupported()){settleNotificationInvitation('unsupported');return false}
   let permission=Notification.permission;
   if(permission==='default'){try{permission=await Notification.requestPermission()}catch{permission=Notification.permission}}
-  if(permission==='granted'){haptic('confirm');acceptStudyNotifications();showToast(FiezelI18n.t('notif.toast-aktif'),'success');return true}
+  if(permission==='granted'){haptic('confirm');await acceptStudyNotifications();showToast(FiezelI18n.t('notif.toast-aktif'),'success');return true}
   // Ditolak di dialog browser: aplikasi tetap terbuka penuh, panelnya menjelaskan itu lalu
   // menutup diri. Ini persis kalimat OWNER: "tetap bisa dipakai kalau ditolak".
   settleNotificationInvitation(permission==='denied'?'denied':'declined');
@@ -18447,7 +18453,14 @@ function reminderSettingHint(){
 // sendiri saat aplikasi dibuka.
 async function toggleStudyReminders(input){
   const wantOn=!!input?.checked;
-  if(!wantOn){state.preferences={...state.preferences,reminders:false};save();startReminderEngine();showToast(FiezelI18n.t('settings.pengingat-study-dimatikan'));return false}
+  if(!wantOn){
+    state.preferences={...state.preferences,reminders:false};save();startReminderEngine();showToast(FiezelI18n.t('settings.pengingat-study-dimatikan'));
+    try{
+      navigator.serviceWorker?.ready?.then(reg=>reg.pushManager.getSubscription()).then(sub=>sub?.unsubscribe?.()).catch(()=>{});
+      localStorage.removeItem('fiezel-remote-push');
+    }catch(_){}
+    return false
+  }
   if(notificationPermission()!=='granted'){
     if(!notificationsSupported()){if(input)input.checked=false;showToast(FiezelI18n.t('settings.browser-belum-mendukung-notifikasi-web-2'));return false}
     let permission=Notification.permission;
@@ -18456,6 +18469,13 @@ async function toggleStudyReminders(input){
   }
   state.preferences={...state.preferences,reminders:true};save();startReminderEngine();haptic('confirm');showToast(FiezelI18n.t('settings.pengingat-study-aktif'),'success');
   if(input)input.checked=true;
+  try{
+    if(CORE_WORKER_URL&&self.navigator?.onLine!==false){
+      ensureRemotePushSubscription().then(result=>{
+        if(result?.ok)syncRemoteLearningActivity();
+      }).catch(()=>{});
+    }
+  }catch(_){}
   return true
 }
 // m025-121: tombol "Simpan untuk offline" beserta prepareNeuralVoice() dan
