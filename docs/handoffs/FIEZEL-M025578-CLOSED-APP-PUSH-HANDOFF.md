@@ -1,9 +1,9 @@
 # FIEZEL Hand-off Dossier: Closed-App Remote Push Notification Lifecycle & Anonymous Auto-Identity
 
-**Build**: `m025-578`  
-**Tanggal**: 13 Oktober 2026  
-**Otoritas**: Master Rule FIEZEL-APPS (Probe-Driven Empirical Audit & PWA Arbiter)  
-**Tautan Branch**: `fix/closed-app-push-notifications`  
+**Build**: `m025-578`
+**Tanggal**: 13 Oktober 2026
+**Otoritas**: Master Rule FIEZEL-APPS (Probe-Driven Empirical Audit & PWA Arbiter)
+**Tautan Branch**: `fix/closed-app-push-notifications`
 
 ---
 
@@ -29,7 +29,7 @@ Pengguna melaporkan bahwa notifikasi FIEZEL **tidak pernah muncul jika aplikasi 
 
 ## 2. Bukti Pengujian Empiris (Headless Chromium Playwright Probe)
 
-Pengujian diverifikasi menggunakan skrip probe Chromium Playwright headless:  
+Pengujian diverifikasi menggunakan skrip probe Chromium Playwright headless:
 [`tools/dev/probe-closed-app-push.mjs`](file:///c:/Users/hp/fiezel-apps/tools/dev/probe-closed-app-push.mjs).
 
 ### Hasil Eksekusi Probe:
