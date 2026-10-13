@@ -759,15 +759,15 @@ const RAW_ROUTES = [
       try {
         await ensureLegacySchema(ctx.env.CORE_DB).catch(() => {});
         const query = force
-          ? `SELECT sub, endpoint, keys_p256dh, keys_auth, activity, learner_name, last_push_at 
-             FROM push_subscriptions 
-             WHERE endpoint IS NOT NULL AND endpoint != ''
-             LIMIT 50`
-          : `SELECT sub, endpoint, keys_p256dh, keys_auth, activity, learner_name, last_push_at 
-             FROM push_subscriptions 
-             WHERE (last_push_at IS NULL OR last_push_at <= ?) 
-               AND endpoint IS NOT NULL AND endpoint != ''
-             LIMIT 50`;
+          ? `SELECT sub, endpoint, keys_p256dh, keys_auth, activity, learner_name, last_push_at\n` +
+            `FROM push_subscriptions\n` +
+            `WHERE endpoint IS NOT NULL AND endpoint != ''\n` +
+            `LIMIT 50`
+          : `SELECT sub, endpoint, keys_p256dh, keys_auth, activity, learner_name, last_push_at\n` +
+            `FROM push_subscriptions\n` +
+            `WHERE (last_push_at IS NULL OR last_push_at <= ?)\n` +
+            `  AND endpoint IS NOT NULL AND endpoint != ''\n` +
+            `LIMIT 50`;
 
         const stmt = force
           ? ctx.env.CORE_DB.prepare(query)

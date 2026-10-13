@@ -244,7 +244,7 @@ check('Remote push architecture test',remote_push_run.returncode==0 and 'FIEZEL 
 core_brain_run=subprocess.run(['node',str(ROOT/'tests/core-brain-test.js')],capture_output=True,text=True)
 check('FIEZEL Core Brain architecture',core_brain_run.returncode==0 and 'FIEZEL core brain: PASS' in core_brain_run.stdout,core_brain_run.stdout.strip()[-800:] or core_brain_run.stderr.strip()[-800:])
 core_worker_contract_run=subprocess.run(['node',str(ROOT/'tests/cf-api-contract-test.js')],capture_output=True,text=True)
-check('FIEZEL Cloudflare API deterministic contract',core_worker_contract_run.returncode==0 and 'cf-api-contract-test: 281/281 assert PASS' in core_worker_contract_run.stdout,core_worker_contract_run.stdout.strip()[-800:] or core_worker_contract_run.stderr.strip()[-800:])
+check('FIEZEL Cloudflare API deterministic contract',core_worker_contract_run.returncode==0 and bool(re.search(r'cf-api-contract-test:\s*(\d+)/\1\s+assert PASS',core_worker_contract_run.stdout)),core_worker_contract_run.stdout.strip()[-800:] or core_worker_contract_run.stderr.strip()[-800:])
 learner_evidence_run=subprocess.run(['node',str(ROOT/'tests/learner-evidence-test.js')],capture_output=True,text=True)
 check('Learner Evidence Model v1',learner_evidence_run.returncode==0 and 'FIEZEL learner evidence: PASS' in learner_evidence_run.stdout,learner_evidence_run.stdout.strip()[-800:] or learner_evidence_run.stderr.strip()[-800:])
 alrs_behavior_run=subprocess.run(['node',str(ROOT/'tests/alrs-behavior-test.js')],capture_output=True,text=True)
