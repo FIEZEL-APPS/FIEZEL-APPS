@@ -1,7 +1,7 @@
 {
   "schema": "fiezel-audio-manifest-v1",
-  "version": 673,
-  "generatedAt": "2026-10-13T13:39:08.857Z",
+  "version": 684,
+  "generatedAt": "2026-10-14T06:27:45.322Z",
   "assetBaseUrl": "https://fiezel-audio.fitrajft.workers.dev",
   "voiceProfile": {
     "voiceId": "4KH3q7xDXbPdY3S5yw0Y",
@@ -21172,6 +21172,90 @@
       "checksum": "29d5b71191e2e167587d14a873ce340ce69fe883cf6535c9c8c0eee8cdb3b12d",
       "sourceRef": "vocab_02584",
       "createdAt": "2026-10-13T13:39:06.362Z",
+      "status": "ready"
+    },
+    "5f9b358ae0cb862670a0adfb010629575077f01c57430580d319ce7efae679b5": {
+      "url": "a/5f9b358ae0cb862670a0adfb010629575077f01c57430580d319ce7efae679b5.mp3",
+      "contentType": "word",
+      "locale": "en-US",
+      "voiceId": "Aoede",
+      "modelId": "gemini-tts-gemini-2.5-flash-preview-tts",
+      "bytes": 52410,
+      "checksum": "68847282709b475edbf26c31ec70226e68601800ca1e83282f8f3f7a4401e5b0",
+      "sourceRef": "vocab_02585",
+      "createdAt": "2026-10-14T06:26:06.090Z",
+      "status": "ready"
+    },
+    "c609976c1a37ea2d61df5c83fea6d59eff0e73ff776f86d9f8fd9c9da1bdd863": {
+      "url": "a/c609976c1a37ea2d61df5c83fea6d59eff0e73ff776f86d9f8fd9c9da1bdd863.mp3",
+      "contentType": "word",
+      "locale": "en-US",
+      "voiceId": "Aoede",
+      "modelId": "gemini-tts-gemini-2.5-flash-preview-tts",
+      "bytes": 50490,
+      "checksum": "34d7a484f18a44ae00cb11ea3568f5c36ff3d52d4ffb82d5d53b9348572b79cc",
+      "sourceRef": "vocab_02586",
+      "createdAt": "2026-10-14T06:26:11.159Z",
+      "status": "ready"
+    },
+    "9e5470c1eb17d6e064e158be6b622edfbb29bcc9f249051d2a3aad538f286df1": {
+      "url": "a/9e5470c1eb17d6e064e158be6b622edfbb29bcc9f249051d2a3aad538f286df1.mp3",
+      "contentType": "word",
+      "locale": "en-US",
+      "voiceId": "Aoede",
+      "modelId": "gemini-tts-gemini-2.5-flash-preview-tts",
+      "bytes": 48570,
+      "checksum": "4665b4b6955cc227941d9579a490e547e52c97c3ed382fb5850a05ff028a6fc5",
+      "sourceRef": "vocab_02587",
+      "createdAt": "2026-10-14T06:26:15.905Z",
+      "status": "ready"
+    },
+    "7ab4723c89d66aced7a8e79c27ea0f4337b7b8d36615b001368af9402132f233": {
+      "url": "a/7ab4723c89d66aced7a8e79c27ea0f4337b7b8d36615b001368af9402132f233.mp3",
+      "contentType": "word",
+      "locale": "en-US",
+      "voiceId": "Aoede",
+      "modelId": "gemini-tts-gemini-2.5-flash-preview-tts",
+      "bytes": 46650,
+      "checksum": "7008ec1dbfcef0a1c84b855e34ce1d88b676ae9600dd499e6f017ba4dff3dd23",
+      "sourceRef": "vocab_02588",
+      "createdAt": "2026-10-14T06:26:20.826Z",
+      "status": "ready"
+    },
+    "73195410e61f6ee1736271a31e8ba82b1c4a9e36158fb650163d19a01a9db8e0": {
+      "url": "a/73195410e61f6ee1736271a31e8ba82b1c4a9e36158fb650163d19a01a9db8e0.mp3",
+      "contentType": "word",
+      "locale": "en-US",
+      "voiceId": "Aoede",
+      "modelId": "gemini-tts-gemini-2.5-flash-preview-tts",
+      "bytes": 63930,
+      "checksum": "681271d76dfd8bbcddc6b581865ff6dd0340f32c72f2ca9ded608ce57cc9fc49",
+      "sourceRef": "vocab_02589",
+      "createdAt": "2026-10-14T06:26:25.755Z",
+      "status": "ready"
+    },
+    "0f3a415b2f22bf5425339fdb30e243d0c2170dbe38f916036b927118f3d4ca81": {
+      "url": "a/0f3a415b2f22bf5425339fdb30e243d0c2170dbe38f916036b927118f3d4ca81.mp3",
+      "contentType": "word",
+      "locale": "en-US",
+      "voiceId": "Aoede",
+      "modelId": "gemini-tts-gemini-2.5-flash-preview-tts",
+      "bytes": 48570,
+      "checksum": "f529dd8fa269eda78a9411c47a4140cbefef07693d8987209c5d750d4f869854",
+      "sourceRef": "vocab_02590",
+      "createdAt": "2026-10-14T06:26:30.265Z",
+      "status": "ready"
+    },
+    "93d5b432cb734a82052e8f355313aa07e290ce69bad738df8506303d5b7e51ec": {
+      "url": "a/93d5b432cb734a82052e8f355313aa07e290ce69bad738df8506303d5b7e51ec.mp3",
+      "contentType": "word",
+      "locale": "en-US",
+      "voiceId": "Aoede",
+      "modelId": "gemini-tts-gemini-2.5-flash-preview-tts",
+      "bytes": 50490,
+      "checksum": "2e5580cb66a1c4d0541ea09008d94c65645d80b1ae7e86e84563bd208586768b",
+      "sourceRef": "vocab_02591",
+      "createdAt": "2026-10-14T06:26:34.766Z",
       "status": "ready"
     }
   },
