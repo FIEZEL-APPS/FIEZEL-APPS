@@ -105,6 +105,8 @@
     'jlpt.wrong-title': 'Belum Tepat',
     'jlpt.play-audio': 'Putar Audio',
     'jlpt.pause-audio': 'Jeda Audio',
+    'jlpt.key-locked-title': 'Kunci & Pembahasan Terkunci',
+    'jlpt.key-locked-desc': 'Pilih salah satu jawaban pada kartu soal terlebih dahulu untuk membuka kunci resmi dan analisis lengkap.',
     'speaker.instructor': 'Instruktor',
     'speaker.female': 'Wanita',
     'speaker.mother': 'Wanita (Ibu)',

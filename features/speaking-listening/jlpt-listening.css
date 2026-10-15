@@ -726,6 +726,37 @@
   box-shadow: 0 2px 0 #D97706 !important;
 }
 
+/* Speed Toggle Chip */
+.jlpt-speed-chip {
+  height: 44px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: #FAF6EF !important;
+  color: #475569 !important;
+  border: 1.5px solid var(--line, #E8DFD3) !important;
+  border-radius: 999px !important;
+  padding: 0 12px !important;
+  font-family: inherit !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+  box-shadow: 0 2.5px 0 #D8CEBF !important;
+  transition: all 0.15s ease !important;
+  flex-shrink: 0 !important;
+}
+
+.jlpt-speed-chip:hover {
+  background: #F3ECE1 !important;
+  transform: translateY(-1px) !important;
+}
+
+.jlpt-speed-chip:active {
+  transform: translateY(1.5px) !important;
+  box-shadow: 0 0.5px 0 #D8CEBF !important;
+}
+
 .jlpt-replay-pill {
   font-size: 11px;
   font-weight: 700;

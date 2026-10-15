@@ -19,6 +19,7 @@
   var replayCount = 0;
   var curSheetTab = 'script';
   var sheetOpen = false;
+  var audioPlaybackRate = 1.0;
 
   function t(k, fallback) {
     try {
@@ -199,6 +200,12 @@
       legacyJeesBtn.innerHTML = isJeesPlaying ? '❚❚ Jeda Rekaman JEES' : '📻 Rekaman JEES';
     }
 
+    // Speed Button
+    var speedBtn = document.getElementById('jlptSpeedBtn');
+    if (speedBtn) {
+      speedBtn.textContent = audioPlaybackRate.toFixed(1).replace(/\.0$/, '') + '×';
+    }
+
     // Replay Pill
     if (replayPill) {
       if (replayCount > 0) {
@@ -208,6 +215,22 @@
         replayPill.classList.remove('visible');
       }
     }
+  }
+
+  function cycleAudioPlaybackRate() {
+    if (audioPlaybackRate === 1.0) {
+      audioPlaybackRate = 1.2;
+    } else if (audioPlaybackRate === 1.2) {
+      audioPlaybackRate = 0.8;
+    } else {
+      audioPlaybackRate = 1.0;
+    }
+    if (audioObj) {
+      try {
+        audioObj.playbackRate = audioPlaybackRate;
+      } catch (_) {}
+    }
+    updateAudioUi();
   }
 
   function notifyMascot(reaction) {
@@ -262,9 +285,9 @@
       } catch (_) {}
       audioObj = null;
     }
-    if (typeof window !== 'undefined' && window.speechSynthesis) {
+    if (typeof window !== 'undefined' && window.FiezelVoiceSay && typeof window.FiezelVoiceSay.stop === 'function') {
       try {
-        window.speechSynthesis.cancel();
+        window.FiezelVoiceSay.stop();
       } catch (_) {}
     }
     audioPlaying = false;
@@ -275,45 +298,31 @@
 
   function playJlptSpeech(text, source) {
     if (!text) return;
-    if (audioObj) {
+    stopJlptAudio();
+    if (typeof window !== 'undefined' && window.FiezelVoiceSay && typeof window.FiezelVoiceSay.say === 'function') {
       try {
-        audioObj.pause();
-        audioObj.currentTime = 0;
-      } catch (_) {}
-      audioObj = null;
-    }
-    if (typeof window !== 'undefined' && window.speechSynthesis) {
-      try {
-        window.speechSynthesis.cancel();
-        var utt = new SpeechSynthesisUtterance(text);
-        utt.lang = 'ja-JP';
-        utt.rate = 0.85;
-
-        activeAudioSource = source || 'speech';
-
-        utt.onstart = function () {
-          audioPlaying = true;
-          updateAudioUi();
-          notifyMascot('listening-start');
-        };
-        utt.onend = function () {
-          audioPlaying = false;
-          activeAudioSource = null;
-          updateAudioUi();
-          notifyMascot('listening-stop');
-        };
-        utt.onerror = function () {
-          audioPlaying = false;
-          activeAudioSource = null;
-          updateAudioUi();
-          notifyMascot('listening-stop');
-        };
-        window.speechSynthesis.speak(utt);
-      } catch (err) {
-        console.warn('Speech synthesis error:', err);
+        activeAudioSource = source || 'voice';
+        audioPlaying = true;
+        updateAudioUi();
+        notifyMascot('listening-start');
+        window.FiezelVoiceSay.say(text, { speed: audioPlaybackRate, suppressSubtitles: true })
+          .then(function () {
+            audioPlaying = false;
+            activeAudioSource = null;
+            updateAudioUi();
+            notifyMascot('listening-stop');
+          })
+          .catch(function () {
+            audioPlaying = false;
+            activeAudioSource = null;
+            updateAudioUi();
+            notifyMascot('listening-stop');
+          });
+      } catch (_) {
         audioPlaying = false;
         activeAudioSource = null;
         updateAudioUi();
+        notifyMascot('listening-stop');
       }
     }
   }
@@ -327,12 +336,15 @@
     stopJlptAudio();
 
     if (!url) {
-      playJlptSpeech(fallbackScript, source);
+      if (fallbackScript) {
+        playJlptSpeech(fallbackScript, source);
+      }
       return;
     }
 
     try {
       audioObj = new Audio(url);
+      audioObj.playbackRate = audioPlaybackRate;
       activeAudioSource = source;
 
       audioObj.onended = function () {
@@ -343,11 +355,11 @@
       };
 
       audioObj.onerror = function () {
-        console.warn('[JLPT Audio] Gagal memuat audio ' + source + ', fallback ke Web Speech:', url);
+        console.warn('[JLPT Audio] Gagal memuat audio ' + source + ':', url);
         audioPlaying = false;
         activeAudioSource = null;
         updateAudioUi();
-        playJlptSpeech(fallbackScript, source);
+        if (fallbackScript) playJlptSpeech(fallbackScript, source);
       };
 
       var playPromise = audioObj.play();
@@ -359,17 +371,17 @@
           updateAudioUi();
           notifyMascot('listening-start');
         }).catch(function (e) {
-          console.warn('[JLPT Audio] Play error, fallback ke Web Speech:', e);
+          console.warn('[JLPT Audio] Play error:', e);
           audioPlaying = false;
           activeAudioSource = null;
           updateAudioUi();
           notifyMascot('listening-stop');
-          playJlptSpeech(fallbackScript, source);
+          if (fallbackScript) playJlptSpeech(fallbackScript, source);
         });
       }
     } catch (err) {
-      console.warn('[JLPT Audio] Init error, fallback ke Web Speech:', err);
-      playJlptSpeech(fallbackScript, source);
+      console.warn('[JLPT Audio] Init error:', err);
+      if (fallbackScript) playJlptSpeech(fallbackScript, source);
     }
   }
 
@@ -416,6 +428,9 @@
     if (selectedChoice !== null) return;
     selectedChoice = optId;
 
+    // Hentikan audio seketika saat murid menjawab
+    stopJlptAudio();
+
     var btns = document.querySelectorAll('.jlpt-opt-btn');
     btns.forEach(function (btn) {
       btn.classList.add('locked');
@@ -436,6 +451,102 @@
       notifyMascot('wrong');
     }
 
+    // Braincore Engine Authority & Zero-Dumbing Invariant:
+    // Alirkan bukti penguasaan nyata ke model murid (updateMastery, BKT, history)
+    var qs = getFilteredQuestions();
+    var q = (qs && qs[curIndex]) ? qs[curIndex] : null;
+    if (typeof window !== 'undefined') {
+      var itemKey = (q && (q.id || q.itemId)) || ('jlpt_' + curLevel.toLowerCase() + '_' + curIndex);
+      var latencyMs = 6000;
+      if (typeof window.updateMastery === 'function') {
+        try {
+          window.updateMastery('listening', itemKey, isRight, latencyMs, null, Date.now());
+        } catch (_) {}
+      }
+      var recordFn = window.record || window.recordAnswer || (window.__fiezelAudit && window.__fiezelAudit.record);
+      if (typeof recordFn === 'function') {
+        try {
+          var fakeQ = {
+            id: itemKey,
+            type: 'listening',
+            level: curLevel,
+            skill: 'listening_comprehension',
+            target: itemKey,
+            options: q && q.options ? q.options : [],
+            answerIndex: (correctOptId - 1)
+          };
+          recordFn(fakeQ, isRight, latencyMs, optId - 1);
+        } catch (_) {}
+      } else if (typeof window.__getFiezelState === 'function') {
+        try {
+          var s = window.__getFiezelState();
+          if (s && Array.isArray(s.history)) {
+            s.totalAnswered = (s.totalAnswered || 0) + 1;
+            if (isRight) s.totalCorrect = (s.totalCorrect || 0) + 1;
+            var now = Date.now();
+            s.history.push({
+              attemptId: now.toString(36) + '-jlpt-' + Math.random().toString(36).slice(2, 6),
+              id: itemKey,
+              type: 'listening',
+              level: curLevel,
+              skill: 'listening_comprehension',
+              target: itemKey,
+              reviewBucket: 'listening',
+              reviewKey: itemKey,
+              difficulty: curLevel === 'N4' ? 2 : 1,
+              ok: isRight,
+              ms: latencyMs,
+              confidence: null,
+              selectedIndex: optId - 1,
+              selectedAnswer: 'Pilihan ' + optId,
+              correctAnswer: 'Pilihan ' + correctOptId,
+              errorTag: 'jlpt_listening',
+              at: now
+            });
+            if (s.history.length > 1000) s.history.shift();
+          }
+        } catch (_) {}
+      }
+      if (window.bktRecord && typeof window.bktRecord === 'function') {
+        try {
+          window.bktRecord({ lessonSkill: 'listening_' + curLevel.toLowerCase(), skill: 'listening_' + curLevel.toLowerCase() }, isRight, 1);
+        } catch (_) {}
+      } else if (window.FiezelMasteryBKT && typeof window.FiezelMasteryBKT.update === 'function') {
+        try {
+          var rawBkt = localStorage.getItem('fiezel-mastery-bkt-v1');
+          var bktData = rawBkt ? JSON.parse(rawBkt) : {};
+          var updated = window.FiezelMasteryBKT.update(bktData, {
+            lesson: 'listening_' + curLevel.toLowerCase(),
+            correct: isRight,
+            weight: 1
+          }, Date.now());
+          localStorage.setItem('fiezel-mastery-bkt-v1', JSON.stringify(updated));
+        } catch (_) {}
+      }
+    }
+
+    // Tampilkan terjemahan opsi dan soal di kartu begitu soal sudah terjawab
+    var optTexts = document.querySelectorAll('.jlpt-opt-texts');
+    if (q && Array.isArray(q.options) && optTexts) {
+      optTexts.forEach(function (el, idx) {
+        var opt = q.options[idx];
+        var textId = (typeof opt === 'object') ? (opt.textId || '') : '';
+        if (textId && !el.querySelector('.jlpt-opt-id')) {
+          var idDiv = document.createElement('div');
+          idDiv.className = 'jlpt-opt-id';
+          idDiv.textContent = textId;
+          el.appendChild(idDiv);
+        }
+      });
+    }
+    var qBlock = document.querySelector('.jlpt-question-block');
+    if (q && q.questionIndonesian && qBlock && !qBlock.querySelector('.jlpt-question-id')) {
+      var qIdP = document.createElement('p');
+      qIdP.className = 'jlpt-question-id';
+      qIdP.textContent = q.questionIndonesian;
+      qBlock.appendChild(qIdP);
+    }
+
     // Refresh feedback and highlight sheet button
     renderFeedbackBanner(isRight, correctOptId);
     var sheetTrigger = document.getElementById('jlptSheetTriggerBtn');
@@ -444,7 +555,6 @@
     }
 
     // Populate bottom sheet so it is ready
-    var qs = getFilteredQuestions();
     if (qs && qs[curIndex]) {
       populateDetailSheet(qs[curIndex], correctOptId);
     }
@@ -558,6 +668,16 @@
   }
 
   function formatExplainHtml(q, correctOptId) {
+    if (selectedChoice === null) {
+      return '<div class="jlpt-explain-panel">' +
+        '<div class="jlpt-key-card" style="text-align:center;padding:24px 16px;">' +
+          '<div style="font-size:28px;margin-bottom:8px;">🔒</div>' +
+          '<div style="font-weight:700;font-size:15px;color:#2D241E;margin-bottom:6px;">' + t('jlpt.key-locked-title', 'Kunci & Pembahasan Terkunci') + '</div>' +
+          '<p style="font-size:13px;color:#7A6F64;margin:0;line-height:1.5;">' + t('jlpt.key-locked-desc', 'Pilih salah satu jawaban pada kartu soal terlebih dahulu untuk membuka kunci resmi dan analisis lengkap.') + '</p>' +
+        '</div>' +
+      '</div>';
+    }
+
     var options = q.options || [];
     var correctOpt = options.find(function (o, idx) {
       var id = (typeof o === 'object' && o.id !== undefined) ? o.id : (idx + 1);
@@ -568,10 +688,7 @@
 
     var statusText = '';
     var statusClass = '';
-    if (selectedChoice === null) {
-      statusText = t('jlpt.status-pending', 'Belum Dijawab');
-      statusClass = 'status-pending';
-    } else if (selectedChoice === correctOptId) {
+    if (selectedChoice === correctOptId) {
       statusText = t('jlpt.status-correct', '✓ Jawaban Anda Benar!');
       statusClass = 'status-correct';
     } else {
@@ -690,6 +807,9 @@
       isDragging = true;
       startY = e.clientY || (e.touches && e.touches[0].clientY) || 0;
       container.style.transition = 'none';
+      window.addEventListener('pointermove', onMove, { passive: false });
+      window.addEventListener('pointerup', onEnd);
+      window.addEventListener('pointercancel', onEnd);
     }
 
     function onMove(e) {
@@ -705,6 +825,10 @@
     function onEnd(e) {
       if (!isDragging) return;
       isDragging = false;
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onEnd);
+      window.removeEventListener('pointercancel', onEnd);
+
       var y = e.clientY || (e.changedTouches && e.changedTouches[0].clientY) || 0;
       var dy = y - startY;
       container.style.transition = 'transform 0.24s cubic-bezier(0.16, 1, 0.3, 1)';
@@ -716,9 +840,6 @@
     }
 
     handleZone.addEventListener('pointerdown', onStart);
-    window.addEventListener('pointermove', onMove, { passive: false });
-    window.addEventListener('pointerup', onEnd);
-    window.addEventListener('pointercancel', onEnd);
   }
 
   function populateDetailSheet(q, correctOptId) {
@@ -849,6 +970,11 @@
       currentY = startY;
 
       cardEl.style.transition = 'none';
+
+      // Pasang listener dinamis window saat gesture aktif (cegah memory leak)
+      window.addEventListener('pointermove', onPointerMove, { passive: false });
+      window.addEventListener('pointerup', onPointerEnd);
+      window.addEventListener('pointercancel', onPointerEnd);
     }
 
     function onPointerMove(e) {
@@ -969,6 +1095,11 @@
     }
 
     function onPointerEnd(e) {
+      // Lepas listener dinamis window seketika setelah pointer dilepas (cegah memory leak)
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onPointerEnd);
+      window.removeEventListener('pointercancel', onPointerEnd);
+
       if (!isPointerDown) return;
       isPointerDown = false;
 
@@ -1060,9 +1191,6 @@
 
     // Pasang Pointer Events yang mencakup mouse drag dan touch swipe
     cardEl.addEventListener('pointerdown', onPointerDown);
-    window.addEventListener('pointermove', onPointerMove, { passive: false });
-    window.addEventListener('pointerup', onPointerEnd);
-    window.addEventListener('pointercancel', onPointerEnd);
   }
 
   function prevListeningQuestion(animClass) {
@@ -1147,7 +1275,7 @@
         '<span class="jlpt-opt-badge">' + optId + '</span>' +
         '<div class="jlpt-opt-texts">' +
           '<div class="jlpt-opt-ja">' + escapeHtml(textJa) + '</div>' +
-          (textId ? '<div class="jlpt-opt-id">' + escapeHtml(textId) + '</div>' : '') +
+          (isAnswered && textId ? '<div class="jlpt-opt-id">' + escapeHtml(textId) + '</div>' : '') +
         '</div>' +
       '</button>';
     }).join('');
@@ -1194,13 +1322,16 @@
                 '📻 JEES' +
               '</button>'
             : '') +
+            '<button type="button" class="jlpt-speed-chip" id="jlptSpeedBtn" onclick="cycleAudioPlaybackRate()" title="Kecepatan Audio">' +
+              audioPlaybackRate.toFixed(1).replace(/\.0$/, '') + '×' +
+            '</button>' +
             '<span class="jlpt-replay-pill" id="jlptReplayPill"></span>' +
           '</div>' +
 
           '<!-- Typography Soal Jepang (Plus Jakarta Sans, Slate Gelap Kontras Tinggi) -->' +
           '<div class="jlpt-question-block">' +
             '<h3 class="jlpt-question-ja">' + escapeHtml(qJa) + '</h3>' +
-            (qId ? '<p class="jlpt-question-id">' + escapeHtml(qId) + '</p>' : '') +
+            (isAnswered && qId ? '<p class="jlpt-question-id">' + escapeHtml(qId) + '</p>' : '') +
           '</div>' +
 
           '<!-- 4 Kartu Pilihan Ganda Tactile Clay (48-54px) -->' +
@@ -1306,6 +1437,7 @@
   window.selectJlptChoice = selectJlptChoice;
   window.openJlptDetailSheet = openJlptDetailSheet;
   window.closeJlptDetailSheet = closeJlptDetailSheet;
+  window.cycleAudioPlaybackRate = cycleAudioPlaybackRate;
   window.switchJlptSheetTab = switchJlptSheetTab;
   window.prevListeningQuestion = prevListeningQuestion;
   window.nextListeningQuestion = nextListeningQuestion;
@@ -1318,6 +1450,7 @@
     playAi: togglePlayJlptPrimaryAudio,
     playJees: togglePlayJlptJeesAudio,
     playSpeech: playJlptSpeech,
+    cycleSpeed: cycleAudioPlaybackRate,
     stop: stopJlptAudio,
     openSheet: openJlptDetailSheet,
     closeSheet: closeJlptDetailSheet

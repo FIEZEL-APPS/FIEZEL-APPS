@@ -254,8 +254,8 @@
         },
         {
           "id": 2,
-          "text": "げんかんの くろい かさ",
-          "textId": "Payung hitam di genkan"
+          "text": "かさは もっていかない",
+          "textId": "Tidak membawa payung"
         },
         {
           "id": 3,
@@ -264,12 +264,12 @@
         },
         {
           "id": 4,
-          "text": "かさは もっていかない",
-          "textId": "Tidak membawa payung"
+          "text": "げんかんの くろい かさ",
+          "textId": "Payung hitam di genkan"
         }
       ],
-      "answerIndex": 1,
-      "explain": "Payung biru anak tersebut rusak (こわれている), dan ibunya menyuruh memakai payung hitam yang ada di genkan: \"げんかんの くろい かさを つかいなさい\". Anak menyetujuinya, sehingga ia membawa payung hitam (Pilihan 2).",
+      "answerIndex": 3,
+      "explain": "Payung biru anak tersebut rusak (こわれている), dan ibunya menyuruh memakai payung hitam yang ada di genkan: \"げんかんの くろい かさを つかいなさい\". Anak menyetujuinya, sehingga ia membawa payung hitam (Pilihan 4).",
       "vocabularyKey": [
         {
           "ja": "あめが ふる (ame ga furu)",
@@ -427,8 +427,8 @@
         },
         {
           "id": 2,
-          "text": "9時半 (くじはん)",
-          "textId": "Pukul 09:30"
+          "text": "6時半 (ろくじはん)",
+          "textId": "Pukul 18:30"
         },
         {
           "id": 3,
@@ -437,12 +437,12 @@
         },
         {
           "id": 4,
-          "text": "6時半 (ろくじはん)",
-          "textId": "Pukul 18:30"
+          "text": "9時半 (くじはん)",
+          "textId": "Pukul 09:30"
         }
       ],
-      "answerIndex": 1,
-      "explain": "Siswa memilih kelas pagi (あさのクラス). Resepsionis menyatakan kelas pagi dimulai pukul 9:30: \"あさの クラスは くじはんに はじまって\". 11:30 adalah waktu selesai (おわります), dan 18:30 adalah kelas malam. Jadi jawabannya 09:30 (Pilihan 2).",
+      "answerIndex": 3,
+      "explain": "Siswa memilih kelas pagi (あさのクラス). Resepsionis menyatakan kelas pagi dimulai pukul 9:30: \"あさの クラスは くじはんに はじまって\". 11:30 adalah waktu selesai (おわります), dan 18:30 adalah kelas malam. Jadi jawabannya 09:30 (Pilihan 4).",
       "vocabularyKey": [
         {
           "ja": "なんじから (nan-ji kara)",
@@ -1001,8 +1001,8 @@
         },
         {
           "id": 2,
-          "text": "かいそく電車",
-          "textId": "Kereta cepat (kaisoku)"
+          "text": "バス",
+          "textId": "Bus"
         },
         {
           "id": 3,
@@ -1011,12 +1011,12 @@
         },
         {
           "id": 4,
-          "text": "バス",
-          "textId": "Bus"
+          "text": "かいそく電車",
+          "textId": "Kereta cepat (kaisoku)"
         }
       ],
-      "answerIndex": 1,
-      "explain": "Wanita tidak terburu-buru (\"いそぎません\") karena waktu terbang masih 3 jam lagi. Petugas menyarankan kaisoku karena lebih murah: \"それなら、かいそくの ほうが やすくて いいですよ\". Maka ia memilih kereta cepat kaisoku (Pilihan 2).",
+      "answerIndex": 3,
+      "explain": "Wanita tidak terburu-buru (\"いそぎません\") karena waktu terbang masih 3 jam lagi. Petugas menyarankan kaisoku karena lebih murah: \"それなら、かいそくの ほうが やすくて いいですよ\". Maka ia memilih kereta cepat kaisoku (Pilihan 4).",
       "vocabularyKey": [
         {
           "ja": "とっきゅう / かいそく",
@@ -1229,8 +1229,8 @@
         },
         {
           "id": 2,
-          "text": "きんかくじ (Kinkakuji)",
-          "textId": "Kuil Emas Kinkakuji"
+          "text": "ぜんぶ いけた",
+          "textId": "Semua tempat sempat dikunjungi"
         },
         {
           "id": 3,
@@ -1239,12 +1239,12 @@
         },
         {
           "id": 4,
-          "text": "ぜんぶ いけた",
-          "textId": "Semua tempat sempat dikunjungi"
+          "text": "きんかくじ (Kinkakuji)",
+          "textId": "Kuil Emas Kinkakuji"
         }
       ],
-      "answerIndex": 1,
-      "explain": "Wanita tersebut menyatakan secara jelas: \"きんかくじは じかんが なくなって いけなかったの\" (Kinkakuji kehabisan waktu jadi tidak sempat pergi). Maka tempat yang batal dikunjungi adalah Kinkakuji (Pilihan 2).",
+      "answerIndex": 3,
+      "explain": "Wanita tersebut menyatakan secara jelas: \"きんかくじは じかんが なくなって いけなかったの\" (Kinkakuji kehabisan waktu jadi tidak sempat pergi). Maka tempat yang batal dikunjungi adalah Kinkakuji (Pilihan 4).",
       "vocabularyKey": [
         {
           "ja": "りょうほう (ryouhou)",
@@ -1534,8 +1534,8 @@
       "options": [
         {
           "id": 1,
-          "text": "10じからだよ。",
-          "textId": "Juuji kara da yo. (Mulai jam 10 kok.)"
+          "text": "きのうだったよ。",
+          "textId": "Kinou datta yo. (Kemarin kok.)"
         },
         {
           "id": 2,
@@ -1544,12 +1544,12 @@
         },
         {
           "id": 3,
-          "text": "きのうだったよ。",
-          "textId": "Kinou datta yo. (Kemarin kok.)"
+          "text": "10じからだよ。",
+          "textId": "Juuji kara da yo. (Mulai jam 10 kok.)"
         }
       ],
-      "answerIndex": 0,
-      "explain": "Pertanyaan berakhiran \"～だっけ\" menanyakan konfirmasi waktu yang lupa (\"なんじから\" - mulai jam berapa). Jawaban yang menyatakan waktu adalah \"10じからだよ\" (Mulai jam 10 - Pilihan 1). Pilihan 2 menjawab tempat.",
+      "answerIndex": 2,
+      "explain": "Pertanyaan berakhiran \"～だっけ\" menanyakan konfirmasi waktu yang lupa (\"なんじから\" - mulai jam berapa). Jawaban yang menyatakan waktu adalah \"10じからだよ\" (Mulai jam 10 - Pilihan 3). Pilihan 2 menjawab tempat.",
       "vocabularyKey": [
         {
           "ja": "かいぎ (kaigi)",
@@ -1580,13 +1580,13 @@
       "options": [
         {
           "id": 1,
-          "text": "いいえ、けっこうです。もう おなかいっぱいですから。",
-          "textId": "Iie, kekkou desu. Mou onaka ippai desu kara. (Tidak, terima kasih sudah cukup, saya sudah kenyang.)"
+          "text": "はい、いっぱいです。",
+          "textId": "Hai, ippai desu. (Ya, penuh.)"
         },
         {
           "id": 2,
-          "text": "はい、いっぱいです。",
-          "textId": "Hai, ippai desu. (Ya, penuh.)"
+          "text": "いいえ、けっこうです。もう おなかいっぱいですから。",
+          "textId": "Iie, kekkou desu. Mou onaka ippai desu kara. (Tidak, terima kasih sudah cukup, saya sudah kenyang.)"
         },
         {
           "id": 3,
@@ -1594,8 +1594,8 @@
           "textId": "Gochisousama deshita. (Terima kasih makanannya.)"
         }
       ],
-      "answerIndex": 0,
-      "explain": "Tawaran sopan \"いかがですか\" (Mau ... lagi?) jika ingin menolak secara santun diucapkan dengan \"いいえ、けっこうです\" (Iie, kekkou desu - Tidak terima kasih, sudah cukup - Pilihan 1).",
+      "answerIndex": 1,
+      "explain": "Tawaran sopan \"いかがですか\" (Mau ... lagi?) jika ingin menolak secara santun diucapkan dengan \"いいえ、けっこうです\" (Iie, kekkou desu - Tidak terima kasih, sudah cukup - Pilihan 2).",
       "vocabularyKey": [
         {
           "ja": "もう いっぱい (mou ippai)",

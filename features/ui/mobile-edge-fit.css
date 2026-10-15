@@ -3233,17 +3233,38 @@ html body #tutorStuck:active {
 
 /* JLPT Answer Feedback Banner */
 .jlpt-feedback-banner {
-  background: rgba(16, 185, 129, 0.16) !important;
-  border: 1px solid rgba(16, 185, 129, 0.4) !important;
   border-radius: 14px !important;
-  color: #FFFFFF !important;
 }
-.jlpt-feedback-banner * {
-  color: #FFFFFF !important;
+.jlpt-feedback-banner.correct {
+  background: #ECFDF5 !important;
+  border: 1.5px solid #A7F3D0 !important;
+  color: #065F46 !important;
 }
-.jlpt-feedback-link {
-  color: #FFE02E !important;
-  font-weight: 700 !important;
+.jlpt-feedback-banner.correct * {
+  color: #065F46 !important;
+}
+.jlpt-feedback-banner.wrong {
+  background: #FEF2F2 !important;
+  border: 1.5px solid #FECACA !important;
+  color: #991B1B !important;
+}
+.jlpt-feedback-banner.wrong * {
+  color: #991B1B !important;
+}
+.jlpt-fb-next-btn {
+  background: #10B981 !important;
+  color: #FFFFFF !important;
+  border: none !important;
+}
+.jlpt-fb-key-btn {
+  background: #FFFFFF !important;
+  color: #1E293B !important;
+  border: 1.5px solid #CBD5E1 !important;
+}
+.jlpt-replay-pill {
+  color: #7A5F1B !important;
+  background: #FEF3C7 !important;
+  border: 1px solid #FDE68A !important;
 }
 
 /* JLPT Bottom Sheet Drawer */
@@ -3255,95 +3276,96 @@ html body #tutorStuck:active {
 }
 .jlpt-sheet-container {
   z-index: 2700 !important;
-  background: #14141E !important;
-  border-top: 1.5px solid rgba(255, 255, 255, 0.12) !important;
-  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.75) !important;
-  color: #F8FAFC !important;
+  background: #FFFDF9 !important;
+  border-top: 1.5px solid #E8DFD3 !important;
+  box-shadow: 0 -12px 38px rgba(36, 26, 17, 0.18) !important;
+  color: #0F172A !important;
 }
 
 .jlpt-sheet-header {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  background: #FFFDF9 !important;
+  border-bottom: 1.5px solid #E8DFD3 !important;
 }
 .jlpt-sheet-title {
-  color: #FFFFFF !important;
+  color: #0F172A !important;
   font-weight: 800 !important;
 }
 .jlpt-sheet-subtitle {
-  color: #94A3B8 !important;
+  color: #7A6F64 !important;
 }
 .jlpt-sheet-close {
-  background: #202032 !important;
-  color: #FFFFFF !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  background: #FAF6EF !important;
+  color: #1E293B !important;
+  border: 1.5px solid #E8DFD3 !important;
   border-radius: 999px !important;
 }
 
 /* JLPT Sheet Tabs */
 .jlpt-sheet-tabs {
-  background: #181826 !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  background: #FAF6EF !important;
+  border: 1.5px solid #E8DFD3 !important;
 }
 .jlpt-tab-chip,
 .jlpt-sheet-tab-btn {
-  background: #202032 !important;
-  color: #94A3B8 !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  background: #FFFDF9 !important;
+  color: #64748B !important;
+  border: 1px solid #E8DFD3 !important;
 }
 .jlpt-sheet-tab-btn:hover {
-  color: #FFFFFF !important;
+  color: #0F172A !important;
 }
 .jlpt-tab-chip.active,
 .jlpt-sheet-tab-btn.active {
-  background: #FFE02E !important;
-  color: #101018 !important;
+  background: #241A11 !important;
+  color: #FFD94F !important;
   font-weight: 800 !important;
-  border-color: #F59E0B !important;
+  border-color: #18110A !important;
 }
 .jlpt-sheet-tab-count {
-  background: rgba(255, 255, 255, 0.12) !important;
-  color: #FFFFFF !important;
+  background: rgba(36, 26, 17, 0.08) !important;
+  color: #1E293B !important;
 }
 .jlpt-sheet-tab-btn.active .jlpt-sheet-tab-count {
-  background: #0F172A !important;
-  color: #FFE02E !important;
+  background: #FFD94F !important;
+  color: #101018 !important;
 }
 
 /* JLPT Sheet Naskah Tab */
 .jlpt-transcript-tag {
-  background: #1E1E2C !important;
-  color: #38BDF8 !important;
-  border: 1px solid rgba(56, 189, 248, 0.3) !important;
+  background: #FAF6EF !important;
+  color: #0284C7 !important;
+  border: 1px solid rgba(2, 132, 199, 0.25) !important;
   border-radius: 6px !important;
 }
 .jlpt-dialogue-turn {
   background: transparent !important;
 }
 .jlpt-turn-bubble {
-  background: #1C1C2C !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  background: #FAF6EF !important;
+  border: 1.5px solid #E8DFD3 !important;
   border-radius: 12px !important;
 }
 .jlpt-bubble-ja {
-  color: #FFFFFF !important;
+  color: #0F172A !important;
   font-weight: 700 !important;
 }
 .jlpt-bubble-ro {
-  color: #94A3B8 !important;
+  color: #64748B !important;
 }
 .jlpt-bubble-id {
-  color: #CBD5E1 !important;
-  border-top: 1px dashed rgba(255, 255, 255, 0.12) !important;
+  color: #334155 !important;
+  border-top: 1px dashed #E8DFD3 !important;
 }
 
 /* JLPT Sheet Pembahasan Tab */
 .jlpt-explain-article {
-  background: #1C1C2C !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  background: #FAF6EF !important;
+  border: 1.5px solid #E8DFD3 !important;
   border-radius: 14px !important;
-  color: #F8FAFC !important;
+  color: #0F172A !important;
 }
 .jlpt-explain-article-title {
-  color: #FFE02E !important;
+  color: #0F172A !important;
   font-weight: 800 !important;
 }
 .jlpt-explain-body {
@@ -3381,20 +3403,20 @@ html body #tutorStuck:active {
 
 /* JLPT Sheet Kosakata Tab */
 .jlpt-vocab-card-item {
-  background: #1C1C2C !important;
-  border: 1.5px solid rgba(255, 255, 255, 0.08) !important;
+  background: #FFFDF9 !important;
+  border: 1.5px solid #E8DFD3 !important;
   border-radius: 12px !important;
 }
 .jlpt-vocab-card-item:hover {
-  background: #252538 !important;
-  border-color: rgba(255, 255, 255, 0.15) !important;
+  background: #FAF6EF !important;
+  border-color: #D8CEBF !important;
 }
 .jlpt-vocab-term {
-  color: #FFE02E !important;
+  color: #0F172A !important;
   font-weight: 800 !important;
 }
 .jlpt-vocab-meaning {
-  color: #CBD5E1 !important;
+  color: #475569 !important;
 }
 
 /* ==========================================================================
@@ -3435,9 +3457,6 @@ html body #tutorStuck:active {
 .fsl-mascot,
 .fsl-player fiezel-mascot,
 .fsl-card fiezel-mascot,
-.jlpt-mascot-slot,
-.jlpt-mascot,
-.jlpt-mascot-slot fiezel-mascot,
 fiezel-mascot:has(.fz-mochi-viewport),
 .fz-paw-slot:has(.fz-mochi-viewport) {
   display: flex !important;

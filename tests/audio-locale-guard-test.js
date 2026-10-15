@@ -41,7 +41,7 @@ const collect = (dir) => {
     else if (e.name.endsWith('.js')) AUDIO_ZONES.push(p);
   }
 };
-['features/neural-voice', 'features/audio', 'features/audio-assets', 'workers/api/tts'].forEach(collect);
+['features/neural-voice', 'features/audio', 'features/audio-assets', 'workers/api/tts', 'features/speaking-listening'].forEach(collect);
 
 // 1. m025-232: BOUNDARY-NYA SENDIRI YANG DIHAPUS, dan gerbangnya ikut naik kelas.
 //
@@ -94,7 +94,9 @@ const EXEMPT = new Set([
   'features/neural-voice/fiezel-cf-voice-notice.js'
 ]);
 for (const f of AUDIO_ZONES) {
-  if (EXEMPT.has(f)) continue;
+  // features/speaking-listening adalah antarmuka murid yang sah memakai FiezelI18n untuk salinan UI;
+  // penjagaan bebas speechSynthesis tetap ditegakkan penuh di Check 1.
+  if (EXEMPT.has(f) || f.startsWith('features/speaking-listening/')) continue;
   const hit = read(f).match(FORBIDDEN);
   check(`zona audio bersih: ${f}`, !hit, hit ? `menyebut ${hit[1]}` : '');
 }
