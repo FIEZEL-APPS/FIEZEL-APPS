@@ -95,3 +95,10 @@ Dalam rilis `m025-581`, seluruh 4 pilar arsitektur sosial FIEZEL telah diperbaik
 - `tools/dev/probe-friend-flow.mjs`
 - `tests/subagent1-backend-audit-test.js`
 - `tests/social-concurrency-test.js`
+
+---
+
+## 4. Langkah Berikutnya (Roadmap & Pemantauan)
+
+1. Memantau telemetri metrik retensi dan utilisasi penulisan D1 Cloudflare setelah rilis.
+2. Memperluas probe Playwright berkala untuk memvalidasi performa sinkronisasi antar-tab di lingkungan produksi.
