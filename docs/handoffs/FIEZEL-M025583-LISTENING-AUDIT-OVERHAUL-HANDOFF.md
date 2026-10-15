@@ -1,11 +1,11 @@
 # FIEZEL · Handoff Dossier Build m025-583
 ## Audit & Remediasi Menyeluruh Sesi Listening PWA Fiezel
 
-**Nomor Rilis:** `m025-583`  
-**Cakupan:** `fix(listening): overhaul total UI/UX, braincore sync, audio offline, and exam anti-leak`  
-**Waktu Rilis:** 16 Oktober 2026  
-**Branch:** `feat/listening-audit-overhaul`  
-**Target Penggabungan:** `main` (melalui Pull Request sesuai *Git Protection Rule*)
+- **Nomor Rilis:** `m025-583`
+- **Cakupan:** `fix(listening): overhaul total UI/UX, braincore sync, audio offline, and exam anti-leak`
+- **Waktu Rilis:** 16 Oktober 2026
+- **Branch:** `feat/listening-audit-overhaul`
+- **Target Penggabungan:** `main` (melalui Pull Request sesuai *Git Protection Rule*)
 
 ---
 
