@@ -114,6 +114,7 @@
     'social.deeplink-success-title': 'Kalian sekarang teman belajar 🎉',
     'social.deeplink-success-body': '@{handle} sudah masuk daftar temanmu. Saling sorak, saling kejar Poin Bukti mingguan.',
     'social.deeplink-duel-btn': 'Main Duel Belajar',
+    'social.deeplink-desc': 'Tantang temanmu dalam duel belajar 8 soal berwaktu untuk menguji penguasaan materi.',
     'social.deeplink-open-btn': 'Lihat teman',
     'social.deeplink-offline': 'Kamu sedang offline. Undangannya aku simpan — buka lagi nanti saat tersambung, kodenya tidak hilang.',
     'social.deeplink-flag-off': 'Fitur online belum aktif. Undangannya aku simpan sampai fiturnya menyala — semua belajarmu tetap jalan seperti biasa.',
