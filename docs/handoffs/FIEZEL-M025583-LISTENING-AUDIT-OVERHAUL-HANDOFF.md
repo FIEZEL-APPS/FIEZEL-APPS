@@ -83,18 +83,22 @@ Seluruh perbaikan telah divalidasi menggunakan skrip probe Chromium headless Pla
     - Memperbarui baseline emas untuk menyertakan fallback i18n yang ditambahkan secara sah.
 12. **`coordination/BUILD-VERSION.json`, `sw.js`, `core-config.js`, `features/neural-voice/fiezel-diag-panel.js`, `kurikulum.html`, `misi.html`**:
     - Hexa-sync build dinaikkan dari `m025-582` ke `m025-583`.
+13. **`features/i18n/copy-id-bahasa.js` & `features/i18n/copy-th-bahasa.js`**:
+    - Mendaftarkan kunci `jlpt.key-locked-title` dan `jlpt.key-locked-desc` (Indonesia & Thai) untuk mencegah nama kunci mentah tampil di layar dan memenuhi gerbang `tests/i18n-kunci-hantu-test.js`.
 
 ---
 
 ### 4. Status Kelulusan Gerbang Mutu Lokal
 
-Seluruh 9 gerbang mutu lolos dengan predikat **100% HIJAU (PASS)**:
+Seluruh 11 gerbang mutu lolos dengan predikat **100% HIJAU (PASS)**:
 - `node tests/audio-locale-guard-test.js` -> PASS (Audio tetap locale-independent dan bebas TTS browser)
 - `node tests/speaking-listening-test.js` -> PASS (45/0 pemeriksaan lolos)
 - `node tests/listening-exam-test.js` -> PASS (38/0 pemeriksaan lolos)
 - `node tests/chokai-multi-voice-protocol-test.js` -> PASS (30 soal, multi-voice protocol tervalidasi)
 - `node tests/gems-test.js` -> PASS (34 pemeriksaan lolos)
 - `node tests/th-ui-leak-test.js` -> PASS (Bebas kebocoran teks non-i18n di mode Thai)
+- `node tests/th-coverage-test.js` -> PASS (258/258 paritas kamus ID-TH penuh)
+- `node tests/i18n-kunci-hantu-test.js` -> PASS (Semua t('kunci') terdaftar resmi, 0 kunci hantu)
 - `node tests/id-golden-snapshot-test.js` -> PASS (Baseline emas Indonesia utuh)
 - `node tests/curriculum-cache-version-test.js` -> PASS (26 penegasan selaras di build m025-583)
 - `node tests/gate-registry-test.js` -> PASS (10/0 pemeriksaan registry lolos)

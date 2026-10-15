@@ -672,7 +672,7 @@
       return '<div class="jlpt-explain-panel">' +
         '<div class="jlpt-key-card" style="text-align:center;padding:24px 16px;">' +
           '<div style="font-size:28px;margin-bottom:8px;">🔒</div>' +
-          '<div style="font-weight:700;font-size:15px;color:#2D241E;margin-bottom:6px;">' + t('jlpt.key-locked-title', 'Kunci &amp; Pembahasan Terkunci') + '</div>' +
+          '<div style="font-weight:700;font-size:15px;color:#2D241E;margin-bottom:6px;">' + t('jlpt.key-locked-title', 'Kunci & Pembahasan Terkunci') + '</div>' +
           '<p style="font-size:13px;color:#7A6F64;margin:0;line-height:1.5;">' + t('jlpt.key-locked-desc', 'Pilih salah satu jawaban pada kartu soal terlebih dahulu untuk membuka kunci resmi dan analisis lengkap.') + '</p>' +
         '</div>' +
       '</div>';

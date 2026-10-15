@@ -95,6 +95,8 @@
     'jlpt.wrong-title': 'ยังไม่ถูกต้อง',
     'jlpt.play-audio': 'เล่นเสียง',
     'jlpt.pause-audio': 'หยุดชั่วคราว',
+    'jlpt.key-locked-title': 'เฉลยและคำอธิบายถูกล็อค',
+    'jlpt.key-locked-desc': 'โปรดเลือกคำตอบบนการ์ดคำถามก่อนเพื่อปลดล็อคเฉลยและบทวิเคราะห์',
     'speaker.instructor': 'ผู้บรรยาย',
     'speaker.female': 'ผู้หญิง',
     'speaker.mother': 'ผู้หญิง (แม่)',
