@@ -37,7 +37,7 @@
 .fsl-q-feedback small{opacity:.85;line-height:1.45}
 .fsl-option.is-picked{outline:2px solid var(--accent,#c2402c);outline-offset:1px}
 .fsl-notes-label{display:grid;gap:5px;margin:12px 0 0;font-size:.79rem;font-weight:650}
-.fsl-notes{width:100%;font:inherit;font-weight:400;padding:9px 11px;border-radius:12px;border:1px solid var(--line,#eadfce);resize:vertical}
+.fsl-notes{width:100%;font:inherit;font-weight:400;padding:8px 10px;border-radius:12px;border:1px solid var(--line,#eadfce);min-height:60px;max-height:100px;resize:vertical}
 .fsl-exam-result{margin:10px 0 0}
 .fsl-script{margin:10px 0 0;font-size:.8rem}
 .fsl-script pre{white-space:pre-wrap;line-height:1.55;padding:11px;border-radius:12px;background:rgba(0,0,0,.05);font:inherit;font-size:.8rem;max-height:340px;overflow:auto}
@@ -148,12 +148,12 @@ body.fz-stage-sl.fsl-session-active .fsl-card-listening>h2 {
 /* 2. ERGONOMI TOMBOL KELUAR: Ikon silang ✕ di pojok kanan atas kartu */
 .fsl-exit-btn {
   position: absolute !important;
-  top: 14px !important;
-  right: 14px !important;
-  width: 36px !important;
-  height: 36px !important;
-  min-height: 36px !important;
-  max-height: 36px !important;
+  top: 12px !important;
+  right: 12px !important;
+  width: 44px !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  max-height: 44px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;

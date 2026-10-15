@@ -715,10 +715,13 @@
         button.disabled=true;this.replays++;
         const stage=this.root.querySelector('.fsl-player');
         if(stage&&stage.classList&&stage.classList.add)stage.classList.add('is-playing');
+        let ttsTimer;
         try{
           const playing=this.tts.play(item.script,{voice:item.voice,rate:this.config.ttsRate,suppressSubtitles:true});
           this.prefetchNextScript();
-          const result=await Promise.race([playing,new Promise((_,reject)=>setTimeout(()=>reject(new Error('tts_timeout')),TTS_TIMEOUT_MS))]);
+          const timeoutPromise=new Promise((_,reject)=>{ttsTimer=setTimeout(()=>reject(new Error('tts_timeout')),TTS_TIMEOUT_MS)});
+          const result=await Promise.race([playing,timeoutPromise]);
+          clearTimeout(ttsTimer);
           if(result===false||result==null)throw new Error('tts_silent');
           this.noAudio=false;
           this.root.querySelector('[data-work]').disabled=false;
@@ -726,6 +729,7 @@
           const chip=this.root.querySelector('[data-replays]');if(chip)chip.textContent=T('fsl.replays-count',{count:this.replays});this.root.querySelectorAll?.('[data-replays]').forEach?.(c=>{c.textContent=T('fsl.replays-count',{count:this.replays});});
           this.setFeedback(T('fsl.replay-status',{current:this.replays,limit:limit}));
         }catch(_){
+          clearTimeout(ttsTimer);
           /* m026-BUG1 (cf-b4 §5.2, CF-MIGRATION §Ringkasan). Kegagalan pemutaran BUKAN
              pemakaian replay. Sebelum baris ini, this.replays++ dijalankan di luar try dan
              tidak pernah dikembalikan: DUA kegagalan TTS berturut-turut membuat
@@ -859,7 +863,7 @@
           : `<input class="fsl-input" data-q="${index}" autocomplete="off" spellcheck="false" placeholder="${esc(T('fsl.freeform-placeholder'))}">`;
         return `<li class="fsl-exam-q" data-question="${index}"><p><b>${index+1}.</b> ${esc(question.prompt)}</p>${body}<div class="fsl-q-feedback" data-q-feedback="${index}"></div></li>`;
       }).join('');
-      this.root.innerHTML=`${T('skillslab.practice-ujian-audio-diputar-saja',{progress:progress,level:esc(set.level),slMascotStripMarkup:slMascotStripMarkup(),label:esc(format.label||''),allowedReplays:allowedReplays,length:questions.length,note:esc(format.note||''),title:esc(set.title||''),listeningHonesty:esc(this.repo.listeningHonestyText()),label2:visibleDuringAudio?'':'<label class="fsl-notes-label">'+esc(T('fsl.notes-label'))+'<textarea class="fsl-notes" data-notes rows="5" placeholder="'+esc(T('fsl.notes-placeholder'))+'"></textarea></label>',hidden:visibleDuringAudio?'':' hidden',questionMarkup:questionMarkup})}`;
+      this.root.innerHTML=`${T('skillslab.practice-ujian-audio-diputar-saja',{progress:progress,level:esc(set.level),slMascotStripMarkup:slMascotStripMarkup(),label:esc(format.label||''),allowedReplays:allowedReplays,length:questions.length,note:esc(format.note||''),title:esc(set.title||''),listeningHonesty:esc(this.repo.listeningHonestyText()),label2:visibleDuringAudio?'':'<label class="fsl-notes-label">'+esc(T('fsl.notes-label'))+'<textarea class="fsl-notes" data-notes rows="3" placeholder="'+esc(T('fsl.notes-placeholder'))+'"></textarea></label>',hidden:visibleDuringAudio?'':' hidden',questionMarkup:questionMarkup})}`;
 
       const responses=new Array(questions.length).fill(undefined);
       const work=this.root.querySelector('[data-work]');
