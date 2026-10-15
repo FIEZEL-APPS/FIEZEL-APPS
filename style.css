@@ -8124,6 +8124,14 @@ header.topbar {
   box-shadow: 0 3px 0 #CBD5E1 !important;
   cursor: pointer !important;
   white-space: nowrap !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  width: auto !important;
+  min-width: auto !important;
+  flex-shrink: 0 !important;
+  line-height: 1 !important;
+  transition: all 0.12s ease !important;
+  overflow: visible !important;
 }
 
 #fzCourseSwitchBtn[style*="display: none"],
@@ -8134,15 +8142,6 @@ header.topbar {
 #topGamifyCluster[style*="display: none"],
 #topGamifyCluster[style*="display:none"] {
   display: none !important;
-}
-  height: 36px !important;
-  min-height: 36px !important;
-  width: auto !important;
-  min-width: auto !important;
-  flex-shrink: 0 !important;
-  line-height: 1 !important;
-  transition: all 0.12s ease !important;
-  overflow: visible !important;
 }
 
 .topbar .btn-course-selector:hover,
@@ -8702,8 +8701,11 @@ body:has(.home-today) #modalPanel h2,
   color: #FFFFFF !important;
 }
 
-.modal-panel p {
-  color: #8E8E98 !important;
+.modal-panel p,
+#modalPanel p,
+.modal-panel .muted,
+#modalPanel .muted {
+  color: #94A3B8 !important;
 }
 
 .modal-panel .text-button,
@@ -8718,6 +8720,27 @@ body:has(.home-today) #modalPanel h2,
 #modalPanel .text-button:hover {
   color: #FFFFFF !important;
   background: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Recovery kontras: tombol "Tolak" pada kartu permintaan teman (di atas kartu putih #F8FAFC ganti teks kuning jadi slate 500/600 #64748B, kontras > 5:1 AA) */
+.modal-panel #connectRequestsList .text-button,
+#modalPanel #connectRequestsList .text-button,
+.modal-panel .social-request-row .text-button,
+#modalPanel .social-request-row .text-button,
+.social-request-acts .text-button,
+#connectRequestsList .text-button {
+  color: #64748B !important;
+  background: transparent !important;
+}
+
+.modal-panel #connectRequestsList .text-button:hover,
+#modalPanel #connectRequestsList .text-button:hover,
+.modal-panel .social-request-row .text-button:hover,
+#modalPanel .social-request-row .text-button:hover,
+.social-request-acts .text-button:hover,
+#connectRequestsList .text-button:hover {
+  color: #334155 !important;
+  background: #E2E8F0 !important;
 }
 
 .modal-panel .notif-item.is-teacher,
@@ -11024,10 +11047,90 @@ body.fz-view-classroom header.topbar #topGamifyCluster {
   color: #CBD5E1 !important;
 }
 
-.modal-panel.modal-connect-panel {
-  padding: 16px 16px 12px !important;
+.modal-panel.modal-connect-panel,
+#modalPanel.modal-connect-panel {
+  padding: 16px 16px 16px !important;
+  padding-bottom: max(16px, env(safe-area-inset-bottom, 16px)) !important;
   max-width: 360px !important;
   max-height: 92vh !important;
+}
+
+/* Kontras WCAG AAA: Kode Undangan & Teman di dalam modal gelap (#14141C) */
+.modal-panel .social-code,
+#modalPanel .social-code {
+  background: rgba(255, 200, 0, 0.12) !important;
+  border: 1.5px solid #FFC800 !important;
+  color: #FFDE43 !important;
+}
+
+/* Modal handle ID: pill kontras tinggi (#FFF9E6 teks #111118, kontras > 16:1 AAA) */
+.modal-panel .fz2-myid,
+#modalPanel .fz2-myid,
+.modal-connect-panel .fz2-myid {
+  background: #FFF9E6 !important;
+  color: #111118 !important;
+  padding: 4px 12px !important;
+  border-radius: 999px !important;
+  border: 1.5px solid rgba(255, 200, 0, 0.45) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-weight: 800 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+  letter-spacing: 0.02em !important;
+}
+
+/* Ergonomi Touch Target: Segmented Nav Modal (min-height 40px, padding 8px 4px) */
+.connect-segmented-nav button {
+  min-height: 40px !important;
+  padding: 8px 4px !important;
+  font-size: 11px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Ergonomi Touch Target: Tombol Salin ID (min-height >= 36px, padding 6px 12px) */
+.btn-copy-code {
+  min-height: 36px !important;
+  padding: 6px 12px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+}
+
+/* Ergonomi Touch Target: Baris Permintaan Teman (min-height 40px, padding 8px 14px, gap 10px) */
+.social-request-acts,
+#connectRequestsList [style*="flex-shrink:0"],
+#connectRequestsList div:has(> button) {
+  gap: 10px !important;
+}
+
+.social-request-acts button,
+.social-request-acts .text-button,
+.social-request-acts .primary,
+#connectRequestsList button.text-button,
+#connectRequestsList button.primary,
+#connectRequestsList [onclick*="decideFriendRequest"] {
+  min-height: 40px !important;
+  padding: 8px 14px !important;
+  font-size: 11.5px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Pencegahan Horizontal Layout Blowout pada layar sempit */
+@media (max-width: 400px) {
+  .social-friend {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+  .social-friend-acts {
+    width: 100% !important;
+    justify-content: flex-end !important;
+  }
 }
 
 .fz3-qr {

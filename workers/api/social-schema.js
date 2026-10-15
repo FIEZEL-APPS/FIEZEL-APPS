@@ -124,6 +124,7 @@ export function ensureSocialSchema(db) {
         /* eslint-disable no-await-in-loop */
         await db.prepare(statement).run();
       }
+      await db.prepare('CREATE INDEX IF NOT EXISTS idx_social_friend_b ON social_friend (b, a, since_day)').run();
       return true;
     })();
     ENSURED.set(db, pending);

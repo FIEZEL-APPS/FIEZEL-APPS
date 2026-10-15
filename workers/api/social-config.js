@@ -157,6 +157,25 @@ export const SOCIAL_FEATURE_SPEC = Object.freeze({
   })
 });
 
+/** Aturan retensi lapisan sosial (pembersihan berkala D1 di route-social.js). */
+export const RETENTION_RULES = Object.freeze({
+  INVITE_DAYS: 7,
+  MILESTONE_DAYS: 14,
+  RANK_JTI_DAYS: 7,
+  COUNTER_DAYS: 14,
+  CHEER_DAYS: 7
+});
+
+/** Aturan batasan laju & pertemanan lapisan sosial. */
+export const RATE_LIMIT_RULES = Object.freeze({
+  CHEER_PER_FRIEND_PER_DAY: 5,
+  CHEER_RETRY_AFTER_S: 3600,
+  MAX_BATCHES_PER_DAY: 40,
+  MAX_ACTIVE_INVITES_PER_USER: 3,
+  FRIENDS_MAX: 50,
+  REQUESTS_MAX: 50
+});
+
 export const SOCIAL_CONFIG = Object.freeze({
   SCHEMA: 'fiezel-social-config-v1',
   HANDLE_RULES,
@@ -173,7 +192,9 @@ export const SOCIAL_CONFIG = Object.freeze({
   MILESTONE_KINDS,
   EVIDENCE_RULES,
   COHORT_RULES,
-  SOCIAL_FEATURE_SPEC
+  SOCIAL_FEATURE_SPEC,
+  RETENTION_RULES,
+  RATE_LIMIT_RULES
 });
 
 export default SOCIAL_CONFIG;

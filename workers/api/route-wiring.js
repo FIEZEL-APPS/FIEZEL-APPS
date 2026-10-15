@@ -79,6 +79,7 @@ import { purgeEvidence } from './evidence/evidence-store-d1.js';
 import { purgeLearnerEvidence } from './evidence/learner-evidence-store-d1.js';
 import { registerItemPoolRoutes } from './evidence/route-item-pool.js';
 import { purgeItemPool } from './evidence/item-pool-store-d1.js';
+import { runSocialRetentionPurge } from './route-social.js';
 import { jsonResponse, jsonError, unauthenticated, ERR } from './errors.js';
 // A3: pencatat hasil cron. Satu-satunya alasan berkas ini diubah paket kerja A3.
 import { withCronRun, CRON_JOBS } from './cron-status.js';
@@ -891,13 +892,36 @@ export async function runLearnerEvidencePurge(env, now) {
   return purgeLearnerEvidence(db, today);
 }
 
+/**
+ * (e) Purge retensi lapisan sosial (CORE_DB):
+ *     - social_invite (> 7 hari)
+ *     - milestone_feed (> 14 hari)
+ *     - rank_jti (> 7 hari)
+ *     - social_counter (> 14 hari)
+ *     - cheer_feed (> 7 hari)
+ */
+export async function runSocialPurge(env, now) {
+  return runSocialRetentionPurge(env, now);
+}
+
+export { runSocialRetentionPurge };
+
 export const CRON_QUOTA_SWEEP = '*/5 * * * *';
 export const CRON_ANALYTICS_ROLLUP = '5 17 * * *';
 
 export async function runScheduled(event, env, executionCtx, now) {
   const cron = String((event && event.cron) || '');
   const at = Number.isFinite(now) ? now : Number((event && event.scheduledTime)) || Date.now();
-  const out = { cron, quotaSweep: null, analyticsRollup: null, evidencePurge: null, learnerEvidencePurge: null, itemPool: null };
+  const out = {
+    cron,
+    quotaSweep: null,
+    analyticsRollup: null,
+    evidencePurge: null,
+    learnerEvidencePurge: null,
+    itemPool: null,
+    socialPurge: null,
+    socialRetentionPurge: null
+  };
 
   const wantSweep = cron === CRON_QUOTA_SWEEP || cron !== CRON_ANALYTICS_ROLLUP;
   const wantRollup = cron === CRON_ANALYTICS_ROLLUP || cron !== CRON_QUOTA_SWEEP;
@@ -934,6 +958,16 @@ export async function runScheduled(event, env, executionCtx, now) {
     try {
       out.itemPool = await runItemPoolRollup(env, at);
     } catch (e) { out.itemPool = { error: e && e.name }; }
+    // Retensi lapisan sosial (CORE_DB): irama harian yang sama, kegagalan sendiri.
+    try {
+      const socialRes = await runSocialRetentionPurge(env, at);
+      out.socialPurge = socialRes;
+      out.socialRetentionPurge = socialRes;
+    } catch (e) {
+      const err = { error: e && e.name };
+      out.socialPurge = err;
+      out.socialRetentionPurge = err;
+    }
   }
   return out;
 }

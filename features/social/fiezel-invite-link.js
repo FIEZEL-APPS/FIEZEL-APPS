@@ -104,7 +104,11 @@
    * TIDAK memvalidasi — itu tugas `isServerShaped`/`isMintShaped`.
    */
   function normalizeCode(raw) {
-    return String(raw == null ? '' : raw).toUpperCase().replace(/[^A-Z0-9]/g, '');
+    return String(raw == null ? '' : raw)
+      .toUpperCase()
+      .replace(/0/g, 'O')
+      .replace(/[1L]/g, 'I')
+      .replace(/[^A-Z0-9]/g, '');
   }
   /** Bentuk yang server terima (kode yang diketik murid lewat jalur ini). */
   function isServerShaped(code) { return SERVER_RE.test(String(code || '')); }
@@ -116,9 +120,10 @@
   function paramFrom(text, name) {
     // Menangkap `?invite=X`, `&invite=X`, dan `#invite=X` di mana pun dalam teks —
     // termasuk di tengah kalimat WhatsApp, di mana tidak ada URL yang bisa di-parse.
-    var re = new RegExp('[?&#]' + name + '=([A-Za-z0-9_-]{1,64})');
+    var re = new RegExp('(?:[?&#]|^)' + name + '=([@%A-Za-z0-9_.-]{1,64})');
     var hit = re.exec(String(text || ''));
-    return hit ? hit[1] : '';
+    if (!hit) return '';
+    try { return decodeURIComponent(hit[1]); } catch (_) { return hit[1]; }
   }
 
   /**
@@ -137,6 +142,15 @@
 
     var duel = paramFrom(s, 'duel');
     if (duel && duel.length >= 8) return { kind: KIND_DUEL, code: duel, source: 'param' };
+
+    var friend = paramFrom(s, 'friend');
+    if (friend) {
+      friend = friend.replace(/[.,!?:;]+$/, '');
+      if (/^@?[A-Za-z0-9_]{3,20}$/.test(friend)) {
+        var handle = friend.charAt(0) === '@' ? friend : '@' + friend;
+        return { kind: KIND_FRIEND, code: handle, source: 'param' };
+      }
+    }
 
     var invite = normalizeCode(paramFrom(s, 'invite'));
     if (isServerShaped(invite)) return { kind: KIND_FRIEND, code: invite, source: 'param' };
@@ -170,6 +184,10 @@
       var q = s.indexOf('?');
       if (q < 0) return null;
       var params = new root.URLSearchParams(s.slice(q + 1).split('#')[0]);
+      if (params.has('friend')) {
+        var directFriend = extract('?friend=' + params.get('friend'));
+        if (directFriend) return directFriend;
+      }
       var fields = ['text', 'url', 'title'];
       for (var i = 0; i < fields.length; i += 1) {
         var value = params.get(fields[i]);
@@ -301,7 +319,7 @@
       });
       // ?url= hanya dibuang kalau ia memang muatan share sheet — bukan parameter lain
       // yang kebetulan bernama sama.
-      if (url.searchParams.has('url') && url.searchParams.has('share-target') === false && /invite=/.test(String(url.searchParams.get('url') || ''))) {
+      if (url.searchParams.has('url') && (/invite=/.test(String(url.searchParams.get('url') || '')) || /friend=/.test(String(url.searchParams.get('url') || '')))) {
         url.searchParams.delete('url'); touched = true;
       }
       if (/[?&#]invite=/.test(url.hash)) { url.hash = ''; touched = true; }
@@ -319,14 +337,33 @@
     var options = opts || {};
     var found = fromLocation(options.href);
     if (found && found.kind === KIND_FRIEND) {
-      setPending(found, options.now);
-      if (options.clean !== false) cleanUrl(options.replaceState);
+      if (String(found.code || '').charAt(0) === '@') {
+        if (options.clean !== false) promoteFriendUrl(found.code, options.replaceState);
+      } else {
+        setPending(found, options.now);
+        if (options.clean !== false) cleanUrl(options.replaceState);
+      }
     } else if (found && found.kind === KIND_DUEL && options.clean !== false) {
       // Duel dari share sheet: kodenya ada di ?text=, bukan di ?duel= yang dibaca
       // alur Duel. Alamat ditulis ulang ke bentuk yang alur itu mengerti.
       promoteDuelUrl(found.code, options.replaceState);
     }
     return pending(options.now);
+  }
+
+  function promoteFriendUrl(code, replaceState) {
+    try {
+      var loc = root.location; if (!loc) return false;
+      var history = root.history;
+      var replace = replaceState || (history && history.replaceState && history.replaceState.bind(history));
+      if (typeof replace !== 'function') return false;
+      var url = new root.URL(loc.href);
+      if (url.searchParams.get('friend') === code) return false;
+      ['text', 'title', 'url', 'share-target'].forEach(function (n) { url.searchParams.delete(n); });
+      url.searchParams.set('friend', String(code || ''));
+      replace(null, '', url.pathname + (url.search || '') + (url.hash || ''));
+      return true;
+    } catch (_) { return false; }
   }
 
   function promoteDuelUrl(code, replaceState) {
@@ -365,6 +402,8 @@
     inviteUrl: inviteUrl,
     sharePayload: sharePayload,
     cleanUrl: cleanUrl,
+    promoteFriendUrl: promoteFriendUrl,
+    promoteDuelUrl: promoteDuelUrl,
     _pendingKey: PENDING_KEY,
     _handledKey: HANDLED_KEY
   });

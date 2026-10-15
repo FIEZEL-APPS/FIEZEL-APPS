@@ -2245,12 +2245,24 @@ span.social-avatar,
 .card div > span.social-avatar {
   background: #FFE02E !important;
   color: #101018 !important;
-  font-weight: 900 !important;
+  font-weight: 800 !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
   border-radius: 50% !important;
   border: none !important;
+}
+
+/* Pencegahan Horizontal Layout Blowout pada layar sempit (<= 400px) */
+@media (max-width: 400px) {
+  .social-friend {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+  .social-friend-acts {
+    width: 100% !important;
+    justify-content: flex-end !important;
+  }
 }
 
 /* Class Hub Badges (Zero white-on-yellow) */

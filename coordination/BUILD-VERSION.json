@@ -1,7 +1,7 @@
 {
-  "version": "m025-580",
-  "claimedBy": "branch main",
-  "claimedAt": "2026-10-13T14:26:06.491Z",
-  "reason": "fix(push): ensure D1 legacy schema bootstrap, support custom reminder dispatch, and auto-refresh VAPID key",
+  "version": "m025-581",
+  "claimedBy": "branch sync/audio-manifest-a2-sentences-batch3",
+  "claimedAt": "2026-10-15T17:26:39.389Z",
+  "reason": "fix(social): audit menyeluruh invite dan accept teman frontend backend ui ux",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

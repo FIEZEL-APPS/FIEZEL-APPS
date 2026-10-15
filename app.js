@@ -7926,6 +7926,49 @@ function openApp(){
   document.body?.classList?.remove?.('notification-locked');notifyAppUpdateIfNew();render();try{updateTopbarCourseButton()}catch(_){}
   // Deteksi token undangan guru di URL (?token=...): langsung aktivasi & buka KelasKu untuk Guru
   try{checkUrlTeacherToken()}catch(_){}
+  // PWA Shortcuts (?invite-hub=1, ?duel-hub=1): tangkap parameter pintasan PWA
+  try{
+    const _sp=new URL(location.href).searchParams;
+    if(_sp.has('invite-hub')){
+      setTimeout(()=>{try{openFriendConnectModal()}catch(_){}},240);
+      try{const u=new URL(location.href);u.searchParams.delete('invite-hub');history.replaceState(null,'',u.pathname+(u.search?u.search:'')+u.hash)}catch(_){}
+    }
+    if(_sp.has('duel-hub')){
+      setTimeout(()=>{try{openDuelModal()}catch(_){}},240);
+      try{const u=new URL(location.href);u.searchParams.delete('duel-hub');history.replaceState(null,'',u.pathname+(u.search?u.search:'')+u.hash)}catch(_){}
+    }
+  }catch(_){}
+  // PWA Launch Queue: tangkap URL saat aplikasi aktif di background dan tautan diketuk dari luar
+  try{
+    if('launchQueue' in window && typeof window.launchQueue.setConsumer==='function'){
+      window.launchQueue.setConsumer((launchParams)=>{
+        if(!launchParams||!launchParams.targetURL)return;
+        try{
+          const u=new URL(launchParams.targetURL);
+          if(u.searchParams.has('invite-hub')){openFriendConnectModal();return}
+          if(u.searchParams.has('duel-hub')){openDuelModal();return}
+          if(u.searchParams.has('invite')){
+            const code=u.searchParams.get('invite'),link=inviteLink();
+            if(link&&code){link.setPending({code:code,kind:link.KIND_FRIEND,source:'launch_queue'});armSocialInviteSheet()}
+            return;
+          }
+          if(u.searchParams.has('friend')){
+            const raw=String(u.searchParams.get('friend')||'').trim().replace(/^@/,'').toLowerCase();
+            if(raw){cleanFriendUrl();socialFriendLinkSheet(raw)}
+            return;
+          }
+          if(u.searchParams.has('duel')){
+            try{if(state.view!=='learn')go('learn')}catch(_){}
+            return;
+          }
+          if(u.searchParams.has('stage')){
+            try{fzStageAutoJoin()}catch(_){}
+            return;
+          }
+        }catch(_){}
+      });
+    }
+  }catch(_){}
   // Tautan undangan Duel Belajar (?duel=KODE): langsung buka alur belajar tab Duel.
   try{if(new URL(location.href).searchParams.get('duel')&&state.view!=='learn')go('learn')}catch{}
   // Undangan teman (?invite=KODE, share sheet, atau sisa boot sebelumnya). Ditangkap SEKARANG
@@ -19180,8 +19223,26 @@ function onlineTabs(){return [['profil',FiezelI18n.t('social.tab-profile')],['te
 function onlineTemanTabLabel(label){
   return `${esc(label)}<span class="social-badge fz3-tab-badge hidden" id="fz3TemanBadge" aria-hidden="true"></span>`;
 }
+function storeSocialInvite(code,expiresDay){
+  try{
+    if(!code){localStorage.removeItem('fiezel-social-invite-last-v1');return}
+    const ob={code:String(code),expiresDay:String(expiresDay||''),savedAt:Date.now()};
+    localStorage.setItem('fiezel-social-invite-last-v1',JSON.stringify(ob));
+  }catch(_){}
+}
+window.storeSocialInvite=storeSocialInvite;
+function getStoredSocialInvite(){
+  try{
+    const raw=localStorage.getItem('fiezel-social-invite-last-v1');
+    if(!raw)return null;
+    const ob=JSON.parse(raw);
+    if(ob&&ob.code)return {code:String(ob.code),expiresDay:String(ob.expiresDay||'')};
+  }catch(_){}
+  return null;
+}
+window.getStoredSocialInvite=getStoredSocialInvite;
 let onlineTab='profil',onlineBoardTab='teman',onlineSeq=0;
-let socialProfileCache=null,socialInviteLast=null,socialSummaryCache=null,socialSummaryAt=0;
+let socialProfileCache=null,socialInviteLast=getStoredSocialInvite(),socialSummaryCache=null,socialSummaryAt=0;
 function socialCore(){try{return self.FiezelSocial||null}catch(_){return null}}
 // Momen mikro sosial: SATU bunyi (gerbang feedbackSounds) + SATU reaksi maskot (gerbang
 // reduced-motion di pawReact). Tidak menumpuk dengan celebrate() — sorakan bukan prestasi belajar.
@@ -19960,10 +20021,16 @@ async function socialTemanMarkup(core){
 
   // URL undangan ?invite=KODE dari share-sheet teman → prefill kolom tukar kode.
   let urlInvite='';try{urlInvite=String(new URLSearchParams(location.search).get('invite')||'').trim()}catch(_){urlInvite=''}
+  if(!urlInvite){
+    try{
+      const pend=inviteLink()?.pending?.();
+      if(pend&&pend.code)urlInvite=String(pend.code);
+    }catch(_){}
+  }
   const inviteCard=card(`<h3>${FiezelI18n.t('social.invite-title')}</h3><p class="muted">${FiezelI18n.t('social.invite-desc')}</p>
     ${socialInviteLast?`<div class="social-code" id="socialInviteCode">${esc(socialInviteLast.code)}</div><p class="muted">${FiezelI18n.t('social.invite-expires',{date:esc(socialInviteLast.expiresDay||'')})}.</p><div class="modal-actions"><button onclick="socialCopyInvite()"><i data-lucide="copy"></i> ${FiezelI18n.t('social.copy-code-btn')}</button><button class="primary" onclick="socialShareInvite()"><i data-lucide="share-2"></i> ${FiezelI18n.t('social.share-btn')}</button></div>`:''}
     <div class="modal-actions"><button ${socialInviteLast?'':'class="primary"'} id="socialMintBtn" onclick="socialMintInvite()"><i data-lucide="ticket"></i> ${socialInviteLast?FiezelI18n.t('social.new-code-btn'):FiezelI18n.t('social.print-code-btn')}</button></div>`,'social-card');
-  const redeemCard=card(`<h3>${FiezelI18n.t('social.have-code-title')}</h3><label class="endpoint-label">${FiezelI18n.t('social.invite-code-label')}<input id="socialRedeemInput" type="text" maxlength="12" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="mis. K3JQ7W2A" value="${esc(urlInvite)}"></label><div class="modal-actions"><button class="primary" onclick="socialRedeem()"><i data-lucide="handshake"></i> ${FiezelI18n.t('social.redeem-btn')}</button></div>`,'social-card');
+  const redeemCard=card(`<h3>${FiezelI18n.t('social.have-code-title')}</h3><label class="endpoint-label">${FiezelI18n.t('social.invite-code-label')}<input id="socialRedeemInput" type="text" maxlength="12" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="mis. K3JQ7W2A" value="${esc(urlInvite)}"></label><div class="modal-actions"><button class="primary" id="socialRedeemBtn" onclick="socialRedeem()"><i data-lucide="handshake"></i> ${FiezelI18n.t('social.redeem-btn')}</button></div>`,'social-card');
   const cheerFeed=cheers.length?card(`<h3>${FiezelI18n.t('social.cheers-title')}</h3>${cheers.map(c=>{const m=core.stickerMeta(c.sticker);return `<div class="row"><span>${m?m.emoji:''} ${FiezelI18n.t('social.cheer-from',{handle:esc(c.handle)})}</span><b>×${Math.max(1,Number(c.cnt)||1)}</b></div>`}).join('<hr>')}`,'social-card'):'';
   const myHandle=socialProfileCache?.handle||'';
   const addCard=card(`<h3>${FiezelI18n.t('social2.add-title')}</h3><p class="muted">${FiezelI18n.t('social2.add-desc')}</p>${myHandle?`<p class="fz2-myid" data-testid="my-social-id">${esc(FiezelI18n.t('social2.my-id',{handle:myHandle}))}</p>`:''}<div class="fz2-inline"><input id="socialAddInput" type="text" maxlength="21" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="@nama_teman" aria-label="${FiezelI18n.t('social2.add-label')}" data-testid="add-friend-input"><button class="primary" id="socialAddBtn" onclick="socialAddByHandle()" data-testid="add-friend-submit"><i data-lucide="user-plus"></i> ${FiezelI18n.t('social2.add-btn')}</button></div>`,'social-card fz2-add-card');
@@ -19979,13 +20046,19 @@ async function socialTemanMarkup(core){
   }).join(''):`<div class="social-empty"><p><b>${FiezelI18n.t('social.no-friends-title')}</b></p><p class="muted">${FiezelI18n.t('social.no-friends-body')}</p></div>`;
   const reqList2=reqList.filter(r=>!/^$/.test(String(r.handle||'')));
   const reqSection=card(`<h3>${FiezelI18n.t('social3.req-section-title')}</h3><p class="muted">${FiezelI18n.t('social3.req-section-desc')}</p>${reqList2.length?reqList2.map(r=>friendRequestRow(r)).join(''):`<div class="social-empty"><p class="muted">${FiezelI18n.t('social3.req-none')}</p></div>`}`,'social-card');
-  return addCard+classCard+reqSection+card(`<h3>${FiezelI18n.t('social.friends-list-title',{count:friends.length})}</h3><p class="muted">${FiezelI18n.t('social.friends-list-desc')}</p>${list}`,'social-card')+cheerFeed+`<details class="fz2-more"><summary>${FiezelI18n.t('social2.more-ways')}</summary>${inviteCard}${redeemCard}</details>`;
+  return addCard+classCard+reqSection+card(`<h3>${FiezelI18n.t('social.friends-list-title',{count:friends.length})}</h3><p class="muted">${FiezelI18n.t('social.friends-list-desc')}</p>${list}`,'social-card')+cheerFeed+`<details class="fz2-more"${socialInviteLast?' open':''}><summary>${FiezelI18n.t('social2.more-ways')}</summary>${inviteCard}${redeemCard}</details>`;
 }
 async function socialMintInvite(){
   const core=socialCore();if(!core)return;
   const btn=$('socialMintBtn');if(btn)btn.disabled=true;
   const res=await core.api.invite();
-  if(res.ok&&res.data?.code){socialInviteLast={code:String(res.data.code),expiresDay:String(res.data.expiresDay||'')};showToast(FiezelI18n.t('social.code-created-toast'),'success');render();return}
+  if(res.ok&&res.data?.code){
+    socialInviteLast={code:String(res.data.code),expiresDay:String(res.data.expiresDay||'')};
+    storeSocialInvite(socialInviteLast.code,socialInviteLast.expiresDay);
+    showToast(FiezelI18n.t('social.code-created-toast'),'success');
+    render();
+    return;
+  }
   if(btn)btn.disabled=false;
   showToast(res.message);
 }
@@ -20021,7 +20094,9 @@ function socialShareInvite(){
   try{navigator.clipboard?.writeText?.(full).then(()=>showToast(FiezelI18n.t('social.share-copied-toast'),'success')).catch(()=>socialCopyInvite())}catch(_){socialCopyInvite()}
 }
 window.socialShareInvite=socialShareInvite;
+let socialRedeemBusy=false;
 async function socialRedeem(){
+  if(socialRedeemBusy)return;
   const core=socialCore();if(!core)return;
   const raw=String($('socialRedeemInput')?.value||'').trim();
   if(!raw)return showToast(FiezelI18n.t('social.redeem-empty-toast'));
@@ -20035,13 +20110,28 @@ async function socialRedeem(){
     code=hit&&hit.kind===link.KIND_FRIEND?hit.code:link.normalizeCode(raw);
     if(!link.isServerShaped(code))return showToast(FiezelI18n.t('social.redeem-not-found-toast'),'warn');
   }
-  const res=await core.api.redeem(code);
-  if(res.ok&&res.data?.friend){
-    try{link?.markHandled(code)}catch(_){}
-    socialNotifyResync();socialSummaryAt=0;
-    showToast(FiezelI18n.t('social.redeem-success-toast',{handle:res.data.friend.handle}),'success');socialMicroMoment('friend');render();return;
+  // Offline handling: simpan kode ke link.setPending() dan beri tahu murid
+  if(typeof navigator!=='undefined'&&navigator.onLine===false){
+    try{link?.setPending?.({code:code,kind:link?.KIND_FRIEND||'friend',source:'offline_redeem'})}catch(_){}
+    showToast(FiezelI18n.t('social.deeplink-offline')||'Sedang offline. Kode disimpan dan akan otomatis ditukarkan saat tersambung kembali.','info');
+    return;
   }
-  showToast(res.message);
+  socialRedeemBusy=true;
+  const btn=$('socialRedeemBtn')||document.querySelector('button[onclick*="socialRedeem"]');
+  if(btn)btn.disabled=true;
+  try{
+    const res=await core.api.redeem(code);
+    if(res.ok&&res.data?.friend){
+      try{link?.markHandled(code)}catch(_){}
+      socialNotifyResync();socialSummaryAt=0;
+      try{broadcastSocialSync('invite_redeemed',{code:code})}catch(_){}
+      showToast(FiezelI18n.t('social.redeem-success-toast',{handle:res.data.friend.handle}),'success');socialMicroMoment('friend');render();return;
+    }
+    showToast(res.message);
+  }finally{
+    socialRedeemBusy=false;
+    if(btn)btn.disabled=false;
+  }
 }
 window.socialRedeem=socialRedeem;
 function socialOpenCheer(handle){
@@ -20612,19 +20702,28 @@ async function socialAddByInput(){
   const core=socialCore();if(!core)return;
   const raw=String($('connectFriendInput')?.value||'').trim().replace(/^@/,'').toLowerCase();
   if(!raw)return showToast(t('social2.add-empty','Ketik ID teman terlebih dahulu.'));
-  const btn=$('btnConnectFriendSubmit');if(btn)btn.disabled=true;
-  const res=await core.api.friendAdd(raw);
-  if(res.ok){
-    const h=res.data?.friend?.handle||raw;
-    showToast(FiezelI18n.t(res.data?.status==='friends'?'social2.add-ok':'social2.add-pending',{handle:h}));
-    socialSummaryAt=0;
-    try{socialMicroMoment('friend')}catch(_){}
-    closeModal();
-    if(state.view==='online'||state.view==='profile')render();
+  const myHandle=(socialProfileCache?.handle||storedSocialHandle()||'').toLowerCase();
+  if(myHandle&&raw===myHandle){
+    showToast(FiezelI18n.t('social3.scan-self')||'Tidak bisa menambahkan akun sendiri sebagai teman.');
     return;
   }
-  if(btn)btn.disabled=false;
-  showToast(res.error==='code_invalid'||res.status===400?t('social2.add-invalid','ID teman tidak ditemukan.'):res.message);
+  const btn=$('btnConnectFriendSubmit');if(btn)btn.disabled=true;
+  try{
+    const res=await core.api.friendAdd(raw);
+    if(res.ok){
+      const h=res.data?.friend?.handle||raw;
+      showToast(FiezelI18n.t(res.data?.status==='friends'?'social2.add-ok':'social2.add-pending',{handle:h}));
+      socialSummaryAt=0;
+      try{socialMicroMoment('friend')}catch(_){}
+      try{broadcastSocialSync('friend_added',{handle:h})}catch(_){}
+      closeModal();
+      if(state.view==='online'||state.view==='profile')render();
+      return;
+    }
+    showToast(res.error==='code_invalid'||res.status===400?t('social2.add-invalid','ID teman tidak ditemukan.'):res.message);
+  }finally{
+    if(btn)btn.disabled=false;
+  }
 }
 window.socialAddByInput=socialAddByInput;
 
@@ -20657,8 +20756,8 @@ async function loadConnectRequests(){
             </div>
           </div>
           <div style="display:flex;gap:6px;flex-shrink:0;">
-            <button type="button" class="text-button" onclick="decideFriendRequestInModal('${h}',false)" style="padding:5px 8px;font-size:11px;font-weight:700;">${t('social2.req-reject','Tolak')}</button>
-            <button type="button" class="primary" onclick="decideFriendRequestInModal('${h}',true)" style="padding:5px 10px;font-size:11px;font-weight:800;border-radius:8px;">${t('social2.req-accept','Terima')}</button>
+            <button type="button" class="text-button" onclick="decideFriendRequestInModal('${h}',false)" data-testid="reject-${h}" style="padding:5px 8px;font-size:11px;font-weight:700;">${t('social2.req-reject','Tolak')}</button>
+            <button type="button" class="primary" onclick="decideFriendRequestInModal('${h}',true)" data-testid="accept-${h}" style="padding:5px 10px;font-size:11px;font-weight:800;border-radius:8px;">${t('social2.req-accept','Terima')}</button>
           </div>
         </div>
       `;
@@ -20677,11 +20776,28 @@ async function socialAddByHandle(){
   const core=socialCore();if(!core)return;
   const raw=String($('socialAddInput')?.value||'').trim().replace(/^@/,'').toLowerCase();
   if(!raw)return showToast(FiezelI18n.t('social2.add-empty'));
+  const myHandle=(socialProfileCache?.handle||storedSocialHandle()||'').toLowerCase();
+  if(myHandle&&raw===myHandle){
+    showToast(FiezelI18n.t('social3.scan-self')||'Tidak bisa menambahkan akun sendiri sebagai teman.');
+    return;
+  }
   const btn=$('socialAddBtn');if(btn)btn.disabled=true;
-  const res=await core.api.friendAdd(raw);
-  if(res.ok){const h=res.data?.friend?.handle||raw;showToast(FiezelI18n.t(res.data?.status==='friends'?'social2.add-ok':'social2.add-pending',{handle:h}));socialSummaryAt=0;closeModal();try{socialMicroMoment('friend')}catch(_){}if(state.view==='online')renderOnlineTab();else refreshSocialSummaryCard();return}
-  if(btn)btn.disabled=false;
-  showToast(res.error==='code_invalid'||res.status===400?FiezelI18n.t('social2.add-invalid'):res.message);
+  try{
+    const res=await core.api.friendAdd(raw);
+    if(res.ok){
+      const h=res.data?.friend?.handle||raw;
+      showToast(FiezelI18n.t(res.data?.status==='friends'?'social2.add-ok':'social2.add-pending',{handle:h}));
+      socialSummaryAt=0;
+      closeModal();
+      try{socialMicroMoment('friend')}catch(_){}
+      try{broadcastSocialSync('friend_added',{handle:h})}catch(_){}
+      if(state.view==='online')renderOnlineTab();else refreshSocialSummaryCard();
+      return;
+    }
+    showToast(res.error==='code_invalid'||res.status===400?FiezelI18n.t('social2.add-invalid'):res.message);
+  }finally{
+    if(btn)btn.disabled=false;
+  }
 }
 window.socialAddByHandle=socialAddByHandle;
 /* ---------------------------------------------- permintaan teman: terima / tolak ------
@@ -20753,20 +20869,31 @@ async function renderFriendRequests(){
   box.innerHTML=list.length?list.map(friendRequestRow).join(''):`<p class="muted">${FiezelI18n.t('social2.req-empty')}</p>`;
   try{enhanceUI()}catch(_){}
 }
+let decideFriendBusy=false;
 async function decideFriendRequest(handle,accept){
+  if(decideFriendBusy)return;
   const core=socialCore();if(!core)return;
   const h=String(handle||'').trim().replace(/^@/,'').toLowerCase();
   if(!h)return;
-  const res=accept?await core.api.friendAccept(h):await core.api.friendReject(h);
-  if(!res.ok)return showToast(res.error==='code_invalid'||res.status===400?FiezelI18n.t('social2.add-invalid'):res.message);
-  showToast(FiezelI18n.t(accept?'social2.req-accepted':'social2.req-rejected',{handle:h}));
-  socialSummaryAt=0;
-  saveNotifCachedRequests(notifCachedRequests.filter(x=>String(x&&x.handle||'').toLowerCase()!==h));
-  await renderFriendRequests();
-  updateTemanBadge();
-  refreshNotifBadge();
-  if(accept){try{socialMicroMoment('friend')}catch(_){}}
-  if(state.view==='home')render();
+  decideFriendBusy=true;
+  const btns=document.querySelectorAll(`[data-testid="reject-${h}"], [data-testid="accept-${h}"], [data-testid="notif-reject-${h}"], [data-testid="notif-accept-${h}"]`);
+  btns.forEach(b=>{try{b.disabled=true}catch(_){}});
+  try{
+    const res=accept?await core.api.friendAccept(h):await core.api.friendReject(h);
+    if(!res.ok)return showToast(res.error==='code_invalid'||res.status===400?FiezelI18n.t('social2.add-invalid'):res.message);
+    showToast(FiezelI18n.t(accept?'social2.req-accepted':'social2.req-rejected',{handle:h}));
+    socialSummaryAt=0;
+    saveNotifCachedRequests(notifCachedRequests.filter(x=>String(x&&x.handle||'').toLowerCase()!==h));
+    await renderFriendRequests();
+    updateTemanBadge();
+    refreshNotifBadge();
+    if(accept){try{socialMicroMoment('friend')}catch(_){}}
+    if(state.view==='home')render();
+    try{broadcastSocialSync('friend_request_decided',{handle:h,accept:accept})}catch(_){}
+  }finally{
+    decideFriendBusy=false;
+    btns.forEach(b=>{try{b.disabled=false}catch(_){}});
+  }
 }
 window.decideFriendRequest=decideFriendRequest;
 /* ============================ SISTEM PERTEMANAN ala LINE (SLOT 7) ============================
@@ -20843,6 +20970,19 @@ function socialShareProfile(){
 }
 window.socialShareProfile=socialShareProfile;
 /* ---------------------------------------------------------------- tautan masuk ?friend=@handle */
+function cleanFriendUrl(){
+  try{
+    if(typeof location!=='undefined'&&location.search.indexOf('friend=')>=0){
+      const u=new URL(location.href);
+      u.searchParams.delete('friend');
+      if(typeof history!=='undefined'&&history.replaceState){
+        history.replaceState(null,'',u.pathname+(u.search?u.search:'')+u.hash);
+      }
+    }
+  }catch(_){}
+}
+window.cleanFriendUrl=cleanFriendUrl;
+
 function socialFriendParam(){
   try{const raw=String(new URLSearchParams(location.search).get('friend')||'').trim();return raw.replace(/^@/,'').toLowerCase()}catch(_){return ''}
 }
@@ -20852,8 +20992,14 @@ function friendLinkBoot(){
   const core=socialCore();if(!core)return false;
   const handle=socialFriendParam();
   if(!handle)return false;
+  cleanFriendUrl();
   const v=core.validateHandle(handle);
   if(!v.ok)return false;
+  const myHandle=(socialProfileCache?.handle||storedSocialHandle()||'').toLowerCase();
+  if(myHandle&&v.handle===myHandle){
+    showToast(FiezelI18n.t('social3.scan-self')||'Ini adalah ID profil kamu sendiri.');
+    return false;
+  }
   setTimeout(()=>socialFriendLinkSheet(v.handle),220);
   return true;
 }
@@ -20865,13 +21011,91 @@ function socialFriendLinkSheet(handle){
   return true;
 }
 window.socialFriendLinkSheet=socialFriendLinkSheet;
+function socialFriendAskHandleThenAdd(targetHandle){
+  const h=String(targetHandle||'').replace(/^@/,'').toLowerCase();
+  openModal(`<div class="modal-mark">${FiezelI18n.t('social3.link-mark')}</div>
+    <h2>${FiezelI18n.t('social.deeplink-title')}</h2>
+    <p>${FiezelI18n.t('social.deeplink-need-handle')}</p>
+    <label class="endpoint-label">${FiezelI18n.t('social.handle-label')}<input id="socialFriendHandleInput" type="text" maxlength="20" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="mis. belajar_terus"></label>
+    <p class="social-handle-status muted" id="socialFriendHandleStatus">${FiezelI18n.t('social.handle-rules')}</p>
+    <div class="modal-actions">
+      <button type="button" onclick="closeModal()">${FiezelI18n.t('social3.link-cancel')}</button>
+      <button type="button" class="primary" id="socialFriendCreateBtn" onclick="socialFriendCreateThenAdd('${esc(h)}')"><i data-lucide="user-plus"></i> ${FiezelI18n.t('social.deeplink-create-accept')}</button>
+    </div>`);
+  try{enhanceUI()}catch(_){}
+  setTimeout(()=>{try{$('socialFriendHandleInput')?.focus()}catch(_){}},60);
+  return false;
+}
+window.socialFriendAskHandleThenAdd=socialFriendAskHandleThenAdd;
+
+async function socialFriendCreateThenAdd(targetHandle){
+  const core=socialCore();if(!core)return false;
+  const h=String(targetHandle||'').replace(/^@/,'').toLowerCase();if(!h)return false;
+  const val=$('socialFriendHandleInput')?.value;
+  const v=core.validateHandle(val);
+  const status=$('socialFriendHandleStatus');
+  if(!v.ok){if(status)status.textContent=v.reason;return false}
+  const btn=$('socialFriendCreateBtn');
+  if(btn){btn.disabled=true;btn.textContent=FiezelI18n.t('social.deeplink-working')}
+  try{
+    const res=await core.api.profileCreate({handle:v.handle,friendsVisible:true,leagueOptIn:false});
+    if(!res.ok&&res.error!=='profile_exists'){
+      if(status)status.textContent=res.message;
+      if(btn){btn.disabled=false;btn.innerHTML=`<i data-lucide="user-plus"></i> ${FiezelI18n.t('social.deeplink-create-accept')}`;try{enhanceUI()}catch(_){}}
+      return false;
+    }
+    socialProfileCache=res.data?.profile||null;socialSummaryAt=0;
+    try{queueSocialEvidence()}catch(_){}
+    return await socialFriendFromLink(h);
+  }finally{
+    if(btn)btn.disabled=false;
+  }
+}
+window.socialFriendCreateThenAdd=socialFriendCreateThenAdd;
+
 async function socialFriendFromLink(handle){
   const core=socialCore();if(!core)return false;
   const h=String(handle||'').replace(/^@/,'').toLowerCase();if(!h)return false;
+  const myHandle=(socialProfileCache?.handle||storedSocialHandle()||'').toLowerCase();
+  if(myHandle&&h===myHandle){
+    showToast(FiezelI18n.t('social3.scan-self')||'Tidak bisa menambahkan akun sendiri sebagai teman.');
+    closeModal();
+    return false;
+  }
   const btn=$('socialFriendLinkBtn');if(btn)btn.disabled=true;
   try{await core.ensureAnon()}catch(_){}
+  try{
+    const me=await core.api.profileMe();
+    if(me&&me.error==='profile_required'){
+      if(btn)btn.disabled=false;
+      return socialFriendAskHandleThenAdd(h);
+    }
+    if(me&&me.ok&&me.data?.profile){
+      socialProfileCache=me.data.profile;
+      if(socialProfileCache.handle&&socialProfileCache.handle.toLowerCase()===h){
+        showToast(FiezelI18n.t('social3.scan-self')||'Tidak bisa menambahkan akun sendiri sebagai teman.');
+        if(btn)btn.disabled=false;
+        closeModal();
+        return false;
+      }
+    }
+  }catch(_){}
   const res=await core.api.friendAdd(h);
-  if(res.ok){const fh=res.data?.friend?.handle||h;showToast(FiezelI18n.t(res.data?.status==='friends'?'social3.link-friends':'social3.link-sent',{handle:fh}),'success');socialSummaryAt=0;try{socialNotifyResync()}catch(_){}closeModal();try{socialMicroMoment('friend')}catch(_){}if(state.view==='online')renderOnlineTab();else render();return true}
+  if(res.error==='profile_required'){
+    if(btn)btn.disabled=false;
+    return socialFriendAskHandleThenAdd(h);
+  }
+  if(res.ok){
+    const fh=res.data?.friend?.handle||h;
+    showToast(FiezelI18n.t(res.data?.status==='friends'?'social3.link-friends':'social3.link-sent',{handle:fh}),'success');
+    socialSummaryAt=0;
+    try{socialNotifyResync()}catch(_){}
+    try{broadcastSocialSync('friend_added',{handle:fh})}catch(_){}
+    closeModal();
+    try{socialMicroMoment('friend')}catch(_){}
+    if(state.view==='online')renderOnlineTab();else render();
+    return true;
+  }
   if(btn)btn.disabled=false;
   showToast(res.error==='code_invalid'||res.status===400?FiezelI18n.t('social2.add-invalid'):FiezelI18n.t('social3.link-fail'));
   return false;
@@ -21184,6 +21408,17 @@ function socialInviteOpenDuel(){
   return true;
 }
 window.socialInviteOpenDuel=socialInviteOpenDuel;
+function openDuelModal(){
+  openModal(`<div class="modal-mark">DUEL BELAJAR</div>
+    <h2>${esc(FiezelI18n.t('student.duel-invite-title'))}</h2>
+    <p class="muted">${esc(FiezelI18n.t('social.deeplink-desc')||FiezelI18n.t('student.flow-sub-ready'))}</p>
+    <div class="modal-actions">
+      <button onclick="closeModal()">${FiezelI18n.t('coach.close-aria')}</button>
+      <button class="primary" onclick="socialInviteOpenDuel()"><i data-lucide="swords"></i> ${FiezelI18n.t('social.deeplink-duel-btn')}</button>
+    </div>`);
+  try{enhanceUI()}catch(_){}
+}
+window.openDuelModal=openDuelModal;
 /* ---------------------------------------------------------------- kabar dari teman (notifikasi) */
 let socialNotifyAt=0,socialNotifyBusy=false;
 const SOCIAL_NOTIFY_MIN_GAP_MS=90000;   // satu tanya per satu setengah menit, bukan per render
@@ -21231,6 +21466,28 @@ async function socialNotifyPoll(force){
   }catch(_){return null}
   finally{socialNotifyBusy=false}
 }
+let socialSyncChannel=null;
+try{
+  if(typeof BroadcastChannel!=='undefined'){
+    socialSyncChannel=new BroadcastChannel('fiezel-social-sync');
+    socialSyncChannel.onmessage=(ev)=>{
+      try{
+        if(!ev||!ev.data)return;
+        socialSummaryAt=0;
+        try{refreshFriendRequestCount(true)}catch(_){}
+        try{socialNotifyPoll(true)}catch(_){}
+        if(state.view==='online'&&onlineTab==='teman')renderOnlineTab();
+        else if(state.view==='home')refreshSocialSummaryCard();
+      }catch(_){}
+    };
+  }
+}catch(_){}
+function broadcastSocialSync(type,payload){
+  try{socialSyncChannel?.postMessage?.({type:type,payload:payload,at:Date.now()})}catch(_){}
+  try{localStorage.setItem('fiezel-social-sync-v1',String(Date.now()))}catch(_){}
+}
+window.broadcastSocialSync=broadcastSocialSync;
+
 /** Potret ulang tanpa melahirkan kabar — dipakai sesudah kita sendiri yang menambah teman. */
 function socialNotifyResync(){
   const core=socialCore(),notify=socialNotifyCore();
@@ -21244,6 +21501,7 @@ function socialNotifyResync(){
     let rh=null;
     try{const rq=await core.api.friendRequests();if(rq.ok&&Array.isArray(rq.data?.requests))rh=rq.data.requests.map(x=>String(x&&x.handle||''))}catch(_){}
     notify.writeSnapshot(notify.snapshotOf(fr.data,undefined,rh));
+    try{broadcastSocialSync('resync')}catch(_){}
   }catch(_){}})();
   return true;
 }
@@ -21348,7 +21606,21 @@ function isInputActive(){
     return isField;
   }catch(_){return false}
 }
-function refreshNotifBadge(){try{if(state.view==='classroom'&&$('fzClassHub')&&!$('fzClassHub').querySelector('[data-testid="class-runner"]')){if(!isInputActive())self.FiezelClassHub?.renderStudent?.({quiet:true})}}catch(_){}const b=$('fzNotifBadge');if(!b)return false;const n=notifUnreadTotal();b.textContent=n>9?'9+':String(n);b.classList.toggle('hidden',n<=0);$('fzNotifBtn')?.classList.toggle('has-new',n>0);return true}
+function refreshNotifBadge(){
+  try{if(state.view==='classroom'&&$('fzClassHub')&&!$('fzClassHub').querySelector('[data-testid="class-runner"]')){if(!isInputActive())self.FiezelClassHub?.renderStudent?.({quiet:true})}}catch(_){}
+  const n=notifUnreadTotal();
+  try{
+    if(typeof navigator!=='undefined'){
+      if(n>0)navigator.setAppBadge?.(n)?.catch?.(()=>{});
+      else navigator.clearAppBadge?.()?.catch?.(()=>{});
+    }
+  }catch(_){}
+  const b=$('fzNotifBadge');if(!b)return false;
+  b.textContent=n>9?'9+':String(n);
+  b.classList.toggle('hidden',n<=0);
+  $('fzNotifBtn')?.classList.toggle('has-new',n>0);
+  return true;
+}
 function notifTimeLabel(ts){try{const d=new Date(Number(ts)||Date.now()),diff=Date.now()-d.getTime();if(diff<60000)return t('sinkron.baru-saja','baru saja');if(diff<3600000)return t('sinkron.menit-lalu','{n} menit lalu',{n:Math.max(1,Math.round(diff/60000))});if(diff<86400000)return t('sinkron.jam-lalu','{n} jam lalu',{n:Math.max(1,Math.round(diff/3600000))});return d.toLocaleDateString('id-ID',{day:'numeric',month:'short'})}catch(_){return ''}}
 function notifItemMarkup(e){
   const time=`<small>${esc(notifTimeLabel(e.at))}</small>`;
@@ -21440,7 +21712,7 @@ async function openNotifications(){
     await Promise.allSettled([
       inboxPoll(true),
       socialNotifyPoll(true),
-      refreshFriendRequestCount()
+      refreshFriendRequestCount(true)
     ]);
   }catch(_){}
   finally{
@@ -21566,10 +21838,27 @@ function startNotifPolling(){
           inboxPoll(true);
         }
       };
+      const sc=new BroadcastChannel('fiezel-social-sync');
+      sc.onmessage=(ev)=>{
+        try{
+          socialSummaryAt=0;
+          try{refreshFriendRequestCount(true)}catch(_){}
+          try{socialNotifyPoll(true)}catch(_){}
+          if(state.view==='online'&&onlineTab==='teman')renderOnlineTab();
+          else if(state.view==='home')refreshSocialSummaryCard();
+        }catch(_){}
+      };
     }
     window.addEventListener?.('storage',(ev)=>{
       if(ev&&(ev.key==='fiezel-assignment-sync'||ev.key==='fiezel-inbox-v1'||ev.key==='fiezel-onboarding-v1')){
         inboxPoll(true);
+      }
+      if(ev&&(ev.key==='fiezel-social-sync-v1'||ev.key==='fz_notif_cached_requests'||ev.key==='fiezel-social-invite-last-v1'||ev.key==='fiezel-social-notify-last-v1')){
+        socialSummaryAt=0;
+        try{refreshFriendRequestCount(true)}catch(_){}
+        try{socialNotifyPoll(true)}catch(_){}
+        if(state.view==='online'&&onlineTab==='teman')renderOnlineTab();
+        else if(state.view==='home')refreshSocialSummaryCard();
       }
     });
   }catch(_){}

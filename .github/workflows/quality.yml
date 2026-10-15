@@ -305,6 +305,8 @@ jobs:
           node tests/social-frontend-test.js
           node tests/social-schema-contract-test.js
           node tests/social-invite-link-test.js
+          node tests/social-concurrency-test.js
+          node tests/subagent1-backend-audit-test.js
           # SLOT 13 PANGGUNG SUARA LIVE (frontend) - kontrak naskah/CSS/modul panggung
           # suara dan kontrak signaling dua arah. Diletakkan tepat sesudah gerbang sosial
           # karena keduanya berbagi lane transport Worker+anon yang sama; cacat di lane

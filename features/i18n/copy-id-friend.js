@@ -36,7 +36,7 @@
     'social3.qr-share': 'Bagikan tautan profil',
     'social3.qr-share-done': 'Tautan profil kamu disalin.',
     'social3.qr-share-fail': 'Tidak bisa membagikan otomatis. Salin tautan ini: {tautan}',
-    'social3.qr-share-body': 'Ayo berteman di FIEZEL. Pindai atau buka tautan ini:',
+    'social3.qr-share-body': 'Ayo berteman di FIEZEL. Pindai atau buka tautan ini: (Tips: bila terbuka di WhatsApp, ketuk tanda titik tiga ⋮ di kanan atas lalu pilih \'Buka di Chrome\')',
     'social3.qr-fail': 'Kode QR tidak bisa dibuat sekarang. Coba lagi nanti.',
     'social3.qr-need-profile': 'Buat ID online dulu supaya kode QR kamu bisa tampil.',
     'social3.qr-unavailable': 'Kode QR belum tersedia',
@@ -56,7 +56,7 @@
     'social3.scan-my-qr': 'Kode QR Saya',
     'social3.scan-cam-err': 'Kamera tidak dapat diakses atau izin belum diberikan.',
     'social3.scan-not-found': 'Kode QR tidak ditemukan pada gambar ini. Pastikan gambar jelas.',
-    'social3.scan-self': 'Ini adalah kode QR profil kamu sendiri.',
+    'social3.scan-self': 'Ini ID kamu sendiri! Bagikan ID ini ke temanmu.',
     'social3.scan-invalid': 'Kode QR ini bukan tautan profil atau ID teman FIEZEL.',
 
     /* ── Deteksi tautan masuk ?friend=@handle ────────────────────────────────── */
