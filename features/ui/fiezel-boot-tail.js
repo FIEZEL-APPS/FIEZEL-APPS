@@ -16,8 +16,13 @@
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then(function (reg) {
       if (reg) {
+        try { self.FiezelUpdatePrompt?.check?.(true); } catch (_) {}
         setTimeout(function () {
-          try { reg.update().catch(function () {}); } catch (_) {}
+          try {
+            reg.update().then(function () {
+              try { self.FiezelUpdatePrompt?.check?.(false); } catch (_) {}
+            }).catch(function () {});
+          } catch (_) {}
         }, 2000);
       }
     }).catch(function () {});

@@ -134,6 +134,7 @@
     'update.later-btn': 'ไว้ก่อน',
     'update.applying-text': 'กำลังอัปเดต...',
     'update.version-text': 'เวอร์ชัน {newVersion} · ตอนนี้คุณกำลังใช้ {curVersion}',
+    'update.success-toast': 'FIEZEL ได้รับการอัปเดตเป็นบิลด์ {build} เรียบร้อยแล้ว ขอให้สนุกกับการเรียน',
 
     'boot.recovery-title': 'FIEZEL ยังไม่พร้อม',
     'boot.recovery-desc': 'การเชื่อมต่อหรือข้อมูลยังโหลดไม่เสร็จ',

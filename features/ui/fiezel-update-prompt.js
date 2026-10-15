@@ -186,6 +186,16 @@
       if (pendingWorker && typeof pendingWorker.postMessage === 'function') {
         try { pendingWorker.postMessage({ type: 'FIEZEL_SKIP_WAITING' }); } catch (_) {}
         setTimeout(reloadIfApproved, 3500);
+      } else if (navigator.serviceWorker && typeof navigator.serviceWorker.getRegistration === 'function') {
+        navigator.serviceWorker.getRegistration().then(function (reg) {
+          var w = reg && (reg.waiting || (reg.installing && reg.installing.state === 'installed' ? reg.installing : null));
+          if (w && typeof w.postMessage === 'function') {
+            try { w.postMessage({ type: 'FIEZEL_SKIP_WAITING' }); } catch (_) {}
+            setTimeout(reloadIfApproved, 3500);
+            return;
+          }
+          reloadIfApproved();
+        }).catch(function () { reloadIfApproved(); });
       } else {
         reloadIfApproved();
       }
@@ -247,7 +257,7 @@
       if (remoteVersion.version) bestRemote = remoteVersion.version;
     }
     if (!worker && !force && remoteVersion && !newerKind(remoteVersion) && !bestBuild && !bestRemote) return false;
-    if (shown) return false;
+    if (shown) return true;
     if (sess('fiezel-apply-update') === '1') {
       dropSess('fiezel-apply-update');
       return false;
@@ -336,20 +346,39 @@
     return false;
   }
 
+  function resolveRegistration() {
+    if (!navigator.serviceWorker) return Promise.resolve(null);
+    var getReg = (typeof navigator.serviceWorker.getRegistration === 'function')
+      ? navigator.serviceWorker.getRegistration().catch(function () { return null; })
+      : Promise.resolve(null);
+    return Promise.resolve(getReg).then(function (reg) {
+      if (reg) return reg;
+      if (navigator.serviceWorker.ready && typeof navigator.serviceWorker.ready.then === 'function') {
+        return Promise.race([
+          navigator.serviceWorker.ready.catch(function () { return null; }),
+          new Promise(function (res) { setTimeout(function () { res(null); }, 1200); })
+        ]);
+      }
+      return null;
+    });
+  }
+
   function check(force) {
     if (!force && typeof navigator.onLine === 'boolean' && !navigator.onLine) return Promise.resolve(false);
-    if (!navigator.serviceWorker || typeof navigator.serviceWorker.getRegistration !== 'function') return Promise.resolve(false);
-    return navigator.serviceWorker.getRegistration().catch(function () { return null; }).then(function (reg) {
-      if (!reg) return false;
-      bindReload();
+    if (!navigator.serviceWorker) return Promise.resolve(false);
+    bindReload();
+    return resolveRegistration().then(function (reg) {
       return fetchRemoteVersion().then(function (remote) {
         var kind = newerKind(remote);
         /* Ingat kandidat terbaru supaya perayapan berkala tak perlu membandingkan ulang. */
         if (kind === 'build') bestBuild = remote.build;
         if (kind === 'semver') bestRemote = remote.version;
-        if (watchRegistration(reg, remote)) return true;
-        return Promise.resolve(reg.update()).catch(function () {}).then(function () {
-          if (reg.waiting) return show(reg.waiting, remote);
+        if (reg && watchRegistration(reg, remote)) return true;
+        var updatePromise = (reg && typeof reg.update === 'function')
+          ? Promise.resolve(reg.update()).catch(function () {})
+          : Promise.resolve();
+        return updatePromise.then(function () {
+          if (reg && reg.waiting) return show(reg.waiting, remote);
           // Sinyal REMOTE sudah lebih baru (build halaman atau VERSION.json) tetapi service
           // worker belum punya kandidat baru (mis. hanya berkas non-precache yang berubah).
           // Kartu tetap muncul; jalur "tanpa worker menunggu" di apply() menanganinya dengan
@@ -368,7 +397,7 @@
            * menawarkannya. `reg.waiting` sudah ditangani di atas, jadi di sini hanya
            * `installing`/`installed` yang belum sempat menjadi waiting. */
           try {
-            var cand = reg.installing;
+            var cand = reg && reg.installing;
             if (cand && cand !== navigator.serviceWorker.controller && cand.state && cand.state !== 'activated') {
               return show(cand, remote);
             }
@@ -415,6 +444,9 @@
     started = true;
     bindReload();
     check(true);
+    setTimeout(function () { check(false); }, 2500);
+    setTimeout(function () { check(false); }, 8000);
+    setTimeout(function () { check(false); }, 20000);
     var t = setInterval(function () { check(false); }, CHECK_MS);
     if (t && t.unref) t.unref();
     document.addEventListener('visibilitychange', function () {
