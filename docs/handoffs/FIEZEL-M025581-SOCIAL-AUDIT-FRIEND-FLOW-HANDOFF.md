@@ -1,9 +1,9 @@
 # FIEZEL — handoff m025-581: Audit & Refactoring Menyeluruh Fitur Invite & Accept Teman
 
-**Otoritas: OWNER & PWA Release Arbiter**  
-**Build:** `m025-581`  
-**Cakupan:** Frontend Social Core, Cloudflare Worker API & D1, Ergonomi UI, UX Psikologi Murid, dan Integrasi PWA Sync.  
-**Dokumen Audit Induk:** `C:\Users\hp\.gemini\antigravity\brain\68535665-6b05-4886-8185-ca05608806a3\AUDIT-INVITE-ACCEPT-TEMAN-FIEZEL.md`  
+**Otoritas: OWNER & PWA Release Arbiter**
+**Build:** `m025-581`
+**Cakupan:** Frontend Social Core, Cloudflare Worker API & D1, Ergonomi UI, UX Psikologi Murid, dan Integrasi PWA Sync.
+**Dokumen Audit Induk:** `C:\Users\hp\.gemini\antigravity\brain\68535665-6b05-4886-8185-ca05608806a3\AUDIT-INVITE-ACCEPT-TEMAN-FIEZEL.md`
 
 ---
 
