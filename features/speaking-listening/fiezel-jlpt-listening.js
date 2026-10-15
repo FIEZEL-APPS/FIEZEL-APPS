@@ -356,6 +356,28 @@
 
       audioObj.onerror = function () {
         console.warn('[JLPT Audio] Gagal memuat audio ' + source + ':', url);
+        if (typeof window !== 'undefined' && window.caches && url && url.indexOf('blob:') !== 0) {
+          window.caches.match(url).then(function (res) {
+            if (res) return res.blob();
+            return null;
+          }).then(function (blob) {
+            if (blob) {
+              var blobUrl = URL.createObjectURL(blob);
+              playAudioStream(blobUrl, source, fallbackScript);
+              return;
+            }
+            audioPlaying = false;
+            activeAudioSource = null;
+            updateAudioUi();
+            if (fallbackScript) playJlptSpeech(fallbackScript, source);
+          }).catch(function () {
+            audioPlaying = false;
+            activeAudioSource = null;
+            updateAudioUi();
+            if (fallbackScript) playJlptSpeech(fallbackScript, source);
+          });
+          return;
+        }
         audioPlaying = false;
         activeAudioSource = null;
         updateAudioUi();
@@ -431,15 +453,29 @@
     // Hentikan audio seketika saat murid menjawab
     stopJlptAudio();
 
+    var qs = getFilteredQuestions();
+    var q = (qs && qs[curIndex]) ? qs[curIndex] : null;
+
     var btns = document.querySelectorAll('.jlpt-opt-btn');
     btns.forEach(function (btn) {
       btn.classList.add('locked');
+      btn.disabled = true;
+      btn.setAttribute('aria-disabled', 'true');
       var bId = parseInt(btn.getAttribute('data-opt-id'), 10);
+      var bOpt = (q && q.options) ? q.options.find(function (o, idx) {
+        var id = (typeof o === 'object' && o.id !== undefined) ? o.id : (idx + 1);
+        return id === bId;
+      }) : null;
+      var bText = bOpt ? ((typeof bOpt === 'object' ? bOpt.text : bOpt) || '') : '';
+      var bAria = 'Pilihan ' + bId + ': ' + bText;
       if (bId === correctOptId) {
         btn.classList.add('correct');
+        bAria += ' (' + t('jlpt.kunci-tepat', 'KUNCI JAWABAN TEPAT') + ')';
       } else if (bId === optId && optId !== correctOptId) {
         btn.classList.add('wrong');
+        bAria += ' (' + t('jlpt.not-quite-right', 'Kurang Tepat') + ')';
       }
+      btn.setAttribute('aria-label', bAria);
     });
 
     var isRight = (optId === correctOptId);
@@ -453,8 +489,6 @@
 
     // Braincore Engine Authority & Zero-Dumbing Invariant:
     // Alirkan bukti penguasaan nyata ke model murid (updateMastery, BKT, history)
-    var qs = getFilteredQuestions();
-    var q = (qs && qs[curIndex]) ? qs[curIndex] : null;
     if (typeof window !== 'undefined') {
       var itemKey = (q && (q.id || q.itemId)) || ('jlpt_' + curLevel.toLowerCase() + '_' + curIndex);
       var latencyMs = 6000;
@@ -571,9 +605,9 @@
     var isLast = (curIndex >= qs.length - 1);
 
     container.innerHTML =
-      '<div class="' + cls + '">' +
+      '<div class="' + cls + '" role="alert" aria-live="assertive">' +
         '<div class="jlpt-fb-left">' +
-          '<span class="jlpt-fb-badge">' + icon + '</span>' +
+          '<span class="jlpt-fb-badge" aria-hidden="true">' + icon + '</span>' +
           '<div class="jlpt-fb-text-col">' +
             '<div class="jlpt-fb-title">' + title + '</div>' +
             '<div class="jlpt-fb-sub">' + sub + '</div>' +
@@ -696,6 +730,17 @@
       statusClass = 'status-wrong';
     }
 
+    var chosenOpt = options.find(function (o, idx) {
+      var id = (typeof o === 'object' && o.id !== undefined) ? o.id : (idx + 1);
+      return id === selectedChoice;
+    });
+    var distractorNote = (chosenOpt && typeof chosenOpt === 'object' && chosenOpt.whyFails) ? chosenOpt.whyFails : '';
+    var distractorHtml = (distractorNote && selectedChoice !== correctOptId) ? (
+      '<div class="jlpt-explain-distractor-card" style="margin-top:10px;background:#FFF1F2;border:1px solid #FECDD3;border-radius:10px;padding:9px 12px;font-size:12px;color:#9F1239;line-height:1.45;">' +
+        '<b>⚠️ Analisis Pilihan ' + selectedChoice + ':</b> ' + escapeHtml(distractorNote) +
+      '</div>'
+    ) : '';
+
     return '<div class="jlpt-explain-panel">' +
       '<div class="jlpt-key-card">' +
         '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">' +
@@ -707,6 +752,7 @@
       '<div class="jlpt-explain-body">' +
         '<h4 class="jlpt-explain-title">' + t('jlpt.explain-title', '💡 Analisis & Pembahasan Soal:') + '</h4>' +
         '<p class="jlpt-explain-desc">' + escapeHtml(explanation) + '</p>' +
+        distractorHtml +
       '</div>' +
       '<div class="jlpt-explain-tip-card" style="background:#F0F7FF;border:1px solid #D0E4FA;border-radius:10px;padding:9px 12px;font-size:12px;color:#1E40AF;line-height:1.45;">' +
         '<b>🎯 Tips Menyimak:</b> Perhatikan kata penunjuk instruksi, waktu, serta kata sambung (<i>しかし</i>, <i>でも</i>, <i>じゃあ</i>) yang kerap membalik atau menegaskan keputusan tokoh.' +
@@ -1261,17 +1307,21 @@
       var textJa = (typeof opt === 'object') ? (opt.text || '') : String(opt);
       var textId = (typeof opt === 'object') ? (opt.textId || '') : '';
       var cls = 'jlpt-opt-btn';
+      var ariaLabel = 'Pilihan ' + optId + ': ' + textJa;
 
       if (isAnswered) {
         cls += ' locked';
         if (optId === correctOptId) {
           cls += ' correct';
+          ariaLabel += ' (' + t('jlpt.kunci-tepat', 'KUNCI JAWABAN TEPAT') + ')';
         } else if (optId === selectedChoice) {
           cls += ' wrong';
+          ariaLabel += ' (' + t('jlpt.not-quite-right', 'Kurang Tepat') + ')';
         }
       }
 
-      return '<button type="button" class="' + cls + '" data-opt-id="' + optId + '" onclick="selectJlptChoice(' + optId + ', ' + correctOptId + ')">' +
+      var disabledAttr = isAnswered ? ' disabled aria-disabled="true"' : '';
+      return '<button type="button" class="' + cls + '" data-opt-id="' + optId + '"' + disabledAttr + ' aria-label="' + escapeHtml(ariaLabel) + '" onclick="selectJlptChoice(' + optId + ', ' + correctOptId + ')">' +
         '<span class="jlpt-opt-badge">' + optId + '</span>' +
         '<div class="jlpt-opt-texts">' +
           '<div class="jlpt-opt-ja">' + escapeHtml(textJa) + '</div>' +

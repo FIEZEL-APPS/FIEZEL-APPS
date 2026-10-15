@@ -13,7 +13,7 @@
     "feedbackBanner": {
       "title": "Belum Tepat",
       "sub": "Kunci jawaban: Pilihan 1",
-      "html": "<div class=\"jlpt-feedback-banner wrong\"><div class=\"jlpt-fb-left\"><span class=\"jlpt-fb-badge\">✗</span><div class=\"jlpt-fb-text-col\"><div class=\"jlpt-fb-title\">Belum Tepat</div><div class=\"jlpt-fb-sub\">Kunci jawaban: Pilihan 1</div></div></div><div class=\"jlpt-fb-actions\"><button type=\"button\" class=\"jlpt-fb-key-btn\" onclick=\"openJlptDetailSheet('explain')\">Lihat Kunci ↗</button><button type=\"button\" class=\"jlpt-fb-next-btn\" onclick=\"nextListeningQuestion()\">Maju →</button></div></div>"
+      "html": "<div class=\"jlpt-feedback-banner wrong\" role=\"alert\" aria-live=\"assertive\"><div class=\"jlpt-fb-left\"><span class=\"jlpt-fb-badge\" aria-hidden=\"true\">✗</span><div class=\"jlpt-fb-text-col\"><div class=\"jlpt-fb-title\">Belum Tepat</div><div class=\"jlpt-fb-sub\">Kunci jawaban: Pilihan 1</div></div></div><div class=\"jlpt-fb-actions\"><button type=\"button\" class=\"jlpt-fb-key-btn\" onclick=\"openJlptDetailSheet('explain')\">Lihat Kunci ↗</button><button type=\"button\" class=\"jlpt-fb-next-btn\" onclick=\"nextListeningQuestion()\">Maju →</button></div></div>"
     },
     "stateSync": {
       "historyDelta": 1,

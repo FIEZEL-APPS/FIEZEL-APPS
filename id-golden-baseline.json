@@ -1,6 +1,6 @@
 {
   "schema": "id-golden-baseline/1",
-  "generatedAt": "2026-10-15T19:38:29.188Z",
+  "generatedAt": "2026-10-15T21:08:04.351Z",
   "root": "C:\\Users\\hp\\fiezel-apps",
   "files": {
     "grammar-explanations-id.json": "6f7f5e03b33742917af73b5f6ac7dad6b4fafd92bc1bb39009731a04cf72b567",
@@ -18,8 +18,8 @@
     "features/audio-assets/fiezel-audio-key.js": "11624e303917fe0df881ac3f410911587766fd6f4d2491ca6687ec42de8d457d"
   },
   "literals": {
-    "count": 5679,
-    "sha256": "cdea9456d96a4bca7cd0616fec3783b6fd6b66b3dbf674974af7e6321769d632",
+    "count": 5680,
+    "sha256": "fc370d36bb95a806fe13da0f0f800bea56c5f6e5a5a295ad45c0087b27e67522",
     "list": [
       "\n        <div class=\"hint-sheet-handle\" aria-hidden=\"true\"></div>\n        <div class=\"hint-popover-header\">\n          <div style=\"display:flex;align-items:center;gap:6px\">\n            <i data-lucide=\"info\"></i>\n            <strong>${FiezelI18n.t('grammar.petunjuk', 'Petunjuk Tata Bahasa')}</strong>\n          </div>\n          <span class=\"hint-level-pill\">${currentLvl}/4</span>\n          <button type=\"button\" id=\"hintCloseBtn\" class=\"hint-close-btn\" aria-label=\"${FiezelI18n.t('modal.tutup', 'Tutup')}\"><i data-lucide=\"x\"></i></button>\n        </div>\n        <div class=\"hint-step-indicator\" aria-hidden=\"true\">\n          ${[1,2,3,4].map(i => ",
       "\n        <div style=\"display:flex;flex-direction:column;align-items:center;gap:8px;padding:2px 0;\">\n          <div class=\"fz-qr-scanner-box\" id=\"fzQrScannerBox\" data-testid=\"qr-scanner-box\">\n            <video id=\"qrScanVideo\" class=\"fz-qr-video\" playsinline autoplay muted></video>\n            <div class=\"fz-qr-reticle\" id=\"fzQrReticle\">\n              <div class=\"fz-qr-corner fz-qr-corner-tl\"></div>\n              <div class=\"fz-qr-corner fz-qr-corner-tr\"></div>\n              <div class=\"fz-qr-corner fz-qr-corner-bl\"></div>\n              <div class=\"fz-qr-corner fz-qr-corner-br\"></div>\n              <div class=\"fz-qr-laser\"></div>\n            </div>\n            <div class=\"fz-qr-cam-fallback\" id=\"fzQrCamFallback\" style=\"display:none;\">\n              <i data-lucide=\"camera\" style=\"width:30px;height:30px;color:#64748B;\"></i>\n              <p style=\"font-size:11px;line-height:1.3;margin:0;color:#CBD5E1;\">${FiezelI18n.t('social3.scan-cam-err','Kamera belum aktif.')}</p>\n            </div>\n          </div>\n          <input type=\"file\" id=\"qrFileInput\" accept=\"image/*\" style=\"display:none;\" onchange=\"handleQrFilePicked(event)\">\n          <button type=\"button\" class=\"btn-scan-gallery\" onclick=\"$('qrFileInput')?.click()\" data-testid=\"qr-gallery-btn\" style=\"display:flex;align-items:center;justify-content:center;gap:6px;width:100%;max-width:260px;padding:8px 12px;border-radius:10px;background:#F8FAFC;border:1.5px solid #CBD5E1;color:#0F172A !important;font-weight:700;font-size:12px;cursor:pointer;\">\n            <i data-lucide=\"image\" style=\"width:15px;height:15px;color:#0284C7;\"></i> ${FiezelI18n.t('social3.scan-from-gallery','Pilih dari Galeri Foto')}\n          </button>\n        </div>\n      ",
@@ -2839,6 +2839,7 @@
       "KEMBALI KE SARANG",
       "KNIP salah karena lembaga kemudian dibawa ke 1945.",
       "KOSAKATA",
+      "KUNCI JAWABAN TEPAT",
       "Kaidah bahasa pidato tidak mewajibkan menyertakan perhitungan matematika.",
       "Kakak laki-lakiku benci bangun pagi di hari Minggu, makanya dia tidak pernah memasang alarm.",
       "Kakak yang membeli printer kedua untuk keluarga",

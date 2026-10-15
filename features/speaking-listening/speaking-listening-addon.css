@@ -20,7 +20,7 @@
 @media(max-width:640px){.fsl-grid{grid-template-columns:1fr}.fsl-head{display:block}.fsl-actions>*{flex:1 1 auto}}
 /* m025-145: kontrak ujian Speaking. Waktu menyiapkan dan waktu bicara ditaruh di muka
    karena itulah yang membedakan latihan ujian dari latihan harian. */
-.fsl-timing{display:grid;gap:3px;margin:0 0 10px;padding:11px 13px;border-radius:14px;background:rgba(194,64,44,.08);font-size:.8rem}
+.fsl-timing{display:grid;gap:2px;margin:0 0 8px;padding:8px 11px;border-radius:12px;background:rgba(194,64,44,.08);font-size:.78rem}
 .fsl-timing span{font-weight:700}
 .fsl-timing small{line-height:1.45;opacity:.8}
 .fsl-cue{margin:10px 0;padding-left:20px;display:grid;gap:5px;font-size:.85rem}
@@ -36,8 +36,8 @@
 .fsl-q-feedback.is-wrong{background:rgba(194,64,44,.12)}
 .fsl-q-feedback small{opacity:.85;line-height:1.45}
 .fsl-option.is-picked{outline:2px solid var(--accent,#c2402c);outline-offset:1px}
-.fsl-notes-label{display:grid;gap:5px;margin:12px 0 0;font-size:.79rem;font-weight:650}
-.fsl-notes{width:100%;font:inherit;font-weight:400;padding:8px 10px;border-radius:12px;border:1px solid var(--line,#eadfce);min-height:60px;max-height:100px;resize:vertical}
+.fsl-notes-label{display:grid;gap:4px;margin:8px 0 0;font-size:.78rem;font-weight:650}
+.fsl-notes{width:100%;font:inherit;font-weight:400;padding:6px 9px;border-radius:12px;border:1px solid var(--line,#eadfce);min-height:50px;max-height:85px;resize:vertical}
 .fsl-exam-result{margin:10px 0 0}
 .fsl-script{margin:10px 0 0;font-size:.8rem}
 .fsl-script pre{white-space:pre-wrap;line-height:1.55;padding:11px;border-radius:12px;background:rgba(0,0,0,.05);font:inherit;font-size:.8rem;max-height:340px;overflow:auto}
