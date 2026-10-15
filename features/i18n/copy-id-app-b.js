@@ -205,6 +205,7 @@
     'update.later-btn': 'Nanti saja',
     'update.applying-text': 'Memperbarui...',
     'update.version-text': 'Versi {newVersion} · kamu sekarang memakai {curVersion}',
+    'update.success-toast': 'FIEZEL berhasil diperbarui ke build {build}. Selamat belajar.',
 
     'boot.recovery-title': 'FIEZEL belum siap',
     'boot.recovery-desc': 'Koneksi atau data belum selesai dimuat.',

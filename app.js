@@ -7644,7 +7644,32 @@ function notifyAppUpdateIfNew(){
 // sampai service worker barunya aktif. Berkas dengan nama baru adalah cache miss di shell
 // lama, jadi ia diambil dari jaringan dan kartunya muncul di instalasi lama juga. Baca
 // catatan panjang di kepala berkas itu.
-function startUpdateWatcher(){try{self.FiezelUpdatePrompt?.start?.()}catch{}}
+function checkPostUpdateCelebration(){
+  try{
+    const curBuild=self.FIEZEL_PAGE_BUILD;
+    if(!curBuild)return;
+    const key='fiezel-last-seen-build-v1';
+    const last=localStorage.getItem(key);
+    if(!last){localStorage.setItem(key,curBuild);return}
+    const parse=v=>{const m=String(v||'').match(/^m(\d+)-(\d+)/i);return m?(parseInt(m[1],10)*100000+parseInt(m[2],10)):null};
+    const c=parse(curBuild),l=parse(last);
+    if(c!==null&&l!==null&&c>l){
+      localStorage.setItem(key,curBuild);
+      setTimeout(()=>{
+        try{
+          if(!self.FiezelStage?.lessonMode?.()){
+            const msg=FiezelI18n.t('update.success-toast',{build:curBuild});
+            showToast(msg,'success');
+            uiSfx?.('badge_reward');
+          }
+        }catch(_){}
+      },2200);
+    }else if(curBuild!==last&&(c!==null&&l!==null&&c>=l)){
+      localStorage.setItem(key,curBuild);
+    }
+  }catch(_){}
+}
+function startUpdateWatcher(){try{self.FiezelUpdatePrompt?.start?.();checkPostUpdateCelebration()}catch{}}
 function buildALRSContext(now=Date.now()){
   const evidence=buildLearnerEvidenceModel(now),last=lastLearningAt(),daysInactive=last?Math.max(0,Math.floor((now-last)/86400000)):999;return{now,hour:studyHour(now),bestWindowFrom:braincoreBestWindowFrom(now),today:studyDayKey(now),consecutiveWrong:Number(state.consecutiveWrong||0),totalAnswered:Number(state.totalAnswered||0),todayAttempts:Number(state.daily?.date===studyDayKey(now)?state.daily?.attempts||0:0),streakDays:Number(state.streak||0),daysInactive,dueReviews:evidence.memory.dueReviews,maxForgettingRisk:evidence.memory.maxForgettingRisk,consistency14d:evidence.behavior.consistency14d,abandonmentRate:evidence.behavior.abandonmentRate,recurringErrorSkills:evidence.skills.recurringErrorSkills}
 }
@@ -18418,7 +18443,7 @@ function openSettings(){const p=state.preferences||defaultPreferences,endpoint=p
   // itulah yang melaporkan shell usang, jadi tombol perbaikannya berdampingan dengannya.
   /* Audit F15: "Hapus semua progres" pindah dari dasar halaman Progres ke Pengaturan -> Data
      (tetap lewat konfirmasi resetProgress). */
-  const grupData=`${progressSyncSettingsMarkup()}${continuitySettingsMarkup()}<div class="card reset-card"><h3>${FiezelI18n.t('progress.reset-progres')}</h3><p class="muted">${FiezelI18n.t('settings.reset-lokasi-desc')}</p><button type="button" class="danger" data-testid="settings-reset-progress" onclick="resetProgress()">${FiezelI18n.t('progress.reset-progres')}</button></div><div class="card cache-card"><h3>${FiezelI18n.t('settings.bersihkan-cache-judul')}</h3><p class="muted">${FiezelI18n.t('settings.menghapus-berkas-aplikasi-lama-menumpuk')}</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button id="settingCheckUpdate" type="button" class="primary" style="flex:1"><i data-lucide="refresh-cw"></i> Cek Pembaruan</button><button id="settingClearCache" type="button" style="flex:1"><i data-lucide="trash-2"></i> ${FiezelI18n.t('settings.bersihkan-cache-amp-muat-ulang')}</button></div></div><div class="card"><h3>${FiezelI18n.t('settings.kesehatan-instalasi-judul')}</h3><div id="installHealth"><p class="muted">${FiezelI18n.t('settings.memeriksa-pemasangan')}</p></div></div>`;
+  const grupData=`${progressSyncSettingsMarkup()}${continuitySettingsMarkup()}<div class="card reset-card"><h3>${FiezelI18n.t('progress.reset-progres')}</h3><p class="muted">${FiezelI18n.t('settings.reset-lokasi-desc')}</p><button type="button" class="danger" data-testid="settings-reset-progress" onclick="resetProgress()">${FiezelI18n.t('progress.reset-progres')}</button></div><div class="card cache-card"><h3>${FiezelI18n.t('settings.bersihkan-cache-judul')}</h3><p class="muted">${FiezelI18n.t('settings.menghapus-berkas-aplikasi-lama-menumpuk')}</p><p class="muted" style="margin-top:6px;margin-bottom:8px;font-size:0.75rem;opacity:0.85">Build aktif: <b>${esc(self.FIEZEL_PAGE_BUILD||'m025')}</b></p><div style="display:flex;gap:8px;flex-wrap:wrap"><button id="settingCheckUpdate" type="button" class="primary" style="flex:1"><i data-lucide="refresh-cw"></i> Cek Pembaruan</button><button id="settingClearCache" type="button" style="flex:1"><i data-lucide="trash-2"></i> ${FiezelI18n.t('settings.bersihkan-cache-amp-muat-ulang')}</button></div></div><div class="card"><h3>${FiezelI18n.t('settings.kesehatan-instalasi-judul')}</h3><div id="installHealth"><p class="muted">${FiezelI18n.t('settings.memeriksa-pemasangan')}</p></div></div>`;
   /* Audit F16 (2026-09-23): "Creator Learning Report", "Endpoint Webhook Laporan", dan
      "Pasang Creator Hub" adalah alat pengembang, bukan pengaturan murid. Blok itu kini
      tersembunyi kecuali mode kreator (guru terverifikasi, ?creator=1, atau
@@ -18442,7 +18467,7 @@ function openSettings(){const p=state.preferences||defaultPreferences,endpoint=p
     +settingsFold(FiezelI18n.t('settings.data-amp-penyimpanan'),grupData,false)
     +settingsFold(FiezelI18n.t('settings.lanjutan'),grupLanjutan,false)
     +`<div class="modal-actions settings-actions"><button id="settingsCancel">${FiezelI18n.t('settings.cancel-btn')}</button><button class="primary" id="settingsSave">${FiezelI18n.t('settings.simpan-prefs')}</button></div>`);
-  $('settingsCancel').onclick=closeModal;setTimeout(refreshInstallHealth,0);setTimeout(refreshAudioDiagnostics,0);$('backupExport')?.addEventListener('click',runBackupExport);$('backupPick')?.addEventListener('click',()=>$('backupFile')?.click());$('backupFile')?.addEventListener('change',event=>runBackupImport(event.currentTarget.files?.[0]));$('openFeedback')?.addEventListener('click',()=>{closeModal();openFeedback('')});$('reportPreview').onclick=openReportPreview;$('settingsSave').onclick=saveSettings;$('settingClearCache')?.addEventListener('click',()=>{confirmClearAppCache()});$('settingCheckUpdate')?.addEventListener('click',async()=>{const btn=$('settingCheckUpdate');if(btn){btn.disabled=true;btn.textContent='Memeriksa...';}try{const hasUpdate=await self.FiezelUpdatePrompt?.check?.(true);if(!hasUpdate){showToast('Aplikasi sudah versi terbaru.','success');if(btn){btn.disabled=false;btn.innerHTML='<i data-lucide="check"></i> Versi Terbaru';enhanceUI();}}else{closeModal();}}catch(err){showToast('Gagal memeriksa: '+(err?.message||err),'warn');if(btn){btn.disabled=false;btn.innerHTML='<i data-lucide="refresh-cw"></i> Cek Pembaruan';enhanceUI();}}});bindVoiceSettingControls();bindAccountSettingControls();bindFiezelAccountControls();$('settingReminders')?.addEventListener('change',event=>toggleStudyReminders(event.currentTarget));$('settingLearnerLocale')?.addEventListener('change',event=>setLearnerLocalePreference(event.currentTarget.value));$('settingTargetLang')?.addEventListener('change',event=>setTargetLangPreference(event.currentTarget.value));$('settingBoardHidden')?.addEventListener('change',event=>socialToggleHidden(event.currentTarget));
+  $('settingsCancel').onclick=closeModal;setTimeout(refreshInstallHealth,0);setTimeout(refreshAudioDiagnostics,0);$('backupExport')?.addEventListener('click',runBackupExport);$('backupPick')?.addEventListener('click',()=>$('backupFile')?.click());$('backupFile')?.addEventListener('change',event=>runBackupImport(event.currentTarget.files?.[0]));$('openFeedback')?.addEventListener('click',()=>{closeModal();openFeedback('')});$('reportPreview').onclick=openReportPreview;$('settingsSave').onclick=saveSettings;$('settingClearCache')?.addEventListener('click',()=>{confirmClearAppCache()});$('settingCheckUpdate')?.addEventListener('click',async()=>{const btn=$('settingCheckUpdate');if(btn){btn.disabled=true;btn.textContent='Memeriksa...';}try{const hasUpdate=await self.FiezelUpdatePrompt?.check?.(true);if(!hasUpdate){showToast('Aplikasi sudah versi terbaru ('+(self.FIEZEL_PAGE_BUILD||'')+').','success');if(btn){btn.disabled=false;btn.innerHTML='<i data-lucide="check"></i> Versi Terbaru ('+(self.FIEZEL_PAGE_BUILD||'')+')';enhanceUI();}}else{closeModal();}}catch(err){showToast('Gagal memeriksa: '+(err?.message||err),'warn');if(btn){btn.disabled=false;btn.innerHTML='<i data-lucide="refresh-cw"></i> Cek Pembaruan';enhanceUI();}}});bindVoiceSettingControls();bindAccountSettingControls();bindFiezelAccountControls();$('settingReminders')?.addEventListener('change',event=>toggleStudyReminders(event.currentTarget));$('settingLearnerLocale')?.addEventListener('change',event=>setLearnerLocalePreference(event.currentTarget.value));$('settingTargetLang')?.addEventListener('change',event=>setTargetLangPreference(event.currentTarget.value));$('settingBoardHidden')?.addEventListener('change',event=>socialToggleHidden(event.currentTarget));
 // Pengaturan sebelum gelombang idle selesai, kartunya akan berbunyi "tidak tersedia"
 // padahal berkasnya sedang dalam perjalanan - jadi kartunya digambar ulang begitu tiba.
 if(!self.FiezelVoiceRuntime)ensureVoiceRuntime().then(()=>{const holder=$('voiceSettingsCard');if(!holder)return;holder.innerHTML=neuralVoiceStatusMarkup();bindVoiceSettingControls();enhanceUI()});
