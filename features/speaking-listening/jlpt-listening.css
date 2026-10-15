@@ -760,14 +760,29 @@
 .jlpt-replay-pill {
   font-size: 11px;
   font-weight: 700;
-  color: #D6CBC2;
-  padding: 0 4px;
+  color: #7A5F1B !important;
+  background: #FEF3C7 !important;
+  border: 1px solid #FDE68A !important;
+  border-radius: 999px !important;
+  padding: 2px 7px !important;
   white-space: nowrap;
   display: none;
 }
 
 .jlpt-replay-pill.visible {
   display: inline-block;
+}
+
+.jlpt-opt-btn:focus-visible,
+.jlpt-primary-play-btn:focus-visible,
+.jlpt-speed-chip:focus-visible,
+.jlpt-jees-chip:focus-visible,
+.jlpt-fb-next-btn:focus-visible,
+.jlpt-fb-key-btn:focus-visible,
+.jlpt-tab-chip:focus-visible,
+.jlpt-sheet-close:focus-visible {
+  outline: 2px solid #D97706 !important;
+  outline-offset: 2px !important;
 }
 
 /* =========================================================================

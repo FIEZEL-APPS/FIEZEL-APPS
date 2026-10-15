@@ -1,7 +1,7 @@
 {
-  "version": "m025-583",
-  "claimedBy": "branch feat/listening-audit-overhaul",
-  "claimedAt": "2026-10-15T19:39:02.437Z",
-  "reason": "fix(listening): overhaul total UI/UX, braincore sync, audio offline, and exam anti-leak",
+  "version": "m025-584",
+  "claimedBy": "branch feat/listening-perfection-a11y-pedagogy",
+  "claimedAt": "2026-10-15T21:29:21.567Z",
+  "reason": "fix(listening): a11y focus rings, distractor diagnosis, and cache resilience",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

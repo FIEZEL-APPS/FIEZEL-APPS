@@ -82,17 +82,20 @@
         {
           "id": 2,
           "text": "13ページの もんだいを ぜんぶ やります",
-          "textId": "Mengerjakan semua soal di halaman 13"
+          "textId": "Mengerjakan semua soal di halaman 13",
+          "whyFails": "Guru menegaskan 'いいえ' (bukan semuanya) dan murid hanya diminta mengerjakan nomor 1 dan 2."
         },
         {
           "id": 3,
           "text": "13ページの 1ばんと 2ばんを やります",
-          "textId": "Mengerjakan halaman 13 nomor 1 dan 2 saja"
+          "textId": "Mengerjakan halaman 13 nomor 1 dan 2 saja",
+          "whyFails": "Soal halaman 13 dikerjakan setelah membaca, sedangkan pertanyaan menanyakan instruksi yang dilakukan pertama kali (はじめに)."
         },
         {
           "id": 4,
           "text": "本を とじます",
-          "textId": "Menutup buku"
+          "textId": "Menutup buku",
+          "whyFails": "Murid diminta membuka dan membaca halaman 10 sampai 12, bukan menutup buku."
         }
       ],
       "answerIndex": 0,
@@ -136,7 +139,8 @@
         {
           "id": 1,
           "text": "りんごを 3つ",
-          "textId": "Apel 3 buah"
+          "textId": "Apel 3 buah",
+          "whyFails": "Awalnya perempuan mengajak beli 3 apel, namun setelah diingatkan ada pisang, mereka sepakat membeli 2 buah saja."
         },
         {
           "id": 2,
@@ -146,12 +150,14 @@
         {
           "id": 3,
           "text": "りんごを 2つと みかんを 1つ",
-          "textId": "Apel 2 buah dan jeruk 1 buah"
+          "textId": "Apel 2 buah dan jeruk 1 buah",
+          "whyFails": "Jeruk tidak jadi dibeli karena persediaan jeruk di rumah masih ada (みかんは いえに まだ あります)."
         },
         {
           "id": 4,
           "text": "バナナと みかん",
-          "textId": "Pisang dan jeruk"
+          "textId": "Pisang dan jeruk",
+          "whyFails": "Pisang sudah dibeli kemarin dan jeruk masih ada di rumah, bukan barang yang dibeli hari ini."
         }
       ],
       "answerIndex": 1,
@@ -191,7 +197,8 @@
         {
           "id": 1,
           "text": "えきの ひがしぐち",
-          "textId": "Pintu timur stasiun"
+          "textId": "Pintu timur stasiun",
+          "whyFails": "Pintu timur stasiun sedang dalam perbaikan konstruksi (こうじをして います)."
         },
         {
           "id": 2,
@@ -201,12 +208,14 @@
         {
           "id": 3,
           "text": "えきの なかの カフェ",
-          "textId": "Kafe di dalam stasiun"
+          "textId": "Kafe di dalam stasiun",
+          "whyFails": "Kafe tidak pernah disebutkan dalam percakapan janji temu."
         },
         {
           "id": 4,
           "text": "こうじの ばしょ",
-          "textId": "Lokasi tempat konstruksi"
+          "textId": "Lokasi tempat konstruksi",
+          "whyFails": "Lokasi perbaikan konstruksi justru dihindari oleh kedua tokoh."
         }
       ],
       "answerIndex": 1,
