@@ -358,11 +358,229 @@
     return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg(text, opts));
   }
 
+  // ---------------------------------------------------------------- pemrosesan teks QR / scanner
+  var MINT_ALPHABET = '23456789ABCDEFGHJKMNPQRSTVWXYZ';
+
+  function normalizeCode(raw) {
+    return String(raw == null ? '' : raw).toUpperCase().replace(/[^A-Z0-9]/g, '');
+  }
+
+  function isMintShaped(code) {
+    if (typeof code !== 'string' || code.length !== 8) return false;
+    for (var i = 0; i < 8; i++) {
+      if (MINT_ALPHABET.indexOf(code.charAt(i)) < 0) return false;
+    }
+    return true;
+  }
+
+  function paramFrom(text, name) {
+    var re = new RegExp('[?&#]' + name + '=([A-Za-z0-9_@.-]{1,64})(?:&|#|$)');
+    var hit = re.exec(String(text || ''));
+    return hit ? hit[1] : '';
+  }
+
+  /**
+   * Ekstraksi handle teman dari teks apa pun (?friend=@handle, deep link, @handle, handle polos).
+   * @param {string} text
+   * @returns {string|null}
+   */
+  function parseFriendHandle(text) {
+    if (!text) return null;
+    var s = String(text).trim();
+    var p = paramFrom(s, 'friend');
+    if (p) return p.replace(/^@/, '').toLowerCase();
+    var mDeep = s.match(/(?:^|\/)(?:app\/)?(?:#|\?)?friend\/@?([a-zA-Z0-9_]{3,20})(?:[/?#]|$)/i);
+    if (mDeep) return mDeep[1].toLowerCase();
+    var mAt = s.match(/(?:^|\s)@([a-zA-Z0-9_]{3,20})$/);
+    if (mAt) return mAt[1].toLowerCase();
+    // Jika berupa kode bertanda hubung 4-4, ini bukan handle
+    if (/^[A-Za-z0-9]{4}-[A-Za-z0-9]{4}$/.test(s)) return null;
+    // Handle polos 3-20 karakter
+    if (/^[a-zA-Z0-9_]{3,20}$/.test(s)) {
+      var norm = normalizeCode(s);
+      // Jika string 8 karakter memenuhi pola mint kode undangan dan tanpa underscore,
+      // dengan angka di dalamnya, prioritaskan sebagai kode undangan
+      if (s.length === 8 && isMintShaped(norm) && s === norm && s.indexOf('_') < 0 && /[0-9]/.test(s)) {
+        return null;
+      }
+      return s.toLowerCase();
+    }
+    return null;
+  }
+
+  /**
+   * Ekstraksi kode tiket undangan dari teks (?invite=KODE, K3JQ-7W2A, K3JQ7W2A 8 karakter).
+   * @param {string} text
+   * @returns {string|null}
+   */
+  function parseInviteCode(text) {
+    if (!text) return null;
+    var s = String(text).trim();
+    var inv = paramFrom(s, 'invite');
+    if (inv) {
+      var normInv = normalizeCode(inv);
+      if (normInv.length >= 6 && normInv.length <= 16) return normInv;
+    }
+    // Bentuk terformat 4-4 (mis. K3JQ-7W2A)
+    var mHyphen = s.match(/^([A-Za-z0-9]{4})-([A-Za-z0-9]{4})$/);
+    if (mHyphen) return (mHyphen[1] + mHyphen[2]).toUpperCase();
+    // Token 8 karakter murni
+    var norm8 = normalizeCode(s);
+    if (norm8.length === 8 && (isMintShaped(norm8) || /^[A-Z0-9]{8}$/.test(norm8))) {
+      if (s.indexOf('@') < 0) return norm8;
+    }
+    return null;
+  }
+
+  /**
+   * Pemrosesan teks QR fleksibel:
+   * Mengenali:
+   *   - Profil teman: URL ?friend=@handle, deep link, @handle, handle biasa
+   *   - Tiket undangan: URL ?invite=KODE, kode 8 karakter murni (K3JQ7W2A / K3JQ-7W2A)
+   *   - Duel belajar: URL ?duel=KODE
+   *   - URL tautan PWA: https://fiezel.my.id/app/ atau tautan aplikasi Fiezel lainnya
+   *
+   * @param {string} text
+   * @returns {{
+   *   kind: 'friend'|'invite'|'duel'|'pwa'|'unknown',
+   *   handle: string|null,
+   *   code: string|null,
+   *   url: string|null,
+   *   raw: string
+   * }}
+   */
+  function parseQrText(text) {
+    var raw = String(text == null ? '' : text).trim();
+    if (!raw) {
+      return { kind: 'unknown', handle: null, code: null, url: null, raw: '' };
+    }
+
+    // 1. Cek parameter friend / handle eksplisit
+    var friendHandle = parseFriendHandle(raw);
+    if (friendHandle && (/[?&#]friend=/i.test(raw) || raw.indexOf('@') >= 0 || /friend\//i.test(raw))) {
+      return { kind: 'friend', handle: friendHandle, code: null, url: (/^https?:\/\//i.test(raw) ? raw : null), raw: raw };
+    }
+
+    // 2. Cek parameter invite / kode tiket undangan
+    var inviteCode = parseInviteCode(raw);
+    if (inviteCode && (/[?&#]invite=/i.test(raw) || /^[A-Za-z0-9]{4}-[A-Za-z0-9]{4}$/.test(raw) || (raw.length === 8 && isMintShaped(inviteCode)))) {
+      return { kind: 'invite', handle: null, code: inviteCode, url: (/^https?:\/\//i.test(raw) ? raw : null), raw: raw };
+    }
+
+    // 3. Cek parameter duel
+    var duel = paramFrom(raw, 'duel');
+    if (duel && duel.length >= 8) {
+      return { kind: 'duel', handle: null, code: duel, url: (/^https?:\/\//i.test(raw) ? raw : null), raw: raw };
+    }
+
+    // 4. Jika ada friendHandle tapi belum tertangkap (misal handle polos)
+    if (friendHandle) {
+      return { kind: 'friend', handle: friendHandle, code: null, url: null, raw: raw };
+    }
+
+    // 5. Jika ada inviteCode umum 8 karakter
+    if (inviteCode) {
+      return { kind: 'invite', handle: null, code: inviteCode, url: null, raw: raw };
+    }
+
+    // 6. Cek apakah berupa tautan URL PWA (Fiezel atau Web URL)
+    if (/^(https?:\/\/|\/app\/)/i.test(raw)) {
+      return { kind: 'pwa', handle: null, code: null, url: raw, raw: raw };
+    }
+
+    return { kind: 'unknown', handle: null, code: null, url: null, raw: raw };
+  }
+
+  // ---------------------------------------------------------------- visual feedback: shimmer / placeholder
+  /**
+   * SVG murni untuk shimmer animasi saat kamera sedang inisialisasi.
+   * Tidak memiliki dependensi eksternal, memakai SMIL animateTransform yang didukung
+   * seluruh peramban modern untuk menghilangkan "black void" di kotak pemindai.
+   */
+  function scannerPlaceholderSvg(opts) {
+    opts = opts || {};
+    var label = opts.label == null ? 'Menyiapkan kamera...' : String(opts.label);
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 210 210" width="100%" height="100%" preserveAspectRatio="none" role="img" aria-label="' + escAttr(label) + '">' +
+      '<defs>' +
+        '<linearGradient id="fzQrShimmerGrad" x1="0%" y1="0%" x2="100%" y2="100%">' +
+          '<stop offset="0%" stop-color="#090D16"/>' +
+          '<stop offset="35%" stop-color="#1E293B"/>' +
+          '<stop offset="50%" stop-color="#334155"/>' +
+          '<stop offset="65%" stop-color="#1E293B"/>' +
+          '<stop offset="100%" stop-color="#090D16"/>' +
+          '<animateTransform attributeName="gradientTransform" type="translate" from="-2 -2" to="2 2" dur="1.8s" repeatCount="indefinite"/>' +
+        '</linearGradient>' +
+      '</defs>' +
+      '<rect width="100%" height="100%" fill="url(#fzQrShimmerGrad)"/>' +
+      '<g transform="translate(105, 90)">' +
+        '<rect x="-20" y="-20" width="40" height="40" rx="10" fill="rgba(255,255,255,0.06)" stroke="rgba(255,200,0,0.4)" stroke-width="1.5"/>' +
+        '<path d="M-8 -3h4l2 -3h4l2 3h4c1.1 0 2 .9 2 2v8c0 1.1 -.9 2 -2 2h-14c-1.1 0 -2 -.9 -2 -2v-8c0 -1.1 .9 -2 2 -2z" fill="none" stroke="#FFC800" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>' +
+        '<circle cx="1" cy="3" r="2.8" fill="none" stroke="#FFC800" stroke-width="1.8"/>' +
+      '</g>' +
+      '<text x="105" y="142" fill="#CBD5E1" font-family="-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,sans-serif" font-size="11" font-weight="700" text-anchor="middle">' + escAttr(label) + '</text>' +
+    '</svg>';
+  }
+
+  /**
+   * HTML wrapper placeholder / shimmer saat kamera sedang inisialisasi.
+   * Diletakkan di dalam `.fz-qr-scanner-box` dengan z-index di atas video kosong.
+   */
+  function scannerPlaceholder(opts) {
+    opts = opts || {};
+    var id = opts.id || 'fzQrScannerPlaceholder';
+    var svgContent = scannerPlaceholderSvg(opts);
+    return '<div id="' + escAttr(id) + '" class="fz-qr-shimmer" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#090D16;overflow:hidden;z-index:2;pointer-events:none;">' +
+      svgContent +
+    '</div>';
+  }
+
+  /**
+   * Helper DOM untuk menyisipkan atau menampilkan placeholder shimmer di kotak pemindai.
+   */
+  function showPlaceholder(containerEl, label) {
+    if (!containerEl || typeof containerEl.querySelector !== 'function') return null;
+    var el = containerEl.querySelector('#fzQrScannerPlaceholder');
+    if (!el) {
+      if (typeof document !== 'undefined') {
+        var wrapper = document.createElement('div');
+        wrapper.innerHTML = scannerPlaceholder({ label: label });
+        el = wrapper.firstElementChild;
+        if (el) containerEl.appendChild(el);
+      }
+    } else {
+      el.style.display = 'flex';
+      var txt = el.querySelector('text');
+      if (txt && label) txt.textContent = label;
+    }
+    return el;
+  }
+
+  /**
+   * Helper DOM untuk menyembunyikan placeholder shimmer saat video kamera sudah memutar frame.
+   */
+  function hidePlaceholder(containerEl) {
+    if (!containerEl || typeof containerEl.querySelector !== 'function') return;
+    var el = containerEl.querySelector('#fzQrScannerPlaceholder');
+    if (el) {
+      el.style.display = 'none';
+    }
+  }
+
   root.FiezelQr = Object.freeze({
     LEVELS: LEVELS,
     matrix: matrix,
     svg: svg,
     dataUrl: dataUrl,
-    utf8: utf8
+    utf8: utf8,
+    // Ekstensi Scanner & Parser Fleksibel
+    parse: parseQrText,
+    parseQrText: parseQrText,
+    parseFriendHandle: parseFriendHandle,
+    parseInviteCode: parseInviteCode,
+    // Visual Feedback Shimmer / Placeholder
+    scannerPlaceholder: scannerPlaceholder,
+    scannerPlaceholderSvg: scannerPlaceholderSvg,
+    showPlaceholder: showPlaceholder,
+    hidePlaceholder: hidePlaceholder
   });
 })(typeof self !== 'undefined' ? self : this);

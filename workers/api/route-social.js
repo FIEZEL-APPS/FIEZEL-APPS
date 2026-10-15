@@ -59,7 +59,8 @@ import { ensureSocialSchema } from './social-schema.js';
 import {
   HANDLE_RULES, DISPLAY_RULES, AVATAR_MAX_ID, PROFILE_FLAGS, INVITE_RULES,
   FRIENDS_MAX, REQUESTS_MAX, CHEER_STICKERS, CHEER_PER_FRIEND_PER_DAY, LEVEL_BANDS,
-  PB_RULES, MILESTONE_KINDS, EVIDENCE_RULES, COHORT_RULES, SOCIAL_FEATURE_SPEC
+  PB_RULES, MILESTONE_KINDS, EVIDENCE_RULES, COHORT_RULES, SOCIAL_FEATURE_SPEC,
+  RETENTION_RULES, RATE_LIMIT_RULES
 } from './social-config.js';
 
 /* ========================================================== waktu (hari/pekan WIB) == */
@@ -150,8 +151,9 @@ async function socialGate(ctx) {
   } catch {
     return { deny: jsonError(503, ERR.UNAVAILABLE, {}, opt) };
   }
-  const day = studyDayWib(ctx.now);
-  return { db, sub: ctx.identity.sub, day, week: weekMondayOf(day), opt };
+  const now = Number(ctx.now) || Date.now();
+  const day = studyDayWib(now);
+  return { db, sub: ctx.identity.sub, now, day, week: weekMondayOf(day), opt };
 }
 
 const PROFILE_COLUMNS =
@@ -386,10 +388,20 @@ async function routeProfileMe(ctx) {
 
 function randomInviteCode() {
   const alphabet = INVITE_RULES.ALPHABET;
-  const bytes = new Uint8Array(INVITE_RULES.CODE_LEN);
-  crypto.getRandomValues(bytes);
+  const len = alphabet.length;
+  const maxUnbiased = 256 - (256 % len);
+  const targetLen = INVITE_RULES.CODE_LEN;
   let code = '';
-  for (const b of bytes) code += alphabet[b % alphabet.length];
+  const buf = new Uint8Array(targetLen * 2);
+  while (code.length < targetLen) {
+    crypto.getRandomValues(buf);
+    for (let i = 0; i < buf.length && code.length < targetLen; i += 1) {
+      const b = buf[i];
+      if (b < maxUnbiased) {
+        code += alphabet[b % len];
+      }
+    }
+  }
   return code;
 }
 
@@ -452,39 +464,60 @@ async function routeFriendsRedeem(ctx) {
   const me = await requireProfile(gate);
   if (!me) return jsonError(404, ERR.PROFILE_REQUIRED, {}, gate.opt);
 
+  // Rate limiting anti-brute force tebakan kode: maks 15 tebakan per user/IP per jam
+  const hourPeriod = new Date(gate.now + 7 * 3600 * 1000).toISOString().slice(0, 13);
+  const granted = await grantCapped(
+    gate.db, gate.sub, hourPeriod, 'redeem_guess', 1, 15
+  );
+  if (!granted) {
+    return jsonError(429, ERR.RATE_LIMITED, { retryAfter: 3600 }, gate.opt);
+  }
+
   // SATU bentuk galat untuk SEMUA sebab kode (salah bentuk / tidak ada /
   // kedaluwarsa / sudah terpakai / kode sendiri) — anti-oracle, pola claim_invalid.
   const invalid = () => jsonError(400, ERR.CODE_INVALID, {}, gate.opt);
   const code = String(body.value.code).toUpperCase();
   if (!/^[A-Z0-9]{8}$/.test(code)) return invalid();
 
+  const invite = await gate.db
+    .prepare(
+      'SELECT sub, expires_day, used_by FROM social_invite ' +
+      'WHERE code = ?1 AND used_by IS NULL AND expires_day >= ?2 AND sub <> ?3'
+    )
+    .bind(code, gate.day, gate.sub)
+    .first();
+  if (!invite || !invite.sub) return invalid();
+
+  const inviter = await readProfile(gate.db, invite.sub);
+  if (!inviter) return invalid(); // profil pengundang sudah lenyap: kode mati sunyi
+
+  // Periksa kuota teman FRIENDS_MAX (50 teman) untuk KEDUA belah pihak
   if ((await mutualFriendCount(gate.db, gate.sub)) >= FRIENDS_MAX) {
     return jsonError(409, ERR.LIMIT_REACHED, {}, gate.opt);
   }
+  if ((await mutualFriendCount(gate.db, invite.sub)) >= FRIENDS_MAX) {
+    return jsonError(409, ERR.LIMIT_REACHED, {}, gate.opt);
+  }
 
-  // Klaim SINGLE-USE atomik: satu pernyataan, satu pemenang. Replay kode yang
-  // sama menemukan used_by terisi dan jatuh ke galat generik yang sama.
-  const claimed = await gate.db
-    .prepare(
-      'UPDATE social_invite SET used_by = ?2, used_day = ?3 ' +
-      'WHERE code = ?1 AND used_by IS NULL AND expires_day >= ?3 AND sub <> ?2 RETURNING sub'
-    )
-    .bind(code, gate.sub, gate.day)
-    .first();
-  if (!claimed || !claimed.sub) return invalid();
-
-  const inviter = await readProfile(gate.db, claimed.sub);
-  if (!inviter) return invalid(); // profil pengundang sudah lenyap: kode mati sunyi
-
-  // Pertemanan DUA ARAH, idempoten (sudah berteman = no-op ramah, spec §3.2).
-  await gate.db
-    .prepare('INSERT OR IGNORE INTO social_friend (a, b, since_day) VALUES (?1, ?2, ?3)')
-    .bind(gate.sub, claimed.sub, gate.day)
-    .run();
-  await gate.db
-    .prepare('INSERT OR IGNORE INTO social_friend (a, b, since_day) VALUES (?1, ?2, ?3)')
-    .bind(claimed.sub, gate.sub, gate.day)
-    .run();
+  // Atomisitas D1: update hangus social_invite DAN kedua INSERT OR IGNORE INTO social_friend dalam SATU batch
+  const batchRes = await gate.db.batch([
+    gate.db
+      .prepare(
+        'UPDATE social_invite SET used_by = ?2, used_day = ?3 ' +
+        'WHERE code = ?1 AND used_by IS NULL AND expires_day >= ?3 AND sub <> ?2'
+      )
+      .bind(code, gate.sub, gate.day),
+    gate.db
+      .prepare('INSERT OR IGNORE INTO social_friend (a, b, since_day) VALUES (?1, ?2, ?3)')
+      .bind(gate.sub, invite.sub, gate.day),
+    gate.db
+      .prepare('INSERT OR IGNORE INTO social_friend (a, b, since_day) VALUES (?1, ?2, ?3)')
+      .bind(invite.sub, gate.sub, gate.day)
+  ]);
+  const updateRes = batchRes && batchRes[0];
+  if (!updateRes || !updateRes.meta || updateRes.meta.changes === 0) {
+    return invalid();
+  }
 
   return jsonResponse(
     {
@@ -538,11 +571,11 @@ const EDGE_SCAN_LIMIT = 200;
 
 async function friendEdges(db, sub) {
   const out = await db
-    .prepare('SELECT b, since_day FROM social_friend WHERE a = ?1 LIMIT ' + EDGE_SCAN_LIMIT)
+    .prepare('SELECT b, since_day FROM social_friend WHERE a = ?1 LIMIT 200')
     .bind(sub)
     .all();
   const inc = await db
-    .prepare('SELECT a, since_day FROM social_friend WHERE b = ?1 LIMIT ' + EDGE_SCAN_LIMIT)
+    .prepare('SELECT a, since_day FROM social_friend WHERE b = ?1 LIMIT 200')
     .bind(sub)
     .all();
   const outgoing = ((out && out.results) || []);
@@ -694,16 +727,31 @@ async function routeFriendsAccept(ctx) {
     .first();
   if (!theirs) return invalid();
 
-  /* Batasnya dicek untuk YANG MENERIMA - inilah pihak yang daftar temannya
-     bertambah, dan pihak yang dulu tidak pernah dihitung sama sekali. */
+  /* Batasnya dicek untuk KEDUA belah pihak sebelum menerima */
   if ((await mutualFriendCount(gate.db, gate.sub)) >= FRIENDS_MAX) {
     return jsonError(409, ERR.LIMIT_REACHED, {}, gate.opt);
   }
+  if ((await mutualFriendCount(gate.db, target.sub)) >= FRIENDS_MAX) {
+    return jsonError(409, ERR.LIMIT_REACHED, {}, gate.opt);
+  }
 
-  await gate.db
-    .prepare('INSERT OR IGNORE INTO social_friend (a, b, since_day) VALUES (?1, ?2, ?3)')
+  /* Conditional insert untuk mencegah ghost friend requests */
+  const res = await gate.db
+    .prepare(
+      'INSERT OR IGNORE INTO social_friend (a, b, since_day) ' +
+      'SELECT ?1, ?2, ?3 WHERE EXISTS (SELECT 1 FROM social_friend WHERE a = ?2 AND b = ?1)'
+    )
     .bind(gate.sub, target.sub, gate.day)
     .run();
+  if (!res || !res.meta || res.meta.changes === 0) {
+    const already = await gate.db
+      .prepare('SELECT 1 FROM social_friend WHERE a = ?1 AND b = ?2')
+      .bind(gate.sub, target.sub)
+      .first();
+    if (!already) {
+      return invalid();
+    }
+  }
 
   return jsonResponse({ status: 'friends', friend: friendPayload(target.profile) }, gate.opt);
 }
@@ -855,7 +903,7 @@ async function routeCheer(ctx) {
     gate.db, gate.sub, gate.day, 'cheer:' + target.sub, 1, CHEER_PER_FRIEND_PER_DAY
   );
   if (!granted) {
-    return jsonError(429, ERR.RATE_LIMITED, { retryAfter: 3600 }, gate.opt);
+    return jsonError(429, ERR.RATE_LIMITED, { retryAfter: RATE_LIMIT_RULES.CHEER_RETRY_AFTER_S }, gate.opt);
   }
   await gate.db
     .prepare(
@@ -1181,6 +1229,61 @@ async function routeRankOptout(ctx) {
     .bind(gate.sub, gate.week, hidden ? 1 : 0)
     .run();
   return jsonResponse({ hidden }, gate.opt);
+}
+
+/* ========================================================== retensi & pembersihan == */
+
+/**
+ * Pembersihan berkala lapisan sosial (D1 CORE_DB):
+ * - Hapus social_invite yang kadaluarsa (> 7 hari)
+ * - Hapus milestone_feed lama (> 14 hari)
+ * - Hapus rank_jti lama (> 7 hari)
+ * - Hapus social_counter lama (> 14 hari)
+ * - Hapus cheer_feed lama (> 7 hari)
+ */
+export async function runSocialRetentionPurge(env, nowMs) {
+  const db = socialDb(env);
+  if (!db) return { skipped: 'no_binding' };
+
+  try {
+    await ensureSocialSchema(db);
+  } catch {
+    // schema idempoten, abaikan jika tabel sudah terdaftar
+  }
+
+  const at = Number.isFinite(nowMs) ? nowMs : Date.now();
+  const today = studyDayWib(at);
+  const cutoff7 = addDays(today, -RETENTION_RULES.INVITE_DAYS);
+  const cutoff14 = addDays(today, -RETENTION_RULES.MILESTONE_DAYS);
+
+  const stmts = [
+    db.prepare('DELETE FROM social_invite WHERE expires_day < ?1').bind(cutoff7),
+    db.prepare('DELETE FROM milestone_feed WHERE day < ?1').bind(cutoff14),
+    db.prepare('DELETE FROM rank_jti WHERE day < ?1').bind(cutoff7),
+    db.prepare('DELETE FROM social_counter WHERE period < ?1').bind(cutoff14),
+    db.prepare('DELETE FROM cheer_feed WHERE day < ?1').bind(cutoff7)
+  ];
+
+  let results;
+  if (typeof db.batch === 'function') {
+    results = await db.batch(stmts);
+  } else {
+    results = [];
+    for (const stmt of stmts) {
+      /* eslint-disable no-await-in-loop */
+      results.push(await stmt.run());
+    }
+  }
+
+  const changes = (res) => (res && res.meta && typeof res.meta.changes === 'number') ? res.meta.changes : 0;
+
+  return {
+    socialInvite: changes(results[0]),
+    milestoneFeed: changes(results[1]),
+    rankJti: changes(results[2]),
+    socialCounter: changes(results[3]),
+    cheerFeed: changes(results[4])
+  };
 }
 
 /* ========================================================== pendaftaran rute ======= */

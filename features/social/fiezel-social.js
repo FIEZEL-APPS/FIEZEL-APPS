@@ -187,8 +187,17 @@
     if(!online()){flagState={status:'offline',at:Date.now()};return 'offline'}
     var base=baseUrl();
     if(!base){flagState={status:'off',at:Date.now()};return 'off'}
+    var AC=root.AbortController||(typeof AbortController!=='undefined'?AbortController:null);
+    var controller=AC?new AC():null;
+    var timer=controller?setTimeout(function(){try{controller.abort()}catch(_){}},10000):null;
     try{
-      var r=await fetch(base+API_PATHS.config,{method:'GET',cache:'no-store',mode:'cors',credentials:'omit'});
+      var r=await fetch(base+API_PATHS.config,{
+        method:'GET',
+        cache:'no-store',
+        mode:'cors',
+        credentials:'omit',
+        signal:controller?controller.signal:undefined
+      });
       if(!r||!r.ok){flagState={status:'off',at:Date.now()};return 'off'}
       var data=await r.json();
       // Hanya `=== true` yang berarti hidup — flag absen/ambigu = mati (fail-closed).
@@ -196,44 +205,82 @@
       flagState={status:on?'on':'off',at:Date.now()};
       return flagState.status;
     }catch(_){flagState={status:online()?'off':'offline',at:Date.now()};return flagState.status}
+    finally{if(timer)clearTimeout(timer)}
   }
 
   // ---------------------------------------------------------------- klien API
   var anonReady=false;
-  /** POST /api/auth/anon sekali per sesi — menerbitkan cookie fz_id bila belum ada. */
+  var ensureAnonPromise=null;
+  /** POST /api/auth/anon sekali per sesi — menerbitkan cookie fz_id bila belum ada. Inflight deduplication. */
   async function ensureAnon(){
     if(anonReady)return true;
+    if(ensureAnonPromise)return ensureAnonPromise;
     var base=baseUrl();if(!base)return false;
-    try{
-      var r=await fetch(base+API_PATHS.anon,{method:'POST',headers:{'Content-Type':'application/json'},body:'{}',credentials:'include',mode:'cors',cache:'no-store'});
-      anonReady=!!(r&&(r.ok||r.status===409));
-      return anonReady;
-    }catch(_){return false}
+    var AC=root.AbortController||(typeof AbortController!=='undefined'?AbortController:null);
+    var controller=AC?new AC():null;
+    var timer=controller?setTimeout(function(){try{controller.abort()}catch(_){}},10000):null;
+    ensureAnonPromise=(async function(){
+      try{
+        var r=await fetch(base+API_PATHS.anon,{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:'{}',
+          credentials:'include',
+          mode:'cors',
+          cache:'no-store',
+          signal:controller?controller.signal:undefined
+        });
+        anonReady=!!(r&&(r.ok||r.status===409));
+        return anonReady;
+      }catch(_){
+        anonReady=false;
+        return false;
+      }finally{
+        if(timer)clearTimeout(timer);
+        ensureAnonPromise=null;
+      }
+    })();
+    return ensureAnonPromise;
   }
   /**
    * Satu pintu semua panggilan sosial. Jawaban SERAGAM dan tidak pernah melempar:
    * {ok:boolean, status:number, data:object|null, error:string, message:string}.
    * `message` sudah kalimat Indonesia siap tampil.
    */
-  async function call(path,body,method){
+  async function call(path,body,method,_retried){
     if(!online())return {ok:false,status:0,data:null,error:'offline',message:errorCopy('offline')};
     var base=baseUrl();
     if(!base)return {ok:false,status:0,data:null,error:'social_disabled',message:errorCopy('social_disabled')};
     var m=method||(body===undefined?'GET':'POST');
-    var opts={method:m,credentials:'include',mode:'cors',cache:'no-store'};
+    var AC=root.AbortController||(typeof AbortController!=='undefined'?AbortController:null);
+    var controller=AC?new AC():null;
+    var timer=controller?setTimeout(function(){try{controller.abort()}catch(_){}},10000):null;
+    var opts={
+      method:m,
+      credentials:'include',
+      mode:'cors',
+      cache:'no-store',
+      signal:controller?controller.signal:undefined
+    };
     if(m!=='GET'){opts.headers={'Content-Type':'application/json'};opts.body=JSON.stringify(body||{})}
     try{
       var r=await fetch(base+path,opts);
       var data=null;try{data=await r.json()}catch(_){data=null}
       if(r.ok)return {ok:true,status:r.status,data:data,error:'',message:''};
       var code=data&&data.error?String(data.error):(r.status===401?'unauthorized':r.status===403?'social_disabled':r.status===503?'unavailable':'unknown');
-      // 401 = cookie belum ada; terbitkan sekali lalu ulang SEKALI (bukan loop).
-      if(r.status===401&&!anonReady){
-        if(await ensureAnon())return call(path,body,method);
+      // 401 = cookie belum ada atau kedaluwarsa; reset anonReady, terbitkan sekali lalu ulang SEKALI (bukan loop).
+      if(r.status===401){
+        anonReady=false;
+        if(!_retried){
+          var restored=await ensureAnon();
+          if(restored)return call(path,body,method,true);
+        }
       }
       return {ok:false,status:r.status,data:data,error:code,message:errorCopy(code,data&&data.retryAfter)};
     }catch(_){
       return {ok:false,status:0,data:null,error:online()?'unavailable':'offline',message:errorCopy(online()?'unavailable':'offline')};
+    }finally{
+      if(timer)clearTimeout(timer);
     }
   }
 
@@ -325,6 +372,10 @@
     try{
       var box=outboxPrune(outboxRead(),nowMs);
       outboxWrite(box);
+      var processedJtis={};
+      for(var b=0;b<box.length;b++){
+        if(box[b]&&box[b].jti)processedJtis[box[b].jti]=true;
+      }
       var keep=[];
       for(var i=0;i<box.length;i++){
         var it=box[i];
@@ -334,8 +385,17 @@
         keep.push(it);                                    // lainnya: coba lagi nanti
         if(res.error==='offline'||res.error==='unavailable'){for(var j=i+1;j<box.length;j++)keep.push(box[j]);break}
       }
-      outboxWrite(keep);
-      return {sent:sent,kept:keep.length,reason:''};
+      var latestBox=outboxRead();
+      var incoming=[];
+      for(var k=0;k<latestBox.length;k++){
+        var cur=latestBox[k];
+        if(cur&&cur.jti&&!processedJtis[cur.jti]){
+          incoming.push(cur);
+        }
+      }
+      var finalBox=keep.concat(incoming);
+      outboxWrite(finalBox);
+      return {sent:sent,kept:finalBox.length,reason:''};
     }catch(_){return {sent:sent,kept:outboxRead().length,reason:'error'}}
     finally{flushing=false}
   }

@@ -104,10 +104,24 @@ assert(L.extract('https://fiezel.my.id/app/?duel=eyJ2IjoxfQ').kind === L.KIND_DU
 
 // Normalisasi: murid menempel apa adanya.
 assert(L.normalizeCode(' k3jq-7w2a ') === 'K3JQ7W2A', 'spasi, tanda hubung, huruf kecil dirapikan');
+assert(L.normalizeCode('01l-k3jq') === 'OIIK3JQ', 'Crockford: 0->O, 1/L->I');
+assert(L.normalizeCode(' k0jq-7w2a ') === 'KOJQ7W2A', 'Crockford: 0 diganti O');
+assert(L.normalizeCode(' k1jq-7w2a ') === 'KIJQ7W2A', 'Crockford: 1 diganti I');
+assert(L.normalizeCode(' kljq-7w2a ') === 'KIJQ7W2A', 'Crockford: L diganti I');
 assert(L.isServerShaped('K3JQ7W2A') === true, 'bentuk kode server diterima');
 assert(L.isServerShaped('K3JQ7W2') === false, 'kode 7 karakter ditolak');
 assert(L.isMintShaped('K3JQ7W2A') === true && L.isMintShaped('KOJQ7W2A') === false,
   'alfabet cetak menolak huruf O yang tidak pernah dicetak server');
+
+// Ekstraksi friend=@handle
+assert(L.extract('https://fiezel.my.id/app/?friend=@rian_guru').code === '@rian_guru',
+  'ekstraksi friend=@handle dari URL');
+assert(L.extract('https://fiezel.my.id/app/?friend=rian_guru').code === '@rian_guru',
+  'ekstraksi friend=handle tanpa @ dinormalisasi jadi @handle');
+assert(L.fromLocation('https://fiezel.my.id/app/?url=' + encodeURIComponent('https://fiezel.my.id/app/?friend=@siti')).source === 'share-target',
+  'fromLocation membaca friend dari share-target url');
+assert(L.fromLocation('https://fiezel.my.id/app/?text=' + encodeURIComponent('Lihat https://fiezel.my.id/app/?friend=@siti')).source === 'share-target',
+  'fromLocation membaca friend dari share-target text');
 
 /* ================================================================ 2. antrean undangan */
 
@@ -151,6 +165,12 @@ assert(keptDuel !== null && /duel=abc123xyz/.test(keptDuel),
   'cleanUrl TIDAK PERNAH membuang ?duel= — alur Duel Belajar membacanya dari location tiap render');
 assert(cleanWith('https://fiezel.my.id/app/') === null,
   'alamat tanpa jejak undangan tidak ditulis ulang sama sekali');
+assert(!/url=/.test(cleanWith('https://fiezel.my.id/app/?url=' + encodeURIComponent('https://fiezel.my.id/app/?invite=K3JQ7W2A'))),
+  'cleanUrl membuang ?url= yang berisi invite');
+assert(!/url=/.test(cleanWith('https://fiezel.my.id/app/?url=' + encodeURIComponent('https://fiezel.my.id/app/?friend=@siti'))),
+  'cleanUrl membuang ?url= yang berisi friend');
+assert(cleanWith('https://fiezel.my.id/app/?url=' + encodeURIComponent('https://example.com')) === null,
+  'cleanUrl mempertahankan ?url= yang tidak terkait undangan');
 
 /* ================================================================ 4. kotak masuk sosial */
 

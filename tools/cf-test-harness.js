@@ -480,6 +480,33 @@ function fakeD1(handlersOrOptions) {
       const rows = returning ? projection(t, returning, affected, binds) : [];
       return { rows, meta: { changes, last_row_id: t.rows.length, rows_written: changes } };
     }
+    /* INSERT … SELECT … WHERE EXISTS (…) */
+    if ((m = sql.match(/^INSERT (OR IGNORE )?INTO ([A-Za-z_][\w]*)\s*\(([^)]*)\)\s*SELECT\s+(.*?)\s+WHERE\s+EXISTS\s*\((.+)\)$/i))) {
+      const [, orIgnore, name, columnList, valueList, existsSql] = m;
+      const t = table(name);
+      const subRes = execute(existsSql, binds);
+      if (!subRes.rows || subRes.rows.length === 0) {
+        return { rows: [], meta: { changes: 0, last_row_id: t.rows.length, rows_written: 0 } };
+      }
+      const columns = columnList.split(',').map(s => s.trim());
+      const values = splitTopLevel(valueList, ',').map(expression => compileExpr(expression)(null, binds));
+      const candidate = {};
+      for (const column of t.columns) candidate[column.name] = column.default;
+      columns.forEach((column, i) => { candidate[column] = values[i]; });
+      const existing = t.pk.length ? t.rows.find(r => pkOf(t, r) === pkOf(t, candidate)) : null;
+      let changes = 0;
+      let affected = [];
+      if (existing) {
+        if (orIgnore) {
+          changes = 0; affected = [];
+        } else {
+          throw new Error('D1_CONSTRAINT: UNIQUE constraint failed pada ' + name);
+        }
+      } else {
+        t.rows.push(candidate); changes = 1; affected = [candidate];
+      }
+      return { rows: [], meta: { changes, last_row_id: t.rows.length, rows_written: changes } };
+    }
     /* INSERT … SELECT — tidak didukung: melempar dengan pesan yang menyebut jalannya */
     if (/^INSERT/i.test(sql)) {
       throw new Error('D1_UNSUPPORTED_SQL: hanya INSERT … VALUES yang didukung harness ini (lihat tools/cf-test-harness.js §3): ' + sql);
