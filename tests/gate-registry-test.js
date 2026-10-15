@@ -149,6 +149,14 @@ const EXCLUSIONS = new Map([
       'zero dark bleed dan zero reload swipe back (m025-497). Memerlukan browser grafis Playwright lokal ' +
       'serta port web server aktif. Bukti kelulusan terdokumentasi di docs/handoffs/FIEZEL-M025497-SWIPE-ZERO-RELOAD-FINAL-HANDOFF.md.'
   }],
+  ['tools/dev/listening-ux-ergonomics-a11y-audit.mjs', {
+    class: 'alat-pelaporan',
+    reason:
+      'BUKAN gerbang CI Linux: alat pelaporan audit empiris Playwright Chromium lokal untuk mengukur ' +
+      'ergonomi UI/UX sesi listening, tap targets 44x44px, Daylight Travertine palette, dan anti-leak ' +
+      'kunci jawaban (m025-583). Memerlukan browser Playwright Chromium lokal dan port server aktif. ' +
+      'Bukti kelulusan terdokumentasi di docs/handoffs/FIEZEL-M025583-LISTENING-AUDIT-OVERHAUL-HANDOFF.md.'
+  }],
   ['tests/chokai-multi-voice-protocol-test.js', {
     class: 'gerbang-pra-rilis-fitur',
     reason:
