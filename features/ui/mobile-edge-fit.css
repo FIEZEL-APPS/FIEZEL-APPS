@@ -2591,7 +2591,7 @@ body.fz-lux .notification-panel,
 }
 
 .listening-modal-box p,
-.listening-modal-box span {
+.listening-modal-box span:not(.jlpt-speaker-chip):not(.jlpt-speaker-chip *):not(.jlpt-speaker-dot) {
   color: #382E25 !important;
 }
 

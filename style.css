@@ -9613,11 +9613,7 @@ body.fz-lux .feedback,
   color: #94A3B8 !important;
 }
 
-.jlpt-speaker-chip {
-  background: #252536 !important;
-  color: #FFE02E !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-}
+/* JLPT speaker chip styles are governed by jlpt-listening.css personas */
 
 .jlpt-sheet-subtitle {
   color: #CBD5E1 !important;

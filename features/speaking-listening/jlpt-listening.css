@@ -1516,48 +1516,47 @@
   background: currentColor;
 }
 
-/* Personas: Indigo / Amber / Emerald Palettes */
+/* Personas: Indigo / Amber / Emerald Palettes (Contrast > 7:1) */
 .jlpt-speaker-chip.speaker-instructor {
-  background: #EEF2FF;
-  color: #4338CA;
-  border: 1px solid #C7D2FE;
+  background: #EEF2FF !important;
+  color: #4338CA !important;
+  border: 1px solid #C7D2FE !important;
 }
 
 .jlpt-speaker-chip.speaker-male {
-  background: #FEF3C7;
-  color: #B45309;
-  border: 1px solid #FDE68A;
+  background: #FEF3C7 !important;
+  color: #B45309 !important;
+  border: 1px solid #FDE68A !important;
 }
 
 .jlpt-speaker-chip.speaker-female {
-  background: #ECFDF5;
-  color: #047857;
-  border: 1px solid #A7F3D0;
+  background: #ECFDF5 !important;
+  color: #047857 !important;
+  border: 1px solid #A7F3D0 !important;
 }
 
 .jlpt-speaker-chip.speaker-teacher {
-  background: #EDE9FE;
-  color: #6D28D9;
-  border: 1px solid #DDD6FE;
+  background: #EDE9FE !important;
+  color: #6D28D9 !important;
+  border: 1px solid #DDD6FE !important;
 }
 
 .jlpt-speaker-chip.speaker-student {
-  background: #CCFBF1;
-  color: #0F766E;
-  border: 1px solid #99F6E4;
+  background: #CCFBF1 !important;
+  color: #0F766E !important;
+  border: 1px solid #99F6E4 !important;
 }
 
 .jlpt-speaker-chip.speaker-staff,
 .jlpt-speaker-chip.speaker-neutral {
-  background: #F4EFEA;
-  color: #4A3E34;
-  border: 1px solid #E8DFD3;
+  background: #F4EFEA !important;
+  color: #4A3E34 !important;
+  border: 1px solid #E8DFD3 !important;
 }
 
+.jlpt-speaker-name,
 .jlpt-speaker-raw {
-  font-size: 10px;
-  opacity: 0.75;
-  font-weight: 600;
+  color: inherit !important;
 }
 
 .jlpt-line-speak-btn {
@@ -1960,9 +1959,11 @@
   }
 
   .listening-close-btn {
-    width: 30px !important;
-    height: 30px !important;
-    font-size: 14px !important;
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    font-size: 15px !important;
   }
 
   .listening-body {
