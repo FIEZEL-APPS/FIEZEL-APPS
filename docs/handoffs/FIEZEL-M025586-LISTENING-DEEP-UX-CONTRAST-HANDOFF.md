@@ -1,8 +1,9 @@
 # FIEZEL m025-586: Handoff Perbaikan Menyeluruh UI/UX Sesi Listening (Audio-First, WCAG AAA, & Anti-Ghost-Button)
 
-**Otoritas & Modul**: Sesi Listening (`features/speaking-listening/`), Tactile Clay Theme (`features/ui/`), dan Pipeline Ujian Chōkai / TOEFL.  
-**Build Target**: `m025-586` (Hexa-Sync diverifikasi).  
-**Tanggal**: 16 Oktober 2026.  
+**Otoritas & Modul**: MASTER / OWNER Authority — Sesi Listening (`features/speaking-listening/`), Tactile Clay Theme (`features/ui/`), dan Pipeline Ujian Chōkai / TOEFL.
+**Status**: SELESAI (diverifikasi pada m025-586).
+**Build Target**: `m025-586` (Hexa-Sync diverifikasi).
+**Tanggal**: 16 Oktober 2026.
 
 ---
 
@@ -68,7 +69,7 @@ Beserta 24 tangkapan layar verifikasi di folder `reports/listening-deep-audit-v2
 
 ---
 
-## 4. Status Kelulusan Gerbang Mutu Lokal & Catatan Utang Teknis
+## 4. Status Kelulusan Gerbang Mutu Lokal & Langkah Berikutnya
 
 ### Gerbang Mutu Lokal (Quality Gates)
 - `node tests/id-golden-snapshot-test.js`: **PASS (HIJAU: baseline emas Indonesia utuh)**
@@ -77,6 +78,6 @@ Beserta 24 tangkapan layar verifikasi di folder `reports/listening-deep-audit-v2
 - `node tests/gate-registry-test.js`: **PASS (10 pass, 0 fail, 374 gerbang terdaftar)**
 - `node tools/bump-build.mjs --check`: **PASS (Selaras 6 titik m025-586)**
 
-### Catatan Utang Teknis
-- Seluruh perbaikan CSS telah diisolasi dengan spesifisitas tinggi agar tidak mempengaruhi komponen clay di halaman lain.
-- Tidak ada utang teknis baru yang ditinggalkan.
+### Langkah Berikutnya (Next Steps)
+- Merge Pull Request ke branch `main`.
+- Verifikasi rilis Service Worker shell cache pada situs produksi (`https://fiezel.my.id/app/`).
