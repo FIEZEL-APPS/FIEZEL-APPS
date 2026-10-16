@@ -24,7 +24,7 @@
 .fsl-timing span{font-weight:700}
 .fsl-timing small{line-height:1.45;opacity:.8}
 .fsl-cue{margin:10px 0;padding-left:20px;display:grid;gap:5px;font-size:.85rem}
-.fsl-source{margin:10px 0;padding:12px 13px;border-radius:12px;background:rgba(0,0,0,.05);font:inherit;font-size:.82rem;line-height:1.55;white-space:pre-wrap;max-height:320px;overflow:auto}
+.fsl-source{margin:8px 0;padding:8px 11px;border-radius:12px;background:rgba(0,0,0,.04);border:1px solid rgba(0,0,0,.06);font:inherit;font-size:.78rem;line-height:1.45;color:#334155;white-space:pre-wrap;max-height:140px;overflow:auto}
 .fsl-adapted{margin:6px 0 0;font-size:.75rem;opacity:.75}
 /* m025-146: sesi Listening berformat ujian. Satu audio, banyak soal, sekali putar. */
 .fsl-exam-list{display:grid;gap:16px;margin:12px 0 0;padding-left:20px}
@@ -36,8 +36,9 @@
 .fsl-q-feedback.is-wrong{background:rgba(194,64,44,.12)}
 .fsl-q-feedback small{opacity:.85;line-height:1.45}
 .fsl-option.is-picked{outline:2px solid var(--accent,#c2402c);outline-offset:1px}
-.fsl-notes-label{display:grid;gap:4px;margin:8px 0 0;font-size:.78rem;font-weight:650}
-.fsl-notes{width:100%;font:inherit;font-weight:400;padding:6px 9px;border-radius:12px;border:1px solid var(--line,#eadfce);min-height:50px;max-height:85px;resize:vertical}
+.fsl-notes-label{display:grid;gap:4px;margin:8px 0 0;font-size:.78rem;font-weight:700;color:#334155}
+.fsl-notes{width:100%;font:inherit;font-weight:400;padding:8px 12px;border-radius:12px;border:1.5px solid var(--line,#CBD5E1) !important;min-height:54px;max-height:85px;resize:vertical;background:#FFFFFF !important;color:#0F172A !important}
+.fsl-notes:focus-visible{outline:2px solid var(--focus-ring,#A67A00);outline-offset:2px;border-color:var(--sun-deep,#E6A800) !important}
 .fsl-exam-result{margin:10px 0 0}
 .fsl-script{margin:10px 0 0;font-size:.8rem}
 .fsl-script pre{white-space:pre-wrap;line-height:1.55;padding:11px;border-radius:12px;background:rgba(0,0,0,.05);font:inherit;font-size:.8rem;max-height:340px;overflow:auto}
@@ -452,7 +453,7 @@ body.reduce-motion .fsl-player.is-playing .fsl-eq i { animation: none; transform
 }
 .fsl-card-listening .fsl-work:disabled .fsl-option {
   background: #F7F3EB !important;
-  color: #9A8A78 !important;
+  color: #54483E !important;
   border-color: #E8DFD3 !important;
   box-shadow: none !important;
   cursor: not-allowed !important;
@@ -460,7 +461,7 @@ body.reduce-motion .fsl-player.is-playing .fsl-eq i { animation: none; transform
 .fsl-card-listening .fsl-work:disabled .fsl-option .fsl-option-badge {
   background: #EFE8DC !important;
   border-color: #DFD5C6 !important;
-  color: #A39382 !important;
+  color: #54483E !important;
 }
 
 /* 6. PERBAIKAN GEM FOOTER (ANTI-CLIPPING PADA VIEWPORT 390PX) */
@@ -591,30 +592,35 @@ body.fsl-session-active .fsl-feedback .fsl-actions {
   margin-top: 0 !important;
 }
 .fsl-feedback .fsl-actions button[data-next],
-.fsl-actions button[data-next] {
+.fsl-actions button[data-next],
+button[data-next] {
   flex: 1 !important;
   width: 100% !important;
-  background: #F59E0B !important;
-  color: #1E1B18 !important;
+  background: #FFE02E !important;
+  color: #101018 !important;
+  -webkit-text-fill-color: #101018 !important;
   font-weight: 800 !important;
-  font-size: 15px !important;
-  border: none !important;
-  border-bottom: 3px solid #D97706 !important;
+  font-size: 16px !important;
+  letter-spacing: -0.01em !important;
+  border: 1.5px solid #241A11 !important;
+  border-bottom: 4px solid #241A11 !important;
   border-radius: 999px !important;
-  min-height: 48px !important;
-  height: 48px !important;
+  min-height: 50px !important;
+  height: 50px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   cursor: pointer !important;
-  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35) !important;
+  box-shadow: 0 4px 14px rgba(36, 26, 17, 0.22) !important;
+  opacity: 1 !important;
   transition: transform 0.1s ease, box-shadow 0.1s ease !important;
 }
 .fsl-feedback .fsl-actions button[data-next]:active,
-.fsl-actions button[data-next]:active {
+.fsl-actions button[data-next]:active,
+button[data-next]:active {
   transform: translateY(2px) !important;
-  border-bottom-width: 1px !important;
-  box-shadow: 0 2px 6px rgba(245, 158, 11, 0.25) !important;
+  border-bottom-width: 1.5px !important;
+  box-shadow: 0 2px 6px rgba(36, 26, 17, 0.14) !important;
 }
 
 /* 8. SINGLE-SCREEN VIEWPORT FIT & CLEAN LAYOUT */
