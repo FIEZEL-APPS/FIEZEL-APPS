@@ -7801,7 +7801,7 @@ html body #app .fz-kawan-card {
   box-shadow: 0 5px 0 #E9C188, 0 12px 26px rgba(217, 119, 6, 0.10) !important;
   cursor: pointer !important;
   position: relative !important;
-  overflow: hidden !important;
+  overflow: clip !important; /* clip, bukan hidden: kartu bukan wadah gulir */
   transition: transform 0.16s ease, box-shadow 0.16s ease !important;
   -webkit-tap-highlight-color: transparent;
 }
