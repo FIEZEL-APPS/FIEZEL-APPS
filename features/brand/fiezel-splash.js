@@ -516,7 +516,8 @@
     /* FRAME — semua opasitas/transform dihitung MURNI dari t (parametrik):
        scrub, lompat, dan adopsi-terlambat selalu konsisten. */
     var _lastF = '', _lastB = '', _lastWO = '', _lastWT = '';
-    var adoptedRevealed = !!(ctl.adopted && !frozenMode);
+    var adoptedRevealed = !!(ctl.adopted && !frozenMode && ctl.startOffset >= (particles.T ? particles.T.DONE : 1320));
+    try { env.__fiezelAuditSplashState = { ctlStartOffset: ctl.startOffset, adoptedRevealed: adoptedRevealed, ready: false, now: 0 }; } catch(_) {}
     function applyVisualState(t) {
       var sF = (adoptedRevealed ? 1 : easeOutCubic(ramp(t, TL.F_IN0, TL.F_IN1))).toFixed(3);
       if (sF !== _lastF) { fGroup.style.opacity = sF; _lastF = sF; }
@@ -529,6 +530,7 @@
       if (sWT !== _lastWT) { wordSlot.style.transform = sWT; _lastWT = sWT; }
     }
     function perFrame(t, dt) {
+      try { if (env.__fiezelAuditSplashState) { env.__fiezelAuditSplashState.now = t; env.__fiezelAuditSplashState.particlesN = (typeof particles.getCount === 'function' ? particles.getCount() : 0); } } catch(_) {}
       particles.update(t, dt);
       applyVisualState(t);
       equalizer.update(t, dt);
@@ -760,9 +762,11 @@
 
     /* ctl — jabat tangan antara show() dan jalur gerak/statis. */
     var ctl = {
-      /* Jam koreografi mulai dari sini: bagian yang sudah "dipakai" boot
-         diloncati, bukan diulang (adopsi lambat → langsung dekat cap). */
-      startOffset: Math.max(0, VISIBLE_MS - visibleMs),
+      /* Jam koreografi: untuk jalur gerak (motion), partikel dan koreografi
+         pembentukan ikon F serta balok emas WAJIB dimulai dari t=0 agar murid
+         selalu menikmati animasi konvergensi partikel yang membentuk logo.
+         Jalur kurangi-gerak (still) atau offset eksplisit tetap memperhitungkan sisa waktu. */
+      startOffset: (still || typeof opts.startOffset === 'number') ? (typeof opts.startOffset === 'number' ? opts.startOffset : Math.max(0, VISIBLE_MS - visibleMs)) : 0,
       adopted: !!adopted,
       ready: false, stampStarted: false, frozen: false, closed: false,
       introRequested: false,
@@ -860,7 +864,7 @@
        ('onboarding-enter' @ VISIBLE_MS−530 pada jam tayangan); pewaktu ini
        hanya jaring bila jalur gerak macet. Mode beku QA tidak memasangnya. */
     if (!ctl.frozen && typeof target.setTimeout === 'function') {
-      timer = target.setTimeout(close, visibleMs);
+      timer = target.setTimeout(close, (motion && !still) ? (VISIBLE_MS + 400) : visibleMs);
     }
     return { shown: true, close: close, element: host, adopted: !!adopted, visibleMs: visibleMs };
   }
