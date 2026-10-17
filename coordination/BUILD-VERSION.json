@@ -1,7 +1,7 @@
 {
-  "version": "m025-586",
-  "claimedBy": "branch feat/listening-deep-audit-ux-v2",
-  "claimedAt": "2026-10-16T13:22:36.707Z",
-  "reason": "fix(listening): WCAG contrast, next button cascade, and TOEFL notes ergonomics (m025-586)",
+  "version": "m025-587",
+  "claimedBy": "branch feature/interactive-chat-kaiwa",
+  "claimedAt": "2026-10-17T12:07:46.428Z",
+  "reason": "feat(chat): interactive AI conversational partner (kaiwa) and speaking session (m025-587)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
