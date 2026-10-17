@@ -2386,6 +2386,109 @@
     }
   }
 
+  // Shadowing Audio Stream & Visualizer State
+  var shadowingAudioStream = null;
+  var shadowingAudioCtx = null;
+  var shadowingAnalyser = null;
+  var shadowingRafId = null;
+
+  function stopShadowingAudio() {
+    if (shadowingRafId) {
+      if (typeof cancelAnimationFrame === 'function') cancelAnimationFrame(shadowingRafId);
+      else clearTimeout(shadowingRafId);
+      shadowingRafId = null;
+    }
+    if (shadowingAudioStream) {
+      try {
+        shadowingAudioStream.getTracks().forEach(function (tr) { tr.stop(); });
+      } catch (_) {}
+      shadowingAudioStream = null;
+    }
+    if (shadowingAudioCtx && shadowingAudioCtx.state !== 'closed') {
+      try { shadowingAudioCtx.close(); } catch (_) {}
+      shadowingAudioCtx = null;
+    }
+    shadowingAnalyser = null;
+  }
+
+  function startShadowingAudioVisualizer(msgId) {
+    stopShadowingAudio();
+    if (!navigator.mediaDevices || typeof navigator.mediaDevices.getUserMedia !== 'function') return;
+
+    navigator.mediaDevices.getUserMedia({ audio: true })
+      .then(function (stream) {
+        if (state.shadowingMsgId !== msgId) {
+          try { stream.getTracks().forEach(function (tr) { tr.stop(); }); } catch (_) {}
+          return;
+        }
+        shadowingAudioStream = stream;
+        var AudioCtx = root.AudioContext || root.webkitAudioContext;
+        if (!AudioCtx) return;
+
+        shadowingAudioCtx = new AudioCtx();
+        shadowingAnalyser = shadowingAudioCtx.createAnalyser();
+        shadowingAnalyser.fftSize = 64;
+        shadowingAnalyser.smoothingTimeConstant = 0.55;
+
+        var source = shadowingAudioCtx.createMediaStreamSource(stream);
+        source.connect(shadowingAnalyser);
+
+        var freqData = new Uint8Array(shadowingAnalyser.frequencyBinCount);
+
+        function loop() {
+          if (state.shadowingMsgId !== msgId || !shadowingAnalyser) {
+            stopShadowingAudio();
+            return;
+          }
+
+          shadowingAnalyser.getByteFrequencyData(freqData);
+          var sum = 0;
+          for (var i = 0; i < freqData.length; i++) {
+            sum += freqData[i];
+          }
+          var avg = sum / (freqData.length || 1); // 0 to 255
+          var isVoiceDetected = avg > 12;
+
+          var box = document.getElementById('fzcShadowBoxActive');
+          var eqContainer = document.getElementById('fzcShadowLiveEq');
+          var statusPill = document.getElementById('fzcShadowStatusPill');
+
+          if (box) {
+            box.classList.toggle('is-speaking-detected', isVoiceDetected);
+          }
+
+          if (statusPill) {
+            if (isVoiceDetected) {
+              statusPill.classList.add('is-detecting');
+              statusPill.innerHTML = '● ' + t('chat_shadow_hearing_voice', 'Mendengar suaramu...');
+            } else {
+              statusPill.classList.remove('is-detecting');
+              statusPill.innerHTML = t('chat_shadow_waiting_voice', 'Menunggu suaramu...');
+            }
+          }
+
+          if (eqContainer) {
+            var bars = eqContainer.querySelectorAll('.fzc-eq-bar');
+            if (bars && bars.length > 0) {
+              for (var b = 0; b < bars.length; b++) {
+                var binVal = freqData[b % freqData.length] || 0;
+                var h = Math.max(4, Math.min(22, Math.round(binVal * 0.22) + 3));
+                if (!isVoiceDetected) h = 4;
+                bars[b].style.height = h + 'px';
+              }
+            }
+          }
+
+          shadowingRafId = requestAnimationFrame(loop);
+        }
+
+        shadowingRafId = requestAnimationFrame(loop);
+      })
+      .catch(function (streamErr) {
+        console.warn('[FiezelShadowing] Microphone stream visualizer skipped:', streamErr);
+      });
+  }
+
   // Shadowing & Pronunciation Practice Mode
   function startShadowing(msgId, targetText) {
     var Ctor = root.SpeechRecognition || root.webkitSpeechRecognition;
@@ -2400,6 +2503,7 @@
       try { state.recognition.stop(); } catch (_) {}
       state.recognition = null;
     }
+    stopShadowingAudio();
 
     if (state.shadowingMsgId === msgId) {
       state.shadowingMsgId = null;
@@ -2411,23 +2515,43 @@
     state.isListening = false;
     state.shadowingMsgId = msgId;
     updateUI();
+    scrollBottom();
+    startShadowingAudioVisualizer(msgId);
 
     try {
       var rec = new Ctor();
       rec.lang = state.course === 'ja' ? 'ja-JP' : 'en-US';
       rec.continuous = false;
-      rec.interimResults = false;
+      rec.interimResults = true;
 
       rec.onresult = function (event) {
-        var transcript = '';
-        if (event.results && event.results[0] && event.results[0][0]) {
-          transcript = event.results[0][0].transcript;
-        }
-        state.shadowingMsgId = null;
-        state.recognition = null;
+        var interimTranscript = '';
+        var finalTranscript = '';
 
-        if (transcript) {
-          var evalRes = evaluatePronunciation(targetText, transcript, state.course);
+        if (event.results) {
+          for (var r = event.resultIndex; r < event.results.length; r++) {
+            var res = event.results[r];
+            if (res && res[0]) {
+              if (res.isFinal) {
+                finalTranscript += res[0].transcript;
+              } else {
+                interimTranscript += res[0].transcript;
+              }
+            }
+          }
+        }
+
+        var liveTranscriptEl = document.getElementById('fzcShadowLiveTranscript');
+        if (liveTranscriptEl && interimTranscript) {
+          liveTranscriptEl.textContent = '"' + interimTranscript + '"';
+        }
+
+        if (finalTranscript) {
+          stopShadowingAudio();
+          state.shadowingMsgId = null;
+          state.recognition = null;
+
+          var evalRes = evaluatePronunciation(targetText, finalTranscript, state.course);
           for (var i = 0; i < state.messages.length; i++) {
             if (state.messages[i].id === msgId) {
               state.messages[i].shadowResult = evalRes;
@@ -2436,18 +2560,21 @@
           }
           var xpGain = evalRes.score >= 85 ? 15 : (evalRes.score >= 60 ? 8 : 3);
           dispatchShadowingTelemetry(evalRes, xpGain, targetText, msgId);
+          saveState();
+          updateUI();
+          scrollBottom();
         }
-        saveState();
-        updateUI();
       };
 
       rec.onerror = function () {
+        stopShadowingAudio();
         state.shadowingMsgId = null;
         state.recognition = null;
         updateUI();
       };
 
       rec.onend = function () {
+        stopShadowingAudio();
         if (state.shadowingMsgId === msgId) {
           state.shadowingMsgId = null;
           state.recognition = null;
@@ -2458,6 +2585,7 @@
       state.recognition = rec;
       rec.start();
     } catch (_) {
+      stopShadowingAudio();
       state.shadowingMsgId = null;
       state.recognition = null;
       updateUI();
@@ -2527,13 +2655,21 @@
     }
   }
 
-  function scrollBottom() {
+  function scrollBottom(immediate) {
     if (typeof document === 'undefined') return;
     setTimeout(function () {
       if (typeof document === 'undefined') return;
       var feed = document.getElementById('fzcFeed');
-      if (feed) feed.scrollTop = feed.scrollHeight;
-    }, 50);
+      if (feed) {
+        if (immediate) {
+          feed.scrollTop = feed.scrollHeight;
+        } else if (typeof feed.scrollTo === 'function') {
+          feed.scrollTo({ top: feed.scrollHeight, behavior: 'smooth' });
+        } else {
+          feed.scrollTop = feed.scrollHeight;
+        }
+      }
+    }, 30);
   }
 
   // --- HTML Rendering ---
@@ -2675,10 +2811,22 @@
         );
       } else if (state.shadowingMsgId === msg.id) {
         shadowResultHtml = (
-          '<div class="fzc-shadow-box is-listening">' +
+          '<div class="fzc-shadow-box is-listening" id="fzcShadowBoxActive">' +
           '<div class="fzc-shadow-header">' +
-          '<span class="fzc-shadow-badge">' + icon('mic', { size: 14, className: 'fzc-inline-icon' }) + ' ' + t('chat_shadow_speak_now', 'Ucapkan kalimat ini sekarang...') + '</span>' +
-          '<div class="fzc-wave-bars"><span></span><span></span><span></span><span></span></div>' +
+          '<span class="fzc-shadow-badge"><span class="fzc-shadow-pulse-dot"></span> ' + t('chat_shadow_speak_now', 'Ucapkan kalimat ini sekarang...') + '</span>' +
+          '<div class="fzc-shadow-live-eq" id="fzcShadowLiveEq">' +
+          '<span class="fzc-eq-bar" style="height: 6px;"></span>' +
+          '<span class="fzc-eq-bar" style="height: 10px;"></span>' +
+          '<span class="fzc-eq-bar" style="height: 16px;"></span>' +
+          '<span class="fzc-eq-bar" style="height: 12px;"></span>' +
+          '<span class="fzc-eq-bar" style="height: 18px;"></span>' +
+          '<span class="fzc-eq-bar" style="height: 8px;"></span>' +
+          '<span class="fzc-eq-bar" style="height: 5px;"></span>' +
+          '</div>' +
+          '</div>' +
+          '<div class="fzc-shadow-live-status">' +
+          '<span class="fzc-shadow-status-pill" id="fzcShadowStatusPill">' + t('chat_shadow_waiting_voice', 'Menunggu suaramu...') + '</span>' +
+          '<div class="fzc-shadow-live-transcript" id="fzcShadowLiveTranscript"></div>' +
           '</div>' +
           '</div>'
         );
@@ -2696,8 +2844,9 @@
         suggestionsHtml = '<div class="fzc-suggestions-row">' + chips + '</div>';
       }
 
-      return '<div class="fzc-msg-row is-assistant">' +
-        '<div class="fzc-msg-box">' +
+      var hasSuggestionsClass = suggestionsHtml ? ' has-suggestions' : '';
+      return '<div class="fzc-msg-row is-assistant' + hasSuggestionsClass + '">' +
+        '<div class="fzc-msg-box' + hasSuggestionsClass + '">' +
         '<div class="fzc-bubble fzc-bubble-ai fzc-japanese-text">' +
         '<span class="fzc-message-text">' + displayText + '</span>' +
         romajiHtml +
@@ -2929,7 +3078,10 @@
     },
     unmount: function () {
       stopVoice();
+      stopShadowingAudio();
       if (typeof document !== 'undefined') {
+        var micModal = document.getElementById('fzcMicModal');
+        if (micModal) micModal.remove();
         if (document.documentElement) document.documentElement.classList.remove('fz-view-chat');
         if (document.body) {
           document.body.classList.remove('fz-view-chat');
