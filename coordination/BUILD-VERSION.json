@@ -1,7 +1,7 @@
 {
-  "version": "m025-592",
-  "claimedBy": "branch fix/ios-pwa-microphone-permission",
-  "claimedAt": "2026-10-17T19:40:28.040Z",
-  "reason": "fix(chat): ios pwa microphone permission guidance and live shadowing audio visualizer",
+  "version": "m025-593",
+  "claimedBy": "branch fix/ios-pwa-voice-call-speechrec-fallback",
+  "claimedAt": "2026-10-17T20:25:47.337Z",
+  "reason": "fix(chat): ios pwa speechrecognition fallback for voice call and prevent flex cutoff (m025-593)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
