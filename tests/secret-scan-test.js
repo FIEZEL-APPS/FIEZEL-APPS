@@ -331,7 +331,8 @@ const BINARY_EXTENSIONS = new Set([
   '.mp3', '.wav', '.m4a', '.ogg', '.opus',                     // aset suara pelajaran
   '.mp4', '.webm', '.mov',                                     // klip pemasaran
   '.onnx', '.wasm', '.bin', '.pt', '.zip', '.gz', '.pdf',      // model neural & arsip vendor
-  '.exe'                                                        // executable Windows (tool sentinel)
+  '.exe',                                                       // executable Windows (tool sentinel)
+  '.jar'                                                        // arsip Java binari (gradle-wrapper.jar untuk build Android)
 ]);
 
 /**

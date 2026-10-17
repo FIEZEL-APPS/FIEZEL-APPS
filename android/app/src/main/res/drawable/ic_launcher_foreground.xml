@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="512"
+    android:viewportHeight="512">
+
+    <!-- Scaled to 82% centered to strictly enforce the adaptive icon safe circle zone (72dp) -->
+    <group
+        android:name="fiezel_mark"
+        android:pivotX="256"
+        android:pivotY="256"
+        android:scaleX="0.82"
+        android:scaleY="0.82">
+
+        <!-- F Vertical Stem -->
+        <path
+            android:name="f_vertical_stem"
+            android:fillColor="@color/fz_cream"
+            android:pathData="M 156,148 H 158 A 20,20 0 0 1 178,168 V 344 A 20,20 0 0 1 158,364 H 156 A 20,20 0 0 1 136,344 V 168 A 20,20 0 0 1 156,148 Z" />
+
+        <!-- F Top Arm -->
+        <path
+            android:name="f_top_arm"
+            android:fillColor="@color/fz_cream"
+            android:pathData="M 156,148 H 244 A 20,20 0 0 1 264,168 V 170 A 20,20 0 0 1 244,190 H 156 A 20,20 0 0 1 136,170 V 168 A 20,20 0 0 1 156,148 Z" />
+
+        <!-- F Mid Arm -->
+        <path
+            android:name="f_mid_arm"
+            android:fillColor="@color/fz_cream"
+            android:pathData="M 155,230 H 219 A 19,19 0 0 1 238,249 V 251 A 19,19 0 0 1 219,270 H 155 A 19,19 0 0 1 136,251 V 249 A 19,19 0 0 1 155,230 Z" />
+
+        <!-- Sound Wave Bar 1 (Gold) -->
+        <path
+            android:name="soundwave_bar_1"
+            android:fillColor="@color/fz_gold"
+            android:pathData="M 315,200 H 315 A 17,17 0 0 1 332,217 V 295 A 17,17 0 0 1 315,312 H 315 A 17,17 0 0 1 298,295 V 217 A 17,17 0 0 1 315,200 Z" />
+
+        <!-- Sound Wave Bar 2 (Gold) -->
+        <path
+            android:name="soundwave_bar_2"
+            android:fillColor="@color/fz_gold"
+            android:pathData="M 365,166 H 365 A 17,17 0 0 1 382,183 V 329 A 17,17 0 0 1 365,346 H 365 A 17,17 0 0 1 348,329 V 183 A 17,17 0 0 1 365,166 Z" />
+    </group>
+</vector>

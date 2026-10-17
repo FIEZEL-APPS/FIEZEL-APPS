@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Fiezel Brand Core Palette -->
+    <color name="fz_splash_bg">#1B1418</color>
+    <color name="fz_cream">#FDFAF3</color>
+    <color name="fz_coral">#FF3045</color>
+    <color name="fz_gold">#FFD700</color>
+    <color name="fz_surface">#231A20</color>
+
+    <!-- Extended Fiezel Identity Tokens (Brand Guide G1) -->
+    <color name="fz_primary">#8C2233</color>
+    <color name="fz_maroon_dark">#6D1926</color>
+    <color name="fz_gold_accent">#D8B36B</color>
+    <color name="fz_yellow">#FFD94F</color>
+    <color name="fz_yellow_dark">#EDB93A</color>
+    <color name="fz_brown">#33201F</color>
+    <color name="fz_blush">#F0A0AC</color>
+    <color name="fz_surface_dark">#140E10</color>
+
+    <!-- Legacy / Compatibility Aliases -->
+    <color name="fiezel_primary">#2979FF</color>
+    <color name="fiezel_primary_dark">#1565C0</color>
+    <color name="fiezel_accent">#FF3045</color>
+    <color name="fiezel_cyan">#00E5FF</color>
+    <color name="fiezel_gold">#FFD700</color>
+    <color name="fiezel_background">#FDFAF3</color>
+    <color name="fiezel_surface">#FFFFFF</color>
+    <color name="fiezel_text_primary">#1B1418</color>
+    <color name="fiezel_text_secondary">#6E6A70</color>
+    <color name="fiezel_divider">#E8E4DB</color>
+
+    <!-- System UI Colors -->
+    <color name="colorPrimary">@color/fz_primary</color>
+    <color name="colorPrimaryDark">@color/fz_splash_bg</color>
+    <color name="colorAccent">@color/fz_gold</color>
+    <color name="ic_launcher_background">#1B1418</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="transparent">#00000000</color>
+</resources>

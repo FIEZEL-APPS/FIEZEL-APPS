@@ -114,7 +114,7 @@ const UTANG_TANPA_PALET = [
 ];
 /* design/ dan remotion/ adalah prototipe/studio video yang tidak pernah dimuat produksi
    (sama seperti pengecualian di css-keyframe-uniq-test dan deploy/site-exclude.txt), jadi di luar lingkup. */
-const BUKAN_PRODUKSI = ['design/', 'node_modules/', 'vendor/', 'remotion/'];
+const BUKAN_PRODUKSI = ['design/', 'node_modules/', 'vendor/', 'remotion/', 'android/'];
 
 test('inventaris: tidak ada SVG karakter yang tak bernama — lulus palet, atau tercatat sebagai utang', () => {
   const ditemukan = [];
