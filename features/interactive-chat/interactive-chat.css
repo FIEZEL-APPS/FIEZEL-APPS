@@ -25,6 +25,18 @@
   --fzc-assistant-border: #E8E0D5;
 }
 
+/* Hide bottomnav and floating PAW FAB while in Chat view */
+body.fz-view-chat nav.bottomnav,
+body.fz-view-chat .bottomnav,
+body.fz-view-chat #fiezelPawFab,
+body.fz-view-chat .fz-paw-fab,
+html body:has(.fzc-container) nav.bottomnav,
+html body:has(.fzc-container) .bottomnav,
+html body:has(.fzc-container) #fiezelPawFab,
+html body:has(.fzc-container) .fz-paw-fab {
+  display: none !important;
+}
+
 /* Chat View Container */
 .fzc-container {
   display: flex;
@@ -191,7 +203,7 @@
 .fzc-feed {
   flex: 1;
   overflow-y: auto;
-  padding: 16px 0 120px 0;
+  padding: 16px 0 24px 0;
   display: flex;
   flex-direction: column;
   gap: 16px;

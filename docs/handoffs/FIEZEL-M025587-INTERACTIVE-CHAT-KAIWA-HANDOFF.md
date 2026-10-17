@@ -1,8 +1,8 @@
 # DOSIR SERAH TERIMA RESMI (HANDOFF DOSSIER)
-**ID Rilis**: FIEZEL-M025588-INTERACTIVE-CHAT-KAIWA  
-**Nomor Build**: `m025-588`  
-**Tanggal**: 17 Oktober 2026  
-**Status**: SIAP RILIS (Gerbang Mutu 100% HIJAU)  
+**ID Rilis**: FIEZEL-M025587-INTERACTIVE-CHAT-KAIWA
+**Nomor Build**: `m025-587`
+**Tanggal**: 17 Oktober 2026
+**Status**: SIAP RILIS (Gerbang Mutu 100% HIJAU)
 
 ---
 
@@ -40,7 +40,7 @@ Pengujian otomatis dijalankan secara komprehensif melalui suite pengujian lokal:
 5. `node tests/gate-registry-test.js`: **10/10 PASS**
    - Test suite terdaftar di `.github/workflows/quality.yml` dalam step `Core validation`.
 6. `node tools/bump-build.mjs --check`: **Selaras (Hexa-Sync Invariant)**
-   - 6 titik build tersinkronisasi pada `m025-588`.
+   - 6 titik build tersinkronisasi pada `m025-587`.
 
 ---
 
@@ -48,18 +48,20 @@ Pengujian otomatis dijalankan secara komprehensif melalui suite pengujian lokal:
 
 - `features/interactive-chat/fiezel-interactive-chat.js`: Modul logika interaktif percakapan AI, skenario, parser furigana, dan state machine.
 - `features/interactive-chat/interactive-chat.css`: Gaya UI visual responsif, bubble pesan, suggestion chips, dan efek visualizer audio.
-- `app.js`: Pendaftaran `chat` di `VALID_VIEWS`, perutean `renderInner()`, tombol kembali `handleTopbarBack()`, dan peluncur `latihanCards()`.
+- `features/i18n/copy-id-student.js`: Pendaftaran 34 kunci naskah percakapan Indonesia.
+- `features/i18n/copy-th-student.js`: Pendaftaran 34 kunci naskah percakapan Thai.
+- `app.js`: Pendaftaran `chat` di `VALID_VIEWS`, perutean `renderInner()`, tombol kembali `handleTopbarBack()`, peluncur `latihanCards()`, dan pengalihan body class `fz-view-chat`.
 - `index.html`: Penyisipan stylesheet dan modul skrip sebelum `app.js`.
 - `sw.js`: Pendaftaran precache shell untuk berkas CSS dan JS modul `interactive-chat`.
 - `.github/workflows/quality.yml`: Pendaftaran `tests/interactive-chat-test.js` pada step `Core validation`.
 - `tests/interactive-chat-test.js`: Suite pengujian otomatis fitur interactive chat.
 - `id-golden-baseline.json`: Regenerasi baseline emas naskah Indonesia.
-- `coordination/BUILD-VERSION.json`, `core-config.js`, `features/neural-voice/fiezel-diag-panel.js`, `kurikulum.html`, `misi.html`: Kenaikan nomor build terkoordinasi ke `m025-588`.
+- `coordination/BUILD-VERSION.json`, `core-config.js`, `features/neural-voice/fiezel-diag-panel.js`, `kurikulum.html`, `misi.html`: Kenaikan nomor build terkoordinasi ke `m025-587`.
 
 ---
 
 ## 4. Status Gerbang Mutu & Catatan Serah Terima
 
-- **Status Build**: `m025-588`
+- **Status Build**: `m025-587`
 - **Zero Ghost Release**: Dipatuhi melalui `tools/bump-build.mjs`.
 - **Git Protection Rule**: Siap diajukan melalui Pull Request (PR) resmi ke branch `main`.
