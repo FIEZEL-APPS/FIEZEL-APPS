@@ -1,0 +1,2166 @@
+/* =========================================================================
+   PANEL BANK SOAL LISTENING JLPT (N5 & N4) - FIEZEL APPS
+   Resmi Japan Foundation & JEES Listening Exam Simulation
+   Tactile Travertine Single-Screen Hero Engine (390×844 px)
+   ========================================================================= */
+
+.listening-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(36, 26, 17, 0.72);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  z-index: 2500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px;
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transition: opacity 0.22s ease, visibility 0.22s ease;
+}
+
+.listening-modal:not(.open) {
+  display: none !important;
+}
+
+.listening-modal.open {
+  display: flex !important;
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+}
+
+.listening-modal-box {
+  position: relative;
+  background: #FFFDF9;
+  width: min(100%, 540px);
+  max-height: 94vh;
+  border-radius: 24px;
+  box-shadow: 0 24px 48px rgba(36, 26, 17, 0.28);
+  border: 1.5px solid var(--line, #E8DFD3);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: fzJlptModalPop 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fzJlptModalPop {
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Minimalist Topbar (Like Quiz Stage) */
+.listening-topbar {
+  padding: 10px 16px;
+  background: #FFFDF9;
+  border-bottom: 1.5px solid var(--line, #E8DFD3);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  min-height: 52px;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 10;
+}
+
+.listening-top-progress {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.listening-top-counter {
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 800;
+  color: #1E293B;
+  letter-spacing: -0.01em;
+}
+
+.listening-filter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: #FAF6EF;
+  border: 1.5px solid var(--line, #E8DFD3);
+  box-shadow: 0 2px 0 #D8CEBF;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.listening-filter-btn:hover {
+  background: #F3ECE1;
+  transform: translateY(-1px);
+}
+
+.listening-filter-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 0.5px 0 #D8CEBF;
+}
+
+.jlpt-filter-arrow {
+  font-size: 10px;
+  opacity: 0.7;
+}
+
+/* Filter Sheet Modal for Level & Mondai Selector */
+.jlpt-filter-modal {
+  position: absolute !important;
+  inset: 0 !important;
+  background: rgba(30, 20, 12, 0.48) !important;
+  backdrop-filter: blur(4px) !important;
+  -webkit-backdrop-filter: blur(4px) !important;
+  z-index: 100 !important;
+  display: none !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+  padding: 16px !important;
+  box-sizing: border-box !important;
+  animation: fzFilterFadeIn 0.18s ease-out !important;
+}
+
+.jlpt-filter-modal.open {
+  display: flex !important;
+}
+
+@keyframes fzFilterFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.jlpt-filter-panel {
+  background: #FFFDF9 !important;
+  border-radius: 20px !important;
+  border: 1.5px solid var(--line, #E8DFD3) !important;
+  box-shadow: 0 16px 36px rgba(36, 26, 17, 0.22) !important;
+  width: min(100%, 440px) !important;
+  overflow: hidden !important;
+  animation: fzFilterPop 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  margin-top: 10px !important;
+}
+
+@keyframes fzFilterPop {
+  from { transform: scale(0.95) translateY(-8px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.jlpt-filter-head {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 12px 16px !important;
+  border-bottom: 1.5px solid var(--line, #E8DFD3) !important;
+  background: #FDF9F2 !important;
+}
+
+.jlpt-filter-title {
+  margin: 0 !important;
+  font-size: 14.5px !important;
+  font-weight: 800 !important;
+  color: #0F172A !important;
+}
+
+.jlpt-filter-close {
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 50% !important;
+  border: 1.5px solid var(--line, #E8DFD3) !important;
+  background: #FFFDF9 !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  color: #475569 !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.jlpt-filter-body {
+  padding: 14px 16px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  max-height: 70vh !important;
+  overflow-y: auto !important;
+}
+
+.jlpt-filter-group-label {
+  display: block !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  color: #64748B !important;
+  margin-bottom: 6px !important;
+}
+
+.listening-head {
+  padding: 10px 16px;
+  background: #FDF9F2;
+  border-bottom: 1.5px solid var(--line, #E8DFD3);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  min-height: 44px;
+  box-sizing: border-box;
+}
+
+.listening-head-title {
+  margin: 0;
+  font-size: 15.5px;
+  font-weight: 800;
+  color: #0F172A;
+  line-height: 1.25;
+}
+
+.listening-head-sub {
+  font-size: 11px;
+  color: var(--text-muted, #7A6F64);
+  font-weight: 600;
+  display: block;
+}
+
+.listening-close-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1.5px solid var(--line, #E8DFD3);
+  background: #FFFDF9;
+  box-shadow: 0 2px 0 #D8CEBF;
+  color: #0F172A;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.12s ease;
+  flex-shrink: 0;
+}
+
+.listening-close-btn:hover {
+  background: #FAF6EF;
+  border-color: #D6CBC0;
+  transform: translateY(-1px);
+}
+
+.listening-close-btn:active {
+  transform: translateY(1.5px);
+  box-shadow: 0 0.5px 0 #D8CEBF;
+}
+
+.listening-body {
+  padding: 8px 12px 12px;
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* =========================================================================
+   LEVEL TABS & MONDAI CHIPS SCROLL
+   Fixed bug fatal: Mondai chips tergencet 6px
+   ========================================================================= */
+
+.jlpt-level-tabs {
+  display: flex;
+  gap: 6px;
+  background: #EFE6D8;
+  padding: 2.5px;
+  border-radius: 12px;
+  min-height: 34px;
+  height: 34px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.jlpt-lvl-btn {
+  flex: 1;
+  padding: 0 8px;
+  height: 29px;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted, #7A6F64);
+  border-radius: 9px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.jlpt-lvl-btn.active {
+  background: #FFFFFF;
+  color: #0F172A;
+  font-weight: 800;
+  box-shadow: 0 2px 0 #D8CEBF;
+}
+
+/* Bug Fatal Fix: Bilah Mondai Chips Wajib min-height: 42px; height: 42px; flex-shrink: 0; */
+.jlpt-mondai-scroll {
+  min-height: 42px !important;
+  height: 42px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  overflow-x: auto !important;
+  padding: 4px 2px !important;
+  box-sizing: border-box !important;
+  flex-shrink: 0 !important;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.jlpt-mondai-chip {
+  padding: 0 14px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #FAF6EF;
+  border: 1.5px solid var(--line, #E8DFD3);
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #382E25;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: 0 2px 0 #D8CEBF;
+  transition: all 0.12s ease;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.jlpt-mondai-chip:hover {
+  background: #FFFDF9;
+  border-color: #D6CBC0;
+  transform: translateY(-1px);
+}
+
+.jlpt-mondai-chip:active {
+  transform: translateY(1.5px);
+  box-shadow: 0 0.5px 0 #D8CEBF;
+}
+
+.jlpt-mondai-chip.active {
+  background: #241A11;
+  color: #FFD94F;
+  border-color: #241A11;
+  box-shadow: 0 2px 0 #18110A;
+  font-weight: 800;
+}
+
+/* =========================================================================
+   SINGLE-SCREEN HERO LAYOUT: MOBILE CARD & TOUCH ENGINE
+   Seluruh 4 pilihan jawaban terlihat 100% di layar pandang pertama (390×844)
+   ========================================================================= */
+
+.jlpt-mobile-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+  user-select: none;
+  -webkit-user-select: none;
+  width: 100%;
+}
+
+/* Touch Card with Gestures */
+.jlpt-mobile-card {
+  position: relative;
+  background: #FFFDF9 !important;
+  border: 1.5px solid #E8DFD3 !important;
+  border-radius: 20px !important;
+  padding: 10px 12px 12px !important;
+  box-shadow: 0 3px 0 #D8CEBF, 0 10px 24px rgba(36, 26, 17, 0.05) !important;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  touch-action: pan-y;
+  cursor: grab;
+  transform-origin: center center;
+  will-change: transform;
+  animation: fzCardIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.jlpt-mobile-card:active {
+  cursor: grabbing;
+}
+
+/* Zero Mascot Avatar Prohibited Rule */
+.jlpt-mascot-slot {
+  display: none !important;
+}
+
+/* Gestures & Swipe Physics */
+.swiping,
+.jlpt-mobile-card.swiping {
+  cursor: grabbing !important;
+  transition: none !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  will-change: transform, box-shadow;
+  z-index: 20;
+}
+
+.slide-out-left,
+.jlpt-mobile-card.slide-out-left {
+  animation: fzSlideOutLeft 0.2s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
+  pointer-events: none !important;
+}
+
+.slide-out-right,
+.jlpt-mobile-card.slide-out-right {
+  animation: fzSlideOutRight 0.2s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
+  pointer-events: none !important;
+}
+
+.slide-in-right,
+.jlpt-mobile-card.slide-in-right {
+  animation: fzSlideInRight 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+.slide-in-left,
+.jlpt-mobile-card.slide-in-left {
+  animation: fzSlideInLeft 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+@keyframes fzSlideOutLeft {
+  0% {
+    transform: translate3d(var(--swipe-x, -60px), 0, 0) rotate(calc(var(--swipe-x, -60px) * 0.05deg));
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(-120%, 0, 0) rotate(-10deg);
+    opacity: 0;
+  }
+}
+
+@keyframes fzSlideOutRight {
+  0% {
+    transform: translate3d(var(--swipe-x, 60px), 0, 0) rotate(calc(var(--swipe-x, 60px) * 0.05deg));
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(120%, 0, 0) rotate(10deg);
+    opacity: 0;
+  }
+}
+
+@keyframes fzSlideInRight {
+  0% {
+    transform: translate3d(100%, 0, 0) rotate(6deg);
+    opacity: 0;
+  }
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes fzSlideInLeft {
+  0% {
+    transform: translate3d(-100%, 0, 0) rotate(-6deg);
+    opacity: 0;
+  }
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes fzCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Card Header: Sangat Ringkas (Satu Baris Elegan) */
+.jlpt-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 26px;
+  height: 26px;
+  flex-shrink: 0;
+}
+
+.jlpt-badge-mondai {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #FAF6EF;
+  color: #7A5F1B;
+  font-size: 11.5px;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1.5px solid var(--line, #E8DFD3);
+  box-shadow: 0 1.5px 0 #D8CEBF;
+}
+
+.jlpt-badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #D97706;
+  flex-shrink: 0;
+}
+
+.jlpt-badge-lvl {
+  font-weight: 800;
+}
+
+.jlpt-badge-sep {
+  opacity: 0.45;
+}
+
+.jlpt-badge-mondai-txt {
+  font-weight: 700;
+}
+
+.jlpt-counter-pill {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #0F172A;
+  background: #FAF6EF;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1.5px solid var(--line, #E8DFD3);
+  box-shadow: 0 1.5px 0 #D8CEBF;
+}
+
+/* Situasi Ringkas (1 Baris, Tactile Travertine) */
+/* Situasi Ringkas (Tactile Travertine) */
+.jlpt-situation-chip {
+  background: #FAF6EF !important;
+  border: 1.5px solid var(--line, #E8DFD3) !important;
+  border-radius: 10px !important;
+  padding: 4px 10px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  font-size: 11.5px !important;
+  line-height: 1.35 !important;
+  color: #7A5F1B !important;
+  box-shadow: 0 1.5px 0 #D8CEBF !important;
+  min-height: 26px !important;
+  height: auto !important;
+  box-sizing: border-box !important;
+  flex-shrink: 0 !important;
+}
+
+.jlpt-sit-icon {
+  font-size: 11.5px !important;
+  flex-shrink: 0 !important;
+}
+
+.jlpt-sit-text {
+  flex: 1 !important;
+  font-weight: 700 !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+}
+
+/* =========================================================================
+   PANGGUNG AUDIO TACTILE PILL (44-48px)
+   Equalizer gelombang hidup saat playing
+   ========================================================================= */
+
+.jlpt-audio-row {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  background: transparent !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+  min-height: 44px !important;
+  height: 44px !important;
+  box-sizing: border-box !important;
+  flex-shrink: 0 !important;
+}
+
+.jlpt-primary-play-btn {
+  flex: 1 !important;
+  height: 44px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px !important;
+  background: #FAF6EF !important;
+  color: #1E293B !important;
+  border: 1.5px solid var(--line, #E8DFD3) !important;
+  border-radius: 999px !important;
+  padding: 0 16px !important;
+  font-family: inherit !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  cursor: pointer !important;
+  box-shadow: 0 2.5px 0 #D8CEBF !important;
+  transition: all 0.12s ease !important;
+  user-select: none !important;
+}
+
+.jlpt-primary-play-btn:hover {
+  background: #F3ECE1 !important;
+  transform: translateY(-1px) !important;
+}
+
+.jlpt-primary-play-btn:active {
+  transform: translateY(1.5px) !important;
+  box-shadow: 0 0.5px 0 #D8CEBF !important;
+}
+
+.jlpt-primary-play-btn.playing {
+  background: #FFF8E7 !important;
+  border-color: #F59E0B !important;
+  color: #B45309 !important;
+  box-shadow: 0 2px 0 #D97706 !important;
+}
+
+.jlpt-play-icon {
+  font-size: 13px !important;
+  line-height: 1 !important;
+}
+
+/* Mini Equalizer Wave Visualizer */
+.jlpt-mini-wave {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 2.5px !important;
+  height: 16px !important;
+  opacity: 0.55 !important;
+  transition: opacity 0.15s !important;
+}
+
+.jlpt-primary-play-btn.playing .jlpt-mini-wave {
+  opacity: 1 !important;
+}
+
+.jlpt-mini-wave span {
+  width: 2.5px !important;
+  height: 4px !important;
+  background: currentColor !important;
+  border-radius: 2px !important;
+  transition: height 0.15s ease !important;
+}
+
+.jlpt-primary-play-btn.playing .jlpt-mini-wave span {
+  animation: fzEqWave 0.55s infinite ease-in-out alternate !important;
+}
+
+.jlpt-primary-play-btn.playing .jlpt-mini-wave span:nth-child(1) { animation-delay: 0.05s !important; }
+.jlpt-primary-play-btn.playing .jlpt-mini-wave span:nth-child(2) { animation-delay: 0.22s !important; }
+.jlpt-primary-play-btn.playing .jlpt-mini-wave span:nth-child(3) { animation-delay: 0.12s !important; }
+.jlpt-primary-play-btn.playing .jlpt-mini-wave span:nth-child(4) { animation-delay: 0.3s !important; }
+.jlpt-primary-play-btn.playing .jlpt-mini-wave span:nth-child(5) { animation-delay: 0.18s !important; }
+
+@keyframes fzEqWave {
+  0% { height: 3px; }
+  100% { height: 14px; }
+}
+
+/* Secondary JEES Chip */
+.jlpt-jees-chip {
+  height: 44px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  background: #FAF6EF !important;
+  color: #475569 !important;
+  border: 1.5px solid var(--line, #E8DFD3) !important;
+  border-radius: 999px !important;
+  padding: 0 14px !important;
+  font-family: inherit !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+  box-shadow: 0 2.5px 0 #D8CEBF !important;
+  transition: all 0.15s ease !important;
+  flex-shrink: 0 !important;
+}
+
+.jlpt-jees-chip:hover {
+  background: #F3ECE1 !important;
+  transform: translateY(-1px) !important;
+}
+
+.jlpt-jees-chip:active {
+  transform: translateY(1.5px) !important;
+  box-shadow: 0 0.5px 0 #D8CEBF !important;
+}
+
+.jlpt-jees-chip.playing {
+  background: #FFF8E7 !important;
+  border-color: #F59E0B !important;
+  color: #B45309 !important;
+  box-shadow: 0 2px 0 #D97706 !important;
+}
+
+/* Speed Toggle Chip */
+.jlpt-speed-chip {
+  height: 44px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: #FAF6EF !important;
+  color: #475569 !important;
+  border: 1.5px solid var(--line, #E8DFD3) !important;
+  border-radius: 999px !important;
+  padding: 0 12px !important;
+  font-family: inherit !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+  box-shadow: 0 2.5px 0 #D8CEBF !important;
+  transition: all 0.15s ease !important;
+  flex-shrink: 0 !important;
+}
+
+.jlpt-speed-chip:hover {
+  background: #F3ECE1 !important;
+  transform: translateY(-1px) !important;
+}
+
+.jlpt-speed-chip:active {
+  transform: translateY(1.5px) !important;
+  box-shadow: 0 0.5px 0 #D8CEBF !important;
+}
+
+.jlpt-replay-pill {
+  font-size: 11px;
+  font-weight: 700;
+  color: #7A5F1B !important;
+  background: #FEF3C7 !important;
+  border: 1px solid #FDE68A !important;
+  border-radius: 999px !important;
+  padding: 2px 7px !important;
+  white-space: nowrap;
+  display: none;
+}
+
+.jlpt-replay-pill.visible {
+  display: inline-block;
+}
+
+.jlpt-opt-btn:focus-visible,
+.jlpt-primary-play-btn:focus-visible,
+.jlpt-speed-chip:focus-visible,
+.jlpt-jees-chip:focus-visible,
+.jlpt-fb-next-btn:focus-visible,
+.jlpt-fb-key-btn:focus-visible,
+.jlpt-tab-chip:focus-visible,
+.jlpt-sheet-close:focus-visible {
+  outline: 2px solid #D97706 !important;
+  outline-offset: 2px !important;
+}
+
+/* =========================================================================
+   TYPOGRAPHY SOAL JEPANG
+   Plus Jakarta Sans, 18-20px, bold 800, warna slate gelap kontras tinggi #0F172A
+   ========================================================================= */
+
+.jlpt-question-block {
+  padding: 1px 0;
+  flex-shrink: 0;
+}
+
+.jlpt-question-ja {
+  font-family: inherit;
+  font-size: 17.5px;
+  font-weight: 800;
+  color: #0F172A;
+  line-height: 1.32;
+  margin: 0 0 2px 0;
+}
+
+.jlpt-question-id {
+  font-size: 11.5px;
+  color: #475569;
+  font-weight: 600;
+  line-height: 1.3;
+  margin: 0;
+}
+
+/* =========================================================================
+   4 KARTU PILIHAN GANDA TACTILE CLAY RAMPING (48-54px)
+   Badge nomor 1-4 tajam, teks Jepang + terjemahan proporsional
+   ========================================================================= */
+
+.jlpt-options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.jlpt-opt-btn {
+  width: 100%;
+  min-height: 48px;
+  max-height: 52px;
+  height: 48px;
+  text-align: left;
+  padding: 4px 10px;
+  border: 1.5px solid #E8DFD3 !important;
+  border-radius: 12px;
+  background: #FFFFFF !important;
+  box-shadow: 0 3px 0 #D8CEBF !important;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.15s ease, border-color 0.15s ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+}
+
+.jlpt-opt-btn:hover:not(.locked) {
+  background: #FFFDF8 !important;
+  border-color: #D6CBC0 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 0 #D8CEBF !important;
+}
+
+.jlpt-opt-btn:active:not(.locked) {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #D8CEBF !important;
+}
+
+.jlpt-opt-badge {
+  width: 26px;
+  height: 26px;
+  min-width: 26px;
+  border-radius: 8px;
+  background: #F4ECE1;
+  color: #382E25;
+  font-weight: 800;
+  font-size: 12.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid #E0D4C3;
+  box-shadow: 0 1px 0 #D8CEBF;
+  transition: all 0.15s ease;
+}
+
+.jlpt-opt-texts {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1px;
+}
+
+.jlpt-opt-ja {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #0F172A;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.jlpt-opt-id {
+  font-size: 10.5px;
+  color: #475569;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Locked & Correct / Wrong States (Tactile Clay) */
+.jlpt-opt-btn.locked {
+  cursor: default;
+}
+
+.jlpt-opt-btn.correct {
+  background: #F0FDF4 !important;
+  border-color: #16A34A !important;
+  box-shadow: 0 3px 0 #15803D !important;
+}
+
+.jlpt-opt-btn.correct .jlpt-opt-badge {
+  background: #16A34A;
+  color: #FFFFFF;
+  border-color: #15803D;
+  box-shadow: 0 1px 0 #15803D;
+}
+
+.jlpt-opt-btn.correct .jlpt-opt-ja {
+  color: #14532D;
+}
+
+.jlpt-opt-btn.correct .jlpt-opt-id {
+  color: #15803D;
+}
+
+.jlpt-opt-btn.wrong {
+  background: #FEF2F2 !important;
+  border-color: #EF4444 !important;
+  box-shadow: 0 3px 0 #DC2626 !important;
+}
+
+.jlpt-opt-btn.wrong .jlpt-opt-badge {
+  background: #EF4444;
+  color: #FFFFFF;
+  border-color: #DC2626;
+  box-shadow: 0 1px 0 #DC2626;
+}
+
+.jlpt-opt-btn.wrong .jlpt-opt-ja {
+  color: #7F1D1D;
+}
+
+.jlpt-opt-btn.wrong .jlpt-opt-id {
+  color: #B91C1C;
+}
+
+/* Inline Feedback Banner (Compact, Viewport-Safe) */
+.jlpt-feedback-banner {
+  border-radius: 10px;
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  animation: fzFeedbackPop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.05);
+  min-height: 34px;
+  flex-shrink: 0;
+}
+
+@keyframes fzFeedbackPop {
+  from { opacity: 0; transform: translateY(-3px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.jlpt-feedback-banner.correct {
+  background: #F0FDF4;
+  border: 1.5px solid #22C55E;
+  color: #15803D;
+}
+
+.jlpt-feedback-banner.wrong {
+  background: #FEF2F2;
+  border: 1.5px solid #EF4444;
+  color: #B91C1C;
+}
+
+.jlpt-fb-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.jlpt-fb-badge {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.jlpt-feedback-banner.correct .jlpt-fb-badge {
+  background: #22C55E;
+  color: #FFFFFF;
+}
+
+.jlpt-feedback-banner.wrong .jlpt-fb-badge {
+  background: #EF4444;
+  color: #FFFFFF;
+}
+
+.jlpt-fb-text-col {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.jlpt-fb-title {
+  font-size: 11.5px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.jlpt-fb-sub {
+  font-size: 10.5px;
+  opacity: 0.9;
+  line-height: 1.2;
+}
+
+.jlpt-fb-key-btn {
+  background: #FFFFFF;
+  border: 1px solid currentColor;
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  color: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08);
+  transition: all 0.12s ease;
+  flex-shrink: 0;
+}
+
+.jlpt-fb-key-btn:hover {
+  transform: translateY(-1px);
+}
+
+.jlpt-fb-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  flex-shrink: 0 !important;
+}
+
+.jlpt-fb-next-btn {
+  background: #0F172A !important;
+  color: #FFFFFF !important;
+  border: none !important;
+  border-radius: 6px !important;
+  padding: 4px 10px !important;
+  font-family: inherit !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+  box-shadow: 0 1.5px 0 #020617 !important;
+  transition: all 0.12s ease !important;
+  flex-shrink: 0 !important;
+}
+
+.jlpt-fb-next-btn:hover {
+  background: #1E293B !important;
+  transform: translateY(-1px) !important;
+}
+
+.jlpt-fb-next-btn:active {
+  transform: translateY(1px) !important;
+  box-shadow: 0 0.5px 0 #020617 !important;
+}
+
+/* Quick Bottom Sheet Triggers (Ergonomis & Ringkas) */
+.jlpt-sheet-triggers {
+  display: flex;
+  gap: 5px;
+  margin-top: 1px;
+  flex-shrink: 0;
+}
+
+.jlpt-sheet-trigger-btn {
+  flex: 1;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: #FAF6EF;
+  border: 1.5px solid var(--line, #E8DFD3);
+  border-radius: 10px;
+  box-shadow: 0 2px 0 #D8CEBF;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  color: #241A11;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  user-select: none;
+}
+
+.jlpt-sheet-trigger-btn:hover {
+  background: #FFFDF9;
+  border-color: #D6CBC0;
+  transform: translateY(-1px);
+}
+
+.jlpt-sheet-trigger-btn:active {
+  transform: translateY(1.5px);
+  box-shadow: 0 0.5px 0 #D8CEBF;
+}
+
+.jlpt-sheet-trigger-btn.pulse-hint {
+  background: #FEF3C7;
+  border-color: #F59E0B;
+  color: #B45309;
+  box-shadow: 0 2px 0 #D97706, 0 0 10px rgba(245, 158, 11, 0.35);
+}
+
+/* Dynamic Swipe Cues (Visible during drag) */
+.jlpt-swipe-cue {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%) scale(0.9);
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.12s ease, transform 0.12s ease;
+  z-index: 25;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  white-space: nowrap;
+}
+
+.jlpt-cue-prev {
+  left: 14px;
+  background: #E8F5E9;
+  color: #1B5E20;
+  border: 1.5px solid #2E8B69;
+}
+
+.jlpt-cue-next {
+  right: 14px;
+  background: #FFF3C4;
+  color: #7A5F1B;
+  border: 1.5px solid #E6A800;
+}
+
+.jlpt-swipe-cue.active {
+  transform: translateY(-50%) scale(1.05);
+}
+
+/* =========================================================================
+   BOTTOM NAV BAR (MUNDUR, COUNTER, MAJU)
+   Menempel rapi dan proporsional
+   ========================================================================= */
+
+.jlpt-bottom-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 1px 0;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.jlpt-nav-pill {
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 11px;
+  border: 1.5px solid var(--line, #E8DFD3);
+  background: #FFFDF9;
+  box-shadow: 0 2.5px 0 #D8CEBF;
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #241A11;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.12s ease;
+  user-select: none;
+}
+
+.jlpt-nav-pill:hover:not(:disabled) {
+  background: #FAF6EF;
+  border-color: #D6CBC0;
+  transform: translateY(-1px);
+}
+
+.jlpt-nav-pill:active:not(:disabled) {
+  transform: translateY(1.5px);
+  box-shadow: 0 1px 0 #D8CEBF;
+}
+
+.jlpt-nav-pill:disabled {
+  opacity: 0.38;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.jlpt-nav-status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+}
+
+.jlpt-nav-counter {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #0F172A;
+}
+
+.jlpt-swipe-subhint {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--text-muted, #7A6F64);
+  display: inline-flex;
+  align-items: center;
+  gap: 2.5px;
+}
+
+.jlpt-hint-arrows {
+  color: #B45309;
+  font-weight: 800;
+}
+
+/* =========================================================================
+   SPRING BOTTOM SHEET DRAWER (#jlptDetailSheet & .jlpt-detail-sheet)
+   Drawer native bersih dengan 3 tab rapi: 📝 Naskah, 💡 Pembahasan, 📚 Kosakata
+   ========================================================================= */
+
+#jlptDetailSheet,
+.jlpt-detail-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 2600;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  pointer-events: none;
+  visibility: hidden;
+  transition: visibility 0.25s ease;
+}
+
+#jlptDetailSheet.open,
+.jlpt-detail-sheet.open {
+  pointer-events: auto;
+  visibility: visible;
+}
+
+#jlptSheetBackdrop,
+.jlpt-sheet-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(36, 26, 17, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  opacity: 0;
+  transition: opacity 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#jlptDetailSheet.open #jlptSheetBackdrop,
+.jlpt-detail-sheet.open .jlpt-sheet-backdrop {
+  opacity: 1;
+}
+
+.jlpt-sheet-container {
+  position: relative;
+  z-index: 2;
+  background: #FFFDF9;
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  box-shadow: 0 -12px 38px rgba(36, 26, 17, 0.22);
+  border: 1.5px solid var(--line, #E8DFD3);
+  border-bottom: none;
+  max-height: 85vh;
+  height: 85vh;
+  display: flex;
+  flex-direction: column;
+  transform: translateY(105%);
+  transition: transform 0.32s cubic-bezier(0.175, 0.885, 0.32, 1.15); /* Spring drawer */
+  overflow: hidden;
+}
+
+#jlptDetailSheet.open .jlpt-sheet-container,
+.jlpt-detail-sheet.open .jlpt-sheet-container {
+  transform: translateY(0);
+}
+
+.sheet-drag-handle-wrapper,
+.jlpt-sheet-handle-zone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 0 6px;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.sheet-drag-handle,
+.jlpt-sheet-handle-bar {
+  width: 44px;
+  height: 5px;
+  border-radius: 999px;
+  background: #D8CEBF;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.sheet-drag-handle-wrapper:hover .sheet-drag-handle,
+.jlpt-sheet-handle-zone:hover .jlpt-sheet-handle-bar {
+  background: #B6A795;
+  transform: scaleY(1.2);
+}
+
+.jlpt-sheet-header,
+.jlpt-sheet-head {
+  padding: 6px 18px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1.5px solid var(--line, #E8DFD3);
+  background: #FFFDF9;
+  flex-shrink: 0;
+}
+
+.jlpt-sheet-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: #0F172A;
+  margin: 0;
+}
+
+.jlpt-sheet-subtitle {
+  font-size: 11px;
+  color: var(--text-muted, #7A6F64);
+  font-weight: 600;
+}
+
+.jlpt-sheet-close,
+.jlpt-sheet-close-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1.5px solid var(--line, #E8DFD3);
+  background: #FAF6EF;
+  color: #241A11;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1.5px 0 #D8CEBF;
+  transition: all 0.12s ease;
+}
+
+.jlpt-sheet-close:hover,
+.jlpt-sheet-close-btn:hover {
+  background: #241A11;
+  color: #FFD94F;
+  border-color: #241A11;
+}
+
+/* 3 Tabs Rapi: 📝 Naskah, 💡 Pembahasan, 📚 Kosakata */
+.jlpt-sheet-tabs {
+  display: flex;
+  gap: 6px;
+  padding: 8px 16px;
+  background: #F4EFE6;
+  border-bottom: 1px solid var(--line, #E8DFD3);
+  flex-shrink: 0;
+}
+
+.jlpt-tab-chip {
+  flex: 1;
+  height: 34px;
+  padding: 0 10px;
+  border-radius: 10px;
+  border: 1.5px solid transparent;
+  background: transparent;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted, #7A6F64);
+  white-space: nowrap;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: all 0.15s ease;
+}
+
+.jlpt-tab-chip:hover {
+  color: #0F172A;
+}
+
+.jlpt-tab-chip.active {
+  background: #FFFFFF;
+  color: #0F172A;
+  font-weight: 800;
+  border-color: var(--line, #E8DFD3);
+  box-shadow: 0 2px 0 #D8CEBF;
+}
+
+.jlpt-sheet-content,
+.jlpt-sheet-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 16px 28px;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* =========================================================================
+   TAB 1: NASKAH PERCAKAPAN DENGAN BADGE PILL PENUTUR PROFESIONAL
+   Zero Generic Emojis (No 👩, 👨, 👔), Tema Indigo / Amber / Emerald Elegan
+   ========================================================================= */
+
+.jlpt-transcript-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.jlpt-transcript-tag {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #7A5F1B;
+  background: #FAF6EF;
+  border: 1px solid #E8DFD3;
+  padding: 3px 8px;
+  border-radius: 8px;
+}
+
+.jlpt-transcript-play-btn {
+  background: #241A11;
+  color: #FFD94F;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 2px 0 #18110A;
+  transition: background 0.15s;
+}
+
+.jlpt-transcript-play-btn:hover {
+  background: #3B2B1D;
+}
+
+.jlpt-dialogue-bubbles {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.jlpt-dialogue-turn {
+  background: #FFFFFF;
+  border: 1.5px solid var(--line, #E8DFD3);
+  border-radius: 14px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: 0 2px 0 #D8CEBF;
+}
+
+.jlpt-turn-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Professional Speaker Badge Pills */
+.jlpt-speaker-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+}
+
+.jlpt-speaker-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* Personas: Indigo / Amber / Emerald Palettes (Contrast > 7:1) */
+.jlpt-speaker-chip.speaker-instructor {
+  background: #EEF2FF !important;
+  color: #4338CA !important;
+  border: 1px solid #C7D2FE !important;
+}
+
+.jlpt-speaker-chip.speaker-male {
+  background: #FEF3C7 !important;
+  color: #B45309 !important;
+  border: 1px solid #FDE68A !important;
+}
+
+.jlpt-speaker-chip.speaker-female {
+  background: #ECFDF5 !important;
+  color: #047857 !important;
+  border: 1px solid #A7F3D0 !important;
+}
+
+.jlpt-speaker-chip.speaker-teacher {
+  background: #EDE9FE !important;
+  color: #6D28D9 !important;
+  border: 1px solid #DDD6FE !important;
+}
+
+.jlpt-speaker-chip.speaker-student {
+  background: #CCFBF1 !important;
+  color: #0F766E !important;
+  border: 1px solid #99F6E4 !important;
+}
+
+.jlpt-speaker-chip.speaker-staff,
+.jlpt-speaker-chip.speaker-neutral {
+  background: #F4EFEA !important;
+  color: #4A3E34 !important;
+  border: 1px solid #E8DFD3 !important;
+}
+
+.jlpt-speaker-name,
+.jlpt-speaker-raw {
+  color: inherit !important;
+}
+
+.jlpt-line-speak-btn {
+  background: #FAF6EF;
+  border: 1px solid #E8DFD3;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 3px 6px;
+  color: #7A5F1B;
+  transition: transform 0.1s;
+}
+
+.jlpt-line-speak-btn:hover {
+  transform: scale(1.1);
+  background: #241A11;
+  color: #FFD94F;
+}
+
+.jlpt-turn-bubble {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.jlpt-bubble-ja {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #0F172A;
+  line-height: 1.45;
+  word-break: break-word;
+}
+
+.jlpt-bubble-ro {
+  font-size: 11.5px;
+  font-style: italic;
+  color: #64748B;
+  line-height: 1.35;
+}
+
+.jlpt-bubble-id {
+  font-size: 12px;
+  line-height: 1.4;
+  color: #334155;
+  background: #FAF6EF;
+  border-left: 3px solid #D97706;
+  padding: 5px 8px;
+  border-radius: 0 6px 6px 0;
+  margin-top: 2px;
+}
+
+/* =========================================================================
+   TAB 2: PEMBAHASAN PANEL (TACTILE CLAY)
+   ========================================================================= */
+
+.jlpt-explain-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.jlpt-key-card {
+  background: #F0FDF4;
+  border: 1.5px solid #22C55E;
+  border-radius: 12px;
+  padding: 10px 12px;
+  box-shadow: 0 2px 0 #15803D;
+}
+
+.jlpt-key-badge {
+  font-size: 11px;
+  font-weight: 800;
+  color: #15803D;
+  letter-spacing: 0.3px;
+}
+
+.jlpt-status-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.jlpt-status-badge.status-correct {
+  background: #DCFCE7;
+  color: #15803D;
+}
+
+.jlpt-status-badge.status-wrong {
+  background: #FEE2E2;
+  color: #B91C1C;
+}
+
+.jlpt-status-badge.status-pending {
+  background: #EFE6D8;
+  color: #7A6F64;
+}
+
+.jlpt-key-choice {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #0F172A;
+  line-height: 1.35;
+}
+
+.jlpt-explain-body {
+  background: #FFFFFF;
+  border: 1.5px solid var(--line, #E8DFD3);
+  border-radius: 12px;
+  padding: 12px 14px;
+  box-shadow: 0 2px 0 #D8CEBF;
+}
+
+.jlpt-explain-title {
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #0F172A;
+}
+
+.jlpt-explain-desc {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: #334155;
+  white-space: pre-wrap;
+}
+
+.jlpt-explain-tip-card {
+  background: #F0F7FF;
+  border: 1.5px solid #BFDBFE;
+  border-radius: 10px;
+  padding: 9px 12px;
+  font-size: 12px;
+  color: #1E40AF;
+  line-height: 1.45;
+  box-shadow: 0 1.5px 0 #93C5FD;
+}
+
+/* =========================================================================
+   TAB 3: KOSAKATA PANEL
+   ========================================================================= */
+
+.jlpt-vocab-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.jlpt-vocab-card-item,
+.jlpt-vocab-item {
+  background: #FFFFFF;
+  border: 1.5px solid var(--line, #E8DFD3);
+  border-radius: 10px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  box-shadow: 0 2px 0 #D8CEBF;
+  transition: all 0.12s ease;
+}
+
+.jlpt-vocab-card-item:hover,
+.jlpt-vocab-item:hover {
+  background: #FAF6EF;
+  border-color: #D6CBC0;
+}
+
+.jlpt-vocab-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.jlpt-vocab-word {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #0F172A;
+}
+
+.jlpt-vocab-meaning {
+  font-size: 12px;
+  color: #64748B;
+  font-weight: 600;
+}
+
+.jlpt-vocab-speak {
+  background: #FAF6EF;
+  border: 1px solid #E8DFD3;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 1px 0 #D8CEBF;
+  transition: transform 0.1s;
+}
+
+.jlpt-vocab-speak:hover {
+  transform: scale(1.1);
+  background: #241A11;
+  color: #FFD94F;
+}
+
+.jlpt-vocab-empty {
+  text-align: center;
+  padding: 24px;
+  font-size: 13px;
+  color: var(--text-muted, #7A6F64);
+}
+
+/* =========================================================================
+   TACTILE TRAVERTINE DOWNLOAD SECTION (ANTI-BLACK MONOLITH)
+   ========================================================================= */
+
+.jlpt-download-box {
+  background: #FAF6EF;
+  border: 1.5px solid var(--line, #E8DFD3);
+  border-radius: 14px;
+  padding: 10px 14px;
+  box-shadow: 0 3px 0 #D8CEBF;
+  margin-top: 4px;
+  flex-shrink: 0;
+}
+
+.jlpt-download-title {
+  font-size: 12px;
+  font-weight: 800;
+  color: #0F172A;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.jlpt-download-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 11.5px;
+}
+
+.jlpt-download-link {
+  color: #B45309;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.jlpt-download-link:hover {
+  text-decoration: underline;
+}
+
+/* Banner di Beranda */
+.ja-chokai-banner {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  margin: 12px 0;
+  border: 1.5px solid var(--line, #E8DFD3);
+  border-radius: 16px;
+  background: linear-gradient(135deg, #FFFDF8 0%, #FFF8E7 100%);
+  box-shadow: 0 2px 8px rgba(36, 26, 17, 0.04);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.ja-chokai-banner:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(36, 26, 17, 0.08);
+}
+
+.ja-chokai-banner-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ja-chokai-banner-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: #FFD94F;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.ja-chokai-banner-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  color: #B45309;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: block;
+}
+
+.ja-chokai-banner-title {
+  font-size: 14px;
+  color: #241A11;
+  display: block;
+}
+
+.ja-chokai-banner-sub {
+  font-size: 11.5px;
+  color: var(--text-muted, #7A6F64);
+  display: block;
+}
+
+.ja-chokai-btn {
+  margin: 0 !important;
+  padding: 8px 14px !important;
+  font-size: 12.5px !important;
+  white-space: nowrap;
+}
+
+/* =========================================================================
+   RESPONSIVE MULTI-DEVICE VIEWPORTS (390×844 IPHONE & ANDROID COMPAT)
+   ========================================================================= */
+
+@media (min-width: 641px) {
+  .listening-modal {
+    padding: 4px 14px !important;
+  }
+  .listening-modal-box {
+    max-height: 98.5vh !important;
+  }
+  .listening-head {
+    min-height: 38px !important;
+    padding: 6px 14px !important;
+  }
+  .listening-body {
+    padding: 4px 12px 6px !important;
+    gap: 3px !important;
+  }
+  .jlpt-mobile-card {
+    padding: 6px 12px 8px !important;
+    gap: 4px !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .listening-modal {
+    padding: 0 !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    background: rgba(20, 14, 10, 0.72);
+  }
+
+  .listening-modal-box {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    border-radius: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding-bottom: max(6px, env(safe-area-inset-bottom, 6px)) !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .listening-topbar {
+    padding: max(8px, env(safe-area-inset-top, 8px)) 14px 8px !important;
+    min-height: 48px !important;
+    height: auto !important;
+    flex-shrink: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .listening-top-counter {
+    font-size: 14.5px !important;
+  }
+
+  .listening-filter-btn {
+    padding: 4px 10px !important;
+    font-size: 11px !important;
+  }
+
+  .listening-head {
+    padding: 6px 12px !important;
+    min-height: 40px !important;
+    height: 40px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .listening-head .f-tag,
+  .listening-head-sub {
+    display: none !important;
+  }
+
+  .listening-head-title {
+    font-size: 14px !important;
+    line-height: 1.2 !important;
+  }
+
+  .listening-close-btn {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    font-size: 15px !important;
+  }
+
+  .listening-body {
+    padding: 6px 10px 8px !important;
+    gap: 6px !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .jlpt-level-tabs {
+    min-height: 30px !important;
+    height: 30px !important;
+    padding: 2px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .jlpt-lvl-btn {
+    font-size: 11px !important;
+    height: 26px !important;
+    padding: 0 8px !important;
+  }
+
+  .jlpt-mondai-scroll {
+    min-height: 40px !important;
+    height: 40px !important;
+    flex-shrink: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 2px 0 !important;
+  }
+
+  .jlpt-mondai-chip {
+    padding: 0 10px !important;
+    font-size: 11px !important;
+    height: 30px !important;
+    min-height: 30px !important;
+    flex-shrink: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+  }
+
+  .jlpt-mobile-card {
+    padding: 8px 10px !important;
+    gap: 5px !important;
+    border-radius: 14px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .jlpt-card-header {
+    min-height: 22px !important;
+    height: 22px !important;
+    margin-bottom: 2px !important;
+  }
+
+  .jlpt-situation-chip {
+    padding: 2px 8px !important;
+    font-size: 10px !important;
+    min-height: 20px !important;
+    height: 20px !important;
+  }
+
+  .jlpt-audio-row {
+    min-height: 36px !important;
+    height: 36px !important;
+    padding: 2px 6px !important;
+    gap: 6px !important;
+  }
+
+  .jlpt-primary-play-btn {
+    height: 30px !important;
+    font-size: 11.5px !important;
+    padding: 0 10px !important;
+  }
+
+  .jlpt-jees-chip {
+    height: 30px !important;
+    font-size: 10.5px !important;
+    padding: 0 8px !important;
+  }
+
+  .jlpt-question-block {
+    padding: 1px 0 !important;
+  }
+
+  .jlpt-question-ja {
+    font-size: 14px !important;
+    line-height: 1.25 !important;
+    margin: 0 0 2px 0 !important;
+  }
+
+  .jlpt-question-id {
+    font-size: 10px !important;
+    line-height: 1.15 !important;
+    margin: 0 !important;
+  }
+
+  .jlpt-options-list {
+    gap: 5px !important;
+  }
+
+  .jlpt-opt-btn {
+    min-height: 42px !important;
+    max-height: 46px !important;
+    height: 44px !important;
+    padding: 4px 8px !important;
+    gap: 8px !important;
+  }
+
+  .jlpt-opt-badge {
+    width: 24px !important;
+    height: 24px !important;
+    min-width: 24px !important;
+    font-size: 11px !important;
+  }
+
+  .jlpt-opt-ja {
+    font-size: 12.5px !important;
+    line-height: 1.15 !important;
+  }
+
+  .jlpt-opt-id {
+    font-size: 9.5px !important;
+    line-height: 1.1 !important;
+  }
+
+  .jlpt-feedback-banner {
+    padding: 6px 10px !important;
+    font-size: 11px !important;
+    margin: 3px 0 !important;
+  }
+
+  .jlpt-sheet-triggers {
+    gap: 4px !important;
+    margin-top: 4px !important;
+  }
+
+  .jlpt-sheet-trigger-btn {
+    height: 28px !important;
+    min-height: 28px !important;
+    padding: 0 6px !important;
+    font-size: 10px !important;
+  }
+
+  .jlpt-bottom-nav {
+    padding: 3px 0 !important;
+  }
+
+  .jlpt-nav-pill {
+    min-height: 30px !important;
+    height: 30px !important;
+    padding: 0 10px !important;
+    font-size: 11px !important;
+  }
+
+  .jlpt-sheet-container {
+    max-height: 90vh;
+    height: 90vh;
+    border-top-left-radius: 22px;
+    border-top-right-radius: 22px;
+    padding-bottom: max(12px, env(safe-area-inset-bottom, 12px));
+  }
+}
+
+@media (max-width: 375px) {
+  .listening-head {
+    padding: 4px 10px;
+    min-height: 38px;
+  }
+
+  .listening-head-title {
+    font-size: 14px;
+  }
+
+  .listening-body {
+    padding: 4px 8px 6px;
+    gap: 5px;
+  }
+
+  .jlpt-opt-btn {
+    min-height: 46px;
+    max-height: 50px;
+    height: 46px;
+    padding: 4px 8px;
+  }
+
+  .jlpt-opt-ja {
+    font-size: 13px;
+  }
+
+  .jlpt-opt-id {
+    font-size: 10px;
+  }
+
+  .jlpt-swipe-subhint {
+    display: none;
+  }
+}

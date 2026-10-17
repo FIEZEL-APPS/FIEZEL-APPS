@@ -1,0 +1,21 @@
+<!--
+  m025-105 ikon "Tanya FIEZEL".
+
+  Bukan gambar baru: ini dua balok emas dari wordmark FIEZEL, dipotong apa adanya dari
+  assets/brand/fiezel-wordmark.svg. Koordinatnya digeser (x 192 dan 240 menjadi 0 dan 48,
+  y dikurangi 30) tetapi ukuran, radius, dan gradiennya tidak disentuh - kalau proporsinya
+  diubah, ia berhenti menjadi tanda FIEZEL dan hanya menjadi dua batang kuning.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 74 200" role="img" aria-label="Tanya FIEZEL">
+  <defs>
+    <linearGradient id="fiezelAskGold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#F7E3AE"/>
+      <stop offset="45%" stop-color="#DDB55F"/>
+      <stop offset="100%" stop-color="#B0812A"/>
+    </linearGradient>
+  </defs>
+  <g fill="url(#fiezelAskGold)">
+    <rect x="0" y="0" width="26" height="200" rx="13"/>
+    <rect x="48" y="76" width="26" height="124" rx="13"/>
+  </g>
+</svg>

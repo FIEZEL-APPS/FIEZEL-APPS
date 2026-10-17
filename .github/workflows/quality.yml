@@ -653,6 +653,7 @@ jobs:
           node tests/interactive-chat-test.js
           node tests/voice-call-two-way-test.js
           node tests/ios-pwa-mic-shadowing-test.js
+          node tests/ios-speech-priming-voice-guard-test.js
           node tests/shadowing-eval-card-test.js
           node tests/interactive-chat-braincore-telemetry-test.js
           node tests/speech-synthesis-engine-test.js

@@ -1,0 +1,246 @@
+name: Build Android APK
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'android/**'
+      - 'tools/**'
+      - '.github/workflows/build-android-apk.yml'
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'Build Type to assemble'
+        required: true
+        type: choice
+        default: 'all'
+        options:
+          - 'all'
+          - 'debug'
+          - 'release'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build & Sign Android APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Java 17 (temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Sync web assets using node tools/sync-android-assets.mjs
+        run: |
+          echo "=== Step: Sync web assets ==="
+          if [ -f tools/sync-android-assets.mjs ]; then
+            echo "Running tools/sync-android-assets.mjs..."
+            node tools/sync-android-assets.mjs
+          else
+            echo "::warning::tools/sync-android-assets.mjs not found; creating fallback assets/public structure"
+            mkdir -p android/app/src/main/assets/public
+            touch android/app/src/main/assets/public/.gitkeep
+          fi
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('android/**/*.gradle*', 'android/**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Grant execute permission to gradlew
+        run: chmod +x gradlew
+        working-directory: android
+
+      - name: Determine target build variants
+        id: targets
+        run: |
+          EVENT="${{ github.event_name }}"
+          INPUT_TYPE="${{ github.event.inputs.build_type }}"
+          BUILD_DEBUG=false
+          BUILD_RELEASE=false
+
+          if [ "$EVENT" = "push" ] || [ -z "$INPUT_TYPE" ] || [ "$INPUT_TYPE" = "all" ]; then
+            BUILD_DEBUG=true
+            BUILD_RELEASE=true
+          elif [ "$INPUT_TYPE" = "debug" ]; then
+            BUILD_DEBUG=true
+          elif [ "$INPUT_TYPE" = "release" ]; then
+            BUILD_RELEASE=true
+          fi
+
+          echo "BUILD_DEBUG=$BUILD_DEBUG" >> $GITHUB_ENV
+          echo "BUILD_RELEASE=$BUILD_RELEASE" >> $GITHUB_ENV
+          echo "Targets configured: Debug=$BUILD_DEBUG, Release=$BUILD_RELEASE"
+
+      - name: Build Debug APK
+        if: env.BUILD_DEBUG == 'true'
+        working-directory: android
+        run: ./gradlew assembleDebug --stacktrace
+
+      - name: Build Release APK
+        if: env.BUILD_RELEASE == 'true'
+        working-directory: android
+        run: ./gradlew assembleRelease --stacktrace
+
+      - name: Sign & verify Debug APK
+        if: env.BUILD_DEBUG == 'true'
+        run: |
+          echo "=== Locating and validating Debug APK ==="
+          DEBUG_APK=$(find android/app/build/outputs/apk/debug -name "*.apk" -type f | head -n 1)
+          if [ -z "$DEBUG_APK" ] || [ ! -f "$DEBUG_APK" ]; then
+            echo "::error::Debug APK was not found in android/app/build/outputs/apk/debug!"
+            exit 1
+          fi
+          echo "Found debug APK: $DEBUG_APK"
+
+          BUILD_TOOLS_DIR=$(ls -d $ANDROID_HOME/build-tools/* | sort -V | tail -n 1)
+          APKSIGNER="$BUILD_TOOLS_DIR/apksigner"
+          echo "Using apksigner: $APKSIGNER"
+
+          # Copy to final artifact filename
+          cp "$DEBUG_APK" fiezel-app-debug.apk
+
+          # Verify signature or sign with standard debug keystore
+          if ! "$APKSIGNER" verify fiezel-app-debug.apk >/dev/null 2>&1; then
+            echo "Debug APK unsigned; signing with standard debug keystore..."
+            mkdir -p ~/.android
+            if [ ! -f ~/.android/debug.keystore ]; then
+              keytool -genkey -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+            fi
+            "$APKSIGNER" sign --ks ~/.android/debug.keystore --ks-key-alias androiddebugkey --ks-pass pass:android --key-pass pass:android fiezel-app-debug.apk
+          fi
+
+          echo "=== Debug APK signature verification ==="
+          "$APKSIGNER" verify --verbose fiezel-app-debug.apk
+          sha256sum fiezel-app-debug.apk > fiezel-app-debug.apk.sha256
+          echo "Debug APK SHA-256: $(cat fiezel-app-debug.apk.sha256)"
+
+      - name: Sign & verify Release APK
+        if: env.BUILD_RELEASE == 'true'
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 || secrets.RELEASE_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD || secrets.RELEASE_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS || secrets.RELEASE_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD || secrets.RELEASE_KEY_PASSWORD }}
+        run: |
+          echo "=== Locating and preparing Release APK ==="
+          RAW_RELEASE_APK=$(find android/app/build/outputs/apk/release -name "*.apk" -type f | head -n 1)
+          if [ -z "$RAW_RELEASE_APK" ] || [ ! -f "$RAW_RELEASE_APK" ]; then
+            echo "::error::Release APK was not found in android/app/build/outputs/apk/release!"
+            exit 1
+          fi
+          echo "Found raw release APK: $RAW_RELEASE_APK"
+
+          BUILD_TOOLS_DIR=$(ls -d $ANDROID_HOME/build-tools/* | sort -V | tail -n 1)
+          APKSIGNER="$BUILD_TOOLS_DIR/apksigner"
+          ZIPALIGN="$BUILD_TOOLS_DIR/zipalign"
+          echo "Using build tools: $BUILD_TOOLS_DIR"
+
+          # Align APK if unaligned
+          echo "Checking alignment..."
+          if ! "$ZIPALIGN" -c 4 "$RAW_RELEASE_APK" >/dev/null 2>&1; then
+            echo "Aligning APK with zipalign..."
+            "$ZIPALIGN" -v -p 4 "$RAW_RELEASE_APK" aligned-release.apk
+          else
+            echo "APK is already 4-byte aligned."
+            cp "$RAW_RELEASE_APK" aligned-release.apk
+          fi
+
+          # Sign with release secrets or standard Android debug keystore fallback
+          if [ -n "$KEYSTORE_BASE64" ] && [ -n "$KEYSTORE_PASSWORD" ] && [ -n "$KEY_ALIAS" ]; then
+            echo "Signing Release APK with repository release keystore secret..."
+            echo "$KEYSTORE_BASE64" | base64 -d > release.keystore
+            KEY_PASS_ARG=""
+            if [ -n "$KEY_PASSWORD" ]; then
+              KEY_PASS_ARG="--key-pass pass:$KEY_PASSWORD"
+            else
+              KEY_PASS_ARG="--key-pass pass:$KEYSTORE_PASSWORD"
+            fi
+            "$APKSIGNER" sign --ks release.keystore --ks-key-alias "$KEY_ALIAS" --ks-pass "pass:$KEYSTORE_PASSWORD" $KEY_PASS_ARG --out fiezel-app-release.apk aligned-release.apk
+            rm -f release.keystore
+          else
+            echo "Release secrets not detected. Signing with standard Android debug keystore fallback..."
+            mkdir -p ~/.android
+            if [ ! -f ~/.android/debug.keystore ]; then
+              keytool -genkey -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+            fi
+            "$APKSIGNER" sign --ks ~/.android/debug.keystore --ks-key-alias androiddebugkey --ks-pass pass:android --key-pass pass:android --out fiezel-app-release.apk aligned-release.apk
+          fi
+
+          echo "=== Release APK signature verification ==="
+          "$APKSIGNER" verify --verbose fiezel-app-release.apk
+          sha256sum fiezel-app-release.apk > fiezel-app-release.apk.sha256
+          echo "Release APK SHA-256: $(cat fiezel-app-release.apk.sha256)"
+
+      - name: Upload Debug APK
+        if: env.BUILD_DEBUG == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: fiezel-app-debug
+          path: |
+            fiezel-app-debug.apk
+            fiezel-app-debug.apk.sha256
+          retention-days: 30
+          if-no-files-found: error
+
+      - name: Upload Release APK
+        if: env.BUILD_RELEASE == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: fiezel-app-release
+          path: |
+            fiezel-app-release.apk
+            fiezel-app-release.apk.sha256
+          retention-days: 30
+          if-no-files-found: error
+
+      - name: Generate Build Summary
+        if: always()
+        run: |
+          echo "## 📱 FIEZEL Android APK Build Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Artifact Name | Status | Size | SHA-256 | Retention |" >> $GITHUB_STEP_SUMMARY
+          echo "| :--- | :---: | :---: | :--- | :---: |" >> $GITHUB_STEP_SUMMARY
+          if [ -f fiezel-app-debug.apk ]; then
+            DEBUG_SIZE=$(ls -lh fiezel-app-debug.apk | awk '{print $5}')
+            DEBUG_HASH=$(awk '{print $1}' fiezel-app-debug.apk.sha256)
+            echo "| \`fiezel-app-debug.apk\` | ✅ Signed | $DEBUG_SIZE | \`${DEBUG_HASH:0:16}...\` | 30 Days |" >> $GITHUB_STEP_SUMMARY
+          fi
+          if [ -f fiezel-app-release.apk ]; then
+            RELEASE_SIZE=$(ls -lh fiezel-app-release.apk | awk '{print $5}')
+            RELEASE_HASH=$(awk '{print $1}' fiezel-app-release.apk.sha256)
+            echo "| \`fiezel-app-release.apk\` | ✅ Signed | $RELEASE_SIZE | \`${RELEASE_HASH:0:16}...\` | 30 Days |" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "> 💡 APK artifacts can be downloaded from the Summary tab of this workflow run." >> $GITHUB_STEP_SUMMARY

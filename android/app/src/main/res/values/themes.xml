@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme: Material 3 DayNight NoActionBar -->
+    <style name="Theme.Fiezel" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Brand Primary & Accent Colors -->
+        <item name="colorPrimary">@color/fz_primary</item>
+        <item name="colorPrimaryVariant">@color/fz_maroon_dark</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorSecondary">@color/fz_gold</item>
+        <item name="colorSecondaryVariant">@color/fz_coral</item>
+        <item name="colorOnSecondary">@color/fz_splash_bg</item>
+        <item name="colorSurface">@color/fz_surface</item>
+        <item name="colorOnSurface">@color/fz_cream</item>
+
+        <!-- System Bars & Edge-to-Edge Window Background -->
+        <item name="android:windowBackground">@color/fz_splash_bg</item>
+        <item name="android:statusBarColor">@color/fz_splash_bg</item>
+        <item name="android:navigationBarColor">@color/fz_splash_bg</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">false</item>
+    </style>
+
+    <!-- Modern Splash Screen Theme using AndroidX Core Splashscreen -->
+    <style name="Theme.Fiezel.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/fz_splash_bg</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_logo</item>
+        <item name="windowSplashScreenAnimationDuration">500</item>
+        <item name="postSplashScreenTheme">@style/Theme.Fiezel</item>
+    </style>
+
+    <!-- Standard NoActionBar Fullscreen / Cold-Start Splash Window Theme -->
+    <style name="Theme.Fiezel.Splash" parent="Theme.Fiezel">
+        <item name="android:windowBackground">@drawable/splash_background</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">false</item>
+    </style>
+</resources>

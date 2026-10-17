@@ -1,0 +1,75 @@
+/**
+ * FIEZEL · features/i18n/copy-id-proctor.js — COPY-MAP PENDETEKSI KELUAR LAYAR (id)
+ *
+ * Kalimat yang dibaca MURID saat mengerjakan ujian dari guru, dan kalimat yang dibaca
+ * GURU saat pendeteksi melaporkan kepergian. Semuanya baru (lahir bersama pendeteksi
+ * keluar layar), jadi tidak ada padanan di baseline emas — pasangan Thai-nya ada di
+ * copy-th-proctor.js, kunci demi kunci.
+ *
+ * NADA: menyebut fakta, tidak menuduh. Pendeteksi ini melaporkan bahwa layar ditinggalkan,
+ * bukan bahwa murid menyontek — perbedaan itu harus terdengar di setiap kalimat, karena
+ * kalimat inilah yang dibaca murid yang keluar hanya karena dipanggil orang rumah.
+ */
+(function () {
+  'use strict';
+  /* Akses lewat `self`, bukan identifier telanjang: gerbang paritas (th-ui-leak-test) memuat
+     berkas ini di Node dengan `self` yang disuntik, dan berkas yang menyebut FiezelI18n
+     telanjang tidak terlihat olehnya — kuncinya lolos tanpa pernah dihitung. */
+  var I18N = (typeof self !== 'undefined' ? self : globalThis).FiezelI18n;
+  if (!I18N || typeof I18N.registerCopy !== 'function') return;
+  I18N.registerCopy('id', {
+    'proctor.aktif': 'Mode ujian: kalau kamu keluar dari layar ini, gurumu menerima catatannya.',
+    'proctor.kamera-aktif': 'Kamera ujian aktif',
+    'proctor.wajah-peringatan': 'Wajah tidak terdeteksi di kamera depan. Harap menghadap layar HP agar ujian tidak ditandai pengawas.',
+    'proctor.modal-judul': 'Yuk, Kembali Menghadap Layar!',
+    'proctor.modal-pesan': 'Halo! Wajahmu belum terdeteksi di kamera depan. Pastikan kamu tetap menghadap ke layar HP ya, agar ujianmu lancar dan tidak ditandai oleh guru.',
+    'proctor.modal-status': 'Memeriksa kamera depan...',
+    'proctor.modal-tombol': 'Saya Sudah Menghadap Layar',
+    'proctor.wajah-kembali': 'Wajah terdeteksi kembali! Selamat melanjutkan ujian.',
+    'proctor.wajah-belum': 'Wajah belum terdeteksi. Pastikan pencahayaan cukup dan wajah menghadap kamera.',
+    'proctor.wajah-tercatat': 'Wajah tidak terlihat {vn}× ({detik} detik). Catatannya terkirim ke gurumu.',
+    'proctor.tercatat': 'Tercatat keluar layar {n}× ({detik} detik). Gurumu sudah menerima catatannya.',
+    'proctor.kembali-toast': 'Kamu keluar dari layar ujian {n}× ({detik} detik terakhir). Catatannya sudah sampai ke gurumu.',
+    'proctor.guru-chip': 'Keluar layar {n}×',
+    'proctor.guru-bersih': 'Tidak keluar layar',
+    'proctor.guru-ringkas': '{jumlah} murid terdeteksi keluar layar',
+    'proctor.verifikasi-kicker': 'Verifikasi Wajah & Kamera Ujian',
+    'proctor.verifikasi-judul': 'Verifikasi Wajah Sebelum Mulai',
+    'proctor.verifikasi-desc': 'Pastikan wajahmu terlihat jelas di kamera depan, pencahayaan cukup, dan tidak memakai masker/penutup wajah. Kamera akan menjaga integritas ujianmu secara otomatis.',
+    'proctor.verifikasi-panduan': 'Posisikan wajahmu di dalam lingkaran',
+    'proctor.verifikasi-liveness-panduan': 'Langkah 2/2: Kedipkan matamu perlahan atau tolehkan kepalamu',
+    'proctor.verifikasi-btn-mulai': 'Aktifkan Kamera & Pindai Wajah',
+    'proctor.verifikasi-menghubungkan': 'Menghubungkan kamera...',
+    'proctor.verifikasi-memindai': 'Memindai wajah... Harap tetap menghadap kamera',
+    'proctor.verifikasi-sukses': 'Wajah Terverifikasi!',
+    'proctor.verifikasi-liveness-sukses': 'Wajah Hidup Terverifikasi',
+    'proctor.verifikasi-sukses-sub': 'Kamera siap menjaga integritas ujianmu. Silakan mulai pengerjaan.',
+    'proctor.verifikasi-sukses-toast': 'Wajah terverifikasi! Kamera siap menjaga ujianmu.',
+    'proctor.verifikasi-btn-lanjut': 'Mulai Kerjakan Ujian',
+    'proctor.verifikasi-error-info': 'Kamera tidak dapat diakses atau izin belum diberikan. Klik ikon gembok di bilah peramban untuk mengizinkan kamera.',
+    'proctor.verifikasi-btn-bypass': 'Lanjut Tanpa Kamera (Dilaporkan ke Guru)',
+    'proctor.wajah-peringatan-ringkas': 'Wajah di luar kamera!',
+    'proctor.keluar-layar-slot': 'Keluar layar',
+    'proctor.wajah-hilang-slot': 'Wajah tak terlihat',
+    'proctor.mode-ujian-ringkas': 'Mode ujian aktif',
+    'proctor.keluar-ujian': 'Keluar ujian',
+    'proctor.keluar-ujian-judul': 'Keluar dari Ruang Ujian?',
+    'proctor.keluar-ujian-desc': 'Ujian akan diselesaikan dan kamu tidak bisa melanjutkan lagi. Yakin ingin keluar?',
+    'proctor.keluar-dan-selesaikan': 'Keluar & Selesaikan',
+    'proctor.lanjut-ujian': 'Lanjut Ujian',
+    /* m025-560 — ujian tanpa kamera kini benar-benar sampai ke guru (nc = 1). */
+    'proctor.kamera-terputus': 'Kamera ujian tidak aktif. Gurumu akan melihat bahwa ujian ini berjalan tanpa kamera.',
+    'proctor.guru-tanpa-kamera': 'Tanpa kamera',
+    'proctor.guru-kabar-tanpa-kamera': '⚠ {murid} mengerjakan ujian “{judul}” tanpa kamera — pengawasan wajah tidak berjalan. Tanyakan ke muridnya sebelum menilai.',
+    /* m025-273 — kunci ujian berlaku di SELURUH permukaan ujian, bukan hanya tugas Kelas. */
+    'ujian.mode-aktif': 'Mode ujian: pembimbing FIEZEL nonaktif, dan kalau kamu keluar dari layar ini gurumu menerima catatannya.',
+    'ujian.ai-terkunci': 'Pembimbing FIEZEL nonaktif selama sesi ujian. Kerjakan dengan kemampuanmu sendiri — ia kembali begitu ujian selesai.',
+    'ujian.ai-terkunci-singkat': 'Nonaktif selama ujian.',
+    'ujian.keluar-tercatat': 'Kamu keluar dari layar ujian {n}× ({detik} detik terakhir). Catatannya sudah sampai ke gurumu.',
+    // Audit F01/F03 (2026-09-22): murid tanpa kelas tidak punya guru yang menerima catatan,
+    // dan tes awal dijanjikan "bukan ujian" - kalimatnya harus benar untuk keduanya.
+    'ujian.mode-aktif-tes-awal': 'Tes awal: kerjakan sendiri, Mochi istirahat dulu. Tidak ada nilai dan tidak ada hukuman.',
+    'ujian.mode-aktif-tanpa-kelas': 'Mode ujian: pembimbing FIEZEL nonaktif sampai ujian selesai.',
+    'ujian.keluar-tercatat-tanpa-kelas': 'Kamu keluar dari layar ujian {n}× ({detik} detik terakhir).'
+  });
+})();

@@ -107,6 +107,8 @@ remotion/public/assets
 # --- ALAT DAN SAMPAH LOKAL: dilarang masuk git ---
 *.exe
 *.bat
+!tools/build-android-apk.bat
+!android/gradlew.bat
 *.raw
 *.pcm
 *.wav

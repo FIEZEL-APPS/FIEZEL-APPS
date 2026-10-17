@@ -1,0 +1,699 @@
+/* ==========================================================================
+   FIEZEL — features/ui/fiezel-marshmallow.css
+   Redesign Penuh: Soft Claymorphism & Pastel Marshmallow (Option 5)
+   Dipadukan dengan Editorial-Quality Flat Vector Character System (Nusa & Mira)
+   ========================================================================== */
+
+:root {
+  /* Palet Warna Soft Marshmallow (Option 5) */
+  --fz-marsh-bg: #FFF8E7;
+  --fz-marsh-card: #FFFFFF;
+  --fz-marsh-card-soft: #FFFDF8;
+  
+  /* Pastel Primaries */
+  --fz-marsh-yellow: #FFD680;
+  --fz-marsh-yellow-deep: #E6A800;
+  --fz-marsh-yellow-light: #FFF7D3;
+  --fz-marsh-yellow-ink: #462104;
+
+  --fz-marsh-mint: #E5F9CE;
+  --fz-marsh-mint-deep: #529917;
+  --fz-marsh-mint-ink: #162B08;
+
+  --fz-marsh-sky: #BAF4FF;
+  --fz-marsh-sky-deep: #1EC6F2;
+  --fz-marsh-sky-ink: #072F45;
+
+  --fz-marsh-coral: #FFD1C9;
+  --fz-marsh-coral-deep: #B8432D;
+  --fz-marsh-coral-ink: #6B1C10;
+
+  --fz-marsh-lavender: #EBE4F7;
+  --fz-marsh-lavender-ink: #311B58;
+
+  --fz-marsh-ink: #241A11;
+  --fz-marsh-muted: #6E5E47;
+  --fz-marsh-border: rgba(70, 33, 4, 0.08);
+
+  /* Bayangan Claymorphism (Inner Highlight + Outer Diffuse Soft Drop) */
+  --fz-clay-shadow: 0 12px 28px -4px rgba(70, 33, 4, 0.07), inset 0 2px 4px rgba(255, 255, 255, 0.95);
+  --fz-clay-shadow-sm: 0 6px 16px -2px rgba(70, 33, 4, 0.05), inset 0 1.5px 3px rgba(255, 255, 255, 0.95);
+  --fz-clay-shadow-lg: 0 20px 48px -8px rgba(70, 33, 4, 0.10), inset 0 3px 6px rgba(255, 255, 255, 0.95);
+  --fz-clay-btn-shadow: 0 6px 14px rgba(70, 33, 4, 0.08), inset 0 2px 3px rgba(255, 255, 255, 0.75);
+  --fz-clay-btn-yellow-shadow: 0 8px 18px rgba(230, 168, 0, 0.32), inset 0 2px 3px rgba(255, 255, 255, 0.85);
+
+  /* Sudut Lengkung Empuk */
+  --fz-clay-radius-xl: 32px;
+  --fz-clay-radius-lg: 26px;
+  --fz-clay-radius-md: 20px;
+  --fz-clay-radius-pill: 999px;
+}
+
+/* Base Body Application */
+body {
+  background-color: var(--fz-marsh-bg) !important;
+  color: var(--fz-marsh-ink);
+}
+
+/* ==========================================================================
+   1. AUTH GATE & LOGIN REDESIGN (Soft Claymorphism & Flat Vector)
+   ========================================================================== */
+.auth-gate {
+  background: rgba(255, 248, 231, 0.92) !important;
+  backdrop-filter: blur(20px) !important;
+}
+
+.auth-gate .auth-panel {
+  width: min(420px, 92vw) !important;
+  padding: 38px 28px 34px !important;
+  border-radius: var(--fz-clay-radius-xl) !important;
+  background: #FFFFFF !important;
+  border: 2px solid rgba(255, 255, 255, 0.9) !important;
+  box-shadow: var(--fz-clay-shadow-lg) !important;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Flat Vector Mascot Greeting in Auth Gate */
+.auth-gate .auth-vector-hero {
+  display: block;
+  width: 110px;
+  height: 110px;
+  margin: 0 auto 16px;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 16px rgba(70, 33, 4, 0.10));
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.auth-gate .auth-vector-hero:hover {
+  transform: scale(1.06) rotate(2deg);
+}
+
+.auth-gate .auth-panel h2 {
+  font-family: var(--fz-display, 'Plus Jakarta Sans', sans-serif) !important;
+  font-size: 1.75rem !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.02em !important;
+  color: var(--fz-marsh-yellow-ink) !important;
+  margin: 0 0 8px !important;
+}
+
+.auth-gate .auth-panel #authGateBody {
+  font-size: 0.92rem !important;
+  line-height: 1.55 !important;
+  color: var(--fz-marsh-muted) !important;
+  margin: 0 auto 20px !important;
+  max-width: 22rem !important;
+}
+
+/* Status Pill */
+.auth-gate .auth-status {
+  border-radius: var(--fz-clay-radius-pill) !important;
+  padding: 8px 16px !important;
+  background: var(--fz-marsh-yellow-light) !important;
+  color: var(--fz-marsh-yellow-ink) !important;
+  border: 1px solid rgba(255, 214, 128, 0.5) !important;
+  font-size: 0.8rem !important;
+  font-weight: 700 !important;
+}
+
+/* Pillowy Primary Button & Google Button */
+.auth-gate .auth-primary {
+  min-height: 54px !important;
+  border-radius: var(--fz-clay-radius-pill) !important;
+  background: var(--fz-marsh-yellow) !important;
+  color: var(--fz-marsh-yellow-ink) !important;
+  font-weight: 800 !important;
+  font-size: 1rem !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.8) !important;
+  box-shadow: var(--fz-clay-btn-yellow-shadow) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px !important;
+  transition: transform 0.12s ease, box-shadow 0.12s ease !important;
+}
+
+.auth-gate .auth-primary:hover {
+  background: #FFCF66 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 10px 24px rgba(230, 168, 0, 0.4), inset 0 2px 3px #FFFFFF !important;
+}
+
+.auth-gate .auth-primary:active {
+  transform: translateY(2px) scale(0.99) !important;
+  box-shadow: 0 3px 8px rgba(230, 168, 0, 0.25) !important;
+}
+
+/* Google Sign-In Exclusive Tactile Button */
+.auth-gate .auth-primary.auth-google-btn {
+  background: #FFFFFF !important;
+  color: #241A11 !important;
+  border: 1.5px solid rgba(70, 33, 4, 0.12) !important;
+  box-shadow: 0 8px 22px rgba(70, 33, 4, 0.08), inset 0 2px 3px #FFFFFF !important;
+  font-weight: 700 !important;
+  gap: 12px !important;
+}
+
+.auth-gate .auth-primary.auth-google-btn:hover {
+  background: #FFFDF9 !important;
+  border-color: rgba(66, 133, 244, 0.45) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 12px 28px rgba(66, 133, 244, 0.18), inset 0 2px 3px #FFFFFF !important;
+}
+
+.auth-gate .auth-primary.auth-google-btn:active {
+  transform: translateY(1px) scale(0.99) !important;
+  box-shadow: 0 4px 10px rgba(66, 133, 244, 0.12) !important;
+}
+
+.auth-gate .auth-primary.auth-google-btn .google-logo {
+  flex-shrink: 0;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.08));
+}
+
+/* Guest Skip Button */
+.auth-gate .text-button {
+  min-height: 46px !important;
+  border-radius: var(--fz-clay-radius-pill) !important;
+  background: #F7F5EE !important;
+  color: var(--fz-marsh-ink) !important;
+  font-weight: 700 !important;
+  font-size: 0.88rem !important;
+  margin-top: 10px !important;
+  border: 1px solid rgba(70, 33, 4, 0.08) !important;
+  transition: all 0.12s ease !important;
+}
+
+.auth-gate .text-button:hover {
+  background: #EFECE2 !important;
+  transform: translateY(-1px) !important;
+}
+
+/* ==========================================================================
+   2. NOTIFICATION GATE REDESIGN
+   ========================================================================== */
+.notification-gate {
+  background: rgba(255, 248, 231, 0.92) !important;
+  backdrop-filter: blur(20px) !important;
+}
+
+.notification-panel {
+  border-radius: var(--fz-clay-radius-xl) !important;
+  background: #FFFFFF !important;
+  border: 2px solid rgba(255, 255, 255, 0.9) !important;
+  box-shadow: var(--fz-clay-shadow-lg) !important;
+}
+
+.notification-gate button.primary {
+  background: var(--fz-marsh-yellow) !important;
+  color: var(--fz-marsh-yellow-ink) !important;
+  box-shadow: var(--fz-clay-btn-yellow-shadow) !important;
+  border-radius: var(--fz-clay-radius-pill) !important;
+}
+
+/* ==========================================================================
+   3. TOPBAR FLOATING PILL HEADER & EXCLUSIVE PANEL CONTROLS
+   ========================================================================== */
+header.topbar {
+  background: rgba(255, 255, 255, 0.92) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border-bottom: 1.5px solid rgba(255, 255, 255, 0.9) !important;
+  box-shadow: 0 8px 24px rgba(70, 33, 4, 0.05) !important;
+  padding: 8px 18px !important;
+  border-radius: 0 0 26px 26px !important;
+  max-width: 720px !important;
+  margin: 0 auto !important;
+}
+
+/* Exclusive Topbar Action Icons */
+.topbar .icon-button {
+  width: 42px !important;
+  height: 42px !important;
+  min-height: 42px !important;
+  border-radius: 14px !important;
+  background: linear-gradient(145deg, #FFFFFF 0%, #FFFDF8 100%) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 0 6px 14px rgba(70, 33, 4, 0.07), inset 0 2px 3px rgba(255, 255, 255, 0.95) !important;
+  color: var(--fz-marsh-yellow-ink) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: transform 0.16s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.16s ease, background-color 0.16s ease !important;
+}
+
+.topbar .icon-button svg {
+  width: 20px !important;
+  height: 20px !important;
+  stroke: var(--fz-marsh-yellow-ink) !important;
+  stroke-width: 2.2 !important;
+  filter: drop-shadow(0 1px 1px rgba(70, 33, 4, 0.08));
+}
+
+.topbar .icon-button:hover {
+  background: #FFF9E6 !important;
+  transform: translateY(-2px) scale(1.05) !important;
+  box-shadow: 0 10px 20px rgba(230, 168, 0, 0.22), inset 0 2px 3px #FFFFFF !important;
+}
+
+.topbar .icon-button:active {
+  transform: translateY(1px) scale(0.96) !important;
+  box-shadow: 0 3px 8px rgba(70, 33, 4, 0.10) !important;
+}
+
+.topbar .notif-button.has-new {
+  background: linear-gradient(145deg, #FFF7D3 0%, var(--fz-marsh-yellow) 100%) !important;
+}
+
+.topbar .notif-badge {
+  top: 4px !important;
+  right: 4px !important;
+  width: 10px !important;
+  height: 10px !important;
+  background: var(--fz-marsh-coral-deep) !important;
+  box-shadow: 0 0 0 2px #FFFFFF, 0 2px 6px rgba(184, 67, 45, 0.4) !important;
+  border-radius: 50% !important;
+}
+
+/* Level & Streak Indicator Pills in Topbar */
+.fz-top-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: var(--fz-clay-radius-pill);
+  font-size: 0.8rem;
+  font-weight: 800;
+  box-shadow: 0 4px 10px rgba(70, 33, 4, 0.05), inset 0 1.5px 2px rgba(255, 255, 255, 0.95);
+  border: 1.5px solid rgba(255, 255, 255, 0.9);
+}
+
+.fz-top-pill.level {
+  background: linear-gradient(145deg, #FFFFFF 0%, var(--fz-marsh-mint) 100%);
+  color: var(--fz-marsh-mint-ink);
+  border-color: rgba(82, 153, 23, 0.25);
+}
+
+.fz-top-pill.coins {
+  background: linear-gradient(145deg, #FFFFFF 0%, var(--fz-marsh-yellow-light) 100%);
+  color: var(--fz-marsh-yellow-ink);
+  border-color: rgba(230, 168, 0, 0.3);
+}
+
+/* ==========================================================================
+   4. HOME & DASHBOARD CARDS (Soft Clay & Flat Vector Integration)
+   ========================================================================== */
+.card, 
+.today-card,
+.paw-hero-cockpit {
+  background: #FFFFFF !important;
+  border-radius: var(--fz-clay-radius-lg) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.8) !important;
+  box-shadow: var(--fz-clay-shadow) !important;
+  position: relative;
+  transition: transform 0.18s ease, box-shadow 0.18s ease !important;
+}
+
+.today-card {
+  background: linear-gradient(145deg, #FFFFFF 0%, #FFFDF8 45%, #FFF8E7 100%) !important;
+  border: 1.5px solid rgba(255, 214, 128, 0.4) !important;
+  border-radius: var(--fz-clay-radius-xl) !important;
+  padding: 24px 22px !important;
+}
+
+/* Flat Vector Mascot Slot inside Cards */
+.fz-vector-mascot-dock {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.fz-vector-avatar {
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 12px rgba(70, 33, 4, 0.08));
+}
+
+/* Speech Bubble Tip with Flat Vector */
+.fz-speech-bubble {
+  position: relative;
+  background: #FFFFFF;
+  border-radius: var(--fz-clay-radius-md);
+  padding: 12px 16px;
+  border: 1.5px solid rgba(70, 33, 4, 0.07);
+  box-shadow: var(--fz-clay-shadow-sm);
+  font-size: 0.88rem;
+  color: var(--fz-marsh-ink);
+  line-height: 1.45;
+  font-weight: 600;
+}
+
+.fz-speech-bubble::before {
+  content: "";
+  position: absolute;
+  left: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-right: 8px solid #FFFFFF;
+}
+
+/* Primary Today Action CTA */
+.today-cta,
+button.primary {
+  background: var(--fz-marsh-yellow) !important;
+  color: var(--fz-marsh-yellow-ink) !important;
+  border-radius: var(--fz-clay-radius-pill) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.8) !important;
+  box-shadow: var(--fz-clay-btn-yellow-shadow) !important;
+  font-weight: 800 !important;
+  transition: transform 0.12s ease, box-shadow 0.12s ease !important;
+}
+
+.today-cta:hover,
+button.primary:hover {
+  background: #FFCF66 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 10px 24px rgba(230, 168, 0, 0.38), inset 0 2px 3px #FFFFFF !important;
+}
+
+.today-cta:active,
+button.primary:active {
+  transform: translateY(2px) scale(0.99) !important;
+  box-shadow: 0 3px 8px rgba(230, 168, 0, 0.22) !important;
+}
+
+/* ==========================================================================
+   5. SKILL HUB & MODULE TILES (Marshmallow Pastels)
+   ========================================================================== */
+.skill-card {
+  border-radius: var(--fz-clay-radius-lg) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.85) !important;
+  box-shadow: var(--fz-clay-shadow) !important;
+  padding: 18px !important;
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.18s ease !important;
+}
+
+.skill-card:hover {
+  transform: translateY(-3px) scale(1.02) !important;
+  box-shadow: var(--fz-clay-shadow-lg) !important;
+}
+
+.skill-card:active {
+  transform: translateY(1px) scale(0.99) !important;
+}
+
+/* Pastel Tint per Skill */
+.skill-speaking {
+  background: linear-gradient(145deg, #FFFFFF 0%, #F1FCE8 100%) !important;
+  --skill-line: var(--fz-marsh-mint);
+  --skill-ink: var(--fz-marsh-mint-ink);
+}
+
+.skill-grammar {
+  background: linear-gradient(145deg, #FFFFFF 0%, #E6F9FD 100%) !important;
+  --skill-line: var(--fz-marsh-sky);
+  --skill-ink: var(--fz-marsh-sky-ink);
+}
+
+.skill-vocab {
+  background: linear-gradient(145deg, #FFFFFF 0%, #FFF9E6 100%) !important;
+  --skill-line: var(--fz-marsh-yellow);
+  --skill-ink: var(--fz-marsh-yellow-ink);
+}
+
+.skill-reading {
+  background: linear-gradient(145deg, #FFFFFF 0%, #F5F0FD 100%) !important;
+  --skill-line: var(--fz-marsh-lavender);
+  --skill-ink: var(--fz-marsh-lavender-ink);
+}
+
+/* Exclusive Tactile Clay Pod for Skill Module Icons */
+.skill-card-top > .fz-i,
+.skill-card-top > i,
+.launch-icon .fz-i {
+  width: 50px !important;
+  height: 50px !important;
+  border-radius: 18px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 8px 18px rgba(70, 33, 4, 0.08), inset 0 2px 3px rgba(255, 255, 255, 0.95) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.95) !important;
+  background: #FFFFFF !important;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease !important;
+}
+
+.skill-speaking .skill-card-top > .fz-i {
+  background: linear-gradient(135deg, #FFFFFF 0%, #E5F9CE 100%) !important;
+  border-color: rgba(169, 236, 114, 0.7) !important;
+  --fz-i-fill: var(--fz-marsh-mint-ink) !important;
+  --fz-i-line: var(--fz-marsh-mint-deep) !important;
+}
+
+.skill-grammar .skill-card-top > .fz-i {
+  background: linear-gradient(135deg, #FFFFFF 0%, #BAF4FF 100%) !important;
+  border-color: rgba(30, 198, 242, 0.5) !important;
+  --fz-i-fill: var(--fz-marsh-sky-ink) !important;
+  --fz-i-line: var(--fz-marsh-sky-deep) !important;
+}
+
+.skill-vocab .skill-card-top > .fz-i {
+  background: linear-gradient(135deg, #FFFFFF 0%, #FFD680 100%) !important;
+  border-color: rgba(230, 168, 0, 0.45) !important;
+  --fz-i-fill: var(--fz-marsh-yellow-ink) !important;
+  --fz-i-line: var(--fz-marsh-yellow-deep) !important;
+}
+
+.skill-reading .skill-card-top > .fz-i {
+  background: linear-gradient(135deg, #FFFFFF 0%, #EBE4F7 100%) !important;
+  border-color: rgba(184, 153, 235, 0.6) !important;
+  --fz-i-fill: var(--fz-marsh-lavender-ink) !important;
+  --fz-i-line: #6E45B8 !important;
+}
+
+.skill-card:hover .skill-card-top > .fz-i {
+  transform: translateY(-3px) scale(1.08) rotate(-3deg) !important;
+  box-shadow: 0 12px 24px rgba(70, 33, 4, 0.12), inset 0 2px 4px #FFFFFF !important;
+}
+
+/* ==========================================================================
+   6. QUIZ & PRACTICE SCREEN (Pillowy Options & Feedback)
+   ========================================================================== */
+.question {
+  border-radius: var(--fz-clay-radius-lg) !important;
+  background: #FFFFFF !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.9) !important;
+  box-shadow: var(--fz-clay-shadow) !important;
+  padding: 22px !important;
+  font-family: var(--fz-display, 'Plus Jakarta Sans', sans-serif) !important;
+  font-weight: 800 !important;
+  color: var(--fz-marsh-ink) !important;
+}
+
+.option {
+  border-radius: var(--fz-clay-radius-md) !important;
+  background: #FFFFFF !important;
+  border: 2px solid rgba(70, 33, 4, 0.08) !important;
+  box-shadow: var(--fz-clay-shadow-sm) !important;
+  font-weight: 700 !important;
+  padding: 16px 18px 16px 64px !important;
+  transition: all 0.14s ease !important;
+}
+
+.option::before {
+  border-radius: 12px !important;
+  background: var(--fz-marsh-yellow-light) !important;
+  color: var(--fz-marsh-yellow-ink) !important;
+  font-weight: 800 !important;
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.8) !important;
+}
+
+.option:not(:disabled):hover {
+  border-color: var(--fz-marsh-yellow) !important;
+  background: #FFFDF5 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: var(--fz-clay-shadow) !important;
+}
+
+.option:active {
+  transform: translateY(2px) !important;
+}
+
+/* Correct Option (Fresh Mint) */
+.option.correct,
+.option.correct:disabled {
+  background: var(--fz-marsh-mint) !important;
+  border-color: var(--fz-marsh-mint-deep) !important;
+  color: var(--fz-marsh-mint-ink) !important;
+  box-shadow: 0 4px 14px rgba(82, 153, 23, 0.2), inset 0 2px 3px rgba(255, 255, 255, 0.8) !important;
+}
+
+.option.correct::before {
+  background: var(--fz-marsh-mint-deep) !important;
+  color: #FFFFFF !important;
+}
+
+/* Wrong Option (Soft Coral) */
+.option.wrong,
+.option.wrong:disabled {
+  background: var(--fz-marsh-coral) !important;
+  border-color: var(--fz-marsh-coral-deep) !important;
+  color: var(--fz-marsh-coral-ink) !important;
+  box-shadow: 0 4px 14px rgba(184, 67, 45, 0.2), inset 0 2px 3px rgba(255, 255, 255, 0.8) !important;
+}
+
+.option.wrong::before {
+  background: var(--fz-marsh-coral-deep) !important;
+  color: #FFFFFF !important;
+}
+
+/* Quiz Feedback Drawer */
+.feedback {
+  border-radius: var(--fz-clay-radius-xl) !important;
+  box-shadow: var(--fz-clay-shadow-lg) !important;
+  border: 2px solid rgba(255, 255, 255, 0.9) !important;
+  padding: 20px 24px !important;
+}
+
+.feedback.is-correct,
+.feedback.feedback-success {
+  background: linear-gradient(145deg, #FFFFFF 0%, var(--fz-marsh-mint) 100%) !important;
+  border-color: rgba(82, 153, 23, 0.3) !important;
+}
+
+.feedback.is-wrong,
+.feedback.feedback-error {
+  background: linear-gradient(145deg, #FFFFFF 0%, #FFF0ED 100%) !important;
+  border-color: rgba(184, 67, 45, 0.3) !important;
+}
+
+/* Next / Continue Button in Quiz */
+.quiz-next:not(:disabled) {
+  background: var(--fz-marsh-yellow) !important;
+  color: var(--fz-marsh-yellow-ink) !important;
+  border-radius: var(--fz-clay-radius-pill) !important;
+  box-shadow: var(--fz-clay-btn-yellow-shadow) !important;
+  font-weight: 800 !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.8) !important;
+}
+
+/* ==========================================================================
+   7. BOTTOM NAVIGATION BAR (Floating Frosted Milk Dock & Exclusive Icon Pods)
+   ========================================================================== */
+nav.bottomnav {
+  position: fixed !important;
+  bottom: 14px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: min(640px, calc(100% - 24px)) !important;
+  border-radius: var(--fz-clay-radius-pill) !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(28px) !important;
+  -webkit-backdrop-filter: blur(28px) !important;
+  border: 2px solid rgba(255, 255, 255, 0.9) !important;
+  box-shadow: 0 16px 40px rgba(70, 33, 4, 0.12), 0 2px 6px rgba(70, 33, 4, 0.04) !important;
+  padding: 6px 8px !important;
+  z-index: 1000 !important;
+  margin: 0 !important;
+  display: flex !important;
+  justify-content: space-around !important;
+  align-items: center !important;
+}
+
+nav.bottomnav .nav {
+  position: relative !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 3px !important;
+  padding: 6px 10px 6px !important;
+  min-height: 58px !important;
+  border-radius: 20px !important;
+  background: transparent !important;
+  border: 1px solid transparent !important;
+  box-shadow: none !important;
+  color: var(--fz-marsh-muted) !important;
+  font-weight: 700 !important;
+  font-size: 0.75rem !important;
+  letter-spacing: 0.01em !important;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  cursor: pointer !important;
+}
+
+/* Minimalist, Fine-line Luxury Icon (No clunky boxed backgrounds for inactive tabs) */
+nav.bottomnav .nav .fz-i {
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: transparent !important;
+  border: 1px solid transparent !important;
+  box-shadow: none !important;
+  transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  --fz-i-fill: transparent !important;
+  --fz-i-line: #8C7F6E !important;
+}
+
+nav.bottomnav .nav .fz-i svg {
+  width: 22px !important;
+  height: 22px !important;
+  stroke: #8C7F6E !important;
+  transition: transform 0.2s ease, stroke 0.2s ease !important;
+}
+
+nav.bottomnav .nav:hover .fz-i {
+  transform: translateY(-2px) scale(1.08) !important;
+  background: rgba(255, 248, 231, 0.6) !important;
+}
+
+nav.bottomnav .nav:hover .fz-i svg {
+  stroke: var(--fz-marsh-yellow-ink) !important;
+}
+
+/* Active State: Exclusive Gold Marshmallow Highlight */
+nav.bottomnav .nav.active {
+  color: var(--fz-marsh-yellow-ink) !important;
+  font-weight: 800 !important;
+  transform: translateY(-2px) !important;
+  background: transparent !important;
+}
+
+nav.bottomnav .nav.active .fz-i {
+  background: linear-gradient(135deg, #FFE094 0%, var(--fz-marsh-yellow) 100%) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 0 8px 18px rgba(230, 168, 0, 0.35), inset 0 2px 3px rgba(255, 255, 255, 0.95) !important;
+  border-radius: 13px !important;
+  --fz-i-fill: var(--fz-marsh-yellow-ink) !important;
+  --fz-i-line: var(--fz-marsh-yellow-ink) !important;
+  transform: scale(1.08) !important;
+}
+
+nav.bottomnav .nav.active .fz-i svg {
+  stroke: var(--fz-marsh-yellow-ink) !important;
+  transform: scale(1.04) !important;
+  filter: drop-shadow(0 1px 2px rgba(70, 33, 4, 0.12));
+}
+
+/* Custom Emerald Pod for KelasKu tab */
+nav.bottomnav .nav[data-view="classroom"].active .fz-i {
+  background: linear-gradient(135deg, #F0FCE6 0%, var(--fz-marsh-mint) 100%) !important;
+  border-color: #A9EC72 !important;
+  box-shadow: 0 8px 20px rgba(82, 153, 23, 0.32), inset 0 2px 4px rgba(255, 255, 255, 0.95) !important;
+  --fz-i-fill: #162B08 !important;
+  --fz-i-line: #1F7A63 !important;
+}
+nav.bottomnav .nav[data-view="classroom"].active .kelasku-wordmark {
+  color: #1F7A63 !important;
+}

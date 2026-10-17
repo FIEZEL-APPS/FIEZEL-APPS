@@ -1,0 +1,3290 @@
+/**
+ * FIEZEL · features/interactive-chat/fiezel-interactive-chat.js
+ * ChatGPT-like Interactive Conversational Partner (Kaiwa & Speaking Partner) for FIEZEL.
+ *
+ * Implements:
+ * 1. Bilingual Immersion: Japanese JLPT N5-N4 with Furigana Ruby + English CEFR A1-A2.
+ * 2. Multi-turn contextual conversation scenarios (Free talk, Cafe, Ramen, Konbini, Directions, Interview).
+ * 3. Interactive Shadowing & Pronunciation Practice with real-time Speech-to-Text & accuracy scoring.
+ * 4. Scenario Goal Tracking: 3 progressive conversational milestones per scenario.
+ * 5. Per-Scenario History Persistence & Anti-Race Guard (Zero-Loss across scenario switching).
+ * 6. Expanded Misconception Detector (Japanese particles, English Subject-Verb Agreement, double comparatives).
+ * 7. Braincore Learning Telemetry: updateMastery, bktRecord, and learner XP syncing.
+ * 8. Offline Deterministic Dialogue Fallback Graph when offline or AI quota is unavailable.
+ */
+(function (root, factory) {
+  'use strict';
+  var api = factory(root);
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  if (root) {
+    root.FiezelInteractiveChat = api;
+    root.interactiveChatView = function () {
+      api.mount(document.getElementById('app'));
+    };
+  }
+}(typeof globalThis !== 'undefined' ? globalThis : window, function (root) {
+  'use strict';
+
+  var STORAGE_KEY = 'fiezel-interactive-chat-v1';
+
+  // --- Tactile Bespoke SVG Iconography System Integration ---
+  var _staticChatIcons = (function () {
+    try {
+      if (typeof require === 'function') return require('./fiezel-chat-icons.js');
+    } catch (_) {}
+    return null;
+  })();
+
+  function getChatIcons() {
+    return (typeof root !== 'undefined' && root && root.FiezelChatIcons) ||
+      (typeof globalThis !== 'undefined' && globalThis && globalThis.FiezelChatIcons) ||
+      (typeof window !== 'undefined' && window && window.FiezelChatIcons) ||
+      _staticChatIcons;
+  }
+
+  var FiezelChatIcons = {
+    icon: function (name, opts) {
+      var mod = getChatIcons();
+      if (mod && typeof mod.icon === 'function') {
+        return mod.icon(name, opts);
+      }
+      return '';
+    }
+  };
+
+  function icon(name, opts) {
+    return FiezelChatIcons.icon(name, opts);
+  }
+
+  function t(k, fb) {
+    var s;
+    try {
+      var I = (typeof root !== 'undefined' && root && root.FiezelI18n) || (typeof self !== 'undefined' ? self.FiezelI18n : null);
+      s = I && typeof I.t === 'function' ? I.t(k) : undefined;
+    } catch (_) {}
+    if (s === undefined || s === k) s = (fb == null ? k : fb);
+    return s;
+  }
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function getActiveCourse() {
+    try {
+      if (typeof root.activeTargetLang === 'function') {
+        var atl = root.activeTargetLang();
+        if (atl === 'ja') return 'ja';
+        if (atl === 'en') return 'en';
+      }
+      if (root.FiezelI18n && typeof root.FiezelI18n.getCourse === 'function') {
+        var c = root.FiezelI18n.getCourse();
+        if (c === 'ja') return 'ja';
+        if (c === 'en') return 'en';
+      }
+      var stored = localStorage.getItem('fz_target_course') || localStorage.getItem('fiezel_target_lang') || localStorage.getItem('fiezel_course');
+      if (stored === 'ja') return 'ja';
+      if (stored === 'en') return 'en';
+    } catch (_) {}
+    return 'ja';
+  }
+
+  function getLearnerLevel() {
+    try {
+      if (typeof root.getActiveLevel === 'function') return root.getActiveLevel();
+      var state = (typeof root.__getFiezelState === 'function') ? root.__getFiezelState() : (root.state || {});
+      return state.level || 'A1';
+    } catch (_) {
+      return 'N5';
+    }
+  }
+
+  function getLearnerName() {
+    try {
+      if (typeof root.learnerName === 'function') return root.learnerName() || 'Kawan';
+      var state = (typeof root.__getFiezelState === 'function') ? root.__getFiezelState() : (root.state || {});
+      return state.userName || 'Kawan';
+    } catch (_) {
+      return 'Kawan';
+    }
+  }
+
+  // --- Scenarios Data Bank ---
+  var SCENARIOS = {
+    ja: [
+      {
+        id: 'free',
+        icon: 'free-talk',
+        title: 'フリートーク',
+        label: t('chat_sc_free_ja', 'Obrolan Bebas'),
+        desc: t('chat_sc_free_ja_desc', 'Ngobrol santai seputar hari ini, cuaca, atau apa pun yang ingin kamu bicarakan.'),
+        goals: [
+          { id: 'g1', text: t('chat_g_free1', 'Sapa partner percakapan (Konnichiwa / Hajimemashite)') },
+          { id: 'g2', text: t('chat_g_free2', 'Bicarakan topik kegemaran atau hobi') },
+          { id: 'g3', text: t('chat_g_free3', 'Berikan pendapat atau respon (Suki / Omoshiroi)') }
+        ],
+        starter: {
+          text: 'もしもし！元気にしてた？今日はどんなこと話そうか？何でも気軽に話しかけてね！',
+          furigana: 'もしもし！[元気](げんき)にしてた？[今日](きょう)はどんなこと[話](はな)そうか？[何](なん)でも[気軽](きがる)に[話](はな)しかけてね！',
+          romaji: 'Moshi moshi! Genki ni shiteta? Kyou wa donna koto hanasou ka? Nan demo kigaru ni hanashikakete ne!',
+          translation: t('chat_sc_free_trans', 'Halo! Gimana kabarnya, sehat kan? Hari ini mau ngobrol tentang apa nih? Cerita apa saja dengan santai ya!'),
+          grammarNote: t('chat_sc_free_note', 'Frasa telepon santai「もしもし！元気にしてた？」sangat akrab untuk menyapa teman, disusul bentuk santai「〜話そうか」.'),
+          suggestions: [
+            { text: 'もしもし！元気だよ。日本語の練習相手になってくれる？', furigana: 'もしもし！[元気](げんき)だよ。[日本語](にほんご)の[練習相手](れんしゅうあいて)になってくれる？', romaji: 'Moshi moshi! Genki da yo. Nihongo no renshuu aite ni natte kureru?', translation: t('chat_sug_ja_learn', 'Halo! Kabar baik kok. Mau jadi partner latihan bahasa Jepangku?') },
+            { text: 'うんうん、週末に面白い映画を見たんだ！', furigana: 'うんうん、[週末](しゅうまつ)に[面白](おもしろ)い[映画](えいが)を[見](み)たんだ！', romaji: 'Un-un, shuumatsu ni omoshiroi eiga o mita nda!', translation: t('chat_sug_ja_movie', 'Iya iya, akhir pekan kemarin aku nonton film seru lho!') },
+            { text: 'へえ、そうなんだ！美味しそうな日本料理が食べたいな！', furigana: 'へえ、そうなんだ！[美味](おい)しそうな[日本料理](にほんりょうり)が[食](た)べたいな！', romaji: 'Hee, sou nan da! Oishisouna Nihon ryouri ga tabetai na!', translation: t('chat_sug_ja_culture', 'Wah gitu ya! Aku kepengin banget makan masakan Jepang yang lezat!') }
+          ]
+        }
+      },
+      {
+        id: 'ramen',
+        icon: 'ramen',
+        title: 'ラーメン屋',
+        label: t('chat_sc_ramen_lbl', 'Restoran Ramen'),
+        desc: t('chat_sc_ramen_desc', 'Latihan memesan makanan dan berinteraksi dengan pelayan di kedai ramen.'),
+        goals: [
+          { id: 'g1', text: t('chat_g_ramen1', 'Pilih varian kuah ramen (Shoyu / Miso / Tonkotsu)') },
+          { id: 'g2', text: t('chat_g_ramen2', 'Tentukan tekstur kematangan mie (Futsuu / Katame)') },
+          { id: 'g3', text: t('chat_g_ramen3', 'Ucapkan selesai / terima kasih (Gochisousama)') }
+        ],
+        starter: {
+          text: 'いらっしゃいませ！ラーメン屋へようこそ。何名様ですか？ご注文はお決まりですか？',
+          furigana: 'いらっしゃいませ！ラーメン[屋](や)へようこそ。[何名様](なんめいさま)ですか？ご[注文](ちゅうもん)はお[決](き)まりですか？',
+          romaji: 'Irasshaimase! Raamen-ya e youkoso. Nan-mei-sama desu ka? Gochuumon wa okimari desu ka?',
+          translation: t('chat_sc_ramen_trans', 'Selamat datang di kedai ramen kami! Untuk berapa orang? Apakah sudah siap memesan?'),
+          grammarNote: t('chat_sc_ramen_note', 'Frasa「お決まりですか」(Okimari desu ka) adalah bentuk sopan keigo dari "apakah sudah memutuskan/memilih".'),
+          suggestions: [
+            { text: '一人です。豚骨ラーメンを一つください。', romaji: 'Hitori desu. Tonkotsu raamen o hitotsu kudasai.', translation: t('chat_sug_ramen_order', 'Satu orang. Minta tonkotsu ramen 1 porsi.') },
+            { text: 'おすすめのラーメンは何ですか？', romaji: 'Osusume no raamen wa nan desu ka?', translation: t('chat_sug_ramen_rec', 'Apa ramen yang direkomendasikan?') },
+            { text: 'お水を一杯いただけますか？', romaji: 'Omizu o ippai itadakemasu ka?', translation: t('chat_sug_ramen_water', 'Boleh saya minta segelas air putih?') }
+          ]
+        }
+      },
+      {
+        id: 'konbini',
+        icon: 'konbini',
+        title: 'コンビニ',
+        label: t('chat_sc_konbini_lbl', 'Belanja di Konbini'),
+        desc: t('chat_sc_konbini_desc', 'Praktik transaksi di minimarket Jepang (meminta kantong, menghangatkan bento, dll).'),
+        goals: [
+          { id: 'g1', text: t('chat_g_konb1', 'Minta hangatkan bekal / beli belanjaan (Onegaishimasu)') },
+          { id: 'g2', text: t('chat_g_konb2', 'Pilih metode pembayaran (Genkin / Suica / Card)') },
+          { id: 'g3', text: t('chat_g_konb3', 'Respon tawaran kantong atau struk (Daijoubu / Kekkou)') }
+        ],
+        starter: {
+          text: 'いらっしゃいませ！こちら温めますか？ポイントカードはお持ちですか？',
+          furigana: 'いらっしゃいませ！こちら[温](あたた)めますか？ポイントカードはお[持](も)ちですか？',
+          romaji: 'Irasshaimase! Kochira atatamemasu ka? Pointo kaado wa omochi desu ka?',
+          translation: t('chat_sc_konbini_trans', 'Selamat datang! Apakah makanannya mau dihangatkan? Punya kartu poin?'),
+          grammarNote: t('chat_sc_konbini_note', '「温めますか」(Atatamemasu ka) selalu ditanyakan saat membeli bento atau onigiri di minimarket.'),
+          suggestions: [
+            { text: 'はい、温めてください。', romaji: 'Hai, atatamete kudasai.', translation: t('chat_sug_konb_heat', 'Ya, tolong dihangatkan.') },
+            { text: 'いいえ、大丈夫です。袋もお願いします。', romaji: 'Iie, daijoubu desu. Fukuro mo onegai shimasu.', translation: t('chat_sug_konb_bag', 'Tidak perlu. Tolong plastiknya juga.') },
+            { text: 'お箸を二膳もらえますか？', romaji: 'Ohashi o nizen moraemasu ka?', translation: t('chat_sug_konb_chopsticks', 'Boleh minta sumpit dua pasang?') }
+          ]
+        }
+      },
+      {
+        id: 'direction',
+        icon: 'train',
+        title: '道案内・駅',
+        label: t('chat_sc_dir_lbl_ja', 'Tanya Jalan & Kereta'),
+        desc: t('chat_sc_dir_desc_ja', 'Latihan menanyakan arah jalan, letak stasiun kereta, dan peron tujuan.'),
+        goals: [
+          { id: 'g1', text: t('chat_g_dir1', 'Permisi dan sapa orang sekitar (Sumimasen)') },
+          { id: 'g2', text: t('chat_g_dir2', 'Tanyakan arah stasiun atau lokasi (Doko / Eki)') },
+          { id: 'g3', text: t('chat_g_dir3', 'Ucapkan rasa terima kasih (Arigatou gozaimasu)') }
+        ],
+        starter: {
+          text: 'すみません、何かお困りですか？どちらへ行きたいですか？案内しますよ！',
+          furigana: 'すみません、[何](なに)かお[困](こま)りですか？どちらへ[行](い)きたいですか？[案内](あんない)しますよ！',
+          romaji: 'Sumimasen, nanika okomari desu ka? Dochira e ikitai desu ka? Annai shimasu yo!',
+          translation: t('chat_sc_dir_trans_ja', 'Permisi, apakah ada yang bisa dibantu? Mau pergi ke mana? Akan saya bantu tunjukkan jalannya!'),
+          grammarNote: t('chat_sc_dir_note_ja', '「どちらへ行きたいですか」(Dochira e ikitai desu ka) lebih halus daripada「どこ」(doko).'),
+          suggestions: [
+            { text: 'すみません、新宿駅はどこですか？', romaji: 'Sumimasen, Shinjuku-eki wa doko desu ka?', translation: t('chat_sug_dir_shinjuku', 'Permisi, stasiun Shinjuku di mana ya?') },
+            { text: 'ここから歩いてどのくらいかかりますか？', romaji: 'Koko kara aruite dono kurai kakarimasu ka?', translation: t('chat_sug_dir_time', 'Berapa lama jalan kaki dari sini?') },
+            { text: 'この電車は渋谷に行きますか？', romaji: 'Kono densha wa Shibuya ni ikimasu ka?', translation: t('chat_sug_dir_train', 'Apakah kereta ini menuju ke Shibuya?') }
+          ]
+        }
+      },
+      {
+        id: 'intro',
+        icon: 'intro',
+        title: '自己紹介',
+        label: t('chat_sc_intro_lbl', 'Perkenalan Diri'),
+        desc: t('chat_sc_intro_desc', 'Latihan memperkenalkan diri, asal negara, hobi, dan pekerjaan dalam bahasa Jepang.'),
+        goals: [
+          { id: 'g1', text: t('chat_g_intro1', 'Perkenalkan nama diri (Watashi wa ... desu)') },
+          { id: 'g2', text: t('chat_g_intro2', 'Sebutkan status atau profesi (Gakusei / Kaishain)') },
+          { id: 'g3', text: t('chat_g_intro3', 'Tutup dengan salam perkenalan (Yoroshiku onegaishimasu)') }
+        ],
+        starter: {
+          text: '初めまして！私の名前はフィゼルです。東京に住んでいます。あなたのお名前と出身を教えてください！',
+          furigana: '[初](はじ)めまして！[私](わたし)の[名前](なまえ)はフィゼルです。[東京](とうきょう)に[住](す)んでいます。あなたのお[名前](なまえ)とご[出身](しゅっしん)を[教](おし)えてください！',
+          romaji: 'Hajimemashite! Watashi no namae wa Fizeru desu. Toukyou ni sunde imasu. Anata no onamae to goshusshin o oshiete kudasai!',
+          translation: t('chat_sc_intro_trans', 'Salam kenal! Nama saya Fiezel. Saya tinggal di Tokyo. Siapa namamu dan dari mana asalmu?'),
+          grammarNote: t('chat_sc_intro_note', 'Selalu awali perkenalan dengan「初めまして」(Hajimemashite) dan akhiri dengan「よろしくお願いします」(Yoroshiku onegaishimasu).'),
+          suggestions: [
+            { text: '初めまして！インドネシアから来ました。', romaji: 'Hajimemashite! Indoneshia kara kimashita.', translation: t('chat_sug_intro_origin', 'Salam kenal! Saya berasal dari Indonesia.') },
+            { text: '学生です。日本語を勉強し始めたばかりです。', romaji: 'Gakusei desu. Nihongo o benkyou shihajimeta bakari desu.', translation: t('chat_sug_intro_student', 'Saya pelajar. Baru mulai belajar bahasa Jepang.') },
+            { text: 'よろしくお願いします！', romaji: 'Yoroshiku onegaishimasu!', translation: t('chat_sug_intro_pleased', 'Senang berkenalan dengan Anda / Mohon bantuannya!') }
+          ]
+        }
+      },
+      {
+        id: 'phone_restaurant',
+        icon: 'phone',
+        title: '電話で席を予約する',
+        label: t('chat_sc_tel_rest_lbl', 'Reservasi Restoran via Telepon'),
+        desc: t('chat_sc_tel_rest_desc', 'Latihan tata krama menelepon restoran di Jepang: memesan meja, menyebutkan jam dan jumlah orang, serta menutup telepon dengan sopan.'),
+        goals: [
+          { id: 'g1', text: t('chat_g_ja_tel_rest1', 'Buka percakapan telepon dengan sopan (Moshi moshi / Yoyaku shitai)') },
+          { id: 'g2', text: t('chat_g_ja_tel_rest2', 'Sebutkan tanggal, jam, dan jumlah tamu (Ji / Ninmei)') },
+          { id: 'g3', text: t('chat_g_ja_tel_rest3', 'Sebutkan nama dan tutup telepon dengan sopan (Shitsurei itashimasu)') }
+        ],
+        starter: {
+          text: 'お電話ありがとうございます。和食さくら亭でございます。ご予約でしょうか？',
+          furigana: 'お[電話](でんわ)ありがとうございます。[和食](わしょく)さくら[亭](てい)でございます。ご[予約](よやく)でしょうか？',
+          romaji: 'Odenwa arigatou gozaimasu. Washoku Sakuratei de gozaimasu. Goyoyaku deshou ka?',
+          translation: t('chat_sc_tel_rest_trans', 'Terima kasih telah menelepon restoran Jepang Sakuratei. Apakah Anda ingin melakukan reservasi meja?'),
+          grammarNote: t('chat_sc_tel_rest_note', 'Restoran dan bisnis di Jepang selalu membuka telepon dengan「お電話ありがとうございます」(Terima kasih telah menelepon) dan「〜でございます」(bentuk sangat sopan dari desu).'),
+          suggestions: [
+            { text: 'もしもし、今週の金曜日に席を予約したいのですが。', furigana: 'もしもし、[今週](こんしゅう)の[金曜日](きんようび)に[席](せき)を[予約](よやく)したいのですが。', romaji: 'Moshi moshi, konshuu no kin\'youbi ni seki o yoyaku shitai no desu ga.', translation: t('chat_sug_tel_rest1', 'Halo, saya ingin memesan meja untuk hari Jumat minggu ini.') },
+            { text: '夜の7時から、3名でお願いできますか？', furigana: '[夜](よる)の7[時](じ)から、3[名](めい)でお[願](ねが)いできますか？', romaji: 'Yoru no shichiji kara, san-mei de onegai dekimasu ka?', translation: t('chat_sug_tel_rest2', 'Mulai jam 7 malam, untuk 3 orang apakah bisa?') },
+            { text: '田中と申します。それでは失礼いたします。', furigana: '[田中](たなか)と[申](もう)します。それでは[失礼](しつれい)いたします。', romaji: 'Tanaka to moushimasu. Sore dewa shitsurei itashimasu.', translation: t('chat_sug_tel_rest3', 'Saya Tanaka. Kalau begitu permisi (menutup telepon).') }
+          ]
+        }
+      },
+      {
+        id: 'phone_friend',
+        icon: 'phone-call',
+        title: '友達と週末の約束',
+        label: t('chat_sc_tel_friend_lbl', 'Janji Temu Teman (Telepon)'),
+        desc: t('chat_sc_tel_friend_desc', 'Obrolan santai via telepon dengan teman untuk menanyakan kabar dan merencanakan janji jalan-jalan di akhir pekan.'),
+        goals: [
+          { id: 'g1', text: t('chat_g_ja_tel_fr1', 'Sapa teman di telepon dengan santai (Moshi moshi / Genki?)') },
+          { id: 'g2', text: t('chat_g_ja_tel_fr2', 'Tanyakan rencana atau ajak pergi di akhir pekan (Shuumatsu / Doyoubi)') },
+          { id: 'g3', text: t('chat_g_ja_tel_fr3', 'Tentukan jam dan tempat bertemu (Jikan / Eki / Machiawase)') }
+        ],
+        starter: {
+          text: 'もしもし！元気にしてた？久しぶり！今、電話大丈夫？今度の土曜日、何か予定ある？',
+          furigana: 'もしもし！[元気](げんき)にしてた？[久](ひさ)しぶり！[今](いま)、[電話](でんわ)[大丈夫](だいじょうぶ)？[今度](こんど)の[土曜日](どようび)、[何](なに)か[予定](よてい)ある？',
+          romaji: 'Moshi moshi! Genki ni shiteta? Hisashiburi! Ima, denwa daijoubu? Kondo no doyoubi, nanika yotei aru?',
+          translation: t('chat_sc_tel_friend_trans', 'Halo! Gimana kabarmu, sehat kan? Sudah lama ya! Sekarang bisa bicara di telepon? Hari Sabtu besok ada acara apa nih?'),
+          grammarNote: t('chat_sc_tel_friend_note', 'Ketika menelepon teman akrab, buka dengan「もしもし！元気にしてた？」lalu tanyakan kesiapannya dengan「今、電話大丈夫？」.'),
+          suggestions: [
+            { text: 'もしもし！元気だよ。土曜日は特に予定ないよ！', furigana: 'もしもし！[元気](げんき)だよ。[土曜日](どようび)は[特](とく)に[予定](よてい)ないよ！', romaji: 'Moshi moshi! Genki da yo. Doyoubi wa toku ni yotei nai yo!', translation: t('chat_sug_tel_fr1', 'Halo! Kabar baik. Hari Sabtu aku nggak ada acara apa-apa kok!') },
+            { text: '渋谷で新しいカフェに行かない？', furigana: '[渋谷](しぶや)で[新](あたら)しいカフェに[行](い)かない？', romaji: 'Shibuya de atarashii kafe ni ikanai?', translation: t('chat_sug_tel_fr2', 'Mau pergi bareng ke kafe baru di Shibuya nggak?') },
+            { text: 'いいね！じゃあ駅のハチ公前で13時に会おう！', furigana: 'いいね！じゃあ[駅](えき)の[ハチ公前](はちこうまえ)で13[時](じ)に[会](あ)おう！', romaji: 'Ii ne! Jaa eki no Hachikou-mae de juusan-ji ni aou!', translation: t('chat_sug_tel_fr3', 'Bagus tuh! Kalau begitu kita ketemu di depan patung Hachiko stasiun jam 1 siang ya!') }
+          ]
+        }
+      },
+      {
+        id: 'phone_delivery',
+        icon: 'delivery',
+        title: 'デリバリーを頼む',
+        label: t('chat_sc_tel_deliv_lbl', 'Pesan Antar Makanan (Telepon)'),
+        desc: t('chat_sc_tel_deliv_desc', 'Praktik memesan makanan delivery melalui telepon: memesan menu, memberikan alamat, dan menanyakan estimasi waktu antar.'),
+        goals: [
+          { id: 'g1', text: t('chat_g_ja_tel_del1', 'Pesan menu makanan via telepon (Chuumon / Hitotsu / Onegaishimasu)') },
+          { id: 'g2', text: t('chat_g_ja_tel_del2', 'Berikan alamat pengantaran dan nomor kontak (Otodokesaki / Juusho)') },
+          { id: 'g3', text: t('chat_g_ja_tel_del3', 'Tanyakan waktu tiba dan pamit sopan (Donokurai / Shitsurei itashimasu)') }
+        ],
+        starter: {
+          text: '毎度ありがとうございます！ピザ・デリバリーのニコニコピザです。ご注文とお届け先をお願いいたします！',
+          furigana: '[毎度](まいど)ありがとうございます！ピザ・デリバリーのニコニコピザです。ご[注文](ちゅうもん)とお[届](とど)け[先](さき)をお[願](ねが)いいたします！',
+          romaji: 'Maido arigatou gozaimasu! Piza deribarii no Nikoniko Piza desu. Gochuumon to otodokesaki o onegai itashimasu!',
+          translation: t('chat_sc_tel_deliv_trans', 'Terima kasih banyak atas langganannya! Di sini Niko-Niko Pizza Delivery. Mau pesan apa dan mohon alamat pengantarannya ya!'),
+          grammarNote: t('chat_sc_tel_deliv_note', '「毎度ありがとうございます」(Maido arigatou gozaimasu) adalah sapaan khas pesan antar, dan「お届け先」(Otodokesaki) adalah alamat tujuan antar.'),
+          suggestions: [
+            { text: 'もしもし、マルゲリータピザのMサイズを1枚デリバリーでお願いします。', furigana: 'もしもし、マルゲリータピザのMサイズを1[枚](まい)デリバリーでお[願](ねが)いします。', romaji: 'Moshi moshi, Marugeriita piza no Emu-saizu o ichimai deribarii de onegai shimasu.', translation: t('chat_sug_tel_del1', 'Halo, tolong antar satu loyang pizza Margherita ukuran M.') },
+            { text: 'お届け先は新宿区3丁目です。少々お待ちください、メモを確認します。', furigana: 'お[届](とど)け[先](さき)は[新宿区](しんじゅくく)3[丁目](ちょうめ)です。[少々](しょうしょう)お[待](ま)ちください、メモを[確認](かくにん)します。', romaji: 'Otodokesaki wa Shinjuku-ku sanchoume desu. Shoushou omachi kudasai, memo o kakunin shimasu.', translation: t('chat_sug_tel_del2', 'Alamat pengantarannya Shinjuku-ku 3-chome. Mohon tunggu sebentar, saya lihat catatan dulu.') },
+            { text: '届くまでどのくらいかかりますか？ありがとうございます、失礼いたします。', furigana: '[届](とど)くまでどのくらいかかりますか？ありがとうございます、[失礼](しつれい)いたします。', romaji: 'Todoku made dono kurai kakarimasu ka? Arigatou gozaimasu, shitsurei itashimasu.', translation: t('chat_sug_tel_del3', 'Kira-kira berapa lama sampai? Terima kasih banyak, permisi (menutup telepon).') }
+          ]
+        }
+      }
+    ],
+    en: [
+      {
+        id: 'free',
+        icon: 'free-talk',
+        title: 'Free Talk',
+        label: t('chat_sc_free_en', 'Obrolan Bebas'),
+        desc: t('chat_sc_free_en_desc', 'Casual conversation on any topic you like to boost everyday speaking fluency.'),
+        goals: [
+          { id: 'g1', text: t('chat_g_en_free1', 'Greet your speaking partner naturally') },
+          { id: 'g2', text: t('chat_g_en_free2', 'Share a favorite activity or recent experience') },
+          { id: 'g3', text: t('chat_g_en_free3', 'Ask your partner a follow-up question') }
+        ],
+        starter: {
+          text: "Hey there! How's your day going? Feel free to tell me anything, what's on your mind today?",
+          translation: t('chat_sc_en_free_trans', "Hai! Gimana harimu sejauh ini? Cerita apa saja dengan santai ya, lagi kepikiran apa nih hari ini?"),
+          grammarNote: t('chat_sc_en_free_note', 'Use "Hey there! How\'s your day going?" and "What\'s on your mind?" to start an engaging, friendly conversation like chatting on the phone.'),
+          suggestions: [
+            { text: "Hey! I'm practicing my English speaking skills today.", translation: t('chat_sug_en_practice', 'Hai! Hari ini saya sedang melatih kemampuan berbicara bahasa Inggris.') },
+            { text: "Oh really? That sounds super fun! I watched a movie yesterday.", translation: t('chat_sug_en_movie', 'Oh ya? Kedengarannya seru banget! Kemarin saya nonton film.') },
+            { text: "What is your favorite hobby on weekends?", translation: t('chat_sug_en_hobby', 'Apa hobi favoritmu di akhir pekan?') }
+          ]
+        }
+      },
+      {
+        id: 'cafe',
+        icon: 'cafe',
+        title: 'At the Cafe',
+        label: t('chat_sc_cafe_lbl', 'Pesan Kopi di Kafe'),
+        desc: t('chat_sc_cafe_desc', 'Practice ordering drinks, pastries, and asking for customized coffee orders.'),
+        goals: [
+          { id: 'g1', text: t('chat_g_en_cafe1', 'Order a beverage (coffee / iced latte / tea)') },
+          { id: 'g2', text: t('chat_g_en_cafe2', 'Customize milk, size, or pastry (oat milk / croissant)') },
+          { id: 'g3', text: t('chat_g_en_cafe3', 'Specify dine-in or takeaway (for here / to go)') }
+        ],
+        starter: {
+          text: 'Welcome to Fiezel Cafe! What can I get started for you today?',
+          translation: t('chat_sc_en_cafe_trans', 'Selamat datang di Fiezel Cafe! Mau pesan apa hari ini?'),
+          grammarNote: t('chat_sc_en_cafe_note', '"What can I get started for you?" is a very common polite greeting used by baristas.'),
+          suggestions: [
+            { text: 'Could I get an iced latte with oat milk, please?', translation: t('chat_sug_cafe_latte', 'Bisa minta satu es latte dengan susu oat?') },
+            { text: 'Do you have any dairy-free options available?', translation: t('chat_sug_cafe_dairy', 'Apakah ada pilihan yang bebas susu sapi?') },
+            { text: 'For here, and I will take a chocolate croissant too.', translation: t('chat_sug_cafe_pastry', 'Makan di sini, dan saya mau croissant cokelat juga.') }
+          ]
+        }
+      },
+      {
+        id: 'direction',
+        icon: 'map',
+        title: 'Directions',
+        label: t('chat_sc_dir_lbl_en', 'Tanya Arah Jalan'),
+        desc: t('chat_sc_dir_desc_en', 'Asking for directions in a new city, subway stations, or nearest tourist attractions.'),
+        goals: [
+          { id: 'g1', text: t('chat_g_en_dir1', 'Excuse yourself politely to ask for help') },
+          { id: 'g2', text: t('chat_g_en_dir2', 'Ask for the nearest train station or landmark') },
+          { id: 'g3', text: t('chat_g_en_dir3', 'Thank the local person warmly') }
+        ],
+        starter: {
+          text: 'Excuse me! You look a bit lost. Are you looking for a specific place around here?',
+          translation: t('chat_sc_dir_trans_en', 'Permisi! Kamu terlihat agak tersesat. Apakah sedang mencari tempat tertentu di sekitar sini?'),
+          grammarNote: t('chat_sc_dir_note_en', '"To look lost" means appearing uncertain of where you are going.'),
+          suggestions: [
+            { text: 'Excuse me, where is the nearest train station?', translation: t('chat_sug_dir_en_station', 'Permisi, di mana stasiun kereta terdekat?') },
+            { text: 'How long does it take to walk to downtown?', translation: t('chat_sug_dir_en_walk', 'Berapa lama waktu jalan kaki ke pusat kota?') },
+            { text: 'Could you show me the way on the map?', translation: t('chat_sug_dir_en_map', 'Bisakah kamu tunjukkan jalannya di peta?') }
+          ]
+        }
+      },
+      {
+        id: 'interview',
+        icon: 'interview',
+        title: 'Job & School Interview',
+        label: t('chat_sc_interview_lbl', 'Simulasi Wawancara'),
+        desc: t('chat_sc_interview_desc', 'Practice answering common interview questions about your background, skills, and goals.'),
+        goals: [
+          { id: 'g1', text: t('chat_g_en_int1', 'Introduce your name and current role') },
+          { id: 'g2', text: t('chat_g_en_int2', 'Highlight a key skill or strength') },
+          { id: 'g3', text: t('chat_g_en_int3', 'Express your motivation to grow and contribute') }
+        ],
+        starter: {
+          text: 'Thank you for coming in today. Could you please introduce yourself and tell me about your background?',
+          translation: t('chat_sc_interview_trans', 'Terima kasih sudah hadir hari ini. Bisakah kamu memperkenalkan dirimu dan latar belakangmu?'),
+          grammarNote: t('chat_sc_interview_note', 'Start with a brief statement of your current role, key strengths, and what drives your passion.'),
+          suggestions: [
+            { text: 'Certainly! My name is ' + getLearnerName() + ' and I am passionate about learning.', translation: t('chat_sug_int_name', 'Tentu! Nama saya ' + getLearnerName() + ' dan saya bersemangat untuk belajar.') },
+            { text: 'I have been developing my communication and problem-solving skills.', translation: t('chat_sug_int_skills', 'Saya telah mengembangkan kemampuan komunikasi dan pemecahan masalah saya.') },
+            { text: 'I am excited about this opportunity to contribute and grow.', translation: t('chat_sug_int_contrib', 'Saya antusias dengan kesempatan ini untuk berkontribusi dan bertumbuh.') }
+          ]
+        }
+      },
+      {
+        id: 'hotel',
+        icon: 'hotel',
+        title: 'Hotel Check-in',
+        label: t('chat_sc_hotel_lbl', 'Check-in Hotel'),
+        desc: t('chat_sc_hotel_desc', 'Check in smoothly, ask about hotel amenities, breakfast hours, and room services.'),
+        goals: [
+          { id: 'g1', text: t('chat_g_en_hot1', 'State reservation details and check-in') },
+          { id: 'g2', text: t('chat_g_en_hot2', 'Ask about Wi-Fi or breakfast hours') },
+          { id: 'g3', text: t('chat_g_en_hot3', 'Request room key and thank the concierge') }
+        ],
+        starter: {
+          text: 'Good evening! Welcome to the Grand Fiezel Hotel. Do you have a reservation with us?',
+          translation: t('chat_sc_hotel_trans', 'Selamat malam! Selamat datang di Grand Fiezel Hotel. Apakah Anda sudah memiliki reservasi?'),
+          grammarNote: t('chat_sc_hotel_note', '"To have a reservation" means your booking is already registered in advance.'),
+          suggestions: [
+            { text: 'Yes, I have a reservation under ' + getLearnerName() + '.', translation: t('chat_sug_hot_booking', 'Ya, saya ada reservasi atas nama ' + getLearnerName() + '.') },
+            { text: 'What time is breakfast served in the morning?', translation: t('chat_sug_hot_bfast', 'Sarapan pagi disajikan jam berapa?') },
+            { text: 'Is complimentary high-speed Wi-Fi available in the room?', translation: t('chat_sug_hot_wifi', 'Apakah ada Wi-Fi cepat gratis di kamar?') }
+          ]
+        }
+      },
+      {
+        id: 'phone_friend',
+        icon: 'phone-call',
+        title: 'Calling a Friend to Catch Up',
+        label: t('chat_sc_en_tel_fr_lbl', 'Telepon Teman (Catch Up)'),
+        desc: t('chat_sc_en_tel_fr_desc', 'Catch up on recent life updates, check audio connection, and make casual weekend plans over the phone.'),
+        goals: [
+          { id: 'g1', text: t('chat_g_en_tel_fr1', 'Say a casual phone greeting ("Hey what\'s up?" / "Can you hear me okay?")') },
+          { id: 'g2', text: t('chat_g_en_tel_fr2', 'Ask to hold or share what you have been doing lately ("Hang on a second")') },
+          { id: 'g3', text: t('chat_g_en_tel_fr3', 'Wrap up the phone call warmly ("Catch you later!" / "Talk soon!")') }
+        ],
+        starter: {
+          text: "Hey there! How's your day going? Can you hear me okay? It's so good to hear from you, what's new with you?",
+          translation: t('chat_sc_en_tel_fr_trans', "Hai! Gimana harimu sejauh ini? Bisa dengar suaraku dengan jelas? Senang banget bisa dengar suaramu, ada kabar baru apa nih?"),
+          grammarNote: t('chat_sc_en_tel_fr_note', '"Hey there! How\'s your day going?" and "Can you hear me okay?" are the friendliest opening phrases when catching up on a phone call with a buddy.'),
+          suggestions: [
+            { text: "Hey! I can hear you loud and clear. Everything has been great, just busy with work!", translation: t('chat_sug_en_tel_fr1', 'Hei! Aku bisa dengar suaramu dengan sangat jelas. Semuanya baik-baik saja, cuma lagi sibuk kerjaan!') },
+            { text: "Hang on a second, let me put my headphones on so there's no echo.", translation: t('chat_sug_en_tel_fr2', 'Tunggu sebentar, biar kupakai headphone dulu supaya nggak menggema.') },
+            { text: "It was awesome catching up! I gotta run now, catch you later!", translation: t('chat_sug_en_tel_fr3', 'Seru banget bisa ngobrol! Aku harus pergi sekarang, sampai jumpa nanti ya!') }
+          ]
+        }
+      },
+      {
+        id: 'phone_delivery',
+        icon: 'pizza',
+        title: 'Ordering Pizza Delivery',
+        label: t('chat_sc_en_tel_piz_lbl', 'Pesan Antar Pizza (Telepon)'),
+        desc: t('chat_sc_en_tel_piz_desc', 'Order your favorite pizza over the phone, specify toppings, give delivery address, and ask for estimated arrival time.'),
+        goals: [
+          { id: 'g1', text: t('chat_g_en_tel_piz1', 'Place a pizza order with size and toppings') },
+          { id: 'g2', text: t('chat_g_en_tel_piz2', 'Provide delivery address or ask to hang on a second') },
+          { id: 'g3', text: t('chat_g_en_tel_piz3', 'Ask about delivery time and thank the staff ("Catch you later" / "Thank you")') }
+        ],
+        starter: {
+          text: "Thanks for calling Tony's Pizzeria! Are you ordering for delivery or carryout today?",
+          translation: t('chat_sc_en_tel_piz_trans', 'Terima kasih telah menelepon Pizzeria Tony! Apakah Anda memesan untuk pesan antar atau ambil sendiri hari ini?'),
+          grammarNote: t('chat_sc_en_tel_piz_note', '"Delivery" means food brought to your door, while "carryout" or "takeout" means picking it up yourself at the store.'),
+          suggestions: [
+            { text: "Hi! I'd like to order a large pepperoni pizza for delivery, please.", translation: t('chat_sug_en_tel_piz1', 'Halo! Saya ingin memesan satu pizza pepperoni besar untuk pesan antar.') },
+            { text: "Hang on a second, let me double check the apartment number for the delivery address.", translation: t('chat_sug_en_tel_piz2', 'Tunggu sebentar, biar saya cek nomor apartemen untuk alamat pengantarannya.') },
+            { text: "How long is the estimated delivery time? Thanks so much, catch you later!", translation: t('chat_sug_en_tel_piz3', 'Berapa perkiraan waktu pengantarannya? Terima kasih banyak, sampai nanti!') }
+          ]
+        }
+      },
+      {
+        id: 'phone_hotel',
+        icon: 'hotel',
+        title: 'Hotel Booking Inquiry',
+        label: t('chat_sc_en_tel_hot_lbl', 'Reservasi Hotel via Telepon'),
+        desc: t('chat_sc_en_tel_hot_desc', 'Inquire about room availability, check-in policies, room amenities, and confirm a telephone reservation.'),
+        goals: [
+          { id: 'g1', text: t('chat_g_en_tel_hot1', 'Inquire politely about room availability for specific dates') },
+          { id: 'g2', text: t('chat_g_en_tel_hot2', 'Ask for room rates, amenities, or ask the staff to hold on a moment') },
+          { id: 'g3', text: t('chat_g_en_tel_hot3', 'Confirm reservation details and conclude the phone call') }
+        ],
+        starter: {
+          text: "Thank you for calling Fiezel Grand Resort reservations. Can you hear me okay? How may I assist you with your booking today?",
+          translation: t('chat_sc_en_tel_hot_trans', 'Terima kasih telah menelepon bagian reservasi Fiezel Grand Resort. Apakah suara saya terdengar jelas? Ada yang bisa saya bantu terkait reservasi Anda hari ini?'),
+          grammarNote: t('chat_sc_en_tel_hot_note', '"How may I assist you?" is standard formal phone hospitality language for "How can I help you?".'),
+          suggestions: [
+            { text: "Hello! Yes, I can hear you fine. I'd like to check room availability for next weekend.", translation: t('chat_sug_en_tel_hot1', 'Halo! Ya, suara Anda terdengar jelas. Saya ingin mengecek ketersediaan kamar untuk akhir pekan depan.') },
+            { text: "Hang on a second, let me grab my calendar. Do you have a deluxe queen room available?", translation: t('chat_sug_en_tel_hot2', 'Tunggu sebentar, saya ambil kalender dulu. Apakah ada kamar deluxe queen yang tersedia?') },
+            { text: "That sounds wonderful. Please book it under my name. Thanks for your help, catch you later!", translation: t('chat_sug_en_tel_hot3', 'Terdengar bagus sekali. Tolong pesan atas nama saya. Terima kasih bantuannya, sampai jumpa nanti!') }
+          ]
+        }
+      }
+    ]
+  };
+
+  // Convert bracketed furigana `[Kanji](reading)` to HTML ruby
+  function formatFurigana(text) {
+    if (!text) return '';
+    return esc(text).replace(/\[([^\]]+)\]\(([^)]+)\)/g, function (_, kanji, kana) {
+      return '<ruby>' + kanji + '<rt>' + kana + '</rt></ruby>';
+    });
+  }
+
+  // --- Pronunciation & Levenshtein Similarity Evaluator ---
+  function levenshteinDistance(a, b) {
+    if (a === b) return 0;
+    if (!a.length) return b.length;
+    if (!b.length) return a.length;
+    var v0 = new Array(b.length + 1);
+    var v1 = new Array(b.length + 1);
+    for (var i = 0; i <= b.length; i++) v0[i] = i;
+    for (var j = 0; j < a.length; j++) {
+      v1[0] = i + 1;
+      for (var k = 0; k < b.length; k++) {
+        var cost = a[j] === b[k] ? 0 : 1;
+        v1[k + 1] = Math.min(v1[k] + 1, v0[k + 1] + 1, v0[k] + cost);
+      }
+      for (var m = 0; m <= b.length; m++) v0[m] = v1[m];
+    }
+    return v1[b.length];
+  }
+
+  function toHiragana(str) {
+    if (!str) return '';
+    return str.replace(/[\u30a1-\u30f6]/g, function (m) {
+      return String.fromCharCode(m.charCodeAt(0) - 0x60);
+    });
+  }
+
+  function normalizeSpeechText(str, useKanaReading) {
+    if (!str) return '';
+    var s = String(str);
+    if (useKanaReading) {
+      s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '$2');
+    } else {
+      s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '$1');
+    }
+    s = s.replace(/[\s\.,!\?、。！？・'"`~\-_:;\(\)]/g, '');
+    s = toHiragana(s);
+    return s.toLowerCase();
+  }
+
+  function calcSimScore(a, b) {
+    if (!a || !b) return 0;
+    if (a === b) return 100;
+    var dist = levenshteinDistance(a, b);
+    var maxLen = Math.max(a.length, b.length);
+    var rawRatio = Math.max(0, 1 - (dist / maxLen));
+    return Math.min(100, Math.max(0, Math.round(rawRatio * 100)));
+  }
+
+  // English phonetic guide dictionary for scenario starters and common conversational words
+  var EN_IPA_DICT = {
+    'welcome': '/ˈwel.kəm/',
+    'to': '/tuː/',
+    'fiezel': '/ˈfiː.zəl/',
+    'cafe': '/kæfˈeɪ/',
+    'coffee': '/ˈkɒf.i/',
+    'tea': '/tiː/',
+    'latte': '/ˈlɑː.teɪ/',
+    'would': '/wʊd/',
+    'you': '/juː/',
+    'like': '/laɪk/',
+    'for': '/fɔːr/',
+    'here': '/hɪər/',
+    'or': '/ɔːr/',
+    'go': '/ɡoʊ/',
+    'we': '/wiː/',
+    'also': '/ˈɔːl.soʊ/',
+    'have': '/hæv/',
+    'freshly': '/ˈfreʃ.li/',
+    'baked': '/beɪkt/',
+    'chocolate': '/ˈtʃɒk.lət/',
+    'muffins': '/ˈmʌf.ɪnz/',
+    'today': '/təˈdeɪ/',
+    'great': '/ɡreɪt/',
+    'choice': '/tʃɔɪs/',
+    'hello': '/həˈloʊ/',
+    'hi': '/haɪ/',
+    'thank': '/θæŋk/',
+    'thanks': '/θæŋks/',
+    'please': '/pliːz/',
+    'excuse': '/ɪkˈskjuːz/',
+    'me': '/miː/',
+    'where': '/weər/',
+    'is': '/ɪz/',
+    'the': '/ðiː/',
+    'station': '/ˈsteɪ.ʃən/',
+    'hotel': '/hoʊˈtel/',
+    'room': '/ruːm/',
+    'pizza': '/ˈpiːt.sə/',
+    'friend': '/frend/',
+    'weekend': '/ˈwiːk.end/',
+    'what': '/wɒt/',
+    'how': '/haʊ/',
+    'assist': '/əˈsɪst/',
+    'check': '/tʃek/',
+    'availability': '/əˌveɪ.ləˈbɪl.ə.ti/',
+    'book': '/bʊk/',
+    'reserve': '/rɪˈzɜːv/',
+    'deluxe': '/dɪˈlʌks/',
+    'queen': '/kwiːn/',
+    'buffet': '/ˈbʊf.eɪ/',
+    'breakfast': '/ˈbrek.fəst/',
+    'driver': '/ˈdraɪ.vər/',
+    'pepperoni': '/ˌpep.əˈroʊ.ni/',
+    'delivery': '/dɪˈlɪv.ər.i/',
+    'address': '/ˈæd.res/',
+    'hang': '/hæŋ/',
+    'on': '/ɒn/',
+    'second': '/ˈsek.ənd/',
+    'catch': '/kætʃ/',
+    'later': '/ˈleɪ.tər/',
+    'awesome': '/ˈɔː.səm/',
+    'solid': '/ˈsɒl.ɪd/',
+    'plan': '/plæn/',
+    'impressive': '/ɪmˈpres.ɪv/',
+    'strength': '/streŋθ/',
+    'collaborating': '/kəˈlæb.ə.reɪt.ɪŋ/',
+    'team': '/tiːm/',
+    'communicator': '/kəˈmjuː.nɪ.keɪ.tər/',
+    'supporting': '/səˈpɔːt.ɪŋ/',
+    'teammates': '/ˈtiːm.meɪts/',
+    'calm': '/kɑːm/',
+    'focused': '/ˈfoʊ.kəst/',
+    'solving': '/ˈsɒlv.ɪŋ/',
+    'complex': '/ˈkɒm.pleks/',
+    'problems': '/ˈprɒb.ləmz/'
+  };
+
+  function getWordIpa(word) {
+    if (!word) return '';
+    var clean = word.toLowerCase().replace(/[^a-z']/g, '');
+    if (EN_IPA_DICT[clean]) return EN_IPA_DICT[clean];
+    return '/' + clean + '/';
+  }
+
+  function tokenizeAndCompare(targetText, spokenText, course) {
+    if (!targetText) return [];
+    var isJa = course === 'ja';
+    var normSpoken = normalizeSpeechText(spokenText, false);
+    var normSpokenKana = normalizeSpeechText(spokenText, true);
+    var spokenWords = String(spokenText || '').toLowerCase().replace(/[\.,!\?、。！？・]/g, ' ').split(/\s+/).filter(Boolean);
+
+    var tokens = [];
+
+    if (isJa) {
+      var regex = /\[([^\]]+)\]\(([^)]+)\)|[\u3040-\u309f]+|[\u30a0-\u30ff]+|[\u4e00-\u9faf]+|[a-zA-Z0-9]+|[^\s\.,!\?、。！？・'"`~\-_:;\(\)]+/g;
+      var m;
+      var tStr = String(targetText);
+      while ((m = regex.exec(tStr)) !== null) {
+        var surface = '';
+        var reading = '';
+        var guide = '';
+        if (m[1] && m[2]) {
+          surface = m[1];
+          reading = m[2];
+          guide = m[2];
+        } else {
+          surface = m[0];
+          reading = toHiragana(surface);
+          guide = toHiragana(surface);
+        }
+        var cleanReading = toHiragana(reading);
+        var cleanSurface = surface.toLowerCase();
+
+        var matched = false;
+        if (normSpoken && (normSpoken.indexOf(cleanSurface) !== -1 || normSpoken.indexOf(cleanReading) !== -1)) {
+          matched = true;
+        } else if (normSpokenKana && normSpokenKana.indexOf(cleanReading) !== -1) {
+          matched = true;
+        } else if (spokenText && spokenText.indexOf(surface) !== -1) {
+          matched = true;
+        }
+
+        tokens.push({
+          surface: surface,
+          guide: (guide && guide !== surface) ? guide : (reading || surface),
+          matched: matched,
+          status: matched ? 'correct' : 'missed'
+        });
+      }
+    } else {
+      var rawWords = String(targetText || '').trim().split(/\s+/);
+      rawWords.forEach(function (raw) {
+        var clean = raw.replace(/[\.,!\?・'"`~\-_:;\(\)]/g, '').toLowerCase();
+        if (!clean) return;
+        var ipa = getWordIpa(clean);
+        var matched = false;
+        if (spokenWords.indexOf(clean) !== -1) {
+          matched = true;
+        } else if (normSpoken && normSpoken.indexOf(clean) !== -1) {
+          matched = true;
+        }
+
+        tokens.push({
+          surface: raw.replace(/[\.,!\?]/g, ''),
+          guide: ipa,
+          matched: matched,
+          status: matched ? 'correct' : 'missed'
+        });
+      });
+    }
+
+    return tokens;
+  }
+
+  function evaluatePronunciation(targetText, spokenText, course) {
+    if (!targetText || !spokenText) {
+      return { score: 0, heard: spokenText || '', passed: false, tokens: [] };
+    }
+    var normSpoken = normalizeSpeechText(spokenText, false);
+    if (!normSpoken) {
+      return { score: 0, heard: spokenText, passed: false, tokens: [] };
+    }
+
+    var score = 0;
+    if (course === 'ja') {
+      var normTargetKanji = normalizeSpeechText(targetText, false);
+      var normTargetKana = normalizeSpeechText(targetText, true);
+      var scoreKanji = calcSimScore(normTargetKanji, normSpoken);
+      var scoreKana = calcSimScore(normTargetKana, normSpoken);
+      score = Math.max(scoreKanji, scoreKana);
+    } else {
+      var normTarget = normalizeSpeechText(targetText, false);
+      score = calcSimScore(normTarget, normSpoken);
+    }
+
+    var tokens = tokenizeAndCompare(targetText, spokenText, course);
+
+    return {
+      score: score,
+      heard: spokenText,
+      passed: score >= 60,
+      tokens: tokens
+    };
+  }
+
+  // --- Scenario Goal Evaluation ---
+  function evaluateGoalProgress(scenario, messages) {
+    if (!scenario || !Array.isArray(scenario.goals)) return [];
+    var userMsgs = (messages || []).filter(function (m) { return m.role === 'user'; });
+    var fullText = userMsgs.map(function (m) { return m.text || ''; }).join(' ').toLowerCase();
+    var userMsgCount = userMsgs.length;
+
+    return scenario.goals.map(function (g) {
+      var done = false;
+      if (scenario.id === 'ramen') {
+        if (g.id === 'g1') done = /醤油|しょうゆ|味噌|みそ|豚骨|とんこつ|shoyu|miso|tonkotsu|ラーメン/.test(fullText);
+        else if (g.id === 'g2') done = /普通|ふつう|硬め|かため|柔らかめ|やわらかめ|futsuu|katame/.test(fullText);
+        else if (g.id === 'g3') done = /ごちそう|ありがとう|会計|かいけい|gochisou|arigatou/.test(fullText);
+      } else if (scenario.id === 'konbini') {
+        if (g.id === 'g1') done = /温め|はい|お願い|atatam|onegai|これ/.test(fullText);
+        else if (g.id === 'g2') done = /現金|suica|カード|げんきん|genkin|card/.test(fullText);
+        else if (g.id === 'g3') done = /袋|レシート|大丈夫|要りません|fukuro|daijoubu|irimasen|結構/.test(fullText);
+      } else if (scenario.id === 'direction') {
+        if (g.id === 'g1') done = /すみません|sumimasen|excuse/.test(fullText);
+        else if (g.id === 'g2') done = /どこ|駅|えき|doko|eki|station|where/.test(fullText);
+        else if (g.id === 'g3') done = /ありがとう|わかりました|arigatou|wakarimashita|thank/.test(fullText);
+      } else if (scenario.id === 'cafe') {
+        if (g.id === 'g1') done = /coffee|latte|tea|espresso|order|like to get/.test(fullText);
+        else if (g.id === 'g2') done = /oat|almond|milk|croissant|large|medium|small|sugar/.test(fullText);
+        else if (g.id === 'g3') done = /for here|to go|takeaway|card|cash|pay/.test(fullText);
+      } else if (scenario.id === 'phone_restaurant') {
+        if (g.id === 'g1') done = /もしもし|予約|席|よやく|せき|moshi|yoyaku/.test(fullText);
+        else if (g.id === 'g2') done = /金曜|土曜|日曜|時|名|人|kinyou|doyou|ji|mei|nin|person|people/.test(fullText);
+        else if (g.id === 'g3') done = /失礼|田中|申します|ありがとう|shitsurei|moushimasu|arigatou/.test(fullText);
+      } else if (scenario.id === 'phone_friend') {
+        var isJaFr = /[\u3040-\u309f\u30a0-\u30ff\u4e00-\u9faf]/.test((scenario.title || '') + (scenario.desc || ''));
+        if (isJaFr) {
+          if (g.id === 'g1') done = /もしもし|久しぶり|元気|moshi|hisashiburi|genki/.test(fullText);
+          else if (g.id === 'g2') done = /土曜|日曜|週末|予定|行かない|空いて|doyou|shuumatsu|yotei|ikanai/.test(fullText);
+          else if (g.id === 'g3') done = /渋谷|駅|時|カフェ|会おう|ハチ公|shibuya|eki|ji|kafe|aou/.test(fullText);
+        } else {
+          if (g.id === 'g1') done = /hey|what's up|hear me|hello|hi/.test(fullText);
+          else if (g.id === 'g2') done = /hang on|busy|doing|weekend|second|lately/.test(fullText);
+          else if (g.id === 'g3') done = /catch you later|talk soon|bye|later|run/.test(fullText);
+        }
+      } else if (scenario.id === 'phone_delivery') {
+        var isJaDel = /[\u3040-\u309f\u30a0-\u30ff\u4e00-\u9faf]/.test((scenario.title || '') + (scenario.desc || ''));
+        if (isJaDel) {
+          if (g.id === 'g1') done = /ピザ|マルゲリータ|注文|枚|piza|chuumon|ichimai/.test(fullText);
+          else if (g.id === 'g2') done = /お届け先|住所|新宿|田中|少々お待ち|otodokesaki|juusho|shoushou/.test(fullText);
+          else if (g.id === 'g3') done = /どのくらい|時間|失礼|ありがとう|kakarimasu|shitsurei|arigatou/.test(fullText);
+        } else {
+          if (g.id === 'g1') done = /pizza|pepperoni|order|large|delivery/.test(fullText);
+          else if (g.id === 'g2') done = /address|apartment|hang on|second|check/.test(fullText);
+          else if (g.id === 'g3') done = /how long|delivery time|catch you later|thank/.test(fullText);
+        }
+      } else if (scenario.id === 'phone_hotel') {
+        if (g.id === 'g1') done = /availability|check|book|reserve|room|weekend/.test(fullText);
+        else if (g.id === 'g2') done = /hang on|rate|deluxe|queen|breakfast|wifi|price|second/.test(fullText);
+        else if (g.id === 'g3') done = /name|catch you later|thank|confirm|book it/.test(fullText);
+      } else {
+        if (g.id === 'g1') done = userMsgCount >= 1;
+        else if (g.id === 'g2') done = userMsgCount >= 2;
+        else if (g.id === 'g3') done = userMsgCount >= 3;
+      }
+      return { id: g.id, text: g.text, done: done };
+    });
+  }
+
+  // --- Common Misconception Detector ---
+  function checkMisconception(text, course) {
+    if (!text) return null;
+    var tRaw = text.trim();
+    if (course === 'ja') {
+      if (/\bわたし\s*わ\b/i.test(tRaw) || /わたしわ/.test(tRaw)) {
+        return {
+          id: 'particle_wa_ha',
+          title: t('chat_misc_wa_title', 'Tips Partikel は'),
+          desc: t('chat_misc_wa_desc', 'Partikel penanda topik "wa" selalu ditulis dengan hiragana「は」, bukan「わ」.')
+        };
+      }
+      if (/これ\s*わ/i.test(tRaw) || /それ\s*わ/i.test(tRaw) || /あれ\s*わ/i.test(tRaw)) {
+        return {
+          id: 'particle_wa_pronoun',
+          title: t('chat_misc_wa_pron_title', 'Tips Partikel は'),
+          desc: t('chat_misc_wa_pron_desc', 'Gunakan hiragana「は」untuk partikel penanda topik (contoh: これは / それは).')
+        };
+      }
+      if (/[がガ]\s*(食べ|たべ|飲み|のみ|買い|かい|見|み|勉強し|べんきょうし)/.test(tRaw)) {
+        return {
+          id: 'particle_o_vs_ga',
+          title: t('chat_misc_o_ga_title', 'Tips Partikel を vs が'),
+          desc: t('chat_misc_o_ga_desc', 'Gunakan partikel penanda objek「を」untuk kata kerja yang dikenai aksi (contoh: ラーメンを食べます).')
+        };
+      }
+      if (/ですかか|ですか\s*か/.test(tRaw)) {
+        return {
+          id: 'particle_ka_repeat',
+          title: t('chat_misc_ka_rep_title', 'Partikel Tanya か'),
+          desc: t('chat_misc_ka_rep_desc', 'Partikel tanya「か」cukup digunakan satu kali di akhir kalimat tanya sopan.')
+        };
+      }
+      if (/ありがとう\s*ございます/i.test(tRaw) && !/ありがとう/i.test(tRaw)) {
+        return null;
+      }
+    } else {
+      if (/\bi\s+am\s+agree\b/i.test(tRaw)) {
+        return {
+          id: 'verb_agree',
+          title: t('chat_misc_agree_title', 'Common Mistake: I agree'),
+          desc: t('chat_misc_agree_desc', 'Say "I agree", not "I am agree". "Agree" is already a verb.')
+        };
+      }
+      if (/\b(he|she|it)\s+(go|want|like|need|play)\b/i.test(tRaw)) {
+        return {
+          id: 'sva_present',
+          title: t('chat_misc_sva_title', 'Subject-Verb Agreement'),
+          desc: t('chat_misc_sva_desc', 'Add -s or -es for third-person singular (e.g. "He goes" / "She wants").')
+        };
+      }
+      if (/\b(yesterday|last\s+week|last\s+night)\b.*?\bi\s+go\b/i.test(tRaw)) {
+        return {
+          id: 'past_tense_go',
+          title: t('chat_misc_past_title', 'Simple Past Tense'),
+          desc: t('chat_misc_past_desc', 'Use the past tense form "went" for past time events (e.g. "Yesterday I went").')
+        };
+      }
+      if (/\bi\s+am\s+study\b/i.test(tRaw)) {
+        return {
+          id: 'verb_study_be',
+          title: t('chat_misc_be_study_title', 'Verb Form Notice'),
+          desc: t('chat_misc_be_study_desc', 'Say "I am studying" for continuous actions, or "I study" for routine habits.')
+        };
+      }
+      if (/\bmore\s+(better|easier|faster|bigger)\b/i.test(tRaw)) {
+        return {
+          id: 'double_comparative',
+          title: t('chat_misc_double_comp_title', 'Double Comparative'),
+          desc: t('chat_misc_double_comp_desc', 'Avoid "more better". The word "better" is already comparative.')
+        };
+      }
+    }
+    return null;
+  }
+
+  function isPhoneScenario(scenarioId) {
+    return scenarioId === 'phone_friend' ||
+           scenarioId === 'phone_restaurant' ||
+           scenarioId === 'phone_delivery' ||
+           scenarioId === 'phone_hotel' ||
+           (typeof scenarioId === 'string' && scenarioId.indexOf('phone_') === 0);
+  }
+
+  function isPhoneModeActive(options, scenarioId) {
+    if (options && (options.isPhoneCall || options.isCallMode || options.phoneMode)) return true;
+    if (state && (state.isCallMode || state.isPhoneMode)) return true;
+    if (isPhoneScenario(scenarioId || state.scenarioId)) return true;
+    try {
+      if (root && root.FiezelVoiceCall && typeof root.FiezelVoiceCall.getState === 'function') {
+        var callSt = root.FiezelVoiceCall.getState();
+        if (callSt && callSt.status && callSt.status !== 'idle') return true;
+      }
+    } catch (_) {}
+    return false;
+  }
+
+  // Offline Deterministic Dialogue Fallback Graph
+  function generateOfflineReply(userText, scenarioId, course, optionsOrLevel) {
+    var raw = (userText || '').toLowerCase();
+    var opts = (typeof optionsOrLevel === 'object' && optionsOrLevel) ? optionsOrLevel : {};
+    var isPhone = isPhoneModeActive(opts, scenarioId);
+
+    if (course === 'ja') {
+      if (scenarioId === 'ramen') {
+        if (/ラーメン|豚骨|味噌|醤油/i.test(raw)) {
+          return {
+            text: 'かしこまりました！麺の硬さはどうなさいますか？普通、硬め、柔らかめから選べますよ。',
+            furigana: 'かしこまりました！[麺](めん)の[硬](かた)さはどうなさいますか？[普通](ふつう)、[硬](かた)め、[柔](やわ)らかめから[選](えら)べますよ。',
+            romaji: 'Kashikomarimashita! Men no katasa wa dou nasaimasu ka? Futsuu, katame, yawarakame kara erabemasu yo.',
+            translation: t('chat_off_ramen_trans1', 'Baik, dimengerti! Bagaimana dengan tingkat kematangan mienya? Bisa pilih biasa, keras, atau lembut.'),
+            grammarNote: t('chat_off_ramen_note1', '「どうなさいますか」(Dou nasaimasu ka) adalah bentuk sangat sopan dari「どうしますか」(Bagaimana maunya).'),
+            suggestions: [
+              { text: '硬めでお願いします！', furigana: '[硬](かた)めでお願い(ねが)いします！', romaji: 'Katame de onegai shimasu!', translation: t('chat_sug_katame', 'Minta yang agak keras ya!') },
+              { text: '普通で大丈夫です。', furigana: '[普通](ふつう)で[大丈夫](だいじょうぶ)です。', romaji: 'Futsuu de daijoubu desu.', translation: t('chat_sug_futsuu', 'Biasa saja tidak apa-apa.') },
+              { text: 'トッピングに味玉も追加できますか？', furigana: 'トッピングに[味玉](あじたま)も[追加](ついか)できますか？', romaji: 'Toppingu ni ajitama mo tsuika dekimasu ka?', translation: t('chat_sug_ajitam', 'Bisa tambah topping telur rebus berbumbu?') }
+            ]
+          };
+        }
+        if (/ごちそう|ありがとう|会計/i.test(raw)) {
+          return {
+            text: 'ありがとうございます！少々お待ちくださいね。すぐに熱々のラーメンをお持ちします！',
+            furigana: 'ありがとうございます！[少々](しょうしょう)お[待](ま)ちくださいね。すぐに[熱々](あつあつ)のラーメンをお[持](も)ちします！',
+            romaji: 'Arigatou gozaimasu! Shoushou omachi kudasai ne. Sugu ni atsuatsu no raamen o omochi shimasu!',
+            translation: t('chat_off_ramen_trans2', 'Terima kasih banyak! Mohon tunggu sebentar ya. Segera saya bawakan ramen hangatnya!'),
+            grammarNote: t('chat_off_ramen_note2', '「少々お待ちください」(Shoushou omachi kudasai) = Mohon tunggu sebentar.'),
+            suggestions: [
+              { text: 'とても美味しそうです！', furigana: 'とても[美味](おい)しそうです！', romaji: 'Totemo oishisou desu!', translation: t('chat_sug_tasty', 'Kelihatannya enak sekali!') },
+              { text: 'ごちそうさまでした。', romaji: 'Gochisousama deshita.', translation: t('chat_sug_gochisou', 'Terima kasih atas hidangannya (setelah makan).') }
+            ]
+          };
+        }
+        return {
+          text: 'へえ、そうなんだ！美味しそうだね！トッピングや麺の硬さはお決まりですか？',
+          furigana: 'へえ、そうなんだ！[美味](おい)しそうだね！トッピングや[麺](めん)の[硬](かた)さはお[決](き)まりですか？',
+          romaji: 'Hee, sou nan da! Oishisou da ne! Toppingu ya men no katasa wa okimari desu ka?',
+          translation: t('chat_off_ramen_other_trans', 'Wah gitu ya! Kelihatannya enak banget tuh! Apakah pilihan topping dan kematangan mienya sudah ditentukan?'),
+          grammarNote: t('chat_off_ramen_other_note', 'Tanggapan hangat「へえ、そうなんだ！美味しそうだね！」disusul pertanyaan pancingan membuat percakapan terus mengalir.'),
+          suggestions: [
+            { text: '豚骨ラーメン、硬めで！', furigana: '[豚骨](とんこつ)ラーメン、[硬](かた)めで！', romaji: 'Tonkotsu raamen, katame de!', translation: t('chat_sug_ramen_tonk', 'Tonkotsu ramen, mie yang agak keras!') },
+            { text: 'おすすめを教えてください。', furigana: 'おすすめを[教](おし)えてください。', romaji: 'Osusume o oshiete kudasai.', translation: t('chat_sug_ramen_rec', 'Tolong rekomendasikan menu terbaik.') }
+          ]
+        };
+      }
+      if (scenarioId === 'konbini') {
+        if (/温め|はい|お願いします/i.test(raw)) {
+          return {
+            text: 'かしこまりました。電子レンジで温めますね。お会計は750円になります！',
+            furigana: 'かしこまりました。[電子](でんし)レンジで[温](あたた)めますね。お[会計](かいけい)は750[円](えん)になります！',
+            romaji: 'Kashikomarimashita. Denshi renji de atatamemasu ne. Okaikei wa nanahyaku-gojuu-en ni narimasu!',
+            translation: t('chat_off_konb_trans1', 'Baik, saya hangatkan di microwave ya. Total pembayarannya jadi 750 yen!'),
+            grammarNote: t('chat_off_konb_note1', 'Frasa「〜になります」sering dipakai kasir Jepang untuk menyebutkan total harga.'),
+            suggestions: [
+              { text: '現金で払います。', furigana: '[現金](げんきん)で[払](はら)います。', romaji: 'Genkin de haraimasu.', translation: t('chat_sug_cash', 'Saya bayar tunai.') },
+              { text: 'Suicaで払えますか？', romaji: 'Suica de haraemasu ka?', translation: t('chat_sug_suica', 'Bisa bayar pakai kartu Suica?') },
+              { text: 'レシートは要りません。', furigana: 'レシートは[要](い)りません。', romaji: 'Reshiito wa irimasen.', translation: t('chat_sug_receipt', 'Tidak perlu struk belanja.') }
+            ]
+          };
+        }
+        return {
+          text: 'かしこまりました！他にご注文はございますか？',
+          furigana: 'かしこまりました！[他](ほか)にご[注文](ちゅうもん)はございますか？',
+          romaji: 'Kashikomarimashita! Hoka ni gochuumon wa gozaimasu ka?',
+          translation: t('chat_off_konb_trans2', 'Baik, dimengerti! Apakah ada pesanan lain lagi?'),
+          grammarNote: t('chat_off_konb_note2', '「他に〜ございますか」(Hoka ni ~ gozaimasu ka) = Apakah ada yang lain?'),
+          suggestions: [
+            { text: 'これで全部です。', furigana: 'これで[全部](ぜんぶ)です。', romaji: 'Kore de zenbu desu.', translation: t('chat_sug_all', 'Ini saja semuanya.') },
+            { text: 'ありがとうございます！', romaji: 'Arigatou gozaimasu!', translation: t('chat_sug_thanks', 'Terima kasih banyak!') }
+          ]
+        };
+      }
+      if (scenarioId === 'direction') {
+        return {
+          text: 'ここをまっすぐ行って、二つ目の交差点を右に曲がるとすぐ見えますよ！歩いて約5分です。',
+          furigana: 'ここをまっすぐ[行](い)って、[二](ふた)つ[目](め)の[交差点](こうさてん)を[右](みぎ)に[曲](ま)がるとすぐ[見](み)えますよ！[歩](ある)いて[約](やく)5[分](ふん)です。',
+          romaji: 'Koko o massugu itte, futatsume no kousaten o migi ni magaru to sugu miemasu yo! Aruite yaku gofun desu.',
+          translation: t('chat_off_dir_trans', 'Jalan lurus dari sini, lalu belok kanan di perempatan kedua, nanti langsung kelihatan! Jalan kaki sekitar 5 menit.'),
+          grammarNote: t('chat_off_dir_note', 'Pola「まっすぐ行って、〜を右に曲がる」adalah rumus standar memberi petunjuk jalan.'),
+          suggestions: [
+            { text: 'わかりました！親切にありがとうございます。', furigana: 'わかりました！[親切](しんせつ)にありがとうございます。', romaji: 'Wakarimashita! Shinsetsu ni arigatou gozaimasu.', translation: t('chat_sug_dir_kind', 'Saya mengerti! Terima kasih atas keramahannya.') },
+            { text: '近くにコンビニもありますか？', furigana: '[近](ちか)くにコンビニもありますか？', romaji: 'Chikaku ni konbini mo arimasu ka?', translation: t('chat_sug_dir_konbini', 'Apakah ada minimarket di dekat sana juga?') }
+          ]
+        };
+      }
+      if (scenarioId === 'phone_restaurant') {
+        if (/金曜|土曜|日曜|時|名|人|予約|お願い/i.test(raw)) {
+          return {
+            text: 'もしもし、お電話ありがとうございます！少々お待ちください……はい、お席をご用意できます！お名前とお電話番号を教えていただけますでしょうか？',
+            furigana: 'もしもし、お[電話](でんわ)ありがとうございます！[少々](しょうしょう)お[待](ま)ちください……はい、お[席](せき)をご[用意](ようい)できます！お[名前](なまえ)とお[電話番号](でんわばんごう)を[教](おし)えていただけますでしょうか？',
+            romaji: 'Moshi moshi, odenwa arigatou gozaimasu! Shoushou omachi kudasai... Hai, oseki o goyoui dekimasu! Onamae to odenwa bangou o oshiete itadakemasu deshou ka?',
+            translation: t('chat_off_rest_trans1', 'Halo, terima kasih telah menelepon! Mohon tunggu sebentar... Ya, mejanya tersedia! Boleh sebutkan nama dan nomor telepon Anda?'),
+            grammarNote: t('chat_off_rest_note1', 'Buka dengan「もしもし、お電話ありがとうございます！」dan gunakan pertanyaan pancingan data pemesan agar telepon ringkas dan jelas.'),
+            suggestions: [
+              { text: '田中と申します。電話番号は090-1234です。', furigana: '[田中](たなか)と[申](もう)します。[電話番号](でんわばんごう)は090-1234です。', romaji: 'Tanaka to moushimasu. Denwa bangou wa zero-kyuu-zero-ichi-nii-san-yon desu.', translation: t('chat_sug_rest_tanaka', 'Nama saya Tanaka. Nomor teleponnya 090-1234.') },
+              { text: 'それでは予約をお願いします。失礼いたします。', furigana: 'それでは[予約](よやく)をお[願](ねが)いします。[失礼](しつれい)いたします。', romaji: 'Sore dewa yoyaku o onegai shimasu. Shitsurei itashimasu.', translation: t('chat_sug_rest_close', 'Tolong reservasinya ya. Kalau begitu permisi (menutup telepon).') }
+            ]
+          };
+        }
+        return {
+          text: 'お電話ありがとうございます！和食さくら亭でございます。もしもし、ご予約のお電話でしょうか？',
+          furigana: 'お[電話](でんわ)ありがとうございます！[和食](わしょく)さくら[亭](てい)でございます。もしもし、ご[予約](よやく)のお[電話](でんわ)でしょうか？',
+          romaji: 'Odenwa arigatou gozaimasu! Washoku Sakuratei de gozaimasu. Moshi moshi, goyoyaku no odenwa deshou ka?',
+          translation: t('chat_off_rest_trans2', 'Terima kasih telah menelepon restoran Sakuratei! Halo, apakah Anda ingin memesan meja reservasi?'),
+          grammarNote: t('chat_off_rest_note2', 'Pertanyaan「ご予約のお電話でしょうか？」langsung mengarahkan percakapan telepon restoran tanpa jeda berbelit-belit.'),
+          suggestions: [
+            { text: 'もしもし、今夜2名で席を予約したいです。', furigana: 'もしもし、[今夜](こんや)2[名](めい)で[席](せき)を[予約](よやく)したいです。', romaji: 'Moshi moshi, kon\'ya ni-mei de seki o yoyaku shitai desu.', translation: t('chat_sug_rest_tonight', 'Halo, saya ingin reservasi meja untuk 2 orang malam ini.') },
+            { text: '個室は空いていますか？', furigana: '[個室](こしつ)は[空](あ)いていますか？', romaji: 'Koshitsu wa aite imasu ka?', translation: t('chat_sug_rest_room', 'Apakah ada ruang privat yang kosong?') }
+          ]
+        };
+      }
+      if (scenarioId === 'phone_delivery') {
+        if (/ピザ|マルゲリータ|注文|お届け|新宿|住所/i.test(raw)) {
+          return {
+            text: 'もしもし、毎度ありがとうございます！ご注文を承りました。熱々のピザを約30分でお届けしますね。他にご注文はございますか？',
+            furigana: 'もしもし、[毎度](まいど)ありがとうございます！ご[注文](ちゅうもん)を[承](うけたまわ)りました。[熱々](あつあつ)のピザを[約](やく)30[分](ふん)でお[届](とど)けしますね。[他](ほか)にご[注文](ちゅうもん)はございますか？',
+            romaji: 'Moshi moshi, maido arigatou gozaimasu! Gochuumon o uketamawarimashita. Atsuatsu no piza o yaku sanjuppun de otodoke shimasu ne. Hoka ni gochuumon wa gozaimasu ka?',
+            translation: t('chat_off_del_ja_trans1', 'Halo, terima kasih banyak atas langganannya! Pesanan telah dicatat, pizza hangat akan diantar dalam waktu sekitar 30 menit. Ada pesanan lain?'),
+            grammarNote: t('chat_off_del_ja_note1', 'Buka dengan「もしもし、毎度ありがとうございます！」dan tutup konfirmasi dengan pertanyaan「他にご注文はございますか？」.'),
+            suggestions: [
+              { text: 'これで全部です。楽しみに待っています！', furigana: 'これで[全部](ぜんぶ)です。[楽](たの)しみに[待](ま)っています！', romaji: 'Kore de zenbu desu. Tanoshimi ni matte imasu!', translation: t('chat_sug_del_ja_wait', 'Ini saja semuanya. Saya tunggu dengan senang hati!') },
+              { text: 'ありがとうございます、失礼いたします。', furigana: 'ありがとうございます、[失礼](しつれい)いたします。', romaji: 'Arigatou gozaimasu, shitsurei itashimasu.', translation: t('chat_sug_del_ja_bye', 'Terima kasih, permisi.') }
+            ]
+          };
+        }
+        return {
+          text: 'もしもし、お電話ありがとうございます！ニコニコピザです。温かいピザをご注文なさいますか？',
+          furigana: 'もしもし、お[電話](でんわ)ありがとうございます！ニコニコピザです。[温](あたた)かいピザをご[注文](ちゅうもん)なさいますか？',
+          romaji: 'Moshi moshi, odenwa arigatou gozaimasu! Nikoniko Piza desu. Atatakai piza o gochuumon nasaimasu ka?',
+          translation: t('chat_off_del_ja_trans2', 'Halo, terima kasih telah menelepon! Di sini Niko-Niko Pizza. Apakah Anda ingin memesan pizza hangat?'),
+          grammarNote: t('chat_off_del_ja_note2', '「ご注文なさいますか」(Gochuumon nasaimasu ka) adalah bentuk halus mempersilakan pesanan pelanggan di telepon.'),
+          suggestions: [
+            { text: 'もしもし、マルゲリータピザを1枚お願いします。', furigana: 'もしもし、マルゲリータピザを1[枚](まい)お[願](ねが)いします。', romaji: 'Moshi moshi, Marugeriita piza no Emu-saizu o ichimai onegai shimasu.', translation: t('chat_sug_del_ja_mrg', 'Halo, minta satu loyang pizza Margherita.') },
+            { text: 'お届け先は新宿区です。どのくらいかかりますか？', furigana: 'お[届](とど)け[先](さき)は[新宿区](しんじゅくく)です。どのくらいかかりますか？', romaji: 'Otodokesaki wa Shinjuku-ku desu. Donokurai kakarimasu ka?', translation: t('chat_sug_del_ja_time', 'Alamat antarnya di Shinjuku-ku. Kira-kira berapa lama?') }
+          ]
+        };
+      }
+
+      // Contextual Japanese Friendly Dialogue Fallback (Phone / Free / Conversation)
+      // 1. Greetings, Moshi moshi, Audio check, How's it going
+      if (/もしもし|元気|こんにちは|おはよう|こんばんは|久しぶり|聞こえる|聞こえます/i.test(raw)) {
+        return {
+          text: isPhone ? 'もしもし！元気にしてた？' : 'もしもし！元気にしてた？声が聞けて嬉しいよ。今日どんな一日だった？',
+          furigana: isPhone ? 'もしもし！[元気](げんき)にしてた？' : 'もしもし！[元気](げんき)にしてた？[声](こえ)が[聞](き)けて[嬉](うれ)しいよ。[今日](きょう)どんな[一日](いちにち)だった？',
+          romaji: isPhone ? 'Moshi moshi! Genki ni shiteta?' : 'Moshi moshi! Genki ni shiteta? Koe ga kikete ureshii yo. Kyou donna ichinichi datta?',
+          translation: isPhone ? t('chat_off_ja_greet_phone_trans', 'Halo! Gimana kabarnya, sehat kan?') : t('chat_off_ja_greet_trans', 'Halo! Gimana kabarnya, sehat kan? Senang banget bisa dengar suaramu. Hari ini kamu ngapain aja?'),
+          grammarNote: t('chat_off_ja_greet_note', 'Frasa telepon khas「もしもし！元気にしてた？」diakhiri pertanyaan pancingan santai agar percakapan terus mengalir dua arah.'),
+          suggestions: [
+            { text: 'うんうん、元気だよ！買い物に行ってきたんだ。', furigana: 'うんうん、[元気](げんき)だよ！[買](か)い[物](もの)に[行](い)ってきたんだ。', romaji: 'Un-un, genki da yo! Kaimono ni itte kita nda.', translation: t('chat_sug_ja_shop', 'Iya iya, kabar baik! Tadi aku baru habis belanja nih.') },
+            { text: 'ちょっと仕事で疲れたけど、話せて元気出た！', furigana: 'ちょっと[仕事](しごと)で[疲](つか)れたけど、[話](はな)せて[元気](げんき)[出](で)た！', romaji: 'Chotto shigoto de tsukareta kedo, hanasete genki deta!', translation: t('chat_sug_ja_tired_good', 'Agak capek karena kerjaan sih, tapi setelah ngobrol jadi semangat lagi!') }
+          ]
+        };
+      }
+
+      // 2. Food, eating, restaurants, delicious
+      if (/ラーメン|ピザ|寿司|すし|食べ|美味|ごはん|ご飯|ランチ|ディナー|料理|お腹|スイーツ|うどん|カレー/i.test(raw)) {
+        return {
+          text: 'へえ、そうなんだ！美味しそうだね！最近一番お気に入りの食べ物は何？',
+          furigana: 'へえ、そうなんだ！[美味](おい)しそうだね！[最近](さいきん)[一番](いちばん)お[気](き)に[入](い)りの[食](た)べ[物](もの)は[何](なに)？',
+          romaji: 'Hee, sou nan da! Oishisou da ne! Saikin ichiban o-kiniiri no tabemono wa nani?',
+          translation: t('chat_off_ja_food_trans', 'Wah, gitu ya! Kelihatannya enak banget tuh! Makanan paling favoritmu akhir-akhir ini apa nih?'),
+          grammarNote: t('chat_off_ja_food_note', 'Interjeksi santai「へえ、そうなんだ！美味しそうだね！」sangat hidup saat teman bercerita tentang kuliner di telepon.'),
+          suggestions: [
+            { text: '日本の豚骨ラーメンが一番大好きだよ！', furigana: '[日本](にほん)の[豚骨](とんこつ)ラーメンが[一番](いちばん)[大好](だいす)きだよ！', romaji: 'Nihon no tonkotsu raamen ga ichiban daisuki da yo!', translation: t('chat_sug_ja_fav_ramen', 'Aku paling suka tonkotsu ramen khas Jepang!') },
+            { text: '今度一緒に美味しいお店巡りしようよ！', furigana: '[今度](こんど)[一緒](いっしょ)に[美味](おい)しいお[店巡](みせめぐ)りしようよ！', romaji: 'Kondo issho ni oishii omiseguri shiyou yo!', translation: t('chat_sug_ja_food_trip', 'Kapan-kapan ayo kita hunting kuliner enak bareng!') }
+          ]
+        };
+      }
+
+      // 3. Surprising news, hobbies, movies, anime, travel, experiences
+      if (/映画|アニメ|旅行|行った|ゲーム|面白い|すごい|本当に|見た|聞いた|買った|趣味/i.test(raw)) {
+        return {
+          text: 'えっ、本当に？詳しく聞かせて！どんなところが一番面白かったの？',
+          furigana: 'えっ、[本当](ほんとう)に？[詳](くわ)しく[聞](き)かせて！どんなところが[一番](いちばん)[面白](おもしろ)かったの？',
+          romaji: 'E\', hontou ni? Kuwashiku kikasete! Donna tokoro ga ichiban omoshirokatta no?',
+          translation: t('chat_off_ja_surp_trans', 'Eh, beneran? Ceritain lebih banyak dong! Bagian mana yang menurutmu paling seru?'),
+          grammarNote: t('chat_off_ja_surp_note', 'Frasa interjeksi「えっ、本当に？詳しく聞かせて！」membuat lawan bicara bersemangat bercerita tanpa jeda canggung.'),
+          suggestions: [
+            { text: 'ストーリーの展開が予想外ですごかったよ！', furigana: 'ストーリーの[展開](てんかい)が[予想外](よそうがい)ですごかったよ！', romaji: 'Sutoorii no tenkai ga yosougai de sugokatta yo!', translation: t('chat_sug_ja_plot', 'Perkembangan ceritanya beneran di luar dugaan, seru banget!') },
+            { text: '今度ぜひ見てみてほしいな！', furigana: '[今度](こんど)ぜひ[見](み)てみてほしいな！', romaji: 'Kondo zehi mite mite hoshii na!', translation: t('chat_sug_ja_rec', 'Kapan-kapan kamu harus tonton deh!') }
+          ]
+        };
+      }
+
+      // 4. Meetup, schedule, weekend plans
+      if (/会おう|待ち合わせ|何時に|行かない|行こう|合流|ハチ公/i.test(raw) || (scenarioId === 'phone_friend' && /土曜|日曜|週末|予定/i.test(raw))) {
+        return {
+          text: 'いいね！じゃあ土曜日の13時にハチ公前で待ち合わせしよう！その後カフェにも寄らない？',
+          furigana: 'いいね！じゃあ[土曜日](どようび)の13[時](じ)に[ハチ公前](はちこうまえ)で[待](ま)ち[合](あ)わせしよう！その[後](あと)カフェにも[寄](よ)らない？',
+          romaji: 'Ii ne! Jaa doyoubi no juusan-ji ni Hachikou-mae de machiawase shiyou! Sono ato kafe ni mo yoranai?',
+          translation: t('chat_off_fr_ja_trans1', 'Boleh banget! Kalau gitu hari Sabtu jam 1 siang kita ketemuan di depan Hachiko ya! Habis itu mampir ke kafe juga mau nggak?'),
+          grammarNote: t('chat_off_fr_ja_note1', '「待ち合わせしよう」(Machiawase shiyou) adalah ajakan santai untuk janjian bertemu di suatu tempat.'),
+          suggestions: [
+            { text: '了解！遅れないように行くね。また土曜日に！', furigana: '[了解](りょうかい)！[遅](おく)れないように[行](い)くね。また[土曜日](どようび)に！', romaji: 'Ryoukai! Okurenai you ni iku ne. Mata doyoubi ni!', translation: t('chat_sug_fr_ja_ok', 'Siap! Aku bakal datang tepat waktu. Sampai ketemu hari Sabtu!') },
+            { text: 'じゃあね、バイバイ！', romaji: 'Jaa ne, baibai!', translation: t('chat_sug_fr_ja_bye', 'Dah, sampai nanti!') }
+          ]
+        };
+      }
+
+      // 5. Sympathy, busy, tired, feelings, hard work
+      if (/忙しい|疲れた|大変|勉強|仕事|テスト|宿題|わかる|うん|そう|つらい|眠い/i.test(raw)) {
+        return {
+          text: isPhone ? 'うんうん、わかるよ！今日はお家でゆっくりできそう？' : 'うんうん、わかるよ！毎日頑張ってて本当にえらいね。今日はお家でゆっくりできそう？',
+          furigana: isPhone ? 'うんうん、わかるよ！[今日](きょう)はお[家](うち)でゆっくりできそう？' : 'うんうん、わかるよ！[毎日](まいにち)[頑張](がんば)ってて[本当](ほんとう)にえらいね。[今日](きょう)はお[家](うち)でゆっくりできそう？',
+          romaji: isPhone ? 'Un-un, wakaru yo! Kyou wa ouchi de yukkuri dekisou?' : 'Un-un, wakaru yo! Mainichi ganbattete hontou ni erai ne. Kyou wa ouchi de yukkuri dekisou?',
+          translation: isPhone ? t('chat_off_ja_symp_phone_trans', 'Iya iya, aku paham banget! Hari ini bisa santai-santai di rumah nggak?') : t('chat_off_ja_symp_trans', 'Iya iya, aku paham banget! Hebat banget kamu udah berjuang keras tiap hari. Hari ini bisa santai-santai di rumah nggak?'),
+          grammarNote: t('chat_off_ja_symp_note', 'Interjeksi hangat「うんうん、わかるよ！」memberikan rasa nyaman dan didengarkan layaknya sahabat karib.'),
+          suggestions: [
+            { text: 'うん、お風呂に入って早く寝るよ！', furigana: 'うん、お[風呂](ふろ)に[入](はい)って[早](はや)く[寝](ね)るよ！', romaji: 'Un, ofuro ni haitte hayaku neru yo!', translation: t('chat_sug_ja_bath_sleep', 'Iya, aku mau mandi terus tidur lebih cepat!') },
+            { text: 'ありがとう、話を聞いてくれて元気出た！', furigana: 'ありがとう、[話](はなし)を[聞](き)いてくれて[元気](げんき)[出](で)た！', romaji: 'Arigatou, hanashi o kiite kurete genki deta!', translation: t('chat_sug_ja_cheer', 'Makasih ya, didengerin curhatnya bikin semangat lagi!') }
+          ]
+        };
+      }
+
+      // 6. Default Japanese Fallback
+      return {
+        text: 'うんうん、わかるよ！もっと詳しく聞かせてほしいな。あなたはどう思う？',
+        furigana: 'うんうん、わかるよ！もっと[詳](くわ)しく[聞](き)かせてほしいな。あなたはどう[思](おも)う？',
+        romaji: 'Un-un, wakaru yo! Motto kuwashiku kikasete hoshii na. Anata wa dou omou?',
+        translation: t('chat_off_free_trans', 'Iya iya, aku paham banget! Ceritain lebih banyak lagi dong. Menurutmu sendiri gimana?'),
+        grammarNote: t('chat_off_free_note', 'Pertanyaan pancingan santai di akhir kalimat menjaga obrolan telepon terus mengalir dua arah tanpa jeda canggung.'),
+        suggestions: [
+          { text: '実はね、最近挑戦してみたいことがあるんだ。', furigana: '[実](じつ)はね、[最近](さいきん)[挑戦](ちょうせん)してみたいことがあるんだ。', romaji: 'Jitsu wa ne, saikin chousen shite mitai koto ga aru nda.', translation: t('chat_sug_ja_try_new', 'Sebenarnya, akhir-akhir ini ada hal baru yang pengin kucoba.') },
+          { text: '日本のアニメや文化についてもっと知りたいな！', furigana: '[日本](にほん)のアニメや[文化](ぶんか)についてもっと[知](し)りたいな！', romaji: 'Nihon no anime ya bunka ni tsuite motto shiritai na!', translation: t('chat_sug_anime', 'Aku pengin tahu lebih banyak tentang anime dan budaya Jepang!') }
+        ]
+      };
+    } else {
+      // English scenarios
+      if (scenarioId === 'cafe') {
+        if (/coffee|latte|tea|milk|croissant|muffin|order/i.test(raw)) {
+          return {
+            text: 'Great choice! Would you like that for here, or to go? We also have freshly baked chocolate muffins today!',
+            translation: t('chat_off_cafe_trans', 'Pilihan mantap! Mau dinikmati di sini atau dibungkus? Kami juga ada muffin cokelat hangat hari ini!'),
+            grammarNote: t('chat_off_cafe_note', '"For here or to go" is the universal phrase for dining in vs takeout in English coffee shops.'),
+            suggestions: [
+              { text: 'For here, please. And I will add a muffin too!', translation: t('chat_sug_en_dine', 'Makan di sini ya. Dan saya tambah muffin juga!') },
+              { text: 'To go, please. Could you make it extra hot?', translation: t('chat_sug_en_takeout', 'Dibungkus ya. Bisa dibuat lebih panas?') }
+            ]
+          };
+        }
+        return {
+          text: 'Welcome to Fiezel Cafe! What can I get started for you today?',
+          translation: t('chat_sc_en_cafe_trans', 'Selamat datang di Fiezel Cafe! Mau pesan apa hari ini?'),
+          grammarNote: t('chat_sc_en_cafe_note', '"What can I get started for you?" is a warm greeting used by baristas.'),
+          suggestions: [
+            { text: 'Could I get an iced latte with oat milk, please?', translation: t('chat_sug_cafe_latte', 'Bisa minta satu es latte dengan susu oat?') },
+            { text: 'For here, and I will take a chocolate croissant too.', translation: t('chat_sug_cafe_pastry', 'Makan di sini, dan saya mau croissant cokelat juga.') }
+          ]
+        };
+      }
+      if (scenarioId === 'interview') {
+        return {
+          text: 'That sounds impressive! What would you say is your greatest strength when collaborating with a team?',
+          translation: t('chat_off_int_trans', 'Terdengar sangat impresif! Menurutmu apa kekuatan terbesarmu saat berkolaborasi dalam sebuah tim?'),
+          grammarNote: t('chat_off_int_note', 'Interviewers frequently ask about team dynamics to evaluate emotional intelligence and adaptability.'),
+          suggestions: [
+            { text: 'I am a clear communicator and love supporting my teammates.', translation: t('chat_sug_int_comm', 'Saya komunikator yang jelas dan suka mendukung rekan tim.') },
+            { text: 'I stay calm and focused when solving complex problems.', translation: t('chat_sug_int_solve', 'Saya tetap tenang dan fokus saat menyelesaikan masalah rumit.') }
+          ]
+        };
+      }
+      if (scenarioId === 'phone_hotel') {
+        if (/availability|room|weekend|queen|deluxe|book|reserve/i.test(raw)) {
+          return {
+            text: "Thank you for holding! We have a beautiful deluxe room available for that weekend at $120 per night, including complimentary buffet breakfast. Shall I confirm this reservation under your name?",
+            translation: t('chat_off_hot_en_trans1', 'Terima kasih telah menunggu! Kami punya kamar deluxe yang sangat nyaman untuk akhir pekan tersebut seharga $120 per malam, sudah termasuk prasmanan sarapan gratis. Apakah ingin saya konfirmasi pemesanan ini atas nama Anda?'),
+            grammarNote: t('chat_off_hot_en_note1', '"Thank you for holding" is courteous phone protocol after pausing while looking up booking details.'),
+            suggestions: [
+              { text: "Yes, please confirm the booking under my name. Thanks a lot, catch you later!", translation: t('chat_sug_hot_en_confirm', 'Ya, tolong konfirmasi pemesanannya atas nama saya. Terima kasih banyak, sampai jumpa nanti!') },
+              { text: "Hang on a second, does the room offer a late check-out option?", translation: t('chat_sug_hot_en_late', 'Tunggu sebentar, apakah kamarnya ada opsi late check-out?') }
+            ]
+          };
+        }
+        return {
+          text: "Thank you for calling Fiezel Grand Resort. Can you hear me okay? How may I assist you with your room inquiry today?",
+          translation: t('chat_off_hot_en_trans2', 'Terima kasih telah menelepon Fiezel Grand Resort. Apakah suara saya terdengar jelas? Ada yang bisa saya bantu mengenai informasi kamar hari ini?'),
+          grammarNote: t('chat_off_hot_en_note2', '"How may I assist you?" is formal hospitality phrasing used across front-desk phone lines.'),
+          suggestions: [
+            { text: "Hello! Yes, I can hear you clearly. I'd like to check room availability for this weekend.", translation: t('chat_sug_hot_en_avail', 'Halo! Ya, suara Anda jelas sekali. Saya ingin mengecek ketersediaan kamar untuk akhir pekan ini.') },
+            { text: "Hang on a second, do you have any ocean-view suites open?", translation: t('chat_sug_hot_en_ocean', 'Tunggu sebentar, apakah ada kamar suite pemandangan laut yang kosong?') }
+          ]
+        };
+      }
+      if (scenarioId === 'phone_delivery') {
+        if (/pizza|pepperoni|order|address|apartment|deliver/i.test(raw)) {
+          return {
+            text: "Got your order! One large pepperoni pizza coming right up. Our driver will be at your address in about 30 minutes. Thanks for calling Tony's Pizzeria, catch you later!",
+            translation: t('chat_off_del_en_trans1', 'Pesananmu sudah kami catat! Satu pizza pepperoni besar segera dibuat. Driver kami akan sampai di alamatmu sekitar 30 menit lagi. Terima kasih sudah menelepon Tony\'s Pizzeria, sampai nanti!'),
+            grammarNote: t('chat_off_del_en_note1', '"Coming right up" means the food order is being prepared immediately.'),
+            suggestions: [
+              { text: "Perfect! I'll have the cash ready. Catch you later!", translation: t('chat_sug_del_en_cash', 'Sip! Uang tunainya sudah saya siapkan. Sampai nanti!') },
+              { text: "Could you also add some crushed red pepper packets?", translation: t('chat_sug_del_en_pepper', 'Bisakah tambah beberapa bungkus bubuk cabai juga?') }
+            ]
+          };
+        }
+        return {
+          text: "Thanks for calling Tony's Pizzeria! Can you hear me okay? What kind of pizza would you like delivered to your door today?",
+          translation: t('chat_off_del_en_trans2', 'Terima kasih telah menelepon Tony\'s Pizzeria! Apakah suara saya terdengar jelas? Pizza jenis apa yang ingin diantar ke tempatmu hari ini?'),
+          grammarNote: t('chat_off_del_en_note2', '"Delivered to your door" emphasizes prompt doorstep delivery service.'),
+          suggestions: [
+            { text: "Hi! I'd like to order a large pepperoni pizza for delivery, please.", translation: t('chat_sug_del_en_order', 'Halo! Saya mau pesan satu pizza pepperoni besar untuk diantar.') },
+            { text: "Hang on a second, what crust sizes do you have available?", translation: t('chat_sug_del_en_crust', 'Tunggu sebentar, ada pilihan ukuran pinggiran apa saja?') }
+          ]
+        };
+      }
+
+      // Contextual English Friendly Dialogue Fallback (Phone / Free / Conversation)
+      // 1. Greetings, How are you, Audio check, What's up
+      if (/hey|hello|hi\b|how are you|how's your day|what's up|hear me|good morning|good evening/i.test(raw)) {
+        return {
+          text: isPhone ? "Hey there! How's your day going?" : "Hey there! How's your day going? Can you hear me okay? What have you been up to today?",
+          translation: isPhone ? t('chat_off_en_greet_phone_trans', "Hai! Gimana harimu sejauh ini?") : t('chat_off_en_greet_trans', "Hai! Gimana harimu sejauh ini? Suaraku terdengar jelas kan? Lagi sibuk apa aja hari ini?"),
+          grammarNote: t('chat_off_en_greet_note', '"Hey there! How\'s your day going?" is the friendliest way to open a phone conversation and invite an easy two-way response.'),
+          suggestions: [
+            { text: "Hey! I can hear you loud and clear. Just catching up on work, how about you?", translation: t('chat_sug_en_work', "Hei! Suaramu jelas banget. Cuma lagi nyelesaiin kerjaan, kalau kamu?") },
+            { text: "Pretty good! Just finished lunch, what are you up to?", translation: t('chat_sug_en_lunch', "Cukup baik! Tadi baru kelar makan siang, kamu lagi ngapain?") }
+          ]
+        };
+      }
+
+      // 2. Food, eating, restaurants, delicious
+      if (/food|eat|pizza|ramen|burger|dinner|lunch|breakfast|delicious|cooking|restaurant|taste/i.test(raw)) {
+        return {
+          text: "Oh really? That sounds super delicious! What's your favorite food lately?",
+          translation: t('chat_off_en_food_trans', "Oh ya? Kedengarannya enak banget tuh! Apa makanan favoritmu akhir-akhir ini?"),
+          grammarNote: t('chat_off_en_food_note', '"That sounds super delicious!" is an enthusiastic phone interjection, followed by a casual prompt question.'),
+          suggestions: [
+            { text: "I can never say no to a hot bowl of spicy ramen!", translation: t('chat_sug_en_spicy_ramen', "Aku nggak pernah bisa nolak semangkuk ramen pedas hangat!") },
+            { text: "Fresh pepperoni pizza is definitely my number one comfort food!", translation: t('chat_sug_en_pep_pizza', "Pizza pepperoni hangat pasti makanan favorit nomor satuku!") }
+          ]
+        };
+      }
+
+      // 3. Fun, movies, anime, hobbies, trips, music
+      if (/movie|anime|game|fun|cool|hobby|music|watched|played/i.test(raw)) {
+        return {
+          text: isPhone ? "Oh really? That sounds super fun! What was the best part about it?" : "Oh really? That sounds super fun! I'm so curious, what was the best part about it?",
+          translation: isPhone ? t('chat_off_en_fun_phone_trans', "Oh ya? Kedengarannya seru banget tuh! Bagian mana yang paling asyik?") : t('chat_off_en_fun_trans', "Oh ya? Kedengarannya seru banget tuh! Aku penasaran banget, bagian mana yang paling asyik?"),
+          grammarNote: t('chat_off_en_fun_note', '"Oh really? That sounds super fun!" keeps the conversation lively and encourages your friend to elaborate without awkward pauses.'),
+          suggestions: [
+            { text: "The plot twist at the end completely blew my mind!", translation: t('chat_sug_en_twist', "Plot twist di bagian akhir bener-bener bikin kaget banget!") },
+            { text: "The soundtrack and visuals were breathtaking!", translation: t('chat_sug_en_soundtrack', "Musik latar dan visualnya indah banget!") }
+          ]
+        };
+      }
+
+      // 4. Surprising news, shocking, achievements
+      if (/really|guess what|bought|won|news|passed|wild|unbelievable|shocking/i.test(raw)) {
+        return {
+          text: "No way, tell me more! That sounds completely wild, how did that happen?",
+          translation: t('chat_off_en_surp_trans', "Beneran? Ceritain lebih banyak dong! Kedengarannya gila banget, kok bisa gitu ceritanya?"),
+          grammarNote: t('chat_off_en_surp_note', '"No way, tell me more!" is a classic enthusiastic phone reaction when a friend shares unexpected news.'),
+          suggestions: [
+            { text: "It was such a crazy coincidence, let me tell you from the beginning!", translation: t('chat_sug_en_coincidence', "Beneran kebetulan yang gila banget, biar kuceritain dari awal!") },
+            { text: "I still can't believe it myself, honestly!", translation: t('chat_sug_en_cant_believe', "Aku sendiri jujur masih nggak percaya!") }
+          ]
+        };
+      }
+
+      // 5. Meetup, schedule in phone_friend
+      if (/loud and clear|grab coffee|meet up|saturday|sunday/i.test(raw) || (scenarioId === 'phone_friend' && /schedule|weekend|free/i.test(raw))) {
+        return {
+          text: "That sounds awesome! Hang on a second, let me check my schedule for Saturday... Yes, I'm completely free in the afternoon. Let's grab coffee downtown! Catch you later!",
+          translation: t('chat_off_fr_en_trans1', 'Terdengar seru banget! Tunggu sebentar, biar kucek jadwalku untuk hari Sabtu... Ya, sore harinya aku kosong sama sekali. Ayo ngopi di pusat kota! Sampai jumpa nanti!'),
+          grammarNote: t('chat_off_fr_en_note1', '"Hang on a second" and "Catch you later!" are ubiquitous conversational idioms in natural phone calls with friends.'),
+          suggestions: [
+            { text: "Sounds like a solid plan. Catch you later!", translation: t('chat_sug_fr_en_solid', 'Rencana yang mantap. Sampai jumpa nanti!') },
+            { text: "Awesome, I'll text you the cafe address soon.", translation: t('chat_sug_fr_en_text', 'Keren, nanti kukirim alamat kafenya lewat pesan ya.') }
+          ]
+        };
+      }
+
+      // 6. Sympathy, busy, tired, feelings, hard work
+      if (/busy|tired|work|study|exam|hard|tough|stress|crazy|exhausted|rough|sleepy/i.test(raw)) {
+        return {
+          text: isPhone ? "Haha I totally get that! Are you able to unwind and relax tonight?" : "Haha I totally get that! You've been working so hard lately. Are you able to unwind and relax tonight?",
+          translation: isPhone ? t('chat_off_en_symp_phone_trans', "Haha aku paham banget tuh! Malam ini bisa santai-santai nggak?") : t('chat_off_en_symp_trans', "Haha aku paham banget tuh! Kamu udah kerja keras banget akhir-akhir ini. Malam ini bisa santai-santai nggak?"),
+          grammarNote: t('chat_off_en_symp_note', '"Haha I totally get that!" gives genuine, friendly empathy over the phone, ending with a warm check-in question.'),
+          suggestions: [
+            { text: "Definitely, I'm ordering pizza and going straight to bed!", translation: t('chat_sug_en_pizza_bed', "Pasti, aku mau pesan pizza terus langsung tidur!") },
+            { text: "Thanks for listening, talking to you always makes me feel better!", translation: t('chat_sug_en_better', "Makasih udah dengerin ya, ngobrol sama kamu selalu bikin lebih tenang!") }
+          ]
+        };
+      }
+
+      // 7. Default English Fallback
+      return {
+        text: "Haha I totally get that! Tell me more about what you think, what's your take on it?",
+        translation: t('chat_off_en_free_trans', "Haha aku paham banget tuh! Ceritain lebih banyak tentang pikiranmu, menurut pandanganmu gimana?"),
+        grammarNote: t('chat_off_en_free_note', 'Ending with "what\'s your take on it?" keeps the conversation flowing two ways naturally without awkward pauses.'),
+        suggestions: [
+          { text: 'Can you tell me about common English slang?', translation: t('chat_sug_en_slang', 'Bisakah kamu ceritakan tentang bahasa gaul Inggris umum?') },
+          { text: "Let's practice ordering food at a restaurant.", translation: t('chat_sug_en_rest', 'Ayo latihan memesan makanan di restoran.') }
+        ]
+      };
+    }
+  }
+
+  // --- Main Interactive Chat Controller ---
+  var state = {
+    course: 'ja',
+    scenarioId: 'free',
+    messages: [],
+    scenarioHistories: {},
+    isThinking: false,
+    isListening: false,
+    autoVoice: true,
+    shadowingMsgId: null,
+    audioPlayingId: null,
+    recognition: null
+  };
+
+  function loadState() {
+    try {
+      var saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+      if (saved && typeof saved === 'object') {
+        state.scenarioId = saved.scenarioId || 'free';
+        state.scenarioHistories = saved.scenarioHistories || {};
+      }
+    } catch (_) {}
+    state.course = getActiveCourse();
+    initScenario(state.scenarioId);
+  }
+
+  function saveState() {
+    try {
+      if (state.scenarioId && state.messages) {
+        state.scenarioHistories[state.scenarioId] = state.messages;
+      }
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        scenarioId: state.scenarioId,
+        scenarioHistories: state.scenarioHistories
+      }));
+    } catch (_) {}
+  }
+
+  function getScenario(id) {
+    var list = SCENARIOS[state.course] || SCENARIOS.ja;
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].id === id) return list[i];
+    }
+    return list[0];
+  }
+
+  function isMatchingCourse(messages, course) {
+    if (!messages || messages.length === 0) return true;
+    var first = messages[0];
+    var isJa = !!first.furigana || /[\u3040-\u309f\u30a0-\u30ff\u4e00-\u9faf]/.test(first.text || '');
+    return course === 'ja' ? isJa : !isJa;
+  }
+
+  function initScenario(id) {
+    var histKey = (state.course || 'ja') + '_' + id;
+    // Save current active messages before switching
+    if (state.scenarioId && state.messages && state.messages.length > 0) {
+      state.scenarioHistories[(state.course || 'ja') + '_' + state.scenarioId] = state.messages;
+      state.scenarioHistories[state.scenarioId] = state.messages;
+    }
+    state.scenarioId = id;
+    var cached = (state.scenarioHistories && state.scenarioHistories[histKey]) ||
+                 (state.scenarioHistories && state.scenarioHistories[id]);
+    if (cached && cached.length > 0 && isMatchingCourse(cached, state.course)) {
+      state.messages = cached;
+    } else {
+      var sc = getScenario(id);
+      var starter = sc.starter;
+      state.messages = [
+        {
+          id: 'msg-start-' + id,
+          role: 'assistant',
+          text: starter.text,
+          furigana: starter.furigana,
+          romaji: starter.romaji,
+          translation: starter.translation,
+          grammarNote: starter.grammarNote,
+          suggestions: starter.suggestions,
+          showTranslation: false
+        }
+      ];
+      state.scenarioHistories[histKey] = state.messages;
+      state.scenarioHistories[id] = state.messages;
+    }
+  }
+
+  function resetCurrentScenario() {
+    var id = state.scenarioId;
+    var histKey = (state.course || 'ja') + '_' + id;
+    if (state.scenarioHistories) {
+      delete state.scenarioHistories[histKey];
+      delete state.scenarioHistories[id];
+    }
+    var sc = getScenario(id);
+    var starter = sc.starter;
+    state.messages = [
+      {
+        id: 'msg-start-' + id,
+        role: 'assistant',
+        text: starter.text,
+        furigana: starter.furigana,
+        romaji: starter.romaji,
+        translation: starter.translation,
+        grammarNote: starter.grammarNote,
+        suggestions: starter.suggestions,
+        showTranslation: false
+      }
+    ];
+    state.scenarioHistories[histKey] = state.messages;
+    state.scenarioHistories[id] = state.messages;
+    saveState();
+    updateUI();
+  }
+
+  // --- Web Audio & Speech Synthesis Engine ---
+  var activeUtterance = null;
+  var keepAliveTimer = null;
+  var audioContextUnlocked = false;
+
+  function clearKeepAlive() {
+    if (keepAliveTimer) {
+      clearInterval(keepAliveTimer);
+      keepAliveTimer = null;
+    }
+  }
+
+  // Web Audio Autoplay Policy Unlock
+  function unlockAudioContext() {
+    if (audioContextUnlocked && root.__fiezelSharedAudioContext && root.__fiezelSharedAudioContext.state === 'running') {
+      return Promise.resolve(root.__fiezelSharedAudioContext);
+    }
+
+    try {
+      if (typeof root.speechSynthesis !== 'undefined') {
+        try {
+          if (root.speechSynthesis.paused) root.speechSynthesis.resume();
+        } catch (_) {}
+      }
+
+      var AudioCtx = root.AudioContext || root.webkitAudioContext;
+      if (!AudioCtx) {
+        audioContextUnlocked = true;
+        return Promise.resolve(null);
+      }
+
+      var ctx = root.__fiezelSharedAudioContext;
+      if (!ctx || ctx.state === 'closed') {
+        ctx = new AudioCtx();
+        root.__fiezelSharedAudioContext = ctx;
+      }
+
+      if (ctx.state === 'suspended') {
+        return ctx.resume().then(function () {
+          try {
+            var buf = ctx.createBuffer(1, 1, 22050);
+            var src = ctx.createBufferSource();
+            src.buffer = buf;
+            src.connect(ctx.destination);
+            src.start(0);
+          } catch (_) {}
+          audioContextUnlocked = true;
+          return ctx;
+        }).catch(function () {
+          return ctx;
+        });
+      } else {
+        audioContextUnlocked = true;
+        return Promise.resolve(ctx);
+      }
+    } catch (_) {
+      return Promise.resolve(null);
+    }
+  }
+
+  // Voice Selector with safe scoring and non-blocking fallback
+  function selectVoice(synth, isJa) {
+    if (!synth || typeof synth.getVoices !== 'function') return null;
+    var voices = synth.getVoices() || [];
+    if (!voices || voices.length === 0) return null;
+
+    var candidates = [];
+    for (var i = 0; i < voices.length; i++) {
+      var v = voices[i];
+      var lang = (v.lang || '').toLowerCase().replace(/_/g, '-');
+      var name = (v.name || '').toLowerCase();
+
+      if (isJa) {
+        if (lang.indexOf('ja') === 0 || lang === 'ja' || /japanese|nihongo|日本語/i.test(name)) {
+          var score = 10;
+          if (/google\s*日本語/i.test(name)) score += 60;
+          else if (/kyoko|otoya/i.test(name)) score += 50;
+          else if (/nanami|keita|ayumi|ichiro|haruka|sayaka|takumi/i.test(name)) score += 40;
+          else if (/natural|neural/i.test(name)) score += 30;
+          if (v.localService) score += 10;
+          if (v.default) score += 5;
+          candidates.push({ voice: v, score: score });
+        }
+      } else {
+        if (lang.indexOf('en') === 0 || /english/i.test(name)) {
+          var scoreEn = 10;
+          if (lang === 'en-us') scoreEn += 35;
+          else if (lang === 'en-gb') scoreEn += 30;
+          if (/google\s*(us|uk|english)/i.test(name)) scoreEn += 50;
+          else if (/samantha|alex|victoria|karen|daniel|oliver|jenny|guy|aria/i.test(name)) scoreEn += 40;
+          else if (/natural|neural/i.test(name)) scoreEn += 30;
+          if (v.localService) scoreEn += 10;
+          if (v.default) scoreEn += 5;
+          candidates.push({ voice: v, score: scoreEn });
+        }
+      }
+    }
+
+    if (candidates.length > 0) {
+      candidates.sort(function (a, b) { return b.score - a.score; });
+      return candidates[0].voice;
+    }
+
+    // Non-blocking fallback: default voice or first available voice without throwing exception
+    for (var j = 0; j < voices.length; j++) {
+      if (voices[j].default) return voices[j];
+    }
+    return voices[0] || null;
+  }
+
+  function getDoc() {
+    if (typeof document !== 'undefined') return document;
+    if (root && root.document) return root.document;
+    return null;
+  }
+
+  function updateAudioButtonUI(playingId) {
+    var doc = getDoc();
+    if (!doc) return;
+    var mountPoint = doc.getElementById('app');
+    if (!mountPoint) return;
+    mountPoint.querySelectorAll('.fzc-action-btn[data-action="audio"]').forEach(function (btn) {
+      var mid = btn.getAttribute('data-id');
+      var lbl = btn.querySelector('.fzc-btn-lbl');
+      if (mid === playingId) {
+        btn.classList.add('is-playing');
+        if (lbl) lbl.textContent = t('chat_act_playing', 'Memutar...');
+      } else {
+        btn.classList.remove('is-playing', 'is-pulsing');
+        if (lbl) lbl.textContent = t('chat_act_listen', 'Dengar');
+      }
+    });
+
+    // Animate avatar speaking state in topbar
+    var avatarWrap = mountPoint.querySelector('.fzc-avatar-wrap');
+    if (avatarWrap) {
+      if (playingId) {
+        avatarWrap.classList.add('is-speaking');
+      } else {
+        avatarWrap.classList.remove('is-speaking');
+      }
+    }
+  }
+
+  // Speak assistant message cleanly
+  function speakAssistantMessage(msg, options) {
+    if (!msg) return;
+    var rawText = '';
+    var mid = '';
+    if (typeof msg === 'string') {
+      rawText = msg;
+      mid = 'msg-asst-' + Date.now();
+    } else {
+      rawText = (state.course === 'ja' && msg.furigana) ? msg.furigana : (msg.text || '');
+      mid = msg.id || ('msg-asst-' + Date.now());
+    }
+    playVoice(rawText, mid, options);
+  }
+
+  // Speak text via neural voice or web speech
+  function playVoice(text, msgId, options) {
+    if (state.audioPlayingId === msgId) {
+      stopVoice();
+      return;
+    }
+    stopVoice();
+    state.audioPlayingId = msgId;
+    updateAudioButtonUI(msgId);
+
+    // Clean text: strip furigana [Kanji](reading) -> Kanji, and markdown
+    var cleanText = String(text || '')
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+      .replace(/[*_~`]/g, '')
+      .trim();
+
+    if (!cleanText) {
+      stopVoice();
+      return;
+    }
+
+    var isJapanese = state.course === 'ja';
+
+    // If English, try FiezelVoiceSay neural voice first
+    if (!isJapanese && root.FiezelVoiceSay && typeof root.FiezelVoiceSay.say === 'function') {
+      root.FiezelVoiceSay.say(cleanText, { suppressSubtitles: true })
+        .then(function (spoke) {
+          if (spoke) {
+            if (state.audioPlayingId === msgId) {
+              state.audioPlayingId = null;
+              updateAudioButtonUI(null);
+            }
+          } else {
+            // FiezelVoiceSay could not play this text -> Fallback to Web Speech
+            speakViaWebSpeech(cleanText, msgId);
+          }
+        })
+        .catch(function () {
+          speakViaWebSpeech(cleanText, msgId);
+        });
+      return;
+    }
+
+    // Japanese or fallback: speak via Web Speech Synthesis
+    speakViaWebSpeech(cleanText, msgId);
+  }
+
+  function speakViaWebSpeech(text, msgId) {
+    var synth = root.speechSynthesis;
+    if (!synth) {
+      state.audioPlayingId = null;
+      updateAudioButtonUI(null);
+      if (typeof root.showToast === 'function') {
+        root.showToast(t('chat_no_speech_engine', 'Browser belum mendukung suara percakapan.'));
+      }
+      return;
+    }
+
+    try {
+      synth.cancel();
+      clearKeepAlive();
+      if (synth.paused) {
+        try { synth.resume(); } catch (_) {}
+      }
+
+      var utter = new root.SpeechSynthesisUtterance(text);
+      activeUtterance = utter;
+      root.__fiezelChatUtterance = utter; // Prevent Chrome GC bug!
+
+      var isJa = state.course === 'ja';
+      utter.lang = isJa ? 'ja-JP' : 'en-US';
+      utter.rate = isJa ? 0.95 : 1.0;
+      utter.pitch = 1.0;
+
+      // Select voice with Japanese & English priorities
+      try {
+        var chosenVoice = selectVoice(synth, isJa);
+        if (chosenVoice) {
+          utter.voice = chosenVoice;
+        } else if (isJa && root.FiezelSpeechBridge && typeof root.FiezelSpeechBridge.speak === 'function') {
+          // If no local voice, try speech bridge fallback if available
+          try { root.FiezelSpeechBridge.speak(text); } catch (_) {}
+        }
+      } catch (_) {}
+
+      utter.onstart = function () {
+        if (state.audioPlayingId === msgId) {
+          updateAudioButtonUI(msgId);
+        }
+      };
+
+      utter.onboundary = function (evt) {
+        if (state.audioPlayingId === msgId) {
+          // Acoustic boundary: pulse the active audio button in sync with speech
+          var doc = getDoc();
+          if (doc) {
+            var mountPoint = doc.getElementById('app');
+            if (mountPoint) {
+              var btn = mountPoint.querySelector('.fzc-action-btn[data-action="audio"][data-id="' + msgId + '"]');
+              if (btn) {
+                btn.classList.add('is-pulsing');
+                setTimeout(function () {
+                  if (btn) btn.classList.remove('is-pulsing');
+                }, 120);
+              }
+            }
+          }
+          // If active visualizer orb exists on page, pulse volume
+          if (root.__fiezelActiveVoiceOrb && typeof root.__fiezelActiveVoiceOrb.setVolume === 'function') {
+            root.__fiezelActiveVoiceOrb.setVolume(0.65 + Math.random() * 0.25);
+          }
+        }
+      };
+
+      utter.onend = function () {
+        clearKeepAlive();
+        if (activeUtterance === utter) {
+          activeUtterance = null;
+          root.__fiezelChatUtterance = null;
+        }
+        if (state.audioPlayingId === msgId) {
+          state.audioPlayingId = null;
+          updateAudioButtonUI(null);
+        }
+        if (root.__fiezelActiveVoiceOrb && typeof root.__fiezelActiveVoiceOrb.setVolume === 'function') {
+          root.__fiezelActiveVoiceOrb.setVolume(0);
+        }
+      };
+
+      utter.onerror = function () {
+        clearKeepAlive();
+        if (activeUtterance === utter) {
+          activeUtterance = null;
+          root.__fiezelChatUtterance = null;
+        }
+        if (state.audioPlayingId === msgId) {
+          state.audioPlayingId = null;
+          updateAudioButtonUI(null);
+        }
+        if (root.__fiezelActiveVoiceOrb && typeof root.__fiezelActiveVoiceOrb.setVolume === 'function') {
+          root.__fiezelActiveVoiceOrb.setVolume(0);
+        }
+      };
+
+      synth.speak(utter);
+      if (synth.paused) {
+        try { synth.resume(); } catch (_) {}
+      }
+
+      // Chrome keepalive timer to prevent speech freezing at 15s
+      keepAliveTimer = setInterval(function () {
+        if (!activeUtterance) {
+          clearKeepAlive();
+          return;
+        }
+        if (synth.speaking && !synth.paused) {
+          try {
+            synth.pause();
+            synth.resume();
+          } catch (_) {}
+        }
+      }, 10000);
+
+    } catch (_) {
+      clearKeepAlive();
+      activeUtterance = null;
+      root.__fiezelChatUtterance = null;
+      state.audioPlayingId = null;
+      updateAudioButtonUI(null);
+    }
+  }
+
+  function stopVoice() {
+    clearKeepAlive();
+    activeUtterance = null;
+    root.__fiezelChatUtterance = null;
+    state.audioPlayingId = null;
+    try {
+      if (root.FiezelVoiceSay && typeof root.FiezelVoiceSay.stop === 'function') {
+        root.FiezelVoiceSay.stop();
+      }
+    } catch (_) {}
+    try {
+      if (root.speechSynthesis) {
+        root.speechSynthesis.cancel();
+      }
+    } catch (_) {}
+    updateAudioButtonUI(null);
+    if (root.__fiezelActiveVoiceOrb && typeof root.__fiezelActiveVoiceOrb.setVolume === 'function') {
+      root.__fiezelActiveVoiceOrb.setVolume(0);
+    }
+  }
+
+  // --- Braincore Learning Telemetry & Learning History Integration ---
+  var CHAT_HISTORY_KEY = 'fzc_chat_history_v1';
+
+  function getChatHistory() {
+    try {
+      var raw = localStorage.getItem(CHAT_HISTORY_KEY);
+      if (!raw) return [];
+      var parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (_) {
+      return [];
+    }
+  }
+
+  function saveChatHistoryRecord(record) {
+    if (!record || typeof record !== 'object') return;
+    try {
+      var list = getChatHistory();
+      list.push(record);
+      // Ring buffer to prevent unbounded localStorage growth (retain last 100 sessions)
+      if (list.length > 100) {
+        list = list.slice(-100);
+      }
+      localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(list));
+    } catch (_) {}
+  }
+
+  function callUpdateMastery(bucket, key, ok, ms, confidence, attemptAt) {
+    if (!key) return;
+    var b = bucket || 'speaking';
+    var isOk = !!ok;
+    var latMs = Math.max(300, Math.min(120000, Number(ms) || 3500));
+    var at = Number(attemptAt) || Date.now();
+
+    var appState = (typeof root.__getFiezelState === 'function') ? root.__getFiezelState() : (root.state || null);
+    if (appState && !appState[b]) {
+      appState[b] = {};
+    }
+
+    if (typeof root.updateMastery === 'function') {
+      try {
+        root.updateMastery(b, key, isOk, latMs, confidence || null, at);
+        return;
+      } catch (_) {}
+    }
+
+    // Secondary fallback to 'grammar' bucket if 'speaking' bucket is not configured
+    if (b !== 'grammar' && typeof root.updateMastery === 'function') {
+      try {
+        root.updateMastery('grammar', key, isOk, latMs, confidence || null, at);
+      } catch (_) {}
+    }
+  }
+
+  function callBktRecord(lessonId, ok, kappa, boost) {
+    var lid = String(lessonId || '').trim();
+    if (!lid) return;
+    var isOk = !!ok;
+    var k = Number.isFinite(Number(kappa)) ? Math.max(0, Math.min(1, Number(kappa))) : (isOk ? 0.6 : 0.35);
+    var b = Number.isFinite(Number(boost)) ? Math.max(1, Math.min(1.5, Number(boost))) : 1.2;
+
+    var bktFn = (typeof root.bktRecord === 'function')
+      ? root.bktRecord
+      : (typeof bktRecord === 'function' ? bktRecord : null);
+
+    if (typeof bktFn === 'function') {
+      try {
+        bktFn({ lessonSkill: lid, skill: lid }, isOk, k, b);
+        return;
+      } catch (_) {}
+    }
+
+    // Direct update via FiezelMasteryBKT if bktRecord not exported on root
+    var BKT = root.FiezelMasteryBKT || (typeof self !== 'undefined' ? self.FiezelMasteryBKT : null);
+    if (BKT && typeof BKT.update === 'function') {
+      try {
+        var BKT_KEY = 'fiezel-mastery-bkt-v1';
+        var raw = localStorage.getItem(BKT_KEY);
+        var currentSt = raw ? JSON.parse(raw) : null;
+        var updated = BKT.update(currentSt, { lesson: lid, correct: isOk, weight: k * b }, Date.now());
+        if (updated) {
+          localStorage.setItem(BKT_KEY, JSON.stringify(updated));
+        }
+      } catch (_) {}
+    }
+  }
+
+  function callMisconceptionRecord(conceptId, hint, ok) {
+    var cid = String(conceptId || '').trim();
+    if (!cid) return;
+    var isOk = !!ok;
+    var miscFn = (typeof root.misconceptionLedgerRecord === 'function')
+      ? root.misconceptionLedgerRecord
+      : (typeof misconceptionLedgerRecord === 'function' ? misconceptionLedgerRecord : null);
+
+    var q = {
+      id: 'kaiwa:' + cid,
+      target: cid,
+      lessonSkill: cid,
+      skill: cid,
+      conceptId: cid,
+      type: 'speaking'
+    };
+
+    var diagnosis = {
+      misconception: hint && hint.id ? String(hint.id) : '',
+      timing: 'normal'
+    };
+
+    if (typeof miscFn === 'function') {
+      try {
+        miscFn(null, q, diagnosis, isOk);
+        return;
+      } catch (_) {}
+    }
+
+    // Direct update via FiezelMisconceptionLedger
+    var Ledger = root.FiezelMisconceptionLedger || (typeof self !== 'undefined' ? self.FiezelMisconceptionLedger : null);
+    if (Ledger && typeof Ledger.update === 'function') {
+      try {
+        var LEDGER_KEY = 'fiezel-misconception-ledger-v1';
+        var raw = localStorage.getItem(LEDGER_KEY);
+        var currentLedger = raw ? JSON.parse(raw) : null;
+        var updated = Ledger.update(currentLedger, {
+          concept: cid,
+          family: 'speaking',
+          misconception: diagnosis.misconception,
+          correct: isOk,
+          timing: 'normal',
+          sessionId: 'chat_' + Date.now()
+        }, Date.now());
+        if (updated) {
+          localStorage.setItem(LEDGER_KEY, JSON.stringify(updated));
+        }
+      } catch (_) {}
+    }
+  }
+
+  // Dispatch real telemetry for a conversational turn (chat text or voice call turn)
+  function dispatchSpeakingTurnTelemetry(userText, scenarioId, hint, isVoice) {
+    var cleanText = String(userText || '').trim();
+    if (!cleanText) return;
+
+    var sid = scenarioId || state.scenarioId || 'free';
+    var isJa = (state.course === 'ja');
+    var conceptId = (isJa ? 'ja_kaiwa_' : 'en_kaiwa_') + sid;
+    var fluencyConcept = (isJa ? 'ja_speaking_fluency' : 'en_speaking_fluency');
+
+    var hasMisconception = !!hint;
+    var isOk = !hasMisconception;
+    var latencyMs = isVoice ? 2800 : 4500;
+
+    // 1. updateMastery with actual ok status and speaking bucket
+    callUpdateMastery('speaking', conceptId, isOk, latencyMs, null, Date.now());
+    callUpdateMastery('speaking', fluencyConcept, isOk, latencyMs, null, Date.now());
+
+    // 2. bktRecord with Bayesian Knowledge Tracing credibility weight
+    // Correct speech has higher credibility (kappa 0.60), erroneous speech has weaker (kappa 0.35)
+    var kappa = isOk ? 0.6 : 0.35;
+    callBktRecord(conceptId, isOk, kappa, 1.2);
+    callBktRecord(fluencyConcept, isOk, kappa, 1.1);
+
+    // 3. Misconception Ledger
+    callMisconceptionRecord(conceptId, hint, isOk);
+
+    // 4. Calculate word count and record turn to fzc_chat_history_v1 (Zero-Loss)
+    var wordCount = isJa
+      ? Math.max(1, Math.round(cleanText.replace(/\s+/g, '').length / 2.5))
+      : Math.max(1, cleanText.split(/\s+/).filter(Boolean).length);
+
+    saveChatHistoryRecord({
+      id: 'turn_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+      type: 'turn',
+      course: state.course,
+      scenarioId: sid,
+      isVoice: !!isVoice,
+      userText: cleanText, // Zero-Loss State: exact student utterance preserved
+      ok: isOk,
+      misconception: hint ? hint.id : null,
+      wordsSpoken: wordCount,
+      timestamp: Date.now()
+    });
+
+    // 5. XP syncing
+    var appState = (typeof root.__getFiezelState === 'function') ? root.__getFiezelState() : (root.state || null);
+    if (appState && typeof appState.xp === 'number') {
+      appState.xp += (isOk ? 5 : 2);
+      if (typeof root.save === 'function') {
+        try { root.save(); } catch (_) {}
+      }
+    }
+  }
+
+  // Backward-compatible alias for existing callers
+  function dispatchBraincoreTelemetry(userText) {
+    var hint = checkMisconception(userText, state.course);
+    dispatchSpeakingTurnTelemetry(userText, state.scenarioId, hint, false);
+  }
+
+  // Dispatch real telemetry for Shadowing & Pronunciation practice
+  function dispatchShadowingTelemetry(evalRes, xpGain, targetText, msgId) {
+    if (!evalRes) return;
+    try {
+      var isJa = (state.course === 'ja');
+      var conceptId = isJa ? 'ja_speaking_shadowing' : 'en_speaking_shadowing';
+      var isPassed = !!evalRes.passed;
+      var score = Number(evalRes.score) || 0;
+      var heardText = String(evalRes.heard || '').trim();
+
+      // 1. updateMastery with actual passed status
+      callUpdateMastery('speaking', conceptId, isPassed, 4000, null, Date.now());
+
+      // 2. bktRecord: graduated credibility based on score accuracy
+      var kappa = score >= 85 ? 0.6 : (score >= 60 ? 0.45 : 0.3);
+      callBktRecord(conceptId, isPassed, kappa, 1.25);
+
+      // 3. Misconception Ledger: record phonetic gap if failed
+      var diag = isPassed ? null : { id: 'shadowing_mismatch', title: 'Pelafalan belum selaras' };
+      callMisconceptionRecord(conceptId, diag, isPassed);
+
+      // 4. Save to fzc_chat_history_v1 without falsifying data (Zero-Loss)
+      saveChatHistoryRecord({
+        id: 'shadow_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+        type: 'shadowing',
+        course: state.course,
+        scenarioId: state.scenarioId,
+        msgId: msgId || null,
+        targetText: targetText || '',
+        heardText: heardText, // Exact learner utterance heard
+        score: score,
+        passed: isPassed,
+        timestamp: Date.now()
+      });
+
+      // 5. XP syncing
+      var earnedXp = typeof xpGain === 'number' ? xpGain : (isPassed ? 10 : 3);
+      var appState = (typeof root.__getFiezelState === 'function') ? root.__getFiezelState() : (root.state || null);
+      if (appState && typeof appState.xp === 'number') {
+        appState.xp += earnedXp;
+        if (typeof root.save === 'function') {
+          try { root.save(); } catch (_) {}
+        }
+      }
+    } catch (_) {}
+  }
+
+  // Record Phone Call Session to fzc_chat_history_v1 and Braincore
+  function recordCallSession(summary) {
+    if (!summary || typeof summary !== 'object') return null;
+
+    var course = summary.course || state.course || 'ja';
+    var scenarioId = summary.scenarioId || state.scenarioId || 'free';
+    var durationSec = Math.max(1, Number(summary.durationSeconds) || 1);
+    var turns = Math.max(0, Number(summary.turns ?? summary.turnCount ?? summary.turnsCount) || 0);
+    var wordsSpoken = Math.max(0, Number(summary.wordsSpoken) || 0);
+
+    // Compute fluency pace: Words Per Minute (WPM)
+    var fluencyPace = Number.isFinite(Number(summary.fluencyPace)) && Number(summary.fluencyPace) > 0
+      ? Number(summary.fluencyPace)
+      : Math.round((wordsSpoken / durationSec) * 60);
+
+    var utterances = Array.isArray(summary.userUtterances) ? summary.userUtterances : [];
+    var transcriptSnippet = utterances.map(function (u) {
+      return typeof u === 'string' ? u : (u && u.text ? u.text : '');
+    }).filter(Boolean).join(' | ');
+
+    var callRecord = {
+      id: 'call_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+      type: 'voice_call',
+      course: course,
+      scenarioId: scenarioId,
+      durationSeconds: durationSec,
+      turns: turns,
+      turnsCount: turns,
+      wordsSpoken: wordsSpoken,
+      fluencyPace: fluencyPace,
+      userUtterances: utterances,
+      transcriptSnippet: transcriptSnippet,
+      interruptedCount: Number(summary.interruptedCount) || 0,
+      timestamp: Date.now()
+    };
+
+    saveChatHistoryRecord(callRecord);
+
+    // Braincore session telemetry
+    var callSkill = (course === 'ja' ? 'ja_kaiwa_call_' : 'en_kaiwa_call_') + scenarioId;
+    var callOk = turns > 0;
+    callUpdateMastery('speaking', callSkill, callOk, durationSec * 1000, null, Date.now());
+    callBktRecord(callSkill, callOk, 0.6, 1.3);
+
+    return callRecord;
+  }
+
+  function getFluencyStats() {
+    var history = getChatHistory();
+    var calls = history.filter(function (h) { return h && h.type === 'voice_call'; });
+    var totalDuration = 0;
+    var totalTurns = 0;
+    var totalWords = 0;
+    var paceSum = 0;
+    for (var i = 0; i < calls.length; i++) {
+      totalDuration += Number(calls[i].durationSeconds) || 0;
+      totalTurns += Number(calls[i].turns) || 0;
+      totalWords += Number(calls[i].wordsSpoken) || 0;
+      paceSum += Number(calls[i].fluencyPace) || 0;
+    }
+    var avgPace = calls.length > 0 ? Math.round(paceSum / calls.length) : 0;
+    return {
+      callCount: calls.length,
+      totalDurationSeconds: totalDuration,
+      totalTurns: totalTurns,
+      totalWordsSpoken: totalWords,
+      averageFluencyPace: avgPace,
+      recentCalls: calls.slice(-10)
+    };
+  }
+
+  // Request AI Reply for text or voice turn
+  function requestReply(text, scenarioId, course, options) {
+    var c = course || state.course || 'ja';
+    var sid = scenarioId || state.scenarioId || 'free';
+    var trimmed = String(text || '').trim();
+    var sc = getScenario(sid) || (SCENARIOS[c] && SCENARIOS[c][0]) || SCENARIOS.ja[0];
+    var isPhone = isPhoneModeActive(options, sid);
+
+    var prompt = '';
+    if (c === 'ja') {
+      if (isPhone) {
+        prompt = 'Kamu adalah Fiezel-chan (フィゼル), sahabat akrab penutur asli Jepang yang sedang asyik saling menelepon dengan murid layaknya teman yang saling telfonan.\n' +
+          'Konteks telepon: ' + sc.title + ' (' + sc.desc + '). Level murid: JLPT ' + getLearnerLevel() + '.\n' +
+          'User input: "' + trimmed + '".\n' +
+          'ATURAN KETAT MODE TELEPONAN:\n' +
+          '1. Balas dengan nada super akrab layaknya teman dekat yang sedang telfonan santai (bukan robot kaku).\n' +
+          '2. Sisipkan interjeksi alami telepon bahasa Jepang yang bersahabat (contoh:「うんうん、わかるよ！」「へえ、そうなんだ！美味しそうだね！」「えっ、本当に？詳しく聞かせて！」「もしもし！元気にしてた？」).\n' +
+          '3. Jawab SANGAT RINGKAS (tepat 1-2 kalimat saja) agar percakapan telepon tetap cepat dan dinamis.\n' +
+          '4. WAJIB diakhiri 1 pertanyaan pancingan santai agar percakapan terus mengalir dua arah tanpa jeda canggung.\n' +
+          '5. Sertakan furigana dengan format [Kanji](bacaan) untuk setiap kanji.\n' +
+          '6. Berikan terjemahan bahasa Indonesia yang santai dan akurat.';
+      } else {
+        prompt = 'Kamu adalah Fiezel-chan (フィゼル), sahabat percakapan bahasa Jepang yang hangat dan seru di Tokyo.\n' +
+          'Konteks situasi: ' + sc.title + ' (' + sc.desc + '). Level murid: JLPT ' + getLearnerLevel() + '.\n' +
+          'User input: "' + trimmed + '".\n' +
+          'ATURAN KETAT:\n' +
+          '1. Jawab seperti teman akrab dalam 1-2 kalimat bahasa Jepang yang alami, ramah, dan tidak kaku.\n' +
+          '2. Sisipkan tanggapan hangat/interjeksi santai (seperti「うんうん、わかるよ！」「へえ、そうなんだ！」「えっ、本当に？」) dan akhiri dengan pertanyaan pancingan santai.\n' +
+          '3. Sertakan furigana dengan format [Kanji](bacaan) untuk setiap kanji.\n' +
+          '4. Berikan terjemahan bahasa Indonesia yang jelas.';
+      }
+    } else {
+      if (isPhone) {
+        prompt = 'You are Fiezel Coach Alex, a close friend currently catching up over a phone call.\n' +
+          'Scenario: ' + sc.title + '. Learner level: CEFR ' + getLearnerLevel() + '.\n' +
+          'User input: "' + trimmed + '".\n' +
+          'STRICT PHONE CALL RULES:\n' +
+          '1. Speak casually like close buddies chatting on the phone (never sound robotic or stiff).\n' +
+          '2. Use natural conversational phone interjections (e.g. "Haha I totally get that!", "Oh really? That sounds super fun!", "No way, tell me more!", "Hey there! How\'s your day going?").\n' +
+          '3. Keep it CONCISE (strictly 1-2 sentences) so the conversation stays snappy.\n' +
+          '4. MUST end with a casual follow-up prompt question so the conversation keeps flowing naturally without awkward pauses.\n' +
+          '5. Provide a natural Indonesian translation.';
+      } else {
+        prompt = 'You are Fiezel Coach Alex, a warm, upbeat English conversational partner and close buddy.\n' +
+          'Scenario: ' + sc.title + '. Learner level: CEFR ' + getLearnerLevel() + '.\n' +
+          'User input: "' + trimmed + '".\n' +
+          'Reply naturally in 1-2 friendly English sentences like a buddy, use conversational interjections, end with a casual prompt question, and provide an Indonesian translation.';
+      }
+    }
+
+    var aiPromise = null;
+    if (typeof root.askFiezelAIResult === 'function') {
+      try {
+        aiPromise = root.askFiezelAIResult(prompt, 'question', {
+          question: trimmed,
+          level: getLearnerLevel(),
+          lessonId: 'kaiwa_' + sid
+        });
+      } catch (_) {
+        aiPromise = null;
+      }
+    }
+
+    if (!aiPromise) {
+      return Promise.resolve(generateOfflineReply(trimmed, sid, c, { isPhoneCall: isPhone }));
+    }
+
+    return aiPromise.then(function (result) {
+      if (result && result.text && !result.degraded) {
+        return {
+          text: result.text,
+          furigana: c === 'ja' ? result.text : null,
+          romaji: null,
+          translation: t('chat_ai_direct', 'Jawaban langsung dari AI Partner FIEZEL.'),
+          grammarNote: t('chat_ai_note', 'Latihan percakapan responsif real-time.'),
+          suggestions: (sc.starter && sc.starter.suggestions) ? sc.starter.suggestions : []
+        };
+      }
+      return generateOfflineReply(trimmed, sid, c, { isPhoneCall: isPhone });
+    }).catch(function () {
+      return generateOfflineReply(trimmed, sid, c, { isPhoneCall: isPhone });
+    });
+  }
+
+  // Handle User Message Submission
+  function sendMessage(text) {
+    var trimmed = String(text || '').trim();
+    if (!trimmed || state.isThinking) return;
+
+    var reqScenarioId = state.scenarioId;
+
+    // Zero-Loss Input: preserve exact student utterance
+    var hint = checkMisconception(trimmed, state.course);
+    var userMsg = {
+      id: 'msg-user-' + Date.now(),
+      role: 'user',
+      text: trimmed,
+      hint: hint
+    };
+
+    state.messages.push(userMsg);
+    state.scenarioHistories[state.scenarioId] = state.messages;
+    state.isThinking = true;
+    saveState();
+    updateUI();
+    scrollBottom();
+
+    dispatchSpeakingTurnTelemetry(trimmed, reqScenarioId, hint, false);
+
+    requestReply(trimmed, reqScenarioId, state.course).then(function (replyObj) {
+      deliverAssistantReply(replyObj, reqScenarioId);
+    });
+  }
+
+  // Record completed turn from voice call mode
+  function recordTurn(userText, replyObj, scenarioId) {
+    if (!userText && !replyObj) return;
+    var targetSid = scenarioId || state.scenarioId;
+    var histKey = (state.course || 'ja') + '_' + targetSid;
+    var targetMsgs = (targetSid === state.scenarioId) ? state.messages : (state.scenarioHistories[histKey] || state.scenarioHistories[targetSid] || []);
+
+    if (userText && String(userText).trim()) {
+      var trimmedUser = String(userText).trim();
+      var hint = checkMisconception(trimmedUser, state.course);
+      var userMsg = {
+        id: 'msg-user-voice-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
+        role: 'user',
+        text: trimmedUser,
+        hint: hint,
+        isVoice: true
+      };
+      targetMsgs.push(userMsg);
+      dispatchSpeakingTurnTelemetry(trimmedUser, targetSid, hint, true);
+    }
+
+    if (replyObj && replyObj.text) {
+      var asstMsg = {
+        id: 'msg-asst-voice-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
+        role: 'assistant',
+        text: replyObj.text,
+        furigana: replyObj.furigana || null,
+        romaji: replyObj.romaji || null,
+        translation: replyObj.translation || '',
+        grammarNote: replyObj.grammarNote || null,
+        suggestions: replyObj.suggestions || [],
+        isVoice: true,
+        showTranslation: false
+      };
+      targetMsgs.push(asstMsg);
+    }
+
+    if (targetSid === state.scenarioId) {
+      state.messages = targetMsgs;
+    }
+    state.scenarioHistories[histKey] = targetMsgs;
+    state.scenarioHistories[targetSid] = targetMsgs;
+    saveState();
+    if (typeof document !== 'undefined') {
+      updateUI();
+      scrollBottom();
+    }
+  }
+
+  // Sync entire voice call turns into chat history (Zero-Loss State)
+  function syncVoiceCallTurns(turns, scenarioId) {
+    if (!Array.isArray(turns) || turns.length === 0) return;
+    var targetSid = scenarioId || state.scenarioId;
+    var histKey = (state.course || 'ja') + '_' + targetSid;
+    var targetMsgs = (targetSid === state.scenarioId) ? state.messages : (state.scenarioHistories[histKey] || state.scenarioHistories[targetSid] || []);
+
+    var modified = false;
+    for (var i = 0; i < turns.length; i++) {
+      var turn = turns[i];
+      if (!turn) continue;
+
+      var userText = turn.userText ? String(turn.userText).trim() : '';
+      var replyObj = turn.reply;
+
+      var alreadyExists = false;
+      if (userText) {
+        for (var j = targetMsgs.length - 1; j >= Math.max(0, targetMsgs.length - 15); j--) {
+          if (targetMsgs[j].role === 'user' && targetMsgs[j].text === userText) {
+            alreadyExists = true;
+            break;
+          }
+        }
+      }
+
+      if (!alreadyExists) {
+        if (userText) {
+          var hint = checkMisconception(userText, state.course);
+          targetMsgs.push({
+            id: 'msg-user-voice-' + (turn.timestamp || Date.now()) + '-' + i,
+            role: 'user',
+            text: userText,
+            hint: hint,
+            isVoice: true
+          });
+          dispatchSpeakingTurnTelemetry(userText, targetSid, hint, true);
+          modified = true;
+        }
+
+        if (replyObj && replyObj.text) {
+          targetMsgs.push({
+            id: 'msg-asst-voice-' + (turn.timestamp || Date.now()) + '-' + i,
+            role: 'assistant',
+            text: replyObj.text,
+            furigana: replyObj.furigana || null,
+            romaji: replyObj.romaji || null,
+            translation: replyObj.translation || '',
+            grammarNote: replyObj.grammarNote || null,
+            suggestions: replyObj.suggestions || [],
+            isVoice: true,
+            showTranslation: false
+          });
+          modified = true;
+        }
+      }
+    }
+
+    if (modified) {
+      if (targetSid === state.scenarioId) {
+        state.messages = targetMsgs;
+      } else {
+        state.scenarioId = targetSid;
+        state.messages = targetMsgs;
+      }
+      state.scenarioHistories[histKey] = targetMsgs;
+      state.scenarioHistories[targetSid] = targetMsgs;
+      saveState();
+      updateUI();
+      scrollBottom();
+    }
+  }
+
+  // Trigger Two-Way Voice Call mode
+  function startVoiceCall(options) {
+    stopVoice();
+    unlockAudioContext();
+    var course = state.course || 'ja';
+    var partnerName = course === 'ja' ? 'フィゼル先生' : 'Coach Alex';
+    var partnerAvatar = course === 'ja'
+      ? icon('sensei', { size: 24, filled: true })
+      : icon('coach', { size: 24, filled: true });
+    var scenarioId = state.scenarioId || 'free';
+
+    var opts = Object.assign({
+      partnerName: partnerName,
+      partnerAvatar: partnerAvatar,
+      course: course,
+      scenarioId: scenarioId
+    }, options || {});
+
+    var VoiceCall = root.FiezelVoiceCall;
+    if (VoiceCall && (typeof VoiceCall.startCall === 'function' || typeof VoiceCall.start === 'function')) {
+      var startFn = typeof VoiceCall.startCall === 'function' ? VoiceCall.startCall : VoiceCall.start;
+      try {
+        if (typeof VoiceCall.on === 'function') {
+          if (typeof VoiceCall.off === 'function') VoiceCall.off('end', recordCallSession);
+          VoiceCall.on('end', recordCallSession);
+        }
+        return startFn.call(VoiceCall, opts);
+      } catch (err) {
+        if (typeof console !== 'undefined' && console.warn) {
+          console.warn('[FiezelInteractiveChat] startCall error:', err);
+        }
+      }
+    }
+
+    if (typeof root.openLiveVoiceStage === 'function') {
+      try {
+        return root.openLiveVoiceStage(opts);
+      } catch (_) {}
+    }
+    toggleSpeechRecognition();
+  }
+
+  function deliverAssistantReply(replyObj, reqScenarioId) {
+    state.isThinking = false;
+    var assistantMsg = {
+      id: 'msg-asst-' + Date.now(),
+      role: 'assistant',
+      text: replyObj.text,
+      furigana: replyObj.furigana,
+      romaji: replyObj.romaji,
+      translation: replyObj.translation,
+      grammarNote: replyObj.grammarNote,
+      suggestions: replyObj.suggestions || [],
+      showTranslation: false
+    };
+
+    // Anti-Race: If user switched scenario while waiting, save into target scenario history without polluting current screen
+    if (reqScenarioId && reqScenarioId !== state.scenarioId) {
+      var targetHistory = state.scenarioHistories[reqScenarioId] || [];
+      targetHistory.push(assistantMsg);
+      state.scenarioHistories[reqScenarioId] = targetHistory;
+      saveState();
+      return;
+    }
+
+    state.messages.push(assistantMsg);
+    state.scenarioHistories[state.scenarioId] = state.messages;
+    saveState();
+    updateUI();
+    scrollBottom();
+
+    // Auto-speak assistant response in conversational partner mode
+    if (state.autoVoice !== false) {
+      speakAssistantMessage(assistantMsg);
+    }
+  }
+
+  // Shadowing Audio Stream & Visualizer State
+  var shadowingAudioStream = null;
+  var shadowingAudioCtx = null;
+  var shadowingAnalyser = null;
+  var shadowingRafId = null;
+  var shadowingSpeechDetected = false;
+  var shadowingSpeechEnergy = 0;
+  var shadowingSpeechDecayTimer = null;
+
+  function triggerShadowingSpeechActivity(energyBoost) {
+    shadowingSpeechDetected = true;
+    var b = typeof energyBoost === 'number' ? energyBoost : 0.9;
+    shadowingSpeechEnergy = Math.max(shadowingSpeechEnergy, b);
+    if (shadowingSpeechDecayTimer) clearTimeout(shadowingSpeechDecayTimer);
+    shadowingSpeechDecayTimer = setTimeout(function () {
+      shadowingSpeechDetected = false;
+    }, 850);
+  }
+
+  function stopShadowingAudio() {
+    if (shadowingRafId) {
+      if (typeof cancelAnimationFrame === 'function') cancelAnimationFrame(shadowingRafId);
+      else clearTimeout(shadowingRafId);
+      shadowingRafId = null;
+    }
+    if (shadowingSpeechDecayTimer) {
+      clearTimeout(shadowingSpeechDecayTimer);
+      shadowingSpeechDecayTimer = null;
+    }
+    shadowingSpeechDetected = false;
+    shadowingSpeechEnergy = 0;
+    if (shadowingAudioStream) {
+      try {
+        shadowingAudioStream.getTracks().forEach(function (tr) { tr.stop(); });
+      } catch (_) {}
+      shadowingAudioStream = null;
+    }
+    if (shadowingAudioCtx && shadowingAudioCtx.state !== 'closed' && shadowingAudioCtx !== root.__fiezelSharedAudioContext) {
+      try { shadowingAudioCtx.close(); } catch (_) {}
+      shadowingAudioCtx = null;
+    }
+    shadowingAnalyser = null;
+  }
+
+  function runShadowingVisualizerLoop(msgId) {
+    if (shadowingRafId) {
+      if (typeof cancelAnimationFrame === 'function') cancelAnimationFrame(shadowingRafId);
+      else clearTimeout(shadowingRafId);
+      shadowingRafId = null;
+    }
+
+    var freqData = shadowingAnalyser ? new Uint8Array(shadowingAnalyser.frequencyBinCount) : null;
+
+    function loop() {
+      if (state.shadowingMsgId !== msgId) {
+        stopShadowingAudio();
+        return;
+      }
+
+      var isVoiceDetected = false;
+      var avg = 0;
+
+      if (shadowingAnalyser && freqData) {
+        try {
+          shadowingAnalyser.getByteFrequencyData(freqData);
+          var sum = 0;
+          for (var i = 0; i < freqData.length; i++) {
+            sum += freqData[i];
+          }
+          avg = sum / (freqData.length || 1);
+          if (avg > 9) {
+            isVoiceDetected = true;
+            shadowingSpeechEnergy = Math.max(shadowingSpeechEnergy, Math.min(1, avg / 55));
+          }
+        } catch (_) {}
+      }
+
+      if (shadowingSpeechDetected || shadowingSpeechEnergy > 0.12) {
+        isVoiceDetected = true;
+      }
+
+      // Smooth decay of speech energy
+      shadowingSpeechEnergy = Math.max(0, shadowingSpeechEnergy * 0.94);
+
+      var box = document.getElementById('fzcShadowBoxActive');
+      var eqContainer = document.getElementById('fzcShadowLiveEq');
+      var statusPill = document.getElementById('fzcShadowStatusPill');
+
+      if (box) {
+        box.classList.toggle('is-speaking-detected', isVoiceDetected);
+      }
+
+      if (statusPill) {
+        if (isVoiceDetected) {
+          statusPill.classList.add('is-detecting');
+          statusPill.innerHTML = '● ' + t('chat_shadow_hearing_voice', 'Mendengar suaramu...');
+        } else {
+          statusPill.classList.remove('is-detecting');
+          statusPill.innerHTML = t('chat_shadow_waiting_voice', 'Menunggu suaramu...');
+        }
+      }
+
+      if (eqContainer) {
+        var bars = eqContainer.querySelectorAll('.fzc-eq-bar');
+        if (bars && bars.length > 0) {
+          var now = Date.now();
+          for (var b = 0; b < bars.length; b++) {
+            var h = 4;
+            if (isVoiceDetected) {
+              if (shadowingAnalyser && freqData && avg > 9) {
+                var binVal = freqData[b % freqData.length] || 0;
+                h = Math.max(4, Math.min(22, Math.round(binVal * 0.22) + 4));
+              } else {
+                // Kinetic soundwave algorithm for SpeechRecognition and iOS WebKit audio sessions
+                var wave = Math.sin((now / 110) + (b * 1.35)) * 0.5 + 0.5;
+                h = Math.round(4 + (shadowingSpeechEnergy * (14 * wave + 4)));
+                h = Math.max(4, Math.min(22, h));
+              }
+            }
+            bars[b].style.height = h + 'px';
+          }
+        }
+      }
+
+      shadowingRafId = requestAnimationFrame(loop);
+    }
+
+    shadowingRafId = requestAnimationFrame(loop);
+  }
+
+  function startShadowingAudioVisualizer(msgId) {
+    stopShadowingAudio();
+    runShadowingVisualizerLoop(msgId);
+
+    var isIOS = (typeof navigator !== 'undefined') && (
+      /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+    );
+
+    // On iOS WebKit, running getUserMedia simultaneously with webkitSpeechRecognition locks AVAudioSession.
+    // SpeechRecognition events drive the kinetic visualizer cleanly without hardware collision.
+    if (isIOS) return;
+
+    if (!navigator.mediaDevices || typeof navigator.mediaDevices.getUserMedia !== 'function') return;
+
+    navigator.mediaDevices.getUserMedia({ audio: true })
+      .then(function (stream) {
+        if (state.shadowingMsgId !== msgId) {
+          try { stream.getTracks().forEach(function (tr) { tr.stop(); }); } catch (_) {}
+          return;
+        }
+        shadowingAudioStream = stream;
+        var AudioCtx = root.AudioContext || root.webkitAudioContext;
+        if (!AudioCtx) return;
+
+        shadowingAudioCtx = root.__fiezelSharedAudioContext || new AudioCtx();
+        root.__fiezelSharedAudioContext = shadowingAudioCtx;
+        if (shadowingAudioCtx.state === 'suspended') {
+          shadowingAudioCtx.resume().catch(function () {});
+        }
+
+        shadowingAnalyser = shadowingAudioCtx.createAnalyser();
+        shadowingAnalyser.fftSize = 64;
+        shadowingAnalyser.smoothingTimeConstant = 0.55;
+
+        var source = shadowingAudioCtx.createMediaStreamSource(stream);
+        source.connect(shadowingAnalyser);
+
+        runShadowingVisualizerLoop(msgId);
+      })
+      .catch(function (streamErr) {
+        console.warn('[FiezelShadowing] Microphone stream visualizer fallback to speech engine:', streamErr);
+      });
+  }
+
+  // Shadowing & Pronunciation Practice Mode
+  function startShadowing(msgId, targetText) {
+    var Ctor = root.SpeechRecognition || root.webkitSpeechRecognition;
+    if (!Ctor) {
+      if (typeof root.showToast === 'function') {
+        root.showToast(t('chat_no_mic_shadow', 'Browser belum mendukung pengenalan suara untuk latihan pelafalan.'));
+      }
+      return;
+    }
+
+    if (state.recognition) {
+      try { state.recognition.stop(); } catch (_) {}
+      state.recognition = null;
+    }
+    stopShadowingAudio();
+
+    if (state.shadowingMsgId === msgId) {
+      state.shadowingMsgId = null;
+      updateUI();
+      return;
+    }
+
+    stopVoice();
+    state.isListening = false;
+    state.shadowingMsgId = msgId;
+    updateUI();
+    scrollBottom();
+    startShadowingAudioVisualizer(msgId);
+
+    try {
+      var rec = new Ctor();
+      rec.lang = state.course === 'ja' ? 'ja-JP' : 'en-US';
+      rec.continuous = false;
+      rec.interimResults = true;
+
+      rec.onaudiostart = function () {
+        triggerShadowingSpeechActivity(0.5);
+      };
+      rec.onsoundstart = function () {
+        triggerShadowingSpeechActivity(0.8);
+      };
+      rec.onspeechstart = function () {
+        triggerShadowingSpeechActivity(1.0);
+      };
+      rec.onspeechend = function () {
+        if (shadowingSpeechDecayTimer) clearTimeout(shadowingSpeechDecayTimer);
+        shadowingSpeechDecayTimer = setTimeout(function () {
+          shadowingSpeechDetected = false;
+        }, 400);
+      };
+
+      rec.onresult = function (event) {
+        triggerShadowingSpeechActivity(1.0);
+        var interimTranscript = '';
+        var finalTranscript = '';
+
+        if (event.results) {
+          for (var r = event.resultIndex; r < event.results.length; r++) {
+            var res = event.results[r];
+            if (res && res[0]) {
+              if (res.isFinal) {
+                finalTranscript += res[0].transcript;
+              } else {
+                interimTranscript += res[0].transcript;
+              }
+            }
+          }
+        }
+
+        var liveTranscriptEl = document.getElementById('fzcShadowLiveTranscript');
+        if (liveTranscriptEl && interimTranscript) {
+          liveTranscriptEl.textContent = '"' + interimTranscript + '"';
+        }
+
+        if (finalTranscript) {
+          stopShadowingAudio();
+          state.shadowingMsgId = null;
+          state.recognition = null;
+
+          var evalRes = evaluatePronunciation(targetText, finalTranscript, state.course);
+          for (var i = 0; i < state.messages.length; i++) {
+            if (state.messages[i].id === msgId) {
+              state.messages[i].shadowResult = evalRes;
+              break;
+            }
+          }
+          var xpGain = evalRes.score >= 85 ? 15 : (evalRes.score >= 60 ? 8 : 3);
+          dispatchShadowingTelemetry(evalRes, xpGain, targetText, msgId);
+          saveState();
+          updateUI();
+          scrollBottom();
+        }
+      };
+
+      rec.onerror = function (event) {
+        stopShadowingAudio();
+        state.shadowingMsgId = null;
+        state.recognition = null;
+        updateUI();
+        if (event && event.error === 'not-allowed') {
+          var VoiceCall = root.FiezelVoiceCall;
+          if (VoiceCall && typeof VoiceCall.showMicPermissionModal === 'function') {
+            VoiceCall.showMicPermissionModal(function () {
+              startShadowing(msgId, targetText);
+            });
+          }
+        }
+      };
+
+      rec.onend = function () {
+        stopShadowingAudio();
+        if (state.shadowingMsgId === msgId) {
+          state.shadowingMsgId = null;
+          state.recognition = null;
+          updateUI();
+        }
+      };
+
+      state.recognition = rec;
+      rec.start();
+    } catch (_) {
+      stopShadowingAudio();
+      state.shadowingMsgId = null;
+      state.recognition = null;
+      updateUI();
+    }
+  }
+
+  // Speech Recognition (Voice Input in Input Dock)
+  function toggleSpeechRecognition() {
+    var Ctor = root.SpeechRecognition || root.webkitSpeechRecognition;
+    if (!Ctor) {
+      if (typeof root.showToast === 'function') {
+        root.showToast(t('chat_no_mic', 'Browser ini belum mendukung pengenal suara langsung. Silakan ketik pertanyaanmu.'));
+      }
+      return;
+    }
+
+    if (state.isListening && state.recognition) {
+      try { state.recognition.stop(); } catch (_) {}
+      state.isListening = false;
+      updateUI();
+      return;
+    }
+
+    try {
+      var rec = new Ctor();
+      rec.lang = state.course === 'ja' ? 'ja-JP' : 'en-US';
+      rec.continuous = false;
+      rec.interimResults = false;
+
+      rec.onstart = function () {
+        state.isListening = true;
+        updateUI();
+      };
+
+      rec.onresult = function (event) {
+        var transcript = '';
+        if (event.results && event.results[0] && event.results[0][0]) {
+          transcript = event.results[0][0].transcript;
+        }
+        state.isListening = false;
+        state.recognition = null;
+        updateUI();
+        if (transcript) {
+          var input = document.getElementById('fzcInput');
+          if (input) input.value = transcript;
+          sendMessage(transcript);
+        }
+      };
+
+      rec.onerror = function (event) {
+        state.isListening = false;
+        state.recognition = null;
+        updateUI();
+        if (event && event.error === 'not-allowed') {
+          var VoiceCall = root.FiezelVoiceCall;
+          if (VoiceCall && typeof VoiceCall.showMicPermissionModal === 'function') {
+            VoiceCall.showMicPermissionModal(function () {
+              toggleSpeechRecognition();
+            });
+          }
+        }
+      };
+
+      rec.onend = function () {
+        state.isListening = false;
+        state.recognition = null;
+        updateUI();
+      };
+
+      state.recognition = rec;
+      rec.start();
+    } catch (_) {
+      state.isListening = false;
+      updateUI();
+    }
+  }
+
+  function scrollBottom(immediate) {
+    if (typeof document === 'undefined') return;
+    setTimeout(function () {
+      if (typeof document === 'undefined') return;
+      var feed = document.getElementById('fzcFeed');
+      if (feed) {
+        if (immediate) {
+          feed.scrollTop = feed.scrollHeight;
+        } else if (typeof feed.scrollTo === 'function') {
+          feed.scrollTo({ top: feed.scrollHeight, behavior: 'smooth' });
+        } else {
+          feed.scrollTop = feed.scrollHeight;
+        }
+      }
+    }, 30);
+  }
+
+  // --- HTML Rendering ---
+  function renderMarkup() {
+    var course = state.course;
+    var scList = SCENARIOS[course] || SCENARIOS.ja;
+    var currentSc = getScenario(state.scenarioId);
+    var level = getLearnerLevel();
+    var partnerName = course === 'ja' ? 'フィゼル先生' : 'Coach Alex';
+
+    var partnerAvatar = course === 'ja'
+      ? icon('sensei', { size: 24, filled: true, className: 'fzc-avatar-svg' })
+      : icon('coach', { size: 24, filled: true, className: 'fzc-avatar-svg' });
+
+    var partnerSub = course === 'ja'
+      ? t('chat_partner_sub_ja', 'Partner Percakapan Jepang • Fiezel-sensei')
+      : t('chat_partner_sub_en', 'Native English Speaking Partner');
+
+    // Scenario Carousel
+    var chipsHtml = scList.map(function (sc) {
+      var isActive = sc.id === state.scenarioId ? ' is-active' : '';
+      return '<button type="button" class="fzc-scenario-chip fzc-scenario-pill' + isActive + '" data-scenario="' + sc.id + '">' +
+        '<span class="fzc-scenario-chip-icon">' + icon(sc.icon, { size: 16 }) + '</span> <span class="fzc-scenario-chip-title">' + esc(sc.title) + '</span>' +
+        '</button>';
+    }).join('');
+
+    // Scenario Mission Checkpoints Tracker
+    var currentGoals = evaluateGoalProgress(currentSc, state.messages);
+    var doneCount = currentGoals.filter(function (g) { return g.done; }).length;
+    var totalGoals = currentGoals.length;
+    var goalsHtml = '';
+    if (totalGoals > 0) {
+      var goalItems = currentGoals.map(function (g) {
+        var doneClass = g.done ? ' is-done' : '';
+        return '<div class="fzc-goal-item' + doneClass + '">' +
+          '<span class="fzc-goal-check">' + (g.done ? icon('check', { size: 12, strokeWidth: 2.5, color: '#FFFFFF' }) : '') + '</span>' +
+          '<span>' + esc(g.text) + '</span>' +
+          '</div>';
+      }).join('');
+      var bonusTag = doneCount === totalGoals
+        ? '<span class="fzc-goal-bonus-tag">' + icon('trophy', { size: 13, className: 'fzc-inline-icon' }) + ' ' + t('chat_all_goals_done', 'Target Lengkap (+25 XP)') + '</span>'
+        : '<span>' + doneCount + '/' + totalGoals + ' ' + t('chat_goals_done', 'Target Selesai') + '</span>';
+
+      goalsHtml = (
+        '<div class="fzc-goals-container">' +
+        '<div class="fzc-goals-header">' +
+        '<span class="fzc-goals-title">' + icon('target', { size: 15, className: 'fzc-inline-icon' }) + ' ' + t('chat_scenario_goals', 'Target Percakapan Skenario') + '</span>' +
+        bonusTag +
+        '</div>' +
+        '<div class="fzc-goals-list">' + goalItems + '</div>' +
+        '</div>'
+      );
+    }
+
+    // Messages
+    var msgsHtml = state.messages.map(function (msg, idx) {
+      if (msg.role === 'user') {
+        var hintHtml = msg.hint ? (
+          '<div class="fzc-user-hint">' +
+          '<strong>' + icon('lightbulb', { size: 14, className: 'fzc-inline-icon' }) + ' ' + esc(msg.hint.title) + ':</strong> ' + esc(msg.hint.desc) +
+          '</div>'
+        ) : '';
+        return '<div class="fzc-msg-row is-user">' +
+          '<div class="fzc-msg-box">' +
+          '<div class="fzc-bubble fzc-bubble-user fzc-message-text">' + esc(msg.text) + '</div>' +
+          hintHtml +
+          '</div>' +
+          '</div>';
+      }
+
+      // Assistant Message
+      var displayText = msg.furigana ? formatFurigana(msg.furigana) : esc(msg.text);
+      var romajiHtml = msg.romaji ? '<span class="fzc-romaji">' + esc(msg.romaji) + '</span>' : '';
+      var isTranslateHidden = msg.showTranslation ? '' : ' is-hidden';
+      var isPlaying = state.audioPlayingId === msg.id ? ' is-playing' : '';
+      var isShadowing = state.shadowingMsgId === msg.id ? ' is-shadowing' : '';
+
+      var revealHtml = (
+        '<div class="fzc-reveal-box fzc-translation-box' + isTranslateHidden + '" id="fzcReveal-' + msg.id + '">' +
+        '<div class="fzc-trans-text"><strong>' + icon('translate', { size: 14, className: 'fzc-inline-icon' }) + ' ' + t('chat_lbl_meaning', 'Arti') + ':</strong> ' + esc(msg.translation) + '</div>' +
+        (msg.grammarNote ? '<div class="fzc-grammar-note"><strong>' + icon('lightbulb', { size: 14, className: 'fzc-inline-icon' }) + ' ' + t('chat_lbl_grammar', 'Catatan Tata Bahasa') + ':</strong> ' + esc(msg.grammarNote) + '</div>' : '') +
+        '</div>'
+      );
+
+      // Shadowing evaluation badge if present
+      var shadowResultHtml = '';
+      if (msg.shadowResult) {
+        var sRes = msg.shadowResult;
+        var sBoxClass = sRes.score >= 85 ? ' is-perfect' : (sRes.score >= 60 ? ' is-good' : ' is-retry');
+        var sBadgeIcon = sRes.score >= 85
+          ? icon('sparkles', { size: 14, className: 'fzc-inline-icon' })
+          : (sRes.score >= 60 ? icon('check-circle', { size: 14, className: 'fzc-inline-icon' }) : icon('shadowing', { size: 14, className: 'fzc-inline-icon' }));
+        var sTitle = sRes.score >= 85
+          ? t('chat_shadow_title_perfect', 'Luar Biasa!')
+          : (sRes.score >= 60 ? t('chat_shadow_title_good', 'Bagus!') : t('chat_shadow_title_retry', 'Terus Latih!'));
+        var sXp = sRes.score >= 85 ? 15 : (sRes.score >= 60 ? 8 : 3);
+
+        var evalTokens = (Array.isArray(sRes.tokens) && sRes.tokens.length > 0)
+          ? sRes.tokens
+          : tokenizeAndCompare(msg.text, sRes.heard, state.course);
+
+        var tokensHtml = '';
+        if (Array.isArray(evalTokens) && evalTokens.length > 0) {
+          var tokenItems = evalTokens.map(function (tk) {
+            if (tk.status === 'correct') {
+              return '<span class="fzc-token is-correct" title="' + esc(t('chat_token_correct', 'Pengucapan tepat')) + '">' +
+                '<span class="fzc-token-surface">' + esc(tk.surface) + '</span>' +
+                '<span class="fzc-token-check" aria-hidden="true">' + icon('check', { size: 10, strokeWidth: 2.5 }) + '</span>' +
+                '</span>';
+            } else {
+              var guideHtml = tk.guide ? '<span class="fzc-token-guide">' + esc(tk.guide) + '</span>' : '';
+              return '<span class="fzc-token is-missed" title="' + esc(t('chat_token_missed', 'Perlu dilatih')) + '">' +
+                guideHtml +
+                '<span class="fzc-token-surface">' + esc(tk.surface) + '</span>' +
+                '</span>';
+            }
+          }).join('');
+
+          tokensHtml = (
+            '<div class="fzc-shadow-compare">' +
+            '<div class="fzc-shadow-compare-label">' + t('chat_token_compare_lbl', 'Komparasi Pelafalan Kata per Kata:') + '</div>' +
+            '<div class="fzc-shadow-tokens-row">' + tokenItems + '</div>' +
+            '</div>'
+          );
+        }
+
+        shadowResultHtml = (
+          '<div class="fzc-shadow-box' + sBoxClass + '">' +
+          '<div class="fzc-shadow-header">' +
+          '<span class="fzc-shadow-badge">' + sBadgeIcon + ' ' + sTitle + ' ' + sRes.score + '% ' + t('chat_lbl_accuracy', 'Akurasi') + '</span>' +
+          '<span class="fzc-shadow-xp">+' + sXp + ' XP</span>' +
+          '</div>' +
+          tokensHtml +
+          '<div class="fzc-shadow-heard">' +
+          '<span class="fzc-shadow-heard-lbl">' + t('chat_lbl_heard', 'Terdengar') + ':</span> ' +
+          '<span class="fzc-shadow-heard-val">"' + esc(sRes.heard) + '"</span>' +
+          '</div>' +
+          '</div>'
+        );
+      } else if (state.shadowingMsgId === msg.id) {
+        shadowResultHtml = (
+          '<div class="fzc-shadow-box is-listening" id="fzcShadowBoxActive">' +
+          '<div class="fzc-shadow-header">' +
+          '<span class="fzc-shadow-badge"><span class="fzc-shadow-pulse-dot"></span> ' + t('chat_shadow_speak_now', 'Ucapkan kalimat ini sekarang...') + '</span>' +
+          '<div class="fzc-shadow-live-eq" id="fzcShadowLiveEq">' +
+          '<span class="fzc-eq-bar" style="height: 6px;"></span>' +
+          '<span class="fzc-eq-bar" style="height: 10px;"></span>' +
+          '<span class="fzc-eq-bar" style="height: 16px;"></span>' +
+          '<span class="fzc-eq-bar" style="height: 12px;"></span>' +
+          '<span class="fzc-eq-bar" style="height: 18px;"></span>' +
+          '<span class="fzc-eq-bar" style="height: 8px;"></span>' +
+          '<span class="fzc-eq-bar" style="height: 5px;"></span>' +
+          '</div>' +
+          '</div>' +
+          '<div class="fzc-shadow-live-status">' +
+          '<span class="fzc-shadow-status-pill" id="fzcShadowStatusPill">' + t('chat_shadow_waiting_voice', 'Menunggu suaramu...') + '</span>' +
+          '<div class="fzc-shadow-live-transcript" id="fzcShadowLiveTranscript"></div>' +
+          '</div>' +
+          '</div>'
+        );
+      }
+
+      // Suggestions (only on latest assistant message)
+      var suggestionsHtml = '';
+      if (idx === state.messages.length - 1 && Array.isArray(msg.suggestions) && msg.suggestions.length > 0) {
+        var chips = msg.suggestions.map(function (sg) {
+          return '<button type="button" class="fzc-suggestion-chip fzc-chip" data-send="' + esc(sg.text) + '">' +
+            '<strong class="fzc-chip-main">' + esc(sg.text) + '</strong>' +
+            '<span>' + esc(sg.translation || sg.romaji || '') + '</span>' +
+            '</button>';
+        }).join('');
+        suggestionsHtml = '<div class="fzc-suggestions-row">' + chips + '</div>';
+      }
+
+      var hasSuggestionsClass = suggestionsHtml ? ' has-suggestions' : '';
+      return '<div class="fzc-msg-row is-assistant' + hasSuggestionsClass + '">' +
+        '<div class="fzc-msg-box' + hasSuggestionsClass + '">' +
+        '<div class="fzc-bubble fzc-bubble-ai fzc-japanese-text">' +
+        '<span class="fzc-message-text">' + displayText + '</span>' +
+        romajiHtml +
+        revealHtml +
+        '</div>' +
+        '<div class="fzc-actions-bar">' +
+        '<button type="button" class="fzc-action-btn' + isPlaying + '" data-action="audio" data-id="' + msg.id + '" data-text="' + esc(msg.text) + '" aria-label="' + esc(t('chat_aria_listen', 'Dengarkan Suara')) + '">' +
+        '<span class="fzc-btn-icon-wrap">' + icon(isPlaying ? 'soundwave' : 'volume', { size: 14 }) + '</span> ' +
+        '<span class="fzc-btn-lbl">' + (isPlaying ? t('chat_act_playing', 'Memutar...') : t('chat_act_listen', 'Dengar')) + '</span>' +
+        '</button>' +
+        '<button type="button" class="fzc-action-btn" data-action="translate" data-id="' + msg.id + '" aria-label="' + esc(t('chat_aria_trans', 'Buka Terjemahan')) + '">' +
+        '<span class="fzc-btn-icon-wrap">' + icon('translate', { size: 14 }) + '</span> ' +
+        '<span>' + t('chat_act_trans', 'Arti') + '</span>' +
+        '</button>' +
+        '<button type="button" class="fzc-action-btn' + isShadowing + '" data-action="shadow" data-id="' + msg.id + '" data-text="' + esc(msg.text) + '" aria-label="' + esc(t('chat_aria_shadow', 'Latih Ucapkan')) + '">' +
+        '<span class="fzc-btn-icon-wrap">' + icon('shadowing', { size: 14 }) + '</span> ' +
+        '<span>' + (isShadowing ? t('chat_act_listening', 'Mendengarkan...') : t('chat_act_shadow', 'Shadowing')) + '</span>' +
+        '</button>' +
+        '</div>' +
+        shadowResultHtml +
+        suggestionsHtml +
+        '</div>' +
+        '</div>';
+    }).join('');
+
+    // Typing Row
+    var typingHtml = state.isThinking ? (
+      '<div class="fzc-msg-row is-assistant">' +
+      '<div class="fzc-typing-row">' +
+      '<span>' + partnerName + ' ' + t('chat_is_typing', 'sedang mengetik') + '</span>' +
+      '<span class="fzc-dot-pulse"><span></span><span></span><span></span></span>' +
+      '</div>' +
+      '</div>'
+    ) : '';
+
+    var micActive = state.isListening ? ' is-listening' : '';
+    var inputPlaceholder = course === 'ja'
+      ? t('chat_placeholder_ja', 'Ketik dalam bahasa Jepang (kana/romaji) atau klik mic...')
+      : t('chat_placeholder_en', 'Type your message in English or speak...');
+    var callBtnIcon = icon('phone-call', { size: 18 });
+
+    return (
+      '<section class="fade fzc-container fzc-chat-wrapper">' +
+      '<div class="fzc-header">' +
+      '<div class="fzc-partner-bar">' +
+      '<div class="fzc-partner-meta">' +
+      '<div class="fzc-avatar-wrap">' +
+      partnerAvatar +
+      '<span class="fzc-online-pulse"></span>' +
+      '</div>' +
+      '<div class="fzc-partner-info">' +
+      '<h2><span class="fzc-partner-name">' + esc(partnerName) + '</span> <span class="fzc-badge-level">' + esc(level) + '</span></h2>' +
+      '<p class="fzc-partner-sub">' + esc(partnerSub) + '</p>' +
+      '</div>' +
+      '</div>' +
+      '<div class="fzc-header-actions">' +
+      '<button type="button" class="fzc-btn-call" id="fzcBtnCall" aria-label="' + esc(t('chat_call_mode_aria', 'Panggil Mode Telepon')) + '">' +
+      '<span class="fzc-call-icon">' + callBtnIcon + '</span> <span class="fzc-call-text">' + t('chat_call_mode_btn', 'Panggilan') + '</span>' +
+      '</button>' +
+      '<button type="button" class="fzc-btn-reset" id="fzcBtnReset" title="' + esc(t('chat_reset_btn', 'Mulai Ulang')) + '" aria-label="' + esc(t('chat_reset_btn', 'Mulai Ulang')) + '"><span class="fzc-reset-icon">' + icon('reload', { size: 14 }) + '</span></button>' +
+      '</div>' +
+      '</div>' +
+      '<div class="fzc-scenarios-rail" id="fzcScenariosRail">' +
+      chipsHtml +
+      '</div>' +
+      '</div>' +
+
+      '<div class="fzc-feed" id="fzcFeed">' +
+      '<div class="fzc-scenario-card">' +
+      '<div class="fzc-scenario-card-head">' +
+      '<span class="fzc-scenario-card-icon">' + icon(currentSc.icon || currentSc.id, { size: 20 }) + '</span> <span>' + esc(currentSc.title) + ' (' + esc(currentSc.label || currentSc.title) + ')</span>' +
+      '</div>' +
+      '<p class="fzc-scenario-card-desc">' + esc(currentSc.desc) + '</p>' +
+      goalsHtml +
+      '</div>' +
+      msgsHtml +
+      typingHtml +
+      '</div>' +
+
+      '<div class="fzc-dock">' +
+      '<form class="fzc-dock-form" id="fzcForm">' +
+      '<button type="button" class="fzc-btn-icon fzc-btn-mic' + micActive + '" id="fzcBtnMic" aria-label="' + esc(t('chat_mic_aria', 'Bicara lewat Mikrofon')) + '">' +
+      icon(state.isListening ? 'mic-active' : 'mic', { size: 18 }) +
+      '</button>' +
+      '<input type="text" class="fzc-input" id="fzcInput" placeholder="' + esc(inputPlaceholder) + '" autocomplete="off" enterkeyhint="send">' +
+      '<button type="submit" class="fzc-btn-icon fzc-btn-send" id="fzcBtnSend" aria-label="' + esc(t('chat_send_aria', 'Kirim Pesan')) + '">' +
+      icon('send', { size: 16 }) +
+      '</button>' +
+      '</form>' +
+      '</div>' +
+      '</section>'
+    );
+  }
+
+  function bindEvents(container) {
+    if (!container) return;
+
+    // Web Audio Autoplay Policy: unlock on initial touch/click
+    container.addEventListener('click', unlockAudioContext, { passive: true });
+    container.addEventListener('touchstart', unlockAudioContext, { passive: true });
+
+    // Call Mode CTA
+    var callBtn = container.querySelector('#fzcBtnCall');
+    if (callBtn) {
+      callBtn.onclick = function () {
+        unlockAudioContext();
+        return startVoiceCall();
+      };
+    }
+
+    // Reset Chat
+    var resetBtn = container.querySelector('#fzcBtnReset');
+    if (resetBtn) {
+      resetBtn.onclick = function () {
+        resetCurrentScenario();
+      };
+    }
+
+    // Switch Scenario
+    container.querySelectorAll('.fzc-scenario-chip').forEach(function (btn) {
+      btn.onclick = function () {
+        unlockAudioContext();
+        var sid = btn.getAttribute('data-scenario');
+        if (sid && sid !== state.scenarioId) {
+          initScenario(sid);
+          saveState();
+          updateUI();
+        }
+      };
+    });
+
+    // Form Submit
+    var form = container.querySelector('#fzcForm');
+    var input = container.querySelector('#fzcInput');
+    var sendBtn = container.querySelector('#fzcBtnSend');
+    function doSubmit(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      unlockAudioContext();
+      var val = input ? input.value : '';
+      if (val && val.trim()) {
+        input.value = '';
+        sendMessage(val);
+      }
+    }
+    if (form) form.onsubmit = doSubmit;
+    if (sendBtn) sendBtn.onclick = doSubmit;
+
+    // Mic Button
+    var micBtn = container.querySelector('#fzcBtnMic');
+    if (micBtn) {
+      micBtn.onclick = function () {
+        unlockAudioContext();
+        toggleSpeechRecognition();
+      };
+    }
+
+    // Suggestion Chips
+    container.querySelectorAll('.fzc-suggestion-chip').forEach(function (btn) {
+      btn.onclick = function () {
+        unlockAudioContext();
+        var text = btn.getAttribute('data-send');
+        if (text) sendMessage(text);
+      };
+    });
+
+    // Actions (Audio, Translate, Shadowing)
+    container.querySelectorAll('.fzc-action-btn').forEach(function (btn) {
+      btn.onclick = function () {
+        unlockAudioContext();
+        var act = btn.getAttribute('data-action');
+        var mid = btn.getAttribute('data-id');
+        if (act === 'audio') {
+          var tAudio = btn.getAttribute('data-text');
+          playVoice(tAudio, mid);
+        } else if (act === 'translate') {
+          var targetMsg = null;
+          for (var i = 0; i < state.messages.length; i++) {
+            if (state.messages[i].id === mid) {
+              targetMsg = state.messages[i];
+              break;
+            }
+          }
+          if (targetMsg) {
+            targetMsg.showTranslation = !targetMsg.showTranslation;
+            var box = container.querySelector('#fzcReveal-' + mid);
+            if (box) box.classList.toggle('is-hidden', !targetMsg.showTranslation);
+          }
+        } else if (act === 'shadow') {
+          var tShadow = btn.getAttribute('data-text');
+          startShadowing(mid, tShadow);
+        }
+      };
+    });
+  }
+
+  function updateUI() {
+    var doc = getDoc();
+    if (!doc) return;
+    var mountPoint = doc.getElementById('app');
+    if (!mountPoint) return;
+    mountPoint.innerHTML = renderMarkup();
+    bindEvents(mountPoint);
+    if (typeof root.enhanceUI === 'function') {
+      try { root.enhanceUI(); } catch (_) {}
+    }
+  }
+
+  // --- Public API ---
+  var api = {
+    mount: function (el) {
+      loadState();
+      if (typeof document !== 'undefined') {
+        if (document.documentElement) document.documentElement.classList.add('fz-view-chat');
+        if (document.body) {
+          document.body.classList.add('fz-view-chat');
+          var bn = document.querySelector('.bottomnav');
+          if (bn) bn.style.setProperty('display', 'none', 'important');
+        }
+      }
+      var mountPoint = el || document.getElementById('app');
+      if (mountPoint) {
+        mountPoint.innerHTML = renderMarkup();
+        bindEvents(mountPoint);
+        scrollBottom(true);
+      }
+      if (typeof root.enhanceUI === 'function') {
+        try { root.enhanceUI(); } catch (_) {}
+      }
+    },
+    unmount: function () {
+      stopVoice();
+      stopShadowingAudio();
+      if (typeof document !== 'undefined') {
+        var micModal = document.getElementById('fzcMicModal');
+        if (micModal) micModal.remove();
+        if (document.documentElement) document.documentElement.classList.remove('fz-view-chat');
+        if (document.body) {
+          document.body.classList.remove('fz-view-chat');
+          var bn = document.querySelector('.bottomnav');
+          if (bn) bn.style.removeProperty('display');
+        }
+      }
+    },
+    sendMessage: sendMessage,
+    requestReply: requestReply,
+    recordTurn: recordTurn,
+    syncVoiceCallTurns: syncVoiceCallTurns,
+    startVoiceCall: startVoiceCall,
+    renderMarkup: renderMarkup,
+    bindEvents: bindEvents,
+    isPhoneScenario: isPhoneScenario,
+    isPhoneModeActive: isPhoneModeActive,
+    initScenario: initScenario,
+    resetCurrentScenario: resetCurrentScenario,
+    getState: function () { return state; },
+    formatFurigana: formatFurigana,
+    parseFuriganaRuby: formatFurigana,
+    checkMisconception: checkMisconception,
+    detectMisconception: function (text, course) {
+      var m = checkMisconception(text, course);
+      if (!m) return null;
+      return {
+        id: m.id,
+        type: m.id === 'particle_wa_ha' ? 'particle_wa_vs_ha' : m.id,
+        title: m.title,
+        desc: m.desc,
+        tip: m.desc
+      };
+    },
+    evaluatePronunciation: evaluatePronunciation,
+    evaluateGoalProgress: evaluateGoalProgress,
+    generateOfflineReply: generateOfflineReply,
+    generateOfflineFallback: generateOfflineReply,
+    getScenarios: function (course) {
+      return SCENARIOS[course] || SCENARIOS.ja;
+    },
+    createInitialState: function (course, scenarioId) {
+      var scList = SCENARIOS[course] || SCENARIOS.ja;
+      var sc = scList.find(function (s) { return s.id === scenarioId; }) || scList[0];
+      return {
+        course: course,
+        activeScenarioId: sc.id,
+        messages: [{
+          id: 'init-1',
+          role: 'assistant',
+          text: sc.starter.text,
+          furigana: sc.starter.furigana || null,
+          romaji: sc.starter.romaji || null,
+          translation: sc.starter.translation,
+          grammarNote: sc.starter.grammarNote || null,
+          suggestions: sc.starter.suggestions || []
+        }]
+      };
+    },
+    appendUserMessage: function (st, rawText) {
+      var clean = String(rawText || '').trim();
+      var msgs = (st.messages || []).slice();
+      msgs.push({
+        id: 'user-' + Date.now(),
+        role: 'user',
+        text: clean
+      });
+      return Object.assign({}, st, { messages: msgs });
+    },
+    appendAssistantMessage: function (st, resp) {
+      var msgs = (st.messages || []).slice();
+      msgs.push({
+        id: 'assistant-' + Date.now(),
+        role: 'assistant',
+        text: resp.text,
+        furigana: resp.furigana || null,
+        romaji: resp.romaji || null,
+        translation: resp.translation || '',
+        grammarNote: resp.grammarNote || null,
+        suggestions: resp.suggestions || []
+      });
+      return Object.assign({}, st, { messages: msgs });
+    },
+    speakAssistantMessage: speakAssistantMessage,
+    playVoice: playVoice,
+    stopVoice: stopVoice,
+    speakViaWebSpeech: speakViaWebSpeech,
+    selectVoice: selectVoice,
+    unlockAudioContext: unlockAudioContext,
+    getChatHistory: getChatHistory,
+    saveChatHistoryRecord: saveChatHistoryRecord,
+    recordCallSession: recordCallSession,
+    getFluencyStats: getFluencyStats,
+    dispatchSpeakingTurnTelemetry: dispatchSpeakingTurnTelemetry,
+    dispatchShadowingTelemetry: dispatchShadowingTelemetry,
+    dispatchBraincoreTelemetry: dispatchBraincoreTelemetry,
+    CHAT_HISTORY_KEY: CHAT_HISTORY_KEY
+  };
+
+  return api;
+}));

@@ -1,0 +1,2862 @@
+{
+  "bundle": "fiezel-android-offline-shell",
+  "version": "m025-595",
+  "generatedAt": "2026-10-17T21:56:55.735Z",
+  "totalFiles": 713,
+  "totalBytes": 50315474,
+  "totalMB": "47.98",
+  "checksums": {
+    "404.html": {
+      "size": 3349,
+      "sha256": "d6f620cd736b4f2b8f82bffa5b3c6440b82e0e00d0b179c5d95bceff3a5227aa"
+    },
+    "app.js": {
+      "size": 1670523,
+      "sha256": "e1cd42a7e14684766364930dbf00de1869453cce02f1990ac6b0be41f0ccbdfc"
+    },
+    "apple-touch-icon.png": {
+      "size": 16294,
+      "sha256": "4586aed5135900550e9ed321e2354d59ebe8da09176e502ca529ee8d9c7e190f"
+    },
+    "assets/audio/sfx/answer_correct_perfect.mp3": {
+      "size": 10673,
+      "sha256": "ecc65c907bc17b144eb1482bdf1d9d53d746a8429cd57659c33d00f4ee34e450"
+    },
+    "assets/audio/sfx/answer_correct_perfect.ogg": {
+      "size": 13460,
+      "sha256": "a01134803139a15b8784973b7a1cdcecba7e6c09dbcc83fafc003e00d54f5811"
+    },
+    "assets/audio/sfx/answer_correct.mp3": {
+      "size": 7885,
+      "sha256": "cc58ca0b22000eaa02cd6666189a222b38a88275d39796a3bb8790d0db01e9b9"
+    },
+    "assets/audio/sfx/answer_correct.ogg": {
+      "size": 10407,
+      "sha256": "8f3b67efcb5565dd955494a8754a3044df6bcd42efecee131a7f5b176b1ca4e6"
+    },
+    "assets/audio/sfx/answer_wrong_retry.mp3": {
+      "size": 4598,
+      "sha256": "f9b8e8aae1c08274fb8e36f08f0d48779860377d378e40f85535758a00d9a4f3"
+    },
+    "assets/audio/sfx/answer_wrong_retry.ogg": {
+      "size": 6953,
+      "sha256": "3a17175a0290562a49244f1f0d58346098b7cdf15ec043284a42903a0021974a"
+    },
+    "assets/audio/sfx/answer_wrong.mp3": {
+      "size": 4233,
+      "sha256": "1060ba84b9ef2ede0ab7944cf7a142e4621c8170e1ec0988c78e95d855934402"
+    },
+    "assets/audio/sfx/answer_wrong.ogg": {
+      "size": 6989,
+      "sha256": "89ae7a26d8e557d55183a574145189a7bebf750951d661377c61271e10d33eac"
+    },
+    "assets/audio/sfx/button_tap.mp3": {
+      "size": 1373,
+      "sha256": "97018a28e4fa8336301f9887df7c2c503974275bc79e8844d6ee55d30fd19207"
+    },
+    "assets/audio/sfx/button_tap.ogg": {
+      "size": 4155,
+      "sha256": "eebdcc3d0c4a83319bf5e45a8c27092aed12d346e932c9ea96abb51d2c1bdfb8"
+    },
+    "assets/audio/sfx/error_system.mp3": {
+      "size": 4416,
+      "sha256": "3474c454dbdef8bc73656590d88b0378c808af96a4676984e8f9a533e70a9f50"
+    },
+    "assets/audio/sfx/error_system.ogg": {
+      "size": 7796,
+      "sha256": "30f96727d53644a43aab9cea9146afbc2e1b30eac7d51d6d50e98f51d6cb49bf"
+    },
+    "assets/audio/sfx/exam_complete.mp3": {
+      "size": 26325,
+      "sha256": "c4169e59329807092912ab15c2d08131c543ca80ae2612ca69da2a595aed93f4"
+    },
+    "assets/audio/sfx/exam_complete.ogg": {
+      "size": 28599,
+      "sha256": "89eeb7bd508d7c8a2f332df4d9f0d8ff404ca327006459dd4c0c83372c87c2f4"
+    },
+    "assets/audio/sfx/exam_pass.mp3": {
+      "size": 16054,
+      "sha256": "a5718cf15d9810576ed951e038a97a3d009cc54a3691b094d1c168883a24a78f"
+    },
+    "assets/audio/sfx/exam_pass.ogg": {
+      "size": 19354,
+      "sha256": "e9fb9a963347dda11b1ea0d15ff10c93139439fa81e7a8d63fe2c14c472ac2fe"
+    },
+    "assets/audio/sfx/exam_result_reveal.mp3": {
+      "size": 15418,
+      "sha256": "cca292d50b00568cdcc0119b4136829384b7811af2644ca71c84177fde22bd71"
+    },
+    "assets/audio/sfx/exam_result_reveal.ogg": {
+      "size": 16080,
+      "sha256": "cc1bac74f3d95facd143bdbc053c422e6d074656506b8cc3fb487025ac40bf94"
+    },
+    "assets/audio/sfx/exam_score_tick.mp3": {
+      "size": 1191,
+      "sha256": "644a3c805c1225cf4f79c91b7cfaa2f8a89524afb01e51bdc1bd3ccd730ec066"
+    },
+    "assets/audio/sfx/exam_score_tick.ogg": {
+      "size": 4061,
+      "sha256": "b5848b3a545503f18b2b845439bad1dc2807f12fec96a647d3ee8a157673c1fb"
+    },
+    "assets/audio/sfx/lesson_complete.mp3": {
+      "size": 17023,
+      "sha256": "191a6c54031b99a4f765be9f003fcf5838caf7ed28f8a5edd563d47cd1336a99"
+    },
+    "assets/audio/sfx/lesson_complete.ogg": {
+      "size": 19686,
+      "sha256": "8b343e4216cb7e2f8bae0664dfd4c2147c8e46c09d87e50ccf3b79a4b3761067"
+    },
+    "assets/audio/sfx/lesson_start.mp3": {
+      "size": 5794,
+      "sha256": "868ff788f25188fd6682120dff780e42e4735397aa115b70682bd72dc71c9abf"
+    },
+    "assets/audio/sfx/lesson_start.ogg": {
+      "size": 7717,
+      "sha256": "9292b4c1404fde05b291b123c57421492b70e8a147908d7751d1ddfd8b1e07fe"
+    },
+    "assets/audio/sfx/level_up.mp3": {
+      "size": 25855,
+      "sha256": "f6db9524f377d0f56d2f97088057d49afb1f0d9f7ca8ebbfe13d0a6ba5f268e4"
+    },
+    "assets/audio/sfx/level_up.ogg": {
+      "size": 28228,
+      "sha256": "67da4580a6ff119c3c22fad98d61f3cfd3862737425fa8611d70afdbd0ed2fda"
+    },
+    "assets/audio/sfx/notif_achievement.mp3": {
+      "size": 11343,
+      "sha256": "c91182d35c1325cf461774221410558beff147e65f986225144ca824ac299e1e"
+    },
+    "assets/audio/sfx/notif_achievement.ogg": {
+      "size": 13471,
+      "sha256": "e7c3b0d296ad54800b5253b57042b18b8d67ab8a81410078a741cd517d551db8"
+    },
+    "assets/audio/sfx/notif_general.mp3": {
+      "size": 5978,
+      "sha256": "d2791a90e753395df1b6c48ae19ca8c15e71ab24d873f0d445e7a6625ec52247"
+    },
+    "assets/audio/sfx/notif_general.ogg": {
+      "size": 7871,
+      "sha256": "ba41d18ac96f5d7f86c5509e6a5f1bd9363a92b58d99818569b46b93f5f38429"
+    },
+    "assets/audio/sfx/notif_streak_reminder.mp3": {
+      "size": 8402,
+      "sha256": "ce278b26bac54375d9b5522b0a68b5dafe2b535d65e450bf4fb162d7d3b66660"
+    },
+    "assets/audio/sfx/notif_streak_reminder.ogg": {
+      "size": 9966,
+      "sha256": "e127660e23a9864ba9d49d82137785600668772c8d81fff07bf457166b23597b"
+    },
+    "assets/audio/sfx/page_transition.mp3": {
+      "size": 4110,
+      "sha256": "95552cf3cb86d3530f03ece2131e68dd8fd52bb29c4b3e79b2dd4e83540965b4"
+    },
+    "assets/audio/sfx/page_transition.ogg": {
+      "size": 6751,
+      "sha256": "8e549346555643a2c156dc77b3248e32f3fa92dce85658134108737a1fc96e3d"
+    },
+    "assets/audio/sfx/paw_appear.mp3": {
+      "size": 6581,
+      "sha256": "834e7a712e106ae4bf78c9fc5083db3ef7bbacf41001c7bb6c9a1cf65a8ada97"
+    },
+    "assets/audio/sfx/paw_appear.ogg": {
+      "size": 9497,
+      "sha256": "d7d6148900f09e4474f06e9ba2d2c49fe066d70c1c0b58fce533eecc8fb4376b"
+    },
+    "assets/audio/sfx/paw_celebrate.mp3": {
+      "size": 15258,
+      "sha256": "d056f97f39743527a3f50fdc9f247f6c50990178b1110a9b4ee4cc71e469cf00"
+    },
+    "assets/audio/sfx/paw_celebrate.ogg": {
+      "size": 19349,
+      "sha256": "b0bcc7dcba2f71a2c1cf51ca3f97af1460ef9a8733ef67d0819cc43289309ab9"
+    },
+    "assets/audio/sfx/paw_encourage.mp3": {
+      "size": 8808,
+      "sha256": "db91d6bd1e3c747740ae667a006e53a184a66477bb1f352aae72848b3a2f17e1"
+    },
+    "assets/audio/sfx/paw_encourage.ogg": {
+      "size": 10735,
+      "sha256": "42918783f7651a16cb24155ae158986041733226dbb1787cb5bb01ca639621c7"
+    },
+    "assets/audio/sfx/paw_greet.mp3": {
+      "size": 8510,
+      "sha256": "e80d863ac612bd07cedb359f62ed824353fdd4c9e7e0dd4e99160f82bcb40e9d"
+    },
+    "assets/audio/sfx/paw_greet.ogg": {
+      "size": 11451,
+      "sha256": "615858c55c340cd26858b34b793976cd8176da540fa6e6e176429fc95dbc0df8"
+    },
+    "assets/audio/sfx/splash_intro.mp3": {
+      "size": 19170,
+      "sha256": "c4ded4e019f972f01fa62987c4e9648e54df6cdbe56b07ee8bf1db4e0240bd02"
+    },
+    "assets/audio/sfx/splash_intro.ogg": {
+      "size": 20991,
+      "sha256": "85454e9a1f6d67554096a400898b9c65534f8e4ec535de94e994745b0ad84471"
+    },
+    "assets/audio/sfx/splash_paw_appear.mp3": {
+      "size": 6581,
+      "sha256": "834e7a712e106ae4bf78c9fc5083db3ef7bbacf41001c7bb6c9a1cf65a8ada97"
+    },
+    "assets/audio/sfx/splash_paw_appear.ogg": {
+      "size": 9497,
+      "sha256": "f86610ca2803edc808aa931298663ee91079b357a26112a52d344c2313587f36"
+    },
+    "assets/audio/sfx/stamp_thud.mp3": {
+      "size": 3245,
+      "sha256": "652976833ad9694ae6c03ce6174e9c5c0072f09f67f7e7363ad6bc31dea852b5"
+    },
+    "assets/audio/sfx/stamp_thud.ogg": {
+      "size": 6230,
+      "sha256": "8f0efd9ffd3901288cc9080da95b02d85aa6c34a1685aa0f41d5954ae65d20cf"
+    },
+    "assets/audio/sfx/streak_10.mp3": {
+      "size": 14729,
+      "sha256": "ebf8a48605ce704b53f415f4a0a9cd67f8b5d12a8b4d875faa6547fc87a6f83e"
+    },
+    "assets/audio/sfx/streak_10.ogg": {
+      "size": 16499,
+      "sha256": "00cbe280e4aeb6ac300d71e4d4a4dea65c50cd502c1ac411a0d94e501912b772"
+    },
+    "assets/audio/sfx/streak_5.mp3": {
+      "size": 9386,
+      "sha256": "f09deb96711d0e4812ab8692d4bf9ab3549a1ec5bdd00c785c1b773b6301ce6b"
+    },
+    "assets/audio/sfx/streak_5.ogg": {
+      "size": 11347,
+      "sha256": "ce273fcf7abc78092ded4e8a742a21b9d4efe76ccb92ff6a2eb6f40e00148bc4"
+    },
+    "assets/audio/sfx/xp_gain.mp3": {
+      "size": 2024,
+      "sha256": "c770a6abcc5a7843f5e27ca8f61798d887148141ed118787fb7419915cf20762"
+    },
+    "assets/audio/sfx/xp_gain.ogg": {
+      "size": 4540,
+      "sha256": "1641be824918997bd8b31af9fb323799c8b5e303578a25bd739bf0a846c3640a"
+    },
+    "assets/brand/BRAND-GUIDE.md": {
+      "size": 8298,
+      "sha256": "8a0666fd2155ef22ee60691a162c2700402b2c724dd58bc402ec461ec18081c0"
+    },
+    "assets/brand/fiezel-ask.svg": {
+      "size": 903,
+      "sha256": "1a902b30c5a6d49124b35f73b7c74830303f7b48e836959a49a02783ba3ddfec"
+    },
+    "assets/brand/fiezel-icon-192.png": {
+      "size": 18036,
+      "sha256": "2fbf57c0ffa359dfa10860c33f911ad106f902e244ebaba4aff811f7954525cd"
+    },
+    "assets/brand/fiezel-icon-512.png": {
+      "size": 98008,
+      "sha256": "a26df44f2c3ed9fa14d8a431e24a0a0df84ef2a7acb7839002ca2aafadebd93e"
+    },
+    "assets/brand/fiezel-icon.svg": {
+      "size": 1776,
+      "sha256": "91f95294d7a2a51b73c6812ff544f5dc8625d832624836fbd0169a0cb7217097"
+    },
+    "assets/brand/fiezel-paw.svg": {
+      "size": 899,
+      "sha256": "2064b3d10991d20cddf8cc595a987f70b20b4711d05b74d3066df037b2420727"
+    },
+    "assets/brand/fiezel-wordmark-mono.svg": {
+      "size": 1089,
+      "sha256": "34fdf022b22a11bed3e4f5425ccc690d1ddcf0a65550244ce651b1eabb650a33"
+    },
+    "assets/brand/fiezel-wordmark.svg": {
+      "size": 1547,
+      "sha256": "c0c8b6ea54d21a9399adaf75761f6f90f3a31bda5ee8167d733e577edea41eb2"
+    },
+    "assets/brand/mascot-checksums.json": {
+      "size": 1657,
+      "sha256": "864368f92b08929800dd846ce3737238ab41003ace81ed726e6bb230eb5c6915"
+    },
+    "assets/brand/mascot/collection/paw_100_manifest.json": {
+      "size": 22828,
+      "sha256": "c31c7e94e641319fd4b514e3000e4f1d60248b9ddc1a7fe472685456199160b5"
+    },
+    "assets/brand/mascot/collection/paw-002-writing-notebook.svg": {
+      "size": 5044,
+      "sha256": "bbb9805ea6ee4af9f57eb2155c1cfbdbdfbed77564f18d1ba8646e8d84658e1b"
+    },
+    "assets/brand/mascot/collection/paw-003-laptop-study.png": {
+      "size": 59736,
+      "sha256": "fbcc8a93ca17e4f199f87af3d392027d2a348382d846c08680429a5d25bfb697"
+    },
+    "assets/brand/mascot/collection/paw-003-laptop-study.svg": {
+      "size": 4652,
+      "sha256": "5b26bb0e3f2ee80cd9741827c62e53168c1c4a7ccb9c68190104b624d8f0a30b"
+    },
+    "assets/brand/mascot/collection/paw-004-listening-music.png": {
+      "size": 70392,
+      "sha256": "3650417499a0a3c0547fa6f266cfc030ccaab7fc41528a8a81b230fe2da98f87"
+    },
+    "assets/brand/mascot/collection/paw-004-listening-music.svg": {
+      "size": 4884,
+      "sha256": "033dd4eb45dc7bde1b759291f6cb2e1ca6a53c33f348d1557cad4aa7e9f0a2b4"
+    },
+    "assets/brand/mascot/collection/paw-005-drinking-coconut.png": {
+      "size": 68036,
+      "sha256": "a7065354bd429aaf3c0e7ca98ac31f03018dfdcf858a0dae652acdbb2dc9f002"
+    },
+    "assets/brand/mascot/collection/paw-005-drinking-coconut.svg": {
+      "size": 4657,
+      "sha256": "21d567ae9d149a8c277a8f7cb985d9259258516a019281f1b1b8cd6b83cd7494"
+    },
+    "assets/brand/mascot/collection/paw-006-drinking-boba.png": {
+      "size": 61361,
+      "sha256": "164b01e6afd3186900eb5534896b615c42157486de0d9be7f49a3351c842fa85"
+    },
+    "assets/brand/mascot/collection/paw-006-drinking-boba.svg": {
+      "size": 4887,
+      "sha256": "dfff13ffeed0fd2a5db58be0559b22c659d34fd12f40ead89d8c42ff22ba61dd"
+    },
+    "assets/brand/mascot/collection/paw-007-eating-ice-cream.png": {
+      "size": 65342,
+      "sha256": "7bcf685f539a7131dd2d1f25e289b06de866e3453e5bc255097cb47787f39e48"
+    },
+    "assets/brand/mascot/collection/paw-007-eating-ice-cream.svg": {
+      "size": 4473,
+      "sha256": "ccbaa428050cdad6b595805872a7e21dbf702e9f5591d2a60fdd6cf65f87fc17"
+    },
+    "assets/brand/mascot/collection/paw-008-school-backpack.png": {
+      "size": 66254,
+      "sha256": "f6f337865d9dcbd2dd55a3dd81c0c3c2323ecf752fe576a776e3864f5c5f7430"
+    },
+    "assets/brand/mascot/collection/paw-008-school-backpack.svg": {
+      "size": 4684,
+      "sha256": "3c99162997ec0d8d3a68dc3110da7ad8be6aa44893277e88b849bbb6a7a33ab0"
+    },
+    "assets/brand/mascot/collection/paw-009-cleaning-desk.png": {
+      "size": 59709,
+      "sha256": "dd673f181d834eff1b0d4ac21f0c6e560fcee92cffa4c9c986583320454adca0"
+    },
+    "assets/brand/mascot/collection/paw-009-cleaning-desk.svg": {
+      "size": 4654,
+      "sha256": "3791fca9e33c41b30b3a031d2735cf89b4cd99c5f6bf685c76cfcea1476b5b08"
+    },
+    "assets/brand/mascot/collection/paw-010-mopping-floor.png": {
+      "size": 65374,
+      "sha256": "1d366f19438d1bf53b5860e78cbbf519d8ef24b1e8ac2a80683b6ecc50bc03dc"
+    },
+    "assets/brand/mascot/collection/paw-010-mopping-floor.svg": {
+      "size": 5016,
+      "sha256": "7b0bbe9733ff9bc8b6ddc5d556329a3a1c864d60e4875f31a0fc383d95cee942"
+    },
+    "assets/brand/mascot/collection/paw-011-vespa-scooter.png": {
+      "size": 80052,
+      "sha256": "a9e8dcb2aaf0d4b5f64ff6fed58c88fd55d8e31a8339c7e326d3451a5da5d9f4"
+    },
+    "assets/brand/mascot/collection/paw-011-vespa-scooter.svg": {
+      "size": 5735,
+      "sha256": "4edaa079909f6063eae4479f052614fb8cfdd8d14609fb81b5e1553e0f09aa03"
+    },
+    "assets/brand/mascot/collection/paw-012-riding-bicycle.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-012-riding-bicycle.svg": {
+      "size": 5055,
+      "sha256": "dcadaaf4594cd07090f22c78b11deb7d5874376a23d38818349c02b898946b2d"
+    },
+    "assets/brand/mascot/collection/paw-013-skateboarding.png": {
+      "size": 71769,
+      "sha256": "bb623fd91cf16fbabed6d6f0acb96a74fc1070449575329d0804f117eb0b8055"
+    },
+    "assets/brand/mascot/collection/paw-013-skateboarding.svg": {
+      "size": 4487,
+      "sha256": "03fdc9bdc607ea890eb12bf33cb267d094bd122c6df1aea886fd9b3f7576227d"
+    },
+    "assets/brand/mascot/collection/paw-014-airport-luggage.png": {
+      "size": 72533,
+      "sha256": "19a7d8bac01041400bc8dac5cf156effb97b26e4f902111fe8152a183730f533"
+    },
+    "assets/brand/mascot/collection/paw-014-airport-luggage.svg": {
+      "size": 4977,
+      "sha256": "485cd438e62ecd5f39d9253b150dbd2539b7438d19aecac6d77a4b9f6181efa4"
+    },
+    "assets/brand/mascot/collection/paw-015-batik-shirt.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-015-batik-shirt.svg": {
+      "size": 4345,
+      "sha256": "d8e100f697eb6e7bef30ffcb9809e6a53a66431c1872a9c6fb96f059003df778"
+    },
+    "assets/brand/mascot/collection/paw-016-bali-traditional.png": {
+      "size": 14624,
+      "sha256": "c618b2bc4aa5887d869e5a254abffa2ec392fb5ab4cbb79eef7216cdbfdbe4b1"
+    },
+    "assets/brand/mascot/collection/paw-016-bali-traditional.svg": {
+      "size": 4373,
+      "sha256": "03628e5d4a3dc0b79ae4558d6056d2aa47840d193cae7b9e15baf0c37a9e688b"
+    },
+    "assets/brand/mascot/collection/paw-017-jawa-beskap.png": {
+      "size": 14666,
+      "sha256": "fd567ba5305e4b92e257a07aa2aa55cba4683ce8a226bc5354964221ef04cc2f"
+    },
+    "assets/brand/mascot/collection/paw-017-jawa-beskap.svg": {
+      "size": 4492,
+      "sha256": "1787f24e1fc2cdd56b5861a5eaeeee7e287ea1e32ef9fdce4dc46decf934f17b"
+    },
+    "assets/brand/mascot/collection/paw-018-sumatra-adat.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-018-sumatra-adat.svg": {
+      "size": 4396,
+      "sha256": "73e4ca47ae5e5365dab6086a7fac241bfb08f207a0af8b9fa2268500ea7ecbf2"
+    },
+    "assets/brand/mascot/collection/paw-019-kalimantan-adat.png": {
+      "size": 64604,
+      "sha256": "be1a1934230bd7dbd032562820eb7ed68f6e15685546f6d8d3f4f19ed4c92668"
+    },
+    "assets/brand/mascot/collection/paw-019-kalimantan-adat.svg": {
+      "size": 4442,
+      "sha256": "4a3306b446de15e7007d5a7220f9119269176b5dc9f971e10cee98689607cee9"
+    },
+    "assets/brand/mascot/collection/paw-020-sulawesi-adat.png": {
+      "size": 71073,
+      "sha256": "8350a65d29515740d3d8c7dc7e51a01e314ea89bc0ff280e59654b02eb420a45"
+    },
+    "assets/brand/mascot/collection/paw-020-sulawesi-adat.svg": {
+      "size": 4332,
+      "sha256": "9946078cbe7e1fcb4d0307d476d72548bdf55c12e906c29f11f30f543d6296fa"
+    },
+    "assets/brand/mascot/collection/paw-021-hawaiian-shirt-shades.png": {
+      "size": 14774,
+      "sha256": "cdb652c0a231c6a7ecc5f202163f90fed70a252e90614c0c73077f7fce02407d"
+    },
+    "assets/brand/mascot/collection/paw-021-hawaiian-shirt-shades.svg": {
+      "size": 4900,
+      "sha256": "1def62ae22cda3215dc645da0bdce8fdd686be5c11e00d9e838b21f4f4889054"
+    },
+    "assets/brand/mascot/collection/paw-022-grass-skirt-hula.png": {
+      "size": 14769,
+      "sha256": "bf666f69f43f266b6f7a5a7a5ea2e92aad83cd9e673af13ab2fafe0aaa55e6cb"
+    },
+    "assets/brand/mascot/collection/paw-022-grass-skirt-hula.svg": {
+      "size": 5041,
+      "sha256": "49cceae4a71c0324727cb39fba85ef79a312c325a3510684b8241ba528e37bee"
+    },
+    "assets/brand/mascot/collection/paw-023-surfing-wave.png": {
+      "size": 91108,
+      "sha256": "d6a5e9d144da308005cc79dd08631b79495e5922f78d7e3c7b24c4031ab86547"
+    },
+    "assets/brand/mascot/collection/paw-023-surfing-wave.svg": {
+      "size": 4749,
+      "sha256": "196807d2476a21ac8825cba88a4998a7b40eac5721758fc92cab8b8fdb317993"
+    },
+    "assets/brand/mascot/collection/paw-024-beach-volleyball.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-024-beach-volleyball.svg": {
+      "size": 4273,
+      "sha256": "b4a2d264a3bc711a53130f10a9311fd060188947df36880bf3a85b48d1cf8844"
+    },
+    "assets/brand/mascot/collection/paw-025-carrying-surfboard.png": {
+      "size": 70506,
+      "sha256": "3a223277824e8de8425a62add157df8f56150590af57975f5a04cc8e16fc35b0"
+    },
+    "assets/brand/mascot/collection/paw-025-carrying-surfboard.svg": {
+      "size": 4272,
+      "sha256": "c3beca07dde017b936c4335c1991b1f524a3810736b3f7ac5f3f413887e4cc1d"
+    },
+    "assets/brand/mascot/collection/paw-026-beach-umbrella-relax.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-026-beach-umbrella-relax.svg": {
+      "size": 4184,
+      "sha256": "4e6f051ed2a4279f2a5800e2ed70efde3e300baa655671a1bd9d2b3bb0c516f5"
+    },
+    "assets/brand/mascot/collection/paw-027-sandcastle-builder.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-027-sandcastle-builder.svg": {
+      "size": 4280,
+      "sha256": "edd7a956aa3d21baad15df8eda3a1f1d7606c271426b19573c3e42fc83ba95df"
+    },
+    "assets/brand/mascot/collection/paw-028-snorkeling-gear.png": {
+      "size": 14644,
+      "sha256": "43a0cbd3a1ae2de917dc6ffd18baf7e079b9a67549c8178e525e865195f23973"
+    },
+    "assets/brand/mascot/collection/paw-028-snorkeling-gear.svg": {
+      "size": 4276,
+      "sha256": "e3b44a23f806955dcdad15cb2737c534e4582e5e3669a70ff0c05ab7f75e2dee"
+    },
+    "assets/brand/mascot/collection/paw-029-beach-walking-sandals.png": {
+      "size": 63388,
+      "sha256": "eb744fa9e35f1f5a3d6e42d0b72a5df64863f08218fbd37801de9ff3ce1ed746"
+    },
+    "assets/brand/mascot/collection/paw-029-beach-walking-sandals.svg": {
+      "size": 4318,
+      "sha256": "f48af9b0bc60065ec003c4599c736926dd542ad5a7ef650756827cb34186e9e9"
+    },
+    "assets/brand/mascot/collection/paw-030-tropical-dancer.png": {
+      "size": 61117,
+      "sha256": "ba9c558a5711a5db3b85c68f3dc5f45c53bf2d7374bd62586bf12e54467de5b1"
+    },
+    "assets/brand/mascot/collection/paw-030-tropical-dancer.svg": {
+      "size": 4289,
+      "sha256": "d11b2b0161ba8f965d2fa29deb496cc1c6cf5869ff18724a0f4598f9c9b576e5"
+    },
+    "assets/brand/mascot/collection/paw-031-running-sportswear.png": {
+      "size": 63296,
+      "sha256": "2056ef791a0f453d2df29da59adcd7b673f84370fe66962eaba6cc1e2ae4e115"
+    },
+    "assets/brand/mascot/collection/paw-031-running-sportswear.svg": {
+      "size": 4230,
+      "sha256": "3ff92503895bcff8afe3236c1726b8e3231000b2058f995993efb6cc2471edbc"
+    },
+    "assets/brand/mascot/collection/paw-032-smartwatch-jogging.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-032-smartwatch-jogging.svg": {
+      "size": 4170,
+      "sha256": "e70eb3d2793d3b22a424952af6841d3cb496ad34eda90503ce5b4bb250cbe6f4"
+    },
+    "assets/brand/mascot/collection/paw-033-soccer-player.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-033-soccer-player.svg": {
+      "size": 4234,
+      "sha256": "6f329f237a8afe772881faaffdb52163f4874c331e4f9c806925302f4585da18"
+    },
+    "assets/brand/mascot/collection/paw-034-basketball-star.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-034-basketball-star.svg": {
+      "size": 4233,
+      "sha256": "fa6d24422e587d103bc129bca5865b7e388f6038c56f65b56da1a33a65ca9b56"
+    },
+    "assets/brand/mascot/collection/paw-035-badminton-player.png": {
+      "size": 68754,
+      "sha256": "0f99896eaefa6e9c60d5c7a509d4012832ac90f575c61935924fe4ba6eb3d5dd"
+    },
+    "assets/brand/mascot/collection/paw-035-badminton-player.svg": {
+      "size": 4301,
+      "sha256": "517bb730e899042b080516a24788295fefc2ed2d32ba222817e57893263281a2"
+    },
+    "assets/brand/mascot/collection/paw-036-tennis-ace.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-036-tennis-ace.svg": {
+      "size": 4307,
+      "sha256": "d63db6ea95d4b7aea78c4fa28006c7965609c03c41f1610fd4bc9003de8e459c"
+    },
+    "assets/brand/mascot/collection/paw-037-table-tennis.png": {
+      "size": 63661,
+      "sha256": "8448541bb5ed8d71ee2c4b33539073e0ba8f4a1675fd99e2c62a834b8f956866"
+    },
+    "assets/brand/mascot/collection/paw-037-table-tennis.svg": {
+      "size": 4236,
+      "sha256": "50f3fb892aa283f31bad98bdea59c7eefce998cda6186ca05e61a9e84c226a30"
+    },
+    "assets/brand/mascot/collection/paw-038-mountain-biking.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-038-mountain-biking.svg": {
+      "size": 4106,
+      "sha256": "1ad8ee398503851fe9ff88d20ca26c31951d1e4c4ca5bc5963ab5bf30f2fc134"
+    },
+    "assets/brand/mascot/collection/paw-039-stretching-yoga.png": {
+      "size": 61437,
+      "sha256": "5158a59e8337a4dae7287fd9f1d96f8111d68f05954961bdce65be5aab76cd4b"
+    },
+    "assets/brand/mascot/collection/paw-039-stretching-yoga.svg": {
+      "size": 4112,
+      "sha256": "1d00ebc2f3ccb002943c1a82ef69f97209ce7467858c7f79d6a37a4ae5b3f6af"
+    },
+    "assets/brand/mascot/collection/paw-040-gold-medal-winner.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-040-gold-medal-winner.svg": {
+      "size": 4322,
+      "sha256": "71db0dbeb8426c7ab9087f49174301c6f62ad056efcb6d69cbf783bf836cb2e1"
+    },
+    "assets/brand/mascot/collection/paw-041-teacher-pointer.png": {
+      "size": 14669,
+      "sha256": "998038f6387603aa485aed36019f600c2dc5f9b32fa4d31a10f11bc547a8f58d"
+    },
+    "assets/brand/mascot/collection/paw-041-teacher-pointer.svg": {
+      "size": 4224,
+      "sha256": "5452a46b2298e79a6a61199d4acc76c669c00cb12e2d2c9776a10f22e17e2c13"
+    },
+    "assets/brand/mascot/collection/paw-042-doctor-stethoscope.png": {
+      "size": 14755,
+      "sha256": "db145ae090256b857972267efcec01ef646ea75afe7f06ce8f9655897d840789"
+    },
+    "assets/brand/mascot/collection/paw-042-doctor-stethoscope.svg": {
+      "size": 4264,
+      "sha256": "9a695e7258bb474464089adfd59fc4edb8cc2d06086ede1cad5035792efeb07f"
+    },
+    "assets/brand/mascot/collection/paw-043-chef-spatula.png": {
+      "size": 14651,
+      "sha256": "7dc2125c169f26bcdc96f3da9cf61b33ee7aef15be86092c6efbcbcc2e59df37"
+    },
+    "assets/brand/mascot/collection/paw-043-chef-spatula.svg": {
+      "size": 4360,
+      "sha256": "70d1438afd592398416b2d0423a2213917fc453cd07fba6aeaf53c9dc7de906f"
+    },
+    "assets/brand/mascot/collection/paw-044-barista-coffee.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-044-barista-coffee.svg": {
+      "size": 4292,
+      "sha256": "e7eb72fc0c10154d0090b319c937ed5ba86cfa572babcf09ab83232c43b7eca8"
+    },
+    "assets/brand/mascot/collection/paw-045-pilot-uniform.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-045-pilot-uniform.svg": {
+      "size": 4298,
+      "sha256": "fc4236c77cf1c4636761e310191d6f0141ce1002cb3ef87500ea823041a0566e"
+    },
+    "assets/brand/mascot/collection/paw-046-flight-attendant.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-046-flight-attendant.svg": {
+      "size": 4216,
+      "sha256": "2a7e045cc7ccf8379727989d8024ae8f0c7e0cb13af82aae8b7f19b4cad68ff4"
+    },
+    "assets/brand/mascot/collection/paw-047-police-officer.png": {
+      "size": 64321,
+      "sha256": "179f2509a65d42b16b6384cfea9a82fa5e11825b4423e58e5746ee62459a19ac"
+    },
+    "assets/brand/mascot/collection/paw-047-police-officer.svg": {
+      "size": 4236,
+      "sha256": "8f1ebf34c6b048701de37624aec17822c5b6fdcba186c653d1df1f9410022421"
+    },
+    "assets/brand/mascot/collection/paw-048-firefighter-hero.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-048-firefighter-hero.svg": {
+      "size": 4288,
+      "sha256": "34ae54f411e66c3263e6fdde1086d4fdd23e56f08a315bbdb85d2e5d6f15fc2a"
+    },
+    "assets/brand/mascot/collection/paw-049-farmer-harvest.png": {
+      "size": 69209,
+      "sha256": "3b7bca65e6abfa58ef20feb3a90d4c06273eef0a03f6727c22132f5de53217b1"
+    },
+    "assets/brand/mascot/collection/paw-049-farmer-harvest.svg": {
+      "size": 4355,
+      "sha256": "fa6464cf61e3eb71ef01f02b03828b708f3c31d9a96fe811ee1b4372d7063135"
+    },
+    "assets/brand/mascot/collection/paw-050-astronaut-spacesuit.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-050-astronaut-spacesuit.svg": {
+      "size": 4355,
+      "sha256": "b8cd41ae0fbf696886c1d060b8f097b7d8c839f209814ef9bafebdff46c0c42c"
+    },
+    "assets/brand/mascot/collection/paw-051-painter-artist.png": {
+      "size": 14669,
+      "sha256": "998038f6387603aa485aed36019f600c2dc5f9b32fa4d31a10f11bc547a8f58d"
+    },
+    "assets/brand/mascot/collection/paw-051-painter-artist.svg": {
+      "size": 4479,
+      "sha256": "d1e512dd40c4f34686a9701fc0cfe33b1dc7e5d7ed270629f1899c90bc135d75"
+    },
+    "assets/brand/mascot/collection/paw-052-photographer.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-052-photographer.svg": {
+      "size": 4302,
+      "sha256": "fb29e46cb5e0d73eebfd9afa4366bd8b071e45dcb84aa4ccd6530bc43596ba14"
+    },
+    "assets/brand/mascot/collection/paw-053-guitar-musician.png": {
+      "size": 66499,
+      "sha256": "e943f92d3fbf36327357fd4174b7c78f716b6e93f73711625128ffd8734fb550"
+    },
+    "assets/brand/mascot/collection/paw-053-guitar-musician.svg": {
+      "size": 4337,
+      "sha256": "a6d7c29725a0b2ba5e2a6ab90deb7ca9bb295c5548e430ac9316583a5ad051d1"
+    },
+    "assets/brand/mascot/collection/paw-054-drummer-beat.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-054-drummer-beat.svg": {
+      "size": 4362,
+      "sha256": "cc2443f5bcb5cfa459ab9d674a894744499998b8e0bf8ca365a347b9f80b2ec8"
+    },
+    "assets/brand/mascot/collection/paw-055-dj-turntable.png": {
+      "size": 68800,
+      "sha256": "77236c5cba00b21eacdfdf7e948a1d4256f1a26ce1b482ae7a613e44942a3afa"
+    },
+    "assets/brand/mascot/collection/paw-055-dj-turntable.svg": {
+      "size": 4339,
+      "sha256": "aeaea126302a917deb337301a3a66a43a0d5e710e94b2edf08ed2ea8f82921e6"
+    },
+    "assets/brand/mascot/collection/paw-056-singer-vocalist.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-056-singer-vocalist.svg": {
+      "size": 4212,
+      "sha256": "64d19244189fad1c9d5c4de6db493577f380e8ed46d9c3f70af53ca43badca84"
+    },
+    "assets/brand/mascot/collection/paw-057-writer-typewriter.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-057-writer-typewriter.svg": {
+      "size": 4311,
+      "sha256": "62154d63412be04ec191a400826df2f638087f3282db013ed62f6415ecd8b054"
+    },
+    "assets/brand/mascot/collection/paw-058-digital-designer.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-058-digital-designer.svg": {
+      "size": 4303,
+      "sha256": "a89a58c667d063ffcfb31fe3ee36a1019e9367de3c7a81001a404dd32c139176"
+    },
+    "assets/brand/mascot/collection/paw-059-filmmaker-director.png": {
+      "size": 62632,
+      "sha256": "d7018b883d421dd87f39c9995ac85f97364f6775d33d4e64e4843cf83c39cca9"
+    },
+    "assets/brand/mascot/collection/paw-059-filmmaker-director.svg": {
+      "size": 4262,
+      "sha256": "9eb6e3fbb0f8c5af03dd1f2a9fcfbe35164f83469c601f2cd45f96e8ce8a6cef"
+    },
+    "assets/brand/mascot/collection/paw-060-mural-street-artist.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-060-mural-street-artist.svg": {
+      "size": 4295,
+      "sha256": "8159525870d2c7d223dce9153c0a965eb9cd66d5fc203cfb49aae9d5d71e7f96"
+    },
+    "assets/brand/mascot/collection/paw-061-explorer-backpack.png": {
+      "size": 68062,
+      "sha256": "97cd85545ec224848f0a11f8fb60f94e6c2a6336f475ba61dfc18b4be78e0c33"
+    },
+    "assets/brand/mascot/collection/paw-061-explorer-backpack.svg": {
+      "size": 4235,
+      "sha256": "dc2c63cf1614053390e3b24fde1fbc465f67fdff454dd65ec2f3a11a2417cf83"
+    },
+    "assets/brand/mascot/collection/paw-062-mountain-climber.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-062-mountain-climber.svg": {
+      "size": 4213,
+      "sha256": "c8ed1fa52bf77fdbb0a723ff6f6029c6165043d2070dba22bc9916ebcee37066"
+    },
+    "assets/brand/mascot/collection/paw-063-camping-bonfire.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-063-camping-bonfire.svg": {
+      "size": 4199,
+      "sha256": "97b173ac2c137f7ffce3032c3b5e1c30579f6f5e069d57c10a89e694aa668932"
+    },
+    "assets/brand/mascot/collection/paw-064-campfire-cooking.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-064-campfire-cooking.svg": {
+      "size": 4188,
+      "sha256": "651e3b8a43bbe492a1a8a3182b579cc03a6e0aff77d36f847ed9a41cd1e539f9"
+    },
+    "assets/brand/mascot/collection/paw-065-compass-map.png": {
+      "size": 14769,
+      "sha256": "bf666f69f43f266b6f7a5a7a5ea2e92aad83cd9e673af13ab2fafe0aaa55e6cb"
+    },
+    "assets/brand/mascot/collection/paw-065-compass-map.svg": {
+      "size": 4302,
+      "sha256": "dcb29d9e892a8a5a8b80e5067bac38c48b6535c92fc3745a81e62f8d08a354ea"
+    },
+    "assets/brand/mascot/collection/paw-066-binoculars-scout.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-066-binoculars-scout.svg": {
+      "size": 4297,
+      "sha256": "67e1619f312dc068b73bd3489c86d2f2be4a5e5c573a056333fc6e191109a864"
+    },
+    "assets/brand/mascot/collection/paw-067-fishing-rod.png": {
+      "size": 69955,
+      "sha256": "ceb0211a9f607c6eb6a02fd6322071ba3bad49d8a248d54163ad771ca803fd2b"
+    },
+    "assets/brand/mascot/collection/paw-067-fishing-rod.svg": {
+      "size": 4174,
+      "sha256": "1453b7e7b15adf453bac8855eee38f31ee77ac571af5463b53ccff1fad2b02ce"
+    },
+    "assets/brand/mascot/collection/paw-068-rowing-boat.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-068-rowing-boat.svg": {
+      "size": 4193,
+      "sha256": "9d3c4cb98f5f68c650817a6493b4d17654deacb7346b4224cd7ecadbb86a8ece"
+    },
+    "assets/brand/mascot/collection/paw-069-pirate-captain.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-069-pirate-captain.svg": {
+      "size": 4170,
+      "sha256": "95b6e7f134057c8001cddd6b303c80bb3fcb5621654717ea1dc54836eff1a40a"
+    },
+    "assets/brand/mascot/collection/paw-070-adventurer-lantern.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-070-adventurer-lantern.svg": {
+      "size": 4220,
+      "sha256": "41e261d03a8a83eecbf375aa2e4ff0831bf22b98f9ca23836ba02f03c4e17ef7"
+    },
+    "assets/brand/mascot/collection/paw-071-futuristic-headset.png": {
+      "size": 64919,
+      "sha256": "bcb3541dab6e38e48cda77ffadbd07cdf117fdef09a2cbe9e88cbeac8257e67d"
+    },
+    "assets/brand/mascot/collection/paw-071-futuristic-headset.svg": {
+      "size": 4237,
+      "sha256": "b5eb1665e2b7060e4260a6ff4c27abd31dff9a2caa50eb153be4bd930e86d1cb"
+    },
+    "assets/brand/mascot/collection/paw-072-coding-developer.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-072-coding-developer.svg": {
+      "size": 4261,
+      "sha256": "979414e2a0e74ba3ba1668c3d3d40cd28e5ff52d4d529dc04e767f134e5c16dd"
+    },
+    "assets/brand/mascot/collection/paw-073-tablet-touch.png": {
+      "size": 57840,
+      "sha256": "dcb1e559731dd0043104b619867a0991264b89ed816d5ab4a45654813277c796"
+    },
+    "assets/brand/mascot/collection/paw-073-tablet-touch.svg": {
+      "size": 4230,
+      "sha256": "2060ddc9bd3a9337d12950252c62588b91d2734fd131929df0a7f17e00445063"
+    },
+    "assets/brand/mascot/collection/paw-074-vr-headset-gamer.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-074-vr-headset-gamer.svg": {
+      "size": 4250,
+      "sha256": "660297152d13d73968af55a23f42e9c2468c88ed10a5ddaca8b38fe07971cfe8"
+    },
+    "assets/brand/mascot/collection/paw-075-robotics-engineer.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-075-robotics-engineer.svg": {
+      "size": 4309,
+      "sha256": "e63851e64452aabd60d12286ccf25920a0f98fa9786027df00eb7a00fadd3d3e"
+    },
+    "assets/brand/mascot/collection/paw-076-space-explorer-cyber.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-076-space-explorer-cyber.svg": {
+      "size": 4184,
+      "sha256": "7cf0ec3c477f71d1b669c76b86b2bfce22b78a826339928bb9515a7cac6eec04"
+    },
+    "assets/brand/mascot/collection/paw-077-hover-scooter.png": {
+      "size": 64851,
+      "sha256": "1064bf6f374fbcbef953acc3d700b679aef7eebc19310011ccb7153ad311a00c"
+    },
+    "assets/brand/mascot/collection/paw-077-hover-scooter.svg": {
+      "size": 4136,
+      "sha256": "ab07704775e263793882866396b5f7757688f5c9e052268dd0f998acc4b4acf5"
+    },
+    "assets/brand/mascot/collection/paw-078-smart-glasses.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-078-smart-glasses.svg": {
+      "size": 4260,
+      "sha256": "939ee5ed2ee72bd421a7790e5d92234ea9013ebb0a054721f2be3c79aeb7dbce"
+    },
+    "assets/brand/mascot/collection/paw-079-hologram-interface.png": {
+      "size": 71112,
+      "sha256": "bc37d55067f78c882541373953fa79d9f909a6854ab6b9032731ec331df9315b"
+    },
+    "assets/brand/mascot/collection/paw-079-hologram-interface.svg": {
+      "size": 4300,
+      "sha256": "1a0c008694ac3260b7c53874cec3645312300e4c69ea0c285639cce9d781f39b"
+    },
+    "assets/brand/mascot/collection/paw-080-ai-researcher-lab.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-080-ai-researcher-lab.svg": {
+      "size": 4184,
+      "sha256": "fbaa64b0ff1f8f7e6bf931642436dc89082af1efd2b731d9b4e9695c08520f77"
+    },
+    "assets/brand/mascot/collection/paw-081-pajamas-pillow.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-081-pajamas-pillow.svg": {
+      "size": 4061,
+      "sha256": "7cb2fcf48f20014d5e9a3a1c7608925b8a65a725b0e277f4995f892358cb6643"
+    },
+    "assets/brand/mascot/collection/paw-082-morning-bedhead.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-082-morning-bedhead.svg": {
+      "size": 3965,
+      "sha256": "4d98f0e274b9ee74d341c97d27440664fa8ed31c138dc4ba6a6a79a1d020846c"
+    },
+    "assets/brand/mascot/collection/paw-083-raincoat-boots.png": {
+      "size": 14650,
+      "sha256": "293145c714b30569abb5fcc07e584acc2c1abe35d88e1376978bd3e03a61657c"
+    },
+    "assets/brand/mascot/collection/paw-083-raincoat-boots.svg": {
+      "size": 4178,
+      "sha256": "6afe224877a2f0105435c8b38c0321b39d3085b2ad4219ac5a6338a352740076"
+    },
+    "assets/brand/mascot/collection/paw-084-umbrella-rain.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-084-umbrella-rain.svg": {
+      "size": 4175,
+      "sha256": "9625544683eb1593a665409d92d8c87662eb180ffeafca8dbc011b069da849de"
+    },
+    "assets/brand/mascot/collection/paw-085-kite-flying.png": {
+      "size": 71313,
+      "sha256": "a293f39f800783dd58fb3d291c3b08a3930f5d86d76372ab97d8d5148c7c4b94"
+    },
+    "assets/brand/mascot/collection/paw-085-kite-flying.svg": {
+      "size": 4238,
+      "sha256": "3a8da319555ad7cc2a57c3294bf5b6f3339b0df372e5774d2da2415b8625766f"
+    },
+    "assets/brand/mascot/collection/paw-086-soap-bubbles.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-086-soap-bubbles.svg": {
+      "size": 4242,
+      "sha256": "b35ad9c5ac4b1f14dc439136bd03e9d567af9ed309bdcd47aceaf73d70551cba"
+    },
+    "assets/brand/mascot/collection/paw-087-birthday-party-cake.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-087-birthday-party-cake.svg": {
+      "size": 4309,
+      "sha256": "6441954b106d833ca7adf2f089700f120e56c3fb11e4de390d4bfa1bbbb2f0d9"
+    },
+    "assets/brand/mascot/collection/paw-088-gift-wrapping.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-088-gift-wrapping.svg": {
+      "size": 4281,
+      "sha256": "972e1c54e68d9913f7c70a184bfe5d435d957c6c0255eb5e79be3834dace592f"
+    },
+    "assets/brand/mascot/collection/paw-089-nerd-big-glasses.png": {
+      "size": 70561,
+      "sha256": "b39b0215a50e2a7fbb0f2f7be3b8817e0b2aa8e385e1e108aeb847047fdf0b90"
+    },
+    "assets/brand/mascot/collection/paw-089-nerd-big-glasses.svg": {
+      "size": 4300,
+      "sha256": "a2ce8b13214d2cc5dc31450e72948dcab7a86e836ba9b900a53823d0e75d55a5"
+    },
+    "assets/brand/mascot/collection/paw-090-instant-camera-selfie.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-090-instant-camera-selfie.svg": {
+      "size": 4190,
+      "sha256": "a93ab9fae0cd4693c1db71b2423de065c3d1f36f0120686030568b4c32e98f20"
+    },
+    "assets/brand/mascot/collection/paw-091-black-tuxedo.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-091-black-tuxedo.svg": {
+      "size": 4246,
+      "sha256": "af36390cd42255e191bb196cd950b403f712d8a20f2b3c219e852fa636494b71"
+    },
+    "assets/brand/mascot/collection/paw-092-executive-briefcase.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-092-executive-briefcase.svg": {
+      "size": 4292,
+      "sha256": "1d30e7bcfccc3ab417c9c29a3386decb99161741e6cafb9cc25be2ccfecaba3d"
+    },
+    "assets/brand/mascot/collection/paw-093-premium-yellow-coat.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-093-premium-yellow-coat.svg": {
+      "size": 4226,
+      "sha256": "6f3bc7d524706a8a713681407d8bfe700a0b328ab575cd017e8ebeb06e0d1293"
+    },
+    "assets/brand/mascot/collection/paw-094-detective-trenchcoat.png": {
+      "size": 14602,
+      "sha256": "5dd7f2d2cf30756d34ecaa97fc85c3f04d92b0aed381650c938b6501fd71e74e"
+    },
+    "assets/brand/mascot/collection/paw-094-detective-trenchcoat.svg": {
+      "size": 4393,
+      "sha256": "92b0219f8fbed83effabaded341d0cecd8fbe228b57f6e955d0ca3e4552d2ccf"
+    },
+    "assets/brand/mascot/collection/paw-095-royal-explorer-crown.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-095-royal-explorer-crown.svg": {
+      "size": 4260,
+      "sha256": "4aac54d9dc147278b946ffcbdbbcc60971fc553764f895c3f1f1676f36a3476d"
+    },
+    "assets/brand/mascot/collection/paw-096-samurai-warrior.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-096-samurai-warrior.svg": {
+      "size": 4239,
+      "sha256": "71b86b3d0b8c911efe5a4d5b7e9f278aa233f8387b50b92ad724168fdb9f4405"
+    },
+    "assets/brand/mascot/collection/paw-097-indonesian-traditional-dancer.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-097-indonesian-traditional-dancer.svg": {
+      "size": 4286,
+      "sha256": "182c35063bce1c704667eb9327b4055f8386f3f7646e600e9fe48e8f8fdabf0e"
+    },
+    "assets/brand/mascot/collection/paw-098-festival-carnival.png": {
+      "size": 14669,
+      "sha256": "c9f81737ecd0cae60fb2e2ce15ec54bb23f3dc54bfdfc048324a970f8ac410de"
+    },
+    "assets/brand/mascot/collection/paw-098-festival-carnival.svg": {
+      "size": 4245,
+      "sha256": "6d338c12a7514abc48deaa8612ea21dfa896e479804aa4064c52fa516623e6d0"
+    },
+    "assets/brand/mascot/collection/paw-099-language-ambassador.png": {
+      "size": 14644,
+      "sha256": "fd7494ce8236fd99b010f995aa9a7226a3e220f2356e450c7d0575514fd64f57"
+    },
+    "assets/brand/mascot/collection/paw-099-language-ambassador.svg": {
+      "size": 4299,
+      "sha256": "bfdcba5f934581a00f52438f5a7ff05bb7db4caf878cb04ee54e71955e511bae"
+    },
+    "assets/brand/mascot/collection/paw-100-hero-mascot-signature.png": {
+      "size": 60633,
+      "sha256": "c5e6152fcf6adbbc492bba1115c95d252cfcdbaafd3df63fd0a015b10046c0f5"
+    },
+    "assets/brand/mascot/collection/paw-100-hero-mascot-signature.svg": {
+      "size": 4479,
+      "sha256": "851e2b77cc0c00ce82a342926c7ab8379690978023a14feaae7f49b31e5f70f7"
+    },
+    "assets/brand/mascot/paw-mascot-hawaiian-sunglasses.png": {
+      "size": 119331,
+      "sha256": "689d04c50fd2b66033e90ec21bd081fe50d8cb908496e1d91b486c7a2f10effc"
+    },
+    "assets/brand/mascot/paw-mascot-hawaiian-sunglasses.svg": {
+      "size": 11074,
+      "sha256": "293807daeb4582ded80af0543a8ea52dfe4ec2c6258a456128d1ce2910b4e302"
+    },
+    "assets/brand/mascot/paw-mascot-hawaiian.png": {
+      "size": 117360,
+      "sha256": "ee27dcd3fb315202ba7b4583feea49975155ad67c9c827a1be052d21f9e13d68"
+    },
+    "assets/brand/mascot/paw-mascot-hawaiian.svg": {
+      "size": 11045,
+      "sha256": "f35b4884c0d27d023ea3bccc70c2c243c19eea95583c30554e320768f6ec1850"
+    },
+    "assets/brand/mascot/paw-mascot-head.png": {
+      "size": 50717,
+      "sha256": "4d79a449a96f6b1061a940dea8c0b9c3b170c6c8d4a19ec7dec95bec94b38bcc"
+    },
+    "assets/brand/mascot/paw-mascot-head.svg": {
+      "size": 2765,
+      "sha256": "a0a253e446db351528daa2cbe1048cbaf6a271e305dff6463696762f2bcccb46"
+    },
+    "assets/brand/mascot/paw-mascot-official.png": {
+      "size": 57890,
+      "sha256": "2b9b5969985c2d640a340eff557f35970b8d05cde219a93f40a2f322b65a86dd"
+    },
+    "assets/brand/mascot/paw-mascot-official.svg": {
+      "size": 5187,
+      "sha256": "8a6f27be9926748383afef92ef6c5435493c73658b86b82d105b639ecd5ad1a2"
+    },
+    "assets/brand/paw-mascot-full-512.png": {
+      "size": 24707,
+      "sha256": "beb8324c5389789074e316125c80ce2a0a1976150cf5e045d81f749afbbfa9c4"
+    },
+    "assets/brand/paw-mascot-full.svg": {
+      "size": 5187,
+      "sha256": "8a6f27be9926748383afef92ef6c5435493c73658b86b82d105b639ecd5ad1a2"
+    },
+    "assets/brand/paw-mascot-head-512.png": {
+      "size": 22132,
+      "sha256": "c9cb76dbc78826f0b9298f33c9f8b3c3a7f1f9a8096ba19e12ebaa02f88c1267"
+    },
+    "assets/brand/paw-mascot-head.svg": {
+      "size": 2765,
+      "sha256": "a0a253e446db351528daa2cbe1048cbaf6a271e305dff6463696762f2bcccb46"
+    },
+    "assets/brand/screenshot-grammar.png": {
+      "size": 373332,
+      "sha256": "d0871b4f8e55866966af51bb93785e916ffcaf42706de44f06b21279833a2054"
+    },
+    "assets/brand/screenshot-home.png": {
+      "size": 406818,
+      "sha256": "dcaf42f1326a4ba2ca86b672c8da2eb155b65f546e9771cdb83a4c78befc173e"
+    },
+    "assets/fonts/InstrumentSerif-400.woff2": {
+      "size": 21032,
+      "sha256": "5eb09b5ac0e28b67c2f041c8ba6d244604ca0c0980d65912ab2d47fed84ddc31"
+    },
+    "assets/fonts/NotoSansThaiLooped-400.woff2": {
+      "size": 40944,
+      "sha256": "846514032342f66630f2da634e4cde395ca18260db22c977e744ae9cca5c6c27"
+    },
+    "assets/fonts/NotoSansThaiLooped-500.woff2": {
+      "size": 40944,
+      "sha256": "312a751cfdcd49f95d96b0b7914a181b9ff3ccb470225ab1158b543cb50342ac"
+    },
+    "assets/fonts/NotoSansThaiLooped-600.woff2": {
+      "size": 40960,
+      "sha256": "bb458d5e8ade11e9543c8cab5fcde929f68bc9045a441965dd0cb87826125f00"
+    },
+    "assets/fonts/NotoSansThaiLooped-700.woff2": {
+      "size": 40924,
+      "sha256": "a3182b1a0d39a1a50389eff7aae0f45324923841b0f05a99c3c948c80386f5b5"
+    },
+    "assets/fonts/OFL-NotoSansThaiLooped.txt": {
+      "size": 4380,
+      "sha256": "dad6e6abc2bf3fc37cc698af7607c3f4d4235039695713b222e5a034fb5b9b1c"
+    },
+    "assets/fonts/PlusJakartaSans-400.woff2": {
+      "size": 6444,
+      "sha256": "8151a6eb2c7fdeca4ec3536d84929c97da1bdfaa4a27d6195eafcba3e20623fe"
+    },
+    "assets/fonts/PlusJakartaSans-500.woff2": {
+      "size": 6768,
+      "sha256": "04b080daf7cbbebdbd51f97396fa6092e51615b0373039165f6dff251e840fa4"
+    },
+    "assets/fonts/PlusJakartaSans-600.woff2": {
+      "size": 6756,
+      "sha256": "8485f6d9338005bf0761ea7f412aab4c3471ec361bc25b017c2a2526e6a24d9d"
+    },
+    "assets/fonts/PlusJakartaSans-700.woff2": {
+      "size": 6796,
+      "sha256": "4edb1a25ff90e1cfd0c5a9ba2646b0416a7e63f493cfe116d6fb32a4eb7b234a"
+    },
+    "audio/manifest.json": {
+      "size": 1077726,
+      "sha256": "765a00c1f7ef09e97f7be72d1a594602787ed2cd44b6b6652bf21a0b5f35f448"
+    },
+    "cloze-bank-v1.json": {
+      "size": 975483,
+      "sha256": "987eba8c74201c0b14ad39767c1e10094a5f2fc459ea44a704f147dceb97d6ac"
+    },
+    "content-canary-config.js": {
+      "size": 474,
+      "sha256": "7d41d11b3ce09c0112e96cab5da6cc2e90d9a965f3decd76eb483effad7d30c5"
+    },
+    "content-canary.js": {
+      "size": 15641,
+      "sha256": "2a466cb6f77dae8895a6e50fb78cfcb6d2566057c48c34b1d29d83eb3c562f0c"
+    },
+    "content-promotion.js": {
+      "size": 10306,
+      "sha256": "8f1140fefcb95eab8257ff19dcfef9e9c51e570f9c53ad5161252b932290dd86"
+    },
+    "content/buku/buku-eng-d.json": {
+      "size": 169807,
+      "sha256": "87c9358d79b4cca0c13db22609f9bb99a6d8b1defad550a45a51b29ea9954665"
+    },
+    "content/buku/buku-ind-d.json": {
+      "size": 106019,
+      "sha256": "1faf0cd97a2a85a1270c733c1f4c9f99500877b499bef877be8761586bb32dd1"
+    },
+    "content/buku/buku-ipa-d.json": {
+      "size": 138485,
+      "sha256": "2e24b73898a85b40b07e57c287fd3c8edb96cb04df043f1eb84247105cab66b3"
+    },
+    "content/buku/buku-ips-d.json": {
+      "size": 84049,
+      "sha256": "2a7ae4d0cbda3fe2cdaacdbdf0226c24a86f12b873d60032588125058ec4d505"
+    },
+    "content/buku/buku-mat-d.json": {
+      "size": 86808,
+      "sha256": "36cfc428cd4e8160da49bdda9b721b382fdd48048f35160b016e720811a702f7"
+    },
+    "content/buku/manifest-buku-928.json": {
+      "size": 16527,
+      "sha256": "a8f1ddd6b61d6c1ee2ee56b636064f3628dd9dfbfc7142fdcf2a463c948e421a"
+    },
+    "content/grammar-vocab-map-v1.json": {
+      "size": 847167,
+      "sha256": "924a5dfceeea79679db246e537f9d80c94c9d65f761a11fd113c5cee6465e0a4"
+    },
+    "content/ja/family-graph-ja.json": {
+      "size": 2054,
+      "sha256": "c8162fe53a720675f072a7fc6cd73274db059451b01ec957ebc69a19ea9d9c8b"
+    },
+    "content/ja/grammar-templates-ja.json": {
+      "size": 1486473,
+      "sha256": "aa4a7a46be5617b243e1450a382416fb6ba16ff9070a910103dafd8adbd67467"
+    },
+    "content/ja/japanese-misconception-taxonomy.json": {
+      "size": 2755,
+      "sha256": "40c8ec6b0412502f4fe999f45ec3633e0d04716cf0805eb101b9af70d471e330"
+    },
+    "content/ja/reading-bank-ja.json": {
+      "size": 410197,
+      "sha256": "e9c822ba4f321839938fb76b33827ae9875bc8161bea39ff8b121525b8f393d8"
+    },
+    "content/ja/vocabulary-master-ja.json": {
+      "size": 1681634,
+      "sha256": "d9c5f82eba8f9c7d1ef5f56d4602ebbb75351d1d556b9e941f738e737046e5d6"
+    },
+    "content/ja/writing-prompts-ja.json": {
+      "size": 32101,
+      "sha256": "33488d2d86388cb7bf6c62c7fe0bdda8995d6d8f562f5afb2f4dc96902d16b2d"
+    },
+    "content/mapel/mapel-eng-d.json": {
+      "size": 281197,
+      "sha256": "c4465a49c6ec4c89f70516ff7efc9a574a6e51ee75f46cb53530dd60ba1bf139"
+    },
+    "content/mapel/mapel-ind-d.json": {
+      "size": 250120,
+      "sha256": "34abe798930422b50954e0dfb412b9176db4bc23f0a1b97d5f2d0f1afea739e4"
+    },
+    "content/mapel/mapel-ipa-d.json": {
+      "size": 311313,
+      "sha256": "094ff03577bc1fcf2bc7f363dd4630b22c8e1094d168ecbb2e3be19acad28a70"
+    },
+    "content/mapel/mapel-ips-d.json": {
+      "size": 125330,
+      "sha256": "4a1eb24c8cabe9a0d3090ee6528d361d58a547de49740a0d8f2a2d39e90ab8d8"
+    },
+    "content/mapel/mapel-mat-d.json": {
+      "size": 114068,
+      "sha256": "e0220f35895eb44640913264e70bf5aaef32cd9845a27f6957a823935b0e5a45"
+    },
+    "content/mapel/sumber/buku-siswa-eng-kelas-7-daftar-isi.txt": {
+      "size": 1177,
+      "sha256": "2050ca3488a359b6d19594fef0f8c8f4e3295ef97850d1e015403fd2252fb218"
+    },
+    "content/mapel/sumber/buku-siswa-eng-kelas-8-daftar-isi.txt": {
+      "size": 1219,
+      "sha256": "a90e9556bb3fe2c6c9261844c9767dcc6a3304356455b49a0669f5c43d65c1c7"
+    },
+    "content/mapel/sumber/buku-siswa-eng-kelas-9-daftar-isi.txt": {
+      "size": 1249,
+      "sha256": "7c1b481d4f71ce66d39bb680d96e060f6386749ed36f4297c3bc34521c2b6593"
+    },
+    "content/mapel/sumber/buku-siswa-ind-kelas-7-daftar-isi.txt": {
+      "size": 2010,
+      "sha256": "e34038e9146e5c68c687d1c939738458bac4cfd56f5c5e0b94029f2ea81908c7"
+    },
+    "content/mapel/sumber/buku-siswa-ind-kelas-8-daftar-isi.txt": {
+      "size": 2803,
+      "sha256": "d31ed84d4dd4751a3b49b4c4b7bb382deeb5dc3daced4ca4c7b91af834325098"
+    },
+    "content/mapel/sumber/buku-siswa-ipa-kelas-7-daftar-isi.txt": {
+      "size": 1920,
+      "sha256": "482844e91ca69c78a6b17eb59ca840e7a827274ff87b7d0fc0070d6afa0bf7ce"
+    },
+    "content/mapel/sumber/buku-siswa-ipa-kelas-8-daftar-isi.txt": {
+      "size": 1806,
+      "sha256": "2a17c64df3a220991e2487e0fffb4b0ca1e93f6260557af0981a0adda55346aa"
+    },
+    "content/mapel/sumber/buku-siswa-ips-kelas-7-daftar-isi.txt": {
+      "size": 1436,
+      "sha256": "af5ac30a9e05389f7c03d55d156fba6a917c500ea1f8f6248f8b7c8e2ef08512"
+    },
+    "content/mapel/sumber/buku-siswa-mat-kelas-7-daftar-isi.txt": {
+      "size": 1466,
+      "sha256": "e5028998e5eb6c24286f86a5c6efb0162d028318d3ce0cf6e81e4258ee85fab5"
+    },
+    "content/mapel/sumber/MANIFEST.tsv": {
+      "size": 2621,
+      "sha256": "845ef0a1b9c8ab12f794b22885fb2732e4125e3c9f0a47d79a2d0e6e5b2217d9"
+    },
+    "content/mapel/sumber/README.md": {
+      "size": 1429,
+      "sha256": "b3bfabc8eecd3cdc58a52b9e1e7e22f2756c5262bf5d953934246e42c37ffdae"
+    },
+    "content/video-grammar-bank-v1.json": {
+      "size": 48056,
+      "sha256": "6845fce9fd2537d9e79a56d6a8a62b22ae7f5d99529703009e6224d5ec0a12b1"
+    },
+    "content/video/cake-lucy-5q-exact-poster.jpg": {
+      "size": 97130,
+      "sha256": "ef836e21a9babfcbab975fc4db63f68b535ab591a0c27859447ae23d1ee8b637"
+    },
+    "content/video/cake-lucy-clip2-5q-poster.jpg": {
+      "size": 86786,
+      "sha256": "378538be4321025a42cbf6482f6d0932afacd95075cdab1a74d40d85a04e2168"
+    },
+    "content/video/cake-ryan-jake-poster.jpg": {
+      "size": 49792,
+      "sha256": "e0a4358c982cc9f2f61018eb40d556dc9c733f2ded46951fe45ea109347636e7"
+    },
+    "core-config.js": {
+      "size": 19830,
+      "sha256": "2bc1830314b0427c33ec2c8c58ffca89dfb008ecdbe226b87cd3e3f7747e6a96"
+    },
+    "favicon-64.png": {
+      "size": 3313,
+      "sha256": "1dd3a9096cefcdc53fb699fe7e7d6b546ae4768376f4f6a75a349e19c8b07a28"
+    },
+    "features/academic-readiness/fiezel-academic-readiness.js": {
+      "size": 11717,
+      "sha256": "f4c27051fa4ed2fe3b7f3162b7529aa7480ed9d9ce76caffd0b5213790db184d"
+    },
+    "features/analytics/fiezel-analytics-client.js": {
+      "size": 40431,
+      "sha256": "720421632fbcdebf3923e23e2da7942b76a6e51251b21a60a5c9f43f47681376"
+    },
+    "features/audio-assets/fiezel-audio-key.js": {
+      "size": 9802,
+      "sha256": "11624e303917fe0df881ac3f410911587766fd6f4d2491ca6687ec42de8d457d"
+    },
+    "features/audio-assets/fiezel-audio-manifest.js": {
+      "size": 8540,
+      "sha256": "c3079c8c89873adf9f7198292562694d2ca13b7e5e23652b689b41699c74e2e5"
+    },
+    "features/audio-assets/fiezel-audio-resolver.js": {
+      "size": 16602,
+      "sha256": "997d196a6e27ef1018d61c05a4ec1ecb63c8b060f5616423ed55194899d46442"
+    },
+    "features/audio/fiezel-ui-sfx.js": {
+      "size": 33132,
+      "sha256": "f08741ddc7ba52c5bd90643ce1f88c46731309c8f82ab9588c604ac0e696aa9a"
+    },
+    "features/auth/fiezel-account.js": {
+      "size": 23946,
+      "sha256": "aa799834f7fa188ce225de63e597894d10ecdd268cb7d267d25ebaf0b18ad8f2"
+    },
+    "features/auth/fiezel-auth-screen.js": {
+      "size": 28742,
+      "sha256": "24b0bc608d802f36d64bb70ea783a9ef13b8631be388708097fa398a5f67bd29"
+    },
+    "features/auth/fiezel-google.js": {
+      "size": 12274,
+      "sha256": "f64e57c3fec973829f72dfafab75dd2a57df6d4c925bbbefb387add0139cab52"
+    },
+    "features/brain/fiezel-affect.js": {
+      "size": 15261,
+      "sha256": "7cd2de5568cadf82552e094cfdecf6abee7253c75dad7509509bd25c88aa7b01"
+    },
+    "features/brain/fiezel-arena-bot.js": {
+      "size": 8609,
+      "sha256": "d85c17391ad68d8d86330307aa1c1d41841d3437a94b6c6b021fd24adcc893a2"
+    },
+    "features/brain/fiezel-attempt-record.js": {
+      "size": 6923,
+      "sha256": "ff8a7a61d5c8a2ff8516414e4ffd8c3d3268dcd3a3fd8787d46a74f9765f0779"
+    },
+    "features/brain/fiezel-brain-config.js": {
+      "size": 13938,
+      "sha256": "e5f58dc3b89f6ff1a0ad7801b26045a026e4693e3c9d1df330e4f8597c507d2e"
+    },
+    "features/brain/fiezel-brain-manifest.js": {
+      "size": 24836,
+      "sha256": "48b6a600a69df2797c094626381ea92fbb4280e040c74d4baa53dbb9d577de55"
+    },
+    "features/brain/fiezel-confusion-matrix.js": {
+      "size": 15432,
+      "sha256": "44a55f40ba7779364087a19623d98f11600d30f8662d26487aef65364163c8b9"
+    },
+    "features/brain/fiezel-content-chain.js": {
+      "size": 8066,
+      "sha256": "1e2d78622e1ec487b2d5236179e5c151800dd2024fc22f0b14a0f7be4df7c529"
+    },
+    "features/brain/fiezel-core-brain.js": {
+      "size": 69354,
+      "sha256": "a4ff43a740a0ba45f3a56eec9b90d2585086f7db945a6ba6b267257a7d6e6707"
+    },
+    "features/brain/fiezel-evidence-credibility.js": {
+      "size": 13889,
+      "sha256": "9ea1d9de52cbe5abdb451d688f846375dd4c935d67a4c58b57f78995f322ed67"
+    },
+    "features/brain/fiezel-item-calibration.js": {
+      "size": 15240,
+      "sha256": "e29fce276fb5b26ff562fc27e598598ec7d7fd81e83498c54bec80f30c0a6928"
+    },
+    "features/brain/fiezel-item-pool.js": {
+      "size": 22550,
+      "sha256": "ec4043ee6126890a378192f95316a5b2f57a7995ecdbd2c9e14bdcdc8dc6864e"
+    },
+    "features/brain/fiezel-item-prior.js": {
+      "size": 10145,
+      "sha256": "6d169f85132bb882757a85f9bdb08f784fa2ad51b90252c43123e7b63f87ed82"
+    },
+    "features/brain/fiezel-learning-metrics.js": {
+      "size": 23052,
+      "sha256": "867fceb12240b27023e7966adcf733a99ee8d26b94f08847da6b306cb1c44b03"
+    },
+    "features/brain/fiezel-listening-adaptive.js": {
+      "size": 16792,
+      "sha256": "38691c866cf2ab5a01a6e2105f59f39ce64a2751b6f79c8eaa916531e8690dd1"
+    },
+    "features/brain/fiezel-mastery-bkt.js": {
+      "size": 16601,
+      "sha256": "a32dd163844b8bbb0db63b575eb3e0cd53ace475803ab1e399a7792b6be9b4b8"
+    },
+    "features/brain/fiezel-metrics-digest.js": {
+      "size": 22247,
+      "sha256": "14526c88bb450d865cba43b1967e3bfc943fa740c5db1ecc0d902e4c0a9405f8"
+    },
+    "features/brain/fiezel-misconception-ledger.js": {
+      "size": 17391,
+      "sha256": "65b5083a0ae1c4d50033c54b266c90c73ef185d5608d7841c91fe65cd2f16051"
+    },
+    "features/brain/fiezel-nof1.js": {
+      "size": 7939,
+      "sha256": "c706744d5f98fc66b847cef39772883168c23d6aa699db849a139beb697ffb48"
+    },
+    "features/brain/fiezel-olm.js": {
+      "size": 31672,
+      "sha256": "5e3e94391b5567f1243629b9cafe3a9d603d1cf688d9d4d0d63279c7b0aa824b"
+    },
+    "features/brain/fiezel-param-ledger.js": {
+      "size": 9244,
+      "sha256": "89d67d908748ce9ed58e34590844d2c32cdb1bf486cdb0d66b2b41647955642d"
+    },
+    "features/brain/fiezel-policy-verdict.js": {
+      "size": 6822,
+      "sha256": "478f14280dbee465b58d5fa3e4748a15dfda8056fbad8719a97537d3e0d7758b"
+    },
+    "features/brain/fiezel-production-grader.js": {
+      "size": 16631,
+      "sha256": "cd46066a21ea10f0a93155217b4774c2f0c73f9d86f06298e26df216ae257879"
+    },
+    "features/brain/fiezel-question-allocator.js": {
+      "size": 10049,
+      "sha256": "1b6c48cd7f8c5e5e8f3bcce2f96160a979e9e5ed2dde50c1cf83d22416a4ee91"
+    },
+    "features/brain/fiezel-question-memory.js": {
+      "size": 12480,
+      "sha256": "8d2c9d5868ca50699b4fa63913adefef966c3074e5aca2e64bb1a05566d13856"
+    },
+    "features/brain/fiezel-retention-probe.js": {
+      "size": 18636,
+      "sha256": "5b497fef0b3d31f92bbe75cf466e3c3ec4ca7c79cfe5122e3726364b077ceaa2"
+    },
+    "features/brain/fiezel-self-tune.js": {
+      "size": 15716,
+      "sha256": "db19995ae4b6eab0da738c0f1d8289d744e166f3681bd4fde2adb3a4b300439b"
+    },
+    "features/brain/fiezel-speaking-adaptive.js": {
+      "size": 25018,
+      "sha256": "383098b0200b507ec95816700b90ea991951aae315ac3c57253cdf1ce5087847"
+    },
+    "features/brain/fiezel-srl-coach.js": {
+      "size": 19846,
+      "sha256": "a64263bad0fe63e4ec4cc7679a665145ddbc26aab75252673aee45916215abe6"
+    },
+    "features/brain/fiezel-stat-gate.js": {
+      "size": 20684,
+      "sha256": "1d9d6c1715147d136ae034c0821a70a7fe833fd51cbd655c04dfdac49ad490be"
+    },
+    "features/brain/fiezel-step-tutor.js": {
+      "size": 12895,
+      "sha256": "044797fa3a3b75c4975ade9b62477e105c504ae5b811f2e3505c979b8a91dcb8"
+    },
+    "features/brain/fiezel-target-language.js": {
+      "size": 4419,
+      "sha256": "cf3d3850c467e8289fc98bba2c3256bf63abdd7eb023b0f5e7ef834cfd60b132"
+    },
+    "features/brain/fiezel-tutor-brain.js": {
+      "size": 48891,
+      "sha256": "a6b109a34bffbe41fd65fdf591ebfd2bfb12cb874eb0d22208d41bde770a3187"
+    },
+    "features/brand/fiezel-choreography.js": {
+      "size": 6326,
+      "sha256": "8b8ec86a827b14c0a00e564756b777b260aeba6d5ff9b2c6c6b371b22bb3c6bc"
+    },
+    "features/brand/fiezel-splash-equalizer.js": {
+      "size": 14984,
+      "sha256": "e36b448353363d8aa4c820bcbc63285622983c4ab4c5879367a21237e0c473a0"
+    },
+    "features/brand/fiezel-splash-particles.js": {
+      "size": 19720,
+      "sha256": "7166d09336533e7df63f63afb960fca9c38afd6ccc8c898ec36e6bdc4c974ebb"
+    },
+    "features/brand/fiezel-splash-pawstamp.js": {
+      "size": 25688,
+      "sha256": "61dd78c0ad631035089376a6bbe9d0f2300f36476b69afac1f2038be8d9f4c8f"
+    },
+    "features/brand/fiezel-splash.js": {
+      "size": 44735,
+      "sha256": "f6e3d12748d10be7cbb78be260b2720dc207c17bf614ab43658f2c990fba394e"
+    },
+    "features/bug/bug-species.json": {
+      "size": 11690,
+      "sha256": "515fadd5e3e8851460bf216b828810a754889aed77b5769ce8c02609dda033eb"
+    },
+    "features/bug/fiezel-bug-core.js": {
+      "size": 6026,
+      "sha256": "bc1fa1f96b8d58277952fa0af8e47a19d1c59344970658651947627ae42de439"
+    },
+    "features/bug/fiezel-bug.css": {
+      "size": 25912,
+      "sha256": "e0ba753a181bc8c056318b621d8e015c6fb6755b8a09fda8e2fa80f26f40a8a6"
+    },
+    "features/bug/fiezel-bug.js": {
+      "size": 36127,
+      "sha256": "c4146592a0b21fb5d6fa5f5cbe1ae7754674a4751a9cb4a85797ea98924fd0f1"
+    },
+    "features/certificate/fiezel-certificate-core.js": {
+      "size": 12416,
+      "sha256": "bc39f43cdf8689200614ae7dc027a63047af550bdb98ca5a2e2a8a4eebc34cfd"
+    },
+    "features/cf-shadow/fiezel-shadow-ledger.js": {
+      "size": 20028,
+      "sha256": "02f10b8a530d691f0028c1c8a6a16452ee5f23686cf3a7b128265e4cea9d3ae8"
+    },
+    "features/class-hub/class-hub.css": {
+      "size": 56102,
+      "sha256": "1d72f04e1244efebe9cee090e3542caa631fc601da92917f378d90d04a59766d"
+    },
+    "features/class-hub/fiezel-braincore-review.js": {
+      "size": 23230,
+      "sha256": "98e5c95a06b3f0be019adb4bc8c934124fd3f9929c0fa1beadf0729f42b2678d"
+    },
+    "features/class-hub/fiezel-class-hub.js": {
+      "size": 224061,
+      "sha256": "3cb692df3f0868d4c57f5d245ef8e3cb7feb819c8a8dcd956d3b119b0a4644f3"
+    },
+    "features/class-hub/fiezel-face-guard.js": {
+      "size": 59809,
+      "sha256": "d81f264f52ebc6700dd883e8990732a9aaba3902438db9966550aaeef5ed3170"
+    },
+    "features/class-hub/fiezel-focus-guard.js": {
+      "size": 9881,
+      "sha256": "089f977dbda28c8113be59d26592cd21d8eda8ebc1119b019fe72160c6a7a043"
+    },
+    "features/classroom/classroom-lessons-v1.json": {
+      "size": 104716,
+      "sha256": "4fd6dbc744d6ded97619ae5cef629ecb0aa2f0ee068ecc36d916924c46eff926"
+    },
+    "features/classroom/fiezel-classroom.js": {
+      "size": 9862,
+      "sha256": "43ea9b9104ac62f01c5611e72a4cad5a0cfee5bc263953f4514475fc450baf4a"
+    },
+    "features/continuity/fiezel-continuity.js": {
+      "size": 28943,
+      "sha256": "2d0eef33525b324f9b3afeef2971940aaa6537cb95832072e8de064f0e80384c"
+    },
+    "features/curriculum/console.css": {
+      "size": 13124,
+      "sha256": "72dbd0602114d5f90688e87d7a4f5cf3d7ac735bf182f7d57071f70520b1b910"
+    },
+    "features/curriculum/fiezel-curriculum-inbox.js": {
+      "size": 7420,
+      "sha256": "c184a4190aebbef4429e8e606b41a4e75b1769a1e6b8d377029a2edb8cc18a14"
+    },
+    "features/curriculum/fz-api.js": {
+      "size": 12073,
+      "sha256": "351f36ee9d6704f7ac4ae1d96ace4d8eca6c15929c0e4918bddb3c9d8dd1e4aa"
+    },
+    "features/curriculum/learning-mission.js": {
+      "size": 33490,
+      "sha256": "a60ba9e1874be499e13c20ca7b635421bbcfc42f0b2c3c0ad463710db56c62a2"
+    },
+    "features/curriculum/rapor-share.js": {
+      "size": 16356,
+      "sha256": "bf5725bc9b10ddcf638d9acc7da845547dd864154933edc33a10d30f30cf3a7e"
+    },
+    "features/curriculum/teacher-console.js": {
+      "size": 108371,
+      "sha256": "cd544da046b1d474852cf8ae8676e55bed8ccb035e4df1440cfdbed900441a2f"
+    },
+    "features/diagnostics/fiezel-diagnostic-bus.js": {
+      "size": 9240,
+      "sha256": "af83e41e36ccf92410a74f23b78a0f8263aee063255755b85df0c5c46937c9bb"
+    },
+    "features/diagnostics/fiezel-diagnostic-register.js": {
+      "size": 11156,
+      "sha256": "899534dc09f88b84a908ad2c1863a5979c2875b2148099be3958990ec30e47d4"
+    },
+    "features/diagnostics/fiezel-diagnostic-targets.js": {
+      "size": 2512,
+      "sha256": "73869ee7d995ecf86b8de036da66cf0bf5c585fa976793d3b5dc62ac91d6c4b9"
+    },
+    "features/diagnostics/fiezel-live-chrome-runner.js": {
+      "size": 15641,
+      "sha256": "01cb04ac6d9c3a4175b215c8cd797030704e2534eb046a1a2af366c285806473"
+    },
+    "features/diagnostics/fiezel-module-selftests.js": {
+      "size": 19352,
+      "sha256": "228023eddf32838b1d65c815f5e5413e660fb9a62085e6a51abb1437fc5a5f8c"
+    },
+    "features/grammar/fiezel-grammar-upgrade.js": {
+      "size": 34168,
+      "sha256": "c2164258c991b76ee03458caa28898c858a865531d7fae407b4e0d978f08f7d3"
+    },
+    "features/grammar/fiezel-grammar-video.js": {
+      "size": 44902,
+      "sha256": "9fe898f032959cf346b119728b43979404288c985c8698f123cd33f0c8a7c3f1"
+    },
+    "features/grammar/grammar-sentence-translations.json": {
+      "size": 43409,
+      "sha256": "40310cbc81369a2da9b9ee03b1c6521be1c142b4212351f3ee80a826749c6f32"
+    },
+    "features/grammar/grammar-upgrade.css": {
+      "size": 58635,
+      "sha256": "752aa538ed808f27e11f1bded0b42540278e67856e90d983193bfa8f446da3f4"
+    },
+    "features/grammar/grammar-vocab-bridge.css": {
+      "size": 30956,
+      "sha256": "93cc4d23bc08e43ce0cfad3ad3c0bef162affaa0acbf3f307892d70dea913e32"
+    },
+    "features/grammar/grammar-vocab-bridge.js": {
+      "size": 61330,
+      "sha256": "2ebec1e79425b2309c52c4b41eb4dbd8463232c96d7b29d728e1ff046de03148"
+    },
+    "features/health/fiezel-install-health.js": {
+      "size": 10359,
+      "sha256": "50c8f32f1770e71693f6e4d447bf34d8dcf4854d8b283687f9a804c9452969ee"
+    },
+    "features/i18n/cloze-bank-th.json": {
+      "size": 926626,
+      "sha256": "f06a1315d5a0058088ce142acec9b9adb65414e4ff424e78b512d369155f7dfb"
+    },
+    "features/i18n/copy-id-app-a.js": {
+      "size": 66163,
+      "sha256": "17ca6a674c1f6ee9aea46b52fcce1831366fe844dfaf5bd8217ecb4d3ba7fc18"
+    },
+    "features/i18n/copy-id-app-b.js": {
+      "size": 15734,
+      "sha256": "822ef3ac08167860a251d4a51c8a067060ed4188d4d702113f58815f7b1392ee"
+    },
+    "features/i18n/copy-id-app-c.js": {
+      "size": 39680,
+      "sha256": "c9c9a7d75485c5b7c4c5c54b45d98121ccecb643a70200be35b5193b05f6b5f4"
+    },
+    "features/i18n/copy-id-app-d.js": {
+      "size": 51298,
+      "sha256": "7348012f8363b3f3b7d6daef6820dc383ab885abfd5eda6b819226ed4282452a"
+    },
+    "features/i18n/copy-id-app-e.js": {
+      "size": 7931,
+      "sha256": "1d344c7914b38055c95b11d98903909fcde3e9f45ab9d6546570f4007d9b8aca"
+    },
+    "features/i18n/copy-id-app-f.js": {
+      "size": 14585,
+      "sha256": "3c2ee9416bb9bba96a39bd767bdd8b3dee1c3fb2400d8fc11967ccb0bce48372"
+    },
+    "features/i18n/copy-id-bahasa.js": {
+      "size": 10987,
+      "sha256": "c1eafcde6a712a14759650db50fb38ca0305e07fc52b1ddc00941a50e39e5294"
+    },
+    "features/i18n/copy-id-certificate.js": {
+      "size": 5300,
+      "sha256": "7df3ba4e4a3964a9f7324c82a52f45c2adcf88c1605ec1f5adee71abd60079c9"
+    },
+    "features/i18n/copy-id-classjoin.js": {
+      "size": 8707,
+      "sha256": "9dc2250af358859eb8ac2fe89dd20e58407dd236e314fe4fa3dd533175dea532"
+    },
+    "features/i18n/copy-id-core.js": {
+      "size": 2905,
+      "sha256": "48de103d3378a312f773e4b4a56b57fcd2057aca18cc5576de028fb45f34f4d2"
+    },
+    "features/i18n/copy-id-feat-a.js": {
+      "size": 36018,
+      "sha256": "d19be9dd8bdaf205da8e71a01d582222277f4163ae52524f63daa77c9d6a71f2"
+    },
+    "features/i18n/copy-id-feat-b.js": {
+      "size": 34573,
+      "sha256": "dd1ad3b337d2719d9fc7e948093feda475297f7cd96e93ed02f2ef14188d6792"
+    },
+    "features/i18n/copy-id-feat-c.js": {
+      "size": 18628,
+      "sha256": "60e2830b8bab9cbfef7fa7c1f409f7554147bb27cb458899090cf2f42e11e754"
+    },
+    "features/i18n/copy-id-feat-d.js": {
+      "size": 45952,
+      "sha256": "21177968ee3cf4ddbbdcbf323bd4bb56574c3cd81d1c7c6629925266d8220347"
+    },
+    "features/i18n/copy-id-friend.js": {
+      "size": 5227,
+      "sha256": "2de9f30d66a11f5ad8dcef558c80e6763d9a78247f10b29f48298cee34d7ee69"
+    },
+    "features/i18n/copy-id-gems.js": {
+      "size": 3134,
+      "sha256": "0cdcad3a64f1f17c4221048cdfa01f5f3e18b6cb924dbd81e4df3c72445e6b3e"
+    },
+    "features/i18n/copy-id-google.js": {
+      "size": 8674,
+      "sha256": "de0c69e3cc477c289861247beaadc4eeb51ba3306fd7532fda93a3f1ebac8122"
+    },
+    "features/i18n/copy-id-grammar-labels.js": {
+      "size": 24499,
+      "sha256": "8f691cd06358f095ff499118ec2d1d8e49cde7cd3df29d1decfa2abeed3dffe7"
+    },
+    "features/i18n/copy-id-kelasku.js": {
+      "size": 1290,
+      "sha256": "a6e6fae17a8a074e650109b8fe9324547f25e1fced4f639d18b29f8ecb13490e"
+    },
+    "features/i18n/copy-id-kurikulum.js": {
+      "size": 22541,
+      "sha256": "3829db4d353f55d735c88394514bf7f91c84f2f232e0d11194921b0e2fe18770"
+    },
+    "features/i18n/copy-id-pawarena.js": {
+      "size": 5797,
+      "sha256": "22fd6f8c42ad2a31ae21fce6484c144837498032f10ad7b85167d1690f78cdad"
+    },
+    "features/i18n/copy-id-proctor.js": {
+      "size": 5887,
+      "sha256": "19dc21349deb712f4fe5372a36fdda20577a45f9236748ef5a3331940dd994d4"
+    },
+    "features/i18n/copy-id-quota.js": {
+      "size": 10629,
+      "sha256": "c465352f772621186681e1449236c23cfc2f363b6a0973de7201e4431619e919"
+    },
+    "features/i18n/copy-id-redesign.js": {
+      "size": 29033,
+      "sha256": "4348eaaef4f490a739e854e44a4d911cda30ba6eb7988f2dbb5f52ae1294df00"
+    },
+    "features/i18n/copy-id-sekolah.js": {
+      "size": 12845,
+      "sha256": "f6e426df42bcab70c32dbc6cb7737ac00db222a38e630a060542014a26defb15"
+    },
+    "features/i18n/copy-id-settings-locale.js": {
+      "size": 1731,
+      "sha256": "d87cc35fe1172176ce438696c3f29709607f96195cea3627a7a5c914eb6d967b"
+    },
+    "features/i18n/copy-id-stage.js": {
+      "size": 7686,
+      "sha256": "8602f9a51317c9eb3eb5282019f733bc14641b6259e3343f926aaa30cbf2c462"
+    },
+    "features/i18n/copy-id-student.js": {
+      "size": 22342,
+      "sha256": "f8fa584e1f436932266ae58e12bbb4fb57c7b993e2ddd0e450427e124697c78b"
+    },
+    "features/i18n/copy-id-undercover.js": {
+      "size": 21771,
+      "sha256": "4dd76d6ba0ba318dcd5f748598d7c728dd6b0e1e8c2311c739f45ece920f800f"
+    },
+    "features/i18n/copy-id-worker.js": {
+      "size": 1467,
+      "sha256": "1b4a0c2d2baa78e6bfb45751aa8e39f75f561cbe08e0b59820837ec717432934"
+    },
+    "features/i18n/copy-th-app-a.js": {
+      "size": 78749,
+      "sha256": "8eba24a27f58634f79e9d472c4788ca25e0a5ce8ddc127674fe079a93fa62a4b"
+    },
+    "features/i18n/copy-th-app-b.js": {
+      "size": 19124,
+      "sha256": "7d247e7b3a8205ff662e8be9b43b0c8f7e34538cc52a432ab3b419e389774714"
+    },
+    "features/i18n/copy-th-app-c.js": {
+      "size": 37070,
+      "sha256": "1e8f6d4a4c5f637cc2550f21f4497c40bf4b7398328619123f22ef2165ce20c7"
+    },
+    "features/i18n/copy-th-app-d.js": {
+      "size": 85157,
+      "sha256": "8391ed3358c0754cb4fcd14e4bdd81b9f523b526e38b256ed5d8d314db608d39"
+    },
+    "features/i18n/copy-th-app-e.js": {
+      "size": 12627,
+      "sha256": "47d67df43345022d42d04b7c96eb45d5444305196779236a68c07a4e30e19361"
+    },
+    "features/i18n/copy-th-app-f.js": {
+      "size": 22776,
+      "sha256": "0fd102711a6a88840cd7a9cf30d499582c5861a442e2d440108ed65e5ce2f4bc"
+    },
+    "features/i18n/copy-th-bahasa.js": {
+      "size": 14165,
+      "sha256": "ffb9f897699b4d8214e96c5fe4ef7f8cc2df86ac4b011002758b992272c92709"
+    },
+    "features/i18n/copy-th-certificate.js": {
+      "size": 7434,
+      "sha256": "eb0beae78377a484957aa2d65d61cd64401fcc20fde8a843356b7cb5063ed568"
+    },
+    "features/i18n/copy-th-classjoin.js": {
+      "size": 14032,
+      "sha256": "1d41fe3157e864b08dc608d1944a615962b5676593f6382762098c51a3b538cd"
+    },
+    "features/i18n/copy-th-core.js": {
+      "size": 1629,
+      "sha256": "d356e6ffd8c655967766b0df6e5f74d8e1aed90471035cfec1138b18fffe8ccb"
+    },
+    "features/i18n/copy-th-feat-a.js": {
+      "size": 57318,
+      "sha256": "381ce5387636f5114198860c62ac8b47702f5044d5d5fc44382fe4c3536f0d86"
+    },
+    "features/i18n/copy-th-feat-b.js": {
+      "size": 50801,
+      "sha256": "971d768bab67aeb9e63e09628d7fb593958ab8f8b2b2b3acd2bddaa1be81e274"
+    },
+    "features/i18n/copy-th-feat-c.js": {
+      "size": 32436,
+      "sha256": "5e999e733abddb8752f53180e35274ce60924c0592c258ab9b6ab7491fb22db4"
+    },
+    "features/i18n/copy-th-feat-d.js": {
+      "size": 77757,
+      "sha256": "0e7440d7378b279b642b14ca37b455103a30ca0f90f5ba58a8e4c0a01f990936"
+    },
+    "features/i18n/copy-th-friend.js": {
+      "size": 7317,
+      "sha256": "bc83d39fddde690c3e7ae7d630a6033c51784dc7a228479b04ebf5175e9f6841"
+    },
+    "features/i18n/copy-th-gems.js": {
+      "size": 4595,
+      "sha256": "ac0dede1603d428b3c7d002df2b7314e8bf9a9ae0799b38b185eec2e741fd752"
+    },
+    "features/i18n/copy-th-google.js": {
+      "size": 15486,
+      "sha256": "93718ebdbec132f9fc90a0174c1b86eab2850465feb860e6dccdfba4ce93d63e"
+    },
+    "features/i18n/copy-th-grammar-labels.js": {
+      "size": 34735,
+      "sha256": "450799aaafb03e7662b56dda8702ef9bf9fe5c483517b666be83a984e745100d"
+    },
+    "features/i18n/copy-th-kelasku.js": {
+      "size": 1497,
+      "sha256": "e213a54cd277347e8d239e3049a84babbab94f4bf268ba899c5b16987df744ea"
+    },
+    "features/i18n/copy-th-kurikulum.js": {
+      "size": 38523,
+      "sha256": "0e5ed9c76a675bd92a17bbb8e4a9cbc20d9ea09fb27fcaa4a7c6e8a4abe02a84"
+    },
+    "features/i18n/copy-th-pawarena.js": {
+      "size": 8549,
+      "sha256": "56d1a8849a702b4cf11e5a3cc36acd8d570a18f3812bed3d1d81ae7bc300535a"
+    },
+    "features/i18n/copy-th-proctor.js": {
+      "size": 9036,
+      "sha256": "b8820b6425387f635b6629d37266144ce538accca9eea88fa49ef3b4fbc0a397"
+    },
+    "features/i18n/copy-th-quota.js": {
+      "size": 18140,
+      "sha256": "921185292d5fd216a41cc74983973041d37889b4679a5df7f3992ba39ec18a8b"
+    },
+    "features/i18n/copy-th-redesign.js": {
+      "size": 41572,
+      "sha256": "0ed70e56e4a1a69df4b264483a60d56c65058aed1fa261cb4104f0873cf2c721"
+    },
+    "features/i18n/copy-th-settings-locale.js": {
+      "size": 1316,
+      "sha256": "9a6781df3086eeb128487d532d6498c347198e4b2bc3fdfe0c57c7273c0e0401"
+    },
+    "features/i18n/copy-th-stage.js": {
+      "size": 9973,
+      "sha256": "5aa1f45fb9cbaf0a5e994ec6c2a710d3e97b68b70ac7af7e7bc114fc028196e4"
+    },
+    "features/i18n/copy-th-student.js": {
+      "size": 35228,
+      "sha256": "c380d4f9fcd07d2c8ad535d9cbe5fa34e0ceae583de35597de36e2ba0e4f9c61"
+    },
+    "features/i18n/copy-th-undercover.js": {
+      "size": 31573,
+      "sha256": "1955573f61c25fc58ed045a137d1e2c87ac04cb5a4d8d19ae36462277f72b002"
+    },
+    "features/i18n/copy-th-worker.js": {
+      "size": 838,
+      "sha256": "6f29886f7326c1b085d1337a8f1e65ec685060b0954466984d74822d3024df5d"
+    },
+    "features/i18n/fiezel-i18n.js": {
+      "size": 9058,
+      "sha256": "d3eeacf47e933e3e00fb396b21854988fbfa3700997fc5fe8b171f02dc35b39d"
+    },
+    "features/i18n/fiezel-th-loader.js": {
+      "size": 9827,
+      "sha256": "ca0e2ca512b150c15e4d03b3d34ef7d03a79631f1508425ca8c3d00f8109e0df"
+    },
+    "features/i18n/grammar-sentence-translations.js": {
+      "size": 44270,
+      "sha256": "6142fd4e6bc1423cdc1371ecc483f5784f6f71886abf5f561774b633bf3b78b5"
+    },
+    "features/i18n/listening-bank-th.json": {
+      "size": 837649,
+      "sha256": "418c124fb12bb1d62585182683ddb27b0396337f573cfc4763ab1d9565ce891f"
+    },
+    "features/i18n/listening-exam-th.json": {
+      "size": 22219,
+      "sha256": "e9eb5523165baaa8c862ecbdc0729afe6d4af017c2c9d754107c10f16d881cf6"
+    },
+    "features/i18n/locale-assets-th.json": {
+      "size": 3407,
+      "sha256": "bedb2a36ab7822b7ad7616ff6b1b993096058e9b036a32d4f1dcb6a09deb7269"
+    },
+    "features/i18n/misconception-th.json": {
+      "size": 244173,
+      "sha256": "f96d197013d3d2d7dc38ebfdf6ecc2a24d901b93db7226eee54f8dd51dca7aaa"
+    },
+    "features/i18n/naskah-th-brain.js": {
+      "size": 26692,
+      "sha256": "1e91da50d008b6661bdd5dbf3f1ab617749a8f4d4e4b9bbd2010c5dd5a122a42"
+    },
+    "features/i18n/reading-bank-th.json": {
+      "size": 596172,
+      "sha256": "0b1f11556b08fd2a30e373cd6622207e5129c9ea04cd18a9de7476744df66808"
+    },
+    "features/i18n/reading-exam-th.json": {
+      "size": 77861,
+      "sha256": "228c448d140116311c6c62da50066532032c6057915cf8f53597bb76fc1263d6"
+    },
+    "features/i18n/speaking-bank-th.json": {
+      "size": 20566,
+      "sha256": "b0f17dbb4756d04e8767b0c636a66d5db1a001f07471f01128e305155592b35a"
+    },
+    "features/i18n/speaking-exam-th.json": {
+      "size": 11730,
+      "sha256": "2c8c51fa8fcc9bbc311269cfbc711aa4fff2e8a682b1fb83022bdea69b0c8414"
+    },
+    "features/i18n/writing-prompts-th.json": {
+      "size": 41036,
+      "sha256": "cb62f0b11897b62bab1d72a5b6288bd375f869feb80ac1d30eda2b4fefb295ec"
+    },
+    "features/interactive-chat/fiezel-chat-icons.js": {
+      "size": 16981,
+      "sha256": "291f0cce8d3c63eab0d1b0bbeedd684ed2b1a36ff54fd052b9d4fe2288b44411"
+    },
+    "features/interactive-chat/fiezel-interactive-chat.js": {
+      "size": 169808,
+      "sha256": "9af4988876e0d6fdd9f45b757b1490def1464eb4abd301967af293ec09d92838"
+    },
+    "features/interactive-chat/fiezel-voice-call.js": {
+      "size": 62874,
+      "sha256": "48157e7f809fd0ddfaad6e1cdfb70a1955cea0c9dd171d17d9cffd6f0e1bd755"
+    },
+    "features/interactive-chat/fiezel-voice-orb.css": {
+      "size": 25338,
+      "sha256": "6a38d250305bc4ab69aba96c72535c317a65f9c53f2b8f10ac8558765e9a3491"
+    },
+    "features/interactive-chat/fiezel-voice-orb.js": {
+      "size": 17965,
+      "sha256": "eaaa24c1cfd90f755fc7deb736fc758e63142c0a0a9786bef400714855f8fa9b"
+    },
+    "features/interactive-chat/interactive-chat.css": {
+      "size": 70853,
+      "sha256": "073362e187487e550bff0fda9e78a1f1d39210077bcc31aebeb9e320d5b47602"
+    },
+    "features/japanese/fiezel-ja-ui.js": {
+      "size": 24215,
+      "sha256": "1dba48af0dcddece15c71516af82d8bec051c7e75215197f1d465a5b74edca57"
+    },
+    "features/learner-flow/fiezel-decision-trace.js": {
+      "size": 16792,
+      "sha256": "c12a7dd8e4b3cc6bb1cae88785367883caf498dae9caacde9053757378c2d20d"
+    },
+    "features/learner-flow/fiezel-duel.js": {
+      "size": 23711,
+      "sha256": "a2fa119eaa2d1fdfae8d6faf4d2534fc0a424df2ef7b3c0847b564f9665a822e"
+    },
+    "features/learner-flow/fiezel-learner-flow.js": {
+      "size": 71850,
+      "sha256": "d1b289479c8015717541cd58aad7399d41b6c1113a4ac4f200efc697d4a2c9cb"
+    },
+    "features/learner-flow/fiezel-paw-arena.js": {
+      "size": 45001,
+      "sha256": "29238f528348bcfb4518a30059777cf6193d1661fa787069a9c47cc7628830e0"
+    },
+    "features/learner-flow/fiezel-progress-backup.js": {
+      "size": 5738,
+      "sha256": "7f39675822e84c1ac886bb0b1a8305cfb7918e567919ab4b5b673dffc9629ba7"
+    },
+    "features/learner-flow/fiezel-review-bank.js": {
+      "size": 98891,
+      "sha256": "46da80b922cec491694e733991f7e4921c388bb1ed1e5256b566ff5aafb3bcea"
+    },
+    "features/learner-flow/home-polish.css": {
+      "size": 3905,
+      "sha256": "4211ae588927073c5bd145becec026630663b9c53dd90dd95220e57f94bb067d"
+    },
+    "features/learner-flow/learner-flow.css": {
+      "size": 29136,
+      "sha256": "ffdb6118d09258ede59212e70fb1395b9a20a6f10eb3fbead06a6ffb265f78c8"
+    },
+    "features/library/fiezel-library-ui.js": {
+      "size": 45656,
+      "sha256": "f8054434ea0900f023150cdc263f1cd98e8b896947ee9355dd1339ef636fcaf2"
+    },
+    "features/library/fiezel-library.js": {
+      "size": 7792,
+      "sha256": "b8a64f038a578d77b47fa0f773c9f40b25acc8f19bf3ef62376a7eff22c95cc8"
+    },
+    "features/library/library-books-v1.json": {
+      "size": 331753,
+      "sha256": "b345693e4d9ae9457d76302f6a5f952e38d77363b1a7682c980e31c75aeed7d5"
+    },
+    "features/mascot/fiezel-mascot.js": {
+      "size": 72791,
+      "sha256": "73d5e7f06e9802202dc49a0883d504ebbdb108e215ba0d132103b1f41ef76378"
+    },
+    "features/mascot/fiezel-mochi-companion.js": {
+      "size": 22869,
+      "sha256": "b9e4dc7cb2912c38e5dbd2f0c3fda60ce540f61bbeda6144dacec6d2c72d4918"
+    },
+    "features/mascot/fiezel-motion.css": {
+      "size": 41512,
+      "sha256": "4018a06f6feb6e12398019efecbe14253f3b5b7cfc970bd1d55d737156d543c5"
+    },
+    "features/mascot/fiezel-paw-outfit.js": {
+      "size": 27947,
+      "sha256": "0b000ef3881e3ef2d9a4aa159d92985aa2fea9340627905e52778410f28a00a0"
+    },
+    "features/mascot/fiezel-paw-slot.js": {
+      "size": 17598,
+      "sha256": "e0893c0aec6fb311871218c1d1828d67c57ea3ba5c96538796f14ade9c814cc4"
+    },
+    "features/mascot/fiezel-presence-engine.js": {
+      "size": 8746,
+      "sha256": "fda0f7feaeec543697436899192649b0403a29a138a69714996c988d63590e93"
+    },
+    "features/mascot/micro-ui.css": {
+      "size": 10621,
+      "sha256": "42ee75bc8715b7bb656495cd212735b8322879874ccd80f99addc288710f94e3"
+    },
+    "features/mascot/qa/bbox-probe.mjs": {
+      "size": 5851,
+      "sha256": "1212e8b6e40d47d4ee4a3907e50a58a3bae1441986e840bfaf6e72fb2863fe27"
+    },
+    "features/mascot/README.md": {
+      "size": 2622,
+      "sha256": "bb832cdec8f560534eabce63594a9224d040df3d9e84943b4a2ac88ae8704358"
+    },
+    "features/neural-voice/fiezel-cf-tts-transport.js": {
+      "size": 22963,
+      "sha256": "e62e32e2bd00c32bc233198ec97c7bd46f0eb1966d24047b0fccaf2d81bc649c"
+    },
+    "features/neural-voice/fiezel-cf-voice-notice.js": {
+      "size": 11784,
+      "sha256": "1c73b8555f931aa8e092d745565a5b8eb664006d8aa7409fdd11420db9450497"
+    },
+    "features/neural-voice/fiezel-diag-panel.js": {
+      "size": 33348,
+      "sha256": "2b145f3a690318909908f03b9cadf79ad7de83cbae86528dcc451e8978dce8a2"
+    },
+    "features/neural-voice/fiezel-m0281-prebootstrap-hotfix.js": {
+      "size": 6437,
+      "sha256": "ba79be27797a4058efb037d452caa95d2946a741fefc01047a97893ed1d2180e"
+    },
+    "features/neural-voice/fiezel-neural-voice-audibility-fix.js": {
+      "size": 15420,
+      "sha256": "68520c0c808816ce04f0ca281a76c449144595ba6c4a0fc2c29356f52004664a"
+    },
+    "features/neural-voice/fiezel-neural-voice-bootstrap.js": {
+      "size": 39043,
+      "sha256": "0d0ef3117dc102baf6fef932765e9cabf9976d855766772a06eb379a0228dacf"
+    },
+    "features/neural-voice/fiezel-neural-voice-cache-integrity-repair.js": {
+      "size": 5188,
+      "sha256": "be962cfa576157f28e67809d02295a84fd2aa2e012899d4309c10e1ce6f46ee9"
+    },
+    "features/neural-voice/fiezel-neural-voice-config.js": {
+      "size": 3614,
+      "sha256": "d7ce104ef3b7af8ac9bee3297c29e4545d81718d3914d3394fd80b7906ff9422"
+    },
+    "features/neural-voice/fiezel-neural-voice-ios-cache-fix.js": {
+      "size": 8732,
+      "sha256": "a3abcd058ec0113b083215f3b48035125b6725e3f090550e30d569076d3be2b3"
+    },
+    "features/neural-voice/fiezel-neural-voice.js": {
+      "size": 43263,
+      "sha256": "bfabdde7ff5d2bfed87f5e14d7f2b0d96cf06058fe7772934b7de765387f20a6"
+    },
+    "features/neural-voice/fiezel-pcm-renderer-worklet.js": {
+      "size": 5548,
+      "sha256": "2c12f387bf3ee9ada6b442e0e8f2c66c83797367f8deaebedcd69c7383e068c8"
+    },
+    "features/neural-voice/fiezel-prosody.js": {
+      "size": 36769,
+      "sha256": "8249fbc8bc9935020e84f0072eebb22728c5485433004092c0d3938dcdc6d9de"
+    },
+    "features/neural-voice/fiezel-puter-voice.js": {
+      "size": 16658,
+      "sha256": "b64295723b9915f69b0c1758983fc9d46b37f52939461daad3650adf7b18bb55"
+    },
+    "features/neural-voice/fiezel-sherpa-vits-adapter.js": {
+      "size": 23865,
+      "sha256": "d141b56bd99e2dfc7ad41ccb9c91aef5fa23bbc9a2f550c57cd41b176597aa53"
+    },
+    "features/neural-voice/fiezel-speech-bridge.js": {
+      "size": 19167,
+      "sha256": "1c9c966cd337c18d86427b214662bd44eb5b38a61696088bc92e1095181577ee"
+    },
+    "features/neural-voice/fiezel-subtitle-translate.js": {
+      "size": 9890,
+      "sha256": "a786dd96526e9891f3c834fc765b0efc8e71c402e79625cb66fa5c41ec7ac9dc"
+    },
+    "features/neural-voice/fiezel-subtitle.js": {
+      "size": 9076,
+      "sha256": "138dd37652ad1011eb343e8ab38519635f7629baaddfc659f34db78a59319260"
+    },
+    "features/neural-voice/fiezel-voice-diagnostics.js": {
+      "size": 5064,
+      "sha256": "0cf5ec07b78f8080d3122a0aa79dfd9e0a9e5a11934a5dea563df24cdc85337f"
+    },
+    "features/neural-voice/fiezel-voice-offline-autoload.js": {
+      "size": 21662,
+      "sha256": "1743139c8db1693f62274aa0afe3a49ea84265152196aafa6359d8fd78596bae"
+    },
+    "features/neural-voice/fiezel-voice-persona.js": {
+      "size": 5465,
+      "sha256": "b46e22ea4f7aa138600520d09b4576e06b91e69edb133d0f5f12a52a6fd0082f"
+    },
+    "features/neural-voice/fiezel-voice-say.js": {
+      "size": 39824,
+      "sha256": "5f3a9a40a53b86b10f6358e78f25bfbb65eb2fab1dc362d989294aa1f09b7568"
+    },
+    "features/neural-voice/fiezel-web-audio-player.js": {
+      "size": 70570,
+      "sha256": "bd5459687764e96075234c59fbda72a795a3b34489277a1fdd6bd5d26ce93ea6"
+    },
+    "features/notify/fiezel-inbox.js": {
+      "size": 13432,
+      "sha256": "d1c51dc9d42f5d2201b9e3c48abc9eb081418dfa62ed4cb9b2472994a20be4e3"
+    },
+    "features/notify/fiezel-sync-plan.js": {
+      "size": 3926,
+      "sha256": "2543ff171b2624809bc3c2a16ee6ffc11bf56d620a92398fc283e65c80cf3e98"
+    },
+    "features/nujum/audio/DL-01.mp3": {
+      "size": 62496,
+      "sha256": "eba41bd65e66f5a7291a732a5257687b7349d19dcb2776c6d47d7825722e7a87"
+    },
+    "features/nujum/audio/DS-01.mp3": {
+      "size": 52704,
+      "sha256": "0415748b9229c337ba4b2f6fcd4d3467b30faa920fcd270ffb631e398b8cb0c5"
+    },
+    "features/nujum/audio/DS-02.mp3": {
+      "size": 48240,
+      "sha256": "0bb7e3bf35c066199b9fbdfc27519196e9661c4603e57f0f1994b557526ac4b6"
+    },
+    "features/nujum/audio/DW-01.mp3": {
+      "size": 54432,
+      "sha256": "3414ca6dacbd2d15189da6ba45e2429d0669a3ba2e8469030dfcdc4444f86d46"
+    },
+    "features/nujum/audio/FS-A01.mp3": {
+      "size": 53568,
+      "sha256": "940a9c3fae917b51d60981abf1c0b611d0308208a2af1120cccfa3cf24935fbf"
+    },
+    "features/nujum/audio/FS-B01.mp3": {
+      "size": 51984,
+      "sha256": "5e09822353b7019b8322343237f92501e277edfd00dcd76bcf55812e28084aea"
+    },
+    "features/nujum/audio/FS-C01.mp3": {
+      "size": 64656,
+      "sha256": "eb9ee4dfd210c5b0b1da8b9c98e5a6fe8bcd8d895fc6915bb445f933940f294c"
+    },
+    "features/nujum/audio/MW-SPD1.mp3": {
+      "size": 73872,
+      "sha256": "1e490ac686448ebb37110ca472fc4d81d16ded5e14a3b58b440b951c72227402"
+    },
+    "features/nujum/audio/MW-SPD2.mp3": {
+      "size": 55152,
+      "sha256": "78fe5f75c015fcc857890617c25512131d88549c8c064a09827a7a1ea7a5d0d0"
+    },
+    "features/nujum/audio/MW-SPD3.mp3": {
+      "size": 50400,
+      "sha256": "e809f46ff429e539f35c843f0e299af7c2a8d704264dd51edc2e107b8401d840"
+    },
+    "features/nujum/audio/MW-SVA1.mp3": {
+      "size": 88364,
+      "sha256": "78cd974c755078293167babbc4d8582a2c47aac27e1ee6cde9781463e08724d6"
+    },
+    "features/nujum/audio/MW-SVA2.mp3": {
+      "size": 71424,
+      "sha256": "a5f311d4571065e6a74d314fa900b01314a68fcd05dcba7eb0d8231a279f1d45"
+    },
+    "features/nujum/audio/MW-SVA3.mp3": {
+      "size": 82796,
+      "sha256": "9a24c693f30968fcc694dac462bede389ede75be62555a575e151a3e5894b1a6"
+    },
+    "features/nujum/audio/MW-SVA4.mp3": {
+      "size": 72812,
+      "sha256": "130c6c29b8faf2252b28a2a7152dfc2db7e1ca3da5ef0e8d16d0205d3ef20711"
+    },
+    "features/nujum/audio/MW-TNS1.mp3": {
+      "size": 87596,
+      "sha256": "3e6c46196b44c3726b143c19caf0cc3f64473b7fc6e3c0297554fa0fd7dd920e"
+    },
+    "features/nujum/audio/MW-TNS2.mp3": {
+      "size": 73440,
+      "sha256": "a6604341c7813d552c98d5479f386ba9968874dfd1ba49aae4c0bf6fc4aed41f"
+    },
+    "features/nujum/audio/MW-TNS3.mp3": {
+      "size": 85676,
+      "sha256": "3623601b7e34073ac59bc48cacbe9c06063dc08f25de5e99c675e503fd587316"
+    },
+    "features/nujum/audio/MW-TNS4.mp3": {
+      "size": 81068,
+      "sha256": "5381f0608e74abd79255765d08986bc14cd54f0ee4e6f0f11172d74c7c1d22d1"
+    },
+    "features/nujum/audio/MW-TO1.mp3": {
+      "size": 71712,
+      "sha256": "77ea6e5d1f4a2a726fb39edb82810214624a446ac20fcdab3c96e44145bf6b5b"
+    },
+    "features/nujum/audio/MW-TO2.mp3": {
+      "size": 61200,
+      "sha256": "b092fc8d35bdad1796a69e068dc52bcdbf280f6066aed73265783fd952418eca"
+    },
+    "features/nujum/audio/MW-TRN1.mp3": {
+      "size": 79148,
+      "sha256": "149f007f0b51e6fb00305a5c2471a51f6cefd17a56c4adf3db4ff35563cfbda3"
+    },
+    "features/nujum/audio/MW-TRN2.mp3": {
+      "size": 91436,
+      "sha256": "06ab18712659b4e257bfedf7db6420aaf14b60cec8df961fbf01eee26bb07f98"
+    },
+    "features/nujum/audio/MW-TRN3.mp3": {
+      "size": 75692,
+      "sha256": "85b519655fa16b248a4ed75b938146987370426979d9df18ac4e5cc3b3c68020"
+    },
+    "features/nujum/audio/MW-TRN4.mp3": {
+      "size": 77228,
+      "sha256": "88a35df918744c0c4c40f65d13bb72d12bfa5e8b92ca4c2e8f26fc91707725e3"
+    },
+    "features/nujum/audio/PB-01.mp3": {
+      "size": 87788,
+      "sha256": "e2f4a1aac158bef546ca5d1ea5b10ca75b8849284c20bb1b722e8bc13e91060a"
+    },
+    "features/nujum/audio/PB-02.mp3": {
+      "size": 75500,
+      "sha256": "aa2a476183bc3c7bb6777e0c7ff3953acefecf0bb6dd272cf848dac8cecba693"
+    },
+    "features/nujum/audio/PB-03.mp3": {
+      "size": 75500,
+      "sha256": "989229a99a33416304b61ae3b672a71b80c3a267eccb049af2b849653d152d27"
+    },
+    "features/nujum/audio/PB-04.mp3": {
+      "size": 82604,
+      "sha256": "d9b88547e8e625d598ac796527c2a11f7b1bacb85cfe1667f35fe03eee4e498e"
+    },
+    "features/nujum/audio/PB-05.mp3": {
+      "size": 93164,
+      "sha256": "941f0a74b3b08514913650acaea626ae4c7bd1bfde90c283d758b5206f3cec36"
+    },
+    "features/nujum/audio/PB-06.mp3": {
+      "size": 84140,
+      "sha256": "66e1bc1e80ea42e03320fabf4c5bb93bc94cdb2a425d1ecd5653b0207daff9a1"
+    },
+    "features/nujum/audio/PB-07.mp3": {
+      "size": 112364,
+      "sha256": "7e80ce3cde4862f25c591049bd2bf5b3b38064c9a2c2627ef278c441b963fd3a"
+    },
+    "features/nujum/audio/PB-08.mp3": {
+      "size": 101420,
+      "sha256": "1f6d42d3df3add24604ed4c6bb22d1e1b849e8cb6bfbb9c88f0d13e89447d3c9"
+    },
+    "features/nujum/audio/PB-09.mp3": {
+      "size": 79340,
+      "sha256": "dbfd57ca0584df009a8001363ee7b18ca7d7cf3d4f16b60914647ff42d229046"
+    },
+    "features/nujum/audio/SR-01.mp3": {
+      "size": 55440,
+      "sha256": "be980e57354ab1a1731be312dc8455e684900ee960cca9312a33a03e87c6667e"
+    },
+    "features/nujum/audio/SR-02.mp3": {
+      "size": 51696,
+      "sha256": "0c7238ee911cad734ff0ee63c7a65233706f5ce5f32140142fe5ac48b93ef687"
+    },
+    "features/nujum/audio/SR-03.mp3": {
+      "size": 45360,
+      "sha256": "a4f5341184de1e37be06c91bf69416a4052fe084548e88193402fb13c380d0fd"
+    },
+    "features/nujum/audio/SR-04.mp3": {
+      "size": 51696,
+      "sha256": "923c651cf3de3b631428a15e2b84d688af56489aea5fbe44517dcc9186db3d5e"
+    },
+    "features/nujum/audio/SW-01.mp3": {
+      "size": 60192,
+      "sha256": "b2c0beb409cdbb540c3c359fc1ff96de5c7d4b28f5670e16fefe15099a6be3a5"
+    },
+    "features/nujum/audio/SW-02.mp3": {
+      "size": 60048,
+      "sha256": "3bd5cc4811cf8eb528212411725c4cb6601469e99661c5c9c3c75d6c8523a429"
+    },
+    "features/nujum/audio/SW-03.mp3": {
+      "size": 56160,
+      "sha256": "7e9dfafdd5b9ef3e6cb0cc08ee808ad1acdc18ea2de628d7fb0895bfb1b3c2d4"
+    },
+    "features/nujum/audio/SW-04.mp3": {
+      "size": 56880,
+      "sha256": "e23a102eccc0e1c660cdc7b313d3a0289948805a148f0f26029c7804b38cd2f0"
+    },
+    "features/nujum/audio/SW-05.mp3": {
+      "size": 40032,
+      "sha256": "1fdbd4699b33b9c9dd1ee3a7abc4f8d6267603acdc2c7fcd96069408261c902b"
+    },
+    "features/nujum/audio/SW-06.mp3": {
+      "size": 49968,
+      "sha256": "b7d4209788b8fb1a5b0ac3879f2f1768b6cff48e53296873cd2c778e82b61ae7"
+    },
+    "features/nujum/fiezel-nujum.css": {
+      "size": 47706,
+      "sha256": "b3c067052d13d260ac5cddc94f7b6b10456705304ede1b8aef4e28e6ef361927"
+    },
+    "features/nujum/fiezel-nujum.js": {
+      "size": 85444,
+      "sha256": "4662e3526f29ecb9d07cb05724e611ced4437d038bfdc8eb1a59090ff5c6538c"
+    },
+    "features/nujum/mockup.html": {
+      "size": 29323,
+      "sha256": "4f12e1891b4abca159a2890f077dedd88f9f2b4b9973aefd74fbc40da74c54d6"
+    },
+    "features/nujum/nujum_scripts.json": {
+      "size": 16984,
+      "sha256": "27bde7d9b70e81ef8c05cb62e4993fd7241d5653b495fdfea0b25da5bf76dbc7"
+    },
+    "features/onboarding/fiezel-onboarding.js": {
+      "size": 95030,
+      "sha256": "8c86c3a6203595d91e8eaa29864d6c81cbb9dd4a8140cb1a0d4aefe183570fd8"
+    },
+    "features/onboarding/fiezel-tour.js": {
+      "size": 29802,
+      "sha256": "d5030e425545bbd153b3ef23c795f1dff6c677eabbdb70653d2052147e7c4d99"
+    },
+    "features/personal-journey/fiezel-personal-journey.js": {
+      "size": 22966,
+      "sha256": "cab96cd1dff48d933201f319efd74713f4160211acc2279a6bddd56115d33180"
+    },
+    "features/prasasti/fiezel-prasasti-core.js": {
+      "size": 6069,
+      "sha256": "81b9b9fdcd5dec2f6f21582837709a9c4a7fa1624d8c1a9110a0abc2ca993ad7"
+    },
+    "features/quota/quota-copy.js": {
+      "size": 23946,
+      "sha256": "a39ec3b245e6fa279d32c0a4f75ec18e9a9aec3ad80133b3eee9def678d869a3"
+    },
+    "features/search/fiezel-search.js": {
+      "size": 12502,
+      "sha256": "9243fa579ff4f4b05e8a9cad7d4a8321f85545b45f8ac0e8831d83a442a54746"
+    },
+    "features/skills-evidence/fiezel-skills-evidence.js": {
+      "size": 11317,
+      "sha256": "ff24f623d97708fae4535eaf024431ca763078a66974b302a2ce60cfcbcaf490"
+    },
+    "features/social/fiezel-invite-link.js": {
+      "size": 18208,
+      "sha256": "f7c40b7bfe9981fb58d80848c259765c4794af444bf37215a3a6d2e50a60135f"
+    },
+    "features/social/fiezel-qr.js": {
+      "size": 25772,
+      "sha256": "1712108ef018f5c129fdcbea0b0b055d2dcd784a57af526ee963bde7cfd1112b"
+    },
+    "features/social/fiezel-social-notify.js": {
+      "size": 11828,
+      "sha256": "70a7ad5d1f0f2e3b6da32e77f2416d241cc7cbee1fb0943c056a7b24887bf45a"
+    },
+    "features/social/fiezel-social.js": {
+      "size": 23998,
+      "sha256": "70d82e8a955541178215e3dc03603fe53185d5fcc935e9b6f8a5ed0822e7ac67"
+    },
+    "features/social/jsqr.js": {
+      "size": 257210,
+      "sha256": "445ca22bb888b06287395463fa29bb6220d0b82e7ef80d166ae57abc189f70b3"
+    },
+    "features/speaking-listening/audio-jlpt/jlpt-n4-m1-01.mp3": {
+      "size": 267692,
+      "sha256": "bfdef9300ff727505841a731e5627a101c97787d3a0304407194dffafb6c3dfe"
+    },
+    "features/speaking-listening/audio-jlpt/jlpt-n4-m1-02.mp3": {
+      "size": 258476,
+      "sha256": "7f9637821cbcba7100a16586e790781b7ce2f619422450775cdf1437edda3c46"
+    },
+    "features/speaking-listening/audio-jlpt/jlpt-n4-m1-03.mp3": {
+      "size": 299756,
+      "sha256": "bfec0bc76648c892c63ee1dc73a2dc2c490b43cf9a4612376a087f62943be2a3"
+    },
+    "features/speaking-listening/audio-jlpt/jlpt-n4-m1-04.mp3": {
+      "size": 276332,
+      "sha256": "6d26acacbdf06acebb80b6a52f4d7f77895a2414c5ffee6dc63154be11d38a84"
+    },
+    "features/speaking-listening/audio-jlpt/jlpt-n4-m2-01.mp3": {
+      "size": 305900,
+      "sha256": "1dec6230ea843be2f6a021515a9ea1eb9c899f109d0760018ebf5fc47cfae17d"
+    },
+    "features/speaking-listening/audio-jlpt/jlpt-n4-m2-02.mp3": {
+      "size": 269804,
+      "sha256": "d507673757b6e5d861d555ee966f9b0559c43b1d2837561f309dd3b7a59eb863"
+    },
+    "features/speaking-listening/audio-jlpt/jlpt-n4-m2-03.mp3": {
+      "size": 267884,
+      "sha256": "acf232e4690987ccf0bc69d30ca28240a7fd3879103aeeee39ea479d680f26df"
+    },
+    "features/speaking-listening/audio-jlpt/jlpt-n4-m2-04.mp3": {
+      "size": 241004,
+      "sha256": "45473091ef964dc82d8121cd63960bbc1b0201b3abd1760a71c1e50300b564d0"
+    },
+    "features/speaking-listening/audio-jlpt/jlpt-n4-m3-01.mp3": {
+      "size": 130604,
+      "sha256": "8cfca71c4c33e1869c66acb0e679be241005915a456a51b36b731309f3623165"
+    },
+    "features/speaking-listening/audio-jlpt/jlpt-n4-m3-02.mp3": {
+      "size": 135212,
+      "sha256": "fc0c217e12612d7c79c1b8f319ea2a5fdad31ad51ac5dddaa3ba14753a2a720e"
+    },
+    "features/speaking-listening/audio-jlpt/jlpt-n4-m3-03.mp3": {
+      "size": 136940,
+      "sha256": "c949ad4ab5aa638473a218a9394567bd80ddd47923bc5234433376482b9d3faa"
+    },
+    "features/speaking-listening/audio-jlpt/jlpt-n4-m4-01.mp3": {
+      "size": 111404,
+      "sha256": "f7196dafc27c9899c98d6761ae2bf5c58c509a137258b5ef181ecffd93ba2a91"
+    },
+    "features/speaking-listening/audio-jlpt/jlpt-n4-m4-02.mp3": {
+      "size": 102380,
+      "sha256": "df30fa73ccf7fac3ed4772e138bfed00e8d8849dacaf00fcd5efc5e1fd388fd7"
+    },
+    "features/speaking-listening/audio-jlpt/jlpt-n4-m4-03.mp3": {
+      "size": 102380,
+      "sha256": "c8e15775acc34474f7f2f391f60438567e08809bfaf5c03e9884ca4db1e1b4a0"
+    },
+    "features/speaking-listening/audio-jlpt/jlpt-n4-m4-04.mp3": {
+      "size": 108524,
+      "sha256": "12949551ef8ecc46fd7255724890b071bea24638c429ba418ab6d90fc457f8c0"
+    },
+    "features/speaking-listening/audio-jlpt/jlpt-n5-m1-01.mp3": {
+      "size": 193388,
+      "sha256": "4f6d16c7687f22e8c89a5cb3db85be82a527fff902b77a429f670c69be2ff328"
+    },
+    "features/speaking-listening/audio-jlpt/jlpt-n5-m1-02.mp3": {
+      "size": 212204,
+      "sha256": "f357033d15e265ac1df22093dbe6f810643ba6d2c66a4d8f3107f10542f0f33e"
+    },
+    "features/speaking-listening/audio-jlpt/jlpt-n5-m1-03.mp3": {
+      "size": 215660,
+      "sha256": "c095d1ed3319d84157224efa8968cae34b855f0c2ffcd36ab88b2c333cb6855a"
+    },
+    "features/speaking-listening/audio-jlpt/jlpt-n5-m1-04.mp3": {
+      "size": 233708,
+      "sha256": "0689cf8b27b47d0095d5e08e2fb751f00326aaef7646c2715911bafd4c4309c1"
+    },
+    "features/speaking-listening/audio-jlpt/jlpt-n5-m2-01.mp3": {
+      "size": 249836,
+      "sha256": "a3e202199abf3b5b0c2ce04f557c2459c11219940c57cd925f1dfb28c11fef2a"
+    },
+    "features/speaking-listening/audio-jlpt/jlpt-n5-m2-02.mp3": {
+      "size": 250028,
+      "sha256": "a1fbd123764c685078a53df8f6e107a3ad6d8be1e692afd5da921de688358f10"
+    },
+    "features/speaking-listening/audio-jlpt/jlpt-n5-m2-03.mp3": {
+      "size": 245612,
+      "sha256": "0da47a243d784f4b1828a5eb6e1abcf4fd605bd4dd5ea6d55f4256894fc37836"
+    },
+    "features/speaking-listening/audio-jlpt/jlpt-n5-m2-04.mp3": {
+      "size": 206252,
+      "sha256": "110d8d2859da9ea80db5fc3e15810489bba08c4869839c27ececa89ad44440e3"
+    },
+    "features/speaking-listening/audio-jlpt/jlpt-n5-m3-01.mp3": {
+      "size": 118124,
+      "sha256": "0fdd3347085b16e3cc0155ea6dc3289a4fb126bfaff2d14e6407689e151d0a5c"
+    },
+    "features/speaking-listening/audio-jlpt/jlpt-n5-m3-02.mp3": {
+      "size": 121580,
+      "sha256": "f90d5cbc319fe791325acbe26c8e525ef8f8c9b206b983ca0c6f0819ad2bf190"
+    },
+    "features/speaking-listening/audio-jlpt/jlpt-n5-m3-03.mp3": {
+      "size": 123500,
+      "sha256": "a492479e36caf7ebabe45ebc4cbf87290d8862aa925c69db1d8a7bb37d09bfc1"
+    },
+    "features/speaking-listening/audio-jlpt/jlpt-n5-m4-01.mp3": {
+      "size": 91436,
+      "sha256": "0cf78fb811060ff49997a449fb759546a31765c65ab34ccf3a16bc9bca110c6a"
+    },
+    "features/speaking-listening/audio-jlpt/jlpt-n5-m4-02.mp3": {
+      "size": 96428,
+      "sha256": "2f959559afa2d86c98f94ed01c99bb8651882d1e1b077c2dc890bf31f0a4e3da"
+    },
+    "features/speaking-listening/audio-jlpt/jlpt-n5-m4-03.mp3": {
+      "size": 97388,
+      "sha256": "60076e15ecbaa8920eb90bae86f90f4a5eb2251e0da4862ab9404d3be16e5cbd"
+    },
+    "features/speaking-listening/audio-jlpt/jlpt-n5-m4-04.mp3": {
+      "size": 95468,
+      "sha256": "0ccb1a630cade14efa61ce92b73324fe64b0b5fb4158f21165f674f08006bb60"
+    },
+    "features/speaking-listening/fiezel-bicara-privat.js": {
+      "size": 30175,
+      "sha256": "5762ce508ce4ba6504d2e44f8b2e18316aa25e94004e2bb060552e6fb7766e0e"
+    },
+    "features/speaking-listening/fiezel-jlpt-listening.js": {
+      "size": 59626,
+      "sha256": "35686ebb41345f115f443f0735be41c8f7191e57bec774ad0e847261eddd8e4d"
+    },
+    "features/speaking-listening/fiezel-panggung-suara.js": {
+      "size": 20541,
+      "sha256": "423fd39f599adb4de8487c007e9282ee14c752ed3b14d55a503e39c23dc1a544"
+    },
+    "features/speaking-listening/fiezel-speaking-listening-addon.js": {
+      "size": 92363,
+      "sha256": "6661463432f892f9d67066c8bc3c3e50a5ee4abab4edac6ec698b8bcdd3241fd"
+    },
+    "features/speaking-listening/fiezel-webrtc-stage.js": {
+      "size": 34118,
+      "sha256": "4c8f9b4946dd36c79362a8a0de3fe1c4c174e0198c666a194ff765c975fff6fc"
+    },
+    "features/speaking-listening/gems-core.js": {
+      "size": 11115,
+      "sha256": "5e30ae80b4234083f3b7a3bbb3b2e78f072835f124d298f21727a4e8e43890d6"
+    },
+    "features/speaking-listening/jlpt-listening-bank-v1.json": {
+      "size": 81081,
+      "sha256": "20d1c7ccdea0ee0e119a60c4238e3b77b2e1ba49b14dbc8de2bb43e352cd6e5e"
+    },
+    "features/speaking-listening/jlpt-listening.css": {
+      "size": 47074,
+      "sha256": "1df1bd9f6824a35555d860b736eb0b8778a8e9a9f54543d47b461425fb1a8df7"
+    },
+    "features/speaking-listening/listening-bank-v1.json": {
+      "size": 1891574,
+      "sha256": "3d806033fae694d061378bcdbe6e9d7a793277e68cc7ee99e93bfa435616cf76"
+    },
+    "features/speaking-listening/listening-exam-v1.json": {
+      "size": 59600,
+      "sha256": "d717e86530da512d7eeab6212fddc1a128e75f02adc3cd09f41a44df4b14e350"
+    },
+    "features/speaking-listening/listening-generate.js": {
+      "size": 8782,
+      "sha256": "521a8e80afcb73564f11e518d30b1d28012e5dc2e7b3088cd6bb85d4229a0e1e"
+    },
+    "features/speaking-listening/listening-lint.js": {
+      "size": 3579,
+      "sha256": "065efc7f7297c5817da3971858bc584e12a78aec9239d6bad14d2dc54c0bcd35"
+    },
+    "features/speaking-listening/listening-quality.js": {
+      "size": 13392,
+      "sha256": "a4f04e2cdfed424091d8b0f5b386959e6b1309a53cfb8539c206de0fb34c80d4"
+    },
+    "features/speaking-listening/listening-scenarios-a1.js": {
+      "size": 45193,
+      "sha256": "287a06075f3bb9b4194252844f424d39533864ec4beb39d784ce38d0108a56be"
+    },
+    "features/speaking-listening/listening-scenarios-a2.js": {
+      "size": 52065,
+      "sha256": "5ce343c47254a0b5aa2de36d2d74f299d1a497038539f3d1ad83a5bc08048a0d"
+    },
+    "features/speaking-listening/listening-scenarios-b1.js": {
+      "size": 59279,
+      "sha256": "8d2ee30fc9c91b04a087c8781901657a6524c340b695ac80051ae6b20a425076"
+    },
+    "features/speaking-listening/listening-scenarios-b2.js": {
+      "size": 64643,
+      "sha256": "5f109d7c682cfa95b961c2e94ec9e2951cca6ae6ec50db78f18a033cc7504e59"
+    },
+    "features/speaking-listening/listening-scenarios-c1.js": {
+      "size": 69301,
+      "sha256": "c0c74a83540a90ccc6473fc33b4257a53ab99c394784634801267d49f27d97b4"
+    },
+    "features/speaking-listening/listening-scenarios-c2.js": {
+      "size": 71554,
+      "sha256": "eeb26988820f97f8a930e0beb499da8deeefaf5df2efb39181df9b52dde5724c"
+    },
+    "features/speaking-listening/panggung-suara.css": {
+      "size": 24374,
+      "sha256": "83f7d84f4cf0263cbc642dd5f9f65b0d48db9683806948326aa639c4f272bb8f"
+    },
+    "features/speaking-listening/speaking-bank-v1.json": {
+      "size": 36633,
+      "sha256": "3b9378b3d9944a42446cfa04f8df495b12eb16a27528e416f2f6b9164be4e0a5"
+    },
+    "features/speaking-listening/speaking-exam-v1.json": {
+      "size": 41332,
+      "sha256": "f34973b9726300a059ea6f26ae1e244a81de30c8682ebeeb20dde12628fe5f7a"
+    },
+    "features/speaking-listening/speaking-listening-addon.css": {
+      "size": 32605,
+      "sha256": "74f28c5d01e3a1acc98887ce845c1f73024ed156d0efc9f792ca3fe00798cc0c"
+    },
+    "features/speaking-listening/speaking-listening-config.js": {
+      "size": 752,
+      "sha256": "ae57910a8623457f39f4ccbe8eb5767cf5d917630835ec1b8f9638881a5693f4"
+    },
+    "features/speaking-listening/taboo-bank-v1.json": {
+      "size": 19700,
+      "sha256": "cc6388c76212544e5f4cc34611fcda83dffdef7e64982f06cc5bc1ae54ba58dc"
+    },
+    "features/teacher/fiezel-analisis-butir.js": {
+      "size": 8154,
+      "sha256": "8fccb9ead82ff9e1d6461be547cd4fd23cdfe95dd911ad0a03c92572208a184b"
+    },
+    "features/teacher/fiezel-kelas-tanpa-hp.js": {
+      "size": 16626,
+      "sha256": "bb7a907e8494f2f1c5b8bb49a7e2534f82991b7dc5a498fe366a316be70db663"
+    },
+    "features/teacher/fiezel-rapor-kktp.js": {
+      "size": 10845,
+      "sha256": "8425f237a7685f2e32212dabe8866b8a6d61f94ec6af6a46dba9287682130366"
+    },
+    "features/teacher/fiezel-teacher-curriculum.js": {
+      "size": 260549,
+      "sha256": "0d846fb7d8630f6fed6d599a5c6333a722869d9db28ed41a84079bb611131182"
+    },
+    "features/teacher/fiezel-teacher-icons.js": {
+      "size": 6943,
+      "sha256": "4ad6226634f558e0a780f04545bab24b2c22bf79b2ad72ee0fbcc734ac9dc233"
+    },
+    "features/teacher/fiezel-teacher-loader.js": {
+      "size": 4878,
+      "sha256": "32be0dd1d3cb8898a494f7a79537430a8eb1779780e5a41023001050d5d2ea30"
+    },
+    "features/teacher/fiezel-teacher-shell.js": {
+      "size": 391521,
+      "sha256": "b94cecd60b5a71d36ee6febd485cdd454b3064859d0a376c86f0d8a4af74a4f7"
+    },
+    "features/teacher/fiezel-teacher-store.js": {
+      "size": 63271,
+      "sha256": "bfa3bc1b753c8c4a3c06a2beac70b2105384f3d21daa67d49d1c6e99da3f6dc1"
+    },
+    "features/teacher/teacher-shell.css": {
+      "size": 85211,
+      "sha256": "530af7e14c47ae06f1a4c233f6ad20f79389280f045da12da4a31bf86b031256"
+    },
+    "features/telemetry/fiezel-braincore-evidence.js": {
+      "size": 18480,
+      "sha256": "aa3416b823d107a40ad2fa5a5c0995b331129578b82087f65a649e5680c560d9"
+    },
+    "features/telemetry/fiezel-learning-events.js": {
+      "size": 18490,
+      "sha256": "2c3ef3a50c057b8ddd35b02859adf928179b303fd1091f5033b27c6cfc014a16"
+    },
+    "features/telemetry/fiezel-learning-queue.js": {
+      "size": 12392,
+      "sha256": "4ebaae7ca45566f2c382379c64b560aaf76d7f779b10901dad7eb8748b27ffd0"
+    },
+    "features/telemetry/fiezel-learning-transport.js": {
+      "size": 14246,
+      "sha256": "bcad9b4c21cf884d9acdcd4b3ddd20a478a3d43ac373e26195209dc8335fb069"
+    },
+    "features/telemetry/fiezel-telemetry-config.js": {
+      "size": 6264,
+      "sha256": "12c4d3d337054fdc1a53b4a34ded8e728b7d39ae1b4fcb9a382c79178514b129"
+    },
+    "features/tutor-action-center/fiezel-tutor-action-center.js": {
+      "size": 44948,
+      "sha256": "c4c28f5af4705a5f22e5553aa7e0c76f188af6e6804a77b4734ec45bccf32096"
+    },
+    "features/tutor-classroom/fiezel-tutor-dialog.js": {
+      "size": 12346,
+      "sha256": "627f0447f958329ce4c2fc0cae3fe2cb3a7bbf0f16d0e4a8c01c7face5288b85"
+    },
+    "features/tutor-classroom/fiezel-tutor-v3.js": {
+      "size": 51814,
+      "sha256": "b6c27f9ea9fa0bd8b34883ccb95dfe7767736dced57439a503b6e378e6905f0c"
+    },
+    "features/tutor-classroom/fiezel-tutor-voice-chat.js": {
+      "size": 13672,
+      "sha256": "02840b2b75b7a8e6ac55fe5ec37bf85209008a8b2b2ae6aecb4a04994f1162fd"
+    },
+    "features/tutor-classroom/tutor-v3.css": {
+      "size": 17538,
+      "sha256": "169f576d77b065058489f82ae7c5ddab705c1f88f82532b4ba4202559a049778"
+    },
+    "features/ui/fiezel-3d-emblems.js": {
+      "size": 11215,
+      "sha256": "f9c3f9d2314455c8d29d6a717c6234c7fbef4c74f9a8e69a55e9ec92daeb947c"
+    },
+    "features/ui/fiezel-ab-testing.js": {
+      "size": 7232,
+      "sha256": "8a3cb781aaa0b96539ea9fbb09ce1364f8d6ab23f13686a2c5d190b7ef27af71"
+    },
+    "features/ui/fiezel-back-nav.js": {
+      "size": 41720,
+      "sha256": "ef5a1a5ffc879eb46ce0113bb73f1c216af12f8cc59d207a609e501d766e41b1"
+    },
+    "features/ui/fiezel-boot-tail.js": {
+      "size": 4052,
+      "sha256": "fdcc4fa4ba11b29369156e92d5eea69aba0f82877c84aaab9d8511ccfad2de39"
+    },
+    "features/ui/fiezel-coach-bubble.js": {
+      "size": 29261,
+      "sha256": "8a5342ec62506eefb9d960e407133f818b66991b086ed4e42063f722f7487fd3"
+    },
+    "features/ui/fiezel-exam-lock.js": {
+      "size": 6067,
+      "sha256": "689617c9436fa8ecca6f1a2ea60b03dcb795c4c7c97a0625b4e2ab6513d503ae"
+    },
+    "features/ui/fiezel-icons.js": {
+      "size": 13790,
+      "sha256": "a7e5a7a22555b8e8041964ab2f2fd9618029c4f6991b2dd3033bd3b140c0b34f"
+    },
+    "features/ui/fiezel-lux.css": {
+      "size": 20847,
+      "sha256": "9c6ab8c311758af10853ba2e741b9c5a1295eada7dd571000d385d0b303c85cd"
+    },
+    "features/ui/fiezel-marshmallow.css": {
+      "size": 23397,
+      "sha256": "1c75636815cc429551bc07d29181d79c44c67f6e79000da08069007c16804a68"
+    },
+    "features/ui/fiezel-report-gesture-isolation.js": {
+      "size": 2717,
+      "sha256": "689e3fd117c4e256f39f9cd1af61e375b85b744c39b0608559154239e25da24d"
+    },
+    "features/ui/fiezel-student-mode.js": {
+      "size": 2976,
+      "sha256": "c530c1f0908757443bdb8cde2275d69f599ec6c719633ee9c8a9b43abfbc6566"
+    },
+    "features/ui/fiezel-tactile-clay.css": {
+      "size": 239793,
+      "sha256": "158bf4512cb83d1bd71b3ccc6995009728f9a547ca5e327b5849fe48678d6597"
+    },
+    "features/ui/fiezel-ui-manager.js": {
+      "size": 5203,
+      "sha256": "36d18451178b7264a6946bf3a0017daf46560975a02526cdb8922a8d96a0ab4d"
+    },
+    "features/ui/fiezel-update-prompt.js": {
+      "size": 23768,
+      "sha256": "a4d27db8e6c0ec4be658645a68d60a006aeffb3e345b33e249e8e440bef7e9ca"
+    },
+    "features/ui/fiezel-vivid.css": {
+      "size": 31821,
+      "sha256": "0d32d16bd11e4d6a7a3b6549501e6998b097c1db3aa6d10cfbfc44bea35f5d9a"
+    },
+    "features/ui/fiezel-zoom-lock.js": {
+      "size": 11156,
+      "sha256": "612fce830932ef716ee7d534d04f12b4159b135f7dce73bf03c3b0dbc70a42df"
+    },
+    "features/ui/mobile-edge-fit.css": {
+      "size": 160553,
+      "sha256": "09359679f0d1980a709c347548f297b6051d01b792640e30b07ad96d485393da"
+    },
+    "features/ui/skeleton-helpers.js": {
+      "size": 6304,
+      "sha256": "5509675e48162c5eff824dbb636c629d424ff4effbdfe44d9d560023ad5a7b33"
+    },
+    "features/undercover/fiezel-undercover-data.js": {
+      "size": 12085,
+      "sha256": "6bad5566f212923ead3eff1a3455a6884d1b46e7c7add283ca4f010e8c8d5d99"
+    },
+    "features/undercover/fiezel-undercover-engine.js": {
+      "size": 23174,
+      "sha256": "7dd6b18ac24de6f49eca24329e5b60f46f5ed9ed8a85e4949a97882ff7c9560c"
+    },
+    "features/undercover/fiezel-undercover-ui.js": {
+      "size": 69206,
+      "sha256": "f5f6d2fce82c06a3d32681ddefb219a653e717967a709c05eba9f56a3a626522"
+    },
+    "fiezel-2.css": {
+      "size": 43896,
+      "sha256": "a0a7b013fcdc0c220b937c77f42c843a79f3ce1a3e131704560fb98d219286ab"
+    },
+    "fiezel-lazy-loader.js": {
+      "size": 9722,
+      "sha256": "d3ded679e16906bd65886591ddaedfb97b1ddc2ad4e8c6031f2f75415bceacf7"
+    },
+    "fiezel-ux-flags.js": {
+      "size": 12260,
+      "sha256": "59cb17f3943a72448e137c7a88870872e5ecb31a91b16565d2544cac4fe44c4a"
+    },
+    "grammar-curriculum-v1.json": {
+      "size": 70256,
+      "sha256": "87ce9c336d1a4e067ca01ca68d18822f31a98a5578753d2ff899396adb95eb54"
+    },
+    "grammar-labels-id.js": {
+      "size": 19527,
+      "sha256": "dfd86bd7591f7cba9327e9f14e6aa05e38e7ff15036c7d7741493ad166d297d7"
+    },
+    "grammar-misconception-id.json": {
+      "size": 129850,
+      "sha256": "5c4b511ae931bc101067bd9a7760273ad62b5d33e653bfd5ae0abebb72ea82a5"
+    },
+    "grammar-templates.json": {
+      "size": 2200303,
+      "sha256": "54e8f9e0c7a8b9a8161d129d0250912a34afdb00139a4c4bc1251930e3c3ef7a"
+    },
+    "index.html": {
+      "size": 112536,
+      "sha256": "029a20f9e163b5562232e6ce5700960062c31586437af6a3a2dc1a96d93e32cb"
+    },
+    "instagram.svg": {
+      "size": 314,
+      "sha256": "5f79fd91a912f916606cd348ac72b32ad9292f91b8dbe4bdc68bee2ed1258f6c"
+    },
+    "kurikulum.html": {
+      "size": 1260,
+      "sha256": "4ddbbd22b527c2846eadbcd8144d71381841d315475fcc149e530a970b1fe96f"
+    },
+    "lucide.min.js": {
+      "size": 25840,
+      "sha256": "0b0af24ac6f44412d0c4d308567b20ce9aca8e58f34ee3b81b3323949dac004e"
+    },
+    "manifest.json": {
+      "size": 2609,
+      "sha256": "a2e7944a8f5bb5f24b04db28d6ae0e63bff9f311e4e806fec4c5a36ad1833b63"
+    },
+    "misconception-taxonomy-v1.json": {
+      "size": 100542,
+      "sha256": "3aa37cea0f4a101eceda89bad008b560d9685419540475116a61439a2c572753"
+    },
+    "misi.html": {
+      "size": 1278,
+      "sha256": "d5d5d1d19f586b28a7696c1a4636dbddd442d46dd5fc1a27117dca916b464c50"
+    },
+    "mochi-mascot/fiezel-mochi.js": {
+      "size": 82348,
+      "sha256": "7e38421687b68bfbeda476dd04df82f1bb92b29d14bd08c0c7c28fe037026fd9"
+    },
+    "mochi-mascot/three.module.js": {
+      "size": 1272971,
+      "sha256": "505fa5d00047c76ecfc8947c67c82922508b263e76f9b25e64948130e783b0a2"
+    },
+    "reading-bank.json": {
+      "size": 2185308,
+      "sha256": "b8ca92928c8917c437a4667ceaa4af95196f86296f18f45267587d06809106f8"
+    },
+    "reading-exam-v1.json": {
+      "size": 128382,
+      "sha256": "05f24f68421a70500a7b093a0820795482874ddac5816bc2081d2bde2ff07e61"
+    },
+    "report-config.js": {
+      "size": 32,
+      "sha256": "6240bb7b2de6b4e16978ccedcc1ffdeac00a77a475f16fe52c84f39920742965"
+    },
+    "style.css": {
+      "size": 529696,
+      "sha256": "816950556ba0c2bbf6b41837b08050d9f29ec67ab54ef6dcabdbddf6c6fb2577"
+    },
+    "sw.js": {
+      "size": 52481,
+      "sha256": "ebeb0d49b6331a4c91f0e00605d053ee3a9439ebfacc7931ee666856cdab7082"
+    },
+    "th-purity-lexicon.js": {
+      "size": 18215,
+      "sha256": "339c28c396985803e7e8f414967e37d73dec3bf921e60eae96ee03f55e9a56b5"
+    },
+    "undercover.html": {
+      "size": 63230,
+      "sha256": "5ebdd979f6ede6792457863fc767b94d5c5973140ee1bafbd70161bc1af00fc4"
+    },
+    "validator.js": {
+      "size": 3749,
+      "sha256": "b7385322c92c30a5e67a4b4ecbabd95ecaa24d8773e584b1cf19b620a1bae10d"
+    },
+    "version.js": {
+      "size": 29,
+      "sha256": "2b6abde0056da89f89f2aecd1c938f4c86e09d5d3f8171e8ee1c2aed45cb01e2"
+    },
+    "VERSION.json": {
+      "size": 20,
+      "sha256": "59e138a06c7eb97dd445637a64764b949a71b96e417e9c681d6d833600fdc1ab"
+    },
+    "vocabulary-master.json": {
+      "size": 2358464,
+      "sha256": "9c32e169a25116f2e2f394ca21266c48e54935b06149e9cfe55c3645b094c96c"
+    },
+    "vocabulary-th.json": {
+      "size": 561375,
+      "sha256": "247f93f0604caa217695dab70b17ad8ac0c27aa6c653901e134b69cec01894c0"
+    },
+    "writing-prompts-v1.json": {
+      "size": 35507,
+      "sha256": "8b97e825daa44062e9d2640631982708c70020fe2946e68d62ffaa95025eb167"
+    }
+  }
+}

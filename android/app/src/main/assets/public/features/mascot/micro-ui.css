@@ -1,0 +1,216 @@
+/* ============================================================
+   FIEZEL Micro-UI TAMBAHAN — melengkapi fiezel-motion.css
+   Wajib di-load SETELAH fiezel-motion.css (pakai var token --fz-*).
+   Prinsip: hanya animasikan transform/opacity (kecuali stroke-dashoffset
+   untuk ring & checkmark yang memang butuh properti SVG itu).
+   ============================================================ */
+
+/* ================= 1) .fz-toast ================= */
+/* Notifikasi kecil slide-up + auto dismiss.
+   Pakai: buat elemen .fz-toast di dalam .fz-toast-stack (fixed bawah-tengah),
+   animasi in→hold→out jalan sendiri (total 3.2s), lalu hapus elemennya
+   via JS (animationend / setTimeout). Varian warna: .ok .warn .gold */
+.fz-toast-stack {
+  position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
+  display: flex; flex-direction: column-reverse; align-items: center; gap: 10px;
+  z-index: 999; pointer-events: none;
+}
+.fz-toast {
+  pointer-events: auto;
+  display: inline-flex; align-items: center; gap: 10px;
+  max-width: min(86vw, 420px);
+  background: var(--fz-cocoa); color: var(--fz-cream);
+  font-weight: 700; font-size: 14px; line-height: 1.35;
+  padding: 12px 18px; border-radius: 999px;
+  box-shadow: 0 10px 24px rgba(51,32,31,.28);
+  opacity: 0;
+  animation: fzToastLife 3.2s var(--fz-spring) forwards;
+}
+.fz-toast .ico { font-size: 16px; line-height: 1; }
+.fz-toast.ok    { background: var(--fz-green);  color: #fff; }
+.fz-toast.warn  { background: var(--fz-maroon); color: #fff; }
+.fz-toast.gold  { background: var(--fz-gold);   color: var(--fz-ink);
+                  box-shadow: 0 10px 24px rgba(216,179,107,.4); }
+/* in (0–14%) → tahan → out (88–100%): slide-up masuk, turun-fade keluar */
+@keyframes fzToastLife {
+  0%   { opacity: 0; transform: translateY(28px) scale(.92); }
+  10%  { opacity: 1; transform: translateY(-4px) scale(1.02); }
+  14%  { opacity: 1; transform: translateY(0)    scale(1); }
+  86%  { opacity: 1; transform: translateY(0)    scale(1); }
+  100% { opacity: 0; transform: translateY(14px) scale(.96); }
+}
+/* varian sticky (tanpa auto dismiss): tambah class .stay, tutup manual */
+.fz-toast.stay { animation: fzToastIn var(--fz-slow) var(--fz-spring) forwards; }
+@keyframes fzToastIn {
+  from { opacity: 0; transform: translateY(28px) scale(.92); }
+  60%  { opacity: 1; transform: translateY(-4px) scale(1.02); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ================= 2) .fz-streak ================= */
+/* Counter api streak. Saat angka naik: tambah class .bump sebentar
+   (hapus lagi via animationend / timeout 700ms) → api pulse + angka pop. */
+.fz-streak {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--fz-cream2); border: 2px solid var(--fz-gold);
+  border-radius: 999px; padding: 8px 16px 8px 12px;
+  font-weight: 800; color: var(--fz-ink);
+}
+.fz-streak .flame { font-size: 20px; line-height: 1; display: inline-block;
+  transform-origin: 50% 85%; }
+.fz-streak .num { font-size: 18px; display: inline-block; min-width: 1.2em;
+  text-align: center; color: var(--fz-maroon); }
+.fz-streak .lbl { font-size: 12px; font-weight: 700; color: var(--fz-muted); }
+/* idle: api bergoyang pelan terus-menerus */
+.fz-streak .flame { animation: fzFlameIdle 1.8s ease-in-out infinite; }
+@keyframes fzFlameIdle {
+  0%,100% { transform: rotate(0) scale(1); }
+  30%     { transform: rotate(-4deg) scale(1.04); }
+  65%     { transform: rotate(3deg)  scale(.98); }
+}
+/* bump: pulse api + pop angka + ring kilat via ::after */
+.fz-streak { position: relative; }
+.fz-streak::after { content: ""; position: absolute; inset: -2px;
+  border-radius: 999px; border: 2px solid var(--fz-yel);
+  opacity: 0; pointer-events: none; }
+.fz-streak.bump .flame { animation: fzFlamePulse .65s var(--fz-spring); }
+@keyframes fzFlamePulse {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.5) rotate(-8deg); }
+  65%  { transform: scale(.9)  rotate(5deg); }
+  100% { transform: scale(1); }
+}
+.fz-streak.bump .num { animation: fzNumPop .65s var(--fz-spring); }
+@keyframes fzNumPop {
+  0% { transform: translateY(8px) scale(.6); opacity: 0; }
+  55%{ transform: translateY(-3px) scale(1.25); opacity: 1; }
+  100%{ transform: translateY(0) scale(1); }
+}
+.fz-streak.bump::after { animation: fzRingFlash .65s var(--fz-out); }
+@keyframes fzRingFlash {
+  0%   { opacity: .9; transform: scale(1); }
+  100% { opacity: 0;  transform: scale(1.25); }
+}
+
+/* ================= 3) .fz-levelup ================= */
+/* Badge naik level: pop masuk + shine sweep sekali.
+   Pakai: tambah class .show untuk memunculkan (hapus dulu, force reflow,
+   tambah lagi untuk replay). */
+.fz-levelup {
+  position: relative; display: inline-flex; align-items: center; gap: 10px;
+  padding: 12px 22px; border-radius: 16px;
+  background: linear-gradient(135deg, var(--fz-yel), var(--fz-gold));
+  color: var(--fz-cocoa); font-weight: 800;
+  box-shadow: 0 4px 0 var(--fz-yel-d), 0 12px 24px rgba(216,179,107,.35);
+  overflow: hidden;
+  opacity: 0; transform: scale(.4);
+}
+.fz-levelup .lv-ico { font-size: 22px; line-height: 1; }
+.fz-levelup .lv-txt small { display: block; font-size: 11px; font-weight: 700;
+  color: var(--fz-maroon); letter-spacing: .04em; }
+.fz-levelup .lv-txt b { font-size: 17px; }
+/* shine sweep: pita miring yang menyapu via translateX (transform-only) */
+.fz-levelup::before { content: ""; position: absolute; top: -20%; bottom: -20%;
+  left: 0; width: 46%;
+  background: linear-gradient(105deg, transparent, rgba(255,255,255,.75), transparent);
+  transform: translateX(-160%) skewX(-18deg); pointer-events: none; }
+.fz-levelup.show { animation: fzLvPop .6s var(--fz-spring) forwards; }
+@keyframes fzLvPop {
+  0%   { opacity: 0; transform: scale(.4) rotate(-6deg); }
+  60%  { opacity: 1; transform: scale(1.12) rotate(2deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0); }
+}
+.fz-levelup.show::before { animation: fzShine .9s var(--fz-out) .35s forwards; }
+@keyframes fzShine {
+  from { transform: translateX(-160%) skewX(-18deg); }
+  to   { transform: translateX(320%)  skewX(-18deg); }
+}
+
+/* ================= 4) .fz-progress-ring ================= */
+/* Ring progres SVG. Markup:
+   <div class="fz-progress-ring" style="--p:.65">
+     <svg viewBox="0 0 96 96">
+       <circle class="track" cx="48" cy="48" r="40"/>
+       <circle class="bar"   cx="48" cy="48" r="40"/>
+     </svg>
+     <span class="pct">65%</span>
+   </div>
+   r=40 → keliling = 2π·40 ≈ 251.327. Set progres lewat var --p (0..1),
+   stroke-dashoffset ber-transisi dengan easing spring. */
+.fz-progress-ring { position: relative; width: 96px; height: 96px;
+  display: inline-block; }
+.fz-progress-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.fz-progress-ring .track { fill: none; stroke: var(--fz-cream2);
+  stroke-width: 10; }
+.fz-progress-ring .bar { fill: none; stroke: var(--fz-maroon);
+  stroke-width: 10; stroke-linecap: round;
+  stroke-dasharray: 251.327;
+  stroke-dashoffset: calc(251.327 * (1 - var(--p, 0)));
+  transition: stroke-dashoffset .8s var(--fz-spring); }
+.fz-progress-ring.gold .bar { stroke: var(--fz-gold); }
+.fz-progress-ring .pct { position: absolute; inset: 0; display: grid;
+  place-items: center; font-weight: 800; font-size: 18px;
+  color: var(--fz-maroon); }
+/* selesai 100%: kasih class .done → denyut sekali */
+.fz-progress-ring.done { animation: fzRingDone .6s var(--fz-spring); }
+@keyframes fzRingDone { 40% { transform: scale(1.1); } }
+
+/* ================= 5) .fz-checkbox ================= */
+/* Ceklis harian dengan checkmark draw-in. Markup:
+   <label class="fz-checkbox">
+     <input type="checkbox">
+     <span class="box"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></svg></span>
+     <span class="txt">Label</span>
+   </label>
+   Panjang path ±20.4 → dasharray 21 aman. */
+.fz-checkbox { display: inline-flex; align-items: center; gap: 10px;
+  cursor: pointer; font-weight: 700; color: var(--fz-ink);
+  -webkit-user-select: none; user-select: none; }
+.fz-checkbox input { position: absolute; opacity: 0; width: 0; height: 0; }
+.fz-checkbox .box { width: 26px; height: 26px; border-radius: 9px;
+  border: 2.5px solid var(--fz-line); background: var(--fz-panel);
+  display: grid; place-items: center; flex: none;
+  transition: background var(--fz-fast) ease, border-color var(--fz-fast) ease,
+              transform var(--fz-base) var(--fz-spring); }
+.fz-checkbox .box svg { width: 16px; height: 16px; display: block; }
+.fz-checkbox .box path { fill: none; stroke: #fff; stroke-width: 3.4;
+  stroke-linecap: round; stroke-linejoin: round;
+  stroke-dasharray: 21; stroke-dashoffset: 21; }
+.fz-checkbox:hover .box { border-color: var(--fz-gold); }
+.fz-checkbox input:focus-visible + .box { outline: 3px solid var(--fz-yel);
+  outline-offset: 2px; }
+.fz-checkbox input:checked + .box { background: var(--fz-green);
+  border-color: var(--fz-green);
+  animation: fzCheckPop .45s var(--fz-spring); }
+@keyframes fzCheckPop { 40% { transform: scale(1.18) rotate(-4deg); } }
+.fz-checkbox input:checked + .box path {
+  animation: fzCheckDraw .35s var(--fz-out) .08s forwards; }
+@keyframes fzCheckDraw { to { stroke-dashoffset: 0; } }
+.fz-checkbox input:checked ~ .txt { color: var(--fz-muted);
+  text-decoration: line-through; text-decoration-color: var(--fz-gold);
+  text-decoration-thickness: 2px; }
+.fz-checkbox .txt { transition: color var(--fz-base) ease; }
+
+/* ================= 6) .fz-skeleton ================= */
+/* Shimmer loading krem-emas. Basis krem, kilau emas menyapu via ::after
+   (translateX, transform-only). Varian bentuk: .line .avatar .card-sk */
+.fz-skeleton { position: relative; overflow: hidden;
+  background: var(--fz-cream2); border-radius: 12px; }
+.fz-skeleton::after { content: ""; position: absolute; inset: 0;
+  background: linear-gradient(100deg, transparent 30%,
+              rgba(216,179,107,.35) 50%, transparent 70%);
+  transform: translateX(-100%);
+  animation: fzShimmer 1.4s var(--fz-out) infinite; }
+@keyframes fzShimmer { to { transform: translateX(100%); } }
+.fz-skeleton.line   { height: 14px; }
+.fz-skeleton.line.w60 { width: 60%; } .fz-skeleton.line.w40 { width: 40%; }
+.fz-skeleton.avatar { width: 52px; height: 52px; border-radius: 50%; }
+.fz-skeleton.card-sk { height: 92px; border-radius: 20px;
+  border: 2px solid var(--fz-line); }
+
+/* reduced-motion: fiezel-motion.css sudah memangkas durasi global;
+   pastikan toast tetap terbaca (tanpa fase hilang instan) */
+@media (prefers-reduced-motion: reduce) {
+  .fz-toast { opacity: 1; animation: none; }
+  .fz-skeleton::after { animation: none; opacity: .4; transform: none; }
+}

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Fiezel Component and Widget Styles -->
+    <style name="Widget.Fiezel.ProgressBar" parent="Widget.Material3.LinearProgressIndicator">
+        <item name="indicatorColor">@color/fz_gold</item>
+        <item name="trackColor">@color/fz_surface</item>
+    </style>
+</resources>
