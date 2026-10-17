@@ -37,6 +37,9 @@ server.listen(PORT, '127.0.0.1', async () => {
     const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
     await context.addInitScript(() => {
       localStorage.setItem('fz_user_name', 'Rian Pratama');
+      localStorage.setItem('fiezel_course', 'ja');
+      localStorage.setItem('fiezel_target_lang', 'ja');
+      localStorage.setItem('fz_target_course', 'ja');
       localStorage.setItem('fz_onboarding_done', '1');
       localStorage.setItem('fz_auth_skip', '1');
       localStorage.setItem('fiezel-auth-v1', JSON.stringify({ v: 1, signedIn: true, at: Date.now(), role: 'murid', via: 'akun' }));
@@ -83,18 +86,36 @@ server.listen(PORT, '127.0.0.1', async () => {
     // Verify view is chat
     const curView = await page.evaluate(() => typeof state !== 'undefined' ? state.view : (window.__fiezelAudit?.liveState()?.view || null));
     console.log('Current state.view:', curView);
-    const debugInfo = await page.evaluate(() => ({
-      fnExists: typeof window.interactiveChatView,
-      fzcExists: typeof window.FiezelInteractiveChat,
-      appHtml: document.getElementById('app')?.innerHTML?.slice(0, 300)
-    }));
-    console.log('DEBUG INFO:', debugInfo);
     if (curView !== 'chat') throw new Error(`Expected state.view to be 'chat', got '${curView}'`);
 
     // Verify chat container is mounted
     const isChatMounted = await page.evaluate(() => !!document.querySelector('.fzc-container'));
     console.log('Is chat container mounted in DOM:', isChatMounted ? 'YES' : 'NO');
     if (!isChatMounted) throw new Error('Interactive chat UI not mounted in DOM!');
+
+    // ── Audit Scroll Invariants & No Double Scroll ──
+    console.log('2b. Auditing scroll metrics & body overflow containment...');
+    const scrollAudit = await page.evaluate(() => {
+      const b = document.body;
+      const h = document.documentElement;
+      const feed = document.querySelector('.fzc-feed');
+      return {
+        bodyScrollHeight: b.scrollHeight,
+        bodyClientHeight: b.clientHeight,
+        htmlScrollHeight: h.scrollHeight,
+        htmlClientHeight: h.clientHeight,
+        feedHeight: feed ? feed.offsetHeight : 0,
+        feedScrollHeight: feed ? feed.scrollHeight : 0,
+        feedCanScroll: feed ? (feed.scrollHeight > feed.clientHeight) : false
+      };
+    });
+    console.log('Scroll audit results:', JSON.stringify(scrollAudit, null, 2));
+    if (scrollAudit.bodyScrollHeight > 844 || scrollAudit.htmlScrollHeight > 844) {
+      throw new Error(`Double scroll leak detected! Body scroll height is ${scrollAudit.bodyScrollHeight}px (expected 844px)`);
+    }
+    if (scrollAudit.feedHeight < 250) {
+      throw new Error(`Feed container is squashed! Feed height is ${scrollAudit.feedHeight}px (expected >= 250px)`);
+    }
 
     // Check scenario chips
     const scenarioCount = await page.evaluate(() => document.querySelectorAll('.fzc-scenario-chip').length);
@@ -121,6 +142,51 @@ server.listen(PORT, '127.0.0.1', async () => {
     const hasRuby = await page.evaluate(() => !!document.querySelector('.fzc-msg-row.is-assistant .fzc-bubble ruby'));
     console.log('Furigana <ruby> present in Japanese speech:', hasRuby ? 'YES' : 'NO');
 
+    // ── Audit Audio & Speech Synthesis ──
+    console.log('3b. Testing Audio Playback & Web Speech Synthesis...');
+    const chatState = await page.evaluate(() => window.FiezelInteractiveChat.getState());
+    console.log('Live Chat State:', chatState);
+    const speechCallResult = await page.evaluate(() => {
+      let spokenUtterance = null;
+      SpeechSynthesis.prototype.speak = function(u) {
+        spokenUtterance = { text: u.text, lang: u.lang };
+      };
+      SpeechSynthesis.prototype.getVoices = function() {
+        return [{ name: 'Nanami', lang: 'ja-JP' }];
+      };
+
+      const audioBtn = document.querySelector('.fzc-action-btn[data-action="audio"]');
+      if (!audioBtn) return { error: 'Audio button not found' };
+
+      audioBtn.click();
+      return {
+        spoken: spokenUtterance,
+        isPlayingClass: audioBtn.classList.contains('is-playing')
+      };
+    });
+    console.log('Speech playback result:', speechCallResult);
+    if (!speechCallResult.spoken || speechCallResult.spoken.lang !== 'ja-JP') {
+      throw new Error(`Audio failed to invoke SpeechSynthesis! Result: ${JSON.stringify(speechCallResult)}`);
+    }
+
+    // ── Audit Feed Scrolling ──
+    console.log('3c. Testing programmatic feed scrolling...');
+    const scrollTest = await page.evaluate(() => {
+      const feed = document.querySelector('.fzc-feed');
+      if (!feed) return { error: 'No feed' };
+      feed.scrollTop = 50;
+      return { scrollTop: feed.scrollTop };
+    });
+    console.log('Feed scrollTop after scroll:', scrollTest.scrollTop);
+    if (scrollTest.scrollTop <= 0) {
+      console.warn('Feed did not scroll; verifying feed scrollability:', scrollAudit.feedCanScroll);
+    }
+
+    // Verify Scenario Goals checklist is mounted
+    const hasGoals = await page.evaluate(() => !!document.querySelector('.fzc-goals-container'));
+    console.log('Scenario goals checklist mounted:', hasGoals ? 'YES' : 'NO');
+    if (!hasGoals) throw new Error('Scenario goals checklist missing in scenario card');
+
     // Click translation toggle
     console.log('4. Toggling translation on AI message...');
     await page.evaluate(() => {
@@ -134,6 +200,11 @@ server.listen(PORT, '127.0.0.1', async () => {
       return transBox && !transBox.classList.contains('is-hidden');
     });
     console.log('Is translation visible after toggle:', isTransVisible ? 'YES' : 'NO');
+
+    // Check Shadowing action button presence
+    const hasShadowBtn = await page.evaluate(() => !!document.querySelector('.fzc-action-btn[data-action="shadow"]'));
+    console.log('Shadowing action button present:', hasShadowBtn ? 'YES' : 'NO');
+    if (!hasShadowBtn) throw new Error('Shadowing action button missing on assistant bubble');
 
     // Click quick suggestion chip
     console.log('5. Clicking quick suggestion chip...');
@@ -190,7 +261,7 @@ server.listen(PORT, '127.0.0.1', async () => {
     // Capture visual screenshot
     console.log('8. Capturing preview screenshot...');
     await page.evaluate(() => window.go('chat'));
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(1000);
     await page.screenshot({ path: path.join(ROOT, 'tools', 'dev', 'interactive-chat-preview.png'), fullPage: false });
     console.log('Screenshot saved to tools/dev/interactive-chat-preview.png');
 

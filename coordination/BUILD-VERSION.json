@@ -1,7 +1,7 @@
 {
-  "version": "m025-588",
-  "claimedBy": "branch feat/friendly-personalized-scheduled-push",
-  "claimedAt": "2026-10-17T14:47:06.143Z",
-  "reason": "feat(push): personalized 7-day friendly chat reminder matrix with wib scheduling",
+  "version": "m025-589",
+  "claimedBy": "branch feature/chat-speaking-shadowing",
+  "claimedAt": "2026-10-17T15:16:11.084Z",
+  "reason": "feat(chat): interactive AI speaking partner, zero void layout, and shadowing evaluation (m025-589)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
