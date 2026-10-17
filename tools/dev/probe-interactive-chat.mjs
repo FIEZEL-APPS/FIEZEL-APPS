@@ -2,9 +2,12 @@ import { chromium } from 'playwright';
 import path from 'path';
 import http from 'http';
 import fs from 'fs';
+import { fileURLToPath } from 'url';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const ROOT = path.resolve(__dirname, '..', '..');
 const PORT = 4512;
-const ROOT = process.cwd();
 
 const server = http.createServer((req, res) => {
   let reqPath = req.url.split('?')[0];
@@ -30,11 +33,22 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, '127.0.0.1', async () => {
-  console.log(`Probe server running at http://127.0.0.1:${PORT}`);
+  console.log(`Probe server running at http://127.0.0.1:${PORT} (ROOT: ${ROOT})`);
   let browser;
   try {
-    browser = await chromium.launch({ headless: true });
-    const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+    browser = await chromium.launch({
+      headless: true,
+      args: [
+        '--use-fake-ui-for-media-stream',
+        '--use-fake-device-for-media-stream',
+        '--no-sandbox',
+        '--disable-setuid-sandbox'
+      ]
+    });
+    const context = await browser.newContext({
+      viewport: { width: 390, height: 844 },
+      permissions: ['microphone']
+    });
     await context.addInitScript(() => {
       localStorage.setItem('fz_user_name', 'Rian Pratama');
       localStorage.setItem('fiezel_course', 'ja');
@@ -115,6 +129,58 @@ server.listen(PORT, '127.0.0.1', async () => {
     }
     if (scrollAudit.feedHeight < 250) {
       throw new Error(`Feed container is squashed! Feed height is ${scrollAudit.feedHeight}px (expected >= 250px)`);
+    }
+
+    // ── Audit Zero Emoji Slop Invariant ──
+    console.log('2c. Auditing Zero Emoji Slop across all buttons & components...');
+    const emojiAudit = await page.evaluate(() => {
+      const emojiRegex = /[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F1E6}-\u{1F1FF}]/u;
+      const container = document.querySelector('.fzc-container');
+      if (!container) return { error: 'No container' };
+
+      const buttons = Array.from(container.querySelectorAll('button'));
+      const buttonsWithEmoji = buttons.filter(b => emojiRegex.test(b.textContent || ''));
+
+      const chips = Array.from(container.querySelectorAll('.fzc-scenario-chip'));
+      const chipsWithoutSvg = chips.filter(c => !c.querySelector('svg'));
+
+      const callBtn = document.getElementById('fzcBtnCall');
+      const resetBtn = document.getElementById('fzcBtnReset');
+      const callHasSvg = callBtn && !!callBtn.querySelector('svg');
+      const resetHasSvg = resetBtn && !!resetBtn.querySelector('svg');
+
+      const micBtn = document.getElementById('fzcBtnMic');
+      const sendBtn = document.getElementById('fzcBtnSend');
+      const micHasSvg = micBtn && !!micBtn.querySelector('svg');
+      const sendHasSvg = sendBtn && !!sendBtn.querySelector('svg');
+
+      const actionBtns = Array.from(container.querySelectorAll('.fzc-action-btn'));
+      const actionBtnsWithoutSvg = actionBtns.filter(b => !b.querySelector('svg'));
+
+      const avatarWrap = container.querySelector('.fzc-avatar-wrap');
+      const avatarHasSvg = avatarWrap && !!avatarWrap.querySelector('svg');
+
+      return {
+        buttonsWithEmojiCount: buttonsWithEmoji.length,
+        buttonsWithEmoji: buttonsWithEmoji.map(b => b.className || b.id),
+        chipsWithoutSvgCount: chipsWithoutSvg.length,
+        callHasSvg,
+        resetHasSvg,
+        micHasSvg,
+        sendHasSvg,
+        actionBtnsWithoutSvgCount: actionBtnsWithoutSvg.length,
+        avatarHasSvg
+      };
+    });
+    console.log('Emoji slop audit results:', emojiAudit);
+    if (emojiAudit.buttonsWithEmojiCount > 0) {
+      throw new Error(`Emoji slop detected in buttons: ${JSON.stringify(emojiAudit.buttonsWithEmoji)}`);
+    }
+    if (emojiAudit.chipsWithoutSvgCount > 0) {
+      throw new Error(`Scenario chips missing SVG icon: ${emojiAudit.chipsWithoutSvgCount}`);
+    }
+    if (!emojiAudit.callHasSvg || !emojiAudit.resetHasSvg || !emojiAudit.micHasSvg || !emojiAudit.sendHasSvg || !emojiAudit.avatarHasSvg) {
+      throw new Error(`UI components missing inline SVG icons: ${JSON.stringify(emojiAudit)}`);
     }
 
     // Check scenario chips
@@ -249,8 +315,109 @@ server.listen(PORT, '127.0.0.1', async () => {
       throw new Error(`Zero-loss violated! Expected 'ごちそうさまでした！とても美味しかったです。', got '${secondUserText}'`);
     }
 
+    // ── Audit Voice Call Mode (Teleponan) ──
+    console.log('7. Clicking #fzcBtnCall to launch Voice Call Mode (Teleponan)...');
+    await page.evaluate(() => {
+      const callBtn = document.getElementById('fzcBtnCall');
+      if (callBtn) callBtn.click();
+    });
+    await page.waitForTimeout(800);
+
+    // Verify call overlay & active voice orb are mounted in DOM
+    const callOverlayAudit = await page.evaluate(() => {
+      const overlay = document.getElementById('fzcCallOverlay');
+      const orb = document.getElementById('fzcVoiceOrb');
+      const endBtn = document.getElementById('fzcCallBtnEnd') || document.getElementById('fzcBtnEndCall');
+      const muteBtn = document.getElementById('fzcCallBtnMute');
+      const subCard = document.getElementById('fzcCallSubtitleCard');
+      const timer = document.getElementById('fzcCallTimer');
+      const state = window.FiezelVoiceCall ? window.FiezelVoiceCall.getState() : null;
+
+      return {
+        hasOverlay: !!overlay,
+        hasOrb: !!orb,
+        hasEndBtn: !!endBtn,
+        hasMuteBtn: !!muteBtn,
+        hasSubCard: !!subCard,
+        hasTimer: !!timer,
+        status: state ? state.status : null
+      };
+    });
+    console.log('Voice Call Overlay Audit:', JSON.stringify(callOverlayAudit, null, 2));
+    if (!callOverlayAudit.hasOverlay) throw new Error('#fzcCallOverlay modal not mounted in DOM!');
+    if (!callOverlayAudit.hasOrb) throw new Error('#fzcVoiceOrb active orb visualizer not found!');
+    if (!callOverlayAudit.hasEndBtn) throw new Error('Hangup button (#fzcCallBtnEnd) not found in call overlay!');
+
+    // Capture visual screenshot of active call overlay
+    console.log('8. Capturing interactive call preview screenshot...');
+    await page.screenshot({ path: path.join(ROOT, 'tools', 'dev', 'interactive-call-preview.png'), fullPage: false });
+    console.log('Screenshot saved to tools/dev/interactive-call-preview.png');
+
+    // Simulate hands-free telephone turn-taking loop (listening -> thinking -> speaking -> listening)
+    console.log('9. Simulating hands-free telephone turn-taking loop...');
+    const simTurnResult = await page.evaluate(async () => {
+      if (!window.FiezelVoiceCall || typeof window.FiezelVoiceCall._testSimulateTurn !== 'function') {
+        return { error: 'window.FiezelVoiceCall._testSimulateTurn is not defined' };
+      }
+      const spokenText = 'こんにちは！豚骨ラーメンを一杯お願いします。';
+      const result = await window.FiezelVoiceCall._testSimulateTurn(spokenText);
+      const state = window.FiezelVoiceCall.getState();
+      const subText = document.getElementById('fzcCallSubText')?.textContent || '';
+
+      return {
+        turnResult: result,
+        finalStatus: state.status,
+        callTurnsCount: state.callTurns ? state.callTurns.length : 0,
+        latestAiReply: state.latestAiReply ? state.latestAiReply.text : null,
+        subText: subText
+      };
+    });
+    console.log('Turn simulation result:', JSON.stringify(simTurnResult, null, 2));
+    if (simTurnResult.error) throw new Error(simTurnResult.error);
+    if (simTurnResult.callTurnsCount < 1) throw new Error('Turn was not recorded in state.callTurns!');
+
+    // End call via #fzcCallBtnEnd
+    console.log('10. Ending call via #fzcCallBtnEnd...');
+    await page.evaluate(() => {
+      const endBtn = document.getElementById('fzcCallBtnEnd') || document.getElementById('fzcBtnEndCall');
+      if (endBtn) endBtn.click();
+    });
+    await page.waitForTimeout(600);
+
+    const callClosedAudit = await page.evaluate(() => {
+      const overlay = document.getElementById('fzcCallOverlay');
+      const state = window.FiezelVoiceCall ? window.FiezelVoiceCall.getState() : null;
+      return {
+        overlayRemaining: !!overlay,
+        status: state ? state.status : null
+      };
+    });
+    console.log('Call closure audit:', callClosedAudit);
+    if (callClosedAudit.status !== 'idle') throw new Error(`Expected call status to be 'idle', got '${callClosedAudit.status}'`);
+
+    // Verify dialogue is saved intact without loss in chat feed (.fzc-feed)
+    console.log('11. Verifying zero-loss voice dialogue preservation in chat feed (.fzc-feed)...');
+    const feedVerification = await page.evaluate(() => {
+      const feed = document.querySelector('.fzc-feed');
+      if (!feed) return { error: 'No feed' };
+      const bubbles = Array.from(feed.querySelectorAll('.fzc-msg-row .fzc-bubble'));
+      const textList = bubbles.map(b => b.textContent.trim());
+      const hasSpokenInput = textList.some(t => t.includes('こんにちは！豚骨ラーメンを一杯お願いします。'));
+      const voiceBubbles = Array.from(feed.querySelectorAll('.fzc-msg-row'));
+      return {
+        totalBubbles: bubbles.length,
+        hasSpokenInput,
+        textList: textList
+      };
+    });
+    console.log('Feed verification results:', JSON.stringify(feedVerification, null, 2));
+    if (!feedVerification.hasSpokenInput) {
+      throw new Error(`Zero-Loss Invariant Violated! Spoken turn 'こんにちは！豚骨ラーメンを一杯お願いします。' missing from .fzc-feed!`);
+    }
+    console.log('✓ Zero-loss state certified: Spoken phone dialogue preserved in chat feed');
+
     // Verify Topbar back returns to Latihan
-    console.log('7. Testing Topbar back navigation...');
+    console.log('12. Testing Topbar back navigation...');
     await page.evaluate(() => window.handleTopbarBack());
     await page.waitForTimeout(400);
 
@@ -258,8 +425,8 @@ server.listen(PORT, '127.0.0.1', async () => {
     console.log('State.view after handleTopbarBack():', backView);
     if (backView !== 'latihan') throw new Error(`Expected return to 'latihan', got '${backView}'`);
 
-    // Capture visual screenshot
-    console.log('8. Capturing preview screenshot...');
+    // Capture visual screenshot of final interactive chat screen
+    console.log('13. Capturing final interactive chat preview screenshot...');
     await page.evaluate(() => window.go('chat'));
     await page.waitForTimeout(1000);
     await page.screenshot({ path: path.join(ROOT, 'tools', 'dev', 'interactive-chat-preview.png'), fullPage: false });
@@ -273,5 +440,6 @@ server.listen(PORT, '127.0.0.1', async () => {
   } finally {
     if (browser) await browser.close();
     server.close();
+    process.exit(process.exitCode ?? 0);
   }
 });
