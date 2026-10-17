@@ -250,6 +250,9 @@ const PASS = Object.freeze({ __wiring: 'pass' });
 export function bucketFor(req) {
   if (req && req.kind === 'tts') return 'tts';
   if (req && req.task === 'translate_subtitle') return 'aiTranslate';
+  // Ngobrol AI punya jatah sendiri (0018_quota_ai_chat.sql): giliran obrolan tidak
+  // boleh menghabiskan jatah penjelasan tutor.
+  if (req && (req.task === 'conversation_turn' || req.task === 'conversation_correct')) return 'aiChat';
   return 'ai';
 }
 

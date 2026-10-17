@@ -127,3 +127,32 @@ jalur offline, sama dengan yang murid lihat saat AI gagal/kuota habis).
 2. Saat koreksi mati, apakah kesalahan tetap **dicatat diam-diam** ke Braincore (untuk rekomendasi
    latihan), atau benar-benar tidak dianalisis sama sekali?
 3. Kuota & model: boleh pakai model `standard` dengan kuota terpisah ±60 pesan/jam?
+
+---
+
+## Tindak lanjut (m025-595, cabang yang sama)
+
+Keputusan owner: (1) koreksi **mati** secara bawaan + popup ajakan saat kesalahan menumpuk;
+(2) belum dijawab, jadi telemetri lama dipertahankan; (3) model lebih murah boleh, asal tidak ada
+jawaban anomali.
+
+| Temuan | Status |
+|---|---|
+| B1, B2, B4, B8 | Diperbaiki. Task Worker baru `conversation_turn` / `conversation_correct` dengan riwayat 8 giliran, peran per skenario, dan keluaran `turn` terstruktur |
+| B3 | Diperbaiki. Gerbang bahasa dipisah: balasan wajib bahasa target, arti dan alasan wajib bahasa murid |
+| B5 | Diperbaiki. Bucket kuota `aiChat` 120/hari (migrasi `0018`). Ngobrol memakai model `standard`; koreksi memakai `reasoning` |
+| B6 | Diperbaiki. Sapaan fallback Puter dikenali dan diganti naskah + penanda "Mode hemat" |
+| B7 | Jalur CF tidak lagi menerima prompt dari klien. Prompt Puter memakai pembatas data |
+| F1, U1 | Diperbaiki. Saklar Koreksi (mati bawaan); koreksi hanya tampil untuk pesan yang dikirim saat saklar hidup |
+| F2, F3 | Diperbaiki sebagian. False positive dihapus, tiga pola baru ditambah. AI menjadi sumber koreksi utama |
+| F4, U6 | Diperbaiki. Penanda "Mode hemat" / "Jatah habis" |
+| F5 | Belum. Naskah offline masih berbasis kata kunci, tetapi sekarang ditandai jujur |
+| F6 | Tidak diubah. Aplikasi selalu mengirim kursus lewat `activeTargetLang()`, jadi nilai bawaan jarang dipakai |
+| F7 | Diperbaiki. Satu kunci per kursus+skenario, batas 200 pesan, migrasi kunci lama |
+| F8 | Diperbaiki. Duplikat dikenali dari cap waktu giliran |
+| U2 | Diperbaiki. Kartu "Lebih tepat:" dengan sorotan bagian yang diperbaiki + alasan dalam bahasa murid |
+| U3 | Diperbaiki. Catatan tata bahasa hanya tampil saat koreksi hidup |
+| U4, I4 | Diperbaiki. Saklar Suara otomatis |
+| I1 | Diperbaiki. Kartu kuning lembut satu kolom, bukan kotak merah dua kolom |
+| E (i18n) | Sebagian. Semua teks BARU dan tips kesalahan sudah id+th. ±340 kunci lama tetap utang (lihat handoff) |
+| F9, I2, I3, I5, U5 | Belum disentuh |

@@ -37,6 +37,14 @@ export const FREE_PLAN_LIMITS = Object.freeze({
   // pedagogisnya lebih tinggi per permintaan (cf-b3 §3.3).
   FREE_AI_TRANSLATE_DAILY: 15,
 
+  // ALASAN (keputusan owner 17 Okt 2026, audit Ngobrol AI): percakapan di Ngobrol AI
+  // memakai satu permintaan per GILIRAN, jadi 25/hari milik `ai` habis dalam ±10 menit
+  // ngobrol dan sekaligus menghabiskan jatah penjelasan tutor. Owner menyetujui jatah
+  // chat SENDIRI ±60 pesan/jam; D1 menghitung per hari, jadi angkanya 120/hari (±2 jam
+  // ngobrol aktif). BUKAN sub-kuota `ai`: ngobrol tidak boleh memakan jatah tutor.
+  // Pagar biaya akun tetap `ai_account_day` (neuron), yang tidak dilonggarkan di sini.
+  FREE_AI_CHAT_DAILY: 120,
+
   // ALASAN (cf-a10 §6): 3,75× kebutuhan harian profil sedang (32 panggilan). Dihitung
   // per CACHE-MISS, bukan per tekan tombol — replay aset yang sudah ada selalu gratis.
   // Menutup 1 sesi listening 20 item + 1 bab buku (±35 kalimat) + 40 kata kosakata/hari.
@@ -155,11 +163,12 @@ export const QUOTA_CONFIG = Object.freeze({
 export const FREE_BUCKET_LIMITS = Object.freeze({
   ai: FREE_PLAN_LIMITS.FREE_AI_DAILY_LIMIT,
   aiTranslate: FREE_PLAN_LIMITS.FREE_AI_TRANSLATE_DAILY,
+  aiChat: FREE_PLAN_LIMITS.FREE_AI_CHAT_DAILY,
   ttsCalls: FREE_PLAN_LIMITS.FREE_TTS_DAILY_LIMIT,
   ttsChars: FREE_PLAN_LIMITS.FREE_TTS_DAILY_CHARS
 });
 
-export const QUOTA_BUCKETS = Object.freeze(['ai', 'aiTranslate', 'ttsCalls', 'ttsChars']);
+export const QUOTA_BUCKETS = Object.freeze(['ai', 'aiTranslate', 'aiChat', 'ttsCalls', 'ttsChars']);
 
 /**
  * Satuan tiap bucket untuk skema respons `fiezel-quota-v1` (cf-b3 §4.1). Bahasa Inggris
@@ -169,6 +178,7 @@ export const QUOTA_BUCKETS = Object.freeze(['ai', 'aiTranslate', 'ttsCalls', 'tt
 export const QUOTA_BUCKET_UNITS = Object.freeze({
   ai: 'request',
   aiTranslate: 'request',
+  aiChat: 'request',
   ttsCalls: 'render',
   ttsChars: 'character'
 });

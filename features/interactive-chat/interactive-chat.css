@@ -2840,3 +2840,230 @@ body.fz-ja-no-romaji .fzc-romaji {
 .fzc-mic-modal-btn-dismiss:hover {
   color: #1B1418;
 }
+
+/* ── Ngobrol AI: saklar Koreksi & Suara (audit 17 Okt 2026) ── */
+.fzc-mode-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 2px 0 6px;
+}
+
+.fzc-mode-toggle {
+  /* !important mengikuti konvensi berkas ini (.fzc-btn-reset): gaya tombol global aplikasi
+     menggelembungkan tombol tanpa itu (terukur: saklar memenuhi satu baris penuh). */
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  flex: 0 0 auto !important;
+  width: auto !important;
+  min-height: 32px !important;
+  height: 32px !important;
+  padding: 0 8px 0 10px !important;
+  margin: 0 !important;
+  border-radius: 999px !important;
+  border: 1px solid var(--fzc-border) !important;
+  background: var(--fzc-surface) !important;
+  color: var(--fzc-ink-muted) !important;
+  box-shadow: none !important;
+  font-family: var(--font-display, 'Plus Jakarta Sans', sans-serif) !important;
+  font-size: 0.74rem !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.16s ease, border-color 0.16s ease, color 0.16s ease;
+}
+
+.fzc-mode-toggle:focus-visible,
+.fzc-nudge button:focus-visible {
+  outline: 2px solid var(--fzc-accent-blue);
+  outline-offset: 2px;
+}
+
+.fzc-mode-toggle.is-on {
+  border-color: var(--fzc-accent-emerald) !important;
+  color: var(--fzc-accent-emerald-dark) !important;
+  background: #ECFDF5 !important;
+}
+
+.fzc-mode-icon {
+  display: inline-flex;
+  width: 14px;
+  height: 14px;
+}
+
+.fzc-mode-icon svg { width: 100%; height: 100%; display: block; }
+
+.fzc-mode-switch {
+  position: relative;
+  width: 28px;
+  height: 16px;
+  border-radius: 999px;
+  background: var(--fzc-border-strong);
+  transition: background-color 0.16s ease;
+  flex-shrink: 0;
+}
+
+.fzc-mode-switch span {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  transition: transform 0.18s var(--fzc-ease-out);
+}
+
+.fzc-mode-toggle.is-on .fzc-mode-switch { background: var(--fzc-accent-emerald); }
+.fzc-mode-toggle.is-on .fzc-mode-switch span { transform: translateX(12px); }
+
+/* ── Kartu koreksi lembut: kuning muda, bukan merah — ini bantuan, bukan hukuman ── */
+.fzc-correction {
+  margin-top: 6px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 1px solid #F5E1B8;
+  background: #FFFBF0;
+  color: var(--fzc-ink);
+  font-size: 0.8rem;
+  line-height: 1.5;
+  animation: fzcSlideDown 0.2s ease-out;
+}
+
+.fzc-correction.is-tip { border-color: var(--fzc-border); background: var(--fzc-surface-alt); }
+
+.fzc-correction-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-display, 'Plus Jakarta Sans', sans-serif);
+  font-weight: 800;
+  font-size: 0.74rem;
+  color: var(--fzc-accent-amber);
+}
+
+.fzc-correction.is-tip .fzc-correction-head { color: var(--fzc-ink-muted); }
+
+.fzc-correction-text { margin-top: 2px; font-weight: 600; }
+
+.fzc-fix-mark {
+  background: #FDE68A;
+  color: inherit;
+  border-radius: 4px;
+  padding: 0 2px;
+}
+
+.fzc-correction-note { margin-top: 2px; color: var(--fzc-ink-muted); font-size: 0.76rem; }
+
+.fzc-correction-ok {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--fzc-accent-emerald-dark);
+}
+
+/* ── Penanda jujur: balasan dari naskah, bukan AI ── */
+.fzc-source-note {
+  align-self: center;
+  max-width: 92%;
+  margin: 4px auto 0;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--fzc-surface-alt);
+  color: var(--fzc-ink-muted);
+  font-size: 0.72rem;
+  text-align: center;
+}
+
+/* ── Ajakan menyalakan koreksi ── */
+.fzc-nudge-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(27, 20, 24, 0.38);
+  animation: fzcFadeIn 0.18s ease-out;
+}
+
+.fzc-nudge {
+  width: 100%;
+  max-width: 400px;
+  padding: 20px;
+  border-radius: 20px;
+  background: var(--fzc-surface);
+  color: var(--fzc-ink);
+  box-shadow: 0 18px 48px rgba(27, 20, 24, 0.22);
+  text-align: center;
+}
+
+@media (min-width: 600px) {
+  .fzc-nudge-backdrop { align-items: center; }
+}
+
+.fzc-nudge-icon {
+  display: inline-flex;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #FFFBF0;
+  color: var(--fzc-accent-amber);
+}
+
+.fzc-nudge-icon svg { width: 22px; height: 22px; }
+
+.fzc-nudge h3 {
+  margin: 10px 0 6px;
+  color: var(--fzc-ink);
+  font-family: var(--font-display, 'Plus Jakarta Sans', sans-serif);
+  font-size: 1.02rem;
+  font-weight: 800;
+}
+
+.fzc-nudge p { margin: 0 0 16px; color: var(--fzc-ink-muted); font-size: 0.84rem; line-height: 1.5; }
+
+.fzc-nudge-actions { display: flex; gap: 8px; }
+
+.fzc-nudge-actions button {
+  flex: 1 1 0 !important;
+  min-height: 44px !important;
+  margin: 0 !important;
+  padding: 0 12px !important;
+  border-radius: 14px !important;
+  box-shadow: none !important;
+  font-family: var(--font-display, 'Plus Jakarta Sans', sans-serif) !important;
+  font-size: 0.84rem !important;
+  font-weight: 800 !important;
+  cursor: pointer;
+}
+
+.fzc-nudge-actions .fzc-nudge-later {
+  border: 1px solid var(--fzc-border) !important;
+  background: transparent !important;
+  color: var(--fzc-ink-muted) !important;
+}
+
+.fzc-nudge-actions .fzc-nudge-on {
+  border: none !important;
+  background: var(--fzc-primary) !important;
+  color: var(--fzc-primary-text) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fzc-correction, .fzc-nudge-backdrop { animation: none; }
+  .fzc-mode-switch span, .fzc-mode-switch { transition: none; }
+}
+
+@keyframes fzcFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

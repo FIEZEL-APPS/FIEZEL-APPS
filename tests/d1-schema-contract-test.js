@@ -225,6 +225,15 @@ function schemaFromMigrations(files) {
       if (m) { indexes.delete(m[1].toLowerCase()); stat.dikenali += 1; continue; }
       m = /^DROP\s+TABLE\s+(?:IF\s+EXISTS\s+)?([A-Za-z_]\w*)/i.exec(stmt);
       if (m) { tables.delete(m[1].toLowerCase()); stat.dikenali += 1; continue; }
+      // 0018: kolom yang DITAMBAHKAN ke tabel yang sudah ada. Tabel yang belum dibuat oleh
+      // migrasi sebelumnya bukan "dikenali" — ALTER atas tabel hantu adalah cacat urutan.
+      m = /^ALTER\s+TABLE\s+([A-Za-z_]\w*)\s+ADD\s+(?:COLUMN\s+)?([A-Za-z_]\w*)/i.exec(stmt);
+      if (m && tables.has(m[1].toLowerCase())) {
+        const t = tables.get(m[1].toLowerCase());
+        if (!t.columns.includes(m[2].toLowerCase())) t.columns.push(m[2].toLowerCase());
+        stat.dikenali += 1;
+        continue;
+      }
       stat.tak_dikenali.push(stmt.slice(0, 120));
     }
   }

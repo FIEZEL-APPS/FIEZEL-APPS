@@ -253,7 +253,10 @@
       writing_feedback: 12,   // 5 skor kriteria + 1 langkah berikutnya + sebelum/sesudah ⇒ 12 kalimat cukup
       context_coach: 4,       // analisa murid — batas terukur pada benchmark hari ini
       session_recap: 3,       // maksimal 3 poin, satu kalimat per poin
-      translate_subtitle: 0   // 0 = tidak dibatasi
+      translate_subtitle: 0,  // 0 = tidak dibatasi
+      // Ngobrol AI: balasan teman, bukan penjelasan. Ditegakkan di shapeConversationOutput().
+      conversation_turn: 3,
+      conversation_correct: 3
     }),
     bannedWords: Object.freeze(['tidak']),
     preferredWord: 'nggak',
@@ -698,7 +701,9 @@
     tutor_turn: fallbackTutorTurnTh,
     writing_feedback: fallbackWritingFeedbackTh,
     context_coach: fallbackContextCoachTh,
-    session_recap: fallbackSessionRecapTh
+    session_recap: fallbackSessionRecapTh,
+    conversation_turn: fallbackConversationTh,
+    conversation_correct: fallbackConversationTh
   });
 
   // --------------------------------------------------------------------------------------
@@ -1009,6 +1014,310 @@
   }
 
   // --------------------------------------------------------------------------------------
+  // PERCAKAPAN — Ngobrol AI (keputusan owner 17 Okt 2026,
+  // reports/audit-ngobrol-ai-2026-10-17.md)
+  //
+  // Dua task, satu prompt, satu pemeriksa:
+  //   conversation_turn    — koreksi MATI. Prompt sama sekali tidak menyebut kesalahan, jadi
+  //                          obrolan mengalir tanpa umpan balik. Model `standard` (owner
+  //                          menyetujui model lebih murah untuk ngobrol).
+  //   conversation_correct — koreksi HIDUP. Koreksi adalah pernyataan KEBENARAN: koreksi yang
+  //                          salah mengajarkan kesalahan, jadi model `reasoning`. Kalau
+  //                          `pickModel()` menurunkannya ke model yang belum dipercaya secara
+  //                          pedagogis, BALASAN tetap sampai tetapi KOREKSI dibuang.
+  //
+  // "Jangan sampai anomali" (syarat owner) ditegakkan di `shapeConversationOutput()`, bukan
+  // diharapkan dari prompt: balasan wajib berbahasa target, maksimal 3 kalimat, tanpa gema
+  // rangka, tanpa membeo pesan murid; arti wajib berbahasa murid; koreksi wajib benar-benar
+  // berbeda dari kalimat murid tetapi tetap kalimat yang SAMA (bukan tulisan ulang bebas).
+  // Yang gagal balasan → fallback deterministik (klien memakai naskah offline). Yang gagal
+  // hanya arti/koreksi → bagian itu dibuang, balasannya tetap.
+  // --------------------------------------------------------------------------------------
+
+  var CONVERSATION = Object.freeze({
+    courses: Object.freeze(['en', 'ja']),
+    maxReplySentences: 3,
+    maxReplyChars: 360,
+    maxNoteChars: 240,
+    historyItems: 8,
+    historyItemMaxLength: 320,
+    // Koreksi yang mengubah lebih dari separuh kalimat bukan koreksi, ia tulisan ulang:
+    // murid tidak bisa melihat apa yang salah, dan model yang melakukannya sedang mengarang.
+    maxFixChangeRatio: 0.5,
+    // Kata fungsi Indonesia: balasan "Inggris" yang memuat banyak kata ini adalah model yang
+    // lupa bahasa target, bukan teman yang sesekali menyelipkan "ya".
+    idMarkers: Object.freeze(['yang', 'dan', 'aku', 'kamu', 'tidak', 'nggak', 'itu', 'ini', 'dengan',
+      'untuk', 'saya', 'apa', 'bagaimana', 'sangat', 'juga', 'sudah', 'belum', 'dari', 'kita', 'ada',
+      'banget', 'sih', 'dong', 'nih', 'kok', 'gimana', 'mana', 'aja', 'udah', 'mau', 'wah', 'ke', 'di']),
+    idMarkerMaxRatio: 0.25,
+    // Kalimat Inggris sungguhan (>= 4 kata) hampir selalu memuat kata fungsi Inggris. Nol
+    // kata fungsi pada empat kata atau lebih = bukan bahasa Inggris, apa pun bahasanya.
+    enFunctionWords: Object.freeze(['the', 'a', 'an', 'i', 'you', 'he', 'she', 'it', 'we', 'they', 'is', 'are',
+      'am', 'was', 'were', 'do', 'did', 'does', 'to', 'of', 'in', 'on', 'at', 'for', 'with', 'and', 'but', 'so',
+      'what', 'where', 'when', 'how', 'why', 'who', 'that', 'this', 'my', 'your', 'have', 'has', 'be', 'can',
+      'not', 'me', 'oh', 'yes', 'no', 'there', 'too', 'really', 'sounds', 'like', 'just']),
+    enFunctionMinRatio: 0.15
+  });
+
+  /**
+   * Peran per skenario Ngobrol AI. Instruksi peran hidup DI SINI (zona terpercaya), klien
+   * hanya mengirim id dari enum — teks skenario bebas dari klien akan menjadi instruksi
+   * yang ditulis pengguna. Skenario `phone_*` = telepon: balasan lebih pendek.
+   */
+  var CONVERSATION_ROLES = Object.freeze({
+    free: 'a close friend having a relaxed everyday chat',
+    intro: 'a new friend meeting the learner for the first time; you both introduce yourselves',
+    cafe: 'a friendly barista at a cafe; the learner is a customer ordering',
+    ramen: 'a friendly staff member at a ramen shop taking the learner\'s order',
+    konbini: 'a friendly convenience store clerk at the register',
+    direction: 'a friendly local on the street; the learner is asking the way to a station or place',
+    interview: 'a friendly interviewer at a simple school or part-time job interview',
+    hotel: 'a friendly hotel receptionist; the learner is checking in',
+    phone_friend: 'a close friend on a phone call, making weekend plans',
+    phone_delivery: 'a friendly staff member taking a food delivery order by phone',
+    phone_hotel: 'a friendly hotel staff member answering a booking question by phone',
+    phone_restaurant: 'a friendly restaurant staff member taking a table reservation by phone'
+  });
+
+  var KANA_RE = /[\u3040-\u30ff]/g;
+  var CJK_RE = /[\u4e00-\u9faf\u3400-\u4dbf]/g;
+
+  function countMatches(text, re) { return (s(text).match(re) || []).length; }
+
+  function conversationCourse(input) { return s(input && input.course) === 'ja' ? 'ja' : 'en'; }
+
+  function promptConversation(input, locale, withCorrection) {
+    var course = conversationCourse(input);
+    var target = course === 'ja' ? 'Japanese' : 'English';
+    var level = s(input.level) || 'A1';
+    var learnerLang = s(locale) === 'th'
+      ? 'Thai (ภาษาไทย), casual and polite, without ครับ/ค่ะ'
+      : 'Indonesian (bahasa Indonesia santai, pakai "kamu" dan "nggak")';
+    var sid = Object.prototype.hasOwnProperty.call(CONVERSATION_ROLES, s(input.scenarioId)) ? s(input.scenarioId) : 'free';
+    var lines = [
+      GUARD_SAFETY.trim(),
+      'You are FIEZEL, chatting in ' + target + ' with a language learner (level ' + level + ').',
+      'Your role: ' + CONVERSATION_ROLES[sid] + '.',
+      'Talk like a real person in everyday life: react to what they said, add a little of your own, and keep the conversation going.',
+      'Never lecture, never explain grammar, never praise or grade their ' + target + ', and never say you are an AI or a teacher.',
+      'Use simple ' + target + ' for level ' + level + '. At most ' + CONVERSATION.maxReplySentences +
+        ' short sentences. Usually end with one natural question.',
+      course === 'ja'
+        ? 'REPLY must be natural casual Japanese written in kana and common kanji. No romaji, no English.'
+        : 'REPLY must be written only in English.',
+      'If the learner writes in another language, still answer in ' + target + '.',
+      'Keep it safe for school students. Do not ask for personal data such as address, phone number or full name.'
+    ];
+    if (sid.indexOf('phone_') === 0) lines.push('This is a phone call: keep every reply to 1-2 short sentences.');
+    if (withCorrection) {
+      lines.push(
+        'Also check ONLY the learner\'s last message for real ' + target + ' grammar or word-choice mistakes. ' +
+        'Casual style, slang, contractions, missing final punctuation and capital letters are NOT mistakes. ' +
+        'If the last message is already correct, or is not written in ' + target + ', write FIX: NONE and WHY: NONE. ' +
+        'Otherwise FIX is the learner\'s own sentence with the smallest change that makes it correct (keep their words and meaning), ' +
+        'and WHY is one short sentence in ' + learnerLang + ' naming the main mistake. Never mention the mistake inside REPLY.'
+      );
+    }
+    lines.push('Answer EXACTLY in this format and nothing else:');
+    lines.push('REPLY: <your reply in ' + target + '>');
+    lines.push('MEANING: <the meaning of REPLY in ' + learnerLang + '>');
+    if (withCorrection) {
+      lines.push('FIX: <corrected sentence, or NONE>');
+      lines.push('WHY: <one short explanation, or NONE>');
+    } else {
+      // Sinyal DIAM untuk ajakan menyalakan koreksi di klien: satu kata, tidak pernah
+      // ditampilkan, dan REPLY tetap dilarang menyinggungnya.
+      lines.push('CHECK: <MISTAKE if the learner\'s last message has a clear ' + target +
+        ' grammar mistake, otherwise OK. Never mention it in REPLY>');
+    }
+    lines.push(DATA_DELIM);
+    var history = Array.isArray(input.history) ? input.history.slice(-CONVERSATION.historyItems) : [];
+    if (history.length) {
+      lines.push('Conversation so far:');
+      for (var i = 0; i < history.length; i++) {
+        var item = s(history[i]);
+        var who = /^a:/i.test(item) ? 'Friend' : 'Learner';
+        lines.push(who + ': ' + item.replace(/^[au]:\s*/i, ''));
+      }
+    }
+    lines.push('Learner (last message): ' + s(input.message));
+    return lines.join('\n');
+  }
+
+  function promptConversationTurn(input, locale) { return promptConversation(input, locale, false); }
+  function promptConversationCorrect(input, locale) { return promptConversation(input, locale, true); }
+
+  /** Pecah keluaran bertag menjadi {reply, meaning, fix, why}. Baris tanpa tag menyambung tag sebelumnya. */
+  function parseConversationTags(text) {
+    var out = { reply: '', meaning: '', fix: '', why: '', check: '' };
+    var map = { REPLY: 'reply', MEANING: 'meaning', FIX: 'fix', WHY: 'why', CHECK: 'check' };
+    var current = '';
+    var lines = stripCodeFence(text).split(/\r?\n/);
+    for (var i = 0; i < lines.length; i++) {
+      var m = /^\s*[*_#>\-\s]*(REPLY|MEANING|FIX|WHY|CHECK)[*_\s]*[:\uff1a]\s*(.*)$/i.exec(lines[i]);
+      if (m) {
+        current = map[m[1].toUpperCase()];
+        out[current] = out[current] ? out[current] + ' ' + m[2] : m[2];
+        continue;
+      }
+      if (current && lines[i].trim()) out[current] += ' ' + lines[i].trim();
+    }
+    Object.keys(out).forEach(function (k) {
+      out[k] = out[k].replace(/\s+/g, ' ').trim().replace(/^["'\u201c\u300c]+|["'\u201d\u300d]+$/g, '').replace(/[*_]{2,}/g, '').trim();
+    });
+    return out;
+  }
+
+  function isNoneMarker(v) { return /^(none|n\/a|-+|tidak ada|nggak ada|ไม่มี)\.?$/i.test(s(v).trim()) || !s(v).trim(); }
+
+  /** Huruf kecil, tanpa tanda baca dan spasi: dasar perbandingan "apakah koreksinya beda". */
+  function normalizeForCompare(v) {
+    return s(v).toLowerCase().replace(/[\s.,!?;:'"`\u2019\u201c\u201d\u3001\u3002\uff01\uff1f\u300c\u300d\-]+/g, '');
+  }
+
+  function editDistance(a, b) {
+    var x = s(a), y = s(b);
+    if (!x.length) return y.length;
+    if (!y.length) return x.length;
+    var prev = [];
+    for (var j = 0; j <= y.length; j++) prev[j] = j;
+    for (var i = 1; i <= x.length; i++) {
+      var cur = [i];
+      for (var k = 1; k <= y.length; k++) {
+        cur[k] = Math.min(prev[k] + 1, cur[k - 1] + 1, prev[k - 1] + (x[i - 1] === y[k - 1] ? 0 : 1));
+      }
+      prev = cur;
+    }
+    return prev[y.length];
+  }
+
+  function countJaSentences(text) {
+    return s(text).split(/[\u3002\uff01\uff1f!?]+/).filter(function (p) { return p.trim().length > 0; }).length;
+  }
+
+  function clampJaSentences(text, max) {
+    var chunks = s(text).match(/[^\u3002\uff01\uff1f!?]+[\u3002\uff01\uff1f!?]*/g) || [];
+    return chunks.slice(0, max).join('').trim();
+  }
+
+  /** Apakah teks benar-benar berbahasa target kursus. */
+  function isTargetLanguage(text, course) {
+    var t = s(text);
+    if (countMatches(t, THAI_CHAR_RE)) return false;
+    var kana = countMatches(t, KANA_RE);
+    var cjk = countMatches(t, CJK_RE);
+    var latin = countMatches(t, /[A-Za-z]/g);
+    if (course === 'ja') return kana >= 2 && (kana + cjk) / Math.max(1, kana + cjk + latin) >= 0.6;
+    if (kana || cjk || latin < 2) return false;
+    var words = t.toLowerCase().match(/[a-z]+/g) || [];
+    var id = 0;
+    var en = 0;
+    for (var i = 0; i < words.length; i++) {
+      if (CONVERSATION.idMarkers.indexOf(words[i]) !== -1) id += 1;
+      if (CONVERSATION.enFunctionWords.indexOf(words[i]) !== -1) en += 1;
+    }
+    if (!words.length) return false;
+    if (id / words.length > CONVERSATION.idMarkerMaxRatio) return false;
+    return words.length < 4 || en / words.length >= CONVERSATION.enFunctionMinRatio;
+  }
+
+  /** Apakah teks berbahasa murid (arti / alasan koreksi). Kutipan kata target boleh ada di dalamnya. */
+  function isLearnerLanguage(text, locale) {
+    var t = s(text);
+    if (s(locale) === 'th') return thaiScriptRatio(t) >= 0.3;
+    if (countMatches(t, THAI_CHAR_RE)) return false;
+    return countMatches(t, /[A-Za-z]/g) >= 3;
+  }
+
+  /**
+   * Bentuk keluaran percakapan + gerbang mutu. Fungsi MURNI.
+   * @returns {{ok:boolean, reason:string, text:string, turn:object|null}}
+   */
+  function shapeConversationOutput(taskName, raw, ctx) {
+    var c = ctx || {};
+    var input = c.input || {};
+    var locale = canonicalLearnerLocale(c.locale);
+    var course = conversationCourse(input);
+    var fail = function (reason) { return { ok: false, reason: reason, text: '', turn: null }; };
+    if (isEmptyOutput(raw)) return fail(OUTPUT_FAILURES.empty);
+    if (scaffoldEchoIn(raw)) return fail(OUTPUT_FAILURES.scaffoldEcho);
+    var tags = parseConversationTags(raw);
+    var reply = tags.reply;
+    if (!reply) return fail(OUTPUT_FAILURES.empty);
+    if (!isTargetLanguage(reply, course)) return fail(OUTPUT_FAILURES.localeMismatch);
+    var max = CONVERSATION.maxReplySentences;
+    if (course === 'ja') {
+      if (countJaSentences(reply) > max) reply = clampJaSentences(reply, max);
+    } else if (countSentences(reply) > max) {
+      var clamp = clampSentences(reply, max);
+      if (!clamp.clamped) return fail(OUTPUT_FAILURES.sentenceLimit);
+      reply = clamp.text;
+    }
+    if (!reply || reply.length > CONVERSATION.maxReplyChars) return fail(OUTPUT_FAILURES.sentenceLimit);
+    // Membeo pesan murid bukan balasan teman.
+    if (normalizeForCompare(reply) === normalizeForCompare(input.message)) return fail('echo_learner');
+
+    var meaning = tags.meaning;
+    if (!meaning || !isLearnerLanguage(meaning, locale) ||
+        normalizeForCompare(meaning) === normalizeForCompare(reply) ||
+        meaning.length > CONVERSATION.maxReplyChars * 2) meaning = '';
+
+    var wantsCorrection = resolveTaskName(taskName) === 'conversation_correct';
+    var trusted = !!(c.model && c.model.pedagogicallyTrusted === true);
+    var correction = null;
+    var correctionChecked = wantsCorrection && trusted;
+    if (correctionChecked && !isNoneMarker(tags.fix)) {
+      var fix = tags.fix;
+      var why = isNoneMarker(tags.why) ? '' : tags.why;
+      var a = normalizeForCompare(input.message);
+      var b = normalizeForCompare(fix);
+      var changed = a && b && a !== b;
+      var ratio = changed ? editDistance(a, b) / Math.max(a.length, b.length) : 1;
+      if (changed && ratio <= CONVERSATION.maxFixChangeRatio && isTargetLanguage(fix, course) &&
+          fix.length <= CONVERSATION.maxReplyChars && why && why.length <= CONVERSATION.maxNoteChars &&
+          isLearnerLanguage(why, locale) && !scaffoldEchoIn(why)) {
+        correction = { corrected: fix, note: why };
+      } else {
+        // Koreksi yang tidak lolos tidak boleh tampil sebagai "kalimatmu sudah benar".
+        correctionChecked = false;
+      }
+    }
+    // mistakeSignal: true/false hanya kalau ada dasar; null = tidak diketahui. Dipakai klien
+    // HANYA untuk ajakan menyalakan koreksi, tidak pernah ditampilkan sebagai umpan balik.
+    var mistakeSignal = null;
+    if (wantsCorrection) mistakeSignal = correctionChecked ? !!correction : null;
+    else if (/^\W*mistake/i.test(tags.check)) mistakeSignal = true;
+    else if (/^\W*ok\b/i.test(tags.check)) mistakeSignal = false;
+    return {
+      ok: true, reason: '', text: reply,
+      turn: { reply: reply, translation: meaning, correction: correction, correctionChecked: correctionChecked, mistakeSignal: mistakeSignal }
+    };
+  }
+
+  /** Pintu umum: task yang punya `shapeOutput` dibentuk oleh fungsinya sendiri. */
+  function shapeOutput(taskName, raw, ctx) {
+    var spec = get(taskName);
+    if (!spec || typeof spec.shapeOutput !== 'function') throw new Error('no_shape_output');
+    return spec.shapeOutput(taskName, raw, ctx);
+  }
+
+  function fallbackConversation() {
+    return 'Mode hemat — balasan ini dari naskah latihan FIEZEL, bukan AI.';
+  }
+
+  function fallbackConversationTh() {
+    return 'โหมดประหยัด — คำตอบนี้มาจากบทฝึกของ FIEZEL ไม่ใช่ AI';
+  }
+
+  var CONVERSATION_INPUT = Object.freeze({
+    message: { type: 'string', required: true, maxLength: 400 },
+    course: { type: 'enum', required: true, values: CONVERSATION.courses },
+    level: { type: 'enum', required: true, values: LEVELS },
+    scenarioId: { type: 'enum', values: Object.keys(CONVERSATION_ROLES) },
+    history: { type: 'array', maxItems: CONVERSATION.historyItems, itemMaxLength: CONVERSATION.historyItemMaxLength }
+  });
+
+  // --------------------------------------------------------------------------------------
   // REGISTRY
   // --------------------------------------------------------------------------------------
 
@@ -1240,6 +1549,55 @@
       clampable: false,
       prompt: promptSessionRecap,
       fallback: fallbackSessionRecap
+    }),
+
+    conversation_turn: Object.freeze({
+      task: 'conversation_turn',
+      input: CONVERSATION_INPUT,
+      // 8 giliran x 320 karakter + pesan 400 ≈ 750 token pada estimasi 4 char/token.
+      maxInputTokens: 900,
+      maxOutputTokens: 260,
+      timeoutMs: 12000,
+      // Deklaratif; yang ditegakkan adalah bucket `aiChat` (FREE_AI_CHAT_DAILY, 0018).
+      rateLimit: Object.freeze({ perHour: 60 }),
+      cache: CACHE.NONE, // percakapan pribadi; tidak pernah di-cache
+      cacheTtlSeconds: 0,
+      dedupInFlight: true,
+      // Owner (17 Okt 2026): ngobrol boleh model lebih murah. Yang menjaga mutunya
+      // shapeConversationOutput(), dan task ini TIDAK menyatakan benar/salah apa pun.
+      model: MODELS.standard,
+      cheapModel: MODELS.standard,
+      maxSentences: OUTPUT_CONTRACT.sentenceLimits.conversation_turn,
+      enforceStyleWords: false, // balasan berbahasa target; kanon "nggak" tidak berlaku
+      jsonMode: false,
+      clampable: false, // dipotong oleh shapeOutput, bukan oleh pemotong prosa umum
+      prompt: promptConversationTurn,
+      shapeOutput: shapeConversationOutput,
+      fallback: fallbackConversation
+    }),
+
+    conversation_correct: Object.freeze({
+      task: 'conversation_correct',
+      input: CONVERSATION_INPUT,
+      maxInputTokens: 900,
+      maxOutputTokens: 360,
+      timeoutMs: 15000,
+      rateLimit: Object.freeze({ perHour: 60 }),
+      cache: CACHE.NONE,
+      cacheTtlSeconds: 0,
+      dedupInFlight: true,
+      // KEBENARAN: koreksi yang salah diajarkan ulang ke murid. Tier degradasi tetap
+      // `standard` supaya obrolan tidak putus, tetapi koreksinya dibuang di sana
+      // (pedagogicallyTrusted:false) — lihat shapeConversationOutput().
+      model: MODELS.reasoning,
+      cheapModel: MODELS.standard,
+      maxSentences: OUTPUT_CONTRACT.sentenceLimits.conversation_correct,
+      enforceStyleWords: false,
+      jsonMode: false,
+      clampable: false,
+      prompt: promptConversationCorrect,
+      shapeOutput: shapeConversationOutput,
+      fallback: fallbackConversation
     })
   });
 
@@ -1520,7 +1878,7 @@
    * salah satu tier task ini — termasuk tier degradasi, karena degradasi yang salah fakta
    * bukan degradasi, ia kerusakan.
    */
-  var TRUTH_TASKS = Object.freeze(['tutor_turn', 'writing_feedback', 'context_coach', 'session_recap']);
+  var TRUTH_TASKS = Object.freeze(['tutor_turn', 'writing_feedback', 'context_coach', 'session_recap', 'conversation_correct']);
 
   function isTruthTask(taskName) { return TRUTH_TASKS.indexOf(resolveTaskName(taskName)) !== -1; }
 
@@ -1585,6 +1943,11 @@
     bannedWordsIn: bannedWordsIn,
     sentenceLimitFor: sentenceLimitFor,
     isTruthTask: isTruthTask,
-    modelsUsedBy: modelsUsedBy
+    modelsUsedBy: modelsUsedBy,
+    CONVERSATION: CONVERSATION,
+    CONVERSATION_ROLES: CONVERSATION_ROLES,
+    shapeOutput: shapeOutput,
+    shapeConversationOutput: shapeConversationOutput,
+    parseConversationTags: parseConversationTags
   });
 }));

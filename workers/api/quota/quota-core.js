@@ -42,6 +42,7 @@ const MS_PER_MINUTE = 60000;
 export const DENY_SCOPE = Object.freeze({
   ai: 'ai_daily',
   aiTranslate: 'ai_translate_daily',
+  aiChat: 'ai_chat_daily',
   ttsCalls: 'tts_daily_calls',
   ttsChars: 'tts_daily_chars'
 });
@@ -226,6 +227,8 @@ export function chargesFor(bucket, amount) {
   if (n < 0) return null;
   if (bucket === 'ai') return { ai: n };
   if (bucket === 'aiTranslate') return { ai: n, aiTranslate: n };
+  // Bucket SENDIRI, bukan sub-kuota: giliran ngobrol tidak menaikkan `ai`.
+  if (bucket === 'aiChat') return { aiChat: n };
   if (bucket === 'ttsCalls') return { ttsCalls: n };
   if (bucket === 'ttsChars') return { ttsChars: n };
   if (bucket === 'tts') return { ttsCalls: 1, ttsChars: n };

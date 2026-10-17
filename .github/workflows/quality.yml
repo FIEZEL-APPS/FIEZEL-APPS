@@ -651,6 +651,9 @@ jobs:
           node tests/search-feedback-test.js
           node tests/view-reachability-test.js
           node tests/interactive-chat-test.js
+          # Ngobrol AI (audit 17 Okt 2026): saklar koreksi mati secara bawaan, ajakan koreksi,
+          # riwayat percakapan, dan penanda jujur saat balasan datang dari naskah.
+          node tests/interactive-chat-correction-test.js
           node tests/voice-call-two-way-test.js
           node tests/ios-pwa-mic-shadowing-test.js
           node tests/shadowing-eval-card-test.js
@@ -788,6 +791,8 @@ jobs:
           # source:"unavailable", bytes:0, dan tidak ada gerbang yang memeriksa isi permintaan.
           node tests/tts-provider-contract-test.js
           node tests/ai-task-contract-test.js
+          # Ngobrol AI: task percakapan + gerbang anti-anomali + jatah chat sendiri (aiChat).
+          node tests/ai-conversation-task-test.js
           # V4: gerbang bentuk jawaban Workers AI + kontrak mutu keluaran. Dijalankan tepat
           # sesudah gerbang kontrak task karena keduanya menguji berkas yang sama dari dua sisi:
           # yang di atas menjaga bentuk PERMINTAAN (klien tidak mengirim prompt), yang ini menjaga

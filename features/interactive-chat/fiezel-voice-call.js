@@ -802,7 +802,21 @@
       var replyPromise = null;
 
       if (chatEngine && typeof chatEngine.requestReply === 'function') {
-        replyPromise = chatEngine.requestReply(text, state.scenarioId, state.course);
+        // Teman di telepon ingat obrolan: riwayat chat sebelum panggilan + giliran panggilan ini.
+        var callHistory = [];
+        try {
+          if (typeof chatEngine.buildHistory === 'function' && typeof chatEngine.getState === 'function') {
+            callHistory = chatEngine.buildHistory(chatEngine.getState().messages);
+          }
+        } catch (_) { callHistory = []; }
+        (state.callTurns || []).forEach(function (tn) {
+          if (tn && tn.userText) callHistory.push('u: ' + String(tn.userText).slice(0, 300));
+          if (tn && tn.reply && tn.reply.text) callHistory.push('a: ' + String(tn.reply.text).slice(0, 300));
+        });
+        replyPromise = chatEngine.requestReply(text, state.scenarioId, state.course, {
+          isPhoneCall: true,
+          history: callHistory.slice(-8)
+        });
       } else if (typeof root.askFiezelAIResult === 'function') {
         var scTitle = state.scenarioId;
         var p = state.course === 'ja'

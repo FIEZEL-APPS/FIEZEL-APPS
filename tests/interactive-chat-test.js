@@ -242,7 +242,8 @@ chatEngine.requestReply('もしもし！', 'phone_friend', 'ja', { isPhoneCall: 
 
   chatEngine.recordTurn('もしもし！', reply, 'phone_friend');
   const chatState = chatEngine.getState();
-  const phoneHist = chatState.scenarioHistories['ja_phone_friend'] || chatState.scenarioHistories['phone_friend'];
+  // Riwayat disimpan SATU kali, di kunci berawalan kursus aktif (audit Ngobrol AI 17 Okt 2026).
+  const phoneHist = chatState.scenarioHistories[chatState.course + '_phone_friend'];
   assert.ok(Array.isArray(phoneHist) && phoneHist.length >= 2, 'recordTurn must persist turns in scenario histories');
   console.log('✓ Voice Call requestReply and recordTurn verified successfully.');
   console.log('ALL INTERACTIVE CHAT TESTS PASSED (11/11).');

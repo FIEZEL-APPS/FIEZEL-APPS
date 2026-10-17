@@ -39,7 +39,10 @@ const capDeps = (extra) => Object.assign({
   })
 }, extra || {});
 
-const EXPECTED_TASKS = ['tutor_turn', 'writing_feedback', 'context_coach', 'translate_subtitle', 'session_recap'];
+// Ngobrol AI, 17 Okt 2026): dua task percakapan. Perilakunya digerbang di
+// tests/ai-conversation-task-test.js.
+const EXPECTED_TASKS = ['tutor_turn', 'writing_feedback', 'context_coach', 'translate_subtitle', 'session_recap',
+  'conversation_turn', 'conversation_correct'];
 
 const VALID_INPUT = {
   tutor_turn: { question: 'Apa beda "in" dan "on"?', surface: 'ask', level: 'A2', focusLabel: 'Preposisi tempat' },
@@ -49,7 +52,9 @@ const VALID_INPUT = {
     outcomes: ['slow'], profile: { level: 'A2' }, privacy: { rawAnswersIncluded: false, rawHistoryIncluded: false }
   },
   translate_subtitle: { en: 'It is raining and I am at the school gate.', bankVersion: 'v2' },
-  session_recap: { level: 'A2', bankVersion: 'v2', weakSkills: ['past simple', 'prepositions'], missedItemIds: ['q1'] }
+  session_recap: { level: 'A2', bankVersion: 'v2', weakSkills: ['past simple', 'prepositions'], missedItemIds: ['q1'] },
+  conversation_turn: { message: 'I go to the beach yesterday', course: 'en', level: 'A2', history: ['a: Hi! How was your weekend?'] },
+  conversation_correct: { message: 'わたしわ学生です', course: 'ja', level: 'A1', scenarioId: 'intro' }
 };
 
 const req = (task, input, extra) => ({ schema: 'fiezel-ai-task-v2', task, input, locale: 'id', ...(extra || {}) });
@@ -57,7 +62,7 @@ const req = (task, input, extra) => ({ schema: 'fiezel-ai-task-v2', task, input,
 // --- 1. REGISTRY LENGKAP ---------------------------------------------------------------
 {
   const list = AiTasks.list();
-  check('Lima task runtime terdaftar tepat',
+  check('Tujuh task runtime terdaftar tepat',
     list.length === EXPECTED_TASKS.length && EXPECTED_TASKS.every((t) => list.includes(t)), list.join(','));
   check('Task yang dihapus tidak kembali (quiz_explanation / vocabulary_explanation)',
     !list.includes('quiz_explanation') && !list.includes('vocabulary_explanation'),
