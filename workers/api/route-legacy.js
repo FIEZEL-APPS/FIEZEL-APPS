@@ -203,7 +203,75 @@ async function isCronAuthorized(ctx) {
 //      owner (quota-config.js) adalah 25/hari.
 //   3. Ia hanya dipasang di /api/ai/translate, sementara empat rute lain yang memanggil
 //      model yang sama tidak punya pembatas apa pun.
-// Menyimpan keduanya berarti dua mekanisme untuk satu maksud - cara celah berikutnya lahir.
+// ==========================================
+// Friendly Study Push Matrix & Personalizer
+// ==========================================
+
+export const SCHEDULED_FRIEND_MESSAGES = Object.freeze({
+  0: { // Minggu (2x: pagi santai & malam penutup weekend)
+    morning: {
+      title: 'Selamat hari Minggu {name}! ☀️',
+      body: 'Hari libur santai nih. Sambil santai pagi, yuk asah 3 frasa keren bareng aku 2 menit aja.'
+    },
+    evening: {
+      title: 'Malam {name}! 🛋️',
+      body: 'Siap-siap buat besok ya? Tutup weekend kamu dengan manis bareng aku 2 menit yuk sebelum tidur!'
+    }
+  },
+  1: { // Senin (1x malam)
+    evening: {
+      title: 'Hei {name}! 🌙',
+      body: 'Udah di rumah kan? Hari Senin yang panjang udah kelar, yuk santai rebahan 2 menit bareng aku.'
+    }
+  },
+  2: { // Selasa (1x malam)
+    evening: {
+      title: 'Hei {name}! ✨',
+      body: 'Kemana aja nih, sepi banget nggak ada kamu. Luang 2 menit buat santai bareng malam ini yuk?'
+    }
+  },
+  3: { // Rabu (1x malam)
+    evening: {
+      title: '{name}, lagi santai ya? 🛋️',
+      body: 'Aku tungguin dari tadi nih haha. Yuk tengok sebentar, sayang banget kalau progres kamu terlewat.'
+    }
+  },
+  4: { // Kamis (1x malam)
+    evening: {
+      title: 'Hei {name}! 🌙',
+      body: 'Udah leyeh-leyeh ya? Temenin aku 2 menit sebelum tidur yuk, obrolannya ringan banget kok.'
+    }
+  },
+  5: { // Jumat (1x malam)
+    evening: {
+      title: '{name}, malam sabtuan apa nih? 🍿',
+      body: 'Santai banget kan malam ini? Yuk luang 2 menit sebelum nonton atau jalan bareng teman.'
+    }
+  },
+  6: { // Sabtu (1x malam)
+    evening: {
+      title: '{name}, lagi ngapain nih? 🎮',
+      body: 'Malam minggu gini seru banget kalau ditemenin obrolan santai 2 menit bareng aku.'
+    }
+  }
+});
+
+export function formatPersonalizedMessage(template, rawName) {
+  const name = String(rawName || '').trim();
+  let s = String(template || '');
+  if (name) {
+    return s.replace(/\{name\}/g, name);
+  }
+  return s
+    .replace(/Hei\s+\{name\}!/gi, 'Hei kamu!')
+    .replace(/Pagi\s+\{name\}!/gi, 'Semangat pagi!')
+    .replace(/Malam\s+\{name\}!/gi, 'Selamat malam!')
+    .replace(/Selamat hari Minggu\s+\{name\}!/gi, 'Selamat hari Minggu!')
+    .replace(/Happy Friday\s+\{name\}!/gi, 'Happy Friday!')
+    .replace(/\{name\},\s*/gi, '')
+    .replace(/\{name\}!\s*/gi, 'kamu! ')
+    .replace(/\{name\}/gi, 'kamu');
+}
 
 const RAW_ROUTES = [
   // ==========================================
@@ -740,73 +808,6 @@ const RAW_ROUTES = [
   // ==========================================
   // Endpoint Reminder (Cron-token gated)
   // ==========================================
-  
-export const SCHEDULED_FRIEND_MESSAGES = Object.freeze({
-  0: { // Minggu (2x: pagi santai & malam penutup weekend)
-    morning: {
-      title: 'Selamat hari Minggu {name}! ☀️',
-      body: 'Hari libur santai nih. Sambil santai pagi, yuk asah 3 frasa keren bareng aku 2 menit aja.'
-    },
-    evening: {
-      title: 'Malam {name}! 🛋️',
-      body: 'Siap-siap buat besok ya? Tutup weekend kamu dengan manis bareng aku 2 menit yuk sebelum tidur!'
-    }
-  },
-  1: { // Senin (1x malam)
-    evening: {
-      title: 'Hei {name}! 🌙',
-      body: 'Udah di rumah kan? Hari Senin yang panjang udah kelar, yuk santai rebahan 2 menit bareng aku.'
-    }
-  },
-  2: { // Selasa (1x malam)
-    evening: {
-      title: 'Hei {name}! ✨',
-      body: 'Kemana aja nih, sepi banget nggak ada kamu. Luang 2 menit buat santai bareng malam ini yuk?'
-    }
-  },
-  3: { // Rabu (1x malam)
-    evening: {
-      title: '{name}, lagi santai ya? 🛋️',
-      body: 'Aku tungguin dari tadi nih haha. Yuk tengok sebentar, sayang banget kalau progres kamu terlewat.'
-    }
-  },
-  4: { // Kamis (1x malam)
-    evening: {
-      title: 'Hei {name}! 🌙',
-      body: 'Udah leyeh-leyeh ya? Temenin aku 2 menit sebelum tidur yuk, obrolannya ringan banget kok.'
-    }
-  },
-  5: { // Jumat (1x malam)
-    evening: {
-      title: '{name}, malam sabtuan apa nih? 🍿',
-      body: 'Santai banget kan malam ini? Yuk luang 2 menit sebelum nonton atau jalan bareng teman.'
-    }
-  },
-  6: { // Sabtu (1x malam)
-    evening: {
-      title: '{name}, lagi ngapain nih? 🎮',
-      body: 'Malam minggu gini seru banget kalau ditemenin obrolan santai 2 menit bareng aku.'
-    }
-  }
-});
-
-export function formatPersonalizedMessage(template, rawName) {
-  const name = String(rawName || '').trim();
-  let s = String(template || '');
-  if (name) {
-    return s.replace(/\{name\}/g, name);
-  }
-  return s
-    .replace(/Hei\s+\{name\}!/gi, 'Hei kamu!')
-    .replace(/Pagi\s+\{name\}!/gi, 'Semangat pagi!')
-    .replace(/Malam\s+\{name\}!/gi, 'Selamat malam!')
-    .replace(/Selamat hari Minggu\s+\{name\}!/gi, 'Selamat hari Minggu!')
-    .replace(/Happy Friday\s+\{name\}!/gi, 'Happy Friday!')
-    .replace(/\{name\},\s*/gi, '')
-    .replace(/\{name\}!\s*/gi, 'kamu! ')
-    .replace(/\{name\}/gi, 'kamu');
-}
-
   // 19. POST /api/reminders/due
   ['POST', '/api/reminders/due', async (ctx) => {
     const opt = { headers: ctx.corsHeaders };
