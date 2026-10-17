@@ -164,4 +164,3 @@ assert.ok(appJs.includes("go('chat')") || appJs.includes("view:'chat'"), 'latiha
 
 console.log('✓ App integration & routing invariants passed.');
 console.log('ALL INTERACTIVE CHAT TESTS PASSED (8/8).');
-

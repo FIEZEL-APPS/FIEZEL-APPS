@@ -1,9 +1,9 @@
 # FIEZEL HANDOFF DOSSIER: INTERACTIVE CHAT SHADOWING & SCENARIO GOALS (m025-588)
 
-**Tanggal**: 17 Oktober 2026  
-**Build Rilis**: `m025-588` (Hexa-Sync: `BUILD-VERSION.json`, `sw.js`, `core-config.js`, `fiezel-diag-panel.js`, `kurikulum.html`, `misi.html`)  
-**Penulis**: Pair Programming Antigravity Assistant  
-**Cakupan**: Interactive Chat & Speaking Partner Phase 2 Enhancement  
+**Tanggal**: 17 Oktober 2026<br>
+**Build Rilis**: `m025-588` (Hexa-Sync: `BUILD-VERSION.json`, `sw.js`, `core-config.js`, `fiezel-diag-panel.js`, `kurikulum.html`, `misi.html`)<br>
+**Penulis**: Pair Programming Antigravity Assistant<br>
+**Cakupan**: Interactive Chat & Speaking Partner Phase 2 Enhancement
 
 ---
 
