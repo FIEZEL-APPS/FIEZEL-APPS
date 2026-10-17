@@ -43,8 +43,8 @@
     speechThreshold: 0.032,        // Normalized RMS amplitude to register speech
     interruptThreshold: 0.075,     // RMS amplitude threshold to trigger polite barge-in while AI speaks
     interruptConsecutiveFrames: 3, // Consecutive loud frames (~150ms) to trigger barge-in
-    silenceTimeoutMs: 1350,        // Silence timeout after speech before triggering AI turn
-    naturalTurnPauseMs: 380,       // Breathing pause after AI finishes speaking before opening mic
+    silenceTimeoutMs: 800,         // Snappy turn timeout for fast conversational response
+    naturalTurnPauseMs: 260,       // Breathing pause after AI finishes speaking before opening mic
     fftSize: 512,
     smoothingTimeConstant: 0.25
   };
@@ -193,10 +193,17 @@
     }
 
     // Web Audio Autoplay Policy Unlock
+    var isCallSpeechPrimed = false;
     function unlockAudio() {
       try {
-        if (root.speechSynthesis && root.speechSynthesis.paused) {
-          root.speechSynthesis.resume();
+        if (root.speechSynthesis) {
+          if (root.speechSynthesis.paused) root.speechSynthesis.resume();
+          if (!isCallSpeechPrimed) {
+            var silentPrime = new root.SpeechSynthesisUtterance(' ');
+            silentPrime.volume = 0.01;
+            root.speechSynthesis.speak(silentPrime);
+            isCallSpeechPrimed = true;
+          }
         }
       } catch (_) {}
 
@@ -312,8 +319,22 @@
 
         var isJa = course === 'ja';
 
-        // English: prioritize FiezelVoiceSay neural voice if present
-        if (!isJa && root.FiezelVoiceSay && typeof root.FiezelVoiceSay.say === 'function') {
+        var hasNeuralVoice = false;
+        try {
+          if (root.FiezelCfTtsTransport && typeof root.FiezelCfTtsTransport.isOn === 'function' && root.FiezelCfTtsTransport.isOn()) {
+            hasNeuralVoice = true;
+          } else if (root.FiezelVoiceRuntime && typeof root.FiezelVoiceRuntime.status === 'function') {
+            var rtStatus = root.FiezelVoiceRuntime.status();
+            if (rtStatus && (rtStatus.ready || rtStatus.prepared || rtStatus.loaded)) {
+              hasNeuralVoice = true;
+            }
+          }
+        } catch (_) {
+          hasNeuralVoice = false;
+        }
+
+        // English: prioritize FiezelVoiceSay neural voice only if active/ready
+        if (!isJa && hasNeuralVoice && root.FiezelVoiceSay && typeof root.FiezelVoiceSay.say === 'function') {
           root.FiezelVoiceSay.say(clean, { suppressSubtitles: true })
             .then(function (spoke) {
               if (spoke) {
@@ -328,7 +349,7 @@
           return;
         }
 
-        // Japanese or fallback: SpeechSynthesis
+        // Japanese or English Web Speech fallback (instant & synchronous): SpeechSynthesis
         speakViaSynth(clean, isJa, resolve);
       });
     }
@@ -341,7 +362,9 @@
       }
 
       try {
-        synth.cancel();
+        if (synth.speaking || synth.pending) {
+          synth.cancel();
+        }
         clearCallKeepAlive();
         if (synth.paused) {
           try { synth.resume(); } catch (_) {}
@@ -357,7 +380,13 @@
         try {
           var chosenVoice = selectVoice(synth, isJa);
           if (chosenVoice) {
-            utter.voice = chosenVoice;
+            var vLang = (chosenVoice.lang || '').toLowerCase();
+            var matchesTarget = isJa
+              ? (vLang.indexOf('ja') === 0 || /japanese|nihongo|日本語/i.test(chosenVoice.name || ''))
+              : (vLang.indexOf('en') === 0 || /english/i.test(chosenVoice.name || ''));
+            if (matchesTarget) {
+              utter.voice = chosenVoice;
+            }
           } else if (isJa && root.FiezelSpeechBridge && typeof root.FiezelSpeechBridge.speak === 'function') {
             try { root.FiezelSpeechBridge.speak(text); } catch (_) {}
           }
@@ -827,7 +856,7 @@
             'Scenario: ' + scTitle + '. User input: "' + text + '".\n' +
             'Reply naturally in 1-2 friendly English sentences and provide an Indonesian translation.';
         try {
-          replyPromise = root.askFiezelAIResult(p, 'question', {
+          replyPromise = root.askFiezelAIResult(p, 'kaiwa', {
             question: text,
             lessonId: 'kaiwa_' + state.scenarioId
           }).then(function (res) {

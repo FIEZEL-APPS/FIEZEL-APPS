@@ -1074,8 +1074,8 @@
       }
 
       // Contextual Japanese Friendly Dialogue Fallback (Phone / Free / Conversation)
-      // 1. Greetings, Moshi moshi, Audio check, How's it going
-      if (/もしもし|元気|こんにちは|おはよう|こんばんは|久しぶり|聞こえる|聞こえます/i.test(raw)) {
+      // 1. Greetings, Moshi moshi, Audio check, How's it going (Japanese, Romaji, and Indonesian greetings)
+      if (/もしもし|元気|こんにちは|おはよう|こんばんは|久しぶり|聞こえる|聞こえます|halo|hai|hello|hei|pagi|siang|malam|apa\s*kabar|tes|lagi\s*apa/i.test(raw)) {
         return {
           text: isPhone ? 'もしもし！元気にしてた？' : 'もしもし！元気にしてた？声が聞けて嬉しいよ。今日どんな一日だった？',
           furigana: isPhone ? 'もしもし！[元気](げんき)にしてた？' : 'もしもし！[元気](げんき)にしてた？[声](こえ)が[聞](き)けて[嬉](うれ)しいよ。[今日](きょう)どんな[一日](いちにち)だった？',
@@ -1086,6 +1086,28 @@
             { text: 'うんうん、元気だよ！買い物に行ってきたんだ。', furigana: 'うんうん、[元気](げんき)だよ！[買](か)い[物](もの)に[行](い)ってきたんだ。', romaji: 'Un-un, genki da yo! Kaimono ni itte kita nda.', translation: t('chat_sug_ja_shop', 'Iya iya, kabar baik! Tadi aku baru habis belanja nih.') },
             { text: 'ちょっと仕事で疲れたけど、話せて元気出た！', furigana: 'ちょっと[仕事](しごと)で[疲](つか)れたけど、[話](はな)せて[元気](げんき)[出](で)た！', romaji: 'Chotto shigoto de tsukareta kedo, hanasete genki deta!', translation: t('chat_sug_ja_tired_good', 'Agak capek karena kerjaan sih, tapi setelah ngobrol jadi semangat lagi!') }
           ]
+        };
+      }
+
+      // 1b. Identity / Who are you
+      if (/siapa\s*kamu|kamu\s*siapa|anata\s*wa\s*dare|nama\s*kamu|who\s*are\s*you/i.test(raw)) {
+        return {
+          text: '初めまして！私の名前はフィゼルだよ。日本語の会話パートナーだよ！何について話そうか？',
+          furigana: '[初](はじ)めまして！[私](わたし)の[名前](なまえ)はフィゼルだよ。[日本語](にほんご)の[会話](かいわ)パートナーだよ！[何](なに)について[話](はな)そうか？',
+          romaji: 'Hajimemashite! Watashi no namae wa Fizeru da yo. Nihongo no kaiwa paatonaa da yo! Nani ni tsuite hanasou ka?',
+          translation: t('chat_off_who_trans', 'Salam kenal! Namaku Fiezel, teman ngobrol bahasa Jepangmu! Mau ngobrolin tentang apa nih?'),
+          grammarNote: t('chat_off_who_note', 'Awalan「初めまして」dan penutup pertanyaan santai menjaga kehangatan percakapan.')
+        };
+      }
+
+      // 1c. Thanks / Appreciation
+      if (/makasih|terima\s*kasih|thank|arigatou|arigato/i.test(raw)) {
+        return {
+          text: 'どういたしまして！話せて楽しかったよ。またいつでも電話してね！',
+          furigana: 'どういたしまして！[話](はな)せて[楽](たの)しかったよ。またいつでも[電話](でんわ)してね！',
+          romaji: 'Douitashimashite! Hanasete tanoshikatta yo. Mata itsudemo denwa shite ne!',
+          translation: t('chat_off_thanks_trans', 'Sama-sama! Senang banget bisa ngobrol bareng kamu. Kapan pun mau ngobrol, telepon lagi ya!'),
+          grammarNote: t('chat_off_thanks_note', 'Ucapan terima kasih direspon dengan「どういたしまして！」yang ramah.')
         };
       }
 
@@ -1477,6 +1499,7 @@
   }
 
   // Web Audio Autoplay Policy Unlock
+  var isSpeechPrimed = false;
   function unlockAudioContext() {
     if (audioContextUnlocked && root.__fiezelSharedAudioContext && root.__fiezelSharedAudioContext.state === 'running') {
       return Promise.resolve(root.__fiezelSharedAudioContext);
@@ -1486,6 +1509,12 @@
       if (typeof root.speechSynthesis !== 'undefined') {
         try {
           if (root.speechSynthesis.paused) root.speechSynthesis.resume();
+          if (!isSpeechPrimed) {
+            var silentPrime = new root.SpeechSynthesisUtterance(' ');
+            silentPrime.volume = 0.01;
+            root.speechSynthesis.speak(silentPrime);
+            isSpeechPrimed = true;
+          }
         } catch (_) {}
       }
 
@@ -1646,8 +1675,22 @@
 
     var isJapanese = state.course === 'ja';
 
-    // If English, try FiezelVoiceSay neural voice first
-    if (!isJapanese && root.FiezelVoiceSay && typeof root.FiezelVoiceSay.say === 'function') {
+    var hasNeuralVoice = false;
+    try {
+      if (root.FiezelCfTtsTransport && typeof root.FiezelCfTtsTransport.isOn === 'function' && root.FiezelCfTtsTransport.isOn()) {
+        hasNeuralVoice = true;
+      } else if (root.FiezelVoiceRuntime && typeof root.FiezelVoiceRuntime.status === 'function') {
+        var rtStatus = root.FiezelVoiceRuntime.status();
+        if (rtStatus && (rtStatus.ready || rtStatus.prepared || rtStatus.loaded)) {
+          hasNeuralVoice = true;
+        }
+      }
+    } catch (_) {
+      hasNeuralVoice = false;
+    }
+
+    // If English and neural voice is active/ready, try FiezelVoiceSay neural voice first
+    if (!isJapanese && hasNeuralVoice && root.FiezelVoiceSay && typeof root.FiezelVoiceSay.say === 'function') {
       root.FiezelVoiceSay.say(cleanText, { suppressSubtitles: true })
         .then(function (spoke) {
           if (spoke) {
@@ -1666,7 +1709,7 @@
       return;
     }
 
-    // Japanese or fallback: speak via Web Speech Synthesis
+    // Japanese or English Web Speech fallback (instant & synchronous within gesture): speak via Web Speech Synthesis
     speakViaWebSpeech(cleanText, msgId);
   }
 
@@ -1682,7 +1725,9 @@
     }
 
     try {
-      synth.cancel();
+      if (synth.speaking || synth.pending) {
+        synth.cancel();
+      }
       clearKeepAlive();
       if (synth.paused) {
         try { synth.resume(); } catch (_) {}
@@ -1701,7 +1746,13 @@
       try {
         var chosenVoice = selectVoice(synth, isJa);
         if (chosenVoice) {
-          utter.voice = chosenVoice;
+          var vLang = (chosenVoice.lang || '').toLowerCase();
+          var matchesTarget = isJa
+            ? (vLang.indexOf('ja') === 0 || /japanese|nihongo|日本語/i.test(chosenVoice.name || ''))
+            : (vLang.indexOf('en') === 0 || /english/i.test(chosenVoice.name || ''));
+          if (matchesTarget) {
+            utter.voice = chosenVoice;
+          }
         } else if (isJa && root.FiezelSpeechBridge && typeof root.FiezelSpeechBridge.speak === 'function') {
           // If no local voice, try speech bridge fallback if available
           try { root.FiezelSpeechBridge.speak(text); } catch (_) {}
@@ -2314,6 +2365,7 @@
 
   // Handle User Message Submission
   function sendMessage(text) {
+    unlockAudioContext();
     var trimmed = String(text || '').trim();
     if (!trimmed || state.isThinking) return;
 
