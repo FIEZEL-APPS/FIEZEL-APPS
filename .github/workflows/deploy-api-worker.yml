@@ -117,19 +117,23 @@ jobs:
           JS
           # Migrasi 0018 (bucket kuota Ngobrol AI `aiChat`) WAJIB ada sebelum Worker yang memuat
           # COLUMN.aiChat: reconcileHeld() menulis ai_chat_held untuk SETIAP murid, jadi Worker
-          # baru di atas database lama mematahkan rekonsiliasi kuota semua bucket. Idempoten:
-          # kolom sudah ada = lewati. Pemeriksaan gagal karena sebab lain (izin token, jaringan)
-          # = deploy DIBATALKAN, bukan diteruskan dengan harapan.
-          if npx --yes wrangler@3 d1 execute CORE_DB --remote --command "SELECT ai_chat_used, ai_chat_held FROM quota_daily LIMIT 1" > /tmp/m0018-check.log 2>&1; then
-            echo "Migrasi 0018 sudah diterapkan."
-          elif grep -qi "no such column" /tmp/m0018-check.log; then
+          # baru di atas database lama mematahkan rekonsiliasi kuota semua bucket.
+          # Bukti dibaca dari ISI jawaban (pragma_table_info, --json), bukan dari kode keluar
+          # wrangler: kode keluar 0 belum membuktikan kolomnya ada. Idempoten: dua kolom sudah
+          # ada = lewati. Tidak bisa dibaca / tetap kurang sesudah migrasi = deploy DIBATALKAN.
+          m0018_count() {
+            npx --yes wrangler@3 d1 execute CORE_DB --remote --json \
+              --command "SELECT name FROM pragma_table_info('quota_daily') WHERE name IN ('ai_chat_used','ai_chat_held')" \
+              > /tmp/m0018.json 2>/tmp/m0018.err || return 1
+            node -e "const d=JSON.parse(require('fs').readFileSync('/tmp/m0018.json','utf8'));const r=(Array.isArray(d)?d:[d]).flatMap(x=>x.results||[]);console.log(r.length)"
+          }
+          N=$(m0018_count) || { cat /tmp/m0018.err /tmp/m0018.json 2>/dev/null; echo "Skema D1 tidak bisa dibaca: deploy dibatalkan."; exit 1; }
+          echo "Kolom ai_chat_* yang ada sebelum deploy: $N/2"
+          if [ "$N" != "2" ]; then
             npx --yes wrangler@3 d1 execute CORE_DB --remote --file=migrations/0018_quota_ai_chat.sql
-            npx --yes wrangler@3 d1 execute CORE_DB --remote --command "SELECT ai_chat_used, ai_chat_held FROM quota_daily LIMIT 1"
-            echo "Migrasi 0018 diterapkan."
-          else
-            cat /tmp/m0018-check.log
-            echo "Skema D1 tidak bisa diperiksa (bukan 'no such column'): deploy dibatalkan."
-            exit 1
+            N=$(m0018_count) || { cat /tmp/m0018.err; echo "Skema D1 tidak bisa dibaca ulang: deploy dibatalkan."; exit 1; }
+            echo "Kolom ai_chat_* sesudah migrasi 0018: $N/2"
+            [ "$N" = "2" ] || { echo "Migrasi 0018 tidak lengkap: deploy dibatalkan."; exit 1; }
           fi
           npx --yes wrangler@3 deploy
           CFG_ID=$(node -e "try{const b=JSON.parse(require('fs').readFileSync('/tmp/settings.json')).result.bindings.find(x=>x.name==='CFG');console.log(b.id||b.namespace_id||'')}catch{console.log('')}")
