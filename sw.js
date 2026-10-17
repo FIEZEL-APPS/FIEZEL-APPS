@@ -53,7 +53,7 @@ const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
 // dilayani dan kedua berkas baru tidak pernah sampai ke pengguna lama - aplikasi mereka
 // akan menjalankan app.js baru tanpa berkas benderanya, dan seluruh bendera jatuh ke
 // salinan bawaan di app.js. Naik SEKALI untuk seluruh gelombang.
-const SW_REV='m025-588-unified-grammar-20261002';
+const SW_REV='m025-591-unified-grammar-20261002';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
 // m025-61: health check menanyakan revisi shell langsung ke worker yang sedang aktif.
 // Menebaknya dari nama cache tidak cukup: cache lama bisa tertinggal, sedangkan jawaban ini
@@ -439,7 +439,7 @@ self.addEventListener('push',event=>{
   // m025-117: service worker tidak punya akses ke state murid, jadi teks cadangan di sini
   // TIDAK boleh menyebut nama siapa pun. Sapaan bernama datang dari payload push yang
   // memang membawanya; cadangan ini hanya berlaku saat payload-nya kosong atau rusak.
-  let payload={title:'FIEZEL · Reminder belajar',body:'Waktunya kembali ke sesi belajar.',url:'./',tag:'fiezel-remote'};
+  let payload={title:'Hei kamu! 👋',body:'Kemana aja nih, sepi banget nggak ada kamu. Luang 2 menit yuk?',url:'./',tag:'chat-study-daily'};
   try{
     if(event.data){
       const parsed=event.data.json();
@@ -448,8 +448,8 @@ self.addEventListener('push',event=>{
   }catch{
     try{payload.body=event.data?.text?.()||payload.body}catch{}
   }
-  const options={body:String(payload.body||'').slice(0,280),tag:String(payload.tag||'fiezel-remote').slice(0,64),renotify:false,icon:'./apple-touch-icon.png',badge:'./favicon-64.png',data:{url:payload.url||'./'}};
-  event.waitUntil(self.registration.showNotification(String(payload.title||'FIEZEL').slice(0,80),options));
+  const options={body:String(payload.body||'').slice(0,280),tag:String(payload.tag||'chat-study-daily').slice(0,64),renotify:false,icon:'./apple-touch-icon.png',badge:'./favicon-64.png',data:{url:payload.url||'./'}};
+  event.waitUntil(self.registration.showNotification(String(payload.title||'Hei kamu! 👋').slice(0,80),options));
 });
 
 /* ===== m025-235: UNDUHAN SUARA NEURAL YANG TIDAK IKUT MATI SAAT APLIKASI DITUTUP =====

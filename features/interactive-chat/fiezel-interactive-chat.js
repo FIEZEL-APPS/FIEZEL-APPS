@@ -45,12 +45,19 @@
 
   function getActiveCourse() {
     try {
-      if (root.FiezelI18n && typeof root.FiezelI18n.getCourse === 'function') {
-        return root.FiezelI18n.getCourse() === 'ja' ? 'ja' : 'en';
-      }
       if (typeof root.activeTargetLang === 'function') {
-        return root.activeTargetLang() === 'ja' ? 'ja' : 'en';
+        var atl = root.activeTargetLang();
+        if (atl === 'ja') return 'ja';
+        if (atl === 'en') return 'en';
       }
+      if (root.FiezelI18n && typeof root.FiezelI18n.getCourse === 'function') {
+        var c = root.FiezelI18n.getCourse();
+        if (c === 'ja') return 'ja';
+        if (c === 'en') return 'en';
+      }
+      var stored = localStorage.getItem('fz_target_course') || localStorage.getItem('fiezel_target_lang') || localStorage.getItem('fiezel_course');
+      if (stored === 'ja') return 'ja';
+      if (stored === 'en') return 'en';
     } catch (_) {}
     return 'ja';
   }
@@ -724,6 +731,22 @@
     updateUI();
   }
 
+  function updateAudioButtonUI(playingId) {
+    var mountPoint = document.getElementById('app');
+    if (!mountPoint) return;
+    mountPoint.querySelectorAll('.fzc-action-btn[data-action="audio"]').forEach(function (btn) {
+      var mid = btn.getAttribute('data-id');
+      var lbl = btn.querySelector('.fzc-btn-lbl');
+      if (mid === playingId) {
+        btn.classList.add('is-playing');
+        if (lbl) lbl.textContent = t('chat_act_playing', 'Memutar...');
+      } else {
+        btn.classList.remove('is-playing');
+        if (lbl) lbl.textContent = t('chat_act_listen', 'Dengar');
+      }
+    });
+  }
+
   // Speak text via neural voice or web speech
   function playVoice(text, msgId) {
     if (state.audioPlayingId === msgId) {
@@ -732,46 +755,127 @@
     }
     stopVoice();
     state.audioPlayingId = msgId;
-    updateUI();
+    updateAudioButtonUI(msgId);
 
-    var cleanText = String(text || '').replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
-    if (root.FiezelVoiceSay && typeof root.FiezelVoiceSay.say === 'function') {
-      root.FiezelVoiceSay.say(cleanText).finally(function () {
-        if (state.audioPlayingId === msgId) {
-          state.audioPlayingId = null;
-          updateUI();
-        }
-      });
+    var cleanText = String(text || '').replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').trim();
+    if (!cleanText) {
+      stopVoice();
       return;
     }
 
-    if (root.speechSynthesis) {
-      try {
-        var utter = new root.SpeechSynthesisUtterance(cleanText);
-        utter.lang = state.course === 'ja' ? 'ja-JP' : 'en-US';
-        utter.onend = function () {
-          if (state.audioPlayingId === msgId) {
-            state.audioPlayingId = null;
-            updateUI();
+    var isJapanese = state.course === 'ja';
+
+    // If English, try FiezelVoiceSay first
+    if (!isJapanese && root.FiezelVoiceSay && typeof root.FiezelVoiceSay.say === 'function') {
+      root.FiezelVoiceSay.say(cleanText, { suppressSubtitles: true })
+        .then(function (spoke) {
+          if (spoke) {
+            if (state.audioPlayingId === msgId) {
+              state.audioPlayingId = null;
+              updateAudioButtonUI(null);
+            }
+          } else {
+            // FiezelVoiceSay could not play this text (e.g. dynamic sentence) -> Fallback to Web Speech
+            speakViaWebSpeech(cleanText, msgId);
           }
-        };
-        utter.onerror = function () {
-          state.audioPlayingId = null;
-          updateUI();
-        };
-        root.speechSynthesis.speak(utter);
-      } catch (_) {
-        state.audioPlayingId = null;
-        updateUI();
+        })
+        .catch(function () {
+          speakViaWebSpeech(cleanText, msgId);
+        });
+      return;
+    }
+
+    // Japanese or fallback: speak via Web Speech Synthesis
+    speakViaWebSpeech(cleanText, msgId);
+  }
+
+  function speakViaWebSpeech(text, msgId) {
+    var synth = root.speechSynthesis;
+    if (!synth) {
+      state.audioPlayingId = null;
+      updateAudioButtonUI(null);
+      if (typeof root.showToast === 'function') {
+        root.showToast(t('chat_no_speech_engine', 'Browser belum mendukung suara percakapan.'));
       }
+      return;
+    }
+
+    try {
+      synth.cancel();
+      if (synth.paused) synth.resume();
+
+      var utter = new root.SpeechSynthesisUtterance(text);
+      var isJa = state.course === 'ja';
+      utter.lang = isJa ? 'ja-JP' : 'en-US';
+      utter.rate = isJa ? 0.95 : 1.0;
+      utter.pitch = 1.0;
+
+      // Pick preferred high quality native voice if available
+      try {
+        var voices = synth.getVoices() || [];
+        if (voices.length > 0) {
+          var prefix = isJa ? 'ja' : 'en';
+          var selected = null;
+          for (var i = 0; i < voices.length; i++) {
+            var vl = (voices[i].lang || '').toLowerCase();
+            if (vl.startsWith(prefix) || vl.indexOf(prefix) >= 0) {
+              selected = voices[i];
+              var vn = voices[i].name || '';
+              if (isJa && /nanami|keita|kyoko|otoya|ayumi|ichiro|haruka|google\s*日本語|japanese/i.test(vn)) {
+                selected = voices[i];
+                break;
+              }
+              if (!isJa && /alex|samantha|victoria|google\s*us|natural/i.test(vn)) {
+                selected = voices[i];
+                break;
+              }
+            }
+          }
+          if (selected) utter.voice = selected;
+        }
+      } catch (_) {}
+
+      utter.onstart = function () {
+        if (state.audioPlayingId === msgId) {
+          updateAudioButtonUI(msgId);
+        }
+      };
+
+      utter.onend = function () {
+        if (state.audioPlayingId === msgId) {
+          state.audioPlayingId = null;
+          updateAudioButtonUI(null);
+        }
+      };
+
+      utter.onerror = function () {
+        if (state.audioPlayingId === msgId) {
+          state.audioPlayingId = null;
+          updateAudioButtonUI(null);
+        }
+      };
+
+      synth.speak(utter);
+      if (synth.paused) synth.resume();
+    } catch (_) {
+      state.audioPlayingId = null;
+      updateAudioButtonUI(null);
     }
   }
 
   function stopVoice() {
     state.audioPlayingId = null;
-    if (root.speechSynthesis && root.speechSynthesis.cancel) {
-      root.speechSynthesis.cancel();
-    }
+    try {
+      if (root.FiezelVoiceSay && typeof root.FiezelVoiceSay.stop === 'function') {
+        root.FiezelVoiceSay.stop();
+      }
+    } catch (_) {}
+    try {
+      if (root.speechSynthesis) {
+        root.speechSynthesis.cancel();
+      }
+    } catch (_) {}
+    updateAudioButtonUI(null);
   }
 
   // Send telemetry to Braincore
@@ -1075,10 +1179,11 @@
     var scList = SCENARIOS[course] || SCENARIOS.ja;
     var currentSc = getScenario(state.scenarioId);
     var level = getLearnerLevel();
-    var partnerName = course === 'ja' ? 'フィゼル (Fiezel-chan)' : 'Fiezel Coach';
+    var partnerName = course === 'ja' ? 'フィゼル先生' : 'Coach Alex';
+    var partnerAvatar = course === 'ja' ? '🌸' : '✨';
     var partnerSub = course === 'ja'
-      ? t('chat_partner_sub_ja', 'Partner Percakapan Jepang • Tokyo')
-      : t('chat_partner_sub_en', 'Native English Conversation Partner');
+      ? t('chat_partner_sub_ja', 'Partner Percakapan Jepang • Fiezel-sensei')
+      : t('chat_partner_sub_en', 'Native English Speaking Partner');
 
     // Scenario Carousel
     var chipsHtml = scList.map(function (sc) {
@@ -1170,6 +1275,7 @@
           '<div class="fzc-shadow-box is-listening">' +
           '<div class="fzc-shadow-header">' +
           '<span class="fzc-shadow-badge">🎙️ ' + t('chat_shadow_speak_now', 'Ucapkan kalimat ini sekarang...') + '</span>' +
+          '<div class="fzc-wave-bars"><span></span><span></span><span></span><span></span></div>' +
           '</div>' +
           '</div>'
         );
@@ -1196,13 +1302,13 @@
         '</div>' +
         '<div class="fzc-actions-bar">' +
         '<button type="button" class="fzc-action-btn' + isPlaying + '" data-action="audio" data-id="' + msg.id + '" data-text="' + esc(msg.text) + '" aria-label="' + esc(t('chat_aria_listen', 'Dengarkan Suara')) + '">' +
-        '<i class="fz-i" data-fz-icon="speaking"></i> <span>' + t('chat_act_listen', 'Dengarkan') + '</span>' +
+        '<span>🔊</span> <span class="fzc-btn-lbl">' + (isPlaying ? t('chat_act_playing', 'Memutar...') : t('chat_act_listen', 'Dengar')) + '</span>' +
         '</button>' +
         '<button type="button" class="fzc-action-btn" data-action="translate" data-id="' + msg.id + '" aria-label="' + esc(t('chat_aria_trans', 'Buka Terjemahan')) + '">' +
-        '<span>🌐 ' + t('chat_act_trans', 'Terjemahan') + '</span>' +
+        '<span>🌐</span> <span>' + t('chat_act_trans', 'Arti') + '</span>' +
         '</button>' +
         '<button type="button" class="fzc-action-btn' + isShadowing + '" data-action="shadow" data-id="' + msg.id + '" data-text="' + esc(msg.text) + '" aria-label="' + esc(t('chat_aria_shadow', 'Latih Ucapkan')) + '">' +
-        '<span>🎙️ ' + (isShadowing ? t('chat_act_listening', 'Mendengarkan...') : t('chat_act_shadow', 'Latih Ucapkan')) + '</span>' +
+        '<span>🎙️</span> <span>' + (isShadowing ? t('chat_act_listening', 'Mendengarkan...') : t('chat_act_shadow', 'Shadowing')) + '</span>' +
         '</button>' +
         '</div>' +
         shadowResultHtml +
@@ -1232,7 +1338,7 @@
       '<div class="fzc-partner-bar">' +
       '<div class="fzc-partner-meta">' +
       '<div class="fzc-avatar-wrap">' +
-      (course === 'ja' ? '🇯🇵' : '🇬🇧') +
+      partnerAvatar +
       '<span class="fzc-online-pulse"></span>' +
       '</div>' +
       '<div class="fzc-partner-info">' +
@@ -1241,7 +1347,7 @@
       '</div>' +
       '</div>' +
       '<div class="fzc-header-actions">' +
-      '<button type="button" class="fzc-btn-reset" id="fzcBtnReset">' + t('chat_reset_btn', 'Mulai Ulang') + '</button>' +
+      '<button type="button" class="fzc-btn-reset" id="fzcBtnReset"><span>↺</span> <span>' + t('chat_reset_btn', 'Mulai Ulang') + '</span></button>' +
       '</div>' +
       '</div>' +
       '<div class="fzc-scenarios-rail" id="fzcScenariosRail">' +
@@ -1373,14 +1479,33 @@
   var api = {
     mount: function (el) {
       loadState();
+      if (typeof document !== 'undefined') {
+        if (document.documentElement) document.documentElement.classList.add('fz-view-chat');
+        if (document.body) {
+          document.body.classList.add('fz-view-chat');
+          var bn = document.querySelector('.bottomnav');
+          if (bn) bn.style.setProperty('display', 'none', 'important');
+        }
+      }
       var mountPoint = el || document.getElementById('app');
       if (mountPoint) {
         mountPoint.innerHTML = renderMarkup();
         bindEvents(mountPoint);
-        scrollBottom();
+        scrollBottom(true);
       }
       if (typeof root.enhanceUI === 'function') {
         try { root.enhanceUI(); } catch (_) {}
+      }
+    },
+    unmount: function () {
+      stopVoice();
+      if (typeof document !== 'undefined') {
+        if (document.documentElement) document.documentElement.classList.remove('fz-view-chat');
+        if (document.body) {
+          document.body.classList.remove('fz-view-chat');
+          var bn = document.querySelector('.bottomnav');
+          if (bn) bn.style.removeProperty('display');
+        }
       }
     },
     sendMessage: sendMessage,

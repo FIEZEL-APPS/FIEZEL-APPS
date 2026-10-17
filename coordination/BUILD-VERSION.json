@@ -1,7 +1,7 @@
 {
-  "version": "m025-588",
+  "version": "m025-591",
   "claimedBy": "branch feature/chat-speaking-shadowing",
-  "claimedAt": "2026-10-17T13:30:16.012Z",
-  "reason": "feat(chat): shadowing pronunciation evaluation, scenario goals and anti-race persistence",
+  "claimedAt": "2026-10-17T14:42:18.465Z",
+  "reason": "fix(interactive-chat): resolve feed scroll jamming and speech synthesis audio output",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
