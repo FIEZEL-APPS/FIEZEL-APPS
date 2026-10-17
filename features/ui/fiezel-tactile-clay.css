@@ -179,8 +179,8 @@ button.primary:disabled {
 }
 
 /* 6. TACTILE 3D SECONDARY BUTTONS */
-button:not(.primary):not(.nav):not(.token-chip):not(.fz-aurora-audio-btn):not(.option-btn):not(.fz-i):not(.brand-button):not(.icon-button):not(.course-switch-btn):not(.fzb-bug):not(.fzb-exit):not(.kelasku-strip-btn):not(.fz-drawer-toggle):not(.close-btn):not(#modalClose):not(.hero-cta-btn):not(.bug-raid-btn):not(.class-btn-3d):not(.audio-btn-3d):not(.today-cta-soft):not(.target-lang-chip):not(.btn-class-selector):not(.ch-segbar-btn):not(.ch-tab):not(.progress-tab):not(.active-level-control):not(.ch-btn-kerjakan):not(.ch-btn-mulai):not(.ch-btn-tuntas):not(.poster-action-btn):not(.paw-action-btn):not(.bug-raid-action-btn):not(.game-back-pill):not(.setup-link):not(.level-picker-card):not(.jlpt-opt-btn):not(.fsl-option):not(.fsl-exit-btn):not(.listening-close-btn):not(.jlpt-primary-play-btn):not(.jlpt-jees-chip):not(.jlpt-speed-chip):not(.jlpt-fb-next-btn):not(.jlpt-fb-key-btn):not(.jlpt-tab-chip):not(.fsl-play-hero):not([data-next]):not(.fsl-primary):not(.fsl-play-btn):not([class*="fzc-"]),
-.btn:not(.primary):not(.hero-cta-btn):not(.bug-raid-btn):not(.class-btn-3d):not(.target-lang-chip):not(.ch-btn-kerjakan):not(.ch-btn-mulai):not(.ch-btn-tuntas):not(.poster-action-btn):not(.paw-action-btn):not(.bug-raid-action-btn):not(.game-back-pill):not(.setup-link):not(.level-picker-card):not(.jlpt-opt-btn):not(.fsl-option):not(.fsl-exit-btn):not(.listening-close-btn):not(.jlpt-primary-play-btn):not(.jlpt-jees-chip):not(.jlpt-speed-chip):not(.jlpt-fb-next-btn):not(.jlpt-fb-key-btn):not(.jlpt-tab-chip):not(.fsl-play-hero):not([data-next]):not(.fsl-primary):not(.fsl-play-btn):not([class*="fzc-"]) {
+button:not(.primary):not(.nav):not(.token-chip):not(.fz-aurora-audio-btn):not(.option-btn):not(.fz-i):not(.brand-button):not(.icon-button):not(.course-switch-btn):not(.fzb-bug):not(.fzb-exit):not(.kelasku-strip-btn):not(.fz-drawer-toggle):not(.close-btn):not(#modalClose):not(.hero-cta-btn):not(.bug-raid-btn):not(.class-btn-3d):not(.fz-kawan-cta):not(.audio-btn-3d):not(.today-cta-soft):not(.target-lang-chip):not(.btn-class-selector):not(.ch-segbar-btn):not(.ch-tab):not(.progress-tab):not(.active-level-control):not(.ch-btn-kerjakan):not(.ch-btn-mulai):not(.ch-btn-tuntas):not(.poster-action-btn):not(.paw-action-btn):not(.bug-raid-action-btn):not(.game-back-pill):not(.setup-link):not(.level-picker-card):not(.jlpt-opt-btn):not(.fsl-option):not(.fsl-exit-btn):not(.listening-close-btn):not(.jlpt-primary-play-btn):not(.jlpt-jees-chip):not(.jlpt-speed-chip):not(.jlpt-fb-next-btn):not(.jlpt-fb-key-btn):not(.jlpt-tab-chip):not(.fsl-play-hero):not([data-next]):not(.fsl-primary):not(.fsl-play-btn):not([class*="fzc-"]),
+.btn:not(.primary):not(.hero-cta-btn):not(.bug-raid-btn):not(.class-btn-3d):not(.fz-kawan-cta):not(.target-lang-chip):not(.ch-btn-kerjakan):not(.ch-btn-mulai):not(.ch-btn-tuntas):not(.poster-action-btn):not(.paw-action-btn):not(.bug-raid-action-btn):not(.game-back-pill):not(.setup-link):not(.level-picker-card):not(.jlpt-opt-btn):not(.fsl-option):not(.fsl-exit-btn):not(.listening-close-btn):not(.jlpt-primary-play-btn):not(.jlpt-jees-chip):not(.jlpt-speed-chip):not(.jlpt-fb-next-btn):not(.jlpt-fb-key-btn):not(.jlpt-tab-chip):not(.fsl-play-hero):not([data-next]):not(.fsl-primary):not(.fsl-play-btn):not([class*="fzc-"]) {
   background: #FFFFFF !important;
   border: 2px solid var(--card-border) !important;
   border-radius: 14px !important;
@@ -192,8 +192,8 @@ button:not(.primary):not(.nav):not(.token-chip):not(.fz-aurora-audio-btn):not(.o
   transition: transform 0.1s ease, box-shadow 0.1s ease !important;
 }
 
-button:not(.primary):not(.nav):not(.token-chip):not(.fz-aurora-audio-btn):not(.option-btn):not(.fz-i):not(.brand-button):not(.icon-button):not(.course-switch-btn):not(.fzb-bug):not(.fzb-exit):not(.kelasku-strip-btn):not(.fz-drawer-toggle):not(.close-btn):not(#modalClose):not(.hero-cta-btn):not(.bug-raid-btn):not(.class-btn-3d):not(.audio-btn-3d):not(.today-cta-soft):not(.target-lang-chip):not(.btn-class-selector):not(.ch-segbar-btn):not(.ch-tab):not(.progress-tab):not(.active-level-control):not(.ch-btn-kerjakan):not(.ch-btn-mulai):not(.ch-btn-tuntas):not(.poster-action-btn):not(.paw-action-btn):not(.bug-raid-action-btn):not(.game-back-pill):not(.setup-link):not(.level-picker-card):not(.jlpt-opt-btn):not(.fsl-option):not(.fsl-exit-btn):not(.listening-close-btn):not(.jlpt-primary-play-btn):not(.jlpt-jees-chip):not(.jlpt-speed-chip):not(.jlpt-fb-next-btn):not(.jlpt-fb-key-btn):not(.jlpt-tab-chip):not(.fsl-play-hero):not([data-next]):not(.fsl-primary):not(.fsl-play-btn):not([class*="fzc-"]):active,
-.btn:not(.primary):not(.hero-cta-btn):not(.bug-raid-btn):not(.class-btn-3d):not(.target-lang-chip):not(.ch-btn-kerjakan):not(.ch-btn-mulai):not(.ch-btn-tuntas):not(.poster-action-btn):not(.paw-action-btn):not(.bug-raid-action-btn):not(.game-back-pill):not(.setup-link):not(.level-picker-card):not(.jlpt-opt-btn):not(.fsl-option):not(.fsl-exit-btn):not(.listening-close-btn):not(.jlpt-primary-play-btn):not(.jlpt-jees-chip):not(.jlpt-speed-chip):not(.jlpt-fb-next-btn):not(.jlpt-fb-key-btn):not(.jlpt-tab-chip):not(.fsl-play-hero):not([data-next]):not(.fsl-primary):not(.fsl-play-btn):not([class*="fzc-"]):active {
+button:not(.primary):not(.nav):not(.token-chip):not(.fz-aurora-audio-btn):not(.option-btn):not(.fz-i):not(.brand-button):not(.icon-button):not(.course-switch-btn):not(.fzb-bug):not(.fzb-exit):not(.kelasku-strip-btn):not(.fz-drawer-toggle):not(.close-btn):not(#modalClose):not(.hero-cta-btn):not(.bug-raid-btn):not(.class-btn-3d):not(.fz-kawan-cta):not(.audio-btn-3d):not(.today-cta-soft):not(.target-lang-chip):not(.btn-class-selector):not(.ch-segbar-btn):not(.ch-tab):not(.progress-tab):not(.active-level-control):not(.ch-btn-kerjakan):not(.ch-btn-mulai):not(.ch-btn-tuntas):not(.poster-action-btn):not(.paw-action-btn):not(.bug-raid-action-btn):not(.game-back-pill):not(.setup-link):not(.level-picker-card):not(.jlpt-opt-btn):not(.fsl-option):not(.fsl-exit-btn):not(.listening-close-btn):not(.jlpt-primary-play-btn):not(.jlpt-jees-chip):not(.jlpt-speed-chip):not(.jlpt-fb-next-btn):not(.jlpt-fb-key-btn):not(.jlpt-tab-chip):not(.fsl-play-hero):not([data-next]):not(.fsl-primary):not(.fsl-play-btn):not([class*="fzc-"]):active,
+.btn:not(.primary):not(.hero-cta-btn):not(.bug-raid-btn):not(.class-btn-3d):not(.fz-kawan-cta):not(.target-lang-chip):not(.ch-btn-kerjakan):not(.ch-btn-mulai):not(.ch-btn-tuntas):not(.poster-action-btn):not(.paw-action-btn):not(.bug-raid-action-btn):not(.game-back-pill):not(.setup-link):not(.level-picker-card):not(.jlpt-opt-btn):not(.fsl-option):not(.fsl-exit-btn):not(.listening-close-btn):not(.jlpt-primary-play-btn):not(.jlpt-jees-chip):not(.jlpt-speed-chip):not(.jlpt-fb-next-btn):not(.jlpt-fb-key-btn):not(.jlpt-tab-chip):not(.fsl-play-hero):not([data-next]):not(.fsl-primary):not(.fsl-play-btn):not([class*="fzc-"]):active {
   transform: translateY(2px) !important;
   box-shadow: 0 2px 0 var(--card-bevel) !important;
 }
@@ -7778,4 +7778,209 @@ html:not(.fz-app-open) body header.topbar {
 }
 html:not(.fz-app-open) body .nav-scrim {
   visibility: hidden !important;
+}
+
+/* ==========================================================================
+   KAWAN BICARA / MITRA KAIWA — kartu launcher percakapan di panel Hari Ini (m025-596)
+   Tactile Clay hangat (amber), elevasi 3D, lencana status hidup. Selektor dipaku ke
+   `html body #app` karena tipografi dan tombol global di berkas ini memakai !important
+   dengan spesifisitas tinggi (terukur di probe 390 px: judul membesar, CTA memutih).
+   ========================================================================== */
+html body #app .fz-kawan-card {
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) !important;
+  grid-template-areas: "avatar body" "cta cta" !important;
+  align-items: center !important;
+  column-gap: 12px !important;
+  row-gap: 12px !important;
+  padding: 14px !important;
+  margin: 0 !important;
+  border-radius: 20px !important;
+  background: linear-gradient(135deg, #FFF6E8 0%, #FFFFFF 62%) !important;
+  border: 2px solid #F3D7AA !important;
+  box-shadow: 0 5px 0 #E9C188, 0 12px 26px rgba(217, 119, 6, 0.10) !important;
+  cursor: pointer !important;
+  position: relative !important;
+  overflow: hidden !important;
+  transition: transform 0.16s ease, box-shadow 0.16s ease !important;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html body #app .fz-kawan-card::after {
+  content: '';
+  position: absolute;
+  right: -28px;
+  top: -34px;
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.18) 0%, rgba(245, 158, 11, 0) 70%);
+  pointer-events: none;
+}
+
+@media (hover: hover) {
+  html body #app .fz-kawan-card:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 7px 0 #E9C188, 0 16px 30px rgba(217, 119, 6, 0.14) !important;
+  }
+}
+
+html body #app .fz-kawan-card:active {
+  transform: translateY(3px) !important;
+  box-shadow: 0 2px 0 #E9C188, 0 6px 14px rgba(217, 119, 6, 0.10) !important;
+}
+
+html body #app .fz-kawan-card .fz-kawan-avatar {
+  grid-area: avatar;
+  align-self: start;
+  width: 50px;
+  height: 50px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #FFEBCC;
+  border: 1.5px solid #F3D7AA;
+  box-shadow: 0 3px 0 #E9C188;
+  color: #B45309;
+  animation: fzKawanFloat 3.2s ease-in-out infinite;
+}
+
+html body #app .fz-kawan-card .fz-kawan-avatar svg { width: 30px; height: 30px; display: block; }
+
+html body #app .fz-kawan-card .fz-kawan-body { grid-area: body; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+
+html body #app .fz-kawan-card .fz-kawan-head { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+
+html body #app .fz-kawan-card .fz-kawan-title {
+  margin: 0 !important;
+  font-family: var(--font-sans) !important;
+  font-size: 16px !important;
+  font-weight: 800 !important;
+  line-height: 1.2 !important;
+  letter-spacing: -0.01em !important;
+  text-transform: none !important;
+  color: #1B1418 !important;
+}
+
+html body #app .fz-kawan-card .fz-kawan-tag {
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  line-height: 1.5 !important;
+  letter-spacing: 0.02em;
+  color: #B45309 !important;
+  background: #FFF1D6;
+  border: 1px solid #F3D7AA;
+  border-radius: 9999px;
+  padding: 0 7px;
+  white-space: nowrap;
+}
+
+html body #app .fz-kawan-card .fz-kawan-lead {
+  margin: 0 !important;
+  font-size: 12.5px !important;
+  line-height: 1.45 !important;
+  color: #66595F !important;
+  font-weight: 600 !important;
+}
+
+html body #app .fz-kawan-card .fz-kawan-badges { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 3px; }
+
+html body #app .fz-kawan-card .fz-kawan-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10.5px !important;
+  font-weight: 700 !important;
+  line-height: 1.6 !important;
+  color: #66595F !important;
+  background: #FFFFFF;
+  border: 1px solid #EAE3D6;
+  border-radius: 9999px;
+  padding: 0 8px;
+  white-space: nowrap;
+}
+
+html body #app .fz-kawan-card .fz-kawan-badge.is-live { color: #047857 !important; border-color: #A7F3D0; background: #ECFDF5; }
+html body #app .fz-kawan-card .fz-kawan-badge.is-koreksi { color: #B45309 !important; border-color: #F3D7AA; background: #FFF6E8; }
+
+html body #app .fz-kawan-card .fz-kawan-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10B981;
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5);
+  animation: fzKawanPulse 1.8s ease-out infinite;
+}
+
+html body #app .fz-kawan-card button.fz-kawan-cta {
+  grid-area: cta;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  width: 100% !important;
+  margin: 0 !important;
+  min-height: 42px !important;
+  height: auto !important;
+  padding: 0 16px !important;
+  border: none !important;
+  border-radius: 9999px !important;
+  background: linear-gradient(180deg, #F59E0B 0%, #D97706 100%) !important;
+  color: #FFFFFF !important;
+  font-family: inherit !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.01em !important;
+  text-transform: none !important;
+  white-space: nowrap !important;
+  cursor: pointer !important;
+  box-shadow: 0 3px 0 #B45309, 0 6px 14px rgba(217, 119, 6, 0.30) !important;
+  transition: transform 0.12s ease, box-shadow 0.12s ease !important;
+  position: relative;
+  z-index: 1;
+}
+
+html body #app .fz-kawan-card button.fz-kawan-cta:active {
+  transform: translateY(2px) !important;
+  box-shadow: 0 1px 0 #B45309 !important;
+}
+
+html body #app .fz-kawan-card button.fz-kawan-cta:focus-visible { outline: 2px solid #1B1418 !important; outline-offset: 2px !important; }
+
+/* Layar lebar: tombol kembali ke kanan, sejajar isi kartu. */
+@media (min-width: 600px) {
+  html body #app .fz-kawan-card {
+    grid-template-columns: auto minmax(0, 1fr) auto !important;
+    grid-template-areas: "avatar body cta" !important;
+  }
+  html body #app .fz-kawan-card .fz-kawan-avatar { align-self: center; }
+  html body #app .fz-kawan-card button.fz-kawan-cta { width: auto !important; }
+}
+
+@keyframes fzKawanFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+@keyframes fzKawanPulse {
+  0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5); }
+  80%, 100% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html body #app .fz-kawan-card .fz-kawan-avatar,
+  html body #app .fz-kawan-card .fz-kawan-dot { animation: none !important; }
+  html body #app .fz-kawan-card,
+  html body #app .fz-kawan-card button.fz-kawan-cta { transition: none !important; }
+}
+
+/* Desktop: Kawan Bicara selebar penuh tepat di bawah sapaan; misi/KelasKu/Latihan Singkat
+   turun satu baris (lihat grid Hari Ini di atas). */
+@media (min-width: 1100px) {
+  html body #app .today-home-cockpit.today-home-cockpit { grid-template-rows: auto auto auto 1fr !important; }
+  html body #app .today-home-cockpit.today-home-cockpit > .fz-kawan-card { grid-column: 1 / -1 !important; grid-row: 2 !important; }
+  html body #app .today-home-cockpit.today-home-cockpit > #heroCard { grid-row: 3 !important; }
+  html body #app .today-home-cockpit.today-home-cockpit > .class-bar { grid-row: 4 !important; }
+  html body #app .today-home-cockpit.today-home-cockpit > .quick-practice-section { grid-row: 3 / span 2 !important; }
 }

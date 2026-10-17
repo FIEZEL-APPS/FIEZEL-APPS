@@ -40,3 +40,32 @@ dan teks tetap tampil. Ini perilaku L5 yang sama dengan fitur lain.
 ## Utang
 - `features/learner-flow/fiezel-learner-flow.js` masih memanggil `speechSynthesis` (di luar zona
   gerbang, di luar lingkup tugas ini).
+
+---
+
+# Bagian 2: Kawan Bicara / Mitra Kaiwa di panel Hari Ini (brief owner, m025-596)
+
+## Permintaan
+Pintu masuk fitur percakapan dipindah ke panel **Hari Ini**, tepat di bawah sapaan. Nama "Ngobrol AI" dilarang dan diganti identitas yang hangat dan adaptif per kursus. Kartunya memakai desain Tactile Clay dan dibuktikan dengan probe Playwright.
+
+## Yang berubah
+- `app.js`: `conversationPartnerHomeCardMarkup()` dipasang tepat sesudah `${homeTop}` di `todayHomeMarkup()`.
+  - Kartu dan tombolnya membuka `go('chat')`.
+  - Lencana dibaca dari simpanan chat yang nyata (`conversationPartnerChatSnapshot`): "Siap ngobrol", "{n} pesan tersimpan" atau "Obrolan baru", dan "Koreksi hidup".
+  - Label tombol berganti antara "Mulai ngobrol" dan "Lanjutkan".
+  - Kartu Latihan dan judul topbar memakai nama baru.
+- **Nama**:
+  - `chat.nama` = **Kawan Bicara** (tag "Speaking Companion").
+  - Lapisan kursus `kursus-ja.chat.nama` = **Mitra Kaiwa** (tag 会話パートナー).
+  - Versi Thai: เพื่อนคู่สนทนา / คู่หู Kaiwa.
+  - Naskah kuota dibuat netral ("Jatah obrolan…").
+- `features/ui/fiezel-tactile-clay.css`:
+  - kartu amber dengan elevasi 3D, avatar mengambang, titik "siap" berdenyut, dan gerak yang menghormati `prefers-reduced-motion`;
+  - tombol pindah ke baris sendiri di bawah 600 px;
+  - grid desktop (≥1100 px) memberi kartu baris ke-2 selebar penuh, sehingga misi, KelasKu, dan Latihan Singkat turun satu baris;
+  - `.fz-kawan-cta` dikecualikan dari gaya tombol global, sama seperti `.class-btn-3d`.
+- Catatan kejujuran: lead brief menyebut "koreksi pengucapan seketika". Naskah yang dipakai adalah "Koreksi bisa kamu nyalakan kapan saja", karena koreksi sengaja mati secara bawaan (keputusan owner m025-595).
+
+## Bukti
+- Probe Playwright 320/390/1280 px, id/th, kursus en/ja: kartu tepat di bawah sapaan, tidak ada scroll horizontal, dan tombol membuka view `chat`.
+- Gerbang `tests/home-kawan-bicara-card-test.js`.

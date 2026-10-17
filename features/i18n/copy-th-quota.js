@@ -57,7 +57,7 @@
     'quota.copy.quota.aiTranslate.exhausted.title': 'คำแปลของวันนี้ใช้ครบจำนวนแล้ว',
     'quota.copy.quota.aiTranslate.exhausted.spoken': 'ความหมายของคำจากพจนานุกรมในเครื่องยังเปิดดูได้ เซสชันการฟังของคุณไม่ได้รับผลกระทบ',
     'quota.copy.quota.aiTranslate.exhausted.silent': 'ความหมายของคำจากพจนานุกรมในเครื่องยังเปิดดูได้ ตอนนี้เสียงยังไม่ออก อ่านข้อความไปก่อนได้เลย',
-    'quota.copy.quota.aiChat.exhausted.title': 'การคุยกับ AI ของวันนี้ใช้ครบจำนวนแล้ว',
+    'quota.copy.quota.aiChat.exhausted.title': 'การสนทนาของวันนี้ใช้ครบจำนวนแล้ว',
     'quota.copy.quota.aiChat.exhausted.spoken': 'ฉันยังตอบจากบทฝึกได้อยู่ และจำนวนการคุยจะกลับมาหลังเที่ยงคืน',
     'quota.copy.quota.aiChat.exhausted.silent': 'ฉันยังตอบจากบทฝึกได้อยู่ และจำนวนการคุยจะกลับมาหลังเที่ยงคืน ตอนนี้เสียงยังไม่ออก อ่านข้อความไปก่อนได้เลย',
     'quota.copy.quota.rate.slowdown.title': 'กดถี่เกินไป เว้นจังหวะสักนิด',

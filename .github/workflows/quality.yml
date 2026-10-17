@@ -654,6 +654,8 @@ jobs:
           # Ngobrol AI (audit 17 Okt 2026): saklar koreksi mati secara bawaan, ajakan koreksi,
           # riwayat percakapan, dan penanda jujur saat balasan datang dari naskah.
           node tests/interactive-chat-correction-test.js
+          # Kawan Bicara / Mitra Kaiwa (m025-596): pintu utama di panel Hari Ini + nama baru.
+          node tests/home-kawan-bicara-card-test.js
           node tests/voice-call-two-way-test.js
           node tests/ios-pwa-mic-shadowing-test.js
           node tests/shadowing-eval-card-test.js

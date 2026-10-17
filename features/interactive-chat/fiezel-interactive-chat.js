@@ -2784,7 +2784,7 @@
   function sourceNoteHtml() {
     if (state.isThinking) return '';
     if (state.replySource === 'quota') {
-      return '<div class="fzc-source-note" role="status">' + esc(t('chat.sumber.kuota', 'Jatah ngobrol AI hari ini sudah habis. Sampai tengah malam, balasanku dari naskah latihan.')) + '</div>';
+      return '<div class="fzc-source-note" role="status">' + esc(t('chat.sumber.kuota', 'Jatah obrolan hari ini sudah habis. Sampai tengah malam, balasanku dari naskah latihan.')) + '</div>';
     }
     if (state.replySource === 'offline') {
       return '<div class="fzc-source-note" role="status">' + esc(t('chat.sumber.hemat', 'Mode hemat: balasan ini dari naskah latihan, bukan AI.')) + '</div>';

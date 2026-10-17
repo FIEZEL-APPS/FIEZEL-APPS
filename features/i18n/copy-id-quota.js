@@ -45,7 +45,7 @@
     'quota.copy.quota.aiTranslate.exhausted.title': 'Jatah terjemahan hari ini sudah habis',
     'quota.copy.quota.aiTranslate.exhausted.spoken': 'Arti kata dari kamus di perangkat ini tetap bisa kamu buka. Sesi dengarmu nggak terpengaruh.',
     'quota.copy.quota.aiTranslate.exhausted.silent': 'Arti kata dari kamus di perangkat ini tetap bisa kamu buka. Suaranya belum keluar sekarang, jadi bacalah teksnya dulu.',
-    'quota.copy.quota.aiChat.exhausted.title': 'Jatah ngobrol AI hari ini sudah habis',
+    'quota.copy.quota.aiChat.exhausted.title': 'Jatah obrolan hari ini sudah habis',
     'quota.copy.quota.aiChat.exhausted.spoken': 'Aku tetap bisa membalas dari naskah latihan sampai jatahnya kembali sesudah tengah malam.',
     'quota.copy.quota.aiChat.exhausted.silent': 'Aku tetap bisa membalas dari naskah latihan sampai jatahnya kembali sesudah tengah malam. Suaranya belum keluar sekarang, jadi bacalah teksnya dulu.',
     'quota.copy.quota.rate.slowdown.title': 'Kecepatan menekannya perlu diberi jeda',

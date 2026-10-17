@@ -124,6 +124,13 @@
      dipakai murid dan buku ajar (Kotoba, Bunpō, Dokkai...), keterangannya tetap berbahasa
      murid supaya tidak ada yang harus menebak. Istilah Jepang identik di id dan th (netral). */
   I18N.registerCopy('id', {
+    // Mitra Kaiwa (m025-596): nama fitur percakapan untuk kursus Jepang
+    'kursus-ja.chat.nama': 'Mitra Kaiwa',
+    'kursus-ja.chat.nama-tag': '会話パートナー',
+    'kursus-ja.chat.title': 'Mitra Kaiwa',
+    'kursus-ja.chat.label': 'Mitra Kaiwa',
+    'kursus-ja.chat.lead': 'Latihan percakapan situasi nyata (N5–N4) ber-furigana.',
+    'kursus-ja.chat.note': 'Latihan percakapan situasi nyata (N5–N4) ber-furigana.',
     'kursus-ja.nav.practice': 'Renshū',
     'kursus-ja.nav.school': '<span class="kelasku-wordmark">Kyōshitsu</span>',
     'kursus-ja.nav.home-primary': 'Kyō',
