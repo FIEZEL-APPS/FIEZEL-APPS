@@ -67,12 +67,19 @@
     return !splash || splash.classList.contains('is-leaving');
   }
 
+  function readyForBirth() {
+    if (!curtainGone()) return false;
+    // Topbar disembunyikan sampai fz-app-open aktif (fiezel-tactile-clay.css §16).
+    // Menjalankan animasi kelahiran sebelum fz-app-open berarti animasi terbuang di balik visibility:hidden.
+    return !!(doc.documentElement && doc.documentElement.classList.contains('fz-app-open'));
+  }
+
   function watch() {
-    if (curtainGone()) { setTimeout(birth, 120); return; }
+    if (readyForBirth()) { setTimeout(birth, 120); return; }
     var stop = null;
     try {
       var obs = new MutationObserver(function () {
-        if (!curtainGone()) return;
+        if (!readyForBirth()) return;
         obs.disconnect();
         if (stop) clearTimeout(stop);
         // Jeda pendek supaya kelahiran mulai SESUDAH splash benar-benar memudar, bukan

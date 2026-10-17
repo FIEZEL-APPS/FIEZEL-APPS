@@ -2202,6 +2202,8 @@ body.voice-bundle-locked .bottomnav,body.voice-bundle-locked .app-header{pointer
 .fiezel-splash-still .fiezel-splash-tag{
   transform:none!important;animation:fz-fade-in .24s ease var(--fz-b12,1900ms) both;opacity:0}
 .fiezel-splash-still .fiezel-splash-kelasku{transform:none!important;animation:fz-fade-in .24s ease var(--fz-b12,1900ms) both;opacity:0}
+.fiezel-splash-still .kelasku-wordmark,.fiezel-splash-still .kelasku-tag{animation:none!important;transform:none!important;filter:none!important}
+@keyframes fz-splash-fade-out{from{opacity:1}to{opacity:0}}
 
 /* ---------- Feature Carousel (Step 1) ---------- */
 .fiezel-carousel-track{display:flex;flex-direction:column;gap:8px;width:100%;text-align:left}

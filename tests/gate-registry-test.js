@@ -157,6 +157,14 @@ const EXCLUSIONS = new Map([
       'kunci jawaban (m025-583). Memerlukan browser Playwright Chromium lokal dan port server aktif. ' +
       'Bukti kelulusan terdokumentasi di docs/handoffs/FIEZEL-M025583-LISTENING-AUDIT-OVERHAUL-HANDOFF.md.'
   }],
+  ['tools/dev/probe-empirical-boot-audit.mjs', {
+    class: 'alat-pelaporan',
+    reason:
+      'BUKAN gerbang CI Linux: alat pelaporan audit empiris Playwright Chromium lokal untuk memverifikasi ' +
+      'siklus boot, eliminasi blank gap transisi splash, watchdog recovery, dan zero zombie particle loop (m025-592). ' +
+      'Memerlukan browser Playwright Chromium lokal dan port server aktif. Bukti kelulusan terdokumentasi ' +
+      'di docs/handoffs/FIEZEL-M025592-BOOT-SPLASH-REPAIR-HANDOFF.md.'
+  }],
   ['tests/chokai-multi-voice-protocol-test.js', {
     class: 'gerbang-pra-rilis-fitur',
     reason:

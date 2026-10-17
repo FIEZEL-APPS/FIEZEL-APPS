@@ -7948,7 +7948,7 @@ function openApp(){
   // Sesi lama bisa saja masih memegang kelas kunci m025-34 di <body> (mis. tab yang dibuka
   // sebelum rilis ini). Dibersihkan sekali di sini supaya .app/.bottomnav tidak tetap
   // tersembunyi oleh aturan CSS yang sekarang tidak pernah dipasang lagi.
-  document.body?.classList?.remove?.('notification-locked');notifyAppUpdateIfNew();render();try{updateTopbarCourseButton()}catch(_){}
+  document.body?.classList?.remove?.('notification-locked');notifyAppUpdateIfNew();render();try{dismissBootSplash()}catch(_){}try{updateTopbarCourseButton()}catch(_){}
   // Deteksi token undangan guru di URL (?token=...): langsung aktivasi & buka KelasKu untuk Guru
   try{checkUrlTeacherToken()}catch(_){}
   // PWA Shortcuts (?invite-hub=1, ?duel-hub=1): tangkap parameter pintasan PWA
@@ -12075,6 +12075,7 @@ function dismissBootSplash(){
     return true;
   }
   try{self.__fiezelBootSplash?.clearRecovery?.()}catch(_){}
+  try{self.__fiezelBootSplash?.clearWatchdog?.()}catch(_){}
   try{const r=self.document?.getElementById?.('fiezelBootRecovery');if(r)r.remove()}catch(_){}
   try{if(self.FiezelSplash?.disposeBootSplash?.(self))return true}catch(_){}
   try{
@@ -12131,9 +12132,9 @@ function showBrandSplash(now=Date.now(),afterSplash=null){
     const shown=splash.show(self,{now,force:typeof afterSplash==='function'&&isColdLaunch(),onClose:()=>done(Date.now())});
     // Splash yang tidak jadi tampil (sudah disapa hari ini) tidak boleh menelan perkenalan
     // bersamanya - murid baru yang membuka aplikasi untuk kedua kalinya tetap perlu dituntun.
-    if(!shown||shown.shown!==true){dismissBootSplash();done(now)}
+    if(!shown||shown.shown!==true){done(now);dismissBootSplash()}
     return shown
-  }catch(_){dismissBootSplash();done(now);return null}
+  }catch(_){done(now);dismissBootSplash();return null}
 }
 window.showBrandSplash=showBrandSplash;
 // Perkenalan lima langkah (Step 1-5, FIEZEL_Complete_Design_Specification.pdf bagian 3).
