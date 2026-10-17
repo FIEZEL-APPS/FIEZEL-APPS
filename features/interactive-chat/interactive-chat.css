@@ -27,17 +27,15 @@
   --fzc-assistant-border: #E8E0D5;
 }
 
-/* ── Hide bottomnav & floating PAW FAB with maximum specificity ── */
-html body.fz-lang-ja nav.bottomnav,
-html body.fz-lang-ja .bottomnav,
-html body.fz-lux nav.bottomnav,
-html body.fz-lux .bottomnav,
+/* ── Hide bottomnav, nav-scrim & floating PAW FAB with maximum specificity in Chat view ── */
 html body.fz-view-chat nav.bottomnav,
 html body.fz-view-chat .bottomnav,
-html body:has(.fzc-container) nav.bottomnav,
-html body:has(.fzc-container) .bottomnav,
+html body.fz-view-chat .nav-scrim,
 html body.fz-view-chat #fiezelPawFab,
 html body.fz-view-chat .fz-paw-fab,
+html body:has(.fzc-container) nav.bottomnav,
+html body:has(.fzc-container) .bottomnav,
+html body:has(.fzc-container) .nav-scrim,
 html body:has(.fzc-container) #fiezelPawFab,
 html body:has(.fzc-container) .fz-paw-fab {
   display: none !important;
@@ -80,26 +78,33 @@ body.fz-view-chat #app,
 html body:has(.fzc-container) main.app,
 html body:has(.fzc-container) .app,
 html body:has(.fzc-container) #app {
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
-  padding-left: 0 !important;
-  padding-right: 0 !important;
-  max-width: 100% !important;
+  padding: 0 !important;
   margin: 0 auto !important;
-  height: 100% !important;
-  max-height: 100% !important;
-  overflow: hidden !important;
-  display: flex !important;
-  flex-direction: column !important;
-  flex: 1 1 0px !important;
-  min-height: 0 !important;
+  max-width: 100% !important;
+  width: 100% !important;
   box-sizing: border-box !important;
 }
 
 body.fz-view-chat main.app,
 html body:has(.fzc-container) main.app {
-  height: calc(100dvh - 56px) !important;
-  max-height: calc(100dvh - 56px) !important;
+  height: 100% !important;
+  height: 100dvh !important;
+  max-height: 100dvh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  flex: 1 1 0px !important;
+  min-height: 0 !important;
+}
+
+body.fz-view-chat #app,
+html body:has(.fzc-container) #app {
+  height: 100% !important;
+  flex: 1 1 0px !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
 }
 
 /* Collapse non-visual background elements that cause 923px body scroll leak */
@@ -130,14 +135,21 @@ body.fz-view-chat #fiezelDiagHost {
 }
 
 /* ── Main Chat Shell & Viewport Container ── */
+#app > div.fzc-container,
+#app > .fzc-container,
 .fzc-container {
   display: flex !important;
   flex-direction: column !important;
+  flex: 1 1 0px !important;
+  min-height: 0 !important;
   height: 100% !important;
   max-height: 100% !important;
   width: 100% !important;
   max-width: 840px !important;
   margin: 0 auto !important;
+  padding: 0 !important;
+  padding-bottom: 0 !important;
+  scroll-padding-bottom: 0 !important;
   position: relative !important;
   box-sizing: border-box !important;
   background: var(--fzc-bg) !important;
@@ -812,14 +824,15 @@ body.fz-ja-no-romaji .fzc-romaji {
 /* ── Bottom Input Dock (Glassmorphic & Pinned to Flex Bottom) ── */
 .fzc-dock {
   flex-shrink: 0 !important;
-  padding: 8px 14px max(14px, env(safe-area-inset-bottom, 14px)) 14px;
-  background: rgba(253, 250, 243, 0.96);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-top: 1px solid rgba(232, 224, 213, 0.75);
+  margin-top: auto !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  padding: 8px 14px calc(14px + env(safe-area-inset-bottom, 0px)) 14px !important;
+  background: #FDFAF3 !important;
+  border-top: 1px solid rgba(232, 224, 213, 0.9) !important;
   position: relative !important;
-  bottom: 0;
-  z-index: 30;
+  bottom: 0 !important;
+  z-index: 50 !important;
 }
 
 @media (min-width: 768px) {
@@ -834,11 +847,13 @@ body.fz-ja-no-romaji .fzc-romaji {
   align-items: center;
   gap: 8px;
   background: #FFFFFF;
-  border: 1.5px solid #E2D9CE;
+  border: 1.5px solid #DDD3C6;
   border-radius: 999px;
   padding: 4px 6px 4px 14px;
   box-shadow: 0 2px 10px rgba(27, 20, 24, 0.05);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  min-height: 46px;
+  box-sizing: border-box;
 }
 
 .fzc-dock-form:focus-within {

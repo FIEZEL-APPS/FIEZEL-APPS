@@ -261,7 +261,7 @@ server.listen(PORT, '127.0.0.1', async () => {
     // Capture visual screenshot
     console.log('8. Capturing preview screenshot...');
     await page.evaluate(() => window.go('chat'));
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(1000);
     await page.screenshot({ path: path.join(ROOT, 'tools', 'dev', 'interactive-chat-preview.png'), fullPage: false });
     console.log('Screenshot saved to tools/dev/interactive-chat-preview.png');
 
