@@ -658,7 +658,9 @@ jobs:
           node tests/ios-pwa-mic-shadowing-test.js
           node tests/shadowing-eval-card-test.js
           node tests/interactive-chat-braincore-telemetry-test.js
-          node tests/speech-synthesis-engine-test.js
+          # m025-596: menggantikan speech-synthesis-engine-test.js, yang mengunci suara peramban
+          # yang sudah dilarang owner. Gerbang ini menegakkan pipeline Neural Voice resmi.
+          node tests/chat-neural-voice-test.js
           node tests/diag-panel-test.js
           node tests/diag-search-test.js
           node tests/sw-corp-test.js

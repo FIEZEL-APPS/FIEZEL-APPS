@@ -41,7 +41,9 @@ const collect = (dir) => {
     else if (e.name.endsWith('.js')) AUDIO_ZONES.push(p);
   }
 };
-['features/neural-voice', 'features/audio', 'features/audio-assets', 'workers/api/tts', 'features/speaking-listening'].forEach(collect);
+// features/interactive-chat (m025-596): Ngobrol AI + Panggilan dulu menyimpan cadangan TTS peramban
+// sendiri di LUAR zona ini — begitulah suara robot itu kembali ke voice call. Kini ikut dijaga.
+['features/neural-voice', 'features/audio', 'features/audio-assets', 'workers/api/tts', 'features/speaking-listening', 'features/interactive-chat'].forEach(collect);
 
 // 1. m025-232: BOUNDARY-NYA SENDIRI YANG DIHAPUS, dan gerbangnya ikut naik kelas.
 //
@@ -96,7 +98,8 @@ const EXEMPT = new Set([
 for (const f of AUDIO_ZONES) {
   // features/speaking-listening adalah antarmuka murid yang sah memakai FiezelI18n untuk salinan UI;
   // penjagaan bebas speechSynthesis tetap ditegakkan penuh di Check 1.
-  if (EXEMPT.has(f) || f.startsWith('features/speaking-listening/')) continue;
+  // features/interactive-chat sama: antarmuka chat/panggilan yang sah memakai FiezelI18n untuk naskah.
+  if (EXEMPT.has(f) || f.startsWith('features/speaking-listening/') || f.startsWith('features/interactive-chat/')) continue;
   const hit = read(f).match(FORBIDDEN);
   check(`zona audio bersih: ${f}`, !hit, hit ? `menyebut ${hit[1]}` : '');
 }

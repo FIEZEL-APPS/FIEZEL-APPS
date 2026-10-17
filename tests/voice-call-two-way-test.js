@@ -209,32 +209,22 @@ let rafCounter = 1;
 global.requestAnimationFrame = (fn) => setTimeout(fn, 16);
 global.cancelAnimationFrame = (id) => clearTimeout(id);
 
-let synthCancelled = false;
-let spokenUtterances = [];
-global.speechSynthesis = {
-  paused: false,
-  speaking: false,
-  speak: (utter) => {
-    spokenUtterances.push(utter);
-    global.speechSynthesis.speaking = true;
-    setTimeout(() => {
-      global.speechSynthesis.speaking = false;
-      if (typeof utter.onend === 'function') utter.onend();
-    }, 50);
-  },
-  cancel: () => {
-    synthCancelled = true;
-    global.speechSynthesis.speaking = false;
-  },
-  resume: () => {},
-  getVoices: () => [{ name: 'ja-JP-NanamiNeural', lang: 'ja-JP' }, { name: 'en-US-JennyNeural', lang: 'en-US' }]
-};
+// m025-596: panggilan bersuara lewat pipeline Neural Voice resmi (FiezelChatVoice → Puter Voice
+// untuk kursus Jepang). speechSynthesis SENGAJA tetap tersedia di sini supaya gerbang ini
+// membuktikan ia TIDAK dipakai (kanon: TTS peramban mati total).
+let synthTouched = 0;
+global.speechSynthesis = new Proxy({}, { get() { synthTouched++; return () => {}; } });
+global.SpeechSynthesisUtterance = function () { synthTouched++; };
 
-global.SpeechSynthesisUtterance = function (text) {
-  this.text = text;
-  this.lang = 'ja-JP';
-  this.onend = null;
-  this.onerror = null;
+let neuralStopped = false;
+let spokenUtterances = [];
+global.FiezelPuterVoice = {
+  speak: (text, opts) => {
+    spokenUtterances.push({ text, lang: opts && opts.lang });
+    return new Promise((r) => setTimeout(() => r(true), 50));
+  },
+  prefetch: () => Promise.resolve(true),
+  stop: () => { neuralStopped = true; }
 };
 
 let activeRecognition = null;
@@ -302,6 +292,8 @@ const chatModulePath = path.join(__dirname, '..', 'features', 'interactive-chat'
 
 const FiezelChatIcons = require(iconsModulePath);
 global.FiezelChatIcons = FiezelChatIcons;
+
+global.FiezelChatVoice = require(path.join(__dirname, '..', 'features', 'interactive-chat', 'fiezel-chat-voice.js'));
 
 const FiezelVoiceOrb = require(orbModulePath);
 global.FiezelVoiceOrb = FiezelVoiceOrb;
@@ -402,6 +394,7 @@ async function runTests() {
 
   // Should have transitioned through thinking to speaking
   assert.ok(spokenUtterances.length > 0, 'AI Tutor must have spoken an utterance');
+  assert.ok(spokenUtterances.every((u) => u.lang === 'ja-JP'), 'Japanese call must speak through the neural ja-JP voice');
   console.log('✓ AI responded autonomously with spoken utterance:', spokenUtterances[spokenUtterances.length - 1].text);
 
   // Wait for speech synthesis to end and natural pause (hands-free return to listening)
@@ -418,11 +411,11 @@ async function runTests() {
   console.log('--- TEST 5: Polite Barge-In (Interruption) ---');
   // Transition to speaking to test barge-in
   FiezelVoiceCall._testSetStatus('speaking');
-  synthCancelled = false;
+  neuralStopped = false;
 
   // Student interrupts AI by speaking
   FiezelVoiceCall.interrupt('user_acoustic_barge_in');
-  assert.strictEqual(synthCancelled, true, 'SpeechSynthesis.cancel() must be called on barge-in');
+  assert.strictEqual(neuralStopped, true, 'Neural voice playback must be stopped on barge-in');
   assert.strictEqual(FiezelVoiceCall.getState().status, 'listening', 'Status must immediately switch to listening on barge-in');
   console.log('✓ Polite barge-in successfully interrupted AI playback and switched to listening.');
 
@@ -450,6 +443,8 @@ async function runTests() {
   assert.ok(voiceAssistantMsg, 'AI voice response must be preserved in text chat messages');
 
   console.log('✓ Zero-loss state verified: Spoken messages preserved in text chat feed:', voiceUserMsg.text, '->', voiceAssistantMsg.text);
+
+  assert.strictEqual(synthTouched, 0, 'Browser speechSynthesis must never be touched during a call');
 
   console.log('\n======================================================');
   console.log('ALL TWO-WAY VOICE CALL INTEGRATION TESTS PASSED (6/6)!');

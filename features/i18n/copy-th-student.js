@@ -354,6 +354,7 @@
     // Ngobrol AI: saklar koreksi, ajakan koreksi, penanda sumber balasan, tips kesalahan (audit 17 Okt 2026)
     'chat.koreksi.saklar': 'แก้ไขประโยค',
     'chat.suara.saklar': 'เสียงอัตโนมัติ',
+    'chat.suara.diam': 'ตอนนี้เสียงยังไม่พร้อม แต่คุณยังอ่านข้อความได้',
     'chat.koreksi.lebih-tepat': 'ที่ถูกต้องกว่า:',
     'chat.koreksi.sudah-pas': 'ประโยคของคุณถูกต้องแล้ว',
     'chat.sumber.hemat': 'โหมดประหยัด: คำตอบนี้มาจากบทฝึก ไม่ใช่ AI',

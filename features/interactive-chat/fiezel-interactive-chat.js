@@ -1464,16 +1464,17 @@
     updateUI();
   }
 
-  // --- Web Audio & Speech Synthesis Engine ---
-  var activeUtterance = null;
-  var keepAliveTimer = null;
+  // --- Web Audio & Neural Voice ---
+  // Kanon m025-232/m025-246: TTS peramban mati total. Suara chat lewat FiezelChatVoice
+  // (FiezelVoiceSay / Puter Voice / Cloudflare TTS); semua lapisan gagal = diam, teks tetap ada.
   var audioContextUnlocked = false;
 
-  function clearKeepAlive() {
-    if (keepAliveTimer) {
-      clearInterval(keepAliveTimer);
-      keepAliveTimer = null;
-    }
+  function chatVoice() {
+    if (root.FiezelChatVoice) return root.FiezelChatVoice;
+    try {
+      if (typeof require === 'function') return require('./fiezel-chat-voice.js');
+    } catch (_) {}
+    return null;
   }
 
   // Web Audio Autoplay Policy Unlock
@@ -1483,12 +1484,6 @@
     }
 
     try {
-      if (typeof root.speechSynthesis !== 'undefined') {
-        try {
-          if (root.speechSynthesis.paused) root.speechSynthesis.resume();
-        } catch (_) {}
-      }
-
       var AudioCtx = root.AudioContext || root.webkitAudioContext;
       if (!AudioCtx) {
         audioContextUnlocked = true;
@@ -1522,56 +1517,6 @@
     } catch (_) {
       return Promise.resolve(null);
     }
-  }
-
-  // Voice Selector with safe scoring and non-blocking fallback
-  function selectVoice(synth, isJa) {
-    if (!synth || typeof synth.getVoices !== 'function') return null;
-    var voices = synth.getVoices() || [];
-    if (!voices || voices.length === 0) return null;
-
-    var candidates = [];
-    for (var i = 0; i < voices.length; i++) {
-      var v = voices[i];
-      var lang = (v.lang || '').toLowerCase().replace(/_/g, '-');
-      var name = (v.name || '').toLowerCase();
-
-      if (isJa) {
-        if (lang.indexOf('ja') === 0 || lang === 'ja' || /japanese|nihongo|日本語/i.test(name)) {
-          var score = 10;
-          if (/google\s*日本語/i.test(name)) score += 60;
-          else if (/kyoko|otoya/i.test(name)) score += 50;
-          else if (/nanami|keita|ayumi|ichiro|haruka|sayaka|takumi/i.test(name)) score += 40;
-          else if (/natural|neural/i.test(name)) score += 30;
-          if (v.localService) score += 10;
-          if (v.default) score += 5;
-          candidates.push({ voice: v, score: score });
-        }
-      } else {
-        if (lang.indexOf('en') === 0 || /english/i.test(name)) {
-          var scoreEn = 10;
-          if (lang === 'en-us') scoreEn += 35;
-          else if (lang === 'en-gb') scoreEn += 30;
-          if (/google\s*(us|uk|english)/i.test(name)) scoreEn += 50;
-          else if (/samantha|alex|victoria|karen|daniel|oliver|jenny|guy|aria/i.test(name)) scoreEn += 40;
-          else if (/natural|neural/i.test(name)) scoreEn += 30;
-          if (v.localService) scoreEn += 10;
-          if (v.default) scoreEn += 5;
-          candidates.push({ voice: v, score: scoreEn });
-        }
-      }
-    }
-
-    if (candidates.length > 0) {
-      candidates.sort(function (a, b) { return b.score - a.score; });
-      return candidates[0].voice;
-    }
-
-    // Non-blocking fallback: default voice or first available voice without throwing exception
-    for (var j = 0; j < voices.length; j++) {
-      if (voices[j].default) return voices[j];
-    }
-    return voices[0] || null;
   }
 
   function getDoc() {
@@ -1623,193 +1568,52 @@
     playVoice(rawText, mid, options);
   }
 
-  // Speak text via neural voice or web speech
+  // Speak text via the official neural voice pipeline (never browser TTS)
   function playVoice(text, msgId, options) {
     if (state.audioPlayingId === msgId) {
       stopVoice();
       return;
     }
     stopVoice();
-    state.audioPlayingId = msgId;
-    updateAudioButtonUI(msgId);
 
-    // Clean text: strip furigana [Kanji](reading) -> Kanji, and markdown
-    var cleanText = String(text || '')
-      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
-      .replace(/[*_~`]/g, '')
-      .trim();
-
-    if (!cleanText) {
+    var cv = chatVoice();
+    var cleanText = cv && typeof cv.cleanText === 'function'
+      ? cv.cleanText(text)
+      : String(text || '').replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').replace(/[*_~`]/g, '').trim();
+    if (!cleanText || !cv) {
       stopVoice();
       return;
     }
 
-    var isJapanese = state.course === 'ja';
+    state.audioPlayingId = msgId;
+    updateAudioButtonUI(msgId);
 
-    // If English, try FiezelVoiceSay neural voice first
-    if (!isJapanese && root.FiezelVoiceSay && typeof root.FiezelVoiceSay.say === 'function') {
-      root.FiezelVoiceSay.say(cleanText, { suppressSubtitles: true })
-        .then(function (spoke) {
-          if (spoke) {
-            if (state.audioPlayingId === msgId) {
-              state.audioPlayingId = null;
-              updateAudioButtonUI(null);
-            }
-          } else {
-            // FiezelVoiceSay could not play this text -> Fallback to Web Speech
-            speakViaWebSpeech(cleanText, msgId);
-          }
-        })
-        .catch(function () {
-          speakViaWebSpeech(cleanText, msgId);
-        });
-      return;
-    }
-
-    // Japanese or fallback: speak via Web Speech Synthesis
-    speakViaWebSpeech(cleanText, msgId);
-  }
-
-  function speakViaWebSpeech(text, msgId) {
-    var synth = root.speechSynthesis;
-    if (!synth) {
+    cv.speak(cleanText, state.course === 'ja' ? 'ja' : 'en', {
+      onSentenceStart: function () {
+        if (root.__fiezelActiveVoiceOrb && typeof root.__fiezelActiveVoiceOrb.setVolume === 'function') {
+          root.__fiezelActiveVoiceOrb.setVolume(0.7);
+        }
+      }
+    }).then(function (spoke) {
+      if (state.audioPlayingId !== msgId) return; // sudah diganti / dihentikan
       state.audioPlayingId = null;
       updateAudioButtonUI(null);
-      if (typeof root.showToast === 'function') {
-        root.showToast(t('chat_no_speech_engine', 'Browser belum mendukung suara percakapan.'));
+      if (root.__fiezelActiveVoiceOrb && typeof root.__fiezelActiveVoiceOrb.setVolume === 'function') {
+        root.__fiezelActiveVoiceOrb.setVolume(0);
       }
-      return;
-    }
-
-    try {
-      synth.cancel();
-      clearKeepAlive();
-      if (synth.paused) {
-        try { synth.resume(); } catch (_) {}
+      // Diam yang jujur: hanya diberitahu saat murid sendiri menekan tombol Dengar.
+      if (!spoke && options && options.userInitiated && typeof root.showToast === 'function') {
+        root.showToast(t('chat.suara.diam', 'Suaranya belum tersedia sekarang. Teksnya tetap bisa kamu baca.'));
       }
-
-      var utter = new root.SpeechSynthesisUtterance(text);
-      activeUtterance = utter;
-      root.__fiezelChatUtterance = utter; // Prevent Chrome GC bug!
-
-      var isJa = state.course === 'ja';
-      utter.lang = isJa ? 'ja-JP' : 'en-US';
-      utter.rate = isJa ? 0.95 : 1.0;
-      utter.pitch = 1.0;
-
-      // Select voice with Japanese & English priorities
-      try {
-        var chosenVoice = selectVoice(synth, isJa);
-        if (chosenVoice) {
-          utter.voice = chosenVoice;
-        } else if (isJa && root.FiezelSpeechBridge && typeof root.FiezelSpeechBridge.speak === 'function') {
-          // If no local voice, try speech bridge fallback if available
-          try { root.FiezelSpeechBridge.speak(text); } catch (_) {}
-        }
-      } catch (_) {}
-
-      utter.onstart = function () {
-        if (state.audioPlayingId === msgId) {
-          updateAudioButtonUI(msgId);
-        }
-      };
-
-      utter.onboundary = function (evt) {
-        if (state.audioPlayingId === msgId) {
-          // Acoustic boundary: pulse the active audio button in sync with speech
-          var doc = getDoc();
-          if (doc) {
-            var mountPoint = doc.getElementById('app');
-            if (mountPoint) {
-              var btn = mountPoint.querySelector('.fzc-action-btn[data-action="audio"][data-id="' + msgId + '"]');
-              if (btn) {
-                btn.classList.add('is-pulsing');
-                setTimeout(function () {
-                  if (btn) btn.classList.remove('is-pulsing');
-                }, 120);
-              }
-            }
-          }
-          // If active visualizer orb exists on page, pulse volume
-          if (root.__fiezelActiveVoiceOrb && typeof root.__fiezelActiveVoiceOrb.setVolume === 'function') {
-            root.__fiezelActiveVoiceOrb.setVolume(0.65 + Math.random() * 0.25);
-          }
-        }
-      };
-
-      utter.onend = function () {
-        clearKeepAlive();
-        if (activeUtterance === utter) {
-          activeUtterance = null;
-          root.__fiezelChatUtterance = null;
-        }
-        if (state.audioPlayingId === msgId) {
-          state.audioPlayingId = null;
-          updateAudioButtonUI(null);
-        }
-        if (root.__fiezelActiveVoiceOrb && typeof root.__fiezelActiveVoiceOrb.setVolume === 'function') {
-          root.__fiezelActiveVoiceOrb.setVolume(0);
-        }
-      };
-
-      utter.onerror = function () {
-        clearKeepAlive();
-        if (activeUtterance === utter) {
-          activeUtterance = null;
-          root.__fiezelChatUtterance = null;
-        }
-        if (state.audioPlayingId === msgId) {
-          state.audioPlayingId = null;
-          updateAudioButtonUI(null);
-        }
-        if (root.__fiezelActiveVoiceOrb && typeof root.__fiezelActiveVoiceOrb.setVolume === 'function') {
-          root.__fiezelActiveVoiceOrb.setVolume(0);
-        }
-      };
-
-      synth.speak(utter);
-      if (synth.paused) {
-        try { synth.resume(); } catch (_) {}
-      }
-
-      // Chrome keepalive timer to prevent speech freezing at 15s
-      keepAliveTimer = setInterval(function () {
-        if (!activeUtterance) {
-          clearKeepAlive();
-          return;
-        }
-        if (synth.speaking && !synth.paused) {
-          try {
-            synth.pause();
-            synth.resume();
-          } catch (_) {}
-        }
-      }, 10000);
-
-    } catch (_) {
-      clearKeepAlive();
-      activeUtterance = null;
-      root.__fiezelChatUtterance = null;
-      state.audioPlayingId = null;
-      updateAudioButtonUI(null);
-    }
+    });
   }
 
   function stopVoice() {
-    clearKeepAlive();
-    activeUtterance = null;
-    root.__fiezelChatUtterance = null;
     state.audioPlayingId = null;
-    try {
-      if (root.FiezelVoiceSay && typeof root.FiezelVoiceSay.stop === 'function') {
-        root.FiezelVoiceSay.stop();
-      }
-    } catch (_) {}
-    try {
-      if (root.speechSynthesis) {
-        root.speechSynthesis.cancel();
-      }
-    } catch (_) {}
+    var cv = chatVoice();
+    if (cv && typeof cv.stop === 'function') {
+      try { cv.stop(); } catch (_) {}
+    }
     updateAudioButtonUI(null);
     if (root.__fiezelActiveVoiceOrb && typeof root.__fiezelActiveVoiceOrb.setVolume === 'function') {
       root.__fiezelActiveVoiceOrb.setVolume(0);
@@ -3387,7 +3191,7 @@
         var mid = btn.getAttribute('data-id');
         if (act === 'audio') {
           var tAudio = btn.getAttribute('data-text');
-          playVoice(tAudio, mid);
+          playVoice(tAudio, mid, { userInitiated: true });
         } else if (act === 'translate') {
           var targetMsg = null;
           for (var i = 0; i < state.messages.length; i++) {
@@ -3540,8 +3344,6 @@
     speakAssistantMessage: speakAssistantMessage,
     playVoice: playVoice,
     stopVoice: stopVoice,
-    speakViaWebSpeech: speakViaWebSpeech,
-    selectVoice: selectVoice,
     unlockAudioContext: unlockAudioContext,
     getChatHistory: getChatHistory,
     saveChatHistoryRecord: saveChatHistoryRecord,

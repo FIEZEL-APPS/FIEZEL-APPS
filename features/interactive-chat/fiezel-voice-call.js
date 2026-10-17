@@ -129,7 +129,6 @@
     var recognition = null;
     var hasUserSpoken = false;
     var pendingTranscript = '';
-    var activeUtterance = null;
     var overlayEl = null;
     var orbInstance = null;
     var loudFramesCount = 0;
@@ -181,25 +180,45 @@
       return true;
     }
 
-    // --- Web Audio Autoplay Policy & Speech Synthesis ---
-    var callKeepAliveTimer = null;
+    // --- Web Audio Autoplay Policy & Neural Voice ---
+    // Kanon m025-232/m025-246: TTS peramban mati total. Suara panggilan lewat FiezelChatVoice
+    // (FiezelVoiceSay / Puter Voice / Cloudflare TTS); kalau semua lapisan gagal, panggilan
+    // tetap berjalan tanpa suara dan balasan terbaca di subtitle.
+    var speakPulseTimer = null;
     var currentAiSpeechLevel = 0;
 
-    function clearCallKeepAlive() {
-      if (callKeepAliveTimer) {
-        clearInterval(callKeepAliveTimer);
-        callKeepAliveTimer = null;
+    function chatVoice() {
+      if (root.FiezelChatVoice) return root.FiezelChatVoice;
+      try {
+        if (typeof require === 'function') return require('./fiezel-chat-voice.js');
+      } catch (_) {}
+      return null;
+    }
+
+    function clearSpeakPulse() {
+      if (speakPulseTimer) {
+        clearInterval(speakPulseTimer);
+        speakPulseTimer = null;
       }
+    }
+
+    // Pemutar neural tidak memberi peristiwa batas kata, jadi orb berdenyut halus selama
+    // giliran AI berbunyi dan berhenti tepat saat audionya berhenti.
+    function startSpeakPulse() {
+      clearSpeakPulse();
+      speakPulseTimer = setInterval(function () {
+        currentAiSpeechLevel = 0.55 + Math.random() * 0.35;
+        renderOrbLevel(currentAiSpeechLevel);
+        if (orbInstance && typeof orbInstance.setVolume === 'function') {
+          orbInstance.setVolume(currentAiSpeechLevel);
+        }
+        state.audioLevel = currentAiSpeechLevel;
+        emit('audioLevel', currentAiSpeechLevel);
+      }, 120);
     }
 
     // Web Audio Autoplay Policy Unlock
     function unlockAudio() {
-      try {
-        if (root.speechSynthesis && root.speechSynthesis.paused) {
-          root.speechSynthesis.resume();
-        }
-      } catch (_) {}
-
       try {
         var AudioCtx = root.AudioContext || root.webkitAudioContext;
         if (!AudioCtx) return;
@@ -221,80 +240,18 @@
       } catch (_) {}
     }
 
-    // Voice Selector with safe scoring and non-blocking fallback
-    function selectVoice(synth, isJa) {
-      if (!synth || typeof synth.getVoices !== 'function') return null;
-      var voices = synth.getVoices() || [];
-      if (!voices || voices.length === 0) return null;
-
-      var candidates = [];
-      for (var i = 0; i < voices.length; i++) {
-        var v = voices[i];
-        var lang = (v.lang || '').toLowerCase().replace(/_/g, '-');
-        var name = (v.name || '').toLowerCase();
-
-        if (isJa) {
-          if (lang.indexOf('ja') === 0 || lang === 'ja' || /japanese|nihongo|日本語/i.test(name)) {
-            var score = 10;
-            if (/google\s*日本語/i.test(name)) score += 60;
-            else if (/kyoko|otoya/i.test(name)) score += 50;
-            else if (/nanami|keita|ayumi|ichiro|haruka|sayaka|takumi/i.test(name)) score += 40;
-            else if (/natural|neural/i.test(name)) score += 30;
-            if (v.localService) score += 10;
-            if (v.default) score += 5;
-            candidates.push({ voice: v, score: score });
-          }
-        } else {
-          if (lang.indexOf('en') === 0 || /english/i.test(name)) {
-            var scoreEn = 10;
-            if (lang === 'en-us') scoreEn += 35;
-            else if (lang === 'en-gb') scoreEn += 30;
-            if (/google\s*(us|uk|english)/i.test(name)) scoreEn += 50;
-            else if (/samantha|alex|victoria|karen|daniel|oliver|jenny|guy|aria/i.test(name)) scoreEn += 40;
-            else if (/natural|neural/i.test(name)) scoreEn += 30;
-            if (v.localService) scoreEn += 10;
-            if (v.default) scoreEn += 5;
-            candidates.push({ voice: v, score: scoreEn });
-          }
-        }
-      }
-
-      if (candidates.length > 0) {
-        candidates.sort(function (a, b) { return b.score - a.score; });
-        return candidates[0].voice;
-      }
-
-      // Safe fallback: default voice or first available without throwing exception
-      for (var j = 0; j < voices.length; j++) {
-        if (voices[j].default) return voices[j];
-      }
-      return voices[0] || null;
-    }
-
-    // --- Audio Synthesis Playback ---
+    // --- Neural Voice Playback ---
     function stopAudioPlayback() {
-      clearCallKeepAlive();
+      clearSpeakPulse();
       currentAiSpeechLevel = 0;
       renderOrbLevel(0);
       if (orbInstance && typeof orbInstance.setVolume === 'function') {
         orbInstance.setVolume(0);
       }
-      if (activeUtterance) {
-        activeUtterance.onstart = null;
-        activeUtterance.onboundary = null;
-        activeUtterance.onend = null;
-        activeUtterance.onerror = null;
-        activeUtterance = null;
-        root.__fiezelCallUtterance = null;
+      var cv = chatVoice();
+      if (cv && typeof cv.stop === 'function') {
+        try { cv.stop(); } catch (_) {}
       }
-      try {
-        if (root.speechSynthesis) root.speechSynthesis.cancel();
-      } catch (_) {}
-      try {
-        if (root.FiezelVoiceSay && typeof root.FiezelVoiceSay.stop === 'function') {
-          root.FiezelVoiceSay.stop();
-        }
-      } catch (_) {}
       try {
         if (root.FiezelNeuralVoice && typeof root.FiezelNeuralVoice.stop === 'function') {
           root.FiezelNeuralVoice.stop();
@@ -303,132 +260,32 @@
     }
 
     function playSpeech(text, course) {
-      return new Promise(function (resolve) {
-        var clean = stripFurigana(text);
-        if (!clean) {
-          resolve(true);
-          return;
+      var cv = chatVoice();
+      var clean = stripFurigana(text);
+      if (!clean || !cv || typeof cv.speak !== 'function') return Promise.resolve(false);
+      var isJa = course === 'ja';
+      var started = false;
+      return cv.speak(clean, isJa ? 'ja' : 'en', {
+        onSentenceStart: function (i, sentence) {
+          if (!started) {
+            started = true;
+            startSpeakPulse();
+            emit('speechStart', { isJa: isJa, text: clean });
+          }
+          emit('speechBoundary', { index: i, text: sentence });
         }
-
-        var isJa = course === 'ja';
-
-        // English: prioritize FiezelVoiceSay neural voice if present
-        if (!isJa && root.FiezelVoiceSay && typeof root.FiezelVoiceSay.say === 'function') {
-          root.FiezelVoiceSay.say(clean, { suppressSubtitles: true })
-            .then(function (spoke) {
-              if (spoke) {
-                resolve(true);
-              } else {
-                speakViaSynth(clean, isJa, resolve);
-              }
-            })
-            .catch(function () {
-              speakViaSynth(clean, isJa, resolve);
-            });
-          return;
+      }).then(function (spoke) {
+        clearSpeakPulse();
+        currentAiSpeechLevel = 0;
+        renderOrbLevel(0);
+        if (orbInstance && typeof orbInstance.setVolume === 'function') {
+          orbInstance.setVolume(0);
         }
-
-        // Japanese or fallback: SpeechSynthesis
-        speakViaSynth(clean, isJa, resolve);
+        return spoke;
+      }, function () {
+        clearSpeakPulse();
+        return false;
       });
-    }
-
-    function speakViaSynth(text, isJa, onDone) {
-      var synth = root.speechSynthesis;
-      if (!synth) {
-        setTimeout(function () { onDone(false); }, 1000);
-        return;
-      }
-
-      try {
-        synth.cancel();
-        clearCallKeepAlive();
-        if (synth.paused) {
-          try { synth.resume(); } catch (_) {}
-        }
-
-        var utter = new root.SpeechSynthesisUtterance(text);
-        activeUtterance = utter;
-        root.__fiezelCallUtterance = utter; // Prevent Chrome GC bug!
-        utter.lang = isJa ? 'ja-JP' : 'en-US';
-        utter.rate = isJa ? 0.95 : 1.0;
-        utter.pitch = 1.0;
-
-        try {
-          var chosenVoice = selectVoice(synth, isJa);
-          if (chosenVoice) {
-            utter.voice = chosenVoice;
-          } else if (isJa && root.FiezelSpeechBridge && typeof root.FiezelSpeechBridge.speak === 'function') {
-            try { root.FiezelSpeechBridge.speak(text); } catch (_) {}
-          }
-        } catch (_) {}
-
-        var finished = false;
-        function finish(ok) {
-          if (finished) return;
-          finished = true;
-          clearCallKeepAlive();
-          if (activeUtterance === utter) {
-            activeUtterance = null;
-            root.__fiezelCallUtterance = null;
-          }
-          currentAiSpeechLevel = 0;
-          renderOrbLevel(0);
-          if (orbInstance && typeof orbInstance.setVolume === 'function') {
-            orbInstance.setVolume(0);
-          }
-          onDone(ok);
-        }
-
-        utter.onstart = function () {
-          currentAiSpeechLevel = 0.55;
-          renderOrbLevel(currentAiSpeechLevel);
-          if (orbInstance && typeof orbInstance.setVolume === 'function') {
-            orbInstance.setVolume(currentAiSpeechLevel);
-          }
-          emit('speechStart', { isJa: isJa, text: text });
-        };
-
-        utter.onboundary = function (evt) {
-          // Acoustic boundary: pulse the Voice Orb dynamically in sync with words
-          currentAiSpeechLevel = 0.70 + Math.random() * 0.25;
-          renderOrbLevel(currentAiSpeechLevel);
-          if (orbInstance && typeof orbInstance.setVolume === 'function') {
-            orbInstance.setVolume(currentAiSpeechLevel);
-          }
-          state.audioLevel = currentAiSpeechLevel;
-          emit('audioLevel', currentAiSpeechLevel);
-          emit('speechBoundary', evt);
-        };
-
-        utter.onend = function () { finish(true); };
-        utter.onerror = function (err) {
-          if (typeof console !== 'undefined' && console.warn) {
-            console.warn('[VoiceCall] Utterance error:', err);
-          }
-          finish(false);
-        };
-
-        synth.speak(utter);
-        if (synth.paused) {
-          try { synth.resume(); } catch (_) {}
-        }
-
-        callKeepAliveTimer = setInterval(function () {
-          if (!activeUtterance) {
-            clearCallKeepAlive();
-            return;
-          }
-          if (synth.speaking && !synth.paused) {
-            try {
-              synth.pause();
-              synth.resume();
-            } catch (_) {}
-          }
-        }, 10000);
-      } catch (_) {
-        finish(false);
-      }
     }
 
     // --- VAD & Audio Input Handling ---
@@ -1546,8 +1403,7 @@
       commitUserTurn: commitUserTurn,
       computeRMS: computeRMS,
       unlockAudio: unlockAudio,
-      selectVoice: selectVoice,
-      speakViaSynth: speakViaSynth,
+      playSpeech: playSpeech,
       showMicPermissionModal: showMicPermissionModal,
       _testSetStatus: function (status, meta) { return setStatus(status, meta, true); },
       _testCommitTurn: commitUserTurn,
@@ -1577,7 +1433,7 @@
     off: function (evt, fn) { defaultInstance.off(evt, fn); },
     computeRMS: computeRMS,
     unlockAudio: function () { return defaultInstance.unlockAudio(); },
-    selectVoice: function (synth, isJa) { return defaultInstance.selectVoice(synth, isJa); },
+    playSpeech: function (text, course) { return defaultInstance.playSpeech(text, course); },
     _testSetStatus: function (status, meta) { return defaultInstance._testSetStatus(status, meta); },
     _testCommitTurn: function () { return defaultInstance._testCommitTurn(); },
     _testSimulateTurn: function (text) { return defaultInstance._testSimulateTurn(text); },

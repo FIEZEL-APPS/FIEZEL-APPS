@@ -345,6 +345,7 @@
     // Ngobrol AI: saklar koreksi, ajakan koreksi, penanda sumber balasan, tips kesalahan (audit 17 Okt 2026)
     'chat.koreksi.saklar': 'Koreksi',
     'chat.suara.saklar': 'Suara otomatis',
+    'chat.suara.diam': 'Suaranya belum tersedia sekarang. Teksnya tetap bisa kamu baca.',
     'chat.koreksi.lebih-tepat': 'Lebih tepat:',
     'chat.koreksi.sudah-pas': 'Kalimatmu sudah pas',
     'chat.sumber.hemat': 'Mode hemat: balasan ini dari naskah latihan, bukan AI.',
