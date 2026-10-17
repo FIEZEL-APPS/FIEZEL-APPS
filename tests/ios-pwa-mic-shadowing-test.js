@@ -61,17 +61,22 @@ class MockElement {
   constructor(tag) {
     this.tagName = (tag || 'div').toUpperCase();
     this.children = [];
-    this.classList = new Set();
-    this.classList.add = (c) => this.classList.add(c);
-    this.classList.remove = (c) => this.classList.delete(c);
-    this.classList.toggle = (c, val) => {
-      if (val === undefined) {
-        if (this.classList.has(c)) this.classList.delete(c);
-        else this.classList.add(c);
-      } else if (val) {
-        this.classList.add(c);
-      } else {
-        this.classList.delete(c);
+    const selfSet = new Set();
+    this.classList = {
+      add: (c) => selfSet.add(c),
+      remove: (c) => selfSet.delete(c),
+      delete: (c) => selfSet.delete(c),
+      has: (c) => selfSet.has(c),
+      contains: (c) => selfSet.has(c),
+      toggle: (c, val) => {
+        if (val === undefined) {
+          if (selfSet.has(c)) selfSet.delete(c);
+          else selfSet.add(c);
+        } else if (val) {
+          selfSet.add(c);
+        } else {
+          selfSet.delete(c);
+        }
       }
     };
     this.attributes = {};
@@ -162,10 +167,28 @@ async function runTests() {
 
   const FiezelInteractiveChat = require('../features/interactive-chat/fiezel-interactive-chat.js');
   assert.ok(FiezelInteractiveChat, 'FiezelInteractiveChat module must load cleanly');
-  console.log('✓ Test 4: FiezelInteractiveChat loaded cleanly with new kinetic visualizer.');
+  // Test 5: VoiceCall on iOS starts cleanly using SpeechRecognition pipeline without failing on getUserMedia
+  let callConnected = false;
+  try {
+    const callPromise = FiezelVoiceCall.startCall({
+      partnerName: 'Sensei',
+      course: 'ja',
+      scenarioId: 'free'
+    });
+    assert.ok(callPromise, 'startCall must return a Promise');
+    await callPromise;
+    callConnected = true;
+  } catch (err) {
+    console.error('Call failed unexpectedly on iOS SpeechRecognition environment:', err);
+  }
+  assert.strictEqual(callConnected, true, 'VoiceCall must connect successfully on iOS using SpeechRecognition pipeline');
+  console.log('✓ Test 5: VoiceCall connects successfully on iOS via SpeechRecognition pipeline.');
+
+  // Clean up call
+  FiezelVoiceCall.endCall();
 
   console.log('\n======================================================');
-  console.log('ALL iOS PWA MIC & SHADOWING TESTS PASSED (4/4)!');
+  console.log('ALL iOS PWA MIC & SHADOWING TESTS PASSED (5/5)!');
   console.log('======================================================');
 }
 

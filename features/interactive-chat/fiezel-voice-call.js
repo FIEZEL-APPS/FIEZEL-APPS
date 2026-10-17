@@ -432,6 +432,8 @@
     }
 
     // --- VAD & Audio Input Handling ---
+    var kineticSpeechLevel = 0.05;
+
     function initMediaStream(preacquiredStream) {
       if (preacquiredStream) {
         mediaStream = preacquiredStream;
@@ -447,10 +449,21 @@
         (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
       );
 
+      var hasSpeechRec = Boolean(root.SpeechRecognition || root.webkitSpeechRecognition);
+
+      // On iOS WebKit (Safari & Standalone PWA), running getUserMedia simultaneously with
+      // webkitSpeechRecognition locks Apple's AVAudioSession hardware controller. Furthermore,
+      // in iOS PWA standalone mode, getUserMedia is frequently restricted by WebKit permissions,
+      // while webkitSpeechRecognition works flawlessly without locks (proven by Shadowing mode).
+      // Therefore, if SpeechRecognition is available on iOS, we bypass mandatory getUserMedia
+      // and let SpeechRecognition drive both transcription and speech-reactive kinetic levels!
+      if (isIOS && hasSpeechRec) {
+        startVadLoop();
+        return Promise.resolve(true);
+      }
+
       if (navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === 'function') {
-        // On iOS WebKit (Safari & PWA), complex audio constraints often fail and waste the user gesture token.
-        // Use direct { audio: true } on iOS to preserve synchronous user gesture activation!
-        var constraints = isIOS ? { audio: true } : {
+        var constraints = {
           audio: {
             echoCancellation: true,
             noiseSuppression: true,
@@ -458,9 +471,7 @@
           }
         };
         return navigator.mediaDevices.getUserMedia(constraints)
-          .catch(function (err) {
-            if (isIOS) throw err;
-            // OverconstrainedError or driver refusal on non-iOS: fallback to standard audio constraint
+          .catch(function () {
             return navigator.mediaDevices.getUserMedia({ audio: true });
           })
           .then(function (stream) {
@@ -470,13 +481,30 @@
               try { orbInstance.attachStream(stream); } catch (_) {}
             }
             return true;
-          }).catch(function (err) {
+          })
+          .catch(function (err) {
+            // Graceful resilience: If getUserMedia fails or is denied on any browser, BUT
+            // SpeechRecognition is supported, DO NOT abort the call! SpeechRecognition can
+            // capture the student's voice directly!
+            if (hasSpeechRec) {
+              if (typeof console !== 'undefined' && console.warn) {
+                console.warn('[FiezelVoiceCall] getUserMedia failed, continuing with SpeechRecognition engine:', err);
+              }
+              startVadLoop();
+              return true;
+            }
             if (root.__FIEZEL_TEST_MOCK_STREAM__ || (typeof window !== 'undefined' && window.__FZ_TEST_CALL)) {
               return setupMockAudioStream();
             }
             throw err;
           });
       }
+
+      if (hasSpeechRec) {
+        startVadLoop();
+        return Promise.resolve(true);
+      }
+
       if (root.__FIEZEL_TEST_MOCK_STREAM__ || (typeof window !== 'undefined' && window.__FZ_TEST_CALL)) {
         return setupMockAudioStream();
       }
@@ -533,14 +561,27 @@
     }
 
     function startVadLoop() {
-      if (!analyserNode) return;
-      var dataArray = new Uint8Array(analyserNode.frequencyBinCount);
+      if (vadRafId) {
+        if (typeof cancelAnimationFrame === 'function') cancelAnimationFrame(vadRafId);
+        else clearTimeout(vadRafId);
+        vadRafId = null;
+      }
+
+      var dataArray = analyserNode ? new Uint8Array(analyserNode.frequencyBinCount) : null;
 
       function vadTick() {
         if (isDestroyed || state.status === STATE.IDLE) return;
 
-        analyserNode.getByteTimeDomainData(dataArray);
-        var rms = computeRMS(dataArray);
+        var rms = 0;
+        if (analyserNode && dataArray) {
+          analyserNode.getByteTimeDomainData(dataArray);
+          rms = computeRMS(dataArray);
+        } else {
+          // Synthetic speech-reactive level when running in SpeechRecognition-only pipeline (e.g. iOS)
+          kineticSpeechLevel = Math.max(0.04, kineticSpeechLevel * 0.91);
+          var ambientBreathing = 0.025 * Math.sin(Date.now() / 320);
+          rms = Math.min(1, Math.max(0, kineticSpeechLevel + ambientBreathing));
+        }
 
         if (state.status === STATE.SPEAKING) {
           // When AI is speaking, animate orb with AI speech level
@@ -553,7 +594,7 @@
             orbInstance.setVolume(displayLevel);
           }
         } else {
-          // In listening or connecting state, animate orb with mic input
+          // In listening or connecting state, animate orb with mic/speech input
           state.audioLevel = rms;
           emit('audioLevel', rms);
           if (orbInstance && typeof orbInstance.setVolume === 'function') {
@@ -563,8 +604,8 @@
         }
 
         if (!state.isMuted) {
-          // 1. Listening State: Detect user speaking & silence timeout
-          if (state.status === STATE.LISTENING) {
+          // 1. Listening State: Detect user speaking & silence timeout (for analyserNode mode)
+          if (state.status === STATE.LISTENING && analyserNode) {
             if (rms > CONFIG.speechThreshold) {
               hasUserSpoken = true;
               if (silenceTimer) {
@@ -581,8 +622,8 @@
             }
           }
 
-          // 2. Speaking State: Detect Polite Interruption (Barge-in)
-          if (state.status === STATE.SPEAKING) {
+          // 2. Speaking State: Detect Polite Interruption (Barge-in via acoustic analyser)
+          if (state.status === STATE.SPEAKING && analyserNode) {
             if (rms > CONFIG.interruptThreshold) {
               loudFramesCount++;
               if (loudFramesCount >= CONFIG.interruptConsecutiveFrames) {
@@ -616,6 +657,25 @@
         rec.interimResults = true;
         rec.lang = state.course === 'ja' ? 'ja-JP' : 'en-US';
 
+        rec.onaudiostart = function () {
+          kineticSpeechLevel = Math.max(kineticSpeechLevel, 0.35);
+        };
+        rec.onsoundstart = function () {
+          kineticSpeechLevel = Math.max(kineticSpeechLevel, 0.55);
+        };
+        rec.onspeechstart = function () {
+          kineticSpeechLevel = Math.max(kineticSpeechLevel, 0.75);
+        };
+        rec.onspeechend = function () {
+          kineticSpeechLevel = 0.12;
+        };
+        rec.onsoundend = function () {
+          kineticSpeechLevel = 0.08;
+        };
+        rec.onaudioend = function () {
+          kineticSpeechLevel = 0.05;
+        };
+
         rec.onresult = function (event) {
           if (state.isMuted) return;
 
@@ -633,6 +693,7 @@
 
           var combined = (finalStr + ' ' + interimStr).trim();
           if (combined) {
+            kineticSpeechLevel = 0.70 + Math.random() * 0.25;
             pendingTranscript = combined;
             state.currentTranscript = combined;
             emit('transcript', combined, Boolean(finalStr), 'user');
@@ -664,15 +725,25 @@
           if (event && (event.error === 'no-speech' || event.error === 'aborted')) {
             return;
           }
+          if (event && event.error === 'not-allowed') {
+            showMicPermissionModal(function () {
+              startRecognition();
+            });
+            return;
+          }
           emit('error', event ? event.error : 'speech_recognition_error');
         };
 
         rec.onend = function () {
-          // Hands-free loop: If call is still active and not idle, restart recognition
+          // Hands-free loop: If call is still active and not idle, restart recognition safely
           if (!isDestroyed && state.status !== STATE.IDLE) {
-            try {
-              rec.start();
-            } catch (_) {}
+            setTimeout(function () {
+              if (!isDestroyed && state.status !== STATE.IDLE) {
+                try {
+                  rec.start();
+                } catch (_) {}
+              }
+            }, 80);
           }
         };
 
@@ -1453,6 +1524,7 @@
       start: start,
       startCall: start,
       end: end,
+      endCall: end,
       interrupt: interrupt,
       toggleMute: toggleMute,
       setMute: setMute,
@@ -1480,6 +1552,7 @@
     start: function (options) { return defaultInstance.start(options); },
     startCall: function (options) { return defaultInstance.start(options); },
     end: function () { return defaultInstance.end(); },
+    endCall: function () { return defaultInstance.end(); },
     interrupt: function (reason) { return defaultInstance.interrupt(reason); },
     toggleMute: function () { return defaultInstance.toggleMute(); },
     setMute: function (muted) { return defaultInstance.setMute(muted); },
