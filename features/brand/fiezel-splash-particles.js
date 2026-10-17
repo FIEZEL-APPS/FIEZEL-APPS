@@ -305,6 +305,7 @@
 
       if (typeof opts.seed === 'number') seed = opts.seed >>> 0;
       this._clearedDone = false;
+      this._skipBuild = !!opts.skipBuild;
       if (opts.skipBuild) {
         N = 0;
         emitF = false;
@@ -366,6 +367,14 @@
         if (_emit) _emit('bars-solid');
       }
 
+      if (this._skipBuild) {
+        if (!this._clearedDone) {
+          this._clearedDone = true;
+          ctx.setTransform(1, 0, 0, 1, 0, 0);
+          ctx.clearRect(0, 0, cv.width, cv.height);
+        }
+        return;
+      }
       if (t >= T.DONE) {
         if (!this._clearedDone) {
           this._clearedDone = true;

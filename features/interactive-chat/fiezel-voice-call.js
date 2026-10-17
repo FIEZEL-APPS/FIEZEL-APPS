@@ -434,25 +434,31 @@
     // --- VAD & Audio Input Handling ---
     function initMediaStream() {
       if (navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === 'function') {
-        return navigator.mediaDevices.getUserMedia({
+        var constraints = {
           audio: {
             echoCancellation: true,
             noiseSuppression: true,
             autoGainControl: true
           }
-        }).then(function (stream) {
-          mediaStream = stream;
-          setupAudioAnalyser(stream);
-          if (orbInstance && typeof orbInstance.attachStream === 'function') {
-            try { orbInstance.attachStream(stream); } catch (_) {}
-          }
-          return true;
-        }).catch(function (err) {
-          if (root.__FIEZEL_TEST_MOCK_STREAM__ || (typeof window !== 'undefined' && window.__FZ_TEST_CALL)) {
-            return setupMockAudioStream();
-          }
-          throw err;
-        });
+        };
+        return navigator.mediaDevices.getUserMedia(constraints)
+          .catch(function () {
+            // OverconstrainedError or specific driver refusal: fallback to standard audio constraint
+            return navigator.mediaDevices.getUserMedia({ audio: true });
+          })
+          .then(function (stream) {
+            mediaStream = stream;
+            setupAudioAnalyser(stream);
+            if (orbInstance && typeof orbInstance.attachStream === 'function') {
+              try { orbInstance.attachStream(stream); } catch (_) {}
+            }
+            return true;
+          }).catch(function (err) {
+            if (root.__FIEZEL_TEST_MOCK_STREAM__ || (typeof window !== 'undefined' && window.__FZ_TEST_CALL)) {
+              return setupMockAudioStream();
+            }
+            throw err;
+          });
       }
       if (root.__FIEZEL_TEST_MOCK_STREAM__ || (typeof window !== 'undefined' && window.__FZ_TEST_CALL)) {
         return setupMockAudioStream();
@@ -801,6 +807,85 @@
       ensureRecognitionRunning();
     }
 
+    // --- Microphone Permission Guidance Modal ---
+    function showMicPermissionModal(onRetry) {
+      if (typeof document === 'undefined') return;
+      var existing = document.getElementById('fzcMicModal');
+      if (existing) existing.remove();
+
+      var overlay = document.createElement('div');
+      overlay.className = 'fzc-mic-modal-overlay';
+      overlay.id = 'fzcMicModal';
+      overlay.setAttribute('role', 'dialog');
+      overlay.setAttribute('aria-modal', 'true');
+
+      overlay.innerHTML = (
+        '<div class="fzc-mic-modal-card">' +
+        '  <div class="fzc-mic-modal-icon-wrap">' +
+        '    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+        '      <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>' +
+        '      <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>' +
+        '      <line x1="12" y1="19" x2="12" y2="22"/>' +
+        '      <line x1="8" y1="22" x2="16" y2="22"/>' +
+        '    </svg>' +
+        '  </div>' +
+        '  <h3 class="fzc-mic-modal-title">' + esc(t('mic_modal_title', 'Izinkan Akses Mikrofon')) + '</h3>' +
+        '  <p class="fzc-mic-modal-desc">' +
+        '    ' + esc(t('mic_modal_desc', 'Fiezel memerlukan izin mikrofon agar kamu bisa mengobrol dua arah dengan partner AI seperti berteleponan sungguhan.')) +
+        '  </p>' +
+        '  <div class="fzc-mic-modal-help">' +
+        '    <strong>💡 ' + esc(t('mic_modal_help_title', 'Jika izin tidak muncul atau terblokir:')) + '</strong><br>' +
+        '    ' + esc(t('mic_modal_help_body', 'Ketuk ikon gembok 🔒 atau setelan di bilah alamat browser kamu, pilih "Izin Situs", lalu ubah Mikrofon menjadi "Izinkan" (Allow).')) +
+        '  </div>' +
+        '  <div class="fzc-mic-modal-actions">' +
+        '    <button type="button" class="fzc-mic-modal-btn-allow" id="fzcMicModalAllowBtn">' +
+        '      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+        '        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>' +
+        '        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>' +
+        '      </svg>' +
+        '      <span>' + esc(t('mic_modal_btn_allow', 'Aktifkan Mikrofon Sekarang')) + '</span>' +
+        '    </button>' +
+        '    <button type="button" class="fzc-mic-modal-btn-dismiss" id="fzcMicModalCancelBtn">' +
+        '      ' + esc(t('mic_modal_btn_cancel', 'Nanti Saja')) +
+        '    </button>' +
+        '  </div>' +
+        '</div>'
+      );
+
+      document.body.appendChild(overlay);
+
+      var allowBtn = overlay.querySelector('#fzcMicModalAllowBtn');
+      var cancelBtn = overlay.querySelector('#fzcMicModalCancelBtn');
+
+      if (allowBtn) {
+        allowBtn.addEventListener('click', function () {
+          if (navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === 'function') {
+            navigator.mediaDevices.getUserMedia({ audio: true })
+              .then(function (stream) {
+                try { stream.getTracks().forEach(function (tr) { tr.stop(); }); } catch (_) {}
+                overlay.remove();
+                if (typeof onRetry === 'function') onRetry();
+              })
+              .catch(function (permErr) {
+                console.warn('[FiezelVoiceCall] Permission still denied after prompt:', permErr);
+                if (typeof root.showToast === 'function') {
+                  root.showToast(t('call_permission_denied', 'Mikrofon masih belum diizinkan. Cek setelan browser kamu.'));
+                }
+              });
+          } else {
+            overlay.remove();
+            if (typeof onRetry === 'function') onRetry();
+          }
+        });
+      }
+
+      if (cancelBtn) {
+        cancelBtn.addEventListener('click', function () {
+          overlay.remove();
+        });
+      }
+    }
+
     // --- Lifecycle Controls ---
     function start(arg1, arg2, arg3, arg4) {
       var opts = {};
@@ -850,9 +935,9 @@
           setStatus(STATE.IDLE);
           unmountOverlay();
           emit('error', err);
-          if (typeof root.showToast === 'function') {
-            root.showToast(t('call_permission_denied', 'Tidak dapat mengakses mikrofon. Pastikan izin mikrofon telah diberikan.'));
-          }
+          showMicPermissionModal(function () {
+            start(opts);
+          });
           throw err;
         });
     }

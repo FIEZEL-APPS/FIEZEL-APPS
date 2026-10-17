@@ -216,6 +216,9 @@ html.fz-booting body{overflow:hidden}
 .fiezel-splash-still .fiezel-splash-word{transform:none!important;animation:fz-fade-in .3s ease var(--fz-b7,1150ms) both}
 .fiezel-splash-still .fiezel-splash-tag{transform:none!important;animation:fz-fade-in .24s ease var(--fz-b12,1900ms) both;opacity:0}
 .fiezel-splash-still .fiezel-splash-kelasku{transform:none!important;animation:fz-fade-in .24s ease var(--fz-b12,1900ms) both;opacity:0}
+.fiezel-splash-still .kelasku-wordmark,.fiezel-splash-still .kelasku-tag{animation:none!important;transform:none!important;filter:none!important}
+#fiezelBootSplash.is-leaving{animation:fz-splash-fade-out .32s cubic-bezier(.2,.8,.2,1) both}
+@keyframes fz-splash-fade-out{from{opacity:1}to{opacity:0}}
   </style>
   <!-- ============================================================================
        m025-199 (laporan OWNER: "saat boot memasukin splash sangat lama sekali").
@@ -487,7 +490,15 @@ html.fz-booting body{overflow:hidden}
       function usable(kind){try{var s=window[kind];var k='__fz_probe__';s.setItem(k,'1');s.removeItem(k);return true}catch(e){return false}}
       function memStore(){var m=new Map();return{get length(){return m.size},key:function(i){var ks=Array.from(m.keys());return i>=0&&i<ks.length?ks[i]:null},getItem:function(k){k=String(k);return m.has(k)?m.get(k):null},setItem:function(k,v){m.set(String(k),String(v))},removeItem:function(k){m.delete(String(k))},clear:function(){m.clear()}}}
       ['localStorage','sessionStorage'].forEach(function(kind){
-        if(!usable(kind)){try{Object.defineProperty(window,kind,{value:memStore(),configurable:true})}catch(e){}}
+        if(!usable(kind)){
+          var store = memStore();
+          try{Object.defineProperty(window,kind,{value:store,configurable:true,writable:true})}catch(e){
+            try{
+              var proto = Object.getPrototypeOf(window) || (typeof Window!=='undefined'&&Window.prototype);
+              if(proto)Object.defineProperty(proto,kind,{get:function(){return store;},configurable:true});
+            }catch(e2){}
+          }
+        }
       });
     })();
     /* Stempel waktu cat pertama + jaring pengaman. Stempelnya dipakai fiezel-splash.js untuk
@@ -497,25 +508,44 @@ html.fz-booting body{overflow:hidden}
        ada lagi yang akan menutupnya. */
     (function () {
       var doc = document, el = doc.getElementById('fiezelBootSplash');
+      /* m025-591: Fast bypass for warm reload. Jika murid sudah melihat splash hari ini
+         dan ini adalah muat ulang/navigasi di sesi yang sama, sembunyikan splash statis
+         sejak frame pertama agar murid tidak dipaksa menatap layar splash diam selama 3 detik. */
+      try {
+        var sStore = window.sessionStorage, lStore = window.localStorage;
+        if (el && sStore && lStore && sStore.getItem('fiezel-launch-session-v1') === '1') {
+          var todayWib = new Date(Date.now() + 25200000).toISOString().slice(0, 10);
+          if (lStore.getItem('fiezel-splash-seen-v1') === todayWib) {
+            el.style.display = 'none';
+            el.setAttribute('data-fiezel-boot-claimed', 'disposed');
+            doc.documentElement.classList.remove('fz-booting');
+            window.__fiezelBootSplashDismissed = true;
+          }
+        }
+      } catch (e) {}
       /* Boot JSON must not be allowed to wait forever on a mobile radio. This wrapper
          covers both the response headers and the body consumed by response.json(). */
       try {
         if (!window.__fiezelBootFetchGuard && typeof window.fetch === 'function') {
           var nativeFetch = window.fetch.bind(window);
           var bootFetchTimeoutMs = 12000;
-          var settleBootFetch = function (promise, controller) {
+          var settleBootFetch = function (promise, controller, cleanup) {
             var timeout = 0;
             var guard = new Promise(function (_, reject) {
               timeout = setTimeout(function () {
                 try { if (controller) controller.abort(); } catch (e) {}
-                reject(new Error());
+                var timeoutErr = new Error('Boot JSON timeout');
+                timeoutErr.name = 'TimeoutError';
+                reject(timeoutErr);
               }, bootFetchTimeoutMs);
             });
             return Promise.race([promise, guard]).then(function (value) {
               if (timeout) clearTimeout(timeout);
+              if (cleanup) cleanup();
               return value;
             }, function (error) {
               if (timeout) clearTimeout(timeout);
+              if (cleanup) cleanup();
               throw error;
             });
           };
@@ -526,21 +556,31 @@ html.fz-booting body{overflow:hidden}
             var controller = null;
             try { if (typeof AbortController === 'function') controller = new AbortController(); } catch (e) {}
             var options = init;
+            var cleanupSignal = null;
             if (controller) {
               options = {};
               if (init) for (var key in init) options[key] = init[key];
               options.signal = controller.signal;
               var sourceSignal = (init && init.signal) || (input && input.signal);
+              var onAbort = null;
+              cleanupSignal = function () {
+                try {
+                  if (sourceSignal && onAbort && typeof sourceSignal.removeEventListener === 'function') {
+                    sourceSignal.removeEventListener('abort', onAbort);
+                  }
+                } catch (e) {}
+              };
               try {
                 if (sourceSignal) {
                   if (sourceSignal.aborted) controller.abort();
-                  else sourceSignal.addEventListener('abort', function () {
-                    try { controller.abort(); } catch (e) {}
-                  }, { once: true });
+                  else {
+                    onAbort = function () { try { controller.abort(); } catch (e) {} };
+                    sourceSignal.addEventListener('abort', onAbort, { once: true });
+                  }
                 }
               } catch (e) {}
             }
-            var responsePromise = settleBootFetch(nativeFetch(input, options), controller);
+            var responsePromise = settleBootFetch(nativeFetch(input, options), controller, cleanupSignal);
             return responsePromise.then(function (response) {
               if (!response || typeof response.json !== 'function') return response;
               var originalJson = response.json.bind(response);
@@ -578,6 +618,9 @@ html.fz-booting body{overflow:hidden}
           }
         } catch (e) {}
       }
+      function clearWatchdog() {
+        if (timer) { clearTimeout(timer); timer = 0; }
+      }
       timer = setTimeout(function () {
         try { if (!el.parentNode) return; } catch (e) {}
         window.__fiezelBootWatchdogFired = true;
@@ -612,7 +655,7 @@ html.fz-booting body{overflow:hidden}
           title.style.cssText = 'display:block;font-size:20px;line-height:1.25;margin-bottom:10px';
           var message = doc.createElement('p');
           message.textContent = isTh ? 'การเชื่อมต่อหรือข้อมูลยังโหลดไม่เสร็จ' : 'Koneksi atau data belum selesai dimuat.';
-          message.style.cssText = 'margin:0;color:#E8D9C5;font-size:15px;line-height:1.5';
+          message.style.cssText = 'margin:0;color:#6E635C;font-size:15px;line-height:1.5';
           var retry = doc.createElement('button');
           retry.type = 'button';
           retry.textContent = isTh ? 'โหลดใหม่อีกครั้ง' : 'Muat ulang';
@@ -627,7 +670,7 @@ html.fz-booting body{overflow:hidden}
           (doc.body || doc.documentElement).appendChild(recovery);
         } catch (e) {}
       }
-      window.__fiezelBootSplash = { at: startedAt, dismiss: dismiss, clearRecovery: clearRecovery };
+      window.__fiezelBootSplash = { at: startedAt, dismiss: dismiss, clearRecovery: clearRecovery, clearWatchdog: clearWatchdog };
       try {
         window.addEventListener('pageshow', function (e) {
           if (!(e && e.persisted) && !window.__fiezelBootSplashDismissed) return;

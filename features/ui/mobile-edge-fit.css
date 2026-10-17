@@ -3855,7 +3855,7 @@ body.fz-stage-quiz .quiz-shell > .card,
    ========================================================================== */
 html:not(.fz-booting) .fz-splash-canvas,
 #fiezelBootSplash.is-leaving .fz-splash-canvas,
-html:not(.fz-booting) #fiezelBootSplash {
+html:not(.fz-booting) #fiezelBootSplash:not(.is-leaving) {
   display: none !important;
   pointer-events: none !important;
   visibility: hidden !important;
