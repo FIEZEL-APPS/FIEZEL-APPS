@@ -101,7 +101,7 @@
       urgency: 'advisory', surface: 'panel'
     }),
     'quota.aiChat.exhausted': Object.freeze({
-      title: 'Jatah ngobrol AI hari ini sudah habis',
+      title: 'Jatah obrolan hari ini sudah habis',
       spoken: 'Aku tetap bisa membalas dari naskah latihan sampai jatahnya kembali sesudah tengah malam.',
       silent: 'Aku tetap bisa membalas dari naskah latihan sampai jatahnya kembali sesudah tengah malam. Suaranya belum keluar sekarang, jadi bacalah teksnya dulu.',
       urgency: 'advisory', surface: 'panel'

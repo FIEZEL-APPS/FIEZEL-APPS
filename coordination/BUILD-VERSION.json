@@ -1,7 +1,7 @@
 {
-  "version": "m025-595",
+  "version": "m025-596",
   "claimedBy": "branch claude/intelligent-franklin-5cu69k",
-  "claimedAt": "2026-10-17T22:28:01.260Z",
-  "reason": "feat(chat): Ngobrol AI jadi teman ngobrol + saklar koreksi + ajakan koreksi (m025-595)",
+  "claimedAt": "2026-10-17T23:09:31.423Z",
+  "reason": "feat(voice-call): suara neural resmi tanpa TTS peramban (m025-596)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
