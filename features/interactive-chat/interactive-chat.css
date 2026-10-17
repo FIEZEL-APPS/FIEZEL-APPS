@@ -586,3 +586,156 @@ body.fz-ja-no-romaji .fzc-romaji {
     padding: 10px 14px;
   }
 }
+
+/* Shadowing & Pronunciation Practice */
+.fzc-action-btn.is-shadowing {
+  color: var(--fzc-accent-coral);
+  font-weight: 700;
+  animation: fzcMicPulse 1s infinite alternate ease-in-out;
+}
+
+.fzc-shadow-box {
+  margin-top: 8px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #F0FDF4, #E8F5E9);
+  border: 1px solid #A7F3D0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  animation: fzcSlideDown 0.25s ease-out;
+}
+
+.fzc-shadow-box.is-listening {
+  background: #FFF7ED;
+  border-color: #FDBA74;
+}
+
+.fzc-shadow-box.is-retry {
+  background: #FFFBEB;
+  border-color: #FDE68A;
+}
+
+.fzc-shadow-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.fzc-shadow-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #065F46;
+}
+
+.fzc-shadow-box.is-listening .fzc-shadow-badge {
+  color: #C2410C;
+}
+
+.fzc-shadow-box.is-retry .fzc-shadow-badge {
+  color: #92400E;
+}
+
+.fzc-shadow-xp {
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #10B981;
+  color: #FFFFFF;
+}
+
+.fzc-shadow-heard {
+  font-size: 0.78rem;
+  color: var(--fzc-ink-muted);
+  font-style: italic;
+}
+
+/* Scenario Goal Rail / Checkpoints */
+.fzc-goals-container {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--fzc-border);
+}
+
+.fzc-goals-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--fzc-ink-muted);
+}
+
+.fzc-goals-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fzc-goal-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.76rem;
+  color: var(--fzc-ink-muted);
+  transition: all 0.2s ease;
+}
+
+.fzc-goal-item.is-done {
+  color: #047857;
+  font-weight: 700;
+}
+
+.fzc-goal-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1.5px solid #D5C8B8;
+  font-size: 10px;
+  font-weight: 900;
+  color: transparent;
+}
+
+.fzc-goal-item.is-done .fzc-goal-check {
+  background: #10B981;
+  border-color: #10B981;
+  color: #FFFFFF;
+}
+
+.fzc-goal-bonus-tag {
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: #FEF3C7;
+  color: #B45309;
+  font-weight: 800;
+}
+
+/* Interim Voice Feedback Banner */
+.fzc-interim-banner {
+  padding: 6px 14px;
+  background: #FFF7ED;
+  border: 1px solid #FFEDD5;
+  border-radius: 12px;
+  margin-bottom: 8px;
+  font-size: 0.8rem;
+  color: #C2410C;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  animation: fzcSlideDown 0.2s ease;
+}
+
+@keyframes fzcSlideDown {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+

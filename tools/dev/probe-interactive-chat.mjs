@@ -37,6 +37,8 @@ server.listen(PORT, '127.0.0.1', async () => {
     const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
     await context.addInitScript(() => {
       localStorage.setItem('fz_user_name', 'Rian Pratama');
+      localStorage.setItem('fiezel_course', 'ja');
+      localStorage.setItem('fiezel_target_lang', 'ja');
       localStorage.setItem('fz_onboarding_done', '1');
       localStorage.setItem('fz_auth_skip', '1');
       localStorage.setItem('fiezel-auth-v1', JSON.stringify({ v: 1, signedIn: true, at: Date.now(), role: 'murid', via: 'akun' }));
@@ -121,6 +123,11 @@ server.listen(PORT, '127.0.0.1', async () => {
     const hasRuby = await page.evaluate(() => !!document.querySelector('.fzc-msg-row.is-assistant .fzc-bubble ruby'));
     console.log('Furigana <ruby> present in Japanese speech:', hasRuby ? 'YES' : 'NO');
 
+    // Verify Scenario Goals checklist is mounted
+    const hasGoals = await page.evaluate(() => !!document.querySelector('.fzc-goals-container'));
+    console.log('Scenario goals checklist mounted:', hasGoals ? 'YES' : 'NO');
+    if (!hasGoals) throw new Error('Scenario goals checklist missing in scenario card');
+
     // Click translation toggle
     console.log('4. Toggling translation on AI message...');
     await page.evaluate(() => {
@@ -134,6 +141,11 @@ server.listen(PORT, '127.0.0.1', async () => {
       return transBox && !transBox.classList.contains('is-hidden');
     });
     console.log('Is translation visible after toggle:', isTransVisible ? 'YES' : 'NO');
+
+    // Check Shadowing action button presence
+    const hasShadowBtn = await page.evaluate(() => !!document.querySelector('.fzc-action-btn[data-action="shadow"]'));
+    console.log('Shadowing action button present:', hasShadowBtn ? 'YES' : 'NO');
+    if (!hasShadowBtn) throw new Error('Shadowing action button missing on assistant bubble');
 
     // Click quick suggestion chip
     console.log('5. Clicking quick suggestion chip...');

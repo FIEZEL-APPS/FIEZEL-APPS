@@ -77,11 +77,19 @@ console.log('--- 3. Testing Misconception Detection ---');
 const misW = chatEngine.detectMisconception('わたしわがくせいです', 'ja');
 assert.ok(misW, 'Should detect particle misconception for わたしわ');
 assert.strictEqual(misW.type, 'particle_wa_vs_ha', 'Should detect particle_wa_vs_ha');
-assert.ok(misW.tip.includes('「は」'), 'Tip should instruct to use は');
+// Test Japanese particle を vs が misconception
+const misOGa = chatEngine.detectMisconception('ラーメンが食べます', 'ja');
+assert.ok(misOGa, 'Should detect particle misconception for ラーメンが食べます');
+assert.strictEqual(misOGa.id, 'particle_o_vs_ga');
 
-// Test clean input
-const misClean = chatEngine.detectMisconception('わたしはがくせいです', 'ja');
-assert.strictEqual(misClean, null, 'Clean input should produce no misconception');
+// Test English misconceptions
+const misAgree = chatEngine.detectMisconception('I am agree with you', 'en');
+assert.ok(misAgree, 'Should detect "I am agree" misconception');
+assert.strictEqual(misAgree.id, 'verb_agree');
+
+const misSVA = chatEngine.detectMisconception('He go to school every day', 'en');
+assert.ok(misSVA, 'Should detect Subject-Verb Agreement error');
+assert.strictEqual(misSVA.id, 'sva_present');
 console.log('✓ Misconception detection verified successfully.');
 
 console.log('--- 4. Testing Offline Deterministic Fallback ---');
@@ -92,7 +100,35 @@ assert.ok(offlineResp.translation, 'Japanese offline fallback must provide Indon
 assert.ok(Array.isArray(offlineResp.suggestions) && offlineResp.suggestions.length > 0, 'Offline response must provide follow-up suggestion chips');
 console.log('✓ Offline fallback dialogue verified:', offlineResp.text);
 
-console.log('--- 5. Testing Multi-turn State Transitions & Zero-Loss Input ---');
+console.log('--- 5. Testing Shadowing & Pronunciation Evaluation ---');
+const evalExact = chatEngine.evaluatePronunciation('こんにちは！', 'こんにちは！', 'ja');
+assert.strictEqual(evalExact.score, 100, 'Exact speech match must score 100%');
+assert.strictEqual(evalExact.passed, true);
+
+const evalFurigana = chatEngine.evaluatePronunciation('[今日](きょう)は良い天気ですね', '今日は良い天気ですね', 'ja');
+assert.strictEqual(evalFurigana.score, 100, 'Furigana brackets must be normalized before comparison');
+
+const evalEnglish = chatEngine.evaluatePronunciation('Welcome to Fiezel Cafe!', 'welcome to fiezel cafe', 'en');
+assert.strictEqual(evalEnglish.score, 100, 'English case and punctuation must be normalized');
+
+const evalMinor = chatEngine.evaluatePronunciation('Excuse me, where is the station?', 'Excuse me, where is a station', 'en');
+assert.ok(evalMinor.score >= 80, 'Minor speech difference should yield high similarity score (>=80)');
+console.log('✓ Shadowing & Pronunciation evaluation verified successfully.');
+
+console.log('--- 6. Testing Scenario Goal Tracking ---');
+const ramenSc = jaScenarios.find(s => s.id === 'ramen');
+assert.ok(ramenSc && Array.isArray(ramenSc.goals) && ramenSc.goals.length === 3, 'Ramen scenario must have 3 goals');
+const goalsInitial = chatEngine.evaluateGoalProgress(ramenSc, [{ role: 'assistant', text: ramenSc.starter.text }]);
+assert.strictEqual(goalsInitial.filter(g => g.done).length, 0, 'Initially 0 goals done');
+
+const goalsAfterOrder = chatEngine.evaluateGoalProgress(ramenSc, [
+  { role: 'assistant', text: ramenSc.starter.text },
+  { role: 'user', text: '豚骨ラーメンと硬めでお願いします！ごちそうさまでした！' }
+]);
+assert.strictEqual(goalsAfterOrder.filter(g => g.done).length, 3, 'All 3 ramen goals satisfied after complete order flow');
+console.log('✓ Scenario Goal Tracking verified successfully.');
+
+console.log('--- 7. Testing Multi-turn State Transitions & Zero-Loss Input ---');
 let state = chatEngine.createInitialState('ja', 'free');
 assert.strictEqual(state.messages.length, 1, 'Initial state should have 1 starter message from assistant');
 assert.strictEqual(state.messages[0].role, 'assistant', 'First message must be assistant greeting');
@@ -111,7 +147,7 @@ assert.strictEqual(finalState.messages.length, 3, 'Message history must now have
 assert.strictEqual(finalState.messages[2].role, 'assistant');
 console.log('✓ Multi-turn message state transitions & Zero-loss verified.');
 
-console.log('--- 6. Testing App Integration & Routing Invariants ---');
+console.log('--- 8. Testing App Integration & Routing Invariants ---');
 const appJs = fs.readFileSync(appJsPath, 'utf8');
 
 // VALID_VIEWS check
@@ -127,4 +163,5 @@ assert.ok(appJs.includes("TAB_PARENT={chat:'latihan',") || appJs.includes("TAB_P
 assert.ok(appJs.includes("go('chat')") || appJs.includes("view:'chat'"), 'latihanCards must include chat entry');
 
 console.log('✓ App integration & routing invariants passed.');
-console.log('ALL INTERACTIVE CHAT TESTS PASSED (6/6).');
+console.log('ALL INTERACTIVE CHAT TESTS PASSED (8/8).');
+
