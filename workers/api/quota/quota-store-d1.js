@@ -70,6 +70,9 @@ import { DENY_SCOPE, chargesFor, dayKeyForQuota, resetAtForQuota } from './quota
 export const COLUMN = Object.freeze({
   ai: { used: 'ai_used', held: 'ai_held' },
   aiTranslate: { used: 'ai_translate_used', held: 'ai_translate_held' },
+  // Kolom dari migrations/0018_quota_ai_chat.sql. WAJIB diterapkan SEBELUM Worker ini
+  // di-deploy: rekonsiliasi di bawah menulis kolom ini untuk setiap murid.
+  aiChat: { used: 'ai_chat_used', held: 'ai_chat_held' },
   ttsCalls: { used: 'tts_calls_used', held: 'tts_calls_held' },
   ttsChars: { used: 'tts_chars_used', held: 'tts_chars_held' }
 });
@@ -310,20 +313,20 @@ export async function reconcileHeld(db, now) {
   const perUser = new Map();
   for (const lease of (leases && leases.results) || []) {
     const charges = JSON.parse(lease.charges_json);
-    const acc = perUser.get(lease.user_id) || { ai: 0, aiTranslate: 0, ttsCalls: 0, ttsChars: 0 };
+    const acc = perUser.get(lease.user_id) || { ai: 0, aiTranslate: 0, aiChat: 0, ttsCalls: 0, ttsChars: 0 };
     for (const b of Object.keys(charges)) acc[b] += charges[b];
     perUser.set(lease.user_id, acc);
   }
   const rows = await db.prepare('SELECT user_id FROM quota_daily WHERE day = ?1').bind(day).all();
   let fixed = 0;
   for (const row of (rows && rows.results) || []) {
-    const acc = perUser.get(row.user_id) || { ai: 0, aiTranslate: 0, ttsCalls: 0, ttsChars: 0 };
+    const acc = perUser.get(row.user_id) || { ai: 0, aiTranslate: 0, aiChat: 0, ttsCalls: 0, ttsChars: 0 };
     await db
       .prepare(
         'UPDATE quota_daily SET ai_held = ?1, ai_translate_held = ?2, tts_calls_held = ?3, tts_chars_held = ?4,' +
-        ' touched_at = ?5 WHERE user_id = ?6 AND day = ?7'
+        ' ai_chat_held = ?8, touched_at = ?5 WHERE user_id = ?6 AND day = ?7'
       )
-      .bind(acc.ai, acc.aiTranslate, acc.ttsCalls, acc.ttsChars, now, row.user_id, day)
+      .bind(acc.ai, acc.aiTranslate, acc.ttsCalls, acc.ttsChars, now, row.user_id, day, acc.aiChat)
       .run();
     fixed += 1;
   }
@@ -338,7 +341,7 @@ export async function loadStateD1(db, { userId, now, limits }) {
   const day = dayKeyForQuota(now);
   const row = await db.prepare('SELECT * FROM quota_daily WHERE user_id = ?1 AND day = ?2').bind(userId, day).first();
   const leases = await db.prepare('SELECT * FROM quota_reservation WHERE user_id = ?1 AND day = ?2').bind(userId, day).all();
-  const counters = { ai: 0, aiTranslate: 0, ttsCalls: 0, ttsChars: 0 };
+  const counters = { ai: 0, aiTranslate: 0, aiChat: 0, ttsCalls: 0, ttsChars: 0 };
   if (row) for (const b of Object.keys(COLUMN)) counters[b] = row[COLUMN[b].used] || 0;
   return {
     schema: 'fiezel-quota-state-v1',

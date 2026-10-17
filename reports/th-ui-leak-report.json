@@ -1,6 +1,6 @@
 {
   "schema": "fiezel-th-ui-leak-v1",
-  "generatedAt": "2026-10-17T20:26:01.755Z",
+  "generatedAt": "2026-10-17T22:31:35.046Z",
   "files": {
     "app.js": {
       "leaks": 3,
@@ -295,23 +295,23 @@
       "budget": 5,
       "sample": [
         {
-          "line": 123,
+          "line": 129,
           "text": "Suara cadanganku dulu, ya. Ini bukan kesalahanmu dan nggak ada yang hilang."
         },
         {
-          "line": 128,
+          "line": 134,
           "text": "Suara gagal disiapkan"
         },
         {
-          "line": 134,
+          "line": 140,
           "text": "Suara belum tersedia untuk kalimat ini"
         },
         {
-          "line": 152,
+          "line": 158,
           "text": "Suara dari perangkatmu tetap jalan, dan latihan yang sudah tersimpan tetap bisa kamu kerjakan."
         },
         {
-          "line": 160,
+          "line": 166,
           "text": "Masuk lagi sebentar, ya. Yang sudah selesai tetap aman."
         }
       ]
@@ -504,8 +504,8 @@
     }
   },
   "copyKeys": {
-    "id": 4374,
-    "th": 4198,
+    "id": 4377,
+    "th": 4201,
     "idTanpaTh": 0
   },
   "pass": true

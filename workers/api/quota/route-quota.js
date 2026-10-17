@@ -40,6 +40,7 @@ export const COPY_KEY = Object.freeze({
   degraded: 'quota.degraded',
   ai_daily: 'quota.ai.exhausted',
   ai_translate_daily: 'quota.aiTranslate.exhausted',
+  ai_chat_daily: 'quota.aiChat.exhausted',
   tts_daily_calls: 'quota.tts.exhausted',
   tts_daily_chars: 'quota.tts.exhausted',
   rate_limited: 'quota.rate.slowdown',

@@ -115,6 +115,22 @@ jobs:
           if (toml.includes('<isi setelah')) { console.error('masih ada placeholder yang tidak tertangani'); process.exit(1); }
           fs.writeFileSync('wrangler.toml', toml);
           JS
+          # Migrasi 0018 (bucket kuota Ngobrol AI `aiChat`) WAJIB ada sebelum Worker yang memuat
+          # COLUMN.aiChat: reconcileHeld() menulis ai_chat_held untuk SETIAP murid, jadi Worker
+          # baru di atas database lama mematahkan rekonsiliasi kuota semua bucket. Idempoten:
+          # kolom sudah ada = lewati. Pemeriksaan gagal karena sebab lain (izin token, jaringan)
+          # = deploy DIBATALKAN, bukan diteruskan dengan harapan.
+          if npx --yes wrangler@3 d1 execute CORE_DB --remote --command "SELECT ai_chat_used, ai_chat_held FROM quota_daily LIMIT 1" > /tmp/m0018-check.log 2>&1; then
+            echo "Migrasi 0018 sudah diterapkan."
+          elif grep -qi "no such column" /tmp/m0018-check.log; then
+            npx --yes wrangler@3 d1 execute CORE_DB --remote --file=migrations/0018_quota_ai_chat.sql
+            npx --yes wrangler@3 d1 execute CORE_DB --remote --command "SELECT ai_chat_used, ai_chat_held FROM quota_daily LIMIT 1"
+            echo "Migrasi 0018 diterapkan."
+          else
+            cat /tmp/m0018-check.log
+            echo "Skema D1 tidak bisa diperiksa (bukan 'no such column'): deploy dibatalkan."
+            exit 1
+          fi
           npx --yes wrangler@3 deploy
           CFG_ID=$(node -e "try{const b=JSON.parse(require('fs').readFileSync('/tmp/settings.json')).result.bindings.find(x=>x.name==='CFG');console.log(b.id||b.namespace_id||'')}catch{console.log('')}")
           if [ -n "$CFG_ID" ] && [ -n "$VAPID_PUBLIC_KEY" ]; then

@@ -26,6 +26,7 @@ sini yang menjadi urutan resmi.
 | `0015_item_pool.sql` | `fiezel-evidence` (binding `EVIDENCE_DB`) | `item_pool_daily`, `item_pool_dedup`, `item_pool_table` |
 | `0016_item_pool_probe.sql` | `fiezel-evidence` (binding `EVIDENCE_DB`) | `item_pool_probe_daily` |
 | `0017_social_friend_idx.sql` | `fiezel-core` (binding `CORE_DB`) | *(nol tabel baru — hanya indeks)* |
+| `0018_quota_ai_chat.sql` | `fiezel-core` (binding `CORE_DB`) | *(nol tabel baru — kolom `ai_chat_used`/`ai_chat_held` di `quota_daily`)* |
 
 Tabel di atas adalah **satu-satunya** daftar berkas→database yang ditulis manusia.
 `tools/d1-schema-check.mjs` dan `tests/d1-schema-contract-test.js` **menurunkan** peta itu
@@ -112,6 +113,9 @@ wrangler d1 execute fiezel-evidence --remote --file=migrations/0015_item_pool.sq
 wrangler d1 execute fiezel-evidence --remote --file=migrations/0016_item_pool_probe.sql
 # --- fiezel-core: indeks reverse lookup teman (SLOT 7) ---
 wrangler d1 execute fiezel-core --remote --file=migrations/0017_social_friend_idx.sql
+# --- fiezel-core: bucket kuota Ngobrol AI (WAJIB sebelum deploy Worker yang memuat aiChat;
+#     .github/workflows/deploy-api-worker.yml menerapkannya otomatis bila kolomnya belum ada) ---
+wrangler d1 execute fiezel-core --remote --file=migrations/0018_quota_ai_chat.sql
 ```
 
 `0009_learner_evidence.sql` masuk `fiezel-core` dan **bukan** `fiezel-evidence`,

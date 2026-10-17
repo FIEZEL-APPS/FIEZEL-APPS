@@ -1,7 +1,7 @@
 {
-  "version": "m025-594",
-  "claimedBy": "branch fix/smooth-splash-particle-kinematics",
-  "claimedAt": "2026-10-17T20:53:03.386Z",
-  "reason": "fix(splash): sempurnakan kinematika konvergensi partikel C2 dan crossfade komplementer (m025-594)",
+  "version": "m025-595",
+  "claimedBy": "branch claude/intelligent-franklin-5cu69k",
+  "claimedAt": "2026-10-17T22:28:01.260Z",
+  "reason": "feat(chat): Ngobrol AI jadi teman ngobrol + saklar koreksi + ajakan koreksi (m025-595)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

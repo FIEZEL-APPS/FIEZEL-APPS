@@ -18778,7 +18778,10 @@ const AI_TASK_MAP=Object.freeze({
   writing_feedback:'writing_feedback',
   context_coach:'context_coach',
   translate_subtitle:'translate_subtitle',subtitle_translate:'translate_subtitle',
-  session_recap:'session_recap'
+  session_recap:'session_recap',
+  // Ngobrol AI (audit 17 Okt 2026): giliran obrolan, bukan pertanyaan materi. Koreksi
+  // hanya lewat task kedua, yang dipanggil HANYA saat murid menyalakan saklar koreksi.
+  conversation_turn:'conversation_turn',conversation_correct:'conversation_correct'
 });
 // `surface` adalah enum WAJIB pada tutor_turn: ['ask','coach','classroom','library'].
 const AI_TASK_SURFACE=Object.freeze({
@@ -18909,6 +18912,17 @@ function aiTaskInputFor(clientTask,ctx){
     const itemId=aiClampText(c.itemId,80);if(itemId)input.itemId=itemId;
     return input;
   }
+  if(worker==='conversation_turn'||worker==='conversation_correct'){
+    const message=aiClampText(c.message,400);
+    if(!message)return null;
+    const input={message,course:c.course==='ja'?'ja':'en',level:aiClampLevel(c.level)};
+    // Peran skenario dirakit Worker dari enum; id asing tidak dikirim (Worker menolaknya 400).
+    const scenarioId=aiClampText(c.scenarioId,40);if(/^[a-z_]+$/.test(scenarioId))input.scenarioId=scenarioId;
+    // Riwayat dikirim sebagai DATA berlabel 'u:'/'a:' (skema Worker: array string, 8 x 320).
+    const history=(Array.isArray(c.history)?c.history:[]).map(v=>aiClampText(v,320)).filter(v=>/^[ua]:/.test(v)).slice(-8);
+    if(history.length)input.history=history;
+    return input;
+  }
   if(worker==='session_recap'){
     const weakSkills=(Array.isArray(c.weakSkills)?c.weakSkills:[]).map(v=>aiClampText(v,80)).filter(Boolean).slice(0,5);
     if(!weakSkills.length)return null;
@@ -18943,6 +18957,7 @@ function classifyAiTaskResponse(status,data){
   const text=typeof d.text==='string'?d.text:'';
   if(code>=200&&code<300&&text.trim()){
     return{kind:d.degraded===true?'degraded':'ok',text,
+      turn:(d.degraded!==true&&d.turn&&typeof d.turn==='object'&&!Array.isArray(d.turn))?d.turn:null,
       source:String(d.source||''),breaker:String(d.breaker||''),reason:String(d.reason||''),
       retryAfter:Number(d.retryAfter)||0,note:d.degraded===true?AI_TASK_COPY.degraded.note:''};
   }
@@ -18993,7 +19008,7 @@ async function askCloudflareAITask(clientTask,ctx){
   if(response.kind==='protocol'){aiTaskProtocolOk=false;throw aiTaskError('ai_protocol_mismatch',AI_TASK_COPY.provider)}
   if(response.kind==='quota')throw aiTaskError('quota_exhausted',AI_TASK_COPY.ai,{retryAfter:response.retryAfter,transport:'cf'});
   if(response.kind==='error')throw aiTaskError('ai_unavailable',AI_TASK_COPY.provider,{retryAfter:response.retryAfter,breaker:response.breaker,transport:'cf'});
-  return{text:response.text,degraded:response.kind==='degraded',note:response.note,source:response.source,breaker:response.breaker,reason:response.reason,transport:'cf'};
+  return{text:response.text,turn:response.turn||null,degraded:response.kind==='degraded',note:response.note,source:response.source,breaker:response.breaker,reason:response.reason,transport:'cf'};
 }
 /**
  * Pemanggil AI dengan hasil BERSTRUKTUR. Ini yang tahu soal transport; pemanggil di atasnya

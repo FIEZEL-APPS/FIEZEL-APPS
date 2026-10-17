@@ -260,6 +260,8 @@ export function parseStatement(stmt) {
   if (m) return { kind: 'drop-index', name: m[1].toLowerCase() };
   m = /^DROP\s+TABLE\s+(?:IF\s+EXISTS\s+)?["`[]?([A-Za-z_][\w$]*)["`\]]?/i.exec(stmt);
   if (m) return { kind: 'drop-table', name: m[1].toLowerCase() };
+  m = /^ALTER\s+TABLE\s+["`[]?([A-Za-z_][\w$]*)["`\]]?\s+ADD\s+(?:COLUMN\s+)?["`[]?([A-Za-z_][\w$]*)["`\]]?/i.exec(stmt);
+  if (m) return { kind: 'add-column', table: m[1].toLowerCase(), column: m[2].toLowerCase() };
   return { kind: 'other', text: stmt };
 }
 
@@ -281,6 +283,11 @@ export function expectedSchema(dir, files) {
       else if (p.kind === 'index') indexes.set(p.name, { ...p, file });
       else if (p.kind === 'drop-index') indexes.delete(p.name);
       else if (p.kind === 'drop-table') tables.delete(p.name);
+      else if (p.kind === 'add-column') {
+        const t = tables.get(p.table);
+        if (!t) unparsed.push({ file, text: stmt.slice(0, 120) });
+        else if (!t.columns.includes(p.column)) t.columns.push(p.column);
+      }
       else if (p.kind === 'unparsed') unparsed.push({ file, text: p.text.slice(0, 120) });
     }
   }

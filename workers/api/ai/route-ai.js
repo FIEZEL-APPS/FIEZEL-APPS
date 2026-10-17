@@ -562,6 +562,7 @@
     var clamped = false;     // P3: jawaban dipotong di batas kalimat sebelum dikirim
     var clampedFrom = 0;     // jumlah kalimat SEBELUM dipotong (untuk audit prompt)
     var providerThrew = null; // galat mentah, dipakai untuk memutuskan pelepasan reservasi
+    var shapedTurn = null;    // Ngobrol AI: {reply, translation, correction, correctionChecked}
     try {
       var result = await callProvider(env, model.id, payload, spec.timeoutMs, reservation);
       // DUA BENTUK JAWABAN dibaca sekaligus; `reasoning` hanya untuk klasifikasi sebab dan
@@ -578,6 +579,20 @@
         failureKind = 'empty_body';
         failureReason = modelFailure;
         text = '';
+      } else if (typeof spec.shapeOutput === 'function') {
+        // Task berbentuk (Ngobrol AI): keluaran bertag diurai dan diperiksa pemeriksa task
+        // itu sendiri. Kontrak prosa umum (kanon "nggak", hitung kalimat atas seluruh
+        // keluaran) tidak berlaku pada balasan berbahasa target. Gagal mutu = bukan
+        // kegagalan breaker, sama seperti cabang kontrak di bawah.
+        var shaped = AiTasks.shapeOutput(taskName, text, { input: verdict.input, locale: verdict.locale, model: model });
+        if (shaped.ok) {
+          text = shaped.text;
+          shapedTurn = shaped.turn;
+        } else {
+          qualityRejected = true;
+          failureReason = shaped.reason;
+          text = '';
+        }
       } else {
         // KONTRAK MUTU: batas kalimat, kanon kata, tidak kosong. Provider SEHAT di sini — yang
         // gagal adalah jawabannya — jadi ini TIDAK menghitung kegagalan breaker: membuka breaker
@@ -731,6 +746,7 @@
       quotaCharged: quotaChecked === true,
       usage: { inputTokens: inTokens, outputTokens: outTokens, ms: now() - started }
     });
+    if (shapedTurn) okBody.turn = shapedTurn;
     if (clamped) {
       // Jawaban NYATA dari provider dan MENAGIH - model bekerja, jawabannya dipakai, hanya
       // ekornya dipotong. Ditandai supaya potongan yang sering terjadi terlihat di telemetri

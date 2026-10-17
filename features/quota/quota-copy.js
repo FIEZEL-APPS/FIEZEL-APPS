@@ -100,6 +100,12 @@
       silent: 'Arti kata dari kamus di perangkat ini tetap bisa kamu buka. Suaranya belum keluar sekarang, jadi bacalah teksnya dulu.',
       urgency: 'advisory', surface: 'panel'
     }),
+    'quota.aiChat.exhausted': Object.freeze({
+      title: 'Jatah ngobrol AI hari ini sudah habis',
+      spoken: 'Aku tetap bisa membalas dari naskah latihan sampai jatahnya kembali sesudah tengah malam.',
+      silent: 'Aku tetap bisa membalas dari naskah latihan sampai jatahnya kembali sesudah tengah malam. Suaranya belum keluar sekarang, jadi bacalah teksnya dulu.',
+      urgency: 'advisory', surface: 'panel'
+    }),
     'quota.rate.slowdown': Object.freeze({
       title: 'Kecepatan menekannya perlu diberi jeda',
       spoken: 'Aku pakai suara cadanganku untuk kalimat ini. Tunggu sebentar sebelum menekan lagi.',
