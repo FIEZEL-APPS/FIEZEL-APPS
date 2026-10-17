@@ -113,7 +113,8 @@ wrangler d1 execute fiezel-evidence --remote --file=migrations/0015_item_pool.sq
 wrangler d1 execute fiezel-evidence --remote --file=migrations/0016_item_pool_probe.sql
 # --- fiezel-core: indeks reverse lookup teman (SLOT 7) ---
 wrangler d1 execute fiezel-core --remote --file=migrations/0017_social_friend_idx.sql
-# --- fiezel-core: bucket kuota Ngobrol AI (WAJIB sebelum deploy Worker yang memuat aiChat) ---
+# --- fiezel-core: bucket kuota Ngobrol AI (WAJIB sebelum deploy Worker yang memuat aiChat;
+#     .github/workflows/deploy-api-worker.yml menerapkannya otomatis bila kolomnya belum ada) ---
 wrangler d1 execute fiezel-core --remote --file=migrations/0018_quota_ai_chat.sql
 ```
 

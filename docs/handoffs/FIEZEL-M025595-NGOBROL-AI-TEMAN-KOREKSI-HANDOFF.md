@@ -54,7 +54,9 @@ cd workers/api
 wrangler d1 execute fiezel-core --remote --file=migrations/0018_quota_ai_chat.sql
 ```
 `reconcileHeld()` menulis `ai_chat_held` untuk setiap murid; Worker baru di atas database lama
-membuat rekonsiliasi kuota gagal. `tools/d1-schema-check.mjs` dan `tests/d1-schema-contract-test.js`
+membuat rekonsiliasi kuota gagal.
+`.github/workflows/deploy-api-worker.yml` kini menerapkannya otomatis sebelum `wrangler deploy`
+(idempoten; kalau skema tidak bisa diperiksa, deploy dibatalkan). `tools/d1-schema-check.mjs` dan `tests/d1-schema-contract-test.js`
 sekarang mengenal `ALTER TABLE … ADD COLUMN`.
 
 ### Klien
