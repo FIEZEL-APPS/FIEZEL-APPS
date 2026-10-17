@@ -62,7 +62,7 @@ Pengujian empiris dilakukan dengan mengemulasikan murid nyata di peramban Chromi
 
 ## 3. Daftar Berkas yang Disentuh & Perubahan
 1. `features/interactive-chat/fiezel-interactive-chat.js`:
-   - Implementasi `evaluatePronunciation(target, spoken, course)` berbasis Levenshtein distance.
+   - Implementasi `evaluatePronunciation(target, spoken, course)` berbasis Levenshtein distance dengan dual normalisasi (Kanji surface form & Furigana kana reading + konversi Hiragana) agar input STT peramban tidak gagal secara salah.
    - Implementasi `startShadowing(msgId, targetText)` dan `dispatchShadowingTelemetry()`.
    - Implementasi `evaluateGoalProgress(scenario, messages)` untuk checklist target skenario.
    - Implementasi `state.scenarioHistories` dan perbaikan anti-race condition pada `deliverAssistantReply`.

@@ -106,7 +106,10 @@ assert.strictEqual(evalExact.score, 100, 'Exact speech match must score 100%');
 assert.strictEqual(evalExact.passed, true);
 
 const evalFurigana = chatEngine.evaluatePronunciation('[今日](きょう)は良い天気ですね', '今日は良い天気ですね', 'ja');
-assert.strictEqual(evalFurigana.score, 100, 'Furigana brackets must be normalized before comparison');
+assert.strictEqual(evalFurigana.score, 100, 'Furigana brackets must normalize to Kanji surface form');
+
+const evalKanaSpoken = chatEngine.evaluatePronunciation('[今日](きょう)は良い天気ですね', 'きょうは良い天気ですね', 'ja');
+assert.strictEqual(evalKanaSpoken.score, 100, 'Furigana phonetic reading must match STT Hiragana output with 100%');
 
 const evalEnglish = chatEngine.evaluatePronunciation('Welcome to Fiezel Cafe!', 'welcome to fiezel cafe', 'en');
 assert.strictEqual(evalEnglish.score, 100, 'English case and punctuation must be normalized');

@@ -340,35 +340,58 @@
     return v1[b.length];
   }
 
-  function normalizeSpeechText(str) {
+  function toHiragana(str) {
+    if (!str) return '';
+    return str.replace(/[\u30a1-\u30f6]/g, function (m) {
+      return String.fromCharCode(m.charCodeAt(0) - 0x60);
+    });
+  }
+
+  function normalizeSpeechText(str, useKanaReading) {
     if (!str) return '';
     var s = String(str);
-    // Strip furigana bracket notation [Kanji](reading)
-    s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '$1');
+    if (useKanaReading) {
+      s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '$2');
+    } else {
+      s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '$1');
+    }
     s = s.replace(/[\s\.,!\?、。！？・'"`~\-_:;\(\)]/g, '');
+    s = toHiragana(s);
     return s.toLowerCase();
+  }
+
+  function calcSimScore(a, b) {
+    if (!a || !b) return 0;
+    if (a === b) return 100;
+    var dist = levenshteinDistance(a, b);
+    var maxLen = Math.max(a.length, b.length);
+    var rawRatio = Math.max(0, 1 - (dist / maxLen));
+    return Math.min(100, Math.max(0, Math.round(rawRatio * 100)));
   }
 
   function evaluatePronunciation(targetText, spokenText, course) {
     if (!targetText || !spokenText) {
       return { score: 0, heard: spokenText || '', passed: false };
     }
-    var normTarget = normalizeSpeechText(targetText);
-    var normSpoken = normalizeSpeechText(spokenText);
-    if (!normTarget || !normSpoken) {
+    var normSpoken = normalizeSpeechText(spokenText, false);
+    if (!normSpoken) {
       return { score: 0, heard: spokenText, passed: false };
     }
-    if (normTarget === normSpoken) {
-      return { score: 100, heard: spokenText, passed: true };
+
+    var score = 0;
+    if (course === 'ja') {
+      var normTargetKanji = normalizeSpeechText(targetText, false);
+      var normTargetKana = normalizeSpeechText(targetText, true);
+      var scoreKanji = calcSimScore(normTargetKanji, normSpoken);
+      var scoreKana = calcSimScore(normTargetKana, normSpoken);
+      score = Math.max(scoreKanji, scoreKana);
+    } else {
+      var normTarget = normalizeSpeechText(targetText, false);
+      score = calcSimScore(normTarget, normSpoken);
     }
 
-    var dist = levenshteinDistance(normTarget, normSpoken);
-    var maxLen = Math.max(normTarget.length, normSpoken.length);
-    var rawRatio = Math.max(0, 1 - (dist / maxLen));
-    var score = Math.round(rawRatio * 100);
-
     return {
-      score: Math.min(100, Math.max(0, score)),
+      score: score,
       heard: spokenText,
       passed: score >= 60
     };
