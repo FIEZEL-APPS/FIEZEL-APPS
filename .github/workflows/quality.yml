@@ -651,6 +651,10 @@ jobs:
           node tests/search-feedback-test.js
           node tests/view-reachability-test.js
           node tests/interactive-chat-test.js
+          node tests/voice-call-two-way-test.js
+          node tests/shadowing-eval-card-test.js
+          node tests/interactive-chat-braincore-telemetry-test.js
+          node tests/speech-synthesis-engine-test.js
           node tests/diag-panel-test.js
           node tests/diag-search-test.js
           node tests/sw-corp-test.js
