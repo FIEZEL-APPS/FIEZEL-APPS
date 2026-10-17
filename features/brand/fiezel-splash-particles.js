@@ -39,14 +39,13 @@
     F_START: 120,       // partikel F paling awal mulai bergerak
     F_STEM_LOCK: 760,   // batang tegak F terkunci (bias lebih awal)
     F_LOCK: 950,        // F utuh terkunci → event 'f-locked'
-    BARS_START: 700,    // partikel batang emas mulai merapat
+    BARS_START: 520,    // partikel batang emas mulai mengalir anggun
     BARS_SOLID: 1150,   // dua kapsul terbaca → event 'bars-solid'
     F_FADE_IN: 820,     // (harness) SVG F tajam mulai crossfade masuk
-    F_FADE_OUT0: 870,   // partikel F memudar SEIRING SVG masuk — di 950 debu
-    F_FADE_OUT1: 970,   //   tinggal ≈4% sehingga kunci F jatuh KREM TAJAM,
-                        //   tanpa bintik emas/abu (perbaikan QA-VISUAL P1-1)
-    B_FADE_OUT0: 1150,  // partikel batang memudar setelah serah-terima
-    B_FADE_OUT1: 1300,  // partikel batang habis — tak ada titik tersisa
+    F_FADE_OUT0: 820,   // partikel F memudar complementary seiring SVG masuk (820-960)
+    F_FADE_OUT1: 960,   // tuntas tepat saat SVG F solid sempurna
+    B_FADE_OUT0: 1060,  // partikel batang memudar complementary seiring SVG batang masuk (1060-1180)
+    B_FADE_OUT1: 1180,  // tuntas saat dua batang emas pejal
     DONE: 1320
   };
 
@@ -171,37 +170,36 @@
         tx[idx] = _tmpPt.x; ty[idx] = _tmpPt.y;
         grpI[idx] = rc.grp;
 
-        // ---- Posisi sebar: galaksi dua-lengan yang berputar pelan.
-        // Partikel BATANG EMAS disebar di sisi KANAN (awan menunggu di sisi
-        // targetnya) supaya saat F terkunci, sisa awan terbaca disengaja.
+        // ---- Posisi sebar: galaksi spiral kosmik terpadu (C2 kinematis).
+        // Partikel krem (F) membentuk galaksi spiral dua lengan elegan,
+        // partikel emas (batang) membentuk pita spiral anggun di kuadran kanan.
         var u = rnd();
-        var r = fieldR * (0.30 + 0.70 * Math.pow(u, 0.62));
+        var r = fieldR * (0.28 + 0.72 * Math.pow(u, 0.62));
         var th;
         if (rc.grp >= 2) {
-          // Awan-tunggu batang emas: gumpalan lonjong RAPAT di sekitar
-          // centroid kedua batang (356,256) — tidak meluber ke tepi layar,
-          // terbaca sebagai awan yang sengaja menunggu di posisi targetnya.
-          th = rnd() * 6.2832;
-          var rb = fieldR * (0.10 + 0.42 * Math.pow(u, 0.7));
-          sx[idx] = 356 + Math.cos(th) * rb * 0.72;
-          sy[idx] = 256 + Math.sin(th) * rb * 1.05;
+          // Awan pita spiral emas: mengorbit harmonis bersama galaksi sebelum
+          // mengalir anggun ke target dua batang (centroid visual ~340, 256).
+          var thGold = (rc.grp === 2 ? -0.42 : 0.42) + (rnd() - 0.5) * 0.85 + r * 0.009;
+          var rg = fieldR * (0.32 + 0.68 * Math.pow(u, 0.65));
+          sx[idx] = LOGO_CX + Math.cos(thGold) * rg * 1.08;
+          sy[idx] = LOGO_CY + Math.sin(thGold) * rg * 0.88;
         } else {
-          th = (idx % 2 ? 0 : Math.PI) + r * 0.0105 + (rnd() - 0.5) * 0.9;
+          th = (idx % 2 ? 0 : Math.PI) + r * 0.0105 + (rnd() - 0.5) * 0.65;
           sx[idx] = LOGO_CX + Math.cos(th) * r * 1.12;
           sy[idx] = LOGO_CY + Math.sin(th) * r * 0.88;
         }
 
-        // ---- Jendela konvergensi (stagger tiba satu-satu, kunci renyah).
+        // ---- Jendela konvergensi: aliran kontinu elegan tanpa jeda mati.
         var j = rnd();
-        if (rc.grp === 0) {          // batang F: bias LEBIH AWAL
+        if (rc.grp === 0) {          // batang F: memadat 120 -> 520..760ms
           t0a[idx] = T.F_START + j * 160;
           t1a[idx] = 520 + Math.pow(rnd(), 1.4) * (T.F_STEM_LOCK - 520);
-        } else if (rc.grp === 1) {   // lengan F: menyusul, rampung 910 — partikel
-          t0a[idx] = T.F_START + 90 + j * 210; // “memegang” bentuk sampai ≈98%
-          t1a[idx] = 620 + Math.pow(rnd(), 1.25) * (910 - 620); // sebelum SVG penuh @944
-        } else {                     // batang emas: 700 → ≤1148
-          t0a[idx] = T.BARS_START + j * 190;
-          t1a[idx] = 960 + Math.pow(rnd(), 1.2) * (1148 - 960) + (rc.grp === 3 ? 0 : -30);
+        } else if (rc.grp === 1) {   // lengan F: menyusul mengalir 210 -> 620..910ms
+          t0a[idx] = T.F_START + 90 + j * 210;
+          t1a[idx] = 620 + Math.pow(rnd(), 1.25) * (910 - 620);
+        } else {                     // batang emas: mulai mengalir anggun 520ms -> tiba 980..1148ms
+          t0a[idx] = 520 + j * 200;
+          t1a[idx] = 980 + Math.pow(rnd(), 1.2) * (1148 - 980) + (rc.grp === 3 ? 0 : -35);
         }
 
         // ---- Rupa titik: 1–2.5px; huruf F condong krem, batang condong emas
@@ -216,10 +214,9 @@
         swA[idx] = 16 + rnd() * 26;               // amplitudo (unit 512)
         ph1[idx] = rnd() * 6.2832;
         ph2[idx] = rnd() * 6.2832;
-        /* Orbit awan pra-konvergensi: dipercepat ×3.5 dari tuning awal —
-           300ms pertama kini memperlihatkan busur gerak yang jelas antar
-           frame (dulu “debu statis”, QA-VISUAL P2-3). */
-        rotW[idx] = (rnd() < 0.5 ? -1 : 1) * (0.00042 + rnd() * 0.00048);
+        /* Orbit awan pra-konvergensi: vortex kosmik terpadu searah.
+           Kecepatan sudut berpadu harmonis tanpa tabrakan kacau. */
+        rotW[idx] = 0.00062 + rnd() * 0.00032;
       }
     }
     emitF = false; emitB = false;
@@ -234,34 +231,31 @@
   function posAt(i, t) {
     var p = (t - t0a[i]) / (t1a[i] - t0a[i]);
     if (p <= 0) p = 0; else if (p >= 1) p = 1;
-    // Easing: berangkat halus, meluncur cepat, lalu MENGUNCI renyah
-    // (pangkat 3.2 → kecepatan datang masih terasa saat snap ke target).
-    var q = 1 - p, e = 1 - q * q * q * (1 + 0.2 * p);
 
-    if (e >= 1) { _px = tx[i]; _py = ty[i]; return; } // terkunci: presisi mutlak
+    // Easing: Quintic Smootherstep (kontinuitas C2, v=0 dan a=0 di titik mendarat)
+    var e = p * p * p * (p * (p * 6 - 15) + 10);
 
-    // Awan pra-konvergensi berputar pelan mengelilingi pusat logo
-    // (rotasi membeku begitu partikel berangkat — bobotnya (1-e) → 0).
-    var a = rotW[i] * (t < t0a[i] ? t : t0a[i]);
+    // Orbit kontinu mengitari pusat visual logo (LOGO_CX, LOGO_CY)
+    var a = rotW[i] * t;
     var ca = Math.cos(a), sa = Math.sin(a);
     var dx = sx[i] - LOGO_CX, dy = sy[i] - LOGO_CY;
     var ox = LOGO_CX + dx * ca - dy * sa;
     var oy = LOGO_CY + dx * sa + dy * ca;
 
+    // Jalur konvergensi: interpolasi mulus dari posisi orbit (ox, oy) ke target (tx, ty)
     var x = ox + (tx[i] - ox) * e;
     var y = oy + (ty[i] - oy) * e;
 
-    // Curl-noise analitik (medan hampir bebas-divergensi dari dua gelombang
-    // potensial) — pusaran koheren selama terbang, meluruh (1-e)^1.6 → snap.
-    var w = (1 - e); w = w * Math.sqrt(w) * swA[i];
+    // Curl-noise analitik dinamis: mekar anggun saat terbang, meluruh kuadratik ke 0 di target
+    var w = (p > 0 && p < 1) ? 2.6 * p * (1 - p) * (1 - p) * swA[i] : 0;
     _px = x + w * (Math.sin(y * 0.021 + t * 0.0011 + ph1[i]) +
                    0.5 * Math.sin(y * 0.047 - t * 0.0007 + ph2[i]));
     _py = y + w * (Math.cos(x * 0.019 - t * 0.0009 + ph2[i]) +
                    0.5 * Math.cos(x * 0.043 + t * 0.0013 + ph1[i]));
   }
 
-  /* Alfa per grup: partikel F memudar setelah SVG tajam masuk; partikel
-     batang memudar setelah 'bars-solid' — tak ada titik tersisa > DONE. */
+  /* Alfa per grup: partikel F memudar complementary seiring SVG tajam masuk (820-960);
+     partikel batang memudar complementary saat SVG batang masuk (1060-1180). */
   function groupAlpha(grp, t) {
     var a0, a1;
     if (grp <= 1) { a0 = T.F_FADE_OUT0; a1 = T.F_FADE_OUT1; }
@@ -269,7 +263,7 @@
     if (t <= a0) return 1;
     if (t >= a1) return 0;
     var k = 1 - (t - a0) / (a1 - a0);
-    return k * k; // meluruh kuadratik: cepat bersih, tanpa ekor kabur
+    return k * k; // meluruh kuadratik: serah terima mulus tanpa lonjakan luminansi
   }
 
   /* ==================================================================
@@ -411,12 +405,7 @@
         var x1, y1, vx, vy, sp2;
         if (pNow >= 1) {
           x1 = tx[i]; y1 = ty[i];
-          if (t - 16.7 >= t1a[i]) { vx = 0; vy = 0; sp2 = 0; }
-          else {
-            posAt(i, t - 16.7);
-            vx = (x1 - _px) * scale; vy = (y1 - _py) * scale;
-            sp2 = vx * vx + vy * vy;
-          }
+          vx = 0; vy = 0; sp2 = 0;
         } else if (pNow <= 0) {
           posAt(i, t);
           x1 = _px; y1 = _py;
