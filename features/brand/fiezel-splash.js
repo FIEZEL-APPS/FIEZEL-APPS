@@ -648,7 +648,7 @@
     } else {
       layout();
       applyVisualState(ctl.startOffset);
-      env.requestAnimationFrame(function () { env.setTimeout(bootMotion, 0); });
+      env.requestAnimationFrame(bootMotion);
     }
     return true;
   }
