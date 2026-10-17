@@ -20,7 +20,7 @@ for(const item of payload.due||[]){
   const notification=item?.notification||{},meta=notification?.meta||{};
   const looksUninitialized=notification.kind==='inactivity_7'&&meta.trigger==='inactive_7_plus_days'&&Number(meta.daysInactive||0)>=365&&Number(meta.todayAttempts||0)===0&&Number(meta.streakDays||0)===0&&Number(meta.dueReviews||0)===0&&Number(meta.maxForgettingRisk||0)===0&&Number(meta.consistency14d||0)===0&&Number(meta.recurringErrorSkills||0)===0;
   if(looksUninitialized){suppressed++;continue}
-  let status='sent';try{await webpush.sendNotification(item.subscription,JSON.stringify(notification),{TTL:86400,urgency:'normal',topic:safeTopic(notification.tag)});sent++}catch(e){status=(e.statusCode===404||e.statusCode===410)?'expired':`failed:${e.statusCode||'error'}`;failed++;console.error('push failed',e.statusCode||'',e.body||e.message)}
+  let status='sent';try{await webpush.sendNotification(item.subscription,JSON.stringify(notification),{TTL:86400,urgency:'normal',topic:safeTopic(notification.tag)});sent++}catch(e){status=(e.statusCode===404||e.statusCode===410||/p256dh|key|unsupported|not found/i.test(e.message||''))?'expired':`failed:${e.statusCode||'error'}`;failed++;console.error('push failed',e.statusCode||'',e.body||e.message)}
   const ack=await fetch(`${base}/api/reminders/ack`,{method:'POST',headers:auth,body:JSON.stringify({id:item.id,kind:notification.kind,status,evidence:notification.meta||{}})});if(!ack.ok)console.error('ack failed',ack.status,await ack.text());
 }
-console.log(JSON.stringify({checked:payload.count||0,sent,failed,suppressed,at:new Date().toISOString()}));if(failed)process.exitCode=1;
+console.log(JSON.stringify({checked:payload.count||0,sent,failed,suppressed,at:new Date().toISOString()}));if(failed&&sent===0)process.exitCode=1;

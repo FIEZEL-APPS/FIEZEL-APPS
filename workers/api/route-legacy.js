@@ -741,6 +741,72 @@ const RAW_ROUTES = [
   // Endpoint Reminder (Cron-token gated)
   // ==========================================
   
+export const SCHEDULED_FRIEND_MESSAGES = Object.freeze({
+  0: { // Minggu (2x: pagi santai & malam penutup weekend)
+    morning: {
+      title: 'Selamat hari Minggu {name}! ☀️',
+      body: 'Hari libur santai nih. Sambil santai pagi, yuk asah 3 frasa keren bareng aku 2 menit aja.'
+    },
+    evening: {
+      title: 'Malam {name}! 🛋️',
+      body: 'Siap-siap buat besok ya? Tutup weekend kamu dengan manis bareng aku 2 menit yuk sebelum tidur!'
+    }
+  },
+  1: { // Senin (1x malam)
+    evening: {
+      title: 'Hei {name}! 🌙',
+      body: 'Udah di rumah kan? Hari Senin yang panjang udah kelar, yuk santai rebahan 2 menit bareng aku.'
+    }
+  },
+  2: { // Selasa (1x malam)
+    evening: {
+      title: 'Hei {name}! ✨',
+      body: 'Kemana aja nih, sepi banget nggak ada kamu. Luang 2 menit buat santai bareng malam ini yuk?'
+    }
+  },
+  3: { // Rabu (1x malam)
+    evening: {
+      title: '{name}, lagi santai ya? 🛋️',
+      body: 'Aku tungguin dari tadi nih haha. Yuk tengok sebentar, sayang banget kalau progres kamu terlewat.'
+    }
+  },
+  4: { // Kamis (1x malam)
+    evening: {
+      title: 'Hei {name}! 🌙',
+      body: 'Udah leyeh-leyeh ya? Temenin aku 2 menit sebelum tidur yuk, obrolannya ringan banget kok.'
+    }
+  },
+  5: { // Jumat (1x malam)
+    evening: {
+      title: '{name}, malam sabtuan apa nih? 🍿',
+      body: 'Santai banget kan malam ini? Yuk luang 2 menit sebelum nonton atau jalan bareng teman.'
+    }
+  },
+  6: { // Sabtu (1x malam)
+    evening: {
+      title: '{name}, lagi ngapain nih? 🎮',
+      body: 'Malam minggu gini seru banget kalau ditemenin obrolan santai 2 menit bareng aku.'
+    }
+  }
+});
+
+export function formatPersonalizedMessage(template, rawName) {
+  const name = String(rawName || '').trim();
+  let s = String(template || '');
+  if (name) {
+    return s.replace(/\{name\}/g, name);
+  }
+  return s
+    .replace(/Hei\s+\{name\}!/gi, 'Hei kamu!')
+    .replace(/Pagi\s+\{name\}!/gi, 'Semangat pagi!')
+    .replace(/Malam\s+\{name\}!/gi, 'Selamat malam!')
+    .replace(/Selamat hari Minggu\s+\{name\}!/gi, 'Selamat hari Minggu!')
+    .replace(/Happy Friday\s+\{name\}!/gi, 'Happy Friday!')
+    .replace(/\{name\},\s*/gi, '')
+    .replace(/\{name\}!\s*/gi, 'kamu! ')
+    .replace(/\{name\}/gi, 'kamu');
+}
+
   // 19. POST /api/reminders/due
   ['POST', '/api/reminders/due', async (ctx) => {
     const opt = { headers: ctx.corsHeaders };
@@ -752,7 +818,42 @@ const RAW_ROUTES = [
     const customBody = body?.customBody || body?.body || '';
 
     const now = ctx.now || Date.now();
-    const eighteenHoursAgo = now - (18 * 60 * 60 * 1000);
+    // Konversi waktu ke Waktu Indonesia Barat (WIB = UTC+7)
+    const wibDate = new Date(now + (7 * 60 * 60 * 1000));
+    const dayOfWeek = wibDate.getUTCDay(); // 0 = Minggu, 1..6 = Senin..Sabtu
+    const hourWIB = wibDate.getUTCHours();
+
+    // Jam Tenang Malam: 22:00 - 05:59 WIB dilarang kirim kecuali force=true
+    const isQuietHour = hourWIB >= 22 || hourWIB < 6;
+    if (isQuietHour && !force) {
+      return jsonResponse({ due: [], count: 0, reason: 'quiet_hours_wib' }, { status: 200, ...opt });
+    }
+
+    // Penentuan slot jendela aktif:
+    // Minggu: 2 slot (morning: 09:00 - 13:59 WIB, evening: 18:00 - 21:59 WIB)
+    // Senin-Sabtu: 1 slot (evening: 18:00 - 21:59 WIB)
+    let activeSlot = null;
+    if (dayOfWeek === 0) {
+      if (hourWIB >= 9 && hourWIB < 14) activeSlot = 'morning';
+      else if (hourWIB >= 18 && hourWIB < 22) activeSlot = 'evening';
+    } else {
+      if (hourWIB >= 18 && hourWIB < 22) activeSlot = 'evening';
+    }
+
+    // Jika di luar jendela aktif dan bukan force, return empty
+    if (!activeSlot && !force) {
+      return jsonResponse({ due: [], count: 0, reason: 'outside_active_window' }, { status: 200, ...opt });
+    }
+
+    if (!activeSlot) {
+      activeSlot = (dayOfWeek === 0 && hourWIB < 15) ? 'morning' : 'evening';
+    }
+
+    // Jeda antar notifikasi per murid:
+    // Minggu: jeda 8 jam agar murid bisa menerima sesi pagi dan sesi malam.
+    // Senin-Sabtu: jeda 18 jam agar tepat 1x sehari.
+    const minGap = dayOfWeek === 0 ? (8 * 60 * 60 * 1000) : (18 * 60 * 60 * 1000);
+    const lastEligiblePushAt = now - minGap;
     
     let due = [];
     if (ctx.env.CORE_DB) {
@@ -771,13 +872,24 @@ const RAW_ROUTES = [
 
         const stmt = force
           ? ctx.env.CORE_DB.prepare(query)
-          : ctx.env.CORE_DB.prepare(query).bind(eighteenHoursAgo);
+          : ctx.env.CORE_DB.prepare(query).bind(lastEligiblePushAt);
 
         const { results } = await stmt.all();
+
+        const dayMessages = SCHEDULED_FRIEND_MESSAGES[dayOfWeek] || SCHEDULED_FRIEND_MESSAGES[1];
+        const defaultMsg = dayMessages[activeSlot] || dayMessages.evening || SCHEDULED_FRIEND_MESSAGES[1].evening;
         
         due = (results || []).map(r => {
           let act = {};
           try { act = JSON.parse(r.activity); } catch {}
+          const learnerName = r.learner_name || act.learnerName || '';
+          
+          const rawTitle = customTitle || defaultMsg.title;
+          const rawBody = customBody || defaultMsg.body;
+
+          const title = formatPersonalizedMessage(rawTitle, learnerName);
+          const body = formatPersonalizedMessage(rawBody, learnerName);
+
           return {
             id: r.sub,
             subscription: {
@@ -785,12 +897,12 @@ const RAW_ROUTES = [
               keys: { p256dh: r.keys_p256dh, auth: r.keys_auth }
             },
             notification: {
-              title: customTitle || 'Waktunya Belajar FIEZEL! ✨',
-              body: customBody || 'Waktunya kembali ke sesi belajar.',
-              kind: customBody ? 'broadcast_reminder' : 'daily_reminder',
-              tag: 'fiezel-study-daily',
+              title,
+              body,
+              kind: customBody ? 'broadcast_reminder' : 'friend_reminder',
+              tag: 'chat-study-daily',
               meta: {
-                learnerName: r.learner_name || '',
+                learnerName,
                 streakDays: act.streakDays || 0,
                 dueReviews: act.dueReviews || 0
               }
