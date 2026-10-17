@@ -168,6 +168,11 @@
     var node = bootSplashElement(target);
     endBootBackground(target);
     try {
+      if (target.__fiezelBootSplash && typeof target.__fiezelBootSplash.clearWatchdog === 'function') {
+        target.__fiezelBootSplash.clearWatchdog();
+      }
+    } catch (_) {}
+    try {
       target.__fiezelBootSplashDismissed = true;
       if (typeof target.dispatchEvent === 'function' && typeof target.CustomEvent === 'function') {
         target.dispatchEvent(new target.CustomEvent('fiezel:splash-dismissed'));
@@ -344,10 +349,17 @@
     function fireDue(t) {
       for (var i = 0; i < scheds.length; i++) {
         var s = scheds[i];
-        if (!s.fired && t >= s.t) { s.fired = true; s.fn(s.t); }
+        if (!s.fired && t >= s.t) {
+          s.fired = true;
+          try { s.fn(s.t); } catch (_) {}
+        }
       }
     }
-    function framePass(t, dt) { for (var i = 0; i < frames.length; i++) frames[i](t, dt); }
+    function framePass(t, dt) {
+      for (var i = 0; i < frames.length; i++) {
+        try { frames[i](t, dt); } catch (_) {}
+      }
+    }
     function tick() {
       rafId = 0;
       if (!playing) return;
@@ -581,6 +593,7 @@
     try { env.addEventListener && env.addEventListener('resize', onResize); } catch (_) {}
     ctl.cleanup.push(function () {
       try { env.removeEventListener && env.removeEventListener('resize', onResize); } catch (_) {}
+      try { if (pawstamp && typeof pawstamp.disarm === 'function') pawstamp.disarm(); } catch (_) {}
       clock.stop();
     });
 
@@ -662,8 +675,18 @@
       ctl.stampStarted = true;
       try { pawstamp.play(); } catch (_) { ctl.finish(); }
     }, isFinite(stampAt) && stampAt >= 0 ? stampAt : TL.STAMP0);
-    ctl.cleanup.push(function () { try { env.clearTimeout && env.clearTimeout(timer); } catch (_) {} });
-    ctl.skip = function () { try { pawstamp.skip(); } catch (_) { ctl.finish(); } };
+    ctl.cleanup.push(function () {
+      try { env.clearTimeout && env.clearTimeout(timer); } catch (_) {}
+      try { if (pawstamp && typeof pawstamp.disarm === 'function') pawstamp.disarm(); } catch (_) {}
+    });
+    ctl.skip = function () {
+      if (!ctl.stampStarted) {
+        try { env.clearTimeout && env.clearTimeout(timer); } catch (_) {}
+        ctl.finish();
+      } else {
+        try { pawstamp.skip(); } catch (_) { ctl.finish(); }
+      }
+    };
     return true;
   }
 
@@ -706,6 +729,11 @@
     } catch (_) {}
     if (host) {
       try { host.setAttribute(BOOT_CLAIMED_ATTR, 'shown'); } catch (_) {}
+      try {
+        if (target.__fiezelBootSplash && typeof target.__fiezelBootSplash.clearWatchdog === 'function') {
+          target.__fiezelBootSplash.clearWatchdog();
+        }
+      } catch (_) {}
     } else {
       host = doc.createElement('div');
       // Bidang gelap dipasang di HOST, bukan hanya di anaknya: host punya

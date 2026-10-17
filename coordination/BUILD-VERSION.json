@@ -1,7 +1,7 @@
 {
-  "version": "m025-591",
+  "version": "m025-592",
   "claimedBy": "branch fix/chat-scroll-mic-shadowing-ux",
-  "claimedAt": "2026-10-17T18:19:20.514Z",
-  "reason": "fix(chat): unstuck feed scrolling, mic permission guide modal, and live audio equalizer in shadowing",
+  "claimedAt": "2026-10-17T18:27:57.292Z",
+  "reason": "fix(boot-splash): perbaikan komprehensif alur boot, transisi splash, watchdog, dan eliminasi flicker/blank gap",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

@@ -7110,8 +7110,15 @@ html body main.app.app,html body.fz-lux main.app.app,html body.fz-lux.fz-view-ga
 html body.fz-lesson-mode main.app.app,html body.fz-lux.fz-lesson-mode main.app.app,html body.fz-lux.fz-stage-quiz main.app.app,html body:has(.quiz-shell) main.app.app { padding-top: 0 !important; }
 html body.fz-lesson-mode header.topbar,
 html body.fz-teacher-mode header.topbar,
+html body.fz-teacher-mode nav.bottomnav,
+html body.fz-teacher-mode .bottomnav,
+html body.fz-teacher-mode .nav-scrim,
 html body.fz-auth-open header.topbar,
+html body.fz-auth-open nav.bottomnav,
+html body.fz-auth-open .bottomnav,
+html body.fz-auth-open .nav-scrim,
 html body.fz-stage-sl.fsl-session-active header.topbar { display: none !important; }
+body.fz-auth-open { background-color: #1B1418 !important; }
 
 /* ==========================================================================
    18. IN-QUIZ LISTENING QUESTION & SKILLS LAB TACTILE CLAY HARMONY
@@ -7767,5 +7774,8 @@ header.topbar .active-level-control::after,
    ========================================================================== */
 html:not(.fz-app-open) body nav.bottomnav,
 html:not(.fz-app-open) body header.topbar {
+  visibility: hidden !important;
+}
+html:not(.fz-app-open) body .nav-scrim {
   visibility: hidden !important;
 }
