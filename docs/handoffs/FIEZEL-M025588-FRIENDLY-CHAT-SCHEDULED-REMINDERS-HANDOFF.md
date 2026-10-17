@@ -45,3 +45,14 @@ Pengguna meminta sistem pengingat belajar via remote push dirombak secara pedago
 - `node tests/gate-registry-test.js` — **PASS (10 pass, 0 fail)**
 - `python release-audit.py` — **PASS (1109 pass, 0 fail)**
 - `node tools/bump-build.mjs --check` — **Selaras (Hexa-Sync 100%)**
+
+---
+
+## 4. Otoritas MASTER & OWNER
+Perubahan ini dilakukan di bawah arahan langsung OWNER untuk meningkatkan kenyamanan dan retensi murid secara etis tanpa spam, dengan mematuhi seluruh aturan Git Protection Rule dan MASTER authority.
+
+---
+
+## 5. Rencana Langkah Lanjutan (Roadmap & Next Steps)
+- Memantau tingkat interaksi (click-through rate) murid terhadap notifikasi gaya obrolan sahabat di dasbor analitik.
+- Menambahkan variasi pesan kontekstual berdasarkan progres materi terakhir murid pada iterasi mendatang.

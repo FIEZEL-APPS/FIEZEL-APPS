@@ -884,7 +884,7 @@ const RAW_ROUTES = [
           let act = {};
           try { act = JSON.parse(r.activity); } catch {}
           const learnerName = r.learner_name || act.learnerName || '';
-          
+
           const rawTitle = customTitle || defaultMsg.title;
           const rawBody = customBody || defaultMsg.body;
 
