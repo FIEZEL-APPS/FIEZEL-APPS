@@ -432,9 +432,25 @@
     }
 
     // --- VAD & Audio Input Handling ---
-    function initMediaStream() {
+    function initMediaStream(preacquiredStream) {
+      if (preacquiredStream) {
+        mediaStream = preacquiredStream;
+        setupAudioAnalyser(mediaStream);
+        if (orbInstance && typeof orbInstance.attachStream === 'function') {
+          try { orbInstance.attachStream(mediaStream); } catch (_) {}
+        }
+        return Promise.resolve(true);
+      }
+
+      var isIOS = (typeof navigator !== 'undefined') && (
+        /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+      );
+
       if (navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === 'function') {
-        var constraints = {
+        // On iOS WebKit (Safari & PWA), complex audio constraints often fail and waste the user gesture token.
+        // Use direct { audio: true } on iOS to preserve synchronous user gesture activation!
+        var constraints = isIOS ? { audio: true } : {
           audio: {
             echoCancellation: true,
             noiseSuppression: true,
@@ -442,8 +458,9 @@
           }
         };
         return navigator.mediaDevices.getUserMedia(constraints)
-          .catch(function () {
-            // OverconstrainedError or specific driver refusal: fallback to standard audio constraint
+          .catch(function (err) {
+            if (isIOS) throw err;
+            // OverconstrainedError or driver refusal on non-iOS: fallback to standard audio constraint
             return navigator.mediaDevices.getUserMedia({ audio: true });
           })
           .then(function (stream) {
@@ -813,11 +830,74 @@
       var existing = document.getElementById('fzcMicModal');
       if (existing) existing.remove();
 
+      var isIOS = (typeof navigator !== 'undefined') && (
+        /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+      );
+      var isStandalone = (typeof window !== 'undefined') && (
+        (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
+        window.navigator.standalone === true
+      );
+
       var overlay = document.createElement('div');
       overlay.className = 'fzc-mic-modal-overlay';
       overlay.id = 'fzcMicModal';
       overlay.setAttribute('role', 'dialog');
       overlay.setAttribute('aria-modal', 'true');
+
+      var modalTitle = isIOS
+        ? esc(t('mic_modal_title_ios', 'Izinkan Akses Mikrofon di iPhone'))
+        : esc(t('mic_modal_title', 'Izinkan Akses Mikrofon'));
+
+      var modalDesc = esc(t('mic_modal_desc', 'Fiezel memerlukan izin mikrofon agar kamu bisa mengobrol dua arah dengan partner AI seperti berteleponan sungguhan.'));
+
+      var helpContentHtml = '';
+      if (isIOS) {
+        if (isStandalone) {
+          helpContentHtml = (
+            '<div class="fzc-mic-modal-help fzc-mic-modal-help-ios">' +
+            '  <strong>📱 ' + esc(t('mic_modal_ios_pwa_title', 'Panduan Izin Mikrofon (PWA iPhone):')) + '</strong>' +
+            '  <div class="fzc-ios-help-step">' +
+            '    <span class="fzc-step-num">1</span>' +
+            '    <span>' + esc(t('mic_modal_ios_pwa_step1', 'Ketuk tombol Aktifkan Mikrofon Sekarang di bawah. Jika iPhone memunculkan dialog sistem, pilih Izinkan (Allow).')) + '</span>' +
+            '  </div>' +
+            '  <div class="fzc-ios-help-step">' +
+            '    <span class="fzc-step-num">2</span>' +
+            '    <div>' +
+            '      <span>' + esc(t('mic_modal_ios_pwa_step2_title', 'Jika dialog izin tidak muncul (terblokir di sistem iOS):')) + '</span>' +
+            '      <div class="fzc-ios-substeps">' +
+            '        <p>• ' + esc(t('mic_modal_ios_pwa_s1', 'Buka aplikasi Pengaturan (Settings) di iPhone.')) + '</p>' +
+            '        <p>• ' + esc(t('mic_modal_ios_pwa_s2', 'Pilih menu Safari -> Pengaturan untuk Situs Web -> Mikrofon.')) + '</p>' +
+            '        <p>• ' + esc(t('mic_modal_ios_pwa_s3', 'Ubah status menjadi Izinkan (Allow) atau Tanya (Ask).')) + '</p>' +
+            '        <p>• ' + esc(t('mic_modal_ios_pwa_s4', 'Atau buka fiezel.my.id di Safari biasa, ketuk ikon aA di bilah alamat -> Pengaturan Situs Web -> Mikrofon: Izinkan.')) + '</p>' +
+            '      </div>' +
+            '    </div>' +
+            '  </div>' +
+            '</div>'
+          );
+        } else {
+          helpContentHtml = (
+            '<div class="fzc-mic-modal-help fzc-mic-modal-help-ios">' +
+            '  <strong>📱 ' + esc(t('mic_modal_ios_safari_title', 'Panduan Izin Mikrofon di Safari iPhone:')) + '</strong>' +
+            '  <div class="fzc-ios-help-step">' +
+            '    <span class="fzc-step-num">1</span>' +
+            '    <span>' + esc(t('mic_modal_ios_step1', 'Ketuk tombol di bawah, lalu pilih Izinkan saat sistem iOS meminta akses.')) + '</span>' +
+            '  </div>' +
+            '  <div class="fzc-ios-help-step">' +
+            '    <span class="fzc-step-num">2</span>' +
+            '    <span>' + esc(t('mic_modal_ios_step2', 'Jika terblokir: ketuk ikon aA di kiri bilah alamat Safari -> Pengaturan Situs Web -> Mikrofon: ubah ke Izinkan.')) + '</span>' +
+            '  </div>' +
+            '</div>'
+          );
+        }
+      } else {
+        helpContentHtml = (
+          '<div class="fzc-mic-modal-help">' +
+          '  <strong>💡 ' + esc(t('mic_modal_help_title', 'Jika izin tidak muncul atau terblokir:')) + '</strong><br>' +
+          '  ' + esc(t('mic_modal_help_body', 'Ketuk ikon gembok 🔒 atau setelan di bilah alamat browser kamu, pilih "Izin Situs", lalu ubah Mikrofon menjadi "Izinkan" (Allow).')) +
+          '</div>'
+        );
+      }
 
       overlay.innerHTML = (
         '<div class="fzc-mic-modal-card">' +
@@ -829,14 +909,9 @@
         '      <line x1="8" y1="22" x2="16" y2="22"/>' +
         '    </svg>' +
         '  </div>' +
-        '  <h3 class="fzc-mic-modal-title">' + esc(t('mic_modal_title', 'Izinkan Akses Mikrofon')) + '</h3>' +
-        '  <p class="fzc-mic-modal-desc">' +
-        '    ' + esc(t('mic_modal_desc', 'Fiezel memerlukan izin mikrofon agar kamu bisa mengobrol dua arah dengan partner AI seperti berteleponan sungguhan.')) +
-        '  </p>' +
-        '  <div class="fzc-mic-modal-help">' +
-        '    <strong>💡 ' + esc(t('mic_modal_help_title', 'Jika izin tidak muncul atau terblokir:')) + '</strong><br>' +
-        '    ' + esc(t('mic_modal_help_body', 'Ketuk ikon gembok 🔒 atau setelan di bilah alamat browser kamu, pilih "Izin Situs", lalu ubah Mikrofon menjadi "Izinkan" (Allow).')) +
-        '  </div>' +
+        '  <h3 class="fzc-mic-modal-title">' + modalTitle + '</h3>' +
+        '  <p class="fzc-mic-modal-desc">' + modalDesc + '</p>' +
+        helpContentHtml +
         '  <div class="fzc-mic-modal-actions">' +
         '    <button type="button" class="fzc-mic-modal-btn-allow" id="fzcMicModalAllowBtn">' +
         '      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
@@ -862,14 +937,15 @@
           if (navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === 'function') {
             navigator.mediaDevices.getUserMedia({ audio: true })
               .then(function (stream) {
-                try { stream.getTracks().forEach(function (tr) { tr.stop(); }); } catch (_) {}
                 overlay.remove();
-                if (typeof onRetry === 'function') onRetry();
+                if (typeof onRetry === 'function') {
+                  onRetry(stream);
+                }
               })
               .catch(function (permErr) {
                 console.warn('[FiezelVoiceCall] Permission still denied after prompt:', permErr);
                 if (typeof root.showToast === 'function') {
-                  root.showToast(t('call_permission_denied', 'Mikrofon masih belum diizinkan. Cek setelan browser kamu.'));
+                  root.showToast(t('call_permission_denied', 'Mikrofon masih belum diizinkan. Cek setelan browser / Safari kamu.'));
                 }
               });
           } else {
@@ -922,7 +998,7 @@
       mountOverlay();
       setStatus(STATE.CONNECTING);
 
-      return initMediaStream()
+      return initMediaStream(opts.preacquiredStream)
         .then(function () {
           setupSpeechRecognition();
           startRecognition();
@@ -935,8 +1011,10 @@
           setStatus(STATE.IDLE);
           unmountOverlay();
           emit('error', err);
-          showMicPermissionModal(function () {
-            start(opts);
+          showMicPermissionModal(function (freshStream) {
+            var nextOpts = Object.assign({}, opts);
+            if (freshStream) nextOpts.preacquiredStream = freshStream;
+            start(nextOpts);
           });
           throw err;
         });
@@ -1384,6 +1462,7 @@
       unlockAudio: unlockAudio,
       selectVoice: selectVoice,
       speakViaSynth: speakViaSynth,
+      showMicPermissionModal: showMicPermissionModal,
       _testSetStatus: function (status, meta) { return setStatus(status, meta, true); },
       _testCommitTurn: commitUserTurn,
       _testSimulateTurn: testSimulateTurn,
@@ -1406,6 +1485,7 @@
     setMute: function (muted) { return defaultInstance.setMute(muted); },
     toggleSubtitles: function () { return defaultInstance.toggleSubtitles(); },
     getState: function () { return defaultInstance.getState(); },
+    showMicPermissionModal: function (onRetry) { return defaultInstance.showMicPermissionModal(onRetry); },
     on: function (evt, fn) { defaultInstance.on(evt, fn); },
     off: function (evt, fn) { defaultInstance.off(evt, fn); },
     computeRMS: computeRMS,

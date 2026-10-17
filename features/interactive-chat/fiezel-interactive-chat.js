@@ -2391,6 +2391,19 @@
   var shadowingAudioCtx = null;
   var shadowingAnalyser = null;
   var shadowingRafId = null;
+  var shadowingSpeechDetected = false;
+  var shadowingSpeechEnergy = 0;
+  var shadowingSpeechDecayTimer = null;
+
+  function triggerShadowingSpeechActivity(energyBoost) {
+    shadowingSpeechDetected = true;
+    var b = typeof energyBoost === 'number' ? energyBoost : 0.9;
+    shadowingSpeechEnergy = Math.max(shadowingSpeechEnergy, b);
+    if (shadowingSpeechDecayTimer) clearTimeout(shadowingSpeechDecayTimer);
+    shadowingSpeechDecayTimer = setTimeout(function () {
+      shadowingSpeechDetected = false;
+    }, 850);
+  }
 
   function stopShadowingAudio() {
     if (shadowingRafId) {
@@ -2398,21 +2411,124 @@
       else clearTimeout(shadowingRafId);
       shadowingRafId = null;
     }
+    if (shadowingSpeechDecayTimer) {
+      clearTimeout(shadowingSpeechDecayTimer);
+      shadowingSpeechDecayTimer = null;
+    }
+    shadowingSpeechDetected = false;
+    shadowingSpeechEnergy = 0;
     if (shadowingAudioStream) {
       try {
         shadowingAudioStream.getTracks().forEach(function (tr) { tr.stop(); });
       } catch (_) {}
       shadowingAudioStream = null;
     }
-    if (shadowingAudioCtx && shadowingAudioCtx.state !== 'closed') {
+    if (shadowingAudioCtx && shadowingAudioCtx.state !== 'closed' && shadowingAudioCtx !== root.__fiezelSharedAudioContext) {
       try { shadowingAudioCtx.close(); } catch (_) {}
       shadowingAudioCtx = null;
     }
     shadowingAnalyser = null;
   }
 
+  function runShadowingVisualizerLoop(msgId) {
+    if (shadowingRafId) {
+      if (typeof cancelAnimationFrame === 'function') cancelAnimationFrame(shadowingRafId);
+      else clearTimeout(shadowingRafId);
+      shadowingRafId = null;
+    }
+
+    var freqData = shadowingAnalyser ? new Uint8Array(shadowingAnalyser.frequencyBinCount) : null;
+
+    function loop() {
+      if (state.shadowingMsgId !== msgId) {
+        stopShadowingAudio();
+        return;
+      }
+
+      var isVoiceDetected = false;
+      var avg = 0;
+
+      if (shadowingAnalyser && freqData) {
+        try {
+          shadowingAnalyser.getByteFrequencyData(freqData);
+          var sum = 0;
+          for (var i = 0; i < freqData.length; i++) {
+            sum += freqData[i];
+          }
+          avg = sum / (freqData.length || 1);
+          if (avg > 9) {
+            isVoiceDetected = true;
+            shadowingSpeechEnergy = Math.max(shadowingSpeechEnergy, Math.min(1, avg / 55));
+          }
+        } catch (_) {}
+      }
+
+      if (shadowingSpeechDetected || shadowingSpeechEnergy > 0.12) {
+        isVoiceDetected = true;
+      }
+
+      // Smooth decay of speech energy
+      shadowingSpeechEnergy = Math.max(0, shadowingSpeechEnergy * 0.94);
+
+      var box = document.getElementById('fzcShadowBoxActive');
+      var eqContainer = document.getElementById('fzcShadowLiveEq');
+      var statusPill = document.getElementById('fzcShadowStatusPill');
+
+      if (box) {
+        box.classList.toggle('is-speaking-detected', isVoiceDetected);
+      }
+
+      if (statusPill) {
+        if (isVoiceDetected) {
+          statusPill.classList.add('is-detecting');
+          statusPill.innerHTML = '● ' + t('chat_shadow_hearing_voice', 'Mendengar suaramu...');
+        } else {
+          statusPill.classList.remove('is-detecting');
+          statusPill.innerHTML = t('chat_shadow_waiting_voice', 'Menunggu suaramu...');
+        }
+      }
+
+      if (eqContainer) {
+        var bars = eqContainer.querySelectorAll('.fzc-eq-bar');
+        if (bars && bars.length > 0) {
+          var now = Date.now();
+          for (var b = 0; b < bars.length; b++) {
+            var h = 4;
+            if (isVoiceDetected) {
+              if (shadowingAnalyser && freqData && avg > 9) {
+                var binVal = freqData[b % freqData.length] || 0;
+                h = Math.max(4, Math.min(22, Math.round(binVal * 0.22) + 4));
+              } else {
+                // Kinetic soundwave algorithm for SpeechRecognition and iOS WebKit audio sessions
+                var wave = Math.sin((now / 110) + (b * 1.35)) * 0.5 + 0.5;
+                h = Math.round(4 + (shadowingSpeechEnergy * (14 * wave + 4)));
+                h = Math.max(4, Math.min(22, h));
+              }
+            }
+            bars[b].style.height = h + 'px';
+          }
+        }
+      }
+
+      shadowingRafId = requestAnimationFrame(loop);
+    }
+
+    shadowingRafId = requestAnimationFrame(loop);
+  }
+
   function startShadowingAudioVisualizer(msgId) {
     stopShadowingAudio();
+    runShadowingVisualizerLoop(msgId);
+
+    var isIOS = (typeof navigator !== 'undefined') && (
+      /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+    );
+
+    // On iOS WebKit, running getUserMedia simultaneously with webkitSpeechRecognition locks AVAudioSession.
+    // SpeechRecognition events drive the kinetic visualizer cleanly without hardware collision.
+    if (isIOS) return;
+
     if (!navigator.mediaDevices || typeof navigator.mediaDevices.getUserMedia !== 'function') return;
 
     navigator.mediaDevices.getUserMedia({ audio: true })
@@ -2425,7 +2541,12 @@
         var AudioCtx = root.AudioContext || root.webkitAudioContext;
         if (!AudioCtx) return;
 
-        shadowingAudioCtx = new AudioCtx();
+        shadowingAudioCtx = root.__fiezelSharedAudioContext || new AudioCtx();
+        root.__fiezelSharedAudioContext = shadowingAudioCtx;
+        if (shadowingAudioCtx.state === 'suspended') {
+          shadowingAudioCtx.resume().catch(function () {});
+        }
+
         shadowingAnalyser = shadowingAudioCtx.createAnalyser();
         shadowingAnalyser.fftSize = 64;
         shadowingAnalyser.smoothingTimeConstant = 0.55;
@@ -2433,59 +2554,10 @@
         var source = shadowingAudioCtx.createMediaStreamSource(stream);
         source.connect(shadowingAnalyser);
 
-        var freqData = new Uint8Array(shadowingAnalyser.frequencyBinCount);
-
-        function loop() {
-          if (state.shadowingMsgId !== msgId || !shadowingAnalyser) {
-            stopShadowingAudio();
-            return;
-          }
-
-          shadowingAnalyser.getByteFrequencyData(freqData);
-          var sum = 0;
-          for (var i = 0; i < freqData.length; i++) {
-            sum += freqData[i];
-          }
-          var avg = sum / (freqData.length || 1); // 0 to 255
-          var isVoiceDetected = avg > 12;
-
-          var box = document.getElementById('fzcShadowBoxActive');
-          var eqContainer = document.getElementById('fzcShadowLiveEq');
-          var statusPill = document.getElementById('fzcShadowStatusPill');
-
-          if (box) {
-            box.classList.toggle('is-speaking-detected', isVoiceDetected);
-          }
-
-          if (statusPill) {
-            if (isVoiceDetected) {
-              statusPill.classList.add('is-detecting');
-              statusPill.innerHTML = '● ' + t('chat_shadow_hearing_voice', 'Mendengar suaramu...');
-            } else {
-              statusPill.classList.remove('is-detecting');
-              statusPill.innerHTML = t('chat_shadow_waiting_voice', 'Menunggu suaramu...');
-            }
-          }
-
-          if (eqContainer) {
-            var bars = eqContainer.querySelectorAll('.fzc-eq-bar');
-            if (bars && bars.length > 0) {
-              for (var b = 0; b < bars.length; b++) {
-                var binVal = freqData[b % freqData.length] || 0;
-                var h = Math.max(4, Math.min(22, Math.round(binVal * 0.22) + 3));
-                if (!isVoiceDetected) h = 4;
-                bars[b].style.height = h + 'px';
-              }
-            }
-          }
-
-          shadowingRafId = requestAnimationFrame(loop);
-        }
-
-        shadowingRafId = requestAnimationFrame(loop);
+        runShadowingVisualizerLoop(msgId);
       })
       .catch(function (streamErr) {
-        console.warn('[FiezelShadowing] Microphone stream visualizer skipped:', streamErr);
+        console.warn('[FiezelShadowing] Microphone stream visualizer fallback to speech engine:', streamErr);
       });
   }
 
@@ -2524,7 +2596,24 @@
       rec.continuous = false;
       rec.interimResults = true;
 
+      rec.onaudiostart = function () {
+        triggerShadowingSpeechActivity(0.5);
+      };
+      rec.onsoundstart = function () {
+        triggerShadowingSpeechActivity(0.8);
+      };
+      rec.onspeechstart = function () {
+        triggerShadowingSpeechActivity(1.0);
+      };
+      rec.onspeechend = function () {
+        if (shadowingSpeechDecayTimer) clearTimeout(shadowingSpeechDecayTimer);
+        shadowingSpeechDecayTimer = setTimeout(function () {
+          shadowingSpeechDetected = false;
+        }, 400);
+      };
+
       rec.onresult = function (event) {
+        triggerShadowingSpeechActivity(1.0);
         var interimTranscript = '';
         var finalTranscript = '';
 
@@ -2566,11 +2655,19 @@
         }
       };
 
-      rec.onerror = function () {
+      rec.onerror = function (event) {
         stopShadowingAudio();
         state.shadowingMsgId = null;
         state.recognition = null;
         updateUI();
+        if (event && event.error === 'not-allowed') {
+          var VoiceCall = root.FiezelVoiceCall;
+          if (VoiceCall && typeof VoiceCall.showMicPermissionModal === 'function') {
+            VoiceCall.showMicPermissionModal(function () {
+              startShadowing(msgId, targetText);
+            });
+          }
+        }
       };
 
       rec.onend = function () {
@@ -2635,10 +2732,18 @@
         }
       };
 
-      rec.onerror = function () {
+      rec.onerror = function (event) {
         state.isListening = false;
         state.recognition = null;
         updateUI();
+        if (event && event.error === 'not-allowed') {
+          var VoiceCall = root.FiezelVoiceCall;
+          if (VoiceCall && typeof VoiceCall.showMicPermissionModal === 'function') {
+            VoiceCall.showMicPermissionModal(function () {
+              toggleSpeechRecognition();
+            });
+          }
+        }
       };
 
       rec.onend = function () {

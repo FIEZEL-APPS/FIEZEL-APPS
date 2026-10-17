@@ -2723,6 +2723,52 @@ body.fz-ja-no-romaji .fzc-romaji {
   color: #1B1418;
 }
 
+.fzc-mic-modal-help-ios {
+  background: #F8FAFC !important;
+  border-color: #E2E8F0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+}
+
+.fzc-ios-help-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 0.74rem;
+  color: #475569;
+  line-height: 1.45;
+}
+
+.fzc-step-num {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #0284C7;
+  color: #FFFFFF;
+  font-weight: 800;
+  font-size: 0.65rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.fzc-ios-substeps {
+  margin-top: 4px;
+  padding-left: 2px;
+  font-size: 0.72rem;
+  color: #64748B;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.fzc-ios-substeps p {
+  margin: 0;
+}
+
 .fzc-mic-modal-actions {
   display: flex;
   flex-direction: column;

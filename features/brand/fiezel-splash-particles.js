@@ -339,6 +339,7 @@
     },
 
     setSeed: function (s) { seed = s >>> 0; if (cv) build(); },
+    getCount: function () { return N; },
     getLayout: function () { return { scale: scale, offX: offX, offY: offY, width: cssW, height: cssH }; },
 
     getPhase: function (t) {
