@@ -1673,10 +1673,10 @@ body.fz-ja-no-romaji .fzc-romaji {
   inset: -4px;
   border-radius: 50%;
   border: 1.5px solid rgba(245, 158, 11, 0.4);
-  animation: fzcAvatarPulse 2.4s infinite ease-in-out;
+  animation: fzcCallAvatarPulse 2.4s infinite ease-in-out;
 }
 
-@keyframes fzcAvatarPulse {
+@keyframes fzcCallAvatarPulse {
   0% { transform: scale(1); opacity: 0.8; }
   50% { transform: scale(1.14); opacity: 0; }
   100% { transform: scale(1); opacity: 0; }
