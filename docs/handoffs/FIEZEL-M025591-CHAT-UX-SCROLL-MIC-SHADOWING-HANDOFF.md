@@ -1,10 +1,10 @@
 # FIEZEL HANDOFF DOSSIER: BUILD M025-591
 ## Peningkatan UX Chat: Unstuck Feed Scrolling, Panduan Izin Mikrofon, Equalizer Suara Shadowing, dan Zero Card Truncation
 
-**Tanggal Rilis**: 18 Oktober 2026  
-**Build Number**: `m025-591` (Hexa-Sync Selaras)  
-**Branch**: `fix/chat-scroll-mic-shadowing-ux`  
-**Autor**: Antigravity Assistant & FIEZEL Core Engineering  
+**Tanggal Rilis**: 18 Oktober 2026
+**Build Number**: `m025-591` (Hexa-Sync Selaras)
+**Branch**: `fix/chat-scroll-mic-shadowing-ux`
+**Autor**: Antigravity Assistant & FIEZEL Core Engineering
 
 ---
 

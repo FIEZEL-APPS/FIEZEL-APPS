@@ -1,10 +1,10 @@
 # FIEZEL HANDOFF DOSSIER: BUILD M025-592
 ## Perbaikan Komprehensif Siklus Boot, Transisi Splash, Watchdog, dan Eliminasi Blank Gap / Flicker
 
-**Tanggal Rilis**: 18 Oktober 2026  
-**Build Number**: `m025-592` (Hexa-Sync Selaras)  
-**Branch**: `fix/chat-scroll-mic-shadowing-ux`  
-**Otoritas Audit**: Antigravity Assistant & FIEZEL Core Engineering  
+**Tanggal Rilis**: 18 Oktober 2026
+**Build Number**: `m025-592` (Hexa-Sync Selaras)
+**Branch**: `fix/chat-scroll-mic-shadowing-ux`
+**Otoritas Audit**: Antigravity Assistant & FIEZEL Core Engineering
 
 ---
 
@@ -32,7 +32,7 @@ Berdasarkan audit terorkestrasi 5 subagent dan pengujian empiris Playwright pada
 
 5. **Pencegahan Watchdog False Positive & Standar Kontras WCAG AA**:
    - **Akar Masalah**: Pada koneksi lambat, watchdog 15 detik di `index.html` dapat memunculkan kartu pemulihan `fiezelBootRecovery` sementara aplikasi masih mengunduh skrip. Kartu pemulihan memiliki warna teks `#E8D9C5` di atas latar putih `#FFFFFF` (rasio kontras 1.41:1, gagal telak WCAG AA).
-   - **Solusi**: 
+   - **Solusi**:
      a) Menambahkan metode `clearWatchdog` pada `window.__fiezelBootSplash` yang otomatis dipanggil saat splash diadopsi atau didismiss oleh aplikasi.
      b) Memperbaiki kontras kartu pemulihan ke `#6E635C` di atas putih (kontras rasio $\ge 4.5:1$, lolos WCAG 2.1 AA).
 
