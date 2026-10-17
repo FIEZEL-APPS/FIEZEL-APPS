@@ -1,7 +1,7 @@
 {
-  "version": "m025-594",
-  "claimedBy": "tidak tercatat (jalankan ulang di dalam git, atau set FIEZEL_BUILD_CLAIMER)",
-  "claimedAt": "2026-10-17T18:35:49.079Z",
-  "reason": "bot(heal): auto-synchronize release boundary",
+  "version": "m025-591",
+  "claimedBy": "branch fix/chat-scroll-mic-shadowing-ux",
+  "claimedAt": "2026-10-17T18:19:20.514Z",
+  "reason": "fix(chat): unstuck feed scrolling, mic permission guide modal, and live audio equalizer in shadowing",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
