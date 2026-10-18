@@ -1,9 +1,9 @@
 # FIEZEL M025-605 Handoff Dossier: Pemulihan Arsitektur Topbar & Bottombar Kawan Bicara (Chat)
 
-**Nomor Rilis**: `m025-605`  
-**Cakupan**: `fix(chat): pulihkan arsitektur topbar dan bottombar kawan bicara (m025-605)`  
-**Tanggal**: 18 Oktober 2026  
-**Status CI & Mutu**: 100% HIJAU (PASS)  
+**Nomor Rilis**: `m025-605`
+**Cakupan**: `fix(chat): pulihkan arsitektur topbar dan bottombar kawan bicara (m025-605)`
+**Tanggal**: 18 Oktober 2026
+**Status CI & Mutu**: 100% HIJAU (PASS)
 
 ---
 
