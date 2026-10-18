@@ -739,6 +739,6 @@ public class MainActivity extends AppCompatActivity {
         if (ua == null) {
             return "Mozilla/5.0 (Linux; Android 14; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36";
         }
-        return ua.replace("; wv", "").replaceAll("Version/\d+\.\d+\s+", "");
+        return ua.replace("; wv", "").replaceAll("Version/\\d+\\.\\d+\\s+", "");
     }
 }
