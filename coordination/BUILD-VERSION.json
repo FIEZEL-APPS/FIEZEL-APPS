@@ -1,7 +1,7 @@
 {
-  "version": "m025-600",
-  "claimedBy": "branch fix/gradlew-bash-shebang-and-invocation",
-  "claimedAt": "2026-10-18T01:20:56.030Z",
-  "reason": "fix(android): perbaiki shebang bash gradlew untuk kompilasi apk di ci",
+  "version": "m025-601",
+  "claimedBy": "branch feat/chat-quota-popup-and-audit-fixes",
+  "claimedAt": "2026-10-18T01:41:46.909Z",
+  "reason": "fix(chat): modal limit kuota harian, sanitasi delimiter & skenario interview",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
