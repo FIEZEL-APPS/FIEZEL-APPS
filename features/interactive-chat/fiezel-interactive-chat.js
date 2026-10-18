@@ -3614,6 +3614,43 @@
         }
       };
     });
+
+    // Wheel event delegation: allow scrolling the chat feed even when mouse/trackpad cursor is over header, dock padding, or empty margins
+    container.addEventListener('wheel', function (e) {
+      var feed = container.querySelector('#fzcFeed');
+      if (feed && e.target && !feed.contains(e.target)) {
+        feed.scrollTop += e.deltaY;
+      }
+    }, { passive: true });
+
+    // Header vertical touch delegation: allow swiping vertically on header to scroll the feed
+    var headerEl = container.querySelector('.fzc-header');
+    if (headerEl) {
+      var headerTouchStartY = 0;
+      var headerTouchStartX = 0;
+      headerEl.addEventListener('touchstart', function (e) {
+        if (e.touches && e.touches.length === 1) {
+          headerTouchStartY = e.touches[0].clientY;
+          headerTouchStartX = e.touches[0].clientX;
+        }
+      }, { passive: true });
+      headerEl.addEventListener('touchmove', function (e) {
+        if (e.touches && e.touches.length === 1) {
+          // If touching scenario rail or horizontal swipe, let rail scroll
+          if (e.target && e.target.closest && e.target.closest('.fzc-scenarios-rail')) return;
+          var dy = headerTouchStartY - e.touches[0].clientY;
+          var dx = headerTouchStartX - e.touches[0].clientX;
+          if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 4) {
+            headerTouchStartY = e.touches[0].clientY;
+            headerTouchStartX = e.touches[0].clientX;
+            var feed = container.querySelector('#fzcFeed');
+            if (feed) {
+              feed.scrollTop += dy;
+            }
+          }
+        }
+      }, { passive: true });
+    }
   }
 
   function updateUI() {

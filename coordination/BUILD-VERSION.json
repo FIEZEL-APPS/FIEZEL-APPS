@@ -1,7 +1,7 @@
 {
-  "version": "m025-603",
-  "claimedBy": "branch fix/android-google-oauth-and-webview-polish",
-  "claimedAt": "2026-10-18T10:37:33.172Z",
-  "reason": "fix(android): perbaiki login google popup oauth dan sanitasi user-agent webview (m025-603)",
+  "version": "m025-604",
+  "claimedBy": "branch fix/kawan-bicara-feed-scrolling",
+  "claimedAt": "2026-10-18T10:55:16.127Z",
+  "reason": "fix(chat): pulihkan scrolling atas bawah dan eliminasi blokir touch gesture kawan bicara",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
