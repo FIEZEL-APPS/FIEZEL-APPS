@@ -153,13 +153,19 @@
     return step(0).then(function (ok) { return finish(mine === token && ok); });
   }
 
-  /** Barge-in / ganti giliran: putus loop kalimat dan bungkam semua lapisan. */
+  /** Barge-in / ganti giliran / unmount: putus loop kalimat dan bungkam semua lapisan seketika. */
   function stop() {
     token++;
     var vs = voiceSay();
     if (vs && typeof vs.stop === 'function') { try { vs.stop(); } catch (_) {} }
     var p = puter();
     if (p && typeof p.stop === 'function') { try { p.stop(); } catch (_) {} }
+    if (root && root.FiezelNeuralVoice && typeof root.FiezelNeuralVoice.stop === 'function') {
+      try { root.FiezelNeuralVoice.stop(); } catch (_) {}
+    }
+    if (root && root.FiezelWebAudioPlayer && typeof root.FiezelWebAudioPlayer.stop === 'function') {
+      try { root.FiezelWebAudioPlayer.stop(); } catch (_) {}
+    }
     return true;
   }
 

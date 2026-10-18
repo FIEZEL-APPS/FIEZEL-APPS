@@ -123,10 +123,13 @@
     var mediaStream = null;
     var audioContext = null;
     var analyserNode = null;
+    var callSourceNode = null;
     var vadRafId = null;
     var silenceTimer = null;
     var callTimerInterval = null;
     var recognition = null;
+    var recognitionRestartTimer = null;
+    var mediaStreamToken = 0;
     var hasUserSpoken = false;
     var pendingTranscript = '';
     var overlayEl = null;
@@ -223,6 +226,9 @@
         var AudioCtx = root.AudioContext || root.webkitAudioContext;
         if (!AudioCtx) return;
         if (!audioContext || audioContext.state === 'closed') {
+          if (root.__fiezelSharedAudioContext && root.__fiezelSharedAudioContext.state === 'closed') {
+            root.__fiezelSharedAudioContext = null;
+          }
           audioContext = root.__fiezelSharedAudioContext || new AudioCtx();
           root.__fiezelSharedAudioContext = audioContext;
         }
@@ -255,6 +261,11 @@
       try {
         if (root.FiezelNeuralVoice && typeof root.FiezelNeuralVoice.stop === 'function') {
           root.FiezelNeuralVoice.stop();
+        }
+      } catch (_) {}
+      try {
+        if (root.FiezelWebAudioPlayer && typeof root.FiezelWebAudioPlayer.stop === 'function') {
+          root.FiezelWebAudioPlayer.stop();
         }
       } catch (_) {}
     }
@@ -332,6 +343,16 @@
             return navigator.mediaDevices.getUserMedia({ audio: true });
           })
           .then(function (stream) {
+            if (isDestroyed || state.status === STATE.IDLE) {
+              if (stream && typeof stream.getTracks === 'function') {
+                var trks = stream.getTracks();
+                for (var tIdx = 0; tIdx < trks.length; tIdx++) {
+                  try { trks[tIdx].enabled = false; } catch (_) {}
+                  try { trks[tIdx].stop(); } catch (_) {}
+                }
+              }
+              return false;
+            }
             mediaStream = stream;
             setupAudioAnalyser(stream);
             if (orbInstance && typeof orbInstance.attachStream === 'function') {
@@ -340,6 +361,7 @@
             return true;
           })
           .catch(function (err) {
+            if (isDestroyed || state.status === STATE.IDLE) return false;
             // Graceful resilience: If getUserMedia fails or is denied on any browser, BUT
             // SpeechRecognition is supported, DO NOT abort the call! SpeechRecognition can
             // capture the student's voice directly!
@@ -397,13 +419,21 @@
         var AudioCtx = root.AudioContext || root.webkitAudioContext;
         if (!AudioCtx) return;
         if (!audioContext || audioContext.state === 'closed') {
+          if (root.__fiezelSharedAudioContext && root.__fiezelSharedAudioContext.state === 'closed') {
+            root.__fiezelSharedAudioContext = null;
+          }
           audioContext = root.__fiezelSharedAudioContext || new AudioCtx();
           root.__fiezelSharedAudioContext = audioContext;
         }
         if (audioContext.state === 'suspended') {
           audioContext.resume().catch(function () {});
         }
+        if (callSourceNode) {
+          try { callSourceNode.disconnect(); } catch (_) {}
+          callSourceNode = null;
+        }
         var source = audioContext.createMediaStreamSource(stream);
+        callSourceNode = source;
         analyserNode = audioContext.createAnalyser();
         analyserNode.fftSize = CONFIG.fftSize;
         analyserNode.smoothingTimeConstant = CONFIG.smoothingTimeConstant;
@@ -594,10 +624,12 @@
         rec.onend = function () {
           // Hands-free loop: If call is still active and not idle, restart recognition safely
           if (!isDestroyed && state.status !== STATE.IDLE) {
-            setTimeout(function () {
-              if (!isDestroyed && state.status !== STATE.IDLE) {
+            if (recognitionRestartTimer) clearTimeout(recognitionRestartTimer);
+            recognitionRestartTimer = setTimeout(function () {
+              recognitionRestartTimer = null;
+              if (!isDestroyed && state.status !== STATE.IDLE && recognition) {
                 try {
-                  rec.start();
+                  recognition.start();
                 } catch (_) {}
               }
             }, 80);
@@ -620,9 +652,30 @@
     }
 
     function stopRecognition() {
+      if (recognitionRestartTimer) {
+        clearTimeout(recognitionRestartTimer);
+        recognitionRestartTimer = null;
+      }
       if (!recognition) return;
+      var rec = recognition;
+      recognition = null;
       try {
-        recognition.stop();
+        rec.onend = null;
+        rec.onerror = null;
+        rec.onresult = null;
+        rec.onaudiostart = null;
+        rec.onsoundstart = null;
+        rec.onspeechstart = null;
+        rec.onspeechend = null;
+        rec.onsoundend = null;
+        rec.onaudioend = null;
+      } catch (_) {}
+      try {
+        if (typeof rec.abort === 'function') {
+          rec.abort();
+        } else if (typeof rec.stop === 'function') {
+          rec.stop();
+        }
       } catch (_) {}
     }
 
@@ -904,6 +957,57 @@
       }
     }
 
+    var popStateListener = null;
+    var pageHideListener = null;
+    var BACKNAV_LAYER_ID = 'fzc-voice-call';
+
+    function registerBackNav() {
+      unregisterBackNav();
+      if (root.FiezelBackNav && typeof root.FiezelBackNav.pushLayer === 'function') {
+        try {
+          root.FiezelBackNav.pushLayer({
+            id: BACKNAV_LAYER_ID,
+            close: function () {
+              end();
+              return true;
+            }
+          });
+        } catch (_) {}
+      }
+      if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+        popStateListener = function () {
+          if (!isDestroyed && state.status !== STATE.IDLE) {
+            end();
+          }
+        };
+        window.addEventListener('popstate', popStateListener);
+        pageHideListener = function () {
+          if (!isDestroyed && state.status !== STATE.IDLE) {
+            end();
+          }
+        };
+        window.addEventListener('pagehide', pageHideListener);
+        window.addEventListener('beforeunload', pageHideListener);
+      }
+    }
+
+    function unregisterBackNav() {
+      if (root.FiezelBackNav && typeof root.FiezelBackNav.dismiss === 'function') {
+        try { root.FiezelBackNav.dismiss(BACKNAV_LAYER_ID); } catch (_) {}
+      }
+      if (typeof window !== 'undefined' && typeof window.removeEventListener === 'function') {
+        if (popStateListener) {
+          window.removeEventListener('popstate', popStateListener);
+          popStateListener = null;
+        }
+        if (pageHideListener) {
+          window.removeEventListener('pagehide', pageHideListener);
+          window.removeEventListener('beforeunload', pageHideListener);
+          pageHideListener = null;
+        }
+      }
+    }
+
     // --- Lifecycle Controls ---
     function start(arg1, arg2, arg3, arg4) {
       var opts = {};
@@ -939,6 +1043,7 @@
 
       mountOverlay();
       setStatus(STATE.CONNECTING);
+      registerBackNav();
 
       return initMediaStream(opts.preacquiredStream)
         .then(function () {
@@ -951,6 +1056,7 @@
         })
         .catch(function (err) {
           setStatus(STATE.IDLE);
+          unregisterBackNav();
           unmountOverlay();
           emit('error', err);
           showMicPermissionModal(function (freshStream) {
@@ -966,6 +1072,7 @@
       if (state.status === STATE.IDLE && isDestroyed) return;
       isDestroyed = true;
 
+      unregisterBackNav();
       stopAudioPlayback();
       stopRecognition();
 
@@ -985,17 +1092,40 @@
         callTimerInterval = null;
       }
 
+      if (callSourceNode) {
+        try { callSourceNode.disconnect(); } catch (_) {}
+        callSourceNode = null;
+      }
+
+      if (analyserNode) {
+        try { analyserNode.disconnect(); } catch (_) {}
+        analyserNode = null;
+      }
+
+      if (orbInstance) {
+        try { orbInstance.detachStream(); } catch (_) {}
+        try { orbInstance.setVolume(0); } catch (_) {}
+      }
+
       if (mediaStream) {
         try {
           var tracks = mediaStream.getTracks();
-          for (var i = 0; i < tracks.length; i++) tracks[i].stop();
+          for (var i = 0; i < tracks.length; i++) {
+            try { tracks[i].enabled = false; } catch (_) {}
+            try { tracks[i].stop(); } catch (_) {}
+          }
         } catch (_) {}
         mediaStream = null;
       }
 
       if (audioContext) {
-        try { audioContext.close(); } catch (_) {}
+        if (audioContext !== root.__fiezelSharedAudioContext) {
+          try { audioContext.close(); } catch (_) {}
+        }
         audioContext = null;
+      }
+      if (root.__fiezelSharedAudioContext && root.__fiezelSharedAudioContext.state === 'closed') {
+        root.__fiezelSharedAudioContext = null;
       }
 
       // Zero-Loss State: Commit any pending uncommitted student transcript
@@ -1062,7 +1192,7 @@
         } catch (_) {}
       }
 
-      unmountOverlay();
+      unmountOverlay(true);
     }
 
     function setMute(muted) {
@@ -1220,21 +1350,54 @@
       bindOverlayEvents(div);
     }
 
-    function unmountOverlay() {
+    function closeCallUI(immediate) {
       if (orbInstance) {
-        orbInstance.close();
-        orbInstance.destroy();
+        try { orbInstance.close(); } catch (_) {}
+        try { orbInstance.destroy(); } catch (_) {}
         orbInstance = null;
       }
-      if (overlayEl) {
-        overlayEl.classList.add('is-closing');
-        setTimeout(function () {
-          if (overlayEl && overlayEl.parentNode) {
-            overlayEl.parentNode.removeChild(overlayEl);
+      var targets = [];
+      if (typeof document !== 'undefined') {
+        try {
+          var found = document.querySelectorAll(
+            '#fzcCallOverlay, .fzc-call-overlay, .fzc-call-stage, .fzc-call-screen, .fzc-voice-orb-canvas, #fzcMicModal'
+          );
+          for (var i = 0; i < found.length; i++) targets.push(found[i]);
+        } catch (_) {}
+        if (overlayEl && targets.indexOf(overlayEl) < 0) targets.push(overlayEl);
+
+        try {
+          var callContainers = document.querySelectorAll('.fzc-container.is-call-active, body.is-call-active');
+          for (var c = 0; c < callContainers.length; c++) {
+            callContainers[c].classList.remove('is-call-active');
           }
-          overlayEl = null;
-        }, 220);
+        } catch (_) {}
+      } else if (overlayEl) {
+        targets.push(overlayEl);
       }
+
+      overlayEl = null;
+
+      for (var tIdx = 0; tIdx < targets.length; tIdx++) {
+        var el = targets[tIdx];
+        if (!el) continue;
+        if (immediate !== false) {
+          if (el.parentNode) el.parentNode.removeChild(el);
+        } else {
+          el.classList.add('is-closing');
+          (function (targetNode) {
+            setTimeout(function () {
+              if (targetNode && targetNode.parentNode) {
+                targetNode.parentNode.removeChild(targetNode);
+              }
+            }, 220);
+          })(el);
+        }
+      }
+    }
+
+    function unmountOverlay(immediate) {
+      closeCallUI(immediate !== false);
     }
 
     function bindOverlayEvents(container) {
@@ -1396,6 +1559,8 @@
       startCall: start,
       end: end,
       endCall: end,
+      endVoiceCall: end,
+      closeCallUI: closeCallUI,
       interrupt: interrupt,
       toggleMute: toggleMute,
       setMute: setMute,
@@ -1405,6 +1570,7 @@
       unlockAudio: unlockAudio,
       playSpeech: playSpeech,
       showMicPermissionModal: showMicPermissionModal,
+      cleanup: end,
       _testSetStatus: function (status, meta) { return setStatus(status, meta, true); },
       _testCommitTurn: commitUserTurn,
       _testSimulateTurn: testSimulateTurn,
@@ -1423,6 +1589,9 @@
     startCall: function (options) { return defaultInstance.start(options); },
     end: function () { return defaultInstance.end(); },
     endCall: function () { return defaultInstance.end(); },
+    endVoiceCall: function () { return defaultInstance.end(); },
+    closeCallUI: function (immediate) { return defaultInstance.closeCallUI(immediate); },
+    cleanup: function () { return defaultInstance.end(); },
     interrupt: function (reason) { return defaultInstance.interrupt(reason); },
     toggleMute: function () { return defaultInstance.toggleMute(); },
     setMute: function (muted) { return defaultInstance.setMute(muted); },
@@ -1439,6 +1608,29 @@
     _testSimulateTurn: function (text) { return defaultInstance._testSimulateTurn(text); },
     _testSetState: function (patch) { return defaultInstance._testSetState(patch); }
   };
+
+  // Auto-teardown on mobile app switch / page hide / back navigation
+  function handleGlobalTeardown() {
+    if (defaultInstance && typeof defaultInstance.end === 'function') {
+      var curSt = defaultInstance.getState ? defaultInstance.getState().status : null;
+      if (curSt && curSt !== STATE.IDLE) {
+        defaultInstance.end();
+      }
+    }
+  }
+
+  if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+    window.addEventListener('pagehide', handleGlobalTeardown);
+    window.addEventListener('beforeunload', handleGlobalTeardown);
+    window.addEventListener('popstate', handleGlobalTeardown);
+    if (typeof document !== 'undefined' && typeof document.addEventListener === 'function') {
+      document.addEventListener('visibilitychange', function () {
+        if (document.visibilityState === 'hidden') {
+          handleGlobalTeardown();
+        }
+      });
+    }
+  }
 
   return api;
 }));
