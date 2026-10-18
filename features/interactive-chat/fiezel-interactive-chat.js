@@ -1988,7 +1988,7 @@
     var out = { reply: '', meaning: '', check: '' };
     var map = { REPLY: 'reply', MEANING: 'meaning', CHECK: 'check' };
     var current = '';
-    String(raw || '').replace(/^```[a-z]*\s*|\s*```$/gi, '').split(/\r?\n/).forEach(function (line) {
+    String(raw || '').replace(/^\x60{3}[a-z]*\s*|\s*\x60{3}$/gi, '').split(/\r?\n/).forEach(function (line) {
       var m = /^\s*[*_#>\-\s]*(REPLY|MEANING|FIX|WHY|CHECK)[*_\s]*[:\uff1a]\s*(.*)$/i.exec(line);
       if (m) {
         current = map[m[1].toUpperCase()] || '';
@@ -2375,6 +2375,13 @@
   }
 
   function stopShadowingAudio() {
+    if (state.recognition) {
+      try {
+        if (typeof state.recognition.abort === 'function') state.recognition.abort();
+        else if (typeof state.recognition.stop === 'function') state.recognition.stop();
+      } catch (_) {}
+      state.recognition = null;
+    }
     if (shadowingRafId) {
       if (typeof cancelAnimationFrame === 'function') cancelAnimationFrame(shadowingRafId);
       else clearTimeout(shadowingRafId);
@@ -2388,7 +2395,10 @@
     shadowingSpeechEnergy = 0;
     if (shadowingAudioStream) {
       try {
-        shadowingAudioStream.getTracks().forEach(function (tr) { tr.stop(); });
+        shadowingAudioStream.getTracks().forEach(function (tr) {
+          try { tr.enabled = false; } catch (_) {}
+          try { tr.stop(); } catch (_) {}
+        });
       } catch (_) {}
       shadowingAudioStream = null;
     }
