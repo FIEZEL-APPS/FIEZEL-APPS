@@ -106,6 +106,14 @@
     'voice.notice.reassurance': 'Item ini nggak dinilai dan nggak dikunci.',
     'voice.notice.reset-tail': ' Jatah berikutnya mulai jam {jam} WIB.',
     'voice.notice.reset-marker': 'setelah tengah malam',
-    'voice.notice.reset-inline': 'jam {jam} WIB'
+    'voice.notice.reset-inline': 'jam {jam} WIB',
+
+    // Modal pemberitahuan limit harian AI habis (Kawan Bicara / Interactive Chat)
+    'chat.quota.modal.badge': 'FIEZEL AI · JATAH HARIAN',
+    'chat.quota.modal.title': 'Limit Harian AI Sudah Terpakai Penuh',
+    'chat.quota.modal.desc': 'Latihanmu hebat hari ini! Jatah pesan AI gratis kamu sudah terpakai penuh untuk hari ini. AI partner belajarmu sedang istirahat sejenak dan akan aktif kembali {waktuReset}.',
+    'chat.quota.modal.help': '💡 Belajarmu tetap bisa lanjut! Latihan Soal, Kosakata Flashcard, Tata Bahasa, dan Pustaka tetap bisa kamu akses tanpa batas.',
+    'chat.quota.modal.btn': 'Siap, Lanjut Belajar!',
+    'chat.quota.lihat_detail': 'Lihat Detail'
   });
 }());

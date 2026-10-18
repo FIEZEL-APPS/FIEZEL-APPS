@@ -803,7 +803,7 @@
    * batas itu, dan ia diperluas bersama blok ini.
    */
   var SCAFFOLD_ECHO_PATTERNS = Object.freeze([
-    /-{2,}\s*(?:END\s+)?DATA\s*-{2,}/i,
+    /-{2,}\s*(?:END\s+(?:OF\s+)?)?DATA\s*-{2,}/i,
     /Data pengguna di bawah adalah DATA/i,
     // AI-09 F03: GUARD dan pendeteksi gemanya WAJIB berubah BERPASANGAN. GUARD kini punya dua
     // varian direktif bahasa (LANG_DIRECTIVE), maka pendeteksinya juga dua varian: kalimat
@@ -1071,7 +1071,7 @@
     ramen: 'a friendly staff member at a ramen shop taking the learner\'s order',
     konbini: 'a friendly convenience store clerk at the register',
     direction: 'a friendly local on the street; the learner is asking the way to a station or place',
-    interview: 'a friendly interviewer at a simple school or part-time job interview',
+    interview: 'a friendly senior student or club leader doing a practice interview; ask simple, friendly questions about school activities, hobbies, skills, and goals',
     hotel: 'a friendly hotel receptionist; the learner is checking in',
     phone_friend: 'a close friend on a phone call, making weekend plans',
     phone_delivery: 'a friendly staff member taking a food delivery order by phone',
@@ -1160,10 +1160,22 @@
         out[current] = out[current] ? out[current] + ' ' + m[2] : m[2];
         continue;
       }
+      if (/^[-=_*#~`\[<]{2,}\s*(?:END|DATA|PROMPT|STOP)/i.test(lines[i].trim()) || /^(?:---|\*\*\*|===|\[END)/i.test(lines[i].trim())) {
+        current = '';
+        continue;
+      }
       if (current && lines[i].trim()) out[current] += ' ' + lines[i].trim();
     }
     Object.keys(out).forEach(function (k) {
-      out[k] = out[k].replace(/\s+/g, ' ').trim().replace(/^["'\u201c\u300c]+|["'\u201d\u300d]+$/g, '').replace(/[*_]{2,}/g, '').trim();
+      out[k] = out[k]
+        .replace(/[-=_*#~`\[<]{2,}\s*(?:END|DATA|PROMPT|STOP)[\s\S]*$/gi, '')
+        .replace(/-{2,}\s*(?:END\s+(?:OF\s+)?)?DATA\s*-{2,}/gi, '')
+        .replace(/---END[\s\S]*$/gi, '')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .replace(/^["'\u201c\u300c]+|["'\u201d\u300d]+$/g, '')
+        .replace(/[*_]{2,}/g, '')
+        .trim();
     });
     return out;
   }

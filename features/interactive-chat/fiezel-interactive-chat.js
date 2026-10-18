@@ -817,7 +817,7 @@
     if (!text) return null;
     var tRaw = text.trim();
     if (course === 'ja') {
-      if (/\bわたし\s*わ\b/i.test(tRaw) || /わたしわ/.test(tRaw)) {
+      if (/(わたし|私|ぼく|僕)\s*わ/i.test(tRaw) || /わたしわ/.test(tRaw)) {
         return {
           id: 'particle_wa_ha',
           title: t('chat_misc_wa_title', 'Tips Partikel は'),
@@ -852,6 +852,13 @@
         return null;
       }
     } else {
+      if (/\bsince\s+(\d+|one|two|three|four|five|six|seven|eight|nine|ten|a\s+few|several)\s+(years?|months?|weeks?|days?|hours?)\b/i.test(tRaw)) {
+        return {
+          id: 'prep_since_vs_for',
+          title: t('chat_misc_since_title', 'Preposition: For vs Since'),
+          desc: t('chat_misc_since_desc', 'Gunakan "for" untuk durasi rentang waktu (misal: for 3 years), dan "since" hanya untuk titik awal waktu (misal: since 2021).')
+        };
+      }
       if (/\bi\s+am\s+agree\b/i.test(tRaw)) {
         return {
           id: 'verb_agree',
@@ -1344,6 +1351,8 @@
     nudgeOpen: false,
     // Sumber balasan terakhir: 'ai' | 'offline' | 'quota' (untuk penanda jujur di layar).
     replySource: '',
+    quotaModalOpen: false,
+    quotaResetTime: '',
     messages: [],
     scenarioHistories: {},
     isThinking: false,
@@ -1439,6 +1448,8 @@
   }
 
   function initScenario(id) {
+    stopVoice();
+    stopShadowingAudio();
     // Simpan pesan aktif sebelum berpindah skenario.
     if (state.scenarioId && state.messages && state.messages.length > 0) {
       state.scenarioHistories[histKeyFor(state.course, state.scenarioId)] = state.messages;
@@ -1456,6 +1467,8 @@
   }
 
   function resetCurrentScenario() {
+    stopVoice();
+    stopShadowingAudio();
     var id = state.scenarioId;
     state.messages = [starterMessage(id)];
     state.scenarioHistories[histKeyFor(state.course, id)] = state.messages;
@@ -1975,7 +1988,7 @@
     var out = { reply: '', meaning: '', check: '' };
     var map = { REPLY: 'reply', MEANING: 'meaning', CHECK: 'check' };
     var current = '';
-    String(raw || '').replace(/^```[a-z]*\s*|\s*```$/gi, '').split(/\r?\n/).forEach(function (line) {
+    String(raw || '').replace(/^\x60{3}[a-z]*\s*|\s*\x60{3}$/gi, '').split(/\r?\n/).forEach(function (line) {
       var m = /^\s*[*_#>\-\s]*(REPLY|MEANING|FIX|WHY|CHECK)[*_\s]*[:\uff1a]\s*(.*)$/i.exec(line);
       if (m) {
         current = map[m[1].toUpperCase()] || '';
@@ -1984,8 +1997,15 @@
       }
       if (current && line.trim()) out[current] += ' ' + line.trim();
     });
-    Object.keys(out).forEach(function (k) { out[k] = out[k].replace(/\s+/g, ' ').trim(); });
-    if (!out.reply && !/\b(REPLY|MEANING)\b/i.test(String(raw || ''))) out.reply = String(raw || '').trim();
+    Object.keys(out).forEach(function (k) {
+      out[k] = out[k]
+        .replace(/-{2,}\s*(?:END\s+(?:OF\s+)?)?DATA\s*-{2,}/gi, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+    });
+    if (!out.reply && !/\b(REPLY|MEANING)\b/i.test(String(raw || ''))) {
+      out.reply = String(raw || '').replace(/-{2,}\s*(?:END\s+(?:OF\s+)?)?DATA\s*-{2,}/gi, '').trim();
+    }
     return out;
   }
 
@@ -2053,15 +2073,17 @@
           mistakeSignal: /^\W*mistake/i.test(p.check) ? true : (/^\W*ok\b/i.test(p.check) ? false : null)
         };
       }
+      var cleanReply = String(turn.reply || result.text || '').replace(/-{2,}\s*(?:END\s+(?:OF\s+)?)?DATA\s*-{2,}/gi, '').trim();
+      var cleanTrans = String(turn.translation || '').replace(/-{2,}\s*(?:END\s+(?:OF\s+)?)?DATA\s*-{2,}/gi, '').trim();
       var corr = turn.correction && turn.correction.corrected ? {
-        corrected: String(turn.correction.corrected),
-        note: String(turn.correction.note || '')
+        corrected: String(turn.correction.corrected).replace(/-{2,}\s*(?:END\s+(?:OF\s+)?)?DATA\s*-{2,}/gi, '').trim(),
+        note: String(turn.correction.note || '').replace(/-{2,}\s*(?:END\s+(?:OF\s+)?)?DATA\s*-{2,}/gi, '').trim()
       } : null;
       return {
-        text: String(turn.reply || result.text),
+        text: cleanReply,
         furigana: null,
         romaji: null,
-        translation: String(turn.translation || ''),
+        translation: cleanTrans,
         grammarNote: null,
         suggestions: [],
         correction: corr,
@@ -2071,7 +2093,9 @@
       };
     }).catch(function (err) {
       var code = err && (err.code || err.error);
-      return offline(code === 'quota_exhausted' ? 'quota' : 'offline');
+      var r = offline(code === 'quota_exhausted' ? 'quota' : 'offline');
+      if (err && err.retryAfter) r.retryAfter = err.retryAfter;
+      return r;
     });
   }
 
@@ -2118,6 +2142,8 @@
 
   // Handle User Message Submission
   function sendMessage(text) {
+    stopVoice();
+    stopShadowingAudio();
     var trimmed = String(text || '').trim();
     if (!trimmed || state.isThinking) return;
 
@@ -2316,6 +2342,9 @@
     }
 
     if (shouldNudgeCorrection(state.messages)) state.nudgeOpen = true;
+    if (r.source === 'quota') {
+      showQuotaExhaustedModal(r.retryAfter);
+    }
     saveState();
     updateUI();
     scrollBottom();
@@ -2346,6 +2375,13 @@
   }
 
   function stopShadowingAudio() {
+    if (state.recognition) {
+      try {
+        if (typeof state.recognition.abort === 'function') state.recognition.abort();
+        else if (typeof state.recognition.stop === 'function') state.recognition.stop();
+      } catch (_) {}
+      state.recognition = null;
+    }
     if (shadowingRafId) {
       if (typeof cancelAnimationFrame === 'function') cancelAnimationFrame(shadowingRafId);
       else clearTimeout(shadowingRafId);
@@ -2359,7 +2395,10 @@
     shadowingSpeechEnergy = 0;
     if (shadowingAudioStream) {
       try {
-        shadowingAudioStream.getTracks().forEach(function (tr) { tr.stop(); });
+        shadowingAudioStream.getTracks().forEach(function (tr) {
+          try { tr.enabled = false; } catch (_) {}
+          try { tr.stop(); } catch (_) {}
+        });
       } catch (_) {}
       shadowingAudioStream = null;
     }
@@ -2737,12 +2776,25 @@
     var out = '';
     var p = 0, q = 0;
     while (q < b.length) {
-      if (p < a.length && norm(a[p]) === norm(b[q])) { out += esc(b[q]); p++; q++; }
-      else if (p < a.length && dp[p + 1][q] >= dp[p][q + 1]) { p++; }
-      else {
+      if (p < a.length && norm(a[p]) === norm(b[q])) {
+        out += esc(b[q]);
+        p++;
+        q++;
+      } else if (p < a.length && dp[p + 1][q] >= dp[p][q + 1]) {
+        if (!/^\s+$/.test(a[p]) && norm(a[p])) {
+          out += '<del class="fzc-del-mark">' + esc(a[p]) + '</del> ';
+        }
+        p++;
+      } else {
         out += /^\s+$/.test(b[q]) ? esc(b[q]) : '<mark class="fzc-fix-mark">' + esc(b[q]) + '</mark>';
         q++;
       }
+    }
+    while (p < a.length) {
+      if (!/^\s+$/.test(a[p]) && norm(a[p])) {
+        out += ' <del class="fzc-del-mark">' + esc(a[p]) + '</del>';
+      }
+      p++;
     }
     return out;
   }
@@ -2784,7 +2836,12 @@
   function sourceNoteHtml() {
     if (state.isThinking) return '';
     if (state.replySource === 'quota') {
-      return '<div class="fzc-source-note" role="status">' + esc(t('chat.sumber.kuota', 'Jatah obrolan hari ini sudah habis. Sampai tengah malam, balasanku dari naskah latihan.')) + '</div>';
+      return '<div class="fzc-source-note fzc-source-note-quota" role="status">' +
+        '<span>' + esc(t('chat.sumber.kuota', 'Jatah obrolan hari ini sudah habis. Sampai tengah malam, balasanku dari naskah latihan.')) + '</span>' +
+        '<button type="button" class="fzc-btn-quota-info" id="fzcBtnQuotaInfo" aria-label="' + esc(t('chat.quota.lihat_detail', 'Lihat Detail')) + '">' +
+        esc(t('chat.quota.lihat_detail', 'Lihat Detail')) +
+        '</button>' +
+        '</div>';
     }
     if (state.replySource === 'offline') {
       return '<div class="fzc-source-note" role="status">' + esc(t('chat.sumber.hemat', 'Mode hemat: balasan ini dari naskah latihan, bukan AI.')) + '</div>';
@@ -2803,6 +2860,70 @@
       '<button type="button" class="fzc-nudge-later" id="fzcNudgeLater">' + esc(t('chat.ajakan.nanti', 'Nanti saja')) + '</button>' +
       '<button type="button" class="fzc-nudge-on" id="fzcNudgeOn">' + esc(t('chat.ajakan.nyalakan', 'Nyalakan koreksi')) + '</button>' +
       '</div>' +
+      '</div>' +
+      '</div>';
+  }
+
+  function formatQuotaResetLabel(retryAfter) {
+    if (typeof retryAfter === 'number' && retryAfter > 0) {
+      var jam = Math.ceil(retryAfter / 3600);
+      var resetDate = new Date(Date.now() + retryAfter * 1000);
+      var hh = String(resetDate.getHours()).padStart(2, '0');
+      var mm = String(resetDate.getMinutes()).padStart(2, '0');
+      var locale = (root.FiezelI18n && typeof root.FiezelI18n.getLocale === 'function') ? root.FiezelI18n.getLocale() : 'id';
+      if (locale === 'th') {
+        return 'อีก ' + jam + ' ชม. (เวลา ' + hh + '.' + mm + ' น.)';
+      }
+      return jam + ' jam lagi (pukul ' + hh + '.' + mm + ' WIB)';
+    }
+
+    // Default: Reset pada tengah malam berikutnya (00:00 WIB, UTC+7)
+    var now = new Date();
+    var utcTime = now.getTime() + (now.getTimezoneOffset() * 60000);
+    var wibNow = new Date(utcTime + (7 * 3600000));
+    var wibMidnight = new Date(wibNow);
+    wibMidnight.setHours(24, 0, 0, 0);
+    var diffMs = wibMidnight.getTime() - wibNow.getTime();
+    var hoursLeft = Math.max(1, Math.ceil(diffMs / 3600000));
+
+    var loc = (root.FiezelI18n && typeof root.FiezelI18n.getLocale === 'function') ? root.FiezelI18n.getLocale() : 'id';
+    if (loc === 'th') {
+      return 'อีก ' + hoursLeft + ' ชม. (เวลา 00.00 น.)';
+    }
+    return hoursLeft + ' jam lagi (pukul 00.00 WIB)';
+  }
+
+  function showQuotaExhaustedModal(retryAfter) {
+    state.quotaResetTime = formatQuotaResetLabel(retryAfter);
+    state.quotaModalOpen = true;
+    updateUI();
+  }
+
+  function dismissQuotaExhaustedModal() {
+    state.quotaModalOpen = false;
+    updateUI();
+  }
+
+  function quotaModalHtml() {
+    if (!state.quotaModalOpen) return '';
+    var labelReset = state.quotaResetTime || formatQuotaResetLabel();
+    var descPattern = t('chat.quota.modal.desc', 'Latihanmu hebat hari ini! Jatah pesan AI gratis kamu sudah terpakai penuh untuk hari ini. AI partner belajarmu sedang istirahat sejenak dan akan aktif kembali {waktuReset}.');
+    var descText = descPattern.replace(/\{waktuReset\}/g, labelReset);
+
+    return '<div class="fzc-quota-modal-overlay" id="fzcQuotaModalOverlay" role="dialog" aria-modal="true" aria-labelledby="fzcQuotaTitle" aria-describedby="fzcQuotaDesc">' +
+      '<div class="fzc-quota-modal-card">' +
+      '<div class="fzc-quota-modal-icon-wrap">' +
+      '<span class="fzc-quota-badge">' + esc(t('chat.quota.modal.badge', 'FIEZEL AI · JATAH HARIAN')) + '</span>' +
+      icon('sparkles', { size: 36 }) +
+      '</div>' +
+      '<h2 class="fzc-quota-modal-title" id="fzcQuotaTitle">' + esc(t('chat.quota.modal.title', 'Limit Harian AI Sudah Terpakai Penuh')) + '</h2>' +
+      '<p class="fzc-quota-modal-desc" id="fzcQuotaDesc">' + esc(descText) + '</p>' +
+      '<div class="fzc-quota-modal-help">' +
+      '<p>' + esc(t('chat.quota.modal.help', '💡 Belajarmu tetap bisa lanjut! Latihan Soal, Kosakata Flashcard, Tata Bahasa, dan Pustaka tetap bisa kamu akses tanpa batas.')) + '</p>' +
+      '</div>' +
+      '<button type="button" class="fzc-quota-modal-btn-confirm" id="fzcQuotaConfirmBtn">' +
+      esc(t('chat.quota.modal.btn', 'Siap, Lanjut Belajar!')) +
+      '</button>' +
       '</div>' +
       '</div>';
   }
@@ -3058,15 +3179,22 @@
       msgsHtml +
       typingHtml +
       sourceNoteHtml() +
+      '<button type="button" class="fzc-floating-new-msg" id="fzcNewMsgBtn" style="display:none;" aria-label="' + esc(t('chat_new_msg_pill', 'Pesan Baru ↓')) + '">' +
+      icon('arrow-down', { size: 14 }) + ' <span>' + esc(t('chat_new_msg_pill', 'Pesan Baru ↓')) + '</span>' +
+      '</button>' +
       '</div>' +
       nudgeHtml() +
+      quotaModalHtml() +
 
       '<div class="fzc-dock">' +
       '<form class="fzc-dock-form" id="fzcForm">' +
       '<button type="button" class="fzc-btn-icon fzc-btn-mic' + micActive + '" id="fzcBtnMic" aria-label="' + esc(t('chat_mic_aria', 'Bicara lewat Mikrofon')) + '">' +
       icon(state.isListening ? 'mic-active' : 'mic', { size: 18 }) +
       '</button>' +
-      '<input type="text" class="fzc-input" id="fzcInput" placeholder="' + esc(inputPlaceholder) + '" autocomplete="off" enterkeyhint="send">' +
+      '<button type="button" class="fzc-btn-icon fzc-btn-speaker-dock' + (state.autoVoice === false ? ' is-muted' : '') + '" id="fzcBtnSpeakerDock" aria-label="' + esc(state.autoVoice === false ? t('chat_unmute_voice', 'Nyalakan Suara') : t('chat_mute_voice', 'Bisukan Suara')) + '">' +
+      icon(state.autoVoice === false ? 'volume-x' : 'volume', { size: 18 }) +
+      '</button>' +
+      '<textarea class="fzc-input" id="fzcInput" rows="1" placeholder="' + esc(inputPlaceholder) + '" autocomplete="off" enterkeyhint="send"></textarea>' +
       '<button type="submit" class="fzc-btn-icon fzc-btn-send" id="fzcBtnSend" aria-label="' + esc(t('chat_send_aria', 'Kirim Pesan')) + '">' +
       icon('send', { size: 16 }) +
       '</button>' +
@@ -3088,8 +3216,42 @@
     if (callBtn) {
       callBtn.onclick = function () {
         unlockAudioContext();
+        if (state.replySource === 'quota') {
+          showQuotaExhaustedModal();
+          return false;
+        }
         return startVoiceCall();
       };
+    }
+
+    // Quota Modal & Source Note Info CTA
+    var quotaInfoBtn = container.querySelector('#fzcBtnQuotaInfo');
+    if (quotaInfoBtn) {
+      quotaInfoBtn.onclick = function () {
+        showQuotaExhaustedModal();
+      };
+    }
+
+    var quotaConfirmBtn = container.querySelector('#fzcQuotaConfirmBtn');
+    if (quotaConfirmBtn) {
+      quotaConfirmBtn.onclick = dismissQuotaExhaustedModal;
+    }
+
+    var quotaOverlay = container.querySelector('#fzcQuotaModalOverlay');
+    if (quotaOverlay) {
+      quotaOverlay.onclick = function (e) {
+        if (e && e.target === quotaOverlay) {
+          dismissQuotaExhaustedModal();
+        }
+      };
+      quotaOverlay.onkeydown = function (e) {
+        if (e && e.key === 'Escape') {
+          dismissQuotaExhaustedModal();
+        }
+      };
+      if (quotaConfirmBtn && typeof quotaConfirmBtn.focus === 'function') {
+        try { quotaConfirmBtn.focus(); } catch (_) {}
+      }
     }
 
     // Reset Chat
@@ -3149,7 +3311,7 @@
       };
     });
 
-    // Form Submit
+    // Form Submit & Textarea Handling
     var form = container.querySelector('#fzcForm');
     var input = container.querySelector('#fzcInput');
     var sendBtn = container.querySelector('#fzcBtnSend');
@@ -3159,11 +3321,62 @@
       var val = input ? input.value : '';
       if (val && val.trim()) {
         input.value = '';
+        try { input.style.height = 'auto'; } catch (_) {}
         sendMessage(val);
       }
     }
     if (form) form.onsubmit = doSubmit;
     if (sendBtn) sendBtn.onclick = doSubmit;
+
+    if (input) {
+      // Barge-in & auto-grow on typing
+      input.addEventListener('input', function () {
+        stopVoice();
+        this.style.height = 'auto';
+        this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+      });
+
+      // Japanese / CJK IME composition guard & Enter to submit
+      input.addEventListener('keydown', function (e) {
+        if (e && (e.isComposing || e.keyCode === 229)) {
+          return; // IME is actively composing Kanji/Kana
+        }
+        if (e && e.key === 'Enter') {
+          if (!e.shiftKey) {
+            e.preventDefault();
+            doSubmit(e);
+          }
+        }
+      });
+    }
+
+    // Speaker Dock Button (Mute / Unmute Auto Voice)
+    var speakerDockBtn = container.querySelector('#fzcBtnSpeakerDock');
+    if (speakerDockBtn) {
+      speakerDockBtn.onclick = function () {
+        unlockAudioContext();
+        state.autoVoice = state.autoVoice === false;
+        if (!state.autoVoice) stopVoice();
+        saveState();
+        updateUI();
+      };
+    }
+
+    // Floating New Message Pill & Smart Scroll Anchoring
+    var newMsgBtn = container.querySelector('#fzcNewMsgBtn');
+    var feed = container.querySelector('#fzcFeed');
+    if (newMsgBtn && feed) {
+      newMsgBtn.onclick = function () {
+        feed.scrollTo({ top: feed.scrollHeight, behavior: 'smooth' });
+        newMsgBtn.style.display = 'none';
+      };
+      feed.addEventListener('scroll', function () {
+        var isNear = (feed.scrollHeight - feed.scrollTop - feed.clientHeight) < 60;
+        if (isNear) {
+          newMsgBtn.style.display = 'none';
+        }
+      }, { passive: true });
+    }
 
     // Mic Button
     var micBtn = container.querySelector('#fzcBtnMic');
@@ -3218,8 +3431,63 @@
     if (!doc) return;
     var mountPoint = doc.getElementById('app');
     if (!mountPoint) return;
+
+    // Zero-Loss Draft & Focus Preservation
+    var draftText = '';
+    var selStart = 0;
+    var selEnd = 0;
+    var hadFocus = false;
+    var prevInput = mountPoint.querySelector('#fzcInput');
+    if (prevInput) {
+      draftText = prevInput.value || '';
+      hadFocus = (doc.activeElement === prevInput);
+      try {
+        selStart = prevInput.selectionStart || 0;
+        selEnd = prevInput.selectionEnd || 0;
+      } catch (_) {}
+    }
+
+    // Smart Scroll Anchoring: check if student was reading history
+    var prevFeed = mountPoint.querySelector('#fzcFeed');
+    var wasNearBottom = true;
+    var savedScrollTop = 0;
+    if (prevFeed) {
+      wasNearBottom = (prevFeed.scrollHeight - prevFeed.scrollTop - prevFeed.clientHeight) < 75;
+      savedScrollTop = prevFeed.scrollTop;
+    }
+
     mountPoint.innerHTML = renderMarkup();
     bindEvents(mountPoint);
+
+    // Restore Draft, Auto-grow & Focus
+    var nextInput = mountPoint.querySelector('#fzcInput');
+    if (nextInput && draftText) {
+      nextInput.value = draftText;
+      try {
+        nextInput.style.height = 'auto';
+        nextInput.style.height = Math.min(nextInput.scrollHeight, 120) + 'px';
+      } catch (_) {}
+      if (hadFocus) {
+        try {
+          nextInput.focus();
+          nextInput.setSelectionRange(selStart, selEnd);
+        } catch (_) {}
+      }
+    }
+
+    // Restore or Anchor Feed Scroll
+    var nextFeed = mountPoint.querySelector('#fzcFeed');
+    var newMsgBtn = mountPoint.querySelector('#fzcNewMsgBtn');
+    if (nextFeed) {
+      if (wasNearBottom) {
+        nextFeed.scrollTop = nextFeed.scrollHeight;
+        if (newMsgBtn) newMsgBtn.style.display = 'none';
+      } else {
+        nextFeed.scrollTop = savedScrollTop;
+        if (newMsgBtn) newMsgBtn.style.display = 'inline-flex';
+      }
+    }
+
     if (typeof root.enhanceUI === 'function') {
       try { root.enhanceUI(); } catch (_) {}
     }
@@ -3267,6 +3535,7 @@
     syncVoiceCallTurns: syncVoiceCallTurns,
     startVoiceCall: startVoiceCall,
     renderMarkup: renderMarkup,
+    updateUI: updateUI,
     bindEvents: bindEvents,
     isPhoneScenario: isPhoneScenario,
     isPhoneModeActive: isPhoneModeActive,
@@ -3344,7 +3613,13 @@
     speakAssistantMessage: speakAssistantMessage,
     playVoice: playVoice,
     stopVoice: stopVoice,
+    stopShadowingAudio: stopShadowingAudio,
     unlockAudioContext: unlockAudioContext,
+    formatQuotaResetLabel: formatQuotaResetLabel,
+    showQuotaExhaustedModal: showQuotaExhaustedModal,
+    dismissQuotaExhaustedModal: dismissQuotaExhaustedModal,
+    quotaModalHtml: quotaModalHtml,
+    parseTaggedReply: parseTaggedReply,
     getChatHistory: getChatHistory,
     saveChatHistoryRecord: saveChatHistoryRecord,
     recordCallSession: recordCallSession,
