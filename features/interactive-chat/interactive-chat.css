@@ -3039,6 +3039,10 @@ body.fz-ja-no-romaji .fzc-romaji {
   display: none !important;
 }
 
+.fzc-source-note-quota {
+  display: flex !important;
+}
+
 /* ── Smart Scroll Anchoring: Floating "Pesan Baru ↓" Indicator ── */
 .fzc-scroll-bottom-pill,
 .fzc-floating-new-msg {

@@ -140,6 +140,16 @@
       '<polygon class="fzc-i-line" points="11,5 6,9 3,9 3,15 6,15 11,19"/>' +
       '<path class="fzc-i-line" d="M15.5 8.5a5 5 0 0 1 0 7M19 5a9 9 0 0 1 0 14"/>',
 
+    'volume-x':
+      '<polygon class="fzc-i-fill" points="11,5 6,9 3,9 3,15 6,15 11,19"/>' +
+      '<polygon class="fzc-i-line" points="11,5 6,9 3,9 3,15 6,15 11,19"/>' +
+      '<line class="fzc-i-line" x1="23" y1="9" x2="17" y2="15"/>' +
+      '<line class="fzc-i-line" x1="17" y1="9" x2="23" y2="15"/>',
+
+    'arrow-down':
+      '<line class="fzc-i-line" x1="12" y1="5" x2="12" y2="19"/>' +
+      '<polyline class="fzc-i-line" points="19 12 12 19 5 12"/>',
+
     'soundwave':
       '<path class="fzc-i-line" d="M4 12v.01M8 8v8M12 4v16M16 7v10M20 10v4" stroke-width="2.2"/>',
 
@@ -241,6 +251,14 @@
     'audio': 'volume',
     'speaker': 'volume',
     'listen': 'volume',
+    'volume-off': 'volume-x',
+    'volume-mute': 'volume-x',
+    'mute': 'volume-x',
+    'speaker-off': 'volume-x',
+    'speaker-muted': 'volume-x',
+    'silent': 'volume-x',
+    'down': 'arrow-down',
+    'chevron-down': 'arrow-down',
     'audio-wave': 'soundwave',
     'globe': 'translate',
     'lang': 'translate',
