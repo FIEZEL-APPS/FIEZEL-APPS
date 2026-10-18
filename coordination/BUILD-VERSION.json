@@ -1,7 +1,7 @@
 {
-  "version": "m025-597",
-  "claimedBy": "branch feat/android-native-m025-595",
-  "claimedAt": "2026-10-17T23:55:38.037Z",
-  "reason": "feat(android): rilis native android shell dan tautan unduh apk (m025-597)",
+  "version": "m025-598",
+  "claimedBy": "branch feat/chat-quota-popup-and-audit-fixes",
+  "claimedAt": "2026-10-18T00:46:35.368Z",
+  "reason": "fix(chat): modal limit kuota harian, sanitasi delimiter & skenario interview",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

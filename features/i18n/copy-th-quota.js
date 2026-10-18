@@ -118,6 +118,14 @@
     'voice.notice.reassurance': 'ข้อนี้ไม่ถูกให้คะแนนและไม่ถูกล็อก',
     'voice.notice.reset-tail': ' เริ่มใช้ได้อีกครั้งเวลา {jam} น.',
     'voice.notice.reset-marker': 'หลังเที่ยงคืน',
-    'voice.notice.reset-inline': 'เวลา {jam} น.'
+    'voice.notice.reset-inline': 'เวลา {jam} น.',
+
+    // Modal pemberitahuan limit harian AI habis (Kawan Bicara / Interactive Chat)
+    'chat.quota.modal.badge': 'FIEZEL AI · สิทธิ์ประจำวัน',
+    'chat.quota.modal.title': 'การสนทนา AI วันนี้ใช้ครบจำนวนแล้ว',
+    'chat.quota.modal.desc': 'วันนี้คุณฝึกฝนได้ยอดเยี่ยมมาก! จำนวนข้อความ AI ฟรีประจำวันของคุณถูกใช้งานครบแล้ว คู่หู AI กำลังพักผ่อนและจะกลับมาพร้อมใช้งานอีกครั้งใน {waktuReset}',
+    'chat.quota.modal.help': '💡 การเรียนรู้ไม่สะดุด! คุณยังสามารถฝึกฝนต่อได้ไม่จำกัดผ่านแบบฝึกหัด คำศัพท์ แฟลชการ์ด และบทเรียนไวยากรณ์',
+    'chat.quota.modal.btn': 'เข้าใจแล้ว ลุยต่อเลย!',
+    'chat.quota.lihat_detail': 'ดูรายละเอียด'
   });
 }());

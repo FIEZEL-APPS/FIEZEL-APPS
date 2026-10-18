@@ -430,14 +430,16 @@ body.fz-view-chat #fiezelDiagHost {
   line-height: 1;
 }
 
-/* ── Reset Button: Tactile Minimalist Circular Icon ── */
-.fzc-btn-reset {
+/* ── Reset & Speaker Buttons: Apple HIG 44px Tactile Circular Icons ── */
+.fzc-btn-reset,
+.fzc-btn-speaker {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  width: 32px !important;
-  height: 32px !important;
-  min-height: 32px !important;
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  min-height: 44px !important;
   border-radius: 50% !important;
   background: #FFFFFF !important;
   border: 1px solid rgba(226, 218, 206, 0.9) !important;
@@ -446,9 +448,28 @@ body.fz-view-chat #fiezelDiagHost {
   cursor: pointer !important;
   transition: transform 0.16s var(--fzc-spring), background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease !important;
   -webkit-tap-highlight-color: transparent !important;
+  touch-action: manipulation !important;
   font-size: 0.82rem !important;
   padding: 0 !important;
   flex-shrink: 0 !important;
+}
+
+.fzc-btn-speaker {
+  color: var(--fzc-accent-emerald, #00C853) !important;
+}
+
+.fzc-btn-speaker.is-muted {
+  color: var(--fzc-ink-muted, #8C7B83) !important;
+  background: #FAF7F0 !important;
+}
+
+.fzc-btn-speaker:hover {
+  background: #FAF7F0 !important;
+  transform: translateY(-1px) scale(1.04) !important;
+}
+
+.fzc-btn-speaker:active {
+  transform: scale(0.92) !important;
 }
 
 .fzc-btn-reset:hover {
@@ -642,10 +663,12 @@ body.fz-view-chat #fiezelDiagHost {
     font-size: 0.70rem !important;
     gap: 4px !important;
   }
-  .fzc-btn-reset {
-    width: 28px !important;
-    height: 28px !important;
-    min-height: 28px !important;
+  .fzc-btn-reset,
+  .fzc-btn-speaker {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
   }
 }
 
@@ -872,16 +895,18 @@ body.fz-view-chat #fiezelDiagHost {
 .fzc-japanese-text ruby {
   ruby-align: center !important;
   ruby-position: over !important;
+  -webkit-ruby-position: before !important;
 }
 
 .fzc-japanese-text rt {
-  font-size: 0.60em !important;
+  font-size: 0.64em !important;
   line-height: 1 !important;
-  color: #8C7B83 !important;
-  font-weight: 600 !important;
+  color: #55484E !important; /* Kontras 8.45:1 (WCAG AAA) */
+  font-weight: 700 !important;
   padding-bottom: 2px !important;
-  letter-spacing: 0 !important;
-  user-select: none;
+  letter-spacing: 0.02em !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
   display: ruby-text !important;
   text-align: center !important;
 }
@@ -893,8 +918,9 @@ body.fz-ja-no-furigana .fzc-japanese-text rt {
 .fzc-romaji {
   display: block;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  font-size: 0.76rem;
-  color: #8C7B83;
+  font-size: 0.78rem;
+  color: #574A50; /* Kontras 8.12:1 (WCAG AAA) */
+  font-weight: 500;
   margin-top: 6px;
   font-style: italic;
   line-height: 1.35;
@@ -960,22 +986,23 @@ body.fz-ja-no-romaji .fzc-romaji {
   align-items: center !important;
   justify-content: center !important;
   gap: 6px !important;
-  padding: 0 12px !important;
-  min-height: 28px !important;
-  height: 28px !important;
+  padding: 0 14px !important;
+  min-height: 44px !important;
+  height: 44px !important;
   border-radius: 999px !important;
   background: #FFFFFF !important;
   border: 1px solid rgba(226, 218, 205, 0.95) !important;
   box-shadow: 0 1px 3px rgba(27, 20, 24, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
   color: #4A3E44 !important;
   font-family: var(--font-display, 'Plus Jakarta Sans', sans-serif) !important;
-  font-size: 0.73rem !important;
+  font-size: 0.78rem !important;
   font-weight: 700 !important;
   white-space: nowrap !important;
   line-height: 1 !important;
   cursor: pointer !important;
   transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.15s ease, box-shadow 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.15s ease, color 0.15s ease !important;
   -webkit-tap-highlight-color: transparent !important;
+  touch-action: manipulation !important;
   user-select: none !important;
 }
 
@@ -1472,6 +1499,8 @@ body.fz-ja-no-romaji .fzc-romaji {
   margin-top: auto !important;
   width: 100% !important;
   box-sizing: border-box !important;
+  padding: 8px 16px 14px 16px !important;
+  padding: 8px 16px calc(14px + constant(safe-area-inset-bottom, 0px)) 16px !important;
   padding: 8px 16px calc(14px + env(safe-area-inset-bottom, 0px)) 16px !important;
   background: rgba(253, 250, 243, 0.94) !important;
   backdrop-filter: blur(16px) saturate(180%) !important;
@@ -1489,18 +1518,18 @@ body.fz-ja-no-romaji .fzc-romaji {
   }
 }
 
-/* Input Bar Clay Melengkung */
+/* Input Bar Clay Melengkung: Multi-line Auto-Grow */
 .fzc-dock-form {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   gap: 8px;
   background: #FFFFFF;
   border: 1.5px solid #E2D9CC;
-  border-radius: 999px;
-  padding: 4px 6px 4px 8px;
+  border-radius: 24px;
+  padding: 4px 6px 4px 10px;
   box-shadow: 0 2px 10px rgba(27, 20, 24, 0.04), inset 0 1px 0 #FFFFFF;
   transition: border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  min-height: 50px;
+  min-height: 52px;
   box-sizing: border-box;
 }
 
@@ -1513,25 +1542,33 @@ body.fz-ja-no-romaji .fzc-romaji {
   flex: 1;
   border: none !important;
   background: transparent !important;
-  padding: 8px 6px !important;
-  font-size: 0.88rem !important;
+  padding: 10px 8px !important;
+  font-size: 1rem !important; /* 16px: Eliminates iOS Safari Hardware Auto-Zoom */
+  line-height: 1.4 !important;
   color: var(--fzc-ink) !important;
-  min-height: unset !important;
+  min-height: 24px !important;
+  max-height: 120px !important;
   min-width: 0 !important;
   outline: none !important;
   font-family: inherit;
   letter-spacing: -0.01em;
+  resize: none !important;
+  overflow-y: hidden;
+  box-sizing: border-box !important;
+  touch-action: manipulation !important;
+  field-sizing: content;
 }
 
 .fzc-input::placeholder {
   color: var(--fzc-ink-subtle);
-  font-size: 0.81rem;
+  font-size: 0.90rem;
 }
 
 .fzc-btn-icon {
-  width: 40px !important;
-  height: 40px !important;
-  min-height: 40px !important;
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  min-height: 44px !important;
   border-radius: 50% !important;
   padding: 0 !important;
   display: inline-flex !important;
@@ -1544,6 +1581,24 @@ body.fz-ja-no-romaji .fzc-romaji {
   flex-shrink: 0;
   -webkit-tap-highlight-color: transparent;
   user-select: none;
+  touch-action: manipulation !important;
+}
+
+.fzc-btn-speaker-dock {
+  background: transparent !important;
+  color: var(--fzc-accent-emerald, #00C853) !important;
+}
+
+.fzc-btn-speaker-dock.is-muted {
+  color: var(--fzc-ink-muted, #8C7B83) !important;
+}
+
+.fzc-btn-speaker-dock:hover {
+  background: #FAF7F0 !important;
+}
+
+.fzc-btn-speaker-dock:active {
+  transform: scale(0.92) !important;
 }
 
 /* Tombol Mic Taktil (Clay Round Button with Tactile Bounce) */
@@ -2854,12 +2909,12 @@ body.fz-ja-no-romaji .fzc-romaji {
      menggelembungkan tombol tanpa itu (terukur: saklar memenuhi satu baris penuh). */
   display: inline-flex !important;
   align-items: center !important;
-  gap: 6px !important;
+  gap: 8px !important;
   flex: 0 0 auto !important;
   width: auto !important;
-  min-height: 32px !important;
-  height: 32px !important;
-  padding: 0 8px 0 10px !important;
+  min-height: 44px !important;
+  height: 44px !important;
+  padding: 0 14px !important;
   margin: 0 !important;
   border-radius: 999px !important;
   border: 1px solid var(--fzc-border) !important;
@@ -2867,11 +2922,12 @@ body.fz-ja-no-romaji .fzc-romaji {
   color: var(--fzc-ink-muted) !important;
   box-shadow: none !important;
   font-family: var(--font-display, 'Plus Jakarta Sans', sans-serif) !important;
-  font-size: 0.74rem !important;
+  font-size: 0.78rem !important;
   font-weight: 700 !important;
   line-height: 1 !important;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation !important;
   transition: background-color 0.16s ease, border-color 0.16s ease, color 0.16s ease;
 }
 
@@ -2889,16 +2945,16 @@ body.fz-ja-no-romaji .fzc-romaji {
 
 .fzc-mode-icon {
   display: inline-flex;
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
 }
 
 .fzc-mode-icon svg { width: 100%; height: 100%; display: block; }
 
 .fzc-mode-switch {
   position: relative;
-  width: 28px;
-  height: 16px;
+  width: 32px;
+  height: 18px;
   border-radius: 999px;
   background: var(--fzc-border-strong);
   transition: background-color 0.16s ease;
@@ -2909,15 +2965,15 @@ body.fz-ja-no-romaji .fzc-romaji {
   position: absolute;
   top: 2px;
   left: 2px;
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   background: #FFFFFF;
   transition: transform 0.18s var(--fzc-ease-out);
 }
 
 .fzc-mode-toggle.is-on .fzc-mode-switch { background: var(--fzc-accent-emerald); }
-.fzc-mode-toggle.is-on .fzc-mode-switch span { transform: translateX(12px); }
+.fzc-mode-toggle.is-on .fzc-mode-switch span { transform: translateX(14px); }
 
 /* ── Kartu koreksi lembut: kuning muda, bukan merah — ini bantuan, bukan hukuman ── */
 .fzc-correction {
@@ -2952,7 +3008,18 @@ body.fz-ja-no-romaji .fzc-romaji {
   background: #FDE68A;
   color: inherit;
   border-radius: 4px;
-  padding: 0 2px;
+  padding: 0 3px;
+  font-weight: 700;
+}
+
+.fzc-del-mark {
+  background: #FEE2E2;
+  color: #B91C1C;
+  text-decoration: line-through;
+  border-radius: 4px;
+  padding: 0 3px;
+  margin: 0 1px;
+  font-weight: 600;
 }
 
 .fzc-correction-note { margin-top: 2px; color: var(--fzc-ink-muted); font-size: 0.76rem; }
@@ -2967,17 +3034,85 @@ body.fz-ja-no-romaji .fzc-romaji {
   color: var(--fzc-accent-emerald-dark);
 }
 
-/* ── Penanda jujur: balasan dari naskah, bukan AI ── */
+/* ── Mode Hemat Banner Dimatikan Total (User Directive: Zero Mode Hemat) ── */
 .fzc-source-note {
-  align-self: center;
-  max-width: 92%;
-  margin: 4px auto 0;
-  padding: 6px 12px;
+  display: none !important;
+}
+
+/* ── Smart Scroll Anchoring: Floating "Pesan Baru ↓" Indicator ── */
+.fzc-scroll-bottom-pill,
+.fzc-floating-new-msg {
+  position: absolute;
+  bottom: 74px;
+  left: 50%;
+  transform: translateX(-50%) translateY(0);
+  background: var(--fzc-ink, #1B1418);
+  color: var(--fzc-primary-text, #FDFAF3);
+  padding: 8px 16px;
   border-radius: 999px;
-  background: var(--fzc-surface-alt);
-  color: var(--fzc-ink-muted);
-  font-size: 0.72rem;
-  text-align: center;
+  font-family: var(--font-display, 'Plus Jakarta Sans', sans-serif);
+  font-size: 0.80rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow:
+    0 4px 16px rgba(27, 20, 24, 0.22),
+    0 1px 3px rgba(27, 20, 24, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  z-index: 35;
+  touch-action: manipulation !important;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.22s var(--fzc-spring), opacity 0.2s ease, visibility 0.2s;
+  animation: fzcFloatIn 0.3s var(--fzc-spring);
+}
+
+.fzc-floating-new-msg:hover {
+  transform: translateX(-50%) translateY(-2px);
+  background: #2D2228;
+}
+
+.fzc-floating-new-msg:active {
+  transform: translateX(-50%) translateY(1px) scale(0.96);
+}
+
+.fzc-floating-new-msg.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transform: translateX(-50%) translateY(12px) scale(0.9);
+}
+
+.fzc-floating-new-msg .fzc-pill-badge {
+  background: var(--fzc-accent-emerald, #10B981);
+  color: #FFFFFF;
+  font-size: 0.70rem;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 999px;
+  margin-left: 2px;
+}
+
+@keyframes fzcFloatIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(16px) scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+/* ── 300ms Delay Elimination on All Interactive Elements ── */
+.fzc-scenario-chip,
+.fzc-suggestion-chip,
+.fzc-btn-call,
+.fzc-nudge button {
+  touch-action: manipulation !important;
 }
 
 /* ── Ajakan menyalakan koreksi ── */
@@ -3058,8 +3193,162 @@ body.fz-ja-no-romaji .fzc-romaji {
   color: var(--fzc-primary-text) !important;
 }
 
+/* ── Quota Exhausted Source Note & Modal ── */
+.fzc-source-note-quota {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+  background: #FEF9EE !important;
+  border: 1px solid rgba(245, 158, 11, 0.25) !important;
+  color: #92400E !important;
+}
+
+.fzc-btn-quota-info {
+  background: #FDE68A !important;
+  border: 1px solid rgba(217, 119, 6, 0.4) !important;
+  color: #78350F !important;
+  font-family: var(--font-display, 'Plus Jakarta Sans', sans-serif) !important;
+  font-size: 0.72rem !important;
+  font-weight: 800 !important;
+  border-radius: 999px !important;
+  padding: 4px 10px !important;
+  min-height: 28px !important;
+  white-space: nowrap !important;
+  cursor: pointer !important;
+  transition: transform 0.16s ease, background 0.16s ease !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+.fzc-btn-quota-info:hover {
+  background: #FCD34D !important;
+  transform: translateY(-1px) !important;
+}
+
+.fzc-btn-quota-info:active {
+  transform: scale(0.95) !important;
+}
+
+.fzc-quota-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(27, 20, 24, 0.52);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fzcFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.fzc-quota-modal-card {
+  width: 100%;
+  max-width: 440px;
+  background: #FFFFFF;
+  border-radius: 28px;
+  padding: 28px 24px 24px;
+  border: 1px solid rgba(226, 218, 206, 0.85);
+  box-shadow: 0 24px 48px -12px rgba(27, 20, 24, 0.22), 0 0 0 1px rgba(255, 255, 255, 0.8) inset;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: fzcCardPop 0.24s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.fzc-quota-modal-icon-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: #D97706;
+  margin-bottom: 8px;
+}
+
+.fzc-quota-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-family: var(--font-display, 'Plus Jakarta Sans', sans-serif);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.28);
+  color: #B45309;
+}
+
+.fzc-quota-modal-title {
+  margin: 8px 0 10px;
+  font-family: var(--font-display, 'Plus Jakarta Sans', sans-serif);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #1B1418;
+  line-height: 1.3;
+}
+
+.fzc-quota-modal-desc {
+  margin: 0 0 16px;
+  font-family: inherit;
+  font-size: 0.90rem;
+  line-height: 1.55;
+  color: #4B434D;
+}
+
+.fzc-quota-modal-help {
+  width: 100%;
+  background: #FEF9EE;
+  border: 1px solid rgba(245, 158, 11, 0.22);
+  border-radius: 16px;
+  padding: 12px 14px;
+  margin-bottom: 22px;
+  text-align: left;
+}
+
+.fzc-quota-modal-help p {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: #78350F;
+  font-weight: 600;
+}
+
+.fzc-quota-modal-btn-confirm {
+  width: 100% !important;
+  min-height: 48px !important;
+  background: #1B1418 !important;
+  color: #FFFFFF !important;
+  border: none !important;
+  border-radius: 999px !important;
+  font-family: var(--font-display, 'Plus Jakarta Sans', sans-serif) !important;
+  font-size: 0.94rem !important;
+  font-weight: 800 !important;
+  cursor: pointer !important;
+  box-shadow: 0 4px 12px rgba(27, 20, 24, 0.18) !important;
+  transition: transform 0.16s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.15s ease !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+.fzc-quota-modal-btn-confirm:hover {
+  background: #2D2228 !important;
+  transform: translateY(-1px) scale(1.02) !important;
+}
+
+.fzc-quota-modal-btn-confirm:active {
+  transform: scale(0.97) !important;
+}
+
+@keyframes fzcCardPop {
+  0% { transform: scale(0.92) translateY(12px); opacity: 0; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .fzc-correction, .fzc-nudge-backdrop { animation: none; }
+  .fzc-correction, .fzc-nudge-backdrop, .fzc-quota-modal-overlay, .fzc-quota-modal-card { animation: none; }
   .fzc-mode-switch span, .fzc-mode-switch { transition: none; }
 }
 
