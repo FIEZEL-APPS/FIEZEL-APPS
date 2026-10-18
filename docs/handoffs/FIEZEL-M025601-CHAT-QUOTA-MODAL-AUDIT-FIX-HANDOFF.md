@@ -18,6 +18,15 @@ Audit 50-turn interaktif FIEZEL AI dan pengujian batasan kuota menemukan tiga ar
      - **Tombol Konfirmasi**: `Siap, Lanjut Belajar!` (TH: `เข้าใจแล้ว ลุยต่อเลย!`)
      - **Tautan Feed**: Tombol `Lihat Detail` pada catatan sumber obrolan untuk membuka kembali modal kapan saja.
 
+4. **Hasil Audit Menyeluruh 5 Subagent (UI, UX, Voice, Pedagogi, Probe)**:
+   - **Eliminasi Total Mode Hemat AI**: Mode hemat AI sepenuhnya dihilangkan dari pandangan dan assistive tech murid (`display: none !important`, `aria-hidden="true"`). Obrolan mengalir mulus tanpa badge hemat yang mengganggu.
+   - **Pencegahan iOS Safari Auto-Zoom**: Ukuran font `.fzc-input` dinaikkan ke `1rem !important` (16px) pada mobile.
+   - **Auto-expanding Input Area**: Elemen input diubah menjadi `<textarea rows="1">` elastis (min 44px, max 120px) dengan dukungan Enter (kirim), Shift+Enter (baris baru), dan IME composition guard (Jepang/CJK Kanji conversion aman).
+   - **Instant Barge-in Neural Voice**: Pengetikan atau pengiriman pesan baru seketika menghentikan suara AI yang sedang berjalan (`stopVoice()`), mencegah audio bertabrakan.
+   - **Pembersihan Aliran Audio Shadowing**: `stopShadowingAudio` mematikan media stream tracks (`enabled=false; stop()`) dan membatalkan SpeechRecognition agar indikator mikrofon OS tidak menggantung.
+   - **Smart Scroll Anchoring & Floating Indicator**: Scrolling ke atas mempertahankan posisi baca tanpa ditarik paksa ke bawah; tombol floating `[Pesan Baru ↓]` muncul saat pesan baru tiba.
+   - **Penyempurnaan Visual Diff Koreksi**: Kata yang tertinggal/dihapus kini ditandai dengan `<del class="fzc-del-mark">` dengan kontras WCAG AAA.
+
 ---
 
 ## 2. Bukti Pengujian Empiris (Headless Chromium Playwright Probe)
@@ -59,14 +68,22 @@ Skrip probe Playwright peramban headless dijalankan langsung via `tools/dev/prob
    - Memicu modal saat `r.source === 'quota'` di `deliverAssistantReply`.
    - Mencegah mode telepon saat kuota habis dan membuka modal edukatif.
    - Membersihkan delimiter token pada teks balasan dan catatan koreksi.
+   - Auto-growing textarea dengan IME guard, barge-in neural voice, scroll anchoring, zero-loss draft.
+   - Tombol toggle speaker suara `#fzcBtnSpeakerDock`.
+   - Pembersihan stream audio shadowing (`stopShadowingAudio`).
+   - Penanda `<del class="fzc-del-mark">` pada visual diff grammar correction.
    - Mengekspor helper quota dan `updateUI` pada objek `api`.
-5. `features/interactive-chat/interactive-chat.css`:
+5. `features/interactive-chat/fiezel-chat-icons.js`:
+   - Menambahkan ikon SVG `volume-x` dan `arrow-down` beserta alias pendukung.
+6. `features/interactive-chat/interactive-chat.css`:
    - Menambahkan styling Tactile Clay untuk overlay, card, icon-wrap, badge amber, title, description, help box, dan tombol konfirmasi dengan target sentuh $\ge 48\text{px}$.
-6. `id-golden-baseline.json`:
+   - Auto-expanding textarea styling, iOS Safari 1rem zoom fix, floating indicator pill, `.fzc-del-mark`.
+   - Menyembunyikan total mode hemat: `.fzc-source-note:not(.fzc-source-note-quota) { display: none !important; }`.
+7. `id-golden-baseline.json`:
    - Diperbarui dengan teks modal Indonesia resmi via `--write-baseline`.
-7. `tools/bump-build.mjs`, `coordination/BUILD-VERSION.json`, `sw.js`, `core-config.js`, `features/neural-voice/fiezel-diag-panel.js`, `kurikulum.html`, `misi.html`:
+8. `tools/bump-build.mjs`, `coordination/BUILD-VERSION.json`, `sw.js`, `core-config.js`, `features/neural-voice/fiezel-diag-panel.js`, `kurikulum.html`, `misi.html`:
    - PWA build dinaikkan ke `m025-601` dengan verifikasi Hexa-Sync `Selaras`.
-8. `tools/dev/probe-chat-quota-modal.mjs`:
+9. `tools/dev/probe-chat-quota-modal.mjs`:
    - Skrip pengujian Playwright komprehensif.
 
 ---
@@ -76,7 +93,13 @@ Skrip probe Playwright peramban headless dijalankan langsung via `tools/dev/prob
 - `tests/th-ui-leak-test.js`: PASS (4389 kunci id, semuanya punya padanan th, 0 bocor)
 - `tests/quota-notice-a11y-test.js`: PASS (16 pemeriksaan, 0 gagal)
 - `tests/ai-conversation-task-test.js`: PASS (48/48 LULUS)
+- `tests/chat-neural-voice-test.js`: PASS (7/7 LULUS)
+- `tests/interactive-chat-test.js`: PASS (11/11 LULUS)
+- `tests/interactive-chat-correction-test.js`: PASS (8/8 LULUS)
+- `tests/interactive-chat-braincore-telemetry-test.js`: PASS (7/7 LULUS)
+- `tests/home-kawan-bicara-card-test.js`: PASS (5/5 LULUS)
 - `tests/gate-registry-test.js`: PASS (10 pass, 0 fail)
 - `tests/curriculum-cache-version-test.js`: PASS (26 penegasan, 2 halaman, build m025-601)
 - `tools/bump-build.mjs --check`: PASS (Hexa-Sync Selaras)
 - `tools/dev/probe-chat-quota-modal.mjs`: PASS (100% assertions fulfilled)
+
