@@ -46,7 +46,19 @@
   --fzc-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* ── Hide bottomnav, nav-scrim & floating PAW FAB with maximum specificity in Chat view ── */
+/* ── Topbar & Bottom Navigation in Chat View: Clean Single-Header Experience ── */
+body.fz-view-chat main.app > .topbar,
+body.fz-view-chat .topbar {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+}
+
 html body.fz-view-chat nav.bottomnav,
 html body.fz-view-chat .bottomnav,
 html body.fz-view-chat .nav-scrim,
@@ -79,36 +91,22 @@ body.fz-view-chat {
   flex-direction: column !important;
 }
 
-/* ── Hide topbar in Chat view to prevent double-header collision & preserve mobile viewport ── */
-body.fz-view-chat main.app > .topbar,
-body.fz-view-chat .topbar,
-html body:has(.fzc-container) main.app > .topbar,
-html body:has(.fzc-container) .topbar {
-  display: none !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
-  height: 0 !important;
-  min-height: 0 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  border: none !important;
-}
-
-/* ── Eliminate default app shell padding in Chat view ── */
-body.fz-view-chat main.app,
-body.fz-view-chat .app,
-body.fz-view-chat #app {
-  padding: 0 !important;
-  margin: 0 auto !important;
-  max-width: 100% !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
-}
-
+/* ── App Shell Sizing in Chat view: Zero App Shell Chrome ── */
+html body.fz-view-chat main.app.app,
+html body.fz-lux.fz-view-chat main.app.app,
+html body.fz-view-chat main.app,
 body.fz-view-chat main.app {
   height: 100% !important;
   height: 100dvh !important;
   max-height: 100dvh !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  margin: 0 auto !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
   display: flex !important;
   flex-direction: column !important;
   overflow: hidden !important;
@@ -123,6 +121,10 @@ body.fz-view-chat #app {
   display: flex !important;
   flex-direction: column !important;
   overflow: hidden !important;
+  box-sizing: border-box !important;
+  padding: 0 !important;
+  margin: 0 auto !important;
+  width: 100% !important;
 }
 
 /* Collapse non-visual background elements that cause body scroll leak */
@@ -201,33 +203,6 @@ body.fz-view-chat #fiezelDiagHost {
   margin-bottom: 10px;
   min-width: 0;
   width: 100%;
-}
-
-/* ── In-Chat Back Button: Tactile circular control (Apple HIG 44px) ── */
-.fzc-btn-back {
-  background: rgba(255, 255, 255, 0.76) !important;
-  color: var(--fzc-text-primary, #1B1418) !important;
-  border: 1px solid rgba(234, 227, 214, 0.85) !important;
-  box-shadow: 0 1px 3px rgba(27, 20, 24, 0.05) !important;
-  cursor: pointer;
-  z-index: 2;
-}
-
-.fzc-btn-back:hover {
-  background: rgba(255, 255, 255, 0.96) !important;
-  transform: scale(1.05);
-}
-
-.fzc-btn-back:active {
-  transform: scale(0.92);
-  background: rgba(234, 227, 214, 0.6) !important;
-}
-
-html[data-theme="dark"] .fzc-btn-back,
-body.dark .fzc-btn-back {
-  background: rgba(255, 255, 255, 0.08) !important;
-  color: #FDFAF3 !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
 }
 
 .fzc-partner-meta {
