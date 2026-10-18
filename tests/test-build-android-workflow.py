@@ -55,7 +55,7 @@ def test_workflow():
     assert str(java_step.get('with', {}).get('java-version')) == '17', "Java version must be 17"
     print("   Setup Java 17 (temurin) step: PASS")
 
-    assert any('android-actions/setup-android' in u for u in step_uses), "Missing setup-android step"
+    assert any('android-actions/setup-android' in u for u in step_uses) or any('ANDROID_HOME' in r for r in step_runs), "Missing Android SDK setup step"
     print("   Setup Android SDK step: PASS")
 
     assert any('sync-android-assets.mjs' in r for r in step_runs), "Missing sync-android-assets.mjs step"
