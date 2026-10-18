@@ -1,7 +1,7 @@
-# FIEZEL HANDOFF DOSSIER: ANDROID GOOGLE AUTH, POPUP MULTI-WINDOW & WEBVIEW RESILIENCE FIX (m025-602)
+# FIEZEL HANDOFF DOSSIER: ANDROID GOOGLE AUTH, POPUP MULTI-WINDOW & WEBVIEW RESILIENCE FIX (m025-603)
 
 **Tanggal**: 18 Oktober 2026
-**Build Target**: `m025-602`
+**Build Target**: `m025-603`
 **Cabang**: `fix/android-google-oauth-and-webview-polish`
 **Status Kesiapan**: 100% SIAP RILIS (All 7 Quality Gates Hijau)
 
@@ -38,7 +38,7 @@ Setelah dilakukan audit menyeluruh pada native shell Android (`id.my.fiezel.app`
 - **Solusi**: Mengubah pemanggilan `showOfflineScreen(false, null)` secara tanpa syarat pada `onPageLoadingFinished` saat halaman sukses termuat, serta menjamin retry connection membersihkan state kegagalan.
 
 ### E. Penanganan Parameter Versi Query pada SmartAssetsPathHandler
-- **Akar Masalah**: Aset publik versi cache (`app.js?v=m025-602`, `style.css?v=m025-602`) gagal diresolve oleh `SmartAssetsPathHandler` pada WebViewAssetLoader karena parameter query `?v=...` diikutsertakan dalam pembukaan `AssetManager.open()`.
+- **Akar Masalah**: Aset publik versi cache (`app.js?v=m025-603`, `style.css?v=m025-603`) gagal diresolve oleh `SmartAssetsPathHandler` pada WebViewAssetLoader karena parameter query `?v=...` diikutsertakan dalam pembukaan `AssetManager.open()`.
 - **Solusi**: Menghapus parameter `?` dan `#` pada `SmartAssetsPathHandler` sebelum mencari kandidat berkas lokal di `assets/public/`.
 
 ---
@@ -60,13 +60,13 @@ Seluruh gerbang mutu lokal telah dijalankan di lingkungan kerja dan berhasil 100
 2. **Android Asset Bundle Integrity Gate** (`node tests/android-asset-bundle-test.js`):
    - 3.808 penegasan terpenuhi.
    - 714 berkas terverifikasi utuh (48.04 MB).
-   - Versi build terikat: `m025-602` (PASS).
+   - Versi build terikat: `m025-603` (PASS).
 
 3. **CI/CD Workflow Build Android APK Gate** (`python tests/test-build-android-workflow.py`):
    - 16 konfigurasi tahapan valid (PASS).
 
 4. **Curriculum Cache Version Gate** (`node tests/curriculum-cache-version-test.js`):
-   - 26 penegasan, 2 halaman, build `m025-602` (PASS).
+   - 26 penegasan, 2 halaman, build `m025-603` (PASS).
 
 5. **Gate Registry Test** (`node tests/gate-registry-test.js`):
    - 10 / 10 checks passed (PASS).
@@ -78,12 +78,12 @@ Seluruh gerbang mutu lokal telah dijalankan di lingkungan kerja dan berhasil 100
    - 4.389 kunci teruji bebas bocoran (PASS).
 
 8. **Hexa-Sync Invariant** (`node tools/bump-build.mjs --check`):
-   - `sw.js`: m025-602
-   - `core-config.js`: m025-602
-   - `features/neural-voice/fiezel-diag-panel.js`: m025-602
-   - `kurikulum.html`: m025-602
-   - `misi.html`: m025-602
-   - `coordination/BUILD-VERSION.json`: m025-602
+   - `sw.js`: m025-603
+   - `core-config.js`: m025-603
+   - `features/neural-voice/fiezel-diag-panel.js`: m025-603
+   - `kurikulum.html`: m025-603
+   - `misi.html`: m025-603
+   - `coordination/BUILD-VERSION.json`: m025-603
    - Status: Selaras (PASS).
 
 ---
