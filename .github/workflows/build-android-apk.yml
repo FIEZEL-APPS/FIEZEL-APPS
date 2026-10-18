@@ -21,7 +21,7 @@ on:
           - 'release'
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: android-build-${{ github.ref }}
@@ -50,7 +50,16 @@ jobs:
           java-version: '17'
 
       - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+        run: |
+          echo "=== Setting up Android SDK Environment ==="
+          echo "ANDROID_HOME=/usr/local/lib/android/sdk" >> $GITHUB_ENV
+          echo "ANDROID_SDK_ROOT=/usr/local/lib/android/sdk" >> $GITHUB_ENV
+          export ANDROID_HOME="/usr/local/lib/android/sdk"
+          SDKMANAGER=$(find /usr/local/lib/android/sdk/cmdline-tools -name "sdkmanager" -type f | head -n 1)
+          if [ -n "$SDKMANAGER" ]; then
+            echo "Found sdkmanager at: $SDKMANAGER"
+            yes | "$SDKMANAGER" --licenses 2>/dev/null || true
+          fi
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -225,6 +234,18 @@ jobs:
             fiezel-app-release.apk.sha256
           retention-days: 30
           if-no-files-found: error
+
+      - name: Create or Update GitHub Release
+        if: env.BUILD_RELEASE == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "=== Publishing Official GitHub Release ==="
+          TAG="v5.19.0"
+          gh release create "$TAG" fiezel-app-release.apk fiezel-app-debug.apk \
+            --title "FIEZEL Android v5.19.0" \
+            --notes "Aplikasi resmi FIEZEL Native Android (.apk). Unduh dan pasang langsung di perangkat Android Anda." \
+            --latest || gh release upload "$TAG" fiezel-app-release.apk fiezel-app-debug.apk --clobber
 
       - name: Generate Build Summary
         if: always()
