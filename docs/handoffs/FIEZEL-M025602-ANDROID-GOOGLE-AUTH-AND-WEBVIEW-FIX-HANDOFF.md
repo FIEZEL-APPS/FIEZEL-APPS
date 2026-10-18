@@ -1,8 +1,8 @@
 # FIEZEL HANDOFF DOSSIER: ANDROID GOOGLE AUTH, POPUP MULTI-WINDOW & WEBVIEW RESILIENCE FIX (m025-602)
 
-**Tanggal**: 18 Oktober 2026  
-**Build Target**: `m025-602`  
-**Cabang**: `fix/android-google-oauth-and-webview-polish`  
+**Tanggal**: 18 Oktober 2026
+**Build Target**: `m025-602`
+**Cabang**: `fix/android-google-oauth-and-webview-polish`
 **Status Kesiapan**: 100% SIAP RILIS (All 7 Quality Gates Hijau)
 
 ---
@@ -18,7 +18,7 @@ Setelah dilakukan audit menyeluruh pada native shell Android (`id.my.fiezel.app`
 
 ### B. Popup Window Jatuh / Batal Otomatis (Google OAuth Popups)
 - **Akar Masalah**: Tombol login Google Fiezel (`features/auth/fiezel-google.js`) mengonfigurasi `ux_mode: 'popup'`. Ini memicu `window.open()`. Tanpa `setSupportMultipleWindows(true)` dan implementasi `WebChromeClient.onCreateWindow()`, sistem Android WebView secara default mematikan pembuatan jendela baru dan mengembalikan `false`, sehingga jendela otentikasi Google tidak pernah muncul di layar.
-- **Solusi**: 
+- **Solusi**:
   1. Mengaktifkan `settings.setSupportMultipleWindows(true)` dan `settings.setJavaScriptCanOpenWindowsAutomatically(true)`.
   2. Mengimplementasikan `onCreateWindow` dan `onCloseWindow` pada `FiezelWebChromeClient.java`.
   3. Membangun modal otentikasi interaktif `Dialog` berbasis Material Light Fullscreen di `MainActivity.java` dengan toolbar independen, tombol batal/tutup, status bar pelindung, User-Agent tersanitasi, dan integrasi penanganan tombol Back (`activeAuthDialog.dismiss()`).
