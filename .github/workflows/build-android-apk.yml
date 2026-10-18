@@ -116,12 +116,12 @@ jobs:
       - name: Build Debug APK
         if: env.BUILD_DEBUG == 'true'
         working-directory: android
-        run: ./gradlew assembleDebug --stacktrace
+        run: bash ./gradlew assembleDebug --stacktrace
 
       - name: Build Release APK
         if: env.BUILD_RELEASE == 'true'
         working-directory: android
-        run: ./gradlew assembleRelease --stacktrace
+        run: bash ./gradlew assembleRelease --stacktrace
 
       - name: Sign & verify Debug APK
         if: env.BUILD_DEBUG == 'true'
