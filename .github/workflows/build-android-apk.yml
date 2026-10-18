@@ -50,7 +50,9 @@ jobs:
           java-version: '17'
 
       - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+        run: |
+          echo "ANDROID_HOME=/usr/local/lib/android/sdk" >> $GITHUB_ENV
+          yes | /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager --licenses 2>/dev/null || yes | /usr/local/lib/android/sdk/cmdline-tools/*/bin/sdkmanager --licenses 2>/dev/null || true
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
