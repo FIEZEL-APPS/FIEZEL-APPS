@@ -51,12 +51,7 @@ html body.fz-view-chat nav.bottomnav,
 html body.fz-view-chat .bottomnav,
 html body.fz-view-chat .nav-scrim,
 html body.fz-view-chat #fiezelPawFab,
-html body.fz-view-chat .fz-paw-fab,
-html body:has(.fzc-container) nav.bottomnav,
-html body:has(.fzc-container) .bottomnav,
-html body:has(.fzc-container) .nav-scrim,
-html body:has(.fzc-container) #fiezelPawFab,
-html body:has(.fzc-container) .fz-paw-fab {
+html body.fz-view-chat .fz-paw-fab {
   display: none !important;
   visibility: hidden !important;
   pointer-events: none !important;
@@ -84,19 +79,25 @@ body.fz-view-chat {
   flex-direction: column !important;
 }
 
-body.fz-view-chat .topbar {
-  flex-shrink: 0 !important;
-  margin-bottom: 0 !important;
-  z-index: 40 !important;
+/* ── Hide topbar in Chat view to prevent double-header collision & preserve mobile viewport ── */
+body.fz-view-chat main.app > .topbar,
+body.fz-view-chat .topbar,
+html body:has(.fzc-container) main.app > .topbar,
+html body:has(.fzc-container) .topbar {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
 }
 
 /* ── Eliminate default app shell padding in Chat view ── */
 body.fz-view-chat main.app,
 body.fz-view-chat .app,
-body.fz-view-chat #app,
-html body:has(.fzc-container) main.app,
-html body:has(.fzc-container) .app,
-html body:has(.fzc-container) #app {
+body.fz-view-chat #app {
   padding: 0 !important;
   margin: 0 auto !important;
   max-width: 100% !important;
@@ -104,8 +105,7 @@ html body:has(.fzc-container) #app {
   box-sizing: border-box !important;
 }
 
-body.fz-view-chat main.app,
-html body:has(.fzc-container) main.app {
+body.fz-view-chat main.app {
   height: 100% !important;
   height: 100dvh !important;
   max-height: 100dvh !important;
@@ -116,8 +116,7 @@ html body:has(.fzc-container) main.app {
   min-height: 0 !important;
 }
 
-body.fz-view-chat #app,
-html body:has(.fzc-container) #app {
+body.fz-view-chat #app {
   height: 100% !important;
   flex: 1 1 0px !important;
   min-height: 0 !important;
@@ -178,7 +177,7 @@ body.fz-view-chat #fiezelDiagHost {
 /* ── Sticky Header: Compact Mitra Profile & Actions ── */
 .fzc-header {
   flex-shrink: 0;
-  padding: 10px 16px 8px 16px;
+  padding: calc(10px + env(safe-area-inset-top, 0px)) 16px 8px 16px;
   background: rgba(253, 250, 243, 0.88);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
@@ -188,6 +187,7 @@ body.fz-view-chat #fiezelDiagHost {
 
 @media (min-width: 768px) {
   .fzc-header {
+    padding-top: calc(12px + env(safe-area-inset-top, 0px));
     padding-left: 24px;
     padding-right: 24px;
   }
@@ -201,6 +201,33 @@ body.fz-view-chat #fiezelDiagHost {
   margin-bottom: 10px;
   min-width: 0;
   width: 100%;
+}
+
+/* ── In-Chat Back Button: Tactile circular control (Apple HIG 44px) ── */
+.fzc-btn-back {
+  background: rgba(255, 255, 255, 0.76) !important;
+  color: var(--fzc-text-primary, #1B1418) !important;
+  border: 1px solid rgba(234, 227, 214, 0.85) !important;
+  box-shadow: 0 1px 3px rgba(27, 20, 24, 0.05) !important;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.fzc-btn-back:hover {
+  background: rgba(255, 255, 255, 0.96) !important;
+  transform: scale(1.05);
+}
+
+.fzc-btn-back:active {
+  transform: scale(0.92);
+  background: rgba(234, 227, 214, 0.6) !important;
+}
+
+html[data-theme="dark"] .fzc-btn-back,
+body.dark .fzc-btn-back {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #FDFAF3 !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
 }
 
 .fzc-partner-meta {
@@ -430,6 +457,79 @@ body.fz-view-chat #fiezelDiagHost {
   line-height: 1;
 }
 
+/* ── In-Chat Back Button: Apple HIG >=44x44px Tactile Clay Icon Button ── */
+.fzc-btn-back {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  min-height: 44px !important;
+  border-radius: 50% !important;
+  background: #FFFFFF !important;
+  background-image: linear-gradient(135deg, #FFFFFF 0%, #FAF6EE 100%) !important;
+  border: 1.5px solid rgba(226, 218, 206, 0.95) !important;
+  color: var(--fzc-ink, #1B1418) !important;
+  box-shadow:
+    0 2px 6px rgba(27, 20, 24, 0.05),
+    0 1px 2px rgba(27, 20, 24, 0.03),
+    inset 0 1px 0 #FFFFFF,
+    inset 0 -1px 2px rgba(220, 210, 196, 0.3) !important;
+  cursor: pointer !important;
+  transition: transform 0.16s var(--fzc-spring), background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, box-shadow 0.16s ease !important;
+  -webkit-tap-highlight-color: transparent !important;
+  touch-action: manipulation !important;
+  font-size: 0.82rem !important;
+  padding: 0 !important;
+  flex-shrink: 0 !important;
+  margin: 0 !important;
+  user-select: none !important;
+}
+
+.fzc-btn-back:hover {
+  background: #FAF7F0 !important;
+  border-color: rgba(210, 200, 186, 1) !important;
+  color: #000000 !important;
+  transform: translateY(-1px) scale(1.04) !important;
+  box-shadow:
+    0 4px 10px rgba(27, 20, 24, 0.08),
+    0 1px 3px rgba(27, 20, 24, 0.04),
+    inset 0 1px 0 #FFFFFF !important;
+}
+
+.fzc-btn-back:active {
+  transform: scale(0.92) !important;
+  background: #F3ECE0 !important;
+  border-color: rgba(195, 185, 170, 1) !important;
+  box-shadow:
+    0 1px 2px rgba(27, 20, 24, 0.08),
+    inset 0 1px 2px rgba(27, 20, 24, 0.08) !important;
+}
+
+.fzc-back-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  transition: transform 0.18s var(--fzc-spring);
+}
+
+.fzc-back-icon svg,
+.fzc-btn-back svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  display: block;
+}
+
+.fzc-btn-back:hover .fzc-back-icon {
+  transform: translateX(-2px);
+}
+
 /* ── Reset & Speaker Buttons: Apple HIG 44px Tactile Circular Icons ── */
 .fzc-btn-reset,
 .fzc-btn-speaker {
@@ -637,6 +737,7 @@ body.fz-view-chat #fiezelDiagHost {
   }
   .fzc-partner-meta {
     gap: 8px;
+    min-width: 0;
   }
   .fzc-avatar-wrap {
     width: 38px;
@@ -644,31 +745,46 @@ body.fz-view-chat #fiezelDiagHost {
   }
   .fzc-avatar-wrap svg,
   .fzc-avatar-wrap .fzc-icon {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
+  }
+  .fzc-partner-info {
+    min-width: 0;
   }
   .fzc-partner-info h2 {
-    font-size: 0.86rem;
+    font-size: 0.84rem;
     gap: 4px;
+    flex-wrap: nowrap;
   }
   .fzc-badge-level {
     padding: 1px 5px;
-    font-size: 0.60rem;
+    font-size: 0.58rem;
   }
   .fzc-header-actions {
-    gap: 6px;
+    gap: 5px;
   }
   .fzc-btn-call {
-    padding: 5px 9px !important;
-    font-size: 0.70rem !important;
+    padding: 5px 8px !important;
+    font-size: 0.68rem !important;
     gap: 4px !important;
   }
   .fzc-btn-reset,
-  .fzc-btn-speaker {
-    width: 44px !important;
-    height: 44px !important;
-    min-width: 44px !important;
-    min-height: 44px !important;
+  .fzc-btn-speaker,
+  .fzc-btn-back {
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+    min-height: 38px !important;
+    position: relative !important;
+  }
+  .fzc-btn-reset::after,
+  .fzc-btn-speaker::after,
+  .fzc-btn-back::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    min-width: 44px;
+    min-height: 44px;
   }
 }
 
@@ -678,21 +794,50 @@ body.fz-view-chat #fiezelDiagHost {
   min-height: 0 !important;
   height: auto !important;
   max-height: 100% !important;
-  overflow-y: scroll !important;
+  overflow-y: auto !important;
   overflow-x: hidden !important;
-  padding: 14px 16px 28px 16px;
+  padding: 14px 16px 36px 16px;
+  scroll-padding-bottom: 24px;
   display: flex;
   flex-direction: column;
   gap: 14px;
   -webkit-overflow-scrolling: touch !important;
   overscroll-behavior-y: contain !important;
   touch-action: pan-y !important;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(27, 20, 24, 0.15) transparent;
+}
+
+.fzc-feed::-webkit-scrollbar {
+  width: 5px;
+}
+
+.fzc-feed::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.fzc-feed::-webkit-scrollbar-thumb {
+  background: rgba(27, 20, 24, 0.15);
+  border-radius: 999px;
+}
+
+.fzc-feed::-webkit-scrollbar-thumb:hover {
+  background: rgba(27, 20, 24, 0.28);
+}
+
+@media (max-height: 680px) {
+  .fzc-feed {
+    padding-top: 10px;
+    padding-bottom: 38px;
+    gap: 12px;
+  }
 }
 
 @media (min-width: 768px) {
   .fzc-feed {
     padding-left: 24px;
     padding-right: 24px;
+    padding-bottom: 40px;
   }
 }
 
@@ -3047,7 +3192,8 @@ body.fz-ja-no-romaji .fzc-romaji {
 .fzc-scroll-bottom-pill,
 .fzc-floating-new-msg {
   position: absolute;
-  bottom: 74px;
+  bottom: calc(var(--fzc-dock-h, 78px) + 12px);
+  bottom: calc(var(--fzc-dock-h, calc(78px + env(safe-area-inset-bottom, 0px))) + 12px);
   left: 50%;
   transform: translateX(-50%) translateY(0);
   background: var(--fzc-ink, #1B1418);
@@ -3066,12 +3212,12 @@ body.fz-ja-no-romaji .fzc-romaji {
     0 1px 3px rgba(27, 20, 24, 0.12),
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
   cursor: pointer;
-  z-index: 35;
+  z-index: 60 !important;
   touch-action: manipulation !important;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
-  transition: transform 0.22s var(--fzc-spring), opacity 0.2s ease, visibility 0.2s;
-  animation: fzcFloatIn 0.3s var(--fzc-spring);
+  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease, visibility 0.2s;
+  animation: fzcFloatIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .fzc-floating-new-msg:hover {
@@ -3084,10 +3230,10 @@ body.fz-ja-no-romaji .fzc-romaji {
 }
 
 .fzc-floating-new-msg.is-hidden {
-  opacity: 0;
-  pointer-events: none;
-  visibility: hidden;
-  transform: translateX(-50%) translateY(12px) scale(0.9);
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+  transform: translateX(-50%) translateY(14px) scale(0.92) !important;
 }
 
 .fzc-floating-new-msg .fzc-pill-badge {
@@ -3359,4 +3505,781 @@ body.fz-ja-no-romaji .fzc-romaji {
 @keyframes fzcFadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   TACTILE CLAY DARK THEME & SCENE NIGHT (WCAG AAA VERIFIED)
+   Applies when body.theme-dark or body.scene-night is active
+   ══════════════════════════════════════════════════════════════════════════ */
+
+body.theme-dark,
+body.scene-night {
+  --fzc-bg: #130E12;
+  --fzc-surface: #1E171D;
+  --fzc-surface-alt: #251D24;
+  --fzc-surface-hover: #2C222B;
+  --fzc-border: rgba(234, 227, 214, 0.12);
+  --fzc-border-light: rgba(234, 227, 214, 0.08);
+  --fzc-border-strong: rgba(234, 227, 214, 0.20);
+  --fzc-ink: #FDFAF3;
+  --fzc-ink-muted: #C5B8BF;
+  --fzc-ink-subtle: #8F8188;
+  --fzc-primary: #FDFAF3;
+  --fzc-primary-text: #1B1418;
+  --fzc-accent-coral: #FB7185;
+  --fzc-accent-emerald: #10B981;
+  --fzc-accent-emerald-dark: #34D399;
+  --fzc-accent-amber: #FBBF24;
+  --fzc-accent-blue: #60A5FA;
+  --fzc-user-bubble: #2C2129;
+  --fzc-user-text: #FDFAF3;
+  --fzc-assistant-bubble: #1E171D;
+  --fzc-assistant-border: rgba(234, 227, 214, 0.12);
+}
+
+/* 1. Main Viewport Container & Shell */
+body.theme-dark .fzc-container,
+body.scene-night .fzc-container,
+.theme-dark .fzc-container,
+.scene-night .fzc-container {
+  background: #130E12 !important;
+  color: #FDFAF3 !important;
+}
+
+/* 2. Header & Mitra Partner Profile */
+body.theme-dark .fzc-header,
+body.scene-night .fzc-header {
+  background: rgba(19, 14, 18, 0.90) !important;
+  border-bottom: 1px solid rgba(234, 227, 214, 0.10) !important;
+}
+
+body.theme-dark .fzc-avatar-wrap,
+body.scene-night .fzc-avatar-wrap {
+  background: #1E171D !important;
+  background-image: linear-gradient(135deg, #2A1F27 0%, #1E171D 65%, #161015 100%) !important;
+  border: 1.5px solid rgba(234, 227, 214, 0.18) !important;
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.4),
+    0 1px 2px rgba(0, 0, 0, 0.25),
+    inset 0 1px 1px rgba(255, 255, 255, 0.14),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.5) !important;
+}
+
+body.theme-dark .fzc-avatar-wrap svg,
+body.scene-night .fzc-avatar-wrap svg,
+body.theme-dark .fzc-avatar-wrap .fzc-icon,
+body.scene-night .fzc-avatar-wrap .fzc-icon {
+  color: #FDFAF3 !important;
+}
+
+body.theme-dark .fzc-avatar-wrap .fzc-i-fill,
+body.scene-night .fzc-avatar-wrap .fzc-i-fill {
+  fill: rgba(253, 250, 243, 0.12) !important;
+}
+
+body.theme-dark .fzc-avatar-wrap .fzc-i-line,
+body.scene-night .fzc-avatar-wrap .fzc-i-line {
+  stroke: #FDFAF3 !important;
+}
+
+body.theme-dark .fzc-online-pulse,
+body.scene-night .fzc-online-pulse {
+  border-color: #130E12 !important;
+}
+
+body.theme-dark .fzc-partner-info h2,
+body.scene-night .fzc-partner-info h2 {
+  color: #FDFAF3 !important;
+}
+
+body.theme-dark .fzc-partner-sub,
+body.scene-night .fzc-partner-sub {
+  color: #C5B8BF !important;
+}
+
+body.theme-dark .fzc-badge-level,
+body.scene-night .fzc-badge-level {
+  background: #2A1F26 !important;
+  border: 1px solid rgba(234, 227, 214, 0.16) !important;
+  color: #EBDDE3 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25) !important;
+}
+
+/* Header Buttons */
+body.theme-dark .fzc-btn-reset,
+body.scene-night .fzc-btn-reset,
+body.theme-dark .fzc-btn-speaker,
+body.scene-night .fzc-btn-speaker {
+  background: #231A21 !important;
+  border: 1px solid rgba(234, 227, 214, 0.14) !important;
+  color: #C5B8BF !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.10) !important;
+}
+
+body.theme-dark .fzc-btn-reset:hover,
+body.scene-night .fzc-btn-reset:hover {
+  background: #2D222A !important;
+  border-color: rgba(234, 227, 214, 0.28) !important;
+  color: #FDFAF3 !important;
+}
+
+body.theme-dark .fzc-btn-speaker:not(.is-muted),
+body.scene-night .fzc-btn-speaker:not(.is-muted) {
+  color: #34D399 !important;
+}
+
+body.theme-dark .fzc-btn-speaker.is-muted,
+body.scene-night .fzc-btn-speaker.is-muted {
+  color: #8F8188 !important;
+  background: #1E171D !important;
+}
+
+/* 3. Mode Toggle Switch Bar */
+body.theme-dark .fzc-mode-toggle,
+body.scene-night .fzc-mode-toggle {
+  background: #20181F !important;
+  border: 1px solid rgba(234, 227, 214, 0.12) !important;
+  color: #C5B8BF !important;
+}
+
+body.theme-dark .fzc-mode-toggle.is-on,
+body.scene-night .fzc-mode-toggle.is-on {
+  background: rgba(16, 185, 129, 0.16) !important;
+  border-color: rgba(16, 185, 129, 0.45) !important;
+  color: #34D399 !important;
+}
+
+body.theme-dark .fzc-mode-switch,
+body.scene-night .fzc-mode-switch {
+  background: #3A2E36 !important;
+}
+
+body.theme-dark .fzc-mode-switch span,
+body.scene-night .fzc-mode-switch span {
+  background: #FDFAF3 !important;
+}
+
+body.theme-dark .fzc-mode-toggle.is-on .fzc-mode-switch,
+body.scene-night .fzc-mode-toggle.is-on .fzc-mode-switch {
+  background: #10B981 !important;
+}
+
+/* 4. Scenario Rail & Modern Clay Chips */
+body.theme-dark .fzc-scenario-chip,
+body.scene-night .fzc-scenario-chip {
+  background: #20181F !important;
+  border: 1px solid rgba(234, 227, 214, 0.12) !important;
+  color: #E2D7DD !important;
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.25),
+    0 1px 2px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.35) !important;
+}
+
+body.theme-dark .fzc-scenario-chip:hover,
+body.scene-night .fzc-scenario-chip:hover {
+  background: #2A1F28 !important;
+  border-color: rgba(234, 227, 214, 0.22) !important;
+  color: #FDFAF3 !important;
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14) !important;
+}
+
+body.theme-dark .fzc-scenario-chip.is-active,
+body.scene-night .fzc-scenario-chip.is-active {
+  background: #FDFAF3 !important;
+  color: #1B1418 !important;
+  border: 1px solid rgba(255, 255, 255, 0.70) !important;
+  font-weight: 800 !important;
+  box-shadow:
+    0 3px 12px rgba(0, 0, 0, 0.4),
+    0 0 16px rgba(253, 250, 243, 0.18),
+    inset 0 1px 1px rgba(255, 255, 255, 0.75),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.15) !important;
+}
+
+body.theme-dark .fzc-scenario-chip.is-active:hover,
+body.scene-night .fzc-scenario-chip.is-active:hover {
+  background: #FFFFFF !important;
+  color: #120E11 !important;
+  border-color: rgba(255, 255, 255, 0.85) !important;
+}
+
+/* 5. Scenario Card & Checkpoints */
+body.theme-dark .fzc-scenario-card,
+body.scene-night .fzc-scenario-card {
+  background: #1B141A !important;
+  border: 1px solid rgba(234, 227, 214, 0.12) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35), 0 1px 3px rgba(0, 0, 0, 0.2) !important;
+}
+
+body.theme-dark .fzc-scenario-card-head,
+body.scene-night .fzc-scenario-card-head {
+  color: #FDFAF3 !important;
+}
+
+body.theme-dark .fzc-scenario-card-desc,
+body.scene-night .fzc-scenario-card-desc {
+  color: #C5B8BF !important;
+}
+
+body.theme-dark .fzc-goals-container,
+body.scene-night .fzc-goals-container {
+  border-top-color: rgba(234, 227, 214, 0.14) !important;
+}
+
+body.theme-dark .fzc-goals-header,
+body.scene-night .fzc-goals-header {
+  color: #C5B8BF !important;
+}
+
+body.theme-dark .fzc-goal-item,
+body.scene-night .fzc-goal-item {
+  color: #C5B8BF !important;
+}
+
+body.theme-dark .fzc-goal-item.is-done,
+body.scene-night .fzc-goal-item.is-done {
+  color: #34D399 !important;
+}
+
+body.theme-dark .fzc-goal-check,
+body.scene-night .fzc-goal-check {
+  background: #231A21 !important;
+  border: 1.5px solid rgba(234, 227, 214, 0.22) !important;
+}
+
+body.theme-dark .fzc-goal-item.is-done .fzc-goal-check,
+body.scene-night .fzc-goal-item.is-done .fzc-goal-check {
+  background: #10B981 !important;
+  border-color: #10B981 !important;
+  color: #FFFFFF !important;
+}
+
+body.theme-dark .fzc-goal-bonus-tag,
+body.scene-night .fzc-goal-bonus-tag {
+  background: rgba(245, 158, 11, 0.18) !important;
+  border: 1px solid rgba(245, 158, 11, 0.35) !important;
+  color: #FBBF24 !important;
+}
+
+/* 6. Message Bubbles: High Contrast & Tactile Clay Surfaces */
+body.theme-dark .fzc-msg-row.is-assistant .fzc-bubble,
+body.scene-night .fzc-msg-row.is-assistant .fzc-bubble {
+  background: #1E171D !important;
+  border: 1px solid rgba(234, 227, 214, 0.12) !important;
+  color: #FDFAF3 !important;
+  box-shadow:
+    0 3px 12px rgba(0, 0, 0, 0.35),
+    0 1px 3px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+body.theme-dark .fzc-msg-row.is-user .fzc-bubble,
+body.scene-night .fzc-msg-row.is-user .fzc-bubble {
+  background: #2C2129 !important;
+  border: 1px solid rgba(234, 227, 214, 0.18) !important;
+  color: #FDFAF3 !important;
+  box-shadow:
+    0 4px 14px rgba(0, 0, 0, 0.4),
+    0 1px 3px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.10) !important;
+}
+
+/* 7. Japanese Typography: High-Clarity Furigana & Romaji (WCAG AAA) */
+body.theme-dark .fzc-japanese-text rt,
+body.scene-night .fzc-japanese-text rt {
+  color: #E2D7DD !important; /* Kontras 12.18:1 (WCAG AAA) */
+}
+
+body.theme-dark .fzc-romaji,
+body.scene-night .fzc-romaji {
+  color: #CFC4CB !important; /* Kontras 10.65:1 (WCAG AAA) */
+}
+
+body.theme-dark .fzc-reveal-box,
+body.scene-night .fzc-reveal-box {
+  background: rgba(0, 0, 0, 0.32) !important;
+  border: 1px solid rgba(234, 227, 214, 0.10) !important;
+  color: #C5B8BF !important;
+}
+
+body.theme-dark .fzc-trans-text strong,
+body.scene-night .fzc-trans-text strong {
+  color: #FDFAF3 !important;
+}
+
+body.theme-dark .fzc-grammar-note,
+body.scene-night .fzc-grammar-note {
+  background: rgba(245, 158, 11, 0.12) !important;
+  border: 1px solid rgba(245, 158, 11, 0.28) !important;
+  color: #FDE68A !important;
+}
+
+body.theme-dark .fzc-grammar-note strong,
+body.scene-night .fzc-grammar-note strong {
+  color: #FEF3C7 !important;
+}
+
+/* 8. Micro-Capsule Action Toolbar */
+body.theme-dark .fzc-action-btn,
+body.scene-night .fzc-action-btn {
+  background: #231A21 !important;
+  border: 1px solid rgba(234, 227, 214, 0.14) !important;
+  color: #E2D7DD !important;
+  box-shadow:
+    0 1px 4px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+body.theme-dark .fzc-action-btn:hover,
+body.scene-night .fzc-action-btn:hover {
+  background: #2D222A !important;
+  border-color: rgba(234, 227, 214, 0.25) !important;
+  color: #FDFAF3 !important;
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14) !important;
+}
+
+body.theme-dark .fzc-action-btn.is-playing,
+body.scene-night .fzc-action-btn.is-playing {
+  background: rgba(16, 185, 129, 0.18) !important;
+  border-color: rgba(16, 185, 129, 0.45) !important;
+  color: #34D399 !important;
+  box-shadow:
+    0 0 0 2px rgba(16, 185, 129, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+}
+
+body.theme-dark .fzc-action-btn.is-shadowing,
+body.scene-night .fzc-action-btn.is-shadowing {
+  background: rgba(234, 88, 12, 0.18) !important;
+  border-color: rgba(249, 115, 22, 0.45) !important;
+  color: #FB923C !important;
+  box-shadow:
+    0 0 0 2px rgba(234, 88, 12, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+}
+
+/* 9. Shadowing Feedback Card */
+body.theme-dark .fzc-shadow-box,
+body.scene-night .fzc-shadow-box {
+  background: linear-gradient(135deg, #18221D 0%, #1A181C 100%) !important;
+  border-color: rgba(16, 185, 129, 0.35) !important;
+  box-shadow:
+    0 4px 14px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+body.theme-dark .fzc-shadow-badge,
+body.scene-night .fzc-shadow-badge {
+  color: #34D399 !important;
+}
+
+body.theme-dark .fzc-shadow-box.is-listening,
+body.scene-night .fzc-shadow-box.is-listening {
+  background: linear-gradient(135deg, #261A16 0%, #1A181C 100%) !important;
+  border-color: rgba(249, 115, 22, 0.40) !important;
+}
+
+body.theme-dark .fzc-shadow-box.is-listening .fzc-shadow-badge,
+body.scene-night .fzc-shadow-box.is-listening .fzc-shadow-badge {
+  color: #FB923C !important;
+}
+
+body.theme-dark .fzc-shadow-box.is-retry,
+body.scene-night .fzc-shadow-box.is-retry {
+  background: linear-gradient(135deg, #262016 0%, #1A181C 100%) !important;
+  border-color: rgba(245, 158, 11, 0.40) !important;
+}
+
+body.theme-dark .fzc-shadow-box.is-retry .fzc-shadow-badge,
+body.scene-night .fzc-shadow-box.is-retry .fzc-shadow-badge {
+  color: #FBBF24 !important;
+}
+
+body.theme-dark .fzc-shadow-compare,
+body.scene-night .fzc-shadow-compare {
+  border-top-color: rgba(234, 227, 214, 0.12) !important;
+}
+
+body.theme-dark .fzc-shadow-compare-label,
+body.scene-night .fzc-shadow-compare-label {
+  color: #C5B8BF !important;
+}
+
+body.theme-dark .fzc-token.is-correct,
+body.scene-night .fzc-token.is-correct {
+  background: rgba(16, 185, 129, 0.18) !important;
+  border: 1px solid rgba(16, 185, 129, 0.40) !important;
+  color: #34D399 !important;
+}
+
+body.theme-dark .fzc-token.is-correct .fzc-token-check,
+body.scene-night .fzc-token.is-correct .fzc-token-check {
+  color: #34D399 !important;
+}
+
+body.theme-dark .fzc-token.is-missed,
+body.scene-night .fzc-token.is-missed {
+  background: rgba(245, 158, 11, 0.18) !important;
+  border: 1px dashed rgba(245, 158, 11, 0.45) !important;
+  color: #FCD34D !important;
+}
+
+body.theme-dark .fzc-shadow-heard,
+body.scene-night .fzc-shadow-heard {
+  color: #C5B8BF !important;
+}
+
+body.theme-dark .fzc-shadow-heard-val,
+body.scene-night .fzc-shadow-heard-val {
+  color: #FDFAF3 !important;
+}
+
+body.theme-dark .fzc-shadow-live-transcript,
+body.scene-night .fzc-shadow-live-transcript {
+  background: rgba(0, 0, 0, 0.35) !important;
+  border-color: rgba(249, 115, 22, 0.35) !important;
+  color: #FDFAF3 !important;
+}
+
+/* 10. Suggestions Carousel Rail */
+body.theme-dark .fzc-suggestion-chip,
+body.scene-night .fzc-suggestion-chip {
+  background: #1F171E !important;
+  border: 1px solid rgba(234, 227, 214, 0.12) !important;
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+body.theme-dark .fzc-suggestion-chip:hover,
+body.scene-night .fzc-suggestion-chip:hover {
+  background: #281F26 !important;
+  border-color: rgba(234, 227, 214, 0.24) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35) !important;
+}
+
+body.theme-dark .fzc-suggestion-chip strong,
+body.scene-night .fzc-suggestion-chip strong {
+  color: #FDFAF3 !important;
+}
+
+body.theme-dark .fzc-suggestion-chip span,
+body.scene-night .fzc-suggestion-chip span {
+  color: #C5B8BF !important;
+}
+
+/* 11. Typing Indicator */
+body.theme-dark .fzc-typing-row,
+body.scene-night .fzc-typing-row {
+  background: #1E171D !important;
+  border: 1px solid rgba(234, 227, 214, 0.12) !important;
+  color: #C5B8BF !important;
+}
+
+body.theme-dark .fzc-dot-pulse span,
+body.scene-night .fzc-dot-pulse span {
+  background: #C5B8BF !important;
+}
+
+/* 12. Soft Correction Card */
+body.theme-dark .fzc-correction,
+body.scene-night .fzc-correction {
+  background: #251E16 !important;
+  border-color: rgba(245, 158, 11, 0.30) !important;
+  color: #FDFAF3 !important;
+}
+
+body.theme-dark .fzc-correction.is-tip,
+body.scene-night .fzc-correction.is-tip {
+  background: #1F171E !important;
+  border-color: rgba(234, 227, 214, 0.14) !important;
+}
+
+body.theme-dark .fzc-fix-mark,
+body.scene-night .fzc-fix-mark {
+  background: rgba(245, 158, 11, 0.30) !important;
+  color: #FEF3C7 !important;
+}
+
+body.theme-dark .fzc-del-mark,
+body.scene-night .fzc-del-mark {
+  background: rgba(239, 68, 68, 0.25) !important;
+  color: #FCA5A5 !important;
+}
+
+body.theme-dark .fzc-correction-note,
+body.scene-night .fzc-correction-note {
+  color: #C5B8BF !important;
+}
+
+body.theme-dark .fzc-correction-ok,
+body.scene-night .fzc-correction-ok {
+  color: #34D399 !important;
+}
+
+/* 13. Floating New Message Indicator */
+body.theme-dark .fzc-floating-new-msg,
+body.scene-night .fzc-floating-new-msg {
+  background: #2C2129 !important;
+  color: #FDFAF3 !important;
+  border: 1px solid rgba(234, 227, 214, 0.20) !important;
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.45),
+    0 1px 3px rgba(0, 0, 0, 0.30),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+}
+
+body.theme-dark .fzc-floating-new-msg:hover,
+body.scene-night .fzc-floating-new-msg:hover {
+  background: #362932 !important;
+}
+
+/* 14. Bottom Input Dock & Clay Form */
+body.theme-dark .fzc-dock,
+body.scene-night .fzc-dock {
+  background: rgba(19, 14, 18, 0.94) !important;
+  border-top: 1px solid rgba(234, 227, 214, 0.10) !important;
+}
+
+body.theme-dark .fzc-dock-form,
+body.scene-night .fzc-dock-form {
+  background: #1C151B !important;
+  border: 1.5px solid rgba(234, 227, 214, 0.16) !important;
+  box-shadow:
+    0 4px 14px rgba(0, 0, 0, 0.40),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+body.theme-dark .fzc-dock-form:focus-within,
+body.scene-night .fzc-dock-form:focus-within {
+  border-color: #FDFAF3 !important;
+  box-shadow:
+    0 0 0 3px rgba(253, 250, 243, 0.15),
+    0 6px 20px rgba(0, 0, 0, 0.50),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+}
+
+body.theme-dark .fzc-input,
+body.scene-night .fzc-input {
+  color: #FDFAF3 !important;
+}
+
+body.theme-dark .fzc-input::placeholder,
+body.scene-night .fzc-input::placeholder {
+  color: #8F8188 !important;
+}
+
+body.theme-dark .fzc-btn-mic,
+body.scene-night .fzc-btn-mic {
+  background: #281F26 !important;
+  border: 1px solid rgba(234, 227, 214, 0.16) !important;
+  color: #E2D7DD !important;
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.30),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+body.theme-dark .fzc-btn-mic:hover,
+body.scene-night .fzc-btn-mic:hover {
+  background: #322630 !important;
+  border-color: rgba(234, 227, 214, 0.25) !important;
+  color: #FDFAF3 !important;
+  box-shadow:
+    0 3px 8px rgba(0, 0, 0, 0.40),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14) !important;
+}
+
+body.theme-dark .fzc-btn-mic.is-listening,
+body.scene-night .fzc-btn-mic.is-listening {
+  background: #EF4444 !important;
+  border-color: #DC2626 !important;
+  color: #FFFFFF !important;
+  box-shadow:
+    0 0 0 3px rgba(239, 68, 68, 0.30),
+    0 4px 14px rgba(239, 68, 68, 0.50) !important;
+}
+
+body.theme-dark .fzc-btn-send,
+body.scene-night .fzc-btn-send {
+  background: #FDFAF3 !important;
+  color: #1B1418 !important;
+  border: 1px solid rgba(255, 255, 255, 0.70) !important;
+  box-shadow:
+    0 2px 10px rgba(0, 0, 0, 0.40),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75) !important;
+}
+
+body.theme-dark .fzc-btn-send:hover,
+body.scene-night .fzc-btn-send:hover {
+  background: #FFFFFF !important;
+  color: #120E11 !important;
+  border-color: rgba(255, 255, 255, 0.85) !important;
+  box-shadow:
+    0 4px 14px rgba(255, 255, 255, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85) !important;
+}
+
+/* 15. Flip Screen Fullscreen Voice Call Stage */
+body.theme-dark .fzc-panel-call,
+body.scene-night .fzc-panel-call {
+  background: radial-gradient(circle at 50% 25%, #1F171E 0%, #161115 55%, #0F0B0E 100%) !important;
+  color: #FDFAF3 !important;
+}
+
+body.theme-dark .fzc-call-scenario-tag,
+body.scene-night .fzc-call-scenario-tag {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  color: #FDFAF3 !important;
+}
+
+body.theme-dark .fzc-call-timer-pill,
+body.scene-night .fzc-call-timer-pill {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  color: #FDFAF3 !important;
+}
+
+body.theme-dark .fzc-call-partner-name,
+body.scene-night .fzc-call-partner-name {
+  color: #FDFAF3 !important;
+}
+
+body.theme-dark .fzc-call-status-text,
+body.scene-night .fzc-call-status-text {
+  color: #C5B8BF !important;
+}
+
+body.theme-dark .fzc-call-transcript-card,
+body.scene-night .fzc-call-transcript-card {
+  background: rgba(25, 18, 24, 0.85) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.40) !important;
+}
+
+body.theme-dark .fzc-call-transcript-text,
+body.scene-night .fzc-call-transcript-text {
+  color: #FDFAF3 !important;
+}
+
+body.theme-dark .fzc-call-quick-chip,
+body.scene-night .fzc-call-quick-chip {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  color: #E2D7DD !important;
+}
+
+body.theme-dark .fzc-call-quick-chip:hover,
+body.scene-night .fzc-call-quick-chip:hover {
+  background: rgba(255, 255, 255, 0.16) !important;
+  color: #FDFAF3 !important;
+  border-color: rgba(255, 255, 255, 0.30) !important;
+}
+
+/* 16. Modals (Microphone Guide & Quota Exhausted) */
+body.theme-dark .fzc-mic-modal-card,
+body.scene-night .fzc-mic-modal-card,
+body.theme-dark .fzc-quota-modal-card,
+body.scene-night .fzc-quota-modal-card,
+body.theme-dark .fzc-nudge,
+body.scene-night .fzc-nudge {
+  background: #1E171D !important;
+  border: 1px solid rgba(234, 227, 214, 0.16) !important;
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.60),
+    0 0 0 1px rgba(255, 255, 255, 0.08) inset !important;
+  color: #FDFAF3 !important;
+}
+
+body.theme-dark .fzc-mic-modal-title,
+body.scene-night .fzc-mic-modal-title,
+body.theme-dark .fzc-quota-modal-title,
+body.scene-night .fzc-quota-modal-title,
+body.theme-dark .fzc-nudge h3,
+body.scene-night .fzc-nudge h3 {
+  color: #FDFAF3 !important;
+}
+
+body.theme-dark .fzc-mic-modal-desc,
+body.scene-night .fzc-mic-modal-desc,
+body.theme-dark .fzc-quota-modal-desc,
+body.scene-night .fzc-quota-modal-desc,
+body.theme-dark .fzc-nudge p,
+body.scene-night .fzc-nudge p {
+  color: #C5B8BF !important;
+}
+
+body.theme-dark .fzc-mic-modal-help,
+body.scene-night .fzc-mic-modal-help,
+body.theme-dark .fzc-quota-modal-help,
+body.scene-night .fzc-quota-modal-help {
+  background: #140F13 !important;
+  border: 1px solid rgba(234, 227, 214, 0.12) !important;
+  color: #C5B8BF !important;
+}
+
+body.theme-dark .fzc-mic-modal-help strong,
+body.scene-night .fzc-mic-modal-help strong {
+  color: #FDFAF3 !important;
+}
+
+body.theme-dark .fzc-quota-modal-help p,
+body.scene-night .fzc-quota-modal-help p {
+  color: #FCD34D !important;
+}
+
+body.theme-dark .fzc-mic-modal-help-ios,
+body.scene-night .fzc-mic-modal-help-ios {
+  background: #140F13 !important;
+  border-color: rgba(234, 227, 214, 0.12) !important;
+}
+
+body.theme-dark .fzc-ios-help-step,
+body.scene-night .fzc-ios-help-step {
+  color: #C5B8BF !important;
+}
+
+body.theme-dark .fzc-ios-substeps,
+body.scene-night .fzc-ios-substeps {
+  color: #A999A1 !important;
+}
+
+body.theme-dark .fzc-mic-modal-btn-dismiss,
+body.scene-night .fzc-mic-modal-btn-dismiss {
+  color: #C5B8BF !important;
+}
+
+body.theme-dark .fzc-mic-modal-btn-dismiss:hover,
+body.scene-night .fzc-mic-modal-btn-dismiss:hover {
+  color: #FDFAF3 !important;
+}
+
+body.theme-dark .fzc-quota-modal-btn-confirm,
+body.scene-night .fzc-quota-modal-btn-confirm {
+  background: #FDFAF3 !important;
+  color: #1B1418 !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35) !important;
+}
+
+body.theme-dark .fzc-quota-modal-btn-confirm:hover,
+body.scene-night .fzc-quota-modal-btn-confirm:hover {
+  background: #FFFFFF !important;
+}
+
+body.theme-dark .fzc-nudge-actions .fzc-nudge-later,
+body.scene-night .fzc-nudge-actions .fzc-nudge-later {
+  border: 1px solid rgba(234, 227, 214, 0.18) !important;
+  color: #C5B8BF !important;
+}
+
+body.theme-dark .fzc-nudge-actions .fzc-nudge-on,
+body.scene-night .fzc-nudge-actions .fzc-nudge-on {
+  background: #FDFAF3 !important;
+  color: #1B1418 !important;
 }

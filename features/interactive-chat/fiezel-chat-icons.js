@@ -150,6 +150,13 @@
       '<line class="fzc-i-line" x1="12" y1="5" x2="12" y2="19"/>' +
       '<polyline class="fzc-i-line" points="19 12 12 19 5 12"/>',
 
+    'arrow-left':
+      '<line class="fzc-i-line" x1="19" y1="12" x2="5" y2="12"/>' +
+      '<polyline class="fzc-i-line" points="12 19 5 12 12 5"/>',
+
+    'chevron-left':
+      '<polyline class="fzc-i-line" points="15 18 9 12 15 6"/>',
+
     'soundwave':
       '<path class="fzc-i-line" d="M4 12v.01M8 8v8M12 4v16M16 7v10M20 10v4" stroke-width="2.2"/>',
 
@@ -211,11 +218,21 @@
     'sparkles':
       '<path class="fzc-i-fill" d="M12 2.5l2.2 6.8 6.8 2.2-6.8 2.2-2.2 6.8-2.2-6.8-6.8-2.2 6.8-2.2z"/>' +
       '<path class="fzc-i-line" d="M12 2.5l2.2 6.8 6.8 2.2-6.8 2.2-2.2 6.8-2.2-6.8-6.8-2.2 6.8-2.2z"/>' +
-      '<path class="fzc-i-line" d="M19 3.5v3M20.5 5h-3M4 17.5v3M5.5 19h-3"/>'
+      '<path class="fzc-i-line" d="M19 3.5v3M20.5 5h-3M4 17.5v3M5.5 19h-3"/>',
+
+    'arrow-left':
+      '<path class="fzc-i-line" d="m12 19-7-7 7-7M5 12h14"/>',
+
+    'chevron-left':
+      '<path class="fzc-i-line" d="m15 18-6-6 6-6"/>'
   };
 
   // Synonyms & Semantic Aliases (including emoji fallbacks)
   var ALIASES = {
+    'back': 'arrow-left',
+    'left': 'arrow-left',
+    'arrow_back': 'arrow-left',
+    'chevron-back': 'chevron-left',
     'call': 'phone',
     'call-phone': 'phone',
     'telfon': 'phone',
@@ -259,6 +276,9 @@
     'silent': 'volume-x',
     'down': 'arrow-down',
     'chevron-down': 'arrow-down',
+    'back': 'arrow-left',
+    'left': 'arrow-left',
+    'chevron-left': 'chevron-left',
     'audio-wave': 'soundwave',
     'globe': 'translate',
     'lang': 'translate',
