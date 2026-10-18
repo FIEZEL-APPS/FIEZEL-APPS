@@ -1,6 +1,6 @@
 /**
  * probe-chat-quota-modal.mjs
- * 
+ *
  * Empirical verification probe for:
  * 1. Daily AI Quota Exhausted Modal rendering & UX in interactive chat
  * 2. Delimiter leak sanitization (---END OF DATA--- / ---DATA---)
