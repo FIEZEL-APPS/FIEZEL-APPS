@@ -8324,8 +8324,8 @@ function startWelcomeExperience(){
       bootAuthVerdictUsed=true;
       if(bootAuth==='signed-out'){forgetLocalAuth();showAuthGate(at,proceed);return null}
       followUpAuthCheck(bootAuth);
-      if(!onboardingDone&&showOnboarding(at)?.shown===true)return null;
-      if(askLearnerNameIfMissing(at))return null;
+      if(!onboardingDone&&showOnboarding(at)?.shown===true){try{dismissBootSplash()}catch(_){}return null;}
+      if(askLearnerNameIfMissing(at)){try{dismissBootSplash()}catch(_){}return null;}
       maybeSyncLearnerName(at);
       return startNotificationInvitation()
     };
@@ -12165,12 +12165,24 @@ function showBrandSplash(now=Date.now(),afterSplash=null){
        sesi yang sama. Ketika ia bukan peluncuran dingin, `force` mati dan gerbang
        seenToday() milik modul splash yang memutuskan - jadi tidak ada jalur baru yang
        diciptakan, hanya satu paksaan yang dilepas. */
-    const shown=splash.show(self,{now,force:typeof afterSplash==='function'&&isColdLaunch(),onClose:()=>done(Date.now())});
+    const hasHandoff = typeof afterSplash === 'function';
+    const shown=splash.show(self,{now,force:hasHandoff&&isColdLaunch(),deferDispose:hasHandoff,onClose:()=>done(Date.now())});
     // Splash yang tidak jadi tampil (sudah disapa hari ini) tidak boleh menelan perkenalan
     // bersamanya - murid baru yang membuka aplikasi untuk kedua kalinya tetap perlu dituntun.
-    if(!shown||shown.shown!==true){done(now);dismissBootSplash()}
+    // m025-597: Jika ada afterSplash (jalur boot), dismissBootSplash() DITUNDA sampai
+    // openApp() atau showAuthGate() selesai merender antarmuka pertama. Menghancurkannya
+    // secara sinkron di sini saat proceed() menunggu auth verdict (hingga 1500ms) adalah
+    // akar penyebab layar putih kosong selama boot/reload!
+    if(!shown||shown.shown!==true){
+      done(now);
+      if(!hasHandoff)dismissBootSplash();
+    }
     return shown
-  }catch(_){done(now);dismissBootSplash();return null}
+  }catch(_){
+    done(now);
+    if(typeof afterSplash!=='function')dismissBootSplash();
+    return null
+  }
 }
 window.showBrandSplash=showBrandSplash;
 // Perkenalan lima langkah (Step 1-5, FIEZEL_Complete_Design_Specification.pdf bagian 3).
