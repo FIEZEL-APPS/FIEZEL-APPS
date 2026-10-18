@@ -2142,6 +2142,8 @@
 
   // Handle User Message Submission
   function sendMessage(text) {
+    stopVoice();
+    stopShadowingAudio();
     var trimmed = String(text || '').trim();
     if (!trimmed || state.isThinking) return;
 
@@ -2764,12 +2766,25 @@
     var out = '';
     var p = 0, q = 0;
     while (q < b.length) {
-      if (p < a.length && norm(a[p]) === norm(b[q])) { out += esc(b[q]); p++; q++; }
-      else if (p < a.length && dp[p + 1][q] >= dp[p][q + 1]) { p++; }
-      else {
+      if (p < a.length && norm(a[p]) === norm(b[q])) {
+        out += esc(b[q]);
+        p++;
+        q++;
+      } else if (p < a.length && dp[p + 1][q] >= dp[p][q + 1]) {
+        if (!/^\s+$/.test(a[p]) && norm(a[p])) {
+          out += '<del class="fzc-del-mark">' + esc(a[p]) + '</del> ';
+        }
+        p++;
+      } else {
         out += /^\s+$/.test(b[q]) ? esc(b[q]) : '<mark class="fzc-fix-mark">' + esc(b[q]) + '</mark>';
         q++;
       }
+    }
+    while (p < a.length) {
+      if (!/^\s+$/.test(a[p]) && norm(a[p])) {
+        out += ' <del class="fzc-del-mark">' + esc(a[p]) + '</del>';
+      }
+      p++;
     }
     return out;
   }
@@ -3154,6 +3169,9 @@
       msgsHtml +
       typingHtml +
       sourceNoteHtml() +
+      '<button type="button" class="fzc-floating-new-msg" id="fzcNewMsgBtn" style="display:none;" aria-label="' + esc(t('chat_new_msg_pill', 'Pesan Baru ↓')) + '">' +
+      icon('arrow-down', { size: 14 }) + ' <span>' + esc(t('chat_new_msg_pill', 'Pesan Baru ↓')) + '</span>' +
+      '</button>' +
       '</div>' +
       nudgeHtml() +
       quotaModalHtml() +
@@ -3163,7 +3181,10 @@
       '<button type="button" class="fzc-btn-icon fzc-btn-mic' + micActive + '" id="fzcBtnMic" aria-label="' + esc(t('chat_mic_aria', 'Bicara lewat Mikrofon')) + '">' +
       icon(state.isListening ? 'mic-active' : 'mic', { size: 18 }) +
       '</button>' +
-      '<input type="text" class="fzc-input" id="fzcInput" placeholder="' + esc(inputPlaceholder) + '" autocomplete="off" enterkeyhint="send">' +
+      '<button type="button" class="fzc-btn-icon fzc-btn-speaker-dock' + (state.autoVoice === false ? ' is-muted' : '') + '" id="fzcBtnSpeakerDock" aria-label="' + esc(state.autoVoice === false ? t('chat_unmute_voice', 'Nyalakan Suara') : t('chat_mute_voice', 'Bisukan Suara')) + '">' +
+      icon(state.autoVoice === false ? 'volume-x' : 'volume', { size: 18 }) +
+      '</button>' +
+      '<textarea class="fzc-input" id="fzcInput" rows="1" placeholder="' + esc(inputPlaceholder) + '" autocomplete="off" enterkeyhint="send"></textarea>' +
       '<button type="submit" class="fzc-btn-icon fzc-btn-send" id="fzcBtnSend" aria-label="' + esc(t('chat_send_aria', 'Kirim Pesan')) + '">' +
       icon('send', { size: 16 }) +
       '</button>' +
@@ -3280,7 +3301,7 @@
       };
     });
 
-    // Form Submit
+    // Form Submit & Textarea Handling
     var form = container.querySelector('#fzcForm');
     var input = container.querySelector('#fzcInput');
     var sendBtn = container.querySelector('#fzcBtnSend');
@@ -3290,11 +3311,62 @@
       var val = input ? input.value : '';
       if (val && val.trim()) {
         input.value = '';
+        try { input.style.height = 'auto'; } catch (_) {}
         sendMessage(val);
       }
     }
     if (form) form.onsubmit = doSubmit;
     if (sendBtn) sendBtn.onclick = doSubmit;
+
+    if (input) {
+      // Barge-in & auto-grow on typing
+      input.addEventListener('input', function () {
+        stopVoice();
+        this.style.height = 'auto';
+        this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+      });
+
+      // Japanese / CJK IME composition guard & Enter to submit
+      input.addEventListener('keydown', function (e) {
+        if (e && (e.isComposing || e.keyCode === 229)) {
+          return; // IME is actively composing Kanji/Kana
+        }
+        if (e && e.key === 'Enter') {
+          if (!e.shiftKey) {
+            e.preventDefault();
+            doSubmit(e);
+          }
+        }
+      });
+    }
+
+    // Speaker Dock Button (Mute / Unmute Auto Voice)
+    var speakerDockBtn = container.querySelector('#fzcBtnSpeakerDock');
+    if (speakerDockBtn) {
+      speakerDockBtn.onclick = function () {
+        unlockAudioContext();
+        state.autoVoice = state.autoVoice === false;
+        if (!state.autoVoice) stopVoice();
+        saveState();
+        updateUI();
+      };
+    }
+
+    // Floating New Message Pill & Smart Scroll Anchoring
+    var newMsgBtn = container.querySelector('#fzcNewMsgBtn');
+    var feed = container.querySelector('#fzcFeed');
+    if (newMsgBtn && feed) {
+      newMsgBtn.onclick = function () {
+        feed.scrollTo({ top: feed.scrollHeight, behavior: 'smooth' });
+        newMsgBtn.style.display = 'none';
+      };
+      feed.addEventListener('scroll', function () {
+        var isNear = (feed.scrollHeight - feed.scrollTop - feed.clientHeight) < 60;
+        if (isNear) {
+          newMsgBtn.style.display = 'none';
+        }
+      }, { passive: true });
+    }
 
     // Mic Button
     var micBtn = container.querySelector('#fzcBtnMic');
@@ -3349,8 +3421,63 @@
     if (!doc) return;
     var mountPoint = doc.getElementById('app');
     if (!mountPoint) return;
+
+    // Zero-Loss Draft & Focus Preservation
+    var draftText = '';
+    var selStart = 0;
+    var selEnd = 0;
+    var hadFocus = false;
+    var prevInput = mountPoint.querySelector('#fzcInput');
+    if (prevInput) {
+      draftText = prevInput.value || '';
+      hadFocus = (doc.activeElement === prevInput);
+      try {
+        selStart = prevInput.selectionStart || 0;
+        selEnd = prevInput.selectionEnd || 0;
+      } catch (_) {}
+    }
+
+    // Smart Scroll Anchoring: check if student was reading history
+    var prevFeed = mountPoint.querySelector('#fzcFeed');
+    var wasNearBottom = true;
+    var savedScrollTop = 0;
+    if (prevFeed) {
+      wasNearBottom = (prevFeed.scrollHeight - prevFeed.scrollTop - prevFeed.clientHeight) < 75;
+      savedScrollTop = prevFeed.scrollTop;
+    }
+
     mountPoint.innerHTML = renderMarkup();
     bindEvents(mountPoint);
+
+    // Restore Draft, Auto-grow & Focus
+    var nextInput = mountPoint.querySelector('#fzcInput');
+    if (nextInput && draftText) {
+      nextInput.value = draftText;
+      try {
+        nextInput.style.height = 'auto';
+        nextInput.style.height = Math.min(nextInput.scrollHeight, 120) + 'px';
+      } catch (_) {}
+      if (hadFocus) {
+        try {
+          nextInput.focus();
+          nextInput.setSelectionRange(selStart, selEnd);
+        } catch (_) {}
+      }
+    }
+
+    // Restore or Anchor Feed Scroll
+    var nextFeed = mountPoint.querySelector('#fzcFeed');
+    var newMsgBtn = mountPoint.querySelector('#fzcNewMsgBtn');
+    if (nextFeed) {
+      if (wasNearBottom) {
+        nextFeed.scrollTop = nextFeed.scrollHeight;
+        if (newMsgBtn) newMsgBtn.style.display = 'none';
+      } else {
+        nextFeed.scrollTop = savedScrollTop;
+        if (newMsgBtn) newMsgBtn.style.display = 'inline-flex';
+      }
+    }
+
     if (typeof root.enhanceUI === 'function') {
       try { root.enhanceUI(); } catch (_) {}
     }
@@ -3476,6 +3603,7 @@
     speakAssistantMessage: speakAssistantMessage,
     playVoice: playVoice,
     stopVoice: stopVoice,
+    stopShadowingAudio: stopShadowingAudio,
     unlockAudioContext: unlockAudioContext,
     formatQuotaResetLabel: formatQuotaResetLabel,
     showQuotaExhaustedModal: showQuotaExhaustedModal,

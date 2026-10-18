@@ -1,4 +1,4 @@
-# FIEZEL HANDOFF DOSSIER: Modal Limit Kuota AI Harian, Sanitasi Delimiter & Perbaikan Skenario Interview (m025-598)
+# FIEZEL HANDOFF DOSSIER: Modal Limit Kuota AI Harian, Sanitasi Delimiter & Perbaikan Skenario Interview (m025-600)
 
 ## 1. Ringkasan Eksekutif & Temuan Audit
 Audit 50-turn interaktif FIEZEL AI dan pengujian batasan kuota menemukan tiga area yang perlu disempurnakan:
@@ -29,10 +29,10 @@ Skrip probe Playwright peramban headless dijalankan langsung via `tools/dev/prob
   "modalTriggered": true,
   "modalCardFound": true,
   "titleText": "Limit Harian AI Sudah Terpakai Penuh",
-  "descText": "Latihanmu hebat hari ini! Jatah pesan AI gratis kamu sudah terpakai penuh untuk hari ini. AI partner belajarmu sedang istirahat sejenak dan akan aktif kembali 2 jam lagi (pukul 09.46 WIB).",
+  "descText": "Latihanmu hebat hari ini! Jatah pesan AI gratis kamu sudah terpakai penuh untuk hari ini. AI partner belajarmu sedang istirahat sejenak dan akan aktif kembali 2 jam lagi (pukul 10.26 WIB).",
   "helpText": "💡 Belajarmu tetap bisa lanjut! Latihan Soal, Kosakata Flashcard, Tata Bahasa, dan Pustaka tetap bisa kamu akses tanpa batas.",
   "btnText": "Siap, Lanjut Belajar!",
-  "resetLabelText": "2 jam lagi (pukul 09.46 WIB)",
+  "resetLabelText": "2 jam lagi (pukul 10.26 WIB)",
   "dismissWorks": true,
   "sourceNoteDetailWorks": true,
   "delimiterSanitized": true,
@@ -65,7 +65,7 @@ Skrip probe Playwright peramban headless dijalankan langsung via `tools/dev/prob
 6. `id-golden-baseline.json`:
    - Diperbarui dengan teks modal Indonesia resmi via `--write-baseline`.
 7. `tools/bump-build.mjs`, `coordination/BUILD-VERSION.json`, `sw.js`, `core-config.js`, `features/neural-voice/fiezel-diag-panel.js`, `kurikulum.html`, `misi.html`:
-   - PWA build dinaikkan dari `m025-597` ke `m025-598` dengan verifikasi Hexa-Sync `Selaras`.
+   - PWA build dinaikkan ke `m025-600` dengan verifikasi Hexa-Sync `Selaras`.
 8. `tools/dev/probe-chat-quota-modal.mjs`:
    - Skrip pengujian Playwright komprehensif.
 
@@ -77,6 +77,6 @@ Skrip probe Playwright peramban headless dijalankan langsung via `tools/dev/prob
 - `tests/quota-notice-a11y-test.js`: PASS (16 pemeriksaan, 0 gagal)
 - `tests/ai-conversation-task-test.js`: PASS (48/48 LULUS)
 - `tests/gate-registry-test.js`: PASS (10 pass, 0 fail)
-- `tests/curriculum-cache-version-test.js`: PASS (26 penegasan, 2 halaman, build m025-598)
+- `tests/curriculum-cache-version-test.js`: PASS (26 penegasan, 2 halaman, build m025-600)
 - `tools/bump-build.mjs --check`: PASS (Hexa-Sync Selaras)
 - `tools/dev/probe-chat-quota-modal.mjs`: PASS (100% assertions fulfilled)
