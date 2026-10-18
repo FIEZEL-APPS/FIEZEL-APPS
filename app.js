@@ -8324,8 +8324,8 @@ function startWelcomeExperience(){
       bootAuthVerdictUsed=true;
       if(bootAuth==='signed-out'){forgetLocalAuth();showAuthGate(at,proceed);return null}
       followUpAuthCheck(bootAuth);
-      if(!onboardingDone&&showOnboarding(at)?.shown===true){try{dismissBootSplash()}catch(_){}return null;}
-      if(askLearnerNameIfMissing(at)){try{dismissBootSplash()}catch(_){}return null;}
+      if(!onboardingDone&&showOnboarding(at)?.shown===true)return null;
+      if(askLearnerNameIfMissing(at))return null;
       maybeSyncLearnerName(at);
       return startNotificationInvitation()
     };
