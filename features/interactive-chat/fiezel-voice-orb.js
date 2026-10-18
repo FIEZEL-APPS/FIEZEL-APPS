@@ -438,6 +438,9 @@
       this.stageEl.classList.add('is-active');
       if (this.enableCanvas) {
         this._resizeCanvas();
+        if (!this.rafId) {
+          this._startLoop();
+        }
       }
     }
   };
@@ -449,8 +452,24 @@
     if (this.stageEl) {
       this.stageEl.classList.remove('is-active');
     }
+    if (this.rafId) {
+      if (typeof cancelAnimationFrame === 'function') cancelAnimationFrame(this.rafId);
+      else clearTimeout(this.rafId);
+      this.rafId = null;
+    }
     this.detachStream();
+    if (this.audioContext && this.audioContext.state !== 'closed') {
+      try { this.audioContext.close(); } catch (_) {}
+      this.audioContext = null;
+    }
     this.setVolume(0);
+  };
+
+  /**
+   * Clean UI teardown alias
+   */
+  VoiceOrb.prototype.closeCallUI = function () {
+    this.destroy();
   };
 
   /**
@@ -459,7 +478,8 @@
   VoiceOrb.prototype.destroy = function () {
     this.close();
     if (this.rafId) {
-      cancelAnimationFrame(this.rafId);
+      if (typeof cancelAnimationFrame === 'function') cancelAnimationFrame(this.rafId);
+      else clearTimeout(this.rafId);
       this.rafId = null;
     }
     if (this._onResize && typeof window !== 'undefined' && typeof window.removeEventListener === 'function') {
@@ -471,6 +491,7 @@
     }
     if (this.stageEl && this.stageEl.parentNode) {
       this.stageEl.parentNode.removeChild(this.stageEl);
+      this.stageEl = null;
     }
   };
 
