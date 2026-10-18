@@ -124,7 +124,7 @@ function assignmentHits(name, src) {
  * Pengecualian berbasis POLA, bukan daftar nama. */
 const GATE_FILE_RE = /(?:-test|-audit|-selftest|-simulation(?:-v\d+)?)\.(?:js|mjs|cjs)$/;
 const SOURCE_RE = /\.(?:js|mjs|cjs|html)$/;
-const SKIP_DIR_RE = /^(?:vendor|node_modules|ecohero-quest|website|deploy|audit|docs|analysis|reports|tools|coordination)\//;
+const SKIP_DIR_RE = /^(?:vendor|node_modules|ecohero-quest|website|deploy|audit|docs|analysis|reports|tools|coordination|android)\//;
 
 const tracked = execFileSync('git', ['ls-files'], { cwd: ROOT, encoding: 'utf8' })
   .split('\n').map(s => s.trim()).filter(Boolean);

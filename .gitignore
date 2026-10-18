@@ -107,6 +107,8 @@ remotion/public/assets
 # --- ALAT DAN SAMPAH LOKAL: dilarang masuk git ---
 *.exe
 *.bat
+!tools/build-android-apk.bat
+!android/gradlew.bat
 *.raw
 *.pcm
 *.wav
@@ -187,5 +189,7 @@ tools/verify-batch.js
 !assets/**/*.png
 !features/**/*.png
 !website/**/*.png
+!android/**/*.png
 
-
+# Android offline web runtime bundle (dihasilkan dinamis oleh tools/sync-android-assets.mjs)
+android/app/src/main/assets/public/

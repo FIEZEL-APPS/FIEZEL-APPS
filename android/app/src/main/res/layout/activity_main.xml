@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/rootContainer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/fiezel_background"
+    android:fitsSystemWindows="true">
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <WebView
+            android:id="@+id/webView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <!-- Horizontal Top Progress Indicator -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:layout_gravity="top"
+        android:indeterminate="false"
+        android:max="100"
+        android:progress="0"
+        android:progressTint="@color/fiezel_primary"
+        android:visibility="gone" />
+
+    <!-- Fiezel Branded Offline Fallback Screen -->
+    <LinearLayout
+        android:id="@+id/offlineContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="32dp"
+        android:background="@color/fiezel_background"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/ivOfflineIcon"
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:contentDescription="@string/offline_icon_desc"
+            android:src="@drawable/ic_offline_cloud"
+            app:tint="@color/fiezel_primary" />
+
+        <TextView
+            android:id="@+id/tvOfflineTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="@string/offline_title"
+            android:textColor="@color/fiezel_text_primary"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:gravity="center" />
+
+        <TextView
+            android:id="@+id/tvErrorMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/offline_subtitle"
+            android:textColor="@color/fiezel_text_secondary"
+            android:textSize="14sp"
+            android:gravity="center"
+            android:lineSpacingExtra="4dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnRetry"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:paddingHorizontal="32dp"
+            android:paddingVertical="12dp"
+            android:text="@string/btn_retry"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            app:cornerRadius="24dp"
+            app:backgroundTint="@color/fiezel_primary" />
+
+    </LinearLayout>
+
+</FrameLayout>

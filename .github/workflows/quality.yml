@@ -658,6 +658,8 @@ jobs:
           node tests/home-kawan-bicara-card-test.js
           node tests/voice-call-two-way-test.js
           node tests/ios-pwa-mic-shadowing-test.js
+          node tests/android-app-integrity-test.js
+          node tests/android-asset-bundle-test.js
           node tests/shadowing-eval-card-test.js
           node tests/interactive-chat-braincore-telemetry-test.js
           # m025-596: menggantikan speech-synthesis-engine-test.js, yang mengunci suara peramban

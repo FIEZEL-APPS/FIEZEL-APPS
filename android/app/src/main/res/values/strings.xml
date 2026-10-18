@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FIEZEL</string>
+    <string name="offline_title">Koneksi Terputus</string>
+    <string name="offline_subtitle">Tidak dapat terhubung ke server FIEZEL. Periksa koneksi internet Anda lalu coba lagi.</string>
+    <string name="offline_icon_desc">Ikon Koneksi Terputus</string>
+    <string name="btn_retry">Coba Lagi</string>
+    <string name="exit_confirm_toast">Tekan sekali lagi untuk keluar</string>
+    <string name="kiosk_exit_warning">Ujian sedang berlangsung. Apakah Anda yakin ingin keluar?</string>
+</resources>
