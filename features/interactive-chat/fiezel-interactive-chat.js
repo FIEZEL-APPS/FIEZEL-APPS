@@ -3043,6 +3043,12 @@
       }
     } catch (_) {}
 
+    try {
+      if (typeof api !== 'undefined' && typeof api.unmount === 'function') {
+        api.unmount();
+      }
+    } catch (_) {}
+
     // Priority 1: custom app-level handler if present
     if (typeof root.handleChatBack === 'function' && root.handleChatBack !== handleChatBack) {
       try {
@@ -3051,7 +3057,17 @@
       } catch (_) {}
     }
 
-    // Priority 2: FiezelBackNav stack controller
+    // Priority 2: Return to previously recorded view if valid and not chat
+    if (root.state && root.state._previousView && root.state._previousView !== 'chat') {
+      if (typeof root.go === 'function') {
+        try {
+          root.go(root.state._previousView);
+          return true;
+        } catch (_) {}
+      }
+    }
+
+    // Priority 3: FiezelBackNav stack controller
     if (root.FiezelBackNav && typeof root.FiezelBackNav.back === 'function') {
       try {
         var didBack = root.FiezelBackNav.back();
@@ -3059,7 +3075,7 @@
       } catch (_) {}
     }
 
-    // Priority 3: App's standard topbar back handler
+    // Priority 4: App's standard topbar back handler
     if (typeof root.handleTopbarBack === 'function') {
       try {
         root.handleTopbarBack();
@@ -3067,7 +3083,7 @@
       } catch (_) {}
     }
 
-    // Priority 4: Direct navigation to home view
+    // Priority 5: Direct navigation to home view
     if (typeof root.go === 'function') {
       try {
         root.go('home');
@@ -3075,7 +3091,7 @@
       } catch (_) {}
     }
 
-    // Priority 5: Browser history back fallback
+    // Priority 6: Browser history back fallback
     if (typeof root.history === 'object' && typeof root.history.back === 'function') {
       try {
         root.history.back();
@@ -3773,7 +3789,16 @@
         if (document.body) {
           document.body.classList.remove('fz-view-chat');
           var bn = document.querySelector('.bottomnav');
-          if (bn) bn.style.removeProperty('display');
+          if (bn) {
+            bn.style.removeProperty('display');
+            bn.style.removeProperty('visibility');
+            bn.style.removeProperty('opacity');
+          }
+          var tb = document.querySelector('.topbar');
+          if (tb) {
+            tb.style.removeProperty('display');
+            tb.style.removeProperty('visibility');
+          }
         }
       }
     },
