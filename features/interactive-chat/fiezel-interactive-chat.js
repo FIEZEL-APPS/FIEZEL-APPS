@@ -817,7 +817,7 @@
     if (!text) return null;
     var tRaw = text.trim();
     if (course === 'ja') {
-      if (/\bわたし\s*わ\b/i.test(tRaw) || /わたしわ/.test(tRaw)) {
+      if (/(わたし|私|ぼく|僕)\s*わ/i.test(tRaw) || /わたしわ/.test(tRaw)) {
         return {
           id: 'particle_wa_ha',
           title: t('chat_misc_wa_title', 'Tips Partikel は'),
@@ -852,6 +852,13 @@
         return null;
       }
     } else {
+      if (/\bsince\s+(\d+|one|two|three|four|five|six|seven|eight|nine|ten|a\s+few|several)\s+(years?|months?|weeks?|days?|hours?)\b/i.test(tRaw)) {
+        return {
+          id: 'prep_since_vs_for',
+          title: t('chat_misc_since_title', 'Preposition: For vs Since'),
+          desc: t('chat_misc_since_desc', 'Gunakan "for" untuk durasi rentang waktu (misal: for 3 years), dan "since" hanya untuk titik awal waktu (misal: since 2021).')
+        };
+      }
       if (/\bi\s+am\s+agree\b/i.test(tRaw)) {
         return {
           id: 'verb_agree',
@@ -1441,6 +1448,8 @@
   }
 
   function initScenario(id) {
+    stopVoice();
+    stopShadowingAudio();
     // Simpan pesan aktif sebelum berpindah skenario.
     if (state.scenarioId && state.messages && state.messages.length > 0) {
       state.scenarioHistories[histKeyFor(state.course, state.scenarioId)] = state.messages;
@@ -1458,6 +1467,8 @@
   }
 
   function resetCurrentScenario() {
+    stopVoice();
+    stopShadowingAudio();
     var id = state.scenarioId;
     state.messages = [starterMessage(id)];
     state.scenarioHistories[histKeyFor(state.course, id)] = state.messages;
