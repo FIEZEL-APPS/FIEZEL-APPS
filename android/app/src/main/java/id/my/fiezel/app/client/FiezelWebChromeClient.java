@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Message;
 import android.util.Log;
 import android.webkit.ConsoleMessage;
 import android.webkit.JsResult;
@@ -25,6 +26,7 @@ import java.util.List;
  * Custom WebChromeClient for FIEZEL:
  * - Grants CAMERA and AUDIO permissions for verified FIEZEL origins
  * - Supports HTML file input (<input type="file">) via onShowFileChooser
+ * - Supports popup windows (Google Sign-In OAuth popup) via onCreateWindow/onCloseWindow
  * - Manages loading progress indicators
  * - Forwards JavaScript console messages to Android Logcat under [FiezelWeb]
  * - Renders native Material 3 alerts and confirms
@@ -41,6 +43,8 @@ public class FiezelWebChromeClient extends WebChromeClient {
         void onProgressUpdated(int progress);
         void onRequestRuntimePermissions(@NonNull String[] permissions, @NonNull PermissionCallback callback);
         boolean onOpenFileChooser(@NonNull ValueCallback<Uri[]> filePathCallback, @Nullable FileChooserParams fileChooserParams);
+        boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg);
+        void onCloseWindow(WebView window);
     }
 
     private final Context context;
@@ -172,6 +176,17 @@ public class FiezelWebChromeClient extends WebChromeClient {
     @Override
     public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
         return listener.onOpenFileChooser(filePathCallback, fileChooserParams);
+    }
+
+    @Override
+    public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
+        return listener.onCreateWindow(view, isDialog, isUserGesture, resultMsg);
+    }
+
+    @Override
+    public void onCloseWindow(WebView window) {
+        super.onCloseWindow(window);
+        listener.onCloseWindow(window);
     }
 
     @Override

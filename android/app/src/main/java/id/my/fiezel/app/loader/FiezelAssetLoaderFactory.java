@@ -93,6 +93,12 @@ public final class FiezelAssetLoaderFactory {
         @Override
         public WebResourceResponse handle(@NonNull String path) {
             String cleanPath = path.startsWith("/") ? path.substring(1) : path;
+            if (cleanPath.contains("?")) {
+                cleanPath = cleanPath.substring(0, cleanPath.indexOf("?"));
+            }
+            if (cleanPath.contains("#")) {
+                cleanPath = cleanPath.substring(0, cleanPath.indexOf("#"));
+            }
             if (cleanPath.isEmpty() || cleanPath.endsWith("/")) {
                 cleanPath += "index.html";
             }

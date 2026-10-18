@@ -2,6 +2,7 @@ package id.my.fiezel.app;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -10,14 +11,19 @@ import android.net.NetworkCapabilities;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.webkit.CookieManager;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,9 +34,13 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.WindowCompat;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.webkit.ServiceWorkerClientCompat;
+import androidx.webkit.ServiceWorkerControllerCompat;
+import androidx.webkit.WebViewFeature;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
@@ -46,6 +56,7 @@ import id.my.fiezel.app.loader.FiezelAssetLoaderFactory;
  * Main host activity for FIEZEL:
  * - Edge-to-edge window rendering with hardware acceleration
  * - High-performance WebKit setup with custom WebViewAssetLoader
+ * - Google Sign-In multi-window OAuth popup dialog support
  * - Runtime camera and audio permission dispatch for speaking exams
  * - HTML5 file chooser bridge
  * - AndroidX OnBackPressedDispatcher navigation & kiosk protection
@@ -71,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
     private FiezelNativeBridge nativeBridge;
     private FiezelWebChromeClient.PermissionCallback pendingPermissionCallback;
     private ValueCallback<Uri[]> mFilePathCallback;
+    private Dialog activeAuthDialog;
 
     // Navigation & State
     private String lastAttemptedUrl = DEFAULT_ENTRY_URL;
@@ -205,7 +217,9 @@ public class MainActivity extends AppCompatActivity {
         settings.setDomStorageEnabled(true);
         settings.setDatabaseEnabled(true);
         settings.setMediaPlaybackRequiresUserGesture(false);
-        settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
+        settings.setSupportMultipleWindows(true);
+        settings.setJavaScriptCanOpenWindowsAutomatically(true);
+        settings.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
 
         // Cache mode based on network connectivity
         if (isNetworkConnected()) {
@@ -226,15 +240,40 @@ public class MainActivity extends AppCompatActivity {
         settings.setSupportZoom(false);
         settings.setDisplayZoomControls(false);
 
-        // App User-Agent signature
+        // App User-Agent signature: sanitize WebView markers so Google Identity & OAuth succeed
         String baseUA = settings.getUserAgentString();
-        settings.setUserAgentString(baseUA + " FiezelApp/" + BuildConfig.VERSION_NAME + " (Android; NativeShell)");
+        String cleanUA = sanitizeUserAgent(baseUA);
+        settings.setUserAgentString(cleanUA);
+
+        // Third-party cookie support for cross-origin authentication
+        CookieManager cookieManager = CookieManager.getInstance();
+        cookieManager.setAcceptCookie(true);
+        cookieManager.setAcceptThirdPartyCookies(webView, true);
+
+        // Service Worker support for intercepting bundled local assets
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.SERVICE_WORKER_BASIC_USAGE)) {
+            try {
+                ServiceWorkerControllerCompat swController = ServiceWorkerControllerCompat.getInstance();
+                swController.setServiceWorkerClient(new ServiceWorkerClientCompat() {
+                    @Nullable
+                    @Override
+                    public android.webkit.WebResourceResponse shouldInterceptRequest(@NonNull android.webkit.WebResourceRequest request) {
+                        if (request.getUrl() != null && assetLoaderFactory != null) {
+                            return assetLoaderFactory.shouldInterceptRequest(request.getUrl());
+                        }
+                        return null;
+                    }
+                });
+            } catch (Exception e) {
+                Log.w(TAG, "ServiceWorkerControllerCompat setup failed", e);
+            }
+        }
 
         // Attach Native JavaScript Bridge (window.FiezelNative)
         nativeBridge = new FiezelNativeBridge(this, webView);
         webView.addJavascriptInterface(nativeBridge, "FiezelNative");
 
-        // Custom WebChromeClient
+        // Custom WebChromeClient with OAuth popup window support
         FiezelWebChromeClient chromeClient = new FiezelWebChromeClient(this, new FiezelWebChromeClient.ChromeClientListener() {
             @Override
             public void onProgressUpdated(int progress) {
@@ -291,6 +330,120 @@ public class MainActivity extends AppCompatActivity {
                     return false;
                 }
             }
+
+            @Override
+            public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
+                if (activeAuthDialog != null && activeAuthDialog.isShowing()) {
+                    activeAuthDialog.dismiss();
+                }
+
+                activeAuthDialog = new Dialog(MainActivity.this, android.R.style.Theme_DeviceDefault_Light_NoActionBar_Fullscreen);
+
+                LinearLayout container = new LinearLayout(MainActivity.this);
+                container.setOrientation(LinearLayout.VERTICAL);
+                container.setBackgroundColor(0xFFFDFAF3);
+
+                Toolbar toolbar = new Toolbar(MainActivity.this);
+                toolbar.setTitle("Masuk dengan Google");
+                toolbar.setTitleTextColor(0xFF1B1418);
+                toolbar.setBackgroundColor(0xFFFDFAF3);
+                toolbar.setNavigationIcon(android.R.drawable.ic_menu_close_clear_cancel);
+                toolbar.setNavigationOnClickListener(v -> {
+                    if (activeAuthDialog != null && activeAuthDialog.isShowing()) {
+                        activeAuthDialog.dismiss();
+                    }
+                });
+                container.addView(toolbar, new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                ));
+
+                WebView popupWebView = new WebView(MainActivity.this);
+                popupWebView.setLayoutParams(new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT
+                ));
+                container.addView(popupWebView);
+
+                activeAuthDialog.setContentView(container);
+                activeAuthDialog.setCancelable(true);
+                activeAuthDialog.setOnDismissListener(dialog -> {
+                    popupWebView.destroy();
+                    activeAuthDialog = null;
+                });
+
+                WebSettings popupSettings = popupWebView.getSettings();
+                popupSettings.setJavaScriptEnabled(true);
+                popupSettings.setDomStorageEnabled(true);
+                popupSettings.setDatabaseEnabled(true);
+                popupSettings.setSupportMultipleWindows(true);
+                popupSettings.setJavaScriptCanOpenWindowsAutomatically(true);
+                popupSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
+                popupSettings.setUserAgentString(cleanUA);
+
+                CookieManager cm = CookieManager.getInstance();
+                cm.setAcceptCookie(true);
+                cm.setAcceptThirdPartyCookies(popupWebView, true);
+
+                popupWebView.setWebChromeClient(new WebChromeClient() {
+                    @Override
+                    public void onCloseWindow(WebView window) {
+                        if (activeAuthDialog != null && activeAuthDialog.isShowing()) {
+                            activeAuthDialog.dismiss();
+                        }
+                    }
+                });
+
+                popupWebView.setWebViewClient(new WebViewClient() {
+                    @Override
+                    public boolean shouldOverrideUrlLoading(WebView v, android.webkit.WebResourceRequest req) {
+                        if (req == null || req.getUrl() == null) return false;
+                        Uri uri = req.getUrl();
+                        String host = uri.getHost();
+                        if (host != null && (
+                                host.equalsIgnoreCase("accounts.google.com") ||
+                                host.endsWith(".google.com") ||
+                                host.endsWith(".googleusercontent.com") ||
+                                host.endsWith(".gstatic.com") ||
+                                host.endsWith(".googleapis.com") ||
+                                host.equalsIgnoreCase(FiezelAssetLoaderFactory.DOMAIN_FIEZEL) ||
+                                host.endsWith("." + FiezelAssetLoaderFactory.DOMAIN_FIEZEL) ||
+                                host.equalsIgnoreCase(FiezelAssetLoaderFactory.DOMAIN_APPASSETS)
+                        )) {
+                            return false;
+                        }
+                        try {
+                            Intent ext = new Intent(Intent.ACTION_VIEW, uri);
+                            startActivity(ext);
+                        } catch (Exception ignored) {}
+                        return true;
+                    }
+
+                    @Override
+                    public void onPageFinished(WebView v, String url) {
+                        super.onPageFinished(v, url);
+                        if (url != null && url.contains(FiezelAssetLoaderFactory.DOMAIN_FIEZEL) && !url.contains("accounts.google.com")) {
+                            if (activeAuthDialog != null && activeAuthDialog.isShowing()) {
+                                activeAuthDialog.dismiss();
+                            }
+                        }
+                    }
+                });
+
+                activeAuthDialog.show();
+
+                WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
+                transport.setWebView(popupWebView);
+                resultMsg.sendToTarget();
+                return true;
+            }
+
+            @Override
+            public void onCloseWindow(WebView window) {
+                if (activeAuthDialog != null && activeAuthDialog.isShowing()) {
+                    activeAuthDialog.dismiss();
+                }
+            }
         });
         webView.setWebChromeClient(chromeClient);
 
@@ -307,9 +460,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onPageLoadingFinished(@NonNull String url) {
-                if (!isOfflineVisible) {
-                    showOfflineScreen(false, null);
-                }
+                showOfflineScreen(false, null);
                 if (progressBar != null) {
                     progressBar.setVisibility(View.GONE);
                 }
@@ -369,6 +520,13 @@ public class MainActivity extends AppCompatActivity {
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
+                // If popup auth dialog is showing, dismiss it first
+                if (activeAuthDialog != null && activeAuthDialog.isShowing()) {
+                    activeAuthDialog.dismiss();
+                    activeAuthDialog = null;
+                    return;
+                }
+
                 // If exam kiosk proctoring is active, display confirmation modal
                 if (nativeBridge != null && nativeBridge.isKioskProctoringActive()) {
                     showKioskExitConfirmation();
@@ -553,6 +711,10 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        if (activeAuthDialog != null && activeAuthDialog.isShowing()) {
+            activeAuthDialog.dismiss();
+            activeAuthDialog = null;
+        }
         if (webView != null) {
             webView.loadUrl("about:blank");
             webView.stopLoading();
@@ -562,5 +724,21 @@ public class MainActivity extends AppCompatActivity {
             webView = null;
         }
         super.onDestroy();
+    }
+
+    /**
+     * Sanitizes the WebView User-Agent by removing embedded WebView tokens ('; wv' and 'Version/X.X')
+     * so that Google Identity Services, Google Accounts, and OAuth 2.0 endpoints treat the client
+     * as a standard modern Chrome Mobile browser, preventing 403 disallowed_useragent errors.
+     */
+    @NonNull
+    private String sanitizeUserAgent(@Nullable String ua) {
+        if (ua == null || ua.isEmpty()) {
+            ua = WebSettings.getDefaultUserAgent(this);
+        }
+        if (ua == null) {
+            return "Mozilla/5.0 (Linux; Android 14; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36";
+        }
+        return ua.replace("; wv", "").replaceAll("Version/\d+\.\d+\s+", "");
     }
 }
