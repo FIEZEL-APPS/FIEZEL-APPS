@@ -268,6 +268,31 @@ console.log(`${BOLD}============================================================
   }
   details.push(`Predictive Back navigation & OnBackPressedCallback handling verified`);
 
+  // Multi-window & Popup Window (Google OAuth)
+  if (!javaContent.includes('setSupportMultipleWindows(true)') ||
+      !javaContent.includes('setJavaScriptCanOpenWindowsAutomatically(true)')) {
+    return recordFail(checkNum, title, `MainActivity missing multi-window / popup window settings (required for Google OAuth)`);
+  }
+  details.push(`Multi-window and automatic window opening enabled for OAuth popups`);
+
+  // Third-Party Cookies Support
+  if (!javaContent.includes('setAcceptThirdPartyCookies')) {
+    return recordFail(checkNum, title, `MainActivity missing setAcceptThirdPartyCookies (required for cross-origin authentication)`);
+  }
+  details.push(`Third-party cookies enabled for cross-origin authentication`);
+
+  // User-Agent Sanitization (Anti-403 disallowed_useragent)
+  if (!javaContent.includes('sanitizeUserAgent') || !javaContent.includes('replace("; wv", "")')) {
+    return recordFail(checkNum, title, `MainActivity missing User-Agent sanitization (must strip '; wv' and 'Version/' to prevent 403 disallowed_useragent)`);
+  }
+  details.push(`User-Agent sanitization verified (strips WebView markers to prevent 403 disallowed_useragent)`);
+
+  // OAuth Popup Dialog Handler (onCreateWindow / onCloseWindow)
+  if (!javaContent.includes('onCreateWindow') || !javaContent.includes('onCloseWindow')) {
+    return recordFail(checkNum, title, `MainActivity missing onCreateWindow or onCloseWindow implementation for OAuth popup`);
+  }
+  details.push(`OAuth popup lifecycle handling verified (onCreateWindow and onCloseWindow)`);
+
   recordPass(checkNum, title, details);
 })();
 

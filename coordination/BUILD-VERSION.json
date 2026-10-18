@@ -1,7 +1,7 @@
 {
-  "version": "m025-601",
-  "claimedBy": "branch feat/chat-quota-popup-and-audit-fixes",
-  "claimedAt": "2026-10-18T01:41:46.909Z",
-  "reason": "fix(chat): modal limit kuota harian, sanitasi delimiter & skenario interview",
+  "version": "m025-602",
+  "claimedBy": "branch fix/android-google-oauth-and-webview-polish",
+  "claimedAt": "2026-10-18T10:17:08.544Z",
+  "reason": "fix(android): perbaiki login google popup oauth dan sanitasi user-agent webview (m025-602)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

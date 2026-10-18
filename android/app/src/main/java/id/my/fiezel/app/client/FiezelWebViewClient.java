@@ -116,11 +116,20 @@ public class FiezelWebViewClient extends WebViewClient {
                 host.equalsIgnoreCase("10.0.2.2")
         );
 
-        if (isInternal) {
+        // Google Authentication & identity services domains must stay inside WebView
+        boolean isAuthDomain = host != null && (
+                host.equalsIgnoreCase("accounts.google.com") ||
+                host.endsWith(".google.com") ||
+                host.endsWith(".googleusercontent.com") ||
+                host.endsWith(".gstatic.com") ||
+                host.endsWith(".googleapis.com")
+        );
+
+        if (isInternal || isAuthDomain) {
             return false; // Allow WebView to load internally
         }
 
-        // 4. External links (wa.me, external documentation, third-party auth) open externally
+        // 4. External links (wa.me, external documentation) open externally
         Log.i(TAG, "Routing external URL to system handler: " + uri);
         launchExternalIntent(uri);
         return true;
