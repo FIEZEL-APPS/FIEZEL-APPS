@@ -505,21 +505,10 @@ html.fz-booting body{overflow:hidden}
        ada lagi yang akan menutupnya. */
     (function () {
       var doc = document, el = doc.getElementById('fiezelBootSplash');
-      /* m025-591: Fast bypass for warm reload. Jika murid sudah melihat splash hari ini
-         dan ini adalah muat ulang/navigasi di sesi yang sama, sembunyikan splash statis
-         sejak frame pertama agar murid tidak dipaksa menatap layar splash diam selama 3 detik. */
-      try {
-        var sStore = window.sessionStorage, lStore = window.localStorage;
-        if (el && sStore && lStore && sStore.getItem('fiezel-launch-session-v1') === '1') {
-          var todayWib = new Date(Date.now() + 25200000).toISOString().slice(0, 10);
-          if (lStore.getItem('fiezel-splash-seen-v1') === todayWib) {
-            el.style.display = 'none';
-            el.setAttribute('data-fiezel-boot-claimed', 'disposed');
-            doc.documentElement.classList.remove('fz-booting');
-            window.__fiezelBootSplashDismissed = true;
-          }
-        }
-      } catch (e) {}
+      /* m025-597: Invarian anti-layar putih: Splash frame-pertama (#fiezelBootSplash)
+         WAJIB tetap bertahan sebagai tirai pelindung sampai #app selesai dirender oleh openApp()
+         atau showAuthGate(). Fast-bypass prematur di frame 1 dihapus agar murid tidak pernah
+         melihat kanvas body kosong selama unduh naskah dan proses data boot. */
       /* Boot JSON must not be allowed to wait forever on a mobile radio. This wrapper
          covers both the response headers and the body consumed by response.json(). */
       try {

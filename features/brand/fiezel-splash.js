@@ -712,8 +712,11 @@
       return { shown: false, reason: 'watchdog_elapsed' };
     }
     if (opts.force !== true && seenToday(target, now)) {
-      // Splash frame-pertama TIDAK boleh tertinggal hanya karena sapaan hari ini dilewati.
-      disposeBootSplash(target);
+      // Splash frame-pertama TIDAK boleh tertinggal hanya karena sapaan hari ini dilewati,
+      // KECUALI pemanggil meminta penundaan (deferDispose: true) sampai antarmuka #app selesai dirender.
+      if (!opts.deferDispose) {
+        disposeBootSplash(target);
+      }
       return { shown: false, reason: 'seen_today' };
     }
 
