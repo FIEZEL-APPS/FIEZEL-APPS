@@ -790,7 +790,7 @@ body.dark .fzc-btn-back {
 
 /* ── Feed & Messages Stream (The ONE AND ONLY Scrollable Element) ── */
 .fzc-feed {
-  flex: 1 1 auto !important;
+  flex: 1 1 0px !important;
   min-height: 0 !important;
   height: auto !important;
   max-height: 100% !important;
@@ -806,6 +806,16 @@ body.dark .fzc-btn-back {
   touch-action: pan-y !important;
   scrollbar-width: thin;
   scrollbar-color: rgba(27, 20, 24, 0.15) transparent;
+}
+
+.fzc-msg-row,
+.fzc-msg-box,
+.fzc-bubble,
+.fzc-scenario-card,
+.fzc-reveal-box,
+.fzc-shadow-box,
+.fzc-japanese-text {
+  touch-action: pan-y !important;
 }
 
 .fzc-feed::-webkit-scrollbar {

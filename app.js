@@ -22327,11 +22327,12 @@ function installScrollRubberBand(){
     if(!isRubberBanding){
       if(Math.abs(dx)>Math.abs(dy))return;
       if(Math.abs(dy)<8)return;
-      if(e.target&&e.target.closest&&e.target.closest('.flashcard,.card-flashcard,input,textarea,select,.modal-content,.fiezel-ob'))return;
-      if(document.body.classList.contains('fz-lesson-mode')||
+      if(e.target&&e.target.closest&&e.target.closest('.flashcard,.card-flashcard,input,textarea,select,.modal-content,.fiezel-ob,.fzc-container,.fzc-feed'))return;
+      if(document.body.classList.contains('fz-view-chat')||
+         document.body.classList.contains('fz-lesson-mode')||
          document.body.classList.contains('fz-stage-quiz')||
          document.body.classList.contains('fz-stage-sl')||
-         (e.target&&e.target.closest&&e.target.closest('.quiz-shell,.quiz-stage,fiezel-mascot,.fz-mochi-viewport,canvas,.card,.fsl-player,.jlpt-mobile-card,.jlpt-mascot-slot,.fsl-shell,.writing-stage')))return;
+         (e.target&&e.target.closest&&e.target.closest('.fzc-container,.fzc-feed,.quiz-shell,.quiz-stage,fiezel-mascot,.fz-mochi-viewport,canvas,.card,.fsl-player,.jlpt-mobile-card,.jlpt-mascot-slot,.fsl-shell,.writing-stage')))return;
       const scrollEl=document.scrollingElement||document.documentElement||document.body;
       const scrollTop=scrollEl?scrollEl.scrollTop:window.scrollY;
       const maxScroll=scrollEl?Math.max(0,scrollEl.scrollHeight-window.innerHeight):0;
