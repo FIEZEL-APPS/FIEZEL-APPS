@@ -12166,7 +12166,7 @@ function showBrandSplash(now=Date.now(),afterSplash=null){
        seenToday() milik modul splash yang memutuskan - jadi tidak ada jalur baru yang
        diciptakan, hanya satu paksaan yang dilepas. */
     const hasHandoff = typeof afterSplash === 'function';
-    const shown=splash.show(self,{now,force:hasHandoff&&isColdLaunch(),deferDispose:hasHandoff,onClose:()=>done(Date.now())});
+    const shown=splash.show(self,{now,force:typeof afterSplash==='function'&&isColdLaunch(),deferDispose:hasHandoff,onClose:()=>done(Date.now())});
     // Splash yang tidak jadi tampil (sudah disapa hari ini) tidak boleh menelan perkenalan
     // bersamanya - murid baru yang membuka aplikasi untuk kedua kalinya tetap perlu dituntun.
     // m025-597: Jika ada afterSplash (jalur boot), dismissBootSplash() DITUNDA sampai
