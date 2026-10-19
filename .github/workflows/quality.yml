@@ -1132,6 +1132,7 @@ jobs:
           node tests/level-source-difficulty-variance-test.js
           node tests/listening-adaptive-test.js
           node tests/mastery-bkt-test.js
+          node tests/grammar-vocab-bridge-test.js
           node tests/misconception-ledger-test.js
           # m025-565 Stempel Ingatan: ledger miskonsepsi bicara di kotak umpan balik latihan mandiri
           node tests/memory-stamp-test.js
