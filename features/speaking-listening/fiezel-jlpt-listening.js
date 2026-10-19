@@ -21,6 +21,79 @@
   var sheetOpen = false;
   var audioPlaybackRate = 1.0;
 
+  var curScriptMode = 'ruby'; // 'ruby' | 'kanji' | 'romaji'
+  try {
+    var savedScriptMode = localStorage.getItem('fiezel-jlpt-script-mode');
+    if (savedScriptMode && ['ruby', 'kanji', 'romaji'].indexOf(savedScriptMode) !== -1) {
+      curScriptMode = savedScriptMode;
+    }
+  } catch (_) {}
+
+  var isExamMode = false;
+  var examTimeRemaining = 0;
+  var examTimerId = null;
+  var currentSpeakingTurnIdx = -1;
+
+  var JLPT_KANJI_DICT = [
+    { k: '男の人', r: 'おとこのひと', ro: 'otoko no hito' },
+    { k: '女の人', r: 'おんなのひと', ro: 'onna no hito' },
+    { k: '男の子', r: 'おとこのこ', ro: 'otokonoko' },
+    { k: '女の子', r: 'おんなのこ', ro: 'onnanoko' },
+    { k: 'お母さん', r: 'おかあさん', ro: 'okaasan' },
+    { k: 'お父さん', r: 'おとうさん', ro: 'otousan' },
+    { k: '先生', r: 'せんせい', ro: 'sensei' },
+    { k: '学生', r: 'がくせい', ro: 'gakusei' },
+    { k: '店長', r: 'てんちょう', ro: 'tenchou' },
+    { k: '医者', r: 'いしゃ', ro: 'isha' },
+    { k: '患者', r: 'かんじゃ', ro: 'kanja' },
+    { k: '駅員', r: 'えきいん', ro: 'ekiin' },
+    { k: '部長', r: 'ぶちょう', ro: 'buchou' },
+    { k: '山田', r: 'やまだ', ro: 'Yamada' },
+    { k: '田中', r: 'たなか', ro: 'Tanaka' },
+    { k: '電車', r: 'でんしゃ', ro: 'densha' },
+    { k: '京都', r: 'きょうと', ro: 'Kyouto' },
+    { k: '両方', r: 'りょうほう', ro: 'ryouhou' },
+    { k: '受付', r: 'うけつけ', ro: 'uketsuke' },
+    { k: '本屋', r: 'ほんや', ro: 'hon\'ya' },
+    { k: '東口', r: 'ひがしぐち', ro: 'higashiguchi' },
+    { k: '西口', r: 'にしぐち', ro: 'nishiguchi' },
+    { k: '改札口', r: 'かいさつぐち', ro: 'kaisatsuguchi' },
+    { k: '昼ご飯', r: 'ひるごはん', ro: 'hirugohan' },
+    { k: '時間', r: 'じかん', ro: 'jikan' },
+    { k: '言っています', r: 'いっています', ro: 'itte imasu' },
+    { k: '言います', r: 'いいます', ro: 'iimasu' },
+    { k: '言って', r: 'いって', ro: 'itte' },
+    { k: '言う', r: 'いう', ro: 'iu' },
+    { k: '本', r: 'ほん', ro: 'hon' },
+    { k: '時', r: 'じ', ro: 'ji' },
+    { k: '半', r: 'はん', ro: 'han' }
+  ];
+
+  function formatMmSs(sec) {
+    var s = Math.max(0, Math.floor(sec || 0));
+    var m = Math.floor(s / 60);
+    var rem = s % 60;
+    return (m < 10 ? '0' : '') + m + ':' + (rem < 10 ? '0' : '') + rem;
+  }
+
+  function renderFuriganaText(textJa, mode) {
+    if (!textJa) return '';
+    if (mode === 'kanji') {
+      return escapeHtml(textJa);
+    }
+    var res = escapeHtml(textJa);
+    if (mode === 'ruby') {
+      for (var i = 0; i < JLPT_KANJI_DICT.length; i++) {
+        var item = JLPT_KANJI_DICT[i];
+        if (res.indexOf(item.k) !== -1) {
+          var rubyHtml = '<ruby class="jlpt-ruby">' + item.k + '<rp>(</rp><rt>' + item.r + '</rt><rp>)</rp></ruby>';
+          res = res.split(item.k).join(rubyHtml);
+        }
+      }
+    }
+    return res;
+  }
+
   function t(k, fallback) {
     try {
       var I = (typeof self !== 'undefined' ? self : (typeof window !== 'undefined' ? window : this)).FiezelI18n;
@@ -233,6 +306,198 @@
     updateAudioUi();
   }
 
+  /* ---------- Interactive Feature Engines ---------- */
+  function startExamTimer(seconds) {
+    stopExamTimer();
+    examTimeRemaining = seconds;
+    var banner = document.getElementById('jlptExamTimerBanner');
+    var countdownEl = document.getElementById('jlptTimerCountdown');
+    if (banner) {
+      banner.style.display = 'flex';
+      banner.classList.remove('timer-warning');
+    }
+    if (countdownEl) {
+      countdownEl.textContent = formatMmSs(examTimeRemaining);
+    }
+
+    examTimerId = setInterval(function () {
+      examTimeRemaining--;
+      if (countdownEl) {
+        countdownEl.textContent = formatMmSs(Math.max(0, examTimeRemaining));
+      }
+      if (banner && examTimeRemaining <= 10) {
+        banner.classList.add('timer-warning');
+      }
+      if (examTimeRemaining <= 0) {
+        stopExamTimer();
+        handleExamTimeout();
+      }
+    }, 1000);
+  }
+
+  function stopExamTimer() {
+    if (examTimerId) {
+      clearInterval(examTimerId);
+      examTimerId = null;
+    }
+    var banner = document.getElementById('jlptExamTimerBanner');
+    if (banner) {
+      banner.classList.remove('timer-warning');
+      if (!isExamMode) banner.style.display = 'none';
+    }
+  }
+
+  function handleExamTimeout() {
+    if (selectedChoice !== null) return;
+    var qs = getFilteredQuestions();
+    if (!qs || !qs[curIndex]) return;
+    var q = qs[curIndex];
+    var correctOptId = (q.answerIndex !== undefined ? q.answerIndex + 1 : (q.correct_answer || 1));
+    selectJlptChoice(-1, correctOptId);
+  }
+
+  function toggleJlptExamMode() {
+    isExamMode = !isExamMode;
+    stopExamTimer();
+    stopJlptAudio();
+    selectedChoice = null;
+    replayCount = 0;
+    closeJlptDetailSheet();
+
+    var btn = document.getElementById('jlptExamToggleBtn');
+    var txt = document.getElementById('jlptExamBtnText');
+    var banner = document.getElementById('jlptExamTimerBanner');
+    var modal = document.getElementById('listeningPanelModal');
+
+    if (modal) {
+      modal.classList.toggle('exam-mode-active', isExamMode);
+    }
+    if (btn) {
+      btn.classList.toggle('active', isExamMode);
+    }
+    if (txt) {
+      txt.textContent = isExamMode ? t('jlpt.exam-mode', 'Ujian') : t('jlpt.practice-mode', 'Latihan');
+    }
+    if (banner) {
+      banner.style.display = isExamMode ? 'flex' : 'none';
+    }
+
+    renderListeningQuestion();
+  }
+
+  function setJlptScriptMode(mode) {
+    if (['ruby', 'kanji', 'romaji'].indexOf(mode) === -1) return;
+    curScriptMode = mode;
+    try { localStorage.setItem('fiezel-jlpt-script-mode', mode); } catch (_) {}
+
+    var modal = document.getElementById('listeningPanelModal');
+    if (modal) {
+      modal.classList.remove('jlpt-mode-ruby', 'jlpt-mode-kanji', 'jlpt-mode-romaji');
+      modal.classList.add('jlpt-mode-' + mode);
+    }
+
+    var btnRuby = document.getElementById('btnModeRuby');
+    var btnKanji = document.getElementById('btnModeKanji');
+    var btnRomaji = document.getElementById('btnModeRomaji');
+    if (btnRuby) btnRuby.classList.toggle('active', mode === 'ruby');
+    if (btnKanji) btnKanji.classList.toggle('active', mode === 'kanji');
+    if (btnRomaji) btnRomaji.classList.toggle('active', mode === 'romaji');
+
+    var qs = getFilteredQuestions();
+    if (qs && qs[curIndex]) {
+      var correctOptId = (qs[curIndex].answerIndex !== undefined ? qs[curIndex].answerIndex + 1 : (qs[curIndex].correct_answer || 1));
+      populateDetailSheet(qs[curIndex], correctOptId);
+    }
+
+    updateQuestionScriptMode();
+  }
+
+  function updateQuestionScriptMode() {
+    var qs = getFilteredQuestions();
+    if (!qs || !qs[curIndex]) return;
+    var q = qs[curIndex];
+
+    var qJaEl = document.querySelector('.jlpt-question-ja');
+    if (qJaEl) {
+      if (curScriptMode === 'romaji' && q.questionRomaji) {
+        qJaEl.innerHTML = '<span class="jlpt-q-romaji" style="display:block;font-size:15px;font-weight:800;color:#0F172A;margin-bottom:4px;">' + escapeHtml(q.questionRomaji) + '</span>' +
+          '<span class="jlpt-q-subja" style="font-size:12px;opacity:0.75;">' + renderFuriganaText(q.questionJapanese || q.question || '', 'ruby') + '</span>';
+      } else {
+        qJaEl.innerHTML = renderFuriganaText(q.questionJapanese || q.question || '', curScriptMode);
+      }
+    }
+
+    var optJaEls = document.querySelectorAll('.jlpt-opt-ja');
+    if (optJaEls && q.options) {
+      optJaEls.forEach(function (el, idx) {
+        var opt = q.options[idx];
+        var textJa = (typeof opt === 'object') ? (opt.text || '') : String(opt);
+        el.innerHTML = renderFuriganaText(textJa, curScriptMode);
+      });
+    }
+  }
+
+  function seekToJlptTurn(turnIdx) {
+    var qs = getFilteredQuestions();
+    if (!qs || !qs[curIndex]) return;
+    var q = qs[curIndex];
+    var timestamps = q.turnTimestamps || [];
+    var targetSec = (timestamps[turnIdx] !== undefined) ? timestamps[turnIdx] : (turnIdx * 4.0);
+
+    if (isExamMode) {
+      if (typeof window !== 'undefined' && window.toast) {
+        window.toast(t('jlpt.exam-locked-note', 'Naskah Terkunci (Mode Ujian)'));
+      }
+      return;
+    }
+
+    if (!audioObj || !audioPlaying) {
+      togglePlayJlptPrimaryAudio();
+      setTimeout(function () {
+        if (audioObj) {
+          audioObj.currentTime = targetSec;
+          try { audioObj.play(); } catch (_) {}
+        }
+      }, 200);
+    } else {
+      audioObj.currentTime = targetSec;
+      try { audioObj.play(); } catch (_) {}
+    }
+
+    highlightTurn(turnIdx);
+  }
+
+  function highlightTurn(idx) {
+    currentSpeakingTurnIdx = idx;
+    var allTurns = document.querySelectorAll('.jlpt-dialogue-turn');
+    allTurns.forEach(function (el, i) {
+      el.classList.toggle('speaking-now', i === idx);
+    });
+  }
+
+  function syncPlayingTurnHighlight() {
+    if (!audioObj || !audioPlaying) return;
+    var qs = getFilteredQuestions();
+    if (!qs || !qs[curIndex]) return;
+    var q = qs[curIndex];
+    var timestamps = q.turnTimestamps || [];
+    if (timestamps.length === 0) return;
+
+    var cur = audioObj.currentTime;
+    var activeIdx = -1;
+    for (var i = 0; i < timestamps.length; i++) {
+      var start = timestamps[i];
+      var next = (i < timestamps.length - 1) ? timestamps[i + 1] : 9999;
+      if (cur >= start && cur < next) {
+        activeIdx = i;
+        break;
+      }
+    }
+    if (activeIdx !== -1 && activeIdx !== currentSpeakingTurnIdx) {
+      highlightTurn(activeIdx);
+    }
+  }
+
   function notifyMascot(reaction) {
     try {
       var m = document.querySelector('.jlpt-mascot-slot fiezel-mascot, fiezel-mascot.jlpt-mascot, .jlpt-mascot');
@@ -333,6 +598,13 @@
       return;
     }
 
+    if (isExamMode && replayCount >= 1 && (source === 'primary' || source === 'ai')) {
+      if (typeof window !== 'undefined' && window.toast) {
+        window.toast(t('jlpt.exam-audio-once', 'Audio hanya berputar 1 kali dalam mode ujian'));
+      }
+      return;
+    }
+
     stopJlptAudio();
 
     if (!url) {
@@ -346,10 +618,13 @@
       audioObj = new Audio(url);
       audioObj.playbackRate = audioPlaybackRate;
       activeAudioSource = source;
+      audioObj.ontimeupdate = syncPlayingTurnHighlight;
 
       audioObj.onended = function () {
         audioPlaying = false;
         activeAudioSource = null;
+        currentSpeakingTurnIdx = -1;
+        highlightTurn(-1);
         updateAudioUi();
         notifyMascot('listening-stop');
       };
@@ -621,7 +896,7 @@
   }
 
   // Helper formatting for Chat-Style Dialogue Turns
-  function formatDialogueHtml(scriptJa, scriptRomaji, scriptId) {
+  function formatDialogueHtml(scriptJa, scriptRomaji, scriptId, q) {
     if (!scriptJa) return '<p style="color:var(--text-muted);font-size:13px;">Naskah belum tersedia.</p>';
 
     var linesJa = scriptJa.split('\n').filter(function (l) { return l.trim().length > 0; });
@@ -682,18 +957,29 @@
       }
 
       var safeLineJa = escapeJs(textJa);
+      var safeTextJa = renderFuriganaText(textJa, curScriptMode);
+      var turnTime = (q && q.turnTimestamps && q.turnTimestamps[idx] !== undefined)
+        ? q.turnTimestamps[idx]
+        : (idx * 4.0);
+      var timeFormatted = formatMmSs(turnTime);
 
-      return '<div class="jlpt-dialogue-turn speaker-' + personaType + '">' +
+      return '<div class="jlpt-dialogue-turn speaker-' + personaType + '" id="jlptTurn_' + idx + '" onclick="seekToJlptTurn(' + idx + ')" role="button" tabindex="0" title="' + t('jlpt.seek-turn-hint', 'Ketuk untuk memutar dari bagian ini') + '">' +
         '<div class="jlpt-turn-meta">' +
           '<span class="jlpt-speaker-chip speaker-' + personaType + '">' +
             '<span class="jlpt-speaker-dot"></span>' +
             '<span class="jlpt-speaker-name">' + escapeHtml(personaLabel) + '</span>' +
             (speaker && speaker !== personaLabel ? ' <span class="jlpt-speaker-raw">(' + escapeHtml(speaker) + ')</span>' : '') +
           '</span>' +
-          '<button type="button" class="jlpt-line-speak-btn" onclick="playJlptSpeech(\'' + safeLineJa + '\')" title="Dengarkan baris ini" aria-label="Audio Baris">🔊</button>' +
+          '<div style="display:flex;align-items:center;gap:6px;">' +
+            '<button type="button" class="jlpt-turn-seek-pill" onclick="event.stopPropagation();seekToJlptTurn(' + idx + ')" title="Lompat ke detik ' + timeFormatted + '">' +
+              '<span class="jlpt-seek-icon">▶</span>' +
+              '<span>' + timeFormatted + '</span>' +
+            '</button>' +
+            '<button type="button" class="jlpt-line-speak-btn" onclick="event.stopPropagation();playJlptSpeech(\'' + safeLineJa + '\')" title="Dengarkan baris ini" aria-label="Audio Baris">🔊</button>' +
+          '</div>' +
         '</div>' +
         '<div class="jlpt-turn-bubble">' +
-          '<div class="jlpt-bubble-ja">' + escapeHtml(textJa) + '</div>' +
+          '<div class="jlpt-bubble-ja">' + safeTextJa + '</div>' +
           (textRo ? '<div class="jlpt-bubble-ro">' + escapeHtml(textRo) + '</div>' : '') +
           (textId ? '<div class="jlpt-bubble-id">' + escapeHtml(textId) + '</div>' : '') +
         '</div>' +
@@ -897,7 +1183,7 @@
 
     var bubblesEl = document.getElementById('jlptDialogueBubbles');
     if (bubblesEl) {
-      bubblesEl.innerHTML = formatDialogueHtml(q.scriptJapanese || q.script, q.scriptRomaji, q.scriptIndonesian || q.script_translation);
+      bubblesEl.innerHTML = formatDialogueHtml(q.scriptJapanese || q.script, q.scriptRomaji, q.scriptIndonesian || q.script_translation, q);
     }
 
     var explainEl = document.getElementById('jlptExplainContent');
@@ -916,6 +1202,12 @@
   }
 
   function openJlptDetailSheet(tabName) {
+    if (isExamMode) {
+      if (typeof window !== 'undefined' && window.toast) {
+        window.toast(t('jlpt.exam-locked-note', 'Naskah Terkunci (Mode Ujian)'));
+      }
+      return;
+    }
     var sheet = ensureDetailSheet();
     if (!sheet) return;
 
@@ -1308,6 +1600,7 @@
       var textId = (typeof opt === 'object') ? (opt.textId || '') : '';
       var cls = 'jlpt-opt-btn';
       var ariaLabel = 'Pilihan ' + optId + ': ' + textJa;
+      var optTextFormatted = renderFuriganaText(textJa, curScriptMode);
 
       if (isAnswered) {
         cls += ' locked';
@@ -1324,7 +1617,7 @@
       return '<button type="button" class="' + cls + '" data-opt-id="' + optId + '"' + disabledAttr + ' aria-label="' + escapeHtml(ariaLabel) + '" onclick="selectJlptChoice(' + optId + ', ' + correctOptId + ')">' +
         '<span class="jlpt-opt-badge">' + optId + '</span>' +
         '<div class="jlpt-opt-texts">' +
-          '<div class="jlpt-opt-ja">' + escapeHtml(textJa) + '</div>' +
+          '<div class="jlpt-opt-ja">' + optTextFormatted + '</div>' +
           (isAnswered && textId ? '<div class="jlpt-opt-id">' + escapeHtml(textId) + '</div>' : '') +
         '</div>' +
       '</button>';
@@ -1339,6 +1632,47 @@
     if (topFilterLabelEl) {
       var shortMondai = curMondai === 'all' ? t('jlpt.mondai-all', 'Semua') : mondaiShortLabel;
       topFilterLabelEl.textContent = curLevel + ' · ' + shortMondai;
+    }
+
+    // Sync Controls Bar: Script Mode & Exam Mode
+    var btnRuby = document.getElementById('btnModeRuby');
+    var btnKanji = document.getElementById('btnModeKanji');
+    var btnRomaji = document.getElementById('btnModeRomaji');
+    if (btnRuby) btnRuby.classList.toggle('active', curScriptMode === 'ruby');
+    if (btnKanji) btnKanji.classList.toggle('active', curScriptMode === 'kanji');
+    if (btnRomaji) btnRomaji.classList.toggle('active', curScriptMode === 'romaji');
+
+    var examBtn = document.getElementById('jlptExamToggleBtn');
+    var examTxt = document.getElementById('jlptExamBtnText');
+    if (examBtn) examBtn.classList.toggle('active', isExamMode);
+    if (examTxt) examTxt.textContent = isExamMode ? t('jlpt.exam-mode', 'Ujian') : t('jlpt.practice-mode', 'Latihan');
+
+    var modal = document.getElementById('listeningPanelModal');
+    if (modal) {
+      modal.classList.remove('jlpt-mode-ruby', 'jlpt-mode-kanji', 'jlpt-mode-romaji');
+      modal.classList.add('jlpt-mode-' + curScriptMode);
+      modal.classList.toggle('exam-mode-active', isExamMode);
+    }
+
+    // Timed Exam Simulator
+    if (isExamMode) {
+      if (!isAnswered) {
+        var allocSec = (q.mondai === 'mondai_3' || q.mondai === 'mondai_4') ? 30 : 45;
+        startExamTimer(allocSec);
+      } else {
+        stopExamTimer();
+      }
+    } else {
+      stopExamTimer();
+    }
+
+    // Question Text with Furigana/Romaji
+    var qJaHtml = '';
+    if (curScriptMode === 'romaji' && q.questionRomaji) {
+      qJaHtml = '<span class="jlpt-q-romaji" style="display:block;font-size:15px;font-weight:800;color:#0F172A;margin-bottom:4px;">' + escapeHtml(q.questionRomaji) + '</span>' +
+        '<span class="jlpt-q-subja" style="font-size:12px;opacity:0.75;">' + renderFuriganaText(qJa, 'ruby') + '</span>';
+    } else {
+      qJaHtml = renderFuriganaText(qJa, curScriptMode);
     }
 
     slot.innerHTML =
@@ -1380,13 +1714,22 @@
 
           '<!-- Typography Soal Jepang (Plus Jakarta Sans, Slate Gelap Kontras Tinggi) -->' +
           '<div class="jlpt-question-block">' +
-            '<h3 class="jlpt-question-ja">' + escapeHtml(qJa) + '</h3>' +
+            '<h3 class="jlpt-question-ja">' + qJaHtml + '</h3>' +
             (isAnswered && qId ? '<p class="jlpt-question-id">' + escapeHtml(qId) + '</p>' : '') +
           '</div>' +
 
           '<!-- 4 Kartu Pilihan Ganda Tactile Clay (48-54px) -->' +
           '<div class="jlpt-options-list">' +
             optionsHtml +
+          '</div>' +
+
+          '<!-- Sheet Trigger Button (Only enabled in Practice Mode) -->' +
+          '<div class="jlpt-sheet-triggers" style="display:flex;justify-content:center;margin-top:6px;">' +
+            (isExamMode ?
+              '<button type="button" class="jlpt-sheet-trigger-btn locked" id="jlptSheetTriggerBtn" disabled title="' + t('jlpt.exam-locked-note', 'Naskah Terkunci (Mode Ujian)') + '">🔒 ' + t('jlpt.exam-locked-note', 'Naskah Terkunci (Mode Ujian)') + '</button>'
+            :
+              '<button type="button" class="jlpt-sheet-trigger-btn" id="jlptSheetTriggerBtn" onclick="openJlptDetailSheet(\'script\')">📝 ' + t('jlpt.sheet-trigger-label', 'Naskah & Pembahasan') + '</button>'
+            ) +
           '</div>' +
 
           '<!-- Feedback Slot -->' +
@@ -1491,6 +1834,9 @@
   window.switchJlptSheetTab = switchJlptSheetTab;
   window.prevListeningQuestion = prevListeningQuestion;
   window.nextListeningQuestion = nextListeningQuestion;
+  window.setJlptScriptMode = setJlptScriptMode;
+  window.toggleJlptExamMode = toggleJlptExamMode;
+  window.seekToJlptTurn = seekToJlptTurn;
 
   window.FiezelJlptListening = {
     initBank: initBank,
@@ -1503,7 +1849,10 @@
     cycleSpeed: cycleAudioPlaybackRate,
     stop: stopJlptAudio,
     openSheet: openJlptDetailSheet,
-    closeSheet: closeJlptDetailSheet
+    closeSheet: closeJlptDetailSheet,
+    setScriptMode: setJlptScriptMode,
+    toggleExamMode: toggleJlptExamMode,
+    seekToTurn: seekToJlptTurn
   };
 
   // Pre-fetch bank saat idle setelah splash selesai (dan hanya bila kursus aktif adalah bahasa Jepang)

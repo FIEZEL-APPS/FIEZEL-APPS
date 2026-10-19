@@ -117,7 +117,20 @@
           "ja": "だけ (dake)",
           "id": "hanya / saja"
         }
-      ]
+      ],
+      "turnTimestamps": [
+        3.75,
+        14.32,
+        18.16
+      ],
+      "allTurnTimestamps": [
+        0,
+        3.75,
+        14.32,
+        18.16,
+        21.88
+      ],
+      "questionRomaji": "Gakusei wa hajimeni nani o shimasu ka."
     },
     {
       "id": "jlpt-n5-m1-02",
@@ -175,7 +188,22 @@
           "ja": "まだ (mada)",
           "id": "masih"
         }
-      ]
+      ],
+      "turnTimestamps": [
+        4.49,
+        8.84,
+        12.26,
+        18.98
+      ],
+      "allTurnTimestamps": [
+        0,
+        4.49,
+        8.84,
+        12.26,
+        18.98,
+        22.65
+      ],
+      "questionRomaji": "Futari wa nani o ikutsu kaimasu ka."
     },
     {
       "id": "jlpt-n5-m1-03",
@@ -237,7 +265,22 @@
           "ja": "こうじ (kouji)",
           "id": "pekerjaan konstruksi / perbaikan"
         }
-      ]
+      ],
+      "turnTimestamps": [
+        3.94,
+        8.61,
+        16.44,
+        20.28
+      ],
+      "allTurnTimestamps": [
+        0,
+        3.94,
+        8.61,
+        16.44,
+        20.28,
+        22.52
+      ],
+      "questionRomaji": "Futari wa ashita doko de aimasu ka."
     },
     {
       "id": "jlpt-n5-m1-04",
@@ -296,7 +339,22 @@
           "ja": "もっていく (motte iku)",
           "id": "membawa pergi"
         }
-      ]
+      ],
+      "turnTimestamps": [
+        3.43,
+        9.35,
+        11.47,
+        17.3
+      ],
+      "allTurnTimestamps": [
+        0,
+        3.43,
+        9.35,
+        11.47,
+        17.3,
+        20.89
+      ],
+      "questionRomaji": "Otokonoko wa dono kasa o motte ikimasu ka."
     },
     {
       "id": "jlpt-n5-m2-01",
@@ -355,7 +413,22 @@
           "ja": "すっかり (sukkari)",
           "id": "sepenuhnya / tuntas"
         }
-      ]
+      ],
+      "turnTimestamps": [
+        4.03,
+        9.17,
+        15.19,
+        18.56
+      ],
+      "allTurnTimestamps": [
+        0,
+        4.03,
+        9.17,
+        15.19,
+        18.56,
+        24.05
+      ],
+      "questionRomaji": "Tanaka-san wa doushite kinou paatii ni kimasen deshita ka."
     },
     {
       "id": "jlpt-n5-m2-02",
@@ -410,7 +483,24 @@
           "ja": "おちる (ochiru)",
           "id": "jatuh"
         }
-      ]
+      ],
+      "turnTimestamps": [
+        4.03,
+        9.68,
+        14.3,
+        16.38,
+        20.17
+      ],
+      "allTurnTimestamps": [
+        0,
+        4.03,
+        9.68,
+        14.3,
+        16.38,
+        20.17,
+        22.45
+      ],
+      "questionRomaji": "Kagi wa doko ni arimashita ka."
     },
     {
       "id": "jlpt-n5-m2-03",
@@ -469,7 +559,22 @@
           "ja": "おわる (owaru)",
           "id": "selesai"
         }
-      ]
+      ],
+      "turnTimestamps": [
+        4.08,
+        9.86,
+        20.8,
+        24.22
+      ],
+      "allTurnTimestamps": [
+        0,
+        4.08,
+        9.86,
+        20.8,
+        24.22,
+        28.55
+      ],
+      "questionRomaji": "学生の クラスは なんじに はじまりますか。"
     },
     {
       "id": "jlpt-n5-m2-04",
@@ -524,7 +629,22 @@
           "ja": "おいしい (oishii)",
           "id": "enak / lezat"
         }
-      ]
+      ],
+      "turnTimestamps": [
+        3.47,
+        5.78,
+        13.24,
+        16.42
+      ],
+      "allTurnTimestamps": [
+        0,
+        3.47,
+        5.78,
+        13.24,
+        16.42,
+        18.71
+      ],
+      "questionRomaji": "女の人は なにを のみますか。"
     },
     {
       "id": "jlpt-n5-m3-01",
@@ -574,7 +694,16 @@
           "ja": "へや (heya)",
           "id": "kamar / ruangan"
         }
-      ]
+      ],
+      "turnTimestamps": [
+        4.59
+      ],
+      "allTurnTimestamps": [
+        0,
+        4.59,
+        8.68
+      ],
+      "questionRomaji": "へやに はいるとき、なんと言いますか。"
     },
     {
       "id": "jlpt-n5-m3-02",
@@ -624,7 +753,16 @@
           "ja": "ただいま (tadaima)",
           "id": "aku pulang"
         }
-      ]
+      ],
+      "turnTimestamps": [
+        4.08
+      ],
+      "allTurnTimestamps": [
+        0,
+        4.08,
+        9.71
+      ],
+      "questionRomaji": "Ie o deru toki, nan to iimasu ka."
     },
     {
       "id": "jlpt-n5-m3-03",
@@ -674,7 +812,16 @@
           "ja": "プレゼント (purezento)",
           "id": "kado / hadiah"
         }
-      ]
+      ],
+      "turnTimestamps": [
+        4.12
+      ],
+      "allTurnTimestamps": [
+        0,
+        4.12,
+        10.22
+      ],
+      "questionRomaji": "Purezento o watasu toki, nan to iimasu ka."
     },
     {
       "id": "jlpt-n5-m4-01",
@@ -720,7 +867,16 @@
           "ja": "そうですね (sou desu ne)",
           "id": "betul juga ya / setuju"
         }
-      ]
+      ],
+      "turnTimestamps": [
+        5.14
+      ],
+      "allTurnTimestamps": [
+        0,
+        5.14,
+        7.48
+      ],
+      "questionRomaji": "Nan to itte kotaemasu ka."
     },
     {
       "id": "jlpt-n5-m4-02",
@@ -766,7 +922,16 @@
           "ja": "かばん (kaban)",
           "id": "tas"
         }
-      ]
+      ],
+      "turnTimestamps": [
+        4.73
+      ],
+      "allTurnTimestamps": [
+        0,
+        4.73,
+        7.29
+      ],
+      "questionRomaji": "Nan to itte kotaemasu ka."
     },
     {
       "id": "jlpt-n5-m4-03",
@@ -816,7 +981,16 @@
           "ja": "～ましょう (mashou)",
           "id": "mari / ayo ..."
         }
-      ]
+      ],
+      "turnTimestamps": [
+        4.03
+      ],
+      "allTurnTimestamps": [
+        0,
+        4.03,
+        7.94
+      ],
+      "questionRomaji": "Nan to itte kotaemasu ka."
     },
     {
       "id": "jlpt-n5-m4-04",
@@ -866,7 +1040,16 @@
           "ja": "とても (totemo)",
           "id": "sangat"
         }
-      ]
+      ],
+      "turnTimestamps": [
+        4.31
+      ],
+      "allTurnTimestamps": [
+        0,
+        4.31,
+        7.01
+      ],
+      "questionRomaji": "Nan to itte kotaemasu ka."
     },
     {
       "id": "jlpt-n4-m1-01",
@@ -925,7 +1108,22 @@
           "ja": "おひや (ohiya)",
           "id": "air minum dingin (istilah restoran)"
         }
-      ]
+      ],
+      "turnTimestamps": [
+        4.22,
+        10.56,
+        14.91,
+        23.76
+      ],
+      "allTurnTimestamps": [
+        0,
+        4.22,
+        10.56,
+        14.91,
+        23.76,
+        26.09
+      ],
+      "questionRomaji": "Arubaito no hito wa korekara mazu nani o shimasu ka."
     },
     {
       "id": "jlpt-n4-m1-02",
@@ -984,7 +1182,22 @@
           "ja": "～の あとに (no ato ni)",
           "id": "setelah ..."
         }
-      ]
+      ],
+      "turnTimestamps": [
+        4.77,
+        13.53,
+        15.6,
+        25.29
+      ],
+      "allTurnTimestamps": [
+        0,
+        4.77,
+        13.53,
+        15.6,
+        25.29,
+        27.48
+      ],
+      "questionRomaji": "Kanja wa hirugohan no ato ni dono kusuri o nomimasu ka."
     },
     {
       "id": "jlpt-n4-m1-03",
@@ -1043,7 +1256,22 @@
           "ja": "うんちん (unchin)",
           "id": "tarif / ongkos tiket"
         }
-      ]
+      ],
+      "turnTimestamps": [
+        3.98,
+        11.12,
+        23.45,
+        29.05
+      ],
+      "allTurnTimestamps": [
+        0,
+        3.98,
+        11.12,
+        23.45,
+        29.05,
+        35.19
+      ],
+      "questionRomaji": "Onna no hito wa dono densha ni norimasu ka."
     },
     {
       "id": "jlpt-n4-m1-04",
@@ -1098,7 +1326,22 @@
           "ja": "かいだし (kaidashi)",
           "id": "pergi berbelanja kebutuhan"
         }
-      ]
+      ],
+      "turnTimestamps": [
+        3.84,
+        10.05,
+        15.19,
+        25.52
+      ],
+      "allTurnTimestamps": [
+        0,
+        3.84,
+        10.05,
+        15.19,
+        25.52,
+        32.04
+      ],
+      "questionRomaji": "女の人は これから まず なにを しますか。"
     },
     {
       "id": "jlpt-n4-m2-01",
@@ -1157,7 +1400,24 @@
           "ja": "のりかえる (norikaeru)",
           "id": "berganti kendaraan"
         }
-      ]
+      ],
+      "turnTimestamps": [
+        4.22,
+        8.14,
+        18.58,
+        21.72,
+        28.66
+      ],
+      "allTurnTimestamps": [
+        0,
+        4.22,
+        8.14,
+        18.58,
+        21.72,
+        28.66,
+        31.04
+      ],
+      "questionRomaji": "山田くんが ちこくした いちばんの りゆうは なんですか。"
     },
     {
       "id": "jlpt-n4-m2-02",
@@ -1212,7 +1472,22 @@
           "ja": "えいぞう (eizou)",
           "id": "visual / gambar video"
         }
-      ]
+      ],
+      "turnTimestamps": [
+        4.26,
+        8.28,
+        14.77,
+        20.14
+      ],
+      "allTurnTimestamps": [
+        0,
+        4.26,
+        8.28,
+        14.77,
+        20.14,
+        26.97
+      ],
+      "questionRomaji": "男の人は えいがの なにが いちばん よかったと 言っていますか。"
     },
     {
       "id": "jlpt-n4-m2-03",
@@ -1267,7 +1542,22 @@
           "ja": "ゆっくり (yukkuri)",
           "id": "santai / perlahan"
         }
-      ]
+      ],
+      "turnTimestamps": [
+        4.17,
+        12.56,
+        18.71,
+        20.65
+      ],
+      "allTurnTimestamps": [
+        0,
+        4.17,
+        12.56,
+        18.71,
+        20.65,
+        28.46
+      ],
+      "questionRomaji": "Onna no hito ga ikenakatta tokoro wa doko desu ka."
     },
     {
       "id": "jlpt-n4-m2-04",
@@ -1322,7 +1612,22 @@
           "ja": "こまる (komaru)",
           "id": "mengalami kesulitan"
         }
-      ]
+      ],
+      "turnTimestamps": [
+        4.31,
+        8.28,
+        15.05,
+        19.53
+      ],
+      "allTurnTimestamps": [
+        0,
+        4.31,
+        8.28,
+        15.05,
+        19.53,
+        25.81
+      ],
+      "questionRomaji": "Jon-san wa nani ga ichiban taihen da to itte imasu ka."
     },
     {
       "id": "jlpt-n4-m3-01",
@@ -1372,7 +1677,16 @@
           "ja": "はやく (hayaku)",
           "id": "lebih cepat / lebih awal"
         }
-      ]
+      ],
+      "turnTimestamps": [
+        4.4
+      ],
+      "allTurnTimestamps": [
+        0,
+        4.4,
+        13.33
+      ],
+      "questionRomaji": "Tenchou ni nan to itte kyoka o torimasu ka."
     },
     {
       "id": "jlpt-n4-m3-02",
@@ -1422,7 +1736,16 @@
           "ja": "ことわる (kotowaru)",
           "id": "menolak"
         }
-      ]
+      ],
+      "turnTimestamps": [
+        4.68
+      ],
+      "allTurnTimestamps": [
+        0,
+        4.68,
+        13.05
+      ],
+      "questionRomaji": "Nan to itte teinei ni kotowarimasu ka."
     },
     {
       "id": "jlpt-n4-m3-03",
@@ -1472,7 +1795,16 @@
           "ja": "ごちそうさまでした",
           "id": "terima kasih atas makanannya (sesudah makan)"
         }
-      ]
+      ],
+      "turnTimestamps": [
+        4.31
+      ],
+      "allTurnTimestamps": [
+        0,
+        4.31,
+        12.26
+      ],
+      "questionRomaji": "Mise o deru toki, joushi ni nan to iimasu ka."
     },
     {
       "id": "jlpt-n4-m4-01",
@@ -1522,7 +1854,16 @@
           "ja": "おねがいします (onegai shimasu)",
           "id": "tolong bantu / mohon bantuannya"
         }
-      ]
+      ],
+      "turnTimestamps": [
+        4.03
+      ],
+      "allTurnTimestamps": [
+        0,
+        4.03,
+        9.24
+      ],
+      "questionRomaji": "Nan to itte kotaemasu ka."
     },
     {
       "id": "jlpt-n4-m4-02",
@@ -1568,7 +1909,16 @@
           "ja": "～だっけ (dakke)",
           "id": "... ya? (memastikan hal yang lupa)"
         }
-      ]
+      ],
+      "turnTimestamps": [
+        4.08
+      ],
+      "allTurnTimestamps": [
+        0,
+        4.08,
+        7.85
+      ],
+      "questionRomaji": "Nan to itte kotaemasu ka."
     },
     {
       "id": "jlpt-n4-m4-03",
@@ -1618,7 +1968,16 @@
           "ja": "けっこうです (kekkou desu)",
           "id": "sudah cukup"
         }
-      ]
+      ],
+      "turnTimestamps": [
+        3.38
+      ],
+      "allTurnTimestamps": [
+        0,
+        3.38,
+        6.87
+      ],
+      "questionRomaji": "Nan to itte kotaemasu ka."
     },
     {
       "id": "jlpt-n4-m4-04",
@@ -1672,7 +2031,16 @@
           "ja": "まがる (magaru)",
           "id": "belok"
         }
-      ]
+      ],
+      "turnTimestamps": [
+        4.26
+      ],
+      "allTurnTimestamps": [
+        0,
+        4.26,
+        9.98
+      ],
+      "questionRomaji": "Nan to itte kotaemasu ka."
     }
   ]
 }

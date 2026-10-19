@@ -815,6 +815,32 @@ html.fz-booting body{overflow:hidden}
         </button>
       </div>
 
+      <!-- JLPT Interactive Controls Bar: Furigana Tri-State & Exam Mode -->
+      <div class="jlpt-controls-bar" id="jlptControlsBar">
+        <div class="jlpt-script-mode-group" role="group" aria-label="Mode Tampilan Aksara" data-i18n-aria-label="jlpt.script-mode-aria">
+          <button type="button" class="jlpt-mode-btn active" id="btnModeRuby" onclick="setJlptScriptMode('ruby')" title="Mode Ruby (Furigana)" data-i18n-title="jlpt.mode-ruby-title">
+            <span class="jlpt-mode-label">ふりがな</span>
+          </button>
+          <button type="button" class="jlpt-mode-btn" id="btnModeKanji" onclick="setJlptScriptMode('kanji')" title="Mode Kanji Asli" data-i18n-title="jlpt.mode-kanji-title">
+            <span class="jlpt-mode-label">漢字</span>
+          </button>
+          <button type="button" class="jlpt-mode-btn" id="btnModeRomaji" onclick="setJlptScriptMode('romaji')" title="Mode Romaji" data-i18n-title="jlpt.mode-romaji-title">
+            <span class="jlpt-mode-label">Romaji</span>
+          </button>
+        </div>
+        <button type="button" class="jlpt-exam-mode-btn" id="jlptExamToggleBtn" onclick="toggleJlptExamMode()" title="Simulasi Ujian Resmi JEES (Waktu Terbatas & 1x Putar)" data-i18n-title="jlpt.exam-mode-title">
+          <span class="jlpt-exam-mode-icon">⏱️</span>
+          <span class="jlpt-exam-mode-text" id="jlptExamBtnText" data-i18n="jlpt.practice-mode">Latihan</span>
+        </button>
+      </div>
+
+      <!-- Live Exam Countdown Banner (Visible ONLY in Exam Mode) -->
+      <div class="jlpt-exam-timer-banner" id="jlptExamTimerBanner" style="display:none;" aria-live="polite">
+        <span class="jlpt-timer-pulse-dot"></span>
+        <span class="jlpt-timer-text-label" data-i18n="jlpt.time-remaining">Sisa Waktu:</span>
+        <span class="jlpt-timer-countdown-val" id="jlptTimerCountdown">00:45</span>
+      </div>
+
       <div class="listening-body">
         <!-- Dynamic Question Card Slot -->
         <div id="listeningQuestionSlot"></div>
