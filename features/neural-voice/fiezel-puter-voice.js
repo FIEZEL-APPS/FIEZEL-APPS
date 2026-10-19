@@ -118,6 +118,7 @@
       SCHEMA,
       settings.engine || ENGINE,
       settings.lang || LANG,
+      settings.voice || '',
       String(settings.speed || 1),
       String(text == null ? '' : text)
     ].join(' ');
@@ -251,8 +252,10 @@
         state.calls++;
         // Teks dikirim apa adanya. Lihat catatan kepala berkas: membentuknya lebih
         // dulu adalah konfigurasi yang sudah diuji dan tidak dipilih.
+        var ttsOpts = { language: settings.lang, engine: settings.engine };
+        if (settings.voice) ttsOpts.voice = settings.voice;
         return withTimeout(
-          p.ai.txt2speech(text, { language: settings.lang, engine: settings.engine }),
+          p.ai.txt2speech(text, ttsOpts),
           CALL_TIMEOUT_MS,
           'txt2speech'
         );
@@ -273,7 +276,12 @@
     current = null;
     state.speaking = false;
     if (c && c.audio) {
-      try { c.audio.pause(); } catch (_) {}
+      try {
+        c.audio.muted = true;
+        c.audio.volume = 0;
+        c.audio.currentTime = 0;
+        c.audio.pause();
+      } catch (_) {}
       try { if (c.objectUrl) URL.revokeObjectURL(c.objectUrl); } catch (_) {}
     }
     return true;
@@ -368,6 +376,7 @@
     return render(value, {
       engine: opts.engine || ENGINE,
       lang: opts.lang || LANG,
+      voice: opts.voice || opts.voiceId || '',
       speed: opts.speed || opts.rate || 1
     }).then(function () { return true; }).catch(function () { return false; });
   }
@@ -397,6 +406,7 @@
     var settings = {
       engine: opts.engine || ENGINE,
       lang: opts.lang || LANG,
+      voice: opts.voice || opts.voiceId || '',
       speed: opts.speed || opts.rate || 1
     };
 

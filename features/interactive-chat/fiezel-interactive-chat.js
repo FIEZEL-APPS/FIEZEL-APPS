@@ -1340,6 +1340,87 @@
     }
   }
 
+  // Canonical Interactive Chat & Voice Call Personas
+  var PERSONAS = {
+    en: {
+      alex: {
+        id: 'alex',
+        name: 'Coach Alex',
+        shortName: 'Alex',
+        voice: 'en-US-GuyNeural',
+        gender: 'male',
+        role: 'Speaking & Confidence Coach',
+        avatarIcon: 'coach',
+        label: 'Coach Alex'
+      },
+      sarah: {
+        id: 'sarah',
+        name: 'Coach Sarah',
+        shortName: 'Sarah',
+        voice: 'en-US-AriaNeural',
+        gender: 'female',
+        role: 'Pronunciation & Fluency Coach',
+        avatarIcon: 'coach',
+        label: 'Coach Sarah'
+      }
+    },
+    ja: {
+      keita: {
+        id: 'keita',
+        name: 'フィゼル先生',
+        shortName: 'Keita',
+        voice: 'ja-JP-KeitaNeural',
+        gender: 'male',
+        role: 'Percakapan & Pola Kalimat',
+        avatarIcon: 'sensei',
+        label: 'Sensei Keita'
+      },
+      nanami: {
+        id: 'nanami',
+        name: 'ナナミ先生',
+        shortName: 'Nanami',
+        voice: 'ja-JP-NanamiNeural',
+        gender: 'female',
+        role: 'Percakapan Sehari-hari & Keigo',
+        avatarIcon: 'sensei',
+        label: 'Sensei Nanami'
+      }
+    }
+  };
+
+  function resolvePersona(course, val) {
+    var s = (val && typeof val === 'object' && val.id) ? String(val.id) : String(val || '');
+    s = s.toLowerCase().trim();
+
+    var c = course;
+    if (s === 'sarah' || s === 'aria' || s === 'alex' || s === 'guy' || /sarah|aria|coach/i.test(s)) {
+      c = 'en';
+    } else if (s === 'keita' || s === 'nanami' || /keita|nanami|sensei/i.test(s)) {
+      c = 'ja';
+    } else {
+      c = (course === 'en') ? 'en' : 'ja';
+    }
+
+    var bank = PERSONAS[c];
+    if (!s) {
+      try {
+        var stored = localStorage.getItem('fz_persona_' + c);
+        if (stored && bank[stored]) return bank[stored];
+      } catch (_) {}
+      return bank[c === 'ja' ? 'keita' : 'alex'];
+    }
+    if (bank[s]) return bank[s];
+    if (c === 'en') {
+      if (/sarah|aria/i.test(s)) return bank.sarah;
+      if (/alex|guy/i.test(s)) return bank.alex;
+      return bank.alex;
+    } else {
+      if (/nanami/i.test(s)) return bank.nanami;
+      if (/keita/i.test(s)) return bank.keita;
+      return bank.keita;
+    }
+  }
+
   // --- Main Interactive Chat Controller ---
   var state = {
     course: 'ja',
@@ -1360,8 +1441,48 @@
     autoVoice: true,
     shadowingMsgId: null,
     audioPlayingId: null,
-    recognition: null
+    recognition: null,
+    selectedPersonas: {
+      en: 'alex',
+      ja: 'keita'
+    }
   };
+
+  function getActivePersona(course) {
+    var c = course || state.course || 'ja';
+    var pId = (state.selectedPersonas && state.selectedPersonas[c]) || (c === 'ja' ? 'keita' : 'alex');
+    return resolvePersona(c, pId);
+  }
+
+  function setPersona(personaKey, course) {
+    var c = course || state.course || 'ja';
+    var resolved = resolvePersona(c, personaKey);
+    if (!state.selectedPersonas) state.selectedPersonas = { en: 'alex', ja: 'keita' };
+    state.selectedPersonas[c] = resolved.id;
+    saveState();
+    try {
+      localStorage.setItem('fz_persona_' + c, resolved.id);
+    } catch (_) {}
+    updateUI();
+    return resolved;
+  }
+
+  function renderChatPersonaSwitchHtml(course, activeId) {
+    var c = course === 'ja' ? 'ja' : 'en';
+    var bank = PERSONAS[c];
+    var keys = Object.keys(bank);
+    var btnsHtml = keys.map(function (k) {
+      var p = bank[k];
+      var isActive = p.id === activeId ? ' is-active' : '';
+      var ariaChecked = p.id === activeId ? 'true' : 'false';
+      return '<button type="button" class="fzc-chat-persona-btn' + isActive + '" data-persona="' + esc(p.id) + '" role="radio" aria-checked="' + ariaChecked + '" title="' + esc(p.label + ' (' + p.voice + ')') + '">' +
+        '<span class="fzc-persona-icon" aria-hidden="true">' + (p.gender === 'female' ? '👩‍🏫' : '👨‍🏫') + '</span> ' +
+        '<span class="fzc-persona-name">' + esc(p.shortName || p.label) + '</span>' +
+        '</button>';
+    }).join('');
+
+    return '<div class="fzc-chat-persona-switch" id="fzcChatPersonaSwitch" role="radiogroup" aria-label="' + esc(t('chat_choose_persona', 'Pilih Mitra Bicara')) + '">' + btnsHtml + '</div>';
+  }
 
   // Batas riwayat per skenario: obrolan panjang tidak boleh memenuhi localStorage.
   var MAX_SCENARIO_MESSAGES = 200;
@@ -1379,7 +1500,16 @@
         state.correctionMode = saved.correctionMode === true;
         state.autoVoice = saved.autoVoice !== false;
         state.nudgeDismissedAt = Number(saved.nudgeDismissedAt) || 0;
+        if (saved.selectedPersonas && typeof saved.selectedPersonas === 'object') {
+          state.selectedPersonas = Object.assign({}, state.selectedPersonas, saved.selectedPersonas);
+        }
       }
+    } catch (_) {}
+    try {
+      var pEn = localStorage.getItem('fz_persona_en');
+      if (pEn && PERSONAS.en[pEn]) state.selectedPersonas.en = pEn;
+      var pJa = localStorage.getItem('fz_persona_ja');
+      if (pJa && PERSONAS.ja[pJa]) state.selectedPersonas.ja = pJa;
     } catch (_) {}
     state.course = getActiveCourse();
     // Kunci lama tanpa awalan kursus ('free') dulu disimpan BERDAMPINGAN dengan kunci
@@ -1412,7 +1542,8 @@
         scenarioHistories: state.scenarioHistories,
         correctionMode: state.correctionMode === true,
         autoVoice: state.autoVoice !== false,
-        nudgeDismissedAt: state.nudgeDismissedAt || 0
+        nudgeDismissedAt: state.nudgeDismissedAt || 0,
+        selectedPersonas: state.selectedPersonas
       }));
     } catch (_) {}
   }
@@ -1600,16 +1731,19 @@
     var cv = chatVoice();
     var cleanText = cv && typeof cv.cleanText === 'function'
       ? cv.cleanText(text)
-      : String(text || '').replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').replace(/[*_~`]/g, '').trim();
+      : String(text || '').replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').replace(/[*_~\x60]/g, '').trim();
     if (!cleanText || !cv) {
       stopVoice();
       return;
     }
 
+    var currentPersona = getActivePersona(state.course);
     state.audioPlayingId = msgId;
     updateAudioButtonUI(msgId);
 
     cv.speak(cleanText, state.course === 'ja' ? 'ja' : 'en', {
+      voice: currentPersona ? currentPersona.voice : '',
+      persona: currentPersona ? currentPersona.id : '',
       onSentenceStart: function () {
         if (root.__fiezelActiveVoiceOrb && typeof root.__fiezelActiveVoiceOrb.setVolume === 'function') {
           root.__fiezelActiveVoiceOrb.setVolume(0.7);
@@ -2273,7 +2407,12 @@
     stopVoice();
     unlockAudioContext();
     var course = state.course || 'ja';
-    var partnerName = course === 'ja' ? 'フィゼル先生' : 'Coach Alex';
+    var currentPersona = getActivePersona(course);
+    if (options && (options.persona || options.personaId)) {
+      currentPersona = resolvePersona(course, options.persona || options.personaId);
+      setPersona(currentPersona.id, course);
+    }
+    var partnerName = (currentPersona.id === 'keita' && course === 'ja') ? 'フィゼル先生' : currentPersona.name;
     var partnerAvatar = course === 'ja'
       ? icon('sensei', { size: 24, filled: true })
       : icon('coach', { size: 24, filled: true });
@@ -2282,6 +2421,9 @@
     var opts = Object.assign({
       partnerName: partnerName,
       partnerAvatar: partnerAvatar,
+      partnerVoice: currentPersona.voice,
+      persona: currentPersona.id,
+      personaId: currentPersona.id,
       course: course,
       scenarioId: scenarioId
     }, options || {});
@@ -3107,15 +3249,14 @@
     var scList = SCENARIOS[course] || SCENARIOS.ja;
     var currentSc = getScenario(state.scenarioId);
     var level = getLearnerLevel();
-    var partnerName = course === 'ja' ? 'フィゼル先生' : 'Coach Alex';
+    var currentPersona = getActivePersona(course);
+    var partnerName = (currentPersona.id === 'keita' && course === 'ja') ? 'フィゼル先生' : currentPersona.name;
 
-    var partnerAvatar = course === 'ja'
-      ? icon('sensei', { size: 24, filled: true, className: 'fzc-avatar-svg' })
-      : icon('coach', { size: 24, filled: true, className: 'fzc-avatar-svg' });
+    var partnerAvatar = icon(currentPersona.avatarIcon || (course === 'ja' ? 'sensei' : 'coach'), { size: 24, filled: true, className: 'fzc-avatar-svg' });
 
-    var partnerSub = course === 'ja'
+    var partnerSub = currentPersona.role || (course === 'ja'
       ? t('chat_partner_sub_ja', 'Partner Percakapan Jepang • Fiezel-sensei')
-      : t('chat_partner_sub_en', 'Native English Speaking Partner');
+      : t('chat_partner_sub_en', 'Native English Speaking Partner'));
 
     // Scenario Carousel
     var chipsHtml = scList.map(function (sc) {
@@ -3341,6 +3482,7 @@
       '<div class="fzc-mode-bar">' +
       modeToggleHtml('fzcToggleCorrection', state.correctionMode === true, 'check-circle', t('chat.koreksi.saklar', 'Koreksi')) +
       modeToggleHtml('fzcToggleVoice', state.autoVoice !== false, 'volume', t('chat.suara.saklar', 'Suara otomatis')) +
+      renderChatPersonaSwitchHtml(course, currentPersona.id) +
       '</div>' +
       '<div class="fzc-scenarios-rail" id="fzcScenariosRail">' +
       chipsHtml +
@@ -3466,6 +3608,17 @@
         updateUI();
       };
     }
+
+    // Switch Persona in Text Chat
+    container.querySelectorAll('.fzc-chat-persona-btn').forEach(function (btn) {
+      btn.onclick = function () {
+        unlockAudioContext();
+        var pId = btn.getAttribute('data-persona');
+        if (pId) {
+          setPersona(pId, state.course);
+        }
+      };
+    });
 
     // Ajakan menyalakan koreksi
     var nudgeOn = container.querySelector('#fzcNudgeOn');
@@ -3907,7 +4060,15 @@
     dispatchSpeakingTurnTelemetry: dispatchSpeakingTurnTelemetry,
     dispatchShadowingTelemetry: dispatchShadowingTelemetry,
     dispatchBraincoreTelemetry: dispatchBraincoreTelemetry,
-    CHAT_HISTORY_KEY: CHAT_HISTORY_KEY
+    CHAT_HISTORY_KEY: CHAT_HISTORY_KEY,
+    PERSONAS: PERSONAS,
+    setPersona: setPersona,
+    getActivePersona: getActivePersona,
+    getPersona: function (c) { return getActivePersona(c); },
+    getPersonas: function (c) {
+      var course = c || state.course || 'ja';
+      return PERSONAS[course === 'ja' ? 'ja' : 'en'] || PERSONAS.ja;
+    }
   };
 
   // Auto-teardown on mobile app switch / page hide / tab backgrounding

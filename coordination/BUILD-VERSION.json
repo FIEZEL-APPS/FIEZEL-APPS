@@ -1,7 +1,7 @@
 {
-  "version": "m025-608",
-  "claimedBy": "branch fix/audio-elevenlabs-branch-protection",
-  "claimedAt": "2026-10-19T14:10:38.405Z",
-  "reason": "fix(audio): tambahkan proteksi branch fallback pada workflow audio elevenlabs (m025-607)",
+  "version": "m025-609",
+  "claimedBy": "branch feat/kawan-bicara-neural-voice",
+  "claimedAt": "2026-10-19T14:28:16.332Z",
+  "reason": "feat(chat): integrasi multi-character neural voice ke kawan bicara (m025-608)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
