@@ -89,8 +89,27 @@ async function main() {
   await context.route('**/*', async (route) => {
     const req = route.request();
     const url = new URL(req.url());
-    if (url.hostname.includes('fiezel.my.id') || url.hostname.includes('puter.com') || url.hostname.includes('deepgram.com')) {
+    if (url.hostname.includes('fiezel.my.id') || url.hostname.includes('puter.com') || url.hostname.includes('deepgram.com') || url.hostname.includes('onrender.com')) {
       const origin = req.headers()['origin'] || `http://127.0.0.1:${port}`;
+      if (url.pathname.includes('/api/tts/line')) {
+        return route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          headers: {
+            'Access-Control-Allow-Origin': origin,
+            'Access-Control-Allow-Credentials': 'true',
+            'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, PUT, DELETE',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With'
+          },
+          body: JSON.stringify({
+            ok: true,
+            audioBase64: 'SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjYwLjE2LjEwMAAAAAAAAAAAAAAA//OEAAAAAAAAAAAAAAAAAAAAAAA=',
+            mimeType: 'audio/mpeg',
+            voiceName: 'Keita',
+            personaLabel: 'Keita Neural'
+          })
+        });
+      }
       return route.fulfill({
         status: 200,
         contentType: 'application/json',
