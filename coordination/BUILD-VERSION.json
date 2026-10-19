@@ -1,7 +1,7 @@
 {
-  "version": "m025-620",
-  "claimedBy": "branch feat/japanese-vocab-kana-voice",
-  "claimedAt": "2026-10-19T22:36:14.619Z",
-  "reason": "fix(vocab): gunakan kana dan language_code ja untuk pelafalan kosa kata Jepang (m025-620)",
+  "version": "m025-621",
+  "claimedBy": "branch fix/voice-call-ui-ux-and-audio-repair-m025-619",
+  "claimedAt": "2026-10-19T23:08:43.553Z",
+  "reason": "fix(call): polesan ui-ux layar panggilan dan perbaikan audio chunking",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

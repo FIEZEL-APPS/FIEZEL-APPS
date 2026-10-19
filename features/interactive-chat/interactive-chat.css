@@ -1912,6 +1912,7 @@ body.fz-ja-no-romaji .fzc-romaji {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
   width: 100%;
   flex-shrink: 0;
   padding: 4px 0;
@@ -1960,50 +1961,57 @@ body.fz-ja-no-romaji .fzc-romaji {
   color: #065F46;
 }
 
-/* ── Call Persona Selector ── */
+/* ── Call Persona Selector (Frosted Dark Titanium & Compact Width) ── */
 .fzc-call-persona-switch {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
-  padding: 3px 4px;
-  background: rgba(255, 255, 255, 0.75);
-  border: 1px solid rgba(226, 218, 205, 0.85);
+  gap: 2px;
+  padding: 2px;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
   border-radius: 999px;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  box-shadow: 0 2px 8px rgba(27, 20, 24, 0.04);
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3) !important;
+  flex: 0 0 auto;
+  margin-left: auto;
 }
 
 .fzc-call-persona-btn {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 4px 10px;
+  gap: 4px;
+  height: 32px !important;
+  min-height: 32px !important;
+  max-height: 32px !important;
+  padding: 0 8px !important;
   border-radius: 999px;
-  border: none;
-  background: transparent;
-  color: var(--fzc-ink-muted);
+  border: 1px solid transparent !important;
+  background: transparent !important;
+  color: rgba(253, 250, 243, 0.72) !important;
   font-family: var(--font-display, 'Plus Jakarta Sans', sans-serif);
-  font-size: 0.74rem;
+  font-size: 0.70rem;
   font-weight: 700;
   line-height: 1;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
   transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
 }
 
 .fzc-call-persona-btn:hover {
-  color: var(--fzc-ink);
-  background: rgba(27, 20, 24, 0.05);
+  color: #FDFAF3 !important;
+  background: rgba(255, 255, 255, 0.12) !important;
 }
 
 .fzc-call-persona-btn.is-active {
-  background: var(--fzc-ink);
-  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.22) !important;
+  color: #FDFAF3 !important;
   font-weight: 800;
-  box-shadow: 0 2px 8px rgba(27, 20, 24, 0.18);
-  transform: translateY(-0.5px);
+  border-color: rgba(255, 255, 255, 0.35) !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35) !important;
+  transform: none;
 }
 
 .fzc-call-persona-btn:active {
@@ -2011,7 +2019,7 @@ body.fz-ja-no-romaji .fzc-romaji {
 }
 
 .fzc-persona-icon {
-  font-size: 0.88rem;
+  font-size: 0.82rem;
   line-height: 1;
   display: inline-flex;
 }
@@ -2020,14 +2028,42 @@ body.fz-ja-no-romaji .fzc-romaji {
   white-space: nowrap;
 }
 
-/* ── Partner Persona Info ── */
+/* ── Partner Persona Info in Topbar ── */
 .fzc-call-partner-info {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  text-align: center;
-  margin-top: 8px;
-  flex-shrink: 0;
+  gap: 8px;
+  min-width: 0;
+  flex: 0 0 auto;
+  max-width: 140px;
+  margin-top: 0;
+  text-align: left;
+}
+
+.fzc-call-partner-meta-wrap {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.fzc-call-partner-name {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #FDFAF3 !important;
+  margin: 0;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fzc-call-timer {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: rgba(253, 250, 243, 0.65);
+  font-variant-numeric: tabular-nums;
+  margin-top: 2px;
 }
 
 .fzc-call-avatar-outer {
@@ -2630,6 +2666,12 @@ body.fz-ja-no-romaji .fzc-romaji {
   box-sizing: border-box;
 }
 
+.fzc-call-container .fzc-call-stage::before,
+.fzc-call-container .fzc-call-stage::after {
+  display: none !important;
+  content: none !important;
+}
+
 .fzc-call-container .fzc-call-stage {
   display: flex;
   flex-direction: column;
@@ -2641,6 +2683,7 @@ body.fz-ja-no-romaji .fzc-romaji {
   inset: auto !important;
   background: transparent !important;
   z-index: 1 !important;
+  overflow: visible !important;
 }
 
 .fzc-voice-orb-wrapper {
@@ -2759,36 +2802,41 @@ body.fz-ja-no-romaji .fzc-romaji {
 }
 
 .fzc-call-status-label {
-  font-size: 0.88rem;
+  font-size: 0.92rem;
   font-weight: 700;
   color: #FDFAF3;
   margin-top: 16px;
   letter-spacing: 0.2px;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
-  padding: 4px 14px;
+  padding: 6px 18px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.16);
   display: inline-block;
+  text-align: center;
   transition: all 0.25s ease;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .fzc-call-status-label.is-listening {
-  border-color: rgba(16, 185, 129, 0.5);
-  background: rgba(16, 185, 129, 0.12);
-  color: #A7F3D0;
+  border-color: rgba(52, 211, 153, 0.65) !important;
+  background: rgba(16, 185, 129, 0.16) !important;
+  box-shadow: 0 0 16px rgba(52, 211, 153, 0.25) !important;
+  color: #A7F3D0 !important;
 }
 
 .fzc-call-status-label.is-thinking {
-  border-color: rgba(245, 158, 11, 0.5);
-  background: rgba(245, 158, 11, 0.12);
-  color: #FDE68A;
+  border-color: rgba(251, 146, 60, 0.65) !important;
+  background: rgba(245, 158, 11, 0.16) !important;
+  box-shadow: 0 0 16px rgba(251, 146, 60, 0.25) !important;
+  color: #FED7AA !important;
 }
 
 .fzc-call-status-label.is-speaking {
-  border-color: rgba(224, 72, 88, 0.5);
-  background: rgba(224, 72, 88, 0.12);
-  color: #FECDD3;
+  border-color: rgba(251, 113, 133, 0.65) !important;
+  background: rgba(224, 72, 88, 0.16) !important;
+  box-shadow: 0 0 16px rgba(251, 113, 133, 0.25) !important;
+  color: #FECDD3 !important;
 }
 
 .fzc-call-interrupt-hint {
@@ -2825,20 +2873,30 @@ body.fz-ja-no-romaji .fzc-romaji {
 }
 
 .fzc-call-btn-mini {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #FDFAF3;
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+  max-width: 32px !important;
+  max-height: 32px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  box-shadow: none !important;
+  color: #FDFAF3 !important;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  flex-shrink: 0;
+  box-sizing: border-box;
 }
 .fzc-call-btn-mini:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.18) !important;
   transform: scale(1.05);
 }
 

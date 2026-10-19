@@ -50,8 +50,8 @@
   var PROBE_COOLDOWN_MS = 15000;
 
   var activeAudio = null;
-  var activeAbortController = null;
   var activeSource = null;
+  var activeAbortController = null;
 
   // Cache in-memory hasil prefetch dari server neural voice
   // Key: (persona)::(sentence) -> Promise<object|null>
@@ -385,22 +385,22 @@
 
       var controller = typeof root.AbortController === 'function' ? new root.AbortController() : null;
       var timer = null;
+      var onCancel = null;
       if (controller) {
         timer = setTimeout(function () {
           try { controller.abort(); } catch (_) {}
-        }, 2500);
-      }
-
-      if (cancelSignal) {
-        if (cancelSignal.aborted && controller) {
-          try { controller.abort(); } catch (_) {}
-        } else if (typeof cancelSignal.addEventListener === 'function') {
-          cancelSignal.addEventListener('abort', function () {
-            if (controller) { try { controller.abort(); } catch (_) {} }
-          }, { once: true });
+        }, 3500);
+        if (cancelSignal) {
+          if (cancelSignal.aborted) {
+            try { controller.abort(); } catch (_) {}
+          } else if (typeof cancelSignal.addEventListener === 'function') {
+            onCancel = function () {
+              try { controller.abort(); } catch (_) {}
+            };
+            cancelSignal.addEventListener('abort', onCancel, { once: true });
+          }
         }
       }
-
       var signal = controller ? controller.signal : cancelSignal;
 
       return f(currentTarget, {
@@ -410,6 +410,9 @@
         signal: signal
       }).then(function (res) {
         if (timer) clearTimeout(timer);
+        if (cancelSignal && onCancel && typeof cancelSignal.removeEventListener === 'function') {
+          cancelSignal.removeEventListener('abort', onCancel);
+        }
         if (!res || !res.ok) {
           // Coba candidate endpoint berikutnya
           return tryFetchCandidate();
@@ -427,6 +430,9 @@
         });
       }).catch(function (err) {
         if (timer) clearTimeout(timer);
+        if (cancelSignal && onCancel && typeof cancelSignal.removeEventListener === 'function') {
+          cancelSignal.removeEventListener('abort', onCancel);
+        }
         var isAbort = (err && (err.name === 'AbortError' || err.message === 'aborted')) ||
                       (controller && controller.signal && controller.signal.aborted) ||
                       (cancelSignal && cancelSignal.aborted);
@@ -831,6 +837,10 @@
         activeAudio.src = '';
       } catch (_) {}
       activeAudio = null;
+    }
+    if (activeSource) {
+      try { activeSource.stop(0); } catch (_) {}
+      activeSource = null;
     }
     if (activeAbortController) {
       try { activeAbortController.abort(); } catch (_) {}
