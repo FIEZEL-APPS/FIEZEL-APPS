@@ -551,8 +551,34 @@
       scanAndAttach();
       return;
     }
-    // Dynamic mascot script loading disabled to avoid 404 network errors
+    if (moduleLoading) return;
     moduleLoading = true;
+    var base = '';
+    try {
+      base = new URL('.', window.location.href).href;
+    } catch (_) {
+      base = './';
+    }
+    var candidatePaths = [
+      './mochi-mascot/fiezel-mochi.js',
+      base + 'mochi-mascot/fiezel-mochi.js',
+      new URL('mochi-mascot/fiezel-mochi.js', window.location.href).href,
+      '/app/mochi-mascot/fiezel-mochi.js'
+    ];
+    function tryNext(idx) {
+      if (idx >= candidatePaths.length) {
+        moduleLoading = false;
+        return;
+      }
+      import(candidatePaths[idx]).then(function (mod) {
+        if (mod && mod.FiezelMochi) global.FiezelMochi = mod.FiezelMochi;
+        moduleLoading = false;
+        scanAndAttach();
+      }).catch(function () {
+        tryNext(idx + 1);
+      });
+    }
+    tryNext(0);
   }
 
   // Only a new <fiezel-mascot> or the loss of the current host can change who holds Mochi.
