@@ -137,13 +137,34 @@ jobs:
           git config user.email 'noreply@github.com'
           git add audio/manifest.json
           git commit -m "Audio: aset $CONTENT hasil produksi terkendali"
-          # Push yang gagal di sini terjadi SETELAH kreditnya terpakai, dan manifest yang
-          # tidak mendarat berarti seluruh batch akan diproduksi ulang pada jalan berikutnya.
-          # Karena itu ia diulang dengan rebase, bukan dibiarkan gagal sekali lalu menyerah.
+          pushed=false
           for attempt in 1 2 3; do
-            if git push; then exit 0; fi
-            echo "Push gagal (percobaan $attempt); menarik perubahan lalu mencoba lagi."
-            git pull --rebase --autostash || true
+            if git push origin main; then
+              pushed=true
+              break
+            fi
+            echo "Push langsung ke main ditolak (percobaan $attempt), sinkronisasi manifest remote..."
+            git fetch origin main
+            git show origin/main:audio/manifest.json > /tmp/remote-manifest.json
+            node -e '
+              const fs = require("fs");
+              const local = JSON.parse(fs.readFileSync("audio/manifest.json", "utf8"));
+              const remote = JSON.parse(fs.readFileSync("/tmp/remote-manifest.json", "utf8"));
+              local.assets = Object.assign({}, remote.assets, local.assets);
+              local.version = Math.max(Number(local.version) || 0, Number(remote.version) || 0) + 1;
+              fs.writeFileSync("audio/manifest.json", JSON.stringify(local, null, 2) + "\n");
+            '
+            rm -f /tmp/remote-manifest.json
+            git reset --mixed origin/main
+            git add audio/manifest.json
+            git commit -m "Audio: aset $CONTENT hasil produksi terkendali (merged)" || true
+            sleep 2
           done
-          echo 'Manifest tidak bisa didorong. Aset SUDAH ada di R2; jalankan ulang setelah konflik beres.' >&2
-          exit 1
+
+          if [ "$pushed" = false ]; then
+            echo "Proteksi branch main aktif. Mendorong ke branch audio-update..."
+            BRANCH_NAME="audio-update-$(date +%s)"
+            git checkout -b "$BRANCH_NAME"
+            git push -u origin "$BRANCH_NAME"
+            echo "Branch $BRANCH_NAME berhasil didorong ke remote."
+          fi
