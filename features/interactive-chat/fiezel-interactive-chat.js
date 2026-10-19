@@ -2449,7 +2449,16 @@
           var container = document.querySelector('.fzc-container');
           if (container) container.classList.add('is-call-active');
         }
-        return startFn.call(VoiceCall, opts);
+        var p = startFn.call(VoiceCall, opts);
+        if (p && typeof p.catch === 'function') {
+          p.catch(function (err) {
+            closeCallUI();
+            if (typeof console !== 'undefined' && console.warn) {
+              console.warn('[FiezelInteractiveChat] startCall rejected:', err);
+            }
+          });
+        }
+        return p;
       } catch (err) {
         closeCallUI();
         if (typeof console !== 'undefined' && console.warn) {

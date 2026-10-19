@@ -149,6 +149,13 @@ const EXCLUSIONS = new Map([
       'zero dark bleed dan zero reload swipe back (m025-497). Memerlukan browser grafis Playwright lokal ' +
       'serta port web server aktif. Bukti kelulusan terdokumentasi di docs/handoffs/FIEZEL-M025497-SWIPE-ZERO-RELOAD-FINAL-HANDOFF.md.'
   }],
+  ['tools/dev/probe-voice-call-full-audit.mjs', {
+    class: 'alat-pelaporan',
+    reason:
+      'BUKAN gerbang CI Linux: alat pelaporan audit empiris Playwright Chromium lokal untuk memverifikasi ' +
+      'stabilitas voice call, zero echo loop, dan self-interruption (m025-616). Memerlukan browser grafis Playwright ' +
+      'lokal serta port web server aktif.'
+  }],
   ['tools/dev/listening-ux-ergonomics-a11y-audit.mjs', {
     class: 'alat-pelaporan',
     reason:

@@ -40,11 +40,13 @@
 
   // Default Configuration
   var CONFIG = {
-    speechThreshold: 0.032,        // Normalized RMS amplitude to register speech
-    interruptThreshold: 0.075,     // RMS amplitude threshold to trigger polite barge-in while AI speaks
-    interruptConsecutiveFrames: 3, // Consecutive loud frames (~150ms) to trigger barge-in
-    silenceTimeoutMs: 1350,        // Silence timeout after speech before triggering AI turn
-    naturalTurnPauseMs: 380,       // Breathing pause after AI finishes speaking before opening mic
+    speechThreshold: 0.032,           // Normalized RMS amplitude to register speech
+    interruptThreshold: 0.38,         // RMS amplitude threshold to trigger acoustic barge-in while AI speaks (calibrated high to prevent device speaker bleed self-cutoff)
+    interruptConsecutiveFrames: 5,    // Consecutive loud frames (~250ms) to trigger acoustic barge-in
+    acousticRefractoryMs: 950,        // Mute acoustic barge-in during initial AI speech playback onset (~1 sec)
+    silenceTimeoutMs: 1350,           // Silence timeout after speech before triggering AI turn
+    naturalTurnPauseMs: 400,          // Breathing pause after AI finishes speaking before opening mic
+    recognitionRestartDelayMs: 350,   // Safe backoff restart delay to prevent error storm on mobile
     fftSize: 512,
     smoothingTimeConstant: 0.25
   };
@@ -87,6 +89,20 @@
 
   function stripFurigana(text) {
     return String(text || '').replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').trim();
+  }
+
+  // Acoustic Echo Discriminator: identifies if mic transcription is an echo of the AI's own words
+  function isAcousticEcho(heardText, aiSpokenText) {
+    if (!heardText || !aiSpokenText) return false;
+    var u = String(heardText).toLowerCase().replace(/[\s\p{P}\u3000-\u303F]/gu, '');
+    var a = String(aiSpokenText).toLowerCase().replace(/[\s\p{P}\u3000-\u303F]/gu, '');
+    if (!u || !a) return false;
+    if (a.indexOf(u) >= 0 || u.indexOf(a) >= 0) return true;
+    if (u.length >= 2) {
+      if (a.indexOf(u.slice(0, Math.min(u.length, 6))) >= 0) return true;
+      if (a.indexOf(u.slice(-Math.min(u.length, 6))) >= 0) return true;
+    }
+    return false;
   }
 
   // Pure Math RMS calculator for audio samples
@@ -229,6 +245,10 @@
     var callTimerInterval = null;
     var recognition = null;
     var recognitionRestartTimer = null;
+    var isRecognitionRunning = false;
+    var isPermissionPending = false;
+    var aiSpeechStartTime = 0;
+    var aiCurrentSpeakingText = '';
     var mediaStreamToken = 0;
     var hasUserSpoken = false;
     var pendingTranscript = '';
@@ -320,28 +340,43 @@
       }, 120);
     }
 
-    // Web Audio Autoplay Policy Unlock
+    // Web Audio & HTML5 Audio Autoplay Policy Unlock (iOS Safari / PWA Standalone / Android)
     function unlockAudio() {
       try {
         var AudioCtx = root.AudioContext || root.webkitAudioContext;
-        if (!AudioCtx) return;
-        if (!audioContext || audioContext.state === 'closed') {
-          if (root.__fiezelSharedAudioContext && root.__fiezelSharedAudioContext.state === 'closed') {
-            root.__fiezelSharedAudioContext = null;
+        if (AudioCtx) {
+          if (!audioContext || audioContext.state === 'closed') {
+            if (root.__fiezelSharedAudioContext && root.__fiezelSharedAudioContext.state === 'closed') {
+              root.__fiezelSharedAudioContext = null;
+            }
+            audioContext = root.__fiezelSharedAudioContext || new AudioCtx();
+            root.__fiezelSharedAudioContext = audioContext;
           }
-          audioContext = root.__fiezelSharedAudioContext || new AudioCtx();
-          root.__fiezelSharedAudioContext = audioContext;
+          if (audioContext.state === 'suspended') {
+            audioContext.resume().then(function () {
+              try {
+                var buf = audioContext.createBuffer(1, 1, 22050);
+                var src = audioContext.createBufferSource();
+                src.buffer = buf;
+                src.connect(audioContext.destination);
+                src.start(0);
+              } catch (_) {}
+            }).catch(function () {});
+          }
         }
-        if (audioContext.state === 'suspended') {
-          audioContext.resume().then(function () {
-            try {
-              var buf = audioContext.createBuffer(1, 1, 22050);
-              var src = audioContext.createBufferSource();
-              src.buffer = buf;
-              src.connect(audioContext.destination);
-              src.start(0);
-            } catch (_) {}
-          }).catch(function () {});
+        // Prime HTML5 Audio element for iOS Safari & Android WebKit
+        var AudioCtor = root.Audio;
+        if (AudioCtor) {
+          try {
+            var silentAudio = new AudioCtor('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA');
+            silentAudio.volume = 0.01;
+            var p = silentAudio.play();
+            if (p && typeof p.then === 'function') {
+              p.then(function () {
+                try { silentAudio.pause(); } catch (_) {}
+              }).catch(function () {});
+            }
+          } catch (_) {}
         }
       } catch (_) {}
     }
@@ -350,6 +385,7 @@
     function stopAudioPlayback() {
       clearSpeakPulse();
       currentAiSpeechLevel = 0;
+      aiCurrentSpeakingText = '';
       renderOrbLevel(0);
       if (orbInstance && typeof orbInstance.setVolume === 'function') {
         orbInstance.setVolume(0);
@@ -377,6 +413,9 @@
       var isJa = course === 'ja';
       var started = false;
 
+      aiSpeechStartTime = Date.now();
+      aiCurrentSpeakingText = clean;
+
       try {
         unlockAudio();
         if (typeof cv.unlockAudio === 'function') cv.unlockAudio();
@@ -389,6 +428,8 @@
         voice: state.partnerVoice,
         persona: state.persona,
         onSentenceStart: function (i, sentence) {
+          aiSpeechStartTime = Date.now();
+          aiCurrentSpeakingText = stripFurigana(sentence || clean);
           if (!started) {
             started = true;
             emit('speechStart', { isJa: isJa, text: clean, persona: state.persona, voice: state.partnerVoice });
@@ -398,6 +439,7 @@
         onEnd: function () {
           clearSpeakPulse();
           currentAiSpeechLevel = 0;
+          aiCurrentSpeakingText = '';
           renderOrbLevel(0);
           if (orbInstance && typeof orbInstance.setVolume === 'function') {
             orbInstance.setVolume(0);
@@ -406,6 +448,7 @@
       }).then(function (spoke) {
         clearSpeakPulse();
         currentAiSpeechLevel = 0;
+        aiCurrentSpeakingText = '';
         renderOrbLevel(0);
         if (orbInstance && typeof orbInstance.setVolume === 'function') {
           orbInstance.setVolume(0);
@@ -414,6 +457,7 @@
       }, function () {
         clearSpeakPulse();
         currentAiSpeechLevel = 0;
+        aiCurrentSpeakingText = '';
         renderOrbLevel(0);
         if (orbInstance && typeof orbInstance.setVolume === 'function') {
           orbInstance.setVolume(0);
@@ -634,14 +678,19 @@
 
           // 2. Speaking State: Detect Polite Interruption (Barge-in via acoustic analyser)
           if (state.status === STATE.SPEAKING && analyserNode) {
-            if (rms > CONFIG.interruptThreshold) {
-              loudFramesCount++;
-              if (loudFramesCount >= CONFIG.interruptConsecutiveFrames) {
-                loudFramesCount = 0;
-                interrupt('user_acoustic_barge_in');
+            var timeSpeaking = Date.now() - (aiSpeechStartTime || 0);
+            if (timeSpeaking >= (CONFIG.acousticRefractoryMs || 950)) {
+              if (rms > CONFIG.interruptThreshold) {
+                loudFramesCount++;
+                if (loudFramesCount >= CONFIG.interruptConsecutiveFrames) {
+                  loudFramesCount = 0;
+                  interrupt('user_acoustic_barge_in');
+                }
+              } else {
+                loudFramesCount = Math.max(0, loudFramesCount - 1);
               }
             } else {
-              loudFramesCount = Math.max(0, loudFramesCount - 1);
+              loudFramesCount = 0;
             }
           }
         }
@@ -667,6 +716,9 @@
         rec.interimResults = true;
         rec.lang = state.course === 'ja' ? 'ja-JP' : 'en-US';
 
+        rec.onstart = function () {
+          isRecognitionRunning = true;
+        };
         rec.onaudiostart = function () {
           kineticSpeechLevel = Math.max(kineticSpeechLevel, 0.35);
         };
@@ -703,17 +755,29 @@
 
           var combined = (finalStr + ' ' + interimStr).trim();
           if (combined) {
+            // Echo guard during speaking state
+            if (state.status === STATE.SPEAKING) {
+              var timeSinceAiStart = Date.now() - (aiSpeechStartTime || 0);
+              var activeAiText = aiCurrentSpeakingText || (state.latestAiReply && state.latestAiReply.text) || '';
+              // If within refractory window OR recognized text matches AI's spoken words, it's acoustic echo!
+              if (timeSinceAiStart < 750 || isAcousticEcho(combined, activeAiText)) {
+                // Silently ignore AI's own voice echo from device speaker
+                pendingTranscript = '';
+                return;
+              }
+              // Genuine student interruption (student spoke something distinct from AI words)
+              pendingTranscript = combined;
+              state.currentTranscript = combined;
+              updateSubtitleUI(combined, 'user');
+              interrupt('user_speech_token_barge_in');
+              return;
+            }
+
             kineticSpeechLevel = 0.70 + Math.random() * 0.25;
             pendingTranscript = combined;
             state.currentTranscript = combined;
             emit('transcript', combined, Boolean(finalStr), 'user');
             updateSubtitleUI(combined, 'user');
-
-            // Barge-in check: If user speaks during AI speaking state, interrupt politely
-            if (state.status === STATE.SPEAKING) {
-              interrupt('user_speech_token_barge_in');
-              return;
-            }
 
             if (state.status === STATE.LISTENING) {
               hasUserSpoken = true;
@@ -736,7 +800,9 @@
             return;
           }
           if (event && event.error === 'not-allowed') {
+            isPermissionPending = true;
             showMicPermissionModal(function () {
+              isPermissionPending = false;
               startRecognition();
             });
             return;
@@ -745,17 +811,18 @@
         };
 
         rec.onend = function () {
+          isRecognitionRunning = false;
           // Hands-free loop: If call is still active and not idle, restart recognition safely
-          if (!isDestroyed && state.status !== STATE.IDLE) {
+          if (!isDestroyed && state.status !== STATE.IDLE && !isPermissionPending) {
             if (recognitionRestartTimer) clearTimeout(recognitionRestartTimer);
             recognitionRestartTimer = setTimeout(function () {
               recognitionRestartTimer = null;
-              if (!isDestroyed && state.status !== STATE.IDLE && recognition) {
+              if (!isDestroyed && state.status !== STATE.IDLE && !isPermissionPending && recognition && !isRecognitionRunning) {
                 try {
                   recognition.start();
                 } catch (_) {}
               }
-            }, 80);
+            }, CONFIG.recognitionRestartDelayMs || 350);
           }
         };
 
@@ -768,13 +835,14 @@
     }
 
     function startRecognition() {
-      if (!recognition) return;
+      if (!recognition || isRecognitionRunning) return;
       try {
         recognition.start();
       } catch (_) {}
     }
 
     function stopRecognition() {
+      isRecognitionRunning = false;
       if (recognitionRestartTimer) {
         clearTimeout(recognitionRestartTimer);
         recognitionRestartTimer = null;
@@ -783,6 +851,7 @@
       var rec = recognition;
       recognition = null;
       try {
+        rec.onstart = null;
         rec.onend = null;
         rec.onerror = null;
         rec.onresult = null;
@@ -814,8 +883,12 @@
       if (state.status !== STATE.LISTENING) return;
       var text = pendingTranscript.trim();
       if (!text) {
-        hasUserSpoken = false;
-        return;
+        if (hasUserSpoken) {
+          text = state.course === 'ja' ? 'もしもし、聞こえますか？' : 'Hello, can you hear me?';
+        } else {
+          hasUserSpoken = false;
+          return;
+        }
       }
 
       // Reset turn buffer
@@ -1167,6 +1240,9 @@
       // Web Audio Autoplay Policy: unlock audio context in synchronous user gesture turn
       unlockAudio();
 
+      // Ensure any previous or transition overlay is pruned cleanly
+      closeCallUI(true);
+
       mountOverlay();
       setStatus(STATE.CONNECTING);
       registerBackNav();
@@ -1177,20 +1253,23 @@
           startRecognition();
           startCallTimer();
           setStatus(STATE.LISTENING);
-          updateSubtitleUI(t('call_connected_greeting', 'Tersambung. Silakan mulai berbicara...'), 'status');
+          var hint = Boolean(root.SpeechRecognition || root.webkitSpeechRecognition)
+            ? t('call_connected_greeting', 'Tersambung. Silakan mulai berbicara...')
+            : t('call_no_speech_rec_hint', 'Mikrofon terhubung. Bicara atau sentuh bola untuk kirim giliran.');
+          updateSubtitleUI(hint, 'status');
           return true;
         })
         .catch(function (err) {
           setStatus(STATE.IDLE);
           unregisterBackNav();
-          unmountOverlay();
+          unmountOverlay(true);
           emit('error', err);
           showMicPermissionModal(function (freshStream) {
             var nextOpts = Object.assign({}, opts);
             if (freshStream) nextOpts.preacquiredStream = freshStream;
-            start(nextOpts);
+            start(nextOpts).catch(function () {});
           });
-          throw err;
+          return false;
         });
     }
 
@@ -1666,15 +1745,16 @@
     }
 
     function updateSubtitleUI(text, role, translation) {
+      var displayText = stripFurigana(text);
       if (orbInstance && typeof orbInstance.setTranscript === 'function') {
-        orbInstance.setTranscript(text, translation, role);
+        orbInstance.setTranscript(displayText, translation, role);
       }
       if (!overlayEl) return;
       var subText = overlayEl.querySelector('#fzcCallSubText');
       var subTrans = overlayEl.querySelector('#fzcCallSubTrans');
 
       if (subText) {
-        subText.textContent = text || '';
+        subText.textContent = displayText || '';
       }
 
       if (subTrans) {
