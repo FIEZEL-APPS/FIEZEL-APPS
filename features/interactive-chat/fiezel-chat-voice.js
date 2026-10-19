@@ -153,12 +153,80 @@
     }
   }
 
+  function getCandidateEndpoints() {
+    var list = [];
+    if (root.FIEZEL_TTS_CONFIG && root.FIEZEL_TTS_CONFIG.endpoint) {
+      list.push(root.FIEZEL_TTS_CONFIG.endpoint);
+    }
+    if (root.__FIEZEL_TTS_LINE_ENDPOINT) {
+      list.push(root.__FIEZEL_TTS_LINE_ENDPOINT);
+    }
+    if (serverEndpoint && serverEndpoint !== DEFAULT_ENDPOINT) {
+      list.push(serverEndpoint);
+    }
+
+    var isLocal = false;
+    if (root.location) {
+      var h = root.location.hostname;
+      var port = root.location.port;
+      if (h === 'localhost' || h === '127.0.0.1' || port === '3000' || (root.location.protocol === 'http:' && !h.includes('.'))) {
+        isLocal = true;
+      }
+    }
+
+    if (isLocal) {
+      if (root.location && root.location.origin && root.location.origin !== 'null' && root.location.protocol !== 'file:') {
+        list.push(root.location.origin + '/api/tts/line');
+      }
+      list.push('http://127.0.0.1:3000/api/tts/line');
+    }
+
+    if (root.FIEZEL_TTS_CONFIG && root.FIEZEL_TTS_CONFIG.endpoint) {
+      list.push(root.FIEZEL_TTS_CONFIG.endpoint);
+    }
+    if (root.__FIEZEL_TTS_LINE_ENDPOINT) {
+      list.push(root.__FIEZEL_TTS_LINE_ENDPOINT);
+    }
+    if (serverEndpoint && serverEndpoint !== DEFAULT_ENDPOINT) {
+      list.push(serverEndpoint);
+    }
+
+    if (root.location && root.location.origin && root.location.origin !== 'null' && root.location.protocol !== 'file:') {
+      if (root.FIEZEL_CURRICULUM_CONFIG && root.FIEZEL_CURRICULUM_CONFIG.curriculumApiUrl) {
+        var base = String(root.FIEZEL_CURRICULUM_CONFIG.curriculumApiUrl).replace(/\/+$/, '');
+        list.push(base + '/api/tts/line');
+      } else if (!isLocal) {
+        list.push('https://fiezel-apps.onrender.com/api/tts/line');
+      }
+
+      if (root.location.pathname) {
+        var baseDir = root.location.pathname.replace(/\/[^/]*$/, '');
+        if (baseDir && baseDir !== '/') {
+          list.push(root.location.origin + baseDir + '/api/tts/line/index.php');
+          list.push(root.location.origin + baseDir + '/api/tts/line');
+        }
+      }
+      list.push(root.location.origin + '/api/tts/line/index.php');
+      list.push(root.location.origin + '/api/tts/line');
+    } else {
+      list.push('/api/tts/line');
+    }
+
+    var seen = {};
+    var unique = [];
+    for (var i = 0; i < list.length; i++) {
+      var item = list[i];
+      if (item && !seen[item]) {
+        seen[item] = true;
+        unique.push(item);
+      }
+    }
+    return unique;
+  }
+
   function getEndpoint() {
-    var custom = (root.FIEZEL_CF_CONFIG && root.FIEZEL_CF_CONFIG.ttsLineEndpoint) ||
-                 root.__FIEZEL_TTS_LINE_ENDPOINT ||
-                 (root.FIEZEL_SERVER_CONFIG && root.FIEZEL_SERVER_CONFIG.ttsEndpoint) ||
-                 serverEndpoint;
-    return custom || DEFAULT_ENDPOINT;
+    var candidates = getCandidateEndpoints();
+    return candidates[0] || DEFAULT_ENDPOINT;
   }
 
   function resolveAbsoluteUrl(pathStr) {
@@ -173,10 +241,7 @@
       if (proto === 'file:' || origin === 'null' || !origin) {
         return 'http://127.0.0.1:3000' + pathStr;
       }
-      if (root.location.port === '3000') {
-        return origin + pathStr;
-      }
-      if (root.location.hostname === 'localhost' || root.location.hostname === '127.0.0.1') {
+      if (root.location.port === '3000' || root.location.hostname === 'localhost' || root.location.hostname === '127.0.0.1') {
         return 'http://127.0.0.1:3000' + pathStr;
       }
       return origin + pathStr;
@@ -212,38 +277,48 @@
       serverStatus = 'unavailable';
       return Promise.resolve(false);
     }
-    var target = resolveAbsoluteUrl(url || getEndpoint());
-    var probeUrl = target.replace(/\/line\/?$/, '/personas');
-    var controller = typeof root.AbortController === 'function' ? new root.AbortController() : null;
-    var timer = null;
-    if (controller) {
-      timer = setTimeout(function () {
-        try { controller.abort(); } catch (_) {}
-      }, 950);
+    var candidates = url ? [url] : getCandidateEndpoints();
+    var idx = 0;
+
+    function tryNext() {
+      if (idx >= candidates.length) {
+        serverStatus = 'unavailable';
+        lastProbeTime = Date.now();
+        return Promise.resolve(false);
+      }
+      var target = resolveAbsoluteUrl(candidates[idx++]);
+      var probeUrl = target.replace(/\/line(\/index\.php)?\/?$/, '/personas$1');
+      var controller = typeof root.AbortController === 'function' ? new root.AbortController() : null;
+      var timer = null;
+      if (controller) {
+        timer = setTimeout(function () {
+          try { controller.abort(); } catch (_) {}
+        }, 3000);
+      }
+
+      return f(probeUrl, {
+        method: 'GET',
+        signal: controller ? controller.signal : undefined
+      }).then(function (res) {
+        if (timer) clearTimeout(timer);
+        if (res && (res.ok || res.status === 200 || res.status === 400 || res.status === 405)) {
+          serverStatus = 'available';
+          serverEndpoint = target;
+          return true;
+        }
+        return tryNext();
+      }).catch(function () {
+        if (timer) clearTimeout(timer);
+        return tryNext();
+      });
     }
 
-    return f(probeUrl, {
-      method: 'GET',
-      signal: controller ? controller.signal : undefined
-    }).then(function (res) {
-      if (timer) clearTimeout(timer);
-      if (res && (res.ok || res.status === 200 || res.status === 400 || res.status === 405)) {
-        serverStatus = 'available';
-        return true;
-      }
-      serverStatus = 'unavailable';
-      lastProbeTime = Date.now();
-      return false;
-    }).catch(function () {
-      if (timer) clearTimeout(timer);
-      serverStatus = 'unavailable';
-      lastProbeTime = Date.now();
-      return false;
-    });
+    return tryNext();
   }
 
   /**
    * Panggil endpoint server /api/tts/line untuk sintesis satu ujaran.
+   * Mendukung failover otomatis antar candidate endpoint (local server, Render cloud, same-origin).
    * Mengembalikan Promise<{ audioBase64: string, mimeType?: string, url?: string } | null>.
    */
   function fetchServerLine(sentence, persona, course, cancelSignal) {
@@ -262,7 +337,6 @@
     var f = root.fetch;
     if (typeof f !== 'function') return Promise.resolve(null);
 
-    var targetUrl = resolveAbsoluteUrl(getEndpoint());
     var body = {
       text: sentence,
       speaker: persona,
@@ -270,29 +344,58 @@
       lang: course === 'ja' ? 'ja-JP' : 'en-US'
     };
 
-    var controller = typeof root.AbortController === 'function' ? new root.AbortController() : null;
-    var timer = null;
-    if (controller) {
-      timer = setTimeout(function () {
-        try { controller.abort(); } catch (_) {}
-      }, 9000);
+    var candidates = getCandidateEndpoints();
+    // Prioritaskan endpoint yang terakhir berhasil jika ada
+    if (serverEndpoint && candidates.indexOf(serverEndpoint) > 0) {
+      candidates.splice(candidates.indexOf(serverEndpoint), 1);
+      candidates.unshift(serverEndpoint);
     }
 
-    var signal = cancelSignal || (controller ? controller.signal : undefined);
+    var cIdx = 0;
 
-    return f(targetUrl, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify(body),
-      signal: signal
-    }).then(function (res) {
-      if (timer) clearTimeout(timer);
-      if (!res || !res.ok) return null;
-      return res.json().catch(function () { return null; });
-    }).catch(function () {
-      if (timer) clearTimeout(timer);
-      return null;
-    });
+    function tryFetchCandidate() {
+      if (cIdx >= candidates.length) return Promise.resolve(null);
+      var currentTarget = resolveAbsoluteUrl(candidates[cIdx++]);
+
+      var controller = typeof root.AbortController === 'function' ? new root.AbortController() : null;
+      var timer = null;
+      if (controller) {
+        timer = setTimeout(function () {
+          try { controller.abort(); } catch (_) {}
+        }, 3500);
+      }
+
+      var signal = cancelSignal || (controller ? controller.signal : undefined);
+
+      return f(currentTarget, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(body),
+        signal: signal
+      }).then(function (res) {
+        if (timer) clearTimeout(timer);
+        if (!res || !res.ok) {
+          // Coba candidate endpoint berikutnya
+          return tryFetchCandidate();
+        }
+        return res.json().then(function (data) {
+          if (data && (data.audioBase64 || data.url)) {
+            // Ingat endpoint yang sukses
+            serverEndpoint = currentTarget;
+            serverStatus = 'available';
+            return data;
+          }
+          return tryFetchCandidate();
+        }).catch(function () {
+          return tryFetchCandidate();
+        });
+      }).catch(function () {
+        if (timer) clearTimeout(timer);
+        return tryFetchCandidate();
+      });
+    }
+
+    return tryFetchCandidate();
   }
 
   /**
@@ -387,25 +490,82 @@
         resolve(false);
       };
 
-      if (myToken !== token) {
-        cleanup();
-        resolve(false);
-        return;
+      function playViaWebAudio() {
+        if (!arr || !arr.length) {
+          cleanup();
+          resolve(false);
+          return;
+        }
+        try {
+          var AudioCtx = root.AudioContext || root.webkitAudioContext;
+          if (!AudioCtx) {
+            cleanup();
+            resolve(false);
+            return;
+          }
+          if (!root.__fiezelSharedAudioContext || root.__fiezelSharedAudioContext.state === 'closed') {
+            root.__fiezelSharedAudioContext = new AudioCtx();
+          }
+          var ctx = root.__fiezelSharedAudioContext;
+          var resumeP = ctx.state === 'suspended' ? ctx.resume() : Promise.resolve();
+          resumeP.then(function () {
+            var copyBuf = arr.buffer.slice(arr.byteOffset, arr.byteOffset + arr.byteLength);
+            return ctx.decodeAudioData(copyBuf);
+          }).then(function (audioBuf) {
+            if (myToken !== token) {
+              cleanup();
+              resolve(false);
+              return;
+            }
+            var src = ctx.createBufferSource();
+            src.buffer = audioBuf;
+            src.connect(ctx.destination);
+            src.onended = function () {
+              cleanup();
+              resolve(myToken === token);
+            };
+            src.start(0);
+          }).catch(function () {
+            cleanup();
+            resolve(false);
+          });
+        } catch (_) {
+          cleanup();
+          resolve(false);
+        }
       }
 
       try {
         var playPromise = audio.play();
         if (playPromise && typeof playPromise.then === 'function') {
           playPromise.catch(function () {
-            cleanup();
-            resolve(false);
+            // Autoplay rejection: jatuh ke WebAudio decoder
+            playViaWebAudio();
           });
         }
       } catch (_) {
-        cleanup();
-        resolve(false);
+        playViaWebAudio();
       }
     });
+  }
+
+  function unlockAudio() {
+    try {
+      var AudioCtx = root.AudioContext || root.webkitAudioContext;
+      if (!AudioCtx) return;
+      if (!root.__fiezelSharedAudioContext || root.__fiezelSharedAudioContext.state === 'closed') {
+        root.__fiezelSharedAudioContext = new AudioCtx();
+      }
+      var ctx = root.__fiezelSharedAudioContext;
+      if (ctx && ctx.state === 'suspended') {
+        ctx.resume().catch(function () {});
+      }
+    } catch (_) {}
+  }
+
+  if (typeof document !== 'undefined' && typeof document.addEventListener === 'function') {
+    document.addEventListener('pointerdown', unlockAudio, { once: true, passive: true });
+    document.addEventListener('touchstart', unlockAudio, { once: true, passive: true });
   }
 
   function speakJaFallback(sentence, myToken, persona) {
@@ -657,6 +817,8 @@
     setDefaultPersona: setDefaultPersona,
     getEndpoint: getEndpoint,
     setEndpoint: setEndpoint,
+    getCandidateEndpoints: getCandidateEndpoints,
+    unlockAudio: unlockAudio,
     probeEndpoint: probeEndpoint,
     isServerAvailable: isServerAvailable,
     setServerAvailable: setServerAvailable,

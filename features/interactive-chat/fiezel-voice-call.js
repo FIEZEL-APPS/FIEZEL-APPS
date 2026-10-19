@@ -377,6 +377,11 @@
       var isJa = course === 'ja';
       var started = false;
 
+      try {
+        unlockAudio();
+        if (typeof cv.unlockAudio === 'function') cv.unlockAudio();
+      } catch (_) {}
+
       // Pulse orb immediately as AI begins vocalization
       startSpeakPulse();
 

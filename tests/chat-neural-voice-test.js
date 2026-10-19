@@ -35,6 +35,7 @@ class MockAudioContext {
 global.AudioContext = MockAudioContext;
 global.localStorage = { _s: {}, getItem(k) { return this._s[k] || null; }, setItem(k, v) { this._s[k] = String(v); }, removeItem(k) { delete this._s[k]; } };
 global.FiezelI18n = { getCourse: () => 'en', getLocale: () => 'id', t: (k) => k };
+global.FIEZEL_SERVER_TTS_ENABLED = false;
 
 const log = { say: [], sayPrefetch: [], puter: [], puterPrefetch: [], stops: 0 };
 let sayResult = true;

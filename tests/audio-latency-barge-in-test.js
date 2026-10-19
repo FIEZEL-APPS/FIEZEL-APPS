@@ -47,6 +47,7 @@ global.document = {
   }
 };
 
+global.FIEZEL_SERVER_TTS_ENABLED = false;
 const voice = require(path.join(__dirname, '..', 'features', 'interactive-chat', 'fiezel-chat-voice.js'));
 
 (async () => {

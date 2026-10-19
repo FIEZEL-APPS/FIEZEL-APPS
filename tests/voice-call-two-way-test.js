@@ -212,6 +212,7 @@ global.cancelAnimationFrame = (id) => clearTimeout(id);
 // m025-596: panggilan bersuara lewat pipeline Neural Voice resmi (FiezelChatVoice → Puter Voice
 // untuk kursus Jepang). speechSynthesis SENGAJA tetap tersedia di sini supaya gerbang ini
 // membuktikan ia TIDAK dipakai (kanon: TTS peramban mati total).
+global.FIEZEL_SERVER_TTS_ENABLED = false;
 let synthTouched = 0;
 global.speechSynthesis = new Proxy({}, { get() { synthTouched++; return () => {}; } });
 global.SpeechSynthesisUtterance = function () { synthTouched++; };

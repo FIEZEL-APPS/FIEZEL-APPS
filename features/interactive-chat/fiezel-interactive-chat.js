@@ -1737,6 +1737,11 @@
       return;
     }
 
+    try {
+      unlockAudioContext();
+      if (typeof cv.unlockAudio === 'function') cv.unlockAudio();
+    } catch (_) {}
+
     var currentPersona = getActivePersona(state.course);
     state.audioPlayingId = msgId;
     updateAudioButtonUI(msgId);
