@@ -1,10 +1,10 @@
 /**
- * tests/neural-server-tts-test.js
+ * tools/dev/probe-neural-server-tts.js
  * Verification of Multi-Character Neural Voice TTS Endpoints on FIEZEL Local Server
  */
 const assert = require('assert');
 const http = require('http');
-const server = require('../server.js');
+const server = require('../../server.js');
 
 const TEST_PORT = 3199;
 

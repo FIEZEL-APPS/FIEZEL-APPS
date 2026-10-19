@@ -665,6 +665,10 @@ jobs:
           # m025-596: menggantikan speech-synthesis-engine-test.js, yang mengunci suara peramban
           # yang sudah dilarang owner. Gerbang ini menegakkan pipeline Neural Voice resmi.
           node tests/chat-neural-voice-test.js
+          # m025-609: Integrasi multi-character neural voice ke Kawan Bicara (Coach Alex/Sarah, Sensei Keita/Nanami)
+          node tests/chat-voice-neural-endpoint-test.js
+          node tests/audio-latency-barge-in-test.js
+          node tests/kawan-bicara-neural-voice-test.js
           node tests/audio-resource-leak-audit-test.js
           node tests/diag-panel-test.js
           node tests/diag-search-test.js

@@ -102,7 +102,7 @@ Seluruh suite gerbang mutu otomatis telah dijalankan dan lulus 100%:
 | **Gate Registry Integrity** | `node tests/gate-registry-test.js` | **PASS** | 10 pass, 0 fail (386 gerbang CI terverifikasi) |
 | **Kawan Bicara Neural Voice** | `node tests/kawan-bicara-neural-voice-test.js` | **PASS** | 5 bagian uji komprehensif (Persona, Chunking, Barge-in, L5, Zero-TTS) |
 | **Chat Voice Endpoint Routing** | `node tests/chat-voice-neural-endpoint-test.js` | **PASS** | 6/6 pengujian prioritas rute `/api/tts/line` |
-| **Neural Server TTS Test** | `node tests/neural-server-tts-test.js` | **PASS** | Verifikasi endpoint `/api/tts/personas`, `/line`, `/dialogue` |
+| **Neural Server TTS Probe** | `node tools/dev/probe-neural-server-tts.js` | **PASS** | Verifikasi endpoint `/api/tts/personas`, `/line`, `/dialogue` |
 | **Audio Latency & Barge-In** | `node tests/audio-latency-barge-in-test.js` | **PASS** | Ambang <250ms, prefetch non-blocking, muting instan |
 | **Audio Security Anti-Leak** | `node tests/audio-locale-guard-test.js` | **PASS** | Zero browser TTS, recognition pinned di target language |
 | **PWA Cache Shell Test** | `node tests/pwa-cache-test.js` | **PASS** | 34 aset shell terverifikasi, runtime cache stabil |
@@ -166,7 +166,7 @@ Selaras.
 | `reports/th-ui-leak-report.json` | Dimodifikasi | Laporan audit paritas dwibahasa bebas bocoran |
 | `tests/kawan-bicara-neural-voice-test.js` | Dibuat | Unit test komprehensif 5 bagian untuk integrasi suara neural Kawan Bicara |
 | `tests/chat-voice-neural-endpoint-test.js` | Dibuat | Pengujian integrasi routing endpoint dan fallback adapter |
-| `tests/neural-server-tts-test.js` | Dibuat | Pengujian endpoint backend TTS dan multi-character persona |
+| `tools/dev/probe-neural-server-tts.js` | Dibuat | Pengujian empiris loopback endpoint backend TTS dan multi-character persona |
 | `tests/audio-latency-barge-in-test.js` | Dibuat | Pengujian latensi kalimat pembuka <250ms dan polite barge-in |
 | `tests/pwa-offline-kawan-bicara-probe.js` | Dibuat | Skrip audit ketahanan luring dan fail-quiet L5 Kawan Bicara |
 | `tools/dev/probe-kawan-bicara-neural-voice.mjs` | Dibuat | Skrip probe Playwright headless Chromium untuk pengujian empiris dua arah |
