@@ -9,7 +9,12 @@
  * 3. Timed Exam Simulator (Hitung mundur live, 1x putar, Anti-Leak Exam Purity)
  */
 
-const { chromium } = require('playwright');
+let chromium;
+try {
+  ({ chromium } = require('playwright'));
+} catch (_) {
+  ({ chromium } = require('C:/Users/hp/fiezel-apps/node_modules/playwright'));
+}
 const http = require('http');
 const path = require('path');
 const fs = require('fs');
