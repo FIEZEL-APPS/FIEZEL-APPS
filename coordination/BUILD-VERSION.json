@@ -1,7 +1,7 @@
 {
-  "version": "m025-605",
-  "claimedBy": "branch fix/chat-topbar-bottombar-restore",
-  "claimedAt": "2026-10-18T12:17:04.806Z",
-  "reason": "fix(chat): pulihkan arsitektur topbar dan bottombar kawan bicara (m025-605)",
+  "version": "m025-606",
+  "claimedBy": "branch fix/audio-ci-manifest-enobufs",
+  "claimedAt": "2026-10-19T10:31:17.892Z",
+  "reason": "fix(audio): eliminasi ENOBUFS manifest buffer overflow di workflow ci gemini tts (m025-606)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
