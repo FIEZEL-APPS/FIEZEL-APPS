@@ -19,7 +19,7 @@ on:
       limit:
         description: 'Jumlah aset maksimum untuk sekali jalan (0 = ikut anggaran manifest)'
         required: false
-        default: '50'
+        default: '200'
       apply:
         description: 'Ketik APPLY untuk benar-benar memproduksi. Selain itu tetap dry-run.'
         required: false
