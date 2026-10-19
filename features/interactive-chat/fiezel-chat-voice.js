@@ -37,7 +37,7 @@
   // Kalimat pembuka pendek ("Hello!", "Hi there!", "Got it!", "こんにちは！") berdiri sendiri
   // dan diucapkan seketika (<250ms). Interjeksi mikro (<6 karakter: "Oh!", "いいね！") tetap digabung
   // ke kalimat berikutnya agar ucapan tidak tersendat.
-  var MIN_CHUNK_CHARS = 10;
+  var MIN_CHUNK_CHARS = 6;
   var token = 0;
   // Mesin Puter untuk ja-JP yang terbukti menjawab di sesi ini ('generative' / 'neural').
   var jaEngine = '';
