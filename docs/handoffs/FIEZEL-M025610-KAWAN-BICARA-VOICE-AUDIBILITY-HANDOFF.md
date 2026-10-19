@@ -1,10 +1,10 @@
 # DOKUMEN SERAH TERIMA RESMI (HANDOFF DOSSIER)
-**ID Dokumen:** `FIEZEL-M025610-KAWAN-BICARA-VOICE-AUDIBILITY-HANDOFF`  
-**Fitur / Perbaikan:** Perbaikan Deadlock TTS, Loopback CSP Origin, dan Pemulihan Suara Dua Arah Kawan Bicara (Mitra Kaiwa)  
-**Nomor Rilis Arbiter:** `m025-610`  
-**Tanggal:** 19 Oktober 2026  
-**Status CI & Mutu:** 100% HIJAU (PASS)  
-**Branch Fitur:** `fix/kawan-bicara-voice-deadlock`  
+**ID Dokumen:** `FIEZEL-M025610-KAWAN-BICARA-VOICE-AUDIBILITY-HANDOFF`
+**Fitur / Perbaikan:** Perbaikan Deadlock TTS, Loopback CSP Origin, dan Pemulihan Suara Dua Arah Kawan Bicara (Mitra Kaiwa)
+**Nomor Rilis Arbiter:** `m025-610`
+**Tanggal:** 19 Oktober 2026
+**Status CI & Mutu:** 100% HIJAU (PASS)
+**Branch Fitur:** `fix/kawan-bicara-voice-deadlock`
 
 ---
 
