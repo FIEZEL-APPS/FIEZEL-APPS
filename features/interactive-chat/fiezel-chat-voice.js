@@ -164,11 +164,22 @@
   function resolveAbsoluteUrl(pathStr) {
     if (!pathStr) return '';
     if (/^https?:\/\//i.test(pathStr)) return pathStr;
-    if (root.location && root.location.origin) {
-      return root.location.origin + pathStr;
-    }
     if (root.__FIEZEL_SERVER_BASE__) {
       return String(root.__FIEZEL_SERVER_BASE__).replace(/\/+$/, '') + pathStr;
+    }
+    if (root.location) {
+      var proto = root.location.protocol;
+      var origin = root.location.origin;
+      if (proto === 'file:' || origin === 'null' || !origin) {
+        return 'http://127.0.0.1:3000' + pathStr;
+      }
+      if (root.location.port === '3000') {
+        return origin + pathStr;
+      }
+      if (root.location.hostname === 'localhost' || root.location.hostname === '127.0.0.1') {
+        return 'http://127.0.0.1:3000' + pathStr;
+      }
+      return origin + pathStr;
     }
     return 'http://127.0.0.1:3000' + pathStr;
   }
@@ -182,7 +193,7 @@
   function isServerAvailable() {
     var cfg = isServerConfigured();
     if (cfg !== null) return cfg;
-    return serverStatus === 'available';
+    return serverStatus !== 'unavailable';
   }
 
   function setServerAvailable(val) {
@@ -452,12 +463,7 @@
 
     var isExplicitOff = root.FIEZEL_SERVER_TTS_ENABLED === false;
     var isCoolingDown = (serverStatus === 'unavailable') && (Date.now() - lastProbeTime < PROBE_COOLDOWN_MS);
-    var canTryServer = !isExplicitOff && !isCoolingDown && (
-      Boolean(root.__FIEZEL_TEST_MOCK_TTS_LINE__) ||
-      root.FIEZEL_SERVER_TTS_ENABLED === true ||
-      root.__FIEZEL_TTS_LINE_AVAILABLE === true ||
-      serverStatus === 'available'
-    );
+    var canTryServer = !isExplicitOff && !isCoolingDown;
 
     if (canTryServer) {
       activeAbortController = typeof root.AbortController === 'function' ? new root.AbortController() : null;
@@ -506,12 +512,7 @@
       var cacheKey = persona + '::' + clean;
 
       var isExplicitOff = root.FIEZEL_SERVER_TTS_ENABLED === false;
-      var canTryServer = !isExplicitOff && (serverStatus !== 'unavailable') && (
-        Boolean(root.__FIEZEL_TEST_MOCK_TTS_LINE__) ||
-        root.FIEZEL_SERVER_TTS_ENABLED === true ||
-        root.__FIEZEL_TTS_LINE_AVAILABLE === true ||
-        serverStatus === 'available'
-      );
+      var canTryServer = !isExplicitOff && (serverStatus !== 'unavailable');
 
       if (canTryServer && !prefetchCache.has(cacheKey)) {
         var p = fetchServerLine(clean, persona, c).catch(function () { return null; });
@@ -555,6 +556,14 @@
     var mine = ++token;
     var h = hooks || {};
     var c = course === 'ja' ? 'ja' : 'en';
+
+    try {
+      var lazy = root.FiezelLazy || root.FiezelLazyLoader || null;
+      if (lazy && typeof lazy.load === 'function' && typeof lazy.loaded === 'function' && !lazy.loaded('voice')) {
+        lazy.load('voice');
+      }
+    } catch (_) {}
+
     var sentences = splitSentences(text, c);
     var spokeAny = false;
 
