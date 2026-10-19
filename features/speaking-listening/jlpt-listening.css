@@ -2164,3 +2164,249 @@
     display: none;
   }
 }
+
+/* =========================================================================
+   JLPT INTERACTIVE FEATURES: FURIGANA TRI-STATE, TURN SEEKING, EXAM SIMULATOR
+   ========================================================================= */
+
+/* 1. Sub-Topbar Controls Bar */
+.jlpt-controls-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 14px 8px;
+  background: #FFFDF9;
+  border-bottom: 1px solid var(--line, #E8DFD3);
+  box-sizing: border-box;
+}
+
+/* Furigana Tri-State Segmented Control */
+.jlpt-script-mode-group {
+  display: inline-flex;
+  align-items: center;
+  background: #F1ECE1;
+  padding: 2px;
+  border-radius: 999px;
+  border: 1px solid #E2D9C8;
+  gap: 2px;
+}
+
+.jlpt-mode-btn {
+  border: none;
+  background: transparent;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748B;
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  line-height: 1.2;
+}
+
+.jlpt-mode-btn:hover {
+  color: #1E293B;
+}
+
+.jlpt-mode-btn.active {
+  background: #FFFFFF;
+  color: #0F172A;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  font-weight: 800;
+}
+
+/* Exam Mode Toggle Button */
+.jlpt-exam-mode-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1.5px solid #CBD5E1;
+  background: #F8FAFC;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+}
+
+.jlpt-exam-mode-btn.active {
+  background: #FEF2F2;
+  border-color: #EF4444;
+  color: #DC2626;
+  font-weight: 800;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.2);
+}
+
+.jlpt-exam-mode-btn.active .jlpt-exam-mode-icon {
+  animation: fzTimerTicking 1s infinite alternate ease-in-out;
+}
+
+@keyframes fzTimerTicking {
+  from { transform: scale(1); }
+  to { transform: scale(1.15) rotate(5deg); }
+}
+
+/* Live Exam Countdown Banner */
+.jlpt-exam-timer-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: linear-gradient(90deg, #FEF2F2, #FFF1F2);
+  border-bottom: 1.5px solid #FECDD3;
+  color: #991B1B;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.jlpt-timer-pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #EF4444;
+  box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+  animation: fzPulseRed 1.4s infinite;
+}
+
+@keyframes fzPulseRed {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+.jlpt-timer-countdown-val {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 14px;
+  font-weight: 800;
+  color: #B91C1C;
+  letter-spacing: 0.04em;
+}
+
+.jlpt-exam-timer-banner.timer-warning {
+  background: #FEE2E2;
+  animation: fzExamStrobe 0.6s infinite alternate ease-in-out;
+}
+
+@keyframes fzExamStrobe {
+  from { opacity: 0.9; }
+  to { opacity: 1; filter: brightness(1.05); }
+}
+
+/* 2. Interactive Turn Seeking (In Bottom Sheet Drawer) */
+.jlpt-dialogue-turn {
+  cursor: pointer;
+  border-radius: 14px;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+  background: #FFFFFF;
+  border: 1.5px solid #F1ECE1;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.jlpt-dialogue-turn:hover {
+  border-color: #CBD5E1;
+  background: #FAF8F5;
+  transform: translateY(-1px);
+}
+
+.jlpt-dialogue-turn.speaking-now {
+  border-color: #10B981 !important;
+  background: #ECFDF5 !important;
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.25) !important;
+  transform: scale(1.01);
+}
+
+.jlpt-turn-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.jlpt-turn-seek-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid #CBD5E1;
+  background: #F8FAFC;
+  font-size: 10px;
+  font-weight: 700;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.jlpt-turn-seek-pill:hover,
+.jlpt-dialogue-turn.speaking-now .jlpt-turn-seek-pill {
+  background: #10B981;
+  border-color: #059669;
+  color: #FFFFFF;
+}
+
+.jlpt-seek-icon {
+  font-size: 8px;
+  line-height: 1;
+}
+
+/* 3. Furigana Tri-State Typography */
+.jlpt-ruby {
+  ruby-position: over;
+  -webkit-ruby-position: over;
+}
+
+.jlpt-ruby rt {
+  font-size: 0.58em;
+  font-weight: 700;
+  color: #475569;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  user-select: none;
+}
+
+/* Mode Kanji Asli: Hide all rt (Ruby furigana) and Romaji in bubbles */
+.jlpt-mode-kanji rt {
+  display: none !important;
+}
+
+.jlpt-mode-kanji .jlpt-bubble-ro {
+  display: none !important;
+}
+
+/* Mode Romaji: Highlight Romaji line */
+.jlpt-mode-romaji .jlpt-bubble-ro {
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  color: #0F172A !important;
+  margin-top: 4px;
+}
+
+.jlpt-mode-romaji .jlpt-bubble-ja {
+  opacity: 0.75;
+  font-size: 12px !important;
+}
+
+/* 4. Anti-Leak Exam Mode Locks */
+.listening-modal.exam-mode-active .jlpt-sheet-trigger-btn {
+  opacity: 0.5;
+  pointer-events: none !important;
+  cursor: not-allowed !important;
+  filter: grayscale(1);
+}
+
+.jlpt-primary-play-btn.exam-locked {
+  opacity: 0.6 !important;
+  pointer-events: none !important;
+  cursor: not-allowed !important;
+  filter: grayscale(0.8);
+}
+

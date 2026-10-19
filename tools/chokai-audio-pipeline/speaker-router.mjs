@@ -11,16 +11,26 @@
 export const ROLES = {
   INSTRUCTOR: 'INSTRUCTOR',
   MALE: 'MALE_STUDENT',
-  FEMALE: 'FEMALE_STUDENT'
+  FEMALE: 'FEMALE_STUDENT',
+  MALE_SENIOR: 'MALE_SENIOR',
+  FEMALE_SENIOR: 'FEMALE_SENIOR'
 };
 
+const MALE_SENIOR_LABELS = [
+  '店長', '医者', '部長', '課長', '教授', 'お父さん', '父'
+];
+
+const FEMALE_SENIOR_LABELS = [
+  'お母さん', '母', '寮長'
+];
+
 const MALE_LABELS = [
-  '男の人', '男', '男の子', '学生（男）', '男子学生', '彼', 'お父さん', '父',
-  '店長', '医者', '駅員', '部長', '課長', 'ジョン', '田中（男）', '佐藤（男）'
+  '男の人', '男', '男の子', '学生（男）', '男子学生', '彼',
+  '駅員', 'ジョン', '田中（男）', '佐藤（男）'
 ];
 
 const FEMALE_LABELS = [
-  '女の人', '女', '女の子', '学生（女）', '女子学生', '彼女', 'お母さん', '母',
+  '女の人', '女', '女の子', '学生（女）', '女子学生', '彼女',
   '受付', '先生', 'アルバイト', '山田', '患者', '店員（女）', '田中（女）'
 ];
 
@@ -28,7 +38,7 @@ const FEMALE_LABELS = [
  * Memetakan tag nama pembicara ke peran vokal
  * @param {string} speakerTag - Nama label sebelum titik dua (contoh: "男の人", "先生", "学生")
  * @param {number} lineIndex - Urutan baris untuk resolusi jika tag ambigu
- * @returns {string} Salah satu dari ROLES.INSTRUCTOR, ROLES.MALE, ROLES.FEMALE
+ * @returns {string} Salah satu dari ROLES
  */
 export function classifySpeaker(speakerTag, lineIndex = 0) {
   if (!speakerTag) return ROLES.INSTRUCTOR;
@@ -36,6 +46,14 @@ export function classifySpeaker(speakerTag, lineIndex = 0) {
 
   if (tag.includes('ナレーター') || tag.includes('指示') || tag.includes('問題')) {
     return ROLES.INSTRUCTOR;
+  }
+
+  for (const ms of MALE_SENIOR_LABELS) {
+    if (tag.includes(ms)) return ROLES.MALE_SENIOR;
+  }
+
+  for (const fs of FEMALE_SENIOR_LABELS) {
+    if (tag.includes(fs)) return ROLES.FEMALE_SENIOR;
   }
 
   for (const m of MALE_LABELS) {
