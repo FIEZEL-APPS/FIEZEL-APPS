@@ -110,16 +110,16 @@ ul,ol{margin:0;padding:0;list-style:none}
 
 /* ---------- hero: PANGGUNG VISUAL, bukan artikel ---------- */
 .hero{position:relative;overflow:hidden;padding:4px 0 24px;
-  background:linear-gradient(180deg,var(--sun-soft) 0%,var(--cream-deep) 38%,var(--cream) 84%)}
+  background:linear-gradient(180deg,#F2F8F5 0%,var(--cream-deep) 38%,var(--cream) 84%)}
 .cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-top:26px}
 .cta-center{justify-content:center}
 
-/* ornamen dekor: sorotan Solar + busur hairline maroon (parallax lembut) */
+/* ornamen dekor: sorotan Hijau Emerald + busur hairline (parallax lembut) */
 .decor{position:absolute;pointer-events:none;z-index:0}
 .decor-glow{top:-14%;right:-18%;width:60vw;max-width:520px;aspect-ratio:1;border-radius:50%;
-  background:radial-gradient(circle,rgba(255,199,0,.34) 0%,rgba(255,222,89,.14) 48%,transparent 72%)}
+  background:radial-gradient(circle,rgba(31,122,99,.18) 0%,rgba(58,163,133,.08) 48%,transparent 72%)}
 .decor-arc{left:-16%;bottom:-24%;width:56vw;max-width:460px;aspect-ratio:1;border-radius:50%;
-  border:1px solid var(--maroon-line);box-shadow:inset 0 0 0 14px rgba(255,199,0,.10)}
+  border:1px solid var(--maroon-line);box-shadow:inset 0 0 0 14px rgba(31,122,99,.06)}
 .hero>.wrap{position:relative;z-index:1}
 
 /* ============ PANGGUNG MOTION GRAPHIC (above-the-fold) ============
@@ -1395,50 +1395,51 @@ ul,ol{margin:0;padding:0;list-style:none}
   width: 100%;
 }
 
-/* Tombol Utama: Memenuhi Standar Touch Target (Tinggi >= 54px) */
+/* Tombol Utama: Palet Hijau Emerald KelasKu (#1F7A63) */
 .btn-primary-hero {
-  display: flex;
-  flex-direction: column;
+  display: inline-flex;
+  flex-direction: row;
   justify-content: center;
   align-items: center;
-  width: 100%;
+  gap: 10px;
+  width: auto;
+  min-width: 250px;
   max-width: 320px;
   min-height: 54px;
-  padding: 10px 20px;
+  padding: 14px 28px;
   border-radius: var(--radius-pill);
-  background: var(--sun-grad);
-  border: 1px solid var(--sun-deep);
-  box-shadow: 0 4px 0 var(--maroon), 0 8px 20px rgba(109, 25, 38, 0.12);
+  background: linear-gradient(180deg, #28967B 0%, #1F7A63 55%, #166052 100%);
+  color: #FFFFFF !important;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  border: 1.5px solid #145545;
+  box-shadow: 0 4px 0 #124537, 0 10px 24px -4px rgba(31, 122, 99, 0.40);
   text-decoration: none;
   touch-action: manipulation;
-  transition: transform var(--fz-fast, 0.18s) var(--fz-out, ease-out), box-shadow var(--fz-fast, 0.18s) var(--fz-out, ease-out);
+  transition: transform var(--fz-fast, 0.18s) var(--fz-out, ease-out), box-shadow var(--fz-fast, 0.18s) var(--fz-out, ease-out), background 0.18s ease;
 }
 
 .btn-primary-hero:hover {
   text-decoration: none;
+  color: #FFFFFF !important;
+  background: linear-gradient(180deg, #32A78A 0%, #238970 55%, #186E59 100%);
   transform: translateY(-2px);
-  box-shadow: 0 6px 0 var(--maroon), 0 10px 24px rgba(109, 25, 38, 0.16);
+  box-shadow: 0 6px 0 #124537, 0 14px 28px -4px rgba(31, 122, 99, 0.50);
 }
 
 .btn-primary-hero:active {
   transform: translateY(2px);
-  box-shadow: 0 2px 0 var(--maroon);
+  box-shadow: 0 2px 0 #124537;
 }
 
-.btn-primary-title {
-  font-size: 1.05rem;
-  font-weight: 800;
-  color: var(--maroon-deep);
-  line-height: 1.2;
-  letter-spacing: 0.01em;
+.btn-hero-arrow {
+  flex: none;
+  transition: transform var(--fz-fast, 0.18s) ease-out;
 }
 
-.btn-primary-caption {
-  font-size: var(--fs-micro, 12px);
-  font-weight: 700;
-  color: var(--maroon);
-  line-height: 1.25;
-  margin-top: 2px;
+.btn-primary-hero:hover .btn-hero-arrow {
+  transform: translateX(4px);
 }
 
 /* Jalur Aksi Sekunder: Touch Target Aman 44px */
