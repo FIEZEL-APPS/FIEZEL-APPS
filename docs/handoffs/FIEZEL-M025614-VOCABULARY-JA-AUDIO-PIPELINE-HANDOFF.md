@@ -1,4 +1,4 @@
-# FIEZEL M025-613 Handoff Dossier: Japanese Vocabulary Audio Pipeline & 1000 N5 Budget
+# FIEZEL M025-614 Handoff Dossier: Japanese Vocabulary Audio Pipeline & 1000 N5 Budget
 
 ## 1. Ringkasan & Latar Belakang
 - **Tujuan**: Menambahkan channel produksi audio `vocabulary_ja` pada generator audio FIEZEL (`tools/audio-batch-generate.mjs`), sehingga seluruh 1.884 kosakata dan kalimat Bahasa Jepang dari `content/ja/vocabulary-master-ja.json` dapat diproduksi secara terstruktur dengan Voice ID native Japanese (Sora - `4sirbXwrtRlmPV80MJkQ`).
