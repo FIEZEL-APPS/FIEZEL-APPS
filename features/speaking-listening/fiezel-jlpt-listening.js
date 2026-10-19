@@ -1313,11 +1313,11 @@
         } catch (_) {}
       }
 
-      var chosenLabel = chosenOpt ? 
-        ((chosenOpt.text || '') + (chosenOpt.textId ? ' (' + chosenOpt.textId + ')' : '')) : 
+      var chosenLabel = chosenOpt ?
+        ((chosenOpt.text || '') + (chosenOpt.textId ? ' (' + chosenOpt.textId + ')' : '')) :
         (optId === -1 ? '(Waktu Habis)' : ('Pilihan ' + optId));
-      var correctLabel = correctOpt ? 
-        ((correctOpt.text || '') + (correctOpt.textId ? ' (' + correctOpt.textId + ')' : '')) : 
+      var correctLabel = correctOpt ?
+        ((correctOpt.text || '') + (correctOpt.textId ? ' (' + correctOpt.textId + ')' : '')) :
         ('Pilihan ' + correctOptId);
 
       if (typeof window.__getFiezelState === 'function') {
@@ -1430,11 +1430,11 @@
       return id === correctOptId;
     }) : null;
 
-    var chosenText = chosenOpt ? 
-      ((chosenOpt.text || '') + (chosenOpt.textId ? ' (' + chosenOpt.textId + ')' : '')) : 
+    var chosenText = chosenOpt ?
+      ((chosenOpt.text || '') + (chosenOpt.textId ? ' (' + chosenOpt.textId + ')' : '')) :
       (isTimeout ? t('jlpt.timeout-label', 'Waktu Habis / Tidak Memilih') : ('Pilihan ' + chosenId));
-    var correctText = correctOpt ? 
-      ((correctOpt.text || '') + (correctOpt.textId ? ' (' + correctOpt.textId + ')' : '')) : 
+    var correctText = correctOpt ?
+      ((correctOpt.text || '') + (correctOpt.textId ? ' (' + correctOpt.textId + ')' : '')) :
       ('Pilihan ' + correctOptId);
 
     var failReason = whyFails || (!isRight ? resolveWhyFails(q, chosenOpt, chosenId, correctOptId) : '');
