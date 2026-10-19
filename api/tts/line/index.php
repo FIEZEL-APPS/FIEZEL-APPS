@@ -12,15 +12,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 $raw = file_get_contents('php://input');
 $body = json_decode($raw, true) ?: [];
 
-$text = trim($body['text'] ?? '');
+$text = trim($body['text'] ?? $_POST['text'] ?? $_GET['text'] ?? '');
 if (!$text) {
     http_response_code(400);
     echo json_encode(['ok' => false, 'error' => 'Text is required']);
     exit;
 }
 
-$speaker = trim($body['speaker'] ?? 'coach_alex');
-$lang = trim($body['lang'] ?? 'en');
+$speaker = trim($body['speaker'] ?? $_POST['speaker'] ?? $_GET['speaker'] ?? $body['voice'] ?? $_POST['voice'] ?? $_GET['voice'] ?? 'coach_alex');
+$lang = trim($body['lang'] ?? $_POST['lang'] ?? $_GET['lang'] ?? 'en');
 
 // Check disk cache
 $cacheDir = sys_get_temp_dir() . '/fiezel_tts_cache';
