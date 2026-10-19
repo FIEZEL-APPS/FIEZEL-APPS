@@ -69,9 +69,10 @@
       "aiAudioUrl": "./features/speaking-listening/audio-jlpt/jlpt-n5-m1-01.mp3",
       "audioTrack": "JLPT N5 Vol.2 - Mondai 1",
       "scriptJapanese": "先生：みなさん、きょうは じゅっぺーじから じゅうにぺーじまで よんでください。そして、じゅうさんぺーじの もんだいを やってください。\n学生：先生、じゅうさんぺーじの もんだいは ぜんぶですか。\n先生：いいえ、いちばんと にばんだけ やってください。",
-      "scriptRomaji": "Sensei: Minasan, kyou wa juppeji kara juuni-peji made yonde kudasai. Soshite, juusan-peji no mondai o yatte kudasai.\nGakusei: Sensei, juusan-peji no mondai wa zenbu desu ka.\nSensei: Iie, ichi-ban to ni-ban dake yatte kudasai.",
+      "scriptRomaji": "Sensei: Minasan, kyou wa juppeeji kara juuni-peeji made yonde kudasai. Soshite, juusan-peeji no mondai o yatte kudasai.\nGakusei: Sensei, juusan-peeji no mondai wa zenbu desu ka.\nSensei: Iie, ichi-ban to ni-ban dake yatte kudasai.",
       "scriptIndonesian": "Guru: Semuanya, hari ini silakan baca dari halaman 10 sampai halaman 12. Lalu, kerjakan soal di halaman 13.\nMurid: Bu Guru, apakah soal di halaman 13 dikerjakan semuanya?\nGuru: Tidak, kerjakan nomor 1 dan nomor 2 saja.",
       "questionJapanese": "学生は はじめに なにを しますか。",
+      "questionRomaji": "Gakusei wa hajime ni nani o shimasu ka.",
       "questionIndonesian": "Apa yang harus dilakukan murid terlebih dahulu?",
       "options": [
         {
@@ -83,26 +84,26 @@
           "id": 2,
           "text": "13ページの もんだいを ぜんぶ やります",
           "textId": "Mengerjakan semua soal di halaman 13",
-          "whyFails": "Guru menegaskan 'いいえ' (bukan semuanya) dan murid hanya diminta mengerjakan nomor 1 dan 2."
+          "whyFails": "Guru menegaskan 'いいえ' (bukan semuanya) dan murid hanya diminta mengerjakan nomor 1 dan 2 saja (いちばんと にばんだけ). Selain itu, latihan soal dikerjakan setelah membaca, bukan terlebih dahulu (はじめに)."
         },
         {
           "id": 3,
           "text": "13ページの 1ばんと 2ばんを やります",
           "textId": "Mengerjakan halaman 13 nomor 1 dan 2 saja",
-          "whyFails": "Soal halaman 13 dikerjakan setelah membaca, sedangkan pertanyaan menanyakan instruksi yang dilakukan pertama kali (はじめに)."
+          "whyFails": "Meskipun nomor soalnya benar (nomor 1 dan 2), tugas ini dikerjakan urutan kedua setelah membaca buku ('そして、...'). Pertanyaan secara spesifik menanyakan tugas yang dilakukan pertama kali (はじめに)."
         },
         {
           "id": 4,
           "text": "本を とじます",
           "textId": "Menutup buku",
-          "whyFails": "Murid diminta membuka dan membaca halaman 10 sampai 12, bukan menutup buku."
+          "whyFails": "Murid diminta membuka dan membaca halaman 10 hingga 12, bukan menutup buku (本をとじます)."
         }
       ],
       "answerIndex": 0,
       "explain": "Guru menginstruksikan: \"きょうは じゅっぺーじから じゅうにぺーじまで よんでください。そして、じゅうさんぺーじの もんだいを...\" (Hari ini baca hal 10-12, kemudian kerjakan soal). Pertanyaan menanyakan apa yang dilakukan 'pertama kali' (はじめに), sehingga jawabannya membaca halaman 10-12 (Pilihan 1).",
       "vocabularyKey": [
         {
-          "ja": "ページ (peji)",
+          "ja": "ページ (peeji)",
           "id": "halaman buku"
         },
         {
@@ -129,8 +130,7 @@
         14.32,
         18.16,
         21.88
-      ],
-      "questionRomaji": "Gakusei wa hajimeni nani o shimasu ka."
+      ]
     },
     {
       "id": "jlpt-n5-m1-02",
@@ -147,13 +147,14 @@
       "scriptRomaji": "Onna no hito: Ringo ga yasui desu ne. Mittsu kaimashou ka.\nOtoko no hito: Demo, kinou banana o takusan kaimashita yo.\nOnna no hito: Sou desu ka. Jaa, ringo wa futatsu ni shimashou. Mikan mo hitotsu kaimasu ka.\nOtoko no hito: Iie, mikan wa ie ni mada arimasu.",
       "scriptIndonesian": "Perempuan: Apelnya murah ya. Mau beli tiga buah?\nLaki-laki: Tapi kemarin kita sudah beli banyak pisang lho.\nPerempuan: Begitu ya. Kalau begitu, apelnya dua buah saja ya. Mau beli jeruk satu juga?\nLaki-laki: Tidak, jeruk di rumah masih ada.",
       "questionJapanese": "ふたりは なにを いくつ かいますか。",
+      "questionRomaji": "Futari wa nani o ikutsu kaimasu ka.",
       "questionIndonesian": "Apa yang dibeli oleh mereka berdua dan berapa jumlahnya?",
       "options": [
         {
           "id": 1,
           "text": "りんごを 3つ",
           "textId": "Apel 3 buah",
-          "whyFails": "Awalnya perempuan mengajak beli 3 apel, namun setelah diingatkan ada pisang, mereka sepakat membeli 2 buah saja."
+          "whyFails": "Membeli 3 buah apel (みっつ) adalah usulan awal wanita, namun segera dikurangi menjadi 2 buah (ふたつ) setelah pria mengingatkan mereka sudah membeli banyak pisang kemarin."
         },
         {
           "id": 2,
@@ -164,13 +165,13 @@
           "id": 3,
           "text": "りんごを 2つと みかんを 1つ",
           "textId": "Apel 2 buah dan jeruk 1 buah",
-          "whyFails": "Jeruk tidak jadi dibeli karena persediaan jeruk di rumah masih ada (みかんは いえに まだ あります)."
+          "whyFails": "Jeruk (みかん) tidak jadi dibeli karena pria menolak ('いいえ') dengan alasan persediaan jeruk di rumah masih ada (いえに まだ あります)."
         },
         {
           "id": 4,
           "text": "バナナと みかん",
           "textId": "Pisang dan jeruk",
-          "whyFails": "Pisang sudah dibeli kemarin dan jeruk masih ada di rumah, bukan barang yang dibeli hari ini."
+          "whyFails": "Pisang sudah dibeli kemarin (きのう かいました) dan jeruk masih ada di rumah, sehingga keduanya bukan barang yang dibeli pada belanja kali ini."
         }
       ],
       "answerIndex": 1,
@@ -202,8 +203,7 @@
         12.26,
         18.98,
         22.65
-      ],
-      "questionRomaji": "Futari wa nani o ikutsu kaimasu ka."
+      ]
     },
     {
       "id": "jlpt-n5-m1-03",
@@ -220,13 +220,14 @@
       "scriptRomaji": "Otoko no hito: Ashita no machiawase wa eki no higashiguchi de ii desu ka.\nOnna no hito: Higashiguchi wa ima kouji o shite imasu yo. Nishiguchi no hon'ya no mae ni shimasen ka.\nOtoko no hito: Wakarimashita. Kaisatsuguchi no chikaku desu ne.\nOnna no hito: Hai, sou desu.",
       "scriptIndonesian": "Pria: Apakah janji temu besok di pintu timur stasiun tidak apa-apa?\nWanita: Pintu timur sekarang sedang ada perbaikan konstruksi lho. Bagaimana kalau di depan toko buku pintu barat?\nPria: Baik, saya mengerti. Dekat gerbang tiket kan?\nWanita: Ya, betul.",
       "questionJapanese": "ふたりは あした どこで あいますか。",
+      "questionRomaji": "Futari wa ashita doko de aimasu ka.",
       "questionIndonesian": "Di mana mereka berdua akan bertemu besok?",
       "options": [
         {
           "id": 1,
           "text": "えきの ひがしぐち",
           "textId": "Pintu timur stasiun",
-          "whyFails": "Pintu timur stasiun sedang dalam perbaikan konstruksi (こうじをして います)."
+          "whyFails": "Pintu timur (ひがしぐち) adalah usulan awal pihak pria, tetapi dibatalkan karena sedang ada perbaikan konstruksi (こうじをして います)."
         },
         {
           "id": 2,
@@ -237,13 +238,13 @@
           "id": 3,
           "text": "えきの なかの カフェ",
           "textId": "Kafe di dalam stasiun",
-          "whyFails": "Kafe tidak pernah disebutkan dalam percakapan janji temu."
+          "whyFails": "Kafe di dalam stasiun sama sekali tidak pernah disebutkan atau diusulkan dalam percakapan."
         },
         {
           "id": 4,
           "text": "こうじの ばしょ",
           "textId": "Lokasi tempat konstruksi",
-          "whyFails": "Lokasi perbaikan konstruksi justru dihindari oleh kedua tokoh."
+          "whyFails": "Lokasi konstruksi adalah kondisi yang dihindari oleh kedua tokoh, bukan tempat janji temu yang dipilih."
         }
       ],
       "answerIndex": 1,
@@ -279,8 +280,7 @@
         16.44,
         20.28,
         22.52
-      ],
-      "questionRomaji": "Futari wa ashita doko de aimasu ka."
+      ]
     },
     {
       "id": "jlpt-n5-m1-04",
@@ -297,22 +297,26 @@
       "scriptRomaji": "Okaasan: Takeshi, soto wa ame ga furi-sou yo. Kasa o motte ikinasai.\nOtokonoko: Boku no aoi kasa wa doko?\nOkaasan: Aoi kasa wa kowarete iru wa. Genkan no kuroi kasa o tsukainasai.\nOtokonoko: Un, wakatta. Ittekimasu!",
       "scriptIndonesian": "Ibu: Takeshi, di luar sepertinya mau hujan lho. Bawalah payung!\nAnak: Payung biruku di mana?\nIbu: Payung yang biru rusak lho. Pakailah payung hitam yang ada di pintu masuk (genkan).\nAnak: Ya, baiklah. Berangkat dulu!",
       "questionJapanese": "男の子は どのかさを もって いきますか。",
+      "questionRomaji": "Otokonoko wa dono kasa o motte ikimasu ka.",
       "questionIndonesian": "Payung mana yang dibawa oleh anak laki-laki?",
       "options": [
         {
           "id": 1,
           "text": "あおい かさ",
-          "textId": "Payung biru"
+          "textId": "Payung biru",
+          "whyFails": "Payung biru milik anak laki-laki sedang rusak (こわれて いる), sehingga dilarang digunakan oleh ibunya."
         },
         {
           "id": 2,
           "text": "かさは もっていかない",
-          "textId": "Tidak membawa payung"
+          "textId": "Tidak membawa payung",
+          "whyFails": "Ibu secara tegas menyuruh anak membawa payung karena akan turun hujan (かさを もって いきなさい), dan anak tersebut setuju membawanya."
         },
         {
           "id": 3,
           "text": "しろい かさ",
-          "textId": "Payung putih"
+          "textId": "Payung putih",
+          "whyFails": "Payung putih sama sekali tidak disebutkan dalam percakapan; pilihan yang tersedia di genkan adalah payung hitam (くろい かさ)."
         },
         {
           "id": 4,
@@ -353,8 +357,7 @@
         11.47,
         17.3,
         20.89
-      ],
-      "questionRomaji": "Otokonoko wa dono kasa o motte ikimasu ka."
+      ]
     },
     {
       "id": "jlpt-n5-m2-01",
@@ -363,7 +366,7 @@
       "mondai": "mondai_2",
       "mondaiLabel": "Mondai 2: Point Comprehension (ポイント理解)",
       "title": "Alasan Tidak Datang ke Pesta",
-      "situation": "Seorang pria bertanya kepada temannya mengapa kemarin temannya tidak hadir di pesta ulang tahun.",
+      "situation": "Seorang pria bertanya kepada temannya mengapa kemarin temannya tidak hadir di pesta.",
       "audioUrl": "https://www.jlpt.jp/samples/sample2018/mp3/N5Q2.mp3",
       "aiAudioUrl": "./features/speaking-listening/audio-jlpt/jlpt-n5-m2-01.mp3",
       "audioTrack": "JLPT N5 Vol.2 - Mondai 2",
@@ -376,7 +379,8 @@
         {
           "id": 1,
           "text": "しごとが いそがしかったから",
-          "textId": "Karena pekerjaannya sibuk"
+          "textId": "Karena pekerjaannya sibuk",
+          "whyFails": "Pekerjaan sibuk sama sekali tidak disinggung dalam percakapan; Tanaka-san tidak hadir karena sakit kepala dan beristirahat di rumah."
         },
         {
           "id": 2,
@@ -386,16 +390,18 @@
         {
           "id": 3,
           "text": "パーティーを わすれていたから",
-          "textId": "Karena lupa ada pesta"
+          "textId": "Karena lupa ada pesta",
+          "whyFails": "Tanaka-san justru mengatakan sebenarnya ingin pergi (いきたかった), membuktikan ia mengingat pestanya namun terhalang sakit."
         },
         {
           "id": 4,
           "text": "ともだちが いえに きたから",
-          "textId": "Karena ada teman datang ke rumah"
+          "textId": "Karena ada teman datang ke rumah",
+          "whyFails": "Tidak ada teman yang berkunjung ke rumahnya; ia berada di rumah semata-mata untuk beristirahat dan tidur karena sakit."
         }
       ],
       "answerIndex": 1,
-      "explain": "Wanita tersebut menjelaskan alasannya langsung: \"きのうは あたまが いたくて、いえで ねて いました\" (Kemarin kepala saya sakit dan tidur di rumah). Maka alasan tidak datang adalah karena sakit kepala (Pilihan 2).",
+      "explain": "Wanita (Tanaka-san) menjelaskan alasannya langsung: \"きのうは あたまが いたくて、いえで ねて いました\" (Kemarin kepala saya sakit dan tidur beristirahat di rumah). Maka alasan tidak datang adalah karena sakit kepala (Pilihan 2).",
       "vocabularyKey": [
         {
           "ja": "あたまが いたい (atama ga itai)",
@@ -437,25 +443,27 @@
       "mondai": "mondai_2",
       "mondaiLabel": "Mondai 2: Point Comprehension (ポイント理解)",
       "title": "Mencari Kunci Rumah",
-      "situation": "Seorang pria mencari kunci rumahnya yang hilang dan bertanya kepada teman sekamarnya.",
+      "situation": "Seorang pria mencari kuncinya yang hilang dan bertanya kepada temannya.",
       "audioUrl": "https://www.jlpt.jp/samples/sample2018/mp3/N5Q2.mp3",
       "aiAudioUrl": "./features/speaking-listening/audio-jlpt/jlpt-n5-m2-02.mp3",
       "audioTrack": "JLPT N5 Vol.2 - Mondai 2",
       "scriptJapanese": "男の人：あれ？ぼくの かぎが ない。つくえの うえに おいたはずなのに。\n女の人：つくえの うえには ほんしか ないわよ。かばんの なかは みた？\n男の人：うん、かばんの なかにも ないよ。\n女の人：あ、いすの したに おちているわよ！\n男の人：あ、ほんとだ。ありがとう！",
       "scriptRomaji": "Otoko no hito: Are? Boku no kagi ga nai. Tsukue no ue ni oita hazu na noni.\nOnna no hito: Tsukue no ue ni wa hon shika nai wa yo. Kaban no naka wa mita?\nOtoko no hito: Un, kaban no naka ni mo nai yo.\nOnna no hito: A, isu no shita ni ochite iru wa yo!\nOtoko no hito: A, honto da. Arigatou!",
-      "scriptIndonesian": "Pria: Lho? Kunciku tidak ada. Padahal seharusnya kutitipkan di atas meja.\nWanita: Di atas meja cuma ada buku lho. Sudah periksa di dalam tas?\nPria: Ya, di dalam tas juga tidak ada.\nWanita: Ah, ada yang jatuh di bawah kursi tuh!\nPria: Ah, benar sekali. Terima kasih!",
+      "scriptIndonesian": "Pria: Lho? Kunciku tidak ada. Padahal seharusnya kuletakkan di atas meja.\nWanita: Di atas meja cuma ada buku lho. Sudah periksa di dalam tas?\nPria: Ya, di dalam tas juga tidak ada.\nWanita: Ah, ada yang jatuh di bawah kursi tuh!\nPria: Ah, benar sekali. Terima kasih!",
       "questionJapanese": "かぎは どこに ありましたか。",
       "questionIndonesian": "Di manakah kunci tersebut berada?",
       "options": [
         {
           "id": 1,
           "text": "つくえの うえ",
-          "textId": "Di atas meja"
+          "textId": "Di atas meja",
+          "whyFails": "Pria menduga menaruhnya di atas meja, namun wanita mengonfirmasi bahwa di atas meja hanya ada buku (ほんしか ない)."
         },
         {
           "id": 2,
           "text": "かばんの なか",
-          "textId": "Di dalam tas"
+          "textId": "Di dalam tas",
+          "whyFails": "Pria sudah memeriksa tasnya dan memastikan kuncinya tidak ada di dalam tas (かばんの なかにも ない)."
         },
         {
           "id": 3,
@@ -465,11 +473,12 @@
         {
           "id": 4,
           "text": "ドアの まえ",
-          "textId": "Di depan pintu"
+          "textId": "Di depan pintu",
+          "whyFails": "Area depan pintu sama sekali tidak disebutkan atau diperiksa dalam percakapan."
         }
       ],
       "answerIndex": 2,
-      "explain": "Wanita melihat kunci tersebut jatuh di bawah kursi: \"あ、いすの したに おちているわよ！\" (Ah, jatuh di bawah kursi!). Pria mengonfirmasinya: \"ほんとだ\" (Benar sekali). Jadi posisinya di bawah kursi (Pilihan 3).",
+      "explain": "Wanita melihat kunci tersebut jatuh di bawah kursi: \"あ、いすの したに おちているわよ！\" (Ah, jatuh di bawah kursi!). Pria mengonfirmasinya: \"あ、ほんとだ\" (Ah, benar sekali). Jadi posisinya berada di bawah kursi (Pilihan 3).",
       "vocabularyKey": [
         {
           "ja": "かぎ (kagi)",
@@ -509,7 +518,7 @@
       "mondai": "mondai_2",
       "mondaiLabel": "Mondai 2: Point Comprehension (ポイント理解)",
       "title": "Jadwal Kursus Bahasa Jepang",
-      "situation": "Seorang siswa asing menanyakan jadwal kursus kepada staf resepsionis sekolah bahasa.",
+      "situation": "Seorang siswa menanyakan jadwal kelas bahasa Jepang kepada staf resepsionis sekolah bahasa.",
       "audioUrl": "https://www.jlpt.jp/samples/sample2018/mp3/N5Q2.mp3",
       "aiAudioUrl": "./features/speaking-listening/audio-jlpt/jlpt-n5-m2-03.mp3",
       "audioTrack": "JLPT N5 Vol.2 - Mondai 2",
@@ -522,17 +531,20 @@
         {
           "id": 1,
           "text": "9時 (くじ)",
-          "textId": "Pukul 09:00"
+          "textId": "Pukul 09:00",
+          "whyFails": "Pengecoh angka; kelas pagi tidak dimulai tepat pukul 09:00, melainkan pukul 09:30 (くじはん)."
         },
         {
           "id": 2,
           "text": "6時半 (ろくじはん)",
-          "textId": "Pukul 18:30"
+          "textId": "Pukul 18:30",
+          "whyFails": "Pukul 18:30 (ろくじはん) adalah jadwal dimulainya kelas malam (よるの クラス), sedangkan siswa memilih kelas pagi."
         },
         {
           "id": 3,
           "text": "11時半 (じゅういちじはん)",
-          "textId": "Pukul 11:30"
+          "textId": "Pukul 11:30",
+          "whyFails": "Pukul 11:30 (じゅういちじはん) adalah jam berakhirnya kelas pagi (おわります), bukan jam mulainya."
         },
         {
           "id": 4,
@@ -541,7 +553,7 @@
         }
       ],
       "answerIndex": 3,
-      "explain": "Siswa memilih kelas pagi (あさのクラス). Resepsionis menyatakan kelas pagi dimulai pukul 9:30: \"あさの クラスは くじはんに はじまって\". 11:30 adalah waktu selesai (おわります), dan 18:30 adalah kelas malam. Jadi jawabannya 09:30 (Pilihan 4).",
+      "explain": "Siswa memilih kelas pagi (あさの クラス). Resepsionis menjelaskan bahwa kelas pagi dimulai pukul 09:30: \"あさの クラスは くじはんに はじまって\". Pukul 11:30 adalah waktu selesai (おわります), dan pukul 18:30 adalah jadwal kelas malam. Jadi kelas siswa tersebut dimulai pukul 09:30 (Pilihan 4).",
       "vocabularyKey": [
         {
           "ja": "なんじから (nan-ji kara)",
@@ -574,7 +586,7 @@
         24.22,
         28.55
       ],
-      "questionRomaji": "学生の クラスは なんじに はじまりますか。"
+      "questionRomaji": "Gakusei no kurasu wa nan-ji ni hajimarimasu ka."
     },
     {
       "id": "jlpt-n5-m2-04",
@@ -583,7 +595,7 @@
       "mondai": "mondai_2",
       "mondaiLabel": "Mondai 2: Point Comprehension (ポイント理解)",
       "title": "Minuman Favorit",
-      "situation": "Di sebuah kafe, seorang pria memesan minuman untuk dirinya dan temannya.",
+      "situation": "Di sebuah kafe, seorang pria dan wanita membicarakan minuman yang akan dipesan.",
       "audioUrl": "https://www.jlpt.jp/samples/sample2018/mp3/N5Q2.mp3",
       "aiAudioUrl": "./features/speaking-listening/audio-jlpt/jlpt-n5-m2-04.mp3",
       "audioTrack": "JLPT N5 Vol.2 - Mondai 2",
@@ -596,12 +608,14 @@
         {
           "id": 1,
           "text": "コーヒー",
-          "textId": "Kopi"
+          "textId": "Kopi",
+          "whyFails": "Kopi sempat ditawarkan oleh pria, namun ditolak halus oleh wanita karena ia jarang minum kopi (あまり のまない)."
         },
         {
           "id": 2,
           "text": "おちゃ",
-          "textId": "Teh hijau"
+          "textId": "Teh hijau",
+          "whyFails": "Teh hijau sempat dipertimbangkan di awal (おちゃか ジュース), tetapi dibatalkan setelah pria menyarankan jus apel yang lezat."
         },
         {
           "id": 3,
@@ -611,11 +625,12 @@
         {
           "id": 4,
           "text": "みず",
-          "textId": "Air putih"
+          "textId": "Air putih",
+          "whyFails": "Air putih sama sekali tidak disebutkan atau ditawarkan dalam percakapan."
         }
       ],
       "answerIndex": 2,
-      "explain": "Wanita menolak kopi (\"あまり のまない\"). Ketika pria merekomendasikan jus apel toko itu enak, wanita menyetujui: \"じゃあ、それに する！\" (Kalau begitu, saya pesan itu!). Maka yang diminum adalah jus apel (Pilihan 3).",
+      "explain": "Wanita menolak kopi (\"あまり のまない\"). Meskipun sempat menyebut teh atau jus (\"おちゃか ジュースが いいな\"), ketika pria merekomendasikan jus apel di kafe tersebut enak, wanita memutuskan: \"じゃあ、それに する！\" (Kalau begitu, saya pilih itu!). Maka minuman yang diminum adalah jus apel (Pilihan 3).",
       "vocabularyKey": [
         {
           "ja": "あまり～ない (amari ... nai)",
@@ -644,7 +659,7 @@
         16.42,
         18.71
       ],
-      "questionRomaji": "女の人は なにを のみますか。"
+      "questionRomaji": "Onna no hito wa nani o nomimasu ka."
     },
     {
       "id": "jlpt-n5-m3-01",
@@ -671,12 +686,14 @@
         {
           "id": 2,
           "text": "じゃあ、また",
-          "textId": "Jaa, mata (Sampai jumpa lagi)"
+          "textId": "Jaa, mata (Sampai jumpa lagi)",
+          "whyFails": "Ungkapan santai / kasual untuk berpamitan kepada teman sebaya ('Sampai jumpa lagi'), tidak pantas secara etiket (pragmatik) saat baru masuk ke ruangan guru atau orang yang dihormati."
         },
         {
           "id": 3,
           "text": "ごちそうさまでした",
-          "textId": "Gochisousama deshita (Terima kasih atas makanannya)"
+          "textId": "Gochisousama deshita (Terima kasih atas makanannya)",
+          "whyFails": "Ungkapan rasa terima kasih yang diucapkan setelah selesai makan/minum, bukan ungkapan permisi saat memasuki ruangan."
         }
       ],
       "answerIndex": 0,
@@ -703,7 +720,7 @@
         4.59,
         8.68
       ],
-      "questionRomaji": "へやに はいるとき、なんと言いますか。"
+      "questionRomaji": "Heya ni hairu toki, nan to iimasu ka."
     },
     {
       "id": "jlpt-n5-m3-02",
@@ -725,7 +742,8 @@
         {
           "id": 1,
           "text": "ただいま",
-          "textId": "Tadaima (Saya pulang)"
+          "textId": "Tadaima (Saya pulang)",
+          "whyFails": "Ungkapan salam yang diucapkan oleh orang yang baru saja tiba/pulang ke rumah ('Aku pulang'), bukan saat hendak berangkat meninggalkan rumah."
         },
         {
           "id": 2,
@@ -735,7 +753,8 @@
         {
           "id": 3,
           "text": "おかえりなさい",
-          "textId": "Okaerinasai (Selamat datang kembali)"
+          "textId": "Okaerinasai (Selamat datang kembali)",
+          "whyFails": "Ungkapan balasan yang diucapkan orang yang berada di rumah untuk menyambut orang yang baru pulang ('Selamat datang kembali'), bukan diucapkan oleh orang yang hendak pergi."
         }
       ],
       "answerIndex": 1,
@@ -789,12 +808,14 @@
         {
           "id": 2,
           "text": "いただきます",
-          "textId": "Itadakimasu (Selamat makan / saya terima)"
+          "textId": "Itadakimasu (Selamat makan / saya terima)",
+          "whyFails": "Diucapkan oleh penerima sebelum menyantap hidangan atau menerima pemberian makanan ('Saya terima/selamat makan'), bukan oleh pihak pemberi saat menyerahkan hadiah."
         },
         {
           "id": 3,
           "text": "どういたしまして",
-          "textId": "Dou itashimashite (Sama-sama)"
+          "textId": "Dou itashimashite (Sama-sama)",
+          "whyFails": "Respon atas ucapan terima kasih orang lain ('Sama-sama'), bukan ujaran saat mengulurkan bingkisan atau hadiah."
         }
       ],
       "answerIndex": 0,
@@ -848,12 +869,14 @@
         {
           "id": 2,
           "text": "どういたしまして。",
-          "textId": "Dou itashimashite. (Sama-sama.)"
+          "textId": "Dou itashimashite. (Sama-sama.)",
+          "whyFails": "Respon untuk membalas ucapan terima kasih ('Sama-sama'), tidak relevan menanggapi komentar basa-basi tentang suhu cuaca."
         },
         {
           "id": 3,
           "text": "さようなら。",
-          "textId": "Sayounara. (Selamat tinggal.)"
+          "textId": "Sayounara. (Selamat tinggal.)",
+          "whyFails": "Ujaran perpisahan saat berpisah jalan ('Selamat tinggal'), tidak nyambung digunakan sebagai respon obrolan basa-basi cuaca."
         }
       ],
       "answerIndex": 0,
@@ -898,7 +921,8 @@
         {
           "id": 1,
           "text": "あそこです。",
-          "textId": "Asoko desu. (Di sebelah sana.)"
+          "textId": "Asoko desu. (Di sebelah sana.)",
+          "whyFails": "Menjawab pertanyaan lokasi/tempat ('Di sebelah sana' untuk 'どこですか'), bukan menjawab pertanyaan kepemilikan subjek ('だれのですか')."
         },
         {
           "id": 2,
@@ -908,7 +932,8 @@
         {
           "id": 3,
           "text": "いいえ、ちがいます。",
-          "textId": "Iie, chigaimasu. (Bukan, salah.)"
+          "textId": "Iie, chigaimasu. (Bukan, salah.)",
+          "whyFails": "Jawaban konfirmasi benar/salah untuk pertanyaan ya/tidak (seperti 'これは あなたのかばんですか'), tidak tepat menjawab kalimat tanya kata tanya terbuka (wh-question) 'だれの'."
         }
       ],
       "answerIndex": 1,
@@ -958,12 +983,14 @@
         {
           "id": 2,
           "text": "いいえ、のみました。",
-          "textId": "Iie, nomimashita. (Tidak, saya sudah minum.)"
+          "textId": "Iie, nomimashita. (Tidak, saya sudah minum.)",
+          "whyFails": "Bentuk lampau yang tidak koheren dengan ajakan ('Tidak, saya sudah minum'); menolak ajakan dalam budaya Jepang harus disampaikan secara halus (misalnya 'すみません、ちょっと...') bukan dengan sanggahan lampau yang kaku."
         },
         {
           "id": 3,
           "text": "はい、おちゃです。",
-          "textId": "Hai, ocha desu. (Ya, ini teh.)"
+          "textId": "Hai, ocha desu. (Ya, ini teh.)",
+          "whyFails": "Menjawab identifikasi objek benda ('Ya, ini teh'), bukan merespons ajakan kegiatan bersama."
         }
       ],
       "answerIndex": 0,
@@ -1012,7 +1039,8 @@
         {
           "id": 1,
           "text": "あしたです。",
-          "textId": "Ashita desu. (Besok.)"
+          "textId": "Ashita desu. (Besok.)",
+          "whyFails": "Pertentangan waktu (temporal clash); menjawab waktu masa depan ('Besok'), padahal pertanyaan menanyakan kesan ujian yang sudah selesai kemarin ('きのうの...どうでしたか')."
         },
         {
           "id": 2,
@@ -1022,7 +1050,8 @@
         {
           "id": 3,
           "text": "きょうしつに あります。",
-          "textId": "Kyoushitsu ni arimasu. (Ada di ruang kelas.)"
+          "textId": "Kyoushitsu ni arimasu. (Ada di ruang kelas.)",
+          "whyFails": "Menjawab keberadaan lokasi fisik suatu benda ('Ada di ruang kelas'), bukan memberikan evaluasi atau kesan kualitatif atas tes."
         }
       ],
       "answerIndex": 1,
@@ -1066,17 +1095,20 @@
       "scriptRomaji": "Tenchou: Rii-san, mise ga aku mae ni, teeburu o fuite, menyuu o narabete kudasai.\nArubaito: Hai, wakarimashita. Teeburu wa mou fukimashita.\nTenchou: A, arigatou. Jaa, menyuu o oku mae ni, mazu ohiya no gurasu o kauntaa ni narabete kureru?\nArubaito: Hai, sugu yarimasu!",
       "scriptIndonesian": "Manajer: Lee-san, sebelum toko buka tolong lap meja dan rapikan buku menu.\nStaf: Baik. Kalau meja tadi sudah saya lap.\nManajer: Ah, terima kasih. Kalau begitu sebelum menaruh menu, bisakah tata gelas air minum dulu di meja konter?\nStaf: Baik, segera saya kerjakan!",
       "questionJapanese": "アルバイトの人は これから まず なにを しますか。",
+      "questionRomaji": "Arubaito no hito wa korekara mazu nani o shimasu ka.",
       "questionIndonesian": "Apa yang pertama kali harus dilakukan staf tersebut sekarang?",
       "options": [
         {
           "id": 1,
           "text": "テーブルを ふきます",
-          "textId": "Mengelap meja"
+          "textId": "Mengelap meja",
+          "whyFails": "Tugas mengelap meja sudah selesai dikerjakan sebelumnya oleh staf (テーブルは もう ふきました), sehingga bukan hal yang akan dilakukan sekarang."
         },
         {
           "id": 2,
           "text": "メニューを ならべます",
-          "textId": "Menata buku menu"
+          "textId": "Menata buku menu",
+          "whyFails": "Menata buku menu dikerjakan belakangan karena manajer meminta 'メニューを おくまえに、まず...' (sebelum menaruh menu, terlebih dahulu tata gelas air minum)."
         },
         {
           "id": 3,
@@ -1086,7 +1118,8 @@
         {
           "id": 4,
           "text": "みせの ドアを あけます",
-          "textId": "Membuka pintu restoran"
+          "textId": "Membuka pintu restoran",
+          "whyFails": "Membuka toko/pintu adalah penanda konteks waktu persiapan ('みせが あくまえに' / sebelum buka), bukan instruksi tugas kerja yang harus dilakukan staf saat ini."
         }
       ],
       "answerIndex": 2,
@@ -1122,8 +1155,7 @@
         14.91,
         23.76,
         26.09
-      ],
-      "questionRomaji": "Arubaito no hito wa korekara mazu nani o shimasu ka."
+      ]
     },
     {
       "id": "jlpt-n4-m1-02",
@@ -1140,6 +1172,7 @@
       "scriptRomaji": "Isha: Kusuri o ni-shurui dashite okimasu ne. Shiroi kusuri wa asa, hiru, ban no gohan no ato ni nonde kudasai.\nKanja: Akai kusuri wa dou desu ka.\nIsha: Akai kusuri wa nemuku narimasu kara, yoru, neru mae ni hitotsu nonde kudasai. Hiruma wa zettai ni nomanaide kudasai ne.\nKanja: Wakarimashita.",
       "scriptIndonesian": "Dokter: Saya resepkan dua macam obat ya. Obat putih diminum sesudah makan pagi, siang, dan malam.\nPasien: Obat merah bagaimana Dok?\nDokter: Obat merah menyebabkan kantuk, jadi minumlah satu butir di malam hari sebelum tidur. Siang hari sama sekali jangan diminum ya.\nPasien: Baik, saya mengerti.",
       "questionJapanese": "患者は ひるごはんの あとに どのくすりを のみますか。",
+      "questionRomaji": "Kanja wa hirugohan no ato ni dono kusuri o nomimasu ka.",
       "questionIndonesian": "Obat mana yang diminum pasien sesudah makan siang?",
       "options": [
         {
@@ -1150,17 +1183,20 @@
         {
           "id": 2,
           "text": "あかい くすりだけ",
-          "textId": "Obat merah saja"
+          "textId": "Obat merah saja",
+          "whyFails": "Obat merah menyebabkan kantuk dan hanya diminum pada malam hari sebelum tidur (よる、ねるまえに), serta dilarang keras diminum pada siang hari (ひるまは ぜったいに のまないで)."
         },
         {
           "id": 3,
           "text": "しろい くすりと あかい くすり",
-          "textId": "Obat putih dan obat merah"
+          "textId": "Obat putih dan obat merah",
+          "whyFails": "Obat merah dilarang keras diminum pada waktu siang, sehingga kombinasi kedua obat ini setelah makan siang adalah keliru dan berbahaya."
         },
         {
           "id": 4,
           "text": "くすりは のまない",
-          "textId": "Tidak minum obat"
+          "textId": "Tidak minum obat",
+          "whyFails": "Pasien tetap diwajibkan meminum obat putih setelah makan siang sesuai aturan dokter 'あさ、ひる、ばんの ごはんの あとに'."
         }
       ],
       "answerIndex": 0,
@@ -1196,8 +1232,7 @@
         15.6,
         25.29,
         27.48
-      ],
-      "questionRomaji": "Kanja wa hirugohan no ato ni dono kusuri o nomimasu ka."
+      ]
     },
     {
       "id": "jlpt-n4-m1-03",
@@ -1214,22 +1249,26 @@
       "scriptRomaji": "Onna no hito: Kuukou made ikitai n desu ga, tokkyuu to kaisoku, dochira ga ii desu ka.\nEkiin: Tokkyuu wa yonjuppun de tsukimasu ga, tokkyuuken ga sen-gohyaku-en hitsuyou desu. Kaisoku wa ichi-jikan kakarimasu ga, futsuu unchin dake de ikemasu yo.\nOnna no hito: Hikouki no jikan made mada san-jikan arimasu kara, isogimasen.\nEkiin: Sore nara, kaisoku no hou ga yasukute ii desu yo. Niban-sen desu.",
       "scriptIndonesian": "Wanita: Saya ingin pergi ke bandara, antara kereta ekspres terbatas (tokkyuu) dan kereta cepat (kaisoku), mana yang lebih baik?\nPetugas: Kereta ekspres sampai dalam 40 menit, tapi butuh tiket ekspres 1500 yen. Kereta cepat butuh waktu 1 jam, tapi cukup bayar ongkos biasa saja.\nWanita: Waktu penerbangan masih 3 jam lagi, jadi saya tidak terburu-buru.\nPetugas: Kalau begitu, kereta cepat lebih murah dan bagus. Di peron nomor 2.",
       "questionJapanese": "女の人は どの電車に のりますか。",
+      "questionRomaji": "Onna no hito wa dono densha ni norimasu ka.",
       "questionIndonesian": "Kereta mana yang akan dinaiki oleh wanita tersebut?",
       "options": [
         {
           "id": 1,
           "text": "とっきゅう電車",
-          "textId": "Kereta ekspres terbatas (tokkyuu)"
+          "textId": "Kereta ekspres terbatas (tokkyuu)",
+          "whyFails": "Kereta ekspres terbatas (tokkyuu) membutuhkan biaya tambahan tiket ekspres 1500 yen. Karena wanita tersebut memiliki banyak waktu dan tidak buru-buru ('いそぎません'), ia tidak memilih kereta ini."
         },
         {
           "id": 2,
           "text": "バス",
-          "textId": "Bus"
+          "textId": "Bus",
+          "whyFails": "Moda bus tidak pernah dibahas maupun ditawarkan sebagai opsi perjalanan menuju bandara dalam percakapan."
         },
         {
           "id": 3,
           "text": "タクシー",
-          "textId": "Taksi"
+          "textId": "Taksi",
+          "whyFails": "Taksi tidak pernah disebutkan dalam percakapan stasiun kereta ini."
         },
         {
           "id": 4,
@@ -1270,8 +1309,7 @@
         23.45,
         29.05,
         35.19
-      ],
-      "questionRomaji": "Onna no hito wa dono densha ni norimasu ka."
+      ]
     },
     {
       "id": "jlpt-n4-m1-04",
@@ -1288,17 +1326,20 @@
       "scriptRomaji": "Otoko no hito: Soubetsukai no junbi desu ga, keeki to okashi wa boku ga katte kimasu ne.\nOnna no hito: Arigatou. Jaa, watashi wa nomimono o katte kimasu.\nOtoko no hito: A, sore kara, minna kara no messeeji kaado o atsumete kudasai. Ashita watashimasu kara.\nOnna no hito: Wakarimashita. Kaidashi ni iku mae ni, minna ni kaite moraimasu.",
       "scriptIndonesian": "Pria: Untuk persiapan pesta perpisahan, kue dan camilan biar saya yang beli ya.\nWanita: Terima kasih. Kalau begitu saya akan pergi beli minuman.\nPria: Ah, satu lagi, tolong kumpulkan kartu pesan dari teman-teman ya, karena besok akan diserahkan.\nWanita: Baik. Sebelum pergi belanja, saya akan minta mereka menulisnya dulu.",
       "questionJapanese": "女の人は これから まず なにを しますか。",
+      "questionRomaji": "Onna no hito wa korekara mazu nani o shimasu ka.",
       "questionIndonesian": "Apa yang akan dilakukan wanita tersebut pertama kali sekarang?",
       "options": [
         {
           "id": 1,
           "text": "ケーキと おかしを かいに いきます",
-          "textId": "Pergi beli kue dan camilan"
+          "textId": "Pergi beli kue dan camilan",
+          "whyFails": "Membeli kue dan camilan adalah tugas yang dikerjakan oleh rekan pria ('ぼくが かってきますね'), bukan oleh wanita tersebut."
         },
         {
           "id": 2,
           "text": "のみものを かいに いきます",
-          "textId": "Pergi membeli minuman"
+          "textId": "Pergi membeli minuman",
+          "whyFails": "Membeli minuman baru akan dilakukan nanti setelah kartu pesan ditulis, karena wanita menyatakan 'かいだしに いくまえに、みんなに かいてもらいます' (sebelum belanja, minta teman-teman tulis kartu dulu)."
         },
         {
           "id": 3,
@@ -1308,7 +1349,8 @@
         {
           "id": 4,
           "text": "かいぎしつを そうじします",
-          "textId": "Membersihkan ruang rapat"
+          "textId": "Membersihkan ruang rapat",
+          "whyFails": "Membersihkan ruang rapat sama sekali tidak pernah dibahas ataupun ditugaskan dalam persiapan pesta perpisahan ini."
         }
       ],
       "answerIndex": 2,
@@ -1340,8 +1382,7 @@
         15.19,
         25.52,
         32.04
-      ],
-      "questionRomaji": "女の人は これから まず なにを しますか。"
+      ]
     },
     {
       "id": "jlpt-n4-m2-01",
@@ -1356,14 +1397,15 @@
       "audioTrack": "JLPT N4 Vol.2 - Mondai 2",
       "scriptJapanese": "部長：山田くん、きょうは おそかったね。どうしたの？\n山田：すみません、部長。あさ、いえを いつもどおりの じかんに でたんですが、じこで でんしゃが 30ぷんも とまって しまったんです。\n部長：そうか。バスに のりかえられなかったの？\n山田：ええ、バスていも ながい れつが できて いて、のれませんでした。\n部長：なるほど、たいへんだったね。",
       "scriptRomaji": "Buchou: Yamada-kun, kyou wa osokatta ne. Dou shita no?\nYamada: Sumimasen, buchou. Asa, ie o itsumodoori no jikan ni deta n desu ga, jiko de densha ga sanjuppun mo tomatte shimatta n desu.\nBuchou: Sou ka. Basu ni norikaerarenakatta no?\nYamada: Ee, basutei mo nagai retsu ga dekite ite, noremasen deshita.\nBuchou: Naruhodo, taihen datta ne.",
-      "scriptIndonesian": "Kepala Bagian: Yamada-kun, hari ini terlambat ya. Ada apa?\nYamada: Maaf Pak. Pagi tadi saya keluar rumah tepat waktu seperti biasa, tapi karena kecelakaan kereta mogok sampai 30 menit.\nKepala Bagian: Begitu ya. Tidak bisa ganti naik bus?\nYamada: Iya, di halte bus juga antrean panjang sekali sehingga tidak bisa naik.\nKepala Bagian: Oh begitu, merepotkan sekali ya.",
+      "scriptIndonesian": "Kepala Bagian: Yamada-kun, hari ini terlambat ya. Ada apa?\nYamada: Maaf Pak. Pagi tadi saya keluar rumah tepat waktu seperti biasa, tapi karena kecelakaan kereta terhenti sampai 30 menit.\nKepala Bagian: Begitu ya. Tidak bisa ganti naik bus?\nYamada: Iya, di halte bus juga antrean panjang sekali sehingga tidak bisa naik.\nKepala Bagian: Oh begitu, merepotkan sekali ya.",
       "questionJapanese": "山田くんが ちこくした いちばんの りゆうは なんですか。",
       "questionIndonesian": "Apa alasan utama Yamada terlambat?",
       "options": [
         {
           "id": 1,
           "text": "あさ ねぼうしたから",
-          "textId": "Karena bangun kesiangan"
+          "textId": "Karena bangun kesiangan",
+          "whyFails": "Yamada menegaskan ia keluar rumah tepat waktu seperti biasa (いつもどおりの じかん), membuktikan ia tidak bangun kesiangan."
         },
         {
           "id": 2,
@@ -1373,16 +1415,18 @@
         {
           "id": 3,
           "text": "バスを まちがえたから",
-          "textId": "Karena salah naik bus"
+          "textId": "Karena salah naik bus",
+          "whyFails": "Yamada tidak salah menaiki bus; ia sama sekali tidak berhasil naik bus karena antrean di halte sangat panjang (のれませんでした)."
         },
         {
           "id": 4,
           "text": "みちに まよったから",
-          "textId": "Karena tersesat di jalan"
+          "textId": "Karena tersesat di jalan",
+          "whyFails": "Tersesat di jalan sama sekali tidak disinggung dalam percakapan dan bukan penyebab keterlambatan."
         }
       ],
       "answerIndex": 1,
-      "explain": "Yamada keluar rumah tepat waktu seperti biasa (\"いつもどおりの じかん\"), namun kereta mogok 30 menit karena kecelakaan (\"じこで でんしゃが 30ぷんも とまって しまった\"). Maka penyebab keterlambatan adalah kereta berhenti akibat kecelakaan (Pilihan 2).",
+      "explain": "Yamada keluar rumah tepat waktu seperti biasa (\"いつもどおりの じかん\"), namun kereta terhenti selama 30 menit akibat kecelakaan (\"じこで でんしゃが 30ぷんも とまって しまった\"). Ia juga tidak bisa beralih ke bus karena antrean sangat panjang. Maka penyebab utama keterlambatan adalah kereta berhenti akibat kecelakaan (Pilihan 2).",
       "vocabularyKey": [
         {
           "ja": "いつもどおり (itsumodoori)",
@@ -1417,7 +1461,7 @@
         28.66,
         31.04
       ],
-      "questionRomaji": "山田くんが ちこくした いちばんの りゆうは なんですか。"
+      "questionRomaji": "Yamada-kun ga chikoku shita ichiban no riyuu wa nan desu ka."
     },
     {
       "id": "jlpt-n4-m2-02",
@@ -1426,7 +1470,7 @@
       "mondai": "mondai_2",
       "mondaiLabel": "Mondai 2: Point Comprehension (ポイント理解)",
       "title": "Kesan Menonton Film Bioskop",
-      "situation": "Dua orang teman baru saja keluar dari gedung bioskop dan saling membicarakan film yang mereka tonton.",
+      "situation": "Dua orang teman baru saja keluar dari bioskop dan saling membicarakan film yang mereka tonton.",
       "audioUrl": "https://www.jlpt.jp/samples/sample2018/mp3/N4Q2.mp3",
       "aiAudioUrl": "./features/speaking-listening/audio-jlpt/jlpt-n4-m2-02.mp3",
       "audioTrack": "JLPT N4 Vol.2 - Mondai 2",
@@ -1439,12 +1483,14 @@
         {
           "id": 1,
           "text": "ストーリー",
-          "textId": "Alur ceritanya"
+          "textId": "Alur ceritanya",
+          "whyFails": "Pria justru mengkritik alur ceritanya agak sulit dipahami (ストーリーが ちょっと わかりにくかった)."
         },
         {
           "id": 2,
           "text": "アクション",
-          "textId": "Adegan aksinya"
+          "textId": "Adegan aksinya",
+          "whyFails": "Kualitas adegan aksi yang luar biasa dipuji oleh si wanita, bukan merupakan aspek terbaik menurut si pria."
         },
         {
           "id": 3,
@@ -1454,11 +1500,12 @@
         {
           "id": 4,
           "text": "えいがかんの いす",
-          "textId": "Kursi bioskopnya"
+          "textId": "Kursi bioskopnya",
+          "whyFails": "Fasilitas atau kursi bioskop sama sekali tidak disinggung dalam percakapan."
         }
       ],
       "answerIndex": 2,
-      "explain": "Pria mengkritik cerita agak sulit dimengerti (\"ストーリーが ちょっと わかりにくかった\"), tetapi memuji musiknya paling hebat: \"おんがくは さいこうだったよ\" (Musiknya juara / terbaik). Jadi yang paling disukai adalah musiknya (Pilihan 3).",
+      "explain": "Wanita memuji adegan aksinya, sedangkan pria mengkritik alur cerita yang agak rumit/sukar dipahami (\"わかりにくかった\"). Namun, pria menegaskan bahwa musiknya luar biasa hebat: \"でも、おんがくは さいこうだったよ\" (Tapi musiknya juara/terbaik) dan ingin membeli soundtrack-nya. Jadi hal yang paling bagus menurut si pria adalah musiknya (Pilihan 3).",
       "vocabularyKey": [
         {
           "ja": "わかりにくい (wakarinikui)",
@@ -1487,7 +1534,7 @@
         20.14,
         26.97
       ],
-      "questionRomaji": "男の人は えいがの なにが いちばん よかったと 言っていますか。"
+      "questionRomaji": "Otoko no hito wa eiga no nani ga ichiban yokatta to itte imasu ka."
     },
     {
       "id": "jlpt-n4-m2-03",
@@ -1509,17 +1556,20 @@
         {
           "id": 1,
           "text": "きよみずでら (Kiyomizudera)",
-          "textId": "Kuil Kiyomizudera"
+          "textId": "Kuil Kiyomizudera",
+          "whyFails": "Wanita menegaskan bahwa ia berhasil berkunjung ke Kiyomizudera (きよみずでらは いけた)."
         },
         {
           "id": 2,
           "text": "ぜんぶ いけた",
-          "textId": "Semua tempat sempat dikunjungi"
+          "textId": "Semua tempat sempat dikunjungi",
+          "whyFails": "Pernyataan ini keliru karena ada satu tempat yang batal dikunjungi akibat waktu yang tidak mencukupi."
         },
         {
           "id": 3,
           "text": "ふしみいなり (Fushimi Inari)",
-          "textId": "Kuil Fushimi Inari"
+          "textId": "Kuil Fushimi Inari",
+          "whyFails": "Fushimi Inari berhasil dikunjungi pagi-pagi sekali dan dinikmati dengan santai (ゆっくり みられた)."
         },
         {
           "id": 4,
@@ -1528,7 +1578,7 @@
         }
       ],
       "answerIndex": 3,
-      "explain": "Wanita tersebut menyatakan secara jelas: \"きんかくじは じかんが なくなって いけなかったの\" (Kinkakuji kehabisan waktu jadi tidak sempat pergi). Maka tempat yang batal dikunjungi adalah Kinkakuji (Pilihan 4).",
+      "explain": "Wanita menyatakan secara gamblang: \"きんかくじは じかんが なくなって いけなかったの\" (Kinkakuji kehabisan waktu jadi tidak sempat pergi). Sedangkan Kiyomizudera dan Fushimi Inari berhasil dikunjungi. Maka tempat yang batal/tidak sempat dikunjungi adalah Kinkakuji (Pilihan 4).",
       "vocabularyKey": [
         {
           "ja": "りょうほう (ryouhou)",
@@ -1579,12 +1629,14 @@
         {
           "id": 1,
           "text": "ぶんぽう (tata bahasa)",
-          "textId": "Tata bahasa (grammar)"
+          "textId": "Tata bahasa (grammar)",
+          "whyFails": "John merasa tata bahasa menyenangkan (ぶんぽうや かいわは たのしい), bukan bagian yang paling berat."
         },
         {
           "id": 2,
           "text": "かいわ (percakapan)",
-          "textId": "Percakapan (speaking)"
+          "textId": "Percakapan (speaking)",
+          "whyFails": "Percakapan dinikmati dan dirasakan menyenangkan oleh John, bukan hal tersulit."
         },
         {
           "id": 3,
@@ -1594,11 +1646,12 @@
         {
           "id": 4,
           "text": "ちょうかい (mendengarkan)",
-          "textId": "Listening (choukai)"
+          "textId": "Listening (choukai)",
+          "whyFails": "Listening (choukai) tidak membuatnya kesulitan (あまり こまっていません) karena terbantu kebiasaan menonton anime."
         }
       ],
       "answerIndex": 2,
-      "explain": "John menyatakan: \"かんじを おぼえるのが いちばん たいへんです\" (Menghafal kanji yang paling berat). Bagian listening aman karena sering nonton anime. Maka hal paling berat adalah menghafal kanji (Pilihan 3).",
+      "explain": "John menyatakan secara eksplisit: \"かんじを おぼえるのが いちばん たいへんです\" (Menghafal kanji yang paling berat/susah). Tata bahasa dan percakapan dinilai menyenangkan, sedangkan listening tidak menyulitkannya karena sering menonton anime. Maka hal yang paling berat adalah menghafal kanji (Pilihan 3).",
       "vocabularyKey": [
         {
           "ja": "おぼえる (oboeru)",
@@ -1649,7 +1702,8 @@
         {
           "id": 1,
           "text": "きょうは もう かえってください。",
-          "textId": "Kyou wa mou kaette kudasai. (Hari ini silakan Anda pulang.)"
+          "textId": "Kyou wa mou kaette kudasai. (Hari ini silakan Anda pulang.)",
+          "whyFails": "Pola instruksi / permohonan '～てください' yang ditujukan kepada lawan bicara ('Silakan Anda pulang hari ini'), terbalik arah pelakunya karena semestinya meminta izin untuk diri sendiri pulang."
         },
         {
           "id": 2,
@@ -1659,7 +1713,8 @@
         {
           "id": 3,
           "text": "きょうは かえらなければ なりませんよ。",
-          "textId": "Kyou wa kaeranakereba narimasen yo. (Hari ini Anda harus pulang lho.)"
+          "textId": "Kyou wa kaeranakereba narimasen yo. (Hari ini Anda harus pulang lho.)",
+          "whyFails": "Pola kewajiban mutlak '～なければなりません' berpartikel 'よ' bernada menggurui atau menuntut; sangat tidak santun secara pragmatik kepada atasan/manajer toko (tenchou)."
         }
       ],
       "answerIndex": 1,
@@ -1708,7 +1763,8 @@
         {
           "id": 1,
           "text": "えいがは だいきらいです。",
-          "textId": "Eiga wa daikirai desu. (Saya benci sekali film.)"
+          "textId": "Eiga wa daikirai desu. (Saya benci sekali film.)",
+          "whyFails": "Menyatakan kebencian personal secara frontal ('Saya sangat benci film'); melanggar kesantunan pragmatik bahasa Jepang dan mempermalukan lawan bicara yang berbaik hati mengajak."
         },
         {
           "id": 2,
@@ -1718,7 +1774,8 @@
         {
           "id": 3,
           "text": "ぜったいに いきたくありません。",
-          "textId": "Zettai ni ikitaku arimasen. (Saya mutlak tidak mau pergi.)"
+          "textId": "Zettai ni ikitaku arimasen. (Saya mutlak tidak mau pergi.)",
+          "whyFails": "Penolakan agresif dan konfrontatif ('Sama sekali tidak mau pergi'); sama sekali tidak mencerminkan cara menolak yang sopan (ていねいに ことわる)."
         }
       ],
       "answerIndex": 1,
@@ -1772,12 +1829,14 @@
         {
           "id": 2,
           "text": "いただきます。",
-          "textId": "Itadakimasu. (Selamat makan.)"
+          "textId": "Itadakimasu. (Selamat makan.)",
+          "whyFails": "Diucapkan sesaat SEBELUM menyantap makanan, bukan saat selesai makan dan hendak keluar restoran."
         },
         {
           "id": 3,
           "text": "おねがいします。",
-          "textId": "Onegai shimasu. (Tolong ya.)"
+          "textId": "Onegai shimasu. (Tolong ya.)",
+          "whyFails": "Ungkapan untuk memohon bantuan atau memesan sesuatu ('Tolong ya'), tidak relevan untuk mengapresiasi kebaikan atasan yang telah mentraktir."
         }
       ],
       "answerIndex": 0,
@@ -1831,12 +1890,14 @@
         {
           "id": 2,
           "text": "いいえ、もちません。",
-          "textId": "Iie, mochimasen. (Tidak, saya tidak bawa.)"
+          "textId": "Iie, mochimasen. (Tidak, saya tidak bawa.)",
+          "whyFails": "Respons gramatikal yang janggal dan dingin ('Tidak, saya tidak membawanya'); gagal merespons niat baik orang yang menawarkan bantuan tenaga."
         },
         {
           "id": 3,
           "text": "どういたしまして。",
-          "textId": "Dou itashimashite. (Sama-sama.)"
+          "textId": "Dou itashimashite. (Sama-sama.)",
+          "whyFails": "Respon untuk membalas ucapan terima kasih ('Sama-sama'), bukan ujaran untuk menerima atau menolak tawaran bantuan."
         }
       ],
       "answerIndex": 0,
@@ -1885,12 +1946,14 @@
         {
           "id": 1,
           "text": "きのうだったよ。",
-          "textId": "Kinou datta yo. (Kemarin kok.)"
+          "textId": "Kinou datta yo. (Kemarin kok.)",
+          "whyFails": "Bertentangan langsung dengan konteks kalimat lawan bicara yang secara spesifik menanyakan rapat besok ('あしたの かいぎ')."
         },
         {
           "id": 2,
           "text": "かいぎしつだよ。",
-          "textId": "Kaigishitsu da yo. (Di ruang rapat kok.)"
+          "textId": "Kaigishitsu da yo. (Di ruang rapat kok.)",
+          "whyFails": "Menjawab tempat/lokasi ('どこで'), padahal lawan bicara menanyakan jam mulai ('なんじから')."
         },
         {
           "id": 3,
@@ -1940,7 +2003,8 @@
         {
           "id": 1,
           "text": "はい、いっぱいです。",
-          "textId": "Hai, ippai desu. (Ya, penuh.)"
+          "textId": "Hai, ippai desu. (Ya, penuh.)",
+          "whyFails": "Kekeliruan semantik kata 'いっぱい' antara penghitung cangkir (一杯 = satu cangkir) dan kata sifat keadaan (penuh); kalimat ini terdengar aneh ('Ya, penuh') alih-alih menerima atau menolak tawaran kopi."
         },
         {
           "id": 2,
@@ -1950,7 +2014,8 @@
         {
           "id": 3,
           "text": "ごちそうさまでした。",
-          "textId": "Gochisousama deshita. (Terima kasih makanannya.)"
+          "textId": "Gochisousama deshita. (Terima kasih makanannya.)",
+          "whyFails": "Ucapan rasa syukur setelah selesai bersantap/minum secara keseluruhan; kurang tepat dan terkesan tiba-tiba jika langsung diucapkan saat baru ditawari apakah ingin secangkir lagi tanpa menolak secara wajar terlebih dahulu."
         }
       ],
       "answerIndex": 1,
@@ -2004,12 +2069,14 @@
         {
           "id": 2,
           "text": "はい、おしえました。",
-          "textId": "Hai, oshiemashita. (Ya, saya sudah beri tahu.)"
+          "textId": "Hai, oshiemashita. (Ya, saya sudah beri tahu.)",
+          "whyFails": "Kesalahan kala lampau ('Ya, saya sudah memberi tahu'); penutur belum memberikan petunjuk jalan sama sekali namun sudah menyatakan sudah memberi tahu."
         },
         {
           "id": 3,
           "text": "いいえ、わかりません。",
-          "textId": "Iie, wakarimasen. (Tidak, saya tidak mengerti.)"
+          "textId": "Iie, wakarimasen. (Tidak, saya tidak mengerti.)",
+          "whyFails": "Penolakan yang terlalu ketus dan tidak sopan untuk orang asing; cara menolak yang wajar dalam bahasa Jepang jika tidak tahu jalan adalah 'すみません、ちょっとわかりません'."
         }
       ],
       "answerIndex": 0,

@@ -1,3 +1,24 @@
+
+:root {
+  --fz-font-ja: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Yu Gothic", "Meiryo", "Noto Sans JP", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.jlpt-question-ja,
+.jlpt-opt-ja,
+.jlpt-bubble-ja,
+.jlpt-ruby {
+  font-family: var(--fz-font-ja);
+  font-feature-settings: "palt" 1;
+  -webkit-font-smoothing: antialiased;
+}
+
+.jlpt-question-block {
+  min-height: 52px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 /* =========================================================================
    PANEL BANK SOAL LISTENING JLPT (N5 & N4) - FIEZEL APPS
    Resmi Japan Foundation & JEES Listening Exam Simulation
@@ -1308,6 +1329,65 @@
   transform: translateY(0);
 }
 
+/* =========================================================================
+   TABLET & DESKTOP DRAWER DOCKING & SPLIT-VIEW (min-width: 768px)
+   Drawer ter-dock di sisi kanan pada Desktop/Tablet dan bottom-sheet pada Mobile.
+   Split-view halus tanpa horizontal overflow dan kartu modal bergeser simetris.
+   ========================================================================= */
+@media (min-width: 768px) {
+  #jlptDetailSheet,
+  .jlpt-detail-sheet {
+    flex-direction: row !important;
+    justify-content: flex-end !important;
+    align-items: stretch !important;
+  }
+
+  .jlpt-sheet-container {
+    width: 440px !important;
+    max-width: 48vw !important;
+    height: 100% !important;
+    max-height: 100vh !important;
+    border-radius: 24px 0 0 24px !important;
+    border-right: none !important;
+    border-top: 1.5px solid var(--line, #E8DFD3) !important;
+    border-bottom: 1.5px solid var(--line, #E8DFD3) !important;
+    border-left: 1.5px solid var(--line, #E8DFD3) !important;
+    box-shadow: -12px 0 38px rgba(36, 26, 17, 0.22) !important;
+    transform: translateX(105%) !important;
+    transition: transform 0.32s cubic-bezier(0.175, 0.885, 0.32, 1.15) !important;
+  }
+
+  #jlptDetailSheet.open .jlpt-sheet-container,
+  .jlpt-detail-sheet.open .jlpt-sheet-container {
+    transform: translateX(0) !important;
+  }
+
+  .sheet-drag-handle-wrapper,
+  .jlpt-sheet-handle-zone {
+    display: none !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .listening-modal {
+    transition: padding 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .listening-modal-box {
+    transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+  }
+
+  /* Split-view: saat drawer terbuka di desktop widescreen, modal bergeser ke kiri */
+  .listening-modal.sheet-open .listening-modal-box,
+  .listening-modal:has(#jlptDetailSheet.open) .listening-modal-box {
+    transform: translateX(-160px);
+  }
+
+  .jlpt-sheet-container {
+    width: 460px !important;
+  }
+}
+
 .sheet-drag-handle-wrapper,
 .jlpt-sheet-handle-zone {
   display: flex;
@@ -2067,12 +2147,13 @@
     gap: 5px !important;
   }
 
-  .jlpt-opt-btn {
-    min-height: 42px !important;
-    max-height: 46px !important;
-    height: 44px !important;
-    padding: 4px 8px !important;
-    gap: 8px !important;
+  .jlpt-opt-btn,
+  .jlpt-option-btn {
+    min-height: 48px !important;
+    height: auto !important;
+    max-height: none !important;
+    padding: 8px 12px !important;
+    gap: 10px !important;
   }
 
   .jlpt-opt-badge {
@@ -2375,7 +2456,10 @@
 
 /* Mode Kanji Asli: Hide all rt (Ruby furigana) and Romaji in bubbles */
 .jlpt-mode-kanji rt {
-  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  display: inline !important;
 }
 
 .jlpt-mode-kanji .jlpt-bubble-ro {
@@ -2408,4 +2492,168 @@
   pointer-events: none !important;
   cursor: not-allowed !important;
   filter: grayscale(0.8);
+}
+
+
+/* =========================================================================
+   TACTILE CLAY AUDIO SCRUBBER & KARAOKE GLOW (ZERO JITTER)
+   ========================================================================= */
+
+.jlpt-scrubber-wrap {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  padding: 4px 6px 6px !important;
+  user-select: none !important;
+  touch-action: none !important;
+}
+
+.jlpt-scrubber-time {
+  font-family: inherit !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  color: #64748B !important;
+  font-variant-numeric: tabular-nums !important;
+  min-width: 32px !important;
+  text-align: center !important;
+}
+
+.jlpt-scrubber-dur {
+  color: #94A3B8 !important;
+}
+
+.jlpt-scrubber-track {
+  position: relative !important;
+  flex: 1 !important;
+  height: 8px !important;
+  background: #E2E8F0 !important;
+  border-radius: 999px !important;
+  cursor: pointer !important;
+  touch-action: none !important;
+  transition: height 0.15s ease !important;
+}
+
+.jlpt-scrubber-track:hover {
+  height: 10px !important;
+}
+
+.jlpt-scrubber-fill {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  height: 100% !important;
+  width: 0% !important;
+  background: linear-gradient(90deg, #F59E0B, #10B981) !important;
+  border-radius: 999px !important;
+  pointer-events: none !important;
+}
+
+.jlpt-scrubber-thumb {
+  position: absolute !important;
+  top: 50% !important;
+  left: 0% !important;
+  width: 16px !important;
+  height: 16px !important;
+  transform: translate(-50%, -50%) !important;
+  background: #FFFFFF !important;
+  border: 2.5px solid #10B981 !important;
+  border-radius: 50% !important;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.35) !important;
+  pointer-events: none !important;
+  transition: transform 0.1s ease !important;
+}
+
+.jlpt-scrubber-track:hover .jlpt-scrubber-thumb,
+.jlpt-scrubber-track:active .jlpt-scrubber-thumb {
+  transform: translate(-50%, -50%) scale(1.2) !important;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.6) !important;
+}
+
+.jlpt-scrubber-markers {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  pointer-events: none !important;
+}
+
+.jlpt-scrub-marker-dot {
+  position: absolute !important;
+  top: 50% !important;
+  width: 3.5px !important;
+  height: 3.5px !important;
+  transform: translate(-50%, -50%) !important;
+  background: #FFFFFF !important;
+  border-radius: 50% !important;
+  opacity: 0.85 !important;
+}
+
+.listening-modal.exam-mode-active .jlpt-scrubber-wrap {
+  opacity: 0.6 !important;
+  pointer-events: none !important;
+  cursor: not-allowed !important;
+}
+
+.listening-modal.exam-mode-active .jlpt-scrubber-track {
+  cursor: not-allowed !important;
+}
+
+/* Active Karaoke Glow */
+.jlpt-dialogue-turn.speaking-now {
+  border-color: #10B981 !important;
+  background: #ECFDF5 !important;
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.3) !important;
+  transform: scale(1.015) !important;
+}
+
+.jlpt-dialogue-turn.speaking-now .jlpt-speaker-dot {
+  background: #10B981 !important;
+  box-shadow: 0 0 8px #10B981 !important;
+  animation: fzSpeakerPulse 0.8s infinite alternate !important;
+}
+
+@keyframes fzSpeakerPulse {
+  0% { transform: scale(1); opacity: 0.7; }
+  100% { transform: scale(1.4); opacity: 1; }
+}
+
+/* Feedback Banner Zero-Loss Choice Details */
+.jlpt-fb-chosen {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: #334155;
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.jlpt-fb-why {
+  font-size: 10.5px !important;
+  font-weight: 600 !important;
+  color: #B91C1C !important;
+  line-height: 1.35;
+  margin-top: 2px;
+  word-break: break-word;
+}
+
+.jlpt-fb-key {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: #1E293B;
+  line-height: 1.35;
+  margin-top: 2px;
+  word-break: break-word;
+}
+
+.jlpt-ruby rt {
+  font-size: clamp(9px, 0.62em, 11px) !important;
+  font-weight: 700 !important;
+  color: #475569 !important;
+  line-height: 1 !important;
+  letter-spacing: -0.01em !important;
+  user-select: none !important;
+  pointer-events: none !important;
+  transition: opacity 0.15s ease !important;
 }

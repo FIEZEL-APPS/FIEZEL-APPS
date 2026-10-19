@@ -59,15 +59,78 @@
     { k: '西口', r: 'にしぐち', ro: 'nishiguchi' },
     { k: '改札口', r: 'かいさつぐち', ro: 'kaisatsuguchi' },
     { k: '昼ご飯', r: 'ひるごはん', ro: 'hirugohan' },
+    { k: '1時間', r: 'いちじかん', ro: 'ichijikan' },
+    { k: '2時間', r: 'にじかん', ro: 'nijikan' },
+    { k: '3時間', r: 'さんじかん', ro: 'sanjikan' },
     { k: '時間', r: 'じかん', ro: 'jikan' },
+    { k: '時半', r: 'じはん', ro: 'jihan' },
     { k: '言っています', r: 'いっています', ro: 'itte imasu' },
     { k: '言います', r: 'いいます', ro: 'iimasu' },
     { k: '言って', r: 'いって', ro: 'itte' },
     { k: '言う', r: 'いう', ro: 'iu' },
     { k: '本', r: 'ほん', ro: 'hon' },
     { k: '時', r: 'じ', ro: 'ji' },
-    { k: '半', r: 'はん', ro: 'han' }
+    { k: '半', r: 'はん', ro: 'han' },
+    { k: '人', r: 'ひと', ro: 'hito' },
+    { k: '友達', r: 'ともだち', ro: 'tomodachi' },
+    { k: '友だち', r: 'ともだち', ro: 'tomodachi' },
+    { k: '留学生', r: 'りゅうがくせい', ro: 'ryuugakusei' },
+    { k: '店員', r: 'てんいん', ro: 'ten\'in' },
+    { k: '家族', r: 'かぞく', ro: 'kazoku' },
+    { k: '子ども', r: 'こども', ro: 'kodomo' },
+    { k: '子供', r: 'こども', ro: 'kodomo' },
+    { k: '皆さん', r: 'みなさん', ro: 'minasan' },
+    { k: '駅', r: 'えき', ro: 'eki' },
+    { k: '学校', r: 'がっこう', ro: 'gakkou' },
+    { k: '教室', r: 'きょうしつ', ro: 'kyoushitsu' },
+    { k: '病院', r: 'びょういん', ro: 'byouin' },
+    { k: '会社', r: 'かいしゃ', ro: 'kaisha' },
+    { k: '部屋', r: 'へや', ro: 'heya' },
+    { k: '店', r: 'みせ', ro: 'mise' },
+    { k: '東京', r: 'とうきょう', ro: 'Toukyou' },
+    { k: '空港', r: 'くうこう', ro: 'kuukou' },
+    { k: '飛行機', r: 'ひこうき', ro: 'hikouki' },
+    { k: '特急', r: 'とっきゅう', ro: 'tokkyuu' },
+    { k: '快速', r: 'かいそく', ro: 'kaisoku' },
+    { k: '普通', r: 'ふつう', ro: 'futsuu' },
+    { k: '今日', r: 'きょう', ro: 'kyou' },
+    { k: '明日', r: 'あした', ro: 'ashita' },
+    { k: '昨日', r: 'きのう', ro: 'kinou' },
+    { k: '毎日', r: 'まいにち', ro: 'mainichi' },
+    { k: '朝', r: 'あさ', ro: 'asa' },
+    { k: '昼', r: 'ひる', ro: 'hiru' },
+    { k: '夜', r: 'よる', ro: 'yoru' },
+    { k: '晩', r: 'ばん', ro: 'ban' },
+    { k: '何時', r: 'なんじ', ro: 'nanji' },
+    { k: '何分', r: 'なんぷん', ro: 'nanpun' },
+    { k: '勉強', r: 'べんきょう', ro: 'benkyou' },
+    { k: '旅行', r: 'りょこう', ro: 'ryokou' },
+    { k: '質問', r: 'しつもん', ro: 'shitsumon' },
+    { k: '問題', r: 'もんだい', ro: 'mondai' },
+    { k: '答え', r: 'こたえ', ro: 'kotae' },
+    { k: '準備', r: 'じゅんび', ro: 'junbi' },
+    { k: '大丈夫', r: 'だいじょうぶ', ro: 'daijoubu' },
+    { k: '大変', r: 'たいへん', ro: 'taihen' }
   ];
+
+  /* Single-Pass Regex Engine (Anti-Nested Ruby) */
+  var JLPT_KANJI_DICT_SORTED = null;
+  var JLPT_KANJI_REGEX = null;
+  var JLPT_KANJI_MAP = {};
+
+  function initKanjiDictionaryEngine() {
+    if (JLPT_KANJI_REGEX) return;
+    JLPT_KANJI_DICT_SORTED = JLPT_KANJI_DICT.slice().sort(function (a, b) {
+      return b.k.length - a.k.length;
+    });
+    var keys = [];
+    for (var i = 0; i < JLPT_KANJI_DICT_SORTED.length; i++) {
+      var item = JLPT_KANJI_DICT_SORTED[i];
+      JLPT_KANJI_MAP[item.k] = item;
+      keys.push(item.k);
+    }
+    JLPT_KANJI_REGEX = new RegExp(keys.join('|'), 'g');
+  }
 
   function formatMmSs(sec) {
     var s = Math.max(0, Math.floor(sec || 0));
@@ -78,20 +141,119 @@
 
   function renderFuriganaText(textJa, mode) {
     if (!textJa) return '';
-    if (mode === 'kanji') {
-      return escapeHtml(textJa);
+    if (mode === 'kanji') return escapeHtml(textJa);
+    initKanjiDictionaryEngine();
+
+    var lastIdx = 0;
+    var out = '';
+    textJa.replace(JLPT_KANJI_REGEX, function (match, offset) {
+      out += escapeHtml(textJa.slice(lastIdx, offset));
+      var entry = JLPT_KANJI_MAP[match];
+      if (entry) {
+        if (mode === 'romaji') {
+          out += '<ruby class="jlpt-ruby">' + escapeHtml(entry.k) + '<rp>(</rp><rt class="jlpt-rt-ro">' + escapeHtml(entry.ro || entry.r) + '</rt><rp>)</rp></ruby>';
+        } else {
+          out += '<ruby class="jlpt-ruby">' + escapeHtml(entry.k) + '<rp>(</rp><rt>' + escapeHtml(entry.r) + '</rt><rp>)</rp></ruby>';
+        }
+      } else {
+        out += escapeHtml(match);
+      }
+      lastIdx = offset + match.length;
+      return match;
+    });
+    out += escapeHtml(textJa.slice(lastIdx));
+    return out;
+  }
+
+  /* ---------- Precision Audio & Scrubber State ---------- */
+  var rafSyncId = null;
+  var isScrubbing = false;
+  var wasPlayingBeforeScrub = false;
+  var pendingSeekSec = null;
+
+  function startAudioRafSync() {
+    stopAudioRafSync();
+    function step() {
+      if (!audioObj || !audioPlaying) {
+        stopAudioRafSync();
+        return;
+      }
+      syncAudioScrubberAndTurns(audioObj.currentTime, audioObj.duration);
+      rafSyncId = requestAnimationFrame(step);
     }
-    var res = escapeHtml(textJa);
-    if (mode === 'ruby') {
-      for (var i = 0; i < JLPT_KANJI_DICT.length; i++) {
-        var item = JLPT_KANJI_DICT[i];
-        if (res.indexOf(item.k) !== -1) {
-          var rubyHtml = '<ruby class="jlpt-ruby">' + item.k + '<rp>(</rp><rt>' + item.r + '</rt><rp>)</rp></ruby>';
-          res = res.split(item.k).join(rubyHtml);
+    rafSyncId = requestAnimationFrame(step);
+  }
+
+  function stopAudioRafSync() {
+    if (rafSyncId) {
+      cancelAnimationFrame(rafSyncId);
+      rafSyncId = null;
+    }
+  }
+
+  function syncAudioScrubberAndTurns(curTime, duration) {
+    if (pendingSeekSec !== null) {
+      if (curTime < pendingSeekSec - 0.2) {
+        return;
+      }
+      pendingSeekSec = null;
+    }
+
+    var qs = getFilteredQuestions();
+    if (qs && qs[curIndex]) {
+      var q = qs[curIndex];
+      var timestamps = q.turnTimestamps || [];
+      if (timestamps.length > 0) {
+        var activeIdx = -1;
+        var dur = duration || 9999;
+        for (var i = 0; i < timestamps.length; i++) {
+          var start = timestamps[i];
+          var next = (i < timestamps.length - 1) ? timestamps[i + 1] : dur;
+          if (curTime >= (start - 0.05) && curTime < (next - 0.02)) {
+            activeIdx = i;
+            break;
+          }
+        }
+        if (activeIdx !== currentSpeakingTurnIdx) {
+          highlightTurn(activeIdx);
         }
       }
     }
-    return res;
+
+    if (!isScrubbing) {
+      var curEl = document.getElementById('jlptScrubTimeCur');
+      var durEl = document.getElementById('jlptScrubTimeDur');
+      var fillEl = document.getElementById('jlptScrubFill');
+      var thumbEl = document.getElementById('jlptScrubThumb');
+      var trackEl = document.getElementById('jlptScrubTrack');
+
+      if (curEl) curEl.textContent = formatMmSs(curTime);
+      if (durEl && duration && isFinite(duration) && duration > 0) {
+        durEl.textContent = formatMmSs(duration);
+      }
+
+      var pct = (duration && isFinite(duration) && duration > 0)
+        ? Math.min(100, Math.max(0, (curTime / duration) * 100))
+        : 0;
+
+      if (fillEl) fillEl.style.width = pct + '%';
+      if (thumbEl) thumbEl.style.left = pct + '%';
+      if (trackEl) trackEl.setAttribute('aria-valuenow', Math.round(pct));
+    }
+  }
+
+  function highlightTurn(idx) {
+    currentSpeakingTurnIdx = idx;
+    var allTurns = document.querySelectorAll('.jlpt-dialogue-turn');
+    allTurns.forEach(function (el, i) {
+      var isNow = (i === idx);
+      el.classList.toggle('speaking-now', isNow);
+      if (isNow && sheetOpen) {
+        try {
+          el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        } catch (_) {}
+      }
+    });
   }
 
   function t(k, fallback) {
@@ -435,15 +597,16 @@
         el.innerHTML = renderFuriganaText(textJa, curScriptMode);
       });
     }
+
+    if (sheetOpen && q) {
+      var correctOptId = (q.answerIndex !== undefined && q.options && q.options[q.answerIndex])
+        ? (q.options[q.answerIndex].id || (q.answerIndex + 1))
+        : 1;
+      populateDetailSheet(q, correctOptId);
+    }
   }
 
   function seekToJlptTurn(turnIdx) {
-    var qs = getFilteredQuestions();
-    if (!qs || !qs[curIndex]) return;
-    var q = qs[curIndex];
-    var timestamps = q.turnTimestamps || [];
-    var targetSec = (timestamps[turnIdx] !== undefined) ? timestamps[turnIdx] : (turnIdx * 4.0);
-
     if (isExamMode) {
       if (typeof window !== 'undefined' && window.toast) {
         window.toast(t('jlpt.exam-locked-note', 'Naskah Terkunci (Mode Ujian)'));
@@ -451,98 +614,159 @@
       return;
     }
 
-    if (!audioObj || !audioPlaying) {
-      togglePlayJlptPrimaryAudio();
-      setTimeout(function () {
-        if (audioObj) {
-          audioObj.currentTime = targetSec;
-          try { audioObj.play(); } catch (_) {}
-        }
-      }, 200);
-    } else {
-      audioObj.currentTime = targetSec;
-      try { audioObj.play(); } catch (_) {}
-    }
-
-    highlightTurn(turnIdx);
-  }
-
-  function highlightTurn(idx) {
-    currentSpeakingTurnIdx = idx;
-    var allTurns = document.querySelectorAll('.jlpt-dialogue-turn');
-    allTurns.forEach(function (el, i) {
-      el.classList.toggle('speaking-now', i === idx);
-    });
-  }
-
-  function syncPlayingTurnHighlight() {
-    if (!audioObj || !audioPlaying) return;
     var qs = getFilteredQuestions();
     if (!qs || !qs[curIndex]) return;
     var q = qs[curIndex];
     var timestamps = q.turnTimestamps || [];
-    if (timestamps.length === 0) return;
+    var targetSec = (timestamps[turnIdx] !== undefined) ? timestamps[turnIdx] : (turnIdx * 4.0);
 
-    var cur = audioObj.currentTime;
-    var activeIdx = -1;
-    for (var i = 0; i < timestamps.length; i++) {
-      var start = timestamps[i];
-      var next = (i < timestamps.length - 1) ? timestamps[i + 1] : 9999;
-      if (cur >= start && cur < next) {
-        activeIdx = i;
-        break;
-      }
-    }
-    if (activeIdx !== -1 && activeIdx !== currentSpeakingTurnIdx) {
-      highlightTurn(activeIdx);
-    }
-  }
+    pendingSeekSec = targetSec;
+    highlightTurn(turnIdx);
 
-  function notifyMascot(reaction) {
-    try {
-      var m = document.querySelector('.jlpt-mascot-slot fiezel-mascot, fiezel-mascot.jlpt-mascot, .jlpt-mascot');
-      if (m) {
-        if (!m.__mochiAttached && window.FiezelMochiCompanion && typeof window.FiezelMochiCompanion.attach === 'function') {
-          window.FiezelMochiCompanion.attach(m);
+    if (audioObj) {
+      var applyDirectSeek = function () {
+        try {
+          audioObj.currentTime = targetSec;
+        } catch (e) {
+          console.warn('[JLPT Audio] Seek error:', e);
         }
-        if (typeof m.react === 'function') {
-          m.react(reaction);
-        } else if (m.__mochiInstance) {
-          var inst = m.__mochiInstance;
-          if (reaction === 'correct') {
-            inst.setMood?.('happy');
-            inst.setAura?.('green');
-            inst.setFx?.('stars');
-            inst.triggerHop?.(0.38);
-            inst.triggerHandGesture?.('cheer', 1.8);
-          } else if (reaction === 'wrong') {
-            inst.setMood?.('pout');
-            inst.setAura?.('pink');
-            inst.triggerHandGesture?.('sulk', 2.0);
-          } else if (reaction === 'question-shown') {
-            inst.setMood?.('dots');
-            inst.setBadge?.('chat_purple');
-            inst.setAura?.('purple');
-            inst.triggerEarWiggle?.(1.3);
-            inst.retractHands?.();
-          } else if (reaction === 'listening-start') {
-            inst.setMood?.('dots');
-            inst.setBadge?.('chat_purple');
-            inst.setAura?.('purple');
-            inst.triggerHandGesture?.('wave', 1.2);
-            inst.triggerEarWiggle?.(1.3);
-          } else if (reaction === 'listening-stop') {
-            inst.setMood?.('dots');
-            inst.setBadge?.('chat_purple');
-            inst.setAura?.('purple');
-            inst.retractHands?.();
+        if (audioObj.paused) {
+          var p = audioObj.play();
+          if (p && typeof p.catch === 'function') {
+            p.catch(function () {});
           }
         }
+        audioPlaying = true;
+        updateAudioUi();
+        startAudioRafSync();
+      };
+
+      if (audioObj.readyState >= 1) {
+        applyDirectSeek();
+      } else {
+        audioObj.addEventListener('loadedmetadata', applyDirectSeek, { once: true });
+        audioObj.addEventListener('canplay', applyDirectSeek, { once: true });
+        try { audioObj.load(); } catch (_) {}
+      }
+      return;
+    }
+
+    var url = q.aiAudioUrl || q.audioUrl || ('./features/speaking-listening/audio-jlpt/' + q.id + '.mp3');
+    var fallbackScript = q.scriptJapanese || q.script || '';
+    playAudioStreamWithTarget(url, 'primary', fallbackScript, targetSec, turnIdx);
+  }
+
+  function safeNotifyMascot(event, data) {
+    try {
+      if (typeof window !== 'undefined' && typeof window.notifyMascot === 'function') {
+        window.notifyMascot(event, data);
       }
     } catch (_) {}
   }
 
-  function stopJlptAudio() {
+  function playAudioStreamWithTarget(url, source, fallbackScript, initialSec, targetTurnIdx) {
+    if (audioPlaying && activeAudioSource === source && (initialSec === undefined || initialSec === null)) {
+      stopJlptAudio();
+      return;
+    }
+
+    if (isExamMode && replayCount >= 1) {
+      if (typeof window !== 'undefined' && window.toast) {
+        window.toast(t('jlpt.exam-audio-once', 'Audio hanya berputar 1 kali dalam mode ujian'));
+      }
+      updateAudioUi();
+      return;
+    }
+
+    var hasTurn = (typeof targetTurnIdx === 'number' && targetTurnIdx >= 0);
+    stopJlptAudio(hasTurn);
+    if (hasTurn) {
+      highlightTurn(targetTurnIdx);
+    }
+    pendingSeekSec = (typeof initialSec === 'number' && initialSec > 0) ? initialSec : null;
+
+    if (!url) {
+      if (fallbackScript) {
+        playJlptSpeech(fallbackScript, source, hasTurn);
+      }
+      return;
+    }
+
+    try {
+      audioObj = new Audio(url);
+      audioObj.playbackRate = audioPlaybackRate;
+      activeAudioSource = source;
+
+      var onMetadataReady = function () {
+        if (typeof initialSec === 'number' && initialSec > 0) {
+          try {
+            audioObj.currentTime = Math.min(initialSec, (audioObj.duration || initialSec));
+          } catch (_) {}
+        }
+        if (hasTurn) {
+          highlightTurn(targetTurnIdx);
+        }
+        renderScrubberMarkers();
+      };
+
+      audioObj.addEventListener('loadedmetadata', onMetadataReady, { once: true });
+
+      audioObj.onended = function () {
+        audioPlaying = false;
+        activeAudioSource = null;
+        currentSpeakingTurnIdx = -1;
+        highlightTurn(-1);
+        stopAudioRafSync();
+        syncAudioScrubberAndTurns(audioObj ? audioObj.duration : 0, audioObj ? audioObj.duration : 0);
+        updateAudioUi();
+        safeNotifyMascot('listening-stop');
+      };
+
+      audioObj.onerror = function () {
+        console.warn('[JLPT Audio] Gagal memuat audio ' + source + ':', url);
+        audioPlaying = false;
+        activeAudioSource = null;
+        stopAudioRafSync();
+        updateAudioUi();
+        if (fallbackScript) playJlptSpeech(fallbackScript, source, hasTurn);
+      };
+
+      var playPromise = audioObj.play();
+      if (playPromise !== undefined) {
+        playPromise.then(function () {
+          audioPlaying = true;
+          activeAudioSource = source;
+          replayCount++;
+          updateAudioUi();
+          if (hasTurn) {
+            highlightTurn(targetTurnIdx);
+          }
+          startAudioRafSync();
+          safeNotifyMascot('listening-start');
+        }).catch(function (e) {
+          console.warn('[JLPT Audio] Play error:', e);
+          audioPlaying = false;
+          activeAudioSource = null;
+          stopAudioRafSync();
+          updateAudioUi();
+          safeNotifyMascot('listening-stop');
+        });
+      }
+    } catch (err) {
+      console.warn('[JLPT Audio] Init error:', err);
+      if (fallbackScript) playJlptSpeech(fallbackScript, source, hasTurn);
+    }
+  }
+
+  function playAudioStream(url, source, fallbackScript) {
+    playAudioStreamWithTarget(url, source, fallbackScript, null);
+  }
+
+  function stopJlptAudio(keepHighlight) {
+    stopAudioRafSync();
+    if (!keepHighlight) {
+      pendingSeekSec = null;
+    }
     if (audioObj) {
       try {
         audioObj.pause();
@@ -557,39 +781,188 @@
     }
     audioPlaying = false;
     activeAudioSource = null;
+    if (!keepHighlight) {
+      currentSpeakingTurnIdx = -1;
+      highlightTurn(-1);
+    }
     updateAudioUi();
-    notifyMascot('listening-stop');
+    safeNotifyMascot('listening-stop');
   }
 
-  function playJlptSpeech(text, source) {
+  function playJlptSpeech(text, source, keepHighlight) {
     if (!text) return;
-    stopJlptAudio();
+    if (isExamMode && replayCount >= 1) {
+      if (typeof window !== 'undefined' && window.toast) {
+        window.toast(t('jlpt.exam-audio-once', 'Audio hanya berputar 1 kali dalam mode ujian'));
+      }
+      return;
+    }
+
+    stopJlptAudio(keepHighlight || (currentSpeakingTurnIdx >= 0));
     if (typeof window !== 'undefined' && window.FiezelVoiceSay && typeof window.FiezelVoiceSay.say === 'function') {
       try {
         activeAudioSource = source || 'voice';
         audioPlaying = true;
+        replayCount++;
         updateAudioUi();
-        notifyMascot('listening-start');
+        safeNotifyMascot('listening-start');
         window.FiezelVoiceSay.say(text, { speed: audioPlaybackRate, suppressSubtitles: true })
           .then(function () {
             audioPlaying = false;
             activeAudioSource = null;
             updateAudioUi();
-            notifyMascot('listening-stop');
+            safeNotifyMascot('listening-stop');
           })
           .catch(function () {
             audioPlaying = false;
             activeAudioSource = null;
             updateAudioUi();
-            notifyMascot('listening-stop');
+            safeNotifyMascot('listening-stop');
           });
       } catch (_) {
         audioPlaying = false;
         activeAudioSource = null;
         updateAudioUi();
-        notifyMascot('listening-stop');
+        safeNotifyMascot('listening-stop');
       }
     }
+  }
+
+  function initAudioScrubber() {
+    var track = document.getElementById('jlptScrubTrack');
+    if (!track || track._scrubberBound) return;
+    track._scrubberBound = true;
+
+    function getPercentageFromPointer(e) {
+      var rect = track.getBoundingClientRect();
+      var clientX = e.clientX || (e.touches && e.touches[0].clientX) || 0;
+      var pos = (clientX - rect.left) / (rect.width || 1);
+      return Math.min(1, Math.max(0, pos));
+    }
+
+    function onPointerDown(e) {
+      if (isExamMode) {
+        if (typeof window !== 'undefined' && window.toast) {
+          window.toast(t('jlpt.exam-scrub-locked', 'Pencarian audio dinonaktifkan dalam Mode Ujian'));
+        }
+        return;
+      }
+
+      isScrubbing = true;
+      wasPlayingBeforeScrub = audioPlaying;
+      if (audioPlaying && audioObj) {
+        try { audioObj.pause(); } catch (_) {}
+      }
+
+      try {
+        if (track.setPointerCapture && e.pointerId !== undefined) {
+          track.setPointerCapture(e.pointerId);
+        }
+      } catch (_) {}
+
+      var pct = getPercentageFromPointer(e);
+      updateScrubberPreview(pct);
+
+      window.addEventListener('pointermove', onPointerMove, { passive: false });
+      window.addEventListener('pointerup', onPointerUp);
+      window.addEventListener('pointercancel', onPointerUp);
+    }
+
+    function onPointerMove(e) {
+      if (!isScrubbing) return;
+      if (e.cancelable) e.preventDefault();
+      var pct = getPercentageFromPointer(e);
+      updateScrubberPreview(pct);
+    }
+
+    function onPointerUp(e) {
+      if (!isScrubbing) return;
+      isScrubbing = false;
+
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onPointerUp);
+      window.removeEventListener('pointercancel', onPointerUp);
+
+      try {
+        if (track.releasePointerCapture && e.pointerId !== undefined && track.hasPointerCapture && track.hasPointerCapture(e.pointerId)) {
+          track.releasePointerCapture(e.pointerId);
+        }
+      } catch (_) {}
+
+      var pct = getPercentageFromPointer(e);
+      var duration = (audioObj && audioObj.duration && isFinite(audioObj.duration)) ? audioObj.duration : 0;
+      var targetSec = pct * duration;
+
+      if (audioObj) {
+        try { audioObj.currentTime = targetSec; } catch (_) {}
+        if (wasPlayingBeforeScrub) {
+          var p = audioObj.play();
+          if (p && typeof p.catch === 'function') p.catch(function () {});
+          audioPlaying = true;
+          startAudioRafSync();
+        } else {
+          syncAudioScrubberAndTurns(targetSec, duration);
+        }
+      } else {
+        var qs = getFilteredQuestions();
+        var q = (qs && qs[curIndex]) ? qs[curIndex] : null;
+        if (q) {
+          var url = q.aiAudioUrl || q.audioUrl || ('./features/speaking-listening/audio-jlpt/' + q.id + '.mp3');
+          var fallback = q.scriptJapanese || q.script || '';
+          playAudioStreamWithTarget(url, 'primary', fallback, targetSec);
+        }
+      }
+      updateAudioUi();
+    }
+
+    function updateScrubberPreview(pct) {
+      var fillEl = document.getElementById('jlptScrubFill');
+      var thumbEl = document.getElementById('jlptScrubThumb');
+      var curEl = document.getElementById('jlptScrubTimeCur');
+      var duration = (audioObj && audioObj.duration && isFinite(audioObj.duration)) ? audioObj.duration : 0;
+      var curSec = pct * duration;
+
+      if (fillEl) fillEl.style.width = (pct * 100) + '%';
+      if (thumbEl) thumbEl.style.left = (pct * 100) + '%';
+      if (curEl) curEl.textContent = formatMmSs(curSec);
+
+      var qs = getFilteredQuestions();
+      if (qs && qs[curIndex]) {
+        var timestamps = qs[curIndex].turnTimestamps || [];
+        for (var i = 0; i < timestamps.length; i++) {
+          var start = timestamps[i];
+          var next = (i < timestamps.length - 1) ? timestamps[i + 1] : (duration || 9999);
+          if (curSec >= start && curSec < next) {
+            highlightTurn(i);
+            break;
+          }
+        }
+      }
+    }
+
+    track.addEventListener('pointerdown', onPointerDown);
+  }
+
+  function renderScrubberMarkers() {
+    var markersEl = document.getElementById('jlptScrubMarkers');
+    if (!markersEl) return;
+    markersEl.innerHTML = '';
+
+    var qs = getFilteredQuestions();
+    if (!qs || !qs[curIndex]) return;
+    var q = qs[curIndex];
+    var timestamps = q.turnTimestamps || [];
+    var duration = (audioObj && audioObj.duration && isFinite(audioObj.duration)) ? audioObj.duration : 0;
+    if (!duration || timestamps.length === 0) return;
+
+    timestamps.forEach(function (sec, idx) {
+      var pct = Math.min(100, Math.max(0, (sec / duration) * 100));
+      var dot = document.createElement('div');
+      dot.className = 'jlpt-scrub-marker-dot';
+      dot.style.left = pct + '%';
+      dot.setAttribute('title', 'Giliran ' + (idx + 1) + ' (' + formatMmSs(sec) + ')');
+      markersEl.appendChild(dot);
+    });
   }
 
   function playAudioStream(url, source, fallbackScript) {
@@ -626,7 +999,7 @@
         currentSpeakingTurnIdx = -1;
         highlightTurn(-1);
         updateAudioUi();
-        notifyMascot('listening-stop');
+        safeNotifyMascot('listening-stop');
       };
 
       audioObj.onerror = function () {
@@ -666,13 +1039,13 @@
           activeAudioSource = source;
           replayCount++;
           updateAudioUi();
-          notifyMascot('listening-start');
+          safeNotifyMascot('listening-start');
         }).catch(function (e) {
           console.warn('[JLPT Audio] Play error:', e);
           audioPlaying = false;
           activeAudioSource = null;
           updateAudioUi();
-          notifyMascot('listening-stop');
+          safeNotifyMascot('listening-stop');
           if (fallbackScript) playJlptSpeech(fallbackScript, source);
         });
       }
@@ -721,12 +1094,155 @@
     }
   }
 
-  function selectJlptChoice(optId, correctOptId) {
+  var JLPT_DISTRACTOR_KB = {
+    'jlpt-n5-m1-04': {
+      1: 'Ibu menegaskan payung biru rusak (こわれている) dan menyuruh memakai payung hitam.',
+      2: 'Cuaca mendung dan akan turun hujan; ibu menyuruh membawa payung, bukan meninggalkannya.',
+      3: 'Payung putih tidak pernah disebutkan dalam percakapan janji cuaca ini.'
+    },
+    'jlpt-n5-m2-01': {
+      1: 'Pria sempat menduga sibuk bekerja, namun Tanaka membantah dan menegaskan ia sakit kepala.',
+      3: 'Tanaka tidak lupa acara pesta; ia ingat tetapi terpaksa beristirahat di rumah karena sakit kepala.',
+      4: 'Teman datang ke rumah sama sekali bukan alasan yang disebutkan dalam dialog.'
+    },
+    'jlpt-n5-m2-02': {
+      1: 'Kunci tidak berada di atas meja melainkan terjatuh di lantai dekat tempat duduk.',
+      2: 'Pria sempat memeriksa tasnya tetapi kunci tidak ada di dalam tas.',
+      4: 'Area depan pintu tidak pernah disebutkan sebagai lokasi penemuan kunci.'
+    },
+    'jlpt-n5-m2-03': {
+      1: 'Pukul 09:00 bukan jam mulai kelas pagi yang dipilih murid.',
+      2: 'Pukul 18:30 (6時半) adalah jadwal kelas malam, bukan kelas pagi yang dipilih.',
+      3: 'Pukul 11:30 adalah waktu kelas pagi selesai (おわります), bukan waktu mulai.'
+    },
+    'jlpt-n5-m2-04': {
+      1: 'Wanita menolak kopi karena jarang meminumnya (あまり のまない).',
+      2: 'Teh hijau tidak dipilih oleh wanita.',
+      4: 'Air putih bukan minuman yang disepakati untuk dipesan.'
+    },
+    'jlpt-n5-m3-01': {
+      2: '"じゃあ、また" adalah ungkapan berpamitan/sampai jumpa, bukan saat memasuki ruangan.',
+      3: '"ごちそうさまでした" diucapkan setelah selesai makan, bukan saat bertamu/masuk ruangan.'
+    },
+    'jlpt-n5-m3-02': {
+      1: '"ただいま" diucapkan oleh orang yang baru pulang ke rumah, bukan yang berangkat keluar.',
+      3: '"おかえりなさい" diucapkan oleh orang di rumah menyambut yang pulang, bukan yang pergi.'
+    },
+    'jlpt-n5-m3-03': {
+      2: '"いただきます" diucapkan oleh penerima sebelum makan/menerima sesuatu, bukan oleh pemberi.',
+      3: '"どういたしまして" diucapkan membalas terima kasih, bukan saat menyerahkan kado.'
+    },
+    'jlpt-n5-m4-01': {
+      2: '"どういたしまして" untuk membalas terima kasih, bukan menyetujui ucapan cuaca dingin.',
+      3: '"さようなら" untuk berpisah/selamat tinggal, tidak sesuai untuk percakapan santai di tempat.'
+    },
+    'jlpt-n5-m4-02': {
+      1: '"あそこです" menjawab lokasi (di mana), padahal pertanyaan menanyakan kepemilikan (だれのかさ).',
+      3: '"いいえ、ちがいます" tidak menjawab pertanyaan siapa pemilik payung tersebut.'
+    },
+    'jlpt-n5-m4-03': {
+      2: 'Bentuk lampau "のみました" tidak cocok untuk merespons ajakan minum teh bersama saat ini.',
+      3: '"はい、おちゃです" hanya menyebutkan nama benda tanpa menyambut ajakan minum.'
+    },
+    'jlpt-n5-m4-04': {
+      1: '"あしたです" menjawab waktu (kapan), bukan menjawab kesan tes yang sudah lewat (どうでしたか).',
+      3: '"きょうしつに あります" menjawab keberadaan benda, bukan pengalaman mengikuti ujian.'
+    },
+    'jlpt-n4-m1-01': {
+      1: 'Manajer menegaskan meja sudah dilap sebelumnya (テーブルは もう ふいたよ).',
+      2: 'Menata menu dilakukan setelah menyiapkan gelas air minum di konter.',
+      4: 'Membuka pintu restoran adalah langkah terakhir setelah semua persiapan selesai.'
+    },
+    'jlpt-n4-m1-02': {
+      2: 'Obat merah diminum pagi dan malam hari saja, bukan siang hari.',
+      3: 'Obat merah tidak boleh diminum siang hari; hanya obat putih yang diminum 3 kali sehari.',
+      4: 'Dokter mewajibkan obat putih tetap diminum setelah makan siang.'
+    },
+    'jlpt-n4-m1-03': {
+      1: 'Kereta tokkyuu memerlukan biaya tiket ekspres tambahan yang ingin dihindari penumpang.',
+      2: 'Bus memerlukan waktu perjalanan terlalu lama dan ditolak oleh penumpang.',
+      3: 'Taksi tidak dipilih karena biayanya mahal dan sudah ada kereta cepat.'
+    },
+    'jlpt-n4-m1-04': {
+      1: 'Membeli kue dan camilan didelegasikan kepada rekan pria, bukan wanita.',
+      2: 'Membeli minuman baru akan dilakukan setelah kartu ucapan terkumpul.',
+      4: 'Membersihkan ruang rapat dilakukan nanti menjelang acara dimulai.'
+    },
+    'jlpt-n4-m2-01': {
+      1: 'Yamada menegaskan ia bangun tepat waktu dan tidak bangun kesiangan.',
+      3: 'Yamada tidak salah menaiki armada bus.',
+      4: 'Yamada sudah hafal jalur perjalanan dan tidak tersesat di jalan.'
+    },
+    'jlpt-n4-m2-02': {
+      1: 'Pria menganggap alur cerita film tersebut biasa saja dan mudah ditebak.',
+      2: 'Adegan aksinya dinilai lumayan, namun aspek musik latarnya yang paling membuatnya kagum.',
+      4: 'Kursi bioskop hanya fasilitas gedung bioskop, bukan bagian dari karya film.'
+    },
+    'jlpt-n4-m2-03': {
+      1: 'Kuil Kiyomizudera sempat dikunjungi paling awal di pagi hari.',
+      2: 'Wanita kehabisan waktu sehingga ada kuil yang batal dikunjungi.',
+      3: 'Kuil Fushimi Inari sempat dikunjungi pada siang hari.'
+    },
+    'jlpt-n4-m2-04': {
+      1: 'John menganggap tata bahasa bahasa Jepang menarik dan tidak terlalu menyulitkannya.',
+      2: 'Percakapan (kaiwa) adalah kemampuan yang paling disenangi dan sering dilatih oleh John.',
+      4: 'Mendengarkan memang menantang, tetapi menghafal kanji dinilai paling berat.'
+    },
+    'jlpt-n4-m3-01': {
+      1: 'Kalimat ini menyuruh atasan pulang, bukan meminta izin bagi diri sendiri.',
+      3: 'Kalimat bernada menuntut yang sangat tidak sopan digunakan kepada atasan/manajer.'
+    },
+    'jlpt-n4-m3-02': {
+      1: 'Terlalu kasar dan blak-blakan untuk menolak ajakan rekan kerja.',
+      3: 'Sangat konfrontatif dan melanggar kesantunan percakapan dalam budaya Jepang.'
+    },
+    'jlpt-n4-m3-03': {
+      2: '"いただきます" diucapkan sebelum mulai makan, bukan saat selesai dan keluar restoran.',
+      3: '"おねがいします" adalah permohonan tolong, bukan ungkapan apresiasi traktir makan.'
+    },
+    'jlpt-n4-m4-01': {
+      2: 'Menolak tawaran bantuan secara kaku dan tidak wajar dalam etika Jepang.',
+      3: '"どういたしまして" digunakan untuk membalas ucapan terima kasih, bukan tawaran bantuan.'
+    },
+    'jlpt-n4-m4-02': {
+      1: '"きのうだったよ" merujuk waktu lampau kemarin, padahal rapat dijadwalkan hari ini.',
+      2: '"かいぎしつだよ" menjawab tempat (di mana), bukan menjawab jam berapa rapat dimulai.'
+    },
+    'jlpt-n4-m4-03': {
+      1: '"はい、いっぱいです" ambigu dan tidak sopan untuk menolak tawaran tambah minum.',
+      3: '"ごちそうさまでした" digunakan saat pamit usai makan, bukan merespons tawaran minum.'
+    },
+    'jlpt-n4-m4-04': {
+      2: '"はい、おしえました" berbentuk lampau (sudah memberi tahu), tidak menjawab pertanyaan saat ini.',
+      3: '"いいえ、わかりません" terlalu kaku dan tidak informatif dalam memberikan petunjuk arah.'
+    }
+  };
+
+  function resolveWhyFails(q, chosenOpt, optId, correctOptId) {
+    if (!q || optId === correctOptId || optId <= 0) return '';
+    if (chosenOpt && typeof chosenOpt === 'object' && chosenOpt.whyFails) {
+      return String(chosenOpt.whyFails).trim();
+    }
+    var qId = q.id || q.itemId || '';
+    if (qId && JLPT_DISTRACTOR_KB[qId] && JLPT_DISTRACTOR_KB[qId][optId]) {
+      return JLPT_DISTRACTOR_KB[qId][optId];
+    }
+    if (q.explain || q.explanation) {
+      var exp = q.explain || q.explanation;
+      var regex = new RegExp('(?:Pilihan|Opsi)\\s*' + optId + '[^.]*\\.', 'i');
+      var m = exp.match(regex);
+      if (m && m[0]) return m[0].trim();
+      return 'Bukan pilihan yang tepat berdasarkan keputusan akhir para tokoh dalam percakapan.';
+    }
+    return 'Opsi ini tidak sesuai dengan kesimpulan dan arahan tokoh dalam dialog audio.';
+  }
+
+  function submitAnswer(optId, correctOptId) {
     if (selectedChoice !== null) return;
     selectedChoice = optId;
 
-    // Hentikan audio seketika saat murid menjawab
     stopJlptAudio();
+    stopExamTimer();
 
     var qs = getFilteredQuestions();
     var q = (qs && qs[curIndex]) ? qs[curIndex] : null;
@@ -756,14 +1272,23 @@
     var isRight = (optId === correctOptId);
     if (isRight) {
       if (window.uiSfx) { try { window.uiSfx('correct'); } catch (_) {} }
-      notifyMascot('correct');
+      safeNotifyMascot('correct');
     } else {
       if (window.uiSfx) { try { window.uiSfx('wrong'); } catch (_) {} }
-      notifyMascot('wrong');
+      safeNotifyMascot('wrong');
     }
 
-    // Braincore Engine Authority & Zero-Dumbing Invariant:
-    // Alirkan bukti penguasaan nyata ke model murid (updateMastery, BKT, history)
+    var chosenOpt = (q && q.options) ? q.options.find(function (o, idx) {
+      var id = (typeof o === 'object' && o.id !== undefined) ? o.id : (idx + 1);
+      return id === optId;
+    }) : null;
+    var correctOpt = (q && q.options) ? q.options.find(function (o, idx) {
+      var id = (typeof o === 'object' && o.id !== undefined) ? o.id : (idx + 1);
+      return id === correctOptId;
+    }) : null;
+
+    var whyFailsNote = isRight ? '' : resolveWhyFails(q, chosenOpt, optId, correctOptId);
+
     if (typeof window !== 'undefined') {
       var itemKey = (q && (q.id || q.itemId)) || ('jlpt_' + curLevel.toLowerCase() + '_' + curIndex);
       var latencyMs = 6000;
@@ -784,9 +1309,18 @@
             options: q && q.options ? q.options : [],
             answerIndex: (correctOptId - 1)
           };
-          recordFn(fakeQ, isRight, latencyMs, optId - 1);
+          recordFn(fakeQ, isRight, latencyMs, optId > 0 ? (optId - 1) : null);
         } catch (_) {}
-      } else if (typeof window.__getFiezelState === 'function') {
+      }
+
+      var chosenLabel = chosenOpt ?
+        ((chosenOpt.text || '') + (chosenOpt.textId ? ' (' + chosenOpt.textId + ')' : '')) :
+        (optId === -1 ? '(Waktu Habis)' : ('Pilihan ' + optId));
+      var correctLabel = correctOpt ?
+        ((correctOpt.text || '') + (correctOpt.textId ? ' (' + correctOpt.textId + ')' : '')) :
+        ('Pilihan ' + correctOptId);
+
+      if (typeof window.__getFiezelState === 'function') {
         try {
           var s = window.__getFiezelState();
           if (s && Array.isArray(s.history)) {
@@ -806,13 +1340,21 @@
               ok: isRight,
               ms: latencyMs,
               confidence: null,
-              selectedIndex: optId - 1,
-              selectedAnswer: 'Pilihan ' + optId,
-              correctAnswer: 'Pilihan ' + correctOptId,
-              errorTag: 'jlpt_listening',
+              selectedIndex: optId > 0 ? (optId - 1) : null,
+              selectedChoice: optId,
+              selectedAnswer: chosenLabel,
+              correctAnswer: correctLabel,
+              errorTag: isRight ? null : (whyFailsNote ? 'distractor_misconception' : 'jlpt_listening'),
+              whyFails: isRight ? null : whyFailsNote,
               at: now
             });
             if (s.history.length > 1000) s.history.shift();
+
+            if (typeof window.saveState === 'function') {
+              try { window.saveState(); } catch (_) {}
+            } else {
+              try { localStorage.setItem('fiezel_state', JSON.stringify(s)); } catch (_) {}
+            }
           }
         } catch (_) {}
       }
@@ -834,7 +1376,6 @@
       }
     }
 
-    // Tampilkan terjemahan opsi dan soal di kartu begitu soal sudah terjawab
     var optTexts = document.querySelectorAll('.jlpt-opt-texts');
     if (q && Array.isArray(q.options) && optTexts) {
       optTexts.forEach(function (el, idx) {
@@ -856,27 +1397,68 @@
       qBlock.appendChild(qIdP);
     }
 
-    // Refresh feedback and highlight sheet button
-    renderFeedbackBanner(isRight, correctOptId);
+    renderFeedbackBanner(isRight, correctOptId, optId, whyFailsNote);
     var sheetTrigger = document.getElementById('jlptSheetTriggerBtn');
     if (sheetTrigger) {
       sheetTrigger.classList.add('pulse-hint');
     }
 
-    // Populate bottom sheet so it is ready
     if (qs && qs[curIndex]) {
       populateDetailSheet(qs[curIndex], correctOptId);
     }
   }
 
-  function renderFeedbackBanner(isRight, correctOptId) {
+  function selectJlptChoice(optId, correctOptId) {
+    return submitAnswer(optId, correctOptId);
+  }
+
+  function renderFeedbackBanner(isRight, correctOptId, optId, whyFails) {
     var container = document.getElementById('jlptFeedbackSlot');
     if (!container) return;
-    var cls = isRight ? 'jlpt-feedback-banner correct' : 'jlpt-feedback-banner wrong';
-    var icon = isRight ? '✓' : '✗';
-    var title = isRight ? t('jlpt.correct-title', 'Jawaban Tepat!') : t('jlpt.wrong-title', 'Belum Tepat');
-    var sub = isRight ? 'Pemahaman dialog akurat.' : ('Kunci jawaban: Pilihan ' + correctOptId);
+
     var qs = getFilteredQuestions();
+    var q = (qs && qs[curIndex]) ? qs[curIndex] : null;
+    var chosenId = (optId !== undefined && optId !== null) ? optId : selectedChoice;
+    var isTimeout = (chosenId === -1);
+
+    var chosenOpt = (q && q.options) ? q.options.find(function (o, idx) {
+      var id = (typeof o === 'object' && o.id !== undefined) ? o.id : (idx + 1);
+      return id === chosenId;
+    }) : null;
+    var correctOpt = (q && q.options) ? q.options.find(function (o, idx) {
+      var id = (typeof o === 'object' && o.id !== undefined) ? o.id : (idx + 1);
+      return id === correctOptId;
+    }) : null;
+
+    var chosenText = chosenOpt ?
+      ((chosenOpt.text || '') + (chosenOpt.textId ? ' (' + chosenOpt.textId + ')' : '')) :
+      (isTimeout ? t('jlpt.timeout-label', 'Waktu Habis / Tidak Memilih') : ('Pilihan ' + chosenId));
+    var correctText = correctOpt ?
+      ((correctOpt.text || '') + (correctOpt.textId ? ' (' + correctOpt.textId + ')' : '')) :
+      ('Pilihan ' + correctOptId);
+
+    var failReason = whyFails || (!isRight ? resolveWhyFails(q, chosenOpt, chosenId, correctOptId) : '');
+
+    var cls = isRight ? 'jlpt-feedback-banner correct' : 'jlpt-feedback-banner wrong';
+    var icon = isRight ? '✓' : (isTimeout ? '⏱' : '✗');
+    var title = isRight ? t('jlpt.correct-title', 'Jawaban Tepat!') : (isTimeout ? t('jlpt.timeout-title', 'Waktu Habis!') : t('jlpt.wrong-title', 'Belum Tepat'));
+
+    var subHtml = '';
+    if (isRight) {
+      subHtml =
+        '<div class="jlpt-fb-chosen"><b>' + t('jlpt.your-choice', 'Pilihan Anda:') + '</b> ' + escapeHtml(t('jlpt.choice-prefix', 'Pilihan ') + correctOptId + ': ' + chosenText) + '</div>' +
+        '<div class="jlpt-fb-note" style="margin-top:2px;color:#15803D;">' + t('jlpt.correct-desc', 'Pemahaman dialog akurat.') + '</div>';
+    } else if (isTimeout) {
+      subHtml =
+        '<div class="jlpt-fb-chosen" style="color:#991B1B;"><b>' + t('jlpt.status-label', 'Status:') + '</b> ' + t('jlpt.timeout-desc', 'Waktu menjawab habis sebelum memilih opsi.') + '</div>' +
+        '<div class="jlpt-fb-key" style="margin-top:2px;"><b>' + t('jlpt.key-title', 'Kunci Jawaban:') + '</b> ' + escapeHtml(t('jlpt.choice-prefix', 'Pilihan ') + correctOptId + ': ' + correctText) + '</div>';
+    } else {
+      subHtml =
+        '<div class="jlpt-fb-chosen" style="color:#991B1B;"><b>' + t('jlpt.your-choice', 'Pilihan Anda:') + '</b> ' + escapeHtml(t('jlpt.choice-prefix', 'Pilihan ') + chosenId + ': ' + chosenText) + '</div>' +
+        (failReason ? ('<div class="jlpt-fb-why" style="margin-top:2px;color:#B91C1C;font-size:10px;line-height:1.25;"><b>' + t('jlpt.analysis-prefix', '⚠️ Analisis:') + '</b> ' + escapeHtml(failReason) + '</div>') : '') +
+        '<div class="jlpt-fb-key" style="margin-top:2px;"><b>' + t('jlpt.key-title', 'Kunci Jawaban:') + '</b> ' + escapeHtml(t('jlpt.choice-prefix', 'Pilihan ') + correctOptId + ': ' + correctText) + '</div>';
+    }
+
     var isLast = (curIndex >= qs.length - 1);
 
     container.innerHTML =
@@ -885,7 +1467,7 @@
           '<span class="jlpt-fb-badge" aria-hidden="true">' + icon + '</span>' +
           '<div class="jlpt-fb-text-col">' +
             '<div class="jlpt-fb-title">' + title + '</div>' +
-            '<div class="jlpt-fb-sub">' + sub + '</div>' +
+            '<div class="jlpt-fb-sub">' + subHtml + '</div>' +
           '</div>' +
         '</div>' +
         '<div class="jlpt-fb-actions">' +
@@ -1020,7 +1602,7 @@
       var id = (typeof o === 'object' && o.id !== undefined) ? o.id : (idx + 1);
       return id === selectedChoice;
     });
-    var distractorNote = (chosenOpt && typeof chosenOpt === 'object' && chosenOpt.whyFails) ? chosenOpt.whyFails : '';
+    var distractorNote = resolveWhyFails(q, chosenOpt, selectedChoice, correctOptId);
     var distractorHtml = (distractorNote && selectedChoice !== correctOptId) ? (
       '<div class="jlpt-explain-distractor-card" style="margin-top:10px;background:#FFF1F2;border:1px solid #FECDD3;border-radius:10px;padding:9px 12px;font-size:12px;color:#9F1239;line-height:1.45;">' +
         '<b>⚠️ Analisis Pilihan ' + selectedChoice + ':</b> ' + escapeHtml(distractorNote) +
@@ -1128,50 +1710,155 @@
   }
 
   function initSheetPullDrag(sheetEl) {
-    var handleZone = sheetEl.querySelector('#jlptSheetHandleZone');
-    var container = sheetEl.querySelector('#jlptSheetContainer');
-    if (!handleZone || !container) return;
+    if (!sheetEl || sheetEl._dragInitialized) return;
+    sheetEl._dragInitialized = true;
+
+    var handleZone = sheetEl.querySelector('#jlptSheetHandleZone') || sheetEl.querySelector('.jlpt-sheet-handle-zone');
+    var headerZone = sheetEl.querySelector('.jlpt-sheet-header') || sheetEl.querySelector('.jlpt-sheet-head');
+    var container = sheetEl.querySelector('#jlptSheetContainer') || sheetEl.querySelector('.jlpt-sheet-container');
+    var backdrop = sheetEl.querySelector('#jlptSheetBackdrop') || sheetEl.querySelector('.jlpt-sheet-backdrop');
+    var scrollBody = sheetEl.querySelector('.jlpt-sheet-content') || sheetEl.querySelector('.jlpt-sheet-body');
+    if (!container) return;
 
     var startY = 0;
+    var lastY = 0;
+    var lastTime = 0;
+    var velocityY = 0;
     var isDragging = false;
+    var pointerId = null;
+    var currentSnap = 'full';
 
-    function onStart(e) {
-      isDragging = true;
-      startY = e.clientY || (e.touches && e.touches[0].clientY) || 0;
-      container.style.transition = 'none';
-      window.addEventListener('pointermove', onMove, { passive: false });
-      window.addEventListener('pointerup', onEnd);
-      window.addEventListener('pointercancel', onEnd);
+    function getSnapOffsets() {
+      var vh = window.innerHeight;
+      return {
+        full: 0,
+        half: Math.round(vh * 0.44),
+        dismissThreshold: Math.round(vh * 0.28)
+      };
     }
 
-    function onMove(e) {
+    function onPointerDown(e) {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      if (e.target.closest('button, a, input, select, textarea, [role="tab"]')) return;
+
+      isDragging = true;
+      pointerId = e.pointerId;
+      startY = e.clientY || (e.touches && e.touches[0].clientY) || 0;
+      lastY = startY;
+      lastTime = performance.now();
+      velocityY = 0;
+
+      container.style.transition = 'none';
+      if (backdrop) backdrop.style.transition = 'none';
+
+      try {
+        if (handleZone && handleZone.setPointerCapture && pointerId !== null) {
+          handleZone.setPointerCapture(pointerId);
+        }
+      } catch (_) {}
+
+      window.addEventListener('pointermove', onPointerMove, { passive: false });
+      window.addEventListener('pointerup', onPointerUp);
+      window.addEventListener('pointercancel', onPointerUp);
+    }
+
+    function onPointerMove(e) {
       if (!isDragging) return;
+
       var y = e.clientY || (e.touches && e.touches[0].clientY) || 0;
-      var dy = y - startY;
-      if (dy > 0) {
-        if (e.cancelable) e.preventDefault();
-        container.style.transform = 'translateY(' + dy + 'px)';
+      var now = performance.now();
+      var dt = Math.max(1, now - lastTime);
+      var dyRaw = y - lastY;
+      velocityY = dyRaw / dt;
+      lastY = y;
+      lastTime = now;
+
+      var totalDy = y - startY;
+      var snaps = getSnapOffsets();
+      var baseOffset = (currentSnap === 'half') ? snaps.half : 0;
+      var targetY = baseOffset + totalDy;
+
+      if (targetY < 0) {
+        targetY = targetY * 0.25;
+      }
+
+      if (e.cancelable) e.preventDefault();
+      container.style.transform = 'translateY(' + targetY + 'px)';
+
+      if (backdrop) {
+        var screenH = window.innerHeight || 800;
+        var progress = Math.max(0, Math.min(1, 1 - (targetY / (screenH * 0.85))));
+        backdrop.style.opacity = progress.toFixed(3);
       }
     }
 
-    function onEnd(e) {
+    function onPointerUp(e) {
       if (!isDragging) return;
       isDragging = false;
-      window.removeEventListener('pointermove', onMove);
-      window.removeEventListener('pointerup', onEnd);
-      window.removeEventListener('pointercancel', onEnd);
 
-      var y = e.clientY || (e.changedTouches && e.changedTouches[0].clientY) || 0;
-      var dy = y - startY;
-      container.style.transition = 'transform 0.24s cubic-bezier(0.16, 1, 0.3, 1)';
-      if (dy > 65) {
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onPointerUp);
+      window.removeEventListener('pointercancel', onPointerUp);
+
+      try {
+        if (handleZone && handleZone.releasePointerCapture && pointerId !== null) {
+          handleZone.releasePointerCapture(pointerId);
+        }
+      } catch (_) {}
+
+      var y = e.clientY || (e.changedTouches && e.changedTouches[0].clientY) || lastY;
+      var totalDy = y - startY;
+      var snaps = getSnapOffsets();
+      var baseOffset = (currentSnap === 'half') ? snaps.half : 0;
+      var finalY = baseOffset + totalDy;
+
+      var projectedDist = velocityY * 160;
+      var projectedY = finalY + projectedDist;
+
+      container.style.transition = 'transform 0.32s cubic-bezier(0.175, 0.885, 0.32, 1.15)';
+      if (backdrop) {
+        backdrop.style.transition = 'opacity 0.24s cubic-bezier(0.16, 1, 0.3, 1)';
+        backdrop.style.opacity = '';
+      }
+
+      if (velocityY > 0.65 || projectedY > (window.innerHeight * 0.65) || (currentSnap === 'half' && totalDy > 70)) {
+        currentSnap = 'full';
         closeJlptDetailSheet();
+      } else if (projectedY > snaps.half * 0.6) {
+        currentSnap = 'half';
+        container.style.transform = 'translateY(' + snaps.half + 'px)';
+        container.classList.add('snap-half');
+        container.classList.remove('snap-full');
       } else {
+        currentSnap = 'full';
         container.style.transform = 'translateY(0)';
+        container.classList.add('snap-full');
+        container.classList.remove('snap-half');
       }
     }
 
-    handleZone.addEventListener('pointerdown', onStart);
+    if (handleZone) {
+      handleZone.addEventListener('pointerdown', onPointerDown);
+    }
+    if (headerZone) {
+      headerZone.addEventListener('pointerdown', onPointerDown);
+    }
+
+    if (scrollBody) {
+      var touchStartY = 0;
+      scrollBody.addEventListener('touchstart', function (e) {
+        touchStartY = e.touches[0].clientY;
+      }, { passive: true });
+
+      scrollBody.addEventListener('touchmove', function (e) {
+        if (scrollBody.scrollTop <= 0) {
+          var touchY = e.touches[0].clientY;
+          if (touchY - touchStartY > 24 && !isDragging) {
+            onPointerDown(e.touches[0]);
+          }
+        }
+      }, { passive: true });
+    }
   }
 
   function populateDetailSheet(q, correctOptId) {
@@ -1202,24 +1889,22 @@
   }
 
   function openJlptDetailSheet(tabName) {
-    if (isExamMode) {
-      if (typeof window !== 'undefined' && window.toast) {
-        window.toast(t('jlpt.exam-locked-note', 'Naskah Terkunci (Mode Ujian)'));
-      }
-      return;
-    }
+    var qs = getFilteredQuestions();
+    if (!qs || !qs[curIndex]) return;
+    var q = qs[curIndex];
+
     var sheet = ensureDetailSheet();
     if (!sheet) return;
 
-    var qs = getFilteredQuestions();
-    if (qs && qs[curIndex]) {
-      var q = qs[curIndex];
-      var correctOptId = (q.answerIndex !== undefined ? q.answerIndex + 1 : (q.correct_answer || 1));
-      populateDetailSheet(q, correctOptId);
-    }
+    var correctOptId = (q.answerIndex !== undefined && q.options && q.options[q.answerIndex])
+      ? (q.options[q.answerIndex].id || (q.answerIndex + 1))
+      : 1;
+    populateDetailSheet(q, correctOptId);
 
     sheet.classList.add('open');
     sheet.setAttribute('aria-hidden', 'false');
+    var modalEl = document.getElementById('listeningPanelModal') || document.querySelector('.listening-modal');
+    if (modalEl) modalEl.classList.add('sheet-open');
     if (!sheetOpen) {
       try {
         self.FiezelBackNav && self.FiezelBackNav.pushLayer && self.FiezelBackNav.pushLayer({
@@ -1242,6 +1927,8 @@
       var container = sheet.querySelector('#jlptSheetContainer');
       if (container) container.style.transform = '';
     }
+    var modalEl = document.getElementById('listeningPanelModal') || document.querySelector('.listening-modal');
+    if (modalEl) modalEl.classList.remove('sheet-open');
     if (sheetOpen) {
       try { self.FiezelBackNav && self.FiezelBackNav.dismiss && self.FiezelBackNav.dismiss('jlpt-sheet'); } catch (_) {}
     }
@@ -1536,6 +2223,8 @@
     if (curIndex > 0) {
       curIndex--;
       selectedChoice = null;
+      replayCount = 0;
+      currentSpeakingTurnIdx = -1;
       closeJlptDetailSheet();
       stopJlptAudio();
       renderListeningQuestion(animClass || 'slide-in-left');
@@ -1547,6 +2236,8 @@
     if (curIndex < qs.length - 1) {
       curIndex++;
       selectedChoice = null;
+      replayCount = 0;
+      currentSpeakingTurnIdx = -1;
       closeJlptDetailSheet();
       stopJlptAudio();
       renderListeningQuestion(animClass || 'slide-in-right');
@@ -1753,7 +2444,7 @@
     // Pre-populate bottom sheet with current item
     populateDetailSheet(q, correctOptId);
     updateAudioUi();
-    notifyMascot('question-shown');
+    safeNotifyMascot('question-shown');
   }
 
   // Filter Sheet Modal Toggles
@@ -1836,6 +2527,8 @@
   window.nextListeningQuestion = nextListeningQuestion;
   window.setJlptScriptMode = setJlptScriptMode;
   window.toggleJlptExamMode = toggleJlptExamMode;
+  window.submitAnswer = submitAnswer;
+  window.renderFeedbackBanner = renderFeedbackBanner;
   window.seekToJlptTurn = seekToJlptTurn;
 
   window.FiezelJlptListening = {

@@ -1,7 +1,7 @@
 {
-  "version": "m025-618",
-  "claimedBy": "branch fix/chat-punctuation-pause-m025-618",
-  "claimedAt": "2026-10-19T21:10:47.091Z",
-  "reason": "fix(chat): hilangkan jeda tanda baca, variasi fallback coaching, dan deteksi SVA noun phrase",
+  "version": "m025-619",
+  "claimedBy": "branch feat/jlpt-chokai-audit-redesign-m025-617",
+  "claimedAt": "2026-10-19T21:34:17.946Z",
+  "reason": "feat(jlpt): audit bank soal chokai, whyFails braincore, dan redesign split-view multidevice",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
