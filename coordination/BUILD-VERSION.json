@@ -1,7 +1,7 @@
 {
-  "version": "m025-613",
-  "claimedBy": "branch feat/jlpt-chokai-elevenlabs-interactive",
-  "claimedAt": "2026-10-19T17:40:07.279Z",
-  "reason": "feat(android): pulihkan ikon resmi OG FIEZEL dan sempurnakan adaptive launcher",
+  "version": "m025-614",
+  "claimedBy": "tidak tercatat (jalankan ulang di dalam git, atau set FIEZEL_BUILD_CLAIMER)",
+  "claimedAt": "2026-10-19T17:44:38.115Z",
+  "reason": "bot(heal): auto-synchronize release boundary",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
