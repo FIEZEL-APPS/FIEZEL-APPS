@@ -526,8 +526,8 @@ const server = http.createServer(async (req, res) => {
     });
   }
 
-  if (pathname === '/') {
-    pathname = '/kurikulum.html';
+  if (pathname === '/' || pathname === '') {
+    pathname = '/index.html';
   }
 
   const safePath = path.normalize(pathname).replace(/^(\.\.[/\\])+/, '');
