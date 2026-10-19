@@ -161,8 +161,13 @@ async def synthesize_edge_tts(text: str, voice_name: str, pitch: str = "+0Hz", r
         "Origin": "chrome-extension://jdiccldimpdaibmpdkjnbmckianbfold",
     }
     timeout = aiohttp.ClientTimeout(total=15)
-    audio_data = bytearray()
-    escaped_text = xml.sax.saxutils.escape(text.strip())
+    import re
+    # Haluskan elipsis dan tanda baca berulang agar Edge TTS tidak menimbulkan jeda hening beku
+    cleaned = re.sub(r'\.{2,}|…|‥', ', ', text.strip())
+    cleaned = re.sub(r'([?!])\1+', r'\1', cleaned)
+    cleaned = re.sub(r'\?!|!\?', '?', cleaned)
+    cleaned = re.sub(r',(\s*,)+', ',', cleaned)
+    escaped_text = xml.sax.saxutils.escape(cleaned)
 
     async with aiohttp.ClientSession(timeout=timeout) as session:
         async with session.ws_connect(url, headers=headers) as ws:

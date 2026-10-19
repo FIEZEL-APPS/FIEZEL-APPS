@@ -37,7 +37,7 @@
   // Kalimat pembuka pendek ("Hello!", "Hi there!", "Got it!", "こんにちは！") berdiri sendiri
   // dan diucapkan seketika (<250ms). Interjeksi mikro (<6 karakter: "Oh!", "いいね！") tetap digabung
   // ke kalimat berikutnya agar ucapan tidak tersendat.
-  var MIN_CHUNK_CHARS = 6;
+  var MIN_CHUNK_CHARS = 10;
   var token = 0;
   // Mesin Puter untuk ja-JP yang terbukti menjawab di sesi ini ('generative' / 'neural').
   var jaEngine = '';
@@ -51,6 +51,7 @@
 
   var activeAudio = null;
   var activeAbortController = null;
+  var activeSource = null;
 
   // Cache in-memory hasil prefetch dari server neural voice
   // Key: (persona)::(sentence) -> Promise<object|null>
@@ -89,28 +90,53 @@
   function voiceSay() { return root.FiezelVoiceSay || null; }
   function puter() { return root.FiezelPuterVoice || null; }
 
-  /** Buang furigana [漢字](かんじ) → 漢字 dan tanda markdown; yang diucapkan hanya kalimatnya. */
-  function cleanText(text) {
-    return String(text == null ? '' : text)
+  /** Buang furigana [漢字](かんじ) → 漢字 dan tanda markdown; haluskan tanda baca berlebih untuk audio alami. */
+  function cleanText(text, course) {
+    var s = String(text == null ? '' : text)
       .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
-      .replace(/[*_~\x60#>]/g, '')
+      .replace(/[*_~\x60#>]/g, '');
+    if (course !== 'ja') {
+      // Haluskan elipsis/titik ganda (... / … / ‥) menjadi koma jeda mikro agar TTS tidak membeku 1.2 detik
+      s = s.replace(/\.{2,}|…|‥/g, ', ');
+    }
+    return s
+      // Haluskan tanda baca seru/tanya berulang (?! / !? / !! / ??) menjadi tanda tunggal
+      .replace(/([?!])\1+/g, '$1')
+      .replace(/\?!|!\?/g, '?')
+      // Rampingkan koma berulang atau koma ganda
+      .replace(/,{2,}/g, ', ')
+      // Rampingkan spasi di sekitar tanda baca agar tidak menimbulkan jeda hening audio ganda
+      .replace(/\s*([,;:])\s*/g, '$1 ')
       .replace(/\s+/g, ' ')
       .trim();
   }
 
-  /** Potong per kalimat; potongan pendek digabung ke kalimat berikutnya. */
+  var EN_ABBREV_RE = /\b(Mr|Mrs|Ms|Dr|Prof|Sr|Jr|St|vs|etc|U\.S|U\.K|a\.m|p\.m|e\.g|i\.e)\./gi;
+  var EN_DECIMAL_RE = /(\d)\.(\d)/g;
+  var DOT_MARK = '\u0001';
+
+  /** Potong per kalimat; potongan pendek digabung ke kalimat berikutnya. Titik desimal/singkatan dilindungi. */
   function splitSentences(text, course) {
-    var t = cleanText(text);
+    var t = cleanText(text, course);
     if (!t) return [];
-    var re = course === 'ja'
-      ? /[^。！？!?]+[。！？!?]*/g
-      : /[^.!?]+[.!?]+["'”’)]*\s*|[^.!?]+$/g;
-    var parts = (t.match(re) || [t]).map(function (p) { return p.trim(); }).filter(Boolean);
+    var parts;
+    if (course === 'ja') {
+      parts = t.match(/[^。！？!?…‥]+[。！？!?…‥]*/g) || [t];
+    } else {
+      var guarded = t
+        .replace(EN_ABBREV_RE, function (m) { return m.slice(0, -1) + DOT_MARK; })
+        .replace(EN_DECIMAL_RE, '$1' + DOT_MARK + '$2');
+      parts = (guarded.match(/[^.!?]+[.!?]+["'”’)]*\s*|[^.!?]+$/g) || [guarded]).map(function (p) {
+        return p.split(DOT_MARK).join('.');
+      });
+    }
+    parts = parts.map(function (p) { return p.trim(); }).filter(Boolean);
     var out = [];
     var carry = '';
+    var minLen = course === 'ja' ? 3 : MIN_CHUNK_CHARS;
     for (var i = 0; i < parts.length; i++) {
       var piece = carry ? carry + (course === 'ja' ? '' : ' ') + parts[i] : parts[i];
-      if (piece.length < MIN_CHUNK_CHARS && i < parts.length - 1) { carry = piece; continue; }
+      if (piece.length < minLen && i < parts.length - 1) { carry = piece; continue; }
       out.push(piece);
       carry = '';
     }
@@ -362,10 +388,20 @@
       if (controller) {
         timer = setTimeout(function () {
           try { controller.abort(); } catch (_) {}
-        }, 3500);
+        }, 2500);
       }
 
-      var signal = cancelSignal || (controller ? controller.signal : undefined);
+      if (cancelSignal) {
+        if (cancelSignal.aborted && controller) {
+          try { controller.abort(); } catch (_) {}
+        } else if (typeof cancelSignal.addEventListener === 'function') {
+          cancelSignal.addEventListener('abort', function () {
+            if (controller) { try { controller.abort(); } catch (_) {} }
+          }, { once: true });
+        }
+      }
+
+      var signal = controller ? controller.signal : cancelSignal;
 
       return f(currentTarget, {
         method: 'POST',
@@ -389,8 +425,12 @@
         }).catch(function () {
           return tryFetchCandidate();
         });
-      }).catch(function () {
+      }).catch(function (err) {
         if (timer) clearTimeout(timer);
+        var isAbort = (err && (err.name === 'AbortError' || err.message === 'aborted')) ||
+                      (controller && controller.signal && controller.signal.aborted) ||
+                      (cancelSignal && cancelSignal.aborted);
+        if (isAbort) return null;
         return tryFetchCandidate();
       });
     }
@@ -465,6 +505,7 @@
         if (settled) return;
         settled = true;
         if (activeAudio === audio) activeAudio = null;
+        audio.ontimeupdate = null;
         audio.onended = null;
         audio.onerror = null;
         audio.onpause = null;
@@ -476,6 +517,15 @@
       audio.onended = function () {
         cleanup();
         resolve(myToken === token);
+      };
+
+      // Potong ekor hening container MP3 (~220ms) agar transisi antar-kalimat tidak menimbulkan jeda kosong
+      audio.ontimeupdate = function () {
+        if (audio.duration && audio.duration > 1.0 && audio.currentTime >= audio.duration - 0.22) {
+          audio.ontimeupdate = null;
+          cleanup();
+          resolve(myToken === token);
+        }
       };
 
       audio.onpause = function () {
@@ -520,7 +570,17 @@
             var src = ctx.createBufferSource();
             src.buffer = audioBuf;
             src.connect(ctx.destination);
+            activeSource = src;
+            // WebAudio zero-gap scheduling: selesaikan sebelum ekor hening container
+            var playDuration = Math.max(0.1, audioBuf.duration - 0.20);
+            var endTimer = setTimeout(function () {
+              if (activeSource === src) activeSource = null;
+              cleanup();
+              resolve(myToken === token);
+            }, playDuration * 1000);
             src.onended = function () {
+              if (endTimer) clearTimeout(endTimer);
+              if (activeSource === src) activeSource = null;
               cleanup();
               resolve(myToken === token);
             };
@@ -758,6 +818,10 @@
   /** Barge-in / ganti giliran / unmount: putus loop kalimat dan bungkam semua lapisan seketika. */
   function stop() {
     token++;
+    if (activeSource) {
+      try { activeSource.stop(0); } catch (_) {}
+      activeSource = null;
+    }
     if (activeAudio) {
       try {
         activeAudio.pause();

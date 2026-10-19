@@ -1094,21 +1094,23 @@
       ? 'Thai (ภาษาไทย), casual and polite, without ครับ/ค่ะ'
       : 'Indonesian (bahasa Indonesia santai, pakai "kamu" dan "nggak")';
     var sid = Object.prototype.hasOwnProperty.call(CONVERSATION_ROLES, s(input.scenarioId)) ? s(input.scenarioId) : 'free';
+    var isCall = s(input && input.mode) === 'call' || sid.indexOf('phone_') === 0;
     var lines = [
       GUARD_SAFETY.trim(),
       'You are FIEZEL, chatting in ' + target + ' with a language learner (level ' + level + ').',
       'Your role: ' + CONVERSATION_ROLES[sid] + '.',
       'Talk like a real person in everyday life: react to what they said, add a little of your own, and keep the conversation going.',
       'Never lecture, never explain grammar, never praise or grade their ' + target + ', and never say you are an AI or a teacher.',
-      'Use simple ' + target + ' for level ' + level + '. At most ' + CONVERSATION.maxReplySentences +
-        ' short sentences. Usually end with one natural question.',
+      isCall
+        ? 'This is a LIVE PHONE CALL. Speak, do not write: react in a few words first ("Oh nice!", "Really?"), then ONE short sentence or ONE short question. Maximum 15 words in total. No lists, no explanations.'
+        : ('Use simple ' + target + ' for level ' + level + '. At most ' + CONVERSATION.maxReplySentences + ' short sentences. Usually end with one natural question.'),
       course === 'ja'
         ? 'REPLY must be natural casual Japanese written in kana and common kanji. No romaji, no English.'
         : 'REPLY must be written only in English.',
       'If the learner writes in another language, still answer in ' + target + '.',
       'Keep it safe for school students. Do not ask for personal data such as address, phone number or full name.'
     ];
-    if (sid.indexOf('phone_') === 0) lines.push('This is a phone call: keep every reply to 1-2 short sentences.');
+    if (isCall) lines.push('This is a phone call: keep every reply to 1-2 short sentences, under 15 words.');
     if (withCorrection) {
       lines.push(
         'Also check ONLY the learner\'s last message for real ' + target + ' grammar or word-choice mistakes. ' +
@@ -1257,7 +1259,7 @@
     var reply = tags.reply;
     if (!reply) return fail(OUTPUT_FAILURES.empty);
     if (!isTargetLanguage(reply, course)) return fail(OUTPUT_FAILURES.localeMismatch);
-    var max = CONVERSATION.maxReplySentences;
+    var max = s(input && input.mode) === 'call' ? 2 : CONVERSATION.maxReplySentences;
     if (course === 'ja') {
       if (countJaSentences(reply) > max) reply = clampJaSentences(reply, max);
     } else if (countSentences(reply) > max) {
@@ -1326,6 +1328,7 @@
     course: { type: 'enum', required: true, values: CONVERSATION.courses },
     level: { type: 'enum', required: true, values: LEVELS },
     scenarioId: { type: 'enum', values: Object.keys(CONVERSATION_ROLES) },
+    mode: { type: 'enum', values: ['chat', 'call'] },
     history: { type: 'array', maxItems: CONVERSATION.historyItems, itemMaxLength: CONVERSATION.historyItemMaxLength }
   });
 
