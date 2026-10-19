@@ -214,7 +214,7 @@ const REGISTRY = {
     records.forEach((record, index) => {
       const level = rank[record?.level] ?? (record?.jlpt === 'N5' ? 0 : 99);
       if (record?.word) {
-        items.push({ text: record.word, contentType: 'word', locale: 'ja-JP', sourceRef: record.id, level, kind: 0, index });
+        items.push({ text: record.kana || record.word, contentType: 'word', locale: 'ja-JP', sourceRef: record.id, level, kind: 0, index });
       }
       if (record?.example) {
         items.push({ text: record.example, contentType: 'sentence', locale: 'ja-JP', sourceRef: record.id, level, kind: 1, index });
@@ -419,6 +419,9 @@ async function synthesize(identity, apiKey) {
       speed: Number(identity.settings.speed ?? 1)
     }
   };
+  if (identity.locale === 'ja-JP' || (typeof identity.locale === 'string' && identity.locale.startsWith('ja'))) {
+    body.language_code = 'ja';
+  }
 
   let lastError = 'unknown';
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {

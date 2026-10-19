@@ -10291,6 +10291,7 @@ function jaCourseOn(){return self.FiezelI18n?.getCourse?.()==='ja'&&!!self.Fieze
 function jaWord(word,phonetic){return jaCourseOn()?FiezelJaUi.wordMarkup(word,phonetic):esc(word)}
 function jaPhonetic(phonetic,fallback){return jaCourseOn()?FiezelJaUi.phoneticMarkup(phonetic||fallback||''):esc(phonetic||fallback||'')}
 function jaTogglesMarkup(){return jaCourseOn()?FiezelJaUi.togglesMarkup():''}
+function vocabAudioWord(v){if(!v)return'';if(jaCourseOn()&&v.kana)return v.kana;return v.word||''}
 function kanaView(){shell(FiezelI18n.t('jepang.kana-judul'),FiezelI18n.t('jepang.kana-lead'),jaCourseOn()?FiezelJaUi.kanaViewBody():'')}
 function latihanCards(){
   const punyaSkillsJa=!targetLangSurfaceBlocked('skills');
@@ -10931,8 +10932,9 @@ function todayHomeMarkup(){
     };
     window.playTodayVocabAudio = function() {
       try {
-        if (typeof audio !== 'undefined' && audio.play && dailyWord && dailyWord.word) {
-          audio.play(dailyWord.word, { contentType: 'word' });
+        const w = vocabAudioWord(dailyWord);
+        if (typeof audio !== 'undefined' && audio.play && w) {
+          audio.play(w, { contentType: 'word' });
         }
       } catch(_) {}
     };
@@ -11162,8 +11164,9 @@ function todayHomeMarkup(){
   /* Kata hero: kata rawan (bila model memilihnya) atau kata hari ini. Tombol suaranya memutar
      kata yang TAMPIL, bukan kata hari ini yang mungkin sudah diganti. */
   const heroKata=heroModel.kata.mode==='rawan'&&heroRawan?{word:heroRawan.word,phonetic:heroRawan.phonetic,meaning:heroRawan.meaning}:dailyWord;
-  try{if(heroKata!==dailyWord&&typeof audio!=='undefined'&&audio.prefetch&&heroKata.word)audio.prefetch(heroKata.word,{contentType:'word'})}catch(_){}
-  if(typeof window!=='undefined')window.playHeroWordAudio=function(){try{if(typeof audio!=='undefined'&&audio.play&&heroKata&&heroKata.word)audio.play(heroKata.word,{contentType:'word'})}catch(_){}};
+  const heroWordAudio=vocabAudioWord(heroKata);
+  try{if(heroKata!==dailyWord&&typeof audio!=='undefined'&&audio.prefetch&&heroWordAudio)audio.prefetch(heroWordAudio,{contentType:'word'})}catch(_){}
+  if(typeof window!=='undefined')window.playHeroWordAudio=function(){try{if(typeof audio!=='undefined'&&audio.play&&heroWordAudio)audio.play(heroWordAudio,{contentType:'word'})}catch(_){}};
   const heroIpa=heroKata.phonetic&&heroKata.phonetic.includes('/')?heroKata.phonetic.split('•')[0].trim():(heroKata.phonetic||'');
   /* Label tombol mengikuti aksi yang SUNGGUH dijalankan: ujian level saat terkunci, "lanjutkan"
      saat sesi tertunda. Dulu teksnya selalu "MULAI SESI HARI INI" apa pun aksinya. */
@@ -13715,15 +13718,16 @@ function flashcards(level){
     // hampir selalu menekan "Dengar" lagi di kartu itu. Menghangatkan satu kartu ke depan
     // gratis secara UX; kalau ia menggeser kartu, stop() membatalkan yang masih menganggur.
     const nextCard=pool[i+1]||null;
-    $('speakWord')?.addEventListener('click',e=>{e.stopPropagation();audio.play(v.word,{contentType:'word',next:nextCard?nextCard.word:''})});
-    $('speakWordBack')?.addEventListener('click',e=>{e.stopPropagation();audio.play(v.word,{contentType:'word',next:nextCard?nextCard.word:''})});
+    const cardWord=vocabAudioWord(v);
+    $('speakWord')?.addEventListener('click',e=>{e.stopPropagation();audio.play(cardWord,{contentType:'word',next:nextCard?nextCard.word:''})});
+    $('speakWordBack')?.addEventListener('click',e=>{e.stopPropagation();audio.play(cardWord,{contentType:'word',next:nextCard?nextCard.word:''})});
     $('speakSentence')?.addEventListener('click',e=>{e.stopPropagation();audio.play(v.example,{contentType:'sentence',next:nextCard?nextCard.example:''})});
     if($('aiWord'))$('aiWord').onclick=e=>{e.stopPropagation();explainWordWithAI(v)};
     $('learning').onclick=e=>{e.stopPropagation();markStillLearning('vocab',v.id);showToast(FiezelI18n.t('flash.toast-progres'),'success');flyOutCard($('flashcard'),-1,()=>{i++;draw()})};
     $('mastered').onclick=e=>{e.stopPropagation();markMastered('vocab',v.id);haptic('success');showToast(FiezelI18n.t('flash.toast-dikuasai'),'success');/* [FASE-4] 09 §3.3: kartu dikuasai = pengakuan → proud. */try{pawReact('badge-earned')}catch(_){}flyOutCard($('flashcard'),1,()=>{i++;draw()})};
     bindSwipe($('flashcard'),()=>{audio.stop();i++;draw()},()=>{audio.stop();i=Math.max(0,i-1);draw()});
-    try{if(v?.word)audio.prefetch(v.word,{contentType:'word'});if(v?.example)audio.prefetch(v.example,{contentType:'sentence'})}catch(_){}
-    if(v?.word&&!targetLangVoiceBlocked()){audio.play(v.word,{contentType:'word',next:nextCard?nextCard.word:''})}
+    try{if(cardWord)audio.prefetch(cardWord,{contentType:'word'});if(v?.example)audio.prefetch(v.example,{contentType:'sentence'})}catch(_){}
+    if(cardWord&&!targetLangVoiceBlocked()){audio.play(cardWord,{contentType:'word',next:nextCard?nextCard.word:''})}
   };
   enterStage('vocab-flashcards',{draw:()=>draw(),leave:()=>audio.stop()});
   draw()
@@ -13741,14 +13745,16 @@ function reviewVocab(){
     $('backReview').onclick=()=>exitStage();const flip=()=>{flipped=!flipped;$('reviewCard').classList.toggle('flipped',flipped);haptic('tap')};
     $('reviewCard').onclick=flip;$('reviewCard').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();flip()}};
     const nextCard=due[i+1]||null;
-    $('reviewSpeakWord')?.addEventListener('click',e=>{e.stopPropagation();audio.play(v.word,{contentType:'word',next:nextCard?nextCard.word:''})});
-    $('reviewSpeakWordBack')?.addEventListener('click',e=>{e.stopPropagation();audio.play(v.word,{contentType:'word',next:nextCard?nextCard.word:''})});
+    const cardWord=vocabAudioWord(v);
+    const nextCardWord=vocabAudioWord(nextCard);
+    $('reviewSpeakWord')?.addEventListener('click',e=>{e.stopPropagation();audio.play(cardWord,{contentType:'word',next:nextCardWord})});
+    $('reviewSpeakWordBack')?.addEventListener('click',e=>{e.stopPropagation();audio.play(cardWord,{contentType:'word',next:nextCardWord})});
     $('reviewSpeakSentence')?.addEventListener('click',e=>{e.stopPropagation();audio.play(v.example,{contentType:'sentence',next:nextCard?nextCard.example:''})});
     $('reviewLearning').onclick=e=>{e.stopPropagation();markStillLearning('vocab',v.id);flyOutCard($('reviewCard'),-1,()=>{i++;draw()})};
     $('reviewMastered').onclick=e=>{e.stopPropagation();markMastered('vocab',v.id);haptic('success');/* [FASE-4] 09 §3.3: dikuasai dari ulangan juga pengakuan → proud. */try{pawReact('badge-earned')}catch(_){}flyOutCard($('reviewCard'),1,()=>{i++;draw()})};
     bindSwipe($('reviewCard'),()=>{audio.stop();i++;draw()},()=>{audio.stop();i=Math.max(0,i-1);draw()});
-    try{if(v?.word)audio.prefetch(v.word,{contentType:'word'});if(v?.example)audio.prefetch(v.example,{contentType:'sentence'})}catch(_){}
-    if(v?.word&&!targetLangVoiceBlocked()){audio.play(v.word,{contentType:'word',next:nextCard?nextCard.word:''})}
+    try{if(cardWord)audio.prefetch(cardWord,{contentType:'word'});if(v?.example)audio.prefetch(v.example,{contentType:'sentence'})}catch(_){}
+    if(cardWord&&!targetLangVoiceBlocked()){audio.play(cardWord,{contentType:'word',next:nextCardWord})}
   };
   enterStage('vocab-review',{draw:()=>draw(),leave:()=>audio.stop()});
   draw()
