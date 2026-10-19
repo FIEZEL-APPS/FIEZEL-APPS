@@ -800,11 +800,20 @@
     'hear', 'heard', 'can', 'could', 'will', 'would', 'should', 'may', 'might', 'must', 'shall',
     'does', 'did', 'do', 'doesnt', "doesn't", 'didnt', "didn't", 'dont', "don't", 'to'];
   function hasThirdPersonBareVerb(text) {
-    var re = /(\S+\s+)?\b(he|she|it)\s+(go|want|like|need|play)\b/ig;
+    var str = String(text || '');
+    // 1. Pronoun subjects: he / she / it
+    var re1 = /(\S+\s+)?\b(he|she|it)\s+(go|want|like|need|play|give|think|say|know|feel|seem|make|take)\b/ig;
     var m;
-    while ((m = re.exec(String(text || '')))) {
-      var prev = String(m[1] || '').trim().toLowerCase().replace(/[^a-z']/g, '');
-      if (BARE_VERB_LICENSORS.indexOf(prev) === -1) return true;
+    while ((m = re1.exec(str))) {
+      var prev1 = String(m[1] || '').trim().toLowerCase().replace(/[^a-z']/g, '');
+      if (BARE_VERB_LICENSORS.indexOf(prev1) === -1) return true;
+    }
+    // 2. Singular third-person noun phrase subjects: my/the/our manager, boss, teacher, doctor, friend, etc.
+    // e.g. "My manager always give", "The boss want", "Our teacher like"
+    var re2 = /(\S+\s+)?\b(my|the|our)\s+(boss|manager|teacher|doctor|nurse|driver|user|system|company|father|mother|brother|sister|friend|colleague|partner)\s+(?:always\s+|often\s+|usually\s+|never\s+|really\s+)?(go|want|like|need|play|give|think|say|know|feel|seem|make|take)\b/ig;
+    while ((m = re2.exec(str))) {
+      var prev2 = String(m[1] || '').trim().toLowerCase().replace(/[^a-z']/g, '');
+      if (BARE_VERB_LICENSORS.indexOf(prev2) === -1) return true;
     }
     return false;
   }
@@ -1263,7 +1272,7 @@
       }
 
       // 2. Food, eating, restaurants, delicious
-      if (/food|eat|pizza|ramen|burger|dinner|lunch|breakfast|delicious|cooking|restaurant|taste/i.test(raw)) {
+      if (/\b(food|eat|eating|eats|pizza|ramen|burger|dinner|lunch|breakfast|delicious|cooking|restaurant|taste)\b/i.test(raw)) {
         return {
           text: "Oh really? That sounds super delicious! What's your favorite food lately?",
           translation: t('chat_off_en_food_trans', "Oh ya? Kedengarannya enak banget tuh! Apa makanan favoritmu akhir-akhir ini?"),
@@ -1276,7 +1285,7 @@
       }
 
       // 3. Fun, movies, anime, hobbies, trips, music
-      if (/movie|anime|game|fun|cool|hobby|music|watched|played/i.test(raw)) {
+      if (/\b(movie|movies|anime|game|games|fun|cool|hobby|hobbies|music|watched|played)\b/i.test(raw)) {
         return {
           text: isPhone ? "Oh really? That sounds super fun! What was the best part about it?" : "Oh really? That sounds super fun! I'm so curious, what was the best part about it?",
           translation: isPhone ? t('chat_off_en_fun_phone_trans', "Oh ya? Kedengarannya seru banget tuh! Bagian mana yang paling asyik?") : t('chat_off_en_fun_trans', "Oh ya? Kedengarannya seru banget tuh! Aku penasaran banget, bagian mana yang paling asyik?"),
@@ -1289,7 +1298,7 @@
       }
 
       // 4. Surprising news, shocking, achievements
-      if (/really|guess what|bought|won|news|passed|wild|unbelievable|shocking/i.test(raw)) {
+      if (/\b(really|guess what|bought|won|news|passed|wild|unbelievable|shocking)\b/i.test(raw)) {
         return {
           text: "No way, tell me more! That sounds completely wild, how did that happen?",
           translation: t('chat_off_en_surp_trans', "Beneran? Ceritain lebih banyak dong! Kedengarannya gila banget, kok bisa gitu ceritanya?"),
@@ -1302,7 +1311,7 @@
       }
 
       // 5. Meetup, schedule in phone_friend
-      if (/loud and clear|grab coffee|meet up|saturday|sunday/i.test(raw) || (scenarioId === 'phone_friend' && /schedule|weekend|free/i.test(raw))) {
+      if (/\b(loud and clear|grab coffee|meet up|saturday|sunday)\b/i.test(raw) || (scenarioId === 'phone_friend' && /\b(schedule|weekend|free)\b/i.test(raw))) {
         return {
           text: "That sounds awesome! Hang on a second, let me check my schedule for Saturday... Yes, I'm completely free in the afternoon. Let's grab coffee downtown! Catch you later!",
           translation: t('chat_off_fr_en_trans1', 'Terdengar seru banget! Tunggu sebentar, biar kucek jadwalku untuk hari Sabtu... Ya, sore harinya aku kosong sama sekali. Ayo ngopi di pusat kota! Sampai jumpa nanti!'),
@@ -1315,7 +1324,7 @@
       }
 
       // 6. Sympathy, busy, tired, feelings, hard work
-      if (/busy|tired|work|study|exam|hard|tough|stress|crazy|exhausted|rough|sleepy/i.test(raw)) {
+      if (/\b(busy|tired|work|working|study|studying|exam|hard|tough|stress|stressed|crazy|exhausted|rough|sleepy)\b/i.test(raw)) {
         return {
           text: isPhone ? "Haha I totally get that! Are you able to unwind and relax tonight?" : "Haha I totally get that! You've been working so hard lately. Are you able to unwind and relax tonight?",
           translation: isPhone ? t('chat_off_en_symp_phone_trans', "Haha aku paham banget tuh! Malam ini bisa santai-santai nggak?") : t('chat_off_en_symp_trans', "Haha aku paham banget tuh! Kamu udah kerja keras banget akhir-akhir ini. Malam ini bisa santai-santai nggak?"),
@@ -1327,16 +1336,73 @@
         };
       }
 
-      // 7. Default English Fallback
-      return {
-        text: "Haha I totally get that! Tell me more about what you think, what's your take on it?",
-        translation: t('chat_off_en_free_trans', "Haha aku paham banget tuh! Ceritain lebih banyak tentang pikiranmu, menurut pandanganmu gimana?"),
-        grammarNote: t('chat_off_en_free_note', 'Ending with "what\'s your take on it?" keeps the conversation flowing two ways naturally without awkward pauses.'),
-        suggestions: [
-          { text: 'Can you tell me about common English slang?', translation: t('chat_sug_en_slang', 'Bisakah kamu ceritakan tentang bahasa gaul Inggris umum?') },
-          { text: "Let's practice ordering food at a restaurant.", translation: t('chat_sug_en_rest', 'Ayo latihan memesan makanan di restoran.') }
-        ]
-      };
+      // 7. Dynamic English Conversational Fallback Bank (Variasi Frasa Penutup)
+      var fallbackBank = [
+        {
+          text: "Haha I totally get that! Tell me more about what you think, what's your take on it?",
+          translation: t('chat_off_en_free_trans', "Haha aku paham banget tuh! Ceritain lebih banyak tentang pikiranmu, menurut pandanganmu gimana?"),
+          grammarNote: t('chat_off_en_free_note', 'Ending with "what\'s your take on it?" keeps the conversation flowing two ways naturally without awkward pauses.'),
+          suggestions: [
+            { text: 'Can you tell me about common English slang?', translation: t('chat_sug_en_slang', 'Bisakah kamu ceritakan tentang bahasa gaul Inggris umum?') },
+            { text: "Let's practice ordering food at a restaurant.", translation: t('chat_sug_en_rest', 'Ayo latihan memesan makanan di restoran.') }
+          ]
+        },
+        {
+          text: "That's super interesting! How did you first get into that?",
+          translation: t('chat_off_en_interest_trans', "Itu menarik banget! Awal mulanya kamu bisa tertarik dengan hal itu gimana?"),
+          grammarNote: t('chat_off_en_interest_note', '"How did you first get into that?" is a warm idiomatic question to ask someone how a hobby or interest began.'),
+          suggestions: [
+            { text: "It actually started as a hobby a few years ago.", translation: t('chat_sug_en_started_hobby', 'Awalnya cuma sekadar hobi beberapa tahun lalu.') },
+            { text: "A close friend of mine introduced me to it.", translation: t('chat_sug_en_friend_intro', 'Teman dekatku yang pertama kali mengenalkannya ke aku.') }
+          ]
+        },
+        {
+          text: "I hear you! That makes total sense. What's the biggest challenge you've faced with that so far?",
+          translation: t('chat_off_en_challenge_trans', "Aku paham! Masuk akal banget. Apa tantangan terbesar yang kamu hadapi sejauh ini?"),
+          grammarNote: t('chat_off_en_challenge_note', '"I hear you!" is a natural American affirmation showing attentive listening and genuine empathy.'),
+          suggestions: [
+            { text: "Managing my time effectively is definitely the hardest part.", translation: t('chat_sug_en_time_mgmt', 'Mengatur waktu dengan efektif pasti bagian yang paling susah.') },
+            { text: "Finding consistent practice routines can be tricky.", translation: t('chat_sug_en_routine_trick', 'Menemukan rutinitas latihan yang konsisten kadang agak rumit.') }
+          ]
+        },
+        {
+          text: "Spot on! That's a great point. How do you usually handle situations like that?",
+          translation: t('chat_off_en_spot_on_trans', "Tepat sekali! Poin yang bagus banget. Gimana caramu biasanya menghadapi situasi seperti itu?"),
+          grammarNote: t('chat_off_en_spot_on_note', '"Spot on!" is an energetic phrase meaning completely accurate or well-said.'),
+          suggestions: [
+            { text: "I try to stay calm and take things one step at a time.", translation: t('chat_sug_en_step_by_step', 'Aku berusaha tetap tenang dan menyelesaikannya selangkah demi selangkah.') },
+            { text: "I like to talk it through with my teammates first.", translation: t('chat_sug_en_talk_team', 'Aku lebih suka mendiskusikannya dulu dengan rekan tim.') }
+          ]
+        },
+        {
+          text: "That's awesome! I love hearing your perspective on this. What would you like to explore next?",
+          translation: t('chat_off_en_explore_trans', "Keren banget! Aku senang dengar sudut pandangmu. Apa yang ingin kamu eksplorasi selanjutnya?"),
+          grammarNote: t('chat_off_en_explore_note', '"What would you like to explore next?" smoothly hands the topic choice back to the learner with confidence.'),
+          suggestions: [
+            { text: "Could you teach me how to express disagreement politely?", translation: t('chat_sug_en_disagree_polite', 'Bisakah ajari aku cara menyatakan ketidaksetujuan dengan sopan?') },
+            { text: "Let's roleplay checking in at a hotel.", translation: t('chat_sug_en_hotel_roleplay', 'Ayo roleplay check-in di hotel.') }
+          ]
+        },
+        {
+          text: "I love that mindset! It's so true. Where do you see things going from here?",
+          translation: t('chat_off_en_mindset_trans', "Aku suka pola pikir itu! Bener banget. Menurutmu ke depannya bakal mengarah ke mana?"),
+          grammarNote: t('chat_off_en_mindset_note', '"I love that mindset!" validates the learner\'s initiative and builds speaking confidence.'),
+          suggestions: [
+            { text: "I'm hoping to apply this in my daily work soon.", translation: t('chat_sug_en_apply_work', 'Aku berharap bisa segera menerapkannya di pekerjaan sehari-hari.') },
+            { text: "I want to keep practicing until it becomes second nature.", translation: t('chat_sug_en_second_nature', 'Aku mau terus latihan sampai jadi kebiasaan alami.') }
+          ]
+        }
+      ];
+
+      var turnSeed = 0;
+      if (state && Array.isArray(state.messages)) {
+        turnSeed = state.messages.length;
+      }
+      for (var sIdx = 0; sIdx < raw.length; sIdx++) {
+        turnSeed = (turnSeed * 31 + raw.charCodeAt(sIdx)) & 0x7FFFFFFF;
+      }
+      var pickIdx = turnSeed % fallbackBank.length;
+      return fallbackBank[pickIdx];
     }
   }
 
@@ -2163,7 +2229,9 @@
     return [
       'You are FIEZEL, chatting in ' + target + ' with a language learner (level ' + getLearnerLevel() + ') in the situation "' + sc.title + '".',
       'Talk like a real friend in everyday life. Never lecture, never explain grammar, never grade the learner.',
-      'At most ' + (isPhone ? 2 : 3) + ' short sentences in simple ' + target + (course === 'ja' ? ' (kana and common kanji, no romaji)' : '') + '. Usually end with one natural question.',
+      isPhone
+        ? 'This is a LIVE PHONE CALL. Speak, do not write: react in a few words first ("Oh nice!", "Really?"), then ONE short sentence or ONE short question. Maximum 15 words in total. No lists, no explanations.'
+        : 'At most 3 short sentences in simple ' + target + (course === 'ja' ? ' (kana and common kanji, no romaji)' : '') + '. Usually end with one natural question.',
       'Answer EXACTLY in this format:',
       'REPLY: <your reply in ' + target + '>',
       'MEANING: <meaning of REPLY in ' + learnerLang + '>',
@@ -2201,7 +2269,7 @@
       aiPromise = root.askFiezelAIResult(
         puterConversationPrompt(trimmed, sc, c, isPhone, history),
         withCorrection ? 'conversation_correct' : 'conversation_turn',
-        { message: trimmed, course: c, level: getLearnerLevel(), scenarioId: sid, history: history }
+        { message: trimmed, course: c, level: getLearnerLevel(), scenarioId: sid, history: history, mode: isPhone ? 'call' : 'chat' }
       );
     } catch (_) {
       return Promise.resolve(offline('offline'));

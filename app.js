@@ -18966,6 +18966,7 @@ function aiTaskInputFor(clientTask,ctx){
     const message=aiClampText(c.message,400);
     if(!message)return null;
     const input={message,course:c.course==='ja'?'ja':'en',level:aiClampLevel(c.level)};
+    if(c.mode==='call'||c.mode==='chat')input.mode=c.mode;
     // Peran skenario dirakit Worker dari enum; id asing tidak dikirim (Worker menolaknya 400).
     const scenarioId=aiClampText(c.scenarioId,40);if(/^[a-z_]+$/.test(scenarioId))input.scenarioId=scenarioId;
     // Riwayat dikirim sebagai DATA berlabel 'u:'/'a:' (skema Worker: array string, 8 x 320).

@@ -41,12 +41,16 @@
   // Default Configuration
   var CONFIG = {
     speechThreshold: 0.032,           // Normalized RMS amplitude to register speech
-    interruptThreshold: 0.38,         // RMS amplitude threshold to trigger acoustic barge-in while AI speaks (calibrated high to prevent device speaker bleed self-cutoff)
-    interruptConsecutiveFrames: 5,    // Consecutive loud frames (~250ms) to trigger acoustic barge-in
-    acousticRefractoryMs: 950,        // Mute acoustic barge-in during initial AI speech playback onset (~1 sec)
-    silenceTimeoutMs: 1350,           // Silence timeout after speech before triggering AI turn
-    naturalTurnPauseMs: 400,          // Breathing pause after AI finishes speaking before opening mic
-    recognitionRestartDelayMs: 350,   // Safe backoff restart delay to prevent error storm on mobile
+    interruptThreshold: 0.075,        // RMS saat AI bicara yang memicu PRE-DUCK (bukan potong langsung)
+    interruptHoldMs: 150,             // Suara keras harus bertahan 150 ms (berbasis waktu, bukan frame rAF)
+    interruptConfirmMs: 650,          // Tanpa token SR dalam 650 ms -> suara AI dikembalikan (gema speaker)
+    minBargeInWords: 2,               // Satu kata / gema pendek tidak memotong AI
+    finalGraceMs: 800,                // SR sudah isFinal -> giliran dikirim 800 ms kemudian (toleransi jeda napas 700ms)
+    interimSilenceMs: 1100,           // SR masih interim -> tunggu lebih lama
+    silenceTimeoutMs: 1350,           // Fallback silence timeout
+    maxUtteranceMs: 12000,            // Pengaman: kirim paksa setelah 12 detik bicara terus-menerus
+    naturalTurnPauseMs: 160,          // Jeda napas sebelum mic dibuka lagi
+    recognitionRestartDelayMs: 80,    // Safe restart delay
     fftSize: 512,
     smoothingTimeConstant: 0.25
   };
@@ -256,6 +260,15 @@
     var orbInstance = null;
     var loudFramesCount = 0;
     var isDestroyed = false;
+    var resultOffset = 0;        // hasil SR (sesi berjalan) yang sudah dikirim sebagai giliran
+    var lastResultsLength = 0;
+    var sessionFinals = '';      // final yang belum dikirim pada sesi SR berjalan
+    var transcriptCarry = '';    // final belum terkirim dari sesi SR sebelumnya (Chrome me-restart sesi)
+    var lastTokenFinal = false;
+    var utteranceStartedAt = 0;
+    var loudSince = 0;
+    var duckTimer = null;
+    var currentAiText = '';
 
     function on(evt, fn) {
       if (typeof fn !== 'function') return;
@@ -705,6 +718,50 @@
       vadTick();
     }
 
+    function armSilenceTimer(isFinal) {
+      if (silenceTimer) clearTimeout(silenceTimer);
+      var wait = isFinal ? CONFIG.finalGraceMs : CONFIG.interimSilenceMs;
+      if (utteranceStartedAt && Date.now() - utteranceStartedAt > CONFIG.maxUtteranceMs) wait = 0;
+      silenceTimer = setTimeout(function () {
+        silenceTimer = null;
+        commitUserTurn();
+      }, wait);
+    }
+
+    function normalizeUnits(s, course) {
+      var tx = String(s || '').toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, ' ');
+      if (course === 'ja') {
+        tx = tx.replace(/\s+/g, '');
+        var grams = [];
+        for (var i = 0; i + 1 < tx.length; i++) grams.push(tx.slice(i, i + 2));
+        return grams;
+      }
+      return tx.split(/\s+/).filter(Boolean);
+    }
+
+    function countWords(s, course) {
+      return course === 'ja' ? String(s || '').replace(/\s+/g, '').length / 2 : normalizeUnits(s, 'en').length;
+    }
+
+    /** Transkrip yang ≥60% unitnya ada di balasan AI yang sedang diputar = gema speaker, bukan murid. */
+    function isEchoOfAi(transcript) {
+      if (!currentAiText) return false;
+      var a = normalizeUnits(transcript, state.course);
+      if (!a.length) return false;
+      var b = normalizeUnits(currentAiText, state.course);
+      var set = {};
+      for (var i = 0; i < b.length; i++) set[b[i]] = true;
+      var hit = 0;
+      for (var j = 0; j < a.length; j++) if (set[a[j]]) hit++;
+      return hit / a.length >= 0.6;
+    }
+
+    function clearDuck() {
+      if (duckTimer) { clearTimeout(duckTimer); duckTimer = null; }
+      var cv = chatVoice();
+      if (cv && typeof cv.duck === 'function') { try { cv.duck(1); } catch (_) {} }
+    }
+
     // --- Speech Recognition Setup ---
     function setupSpeechRecognition() {
       var Ctor = root.SpeechRecognition || root.webkitSpeechRecognition;
@@ -740,58 +797,48 @@
 
         rec.onresult = function (event) {
           if (state.isMuted) return;
-
-          var interimStr = '';
-          var finalStr = '';
-
-          for (var i = event.resultIndex; i < event.results.length; i++) {
+          var finals = '';
+          var interim = '';
+          var lastIsFinal = false;
+          lastResultsLength = event.results.length;
+          // Akumulasi SEMUA hasil sesi yang belum dikirim — bukan hanya dari resultIndex
+          // (Chrome memajukan resultIndex setelah segmen difinalkan; dulu segmen awal tertimpa).
+          for (var i = resultOffset; i < event.results.length; i++) {
             var item = event.results[i];
-            if (item.isFinal) {
-              finalStr += item[0].transcript;
-            } else {
-              interimStr += item[0].transcript;
-            }
+            if (!item || !item[0]) continue;
+            if (item.isFinal) finals += item[0].transcript + ' ';
+            else interim += item[0].transcript + ' ';
+            lastIsFinal = !!item.isFinal;
+          }
+          sessionFinals = finals.trim();
+          var fresh = (finals + ' ' + interim).replace(/\s+/g, ' ').trim();
+          var combined = (transcriptCarry + ' ' + fresh).replace(/\s+/g, ' ').trim();
+          if (!combined) return;
+          kineticSpeechLevel = 0.70 + Math.random() * 0.25;
+          lastTokenFinal = lastIsFinal;
+
+          if (state.status === STATE.SPEAKING) {
+            // Barge-in lewat token SR: tolak gema suara AI sendiri dan satu kata pendek.
+            if (isEchoOfAi(fresh) || countWords(fresh, state.course) < CONFIG.minBargeInWords) return;
+            interrupt('user_speech_token_barge_in');
+            pendingTranscript = fresh;
+            state.currentTranscript = fresh;
+            utteranceStartedAt = Date.now();
+            emit('transcript', fresh, lastIsFinal, 'user');
+            updateSubtitleUI(fresh, 'user');
+            armSilenceTimer(lastIsFinal);
+            return;
           }
 
-          var combined = (finalStr + ' ' + interimStr).trim();
-          if (combined) {
-            // Echo guard during speaking state
-            if (state.status === STATE.SPEAKING) {
-              var timeSinceAiStart = Date.now() - (aiSpeechStartTime || 0);
-              var activeAiText = aiCurrentSpeakingText || (state.latestAiReply && state.latestAiReply.text) || '';
-              // If within refractory window OR recognized text matches AI's spoken words, it's acoustic echo!
-              if (timeSinceAiStart < 750 || isAcousticEcho(combined, activeAiText)) {
-                // Silently ignore AI's own voice echo from device speaker
-                pendingTranscript = '';
-                return;
-              }
-              // Genuine student interruption (student spoke something distinct from AI words)
-              pendingTranscript = combined;
-              state.currentTranscript = combined;
-              updateSubtitleUI(combined, 'user');
-              interrupt('user_speech_token_barge_in');
-              return;
-            }
+          if (state.status !== STATE.LISTENING) return;
 
-            kineticSpeechLevel = 0.70 + Math.random() * 0.25;
-            pendingTranscript = combined;
-            state.currentTranscript = combined;
-            emit('transcript', combined, Boolean(finalStr), 'user');
-            updateSubtitleUI(combined, 'user');
-
-            if (state.status === STATE.LISTENING) {
-              hasUserSpoken = true;
-              if (silenceTimer) {
-                clearTimeout(silenceTimer);
-                silenceTimer = null;
-              }
-              // Reset silence timer on every spoken token
-              silenceTimer = setTimeout(function () {
-                silenceTimer = null;
-                commitUserTurn();
-              }, CONFIG.silenceTimeoutMs);
-            }
-          }
+          pendingTranscript = combined;
+          state.currentTranscript = combined;
+          if (!utteranceStartedAt) utteranceStartedAt = Date.now();
+          hasUserSpoken = true;
+          emit('transcript', combined, lastIsFinal, 'user');
+          updateSubtitleUI(combined, 'user');
+          armSilenceTimer(lastIsFinal);
         };
 
         rec.onerror = function (event) {
@@ -812,17 +859,20 @@
 
         rec.onend = function () {
           isRecognitionRunning = false;
-          // Hands-free loop: If call is still active and not idle, restart recognition safely
+          if (sessionFinals) {
+            transcriptCarry = (transcriptCarry + ' ' + sessionFinals).trim();
+            sessionFinals = '';
+          }
+          resultOffset = 0;
+          lastResultsLength = 0;
           if (!isDestroyed && state.status !== STATE.IDLE && !isPermissionPending) {
             if (recognitionRestartTimer) clearTimeout(recognitionRestartTimer);
             recognitionRestartTimer = setTimeout(function () {
               recognitionRestartTimer = null;
-              if (!isDestroyed && state.status !== STATE.IDLE && !isPermissionPending && recognition && !isRecognitionRunning) {
-                try {
-                  recognition.start();
-                } catch (_) {}
+              if (!isDestroyed && state.status !== STATE.IDLE && !isPermissionPending && recognition) {
+                try { recognition.start(); } catch (_) {}
               }
-            }, CONFIG.recognitionRestartDelayMs || 350);
+            }, 80);
           }
         };
 
@@ -891,13 +941,23 @@
         }
       }
 
-      // Reset turn buffer
+      // Reset turn buffer (hasil SR sesi berjalan sampai di sini sudah dikirim)
       pendingTranscript = '';
       hasUserSpoken = false;
+      transcriptCarry = '';
+      sessionFinals = '';
+      resultOffset = lastResultsLength;
+      lastTokenFinal = false;
+      utteranceStartedAt = 0;
+      loudSince = 0;
       if (silenceTimer) {
         clearTimeout(silenceTimer);
         silenceTimer = null;
       }
+
+      // Bangunkan server neural voice SELAGI AI berpikir, bukan setelah teksnya tiba
+      var cvWarm = chatVoice();
+      if (cvWarm && typeof cvWarm.warmup === 'function') { try { cvWarm.warmup(); } catch (_) {} }
 
       // Transition to Thinking
       setStatus(STATE.THINKING, { query: text });
@@ -983,12 +1043,16 @@
     function deliverAiTurn(replyObj) {
       if (!setStatus(STATE.SPEAKING, { reply: replyObj })) return;
 
-      var speechText = replyObj.text || '';
-      updateSubtitleUI(speechText, 'assistant', replyObj.translation);
+      var speechText = (replyObj && replyObj.text) ? replyObj.text : '';
+      currentAiText = stripFurigana(speechText);
+      loudSince = 0;
+      updateSubtitleUI(speechText, 'assistant', replyObj ? replyObj.translation : '');
       emit('transcript', speechText, true, 'assistant');
 
       // Speak AI response
       playSpeech(speechText, state.course).then(function () {
+        currentAiText = '';
+        clearDuck();
         // Hands-Free Loop: If still in speaking state, return to listening after natural pause
         if (state.status === STATE.SPEAKING && !isDestroyed) {
           setTimeout(function () {
@@ -1006,6 +1070,8 @@
     function interrupt(reason) {
       if (state.status !== STATE.SPEAKING) return;
       state.interruptedCount++;
+      if (duckTimer) { clearTimeout(duckTimer); duckTimer = null; }
+      currentAiText = '';
       stopAudioPlayback();
       emit('interrupt', { timestamp: Date.now(), reason: reason || 'barge_in' });
 
@@ -1013,6 +1079,7 @@
       setStatus(STATE.LISTENING, { interrupted: true });
       updateSubtitleUI(t('call_interrupted', 'Menyimakmu...'), 'status');
       ensureRecognitionRunning();
+      if (pendingTranscript.trim()) armSilenceTimer(true);
     }
 
     // --- Microphone Permission Guidance Modal ---
@@ -1239,6 +1306,11 @@
 
       // Web Audio Autoplay Policy: unlock audio context in synchronous user gesture turn
       unlockAudio();
+      try {
+        var cvBoot = chatVoice();
+        if (cvBoot && typeof cvBoot.probeEndpoint === 'function') cvBoot.probeEndpoint();
+        if (cvBoot && typeof cvBoot.warmup === 'function') cvBoot.warmup();
+      } catch (_) {}
 
       // Ensure any previous or transition overlay is pruned cleanly
       closeCallUI(true);
@@ -1280,6 +1352,13 @@
       unregisterBackNav();
       stopAudioPlayback();
       stopRecognition();
+
+      if (duckTimer) { clearTimeout(duckTimer); duckTimer = null; }
+      transcriptCarry = '';
+      sessionFinals = '';
+      resultOffset = 0;
+      lastResultsLength = 0;
+      currentAiText = '';
 
       if (vadRafId) {
         if (typeof cancelAnimationFrame === 'function') cancelAnimationFrame(vadRafId);
@@ -1335,8 +1414,8 @@
 
       // Zero-Loss State: Commit any pending uncommitted student transcript
       var chatEngine = root.FiezelInteractiveChat;
-      if (pendingTranscript && pendingTranscript.trim()) {
-        var uncommitted = pendingTranscript.trim();
+      var uncommitted = (transcriptCarry + ' ' + sessionFinals + ' ' + pendingTranscript).trim();
+      if (uncommitted) {
         var orphanTurn = {
           userText: uncommitted,
           reply: null,
@@ -1732,6 +1811,7 @@
       }
 
       if (label) {
+        label.className = 'fzc-call-status-label ' + statusClass;
         if (state.status === STATE.CONNECTING) label.textContent = t('call_connecting', 'Menghubungkan...');
         else if (state.status === STATE.LISTENING) label.textContent = t('call_listening', 'Mendengarkan...');
         else if (state.status === STATE.THINKING) label.textContent = t('call_thinking', 'Fiezel berpikir...');
@@ -1849,8 +1929,12 @@
       },
       PERSONAS: PERSONAS,
       showMicPermissionModal: showMicPermissionModal,
-      cleanup: end,
-      _testSetStatus: function (status, meta) { return setStatus(status, meta, true); },
+      _testSetStatus: function (status, meta) {
+        if (status === STATE.SPEAKING && meta && meta.reply && meta.reply.text) {
+          currentAiText = stripFurigana(meta.reply.text);
+        }
+        return setStatus(status, meta, true);
+      },
       _testCommitTurn: commitUserTurn,
       _testSimulateTurn: testSimulateTurn,
       _testSetState: function (patch) { if (patch && typeof patch === 'object') Object.assign(state, patch); }
@@ -1908,8 +1992,10 @@
     window.addEventListener('popstate', handleGlobalTeardown);
     if (typeof document !== 'undefined' && typeof document.addEventListener === 'function') {
       document.addEventListener('visibilitychange', function () {
-        if (document.visibilityState === 'hidden') {
-          handleGlobalTeardown();
+        // Layar padam / pindah app sebentar: panggilan TIDAK diputus. Saat kembali, mic dihidupkan lagi.
+        if (document.visibilityState === 'visible' && defaultInstance) {
+          var st = defaultInstance.getState ? defaultInstance.getState().status : null;
+          if (st && st !== STATE.IDLE) defaultInstance.unlockAudio();
         }
       });
     }
