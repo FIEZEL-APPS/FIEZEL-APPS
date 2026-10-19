@@ -1,7 +1,7 @@
 {
   "schema": "fiezel-audio-manifest-v1",
-  "version": 1046,
-  "generatedAt": "2026-10-19T10:51:56.932Z",
+  "version": 1053,
+  "generatedAt": "2026-10-19T11:04:30.228Z",
   "assetBaseUrl": "https://fiezel-audio.fitrajft.workers.dev",
   "voiceProfile": {
     "voiceId": "4KH3q7xDXbPdY3S5yw0Y",
@@ -26092,6 +26092,42 @@
       "checksum": "f29b282f9ec0f7a3696b6ae17c2ea65e9522bf996e098acb0f1b02362afcdd73",
       "sourceRef": "vocab_02557",
       "createdAt": "2026-10-19T10:51:54.613Z",
+      "status": "ready"
+    },
+    "ebae0760b23dde778bd7d1fd61ae43a2b092ff4c07e1eb4ea6c06348db3c7f4f": {
+      "url": "a/ebae0760b23dde778bd7d1fd61ae43a2b092ff4c07e1eb4ea6c06348db3c7f4f.mp3",
+      "contentType": "sentence",
+      "locale": "en-US",
+      "voiceId": "Aoede",
+      "modelId": "gemini-tts-gemini-2.5-flash-preview-tts",
+      "bytes": 125370,
+      "checksum": "d82a220671d5cee51363b73319f1a7941d0f2668612e1662c06c8285cbc9bfd8",
+      "sourceRef": "vocab_02558",
+      "createdAt": "2026-10-19T11:03:11.627Z",
+      "status": "ready"
+    },
+    "a3f08bff29d7046308686f39d967e60657c4612d57142d565430167e96ef7190": {
+      "url": "a/a3f08bff29d7046308686f39d967e60657c4612d57142d565430167e96ef7190.mp3",
+      "contentType": "sentence",
+      "locale": "en-US",
+      "voiceId": "Aoede",
+      "modelId": "gemini-tts-gemini-2.5-flash-preview-tts",
+      "bytes": 110010,
+      "checksum": "02005ce611c53f321d6bb4ab9ee2518638defa8875138f919b8fee331a6719cd",
+      "sourceRef": "vocab_02559",
+      "createdAt": "2026-10-19T11:03:18.356Z",
+      "status": "ready"
+    },
+    "31fb7cd073b5bfc05875369b46f615ecca86530a86ee398057b8ec5a147c2ccb": {
+      "url": "a/31fb7cd073b5bfc05875369b46f615ecca86530a86ee398057b8ec5a147c2ccb.mp3",
+      "contentType": "sentence",
+      "locale": "en-US",
+      "voiceId": "Aoede",
+      "modelId": "gemini-tts-gemini-2.5-flash-preview-tts",
+      "bytes": 152250,
+      "checksum": "846ffbeb1840f84703676040f39753d0875e4a9b44ace55f47be9f28155106ae",
+      "sourceRef": "vocab_02560",
+      "createdAt": "2026-10-19T11:03:25.033Z",
       "status": "ready"
     }
   },
