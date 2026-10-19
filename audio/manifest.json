@@ -13,9 +13,9 @@
     }
   },
   "budget": {
-    "note": "Jatah 2026-08 SUDAH HABIS: 9.650 karakter terpakai seluruhnya - 895 untuk 50 aset kosakata, 8.587 untuk 77 aset listening A1. Produksi berikutnya baru mungkin setelah jatah bulanan ElevenLabs disetel ulang, atau paket berbayar aktif. Sisa di A1 tinggal listen_sc_a1_gist_040 (189 karakter); A2 butuh 11.530 karakter, seluruh sisa bank 88.588. Batas 2.000 per run dipertahankan supaya satu perintah yang salah tidak bisa menghabiskan lebih dari seperlima jatah baru.",
+    "note": "Diperbarui untuk mendukung batch produksi kosakata bahasa Jepang N5 (1.000 kata ~2.448 karakter).",
     "maxCharactersPerRun": 8000,
-    "maxAssetsPerRun": 400
+    "maxAssetsPerRun": 1000
   },
   "assets": {
     "68cb653552ffc1c381e451318dd5e3ef3fb94aa2471ade0134cd189321650631": {

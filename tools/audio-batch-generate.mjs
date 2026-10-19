@@ -202,6 +202,30 @@ const REGISTRY = {
       .map(({ text, contentType, locale, sourceRef }) => ({ text, contentType, locale, sourceRef }));
   },
   /**
+   * Kosakata bahasa Jepang (content/ja/vocabulary-master-ja.json).
+   * Diurutkan level (N5/A1 dulu), lalu kata (kind 0) sebelum kalimat contoh (kind 1).
+   */
+  vocabulary_ja() {
+    const rank = { A1: 0, A2: 1, B1: 2, B2: 3, C1: 4, C2: 5 };
+    const doc = readJson('content/ja/vocabulary-master-ja.json');
+    const records = doc.words || [];
+    const items = [];
+
+    records.forEach((record, index) => {
+      const level = rank[record?.level] ?? (record?.jlpt === 'N5' ? 0 : 99);
+      if (record?.word) {
+        items.push({ text: record.word, contentType: 'word', locale: 'ja-JP', sourceRef: record.id, level, kind: 0, index });
+      }
+      if (record?.example) {
+        items.push({ text: record.example, contentType: 'sentence', locale: 'ja-JP', sourceRef: record.id, level, kind: 1, index });
+      }
+    });
+
+    return items
+      .sort((a, b) => (a.level - b.level) || (a.kind - b.kind) || (a.index - b.index))
+      .map(({ text, contentType, locale, sourceRef }) => ({ text, contentType, locale, sourceRef }));
+  },
+  /**
    * Listening diurutkan menurut level CEFR, bukan menurut urutan berkas.
    *
    * Anggaran selalu terpotong di tengah daftar, jadi yang menentukan bukan "berapa yang
