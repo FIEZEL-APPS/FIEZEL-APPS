@@ -47,35 +47,41 @@ body{color:#6A2230}
 
 /* ---------- topbar ---------- */
 .topbar{background:rgba(255,249,238,.9);border-bottom:1.5px solid rgba(109,25,38,.14)}
+.topbar .btn-primary{background:linear-gradient(180deg,#28967B 0%,var(--vv-teal) 60%,#166052 100%);color:#fff;border-color:#124B3D;
+  box-shadow:0 3px 0 #124B3D,0 6px 16px -4px rgba(31,122,99,.35)}
+.anim .topbar .btn-primary:hover{background:linear-gradient(180deg,#32A78A 0%,#238970 60%,#186E59 100%);
+  box-shadow:0 5px 0 #124B3D,0 10px 20px -4px rgba(31,122,99,.45);color:#fff}
 .topnav-links a:not(.lang-switch){position:relative}
 .topnav-links a:not(.lang-switch)::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:3px;border-radius:3px;
-  background:var(--vv-sun);transform:scaleX(0);transform-origin:left;transition:transform .25s var(--fz-out)}
+  background:var(--vv-teal);transform:scaleX(0);transform-origin:left;transition:transform .25s var(--fz-out)}
 .topnav-links a:not(.lang-switch):hover{text-decoration:none}
 .topnav-links a:not(.lang-switch):hover::after{transform:scaleX(1)}
 
-/* ============ HERO: sinar matahari solar + judul besar ============ */
+/* ============ HERO: Palet Hijau Emerald KelasKu (#1F7A63) + Krem Travertine ============ */
 .hero{background:
-  radial-gradient(120% 70% at 50% -8%,#FFD94F 0%,#FFE58A 26%,rgba(255,241,184,.85) 46%,rgba(255,249,238,0) 72%),
-  linear-gradient(180deg,#FFF1B8 0%,var(--cream) 78%)}
-.hero::before{content:"";position:absolute;left:50%;top:-38vmax;width:120vmax;height:120vmax;transform:translateX(-50%);
-  pointer-events:none;z-index:0;opacity:.42;
-  background:repeating-conic-gradient(from 0deg,rgba(255,255,255,.75) 0deg 5deg,transparent 5deg 15deg);
-  -webkit-mask-image:radial-gradient(circle at 50% 50%,#000 0%,transparent 44%);
-  mask-image:radial-gradient(circle at 50% 50%,#000 0%,transparent 44%)}
-.anim .hero::before{animation:vvSpin 120s linear infinite}
-@keyframes vvSpin{to{transform:translateX(-50%) rotate(360deg)}}
+  radial-gradient(100% 65% at 50% -5%,rgba(31,122,99,.18) 0%,rgba(58,163,133,.09) 36%,rgba(255,249,238,0) 72%),
+  radial-gradient(60% 45% at 85% 15%,rgba(255,217,79,.10) 0%,transparent 60%),
+  radial-gradient(50% 40% at 15% 20%,rgba(31,122,99,.08) 0%,transparent 55%),
+  linear-gradient(180deg,#F2F8F5 0%,#FAF8F2 42%,var(--cream) 100%)}
+.hero::before{content:"";position:absolute;left:50%;top:-30vmax;width:100vmax;height:100vmax;transform:translateX(-50%);
+  pointer-events:none;z-index:0;opacity:.35;
+  background:radial-gradient(circle at 50% 50%,rgba(31,122,99,.20) 0%,rgba(46,157,129,.08) 38%,transparent 68%)}
+.anim .hero::before{animation:vvPulseGlow 18s ease-in-out infinite alternate}
+@keyframes vvPulseGlow{0%{transform:translateX(-50%) scale(0.96);opacity:.28}100%{transform:translateX(-50%) scale(1.04);opacity:.42}}
 .hero>.wrap{position:relative;z-index:1}
 
-.mast-h1{max-width:18ch;font-size:clamp(2.05rem,7.4vw,3.7rem);line-height:1.04;letter-spacing:-.04em;color:var(--vv-ink)}
-.mast-h1 .vv-hl{position:relative;white-space:nowrap;z-index:0}
-.mast-h1 .vv-hl::after{content:"";position:absolute;left:-.12em;right:-.12em;bottom:.04em;height:.36em;z-index:-1;
-  border-radius:.2em;background:var(--vv-rose);opacity:.28;transform:skewX(-8deg)}
+.mast-h1{max-width:24ch;font-size:clamp(1.85rem,4.6vw,3.05rem);line-height:1.16;letter-spacing:-.035em;color:var(--vv-ink);margin:0 auto;text-wrap:balance}
+.mast-lang{color:var(--vv-teal);display:inline-block;background:linear-gradient(135deg,#238970 0%,#166052 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .mast-sub{white-space:normal;text-transform:none!important;letter-spacing:0!important;
-  font-size:clamp(1rem,3.8vw,1.18rem);font-weight:600;line-height:1.55;color:#6A2230;
+  font-size:clamp(.98rem,2.3vw,1.1rem);font-weight:500;line-height:1.6;color:#7A323F;
   max-width:52ch;margin:14px auto 0;text-wrap:balance}
 
 .mast-cta{gap:12px}
-.mast-cta .btn-primary{min-height:58px;padding:15px 34px;font-size:1.1rem;font-weight:800}
+.mast-cta .btn-primary{min-height:54px;padding:14px 32px;font-size:1.08rem;font-weight:800;
+  background:linear-gradient(180deg,#28967B 0%,var(--vv-teal) 60%,#166052 100%);color:#fff;border-color:#124B3D;
+  box-shadow:0 4px 0 #124B3D,0 12px 24px -6px rgba(31,122,99,.42)}
+.anim .mast-cta .btn-primary:hover{background:linear-gradient(180deg,#32A78A 0%,#238970 60%,#186E59 100%);
+  box-shadow:0 6px 0 #124B3D,0 16px 28px -6px rgba(31,122,99,.52);color:#fff}
 .vv-trust{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 10px;margin:20px auto 0;padding:0;list-style:none}
 .vv-trust li{display:inline-flex;align-items:center;gap:7px;padding:6px 13px 6px 8px;border-radius:999px;
   background:rgba(255,255,255,.82);border:1.5px solid rgba(109,25,38,.22);
@@ -84,11 +90,14 @@ body{color:#6A2230}
   background:var(--vv-teal) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center/11px no-repeat}
 
 @media (max-width:559px){
-  .masthead{padding-left:20px!important;padding-right:20px!important}
-  .mast-h1{max-width:16ch}
+  .masthead{padding-left:18px!important;padding-right:18px!important}
+  .mast-h1{font-size:clamp(1.55rem,5.4vw,1.95rem);line-height:1.2;max-width:100%}
+  .mast-lang{display:inline}
+  .mast-sub{font-size:0.95rem;line-height:1.5;max-width:34ch;margin-top:10px}
   .mast-cta{display:grid;grid-template-columns:1fr;gap:10px}
   .mast-cta .btn{width:100%;min-width:0;padding-left:12px;padding-right:12px}
   .mast-cta .btn-ghost{min-height:46px}
+  .btn-primary-hero{width:100%;max-width:320px}
   .vv-trust li{font-size:var(--fs-micro)}
 }
 

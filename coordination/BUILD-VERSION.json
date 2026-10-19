@@ -1,7 +1,7 @@
 {
-  "version": "m025-616",
-  "claimedBy": "branch main",
-  "claimedAt": "2026-10-19T19:52:42.151Z",
-  "reason": "fix(call): atasi self-interruption echo dan stabilkan voice call (m025-616)",
+  "version": "m025-617",
+  "claimedBy": "branch fix/voice-call-stability-m025-616",
+  "claimedAt": "2026-10-19T20:20:56.329Z",
+  "reason": "feat(landing): palet hijau emerald kelasku dan tipografi bilingual adaptif hero",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

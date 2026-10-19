@@ -51,6 +51,10 @@
 
   var activeAudio = null;
   var activeAbortController = null;
+  var activeSource = null;      // BufferSource jalur WebAudio fallback — harus bisa dibungkam stop()
+  var outputAnalyser = null;    // level suara AI untuk orb (bukan animasi acak)
+  var lastWarmupAt = 0;
+  var WARMUP_COOLDOWN_MS = 20000;
 
   // Cache in-memory hasil prefetch dari server neural voice
   // Key: (persona)::(sentence) -> Promise<object|null>
@@ -98,19 +102,32 @@
       .trim();
   }
 
-  /** Potong per kalimat; potongan pendek digabung ke kalimat berikutnya. */
+  var EN_ABBREV_RE = /\b(Mr|Mrs|Ms|Dr|Prof|Sr|Jr|St|vs|etc|U\.S|U\.K|a\.m|p\.m|e\.g|i\.e)\./gi;
+  var EN_DECIMAL_RE = /(\d)\.(\d)/g;
+  var DOT_MARK = '\u0001';
+
+  /** Potong per kalimat; potongan pendek digabung ke kalimat berikutnya. Titik desimal/singkatan dilindungi. */
   function splitSentences(text, course) {
     var t = cleanText(text);
     if (!t) return [];
-    var re = course === 'ja'
-      ? /[^。！？!?]+[。！？!?]*/g
-      : /[^.!?]+[.!?]+["'”’)]*\s*|[^.!?]+$/g;
-    var parts = (t.match(re) || [t]).map(function (p) { return p.trim(); }).filter(Boolean);
+    var parts;
+    if (course === 'ja') {
+      parts = t.match(/[^。！？!?…‥]+[。！？!?…‥]*/g) || [t];
+    } else {
+      var guarded = t
+        .replace(EN_ABBREV_RE, function (m) { return m.slice(0, -1) + DOT_MARK; })
+        .replace(EN_DECIMAL_RE, '$1' + DOT_MARK + '$2');
+      parts = (guarded.match(/[^.!?]+[.!?]+["'”’)]*\s*|[^.!?]+$/g) || [guarded]).map(function (p) {
+        return p.split(DOT_MARK).join('.');
+      });
+    }
+    parts = parts.map(function (p) { return p.trim(); }).filter(Boolean);
     var out = [];
     var carry = '';
+    var minLen = course === 'ja' ? 3 : MIN_CHUNK_CHARS;
     for (var i = 0; i < parts.length; i++) {
       var piece = carry ? carry + (course === 'ja' ? '' : ' ') + parts[i] : parts[i];
-      if (piece.length < MIN_CHUNK_CHARS && i < parts.length - 1) { carry = piece; continue; }
+      if (piece.length < minLen && i < parts.length - 1) { carry = piece; continue; }
       out.push(piece);
       carry = '';
     }
@@ -321,6 +338,9 @@
    * Mendukung failover otomatis antar candidate endpoint (local server, Render cloud, same-origin).
    * Mengembalikan Promise<{ audioBase64: string, mimeType?: string, url?: string } | null>.
    */
+  // Telepon: lebih baik jatuh ke lapisan cadangan dalam 2,5 detik daripada diam menunggu Render.
+  var LINE_TIMEOUT_MS = 2500;
+
   function fetchServerLine(sentence, persona, course, cancelSignal) {
     var cacheKey = persona + '::' + sentence;
     if (prefetchCache.has(cacheKey)) {
@@ -355,6 +375,7 @@
 
     function tryFetchCandidate() {
       if (cIdx >= candidates.length) return Promise.resolve(null);
+      if (cancelSignal && cancelSignal.aborted) return Promise.resolve(null);
       var currentTarget = resolveAbsoluteUrl(candidates[cIdx++]);
 
       var controller = typeof root.AbortController === 'function' ? new root.AbortController() : null;
@@ -362,10 +383,19 @@
       if (controller) {
         timer = setTimeout(function () {
           try { controller.abort(); } catch (_) {}
-        }, 3500);
+        }, LINE_TIMEOUT_MS);
+        // Sinyal barge-in dari speakSentence HARUS ikut memutus fetch yang sama.
+        if (cancelSignal) {
+          if (cancelSignal.aborted) {
+            try { controller.abort(); } catch (_) {}
+          } else if (typeof cancelSignal.addEventListener === 'function') {
+            cancelSignal.addEventListener('abort', function () {
+              try { controller.abort(); } catch (_) {}
+            }, { once: true });
+          }
+        }
       }
-
-      var signal = cancelSignal || (controller ? controller.signal : undefined);
+      var signal = controller ? controller.signal : cancelSignal;
 
       return f(currentTarget, {
         method: 'POST',
@@ -374,13 +404,9 @@
         signal: signal
       }).then(function (res) {
         if (timer) clearTimeout(timer);
-        if (!res || !res.ok) {
-          // Coba candidate endpoint berikutnya
-          return tryFetchCandidate();
-        }
+        if (!res || !res.ok) return tryFetchCandidate();
         return res.json().then(function (data) {
           if (data && (data.audioBase64 || data.url)) {
-            // Ingat endpoint yang sukses
             serverEndpoint = currentTarget;
             serverStatus = 'available';
             return data;
@@ -391,6 +417,7 @@
         });
       }).catch(function () {
         if (timer) clearTimeout(timer);
+        if (cancelSignal && cancelSignal.aborted) return null;
         return tryFetchCandidate();
       });
     }
@@ -459,6 +486,7 @@
       }
 
       activeAudio = audio;
+      attachOutputAnalyser(audio);
       var settled = false;
 
       function cleanup() {
@@ -520,7 +548,9 @@
             var src = ctx.createBufferSource();
             src.buffer = audioBuf;
             src.connect(ctx.destination);
+            activeSource = src;
             src.onended = function () {
+              if (activeSource === src) activeSource = null;
               cleanup();
               resolve(myToken === token);
             };
@@ -547,6 +577,53 @@
         playViaWebAudio();
       }
     });
+  }
+
+  /** Hubungkan elemen audio ke analyser HANYA bila konteks sudah running (iOS: konteks suspended = bisu). */
+  function attachOutputAnalyser(audio) {
+    try {
+      var ctx = root.__fiezelSharedAudioContext;
+      if (!ctx || ctx.state !== 'running' || typeof ctx.createMediaElementSource !== 'function') return;
+      if (!outputAnalyser) {
+        outputAnalyser = ctx.createAnalyser();
+        outputAnalyser.fftSize = 256;
+        outputAnalyser.smoothingTimeConstant = 0.5;
+        outputAnalyser.connect(ctx.destination);
+      }
+      ctx.createMediaElementSource(audio).connect(outputAnalyser);
+    } catch (_) {}
+  }
+
+  /** RMS 0..1 suara AI yang sedang diputar; 0 bila tidak ada analyser (orb memakai denyut sintetis). */
+  function getOutputLevel() {
+    if (!outputAnalyser || !activeAudio) return 0;
+    try {
+      var buf = new Uint8Array(outputAnalyser.fftSize);
+      outputAnalyser.getByteTimeDomainData(buf);
+      var sum = 0;
+      for (var i = 0; i < buf.length; i++) { var v = (buf[i] - 128) / 128; sum += v * v; }
+      return Math.sqrt(sum / buf.length);
+    } catch (_) { return 0; }
+  }
+
+  /** Kecilkan suara AI sementara (pre-duck barge-in akustik); duck(1) mengembalikan. */
+  function duck(level) {
+    var v = Math.max(0, Math.min(1, Number(level)));
+    if (activeAudio) { try { activeAudio.volume = v; } catch (_) {} }
+  }
+
+  /** Buka koneksi TLS/ bangunkan server neural voice SEBELUM balasan AI tiba (dipanggil saat THINKING). */
+  function warmup() {
+    try {
+      if (root.FIEZEL_SERVER_TTS_ENABLED === false) return Promise.resolve(false);
+      if (Date.now() - lastWarmupAt < WARMUP_COOLDOWN_MS) return Promise.resolve(true);
+      lastWarmupAt = Date.now();
+      var f = root.fetch;
+      if (typeof f !== 'function') return Promise.resolve(false);
+      var target = resolveAbsoluteUrl(getEndpoint());
+      var probeUrl = target.replace(/\/line(\/index\.php)?\/?$/, '/personas$1');
+      return f(probeUrl, { method: 'GET', cache: 'no-store' }).then(function (r) { return !!(r && r.ok); }, function () { return false; });
+    } catch (_) { return Promise.resolve(false); }
   }
 
   function unlockAudio() {
@@ -739,11 +816,11 @@
       if (typeof h.onSentenceStart === 'function') { try { h.onSentenceStart(i, sentences[i]); } catch (_) {} }
       // Prioritaskan pengiriman audio kalimat saat ini ke jaringan seketika (<250ms)
       var run = speakSentence(sentences[i], c, h);
-      // Kalimat berikutnya dihangatkan (prefetch) di latar belakang selagi kalimat sekarang berbunyi
-      if (i + 1 < sentences.length) {
-        Promise.resolve().then(function () {
-          if (mine === token) prefetch(sentences[i + 1], c, h);
-        });
+      // Kalimat berikutnya dihangatkan (prefetch 2 kalimat ke depan) di latar belakang selagi kalimat sekarang berbunyi
+      for (var k = 1; k <= 2 && i + k < sentences.length; k++) {
+        (function (next) {
+          Promise.resolve().then(function () { if (mine === token) prefetch(next, c, h); });
+        })(sentences[i + k]);
       }
       return run.then(function (ok) {
         if (mine !== token) return false;
@@ -767,6 +844,12 @@
         activeAudio.src = '';
       } catch (_) {}
       activeAudio = null;
+    }
+    if (activeSource) {
+      var srcNode = activeSource;
+      activeSource = null;
+      try { srcNode.stop(0); } catch (_) {}
+      try { srcNode.disconnect(); } catch (_) {}
     }
     if (activeAbortController) {
       try { activeAbortController.abort(); } catch (_) {}
@@ -809,6 +892,9 @@
     speak: speak,
     stop: stop,
     prefetch: prefetch,
+    warmup: warmup,
+    duck: duck,
+    getOutputLevel: getOutputLevel,
     isAvailable: isAvailable,
     splitSentences: splitSentences,
     cleanText: cleanText,
