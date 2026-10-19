@@ -29,31 +29,93 @@ try {
   if (process.env.GEMINI_API_KEY) geminiKeys = [process.env.GEMINI_API_KEY];
 }
 
+const ELEVEN_CONFIG_FILE = path.join(ROOT, 'config', 'elevenlabs-key.json');
+let elevenConfig = null;
+try {
+  elevenConfig = JSON.parse(fs.readFileSync(ELEVEN_CONFIG_FILE, 'utf8'));
+} catch (_) {}
+
+const ELEVEN_API_KEY = process.env.ELEVENLABS_API_KEY || elevenConfig?.apiKey || 'sk_f19a703d6ffa2e121405025144326aaadf7d7c1fdd3fefa8';
+
 export const VOICE_PROFILES = {
   INSTRUCTOR: {
+    elevenVoiceId: elevenConfig?.voices?.instructor || 'D3L9PtKnIVJXdgK444Ey',
     geminiVoice: 'Charon',
     edgeVoice: 'ja-JP-KeitaNeural',
     pitch: '-18Hz',
     rate: '-4%',
-    role: 'Instruktor Ujian (Tegas & Dewasa)'
+    role: 'Instruktor Ujian (Ryu - Tegas & Dewasa)'
   },
   MALE_STUDENT: {
+    elevenVoiceId: elevenConfig?.voices?.maleStudent || elevenConfig?.voices?.male || '4sirbXwrtRlmPV80MJkQ',
     geminiVoice: 'Puck',
     edgeVoice: 'ja-JP-KeitaNeural',
     pitch: '+4Hz',
     rate: '+3%',
-    role: 'Mahasiswa Laki-laki (Pemuda Natural)'
+    role: 'Mahasiswa Laki-laki (Sora - Pemuda Natural)'
   },
   FEMALE_STUDENT: {
+    elevenVoiceId: elevenConfig?.voices?.femaleStudent || elevenConfig?.voices?.female || 'ngvNHfiCrXLPAHcTrZK1',
     geminiVoice: 'Aoede',
     edgeVoice: 'ja-JP-NanamiNeural',
     pitch: '+3Hz',
     rate: '+1%',
-    role: 'Mahasiswi Perempuan (Cerdas & Ramah)'
+    role: 'Mahasiswi Perempuan (Aki - Cerdas & Ramah)'
+  },
+  MALE_SENIOR: {
+    elevenVoiceId: elevenConfig?.voices?.maleSenior || 'eRD4wLHoHH7P30TZIexm',
+    geminiVoice: 'Fenrir',
+    edgeVoice: 'ja-JP-DaichiNeural',
+    pitch: '-10Hz',
+    rate: '-2%',
+    role: 'Dosen / Tokoh Pria Senior (Akio - Berwibawa & Matang)'
+  },
+  FEMALE_SENIOR: {
+    elevenVoiceId: elevenConfig?.voices?.femaleSenior || 'xE6NbKmUvY3BhBzNAYsV',
+    geminiVoice: 'Kore',
+    edgeVoice: 'ja-JP-NanamiNeural',
+    pitch: '-6Hz',
+    rate: '-2%',
+    role: 'Ibu Asrama / Tokoh Wanita Matang (Chieko - Hangat & Bijak)'
   }
 };
 
 let currentKeyIndex = 0;
+
+/**
+ * Mencoba sintesis menggunakan ElevenLabs Voice API (Studio Quality)
+ */
+async function tryElevenLabsTts(text, voiceId, outPath) {
+  if (!ELEVEN_API_KEY || !voiceId) return false;
+  try {
+    const url = `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`;
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'xi-api-key': ELEVEN_API_KEY,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        text,
+        model_id: 'eleven_multilingual_v2',
+        voice_settings: {
+          stability: 0.5,
+          similarity_boost: 0.75
+        }
+      })
+    });
+    if (!res.ok) {
+      console.warn(`[ElevenLabs Warning] Voice ${voiceId} status ${res.status}`);
+      return false;
+    }
+    const buffer = Buffer.from(await res.arrayBuffer());
+    fs.writeFileSync(outPath, buffer);
+    return fs.existsSync(outPath) && fs.statSync(outPath).size > 500;
+  } catch (err) {
+    console.warn('[ElevenLabs Fetch Error]:', err.message);
+    return false;
+  }
+}
 
 /**
  * Mencoba sintesis menggunakan Gemini TTS
@@ -124,13 +186,21 @@ export async function synthesizeTurn(text, roleKey, outPath) {
   const cleanText = text.replace(/["\r\n]+/g, ' ').trim();
   if (!cleanText) return false;
 
-  // 1. Coba Gemini TTS terlebih dahulu
+  // 1. Coba ElevenLabs Studio Voice terlebih dahulu
+  if (profile.elevenVoiceId) {
+    const elevenOk = await tryElevenLabsTts(cleanText, profile.elevenVoiceId, outPath);
+    if (elevenOk) {
+      return true;
+    }
+  }
+
+  // 2. Coba Gemini TTS berikutnya
   const geminiOk = await tryGeminiTts(cleanText, profile.geminiVoice, outPath);
   if (geminiOk) {
     return true;
   }
 
-  // 2. Fallback ke Edge Neural (Zero-Quota, Terkalibrasi Pitch & Rate)
+  // 3. Fallback ke Edge Neural (Zero-Quota, Terkalibrasi Pitch & Rate)
   const cmd = `edge-tts --voice ${profile.edgeVoice} --pitch=${profile.pitch} --rate=${profile.rate} --text "${cleanText.replace(/"/g, '\\"')}" --write-media "${outPath}"`;
   try {
     execSync(cmd, { stdio: ['ignore', 'pipe', 'ignore'], timeout: 30000 });
