@@ -100,6 +100,104 @@
     return Math.sqrt(sum / dataArray.length);
   }
 
+  // Canonical Voice Call Personas
+  var PERSONAS = {
+    en: {
+      alex: {
+        id: 'alex',
+        name: 'Coach Alex',
+        shortName: 'Alex',
+        voice: 'en-US-GuyNeural',
+        gender: 'male',
+        role: 'Speaking & Confidence Coach',
+        avatarIcon: 'coach',
+        label: 'Coach Alex'
+      },
+      sarah: {
+        id: 'sarah',
+        name: 'Coach Sarah',
+        shortName: 'Sarah',
+        voice: 'en-US-AriaNeural',
+        gender: 'female',
+        role: 'Pronunciation & Fluency Coach',
+        avatarIcon: 'coach',
+        label: 'Coach Sarah'
+      }
+    },
+    ja: {
+      keita: {
+        id: 'keita',
+        name: 'フィゼル先生',
+        shortName: 'Keita',
+        voice: 'ja-JP-KeitaNeural',
+        gender: 'male',
+        role: 'Percakapan & Pola Kalimat',
+        avatarIcon: 'sensei',
+        label: 'Sensei Keita'
+      },
+      nanami: {
+        id: 'nanami',
+        name: 'ナナミ先生',
+        shortName: 'Nanami',
+        voice: 'ja-JP-NanamiNeural',
+        gender: 'female',
+        role: 'Percakapan Sehari-hari & Keigo',
+        avatarIcon: 'sensei',
+        label: 'Sensei Nanami'
+      }
+    }
+  };
+
+  function resolvePersona(course, val) {
+    var s = (val && typeof val === 'object' && val.id) ? String(val.id) : String(val || '');
+    s = s.toLowerCase().trim();
+
+    var c = course;
+    if (s === 'sarah' || s === 'aria' || s === 'alex' || s === 'guy' || /sarah|aria|coach/i.test(s)) {
+      c = 'en';
+    } else if (s === 'keita' || s === 'nanami' || /keita|nanami|sensei/i.test(s)) {
+      c = 'ja';
+    } else {
+      c = (course === 'en') ? 'en' : 'ja';
+    }
+
+    var bank = PERSONAS[c];
+    if (!s) {
+      try {
+        var stored = localStorage.getItem('fz_persona_' + c);
+        if (stored && bank[stored]) return bank[stored];
+      } catch (_) {}
+      return bank[c === 'ja' ? 'keita' : 'alex'];
+    }
+    if (bank[s]) return bank[s];
+    if (c === 'en') {
+      if (/sarah|aria/i.test(s)) return bank.sarah;
+      if (/alex|guy/i.test(s)) return bank.alex;
+      return bank.alex;
+    } else {
+      if (/nanami/i.test(s)) return bank.nanami;
+      if (/keita/i.test(s)) return bank.keita;
+      return bank.keita;
+    }
+  }
+
+  function renderPersonaSwitchHtml(course, activeId) {
+    var c = course === 'ja' ? 'ja' : 'en';
+    var bank = PERSONAS[c];
+    var keys = Object.keys(bank);
+    var btnsHtml = keys.map(function (k) {
+      var p = bank[k];
+      var isActive = p.id === activeId ? ' is-active' : '';
+      var ariaChecked = p.id === activeId ? 'true' : 'false';
+      return '<button type="button" class="fzc-call-persona-btn' + isActive + '" data-persona="' + esc(p.id) + '" role="radio" aria-checked="' + ariaChecked + '" title="' + esc(p.label + ' (' + p.voice + ')') + '">' +
+        '<span class="fzc-persona-icon" aria-hidden="true">' + (p.gender === 'female' ? '👩‍🏫' : '👨‍🏫') + '</span> ' +
+        '<span class="fzc-persona-name">' + esc(p.shortName || p.label) + '</span>' +
+        '</button>';
+    }).join('');
+
+    return '<div class="fzc-call-persona-switch" id="fzcCallPersonaSwitch" role="radiogroup" aria-label="' + esc(t('call_choose_persona', 'Pilih Mitra Bicara')) + '">' + btnsHtml + '</div>';
+  }
+
   // --- Voice Call Engine Instance ---
   function createVoiceCallEngine() {
     var state = {
@@ -116,6 +214,8 @@
       durationSeconds: 0,
       audioLevel: 0,
       interruptedCount: 0,
+      persona: 'keita',
+      partnerVoice: 'ja-JP-KeitaNeural',
       callTurns: []
     };
 
@@ -276,14 +376,27 @@
       if (!clean || !cv || typeof cv.speak !== 'function') return Promise.resolve(false);
       var isJa = course === 'ja';
       var started = false;
+
+      // Pulse orb immediately as AI begins vocalization
+      startSpeakPulse();
+
       return cv.speak(clean, isJa ? 'ja' : 'en', {
+        voice: state.partnerVoice,
+        persona: state.persona,
         onSentenceStart: function (i, sentence) {
           if (!started) {
             started = true;
-            startSpeakPulse();
-            emit('speechStart', { isJa: isJa, text: clean });
+            emit('speechStart', { isJa: isJa, text: clean, persona: state.persona, voice: state.partnerVoice });
           }
-          emit('speechBoundary', { index: i, text: sentence });
+          emit('speechBoundary', { index: i, text: sentence, persona: state.persona, voice: state.partnerVoice });
+        },
+        onEnd: function () {
+          clearSpeakPulse();
+          currentAiSpeechLevel = 0;
+          renderOrbLevel(0);
+          if (orbInstance && typeof orbInstance.setVolume === 'function') {
+            orbInstance.setVolume(0);
+          }
         }
       }).then(function (spoke) {
         clearSpeakPulse();
@@ -295,6 +408,11 @@
         return spoke;
       }, function () {
         clearSpeakPulse();
+        currentAiSpeechLevel = 0;
+        renderOrbLevel(0);
+        if (orbInstance && typeof orbInstance.setVolume === 'function') {
+          orbInstance.setVolume(0);
+        }
         return false;
       });
     }
@@ -1023,7 +1141,10 @@
       }
       state.course = opts.course || 'ja';
       state.scenarioId = opts.scenarioId || 'free';
-      state.partnerName = opts.partnerName || (state.course === 'ja' ? 'フィゼル先生' : 'Coach Alex');
+      var resolved = resolvePersona(state.course, opts.persona || opts.personaId || opts.partnerPersona || opts.partnerVoice || state.persona);
+      state.persona = resolved.id;
+      state.partnerVoice = resolved.voice;
+      state.partnerName = opts.partnerName || (resolved.id === 'keita' && state.course === 'ja' ? 'フィゼル先生' : resolved.name);
       state.partnerAvatar = opts.partnerAvatar || (state.course === 'ja'
         ? renderIcon('sensei', { size: 24, filled: true })
         : renderIcon('coach', { size: 24, filled: true }));
@@ -1296,11 +1417,12 @@
         '<div class="fzc-call-topbar">' +
         '<div class="fzc-call-partner-info">' +
         '<div class="fzc-call-status-dot is-connecting" id="fzcCallStatusDot"></div>' +
-        '<div>' +
-        '<div class="fzc-call-partner-name">' + esc(partnerName) + '</div>' +
+        '<div class="fzc-call-partner-meta-wrap">' +
+        '<div class="fzc-call-partner-name" id="fzcCallPartnerName">' + esc(partnerName) + '</div>' +
         '<div class="fzc-call-timer" id="fzcCallTimer">00:00</div>' +
         '</div>' +
         '</div>' +
+        renderPersonaSwitchHtml(state.course, state.persona) +
         '<button type="button" class="fzc-call-btn-mini" id="fzcCallBtnClose" aria-label="' + esc(t('call_close', 'Tutup Panggilan')) + '">' + renderIcon('close', { size: 16 }) + '</button>' +
         '</div>' +
 
@@ -1437,6 +1559,68 @@
           }
         };
       }
+
+      var personaBtns = container.querySelectorAll('.fzc-call-persona-btn');
+      for (var pb = 0; pb < personaBtns.length; pb++) {
+        (function (pBtn) {
+          pBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            var targetPersona = pBtn.getAttribute('data-persona');
+            if (targetPersona) {
+              setPersona(targetPersona);
+            }
+          });
+        })(personaBtns[pb]);
+      }
+    }
+
+    function setPersona(personaKey) {
+      var resolved = resolvePersona(state.course, personaKey);
+      if (!resolved) return null;
+      if (PERSONAS.en && PERSONAS.en[resolved.id]) {
+        state.course = 'en';
+      } else if (PERSONAS.ja && PERSONAS.ja[resolved.id]) {
+        state.course = 'ja';
+      }
+      state.persona = resolved.id;
+      state.partnerVoice = resolved.voice;
+      state.partnerName = (resolved.id === 'keita' && state.course === 'ja') ? 'フィゼル先生' : resolved.name;
+      state.partnerAvatar = state.course === 'ja'
+        ? renderIcon('sensei', { size: 24, filled: true })
+        : renderIcon('coach', { size: 24, filled: true });
+
+      try {
+        localStorage.setItem('fz_persona_' + state.course, resolved.id);
+      } catch (_) {}
+
+      var chatEngine = root.FiezelInteractiveChat;
+      if (chatEngine && typeof chatEngine.setPersona === 'function') {
+        try { chatEngine.setPersona(resolved.id, state.course); } catch (_) {}
+      }
+
+      updatePersonaUI();
+      emit('personaChange', {
+        persona: resolved.id,
+        partnerName: state.partnerName,
+        voice: resolved.voice,
+        course: state.course
+      });
+      return resolved;
+    }
+
+    function updatePersonaUI() {
+      if (!overlayEl) return;
+      var nameEl = overlayEl.querySelector('#fzcCallPartnerName') || overlayEl.querySelector('.fzc-call-partner-name');
+      if (nameEl) {
+        nameEl.textContent = state.partnerName;
+      }
+      var btns = overlayEl.querySelectorAll('.fzc-call-persona-btn');
+      for (var i = 0; i < btns.length; i++) {
+        var pId = btns[i].getAttribute('data-persona');
+        var isActive = pId === state.persona;
+        btns[i].classList.toggle('is-active', isActive);
+        btns[i].setAttribute('aria-checked', isActive ? 'true' : 'false');
+      }
     }
 
     function updateOverlayUI() {
@@ -1447,6 +1631,8 @@
       var dot = overlayEl.querySelector('#fzcCallStatusDot');
       var label = overlayEl.querySelector('#fzcCallStatusLabel');
       var hint = overlayEl.querySelector('#fzcCallInterruptHint');
+
+      updatePersonaUI();
 
       var statusClass = 'is-' + state.status;
       if (state.isMuted) statusClass += ' is-muted';
@@ -1569,6 +1755,14 @@
       computeRMS: computeRMS,
       unlockAudio: unlockAudio,
       playSpeech: playSpeech,
+      setPersona: setPersona,
+      getPersona: function () {
+        return resolvePersona(state.course, state.persona);
+      },
+      getPersonas: function (c) {
+        return PERSONAS[c || state.course || 'ja'];
+      },
+      PERSONAS: PERSONAS,
       showMicPermissionModal: showMicPermissionModal,
       cleanup: end,
       _testSetStatus: function (status, meta) { return setStatus(status, meta, true); },
@@ -1584,6 +1778,7 @@
   // Root API Export
   var api = {
     STATE: STATE,
+    PERSONAS: PERSONAS,
     createEngine: createVoiceCallEngine,
     start: function (options) { return defaultInstance.start(options); },
     startCall: function (options) { return defaultInstance.start(options); },
@@ -1597,6 +1792,9 @@
     setMute: function (muted) { return defaultInstance.setMute(muted); },
     toggleSubtitles: function () { return defaultInstance.toggleSubtitles(); },
     getState: function () { return defaultInstance.getState(); },
+    setPersona: function (persona) { return defaultInstance.setPersona(persona); },
+    getPersona: function () { return defaultInstance.getPersona(); },
+    getPersonas: function (c) { return defaultInstance.getPersonas(c); },
     showMicPermissionModal: function (onRetry) { return defaultInstance.showMicPermissionModal(onRetry); },
     on: function (evt, fn) { defaultInstance.on(evt, fn); },
     off: function (evt, fn) { defaultInstance.off(evt, fn); },
