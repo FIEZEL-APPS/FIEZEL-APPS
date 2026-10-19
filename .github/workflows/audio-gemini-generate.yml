@@ -110,15 +110,16 @@ jobs:
             fi
             echo "Push langsung ke main ditolak (percobaan $attempt), sinkronisasi manifest remote..."
             git fetch origin main
+            git show origin/main:audio/manifest.json > /tmp/remote-manifest.json
             node -e '
               const fs = require("fs");
-              const cp = require("child_process");
               const local = JSON.parse(fs.readFileSync("audio/manifest.json", "utf8"));
-              const remote = JSON.parse(cp.execSync("git show origin/main:audio/manifest.json").toString());
+              const remote = JSON.parse(fs.readFileSync("/tmp/remote-manifest.json", "utf8"));
               local.assets = Object.assign({}, remote.assets, local.assets);
               local.version = Math.max(Number(local.version) || 0, Number(remote.version) || 0) + 1;
               fs.writeFileSync("audio/manifest.json", JSON.stringify(local, null, 2) + "\n");
             '
+            rm -f /tmp/remote-manifest.json
             git reset --mixed origin/main
             git add audio/manifest.json
             git commit -m "Audio: aset $CONTENT hasil produksi Gemini TTS (merged)" || true
