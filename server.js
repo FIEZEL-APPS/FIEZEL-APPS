@@ -224,24 +224,28 @@ async function tryMsEdgeTts(text, persona) {
     const msedge = require('msedge-tts');
     if (!msedge || !msedge.MsEdgeTTS) return null;
     const tts = new msedge.MsEdgeTTS();
-    await tts.setMetadata(persona.edgeVoice, msedge.OUTPUT_FORMAT.AUDIO_24KHZ_48KBITRATE_MONO_MP3);
-    const { audioStream } = tts.toStream(text.trim(), {
-      pitch: persona.prosodyPitch,
-      rate: persona.prosodyRate
-    });
-    const chunks = [];
-    for await (const chunk of audioStream) {
-      chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
-    }
-    const mp3Buffer = Buffer.concat(chunks);
-    if (mp3Buffer.length > 0) {
-      return {
-        audioBase64: mp3Buffer.toString('base64'),
-        mimeType: 'audio/mpeg',
-        voiceName: persona.edgeVoice.replace(/^[a-z]{2}-[A-Z]{2}-/, ''),
-        personaLabel: persona.personaLabel,
-        engine: 'edge-neural-24khz'
-      };
+    try {
+      await tts.setMetadata(persona.edgeVoice, msedge.OUTPUT_FORMAT.AUDIO_24KHZ_48KBITRATE_MONO_MP3);
+      const { audioStream } = tts.toStream(text.trim(), {
+        pitch: persona.prosodyPitch,
+        rate: persona.prosodyRate
+      });
+      const chunks = [];
+      for await (const chunk of audioStream) {
+        chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+      }
+      const mp3Buffer = Buffer.concat(chunks);
+      if (mp3Buffer.length > 0) {
+        return {
+          audioBase64: mp3Buffer.toString('base64'),
+          mimeType: 'audio/mpeg',
+          voiceName: persona.edgeVoice.replace(/^[a-z]{2}-[A-Z]{2}-/, ''),
+          personaLabel: persona.personaLabel,
+          engine: 'edge-neural-24khz'
+        };
+      }
+    } finally {
+      try { tts.close(); } catch (_) {}
     }
   } catch (_) {}
   return null;
@@ -522,8 +526,8 @@ const server = http.createServer(async (req, res) => {
     });
   }
 
-  if (pathname === '/') {
-    pathname = '/kurikulum.html';
+  if (pathname === '/' || pathname === '') {
+    pathname = '/index.html';
   }
 
   const safePath = path.normalize(pathname).replace(/^(\.\.[/\\])+/, '');

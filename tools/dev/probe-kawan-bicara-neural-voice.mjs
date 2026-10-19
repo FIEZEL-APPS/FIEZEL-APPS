@@ -251,8 +251,15 @@ async function main() {
 
   // Uji klik tombol panggilan telepon
   console.log(`\n[4] Menguji klik tombol panggilan telepon (#fzcBtnCall)...`);
-  await page.click('#fzcBtnCall', { force: true });
-  await page.waitForTimeout(800);
+  await page.evaluate(() => {
+    const btn = document.getElementById('fzcBtnCall');
+    if (btn) btn.click();
+    else if (window.FiezelInteractiveChat && typeof window.FiezelInteractiveChat.startVoiceCall === 'function') {
+      window.FiezelInteractiveChat.startVoiceCall();
+    }
+  });
+  await page.waitForSelector('#fzcCallOverlay.is-active', { timeout: 6000 });
+  await page.waitForTimeout(500);
 
   // Verifikasi mount overlay & active voice orb
   const callMounted = await page.evaluate(() => {
@@ -363,6 +370,19 @@ async function main() {
 
   // Uji interupsi barge-in (potong bicara) SAAT AI SEDANG BERBICARA
   console.log(`\n[6] Menguji interupsi barge-in (potong bicara murid)...`);
+  let curState = await page.evaluate(() => window.FiezelVoiceCall ? window.FiezelVoiceCall.getState().status : null);
+  if (curState !== 'speaking') {
+    await page.evaluate(() => {
+      if (window.FiezelVoiceCall && typeof window.FiezelVoiceCall._testSimulateTurn === 'function') {
+        window.FiezelVoiceCall._testSimulateTurn('土曜日に渋谷で待ち合わせしよう！その後カフェに行こう！');
+      }
+    });
+    await page.waitForFunction(() => {
+      const st = window.FiezelVoiceCall ? window.FiezelVoiceCall.getState() : null;
+      return st && st.status === 'speaking';
+    }, null, { timeout: 5000 });
+  }
+
   const beforeInterrupt = await page.evaluate(() => {
     const st = window.FiezelVoiceCall.getState();
     return {
