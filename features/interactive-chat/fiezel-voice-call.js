@@ -797,7 +797,6 @@
 
         rec.onresult = function (event) {
           if (state.isMuted) return;
-          console.log('[TRACE onresult]', { resultOffset: resultOffset, lastResultsLength: lastResultsLength, evLen: event.results.length, resIdx: event.resultIndex });
           var finals = '';
           var interim = '';
           var lastIsFinal = false;
@@ -859,7 +858,6 @@
         };
 
         rec.onend = function () {
-          console.log('[TRACE onend]');
           isRecognitionRunning = false;
           if (sessionFinals) {
             transcriptCarry = (transcriptCarry + ' ' + sessionFinals).trim();
