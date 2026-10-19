@@ -133,7 +133,7 @@
     parts = parts.map(function (p) { return p.trim(); }).filter(Boolean);
     var out = [];
     var carry = '';
-    var minLen = course === 'ja' ? 3 : MIN_CHUNK_CHARS;
+    var minLen = course === 'ja' ? 6 : MIN_CHUNK_CHARS;
     for (var i = 0; i < parts.length; i++) {
       var piece = carry ? carry + (course === 'ja' ? '' : ' ') + parts[i] : parts[i];
       if (piece.length < minLen && i < parts.length - 1) { carry = piece; continue; }
