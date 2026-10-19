@@ -255,11 +255,11 @@ test('kartu "AI Booster" menghitung akurasinya, dan diam saat buktinya kurang', 
    4. SUARA
    ──────────────────────────────────────────────────────────────────────────── */
 
-test('tombol dengar flashcard hilang di kursus yang suaranya belum ada', () => {
+test('tombol dengar flashcard aktif di kursus yang sudah memiliki suara (en dan ja)', () => {
   assert.strictEqual(typeof context.targetLangVoiceBlocked, 'function', 'targetLangVoiceBlocked belum dipapar');
   pakaiBahasa('ja');
-  assert.strictEqual(context.targetLangVoiceBlocked(), true,
-    'kursus Jepang dianggap sudah punya suara, padahal tumpukan suaranya masih dipaku en-US');
+  assert.strictEqual(context.targetLangVoiceBlocked(), false,
+    'kursus Jepang harusnya sudah aktif karena 1.000 audio aset N5 sudah tersedia');
   pakaiBahasa('en');
   assert.strictEqual(context.targetLangVoiceBlocked(), false, 'kursus Inggris kehilangan suaranya sendiri');
   /* [SUMBER] Pengikatnya ikut dijaga: kalau tombolnya hilang tetapi pengikatnya masih

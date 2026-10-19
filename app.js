@@ -13477,7 +13477,7 @@ function AudioService(){
    * kolam soal sisanya), persis seperti dicatat reports/voice-v5-prefetch.md §3 baris 4.
    * Tidak ada prepare()/ensureReady() di sini; false yang tenang adalah jawaban sah.
    */
-  prefetch(next,options={}){return prefetchNextVoice(next,{speed:options.speed??selectedNeuralRate(),contentType:options.contentType,locale:options.locale})},
+  prefetch(next,options={}){const loc=options.locale||(typeof activeTargetLang==='function'&&activeTargetLang()==='ja'?'ja-JP':'en-US');return prefetchNextVoice(next,{speed:options.speed??selectedNeuralRate(),contentType:options.contentType,locale:loc})},
   /**
    * Satu pintu untuk Reading/Vocabulary/Grammar. Sejak m025-232 ia TIDAK punya cadangan
    * bersuara: hasil selain "berbunyi" berarti teks tanpa suara, dan sekali per sesi murid
@@ -13485,7 +13485,7 @@ function AudioService(){
    */
   play(text,options={}){
    if(!text)return Promise.resolve(null);
-   this.stop();
+   this.stop();const loc=options.locale||(typeof activeTargetLang==='function'&&activeTargetLang()==='ja'?'ja-JP':'en-US');
    /* m025-198 (laporan OWNER: FATAL). FiezelVoiceSay.say() memanggil prepareSubtitle() -
     * terjemahan bahasa murid muncul di layar sambil rekaman berbunyi - kecuali diberi
     * `suppressSubtitles`. m025-148 sudah memasang tombol itu dan memakainya di Skills Lab,
@@ -13533,14 +13533,14 @@ function AudioService(){
    const say=self.FiezelVoiceSay?.say;
    const viaDoor=typeof say==='function'
     ?Promise.race([
-      Promise.resolve().then(()=>say.call(self.FiezelVoiceSay,text,{speed:options.speed??selectedNeuralRate(),contentType:options.contentType,locale:options.locale,suppressSubtitles:noSubtitles})).catch(()=>false),
+      Promise.resolve().then(()=>say.call(self.FiezelVoiceSay,text,{speed:options.speed??selectedNeuralRate(),contentType:options.contentType,locale:loc,suppressSubtitles:noSubtitles})).catch(()=>false),
       timeoutPromise
     ])
     :Promise.resolve(false);
    // V6: `options.next` dihangatkan SESUDAH pemutaran diajukan - urutan ini yang menjaga
    // mesin single-flight tetap milik kalimat yang sedang didengar (inversi antrean m025-47).
    // stop() di atas sudah membatalkan generation sebelumnya, jadi pengajuan ini yang berlaku.
-   if(options.next)this.prefetch(options.next,{speed:options.speed,contentType:options.nextContentType||options.contentType,locale:options.locale});
+   if(options.next)this.prefetch(options.next,{speed:options.speed,contentType:options.nextContentType||options.contentType,locale:loc});
    return viaDoor.then(result=>{
     if(result===PENDING)return null; // masih berbunyi di bawah sana - lihat catatan PENDING di atas
     if(result!==false&&result!==null&&result!==undefined)return result===true?{provider:'fiezel-voice-say'}:result;
@@ -13723,6 +13723,7 @@ function flashcards(level){
     $('mastered').onclick=e=>{e.stopPropagation();markMastered('vocab',v.id);haptic('success');showToast(FiezelI18n.t('flash.toast-dikuasai'),'success');/* [FASE-4] 09 §3.3: kartu dikuasai = pengakuan → proud. */try{pawReact('badge-earned')}catch(_){}flyOutCard($('flashcard'),1,()=>{i++;draw()})};
     bindSwipe($('flashcard'),()=>{audio.stop();i++;draw()},()=>{audio.stop();i=Math.max(0,i-1);draw()});
     try{if(v?.word)audio.prefetch(v.word,{contentType:'word'});if(v?.example)audio.prefetch(v.example,{contentType:'sentence'})}catch(_){}
+    if(v?.word&&!targetLangVoiceBlocked()){audio.play(v.word,{contentType:'word',next:nextCard?nextCard.word:''})}
   };
   enterStage('vocab-flashcards',{draw:()=>draw(),leave:()=>audio.stop()});
   draw()
@@ -13745,10 +13746,11 @@ function reviewVocab(){
     $('reviewSpeakSentence')?.addEventListener('click',e=>{e.stopPropagation();audio.play(v.example,{contentType:'sentence',next:nextCard?nextCard.example:''})});
     $('reviewLearning').onclick=e=>{e.stopPropagation();markStillLearning('vocab',v.id);flyOutCard($('reviewCard'),-1,()=>{i++;draw()})};
     $('reviewMastered').onclick=e=>{e.stopPropagation();markMastered('vocab',v.id);haptic('success');/* [FASE-4] 09 §3.3: dikuasai dari ulangan juga pengakuan → proud. */try{pawReact('badge-earned')}catch(_){}flyOutCard($('reviewCard'),1,()=>{i++;draw()})};
-    bindSwipe($('reviewCard'),()=>{i++;draw()},()=>{i=Math.max(0,i-1);draw()});
+    bindSwipe($('reviewCard'),()=>{audio.stop();i++;draw()},()=>{audio.stop();i=Math.max(0,i-1);draw()});
     try{if(v?.word)audio.prefetch(v.word,{contentType:'word'});if(v?.example)audio.prefetch(v.example,{contentType:'sentence'})}catch(_){}
+    if(v?.word&&!targetLangVoiceBlocked()){audio.play(v.word,{contentType:'word',next:nextCard?nextCard.word:''})}
   };
-  enterStage('vocab-review',()=>draw());
+  enterStage('vocab-review',{draw:()=>draw(),leave:()=>audio.stop()});
   draw()
 }
 
@@ -18378,7 +18380,7 @@ window.courseLanguageLabel=courseLanguageLabel;
    isinya belum ada, yang ini tentang SUARA yang locale-nya salah. Suatu hari bank dengar
    Jepang bisa lahir sementara pakunya belum dicabut — dan saat itu kedua daftar harus bisa
    berbeda isi. Cabut entri ini hanya setelah paku en-US benar-benar dicabut. */
-const TARGET_LANG_TANPA_SUARA=Object.freeze(['ja']);
+const TARGET_LANG_TANPA_SUARA=Object.freeze([]);
 function targetLangVoiceBlocked(){return TARGET_LANG_TANPA_SUARA.indexOf(activeTargetLang())>=0}
 window.targetLangVoiceBlocked=targetLangVoiceBlocked;
 /* Berganti kursus MEMUAT ULANG bank soal, bukan sekadar mengganti label: bank Inggris dan
