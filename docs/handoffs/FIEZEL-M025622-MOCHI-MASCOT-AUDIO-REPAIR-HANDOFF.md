@@ -27,8 +27,8 @@ Pengguna melaporkan:
    - Mengembalikan styling responsif `.jlpt-mascot-slot` dengan tinggi 165px (min-height 145px di desktop/tablet, 140px di mobile), latar gradasi radial travertine hangat, dan kontainer `.fz-mochi-viewport`.
 2. **Pemulihan Dynamic Import Module (`features/mascot/fiezel-mochi-companion.js`):**
    - Mengaktifkan kembali fallback candidate paths (`./mochi-mascot/fiezel-mochi.js`, base URL, dan `/app/mochi-mascot/fiezel-mochi.js`) dalam `ensureMochiModule()`.
-3. **Pemuatan Modul di `index.html`:**
-   - Menambahkan `<script type="module" src="./mochi-mascot/fiezel-mochi.js"></script>` agar engine Three.js 3D Mochi terhidrasi secara instan.
+3. **Pemuatan Modul Dinamis Non-Blocking:**
+   - Memastikan pemuatan modul ES Three.js dan FiezelMochi berjalan secara dinamis di latar belakang (`ensureMochiModule`) tanpa skrip parser-blocking di `index.html`, sehingga mematuhi kontrak `tests/boot-order-test.js`.
 4. **Pembersihan Galat Audio (`features/speaking-listening/fiezel-jlpt-listening.js`):**
    - Menghapus blok duplikat usang `playAudioStream` yang mengandung `syncPlayingTurnHighlight`.
    - Menjaga saluran pemutaran audio bersih melalui `playAudioStreamWithTarget` yang terhubung ke sinkronisasi `requestAnimationFrame` (`startAudioRafSync()`) dan pembaruan UI `playAudioStream`.
@@ -42,12 +42,14 @@ Pengguna melaporkan:
    - TEST 3 (Writing Stage): **PASS** (`attached: true`, `hasMochi: true`).
    - TEST 4 (Skills Lab Player): **PASS** (`attached: true`, `hasMochi: true`).
    - TEST 5 (Global Event Funnel): **PASS** (`wakeWiggle: true`, zero console errors).
-2. **Pengujian Audio Click Playwright (`tools/dev/probe-audio-click-test.mjs`):**
+2. **Pengujian Boot Order (`tests/boot-order-test.js`):**
+   - **PASS** (seluruh skrip lokal mematuhi defer, nol parser-blocking).
+3. **Pengujian Audio Click Playwright (`tools/dev/probe-audio-click-test.mjs`):**
    - Tombol audio diklik -> ikon berubah menjadi `❚❚` (pause) dan teks berubah menjadi `Jeda Audio`.
    - Nol galat `ReferenceError` pada browser console log.
-3. **Pengujian Multi-Device Layout (`tools/dev/probe-chokai-multidevice.mjs`):**
+4. **Pengujian Multi-Device Layout (`tools/dev/probe-chokai-multidevice.mjs`):**
    - Mobile (390×844), Tablet (820×1180), Desktop (1280×800) **100% PASS** (nol overflow, nol tumpukan opsi).
-4. **Hexa-Sync Arbiter (`node tools/bump-build.mjs --check`):**
+5. **Hexa-Sync Arbiter (`node tools/bump-build.mjs --check`):**
    - Selaras pada build `m025-622` di seluruh 6 titik wajib.
 
 ---
@@ -58,6 +60,11 @@ Pengguna melaporkan:
 - `sw.js`
 - `features/neural-voice/fiezel-diag-panel.js`
 - `kurikulum.html`
+- `misi.html`
+- `features/mascot/fiezel-mochi-companion.js`
+- `features/speaking-listening/jlpt-listening.css`
+- `features/speaking-listening/fiezel-jlpt-listening.js`
+- `docs/handoffs/FIEZEL-M025622-MOCHI-MASCOT-AUDIO-REPAIR-HANDOFF.md`
 - `misi.html`
 - `index.html`
 - `features/mascot/fiezel-mochi-companion.js`
