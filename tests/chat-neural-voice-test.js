@@ -66,7 +66,7 @@ const call = require(path.join(root, 'features', 'interactive-chat', 'fiezel-voi
   assert.deepStrictEqual(voice.splitSentences('Oh! That sounds fun. Which beach did you go to?', 'en'),
     ['Oh! That sounds fun.', 'Which beach did you go to?'], 'potongan pendek "Oh!" digabung ke kalimat berikutnya');
   assert.deepStrictEqual(voice.splitSentences('いいね！どこのビーチに行ったの？楽しかった？', 'ja'),
-    ['いいね！', 'どこのビーチに行ったの？', '楽しかった？']);
+    ['いいね！どこのビーチに行ったの？', '楽しかった？']);
   assert.strictEqual(voice.cleanText('[今日](きょう)はいい[天気](てんき)ですね'), '今日はいい天気ですね', 'furigana dibuang');
   console.log('✓ kalimat dipotong dan potongan pendek digabung');
 
