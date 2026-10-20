@@ -1,7 +1,7 @@
 {
-  "version": "m025-624",
-  "claimedBy": "branch fix/jlpt-audio-url-resolution-m025-623",
-  "claimedAt": "2026-10-20T00:06:16.861Z",
-  "reason": "fix(listening): selaraskan resolusi asset url audio chokai di production path",
+  "version": "m025-625",
+  "claimedBy": "branch main",
+  "claimedAt": "2026-10-20T02:40:39.055Z",
+  "reason": "fix(audio): pulihkan hidrasi kana di V.map dan aktifkan lazy voice load di AudioService (m025-625)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

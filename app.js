@@ -6309,7 +6309,7 @@ async function load(opts){const root=document.baseURI;/* W1 P0-1 (16-001): fetch
     }
     G=buckets;
   }
-  V=V.map(v=>{const rawTranslation=v.exampleTranslation||v.examples?.[0]?.translation||v.examples?.[0]?.id||'';const exampleTranslation=/^[a-z]\d?[a-z]?_\d+$/i.test(rawTranslation)?'':rawTranslation;return{id:v.id,word:v.word,phonetic:v.phonetic||'',partOfSpeech:v.partOfSpeech||'',level:v.level||v.cefr||'',meaning:v.meaning||v.meanings?.[0]?.meaning||'',example:v.example||v.examples?.[0]?.en||'',exampleTranslation,topic:v.topic||'general',difficulty:v.difficulty||({A1:1,A2:2,B1:3,B2:4,C1:5,C2:6}[v.level]||3),synonyms:v.synonyms||[],antonyms:v.antonyms||[],collocations:v.collocations||[],commonMistakes:v.commonMistakes||[],relatedWords:v.relatedWords||[],usageNotes:v.usageNotes||'',status:v.status||'needs_review',canary:v.__fiezelCanary||null}}).filter(v=>v.status==='complete'&&LEVELS.includes(v.level)&&v.word&&v.meaning);
+  V=V.map(v=>{const rawTranslation=v.exampleTranslation||v.examples?.[0]?.translation||v.examples?.[0]?.id||'';const exampleTranslation=/^[a-z]\d?[a-z]?_\d+$/i.test(rawTranslation)?'':rawTranslation;const kana=v.kana||(v.phonetic&&v.phonetic.includes('·')?v.phonetic.split('·')[0].trim():'');const kanji=v.kanji||v.word||'';const romaji=v.romaji||(v.phonetic&&v.phonetic.includes('·')?v.phonetic.split('·')[1].trim():'');return{id:v.id,word:v.word,kana,kanji,romaji,jlpt:v.jlpt||'',phonetic:v.phonetic||'',partOfSpeech:v.partOfSpeech||'',level:v.level||v.cefr||'',meaning:v.meaning||v.meanings?.[0]?.meaning||'',example:v.example||v.examples?.[0]?.en||'',exampleTranslation,topic:v.topic||'general',difficulty:v.difficulty||({A1:1,A2:2,B1:3,B2:4,C1:5,C2:6}[v.level]||3),synonyms:v.synonyms||[],antonyms:v.antonyms||[],collocations:v.collocations||[],commonMistakes:v.commonMistakes||[],relatedWords:v.relatedWords||[],usageNotes:v.usageNotes||'',status:v.status||'needs_review',canary:v.__fiezelCanary||null}}).filter(v=>v.status==='complete'&&LEVELS.includes(v.level)&&v.word&&v.meaning);
   // W4-MERGE: simpan hasil hidrasi id lalu terapkan locale aktif (id = no-op referensial).
   CONTENT_BASE={g:G,items:GRAMMAR_ITEMS,v:V,r:R};applyContentLocale();
   backfillPolicyOutcomes();$('version').textContent=`v${APP_VERSION}`;
@@ -10291,7 +10291,7 @@ function jaCourseOn(){return self.FiezelI18n?.getCourse?.()==='ja'&&!!self.Fieze
 function jaWord(word,phonetic){return jaCourseOn()?FiezelJaUi.wordMarkup(word,phonetic):esc(word)}
 function jaPhonetic(phonetic,fallback){return jaCourseOn()?FiezelJaUi.phoneticMarkup(phonetic||fallback||''):esc(phonetic||fallback||'')}
 function jaTogglesMarkup(){return jaCourseOn()?FiezelJaUi.togglesMarkup():''}
-function vocabAudioWord(v){if(!v)return'';if(jaCourseOn()&&v.kana)return v.kana;return v.word||''}
+function vocabAudioWord(v){if(!v)return'';if(typeof v==='object'){if(v.kana)return v.kana;return v.word||''}if(typeof v==='string'){if(Array.isArray(V)){const found=V.find(x=>x&&(x.word===v||x.kanji===v));if(found&&found.kana)return found.kana}return v}return''}
 function kanaView(){shell(FiezelI18n.t('jepang.kana-judul'),FiezelI18n.t('jepang.kana-lead'),jaCourseOn()?FiezelJaUi.kanaViewBody():'')}
 function latihanCards(){
   const punyaSkillsJa=!targetLangSurfaceBlocked('skills');
@@ -13437,7 +13437,7 @@ async function startAdaptive(){if(!state.adaptiveReady){if(!state.placementDone)
     Satu kalimat ajakan via toast - bukan layar baru. Guarded: tanpa modul, tidak ada apa-apa. */
  // D5 T5: dulu toast 2,6 dtk yang bertanya tanpa bisa dijawab; kini popup pilihan tujuan.
  try{const plan=srlSessionPlan(policy,count);srlSessionSync();const gp=plan?.goalPrompt;if(gp?.ask)setTimeout(()=>{try{srlGoalPopShow(gp)}catch{}},1200)}catch{}}
-function vocab(){const level=getActiveLevel(),active=V.filter(v=>v.level===level),mastered=Object.entries(state.vocab||{}).filter(([id,x])=>x?.mastery>=80&&V.find(v=>v.id===id)?.level===level).length,due=active.filter(v=>state.vocab?.[v.id]?.nextReview&&state.vocab[v.id].nextReview<=Date.now()).length,pct=active.length?Math.round((mastered/active.length)*100):0;setApp(`<section class="fade vocab-hub-page"><div class="vocab-hero-card"><div class="vocab-hero-top"><span class="vocab-level-chip">${esc(level)} · ${esc(levelDescriptor(level))}</span><span class="vocab-count-badge">${FiezelI18n.t('vocab.n-kata',{jumlah:active.length})}</span></div><div class="vocab-progress-track" aria-hidden="true"><div class="vocab-progress-fill" style="width:${pct}%"></div></div><p class="vocab-hero-desc"><b>${mastered}</b> / <b>${active.length}</b> (${pct}%).</p>${active.length?`<button type="button" class="vocab-main-flashcard-btn" onclick="flashcards('${esc(level)}')"><span class="vmf-left"><span class="vmf-icon">🃏</span><span class="vmf-text"><strong>${t('vocab.buka-flashcards','Buka flashcards')}</strong><small>Hafal mandiri dengan kartu interaktif</small></span></span><span class="vmf-arrow">→</span></button>`:`<p class="muted">${t('vocab.kosong','Belum tersedia untuk level ini.')}</p>`}</div><div class="vocab-quick-grid"><button type="button" class="vocab-quick-btn" onclick="startVocabQuiz()"><span class="vq-icon">⚡</span><span class="vq-text"><strong>${t('student.vocab-title','Kosakata')} Test</strong><small>Kuis interaktif</small></span></button><button type="button" class="vocab-quick-btn" onclick="reviewVocab()"><span class="vq-icon">🔄</span><span class="vq-text"><strong>Review Due (${due})</strong><small>Segarkan ingatan SRS</small></span></button></div></section>`);enhanceUI()}
+function vocab(){try{self.FiezelLazy?.load?.('voice')}catch(_){}const level=getActiveLevel(),active=V.filter(v=>v.level===level),mastered=Object.entries(state.vocab||{}).filter(([id,x])=>x?.mastery>=80&&V.find(v=>v.id===id)?.level===level).length,due=active.filter(v=>state.vocab?.[v.id]?.nextReview&&state.vocab[v.id].nextReview<=Date.now()).length,pct=active.length?Math.round((mastered/active.length)*100):0;setApp(`<section class="fade vocab-hub-page"><div class="vocab-hero-card"><div class="vocab-hero-top"><span class="vocab-level-chip">${esc(level)} · ${esc(levelDescriptor(level))}</span><span class="vocab-count-badge">${FiezelI18n.t('vocab.n-kata',{jumlah:active.length})}</span></div><div class="vocab-progress-track" aria-hidden="true"><div class="vocab-progress-fill" style="width:${pct}%"></div></div><p class="vocab-hero-desc"><b>${mastered}</b> / <b>${active.length}</b> (${pct}%).</p>${active.length?`<button type="button" class="vocab-main-flashcard-btn" onclick="flashcards('${esc(level)}')"><span class="vmf-left"><span class="vmf-icon">🃏</span><span class="vmf-text"><strong>${t('vocab.buka-flashcards','Buka flashcards')}</strong><small>Hafal mandiri dengan kartu interaktif</small></span></span><span class="vmf-arrow">→</span></button>`:`<p class="muted">${t('vocab.kosong','Belum tersedia untuk level ini.')}</p>`}</div><div class="vocab-quick-grid"><button type="button" class="vocab-quick-btn" onclick="startVocabQuiz()"><span class="vq-icon">⚡</span><span class="vq-text"><strong>${t('student.vocab-title','Kosakata')} Test</strong><small>Kuis interaktif</small></span></button><button type="button" class="vocab-quick-btn" onclick="reviewVocab()"><span class="vq-icon">🔄</span><span class="vq-text"><strong>Review Due (${due})</strong><small>Segarkan ingatan SRS</small></span></button></div></section>`);enhanceUI()}
 // m025-96 jalur suara materi pelajaran: Reading, Vocabulary, Grammar.
 //
 // Semuanya lewat pintu bersama, jadi tiap kalimat Inggris otomatis membawa subtitle
@@ -13480,7 +13480,7 @@ function AudioService(){
    * kolam soal sisanya), persis seperti dicatat reports/voice-v5-prefetch.md §3 baris 4.
    * Tidak ada prepare()/ensureReady() di sini; false yang tenang adalah jawaban sah.
    */
-  prefetch(next,options={}){const loc=options.locale||(typeof activeTargetLang==='function'&&activeTargetLang()==='ja'?'ja-JP':'en-US');return prefetchNextVoice(next,{speed:options.speed??selectedNeuralRate(),contentType:options.contentType,locale:loc})},
+  prefetch(next,options={}){const loc=options.locale||(typeof activeTargetLang==='function'&&activeTargetLang()==='ja'?'ja-JP':'en-US');let targetNext=next;if(loc==='ja-JP'&&Array.isArray(V)){const found=V.find(x=>x&&(x.word===targetNext||x.kanji===targetNext));if(found&&found.kana)targetNext=found.kana;}return prefetchNextVoice(targetNext,{speed:options.speed??selectedNeuralRate(),contentType:options.contentType,locale:loc})},
   /**
    * Satu pintu untuk Reading/Vocabulary/Grammar. Sejak m025-232 ia TIDAK punya cadangan
    * bersuara: hasil selain "berbunyi" berarti teks tanpa suara, dan sekali per sesi murid
@@ -13489,6 +13489,11 @@ function AudioService(){
   play(text,options={}){
    if(!text)return Promise.resolve(null);
    this.stop();const loc=options.locale||(typeof activeTargetLang==='function'&&activeTargetLang()==='ja'?'ja-JP':'en-US');
+   let playText=text;
+   if(loc==='ja-JP'&&Array.isArray(V)){
+     const found=V.find(x=>x&&(x.word===playText||x.kanji===playText));
+     if(found&&found.kana)playText=found.kana;
+   }
    /* m025-198 (laporan OWNER: FATAL). FiezelVoiceSay.say() memanggil prepareSubtitle() -
     * terjemahan bahasa murid muncul di layar sambil rekaman berbunyi - kecuali diberi
     * `suppressSubtitles`. m025-148 sudah memasang tombol itu dan memakainya di Skills Lab,
@@ -13534,12 +13539,20 @@ function AudioService(){
     * PEMUTARAN, bukan pada saat konstruksi: modulnya dimuat lewat script tag terpisah, jadi
     * penangkapan saat konstruksi bisa mengunci undefined selamanya kalau urutan muat bergeser. */
    const say=self.FiezelVoiceSay?.say;
-   const viaDoor=typeof say==='function'
-    ?Promise.race([
-      Promise.resolve().then(()=>say.call(self.FiezelVoiceSay,text,{speed:options.speed??selectedNeuralRate(),contentType:options.contentType,locale:loc,suppressSubtitles:noSubtitles})).catch(()=>false),
-      timeoutPromise
-    ])
-    :Promise.resolve(false);
+   const viaDoor=Promise.resolve().then(()=>{
+     if(typeof say==='function')return say;
+     if(typeof self.FiezelLazy?.load==='function'){
+       return self.FiezelLazy.load('voice').then(()=>self.FiezelVoiceSay?.say||null).catch(()=>null);
+     }
+     return null;
+   }).then(sayFn=>{
+     if(typeof sayFn!=='function')return false;
+     try{console.log('[AudioService playText]:',playText,'loc:',loc)}catch(_){}
+     return Promise.race([
+       Promise.resolve().then(()=>sayFn.call(self.FiezelVoiceSay,playText,{speed:options.speed??selectedNeuralRate(),contentType:options.contentType,locale:loc,suppressSubtitles:noSubtitles})).catch(e=>{try{console.error('[viaDoor Error]:',e)}catch(_){}return false}),
+       timeoutPromise
+     ]);
+   });
    // V6: `options.next` dihangatkan SESUDAH pemutaran diajukan - urutan ini yang menjaga
    // mesin single-flight tetap milik kalimat yang sedang didengar (inversi antrean m025-47).
    // stop() di atas sudah membatalkan generation sebelumnya, jadi pengajuan ini yang berlaku.
@@ -13698,6 +13711,7 @@ function bindSwipe(el,onLeft,onRight){
   },true);
 }
 function flashcards(level){
+  try{self.FiezelLazy?.load?.('voice')}catch(_){}
   const active=getActiveLevel();
   if(String(level||'')!==active)return showToast(FiezelI18n.t('flash.terkunci',{level:active}));
   /* Audit V-A: kartu jatuh tempo (level ini dan di bawahnya) di depan, sisanya kata level ini
@@ -13734,6 +13748,7 @@ function flashcards(level){
 }
 
 function reviewVocab(){
+  try{self.FiezelLazy?.load?.('voice')}catch(_){}
   const active=getActiveLevel();
   /* Audit V-A/V-B: semua level <= aktif, paling rawan lupa lebih dulu. */
   const due=vocabReviewQueue();
