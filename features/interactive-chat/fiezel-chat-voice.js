@@ -344,12 +344,33 @@
   }
 
   /**
+   * Menghangatkan koneksi server TTS dan Cloudflare/Render di latar belakang.
+   * Dijalankan asinkron saat panggilan telepon terhubung / saat murid selesai bicara.
+   */
+  function warmup(targetCourse) {
+    var explicit = isServerConfigured();
+    if (explicit === false) return;
+    var c = targetCourse === 'ja' ? 'ja' : 'en';
+    var endpoint = getEndpoint();
+    if (!endpoint) return;
+    var target = resolveAbsoluteUrl(endpoint);
+    var warmupUrl = target.replace(/\/line(\/index\.php)?\/?$/, '/personas$1');
+    try {
+      if (typeof root.fetch === 'function') {
+        root.fetch(warmupUrl, { method: 'GET', mode: 'cors', cache: 'no-cache' }).catch(function () {});
+      }
+    } catch (_) {}
+  }
+
+  /**
    * Panggil endpoint server /api/tts/line untuk sintesis satu ujaran.
    * Mendukung failover otomatis antar candidate endpoint (local server, Render cloud, same-origin).
    * Mengembalikan Promise<{ audioBase64: string, mimeType?: string, url?: string } | null>.
    */
   function fetchServerLine(sentence, persona, course, cancelSignal) {
-    var cacheKey = persona + '::' + sentence;
+    var clean = cleanText(sentence, course);
+    if (!clean) return Promise.resolve(null);
+    var cacheKey = persona + '::' + clean;
     if (prefetchCache.has(cacheKey)) {
       var cachedPromise = prefetchCache.get(cacheKey);
       prefetchCache.delete(cacheKey);
@@ -358,14 +379,14 @@
 
     // Mock handler untuk pengujian lokal / node unit test
     if (root.__FIEZEL_TEST_MOCK_TTS_LINE__ && typeof root.__FIEZEL_TEST_MOCK_TTS_LINE__ === 'function') {
-      return Promise.resolve(root.__FIEZEL_TEST_MOCK_TTS_LINE__(sentence, persona, course));
+      return Promise.resolve(root.__FIEZEL_TEST_MOCK_TTS_LINE__(clean, persona, course));
     }
 
     var f = root.fetch;
     if (typeof f !== 'function') return Promise.resolve(null);
 
     var body = {
-      text: sentence,
+      text: clean,
       speaker: persona,
       persona: persona,
       lang: course === 'ja' ? 'ja-JP' : 'en-US'
@@ -835,10 +856,6 @@
       } catch (_) {}
       activeAudio = null;
     }
-    if (activeSource) {
-      try { activeSource.stop(0); } catch (_) {}
-      activeSource = null;
-    }
     if (activeAbortController) {
       try { activeAbortController.abort(); } catch (_) {}
       activeAbortController = null;
@@ -890,6 +907,7 @@
     setEndpoint: setEndpoint,
     getCandidateEndpoints: getCandidateEndpoints,
     unlockAudio: unlockAudio,
+    warmup: warmup,
     probeEndpoint: probeEndpoint,
     isServerAvailable: isServerAvailable,
     setServerAvailable: setServerAvailable,
