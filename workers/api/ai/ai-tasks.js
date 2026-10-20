@@ -1791,7 +1791,12 @@
     var a = args || {};
     var model = a.model || spec.model;
     var prompt = buildPrompt(taskName, a.input, a.locale);
-    var payload = { prompt: prompt, max_tokens: spec.maxOutputTokens };
+    var maxTokens = spec.maxOutputTokens;
+    if ((taskName === 'conversation_turn' || taskName === 'conversation_correct') &&
+        a.input && (a.input.mode === 'call' || (typeof a.input.scenarioId === 'string' && a.input.scenarioId.indexOf('phone_') === 0))) {
+      maxTokens = Math.min(maxTokens, 95);
+    }
+    var payload = { prompt: prompt, max_tokens: maxTokens };
     var jsonMode = false;
     var skipped = '';
     if (spec.jsonMode === true) {

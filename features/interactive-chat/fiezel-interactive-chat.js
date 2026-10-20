@@ -305,6 +305,60 @@
             { text: '届くまでどのくらいかかりますか？ありがとうございます、失礼いたします。', furigana: '[届](とど)くまでどのくらいかかりますか？ありがとうございます、[失礼](しつれい)いたします。', romaji: 'Todoku made dono kurai kakarimasu ka? Arigatou gozaimasu, shitsurei itashimasu.', translation: t('chat_sug_tel_del3', 'Kira-kira berapa lama sampai? Terima kasih banyak, permisi (menutup telepon).') }
           ]
         }
+      },
+      {
+        id: 'scen_ja_n5_kissaten',
+        icon: 'cafe',
+        title: '喫茶店での注文',
+        label: t('chat_sc_ja_kissaten', 'Kaiwa N5: Memesan di Kissaten Tokyo'),
+        desc: t('chat_sc_ja_kissaten_desc', 'Partikel objek を (o), pola bilangan + ください (kudasai) · JLPT N5.'),
+        level: 'JLPT N5',
+        difficultyB: 2.0,
+        competencyId: 'speak_ja_n5_kissaten',
+        prereqCompetencyId: 'vocab_ja_cafe_n5',
+        personaId: 'nanami',
+        isMeasureExam: false,
+        goals: [
+          { id: 'g1', text: t('chat_g_ja_kiss1', 'Gunakan partikel objek を (o) sebelum kata kerja meminta/memesan.') },
+          { id: 'g2', text: t('chat_g_ja_kiss2', 'Akhiri permintaan dengan ～をください (o kudasai) atau ～をお願いします (o onegaishimasu).') }
+        ],
+        starter: {
+          text: 'いらっしゃいませ！ご注文はお決まりですか？今日のおすすめはホットコーヒーとチーズケーキですよ。',
+          furigana: 'いらっしゃいませ！ご[注文](ちゅうもん)はお[決](き)まりですか？[今日](きょう)のおすすめはホットコーヒーとチーズケーキですよ。',
+          romaji: 'Irasshaimase! Gochuumon wa okimari desu ka? Kyou no osusume wa hotto koohii to chiizukeeki desu yo.',
+          translation: t('chat_sc_ja_kiss_trans', 'Selamat datang! Apakah pesanan Anda sudah ditentukan? Rekomendasi hari ini adalah kopi panas dan cheesecake.'),
+          grammarNote: t('chat_sc_ja_kiss_note', 'Pola pemesanan: [Benda] を [Bilangan] ください。Contoh: ホットコーヒーを一つください。'),
+          suggestions: [
+            { text: 'すみません、ホットコーヒーを一つとチーズケーキを一つください。', furigana: 'すみません、ホットコーヒーを[一](ひと)つとチーズケーキを[一](ひと)つください。', romaji: 'Sumimasen, hotto koohii o hitotsu to chiizukeeki o hitotsu kudasai.', translation: 'Permisi, tolong berikan satu kopi panas dan satu cheesecake.' }
+          ]
+        }
+      },
+      {
+        id: 'scen_ja_n4_senpai',
+        icon: 'senpai',
+        title: '先輩への相談',
+        label: t('chat_sc_ja_senpai', 'Kaiwa N4: Konsultasi Kuliah dengan Keita Senpai'),
+        desc: t('chat_sc_ja_senpai_desc', 'Bentuk ～ていただけますか / ～たらいいですか (Meminta Saran) & alasan ～ので · JLPT N4.'),
+        level: 'JLPT N4',
+        difficultyB: 2.9,
+        competencyId: 'speak_ja_n4_senpai_advice',
+        prereqCompetencyId: 'vocab_ja_campus_n4',
+        personaId: 'keita',
+        isMeasureExam: false,
+        goals: [
+          { id: 'g1', text: t('chat_g_ja_sen1', 'Jelaskan alasan kesibukanmu memakai ～ので (node).') },
+          { id: 'g2', text: t('chat_g_ja_sen2', 'Minta saran dengan pola ～たらいいですか (tara ii desu ka).') }
+        ],
+        starter: {
+          text: 'お疲れさま！最近、大学のレポートで忙しそうだね。何か困っていることはある？',
+          furigana: 'お[疲](つか)れさま！[最近](さいきん)、[大学](だいがく)のレポートで[忙](いそが)しそうだね。[何](なに)か[困](こま)っていることはある？',
+          romaji: 'Otsukaresama! Saikin, daigaku no repooto de isogashisou da ne. Nani ka komatte iru koto wa aru?',
+          translation: t('chat_sc_ja_sen_trans', 'Halo, semangat ya! Akhir-akhir ini kamu terlihat sibuk dengan laporan kampus. Apakah ada hal yang sedang menyulitkanmu?'),
+          grammarNote: t('chat_sc_ja_sen_note', 'Meminta saran: [Bentuk lampau ta] + らいいですか。Alasan sopan: [Kalimat] + ので。'),
+          suggestions: [
+            { text: '来週大切なテストがあるので、毎日どう勉強したらいいですか。', furigana: '[来週](らいしゅう)[大切](たいせつ)なテストがあるので、[毎日](まいにち)どう[勉強](べんきょう)したらいいですか。', romaji: 'Raishuu taisetsuna tesuto ga aru node, mainichi dou benkyou shitara ii desu ka.', translation: 'Karena minggu depan ada ujian penting, sebaiknya bagaimana saya belajar setiap hari?' }
+          ]
+        }
       }
     ],
     en: [
@@ -481,6 +535,83 @@
             { text: "Hello! Yes, I can hear you fine. I'd like to check room availability for next weekend.", translation: t('chat_sug_en_tel_hot1', 'Halo! Ya, suara Anda terdengar jelas. Saya ingin mengecek ketersediaan kamar untuk akhir pekan depan.') },
             { text: "Hang on a second, let me grab my calendar. Do you have a deluxe queen room available?", translation: t('chat_sug_en_tel_hot2', 'Tunggu sebentar, saya ambil kalender dulu. Apakah ada kamar deluxe queen yang tersedia?') },
             { text: "That sounds wonderful. Please book it under my name. Thanks for your help, catch you later!", translation: t('chat_sug_en_tel_hot3', 'Terdengar bagus sekali. Tolong pesan atas nama saya. Terima kasih bantuannya, sampai jumpa nanti!') }
+          ]
+        }
+      },
+      {
+        id: 'scen_en_a2_cafe',
+        icon: 'cafe',
+        title: 'Cafe & Afternoon Plans',
+        label: t('chat_sc_en_cafe_a2', 'Memesan Kopi & Rencana Sore'),
+        desc: t('chat_sc_en_cafe_a2_desc', 'Present Continuous untuk rencana dekat & permintaan sopan (Would like) · CEFR A2.'),
+        level: 'CEFR A2',
+        difficultyB: 2.1,
+        competencyId: 'speak_en_a2_cafe',
+        prereqCompetencyId: 'vocab_daily_a2',
+        personaId: 'coach_alex',
+        isMeasureExam: false,
+        goals: [
+          { id: 'g1', text: t('chat_g_en_cafe1', 'Gunakan "I would like..." atau "I\'d like..." untuk memesan minuman.') },
+          { id: 'g2', text: t('chat_g_en_cafe2', 'Gunakan Present Continuous ("I am meeting..." / "I am working on...") untuk rencana sore ini.') }
+        ],
+        starter: {
+          text: "Hey there! Good to see you at the cafe. What would you like to drink today, and what are you doing after our coffee?",
+          translation: t('chat_sc_en_cafe_trans', 'Halo! Senang bertemu kamu di kafe. Kamu ingin minum apa hari ini, dan apa rencanamu setelah kita ngopi?'),
+          grammarNote: t('chat_sc_en_cafe_note', 'Pola sopan "I would like" dan Present Continuous untuk jadwal terencana.'),
+          suggestions: [
+            { text: "I'd like an iced latte, please. After this, I am meeting my study group at the library.", translation: 'Saya ingin pesan iced latte. Setelah ini, saya akan bertemu kelompok belajar di perpustakaan.' },
+            { text: "Could I have a hot cappuccino? Later, I am working on my presentation.", translation: 'Boleh saya pesan cappuccino panas? Nanti saya akan mengerjakan presentasi.' }
+          ]
+        }
+      },
+      {
+        id: 'scen_en_a2_past_trip',
+        icon: 'trip',
+        title: 'Weekend Trip Memories',
+        label: t('chat_sc_en_past_trip', 'Pengalaman Perjalanan Akhir Pekan'),
+        desc: t('chat_sc_en_past_trip_desc', 'Simple Past Tense: Kata kerja tak beraturan (went, saw, bought, ate) · CEFR A2.'),
+        level: 'CEFR A2',
+        difficultyB: 2.5,
+        competencyId: 'speak_en_a2_past_trip',
+        prereqCompetencyId: 'vocab_travel_a2',
+        personaId: 'coach_alex',
+        isMeasureExam: false,
+        goals: [
+          { id: 'g1', text: t('chat_g_en_past1', 'Gunakan kata kerja bentuk ke-2 tak beraturan (went, ate, saw, took) dengan tepat.') },
+          { id: 'g2', text: t('chat_g_en_past2', 'Hindari mencampur bentuk dasar atau menambah -ed pada irregular verb (hindari "goed").') }
+        ],
+        starter: {
+          text: 'Welcome back! I heard you took a short trip last weekend. Where did you go, and what was the best part of your weekend?',
+          translation: t('chat_sc_en_past_trans', 'Selamat datang kembali! Kudengar kamu sempat bepergian akhir pekan lalu. Ke mana kamu pergi, dan apa bagian paling seru dari akhir pekanmu?'),
+          grammarNote: t('chat_sc_en_past_note', 'Past simple irregular verbs: go -> went, eat -> ate, see -> saw, take -> took.'),
+          suggestions: [
+            { text: 'Last weekend I went to Bandung with my brother. We ate local street food and took photos.', translation: 'Akhir pekan lalu saya pergi ke Bandung bersama saudara saya. Kami makan kuliner lokal dan berfoto-foto.' },
+            { text: 'I traveled to Yogyakarta and visited historical temples.', translation: 'Saya bepergian ke Yogyakarta dan mengunjungi candi-candi bersejarah.' }
+          ]
+        }
+      },
+      {
+        id: 'scen_en_b2_ielts_exam',
+        icon: 'exam',
+        title: 'IELTS Speaking Part 3: Remote Work',
+        label: t('chat_sc_en_ielts_b2', 'Ujian IELTS Speaking: Kerja Jarak Jauh'),
+        desc: t('chat_sc_en_ielts_b2_desc', 'Mode Ujian Murni · Opini terstruktur & klausa konsesif (Although/Whereas) · CEFR B2.'),
+        level: 'CEFR B2 · EXAM',
+        difficultyB: 3.6,
+        competencyId: 'speak_en_b2_ielts_part3',
+        prereqCompetencyId: 'vocab_academic_b1',
+        personaId: 'coach_sarah',
+        isMeasureExam: true,
+        goals: [
+          { id: 'g1', text: t('chat_g_en_ielts1', 'Berikan argumen berimbang dengan konjungsi subordinatif (Although, While, Whereas).') },
+          { id: 'g2', text: t('chat_g_en_ielts2', 'Hindari "I am agree" — gunakan "I agree" atau "From my perspective".') }
+        ],
+        starter: {
+          text: 'Let us move on to Part 3. Many companies now allow employees to work remotely. Do you think remote work increases productivity, or does it weaken team collaboration?',
+          translation: t('chat_sc_en_ielts_trans', 'Mari kita lanjut ke Bagian 3. Banyak perusahaan kini mengizinkan kerja jarak jauh. Menurutmu apakah kerja jarak jauh meningkatkan produktivitas, atau justru melemahkan kolaborasi tim?'),
+          grammarNote: t('chat_sc_en_ielts_note', 'Academic speaking: Concessive clauses (Although..., [main clause]). Hindari "Although... but".'),
+          suggestions: [
+            { text: 'Although working remotely saves commuting time and improves focus, I believe a hybrid schedule is better because face-to-face meetings strengthen team collaboration.', translation: 'Meskipun kerja jarak jauh menghemat waktu perjalanan dan meningkatkan fokus, saya rasa jadwal hybrid lebih baik karena pertemuan langsung memperkuat kolaborasi tim.' }
           ]
         }
       }
@@ -824,6 +955,21 @@
   // memeriksa kalimatnya (offline / mode hemat).
   function checkMisconception(text, course) {
     if (!text) return null;
+    var isTh = (root.FiezelI18n && typeof root.FiezelI18n.getLocale === 'function' && root.FiezelI18n.getLocale() === 'th');
+    if (root.FiezelVoicePedagogy && typeof root.FiezelVoicePedagogy.analyzeUtterancePedagogy === 'function') {
+      var pDiag = root.FiezelVoicePedagogy.analyzeUtterancePedagogy(text, state.scenarioId, course);
+      if (pDiag && pDiag.ok === false && pDiag.misconceptionId) {
+        return {
+          id: pDiag.misconceptionId,
+          title: course === 'ja'
+            ? (isTh ? 'ความเข้าใจผิดทางไวยากรณ์ภาษาญี่ปุ่น' : 'Miskonsepsi Tata Bahasa Jepang')
+            : (isTh ? 'ความเข้าใจผิดทางไวยากรณ์ภาษาอังกฤษ' : 'Grammar Misconception'),
+          desc: isTh
+            ? (pDiag.whyFailsTh || pDiag.pedagogicalFeedbackTh || pDiag.whyFailsId || pDiag.pedagogicalFeedbackId)
+            : (pDiag.whyFailsId || pDiag.pedagogicalFeedbackId)
+        };
+      }
+    }
     var tRaw = text.trim();
     if (course === 'ja') {
       if (/(わたし|私|ぼく|僕)\s*わ/i.test(tRaw) || /わたしわ/.test(tRaw)) {
@@ -951,6 +1097,23 @@
 
   // Offline Deterministic Dialogue Fallback Graph
   function generateOfflineReply(userText, scenarioId, course, optionsOrLevel) {
+    if (scenarioId && String(scenarioId).indexOf('scen_') === 0) {
+      if (root.FiezelVoicePedagogy && typeof root.FiezelVoicePedagogy.analyzeUtterancePedagogy === 'function') {
+        var isTh = (root.FiezelI18n && typeof root.FiezelI18n.getLocale === 'function' && root.FiezelI18n.getLocale() === 'th');
+        var pDiag = root.FiezelVoicePedagogy.analyzeUtterancePedagogy(userText, scenarioId, course);
+        return {
+          text: pDiag.aiReply,
+          furigana: course === 'ja' ? pDiag.aiReply : null,
+          romaji: null,
+          translation: isTh ? (pDiag.aiReplyTranslationTh || pDiag.aiReplyTranslationId) : pDiag.aiReplyTranslationId,
+          grammarNote: isTh
+            ? (pDiag.whyFailsTh || pDiag.pedagogicalFeedbackTh || pDiag.whyFailsId || pDiag.pedagogicalFeedbackId)
+            : (pDiag.whyFailsId || pDiag.pedagogicalFeedbackId),
+          suggestions: []
+        };
+      }
+    }
+
     var raw = (userText || '').toLowerCase();
     var opts = (typeof optionsOrLevel === 'object' && optionsOrLevel) ? optionsOrLevel : {};
     var isPhone = isPhoneModeActive(opts, scenarioId);

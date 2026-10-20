@@ -38,19 +38,21 @@
     speaking: ['listening', 'idle']
   };
 
-  // Default Configuration
+  // Default Configuration tuned for instant conversational turn-taking
   var CONFIG = {
-    speechThreshold: 0.032,           // Normalized RMS amplitude to register speech
-    interruptThreshold: 0.075,        // RMS saat AI bicara yang memicu PRE-DUCK (bukan potong langsung)
-    interruptHoldMs: 150,             // Suara keras harus bertahan 150 ms (berbasis waktu, bukan frame rAF)
+    speechThreshold: 0.030,           // Normalized RMS amplitude to register speech
+    interruptThreshold: 0.070,        // RMS saat AI bicara yang memicu PRE-DUCK (bukan potong langsung)
+    interruptHoldMs: 120,             // Suara keras harus bertahan 120 ms (berbasis waktu, bukan frame rAF)
     interruptConfirmMs: 650,          // Tanpa token SR dalam 650 ms -> suara AI dikembalikan (gema speaker)
-    minBargeInWords: 2,               // Satu kata / gema pendek tidak memotong AI
-    finalGraceMs: 800,                // SR sudah isFinal -> giliran dikirim 800 ms kemudian (toleransi jeda napas 700ms)
-    interimSilenceMs: 1100,           // SR masih interim -> tunggu lebih lama
-    silenceTimeoutMs: 1350,           // Fallback silence timeout
+    minBargeInWords: 1,               // 1 kata (bukan gema) sudah bisa menyela AI
+    finalGraceMs: 450,                // SR sudah isFinal (dengan tanda baca selesai) -> kirim cepat dalam 450 ms
+    finalStandardGraceMs: 850,        // SR isFinal tanpa tanda baca selesai (jeda napas antarklausa) -> toleransi 850 ms
+    interimSilenceMs: 1100,           // SR masih interim -> jeda napas 1100 ms
+    silenceTimeoutMs: 1350,           // Fallback silence timeout jika rms drop (1350 ms)
+    acousticRefractoryMs: 350,        // Refractory window dipercepat ke 350 ms (dari 950 ms)
     maxUtteranceMs: 12000,            // Pengaman: kirim paksa setelah 12 detik bicara terus-menerus
-    naturalTurnPauseMs: 160,          // Jeda napas sebelum mic dibuka lagi
-    recognitionRestartDelayMs: 80,    // Safe restart delay
+    naturalTurnPauseMs: 120,          // Jeda napas sebelum mic dibuka lagi
+    recognitionRestartDelayMs: 60,    // Safe restart delay
     fftSize: 512,
     smoothingTimeConstant: 0.25
   };
@@ -173,7 +175,7 @@
     s = s.toLowerCase().trim();
 
     var c = course;
-    if (s === 'sarah' || s === 'aria' || s === 'alex' || s === 'guy' || /sarah|aria|coach/i.test(s)) {
+    if (s === 'coach_sarah' || s === 'sarah' || s === 'aria' || s === 'coach_alex' || s === 'alex' || s === 'guy' || /sarah|aria|coach/i.test(s)) {
       c = 'en';
     } else if (s === 'keita' || s === 'nanami' || /keita|nanami|sensei/i.test(s)) {
       c = 'ja';
@@ -189,16 +191,38 @@
       } catch (_) {}
       return bank[c === 'ja' ? 'keita' : 'alex'];
     }
+    if (s === 'coach_alex') return bank.alex;
+    if (s === 'coach_sarah') return bank.sarah;
     if (bank[s]) return bank[s];
     if (c === 'en') {
-      if (/sarah|aria/i.test(s)) return bank.sarah;
-      if (/alex|guy/i.test(s)) return bank.alex;
+      if (s === 'coach_sarah' || /sarah|aria/i.test(s)) return bank.sarah;
+      if (s === 'coach_alex' || /alex|guy/i.test(s)) return bank.alex;
       return bank.alex;
     } else {
       if (/nanami/i.test(s)) return bank.nanami;
       if (/keita/i.test(s)) return bank.keita;
       return bank.keita;
     }
+  }
+
+  function getVoiceScenarios() {
+    if (root && root.FiezelVoiceScenarios) return root.FiezelVoiceScenarios;
+    if (typeof globalThis !== 'undefined' && globalThis.FiezelVoiceScenarios) return globalThis.FiezelVoiceScenarios;
+    if (typeof window !== 'undefined' && window.FiezelVoiceScenarios) return window.FiezelVoiceScenarios;
+    try {
+      if (typeof require === 'function') return require('./fiezel-voice-scenarios.js');
+    } catch (_) {}
+    return null;
+  }
+
+  function getVoicePedagogy() {
+    if (root && root.FiezelVoicePedagogy) return root.FiezelVoicePedagogy;
+    if (typeof globalThis !== 'undefined' && globalThis.FiezelVoicePedagogy) return globalThis.FiezelVoicePedagogy;
+    if (typeof window !== 'undefined' && window.FiezelVoicePedagogy) return window.FiezelVoicePedagogy;
+    try {
+      if (typeof require === 'function') return require('./fiezel-voice-pedagogy.js');
+    } catch (_) {}
+    return null;
   }
 
   function renderPersonaSwitchHtml(course, activeId) {
@@ -224,6 +248,13 @@
       status: STATE.IDLE,
       course: 'ja',
       scenarioId: 'free',
+      scenario: null,
+      competencyId: null,
+      prereqCompetencyId: null,
+      isMeasureExam: false,
+      prereqStatus: { isReady: true },
+      latestDiagnosis: null,
+      sampleUtterances: [],
       partnerName: 'フィゼル先生',
       partnerAvatar: renderIcon('sensei', { size: 24, filled: true }),
       isMuted: false,
@@ -718,9 +749,40 @@
       vadTick();
     }
 
-    function armSilenceTimer(isFinal) {
+    function playThinkingBridgeTone() {
+      try {
+        var AudioCtx = root.AudioContext || root.webkitAudioContext;
+        if (!AudioCtx) return;
+        if (!audioContext || audioContext.state === 'closed') {
+          audioContext = root.__fiezelSharedAudioContext || new AudioCtx();
+          root.__fiezelSharedAudioContext = audioContext;
+        }
+        if (audioContext && audioContext.state === 'suspended') {
+          audioContext.resume().catch(function () {});
+        }
+        if (audioContext && audioContext.state === 'running') {
+          var nowTime = audioContext.currentTime;
+          var osc = audioContext.createOscillator();
+          var gain = audioContext.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(480, nowTime);
+          osc.frequency.exponentialRampToValueAtTime(540, nowTime + 0.06);
+          gain.gain.setValueAtTime(0.001, nowTime);
+          gain.gain.linearRampToValueAtTime(0.045, nowTime + 0.015);
+          gain.gain.exponentialRampToValueAtTime(0.001, nowTime + 0.075);
+          osc.connect(gain);
+          gain.connect(audioContext.destination);
+          osc.start(nowTime);
+          osc.stop(nowTime + 0.08);
+        }
+      } catch (_) {}
+    }
+
+    function armSilenceTimer(isFinal, text) {
       if (silenceTimer) clearTimeout(silenceTimer);
-      var wait = isFinal ? CONFIG.finalGraceMs : CONFIG.interimSilenceMs;
+      var current = String(text || pendingTranscript || '').trim();
+      var hasTerminalPunct = /[\.!\?。！？]$/.test(current);
+      var wait = isFinal ? (hasTerminalPunct ? CONFIG.finalGraceMs : CONFIG.finalStandardGraceMs) : CONFIG.interimSilenceMs;
       if (utteranceStartedAt && Date.now() - utteranceStartedAt > CONFIG.maxUtteranceMs) wait = 0;
       silenceTimer = setTimeout(function () {
         silenceTimer = null;
@@ -821,9 +883,9 @@
           lastTokenFinal = lastIsFinal;
 
           if (state.status === STATE.SPEAKING) {
-            // Acoustic refractory window: speakerphone echo is worst during the first 900ms
-            if (Date.now() - (aiSpeechStartTime || 0) < 900) return;
-            // Barge-in lewat token SR: tolak gema suara AI sendiri dan satu kata pendek.
+            // Acoustic refractory window: speakerphone echo is worst during the first 350ms
+            if (Date.now() - (aiSpeechStartTime || 0) < (CONFIG.acousticRefractoryMs || 350)) return;
+            // Barge-in lewat token SR: tolak gema suara AI sendiri dan token kosong.
             if (isEchoOfAi(fresh) || countWords(fresh, state.course) < CONFIG.minBargeInWords) return;
             interrupt('user_speech_token_barge_in');
             pendingTranscript = fresh;
@@ -831,7 +893,7 @@
             utteranceStartedAt = Date.now();
             emit('transcript', fresh, lastIsFinal, 'user');
             updateSubtitleUI(fresh, 'user');
-            armSilenceTimer(lastIsFinal);
+            armSilenceTimer(lastIsFinal, fresh);
             return;
           }
 
@@ -849,7 +911,7 @@
           hasUserSpoken = true;
           emit('transcript', combined, lastIsFinal, 'user');
           updateSubtitleUI(combined, 'user');
-          armSilenceTimer(lastIsFinal);
+          armSilenceTimer(lastIsFinal, combined);
         };
 
         rec.onerror = function (event) {
@@ -966,72 +1028,109 @@
         silenceTimer = null;
       }
 
+      // Voice Pedagogy Analysis & Braincore Integration
+      var voicePedagogy = getVoicePedagogy();
+      var diag = null;
+      if (voicePedagogy && typeof voicePedagogy.analyzeUtterancePedagogy === 'function') {
+        diag = voicePedagogy.analyzeUtterancePedagogy(text, state.scenarioId, state.course);
+      }
+      state.latestDiagnosis = diag;
+      updatePedagogyUI();
+
+      if (diag && voicePedagogy && typeof voicePedagogy.recordPedagogicalAttempt === 'function' && state.competencyId) {
+        voicePedagogy.recordPedagogicalAttempt({
+          competencyId: state.competencyId,
+          scenarioId: state.scenarioId,
+          userExactTranscript: text,
+          ok: diag.ok,
+          misconceptionId: diag.misconceptionId
+        });
+      }
+
       // Bangunkan server neural voice SELAGI AI berpikir, bukan setelah teksnya tiba
       var cvWarm = chatVoice();
-      if (cvWarm && typeof cvWarm.warmup === 'function') { try { cvWarm.warmup(); } catch (_) {} }
+      if (cvWarm && typeof cvWarm.warmup === 'function') { try { cvWarm.warmup(state.course); } catch (_) {} }
 
-      // Transition to Thinking
+      // Sensory feedback: warm subtle audio bridge chime and visual transition to thinking
+      playThinkingBridgeTone();
       setStatus(STATE.THINKING, { query: text });
       updateSubtitleUI(t('call_thinking', 'Fiezel sedang berpikir...'), 'thinking');
 
-      // Request reply from AI partner
-      var chatEngine = root.FiezelInteractiveChat;
       var replyPromise = null;
 
-      if (chatEngine && typeof chatEngine.requestReply === 'function') {
-        // Teman di telepon ingat obrolan: riwayat chat sebelum panggilan + giliran panggilan ini.
-        var callHistory = [];
-        try {
-          if (typeof chatEngine.buildHistory === 'function' && typeof chatEngine.getState === 'function') {
-            callHistory = chatEngine.buildHistory(chatEngine.getState().messages);
-          }
-        } catch (_) { callHistory = []; }
-        (state.callTurns || []).forEach(function (tn) {
-          if (tn && tn.userText) callHistory.push('u: ' + String(tn.userText).slice(0, 300));
-          if (tn && tn.reply && tn.reply.text) callHistory.push('a: ' + String(tn.reply.text).slice(0, 300));
+      // If learner has a grammar/syntactic misconception (diag && !diag.ok),
+      // AI immediately responds with the targeted pedagogical correction & follow-up.
+      if (diag && !diag.ok && diag.aiReply) {
+        var isTh = (root.FiezelI18n && typeof root.FiezelI18n.getLocale === 'function' && root.FiezelI18n.getLocale() === 'th');
+        replyPromise = Promise.resolve({
+          text: diag.aiReply,
+          furigana: state.course === 'ja' ? diag.aiReply : null,
+          translation: (isTh ? diag.aiReplyTranslationTh : diag.aiReplyTranslationId) || diag.aiReplyTranslationId || diag.aiReplyTranslationTh || ''
         });
-        var withCorrection = false;
-        try {
-          if (chatEngine && typeof chatEngine.getState === 'function') {
-            withCorrection = chatEngine.getState().correctionMode === true;
-          }
-        } catch (_) { withCorrection = false; }
-        replyPromise = chatEngine.requestReply(text, state.scenarioId, state.course, {
-          isPhoneCall: true,
-          correction: withCorrection,
-          history: callHistory.slice(-8)
-        });
-      } else if (typeof root.askFiezelAIResult === 'function') {
-        var scTitle = state.scenarioId;
-        var p = state.course === 'ja'
-          ? 'Kamu adalah Fiezel-chan (フィゼル), partner percakapan bahasa Jepang yang ramah di Tokyo.\n' +
-            'Konteks skenario: ' + scTitle + '. User input: "' + text + '".\n' +
-            'Jawab dalam 1-2 kalimat bahasa Jepang yang natural dan sopan. Berikan terjemahan bahasa Indonesia.'
-          : 'You are Fiezel Coach, a warm and encouraging English conversational tutor.\n' +
-            'Scenario: ' + scTitle + '. User input: "' + text + '".\n' +
-            'Reply naturally in 1-2 friendly English sentences and provide an Indonesian translation.';
-        try {
-          replyPromise = root.askFiezelAIResult(p, 'question', {
-            question: text,
-            lessonId: 'kaiwa_' + state.scenarioId
-          }).then(function (res) {
-            return {
-              text: res.text,
-              furigana: state.course === 'ja' ? res.text : null,
-              translation: t('chat_ai_direct', 'Jawaban langsung dari AI Partner FIEZEL.')
-            };
-          });
-        } catch (_) {
-          replyPromise = null;
-        }
-      }
+      } else {
+        // Request reply from AI partner
+        var chatEngine = root.FiezelInteractiveChat;
 
-      if (!replyPromise) {
-        replyPromise = Promise.resolve(
-          (chatEngine && typeof chatEngine.generateOfflineReply === 'function')
-            ? chatEngine.generateOfflineReply(text, state.scenarioId, state.course)
-            : { text: state.course === 'ja' ? 'はい、分かりました！' : 'I hear you! That sounds interesting!', translation: 'Saya mengerti!' }
-        );
+        if (chatEngine && typeof chatEngine.requestReply === 'function') {
+          // Teman di telepon ingat obrolan: riwayat chat sebelum panggilan + giliran panggilan ini.
+          var callHistory = [];
+          try {
+            if (typeof chatEngine.buildHistory === 'function' && typeof chatEngine.getState === 'function') {
+              callHistory = chatEngine.buildHistory(chatEngine.getState().messages);
+            }
+          } catch (_) { callHistory = []; }
+          (state.callTurns || []).forEach(function (tn) {
+            if (tn && tn.userText) callHistory.push('u: ' + String(tn.userText).slice(0, 300));
+            if (tn && tn.reply && tn.reply.text) callHistory.push('a: ' + String(tn.reply.text).slice(0, 300));
+          });
+          var withCorrection = false;
+          try {
+            if (chatEngine && typeof chatEngine.getState === 'function') {
+              withCorrection = chatEngine.getState().correctionMode === true;
+            }
+          } catch (_) { withCorrection = false; }
+          // Pemetaan skenario panggilan: skenario bebas diarahkan ke mitra telepon santai
+          var callScenarioId = state.scenarioId;
+          if (!callScenarioId || callScenarioId === 'free') {
+            callScenarioId = 'phone_friend';
+          }
+          replyPromise = chatEngine.requestReply(text, callScenarioId, state.course, {
+            isPhoneCall: true,
+            correction: withCorrection,
+            history: callHistory.slice(-8)
+          });
+        } else if (typeof root.askFiezelAIResult === 'function') {
+          var scTitle = state.scenarioId;
+          var p = state.course === 'ja'
+            ? 'Kamu adalah Fiezel-chan (フィゼル), partner percakapan bahasa Jepang yang ramah di Tokyo.\n' +
+              'Konteks skenario: ' + scTitle + '. User input: "' + text + '".\n' +
+              'Jawab dalam 1-2 kalimat bahasa Jepang yang natural dan sopan. Berikan terjemahan bahasa Indonesia.'
+            : 'You are Fiezel Coach, a warm and encouraging English conversational tutor.\n' +
+              'Scenario: ' + scTitle + '. User input: "' + text + '".\n' +
+              'Reply naturally in 1-2 friendly English sentences and provide an Indonesian translation.';
+          try {
+            replyPromise = root.askFiezelAIResult(p, 'question', {
+              question: text,
+              lessonId: 'kaiwa_' + state.scenarioId
+            }).then(function (res) {
+              return {
+                text: res.text,
+                furigana: state.course === 'ja' ? res.text : null,
+                translation: t('chat_ai_direct', 'Jawaban langsung dari AI Partner FIEZEL.')
+              };
+            });
+          } catch (_) {
+            replyPromise = null;
+          }
+        }
+
+        if (!replyPromise) {
+          replyPromise = Promise.resolve(
+            (chatEngine && typeof chatEngine.generateOfflineReply === 'function')
+              ? chatEngine.generateOfflineReply(text, state.scenarioId, state.course)
+              : { text: state.course === 'ja' ? 'はい、分かりました！' : 'I hear you! That sounds interesting!', translation: 'Saya mengerti!' }
+          );
+        }
       }
 
       replyPromise.then(function (replyObj) {
@@ -1058,6 +1157,89 @@
       });
     }
 
+    function updatePedagogyUI() {
+      if (!overlayEl) return;
+      var diagContainer = overlayEl.querySelector('#fzcCallDiagContainer');
+      var sampleContainer = overlayEl.querySelector('#fzcCallSampleContainer');
+
+      // 1. Diagnosis Card
+      if (diagContainer) {
+        var diag = state.latestDiagnosis;
+        if (diag) {
+          var isTh = (root.FiezelI18n && typeof root.FiezelI18n.getLocale === 'function' && root.FiezelI18n.getLocale() === 'th');
+          if (!diag.ok) {
+            // Error Card: Zero-Dumbing Invariant: exact reason & syntactic fix
+            var whyText = (isTh ? diag.whyFailsTh : diag.whyFailsId) || diag.whyFailsId || diag.whyFailsTh || '';
+            var fixText = diag.syntacticCorrection || diag.naturalReformulation || '';
+            diagContainer.innerHTML = (
+              '<div class="fzc-call-diag-card is-error">' +
+              '  <div class="fzc-call-diag-tag">⚠️ ' + esc(t('call_diag_tag_error', 'Catatan Pedagogis & Tata Bahasa')) + '</div>' +
+              '  <div class="fzc-call-diag-input">' + esc(t('call_diag_your_speech', 'Ucapanmu:')) + ' "' + esc(diag.userExactTranscript || '') + '"</div>' +
+              (whyText ? '  <div class="fzc-call-diag-why">' + esc(whyText) + '</div>' : '') +
+              (fixText ? '  <div class="fzc-call-diag-fix">' + esc(t('call_diag_fix', 'Perbaikan:')) + ' ' + esc(fixText) + '</div>' : '') +
+              '</div>'
+            );
+          } else {
+            // Success Card: Affirm mastery without false praise
+            var feedbackText = (isTh ? diag.pedagogicalFeedbackTh : diag.pedagogicalFeedbackId) || diag.pedagogicalFeedbackId || diag.pedagogicalFeedbackTh || t('call_diag_success_msg', 'Pola tata bahasa dan intonasi kalimat sudah tepat.');
+            diagContainer.innerHTML = (
+              '<div class="fzc-call-diag-card is-success">' +
+              '  <div class="fzc-call-diag-tag">✨ ' + esc(t('call_diag_tag_success', 'Tata Bahasa Tepat')) + '</div>' +
+              '  <div class="fzc-call-diag-input">"' + esc(diag.userExactTranscript || '') + '"</div>' +
+              '  <div class="fzc-call-diag-why">' + esc(feedbackText) + '</div>' +
+              '</div>'
+            );
+          }
+        } else {
+          diagContainer.innerHTML = '';
+        }
+      }
+
+      // 2. Sample Utterances or Exam Notice
+      if (sampleContainer) {
+        if (state.isMeasureExam) {
+          sampleContainer.innerHTML = (
+            '<div class="fzc-call-exam-pure-note">' +
+            '  🎯 ' + esc(t('call_exam_pure_note', 'Mode Ujian Aktif: Petunjuk & contoh kalimat disembunyikan untuk kalibrasi IRT objektif.')) +
+            '</div>'
+          );
+        } else if (state.scenario && Array.isArray(state.scenario.sampleUtterances) && state.scenario.sampleUtterances.length > 0) {
+          var chips = state.scenario.sampleUtterances;
+          var chipsHtml = chips.map(function (item, idx) {
+            var intentCls = 'intent-' + (item.intent || 'accurate');
+            var label = item.labelId || item.labelTh || item.text;
+            return '<button type="button" class="fzc-call-sample-chip ' + intentCls + '" data-idx="' + idx + '" data-text="' + esc(item.text) + '">' +
+              esc(label) +
+              '</button>';
+          }).join('');
+
+          sampleContainer.innerHTML = (
+            '<div class="fzc-call-sample-wrap">' +
+            '  <div class="fzc-call-sample-label">💡 ' + esc(t('call_sample_chips_label', 'Contoh Ucapan (Ketuk untuk Uji):')) + '</div>' +
+            '  <div class="fzc-call-sample-chips">' + chipsHtml + '</div>' +
+            '</div>'
+          );
+
+          var chipButtons = sampleContainer.querySelectorAll('.fzc-call-sample-chip');
+          for (var cb = 0; cb < chipButtons.length; cb++) {
+            (function (btn, index) {
+              var textToSpeak = (chips[index] && chips[index].text) || btn.getAttribute('data-text');
+              btn.setAttribute('data-text', textToSpeak);
+              btn.onclick = function (e) {
+                if (e) e.stopPropagation();
+                var text = btn.getAttribute('data-text') || textToSpeak;
+                if (text) {
+                  testSimulateTurn(text);
+                }
+              };
+            })(chipButtons[cb], cb);
+          }
+        } else {
+          sampleContainer.innerHTML = '';
+        }
+      }
+    }
+
     function deliverAiTurn(replyObj) {
       if (!setStatus(STATE.SPEAKING, { reply: replyObj })) return;
 
@@ -1066,6 +1248,8 @@
       loudSince = 0;
       updateSubtitleUI(speechText, 'assistant', replyObj ? replyObj.translation : '');
       emit('transcript', speechText, true, 'assistant');
+
+      updatePedagogyUI();
 
       // Speak AI response
       playSpeech(speechText, state.course).then(function () {
@@ -1324,6 +1508,38 @@
       }
       state.course = opts.course || 'ja';
       state.scenarioId = opts.scenarioId || 'free';
+      state.latestDiagnosis = null;
+
+      var voiceScenarios = getVoiceScenarios();
+      var sc = null;
+      if (voiceScenarios && typeof voiceScenarios.getScenario === 'function' && state.scenarioId && state.scenarioId !== 'free') {
+        sc = voiceScenarios.getScenario(state.scenarioId);
+      }
+
+      if (sc) {
+        state.scenario = sc;
+        if (sc.targetLang) state.course = sc.targetLang;
+        state.competencyId = sc.competencyId || null;
+        state.prereqCompetencyId = sc.prereqCompetencyId || null;
+        state.isMeasureExam = Boolean(sc.isMeasureExam);
+        state.sampleUtterances = Array.isArray(sc.sampleUtterances) ? sc.sampleUtterances.slice() : [];
+        if (!opts.persona && sc.personaId) {
+          opts.persona = sc.personaId;
+        }
+        if (typeof voiceScenarios.checkPrerequisiteStatus === 'function') {
+          state.prereqStatus = voiceScenarios.checkPrerequisiteStatus(null, sc.prereqCompetencyId);
+        } else {
+          state.prereqStatus = { isReady: true, pMastery: 1.0, stateLabel: 'MASTERED' };
+        }
+      } else {
+        state.scenario = null;
+        state.competencyId = null;
+        state.prereqCompetencyId = null;
+        state.isMeasureExam = false;
+        state.prereqStatus = { isReady: true };
+        state.sampleUtterances = [];
+      }
+
       var resolved = resolvePersona(state.course, opts.persona || opts.personaId || opts.partnerPersona || opts.partnerVoice || state.persona);
       state.persona = resolved.id;
       state.partnerVoice = resolved.voice;
@@ -1347,7 +1563,7 @@
       try {
         var cvBoot = chatVoice();
         if (cvBoot && typeof cvBoot.probeEndpoint === 'function') cvBoot.probeEndpoint();
-        if (cvBoot && typeof cvBoot.warmup === 'function') cvBoot.warmup();
+        if (cvBoot && typeof cvBoot.warmup === 'function') cvBoot.warmup(state.course);
       } catch (_) {}
 
       // Ensure any previous or transition overlay is pruned cleanly
@@ -1358,7 +1574,8 @@
       registerBackNav();
 
       return initMediaStream(opts.preacquiredStream)
-        .then(function () {
+        .then(function (streamOk) {
+          if (isDestroyed || state.status === STATE.IDLE || streamOk === false) return false;
           setupSpeechRecognition();
           startRecognition();
           startCallTimer();
@@ -1368,6 +1585,19 @@
             ? t('call_connected_greeting', 'Tersambung. Silakan mulai berbicara...')
             : t('call_no_speech_rec_hint', 'Mikrofon terhubung. Bicara atau sentuh bola untuk kirim giliran.');
           updateSubtitleUI(hint, 'status');
+
+          if (sc && sc.openingLine && state.prereqStatus && state.prereqStatus.isReady) {
+            setTimeout(function () {
+              if (state.status !== STATE.IDLE && !isDestroyed) {
+                var openingObj = {
+                  text: sc.openingLine,
+                  translation: (state.course === 'ja' ? sc.openingTranslationId : sc.openingTranslationId) || sc.openingTranslationTh || ''
+                };
+                deliverAiTurn(openingObj);
+              }
+            }, 600);
+          }
+
           return true;
         })
         .catch(function (err) {
@@ -1498,6 +1728,8 @@
         durationSeconds: finalDuration,
         interruptedCount: state.interruptedCount,
         scenarioId: state.scenarioId,
+        competencyId: state.competencyId || null,
+        isMeasureExam: Boolean(state.isMeasureExam),
         course: state.course,
         turnsCount: turns,
         turns: turns,
@@ -1517,6 +1749,14 @@
       }
 
       unmountOverlay(true);
+
+      state.scenario = null;
+      state.competencyId = null;
+      state.prereqCompetencyId = null;
+      state.isMeasureExam = false;
+      state.prereqStatus = { isReady: true };
+      state.latestDiagnosis = null;
+      state.sampleUtterances = [];
     }
 
     function setMute(muted) {
@@ -1610,11 +1850,53 @@
       var course = state.course;
       var partnerName = state.partnerName || (course === 'ja' ? 'フィゼル先生' : 'Coach Alex');
 
+      var scenarioMetaHtml = '';
+      if (state.scenario) {
+        var sc = state.scenario;
+        var badgeCls = state.isMeasureExam ? 'is-exam' : 'is-practice';
+        var badgeText = state.isMeasureExam
+          ? ((sc.level ? (sc.level + ' · ') : '') + t('call_badge_exam_pure', 'MODE UJIAN MURNI (TANPA BANTUAN)'))
+          : ((sc.level ? (sc.level + ' · ') : '') + t('call_badge_guided', 'LATIHAN TERBIMBING'));
+        var isTh = (root.FiezelI18n && typeof root.FiezelI18n.getLocale === 'function' && root.FiezelI18n.getLocale() === 'th');
+        scenarioMetaHtml = '<div class="fzc-call-scenario-meta">' +
+          '<div class="fzc-call-scenario-badge ' + badgeCls + '">' +
+          (state.isMeasureExam ? '🎯 ' : '💬 ') + esc(badgeText) +
+          '</div>' +
+          '<div class="fzc-call-scenario-title">' + esc((isTh ? sc.titleTh : sc.titleId) || sc.titleId || sc.titleTh || sc.title || '') + '</div>' +
+          '</div>';
+      }
+
+      var prereqDrawerHtml = '';
+      if (state.scenario && state.prereqStatus && !state.prereqStatus.isReady && Array.isArray(state.scenario.vocabPrereqs)) {
+        var scObj = state.scenario;
+        var isThPrereq = (root.FiezelI18n && typeof root.FiezelI18n.getLocale === 'function' && root.FiezelI18n.getLocale() === 'th');
+        var listHtml = scObj.vocabPrereqs.map(function (item) {
+          return '<div class="fzc-call-prereq-item">' +
+            '<div class="fzc-call-prereq-term">' + esc(item.term) + '</div>' +
+            '<div class="fzc-call-prereq-meaning">' + esc((isThPrereq ? item.meaningTh : item.meaningId) || item.meaningId || item.meaningTh || '') + '</div>' +
+            (item.exampleSentence ? '<div class="fzc-call-prereq-ex">' + esc(item.exampleSentence) + '</div>' : '') +
+            '</div>';
+        }).join('');
+
+        prereqDrawerHtml = '<div class="fzc-call-prereq-overlay" id="fzcCallPrereqOverlay">' +
+          '<div class="fzc-call-prereq-card">' +
+          '<div class="fzc-call-prereq-badge">🔒 ' + esc(t('call_prereq_badge', 'Prasyarat Kosa Kata')) + '</div>' +
+          '<div class="fzc-call-prereq-title">' + esc(t('call_prereq_title', 'Kuasai Kosa Kata Sebelum Mulai')) + '</div>' +
+          '<div class="fzc-call-prereq-desc">' + esc(t('call_prereq_desc', 'Pahami kosa kata kunci berikut agar percakapan telepon mengalir lancar:')) + '</div>' +
+          '<div class="fzc-call-prereq-list">' + listHtml + '</div>' +
+          '<button type="button" class="fzc-call-prereq-btn" id="fzcCallBtnUnlockPrereq">' +
+          esc(t('call_prereq_unlock_btn', 'Saya Siap, Mulai Percakapan!')) +
+          '</button>' +
+          '</div>' +
+          '</div>';
+      }
+
       var div = document.createElement('div');
       div.id = 'fzcCallOverlay';
       div.className = 'fzc-call-overlay is-active';
       div.innerHTML = (
         renderCyberTopoBg() +
+        prereqDrawerHtml +
         '<div class="fzc-call-container">' +
         // Header Bar
         '<div class="fzc-call-topbar">' +
@@ -1625,6 +1907,7 @@
         '<div class="fzc-call-timer" id="fzcCallTimer">00:00</div>' +
         '</div>' +
         '</div>' +
+        scenarioMetaHtml +
         renderPersonaSwitchHtml(state.course, state.persona) +
         '<button type="button" class="fzc-call-btn-mini" id="fzcCallBtnClose" aria-label="' + esc(t('call_close', 'Tutup Panggilan')) + '">' + renderIcon('close', { size: 16 }) + '</button>' +
         '</div>' +
@@ -1642,6 +1925,13 @@
         '<div class="fzc-voice-core"></div>' +
         '</div>' +
         '</div>' +
+        '<div class="fzc-voice-wave" id="fzcVoiceWave" aria-hidden="true">' +
+        '<div class="fzc-wave-bar bar-1"></div>' +
+        '<div class="fzc-wave-bar bar-2"></div>' +
+        '<div class="fzc-wave-bar bar-3"></div>' +
+        '<div class="fzc-wave-bar bar-4"></div>' +
+        '<div class="fzc-wave-bar bar-5"></div>' +
+        '</div>' +
         '<div class="fzc-call-status-label" id="fzcCallStatusLabel">' + t('call_connecting', 'Menghubungkan...') + '</div>' +
         '<div class="fzc-call-interrupt-hint" id="fzcCallInterruptHint">' + t('call_interrupt_hint', 'Bicara atau sentuh bola untuk menyela') + '</div>' +
         '</div>' +
@@ -1650,6 +1940,8 @@
         '<div class="fzc-call-subtitle-card" id="fzcCallSubtitleCard">' +
         '<div class="fzc-call-sub-text fzc-call-transcript-text" id="fzcCallSubText">' + t('call_sub_connecting', 'Mempersiapkan audio...') + '</div>' +
         '<div class="fzc-call-sub-trans" id="fzcCallSubTrans"></div>' +
+        '<div class="fzc-call-diag-container" id="fzcCallDiagContainer"></div>' +
+        '<div class="fzc-call-sample-container" id="fzcCallSampleContainer"></div>' +
         '</div>' +
 
         // Bottom Action Dock
@@ -1673,6 +1965,7 @@
       document.body.appendChild(div);
       overlayEl = div;
       bindOverlayEvents(div);
+      updatePedagogyUI();
     }
 
     function closeCallUI(immediate) {
@@ -1763,6 +2056,40 @@
         };
       }
 
+      var btnUnlock = container.querySelector('#fzcCallBtnUnlockPrereq');
+      if (btnUnlock) {
+        btnUnlock.onclick = function (e) {
+          if (e) e.stopPropagation();
+          var voiceScenarios = getVoiceScenarios();
+          if (voiceScenarios && typeof voiceScenarios.recordVocabPrereqMastery === 'function' && state.prereqCompetencyId) {
+            voiceScenarios.recordVocabPrereqMastery(state.prereqCompetencyId);
+          }
+          state.prereqStatus = { isReady: true, pMastery: 0.75, stateLabel: 'DEVELOPING' };
+          var overlay = container.querySelector('.fzc-call-prereq-overlay') || container.querySelector('#fzcCallPrereqOverlay');
+          if (overlay && overlay.parentNode) {
+            overlay.parentNode.removeChild(overlay);
+          }
+          if (state.scenario && state.scenario.openingLine) {
+            var openingObj = {
+              text: state.scenario.openingLine,
+              translation: (state.course === 'ja' ? state.scenario.openingTranslationId : state.scenario.openingTranslationId) || state.scenario.openingTranslationTh || ''
+            };
+            deliverAiTurn(openingObj);
+          }
+        };
+      }
+
+      var sampleChips = container.querySelectorAll('.fzc-call-sample-chip');
+      for (var scIdx = 0; scIdx < sampleChips.length; scIdx++) {
+        (function (ch) {
+          ch.onclick = function (e) {
+            if (e) e.stopPropagation();
+            var text = ch.getAttribute('data-text');
+            if (text) testSimulateTurn(text);
+          };
+        })(sampleChips[scIdx]);
+      }
+
       var personaBtns = container.querySelectorAll('.fzc-call-persona-btn');
       for (var pb = 0; pb < personaBtns.length; pb++) {
         (function (pBtn) {
@@ -1831,6 +2158,7 @@
 
       var stage = overlayEl.querySelector('.fzc-call-stage');
       var orb = overlayEl.querySelector('#fzcVoiceOrb');
+      var wave = overlayEl.querySelector('#fzcVoiceWave');
       var dot = overlayEl.querySelector('#fzcCallStatusDot');
       var label = overlayEl.querySelector('#fzcCallStatusLabel');
       var hint = overlayEl.querySelector('#fzcCallInterruptHint');
@@ -1845,6 +2173,9 @@
       }
       if (orb) {
         orb.className = 'fzc-voice-orb ' + statusClass;
+      }
+      if (wave) {
+        wave.className = 'fzc-voice-wave ' + statusClass;
       }
       if (dot) {
         dot.className = 'fzc-call-status-dot ' + statusClass;
@@ -1909,6 +2240,16 @@
       }
       if (stage) {
         stage.style.setProperty('--fzc-voice-level', vol.toFixed(3));
+      }
+
+      var waveBars = overlayEl.querySelectorAll('.fzc-wave-bar');
+      if (waveBars && waveBars.length === 5) {
+        var baseVol = Math.max(0.04, Math.min(1, vol));
+        var multipliers = [0.7, 1.25, 1.6, 1.2, 0.75];
+        for (var b = 0; b < 5; b++) {
+          var barScale = 0.22 + (baseVol * multipliers[b] * 1.55);
+          waveBars[b].style.transform = 'scaleY(' + Math.min(2.5, Math.max(0.18, barScale)).toFixed(2) + ')';
+        }
       }
     }
 
