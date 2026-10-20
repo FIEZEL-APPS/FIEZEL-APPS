@@ -743,9 +743,12 @@
       return course === 'ja' ? String(s || '').replace(/\s+/g, '').length / 2 : normalizeUnits(s, 'en').length;
     }
 
-    /** Transkrip yang ≥60% unitnya ada di balasan AI yang sedang diputar = gema speaker, bukan murid. */
+    /** Transkrip yang ≥55% unitnya ada di balasan AI yang sedang diputar = gema speaker, bukan murid. */
     function isEchoOfAi(transcript) {
-      if (!currentAiText) return false;
+      if (!currentAiText || !transcript) return false;
+      var cleanA = String(transcript).toLowerCase().replace(/[\u30a1-\u30f6]/g, function (m) { return String.fromCharCode(m.charCodeAt(0) - 0x60); }).trim();
+      var cleanAi = String(currentAiText).toLowerCase().replace(/[\u30a1-\u30f6]/g, function (m) { return String.fromCharCode(m.charCodeAt(0) - 0x60); }).trim();
+      if (cleanAi && (cleanAi.indexOf(cleanA) !== -1 || cleanA.indexOf(cleanAi) !== -1)) return true;
       var a = normalizeUnits(transcript, state.course);
       if (!a.length) return false;
       var b = normalizeUnits(currentAiText, state.course);
@@ -753,7 +756,7 @@
       for (var i = 0; i < b.length; i++) set[b[i]] = true;
       var hit = 0;
       for (var j = 0; j < a.length; j++) if (set[a[j]]) hit++;
-      return hit / a.length >= 0.6;
+      return hit / a.length >= 0.55;
     }
 
     function clearDuck() {
@@ -818,6 +821,8 @@
           lastTokenFinal = lastIsFinal;
 
           if (state.status === STATE.SPEAKING) {
+            // Acoustic refractory window: speakerphone echo is worst during the first 900ms
+            if (Date.now() - (aiSpeechStartTime || 0) < 900) return;
             // Barge-in lewat token SR: tolak gema suara AI sendiri dan satu kata pendek.
             if (isEchoOfAi(fresh) || countWords(fresh, state.course) < CONFIG.minBargeInWords) return;
             interrupt('user_speech_token_barge_in');
@@ -827,6 +832,12 @@
             emit('transcript', fresh, lastIsFinal, 'user');
             updateSubtitleUI(fresh, 'user');
             armSilenceTimer(lastIsFinal);
+            return;
+          }
+
+          if (state.status === STATE.THINKING) {
+            pendingTranscript = combined;
+            state.currentTranscript = combined;
             return;
           }
 
@@ -979,8 +990,15 @@
           if (tn && tn.userText) callHistory.push('u: ' + String(tn.userText).slice(0, 300));
           if (tn && tn.reply && tn.reply.text) callHistory.push('a: ' + String(tn.reply.text).slice(0, 300));
         });
+        var withCorrection = false;
+        try {
+          if (chatEngine && typeof chatEngine.getState === 'function') {
+            withCorrection = chatEngine.getState().correctionMode === true;
+          }
+        } catch (_) { withCorrection = false; }
         replyPromise = chatEngine.requestReply(text, state.scenarioId, state.course, {
           isPhoneCall: true,
+          correction: withCorrection,
           history: callHistory.slice(-8)
         });
       } else if (typeof root.askFiezelAIResult === 'function') {
@@ -1244,7 +1262,8 @@
           }
         };
         window.addEventListener('popstate', popStateListener);
-        pageHideListener = function () {
+        pageHideListener = function (e) {
+          if (e && e.persisted) return;
           if (!isDestroyed && state.status !== STATE.IDLE) {
             end();
           }
@@ -1269,6 +1288,25 @@
           pageHideListener = null;
         }
       }
+    }
+
+    var screenWakeLock = null;
+    function acquireWakeLock() {
+      try {
+        if (typeof navigator !== 'undefined' && 'wakeLock' in navigator && typeof navigator.wakeLock.request === 'function') {
+          navigator.wakeLock.request('screen').then(function (lock) {
+            screenWakeLock = lock;
+          }).catch(function () {});
+        }
+      } catch (_) {}
+    }
+    function releaseWakeLock() {
+      try {
+        if (screenWakeLock && typeof screenWakeLock.release === 'function') {
+          screenWakeLock.release().catch(function () {});
+          screenWakeLock = null;
+        }
+      } catch (_) {}
     }
 
     // --- Lifecycle Controls ---
@@ -1324,6 +1362,7 @@
           setupSpeechRecognition();
           startRecognition();
           startCallTimer();
+          acquireWakeLock();
           setStatus(STATE.LISTENING);
           var hint = Boolean(root.SpeechRecognition || root.webkitSpeechRecognition)
             ? t('call_connected_greeting', 'Tersambung. Silakan mulai berbicara...')
@@ -1349,6 +1388,7 @@
       if (state.status === STATE.IDLE && isDestroyed) return;
       isDestroyed = true;
 
+      releaseWakeLock();
       unregisterBackNav();
       stopAudioPlayback();
       stopRecognition();

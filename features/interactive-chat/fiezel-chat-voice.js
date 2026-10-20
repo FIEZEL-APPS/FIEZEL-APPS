@@ -121,7 +121,7 @@
     if (!t) return [];
     var parts;
     if (course === 'ja') {
-      parts = t.match(/[^。！？!?…‥]+[。！？!?…‥]*/g) || [t];
+      parts = t.match(/(?:……|…|[^\s。！？!?…‥〜~]+)[。！？!?…‥〜~]*[」』）]*/g) || [t];
     } else {
       var guarded = t
         .replace(EN_ABBREV_RE, function (m) { return m.slice(0, -1) + DOT_MARK; })
@@ -133,7 +133,7 @@
     parts = parts.map(function (p) { return p.trim(); }).filter(Boolean);
     var out = [];
     var carry = '';
-    var minLen = course === 'ja' ? 6 : MIN_CHUNK_CHARS;
+    var minLen = course === 'ja' ? 3 : MIN_CHUNK_CHARS;
     for (var i = 0; i < parts.length; i++) {
       var piece = carry ? carry + (course === 'ja' ? '' : ' ') + parts[i] : parts[i];
       if (piece.length < minLen && i < parts.length - 1) { carry = piece; continue; }
@@ -229,11 +229,12 @@
         var baseDir = root.location.pathname.replace(/\/[^/]*$/, '');
         if (baseDir && baseDir !== '/') {
           list.push(root.location.origin + baseDir + '/api/tts/line/index.php');
-          list.push(root.location.origin + baseDir + '/api/tts/line');
         }
       }
-      list.push(root.location.origin + '/api/tts/line/index.php');
-      list.push(root.location.origin + '/api/tts/line');
+      list.push(root.location.origin + '/app/api/tts/line/index.php');
+      if (!isLocal) {
+        list.push('https://fiezel-apps.onrender.com/api/tts/line');
+      }
     } else {
       list.push('/api/tts/line');
     }
@@ -630,8 +631,8 @@
   }
 
   if (typeof document !== 'undefined' && typeof document.addEventListener === 'function') {
-    document.addEventListener('pointerdown', unlockAudio, { once: true, passive: true });
-    document.addEventListener('touchstart', unlockAudio, { once: true, passive: true });
+    document.addEventListener('pointerdown', unlockAudio, { passive: true });
+    document.addEventListener('touchstart', unlockAudio, { passive: true });
   }
 
   function speakJaFallback(sentence, myToken, persona) {
@@ -701,10 +702,8 @@
           serverStatus = 'available';
           return playAudioResult(result, myToken);
         }
-        if (serverStatus !== 'available') {
-          serverStatus = 'unavailable';
-          lastProbeTime = Date.now();
-        }
+        serverStatus = 'unavailable';
+        lastProbeTime = Date.now();
         return false;
       }).then(function (ok) {
         if (myToken !== token) return false;
@@ -712,10 +711,8 @@
         return c === 'ja' ? speakJaFallback(sentence, myToken, persona) : speakEnFallback(sentence, myToken, persona);
       }).catch(function () {
         if (myToken !== token) return false;
-        if (serverStatus !== 'available') {
-          serverStatus = 'unavailable';
-          lastProbeTime = Date.now();
-        }
+        serverStatus = 'unavailable';
+        lastProbeTime = Date.now();
         return c === 'ja' ? speakJaFallback(sentence, myToken, persona) : speakEnFallback(sentence, myToken, persona);
       });
     }
@@ -731,7 +728,7 @@
     try {
       var opts = options || {};
       var c = course === 'ja' ? 'ja' : 'en';
-      var clean = cleanText(sentence);
+      var clean = cleanText(sentence, c);
       if (!clean) return Promise.resolve(false);
 
       var persona = resolvePersona(c, opts.persona);

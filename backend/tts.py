@@ -168,6 +168,7 @@ async def synthesize_edge_tts(text: str, voice_name: str, pitch: str = "+0Hz", r
     cleaned = re.sub(r'\?!|!\?', '?', cleaned)
     cleaned = re.sub(r',(\s*,)+', ',', cleaned)
     escaped_text = xml.sax.saxutils.escape(cleaned)
+    audio_data = bytearray()
 
     async with aiohttp.ClientSession(timeout=timeout) as session:
         async with session.ws_connect(url, headers=headers) as ws:

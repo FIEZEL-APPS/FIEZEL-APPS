@@ -98,6 +98,9 @@
   function waitForSdk() {
     return new Promise(function (resolve, reject) {
       if (sdkReady()) return resolve(root.puter);
+      if (typeof document !== 'undefined' && !document.querySelector('script[src*="puter.com"]')) {
+        return reject(new Error('puter_sdk_unavailable'));
+      }
       var end = Date.now() + SDK_TIMEOUT_MS;
       (function poll() {
         if (sdkReady()) return resolve(root.puter);

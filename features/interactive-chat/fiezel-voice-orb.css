@@ -43,6 +43,24 @@
    1. FULLSCREEN CALL STAGE & BACKDROP
    ========================================================================== */
 
+.fzc-call-container .fzc-call-stage {
+  position: relative !important;
+  inset: auto !important;
+  background: transparent !important;
+  overflow: visible !important;
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  z-index: 1 !important;
+}
+
+.fzc-call-container .fzc-call-stage::before,
+.fzc-call-container .fzc-call-stage::after {
+  display: none !important;
+  content: none !important;
+}
+
 .fzc-call-stage {
   position: fixed;
   inset: 0;

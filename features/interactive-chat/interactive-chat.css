@@ -142,8 +142,10 @@ body.fz-view-chat #fiezelDiagHost {
   display: none !important;
 }
 
-/* ── Reset Global Button Styles inside Chat ── */
-.fzc-container button {
+/* ── Reset Global Button Styles inside Chat & Call Overlay ── */
+.fzc-container button,
+.fzc-call-container button,
+#fzcCallOverlay button {
   min-height: unset;
   font: inherit;
   border-radius: 0;
@@ -319,14 +321,17 @@ body.fz-view-chat #fiezelDiagHost {
   line-height: 1.25;
   letter-spacing: -0.015em;
   min-width: 0;
+  overflow: hidden;
 }
 
 .fzc-partner-name {
-  overflow: visible !important;
-  text-overflow: clip !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
   white-space: nowrap !important;
   display: inline-block !important;
-  flex-shrink: 0 !important;
+  flex: 0 1 auto !important;
+  min-width: 0 !important;
+  font-size: inherit !important;
 }
 
 .fzc-badge-level {
@@ -1136,6 +1141,8 @@ body.fz-ja-no-romaji .fzc-romaji {
   user-select: none !important;
 }
 
+.fzc-action-btn .fzc-btn-icon-wrap svg,
+.fzc-action-btn .fzc-icon,
 .fzc-action-btn .fzc-pill-svg {
   display: inline-block;
   vertical-align: middle;
@@ -1151,6 +1158,8 @@ body.fz-ja-no-romaji .fzc-romaji {
   box-shadow: 0 4px 10px rgba(27, 20, 24, 0.08), inset 0 1px 0 #FFFFFF !important;
 }
 
+.fzc-action-btn:hover .fzc-btn-icon-wrap svg,
+.fzc-action-btn:hover .fzc-icon,
 .fzc-action-btn:hover .fzc-pill-svg {
   transform: scale(1.12);
 }
@@ -1167,6 +1176,8 @@ body.fz-ja-no-romaji .fzc-romaji {
   box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
 }
 
+.fzc-action-btn.is-playing .fzc-btn-icon-wrap svg,
+.fzc-action-btn.is-playing .fzc-icon,
 .fzc-action-btn.is-playing .fzc-pill-svg {
   stroke: #059669;
   animation: fzcAudioPulse 1.1s infinite alternate ease-in-out;
@@ -2095,16 +2106,17 @@ body.fz-ja-no-romaji .fzc-romaji {
   100% { transform: scale(1); opacity: 0; }
 }
 
-.fzc-call-partner-name {
-  font-size: 1.15rem;
-  font-weight: 800;
-  color: var(--fzc-ink);
-  margin: 0 0 4px 0;
-  line-height: 1.2;
-}
-
+.fzc-call-partner-name,
 .fzc-call-overlay .fzc-call-partner-name {
+  font-size: 0.90rem !important;
+  font-weight: 800 !important;
   color: #FDFAF3 !important;
+  margin: 0 !important;
+  line-height: 1.2 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  max-width: 100% !important;
 }
 
 .fzc-call-status-text {
@@ -2547,7 +2559,10 @@ body.fz-ja-no-romaji .fzc-romaji {
   overflow: hidden;
   user-select: none;
   -webkit-user-select: none;
-  padding: env(safe-area-inset-top, 24px) 20px env(safe-area-inset-bottom, 32px);
+  padding-top: max(16px, env(safe-area-inset-top, 16px)) !important;
+  padding-left: max(12px, env(safe-area-inset-left, 12px)) !important;
+  padding-right: max(12px, env(safe-area-inset-right, 12px)) !important;
+  padding-bottom: max(24px, env(safe-area-inset-bottom, 24px)) !important;
   box-sizing: border-box;
   animation: fzcFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -2667,12 +2682,15 @@ body.fz-ja-no-romaji .fzc-romaji {
 }
 
 .fzc-call-container .fzc-call-stage::before,
-.fzc-call-container .fzc-call-stage::after {
+.fzc-call-container .fzc-call-stage::after,
+.fzc-call-stage::before,
+.fzc-call-stage::after {
   display: none !important;
   content: none !important;
 }
 
-.fzc-call-container .fzc-call-stage {
+.fzc-call-container .fzc-call-stage,
+.fzc-call-stage {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -2684,6 +2702,9 @@ body.fz-ja-no-romaji .fzc-romaji {
   background: transparent !important;
   z-index: 1 !important;
   overflow: visible !important;
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 .fzc-voice-orb-wrapper {
@@ -2693,6 +2714,10 @@ body.fz-ja-no-romaji .fzc-romaji {
   display: flex;
   align-items: center;
   justify-content: center;
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
 }
 
 /* ── Gyroscopic Orbital Rings & Coordinate Telemetry ── */
@@ -4472,4 +4497,125 @@ body.theme-dark .fzc-nudge-actions .fzc-nudge-on,
 body.scene-night .fzc-nudge-actions .fzc-nudge-on {
   background: #FDFAF3 !important;
   color: #1B1418 !important;
+}
+
+/* ==========================================================================
+   KAWAN BICARA MOBILE RESPONSIVE POLISH & ZERO-COLLISION TOPBAR
+   ========================================================================== */
+@media (max-width: 375px) {
+  .fzc-btn-call .fzc-call-text {
+    display: none !important;
+  }
+  .fzc-btn-call {
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+    min-height: 38px !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+  }
+  .fzc-call-icon {
+    width: 18px !important;
+    height: 18px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .fzc-mode-bar {
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    scrollbar-width: none !important;
+    gap: 6px !important;
+    padding: 2px 0 4px !important;
+  }
+  .fzc-mode-bar::-webkit-scrollbar { display: none !important; }
+  .fzc-mode-toggle {
+    height: 34px !important;
+    min-height: 34px !important;
+    padding: 0 10px !important;
+    font-size: 0.72rem !important;
+    white-space: nowrap !important;
+  }
+  .fzc-chat-persona-switch {
+    height: 34px !important;
+    min-height: 34px !important;
+    padding: 2px 3px !important;
+  }
+  .fzc-chat-persona-btn {
+    height: 28px !important;
+    min-height: 28px !important;
+    padding: 0 8px !important;
+    font-size: 0.70rem !important;
+  }
+}
+
+.fzc-call-topbar {
+  gap: 6px !important;
+  box-sizing: border-box !important;
+}
+
+.fzc-call-partner-info {
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+  max-width: 120px !important;
+  gap: 6px !important;
+}
+
+@media (max-width: 390px) {
+  .fzc-call-persona-switch {
+    gap: 2px !important;
+    padding: 2px !important;
+    margin-left: auto !important;
+    flex: 0 0 auto !important;
+  }
+  .fzc-call-persona-btn {
+    height: 30px !important;
+    min-height: 30px !important;
+    padding: 0 6px !important;
+    font-size: 0.68rem !important;
+    gap: 3px !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .fzc-call-persona-btn .fzc-persona-name {
+    display: none !important;
+  }
+  .fzc-call-persona-btn {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    min-height: 28px !important;
+    padding: 0 !important;
+    justify-content: center !important;
+  }
+  .fzc-call-btn-mini {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    min-height: 28px !important;
+  }
+}
+
+@media (max-width: 430px) {
+  .fzc-actions-bar {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    max-width: 100% !important;
+    padding-bottom: 2px !important;
+    gap: 5px !important;
+  }
+  .fzc-actions-bar::-webkit-scrollbar {
+    display: none !important;
+  }
+  .fzc-action-btn {
+    height: 38px !important;
+    min-height: 38px !important;
+    padding: 0 11px !important;
+    font-size: 0.74rem !important;
+    flex-shrink: 0 !important;
+  }
 }
