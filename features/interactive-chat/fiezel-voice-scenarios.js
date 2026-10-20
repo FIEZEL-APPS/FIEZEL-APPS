@@ -32,7 +32,8 @@
       edgeVoice: 'en-US-GuyNeural',
       targetLang: 'en',
       levelRange: 'CEFR A1–B1',
-      avatarUrl: './assets/characters/nusa/webp/head-happy.webp',
+      avatarIcon: 'coach',
+      avatarUrl: '',
       accentLabel: 'American English · Natural Pace',
       speakingStyle: 'Warm, encouraging, conversational language coach',
       systemPrompt:
@@ -48,7 +49,8 @@
       edgeVoice: 'en-US-AriaNeural',
       targetLang: 'en',
       levelRange: 'CEFR B1–C1',
-      avatarUrl: './assets/characters/mira/webp/head-explain.webp',
+      avatarIcon: 'coach',
+      avatarUrl: '',
       accentLabel: 'International Academic English',
       speakingStyle: 'Articulate, structured, crisp academic examiner and mentor',
       systemPrompt:
@@ -64,7 +66,8 @@
       edgeVoice: 'ja-JP-NanamiNeural',
       targetLang: 'ja',
       levelRange: 'JLPT N5–N4',
-      avatarUrl: './assets/characters/mira/webp/head-happy.webp',
+      avatarIcon: 'sensei',
+      avatarUrl: '',
       accentLabel: 'Tokyo Standard Japanese (標準語)',
       speakingStyle: 'Polite, gentle, clear Japanese conversation teacher',
       systemPrompt:
@@ -80,7 +83,8 @@
       edgeVoice: 'ja-JP-KeitaNeural',
       targetLang: 'ja',
       levelRange: 'JLPT N4',
-      avatarUrl: './assets/characters/nusa/webp/head-curious.webp',
+      avatarIcon: 'sensei',
+      avatarUrl: '',
       accentLabel: 'Tokyo Campus Japanese',
       speakingStyle: 'Friendly university senpai, clear and supportive',
       systemPrompt:

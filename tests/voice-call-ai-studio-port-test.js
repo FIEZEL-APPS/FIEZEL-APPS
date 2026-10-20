@@ -120,7 +120,7 @@ Object.entries(expectedPersonas).forEach(([pId, expected]) => {
   assert.strictEqual(persona.geminiVoice, expected.geminiVoice, `Persona "${pId}" geminiVoice mismatch`);
   assert.strictEqual(persona.targetLang, expected.targetLang, `Persona "${pId}" targetLang mismatch`);
   assert.ok(persona.name, `Persona "${pId}" must have a name`);
-  assert.ok(persona.avatarUrl, `Persona "${pId}" must have avatarUrl`);
+  assert.ok(persona.avatarIcon || persona.avatarUrl, `Persona "${pId}" must have avatarIcon or avatarUrl`);
   assert.ok(persona.systemPrompt, `Persona "${pId}" must have systemPrompt`);
   assert.ok(persona.accentLabel, `Persona "${pId}" must have accentLabel`);
 });
