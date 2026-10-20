@@ -194,6 +194,18 @@
             setTimeout(reloadIfApproved, 3500);
             return;
           }
+          if (reg && reg.installing && !reg.waiting) {
+            var inst = reg.installing;
+            inst.addEventListener('statechange', function onState() {
+              if (inst.state === 'installed' || inst.state === 'activated') {
+                inst.removeEventListener('statechange', onState);
+                try { inst.postMessage({ type: 'FIEZEL_SKIP_WAITING' }); } catch (_) {}
+                setTimeout(reloadIfApproved, 3500);
+              }
+            });
+            setTimeout(reloadIfApproved, 10000);
+            return;
+          }
           reloadIfApproved();
         }).catch(function () { reloadIfApproved(); });
       } else {

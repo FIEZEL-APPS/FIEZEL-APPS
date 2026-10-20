@@ -1751,12 +1751,15 @@
     mountPoint.querySelectorAll('.fzc-action-btn[data-action="audio"]').forEach(function (btn) {
       var mid = btn.getAttribute('data-id');
       var lbl = btn.querySelector('.fzc-btn-lbl');
+      var iconWrap = btn.querySelector('.fzc-btn-icon-wrap');
       if (mid === playingId) {
         btn.classList.add('is-playing');
         if (lbl) lbl.textContent = t('chat_act_playing', 'Memutar...');
+        if (iconWrap) iconWrap.innerHTML = icon('soundwave', { size: 14 });
       } else {
         btn.classList.remove('is-playing', 'is-pulsing');
         if (lbl) lbl.textContent = t('chat_act_listen', 'Dengar');
+        if (iconWrap) iconWrap.innerHTML = icon('volume', { size: 14 });
       }
     });
 
@@ -1796,7 +1799,7 @@
 
     var cv = chatVoice();
     var cleanText = cv && typeof cv.cleanText === 'function'
-      ? cv.cleanText(text)
+      ? cv.cleanText(text, state.course)
       : String(text || '').replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').replace(/[*_~\x60]/g, '').trim();
     if (!cleanText || !cv) {
       stopVoice();
@@ -1957,7 +1960,8 @@
 
     if (typeof miscFn === 'function') {
       try {
-        miscFn(null, q, diagnosis, isOk);
+        var activeChatSession = { startedAt: state.scenarioStartedAt || (state.scenarioStartedAt = Date.now()) };
+        miscFn(activeChatSession, q, diagnosis, isOk);
         return;
       } catch (_) {}
     }
@@ -2395,7 +2399,14 @@
     var out = [];
     if (userText) {
       var hint = checkMisconception(userText, state.course);
-      out.push({ id: 'msg-user-voice-' + stamp, role: 'user', text: userText, hint: hint, isVoice: true });
+      out.push({
+        id: 'msg-user-voice-' + stamp,
+        role: 'user',
+        text: userText,
+        hint: hint,
+        correctionMode: state.correctionMode === true,
+        isVoice: true
+      });
     }
     if (replyObj && replyObj.text) {
       out.push({
@@ -3139,6 +3150,12 @@
         '</div>';
     }
     if (msg.correctionChecked) {
+      if (msg.hint) {
+        return '<div class="fzc-correction is-tip" role="note">' +
+          '<div class="fzc-correction-head">' + icon('lightbulb', { size: 13, className: 'fzc-inline-icon' }) + ' ' + esc(msg.hint.title) + '</div>' +
+          '<div class="fzc-correction-note">' + esc(msg.hint.desc) + '</div>' +
+          '</div>';
+      }
       return '<div class="fzc-correction-ok">' + icon('check-circle', { size: 13, className: 'fzc-inline-icon' }) + ' ' +
         esc(t('chat.koreksi.sudah-pas', 'Kalimatmu sudah pas')) + '</div>';
     }
@@ -3379,9 +3396,10 @@
     // Messages
     var msgsHtml = state.messages.map(function (msg, idx) {
       if (msg.role === 'user') {
+        var voiceTag = msg.isVoice ? '<span class="fzc-voice-tag" title="' + esc(t('chat_voice_tag', 'Diucapkan lewat panggilan')) + '">' + icon('mic', { size: 12, className: 'fzc-inline-icon' }) + ' </span>' : '';
         return '<div class="fzc-msg-row is-user">' +
           '<div class="fzc-msg-box">' +
-          '<div class="fzc-bubble fzc-bubble-user fzc-message-text">' + esc(msg.text) + '</div>' +
+          '<div class="fzc-bubble fzc-bubble-user fzc-message-text">' + voiceTag + esc(msg.text) + '</div>' +
           userFeedbackHtml(msg) +
           '</div>' +
           '</div>';
@@ -3492,9 +3510,10 @@
       }
 
       var hasSuggestionsClass = suggestionsHtml ? ' has-suggestions' : '';
+      var courseTextClass = (state.course === 'ja') ? ' fzc-japanese-text' : ' fzc-english-text';
       return '<div class="fzc-msg-row is-assistant' + hasSuggestionsClass + '">' +
         '<div class="fzc-msg-box' + hasSuggestionsClass + '">' +
-        '<div class="fzc-bubble fzc-bubble-ai fzc-japanese-text">' +
+        '<div class="fzc-bubble fzc-bubble-ai' + courseTextClass + '">' +
         '<span class="fzc-message-text">' + displayText + '</span>' +
         romajiHtml +
         revealHtml +
@@ -3844,8 +3863,21 @@
         var act = btn.getAttribute('data-action');
         var mid = btn.getAttribute('data-id');
         if (act === 'audio') {
-          var tAudio = btn.getAttribute('data-text');
-          playVoice(tAudio, mid, { userInitiated: true });
+          var targetMsg = null;
+          for (var i = 0; i < state.messages.length; i++) {
+            if (state.messages[i].id === mid) {
+              targetMsg = state.messages[i];
+              break;
+            }
+          }
+          if (state.audioPlayingId === mid) {
+            stopVoice();
+          } else if (targetMsg) {
+            speakAssistantMessage(targetMsg, { userInitiated: true });
+          } else {
+            var tAudio = btn.getAttribute('data-text');
+            playVoice(tAudio, mid, { userInitiated: true });
+          }
         } else if (act === 'translate') {
           var targetMsg = null;
           for (var i = 0; i < state.messages.length; i++) {
@@ -3856,7 +3888,7 @@
           }
           if (targetMsg) {
             targetMsg.showTranslation = !targetMsg.showTranslation;
-            var box = container.querySelector('#fzcReveal-' + mid);
+            var box = document.getElementById('fzcReveal-' + mid);
             if (box) box.classList.toggle('is-hidden', !targetMsg.showTranslation);
           }
         } else if (act === 'shadow') {
