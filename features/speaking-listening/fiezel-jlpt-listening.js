@@ -267,17 +267,33 @@
     return fallback !== undefined ? fallback : k;
   }
 
-  function getBankUrl() {
-    try {
-      var loc = window.location;
-      var path = loc.pathname;
-      if (!path.endsWith('/')) {
-        path = path.substring(0, path.lastIndexOf('/') + 1);
-      }
-      return loc.origin + path + 'features/speaking-listening/jlpt-listening-bank-v1.json';
-    } catch (_) {
-      return './features/speaking-listening/jlpt-listening-bank-v1.json';
+  function resolveJlptAssetUrl(relPath) {
+    if (!relPath) return '';
+    if (relPath.indexOf('http://') === 0 || relPath.indexOf('https://') === 0 || relPath.indexOf('blob:') === 0 || relPath.indexOf('data:') === 0) {
+      return relPath;
     }
+    try {
+      var clean = relPath.replace(/^\.\//, '');
+      var base = '';
+      if (typeof window !== 'undefined' && window.location) {
+        var loc = window.location;
+        var path = loc.pathname || '';
+        if (path.indexOf('/app') === 0) {
+          base = loc.origin + '/app/';
+        } else if (path.indexOf('/') !== -1) {
+          base = loc.origin + path.substring(0, path.lastIndexOf('/') + 1);
+        } else {
+          base = loc.origin + '/';
+        }
+      }
+      return base ? (base + clean) : ('./' + clean);
+    } catch (_) {
+      return relPath;
+    }
+  }
+
+  function getBankUrl() {
+    return resolveJlptAssetUrl('features/speaking-listening/jlpt-listening-bank-v1.json');
   }
 
   // Muat bank soal dari JSON
@@ -665,6 +681,7 @@
   }
 
   function playAudioStreamWithTarget(url, source, fallbackScript, initialSec, targetTurnIdx) {
+    url = resolveJlptAssetUrl(url);
     if (audioPlaying && activeAudioSource === source && (initialSec === undefined || initialSec === null)) {
       stopJlptAudio();
       return;
