@@ -1,8 +1,8 @@
 # FIEZEL-M025625: Pemulihan Hidrasi Kana Kosakata dan Lazy Voice Load di AudioService
 
-**Tanggal Serah Terima**: 2026-10-20  
-**Build Release**: `m025-625`  
-**Cakupan**: `app.js`, `coordination/BUILD-VERSION.json`, `sw.js`, `core-config.js`, `kurikulum.html`, `misi.html`, `features/neural-voice/fiezel-diag-panel.js`, `id-golden-baseline.json`  
+- **Tanggal Serah Terima**: 2026-10-20
+- **Build Release**: `m025-625`
+- **Cakupan**: `app.js`, `coordination/BUILD-VERSION.json`, `sw.js`, `core-config.js`, `kurikulum.html`, `misi.html`, `features/neural-voice/fiezel-diag-panel.js`, `id-golden-baseline.json`
 
 ---
 
