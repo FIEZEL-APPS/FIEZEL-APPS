@@ -76,6 +76,9 @@ const SVGS = [
   // Diukur, bukan diasumsikan — keduanya lolos tanpa satu pun warna di luar palet.
   'assets/brand/mascot/paw-mascot-head.svg',
   'assets/brand/mascot/paw-mascot-official.svg',
+  // m025-628: Voice Studio PAW Mochi avatar (idle & speaking) 100% palet G1
+  'assets/brand/paw-mochi-idle.svg',
+  'assets/brand/paw-mochi-speaking.svg',
 ];
 
 /* SENI KARAKTER YANG SENGAJA TIDAK DIJAGA — daftar UTANG, bukan daftar lingkup (m025-301).
@@ -114,7 +117,7 @@ const UTANG_TANPA_PALET = [
 ];
 /* design/ dan remotion/ adalah prototipe/studio video yang tidak pernah dimuat produksi
    (sama seperti pengecualian di css-keyframe-uniq-test dan deploy/site-exclude.txt), jadi di luar lingkup. */
-const BUKAN_PRODUKSI = ['design/', 'node_modules/', 'vendor/', 'remotion/', 'android/'];
+const BUKAN_PRODUKSI = ['design/', 'node_modules/', 'vendor/', 'remotion/', 'android/', 'tools/dev/'];
 
 test('inventaris: tidak ada SVG karakter yang tak bernama — lulus palet, atau tercatat sebagai utang', () => {
   const ditemukan = [];
