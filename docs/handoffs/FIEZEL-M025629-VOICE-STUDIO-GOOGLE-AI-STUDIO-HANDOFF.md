@@ -1,4 +1,4 @@
-# FIEZEL HANDOFF DOSSIER: INTEGRASI GOOGLE AI STUDIO BERANDA & GEMINI LIVE DUPLEX STREAMING (m025-630)
+# FIEZEL HANDOFF DOSSIER: INTEGRASI GOOGLE AI STUDIO BERANDA & GEMINI LIVE DUPLEX STREAMING (m025-629)
 
 ## 1. Ringkasan Temuan Audit & Alasan Perubahan
 - **Kebutuhan Pengguna**: Menjawab kebutuhan integrasi menyeluruh Opsi A dan Opsi B:
@@ -44,7 +44,7 @@
 6. `features/i18n/copy-id-student.js` & `features/i18n/copy-th-student.js`:
    - Pendaftaran naskah dua bahasa (ID & TH) untuk kartu Studio Suara, tombol, dan pintasan panggil.
 7. `coordination/BUILD-VERSION.json`, `core-config.js`, `features/neural-voice/fiezel-diag-panel.js`, `kurikulum.html`, `misi.html`, `sw.js`:
-   - Kenaikan build terkoordinasi ke `m025-630`.
+   - Kenaikan build terkoordinasi persis +1 ke `m025-629` dari base `m025-628`.
 8. `id-golden-baseline.json` & `reports/th-ui-leak-report.json`:
    - Sinkronisasi baseline emas Indonesia dan verifikasi 0 kebocoran UI Thai.
 
