@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FIEZEL — Studio Panggilan Suara AI & Real-Time Speaking</title>
+    <meta
+      name="description"
+      content="Sub-modul terisolasi FIEZEL AI Voice Call Studio dengan terjemahan real-time, bantuan jawaban pemula, Gemini Live WebSocket (wss://fiezel.my.id/api/live-call) + fallback Turn-by-Turn Audio, serta integrasi Braincore BKT & IRT 3PL."
+    />
+    <meta property="og:title" content="FIEZEL — Studio Panggilan Suara AI & Real-Time Speaking" />
+    <meta
+      property="og:description"
+      content="Sub-modul terisolasi FIEZEL AI Voice Call Studio dengan terjemahan real-time, bantuan jawaban pemula, Gemini Live WebSocket (wss://fiezel.my.id/api/live-call) + fallback Turn-by-Turn Audio, serta integrasi Braincore BKT & IRT 3PL."
+    />
+    <link rel="icon" type="image/svg+xml" href="./assets/brand/fiezel-icon.svg" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <link rel="stylesheet" href="./features/voice-studio/dist/voice-studio.css" />
+    <!-- Read-only host runtime config (never modified by Voice Studio) -->
+    <script src="./core-config.js" defer></script>
+  </head>
+  <body class="bg-[#FFF9EE] text-[#241A11] antialiased">
+    <div id="fiezel-voice-studio-root"></div>
+    <script type="module" src="./features/voice-studio/dist/voice-studio.js"></script>
+  </body>
+</html>

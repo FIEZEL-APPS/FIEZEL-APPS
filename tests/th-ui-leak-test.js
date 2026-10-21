@@ -241,7 +241,7 @@ function fallbackLiterals(text) {
 function walk(dir, acc = []) {
   for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
     const p = path.join(dir, e.name);
-    if (e.isDirectory()) { if (!/i18n|node_modules/.test(p)) walk(p, acc); }
+    if (e.isDirectory()) { if (!/i18n|node_modules|dist/.test(p)) walk(p, acc); }
     else if (e.name.endsWith('.js')) acc.push(p);
   }
   return acc;
