@@ -1,1 +1,0 @@
-self.FIEZEL_REPORT_ENDPOINT='';

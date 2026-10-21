@@ -1,0 +1,185 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 -16 324 316" role="img" aria-label="PAW — maskot FIEZEL berbicara">
+  <style>
+    .fz-all {
+      transform-origin: 160px 264px;
+      animation: fzBreathe 2.2s cubic-bezier(0.45, 0.05, 0.35, 1) infinite;
+    }
+    .fz-head {
+      animation: fzSpeakBob 1.2s cubic-bezier(0.45, 0.05, 0.35, 1) infinite;
+    }
+    .fz-ear-l {
+      transform-origin: 108px 52px;
+      animation: fzEarPerkL 2.4s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+    }
+    .fz-ear-r {
+      transform-origin: 212px 52px;
+      animation: fzEarPerkR 2.4s cubic-bezier(0.34, 1.56, 0.64, 1) infinite 0.3s;
+    }
+    .fz-tail-tip {
+      transform-origin: 296px 200px;
+      animation: fzTailSpeakSway 1.8s cubic-bezier(0.45, 0.05, 0.35, 1) infinite;
+    }
+    .fz-lid {
+      transform-origin: 160px 82px;
+      animation: fzBlink 3.6s ease-in-out infinite;
+    }
+    .fz-m-sp1 {
+      animation: fzViseme1 0.42s steps(1) infinite;
+    }
+    .fz-m-sp2 {
+      animation: fzViseme2 0.42s steps(1) infinite;
+    }
+    .fz-m-open {
+      animation: fzViseme3 0.42s steps(1) infinite;
+    }
+    @keyframes fzBreathe {
+      0%, 100% { transform: scale(1, 1); }
+      50% { transform: scale(1.022, 0.98); }
+    }
+    @keyframes fzSpeakBob {
+      0%, 100% { transform: translate(0px, 0px); }
+      50% { transform: translate(0px, -2.5px); }
+    }
+    @keyframes fzEarPerkL {
+      0%, 100% { transform: rotate(-4deg); }
+      50% { transform: rotate(-10deg); }
+    }
+    @keyframes fzEarPerkR {
+      0%, 100% { transform: rotate(4deg); }
+      50% { transform: rotate(10deg); }
+    }
+    @keyframes fzTailSpeakSway {
+      0%, 100% { transform: rotate(4deg); }
+      50% { transform: rotate(14deg); }
+    }
+    @keyframes fzBlink {
+      0%, 44%, 48%, 100% { transform: scale(1, 0); }
+      46% { transform: scale(1, 1); }
+    }
+    @keyframes fzViseme1 {
+      0%, 33% { opacity: 1; }
+      34%, 100% { opacity: 0; }
+    }
+    @keyframes fzViseme2 {
+      0%, 33% { opacity: 0; }
+      34%, 66% { opacity: 1; }
+      67%, 100% { opacity: 0; }
+    }
+    @keyframes fzViseme3 {
+      0%, 66% { opacity: 0; }
+      67%, 100% { opacity: 1; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .fz-all, .fz-head, .fz-ear-l, .fz-ear-r, .fz-tail-tip, .fz-lid, .fz-m-sp1, .fz-m-sp2, .fz-m-open {
+        animation: none !important;
+      }
+    }
+  </style>
+  <defs>
+    <g id="fz-pawprint-speak" fill="#8C2233">
+      <rect x="4.6" y="7.5" width="3.1" height="4.6" rx="1.55"/>
+      <rect x="8.9" y="5.1" width="3.1" height="7" rx="1.55"/>
+      <rect x="13.2" y="3.4" width="3.1" height="8.7" rx="1.55"/>
+      <rect x="17.5" y="6.2" width="3.1" height="5.9" rx="1.55"/>
+      <path d="M12.6 14c3.5 0 5.9 1.9 5.9 4.1 0 2-2 3.4-5.9 3.4s-5.9-1.4-5.9-3.4c0-2.2 2.4-4.1 5.9-4.1Z"/>
+    </g>
+    <clipPath id="fzcEyeL-speak"><circle cx="126" cy="98" r="16"/></clipPath>
+    <clipPath id="fzcEyeR-speak"><circle cx="194" cy="98" r="16"/></clipPath>
+    <mask id="fzcTailTip-speak" maskUnits="userSpaceOnUse" x="230" y="120" width="110" height="120">
+      <path d="M296 200 C 295 180 284 164 268 158" stroke="#fff" stroke-width="25" fill="none" stroke-linecap="round"/>
+    </mask>
+  </defs>
+
+  <ellipse class="fz-shadow" cx="160" cy="284" rx="86" ry="10" fill="#000" opacity=".08"/>
+
+  <g class="fz-all">
+    <g class="fz-tail">
+      <g class="fz-tail-base">
+        <path d="M212 244 C 266 258 298 238 296 200" stroke="#EDB93A" stroke-width="25" fill="none" stroke-linecap="round"/>
+      </g>
+      <g class="fz-tail-tip">
+        <path d="M296 200 C 295 180 284 164 268 158" stroke="#EDB93A" stroke-width="25" fill="none" stroke-linecap="round"/>
+        <g mask="url(#fzcTailTip-speak)">
+          <circle class="fz-ring" cx="268" cy="158" r="15" fill="#8C2233"/>
+        </g>
+      </g>
+    </g>
+
+    <g class="fz-body">
+      <g class="fz-torso">
+        <rect x="102" y="164" width="116" height="96" rx="42" fill="#FFD94F"/>
+        <g class="fz-chest">
+          <ellipse cx="160" cy="226" rx="36" ry="28" fill="#FFF4DA"/>
+          <g class="fz-emblem" transform="translate(160,225) scale(1.75) translate(-12.6,-12.45)">
+            <use xlink:href="#fz-pawprint-speak" href="#fz-pawprint-speak"/>
+          </g>
+        </g>
+        <g class="fz-legs">
+          <rect class="fz-foot fz-foot-l" x="108" y="246" width="48" height="22" rx="11" fill="#EDB93A"/>
+          <rect class="fz-foot fz-foot-r" x="164" y="246" width="48" height="22" rx="11" fill="#EDB93A"/>
+        </g>
+      </g>
+
+      <g class="fz-head">
+        <g class="fz-ear fz-ear-l">
+          <path d="M76 66 L95 0 L140 34 Q104 66 76 66 Z" fill="#FFD94F"/>
+          <path d="M90 52 L 101 17 L 125 35 Z" fill="#8C2233"/>
+        </g>
+        <g class="fz-ear fz-ear-r">
+          <path d="M244 66 L225 0 L180 34 Q216 66 244 66 Z" fill="#FFD94F"/>
+          <path d="M230 52 L 219 17 L 195 35 Z" fill="#8C2233"/>
+        </g>
+        <circle cx="160" cy="106" r="88" fill="#FFD94F"/>
+
+        <g class="fz-face">
+          <ellipse cx="160" cy="140" rx="36" ry="25" fill="#FFF4DA"/>
+          <path d="M153 126 L 167 126 L 160 136 Z" fill="#8C2233"/>
+          <circle class="fz-blush" cx="102" cy="126" r="11" fill="#F0A0AC"/>
+          <circle class="fz-blush" cx="218" cy="126" r="11" fill="#F0A0AC"/>
+
+          <g class="fz-eyes">
+            <g class="fz-eye-open">
+              <g class="fz-eye fz-eye-l">
+                <circle cx="126" cy="98" r="16" fill="#33201F"/>
+                <g class="fz-pupil" clip-path="url(#fzcEyeL-speak)">
+                  <circle cx="130.5" cy="92.5" r="5.5" fill="#fff"/>
+                  <circle cx="121.5" cy="104" r="2.8" fill="#fff" opacity=".7"/>
+                </g>
+              </g>
+              <g class="fz-eye fz-eye-r">
+                <circle cx="194" cy="98" r="16" fill="#33201F"/>
+                <g class="fz-pupil" clip-path="url(#fzcEyeR-speak)">
+                  <circle cx="198.5" cy="92.5" r="5.5" fill="#fff"/>
+                  <circle cx="189.5" cy="104" r="2.8" fill="#fff" opacity=".7"/>
+                </g>
+              </g>
+            </g>
+            <g class="fz-lids">
+              <g class="fz-lid">
+                <circle cx="126" cy="98" r="18" fill="#FFD94F"/>
+                <path d="M114 99 C 120 105 132 105 138 99" stroke="#33201F" stroke-width="5" stroke-linecap="round" fill="none"/>
+              </g>
+              <g class="fz-lid">
+                <circle cx="194" cy="98" r="18" fill="#FFD94F"/>
+                <path d="M182 99 C 188 105 200 105 206 99" stroke="#33201F" stroke-width="5" stroke-linecap="round" fill="none"/>
+              </g>
+            </g>
+          </g>
+
+          <g class="fz-mouth">
+            <ellipse class="fz-m fz-m-sp1" cx="160" cy="151" rx="5" ry="3.4" fill="#33201F"/>
+            <ellipse class="fz-m fz-m-sp2" cx="160" cy="151" rx="7.5" ry="6" fill="#33201F"/>
+            <path class="fz-m fz-m-open" d="M145 146 C 148 162 172 162 175 146 C 165 150 155 150 145 146 Z" fill="#33201F"/>
+          </g>
+        </g>
+      </g>
+
+      <g class="fz-arm fz-arm-l">
+        <ellipse cx="115" cy="211" rx="14" ry="30" fill="#FFD94F"/>
+      </g>
+      <g class="fz-arm fz-arm-r">
+        <ellipse cx="198" cy="206" rx="14" ry="30" fill="#FFD94F"/>
+      </g>
+    </g>
+  </g>
+</svg>

@@ -1,7 +1,7 @@
 {
-  "version": "m025-627",
-  "claimedBy": "branch feat/voice-call-ai-studio-port-m025-617",
-  "claimedAt": "2026-10-20T18:14:03.533Z",
-  "reason": "feat(call): integrasi skenario adaptif dan diagnosis miskonsepsi ai studio (m025-617)",
+  "version": "m025-626",
+  "claimedBy": "branch main",
+  "claimedAt": "2026-10-20T10:02:10.216Z",
+  "reason": "fix(kawan-bicara): perbaiki audio tts 502, stt buffer, pwa update cycle, grammar misconception, dan responsive topbar",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

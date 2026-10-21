@@ -1,5 +1,0 @@
-{
-  "grammarBad": 0,
-  "vocabBad": 0,
-  "readingMissing": 0
-}

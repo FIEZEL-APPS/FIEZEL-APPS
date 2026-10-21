@@ -1,0 +1,300 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  src: url('/assets/fonts/PlusJakartaSans-400.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  src: url('/assets/fonts/PlusJakartaSans-500.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  src: url('/assets/fonts/PlusJakartaSans-600.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  src: url('/assets/fonts/PlusJakartaSans-700.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Noto Sans Thai Looped';
+  src: url('/assets/fonts/NotoSansThaiLooped-400.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Noto Sans Thai Looped';
+  src: url('/assets/fonts/NotoSansThaiLooped-600.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Noto Sans Thai Looped';
+  src: url('/assets/fonts/NotoSansThaiLooped-700.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'FZ Fredoka';
+  src: url('/assets/fonts/Fredoka-var.woff2') format('woff2');
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ============================================================================
+   PALET KHAS FIEZEL RESMI (BRAND-GUIDE.md + DIRECTION.md Warm Paper, Bright Mind)
+   ============================================================================ */
+:root {
+  --bg: #FFF9EE;           /* Krem Hangat Terang FIEZEL */
+  --bg-ivory: #FDFAF3;     /* Krem Gading Halaman */
+  --panel: #FFFFFF;        /* Kartu Putih Bersih */
+  --panel-soft: #FFF3DC;   /* Bidang Lembut Krem Hangat */
+  --line: #F0E4CF;         /* Garis Pembatas Halus Khas FIEZEL */
+  --line-soft: #F7EFDF;
+  --text: #241A11;         /* Tinta Utama FIEZEL (Bukan #000000 murni) */
+  --muted: #6E5E47;        /* Teks Sekunder */
+  --muted-soft: #857350;
+  --sun: #FFC700;          /* Kuning Solar Khas FIEZEL */
+  --sun-deep: #E6A800;     /* Tekan / Aksen Emas Solar */
+  --sun-press: #CC9600;
+  --sun-soft: #FFF3C4;     /* Latar Chip Kuning Lembut */
+  --sun-grad: linear-gradient(180deg, #FFDE59 0%, #FFC700 50%, #FFA500 100%);
+  --maroon: #8C2233;       /* Marun Khas FIEZEL (Telinga/Hidung PAW & Aksen Primer) */
+  --maroon-deep: #6D1926;  /* Bayangan Tombol Marun */
+  --maroon-soft: #FDF2F4;  /* Latar Lembut Marun/Blush */
+  --gold: #D8B36B;         /* Emas Khas FIEZEL */
+  --paw-yellow: #FFD94F;   /* Kuning Badan PAW */
+  --blush: #F0A0AC;        /* Pipi PAW */
+  --core: #1B1418;         /* Bright Mind Gelap Eksklusif */
+  --on-core: #FDFAF3;
+  --good: #2E8B69;         /* Hijau Benar FIEZEL */
+  --good-soft: #E9F7F0;
+  --bad: #B8432D;          /* Merah Koreksi FIEZEL */
+  --bad-soft: #FDE3DE;
+  --info: #8C6D1F;         /* Emas Info FIEZEL */
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', 'Noto Sans Thai Looped', system-ui, -apple-system, sans-serif;
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(at 15% 0%, rgba(255, 199, 0, 0.14) 0px, transparent 50%),
+    radial-gradient(at 88% 8%, rgba(140, 34, 51, 0.06) 0px, transparent 45%),
+    radial-gradient(at 50% 100%, rgba(216, 179, 107, 0.12) 0px, transparent 55%);
+  background-attachment: fixed;
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-display {
+  font-family: 'FZ Fredoka', 'Plus Jakarta Sans', 'Noto Sans Thai Looped', system-ui, sans-serif;
+}
+
+/* Permukaan Kartu Khas FIEZEL (Warm Paper Luxury Card) */
+.fz-studio-card {
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(14px);
+  border: 1.5px solid var(--line);
+  box-shadow:
+    0 12px 32px -10px rgba(36, 26, 17, 0.08),
+    0 2px 6px -1px rgba(36, 26, 17, 0.04),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.95);
+}
+
+.fz-studio-subcard {
+  background: #FFFFFF;
+  border: 1.5px solid var(--line);
+  box-shadow: 0 4px 14px -4px rgba(36, 26, 17, 0.06);
+  transition: all 220ms cubic-bezier(0.22, 0.8, 0.28, 1);
+}
+
+.fz-studio-subcard:hover {
+  border-color: var(--sun-deep);
+  box-shadow: 0 10px 26px -6px rgba(230, 168, 0, 0.18);
+  transform: translateY(-1px);
+}
+
+/* Ornamen Garis Kiri Kuning Solar Khas FIEZEL (.why-card / section title) */
+.fz-solar-ribbon {
+  border-left: 4px solid var(--sun);
+}
+
+/* Tombol Taktil Kuning Solar Khas FIEZEL */
+.btn-sun-tactile {
+  background: linear-gradient(180deg, #FFDE59 0%, #FFC700 65%, #F5B400 100%);
+  color: #241A11;
+  border: 1px solid rgba(230, 168, 0, 0.6);
+  box-shadow:
+    0 3px 0 #D99B00,
+    0 8px 20px -4px rgba(230, 168, 0, 0.35),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.65);
+  transition: transform 160ms cubic-bezier(0.34, 1.4, 0.4, 1), box-shadow 160ms cubic-bezier(0.22, 0.8, 0.28, 1);
+}
+
+.btn-sun-tactile:hover {
+  background: linear-gradient(180deg, #FFE57F 0%, #FFD026 65%, #FFC000 100%);
+  transform: translateY(-1px);
+}
+
+.btn-sun-tactile:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #D99B00;
+}
+
+/* Tombol Taktil Marun Khas FIEZEL (#8C2233 -> #6D1926) */
+.btn-maroon-tactile {
+  background: linear-gradient(180deg, #A1283B 0%, #8C2233 100%);
+  color: #FFFBF3;
+  box-shadow:
+    0 3px 0 #6D1926,
+    0 8px 20px -4px rgba(140, 34, 51, 0.32),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+  transition: transform 160ms cubic-bezier(0.34, 1.4, 0.4, 1), box-shadow 160ms cubic-bezier(0.22, 0.8, 0.28, 1);
+}
+
+.btn-maroon-tactile:hover {
+  background: linear-gradient(180deg, #B22D42 0%, #992538 100%);
+  transform: translateY(-1px);
+}
+
+.btn-maroon-tactile:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #6D1926;
+}
+
+/* Tombol Taktil Hijau Emerald FIEZEL (#2E8B69) */
+.btn-emerald-tactile {
+  background: linear-gradient(180deg, #359E78 0%, #2E8B69 100%);
+  color: #FFFFFF;
+  box-shadow:
+    0 3px 0 #1F664C,
+    0 8px 18px -4px rgba(46, 139, 105, 0.32),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.25);
+  transition: transform 160ms cubic-bezier(0.34, 1.4, 0.4, 1), box-shadow 160ms cubic-bezier(0.22, 0.8, 0.28, 1);
+}
+
+.btn-emerald-tactile:hover {
+  background: linear-gradient(180deg, #3CAD84 0%, #2E8B69 100%);
+  transform: translateY(-1px);
+}
+
+.btn-emerald-tactile:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #1F664C;
+}
+
+/* Lencana PAW Resmi (.badge-paw dari prototype/index.html) */
+.fz-badge-paw {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--info);
+  background: var(--sun-soft);
+  border: 1px solid #F2E3AE;
+  border-radius: 999px;
+  padding: 3px 10px;
+}
+
+:focus-visible {
+  outline: 2px solid var(--sun-deep);
+  outline-offset: 2px;
+}
+
+@keyframes fzStatusFadeScale {
+  0% {
+    opacity: 0;
+    transform: translateY(4px) scale(0.92);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-1px) scale(1.03);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fzCardStatePulse {
+  0%, 100% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.92;
+    transform: scale(1.06);
+  }
+}
+
+@keyframes fzWaveBar {
+  0%, 100% {
+    transform: scaleY(0.45);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scaleY(1.2);
+    opacity: 1;
+  }
+}
+
+.fz-status-transition {
+  animation: fzStatusFadeScale 380ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.fz-aura-pulse {
+  animation: fzCardStatePulse 2.4s ease-in-out infinite;
+}
+
+.fz-wave-bar-1 {
+  animation: fzWaveBar 620ms ease-in-out infinite;
+}
+.fz-wave-bar-2 {
+  animation: fzWaveBar 540ms ease-in-out 120ms infinite;
+}
+.fz-wave-bar-3 {
+  animation: fzWaveBar 680ms ease-in-out 240ms infinite;
+}
+.fz-wave-bar-4 {
+  animation: fzWaveBar 580ms ease-in-out 80ms infinite;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(133, 115, 80, 0.3);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(110, 94, 71, 0.5);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
