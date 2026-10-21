@@ -1,7 +1,7 @@
 # FIEZEL HANDOFF DOSSIER: M025-629
-**Topik**: Perbaikan Resolusi Path Relatif Aset & Font Voice Studio untuk Lingkungan PWA `/app/`  
-**Build Target**: `m025-629`  
-**Tanggal**: 2026-10-22  
+**Topik**: Perbaikan Resolusi Path Relatif Aset & Font Voice Studio untuk Lingkungan PWA `/app/`
+**Build Target**: `m025-629`
+**Tanggal**: 2026-10-22
 **Status**: LULUS SELURUH GERBANG MUTU LOKAL & TERVERIFIKASI EMPIRIS HEADLESS PLAYWRIGHT
 
 ---
