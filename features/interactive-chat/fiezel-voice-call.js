@@ -1937,6 +1937,7 @@
         '</div>' +
         scenarioMetaHtml +
         renderPersonaSwitchHtml(state.course, state.persona) +
+        '<a href="./call.html?tab=call" class="fzc-call-btn-mini fzc-call-btn-studio" title="' + esc(t('call.studio.btn_title', 'Buka Studio Suara')) + '" style="text-decoration:none;display:inline-flex;align-items:center;gap:4px;padding:3px 8px;background:#FFF3C4;border:1px solid rgba(230,168,0,0.4);border-radius:10px;color:#8C2233;font-size:11px;font-weight:800;cursor:pointer;"><span>' + esc(t('call.studio.btn', 'Studio Live')) + '</span></a>' +
         '<button type="button" class="fzc-call-btn-mini" id="fzcCallBtnClose" aria-label="' + esc(t('call_close', 'Tutup Panggilan')) + '">' + renderIcon('close', { size: 16 }) + '</button>' +
         '</div>' +
 
@@ -1962,6 +1963,7 @@
         '</div>' +
         '<div class="fzc-call-status-label" id="fzcCallStatusLabel">' + t('call_connecting', 'Menghubungkan...') + '</div>' +
         '<div class="fzc-call-interrupt-hint" id="fzcCallInterruptHint">' + t('call_interrupt_hint', 'Bicara atau sentuh bola untuk menyela') + '</div>' +
+        '<div style="margin-top:6px;"><a href="./call.html?tab=call" style="font-size:11px;color:#8C2233;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,0.7);padding:2px 10px;border-radius:999px;border:1px solid #F0E4CF;">' + esc(t('call.studio.open_full', 'Mode Google AI Studio')) + '</a></div>' +
         '</div>' +
 
         // Live Subtitle Card

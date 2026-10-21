@@ -1,7 +1,7 @@
 {
-  "version": "m025-629",
+  "version": "m025-630",
   "claimedBy": "branch fix/voice-studio-asset-paths-m025-629",
-  "claimedAt": "2026-10-21T20:50:38.938Z",
-  "reason": "fix(call): perbaiki resolusi path relatif aset dan font voice studio (/app/ scope)",
+  "claimedAt": "2026-10-21T22:54:52.016Z",
+  "reason": "feat(voice-studio): integrasi direct gemini live websocket dan google ai studio beranda (m025-630)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

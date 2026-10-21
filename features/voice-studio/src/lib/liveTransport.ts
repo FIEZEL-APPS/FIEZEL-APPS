@@ -189,6 +189,22 @@ export class PcmQueueAudioPlayer {
 export function resolveLiveCallWebSocketUrls(): string[] {
   const urls: string[] = [];
 
+  // Direct client Gemini Multimodal Live API WebSocket if user key is saved
+  if (typeof localStorage !== 'undefined') {
+    try {
+      const userKey = localStorage.getItem('fz_gemini_api_key');
+      if (userKey && userKey.trim().length > 10) {
+        urls.push(
+          `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent?key=${encodeURIComponent(
+            userKey.trim()
+          )}`
+        );
+      }
+    } catch {
+      // Ignore
+    }
+  }
+
   if (typeof window !== 'undefined' && window.FIEZEL_VOICE_STUDIO_CONFIG?.wsUrl) {
     urls.push(window.FIEZEL_VOICE_STUDIO_CONFIG.wsUrl);
   }

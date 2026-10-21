@@ -16,6 +16,9 @@ import {
   Compass,
   ShieldCheck,
   SlidersHorizontal,
+  Key,
+  ArrowLeft,
+  X,
 } from 'lucide-react';
 import {
   BraincoreStoreState,
@@ -75,10 +78,21 @@ export default function App() {
     } catch {
       // Ignore
     }
-    return 'call';
+    return 'home'; // Default to Google AI Studio Beranda
   });
   const [activeScenarioId, setActiveScenarioId] = useState<string>('scen_en_a1_hometown');
   const [customMeasureOverride, setCustomMeasureOverride] = useState<boolean | null>(null);
+
+  // Gemini Live API Direct Client Key state
+  const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState<boolean>(false);
+  const [geminiApiKey, setGeminiApiKey] = useState<string>(() => {
+    try {
+      return (typeof localStorage !== 'undefined' && localStorage.getItem('fz_gemini_api_key')) || '';
+    } catch {
+      return '';
+    }
+  });
+  const [tempApiKey, setTempApiKey] = useState<string>(geminiApiKey);
 
   const [turns, setTurns] = useState<CallTurn[]>([]);
   const [inputText, setInputText] = useState<string>('');
@@ -649,6 +663,7 @@ export default function App() {
       }
 
       const targetUrl = candidateWsUrls[index];
+      const isGoogleLive = targetUrl.includes('generativelanguage.googleapis.com');
       let settled = false;
       let ws: WebSocket;
 
@@ -662,7 +677,7 @@ export default function App() {
           }
           tryConnectWsCandidate(index + 1);
         }
-      }, 2800);
+      }, 3500);
 
       try {
         ws = new WebSocket(targetUrl);
@@ -673,10 +688,46 @@ export default function App() {
         return;
       }
 
+      ws.onopen = () => {
+        if (isGoogleLive) {
+          try {
+            ws.send(
+              JSON.stringify({
+                setup: {
+                  model: 'models/gemini-2.0-flash-exp',
+                  generationConfig: {
+                    responseModalities: ['AUDIO'],
+                    speechConfig: {
+                      voiceConfig: {
+                        prebuiltVoiceConfig: {
+                          voiceName: activePersona.geminiVoice || 'Puck',
+                        },
+                      },
+                    },
+                  },
+                  systemInstruction: {
+                    parts: [
+                      {
+                        text:
+                          activePersona.systemPrompt ||
+                          `You are ${activePersona.name}, speaking partner for scenario "${activeScenario.titleId}".`,
+                      },
+                    ],
+                  },
+                },
+              })
+            );
+          } catch {
+            // Ignore
+          }
+        }
+      };
+
       ws.onmessage = (event) => {
         try {
           const msg = JSON.parse(event.data);
-          if (msg.type === 'ready' || msg.type === 'live_ready') {
+          const isGoogleReady = Boolean(msg.setupComplete);
+          if (isGoogleReady || msg.type === 'ready' || msg.type === 'live_ready') {
             if (!settled) {
               settled = true;
               window.clearTimeout(connectTimer);
@@ -711,7 +762,22 @@ export default function App() {
                   if (isMicMutedRef.current) return;
                   if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
                     const pcmBase64 = float32ToPcm16Base64(e.inputBuffer.getChannelData(0));
-                    wsRef.current.send(JSON.stringify({ audio: pcmBase64 }));
+                    if (isGoogleLive) {
+                      wsRef.current.send(
+                        JSON.stringify({
+                          realtimeInput: {
+                            mediaChunks: [
+                              {
+                                mimeType: 'audio/pcm;rate=16000',
+                                data: pcmBase64,
+                              },
+                            ],
+                          },
+                        })
+                      );
+                    } else {
+                      wsRef.current.send(JSON.stringify({ audio: pcmBase64 }));
+                    }
                   }
                 };
                 const muteGain = inputCtx.createGain();
@@ -723,9 +789,26 @@ export default function App() {
               .catch(() => {
                 // Mic optional
               });
-          } else if (msg.type === 'audio' && msg.audio && outputAudioCtxRef.current) {
+          }
+
+          // Direct Google Gemini Live or Proxy Audio Chunk extraction
+          let incomingAudioBase64: string | null = null;
+          if (msg.type === 'audio' && msg.audio) {
+            incomingAudioBase64 = msg.audio;
+          } else if (msg.serverContent?.modelTurn?.parts) {
+            for (const part of msg.serverContent.modelTurn.parts) {
+              if (part?.inlineData?.data) {
+                incomingAudioBase64 = part.inlineData.data;
+              }
+              if (part?.text) {
+                setLiveAiDraft((prev) => (prev ? `${prev} ${part.text}` : part.text));
+              }
+            }
+          }
+
+          if (incomingAudioBase64 && outputAudioCtxRef.current) {
             const ctx = outputAudioCtxRef.current;
-            const buffer = pcm16Base64ToAudioBuffer(ctx, msg.audio, 24000);
+            const buffer = pcm16Base64ToAudioBuffer(ctx, incomingAudioBase64, 24000);
             const source = ctx.createBufferSource();
             source.buffer = buffer;
             source.connect(ctx.destination);
@@ -741,6 +824,22 @@ export default function App() {
                 setIsPlayingAiAudio(false);
               }
             };
+          }
+
+          // Barge-in interruption from Gemini Live server
+          if (msg.serverContent?.interrupted) {
+            if (outputAudioCtxRef.current) {
+              nextStartTimeRef.current = outputAudioCtxRef.current.currentTime;
+            }
+            activeSourcesRef.current.forEach((s) => {
+              try {
+                s.stop();
+              } catch {
+                // Ignore
+              }
+            });
+            activeSourcesRef.current = [];
+            setIsPlayingAiAudio(false);
           } else if (msg.type === 'input_transcription' || msg.type === 'user_transcript') {
             setLiveUserDraft(msg.fullText || msg.text || '');
           } else if (msg.type === 'output_transcription' || msg.type === 'ai_transcript') {
@@ -967,6 +1066,15 @@ export default function App() {
     }
     playFiezelSfx('button_tap');
     setActiveTab(nextTab);
+    try {
+      if (typeof window !== 'undefined') {
+        const url = new URL(window.location.href);
+        url.searchParams.set('tab', nextTab);
+        window.history.replaceState({}, '', url.toString());
+      }
+    } catch {
+      // Ignore
+    }
   };
 
   const formatTimer = (sec: number) => {
@@ -1053,18 +1161,28 @@ export default function App() {
     <div className="min-h-screen text-[#241A11] flex flex-col">
       {/* HEADER KACA HANGAT KHAS FIEZEL (Warm Paper + Solar Gold + Maroon) */}
       <header className="sticky top-0 z-30 bg-[#FFF9EE]/92 backdrop-blur-xl border-b border-[#F0E4CF]">
-        <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3.5">
+        <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between gap-2.5">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            {/* Tombol Kembali ke PWA Utama */}
+            <a
+              href="./index.html"
+              className="px-2.5 py-1.5 rounded-xl bg-white border border-[#F0E4CF] font-bold text-[#8C2233] hover:border-[#8C2233] cursor-pointer shadow-2xs flex items-center gap-1.5 transition-all text-xs shrink-0"
+              title="Kembali ke Beranda PWA FIEZEL"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span className="hidden md:inline">PWA</span>
+            </a>
+
             {/* Lambang Resmi FIEZEL (Huruf F + 2 Batang Gelombang Emas) */}
-            <div className="flex items-center gap-2.5">
-              <FiezelBrandCrest className="w-9 h-9 rounded-xl shadow-xs shrink-0" />
+            <div className="flex items-center gap-2 shrink-0">
+              <FiezelBrandCrest className="w-8 h-8 rounded-xl shadow-xs shrink-0" />
               <div className="hidden sm:block">
-                <div className="font-display font-bold text-base text-[#241A11] leading-none tracking-tight flex items-center gap-1">
+                <div className="font-display font-bold text-sm text-[#241A11] leading-none tracking-tight flex items-center gap-1">
                   <span>FIEZEL</span>
-                  <FiezelPawStamp className="w-3.5 h-3.5 text-[#8C2233]" />
+                  <FiezelPawStamp className="w-3 h-3 text-[#8C2233]" />
                 </div>
-                <div className="text-[10px] font-bold uppercase tracking-widest text-[#8C6D1F] mt-0.5">
-                  PAW Voice Studio
+                <div className="text-[9px] font-bold uppercase tracking-widest text-[#8C6D1F] mt-0.5">
+                  AI Voice Studio
                 </div>
               </div>
             </div>
@@ -1074,7 +1192,7 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => handleTabChange('home')}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   activeTab === 'home'
                     ? 'bg-[#FFC700] text-[#241A11] shadow-2xs'
                     : 'text-[#6E5E47] hover:text-[#241A11]'
@@ -1085,7 +1203,7 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => handleTabChange('call')}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                   activeTab === 'call'
                     ? 'bg-[#FFC700] text-[#241A11] shadow-2xs'
                     : 'text-[#6E5E47] hover:text-[#241A11]'
@@ -1101,7 +1219,7 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => handleTabChange('braincore')}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   activeTab === 'braincore'
                     ? 'bg-[#FFC700] text-[#241A11] shadow-2xs'
                     : 'text-[#6E5E47] hover:text-[#241A11]'
@@ -1112,13 +1230,30 @@ export default function App() {
             </nav>
           </div>
 
-          {/* Kontrol Kursus (EN/JA), Bahasa (ID/TH) & Unduh Patch */}
-          <div className="flex items-center gap-2 text-xs">
+          {/* Kontrol Kunci Live, Kursus (EN/JA), Bahasa (ID/TH) & Unduh Patch */}
+          <div className="flex items-center gap-1.5 sm:gap-2 text-xs">
+            <button
+              type="button"
+              onClick={() => {
+                setTempApiKey(geminiApiKey);
+                setIsApiKeyModalOpen(true);
+              }}
+              className={`px-2.5 py-1.5 rounded-xl font-bold cursor-pointer transition-all flex items-center gap-1.5 shadow-2xs ${
+                geminiApiKey
+                  ? 'bg-[#EBF7F0] border border-[#2E8B69] text-[#2E8B69]'
+                  : 'bg-white border border-[#F0E4CF] text-[#6E5E47] hover:border-[#FFC700]'
+              }`}
+              title="Atur Google Gemini Multimodal Live API Key pribadi"
+            >
+              <Key className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">{geminiApiKey ? 'Gemini Live' : 'Kunci Live'}</span>
+            </button>
+
             <div className="flex items-center bg-[#FFF3DC] border border-[#F0E4CF] rounded-xl p-0.5">
               <button
                 type="button"
                 onClick={() => handleSelectTargetLang('en')}
-                className={`px-2.5 py-1 rounded-lg font-bold cursor-pointer transition-all ${
+                className={`px-2 py-1 rounded-lg font-bold cursor-pointer transition-all ${
                   targetLang === 'en'
                     ? 'bg-[#8C2233] text-[#FFFBF3] shadow-2xs'
                     : 'text-[#6E5E47] hover:text-[#241A11]'
@@ -1129,7 +1264,7 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => handleSelectTargetLang('ja')}
-                className={`px-2.5 py-1 rounded-lg font-bold cursor-pointer transition-all ${
+                className={`px-2 py-1 rounded-lg font-bold cursor-pointer transition-all ${
                   targetLang === 'ja'
                     ? 'bg-[#8C2233] text-[#FFFBF3] shadow-2xs'
                     : 'text-[#6E5E47] hover:text-[#241A11]'
@@ -1142,7 +1277,7 @@ export default function App() {
             <button
               type="button"
               onClick={() => handleSelectLocale(locale === 'id' ? 'th' : 'id')}
-              className="px-2.5 py-1.5 rounded-xl bg-white border border-[#F0E4CF] font-bold text-[#241A11] hover:border-[#FFC700] cursor-pointer shadow-2xs"
+              className="px-2 py-1.5 rounded-xl bg-white border border-[#F0E4CF] font-bold text-[#241A11] hover:border-[#FFC700] cursor-pointer shadow-2xs"
               title="Ganti Bahasa Antarmuka (ID / TH)"
             >
               {locale.toUpperCase()}
@@ -1152,15 +1287,123 @@ export default function App() {
               href="/api/download-patch"
               download="fiezel-ai-voice-call.patch"
               data-testid="download-patch-btn"
-              className="px-3 py-1.5 rounded-xl btn-sun-tactile font-bold flex items-center gap-1.5 cursor-pointer"
+              className="px-2.5 py-1.5 rounded-xl btn-sun-tactile font-bold flex items-center gap-1.5 cursor-pointer"
               title="Unduh kode fitur Voice Studio sebagai Git Patch (.patch)"
             >
               <Download className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Unduh Patch</span>
+              <span className="hidden sm:inline">Patch</span>
             </a>
           </div>
         </div>
       </header>
+
+      {/* MODAL PENGATURAN GOOGLE GEMINI MULTIMODAL LIVE KEY */}
+      {isApiKeyModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
+          <div className="bg-[#FFFDF9] border border-[#F0E4CF] rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-[#8C2233] font-bold">
+                <Key className="w-5 h-5" />
+                <h3 className="font-display text-lg text-[#241A11]">Google AI Studio Gemini Live</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsApiKeyModalOpen(false)}
+                className="p-1 rounded-xl text-[#6E5E47] hover:bg-[#F5EAD4] cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <p className="text-xs text-[#6E5E47] leading-relaxed">
+              Gunakan Gemini API Key pribadi Anda untuk mengaktifkan koneksi audio dua arah real-time berlatensi ultra-rendah (<code className="bg-[#F5EAD4] px-1 py-0.5 rounded text-[#8C2233]">gemini-2.0-flash-exp</code>) langsung ke Google AI Studio Live WebSocket (<code className="bg-[#F5EAD4] px-1 py-0.5 rounded text-[#241A11]">wss://generativelanguage.googleapis.com</code>) tanpa server perantara.
+            </p>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-[#241A11] block">
+                Gemini API Key (Tersimpan aman di peramban lokal Anda):
+              </label>
+              <input
+                type="password"
+                value={tempApiKey}
+                onChange={(e) => setTempApiKey(e.target.value)}
+                placeholder="AIzaSy..."
+                className="w-full px-3.5 py-2.5 rounded-xl border border-[#D5C2A5] bg-white text-xs font-mono focus:outline-none focus:border-[#FFC700] focus:ring-2 focus:ring-[#FFC700]/30"
+              />
+              <div className="flex items-center justify-between text-[11px] text-[#8C6D1F]">
+                <span>Kunci hanya disimpan di <code className="font-mono">localStorage</code> perangkat ini.</span>
+                <a
+                  href="https://aistudio.google.com/app/apikey"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#8C2233] font-bold hover:underline"
+                >
+                  Dapatkan Kunci Gratis ↗
+                </a>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-2">
+              {geminiApiKey && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    try {
+                      localStorage.removeItem('fz_gemini_api_key');
+                    } catch {}
+                    setGeminiApiKey('');
+                    setTempApiKey('');
+                    setIsApiKeyModalOpen(false);
+                    setStatusBanner('Gemini Live API Key berhasil dihapus.');
+                  }}
+                  className="px-4 py-2 rounded-xl text-xs font-bold text-[#8C2233] hover:bg-[#FCE8EB] cursor-pointer"
+                >
+                  Hapus Kunci
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => {
+                  const cleanKey = tempApiKey.trim();
+                  try {
+                    if (cleanKey) {
+                      localStorage.setItem('fz_gemini_api_key', cleanKey);
+                    } else {
+                      localStorage.removeItem('fz_gemini_api_key');
+                    }
+                  } catch {}
+                  setGeminiApiKey(cleanKey);
+                  setIsApiKeyModalOpen(false);
+                  setStatusBanner(
+                    cleanKey
+                      ? 'Gemini Live API Key aktif! Percakapan suara kini tersambung langsung ke Google AI Studio Live WebSocket.'
+                      : 'Gemini Live API Key dinonaktifkan.'
+                  );
+                }}
+                className="px-5 py-2 rounded-xl text-xs font-bold btn-sun-tactile cursor-pointer"
+              >
+                Simpan & Gunakan
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* STATUS BANNER GLOBAL */}
+      {statusBanner && (
+        <div className="max-w-4xl mx-auto px-4 pt-3 w-full">
+          <div className="rounded-2xl p-3 text-xs font-bold flex items-center justify-between gap-3 bg-[#FFF3DC] border border-[#F0E4CF] text-[#8C6D1F] shadow-2xs animate-fade-in">
+            <span>{statusBanner}</span>
+            <button
+              type="button"
+              onClick={() => setStatusBanner(null)}
+              className="text-[#6E5E47] hover:text-[#241A11] cursor-pointer p-0.5"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* RUANG KERJA UTAMA FIEZEL VOICE STUDIO */}
       <main className="flex-1 max-w-4xl w-full mx-auto px-4 py-6 pb-28 space-y-5">
@@ -1574,19 +1817,6 @@ export default function App() {
                     </div>
                   )}
                 </section>
-
-                {statusBanner && (
-                  <div className="bg-[#FFF3C4] border border-[#E6A800]/50 rounded-2xl px-4 py-3 text-xs font-semibold text-[#241A11] flex items-center justify-between shadow-2xs">
-                    <span>{statusBanner}</span>
-                    <button
-                      type="button"
-                      onClick={() => setStatusBanner(null)}
-                      className="font-bold text-[#8C2233] hover:underline cursor-pointer ml-3 shrink-0"
-                    >
-                      Tutup
-                    </button>
-                  </div>
-                )}
 
                 {/* 3. BANTUAN CARA JAWAB PEMULA REALTIME */}
                 {!isMeasureMode && (

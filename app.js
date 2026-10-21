@@ -11401,6 +11401,7 @@ function todayHomeMarkup(){
   ${conversationPartnerHomeCardMarkup()}
   ${heroQuestCard}
   ${braincoreHomeCardMarkup()}
+  ${voiceStudioHomeCardMarkup()}
   ${quickPracticeCard}
   ${kelaskuCard}
   <div class="fz-tactile-audit-vault" style="display:none !important;" aria-hidden="true">
@@ -11532,6 +11533,39 @@ function braincoreHomeCardMarkup(){
     <div class="fz-bc-head"><i class="fz-i" data-fz-icon="paw" aria-hidden="true" style="width:16px;height:16px"></i><b>${esc(FiezelI18n.t('bc.judul'))}</b></div>
     ${arah?`<p class="fz-bc-arah">${esc(arah)}</p>`:''}
     ${baris.join('')}
+  </section>`;
+}
+function voiceStudioHomeCardMarkup(){
+  const isJa = jaCourseOn();
+  const title = isJa ? FiezelI18n.t('home.studio.title-ja') : FiezelI18n.t('home.studio.title-en');
+  const desc = isJa ? FiezelI18n.t('home.studio.desc-ja') : FiezelI18n.t('home.studio.desc-en');
+  const tag = FiezelI18n.t('home.studio.tag');
+  const badge = FiezelI18n.t('home.studio.badge');
+  const sub1 = FiezelI18n.t('home.studio.sub1');
+  const sub2 = FiezelI18n.t('home.studio.sub2');
+  const cta = FiezelI18n.t('home.studio.cta');
+  return `<section class="fz-voice-studio-card" data-testid="voice-studio-home-card" style="margin-top:12px;background:linear-gradient(135deg,#FFFDF9,#FFF7E6);border:1px solid #F0E4CF;border-radius:24px;padding:18px 20px;box-shadow:0 4px 16px rgba(140,34,51,0.06);display:flex;flex-direction:column;gap:12px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="width:38px;height:38px;border-radius:12px;background:#FFF3C4;border:1px solid rgba(230,168,0,0.4);display:flex;align-items:center;justify-content:center;color:#8C2233;font-size:18px;font-weight:bold;">🎙️</span>
+        <div>
+          <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:#8C6D1F;">${esc(tag)}</div>
+          <h3 style="font-size:15px;font-weight:800;color:#241A11;margin:0;line-height:1.2;">${esc(title)}</h3>
+        </div>
+      </div>
+      <span style="font-size:10px;font-weight:800;padding:3px 8px;border-radius:999px;background:#EBF7F0;color:#2E8B69;border:1px solid #2E8B69;">${esc(badge)}</span>
+    </div>
+    <p style="font-size:12px;color:#6E5E47;margin:0;line-height:1.45;">${esc(desc)}</p>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:4px;">
+      <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#8C6D1F;">
+        <span>${esc(sub1)}</span>
+        <span>•</span>
+        <span>${esc(sub2)}</span>
+      </div>
+      <a href="./call.html" class="fz-kawan-cta" style="padding:8px 16px;text-decoration:none;font-size:12px;display:inline-flex;align-items:center;gap:6px;" data-testid="voice-studio-cta">
+        ${esc(cta)}
+      </a>
+    </div>
   </section>`;
 }
 /** Panel "Bukti kamu makin pintar" di Ringkasan Progres: angka nyata dalam kalimat biasa. */
