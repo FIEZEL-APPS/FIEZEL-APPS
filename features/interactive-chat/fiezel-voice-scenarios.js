@@ -159,18 +159,27 @@
           labelId: 'Respons Tepat (Present Continuous + Would like)',
           labelTh: 'คำตอบที่ถูกต้องตามโครงสร้าง',
           text: "I'd like an iced latte, please. After coffee, I am meeting my team to prepare our presentation.",
+          pronunciation: "Aid laik en aist la-tei, plis. Af-ter kof-fi, aim mi-ting mai tim tu pri-per aur pre-zen-tei-shen.",
+          meaningId: "Saya mau iced latte. Setelah ngopi, saya akan bertemu tim untuk menyiapkan presentasi kami.",
+          meaningTh: "ฉันขอไอซ์ลาเต้แก้วหนึ่งครับ หลังจากดื่มกาแฟ ฉันจะไปพบทีมเพื่อเตรียมการนำเสนอของเรา",
           intent: 'accurate'
         },
         {
           labelId: 'Uji Miskonsepsi ("I am want..." + Tanpa Auxiliary)',
           labelTh: 'ทดสอบความเข้าใจผิด ("I am want...")',
           text: 'I am want hot coffee. After this I meeting my friend in library.',
+          pronunciation: 'Ai em wont hot kof-fi. Af-ter dis ai mi-ting mai frend in lai-bre-ri.',
+          meaningId: 'Saya ingin kopi panas. Setelah ini saya bertemu teman di perpustakaan. (Ada kekeliruan tata bahasa)',
+          meaningTh: 'ฉันอยากได้กาแฟร้อน หลังจากนี้ฉันจะไปพบเพื่อนที่ห้องสมุด (มีข้อผิดพลาดทางไวยากรณ์)',
           intent: 'misconception'
         },
         {
           labelId: 'Uji Kalimat Rumpang',
           labelTh: 'ทดสอบประโยคไม่สมบูรณ์',
           text: 'I like coffee and later go library.',
+          pronunciation: 'Ai laik kof-fi end lei-ter gou lai-bre-ri.',
+          meaningId: 'Saya suka kopi dan nanti ke perpustakaan. (Kalimat rumpang)',
+          meaningTh: 'ฉันชอบกาแฟและเดี๋ยวไปห้องสมุด (ประโยคไม่สมบูรณ์)',
           intent: 'incomplete'
         }
       ]
@@ -241,18 +250,27 @@
           labelId: 'Respons Tepat (Irregular Past Verbs)',
           labelTh: 'คำตอบที่ถูกต้อง (ใช้ Irregular Past)',
           text: 'Last weekend I went to Bandung with my brother. We ate local street food and took photos of the mountains.',
+          pronunciation: 'Last wik-end ai went tu Ban-dung wit mai bra-der. Wi et lou-kel strit fud end tuk fou-tos ov de maun-tens.',
+          meaningId: 'Akhir pekan lalu saya pergi ke Bandung bersama saudara saya. Kami makan jajanan lokal dan memotret pegunungan.',
+          meaningTh: 'สุดสัปดาห์ที่แล้ว ฉันไปบันดุงกับพี่/น้องชาย เรากินสตรีทฟู้ดท้องถิ่นและถ่ายรูปภูเขา',
           intent: 'accurate'
         },
         {
           labelId: 'Uji Miskonsepsi ("goed" & "eat" di masa lampau)',
           labelTh: 'ทดสอบความเข้าใจผิด (ใช้ "goed" และไม่ผันกริยา)',
           text: 'Last weekend I goed to Bandung with my brother and we eat street food.',
+          pronunciation: 'Last wik-end ai goud tu Ban-dung wit mai bra-der end wi it strit fud.',
+          meaningId: 'Akhir pekan lalu saya pergi ke Bandung bersama saudara saya dan kami makan jajanan. (Bentuk lampau keliru)',
+          meaningTh: 'สุดสัปดาห์ที่แล้ว ฉันไปบันดุงกับน้องชายและเรากินสตรีทฟู้ด (ใช้รูปอดีตผิด)',
           intent: 'misconception'
         },
         {
           labelId: 'Uji Urutan Sintaksis Keliru',
           labelTh: 'ทดสอบการเรียงลำดับคำผิด',
           text: 'Went I yesterday Bandung very happy.',
+          pronunciation: 'Went ai yes-ter-dei Ban-dung ve-ri hep-pi.',
+          meaningId: 'Pergi saya kemarin Bandung sangat senang. (Urutan kata terbalik)',
+          meaningTh: 'ไปฉันเมื่อวานนี้บันดุงมีความสุขมาก (เรียงคำผิดไวยากรณ์)',
           intent: 'incomplete'
         }
       ]
@@ -315,12 +333,18 @@
           labelId: 'Respons B2 Tepat (Klausa Although + Argumen Seimbang)',
           labelTh: 'คำตอบระดับ B2 ที่แม่นยำ (ใช้ Although + เหตุผลสมดุล)',
           text: 'Although working remotely saves commuting time and improves focus, I believe a hybrid schedule is better because face-to-face meetings strengthen team collaboration.',
+          pronunciation: 'Ol-dou wer-king ri-mout-li seivs ke-myu-ting taim end im-pruvs fou-kes, ai bi-liv e hai-brid ske-dyul iz bet-ter bi-kos feis-tu-feis mi-tings streng-ten tim ke-le-be-rei-shen.',
+          meaningId: 'Meskipun bekerja jarak jauh menghemat waktu perjalanan dan meningkatkan fokus, saya percaya jadwal hibrida lebih baik karena pertemuan tatap muka memperkuat kolaborasi tim.',
+          meaningTh: 'แม้ว่าการทำงานระยะไกลจะช่วยประหยัดเวลาเดินทางและเพิ่มสมาธิ แต่ฉันเชื่อว่าตารางแบบไฮบริดดีกว่าเพราะการประชุมต่อหน้าช่วยเสริมสร้างการทำงานร่วมกันในทีม',
           intent: 'accurate'
         },
         {
           labelId: 'Uji Miskonsepsi ("I am agree" + Double But)',
           labelTh: 'ทดสอบความเข้าใจผิด ("I am agree" + although...but)',
           text: 'I am agree that remote work is good. Although it saves time, but people feel lonely at home.',
+          pronunciation: 'Ai em e-gri det ri-mout werk iz gud. Ol-dou it seivs taim, bat pi-pel fil loun-li et houm.',
+          meaningId: 'Saya setuju bahwa kerja jarak jauh itu bagus. Walau hemat waktu, tapi orang merasa kesepian di rumah. (I am agree & double but keliru)',
+          meaningTh: 'ฉันเห็นด้วยว่าการทำงานทางไกลนั้นดี ถึงแม้จะประหยัดเวลา แต่ผู้คนรู้สึกเหงาที่บ้าน (ใช้ I am agree และ although...but ผิด)',
           intent: 'misconception'
         }
       ]
@@ -382,12 +406,18 @@
           labelId: 'Respons Tepat (Partikel を + 一つください)',
           labelTh: 'คำตอบที่ถูกต้อง (ใช้คำช่วย を + 一つください)',
           text: 'すみません、ホットコーヒーを一つとチーズケーキを一つください。',
+          pronunciation: 'Su-mi-ma-sen, hot-to ko-o-hi-i o hi-to-tsu to chi-i-zu ke-e-ki o hi-to-tsu ku-da-sai.',
+          meaningId: 'Permisi, tolong satu kopi panas dan satu cheesecake.',
+          meaningTh: 'ขอโทษนะคะ/ครับ ขอฮอตคอฟฟี่ 1 ที่กับชีสเค้ก 1 ที่ครับ',
           intent: 'accurate'
         },
         {
           labelId: 'Uji Miskonsepsi (Salah Partikel は/に untuk Objek Langsung)',
           labelTh: 'ทดสอบความเข้าใจผิด (ใช้คำช่วย に แทน を)',
           text: 'ホットコーヒーにくだもの飲むです。',
+          pronunciation: 'Hot-to ko-o-hi-i ni ku-da-mo-no no-mu de-su.',
+          meaningId: 'Ke kopi panas minum buah. (Partikel ni keliru)',
+          meaningTh: 'ที่กาแฟร้อนดื่มผลไม้ (ใช้คำช่วยผิด)',
           intent: 'misconception'
         }
       ]
@@ -449,12 +479,18 @@
           labelId: 'Respons Tepat (～ので + ～たらいいですか)',
           labelTh: 'คำตอบที่ถูกต้อง (ใช้ ～ので + ～たらいいですか)',
           text: '来週大切なテストがあるので、毎日どう勉強したらいいですか。',
+          pronunciation: 'Rai-shuu tai-setsu na te-su-to ga a-ru no-de, mai-ni-chi dou ben-kyou shi-ta-ra ii de-su ka.',
+          meaningId: 'Karena minggu depan ada ujian penting, sebaiknya bagaimana saya belajar setiap hari?',
+          meaningTh: 'เพราะสัปดาห์หน้ามีสอบสำคัญ ทุกๆ วันควรจะอ่านหนังสืออย่างไรดีครับ/ค่ะ',
           intent: 'accurate'
         },
         {
           labelId: 'Uji Miskonsepsi (Bentuk Konjugasi Lampau + Partikel Salah)',
           labelTh: 'ทดสอบความเข้าใจผิด (ผันรูปกริยาผิด)',
           text: '来週テストあるから、勉強するたらいいですか。',
+          pronunciation: 'Rai-shuu te-su-to a-ru ka-ra, ben-kyou su-ru-ta-ra ii de-su ka.',
+          meaningId: 'Karena minggu depan ada ujian, belajar-tara bagaimana? (Bentuk konjugasi keliru)',
+          meaningTh: 'เพราะสัปดาห์หน้ามีสอบ ผันรูปกริยาขอคำแนะนำผิด',
           intent: 'misconception'
         }
       ]

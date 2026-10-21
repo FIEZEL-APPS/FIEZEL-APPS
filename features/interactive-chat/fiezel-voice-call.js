@@ -1195,7 +1195,7 @@
         }
       }
 
-      // 2. Sample Utterances or Exam Notice
+      // 2. Beginner Answer Assistance (Sample Utterances with Indonesian Phonetics & Meaning) or Exam Notice
       if (sampleContainer) {
         if (state.isMeasureExam) {
           sampleContainer.innerHTML = (
@@ -1205,17 +1205,45 @@
           );
         } else if (state.scenario && Array.isArray(state.scenario.sampleUtterances) && state.scenario.sampleUtterances.length > 0) {
           var chips = state.scenario.sampleUtterances;
+          var isTh = (root.FiezelI18n && typeof root.FiezelI18n.getLocale === 'function' && root.FiezelI18n.getLocale() === 'th');
+          var studioUrl = 'call.html?scenario=' + encodeURIComponent(state.scenario.id || '') +
+            '&lang=' + encodeURIComponent(state.scenario.targetLang || 'en');
+
           var chipsHtml = chips.map(function (item, idx) {
             var intentCls = 'intent-' + (item.intent || 'accurate');
-            var label = item.labelId || item.labelTh || item.text;
+            var label = (isTh && item.labelTh ? item.labelTh : item.labelId) || item.text;
+            var pron = item.pronunciation || '';
+            var meaning = (isTh && item.meaningTh ? item.meaningTh : item.meaningId) || '';
+
+            var badgeText = item.intent === 'accurate'
+              ? (isTh ? '🌟 รูปแบบที่แนะนำ (แม่นยำ)' : '🌟 Sasaran Akurat')
+              : item.intent === 'misconception'
+                ? (isTh ? '⚠️ ทดสอบความเข้าใจผิด' : '⚠️ Uji Miskonsepsi')
+                : (isTh ? '🔄 รูปแบบประโยคสั้น' : '🔄 Kalimat Sederhana');
+
+            var cardContent =
+              '<div class="fzc-call-sample-top">' +
+              '  <span class="fzc-call-sample-badge ' + intentCls + '">' + esc(badgeText) + '</span>' +
+              '  <span class="fzc-call-sample-title">' + esc(label) + '</span>' +
+              '</div>' +
+              '<div class="fzc-call-sample-text">"' + esc(item.text) + '"</div>' +
+              (pron ? '<div class="fzc-call-sample-pron"><span class="fzc-call-sample-icon">🗣️</span> <span class="fzc-call-sample-pron-body">' + esc(t('call_sample_pron_label', 'Cara baca:')) + ' ' + esc(pron) + '</span></div>' : '') +
+              (meaning ? '<div class="fzc-call-sample-meaning"><span class="fzc-call-sample-icon">🇮🇩</span> <span class="fzc-call-sample-meaning-body">' + esc(meaning) + '</span></div>' : '') +
+              '<div class="fzc-call-sample-actions">' +
+              '  <span class="fzc-call-sample-btn-action">🗣️ ' + esc(t('call_btn_speak_sample', 'Ketuk untuk Ucapkan Ini')) + '</span>' +
+              '</div>';
+
             return '<button type="button" class="fzc-call-sample-chip ' + intentCls + '" data-idx="' + idx + '" data-text="' + esc(item.text) + '">' +
-              esc(label) +
+              cardContent +
               '</button>';
           }).join('');
 
           sampleContainer.innerHTML = (
             '<div class="fzc-call-sample-wrap">' +
-            '  <div class="fzc-call-sample-label">💡 ' + esc(t('call_sample_chips_label', 'Contoh Ucapan (Ketuk untuk Uji):')) + '</div>' +
+            '  <div class="fzc-call-sample-header">' +
+            '    <div class="fzc-call-sample-label">💡 ' + esc(t('call_sample_chips_label', 'Contoh Ucapan (Ketuk untuk Uji):')) + '</div>' +
+            '    <a href="' + esc(studioUrl) + '" target="_blank" class="fzc-call-studio-link" title="' + esc(t('call_title_studio', 'Buka AI Voice Studio')) + '">' + esc(t('call_btn_studio_full', '⚡ Studio Lengkap')) + '</a>' +
+            '  </div>' +
             '  <div class="fzc-call-sample-chips">' + chipsHtml + '</div>' +
             '</div>'
           );
