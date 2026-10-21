@@ -37,6 +37,7 @@
    - Penanganan setup frame, streaming mic, decoding audio, dan interupsi Gemini Live WebSocket.
 3. `features/voice-studio/dist/voice-studio.js` & `features/voice-studio/dist/voice-studio.css`:
    - Dibangun ulang secara bersih menggunakan Vite dan Tailwind v4.
+   - Menyelaraskan `avatarUrl` di `features/voice-studio/src/data/callScenarios.ts` ke `./assets/brand/fiezel-icon.svg` sehingga 100% bebas dari direktori terkecuali (`deploy-site-gate-test`).
 4. `app.js`:
    - Penambahan fungsi `voiceStudioHomeCardMarkup()` pada panel Hari Ini PWA.
 5. `features/interactive-chat/fiezel-voice-call.js`:
