@@ -1,0 +1,338 @@
+{
+  "clips": [
+    {
+      "id": "vg-cake-lucy-5q",
+      "level": "A1",
+      "skill": "to_be",
+      "videoUrl": "./content/video/cake-lucy-5q-exact.mp4",
+      "posterUrl": "./content/video/cake-lucy-5q-exact-poster.jpg",
+      "attribution": {
+        "source": "English with Lucy & William: 100 Common English Questions",
+        "url": "https://www.youtube.com/watch?v=kYv_8B7eX_g"
+      },
+      "subtitles": [
+        { "start": 0.0, "end": 1.1, "speaker": "William", "text": "What is your full name?" },
+        { "start": 1.1, "end": 3.2, "speaker": "Lucy", "text": "My full name is Lucy Bella Simkins.", "censorPattern": "/\\bis\\b/i", "censorAnswer": "is" },
+        { "start": 3.3, "end": 5.8, "speaker": "William", "text": "How is your first name spelt?", "censorPattern": "/\\bis\\b/i", "censorAnswer": "is" },
+        { "start": 6.2, "end": 8.6, "speaker": "Lucy", "text": "L-U-C-Y. Lucy." },
+        { "start": 9.0, "end": 10.0, "speaker": "William", "text": "Who chose your name?" },
+        { "start": 10.4, "end": 12.0, "speaker": "Lucy", "text": "I think my mum did.", "censorPattern": "/\\bdid\\b/i", "censorAnswer": "did" },
+        { "start": 12.4, "end": 14.4, "speaker": "Lucy", "text": "I haven't actually asked that question before." },
+        { "start": 14.9, "end": 16.2, "speaker": "William", "text": "Where were you born?" },
+        { "start": 16.6, "end": 19.8, "speaker": "Lucy", "text": "I was born in Milton Keynes in England.", "censorPattern": "/in\\s+England/i", "censorAnswer": "in", "censorSuffix": " England" },
+        { "start": 20.4, "end": 22.4, "speaker": "William", "text": "Is it a city or a town?" },
+        { "start": 22.8, "end": 25.8, "speaker": "Lucy", "text": "I think it's a city. They always refer to it as a city.", "censorPattern": "/\\bit's\\b/i", "censorAnswer": "it's" }
+      ],
+      "checkpoints": [
+        {
+          "id": "lucy-cp-1",
+          "pauseAt": 3.2,
+          "exercise": {
+            "type": "subtitle-cloze",
+            "grammarPoint": "To Be (Present): is",
+            "question": "Lengkapi to be yang tepat untuk nama lengkap Lucy:",
+            "clozeText": "My full name ___ Lucy Bella Simkins.",
+            "clozeAnswer": "is",
+            "options": ["is", "am", "are", "be"],
+            "answerIndex": 0,
+            "explain": {
+              "why": "'My full name' adalah kata benda tunggal (it), sehingga bentuk to be yang sesuai adalah 'is'.",
+              "rule": "Singular Subject (He / She / It / Singular Noun) + is",
+              "memory": "Satu nama lengkap = IS."
+            }
+          }
+        },
+        {
+          "id": "lucy-cp-2",
+          "pauseAt": 5.8,
+          "exercise": {
+            "type": "subtitle-cloze",
+            "grammarPoint": "Passive Voice Present: is + spelt (V3)",
+            "question": "Lengkapi pertanyaan William tentang cara mengeja nama depan Lucy:",
+            "clozeText": "How ___ your first name spelt?",
+            "clozeAnswer": "is",
+            "options": ["is", "are", "does", "do"],
+            "answerIndex": 0,
+            "explain": {
+              "why": "'your first name' adalah subjek tunggal yang menerima aksi dieja (passive), sehingga kalimat tanya menggunakan to be 'is' + kata kerja bentuk ketiga (spelt).",
+              "rule": "Wh- + is + Singular Subject + V3 (Past Participle)?",
+              "memory": "Dieja tunggal = How IS it spelt?"
+            }
+          }
+        },
+        {
+          "id": "lucy-cp-3",
+          "pauseAt": 12.0,
+          "exercise": {
+            "type": "subtitle-cloze",
+            "grammarPoint": "Past Simple: Auxiliary did (Ellipsis)",
+            "question": "Lengkapi jawaban Lucy tentang siapa yang memilih namanya:",
+            "clozeText": "I think my mum ___.",
+            "clozeAnswer": "did",
+            "options": ["did", "does", "do", "has"],
+            "answerIndex": 0,
+            "explain": {
+              "why": "William bertanya dengan kata kerja lampau 'chose' (V2 dari choose), sehingga elipsis jawaban lampau menggunakan 'did'.",
+              "rule": "Past Simple Ellipsis: Who + V2...? -> Subject + did.",
+              "memory": "Tanya aksi lampau (chose), respon singkat pakai DID."
+            }
+          }
+        },
+        {
+          "id": "lucy-cp-4",
+          "pauseAt": 19.8,
+          "exercise": {
+            "type": "subtitle-cloze",
+            "grammarPoint": "Preposition of Place: in (Country)",
+            "question": "Lengkapi preposisi tempat untuk negara Inggris (England):",
+            "clozeText": "I was born in Milton Keynes, ___ England.",
+            "clozeAnswer": "in",
+            "options": ["in", "at", "on", "to"],
+            "answerIndex": 0,
+            "explain": {
+              "why": "Untuk wilayah negara, kepulauan, atau kawasan teritorial luas (seperti England), preposisi tempat yang benar adalah 'in'.",
+              "rule": "Preposition of Place: in + City / Country (in England, in Jakarta)",
+              "memory": "Negara & kota besar = IN."
+            }
+          }
+        },
+        {
+          "id": "lucy-cp-5",
+          "pauseAt": 25.8,
+          "exercise": {
+            "type": "subtitle-cloze",
+            "grammarPoint": "Contraction: it's (It is) vs its",
+            "question": "Lengkapi singkatan kata (contraction) yang tepat untuk 'it is':",
+            "clozeText": "I think ___ a city.",
+            "clozeAnswer": "it's",
+            "options": ["it's", "its", "they're", "there"],
+            "answerIndex": 0,
+            "explain": {
+              "why": "'it's' dengan apostrof adalah singkatan dari 'it is' (subjek + to be). Sedangkan 'its' tanpa apostrof adalah kata ganti kepunyaan (possessive adjective).",
+              "rule": "it's = it is (atau it has) | its = kepunyaan (its color, its name)",
+              "memory": "Ada to be (is) = pakai apostrof IT'S."
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "vg-cake-lucy-clip2-5q",
+      "level": "A2",
+      "skill": "conversational_grammar_5q",
+      "videoUrl": "./content/video/cake-lucy-clip2-5q.mp4",
+      "posterUrl": "./content/video/cake-lucy-clip2-5q-poster.jpg",
+      "attribution": {
+        "source": "English with Lucy & William: 100 Common English Questions (Part 2)",
+        "url": "https://www.youtube.com/watch?v=kYv_8B7eX_g"
+      },
+      "subtitles": [
+        { "start": 0.0, "end": 1.8, "speaker": "William", "text": "Do you have a favourite colour?", "censorPattern": "/\\bDo\\b/i", "censorAnswer": "Do" },
+        { "start": 1.8, "end": 4.8, "speaker": "Lucy", "text": "Yes, my favourite colour is orange.", "censorPattern": "/\\bis\\b/i", "censorAnswer": "is" },
+        { "start": 4.8, "end": 7.5, "speaker": "William", "text": "What kind of music do you listen to?", "censorPattern": "/\\bto\\b\\?$/i", "censorAnswer": "to", "censorSuffix": "?" },
+        { "start": 7.5, "end": 11.4, "speaker": "Lucy", "text": "I don't really listen to too much music, whatever's in the charts.", "censorPattern": "/\\bdon't\\b/i", "censorAnswer": "don't" },
+        { "start": 11.4, "end": 13.8, "speaker": "William", "text": "Do you have a favourite musical artist?" },
+        { "start": 13.8, "end": 16.2, "speaker": "Lucy", "text": "I love Taylor Swift.", "censorPattern": "/\\blove\\b/i", "censorAnswer": "love" }
+      ],
+      "checkpoints": [
+        {
+          "id": "lucy2-cp-1",
+          "pauseAt": 1.8,
+          "exercise": {
+            "type": "subtitle-cloze",
+            "grammarPoint": "Present Simple Question: Do + you",
+            "question": "Lengkapi kata bantu tanya (auxiliary verb) yang tepat untuk subjek 'you':",
+            "clozeText": "___ you have a favourite colour?",
+            "clozeAnswer": "Do",
+            "options": ["Do", "Does", "Are", "Did"],
+            "answerIndex": 0,
+            "explain": {
+              "why": "Untuk subjek 'you' dalam kalimat tanya Present Simple, gunakan kata kerja bantu 'Do'.",
+              "rule": "Do + you/we/they + Verb 1?",
+              "memory": "Tanya 'you' waktu kini = pakai DO."
+            }
+          }
+        },
+        {
+          "id": "lucy2-cp-2",
+          "pauseAt": 4.8,
+          "exercise": {
+            "type": "subtitle-cloze",
+            "grammarPoint": "To Be (Present): is",
+            "question": "Lengkapi to be yang tepat untuk warna favorit (singular subject):",
+            "clozeText": "Yes, my favourite colour ___ orange.",
+            "clozeAnswer": "is",
+            "options": ["am", "is", "are", "be"],
+            "answerIndex": 1,
+            "explain": {
+              "why": "'my favourite colour' adalah kata benda tunggal (it), sehingga bentuk to be yang sesuai adalah 'is'.",
+              "rule": "Singular Subject (it / singular noun) + is",
+              "memory": "Satu warna favorit = IS."
+            }
+          }
+        },
+        {
+          "id": "lucy2-cp-3",
+          "pauseAt": 7.5,
+          "exercise": {
+            "type": "subtitle-cloze",
+            "grammarPoint": "Dependent Preposition: listen to",
+            "question": "Lengkapi preposisi yang melekat pada kata kerja 'listen':",
+            "clozeText": "What kind of music do you listen ___?",
+            "clozeAnswer": "to",
+            "options": ["at", "for", "to", "on"],
+            "answerIndex": 2,
+            "explain": {
+              "why": "Kata kerja 'listen' berpasangan dengan preposisi 'to' ketika merujuk pada objek musik atau audio.",
+              "rule": "listen + to + noun/object",
+              "memory": "Mendengarkan sesuatu = Listen TO."
+            }
+          }
+        },
+        {
+          "id": "lucy2-cp-4",
+          "pauseAt": 11.4,
+          "exercise": {
+            "type": "subtitle-cloze",
+            "grammarPoint": "Present Simple Negative: don't + Verb 1",
+            "question": "Lengkapi bentuk negatif yang tepat untuk subjek 'I':",
+            "clozeText": "I ___ really listen to too much music.",
+            "clozeAnswer": "don't",
+            "options": ["doesn't", "not", "aren't", "don't"],
+            "answerIndex": 3,
+            "explain": {
+              "why": "Kalimat negatif Present Simple untuk subjek 'I' menggunakan auxiliary 'don't' diikuti kata kerja dasar 'listen'.",
+              "rule": "I/You/We/They + don't + Verb 1",
+              "memory": "I + don't untuk menyangkal rutinitas."
+            }
+          }
+        },
+        {
+          "id": "lucy2-cp-5",
+          "pauseAt": 16.0,
+          "exercise": {
+            "type": "subtitle-cloze",
+            "grammarPoint": "Present Simple: Preference Verb (love)",
+            "question": "Lengkapi kata kerja bentuk dasar untuk menyatakan kesukaan:",
+            "clozeText": "I ___ Taylor Swift.",
+            "clozeAnswer": "love",
+            "options": ["love", "loves", "loving", "loved"],
+            "answerIndex": 0,
+            "explain": {
+              "why": "Menyatakan kesukaan waktu kini dengan subjek 'I' memakai bentuk dasar murni (V1) tanpa akhiran -s.",
+              "rule": "Subject (I) + Base Verb (love)",
+              "memory": "I love (tanpa -s)."
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "vg-cake-ryan-jake",
+      "level": "A2",
+      "skill": "modals_can",
+      "videoUrl": "./content/video/cake-ryan-jake.mp4",
+      "posterUrl": "./content/video/cake-ryan-jake-poster.jpg",
+      "attribution": {
+        "source": "Ryan Reynolds & Jake Gyllenhaal (Wired Interview)",
+        "url": "https://www.youtube.com"
+      },
+      "subtitles": [
+        { "start": 0.4, "end": 2.2, "speaker": "Ryan Reynolds", "text": "Can Jake Gyllenhaal sing?" },
+        { "start": 2.2, "end": 3.8, "speaker": "Jake Gyllenhaal", "text": "Yes, he can.", "censorPattern": "/\\bcan\\b/i", "censorAnswer": "can" },
+        { "start": 3.8, "end": 4.8, "speaker": "Ryan Reynolds", "text": "And dance?" },
+        { "start": 4.8, "end": 6.2, "speaker": "Jake Gyllenhaal", "text": "Nope." }
+      ],
+      "checkpoints": [
+        {
+          "id": "ryan-cp-1",
+          "pauseAt": 2.8,
+          "exercise": {
+            "type": "subtitle-cloze",
+            "grammarPoint": "Modals: Can (Ability)",
+            "question": "Lengkapi kalimat respon dari percakapan asli di atas:",
+            "clozeText": "Yes, he ___.",
+            "clozeAnswer": "can",
+            "options": ["can", "could", "is", "does"],
+            "answerIndex": 0,
+            "explain": {
+              "why": "Pertanyaan memakai modal 'Can' ('Can Jake Gyllenhaal sing?'), sehingga jawaban singkatnya kembali menggunakan 'can': 'Yes, he can'.",
+              "rule": "Modal auxiliary match: Can you / he ... ? -> Yes, I / he can.",
+              "memory": "Tanya CAN, jawab CAN."
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "vg-c1-001",
+      "level": "C1",
+      "skill": "negative_inversion",
+      "videoUrl": "",
+      "posterUrl": "",
+      "attribution": {
+        "source": "Educational Authentic Dialogue (Level C1 Mastery)",
+        "url": "https://en.wikipedia.org/wiki/Subject%E2%80%93auxiliary_inversion"
+      },
+      "subtitles": [
+        { "start": 0.0, "end": 2.4, "speaker": "Speaker A", "text": "Have you ever seen such a spectacular performance?" },
+        { "start": 2.4, "end": 5.0, "speaker": "Speaker B", "text": "Never have I seen anything so breathtaking.", "censorPattern": "/\\bhave\\b/i", "censorAnswer": "have" }
+      ],
+      "checkpoints": [
+        {
+          "id": "c1-cp-1",
+          "pauseAt": 3.2,
+          "exercise": {
+            "type": "subtitle-cloze",
+            "grammarPoint": "Negative Inversion: Adverb + Aux + Subject",
+            "question": "Lengkapi kata bantu pada inversi dramatis setelah kata negatif:",
+            "clozeText": "Never ___ I seen anything so breathtaking.",
+            "clozeAnswer": "have",
+            "options": ["have", "did", "was", "had"],
+            "answerIndex": 0,
+            "explain": {
+              "why": "Ketika kata keterangan negatif seperti 'Never' ditempatkan di awal kalimat untuk memberi penekanan dramatis, susunan subjek dan kata kerja bantu membalik (inversi: Never have I seen).",
+              "rule": "Negative Adverb + Auxiliary (have) + Subject (I) + V3 (seen)",
+              "memory": "Kata negatif di awal = Susunan kalimat membalik seperti bertanya."
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "vg-c2-001",
+      "level": "C2",
+      "skill": "advanced_colloquial_reductions",
+      "videoUrl": "",
+      "posterUrl": "",
+      "attribution": {
+        "source": "Educational Authentic Spoken English (Level C2 Mastery)",
+        "url": "https://en.wikipedia.org/wiki/Relaxed_pronunciation"
+      },
+      "subtitles": [
+        { "start": 0.0, "end": 2.0, "speaker": "Speaker A", "text": "Are you still coming to the meeting?" },
+        { "start": 2.0, "end": 4.5, "speaker": "Speaker B", "text": "I gotta finish this report first, then I'll be right over.", "censorPattern": "/\\bgotta\\b/i", "censorAnswer": "gotta" }
+      ],
+      "checkpoints": [
+        {
+          "id": "c2-cp-1",
+          "pauseAt": 2.8,
+          "exercise": {
+            "type": "subtitle-cloze",
+            "grammarPoint": "Native Spoken Reduction: have got to -> gotta",
+            "question": "Lengkapi reduksi percakapan penutur asli untuk menyatakan keharusan:",
+            "clozeText": "I ___ finish this report first, then I'll be right over.",
+            "clozeAnswer": "gotta",
+            "options": ["ought", "gonna", "gotta", "wanna"],
+            "answerIndex": 2,
+            "explain": {
+              "why": "'Gotta' adalah reduksi fonetis alami penutur asli dari '(have) got to' yang bermakna 'harus' (necessity).",
+              "rule": "(have) got to + base verb -> gotta + base verb",
+              "memory": "Gotta = got to = harus."
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

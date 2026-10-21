@@ -1,6 +1,21 @@
 import React from 'react';
 
 /**
+ * FIEZEL Official Brand Design Tokens
+ * Master identity palette: Solar Gold, Maroon, Emerald, Warm Paper, Warm Ink
+ */
+export const FIEZEL_BRAND_COLORS = {
+  solarGold: '#FFC700',
+  maroon: '#8C2233',
+  emerald: '#2E8B69',
+  warmPaper: '#FFF9EE',
+  warmInk: '#241A11',
+  ivory: '#FDFAF3',
+  goldAccent: '#D8B36B',
+  blush: '#F0A0AC',
+} as const;
+
+/**
  * Ornamen 1: Jejak Kaki PAW Resmi (Koordinat tunggal dari assets/brand/fiezel-paw.svg)
  */
 export const FiezelPawStamp: React.FC<{ className?: string }> = ({
@@ -29,7 +44,7 @@ export const FiezelNeuralConstellation: React.FC<{
   className?: string;
   strokeColor?: string;
   opacity?: number;
-}> = ({ className = 'w-full h-full', strokeColor = '#FFC700', opacity = 0.4 }) => (
+}> = ({ className = 'w-full h-full', strokeColor = FIEZEL_BRAND_COLORS.solarGold, opacity = 0.4 }) => (
   <svg
     viewBox="0 0 340 120"
     preserveAspectRatio="none"
@@ -63,13 +78,13 @@ export const FiezelSparkleOrnament: React.FC<{ className?: string }> = ({
   >
     <path
       d="M14 4 l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3 Z"
-      fill="#FFC700"
+      fill={FIEZEL_BRAND_COLORS.solarGold}
     />
     <path
       d="M28 18 l2 5.5 5.5 2 -5.5 2 -2 5.5 -2 -5.5 -5.5 -2 5.5 -2 Z"
-      fill="#8C2233"
+      fill={FIEZEL_BRAND_COLORS.maroon}
     />
-    <circle cx="27" cy="8" r="2" fill="#D8B36B" />
+    <circle cx="27" cy="8" r="2" fill={FIEZEL_BRAND_COLORS.goldAccent} />
   </svg>
 );
 
@@ -88,17 +103,17 @@ export const FiezelBrandCrest: React.FC<{ className?: string }> = ({
   >
     <defs>
       <radialGradient id="fzCrestField" cx="30%" cy="18%" r="92%">
-        <stop offset="0%" stopColor="#2B1D21" />
+        <stop offset="0%" stopColor={FIEZEL_BRAND_COLORS.warmInk} />
         <stop offset="55%" stopColor="#1B1418" />
         <stop offset="100%" stopColor="#120C0E" />
       </radialGradient>
       <linearGradient id="fzCrestIvory" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stopColor="#FFFBF3" />
+        <stop offset="0%" stopColor={FIEZEL_BRAND_COLORS.warmPaper} />
         <stop offset="100%" stopColor="#EBDBC0" />
       </linearGradient>
       <linearGradient id="fzCrestGold" x1="0" y1="0" x2="0" y2="1">
         <stop offset="0%" stopColor="#FFDE59" />
-        <stop offset="45%" stopColor="#FFC700" />
+        <stop offset="45%" stopColor={FIEZEL_BRAND_COLORS.solarGold} />
         <stop offset="100%" stopColor="#E6A800" />
       </linearGradient>
     </defs>
@@ -127,13 +142,48 @@ export const FiezelCornerOrnament: React.FC<{ className?: string }> = ({
     aria-hidden="true"
     className={`pointer-events-none select-none ${className}`}
   >
-    <circle cx="96" cy="24" r="46" stroke="#FFC700" strokeWidth="1.5" strokeDasharray="4 4" opacity="0.45" />
-    <circle cx="96" cy="24" r="28" stroke="#8C2233" strokeWidth="1.2" opacity="0.22" />
+    <circle cx="96" cy="24" r="46" stroke={FIEZEL_BRAND_COLORS.solarGold} strokeWidth="1.5" strokeDasharray="4 4" opacity="0.45" />
+    <circle cx="96" cy="24" r="28" stroke={FIEZEL_BRAND_COLORS.maroon} strokeWidth="1.2" opacity="0.22" />
     <path
       d="M96 8 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3 Z"
-      fill="#FFC700"
+      fill={FIEZEL_BRAND_COLORS.solarGold}
       opacity="0.65"
     />
-    <circle cx="62" cy="48" r="3" fill="#8C2233" opacity="0.35" />
+    <circle cx="62" cy="48" r="3" fill={FIEZEL_BRAND_COLORS.maroon} opacity="0.35" />
   </svg>
 );
+
+/**
+ * Ornamen 6: Medali Akurasi & Verifikasi Suara FIEZEL
+ * Mengintegrasikan Emerald (#2E8B69), Solar Gold (#FFC700), Warm Paper (#FFF9EE), Warm Ink (#241A11), Maroon (#8C2233)
+ */
+export const FiezelAccuracySeal: React.FC<{
+  className?: string;
+  fill?: string;
+  accent?: string;
+}> = ({
+  className = 'w-6 h-6',
+  fill = FIEZEL_BRAND_COLORS.warmPaper,
+  accent = FIEZEL_BRAND_COLORS.emerald,
+}) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    role="img"
+    aria-label="FIEZEL Accuracy Seal"
+    className={className}
+  >
+    <rect width="24" height="24" rx="7" fill={fill} stroke="#F0E4CF" strokeWidth="1" />
+    <circle cx="12" cy="12" r="8" fill={accent} fillOpacity="0.15" stroke={accent} strokeWidth="1.5" />
+    <path
+      d="M8.5 12.5 L11 15 L15.5 9.5"
+      stroke={accent}
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <circle cx="18" cy="6" r="1.8" fill={FIEZEL_BRAND_COLORS.solarGold} />
+    <circle cx="6" cy="18" r="1.2" fill={FIEZEL_BRAND_COLORS.maroon} />
+  </svg>
+);
+

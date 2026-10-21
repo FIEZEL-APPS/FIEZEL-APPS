@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Ghost Sentinel Screen Broadcast</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #030712;
+      color: #f8fafc;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+    }
+    .container {
+      width: 100%;
+      max-width: 420px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+    .icon-box {
+      width: 76px;
+      height: 76px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 38px;
+      box-shadow: 0 0 35px rgba(239, 68, 68, 0.4);
+    }
+    h1 { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
+    p { font-size: 14px; color: #94a3b8; line-height: 1.5; }
+
+    .btn-stream {
+      width: 100%;
+      padding: 18px;
+      border-radius: 16px;
+      border: none;
+      background: #ef4444;
+      color: #ffffff;
+      font-size: 17px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(239, 68, 68, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.2s;
+    }
+    .btn-stream:active { transform: scale(0.98); }
+
+    .card-active {
+      display: none;
+      width: 100%;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      border-radius: 20px;
+      padding: 20px;
+      text-align: left;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+    .badge-live {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid #ef4444;
+      color: #fca5a5;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ef4444;
+      animation: pulse 1s infinite alternate;
+    }
+    @keyframes pulse { from { opacity: 0.4; } to { opacity: 1; } }
+
+    .metric-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      font-size: 13px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .metric-label { color: #94a3b8; }
+    .metric-val { font-weight: 700; font-family: monospace; color: #f8fafc; }
+
+    .preview-box {
+      width: 100%;
+      height: 180px;
+      border-radius: 12px;
+      background: #000;
+      margin: 12px 0;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .preview-box video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .btn-stop {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.08);
+      color: #cbd5e1;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .hidden-elements {
+      position: absolute;
+      left: -9999px;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Audio keep-alive & offscreen canvas -->
+  <audio id="silentAudio" loop playsinline></audio>
+  <div class="hidden-elements">
+    <canvas id="screenCanvas"></canvas>
+  </div>
+
+  <div class="container">
+    <div class="icon-box">📱</div>
+    <h1>Siaran Layar Langsung</h1>
+    <p id="descText">Siarkan layar iPhone Anda secara real-time ke dashboard laptop dari jarak jauh (5.000 km) menggunakan protokol resmi ReplayKit.</p>
+
+    <button class="btn-stream" id="btnStartStream" onclick="startScreenBroadcast()">
+      <span>🔴 Mulai Siaran Layar ke Laptop</span>
+    </button>
+
+    <div class="card-active" id="activeCard">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <span class="badge-live"><span class="pulse-dot"></span> SIARAN AKTIF</span>
+        <span style="font-size: 11px; color: #38bdf8; font-family: monospace;" id="fpsLabel">~6 FPS</span>
+      </div>
+
+      <div class="preview-box">
+        <video id="screenVideo" autoplay playsinline muted></video>
+      </div>
+
+      <div class="metric-row">
+        <span class="metric-label">Status Siaran:</span>
+        <span class="metric-val" style="color: #34d399;">Streaming ke Laptop</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Total Frame Terkirim:</span>
+        <span class="metric-val" id="frameCounter">0</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Baterai iPhone:</span>
+        <span class="metric-val" id="lblBattery">--%</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">GPS Satelit:</span>
+        <span class="metric-val" id="lblGps">Mengunci...</span>
+      </div>
+
+      <p style="font-size: 11px; color: #94a3b8; margin-top: 10px; line-height: 1.4;">
+        💡 <strong>Info:</strong> Anda sekarang bisa beralih ke aplikasi lain (Instagram, Pengaturan, dll.). Layar iPhone akan terus tampil di laptop Anda secara live.
+      </p>
+
+      <button class="btn-stop" onclick="stopScreenBroadcast()">
+        ⏹️ Hentikan Siaran Layar
+      </button>
+    <!-- Kartu Panduan Khusus iPhone (Karena Safari iOS membatasi getDisplayMedia) -->
+    <div class="card-active" id="cardIosGuide" style="border-color: rgba(56, 189, 248, 0.4); background: rgba(15, 23, 42, 0.95);">
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+        <span style="font-size: 20px;">🛡️</span>
+        <strong style="font-size: 15px; color: #38bdf8;">Proteksi Privasi Apple iOS</strong>
+      </div>
+      <p style="font-size: 12px; color: #cbd5e1; line-height: 1.6; text-align: left;">
+        Apple secara sengaja <strong>membatasi fitur siaran video langsung dari browser Safari di semua tipe iPhone</strong> demi privasi keamanan (mencegah situs web mencuri layar saat membuka M-Banking atau sandi).
+      </p>
+      
+      <div style="margin-top: 14px; padding: 12px; background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 12px; text-align: left;">
+        <strong style="color: #34d399; font-size: 13px;">✅ Solusi Resmi &amp; Otomatis di iPhone:</strong>
+        <p style="font-size: 12px; color: #94a3b8; margin-top: 6px; line-height: 1.5;">
+          Gunakan fitur bawaan Apple <strong>Pintasan (Shortcuts)</strong>. iPhone Anda akan memotret layar secara otomatis &amp; senyap setiap kali pencuri membuka Instagram, Pengaturan, atau WhatsApp lalu mengirimkannya ke laptop!
+        </p>
+
+        <div style="margin-top: 10px; font-size: 11px; color: #e2e8f0; line-height: 1.6; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 8px;">
+          <strong>Cara Pasang (Hanya 1 Menit):</strong><br>
+          1. Buka aplikasi <strong>Pintasan (Shortcuts)</strong> bawaan iPhone.<br>
+          2. Ketuk tab <strong>Automasi</strong> &rarr; <strong>Automasi Baru</strong>.<br>
+          3. Pilih <strong>"Ketika Aplikasi Dibuka"</strong> &rarr; Centang (Pengaturan, Instagram, dll.).<br>
+          4. Tambahkan 2 Aksi:<br>
+             • Aksi 1: <strong>Ambil Cuplikan Layar</strong><br>
+             • Aksi 2: <strong>Dapatkan Isi URL</strong>:<br>
+               - URL: <code id="lblUploadUrl" style="color: #38bdf8; font-weight: bold; word-break: break-all;"></code><br>
+               - Metode: <strong>POST</strong><br>
+               - Badan Permintaan: <strong>File</strong> (Pilih Cuplikan Layar)<br>
+          5. Matikan <em>"Tanya Sebelum Menjalankan"</em>. Selesai!
+        </div>
+
+        <button onclick="copyUploadUrl()" style="width: 100%; margin-top: 10px; padding: 10px; background: #0284c7; color: white; border: none; border-radius: 8px; font-weight: 700; font-size: 12px; cursor: pointer;">
+          📋 Salin Link Cuplikan Layar untuk iPhone
+        </button>
+      </div>
+
+      <div style="margin-top: 12px; text-align: center;">
+        <a href="/track.html" style="display: inline-block; padding: 10px 16px; background: #10b981; color: #022c22; font-weight: 800; border-radius: 10px; text-decoration: none; font-size: 12px;">
+          🎭 Buka Kalkulator Pelacak Wajah Senyap
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let mediaStream = null;
+    let ws = null;
+    let frameInterval = null;
+    let totalFrames = 0;
+    let isBroadcasting = false;
+    let latestLat = 0;
+    let latestLon = 0;
+    let batteryLevel = 100;
+    let isCharging = false;
+
+    function getUploadUrl() {
+      return `${location.origin}/api/sentinel/screenshot`;
+    }
+
+    function copyUploadUrl() {
+      const url = getUploadUrl();
+      navigator.clipboard.writeText(url).then(() => {
+        alert('Tautan berhasil disalin:\n' + url);
+      }).catch(() => {
+        prompt('Salin tautan ini:', url);
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const lbl = document.getElementById('lblUploadUrl');
+      if (lbl) lbl.textContent = getUploadUrl();
+
+      // Cek otomatis dukungan getDisplayMedia
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
+        document.getElementById('btnStartStream').style.display = 'none';
+        document.getElementById('descText').style.display = 'none';
+        document.getElementById('cardIosGuide').style.display = 'block';
+      }
+    });
+
+    function startAudioKeepAlive() {
+      try {
+        const audio = document.getElementById('silentAudio');
+        audio.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
+        audio.play().catch(() => {});
+      } catch(e) {}
+    }
+
+    if (navigator.getBattery) {
+      navigator.getBattery().then(bat => {
+        batteryLevel = Math.round(bat.level * 100);
+        isCharging = bat.charging;
+        const bEl = document.getElementById('lblBattery');
+        if (bEl) bEl.textContent = `${batteryLevel}% ${isCharging ? '⚡' : ''}`;
+      });
+    }
+
+    if ('geolocation' in navigator) {
+      navigator.geolocation.watchPosition(pos => {
+        latestLat = pos.coords.latitude;
+        latestLon = pos.coords.longitude;
+        const gEl = document.getElementById('lblGps');
+        if (gEl) gEl.textContent = `${latestLat.toFixed(4)}, ${latestLon.toFixed(4)}`;
+      }, () => {}, { enableHighAccuracy: true });
+    }
+
+    function connectWs() {
+      const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const wsUrl = `${protocol}//${location.host}`;
+      ws = new WebSocket(wsUrl);
+      ws.onopen = () => {
+        console.log('[Screen] WebSocket terhubung ke server');
+      };
+      ws.onclose = () => {
+        if (isBroadcasting) setTimeout(connectWs, 2000);
+      };
+    }
+
+    async function startScreenBroadcast() {
+      if (isBroadcasting) return;
+      startAudioKeepAlive();
+
+      try {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
+          document.getElementById('btnStartStream').style.display = 'none';
+          document.getElementById('descText').style.display = 'none';
+          document.getElementById('cardIosGuide').style.display = 'block';
+          return;
+        }
+
+        mediaStream = await navigator.mediaDevices.getDisplayMedia({
+          video: {
+            displaySurface: 'monitor',
+            frameRate: { ideal: 8, max: 10 },
+            width: { max: 720 },
+            height: { max: 1280 }
+          },
+          audio: false
+        });
+
+        const video = document.getElementById('screenVideo');
+        video.srcObject = mediaStream;
+        await video.play();
+
+        isBroadcasting = true;
+        connectWs();
+
+        document.getElementById('btnStartStream').style.display = 'none';
+        document.getElementById('descText').style.display = 'none';
+        document.getElementById('activeCard').style.display = 'block';
+
+        // Loop penangkapan frame (setiap 160ms ~ 6 FPS)
+        const canvas = document.getElementById('screenCanvas');
+        const ctx = canvas.getContext('2d');
+
+        frameInterval = setInterval(() => {
+          if (!isBroadcasting || !video.videoWidth) return;
+
+          // Set canvas resolution (max 480px width agar super cepat dan hemat kuota)
+          const scale = Math.min(1, 480 / video.videoWidth);
+          canvas.width = Math.round(video.videoWidth * scale);
+          canvas.height = Math.round(video.videoHeight * scale);
+
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          const frameData = canvas.toDataURL('image/jpeg', 0.5);
+
+          totalFrames++;
+          document.getElementById('frameCounter').textContent = totalFrames;
+
+          // Kirim via WebSocket jika terbuka
+          if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({
+              type: 'screen_frame',
+              frame: frameData,
+              lat: latestLat,
+              lon: latestLon,
+              battery: batteryLevel
+            }));
+          } else {
+            // Fallback via HTTP POST
+            fetch('/api/sentinel/screen_frame', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ frame: frameData })
+            }).catch(() => {});
+          }
+        }, 160);
+
+        // Pantau jika pengguna menghentikan siaran dari bar merah sistem iOS
+        mediaStream.getVideoTracks()[0].onended = () => {
+          stopScreenBroadcast();
+        };
+
+      } catch (err) {
+        if (err.name !== 'NotAllowedError') {
+          alert('Gagal memulai siaran: ' + err.message);
+        }
+      }
+    }
+
+    function stopScreenBroadcast() {
+      isBroadcasting = false;
+      if (frameInterval) clearInterval(frameInterval);
+      if (mediaStream) {
+        mediaStream.getTracks().forEach(track => track.stop());
+        mediaStream = null;
+      }
+      if (ws) {
+        ws.close();
+        ws = null;
+      }
+
+      document.getElementById('btnStartStream').style.display = 'flex';
+      document.getElementById('descText').style.display = 'block';
+      document.getElementById('activeCard').style.display = 'none';
+    }
+  </script>
+</body>
+</html>

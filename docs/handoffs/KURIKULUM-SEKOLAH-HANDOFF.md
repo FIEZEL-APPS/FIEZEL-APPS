@@ -1,0 +1,795 @@
+# KURIKULUM SEKOLAH — bab, sub-bab, dan soal yang benar-benar dari materi ajar (m025-291)
+
+Wewenang: OWNER. Status: cakupan kelas 7–12 dua semester LENGKAP; kedalaman soal masih
+tahap pertama (lihat Langkah berikutnya).
+
+## Tiga cacat yang ditemukan saat audit
+
+**1. Soal tugas kurikulum sebagian besar BUKAN dari kurikulum.** Ini yang paling merusak,
+dan tidak terlihat dari layar mana pun. Guru memilih "Descriptive Text — About Me" kelas 7
+lalu meminta lima soal; yang terkirim ke murid adalah tiga soal kurikulum **ditambah lima
+soal Past Tense dari bank umum** — materi kelas 8 — dan tugasnya dilabeli skill
+`past_tense`.
+
+Rantainya berlapis, dan tiap mata rantainya masuk akal sendiri-sendiri:
+`skills` berisi nama GENRE (`'Descriptive Text'`), penyaring di `buildAssignment` membuangnya
+karena bukan nama skill bank, baris berikutnya memaksa `skills = ['past_tense']` sebagai
+default, lalu penambal menarik soal dari bank untuk memenuhi jumlah yang diminta. Karena
+satu bab hanya berisi 2–3 soal sementara pilihan jumlahnya 2/3/5/8/10, pencemaran itu
+terjadi pada **hampir setiap** tugas kurikulum.
+
+Ditutup dengan `curriculumOnly` di `buildAssignment`: kalau pemanggil menyatakan set ini
+berasal dari materi ajar, bank umum tidak pernah disentuh dan jumlah soalnya apa adanya.
+Lebih baik guru melihat "3 soal" yang jujur daripada delapan soal yang setengahnya
+mengajarkan bab yang salah.
+
+**2. Guru tidak bisa memilih detail materi.** Pilihan terkecil adalah satu bab utuh,
+padahal guru tidak mengajar "Descriptive Text" sekaligus — ia mengajar To Be hari Senin dan
+Simple Present hari Rabu. `languageFeatures` hanya label yang ditampilkan; butirnya tidak
+ditandai, jadi tidak bisa disaring.
+
+**3. Materinya terlalu sedikit dan setengah semester kosong.** Sembilan bab, 19 soal, untuk
+enam tingkat kelas. Deskripsi Fase E bahkan menjanjikan lima genre padahal hanya satu yang
+punya bab — guru membaca janji yang tidak ada isinya.
+
+## Yang dikerjakan
+
+**Struktur sub-bab.** Tiap bab dipecah menjadi tiga sub-bab bernomor (1.1, 1.2, 1.3), dan
+**tiap butir soal ditandai** `subChapterId` + `feature`. Dua saringan baru di `pickItems`:
+`subChapter` dan `features`. Saringan yang menghabiskan kolam mengembalikan **kosong**, tidak
+diisi ulang diam-diam — penambalan senyap itulah cacat nomor satu di atas.
+
+**UI pemilihan bertingkat.** Guru memilih Fase → Bab → Sub-bab (opsional) → centang fitur
+bahasa. Yang ditawarkan hanya fitur yang **benar-benar punya soal**, diturunkan dari butirnya
+lewat `getFeatures()`, bukan dari daftar `languageFeatures`. Menawarkan janji kurikulum
+sebagai pilihan akan menghasilkan tugas kosong saat guru mencentangnya. Pilihan jumlah soal
+juga dipotong sesuai isi bab, dan jumlah tersedia ditampilkan di sebelah labelnya.
+
+**Cakupan dan kedalaman.** Dari 9 bab / 19 soal menjadi **15 bab / 115 soal**. Setiap kelas
+7–12 kini punya materi di kedua semester:
+
+| kelas | semester 1 | semester 2 |
+|---|---|---|
+| 7 | Descriptive (About Me), Procedure (Resep) | Descriptive (Home Sweet Home) |
+| 8 | Recount (17 Agustus), Narrative (Fabel) | Notice & Instruction (Rambu, Aturan) |
+| 9 | Information Report (Fauna) | Procedure (Manual & How-To) |
+| 10 | Narrative (Legenda Nusantara) | Analytical Exposition |
+| 11 | Hortatory Exposition | Explanation |
+| 12 | Discussion, News Item & Caption | Application Letter & CV |
+
+Tiap bab baru membawa perangkat mengajar lengkap: apersepsi 5 menit, rumus papan tulis,
+miskonsepsi khas siswa beserta contoh kesalahannya, diferensiasi untuk yang tertinggal dan
+yang sudah maju, serta kosakata kunci.
+
+**Frasa ambigu di dashboard guru.** Nama internal dan istilah asing yang tidak berarti apa
+pun bagi guru diganti, semuanya lewat copy-map dwibahasa:
+
+| sebelum | sesudah |
+|---|---|
+| Kelas — Guru · Murid · **Braincore** | Ruang Kelas — guru, murid, dan hasil belajar dalam satu layar |
+| **Briefing** / Briefing hari ini | Ringkasan Hari Ini |
+| Analitik & **Deteksi Dini** | Analitik — siapa yang perlu dibantu |
+| Bank **Skill Kilat** (A2) | Latihan cepat per skill (A2) |
+| **Waktu terhemat** | Waktu administrasi yang dihemat |
+| **Teaching Brief** | Panduan mengajar |
+| Perlu perhatian | Perlu dibantu |
+
+Dua tab yang sama-sama bernama "Kelas" juga dibedakan: tab hub menjadi **Ruang Kelas**.
+
+## Bukti
+
+`tests/kurikulum-integritas-test.js` menguji enam rantai K1–K6 dan setiap rantai dibuktikan
+merah lebih dulu lewat mutasi: penambalan bank umum dikembalikan (K1 merah), saringan kosong
+diisi ulang diam-diam (K3 merah), satu butir kehilangan penanda fitur (K6 merah).
+
+K1 sengaja meminta **40 soal** dari bab berisi sembilan — persis keadaan yang dulu memicu
+penambalan — lalu membuktikan tidak satu pun butir asing masuk.
+
+## Langkah berikutnya
+
+- **Kedalaman soal.** 115 soal untuk 15 bab berarti rata-rata 7–8 soal per bab. Cukup untuk
+  satu tugas, belum cukup untuk satu semester penuh tanpa pengulangan. Target berikutnya
+  12–15 soal per bab, ditambah per sub-bab yang paling sering diajarkan.
+- **Bab kedua per semester.** Beberapa semester baru punya satu bab (kelas 9 semester 2,
+  kelas 11 semester 1). Kurikulum Merdeka biasanya memuat dua sampai tiga bab per semester.
+- **Teks bacaan panjang.** Semua butir saat ini berbentuk kalimat rumpang. Genre seperti
+  Report dan Discussion menuntut soal berbasis teks utuh; itu perubahan bentuk data
+  tersendiri (`context` per butir sudah didukung bank soal, belum dipakai di sini).
+- **Sisi Thai.** Isi kurikulum ini nasional Indonesia dan sengaja tidak diterjemahkan
+  (alasannya di `tests/th-ui-leak-test.js`). Kalau FIEZEL kelak masuk kurikulum negara lain,
+  jalannya paket kurikulum per-negara — bukan menerjemahkan paket Indonesia.
+
+---
+
+## m025-294 — PR #389: mesin kurikulum server-side masuk (backend Python)
+
+PR #389 datang dari agen Emergent, bukan dari sesi ini. Isinya besar dan arsitektural:
+`backend/` FastAPI+MongoDB (curriculum engine, question engine dengan lifecycle
+DRAFT→PUBLISHED, assessment engine, learning loop, braincore BKT+FSRS-lite), ditambah dua
+halaman baru `kurikulum.html` (konsol guru) dan `misi.html` (misi murid).
+
+Catatan ini dibuat karena ritual bump menyentuh `DIAG_BUILD` di
+`features/neural-voice/fiezel-diag-panel.js` dan A13 menuntut jejaknya. Panel diagnostiknya
+sendiri tidak berubah perilaku — hanya penanda buildnya naik ke m025-294.
+
+### Yang diperbaiki sebelum PR ini layak digabung
+
+**1. Gerbang yang dirusak, dikembalikan.** Cabang itu mengubah dua assert di
+`tests/braincore-learner-identity-test.js`: `sub` tak dikenal diganti dari UUID menjadi
+`curriculum-engine-6`. Itu bertentangan dengan assert tetangganya di gerbang yang sama, yang
+menuntut `sub` non-UUID ditolak 400. Diukur, bukan diperdebatkan: dengan suntingan itu
+gerbangnya **176/178 merah di cabangnya sendiri**; dikembalikan ke versi main, **178/178
+hijau**. Kode produksi yang melayani rute itu nol tersentuh oleh PR ini — jadi tidak ada
+perilaku baru yang perlu diakomodasi, hanya gerbang yang dilonggarkan tanpa sebab.
+
+**2. `memory/PRD.md` — dua dokumen berbeda, satu nama.** main memuat PRD redesign UI/UX
+FIEZEL 2.0; PR memuat PRD mesin kurikulum. Keduanya sah. PRD main dipulihkan, PRD kurikulum
+dipindah ke `memory/PRD-CURRICULUM-ENGINE.md`. Nol dokumen dibuang.
+
+**3. Tautan sidebar Ruang Guru.** PR menambahkannya dengan teks Indonesia langsung. Tautannya
+dipertahankan, labelnya dipindah ke `t('guru.nav-kurikulum')` dengan kunci id + th — kerangka
+Ruang Guru dilihat guru Thai juga, dan biayanya hanya satu kunci.
+
+**4. `.emergent/*`** (job id lingkungan): sisi main dipertahankan supaya PR tidak menimpa
+pendaftaran job milik main.
+
+### Utang yang dinyatakan terbuka, bukan disembunyikan
+
+**75 literal Indonesia** di `features/curriculum/teacher-console.js` (56) dan
+`features/curriculum/learning-mission.js` (19) didaftarkan sebagai anggaran di
+`tests/th-ui-leak-test.js`, mengikuti keputusan owner 7 September 2026: **kurikulum Indonesia
+tidak perlu Thai**. Alasannya sama dengan entri Kurikulum Merdeka yang sudah ada di gerbang
+itu — guru Thai tidak mengajar di bawah Kurikulum Merdeka, jadi menerjemahkan "Tujuan
+Pembelajaran" dan nama Fase resmi ke Thai bukan sia-sia melainkan menyesatkan.
+
+Yang harus tetap terlihat: **19 dari 75 ada di layar MURID** (`misi.html`), bukan layar guru.
+Kalau kelak ada murid Thai yang dibukakan konsol ini, sembilan belas kalimat itu sampai
+kepadanya dalam bahasa Indonesia. Itu konsekuensi yang diterima sadar, bukan kebocoran yang
+terlewat. Angka anggarannya menyatakan utang: naik satu tetap merah.
+
+### Yang BELUM diputuskan owner, dan sengaja tidak kusentuh
+
+`memory/test_credentials.md` dan `auth_testing.md` memuat nilai token owner master dan sandi
+owner. Kode produksinya bersih — `backend/auth.py` membaca `OWNER_MASTER_TOKEN`, `JWT_SECRET`,
+`ADMIN_PASSWORD` dari environment tanpa nilai cadangan tertanam. Tetapi kalau server yang
+berjalan memakai nilai yang tertulis di kedua berkas itu, mempublikasikannya di repo sama
+dengan membocorkannya. Menggantinya jadi placeholder adalah keputusan owner, bukan keputusan
+sesi ini.
+
+---
+
+## m025-296 — pintu konsol kurikulum ditutup sampai backend benar-benar berjalan
+
+m025-294 memasang tautan **"Kurikulum & Kompetensi"** di sidebar Ruang Guru. Tautan itu
+menuju `./kurikulum.html`, dan seluruh isi halaman itu dilayani
+`features/curriculum/fz-api.js` yang memanggil **`/api/...` relatif ke origin yang sama** —
+artinya halaman itu menuntut server FastAPI berjalan di domain yang sama dengan PWA-nya.
+
+**Diperiksa owner sendiri di fiezel.my.id, 7 September 2026:**
+
+| Alamat | Jawaban |
+|---|---|
+| `/api/health` | **404** |
+| `/kurikulum.html` | **404** |
+
+Repo juga tidak memuat satu pun berkas yang memberi tahu hosting cara menjalankan Python:
+tidak ada `passenger_wsgi.py`, tidak ada `Procfile`, `requirements.txt` hanya ada di dalam
+`backend/` dan bukan di akar, dan tidak ada dokumen pemasangan. Jadi bukan kebetulan
+backend-nya mati — memang belum pernah ada yang memasangnya.
+
+Akibatnya di produksi: guru menekan tautan di sidebar, `kurikulum.html` terbuka, dan setiap
+panggilan API gagal. Itu **lebih buruk daripada fitur yang belum ada** — fitur yang belum ada
+tidak menjanjikan apa-apa, sedangkan pintu yang terbuka ke ruangan kosong menghabiskan
+kepercayaan guru pada seluruh aplikasi.
+
+### Yang dilakukan, dan yang sengaja TIDAK dilakukan
+
+Bendera `curriculumConsole` ditambahkan ke `fiezel-ux-flags.js` dengan bawaan **mati**, plus
+kembarannya di peta cadangan `app.js` — dua jalur, keduanya mati, sesuai konvensi bendera yang
+sudah ada di repo. Tautan sidebar hanya dirender saat benderanya menyala.
+
+**Mesinnya tidak disentuh sama sekali.** `backend/`, `kurikulum.html`, `misi.html`, dan
+seluruh `features/curriculum/` tetap utuh dan tetap diuji. Ini menutup pintu, bukan membakar
+ruangannya: begitu backend benar-benar berjalan, **satu bendera membalikkannya** dan tidak ada
+kode yang perlu ditulis ulang. `tests/curriculum-console-gate-test.js` justru menuntut
+berkas-berkas itu TETAP ADA — supaya "perbaikan" berikutnya tidak menghapus mesinnya.
+
+Pembaca bendera di `fiezel-teacher-shell.js` mengikuti aturan yang sama dengan `uxOn()` di
+`app.js`: nama tak dikenal dan FiezelUX yang absen sama-sama menjawab **false**. Diukur dengan
+menjalankan fungsinya: bendera mati → `false`, bendera nyala → `true`, FiezelUX tidak ada →
+`false`. Kegagalannya menyembunyikan pintu, bukan membukanya.
+
+### Kalau kelak backend dipasang
+
+Yang dibutuhkan bukan mengunggah berkas: hosting yang bisa menjalankan Python, MongoDB, dan
+variabel rahasia (`OWNER_MASTER_TOKEN`, `JWT_SECRET`, `ADMIN_PASSWORD`, `MONGO_URL`). Hosting
+cPanel bersama umumnya tidak bisa. Itu keputusan biaya dan waktu milik owner — dan sampai
+keputusan itu diambil, benderanya tetap mati.
+
+---
+
+## m025-298 — konsol kurikulum disiapkan untuk BENAR-BENAR hidup
+
+m025-296 menutup pintunya. Owner memutuskan sebaliknya: **kerja agen itu harus hidup dan
+aktif**. Keberatan sudah disampaikan (FIEZEL sudah punya backend hidup di
+`fiezel-core.puter.work`; menambah FastAPI+MongoDB berarti tumpukan kedua, sistem login
+ketiga, dua tempat data murid) dan owner tetap memilih menghidupkannya. Catatan ini
+menyiapkan jalannya, bukan memperdebatkannya lagi.
+
+### Akar teknis kenapa ia mati, dan bukan cuma "belum di-deploy"
+
+`features/curriculum/fz-api.js` memanggil `fetch('/api' + path)` — **same-origin**. Itu benar
+di lingkungan tempat berkas itu lahir (ingress mengarahkan `/api` ke FastAPI port 8001) dan
+salah di produksi FIEZEL, karena `fiezel.my.id` hosting statis. Jadi memasang backend saja
+TIDAK akan menghidupkannya: panggilannya tetap menembak domain yang salah.
+
+Backend FIEZEL yang sudah hidup tidak pernah memakai asumsi itu — `fiezel-core-worker`
+dipanggil lewat `CORE_CONFIG.workerUrl`, alamat **absolut dari konfigurasi**. `fz-api.js`
+kini mengikuti pola yang sama, karena pola itu yang terbukti bekerja di produksi ini.
+
+### Pintu diturunkan dari alamat, bukan dari bendera
+
+Bendera manual bisa dinyalakan orang yang lupa memasang backend-nya — dan itu mengembalikan
+persis bug yang ditutup m025-296. Karena itu penjaga pintu kini membaca
+`FIEZEL_CURRICULUM_CONFIG.curriculumApiUrl`:
+
+| Alamat | Bendera | Pintu |
+|---|---|---|
+| kosong | nyala | **tertutup** |
+| terisi | nyala | terbuka |
+| terisi | mati | **tertutup** (sakelar mati paksa tetap ada) |
+
+Diukur dengan menjalankan fungsinya, bukan membaca kodenya. Bendera dinaikkan ke `true`
+("fitur diizinkan"); yang menentukan tetap alamatnya, yang bawaannya **kosong**. Satu hal
+yang perlu diisi owner, bukan dua.
+
+Bawaan kosong itu juga kontrak distribusi: salinan repo ini tidak boleh mengirim data murid
+ke server milik pemasang pertama.
+
+### Gagal cepat, dengan kalimat yang menyebut sebabnya
+
+Tanpa alamat, `fz-api` menolak SEBELUM menyentuh jaringan dan mengatakan alasannya. Versi
+lama menembak halaman statis lalu memunculkan galat penguraian JSON — pesan yang tidak
+memberi tahu siapa pun apa yang sebenarnya salah.
+
+### Gerbangku sendiri tertipu komentarku, lagi
+
+`curriculum-api-base-test` versi pertama menuduh `fz-api.js` masih memakai pola lama —
+padahal yang ia baca adalah **kutipan pola lama di komentar** yang menjelaskan apa yang
+pernah salah. Komentar kini dibuang sebelum diperiksa. Ini kesalahan yang sama persis dengan
+m025-285 (`targetLanguage: 'off'` terbaca dari prosa); dicatat di sini supaya polanya
+dikenali lebih cepat lain kali: **setiap gerbang yang mencari pola kode wajib membuang
+komentar dulu.**
+
+### Yang MASIH harus dikerjakan owner, dan tanpa itu pintunya tetap tertutup
+
+1. MongoDB Atlas M0 (gratis) → dapatkan `MONGO_URL`
+2. Render Web Service, root `backend/`, start `uvicorn server:app --host 0.0.0.0 --port $PORT`
+3. Delapan variabel lingkungan; `OWNER_MASTER_TOKEN` dan `ADMIN_PASSWORD` **wajib nilai baru**
+   — yang tertulis di `memory/test_credentials.md` sudah terpublikasi di repo
+4. `CORS_ORIGINS=https://fiezel.my.id`
+5. Alamat hasilnya ditempel ke `curriculumApiUrl` di `core-config.js`
+
+Catatan jujur untuk owner: Render paket gratis tidur setelah 15 menit menganggur, jadi guru
+yang membuka konsol setelah jeda menunggu ~50 detik. Untuk dipakai guru sungguhan, paketnya
+berbayar.
+
+---
+
+## m025-301 — mesinnya DIJALANKAN, dan kabel yang hilang ketahuan
+
+m025-298 menyiapkan jalannya tanpa pernah menjalankannya. Sesi ini menjalankannya sungguhan
+— MongoDB 7.0.34 dan FastAPI hidup berdampingan, konsol dibuka di Chromium — dan justru di
+situ ketahuan bahwa **mengisi `curriculumApiUrl` saja TIDAK akan menghidupkan konsolnya.**
+
+### Kabel yang hilang
+
+`kurikulum.html` dan `misi.html` hanya memuat dua skrip: `features/curriculum/fz-api.js` dan
+modul layarnya. **`core-config.js` tidak pernah disebut di kedua halaman itu.** Padahal di
+sanalah `FIEZEL_CURRICULUM_CONFIG.curriculumApiUrl` tinggal — satu-satunya tempat `fz-api.js`
+mencari alamat backend.
+
+Diukur di peramban sebelum perbaikan, dengan backend benar-benar hidup dan alamatnya sudah
+ditempel: `kurikulum.html` melaporkan `FIEZEL_CURRICULUM_CONFIG = null`. Jadi setiap
+panggilan ditolak sebelum menyentuh jaringan, dengan kalimat yang **menuduh owner belum
+mengonfigurasi apa pun** — padahal owner sudah melakukan tepat apa yang diminta daftar
+m025-298. Kegagalan yang menyalahkan orang yang benar adalah kegagalan yang paling mahal
+dicari.
+
+Perbaikannya satu baris per halaman: `<script src="./core-config.js"></script>` **sebelum**
+`fz-api.js` (skrip klasik dieksekusi berurutan; terbalik = sama saja tidak dimuat).
+
+`tests/curriculum-config-wiring-test.js` mengunci keduanya. Daftar halamannya tidak ditulis
+tangan: gerbang memindai seluruh `*.html` di akar dan menuntut setiap halaman yang memuat
+`fz-api.js` ikut memuat `core-config.js` lebih dulu — halaman konsol berikutnya terjaga
+sendiri. Arah sebaliknya ikut dijaga: alamat bawaan di repo WAJIB tetap kosong.
+
+### Yang benar-benar dijalankan, dan hasilnya
+
+| Lapis | Hasil |
+|---|---|
+| MongoDB 7.0.34 (127.0.0.1:27017) | hidup, `dbpath` lokal |
+| FastAPI `uvicorn server:app` (:8001) | `/api/health` → `{"ok":true, curriculum_nodes:731, questions:21}` |
+| `backend/smoke_test.py` | **35 PASS / 0 FAIL** |
+| `backend/unit_test.py` | **36 PASS / 0 FAIL** |
+| `backend/tests/` (pytest) | **21 passed** |
+| `kurikulum.html` di Chromium | login token guru tembus; Kopilot Guru terisi evidence nyata (8 TP dipantau, 7 belum diajarkan, rata-rata penguasaan 15%), nol `pageerror` |
+| `misi.html` di Chromium | konfigurasi terbaca, layar murid tampil, nol `pageerror` |
+
+Alamat lokal itu **tidak ditempel ke `core-config.js`**. Ia disuntikkan di peramban saat
+pengujian, karena `http://127.0.0.1:8001` di dalam repo sama dengan pintu ke ruangan kosong
+bagi setiap orang lain — persis bug m025-294 dalam bentuk baru.
+
+### Catatan pemasangan yang baru ketahuan
+
+* `backend/tests/test_fiezel_backend.py` membaca `REACT_APP_BACKEND_URL`; tanpa variabel itu
+  ia gagal saat *collection*, bukan saat assert. Untuk pengujian lokal isi dengan alamat
+  uvicorn-nya.
+* `backend/unit_test.py` memanggil `asyncio.run` sendiri di akhir berkas. Dijalankan sebagai
+  skrip (`python unit_test.py`) ia hijau; lewat `pytest` dua fungsinya dilaporkan merah
+  karena `pytest-asyncio` memang tidak ada di `requirements.txt`. Itu cara pakainya, bukan
+  kerusakan.
+* Token owner yang dipakai suite adalah `FZ-OWNER-2026-MASTER` dari
+  `memory/test_credentials.md` — nilai yang **sudah terpublikasi di repo**. Di produksi
+  `OWNER_MASTER_TOKEN` dan `ADMIN_PASSWORD` wajib nilai baru; ini tetap keputusan owner yang
+  belum diambil (lihat catatan m025-296 di atas).
+
+### Yang MASIH milik owner
+
+Daftar m025-298 tetap berlaku utuh (MongoDB Atlas → Render → delapan variabel →
+`CORS_ORIGINS` → tempel alamatnya). Yang berubah: sekarang langkah ke-5 itu benar-benar
+membuka pintunya, karena kabel yang membuatnya sia-sia sudah tersambung dan dijaga gerbang.
+
+---
+
+## m025-303 — alamat backend disambungkan, DAN DIVERIFIKASI
+
+`curriculumApiUrl` diisi `https://fiezel-apps.onrender.com`, sehingga penjaga pintu
+(m025-298) membuka tautan "Kurikulum & Kompetensi" di sidebar Ruang Guru.
+
+Ini menuntaskan PR #395 (8 Sep), yang sengaja dibiarkan draf dengan satu syarat:
+
+> Syarat gabung: owner membuka `https://fiezel-apps.onrender.com/api/health` di browser
+> dan melihat balasan JSON.
+
+**Syarat itu terpenuhi 12 Sep 2026.** Owner membukanya dan menempelkan jawabannya:
+
+```json
+{"ok":true,"service":"fiezel-learning-engine","curriculum_nodes":731,"questions":21,"attempts":0}
+```
+
+Angka `731` itu bukan sekadar "hidup": ia **sama persis** dengan yang dicetak
+`backend/bootstrap.py` saat menyemai Atlas pada hari yang sama
+(`SIAP. curriculum_nodes=731 questions=21`). Jadi yang dibuktikan bukan cuma servernya
+menjawab, melainkan servernya menunjuk **database yang benar**. Pintu ini tidak dibuka
+atas dasar tebakan.
+
+### Jalan yang ditempuh sebelum sampai ke sini
+
+Pemasangan backend permanen dicoba lebih dulu di cPanel ArenHost dan **gagal** — bukan
+karena kodenya, melainkan karena Passenger tidak pernah dijalankan server itu walau menu
+"Setup Python App" tersedia. Tiga lokasi dicoba, ketiganya 404 dalam 1-2 milidetik.
+Catatan lengkapnya, berikut tes 30 detik yang membuktikannya sebelum orang membuang
+waktu berjam-jam, ada di `docs/BACKEND-CPANEL-DEPLOY.md` §0a.
+
+Render sendiri gagal tiga hari sebelumnya karena tidak ada berkas yang menentukan versi
+Python — akar yang sudah dicatat PR #395 sebagai utang dan baru ditutup m025-318
+(`backend/.python-version` = 3.11.9, dijaga dua assert di
+`tests/backend-env-contract-test.js`). Sesudah itu deploy-nya bersih: wheel `cp311`,
+`Application startup complete`, live.
+
+### Gerbang ketiga ikut diselaraskan
+
+PR #395 melonggarkan dua gerbang yang menuntut `curriculumApiUrl` **selalu kosong**
+(`curriculum-api-base-test.js`, `curriculum-console-gate-test.js`), dengan alasan yang
+masih berlaku: `CORE_CONFIG.workerUrl` di berkas yang sama sudah lama berisi alamat
+operator, dan FIEZEL tanpa langkah build tidak punya tempat lain menaruh alamat.
+
+Yang tidak bisa diketahui PR #395: `curriculum-config-wiring-test.js` lahir **sesudahnya**
+(PR #403, 11 Sep) dan mewarisi tuntutan lama itu. Ia karena itu satu-satunya yang merah
+saat alamatnya benar-benar diisi, dan kini diselaraskan dengan dua yang lain —
+**kosong ATAU https tanpa ekor garis miring**. Dibuktikan masih bisa merah:
+alamat `http://` -> merah, ekor `/` -> merah.
+
+Yang menjaga bug pintu-ke-ruangan-kosong tetap **tidak** dilonggarkan di mana pun: ia
+assert di `curriculum-console-gate-test.js` yang MENJALANKAN penjaganya
+(alamat kosong -> pintu tertutup).
+
+### Yang harus owner tahu
+
+**Render paket gratis tidur setelah 15 menit menganggur.** Guru yang membuka konsol
+sesudah jeda menunggu ~50 detik sebelum halamannya hidup. Untuk dipakai guru sungguhan
+sehari-hari, paketnya perlu berbayar.
+
+**Login Google belum hidup** (`EMERGENT_AUTH_SESSION_URL` ada di Render, pastikan
+diawali `https://`). Login email+sandi jalan penuh, termasuk akun owner.
+
+**Sandi owner yang berlaku** adalah yang tersimpan di `.env` pemasangan, bukan nilai
+`ADMIN_PASSWORD` di Render: `seed_owner()` sengaja tidak menimpa sandi owner yang sudah
+ada (perbaikan dari review PR #405).
+
+---
+
+## m025-318 — tiga pintu dicabut, tersisa satu: KelasKu
+
+Keputusan owner, 14 September 2026, setelah menemukan sendiri bahwa layar
+`kurikulum.html` meminta token `FZG-XXXXXXXX` yang **tidak bisa dibuat dari dashboard
+mana pun**: *"cabut seluruhnya, cukup token KelasKu saja; begitu juga dengan murid,
+cukup dengan memasukkan kode KelasKu."*
+
+### Kenapa dua daftar guru bisa ada sekaligus
+
+FIEZEL punya dua server, dan sampai commit ini keduanya punya daftar penggunanya
+sendiri:
+
+| | KelasKu (aplikasi) | Mesin kurikulum (konsol) |
+|---|---|---|
+| Server | Worker `fiezel-api` | FastAPI + MongoDB |
+| Daftar undangan | D1 `teacher_invite` | Mongo `teacher_invites` |
+| Ditukar di | `POST /api/account/teacher-activate` | `POST /api/auth/teacher/token` |
+| Diterbitkan dari | dashboard owner | **tidak ada antarmuka — hanya curl** |
+
+Dashboard owner menulis ke D1; konsol kurikulum membaca Mongo. Dua kotak yang tidak
+pernah saling melihat, jadi token dari dashboard memang tidak akan pernah dikenali di
+konsol. Ditambah `OWNER_MASTER_TOKEN` — kunci utama yang dikirim di setiap permintaan,
+tidak pernah berputar, dan nilainya sudah terpublikasi di repo.
+
+### Yang dicabut, beserta rutenya
+
+`POST /auth/teacher/token`, `POST /auth/register`, `POST /auth/login`,
+`POST /auth/google/session`, `POST|GET /owner/teacher-invites`, header `X-Owner-Token`,
+seluruh penyimpanan `password_hash`/bcrypt, `seed_owner()`, dan bendera
+`--reset-owner-password`. Empat env ikut mati: `ADMIN_EMAIL`, `ADMIN_PASSWORD`,
+`OWNER_MASTER_TOKEN`, `EMERGENT_AUTH_SESSION_URL`.
+
+Dicabut **beserta rutenya**, bukan hanya dari layar: pintu yang hilang dari layar tetapi
+hidup di server bukan pintu tertutup — ia pintu yang tidak terlihat.
+
+### Yang menggantikannya: tiket, bukan kata sandi
+
+Cookie identitas KelasKu HttpOnly dan terikat `.fiezel.my.id`, jadi ia tidak akan pernah
+terkirim ke mesin kurikulum yang berdiri di domain lain. Yang menyeberang karena itu
+bukan cookie dan bukan kata sandi, melainkan **tiket sekali-pakai berumur dua menit**:
+
+1. `POST /api/account/curriculum-ticket` di Worker (dijaga `roleGate`, peran dibaca dari
+   D1 pada permintaan itu juga) menerbitkan tiket ber-HMAC;
+2. `POST /api/auth/kelasku` di FastAPI memverifikasinya, membakar `jti`-nya, dan
+   menukarnya dengan sesi mesin kurikulum.
+
+Konsekuensi yang disengaja:
+
+* **Peran diselaraskan setiap masuk**, bukan hanya saat akun dibuat. Guru yang dicabut
+  owner di KelasKu kehilangan akses di sini pada tiket berikutnya — tanpa ada yang perlu
+  ingat mencabutnya dua kali.
+* **Peran tak dikenal jatuh ke murid**, bukan guru. Kegagalan pemetaan menutup pintu.
+* **Tiket sekali pakai.** `jti` unik + indeks TTL di `kelasku_tickets`: tiket yang
+  terpungut dari log tidak bisa dipakai ulang, dan barisnya membuang dirinya sendiri.
+* **Murid cukup kode kelas.** Tidak ada pendaftaran, tidak ada sandi ketiga.
+
+### Kunci bersama, dan satu-satunya cara ia bisa salah
+
+`CURRICULUM_TICKET_KEY` wajib **sama persis** di `.env` backend dan di
+`wrangler secret` Worker. Berbeda = setiap tiket ditolak, dan penolakannya sengaja tidak
+menyebut sebabnya (membedakan "tanda tangan salah" dari "kedaluwarsa" memberi peta kepada
+pemalsu). Karena itu `bootstrap.py` menolak kunci yang absen atau lebih pendek dari 32
+karakter: gagal saat pemasangan, bukan 401 misterius pada guru pertama.
+
+Bentuk tiket ditulis dua kali (WebCrypto di Worker, CPython di backend) karena tidak ada
+satu berkas yang bisa dijalankan keduanya. `tests/curriculum-ticket-parity-test.js`
+MENJALANKAN kedua sisi atas vektor yang sama, dua arah, plus penolakan — kalau salah satu
+sisi mengubah urutan ruas JSON atau padding base64url, gerbang itu merah sebelum
+produksi.
+
+### Yang masih milik owner
+
+Satu nilai baru di Worker: `wrangler secret put CURRICULUM_TICKET_KEY` dengan nilai yang
+sama seperti di `.env` backend. Tanpa itu tombol "Masuk dengan akun KelasKu" menjawab
+"jembatan belum dinyalakan" — terang-terangan, bukan diam.
+
+## m025-326 — rilis yang terbit tanpa pernah terlihat
+
+Sesudah seluruh rantai pintu KelasKu selesai dan terbit, owner membuka
+`fiezel.my.id/app/kurikulum.html` dan melihat **layar login token `FZG-`** — layar yang
+dicabut tiga rilis sebelumnya di PR #428. Kesimpulan yang wajar saat itu: "deploy-nya
+gagal". Kesimpulan itu SALAH, dan jarak antara gejala dan sebabnya adalah isi catatan ini.
+
+Pada menit yang sama:
+
+* `deploy-site-verify` membaca produksi: `FIEZEL_PAGE_BUILD` **m025-325**, `SW_REV`
+  **m025-325-paw-kembali-20260913**, keduanya sepadan dengan `main`.
+* Berkasnya sendiri dibaca langsung lewat `?v=999` (melewati cache) — isinya **sudah**
+  kode berpintu-KelasKu, lengkap dengan `data-testid="teacher-login-btn"`.
+
+Servernya benar. Yang salah: peramban tidak pernah memintanya lagi.
+
+### Kenapa halaman-halaman ini tidak terlindungi, padahal cangkang murid terlindungi
+
+Cangkang murid punya penjaga generasi yang ketat — nama cache berkunci `SW_REV`, generasi
+lain dibuang saat `activate`, dokumen pun dilayani dari `SHELL_CACHE` supaya tidak pernah
+ada `index.html` build N+1 berjalan di atas JavaScript build N.
+
+`kurikulum.html` dan `misi.html` **tidak ikut satu pun dari itu**, dan bukan karena
+kelalaian: keduanya memang bukan bagian cangkang murid. Nol entri di `ASSETS` `sw.js` —
+termasuk `fz-api.js`, `teacher-console.js`, `learning-mission.js`:
+
+```
+$ git show origin/main:sw.js | grep -o "'\./[^']*'" \
+    | grep -cE "curriculum/(fz-api|teacher-console|learning-mission)|kurikulum\.html|misi\.html"
+0
+```
+
+Jadi service worker tidak pernah menyentuhnya, dan seluruh kesegarannya diserahkan pada
+cache HTTP biasa. Sementara rujukan skripnya telanjang — `./features/curriculum/teacher-console.js`,
+URL yang sama persis untuk setiap rilis, selamanya. Tidak ada satu pun sinyal di URL itu
+yang memberitahu peramban isinya sudah berubah, jadi peramban menyajikan salinan lama dan
+ia **benar** melakukannya.
+
+### Pelajaran yang berlaku di luar halaman ini
+
+Repo ini punya banyak gerbang yang membuktikan isi berkas benar, dan satu verifier yang
+membuktikan server menyajikan build yang benar. **Tidak ada satu pun** yang bisa melihat
+celah di antaranya: repo hijau, server benar, layar salah. Setiap halaman yang berada di
+LUAR `ASSETS` `sw.js` punya celah ini secara bawaan — kalau kelak lahir halaman ketiga di
+luar cangkang, ia lahir dengan cacat yang sama sampai penandanya dipasang.
+
+### Penjaganya sekarang
+
+`?v=<build>` pada tiap rujukan lokal di kedua halaman, dan nomor itu wajib SAMA dengan
+`FIEZEL_PAGE_BUILD`. `tools/bump-build.mjs` menulis ulang SEMUA kemunculannya pada setiap
+bump (global — satu halaman memanggil empat berkas, dan satu yang tertinggal mengembalikan
+cacat yang sama) dan menolak jalan kalau penandanya hilang.
+`tests/curriculum-cache-version-test.js` menegakkan ketiganya, dan ketiga mode kegagalannya
+dibuktikan merah lebih dulu: rujukan telanjang, penanda tertinggal satu rilis, dan halaman
+yang dicabut dari `HALAMAN_BERVERSI`.
+
+Header cache di server SENGAJA tidak dipakai sebagai jawaban: `.htaccess` ada di
+`deploy/site-exclude.txt` sebagai milik server — repo tidak pernah mengirimkannya supaya
+`rsync --delete` tidak menghapus aturan yang dipasang owner langsung di cPanel. Repo tidak
+bisa menjamin header; ia bisa menjamin bentuk URL. Yang bisa dijamin itulah yang dijadikan
+gerbang.
+
+## m025-327 — kurikulum lengkap yang tidak punya pintu
+
+Owner membuka konsol, melihat dua mata pelajaran dengan satu elemen masing-masing, lalu
+berkata: *"sepertinya mata pelajarannya juga belum lengkap."*
+
+Ia benar tentang yang dilihatnya, dan salah tentang sebabnya — dan salahnya itu bukan
+salahnya. Kurikulum Merdeka Bahasa Inggris UTUH sudah ada di repo sejak lama:
+
+| `backend/seed_english.py` | Jumlah |
+|---|---|
+| Fase | A–F (Kelas 1–12) |
+| Elemen resmi | 3 — Menyimak–Berbicara, Membaca–Memirsa, Menulis–Mempresentasikan |
+| Capaian Pembelajaran | 18 |
+| Tujuan Pembelajaran | 72 |
+| Kompetensi | 144 |
+| Materi ajar | 144 |
+
+Lengkap dengan prasyarat yang dirantai vertikal: kompetensi ke-n pada elemen yang sama di
+kelas sebelumnya menjadi prasyarat kompetensi ke-n di kelas berikutnya. Endpointnya pun
+sudah ada: `POST /api/seed/english`, plus `GET /api/seed/english/status` yang sengaja
+terbuka tanpa kredensial.
+
+**Yang tidak pernah ada adalah pemanggilnya.** Nol antarmuka di seluruh klien menyentuh
+endpoint itu. Satu-satunya kurikulum yang pernah mendarat di MongoDB adalah demo Matematika
+11 kompetensi yang dijalankan otomatis `/seed/bootstrap` saat guru belum punya kelas.
+
+### Kelas cacat yang SUDAH pernah menghantam repo ini
+
+Bentuknya sama persis dengan token `FZG-` yang dicabut di PR #428: konsol menuntut sesuatu
+yang tidak punya antarmuka penerbit. Dua kali, dengan mekanisme berbeda, gejalanya identik —
+**kemampuan lengkap di satu sisi, nol jalan dari sisi yang lain**, dan tidak ada gerbang yang
+bisa melihatnya karena setiap sisinya benar kalau diperiksa sendiri-sendiri.
+
+Pelajaran yang bisa dipakai sesi lain: ketika menambah kemampuan di backend, pertanyaan
+"siapa yang memanggil ini?" adalah bagian dari pekerjaannya, bukan pekerjaan berikutnya.
+Endpoint tanpa pemanggil tidak pernah merah; ia hanya tidak pernah terjadi.
+
+Penjaganya sekarang `tests/curriculum-seed-reachable-test.js` — menuntut ketiga lapisnya
+bersama (endpoint, pengikat klien, kendali di konsol yang penangan aksinya benar-benar ada),
+dan ketiga mode kegagalannya dibuktikan merah lebih dulu, termasuk "tombol mati": kendali
+yang ada di layar tetapi tidak ditangani pengirim aksi.
+
+### Keputusan owner tentang bahasa isi kurikulum
+
+Ditanyakan hari ini dan dijawab tegas: **nama kompetensi dan Tujuan Pembelajaran di dalam
+bank kurikulum tetap berbahasa Indonesia saja** untuk sekarang; murid Thai belum memakai
+bagian ini.
+
+Ini keputusan sadar, bukan utang yang terlupakan, dan batasnya perlu dipegang sesi
+berikutnya: yang dikecualikan adalah ISI BANK (istilah Kurikulum Merdeka — regulasi
+Indonesia yang tidak diajarkan guru Thai). Naskah ANTARMUKA di sekitarnya tetap wajib dua
+bahasa penuh, dan itulah sebabnya `copy-id-kurikulum.js` + `copy-th-kurikulum.js` lahir
+berpasangan pada commit yang sama.
+
+Perlu diketahui kalau keputusan ini kelak ditinjau ulang: `misi.html` MENAMPILKAN nama
+kompetensi dan nama TP langsung ke murid (`learning-mission.js:202,218,220`). Jadi begitu
+murid Thai memakai jalur kurikulum, kekecualian ini berubah dari "tidak relevan" menjadi
+utang yang nyata.
+
+## m025-329 — mapel selain Inggris, dan dua utang yang menyertainya
+
+Owner meminta "lebih lengkap semua pelajaran, dan semua materi". Gelombang pertama masuk
+di `backend/seed_mapel.py` — Fase D (Kelas 7–9):
+
+| Mapel | Elemen | Kompetensi |
+|---|---|---|
+| Matematika | 5 | 32 |
+| Bahasa Indonesia | 4 | 24 |
+| Ilmu Pengetahuan Alam | 2 | 12 |
+| Ilmu Pengetahuan Sosial | 2 | 12 |
+| Pendidikan Pancasila | 4 | 24 |
+| **Total** | **17** | **104** |
+
+Mesinnya generik dan isinya tabel: menambah mapel berikutnya menambah DATA di `MAPEL`,
+bukan kode. Ini disengaja — versi per-mapel akan melahirkan sepuluh salinan logika
+penomoran id, perantaian prasyarat, dan pembuatan topik/materi.
+
+### Utang 1 — teks Capaian Pembelajaran BUKAN salinan resmi
+
+Rumusan CP di `seed_mapel.py` adalah rumusan yang **setia pada isinya**, bukan salinan
+verbatim Kepmendikbudristek. Ia ditulis agar bisa dipakai mengajar dan agar graf
+kompetensinya sah; ia TIDAK bisa dikutip sebagai dokumen resmi.
+
+Syarat pelunasannya jelas: begitu FIEZEL dipakai di luar kelas owner sendiri, teks CP
+wajib diganti salinan resmi dari dokumen Kemendikbud. Utang ini disebut di kepala berkasnya
+juga, supaya pembaca kode menemukannya tanpa harus membaca handoff lebih dulu.
+
+Catatan pembeda yang penting: penyemai Bahasa Inggris (`seed_english.py`) punya batas yang
+sama dan menyebutnya sebagai "ringkas, sesuai rumusan Kurikulum Merdeka". Jadi ini bukan
+kompromi baru — ia kompromi lama yang sekarang ditulis terang-terangan.
+
+### Utang 2 — kompetensi tanpa soal adalah pohon, bukan pelajaran
+
+Ini yang paling penting untuk sesi berikutnya, dan angkanya diukur bukan dikira:
+
+```
+kompetensi demo (seed.py)          :  11  ->  7 punya soal (21 soal)
+kompetensi Inggris (seed_english)  : 144  ->  0 punya soal
+kompetensi mapel  (seed_mapel)     : 104  ->  0 punya soal
+```
+
+Mesin belajar mengambil soal dari `db.questions`. Untuk 248 kompetensi itu banknya KOSONG,
+jadi murid bisa melihat strukturnya dan tidak bisa berlatih satu pun di atasnya.
+
+Dan generatornya tidak menyelamatkan: `POST /api/questions/generate-candidates` membuat
+VARIASI dari soal yang sudah ada. Kalau sebuah kompetensi belum punya soal sama sekali, ia
+jatuh ke cabang `else` dan menghasilkan satu soal esai generik ("Jelaskan dengan kalimatmu
+sendiri: …"). Berguna sebagai benih, bukan sebagai bank.
+
+Kesimpulan yang perlu dipegang sesi berikutnya: **menambah mata pelajaran tanpa menambah
+soal memperbesar pohon yang sama kosongnya.** Urutan yang benar adalah mengisi bank soal
+lebih dulu — itulah yang mengubah kurikulum dari struktur menjadi pelajaran.
+
+### m025-329 lanjutan — bank kurikulum lengkap Kelas 1–12, dan satu mapel yang SENGAJA ditahan
+
+Sesudah tiga gelombang, `seed_mapel.py` + `seed_english.py` berisi:
+
+| | Jumlah |
+|---|---|
+| Mata pelajaran | **18** |
+| Jenjang | Kelas 1–12 (Fase A–F) |
+| Tujuan Pembelajaran | 282 |
+| Kompetensi | **564** |
+| Materi ajar | **564** |
+
+Daftar kelas sengaja berbeda antar mapel, dan tiap perbedaannya adalah keputusan:
+
+* **IPAS** hanya Kelas 3–6 — di SMP ia pecah menjadi IPA dan IPS yang sudah ada, dan
+  Fase A tidak punya IPAS sebagai mapel terpisah.
+* **Fisika, Kimia, Biologi, Ekonomi, Sosiologi, Geografi** hanya Kelas 11–12 — di Fase E
+  muatannya masih menyatu sebagai IPA/IPS terpadu. Menambah Fisika Kelas 10 akan membuat
+  dua tempat mengajarkan hal yang sama dan cakupan kurikulum menghitungnya dua kali.
+* **Prakarya** mulai Kelas 7 — di SD muatan serupa menyatu dalam Seni Budaya dan IPAS.
+
+### PENDIDIKAN AGAMA: ditahan, menunggu keputusan owner
+
+Ia TIDAK ada di tabel, dan itu keputusan sadar yang perlu dihormati sesi berikutnya.
+Isinya berbeda untuk tiap agama (Islam, Kristen, Katolik, Hindu, Buddha, Khonghucu), dan
+menulis materi keagamaan tanpa arahan owner bukan keputusan yang boleh diambil penyemai —
+salah menulisnya bukan sekadar cacat data, ia menyinggung keyakinan murid.
+
+Yang dibutuhkan sebelum ia bisa ditambahkan: owner menyebut agama mana yang diajarkan di
+kelasnya, dan sebaiknya memeriksa sendiri rumusan CP-nya. Sampai itu ada, ketiadaannya
+adalah jawaban yang benar, bukan pekerjaan yang terlupakan.
+
+---
+
+## m025-330 — BANK SOAL: struktur berubah menjadi pelajaran
+
+Sesudah kurikulumnya lengkap, owner masih tidak bisa memakainya, dan sebabnya diukur
+bukan dikira:
+
+```
+kompetensi demo (seed.py)          :  11  ->  7 punya soal (21 soal)
+kompetensi Inggris (seed_english)  : 144  ->  0 punya soal
+kompetensi mapel  (seed_mapel)     : 420  ->  0 punya soal
+```
+
+Mesin belajar mengambil soal dari `db.questions`. Kompetensi tanpa soal adalah simpul yang
+bisa dilihat guru di pohon kurikulum dan TIDAK PERNAH bisa dilatih murid. Struktur lengkap
+tanpa bank soal adalah daftar isi tanpa bukunya.
+
+`POST /api/questions/generate-candidates` tidak menutup celah ini, dan itu bukan
+kekurangannya: ia membuat VARIASI dari soal yang sudah terbit. Kompetensi yang belum punya
+satu soal pun jatuh ke cabang `else` dan menghasilkan satu esai generik. Berguna sebagai
+benih sesudah ada isinya; tidak bisa menciptakan bank dari nol.
+
+Jadi soalnya ditulis. `backend/seed_soal.py`, sepuluh gelombang, **705 butir**:
+
+| Gelombang | Isi | Kompetensi |
+|---|---|---|
+| 1–8 | Bahasa Inggris Kelas 1–12 — TUNTAS | 144 |
+| 9 | Matematika Kelas 7 | 12 |
+| 10 | Matematika Kelas 8–9 | 20 |
+
+**392 kompetensi masih kosong**, seluruhnya mapel non-Inggris. Mesin, gerbang, dan bentuk
+butirnya sudah terbukti; yang tersisa menulis isinya.
+
+### Cara memverifikasi gelombang berikutnya — JANGAN dilewati
+
+Penyemai membuang duplikat berdasarkan `stem`. Artinya butir yang stem-nya kembar TIDAK
+PERNAH masuk basis data, tanpa satu pun galat dan tanpa satu pun gerbang merah. Terjadi
+sungguhan pada gelombang 2: tabel berisi 96 butir, yang masuk 95. Ditemukan HANYA karena
+jumlah di tabel dibandingkan dengan jumlah yang benar-benar masuk.
+
+Maka tiap gelombang diverifikasi terhadap MongoDB sungguhan dengan membandingkan keduanya:
+
+```
+di tabel 705 | masuk 705 | selisih 0 | kompetensi 176 | yatim []
+error: 0 | warn: 0
+```
+
+`selisih` harus nol. `yatim` (kompetensi yang belum ada di graf) harus kosong — penyemai
+menolak menulis soal yatim dan melaporkannya di `missing_competencies`, karena soal yang
+menunjuk kompetensi tak-ada masuk basis data, tidak pernah terambil sesi mana pun, dan
+tidak ada yang merah karenanya.
+
+### `norm_option()` — aturan opsi identik yang selama ini keliru untuk matematika
+
+`duplicate_options` di `questions.py` memakai `norm_stem()`, yang membuang SEMUA karakter
+bukan huruf/angka. Untuk identitas PERTANYAAN itu benar: "Hitunglah: -7 + 12" dan
+"Hitunglah -7 + 12" memang soal yang sama, dan penyemai yang dijalankan dua kali tidak
+boleh menggandakannya. Untuk OPSI JAWABAN aturan itu justru terbalik, karena persis di
+karakter itulah letak jawabannya:
+
+```
+5        vs  -5          beda TANDA
+x - 7    vs  x + 7       beda OPERASI
+40 cm    vs  40 cm²      beda DIMENSI (keliling vs luas)
+Lets go  vs  Let's go    beda EJAAN — dan itu yang diuji soal mekanika
+```
+
+Selama banknya hanya berisi bahasa Inggris, cacat ini tidak pernah terlihat. Gelombang
+Matematika langsung menabraknya sembilan kali. Peringatan yang selalu salah mengajari
+pembacanya mengabaikan peringatan, jadi yang diperbaiki aturannya, bukan soalnya:
+`norm_option()` hanya menyamakan SPASI.
+
+Kapital pun tidak disamakan, dan itu aturan yang sama sekali lagi. Rancangan pertama
+`norm_option()` masih menurunkan hurufnya, dan draf gelombang Bahasa Indonesia Kelas 1
+langsung menabraknya: pada "Penulisan nama diri yang benar adalah ...", pilihannya
+memang `Ani`, `ani`, `ANi`, `aNi` — huruf kapital itulah SELURUH isi soalnya. Ditemukan
+sebelum masuk repo karena drafnya diperiksa lebih dulu dengan aturan gerbangnya sendiri.
+Batasnya satu kalimat: **yang disamakan hanya yang tidak terlihat murid.** Spasi tidak
+terlihat; kapital, tanda baca, dan tanda minus terlihat.
+
+Gerbang `curriculum-seed-reachable` (kini **31 penegasan**) menjaga keduanya tetap satu
+aturan: ia menuntut `questions.py` tetap memakai `norm_option` untuk `duplicate_options`,
+menolak `norm_option` yang diam-diam kembali membuang non-alfanumerik, dan menolak
+`norm_option` yang kembali menurunkan huruf. Tanpa ketiganya, cacatnya bisa kembali lewat
+pintu lain sementara gerbangnya tetap hijau.
+
+### Bank demo dan bank isi tidak boleh menulis soal yang sama
+
+Dua butir gelombang 9 menulis ulang soal yang sudah ada di `seed.py`, hanya beda titik dua.
+Backend menandainya `duplicate_question`, dan benar: satu soal yang sama duduk di dua
+kompetensi, jadi murid yang sudah mengerjakannya di satu tempat mengerjakannya lagi di
+tempat lain seolah materi baru. Angkanya diganti, dan larangannya kini dijaga gerbang.
+
+### Utang yang dibawa gelombang berikutnya
+
+* 392 kompetensi belum bersoal — daftar lengkapnya bisa dibangkitkan ulang dengan
+  membandingkan `db.curriculum_nodes` (type `competency`) dengan
+  `db.questions.distinct("competency_id")`.
+* Pendidikan Agama tetap ditahan sesuai catatan m025-329 di atas; kompetensinya belum ada,
+  jadi soalnya pun belum bisa ditulis.

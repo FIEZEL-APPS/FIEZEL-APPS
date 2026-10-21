@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mochi Mascot - Modular Component Playground</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    body {
+      background: #0F1115;
+      color: #E2E4E9;
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 24px 16px 48px;
+      overflow-x: hidden;
+    }
+    .hero-title {
+      font-size: 24px;
+      font-weight: 800;
+      color: #FFFFFF;
+      letter-spacing: -0.5px;
+      margin-top: 12px;
+      text-align: center;
+    }
+    .hero-subtitle {
+      font-size: 13px;
+      color: #8C92A4;
+      margin-top: 4px;
+      text-align: center;
+      letter-spacing: 0.3px;
+    }
+    .stage {
+      position: relative;
+      width: 360px;
+      height: 340px;
+      margin: 12px auto 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: grab;
+    }
+    .stage:active {
+      cursor: grabbing;
+    }
+    canvas {
+      display: block;
+      width: 360px;
+      height: 340px;
+    }
+    .panel {
+      width: 100%;
+      max-width: 540px;
+      background: #171920;
+      border: 1px solid #232732;
+      border-radius: 20px;
+      padding: 20px;
+      margin-top: 16px;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
+    }
+    .section-title {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: #72798E;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .preset-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+    .btn-preset {
+      background: #202430;
+      border: 1px solid #2D3344;
+      color: #D2D6E2;
+      padding: 10px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-align: center;
+    }
+    .btn-preset:hover {
+      background: #2A3042;
+      border-color: #3F4760;
+      color: #FFFFFF;
+      transform: translateY(-2px);
+    }
+    .btn-preset.active {
+      background: #3B82F6;
+      border-color: #60A5FA;
+      color: #FFFFFF;
+      box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
+    }
+
+    .parts-container {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .part-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .part-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #A6ADBF;
+    }
+    .part-chips {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .chip {
+      background: #1F222B;
+      border: 1px solid #2C303E;
+      color: #9BA3B8;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .chip:hover {
+      background: #282C38;
+      color: #E2E4E9;
+    }
+    .chip.active {
+      background: #E2E8F0;
+      border-color: #FFFFFF;
+      color: #0F172A;
+      box-shadow: 0 2px 10px rgba(255, 255, 255, 0.2);
+    }
+    .code-box {
+      margin-top: 16px;
+      background: #0B0D11;
+      border: 1px solid #1E222D;
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-family: ui-monospace, monospace;
+      font-size: 11px;
+      color: #7DD3FC;
+      overflow-x: auto;
+      line-height: 1.5;
+    }
+    .hint-text {
+      margin-top: 12px;
+      font-size: 12px;
+      color: #6E7589;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="hero-title">Mochi Mascot System</div>
+  <div class="hero-subtitle">Bongkar-Pasang Modular Asset untuk PWA Fiezel</div>
+
+  <div class="stage" id="stage"></div>
+
+  <div class="panel">
+    <div class="section-title">
+      <span>⚡ Skenario Preset PWA</span>
+    </div>
+    <div class="preset-grid">
+      <button class="btn-preset active" onclick="applyPreset('welcome', this)">1. Welcome (Wink)</button>
+      <button class="btn-preset" onclick="applyPreset('thinking_purple', this)">2. AI Thinking (...)</button>
+      <button class="btn-preset" onclick="applyPreset('universe', this)">3. Orbit Kurikulum</button>
+      <button class="btn-preset" onclick="applyPreset('alert', this)">4. Alert Review (!)</button>
+      <button class="btn-preset" onclick="applyPreset('celebrate', this)">5. Streak Juara (★)</button>
+      <button class="btn-preset" onclick="applyPreset('love', this)">6. Selesai Misi (♥)</button>
+    </div>
+
+    <div class="section-title">
+      <span>🧩 Bongkar-Pasang Komponen (Parts Library)</span>
+    </div>
+    <div class="parts-container">
+
+      <!-- Mata / Mood -->
+      <div class="part-group">
+        <div class="part-label">1. Ekspresi Wajah (Mata)</div>
+        <div class="part-chips" id="moodChips">
+          <button class="chip" data-mood="dots" onclick="selectMood('dots')">Dots (Netral)</button>
+          <button class="chip active" data-mood="wink" onclick="selectMood('wink')">Wink (Kedip)</button>
+          <button class="chip" data-mood="happy" onclick="selectMood('happy')">Happy (^ ^)</button>
+          <button class="chip" data-mood="hearts" onclick="selectMood('hearts')">Hearts (Hati)</button>
+          <button class="chip" data-mood="sleepy" onclick="selectMood('sleepy')">Sleepy (Tidur)</button>
+        </div>
+      </div>
+
+      <!-- Badge -->
+      <div class="part-group">
+        <div class="part-label">2. Badge Kepala (Status)</div>
+        <div class="part-chips" id="badgeChips">
+          <button class="chip active" data-badge="null" onclick="selectBadge(null)">Tanpa Badge</button>
+          <button class="chip" data-badge="chat_purple" onclick="selectBadge('chat_purple')">Chat Ungu (...)</button>
+          <button class="chip" data-badge="chat_blue" onclick="selectBadge('chat_blue')">Chat Biru (...)</button>
+          <button class="chip" data-badge="alert" onclick="selectBadge('alert')">Alert Oranye (!)</button>
+          <button class="chip" data-badge="online" onclick="selectBadge('online')">Online Hijau (●)</button>
+        </div>
+      </div>
+
+      <!-- Efek Partikel -->
+      <div class="part-group">
+        <div class="part-label">3. Efek Partikel / Latar</div>
+        <div class="part-chips" id="fxChips">
+          <button class="chip active" data-fx="null" onclick="selectFx(null)">Tanpa Partikel</button>
+          <button class="chip" data-fx="orbit" onclick="selectFx('orbit')">Stardust Orbit Ring</button>
+          <button class="chip" data-fx="stars" onclick="selectFx('stars')">Sparkle Stars (★)</button>
+          <button class="chip" data-fx="hearts" onclick="selectFx('hearts')">Floating Hearts (♥)</button>
+        </div>
+      </div>
+
+      <!-- Tangan Mochi -->
+      <div class="part-group">
+        <div class="part-label">5. Tangan Bulat Mochi (Hands)</div>
+        <div class="part-chips" id="handsChips">
+          <button class="chip active" data-hands="false" onclick="toggleHands(false)">Sembunyikan Tangan</button>
+          <button class="chip" data-hands="true" onclick="toggleHands(true)">Tampilkan Tangan Bulat (o_o)</button>
+        </div>
+      </div>
+      <div class="part-group">
+        <div class="part-label">4. Ambient Aura Glow</div>
+        <div class="part-chips" id="auraChips">
+          <button class="chip active" data-aura="null" onclick="selectAura(null)">Off</button>
+          <button class="chip" data-aura="purple" onclick="selectAura('purple')">Ungu</button>
+          <button class="chip" data-aura="blue" onclick="selectAura('blue')">Biru</button>
+          <button class="chip" data-aura="amber" onclick="selectAura('amber')">Amber/Emas</button>
+          <button class="chip" data-aura="green" onclick="selectAura('green')">Hijau</button>
+          <button class="chip" data-aura="pink" onclick="selectAura('pink')">Pink</button>
+        </div>
+      </div>
+
+      <!-- Telinga Rubah -->
+      <div class="part-group">
+        <div class="part-label">5. Telinga Rubah (Fox Ears)</div>
+        <div class="part-chips" id="earsChips">
+          <button class="chip active" data-ears="true" onclick="toggleEars(true)">Pasang Telinga Rubah</button>
+          <button class="chip" data-ears="false" onclick="toggleEars(false)">Lepas Telinga</button>
+        </div>
+      </div>
+
+      <!-- Ekor Kucing Fluffy -->
+      <div class="part-group">
+        <div class="part-label">6. Ekor Kucing Fluffy (Cat Tail)</div>
+        <div class="part-chips" id="tailChips">
+          <button class="chip active" data-tail="true" onclick="toggleTail(true)">Pasang Ekor Kucing</button>
+          <button class="chip" data-tail="false" onclick="toggleTail(false)">Lepas Ekor</button>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="code-box" id="codeSnippet">
+      // Cara pasang di layar PWA Fiezel:<br>
+      const mochi = new FiezelMochi('#canvas');<br>
+      mochi.preset('welcome');
+    </div>
+
+    <div class="hint-text">
+      Sentuh atau klik Mochi untuk melihat reaksi getaran kenyal dan pelacakan mata interaktif!
+    </div>
+  </div>
+
+  <script type="module">
+    import { FiezelMochi } from './fiezel-mochi.js';
+
+    const mochi = new FiezelMochi('#stage', {
+      width: 360,
+      height: 340,
+      mood: 'wink'
+    });
+
+    // Expose helpers to window for button clicks
+    window.mochi = mochi;
+
+    window.applyPreset = (name, btn) => {
+      document.querySelectorAll('.btn-preset').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      mochi.preset(name);
+      syncChips();
+      updateCodeSnippet();
+    };
+
+    window.selectMood = (m) => {
+      mochi.setMood(m);
+      syncChips();
+      updateCodeSnippet();
+    };
+
+    window.selectBadge = (b) => {
+      mochi.setBadge(b);
+      syncChips();
+      updateCodeSnippet();
+    };
+
+    window.selectFx = (f) => {
+      mochi.setFx(f);
+      syncChips();
+      updateCodeSnippet();
+    };
+
+    window.selectAura = (a) => {
+      mochi.setAura(a);
+      syncChips();
+      updateCodeSnippet();
+    };
+
+    window.toggleHands = (show) => {
+      mochi.setHands(show);
+      syncChips();
+      updateCodeSnippet();
+    };
+
+    window.toggleEars = (show) => {
+      mochi.setEars(show);
+      syncChips();
+      updateCodeSnippet();
+    };
+
+    window.toggleTail = (show) => {
+      mochi.setTail(show);
+      syncChips();
+      updateCodeSnippet();
+    };
+
+    function syncChips() {
+      // Clear all active presets if custom chips clicked
+      updateActiveChip('#moodChips', mochi.mood);
+      updateActiveChip('#badgeChips', String(mochi.badge));
+      updateActiveChip('#fxChips', String(mochi.fx));
+      updateActiveChip('#auraChips', String(mochi.aura));
+      updateActiveChip('#handsChips', String(mochi.showHands));
+      updateActiveChip('#earsChips', String(mochi.showEars));
+      updateActiveChip('#tailChips', String(mochi.showTail));
+    }
+
+    function updateActiveChip(containerSelector, value) {
+      const container = document.querySelector(containerSelector);
+      if (!container) return;
+      container.querySelectorAll('.chip').forEach(chip => {
+        const key = chip.dataset.mood || chip.dataset.badge || chip.dataset.fx || chip.dataset.aura || chip.dataset.hands || chip.dataset.ears || chip.dataset.tail;
+        if (key === value) {
+          chip.classList.add('active');
+        } else {
+          chip.classList.remove('active');
+        }
+      });
+    }
+
+    function updateCodeSnippet() {
+      const snippet = `// Kode Pasang di PWA Fiezel:\nconst mochi = new FiezelMochi('#canvas');\nmochi.setMood('${mochi.mood}');\nmochi.setBadge(${mochi.badge ? `'${mochi.badge}'` : 'null'});\nmochi.setFx(${mochi.fx ? `'${mochi.fx}'` : 'null'});\nmochi.setAura(${mochi.aura ? `'${mochi.aura}'` : 'null'});`;
+      document.getElementById('codeSnippet').innerText = snippet;
+    }
+  </script>
+</body>
+</html>

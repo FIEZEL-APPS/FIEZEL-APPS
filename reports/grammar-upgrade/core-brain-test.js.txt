@@ -1,0 +1,2 @@
+FIEZEL core brain: PASS
+{"unifiedWorker":true,"coreOnlyAI":true,"serverOwnedModel":true,"rateGuard":true,"authenticatedAI":true,"genAlphaTone":true,"guardedAutonomy":true,"contentQa":true}

@@ -1,0 +1,1202 @@
+{
+  "schema": "fiezel-grammar-new-templates-v1",
+  "newLabels": {},
+  "templates": [
+    {
+      "id": "GI-203",
+      "family": "gerunds_infinitives",
+      "subskill": "verb_pattern_try_meaning_change",
+      "cefr": "B2",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Use 'try to + verb' for making an effort at something hard.",
+        "misconception": "Learner uses 'try -ing' (test a method) when the meaning is a difficult attempt.",
+        "reasoning": "identify a hard effort rather than an experiment -> select try + to-infinitive",
+        "stem": "The box was heavy, but I tried ___ it alone. I couldn't.",
+        "options": [
+          "to lift",
+          "lifting",
+          "lift",
+          "having lifted"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "lifting",
+            "misconception": "@sibling:0",
+            "whyFails": "'Try lifting' means testing lifting as one method; here the speaker struggled and failed at the effort."
+          },
+          {
+            "option": "lift",
+            "misconception": "@sibling:1",
+            "whyFails": "A bare verb cannot follow 'try'."
+          },
+          {
+            "option": "having lifted",
+            "misconception": "@sibling:2",
+            "whyFails": "A perfect gerund says the lifting is already done, which contradicts 'I couldn't'."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "Lifting the box was a hard effort that failed, so 'tried to lift' is the meaning needed.",
+          "rule": "Try + to-infinitive = make an effort (hard); try + -ing = test a method to see if it works.",
+          "whyOthersFail": "'Lifting' is the experiment meaning, 'lift' is bare, and 'having lifted' says it already happened.",
+          "howToAvoid": "Was it difficult and maybe impossible? Then 'try to'.",
+          "memoryCue": "Tried to lift (effort) vs. try restarting (method)."
+        }
+      },
+      "id_": {
+        "objective": "Pakai “try to + kata kerja” buat usaha keras ngelakuin sesuatu yang sulit.",
+        "misconception": "Kamu pakai “try -ing” (nyoba satu cara), padahal maknanya usaha yang sulit.",
+        "reasoning": "kenali ini usaha keras, bukan percobaan cara → pilih try + to-infinitive",
+        "rule": "Try + to-infinitive = berusaha (sulit). Try + -ing = nyoba satu cara buat lihat hasilnya.",
+        "whyCorrect": "Ngangkat kotaknya usaha keras yang gagal, jadi “tried to lift” maknanya yang dibutuhin.",
+        "whyOthersFail": "“Lifting” makna percobaan cara. “Lift” polos. “Having lifted” bilang udah terjadi.",
+        "howToAvoid": "Sulit dan mungkin nggak bisa? Pakai “try to”.",
+        "memoryCue": "Tried to lift (usaha) vs. try restarting (cara).",
+        "distractors": {
+          "lifting": {
+            "misconception": "@sibling:0",
+            "whyFails": "“try lifting” artinya nyoba ngangkat sebagai salah satu cara. Di sini pembicaranya berusaha keras dan gagal."
+          },
+          "lift": {
+            "misconception": "@sibling:1",
+            "whyFails": "kata kerja polos nggak bisa ngikut “try”."
+          },
+          "having lifted": {
+            "misconception": "@sibling:2",
+            "whyFails": "perfect gerund bilang ngangkatnya udah selesai, bertentangan sama “I couldn't”."
+          }
+        }
+      },
+      "th": {
+        "objective": "ใช้ 'try to + คำกริยา' กับการพยายามทำสิ่งที่ยาก",
+        "misconception": "ผู้เรียนใช้ 'try -ing' (ทดลองวิธี) ทั้งที่ความหมายคือความพยายามที่ยากลำบาก",
+        "reasoning": "ระบุว่าเป็นความพยายามที่ยาก ไม่ใช่การทดลอง → เลือก try + to-infinitive",
+        "rule": "Try + to-infinitive = พยายาม (ยาก); try + -ing = ทดลองวิธีดูว่าได้ผลไหม",
+        "whyCorrect": "การยกกล่องเป็นความพยายามที่ยากและล้มเหลว จึงต้องใช้ 'tried to lift'",
+        "whyOthersFail": "'lifting' คือความหมายแบบทดลอง 'lift' เป็นรูปเปล่า ส่วน 'having lifted' บอกว่าเกิดขึ้นแล้ว",
+        "howToAvoid": "ยากและอาจทำไม่ได้ใช่ไหม? ถ้าใช่ ใช้ 'try to'",
+        "memoryCue": "Tried to lift (พยายาม) vs. try restarting (วิธี)",
+        "distractors": {
+          "lifting": {
+            "misconception": "@sibling:0",
+            "whyFails": "'try lifting' หมายถึงทดลองยกเป็นวิธีหนึ่ง แต่ตรงนี้ผู้พูดพยายามอย่างหนักและล้มเหลว"
+          },
+          "lift": {
+            "misconception": "@sibling:1",
+            "whyFails": "คำกริยารูปเปล่าตามหลัง 'try' ไม่ได้"
+          },
+          "having lifted": {
+            "misconception": "@sibling:2",
+            "whyFails": "perfect gerund บอกว่ายกเสร็จแล้ว ซึ่งขัดกับ 'I couldn't'"
+          }
+        }
+      }
+    },
+    {
+      "id": "MO-203",
+      "family": "modals",
+      "subskill": "modal_perfect_could_have_missed_opportunity",
+      "cefr": "B2",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Use 'could have + past participle' for a past chance that was not taken.",
+        "misconception": "Learner uses 'should have' (criticism) or a present modal for a missed past opportunity.",
+        "reasoning": "identify a past chance that was not taken -> select could have + past participle -> avoid criticism forms",
+        "stem": "We ___ the early train, but we chose to sleep in. No regrets!",
+        "options": [
+          "could have caught",
+          "should have caught",
+          "can catch",
+          "were able to catch"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "should have caught",
+            "misconception": "@sibling:0",
+            "whyFails": "'Should have' criticises a mistake, but the speaker says 'no regrets'."
+          },
+          {
+            "option": "were able to catch",
+            "misconception": "@sibling:1",
+            "whyFails": "'Were able to' reports that we actually caught it — we did not."
+          },
+          {
+            "option": "can catch",
+            "misconception": "@sibling:2",
+            "whyFails": "'Can' is present; the missed train is in the past."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "Catching the train was possible but did not happen, and there is no criticism, so 'could have caught' fits.",
+          "rule": "Could have + past participle = a past possibility that was not used; should have = criticism.",
+          "whyOthersFail": "'Should have' blames, 'were able to' says it happened, and 'can' is not past.",
+          "howToAvoid": "Ask: possible but not done, and no blame? Then 'could have'.",
+          "memoryCue": "Could have, but didn't."
+        }
+      },
+      "id_": {
+        "objective": "Pakai “could have + past participle” buat kesempatan lampau yang nggak diambil.",
+        "misconception": "Kamu pakai “should have” (kritik) atau modal sekarang buat kesempatan lampau yang kelewat.",
+        "reasoning": "kenali kesempatan lampau yang nggak diambil → pilih could have + past participle → hindari bentuk kritik",
+        "rule": "Could have + past participle = kemungkinan lampau yang nggak dipakai. Should have = kritik.",
+        "whyCorrect": "Ngejar keretanya mungkin tapi nggak terjadi, dan nggak ada kritik, jadi “could have caught” pas.",
+        "whyOthersFail": "“Should have” nyalahin. “Were able to” bilang itu terjadi. “Can” bukan lampau.",
+        "howToAvoid": "Tanya: mungkin tapi nggak dilakuin, dan nggak ada yang disalahin? Pakai “could have”.",
+        "memoryCue": "Could have, tapi nggak.",
+        "distractors": {
+          "should have caught": {
+            "misconception": "@sibling:0",
+            "whyFails": "“should have” ngeritik kesalahan, padahal pembicaranya bilang “no regrets”."
+          },
+          "were able to catch": {
+            "misconception": "@sibling:1",
+            "whyFails": "“were able to” laporin kita beneran ngejar keretanya — padahal nggak."
+          },
+          "can catch": {
+            "misconception": "@sibling:2",
+            "whyFails": "“can” bentuk sekarang. Kereta yang kelewat itu di masa lampau."
+          }
+        }
+      },
+      "th": {
+        "objective": "ใช้ 'could have + past participle' กับโอกาสในอดีตที่ไม่ได้คว้าไว้",
+        "misconception": "ผู้เรียนใช้ 'should have' (ตำหนิ) หรือ modal ปัจจุบันกับโอกาสในอดีตที่พลาดไป",
+        "reasoning": "ระบุโอกาสในอดีตที่ไม่ได้คว้า → เลือก could have + past participle → เลี่ยงรูปที่ใช้ตำหนิ",
+        "rule": "Could have + past participle = ความเป็นไปได้ในอดีตที่ไม่ได้ใช้; should have = การตำหนิ",
+        "whyCorrect": "การขึ้นรถไฟเป็นไปได้แต่ไม่ได้เกิดขึ้น และไม่มีการตำหนิ 'could have caught' จึงเหมาะ",
+        "whyOthersFail": "'should have' กล่าวโทษ 'were able to' บอกว่าเกิดขึ้นจริง ส่วน 'can' ไม่ใช่อดีต",
+        "howToAvoid": "ถามว่าเป็นไปได้แต่ไม่ได้ทำ และไม่โทษใครใช่ไหม ถ้าใช่ 'could have'",
+        "memoryCue": "Could have แต่ไม่ได้ทำ",
+        "distractors": {
+          "should have caught": {
+            "misconception": "@sibling:0",
+            "whyFails": "'should have' ตำหนิความผิดพลาด แต่ผู้พูดบอกว่า 'no regrets'"
+          },
+          "were able to catch": {
+            "misconception": "@sibling:1",
+            "whyFails": "'were able to' รายงานว่าเราขึ้นรถไฟทันจริง ๆ — แต่เราไม่ได้ขึ้น"
+          },
+          "can catch": {
+            "misconception": "@sibling:2",
+            "whyFails": "'can' เป็นปัจจุบัน แต่รถไฟที่พลาดอยู่ในอดีต"
+          }
+        }
+      }
+    },
+    {
+      "id": "AR-203",
+      "family": "articles_determiners",
+      "subskill": "zero_article_with_proper_nouns_exceptions_the_netherlands",
+      "cefr": "B2",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Use 'the' with a plural country name like 'the Philippines'.",
+        "misconception": "Learner applies the no-article rule for country names to plural or descriptive names.",
+        "reasoning": "identify a plural country name -> recall the exception -> select the",
+        "stem": "My aunt works as a nurse in ___ Philippines.",
+        "options": [
+          "the",
+          "a",
+          "an",
+          "[no article]"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "a",
+            "misconception": "@sibling:0",
+            "whyFails": "A country name is not a countable noun that takes 'a'."
+          },
+          {
+            "option": "an",
+            "misconception": "@sibling:1",
+            "whyFails": "'An' is chosen by the following vowel sound, but no indefinite article fits a country name."
+          },
+          {
+            "option": "[no article]",
+            "misconception": "@sibling:2",
+            "whyFails": "Most countries take no article, but plural names like the Philippines and the Netherlands need 'the'."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "'Philippines' is a plural country name, so it takes 'the': the Philippines.",
+          "rule": "Zero article for most countries (Japan, Indonesia); 'the' for plural or descriptive names (the Philippines, the United States, the UK).",
+          "whyOthersFail": "'A' and 'an' never go with country names, and zero article ignores the plural-name exception.",
+          "howToAvoid": "Does the country name end in -s or contain a word like States/Kingdom/Republic? Use 'the'.",
+          "memoryCue": "The Philippines, the Netherlands, the USA."
+        }
+      },
+      "id_": {
+        "objective": "Pakai “the” sama nama negara jamak kayak “the Philippines”.",
+        "misconception": "Kamu nerapin aturan tanpa artikel buat nama negara ke nama yang jamak atau deskriptif.",
+        "reasoning": "kenali nama negara jamak → ingat pengecualiannya → pilih the",
+        "rule": "Tanpa artikel buat kebanyakan negara (Japan, Indonesia). “The” buat nama jamak atau deskriptif (the Philippines, the United States, the UK).",
+        "whyCorrect": "“Philippines” nama negara jamak, jadi pakai “the”: the Philippines.",
+        "whyOthersFail": "“A” dan “an” nggak pernah dipakai sama nama negara. Tanpa artikel ngabaikan pengecualian nama jamak.",
+        "howToAvoid": "Nama negaranya berakhiran -s atau ada kata kayak States/Kingdom/Republic? Pakai “the”.",
+        "memoryCue": "Nama negara jamak pakai “the”: “the Philippines”, “the Netherlands”.",
+        "distractors": {
+          "a": {
+            "misconception": "@sibling:0",
+            "whyFails": "nama negara bukan kata benda yang bisa dihitung pakai “a”."
+          },
+          "an": {
+            "misconception": "@sibling:1",
+            "whyFails": "“an” dipilih dari bunyi vokal sesudahnya, tapi artikel tak tentu mana pun nggak cocok buat nama negara."
+          },
+          "[no article]": {
+            "misconception": "@sibling:2",
+            "whyFails": "kebanyakan negara tanpa artikel, tapi nama jamak kayak the Philippines dan the Netherlands butuh “the”."
+          }
+        }
+      },
+      "th": {
+        "objective": "ใช้ 'the' กับชื่อประเทศรูปพหูพจน์อย่าง 'the Philippines'",
+        "misconception": "ผู้เรียนใช้กฎไม่มีคำนำหน้านามสำหรับชื่อประเทศกับชื่อที่เป็นพหูพจน์หรือเชิงบรรยาย",
+        "reasoning": "ระบุชื่อประเทศรูปพหูพจน์ → นึกถึงข้อยกเว้น → เลือก the",
+        "rule": "ไม่มีคำนำหน้านามกับประเทศส่วนใหญ่ (Japan, Indonesia); ใช้ 'the' กับชื่อพหูพจน์หรือเชิงบรรยาย (the Philippines, the United States, the UK)",
+        "whyCorrect": "'Philippines' เป็นชื่อประเทศรูปพหูพจน์ จึงใช้ 'the': the Philippines",
+        "whyOthersFail": "'a' และ 'an' ไม่เคยใช้กับชื่อประเทศ ส่วนการไม่ใส่คำนำหน้านามละเลยข้อยกเว้นของชื่อพหูพจน์",
+        "howToAvoid": "ชื่อประเทศลงท้ายด้วย -s หรือมีคำอย่าง States/Republic ไหม? ใช้ 'the'",
+        "memoryCue": "ชื่อประเทศพหูพจน์ใช้ 'the': the Philippines, the Netherlands",
+        "distractors": {
+          "a": {
+            "misconception": "@sibling:0",
+            "whyFails": "ชื่อประเทศไม่ใช่คำนามนับได้ที่ใช้กับ 'a'"
+          },
+          "an": {
+            "misconception": "@sibling:1",
+            "whyFails": "'an' เลือกตามเสียงสระที่ตามมา แต่ไม่มีคำนำหน้านามไม่เจาะจงใดเข้ากับชื่อประเทศ"
+          },
+          "[no article]": {
+            "misconception": "@sibling:2",
+            "whyFails": "ประเทศส่วนใหญ่ไม่ใช้คำนำหน้านาม แต่ชื่อพหูพจน์อย่าง the Philippines และ the Netherlands ต้องใช้ 'the'"
+          }
+        }
+      }
+    },
+    {
+      "id": "PR-202",
+      "family": "prepositions",
+      "subskill": "dependent_preposition_after_noun_reason_for_solution_to",
+      "cefr": "B2",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Use 'for' after the noun 'reason'.",
+        "misconception": "Learner attaches 'of' or another preposition to 'reason' by analogy with similar nouns.",
+        "reasoning": "identify the noun reason -> recall its fixed preposition -> select for",
+        "stem": "Nobody knows the reason ___ his sudden decision to leave.",
+        "options": [
+          "for",
+          "of",
+          "to",
+          "about"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "of",
+            "misconception": "@sibling:1",
+            "whyFails": "'Of' feels natural because it links many nouns, but 'reason' takes 'for'."
+          },
+          {
+            "option": "to",
+            "misconception": "@sibling:0",
+            "whyFails": "'To' belongs to 'solution to' or 'answer to', not to 'reason'."
+          },
+          {
+            "option": "about",
+            "misconception": "@sibling:2",
+            "whyFails": "'About' introduces a topic; 'reason' needs the cause marker 'for'."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "The noun 'reason' is always followed by 'for': the reason for his decision.",
+          "rule": "Fixed noun + preposition pairs: reason for, solution to, answer to, effect on.",
+          "whyOthersFail": "'Of' is a default guess, 'to' belongs to other nouns, and 'about' introduces a topic rather than a cause.",
+          "howToAvoid": "Store the noun and its preposition as one chunk: reason for.",
+          "memoryCue": "Reason for, solution to."
+        }
+      },
+      "id_": {
+        "objective": "Pakai “for” sesudah kata benda “reason”.",
+        "misconception": "Kamu nempelin “of” atau kata depan lain ke “reason” karena niru kata benda yang mirip.",
+        "reasoning": "kenali kata benda reason → ingat kata depan tetapnya → pilih for",
+        "rule": "Pasangan tetap kata benda + kata depan: reason for, solution to, answer to, effect on.",
+        "whyCorrect": "Kata benda “reason” selalu diikuti “for”: the reason for his decision.",
+        "whyOthersFail": "“Of” tebakan bawaan. “To” punya kata benda lain. “About” ngenalin topik, bukan sebab.",
+        "howToAvoid": "Simpan kata benda sama kata depannya sebagai satu paket: reason for.",
+        "memoryCue": "Reason for, solution to.",
+        "distractors": {
+          "of": {
+            "misconception": "@sibling:1",
+            "whyFails": "“of” kerasa wajar karena nyambungin banyak kata benda, tapi “reason” pakai “for”."
+          },
+          "to": {
+            "misconception": "@sibling:0",
+            "whyFails": "“to” punya “solution to” atau “answer to”, bukan “reason”."
+          },
+          "about": {
+            "misconception": "@sibling:2",
+            "whyFails": "“about” ngenalin topik. “Reason” butuh penanda sebab “for”."
+          }
+        }
+      },
+      "th": {
+        "objective": "ใช้ 'for' หลังคำนาม 'reason'",
+        "misconception": "ผู้เรียนติด 'of' หรือบุพบทอื่นเข้ากับ 'reason' โดยเทียบกับคำนามคล้ายกัน",
+        "reasoning": "ระบุคำนาม reason → นึกถึงบุพบทคู่ประจำ → เลือก for",
+        "rule": "คู่คำนาม + บุพบทตายตัว: reason for, solution to, answer to, effect on",
+        "whyCorrect": "คำนาม 'reason' ตามด้วย 'for' เสมอ: the reason for his decision",
+        "whyOthersFail": "'of' เป็นการเดาแบบตั้งต้น 'to' เป็นของคำนามอื่น ส่วน 'about' นำหัวข้อ ไม่ใช่สาเหตุ",
+        "howToAvoid": "เก็บคำนามพร้อมบุพบทเป็นก้อนเดียว: reason for",
+        "memoryCue": "Reason for, solution to — จำคำนามคู่กับบุพบท",
+        "distractors": {
+          "of": {
+            "misconception": "@sibling:1",
+            "whyFails": "'of' ดูเป็นธรรมชาติเพราะเชื่อมคำนามได้หลายคำ แต่ 'reason' ใช้ 'for'"
+          },
+          "to": {
+            "misconception": "@sibling:0",
+            "whyFails": "'to' เป็นของ 'solution to' หรือ 'answer to' ไม่ใช่ 'reason'"
+          },
+          "about": {
+            "misconception": "@sibling:2",
+            "whyFails": "'about' นำหัวข้อ ส่วน 'reason' ต้องใช้ตัวบอกสาเหตุ 'for'"
+          }
+        }
+      }
+    },
+    {
+      "id": "CM-205",
+      "family": "comparison",
+      "subskill": "superlative_with_ever_present_perfect_combination",
+      "cefr": "B2",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Pair a superlative with 'have ever + past participle'.",
+        "misconception": "Learner uses the past simple or repeats 'have' without a participle after a superlative + ever.",
+        "reasoning": "identify superlative + ever -> select the present perfect -> apply have + past participle",
+        "stem": "That was the funniest film I ___ ever ___.",
+        "options": [
+          "have; seen",
+          "had; saw",
+          "have; see",
+          "did; see"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "had; saw",
+            "misconception": "@sibling:0",
+            "whyFails": "After superlative + ever the fixed pattern is present perfect, not past forms."
+          },
+          {
+            "option": "have; see",
+            "misconception": "@sibling:1",
+            "whyFails": "'Have' needs the past participle 'seen', not the base 'see'."
+          },
+          {
+            "option": "did; see",
+            "misconception": "@sibling:2",
+            "whyFails": "'Did' is past simple; it does not combine with 'ever' after a superlative."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "Superlative + 'ever' takes the present perfect: the funniest film I have ever seen.",
+          "rule": "The + superlative + (that) + subject + have/has ever + past participle.",
+          "whyOthersFail": "'Had; saw' and 'did; see' use past forms, and 'have; see' lacks the participle.",
+          "howToAvoid": "Hear 'the -est … ever'? Finish with have/has + participle.",
+          "memoryCue": "The best I have ever seen."
+        }
+      },
+      "id_": {
+        "objective": "Pasangin bentuk paling sama “have ever + past participle”.",
+        "misconception": "Kamu pakai past simple atau ngulang “have” tanpa participle sesudah bentuk paling + ever.",
+        "reasoning": "kenali bentuk paling + ever → pilih present perfect → terapin have + past participle",
+        "rule": "The + bentuk paling + (that) + subjek + have/has ever + past participle.",
+        "whyCorrect": "Bentuk paling + “ever” pakai present perfect: the funniest film I have ever seen.",
+        "whyOthersFail": "“Had; saw” dan “did; see” pakai bentuk lampau. “Have; see” kurang participle.",
+        "howToAvoid": "Denger “the -est … ever”? Tutup pakai have/has + participle.",
+        "memoryCue": "Bentuk paling plus “ever” selalu ketemu present perfect: “the best I have ever seen”.",
+        "distractors": {
+          "had; saw": {
+            "misconception": "@sibling:0",
+            "whyFails": "sesudah bentuk paling + ever, pola tetapnya present perfect, bukan bentuk lampau."
+          },
+          "have; see": {
+            "misconception": "@sibling:1",
+            "whyFails": "“have” butuh past participle “seen”, bukan “see” polos."
+          },
+          "did; see": {
+            "misconception": "@sibling:2",
+            "whyFails": "“did” past simple. Nggak bisa digabung sama “ever” sesudah bentuk paling."
+          }
+        }
+      },
+      "th": {
+        "objective": "จับคู่ขั้นสูงสุดกับ 'have ever + past participle'",
+        "misconception": "ผู้เรียนใช้ past simple หรือใช้ 'have' ซ้ำโดยไม่มี participle หลังขั้นสูงสุด + ever",
+        "reasoning": "ระบุขั้นสูงสุด + ever → เลือก present perfect → ใช้ have + past participle",
+        "rule": "The + ขั้นสูงสุด + (that) + ประธาน + have/has ever + past participle",
+        "whyCorrect": "ขั้นสูงสุด + 'ever' ใช้ present perfect: the funniest film I have ever seen",
+        "whyOthersFail": "'had; saw' และ 'did; see' ใช้รูปอดีต ส่วน 'have; see' ขาด participle",
+        "howToAvoid": "ได้ยิน 'the -est … ever'? ปิดท้ายด้วย have/has + participle",
+        "memoryCue": "ขั้นสูงสุดบวก 'ever' ต้องเจอ present perfect เสมอ: 'the best I have ever seen'",
+        "distractors": {
+          "had; saw": {
+            "misconception": "@sibling:0",
+            "whyFails": "หลังขั้นสูงสุด + ever แบบแผนตายตัวคือ present perfect ไม่ใช่รูปอดีต"
+          },
+          "have; see": {
+            "misconception": "@sibling:1",
+            "whyFails": "'have' ต้องใช้ past participle 'seen' ไม่ใช่ 'see' รูปพื้นฐาน"
+          },
+          "did; see": {
+            "misconception": "@sibling:2",
+            "whyFails": "'did' เป็น past simple ใช้ร่วมกับ 'ever' หลังขั้นสูงสุดไม่ได้"
+          }
+        }
+      }
+    },
+    {
+      "id": "EC-205",
+      "family": "error_correction",
+      "subskill": "parallel_structure_error_correction",
+      "cefr": "B2",
+      "questionType": "error_correction",
+      "en": {
+        "objective": "Keep all items in a list in the same to-infinitive form.",
+        "misconception": "Learner mixes infinitives and gerunds in one list.",
+        "reasoning": "identify the list -> check that every item has the same form -> convert the odd item to match",
+        "stem": "Which sentence has correct parallel structure? \"She wants to travel, learning languages, and to meet new people.\"",
+        "options": [
+          "She wants to travel, learn languages, and meet new people.",
+          "She wants to travel, learning languages, and meeting new people.",
+          "She wants travelling, learn languages, and to meet new people.",
+          "She wants to travel, learning languages, and to meet new people."
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "She wants to travel, learning languages, and meeting new people.",
+            "misconception": "@sibling:0",
+            "whyFails": "It fixes only the last item; 'to travel' and 'learning' still clash."
+          },
+          {
+            "option": "She wants travelling, learn languages, and to meet new people.",
+            "misconception": "@sibling:1",
+            "whyFails": "It changes the first item and leaves three different forms."
+          },
+          {
+            "option": "She wants to travel, learning languages, and to meet new people.",
+            "misconception": "@sibling:2",
+            "whyFails": "This is the original sentence with the error untouched."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "All three items share one 'to': to travel, (to) learn, and (to) meet — the same form throughout.",
+          "rule": "Parallel structure: items in a list must use the same grammatical form.",
+          "whyOthersFail": "Two options still mix -ing with infinitives, and one is the unedited original.",
+          "howToAvoid": "Read each list item after 'wants to': does it fit? If not, change its form.",
+          "memoryCue": "To travel, learn, and meet — one shape."
+        }
+      },
+      "id_": {
+        "objective": "Semua butir di daftar tetap dalam bentuk to-infinitive yang sama.",
+        "misconception": "Kamu nyampur infinitive dan -ing dalam satu daftar.",
+        "reasoning": "kenali daftarnya → cek semua butir bentuknya sama → ubah butir yang beda supaya cocok",
+        "rule": "Struktur paralel: butir-butir dalam daftar harus pakai bentuk tata bahasa yang sama.",
+        "whyCorrect": "Ketiga butir berbagi satu “to”: to travel, (to) learn, dan (to) meet — bentuknya sama semua.",
+        "whyOthersFail": "Dua pilihan masih nyampur -ing sama infinitive, satu lagi kalimat asli yang belum diubah.",
+        "howToAvoid": "Baca tiap butir sesudah “wants to”: cocok? Kalau nggak, ubah bentuknya.",
+        "memoryCue": "To travel, learn, and meet — satu bentuk.",
+        "distractors": {
+          "She wants to travel, learning languages, and meeting new people.": {
+            "misconception": "@sibling:0",
+            "whyFails": "cuma ngebetulin butir terakhir. “To travel” dan “learning” masih bentrok."
+          },
+          "She wants travelling, learn languages, and to meet new people.": {
+            "misconception": "@sibling:1",
+            "whyFails": "ngubah butir pertama dan nyisain tiga bentuk yang beda."
+          },
+          "She wants to travel, learning languages, and to meet new people.": {
+            "misconception": "@sibling:2",
+            "whyFails": "ini kalimat aslinya, kesalahannya belum disentuh."
+          }
+        }
+      },
+      "th": {
+        "objective": "ให้ทุกรายการในลิสต์อยู่ในรูป to-infinitive แบบเดียวกัน",
+        "misconception": "ผู้เรียนผสม infinitive กับ gerund ในลิสต์เดียว",
+        "reasoning": "ระบุลิสต์ → เช็กว่าทุกรายการมีรูปเดียวกัน → เปลี่ยนรายการที่แปลกให้ตรงกัน",
+        "rule": "โครงสร้างขนาน: รายการในลิสต์ต้องใช้รูปไวยากรณ์เดียวกัน",
+        "whyCorrect": "ทั้งสามรายการใช้ 'to' ร่วมกันหนึ่งตัว: to travel, (to) learn และ (to) meet — รูปเดียวกันตลอด",
+        "whyOthersFail": "สองตัวเลือกยังผสม -ing กับ infinitive และอีกหนึ่งคือประโยคเดิมที่ยังไม่แก้",
+        "howToAvoid": "อ่านแต่ละรายการต่อจาก 'wants to': เข้ากันไหม ถ้าไม่ ให้เปลี่ยนรูป",
+        "memoryCue": "To travel, learn, and meet — รูปเดียว",
+        "distractors": {
+          "She wants to travel, learning languages, and meeting new people.": {
+            "misconception": "@sibling:0",
+            "whyFails": "แก้แค่รายการสุดท้าย 'to travel' กับ 'learning' ยังขัดกัน"
+          },
+          "She wants travelling, learn languages, and to meet new people.": {
+            "misconception": "@sibling:1",
+            "whyFails": "เปลี่ยนรายการแรกและทิ้งไว้สามรูปที่ต่างกัน"
+          },
+          "She wants to travel, learning languages, and to meet new people.": {
+            "misconception": "@sibling:2",
+            "whyFails": "นี่คือประโยคเดิมที่ยังไม่ได้แก้ข้อผิดพลาด"
+          }
+        }
+      }
+    },
+    {
+      "id": "CO-204",
+      "family": "conditionals",
+      "subskill": "if_only_past_regret_past_perfect",
+      "cefr": "B2",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Use the past perfect after 'If only' for a regret about the past.",
+        "misconception": "Learner uses the past simple or 'would have' after 'If only' about a past event.",
+        "reasoning": "identify a regret about a finished past event -> select had + past participle after If only",
+        "stem": "If only I ___ harder for the exam last week!",
+        "options": [
+          "had studied",
+          "studied",
+          "would have studied",
+          "have studied"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "studied",
+            "misconception": "@sibling:0",
+            "whyFails": "Past simple after 'if only' is for a present wish; 'last week' makes this a past regret."
+          },
+          {
+            "option": "would have studied",
+            "misconception": "@sibling:1",
+            "whyFails": "'Would have' is the result-clause shape; it does not follow 'if only'."
+          },
+          {
+            "option": "have studied",
+            "misconception": "@sibling:2",
+            "whyFails": "Present perfect ties the studying to now, but 'last week' is finished."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "The exam was last week, so the regret uses the past perfect: If only I had studied harder.",
+          "rule": "If only / I wish + past perfect = regret about the past; + past simple = wish about the present.",
+          "whyOthersFail": "'Studied' is the present-wish form, 'would have' belongs in a result clause, and 'have studied' is not past enough.",
+          "howToAvoid": "See a past time word with 'if only'? Go one step further back: had + participle.",
+          "memoryCue": "If only I had… (too late now)."
+        }
+      },
+      "id_": {
+        "objective": "Pakai past perfect sesudah “If only” buat penyesalan soal masa lampau.",
+        "misconception": "Kamu pakai past simple atau “would have” sesudah “If only” soal kejadian lampau.",
+        "reasoning": "kenali penyesalan soal kejadian lampau yang selesai → pilih had + past participle sesudah If only",
+        "rule": "If only / I wish + past perfect = penyesalan soal lampau. + past simple = harapan soal sekarang.",
+        "whyCorrect": "Ujiannya minggu lalu, jadi penyesalannya pakai past perfect: If only I had studied harder.",
+        "whyOthersFail": "“Studied” bentuk harapan sekarang. “Would have” punya klausa akibat. “Have studied” belum cukup lampau.",
+        "howToAvoid": "Ada kata waktu lampau sama “if only”? Mundur satu langkah lagi: had + participle.",
+        "memoryCue": "Udah terlambat buat disesali: “If only I had…”.",
+        "distractors": {
+          "studied": {
+            "misconception": "@sibling:0",
+            "whyFails": "past simple sesudah “if only” buat harapan sekarang. “Last week” bikin ini penyesalan lampau."
+          },
+          "would have studied": {
+            "misconception": "@sibling:1",
+            "whyFails": "“would have” bentuk klausa akibat. Nggak ngikut “if only”."
+          },
+          "have studied": {
+            "misconception": "@sibling:2",
+            "whyFails": "present perfect ngiket belajarnya ke sekarang, padahal “last week” udah selesai."
+          }
+        }
+      },
+      "th": {
+        "objective": "ใช้ past perfect หลัง 'If only' กับความเสียใจเรื่องอดีต",
+        "misconception": "ผู้เรียนใช้ past simple หรือ 'would have' หลัง 'If only' เกี่ยวกับเหตุการณ์ในอดีต",
+        "reasoning": "ระบุความเสียใจเรื่องเหตุการณ์อดีตที่จบแล้ว → เลือก had + past participle หลัง If only",
+        "rule": "If only / I wish + past perfect = เสียใจเรื่องอดีต; + past simple = ปรารถนาเรื่องปัจจุบัน",
+        "whyCorrect": "การสอบเกิดขึ้นสัปดาห์ก่อน ความเสียใจจึงใช้ past perfect: If only I had studied harder",
+        "whyOthersFail": "'studied' เป็นรูปปรารถนาปัจจุบัน 'would have' อยู่ในอนุประโยคผล ส่วน 'have studied' ยังไม่เป็นอดีตพอ",
+        "howToAvoid": "เห็นคำบอกเวลาอดีตกับ 'if only'? ถอยไปอีกหนึ่งขั้น: had + participle",
+        "memoryCue": "สายเกินไปที่จะเสียใจ: 'If only I had…'",
+        "distractors": {
+          "studied": {
+            "misconception": "@sibling:0",
+            "whyFails": "past simple หลัง 'if only' ใช้กับความปรารถนาปัจจุบัน 'last week' ทำให้นี่เป็นความเสียใจในอดีต"
+          },
+          "would have studied": {
+            "misconception": "@sibling:1",
+            "whyFails": "'would have' เป็นรูปของอนุประโยคผล ไม่ตามหลัง 'if only'"
+          },
+          "have studied": {
+            "misconception": "@sibling:2",
+            "whyFails": "present perfect ผูกการเรียนไว้กับตอนนี้ แต่ 'last week' จบไปแล้ว"
+          }
+        }
+      }
+    },
+    {
+      "id": "CO-205",
+      "family": "conditionals",
+      "subskill": "wish_would_annoyance_at_others_behaviour",
+      "cefr": "B2",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Use 'wish + would' to complain about someone else's repeated behaviour.",
+        "misconception": "Learner uses the past simple, present, or 'will' after 'wish' when complaining about another person's habit.",
+        "reasoning": "identify a complaint about another person's habit -> select wish + would + base verb",
+        "stem": "My neighbour plays loud music every night. I wish he ___ it down.",
+        "options": [
+          "would turn",
+          "turned",
+          "turns",
+          "will turn"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "turned",
+            "misconception": "@sibling:0",
+            "whyFails": "'Wish + past simple' describes a state; a complaint about repeated behaviour uses 'would'."
+          },
+          {
+            "option": "turns",
+            "misconception": "@sibling:1",
+            "whyFails": "The present tense cannot follow 'wish'."
+          },
+          {
+            "option": "will turn",
+            "misconception": "@sibling:2",
+            "whyFails": "'Will' never follows 'wish'; the form is 'would'."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "The speaker is annoyed by the neighbour's habit and wants it to change, so 'wish he would turn' is used.",
+          "rule": "Wish + would + base verb = annoyance about someone else's behaviour that they could change.",
+          "whyOthersFail": "'Turned' is for states, 'turns' is present, and 'will' is not allowed after 'wish'.",
+          "howToAvoid": "Complaining about what another person keeps doing? 'I wish they would…'",
+          "memoryCue": "I wish he would stop!"
+        }
+      },
+      "id_": {
+        "objective": "Pakai “wish + would” buat ngeluh soal kelakuan orang lain yang berulang.",
+        "misconception": "Kamu pakai past simple, bentuk sekarang, atau “will” sesudah “wish” waktu ngeluh soal kebiasaan orang lain.",
+        "reasoning": "kenali keluhan soal kebiasaan orang lain → pilih wish + would + kata kerja dasar",
+        "rule": "Wish + would + kata kerja dasar = kesal sama kelakuan orang lain yang bisa dia ubah.",
+        "whyCorrect": "Pembicara kesal sama kebiasaan tetangganya dan mau itu berubah, jadi pakai “wish he would turn”.",
+        "whyOthersFail": "“Turned” buat keadaan. “Turns” bentuk sekarang. “Will” nggak boleh sesudah “wish”.",
+        "howToAvoid": "Ngeluh soal yang terus dilakuin orang lain? “I wish they would…”",
+        "memoryCue": "Kesal sama kelakuan orang lain: “I wish he would stop!”.",
+        "distractors": {
+          "turned": {
+            "misconception": "@sibling:0",
+            "whyFails": "“wish + past simple” ngegambarin keadaan. Keluhan soal kelakuan berulang pakai “would”."
+          },
+          "turns": {
+            "misconception": "@sibling:1",
+            "whyFails": "bentuk sekarang nggak bisa ngikut “wish”."
+          },
+          "will turn": {
+            "misconception": "@sibling:2",
+            "whyFails": "“will” nggak pernah ngikut “wish”. Bentuknya “would”."
+          }
+        }
+      },
+      "th": {
+        "objective": "ใช้ 'wish + would' บ่นถึงพฤติกรรมซ้ำ ๆ ของคนอื่น",
+        "misconception": "ผู้เรียนใช้ past simple, ปัจจุบัน หรือ 'will' หลัง 'wish' เมื่อบ่นถึงนิสัยของคนอื่น",
+        "reasoning": "ระบุการบ่นถึงนิสัยของคนอื่น → เลือก wish + would + คำกริยารูปพื้นฐาน",
+        "rule": "Wish + would + คำกริยารูปพื้นฐาน = ความรำคาญต่อพฤติกรรมของคนอื่นที่เขาเปลี่ยนได้",
+        "whyCorrect": "ผู้พูดรำคาญนิสัยของเพื่อนบ้านและอยากให้เปลี่ยน จึงใช้ 'wish he would turn'",
+        "whyOthersFail": "'turned' ใช้กับสภาวะ 'turns' เป็นปัจจุบัน ส่วน 'will' ใช้หลัง 'wish' ไม่ได้",
+        "howToAvoid": "บ่นเรื่องที่คนอื่นทำซ้ำ ๆ? 'I wish they would…'",
+        "memoryCue": "รำคาญพฤติกรรมคนอื่น: 'I wish he would stop!'",
+        "distractors": {
+          "turned": {
+            "misconception": "@sibling:0",
+            "whyFails": "'wish + past simple' บรรยายสภาวะ การบ่นถึงพฤติกรรมซ้ำ ๆ ใช้ 'would'"
+          },
+          "turns": {
+            "misconception": "@sibling:1",
+            "whyFails": "รูปปัจจุบันตามหลัง 'wish' ไม่ได้"
+          },
+          "will turn": {
+            "misconception": "@sibling:2",
+            "whyFails": "'will' ไม่เคยตามหลัง 'wish' รูปที่ใช้คือ 'would'"
+          }
+        }
+      }
+    },
+    {
+      "id": "GI-204",
+      "family": "gerunds_infinitives",
+      "subskill": "be_get_used_to_gerund_vs_used_to_infinitive",
+      "cefr": "B2",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Use 'get used to + -ing' for becoming comfortable with something new.",
+        "misconception": "Learner reads the 'to' in 'get used to' as an infinitive marker and adds a bare verb.",
+        "reasoning": "identify get used to as a preposition pattern -> select the -ing form after to",
+        "stem": "It took me a month to get used to ___ up at five for work.",
+        "options": [
+          "getting",
+          "get",
+          "got",
+          "be getting"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "get",
+            "misconception": "@sibling:0",
+            "whyFails": "The 'to' in 'get used to' is a preposition, so the verb after it takes -ing."
+          },
+          {
+            "option": "got",
+            "misconception": "@sibling:1",
+            "whyFails": "A past form cannot follow the preposition 'to'."
+          },
+          {
+            "option": "be getting",
+            "misconception": "@sibling:2",
+            "whyFails": "'Be' treats the 'to' as an infinitive marker; the pattern needs -ing directly."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "'Get used to' is followed by a gerund: get used to getting up at five.",
+          "rule": "Be/get used to + -ing = be/become comfortable with; used to + base verb = past habit.",
+          "whyOthersFail": "'Get', 'got', and 'be getting' all treat 'to' as part of an infinitive instead of a preposition.",
+          "howToAvoid": "Is there a 'be' or 'get' before 'used to'? Then the next verb ends in -ing.",
+          "memoryCue": "Get used to getting up early."
+        }
+      },
+      "id_": {
+        "objective": "Pakai “get used to + -ing” buat jadi terbiasa sama hal baru.",
+        "misconception": "Kamu baca “to” di “get used to” sebagai penanda infinitive dan nambah kata kerja polos.",
+        "reasoning": "kenali get used to sebagai pola kata depan → pilih bentuk -ing sesudah to",
+        "rule": "Be/get used to + -ing = terbiasa / jadi terbiasa. Used to + kata kerja dasar = kebiasaan lampau.",
+        "whyCorrect": "“Get used to” diikuti -ing: get used to getting up at five.",
+        "whyOthersFail": "“Get”, “got”, dan “be getting” semuanya nganggap “to” bagian infinitive, bukan kata depan.",
+        "howToAvoid": "Ada “be” atau “get” sebelum “used to”? Kata kerja berikutnya berakhiran -ing.",
+        "memoryCue": "Get used to getting up early.",
+        "distractors": {
+          "get": {
+            "misconception": "@sibling:0",
+            "whyFails": "“to” di “get used to” itu kata depan, jadi kata kerja sesudahnya pakai -ing."
+          },
+          "got": {
+            "misconception": "@sibling:1",
+            "whyFails": "bentuk lampau nggak bisa ngikut kata depan “to”."
+          },
+          "be getting": {
+            "misconception": "@sibling:2",
+            "whyFails": "“be” nganggap “to” penanda infinitive. Polanya butuh -ing langsung."
+          }
+        }
+      },
+      "th": {
+        "objective": "ใช้ 'get used to + -ing' สำหรับการเริ่มคุ้นชินกับสิ่งใหม่",
+        "misconception": "ผู้เรียนอ่าน 'to' ใน 'get used to' เป็นตัวบ่งชี้ infinitive และเติมคำกริยารูปเปล่า",
+        "reasoning": "ระบุว่า get used to เป็นแบบแผนบุพบท → เลือกรูป -ing หลัง to",
+        "rule": "Be/get used to + -ing = คุ้นชิน/เริ่มคุ้นชิน; used to + คำกริยารูปพื้นฐาน = นิสัยในอดีต",
+        "whyCorrect": "'Get used to' ตามด้วย gerund: get used to getting up at five",
+        "whyOthersFail": "'get', 'got' และ 'be getting' ต่างมอง 'to' เป็นส่วนของ infinitive แทนที่จะเป็นบุพบท",
+        "howToAvoid": "มี 'be' หรือ 'get' หน้า 'used to' ไหม? ถ้ามี คำกริยาถัดไปลงท้ายด้วย -ing",
+        "memoryCue": "Get used to getting up early — หลัง used to ใช้ -ing",
+        "distractors": {
+          "get": {
+            "misconception": "@sibling:0",
+            "whyFails": "'to' ใน 'get used to' เป็นบุพบท คำกริยาที่ตามมาจึงใช้ -ing"
+          },
+          "got": {
+            "misconception": "@sibling:1",
+            "whyFails": "รูปอดีตตามหลังบุพบท 'to' ไม่ได้"
+          },
+          "be getting": {
+            "misconception": "@sibling:2",
+            "whyFails": "'be' มอง 'to' เป็นตัวบ่งชี้ infinitive แต่แบบแผนนี้ต้องใช้ -ing ทันที"
+          }
+        }
+      }
+    },
+    {
+      "id": "GI-205",
+      "family": "gerunds_infinitives",
+      "subskill": "would_rather_bare_infinitive_vs_prefer_to",
+      "cefr": "B2",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Use a bare verb after 'would rather'.",
+        "misconception": "Learner adds 'to' or -ing after 'would rather' by analogy with 'prefer'.",
+        "reasoning": "identify would rather -> recall that it takes a bare verb -> select the base form",
+        "stem": "I'd rather ___ tea than coffee in the evening.",
+        "options": [
+          "drink",
+          "to drink",
+          "drinking",
+          "drank"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "to drink",
+            "misconception": "@sibling:0",
+            "whyFails": "'Prefer to drink' takes 'to', but 'would rather' takes the bare verb."
+          },
+          {
+            "option": "drinking",
+            "misconception": "@sibling:1",
+            "whyFails": "-ing belongs to 'prefer drinking', not to 'would rather'."
+          },
+          {
+            "option": "drank",
+            "misconception": "@sibling:2",
+            "whyFails": "A past form is not used after 'would rather' when the speaker talks about their own preference now."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "'Would rather' is followed directly by the base verb: I'd rather drink tea.",
+          "rule": "Would rather + base verb (+ than + base verb); prefer + to-infinitive or -ing.",
+          "whyOthersFail": "'To drink' and 'drinking' copy the 'prefer' patterns, and 'drank' is a past form.",
+          "howToAvoid": "After 'rather', write the verb with nothing in front of it.",
+          "memoryCue": "I'd rather drink tea than coffee."
+        }
+      },
+      "id_": {
+        "objective": "Pakai kata kerja polos sesudah “would rather”.",
+        "misconception": "Kamu nambah “to” atau -ing sesudah “would rather” karena niru “prefer”.",
+        "reasoning": "kenali would rather → ingat dia pakai kata kerja polos → pilih bentuk dasar",
+        "rule": "Would rather + kata kerja dasar (+ than + kata kerja dasar). Prefer + to-infinitive atau -ing.",
+        "whyCorrect": "“Would rather” langsung diikuti kata kerja dasar: I'd rather drink tea.",
+        "whyOthersFail": "“To drink” dan “drinking” niru pola “prefer”. “Drank” bentuk lampau.",
+        "howToAvoid": "Sesudah “rather”, tulis kata kerjanya tanpa apa pun di depannya.",
+        "memoryCue": "Sesudah “would rather” kata kerjanya polos: “I'd rather drink tea than coffee”.",
+        "distractors": {
+          "to drink": {
+            "misconception": "@sibling:0",
+            "whyFails": "“prefer to drink” pakai “to”, tapi “would rather” pakai kata kerja polos."
+          },
+          "drinking": {
+            "misconception": "@sibling:1",
+            "whyFails": "-ing punya “prefer drinking”, bukan “would rather”."
+          },
+          "drank": {
+            "misconception": "@sibling:2",
+            "whyFails": "bentuk lampau nggak dipakai sesudah “would rather” kalau pembicara ngomongin kesukaannya sendiri sekarang."
+          }
+        }
+      },
+      "th": {
+        "objective": "ใช้คำกริยารูปเปล่าหลัง 'would rather'",
+        "misconception": "ผู้เรียนเติม 'to' หรือ -ing หลัง 'would rather' โดยเทียบกับ 'prefer'",
+        "reasoning": "ระบุ would rather → นึกว่ามันใช้กับคำกริยารูปเปล่า → เลือกรูปพื้นฐาน",
+        "rule": "Would rather + คำกริยารูปพื้นฐาน (+ than + คำกริยารูปพื้นฐาน); prefer + to-infinitive หรือ -ing",
+        "whyCorrect": "'Would rather' ตามด้วยคำกริยารูปพื้นฐานทันที: I'd rather drink tea",
+        "whyOthersFail": "'to drink' และ 'drinking' ลอกแบบแผนของ 'prefer' ส่วน 'drank' เป็นรูปอดีต",
+        "howToAvoid": "หลัง 'rather' เขียนคำกริยาโดยไม่มีอะไรนำหน้า",
+        "memoryCue": "หลัง 'would rather' คำกริยาต้องเป็นรูปเปล่า: 'I'd rather drink tea than coffee'",
+        "distractors": {
+          "to drink": {
+            "misconception": "@sibling:0",
+            "whyFails": "'prefer to drink' ใช้ 'to' แต่ 'would rather' ใช้คำกริยารูปเปล่า"
+          },
+          "drinking": {
+            "misconception": "@sibling:1",
+            "whyFails": "-ing เป็นของ 'prefer drinking' ไม่ใช่ 'would rather'"
+          },
+          "drank": {
+            "misconception": "@sibling:2",
+            "whyFails": "รูปอดีตไม่ใช้หลัง 'would rather' เมื่อผู้พูดพูดถึงความชอบของตัวเองในตอนนี้"
+          }
+        }
+      }
+    },
+    {
+      "id": "MO-204",
+      "family": "modals",
+      "subskill": "be_supposed_to_expectation_vs_obligation",
+      "cefr": "B2",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Use 'was supposed to' for a past arrangement that did not happen.",
+        "misconception": "Learner drops 'be' before 'supposed to' or treats 'suppose' as an ordinary verb.",
+        "reasoning": "identify an expectation that was not met -> select be + supposed to -> match the past form was",
+        "stem": "Dani ___ meet us at six, but he never showed up.",
+        "options": [
+          "was supposed to",
+          "supposed to",
+          "supposes to",
+          "was supposing to"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "supposed to",
+            "misconception": "@sibling:0",
+            "whyFails": "'Supposed to' always needs a form of 'be' in front: was supposed to."
+          },
+          {
+            "option": "supposes to",
+            "misconception": "@sibling:1",
+            "whyFails": "'Suppose' as an ordinary verb means 'think'; the expectation pattern needs 'be supposed to'."
+          },
+          {
+            "option": "was supposing to",
+            "misconception": "@sibling:2",
+            "whyFails": "'Supposed' here is a fixed participle and never takes -ing."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "Meeting at six was the arrangement, and it failed, so 'was supposed to meet' expresses the unmet expectation.",
+          "rule": "Be supposed to + verb = what is expected or arranged; the 'be' changes for tense (is/was).",
+          "whyOthersFail": "'Supposed to' has no 'be', 'supposes to' is the wrong verb, and 'supposing' cannot replace the participle.",
+          "howToAvoid": "Always say be + supposed to as one unit: is supposed to, was supposed to.",
+          "memoryCue": "Was supposed to = should have, but didn't."
+        }
+      },
+      "id_": {
+        "objective": "Pakai “was supposed to” buat janji lampau yang nggak terjadi.",
+        "misconception": "Kamu ngilangin “be” sebelum “supposed to” atau nganggap “suppose” kata kerja biasa.",
+        "reasoning": "kenali harapan yang nggak terpenuhi → pilih be + supposed to → cocokin bentuk lampau was",
+        "rule": "Be supposed to + kata kerja = yang diharapkan atau dijanjikan. “Be”-nya berubah ngikut waktu (is/was).",
+        "whyCorrect": "Ketemu jam enam itu janjinya, dan gagal, jadi “was supposed to meet” nyatain harapan yang nggak terpenuhi.",
+        "whyOthersFail": "“Supposed to” nggak ada “be”. “Supposes to” salah kata kerja. “Supposing” nggak bisa ngegantiin participle-nya.",
+        "howToAvoid": "Selalu ucapin be + supposed to sebagai satu paket: is supposed to, was supposed to.",
+        "memoryCue": "Was supposed to = harusnya, tapi nggak.",
+        "distractors": {
+          "supposed to": {
+            "misconception": "@sibling:0",
+            "whyFails": "“supposed to” selalu butuh bentuk “be” di depannya: was supposed to."
+          },
+          "supposes to": {
+            "misconception": "@sibling:1",
+            "whyFails": "“suppose” sebagai kata kerja biasa artinya “mengira”. Pola harapan butuh “be supposed to”."
+          },
+          "was supposing to": {
+            "misconception": "@sibling:2",
+            "whyFails": "“supposed” di sini participle tetap dan nggak pernah pakai -ing."
+          }
+        }
+      },
+      "th": {
+        "objective": "ใช้ 'was supposed to' กับนัดหมายในอดีตที่ไม่ได้เกิดขึ้น",
+        "misconception": "ผู้เรียนตัด 'be' หน้า 'supposed to' หรือมอง 'suppose' เป็นคำกริยาธรรมดา",
+        "reasoning": "ระบุความคาดหวังที่ไม่เป็นจริง → เลือก be + supposed to → จับคู่รูปอดีต was",
+        "rule": "Be supposed to + คำกริยา = สิ่งที่คาดหวังหรือนัดไว้; 'be' เปลี่ยนตามกาล (is/was)",
+        "whyCorrect": "การนัดพบตอนหกโมงคือข้อตกลง และมันล้มเหลว 'was supposed to meet' จึงแสดงความคาดหวังที่ไม่เป็นจริง",
+        "whyOthersFail": "'supposed to' ไม่มี 'be' 'supposes to' ใช้คำกริยาผิด ส่วน 'supposing' แทน participle ไม่ได้",
+        "howToAvoid": "พูด be + supposed to เป็นหน่วยเดียวเสมอ: is supposed to, was supposed to",
+        "memoryCue": "Was supposed to = ควรจะ แต่ไม่ได้ทำ",
+        "distractors": {
+          "supposed to": {
+            "misconception": "@sibling:0",
+            "whyFails": "'supposed to' ต้องมีรูปของ 'be' นำหน้าเสมอ: was supposed to"
+          },
+          "supposes to": {
+            "misconception": "@sibling:1",
+            "whyFails": "'suppose' ในฐานะคำกริยาธรรมดาหมายถึง 'คิดว่า' แบบแผนความคาดหวังต้องใช้ 'be supposed to'"
+          },
+          "was supposing to": {
+            "misconception": "@sibling:2",
+            "whyFails": "'supposed' ตรงนี้เป็น participle ตายตัวและไม่เคยใช้ -ing"
+          }
+        }
+      }
+    },
+    {
+      "id": "CO-206",
+      "family": "conditionals",
+      "subskill": "its_high_time_past_simple_unreal",
+      "cefr": "B2",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Use the past simple after 'It's time' when talking about now.",
+        "misconception": "Learner uses a present or future verb after 'it's time' + subject.",
+        "reasoning": "identify it's time + subject -> recall the unreal past -> select the past simple",
+        "stem": "It's late. It's time we ___ home.",
+        "options": [
+          "went",
+          "go",
+          "will go",
+          "are going"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "go",
+            "misconception": "@sibling:0",
+            "whyFails": "After 'it's time + subject', the verb takes the unreal past, not the present."
+          },
+          {
+            "option": "will go",
+            "misconception": "@sibling:1",
+            "whyFails": "'Will' does not follow 'it's time we'; the fixed form is past simple."
+          },
+          {
+            "option": "are going",
+            "misconception": "@sibling:2",
+            "whyFails": "The continuous describes what is happening; 'it's time' says what should happen."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "'It's time we' is followed by the unreal past even though the meaning is now: it's time we went home.",
+          "rule": "It's (high) time + subject + past simple = something should happen now or should have happened already.",
+          "whyOthersFail": "'Go', 'will go', and 'are going' all ignore the unreal-past rule after 'it's time we'.",
+          "howToAvoid": "See 'it's time' with a subject after it? Put the verb in the past simple.",
+          "memoryCue": "It's time we went."
+        }
+      },
+      "id_": {
+        "objective": "Pakai past simple sesudah “It's time” walau ngomongin sekarang.",
+        "misconception": "Kamu pakai kata kerja sekarang atau masa depan sesudah “it's time” + subjek.",
+        "reasoning": "kenali it's time + subjek → ingat lampau tak nyata → pilih past simple",
+        "rule": "It's (high) time + subjek + past simple = sesuatu harusnya terjadi sekarang atau udah seharusnya terjadi.",
+        "whyCorrect": "“It's time we” diikuti lampau tak nyata walau maknanya sekarang: it's time we went home.",
+        "whyOthersFail": "“Go”, “will go”, dan “are going” semuanya ngabaikan aturan lampau tak nyata sesudah “it's time we”.",
+        "howToAvoid": "Lihat “it's time” dengan subjek sesudahnya? Taruh kata kerjanya di past simple.",
+        "memoryCue": "It's time we went.",
+        "distractors": {
+          "go": {
+            "misconception": "@sibling:0",
+            "whyFails": "sesudah “it's time + subjek”, kata kerjanya pakai lampau tak nyata, bukan bentuk sekarang."
+          },
+          "will go": {
+            "misconception": "@sibling:1",
+            "whyFails": "“will” nggak ngikut “it's time we”. Bentuk tetapnya past simple."
+          },
+          "are going": {
+            "misconception": "@sibling:2",
+            "whyFails": "bentuk -ing ngegambarin yang lagi terjadi. “It's time” bilang yang seharusnya terjadi."
+          }
+        }
+      },
+      "th": {
+        "objective": "ใช้ past simple หลัง 'It's time' เมื่อพูดถึงตอนนี้",
+        "misconception": "ผู้เรียนใช้คำกริยาปัจจุบันหรืออนาคตหลัง 'it's time' + ประธาน",
+        "reasoning": "ระบุ it's time + ประธาน → นึกถึงอดีตสมมติ → เลือก past simple",
+        "rule": "It's (high) time + ประธาน + past simple = บางสิ่งควรเกิดขึ้นตอนนี้หรือควรเกิดไปแล้ว",
+        "whyCorrect": "'It's time we' ตามด้วยอดีตสมมติแม้ความหมายคือตอนนี้: it's time we went home",
+        "whyOthersFail": "'go', 'will go' และ 'are going' ต่างละเลยกฎอดีตสมมติหลัง 'it's time we'",
+        "howToAvoid": "เห็น 'it's time' ที่มีประธานตามหลัง? ใส่คำกริยาเป็น past simple",
+        "memoryCue": "It's time we went — หลัง it's time ใช้ past simple",
+        "distractors": {
+          "go": {
+            "misconception": "@sibling:0",
+            "whyFails": "หลัง 'it's time + ประธาน' คำกริยาใช้อดีตสมมติ ไม่ใช่ปัจจุบัน"
+          },
+          "will go": {
+            "misconception": "@sibling:1",
+            "whyFails": "'will' ไม่ตามหลัง 'it's time we' รูปตายตัวคือ past simple"
+          },
+          "are going": {
+            "misconception": "@sibling:2",
+            "whyFails": "รูป continuous บรรยายสิ่งที่กำลังเกิด ส่วน 'it's time' บอกสิ่งที่ควรเกิด"
+          }
+        }
+      }
+    },
+    {
+      "id": "CM-206",
+      "family": "comparison",
+      "subskill": "as_if_as_though_unreal_past_form",
+      "cefr": "B2",
+      "questionType": "multiple_choice",
+      "en": {
+        "objective": "Use the past simple after 'as if' for something that is clearly not true.",
+        "misconception": "Learner keeps the present or adds 'would' after 'as if' when the comparison is unreal.",
+        "reasoning": "identify an unreal comparison after as if -> select the past simple -> avoid present and would",
+        "stem": "He talks about the city as if he ___ there, but he has never left our village.",
+        "options": [
+          "lived",
+          "lives",
+          "has lived",
+          "would live"
+        ],
+        "correctIndex": 0,
+        "distractors": [
+          {
+            "option": "lives",
+            "misconception": "@sibling:0",
+            "whyFails": "The present suggests it might be true, but 'he has never left our village' shows it is not."
+          },
+          {
+            "option": "has lived",
+            "misconception": "@sibling:1",
+            "whyFails": "Present perfect reports real experience; he has no such experience."
+          },
+          {
+            "option": "would live",
+            "misconception": "@sibling:2",
+            "whyFails": "'Would' belongs in a result clause, not inside an 'as if' clause."
+          }
+        ],
+        "explanation": {
+          "whyCorrect": "He has never lived there, so the unreal comparison uses the past simple: as if he lived there.",
+          "rule": "As if / as though + past simple = unreal now; + present = possibly true.",
+          "whyOthersFail": "'Lives' and 'has lived' treat it as real, and 'would live' misplaces a conditional result form.",
+          "howToAvoid": "Is the comparison clearly false? Move the verb one step back.",
+          "memoryCue": "As if he lived there (he doesn't)."
+        }
+      },
+      "id_": {
+        "objective": "Pakai past simple sesudah “as if” buat sesuatu yang jelas nggak benar.",
+        "misconception": "Kamu biarin bentuk sekarang atau nambah “would” sesudah “as if” padahal perbandingannya nggak nyata.",
+        "reasoning": "kenali perbandingan nggak nyata sesudah as if → pilih past simple → hindari bentuk sekarang dan would",
+        "rule": "As if / as though + past simple = nggak nyata sekarang. + bentuk sekarang = mungkin benar.",
+        "whyCorrect": "Dia nggak pernah tinggal di sana, jadi perbandingan nggak nyatanya pakai past simple: as if he lived there.",
+        "whyOthersFail": "“Lives” dan “has lived” nganggap itu nyata. “Would live” salah naruh bentuk akibat pengandaian.",
+        "howToAvoid": "Perbandingannya jelas salah? Geser kata kerjanya satu langkah ke belakang.",
+        "memoryCue": "As if he lived there (padahal nggak).",
+        "distractors": {
+          "lives": {
+            "misconception": "@sibling:0",
+            "whyFails": "bentuk sekarang ngesankan itu mungkin benar, padahal “he has never left our village” nunjukin nggak."
+          },
+          "has lived": {
+            "misconception": "@sibling:1",
+            "whyFails": "present perfect laporin pengalaman nyata. Dia nggak punya pengalaman itu."
+          },
+          "would live": {
+            "misconception": "@sibling:2",
+            "whyFails": "“would” tempatnya di klausa akibat, bukan di dalam klausa “as if”."
+          }
+        }
+      },
+      "th": {
+        "objective": "ใช้ past simple หลัง 'as if' กับสิ่งที่ชัดว่าไม่จริง",
+        "misconception": "ผู้เรียนคงรูปปัจจุบันหรือเติม 'would' หลัง 'as if' ทั้งที่การเปรียบเทียบไม่จริง",
+        "reasoning": "ระบุการเปรียบเทียบที่ไม่จริงหลัง as if → เลือก past simple → เลี่ยงปัจจุบันและ would",
+        "rule": "As if / as though + past simple = ไม่จริงในตอนนี้; + ปัจจุบัน = อาจเป็นจริง",
+        "whyCorrect": "เขาไม่เคยอาศัยที่นั่น การเปรียบเทียบที่ไม่จริงจึงใช้ past simple: as if he lived there",
+        "whyOthersFail": "'lives' และ 'has lived' มองว่าเป็นจริง ส่วน 'would live' วางรูปผลของเงื่อนไขผิดที่",
+        "howToAvoid": "การเปรียบเทียบเป็นเท็จชัด ๆ ไหม? เลื่อนคำกริยาถอยหนึ่งขั้น",
+        "memoryCue": "As if he lived there (แต่เขาไม่ได้อยู่)",
+        "distractors": {
+          "lives": {
+            "misconception": "@sibling:0",
+            "whyFails": "รูปปัจจุบันบ่งว่าอาจเป็นจริง แต่ 'he has never left our village' บอกว่าไม่จริง"
+          },
+          "has lived": {
+            "misconception": "@sibling:1",
+            "whyFails": "present perfect รายงานประสบการณ์จริง แต่เขาไม่มีประสบการณ์นั้น"
+          },
+          "would live": {
+            "misconception": "@sibling:2",
+            "whyFails": "'would' อยู่ในอนุประโยคผล ไม่ใช่ในอนุประโยค 'as if'"
+          }
+        }
+      }
+    }
+  ]
+}

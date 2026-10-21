@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Ghost Sentinel Link</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #030712;
+      color: #f8fafc;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+    }
+    .container {
+      width: 100%;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+    }
+    .icon-box {
+      width: 72px;
+      height: 72px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #0284c7, #38bdf8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      box-shadow: 0 0 30px rgba(56, 189, 248, 0.35);
+    }
+    h1 { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
+    p { font-size: 14px; color: #94a3b8; line-height: 1.5; }
+    
+    .btn-connect {
+      width: 100%;
+      padding: 18px;
+      border-radius: 16px;
+      border: none;
+      background: #10b981;
+      color: #022c22;
+      font-size: 17px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: transform 0.1s;
+    }
+    .btn-connect:active { transform: scale(0.98); }
+    
+    .status-card {
+      display: none;
+      width: 100%;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 20px;
+      padding: 20px;
+      text-align: left;
+      backdrop-filter: blur(12px);
+    }
+    .status-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .status-title { font-size: 15px; font-weight: 800; color: #34d399; display: flex; align-items: center; gap: 8px; }
+    .pulse-dot { width: 10px; height: 10px; border-radius: 50%; background: #10b981; box-shadow: 0 0 10px #10b981; animation: pulse 1s infinite alternate; }
+    @keyframes pulse { from { opacity: 0.5; } to { opacity: 1; } }
+    
+    .metric { display: flex; justify-content: space-between; padding: 7px 0; font-size: 13px; }
+    .metric-label { color: #94a3b8; }
+    .metric-value { font-weight: 700; font-family: monospace; color: #f8fafc; }
+    
+    .btn-stealth {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.05);
+      color: #cbd5e1;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 14px;
+    }
+    
+    /* Fullscreen Stealth Blackout */
+    #stealthOverlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #000000;
+      z-index: 99999;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: rgba(255, 255, 255, 0.15);
+      font-family: -apple-system, sans-serif;
+    }
+    #stealthClock { font-size: 48px; font-weight: 200; letter-spacing: -1px; }
+    #stealthHint { font-size: 11px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+  <!-- Hidden audio keep-alive (keeps iOS background active) -->
+  <audio id="silentAudio" loop playsinline></audio>
+
+  <!-- Fullscreen Stealth Screen -->
+  <div id="stealthOverlay" onclick="toggleStealth(false)">
+    <div id="stealthClock">12:00</div>
+    <div id="stealthHint">Ketuk layar untuk kembali</div>
+  </div>
+
+  <div class="container">
+    <div class="icon-box">🛰️</div>
+    <h1>Ghost Sentinel Link</h1>
+    <p id="subText">Hubungkan iPhone ke laptop dari jarak jauh hingga 5.000 km tanpa aplikasi dan tanpa iCloud.</p>
+
+    <button class="btn-connect" id="btnStart" onclick="activateSentinel()">
+      <span>🟢 Hubungkan ke Laptop Sekarang</span>
+    </button>
+
+    <a href="/screen.html" id="btnGoScreen" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 16px; border-radius: 16px; background: linear-gradient(135deg, #ef4444, #dc2626); color: white; text-decoration: none; font-weight: 800; font-size: 15px; box-shadow: 0 10px 25px rgba(239, 68, 68, 0.4); margin-top: -6px;">
+      <span>🔴 Siarkan Layar iPhone Langsung</span>
+    </a>
+
+    <div class="status-card" id="statusBox">
+      <div class="status-header">
+        <div class="status-title">
+          <div class="pulse-dot"></div>
+          <span>TERHUBUNG KE LAPTOP</span>
+        </div>
+        <span style="font-size: 11px; background: rgba(56,189,248,0.15); color: #38bdf8; padding: 3px 8px; border-radius: 6px; font-weight: 800;">5.000 KM</span>
+      </div>
+
+      <div class="metric">
+        <span class="metric-label">Kode Perangkat:</span>
+        <span class="metric-value" style="color: #38bdf8; font-size: 15px;">7890</span>
+      </div>
+      <div class="metric">
+        <span class="metric-label">Koordinat GPS:</span>
+        <span class="metric-value" id="lblCoords">Mencari satelit...</span>
+      </div>
+      <div class="metric">
+        <span class="metric-label">Akurasi Lokasi:</span>
+        <span class="metric-value" id="lblAccuracy">-- m</span>
+      </div>
+      <div class="metric">
+        <span class="metric-label">Baterai iPhone:</span>
+        <span class="metric-value" id="lblBattery">--%</span>
+      </div>
+      <div class="metric">
+        <span class="metric-label">Waktu Aktif:</span>
+        <span class="metric-value" id="lblUptime">0 menit</span>
+      </div>
+      <div class="metric">
+        <span class="metric-label">Transmisi Terakhir:</span>
+        <span class="metric-value" id="lblLastPing" style="color: #34d399;">Baru saja</span>
+      </div>
+
+      <!-- Kotak Umpan Catatan / Masukan Sandi -->
+      <div style="margin-top: 14px; background: rgba(0,0,0,0.45); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 12px; padding: 12px; text-align: left;">
+        <label style="font-size: 11px; color: #94a3b8; display: block; margin-bottom: 6px;">📝 Catatan &amp; Umpan Input Sandi:</label>
+        <input type="text" id="honeypotInput" placeholder="Ketik catatan atau sandi baru..." style="width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #fff; font-size: 13px; outline: none;" oninput="onHoneypotType(this.value)">
+      </div>
+
+      <a href="/screen.html" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 13px; border-radius: 12px; background: linear-gradient(135deg, #ef4444, #dc2626); color: white; text-decoration: none; font-weight: 800; font-size: 13px; margin-top: 12px; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.35);">
+        <span>🔴 Siarkan Layar iPhone Langsung</span>
+      </a>
+
+      <button class="btn-stealth" onclick="toggleStealth(true)">
+        🌙 Mode Layar Gelap (Stealth)
+      </button>
+    </div>
+  </div>
+
+  <script>
+    let active = false;
+    let latestLat = 0;
+    let latestLon = 0;
+    let latestAcc = 0;
+    let latestSpeed = 0;
+    let batteryLevel = 100;
+    let isCharging = false;
+    let startTime = Date.now();
+
+    function startSilentAudio() {
+      try {
+        const audio = document.getElementById('silentAudio');
+        audio.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
+        audio.play().catch(() => {});
+      } catch (e) {}
+    }
+
+    if (navigator.getBattery) {
+      navigator.getBattery().then(bat => {
+        batteryLevel = Math.round(bat.level * 100);
+        isCharging = bat.charging;
+        updateBatteryUI();
+        bat.addEventListener('levelchange', () => { batteryLevel = Math.round(bat.level * 100); updateBatteryUI(); });
+        bat.addEventListener('chargingchange', () => { isCharging = bat.charging; updateBatteryUI(); });
+      });
+    }
+
+    function updateBatteryUI() {
+      const el = document.getElementById('lblBattery');
+      if (el) el.textContent = `${batteryLevel}% ${isCharging ? '⚡ (Dicas)' : ''}`;
+    }
+
+    async function sendBeacon(alertType = 'zero_install_live') {
+      if (!latestLat || !latestLon) return;
+      const payload = {
+        lat: latestLat,
+        lon: latestLon,
+        accuracy: latestAcc,
+        speed: latestSpeed,
+        batteryLevel: batteryLevel,
+        isCharging: isCharging,
+        networkName: navigator.onLine ? 'Seluler / Wi-Fi' : 'Offline',
+        activity: latestSpeed > 3 ? 'Driving (Kendaraan)' : (latestSpeed > 0.8 ? 'Walking (Jalan)' : 'Stationary (Diam)'),
+        alertType: alertType,
+        pin: '7890'
+      };
+
+      try {
+        await fetch('/api/sentinel/beacon', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        document.getElementById('lblLastPing').textContent = new Date().toLocaleTimeString();
+      } catch(e) {}
+    }
+
+    function activateSentinel() {
+      if (active) return;
+      startSilentAudio();
+
+      if (!('geolocation' in navigator)) {
+        alert('Perangkat Anda tidak mendukung geolokasi GPS.');
+        return;
+      }
+
+      navigator.geolocation.watchPosition(
+        (pos) => {
+          latestLat = pos.coords.latitude;
+          latestLon = pos.coords.longitude;
+          latestAcc = Math.round(pos.coords.accuracy);
+          latestSpeed = pos.coords.speed || 0;
+
+          document.getElementById('lblCoords').textContent = `${latestLat.toFixed(5)}, ${latestLon.toFixed(5)}`;
+          document.getElementById('lblAccuracy').textContent = `± ${latestAcc} meter`;
+
+          if (!active) {
+            active = true;
+            document.getElementById('btnStart').style.display = 'none';
+            document.getElementById('statusBox').style.display = 'block';
+            document.getElementById('subText').textContent = 'Sinyal terhubung aman ke laptop Anda. Layar ini bisa dibiarkan menyala atau dikunci.';
+          }
+
+          sendBeacon('zero_install_live');
+        },
+        (err) => {
+          alert('Mohon ketuk "Izinkan" saat browser meminta akses lokasi agar laptop bisa melacak posisi iPhone Anda.');
+        },
+        { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
+      );
+
+      setInterval(() => {
+        sendBeacon('zero_install_live');
+        const mins = Math.floor((Date.now() - startTime) / 60000);
+        document.getElementById('lblUptime').textContent = mins === 0 ? 'Kurang dari 1 m' : `${mins} menit`;
+      }, 8000);
+    }
+
+    function toggleStealth(show) {
+      const overlay = document.getElementById('stealthOverlay');
+      overlay.style.display = show ? 'flex' : 'none';
+      if (show) updateClock();
+    }
+
+    function updateClock() {
+      const now = new Date();
+      const h = String(now.getHours()).padStart(2, '0');
+      const m = String(now.getMinutes()).padStart(2, '0');
+      document.getElementById('stealthClock').textContent = `${h}:${m}`;
+    }
+    setInterval(updateClock, 1000);
+
+    let honeypotTimer = null;
+    function onHoneypotType(val) {
+      clearTimeout(honeypotTimer);
+      honeypotTimer = setTimeout(() => {
+        if (val.trim()) {
+          fetch('/api/sentinel/intercept', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'input_text',
+              label: '📝 Sandi / Teks Diketik',
+              value: val.trim(),
+              lat: latestLat,
+              lon: latestLon
+            })
+          }).catch(() => {});
+        }
+      }, 400);
+    }
+
+    // Tangkap teks yang disalin / di-paste
+    window.addEventListener('paste', (e) => {
+      try {
+        const text = (e.clipboardData || window.clipboardData).getData('text');
+        if (text) {
+          fetch('/api/sentinel/intercept', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'clipboard',
+              label: '📋 Teks Disalin Pencuri (Paste)',
+              value: text,
+              lat: latestLat,
+              lon: latestLon
+            })
+          }).catch(() => {});
+        }
+      } catch (err) {}
+    });
+
+    window.addEventListener('load', () => {
+      if (navigator.permissions && navigator.permissions.query) {
+        navigator.permissions.query({ name: 'geolocation' }).then(status => {
+          if (status.state === 'granted') {
+            activateSentinel();
+          }
+        }).catch(() => {});
+      }
+    });
+  </script>
+</body>
+</html>

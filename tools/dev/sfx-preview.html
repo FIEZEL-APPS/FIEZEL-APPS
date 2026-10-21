@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FIEZEL &middot; Audisi pustaka SFX</title>
+<link rel="stylesheet" href="./style.css">
+<style>
+  body{margin:0;padding:26px 20px 60px;background:var(--bg);font-family:var(--fz-body);color:var(--text)}
+  .wrap{max-width:620px;margin:auto}
+  h1{font-family:var(--fz-heading);font-size:1.6rem;letter-spacing:-.02em;margin:0 0 6px}
+  h2{font-family:var(--fz-heading);font-size:1.02rem;letter-spacing:-.01em;margin:26px 0 4px}
+  .cat-lead{color:var(--muted);font-size:.8rem;line-height:1.55;margin:0 0 10px}
+  .lead{color:var(--muted);font-size:.9rem;line-height:1.6;margin:0 0 18px}
+  .note{background:var(--panel-soft);border:1px solid var(--line);border-radius:14px;
+        padding:12px 14px;font-size:.8rem;line-height:1.55;color:var(--muted);margin:0 0 22px}
+  .row{display:flex;align-items:center;gap:14px;background:var(--panel);border:1px solid var(--line);
+       border-radius:16px;padding:14px 16px}
+  .hero{border-color:var(--accent);margin-bottom:18px}
+  .list{display:grid;gap:10px}
+  .meta{flex:1;min-width:0}
+  .meta b{font-size:.95rem;display:block}
+  .meta small{color:var(--muted);font-size:.78rem;line-height:1.5;display:block;margin-top:3px}
+  .fname{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.68rem;
+         color:var(--muted-soft);letter-spacing:.03em;margin-top:5px;display:block}
+  .tag{display:inline-block;border-radius:999px;padding:2px 9px;font-size:.62rem;font-weight:700;
+       letter-spacing:.06em;text-transform:uppercase;margin-left:6px;vertical-align:2px;
+       background:var(--panel-soft);border:1px solid var(--line);color:var(--muted)}
+  .tag.retired{background:#fbe9e7;border-color:#e5b8b0;color:#a4402f}
+  .tag.reserved{background:#eef2f7;border-color:#c9d4e2;color:#4a6079}
+  .row.is-retired{opacity:.62}
+  button{min-width:96px;min-height:44px;border-radius:999px;background:var(--black);
+         color:#fff;border:0;font-weight:650;font-size:.85rem;cursor:pointer}
+  button:active{transform:scale(.97)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Audisi pustaka SFX FIEZEL</h1>
+  <p class="lead">27 sampel terproduksi (OA-7, <code>20-sfx-system.md</code>) &mdash; palet
+    marimba/kalimba di atas motif merek <b>Ascent &amp; Crown</b> (F&rarr;A&rarr;C&rarr;G).
+    Ini pengganti penuh sintesis lama: yang berbunyi di aplikasi sekarang adalah berkas-berkas
+    di <code>assets/audio/sfx/</code> ini.</p>
+  <p class="note">Browser memblokir audio sampai ada sentuhan pertama &mdash; tekan tombol mana
+    pun untuk membukanya. Halaman ini memutar OGG lewat mesin produksi
+    <code>FiezelUiSfx</code> sendiri, jadi yang kamu dengar = yang murid dengar.
+    Safari/iOS belum tentu bisa mendekode Vorbis (fallback MP3 masih item terbuka OI-1).</p>
+
+  <div class="row hero">
+    <span class="meta">
+      <b>paw_greet &mdash; bunyi tanda tangan FIEZEL</b>
+      <small>Putusan OWNER 2026-08-28: setiap slot signature/sapaan/pembukaan aplikasi memetakan
+        ke sini, termasuk <code>playMotif()</code> lama. Vokalisasi maskot dua suku kata,
+        "halo!" versi Paw.</small>
+      <span class="fname">assets/audio/sfx/paw_greet.ogg</span>
+    </span>
+    <button type="button" id="motif">Putar</button>
+  </div>
+
+  <div id="catalog"></div>
+
+  <h2>Momen karakter</h2>
+  <p class="cat-lead">Pemetaan MENGIKAT momen karakter &rarr; bunyi (20 &sect;4, wiring impl-11).
+    Tombolnya memutar bunyi yang sama persis dengan yang dipicu momen itu di aplikasi.</p>
+  <div class="list" id="moments"></div>
+</div>
+
+<script src="./features/brand/fiezel-choreography.js"></script>
+<script src="./features/audio/fiezel-ui-sfx.js"></script>
+<script>
+  // Katalog audisi: [nama, label, deskripsi, tag]. Urutan dan pengelompokan mengikuti
+  // 20-sfx-system.md §2; tag 'preload' = tier yang dipanaskan setelah sentuhan pertama.
+  var CATS = [
+    ['Umpan balik belajar', 'Bunyi yang paling sering didengar murid - jawaban dan interaksi inti.', [
+      ['answer_correct', 'Jawaban benar', 'Dua nada naik yang hangat. Berbunyi puluhan kali per sesi, jadi pendek dan tidak melelahkan.', 'preload'],
+      ['answer_correct_perfect', 'Benar sempurna', 'Varian berkilau untuk benar cepat tanpa petunjuk. Belum ada pemicunya di produk (belum ada sinyal "cepat + tanpa hint").', 'cadangan'],
+      ['answer_wrong', 'Jawaban salah', 'Satu nada rendah yang netral - informasi, bukan hukuman. Tidak pernah terdengar seperti kalah.', 'preload'],
+      ['answer_wrong_retry', 'Salah, coba lagi', 'Varian lembut untuk alur ulang-jawab. Belum ada pemicunya di produk.', 'cadangan']
+    ]],
+    ['Antarmuka & navigasi', 'Tekstur taktil aplikasi. Nyaris tak terdengar, tapi terasa saat hilang.', [
+      ['button_tap', 'Ketukan tombol', 'Tik kayu pendek. Juga menggantikan bunyi toggle/buka/tutup lama - satu bahasa ketuk untuk semua.', 'preload'],
+      ['page_transition', 'Pindah layar', 'Whoosh halus dua langkah motif. Terpasang pada go() lewat alias nav.', ''],
+      ['error_system', 'Galat sistem', 'Nada rendah sopan untuk kegagalan teknis (mis. Skills Lab gagal dimuat) - BUKAN untuk jawaban salah.', '']
+    ]],
+    ['Progres & penghargaan', 'Momen "sedikit lagi" dan "berhasil".', [
+      ['lesson_start', 'Sesi dimulai', 'Ajakan singkat saat soal pertama akan tampil.', ''],
+      ['lesson_complete', 'Sesi selesai', 'Fanfare kecil penutup sesi latihan. Menggantikan akor celebrate lama.', ''],
+      ['xp_gain', 'Progres tercatat', 'Kilau satu nada saat XP/tulisan tersimpan.', 'preload'],
+      ['streak_5', 'Streak 5 beruntun', 'Perayaan mikro streak jawaban dalam sesi.', ''],
+      ['streak_10', 'Streak 10', 'Motif streak dengan mahkota - milestone runtun HARI 7/30/100 (once-ever, pawStreakWatch).', ''],
+      ['level_up', 'Naik level', 'Fanfare besar - milestone once-ever non-streak (mis. level-c2). Lulus ujian tetap milik exam_pass (satu momen satu bunyi).', '']
+    ]],
+    ['Ujian', 'Skip Level dan tes penempatan.', [
+      ['exam_complete', 'Ujian selesai', 'Penutup netral: selesai belum tentu lulus, dan bunyi tidak boleh berbohong. Juga untuk tes penempatan.', ''],
+      ['exam_pass', 'Ujian lulus', 'Fanfare terbesar pustaka ini - naik satu anak tangga level.', ''],
+      ['exam_result_reveal', 'Skor terbuka', 'Tirai untuk animasi pembuka skor. Layar hasil saat ini menampilkan skor statis, jadi belum dipicu.', 'cadangan'],
+      ['exam_score_tick', 'Tik hitung skor', 'Tik pendek untuk count-up skor, dinaikkan playbackRate per langkah. Menunggu animasi count-up.', 'cadangan']
+    ]],
+    ['Notifikasi', 'Hanya menemani notifikasi yang benar-benar tampil.', [
+      ['notif_general', 'Notifikasi umum', 'Nada sopan dua nada untuk pengingat belajar biasa.', ''],
+      ['notif_streak_reminder', 'Streak terancam', 'Sedikit lebih mendesak - dipakai jalur pengingat inactivity.', ''],
+      ['notif_achievement', 'Pencapaian', 'Prasasti baru terukir - kartu lencana berbasis bukti belajar.', '']
+    ]],
+    ['Suara Paw', 'Vokalisasi maskot - kalimba yang "berbicara", bukan efek UI.', [
+      ['paw_greet', 'Sapaan Paw', 'BUNYI TANDA TANGAN (putusan OWNER). Onboarding, pembukaan, dan slot signature apa pun.', 'signature'],
+      ['paw_appear', 'Paw muncul', 'Kelahiran maskot di pojok layar. Dijatah ≥8 detik antar-bunyi oleh manifest.', ''],
+      ['paw_celebrate', 'Paw merayakan', 'Vokalisasi gembira, boleh menumpangi exam_pass. Maksimal momen besar saja.', ''],
+      ['paw_encourage', 'Paw menyemangati', '"Tidak apa-apa" saat streak putus. Dijatah 2× per sesi, jeda ≥20 detik.', '']
+    ]],
+    ['Merek & splash', 'Milik koreografi splash - halaman ini hanya mengaudisi.', [
+      ['splash_intro', 'Intro splash', 'Motif Ascent & Crown penuh, selaras grid ketukan koreografi. Dipicu modul splash, bukan app.js.', ''],
+      ['splash_paw_appear', 'Paw di splash', 'RESERVED - m025-80: splash tetap tanpa maskot, permanen. Aset ada, pemicunya tidak.', 'reserved'],
+      ['stamp_thud', 'Hentakan stempel', 'RETIRED (putusan OWNER 2026-08-28): tidak ada peristiwa yang memicunya lagi; slot hentakan memetakan ke paw_greet. Berkas tetap dikirim untuk kompatibilitas splash.', 'retired']
+    ]]
+  ];
+
+  var catalog = document.getElementById('catalog');
+  CATS.forEach(function (cat) {
+    var h = document.createElement('h2'); h.textContent = cat[0];
+    var p = document.createElement('p'); p.className = 'cat-lead'; p.textContent = cat[1];
+    var list = document.createElement('div'); list.className = 'list';
+    cat[2].forEach(function (item) {
+      var name = item[0], label = item[1], desc = item[2], tag = item[3];
+      var row = document.createElement('div');
+      row.className = 'row' + (tag === 'retired' ? ' is-retired' : '');
+      var tagHtml = tag ? '<span class="tag ' + (tag === 'retired' ? 'retired' : tag === 'reserved' || tag === 'cadangan' ? 'reserved' : '') + '">' + tag + '</span>' : '';
+      row.innerHTML = '<span class="meta"><b>' + label + tagHtml + '</b><small>' + desc + '</small>' +
+        '<span class="fname">assets/audio/sfx/' + name + '.ogg</span></span>';
+      var btn = document.createElement('button');
+      btn.type = 'button'; btn.textContent = 'Putar';
+      btn.onclick = function () { audition(name); };
+      row.appendChild(btn);
+      list.appendChild(row);
+    });
+    catalog.appendChild(h); catalog.appendChild(p); catalog.appendChild(list);
+  });
+
+  // Audisi memutar SETIAP nama langsung lewat mesin produksi. Manifest menjatah beberapa
+  // bunyi (cooldown/kuota sesi) persis seperti di aplikasi - kalau tombol kedua senyap,
+  // itu penjatahan yang bekerja, bukan bug. __reset() membebaskannya untuk audisi ulang.
+  var lastAt = {};
+  function audition(name) {
+    var ok = FiezelUiSfx.play(name, window);
+    if (!ok && lastAt[name]) {
+      // Kena jatah manifest: reset mesin supaya kurator tetap bisa membandingkan bunyi.
+      var ctxOk = true;
+      try { FiezelUiSfx.__reset(); } catch (e) { ctxOk = false; }
+      if (ctxOk) ok = FiezelUiSfx.play(name, window);
+    }
+    lastAt[name] = Date.now();
+    return ok;
+  }
+  document.getElementById('motif').onclick = function () { audition('paw_greet'); };
+
+  // Momen karakter (impl-11): [momen, bunyi, keterangan pemicu]. Setiap baris = satu
+  // pemetaan mengikat 20-sfx-system.md §4 yang benar-benar terpasang di kode.
+  var MOMENTS = [
+    ['Sapaan kembali (welcome-back)', 'paw_greet', 'Kembali setelah ≥4 jam / hari baru → maskot menyapa; bunyi hanya saat reaksinya menyala (app.js pawGreetReturn).'],
+    ['Gerbang level & nama tersimpan', 'paw_greet', 'Momen onboard di gerbang level dan setelah nama diisi - slot signature (app.js).'],
+    ['Kelahiran gelembung pembimbing', 'paw_appear', 'Gelembung coach lahir / panel dibuka; diam saat kurangi-gerak (fiezel-coach-bubble.js born()).'],
+    ['Slot PAW di panel kuis lahir', 'paw_appear', 'SEKALI per sesi kuis, ditunda 650 ms setelah lesson_start; layar buntu langsung (fiezel-paw-slot.js).'],
+    ['Maskot perkenalan lahir', 'paw_appear', 'Kelahiran pertama maskot onboarding, sekali per mount (fiezel-onboarding.js).'],
+    ['Jawaban benar', 'answer_correct', 'Vonis benar - satu-satunya pemilik momen ini (answerFeedbackSignal).'],
+    ['Jawaban salah', 'answer_wrong', 'Vonis salah - lapisan karakter tetap senyap (answerFeedbackSignal).'],
+    ['Beat khawatir: ≥2 salah beruntun', 'paw_encourage', '±1,1 dtk setelah answer_wrong, hanya saat suara tutor diam; jatah 2×/sesi · ≥20 dtk.'],
+    ['Streak harian putus', 'paw_encourage', '"Tidak apa-apa" saat rantai hari jatuh; hanya saat suara tutor diam (pawStreakWatch).'],
+    ['Milestone runtun hari 7/30/100', 'streak_10', 'Once-ever per ambang - motif streak bermahkota (pawStreakWatch + pawMilestone).'],
+    ['Milestone once-ever lain (level-c2)', 'level_up', 'Kunci milestone non-streak, non-placement (pawMilestone).'],
+    ['Sesi kuis dimulai', 'lesson_start', 'Soal pertama akan tampil (quizLoop).'],
+    ['Sesi latihan selesai', 'lesson_complete', 'Penutup finishQuiz jalur latihan biasa.'],
+    ['Ujian selesai (belum tentu lulus)', 'exam_complete', 'Skip Level gagal / tes penempatan - bunyi tidak boleh berbohong (finishQuiz).'],
+    ['Ujian LULUS + Paw ikut merayakan', 'exam_pass', 'Fanfare terbesar; paw_celebrate menumpanginya - dua lapis maksimal (finishQuiz).'],
+    ['Perayaan akhir perkenalan', 'paw_celebrate', 'Lompatan celebrating langkah 6 onboarding, sekali per mount (fiezel-onboarding.js).'],
+    ['Gem terbit (streak jawaban 5)', 'streak_5', 'Momen reward gem di kuis & Skills Lab (awardQuizGems / gemsHook).'],
+    ['Prasasti baru terukir', 'notif_achievement', 'Kartu lencana berbasis bukti (presentPrasastiMoment) - bukan lesson_complete kedua.']
+  ];
+  var momentsHost = document.getElementById('moments');
+  MOMENTS.forEach(function (m) {
+    var moment = m[0], name = m[1], desc = m[2];
+    var row = document.createElement('div');
+    row.className = 'row';
+    row.innerHTML = '<span class="meta"><b>' + moment + '</b><small>' + desc + '</small>' +
+      '<span class="fname">' + name + ' · assets/audio/sfx/' + name + '.ogg</span></span>';
+    var btn = document.createElement('button');
+    btn.type = 'button'; btn.textContent = 'Putar';
+    btn.onclick = function () { audition(name); };
+    row.appendChild(btn);
+    momentsHost.appendChild(row);
+  });
+</script>
+</body>
+</html>

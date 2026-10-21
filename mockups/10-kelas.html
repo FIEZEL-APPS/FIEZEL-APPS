@@ -1,0 +1,56 @@
+<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=390">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<style>
+.task{display:flex;gap:12px;align-items:center;padding:14px 16px;border-radius:18px;background:var(--paper);border:1px solid var(--line)}
+.task .d{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;flex:none;font-weight:700;font-size:12px;line-height:1.1;text-align:center}
+.task b{display:block;font-size:15px}
+.task span{font-size:12px;color:var(--muted);font-weight:600}
+.teacher{display:flex;align-items:center;gap:12px;padding:14px;border-radius:20px;background:var(--lilac);border:1px solid var(--lilac-line)}
+.teacher .av{width:44px;height:44px;border-radius:50%;background:var(--lilac-ink);color:#fff;display:grid;place-items:center;font-weight:700}
+.msg{display:flex;gap:10px;align-items:flex-end}
+.msg .paw{width:44px}
+.rank{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:14px}
+.rank.me{background:var(--sun-soft);border:1px solid var(--yellow-line)}
+.rank .n{width:22px;font-weight:700;color:var(--muted)}
+.rank .av{width:32px;height:32px;border-radius:50%;background:var(--pink);display:grid;place-items:center;font-size:12px;font-weight:700;color:var(--pink-ink)}
+</style></head><body>
+<div class="screen">
+  <div class="top"><h1>Kelas</h1><span class="chip"><i data-lucide="users" class="i sm"></i>X IPA 2</span></div>
+
+  <div class="teacher mt-2">
+    <span class="av">BS</span>
+    <div style="flex:1"><b>Bu Sari</b><div class="small" style="color:var(--lilac-ink)">“Minggu ini fokus Present Simple, ya. Tes Jumat.”</div></div>
+    <span class="iconbtn" style="background:transparent;border:0"><i data-lucide="message-circle-question" class="i"></i></span>
+  </div>
+
+  <div class="row between mt-3"><h3>Tugas</h3><span class="pill bad">2 belum</span></div>
+  <div class="stack mt-2" style="gap:8px">
+    <div class="task"><span class="d" style="background:var(--bad-soft);color:var(--bad)">Kam<br>28</span><div style="flex:1"><b>Grammar · Lesson 4 & 5</b><span>Present Simple + Plural · 20 soal</span></div><a class="btn sun mini">Kerjakan</a></div>
+    <div class="task"><span class="d" style="background:var(--yellow);color:var(--yellow-ink)">Jum<br>29</span><div style="flex:1"><b>Speaking · Perkenalan diri</b><span>Rekam 1 menit · dinilai guru</span></div><i data-lucide="chevron-right" class="i sm muted"></i></div>
+    <div class="task" style="opacity:.6"><span class="d" style="background:var(--good-soft);color:var(--good)"><i data-lucide="check" class="i sm"></i></span><div style="flex:1"><b>Vocab · Makanan</b><span>Selesai · 18/20</span></div></div>
+  </div>
+
+  <div class="card mt-3">
+    <div class="row between"><b>Papan kelas · minggu ini</b><span class="tiny muted">XP</span></div>
+    <div class="stack mt-2" style="gap:4px">
+      <div class="rank"><span class="n">1</span><span class="av" style="background:var(--mint);color:var(--mint-ink)">DA</span><span style="flex:1;font-weight:600">Dara</span><b>340</b></div>
+      <div class="rank"><span class="n">2</span><span class="av" style="background:var(--lilac);color:var(--lilac-ink)">RF</span><span style="flex:1;font-weight:600">Rafi</span><b>310</b></div>
+      <div class="rank me"><span class="n">3</span><span class="av">RA</span><span style="flex:1;font-weight:700">Rani (kamu)</span><b>296</b></div>
+      <div class="rank"><span class="n">4</span><span class="av" style="background:var(--sky);color:var(--sky-ink)">NB</span><span style="flex:1;font-weight:600">Nabil</span><b>250</b></div>
+    </div>
+  </div>
+
+  <div class="msg mt-3">
+    <img class="paw" src="/assets/brand/paw-mascot-head.svg" alt="">
+    <div class="bubble sun tail-l" style="flex:1">Selisih ke peringkat 2 cuma 14 XP. Satu Sesi Kilat cukup.</div>
+  </div>
+</div>
+<nav class="nav">
+  <a><i data-lucide="house" class="i"></i>Hari ini</a>
+  <a><i data-lucide="zap" class="i"></i>Latihan</a>
+  <a class="on"><i data-lucide="school" class="i"></i>Kelas</a>
+  <a><i data-lucide="route" class="i"></i>Progres</a>
+  <a><i data-lucide="user-round" class="i"></i>Profil</a>
+</nav>
+<script src="/lucide.min.js"></script><script>lucide.createIcons()</script></body></html>

@@ -1,0 +1,1373 @@
+{
+  "engine": "features/class-hub/fiezel-face-guard.js",
+  "frames": 16,
+  "matrix": [
+    {
+      "id": "frontal",
+      "grp": "pose",
+      "exp": "hadir",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 42.22
+      },
+      "exam": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 42.22
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "nunduk-15",
+      "grp": "pose",
+      "exp": "hadir",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 43.11
+      },
+      "exam": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 43.11
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "nunduk-25",
+      "grp": "pose",
+      "exp": "hadir",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 45.63
+      },
+      "exam": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 45.63
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "hp-di-bawah (dongak -15)",
+      "grp": "pose",
+      "exp": "hadir",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 36.31
+      },
+      "exam": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 36.31
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "toleh-kiri-15",
+      "grp": "pose",
+      "exp": "hadir",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 29.03
+      },
+      "exam": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 29.03
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "toleh-kiri-30",
+      "grp": "pose",
+      "exp": "hadir",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 27.42
+      },
+      "exam": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 27.42
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "toleh-kanan-15",
+      "grp": "pose",
+      "exp": "hadir",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 32.79
+      },
+      "exam": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 32.79
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "toleh-kanan-30",
+      "grp": "pose",
+      "exp": "hadir",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 35
+      },
+      "exam": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 35
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "miring-kepala-12",
+      "grp": "pose",
+      "exp": "hadir",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 30.69
+      },
+      "exam": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 30.69
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "baca: nunduk-20+toleh-15",
+      "grp": "pose",
+      "exp": "hadir",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 50.5
+      },
+      "exam": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 50.5
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "jarak-jauh (wajah 14px)",
+      "grp": "pose",
+      "exp": "hadir",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 32.58
+      },
+      "exam": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 32.58
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "jarak-dekat (wajah 30px)",
+      "grp": "pose",
+      "exp": "hadir",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 59.2
+      },
+      "exam": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 59.2
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "di-pinggir-bingkai",
+      "grp": "pose",
+      "exp": "hadir",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 42.12
+      },
+      "exam": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 42.12
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "kacamata",
+      "grp": "aksesoris",
+      "exp": "hadir",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 68.57
+      },
+      "exam": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 68.57
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "kacamata+pantulan-layar",
+      "grp": "aksesoris",
+      "exp": "hadir",
+      "enrollOk": true,
+      "enrollMs": 300,
+      "pre": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 53.78
+      },
+      "exam": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 53.78
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "kacamata+pantulan+nunduk-20",
+      "grp": "aksesoris",
+      "exp": "hadir",
+      "enrollOk": true,
+      "enrollMs": 300,
+      "pre": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 47.8
+      },
+      "exam": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 47.8
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "kerudung-hitam",
+      "grp": "aksesoris",
+      "exp": "hadir",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 51.91
+      },
+      "exam": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 51.91
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "kerudung-putih",
+      "grp": "aksesoris",
+      "exp": "hadir",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 60.8
+      },
+      "exam": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 60.8
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "kerudung-krem",
+      "grp": "aksesoris",
+      "exp": "hadir",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 60.24
+      },
+      "exam": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 60.24
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "kerudung-hitam+nunduk-20",
+      "grp": "aksesoris",
+      "exp": "hadir",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 36.51
+      },
+      "exam": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 36.51
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "poni",
+      "grp": "aksesoris",
+      "exp": "hadir",
+      "enrollOk": true,
+      "enrollMs": 600,
+      "pre": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 35.4
+      },
+      "exam": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 35.4
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "poni+nunduk-20",
+      "grp": "aksesoris",
+      "exp": "hadir",
+      "enrollOk": true,
+      "enrollMs": 600,
+      "pre": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 53.96
+      },
+      "exam": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 53.96
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "rambut-panjang",
+      "grp": "aksesoris",
+      "exp": "hadir",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 58.98
+      },
+      "exam": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 58.98
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "seragam-pramuka (cokelat)",
+      "grp": "aksesoris",
+      "exp": "hadir",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 42.22
+      },
+      "exam": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 42.22
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "backlight-jendela",
+      "grp": "cahaya",
+      "exp": "hadir",
+      "enrollOk": true,
+      "enrollMs": 1200,
+      "pre": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 24.45
+      },
+      "exam": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 24.45
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "backlight+nunduk-20",
+      "grp": "cahaya",
+      "exp": "hadir",
+      "enrollOk": true,
+      "enrollMs": 1200,
+      "pre": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 20.55
+      },
+      "exam": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 20.55
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "redup-malam",
+      "grp": "cahaya",
+      "exp": "hadir",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 14.47
+      },
+      "exam": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 14.47
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "redup+toleh-20",
+      "grp": "cahaya",
+      "exp": "hadir",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 0.9375,
+        "reason": "skin_count_out_of_range",
+        "eyeDip": 12.69
+      },
+      "exam": {
+        "rate": 0.9375,
+        "reason": "skin_count_out_of_range",
+        "eyeDip": 12.69
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "redup+kerudung-hitam",
+      "grp": "cahaya",
+      "exp": "hadir",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 28.91
+      },
+      "exam": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 28.91
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "lampu-led-dingin",
+      "grp": "cahaya",
+      "exp": "hadir",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 42.22
+      },
+      "exam": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 42.22
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "lampu-bohlam-hangat",
+      "grp": "cahaya",
+      "exp": "hadir",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 43.16
+      },
+      "exam": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 43.16
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "cahaya-samping-keras",
+      "grp": "cahaya",
+      "exp": "hadir",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 28.51
+      },
+      "exam": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 28.51
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "latar-dinding-krem",
+      "grp": "cahaya",
+      "exp": "hadir",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 42.22
+      },
+      "exam": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 42.22
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "kulit-terang",
+      "grp": "kulit",
+      "exp": "hadir",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 63.23
+      },
+      "exam": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 63.23
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "kulit-langsat",
+      "grp": "kulit",
+      "exp": "hadir",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 53.63
+      },
+      "exam": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 53.63
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "kulit-gelap",
+      "grp": "kulit",
+      "exp": "hadir",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 28.54
+      },
+      "exam": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 28.54
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "kulit-sangat-gelap",
+      "grp": "kulit",
+      "exp": "hadir",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 18
+      },
+      "exam": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 18
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "kulit-sangat-gelap+redup",
+      "grp": "kulit",
+      "exp": "hadir",
+      "enrollOk": true,
+      "enrollMs": 780,
+      "pre": {
+        "rate": 0.5625,
+        "reason": "no_facial_features",
+        "eyeDip": 7.43
+      },
+      "exam": {
+        "rate": 0.5,
+        "reason": "no_facial_features",
+        "eyeDip": 7.43
+      },
+      "verdict": "GAGAL"
+    },
+    {
+      "id": "kardus-penuh",
+      "grp": "benda",
+      "exp": "absen",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 0,
+        "reason": "skin_count_out_of_range",
+        "eyeDip": null
+      },
+      "exam": {
+        "rate": 0,
+        "reason": "skin_count_out_of_range",
+        "eyeDip": null
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "kardus-polos",
+      "grp": "benda",
+      "exp": "absen",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 0,
+        "reason": "skin_count_out_of_range",
+        "eyeDip": null
+      },
+      "exam": {
+        "rate": 0,
+        "reason": "skin_count_out_of_range",
+        "eyeDip": null
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "kardus-lampu-atas",
+      "grp": "benda",
+      "exp": "absen",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 0,
+        "reason": "skin_count_out_of_range",
+        "eyeDip": null
+      },
+      "exam": {
+        "rate": 0,
+        "reason": "skin_count_out_of_range",
+        "eyeDip": null
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "kardus-dipegang",
+      "grp": "benda",
+      "exp": "absen",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 0,
+        "reason": "box_too_large",
+        "eyeDip": 18.06
+      },
+      "exam": {
+        "rate": 0,
+        "reason": "skin_count_out_of_range",
+        "eyeDip": null
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "dinding-krem",
+      "grp": "benda",
+      "exp": "absen",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 0,
+        "reason": "skin_count_out_of_range",
+        "eyeDip": null
+      },
+      "exam": {
+        "rate": 0,
+        "reason": "skin_count_out_of_range",
+        "eyeDip": null
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "dinding-tan-gelap",
+      "grp": "benda",
+      "exp": "absen",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 0,
+        "reason": "skin_count_out_of_range",
+        "eyeDip": null
+      },
+      "exam": {
+        "rate": 0,
+        "reason": "skin_count_out_of_range",
+        "eyeDip": null
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "meja-kayu",
+      "grp": "benda",
+      "exp": "absen",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 0,
+        "reason": "skin_count_out_of_range",
+        "eyeDip": null
+      },
+      "exam": {
+        "rate": 0,
+        "reason": "skin_count_out_of_range",
+        "eyeDip": null
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "gorden",
+      "grp": "benda",
+      "exp": "absen",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 0,
+        "reason": "skin_count_out_of_range",
+        "eyeDip": null
+      },
+      "exam": {
+        "rate": 0,
+        "reason": "skin_count_out_of_range",
+        "eyeDip": null
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "telapak-menempel-lensa",
+      "grp": "benda",
+      "exp": "absen",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 0,
+        "reason": "skin_count_out_of_range",
+        "eyeDip": null
+      },
+      "exam": {
+        "rate": 0,
+        "reason": "skin_count_out_of_range",
+        "eyeDip": null
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "telapak-menutupi-wajah",
+      "grp": "benda",
+      "exp": "absen",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 0,
+        "reason": "no_facial_features",
+        "eyeDip": 35.24
+      },
+      "exam": {
+        "rate": 0,
+        "reason": "no_facial_features",
+        "eyeDip": 35.24
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "tangan-menutup-sebagian (mata)",
+      "grp": "benda",
+      "exp": "absen",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 0,
+        "reason": "box_too_large",
+        "eyeDip": 18.81
+      },
+      "exam": {
+        "rate": 0,
+        "reason": "skin_count_out_of_range",
+        "eyeDip": null
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "buku-menutup-penuh",
+      "grp": "benda",
+      "exp": "absen",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 0,
+        "reason": "skin_count_out_of_range",
+        "eyeDip": null
+      },
+      "exam": {
+        "rate": 0,
+        "reason": "skin_count_out_of_range",
+        "eyeDip": null
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "buku-menutup-sebagian (mata)",
+      "grp": "benda",
+      "exp": "absen",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 0,
+        "reason": "box_too_large",
+        "eyeDip": 36.29
+      },
+      "exam": {
+        "rate": 0,
+        "reason": "skin_count_out_of_range",
+        "eyeDip": null
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "buku-terbuka-redup",
+      "grp": "benda",
+      "exp": "absen",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 0,
+        "reason": "box_too_large",
+        "eyeDip": 95.68
+      },
+      "exam": {
+        "rate": 0,
+        "reason": "skin_count_out_of_range",
+        "eyeDip": null
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "kursi-kosong",
+      "grp": "benda",
+      "exp": "absen",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 0,
+        "reason": "skin_count_out_of_range",
+        "eyeDip": null
+      },
+      "exam": {
+        "rate": 0,
+        "reason": "skin_count_out_of_range",
+        "eyeDip": null
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "kamar-krem-kosong",
+      "grp": "benda",
+      "exp": "absen",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 0,
+        "reason": "skin_count_out_of_range",
+        "eyeDip": null
+      },
+      "exam": {
+        "rate": 0,
+        "reason": "skin_count_out_of_range",
+        "eyeDip": null
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "langit-langit",
+      "grp": "benda",
+      "exp": "absen",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 0,
+        "reason": "skin_count_out_of_range",
+        "eyeDip": null
+      },
+      "exam": {
+        "rate": 0,
+        "reason": "skin_count_out_of_range",
+        "eyeDip": null
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "menoleh-jauh-75",
+      "grp": "benda",
+      "exp": "absen",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 44.21
+      },
+      "exam": {
+        "rate": 0.0625,
+        "reason": "face_turned_away",
+        "eyeDip": 44.21
+      },
+      "verdict": "OK"
+    },
+    {
+      "id": "menunduk-menulis-55",
+      "grp": "benda",
+      "exp": "info",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 0.9375,
+        "reason": "aspect_ratio_invalid",
+        "eyeDip": 52.74
+      },
+      "exam": {
+        "rate": 0.9375,
+        "reason": "aspect_ratio_invalid",
+        "eyeDip": 52.74
+      },
+      "verdict": "info"
+    },
+    {
+      "id": "foto-cetak (per-bingkai)",
+      "grp": "benda",
+      "exp": "info",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 1,
+        "reason": "",
+        "eyeDip": 26.94
+      },
+      "exam": {
+        "rate": 0.125,
+        "reason": "face_turned_away",
+        "eyeDip": 26.94
+      },
+      "verdict": "info"
+    },
+    {
+      "id": "layar-hp (per-bingkai)",
+      "grp": "benda",
+      "exp": "info",
+      "enrollOk": true,
+      "enrollMs": 3060,
+      "pre": {
+        "rate": 0.9375,
+        "reason": "no_facial_features",
+        "eyeDip": 28.75
+      },
+      "exam": {
+        "rate": 0,
+        "reason": "face_turned_away",
+        "eyeDip": 28.75
+      },
+      "verdict": "info"
+    }
+  ],
+  "liveness": [
+    {
+      "name": "wajah hidup diam (mikro-gerak + derau)",
+      "exp": "lolos",
+      "passed": true,
+      "ms": 3060,
+      "verdict": "OK"
+    },
+    {
+      "name": "wajah hidup berkedip di dtk 1,5",
+      "exp": "lolos",
+      "passed": true,
+      "ms": 3060,
+      "verdict": "OK"
+    },
+    {
+      "name": "wajah berponi diam",
+      "exp": "lolos",
+      "passed": true,
+      "ms": 660,
+      "verdict": "OK"
+    },
+    {
+      "name": "wajah berkerudung diam",
+      "exp": "lolos",
+      "passed": true,
+      "ms": 3060,
+      "verdict": "OK"
+    },
+    {
+      "name": "wajah berkacamata + pantulan layar",
+      "exp": "lolos",
+      "passed": true,
+      "ms": 480,
+      "verdict": "OK"
+    },
+    {
+      "name": "wajah backlight jendela",
+      "exp": "lolos",
+      "passed": true,
+      "ms": 3060,
+      "verdict": "OK"
+    },
+    {
+      "name": "wajah ruangan redup",
+      "exp": "lolos",
+      "passed": true,
+      "ms": 600,
+      "verdict": "OK"
+    },
+    {
+      "name": "foto cetak diam (derau sensor saja)",
+      "exp": "batas",
+      "passed": true,
+      "ms": 3060,
+      "verdict": "batas"
+    },
+    {
+      "name": "foto cetak digoyang tangan (kaku)",
+      "exp": "batas",
+      "passed": true,
+      "ms": 3060,
+      "verdict": "batas"
+    },
+    {
+      "name": "layar HP, foto diam",
+      "exp": "batas",
+      "passed": true,
+      "ms": 3060,
+      "verdict": "batas"
+    },
+    {
+      "name": "layar HP, video wajah berkedip (batas jujur)",
+      "exp": "info",
+      "passed": true,
+      "ms": 3060,
+      "verdict": "info"
+    }
+  ],
+  "temporal": [
+    {
+      "name": "membaca tenang 60 dtk (nunduk 15–25, kedip)",
+      "tickMs": 500,
+      "warnOn": [],
+      "warnOff": [],
+      "episodes": [],
+      "absent": [],
+      "perTick": {
+        "draw": 1,
+        "read": 1
+      },
+      "enrolled": true,
+      "verdict": "OK"
+    },
+    {
+      "name": "frame drop 1 bingkai / 2 bingkai (hitam)",
+      "tickMs": 500,
+      "warnOn": [],
+      "warnOff": [],
+      "episodes": [],
+      "absent": [],
+      "perTick": {
+        "draw": 1,
+        "read": 1
+      },
+      "enrolled": true,
+      "verdict": "OK"
+    },
+    {
+      "name": "blur gerak 1,5 dtk (garuk kepala)",
+      "tickMs": 500,
+      "warnOn": [],
+      "warnOff": [],
+      "episodes": [],
+      "absent": [],
+      "perTick": {
+        "draw": 1,
+        "read": 1
+      },
+      "enrolled": true,
+      "verdict": "OK"
+    },
+    {
+      "name": "menunduk menulis 2,5 dtk (pitch 55)",
+      "tickMs": 500,
+      "warnOn": [],
+      "warnOff": [],
+      "episodes": [],
+      "absent": [],
+      "perTick": {
+        "draw": 1,
+        "read": 1
+      },
+      "enrolled": true,
+      "verdict": "OK"
+    },
+    {
+      "name": "backlight jendela 60 dtk",
+      "tickMs": 500,
+      "warnOn": [],
+      "warnOff": [],
+      "episodes": [],
+      "absent": [],
+      "perTick": {
+        "draw": 1,
+        "read": 1
+      },
+      "enrolled": true,
+      "verdict": "OK"
+    },
+    {
+      "name": "redup malam 60 dtk",
+      "tickMs": 500,
+      "warnOn": [],
+      "warnOff": [],
+      "episodes": [],
+      "absent": [],
+      "perTick": {
+        "draw": 1,
+        "read": 1
+      },
+      "enrolled": true,
+      "verdict": "OK"
+    },
+    {
+      "name": "kulit sangat gelap + sangat redup 60 dtk",
+      "tickMs": 500,
+      "warnOn": [],
+      "warnOff": [],
+      "episodes": [],
+      "absent": [
+        6500,
+        55500
+      ],
+      "perTick": {
+        "draw": 1,
+        "read": 1
+      },
+      "enrolled": true,
+      "verdict": "OK"
+    },
+    {
+      "name": "pergi 8 dtk lalu kembali",
+      "tickMs": 500,
+      "warnOn": [
+        13000
+      ],
+      "warnOff": [
+        18500
+      ],
+      "episodes": [
+        14500
+      ],
+      "absent": [
+        12000
+      ],
+      "perTick": {
+        "draw": 1,
+        "read": 1
+      },
+      "enrolled": true,
+      "verdict": "OK"
+    },
+    {
+      "name": "kardus diangkat ke kamera 10 dtk",
+      "tickMs": 500,
+      "warnOn": [
+        13000
+      ],
+      "warnOff": [
+        20500
+      ],
+      "episodes": [
+        14500
+      ],
+      "absent": [
+        12000
+      ],
+      "perTick": {
+        "draw": 1,
+        "read": 1
+      },
+      "enrolled": true,
+      "verdict": "OK"
+    },
+    {
+      "name": "deteksi tersendat 50% selama 40 dtk",
+      "tickMs": 500,
+      "warnOn": [],
+      "warnOff": [],
+      "episodes": [],
+      "absent": [],
+      "perTick": {
+        "draw": 1,
+        "read": 1
+      },
+      "enrolled": true,
+      "verdict": "OK"
+    },
+    {
+      "name": "pergi 10 dtk + kilasan palsu tiap 2 dtk",
+      "tickMs": 500,
+      "warnOn": [
+        13500
+      ],
+      "warnOff": [
+        20500
+      ],
+      "episodes": [
+        15000
+      ],
+      "absent": [
+        12500
+      ],
+      "perTick": {
+        "draw": 1,
+        "read": 1
+      },
+      "enrolled": true,
+      "verdict": "OK"
+    },
+    {
+      "name": "telapak menutup lensa 10 dtk",
+      "tickMs": 500,
+      "warnOn": [
+        13000
+      ],
+      "warnOff": [
+        20500
+      ],
+      "episodes": [
+        14500
+      ],
+      "absent": [
+        12000
+      ],
+      "perTick": {
+        "draw": 1,
+        "read": 1
+      },
+      "enrolled": true,
+      "verdict": "OK"
+    }
+  ],
+  "perf": {
+    "usPerAnalyze": 158.9,
+    "sampleIntervalMs": 500,
+    "ticksPerSec": 2,
+    "readbacksPerTick": 1,
+    "drawsPerTick": 1,
+    "readbacksPerSec": 2,
+    "jsMsPerSec": 0.318,
+    "verdict": "OK"
+  },
+  "summary": {
+    "tpCases": 38,
+    "tpOk": 37,
+    "tnCases": 18,
+    "tnOk": 18,
+    "tpExamRateMean": 0.985,
+    "tpPreRateMean": 0.987,
+    "tnExamFalseRateMean": 0.003,
+    "tnPreFalseRateMean": 0.056,
+    "failures": 1
+  }
+}

@@ -1,0 +1,510 @@
+/* FIEZEL BUG — Sarang (Home) + Perburuan. Palet: tinta #2E2724 di kertas hangat #FBF7F3. Prefix fzb- */
+
+/* ---------------- ADIGAN SARANG (Home) ---------------- */
+.fzb-sarang{position:relative;margin:6px 0 12px;height:515px;border-radius:26px;background:radial-gradient(120% 90% at 50% 10%,#282220 0%,#141110 80%);border:1px solid rgba(255,217,79,.22);color:#FBF7F3;overflow:hidden;box-shadow:0 24px 50px -12px rgba(0,0,0,.65),inset 0 1px 0 rgba(255,255,255,.08);--tx:50;--ty:52}
+.fzb-sarang::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(60% 45% at 50% 62%,rgba(155,58,74,.32),transparent 70%),radial-gradient(45% 35% at 20% 15%,rgba(255,217,79,.08),transparent 70%)}
+.fzb-fog{position:absolute;inset:-20%;pointer-events:none;opacity:.55;background:radial-gradient(30% 25% at 30% 70%,rgba(233,180,76,.12),transparent 70%),radial-gradient(25% 20% at 75% 40%,rgba(16,185,129,.10),transparent 70%);animation:fzbFog 14s ease-in-out infinite alternate}
+@keyframes fzbFog{to{transform:translate(4%,-3%) scale(1.06)}}
+.fzb-label{position:absolute;top:16px;left:18px;font-size:11px;letter-spacing:.22em;font-weight:800;color:#FFD94F;text-shadow:0 0 10px rgba(255,217,79,.35)}
+.fzb-sub{position:absolute;top:32px;left:18px;font-size:12px;color:rgba(251,247,243,.7);font-weight:500}
+.fzb-fosil-chip{position:absolute;top:16px;right:16px;font-size:10.5px;letter-spacing:.08em;font-weight:800;color:#10B981;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.35);border-radius:999px;padding:4px 10px;box-shadow:0 0 10px rgba(16,185,129,.15)}
+
+/* Tombol Bug di Diorama Sarang — isolasi ketat dari body.fz-lux button */
+body .fzb-sarang button.fzb-bug,
+body.fz-lux .fzb-sarang button.fzb-bug {
+  position:absolute!important;
+  width:100px!important;
+  height:auto!important;
+  min-height:0!important;
+  display:block!important;
+  text-align:center!important;
+  color:#FBF7F3!important;
+  transform:translate(-50%,-50%)!important;
+  background:transparent!important;
+  border:0!important;
+  border-radius:0!important;
+  padding:0!important;
+  font:inherit!important;
+  cursor:pointer!important;
+  box-shadow:none!important;
+  -webkit-tap-highlight-color:transparent;
+  transition:transform .18s cubic-bezier(.34,1.56,.64,1)!important;
+}
+body .fzb-sarang button.fzb-bug:hover,
+body.fz-lux .fzb-sarang button.fzb-bug:hover {
+  transform:translate(-50%,-50%) scale(1.08)!important;
+}
+body .fzb-sarang button.fzb-bug:active,
+body.fz-lux .fzb-sarang button.fzb-bug:active {
+  transform:translate(-50%,-50%) scale(.95)!important;
+}
+.fzb-bug.fzb-ghost{
+  position:absolute;
+  width:100px;
+  text-align:center;
+  color:#FBF7F3;
+  transform:translate(-50%,-50%);
+  display:block;
+  opacity:.5;
+}
+.fzb-ghost .fzb-ring{border:2px dashed rgba(251,247,243,.3);border-radius:50%}
+.fzb-ghost-q{position:absolute;inset:0;display:grid;place-items:center;font-size:26px;font-weight:900;color:rgba(251,247,243,.5)}
+
+.fzb-ring{position:relative;display:block;width:76px;height:76px;margin:0 auto;filter:drop-shadow(0 4px 12px rgba(0,0,0,.45))}
+.fzb-ring .fzb-hp{position:absolute;inset:0;transform:rotate(-90deg)}
+.fzb-trk{stroke:rgba(251,247,243,.14)}
+.fzb-val{stroke:#FFD94F;stroke-linecap:round;transition:stroke-dashoffset .9s cubic-bezier(.2,.8,.2,1);filter:drop-shadow(0 0 6px rgba(255,217,79,.45))}
+.fzb-body{position:absolute;inset:8px;display:grid;place-items:center;animation:fzbIdle 3.6s ease-in-out infinite}
+.fzb-bug:nth-of-type(2) .fzb-body{animation-delay:-1.2s}.fzb-bug:nth-of-type(3) .fzb-body{animation-delay:-2.4s}
+@keyframes fzbIdle{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-4px) rotate(2deg)}}
+.fzb-legs{transform-box:fill-box;transform-origin:center;animation:fzbLegs .9s ease-in-out infinite}
+@keyframes fzbLegs{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+.fzb-antena{transform-box:fill-box;transform-origin:bottom center;animation:fzbAntena 2.2s ease-in-out infinite}
+@keyframes fzbAntena{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}}
+.fzb-name{display:block!important;margin-top:6px!important;font-size:12px!important;font-weight:800!important;color:#FBF7F3!important;white-space:nowrap!important;text-shadow:0 2px 4px rgba(0,0,0,.8)}
+.fzb-hpv{display:inline-block!important;margin-top:2px!important;font-size:10.5px!important;color:rgba(251,247,243,.75)!important;font-variant-numeric:tabular-nums!important;white-space:nowrap!important;padding:2px 7px!important;border-radius:999px!important;background:rgba(0,0,0,.35)!important;border:1px solid rgba(255,255,255,.08)!important}
+.fzb-hpv.warn{color:#FFD94F!important;border-color:rgba(255,217,79,.4)!important;font-weight:800!important;background:rgba(255,217,79,.12)!important}
+.fzb-hpv.low{color:#10B981!important;border-color:rgba(16,185,129,.4)!important;font-weight:800!important;background:rgba(16,185,129,.12)!important}
+.fzb-target .fzb-ring::before{content:"";position:absolute;inset:-8px;border-radius:50%;background:radial-gradient(circle,var(--c,#FFD94F) 0,transparent 70%);opacity:.45;animation:fzbMenace 1.6s ease-in-out infinite}
+.fzb-target .fzb-body{animation:fzbIdleT 1.6s ease-in-out infinite}
+.fzb-target .fzb-eye{filter:drop-shadow(0 0 6px var(--c,#FFD94F))}
+@keyframes fzbMenace{0%,100%{transform:scale(.9);opacity:.3}50%{transform:scale(1.18);opacity:.65}}
+@keyframes fzbIdleT{0%,100%{transform:scale(1) translateY(0)}50%{transform:scale(1.08) translateY(-3px)}}
+.fzb-poke .fzb-body{animation:fzbPoke .5s cubic-bezier(.3,1.5,.4,1)}
+@keyframes fzbPoke{30%{transform:scale(1.3) rotate(-10deg)}}
+
+.fzb-paw{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);width:124px;height:124px;filter:drop-shadow(0 12px 24px rgba(0,0,0,.55));animation:fzbSway 5s ease-in-out infinite}
+.fzb-paw>*{width:100%!important;height:100%!important}
+@keyframes fzbSway{0%,100%{transform:translate(-50%,-50%) rotate(-1.5deg)}50%{transform:translate(-50%,-50%) rotate(1.5deg)}}
+
+.fzb-whisper{
+  position:absolute;
+  left:50%;
+  top:18%;
+  transform:translateX(-50%);
+  display:flex;
+  align-items:center;
+  gap:8px;
+  background:rgba(20,18,17,.75);
+  border:1px solid rgba(255,217,79,.25);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  border-radius:999px;
+  padding:7px 16px 7px 12px;
+  font-size:11.5px;
+  max-width:92%;
+  box-sizing:border-box;
+  white-space:normal;
+  text-align:left;
+  line-height:1.35;
+  color:#FBF7F3;
+  box-shadow:0 8px 24px rgba(0,0,0,.45);
+}
+.fzb-spk{width:8px;height:8px;border-radius:50%;background:#FFD94F;flex:none;box-shadow:0 0 0 4px rgba(255,217,79,.25)}
+
+/* CTA Buru Bug di Sarang */
+body .fzb-sarang button.fzb-cta,
+body.fz-lux .fzb-sarang button.fzb-cta {
+  position:absolute!important;
+  left:16px!important;
+  right:16px!important;
+  bottom:16px!important;
+  height:64px!important;
+  min-height:64px!important;
+  border-radius:20px!important;
+  background:linear-gradient(135deg,#FFD94F 0%,#FFB800 100%)!important;
+  color:#1A1412!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  padding:0 16px 0 20px!important;
+  font:inherit!important;
+  font-weight:900!important;
+  font-size:15px!important;
+  letter-spacing:.02em!important;
+  border:0!important;
+  box-shadow:0 12px 28px -6px rgba(255,184,0,.45),inset 0 -2px 0 rgba(0,0,0,.15)!important;
+  overflow:hidden!important;
+  text-align:left!important;
+  cursor:pointer!important;
+  width:auto!important;
+  transition:transform .12s ease,box-shadow .15s ease!important;
+}
+body .fzb-sarang button.fzb-cta:hover,
+body.fz-lux .fzb-sarang button.fzb-cta:hover {
+  transform:translateY(-1px)!important;
+  box-shadow:0 16px 32px -6px rgba(255,184,0,.55)!important;
+}
+body .fzb-sarang button.fzb-cta:active,
+body.fz-lux .fzb-sarang button.fzb-cta:active {
+  transform:translateY(1px)!important;
+}
+.fzb-cta::after{content:"";position:absolute;top:0;bottom:0;width:40%;left:-60%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);animation:fzbSheen 4s ease-in-out infinite}
+@keyframes fzbSheen{0%,60%{left:-60%}100%{left:130%}}
+.fzb-cta small{display:block;font-size:10.5px;font-weight:800;color:#8B2C3B;letter-spacing:.06em}
+.fzb-arrow{width:40px;height:40px;border-radius:50%;background:#1A1412;color:#FFD94F;display:grid;place-items:center;font-size:18px;flex:none}
+
+/* ---------------- BEAT PREDIKSI (Layar Transisi Intersepsi) ---------------- */
+.fzb-beat{position:fixed;inset:0;z-index:9000;background:#120E0D;color:#FBF7F3;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;opacity:0;transition:opacity .22s ease;font-family:inherit}
+.fzb-beat.on{opacity:1}
+.fzb-aura{position:absolute;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,var(--eye,#E9B44C) 0,transparent 60%);opacity:0;filter:blur(20px)}
+.fzb-beat.on .fzb-aura{animation:fzbAura 1.1s ease-in-out .2s infinite alternate}
+@keyframes fzbAura{from{opacity:.10;transform:scale(.85)}to{opacity:.28;transform:scale(1.1)}}
+.fzb-eyes{position:relative;width:180px;height:70px;margin-bottom:14px}
+.fzb-beye{position:absolute;top:22px;width:46px;height:26px;border-radius:50%/60% 60% 40% 40%;background:var(--eye,#E9B44C);transform:scaleY(0);box-shadow:0 0 22px var(--eye,#E9B44C),0 0 70px rgba(233,180,76,.35)}
+.fzb-beye.l{left:24px}.fzb-beye.r{right:24px}
+.fzb-beat.on .fzb-beye{animation:fzbBlink .55s cubic-bezier(.2,.9,.2,1.2) .2s forwards,fzbEyePulse 1.1s ease-in-out .8s infinite alternate}
+.fzb-beye::after{content:"";position:absolute;left:50%;top:50%;width:8px;height:20px;background:#120E0D;transform:translate(-50%,-50%);border-radius:4px}
+@keyframes fzbBlink{0%{transform:scaleY(0)}60%{transform:scaleY(1.1)}80%{transform:scaleY(.2)}100%{transform:scaleY(1)}}
+@keyframes fzbEyePulse{from{box-shadow:0 0 18px var(--eye),0 0 50px rgba(233,180,76,.25)}to{box-shadow:0 0 30px var(--eye),0 0 90px rgba(233,180,76,.45)}}
+.fzb-who{font-size:12px;letter-spacing:.3em;font-weight:800;color:rgba(251,247,243,.5)}
+.fzb-bname{font-size:26px;font-weight:900;text-align:center;padding:0 20px}.fzb-bname span{color:var(--eye,#E9B44C)}
+.fzb-pct{font-size:92px;line-height:1;font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:-.04em;margin-top:6px}
+.fzb-pct small{font-size:34px;color:var(--eye,#E9B44C)}
+.fzb-hint{margin-top:14px;font-size:12px;color:rgba(251,247,243,.45);opacity:0;transition:opacity .3s}
+.fzb-beat.hold .fzb-hint{opacity:1}.fzb-beat.hold .fzb-pct{animation:fzbThump .5s ease-out}
+@keyframes fzbThump{30%{transform:scale(1.12)}}
+
+/* ---------------- ARENA PERBURUAN (Hunt Arena) ---------------- */
+body.fz-view-nujum #app,
+body.fz-view-bug #app {
+  padding:0!important;
+  max-width:none!important;
+}
+.fzb-hunt{
+  min-height:100dvh;
+  max-width:480px;
+  margin:0 auto;
+  box-sizing:border-box;
+  background:#231E1C;
+  color:#FBF7F3;
+  background-image:radial-gradient(70% 40% at 50% 0%,rgba(155,58,74,.28),transparent 70%);
+  padding-bottom:44px;
+  position:relative;
+  display:flex;
+  flex-direction:column;
+}
+.fzb-enter{animation:fzbEnter .45s cubic-bezier(.2,.8,.2,1)}
+@keyframes fzbEnter{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.fzb-loading{padding:80px 20px;text-align:center;font-weight:800;font-size:16px;color:rgba(251,247,243,.7)}
+
+/* Topbar Arena */
+.fzb-top{padding:14px 16px 8px;display:flex;align-items:center;gap:12px;position:relative;flex:none}
+body .fzb-hunt button.fzb-exit,
+body.fz-lux .fzb-hunt button.fzb-exit {
+  display:grid!important;
+  place-items:center!important;
+  width:36px!important;
+  height:36px!important;
+  min-height:36px!important;
+  border-radius:50%!important;
+  background:rgba(251,247,243,.1)!important;
+  border:1px solid rgba(251,247,243,.18)!important;
+  color:#FBF7F3!important;
+  font-size:16px!important;
+  font-weight:700!important;
+  padding:0!important;
+  cursor:pointer!important;
+  flex:none!important;
+  box-shadow:none!important;
+}
+.fzb-mini{width:54px;height:54px;flex:none}.fzb-mini svg{width:100%;height:100%;overflow:visible}
+.fzb-mini.bite{animation:fzbLunge .5s cubic-bezier(.3,1.4,.4,1)}
+@keyframes fzbLunge{40%{transform:scale(1.7) translate(34px,12px) rotate(-12deg)}}
+.fzb-mini.pop{animation:fzbPop .4s ease-out forwards}
+@keyframes fzbPop{30%{transform:scale(1.3)}100%{transform:scale(0);opacity:0}}
+.fzb-meta{min-width:0;flex:1}
+.fzb-meta b{display:block;font-size:15px;font-weight:800;color:#FBF7F3;line-height:1.2}
+.fzb-meta span{font-size:11.5px;color:rgba(251,247,243,.6)}
+.fzb-bet{margin-left:auto;flex:none;white-space:nowrap;background:rgba(251,247,243,.1);border:1px solid rgba(251,247,243,.18);border-radius:999px;padding:6px 11px;font-size:11.5px;font-weight:800;color:#FBF7F3}
+.fzb-bet.dd{background:#E9B44C;color:#2E2724;border-color:#E9B44C}
+
+/* Ronde Progress */
+.fzb-prog{display:flex;gap:5px;padding:4px 16px 8px;flex:none}
+.fzb-prog i{flex:1;height:4px;border-radius:2px;background:rgba(251,247,243,.16)}
+.fzb-prog i.ok{background:#E9B44C}
+.fzb-prog i.ko{background:#E5484D}
+.fzb-prog i.now{background:rgba(251,247,243,.85);box-shadow:0 0 6px rgba(251,247,243,.5)}
+.fzb-prog i.paw{background:#7FB7A4}
+
+/* Crucible Timer */
+.fzb-cru{margin:6px 16px 0;height:8px;border-radius:4px;background:rgba(251,247,243,.12);overflow:hidden;flex:none}
+.fzb-cru i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#E9B44C,#F7EACB);border-radius:4px;transform-origin:left}
+.fzb-cru.panic i{background:#E5484D;animation:fzbPanic .35s steps(2) infinite}
+@keyframes fzbPanic{to{opacity:.35}}
+.fzb-cru-meta{display:flex;justify-content:space-between;padding:4px 18px 0;font-size:10.5px;letter-spacing:.18em;font-weight:900;color:rgba(251,247,243,.55);flex:none}
+.fzb-cru-meta b{color:#F7EACB;font-variant-numeric:tabular-nums}
+.fzb-cru.panic~.fzb-cru-meta b{color:#E5484D}
+
+/* Efek Layar */
+.fzb-vig{position:fixed;inset:0;pointer-events:none;z-index:8000;opacity:0;background:radial-gradient(ellipse at center,transparent 45%,rgba(229,72,77,.55) 100%)}
+.fzb-vig.panic{animation:fzbVig .6s ease-in-out infinite alternate}
+@keyframes fzbVig{from{opacity:.15}to{opacity:.55}}
+.fzb-flash{position:fixed;inset:0;pointer-events:none;z-index:8500;opacity:0;background:radial-gradient(ellipse at center,rgba(229,72,77,.45) 0,rgba(155,58,74,.85) 100%)}
+.fzb-flash.gold{background:radial-gradient(ellipse at center,rgba(247,234,203,0) 30%,rgba(233,180,76,.55) 100%)}
+.fzb-flash.on{animation:fzbFlash .38s ease-out}
+@keyframes fzbFlash{15%{opacity:1}100%{opacity:0}}
+
+/* KARTU SOAL (.fzb-q) — Kertas Hangat Kontras Tinggi */
+.fzb-q{
+  position:relative!important;
+  inset:auto!important;
+  display:block!important;
+  margin:12px 16px 0!important;
+  background:#FBF7F3!important;
+  color:#2E2724!important;
+  border-radius:20px!important;
+  padding:18px 20px 16px!important;
+  box-shadow:0 16px 36px -16px rgba(0,0,0,.7)!important;
+  box-sizing:border-box!important;
+  flex:none!important;
+}
+.fzb-kicker{font-size:11px;letter-spacing:.18em;font-weight:900;color:#9B3A4A;text-transform:uppercase;margin-bottom:6px}
+.fzb-stem{font-size:21px;font-weight:800;line-height:1.35;color:#2E2724;margin:0}
+.fzb-stem u{text-decoration:none;border-bottom:3px solid #9B3A4A;padding:0 8px;color:#9B3A4A;min-width:52px;display:inline-block;text-align:center;font-weight:900}
+
+/* PILIHAN JAWABAN (.fzb-opts) — Tombol Gelap Kontras Tinggi Isolasi Total */
+.fzb-opts{display:grid;gap:10px;padding:12px 16px 0;flex:none}
+body .fzb-hunt .fzb-opts button,
+body.fz-lux .fzb-hunt .fzb-opts button,
+body.fz-view-nujum .fzb-hunt .fzb-opts button {
+  min-height:56px!important;
+  width:100%!important;
+  border-radius:16px!important;
+  background:#2E2724!important;
+  border:1.5px solid rgba(251,247,243,.22)!important;
+  color:#FBF7F3!important;
+  font-family:inherit!important;
+  font-size:16.5px!important;
+  font-weight:800!important;
+  text-align:left!important;
+  padding:12px 18px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:10px!important;
+  cursor:pointer!important;
+  box-shadow:0 4px 12px rgba(0,0,0,.25)!important;
+  transform:none!important;
+  box-sizing:border-box!important;
+  transition:background .18s ease,border-color .18s ease,transform .12s ease!important;
+  -webkit-tap-highlight-color:transparent;
+}
+body .fzb-hunt .fzb-opts button:active:not(:disabled){
+  transform:scale(.98)!important;
+}
+body .fzb-hunt .fzb-opts button:disabled{
+  cursor:default!important;
+}
+/* Jawaban Benar */
+body .fzb-hunt .fzb-opts button.ok,
+body.fz-lux .fzb-hunt .fzb-opts button.ok,
+body.fz-view-nujum .fzb-hunt .fzb-opts button.ok {
+  opacity:1!important;
+  background:#E9B44C!important;
+  border-color:#F7EACB!important;
+  color:#2E2724!important;
+  font-weight:900!important;
+  box-shadow:0 0 24px rgba(233,180,76,.55)!important;
+}
+/* Jawaban Salah */
+body .fzb-hunt .fzb-opts button.ko,
+body.fz-lux .fzb-hunt .fzb-opts button.ko,
+body.fz-view-nujum .fzb-hunt .fzb-opts button.ko {
+  opacity:1!important;
+  background:#9B3A4A!important;
+  border-color:#E5484D!important;
+  color:#FFFFFF!important;
+  font-weight:900!important;
+  box-shadow:0 0 24px rgba(229,72,77,.55)!important;
+}
+/* Opsi Tidak Dipilih (Dimmed) */
+body .fzb-hunt .fzb-opts button.dim,
+body.fz-lux .fzb-hunt .fzb-opts button.dim,
+body.fz-view-nujum .fzb-hunt .fzb-opts button.dim {
+  opacity:.45!important;
+  background:#25201E!important;
+  border-color:rgba(251,247,243,.08)!important;
+  color:rgba(251,247,243,.6)!important;
+}
+body .fzb-hunt .fzb-opts button i{
+  font-size:11px;
+  letter-spacing:.14em;
+  font-weight:900;
+  font-style:normal;
+  opacity:0;
+  flex:none;
+}
+body .fzb-hunt .fzb-opts button.ok i,
+body .fzb-hunt .fzb-opts button.ko i{
+  opacity:1;
+}
+
+/* ALAT BANTU (.fzb-tools) */
+.fzb-tools{display:flex;gap:10px;padding:12px 16px 0;flex:none}
+body .fzb-hunt button.fzb-dd,
+body.fz-lux .fzb-hunt button.fzb-dd {
+  flex:1!important;
+  height:48px!important;
+  min-height:48px!important;
+  border-radius:14px!important;
+  border:1.5px solid #E9B44C!important;
+  background:transparent!important;
+  color:#F7EACB!important;
+  font:inherit!important;
+  font-weight:900!important;
+  font-size:12px!important;
+  letter-spacing:.04em!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:5px!important;
+  cursor:pointer!important;
+  box-shadow:none!important;
+  white-space:nowrap!important;
+}
+body .fzb-hunt button.fzb-dd small{font-weight:700;letter-spacing:0;opacity:.8;font-size:11px;white-space:nowrap}
+body .fzb-hunt button.fzb-dd.armed,
+body.fz-lux .fzb-hunt button.fzb-dd.armed {
+  background:#E9B44C!important;
+  color:#2E2724!important;
+  border-color:#E9B44C!important;
+  animation:fzbArmed .5s ease-out;
+}
+@keyframes fzbArmed{40%{transform:scale(1.06)}}
+
+body .fzb-hunt button.fzb-help,
+body.fz-lux .fzb-hunt button.fzb-help {
+  height:48px!important;
+  min-height:48px!important;
+  padding:0 16px!important;
+  border-radius:14px!important;
+  background:rgba(251,247,243,.08)!important;
+  border:1.5px solid rgba(251,247,243,.18)!important;
+  color:rgba(251,247,243,.75)!important;
+  font:inherit!important;
+  font-weight:800!important;
+  font-size:12.5px!important;
+  cursor:pointer!important;
+  box-shadow:none!important;
+  white-space:nowrap!important;
+}
+body .fzb-hunt .fzb-tools button:disabled{opacity:.4!important;cursor:not-allowed!important}
+
+/* FEEDBACK KARTU (.fzb-fb) */
+.fzb-fb{
+  margin:12px 16px 14px;
+  padding:16px 18px;
+  border-radius:20px;
+  transform:translateY(12px);
+  opacity:0;
+  transition:.3s cubic-bezier(.2,.8,.2,1);
+  display:none;
+  flex:none;
+}
+.fzb-fb.on{
+  display:block;
+  transform:none;
+  opacity:1;
+}
+.fzb-fb.win{background:rgba(233,180,76,.14);border:1.5px solid rgba(233,180,76,.5)}
+.fzb-fb.lose{background:rgba(229,72,77,.16);border:1.5px solid rgba(229,72,77,.55)}
+.fzb-fb.help{background:rgba(127,183,164,.16);border:1.5px solid rgba(127,183,164,.55)}
+.fzb-tag{font-size:10.5px;letter-spacing:.2em;font-weight:900}
+.fzb-fb.win .fzb-tag{color:#E9B44C}.fzb-fb.lose .fzb-tag{color:#FF8A8E}.fzb-fb.help .fzb-tag{color:#7FB7A4}
+.fzb-say{font-size:16px;line-height:1.35;margin:6px 0 8px;font-weight:800;color:#FBF7F3}.fzb-say b{color:#F7EACB}.fzb-fb.lose .fzb-say b{color:#FFB3B6}
+.fzb-why{font-size:13px;line-height:1.45;color:rgba(251,247,243,.7);padding-top:10px;border-top:1px dashed rgba(251,247,243,.2)}.fzb-why b{color:#FBF7F3}
+.fzb-hpline{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:800;margin-top:8px;font-variant-numeric:tabular-nums;color:rgba(251,247,243,.8)}
+.fzb-bar{flex:1;height:8px;border-radius:4px;background:rgba(251,247,243,.15);overflow:hidden}
+.fzb-bar i{display:block;height:100%;background:#E9B44C;transition:width .9s cubic-bezier(.2,1.4,.3,1)}
+.fzb-fb.lose .fzb-bar i{background:#E5484D}
+.fzb-num{min-width:88px;text-align:right}.fzb-drop{color:#E9B44C;display:inline-block;animation:fzbDrop .8s cubic-bezier(.2,1.4,.3,1)}.fzb-fb.lose .fzb-drop{color:#FF8A8E}
+@keyframes fzbDrop{0%{transform:translateY(-10px) scale(1.4);opacity:0}}
+
+/* TOMBOL LANJUT (.fzb-next) */
+body .fzb-hunt button.fzb-next,
+body.fz-lux .fzb-hunt button.fzb-next {
+  margin:0 16px 28px!important;
+  width:calc(100% - 32px)!important;
+  height:58px!important;
+  min-height:58px!important;
+  border-radius:18px!important;
+  background:#F7EACB!important;
+  color:#2E2724!important;
+  border:0!important;
+  font:inherit!important;
+  font-weight:900!important;
+  font-size:15px!important;
+  letter-spacing:.02em!important;
+  cursor:pointer!important;
+  box-shadow:0 12px 26px -12px rgba(247,234,203,.55)!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  flex:none!important;
+}
+body .fzb-hunt button.fzb-next.hidden{display:none!important}
+
+/* Shake Animation */
+body.fzb-shake{animation:fzbShake .45s cubic-bezier(.36,.07,.19,.97)}
+body.fzb-shake-hit{animation:fzbShakeHit .32s cubic-bezier(.36,.07,.19,.97)}
+@keyframes fzbShake{10%,90%{transform:translate3d(-2px,0,0)}20%,80%{transform:translate3d(4px,0,0)}30%,50%,70%{transform:translate3d(-8px,0,0)}40%,60%{transform:translate3d(8px,0,0)}}
+@keyframes fzbShakeHit{20%{transform:translate3d(0,-5px,0) scale(1.01)}45%{transform:translate3d(0,4px,0)}70%{transform:translate3d(0,-2px,0)}}
+#fzbFx{position:fixed;inset:0;z-index:9500;pointer-events:none}
+
+/* ---------------- LAPORAN PERBURUAN (Summary Card) ---------------- */
+.fzb-res{display:flex;flex-direction:column;align-items:center;padding:22px 16px 30px;gap:14px}
+.fzb-report{width:100%;max-width:340px;background:#FBF7F3;color:#2E2724;border-radius:22px;padding:18px;position:relative;overflow:hidden;box-shadow:0 30px 60px -30px rgba(0,0,0,.8);animation:fzbEnter .5s cubic-bezier(.2,.8,.2,1);box-sizing:border-box}
+.fzb-hd{display:flex;justify-content:space-between;align-items:center;font-size:10px;letter-spacing:.22em;font-weight:900;color:#8A7F79}.fzb-hd b{color:#9B3A4A;font-size:12px;letter-spacing:.3em}
+.fzb-report h2{margin:12px 0 2px;font-size:24px;letter-spacing:-.02em;line-height:1.1;max-width:60%;color:#2E2724}
+.fzb-rsub{font-size:12px;color:#8A7F79;font-weight:700;max-width:62%}
+.fzb-stamp{position:absolute;right:16px;top:62px;transform:rotate(-12deg);border:3px solid #9B3A4A;color:#9B3A4A;border-radius:8px;padding:4px 10px;font-size:14px;font-weight:900;letter-spacing:.12em;animation:fzbStamp .5s cubic-bezier(.2,1.6,.3,1) .3s both}
+.fzb-stamp.mint{border-color:#3E8E75;color:#3E8E75}.fzb-stamp.gold{border-color:#B8860B;color:#B8860B}
+@keyframes fzbStamp{from{transform:rotate(-12deg) scale(2.2);opacity:0}to{transform:rotate(-12deg) scale(1);opacity:.9}}
+.fzb-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:16px 0 12px}
+.fzb-stats div{background:#F3ECE4;border-radius:14px;padding:10px 8px;text-align:center}.fzb-stats b{display:block;font-size:22px;color:#2E2724}.fzb-stats small{font-size:9.5px;letter-spacing:.14em;font-weight:900;color:#8A7F79}
+.fzb-list{display:flex;flex-direction:column;gap:6px}
+.fzb-list div{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:800;padding:6px 8px;border-radius:12px;background:rgba(46,39,36,.04);color:#2E2724}
+.fzb-list svg{width:30px;height:30px;flex:none}.fzb-list small{color:#8A7F79;font-weight:700}
+.fzb-list span{margin-left:auto;font-size:10px;letter-spacing:.16em;font-weight:900}
+.fzb-list .pecah span{color:#3E8E75}.fzb-list .gigit span{color:#9B3A4A}.fzb-list .bantu span{color:#6E8FB0}.fzb-list .pecah svg{filter:grayscale(1) opacity(.5)}
+.fzb-ft{margin-top:14px;font-size:10px;letter-spacing:.14em;font-weight:900;color:#8A7F79}
+
+.fzb-share{width:100%;max-width:340px;display:grid;grid-template-columns:1fr auto;gap:8px}
+body .fzb-hunt button.fzb-wa,
+body.fz-lux .fzb-hunt button.fzb-wa {
+  height:56px!important;
+  min-height:56px!important;
+  border-radius:16px!important;
+  background:#25D366!important;
+  color:#0B2E1A!important;
+  border:0!important;
+  font:inherit!important;
+  font-weight:900!important;
+  font-size:14px!important;
+  cursor:pointer!important;
+  box-shadow:0 8px 20px -8px rgba(37,211,102,.5)!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+}
+body .fzb-hunt button.fzb-back,
+body.fz-lux .fzb-hunt button.fzb-back {
+  height:56px!important;
+  min-height:56px!important;
+  padding:0 18px!important;
+  border-radius:16px!important;
+  border:1.5px solid rgba(251,247,243,.22)!important;
+  background:transparent!important;
+  color:#FBF7F3!important;
+  font:inherit!important;
+  font-weight:800!important;
+  font-size:13px!important;
+  cursor:pointer!important;
+  box-shadow:none!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+}
+
+@media (prefers-reduced-motion:reduce){.fzb-sarang *,.fzb-beat *,.fzb-hunt *,body.fzb-shake,body.fzb-shake-hit{animation:none!important}.fzb-beye{transform:scaleY(1)}}

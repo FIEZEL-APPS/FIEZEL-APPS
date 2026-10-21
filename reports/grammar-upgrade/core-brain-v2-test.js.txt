@@ -1,0 +1,32 @@
+ok - lantai tebakan pilihan ganda ikut dimodelkan, bukan diabaikan
+ok - kemampuan naik saat benar pada soal sulit, dan hampir tidak bergerak pada soal mudah
+ok - taksiran mengendap, tidak berayun mengikuti jawaban terakhir
+ok - bukti lama dihitung lebih ringan daripada bukti minggu ini
+ok - keyakinan nol saat belum ada bukti sama sekali
+ok - kesulitan yang dipilih benar-benar menghasilkan peluang mendekati target
+ok - soal terlalu mudah dan terlalu sulit sama-sama ditolak
+ok - kesulitan tidak pernah keluar dari tingkat soal yang benar-benar ada
+ok - pengulangan berhasil melebarkan jarak; kesalahan memendekkannya tajam
+ok - retensi turun mulus dan tepat setengah pada satu paruh-waktu
+ok - jadwal ulang dipilih dari target retensi, bukan dari tabel jarak
+ok - yang diprioritaskan adalah materi di AMBANG lupa, bukan yang paling lama tidak disentuh
+ok - regresi mengembalikan kemiringan dan kecocokan yang benar
+ok - murid yang membaik dan yang memburuk tidak mendapat pembacaan yang sama
+ok - mandek terbaca sebagai mandek, bukan sebagai membaik atau memburuk
+ok - momentum menolak menyimpulkan di atas bukti tipis
+ok - rantai prasyarat menelusuri ke atas dan tidak pernah berputar
+ok - gejala diganti akar masalah HANYA bila prasyaratnya terukur dan nyata lebih lemah
+ok - prasyarat tanpa cukup bukti tidak boleh menggantikan gejala
+ok - jam produktif hanya disimpulkan dari bukti yang cukup di kedua sisi
+ok - kelelahan menuntut DUA sinyal sekaligus: melambat DAN makin sering salah
+ok - arah belajar mengubah keputusan, bukan hanya laporannya
+ok - kelelahan memperpendek sesi, dan itu terlihat di alasannya
+ok - porsi review dihitung dari materi yang benar-benar rawan, bukan dari jumlah jatuh tempo
+ok - bukti tipis membuat rencana berhati-hati, bukan percaya diri
+ok - setiap keputusan membawa alasan yang bisa dibaca, tidak pernah kosong
+ok - analyze() menerima riwayat aplikasi apa adanya dan tidak melempar pada masukan kosong
+ok - analyze() memisahkan arah belajar per domain, bukan satu angka untuk semuanya
+ok - modul murni: tanpa DOM, tanpa jaringan, tanpa penyimpanan
+ok - gate ini terdaftar di CI
+
+FIEZEL Core Brain v2: PASS

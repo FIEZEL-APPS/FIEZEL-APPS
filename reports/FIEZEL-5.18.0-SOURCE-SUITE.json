@@ -1,0 +1,15 @@
+{
+  "schema": "fiezel-source-suite-v1",
+  "version": "5.18.0",
+  "status": "PASS",
+  "commands": 32,
+  "passed": 32,
+  "failed": 0,
+  "syntax": "PASS",
+  "releaseAudit": {"pass":145,"fail":0},
+  "productAudit": {"pass":49,"fail":0},
+  "grammarQuality": {"pass":24,"fail":0,"runtimeQuestions":3225,"crossLessonDuplicates":0,"focusLeaks":0},
+  "speakingListening": {"pass":25,"fail":0,"listeningItems":36,"speakingItems":36},
+  "neuralVoice": {"pass":28,"fail":0,"realDeviceGate":"PENDING"},
+  "externalAction": "NONE"
+}

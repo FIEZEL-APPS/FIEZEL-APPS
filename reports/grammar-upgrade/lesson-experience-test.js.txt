@@ -1,0 +1,2 @@
+FIEZEL lesson experience: PASS
+{"grammarLessons":282,"questionsPerLesson":25,"practiceModesPerLesson":25,"generatedQuestionsChecked":7050,"crossLessonDuplicates":0,"focusLeaks":0,"correctWrongSamples":2,"sfxFilesFetched":5,"realtimeCycle":["sunrise","noon","sunset","moonrise","midnight"],"naturalIndonesian":true}

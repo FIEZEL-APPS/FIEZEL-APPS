@@ -1,0 +1,982 @@
+/* ==========================================================================
+   FIEZEL · features/ui/fiezel-vivid.css — PALET ASLI FIEZEL (WARM DAYLIGHT TRAVERTINE)
+   Dimuat PALING AKHIR (setelah mobile-edge-fit.css).
+   Palet resmi yang terverifikasi dari aset asli Fiezel:
+   - Canvas: #FFF9EE (Warm Ivory Travertine)
+   - Tinta & Garis Tepi: #0F172A (Deep Burgundy Maroon) & #241A11 (Deep Warm Charcoal)
+   - 4 Pods Ikonik:
+       * Sun Yellow: #FFD94F (Emas Surya)
+       * Rose Candy: #FDE4E8 (Mawar Pastel)
+       * Mint Fresh: #DDF3EA (Mint / Emerald Segar)
+       * Sky Calm:   #E4F1FB (Biru Langit Pastel)
+   - Permukaan Kartu: #FFFFFF (Porcelain Card)
+   Tata letak, grid, dan hierarki DOM 100% dipertahankan ("Design Jangan Disentuh").
+   ========================================================================== */
+:root {
+  --vv-sun: #FFD94F;
+  --vv-rose: #FDE4E8;
+  --vv-teal: #DDF3EA;
+  --vv-sky: #E4F1FB;
+  --vv-coral: #FFD680;
+  --vv-lime: #E5F9CE;
+  --vv-kelas: #1F7A63;
+  --vv-maroon: #0F172A;
+  --vv-ink: #241A11;
+  --vv-surface: #FFFFFF;
+  --vv-line: rgba(94, 20, 32, 0.12);
+  --vv-muted: #7A686B;
+  --vv-bg: #FFF9EE;
+}
+
+/* ---------- 1. Latar Belakang: Warm Travertine Canvas dengan Ambience Lembut ---------- */
+html, body,
+html.fiezel-ui-v6,
+html body:not(.fz-teacher-mode),
+body.fz-lux,
+main.app,
+.app,
+#app,
+.home-page,
+.home-today,
+section.fade,
+.classroom-page,
+.learner-flow-page,
+.skills-lab-page,
+.skills-page,
+.writing-page,
+.library-page,
+.ask-page,
+.progress-page,
+.profile-page,
+.settings-page,
+.view-page,
+.view-container {
+  background: #FFF9EE !important;
+  color: #241A11 !important;
+}
+
+html body:not(.fz-teacher-mode)::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(60vmax 40vmax at 110% -10%, rgba(255, 217, 79, 0.18), transparent 60%),
+    radial-gradient(55vmax 38vmax at -15% 8%, rgba(253, 228, 232, 0.40), transparent 62%),
+    radial-gradient(60vmax 40vmax at 50% 115%, rgba(221, 243, 234, 0.30), transparent 60%) !important;
+}
+
+/* Sapaan Header Beranda */
+.fz-welcome-header,
+.home-today .fz-welcome-header {
+  color: #0F172A !important;
+}
+.fz-welcome-header h1,
+.home-today h1 {
+  color: #0F172A !important;
+  font-weight: 800 !important;
+}
+.fz-welcome-header p,
+.home-today p.muted,
+.home-today .quick-practice-hint {
+  color: #64748B !important;
+  font-weight: 500 !important;
+}
+
+/* ---------- 2. Topbar & Header: Warm Ivory & Maroon Brand ---------- */
+.topbar,
+header.topbar,
+body.fz-lux .topbar,
+html body.fz-lang-ja .topbar,
+html body:not(.fz-teacher-mode) header.topbar {
+  background: #FFF9EE !important;
+  border-bottom: 1.5px solid rgba(94, 20, 32, 0.10) !important;
+}
+
+.topbar .brand-button,
+.brand-name,
+.topbar-logo {
+  color: #0F172A !important;
+}
+
+.topbar .icon-button,
+.topbar-action-btn {
+  background: #FFFFFF !important;
+  border: 1.5px solid rgba(94, 20, 32, 0.15) !important;
+  color: #0F172A !important;
+}
+
+/* ---------- 3. Bottomnav: Porcelain White Docked Bar ---------- */
+nav.bottomnav,
+html body.fz-lux nav.bottomnav,
+html body:not(.fz-teacher-mode) nav.bottomnav,
+html.fiezel-ui-v6 body.fz-lux .bottomnav {
+  /* respect tactile clay floating pill bottomnav */
+}
+
+nav.bottomnav .nav,
+nav.bottomnav button {
+  color: #7A686B !important;
+}
+
+nav.bottomnav .nav.active,
+nav.bottomnav .nav[aria-selected="true"],
+nav.bottomnav button.active {
+  color: #0F172A !important;
+}
+
+nav.bottomnav .nav.active .fz-i,
+nav.bottomnav .nav.active svg {
+  color: #0F172A !important;
+  stroke: #0F172A !important;
+}
+
+/* ---------- 4. Tipografi: Tinta Deep Maroon & Warm Charcoal ---------- */
+html body:not(.fz-teacher-mode) h1,
+html body:not(.fz-teacher-mode) h2,
+html body:not(.fz-teacher-mode) h3,
+html body:not(.fz-teacher-mode) .section-head h1 {
+  color: #0F172A !important;
+  letter-spacing: -0.03em !important;
+}
+
+html body:not(.fz-teacher-mode) .section-head h1::after {
+  content: "";
+  display: block;
+  width: 44px;
+  height: 5px;
+  margin-top: 10px;
+  border-radius: 5px;
+  background: linear-gradient(90deg, #FFD94F, #0F172A) !important;
+}
+
+html body:not(.fz-teacher-mode) .section-head p,
+html body:not(.fz-teacher-mode) p.muted,
+html body:not(.fz-teacher-mode) .quick-practice-hint,
+html body:not(.fz-teacher-mode) #app .launch-card small,
+html body:not(.fz-teacher-mode) #app .fz-stitch-card p {
+  color: #7A686B !important;
+}
+
+/* ---------- 5. Kartu Beranda, Stadium, Vocab & Session Cards ---------- */
+html body:not(.fz-teacher-mode) .fz-stadium-card,
+html body:not(.fz-teacher-mode) .fz-aurora-card,
+html body:not(.fz-teacher-mode) .quick-practice-section,
+html body:not(.fz-teacher-mode) .fz-stitch-section,
+html body:not(.fz-teacher-mode) .fz-stitch-kelasku,
+html body:not(.fz-teacher-mode) .fz2-social,
+html body:not(.fz-teacher-mode) .card,
+html body:not(.fz-teacher-mode) .fz-drawer-inner {
+  background: #FFFFFF !important;
+  border: 1.5px solid rgba(94, 20, 32, 0.12) !important;
+  box-shadow: 0 4px 18px rgba(94, 20, 32, 0.05) !important;
+  color: #241A11 !important;
+}
+
+html body:not(.fz-teacher-mode) .fz-aurora-vocab-zone,
+html body:not(.fz-teacher-mode) .fz-aurora-session-zone {
+  background: #FFFDF9 !important;
+  border-bottom: 1.5px solid rgba(94, 20, 32, 0.08) !important;
+}
+
+html body:not(.fz-teacher-mode) .fz-aurora-word {
+  color: #0F172A !important;
+  font-weight: 800 !important;
+}
+
+html body:not(.fz-teacher-mode) .fz-aurora-meaning {
+  color: #241A11 !important;
+}
+
+html body:not(.fz-teacher-mode) .fz-aurora-audio-btn {
+  background: #FFD94F !important;
+  border: 1.5px solid #0F172A !important;
+  box-shadow: 2px 2px 0px #0F172A !important;
+  color: #0F172A !important;
+}
+
+/* Hero CTA Utama: Emas Surya #FFD94F dengan Border Maroon */
+html body:not(.fz-teacher-mode) .fz-hero-cta {
+  position: relative;
+  overflow: hidden;
+  background: #FFD94F !important;
+  color: #0F172A !important;
+  border: 2px solid #0F172A !important;
+  box-shadow: 2.5px 2.5px 0px #0F172A !important;
+  font-weight: 800 !important;
+}
+
+html body:not(.fz-teacher-mode) .fz-hero-cta-arrow {
+  background: #0F172A !important;
+  color: #FFD94F !important;
+}
+
+/* ---------- 6. Kartu Peluncur (Launch Cards) Porcelain ---------- */
+html body:not(.fz-teacher-mode) #app .launch-card {
+  --vv-h: var(--vv-sun);
+  position: relative !important;
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  grid-template-rows: auto 1fr !important;
+  align-content: start !important;
+  align-items: start !important;
+  gap: 12px !important;
+  text-align: left !important;
+  background: #FFFFFF !important;
+  border: 1.5px solid rgba(94, 20, 32, 0.12) !important;
+  box-shadow: 0 6px 18px rgba(94, 20, 32, 0.05) !important;
+  transition: transform .2s cubic-bezier(.22,.8,.28,1), border-color .2s ease, box-shadow .2s ease !important;
+}
+
+html body:not(.fz-teacher-mode) #app .launch-card:hover {
+  transform: translateY(-2px);
+  border-color: #0F172A !important;
+  box-shadow: 0 10px 24px rgba(94, 20, 32, 0.10) !important;
+}
+
+html body:not(.fz-teacher-mode) #app .launch-card:active {
+  transform: scale(.98);
+}
+
+html body:not(.fz-teacher-mode) #app .launch-card > span:not(.launch-icon):not(.coming-soon-tag) {
+  display: flex !important;
+  flex-direction: column-reverse !important;
+  gap: 3px !important;
+  min-width: 0;
+}
+
+html body:not(.fz-teacher-mode) #app .launch-card .launch-icon {
+  width: 46px !important;
+  height: 46px !important;
+  border-radius: 14px !important;
+  display: grid !important;
+  place-items: center !important;
+  background: color-mix(in srgb, var(--vv-h) 25%, #FFFFFF) !important;
+  border: 1.5px solid color-mix(in srgb, var(--vv-h) 65%, #0F172A) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+}
+
+html body:not(.fz-teacher-mode) #app .launch-card .launch-icon .fz-i {
+  width: 24px !important;
+  height: 24px !important;
+  --fz-i-fill: var(--vv-h);
+  --fz-i-line: #0F172A;
+  color: #0F172A;
+}
+
+html body:not(.fz-teacher-mode) #app .launch-card > i[data-lucide],
+html body:not(.fz-teacher-mode) #app .launch-card > svg {
+  position: absolute !important;
+  top: 14px !important;
+  right: 14px !important;
+  width: 18px !important;
+  height: 18px !important;
+  margin: 0 !important;
+  color: #0F172A !important;
+  opacity: .75;
+}
+
+html body:not(.fz-teacher-mode) #app .launch-card b {
+  font-size: 1.02rem !important;
+  line-height: 1.25 !important;
+  color: #0F172A !important;
+  font-weight: 800 !important;
+}
+
+html body:not(.fz-teacher-mode) #app .launch-card:has([data-fz-icon="vocab"]) { --vv-h: var(--vv-sun); }
+html body:not(.fz-teacher-mode) #app .launch-card:has([data-fz-icon="grammar"]) { --vv-h: var(--vv-teal); }
+html body:not(.fz-teacher-mode) #app .launch-card:has([data-fz-icon="reading"]) { --vv-h: var(--vv-sky); }
+html body:not(.fz-teacher-mode) #app .launch-card:has([data-fz-icon="skills"]),
+html body:not(.fz-teacher-mode) #app .launch-card:has([data-fz-icon="speaking"]) { --vv-h: var(--vv-rose); }
+html body:not(.fz-teacher-mode) #app .launch-card:has([data-fz-icon="writing"]) { --vv-h: var(--vv-coral); }
+html body:not(.fz-teacher-mode) #app .launch-card:has([data-fz-icon="library"]) { --vv-h: var(--vv-lime); }
+html body:not(.fz-teacher-mode) #app .launch-card:has([data-fz-icon="map"]),
+html body:not(.fz-teacher-mode) #app .launch-card:has([data-fz-icon="classroom"]) { --vv-h: var(--vv-kelas); }
+html body:not(.fz-teacher-mode) #app .launch-card.learn-launch { --vv-h: var(--vv-sun); }
+html body:not(.fz-teacher-mode) #app .launch-card.arena-launch { --vv-h: var(--vv-rose); }
+
+/* Kisi Peluncur */
+html body:not(.fz-teacher-mode) #app .learning-launcher {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  grid-auto-rows: 1fr !important;
+  gap: 12px !important;
+}
+html body:not(.fz-teacher-mode) #app .learning-launcher:has(> .launch-card:only-child) {
+  grid-template-columns: 1fr !important;
+}
+html body:not(.fz-teacher-mode) #app .home-today .learning-launcher {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+html body:not(.fz-teacher-mode) #app .learning-launcher .launch-card {
+  min-height: 124px !important;
+  padding: 16px !important;
+  margin: 0 !important;
+  width: auto !important;
+}
+html body:not(.fz-teacher-mode) #app .learning-launcher .launch-card > span:not(.launch-icon) {
+  align-self: end;
+}
+
+/* ---------- 7. Stitch Cards & KelasKu Strip ---------- */
+html body:not(.fz-teacher-mode) #app .fz-stitch-card {
+  --vv-h: var(--vv-sun);
+  background: #FFFFFF !important;
+  border: 1.5px solid rgba(94, 20, 32, 0.12) !important;
+  box-shadow: 0 4px 16px rgba(94, 20, 32, 0.05) !important;
+  transition: transform .2s cubic-bezier(.22,.8,.28,1), border-color .2s ease, box-shadow .2s ease !important;
+}
+
+html body:not(.fz-teacher-mode) #app .fz-stitch-card:hover {
+  transform: translateY(-2px);
+  border-color: #0F172A !important;
+  box-shadow: 0 8px 24px rgba(94, 20, 32, 0.09) !important;
+}
+
+html body:not(.fz-teacher-mode) #app .fz-stitch-card:active {
+  transform: scale(.98);
+}
+
+html body:not(.fz-teacher-mode) #app .fz-stitch-card:has(.fz-stitch-icon.is-green) { --vv-h: var(--vv-teal); }
+html body:not(.fz-teacher-mode) #app .fz-stitch-card:has(.fz-stitch-icon.is-blue) { --vv-h: var(--vv-sky); }
+html body:not(.fz-teacher-mode) #app .fz-stitch-card:has(.fz-stitch-icon.is-rose) { --vv-h: var(--vv-rose); }
+
+html body:not(.fz-teacher-mode) #app .fz-stitch-icon {
+  width: 46px !important;
+  height: 46px !important;
+  border-radius: 14px !important;
+  background: color-mix(in srgb, var(--vv-h, #FFD94F) 25%, #FFFFFF) !important;
+  border: 1.5px solid color-mix(in srgb, var(--vv-h, #FFD94F) 65%, #0F172A) !important;
+}
+
+html body:not(.fz-teacher-mode) #app .fz-stitch-icon .fz-i {
+  width: 24px !important;
+  height: 24px !important;
+  --fz-i-fill: var(--vv-h, #FFD94F);
+  --fz-i-line: #0F172A;
+}
+
+html body:not(.fz-teacher-mode) #app .fz-stitch-card h3 {
+  color: #0F172A !important;
+  font-weight: 800 !important;
+}
+
+/* Active Level Control Pill */
+html body:not(.fz-teacher-mode) #app .active-level-control {
+  background: #FFFFFF !important;
+  border: 1.5px solid rgba(94, 20, 32, 0.18) !important;
+  color: #0F172A !important;
+}
+
+html body:not(.fz-teacher-mode) #app .active-level-control small {
+  background: #FFD94F !important;
+  color: #0F172A !important;
+  border: 1px solid #0F172A !important;
+  font-weight: 800 !important;
+}
+
+/* ---------- 8. Sesi Kuis & Opsi Jawaban ---------- */
+html body.fz-lesson-mode main.app > header.topbar {
+  display: none !important;
+}
+
+html body:not(.fz-teacher-mode) #app .vocab-focus-word {
+  color: #0F172A !important;
+  font-weight: 800 !important;
+}
+
+html body:not(.fz-teacher-mode) #app .vocab-focus .phonetic,
+html body:not(.fz-teacher-mode) #app .phonetic,
+html body:not(.fz-teacher-mode) .phonetic {
+  color: #64748B !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  padding: 0 !important;
+}
+
+html body:not(.fz-teacher-mode) #app .options .option {
+  background: #FFFFFF !important;
+  border: 2px solid rgba(94, 20, 32, 0.15) !important;
+  color: #241A11 !important;
+  box-shadow: 0 3px 10px rgba(94, 20, 32, 0.04) !important;
+  text-align: left !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+}
+html body:not(.fz-teacher-mode) #app .options .option:not(:disabled):hover {
+  border-color: #0F172A !important;
+  background: #FFFDF9 !important;
+}
+html body:not(.fz-teacher-mode) #app .options .option.was-tried {
+  background: #FDE4E8 !important;
+  border-color: #0F172A !important;
+  color: #0F172A !important;
+  align-items: flex-start !important;
+}
+html body:not(.fz-teacher-mode) #app .options .option.correct {
+  background: #DDF3EA !important;
+  border-color: #1F7A63 !important;
+  color: #165646 !important;
+  box-shadow: 0 0 0 3px rgba(31, 122, 99, 0.15) !important;
+}
+
+/* ==========================================================================
+   9. ZERO-INVISIBLE-TEXT GUARD — High-Contrast Precision (Palet Asli Fiezel)
+   Menjamin 100% teks di beranda, topbar, kartu, dan navigasi terbaca tajam:
+   - Judul & Aksen Utama: #0F172A (Deep Burgundy Maroon, rasio > 14:1)
+   - Deskripsi & Muted:   #7A686B (Muted Slate Maroon, rasio > 5.5:1)
+   - Teks Tubuh:          #241A11 (Deep Warm Charcoal, rasio > 16:1)
+   - Pod Emas & Tombol:   #FFD94F dengan teks & border #0F172A
+   ========================================================================== */
+
+/* --- 9.1 Topbar Wordmark & Action Icons --- */
+#fzTopMark #fztIv stop:first-child,
+html body #fzTopMark #fztIv stop:first-child { stop-color: #0F172A !important; }
+#fzTopMark #fztIv stop:last-child,
+html body #fzTopMark #fztIv stop:last-child { stop-color: #3A0B13 !important; }
+#fzTopMark #fztGo stop:first-child,
+html body #fzTopMark #fztGo stop:first-child { stop-color: #FFD94F !important; }
+#fzTopMark #fztGo stop:last-child,
+html body #fzTopMark #fztGo stop:last-child { stop-color: #EDB93A !important; }
+
+.topbar .brand svg.fiezel-wordmark text,
+.topbar .brand svg.fiezel-wordmark path,
+.topbar .brand svg.fiezel-wordmark rect,
+.topbar .brand svg.fiezel-wordmark g {
+  --wordmark-ink-hi: #0F172A !important;
+  --wordmark-ink-lo: #3A0B13 !important;
+  --wordmark-accent-hi: #FFD94F !important;
+  --wordmark-accent-lo: #EDB93A !important;
+}
+
+.topbar .brand svg.fiezel-wordmark {
+  filter: none !important;
+}
+
+.topbar .icon-button,
+.topbar .course-switch-btn,
+.topbar #fzCourseSwitchBtn,
+.topbar-action-btn {
+  background: #FFFFFF !important;
+  border: 1.5px solid rgba(94, 20, 32, 0.18) !important;
+  color: #0F172A !important;
+  box-shadow: 0 2px 6px rgba(94, 20, 32, 0.05) !important;
+}
+
+.topbar .icon-button i,
+.topbar .icon-button svg,
+.topbar .course-switch-btn i,
+.topbar .course-switch-btn svg {
+  color: #0F172A !important;
+  stroke: #0F172A !important;
+}
+
+/* --- 9.2 Beranda: Header Sapaan ("Hi Sobat!") --- */
+html body:not(.fz-teacher-mode) .fz-greet-title,
+html body:not(.fz-teacher-mode) .home-today .fz-greet-title,
+html body:not(.fz-teacher-mode) .fz-welcome-header .fz-greet-title {
+  color: #0F172A !important;
+  font-weight: 800 !important;
+}
+
+html body:not(.fz-teacher-mode) .fz-greet-motivation,
+html body:not(.fz-teacher-mode) .home-today .fz-greet-motivation {
+  color: #475569 !important;
+  font-weight: 600 !important;
+}
+
+/* --- 9.3 Aurora Card: Kosakata Harian & Sesi Adaptif --- */
+html body:not(.fz-teacher-mode) .fz-aurora-card {
+  background: #FFFFFF !important;
+  border: 1.5px solid rgba(94, 20, 32, 0.14) !important;
+  box-shadow: 0 4px 20px rgba(94, 20, 32, 0.05) !important;
+}
+
+html body:not(.fz-teacher-mode) .fz-aurora-vocab-zone {
+  background: #FFFDF9 !important;
+  border-bottom: 1.5px solid rgba(94, 20, 32, 0.08) !important;
+}
+
+html body:not(.fz-teacher-mode) .fz-aurora-session-zone {
+  background: #FFFFFF !important;
+}
+
+/* Kicker & Stepper */
+html body:not(.fz-teacher-mode) .fz-aurora-kicker {
+  color: #0F172A !important;
+  font-weight: 800 !important;
+}
+
+html body:not(.fz-teacher-mode) .fz-aurora-dot {
+  background: #FFD94F !important;
+  border: 1px solid #0F172A !important;
+  box-shadow: none !important;
+}
+
+html body:not(.fz-teacher-mode) .fz-aurora-step-text {
+  color: #7A686B !important;
+  font-weight: 700 !important;
+}
+
+html body:not(.fz-teacher-mode) .fz-aurora-dot-item {
+  background: rgba(94, 20, 32, 0.15) !important;
+}
+
+html body:not(.fz-teacher-mode) .fz-aurora-dot-item.is-active {
+  background: #FFD94F !important;
+  border: 1px solid #0F172A !important;
+  box-shadow: none !important;
+}
+
+/* Glass Pod di Vocab Zone */
+html body:not(.fz-teacher-mode) .fz-aurora-glass-pod {
+  background: #FFF9EE !important;
+  border: 1.5px solid rgba(94, 20, 32, 0.15) !important;
+}
+
+html body:not(.fz-teacher-mode) .fz-aurora-word {
+  color: #0F172A !important;
+  font-weight: 800 !important;
+}
+
+html body:not(.fz-teacher-mode) .fz-aurora-pos {
+  background: #FFD94F !important;
+  color: #0F172A !important;
+  border: 1px solid #0F172A !important;
+  font-weight: 800 !important;
+}
+
+html body:not(.fz-teacher-mode) .fz-aurora-phonetic {
+  color: #7A686B !important;
+  font-weight: 600 !important;
+}
+
+html body:not(.fz-teacher-mode) .fz-aurora-meaning {
+  color: #241A11 !important;
+  font-weight: 600 !important;
+}
+
+/* Sesi Adaptif */
+html body:not(.fz-teacher-mode) .fz-aurora-session-badge {
+  background: #FFF9EE !important;
+  color: #0F172A !important;
+  border: 1.5px solid rgba(94, 20, 32, 0.20) !important;
+  font-weight: 800 !important;
+}
+
+html body:not(.fz-teacher-mode) .fz-aurora-session-time {
+  background: rgba(94, 20, 32, 0.06) !important;
+  color: #7A686B !important;
+  font-weight: 700 !important;
+}
+
+html body:not(.fz-teacher-mode) .fz-aurora-session-title {
+  color: #0F172A !important;
+  font-weight: 800 !important;
+}
+
+html body:not(.fz-teacher-mode) .fz-aurora-session-desc {
+  color: #5A4A4D !important;
+  font-weight: 500 !important;
+}
+
+/* Sesi Progress Track */
+html body:not(.fz-teacher-mode) .fz-aurora-progress-block {
+  background: #FFF9EE !important;
+  border: 1.5px solid rgba(94, 20, 32, 0.10) !important;
+}
+
+html body:not(.fz-teacher-mode) .fz-aurora-progress-labels {
+  color: #0F172A !important;
+  font-weight: 700 !important;
+}
+
+html body:not(.fz-teacher-mode) .fz-aurora-progress-labels b {
+  color: #0F172A !important;
+  font-weight: 800 !important;
+}
+
+html body:not(.fz-teacher-mode) .fz-aurora-track {
+  background: rgba(94, 20, 32, 0.12) !important;
+}
+
+html body:not(.fz-teacher-mode) .fz-aurora-track-fill {
+  background: linear-gradient(90deg, #FFD94F, #0F172A) !important;
+  box-shadow: none !important;
+}
+
+/* --- 9.4 Latihan Singkat & Bento Hub (fz-stitch-*) --- */
+html body:not(.fz-teacher-mode) .quick-practice-title,
+html body:not(.fz-teacher-mode) .fz-stitch-title {
+  color: #0F172A !important;
+  font-weight: 800 !important;
+}
+
+html body:not(.fz-teacher-mode) .fz-stitch-all {
+  color: #0F172A !important;
+  font-weight: 800 !important;
+}
+
+html body:not(.fz-teacher-mode) .fz-stitch-badge {
+  background: #FFF9EE !important;
+  border: 1px solid rgba(94, 20, 32, 0.18) !important;
+  color: #0F172A !important;
+  font-weight: 800 !important;
+}
+
+html body:not(.fz-teacher-mode) .fz-stitch-badge.is-yellow {
+  background: #FFD94F !important;
+  border: 1px solid #0F172A !important;
+  color: #0F172A !important;
+  font-weight: 800 !important;
+}
+
+html body:not(.fz-teacher-mode) .fz-stitch-card-bottom h3 {
+  color: #0F172A !important;
+  font-weight: 800 !important;
+}
+
+html body:not(.fz-teacher-mode) .fz-stitch-card-bottom p {
+  color: #7A686B !important;
+}
+
+/* --- 9.5 KelasKu Strip --- */
+html body:not(.fz-teacher-mode) .fz-stitch-kelasku {
+  background: #FFFFFF !important;
+  border: 1.5px solid rgba(31, 122, 99, 0.3) !important;
+  box-shadow: 0 4px 18px rgba(31, 122, 99, 0.06) !important;
+}
+
+html body:not(.fz-teacher-mode) .kelasku-strip-icon {
+  background: #DDF3EA !important;
+  border: 1.5px solid #1F7A63 !important;
+  color: #1F7A63 !important;
+}
+
+html body:not(.fz-teacher-mode) .kelasku-strip-icon .fz-i {
+  --fz-i-line: #1F7A63 !important;
+  --fz-i-fill: #1F7A63 !important;
+}
+
+html body:not(.fz-teacher-mode) .kelasku-meta-brand {
+  color: #1F7A63 !important;
+  font-weight: 800 !important;
+}
+
+html body:not(.fz-teacher-mode) .kelasku-meta-due {
+  color: #B91C1C !important;
+  font-weight: 700 !important;
+}
+
+html body:not(.fz-teacher-mode) .kelasku-strip-title {
+  color: #0F172A !important;
+  font-weight: 800 !important;
+}
+
+html body:not(.fz-teacher-mode) .kelasku-strip-sub {
+  color: #7A686B !important;
+  font-weight: 500 !important;
+}
+
+html body:not(.fz-teacher-mode) .kelasku-strip-btn {
+  background: #DDF3EA !important;
+  border: 1.5px solid #124B3D !important;
+  color: #124B3D !important;
+  font-weight: 800 !important;
+  box-shadow: none !important;
+}
+
+html body:not(.fz-teacher-mode) .kelasku-strip-btn span {
+  color: #124B3D !important;
+  font-weight: 800 !important;
+}
+
+/* --- 9.6 Today Drawer & Blocks (Halo Sobat, Isi Sesi, dsb) --- */
+html body:not(.fz-teacher-mode) .today-eyebrow,
+html body:not(.fz-teacher-mode) .fz-drawer-inner .today-eyebrow {
+  color: #0F172A !important;
+  font-weight: 800 !important;
+}
+
+html body:not(.fz-teacher-mode) .today-title,
+html body:not(.fz-teacher-mode) .fz-drawer-inner .today-title {
+  color: #0F172A !important;
+  font-weight: 800 !important;
+}
+
+html body:not(.fz-teacher-mode) .today-lead,
+html body:not(.fz-teacher-mode) .fz-drawer-inner .today-lead {
+  color: #7A686B !important;
+  font-weight: 600 !important;
+}
+
+html body:not(.fz-teacher-mode) .today-isi-head,
+html body:not(.fz-teacher-mode) .fz-drawer-inner .today-isi-head {
+  color: #0F172A !important;
+  font-weight: 800 !important;
+}
+
+html body:not(.fz-teacher-mode) .fz-drawer-inner .today-blocks li {
+  background: #FFF9EE !important;
+  border: 1.5px solid rgba(94, 20, 32, 0.12) !important;
+  color: #241A11 !important;
+}
+
+html body:not(.fz-teacher-mode) .fz-drawer-inner .today-blocks li b {
+  color: #0F172A !important;
+  font-weight: 800 !important;
+}
+
+html body:not(.fz-teacher-mode) .fz-drawer-inner .today-blocks li span {
+  color: #7A686B !important;
+}
+
+html body .today-rhythm-bar,
+html body .fz-drawer-inner .today-rhythm-bar,
+html body:not(.fz-teacher-mode) .today-rhythm-bar,
+html body:not(.fz-teacher-mode) .fz-drawer-inner .today-rhythm-bar {
+  background: #FFF9EE !important;
+  border: 1.5px solid rgba(94, 20, 32, 0.14) !important;
+  border-radius: 14px !important;
+  color: #0F172A !important;
+}
+
+html body .today-rhythm-bar span,
+html body .fz-drawer-inner .today-rhythm-bar span,
+html body:not(.fz-teacher-mode) .today-rhythm-bar span,
+html body:not(.fz-teacher-mode) .fz-drawer-inner .today-rhythm-bar span {
+  color: #0F172A !important;
+}
+
+html body .today-rhythm-bar b,
+html body .fz-drawer-inner .today-rhythm-bar b,
+html body .today-rhythm-bar span b,
+html body .fz-drawer-inner .today-rhythm-bar span b,
+html body:not(.fz-teacher-mode) .today-rhythm-bar b,
+html body:not(.fz-teacher-mode) .fz-drawer-inner .today-rhythm-bar b {
+  color: #0F172A !important;
+  font-weight: 800 !important;
+}
+
+html body:not(.fz-teacher-mode) .today-cta {
+  background: #FFD94F !important;
+  border: 2px solid #0F172A !important;
+  box-shadow: 2.5px 2.5px 0px #0F172A !important;
+  color: #0F172A !important;
+  font-weight: 800 !important;
+}
+
+/* --- 9.7 Kartu Sosial & Teman (fz2-social) --- */
+html body:not(.fz-teacher-mode) .fz2-social,
+html body:not(.fz-teacher-mode) .fz2-social.card,
+html body:not(.fz-teacher-mode) .fz2-social-card,
+html body:not(.fz-teacher-mode) .social-card {
+  background: #FFFFFF !important;
+  border: 1.5px solid rgba(94, 20, 32, 0.14) !important;
+  box-shadow: 0 4px 18px rgba(94, 20, 32, 0.05) !important;
+}
+
+/* Override legacy card muted span text (restricted to non-quiz cards) */
+html body:not(.fz-teacher-mode) .card:not(.quiz-shell *):not(.card-quiz *):not(#feedback *):not(.feedback *) p:not(#feedback *):not(.feedback *) {
+  color: #7A686B !important;
+}
+
+/* m025-574: pil gelap ("0/7 hari aktif") dan petunjuk lencana Prasasti terkunci berlatar gelap - dikecualikan supaya memakai warnanya sendiri. */
+html body:not(.fz-teacher-mode) .card:not(.quiz-shell *):not(.card-quiz *):not(#feedback *):not(.feedback *) > span:not([class*="lvl"]):not(#feedback *):not(.feedback *):not([class*="pill"]):not(.prasasti-badge *),
+html body:not(.fz-teacher-mode) .card:not(.quiz-shell *):not(.card-quiz *):not(#feedback *):not(.feedback *) p:not(#feedback *):not(.feedback *) > span:not([class*="lvl"]):not([class*="pill"]):not(.prasasti-badge *),
+html body:not(.fz-teacher-mode) .card:not(.quiz-shell *):not(.card-quiz *):not(#feedback *):not(.feedback *) div > span:not([class*="badge"]):not([class*="tag"]):not([class*="btn"]):not([class*="act"]):not([class*="avatar"]):not([class*="lvl"]):not(.is-now):not(.is-done):not(#feedback *):not(.feedback *):not(.feedback-memory-kicker):not([class*="pill"]):not(.prasasti-badge *) {
+  color: #7A686B !important;
+}
+
+html body .eyebrow,
+html body.fz-lux .eyebrow,
+html body:not(.fz-teacher-mode) .eyebrow,
+html body:not(.fz-teacher-mode) .card .eyebrow,
+html body:not(.fz-teacher-mode) .card div > span.eyebrow,
+html body:not(.fz-teacher-mode) .fz2-social .eyebrow,
+html body:not(.fz-teacher-mode) .fz2-social-head .eyebrow,
+html body:not(.fz-teacher-mode) .fz2-social div > span.eyebrow {
+  color: #0F172A !important;
+  font-weight: 800 !important;
+}
+
+html body:not(.fz-teacher-mode) .fz2-social-title,
+html body:not(.fz-teacher-mode) .social-card h3 {
+  color: #0F172A !important;
+  font-weight: 800 !important;
+}
+
+html body:not(.fz-teacher-mode) .fz2-social-sub {
+  color: #7A686B !important;
+  font-weight: 500 !important;
+}
+
+html body:not(.fz-teacher-mode) .fz2-social .fz2-link,
+html body:not(.fz-teacher-mode) .fz2-link {
+  color: #0F172A !important;
+  font-weight: 800 !important;
+}
+
+html body:not(.fz-teacher-mode) .fz2-social .fz2-link svg,
+html body:not(.fz-teacher-mode) .fz2-link svg {
+  color: #0F172A !important;
+  stroke: #0F172A !important;
+}
+
+html body:not(.fz-teacher-mode) .fz2-social .fz2-act {
+  background: #FFF9EE !important;
+  border: 1.5px solid rgba(94, 20, 32, 0.18) !important;
+  color: #0F172A !important;
+}
+
+html body:not(.fz-teacher-mode) .fz2-social .fz2-act:hover {
+  background: #FDE4E8 !important;
+  border-color: #0F172A !important;
+}
+
+html body:not(.fz-teacher-mode) .fz2-social .fz2-act span,
+html body:not(.fz-teacher-mode) .fz2-social .fz2-act b {
+  color: #0F172A !important;
+  font-weight: 700 !important;
+}
+
+html body:not(.fz-teacher-mode) .fz2-social .fz2-act svg,
+html body:not(.fz-teacher-mode) .fz2-social .fz2-act i {
+  color: #0F172A !important;
+  stroke: #0F172A !important;
+}
+
+/* --- 9.8 Bottom Navigation Dock (High Specificity) --- */
+html body nav.bottomnav,
+html body.fz-lux nav.bottomnav,
+html body.fz-lang-ja nav.bottomnav,
+html.fiezel-ui-v6 body nav.bottomnav {
+  /* respect tactile clay floating pill bottomnav */
+}
+
+html body nav.bottomnav .nav,
+html body.fz-lux nav.bottomnav .nav,
+html body.fz-lang-ja nav.bottomnav .nav,
+html body nav.bottomnav button.nav,
+html body.fz-lux nav.bottomnav button.nav {
+  color: #7A686B !important;
+}
+
+html body nav.bottomnav .nav span,
+html body.fz-lux nav.bottomnav .nav span,
+html body.fz-lang-ja nav.bottomnav .nav span,
+html body nav.bottomnav button.nav span,
+html body.fz-lux nav.bottomnav button.nav span,
+html body nav.bottomnav .nav .kelasku-wordmark,
+html body.fz-lang-ja nav.bottomnav .nav .kelasku-wordmark {
+  color: #7A686B !important;
+  font-weight: 700 !important;
+}
+
+html body nav.bottomnav .nav .fz-i,
+html body.fz-lux nav.bottomnav .nav .fz-i,
+html body.fz-lang-ja nav.bottomnav .nav .fz-i,
+html body nav.bottomnav button.nav .fz-i,
+html body.fz-lux nav.bottomnav button.nav .fz-i,
+html body nav.bottomnav .nav svg,
+html body.fz-lux nav.bottomnav .nav svg,
+html body.fz-lang-ja nav.bottomnav .nav svg {
+  --fz-i-fill: transparent !important;
+  --fz-i-line: #7A686B !important;
+  color: #7A686B !important;
+  stroke: #7A686B !important;
+}
+
+/* Active Bottomnav State */
+html body nav.bottomnav .nav.active,
+html body.fz-lux nav.bottomnav .nav.active,
+html body.fz-lang-ja nav.bottomnav .nav.active,
+html body nav.bottomnav .nav[aria-selected="true"],
+html body nav.bottomnav button.nav.active,
+html body.fz-lux nav.bottomnav button.nav.active {
+  color: #0F172A !important;
+}
+
+html body nav.bottomnav .nav.active span,
+html body.fz-lux nav.bottomnav .nav.active span,
+html body.fz-lang-ja nav.bottomnav .nav.active span,
+html body nav.bottomnav button.nav.active span,
+html body.fz-lux nav.bottomnav button.nav.active span {
+  color: #0F172A !important;
+  font-weight: 800 !important;
+}
+
+html body nav.bottomnav .nav.active .fz-i,
+html body.fz-lux nav.bottomnav .nav.active .fz-i,
+html body.fz-lang-ja nav.bottomnav .nav.active .fz-i,
+html body nav.bottomnav button.nav.active .fz-i,
+html body.fz-lux nav.bottomnav button.nav.active .fz-i,
+html body nav.bottomnav .nav.active svg,
+html body.fz-lux nav.bottomnav .nav.active svg,
+html body.fz-lang-ja nav.bottomnav .nav.active svg {
+  --fz-i-fill: #FFD94F !important;
+  --fz-i-line: #0F172A !important;
+  color: #0F172A !important;
+  stroke: #0F172A !important;
+  filter: drop-shadow(0 2px 6px rgba(255, 217, 79, 0.4)) !important;
+}
+
+/* Active KelasKu Tab */
+html body nav.bottomnav .nav[data-view="classroom"].active,
+html body.fz-lang-ja nav.bottomnav .nav[data-view="classroom"].active,
+html body nav.bottomnav .nav[data-view="classroom"].active span,
+html body.fz-lang-ja nav.bottomnav .nav[data-view="classroom"].active span,
+html body nav.bottomnav .nav[data-view="classroom"].active .kelasku-wordmark,
+html body.fz-lang-ja nav.bottomnav .nav[data-view="classroom"].active .kelasku-wordmark {
+  color: #1F7A63 !important;
+}
+
+html body nav.bottomnav .nav[data-view="classroom"].active .fz-i,
+html body.fz-lang-ja nav.bottomnav .nav[data-view="classroom"].active .fz-i {
+  --fz-i-fill: #DDF3EA !important;
+  --fz-i-line: #1F7A63 !important;
+  filter: drop-shadow(0 2px 6px rgba(31, 122, 99, 0.3)) !important;
+}
+
+/* --- 9.9 Ritual Sheet Light Theme --- */
+.fz-ritual-sheet,
+#fzRitual,
+.fz-ritual,
+.fz-ritual-card {
+  background: #FFF9EE !important;
+  border: 1.5px solid rgba(94, 20, 32, 0.18) !important;
+  box-shadow: 0 -10px 40px rgba(94, 20, 32, 0.12) !important;
+  color: #241A11 !important;
+}
+
+.fz-ritual-sheet .fz-ritual-hi,
+.fz-ritual-card .fz-ritual-hi {
+  color: #0F172A !important;
+  font-weight: 800 !important;
+}
+
+.fz-ritual-sheet .fz-ritual-mark,
+.fz-ritual-card .fz-ritual-mark {
+  color: #7A686B !important;
+}
+
+.fz-ritual-card .fz-ritual-block {
+  background: #FFFFFF !important;
+  border: 1px solid rgba(94, 20, 32, 0.12) !important;
+  color: #241A11 !important;
+}
+
+.fz-ritual-card .fz-ritual-block b {
+  color: #0F172A !important;
+}
+
+.fz-ritual-card .fz-ritual-block span {
+  color: #7A686B !important;
+}
+
+
+

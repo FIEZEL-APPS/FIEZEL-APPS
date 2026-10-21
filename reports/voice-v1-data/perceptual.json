@@ -1,0 +1,170 @@
+{
+ "A_per_sentence_no_prefetch": {
+  "trimActive": false,
+  "boundaries": [
+   {
+    "boundary": "0->1",
+    "schedulingGapMs": 4088.4,
+    "tailSilenceInFileMs": 289.8,
+    "headSilenceInFileMs": 285.1,
+    "silenceCountedMs": 574.9,
+    "perceivedPauseMs": 4663.3,
+    "isParagraphBoundary": false
+   },
+   {
+    "boundary": "1->2",
+    "schedulingGapMs": 3379.5,
+    "tailSilenceInFileMs": 369.2,
+    "headSilenceInFileMs": 412.5,
+    "silenceCountedMs": 781.7,
+    "perceivedPauseMs": 4161.2,
+    "isParagraphBoundary": false
+   },
+   {
+    "boundary": "2->3",
+    "schedulingGapMs": 3373.8,
+    "tailSilenceInFileMs": 346.1,
+    "headSilenceInFileMs": 313.7,
+    "silenceCountedMs": 659.8,
+    "perceivedPauseMs": 4033.6,
+    "isParagraphBoundary": true
+   },
+   {
+    "boundary": "3->4",
+    "schedulingGapMs": 4179.7,
+    "tailSilenceInFileMs": 428.1,
+    "headSilenceInFileMs": 401.6,
+    "silenceCountedMs": 829.7,
+    "perceivedPauseMs": 5009.4,
+    "isParagraphBoundary": false
+   },
+   {
+    "boundary": "4->5",
+    "schedulingGapMs": 3426.8,
+    "tailSilenceInFileMs": 423.9,
+    "headSilenceInFileMs": 393.7,
+    "silenceCountedMs": 817.6,
+    "perceivedPauseMs": 4244.4,
+    "isParagraphBoundary": false
+   }
+  ],
+  "perceivedMeanMs": 4422.4,
+  "perceivedMinMs": 4033.6,
+  "perceivedMaxMs": 5009.4,
+  "perceivedParagraphMs": 4033.6,
+  "modelGenMeanMs": 3653.0,
+  "timeToFirstSoundMs": 3449.2
+ },
+ "A2_per_sentence_with_prefetch": {
+  "trimActive": false,
+  "boundaries": [
+   {
+    "boundary": "0->1",
+    "schedulingGapMs": 187.4,
+    "tailSilenceInFileMs": 303.3,
+    "headSilenceInFileMs": 366.3,
+    "silenceCountedMs": 669.6,
+    "perceivedPauseMs": 857.0,
+    "isParagraphBoundary": false
+   },
+   {
+    "boundary": "1->2",
+    "schedulingGapMs": 12.6,
+    "tailSilenceInFileMs": 312.5,
+    "headSilenceInFileMs": 320.2,
+    "silenceCountedMs": 632.7,
+    "perceivedPauseMs": 645.3,
+    "isParagraphBoundary": false
+   },
+   {
+    "boundary": "2->3",
+    "schedulingGapMs": 6.9,
+    "tailSilenceInFileMs": 380.1,
+    "headSilenceInFileMs": 239.4,
+    "silenceCountedMs": 619.5,
+    "perceivedPauseMs": 626.4,
+    "isParagraphBoundary": true
+   },
+   {
+    "boundary": "3->4",
+    "schedulingGapMs": 209.0,
+    "tailSilenceInFileMs": 325.8,
+    "headSilenceInFileMs": 352.4,
+    "silenceCountedMs": 678.2,
+    "perceivedPauseMs": 887.2,
+    "isParagraphBoundary": false
+   },
+   {
+    "boundary": "4->5",
+    "schedulingGapMs": 13.5,
+    "tailSilenceInFileMs": 490.0,
+    "headSilenceInFileMs": 365.1,
+    "silenceCountedMs": 855.1,
+    "perceivedPauseMs": 868.6,
+    "isParagraphBoundary": false
+   }
+  ],
+  "perceivedMeanMs": 776.9,
+  "perceivedMinMs": 626.4,
+  "perceivedMaxMs": 887.2,
+  "perceivedParagraphMs": 626.4,
+  "modelGenMeanMs": 3620.3,
+  "timeToFirstSoundMs": 3362.4
+ },
+ "B_single_speak_streaming": {
+  "trimActive": true,
+  "boundaries": [
+   {
+    "boundary": "0->1",
+    "schedulingGapMs": 1435.4,
+    "tailSilenceInFileMs": 293.9,
+    "headSilenceInFileMs": 308.8,
+    "silenceCountedMs": 24,
+    "perceivedPauseMs": 1459.4,
+    "isParagraphBoundary": false
+   },
+   {
+    "boundary": "1->2",
+    "schedulingGapMs": 420.0,
+    "tailSilenceInFileMs": 308.2,
+    "headSilenceInFileMs": 342.6,
+    "silenceCountedMs": 24,
+    "perceivedPauseMs": 444.0,
+    "isParagraphBoundary": false
+   },
+   {
+    "boundary": "2->3",
+    "schedulingGapMs": 420.0,
+    "tailSilenceInFileMs": 417.5,
+    "headSilenceInFileMs": 296.4,
+    "silenceCountedMs": 24,
+    "perceivedPauseMs": 444.0,
+    "isParagraphBoundary": true
+   },
+   {
+    "boundary": "3->4",
+    "schedulingGapMs": 420.0,
+    "tailSilenceInFileMs": 403.4,
+    "headSilenceInFileMs": 319.4,
+    "silenceCountedMs": 24,
+    "perceivedPauseMs": 444.0,
+    "isParagraphBoundary": false
+   },
+   {
+    "boundary": "4->5",
+    "schedulingGapMs": 420.0,
+    "tailSilenceInFileMs": 261.2,
+    "headSilenceInFileMs": 399.9,
+    "silenceCountedMs": 24,
+    "perceivedPauseMs": 444.0,
+    "isParagraphBoundary": false
+   }
+  ],
+  "perceivedMeanMs": 647.1,
+  "perceivedMinMs": 444.0,
+  "perceivedMaxMs": 1459.4,
+  "perceivedParagraphMs": 444.0,
+  "modelGenMeanMs": 3632.5,
+  "timeToFirstSoundMs": 3387.8
+ }
+}

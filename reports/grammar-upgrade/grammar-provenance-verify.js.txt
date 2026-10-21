@@ -1,0 +1,27 @@
+=== grammar-provenance-verify: ringkasan per level ===
+
+[A1] lesson: 34 | kartu: 850 | pelanggaran: 0
+  - bersih
+
+[A2] lesson: 58 | kartu: 1450 | pelanggaran: 0
+  - bersih
+
+[B1] lesson: 104 | kartu: 2600 | pelanggaran: 2
+  - mode_coverage (WAJIB-LULUS-SEKARANG): 2
+      · QN-003/indirect_questions_embedded_word_order: hanya 24 practiceMode distinct dari 25 kartu
+      · QN-203/indirect_questions_embedded_word_order: hanya 24 practiceMode distinct dari 25 kartu
+
+[B2] lesson: 78 | kartu: 1950 | pelanggaran: 0
+  - bersih
+
+[C1] lesson: 33 | kartu: 825 | pelanggaran: 0
+  - bersih
+
+[C2] lesson: 21 | kartu: 525 | pelanggaran: 0
+  - bersih
+
+=== status ===
+Pelanggaran kontrak total: 2 (aturan patch-independent: 2)
+Dump review: /review/questions-<LEVEL>.json
+
+FAIL grammar-provenance-verify: ada pelanggaran kontrak (lihat rincian di atas).

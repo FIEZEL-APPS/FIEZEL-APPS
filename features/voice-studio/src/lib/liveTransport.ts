@@ -53,6 +53,136 @@ declare global {
 }
 
 /**
+ * Encodes Web Audio Float32 samples (-1.0 to 1.0) into 16-bit little-endian PCM base64.
+ */
+export function float32ToPcm16Base64(float32: Float32Array): string {
+  const int16 = new Int16Array(float32.length);
+  for (let i = 0; i < float32.length; i++) {
+    const s = Math.max(-1, Math.min(1, float32[i]));
+    int16[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
+  }
+  const bytes = new Uint8Array(int16.buffer);
+  let binary = '';
+  const len = bytes.byteLength;
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
+
+/**
+ * Decodes 16-bit little-endian PCM base64 string into a Web Audio AudioBuffer (typically 24kHz).
+ * Safe against odd byte lengths and endian mismatch.
+ */
+export function pcm16Base64ToAudioBuffer(
+  audioCtx: AudioContext,
+  base64: string,
+  sampleRate = 24000
+): AudioBuffer {
+  const binary = atob(base64);
+  const len = binary.length;
+  const samples = Math.floor(len / 2);
+  const bytes = new Uint8Array(len);
+  for (let i = 0; i < len; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  const view = new DataView(bytes.buffer, bytes.byteOffset, samples * 2);
+  const float32 = new Float32Array(samples);
+  for (let i = 0; i < samples; i++) {
+    float32[i] = view.getInt16(i * 2, true) / 32768.0;
+  }
+  const buffer = audioCtx.createBuffer(1, samples, sampleRate);
+  buffer.getChannelData(0).set(float32);
+  return buffer;
+}
+
+/**
+ * High-performance scheduled audio playback buffer for 24kHz PCM chunks.
+ * Guarantees jitter-free, seamless chunk stitching (no clicks/pops) and
+ * microsecond-level interruption (barge-in) queue flushing.
+ */
+export class PcmQueueAudioPlayer {
+  private ctx: AudioContext | null = null;
+  private nextStartTime: number = 0;
+  private activeSources: AudioBufferSourceNode[] = [];
+  private onPlaybackStateChange?: (isPlaying: boolean) => void;
+
+  constructor(options?: {
+    audioContext?: AudioContext;
+    onPlaybackStateChange?: (isPlaying: boolean) => void;
+  }) {
+    if (options?.audioContext) {
+      this.ctx = options.audioContext;
+    }
+    this.onPlaybackStateChange = options?.onPlaybackStateChange;
+  }
+
+  public getContext(): AudioContext {
+    if (!this.ctx || this.ctx.state === 'closed') {
+      const AudioCtx =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      this.ctx = new AudioCtx({ sampleRate: 24000 });
+      this.nextStartTime = this.ctx.currentTime;
+    }
+    if (this.ctx.state === 'suspended') {
+      void this.ctx.resume().catch(() => {});
+    }
+    return this.ctx;
+  }
+
+  public enqueueChunk(pcmBase64: string, sampleRate = 24000): void {
+    if (!pcmBase64) return;
+    const ctx = this.getContext();
+    const buffer = pcm16Base64ToAudioBuffer(ctx, pcmBase64, sampleRate);
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+    source.connect(ctx.destination);
+
+    const startAt = Math.max(ctx.currentTime, this.nextStartTime);
+    source.start(startAt);
+    this.nextStartTime = startAt + buffer.duration;
+    this.activeSources.push(source);
+
+    this.onPlaybackStateChange?.(true);
+
+    source.onended = () => {
+      this.activeSources = this.activeSources.filter((s) => s !== source);
+      if (this.activeSources.length === 0) {
+        this.onPlaybackStateChange?.(false);
+      }
+    };
+  }
+
+  /**
+   * Instantly stops all in-flight playback and clears the playback queue (barge-in).
+   */
+  public clearQueue(): void {
+    for (const src of this.activeSources) {
+      try {
+        src.stop();
+        src.disconnect();
+      } catch {
+        // Ignore already stopped
+      }
+    }
+    this.activeSources = [];
+    if (this.ctx) {
+      this.nextStartTime = this.ctx.currentTime;
+    }
+    this.onPlaybackStateChange?.(false);
+  }
+
+  public close(): void {
+    this.clearQueue();
+    if (this.ctx && this.ctx.state !== 'closed') {
+      void this.ctx.close().catch(() => {});
+      this.ctx = null;
+    }
+  }
+}
+
+/**
  * Resolves the prioritized WebSocket endpoints for Gemini Live (`gemini-3.8-live` / PCM16 duplex).
  * Always includes the production Cloudflare Worker proxy `wss://fiezel.my.id/api/live-call`.
  */

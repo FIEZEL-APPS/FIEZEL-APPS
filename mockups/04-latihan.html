@@ -1,0 +1,44 @@
+<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=390">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<style>
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tile{min-height:150px;display:flex;flex-direction:column}
+.tile .foot{margin-top:auto;display:flex;align-items:center;justify-content:space-between}
+.tile .arrow{width:30px;height:30px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center}
+.quick{display:flex;align-items:center;gap:14px;background:var(--ink);color:#FDFAF3;border-radius:22px;padding:16px 18px;position:relative;overflow:hidden}
+.quick .paw{width:58px;position:absolute;right:14px;bottom:-6px}
+.quick b{font-family:var(--display);font-size:19px;font-weight:600;display:block}
+.quick span{font-size:13px;opacity:.75;display:block;max-width:190px}
+.quick .zap{width:40px;height:40px;border-radius:14px;background:var(--sun);color:var(--ink);display:grid;place-items:center;flex:none}
+</style></head><body>
+<div class="screen">
+  <div class="top">
+    <h1>Latihan</h1>
+    <span class="chip"><i data-lucide="sliders-horizontal" class="i sm"></i>A1</span>
+  </div>
+  <p class="muted" style="margin-top:2px">Pilih skill, mulai dalam 1 ketukan.</p>
+
+  <div class="quick mt-3">
+    <span class="zap"><i data-lucide="zap" class="i"></i></span>
+    <div><b>Sesi Kilat</b><span>10 soal campur · 3 menit · grammar yang sudah terbuka</span></div>
+    <img class="paw" src="/assets/brand/paw-mascot-head.svg" alt="">
+  </div>
+
+  <div class="grid mt-3">
+    <div class="tile pink"><span class="ic"><i data-lucide="headphones" class="i"></i></span><h3>Listening</h3><span class="meta">72% · 3 audio baru</span><div class="foot"><div class="bar thin" style="width:60%;background:rgba(255,255,255,.7)"><i style="width:72%;background:var(--pink-ink)"></i></div><span class="arrow"><i data-lucide="arrow-right" class="i sm"></i></span></div></div>
+    <div class="tile mint"><span class="ic"><i data-lucide="mic" class="i"></i></span><h3>Speaking</h3><span class="meta">40% · latihan ucap</span><div class="foot"><div class="bar thin" style="width:60%;background:rgba(255,255,255,.7)"><i style="width:40%;background:var(--mint-ink)"></i></div><span class="arrow"><i data-lucide="arrow-right" class="i sm"></i></span></div></div>
+    <div class="tile lilac"><span class="ic"><i data-lucide="book-open" class="i"></i></span><h3>Reading</h3><span class="meta">55% · 1 cerita baru</span><div class="foot"><div class="bar thin" style="width:60%;background:rgba(255,255,255,.7)"><i style="width:55%;background:var(--lilac-ink)"></i></div><span class="arrow"><i data-lucide="arrow-right" class="i sm"></i></span></div></div>
+    <div class="tile peach"><span class="ic"><i data-lucide="book-open-text" class="i"></i></span><h3>Writing</h3><span class="meta">30% · prompt harian</span><div class="foot"><div class="bar thin" style="width:60%;background:rgba(255,255,255,.7)"><i style="width:30%;background:var(--peach-ink)"></i></div><span class="arrow"><i data-lucide="arrow-right" class="i sm"></i></span></div></div>
+    <div class="tile yellow"><span class="ic"><i data-lucide="book-a" class="i"></i></span><h3>Vocab</h3><span class="meta">18 kata perlu diulang</span><div class="foot"><div class="bar thin" style="width:60%;background:rgba(255,255,255,.7)"><i style="width:64%;background:var(--yellow-ink)"></i></div><span class="arrow"><i data-lucide="arrow-right" class="i sm"></i></span></div></div>
+    <div class="tile sky"><span class="ic"><i data-lucide="spell-check-2" class="i"></i></span><h3>Grammar</h3><span class="meta">Lesson 4 dari 17</span><div class="foot"><div class="bar thin" style="width:60%;background:rgba(255,255,255,.7)"><i style="width:24%;background:var(--sky-ink)"></i></div><span class="arrow"><i data-lucide="arrow-right" class="i sm"></i></span></div></div>
+  </div>
+</div>
+<nav class="nav">
+  <a><i data-lucide="house" class="i"></i>Hari ini</a>
+  <a class="on"><i data-lucide="zap" class="i"></i>Latihan</a>
+  <a><i data-lucide="school" class="i"></i>Kelas</a>
+  <a><i data-lucide="route" class="i"></i>Progres</a>
+  <a><i data-lucide="user-round" class="i"></i>Profil</a>
+</nav>
+<script src="/lucide.min.js"></script><script>lucide.createIcons()</script></body></html>

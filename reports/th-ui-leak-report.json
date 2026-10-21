@@ -1,0 +1,512 @@
+{
+  "schema": "fiezel-th-ui-leak-v1",
+  "generatedAt": "2026-10-21T16:51:16.614Z",
+  "files": {
+    "app.js": {
+      "leaks": 3,
+      "budget": 3,
+      "sample": [
+        {
+          "line": 11659,
+          "text": "Selesaikan ritme hari ini"
+        },
+        {
+          "line": 12539,
+          "text": "— Penugasan latihan dan pemantauan capaian murid."
+        },
+        {
+          "line": 13161,
+          "text": "Nama kriteria: n/4 - satu kalimat alasan yang menunjuk bukti di tulisannya"
+        }
+      ]
+    },
+    "features/brain/fiezel-listening-adaptive.js": {
+      "leaks": 3,
+      "budget": 3,
+      "sample": [
+        {
+          "line": 93,
+          "text": "Akurasi di bawah target dan replay sudah penuh, jadi klip dipendekkan satu tingkat."
+        },
+        {
+          "line": 94,
+          "text": "Akurasi di bawah target meski replay penuh dan klip pendek, jadi kecepatan diperlambat satu pita."
+        },
+        {
+          "line": 95,
+          "text": "Akurasi berada di dalam pita target (±0.1), jadi kesulitan dipertahankan — di sinilah belajar paling efisien."
+        }
+      ]
+    },
+    "features/brain/fiezel-olm.js": {
+      "leaks": 1,
+      "budget": 1,
+      "sample": [
+        {
+          "line": 219,
+          "text": "%. Jawaban-jawabanmu lebih akurat daripada taksiranmu \\u2014 saat polanya sudah dikenali,"
+        }
+      ]
+    },
+    "features/brain/fiezel-step-tutor.js": {
+      "leaks": 1,
+      "budget": 1,
+      "sample": [
+        {
+          "line": 86,
+          "text": "Sekarang gabungkan langkah-langkah tadi"
+        }
+      ]
+    },
+    "features/brain/fiezel-tutor-brain.js": {
+      "leaks": 3,
+      "budget": 3,
+      "sample": [
+        {
+          "line": 564,
+          "text": "Belum tepat nih, tapi wajar kok, bagian ini memang sering bikin terkecoh."
+        },
+        {
+          "line": 567,
+          "text": ". Sekarang coba lagi yuk."
+        },
+        {
+          "line": 579,
+          "text": "Belum ada jawaban di sesi ini."
+        }
+      ]
+    },
+    "features/class-hub/fiezel-braincore-review.js": {
+      "leaks": 2,
+      "budget": 2,
+      "sample": [
+        {
+          "line": 30,
+          "text": "Latihan membaca terpandu"
+        },
+        {
+          "line": 30,
+          "text": "Latihan menyimak detail"
+        }
+      ]
+    },
+    "features/class-hub/fiezel-class-hub.js": {
+      "leaks": 3,
+      "budget": 3,
+      "sample": [
+        {
+          "line": 2775,
+          "text": "Latihan · ±"
+        },
+        {
+          "line": 2823,
+          "text": "Tenggat"
+        },
+        {
+          "line": 2823,
+          "text": "Latihan — umpan balik tiap soal"
+        }
+      ]
+    },
+    "features/curriculum/learning-mission.js": {
+      "leaks": 19,
+      "budget": 19,
+      "sample": [
+        {
+          "line": 94,
+          "text": "FIEZEL · Misi Belajar"
+        },
+        {
+          "line": 99,
+          "text": "Masuk dengan akun KelasKu"
+        },
+        {
+          "line": 113,
+          "text": "Guru masuk di"
+        },
+        {
+          "line": 113,
+          "text": "Ruang Guru"
+        },
+        {
+          "line": 145,
+          "text": "Murid"
+        }
+      ]
+    },
+    "features/curriculum/teacher-console.js": {
+      "leaks": 35,
+      "budget": 35,
+      "sample": [
+        {
+          "line": 162,
+          "text": "FIEZEL · Ruang Guru"
+        },
+        {
+          "line": 163,
+          "text": "Kurikulum yang benar-benar dipelajari."
+        },
+        {
+          "line": 166,
+          "text": "Masuk dengan akun KelasKu"
+        },
+        {
+          "line": 167,
+          "text": "Belum masuk? Buka"
+        },
+        {
+          "line": 168,
+          "text": "Murid masuk di halaman"
+        }
+      ]
+    },
+    "features/learner-flow/fiezel-learner-flow.js": {
+      "leaks": 1,
+      "budget": 1,
+      "sample": [
+        {
+          "line": 332,
+          "text": ", jadi pola ini akan diulang lagi besok. Sekarang kita lanjut ke"
+        }
+      ]
+    },
+    "features/learner-flow/fiezel-review-bank.js": {
+      "leaks": 15,
+      "budget": 15,
+      "sample": [
+        {
+          "line": 37,
+          "text": "Cari kalimat di teks yang memuat jawabannya"
+        },
+        {
+          "line": 37,
+          "text": "Latihan Membaca TKA: tekstual"
+        },
+        {
+          "line": 38,
+          "text": "Latihan Membaca TKA: inferensial"
+        },
+        {
+          "line": 39,
+          "text": "Latihan Membaca TKA: fakta dan opini"
+        },
+        {
+          "line": 153,
+          "text": "Jawaban ini tidak tertulis kata per kata; ia disimpulkan dari petunjuk “will be closed ... will open again”."
+        }
+      ]
+    },
+    "features/neural-voice/fiezel-cf-voice-notice.js": {
+      "leaks": 3,
+      "budget": 3,
+      "sample": [
+        {
+          "line": 79,
+          "text": "Suara cadanganku dulu, ya. Ini bukan kesalahanmu dan nggak ada yang hilang."
+        },
+        {
+          "line": 84,
+          "text": "Suara gagal disiapkan"
+        },
+        {
+          "line": 90,
+          "text": "Suara belum tersedia untuk kalimat ini"
+        }
+      ]
+    },
+    "features/neural-voice/fiezel-diag-panel.js": {
+      "leaks": 6,
+      "budget": 6,
+      "sample": [
+        {
+          "line": 333,
+          "text": "Cari event penting langsung di bawah. Kirim isi kotak ini ke coordinator bila perlu."
+        },
+        {
+          "line": 341,
+          "text": "Cari: wasm_policy, timeout, adapter..."
+        },
+        {
+          "line": 372,
+          "text": "Kirim"
+        },
+        {
+          "line": 376,
+          "text": "Kirim ringkas"
+        },
+        {
+          "line": 380,
+          "text": "Tutup"
+        }
+      ]
+    },
+    "features/neural-voice/fiezel-neural-voice-audibility-fix.js": {
+      "leaks": 2,
+      "budget": 2,
+      "sample": [
+        {
+          "line": 129,
+          "text": "Suara neural aktif"
+        },
+        {
+          "line": 139,
+          "text": "Aktifkan suara neural"
+        }
+      ]
+    },
+    "features/onboarding/fiezel-onboarding.js": {
+      "leaks": 1,
+      "budget": 1,
+      "sample": [
+        {
+          "line": 681,
+          "text": "Pilih bahasa untuk melanjutkan"
+        }
+      ]
+    },
+    "features/prasasti/fiezel-prasasti-core.js": {
+      "leaks": 5,
+      "budget": 5,
+      "sample": [
+        {
+          "line": 38,
+          "text": "Selesaikan 1 sesi lesson grammar"
+        },
+        {
+          "line": 41,
+          "text": "Belajar bermakna 7 hari beruntun."
+        },
+        {
+          "line": 42,
+          "text": "Belajar bermakna 30 hari beruntun."
+        },
+        {
+          "line": 43,
+          "text": "Belajar bermakna 100 hari beruntun — kebiasaan yang sudah jadi milikmu."
+        },
+        {
+          "line": 45,
+          "text": "Kolektor Runtun"
+        }
+      ]
+    },
+    "features/quota/quota-copy.js": {
+      "leaks": 5,
+      "budget": 5,
+      "sample": [
+        {
+          "line": 129,
+          "text": "Suara cadanganku dulu, ya. Ini bukan kesalahanmu dan nggak ada yang hilang."
+        },
+        {
+          "line": 134,
+          "text": "Suara gagal disiapkan"
+        },
+        {
+          "line": 140,
+          "text": "Suara belum tersedia untuk kalimat ini"
+        },
+        {
+          "line": 158,
+          "text": "Suara dari perangkatmu tetap jalan, dan latihan yang sudah tersimpan tetap bisa kamu kerjakan."
+        },
+        {
+          "line": 166,
+          "text": "Masuk lagi sebentar, ya. Yang sudah selesai tetap aman."
+        }
+      ]
+    },
+    "features/speaking-listening/listening-scenarios-a1.js": {
+      "leaks": 15,
+      "budget": 15,
+      "sample": [
+        {
+          "line": 23,
+          "text": "Menunggu teman karena hujan"
+        },
+        {
+          "line": 31,
+          "text": "Kelas malam yang diikuti ibunya setiap minggu"
+        },
+        {
+          "line": 41,
+          "text": "Menunggu satu jam lagi"
+        },
+        {
+          "line": 41,
+          "text": "Kembali ke toko"
+        },
+        {
+          "line": 79,
+          "text": "Guru baru di kelasnya"
+        }
+      ]
+    },
+    "features/speaking-listening/listening-scenarios-a2.js": {
+      "leaks": 14,
+      "budget": 14,
+      "sample": [
+        {
+          "line": 26,
+          "text": "Guru yang kesal dengan acara di museum sore itu"
+        },
+        {
+          "line": 51,
+          "text": "Kembali lagi keesokan harinya"
+        },
+        {
+          "line": 91,
+          "text": "Menunggu di jalannya sendiri"
+        },
+        {
+          "line": 106,
+          "text": "Daftar nama dan hari untuk kebun sekolah"
+        },
+        {
+          "line": 106,
+          "text": "Daftar murid yang bergabung ke kelasnya"
+        }
+      ]
+    },
+    "features/teacher/fiezel-analisis-butir.js": {
+      "leaks": 2,
+      "budget": 2,
+      "sample": [
+        {
+          "line": 72,
+          "text": "Belum cukup murid"
+        },
+        {
+          "line": 135,
+          "text": "Tingkat kesukaran (p)"
+        }
+      ]
+    },
+    "features/teacher/fiezel-rapor-kktp.js": {
+      "leaks": 3,
+      "budget": 3,
+      "sample": [
+        {
+          "line": 180,
+          "text": "Status KKTP"
+        },
+        {
+          "line": 180,
+          "text": "Capaian Kompetensi (tertinggi)"
+        },
+        {
+          "line": 180,
+          "text": "Capaian Kompetensi (perlu ditingkatkan)"
+        }
+      ]
+    },
+    "features/teacher/fiezel-teacher-curriculum.js": {
+      "leaks": 25,
+      "budget": 25,
+      "sample": [
+        {
+          "line": 20,
+          "text": "Fase D (SMP / MTs)"
+        },
+        {
+          "line": 27,
+          "text": "Fase E (SMA / SMK Kelas 10)"
+        },
+        {
+          "line": 34,
+          "text": "Fase F (SMA / SMK Kelas 11 & 12)"
+        },
+        {
+          "line": 570,
+          "text": "Gunakan bagan alur cerita (Story Mountain) 3 kotak: Awal, Masalah, Selesai."
+        },
+        {
+          "line": 793,
+          "text": "Nama spesies tunggal + pasif"
+        }
+      ]
+    },
+    "features/teacher/fiezel-teacher-shell.js": {
+      "leaks": 8,
+      "budget": 8,
+      "sample": [
+        {
+          "line": 1216,
+          "text": "Penugasan Kontingen Pasukan Garuda ke wilayah konflik"
+        },
+        {
+          "line": 1296,
+          "text": "Penugasan nilai (assignment)"
+        },
+        {
+          "line": 3328,
+          "text": "Tenggat & tugas"
+        },
+        {
+          "line": 3346,
+          "text": "Akurasi"
+        },
+        {
+          "line": 3427,
+          "text": "Latihan ·"
+        }
+      ]
+    },
+    "features/teacher/fiezel-teacher-store.js": {
+      "leaks": 3,
+      "budget": 3,
+      "sample": [
+        {
+          "line": 633,
+          "text": ". Aku bangga. Lanjutkan ritmenya — 1 sesi kecil tiap hari lebih ampuh daripada 1 sesi panjang seminggu."
+        },
+        {
+          "line": 642,
+          "text": "• Akurasi keseluruhan:"
+        },
+        {
+          "line": 665,
+          "text": "Akurasi"
+        }
+      ]
+    },
+    "features/tutor-action-center/fiezel-tutor-action-center.js": {
+      "leaks": 3,
+      "budget": 3,
+      "sample": [
+        {
+          "line": 351,
+          "text": "Latihan terkirim"
+        },
+        {
+          "line": 361,
+          "text": "Latihan yang dikirim muncul di Today Plan murid sebagai “Latihan dari tutor”."
+        },
+        {
+          "line": 416,
+          "text": "Latihan dikirim ke"
+        }
+      ]
+    },
+    "features/tutor-classroom/fiezel-tutor-v3.js": {
+      "leaks": 2,
+      "budget": 2,
+      "sample": [
+        {
+          "line": 175,
+          "text": "Sekarang polanya lebih masuk akal: subjek, have atau has, lalu bentuk ketiga kata kerja."
+        },
+        {
+          "line": 748,
+          "text": "Kurikulum A1 lengkap dulu, lalu naik ke jalur TOEFL / IELTS. Fiezel mengingat checkpoint, bukan audio mentah."
+        }
+      ]
+    }
+  },
+  "copyKeys": {
+    "id": 4412,
+    "th": 4236,
+    "idTanpaTh": 0
+  },
+  "pass": true
+}

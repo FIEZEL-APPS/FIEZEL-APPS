@@ -1,0 +1,408 @@
+# Memasang backend FIEZEL permanen di cPanel (ArenHost)
+
+Panduan ini memasang `backend/` (FastAPI + MongoDB) supaya konsol kurikulum berhenti
+jadi pintu ke ruangan kosong. Ditulis untuk cPanel karena di situlah `fiezel.my.id`
+sudah tinggal.
+
+Semua perilaku yang disebut di sini **diukur**, bukan dikira — versi persis dari
+`backend/requirements.txt`, Python 3.11.
+
+---
+
+## 0a. BUKTIKAN PASSENGER HIDUP SEBELUM MENGERJAKAN APA PUN — 30 detik
+
+**Adanya menu "Setup Python App" TIDAK membuktikan Passenger berjalan.** Diukur di
+ArenHost 12 Sep 2026: menunya ada, aplikasi bisa dibuat, statusnya *started*, `.htaccess`
+berisi `PassengerAppRoot`/`PassengerBaseURI`/`PassengerPython` yang benar — dan Passenger
+**tidak pernah sekali pun dijalankan**. Tiga lokasi berbeda dicoba (subdomain dengan docroot
+di luar `public_html`, subdomain dengan docroot di dalamnya, dan path di bawah domain utama);
+ketiganya menjawab **404 dalam 1–2 milidetik**, dan nol log Passenger terbentuk.
+
+Versi pertama panduan ini hanya menyuruh memastikan menunya ADA. Itu tidak cukup, dan
+kekurangan itulah yang membuat satu pemasangan menghabiskan berjam-jam sebelum sebabnya
+terlihat. Jadi jalankan tes ini **lebih dulu**, sebelum menyentuh Atlas, unggahan, atau env:
+
+```bash
+mkdir -p ~/uji-passenger && cd ~/uji-passenger
+printf 'def application(e,s):\n s("200 OK",[("Content-Type","text/plain")])\n return [b"PASSENGER HIDUP"]\n' > passenger_wsgi.py
+```
+
+Buat aplikasi Python di cPanel yang menunjuk `uji-passenger`, lalu:
+
+```bash
+curl -sS -o /tmp/u.txt -w 'status=%{http_code} waktu=%{time_total}s\n' \
+  -H "Host: <alamat-aplikasinya>" http://127.0.0.1/ ; cat /tmp/u.txt
+```
+
+| Hasil | Artinya |
+|---|---|
+| `PASSENGER HIDUP`, waktu **ratusan ms** | Passenger berjalan. Lanjutkan panduan ini. |
+| 404 dalam **1–2 ms** | Passenger MATI. Berhenti; panduan ini tidak akan bisa diselesaikan. |
+
+Waktunya sama pentingnya dengan statusnya: **404 seketika berarti web server menjawab
+sendiri tanpa pernah memanggil Python.** Kalau hasilnya mati, minta hosting menyalakannya,
+atau pasang backend di luar (Render — lihat §0b) sambil tetap memakai Atlas.
+
+---
+
+## 0b. cPanel MENIMPA `passenger_wsgi.py` — setiap kali
+
+Setiap kali aplikasi Python dibuat atau disimpan ulang, cPanel menulis ulang
+`passenger_wsgi.py` di Application root dengan stub buatannya sendiri. Stub itu memuat
+berkas bernama `passenger_wsgi.py` lewat path relatif — yaitu **dirinya sendiri** — dan
+berakhir sebagai `RecursionError: maximum recursion depth exceeded`, yang sampai ke browser
+sebagai **500 tanpa petunjuk**.
+
+Jadi sesudah **setiap** kali menekan SAVE di Setup Python App, tulis ulang berkasnya:
+
+```bash
+cd ~/fiezel-api && printf '%s\n' 'import os, sys' \
+  'sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))' \
+  'from a2wsgi import ASGIMiddleware' 'from server import app' \
+  'application = ASGIMiddleware(app)' > passenger_wsgi.py && cat passenger_wsgi.py
+```
+
+Kalau `cat` menampilkan baris diawali `import importlib.machinery`, itu stub cPanel — ulangi.
+
+---
+
+## 0c. Versi Python dipaku DI REPO, bukan di dashboard
+
+`backend/.python-version` berisi `3.11.9` dan `tests/backend-env-contract-test.js`
+menegakkannya. Alasannya diukur, bukan gaya: `pymongo 4.6.3` hanya punya wheel untuk
+cp37–cp312. Di Python 3.13 ke atas pip terpaksa mengompilasi dari sumber C dan gagal di
+hosting tanpa compiler; di 3.14 ia bahkan tidak sampai ke sana — `google-api-core`
+menuntut `grpcio-status>=1.75.1` khusus pada `python_version >= "3.14"`, dan pemasangan
+mati sebagai `ResolutionImpossible` (diukur di Render, 12 Sep 2026).
+
+Berkas itu dibaca Render dan sebagian besar PaaS lain. Menyetel `PYTHON_VERSION` di
+dashboard juga bekerja, tetapi setelan dashboard tidak ikut ter-clone bersama repo dan
+tidak ada gerbang yang bisa menjaganya.
+
+---
+
+## 0d. `requirements.txt` adalah freeze UTUH — dan itu pernah bocor
+
+Semua 127 dependensi dipaku persis (`==`), termasuk yang ditarik transitif. Itu bukan
+kerapian: kalau satu saja mengambang, versinya ditentukan oleh **hari kapan pip kebetulan
+dijalankan**, bukan oleh repo ini — dan kerusakannya muncul sebagai deploy gagal tanpa
+satu pun diff yang bisa ditunjuk.
+
+Ini pernah terjadi. Tiga commit langsung ke `main` (`62380627`, `7c3fa7f3`, `81f98f5f`,
+8 Sep 2026) mengejar kegagalan deploy Render dengan mencabut pin satu per satu. Empat
+hilang sama sekali — `pydantic`, `pydantic_core`, `packaging`, `librt` — dan satu
+(`shellingham`) **diturunkan dari 1.5.4 yang sehat ke 1.5.0 yang sudah ditarik PyPI**
+("Incorrect package metadata"), yang membuat pip memperingatkannya di setiap build.
+
+Padahal akar kegagalannya bukan paketnya sama sekali, melainkan versi Python (§0c).
+
+`tests/backend-env-contract-test.js` kini menjaga tiga hal, ketiganya dibuktikan merah
+lebih dulu: setiap baris dipaku persis `==`, tidak ada paket dipaku dua kali (pip memakai
+yang terakhir, jadi yang di atas diabaikan diam-diam), dan tidak ada pin ke rilis yang
+terbukti ditarik.
+
+**Batas gerbang itu, dan cara menutupnya.** Ia menangkap pin yang DILONGGARKAN, bukan pin
+yang DIHAPUS — menemukan yang dihapus menuntut meresolusi seluruh pohon ke PyPI, dan
+gerbangnya offline. Kalau kamu menyunting `requirements.txt` besar-besaran, jalankan ini
+dan pastikan hasilnya nol:
+
+```bash
+python3.11 -m venv /tmp/v && /tmp/v/bin/pip install --dry-run \
+  --report /tmp/r.json -r backend/requirements.txt
+```
+
+Lalu bandingkan jumlah paket di `/tmp/r.json` dengan jumlah baris `==` di
+`requirements.txt`. Diukur 12 Sep 2026: **127 dipaku, 127 terpasang, nol mengambang.**
+
+---
+
+## 0. Dua hal yang harus diterima sejak awal
+
+**MongoDB tidak bisa dipasang di shared hosting cPanel.** Ia butuh proses daemon dan
+port sendiri; paket shared tidak memberi keduanya. Databasenya karena itu **wajib**
+di luar: MongoDB Atlas (tier gratis M0 cukup untuk memulai, dan ia terkelola —
+backup dan update bukan urusanmu lagi).
+
+**Paketmu harus mendukung "Setup Python App"** (Passenger). Cek di cPanel: cari ikon
+*Setup Python App* di bagian SOFTWARE. Kalau tidak ada, paketnya tidak bisa menjalankan
+FastAPI sama sekali, dan tidak ada trik yang mengubah itu — yang tersisa adalah pindah
+ke paket yang mendukung, atau menaruh backend di tempat lain (Render/Railway/VPS)
+sambil tetap memakai Atlas. Periksa ini **sebelum** mengerjakan langkah lain.
+
+---
+
+## 1. MongoDB Atlas
+
+1. Buat akun di mongodb.com/atlas → **Create** cluster **M0 (Free)**, pilih region
+   terdekat (Singapore untuk Indonesia).
+2. **Database Access** → Add New Database User. Simpan sandinya; ia masuk ke
+   `MONGO_URL`.
+3. **Network Access** → Add IP Address. Isi IP server cPanel-mu (tanya ArenHost, atau
+   lihat di cPanel → *Server Information* → Shared IP Address).
+   Hindari `0.0.0.0/0` kecuali darurat — itu membuka databasemu ke seluruh internet
+   dan satu-satunya yang menjaganya tinggal sandi.
+4. **Connect → Drivers → Python** → salin connection string. Bentuknya:
+   `mongodb+srv://pengguna:sandi@cluster0.xxxxx.mongodb.net/?retryWrites=true&w=majority`
+
+---
+
+## 1b. Subdomain dan DNS — DUA HAL YANG TERPISAH DI PEMASANGAN INI
+
+Dua jebakan di sini sudah benar-benar menjegal pemasangan (12 Sep 2026), dan keduanya
+**tidak** muncul sebagai galat yang menyebut sebabnya. Bacalah sebelum membuat subdomain.
+
+### `api.fiezel.my.id` dan `owner.fiezel.my.id` SUDAH TERPAKAI — jangan pakai keduanya
+
+Keduanya adalah *custom domain* Worker Cloudflare yang **sedang melayani murid**:
+
+| Hostname | Dipegang oleh | Sumbernya di repo |
+|---|---|---|
+| `api.fiezel.my.id` | Worker `fiezel-api` (gerbang API murid) | `workers/api/wrangler.toml` → `routes`, dan `mw-edge.js` → `TRUSTED_EDGE_HOSTS` |
+| `owner.fiezel.my.id` | Worker `fiezel-owner` (dashboard owner) | `workers/owner/wrangler.toml` |
+
+Diukur dari luar, bukan dibaca dari berkas:
+
+```
+api.fiezel.my.id      -> 104.21.69.172, 172.67.210.146   (anycast Cloudflare)
+owner.fiezel.my.id    -> 104.21.69.172, 172.67.210.146   (anycast Cloudflare)
+fiezel.my.id          -> 195.88.211.212                  (server cPanel ArenHost)
+www / mail / cpanel   -> 195.88.211.212
+konsol / kurikulum    -> (tidak ada record — bebas)
+```
+
+Backend FastAPI ini adalah layanan **kedua** yang berdiri sendiri; ia butuh hostname
+sendiri. Mengarahkan ulang `api.fiezel.my.id` ke cPanel akan **mematikan gerbang API
+murid**. Pakai nama yang belum terpakai — panduan ini memakai `konsol.fiezel.my.id`.
+
+Jangan pula mengosongkan `~/public_html/api` dan `~/public_html/owner`: keduanya berisi
+jembatan PHP cadangan yang **memuat nilai secret** (lihat `deploy/edge/README.md`).
+
+### DNS otoritatif ada di Cloudflare, jadi membuat subdomain di cPanel TIDAK cukup
+
+Nameserver `fiezel.my.id` sudah pindah ke Cloudflare (`sydney.ns.cloudflare.com` /
+`syeef.ns.cloudflare.com`). Akibatnya: subdomain yang kamu buat lewat cPanel → *Domains*
+hanya membuat vhost dan zona **lokal** di server itu. Dunia luar tidak pernah melihatnya,
+dan tidak ada wildcard yang menolongmu — `*.fiezel.my.id` tidak ada (dibuktikan di tabel
+di atas: nama acak pun tidak menjawab).
+
+Gejalanya muncul jauh kemudian, saat AutoSSL, sebagai pesan yang menyalahkan DNS tanpa
+menyebut Cloudflare:
+
+```
+Domain Control Validation failed: ... responded with 404 (Not Found).
+The domain "..." resolved to an IP address "172.67.210.146" that does not
+exist on this server. DNS-based DCV also failed.
+```
+
+Urutan yang benar, dan urutannya penting:
+
+1. **Cloudflare → DNS → Add record.** Type `A`, Name `konsol`, IPv4
+   `195.88.211.212` (cPanel → *Server Information* → Shared IP Address — pakai
+   angka milikmu sendiri, jangan salin buta angka di sini), Proxy status
+   **DNS only (awan ABU-ABU)**.
+   Awan oranye membuat Let's Encrypt-nya cPanel tetap gagal: permintaan validasinya
+   berhenti di Cloudflare dan tidak pernah sampai ke cPanel.
+2. **cPanel → Domains → Create A New Domain** `konsol.fiezel.my.id`.
+3. Tunggu record menyebar (biasanya 1-2 menit di Cloudflare), pastikan dulu:
+   `konsol.fiezel.my.id` harus menjawab IP cPanel-mu, bukan IP Cloudflare.
+4. **cPanel → SSL/TLS Status → Run AutoSSL** untuk hostname itu.
+
+SSL baru dibutuhkan di langkah 7. Langkah 2-6 (unggah kode, buat aplikasi Python,
+pasang dependensi, isi `.env`, jalankan `bootstrap.py`) **tidak** menunggu sertifikat —
+kerjakan sambil menunggu kalau AutoSSL masih antre.
+
+## 2. Unggah kode
+
+Unggah **isi** direktori `backend/` ke `~/fiezel-api` di akunmu (File Manager atau
+git clone kalau tersedia). Jangan taruh di `public_html` — Passenger tidak
+memerlukannya di sana, dan apa pun di `public_html` bisa terunduh mentah oleh siapa
+saja. `.env` yang berisi sandi ada di direktori ini.
+
+---
+
+## 3. Setup Python App
+
+cPanel → **Setup Python App** → Create Application:
+
+| Kolom | Isi |
+|---|---|
+| Python version | 3.11 (atau 3.10; jangan di bawah 3.9) |
+| Application root | `fiezel-api` |
+| Application URL | subdomain yang kamu buat di langkah 1b, mis. `konsol.fiezel.my.id` |
+| Application startup file | `passenger_wsgi.py` |
+| Application Entry point | `application` |
+
+Dua kolom terakhir bukan pilihan bebas. Passenger mencari variabel bernama
+`application` di berkas yang kamu sebut; salah satu saja meleset hasilnya **503 tanpa
+petunjuk apa pun di log**.
+
+Klik **Create**, lalu salin perintah aktivasi virtualenv yang ditampilkan cPanel
+(bentuknya `source ~/virtualenv/fiezel-api/3.11/bin/activate && cd ~/fiezel-api`).
+
+---
+
+## 4. Pasang dependensi
+
+Lewat cPanel → *Terminal* (atau SSH):
+
+```bash
+source ~/virtualenv/fiezel-api/3.11/bin/activate && cd ~/fiezel-api
+pip install -r requirements.txt
+```
+
+`a2wsgi` ada di daftar itu dan **wajib**: Passenger berbicara WSGI sedangkan FastAPI
+berbicara ASGI, dan `a2wsgi` yang menjembatani. Tanpa itu aplikasinya mati saat impor.
+
+---
+
+## 5. Isi `.env`
+
+Salin `.env.example` jadi `.env` di `~/fiezel-api`, lalu isi:
+
+```bash
+cp .env.example .env
+nano .env
+```
+
+Keempatnya menghalangi pemasangan dan diblokir `bootstrap.py`:
+
+| Env | Kalau kosong |
+|---|---|
+| `MONGO_URL`, `DB_NAME` | server mati saat impor — dibaca di tingkat modul `db.py` |
+| `JWT_SECRET` | nol orang bisa login |
+| `CURRICULUM_TICKET_KEY` | **nol orang bisa masuk** — ini satu-satunya pintu |
+| `CORS_ORIGINS` (opsional) | tidak ada origin lintas-situs yang diizinkan |
+
+**`CURRICULUM_TICKET_KEY` harus sama persis dengan nilai di Worker KelasKu**
+(`wrangler secret put CURRICULUM_TICKET_KEY`). Dua nilai yang berbeda berarti setiap
+tiket ditolak, dan penolakannya sengaja tidak menyebut sebabnya — jadi kalau semua
+orang tiba-tiba tidak bisa masuk, ini tempat pertama yang diperiksa.
+
+Empat env lama sudah **tidak dibaca di mana pun** sejak m025-318: `ADMIN_EMAIL`,
+`ADMIN_PASSWORD`, `OWNER_MASTER_TOKEN`, dan `EMERGENT_AUTH_SESSION_URL`. Mesin
+kurikulum tidak menyimpan kata sandi, tidak punya kunci utama owner, dan tidak menukar
+sesi Google sendiri. Siapa yang guru dan siapa yang owner diputuskan KelasKu.
+
+Bangkitkan dua rahasianya dengan:
+
+```bash
+python3 -c "import secrets; print(secrets.token_urlsafe(48))"
+```
+
+`JWT_SECRET` yang bocor berarti siapa pun bisa memalsukan sesi murid dan guru.
+
+Untuk `CORS_ORIGINS`, isi asal aplikasimu: `https://fiezel.my.id`.
+**Jangan** isi `*`. Alasannya diukur dan ditulis di komentar CORS
+`backend/server.py`: pada starlette 0.37.2, `*` bersama kredensial membuat request
+lintas-situs yang membawa cookie dijawab dengan **origin penuntutnya dipantulkan**,
+sehingga situs mana pun bisa memanggil API ini dari browser murid yang sedang login
+dan membaca jawabannya.
+
+---
+
+## 6. Jalankan bootstrap — LANGKAH INI YANG PALING SERING TERLEWAT
+
+```bash
+python bootstrap.py
+```
+
+**Kenapa ini tidak boleh dilewati.** `server.py` mengerjakan tiga hal di
+`@app.on_event("startup")`: membuat indeks unik, membuat akun owner, dan menyemai
+kurikulum. Di bawah Passenger ketiganya **tidak pernah terjadi** — `a2wsgi`
+menerjemahkan per-request dan tidak menjalankan protokol lifespan ASGI sama sekali.
+Diukur:
+
+```
+status : 200 OK
+body   : {"ok":true,"startup_sudah_jalan":false}
+```
+
+Perhatikan **200 OK**-nya. Itulah yang membuatnya berbahaya: API-nya tampak sehat
+sementara `kelasku_tickets.jti` dan `attempts.idempotency_key` tidak punya indeks unik
+(MongoDB lalu dengan patuh menerima tiket yang dipakai ulang dan jawaban ganda — tanpa
+galat, hanya data yang pelan-pelan rusak) dan databasenya kosong.
+
+`bootstrap.py` **aman dijalankan berulang**. Jalankan lagi setiap kali menaikkan versi
+yang menambah indeks.
+
+**Tidak ada akun owner yang dibuat di sini, dan tidak ada sandi yang bisa dipulihkan.**
+Sejak m025-318 mesin kurikulum tidak menyimpan satu pun kata sandi: peran guru dan owner
+datang dari tiket identitas KelasKu, jadi pemulihan akses dilakukan di dashboard KelasKu —
+satu tempat — lalu berlaku di sini pada tiket berikutnya. Bendera
+`--reset-owner-password` ikut hilang bersama pintunya.
+
+Yang diperiksa bootstrap sebagai gantinya adalah kunci tiketnya: absen atau lebih pendek
+dari 32 karakter = **gagal keras saat pemasangan**, bukan 401 misterius pada guru pertama.
+
+Keluarannya menyebut angka, bukan "selesai":
+
+```
+indeks    : terpasang
+tiket     : kunci KelasKu terpasang (panjang 64)
+kurikulum : disemai (sebelumnya kosong)
+SIAP. curriculum_nodes=731 questions=21
+```
+
+---
+
+## 7. Restart dan buktikan
+
+cPanel → Setup Python App → **Restart**. Lalu:
+
+```
+https://konsol.fiezel.my.id/api/health
+```
+
+Harus menjawab JSON dengan `curriculum_nodes` **bukan nol**, dan angkanya **sama**
+dengan yang dicetak `bootstrap.py`. Nol berarti bootstrap belum jalan atau menunjuk
+database lain — jangan lanjut sebelum angkanya cocok.
+
+---
+
+## 8. Sambungkan aplikasi ke backend
+
+Isi alamatnya di `core-config.js` **pada pemasangan**, bukan di repo:
+
+```js
+self.FIEZEL_CURRICULUM_CONFIG=Object.freeze({
+  curriculumApiUrl:'https://konsol.fiezel.my.id'
+});
+```
+
+**Di repo nilainya wajib tetap kosong**, dan `tests/curriculum-config-wiring-test.js`
+menegakkannya. Alasannya bukan gaya: salinan repo ini tidak boleh diam-diam mengirim
+data murid ke server pemasang pertama. Jadi sunting berkas yang sudah terunggah di
+`public_html/app/`, jangan commit alamatnya.
+
+---
+
+## Kalau macet
+
+| Gejala | Sebab yang paling mungkin |
+|---|---|
+| 503, log kosong | startup file / entry point salah. Harus `passenger_wsgi.py` + `application` |
+| `ModuleNotFoundError` | `pip install -r requirements.txt` dijalankan di luar virtualenv cPanel |
+| Mati saat start, `KeyError` | ada env wajib yang kosong. Jalankan `python bootstrap.py` — ia menyebutkan nama yang hilang |
+| `/api/health` hidup tapi `curriculum_nodes: 0` | `bootstrap.py` belum dijalankan (lihat langkah 6) |
+| Login owner ditolak | sama — `seed_owner()` ada di dalam bootstrap |
+| Guru/owner tidak bisa masuk | cocokkan `CURRICULUM_TICKET_KEY` di `.env` dengan `wrangler secret` di Worker KelasKu — dua nilai berbeda menolak setiap tiket |
+| Timeout ke Atlas | IP server belum masuk Network Access Atlas |
+| Konsol di aplikasi tetap mati | `curriculumApiUrl` belum diisi di `public_html/app/core-config.js` |
+| Galat CORS di Console peramban | `CORS_ORIGINS` belum memuat asal aplikasimu persis (skema + host) |
+| AutoSSL gagal: "DCV failed ... 404" / "resolved to an IP that does not exist on this server" | record DNS-nya belum ada di **Cloudflare**, atau ada tapi awannya oranye. Lihat langkah 1b |
+| Subdomain baru tidak menjawab apa pun dari luar | dibuat di cPanel saja; DNS otoritatif ada di Cloudflare (langkah 1b) |
+| Gerbang API murid tiba-tiba mati sesudah menyentuh DNS | `api.fiezel.my.id` diarahkan ulang ke cPanel. Kembalikan ke record proxied Worker (langkah 1b) |
+
+---
+
+## Yang dijaga gerbang
+
+`tests/backend-env-contract-test.js` menjaga tiga hal ini tetap benar saat backend
+tumbuh, dan ketiganya sudah dibuktikan MERAH sebelum dipercaya:
+
+- setiap `os.environ["X"]` baru di `backend/*.py` **wajib** muncul di `.env.example`
+  — daftarnya dipindai dari kode, bukan ditulis tangan, jadi env berikutnya terjaga
+  sendiri tanpa ada daftar yang perlu disunting;
+- `CORS_ORIGINS` tidak boleh kembali berbawaan `*`;
+- `bootstrap.py` wajib tetap memanggil ketiga tugas startup — yang dilepas dari sana
+  tidak akan pernah jalan di Passenger.

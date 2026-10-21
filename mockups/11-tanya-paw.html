@@ -1,0 +1,41 @@
+<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=390">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<style>
+.chat{display:flex;flex-direction:column;gap:14px}
+.m{display:flex;gap:10px;align-items:flex-end}
+.m .paw{width:40px;flex:none}
+.m .b{max-width:280px;padding:12px 14px;border-radius:18px;font-size:15px;line-height:1.45}
+.m.ai .b{background:var(--paper);border:1px solid var(--line);border-bottom-left-radius:6px}
+.m.me{justify-content:flex-end}
+.m.me .b{background:var(--ink);color:#FDFAF3;border-bottom-right-radius:6px}
+.ex{margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--sun-soft);border:1px solid var(--yellow-line);font-size:14px}
+.ex b{color:var(--maroon)}
+.sugs{display:flex;gap:8px;flex-wrap:wrap}
+.sugs span{padding:8px 12px;border-radius:999px;background:var(--paper);border:1px solid var(--line);font-size:13px;font-weight:600}
+.compose{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;width:358px;height:58px;border-radius:999px;background:var(--paper);border:1px solid var(--line);box-shadow:var(--sh-md);display:flex;align-items:center;padding:6px 6px 6px 18px;gap:8px}
+.compose span{flex:1;color:var(--muted-2);font-size:15px}
+.compose .send{width:46px;height:46px;border-radius:50%;background:var(--sun);display:grid;place-items:center;box-shadow:0 3px 0 var(--sun-deep)}
+.compose .mic{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;color:var(--muted)}
+</style></head><body>
+<div class="screen">
+  <div class="toprow">
+    <span class="iconbtn"><i data-lucide="arrow-left" class="i"></i></span>
+    <div class="row" style="flex:1;gap:10px"><span class="avatar" style="width:38px;height:38px"><img src="/assets/brand/paw-mascot-head.svg" alt="" style="width:30px;height:30px"></span><div><b>Tanya PAW</b><div class="tiny" style="color:var(--good);font-weight:700">● siap bantu</div></div></div>
+    <span class="iconbtn"><i data-lucide="history" class="i sm"></i></span>
+  </div>
+
+  <div class="chat mt-3">
+    <div class="m ai"><img class="paw" src="/assets/brand/paw-mascot-head.svg" alt=""><div class="b">Hai Rani. Lagi di lesson Present Simple, ya. Ada yang bikin bingung?</div></div>
+    <div class="m me"><div class="b">bedanya don't sama doesn't apa sih?</div></div>
+    <div class="m ai"><img class="paw" src="/assets/brand/paw-mascot-head.svg" alt=""><div class="b">Gampang kok. Lihat subjeknya dulu:
+      <div class="ex"><b>I / you / we / they</b> → <b>don't</b><br><span class="small">They don't eat meat.</span></div>
+      <div class="ex" style="margin-top:6px"><b>he / she / it</b> → <b>doesn't</b><br><span class="small">She doesn't eat meat.</span></div>
+      <div class="small muted" style="margin-top:8px">Ingat: setelah doesn't, kata kerjanya polos, tanpa -s.</div>
+    </div></div>
+    <div class="m ai" style="margin-left:50px"><div class="sugs"><span>Kasih 3 soal latihan</span><span>Contoh percakapan</span><span>Jelaskan pakai Thai</span></div></div>
+  </div>
+
+  <div class="compose"><span>Tulis pertanyaan…</span><span class="mic"><i data-lucide="mic" class="i"></i></span><span class="send"><i data-lucide="arrow-up-right" class="i"></i></span></div>
+</div>
+<script src="/lucide.min.js"></script><script>lucide.createIcons()</script></body></html>

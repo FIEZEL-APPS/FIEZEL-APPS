@@ -1,0 +1,11 @@
+ok - halaman menyatakan bahasanya, supaya pembaca layar memakai suara yang benar
+ok - cincin fokus ada untuk semua kontrol, bukan hanya tombol
+ok - setiap outline yang dimatikan punya penanda fokus pengganti
+ok - ukuran sentuh minimum ditegaskan, bukan kebetulan hasil padding
+ok - permintaan kurangi-gerak dari sistem dihormati, tidak hanya dari pengaturan aplikasi
+ok - perubahan yang tidak terlihat tetap diumumkan ke pembaca layar
+ok - tombol yang hanya berisi ikon punya nama yang bisa dibacakan
+ok - teks sekunder tetap cukup kontras terhadap latarnya
+ok - kartu roadmap baru memakai teks, bukan hanya warna, untuk menyampaikan status
+
+FIEZEL accessibility: PASS

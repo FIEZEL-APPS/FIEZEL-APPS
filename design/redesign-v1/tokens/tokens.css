@@ -1,0 +1,172 @@
+/* ============================================================
+   FIEZEL DESIGN TOKENS — FINAL v1.0
+   Konsep: "WARM PAPER, BRIGHT MIND"
+   Sumber: redesign/DIRECTION.md (draf) + koreksi WCAG (lihat
+   redesign/tokens/WCAG.md). Semua pasangan teks/permukaan yang
+   dipakai lulus AA: >=4.5:1 teks normal, >=3:1 teks besar/non-teks.
+   Perubahan dari draf DIRECTION (alasan kontras):
+   - --muted-soft  #857350 -> #7E6C4B   (4,39 -> 4,85 di --bg)
+   - --good        #2E8B69 -> #1F6B4E   (3,80 -> 5,82 di --good-soft)
+   - --bad         #B8432D -> #AC3E2A   (4,44 -> 4,95 di --bad-soft)
+   - --info        #8C6D1F -> #7A5F1B   (4,37 -> 5,42 di --info-soft)
+   - --focus-ring  token baru #A67A00   (--sun-deep hanya 2,01 vs bg;
+     ring wajib >=3:1 non-teks). --sun-deep tetap hidup sbg hover CTA.
+   Nilai lama dipertahankan sebagai *-bright KHUSUS ikon/teks >=18px.
+   ============================================================ */
+
+:root {
+  /* ---------- SURFACE (Warm Paper — dunia belajar) ---------- */
+  --bg:         #FFF9EE;  /* background utama app */
+  --panel:      #FFFFFF;  /* kartu/panel */
+  --panel-soft: #FFF3DC;  /* tile lembut, chip, disabled surface */
+  --line:       #F0E4CF;  /* border kartu */
+  --line-soft:  #F7EFDF;  /* divider halus */
+
+  /* ---------- INK (teks) ---------- */
+  --text:       #241A11;  /* teks utama; juga permukaan CTA ink */
+  --muted:      #6E5E47;  /* teks sekunder — 5,97:1 di bg */
+  --muted-soft: #7E6C4B;  /* teks tersier — 4,85:1 di bg (digeser dari #857350) */
+
+  /* ---------- BRAND ENERGY (Solar) ---------- */
+  --sun:        #FFC700;  /* kuning kanon brand (naik dari #FFD23F) */
+  --sun-deep:   #E6A800;  /* hover permukaan sun; BUKAN focus ring */
+  --sun-press:  #CC9600;  /* press permukaan sun */
+  --sun-soft:   #FFF3C4;  /* tile/chip kuning lembut */
+  --sun-grad:   linear-gradient(180deg, #FFDE59, #FFA500); /* CTA dimensional */
+
+  /* ---------- INTELLIGENCE (Bright Mind — panel AI, HEMAT) ---------- */
+  --core:          #1B1418;             /* permukaan gelap hangat momen AI */
+  --core-soft:     #2A2126;             /* kartu di dalam panel AI */
+  --core-line:     #3A3038;             /* border di panel AI */
+  --on-core:       #FDFAF3;             /* teks utama di core — 17,37:1 */
+  --on-core-muted: rgba(253,250,243,.68); /* teks sekunder di core — efektif 8,43:1 */
+
+  /* ---------- SEMANTIC ---------- */
+  --good:        #1F6B4E;  /* teks benar — 5,82:1 di good-soft (digeser dari #2E8B69) */
+  --good-bright: #2E8B69;  /* HANYA ikon/teks >=18px (3,80:1) */
+  --good-soft:   #E9F7F0;
+  --bad:         #AC3E2A;  /* teks salah — 4,95:1 di bad-soft (digeser dari #B8432D) */
+  --bad-bright:  #B8432D;  /* HANYA ikon/teks >=18px */
+  --bad-soft:    #FDE3DE;
+  --info:        #7A5F1B;  /* teks info — 5,42:1 di info-soft (digeser dari #8C6D1F) */
+  --info-soft:   #FFF3C4;  /* pengganti toast navy: panel ink + teks krem, ATAU info-soft + teks info */
+
+  /* ---------- STATE: CTA INK (permukaan gelap, teks krem) ---------- */
+  --ink:        var(--text); /* alias permukaan CTA ink */
+  --ink-hover:  #3A2B1C;     /* krem di atasnya 12,99:1 */
+  --ink-press:  #120C07;     /* krem di atasnya 18,53:1 */
+
+  /* ---------- STATE: FOCUS ---------- */
+  /* Ring 2px offset 2px konsisten di semua kontrol (perbaikan audit #7).
+     Token baru: sun-deep gagal 3:1 non-teks (2,01 vs bg). */
+  --focus-ring:        #A67A00;  /* 3,71:1 vs bg; 3,89 vs panel; 3,53 vs panel-soft */
+  --focus-ring-width:  2px;
+  --focus-ring-offset: 2px;
+  --focus-ring-on-core:#FFC700;  /* ring di panel AI gelap — 11,57:1 vs core */
+
+  /* ---------- STATE: DISABLED (perbaikan audit #4) ----------
+     Teks tetap terbaca >=4,5:1 + ikon gembok; JANGAN pakai opacity rendah. */
+  --text-disabled:    #75654C;          /* 5,13:1 di panel-soft */
+  --surface-disabled: var(--panel-soft);
+  --line-disabled:    var(--line);
+  --on-core-disabled: rgba(253,250,243,.52); /* efektif ~6,1:1 di core */
+
+  /* ---------- RADIUS ---------- */
+  --radius-lg: 24px;  /* kartu besar, sheet */
+  --radius-md: 16px;  /* kartu, tombol besar */
+  --radius-sm: 12px;  /* chip, input, tombol kecil */
+  --radius-pill: 999px;
+
+  /* ---------- SHADOW ---------- */
+  --shadow-sm: 0 2px 10px rgba(36,26,17,.06);
+  --shadow-md: 0 10px 30px rgba(36,26,17,.09);
+  --shadow-lg: 0 24px 60px rgba(36,26,17,.15);
+
+  /* ---------- TIPOGRAFI ---------- */
+  --font-display: "FZ Fredoka", "Fredoka", var(--font-body); /* HANYA display & judul layar */
+  --font-body:    "FZ Plus Jakarta Sans", "Plus Jakarta Sans", -apple-system, "SF Pro", Inter, sans-serif;
+  /* Skala mobile — LANTAI 12px, tak ada teks lebih kecil (perbaikan audit #3) */
+  --fs-display: 28px;  /* Fredoka 600 / Jakarta 700 */
+  --fs-h1:      22px;  /* judul layar */
+  --fs-h2:      18px;  /* judul seksi — Jakarta 700 (bukan Fredoka) */
+  --fs-body:    15px;  /* Jakarta 400/500 */
+  --fs-label:   13px;  /* label kontrol */
+  --fs-micro:   12px;  /* eyebrow/nav — LANTAI; tracking .08em utk eyebrow */
+  --fw-regular: 400; --fw-medium: 500; --fw-semibold: 600; --fw-bold: 700;
+  /* Angka data: Jakarta 700 + font-variant-numeric: tabular-nums */
+
+  /* ---------- MOTION (fiezel-motion v2.1) ---------- */
+  --ease:        cubic-bezier(.22,.8,.28,1);
+  --ease-spring: cubic-bezier(.34,1.4,.4,1);
+  --dur-fast: 160ms; --dur-med: 260ms; --dur-slow: 420ms;
+
+  /* ---------- LAYOUT ---------- */
+  --tap-min: 44px;          /* touch target minimum (perbaikan audit #6) */
+  --mascot-dock: 88px;      /* slot maskot kanan-bawah */
+}
+
+/* ============================================================
+   RESEP STATE KOMPONEN (referensi implementasi)
+   ============================================================ */
+
+/* CTA primer — dua varian sah, dua-duanya >=10:1 */
+.btn-sun {
+  background: var(--sun); color: var(--text);           /* 10,90:1 */
+}
+.btn-sun:hover  { background: var(--sun-deep); }         /*  8,10:1 */
+.btn-sun:active { background: var(--sun-press); }        /*  6,44:1 */
+.btn-sun-grad   { background: var(--sun-grad); color: var(--text); } /* 12,87–8,64:1 */
+
+.btn-ink {
+  background: var(--ink); color: var(--bg);              /* 16,28:1 */
+}
+.btn-ink:hover  { background: var(--ink-hover); }        /* 12,99:1 */
+.btn-ink:active { background: var(--ink-press); }        /* 18,53:1 */
+
+/* Focus — konsisten semua kontrol (audit #7) */
+:is(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+.on-core :is(a, button, input, [tabindex]):focus-visible {
+  outline-color: var(--focus-ring-on-core);
+}
+
+/* Disabled — tetap terbaca, bukan opacity (audit #4) */
+:is(button, .btn)[disabled], .is-disabled {
+  background: var(--surface-disabled);
+  border-color: var(--line-disabled);
+  color: var(--text-disabled);                           /* 5,13:1 */
+  cursor: not-allowed; box-shadow: none;
+  /* + ikon gembok inline, JANGAN turunkan opacity teks */
+}
+
+/* Toast — pengganti navy (audit #2): panel ink + teks krem */
+.toast { background: var(--ink); color: var(--bg); border-radius: var(--radius-pill); }
+.toast--info { background: var(--info-soft); color: var(--info); border: 1px solid var(--line); }
+
+/* Panel AI (Bright Mind) — dipakai HEMAT */
+.ai-panel {
+  background: var(--core); color: var(--on-core);
+  border: 1px solid var(--core-line); border-radius: var(--radius-lg);
+}
+.ai-panel .muted { color: var(--on-core-muted); }
+.ai-panel .accent { color: var(--sun); }                 /* ikon/teks besar 11,57:1 */
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --dur-fast: 0ms; --dur-med: 0ms; --dur-slow: 0ms; }
+}
+
+/* ============================================================
+   DARK MODE — fase 2
+   Blok sengaja kosong: mode gelap penuh (seluruh app, bukan cuma
+   panel AI) dirancang di fase 2. Jangan isi ad-hoc.
+   ============================================================ */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* fase 2 */
+  }
+}
+[data-theme="dark"] {
+  /* fase 2 */
+}

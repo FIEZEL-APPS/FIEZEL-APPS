@@ -1,0 +1,174 @@
+{
+  "schema": "fiezel-speaking-bank-th-v1",
+  "version": "1.0.0",
+  "status": "reviewed_release_th",
+  "items": {
+    "speak_0001": {
+      "instruction": "อ่านประโยคนี้ด้วยเสียงที่ชัดเจน"
+    },
+    "speak_0002": {
+      "instruction": "อ่านประโยคนี้ด้วยเสียงที่ชัดเจน"
+    },
+    "speak_0003": {
+      "instruction": "ตอบเป็นภาษาอังกฤษ: บอกอาหารที่คุณชอบ 1 อย่างและเหตุผลง่ายๆ"
+    },
+    "speak_0004": {
+      "instruction": "ตอบเป็นภาษาอังกฤษ: แนะนำชื่อและกิจกรรมที่โรงเรียนของคุณสั้นๆ"
+    },
+    "speak_0005": {
+      "instruction": "คุณอยู่ในร้านค้า ขอน้ำ 1 ขวดอย่างสุภาพ"
+    },
+    "speak_0006": {
+      "instruction": "คุณพบเพื่อนใหม่ ถามว่าเขามาจากไหน"
+    },
+    "speak_0007": {
+      "instruction": "อ่านประโยคนี้ด้วยน้ำเสียงที่เป็นธรรมชาติ"
+    },
+    "speak_0008": {
+      "instruction": "อ่านประโยคนี้ด้วยน้ำเสียงที่เป็นธรรมชาติ"
+    },
+    "speak_0009": {
+      "instruction": "ตอบเป็นภาษาอังกฤษ: เล่าสิ่งที่คุณมักจะทำหลังจากกลับจากโรงเรียน"
+    },
+    "speak_0010": {
+      "instruction": "ตอบเป็นภาษาอังกฤษ: อธิบายแผนการสำหรับวันหยุดสุดสัปดาห์ 1 อย่าง"
+    },
+    "speak_0011": {
+      "instruction": "คุณไม่เข้าใจคำสั่งของครู ขอให้ครูพูดซ้ำอย่างสุภาพ"
+    },
+    "speak_0012": {
+      "instruction": "คุณโทรหาคลินิก ถามว่ามีคิวว่างในวันพรุ่งนี้เช้าหรือไม่"
+    },
+    "speak_0013": {
+      "instruction": "อ่านประโยคนี้ด้วยจังหวะที่มั่นคง"
+    },
+    "speak_0014": {
+      "instruction": "อ่านประโยคนี้ด้วยจังหวะที่มั่นคง"
+    },
+    "speak_0015": {
+      "instruction": "ตอบเป็นภาษาอังกฤษ: อธิบายพฤติกรรมการเรียน 1 อย่างที่คุณอยากปรับปรุงและเหตุผล"
+    },
+    "speak_0016": {
+      "instruction": "ตอบเป็นภาษาอังกฤษ: เล่าประสบการณ์ตอนที่คุณทำงานที่ตอนแรกคิดว่ายากจนสำเร็จ"
+    },
+    "speak_0017": {
+      "instruction": "เพื่อนชวนคุณไปข้างนอกตอนที่คุณต้องอ่านหนังสือ ปฏิเสธอย่างสุภาพและเสนอเวลาอื่น"
+    },
+    "speak_0018": {
+      "instruction": "ในการทำงานกลุ่ม ขอให้เพื่อนอธิบายเหตุผลเบื้องหลังตัวเลือกของเขา"
+    },
+    "speak_0019": {
+      "instruction": "อ่านประโยคนี้โดยไม่ต้องรีบร้อน"
+    },
+    "speak_0020": {
+      "instruction": "อ่านประโยคนี้โดยไม่ต้องรีบร้อน"
+    },
+    "speak_0021": {
+      "instruction": "ตอบเป็นภาษาอังกฤษ: เปรียบเทียบการเรียนคนเดียวกับการเรียนกับเพื่อน แล้วเลือกแบบที่เหมาะกับคุณมากกว่า"
+    },
+    "speak_0022": {
+      "instruction": "ตอบเป็นภาษาอังกฤษ: อธิบายความเสี่ยง 1 อย่างจากการใช้ AI เพื่อการเรียนรู้และวิธีลดความเสี่ยงนั้น"
+    },
+    "speak_0023": {
+      "instruction": "คุณส่งงานสายเพราะปัญหาทางเทคนิค อธิบายสถานการณ์และขอขยายเวลาสั้นๆ"
+    },
+    "speak_0024": {
+      "instruction": "ในที่ประชุม คุณไม่เห็นด้วยกับความคิดของเพื่อน แสดงข้อกังวลโดยไม่ให้รู้สึกเหมือนโจมตี"
+    },
+    "speak_0025": {
+      "instruction": "อ่านประโยคนี้โดยเน้นเสียงตามตรรกะในส่วนที่ขัดแย้งกัน"
+    },
+    "speak_0026": {
+      "instruction": "อ่านประโยคนี้โดยเน้นเสียงตามตรรกะในส่วนที่ขัดแย้งกัน"
+    },
+    "speak_0027": {
+      "instruction": "ตอบเป็นภาษาอังกฤษ: อธิบายว่าทำไมความสัมพันธ์ร่วม (correlation) ไม่ได้แสดงถึงความสัมพันธ์เชิงเหตุและผลเสมอไป"
+    },
+    "speak_0028": {
+      "instruction": "ตอบเป็นภาษาอังกฤษ: ให้ข้อโต้แย้งสั้นๆ ว่าโรงเรียนควรอนุญาตให้ใช้ generative AI สำหรับบางงานหรือไม่"
+    },
+    "speak_0029": {
+      "instruction": "คุณกำลังนำเสนอ ผู้ฟังท้าทายสมมติฐานหลักของการวิเคราะห์ของคุณ ยอมรับข้อจำกัดและอธิบายขั้นตอนการตรวจสอบถัดไป"
+    },
+    "speak_0030": {
+      "instruction": "ในการอภิปรายเรื่องทุนการศึกษา ให้ถามอย่างเจาะจงว่าค่าครองชีพรวมอยู่ในเงินทุนหรือไม่"
+    },
+    "speak_0031": {
+      "instruction": "อ่านประโยคนี้โดยรักษาการแบ่งวรรคตอนที่ชัดเจน"
+    },
+    "speak_0032": {
+      "instruction": "อ่านประโยคนี้โดยรักษาการแบ่งวรรคตอนที่ชัดเจน"
+    },
+    "speak_0033": {
+      "instruction": "ตอบเป็นภาษาอังกฤษ: อธิบายว่าเมื่อใดที่ข้อโต้แย้งที่โน้มน้าวใจในเชิงวาทศิลป์ยังคงอ่อนแอในเชิงหลักฐาน"
+    },
+    "speak_0034": {
+      "instruction": "ตอบเป็นภาษาอังกฤษ: อธิบายว่าคุณจะประเมินนโยบายที่ดูเหมือนประสบความสำเร็จโดยอิงจากตัวชี้วัดค่าเฉลี่ยเพียงอย่างเดียวอย่างไร"
+    },
+    "speak_0035": {
+      "instruction": "ในฐานะผู้ประเมิน ให้บอกว่าข้อสรุปของผู้เขียนสมเหตุสมผลแต่มีความแน่นอนมากเกินไปเมื่อเทียบกับน้ำหนักของหลักฐาน"
+    },
+    "speak_0036": {
+      "instruction": "ในที่ประชุม ให้แยกแยะความแตกต่างระหว่างความจำเป็นในการดำเนินการอย่างรวดเร็วกับความแน่นอนว่าวิธีแก้ปัญหาหนึ่งๆ นั้นถูกต้องอย่างแน่นอน"
+    },
+    "speakx_0001": {
+      "instruction": "Part 1. ตอบคำถาม 4 ข้อนี้ทีละข้อ แต่ละข้อตอบ 2-3 ประโยค: Where do you live? Do you prefer studying in the morning or at night? How often do you use English outside class? What kind of music do you listen to?"
+    },
+    "speakx_0002": {
+      "instruction": "Part 1. ตอบคำถาม 4 ข้อนี้ แต่ละข้อตอบ 2-3 ประโยค: Do you work or study? What do you enjoy most about it? Has your daily routine changed in the last year? Would you like to live in a different city?"
+    },
+    "speakx_0003": {
+      "instruction": "Part 2. คุณมีเวลา 1 นาทีในการจดบันทึก แล้วพูด 1-2 นาที Describe a skill you learned that took a long time to get right. ต้องกล่าวถึงทั้ง 4 ประเด็นในการ์ด"
+    },
+    "speakx_0004": {
+      "instruction": "Part 2. มีเวลา 1 นาทีในการเตรียมบันทึก แล้วพูด 1-2 นาที Describe a decision you made that other people disagreed with. ต้องกล่าวถึงทั้ง 4 ประเด็น รวมถึงประเด็นสุดท้าย"
+    },
+    "speakx_0005": {
+      "instruction": "Part 3. การอภิปรายต่อเนื่องจากหัวข้อทักษะ ตอบคำถาม 3 ข้อนี้ แต่ละข้อตอบ 4-6 ประโยค: Why do some people give up on a skill halfway? Should schools teach practical skills as well as academic subjects? Is it easier to learn new skills as an adult than it used to be?"
+    },
+    "speakx_0006": {
+      "instruction": "Part 3. การอภิปรายต่อเนื่องจากหัวข้อการตัดสินใจ ตอบคำถาม 3 ข้อนี้ แต่ละข้อตอบ 4-6 ประโยค: Are young people better at making independent decisions than older generations? How much should public opinion influence major government policies? Why do people find it difficult to admit they made a wrong decision?"
+    },
+    "speakx_0007": {
+      "instruction": "Task 1 (Independent). เตรียม 15 วินาที พูด 45 วินาที Some people prefer living in places that have the same weather all year round, while others prefer living in places with distinct seasons. Which do you prefer and why?"
+    },
+    "speakx_0008": {
+      "instruction": "Task 1 (Independent). เตรียม 15 วินาที พูด 45 วินาที Do you agree or disagree that students learn more from doing group assignments than from studying alone? Use specific reasons and examples to support your opinion."
+    },
+    "speakx_0009": {
+      "instruction": "Task 2 (Campus, ดัดแปลงข้อความ). อ่านประกาศของมหาวิทยาลัยและบทสนทนา แล้วสรุปความคิดเห็นของนักเรียนชายและเหตุผลของเขา",
+      "sourceNote": "การดัดแปลง: ต้นฉบับเป็นการอ่านประกาศแล้วฟังเสียงบทสนทนา ที่นี่แสดงบทสนทนาเป็นข้อความ ให้อธิบายความคิดเห็นของผู้พูดและเหตุผล",
+      "sourceText": "ประกาศจากมหาวิทยาลัย: ตั้งแต่ภาคการศึกษาหน้า ห้องอ่านหนังสือขนาดเล็กแปดห้องที่ชั้นหนึ่งของหอสมุดจะถูกรวมเข้าด้วยกันเป็นพื้นที่ทำงานกลุ่มหนึ่งพื้นที่ เหตุผลคือ ความต้องการใช้พื้นที่ทำงานกลุ่มเพิ่มสูงขึ้น และห้องเล็กเหล่านั้นมักมีคนใช้เพียงคนเดียว\n\nความเห็นของนักศึกษา (ฉบับข้อความ): \"I don't think this is a good idea. Those small rooms are the only quiet place left in the evening - the main hall gets loud after six, and I can't do close reading there. And honestly, the reason they gave doesn't match what I see. There's already a group area on the second floor and it's half empty most nights. If group space were really that scarce, that floor would be full.\""
+    },
+    "speakx_0010": {
+      "instruction": "Task 2 (Campus, ดัดแปลงข้อความ). อ่านข้อเสนอของมหาวิทยาลัยและบทสนทนา แล้วสรุปความคิดเห็นของนักเรียนหญิงและเหตุผลของเธอ",
+      "sourceNote": "การดัดแปลง: ต้นฉบับเป็นการอ่านประกาศแล้วฟังเสียงบทสนทนา ที่นี่แสดงบทสนทนาเป็นข้อความ ให้อธิบายความคิดเห็นของผู้พูดและเหตุผล",
+      "sourceText": "บทอ่าน - Sunk Cost Fallacy: แนวโน้มที่จะทำสิ่งหนึ่งต่อไปโดยยึดจากสิ่งที่ลงไปแล้ว (เงิน เวลา แรงกาย) ไม่ใช่ยึดจากประโยชน์ที่ยังจะได้รับต่อจากนี้ ต้นทุนที่จ่ายออกไปแล้วเรียกคืนไม่ได้ ในทางตรรกะจึงไม่เกี่ยวข้องกับการตัดสินใจครั้งถัดไป\n\nคำบรรยาย (ฉบับข้อความ): \"Let me give you two examples. A software company I consulted for had spent four years on a platform. The engineers said plainly that the architecture would not scale. Management approved two more years of funding, and the argument in the meeting was, word for word, 'we've already put four years into this'. That is the fallacy, stated out loud.\n\nA smaller one, from my own life: I once sat through ninety minutes of a terrible film because I had paid for the ticket. The ticket money was gone either way. All I did was add ninety minutes to the loss.\""
+    },
+    "speakx_0011": {
+      "instruction": "Task 3 (วิชาการ, ดัดแปลงข้อความ). อ่านนิยามและบทบรรยาย แล้วอธิบายว่าแนวคิดนี้ทำงานอย่างไรโดยใช้ตัวอย่างจากการบรรยาย",
+      "sourceNote": "การดัดแปลง: ต้นฉบับเป็นการอ่านนิยามแล้วฟังเสียงบรรยาย ที่นี่แสดงบทบรรยายเป็นข้อความ ให้อธิบายแนวคิดโดยใช้ตัวอย่างจากการบรรยาย",
+      "sourceText": "คำบรรยาย (ฉบับข้อความ): \"Animals facing a cold season have broadly two options, and they cost different things.\n\nThe first is migration - leaving before conditions get severe. The Arctic tern is the extreme case: it flies between the Arctic and the Antarctic every year, so it spends most of its life in summer. But look at the price. That is an enormous amount of energy spent on travel alone.\n\nThe second option is dormancy - staying, but slowing down. The ground squirrel drops its body temperature close to freezing and its heart rate to a few beats a minute, for months. That saves a remarkable amount of energy. The cost is that it cannot feed at all during that time, so everything depends on what it stored beforehand.\""
+    },
+    "speakx_0012": {
+      "instruction": "Task 3 (วิชาการ, ดัดแปลงข้อความ). อ่านข้อความและบทบรรยาย แล้วอธิบายแนวคิดโดยใช้ตัวอย่างจากบทบรรยาย"
+    },
+    "speakx_0013": {
+      "instruction": "Task 4 (การบรรยาย, ดัดแปลงข้อความ). อ่านบทบรรยายแล้วสรุป 2 ประเด็นหลักพร้อมตัวอย่างของแต่ละประเด็น"
+    },
+    "speakx_0014": {
+      "instruction": "Task 4 (การบรรยาย, ดัดแปลงข้อความ). อ่านบทบรรยายแล้วสรุป 2 ประเด็นหลักพร้อมตัวอย่างของแต่ละประเด็น"
+    },
+    "speakx_0015": {
+      "instruction": "Part 2. มีเวลา 1 นาทีเตรียมบันทึก แล้วพูด 1-2 นาที Describe a time when you received constructive feedback that changed how you work. ต้องกล่าวถึงทั้ง 4 ประเด็น"
+    },
+    "speakx_0016": {
+      "instruction": "Part 3. การอภิปรายเชิงลึกเรื่องการประเมินและการเรียนรู้ ตอบ 3 คำถาม แต่ละข้อ 4-6 ประโยค"
+    },
+    "speakx_0017": {
+      "instruction": "Task 1 (Independent). เตรียม 15 วินาที พูด 45 วินาที Should universities require all students to complete internships before graduating?",
+      "sourceText": "คำบรรยาย (ฉบับข้อความ): \"We like to imagine memory as a recording, but it behaves more like a story that is rewritten each time it is told. Let me describe two mechanisms of distortion.\n\nThe first is post-event information. What we encounter after an event can be written back into the memory of the event itself. In a classic type of experiment, people watch a short film of a minor car accident. Those later asked how fast the cars were going when they 'smashed' into each other do not just give higher speed estimates than those asked about cars that 'hit' each other - a week later, they are also more likely to remember broken glass that was never in the film. The question has quietly edited the memory.\n\nThe second mechanism is imagination inflation. The act of imagining an event leaves a trace that can later be mistaken for the trace of a real experience. In one study, adults who spent a few minutes vividly imagining a childhood incident - breaking a window with their hand - became measurably more confident, weeks later, that it had actually happened to them. Nothing was presented as true; imagining it was enough.\"",
+      "sourceNote": "ฉบับดัดแปลง: ต้นฉบับของคำบรรยายนี้เป็นไฟล์เสียง แต่ในที่นี้นำเสนอเป็นข้อความ"
+    }
+  }
+}

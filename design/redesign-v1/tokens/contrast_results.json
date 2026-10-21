@@ -1,0 +1,332 @@
+{
+  "tokens": {
+    "bg": "#FFF9EE",
+    "panel": "#FFFFFF",
+    "panel-soft": "#FFF3DC",
+    "line": "#F0E4CF",
+    "line-soft": "#F7EFDF",
+    "text": "#241A11",
+    "muted": "#6E5E47",
+    "muted-soft": "#857350",
+    "sun": "#FFC700",
+    "sun-deep": "#E6A800",
+    "sun-press": "#CC9600",
+    "sun-soft": "#FFF3C4",
+    "grad-top": "#FFDE59",
+    "grad-bot": "#FFA500",
+    "core": "#1B1418",
+    "core-soft": "#2A2126",
+    "core-line": "#3A3038",
+    "on-core": "#FDFAF3",
+    "good": "#2E8B69",
+    "good-soft": "#E9F7F0",
+    "bad": "#B8432D",
+    "bad-soft": "#FDE3DE",
+    "info": "#8C6D1F",
+    "info-soft": "#FFF3C4",
+    "on-core-muted@core": "#B5B0AD",
+    "on-core-muted@core-soft": "#B9B5B1"
+  },
+  "rows": [
+    {
+      "fg": "text",
+      "fg_hex": "#241A11",
+      "bg": "bg",
+      "bg_hex": "#FFF9EE",
+      "label": "Teks utama di background",
+      "ratio": 16.28,
+      "req": 4.5,
+      "pass": true
+    },
+    {
+      "fg": "text",
+      "fg_hex": "#241A11",
+      "bg": "panel",
+      "bg_hex": "#FFFFFF",
+      "label": "Teks utama di panel putih",
+      "ratio": 17.06,
+      "req": 4.5,
+      "pass": true
+    },
+    {
+      "fg": "text",
+      "fg_hex": "#241A11",
+      "bg": "panel-soft",
+      "bg_hex": "#FFF3DC",
+      "label": "Teks utama di panel-soft",
+      "ratio": 15.52,
+      "req": 4.5,
+      "pass": true
+    },
+    {
+      "fg": "muted",
+      "fg_hex": "#6E5E47",
+      "bg": "bg",
+      "bg_hex": "#FFF9EE",
+      "label": "Teks sekunder (muted) di bg",
+      "ratio": 5.97,
+      "req": 4.5,
+      "pass": true
+    },
+    {
+      "fg": "muted",
+      "fg_hex": "#6E5E47",
+      "bg": "panel",
+      "bg_hex": "#FFFFFF",
+      "label": "Muted di panel",
+      "ratio": 6.26,
+      "req": 4.5,
+      "pass": true
+    },
+    {
+      "fg": "muted",
+      "fg_hex": "#6E5E47",
+      "bg": "panel-soft",
+      "bg_hex": "#FFF3DC",
+      "label": "Muted di panel-soft",
+      "ratio": 5.69,
+      "req": 4.5,
+      "pass": true
+    },
+    {
+      "fg": "muted-soft",
+      "fg_hex": "#857350",
+      "bg": "bg",
+      "bg_hex": "#FFF9EE",
+      "label": "Muted-soft di bg (hanya >=14px?)",
+      "ratio": 4.39,
+      "req": 4.5,
+      "pass": false
+    },
+    {
+      "fg": "muted-soft",
+      "fg_hex": "#857350",
+      "bg": "panel",
+      "bg_hex": "#FFFFFF",
+      "label": "Muted-soft di panel",
+      "ratio": 4.6,
+      "req": 4.5,
+      "pass": true
+    },
+    {
+      "fg": "on-core",
+      "fg_hex": "#FDFAF3",
+      "bg": "core",
+      "bg_hex": "#1B1418",
+      "label": "On-core di panel AI (core)",
+      "ratio": 17.37,
+      "req": 4.5,
+      "pass": true
+    },
+    {
+      "fg": "on-core",
+      "fg_hex": "#FDFAF3",
+      "bg": "core-soft",
+      "bg_hex": "#2A2126",
+      "label": "On-core di core-soft",
+      "ratio": 14.99,
+      "req": 4.5,
+      "pass": true
+    },
+    {
+      "fg": "on-core-muted@core",
+      "fg_hex": "#B5B0AD",
+      "bg": "core",
+      "bg_hex": "#1B1418",
+      "label": "On-core-muted di core (komposit)",
+      "ratio": 8.43,
+      "req": 4.5,
+      "pass": true
+    },
+    {
+      "fg": "on-core-muted@core-soft",
+      "fg_hex": "#B9B5B1",
+      "bg": "core-soft",
+      "bg_hex": "#2A2126",
+      "label": "On-core-muted di core-soft (komposit)",
+      "ratio": 7.67,
+      "req": 4.5,
+      "pass": true
+    },
+    {
+      "fg": "text",
+      "fg_hex": "#241A11",
+      "bg": "sun",
+      "bg_hex": "#FFC700",
+      "label": "Ink di tombol Sun (CTA)",
+      "ratio": 10.9,
+      "req": 4.5,
+      "pass": true
+    },
+    {
+      "fg": "text",
+      "fg_hex": "#241A11",
+      "bg": "sun-deep",
+      "bg_hex": "#E6A800",
+      "label": "Ink di sun-deep (hover)",
+      "ratio": 8.1,
+      "req": 4.5,
+      "pass": true
+    },
+    {
+      "fg": "text",
+      "fg_hex": "#241A11",
+      "bg": "sun-press",
+      "bg_hex": "#CC9600",
+      "label": "Ink di sun-press (press)",
+      "ratio": 6.44,
+      "req": 4.5,
+      "pass": true
+    },
+    {
+      "fg": "text",
+      "fg_hex": "#241A11",
+      "bg": "sun-soft",
+      "bg_hex": "#FFF3C4",
+      "label": "Ink di sun-soft",
+      "ratio": 15.33,
+      "req": 4.5,
+      "pass": true
+    },
+    {
+      "fg": "text",
+      "fg_hex": "#241A11",
+      "bg": "grad-top",
+      "bg_hex": "#FFDE59",
+      "label": "Ink di gradasi atas #FFDE59",
+      "ratio": 12.87,
+      "req": 4.5,
+      "pass": true
+    },
+    {
+      "fg": "text",
+      "fg_hex": "#241A11",
+      "bg": "grad-bot",
+      "bg_hex": "#FFA500",
+      "label": "Ink di gradasi bawah #FFA500",
+      "ratio": 8.64,
+      "req": 4.5,
+      "pass": true
+    },
+    {
+      "fg": "bg",
+      "fg_hex": "#FFF9EE",
+      "bg": "text",
+      "bg_hex": "#241A11",
+      "label": "Krem (bg) di CTA ink",
+      "ratio": 16.28,
+      "req": 4.5,
+      "pass": true
+    },
+    {
+      "fg": "panel",
+      "fg_hex": "#FFFFFF",
+      "bg": "text",
+      "bg_hex": "#241A11",
+      "label": "Putih di CTA ink",
+      "ratio": 17.06,
+      "req": 4.5,
+      "pass": true
+    },
+    {
+      "fg": "good",
+      "fg_hex": "#2E8B69",
+      "bg": "good-soft",
+      "bg_hex": "#E9F7F0",
+      "label": "Good di good-soft",
+      "ratio": 3.8,
+      "req": 4.5,
+      "pass": false
+    },
+    {
+      "fg": "good",
+      "fg_hex": "#2E8B69",
+      "bg": "bg",
+      "bg_hex": "#FFF9EE",
+      "label": "Good di bg",
+      "ratio": 4.0,
+      "req": 4.5,
+      "pass": false
+    },
+    {
+      "fg": "bad",
+      "fg_hex": "#B8432D",
+      "bg": "bad-soft",
+      "bg_hex": "#FDE3DE",
+      "label": "Bad di bad-soft",
+      "ratio": 4.44,
+      "req": 4.5,
+      "pass": false
+    },
+    {
+      "fg": "bad",
+      "fg_hex": "#B8432D",
+      "bg": "bg",
+      "bg_hex": "#FFF9EE",
+      "label": "Bad di bg",
+      "ratio": 5.17,
+      "req": 4.5,
+      "pass": true
+    },
+    {
+      "fg": "info",
+      "fg_hex": "#8C6D1F",
+      "bg": "info-soft",
+      "bg_hex": "#FFF3C4",
+      "label": "Info di info-soft",
+      "ratio": 4.37,
+      "req": 4.5,
+      "pass": false
+    },
+    {
+      "fg": "info",
+      "fg_hex": "#8C6D1F",
+      "bg": "bg",
+      "bg_hex": "#FFF9EE",
+      "label": "Info di bg",
+      "ratio": 4.64,
+      "req": 4.5,
+      "pass": true
+    },
+    {
+      "fg": "muted",
+      "fg_hex": "#6E5E47",
+      "bg": "sun-soft",
+      "bg_hex": "#FFF3C4",
+      "label": "Muted di sun-soft",
+      "ratio": 5.62,
+      "req": 4.5,
+      "pass": true
+    },
+    {
+      "fg": "sun-deep",
+      "fg_hex": "#E6A800",
+      "bg": "bg",
+      "bg_hex": "#FFF9EE",
+      "label": "Focus ring sun-deep vs bg (non-teks)",
+      "ratio": 2.01,
+      "req": 3.0,
+      "pass": false
+    },
+    {
+      "fg": "sun",
+      "fg_hex": "#FFC700",
+      "bg": "core",
+      "bg_hex": "#1B1418",
+      "label": "Sun di core (aksen AI, non-teks/teks besar)",
+      "ratio": 11.57,
+      "req": 3.0,
+      "pass": true
+    },
+    {
+      "fg": "sun-deep",
+      "fg_hex": "#E6A800",
+      "bg": "panel",
+      "bg_hex": "#FFFFFF",
+      "label": "Ring vs panel (non-teks)",
+      "ratio": 2.11,
+      "req": 3.0,
+      "pass": false
+    }
+  ]
+}

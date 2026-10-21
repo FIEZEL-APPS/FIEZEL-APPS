@@ -1,0 +1,23 @@
+bank-soal-audit-test
+  ok   soal jenis kata memakai kalimat contoh sebagai konteks
+  ok   stem lama tanpa konteks sudah tidak ada
+  ok   ada penjaga partOfSpeechAskable
+  ok   PART_OF_SPEECH_ID terdefinisi
+  ok   semua partOfSpeech di bank kosakata punya label Bahasa Indonesia
+  ok   tidak ada label jenis kata yang masih Bahasa Inggris
+  info 0 kata dialihkan ke soal arti karena konteksnya tidak memadai
+  ok   mayoritas kosakata tetap bisa diuji jenis katanya
+  ok   penjaga runtime partOfSpeechAskable tidak memblokir massal
+  ok   setiap lesson grammar punya judul Bahasa Indonesia
+  ok   tidak ada judul yang masih berupa kunci mentah
+  ok   friendlySkillName membaca peta judul Bahasa Indonesia
+  ok   grammar-labels-id.js dimuat sebelum app.js
+  ok   grammar-labels-id.js ikut di-precache service worker
+  ok   cadangan alasan jawaban benar sudah Bahasa Indonesia
+  ok   cadangan alasan distraktor sudah Bahasa Indonesia
+  ok   penjelasan grammar mengutamakan field Bahasa Indonesia
+  ok   setiap penjelasan grammar punya versi Bahasa Indonesia
+  ok   penanda cakupan terjemahan ikut tercatat di bank soal
+  ok   semua terjemahan menunjuk template yang benar-benar ada
+
+PASS

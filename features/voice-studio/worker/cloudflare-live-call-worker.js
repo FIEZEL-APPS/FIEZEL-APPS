@@ -157,6 +157,9 @@ export default {
               server.send(JSON.stringify({ type: 'output_transcription', text: part.text }));
             }
           }
+          if (data?.serverContent?.interrupted) {
+            server.send(JSON.stringify({ type: 'interrupted' }));
+          }
           if (data?.serverContent?.turnComplete) {
             server.send(JSON.stringify({ type: 'turn_complete' }));
           }

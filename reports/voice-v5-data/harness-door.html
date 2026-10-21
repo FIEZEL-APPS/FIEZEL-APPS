@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>FIEZEL V5 prefetch harness — lewat PINTU FiezelVoiceSay</title>
+</head>
+<body>
+<h1>v5 prefetch harness (pintu bersama)</h1>
+<pre id="log"></pre>
+<script src="/features/neural-voice/fiezel-prosody.js"></script>
+<script src="/features/neural-voice/fiezel-neural-voice-config.js"></script>
+<script src="/features/neural-voice/fiezel-voice-persona.js"></script>
+<script src="/features/neural-voice/fiezel-sherpa-vits-adapter.js"></script>
+<script src="/features/neural-voice/fiezel-web-audio-player.js"></script>
+<script src="/features/neural-voice/fiezel-neural-voice.js"></script>
+<script>
+/**
+ * Bedanya dengan reports/voice-v1-data/harness.html: harness V1 memanggil layanan neural
+ * LANGSUNG, jadi ia mengukur batas atas (skenario A2) tanpa membuktikan pintu bersama
+ * benar-benar sampai ke sana. Harness ini memanggil PINTU — FiezelVoiceSay.say/prefetch —
+ * dengan mesin supertonic-3 yang sama, sekali dengan berkas pintu SEBELUM perbaikan v5 dan
+ * sekali dengan yang SESUDAH. Resolver aset dan Puter sengaja tidak dipasang: itulah keadaan
+ * kalimat yang belum punya aset ElevenLabs, yaitu justru kasus yang diserahkan ke neural.
+ *
+ * prepare()/ensureReady() pada shim FiezelVoiceRuntime MELEMPAR. Kalau prefetch v5 menyentuh
+ * salah satunya, pengukuran ini gagal keras, bukan diam-diam mencatat angka bagus.
+ */
+(function () {
+  'use strict';
+  const A = { events: [], pcm: [], notes: [], guardHits: [] };
+  window.__AUDIT = A;
+  const log = m => { document.getElementById('log').textContent += m + '\n'; };
+  const t0 = performance.now();
+  const push = e => { e.wall = +(performance.now() - t0).toFixed(2); A.events.push(e); };
+
+  const origStart = AudioBufferSourceNode.prototype.start;
+  AudioBufferSourceNode.prototype.start = function (when) {
+    const ctx = this.context;
+    const now = ctx.currentTime;
+    const at = (typeof when === 'number' && when > 0) ? when : now;
+    push({
+      type: 'source_start',
+      startsAtCtx: +at.toFixed(6),
+      ctxNow: +now.toFixed(6),
+      durationS: this.buffer ? +this.buffer.duration.toFixed(6) : null
+    });
+    return origStart.apply(this, arguments);
+  };
+
+  const FLOOR = 0.0025; // sama dengan SILENCE_FLOOR fiezel-web-audio-player.js:57
+  function edgeSilence(samples, rate) {
+    if (!samples || !samples.length || !rate) return { headMs: null, tailMs: null };
+    let s = 0, e = samples.length - 1;
+    while (s < e && Math.abs(samples[s]) < FLOOR) s += 1;
+    while (e > s && Math.abs(samples[e]) < FLOOR) e -= 1;
+    return { headMs: +(s / rate * 1000).toFixed(1), tailMs: +((samples.length - 1 - e) / rate * 1000).toFixed(1) };
+  }
+
+  let service = null, player = null, door = null;
+  async function boot() {
+    const speech = window.FiezelNeuralVoiceConfig.speech;
+    let adapter = window.FiezelSherpaVitsAdapter.createSherpaVitsAdapter({
+      env: window,
+      basePath: location.origin + '/vendor/supertonic-3/',
+      expectedSpeakers: 10,
+      modelId: 'supertonic-3-int8-2026-05-11',
+      voiceSids: window.FiezelVoicePersona ? window.FiezelVoicePersona.voiceSids() : undefined,
+      defaultVoice: 'id_natural',
+      kind: 'supertonic-3',
+      generationLang: 'en',
+      personas: window.FiezelVoicePersona || null,
+      usePersona: !!window.FiezelVoicePersona,
+      padBetweenPhrases: false,
+      naturalSpeed: 1,
+      generationSteps: 4,
+      usePitchContour: false,
+      useEmotion: true,
+      silenceScale: speech.silenceScale,
+      prosody: window.FiezelProsody || null
+    });
+    const initAt = performance.now();
+    await adapter.initialize();
+    push({ type: 'adapter_ready', elapsedMs: +(performance.now() - initAt).toFixed(1) });
+
+    const rawGenerate = adapter.generate;
+    const wrapped = Object.assign({}, adapter, {
+      generate: function (text, options) {
+        const started = performance.now();
+        push({ type: 'generate_enter', chars: String(text || '').length, text: String(text || '') });
+        return rawGenerate(text, options).then(res => {
+          const ms = +(performance.now() - started).toFixed(1);
+          const samples = res && (res.audio || res.data);
+          const rate = (res && (res.sampling_rate || res.sampleRate)) || 0;
+          const idx = A.pcm.length;
+          const edges = edgeSilence(samples, rate);
+          A.pcm.push({ index: idx, text: String(text || ''), sampleRate: rate, length: samples ? samples.length : 0, headMs: edges.headMs, tailMs: edges.tailMs });
+          push({
+            type: 'generate_ready', pcmIndex: idx, elapsedMs: ms,
+            audioSeconds: samples && rate ? +(samples.length / rate).toFixed(4) : null,
+            rtf: samples && rate ? +((ms / 1000) / (samples.length / rate)).toFixed(3) : null,
+            headMs: edges.headMs, tailMs: edges.tailMs, chars: String(text || '').length
+          });
+          return res;
+        }, err => { push({ type: 'generate_error', error: String((err && err.message) || err) }); throw err; });
+      }
+    });
+    player = window.FiezelWebAudioPlayer.createPlayer(window);
+    player.warm();
+    service = window.FiezelNeuralVoice.createVoiceService({
+      config: window.FiezelNeuralVoiceConfig,
+      adapter: wrapped,
+      env: window,
+      playAudio: player.play,
+      generationTimeoutMs: 20000,
+      streamSentences: speech.streamSentences,
+      streamMaxWords: speech.streamMaxWords,
+      prosody: window.FiezelProsody || null
+    });
+
+    // Shim runtime: bentuknya persis kontrak yang dibaca localEngine() di pintu.
+    const guard = (label) => () => { A.guardHits.push(label); throw new Error(label + '_called_from_prefetch'); };
+    window.FiezelVoiceRuntime = Object.freeze({
+      status: () => ({ prepared: true, ready: true }),
+      speak: (text, opts) => service.speak(text, { voice: (opts && opts.voice) || 'default', speed: (opts && opts.speed) || 1, lang: 'en-US', allowFallback: false }),
+      prefetch: (text, opts) => service.prefetch(text, { voice: (opts && opts.voice) || 'default', speed: (opts && opts.speed) || 1, lang: 'en-US' }),
+      prepare: guard('prepare'),
+      ensureReady: guard('ensureReady'),
+      prewarm: guard('prewarm'),
+      stop: () => service.stop && service.stop()
+    });
+    A.notes.push('engine booted, speech=' + JSON.stringify(speech));
+    log('booted');
+    return true;
+  }
+  window.__boot = boot;
+
+  /** Memuat berkas pintu (sebelum/sesudah) ke halaman ini. */
+  window.__loadDoor = function (src) {
+    return new Promise((resolve, reject) => {
+      const el = document.createElement('script');
+      el.src = src;
+      el.onload = () => { door = window.FiezelVoiceSay; A.notes.push('door=' + src); resolve(!!door); };
+      el.onerror = () => reject(new Error('door_load_failed ' + src));
+      document.head.appendChild(el);
+    });
+  };
+
+  /**
+   * Loop narasi yang sama dengan features/library/fiezel-library-ui.js:185-215: satu
+   * kalimat per say(), ditunggu, dengan prefetch kalimat BERIKUTNYA ditunda satu task
+   * (anti inversi antrean m025-47).
+   */
+  window.__runDoor = async function (sentences, label) {
+    push({ type: 'scenario_start', scenario: label, sentences: sentences.length });
+    for (let i = 0; i < sentences.length; i++) {
+      push({ type: 'say_call', index: i, text: sentences[i] });
+      const p = door.say(sentences[i], { speed: 1, locale: 'en-US', suppressSubtitles: true });
+      if (sentences[i + 1]) {
+        setTimeout(() => {
+          try {
+            const out = door.prefetch(sentences[i + 1], { speed: 1, locale: 'en-US' });
+            if (out && typeof out.then === 'function') out.then(ok => push({ type: 'prefetch_result', index: i + 1, ok: !!ok }), err => push({ type: 'prefetch_rejected', index: i + 1, error: String(err) }));
+          } catch (error) {
+            push({ type: 'prefetch_threw', index: i + 1, error: String((error && error.message) || error) });
+          }
+        }, 0);
+      }
+      const spoke = await p;
+      push({ type: 'say_resolved', index: i, spoke: spoke === true });
+    }
+    push({ type: 'scenario_end' });
+    return true;
+  };
+
+  window.__dump = function () { return { events: A.events, notes: A.notes, pcmMeta: A.pcm, guardHits: A.guardHits }; };
+  window.__reset = function () { A.events.length = 0; A.pcm.length = 0; A.guardHits.length = 0; };
+})();
+</script>
+</body>
+</html>

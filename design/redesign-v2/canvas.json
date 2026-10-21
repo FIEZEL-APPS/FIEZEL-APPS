@@ -1,0 +1,244 @@
+{
+  "pages": [
+    {
+      "id": "page-menu",
+      "name": "Menu utama"
+    },
+    {
+      "id": "page-auth",
+      "name": "Masuk & Perkenalan"
+    },
+    {
+      "id": "page-sesi",
+      "name": "Sesi belajar"
+    },
+    {
+      "id": "page-sistem",
+      "name": "Sistem desain"
+    }
+  ],
+  "artboards": [
+    {
+      "file": "Main.dc.html",
+      "page": "page-menu",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "file": "MainThai.dc.html",
+      "page": "page-menu",
+      "x": 480,
+      "y": 0,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "file": "Latihan.dc.html",
+      "page": "page-menu",
+      "x": 960,
+      "y": 0,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "file": "KelasKu.dc.html",
+      "page": "page-menu",
+      "x": 1440,
+      "y": 0,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "file": "Progres.dc.html",
+      "page": "page-menu",
+      "x": 1920,
+      "y": 0,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "file": "Profil.dc.html",
+      "page": "page-menu",
+      "x": 2400,
+      "y": 0,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "file": "Pengaturan.dc.html",
+      "page": "page-menu",
+      "x": 2880,
+      "y": 0,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "file": "Login.dc.html",
+      "page": "page-auth",
+      "x": 0,
+      "y": 0,
+      "w": 1120,
+      "h": 780
+    },
+    {
+      "file": "Daftar.dc.html",
+      "page": "page-auth",
+      "x": 1210,
+      "y": 0,
+      "w": 1120,
+      "h": 780
+    },
+    {
+      "file": "Splash.dc.html",
+      "page": "page-auth",
+      "x": 0,
+      "y": 930,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "file": "Intro1.dc.html",
+      "page": "page-auth",
+      "x": 480,
+      "y": 930,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "file": "Intro2.dc.html",
+      "page": "page-auth",
+      "x": 960,
+      "y": 930,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "file": "Intro3.dc.html",
+      "page": "page-auth",
+      "x": 1440,
+      "y": 930,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "file": "ObNama.dc.html",
+      "page": "page-auth",
+      "x": 1920,
+      "y": 930,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "file": "ObTujuan.dc.html",
+      "page": "page-auth",
+      "x": 2400,
+      "y": 930,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "file": "ObTes.dc.html",
+      "page": "page-auth",
+      "x": 2880,
+      "y": 930,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "file": "ObSelesai.dc.html",
+      "page": "page-auth",
+      "x": 3360,
+      "y": 930,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "file": "Peta.dc.html",
+      "page": "page-sesi",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "file": "Soal.dc.html",
+      "page": "page-sesi",
+      "x": 480,
+      "y": 0,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "file": "Benar.dc.html",
+      "page": "page-sesi",
+      "x": 960,
+      "y": 0,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "file": "Salah.dc.html",
+      "page": "page-sesi",
+      "x": 1440,
+      "y": 0,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "file": "Hasil.dc.html",
+      "page": "page-sesi",
+      "x": 1920,
+      "y": 0,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "file": "TanyaMira.dc.html",
+      "page": "page-sesi",
+      "x": 2400,
+      "y": 0,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "file": "Sistem.dc.html",
+      "page": "page-sistem",
+      "x": 0,
+      "y": 0,
+      "w": 1180,
+      "h": 1700
+    }
+  ],
+  "annotations": [
+    {
+      "id": "catatan-arah",
+      "page": "page-menu",
+      "x": 0,
+      "y": -190,
+      "w": 700,
+      "text": "Arah \"Lembut\" (arah B) — dipilih owner dari empat arah.\nTidak ada garis tepi di mana pun: kedalaman datang dari bayangan halus dan ruang kosong. Huruf Quicksand untuk judul, Nunito untuk badan, Noto Sans Thai di belakangnya karena keduanya tidak punya glif Thai. Pastel diredam, dan elemen per layar sengaja lebih sedikit daripada yang muat.\nLanding page website tidak ada di kanvas ini — redesain dibatasi ke aplikasi."
+    },
+    {
+      "id": "catatan-maskot",
+      "page": "page-sesi",
+      "x": 0,
+      "y": -190,
+      "w": 660,
+      "text": "Lima aturan maskot, lahir dari dua temuan owner.\n\"Badannya bocor\": gambar dipasang dengan offset negatif di dalam wadah pemotong. Sekarang maskot berdiri di panggung seukuran rasio aspeknya sendiri, tanpa offset negatif, dan wadahnya tidak boleh lebih pendek dari panggungnya. Hiasan warna memakai gradasi yang meluruh, bukan bentuk padat yang dipotong wadah.\n\"Mascot di Tanya Mira jelek sekali\": pose head-explain dipakai sebagai avatar 34px di tiap gelembung — komposisinya lebar, jadi wajahnya tinggal belasan piksel. Sekarang ada ambang keras 72px: di bawah itu dipakai cap kaki atau inisial, bukan wajah yang diperkecil. Tanya Mira menampilkan Mira SEKALI di kartu pembuka pada 118px, dan gelembung sesudahnya tidak memakai wajah sama sekali."
+    },
+    {
+      "id": "catatan-dwibahasa",
+      "page": "page-menu",
+      "x": 780,
+      "y": -190,
+      "w": 520,
+      "text": "Hari ini dan Hari ini (Thai) memakai satu tata letak dengan dua bank copy, cerminan pasangan berkas copy-id dan copy-th di app.\nSetiap teks di semua artboard harus mendarat sebagai pasangan kunci ID+TH waktu diimplementasi — belum ada kunci yang dibuat di tahap mock ini."
+    }
+  ],
+  "launch": {
+    "view": "canvas",
+    "page": "page-menu"
+  }
+}

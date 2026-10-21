@@ -1,0 +1,10 @@
+<!doctype html><html><body><script>
+const now=Date.now(), day=86400000;
+const hist=[];
+const skills=[['present_simple','grammar'],['reading_inference','reading'],['academic_vocabulary','vocab']];
+for(let i=0;i<40;i++){const [skill,type]=skills[i%3];hist.push({id:'h'+i,type,skill,target:type+'_'+(i%5),difficulty:2,ok:i%4!==0,ms:3000+i*100,confidence:i%3+1,selectedAnswer:i%4===0?'wrong-option':null,correctAnswer:'right',errorTag:skill,at:now-(39-i)*day});}
+// Five attempts today => meaningful streak.
+for(let i=0;i<5;i++)hist.push({id:'today'+i,type:'grammar',skill:'present_simple',target:'grammar_1',difficulty:2,ok:i!==0,ms:4000,confidence:2,selectedAnswer:i===0?'go':'goes',correctAnswer:'goes',errorTag:'subject_verb_agreement',at:now});
+const state={version:'4.4.0',userName:'Jahran',view:'progress',level:3,placementDone:false,totalAnswered:hist.length,totalCorrect:hist.filter(x=>x.ok).length,totalTimeMs:200000,history:hist,wrongAnswers:hist.filter(x=>!x.ok),vocab:{vocab_00003:{total:4,correct:2,mastery:50,nextReview:now-day,stability:1,lastSeen:now-3*day,lapses:1}},grammar:{present_simple:{total:8,correct:4,mastery:50,nextReview:now-day,stability:2,lastSeen:now-4*day,lapses:2}},reading:{reading_00001:{total:4,correct:1,mastery:25,nextReview:now-day,stability:1,lastSeen:now-5*day,lapses:2}},daily:{date:'',count:0,attempts:0,meaningful:false},streak:0,adaptiveReady:false,confidenceHistory:hist.map(h=>({confidence:h.confidence,ok:h.ok,at:h.at,skill:h.skill,type:h.type,errorTag:h.errorTag})),learningDays:[],sessionHistory:[]};
+localStorage.setItem('fiezel-v4-state',JSON.stringify(state)); location.href='./index.html?audit=stage8';
+</script></body></html>

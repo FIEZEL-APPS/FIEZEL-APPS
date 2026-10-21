@@ -1,0 +1,122 @@
+-- ============================================================================
+-- FIEZEL A6/D1 — 0004_indexes.sql
+-- DATABASE TUJUAN: `fiezel-core` (binding CORE_DB) SAJA.
+--                  JANGAN dijalankan di `fiezel-stats`.
+--
+--   cd workers/api
+--   wrangler d1 execute fiezel-core --remote --file=migrations/0004_indexes.sql
+--
+-- TIDAK ADA berkas pasangan untuk `fiezel-stats`: seluruh kueri panas analytics
+-- sudah tertutup PRIMARY KEY tabelnya masing-masing (bukti EXPLAIN QUERY PLAN
+-- ada di `analysis/a6-d1-index-plans.json`). Menambah indeks di sana berarti
+-- menambah satu baris tertulis per upsert tanpa satu pun kueri yang memakainya.
+--
+-- ----------------------------------------------------------------------------
+-- APA YANG DILAKUKAN BERKAS INI, DAN MENGAPA
+-- ----------------------------------------------------------------------------
+-- Migrasi ini TIDAK menambah tabel, TIDAK menambah kolom, dan TIDAK menambah
+-- indeks baru untuk kueri yang sudah cepat. Ia MENGGABUNGKAN indeks yang
+-- tumpang tindih. Alasannya angka, bukan selera:
+--
+--   * Cloudflare menagih dan membatasi D1 dengan "rows written", dan setiap
+--     indeks yang kolomnya ikut tertulis menambah SATU baris tertulis:
+--     "Indexes add an additional written row when writes include the indexed
+--     column" — https://developers.cloudflare.com/d1/platform/pricing/
+--     Plan GRATIS = 100.000 baris tertulis/hari untuk SELURUH akun.
+--   * `quota_reservation` adalah tabel paling panas di repo ini: satu panggilan
+--     AI/TTS = satu INSERT + satu DELETE. Dengan 3 indeks, sepasang itu = 8
+--     baris tertulis. Dengan 2 indeks = 6.
+--
+-- TEMUAN KUNCI (diverifikasi EXPLAIN QUERY PLAN pada skema nyata berkas 0001):
+--
+--   1. `UPDATE quota_daily … WHERE user_id=? AND day=?` (jalur panas reserve/
+--      commit/rollback) SUDAH tertutup PRIMARY KEY (user_id, day):
+--         SEARCH quota_daily USING INDEX sqlite_autoindex_quota_daily_1
+--      => TIDAK ada indeks yang kurang. Menambah indeks apa pun untuk kueri ini
+--         hanya memperlambat tulis. TIDAK DILAKUKAN.
+--
+--   2. Sweep `quota_reservation WHERE expires_at <= ? ORDER BY expires_at`
+--      SUDAH tertutup `idx_quota_reservation_expires`:
+--         SEARCH quota_reservation USING INDEX idx_quota_reservation_expires
+--      => TIDAK ada indeks yang kurang. Indeks itu DIPERTAHANKAN apa adanya;
+--         ia satu-satunya yang membuat rem lease (R2) tidak memindai tabel.
+--
+--   3. `idx_quota_reservation_day(day)` adalah PREFIKS dari indeks gabungan
+--      (day, user_id), dan `idx_quota_reservation_user_day(user_id, day)`
+--      melayani kueri kesetaraan penuh yang indeks gabungan (day, user_id) juga
+--      melayani (SQLite tidak peduli urutan kolom di WHERE bila keduanya '='):
+--         SELECT … WHERE day = ?            -> SEARCH … (day=?)
+--         SELECT … WHERE user_id=? AND day=? -> SEARCH … (day=? AND user_id=?)
+--      Jadi DUA indeks itu bisa diganti SATU. Terukur pada 20.000 baris sintetis:
+--      275,3 B/baris -> 257,2 B/baris, dan dua baris tertulis lebih sedikit per
+--      panggilan AI (INSERT + DELETE).
+--
+--   4. `SELECT user_id FROM quota_daily WHERE day = ?` (reconcileHeld, cron tiap
+--      5 menit) memakai `idx_quota_daily_day(day)` lalu MENGAMBIL BARIS TABEL
+--      untuk setiap user hanya demi satu kolom. Pada 5.000 pengguna aktif itu
+--      288 x 5.000 = 1,44 juta pembacaan baris tabel per hari dari kuota gratis
+--      5 juta baris dibaca/hari. Indeks (day, user_id) membuatnya COVERING:
+--         SEARCH quota_daily USING COVERING INDEX idx_quota_daily_day_user
+--      Biaya jujurnya: 154,2 B/baris -> 191,7 B/baris (indeks lebih lebar).
+--      Nol tambahan baris tertulis, karena `day` dan `user_id` TIDAK PERNAH
+--      di-UPDATE setelah baris dibuat — yang di-UPDATE hanya kolom penghitung,
+--      dan SQLite tidak menyentuh indeks yang kolomnya tidak berubah.
+--
+-- YANG SENGAJA TIDAK DITAMBAHKAN DI SINI (dan alasannya):
+--   * Indeks untuk `identity(created_at)` demi pembersih `issue_ip_hmac`:
+--     pembersih itu jalan SEKALI sehari dan tabel `identity` sebesar jumlah
+--     pengguna seumur hidup (5.000 identitas = 5.000 baris dibaca, sekali).
+--     Indeks di atas kolom yang ditulis setiap penerbitan identitas = tulis
+--     tambahan di jalur panas untuk menghemat satu pemindaian harian. TIDAK.
+--   * Indeks apa pun di `session(revoked_at)`: belum ada satu pun kueri di kode
+--     yang menyaring dengannya. Indeks tanpa kueri = pajak tulis murni.
+--   * Indeks apa pun di database `fiezel-stats` (lihat catatan di atas).
+--
+-- KEAMANAN PENERAPAN: berkas ini idempoten. `CREATE INDEX IF NOT EXISTS` +
+-- `DROP INDEX IF EXISTS`. Nol DELETE, nol DROP TABLE, nol ALTER TABLE. Kalau
+-- ternyata salah, pemulihannya satu pernyataan (lihat blok ROLLBACK di bawah)
+-- dan NOL data hilang — indeks bukan data.
+--
+-- URUTAN DI DALAM BERKAS INI BERMAKNA: indeks pengganti DIBUAT LEBIH DULU,
+-- indeks lama dibuang SESUDAHNYA. Kalau eksekusi terputus di tengah, keadaan
+-- terburuk adalah "dua indeks sekaligus ada" (aman, cuma boros) — bukan "kueri
+-- panas kehilangan indeksnya" (tidak aman: sweep berubah jadi pemindaian tabel).
+-- ============================================================================
+
+-- 1) quota_daily: (day) -> (day, user_id) supaya reconcileHeld jadi COVERING.
+-- DIPAKAI OLEH: quota-store-d1.js reconcileHeld()
+--   'SELECT user_id FROM quota_daily WHERE day = ?1'
+-- DIPAKAI JUGA OLEH: retensi harian 'DELETE FROM quota_daily WHERE rowid IN
+--   (SELECT rowid FROM quota_daily WHERE day < ? LIMIT 500)' (docs/D1-RETENTION.md)
+CREATE INDEX IF NOT EXISTS idx_quota_daily_day_user ON quota_daily(day, user_id);
+-- REDUNDANT-BY: idx_quota_daily_day_user
+DROP INDEX IF EXISTS idx_quota_daily_day;
+
+-- 2) quota_reservation: (day) + (user_id, day) -> satu (day, user_id).
+-- DIPAKAI OLEH: quota-store-d1.js reconcileHeld()
+--   'SELECT * FROM quota_reservation WHERE day = ?1'
+-- DIPAKAI OLEH: quota-store-d1.js loadStateD1()
+--   'SELECT * FROM quota_reservation WHERE user_id = ?1 AND day = ?2'
+CREATE INDEX IF NOT EXISTS idx_quota_reservation_day_user ON quota_reservation(day, user_id);
+-- REDUNDANT-BY: idx_quota_reservation_day_user
+DROP INDEX IF EXISTS idx_quota_reservation_day;
+-- REDUNDANT-BY: idx_quota_reservation_day_user
+DROP INDEX IF EXISTS idx_quota_reservation_user_day;
+
+-- 3) `idx_quota_reservation_expires` TIDAK DISENTUH. Ia jalur panas cron sweep
+--    dan tidak tumpang tindih dengan (day, user_id).
+--    `ux_identity_legacy`, `ix_identity_account`, `ix_identity_seen`,
+--    `ix_session_sub`, `ix_session_expires` juga TIDAK DISENTUH: masing-masing
+--    punya kueri nyata (route-auth.js, mw-identity.js, retensi sesi).
+
+-- ----------------------------------------------------------------------------
+-- ROLLBACK (kalau pemantauan menunjukkan keputusan di atas salah):
+--   CREATE INDEX IF NOT EXISTS idx_quota_daily_day ON quota_daily(day);
+--   CREATE INDEX IF NOT EXISTS idx_quota_reservation_day ON quota_reservation(day);
+--   CREATE INDEX IF NOT EXISTS idx_quota_reservation_user_day ON quota_reservation(user_id, day);
+--   DROP INDEX IF EXISTS idx_quota_daily_day_user;
+--   DROP INDEX IF EXISTS idx_quota_reservation_day_user;
+-- Nol data hilang di kedua arah. Jangan lupa: `tools/d1-schema-check.mjs`
+-- membandingkan skema NYATA dengan berkas migrasi, jadi rollback tanpa
+-- mengubah repo akan membuat gerbang skema MERAH — itu memang tujuannya.
+-- ----------------------------------------------------------------------------

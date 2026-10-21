@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<style>
+  @font-face { font-family:'Fredoka'; src:url('board-assets/Fredoka-var.woff2') format('woff2'); font-weight:300 700; }
+  @font-face { font-family:'Jakarta'; src:url('board-assets/PlusJakartaSans-400.woff2') format('woff2'); font-weight:400; }
+  @font-face { font-family:'Jakarta'; src:url('board-assets/PlusJakartaSans-500.woff2') format('woff2'); font-weight:500; }
+  @font-face { font-family:'Jakarta'; src:url('board-assets/PlusJakartaSans-600.woff2') format('woff2'); font-weight:600; }
+  @font-face { font-family:'Jakarta'; src:url('board-assets/PlusJakartaSans-700.woff2') format('woff2'); font-weight:700; }
+
+  :root{
+    --bg:#FFF9EE; --panel:#FFFFFF; --panel-soft:#FFF3DC; --line:#F0E4CF; --line-soft:#F7EFDF;
+    --text:#241A11; --muted:#6E5E47; --muted-soft:#7E6C4B;
+    --sun:#FFC700; --sun-deep:#E6A800; --sun-press:#CC9600; --sun-soft:#FFF3C4;
+    --sun-grad:linear-gradient(180deg,#FFDE59,#FFA500);
+    --core:#1B1418; --core-soft:#2A2126; --core-line:#3A3038; --on-core:#FDFAF3; --on-core-muted:rgba(253,250,243,.68);
+    --good:#1F6B4E; --good-soft:#E9F7F0; --bad:#AC3E2A; --bad-soft:#FDE3DE; --info:#7A5F1B; --info-soft:#FFF3C4;
+    --focus-ring:#A67A00; --text-disabled:#75654C;
+    --r-lg:24px; --r-md:16px; --r-sm:12px;
+    --sh-sm:0 2px 10px rgba(36,26,17,.06); --sh-md:0 10px 30px rgba(36,26,17,.09);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:1600px;height:2000px;overflow:hidden}
+  body{background:var(--bg);font-family:'Jakarta',sans-serif;color:var(--text);position:relative}
+  .board{width:1600px;height:2000px;padding:44px 52px 40px;display:flex;flex-direction:column;gap:22px}
+  .eyebrow{font-size:14px;font-weight:700;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+  .sec-title{font-size:15px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text);display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .sec-title .n{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:9px;background:var(--sun);font-size:13px;font-weight:700;color:var(--text)}
+
+  /* ---------- header ---------- */
+  header{display:flex;align-items:center;gap:36px;padding:6px 8px 0}
+  header .left{flex:1}
+  h1{font-family:'Fredoka';font-weight:600;font-size:74px;line-height:1.02;letter-spacing:.005em;margin:10px 0 12px}
+  h1 .warm{color:var(--text)}
+  h1 .bright{background:var(--core);color:var(--sun);padding:2px 22px 6px;border-radius:20px;display:inline-block}
+  .tagline{font-size:19px;color:var(--muted);font-weight:500}
+  .tagline b{color:var(--text)}
+  .head-mascot{width:190px;height:178px;flex:none;position:relative}
+  .head-mascot svg{width:100%;height:100%}
+  .chips{display:flex;gap:8px;margin-top:14px}
+  .chip{font-size:13px;font-weight:600;padding:7px 14px;border-radius:999px;background:var(--panel);border:1.5px solid var(--line);color:var(--muted)}
+  .chip.sun{background:var(--sun-soft);color:var(--info);border-color:#F2E0A0}
+
+  .row{display:flex;gap:22px}
+  .card{background:var(--panel);border:1.5px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--sh-sm);padding:22px 24px}
+
+  /* ---------- palette ---------- */
+  .pal-groups{display:grid;grid-template-columns:1.55fr 1.35fr 1fr 1.35fr;gap:16px}
+  .pal-g h4{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted-soft);margin-bottom:8px}
+  .swatches{display:grid;gap:8px}
+  .sw{border-radius:14px;border:1.5px solid var(--line);padding:10px 12px;display:flex;align-items:center;justify-content:space-between;min-height:52px}
+  .sw .nm{font-size:13.5px;font-weight:700}
+  .sw .hx{font-size:12px;font-weight:500;opacity:.75;display:block;margin-top:1px}
+  .ratio{font-size:11.5px;font-weight:700;padding:4px 9px;border-radius:999px;background:rgba(255,255,255,.85);border:1px solid rgba(36,26,17,.14);color:var(--text);white-space:nowrap}
+  .ratio.dark{background:rgba(27,20,24,.55);border-color:rgba(253,250,243,.3);color:var(--on-core)}
+  .cols2{grid-template-columns:1fr 1fr}
+
+  /* ---------- typography ---------- */
+  .type-duo{flex:1.05}
+  .type-sample{border-bottom:1.5px dashed var(--line);padding:10px 0 14px;margin-bottom:12px}
+  .type-name{font-size:12px;font-weight:700;letter-spacing:.1em;color:var(--muted-soft);text-transform:uppercase;margin-bottom:6px}
+  .fredoka-big{font-family:'Fredoka';font-weight:600;font-size:44px;line-height:1.05}
+  .jakarta-big{font-weight:700;font-size:26px;line-height:1.2;margin-bottom:6px}
+  .jakarta-body{font-size:15px;line-height:1.55;color:var(--muted)}
+  .scale{display:flex;flex-direction:column;gap:2px;margin-top:4px}
+  .scale div{display:flex;align-items:baseline;gap:12px}
+  .scale .sz{width:118px;font-size:12px;font-weight:700;color:var(--muted-soft);letter-spacing:.05em}
+  .num{font-weight:700;font-variant-numeric:tabular-nums}
+
+  /* ---------- learn card vs AI panel ---------- */
+  .duo{flex:1.6;display:flex;gap:18px}
+  .phone{flex:1;border-radius:var(--r-lg);padding:20px;position:relative;overflow:hidden}
+  .phone.learn{background:var(--bg);border:1.5px solid var(--line)}
+  .phone.ai{background:var(--core);border:1.5px solid var(--core-line);color:var(--on-core)}
+  .ph-tag{position:absolute;top:16px;right:16px;font-size:11px;font-weight:700;letter-spacing:.1em;padding:5px 10px;border-radius:999px}
+  .learn .ph-tag{background:var(--sun-soft);color:var(--info)}
+  .ai .ph-tag{background:rgba(255,199,0,.16);color:var(--sun)}
+  .q-eyebrow{font-size:12px;font-weight:700;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
+  .q{font-size:19px;font-weight:700;line-height:1.3;margin:8px 0 12px}
+  .opt{background:var(--panel);border:1.5px solid var(--line);border-radius:14px;padding:11px 14px;font-size:14.5px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:9px;min-height:44px}
+  .opt.correct{background:var(--good-soft);border-color:#BFE4D4;color:var(--good)}
+  .opt.wrong{background:var(--bad-soft);border-color:#F2C4BA;color:var(--bad)}
+  .opt.disabled{background:var(--panel-soft);border-color:var(--line);color:var(--text-disabled)}
+  .opt .mini{width:19px;height:19px;flex:none}
+  .opt .mini svg{width:19px;height:19px;display:block}
+  .btnrow{display:flex;gap:8px;margin-top:12px;align-items:center}
+  .btn{border-radius:14px;padding:12px 18px;font-size:14px;font-weight:700;min-height:44px;display:inline-flex;align-items:center;gap:8px}
+  .btn.sunb{background:var(--sun);color:var(--text);box-shadow:var(--sh-sm)}
+  .btn.focus{outline:2px solid var(--focus-ring);outline-offset:2px}
+  .btn.inkb{background:var(--text);color:var(--bg)}
+  .state-note{font-size:11.5px;color:var(--muted-soft);font-weight:600;margin-top:10px}
+  /* AI panel */
+  .neural{position:absolute;inset:0;opacity:.5;pointer-events:none}
+  .ai-eyebrow{font-size:12px;font-weight:700;letter-spacing:.12em;color:var(--sun);text-transform:uppercase;display:flex;align-items:center;gap:8px;margin-top:30px}
+  .ai-eyebrow svg{width:17px;height:17px}
+  .ai-h{font-family:'Fredoka';font-weight:600;font-size:25px;margin:9px 0 7px;color:var(--on-core)}
+  .ai-p{font-size:13.5px;line-height:1.55;color:var(--on-core-muted)}
+  .ai-card{background:var(--core-soft);border:1.5px solid var(--core-line);border-radius:14px;padding:12px 14px;margin-top:12px}
+  .ai-card .lbl{font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--on-core-muted);text-transform:uppercase}
+  .ai-card .val{font-size:24px;font-weight:700;color:var(--sun);font-variant-numeric:tabular-nums;margin-top:2px}
+  .ai-cta{margin-top:14px;background:var(--sun-grad);color:var(--text);border-radius:14px;padding:12px 16px;font-size:14px;font-weight:700;display:inline-flex;align-items:center;gap:8px;min-height:44px;align-self:flex-start}
+  .ai-cta svg{width:18px;height:18px;flex:none}
+
+  /* ---------- mascot & icons ---------- */
+  .mascot-card{flex:1.15;display:flex;gap:18px;align-items:center}
+  .mascot-art{width:215px;flex:none;position:relative}
+  .mascot-art svg{width:100%;height:auto}
+  .bubble{position:absolute;top:-14px;right:-16px;background:var(--panel);border:1.5px solid var(--line);border-radius:14px 14px 14px 4px;padding:8px 12px;font-size:12.5px;font-weight:600;box-shadow:var(--sh-sm);max-width:170px;line-height:1.35}
+  .mrules{flex:1}
+  .mrules li{font-size:13.5px;line-height:1.45;color:var(--muted);margin:0 0 9px 0;list-style:none;display:flex;gap:9px}
+  .mrules li b{color:var(--text)}
+  .mrules .dot{width:7px;height:7px;border-radius:50%;background:var(--sun);flex:none;margin-top:6px}
+  .icons-card{flex:1}
+  .icon-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px 8px;margin-top:4px}
+  .icon-cell{display:flex;flex-direction:column;align-items:center;gap:7px}
+  .icon-tile{width:56px;height:56px;border-radius:16px;background:var(--panel-soft);border:1.5px solid var(--line);display:flex;align-items:center;justify-content:center}
+  .icon-tile svg{width:26px;height:26px;color:var(--text)}
+  .icon-cell span{font-size:11px;font-weight:600;color:var(--muted-soft)}
+  .icon-note{font-size:12px;color:var(--muted);font-weight:600;margin-top:12px;line-height:1.45}
+
+  /* ---------- do / don't ---------- */
+  .dd{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .dd-col h4{font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+  .dd-col.do h4{color:var(--good)} .dd-col.dont h4{color:var(--bad)}
+  .dd-item{display:flex;gap:10px;align-items:flex-start;background:var(--panel);border:1.5px solid var(--line);border-radius:14px;padding:11px 14px;margin-bottom:9px}
+  .dd-item .ic{width:26px;height:26px;border-radius:9px;flex:none;display:flex;align-items:center;justify-content:center}
+  .do .ic{background:var(--good-soft);color:var(--good)} .dont .ic{background:var(--bad-soft);color:var(--bad)}
+  .dd-item .ic svg{width:15px;height:15px}
+  .dd-item p{font-size:13px;line-height:1.42;color:var(--muted)}
+  .dd-item p b{color:var(--text)}
+
+  footer{display:flex;justify-content:space-between;align-items:center;border-top:1.5px solid var(--line);padding-top:14px;font-size:12px;color:var(--muted-soft);font-weight:600}
+  .icon-inline svg{width:16px;height:16px;display:block}
+</style>
+</head>
+<body>
+<div class="board">
+
+  <!-- HEADER -->
+  <header>
+    <div class="left">
+      <div class="eyebrow">FIEZEL Rebrand · Brand Direction Board · v1.0</div>
+      <h1><span class="warm">WARM PAPER,</span> <span class="bright">BRIGHT MIND</span></h1>
+      <div class="tagline"><b>"Not just learning with you. Learning about you."</b> — AI + Education + Human. Bukan cyberpunk, bukan kartun anak.</div>
+      <div class="chips">
+        <span class="chip">Smart</span><span class="chip">Warm</span><span class="chip">Curious</span><span class="chip">Supportive</span><span class="chip">Adaptive</span><span class="chip sun">Kuning Solar = benang merah brand</span>
+      </div>
+    </div>
+    <div class="head-mascot"><!--MASCOT_FULL--></div>
+  </header>
+
+  <!-- PALETTE -->
+  <section class="card">
+    <div class="sec-title"><span class="n">1</span> Palet + rasio kontras (semua LULUS AA — 39/39 pasangan)</div>
+    <div class="pal-groups">
+      <div class="pal-g">
+        <h4>Warm Paper — permukaan belajar</h4>
+        <div class="swatches cols2">
+          <div class="sw" style="background:#FFF9EE"><span><span class="nm">bg</span><span class="hx">#FFF9EE</span></span><span class="ratio">teks 16,28:1</span></div>
+          <div class="sw" style="background:#FFFFFF"><span><span class="nm">panel</span><span class="hx">#FFFFFF</span></span><span class="ratio">teks 17,06:1</span></div>
+          <div class="sw" style="background:#FFF3DC"><span><span class="nm">panel-soft</span><span class="hx">#FFF3DC</span></span><span class="ratio">teks 15,52:1</span></div>
+          <div class="sw" style="background:#241A11"><span><span class="nm" style="color:#FDFAF3">text / ink</span><span class="hx" style="color:rgba(253,250,243,.75)">#241A11</span></span><span class="ratio dark">krem 16,28:1</span></div>
+          <div class="sw" style="background:#6E5E47"><span><span class="nm" style="color:#FDFAF3">muted</span><span class="hx" style="color:rgba(253,250,243,.75)">#6E5E47</span></span><span class="ratio dark">di bg 5,97:1</span></div>
+          <div class="sw" style="background:#7E6C4B"><span><span class="nm" style="color:#FDFAF3">muted-soft ✎</span><span class="hx" style="color:rgba(253,250,243,.75)">#7E6C4B</span></span><span class="ratio dark">di bg 4,85:1</span></div>
+        </div>
+      </div>
+      <div class="pal-g">
+        <h4>Solar — energi brand (dari #FFD23F → kanon)</h4>
+        <div class="swatches cols2">
+          <div class="sw" style="background:#FFC700"><span><span class="nm">sun</span><span class="hx">#FFC700</span></span><span class="ratio">ink 10,90:1</span></div>
+          <div class="sw" style="background:#E6A800"><span><span class="nm">sun-deep · hover</span><span class="hx">#E6A800</span></span><span class="ratio">ink 8,10:1</span></div>
+          <div class="sw" style="background:#CC9600"><span><span class="nm">sun-press</span><span class="hx">#CC9600</span></span><span class="ratio">ink 6,44:1</span></div>
+          <div class="sw" style="background:#FFF3C4"><span><span class="nm">sun-soft</span><span class="hx">#FFF3C4</span></span><span class="ratio">ink 15,33:1</span></div>
+          <div class="sw" style="background:linear-gradient(180deg,#FFDE59,#FFA500);grid-column:1/3"><span><span class="nm">sun-grad — CTA dimensional</span><span class="hx">#FFDE59 → #FFA500</span></span><span class="ratio">ink 12,87 / 8,64:1</span></div>
+        </div>
+      </div>
+      <div class="pal-g">
+        <h4>Bright Mind — momen AI</h4>
+        <div class="swatches">
+          <div class="sw" style="background:#1B1418"><span><span class="nm" style="color:#FDFAF3">core</span><span class="hx" style="color:rgba(253,250,243,.75)">#1B1418</span></span><span class="ratio dark">on-core 17,37:1</span></div>
+          <div class="sw" style="background:#2A2126"><span><span class="nm" style="color:#FDFAF3">core-soft</span><span class="hx" style="color:rgba(253,250,243,.75)">#2A2126</span></span><span class="ratio dark">on-core 14,99:1</span></div>
+          <div class="sw" style="background:#1B1418"><span><span class="nm" style="color:rgba(253,250,243,.68)">on-core-muted</span><span class="hx" style="color:rgba(253,250,243,.5)">α .68</span></span><span class="ratio dark">efektif 8,43:1</span></div>
+        </div>
+      </div>
+      <div class="pal-g">
+        <h4>Semantik (✎ = digeser demi AA)</h4>
+        <div class="swatches cols2">
+          <div class="sw" style="background:#E9F7F0"><span><span class="nm" style="color:#1F6B4E">good ✎</span><span class="hx" style="color:#1F6B4E">#1F6B4E</span></span><span class="ratio">di soft 5,82:1</span></div>
+          <div class="sw" style="background:#FDE3DE"><span><span class="nm" style="color:#AC3E2A">bad ✎</span><span class="hx" style="color:#AC3E2A">#AC3E2A</span></span><span class="ratio">di soft 4,95:1</span></div>
+          <div class="sw" style="background:#FFF3C4"><span><span class="nm" style="color:#7A5F1B">info ✎</span><span class="hx" style="color:#7A5F1B">#7A5F1B</span></span><span class="ratio">di soft 5,42:1</span></div>
+          <div class="sw" style="background:#FFF3DC"><span><span class="nm" style="color:#75654C">disabled ✚</span><span class="hx" style="color:#75654C">#75654C</span></span><span class="ratio">5,13:1</span></div>
+          <div class="sw" style="background:#FFF9EE;grid-column:1/3;border-color:#A67A00;outline:2px solid #A67A00;outline-offset:-6px"><span><span class="nm">focus-ring ✚</span><span class="hx">#A67A00 · 2px offset 2px</span></span><span class="ratio">vs bg 3,71:1</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TYPO + CONTOH -->
+  <div class="row" style="flex:1">
+    <section class="card type-duo">
+      <div class="sec-title"><span class="n">2</span> Duo tipografi</div>
+      <div class="type-sample">
+        <div class="type-name">Display — FZ Fredoka 600 · hanya display &amp; judul layar</div>
+        <div class="fredoka-big">Belajar yang<br>mengenalmu.</div>
+      </div>
+      <div class="type-sample">
+        <div class="type-name">UI &amp; Body — FZ Plus Jakarta Sans 400–700</div>
+        <div class="jakarta-big">Judul kartu pakai Jakarta 700</div>
+        <div class="jakarta-body">Body 15px, nyaman dibaca panjang di kertas hangat. Instrument Serif pensiun — tinggal kutipan testimonial. Angka data: <span class="num">1.248</span> Jakarta 700 tabular-nums.</div>
+      </div>
+      <div class="type-name" style="margin-bottom:8px">Skala mobile — lantai 12px</div>
+      <div class="scale">
+        <div><span class="sz">display · 28</span><span style="font-family:'Fredoka';font-weight:600;font-size:28px">Aa Fredoka</span></div>
+        <div><span class="sz">h1 · 22</span><span style="font-family:'Fredoka';font-weight:600;font-size:22px">Aa Fredoka</span></div>
+        <div><span class="sz">h2 · 18</span><span style="font-weight:700;font-size:18px">Aa Jakarta 700</span></div>
+        <div><span class="sz">body · 15</span><span style="font-size:15px">Aa Jakarta 400</span></div>
+        <div><span class="sz">label · 13</span><span style="font-weight:600;font-size:13px">Aa Jakarta 600</span></div>
+        <div><span class="sz">micro · 12 ⌊</span><span style="font-weight:600;font-size:12px;letter-spacing:.08em">EYEBROW 12PX — TAK ADA TEKS &lt;12PX</span></div>
+      </div>
+    </section>
+
+    <section class="card duo" style="padding:22px">
+      <div style="position:absolute"></div>
+      <div style="display:flex;flex-direction:column;flex:1;gap:0">
+        <div class="sec-title"><span class="n">3</span> Dua dunia, satu sistem</div>
+        <div style="display:flex;gap:16px;flex:1">
+          <!-- LEARN CARD -->
+          <div class="phone learn">
+            <span class="ph-tag">WARM PAPER · BELAJAR</span>
+            <div class="q-eyebrow" style="margin-top:30px">Grammar · Soal 7/25</div>
+            <div class="q">She ___ to school every day.</div>
+            <div class="opt correct"><span class="mini"><!--IC_CHECK--></span> goes — benar, mantap!</div>
+            <div class="opt wrong"><span class="mini"><!--IC_X--></span> go — belum tepat, tidak apa-apa</div>
+            <div class="opt">going</div>
+            <div class="opt disabled"><span class="mini"><!--IC_LOCK--></span> went — terkunci, tetap terbaca 5,13:1</div>
+            <div class="btnrow">
+              <span class="btn sunb focus">Lanjut</span>
+              <span class="btn inkb">Nilai jawaban</span>
+            </div>
+            <div class="state-note">CTA sun 10,9:1 + ring fokus #A67A00 · CTA ink 16,3:1 — pengganti tombol coral 1,45:1</div>
+          </div>
+          <!-- AI PANEL -->
+          <div class="phone ai">
+            <svg class="neural" viewBox="0 0 300 420" preserveAspectRatio="xMidYMid slice">
+              <g stroke="#FFC700" stroke-width="1" fill="none" opacity=".28">
+                <path d="M-10 80 C 60 40, 120 120, 190 84 S 310 40, 330 90"/>
+                <path d="M-10 300 C 70 260, 130 350, 210 300 S 300 260, 330 310"/>
+                <path d="M40 -10 C 20 90, 90 160, 60 260 S 90 380, 60 430"/>
+                <path d="M240 -10 C 220 80, 280 170, 250 260 S 280 380, 250 430"/>
+              </g>
+              <g fill="#FFC700" opacity=".5">
+                <circle cx="190" cy="84" r="3"/><circle cx="60" cy="260" r="3"/><circle cx="210" cy="300" r="3"/><circle cx="250" cy="260" r="3"/>
+              </g>
+            </svg>
+            <span class="ph-tag">BRIGHT MIND · MOMEN AI</span>
+            <div class="ai-eyebrow"><!--IC_BRAIN--> BrainCore · analisis pola</div>
+            <div class="ai-h">Aku melihat polamu.</div>
+            <div class="ai-p">Kamu kuat di simple present, tapi sering ragu di kata kerja -es. Jalur belajarmu kuubah: 3 latihan fokus dulu.</div>
+            <div style="display:flex;gap:10px">
+              <div class="ai-card" style="flex:1"><div class="lbl">Akurasi</div><div class="val">78%</div></div>
+              <div class="ai-card" style="flex:1"><div class="lbl">Fokus baru</div><div class="val" style="font-size:15px;color:var(--on-core);padding-top:6px">Verb + -es</div></div>
+            </div>
+            <div><span class="ai-cta"><!--IC_SPARKLES--> Ikuti jalur adaptif</span></div>
+            <div class="state-note" style="color:var(--on-core-muted)">Dipakai HEMAT: panel/kartu momen AI, bukan seluruh layar</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- MASKOT + IKON -->
+  <div class="row">
+    <section class="card mascot-card">
+      <div>
+        <div class="sec-title"><span class="n">4</span> Maskot PAW — wajah AI tutor</div>
+        <div style="display:flex;gap:18px;align-items:center">
+          <div class="mascot-art">
+            <div class="bubble">Bubble coach maks 2 baris, auto-dismiss ✓</div>
+            <!--MASCOT_FULL2-->
+          </div>
+          <ul class="mrules">
+            <li><span class="dot"></span><span><b>Identitas PRESERVE</b> — PAW kuning tetap wajah AI tutor di semua modul.</span></li>
+            <li><span class="dot"></span><span><b>Tidak pernah menutupi konten interaktif</b> — slot khusus: dock kanan-bawah 88px atau inline slot kartu.</span></li>
+            <li><span class="dot"></span><span><b>Reaksi kontekstual state nyata</b> — correct · encouraging · hinting · listening · celebrating · thinking.</span></li>
+            <li><span class="dot"></span><span><b>Tak menghalangi tap target</b> — bubble auto-dismiss, ada tombol tutup.</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+    <section class="card icons-card">
+      <div class="sec-title"><span class="n">5</span> Ikonografi — Lucide, stroke 1,75 · 20/24px</div>
+      <div class="icon-grid">
+        <div class="icon-cell"><div class="icon-tile"><!--IC_BOOK--></div><span>book-open</span></div>
+        <div class="icon-cell"><div class="icon-tile"><!--IC_HEADPHONES--></div><span>headphones</span></div>
+        <div class="icon-cell"><div class="icon-tile"><!--IC_MIC--></div><span>mic</span></div>
+        <div class="icon-cell"><div class="icon-tile"><!--IC_TARGET--></div><span>target</span></div>
+        <div class="icon-cell"><div class="icon-tile"><!--IC_CHART--></div><span>bar-chart-3</span></div>
+        <div class="icon-cell"><div class="icon-tile" style="background:var(--core);border-color:var(--core-line)"><span style="color:var(--sun);display:flex"><!--IC_BRAIN2--></span></div><span>brain · AI</span></div>
+        <div class="icon-cell"><div class="icon-tile"><!--IC_LIGHTBULB--></div><span>lightbulb</span></div>
+        <div class="icon-cell"><div class="icon-tile"><!--IC_AUDIO--></div><span>audio-lines</span></div>
+      </div>
+      <div class="icon-note">Ilustrasi = flat warm shapes + garis neural kuning untuk momen AI. Emoji dilarang sebagai ikon UI.</div>
+    </section>
+  </div>
+
+  <!-- DO / DON'T -->
+  <section class="card">
+    <div class="sec-title"><span class="n">6</span> Do / Don't</div>
+    <div class="dd">
+      <div class="dd-col do">
+        <div class="dd-item"><span class="ic"><!--IC_CHECK2--></span><p><b>Dua permukaan CTA sah:</b> sun + ink (10,9:1) atau ink + krem (16,3:1). Gradasi solar untuk momen energi.</p></div>
+        <div class="dd-item"><span class="ic"><!--IC_CHECK3--></span><p><b>Bright Mind hemat:</b> panel gelap #1B1418 hanya untuk momen kecerdasan — BrainCore, analyzing, diagnosis, adaptive path.</p></div>
+        <div class="dd-item"><span class="ic"><!--IC_CHECK4--></span><p><b>Disabled tetap terbaca:</b> panel-soft + teks #75654C (5,13:1) + ikon gembok; ring fokus #A67A00 konsisten 2px offset 2px.</p></div>
+      </div>
+      <div class="dd-col dont">
+        <div class="dd-item"><span class="ic"><!--IC_X2--></span><p><b>Jangan</b> pakai coral/mint/lilac sebagai permukaan tombol/aksi — kontras gagal (audit: 1,45–1,92:1). Hanya ilustrasi/stiker dengan teks ink.</p></div>
+        <div class="dd-item"><span class="ic"><!--IC_X3--></span><p><b>Jangan</b> ada teks di bawah 12px, faux-bold 650/750/800, atau kunci internal ("PARTOFSPEECH") bocor ke UI.</p></div>
+        <div class="dd-item"><span class="ic"><!--IC_X4--></span><p><b>Jangan</b> biarkan maskot/toast menutupi konten — toast = pill ink + teks krem, bukan navy; opacity rendah bukan disabled state.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>FIEZEL · WARM PAPER, BRIGHT MIND · Token v1.0 — tokens.css · tokens.json · WCAG.md (39/39 AA)</span>
+    <span>✎ digeser dari draf demi AA · ✚ token baru · Agustus 2026</span>
+  </footer>
+</div>
+</body>
+</html>

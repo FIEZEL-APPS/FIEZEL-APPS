@@ -1,0 +1,19 @@
+{
+  "schema": "fiezel-autonomy-config-v1",
+  "autonomyLevel": "advisory",
+  "ownerApproved": false,
+  "ownerRef": "",
+  "approvedAt": "",
+  "autoCanonicalAdoption": false,
+  "halt": false,
+  "thresholds": {
+    "minExposureSessions": 3,
+    "minControlAttempts": 8,
+    "minCanaryAttempts": 8,
+    "minCanaryAccuracy": 70,
+    "maxCanaryRegressionPp": 5,
+    "minPostPromotionAttempts": 5,
+    "minPostPromotionAccuracy": 60,
+    "maxPostPromotionRegressionPp": 10
+  }
+}

@@ -1,0 +1,46 @@
+<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=390">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mock.css">
+<style>
+.path{position:relative;padding-left:26px}
+.path::before{content:'';position:absolute;left:12px;top:10px;bottom:10px;width:3px;border-radius:3px;background:var(--line)}
+.node{position:relative;margin-bottom:12px}
+.node::before{content:'';position:absolute;left:-21px;top:20px;width:14px;height:14px;border-radius:50%;background:var(--paper);border:3px solid var(--line)}
+.node.done::before{background:var(--good);border-color:var(--good)}
+.node.now::before{background:var(--sun);border-color:var(--sun-deep);box-shadow:0 0 0 5px var(--sun-soft)}
+.node .li{align-items:flex-start}
+.node.now .li{border:2px solid var(--sun);box-shadow:0 4px 0 var(--sun-deep);background:#fff}
+.node .li .t{flex:1}
+.node .li .t b{display:block;font-size:15px}
+.node .li .t span{font-size:12px;color:var(--muted);font-weight:600}
+.badge-lvl{display:inline-grid;place-items:center;height:26px;padding:0 10px;border-radius:9px;background:var(--maroon);color:#fff;font-weight:700;font-size:13px}
+</style></head><body>
+<div class="screen">
+  <div class="toprow">
+    <span class="iconbtn"><i data-lucide="arrow-left" class="i"></i></span>
+    <div style="flex:1"><div class="eyebrow">Grammar</div><h2 style="font-size:20px">Jalur A1</h2></div>
+    <span class="chip">A1 <i data-lucide="chevron-down" class="i sm"></i></span>
+  </div>
+
+  <div class="card soft mt-3 row" style="gap:14px;align-items:center">
+    <span class="ring" style="--p:24;--c:var(--maroon)"><span>4/17</span></span>
+    <div style="flex:1"><b>Fondasi kalimat sederhana</b><div class="small muted">Ikuti urutannya, prasyarat otomatis terbuka.</div></div>
+  </div>
+
+  <div class="path mt-3">
+    <div class="node done"><div class="li"><span class="n" style="background:var(--good-soft);color:var(--good)"><i data-lucide="check" class="i sm"></i></span><div class="t"><b>Subject, object & possessive pronouns</b><span>Mastery 92%</span></div></div></div>
+    <div class="node done"><div class="li"><span class="n" style="background:var(--good-soft);color:var(--good)"><i data-lucide="check" class="i sm"></i></span><div class="t"><b>Verb to be: subject agreement</b><span>Mastery 85%</span></div></div></div>
+    <div class="node done"><div class="li"><span class="n" style="background:var(--good-soft);color:var(--good)"><i data-lucide="check" class="i sm"></i></span><div class="t"><b>Articles: a / an / the</b><span>Mastery 78% · ulang 3 soal</span></div></div></div>
+    <div class="node now"><div class="li"><span class="n" style="background:var(--sun);color:var(--ink)">4</span><div class="t"><b>Present Simple: habits & routines</b><span>Sedang dipelajari · 6/10 soal</span><div class="bar thin mt-1"><i style="width:60%"></i></div><a class="btn sun sm mt-2">Lanjutkan <i data-lucide="arrow-right" class="i sm"></i></a></div></div></div>
+    <div class="node"><div class="li"><span class="n" style="background:var(--cream);color:var(--muted)">5</span><div class="t"><b>Plural nouns: -s / -es / irregular</b><span>Terbuka setelah lesson 4</span></div></div></div>
+    <div class="node"><div class="li lock"><span class="n" style="background:#fff"><i data-lucide="lock" class="i sm"></i></span><div class="t"><b style="color:var(--muted)">There is / there are</b><span>Prasyarat: lesson 5</span></div></div></div>
+  </div>
+</div>
+<nav class="nav">
+  <a><i data-lucide="house" class="i"></i>Hari ini</a>
+  <a class="on"><i data-lucide="zap" class="i"></i>Latihan</a>
+  <a><i data-lucide="school" class="i"></i>Kelas</a>
+  <a><i data-lucide="route" class="i"></i>Progres</a>
+  <a><i data-lucide="user-round" class="i"></i>Profil</a>
+</nav>
+<script src="/lucide.min.js"></script><script>lucide.createIcons()</script></body></html>

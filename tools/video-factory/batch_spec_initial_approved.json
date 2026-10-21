@@ -1,0 +1,157 @@
+{
+  "clips": [
+    {
+      "id": "vg-cake-lucy-5q",
+      "level": "A1",
+      "skill": "to_be",
+      "videoUrl": "./content/video/cake-lucy-5q-exact.mp4",
+      "posterUrl": "./content/video/cake-lucy-5q-exact-poster.jpg",
+      "attribution": {
+        "source": "English with Lucy & William: 100 Common English Questions",
+        "url": "https://www.youtube.com/watch?v=kYv_8B7eX_g"
+      },
+      "subtitles": [
+        { "start": 0.0, "end": 1.1, "speaker": "William", "text": "What is your full name?" },
+        { "start": 1.1, "end": 3.2, "speaker": "Lucy", "text": "My full name is Lucy Bella Simkins.", "censorPattern": "/\\bis\\b/i", "censorAnswer": "is" },
+        { "start": 3.3, "end": 5.8, "speaker": "William", "text": "How is your first name spelt?", "censorPattern": "/\\bis\\b/i", "censorAnswer": "is" },
+        { "start": 6.2, "end": 8.6, "speaker": "Lucy", "text": "L-U-C-Y. Lucy." },
+        { "start": 9.0, "end": 10.0, "speaker": "William", "text": "Who chose your name?" },
+        { "start": 10.4, "end": 12.0, "speaker": "Lucy", "text": "I think my mum did.", "censorPattern": "/\\bdid\\b/i", "censorAnswer": "did" },
+        { "start": 12.4, "end": 14.4, "speaker": "Lucy", "text": "I haven't actually asked that question before." },
+        { "start": 14.9, "end": 16.2, "speaker": "William", "text": "Where were you born?" },
+        { "start": 16.6, "end": 19.8, "speaker": "Lucy", "text": "I was born in Milton Keynes in England.", "censorPattern": "/in\\s+England/i", "censorAnswer": "in", "censorSuffix": " England" },
+        { "start": 20.4, "end": 22.4, "speaker": "William", "text": "Is it a city or a town?" },
+        { "start": 22.8, "end": 25.8, "speaker": "Lucy", "text": "I think it's a city. They always refer to it as a city.", "censorPattern": "/\\bit's\\b/i", "censorAnswer": "it's" }
+      ],
+      "checkpoints": [
+        {
+          "id": "lucy-cp-1",
+          "pauseAt": 3.2,
+          "exercise": {
+            "type": "subtitle-cloze",
+            "grammarPoint": "To Be (Present): is",
+            "question": "Lengkapi to be yang tepat untuk nama lengkap Lucy:",
+            "clozeText": "My full name ___ Lucy Bella Simkins.",
+            "clozeAnswer": "is",
+            "options": ["is", "am", "are", "be"],
+            "answerIndex": 0,
+            "explain": {
+              "why": "'My full name' adalah kata benda tunggal (it), sehingga bentuk to be yang sesuai adalah 'is'.",
+              "rule": "Singular Subject (He / She / It / Singular Noun) + is",
+              "memory": "Satu nama lengkap = IS."
+            }
+          }
+        },
+        {
+          "id": "lucy-cp-2",
+          "pauseAt": 5.8,
+          "exercise": {
+            "type": "subtitle-cloze",
+            "grammarPoint": "Passive Voice Present: is + spelt (V3)",
+            "question": "Lengkapi pertanyaan William tentang cara mengeja nama depan Lucy:",
+            "clozeText": "How ___ your first name spelt?",
+            "clozeAnswer": "is",
+            "options": ["is", "are", "does", "do"],
+            "answerIndex": 0,
+            "explain": {
+              "why": "'your first name' adalah subjek tunggal yang menerima aksi dieja (passive), sehingga kalimat tanya menggunakan to be 'is' + kata kerja bentuk ketiga (spelt).",
+              "rule": "Wh- + is + Singular Subject + V3 (Past Participle)?",
+              "memory": "Dieja tunggal = How IS it spelt?"
+            }
+          }
+        },
+        {
+          "id": "lucy-cp-3",
+          "pauseAt": 12.0,
+          "exercise": {
+            "type": "subtitle-cloze",
+            "grammarPoint": "Past Simple: Auxiliary did (Ellipsis)",
+            "question": "Lengkapi jawaban Lucy tentang siapa yang memilih namanya:",
+            "clozeText": "I think my mum ___.",
+            "clozeAnswer": "did",
+            "options": ["did", "does", "do", "has"],
+            "answerIndex": 0,
+            "explain": {
+              "why": "William bertanya dengan kata kerja lampau 'chose' (V2 dari choose), sehingga elipsis jawaban lampau menggunakan 'did'.",
+              "rule": "Past Simple Ellipsis: Who + V2...? -> Subject + did.",
+              "memory": "Tanya aksi lampau (chose), respon singkat pakai DID."
+            }
+          }
+        },
+        {
+          "id": "lucy-cp-4",
+          "pauseAt": 19.8,
+          "exercise": {
+            "type": "subtitle-cloze",
+            "grammarPoint": "Preposition of Place: in (Country)",
+            "question": "Lengkapi preposisi tempat untuk negara Inggris (England):",
+            "clozeText": "I was born in Milton Keynes, ___ England.",
+            "clozeAnswer": "in",
+            "options": ["in", "at", "on", "to"],
+            "answerIndex": 0,
+            "explain": {
+              "why": "Untuk wilayah negara, kepulauan, atau kawasan teritorial luas (seperti England), preposisi tempat yang benar adalah 'in'.",
+              "rule": "Preposition of Place: in + City / Country (in England, in Jakarta)",
+              "memory": "Negara & kota besar = IN."
+            }
+          }
+        },
+        {
+          "id": "lucy-cp-5",
+          "pauseAt": 25.8,
+          "exercise": {
+            "type": "subtitle-cloze",
+            "grammarPoint": "Contraction: it's (It is) vs its",
+            "question": "Lengkapi singkatan kata (contraction) yang tepat untuk 'it is':",
+            "clozeText": "I think ___ a city.",
+            "clozeAnswer": "it's",
+            "options": ["it's", "its", "they're", "there"],
+            "answerIndex": 0,
+            "explain": {
+              "why": "'it's' dengan apostrof adalah singkatan dari 'it is' (subjek + to be). Sedangkan 'its' tanpa apostrof adalah kata ganti kepunyaan (possessive adjective).",
+              "rule": "it's = it is (atau it has) | its = kepunyaan (its color, its name)",
+              "memory": "Ada to be (is) = pakai apostrof IT'S."
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "vg-cake-ryan-jake",
+      "level": "A2",
+      "skill": "modals_can",
+      "videoUrl": "./content/video/cake-ryan-jake.mp4",
+      "posterUrl": "./content/video/cake-ryan-jake-poster.jpg",
+      "attribution": {
+        "source": "Ryan Reynolds & Jake Gyllenhaal (Wired Interview)",
+        "url": "https://www.youtube.com"
+      },
+      "subtitles": [
+        { "start": 0.4, "end": 2.2, "speaker": "Ryan Reynolds", "text": "Can Jake Gyllenhaal sing?" },
+        { "start": 2.2, "end": 3.8, "speaker": "Jake Gyllenhaal", "text": "Yes, he can.", "censorPattern": "/\\bcan\\b/i", "censorAnswer": "can" },
+        { "start": 3.8, "end": 4.8, "speaker": "Ryan Reynolds", "text": "And dance?" },
+        { "start": 4.8, "end": 6.2, "speaker": "Jake Gyllenhaal", "text": "Nope." }
+      ],
+      "checkpoints": [
+        {
+          "id": "ryan-cp-1",
+          "pauseAt": 2.8,
+          "exercise": {
+            "type": "subtitle-cloze",
+            "grammarPoint": "Modals: Can (Ability)",
+            "question": "Lengkapi kalimat respon dari percakapan asli di atas:",
+            "clozeText": "Yes, he ___.",
+            "clozeAnswer": "can",
+            "options": ["can", "could", "is", "does"],
+            "answerIndex": 0,
+            "explain": {
+              "why": "Pertanyaan memakai modal 'Can' ('Can Jake Gyllenhaal sing?'), sehingga jawaban singkatnya kembali menggunakan 'can': 'Yes, he can'.",
+              "rule": "Modal auxiliary match: Can you / he ... ? -> Yes, I / he can.",
+              "memory": "Tanya CAN, jawab CAN."
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

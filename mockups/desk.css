@@ -1,0 +1,16 @@
+body{width:auto;min-height:900px;margin:0}
+.app{display:grid;grid-template-columns:248px 1fr;min-height:900px}
+.side{background:var(--paper);border-right:1px solid var(--line);padding:26px 18px;display:flex;flex-direction:column;gap:6px;position:sticky;top:0;height:900px}
+.side .wordmark{font-size:26px;padding:0 12px;margin-bottom:22px}
+.side a{display:flex;align-items:center;gap:12px;height:48px;padding:0 14px;border-radius:14px;font-weight:700;color:var(--muted);text-decoration:none;font-size:15px}
+.side a.on{background:var(--sun);color:var(--ink)}
+.side a .i{width:22px;height:22px}
+.side .spacer{flex:1}
+.side .pawcard{background:var(--cream);border:1px solid var(--line);border-radius:18px;padding:14px;display:flex;gap:10px;align-items:center}
+.side .pawcard img{width:42px}
+.side .pawcard b{display:block;font-size:14px}
+.side .pawcard span{font-size:12px;color:var(--muted)}
+.main{padding:28px 40px 40px;max-width:1160px;width:100%}
+.mainhead{display:flex;align-items:center;justify-content:space-between;height:52px}
+.cols{display:grid;grid-template-columns:1.5fr 1fr;gap:22px}
+.screen{padding:0;min-height:0}

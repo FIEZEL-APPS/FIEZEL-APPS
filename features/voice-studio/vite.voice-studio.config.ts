@@ -5,6 +5,9 @@ import path from 'path';
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  resolve: {
+    preserveSymlinks: true,
+  },
   build: {
     outDir: path.resolve(__dirname, 'dist'),
     emptyOutDir: true,

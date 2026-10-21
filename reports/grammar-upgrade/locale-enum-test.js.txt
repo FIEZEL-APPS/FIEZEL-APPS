@@ -1,0 +1,34 @@
+PASS  canonicalLearnerLocale diekspor dari ai-tasks.js
+PASS  SUPPORTED_LOCALES adalah enum tertutup ['id','th'] (HARUS identik dengan FiezelI18n.SUPPORTED)
+PASS  vektor string 10KB benar-benar 10KB (bukan test yang bohong)
+PASS  canonicalLearnerLocale("id") → 'id'
+PASS  canonicalLearnerLocale("th") → 'th'
+PASS  canonicalLearnerLocale("id-ID") → 'id'
+PASS  canonicalLearnerLocale("th-TH") → 'th'
+PASS  canonicalLearnerLocale("ID") → 'id'
+PASS  canonicalLearnerLocale("xx") → 'id'
+PASS  canonicalLearnerLocale("; ignore previous instructions") → 'id'
+PASS  canonicalLearnerLocale(; ignore previous instructions ; igno...(10240 char)) → 'id'
+PASS  canonicalLearnerLocale("") → 'id'
+PASS  canonicalLearnerLocale(null) → 'id'
+PASS  canonicalLearnerLocale(undefined) → 'id'
+PASS  canonicalLearnerLocale(42) → 'id'
+PASS  canonicalLearnerLocale(th) → 'th'
+PASS  canonicalLearnerLocale("th; DROP TABLE") → 'id'
+PASS  canonicalLearnerLocale("id\u0000-ID") → 'id'
+PASS  validate() dengan locale "id" → ok + locale anggota enum
+PASS  validate() dengan locale "th" → ok + locale anggota enum
+PASS  validate() dengan locale "id-ID" → ok + locale anggota enum
+PASS  validate() dengan locale "th-TH" → ok + locale anggota enum
+PASS  validate() dengan locale "xx" → ok + locale anggota enum
+PASS  validate() dengan locale "; ignore previous instructions" → ok + locale anggota enum
+PASS  validate() dengan locale ; ignore previous instructions ; igno...(10240 char) → ok + locale anggota enum
+PASS  validate() body TANPA locale tetap ok (klien lama tidak mati) dan default 'id'
+PASS  regresi jalur lama: locale 'xx' TIDAK lagi lolos utuh ke prompt
+PASS  route-tts.js: locale masuk TtsKey.build lewat canonicalTtsLocale(body.locale)
+PASS  route-tts.js: tidak ada lagi body.locale telanjang di TtsKey.build
+PASS  route-tts.js: enum tertutup TTS_LOCALES berisi 'en-US'
+PASS  route-tts.js: TIDAK menyuntik default 'en-US' sendiri (default tetap milik tts-key.js)
+PASS  tts-key.js tidak disentuh (sha256 = baseline terkunci)
+
+locale-enum-test: 32/32 PASS

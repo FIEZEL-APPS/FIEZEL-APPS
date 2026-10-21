@@ -1,0 +1,165 @@
+{
+  "jlpt": {
+    "preAudioClickable": true,
+    "translationLeaksOnCard": {
+      "optionTranslations": []
+    },
+    "sheetLeakBeforeAnswer": {
+      "paneVisible": true,
+      "keyChoice": null,
+      "explainDesc": null,
+      "statusBadge": null
+    },
+    "feedbackBanner": {
+      "title": "Belum Tepat",
+      "sub": "Kunci jawaban: Pilihan 1",
+      "html": "<div class=\"jlpt-feedback-banner wrong\" role=\"alert\" aria-live=\"assertive\"><div class=\"jlpt-fb-left\"><span class=\"jlpt-fb-badge\" aria-hidden=\"true\">✗</span><div class=\"jlpt-fb-text-col\"><div class=\"jlpt-fb-title\">Belum Tepat</div><div class=\"jlpt-fb-sub\">Kunci jawaban: Pilihan 1</div></div></div><div class=\"jlpt-fb-actions\"><button type=\"button\" class=\"jlpt-fb-key-btn\" onclick=\"openJlptDetailSheet('explain')\">Lihat Kunci ↗</button><button type=\"button\" class=\"jlpt-fb-next-btn\" onclick=\"nextListeningQuestion()\">Maju →</button></div></div>"
+    },
+    "stateSync": {
+      "historyDelta": 1,
+      "listeningMasteryDelta": 1,
+      "bktChanged": true,
+      "persistedToStorage": false
+    }
+  },
+  "skillsLab": {
+    "mount": {
+      "view": "listening",
+      "addonExists": true,
+      "controllerExists": false
+    },
+    "ui": {
+      "cardPresent": true,
+      "workDisabledBeforeAudio": true,
+      "playButtonPresent": true,
+      "hasGemBar": true,
+      "hasTranslateToggle": true
+    },
+    "finishItemBehavior": {
+      "error": "no_controller"
+    }
+  },
+  "inQuiz": {
+    "listeningAdaptivePolicyAvailable": true,
+    "adaptiveSampleOutput": {
+      "rateBand": "fast",
+      "replayQuota": 0,
+      "clipLength": "long",
+      "rationale": [
+        "brain3_listening_baseline_high",
+        "brain3_listening_step_up_replay"
+      ],
+      "confidence": 0.5
+    },
+    "adaptivePoolTypes": [],
+    "adaptivePoolHasListening": false,
+    "recordedAttempt": {
+      "type": "listening",
+      "replayCount": 2,
+      "kappa": 0.45,
+      "target": "listening_detail",
+      "reviewBucket": "",
+      "reviewKey": "test-listening-probe-01"
+    },
+    "bktHasListening": false,
+    "coreBrainMemoryDomains": []
+  },
+  "telemetry": {
+    "eventsModuleAvailable": true,
+    "queueModuleAvailable": true,
+    "supportedDomains": [],
+    "listeningEventRejected": true,
+    "listeningRejectionReason": "invalid_field",
+    "grammarEventAccepted": true
+  },
+  "bankIntegrity": {
+    "jlpt": {
+      "count": 30,
+      "answerIndexDistribution": {
+        "Index 0 (Pilihan 1)": 9,
+        "Index 1 (Pilihan 2)": 10,
+        "Index 2 (Pilihan 3)": 7,
+        "Index 3 (Pilihan 4)": 4
+      },
+      "mondaiBreakdown": {
+        "mondai_1": {
+          "total": 8,
+          "ansDist": [
+            2,
+            2,
+            2,
+            2
+          ],
+          "optsCounts": [
+            4
+          ]
+        },
+        "mondai_2": {
+          "total": 8,
+          "ansDist": [
+            0,
+            2,
+            4,
+            2
+          ],
+          "optsCounts": [
+            4
+          ]
+        },
+        "mondai_3": {
+          "total": 6,
+          "ansDist": [
+            3,
+            3,
+            0,
+            0
+          ],
+          "optsCounts": [
+            3
+          ]
+        },
+        "mondai_4": {
+          "total": 8,
+          "ansDist": [
+            4,
+            3,
+            1,
+            0
+          ],
+          "optsCounts": [
+            3
+          ]
+        }
+      }
+    },
+    "skillsLab": {
+      "count": 1407,
+      "answerIndexDistribution": {
+        "0": 300,
+        "1": 300,
+        "2": 300,
+        "3": 300,
+        "undefined": 207
+      },
+      "modeDistribution": {
+        "dictation": 207,
+        "gist": 240,
+        "detail": 240,
+        "inference": 240,
+        "attitude": 240,
+        "paraphrase": 240
+      }
+    },
+    "exam": {
+      "setsCount": 8,
+      "totalQuestions": 57,
+      "answerIndexDistribution": {
+        "0": 10,
+        "1": 10,
+        "2": 10,
+        "3": 8,
+        "undefined": 19
+      }
+    }
+  }
+}

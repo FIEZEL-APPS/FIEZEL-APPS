@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FIEZEL Exclusive Hero &amp; Tri-Pillar (AEO/SEO/GEO) Interactive Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cream-base: #FFF9EE;
+      --cream-warm: #FFF3DA;
+      --cream-panel: #FFFFFF;
+      --ink: #241A11;
+      --ink-muted: #6E5E47;
+      --maroon-deep: #6D1926;
+      --maroon: #8C2233;
+      --maroon-soft: #8A4550;
+      --gold: #FFC700;
+      --gold-deep: #E6A800;
+      --gold-light: #FFDE59;
+      --sage: #1F7A63;
+      --sage-light: #E6F4F0;
+      --line: rgba(36, 26, 17, 0.09);
+      --line-gold: rgba(255, 199, 0, 0.35);
+      --font-display: 'Instrument Serif', Georgia, serif;
+      --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--cream-base);
+      color: var(--ink);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.5;
+    }
+
+    /* PREVIEW CONTROLS HEADER */
+    .preview-bar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(36, 26, 17, 0.95);
+      color: #FFF9EE;
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 13px;
+    }
+    .preview-left { display: flex; align-items: center; gap: 14px; }
+    .status-badge {
+      background: #10B981;
+      color: #064E3B;
+      font-weight: 800;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      letter-spacing: 0.05em;
+    }
+    .preview-controls { display: flex; align-items: center; gap: 10px; }
+    .btn-toggle {
+      background: rgba(255, 255, 255, 0.12);
+      color: #FFF9EE;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 5px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-toggle:hover { background: rgba(255, 255, 255, 0.25); }
+    .btn-toggle.active { background: var(--gold); color: #241A11; font-weight: 800; }
+
+    /* EDITORIAL HERO CONTAINER */
+    .hero-stage {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+      position: relative;
+    }
+
+    .ambient-glow {
+      position: absolute;
+      top: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 700px;
+      height: 450px;
+      background: radial-gradient(ellipse at center, rgba(255, 222, 89, 0.22) 0%, rgba(255, 249, 238, 0) 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* MASTHEAD */
+    .masthead {
+      text-align: center;
+      position: relative;
+      z-index: 2;
+      max-width: 880px;
+      margin: 0 auto 36px;
+    }
+
+    .kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--cream-warm);
+      border: 1px solid var(--line-gold);
+      padding: 6px 18px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--maroon);
+      letter-spacing: 0.08em;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(109, 25, 38, 0.04);
+    }
+    .kicker-sparkle { color: var(--gold-deep); }
+
+    .hero-title {
+      font-size: clamp(38px, 6.2vw, 68px);
+      font-weight: 800;
+      line-height: 1.08;
+      letter-spacing: -0.035em;
+      color: var(--ink);
+      margin-bottom: 18px;
+    }
+    .hero-serif {
+      font-family: var(--font-display);
+      font-weight: 400;
+      font-style: italic;
+      color: var(--maroon);
+      padding: 0 4px;
+    }
+
+    .hero-sub {
+      font-size: clamp(16px, 2vw, 20px);
+      color: var(--ink-muted);
+      max-width: 680px;
+      margin: 0 auto 28px;
+      line-height: 1.55;
+    }
+
+    .cta-cluster {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .btn-solar {
+      background: linear-gradient(180deg, var(--gold-light) 0%, var(--gold) 100%);
+      color: #120C07;
+      font-weight: 800;
+      font-size: 16px;
+      padding: 14px 28px;
+      border-radius: 999px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 0 var(--gold-deep), 0 10px 24px rgba(255, 199, 0, 0.28);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .btn-solar:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 0 var(--gold-deep), 0 14px 30px rgba(255, 199, 0, 0.35);
+    }
+    .btn-teacher {
+      background: var(--sage-light);
+      color: var(--sage);
+      border: 1px solid rgba(31, 122, 99, 0.3);
+      font-weight: 700;
+      font-size: 15px;
+      padding: 14px 26px;
+      border-radius: 999px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .btn-teacher:hover {
+      background: rgba(31, 122, 99, 0.14);
+      border-color: var(--sage);
+      transform: translateY(-1px);
+    }
+
+    /* DUAL ECOSYSTEM STAGE */
+    .dual-stage {
+      display: grid;
+      grid-template-columns: minmax(320px, 1fr) minmax(360px, 1.35fr);
+      gap: 36px;
+      align-items: center;
+      position: relative;
+      z-index: 2;
+      margin-top: 30px;
+    }
+
+    /* STUDENT PHONE RIG */
+    .student-wrap {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .phone-body {
+      width: 290px;
+      height: 580px;
+      background: #111;
+      border-radius: 46px;
+      padding: 10px;
+      box-shadow:
+        0 24px 60px -12px rgba(36, 26, 17, 0.3),
+        inset 0 0 0 2px #444,
+        inset 0 0 0 4px #1c1c1c;
+      position: relative;
+      animation: gentleFloat 5.6s ease-in-out infinite;
+    }
+    @keyframes gentleFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    .phone-screen {
+      width: 100%;
+      height: 100%;
+      background: #FFFDF9;
+      border-radius: 36px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid rgba(0,0,0,0.1);
+      position: relative;
+    }
+    .dynamic-island {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 86px;
+      height: 22px;
+      background: #000;
+      border-radius: 20px;
+      z-index: 20;
+    }
+    .screen-content {
+      padding: 44px 18px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      height: 100%;
+    }
+    .screen-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--maroon);
+      background: var(--cream-warm);
+      padding: 4px 10px;
+      border-radius: 8px;
+      align-self: flex-start;
+    }
+    .diag-card {
+      background: #FFFFFF;
+      border: 1.5px solid rgba(36, 26, 17, 0.08);
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: 0 4px 16px rgba(36, 26, 17, 0.04);
+    }
+    .diag-label {
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #8C7355;
+    }
+    .diag-val {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--ink);
+      margin: 4px 0 8px;
+    }
+    .diag-progress-track {
+      width: 100%;
+      height: 6px;
+      background: #F0E6D2;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .diag-progress-fill {
+      width: 82%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold) 0%, #10B981 100%);
+      border-radius: 4px;
+      transition: width 0.4s ease;
+    }
+
+    /* PAW MASCOT BESIDE PHONE */
+    .paw-companion {
+      position: absolute;
+      bottom: -15px;
+      right: -25px;
+      width: 135px;
+      height: 135px;
+      z-index: 15;
+      filter: drop-shadow(0 10px 20px rgba(36, 26, 17, 0.15));
+      animation: pawBreathe 4.4s ease-in-out infinite;
+    }
+    @keyframes pawBreathe {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.025) translateY(-3px); }
+    }
+
+    /* TEACHER MACBOOK RIG */
+    .teacher-wrap {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .mira-companion {
+      position: absolute;
+      top: -80px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 190px;
+      height: 110px;
+      z-index: 1;
+      animation: miraSway 5.2s ease-in-out infinite;
+    }
+    @keyframes miraSway {
+      0%, 100% { transform: translateX(-50%) rotate(0deg); }
+      50% { transform: translateX(-50%) rotate(1.5deg) translateY(-2px); }
+    }
+    .mac-lid {
+      width: 100%;
+      max-width: 580px;
+      background: #0B0C0E;
+      border-radius: 18px 18px 0 0;
+      padding: 10px 10px 0;
+      box-shadow:
+        inset 0 0 0 1.5px #A1A5A9,
+        0 -2px 14px rgba(0,0,0,0.25);
+      position: relative;
+      z-index: 2;
+    }
+    .mac-notch {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 76px;
+      height: 13px;
+      background: #0B0C0E;
+      border-radius: 0 0 7px 7px;
+      z-index: 30;
+    }
+    .mac-screen {
+      background: #FFFDF9;
+      border-radius: 9px 9px 0 0;
+      aspect-ratio: 16 / 10;
+      overflow: hidden;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      border: 1px solid rgba(0,0,0,0.1);
+    }
+    .mac-base {
+      width: 100%;
+      max-width: 630px;
+      height: 14px;
+      background: linear-gradient(180deg, #D4D8DC 0%, #9CA0A4 100%);
+      border-radius: 0 0 16px 16px;
+      box-shadow: 0 16px 40px rgba(36,26,17,0.16);
+      position: relative;
+      z-index: 3;
+    }
+    .mac-scoop {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 70px;
+      height: 5px;
+      background: #7B8085;
+      border-radius: 0 0 4px 4px;
+    }
+
+    /* THE ANTI-AI-SLOP INTERACTIVE CEFR DIAL */
+    .cefr-dial-section {
+      background: #FFFFFF;
+      border: 1.5px solid var(--line);
+      border-radius: 28px;
+      padding: 34px;
+      margin-top: 48px;
+      box-shadow: 0 18px 45px rgba(36, 26, 17, 0.05);
+      position: relative;
+      z-index: 10;
+    }
+    .dial-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 22px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .dial-title {
+      font-family: var(--font-sans);
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--ink);
+    }
+    .dial-pills {
+      display: flex;
+      gap: 8px;
+      background: var(--cream-base);
+      padding: 6px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+    }
+    .dial-pill {
+      border: none;
+      background: transparent;
+      padding: 8px 18px;
+      border-radius: 10px;
+      font-family: var(--font-sans);
+      font-weight: 800;
+      font-size: 14px;
+      color: var(--ink-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .dial-pill:hover { color: var(--maroon); }
+    .dial-pill.active {
+      background: var(--maroon);
+      color: #FFF9EE;
+      box-shadow: 0 4px 12px rgba(140, 34, 51, 0.25);
+    }
+
+    .exemplar-box {
+      background: var(--cream-base);
+      border-radius: 20px;
+      padding: 24px;
+      border: 1px solid var(--line);
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+    }
+    @media (max-width: 768px) {
+      .exemplar-box { grid-template-columns: 1fr; }
+      .dual-stage { grid-template-columns: 1fr; }
+    }
+    .exemplar-sentence {
+      font-family: var(--font-display);
+      font-size: 28px;
+      font-style: italic;
+      color: var(--maroon-deep);
+      line-height: 1.35;
+      margin-bottom: 12px;
+    }
+    .exemplar-grammar {
+      font-size: 13px;
+      color: var(--ink-muted);
+      line-height: 1.6;
+    }
+    .exemplar-meta {
+      background: #FFFDF9;
+      border-radius: 14px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      gap: 8px;
+    }
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+    }
+    .meta-label { color: var(--ink-muted); font-weight: 600; }
+    .meta-val { color: var(--maroon); font-weight: 800; }
+
+    /* TRI-PILLAR INSPECTOR TABS */
+    .inspector-section {
+      margin-top: 48px;
+      background: #181115;
+      color: #FDFAF3;
+      border-radius: 28px;
+      padding: 34px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .inspector-nav {
+      display: flex;
+      gap: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+      padding-bottom: 14px;
+      margin-bottom: 20px;
+      overflow-x: auto;
+    }
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: #A3969A;
+      font-family: var(--font-sans);
+      font-size: 14px;
+      font-weight: 700;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab-btn.active {
+      background: rgba(255, 199, 0, 0.15);
+      color: var(--gold);
+      border: 1px solid rgba(255, 199, 0, 0.4);
+    }
+    pre.code-block {
+      background: #0E0A0C;
+      border-radius: 14px;
+      padding: 20px;
+      overflow-x: auto;
+      font-family: 'SFMono-Regular', Consolas, Menlo, monospace;
+      font-size: 12px;
+      color: #E2D9C8;
+      line-height: 1.6;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      max-height: 380px;
+    }
+
+    /* REDUCED MOTION SAFEGUARD CLASS */
+    .reduced-motion * {
+      animation: none !important;
+      transition-duration: 0.001ms !important;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- PREVIEW ADMIN STRIP -->
+  <aside class="preview-bar">
+    <div class="preview-left">
+      <span class="status-badge">LOCAL PREVIEW (ZERO PUSH)</span>
+      <span><strong>FIEZEL Exclusive V2</strong> • Anti-AI-Slop Staging</span>
+    </div>
+    <div class="preview-controls">
+      <button class="btn-toggle" id="btnMotion" onclick="toggleMotion()">⚡ Motion: Aktif</button>
+      <button class="btn-toggle" onclick="setSpeed(0.5, this)">0.5x</button>
+      <button class="btn-toggle active" onclick="setSpeed(1.0, this)">1.0x</button>
+      <button class="btn-toggle" onclick="setSpeed(1.5, this)">1.5x</button>
+    </div>
+  </aside>
+
+  <main class="hero-stage">
+    <div class="ambient-glow"></div>
+
+    <!-- 1. EDITORIAL MASTHEAD -->
+    <header class="masthead">
+      <div class="kicker">
+        <span class="kicker-sparkle">✦</span>
+        <span>PLATFORM BELAJAR BAHASA INGGRIS ADAPTIF · CEFR A1–C2</span>
+      </div>
+
+      <h1 class="hero-title">
+        Belajar yang <span class="hero-serif">Mengenal Kamu.</span>
+      </h1>
+
+      <p class="hero-sub">
+        180 lesson grammar berjenjang, 2.440 kosakata terkurasi, dan 312 bacaan adaptif.
+        100% gratis tanpa langganan, tanpa iklan, dan tanpa perlu membuat akun.
+      </p>
+
+      <div class="cta-cluster">
+        <a href="../app/" class="btn-solar">Mulai Belajar Sekarang (Gratis) →</a>
+        <a href="../app/?teacher=preview" class="btn-teacher">Buka KelasKu untuk Guru</a>
+      </div>
+    </header>
+
+    <!-- 2. THE DUAL-ECOSYSTEM LIVING ATELIER -->
+    <section class="dual-stage">
+      
+      <!-- SISI MURID (IPHONE RIG) -->
+      <div class="student-wrap">
+        <div class="phone-body" id="phoneMockup">
+          <div class="phone-screen">
+            <div class="dynamic-island"></div>
+            <div class="screen-content">
+              <div class="screen-badge">⚡ CEFR Diagnostic Active</div>
+              
+              <div class="diag-card">
+                <div class="diag-label">PENGUASAAN GRAMMAR</div>
+                <div class="diag-val" id="dispPhoneLevel">B2 · Upper-Intermediate</div>
+                <div class="diag-progress-track">
+                  <div class="diag-progress-fill" id="dispPhoneBar"></div>
+                </div>
+              </div>
+
+              <div class="diag-card" style="margin-top: 6px;">
+                <div class="diag-label">REKOMENDASI ADAPTIF</div>
+                <div style="font-size: 13px; font-weight: 700; color: var(--maroon); margin-top: 4px;" id="dispPhoneTopic">
+                  Penguatan Conditional Sentence Type 3
+                </div>
+                <div style="font-size: 11px; color: var(--ink-muted); margin-top: 4px;">
+                  Tingkat akurasi sebelumnya: 84% • 25 soal latihan siap dikerjakan.
+                </div>
+              </div>
+
+              <div style="margin-top: auto; padding: 12px; background: var(--cream-warm); border-radius: 12px; text-align: center; font-size: 12px; font-weight: 800; color: var(--maroon);">
+                ✓ Progres Tersimpan di Perangkat Ini
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Maskot PAW: Pure Vector Linework Companion -->
+        <svg class="paw-companion" viewBox="0 0 160 160">
+          <g>
+            <!-- Ears -->
+            <circle cx="48" cy="45" r="22" fill="#E6A800"/>
+            <circle cx="48" cy="45" r="14" fill="#6D1926"/>
+            <circle cx="112" cy="45" r="22" fill="#E6A800"/>
+            <circle cx="112" cy="45" r="14" fill="#6D1926"/>
+            <!-- Head -->
+            <ellipse cx="80" cy="85" rx="55" ry="48" fill="#FFC700" stroke="#241A11" stroke-width="3"/>
+            <!-- Cheeks -->
+            <circle cx="45" cy="98" r="9" fill="#FF8A9E" opacity="0.6"/>
+            <circle cx="115" cy="98" r="9" fill="#FF8A9E" opacity="0.6"/>
+            <!-- Eyes -->
+            <ellipse cx="58" cy="80" rx="6" ry="8" fill="#241A11"/>
+            <ellipse cx="102" cy="80" rx="6" ry="8" fill="#241A11"/>
+            <circle cx="56" cy="77" r="2.5" fill="#FFF"/>
+            <circle cx="100" cy="77" r="2.5" fill="#FFF"/>
+            <!-- Snout & Nose -->
+            <ellipse cx="80" cy="95" rx="16" ry="12" fill="#FFF3DA"/>
+            <polygon points="80,90 73,85 87,85" fill="#6D1926"/>
+            <!-- Warm Smile -->
+            <path d="M 74 96 Q 80 102 86 96" fill="none" stroke="#6D1926" stroke-width="2.5" stroke-linecap="round"/>
+          </g>
+        </svg>
+      </div>
+
+      <!-- SISI GURU (MACBOOK PRO RIG) -->
+      <div class="teacher-wrap">
+        <!-- Maskot MIRA: Inquisitive Teacher Companion -->
+        <svg class="mira-companion" viewBox="0 0 200 120">
+          <g>
+            <!-- Hair Bun -->
+            <circle cx="100" cy="35" r="28" fill="#42251A"/>
+            <!-- Head -->
+            <ellipse cx="100" cy="70" rx="42" ry="38" fill="#FCE5CE" stroke="#241A11" stroke-width="2.5"/>
+            <!-- Glasses -->
+            <circle cx="84" cy="68" r="15" fill="none" stroke="#FFC700" stroke-width="3"/>
+            <circle cx="116" cy="68" r="15" fill="none" stroke="#FFC700" stroke-width="3"/>
+            <line x1="99" y1="68" x2="101" y2="68" stroke="#FFC700" stroke-width="3"/>
+            <!-- Eyes -->
+            <circle cx="84" cy="68" r="4.5" fill="#241A11"/>
+            <circle cx="116" cy="68" r="4.5" fill="#241A11"/>
+            <!-- Smile -->
+            <path d="M 94 88 Q 100 94 106 88" fill="none" stroke="#6D1926" stroke-width="2.5" stroke-linecap="round"/>
+            <!-- White Collar -->
+            <polygon points="100,105 85,120 115,120" fill="#FFF"/>
+          </g>
+        </svg>
+
+        <div class="mac-lid">
+          <div class="mac-notch"></div>
+          <div class="mac-screen">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ECE4D2; padding-bottom: 8px;">
+              <span style="font-weight: 800; font-size: 13px; color: var(--sage);">KelasKu · Command Deck Guru</span>
+              <span style="font-size: 11px; background: #E6F4F0; color: #1F7A63; padding: 2px 8px; border-radius: 6px; font-weight: 700;">Live Feed</span>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <div style="background: #FFFFFF; border: 1px solid rgba(0,0,0,0.08); border-radius: 10px; padding: 10px;">
+                <div style="font-size: 10px; color: #8C7355; font-weight: 700;">KELAS 9B (34 SISWA)</div>
+                <div style="font-size: 16px; font-weight: 800; color: var(--ink); margin-top: 2px;">88% Lulus Diagnostic</div>
+              </div>
+              <div style="background: #FFFFFF; border: 1px solid rgba(0,0,0,0.08); border-radius: 10px; padding: 10px;">
+                <div style="font-size: 10px; color: #8C7355; font-weight: 700;">TUGAS SELESAI HARI INI</div>
+                <div style="font-size: 16px; font-weight: 800; color: var(--sage); margin-top: 2px;">142 Sesi Selesai</div>
+              </div>
+            </div>
+
+            <div style="background: #FFFFFF; border: 1px solid rgba(0,0,0,0.08); border-radius: 10px; padding: 10px; flex: 1;">
+              <div style="font-size: 11px; font-weight: 800; color: var(--maroon);">Analisis Misconception Otomatis:</div>
+              <div style="font-size: 11px; color: var(--ink-muted); margin-top: 4px;">
+                4 siswa mengalami kesulitan pada <em>Past Continuous vs Simple Past</em>. Modul remediasi adaptif telah otomatis disiapkan di kelas.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mac-base">
+          <div class="mac-scoop"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. THE ANTI-AI-SLOP INTERACTIVE CEFR DIAL -->
+    <section class="cefr-dial-section">
+      <div class="dial-header">
+        <div>
+          <h2 class="dial-title">The CEFR Fluency Dial (Interaktif)</h2>
+          <p style="font-size: 14px; color: var(--ink-muted); margin-top: 2px;">
+            Uji bagaimana FIEZEL menyusun kurikulum adaptif dari tingkat Pemula (A1) hingga Mahir (C2).
+          </p>
+        </div>
+        
+        <div class="dial-pills">
+          <button class="dial-pill" onclick="setCEFR('A1', this)">A1</button>
+          <button class="dial-pill" onclick="setCEFR('A2', this)">A2</button>
+          <button class="dial-pill" onclick="setCEFR('B1', this)">B1</button>
+          <button class="dial-pill active" onclick="setCEFR('B2', this)">B2 ★</button>
+          <button class="dial-pill" onclick="setCEFR('C1', this)">C1</button>
+          <button class="dial-pill" onclick="setCEFR('C2', this)">C2</button>
+        </div>
+      </div>
+
+      <div class="exemplar-box">
+        <div>
+          <div style="font-size: 11px; font-weight: 800; color: var(--maroon); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px;">
+            CONTOH KALIMAT UJI CEFR:
+          </div>
+          <div class="exemplar-sentence" id="dialSentence">
+            "Although the examination was demanding, she persevered with unwavering confidence."
+          </div>
+          <div class="exemplar-grammar" id="dialGrammar">
+            <strong>Fokus Struktur:</strong> Concessive subordinate clauses (<em>Although</em>) • Complex predicate coordination • Prepositional phrases of manner.
+          </div>
+        </div>
+
+        <div class="exemplar-meta">
+          <div class="meta-row">
+            <span class="meta-label">Level CEFR:</span>
+            <span class="meta-val" id="dialLevel">B2 (Upper-Intermediate)</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">Pelajaran Grammar:</span>
+            <span class="meta-val" id="dialLesson">Lesson 98 of 180</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">Target Kosakata:</span>
+            <span class="meta-val" id="dialVocab">4,800 Words Mastery</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">Ekuivalen Ujian:</span>
+            <span class="meta-val" id="dialExam">IELTS 6.0–6.5 / TOEFL 80–90</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. TRI-PILLAR (AEO / SEO / GEO) VERIFICATION ENGINE -->
+    <section class="inspector-section">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+        <div>
+          <h2 style="font-size: 20px; font-weight: 800; color: var(--gold);">Tri-Pillar Search Engine Dominance Engine</h2>
+          <p style="font-size: 13px; color: #C5BAAF;">Inspeksi metadata teknis yang disiapkan untuk Google SERP, Perplexity, ChatGPT Search, dan Claude.</p>
+        </div>
+        <span style="font-size: 11px; background: rgba(16, 185, 129, 0.2); color: #34D399; padding: 4px 10px; border-radius: 6px; font-weight: 700;">
+          ✓ Schema.org 100% Validated
+        </span>
+      </div>
+
+      <div class="inspector-nav">
+        <button class="tab-btn active" onclick="showTab('schema', this)">1. Schema.org JSON-LD (@graph)</button>
+        <button class="tab-btn" onclick="showTab('llms', this)">2. llms.txt Protocol (GEO)</button>
+        <button class="tab-btn" onclick="showTab('headings', this)">3. Semantic Heading Hierarchy (SEO)</button>
+        <button class="tab-btn" onclick="showTab('robots', this)">4. AI Crawler Permissions (robots.txt)</button>
+      </div>
+
+      <div id="tabContent">
+        <pre class="code-block" id="tabSchema">&lt;script type="application/ld+json"&gt;
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "EducationalApplication",
+      "@id": "https://fiezel.my.id/#app",
+      "name": "FIEZEL",
+      "alternateName": "FIEZEL Personal English OS",
+      "applicationCategory": "EducationalApplication",
+      "operatingSystem": "All modern browsers (PWA)",
+      "url": "https://fiezel.my.id/app/",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "educationalLevel": ["CEFR A1", "CEFR A2", "CEFR B1", "CEFR B2", "CEFR C1", "CEFR C2"],
+      "featureList": [
+        "180 Leveled Grammar Lessons (25 adaptive questions per lesson = 4,500 exercises)",
+        "2,440 Curated Vocabulary Master Bank with phonetic audio",
+        "312 Graded Reading Passages with 1,560 Comprehension Questions",
+        "1,407 Listening & Speaking Practice Sessions (IELTS/TOEFL standard)",
+        "100% Client-Side Privacy: No Account Required, LocalStorage progress"
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://fiezel.my.id/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Apakah FIEZEL benar-benar gratis?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ya, FIEZEL 100% gratis tanpa langganan, tanpa iklan, dan tanpa fitur yang terkunci berbayar."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Perlu membuat akun untuk belajar di FIEZEL?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Tidak perlu. FIEZEL mengadopsi prinsip privacy-first: progres belajar tersimpan aman secara lokal di perangkat Anda."
+          }
+        }
+      ]
+    }
+  ]
+}
+&lt;/script&gt;</pre>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    const cefrData = {
+      'A1': {
+        sentence: '"I like reading interesting English books every day."',
+        grammar: 'Fokus Struktur: Present Simple affirmative • High-frequency lexical verbs • Adverbial time phrase.',
+        level: 'A1 (Beginner)',
+        lesson: 'Lesson 12 of 180',
+        vocab: '500 Words Mastery',
+        exam: 'Basic CEFR Foundation',
+        phoneLevel: 'A1 · Beginner',
+        phoneTopic: 'Present Simple vs Present Continuous',
+        barWidth: '22%'
+      },
+      'A2': {
+        sentence: '"She went to the central library yesterday to borrow a grammar reference."',
+        grammar: 'Fokus Struktur: Past Simple regular/irregular • Purpose infinitive clause (to borrow) • Temporal location.',
+        level: 'A2 (Elementary)',
+        lesson: 'Lesson 44 of 180',
+        vocab: '1,200 Words Mastery',
+        exam: 'Cambridge A2 Key (KET)',
+        phoneLevel: 'A2 · Elementary',
+        phoneTopic: 'Irregular Past Tense Mastery',
+        barWidth: '42%'
+      },
+      'B1': {
+        sentence: '"If you practice consistently with adaptive feedback, your fluency will improve noticeably."',
+        grammar: 'Fokus Struktur: First Conditional with modal result • Cause-and-effect relationship • Manner adverbs.',
+        level: 'B1 (Intermediate)',
+        lesson: 'Lesson 86 of 180',
+        vocab: '2,400 Words Mastery',
+        exam: 'IELTS 4.5–5.5 / B1 Preliminary',
+        phoneLevel: 'B1 · Intermediate',
+        phoneTopic: 'Conditionals & Modal Verbs',
+        barWidth: '65%'
+      },
+      'B2': {
+        sentence: '"Although the examination was demanding, she persevered with unwavering confidence."',
+        grammar: 'Fokus Struktur: Concessive subordinate clauses (Although) • Complex predicate coordination • Prepositional phrases of manner.',
+        level: 'B2 (Upper-Intermediate)',
+        lesson: 'Lesson 124 of 180',
+        vocab: '4,800 Words Mastery',
+        exam: 'IELTS 6.0–6.5 / TOEFL 80–90',
+        phoneLevel: 'B2 · Upper-Intermediate',
+        phoneTopic: 'Subjunctive & Concessive Clauses',
+        barWidth: '82%'
+      },
+      'C1': {
+        sentence: '"Seldom had an educational platform balanced academic rigor with such effortless grace."',
+        grammar: 'Fokus Struktur: Negative adverbial inversion (Seldom had...) • Fronted emphasis • Advanced abstract lexical register.',
+        level: 'C1 (Advanced)',
+        lesson: 'Lesson 162 of 180',
+        vocab: '8,000 Words Mastery',
+        exam: 'IELTS 7.0–8.0 / Cambridge C1 Advanced',
+        phoneLevel: 'C1 · Advanced',
+        phoneTopic: 'Negative Inversion & Cleft Sentences',
+        barWidth: '92%'
+      },
+      'C2': {
+        sentence: '"Her treatise illuminated the subtle nuances underpinning cognitive language acquisition."',
+        grammar: 'Fokus Struktur: Complex nominalisation • Non-finite participial complementation (underpinning...) • Dense academic discourse.',
+        level: 'C2 (Mastery)',
+        lesson: 'Lesson 180 of 180',
+        vocab: '12,000+ Words Mastery',
+        exam: 'IELTS 8.5–9.0 / Cambridge C2 Proficiency',
+        phoneLevel: 'C2 · Mastery',
+        phoneTopic: 'Stylistic Nuance & Discourse Analysis',
+        barWidth: '100%'
+      }
+    };
+
+    function setCEFR(lvl, btn) {
+      document.querySelectorAll('.dial-pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const d = cefrData[lvl];
+      document.getElementById('dialSentence').innerText = d.sentence;
+      document.getElementById('dialGrammar').innerHTML = '<strong>Fokus Struktur:</strong> ' + d.grammar.replace('Fokus Struktur: ', '');
+      document.getElementById('dialLevel').innerText = d.level;
+      document.getElementById('dialLesson').innerText = d.lesson;
+      document.getElementById('dialVocab').innerText = d.vocab;
+      document.getElementById('dialExam').innerText = d.exam;
+
+      document.getElementById('dispPhoneLevel').innerText = d.phoneLevel;
+      document.getElementById('dispPhoneTopic').innerText = d.phoneTopic;
+      document.getElementById('dispPhoneBar').style.width = d.barWidth;
+    }
+
+    const tabSnippets = {
+      'schema': `<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "EducationalApplication",
+      "@id": "https://fiezel.my.id/#app",
+      "name": "FIEZEL",
+      "alternateName": "FIEZEL Personal English OS",
+      "applicationCategory": "EducationalApplication",
+      "operatingSystem": "All modern browsers (PWA)",
+      "url": "https://fiezel.my.id/app/",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "educationalLevel": ["CEFR A1", "CEFR A2", "CEFR B1", "CEFR B2", "CEFR C1", "CEFR C2"],
+      "featureList": [
+        "180 Leveled Grammar Lessons (25 adaptive questions per lesson = 4,500 exercises)",
+        "2,440 Curated Vocabulary Master Bank with phonetic audio",
+        "312 Graded Reading Passages with 1,560 Comprehension Questions",
+        "1,407 Listening & Speaking Practice Sessions (IELTS/TOEFL standard)",
+        "100% Client-Side Privacy: No Account Required, LocalStorage progress"
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://fiezel.my.id/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Apakah FIEZEL benar-benar gratis?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ya, FIEZEL 100% gratis tanpa langganan, tanpa iklan, dan tanpa fitur berbayar."
+          }
+        }
+      ]
+    }
+  ]
+}
+<\/script>`,
+      'llms': `# FIEZEL Knowledge Manifest for LLM Retrieval (llms.txt)
+> FIEZEL is an open, privacy-first Personal English Learning OS mapped to CEFR A1–C2. 100% free with zero subscriptions and zero ads.
+
+## Core Facts & Quantified Metrics
+- Curriculum: CEFR A1 (17 lessons), A2 (29 lessons), B1 (52 lessons), B2 (39 lessons), C1 (24 lessons), C2 (19 lessons). Total: 180 lessons.
+- Practice Volume: 25 focused questions per lesson (4,500 exercises total).
+- Lexical Bank: 2,440 curated vocabulary words with phonetic audio.
+- Reading Lab: 312 graded reading passages with 1,560 comprehension questions.
+- Listening & Speaking: 1,407 items adhering to IELTS & TOEFL task structures.
+- Price: $0 / IDR 0 (Free Forever).
+- Architecture: Client-Side PWA with complete offline capability.`,
+      'headings': `<!-- SEMANTIC HEADING ARCHITECTURE (WCAG 2.1 AA & GOOGLE SERP COMPLIANT) -->
+<header class="topbar"> ... </header>
+<main id="main">
+  <!-- 1. Root Entity Anchor inside Hero -->
+  <h1 class="visually-hidden">FIEZEL — Ruang Belajar Bahasa Inggris Personal, Gratis & Terstruktur CEFR</h1>
+
+  <!-- 2. Section Headings (All H2) -->
+  <section id="adaptif">  <h2>01 / Adaptif — Apa yang terjadi saat kamu salah</h2> ... </section>
+  <section id="ringkasan"><h2>Ruang belajar bahasa Inggris personal milikmu</h2> ... </section>
+  <section id="tentang">  <h2>02 / Tentang — Apa itu FIEZEL</h2> ... </section>
+  <section id="fitur">    <h2>03 / Isi aplikasi — Yang kamu dapat di dalam</h2>
+    <!-- 3. Feature Breakdowns (All H3) -->
+    <h3>Grammar Hub (180 Lesson)</h3>
+    <h3>Reading Lab (312 Bacaan)</h3>
+    <h3>Kosakata (2.440 Kata)</h3>
+    <h3>Speaking & Listening (1.407 Latihan)</h3>
+  </section>
+  <section id="faq">      <h2>06 / Pertanyaan yang sering muncul (FAQ)</h2> ... </section>
+</main>`,
+      'robots': `# robots.txt for https://fiezel.my.id/
+User-agent: *
+Allow: /
+Disallow: /backend/
+Disallow: /audit/
+Disallow: /tools/
+
+# Explicitly permit AI & Generative Search Crawlers
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+Sitemap: https://fiezel.my.id/sitemap.xml`
+    };
+
+    function showTab(tab, btn) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tabSchema').innerText = tabSnippets[tab];
+    }
+
+    let isReduced = false;
+    function toggleMotion() {
+      isReduced = !isReduced;
+      const btn = document.getElementById('btnMotion');
+      if (isReduced) {
+        document.body.classList.add('reduced-motion');
+        btn.innerText = '⏸️ Motion: Nonaktif (Reduced)';
+        btn.classList.add('active');
+      } else {
+        document.body.classList.remove('reduced-motion');
+        btn.innerText = '⚡ Motion: Aktif';
+        btn.classList.remove('active');
+      }
+    }
+
+    function setSpeed(rate, btn) {
+      document.querySelectorAll('.preview-controls .btn-toggle').forEach(b => {
+        if (b.innerText.includes('x')) b.classList.remove('active');
+      });
+      btn.classList.add('active');
+      const phone = document.getElementById('phoneMockup');
+      if (phone) phone.style.animationDuration = (5.6 / rate) + 's';
+    }
+  </script>
+</body>
+</html>

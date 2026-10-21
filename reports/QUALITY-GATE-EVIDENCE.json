@@ -1,0 +1,20 @@
+{
+  "schema": "fiezel-quality-gate-evidence-v1",
+  "version": "5.18.0",
+  "automatedStatus": "PASS",
+  "releaseDecision": "NOT READY",
+  "releaseBlocker": "real_device_neural_voice_gate_pending",
+  "evidence": {
+    "releaseAudit": "145/0",
+    "productAudit": "49/0",
+    "grammarQuality": "24/0",
+    "speakingListening": "25/0",
+    "neuralVoice": "28/0",
+    "contentQaBlockers": 0,
+    "contentQaReview": 61,
+    "securityFindings": 0,
+    "httpRange": "PASS",
+    "pwa": "PASS"
+  },
+  "externalAction": "NONE"
+}

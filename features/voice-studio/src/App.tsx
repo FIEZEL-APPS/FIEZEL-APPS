@@ -54,49 +54,29 @@ import {
 } from './lib/liveCallHelper';
 import {
   evaluateTurnFlexible,
+  float32ToPcm16Base64,
   LiveTransportMode,
+  pcm16Base64ToAudioBuffer,
   resolveLiveCallWebSocketUrls,
   synthesizeFlexibleTts,
 } from './lib/liveTransport';
 
-function float32ToPcm16Base64(float32: Float32Array): string {
-  const int16 = new Int16Array(float32.length);
-  for (let i = 0; i < float32.length; i++) {
-    const s = Math.max(-1, Math.min(1, float32[i]));
-    int16[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
-  }
-  const bytes = new Uint8Array(int16.buffer);
-  let binary = '';
-  for (let i = 0; i < bytes.byteLength; i++) {
-    binary += String.fromCharCode(bytes[i]);
-  }
-  return btoa(binary);
-}
-
-function pcm16Base64ToAudioBuffer(
-  audioCtx: AudioContext,
-  base64: string,
-  sampleRate = 24000
-): AudioBuffer {
-  const binary = atob(base64);
-  const len = binary.length;
-  const bytes = new Uint8Array(len);
-  for (let i = 0; i < len; i++) {
-    bytes[i] = binary.charCodeAt(i);
-  }
-  const int16 = new Int16Array(bytes.buffer);
-  const float32 = new Float32Array(int16.length);
-  for (let i = 0; i < int16.length; i++) {
-    float32[i] = int16[i] / 32768.0;
-  }
-  const buffer = audioCtx.createBuffer(1, float32.length, sampleRate);
-  buffer.getChannelData(0).set(float32);
-  return buffer;
-}
-
 export default function App() {
   const [brainState, setBrainState] = useState<BraincoreStoreState>(() => loadBraincoreState());
-  const [activeTab, setActiveTab] = useState<'home' | 'call' | 'braincore'>('call');
+  const [activeTab, setActiveTab] = useState<'home' | 'call' | 'braincore'>(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        const urlParams = new URLSearchParams(window.location.search);
+        const tabParam = urlParams.get('tab') || urlParams.get('view');
+        if (tabParam === 'home' || tabParam === 'call' || tabParam === 'braincore') {
+          return tabParam;
+        }
+      }
+    } catch {
+      // Ignore
+    }
+    return 'call';
+  });
   const [activeScenarioId, setActiveScenarioId] = useState<string>('scen_en_a1_hometown');
   const [customMeasureOverride, setCustomMeasureOverride] = useState<boolean | null>(null);
 
@@ -514,6 +494,24 @@ export default function App() {
 
   const startPttRecording = async () => {
     try {
+      // Immediate barge-in: cancel any playing AI audio or speech synthesis
+      if (currentAudioElRef.current) {
+        try {
+          currentAudioElRef.current.pause();
+          currentAudioElRef.current = null;
+        } catch {
+          // Ignore
+        }
+      }
+      if ('speechSynthesis' in window) {
+        try {
+          window.speechSynthesis.cancel();
+        } catch {
+          // Ignore
+        }
+      }
+      setIsPlayingAiAudio(false);
+
       setStatusBanner(null);
       liveDictatedTextRef.current = '';
 
@@ -693,12 +691,18 @@ export default function App() {
               outputAudioCtxRef.current = outputCtx;
               nextStartTimeRef.current = outputCtx.currentTime;
             }
+            if (outputAudioCtxRef.current.state === 'suspended') {
+              void outputAudioCtxRef.current.resume().catch(() => {});
+            }
             void navigator.mediaDevices
               ?.getUserMedia({ audio: true })
               .then((stream) => {
                 micStreamRef.current = stream;
                 const inputCtx = new AudioContext({ sampleRate: 16000 });
                 inputAudioCtxRef.current = inputCtx;
+                if (inputCtx.state === 'suspended') {
+                  void inputCtx.resume().catch(() => {});
+                }
                 const source = inputCtx.createMediaStreamSource(stream);
                 const processor = inputCtx.createScriptProcessor(4096, 1, 1);
                 scriptProcessorRef.current = processor;
@@ -710,8 +714,11 @@ export default function App() {
                     wsRef.current.send(JSON.stringify({ audio: pcmBase64 }));
                   }
                 };
+                const muteGain = inputCtx.createGain();
+                muteGain.gain.value = 0;
                 source.connect(processor);
-                processor.connect(inputCtx.destination);
+                processor.connect(muteGain);
+                muteGain.connect(inputCtx.destination);
               })
               .catch(() => {
                 // Mic optional
@@ -891,19 +898,75 @@ export default function App() {
       outputAudioCtxRef.current = null;
     }
     if (wsRef.current) {
-      wsRef.current.close();
+      wsRef.current.onclose = null;
+      wsRef.current.onerror = null;
+      wsRef.current.onmessage = null;
+      try {
+        wsRef.current.close();
+      } catch {
+        // Ignore
+      }
       wsRef.current = null;
     }
+    activeSourcesRef.current.forEach((src) => {
+      try {
+        src.stop();
+        src.disconnect();
+      } catch {
+        // Ignore
+      }
+    });
     activeSourcesRef.current = [];
+    if (currentAudioElRef.current) {
+      try {
+        currentAudioElRef.current.pause();
+        currentAudioElRef.current.currentTime = 0;
+      } catch {
+        // Ignore
+      }
+      currentAudioElRef.current = null;
+    }
+    if (isRecordingPtt) {
+      stopPttRecording();
+    }
+    setIsMicMuted(false);
+    isMicMutedRef.current = false;
     setIsLiveConnected(false);
     setIsLiveConnecting(false);
     setIsPlayingAiAudio(false);
   };
 
   const toggleMuteMic = () => {
+    playFiezelSfx('button_tap');
     const next = !isMicMuted;
     setIsMicMuted(next);
     isMicMutedRef.current = next;
+    if (micStreamRef.current) {
+      micStreamRef.current.getAudioTracks().forEach((track) => {
+        track.enabled = !next;
+      });
+    }
+  };
+
+  const handleTabChange = (nextTab: 'home' | 'call' | 'braincore') => {
+    if (activeTab === 'call' && nextTab !== 'call') {
+      stopLiveCall();
+      if (isRecordingPtt) {
+        stopPttRecording();
+      }
+      if (currentAudioElRef.current) {
+        try {
+          currentAudioElRef.current.pause();
+          currentAudioElRef.current.currentTime = 0;
+        } catch {
+          // Ignore
+        }
+        currentAudioElRef.current = null;
+        setIsPlayingAiAudio(false);
+      }
+    }
+    playFiezelSfx('button_tap');
+    setActiveTab(nextTab);
   };
 
   const formatTimer = (sec: number) => {
@@ -923,12 +986,12 @@ export default function App() {
     (a, b) => b.lastAt - a.lastAt
   );
 
-  const callStateKey: 'live' | 'recording' | 'speaking' | 'ready' = isLiveConnected
-    ? 'live'
+  const callStateKey: 'speaking' | 'recording' | 'live' | 'ready' = isPlayingAiAudio
+    ? 'speaking'
     : isRecordingPtt
       ? 'recording'
-      : isPlayingAiAudio
-        ? 'speaking'
+      : isLiveConnected
+        ? 'live'
         : 'ready';
 
   const lastAiTurn = [...turns].reverse().find((tr) => tr.speaker === 'ai');
@@ -1010,7 +1073,7 @@ export default function App() {
             <nav className="flex items-center gap-1 bg-[#FFF3DC] border border-[#F0E4CF] p-1 rounded-2xl">
               <button
                 type="button"
-                onClick={() => setActiveTab('home')}
+                onClick={() => handleTabChange('home')}
                 className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   activeTab === 'home'
                     ? 'bg-[#FFC700] text-[#241A11] shadow-2xs'
@@ -1021,7 +1084,7 @@ export default function App() {
               </button>
               <button
                 type="button"
-                onClick={() => setActiveTab('call')}
+                onClick={() => handleTabChange('call')}
                 className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                   activeTab === 'call'
                     ? 'bg-[#FFC700] text-[#241A11] shadow-2xs'
@@ -1037,7 +1100,7 @@ export default function App() {
               </button>
               <button
                 type="button"
-                onClick={() => setActiveTab('braincore')}
+                onClick={() => handleTabChange('braincore')}
                 className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   activeTab === 'braincore'
                     ? 'bg-[#FFC700] text-[#241A11] shadow-2xs'
@@ -1112,9 +1175,9 @@ export default function App() {
             onSelectScenarioAndCall={(scenId) => {
               stopLiveCall();
               setActiveScenarioId(scenId);
-              setActiveTab('call');
+              handleTabChange('call');
             }}
-            onOpenBraincore={() => setActiveTab('braincore')}
+            onOpenBraincore={() => handleTabChange('braincore')}
             onUnlockScenarioPrereq={(scen) => {
               const nextState = recordVocabPrereqMastery(brainState, scen.prereqCompetencyId);
               setBrainState(nextState);
@@ -1265,7 +1328,7 @@ export default function App() {
                         />
                         <img
                           src={
-                            isPlayingAiAudio || isLiveConnected
+                            isPlayingAiAudio
                               ? '/assets/brand/paw-mochi-speaking.svg'
                               : '/assets/brand/paw-mochi-idle.svg'
                           }
@@ -1327,12 +1390,14 @@ export default function App() {
                                 callStateKey === 'ready' ? 'font-semibold' : 'font-bold'
                               }`}
                             >
-                              {isLiveConnected
-                                ? `LIVE · ${formatTimer(callDurationSec)}`
+                              {isPlayingAiAudio
+                                ? isLiveConnected
+                                  ? `PAW berbicara... (${formatTimer(callDurationSec)})`
+                                  : 'Sedang berbicara...'
                                 : isRecordingPtt
                                   ? `Merekam suara... (${formatTimer(pttRecordingSec)})`
-                                  : isPlayingAiAudio
-                                    ? 'Sedang berbicara...'
+                                  : isLiveConnected
+                                    ? `LIVE · ${formatTimer(callDurationSec)}`
                                     : 'Siap bicara'}
                             </span>
 
@@ -1432,7 +1497,12 @@ export default function App() {
                           </button>
                           <button
                             type="button"
-                            onClick={stopLiveCall}
+                            onClick={() => {
+                              playFiezelSfx('button_tap');
+                              stopLiveCall();
+                              setLiveUserDraft('');
+                              setLiveAiDraft('');
+                            }}
                             className="px-4 py-2.5 rounded-xl bg-[#B8432D] hover:bg-[#9E3622] text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-sm transition-all"
                           >
                             <PhoneOff className="w-3.5 h-3.5" />
@@ -1909,7 +1979,7 @@ export default function App() {
         <div className="max-w-md mx-auto grid grid-cols-3 gap-2">
           <button
             type="button"
-            onClick={() => setActiveTab('home')}
+            onClick={() => handleTabChange('home')}
             className={`min-h-[50px] rounded-2xl flex flex-col items-center justify-center gap-1 text-xs cursor-pointer transition-all ${
               activeTab === 'home'
                 ? 'bg-[#FFF3C4] text-[#241A11] font-bold border border-[#E6A800]/40'
@@ -1921,7 +1991,7 @@ export default function App() {
           </button>
           <button
             type="button"
-            onClick={() => setActiveTab('call')}
+            onClick={() => handleTabChange('call')}
             className={`min-h-[50px] rounded-2xl flex flex-col items-center justify-center gap-1 text-xs cursor-pointer transition-all ${
               activeTab === 'call'
                 ? 'bg-[#FFF3C4] text-[#241A11] font-bold border border-[#E6A800]/40'
@@ -1933,7 +2003,7 @@ export default function App() {
           </button>
           <button
             type="button"
-            onClick={() => setActiveTab('braincore')}
+            onClick={() => handleTabChange('braincore')}
             className={`min-h-[50px] rounded-2xl flex flex-col items-center justify-center gap-1 text-xs cursor-pointer transition-all ${
               activeTab === 'braincore'
                 ? 'bg-[#FFF3C4] text-[#241A11] font-bold border border-[#E6A800]/40'
