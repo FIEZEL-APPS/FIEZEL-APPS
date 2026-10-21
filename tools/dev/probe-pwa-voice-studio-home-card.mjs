@@ -80,14 +80,14 @@ server.listen(4174, async () => {
       throw new Error('Studio Suara AI card is not visible on Home screen!');
     }
 
-    const titleText = await studioCard.locator('h3').textContent();
+    const titleText = await studioCard.locator('.fz-kawan-title').textContent();
     console.log('Studio Card title:', titleText);
 
     const ctaBtn = await studioCard.locator('[data-testid="voice-studio-cta"]').first();
-    const ctaHref = await ctaBtn.getAttribute('href');
-    console.log('CTA href:', ctaHref);
-    if (!ctaHref.includes('call.html')) {
-      throw new Error('CTA href must point to call.html');
+    const ctaAttr = (await ctaBtn.getAttribute('onclick')) || (await ctaBtn.getAttribute('href')) || '';
+    console.log('CTA target:', ctaAttr);
+    if (!ctaAttr.includes('call.html')) {
+      throw new Error('CTA must point to call.html');
     }
 
     console.log('✓ Main PWA Home Studio Suara card verified successfully');
