@@ -16,11 +16,15 @@
 
   var CALL_PAGE_URL = 'call.html';
 
-  function t(key, fallback) {
-    if (typeof global.FiezelI18n !== 'undefined' && global.FiezelI18n.t) {
-      return global.FiezelI18n.t(key, fallback);
-    }
-    return fallback;
+  function t(k, fb, params) {
+    var s;
+    try {
+      var I = (typeof self !== 'undefined' ? self : typeof root !== 'undefined' ? root : global).FiezelI18n;
+      s = I && I.t ? I.t(k, params) : undefined;
+    } catch (_) {}
+    if (s === undefined || s === k) s = fb == null ? k : fb;
+    if (params) s = String(s).replace(/\{(\w+)\}/g, function (m, n) { return Object.prototype.hasOwnProperty.call(params, n) ? String(params[n]) : m; });
+    return s;
   }
 
   function resolveCallUrl(options) {
