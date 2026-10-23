@@ -16,15 +16,21 @@
    "berkas": "perluasan FIEZEL (m025-312)",
    "entri": 514,
    "isi": "kata N5 yang TIDAK berasal dari dua berkas owner. Ditulis untuk menutup silabus N5 sampai 1.000 kata: rumah tangga, keluarga, tubuh dan kesehatan, cuaca, perjalanan, sekolah, pekerjaan, dan kata kerja harian. Sama seperti sisa berkas ini, tingkat JLPT-nya perkiraan dan naskahnya berstatus DRAFT AI — belum ditinjau penutur asli."
+  },
+  {
+   "berkas": "perluasan FIEZEL Jōkyū N1+ (m025-635)",
+   "entri": 100,
+   "isi": "kosakata akademik, diplomatik, hukum, ilmiah, dan sastra tingkat lanjut C2 / N1+ yang ditulis orisinal untuk melengkapi 6 jenjang penuh FIEZEL."
   }
  ],
- "total": 1885,
+ "total": 1985,
  "jumlah": {
   "N5": 1000,
   "N4": 327,
   "N3": 279,
   "N2": 202,
-  "N1": 77
+  "N1": 77,
+  "N1+": 100
  },
  "tingkat": {
   "N5": [
@@ -15875,6 +15881,808 @@
     "pos": "verb",
     "verbGroup": "suru",
     "src": "katakerja#494"
+   }
+  ],
+  "N1+": [
+   {
+    "romaji": "sogo",
+    "kana": "そご",
+    "kanji": "齟齬",
+    "id": "ketidaksesuaian; selisih paham",
+    "pos": "noun",
+    "src": "fiezel-c2#1"
+   },
+   {
+    "romaji": "shinshaku",
+    "kana": "しんしゃく",
+    "kanji": "斟酌",
+    "id": "pertimbangan atas keadaan pihak lain",
+    "pos": "noun",
+    "src": "fiezel-c2#2"
+   },
+   {
+    "romaji": "gaizensei",
+    "kana": "がいぜんせい",
+    "kanji": "蓋然性",
+    "id": "tingkat kemungkinan objektif; probabilitas",
+    "pos": "noun",
+    "src": "fiezel-c2#3"
+   },
+   {
+    "romaji": "kisuu",
+    "kana": "きすう",
+    "kanji": "帰趨",
+    "id": "arah akhir perkembangan; muara hasil",
+    "pos": "noun",
+    "src": "fiezel-c2#4"
+   },
+   {
+    "romaji": "kanka",
+    "kana": "かんか",
+    "kanji": "看過",
+    "id": "pembiaran; pengabaian atas masalah",
+    "pos": "noun",
+    "src": "fiezel-c2#5"
+   },
+   {
+    "romaji": "fuen",
+    "kana": "ふえん",
+    "kanji": "敷衍",
+    "id": "perluasan uraian atau penerapan gagasan",
+    "pos": "noun",
+    "src": "fiezel-c2#6"
+   },
+   {
+    "romaji": "zesei",
+    "kana": "ぜせい",
+    "kanji": "是正",
+    "id": "koreksi; pelurusan penyimpangan",
+    "pos": "noun",
+    "src": "fiezel-c2#7"
+   },
+   {
+    "romaji": "kairi",
+    "kana": "かいり",
+    "kanji": "乖離",
+    "id": "kesenjangan tajam dari kenyataan",
+    "pos": "noun",
+    "src": "fiezel-c2#8"
+   },
+   {
+    "romaji": "moura",
+    "kana": "もうら",
+    "kanji": "網羅",
+    "id": "pencakupan menyeluruh tanpa terlewat",
+    "pos": "noun",
+    "src": "fiezel-c2#9"
+   },
+   {
+    "romaji": "sasshin",
+    "kana": "さっしん",
+    "kanji": "刷新",
+    "id": "perombakan menyeluruh menjadi baru",
+    "pos": "noun",
+    "src": "fiezel-c2#10"
+   },
+   {
+    "romaji": "toushuu",
+    "kana": "とうしゅう",
+    "kanji": "踏襲",
+    "id": "pelanjutan pola atau kebijakan pendahulu",
+    "pos": "noun",
+    "src": "fiezel-c2#11"
+   },
+   {
+    "romaji": "kikkin",
+    "kana": "きっきん",
+    "kanji": "喫緊",
+    "id": "sangat mendesak dan tak dapat ditunda",
+    "pos": "adjective-na",
+    "src": "fiezel-c2#12"
+   },
+   {
+    "romaji": "fukan",
+    "kana": "ふかん",
+    "kanji": "俯瞰",
+    "id": "tinjauan menyeluruh dari sudut pandang luas",
+    "pos": "noun",
+    "src": "fiezel-c2#13"
+   },
+   {
+    "romaji": "jousei",
+    "kana": "じょうせい",
+    "kanji": "醸成",
+    "id": "penumbuhan bertahap kesadaran atau suasana",
+    "pos": "noun",
+    "src": "fiezel-c2#14"
+   },
+   {
+    "romaji": "touta",
+    "kana": "とうた",
+    "kanji": "淘汰",
+    "id": "seleksi ketat yang menyisihkan yang tak layak",
+    "pos": "noun",
+    "src": "fiezel-c2#15"
+   },
+   {
+    "romaji": "ringi",
+    "kana": "りんぎ",
+    "kanji": "稟議",
+    "id": "pengedaran usulan tertulis untuk persetujuan berjenjang",
+    "pos": "noun",
+    "src": "fiezel-c2#16"
+   },
+   {
+    "romaji": "kashi",
+    "kana": "かし",
+    "kanji": "瑕疵",
+    "id": "cacat hukum atau kekurangan tersembunyi",
+    "pos": "noun",
+    "src": "fiezel-c2#17"
+   },
+   {
+    "romaji": "shinchoku",
+    "kana": "しんちょく",
+    "kanji": "進捗",
+    "id": "kemajuan pelaksanaan pekerjaan",
+    "pos": "noun",
+    "src": "fiezel-c2#18"
+   },
+   {
+    "romaji": "bapponteki",
+    "kana": "ばっぽんてき",
+    "kanji": "抜本的",
+    "id": "mendasar hingga ke akar persoalan; radikal",
+    "pos": "adjective-na",
+    "src": "fiezel-c2#19"
+   },
+   {
+    "romaji": "houkatsuteki",
+    "kana": "ほうかつてき",
+    "kanji": "包括的",
+    "id": "menyeluruh dan lintas aspek; komprehensif",
+    "pos": "adjective-na",
+    "src": "fiezel-c2#20"
+   },
+   {
+    "romaji": "shisa",
+    "kana": "しさ",
+    "kanji": "示唆",
+    "id": "isyarat tidak langsung; petunjuk implisit",
+    "pos": "noun",
+    "src": "fiezel-c2#21"
+   },
+   {
+    "romaji": "yokushi",
+    "kana": "よくし",
+    "kanji": "抑止",
+    "id": "pencegahan melalui daya gentar atau kendali",
+    "pos": "noun",
+    "src": "fiezel-c2#22"
+   },
+   {
+    "romaji": "kikkou",
+    "kana": "きっこう",
+    "kanji": "拮抗",
+    "id": "perimbangan kekuatan yang saling berhadapan sepadan",
+    "pos": "noun",
+    "src": "fiezel-c2#23"
+   },
+   {
+    "romaji": "kiketsu",
+    "kana": "きけつ",
+    "kanji": "帰結",
+    "id": "konsekuensi logis; simpulan akhir",
+    "pos": "noun",
+    "src": "fiezel-c2#24"
+   },
+   {
+    "romaji": "shiiteki",
+    "kana": "しいてき",
+    "kanji": "恣意的",
+    "id": "sewenang-wenang menurut kehendak sepihak; arbitrer",
+    "pos": "adjective-na",
+    "src": "fiezel-c2#25"
+   },
+   {
+    "romaji": "fuhenteki",
+    "kana": "ふへんてき",
+    "kanji": "普遍的",
+    "id": "berlaku umum lintas ruang dan waktu; universal",
+    "pos": "adjective-na",
+    "src": "fiezel-c2#26"
+   },
+   {
+    "romaji": "datousei",
+    "kana": "だとうせい",
+    "kanji": "妥当性",
+    "id": "kelayakan penalaran; keabsahan",
+    "pos": "noun",
+    "src": "fiezel-c2#27"
+   },
+   {
+    "romaji": "seigousei",
+    "kana": "せいごうせい",
+    "kanji": "整合性",
+    "id": "konsistensi logis tanpa pertentangan internal",
+    "pos": "noun",
+    "src": "fiezel-c2#28"
+   },
+   {
+    "romaji": "toumeisei",
+    "kana": "とうめいせい",
+    "kanji": "透明性",
+    "id": "keterbukaan proses dan informasi; transparansi",
+    "pos": "noun",
+    "src": "fiezel-c2#29"
+   },
+   {
+    "romaji": "jikkousei",
+    "kana": "じっこうせい",
+    "kanji": "実効性",
+    "id": "daya guna nyata dalam penerapan; efektivitas aktual",
+    "pos": "noun",
+    "src": "fiezel-c2#30"
+   },
+   {
+    "romaji": "zeijakusei",
+    "kana": "ぜいじゃくせい",
+    "kanji": "脆弱性",
+    "id": "kerentanan struktural terhadap gangguan",
+    "pos": "noun",
+    "src": "fiezel-c2#31"
+   },
+   {
+    "romaji": "soujoukouka",
+    "kana": "そうじょうこうか",
+    "kanji": "相乗効果",
+    "id": "efek sinergi yang melipatgandakan hasil",
+    "pos": "noun",
+    "src": "fiezel-c2#32"
+   },
+   {
+    "romaji": "kitokukeneki",
+    "kana": "きとくけんえき",
+    "kanji": "既得権益",
+    "id": "hak istimewa mapan yang dikuasai kelompok tertentu",
+    "pos": "noun",
+    "src": "fiezel-c2#33"
+   },
+   {
+    "romaji": "shikousakugo",
+    "kana": "しこうさくご",
+    "kanji": "試行錯誤",
+    "id": "proses coba-ralat berulang mencari solusi",
+    "pos": "noun",
+    "src": "fiezel-c2#34"
+   },
+   {
+    "romaji": "niritsuhaihan",
+    "kana": "にりつはいはん",
+    "kanji": "二律背反",
+    "id": "dilema dua prinsip yang saling bertolak belakang",
+    "pos": "noun",
+    "src": "fiezel-c2#35"
+   },
+   {
+    "romaji": "gouikeisei",
+    "kana": "ごういけいせい",
+    "kanji": "合意形成",
+    "id": "pembangunan kesepakatan bersama antarpihak",
+    "pos": "noun",
+    "src": "fiezel-c2#36"
+   },
+   {
+    "romaji": "setsumeisekinin",
+    "kana": "せつめいせきにん",
+    "kanji": "説明責任",
+    "id": "akuntabilitas mempertanggungjawabkan keputusan",
+    "pos": "noun",
+    "src": "fiezel-c2#37"
+   },
+   {
+    "romaji": "riekisouhan",
+    "kana": "りえきそうはん",
+    "kanji": "利益相反",
+    "id": "benturan kepentingan jabatan dan keuntungan pribadi",
+    "pos": "noun",
+    "src": "fiezel-c2#38"
+   },
+   {
+    "romaji": "ingakankei",
+    "kana": "いんがかんけい",
+    "kanji": "因果関係",
+    "id": "hubungan sebab-akibat yang dapat dibuktikan",
+    "pos": "noun",
+    "src": "fiezel-c2#39"
+   },
+   {
+    "romaji": "saigensei",
+    "kana": "さいげんせい",
+    "kanji": "再現性",
+    "id": "keterulangan hasil eksperimen; reprodusibilitas",
+    "pos": "noun",
+    "src": "fiezel-c2#40"
+   },
+   {
+    "romaji": "jizokukanousei",
+    "kana": "じぞくかのうせい",
+    "kanji": "持続可能性",
+    "id": "keberlanjutan jangka panjang secara ekologis dan sosial",
+    "pos": "noun",
+    "src": "fiezel-c2#41"
+   },
+   {
+    "romaji": "fukagyakuteki",
+    "kana": "ふかぎゃくてき",
+    "kanji": "不可逆的",
+    "id": "tidak dapat dibalikkan ke keadaan semula; ireversibel",
+    "pos": "adjective-na",
+    "src": "fiezel-c2#42"
+   },
+   {
+    "romaji": "haitateki",
+    "kana": "はいたてき",
+    "kanji": "排他的",
+    "id": "menutup diri dan menyingkirkan pihak luar; eksklusif",
+    "pos": "adjective-na",
+    "src": "fiezel-c2#43"
+   },
+   {
+    "romaji": "batteki",
+    "kana": "ばってき",
+    "kanji": "抜擢",
+    "id": "pengangkatan khusus talenta melampaui urutan senioritas",
+    "pos": "noun",
+    "src": "fiezel-c2#44"
+   },
+   {
+    "romaji": "fusshoku",
+    "kana": "ふっしょく",
+    "kanji": "払拭",
+    "id": "penghapusan tuntas keraguan atau citra buruk",
+    "pos": "noun",
+    "src": "fiezel-c2#45"
+   },
+   {
+    "romaji": "hippaku",
+    "kana": "ひっぱく",
+    "kanji": "逼迫",
+    "id": "keterdesakan kritis pada pasokan atau kapasitas",
+    "pos": "noun",
+    "src": "fiezel-c2#46"
+   },
+   {
+    "romaji": "tonza",
+    "kana": "とんざ",
+    "kanji": "頓挫",
+    "id": "kemandekan mendadak rencana di tengah jalan",
+    "pos": "noun",
+    "src": "fiezel-c2#47"
+   },
+   {
+    "romaji": "gakai",
+    "kana": "がかい",
+    "kanji": "瓦解",
+    "id": "keruntuhan menyeluruh suatu tatanan dari dalam",
+    "pos": "noun",
+    "src": "fiezel-c2#48"
+   },
+   {
+    "romaji": "itsudatsu",
+    "kana": "いつだつ",
+    "kanji": "逸脱",
+    "id": "penyimpangan dari norma, kaidah, atau wewenang",
+    "pos": "noun",
+    "src": "fiezel-c2#49"
+   },
+   {
+    "romaji": "teishoku",
+    "kana": "ていしょく",
+    "kanji": "抵触",
+    "id": "pelanggaran atau pertentangan terhadap ketentuan hukum",
+    "pos": "noun",
+    "src": "fiezel-c2#50"
+   },
+   {
+    "romaji": "junshu",
+    "kana": "じゅんしゅ",
+    "kanji": "遵守",
+    "id": "kepatuhan ketat terhadap hukum dan tata tertib",
+    "pos": "noun",
+    "src": "fiezel-c2#51"
+   },
+   {
+    "romaji": "sokyuu",
+    "kana": "そきゅう",
+    "kanji": "遡及",
+    "id": "pemberlakuan aturan surut ke masa lampau; retroaktivitas",
+    "pos": "noun",
+    "src": "fiezel-c2#52"
+   },
+   {
+    "romaji": "kousokuryoku",
+    "kana": "こうそくりょく",
+    "kanji": "拘束力",
+    "id": "daya ikat hukum yang mewajibkan kepatuhan",
+    "pos": "noun",
+    "src": "fiezel-c2#53"
+   },
+   {
+    "romaji": "sairyou",
+    "kana": "さいりょう",
+    "kanji": "裁量",
+    "id": "ruang kewenangan menimbang sendiri; diskresi",
+    "pos": "noun",
+    "src": "fiezel-c2#54"
+   },
+   {
+    "romaji": "kinkou",
+    "kana": "きんこう",
+    "kanji": "均衡",
+    "id": "keseimbangan proporsional antarkekuatan",
+    "pos": "noun",
+    "src": "fiezel-c2#55"
+   },
+   {
+    "romaji": "zenshinteki",
+    "kana": "ぜんしんてき",
+    "kanji": "漸進的",
+    "id": "bertahap selangkah demi selangkah; gradual",
+    "pos": "adjective-na",
+    "src": "fiezel-c2#56"
+   },
+   {
+    "romaji": "kouchokuka",
+    "kana": "こうちょくか",
+    "kanji": "硬直化",
+    "id": "pembakuan kaku yang kehilangan daya lentur",
+    "pos": "noun",
+    "src": "fiezel-c2#57"
+   },
+   {
+    "romaji": "kuudouka",
+    "kana": "くうどうか",
+    "kanji": "空洞化",
+    "id": "pengosongan substansi atau basis industri domestik",
+    "pos": "noun",
+    "src": "fiezel-c2#58"
+   },
+   {
+    "romaji": "keigaika",
+    "kana": "けいがいか",
+    "kanji": "形骸化",
+    "id": "pendangkalan aturan hingga tinggal bentuk tanpa isi",
+    "pos": "noun",
+    "src": "fiezel-c2#59"
+   },
+   {
+    "romaji": "kenzaika",
+    "kana": "けんざいか",
+    "kanji": "顕在化",
+    "id": "kemunculan nyata masalah terpendam ke permukaan",
+    "pos": "noun",
+    "src": "fiezel-c2#60"
+   },
+   {
+    "romaji": "mokunin",
+    "kana": "もくにん",
+    "kanji": "黙認",
+    "id": "pembiaran diam-diam terhadap pelanggaran",
+    "pos": "noun",
+    "src": "fiezel-c2#61"
+   },
+   {
+    "romaji": "sontaku",
+    "kana": "そんたく",
+    "kanji": "忖度",
+    "id": "penyesuaian diri mendahului kehendak atasan tanpa perintah",
+    "pos": "noun",
+    "src": "fiezel-c2#62"
+   },
+   {
+    "romaji": "atsureki",
+    "kana": "あつれき",
+    "kanji": "軋轢",
+    "id": "gesekan tajam dan ketegangan antarpihak",
+    "pos": "noun",
+    "src": "fiezel-c2#63"
+   },
+   {
+    "romaji": "kouchaku",
+    "kana": "こうちゃく",
+    "kanji": "膠着",
+    "id": "kebuntuan perundingan yang membeku tanpa kemajuan",
+    "pos": "noun",
+    "src": "fiezel-c2#64"
+   },
+   {
+    "romaji": "ikichi",
+    "kana": "いきち",
+    "kanji": "閾値",
+    "id": "nilai ambang batas pemicu perubahan keadaan",
+    "pos": "noun",
+    "src": "fiezel-c2#65"
+   },
+   {
+    "romaji": "henzai",
+    "kana": "へんざい",
+    "kanji": "偏在",
+    "id": "ketimpangan sebaran yang menumpuk di wilayah tertentu",
+    "pos": "noun",
+    "src": "fiezel-c2#66"
+   },
+   {
+    "romaji": "kasen",
+    "kana": "かせん",
+    "kanji": "寡占",
+    "id": "penguasaan pasar oleh segelintir pelaku usaha; oligopoli",
+    "pos": "noun",
+    "src": "fiezel-c2#67"
+   },
+   {
+    "romaji": "sakusou",
+    "kana": "さくそう",
+    "kanji": "錯綜",
+    "id": "jalinan rumit informasi atau kepentingan yang bersilangan",
+    "pos": "noun",
+    "src": "fiezel-c2#68"
+   },
+   {
+    "romaji": "naihou suru",
+    "kana": "ないほうする",
+    "kanji": "内包する",
+    "id": "mengandung secara implisit di dalam dirinya",
+    "pos": "verb",
+    "src": "fiezel-c2#69"
+   },
+   {
+    "romaji": "kizoku suru",
+    "kana": "きぞくする",
+    "kanji": "帰属する",
+    "id": "menjadi milik sah atau berada dalam yurisdiksi",
+    "pos": "verb",
+    "src": "fiezel-c2#70"
+   },
+   {
+    "romaji": "shuuren suru",
+    "kana": "しゅうれんする",
+    "kanji": "収斂する",
+    "id": "mengerucut menuju satu titik temu; berkonvergensi",
+    "pos": "verb",
+    "src": "fiezel-c2#71"
+   },
+   {
+    "romaji": "ryouga suru",
+    "kana": "りょうがする",
+    "kanji": "凌駕する",
+    "id": "melampaui jauh capaian pendahulu atau pesaing",
+    "pos": "verb",
+    "src": "fiezel-c2#72"
+   },
+   {
+    "romaji": "hokan suru",
+    "kana": "ほかんする",
+    "kanji": "補完する",
+    "id": "saling melengkapi kekurangan secara fungsional",
+    "pos": "verb",
+    "src": "fiezel-c2#73"
+   },
+   {
+    "romaji": "kenin suru",
+    "kana": "けんいんする",
+    "kanji": "牽引する",
+    "id": "menjadi penggerak utama yang menarik pertumbuhan",
+    "pos": "verb",
+    "src": "fiezel-c2#74"
+   },
+   {
+    "romaji": "sogai suru",
+    "kana": "そがいする",
+    "kanji": "阻害する",
+    "id": "menghambat jalannya fungsi atau perkembangan",
+    "pos": "verb",
+    "src": "fiezel-c2#75"
+   },
+   {
+    "romaji": "kanki suru",
+    "kana": "かんきする",
+    "kanji": "喚起する",
+    "id": "menggugah kesadaran atau kewaspadaan publik",
+    "pos": "verb",
+    "src": "fiezel-c2#76"
+   },
+   {
+    "romaji": "tanpo suru",
+    "kana": "たんぽする",
+    "kanji": "担保する",
+    "id": "menjamin kepastian mutu, keadilan, atau kewajiban",
+    "pos": "verb",
+    "src": "fiezel-c2#77"
+   },
+   {
+    "romaji": "kenshou suru",
+    "kana": "けんしょうする",
+    "kanji": "検証する",
+    "id": "menguji kebenaran hipotesis atau kebijakan secara empiris",
+    "pos": "verb",
+    "src": "fiezel-c2#78"
+   },
+   {
+    "romaji": "seisa suru",
+    "kana": "せいさする",
+    "kanji": "精査する",
+    "id": "memeriksa secara cermat hingga ke rincian terkecil",
+    "pos": "verb",
+    "src": "fiezel-c2#79"
+   },
+   {
+    "romaji": "kutsugaesu",
+    "kana": "くつがえす",
+    "kanji": "覆す",
+    "id": "membalikkan asumsi mapan atau putusan sebelumnya",
+    "pos": "verb",
+    "src": "fiezel-c2#80"
+   },
+   {
+    "romaji": "misueru",
+    "kana": "みすえる",
+    "kanji": "見据える",
+    "id": "menatap jernih dan memperhitungkan prospek masa depan",
+    "pos": "verb",
+    "src": "fiezel-c2#81"
+   },
+   {
+    "romaji": "tsuchikau",
+    "kana": "つちかう",
+    "kanji": "培う",
+    "id": "memupuk keahlian atau kepercayaan selama bertahun-tahun",
+    "pos": "verb",
+    "src": "fiezel-c2#82"
+   },
+   {
+    "romaji": "yudaneru",
+    "kana": "ゆだねる",
+    "kanji": "委ねる",
+    "id": "menyerahkan mandat keputusan kepada pihak lain",
+    "pos": "verb",
+    "src": "fiezel-c2#83"
+   },
+   {
+    "romaji": "koujiru",
+    "kana": "こうじる",
+    "kanji": "講じる",
+    "id": "mengambil dan menerapkan langkah kebijakan terukur",
+    "pos": "verb",
+    "src": "fiezel-c2#84"
+   },
+   {
+    "romaji": "shirizokeru",
+    "kana": "しりぞける",
+    "kanji": "退ける",
+    "id": "menolak tuntutan hukum atau menepis dalil lawan",
+    "pos": "verb",
+    "src": "fiezel-c2#85"
+   },
+   {
+    "romaji": "kangamiru",
+    "kana": "かんがみる",
+    "kanji": "鑑みる",
+    "id": "menimbang secara saksama berdasarkan preseden atau fakta",
+    "pos": "verb",
+    "src": "fiezel-c2#86"
+   },
+   {
+    "romaji": "kinouteki",
+    "kana": "きのうてき",
+    "kanji": "帰納的",
+    "id": "bernalar induktif dari fakta khusus ke kaidah umum",
+    "pos": "adjective-na",
+    "src": "fiezel-c2#87"
+   },
+   {
+    "romaji": "enekiteki",
+    "kana": "えんえきてき",
+    "kanji": "演繹的",
+    "id": "bernalar deduktif dari premis umum ke simpulan khusus",
+    "pos": "adjective-na",
+    "src": "fiezel-c2#88"
+   },
+   {
+    "romaji": "gyakusetsuteki",
+    "kana": "ぎゃくせつてき",
+    "kanji": "逆説的",
+    "id": "tampak bertentangan sepintas namun benar; paradoksal",
+    "pos": "adjective-na",
+    "src": "fiezel-c2#89"
+   },
+   {
+    "romaji": "chimitsu",
+    "kana": "ちみつ",
+    "kanji": "緻密",
+    "id": "tersusun sangat rapi, teliti, dan terperinci",
+    "pos": "adjective-na",
+    "src": "fiezel-c2#90"
+   },
+   {
+    "romaji": "kihaku",
+    "kana": "きはく",
+    "kanji": "希薄",
+    "id": "menipis atau merenggang ikatan maupun kesadarannya",
+    "pos": "adjective-na",
+    "src": "fiezel-c2#91"
+   },
+   {
+    "romaji": "seichi",
+    "kana": "せいち",
+    "kanji": "精緻",
+    "id": "tergarap sangat presisi dan halus secara metodologis",
+    "pos": "adjective-na",
+    "src": "fiezel-c2#92"
+   },
+   {
+    "romaji": "hanahadashii",
+    "kana": "はなはだしい",
+    "kanji": "甚だしい",
+    "id": "melampaui batas kewajaran; sangat ekstrem",
+    "pos": "adjective-i",
+    "src": "fiezel-c2#93"
+   },
+   {
+    "romaji": "yuruginai",
+    "kana": "ゆるぎない",
+    "kanji": "揺るぎない",
+    "id": "teguh tak tergoyahkan oleh tekanan maupun keraguan",
+    "pos": "adjective-i",
+    "src": "fiezel-c2#94"
+   },
+   {
+    "romaji": "oomune",
+    "kana": "おおむね",
+    "kanji": "概ね",
+    "id": "secara garis besar; pada umumnya",
+    "pos": "adverb",
+    "src": "fiezel-c2#95"
+   },
+   {
+    "romaji": "moppara",
+    "kana": "もっぱら",
+    "kanji": "専ら",
+    "id": "semata-mata terfokus pada satu hal utama",
+    "pos": "adverb",
+    "src": "fiezel-c2#96"
+   },
+   {
+    "romaji": "karoujite",
+    "kana": "かろうじて",
+    "kanji": "辛うじて",
+    "id": "nyaris gagal namun bertahan dengan susah payah",
+    "pos": "adverb",
+    "src": "fiezel-c2#97"
+   },
+   {
+    "romaji": "hakarazumo",
+    "kana": "はからずも",
+    "kanji": "図らずも",
+    "id": "tanpa diduga atau direncanakan sebelumnya",
+    "pos": "adverb",
+    "src": "fiezel-c2#98"
+   },
+   {
+    "romaji": "izentoshite",
+    "kana": "いぜんとして",
+    "kanji": "依然として",
+    "id": "masih tetap berlangsung tanpa perubahan berarti",
+    "pos": "adverb",
+    "src": "fiezel-c2#99"
+   },
+   {
+    "romaji": "osokarehayakare",
+    "kana": "おそかれはやかれ",
+    "kanji": "遅かれ早かれ",
+    "id": "cepat atau lambat pasti akan dihadapi",
+    "pos": "adverb",
+    "src": "fiezel-c2#100"
    }
   ]
  },

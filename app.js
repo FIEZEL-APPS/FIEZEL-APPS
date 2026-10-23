@@ -9885,7 +9885,7 @@ function openLevelPanel(){const current=getActiveLevel(),estimated=placementLeve
   const mistakes=probationMistakes(level);
   const examProof=!!trust.exams?.[level]?.passed;
   const badge=position<=0?`<em class="level-trust-badge is-verified">${esc(examProof?LEVEL_GUARD_COPY.examBadge:level==='A1'?LEVEL_GUARD_COPY.baselineBadge:LEVEL_GUARD_COPY.placementBadge)}</em>`:locked?'<em class="level-trust-badge is-locked">'+FiezelI18n.t('level.badge-terkunci')+'</em>':`<em class="level-trust-badge is-probation">${esc(LEVEL_GUARD_COPY.entryChip)}${mistakes>0?FiezelI18n.t('level.badge-salah',{miss:mistakes,batas:LEVEL_GUARD_WRONG_LIMIT}):''}</em>`;
-  return `<button type="button" class="level-picker-card${level===current?' is-active':''}${locked?' is-locked':''}" data-active-level="${level}" aria-pressed="${level===current}"${locked?' disabled aria-disabled="true" title="'+esc(levelTrustCopy(LEVEL_GUARD_COPY.lockedFeature,verified))+'"':''}><strong>${level}</strong><span>${esc(levelDescriptor(level))}</span>${badge}</button>`;
+  return `<button type="button" class="level-picker-card${level===current?' is-active':''}${locked?' is-locked':''}" data-active-level="${level}" aria-pressed="${level===current}"${locked?' disabled aria-disabled="true" title="'+esc(levelTrustCopy(LEVEL_GUARD_COPY.lockedFeature,verified))+'"':''}><strong>${esc(jaCourseOn()?FiezelJaUi.jlptLabel(level)+' · '+level:level)}</strong><span>${esc(levelDescriptor(level))}</span>${badge}</button>`;
  }).join('');
  /* m025-166: penjelasan "belum terverifikasi" dulu satu paragraf panjang bergaya artikel.
     Sekarang microcopy aplikasi: chip status + satu kalimat + satu CTA, seirama dengan
@@ -11269,7 +11269,7 @@ function todayHomeMarkup(){
                 <path d="M8.5 5.5h4" stroke="rgba(255,255,255,0.6)" stroke-width="1.2" stroke-linecap="round"/>
               </svg>
             </div>
-            <span class="tile-badge">${esc(jaCourseOn() ? 'N5 · 言葉' : (vocabStats.due ? vocabStats.due + ' ' + FiezelI18n.t('home.keping-review') : (todayLevel || 'A1')))}</span>
+            <span class="tile-badge">${esc(jaCourseOn() ? FiezelJaUi.jlptLabel(todayLevel || 'A1') + ' · 言葉' : (vocabStats.due ? vocabStats.due + ' ' + FiezelI18n.t('home.keping-review') : (todayLevel || 'A1')))}</span>
           </div>
           <div>
             <div class="tile-name">${esc(FiezelI18n.t('skill.vocab'))}</div>
@@ -11301,7 +11301,7 @@ function todayHomeMarkup(){
                 <line x1="16" y1="7" x2="19" y2="7" stroke="rgba(255,255,255,0.6)" stroke-width="1.2" stroke-linecap="round"/>
               </svg>
             </div>
-            <span class="tile-badge">${esc(jaCourseOn() ? 'N5 · 文法' : (todayLevel || 'A1'))}</span>
+            <span class="tile-badge">${esc(jaCourseOn() ? FiezelJaUi.jlptLabel(todayLevel || 'A1') + ' · 文法' : (todayLevel || 'A1'))}</span>
           </div>
           <div>
             <div class="tile-name">${esc(FiezelI18n.t('skill.grammar'))}</div>
@@ -11331,7 +11331,7 @@ function todayHomeMarkup(){
                 <line x1="14.5" y1="11" x2="17.5" y2="11" stroke="#86EFAC" stroke-width="1.2" stroke-linecap="round"/>
               </svg>
             </div>
-            <span class="tile-badge">${esc(jaCourseOn() ? 'N5 · 読解' : (todayLevel || 'A1'))}</span>
+            <span class="tile-badge">${esc(jaCourseOn() ? FiezelJaUi.jlptLabel(todayLevel || 'A1') + ' · 読解' : (todayLevel || 'A1'))}</span>
           </div>
           <div>
             <div class="tile-name">${esc(FiezelI18n.t('skill.reading'))}</div>
@@ -11340,7 +11340,7 @@ function todayHomeMarkup(){
         </div>
 
         <!-- Card 4: Listening -->
-        <div class="grid-tile" role="button" tabindex="0" onclick="if(activeTargetLang()==='ja'&&window.openListeningPanel)openListeningPanel();else go('listening');" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();if(activeTargetLang()==='ja'&&window.openListeningPanel)openListeningPanel();else go('listening');}">
+        <div class="grid-tile" role="button" tabindex="0" onclick="if(activeTargetLang()==='ja'&&window.openListeningPanel)openListeningPanel(typeof FiezelJaUi!=='undefined'?FiezelJaUi.jlptLabel('${esc(todayLevel||'A1')}'):'N5');else go('listening');" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();if(activeTargetLang()==='ja'&&window.openListeningPanel)openListeningPanel(typeof FiezelJaUi!=='undefined'?FiezelJaUi.jlptLabel('${esc(todayLevel||'A1')}'):'N5');else go('listening');}">
           <div class="tile-top">
             <div class="tile-icon-3d listening">
               <svg viewBox="0 0 24 24" width="27" height="27" aria-hidden="true" focusable="false" style="display:block;">
@@ -11363,7 +11363,7 @@ function todayHomeMarkup(){
                 <circle cx="12" cy="15.1" r="1.3" fill="#D97706"/>
               </svg>
             </div>
-            <span class="tile-badge">${esc(jaCourseOn() ? 'N5 · 聴解' : (todayLevel || 'A1'))}</span>
+            <span class="tile-badge">${esc(jaCourseOn() ? FiezelJaUi.jlptLabel(todayLevel || 'A1') + ' · 聴解' : (todayLevel || 'A1'))}</span>
           </div>
           <div>
             <div class="tile-name">${esc(jaCourseOn() ? FiezelI18n.t('jepang.chokai') : FiezelI18n.t('home.chip-dengar'))}</div>
@@ -11609,16 +11609,17 @@ function braincoreClassDigest(){
 window.braincoreClassDigest=braincoreClassDigest;
 function jaChokaiHomeBannerMarkup(){
   if(!jaCourseOn())return '';
-  return `<div class="card ja-chokai-banner" onclick="openListeningPanel()" role="button" tabindex="0" aria-label="Chōkai JLPT N5 / N4" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openListeningPanel();}">
+  const activeJlpt=FiezelJaUi.jlptLabel(getActiveLevel());
+  return `<div class="card ja-chokai-banner" onclick="openListeningPanel('${esc(activeJlpt)}')" role="button" tabindex="0" aria-label="Chōkai JLPT N5–N1+" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openListeningPanel('${esc(activeJlpt)}');}">
     <div class="ja-chokai-banner-left">
       <span class="ja-chokai-banner-icon" aria-hidden="true">${typeof Fiezel3DEmblems!=='undefined'?Fiezel3DEmblems.chokai(44):'🎧'}</span>
       <div>
-        <span class="ja-chokai-banner-eyebrow">Japan Foundation &amp; JEES</span>
-        <b class="ja-chokai-banner-title">Listening &amp; Chōkai (JLPT N5 &amp; N4)</b>
-        <span class="ja-chokai-banner-sub">30 Item Interaktif + Audio JEES</span>
+        <span class="ja-chokai-banner-eyebrow">${esc(t('jepang.chokai-banner-eyebrow'))}</span>
+        <b class="ja-chokai-banner-title">Listening &amp; Chōkai (JLPT N5–N1+)</b>
+        <span class="ja-chokai-banner-sub">${esc(t('jepang.chokai-banner-sub'))}</span>
       </div>
     </div>
-    <button type="button" class="today-cta-soft ja-chokai-btn" onclick="event.stopPropagation();openListeningPanel();">Mulai ➔</button>
+    <button type="button" class="today-cta-soft ja-chokai-btn" onclick="event.stopPropagation();openListeningPanel('${esc(activeJlpt)}');">${esc(t('jepang.chokai-banner-cta'))}</button>
   </div>`;
 }
 function home(){pawStreakWatch();/* m028-06: kabar demosi yang tertahan selama kuis dibuka di sini, bukan di tengah soal. */if(!state.activeSession&&levelTrustState(state).pendingNotice)setTimeout(()=>{try{flushLevelGuardNotice()}catch(_){}},280);/* W1 P1-2: kabar percobaan-terputus dari boot (sanitizeState) diumumkan SEKALI di beranda. */if(state.pendingInterruptNotice){const iNotice=state.pendingInterruptNotice;state.pendingInterruptNotice='';save();setTimeout(()=>{try{showToast(iNotice)}catch(_){}},900)}/* m025-166: gerbang level yang dipasang di perkenalan muncul di sini - saat murid sudah

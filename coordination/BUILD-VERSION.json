@@ -1,7 +1,7 @@
 {
-  "version": "m025-636",
+  "version": "m025-637",
   "claimedBy": "branch fix/m025-636-mitra-kaiwa-cache-bust",
-  "claimedAt": "2026-10-23T23:13:57.740Z",
-  "reason": "fix(mitra-kaiwa): akselerasi respons suara AI paralel, UI minimalis & cache-bust call.html",
+  "claimedAt": "2026-10-23T23:55:11.680Z",
+  "reason": "fix(voice-studio): m025-637 voice-first 3D Mochi UI redesign, 1s parallel neural reply, and cache-busting",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

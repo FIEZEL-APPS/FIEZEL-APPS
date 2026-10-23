@@ -52,7 +52,7 @@ test('bank berisi bacaan, dan tiap tingkat kebagian', () => {
   assert.ok(bacaan.length >= 100, 'bacaan terlalu sedikit: ' + bacaan.length);
   const per = {};
   bacaan.forEach((p) => { per[p.level] = (per[p.level] || 0) + 1; });
-  const kosong = ['A1', 'A2', 'B1', 'B2', 'C1'].filter((l) => !per[l]);
+  const kosong = LEVELS.filter((l) => !per[l]);
   assert.deepStrictEqual(kosong, [], 'tingkat tanpa satu pun bacaan: ' + kosong.join(', '));
 });
 

@@ -3,11 +3,11 @@
   "schemaVersion": "1.0.0",
   "version": "1.0.0",
   "targetLang": "ja",
-  "promptCount": 54,
+  "promptCount": 100,
   "minPromptsPerLevel": 6,
   "targetUnit": "characters",
   "catatan": "Medan `en` menyimpan naskah prompt BAHASA JEPANG, bukan Inggris. Namanya warisan dari bank Inggris dan dibaca penyaji apa adanya (app.js:1076); mengganti namanya berarti menyunting penyaji untuk nol manfaat bagi murid. `target` dihitung dalam KARAKTER, bukan kata - kalimat Jepang N5 tidak dipisah spasi, jadi hitungan kata tidak berarti apa-apa di sini.",
-  "cakupan": "Dua prompt untuk TIAP keluarga tata bahasa di content/ja/grammar-templates-ja.json: dua belas keluarga N5 dan lima belas keluarga N4. Bukan prompt yang kebetulan terpikir — tiap keluarga silabus benar-benar punya latihan menulisnya, dan keluarga baru otomatis menuntut promptnya.",
+  "cakupan": "Dua prompt untuk TIAP keluarga tata bahasa di content/ja/grammar-templates-ja.json di seluruh enam tingkat (12 keluarga N5, 15 keluarga N4, 8 keluarga N3, 6 keluarga N2, 5 keluarga N1, dan 4 keluarga N1+). Setiap keluarga silabus memiliki latihan menulisnya sendiri.",
   "honesty": "FIEZEL tidak memprediksi skor IELTS atau TOEFL. Rubrik ini alat latihan dan umpan balik; band resmi hanya keluar dari ujian resmi.",
   "rubric": {
     "id": "fiezel-writing-rubric-v1",
@@ -787,6 +787,466 @@
       "en": "みせの あんないを 書いて ください。「お〜ください」と「〜ございます」を つかって ください。",
       "id_hint": "Tulis pengumuman toko, memakai お〜ください dan 〜ございます.",
       "focus": "rangka permintaan honorifik dan ございます untuk benda"
+    },
+    {
+      "id": "w-ja-b1-01",
+      "level": "B1",
+      "jlpt": "N3",
+      "family": "aspect_phase",
+      "en": "最近新しく始めた習慣や、これから続けようとしている勉強について、４〜５文で書いてください。（使う表現：〜はじめる、〜つづける、〜ていく）",
+      "id_hint": "Tulis 4–5 kalimat tentang kebiasaan baru yang mulai kamu lakukan akhir-akhir ini dan rencana belajar yang ingin kamu teruskan (gunakan pola: 〜はじめる, 〜つづける, 〜ていく).",
+      "target": 80,
+      "focus": "aspect_phase"
+    },
+    {
+      "id": "w-ja-b1-02",
+      "level": "B1",
+      "jlpt": "N3",
+      "family": "aspect_phase",
+      "en": "ここ数年であなたの住んでいる町がどう変わってきたか、そしてこれからどう変わっていくと思うか書いてください。（使う表現：〜てくる、〜ていく、〜おわる）",
+      "id_hint": "Tulis tentang bagaimana kotamu berubah selama beberapa tahun terakhir dan bagaimana menurutmu perubahannya ke depan (gunakan pola: 〜てくる, 〜ていく, 〜おわる).",
+      "target": 85,
+      "focus": "aspect_phase"
+    },
+    {
+      "id": "w-ja-b1-03",
+      "level": "B1",
+      "jlpt": "N3",
+      "family": "hearsay_appearance",
+      "en": "今週末の天気予報と、空の様子を見て思ったことを４〜５文で書いてください。（使う表現：〜そうだ［伝聞］、〜そうだ［様態］、〜らしい）",
+      "id_hint": "Tulis 4–5 kalimat tentang prakiraan cuaca akhir pekan ini dan kesanmu saat melihat keadaan langit (gunakan pola: 〜そうだ [kabar], 〜そうだ [tampak], 〜らしい).",
+      "target": 80,
+      "focus": "hearsay_appearance"
+    },
+    {
+      "id": "w-ja-b1-04",
+      "level": "B1",
+      "jlpt": "N3",
+      "family": "hearsay_appearance",
+      "en": "友達から聞いたおすすめの店や映画のうわさについて、どんな様子か説明してください。（使う表現：〜らしい、〜みたいだ、〜そうだ）",
+      "id_hint": "Jelaskan tentang kabar tempat makan atau film rekomendasi yang kamu dengar dari teman beserta kesannya (gunakan pola: 〜らしい, 〜みたいだ, 〜そうだ).",
+      "target": 85,
+      "focus": "hearsay_appearance"
+    },
+    {
+      "id": "w-ja-b1-05",
+      "level": "B1",
+      "jlpt": "N3",
+      "family": "causative_passive",
+      "en": "子どものころ、親や先生にやりたくないことをさせられた経験と、今どう思うかを書いてください。（使う表現：〜せられる／〜させられる、〜おかげで）",
+      "id_hint": "Tulis tentang pengalaman masa kecil ketika disuruh orang tua atau guru melakukan sesuatu yang tadinya tidak kamu sukai dan bagaimana perasaanmu sekarang (gunakan bentuk kausatif-pasif 〜せられる／〜させられる).",
+      "target": 85,
+      "focus": "causative_passive"
+    },
+    {
+      "id": "w-ja-b1-06",
+      "level": "B1",
+      "jlpt": "N3",
+      "family": "causative_passive",
+      "en": "部活動やアルバイトで、先輩に待たされたり手伝わせられたりした出来事について４〜５文で書いてください。（使う表現：〜される、〜させられる）",
+      "id_hint": "Tulis 4–5 kalimat tentang kejadian saat kamu diminta menunggu atau membantu senior di kegiatan klub atau kerja paruh waktu (gunakan pola: 〜される, 〜させられる).",
+      "target": 80,
+      "focus": "causative_passive"
+    },
+    {
+      "id": "w-ja-b1-07",
+      "level": "B1",
+      "jlpt": "N3",
+      "family": "concession_contrast",
+      "en": "大変だとわかっていても挑戦したい目標について、理由と一緒に書いてください。（使う表現：〜ても、〜のに、〜にもかかわらず）",
+      "id_hint": "Tulis tentang target yang tetap ingin kamu perjuangkan meskipun tahu itu berat, beserta alasannya (gunakan pola: 〜ても, 〜のに, 〜にもかかわらず).",
+      "target": 85,
+      "focus": "concession_contrast"
+    },
+    {
+      "id": "w-ja-b1-08",
+      "level": "B1",
+      "jlpt": "N3",
+      "family": "concession_contrast",
+      "en": "予想していたことと実際の結果が違った経験について４〜５文で書いてください。（使う表現：〜のに、〜くせに、〜わりには）",
+      "id_hint": "Tulis 4–5 kalimat tentang pengalaman ketika hasil nyata berbeda dari perkiraan awalmu (gunakan pola: 〜のに, 〜くせに, 〜わりには).",
+      "target": 85,
+      "focus": "concession_contrast"
+    },
+    {
+      "id": "w-ja-b1-09",
+      "level": "B1",
+      "jlpt": "N3",
+      "family": "formal_conjunctions",
+      "en": "学校の図書館や地域の施設を利用する人への短いお知らせを４〜５文で書いてください。（使う表現：〜について、〜によって、〜に関して）",
+      "id_hint": "Tulis pengumuman singkat 4–5 kalimat bagi pengguna perpustakaan sekolah atau fasilitas umum daerah (gunakan pola: 〜について, 〜によって, 〜に関して).",
+      "target": 90,
+      "focus": "formal_conjunctions"
+    },
+    {
+      "id": "w-ja-b1-10",
+      "level": "B1",
+      "jlpt": "N3",
+      "family": "formal_conjunctions",
+      "en": "インターネットの普及によって私たちの生活や買い物がどう変わったか書いてください。（使う表現：〜によって、〜に対して、〜を中心に）",
+      "id_hint": "Tulis tentang bagaimana kehidupan dan cara berbelanja kita berubah berkat meluasnya internet (gunakan pola: 〜によって, 〜に対して, 〜を中心に).",
+      "target": 90,
+      "focus": "formal_conjunctions"
+    },
+    {
+      "id": "w-ja-b1-11",
+      "level": "B1",
+      "jlpt": "N3",
+      "family": "spoken_contractions",
+      "en": "親しい友達に、うっかり忘れたり失敗しちゃったりした出来事を話すメッセージを書いてください。（使う表現：〜ちゃう／〜じゃう、〜とく、〜なきゃ）",
+      "id_hint": "Tulis pesan santai kepada teman akrab yang menceritakan kejadian ketika kamu tidak sengaja lupa atau melakukan kesalahan kecil (gunakan bentuk lisan: 〜ちゃう／〜じゃう, 〜とく, 〜なきゃ).",
+      "target": 80,
+      "focus": "spoken_contractions"
+    },
+    {
+      "id": "w-ja-b1-12",
+      "level": "B1",
+      "jlpt": "N3",
+      "family": "spoken_contractions",
+      "en": "旅行の前に友達と準備しておくことを相談する短いチャットを４〜５文で書いてください。（使う表現：〜とく、〜なきゃ、〜てる）",
+      "id_hint": "Tulis obrolan singkat 4–5 kalimat bersama teman untuk mendiskusikan hal-hal yang harus disiapkan sebelum berangkat liburan (gunakan bentuk lisan: 〜とく, 〜なきゃ, 〜てる).",
+      "target": 80,
+      "focus": "spoken_contractions"
+    },
+    {
+      "id": "w-ja-b1-13",
+      "level": "B1",
+      "jlpt": "N3",
+      "family": "extent_proportion",
+      "en": "練習すればするほど上達した趣味やスポーツの経験について書いてください。（使う表現：〜ば〜ほど、〜ほど、〜くらい）",
+      "id_hint": "Tulis tentang pengalaman menekuni hobi atau olahraga yang semakin dilatih semakin mahir (gunakan pola: 〜ば〜ほど, 〜ほど, 〜くらい).",
+      "target": 85,
+      "focus": "extent_proportion"
+    },
+    {
+      "id": "w-ja-b1-14",
+      "level": "B1",
+      "jlpt": "N3",
+      "family": "extent_proportion",
+      "en": "これまでで一番うれしかったこと、または驚いたことについて、どのくらいすごかったか書いてください。（使う表現：〜ほど、〜くらい、〜ば〜ほど）",
+      "id_hint": "Tulis tentang pengalaman paling menyenangkan atau mengejutkan yang pernah kamu alami dan gambarkan seberapa hebat kesannya (gunakan pola: 〜ほど, 〜くらい, 〜ば〜ほど).",
+      "target": 85,
+      "focus": "extent_proportion"
+    },
+    {
+      "id": "w-ja-b1-15",
+      "level": "B1",
+      "jlpt": "N3",
+      "family": "contextual_framing",
+      "en": "買おうかどうか迷った末に決めた買い物について、調べるうちにわかったことを書いてください。（使う表現：〜うちに、〜うえで、〜ついでに）",
+      "id_hint": "Tulis tentang barang yang kamu putuskan untuk dibeli setelah sempat ragu, serta hal yang kamu ketahui selagi mencari informasinya (gunakan pola: 〜うちに, 〜うえで, 〜ついでに).",
+      "target": 90,
+      "focus": "contextual_framing"
+    },
+    {
+      "id": "w-ja-b1-16",
+      "level": "B1",
+      "jlpt": "N3",
+      "family": "contextual_framing",
+      "en": "休日に外出するついでに済ませたい用事と、明るいうちにやりたいことを４〜５文で書いてください。（使う表現：〜ついでに、〜うちに、〜最中に）",
+      "id_hint": "Tulis 4–5 kalimat tentang urusan yang ingin kamu selesaikan sekalian saat keluar di hari libur dan kegiatan yang ingin dilakukan selagi hari masih terang (gunakan pola: 〜ついでに, 〜うちに, 〜最中に).",
+      "target": 85,
+      "focus": "contextual_framing"
+    },
+    {
+      "id": "w-ja-b2-01",
+      "level": "B2",
+      "jlpt": "N2",
+      "family": "scope_limit_addition",
+      "en": "新しい技術を学ぶメリットについて、仕事だけでなく日常生活の面からも５〜６文で述べてください。（使う表現：〜だけでなく、〜に限らず、〜ばかりか）",
+      "id_hint": "Uraikan dalam 5–6 kalimat manfaat mempelajari teknologi baru, tidak hanya dari segi pekerjaan tetapi juga kehidupan sehari-hari (gunakan pola: 〜だけでなく, 〜に限らず, 〜ばかりか).",
+      "target": 110,
+      "focus": "scope_limit_addition"
+    },
+    {
+      "id": "w-ja-b2-02",
+      "level": "B2",
+      "jlpt": "N2",
+      "family": "scope_limit_addition",
+      "en": "地域の文化イベントが若者に限らず幅広い世代に人気を集めている理由を説明してください。（使う表現：〜に限らず、〜のみならず、〜うえに）",
+      "id_hint": "Jelaskan alasan mengapa acara budaya daerah diminati oleh berbagai generasi, tidak terbatas pada kalangan muda saja (gunakan pola: 〜に限らず, 〜のみならず, 〜うえに).",
+      "target": 110,
+      "focus": "scope_limit_addition"
+    },
+    {
+      "id": "w-ja-b2-03",
+      "level": "B2",
+      "jlpt": "N2",
+      "family": "inevitability_compulsion",
+      "en": "環境問題や健康管理について、私たちが今すぐ見直さざるを得ない習慣を５〜６文で書いてください。（使う表現：〜ざるを得ない、〜ないわけにはいかない、〜しかない）",
+      "id_hint": "Tulis dalam 5–6 kalimat tentang kebiasaan terkait lingkungan atau kesehatan yang mau tidak mau harus segera kita tinjau ulang (gunakan pola: 〜ざるを得ない, 〜ないわけにはいかない, 〜しかない).",
+      "target": 115,
+      "focus": "inevitability_compulsion"
+    },
+    {
+      "id": "w-ja-b2-04",
+      "level": "B2",
+      "jlpt": "N2",
+      "family": "inevitability_compulsion",
+      "en": "一度引き受けた役割や約束を最後までやり遂げなければならない理由について述べてください。（使う表現：〜以上は、〜からには、〜ないわけにはいかない）",
+      "id_hint": "Kemukakan alasan mengapa tanggung jawab atau janji yang sudah kita sanggupi harus dituntaskan sampai akhir (gunakan pola: 〜以上は, 〜からには, 〜ないわけにはいかない).",
+      "target": 115,
+      "focus": "inevitability_compulsion"
+    },
+    {
+      "id": "w-ja-b2-05",
+      "level": "B2",
+      "jlpt": "N2",
+      "family": "temporal_immediacy",
+      "en": "新しいプロジェクトや新生活を始めるにあたって、準備し次第すぐに行いたいことを書いてください。（使う表現：〜にあたって、〜次第、〜に際して）",
+      "id_hint": "Tulis tentang hal-hal yang ingin segera kamu lakukan begitu persiapan selesai dalam menyambut proyek atau kehidupan baru (gunakan pola: 〜にあたって, 〜次第, 〜に際して).",
+      "target": 110,
+      "focus": "temporal_immediacy"
+    },
+    {
+      "id": "w-ja-b2-06",
+      "level": "B2",
+      "jlpt": "N2",
+      "family": "temporal_immediacy",
+      "en": "大きな試験や発表が終わったとたんに感じたことと、その直後の出来事を５〜６文で書いてください。（使う表現：〜とたんに、〜かと思うと、〜次第）",
+      "id_hint": "Tulis 5–6 kalimat tentang apa yang langsung kamu rasakan tepat begitu ujian atau presentasi besar selesai beserta kejadian sesudahnya (gunakan pola: 〜とたんに, 〜かと思うと, 〜次第).",
+      "target": 110,
+      "focus": "temporal_immediacy"
+    },
+    {
+      "id": "w-ja-b2-07",
+      "level": "B2",
+      "jlpt": "N2",
+      "family": "standpoint_evaluation",
+      "en": "都市の再開発について、住民の立場から見ればどのような利点や課題があるか述べてください。（使う表現：〜から見れば、〜という点では、〜にこたえて）",
+      "id_hint": "Kemukakan keuntungan dan tantangan penataan ulang kota jika dilihat dari sudut pandang warga setempat (gunakan pola: 〜から見れば, 〜という点では, 〜にこたえて).",
+      "target": 115,
+      "focus": "standpoint_evaluation"
+    },
+    {
+      "id": "w-ja-b2-08",
+      "level": "B2",
+      "jlpt": "N2",
+      "family": "standpoint_evaluation",
+      "en": "商品の値段だけでなく、長く使えるかどうかという観点から買い物をすることの大切さを書いてください。（使う表現：〜という点では、〜からすると、〜をもとに）",
+      "id_hint": "Tulis tentang pentingnya berbelanja dari sudut pandang apakah barang tersebut awet digunakan dalam jangka panjang, bukan sekadar harganya (gunakan pola: 〜という点では, 〜からすると, 〜をもとに).",
+      "target": 115,
+      "focus": "standpoint_evaluation"
+    },
+    {
+      "id": "w-ja-b2-09",
+      "level": "B2",
+      "jlpt": "N2",
+      "family": "counterfactual_regret",
+      "en": "過去に「もっと早く相談しておけばよかった」と後悔した経験と、そこから学んだ教訓を書いてください。（使う表現：〜ばかりに、〜あげく、〜ことだ）",
+      "id_hint": "Tulis tentang pengalaman masa lalu yang membuatmu menyesal karena tidak berkonsultasi lebih awal, serta pelajaran yang kamu petik (gunakan pola: 〜ばかりに, 〜あげく, 〜ことだ).",
+      "target": 115,
+      "focus": "counterfactual_regret"
+    },
+    {
+      "id": "w-ja-b2-10",
+      "level": "B2",
+      "jlpt": "N2",
+      "family": "counterfactual_regret",
+      "en": "長く悩んだ末に決断したことと、目標を達成するためにまず実行すべきことを５〜６文で書いてください。（使う表現：〜末に、〜ないことには、〜ことだ）",
+      "id_hint": "Tulis 5–6 kalimat tentang keputusan yang kamu ambil setelah pertimbangan panjang dan langkah pertama yang wajib dilakukan demi mencapai tujuan (gunakan pola: 〜末に, 〜ないことには, 〜ことだ).",
+      "target": 115,
+      "focus": "counterfactual_regret"
+    },
+    {
+      "id": "w-ja-b2-11",
+      "level": "B2",
+      "jlpt": "N2",
+      "family": "advanced_keigo_business",
+      "en": "取引先の担当者へ、資料を送ってもらったお礼と来週訪問する予定を伝える丁寧なメールを書いてください。（使う表現：拝見する、伺う、申し上げます）",
+      "id_hint": "Tulis surel bisnis yang sopan kepada mitra kerja untuk mengucapkan terima kasih atas pengiriman dokumen sekaligus menyampaikan rencana kunjungan minggu depan (gunakan pola: 拝見する, 伺う, 申し上げます).",
+      "target": 120,
+      "focus": "advanced_keigo_business"
+    },
+    {
+      "id": "w-ja-b2-12",
+      "level": "B2",
+      "jlpt": "N2",
+      "family": "advanced_keigo_business",
+      "en": "セミナーの案内メールとして、日程の説明と金曜日までの返信をお願いする文章を５〜６文で書いてください。（使う表現：ご〜させていただきます、承る、〜ていただきたく存じます）",
+      "id_hint": "Tulis 5–6 kalimat surel undangan seminar yang menjelaskan jadwal acara dan memohon konfirmasi balasan paling lambat hari Jumat (gunakan pola: ご〜させていただきます, 承る, 〜ていただきたく存じます).",
+      "target": 120,
+      "focus": "advanced_keigo_business"
+    },
+    {
+      "id": "w-ja-c1-01",
+      "level": "C1",
+      "jlpt": "N1",
+      "family": "literary_negation_classical",
+      "en": "市民の安全や公益を守るために、行政が厳しい措置をとらざるを得ない状況について、５〜６文で論じてください。（使う表現：〜ざるを得ない、〜ずにはおかない、〜ないではすまない）",
+      "id_hint": "Tulis argumen resmi 5–6 kalimat tentang situasi ketika pemerintah mau tidak mau harus mengambil langkah tegas demi keselamatan publik (gunakan pola: 〜ざるを得ない, 〜ずにはおかない, 〜ないではすまない).",
+      "target": 130,
+      "focus": "literary_negation_classical"
+    },
+    {
+      "id": "w-ja-c1-02",
+      "level": "C1",
+      "jlpt": "N1",
+      "family": "literary_negation_classical",
+      "en": "歴史的な記録映像や文学作品に触れたとき、観る者の良心を揺さぶらずにはおかない力について書いてください。（使う表現：〜ずにはおかない、〜べくもない、〜にやまれぬ）",
+      "id_hint": "Tulis tentang kekuatan karya sastra atau rekaman sejarah yang niscaya menggugah hati nurani siapa pun yang menyaksikannya (gunakan pola: 〜ずにはおかない, 〜べくもない, 〜にやまれぬ).",
+      "target": 130,
+      "focus": "literary_negation_classical"
+    },
+    {
+      "id": "w-ja-c1-03",
+      "level": "C1",
+      "jlpt": "N1",
+      "family": "emphatic_concession",
+      "en": "法の下の平等について、いかなる権力者や専門家といえども例外は許されないという意見を５〜６文で書いてください。（使う表現：〜といえども、〜であれ、〜にせよ）",
+      "id_hint": "Tulis opini 5–6 kalimat tentang kesetaraan di mata hukum, bahwa sekalipun seseorang adalah penguasa atau pakar ternama, tidak ada pengecualian yang dibenarkan (gunakan pola: 〜といえども, 〜であれ, 〜にせよ).",
+      "target": 130,
+      "focus": "emphatic_concession"
+    },
+    {
+      "id": "w-ja-c1-04",
+      "level": "C1",
+      "jlpt": "N1",
+      "family": "emphatic_concession",
+      "en": "部下や後輩の将来を真剣に案ずればこそ、時には厳しい指摘を行うことの意義について書いてください。（使う表現：〜ばこそ、〜とて、〜からといって）",
+      "id_hint": "Tulis tentang makna memberikan teguran tegas kepada junior justru karena kita sungguh-sungguh memikirkan masa depan mereka (gunakan pola: 〜ばこそ, 〜とて, 〜からといって).",
+      "target": 130,
+      "focus": "emphatic_concession"
+    },
+    {
+      "id": "w-ja-c1-05",
+      "level": "C1",
+      "jlpt": "N1",
+      "family": "immediate_succession_formal",
+      "en": "画期的な新技術や重大ニュースが報じられるや否や、社会や市場がどう反応したかを５〜６文で描写してください。（使う表現：〜や否や、〜が早いか、〜なり）",
+      "id_hint": "Gambarkan dalam 5–6 kalimat bagaimana masyarakat dan pasar langsung bereaksi begitu berita besar atau teknologi baru diumumkan (gunakan pola: 〜や否や, 〜が早いか, 〜なり).",
+      "target": 130,
+      "focus": "immediate_succession_formal"
+    },
+    {
+      "id": "w-ja-c1-06",
+      "level": "C1",
+      "jlpt": "N1",
+      "family": "immediate_succession_formal",
+      "en": "新しい語彙や専門知識を覚えるそばから忘れてしまう課題をどう克服するか、あなたの工夫を書いてください。（使う表現：〜そばから、〜が早いか、〜や否や）",
+      "id_hint": "Tulis strategi belajarmu dalam mengatasi masalah hafalan kosakata atau ilmu baru yang langsung terlupakan begitu selesai dihafal (gunakan pola: 〜そばから, 〜が早いか, 〜や否や).",
+      "target": 130,
+      "focus": "immediate_succession_formal"
+    },
+    {
+      "id": "w-ja-c1-07",
+      "level": "C1",
+      "jlpt": "N1",
+      "family": "status_role_worthiness",
+      "en": "社会の指導者や医師たるもの、いかなる時も高い倫理観を持つべきであるという考えを５〜６文で述べてください。（使う表現：〜たるもの、〜ならではの、〜に恥じない）",
+      "id_hint": "Kemukakan pendapatmu dalam 5–6 kalimat bahwa sebagai seorang pemimpin atau dokter, seseorang wajib menjunjung etika tinggi setiap saat (gunakan pola: 〜たるもの, 〜ならではの, 〜に恥じない).",
+      "target": 135,
+      "focus": "status_role_worthiness"
+    },
+    {
+      "id": "w-ja-c1-08",
+      "level": "C1",
+      "jlpt": "N1",
+      "family": "status_role_worthiness",
+      "en": "長年の研鑽によって生み出された伝統工芸や研究成果が、なぜ国際的な称賛に値するのかを論じてください。（使う表現：〜に足る、〜に値する、〜ならではの）",
+      "id_hint": "Jelaskan mengapa karya kerajinan tradisional atau hasil riset bertahun-tahun layak mendapatkan pujian dan kepercayaan internasional (gunakan pola: 〜に足る, 〜に値する, 〜ならではの).",
+      "target": 135,
+      "focus": "status_role_worthiness"
+    },
+    {
+      "id": "w-ja-c1-09",
+      "level": "C1",
+      "jlpt": "N1",
+      "family": "extreme_correlation",
+      "en": "組織改革や国際交渉の成否は今後の対応いかんにかかっているというテーマで、５〜６文の分析を書いてください。（使う表現：〜いかんだ、〜いかんによっては、〜にかかっている）",
+      "id_hint": "Tulis analisis 5–6 kalimat dengan tema bahwa berhasil tidaknya reformasi organisasi atau negosiasi bergantung sepenuhnya pada langkah penanganan ke depan (gunakan pola: 〜いかんだ, 〜いかんによっては, 〜にかかっている).",
+      "target": 135,
+      "focus": "extreme_correlation"
+    },
+    {
+      "id": "w-ja-c1-10",
+      "level": "C1",
+      "jlpt": "N1",
+      "family": "extreme_correlation",
+      "en": "国籍や経歴のいかんによらず実力を評価する制度と、困難をものともせずに挑戦する姿勢について書いてください。（使う表現：〜のいかんによらず、〜をものともせず、〜に至っては）",
+      "id_hint": "Tulis tentang sistem penilaian berbasis kompetensi tanpa memandang latar belakang, serta sikap pantang menyerah yang tak gentar menghadapi rintangan (gunakan pola: 〜のいかんによらず, 〜をものともせず, 〜に至っては).",
+      "target": 135,
+      "focus": "extreme_correlation"
+    },
+    {
+      "id": "w-ja-c2-01",
+      "level": "C2",
+      "jlpt": "N1+",
+      "family": "academic_rhetoric_register",
+      "en": "人工知能の台頭は単なる技術革新にとどまらず、人間社会の構造的転換にほかならないという論旨で学術的な段落を書いてください。（使う表現：〜にとどまらず、〜にほかならない、〜のみならず）",
+      "id_hint": "Tulis paragraf esai akademik dengan tesis bahwa kebangkitan AI tidak berhenti pada inovasi teknis semata, melainkan tiada lain adalah transformasi struktural masyarakat manusia (gunakan pola: 〜にとどまらず, 〜にほかならない, 〜のみならず).",
+      "target": 145,
+      "focus": "academic_rhetoric_register"
+    },
+    {
+      "id": "w-ja-c2-02",
+      "level": "C2",
+      "jlpt": "N1+",
+      "family": "academic_rhetoric_register",
+      "en": "内部統制を軽視した組織の崩壊は起きるべくして起きた必然の帰結であるという批判的考察を６文程度で書いてください。（使う表現：〜べくして、〜といっても過言ではない、〜にほかならない）",
+      "id_hint": "Tulis kajian kritis sekitar 6 kalimat bahwa runtuhnya organisasi yang mengabaikan pengawasan internal adalah keniscayaan logis yang memang sudah semestinya terjadi (gunakan pola: 〜べくして, 〜といっても過言ではない, 〜にほかならない).",
+      "target": 145,
+      "focus": "academic_rhetoric_register"
+    },
+    {
+      "id": "w-ja-c2-03",
+      "level": "C2",
+      "jlpt": "N1+",
+      "family": "classical_residual_idioms",
+      "en": "自己の権力を維持せんがために事実を隠蔽することは公職者にあるまじき行為であるという論説文を書いてください。（使う表現：〜んがために、〜にあるまじき、〜べからず）",
+      "id_hint": "Tulis teks editorial bahwa menutup-nutupi fakta demi mempertahankan kekuasaan pribadi adalah tindakan yang sama sekali tidak pantas bagi pejabat publik (gunakan pola: 〜んがために, 〜にあるまじき, 〜べからず).",
+      "target": 150,
+      "focus": "classical_residual_idioms"
+    },
+    {
+      "id": "w-ja-c2-04",
+      "level": "C2",
+      "jlpt": "N1+",
+      "family": "classical_residual_idioms",
+      "en": "戦火や災害で失われた文化財への痛恨の念と、当事者の無念さは察するに難くないという格調高い文章を書いてください。（使う表現：〜に難くない、〜を禁じ得ない、〜に堪えない）",
+      "id_hint": "Tulis esai bergaya sastra tinggi tentang rasa sesal yang tak tertahankan atas musnahnya warisan budaya serta betapa mudahnya memahami kepedihan para korban (gunakan pola: 〜に難くない, 〜を禁じ得ない, 〜に堪えない).",
+      "target": 150,
+      "focus": "classical_residual_idioms"
+    },
+    {
+      "id": "w-ja-c2-05",
+      "level": "C2",
+      "jlpt": "N1+",
+      "family": "pragmatic_nuance_irony",
+      "en": "どれほど独創的な政策も実行に移さなければそれまでだという視点から、企画力と実行力の関係について論じてください。（使う表現：〜もさることながら、〜ばそれまでだ、〜といったらない）",
+      "id_hint": "Bahas hubungan antara kualitas perencanaan dan eksekusi nyata dari sudut pandang bahwa secemerlang apa pun suatu kebijakan, jika tidak dijalankan maka semuanya berakhir sia-sia (gunakan pola: 〜もさることながら, 〜ばそれまでだ, 〜といったらない).",
+      "target": 150,
+      "focus": "pragmatic_nuance_irony"
+    },
+    {
+      "id": "w-ja-c2-06",
+      "level": "C2",
+      "jlpt": "N1+",
+      "family": "pragmatic_nuance_irony",
+      "en": "信念を曲げてまで妥協するくらいなら撤退したほうがましだが、先方が譲歩するなら再交渉に応じないものでもないという交渉姿勢を書いてください。（使う表現：〜くらいなら…ほうがましだ、〜ないものでもない、〜とばかりに）",
+      "id_hint": "Tulis sikap negosiasi berprinsip: daripada berkompromi sampai mengorbankan prinsip lebih mending mundur, namun jika pihak lawan memberikan konsesi, bukannya tidak mungkin negosiasi ulang dipertimbangkan (gunakan pola: 〜くらいなら…ほうがましだ, 〜ないものでもない, 〜とばかりに).",
+      "target": 150,
+      "focus": "pragmatic_nuance_irony"
+    },
+    {
+      "id": "w-ja-c2-07",
+      "level": "C2",
+      "jlpt": "N1+",
+      "family": "executive_diplomatic_keigo",
+      "en": "取引先の経営陣へ宛てて、平素のご高配への感謝と、同封した契約書草案のご査収をお願いする格調高いビジネス文書を書いてください。（使う表現：ご清栄、ご高配を賜り、ご査収のほど）",
+      "id_hint": "Tulis surat resmi tingkat eksekutif kepada jajaran direksi mitra untuk menyelamati kemakmuran perusahaan, berterima kasih atas dukungan istimewa selama ini, dan memohon pemeriksaan draf kontrak terlampir (gunakan pola: ご清栄, ご高配を賜り, ご査収のほど).",
+      "target": 155,
+      "focus": "executive_diplomatic_keigo"
+    },
+    {
+      "id": "w-ja-c2-08",
+      "level": "C2",
+      "jlpt": "N1+",
+      "family": "executive_diplomatic_keigo",
+      "en": "不手際について私の不徳の致すところと深く陳謝し、詳細は後日拝眉の上ご説明すると伝える公式書簡を書いてください。（使う表現：不徳の致すところ、ご容赦くださいますよう、拝眉の上）",
+      "id_hint": "Tulis surat permohonan maaf resmi tingkat eksekutif yang mengakui bahwa kekeliruan yang terjadi semata-mata akibat kekurangan diri pribadi, memohon pemakluman, dan menjanjikan penjelasan rinci saat bertemu langsung (gunakan pola: 不徳の致すところ, ご容赦くださいますよう, 拝眉の上).",
+      "target": 155,
+      "focus": "executive_diplomatic_keigo"
     }
   ]
 }

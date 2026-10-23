@@ -296,34 +296,37 @@
    ========================================================================= */
 
 .jlpt-level-tabs {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 6px;
   background: #EFE6D8;
-  padding: 2.5px;
-  border-radius: 12px;
-  min-height: 34px;
-  height: 34px;
+  padding: 6px;
+  border-radius: 14px;
+  min-height: 44px;
+  height: auto;
   box-sizing: border-box;
   flex-shrink: 0;
 }
 
 .jlpt-lvl-btn {
-  flex: 1;
-  padding: 0 8px;
-  height: 29px;
+  padding: 8px 10px;
+  min-height: 44px;
+  height: auto;
   border: none;
   background: transparent;
   font-family: inherit;
-  font-size: 12px;
+  font-size: 11.5px;
+  line-height: 1.25;
   font-weight: 700;
   color: var(--text-muted, #7A6F64);
-  border-radius: 9px;
+  border-radius: 10px;
   cursor: pointer;
   transition: all 0.15s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  text-align: center;
+  gap: 5px;
 }
 
 .jlpt-lvl-btn.active {
@@ -2092,16 +2095,21 @@
   }
 
   .jlpt-level-tabs {
-    min-height: 30px !important;
-    height: 30px !important;
-    padding: 2px !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    min-height: 44px !important;
+    height: auto !important;
+    padding: 5px !important;
+    gap: 5px !important;
     flex-shrink: 0 !important;
   }
 
   .jlpt-lvl-btn {
     font-size: 11px !important;
-    height: 26px !important;
-    padding: 0 8px !important;
+    min-height: 44px !important;
+    height: auto !important;
+    padding: 6px 8px !important;
+    line-height: 1.2 !important;
   }
 
   .jlpt-mondai-scroll {
