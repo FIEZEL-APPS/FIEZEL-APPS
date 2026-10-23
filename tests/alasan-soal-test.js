@@ -163,7 +163,7 @@ test('B1 probe retensi (jatuh tempo maupun rapuh) TIDAK diberi label apa pun, ju
     const st = { vocab: {}, grammar: { be_subject_agreement: due(9) }, reading: {}, history: [] };
     const sb = sandbox(Object.assign({ state: st }, opts));
     assert.strictEqual(sb.alasanSoalForQuestion(grammarQ(), { policy: { targetSkill: 'be_subject_agreement' } }, NOW), null, JSON.stringify(opts));
-    for (const type of ['token-order', 'video-grammar', 'cloze']) {
+    for (const type of ['token-order', 'cloze']) {
       const q = { type, lessonSkill: 'be_subject_agreement', skill: 'be_subject_agreement' };
       assert.strictEqual(sb.alasanSoalForQuestion(q, { policy: { targetSkill: 'be_subject_agreement' } }, NOW), null, type + ' ' + JSON.stringify(opts));
     }

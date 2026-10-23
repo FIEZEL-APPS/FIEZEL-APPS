@@ -867,8 +867,10 @@ body:has(.modal-intensity-sheet) nav.bottomnav {
   background: #F8FAFC;
   border: 1px solid #E2E8F0;
   border-radius: 50%;
-  width: 32px;
-  height: 32px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;

@@ -233,6 +233,11 @@
           const vacantEl = document.createElement('span');
           vacantEl.className = 'gx-vacant-slot';
           vacantEl.innerHTML = vacantSlotHtml();
+          vacantEl.onclick = () => {
+            if (typeof self.haptic === 'function') self.haptic('tap');
+            vacantSlotIndex = null;
+            render();
+          };
           railEl.appendChild(vacantEl);
         }
         const btn = document.createElement('button');
@@ -258,6 +263,11 @@
         const vacantEl = document.createElement('span');
         vacantEl.className = 'gx-vacant-slot';
         vacantEl.innerHTML = vacantSlotHtml();
+        vacantEl.onclick = () => {
+          if (typeof self.haptic === 'function') self.haptic('tap');
+          vacantSlotIndex = null;
+          render();
+        };
         railEl.appendChild(vacantEl);
       }
 
@@ -616,7 +626,7 @@
     const title = ok ? FiezelI18n.t('quiz.verdict-correct', 'Tepat sekali!') : FiezelI18n.t('quiz.verdict-wrong', 'Belum tepat');
 
     let pickedWhyFails = '';
-    if (!ok && (q.type === 'grammar' || q.type === 'video-grammar') && q.explain && Array.isArray(q.explain.distractors)) {
+    if (!ok && (q.type === 'grammar') && q.explain && Array.isArray(q.explain.distractors)) {
       const dist = q.explain.distractors.find(x => x.option && pickedOption && String(x.option).toLowerCase() === String(pickedOption).toLowerCase());
       pickedWhyFails = dist ? (dist.reason || '').trim() : '';
     }

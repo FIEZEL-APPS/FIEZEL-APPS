@@ -1,7 +1,7 @@
 # FIEZEL M025-631 Handoff Dossier: Perbaikan Tata Letak Topbar, Sticky Bottom Bar, dan Respons Suara Real-Time pada Mitra Kaiwa
 
-**Nomor Rilis**: `m025-631`
-**Cakupan**: `fix(chat): rapikan topbar bottombar dan aktifkan respons suara mitra kaiwa (m025-631)`
+**Nomor Rilis**: `m025-631` / `m025-632`
+**Cakupan**: `fix(chat): rapikan topbar bottombar dan aktifkan respons suara mitra kaiwa (m025-632)`
 **Status Mutu Lokal**: 100% HIJAU (PASS)
 
 ---

@@ -638,6 +638,8 @@
             const isSel = lvl.id === current;
             return `
               <div class="intensity-option-card${isSel ? ' is-selected' : ''}"
+                   role="button" tabindex="0" aria-pressed="${isSel}"
+                   onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}"
                    onclick="FiezelGrammarVocabBridge.applyIntensityAndClose('${lvl.id}', '${returnSkill || ''}')">
                 <div class="option-header">
                   <span class="option-name"><b>${lvl.name}</b></span>
@@ -728,6 +730,9 @@
     if (!s) return false;
     if (!s.preferences) s.preferences = {};
     if (s.preferences.learningIntensityChosen) return false;
+    if (typeof document !== 'undefined' && (document.body?.classList.contains('fz-stage-quiz') || document.body?.classList.contains('fz-lesson-mode') || document.querySelector('.quiz-shell'))) {
+      return false;
+    }
     openFirstTimeIntensityModal();
     return true;
   }
@@ -751,6 +756,8 @@
             const isSel = lvl.id === current;
             return `
               <div class="intensity-option-card${isSel ? ' is-selected' : ''}"
+                   role="button" tabindex="0" aria-pressed="${isSel}"
+                   onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}"
                    onclick="FiezelGrammarVocabBridge.selectFirstTimeIntensity('${lvl.id}')">
                 <div class="option-header">
                   <span class="option-name"><b>${lvl.name}</b></span>

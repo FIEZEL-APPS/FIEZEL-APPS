@@ -26,24 +26,13 @@ function check(name, ok, detail) {
 }
 
 const app = read('app.js');
-const video = read('features/grammar/fiezel-grammar-video.js');
 const bridge = read('features/grammar/grammar-vocab-bridge.js');
 const tour = read('features/onboarding/fiezel-tour.js');
 const style = read('style.css');
 
-// U1
-global.self = global;
-require(path.join(__fzRoot, 'features/grammar/fiezel-grammar-video.js'));
-const blank = self.FiezelGrammarVideo && self.FiezelGrammarVideo.blankAnswerInSubtitle;
-const ex = { clozeText: 'I usually ___ coffee in the morning.', clozeAnswer: 'drink' };
-check('U1 subtitle yang sama dengan kalimat soal terisi ditampilkan rumpang', typeof blank === 'function' && blank('I usually drink coffee in the morning.', ex) === ex.clozeText);
-check('U1 subtitle lain tidak diubah', typeof blank === 'function' && blank('But today I want tea.', ex) === 'But today I want tea.');
-check('U1 baris subtitle memakai warna teks eksplisit, bukan mewarisi', /color:#F1F5F9/.test(video) && !/background:var\(--panel, #0F172A\)/.test(video));
-check('U1 kalimat "Video tidak tersedia" tidak lagi tampil ke murid', !/grammar\.video\.no-video/.test(video));
-// U2
-const vg = (app.match(/function getOrMakeVideoGrammarQuestion[\s\S]*?\n}\n/) || [''])[0];
-check('U2 video hanya dari skill pelajaran itu sendiri', /x\.skill===skill\|\|x\.lessonSkill===skill/.test(vg) && !/x\.level===level/.test(vg) && !/bank\.find\(x=>!usedVgIds\.has\(x\.id\)\)/.test(vg));
-check('U2 perintah soal video lewat i18n, bukan teks Inggris bank', /let stemQuestion = \(typeof FiezelI18n/.test(video));
+// U1 & U2: Soal video grammar telah dihapus total dari aplikasi & sesi soal
+check('U1 fiezel-grammar-video.js tidak lagi dimuat di index.html dan sw.js', !read('index.html').includes('fiezel-grammar-video.js') && !read('sw.js').includes('fiezel-grammar-video.js'));
+check('U2 getOrMakeVideoGrammarQuestion dan startVideoGrammarSession telah dihapus dari app.js', !app.includes('getOrMakeVideoGrammarQuestion') && !app.includes('startVideoGrammarSession'));
 // U3
 check('U3 kartu Prasasti berlatar terang yang pasti', /\.fz-prasasti-card\{[^}]*background:#FFFDF8/.test(style));
 const idD = read('features/i18n/copy-id-app-d.js'), thD = read('features/i18n/copy-th-app-d.js');

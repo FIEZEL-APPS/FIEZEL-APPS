@@ -1093,8 +1093,8 @@ header.topbar,
 #topGamifyCluster[style*="display:none"] {
   display: none !important;
 }
-  height: 36px !important;
-  min-height: 36px !important;
+  height: 44px !important;
+  min-height: 44px !important;
   width: auto !important;
   min-width: auto !important;
   flex-shrink: 0 !important;
@@ -5241,14 +5241,15 @@ html body.fz-view-grammar #app .path-step .path-label > span {
 html body.fz-view-grammar #app .path-step .path-label .path-cta {
   display: inline-flex !important;
   align-items: center !important;
+  justify-content: center !important;
   gap: 6px !important;
   width: auto !important;
   align-self: flex-start !important;
-  height: 32px !important;
-  min-height: 0 !important;
-  padding: 6px 16px !important;
+  height: auto !important;
+  min-height: 44px !important;
+  padding: 10px 18px !important;
   margin-top: 6px !important;
-  font-size: 12px !important;
+  font-size: 12.5px !important;
   font-weight: 800 !important;
   border-radius: 9999px !important;
   background: linear-gradient(135deg, #FBBF24, #F59E0B) !important;
@@ -6021,7 +6022,7 @@ html body #app .grammar-brief-example b{color:#9A3412!important;-webkit-text-fil
        diberi latar krem padat supaya terbaca di panel mana pun;
      - label "Daftar kata tersedia" abu sangat muda (1,48:1);
      - label "PRASASTI BARU" kuning di atas krem (1,29:1). */
-body.fz-lesson-mode .toast,body:has(.quiz-shell) .toast{top:calc(10px + env(safe-area-inset-top));bottom:auto!important}
+body.fz-lesson-mode .toast,body:has(.quiz-shell) .toast{top:calc(66px + env(safe-area-inset-top));bottom:auto!important}
 html body #app .path-step .path-node{padding:0!important;display:flex!important;align-items:center!important;justify-content:center!important}
 html body #app .path-step .path-node .path-ring{width:34px!important;height:34px!important;border-radius:50%!important;flex:none!important}
 html body #app .path-step .path-node .path-ring > b{display:block!important;margin:0!important;padding:0!important;height:auto!important;line-height:1!important;background:none!important;border:0!important;box-shadow:none!important;font-size:14px!important;font-weight:800!important;color:#1F1A14!important;-webkit-text-fill-color:#1F1A14!important}
@@ -7341,8 +7342,8 @@ button.skill-back-btn {
   display: inline-flex !important;
   align-items: center !important;
   gap: 6px !important;
-  height: 40px !important;
-  min-height: 40px !important;
+  height: 44px !important;
+  min-height: 44px !important;
   padding: 0 14px !important;
   border-radius: 999px !important;
   background: #FFFFFF !important;
@@ -7378,9 +7379,9 @@ button.skill-back-btn:active {
 .skill-help-dot,
 button.skill-help-dot,
 html.fiezel-ui-v6 .skill-help-dot {
-  width: 40px !important;
-  height: 40px !important;
-  min-height: 40px !important;
+  width: 44px !important;
+  height: 44px !important;
+  min-height: 44px !important;
   border-radius: 50% !important;
   background: #FFFFFF !important;
   border: 2px solid #E2E8F0 !important;
@@ -7868,7 +7869,7 @@ html body #app .fz-kawan-card .fz-kawan-tag {
   font-weight: 800 !important;
   line-height: 1.5 !important;
   letter-spacing: 0.02em;
-  color: #B45309 !important;
+  color: #92400E !important;
   background: #FFF1D6;
   border: 1px solid #F3D7AA;
   border-radius: 9999px;
@@ -7921,13 +7922,14 @@ html body #app .fz-kawan-card button.fz-kawan-cta {
   gap: 6px !important;
   width: 100% !important;
   margin: 0 !important;
-  min-height: 42px !important;
+  min-height: 44px !important;
   height: auto !important;
   padding: 0 16px !important;
   border: none !important;
   border-radius: 9999px !important;
   background: linear-gradient(180deg, #F59E0B 0%, #D97706 100%) !important;
-  color: #FFFFFF !important;
+  color: #1B1418 !important;
+  -webkit-text-fill-color: #1B1418 !important;
   font-family: inherit !important;
   font-size: 13px !important;
   font-weight: 800 !important;
@@ -7939,6 +7941,10 @@ html body #app .fz-kawan-card button.fz-kawan-cta {
   transition: transform 0.12s ease, box-shadow 0.12s ease !important;
   position: relative;
   z-index: 1;
+}
+html body #app .fz-kawan-card button.fz-kawan-cta span {
+  color: #1B1418 !important;
+  -webkit-text-fill-color: #1B1418 !important;
 }
 
 html body #app .fz-kawan-card button.fz-kawan-cta:active {
@@ -7983,4 +7989,199 @@ html body #app .fz-kawan-card button.fz-kawan-cta:focus-visible { outline: 2px s
   html body #app .today-home-cockpit.today-home-cockpit > #heroCard { grid-row: 3 !important; }
   html body #app .today-home-cockpit.today-home-cockpit > .class-bar { grid-row: 4 !important; }
   html body #app .today-home-cockpit.today-home-cockpit > .quick-practice-section { grid-row: 3 / span 2 !important; }
+}
+
+/* ==========================================================================
+   17. AUDIT UI/UX SESI LATIHAN GRAMMAR (G-01 s/d G-09)
+   ========================================================================== */
+
+/* G-01: Dock #quizFloatingBar dalam alur dokumen tepat di bawah kartu soal
+   agar tidak pernah menumpuki kartu #feedback, #tutorTurn, maupun akordion
+   yang dibuka di Mobile (390x844) maupun Desktop (1280x800). */
+html body #app .quiz-shell #quizFloatingBar.quiz-floating-bar,
+.quiz-shell #quizFloatingBar {
+  position: relative !important;
+  bottom: auto !important;
+  left: auto !important;
+  right: auto !important;
+  transform: none !important;
+  width: 100% !important;
+  max-width: 600px !important;
+  margin: 4px auto 16px !important;
+  padding: 0 !important;
+  z-index: 20 !important;
+  box-sizing: border-box !important;
+}
+
+/* G-02: Video Lab — satu ikon aktif di tombol Play/Pause + kontras badge loop */
+html body #app .video-play-btn svg.is-hidden,
+html body #app .video-player-container:not(.is-playing) .video-play-btn .pause-icon,
+html body #app .video-player-container.is-playing .video-play-btn .play-icon {
+  display: none !important;
+}
+
+html body #app .video-loop-badge,
+html body #app .video-loop-badge span {
+  background: rgba(15, 23, 42, 0.88) !important;
+  color: #F8FAFC !important;
+  -webkit-text-fill-color: #F8FAFC !important;
+  border: 1px solid rgba(255, 255, 255, 0.24) !important;
+}
+
+/* G-03 & G-04: Hierarki tipografi kalimat soal (.question-main >= 18px/700)
+   dan bingkai kartu soal di Desktop saat berada di luar .quiz-bubble */
+html body #app .quiz-shell .question-main {
+  font-size: clamp(1.12rem, 1.05rem + 0.45vw, 1.32rem) !important;
+  font-weight: 700 !important;
+  line-height: 1.4 !important;
+}
+
+html body #app .quiz-shell #quizStem:not(.quiz-bubble *):not(.quiz-stage *):not(.speech-bubble *) {
+  background: #F8FAFC !important;
+  border: 1.5px solid #E2E8F0 !important;
+  border-radius: 16px !important;
+  padding: 14px 18px !important;
+  margin: 0 0 14px 0 !important;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04) !important;
+}
+
+/* G-07: Target sentuh >= 44x44px & cegah teks terpotong di tepi kanan */
+html body #app .path-cta {
+  min-height: 44px !important;
+  padding: 8px 16px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+}
+
+html body #app .lesson-skip-link,
+html body #app button.lesson-skip-link {
+  min-height: 44px !important;
+  padding: 8px 14px !important;
+  max-width: 100% !important;
+  white-space: normal !important;
+  text-align: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+}
+
+html body #hintCloseBtn,
+html body .hint-close-btn {
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  min-height: 44px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+html body #app #feedback details.acc > summary,
+html body #app .quiz-shell details.acc > summary {
+  min-height: 44px !important;
+  display: flex !important;
+  align-items: center !important;
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+  box-sizing: border-box !important;
+}
+
+html body .modal .puzzle-tile,
+html body button.puzzle-tile {
+  min-width: 48px !important;
+  min-height: 48px !important;
+  padding: 10px 16px !important;
+  box-sizing: border-box !important;
+}
+
+html body .course-switch-btn,
+html body button.course-switch-btn,
+html body header.topbar #fzCourseSwitchBtn,
+html body .topbar .btn-course-selector {
+  height: 44px !important;
+  min-height: 44px !important;
+  min-width: 44px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+}
+
+html body .level-change-btn,
+html body button.level-change-btn {
+  min-height: 44px !important;
+  padding: 8px 14px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+}
+
+html body #app .retry-giveup-btn,
+html body #app button.retry-giveup-btn {
+  min-height: 44px !important;
+  padding: 8px 16px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+}
+
+html body .modal-close-corner {
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  min-height: 44px !important;
+}
+
+html body .modal .skill-help-panel h2,
+html body .modal-panel .skill-help-panel h2 {
+  padding-left: 44px !important;
+  padding-right: 44px !important;
+}
+
+/* G-08: Perbaikan kontras WCAG AA (>= 4.5:1) */
+html body .modal .skill-help-panel .skill-badge,
+html body .skill-help-panel .skill-badge {
+  color: #78350F !important;
+  -webkit-text-fill-color: #78350F !important;
+  background: #FEF3C7 !important;
+  border: 1px solid #FDE68A !important;
+  opacity: 1 !important;
+}
+
+html body #app .grammar-grid .card.lesson-locked {
+  opacity: 1 !important;
+  background: #F8FAFC !important;
+}
+
+html body #app .grammar-grid .card .muted,
+html body #app .grammar-grid .card .row span,
+html body #app .grammar-grid .card .lesson-card-foot span,
+html body #app .grammar-grid .card .lesson-lock-note,
+html body #app .grammar-grid .card .lesson-lock-note span {
+  color: #334155 !important;
+  -webkit-text-fill-color: #334155 !important;
+  opacity: 1 !important;
+}
+
+html body #app #tokenResetBtn:disabled,
+html body #app #tokenResetBtn:disabled span,
+html body #app #tokenSubmitBtn:disabled,
+html body #app #tokenSubmitBtn:disabled span {
+  color: #334155 !important;
+  -webkit-text-fill-color: #334155 !important;
+  background: #E2E8F0 !important;
+  border-color: #CBD5E1 !important;
+  opacity: 1 !important;
+}
+
+html body .modal .puzzle-tile.is-used,
+html body .puzzle-tile.is-used {
+  color: #334155 !important;
+  -webkit-text-fill-color: #334155 !important;
+  background: #E2E8F0 !important;
+  border-color: #CBD5E1 !important;
+  opacity: 1 !important;
 }
