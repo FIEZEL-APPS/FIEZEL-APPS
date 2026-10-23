@@ -121,12 +121,17 @@ export default function App() {
   const [isRefreshingAssist, setIsRefreshingAssist] = useState<boolean>(false);
 
   const [isRecordingPtt, setIsRecordingPtt] = useState<boolean>(false);
+  const [isListeningLiveSpeech, setIsListeningLiveSpeech] = useState<boolean>(false);
   const pttStartedAtRef = useRef<number | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const recordedChunksRef = useRef<Blob[]>([]);
   const speechRecRef = useRef<any>(null);
+  const liveSpeechRecRef = useRef<any>(null);
+  const liveSilenceTimerRef = useRef<number | null>(null);
+  const pttSilenceTimerRef = useRef<number | null>(null);
   const liveDictatedTextRef = useRef<string>('');
   const chatEndRef = useRef<HTMLDivElement | null>(null);
+  const transcriptContainerRef = useRef<HTMLDivElement | null>(null);
 
   const [isLiveConnected, setIsLiveConnected] = useState<boolean>(false);
   const [isLiveConnecting, setIsLiveConnecting] = useState<boolean>(false);
@@ -200,11 +205,21 @@ export default function App() {
         timestamp: Date.now(),
       },
     ]);
+    try {
+      window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
+    } catch {
+      // Ignore
+    }
   }, [activeScenario.id]);
 
   useEffect(() => {
-    if (activeTab === 'call') {
-      chatEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    if (activeTab === 'call' && turns.length > 1) {
+      if (transcriptContainerRef.current) {
+        transcriptContainerRef.current.scrollTo({
+          top: transcriptContainerRef.current.scrollHeight,
+          behavior: 'smooth',
+        });
+      }
     }
   }, [turns.length, isAnalyzingTurn, activeTab]);
 
@@ -312,24 +327,6 @@ export default function App() {
         if (flexTts?.audioBase64) {
           audioBase64 = flexTts.audioBase64;
           audioMime = flexTts.audioMimeType || 'audio/mpeg';
-        } else {
-          try {
-            const res = await fetch('/api/tts/speak', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                text,
-                voiceName: activePersona.geminiVoice,
-                speakingStyle: activePersona.speakingStyle,
-              }),
-            });
-            if (res.ok) {
-              const data = await res.json();
-              audioBase64 = data.audioBase64 || null;
-            }
-          } catch {
-            // Fall through to browser speechSynthesis
-          }
         }
       }
 
@@ -379,78 +376,29 @@ export default function App() {
     setStatusBanner(null);
 
     try {
-      let exactTranscript = trimmed;
-      let ev: any = null;
-      let aiAudioBase64: string | null = null;
-      let aiAudioMimeType = 'audio/wav';
-
-      try {
-        const res = await fetch('/api/voice-call/turn', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            userTranscript: trimmed,
-            audioBase64: params.audioBase64,
-            audioMimeType: params.audioMimeType,
-            scenarioId: activeScenario.id,
-            targetLang: activeScenario.targetLang,
-            scenarioTitle: activeScenario.titleId,
-            missionGoals: activeScenario.missionGoalsId,
-            targetPatterns: activeScenario.targetPatterns,
-            personaName: activePersona.name,
-            geminiVoice: activePersona.geminiVoice,
-            speakingStyle: activePersona.speakingStyle,
-            systemPrompt: activePersona.systemPrompt,
-            conversationHistory: turns.slice(-6).map((tItem) => ({
-              speaker: tItem.speaker,
-              text: tItem.text,
-            })),
-          }),
-        });
-
-        if (res.ok) {
-          const data = await res.json();
-          if (data?.ok && data?.evaluation) {
-            exactTranscript = data.userExactTranscript || trimmed;
-            ev = data.evaluation;
-            aiAudioBase64 = data.aiAudioBase64 || null;
-            aiAudioMimeType = data.aiAudioMimeType || 'audio/wav';
-            if (Array.isArray(data.nextSuggestedReplies) && data.nextSuggestedReplies.length > 0) {
-              setNextSuggestedReplies(data.nextSuggestedReplies);
-            } else {
-              setNextSuggestedReplies([]);
-            }
-          }
-        }
-      } catch {
-        // Static cPanel / Cloudflare Worker fallback
-      }
-
-      if (!ev) {
-        const fallbackEv = await evaluateTurnFlexible({
-          text: trimmed || activeScenario.sampleUtterances[0]?.text || 'Hello',
-          scenario: activeScenario,
-          persona: activePersona,
-          targetLang: activeScenario.targetLang,
-          locale,
-          measureMode: isMeasureMode,
-          history: turns.slice(-6).map((tItem) => ({
-            speaker: tItem.speaker,
-            text: tItem.text,
-          })),
-        });
-        exactTranscript = fallbackEv.userExactTranscript;
-        ev = fallbackEv;
-        aiAudioBase64 = fallbackEv.audioBase64 || null;
-        aiAudioMimeType = fallbackEv.audioMimeType || 'audio/mpeg';
-        if (
-          Array.isArray(fallbackEv.nextSuggestedReplies) &&
-          fallbackEv.nextSuggestedReplies.length > 0
-        ) {
-          setNextSuggestedReplies(fallbackEv.nextSuggestedReplies);
-        } else {
-          setNextSuggestedReplies([]);
-        }
+      const fallbackEv = await evaluateTurnFlexible({
+        text: trimmed || activeScenario.sampleUtterances[0]?.text || 'Hello',
+        scenario: activeScenario,
+        persona: activePersona,
+        targetLang: activeScenario.targetLang,
+        locale,
+        measureMode: isMeasureMode,
+        history: turns.slice(-6).map((tItem) => ({
+          speaker: tItem.speaker,
+          text: tItem.text,
+        })),
+      });
+      const exactTranscript = fallbackEv.userExactTranscript;
+      const ev = fallbackEv;
+      const aiAudioBase64 = fallbackEv.audioBase64 || null;
+      const aiAudioMimeType = fallbackEv.audioMimeType || 'audio/mpeg';
+      if (
+        Array.isArray(fallbackEv.nextSuggestedReplies) &&
+        fallbackEv.nextSuggestedReplies.length > 0
+      ) {
+        setNextSuggestedReplies(fallbackEv.nextSuggestedReplies);
+      } else {
+        setNextSuggestedReplies([]);
       }
 
       const effectiveHints = isMeasureMode ? 0 : showHint ? 1 : 0;
@@ -518,6 +466,7 @@ export default function App() {
 
       setTurns((prev) => [...prev, userTurn, aiTurn]);
       setInputText('');
+      setLiveUserDraft('');
       setShowHint(false);
 
       void speakAiText(ev.aiReply, aiAudioBase64);
@@ -530,6 +479,168 @@ export default function App() {
       setIsAnalyzingTurn(false);
     }
   };
+
+  const submitStudentTurnRef = useRef(submitStudentTurn);
+  submitStudentTurnRef.current = submitStudentTurn;
+
+  // Hands-free Continuous Voice Recognition for "Telepon Live" (turn-by-turn-fallback)
+  useEffect(() => {
+    const shouldListenHandsFree =
+      isLiveConnected &&
+      liveTransportMode === 'turn-by-turn-fallback' &&
+      !isPlayingAiAudio &&
+      !isAnalyzingTurn &&
+      !isMicMuted &&
+      !isRecordingPtt;
+
+    if (!shouldListenHandsFree) {
+      if (liveSilenceTimerRef.current) {
+        window.clearTimeout(liveSilenceTimerRef.current);
+        liveSilenceTimerRef.current = null;
+      }
+      if (liveSpeechRecRef.current) {
+        try {
+          liveSpeechRecRef.current.onresult = null;
+          liveSpeechRecRef.current.onend = null;
+          liveSpeechRecRef.current.onerror = null;
+          liveSpeechRecRef.current.stop();
+        } catch {
+          // Ignore
+        }
+        liveSpeechRecRef.current = null;
+      }
+      setIsListeningLiveSpeech(false);
+      return;
+    }
+
+    const SpeechRec =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRec) {
+      return;
+    }
+
+    let isDisposed = false;
+    let accumulatedSpeech = '';
+
+    const startListeningCycle = () => {
+      if (isDisposed) return;
+      try {
+        const rec = new SpeechRec();
+        rec.lang = activeScenario.targetLang === 'ja' ? 'ja-JP' : 'en-US';
+        rec.interimResults = true;
+        rec.continuous = true;
+
+        rec.onstart = () => {
+          if (!isDisposed) {
+            setIsListeningLiveSpeech(true);
+          }
+        };
+
+        rec.onresult = (event: any) => {
+          if (isDisposed) return;
+          let transcript = '';
+          for (let i = 0; i < event.results.length; i++) {
+            transcript += event.results[i][0].transcript;
+          }
+          const clean = transcript.trim();
+          if (clean) {
+            accumulatedSpeech = clean;
+            liveDictatedTextRef.current = clean;
+            setLiveUserDraft(clean);
+            setInputText(clean);
+
+            if (liveSilenceTimerRef.current) {
+              window.clearTimeout(liveSilenceTimerRef.current);
+            }
+            liveSilenceTimerRef.current = window.setTimeout(() => {
+              if (isDisposed) return;
+              const toSend = accumulatedSpeech.trim();
+              if (toSend) {
+                accumulatedSpeech = '';
+                liveDictatedTextRef.current = '';
+                try {
+                  rec.onend = null;
+                  rec.stop();
+                } catch {
+                  // Ignore
+                }
+                setIsListeningLiveSpeech(false);
+                void submitStudentTurnRef.current({
+                  text: toSend,
+                  speakingDurationSec: 3,
+                });
+              }
+            }, 1350);
+          }
+        };
+
+        rec.onerror = () => {
+          // Ignore transient no-speech errors in continuous call
+        };
+
+        rec.onend = () => {
+          if (isDisposed) return;
+          const pending = accumulatedSpeech.trim();
+          if (pending) {
+            accumulatedSpeech = '';
+            liveDictatedTextRef.current = '';
+            if (liveSilenceTimerRef.current) {
+              window.clearTimeout(liveSilenceTimerRef.current);
+              liveSilenceTimerRef.current = null;
+            }
+            setIsListeningLiveSpeech(false);
+            void submitStudentTurnRef.current({
+              text: pending,
+              speakingDurationSec: 3,
+            });
+            return;
+          }
+          // Restart listening loop while call remains active
+          window.setTimeout(() => {
+            if (!isDisposed) {
+              startListeningCycle();
+            }
+          }, 220);
+        };
+
+        liveSpeechRecRef.current = rec;
+        rec.start();
+        setIsListeningLiveSpeech(true);
+      } catch {
+        setIsListeningLiveSpeech(false);
+      }
+    };
+
+    startListeningCycle();
+
+    return () => {
+      isDisposed = true;
+      if (liveSilenceTimerRef.current) {
+        window.clearTimeout(liveSilenceTimerRef.current);
+        liveSilenceTimerRef.current = null;
+      }
+      if (liveSpeechRecRef.current) {
+        try {
+          liveSpeechRecRef.current.onresult = null;
+          liveSpeechRecRef.current.onend = null;
+          liveSpeechRecRef.current.onerror = null;
+          liveSpeechRecRef.current.stop();
+        } catch {
+          // Ignore
+        }
+        liveSpeechRecRef.current = null;
+      }
+      setIsListeningLiveSpeech(false);
+    };
+  }, [
+    isLiveConnected,
+    liveTransportMode,
+    isPlayingAiAudio,
+    isAnalyzingTurn,
+    isMicMuted,
+    isRecordingPtt,
+    activeScenario.targetLang,
+  ]);
 
   const startPttRecording = async () => {
     try {
@@ -550,38 +661,59 @@ export default function App() {
         }
       }
       setIsPlayingAiAudio(false);
-
       setStatusBanner(null);
       liveDictatedTextRef.current = '';
+      setLiveUserDraft('');
+      pttStartedAtRef.current = Date.now();
 
       const SpeechRec =
         (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
       if (SpeechRec) {
-        try {
-          const recognition = new SpeechRec();
-          recognition.lang = activeScenario.targetLang === 'ja' ? 'ja-JP' : 'en-US';
-          recognition.interimResults = true;
-          recognition.continuous = true;
-          recognition.onresult = (event: any) => {
-            let transcript = '';
-            for (let i = 0; i < event.results.length; i++) {
-              transcript += event.results[i][0].transcript;
+        const recognition = new SpeechRec();
+        recognition.lang = activeScenario.targetLang === 'ja' ? 'ja-JP' : 'en-US';
+        recognition.interimResults = true;
+        recognition.continuous = true;
+
+        recognition.onresult = (event: any) => {
+          let transcript = '';
+          for (let i = 0; i < event.results.length; i++) {
+            transcript += event.results[i][0].transcript;
+          }
+          const clean = transcript.trim();
+          if (clean) {
+            liveDictatedTextRef.current = clean;
+            setLiveUserDraft(clean);
+            setInputText(clean);
+
+            // Auto-submit after 1.8s of silence once user has spoken a phrase
+            if (pttSilenceTimerRef.current) {
+              window.clearTimeout(pttSilenceTimerRef.current);
             }
-            if (transcript.trim()) {
-              liveDictatedTextRef.current = transcript.trim();
-              setInputText(transcript.trim());
-            }
-          };
-          recognition.start();
-          speechRecRef.current = recognition;
-        } catch {
-          // Ignore browser speech recognition error
-        }
+            pttSilenceTimerRef.current = window.setTimeout(() => {
+              stopPttRecording();
+            }, 1800);
+          }
+        };
+
+        recognition.onerror = (evErr: any) => {
+          const code = String(evErr?.error || '');
+          if (code === 'not-allowed' || code === 'service-not-allowed') {
+            setIsRecordingPtt(false);
+            setStatusBanner(
+              'Izin mikrofon ditolak oleh peramban. Izinkan akses mikrofon di bilah alamat atau ketik kalimatmu di bawah.'
+            );
+          }
+        };
+
+        speechRecRef.current = recognition;
+        recognition.start();
+        setIsRecordingPtt(true);
+        return;
       }
 
+      // Fallback to MediaRecorder ONLY when Web Speech API is unavailable
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       recordedChunksRef.current = [];
-      pttStartedAtRef.current = Date.now();
       const recorder = new MediaRecorder(stream);
       mediaRecorderRef.current = recorder;
 
@@ -595,31 +727,26 @@ export default function App() {
         stream.getTracks().forEach((tr) => tr.stop());
         const elapsedSec = pttStartedAtRef.current
           ? Math.max(2, Math.round((Date.now() - pttStartedAtRef.current) / 1000))
-          : 5;
+          : 4;
         pttStartedAtRef.current = null;
         const dictated = liveDictatedTextRef.current.trim();
-        const blob = new Blob(recordedChunksRef.current, {
-          type: recorder.mimeType || 'audio/webm',
-        });
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          const dataUrl = String(reader.result || '');
-          const base64 = dataUrl.includes(',') ? dataUrl.split(',')[1] : '';
-          if (base64 || dictated) {
-            void submitStudentTurn({
-              text: dictated || undefined,
-              audioBase64: base64 || undefined,
-              audioMimeType: blob.type || 'audio/webm',
-              speakingDurationSec: elapsedSec,
-            });
-          }
-        };
-        reader.readAsDataURL(blob);
+        if (dictated) {
+          liveDictatedTextRef.current = '';
+          void submitStudentTurnRef.current({
+            text: dictated,
+            speakingDurationSec: elapsedSec,
+          });
+        } else {
+          setStatusBanner(
+            'Peramban ini belum mendukung pengenalan suara otomatis. Ketik kalimatmu di kolom bawah atau pilih dari Bantuan Cara Jawab.'
+          );
+        }
       };
 
       recorder.start();
       setIsRecordingPtt(true);
     } catch {
+      setIsRecordingPtt(false);
       setStatusBanner(
         'Izin mikrofon belum aktif di peramban ini. Ketik kalimatmu atau pilih langsung dari kartu Bantuan Cara Jawab di atas.'
       );
@@ -627,14 +754,42 @@ export default function App() {
   };
 
   const stopPttRecording = () => {
+    if (pttSilenceTimerRef.current) {
+      window.clearTimeout(pttSilenceTimerRef.current);
+      pttSilenceTimerRef.current = null;
+    }
+    const elapsedSec = pttStartedAtRef.current
+      ? Math.max(2, Math.round((Date.now() - pttStartedAtRef.current) / 1000))
+      : 4;
+    pttStartedAtRef.current = null;
+
     if (speechRecRef.current) {
+      const rec = speechRecRef.current;
+      speechRecRef.current = null;
       try {
-        speechRecRef.current.stop();
+        rec.stop();
       } catch {
         // Ignore
       }
-      speechRecRef.current = null;
+      setIsRecordingPtt(false);
+      window.setTimeout(() => {
+        const dictated = liveDictatedTextRef.current.trim();
+        if (dictated) {
+          liveDictatedTextRef.current = '';
+          setLiveUserDraft('');
+          void submitStudentTurnRef.current({
+            text: dictated,
+            speakingDurationSec: elapsedSec,
+          });
+        } else {
+          setStatusBanner(
+            'Belum ada suara yang terdengar. Pastikan mikrofon aktif dan ucapkan kalimat dengan jelas, atau ketik di kolom bawah.'
+          );
+        }
+      }, 240);
+      return;
     }
+
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
       mediaRecorderRef.current.stop();
     }
@@ -692,17 +847,20 @@ export default function App() {
       let settled = false;
       let ws: WebSocket;
 
-      const connectTimer = window.setTimeout(() => {
-        if (!settled) {
-          settled = true;
-          try {
-            ws.close();
-          } catch {
-            // Ignore
+      const connectTimer = window.setTimeout(
+        () => {
+          if (!settled) {
+            settled = true;
+            try {
+              ws.close();
+            } catch {
+              // Ignore
+            }
+            tryConnectWsCandidate(index + 1);
           }
-          tryConnectWsCandidate(index + 1);
-        }
-      }, 3500);
+        },
+        isGoogleLive ? 2500 : 900
+      );
 
       try {
         ws = new WebSocket(targetUrl);
@@ -1053,6 +1211,22 @@ export default function App() {
     if (isRecordingPtt) {
       stopPttRecording();
     }
+    if (liveSilenceTimerRef.current) {
+      window.clearTimeout(liveSilenceTimerRef.current);
+      liveSilenceTimerRef.current = null;
+    }
+    if (liveSpeechRecRef.current) {
+      try {
+        liveSpeechRecRef.current.onresult = null;
+        liveSpeechRecRef.current.onend = null;
+        liveSpeechRecRef.current.onerror = null;
+        liveSpeechRecRef.current.stop();
+      } catch {
+        // Ignore
+      }
+      liveSpeechRecRef.current = null;
+    }
+    setIsListeningLiveSpeech(false);
     setIsMicMuted(false);
     isMicMutedRef.current = false;
     setIsLiveConnected(false);
@@ -1205,27 +1379,27 @@ export default function App() {
   return (
     <div className="min-h-screen text-[#241A11] flex flex-col">
       {/* HEADER KACA HANGAT KHAS FIEZEL (Warm Paper + Solar Gold + Maroon) */}
-      <header className="sticky top-0 z-30 bg-[#FFF9EE]/92 backdrop-blur-xl border-b border-[#F0E4CF]">
-        <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between gap-2.5">
-          <div className="flex items-center gap-2.5 sm:gap-3">
+      <header className="sticky top-0 z-30 bg-[#FFF9EE]/95 backdrop-blur-xl border-b border-[#F0E4CF]">
+        <div className="max-w-4xl mx-auto px-3 sm:px-4 h-14 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 sm:gap-2.5 min-w-0 flex-1">
             {/* Tombol Kembali ke PWA Utama */}
             <a
               href="./index.html"
               onClick={handleBackToPwa}
               data-testid="mitra-kaiwa-back-btn"
-              className="px-2.5 py-1.5 rounded-xl bg-white border border-[#F0E4CF] font-bold text-[#8C2233] hover:border-[#8C2233] cursor-pointer shadow-2xs flex items-center gap-1.5 transition-all text-xs shrink-0"
+              className="px-2.5 py-1.5 rounded-xl bg-white border border-[#F0E4CF] font-bold text-[#8C2233] hover:border-[#8C2233] cursor-pointer shadow-2xs flex items-center gap-1 transition-all text-xs shrink-0"
               title="Kembali ke Beranda PWA FIEZEL"
             >
-              <ArrowLeft className="w-3.5 h-3.5" />
+              <ArrowLeft className="w-3.5 h-3.5 shrink-0" />
               <span>{locale === 'th' ? 'กลับ' : 'Kembali'}</span>
             </a>
 
             {/* Identitas Mitra Kaiwa / Kawan Bicara */}
-            <div className="flex items-center gap-2 shrink-0">
-              <FiezelBrandCrest className="w-8 h-8 rounded-xl shadow-xs shrink-0" />
-              <div>
-                <div className="font-display font-bold text-sm text-[#241A11] leading-none tracking-tight flex items-center gap-1">
-                  <span data-testid="mitra-kaiwa-header-title">
+            <div className="flex items-center gap-2 min-w-0 flex-1">
+              <FiezelBrandCrest className="hidden sm:flex w-8 h-8 rounded-xl shadow-xs shrink-0" />
+              <div className="min-w-0 flex-1">
+                <div className="font-display font-bold text-sm sm:text-base text-[#241A11] leading-tight tracking-tight flex items-center gap-1.5 min-w-0">
+                  <span data-testid="mitra-kaiwa-header-title" className="truncate">
                     {targetLang === 'ja'
                       ? locale === 'th'
                         ? 'คู่สนทนาไควะ'
@@ -1234,9 +1408,15 @@ export default function App() {
                         ? 'คู่สนทนา AI'
                         : 'Kawan Bicara'}
                   </span>
-                  <FiezelPawStamp className="w-3 h-3 text-[#8C2233]" />
+                  <span
+                    className={`w-2 h-2 rounded-full shrink-0 ${
+                      isLiveConnected || isRecordingPtt
+                        ? 'bg-[#2E8B69] animate-ping'
+                        : 'bg-[#2E8B69]'
+                    }`}
+                  />
                 </div>
-                <div className="text-[9px] font-bold uppercase tracking-widest text-[#8C6D1F] mt-0.5">
+                <div className="hidden md:block text-[10px] font-bold uppercase tracking-wider text-[#8C6D1F] truncate">
                   {targetLang === 'ja'
                     ? '会話パートナー · Studio Suara AI'
                     : 'Speaking Partner · Studio Suara AI'}
@@ -1710,7 +1890,9 @@ export default function App() {
                                 : isRecordingPtt
                                   ? `Merekam suara... (${formatTimer(pttRecordingSec)})`
                                   : isLiveConnected
-                                    ? `LIVE · ${formatTimer(callDurationSec)}`
+                                    ? isListeningLiveSpeech && !isMicMuted
+                                      ? `🎙️ Mendengarkan... (${formatTimer(callDurationSec)})`
+                                      : `LIVE · ${formatTimer(callDurationSec)}`
                                     : 'Siap bicara'}
                             </span>
 
@@ -1750,14 +1932,14 @@ export default function App() {
                     </div>
 
                     {/* Tombol Aksi Panggilan Khas FIEZEL */}
-                    <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-stretch sm:justify-end">
+                    <div className="flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto justify-between sm:justify-end">
                       <button
                         type="button"
                         onClick={() => setSpeechRate(speechRate === 1.0 ? 0.8 : 1.0)}
-                        className="px-3 py-2.5 rounded-xl bg-[#FFF3DC] hover:bg-[#FFF3C4] border border-[#F0E4CF] text-[#241A11] text-xs font-mono font-bold cursor-pointer transition-all"
+                        className="px-2.5 sm:px-3 py-2.5 rounded-xl bg-[#FFF3DC] hover:bg-[#FFF3C4] border border-[#F0E4CF] text-[#241A11] text-xs font-mono font-bold cursor-pointer transition-all shrink-0"
                         title="Ubah kecepatan bicara PAW (1.0x Normal / 0.8x Lambat)"
                       >
-                        {speechRate === 1.0 ? '1.0x Normal' : '0.8x Lambat'}
+                        {speechRate === 1.0 ? '1.0x' : '0.8x'}
                       </button>
 
                       <button
@@ -1766,15 +1948,15 @@ export default function App() {
                           const lastAi = [...turns].reverse().find((tr) => tr.speaker === 'ai');
                           if (lastAi) void speakAiText(lastAi.text, lastAi.audioBase64);
                         }}
-                        className={`flex-1 sm:flex-initial justify-center px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-all duration-300 ${
+                        className={`flex-1 sm:flex-initial justify-center px-3 py-2.5 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-all duration-300 ${
                           callStateKey === 'speaking'
                             ? 'bg-[#FFF3C4] text-[#241A11] border-2 border-[#FFC700] scale-105'
                             : 'bg-[#FFF3DC] hover:bg-[#FFF3C4] border border-[#F0E4CF] text-[#241A11] scale-100'
                         }`}
                       >
-                        <Volume2 className="w-4 h-4 text-[#8C2233]" />
+                        <Volume2 className="w-4 h-4 text-[#8C2233] shrink-0" />
                         <span>
-                          {callStateKey === 'speaking' ? 'Sedang Diputar...' : 'Putar Suara'}
+                          {callStateKey === 'speaking' ? 'Diputar...' : 'Putar Suara'}
                         </span>
                       </button>
 
@@ -1938,97 +2120,24 @@ export default function App() {
                   />
                 )}
 
-                {/* 4. DOCK SUARA & RIWAYAT PERCAKAPAN KHAS FIEZEL */}
+                {/* 4. RIWAYAT PERCAKAPAN & EVALUASI BRAINCORE */}
                 <section className="fz-studio-card rounded-3xl p-4 sm:p-6 space-y-4 w-full overflow-hidden">
-                  {/* Baris Input Suara & Ketik Taktil */}
-                  <div className="bg-[#FFF9EE] border-1.5 border-[#F0E4CF] rounded-2xl p-2 sm:p-2.5 flex items-center gap-2 w-full min-w-0">
-                    <button
-                      type="button"
-                      disabled={isAnalyzingTurn}
-                      onClick={isRecordingPtt ? stopPttRecording : startPttRecording}
-                      className={`px-3.5 py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 shrink-0 cursor-pointer transition-all ${
-                        isRecordingPtt
-                          ? 'btn-maroon-tactile animate-pulse'
-                          : 'bg-[#FFF3DC] hover:bg-[#FFF3C4] text-[#241A11] border border-[#F0E4CF]'
-                      }`}
-                      title={t(locale, 'call.pushToTalk')}
-                    >
-                      {isRecordingPtt ? (
-                        <MicOff className="w-4 h-4" />
-                      ) : (
-                        <Mic className="w-4 h-4 text-[#8C2233]" />
-                      )}
-                      <span>
-                        {isRecordingPtt
-                          ? `Stop (${pttRecordingSec}s)`
-                          : locale === 'th'
-                            ? 'พูดตอบ'
-                            : 'Rekam Suara'}
-                      </span>
-                    </button>
-
-                    <input
-                      type="text"
-                      data-testid="voice-turn-input"
-                      value={inputText}
-                      onChange={(e) => setInputText(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && inputText.trim() && !isAnalyzingTurn) {
-                          if (
-                            isLiveConnected &&
-                            wsRef.current &&
-                            wsRef.current.readyState === WebSocket.OPEN
-                          ) {
-                            wsRef.current.send(JSON.stringify({ text: inputText.trim() }));
-                            setInputText('');
-                          } else {
-                            void submitStudentTurn({ text: inputText });
-                          }
-                        }
-                      }}
-                      placeholder={t(locale, 'call.placeholder')}
-                      className="min-w-0 flex-1 bg-transparent px-2 sm:px-3 py-2 text-sm font-medium text-[#241A11] placeholder:text-[#857350] focus:outline-none"
-                    />
-
-                    <button
-                      type="button"
-                      data-testid="send-turn-btn"
-                      disabled={isAnalyzingTurn || !inputText.trim()}
-                      onClick={() => {
-                        if (
-                          isLiveConnected &&
-                          wsRef.current &&
-                          wsRef.current.readyState === WebSocket.OPEN
-                        ) {
-                          wsRef.current.send(JSON.stringify({ text: inputText.trim() }));
-                          setInputText('');
-                        } else {
-                          void submitStudentTurn({ text: inputText });
-                        }
-                      }}
-                      className="px-4 py-2.5 rounded-xl btn-sun-tactile font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shrink-0 cursor-pointer disabled:opacity-40"
-                    >
-                      <Send className="w-3.5 h-3.5" />
-                      <span className="hidden sm:inline">{isAnalyzingTurn ? '...' : 'Kirim'}</span>
-                    </button>
-                  </div>
-
                   {/* Header Transkrip Percakapan */}
-                  <div className="flex items-center justify-between pt-1 pb-2 border-b border-[#F0E4CF] text-xs text-[#6E5E47]">
-                    <div className="flex items-center gap-2 font-medium">
-                      <FiezelPawStamp className="w-3.5 h-3.5 text-[#8C2233]" />
-                      <span className="font-bold text-[#241A11]">
+                  <div className="flex flex-wrap items-center justify-between gap-2 pt-0.5 pb-2 border-b border-[#F0E4CF] text-xs text-[#6E5E47]">
+                    <div className="flex items-center gap-2 font-medium min-w-0">
+                      <FiezelPawStamp className="w-3.5 h-3.5 text-[#8C2233] shrink-0" />
+                      <span className="font-bold text-[#241A11] truncate">
                         {locale === 'th'
                           ? 'บันทึกการสนทนาและผลวิเคราะห์'
-                          : 'Riwayat Percakapan & Evaluasi Braincore'}
+                          : 'Riwayat Percakapan & Evaluasi'}
                       </span>
                       <span aria-hidden="true">·</span>
-                      <span className="font-mono tabular-nums text-[#8C2233] font-bold">
+                      <span className="font-mono tabular-nums text-[#8C2233] font-bold shrink-0">
                         {turns.filter((tr) => tr.speaker === 'user').length} giliran
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 shrink-0">
                       {!isMeasureMode && (
                         <button
                           type="button"
@@ -2050,7 +2159,10 @@ export default function App() {
                   </div>
 
                   {/* Daftar Balon Percakapan & Kartu Diagnosis Pedagogis */}
-                  <div className="space-y-3.5 max-h-[360px] overflow-y-auto pr-1">
+                  <div
+                    ref={transcriptContainerRef}
+                    className="space-y-3.5 max-h-[380px] overflow-y-auto pr-1"
+                  >
                     {turns.map((turn) => {
                       if (turn.speaker === 'ai') {
                         return (
@@ -2270,6 +2382,125 @@ export default function App() {
           </div>
         )}
       </main>
+
+      {/* DOCK BAWAH STICKY KHAS FIEZEL (Rekam Suara + Input Teks + Kirim — Bebas Terpotong) */}
+      {activeTab === 'call' && prereqStatus.isReady && (
+        <div
+          data-testid="mitra-kaiwa-bottom-dock"
+          className="sticky bottom-0 left-0 right-0 z-30 bg-[#FFF9EE]/96 backdrop-blur-xl border-t border-[#F0E4CF] px-3 sm:px-4 pt-2.5 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_-12px_rgba(36,26,17,0.12)]"
+        >
+          <div className="max-w-4xl mx-auto space-y-1.5">
+            {(isRecordingPtt || isListeningLiveSpeech || liveUserDraft.trim()) && (
+              <div
+                data-testid="live-voice-capture-banner"
+                className="flex items-center justify-between gap-2 px-3 py-1.5 rounded-xl bg-[#FDF2F4] border border-[#8C2233]/25 text-xs text-[#8C2233]"
+              >
+                <div className="flex items-center gap-2 min-w-0 flex-1">
+                  <span className="w-2 h-2 rounded-full bg-[#8C2233] animate-ping shrink-0" />
+                  <span className="font-bold truncate">
+                    {liveUserDraft.trim()
+                      ? `🎙️ "${liveUserDraft.trim()}"`
+                      : locale === 'th'
+                        ? '🎙️ กำลังฟังเสียงของคุณ... พูดได้เลย'
+                        : '🎙️ Mendengarkan suaramu... Silakan bicara sekarang'}
+                  </span>
+                </div>
+                {liveUserDraft.trim() && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const textToSend = liveUserDraft.trim();
+                      if (isRecordingPtt) stopPttRecording();
+                      else if (textToSend) {
+                        setLiveUserDraft('');
+                        void submitStudentTurn({ text: textToSend, speakingDurationSec: 3 });
+                      }
+                    }}
+                    className="px-2.5 py-0.5 rounded-lg bg-[#8C2233] text-white font-bold text-[11px] shrink-0 cursor-pointer"
+                  >
+                    Kirim
+                  </button>
+                )}
+              </div>
+            )}
+
+            <div className="flex items-center gap-2 w-full min-w-0">
+              <button
+                type="button"
+                data-testid="ptt-record-btn"
+                disabled={isAnalyzingTurn}
+                onClick={isRecordingPtt ? stopPttRecording : startPttRecording}
+                className={`px-3 sm:px-3.5 py-2.5 rounded-2xl font-bold text-xs flex items-center justify-center gap-1.5 shrink-0 cursor-pointer transition-all ${
+                  isRecordingPtt
+                    ? 'btn-maroon-tactile animate-pulse'
+                    : 'bg-[#FFF3DC] hover:bg-[#FFF3C4] text-[#241A11] border border-[#E2D0B2]'
+                }`}
+                title={t(locale, 'call.pushToTalk')}
+              >
+                {isRecordingPtt ? (
+                  <MicOff className="w-4 h-4 shrink-0" />
+                ) : (
+                  <Mic className="w-4 h-4 text-[#8C2233] shrink-0" />
+                )}
+                <span>
+                  {isRecordingPtt
+                    ? `Stop (${pttRecordingSec}s)`
+                    : locale === 'th'
+                      ? 'พูดตอบ'
+                      : 'Rekam Suara'}
+                </span>
+              </button>
+
+              <input
+                type="text"
+                data-testid="voice-turn-input"
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && inputText.trim() && !isAnalyzingTurn) {
+                    if (
+                      isLiveConnected &&
+                      wsRef.current &&
+                      wsRef.current.readyState === WebSocket.OPEN
+                    ) {
+                      wsRef.current.send(JSON.stringify({ text: inputText.trim() }));
+                      setInputText('');
+                    } else {
+                      void submitStudentTurn({ text: inputText });
+                    }
+                  }
+                }}
+                placeholder={
+                  locale === 'th' ? 'พิมพ์ / พูด...' : 'Ketik / bicara...'
+                }
+                className="min-w-0 flex-1 bg-white border border-[#E2D0B2] rounded-2xl px-3.5 py-2.5 text-sm font-medium text-[#241A11] placeholder:text-[#857350] focus:outline-none focus:border-[#8C2233]"
+              />
+
+              <button
+                type="button"
+                data-testid="send-turn-btn"
+                disabled={isAnalyzingTurn || !inputText.trim()}
+                onClick={() => {
+                  if (
+                    isLiveConnected &&
+                    wsRef.current &&
+                    wsRef.current.readyState === WebSocket.OPEN
+                  ) {
+                    wsRef.current.send(JSON.stringify({ text: inputText.trim() }));
+                    setInputText('');
+                  } else {
+                    void submitStudentTurn({ text: inputText });
+                  }
+                }}
+                className="px-3.5 sm:px-4 py-2.5 rounded-2xl btn-sun-tactile font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shrink-0 cursor-pointer disabled:opacity-40"
+              >
+                <Send className="w-3.5 h-3.5 shrink-0" />
+                <span>{isAnalyzingTurn ? '...' : locale === 'th' ? 'ส่ง' : 'Kirim'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* NAVIGASI BAWAH MOBILE KHAS FIEZEL (Nonaktif pada mode tunggal Mitra Kaiwa) */}
       <nav

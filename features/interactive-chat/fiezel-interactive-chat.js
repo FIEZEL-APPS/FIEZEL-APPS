@@ -48,8 +48,8 @@
       var targetSrc = './call.html?embed=1&tab=call&lang=' + encodeURIComponent(lang) + '&locale=' + encodeURIComponent(locale);
       var titleText = lang === 'ja' ? 'Mitra Kaiwa' : 'Kawan Bicara';
       mountPoint.innerHTML =
-        '<div id="fzcContainer" class="fzc-mitra-kaiwa-studio-host" data-testid="mitra-kaiwa-studio-host" style="width:100%;height:100%;min-height:100dvh;flex:1 1 0px;display:flex;flex-direction:column;margin:0;padding:0;overflow:hidden;background:#FFF9EE;">' +
-        '<iframe id="fzMitraKaiwaStudioFrame" data-testid="mitra-kaiwa-studio-frame" data-lang="' + lang + '" data-locale="' + locale + '" src="' + targetSrc + '" title="' + titleText + '" allow="microphone; autoplay" style="width:100%;height:100%;flex:1 1 0px;border:0;display:block;background:#FFF9EE;"></iframe>' +
+        '<div id="fzcContainer" class="fzc-container fzc-mitra-kaiwa-studio-host" data-testid="mitra-kaiwa-studio-host" style="position:fixed !important;inset:0 !important;width:100vw !important;height:100dvh !important;max-width:100vw !important;max-height:100dvh !important;flex:1 1 0px !important;display:flex !important;flex-direction:column !important;margin:0 !important;padding:0 !important;padding-bottom:0 !important;overflow:hidden !important;background:#FFF9EE !important;z-index:9990 !important;">' +
+        '<iframe id="fzMitraKaiwaStudioFrame" name="fzMitraKaiwaStudioFrame" data-testid="mitra-kaiwa-studio-frame" data-lang="' + lang + '" data-locale="' + locale + '" src="' + targetSrc + '" title="' + titleText + '" allow="microphone; autoplay" style="width:100% !important;height:100% !important;min-height:100dvh !important;flex:1 1 0px !important;border:0 !important;margin:0 !important;padding:0 !important;display:block !important;background:#FFF9EE !important;"></iframe>' +
         '</div>';
     };
   }

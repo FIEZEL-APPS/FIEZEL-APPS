@@ -53,7 +53,7 @@ const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
 // dilayani dan kedua berkas baru tidak pernah sampai ke pengguna lama - aplikasi mereka
 // akan menjalankan app.js baru tanpa berkas benderanya, dan seluruh bendera jatuh ke
 // salinan bawaan di app.js. Naik SEKALI untuk seluruh gelombang.
-const SW_REV='m025-630-unified-grammar-20261002';
+const SW_REV='m025-631-unified-grammar-20261002';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
 // m025-61: health check menanyakan revisi shell langsung ke worker yang sedang aktif.
 // Menebaknya dari nama cache tidak cukup: cache lama bisa tertinggal, sedangkan jawaban ini
@@ -372,7 +372,15 @@ self.addEventListener('fetch',e=>{
     jaringan. Di sana tidak ada apa pun untuk disajikan, jadi anggaran waktu tidak akan
     menolong - ia hanya akan mengganti menunggu dengan layar kosong.
      ============================================================================== */
-  if(e.request.mode==='navigate'){
+  if(requestUrl.pathname.toLowerCase().endsWith('/call.html')||requestUrl.pathname.toLowerCase().includes('/features/voice-studio/dist/')){
+    responsePromise=fetch(e.request).then(r=>{
+      if(r&&r.ok){
+        const copy=r.clone();
+        caches.open(SHELL_CACHE).then(cache=>cache.put(e.request,copy).catch(()=>{}));
+      }
+      return r;
+    }).catch(()=>caches.match(e.request,{cacheName:SHELL_CACHE,ignoreSearch:true}));
+  }else if(e.request.mode==='navigate'){
     /* Entri permintaan ITU SENDIRI lebih dulu, `./index.html` hanya sebagai cadangan rute
        tak dikenal. Bentuk pertama perbaikan ini menyajikan `./index.html` untuk SETIAP
        navigasi - dan itu akan membuat `creator-report-dashboard.html` dan

@@ -280,15 +280,14 @@ export function evaluateUtteranceClientSide(params: {
     }
 
     const wordCount = exact.split(/\s+/).filter(Boolean).length;
-    const isTooShort = wordCount < 4;
+    const isTooShort = wordCount < 2;
 
     if (
       hasSubjectDrop ||
       hasPastTenseError ||
       hasModalToError ||
       hasBareWantRequest ||
-      isTooShort ||
-      missingTokens.length >= 2
+      isTooShort
     ) {
       let misconceptionId = 'EN_INCOMPLETE_CLAUSE_01';
       let whyFailsId =
@@ -413,10 +412,12 @@ export function evaluateUtteranceClientSide(params: {
   const hasWrongLocationParticle = /(駅に|コンビニに|どこに).*?(います|ありますか|お弁当)/u.test(
     exact
   );
-  const lacksPoliteEnding = !/(です|ます|ください|ませんか|でしょうか|ですか)[。！？!?]?$/u.test(
-    exact
-  );
-  const isTooShortJa = exact.length < 6;
+  const lacksPoliteEnding =
+    exact.length > 10 &&
+    !/(です|ます|ください|ませんか|でしょうか|ですか|お願いします|ありがとう|こんにちは|こんばんは|はい|ええ)[。！？!?]?$/u.test(
+      exact
+    );
+  const isTooShortJa = exact.length < 2;
 
   if (hasWrongLocationParticle || lacksPoliteEnding || isTooShortJa) {
     const misconceptionId = hasWrongLocationParticle
@@ -502,10 +503,14 @@ export function evaluateUtteranceClientSide(params: {
   };
 }
 
+let _turnApiAvailable: boolean | null = null;
+let _ttsApiAvailable: boolean | null = null;
+
 /**
- * Evaluates a user speaking turn with flexible multi-tier fallback:
- * 1) Cloudflare Worker / Server REST endpoint (`/api/voice-call/turn`)
- * 2) Client-side Braincore pedagogical analyzer (`evaluateUtteranceClientSide`) if static/serverless
+ * Evaluates a user speaking turn with ultra-low latency:
+ * 1) Direct Gemini 2.0 Flash REST API if user saved `fz_gemini_api_key`
+ * 2) Configured `turnApiUrl` if reachable within 1.5s
+ * 3) Instant client-side Braincore pedagogical analyzer (`evaluateUtteranceClientSide`)
  */
 export async function evaluateTurnFlexible(params: {
   text: string;
@@ -516,25 +521,85 @@ export async function evaluateTurnFlexible(params: {
   measureMode: boolean;
   history: Array<{ speaker: 'ai' | 'user'; text: string }>;
 }): Promise<FlexibleTurnEvaluationResult> {
-  const candidateUrls: string[] = [];
+  const localResult = evaluateUtteranceClientSide({
+    text: params.text,
+    scenario: params.scenario,
+    targetLang: params.targetLang,
+    history: params.history,
+  });
 
-  if (typeof window !== 'undefined' && window.FIEZEL_VOICE_STUDIO_CONFIG?.turnApiUrl) {
-    candidateUrls.push(window.FIEZEL_VOICE_STUDIO_CONFIG.turnApiUrl);
+  // 1) If user has a Gemini API Key, enrich reply via Gemini 2.0 Flash REST API
+  let userGeminiKey = '';
+  try {
+    if (typeof localStorage !== 'undefined') {
+      userGeminiKey = (localStorage.getItem('fz_gemini_api_key') || '').trim();
+    }
+  } catch {
+    // Ignore
   }
 
-  // Relative endpoint (works on AI Studio preview or when proxied by Cloudflare Worker / cPanel)
-  candidateUrls.push('/api/voice-call/turn');
-
-  // Cloudflare Worker base if enabled
-  if (typeof window !== 'undefined' && window.FIEZEL_CF_CONFIG?.base) {
-    candidateUrls.push(`${window.FIEZEL_CF_CONFIG.base.replace(/\/$/, '')}/api/voice-call/turn`);
-  }
-
-  for (const url of candidateUrls) {
+  if (userGeminiKey.length > 10) {
     try {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 5500);
-      const res = await fetch(url, {
+      const timeout = setTimeout(() => controller.abort(), 3200);
+      const langLabel = params.targetLang === 'ja' ? 'Japanese (polite N5/N4)' : 'English (A1/A2)';
+      const promptText = [
+        `You are ${params.persona.name}, a friendly speaking partner in scenario "${params.scenario.titleId}".`,
+        `Reply naturally in ${langLabel} in 1-2 short sentences to the student's message, and ask a simple follow-up question.`,
+        `Student said: "${params.text}"`,
+        `Respond ONLY with valid JSON: {"aiReply":"...","aiReplyTranslationId":"...(Indonesian translation)","aiReplyTranslationTh":"...(Thai translation)"}`,
+      ].join('\n');
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(
+          userGeminiKey
+        )}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ role: 'user', parts: [{ text: promptText }] }],
+            generationConfig: { responseMimeType: 'application/json', temperature: 0.6 },
+          }),
+          signal: controller.signal,
+        }
+      );
+      clearTimeout(timeout);
+      if (res.ok) {
+        const data = await res.json();
+        const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        const parsed = JSON.parse(rawText);
+        if (parsed && typeof parsed.aiReply === 'string' && parsed.aiReply.trim()) {
+          return {
+            ...localResult,
+            aiReply: parsed.aiReply.trim(),
+            aiReplyTranslationId:
+              parsed.aiReplyTranslationId || localResult.aiReplyTranslationId,
+            aiReplyTranslationTh:
+              parsed.aiReplyTranslationTh || localResult.aiReplyTranslationTh,
+            nextSuggestedReplies: getBeginnerReplyCards(
+              params.scenario.id,
+              params.targetLang,
+              undefined,
+              parsed.aiReply.trim(),
+              params.text,
+              params.history
+            ),
+          };
+        }
+      }
+    } catch {
+      // Fall through to fast local result
+    }
+  }
+
+  // 2) Only probe custom turnApiUrl if explicitly configured and not yet marked unavailable
+  const customUrl =
+    typeof window !== 'undefined' ? window.FIEZEL_VOICE_STUDIO_CONFIG?.turnApiUrl : undefined;
+  if (customUrl && _turnApiAvailable !== false) {
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 1500);
+      const res = await fetch(customUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -556,139 +621,96 @@ export async function evaluateTurnFlexible(params: {
       if (res.ok) {
         const data = await res.json();
         if (data && typeof data.aiReply === 'string') {
+          _turnApiAvailable = true;
           return data as FlexibleTurnEvaluationResult;
         }
       }
+      _turnApiAvailable = false;
     } catch {
-      // Fall through to next endpoint or client-side pedagogical engine
+      _turnApiAvailable = false;
     }
   }
 
-  // Fallback to deterministic client-side Braincore evaluation + Edge TTS synthesis
-  const localResult = evaluateUtteranceClientSide({
-    text: params.text,
-    scenario: params.scenario,
-    targetLang: params.targetLang,
-    history: params.history,
-  });
-
-  const ttsResult = await synthesizeFlexibleTts({
-    text: localResult.aiReply,
-    targetLang: params.targetLang,
-    persona: params.persona,
-  });
-
   return {
     ...localResult,
-    audioBase64: ttsResult?.audioBase64 || null,
-    audioMimeType: ttsResult?.audioMimeType || null,
-    ttsEngine: ttsResult?.engine || 'browser-speech-synthesis',
+    audioBase64: null,
+    audioMimeType: null,
+    ttsEngine: 'browser-speech-synthesis',
   };
 }
 
 /**
- * Multi-tier TTS synthesis for FIEZEL production (cPanel + Render Edge TTS + Cloudflare Worker):
- * 1) Same-origin `/api/tts/line` (cPanel PHP proxy `api/tts/line/index.php` -> Render FastAPI Edge TTS)
- * 2) `self.FIEZEL_TTS_CONFIG.endpoint` (`https://fiezel-apps.onrender.com/api/tts/line`)
- * 3) `/api/voice-call/tts` (Gemini / Edge TTS local endpoint)
+ * Fast TTS synthesis with circuit breaker so dead/cold endpoints never stall conversation.
  */
 export async function synthesizeFlexibleTts(params: {
   text: string;
   targetLang: TargetLang;
   persona?: VoicePersona;
 }): Promise<{ audioBase64: string; audioMimeType: string; engine: string } | null> {
+  if (_ttsApiAvailable === false) {
+    return null;
+  }
+
   const speakerMap: Record<string, string> = {
     coach_alex: 'coach_alex',
     coach_sarah: 'coach_sarah',
     sensei_nanami: 'sensei_nanami',
     sensei_keita: 'sensei_keita',
   };
-  const speaker = (params.persona && speakerMap[params.persona.id]) || (params.targetLang === 'ja' ? 'sensei_nanami' : 'coach_alex');
+  const speaker =
+    (params.persona && speakerMap[params.persona.id]) ||
+    (params.targetLang === 'ja' ? 'sensei_nanami' : 'coach_alex');
 
-  // Tier 1: Try `/api/voice-call/tts` if available (preview or CF worker)
+  const endpoint =
+    (typeof window !== 'undefined' && window.FIEZEL_VOICE_STUDIO_CONFIG?.ttsApiUrl) ||
+    '/api/tts/line';
+
   try {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 4500);
-    const res = await fetch('/api/voice-call/tts', {
+    const timer = setTimeout(() => controller.abort(), 1400);
+    const res = await fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         text: params.text,
-        targetLang: params.targetLang,
-        geminiVoice: params.persona?.geminiVoice || (params.targetLang === 'ja' ? 'Kore' : 'Puck'),
-        edgeVoice:
-          params.persona?.edgeVoice ||
-          (params.targetLang === 'ja' ? 'ja-JP-NanamiNeural' : 'en-US-AndrewMultilingualNeural'),
+        speaker,
+        lang: params.targetLang,
       }),
       signal: controller.signal,
     });
     clearTimeout(timer);
     if (res.ok) {
-      const data = await res.json();
-      if (data?.audioBase64) {
+      const contentType = res.headers.get('content-type') || '';
+      if (contentType.includes('audio/')) {
+        const buf = await res.arrayBuffer();
+        const bytes = new Uint8Array(buf);
+        let binary = '';
+        for (let i = 0; i < bytes.byteLength; i++) {
+          binary += String.fromCharCode(bytes[i]);
+        }
+        _ttsApiAvailable = true;
         return {
-          audioBase64: data.audioBase64,
-          audioMimeType: data.audioMimeType || 'audio/mp3',
-          engine: data.engine || 'gemini-or-edge-tts',
+          audioBase64: btoa(binary),
+          audioMimeType: contentType.split(';')[0] || 'audio/mpeg',
+          engine: 'fiezel-edge-tts-binary',
         };
       }
-    }
-  } catch {
-    // Continue to Tier 2 (FIEZEL Production Edge TTS)
-  }
-
-  // Tier 2: FIEZEL Production Edge TTS (`/api/tts/line` cPanel proxy or `window.FIEZEL_TTS_CONFIG.endpoint`)
-  const ttsEndpoints = ['/api/tts/line'];
-  if (typeof window !== 'undefined' && window.FIEZEL_TTS_CONFIG?.endpoint) {
-    ttsEndpoints.push(window.FIEZEL_TTS_CONFIG.endpoint);
-  } else {
-    ttsEndpoints.push('https://fiezel-apps.onrender.com/api/tts/line');
-  }
-
-  for (const endpoint of ttsEndpoints) {
-    try {
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 5000);
-      const res = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          text: params.text,
-          speaker,
-          lang: params.targetLang,
-        }),
-        signal: controller.signal,
-      });
-      clearTimeout(timer);
-      if (res.ok) {
-        const contentType = res.headers.get('content-type') || '';
-        if (contentType.includes('audio/')) {
-          const buf = await res.arrayBuffer();
-          const bytes = new Uint8Array(buf);
-          let binary = '';
-          for (let i = 0; i < bytes.byteLength; i++) {
-            binary += String.fromCharCode(bytes[i]);
-          }
+      if (contentType.includes('application/json')) {
+        const json = await res.json();
+        const b64 = json?.audioBase64 || json?.audio_base64 || json?.audio || json?.data;
+        if (typeof b64 === 'string' && b64.length > 32) {
+          _ttsApiAvailable = true;
           return {
-            audioBase64: btoa(binary),
-            audioMimeType: contentType.split(';')[0] || 'audio/mpeg',
-            engine: 'fiezel-edge-tts-binary',
+            audioBase64: b64.replace(/^data:audio\/[^;]+;base64,/, ''),
+            audioMimeType: json?.mimeType || json?.audioMimeType || 'audio/mpeg',
+            engine: 'fiezel-edge-tts-json',
           };
-        } else {
-          const json = await res.json();
-          const b64 = json?.audioBase64 || json?.audio_base64 || json?.audio || json?.data;
-          if (typeof b64 === 'string' && b64.length > 32) {
-            return {
-              audioBase64: b64.replace(/^data:audio\/[^;]+;base64,/, ''),
-              audioMimeType: json?.mimeType || json?.audioMimeType || 'audio/mpeg',
-              engine: 'fiezel-edge-tts-json',
-            };
-          }
         }
       }
-    } catch {
-      // Try next endpoint
     }
+    _ttsApiAvailable = false;
+  } catch {
+    _ttsApiAvailable = false;
   }
 
   return null;
