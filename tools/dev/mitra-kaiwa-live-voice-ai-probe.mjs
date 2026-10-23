@@ -46,6 +46,17 @@ if (LOCAL_BUNDLE && fs.existsSync(LOCAL_BUNDLE)) {
       body: bundleBody,
     })
   );
+  const cssCandidate = LOCAL_BUNDLE.replace(/voice-studio\.js$/, 'voice-studio.css');
+  if (fs.existsSync(cssCandidate)) {
+    const cssBody = fs.readFileSync(cssCandidate);
+    await page.route('**/features/voice-studio/dist/voice-studio.css*', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'text/css; charset=utf-8',
+        body: cssBody,
+      })
+    );
+  }
   console.log('Injected candidate bundle:', LOCAL_BUNDLE, `(${bundleBody.length} bytes)`);
 }
 const net = [];

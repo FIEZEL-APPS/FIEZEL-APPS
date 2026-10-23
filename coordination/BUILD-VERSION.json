@@ -1,7 +1,7 @@
 {
-  "version": "m025-635",
-  "claimedBy": "branch fix/mitra-kaiwa-live-voice-ai",
-  "claimedAt": "2026-10-23T22:15:25.697Z",
-  "reason": "fix(mitra-kaiwa): aktifkan suara neural murni tanpa robot & respons AI live call",
+  "version": "m025-636",
+  "claimedBy": "branch fix/m025-636-mitra-kaiwa-cache-bust",
+  "claimedAt": "2026-10-23T23:13:57.740Z",
+  "reason": "fix(mitra-kaiwa): akselerasi respons suara AI paralel, UI minimalis & cache-bust call.html",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

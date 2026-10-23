@@ -701,6 +701,10 @@ const _ttsMemoryCache = new Map<
   string,
   { audioBase64: string; audioMimeType: string; engine: string }
 >();
+const _ttsInFlight = new Map<
+  string,
+  Promise<{ audioBase64: string; audioMimeType: string; engine: string } | null>
+>();
 
 // ---------------------------------------------------------------------------------------
 // REAL AI CONVERSATION PARTNER (m025 hotfix): Cloudflare Worker `fiezel-api` task
@@ -712,11 +716,13 @@ const _ttsMemoryCache = new Map<
 // ---------------------------------------------------------------------------------------
 const AI_TASK_REQUEST_SCHEMA = 'fiezel-ai-task-v2';
 const AI_TASK_RESPONSE_SCHEMA = 'fiezel-ai-response-v2';
-const AI_PARTNER_TIMEOUT_MS = 11000;
+const AI_PARTNER_TIMEOUT_MS = 9000;
+const FAST_AI_BUDGET_MS = 850;
 let _aiCallModeSupported: boolean | null = false;
 let _aiScenarioRoleSupported: boolean | null = null;
 let _aiPartnerCooldownUntil = 0;
 let _identityPromise: Promise<boolean> | null = null;
+let _identityReady = false;
 
 function getSameOriginParent(): Window | null {
   try {
@@ -741,6 +747,7 @@ function resolveCfApiBase(): string {
 
 /** Idempotent anonymous identity cookie (`fz_id`) — required by the Worker quota gate. */
 export function ensureLearnerIdentity(): Promise<boolean> {
+  if (_identityReady) return Promise.resolve(true);
   const base = resolveCfApiBase();
   if (!base) return Promise.resolve(false);
   if (!_identityPromise) {
@@ -752,7 +759,11 @@ export function ensureLearnerIdentity(): Promise<boolean> {
       mode: 'cors',
       cache: 'no-store',
     })
-      .then((r) => r.ok || r.status === 409)
+      .then((r) => {
+        const ok = r.ok || r.status === 409;
+        if (ok) _identityReady = true;
+        return ok;
+      })
       .catch(() => {
         _identityPromise = null;
         return false;
@@ -810,7 +821,12 @@ export async function requestAiPartnerReply(params: {
   const message = params.text.trim().slice(0, 400);
   if (!message) return null;
 
-  await ensureLearnerIdentity();
+  if (!_identityReady) {
+    await Promise.race([
+      ensureLearnerIdentity(),
+      new Promise<boolean>((r) => setTimeout(() => r(false), 350)),
+    ]);
+  }
 
   const history = params.history
     .filter((h) => h && h.text && h.text.trim())
@@ -868,6 +884,7 @@ export async function requestAiPartnerReply(params: {
       }
       if (res.status === 401) {
         _identityPromise = null;
+        _identityReady = false;
         return null;
       }
       if (res.status === 429) {
@@ -884,9 +901,16 @@ export async function requestAiPartnerReply(params: {
         reply?: string;
         translation?: string;
       };
-      const reply = String(turn.reply || data?.text || '').trim();
-      if (!replyLooksLikeTargetLanguage(reply, params.targetLang)) return null;
-      return { reply, translation: String(turn.translation || '').trim() };
+      const rawReply = String(turn.reply || data?.text || '')
+        .replace(/^(AI|Partner|Assistant)\s*:\s*/i, '')
+        .replace(/^["「]|["」]$/g, '')
+        .trim();
+      if (!replyLooksLikeTargetLanguage(rawReply, params.targetLang)) return null;
+      const rawTranslation = String(turn.translation || '')
+        .replace(/^.*?(Terjemahan|Translation|คำแปล)\s*:\s*/i, '')
+        .replace(/^["「]|["」]$/g, '')
+        .trim();
+      return { reply: rawReply, translation: rawTranslation };
     } catch {
       clearTimeout(timer);
       return null;
@@ -950,10 +974,9 @@ export function resolveTtsEndpoint(): string {
 
 /**
  * Evaluates a user speaking turn with ultra-low latency:
- * 1) Direct Gemini 2.0 Flash REST API if user saved `fz_gemini_api_key`
- * 2) Production AI partner (Cloudflare Worker `conversation_turn`)
- * 3) Configured `turnApiUrl` if reachable within 1.5s
- * 4) Instant client-side Braincore pedagogical analyzer (`evaluateUtteranceClientSide`)
+ * - Parallel speculative Neural TTS (`synthesizeFlexibleTts`) starts at `t = 0ms` alongside
+ *   `requestAiPartnerReply` so the learner gets an audible neural reply in ~1.2s without
+ *   waiting 6-10s for sequential LLM + TTS waterfalls.
  */
 export async function evaluateTurnFlexible(params: {
   text: string;
@@ -971,6 +994,13 @@ export async function evaluateTurnFlexible(params: {
     history: params.history,
   });
 
+  // Start parallel Neural Edge TTS into _ttsInFlight at t = 0ms
+  void synthesizeFlexibleTts({
+    text: localResult.aiReply,
+    targetLang: params.targetLang,
+    persona: params.persona,
+  });
+
   // 1) If user has a Gemini API Key, enrich reply via Gemini 2.0 Flash REST API
   let userGeminiKey = '';
   try {
@@ -984,7 +1014,7 @@ export async function evaluateTurnFlexible(params: {
   if (userGeminiKey.length > 10) {
     try {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 3200);
+      const timeout = setTimeout(() => controller.abort(), 2200);
       const langLabel = params.targetLang === 'ja' ? 'Japanese (polite N5/N4)' : 'English (A1/A2)';
       const promptText = [
         `You are ${params.persona.name}, a friendly speaking partner in scenario "${params.scenario.titleId}".`,
@@ -1012,9 +1042,15 @@ export async function evaluateTurnFlexible(params: {
         const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
         const parsed = JSON.parse(rawText);
         if (parsed && typeof parsed.aiReply === 'string' && parsed.aiReply.trim()) {
+          const geminiReply = parsed.aiReply.trim();
+          void synthesizeFlexibleTts({
+            text: geminiReply,
+            targetLang: params.targetLang,
+            persona: params.persona,
+          });
           return {
             ...localResult,
-            aiReply: parsed.aiReply.trim(),
+            aiReply: geminiReply,
             aiReplyTranslationId:
               parsed.aiReplyTranslationId || localResult.aiReplyTranslationId,
             aiReplyTranslationTh:
@@ -1023,27 +1059,44 @@ export async function evaluateTurnFlexible(params: {
               params.scenario.id,
               params.targetLang,
               undefined,
-              parsed.aiReply.trim(),
+              geminiReply,
               params.text,
               params.history
             ),
+            audioBase64: null,
+            audioMimeType: 'audio/mpeg',
+            ttsEngine: 'fiezel-edge-tts-binary',
           };
         }
       }
     } catch {
-      // Fall through to fast local result
+      // Fall through to fast path
     }
   }
 
-  // 2) Production AI partner (same Worker path as Ngobrol AI). Grading stays local.
-  const partner = await requestAiPartnerReply({
+  // 2) Production AI partner (same Worker path as Ngobrol AI) raced against FAST_AI_BUDGET_MS.
+  // The underlying fetch is NOT aborted early so /api/ai/task still completes with HTTP 200.
+  const partnerPromise = requestAiPartnerReply({
     text: params.text,
     scenario: params.scenario,
     targetLang: params.targetLang,
     locale: params.locale,
     history: params.history,
   });
+
+  const partner = await Promise.race([
+    partnerPromise,
+    new Promise<null>((resolve) => setTimeout(() => resolve(null), FAST_AI_BUDGET_MS)),
+  ]);
+
   if (partner) {
+    // Kick off Neural Edge TTS immediately into _ttsInFlight and return the reply to the UI
+    // without blocking on audio bytes; speakAiText joins the in-flight TTS promise seamlessly.
+    void synthesizeFlexibleTts({
+      text: partner.reply,
+      targetLang: params.targetLang,
+      persona: params.persona,
+    });
     return {
       ...localResult,
       aiReply: partner.reply,
@@ -1058,55 +1111,22 @@ export async function evaluateTurnFlexible(params: {
         params.history
       ),
       audioBase64: null,
-      audioMimeType: null,
+      audioMimeType: 'audio/mpeg',
       ttsEngine: 'fiezel-ai-partner',
     };
   }
 
-  // 3) Only probe custom turnApiUrl if explicitly configured and not yet marked unavailable
-  const customUrl =
-    typeof window !== 'undefined' ? window.FIEZEL_VOICE_STUDIO_CONFIG?.turnApiUrl : undefined;
-  if (customUrl && _turnApiAvailable !== false) {
-    try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 1500);
-      const res = await fetch(customUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          text: params.text,
-          scenarioId: params.scenario.id,
-          competencyId: params.scenario.competencyId,
-          targetLang: params.targetLang,
-          locale: params.locale,
-          personaId: params.persona.id,
-          geminiVoice: params.persona.geminiVoice,
-          edgeVoice: params.persona.edgeVoice,
-          systemPrompt: params.persona.systemPrompt,
-          measureMode: params.measureMode,
-          history: params.history.slice(-6),
-        }),
-        signal: controller.signal,
-      });
-      clearTimeout(timeout);
-      if (res.ok) {
-        const data = await res.json();
-        if (data && typeof data.aiReply === 'string') {
-          _turnApiAvailable = true;
-          return data as FlexibleTurnEvaluationResult;
-        }
-      }
-      _turnApiAvailable = false;
-    } catch {
-      _turnApiAvailable = false;
-    }
-  }
-
+  // 3) Offline / timeout fallback: kick off Neural Edge TTS into _ttsInFlight and return now
+  void synthesizeFlexibleTts({
+    text: localResult.aiReply,
+    targetLang: params.targetLang,
+    persona: params.persona,
+  });
   return {
     ...localResult,
     audioBase64: null,
-    audioMimeType: null,
-    ttsEngine: 'browser-speech-synthesis',
+    audioMimeType: 'audio/mpeg',
+    ttsEngine: 'fiezel-edge-tts-binary',
   };
 }
 
@@ -1139,76 +1159,87 @@ export async function synthesizeFlexibleTts(params: {
     return cached;
   }
 
+  const inflight = _ttsInFlight.get(cacheKey);
+  if (inflight) {
+    return inflight;
+  }
+
   if (!params.force && Date.now() < _ttsCooldownUntil) {
     return null;
   }
 
   const endpoint = resolveTtsEndpoint();
 
-  try {
-    const controller = new AbortController();
-    // Render free tier cold-starts in ~7s; a 3.5s budget made the FIRST line always silent.
-    const timer = setTimeout(() => controller.abort(), _ttsWarm ? 7000 : 12000);
-    const res = await fetch(endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        text: params.text,
-        speaker,
-        lang: params.targetLang,
-      }),
-      mode: 'cors',
-      signal: controller.signal,
-    });
-    clearTimeout(timer);
-    if (res.ok) {
-      _ttsWarm = true;
-      const contentType = res.headers.get('content-type') || '';
-      if (contentType.includes('audio/')) {
-        const buf = await res.arrayBuffer();
-        const bytes = new Uint8Array(buf);
-        let binary = '';
-        for (let i = 0; i < bytes.byteLength; i++) {
-          binary += String.fromCharCode(bytes[i]);
-        }
-        _ttsConsecutiveFailures = 0;
-        _ttsCooldownUntil = 0;
-        const result = {
-          audioBase64: btoa(binary),
-          audioMimeType: contentType.split(';')[0] || 'audio/mpeg',
-          engine: 'fiezel-edge-tts-binary',
-        };
-        _ttsMemoryCache.set(cacheKey, result);
-        return result;
-      }
-      if (contentType.includes('application/json')) {
-        const json = await res.json();
-        const b64 = json?.audioBase64 || json?.audio_base64 || json?.audio || json?.data;
-        if (typeof b64 === 'string' && b64.length > 32) {
+  const requestPromise = (async () => {
+    try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 11000);
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text: params.text,
+          speaker,
+          lang: params.targetLang,
+        }),
+        mode: 'cors',
+        signal: controller.signal,
+      });
+      clearTimeout(timer);
+      if (res.ok) {
+        _ttsWarm = true;
+        const contentType = res.headers.get('content-type') || '';
+        if (contentType.includes('audio/')) {
+          const buf = await res.arrayBuffer();
+          const bytes = new Uint8Array(buf);
+          let binary = '';
+          for (let i = 0; i < bytes.byteLength; i++) {
+            binary += String.fromCharCode(bytes[i]);
+          }
           _ttsConsecutiveFailures = 0;
           _ttsCooldownUntil = 0;
           const result = {
-            audioBase64: b64.replace(/^data:audio\/[^;]+;base64,/, ''),
-            audioMimeType: json?.mimeType || json?.audioMimeType || 'audio/mpeg',
-            engine: 'fiezel-edge-tts-json',
+            audioBase64: btoa(binary),
+            audioMimeType: contentType.split(';')[0] || 'audio/mpeg',
+            engine: 'fiezel-edge-tts-binary',
           };
           _ttsMemoryCache.set(cacheKey, result);
           return result;
         }
+        if (contentType.includes('application/json')) {
+          const json = await res.json();
+          const b64 = json?.audioBase64 || json?.audio_base64 || json?.audio || json?.data;
+          if (typeof b64 === 'string' && b64.length > 32) {
+            _ttsConsecutiveFailures = 0;
+            _ttsCooldownUntil = 0;
+            const result = {
+              audioBase64: b64.replace(/^data:audio\/[^;]+;base64,/, ''),
+              audioMimeType: json?.mimeType || json?.audioMimeType || 'audio/mpeg',
+              engine: 'fiezel-edge-tts-json',
+            };
+            _ttsMemoryCache.set(cacheKey, result);
+            return result;
+          }
+        }
       }
+      _ttsConsecutiveFailures += 1;
+      if (_ttsConsecutiveFailures >= 3) {
+        _ttsCooldownUntil = Date.now() + 2500;
+      }
+    } catch {
+      _ttsConsecutiveFailures += 1;
+      if (_ttsConsecutiveFailures >= 3) {
+        _ttsCooldownUntil = Date.now() + 2500;
+      }
+    } finally {
+      _ttsInFlight.delete(cacheKey);
     }
-    _ttsConsecutiveFailures += 1;
-    if (_ttsConsecutiveFailures >= 2) {
-      _ttsCooldownUntil = Date.now() + 6000;
-    }
-  } catch {
-    _ttsConsecutiveFailures += 1;
-    if (_ttsConsecutiveFailures >= 2) {
-      _ttsCooldownUntil = Date.now() + 6000;
-    }
-  }
 
-  return null;
+    return null;
+  })();
+
+  _ttsInFlight.set(cacheKey, requestPromise);
+  return requestPromise;
 }
 
 /**

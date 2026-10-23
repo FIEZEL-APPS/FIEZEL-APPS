@@ -45,7 +45,11 @@
       if (existingFrame && existingFrame.getAttribute('data-lang') === lang && existingFrame.getAttribute('data-locale') === locale) {
         return;
       }
-      var targetSrc = './call.html?embed=1&tab=call&lang=' + encodeURIComponent(lang) + '&locale=' + encodeURIComponent(locale);
+      var pageBuild = '';
+      try {
+        pageBuild = String(root.FIEZEL_PAGE_BUILD || '');
+      } catch (_) {}
+      var targetSrc = './call.html?embed=1&tab=call&lang=' + encodeURIComponent(lang) + '&locale=' + encodeURIComponent(locale) + (pageBuild ? '&v=' + encodeURIComponent(pageBuild) : '');
       var titleText = lang === 'ja' ? 'Mitra Kaiwa' : 'Kawan Bicara';
       mountPoint.innerHTML =
         '<div id="fzcContainer" class="fzc-container fzc-mitra-kaiwa-studio-host" data-testid="mitra-kaiwa-studio-host" style="position:fixed !important;inset:0 !important;width:100vw !important;height:100dvh !important;max-width:100vw !important;max-height:100dvh !important;flex:1 1 0px !important;display:flex !important;flex-direction:column !important;margin:0 !important;padding:0 !important;padding-bottom:0 !important;overflow:hidden !important;background:#FFF9EE !important;z-index:9990 !important;">' +
