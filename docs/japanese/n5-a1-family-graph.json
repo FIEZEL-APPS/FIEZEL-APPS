@@ -1,8 +1,8 @@
 {
   "schema": "fiezel-japanese-family-graph-proposal-v0",
-  "status": "USULAN — menunggu persetujuan owner. Belum disuntikkan ke mesin mana pun.",
+  "status": "AKTIF — diselaraskan dengan content/ja/family-graph-ja.json untuk 6 tingkat penuh A1/N5 s/d C2/N1+.",
   "target": "ja",
-  "catatan": "Bentuknya sengaja sama dengan PREREQUISITES di features/brain/fiezel-core-brain.js: peta keluarga -> daftar keluarga prasyarat. Tingkat kedalaman DI DALAM keluarga tetap ditangani urutan CEFR, persis seperti di kursus Inggris. m025-312: ditambah 14 keluarga A2/N4; prasyaratnya menunjuk keluarga A1/N5 supaya diagnosis akar masalah turun ke lapis yang benar, bukan berhenti di keluarga N4.",
+  "catatan": "Bentuknya sengaja sama dengan PREREQUISITES di features/brain/fiezel-core-brain.js: peta keluarga -> daftar keluarga prasyarat. Mencakup 50 keluarga melintasi A1/N5 (12), A2/N4 (15), B1/N3 (8), B2/N2 (6), C1/N1 (5), dan C2/N1+ (4).",
   "families": {
     "particles": [],
     "demonstratives": [],
@@ -95,6 +95,103 @@
     ],
     "experience_frequency": [
       "plain_forms"
+    ],
+    "aspect_phase": [
+      "te_form_extensions",
+      "verb_groups"
+    ],
+    "hearsay_appearance": [
+      "plain_forms",
+      "adjectives",
+      "quotation_thought"
+    ],
+    "causative_passive": [
+      "passive_causative",
+      "giving_receiving"
+    ],
+    "concession_contrast": [
+      "reason_concession",
+      "plain_forms"
+    ],
+    "formal_conjunctions": [
+      "particles",
+      "plain_forms",
+      "reason_concession"
+    ],
+    "spoken_contractions": [
+      "te_form_extensions",
+      "obligation_permission",
+      "quotation_thought"
+    ],
+    "extent_proportion": [
+      "comparison",
+      "conditionals"
+    ],
+    "contextual_framing": [
+      "plain_forms",
+      "volitional_intent",
+      "reason_concession"
+    ],
+    "scope_limit_addition": [
+      "formal_conjunctions",
+      "extent_proportion"
+    ],
+    "inevitability_compulsion": [
+      "contextual_framing",
+      "obligation_permission"
+    ],
+    "temporal_immediacy": [
+      "time_expressions",
+      "aspect_phase",
+      "formal_conjunctions"
+    ],
+    "standpoint_evaluation": [
+      "formal_conjunctions",
+      "hearsay_appearance"
+    ],
+    "counterfactual_regret": [
+      "conditionals",
+      "concession_contrast"
+    ],
+    "advanced_keigo_business": [
+      "keigo",
+      "giving_receiving",
+      "potential"
+    ],
+    "literary_negation_classical": [
+      "inevitability_compulsion",
+      "negation_past"
+    ],
+    "emphatic_concession": [
+      "concession_contrast",
+      "counterfactual_regret"
+    ],
+    "immediate_succession_formal": [
+      "temporal_immediacy"
+    ],
+    "status_role_worthiness": [
+      "standpoint_evaluation",
+      "advanced_keigo_business"
+    ],
+    "extreme_correlation": [
+      "scope_limit_addition",
+      "causative_passive"
+    ],
+    "academic_rhetoric_register": [
+      "standpoint_evaluation",
+      "status_role_worthiness"
+    ],
+    "classical_residual_idioms": [
+      "literary_negation_classical",
+      "extreme_correlation"
+    ],
+    "pragmatic_nuance_irony": [
+      "emphatic_concession",
+      "hearsay_appearance"
+    ],
+    "executive_diplomatic_keigo": [
+      "advanced_keigo_business",
+      "status_role_worthiness"
     ]
   },
   "cakupanTingkat": {
@@ -129,13 +226,45 @@
       "reason_concession",
       "experience_frequency"
     ],
-    "catatan": "A1_N5 = 12 keluarga, A2_N4 = 15 keluarga, total 27. Daftar ini WAJIB sepadan dengan kunci families di berkas ini; kalau tidak, peta tingkat ini menyesatkan siapa pun yang memakainya sebagai acuan."
+    "B1_N3": [
+      "aspect_phase",
+      "hearsay_appearance",
+      "causative_passive",
+      "concession_contrast",
+      "formal_conjunctions",
+      "spoken_contractions",
+      "extent_proportion",
+      "contextual_framing"
+    ],
+    "B2_N2": [
+      "scope_limit_addition",
+      "inevitability_compulsion",
+      "temporal_immediacy",
+      "standpoint_evaluation",
+      "counterfactual_regret",
+      "advanced_keigo_business"
+    ],
+    "C1_N1": [
+      "literary_negation_classical",
+      "emphatic_concession",
+      "immediate_succession_formal",
+      "status_role_worthiness",
+      "extreme_correlation"
+    ],
+    "C2_N1PLUS": [
+      "academic_rhetoric_register",
+      "classical_residual_idioms",
+      "pragmatic_nuance_irony",
+      "executive_diplomatic_keigo"
+    ],
+    "catatan": "A1_N5 = 12, A2_N4 = 15, B1_N3 = 8, B2_N2 = 6, C1_N1 = 5, C2_N1PLUS = 4, total 50 keluarga. Daftar ini sepadan 1:1 dengan kunci families di berkas ini."
   },
   "alasanUrutan": {
     "particles_lebih_dulu": "Tanpa は/が/を/に/で, tidak ada satu pun kalimat Jepang yang bisa disusun benar. Ia akar yang sama seperti tense_aspect di kursus Inggris.",
     "verb_groups_sebelum_polite_forms": "ます/ません dibentuk dari akar yang berbeda per golongan (godan/ichidan/tak beraturan). Murid yang belum bisa menggolongkan kata kerja hanya menghafal bentuk satu per satu.",
     "polite_forms_sebelum_te_form": "Bentuk て di N5 diajarkan setelah murid punya ragam sopan yang stabil, dan aturan てnya sendiri dipilih berdasarkan golongan — jadi ia menuntut verb_groups DAN polite_forms.",
     "counters_setelah_existence_location": "Kata bantu bilangan muncul pertama kali di kalimat keberadaan (…が さんにん います), jadi prasyaratnya kalimat itu, bukan sekadar kata benda.",
-    "keigo_paling_akhir": "Keigo menuntut murid sudah bisa berpindah sadar antara ragam biasa dan sopan; menaruhnya lebih awal membuat murid menghafal tanpa pernah bisa memilih."
+    "keigo_berjenjang_n4_n2_c2": "Keigo dibangun bertahap dari dasar N4 (keigo), lalu bisnis N2 (advanced_keigo_business), hingga korespondensi eksekutif/diplomatik C2 (executive_diplomatic_keigo).",
+    "klasik_dan_retorika_setelah_n2": "Negasi klasik N1 (literary_negation_classical) dan idiom residu klasik C2 (classical_residual_idioms) berakar pada keharusan N2 (inevitability_compulsion) dan korelasi ekstrem."
   }
 }

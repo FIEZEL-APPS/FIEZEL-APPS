@@ -1,8 +1,8 @@
 {
   "schema": "fiezel-jlpt-listening-bank-v1",
-  "version": "1.0.0",
-  "title": "Bank Soal Listening Bahasa Jepang JLPT N5 & N4 (日本語能力試験 聴解)",
-  "description": "Koleksi bank soal latihan listening resmi dan terstandarisasi untuk JLPT N5 dan JLPT N4, mencakup Mondai 1 (課題理解 - Task-based), Mondai 2 (ポイント理解 - Point comprehension), Mondai 3 (発話表現 - Utterance expressions), dan Mondai 4 (即時応答 - Quick response). Dilengkapi audio resmi JLPT, transkrip kanji/kana, transliterasi romaji, terjemahan Indonesia, kunci jawaban, dan pembahasan mendalam.",
+  "version": "2.0.0",
+  "title": "Bank Soal Listening Bahasa Jepang JLPT N5–N1+ (日本語能力試験 聴解)",
+  "description": "Koleksi bank soal latihan listening terstandarisasi untuk seluruh 6 tingkat JLPT N5, N4, N3, N2, N1, hingga Jōkyū N1+ (CEFR A1–C2), mencakup Mondai 1 (課題理解), Mondai 2 (ポイント理解), Mondai 3 (発話表現), dan Mondai 4 (即時応答) dengan audio multi-karakter FIEZEL.",
   "source": {
     "provider": "Japan Foundation & JEES",
     "officialUrls": {
@@ -55,7 +55,7 @@
       "replays": 1
     }
   },
-  "count": 30,
+  "count": 62,
   "items": [
     {
       "id": "jlpt-n5-m1-01",
@@ -2108,6 +2108,2322 @@
         9.98
       ],
       "questionRomaji": "Nan to itte kotaemasu ka."
+    },
+    {
+      "id": "jlpt-n3-m1-01",
+      "level": "N3",
+      "cefr": "B1",
+      "mondai": "mondai_1",
+      "mondaiLabel": "Mondai 1: Task-based Comprehension (課題理解)",
+      "title": "Persiapan Rapat Divisi Sore Ini",
+      "situation": "Di kantor, seorang kepala seksi sedang memberikan instruksi persiapan rapat sore kepada staf perempuan.",
+      "audioUrl": "",
+      "aiAudioUrl": "./features/speaking-listening/audio-jlpt/jlpt-n3-m1-01.mp3",
+      "audioTrack": "FIEZEL Studio Chōkai N3 - Mondai 1",
+      "scriptJapanese": "課長：鈴木さん、今日の午後の会議なんだけど、会議室Bを予約して、資料を15部印刷しておいてくれる？\n女の人：はい、会議室Bは今朝もう予約しておきました。ただ、資料はインターンの学生も3人参加するので、15部だと足りないかもしれません。\n課長：あ、そうだったね。じゃあ予備も含めて20部頼むよ。プロジェクターの準備もしようか？\n女の人：いえ、プロジェクターは佐藤さんが前の会議からそのまま持ってきてくれることになっています。",
+      "scriptRomaji": "Kachou: Suzuki-san, kyou no gogo no kaigi nan dakedo, kaigishitsu B o yoyaku shite, shiryou o juugobu insatsu shite oite kureru?\nOnna no hito: Hai, kaigishitsu B wa kesa mou yoyaku shite okimashita. Tada, shiryou wa intaan no gakusei mo sannin sanka suru node, juugobu da to tarinai kamoshiremasen.\nKachou: A, sou datta ne. Jaa yobi mo fukumete nijuubu tanomu yo. Purojekutaa no junbi mo shiyou ka?\nOnna no hito: Ie, purojekutaa wa Satou-san ga mae no kaigi kara sonomama motte kite kureru koto ni natte imasu.",
+      "scriptIndonesian": "Kepala Seksi: Suzuki-san, soal rapat siang ini, bisakah kamu memesankan Ruang Rapat B dan mencetakkan materi sebanyak 15 rangkap?\nWanita: Baik, Ruang Rapat B tadi pagi sudah saya pesankan. Hanya saja, untuk materi, karena ada 3 mahasiswa magang yang ikut juga, kalau 15 rangkap mungkin kurang.\nKepala Seksi: Oh, betul juga ya. Kalau begitu tolong cetak 20 rangkap termasuk cadangan ya. Apakah perlu menyiapkan proyektor juga?\nWanita: Tidak usah, proyektornya sudah dijadwalkan akan dibawa langsung oleh Sato-san dari rapat sebelumnya.",
+      "questionJapanese": "女の人はこのあと何をしますか。",
+      "questionRomaji": "Onna no hito wa kono ato nani o shimasu ka.",
+      "questionIndonesian": "Apa yang akan dilakukan wanita tersebut setelah ini?",
+      "options": [
+        {
+          "id": 1,
+          "text": "資料を15部印刷する",
+          "textId": "Mencetak materi sebanyak 15 rangkap",
+          "whyFails": "Jumlah 15 rangkap adalah instruksi awal kepala seksi sebelum diingatkan bahwa ada 3 mahasiswa magang yang ikut serta, sehingga jumlahnya direvisi menjadi 20 rangkap."
+        },
+        {
+          "id": 2,
+          "text": "資料を20部印刷する",
+          "textId": "Mencetak materi sebanyak 20 rangkap"
+        },
+        {
+          "id": 3,
+          "text": "会議室Bを予約する",
+          "textId": "Memesan Ruang Rapat B",
+          "whyFails": "Ruang Rapat B sudah selesai dipesan oleh wanita tersebut tadi pagi ('今朝もう予約しておきました'), sehingga tidak perlu dilakukan lagi."
+        },
+        {
+          "id": 4,
+          "text": "プロジェクターを準備する",
+          "textId": "Menyiapkan proyektor",
+          "whyFails": "Proyektor tidak perlu disiapkan oleh wanita tersebut karena sudah disepakati akan dibawa oleh Sato-san dari rapat sebelumnya ('佐藤さんが持ってきてくれることになっています')."
+        }
+      ],
+      "answerIndex": 1,
+      "explain": "Ruang Rapat B sudah dipesan tadi pagi (\"今朝もう予約しておきました\"), sedangkan proyektor akan dibawa oleh Sato-san. Mengenai jumlah materi cetak, usulan awal 15 rangkap direvisi oleh kepala seksi setelah mendengar ada tambahan peserta magang: \"じゃあ予備も含めて20部頼むよ\" (Kalau begitu tolong 20 rangkap termasuk cadangan). Maka tugas yang dilakukan wanita tersebut selanjutnya adalah mencetak materi 20 rangkap (Pilihan 2).",
+      "vocabularyKey": [
+        {
+          "ja": "印刷する (insatsu suru)",
+          "id": "mencetak (dokumen)"
+        },
+        {
+          "ja": "予備 (yobi)",
+          "id": "cadangan / ekstra"
+        },
+        {
+          "ja": "含める (fukumeru)",
+          "id": "menyertakan / memasukkan"
+        },
+        {
+          "ja": "～ことになっている (koto ni natte iru)",
+          "id": "sudah dijadwalkan / disepakati bahwa ..."
+        }
+      ],
+      "turnTimestamps": [
+        3.89,
+        13.95,
+        26.93,
+        34.07
+      ],
+      "allTurnTimestamps": [
+        0,
+        3.89,
+        13.95,
+        26.93,
+        34.07,
+        41.97
+      ]
+    },
+    {
+      "id": "jlpt-n3-m1-02",
+      "level": "N3",
+      "cefr": "B1",
+      "mondai": "mondai_1",
+      "mondaiLabel": "Mondai 1: Task-based Comprehension (課題理解)",
+      "title": "Pengembalian dan Pemesanan Buku di Perpustakaan",
+      "situation": "Seorang mahasiswa laki-laki sedang berbicara dengan petugas resepsionis di loket perpustakaan kampus.",
+      "audioUrl": "",
+      "aiAudioUrl": "./features/speaking-listening/audio-jlpt/jlpt-n3-m1-02.mp3",
+      "audioTrack": "FIEZEL Studio Chōkai N3 - Mondai 1",
+      "scriptJapanese": "男子学生：すみません、この歴史の本を返したいんですが、こちらの専門辞書はもう一週間延ばせますか。\n受付：お調べしますね。あ、この辞書は次の予約が入っているため、延長ができないんです。ちなみに、借りていらっしゃる経済の雑誌は明日が返却日ですが、よろしいですか。\n男子学生：はい、雑誌は明日持ってきます。辞書はまだ使いたいんですけど、どうすればいいですか。\n受付：いったん今日ご返却いただいたうえで、あちらの申込用紙に記入して出してくだされば、順番が来次第メールでお知らせします。",
+      "scriptRomaji": "Danshi gakusei: Sumimasen, kono rekishi no hon o kaeshitai n desu ga, kochira no senmon jisho wa mou isshuukan nobasemasu ka.\nUketsuke: Oshirabe shimasu ne. A, kono jisho wa tsugi no yoyaku ga haitte iru tame, enchou ga dekinai n desu. Chinamini, karite irassharu keizai no zasshi wa ashita ga henkyakubi desu ga, yoroshii desu ka.\nDanshi gakusei: Hai, zasshi wa ashita motte kimasu. Jisho wa mada tsukaitai n desu kedo, dou sureba ii desu ka.\nUketsuke: Ittan kyou gohenkyaku itadaita ue de, achira no moushikomi youshi ni kinyuu shite dashite kudasareba, junban ga kishidai meeru de oshirase shimasu.",
+      "scriptIndonesian": "Mahasiswa: Permisi, saya ingin mengembalikan buku sejarah ini, lalu apakah kamus khusus yang ini bisa diperpanjang satu minggu lagi?\nResepsionis: Saya periksa dulu ya. Oh, kamus ini karena sudah ada antrean pemesanan berikutnya, tidak bisa diperpanjang. Ngomong-ngomong, majalah ekonomi yang sedang Anda pinjam batas pengembaliannya besok, apakah tidak apa-apa?\nMahasiswa: Baik, majalahnya akan saya bawa besok. Kamusnya saya masih ingin memakainya, sebaiknya bagaimana ya?\nResepsionis: Setelah dikembalikan dulu hari ini, silakan isi dan serahkan formulir pendaftaran di sebelah sana; begitu giliran Anda tiba, kami akan memberi tahu lewat surel.",
+      "questionJapanese": "男子学生は本を返したあと、すぐに何をしますか。",
+      "questionRomaji": "Danshi gakusei wa hon o kaeshita ato, sugu ni nani o shimasu ka.",
+      "questionIndonesian": "Setelah mengembalikan buku, apa yang segera dilakukan mahasiswa laki-laki tersebut?",
+      "options": [
+        {
+          "id": 1,
+          "text": "専門辞書の貸出期間を延ばす",
+          "textId": "Memperpanjang masa pinjam kamus khusus",
+          "whyFails": "Permohonan perpanjangan masa pinjam kamus ditolak petugas karena sudah ada pemesan berikutnya ('次の予約が入っているため、延長ができないんです')."
+        },
+        {
+          "id": 2,
+          "text": "経済の雑誌を取りに帰る",
+          "textId": "Pulang mengambil majalah ekonomi",
+          "whyFails": "Batas pengembalian majalah ekonomi adalah besok dan mahasiswa sudah menyatakan akan membawanya besok ('雑誌は明日持ってきます'), bukan sekarang."
+        },
+        {
+          "id": 3,
+          "text": "歴史の本をもう一度借りる",
+          "textId": "Meminjam kembali buku sejarah",
+          "whyFails": "Buku sejarah memang hendak dikembalikan karena sudah selesai dipakai; buku yang masih ingin digunakan mahasiswa adalah kamus khusus, bukan buku sejarah."
+        },
+        {
+          "id": 4,
+          "text": "申込用紙に記入して出す",
+          "textId": "Mengisi dan menyerahkan formulir pendaftaran antrean"
+        }
+      ],
+      "answerIndex": 3,
+      "explain": "Kamus khusus tidak dapat diperpanjang karena ada antrean peminjam lain. Ketika mahasiswa bertanya cara agar tetap bisa memakainya lagi, petugas mengarahkan: \"いったん今日ご返却いただいたうえで、あちらの申込用紙に記入して出してくだされば...\" (Setelah dikembalikan hari ini, silakan isi dan serahkan formulir pendaftaran di sebelah sana). Jadi tindakan yang segera ia lakukan setelah mengembalikan buku adalah mengisi lalu menyerahkan formulir tersebut (Pilihan 4).",
+      "vocabularyKey": [
+        {
+          "ja": "延長 (enchou)",
+          "id": "perpanjangan (waktu/masa pinjam)"
+        },
+        {
+          "ja": "返却日 (henkyakubi)",
+          "id": "tanggal pengembalian"
+        },
+        {
+          "ja": "申込用紙 (moushikomi youshi)",
+          "id": "formulir pendaftaran/permohonan"
+        },
+        {
+          "ja": "～次第 (shidai)",
+          "id": "begitu / segera setelah ..."
+        }
+      ],
+      "turnTimestamps": [
+        4.26,
+        11.95,
+        27.96,
+        34.25
+      ],
+      "allTurnTimestamps": [
+        0,
+        4.26,
+        11.95,
+        27.96,
+        34.25,
+        45.92
+      ]
+    },
+    {
+      "id": "jlpt-n3-m2-01",
+      "level": "N3",
+      "cefr": "B1",
+      "mondai": "mondai_2",
+      "mondaiLabel": "Mondai 2: Point Comprehension (ポイント理解)",
+      "title": "Alasan Utama Pindah Apartemen",
+      "situation": "Sepasang rekan kerja sedang mengobrol saat jam istirahat mengenai apartemen baru si pria.",
+      "audioUrl": "",
+      "aiAudioUrl": "./features/speaking-listening/audio-jlpt/jlpt-n3-m2-01.mp3",
+      "audioTrack": "FIEZEL Studio Chōkai N3 - Mondai 2",
+      "scriptJapanese": "女の人：高橋さん、先月引っ越したんだって？前のアパート、駅から近くて気に入ってたのに、家賃が上がったの？\n男の人：いや、家賃はそのままだったし、駅まで歩いて5分だから通勤にはすごく便利だったんだけどね。\n女の人：じゃあ、建物が古くて部屋が狭かったとか？\n男の人：古いのは最初からわかってて気にしてなかったよ。実は、前の道路が夜間の大型トラックの抜け道になっちゃって、夜中に目が覚める日が続いたんだ。",
+      "scriptRomaji": "Onna no hito: Takahashi-san, sengetsu hikkoshita n datte? Mae no apaato, eki kara chikakute ki ni itteta noni, yachin ga agatta no?\nOtoko no hito: Iya, yachin wa sonomama datta shi, eki made aruite gofun dakara tsuukin ni wa sugoku benri datta n dakedo ne.\nOnna no hito: Jaa, tatemono ga furukute heya ga semakatta toka?\nOtoko no hito: Furui no wa saisho kara wakattete ki ni shitenakatta yo. Jitsu wa, mae no douro ga yakan no oogata torakku no nukemichi ni nacchatte, yonaka ni me ga sameru hi ga tsuzuita n da.",
+      "scriptIndonesian": "Wanita: Takahashi-san, katanya bulan lalu pindah rumah ya? Padahal apartemen sebelumnya dekat stasiun dan kamu suka, apakah uang sewanya naik?\nPria: Tidak, uang sewanya tetap sama, dan karena jalan kaki 5 menit ke stasiun, untuk berangkat kerja sangat praktis sebenarnya.\nWanita: Kalau begitu, apakah karena bangunannya tua dan kamarnya sempit?\nPria: Soal bangunannya tua sudah tahu dari awal jadi tidak mempermasalahkan. Sebenarnya, jalan di depan apartemen jadi jalur pintas truk besar malam hari, sehingga berhari-hari saya terbangun tengah malam.",
+      "questionJapanese": "男の人が引っ越した一番の理由は何ですか。",
+      "questionRomaji": "Otoko no hito ga hikkoshita ichiban no riyuu wa nan desu ka.",
+      "questionIndonesian": "Apa alasan utama pria tersebut pindah rumah?",
+      "options": [
+        {
+          "id": 1,
+          "text": "夜間の車の音がうるさくて眠れなかったから",
+          "textId": "Karena suara kendaraan malam hari bising sehingga tidak bisa tidur nyenyak"
+        },
+        {
+          "id": 2,
+          "text": "アパートの家賃が値上がりしたから",
+          "textId": "Karena uang sewa apartemen mengalami kenaikan",
+          "whyFails": "Pria tersebut langsung membantah kenaikan sewa dengan mengatakan 'いや、家賃はそのままだった' (uang sewanya tetap sama)."
+        },
+        {
+          "id": 3,
+          "text": "駅から遠くて通勤に不便だったから",
+          "textId": "Karena jauh dari stasiun dan tidak praktis untuk berangkat kerja",
+          "whyFails": "Apartemen lamanya justru hanya berjarak 5 menit jalan kaki dari stasiun dan sangat praktis untuk komuter ('通勤にはすごく便利だった')."
+        },
+        {
+          "id": 4,
+          "text": "建物が古くて住みにくかったから",
+          "textId": "Karena bangunannya tua sehingga tidak nyaman ditinggali",
+          "whyFails": "Meskipun bangunannya memang tua, pria menegaskan ia sudah tahu sejak awal dan tidak mempermasalahkannya ('気にしてなかったよ')."
+        }
+      ],
+      "answerIndex": 0,
+      "explain": "Pria menepis dugaan soal kenaikan harga sewa, jarak stasiun, maupun usia bangunan. Di akhir dialog ia mengungkapkan alasan sebenarnya dengan kata kunci \"実は\" (sebenarnya): \"前の道路が夜間の大型トラックの抜け道になっちゃって、夜中に目が覚める日が続いたんだ\" (Jalan di depan menjadi jalur pintas truk besar di malam hari sehingga ia terus terbangun tengah malam). Jadi alasan utamanya adalah kebisingan kendaraan malam hari (Pilihan 1).",
+      "vocabularyKey": [
+        {
+          "ja": "家賃 (yachin)",
+          "id": "uang sewa rumah/apartemen"
+        },
+        {
+          "ja": "通勤 (tsuukin)",
+          "id": "perjalanan pulang-pergi kerja"
+        },
+        {
+          "ja": "夜間 (yakan)",
+          "id": "waktu malam hari"
+        },
+        {
+          "ja": "抜け道 (nukemichi)",
+          "id": "jalan pintas / jalur alternatif"
+        }
+      ],
+      "turnTimestamps": [
+        4.08,
+        15.11,
+        22.43,
+        26.82
+      ],
+      "allTurnTimestamps": [
+        0,
+        4.08,
+        15.11,
+        22.43,
+        26.82,
+        39.33
+      ]
+    },
+    {
+      "id": "jlpt-n3-m2-02",
+      "level": "N3",
+      "cefr": "B1",
+      "mondai": "mondai_2",
+      "mondaiLabel": "Mondai 2: Point Comprehension (ポイント理解)",
+      "title": "Perubahan Jadwal Pemotretan Klub Fotografi",
+      "situation": "Dua anggota klub fotografi kampus sedang mendiskusikan jadwal kegiatan pemotretan akhir pekan.",
+      "audioUrl": "",
+      "aiAudioUrl": "./features/speaking-listening/audio-jlpt/jlpt-n3-m2-02.mp3",
+      "audioTrack": "FIEZEL Studio Chōkai N3 - Mondai 2",
+      "scriptJapanese": "男の人：今度の鎌倉での撮影会、土曜日の朝8時に駅集合の予定だったよね。天気予報を見たら、土曜の午前中は大雨らしいよ。\n女の人：えっ、ほんとう？じゃあ土曜日の午後にずらす？午後からは止むみたいだけど。\n男の人：うーん、お寺の拝観が4時までだから、午後から行くとほとんど撮れないと思うな。日曜日は一日中晴れだよ。\n女の人：日曜日の午後はバイトがある部員が多いけど、朝7時半集合にして午前中に回るなら全員参加できそうね。そうしよう！",
+      "scriptRomaji": "Otoko no hito: Kondo no Kamakura de no satsueikai, doyoubi no asa hachiji ni eki shuugou no yotei datta yo ne. Tenki yohou o mitara, doyou no gozenchuu wa ooame rashii yo.\nOnna no hito: E, hontou? Jaa doyoubi no gogo ni zurasu? Gogo kara wa yamu mitai dakedo.\nOtoko no hito: Uun, otera no haikan ga yoji made dakara, gogo kara iku to hotondo torenai to omou na. Nichiyoubi wa ichinichijuu hare da yo.\nOnna no hito: Nichiyoubi no gogo wa baito ga aru buin ga ooi kedo, asa shichijihan shuugou ni shite gozenchuu ni mawaru nara zen'in sanka dekisou ne. Sou shiyou!",
+      "scriptIndonesian": "Pria: Acara pemotretan di Kamakura nanti itu rencananya kumpul di stasiun hari Sabtu jam 8 pagi kan ya. Setelah saya lihat prakiraan cuaca, katanya Sabtu pagi hujan deras lho.\nWanita: Eh, benarkah? Kalau begitu kita geser ke Sabtu siang? Katanya mulai siang hujannya reda.\nPria: Hmm, kunjungan kuilnya hanya sampai jam 4 sore, jadi kalau berangkat siang rasanya hampir tidak sempat memotret. Hari Minggu cerah sepanjang hari lho.\nWanita: Minggu siang banyak anggota yang kerja paruh waktu, tapi kalau kumpul jam 7:30 pagi dan berkeliling di pagi hari, sepertinya semua bisa ikut ya. Ayo kita buat begitu!",
+      "questionJapanese": "撮影会はいつ行われますか。",
+      "questionRomaji": "Satsueikai wa itsu okonawaremasu ka.",
+      "questionIndonesian": "Kapan kegiatan pemotretan tersebut akan dilaksanakan?",
+      "options": [
+        {
+          "id": 1,
+          "text": "土曜日の朝8時",
+          "textId": "Sabtu pukul 08:00 pagi",
+          "whyFails": "Sabtu pukul 08:00 pagi adalah jadwal semula sebelum dibatalkan karena prakiraan cuaca menunjukkan hujan deras ('土曜の午前中は大雨らしい')."
+        },
+        {
+          "id": 2,
+          "text": "土曜日の午後",
+          "textId": "Sabtu siang",
+          "whyFails": "Usulan menggeser ke Sabtu siang ditolak oleh pria karena jam kunjungan kuil tutup pukul 16:00 sehingga waktu memotret tidak akan cukup."
+        },
+        {
+          "id": 3,
+          "text": "日曜日の朝7時半",
+          "textId": "Minggu pukul 07:30 pagi"
+        },
+        {
+          "id": 4,
+          "text": "日曜日の午後",
+          "textId": "Minggu siang",
+          "whyFails": "Pada Minggu siang banyak anggota klub yang memiliki jadwal kerja paruh waktu ('日曜日の午後はバイトがある部員が多い'), sehingga kegiatan diadakan pagi hari."
+        }
+      ],
+      "answerIndex": 2,
+      "explain": "Jadwal awal Sabtu pukul 08:00 batal karena hujan deras, dan opsi Sabtu siang ditolak karena kuil tutup pukul 16:00. Karena Minggu siang banyak anggota bekerja paruh waktu, wanita mengusulkan: \"日曜日の...朝7時半集合にして午前中に回るなら全員参加できそうね。そうしよう！\" (Kumpul Minggu pukul 07:30 pagi). Maka jadwal akhirnya adalah Minggu pukul 07:30 pagi (Pilihan 3).",
+      "vocabularyKey": [
+        {
+          "ja": "撮影会 (satsueikai)",
+          "id": "kegiatan memotret bersama"
+        },
+        {
+          "ja": "ずらす (zurasu)",
+          "id": "menggeser (jadwal/waktu)"
+        },
+        {
+          "ja": "止む (yamu)",
+          "id": "reda / berhenti (hujan/angin)"
+        },
+        {
+          "ja": "拝観 (haikan)",
+          "id": "kunjungan melihat kuil"
+        }
+      ],
+      "turnTimestamps": [
+        3.98,
+        16.83,
+        24.24,
+        34.16
+      ],
+      "allTurnTimestamps": [
+        0,
+        3.98,
+        16.83,
+        24.24,
+        34.16,
+        46.43
+      ]
+    },
+    {
+      "id": "jlpt-n3-m3-01",
+      "level": "N3",
+      "cefr": "B1",
+      "mondai": "mondai_3",
+      "mondaiLabel": "Mondai 3: Utterance Expressions (発話表現)",
+      "title": "Meminta Izin Pengumpulan Laporan Terlambat",
+      "situation": "Di ruang dosen, seorang mahasiswa menjelaskan kendala laptop rusak menjelang tenggat pengumpulan laporan sore ini.",
+      "audioUrl": "",
+      "aiAudioUrl": "./features/speaking-listening/audio-jlpt/jlpt-n3-m3-01.mp3",
+      "audioTrack": "FIEZEL Studio Chōkai N3 - Mondai 3",
+      "scriptJapanese": "先生：林くん、ゼミのレポートは今日の午後5時が締め切りだけど、もう出せそう？\n学生：あのう、先生、実は昨夜パソコンが急に動かなくなってしまって、今修理に出しているんです。\n先生：あら、それは困ったわね。データは残っているの？\n学生：はい、明日の朝には修理が終わって戻る予定です。",
+      "scriptRomaji": "Sensei: Hayashi-kun, zemi no repooto wa kyou no gogo goji ga shimekiri dakedo, mou dasesou?\nGakusei: Anou, sensei, jitsu wa sakuya pasokon ga kyuu ni ugokanaku natte shimatte, ima shuuri ni dashite iru n desu.\nSensei: Ara, sore wa komatta wa ne. Deeta wa nokotte iru no?\nGakusei: Hai, ashita no asa ni wa shuuri ga owatte modoru yotei desu.",
+      "scriptIndonesian": "Dosen: Hayashi-kun, laporan seminar tenggatnya hari ini jam 5 sore, apakah sudah siap dikumpulkan?\nMahasiswa: Anu, Bu Dosen, sebenarnya tadi malam laptop saya mendadak mati dan sekarang sedang diservis.\nDosen: Waduh, repot juga ya. Apakah datanya masih aman?\nMahasiswa: Ya, rencananya besok pagi servisnya selesai dan laptopnya kembali.",
+      "questionJapanese": "このあと、学生は先生になんと言って許可を求めますか。",
+      "questionRomaji": "Kono ato, gakusei wa sensei ni nan to itte kyoka o motomemasu ka.",
+      "questionIndonesian": "Setelah ini, apa yang diucapkan mahasiswa kepada dosen untuk memohon izin?",
+      "options": [
+        {
+          "id": 1,
+          "text": "すみませんが、明日の午後に提出していただけませんか。",
+          "textId": "Maaf, bisakah Ibu mengumpulkan laporannya besok siang?",
+          "whyFails": "Kesalahan arah pelaku pada pola '～ていただけませんか' (meminta lawan bicara melakukan sesuatu), sehingga kalimat ini justru menyuruh dosen yang mengumpulkan laporan."
+        },
+        {
+          "id": 2,
+          "text": "申し訳ありませんが、明日の午後に提出してもよろしいでしょうか。",
+          "textId": "Mohon maaf sekali, apakah diperkenankan jika saya mengumpulkannya besok siang?"
+        },
+        {
+          "id": 3,
+          "text": "パソコンが直ったら、明日の午後に提出させてあげます。",
+          "textId": "Kalau laptopnya sudah sembuh, saya akan mengizinkan Anda mengumpulkannya besok siang.",
+          "whyFails": "Pola kausatif-benefaktif '～させてあげます' bermakna memberi izin dari pihak lebih tinggi kepada bawahan/anak, sehingga terdengar sangat angkuh dan salah tata bahasa kepada dosen."
+        }
+      ],
+      "answerIndex": 1,
+      "explain": "Untuk memohon izin kelonggaran tenggat waktu kepada dosen (atasan akademik), pola santun yang tepat adalah permintaan maaf \"申し訳ありませんが\" diikuti permohonan izin \"～てもよろしいでしょうか\" (Bolehkah/diperkenankankah saya ...?). Pilihan 1 keliru meminta dosen yang mengumpulkan, sedangkan Pilihan 3 memakai '～させてあげます' yang bernada merendahkan lawan bicara.",
+      "vocabularyKey": [
+        {
+          "ja": "締め切り (shimekiri)",
+          "id": "batas waktu / tenggat (deadline)"
+        },
+        {
+          "ja": "修理に出す (shuuri ni dasu)",
+          "id": "menyerahkan untuk diservis/diperbaiki"
+        },
+        {
+          "ja": "提出する (teishutsu suru)",
+          "id": "mengumpulkan / menyerahkan dokumen"
+        },
+        {
+          "ja": "～てもよろしいでしょうか",
+          "id": "apakah diperkenankan jika ... (izin sopan)"
+        }
+      ],
+      "turnTimestamps": [
+        4.31,
+        12.18,
+        21.22,
+        25.8
+      ],
+      "allTurnTimestamps": [
+        0,
+        4.31,
+        12.18,
+        21.22,
+        25.8,
+        32.87
+      ]
+    },
+    {
+      "id": "jlpt-n3-m3-02",
+      "level": "N3",
+      "cefr": "B1",
+      "mondai": "mondai_3",
+      "mondaiLabel": "Mondai 3: Utterance Expressions (発話表現)",
+      "title": "Menawarkan Bantuan kepada Atasan",
+      "situation": "Di lobi gedung kantor, staf perempuan melihat kepala seksinya hendak mengangkat tumpukan kardus brosur seorang diri.",
+      "audioUrl": "",
+      "aiAudioUrl": "./features/speaking-listening/audio-jlpt/jlpt-n3-m3-02.mp3",
+      "audioTrack": "FIEZEL Studio Chōkai N3 - Mondai 3",
+      "scriptJapanese": "女の人：課長、そのパンフレットの箱、3階の会場まで運ぶんですか。\n課長：うん、今ちょうどエレベーターが点検中で止まっていて、階段で運ばないといけないんだ。\n女の人：全部で4箱もありますね。私、受付の担当までまだ20分ほど時間があります。",
+      "scriptRomaji": "Onna no hito: Kachou, sono panfuretto no hako, sankai no kaijou made hakobu n desu ka.\nKachou: Un, ima choudo erebeetaa ga tenkenchuu de tomatte ite, kaidan de hakobanai to ikenai n da.\nOnna no hito: Zenbu de yonhako mo arimasu ne. Watashi, uketsuke no tantou made mada nijuppun hodo jikan ga arimasu.",
+      "scriptIndonesian": "Wanita: Pak Kepala Seksi, kardus brosur itu mau dibawa sampai ke aula lantai 3?\nKepala Seksi: Iya, kebetulan sekarang lift sedang berhenti karena pemeriksaan rutin, jadi terpaksa harus dibawa lewat tangga.\nWanita: Semuanya ada 4 kardus ya. Saya masih punya waktu sekitar 20 menit sebelum bertugas di meja resepsionis.",
+      "questionJapanese": "このあと、女の人は課長になんと言って手伝いを申し出ますか。",
+      "questionRomaji": "Kono ato, onna no hito wa kachou ni nan to itte tetsudai o moushidemasu ka.",
+      "questionIndonesian": "Setelah ini, apa yang diucapkan wanita tersebut kepada kepala seksi untuk menawarkan bantuan?",
+      "options": [
+        {
+          "id": 1,
+          "text": "課長、階段は大変ですからエレベーターで運んだほうがいいですよ。",
+          "textId": "Pak, lewat tangga berat lho, sebaiknya Anda angkut naik lift saja.",
+          "whyFails": "Bertentangan dengan konteks dialog (lift sedang mati karena pemeriksaan) dan pola saran '～たほうがいいですよ' terdengar menggurui jika diucapkan kepada atasan."
+        },
+        {
+          "id": 2,
+          "text": "時間がありますので、半分運んでくださいませんか。",
+          "textId": "Karena saya ada waktu, maukah Bapak membawakan setengahnya?",
+          "whyFails": "Pola '～てくださいませんか' meminta atasan membawakan barang untuk pembicara, kebalikan dari niat menawarkan tenaga bantuan."
+        },
+        {
+          "id": 3,
+          "text": "よろしければ、半分お持ちしましょうか。",
+          "textId": "Jika berkenan, mari saya bawakan setengahnya?"
+        }
+      ],
+      "answerIndex": 2,
+      "explain": "Untuk menawarkan bantuan secara sopan kepada atasan (謙譲語 / kenjougo), bahasa Jepang menggunakan pola \"お + bentuk masu-stem + しましょうか\" disertai ungkapan penghalus \"よろしければ\" (Jika berkenan). Maka \"よろしければ、半分お持ちしましょうか\" (Pilihan 3) adalah ungkapan yang paling tepat dan santun.",
+      "vocabularyKey": [
+        {
+          "ja": "点検中 (tenkenchuu)",
+          "id": "sedang dalam pemeriksaan/inspeksi"
+        },
+        {
+          "ja": "申し出る (moushideru)",
+          "id": "menawarkan diri / mengajukan"
+        },
+        {
+          "ja": "お持ちしましょうか (omochi shimashou ka)",
+          "id": "mari saya bawakan? (tawaran merendah/sopan)"
+        },
+        {
+          "ja": "よろしければ (yoroshikereba)",
+          "id": "jika Anda berkenan / kalau boleh"
+        }
+      ],
+      "turnTimestamps": [
+        4.26,
+        11.02,
+        18.06
+      ],
+      "allTurnTimestamps": [
+        0,
+        4.26,
+        11.02,
+        18.06,
+        27.22
+      ]
+    },
+    {
+      "id": "jlpt-n3-m4-01",
+      "level": "N3",
+      "cefr": "B1",
+      "mondai": "mondai_4",
+      "mondaiLabel": "Mondai 4: Quick Response (即時応答)",
+      "title": "Merespons Pujian atas Presentasi",
+      "situation": "Rekan kerja memuji kejelasan grafik dalam presentasi yang baru saja Anda sampaikan.",
+      "audioUrl": "",
+      "aiAudioUrl": "./features/speaking-listening/audio-jlpt/jlpt-n3-m4-01.mp3",
+      "audioTrack": "FIEZEL Studio Chōkai N3 - Mondai 4",
+      "scriptJapanese": "女の人：さっきの発表、グラフがすごく見やすかったよ。準備、大変だったでしょう？",
+      "scriptRomaji": "Onna no hito: Sakki no happyou, gurafu ga sugoku miyasukatta yo. Junbi, taihen datta deshou?",
+      "scriptIndonesian": "Wanita: Presentasi barusan grafiknya sangat mudah dilihat lho. Persiapannya pasti berat kan?",
+      "questionJapanese": "なんと言って答えますか。",
+      "questionRomaji": "Nan to itte kotaemasu ka.",
+      "questionIndonesian": "Bagaimanakah respons yang tepat?",
+      "options": [
+        {
+          "id": 1,
+          "text": "ありがとう。きのう遅くまで作り直した甲斐があったよ。",
+          "textId": "Terima kasih. Rasanya tidak sia-sia semalam lembur membuatnya ulang."
+        },
+        {
+          "id": 2,
+          "text": "うん、これからグラフを作るつもりなんだ。",
+          "textId": "Iya, mulai sekarang aku berencana membuat grafiknya.",
+          "whyFails": "Pertentangan waktu (temporal clash): lawan bicara memuji presentasi yang baru saja selesai ('さっきの発表'), bukan sesuatu yang baru akan dibuat."
+        },
+        {
+          "id": 3,
+          "text": "いいえ、見やすいかどうか全然知りません。",
+          "textId": "Tidak, saya sama sekali tidak tahu apakah mudah dilihat atau tidak.",
+          "whyFails": "Respons yang dingin dan janggal secara pragmatik seolah-olah pembicara bukan orang yang menyiapkan presentasi tersebut."
+        }
+      ],
+      "answerIndex": 0,
+      "explain": "Rekan kerja mengapresiasi grafik presentasi sekaligus berempati atas jerih payah persiapannya (\"大変だったでしょう？\"). Respons paling alami pada level N3 adalah mengucapkan terima kasih disertai ungkapan lega \"～た甲斐があった\" (usaha kerasnya membuahkan hasil / tidak sia-sia) pada Pilihan 1.",
+      "vocabularyKey": [
+        {
+          "ja": "発表 (happyou)",
+          "id": "presentasi / pengumuman"
+        },
+        {
+          "ja": "見やすい (miyasui)",
+          "id": "mudah dilihat / jelas terbaca"
+        },
+        {
+          "ja": "作り直す (tsukurinaosu)",
+          "id": "membuat ulang / merevisi"
+        },
+        {
+          "ja": "～甲斐がある (kai ga aru)",
+          "id": "ada hasilnya / tidak sia-sia usahanya"
+        }
+      ],
+      "turnTimestamps": [
+        4.45
+      ],
+      "allTurnTimestamps": [
+        0,
+        4.45,
+        12.72
+      ]
+    },
+    {
+      "id": "jlpt-n3-m4-02",
+      "level": "N3",
+      "cefr": "B1",
+      "mondai": "mondai_4",
+      "mondaiLabel": "Mondai 4: Quick Response (即時応答)",
+      "title": "Menanggapi Kekhawatiran Tertinggal Kereta Ekspres",
+      "situation": "Teman seperjalanan panik melihat jam karena kereta ekspres akan berangkat dalam 5 menit.",
+      "audioUrl": "",
+      "aiAudioUrl": "./features/speaking-listening/audio-jlpt/jlpt-n3-m4-02.mp3",
+      "audioTrack": "FIEZEL Studio Chōkai N3 - Mondai 4",
+      "scriptJapanese": "男の人：大変だ！あと5分で特急が出ちゃうよ。走らないと間に合わないんじゃない？",
+      "scriptRomaji": "Otoko no hito: Taihen da! Ato gofun de tokkyuu ga dechau yo. Hashiranai to maniawanai n janai?",
+      "scriptIndonesian": "Pria: Gawat! Lima menit lagi kereta ekspresnya berangkat lho. Kalau tidak lari bukannya tidak bakal keburu?",
+      "questionJapanese": "なんと言って答えますか。",
+      "questionRomaji": "Nan to itte kotaemasu ka.",
+      "questionIndonesian": "Bagaimanakah respons yang tepat?",
+      "options": [
+        {
+          "id": 1,
+          "text": "よかった、ゆっくり歩いても間に合ったね。",
+          "textId": "Syukurlah, meskipun jalan santai ternyata tadi sempat keburu ya.",
+          "whyFails": "Kesalahan kala lampau ('間に合ったね'): mereka masih sedang menuju peron dan belum naik ke dalam kereta."
+        },
+        {
+          "id": 2,
+          "text": "大丈夫、次の快速に乗っても到着時間はほとんど変わらないよ。",
+          "textId": "Tenang saja, naik kereta cepat berikutnya pun jam tibanya hampir tidak berbeda kok."
+        },
+        {
+          "id": 3,
+          "text": "ええ、5分前にもう出発してしまったよ。",
+          "textId": "Iya, keretanya sudah berangkat 5 menit yang lalu lho.",
+          "whyFails": "Salah menangkap makna 'あと5分で出ちゃう' (5 menit lagi akan berangkat) menjadi '5分前に出た' (sudah berangkat 5 menit lalu)."
+        }
+      ],
+      "answerIndex": 1,
+      "explain": "Teman khawatir tidak terkejar kereta ekspres yang berangkat 5 menit lagi (\"走らないと間に合わないんじゃない？\"). Menenangkan teman bahwa kereta cepat (快速) berikutnya memiliki waktu tiba yang hampir sama (Pilihan 2) adalah respons percakapan yang koheren dan logis.",
+      "vocabularyKey": [
+        {
+          "ja": "あと～で (ato ... de)",
+          "id": "dalam waktu ... lagi"
+        },
+        {
+          "ja": "間に合う (maniau)",
+          "id": "keburu / tepat waktu"
+        },
+        {
+          "ja": "到着時間 (touchaku jikan)",
+          "id": "waktu kedatangan / jam tiba"
+        },
+        {
+          "ja": "ほとんど～ない (hotondo ... nai)",
+          "id": "hampir tidak ..."
+        }
+      ],
+      "turnTimestamps": [
+        4.26
+      ],
+      "allTurnTimestamps": [
+        0,
+        4.26,
+        10.63
+      ]
+    },
+    {
+      "id": "jlpt-n2-m1-01",
+      "level": "N2",
+      "cefr": "B2",
+      "mondai": "mondai_1",
+      "mondaiLabel": "Mondai 1: Task-based Comprehension (課題理解)",
+      "title": "Revisi Dokumen Penawaran Harga sebelum Dikirim",
+      "situation": "Seorang kepala divisi sedang memeriksa draf surat penawaran harga bersama staf perempuan.",
+      "audioUrl": "",
+      "aiAudioUrl": "./features/speaking-listening/audio-jlpt/jlpt-n2-m1-01.mp3",
+      "audioTrack": "FIEZEL Studio Chōkai N2 - Mondai 1",
+      "scriptJapanese": "部長：青葉商事向けの見積書、確認したよ。単価と納期は問題ないし、送料の割引もちゃんと反映されているね。\n女の人：ありがとうございます。このままPDFに変換して、先方にメールでお送りしてもよろしいでしょうか。\n部長：いや、ちょっと待って。昨日の電話で先方から要望があった保守費用の月額プランへの変更がまだ年額のままだし、税込表記も抜けているよ。\n女の人：あっ、失礼いたしました！すぐ直してもう一度お見せします。原本の郵送は来週でよろしかったですね。",
+      "scriptRomaji": "Buchou: Aoba Shouji muke no mitsumorisho, kakunin shita yo. Tanka to nouki wa mondai nai shi, souryou no waribiki mo chanto han'ei sarete iru ne.\nOnna no hito: Arigatou gozaimasu. Kono mama PDF ni henkan shite, senpou ni meeru de ookuri shite mo yoroshii deshou ka.\nBuchou: Iya, chotto matte. Kinou no denwa de senpou kara youbou ga atta hoshu hiyou no getsugaku puran e no henkou ga mada nengaku no mama da shi, zeikomi hyouki mo nukete iru yo.\nOnna no hito: A, shitsurei itashimashita! Sugu naoshite mou ichido omise shimasu. Genpon no yuusou wa raishuu de yoroshikatta desu ne.",
+      "scriptIndonesian": "Kepala Divisi: Surat penawaran untuk Aoba Shouji sudah saya periksa. Harga satuan dan tenggat pengiriman tidak masalah, diskon ongkos kirim juga sudah tercermin dengan benar.\nWanita: Terima kasih. Apakah boleh langsung saya ubah ke PDF seperti ini lalu dikirimkan lewat surel ke pihak klien?\nKepala Divisi: Eh, tunggu sebentar. Perubahan biaya pemeliharaan ke paket bulanan yang diminta klien lewat telepon kemarin masih tertulis tahunan, dan keterangan harga termasuk pajaknya juga terlewat.\nWanita: Ah, mohon maaf! Segera saya perbaiki dan saya tunjukkan sekali lagi kepada Bapak. Pengiriman pos dokumen aslinya minggu depan saja kan ya.",
+      "questionJapanese": "女の人はこのあとまず何をしなければなりませんか。",
+      "questionRomaji": "Onna no hito wa kono ato mazu nani o shinakereba narimasen ka.",
+      "questionIndonesian": "Apa yang pertama-tama harus dilakukan wanita tersebut setelah ini?",
+      "options": [
+        {
+          "id": 1,
+          "text": "見積書をPDFにして先方にメールする",
+          "textId": "Mengubah surat penawaran ke PDF lalu mengirimkannya lewat surel ke klien",
+          "whyFails": "Usulan mengirim PDF sekarang ditahan oleh kepala divisi ('いや、ちょっと待って') karena masih ada dua bagian isi dokumen yang harus direvisi dan diperiksa ulang."
+        },
+        {
+          "id": 2,
+          "text": "送料の割引を見積書に反映させる",
+          "textId": "Memasukkan potongan ongkos kirim ke dalam surat penawaran",
+          "whyFails": "Diskon ongkos kirim sudah tercantum dengan benar sejak awal ('送料の割引もちゃんと反映されているね')."
+        },
+        {
+          "id": 3,
+          "text": "保守費用の記載と税込表記を修正する",
+          "textId": "Memperbaiki rincian biaya pemeliharaan dan keterangan termasuk pajak"
+        },
+        {
+          "id": 4,
+          "text": "見積書の原本を郵便で発送する",
+          "textId": "Mengirimkan dokumen asli surat penawaran melalui pos",
+          "whyFails": "Pengiriman berkas fisik/asli melalui pos dijadwalkan untuk minggu depan ('原本の郵送は来週'), bukan langkah yang dikerjakan sekarang."
+        }
+      ],
+      "answerIndex": 2,
+      "explain": "Kepala divisi menahan pengiriman surel karena menemukan dua kekurangan pada draf: \"保守費用の月額プランへの変更がまだ年額のままだし、税込表記も抜けているよ\" (Biaya pemeliharaan masih tertulis tahunan dan keterangan termasuk pajak terlewat). Wanita menyanggupi akan segera memperbaikinya terlebih dahulu (\"すぐ直してもう一度お見せします\"). Maka langkah pertamanya adalah merevisi rincian biaya pemeliharaan dan keterangan pajak (Pilihan 3).",
+      "vocabularyKey": [
+        {
+          "ja": "見積書 (mitsumorisho)",
+          "id": "surat penawaran harga (quotation)"
+        },
+        {
+          "ja": "納期 (nouki)",
+          "id": "batas waktu pengiriman barang"
+        },
+        {
+          "ja": "保守費用 (hoshu hiyou)",
+          "id": "biaya pemeliharaan / maintenance"
+        },
+        {
+          "ja": "抜ける (nukeru)",
+          "id": "terlewat / tertinggal (data/tulisan)"
+        }
+      ],
+      "turnTimestamps": [
+        4.59,
+        17.57,
+        25.54,
+        39.59
+      ],
+      "allTurnTimestamps": [
+        0,
+        4.59,
+        17.57,
+        25.54,
+        39.59,
+        49.64
+      ]
+    },
+    {
+      "id": "jlpt-n2-m1-02",
+      "level": "N2",
+      "cefr": "B2",
+      "mondai": "mondai_1",
+      "mondaiLabel": "Mondai 1: Task-based Comprehension (課題理解)",
+      "title": "Penanganan Darurat Keluhan Barang Pecah",
+      "situation": "Di divisi layanan pelanggan toko daring, staf perempuan melapor kepada kepala seksi mengenai keluhan pembeli.",
+      "audioUrl": "",
+      "aiAudioUrl": "./features/speaking-listening/audio-jlpt/jlpt-n2-m1-02.mp3",
+      "audioTrack": "FIEZEL Studio Chōkai N2 - Mondai 1",
+      "scriptJapanese": "女の人：課長、今お客様からお電話がありまして、昨日届いた食器セットのうち1枚にひびが入っていたそうです。明日の結婚記念日で使いたいとのことなんですが。\n課長：そうか。マニュアルどおり不良品の返送を待っていたら明日に間に合わないね。倉庫に同じセットの在庫はある？\n女の人：はい、先ほど確認したところ、3セット残っていました。返金をご案内しましょうか。\n課長：いや、記念日に使いたいなら代替品を今日中に至急便で手配しよう。箱に返送用の着払い伝票を同封して、手配が済み次第お客様に伝票番号を電話で伝えて。",
+      "scriptRomaji": "Onna no hito: Kachou, ima okyakusama kara odenwa ga arimashite, kinou todoita shokki setto no uchi ichimai ni hibi ga haitte ita sou desu. Ashita no kekkon kinenbi de tsukaitai to no koto nan desu ga.\nKachou: Sou ka. Manyuaru doori furyouhin no hensou o matte itara ashita ni maniawanai ne. Souko ni onaji setto no zaiko wa aru?\nOnna no hito: Hai, sakihodo kakunin shita tokoro, sansetto nokotte imashita. Henkin o goannai shimashou ka.\nKachou: Iya, kinenbi ni tsukaitai nara daitaihin o kyoujuu ni shikyuubin de tehai shiyou. Hako ni hensouyou no chakubarai denpyou o doufuu shite, tehai ga sumishidai okyakusama ni denpyou bangou o denwa de tsutaete.",
+      "scriptIndonesian": "Wanita: Pak Kepala Seksi, barusan ada telepon dari pelanggan, katanya satu piring dari set peralatan makan yang tiba kemarin retak. Beliau ingin memakainya untuk hari jadi pernikahan besok.\nKepala Seksi: Begitu ya. Kalau menunggu pengembalian barang cacat sesuai buku panduan, tidak akan keburu untuk besok. Apakah di gudang masih ada stok set yang sama?\nWanita: Ya, tadi saat saya periksa masih tersisa 3 set. Apakah sebaiknya kita tawarkan pengembalian dana?\nKepala Seksi: Jangan, kalau ingin dipakai untuk hari jadi, mari kita atur pengiriman barang pengganti hari ini juga dengan kurir kilat. Sertakan slip ongkos kirim bayar di tujuan untuk pengembalian di dalam kotaknya, lalu begitu pengaturannya beres segera telepon pelanggan untuk mengabarkan nomor resinya.",
+      "questionJapanese": "女の人は課長と話したあと、まず何をしますか。",
+      "questionRomaji": "Onna no hito wa kachou to hanashita ato, mazu nani o shimasu ka.",
+      "questionIndonesian": "Setelah berbicara dengan kepala seksi, apa yang pertama kali dilakukan wanita tersebut?",
+      "options": [
+        {
+          "id": 1,
+          "text": "着払い伝票を入れた代替品の至急便を手配する",
+          "textId": "Mengatur pengiriman kilat barang pengganti yang disertai slip pengembalian"
+        },
+        {
+          "id": 2,
+          "text": "倉庫に行って商品の在庫数を確認する",
+          "textId": "Pergi ke gudang untuk memeriksa jumlah stok barang",
+          "whyFails": "Pemeriksaan stok gudang sudah dilakukan sebelumnya oleh wanita tersebut ('先ほど確認したところ、3セット残っていました')."
+        },
+        {
+          "id": 3,
+          "text": "割れた食器が返送されてくるのを待つ",
+          "textId": "Menunggu peralatan makan yang retak dikirim kembali oleh pelanggan",
+          "whyFails": "Kepala seksi memutuskan menyimpang dari prosedur standar menunggu retur agar barang pengganti sempat tiba sebelum acara besok."
+        },
+        {
+          "id": 4,
+          "text": "お客様に電話して返金の手続きを案内する",
+          "textId": "Menelepon pelanggan untuk memandu prosedur pengembalian uang",
+          "whyFails": "Opsi pengembalian dana (返金) ditolak kepala seksi karena pelanggan membutuhkan barang tersebut untuk acara peringatan pernikahan besok."
+        }
+      ],
+      "answerIndex": 0,
+      "explain": "Stok sudah dipastikan tersedia, dan opsi pengembalian dana ditolak. Kepala seksi menginstruksikan urutan kerja yang jelas: mengatur pengiriman kilat barang pengganti beserta slip retur terlebih dahulu (\"代替品を今日中に至急便で手配しよう。箱に返送用の着払い伝票を同封して\"), baru setelah beres menelepon pelanggan (\"手配が済み次第...\"). Maka tindakan pertama adalah mengatur kurir kilat barang pengganti (Pilihan 1).",
+      "vocabularyKey": [
+        {
+          "ja": "ひびが入る (hibi ga hairu)",
+          "id": "retak (keramik/kaca)"
+        },
+        {
+          "ja": "代替品 (daitaihin)",
+          "id": "barang pengganti"
+        },
+        {
+          "ja": "着払い伝票 (chakubarai denpyou)",
+          "id": "slip pengiriman bayar di tempat tujuan"
+        },
+        {
+          "ja": "同封する (doufuu suru)",
+          "id": "melampirkan bersama di dalam paket/amplop"
+        }
+      ],
+      "turnTimestamps": [
+        4.4,
+        18.55,
+        28.84,
+        37.27
+      ],
+      "allTurnTimestamps": [
+        0,
+        4.4,
+        18.55,
+        28.84,
+        37.27,
+        56.37
+      ]
+    },
+    {
+      "id": "jlpt-n2-m2-01",
+      "level": "N2",
+      "cefr": "B2",
+      "mondai": "mondai_2",
+      "mondaiLabel": "Mondai 2: Point Comprehension (ポイント理解)",
+      "title": "Penyebab Rendahnya Pembelian Ulang Minuman Baru",
+      "situation": "Dua staf pemasaran sedang menganalisis hasil survei konsumen atas produk minuman herbal baru.",
+      "audioUrl": "",
+      "aiAudioUrl": "./features/speaking-listening/audio-jlpt/jlpt-n2-m2-01.mp3",
+      "audioTrack": "FIEZEL Studio Chōkai N2 - Mondai 2",
+      "scriptJapanese": "男の人：先月発売した生姜ハーブ飲料のアンケート結果、出そろったよ。初回の売上は好調だったのに、2回目以降の購入率が伸び悩んでいるね。\n女の人：やっぱり生姜の風味が強すぎて、好みが分かれたんでしょうか。価格も他社より少し高めですし。\n男の人：それがね、味については8割以上が「すっきりして飲みやすい」と答えていて、価格も無添加なら妥当だという評価なんだ。パッケージもおしゃれだと好評だよ。\n女の人：へえ。あ、自由記述欄を見てください。「通勤かばんに入れるにはガラス瓶が重いうえに、捨てる場所にも困る」という声が目立ちますね。",
+      "scriptRomaji": "Otoko no hito: Sengetsu hatsubai shita shouga haabu inryou no ankeeto kekka, desorotta yo. Shokai no uriage wa kouchou datta noni, nikaime ikou no kounyuuritsu ga nobinayande iru ne.\nOnna no hito: Yappari shouga no fuumi ga tsuyosugite, konomi ga wakareta n deshou ka. Kakaku mo tasha yori sukoshi takame desu shi.\nOtoko no hito: Sore ga ne, aji ni tsuite wa hachiwari ijou ga 'sukkiri shite nomiyasui' to kotaete ite, kakaku mo mutenka nara datou da to iu hyouka nan da. Pakkeeji mo oshare da to kouhyou da yo.\nOnna no hito: Hee. A, jiyuu kijutsuran o mite kudasai. 'Tsuukin kaban ni ireru ni wa garasubin ga omoi ue ni, suteru basho ni mo komaru' to iu koe ga medachimasu ne.",
+      "scriptIndonesian": "Pria: Hasil kuesioner minuman herbal jahe yang diluncurkan bulan lalu sudah terkumpul semua. Padahal penjualan perdananya bagus, tapi tingkat pembelian kedua dan seterusnya tersendat ya.\nWanita: Apakah jangan-jangan rasa jahenya terlalu tajam sehingga selera konsumen terbelah? Harganya juga sedikit lebih mahal dibanding perusahaan lain.\nPria: Justru soal rasa, lebih dari 80% menjawab 'segar dan mudah diminum', dan harganya pun dinilai wajar kalau tanpa bahan tambahan. Kemasannya juga dipuji modis.\nWanita: Oh ya? Ah, coba lihat kolom komentar bebasnya. Banyak sekali suara yang menyoroti 'Botol kacanya berat untuk dimasukkan ke tas kerja, ditambah lagi bingung membuangnya'.",
+      "questionJapanese": "新商品のリピート率が伸び悩んでいる主な原因は何ですか。",
+      "questionRomaji": "Shinshouhin no ripiitoritsu ga nobinayande iru omo na gen'in wa nan desu ka.",
+      "questionIndonesian": "Apa penyebab utama tersendatnya tingkat pembelian ulang produk baru tersebut?",
+      "options": [
+        {
+          "id": 1,
+          "text": "生姜の風味が強すぎて飲みにくいこと",
+          "textId": "Rasa jahenya terlalu menyengat sehingga sulit diminum",
+          "whyFails": "Dugaan awal wanita tentang rasa langsung dibantah data survei di mana lebih dari 80% responden menilai rasanya segar dan mudah diminum."
+        },
+        {
+          "id": 2,
+          "text": "品質に対して価格が高すぎること",
+          "textId": "Harganya terlalu mahal dibandingkan kualitasnya",
+          "whyFails": "Responden menilai harga tersebut sudah wajar ('妥当だという評価') mengingat produknya bebas bahan tambahan kimia (無添加)."
+        },
+        {
+          "id": 3,
+          "text": "パッケージのデザインが目立たないこと",
+          "textId": "Desain kemasannya kurang menarik perhatian",
+          "whyFails": "Desain tampilan produk justru mendapat sambutan positif karena dianggap modis ('おしゃれだと好評')."
+        },
+        {
+          "id": 4,
+          "text": "容器が重く持ち運びや処分に不便なこと",
+          "textId": "Wadahnya berat serta tidak praktis dibawa maupun dibuang"
+        }
+      ],
+      "answerIndex": 3,
+      "explain": "Rasa, harga, dan tampilan visual semuanya memperoleh penilaian positif. Penyebab rendahnya pembelian ulang terungkap pada kolom komentar bebas: \"通勤かばんに入れるにはガラス瓶が重いうえに、捨てる場所にも困る\" (Botol kacanya berat untuk dibawa di tas kerja dan sulit mencari tempat membuangnya). Maka penyebab utamanya adalah ketidakpraktisan wadah botol kaca (Pilihan 4).",
+      "vocabularyKey": [
+        {
+          "ja": "伸び悩む (nobinayamu)",
+          "id": "tersendat / stagnan pertumbuhannya"
+        },
+        {
+          "ja": "無添加 (mutenka)",
+          "id": "tanpa bahan pengawet/aditif"
+        },
+        {
+          "ja": "妥当 (datou)",
+          "id": "wajar / layak / masuk akal"
+        },
+        {
+          "ja": "～うえに (ue ni)",
+          "id": "selain ... ditambah lagi ..."
+        }
+      ],
+      "turnTimestamps": [
+        3.66,
+        16.97,
+        27.31,
+        41.41
+      ],
+      "allTurnTimestamps": [
+        0,
+        3.66,
+        16.97,
+        27.31,
+        41.41,
+        54.61
+      ]
+    },
+    {
+      "id": "jlpt-n2-m2-02",
+      "level": "N2",
+      "cefr": "B2",
+      "mondai": "mondai_2",
+      "mondaiLabel": "Mondai 2: Point Comprehension (ポイント理解)",
+      "title": "Kriteria Pemilihan Pembicara Simposium",
+      "situation": "Seorang profesor dan mahasiswi pascasarjana sedang memilih pembicara tamu untuk simposium lingkungan di universitas.",
+      "audioUrl": "",
+      "aiAudioUrl": "./features/speaking-listening/audio-jlpt/jlpt-n2-m2-02.mp3",
+      "audioTrack": "FIEZEL Studio Chōkai N2 - Mondai 2",
+      "scriptJapanese": "女子学生：先生、来月の環境シンポジウムの基調講演ですが、テレビでもよく解説している経済学者の村田氏はいかがでしょうか。集客が見込めると思います。\n教授：うーん、今回は提携校からの参加登録ですでに定員の9割が埋まっているから、知名度で人を集める必要はないんだよ。\n女子学生：なるほど。では、理論面で最新の研究をされている方よりも、自治体の現場で資源循環の仕組みを作ってきた実務家のほうがよろしいでしょうか。\n教授：そうだね。去年のアンケートでも、学部生からは「抽象的な議論より現場の具体的な試行錯誤を聞きたい」という要望が一番多かったから、その方向でいこう。",
+      "scriptRomaji": "Joshi gakusei: Sensei, raigetsu no kankyou shinpojiumu no kichou kouen desu ga, terebi demo yoku kaisetsu shite iru keizaigakusha no Murata-shi wa ikaga deshou ka. Shuukyaku ga mikomeru to omoimasu.\nKyouju: Uun, konkai wa teikeikou kara no sanka touroku de sude ni teiin no kyuuwari ga umatte iru kara, chimeido de hito o atsumeru hitsuyou wa nai n da yo.\nJoshi gakusei: Naruhodo. Dewa, rironmen de saishin no kenkyuu o sarete iru kata yori mo, jichitai no genba de shigen junkan no shikumi o tsukutte kita jitsumuka no hou ga yoroshii deshou ka.\nKyouju: Sou da ne. Kyonen no ankeeto demo, gakubusei kara wa 'chuushouteki na giron yori genba no gutaiteki na shikou sakugo o kikitai' to iu youbou ga ichiban ookatta kara, sono houkou de ikou.",
+      "scriptIndonesian": "Mahasiswi: Prof, untuk kuliah kunci simposium lingkungan bulan depan, bagaimana kalau ekonom Bapak Murata yang sering menjadi komentator di TV? Menurut saya beliau bisa menarik banyak peserta.\nProfesor: Hmm, kali ini dari pendaftaran universitas mitra saja sudah terisi 90% kuota, jadi tidak perlu mengumpulkan orang lewat popularitas.\nMahasiswi: Begitu ya. Kalau begitu, ketimbang peneliti teori mutakhir, apakah lebih baik praktisi yang telah membangun sistem daur ulang sumber daya langsung di lapangan pemerintah daerah?\nProfesor: Betul. Pada survei tahun lalu pun, permintaan terbanyak dari mahasiswa S1 adalah 'ingin mendengar jatuh bangun konkret di lapangan ketimbang diskusi abstrak', jadi mari kita pilih arah tersebut.",
+      "questionJapanese": "教授が講演者を選ぶうえで最も重視していることは何ですか。",
+      "questionRomaji": "Kyouju ga kouensha o erabu ue de mottomo juushi shite iru koto wa nan desu ka.",
+      "questionIndonesian": "Apa hal yang paling diutamakan profesor dalam memilih pembicara kuliah tersebut?",
+      "options": [
+        {
+          "id": 1,
+          "text": "メディアでの知名度が高く人を集められること",
+          "textId": "Memiliki ketenaran tinggi di media sehingga mampu menyedot penonton",
+          "whyFails": "Diusulkan mahasiswi di awal, namun ditepis oleh profesor karena kursi peserta sudah terisi 90% ('知名度で人を集める必要はない')."
+        },
+        {
+          "id": 2,
+          "text": "現場での実践的な取り組みについて具体的に話せること",
+          "textId": "Mampu membagikan pengalaman konkret mengenai penerapan nyata di lapangan"
+        },
+        {
+          "id": 3,
+          "text": "最新の経済理論を学術的に詳しく解説できること",
+          "textId": "Mampu menguraikan teori ekonomi mutakhir secara akademis dan mendalam",
+          "whyFails": "Profesor justru menghindari bahasan teoretis/abstrak ('抽象的な議論より...') demi memenuhi kebutuhan mahasiswa S1."
+        },
+        {
+          "id": 4,
+          "text": "提携校の教員として学生に顔が知られていること",
+          "textId": "Sudah dikenal mahasiswa sebagai pengajar dari universitas mitra",
+          "whyFails": "Universitas mitra disebutkan hanya sebagai asal peserta yang mendaftar, bukan syarat latar belakang pembicara."
+        }
+      ],
+      "answerIndex": 1,
+      "explain": "Profesor menolak faktor ketenaran media karena kuota hampir penuh, serta menghindari diskusi teoretis abstrak. Ia menyetujui usulan mengundang praktisi lapangan karena mahasiswa menginginkan \"抽象的な議論より現場の具体的な試行錯誤を聞きたい\" (pengalaman konkret di lapangan ketimbang bahasan abstrak). Maka kriteria utamanya adalah pengalaman praktis nyata di lapangan (Pilihan 2).",
+      "vocabularyKey": [
+        {
+          "ja": "集客 (shuukyaku)",
+          "id": "penarikan jumlah pengunjung/peserta"
+        },
+        {
+          "ja": "知名度 (chimeido)",
+          "id": "tingkat popularitas / ketenaran"
+        },
+        {
+          "ja": "実務家 (jitsumuka)",
+          "id": "praktisi lapangan"
+        },
+        {
+          "ja": "試行錯誤 (shikou sakugo)",
+          "id": "uji coba / jatuh bangun mencari solusi (trial and error)"
+        }
+      ],
+      "turnTimestamps": [
+        3.75,
+        20.22,
+        32.6,
+        46.51
+      ],
+      "allTurnTimestamps": [
+        0,
+        3.75,
+        20.22,
+        32.6,
+        46.51,
+        64.31
+      ]
+    },
+    {
+      "id": "jlpt-n2-m3-01",
+      "level": "N2",
+      "cefr": "B2",
+      "mondai": "mondai_3",
+      "mondaiLabel": "Mondai 3: Utterance Expressions (発話表現)",
+      "title": "Menolak Permintaan Diskon Tambahan dari Klien",
+      "situation": "Seorang staf penjualan berkonsultasi dengan kepala divisi sebelum membalas permintaan potongan harga tambahan dari mitra bisnis.",
+      "audioUrl": "",
+      "aiAudioUrl": "./features/speaking-listening/audio-jlpt/jlpt-n2-m3-01.mp3",
+      "audioTrack": "FIEZEL Studio Chōkai N2 - Mondai 3",
+      "scriptJapanese": "男の人：部長、先方から大量発注を条件に、さらに1割の値引きはできないかと打診がありました。\n部長：うーん、今期は原材料費も上がっているから、これ以上の値下げは厳しいなあ。\n男の人：そうですよね。ただ、導入時の操作研修を無償でつける形なら対応できそうですが。\n部長：よし、その代替案を添えて、角が立たないように丁重にお断りして。",
+      "scriptRomaji": "Otoko no hito: Buchou, senpou kara tairyou hacchuu o jouken ni, sara ni ichiwari no nebiki wa dekinai ka to dashin ga arimashita.\nBuchou: Uun, konki wa genzairyouhi mo agatte iru kara, kore ijou no nesage wa kibishii naa.\nOtoko no hito: Sou desu yo ne. Tada, dounyuuji no sousa kenshuu o mushou de tsukeru katachi nara taiou dekisou desu ga.\nBuchou: Yoshi, sono daitaian o soete, kado ga tatanai you ni teichou ni okotowari shite.",
+      "scriptIndonesian": "Pria: Pak Kepala Divisi, pihak klien menjajaki apakah bisa diberi diskon tambahan 10% dengan syarat pemesanan jumlah besar.\nKepala Divisi: Hmm, kuartal ini biaya bahan baku juga naik, jadi penurunan harga lebih lanjut berat sekali.\nPria: Betul ya, Pak. Namun, kalau berupa pemberian pelatihan pengoperasian awal secara cuma-cuma, tampaknya bisa kita sanggupi.\nKepala Divisi: Bagus, sertakan usulan pengganti itu dan tolaklah secara santun agar tidak menyinggung perasaan mereka.",
+      "questionJapanese": "このあと、男の人は取引先になんと言って伝えますか。",
+      "questionRomaji": "Kono ato, otoko no hito wa torihikisaki ni nan to itte tsutaemasu ka.",
+      "questionIndonesian": "Setelah ini, ungkapan bisnis apa yang disampaikan pria tersebut kepada mitra bisnis?",
+      "options": [
+        {
+          "id": 1,
+          "text": "恐れ入りますが、これ以上のお値引きはいたしかねますので、代わりに初期研修を無償でご提供いたします。",
+          "textId": "Mohon maaf, kami belum dapat memberikan potongan harga lebih lanjut; sebagai gantinya kami akan menyediakan pelatihan awal tanpa biaya."
+        },
+        {
+          "id": 2,
+          "text": "ご期待に添えず申し訳ありませんが、代わりに初期研修を無料で受けて差し上げます。",
+          "textId": "Mohon maaf belum memenuhi harapan Anda, sebagai gantinya kami berbaik hati menerima pelatihan awal secara gratis untuk Anda.",
+          "whyFails": "Kesalahan keigo ganda: menggunakan '受ける' (menerima pelatihan, padahal pihak penjual yang memberikan) serta pola '～て差し上げます' yang terkesan menggurui/merendahkan mitra bisnis."
+        },
+        {
+          "id": 3,
+          "text": "原材料費が上がっておりますので、お値引きをご希望でしたら他社様にご依頼なさってはいかがでしょうか。",
+          "textId": "Karena biaya bahan baku naik, jika Anda menginginkan diskon bagaimana kalau memesan ke perusahaan lain saja?",
+          "whyFails": "Melanggar instruksi kepala divisi agar menolak tanpa menyinggung ('角が立たないように') sekaligus mengabaikan tawaran alternatif pelatihan gratis."
+        }
+      ],
+      "answerIndex": 0,
+      "explain": "Dalam korespondensi/negosiasi bisnis Jepang tingkat N2, penolakan halus menggunakan kalimat bantalan \"恐れ入りますが\" diikuti bentuk merendah \"～いたしかねます\" (kami belum dapat melakukan ...), lalu ditutup solusi alternatif yang sopan \"無償でご提供いたします\" (Pilihan 1).",
+      "vocabularyKey": [
+        {
+          "ja": "打診 (dashin)",
+          "id": "penjajakan / menanyakan kemungkinan"
+        },
+        {
+          "ja": "角が立つ (kado ga tatsu)",
+          "id": "menyinggung perasaan / menimbulkan gesekan"
+        },
+        {
+          "ja": "～いたしかねます (itashikanemasu)",
+          "id": "mohon maaf kami tidak dapat ... (penolakan bisnis sopan)"
+        },
+        {
+          "ja": "無償 (mushou)",
+          "id": "cuma-cuma / tanpa dipungut biaya"
+        }
+      ],
+      "turnTimestamps": [
+        4.03,
+        13.53,
+        20.48,
+        27.98
+      ],
+      "allTurnTimestamps": [
+        0,
+        4.03,
+        13.53,
+        20.48,
+        27.98,
+        34.78
+      ]
+    },
+    {
+      "id": "jlpt-n2-m3-02",
+      "level": "N2",
+      "cefr": "B2",
+      "mondai": "mondai_3",
+      "mondaiLabel": "Mondai 3: Utterance Expressions (発話表現)",
+      "title": "Inti Keberatan terhadap Sistem Jadwal Kerja Baru",
+      "situation": "Dua perawat klinik sedang mendiskusikan uji coba aturan penjadwalan shift baru sebelum rapat staf dimulai.",
+      "audioUrl": "",
+      "aiAudioUrl": "./features/speaking-listening/audio-jlpt/jlpt-n2-m3-02.mp3",
+      "audioTrack": "FIEZEL Studio Chōkai N2 - Mondai 3",
+      "scriptJapanese": "男の人：来月から試験導入される新しいシフト制度、出勤時間を3パターンから選べるようになるから便利になるよね。\n女の人：時間帯の選択肢が増えること自体はありがたいんだけど、確定したシフト表が出るのが勤務日の3日前っていうのがねえ……。\n男の人：ああ、今までは2週間前に出ていたもんね。\n女の人：そうなの。保育園のお迎えや夜間講座に通っているスタッフは予定が立てられないから、そこだけは今日の会議で改善を求めようと思ってるの。",
+      "scriptRomaji": "Otoko no hito: Raigetsu kara shiken dounyuu sareru atarashii shifuto seido, shukkin jikan o sanpataan kara eraberu you ni naru kara benri ni naru yo ne.\nOnna no hito: Jikantai no sentakushi ga fueru koto jitai wa arigatai n dakedo, kakutei shita shifutohyou ga deru no ga kinmubi no mikkamae tte iu no ga nee......\nOtoko no hito: Aa, ima made wa nishuukan mae ni dete ita mon ne.\nOnna no hito: Sou na no. Hoikuen no omukae ya yakan kouza ni kayotte iru sutaffu wa yotei ga taterarenai kara, soko dake wa kyou no kaigi de kaizen o motomeyou to omotteru no.",
+      "scriptIndonesian": "Pria: Sistem shift baru yang akan diuji coba mulai bulan depan, karena jam masuknya bisa dipilih dari 3 pola, bakal jadi praktis ya.\nWanita: Bertambahnya pilihan rentang jam itu sendiri memang patut disyukuri, tapi jadwal shift pastinya baru keluar 3 hari sebelum hari kerja itu lho...\nPria: Oh iya, selama ini keluarnya 2 minggu sebelumnya ya.\nWanita: Betul. Staf yang harus menjemput anak di tempat penitipan atau mengikuti kelas malam jadi tidak bisa menyusun jadwal, jadi khusus bagian itu saya berniat meminta perbaikan di rapat hari ini.",
+      "questionJapanese": "女の人が今日の会議で最も訴えたいことは何ですか。",
+      "questionRomaji": "Onna no hito ga kyou no kaigi de mottomo uttaetai koto wa nan desu ka.",
+      "questionIndonesian": "Apa poin utama yang paling ingin disuarakan wanita tersebut dalam rapat hari ini?",
+      "options": [
+        {
+          "id": 1,
+          "text": "出勤時間を3パターンに分ける仕組みを取りやめてほしい",
+          "textId": "Meminta agar sistem pembagian 3 pola jam masuk kerja dibatalkan",
+          "whyFails": "Wanita justru mengapresiasi bertambahnya pilihan jam masuk kerja ('選択肢が増えること自体はありがたい')."
+        },
+        {
+          "id": 2,
+          "text": "子育て中のスタッフは夜間勤務を免除してほしい",
+          "textId": "Meminta agar staf yang mengasuh anak dibebaskan dari shift malam",
+          "whyFails": "Penjemputan anak dan kursus malam disebutkan sebagai contoh mengapa staf butuh kepastian jadwal jauh-jauh hari, bukan menuntut pembebasan tugas malam."
+        },
+        {
+          "id": 3,
+          "text": "シフト表の確定と通知をもっと早い時期に行ってほしい",
+          "textId": "Meminta agar penetapan dan pengumuman jadwal shift dilakukan lebih awal"
+        }
+      ],
+      "answerIndex": 2,
+      "explain": "Wanita menyambut positif fleksibilitas jam kerja, namun mempermasalahkan pengumuman jadwal yang terlalu mendadak: \"確定したシフト表が出るのが勤務日の3日前っていうのがねえ……そこだけは今日の会議で改善を求めようと思ってるの\". Maka hal yang ingin ia perjuangkan di rapat adalah percepatan waktu pengumuman jadwal shift (Pilihan 3).",
+      "vocabularyKey": [
+        {
+          "ja": "試験導入 (shiken dounyuu)",
+          "id": "penerapan uji coba (pilot trial)"
+        },
+        {
+          "ja": "選択肢 (sentakushi)",
+          "id": "pilihan / opsi"
+        },
+        {
+          "ja": "予定を立てる (yotei o tateru)",
+          "id": "menyusun rencana/jadwal"
+        },
+        {
+          "ja": "訴える (uttaeru)",
+          "id": "menyuarakan / mengajukan keberatan"
+        }
+      ],
+      "turnTimestamps": [
+        4.22,
+        14.18,
+        25.22,
+        29.52
+      ],
+      "allTurnTimestamps": [
+        0,
+        4.22,
+        14.18,
+        25.22,
+        29.52,
+        43.41
+      ]
+    },
+    {
+      "id": "jlpt-n2-m4-01",
+      "level": "N2",
+      "cefr": "B2",
+      "mondai": "mondai_4",
+      "mondaiLabel": "Mondai 4: Quick Response (即時応答)",
+      "title": "Merespons Dugaan Kuat Atasan (～ないはずがない)",
+      "situation": "Kepala seksi heran mengapa Yamada belum mengikuti prosedur baru yang sudah diumumkan kemarin.",
+      "audioUrl": "",
+      "aiAudioUrl": "./features/speaking-listening/audio-jlpt/jlpt-n2-m4-01.mp3",
+      "audioTrack": "FIEZEL Studio Chōkai N2 - Mondai 4",
+      "scriptJapanese": "課長：今度の規約改定の件、きのう全員宛てに通知したんだから、山田さんが知らないはずがないよね？",
+      "scriptRomaji": "Kachou: Kondo no kiyaku kaitei no ken, kinou zen'in ate ni tsuuchi shita n dakara, Yamada-san ga shiranai hazu ga nai yo ne?",
+      "scriptIndonesian": "Kepala Seksi: Soal revisi peraturan kali ini, karena kemarin sudah diumumkan kepada semua staf, tidak mungkin Yamada-san tidak tahu, kan?",
+      "questionJapanese": "なんと言って答えますか。",
+      "questionRomaji": "Nan to itte kotaemasu ka.",
+      "questionIndonesian": "Bagaimanakah respons yang tepat?",
+      "options": [
+        {
+          "id": 1,
+          "text": "ええ、やはり山田さんはご存じないわけですね。",
+          "textId": "Ya, memang benar Yamada-san tidak mengetahuinya ya.",
+          "whyFails": "Terjebak negasi ganda '知らないはずがない' (tidak mungkin tidak tahu = pasti tahu), tetapi dijawab seolah-olah kepala seksi mengatakan Yamada tidak tahu."
+        },
+        {
+          "id": 2,
+          "text": "あっ、山田さんはきのうから出張中で、まだメールを見られていないかもしれません。",
+          "textId": "Ah, Yamada-san sedang dinas luar sejak kemarin, jadi mungkin belum sempat membuka surel."
+        },
+        {
+          "id": 3,
+          "text": "はい、きのう全員には通知しなかったことになっています。",
+          "textId": "Baik, disepakati bahwa kemarin tidak jadi diumumkan kepada semuanya.",
+          "whyFails": "Bertolak belakang langsung dengan fakta kalimat kepala seksi bahwa pengumuman sudah dikirim ke seluruh staf kemarin."
+        }
+      ],
+      "answerIndex": 1,
+      "explain": "Pola negasi ganda N2 \"知らないはずがない\" berarti \"mustahil tidak tahu\" (seharusnya pasti tahu). Memberikan alasan logis mengapa Yamada mungkin saja belum mengetahuinya—yakni sedang dinas luar kota sejak kemarin (Pilihan 2)—adalah respons yang paling tepat.",
+      "vocabularyKey": [
+        {
+          "ja": "規約改定 (kiyaku kaitei)",
+          "id": "revisi peraturan/ketentuan"
+        },
+        {
+          "ja": "～宛て (ate)",
+          "id": "ditujukan kepada ..."
+        },
+        {
+          "ja": "～ないはずがない (nai hazu ga nai)",
+          "id": "tidak mungkin tidak ... / pasti ..."
+        },
+        {
+          "ja": "出張中 (shutchouchuu)",
+          "id": "sedang dalam perjalanan dinas"
+        }
+      ],
+      "turnTimestamps": [
+        4.63
+      ],
+      "allTurnTimestamps": [
+        0,
+        4.63,
+        14.4
+      ]
+    },
+    {
+      "id": "jlpt-n2-m4-02",
+      "level": "N2",
+      "cefr": "B2",
+      "mondai": "mondai_4",
+      "mondaiLabel": "Mondai 4: Quick Response (即時応答)",
+      "title": "Menanggapi Penolakan Jadwal Secara Halus",
+      "situation": "Mitra bisnis dari perusahaan lain menanggapi usulan jadwal rapat hari Rabu melalui telepon.",
+      "audioUrl": "",
+      "aiAudioUrl": "./features/speaking-listening/audio-jlpt/jlpt-n2-m4-02.mp3",
+      "audioTrack": "FIEZEL Studio Chōkai N2 - Mondai 4",
+      "scriptJapanese": "女の人：来週の打ち合わせですが、水曜日はあいにく終日予定が立て込んでおりまして……。",
+      "scriptRomaji": "Onna no hito: Raishuu no uchiawase desu ga, suiyoubi wa ainiku shuujitsu yotei ga tatekonde orimashite......",
+      "scriptIndonesian": "Wanita: Mengenai rapat minggu depan, sayangnya hari Rabu jadwal saya padat sepanjang hari...",
+      "questionJapanese": "なんと言って応じますか。",
+      "questionRomaji": "Nan to itte oujimasu ka.",
+      "questionIndonesian": "Bagaimanakah cara menanggapi yang tepat?",
+      "options": [
+        {
+          "id": 1,
+          "text": "左様ですか。では、木曜日の午後はご都合いかがでしょうか。",
+          "textId": "Begitu rupanya. Kalau begitu, bagaimana dengan jadwal Anda pada Kamis siang?"
+        },
+        {
+          "id": 2,
+          "text": "ありがとうございます。では、水曜日の14時にお伺いいたします。",
+          "textId": "Terima kasih. Kalau begitu saya akan berkunjung pada hari Rabu pukul 14:00.",
+          "whyFails": "Gagal memahami ungkapan penolakan halus 'あいにく終日予定が立て込んでおりまして……' (jadwal penuh seharian pada hari Rabu)."
+        },
+        {
+          "id": 3,
+          "text": "そうですか。水曜日は一日中空いていらっしゃるなら安心しました。",
+          "textId": "Oh begitu. Syukurlah kalau hari Rabu Anda luang sepanjang hari.",
+          "whyFails": "Salah mengartikan kosakata N2 '立て込む' (jadwal padat/sibuk) sebagai waktu senggang/kosong."
+        }
+      ],
+      "answerIndex": 0,
+      "explain": "Kata keterangan \"あいにく\" (sayangnya) dan klausa menggantung \"終日予定が立て込んでおりまして……\" (jadwal penuh sepanjang hari...) merupakan penolakan jadwal tidak langsung khas bisnis Jepang. Respons tepat adalah memaklumi (\"左様ですか\") lalu menawarkan alternatif hari lain seperti Kamis siang (Pilihan 1).",
+      "vocabularyKey": [
+        {
+          "ja": "あいにく (ainiku)",
+          "id": "sayangnya / kebetulan kurang beruntung"
+        },
+        {
+          "ja": "終日 (shuujitsu)",
+          "id": "sepanjang hari"
+        },
+        {
+          "ja": "立て込む (tatekomu)",
+          "id": "sibuk / padat bertumpuk (jadwal/pekerjaan)"
+        },
+        {
+          "ja": "ご都合 (gotsugou)",
+          "id": "ketersediaan waktu / kondisi (hormat)"
+        }
+      ],
+      "turnTimestamps": [
+        5.56
+      ],
+      "allTurnTimestamps": [
+        0,
+        5.56,
+        13.56
+      ]
+    },
+    {
+      "id": "jlpt-n1-m1-01",
+      "level": "N1",
+      "cefr": "C1",
+      "mondai": "mondai_1",
+      "mondaiLabel": "Mondai 1: Task-based Comprehension (課題理解)",
+      "title": "Penyesuaian Strategi Peluncuran Aplikasi Keuangan",
+      "situation": "Manajer produk melaporkan hasil uji beban server menjelang peluncuran aplikasi baru kepada kepala divisi.",
+      "audioUrl": "",
+      "aiAudioUrl": "./features/speaking-listening/audio-jlpt/jlpt-n1-m1-01.mp3",
+      "audioTrack": "FIEZEL Studio Chōkai N1 - Mondai 1",
+      "scriptJapanese": "男の人：部長、来週公開予定の決済アプリですが、法務審査とセキュリティ監査は無事クリアしました。ただ、負荷試験で同時接続が5万件を超えると応答が遅延する事象が見つかりまして……。\n部長：むう、今さら公開日自体を延期するのは対外的な信用問題にかかわるな。初期登録を段階的な招待制に切り替えれば、負荷は抑えられるんじゃないか。\n男の人：はい、それならサーバー増強までの間も安定稼働できます。ただ、操作解説動画のナレーションにも1か所用語の揺れが見つかりました。\n部長：動画の修正は明日でも間に合う。報道資料の配信はいったん見合わせて、まずは開発責任者と協議して招待制の登録上限をシステムに組み込んでくれ。",
+      "scriptRomaji": "Otoko no hito: Buchou, raishuu koukai yotei no kessai apuri desu ga, houmu shinsa to sekyuriti kansa wa buji kuria shimashita. Tada, fuka shiken de douji setsuzoku ga gomanken o koeru to outou ga chien suru jishou ga mitsukarimashite......\nBuchou: Muu, imasara koukaibi jitai o enki suru no wa taigaiteki na shin'you mondai ni kakawaru na. Shoki touroku o dankaiteki na shoutaisei ni kirikaereba, fuka wa osaerareru n janai ka.\nOtoko no hito: Hai, sore nara saabaa zoukyou made no aida mo antei kadou dekimasu. Tada, sousa kaisetsu douga no nareeshon ni mo ikkasho yougo no yure ga mitsukarimashita.\nBuchou: Douga no shuusei wa ashita demo maniau. Houdou shiryou no haishin wa ittan miawasete, mazu wa kaihatsu sekininsha to kyougi shite shoutaisei no touroku jougen o shisutemu ni kumikonde kure.",
+      "scriptIndonesian": "Pria: Pak Kepala Divisi, mengenai aplikasi pembayaran yang dijadwalkan rilis minggu depan, telaah hukum dan audit keamanannya sudah lolos dengan lancar. Hanya saja, pada uji beban ditemukan gejala keterlambatan respons saat koneksi bersamaan melampaui 50.000 pengguna...\nKepala Divisi: Hmm, menunda tanggal rilisnya sendiri pada tahap ini menyangkut masalah kredibilitas eksternal kita. Bukankah bebannya bisa ditekan kalau pendaftaran awal dialihkan ke sistem undangan bertahap?\nPria: Baik, kalau demikian sistem dapat beroperasi stabil sembari menunggu penambahan kapasitas server. Hanya saja, ditemukan juga satu ketidakkonsistenan istilah pada narasi video panduan penggunaan.\nKepala Divisi: Perbaikan videonya besok pun masih keburu. Tahan dulu pengiriman rilis persnya, dan pertama-tama berundinglah dengan penanggung jawab pengembang untuk menanamkan batas atas pendaftaran sistem undangan.",
+      "questionJapanese": "男の人はこのあと最優先で何に取り組みますか。",
+      "questionRomaji": "Otoko no hito wa kono ato saiyuusen de nani ni torikumimasu ka.",
+      "questionIndonesian": "Apa hal paling prioritas yang akan segera dikerjakan pria tersebut setelah ini?",
+      "options": [
+        {
+          "id": 1,
+          "text": "法務部門に利用規約の再審査を依頼する",
+          "textId": "Meminta divisi hukum meninjau ulang ketentuan layanan",
+          "whyFails": "Telaah hukum dan audit keamanan sudah dinyatakan lolos tanpa kendala di awal laporan ('法務審査とセキュリティ監査は無事クリアしました')."
+        },
+        {
+          "id": 2,
+          "text": "公開日の延期を知らせる報道資料を配信する",
+          "textId": "Menyebarkan rilis pers yang mengumumkan penundaan tanggal peluncuran",
+          "whyFails": "Kepala divisi menolak penundaan tanggal rilis karena menyangkut kredibilitas serta memerintahkan agar pengiriman rilis pers ditahan sementara ('配信はいったん見合わせて')."
+        },
+        {
+          "id": 3,
+          "text": "解説動画のナレーションを今日中に録り直す",
+          "textId": "Merekam ulang narasi video panduan hari ini juga",
+          "whyFails": "Kepala divisi menyatakan perbaikan video masih sempat dikerjakan besok ('動画の修正は明日でも間に合う'), sehingga bukan prioritas pertama."
+        },
+        {
+          "id": 4,
+          "text": "開発責任者と協議して登録上限の設定を組み込む",
+          "textId": "Berunding dengan kepala pengembang untuk menerapkan pengaturan batas pendaftaran"
+        }
+      ],
+      "answerIndex": 3,
+      "explain": "Kepala divisi menolak menunda tanggal peluncuran, meminta rilis pers ditangguhkan sementara (\"いったん見合わせて\"), dan menunda revisi video ke esok hari. Instruksi prioritas utamanya tegas: \"まずは開発責任者と協議して招待制の登録上限をシステムに組み込んでくれ\" (Pertama-tama berunding dengan penanggung jawab pengembang untuk menanamkan batas atas pendaftaran). Maka jawabannya adalah Pilihan 4.",
+      "vocabularyKey": [
+        {
+          "ja": "負荷試験 (fuka shiken)",
+          "id": "uji beban (load testing)"
+        },
+        {
+          "ja": "～にかかわる (ni kakawaru)",
+          "id": "menyangkut / berdampak serius pada ..."
+        },
+        {
+          "ja": "見合わせる (miawaseru)",
+          "id": "menangguhkan / menahan sementara"
+        },
+        {
+          "ja": "組み込む (kumikomu)",
+          "id": "menanamkan / mengintegrasikan ke dalam sistem"
+        }
+      ],
+      "turnTimestamps": [
+        4.73,
+        23.66,
+        39.24,
+        55.11
+      ],
+      "allTurnTimestamps": [
+        0,
+        4.73,
+        23.66,
+        39.24,
+        55.11,
+        72.02
+      ]
+    },
+    {
+      "id": "jlpt-n1-m1-02",
+      "level": "N1",
+      "cefr": "C1",
+      "mondai": "mondai_1",
+      "mondaiLabel": "Mondai 1: Task-based Comprehension (課題理解)",
+      "title": "Revisi Analisis Data Disertasi Pascasarjana",
+      "situation": "Seorang mahasiswi program doktor berkonsultasi dengan profesor pembimbing mengenai naskah draf disertasinya.",
+      "audioUrl": "",
+      "aiAudioUrl": "./features/speaking-listening/audio-jlpt/jlpt-n1-m1-02.mp3",
+      "audioTrack": "FIEZEL Studio Chōkai N1 - Mondai 1",
+      "scriptJapanese": "女子学生：先生、先日提出した方言変容に関する論文草稿ですが、現地での追加調査は必要でしょうか。\n教授：ひととおり目を通したよ。先行研究の整理は申し分ないし、標本数も十分だから追加調査には及ばないね。ただ、今の集計だと20代から40代が一括りにされているせいで、世代間の微細な変化が埋もれてしまっているんだ。\n女子学生：なるほど。では、第4章の結論を書き直す前に、手元の録音データを10歳刻みの年代別に再集計してクロス表をお送りしましょうか。\n教授：うん、その数値を見ないことには結論の方向性も定まらないからね。まずはそれを頼むよ。",
+      "scriptRomaji": "Joshi gakusei: Sensei, senjitsu teishutsu shita hougen hen'you ni kansuru ronbun soukou desu ga, genchi de no tsuika chousa wa hitsuyou deshou ka.\nKyouju: Hitotoori me o tooshita yo. Senkou kenkyuu no seiri wa moushibun nai shi, hyouhonsuu mo juubun dakara tsuika chousa ni wa oyobanai ne. Tada, ima no shuukei da to nijuudai kara yonjuudai ga hitokukuri ni sarete iru sei de, sedaikan no bisai na henka ga umorete shimatte iru n da.\nJoshi gakusei: Naruhodo. Dewa, daiyonshou no ketsuron o kakinaosu mae ni, temoto no rokuon deeta o jussai kizami no nendaibetsu ni saishuukei shite kurosuhyou o ookuri shimashou ka.\nKyouju: Un, sono suuchi o minai koto ni wa ketsuron no houkousei mo sadamaranai kara ne. Mazu wa sore o tanomu yo.",
+      "scriptIndonesian": "Mahasiswi: Prof, mengenai draf disertasi tentang pergeseran dialek yang saya serahkan tempo hari, apakah diperlukan survei tambahan di lapangan?\nProfesor: Sudah saya baca menyeluruh. Pemetaan penelitian terdahulunya tanpa cela dan jumlah sampelnya memadai sehingga tidak perlu survei tambahan. Hanya saja, pada tabulasi saat ini usia 20-an hingga 40-an digabung jadi satu, akibatnya perubahan halus antargenerasi jadi tertutup.\nMahasiswi: Begitu ya. Kalau begitu, sebelum menulis ulang kesimpulan Bab 4, bagaimana jika data rekaman yang ada saya tabulasi ulang per rentang usia 10 tahun lalu saya kirimkan tabel silangnya?\nProfesor: Ya, tanpa melihat angka tersebut arah kesimpulannya pun belum bisa ditentukan. Pertama-tama tolong kerjakan itu dulu ya.",
+      "questionJapanese": "女子学生はこのあとまず何をしますか。",
+      "questionRomaji": "Joshi gakusei wa kono ato mazu nani o shimasu ka.",
+      "questionIndonesian": "Apa yang pertama-tama akan dikerjakan mahasiswi tersebut setelah ini?",
+      "options": [
+        {
+          "id": 1,
+          "text": "現地へ赴いて発話データの追加調査を行う",
+          "textId": "Pergi ke lokasi lapangan untuk mengambil data survei tambahan",
+          "whyFails": "Profesor secara eksplisit menggunakan pola N1 '追加調査には及ばない' yang berarti survei tambahan tidak diperlukan."
+        },
+        {
+          "id": 2,
+          "text": "手元のデータを10歳ごとの年代別に再集計する",
+          "textId": "Menabulasi ulang data yang ada berdasarkan kelompok usia per 10 tahun"
+        },
+        {
+          "id": 3,
+          "text": "先行研究の整理を最初から書き改める",
+          "textId": "Menulis ulang bagian tinjauan pustaka dari awal",
+          "whyFails": "Bagian tinjauan penelitian terdahulu dipuji tanpa cela ('先行研究の整理は申し分ない'), sehingga tidak perlu diubah."
+        },
+        {
+          "id": 4,
+          "text": "第4章の結論部分を先に書き直して提出する",
+          "textId": "Menulis ulang bagian kesimpulan Bab 4 terlebih dahulu lalu menyerahkannya",
+          "whyFails": "Penulisan ulang Bab 4 baru dilakukan SETELAH tabulasi ulang selesai ('第4章を書き直す前に...再集計して')."
+        }
+      ],
+      "answerIndex": 1,
+      "explain": "Profesor memuji tinjauan pustaka (\"申し分ない\") dan menyatakan survei tambahan tidak diperlukan (\"追加調査には及ばない\"). Namun ia menyoroti pengelompokan usia 20–40 tahun yang terlalu lebar. Mahasiswi mengusulkan untuk menabulasi ulang data yang ada per rentang 10 tahun sebelum menulis ulang Bab 4, dan profesor mengiyakan: \"まずはそれを頼むよ\". Maka langkah pertamanya adalah tabulasi ulang data per 10 tahun (Pilihan 2).",
+      "vocabularyKey": [
+        {
+          "ja": "申し分ない (moushibun nai)",
+          "id": "sempurna / tidak ada celah kekurangan"
+        },
+        {
+          "ja": "～には及ばない (ni wa oyobanai)",
+          "id": "tidak perlu sampai ..."
+        },
+        {
+          "ja": "一括りにする (hitokukuri ni suru)",
+          "id": "menggabungkan/menyamaratakan dalam satu kelompok"
+        },
+        {
+          "ja": "～ないことには (nai koto ni wa)",
+          "id": "tanpa melakukan ..., maka tidak akan bisa ..."
+        }
+      ],
+      "turnTimestamps": [
+        5,
+        16.09,
+        40.08,
+        54.18
+      ],
+      "allTurnTimestamps": [
+        0,
+        5,
+        16.09,
+        40.08,
+        54.18,
+        63.99
+      ]
+    },
+    {
+      "id": "jlpt-n1-m2-01",
+      "level": "N1",
+      "cefr": "C1",
+      "mondai": "mondai_2",
+      "mondaiLabel": "Mondai 2: Point Comprehension (ポイント理解)",
+      "title": "Faktor Penghambat Sinergi Pasca-Merger Perusahaan Logistik",
+      "situation": "Dua analis industri sedang membahas kinerja keuangan dua perusahaan logistik daerah setahun setelah bergabung.",
+      "audioUrl": "",
+      "aiAudioUrl": "./features/speaking-listening/audio-jlpt/jlpt-n1-m2-01.mp3",
+      "audioTrack": "FIEZEL Studio Chōkai N1 - Mondai 2",
+      "scriptJapanese": "男の人：地方物流大手の2社が経営統合してから1年になるけど、当初見込まれていたほどの収益改善が見られないね。重複していた配送拠点の統廃合が難航しているんだろうか。\n女の人：いえ、拠点の再編自体は前倒しで完了していますし、燃料費の高騰分についても荷主への価格転嫁がおおむね進んでいます。\n男の人：だとすると、統合に伴う離職者が相次いで人件費がかさんだとか？\n女の人：離職率はむしろ低いんです。ただ、旧両社の在庫管理システムがいまだに別々のまま運用されていて、現場でデータの二重入力が常態化し、残業代が利益を圧迫しているのが実情です。",
+      "scriptRomaji": "Otoko no hito: Chihou butsuryuu oote no nisha ga keiei tougou shite kara ichinen ni naru kedo, tousho mikomarete ita hodo no shuueki kaizen ga mirarenai ne. Chuufuku shite ita haisou kyoten no touhaigou ga nankou shite iru n darou ka.\nOnna no hito: Ie, kyoten no saihen jitai wa maedaoshi de kanryou shite imasu shi, nenryouhi no koutoubun ni tsuite mo ninushi e no kakaku tenka ga oomune susunde imasu.\nOtoko no hito: Da to suru to, tougou ni tomonau rishokusha ga aitsuide jinkenhi ga kasanda toka?\nOnna no hito: Rishokuritsu wa mushiro hikui n desu. Tada, kyuu ryousha no zaiko kanri shisutemu ga imada ni betsubetsu no mama un'you sarete ite, genba de deeta no nijuu nyuuryoku ga joutaika shi, zangyoudai ga rieki o appaku shite iru no ga jitsujou desu.",
+      "scriptIndonesian": "Pria: Sudah satu tahun sejak dua perusahaan besar logistik daerah melakukan integrasi manajemen, tetapi perbaikan laba sebesar yang diperkirakan di awal belum terlihat ya. Apakah penggabungan depo distribusi yang tumpang tindih berjalan alot?\nWanita: Tidak, restrukturisasi deponya sendiri justru rampung lebih cepat dari jadwal, dan kenaikan harga bahan bakar pun secara garis besar sudah berhasil dibebankan ke tarif pengirim barang.\nPria: Kalau begitu, apakah karena gelombang pengunduran diri pasca-merger sehingga biaya tenaga kerja membengkak?\nWanita: Tingkat pengunduran dirinya justru rendah. Hanya saja, sistem manajemen inventaris kedua eks-perusahaan masih saja dioperasikan terpisah, sehingga input data ganda menjadi hal lumrah di lapangan dan uang lembur menekan keuntungan.",
+      "questionJapanese": "女の人は、統合後の収益が伸び悩んでいる最大の要因は何だと述べていますか。",
+      "questionRomaji": "Onna no hito wa, tougougo no shuueki ga nobinayande iru saidai no youin wa nan da to nobete imasu ka.",
+      "questionIndonesian": "Menurut wanita tersebut, apa faktor terbesar yang menyebabkan laba pasca-integrasi tersendat?",
+      "options": [
+        {
+          "id": 1,
+          "text": "旧両社の管理システムが統合されず、業務が非効率になっていること",
+          "textId": "Sistem manajemen eks kedua perusahaan belum disatukan sehingga kerja lapangan tidak efisien"
+        },
+        {
+          "id": 2,
+          "text": "重複する配送拠点の統廃合が計画より大幅に遅れていること",
+          "textId": "Penggabungan depo pengiriman yang tumpang tindih sangat terlambat dari rencana",
+          "whyFails": "Restrukturisasi depo justru telah selesai lebih cepat dari jadwal ('前倒しで完了しています')."
+        },
+        {
+          "id": 3,
+          "text": "燃料費の上昇分を運賃へ転嫁できていないこと",
+          "textId": "Kenaikan biaya bahan bakar belum berhasil dialihkan ke tarif angkutan",
+          "whyFails": "Wanita menjelaskan bahwa penyesuaian tarif atas kenaikan bahan bakar secara umum sudah berjalan lancar ('価格転嫁がおおむね進んでいます')."
+        },
+        {
+          "id": 4,
+          "text": "統合後に社員の離職が相次ぎ、採用コストが増大したこと",
+          "textId": "Banyak karyawan mengundurkan diri pasca-merger sehingga biaya rekrutmen melonjak",
+          "whyFails": "Tingkat pengunduran diri justru dinyatakan rendah ('離職率はむしろ低いんです')."
+        }
+      ],
+      "answerIndex": 0,
+      "explain": "Wanita membantah ketiga hipotesis pria (penutupan depo, harga bahan bakar, dan gelombang pengunduran diri). Ia menegaskan akar persoalan sebenarnya: \"旧両社の在庫管理システムがいまだに別々のまま運用されていて、現場でデータの二重入力が常態化し、残業代が利益を圧迫している\". Maka faktor utamanya adalah belum terintegrasinya sistem manajemen kedua perusahaan (Pilihan 1).",
+      "vocabularyKey": [
+        {
+          "ja": "統廃合 (touhaigou)",
+          "id": "penggabungan dan penghapusan unit organisasi"
+        },
+        {
+          "ja": "前倒し (maedaoshi)",
+          "id": "pemajuan jadwal lebih cepat dari rencana"
+        },
+        {
+          "ja": "価格転嫁 (kakaku tenka)",
+          "id": "pengalihan beban kenaikan biaya ke harga jual"
+        },
+        {
+          "ja": "常態化する (joutaika suru)",
+          "id": "menjadi kondisi kronis / kebiasaan sehari-hari"
+        }
+      ],
+      "turnTimestamps": [
+        4.54,
+        23.01,
+        35.15,
+        41.08
+      ],
+      "allTurnTimestamps": [
+        0,
+        4.54,
+        23.01,
+        35.15,
+        41.08,
+        60.64
+      ]
+    },
+    {
+      "id": "jlpt-n1-m2-02",
+      "level": "N1",
+      "cefr": "C1",
+      "mondai": "mondai_2",
+      "mondaiLabel": "Mondai 2: Point Comprehension (ポイント理解)",
+      "title": "Kekhawatiran Kurator atas Pameran Restorasi Digital",
+      "situation": "Seorang jurnalis perempuan mewawancarai kepala divisi konservasi museum mengenai proyeksi restorasi digital lukisan kuno.",
+      "audioUrl": "",
+      "aiAudioUrl": "./features/speaking-listening/audio-jlpt/jlpt-n1-m2-02.mp3",
+      "audioTrack": "FIEZEL Studio Chōkai N1 - Mondai 2",
+      "scriptJapanese": "女の人：近年、退色した江戸時代の屏風絵を高精細プロジェクションで鮮やかに再現する展示が増えていますが、保存修復の立場からはやはり抵抗がおありですか。\n部長：いえ、デジタル復元そのものを否定するわけではありません。強い照明にさらせない原作の劣化を防げますし、研究上の意義も大きいですからね。\n女の人：では、技術的な再現精度にまだ課題があるということでしょうか。\n部長：技術水準は驚くほど高いですよ。ただ私が危惧しているのは、当時の染料に関する複数の仮説のうち一つだけを採用した復元映像が、あたかも歴史的に確定した唯一の姿であるかのように来館者に受け止められてしまうことなんです。",
+      "scriptRomaji": "Onna no hito: Kinnen, taishoku shita Edo jidai no byoubue o kouseisai purojekushon de azayaka ni saigen suru tenji ga fuete imasu ga, hozon shuufuku no tachiba kara wa yahari teikou ga oari desu ka.\nBuchou: Ie, dejitaru fukugen sonomono o hitei suru wake de wa arimasen. Tsuyoi shoumei ni sarasenai gensaku no rekka o fusegemasu shi, kenkyuujou no igi mo ookii desu kara ne.\nOnna no hito: Dewa, gijutsuteki na saigen seido ni mada kadai ga aru to iu koto deshou ka.\nBuchou: Gijutsu suijun wa odoroku hodo takai desu yo. Tada watashi ga kigu shite iru no wa, touji no senryou ni kansuru fukusuu no kasetsu no uchi hitotsu dake o saiyou shita fukugen eizou ga, atakamo rekishiteki ni kakutei shita yuiitsu no sugata de aru ka no you ni raikansha ni uketomerarete shimau koto nan desu.",
+      "scriptIndonesian": "Wanita: Belakangan ini pameran yang mereproduksi lukisan penyekat zaman Edo yang telah memudar secara hidup dengan proyeksi resolusi tinggi semakin marak; dari sudut pandang konservasi, apakah Bapak merasa keberatan?\nKepala Divisi: Tidak, saya sama sekali tidak menolak restorasi digital itu sendiri. Cara itu mencegah kerusakan karya asli yang tidak boleh terpapar cahaya kuat, dan nilai risetnya pun besar.\nWanita: Kalau begitu, apakah akurasi reproduksi teknisnya masih menyisakan kendala?\nKepala Divisi: Standar teknisnya luar biasa tinggi kok. Hanya saja yang saya khawatirkan adalah visualisasi restorasi yang hanya mengambil satu dari sekian hipotesis pewarna masa itu justru diterima pengunjung seolah-olah itulah satu-satunya wujud sejarah yang sudah pasti.",
+      "questionJapanese": "部長がデジタル復元展示について最も危惧している点は何ですか。",
+      "questionRomaji": "Buchou ga dejitaru fukugen tenji ni tsuite mottomo kigu shite iru ten wa nan desu ka.",
+      "questionIndonesian": "Apa hal yang paling dikhawatirkan kepala divisi terkait pameran restorasi digital tersebut?",
+      "options": [
+        {
+          "id": 1,
+          "text": "投影の光によって実物の作品が傷んでしまうこと",
+          "textId": "Cahaya proyeksi dapat merusak fisik karya asli",
+          "whyFails": "Sebaliknya, kepala divisi menyebut restorasi digital justru melindungi karya asli dari paparan pencahayaan kuat ('原作の劣化を防げます')."
+        },
+        {
+          "id": 2,
+          "text": "現在のデジタル技術では当時の色彩を十分に再現できないこと",
+          "textId": "Teknologi digital saat ini belum mampu mereproduksi warna masa lampau secara memadai",
+          "whyFails": "Kepala divisi secara tegas memuji tingkat akurasi teknisnya yang sangat tinggi ('技術水準は驚くほど高いですよ')."
+        },
+        {
+          "id": 3,
+          "text": "仮説に基づく復元像が確定した史実だと誤認されかねないこと",
+          "textId": "Visualisasi berbasis hipotesis berisiko disalahpahami sebagai fakta sejarah tunggal yang mutlak"
+        },
+        {
+          "id": 4,
+          "text": "映像の演出ばかりが注目され、学術研究の予算が削られること",
+          "textId": "Sorotan hanya tertuju pada efek visual sehingga anggaran riset akademik dipangkas",
+          "whyFails": "Pemangkasan anggaran riset sama sekali tidak disinggung dalam wawancara."
+        }
+      ],
+      "answerIndex": 2,
+      "explain": "Kepala divisi mendukung manfaat pelestarian maupun mutu teknis restorasi digital, tetapi menekankan kekhawatirannya lewat frasa kunci \"ただ私が危惧しているのは\": visualisasi yang didasarkan pada salah satu hipotesis saja dapat disalahartikan pengunjung seakan-akan fakta tunggal yang sudah pasti (\"あたかも歴史的に確定した唯一の姿であるかのように...受け止められてしまうこと\"). Maka jawabannya Pilihan 3.",
+      "vocabularyKey": [
+        {
+          "ja": "退色する (taishoku suru)",
+          "id": "memudar warnanya"
+        },
+        {
+          "ja": "劣化 (rekka)",
+          "id": "penurunan kualitas / kerusakan fisik"
+        },
+        {
+          "ja": "危惧する (kigu suru)",
+          "id": "mengkhawatirkan / mencemaskan"
+        },
+        {
+          "ja": "あたかも～かのように",
+          "id": "seolah-olah / bagaikan ..."
+        }
+      ],
+      "turnTimestamps": [
+        4.4,
+        20.82,
+        33.44,
+        40.48
+      ],
+      "allTurnTimestamps": [
+        0,
+        4.4,
+        20.82,
+        33.44,
+        40.48,
+        64.96
+      ]
+    },
+    {
+      "id": "jlpt-n1-m3-01",
+      "level": "N1",
+      "cefr": "C1",
+      "mondai": "mondai_3",
+      "mondaiLabel": "Mondai 3: Utterance Expressions (発話表現)",
+      "title": "Ralat Angka Buklet secara Elegan di Awal Rapat Klien",
+      "situation": "Sesaat sebelum rapat dengan klien dimulai, staf junior menyadari angka pada buklet cetak masih memakai angka sementara.",
+      "audioUrl": "",
+      "aiAudioUrl": "./features/speaking-listening/audio-jlpt/jlpt-n1-m3-01.mp3",
+      "audioTrack": "FIEZEL Studio Chōkai N1 - Mondai 3",
+      "scriptJapanese": "男の人：先輩、大変です！先方にお配りした冊子の付録グラフですが、1か所だけ先週の暫定値のまま印刷されてしまっていました。\n女の人：落ち着いて。投影するスライドのほうは今朝の確定値に差し替えてあるわよね？\n男の人：はい、画面のデータは最新の確定値になっています。どうしましょう、私のミスだと謝罪して冊子を回収しましょうか。\n女の人：いえ、回収するとかえって議事が止まるから、冒頭で私のほうからスマートにお断りを入れてスライドを参照していただくわ。",
+      "scriptRomaji": "Otoko no hito: Senpai, taihen desu! Senpou ni okubari shita sasshi no furoku gurafu desu ga, ikkasho dake senshuu no zanteichi no mama insatsu sarete shimatte imashita.\nOnna no hito: Ochitsuite. Touei suru suraido no hou wa kesa no kakuteichi ni sashikaete aru wa yo ne?\nOtoko no hito: Hai, gamen no deeta wa saishin no kakuteichi ni natte imasu. Dou shimashou, watashi no misu da to shazai shite sasshi o kaishuu shimashou ka.\nOnna no hito: Ie, kaishuu suru to kaette giji ga tomaru kara, boutou de watashi no hou kara sumaato ni okotowari o irete suraido o sanshou shite itadaku wa.",
+      "scriptIndonesian": "Pria: Senior, gawat! Grafik lampiran pada buklet yang sudah dibagikan ke klien ternyata ada satu bagian yang tercetak masih memakai angka sementara minggu lalu.\nWanita: Tenang dulu. Salindia yang akan diproyeksikan di layar sudah diganti ke angka pasti tadi pagi kan?\nPria: Ya, data di layar sudah memakai angka pasti terbaru. Bagaimana ini, apakah saya minta maaf atas kesalahan saya lalu menarik kembali bukletnya?\nWanita: Jangan, kalau ditarik justru jalannya rapat terhambat, jadi di pembukaan nanti biar saya sampaikan pemberitahuan secara elegan dan meminta mereka merujuk pada layar.",
+      "questionJapanese": "このあと、女の人は会議の冒頭で先方にどのように切り出しますか。",
+      "questionRomaji": "Kono ato, onna no hito wa kaigi no boutou de senpou ni dono you ni kiridashimasu ka.",
+      "questionIndonesian": "Setelah ini, bagaimana wanita tersebut membuka penyampaian kepada pihak klien di awal rapat?",
+      "options": [
+        {
+          "id": 1,
+          "text": "後輩の不手際で誤った数値が混入しておりまして、冊子はすべて回収させていただきます。",
+          "textId": "Akibat kelalaian staf junior kami terdapat angka yang keliru, sehingga seluruh buklet izin kami tarik kembali.",
+          "whyFails": "Menyalahkan bawahan secara personal di depan klien dan menarik buklet, bertentangan langsung dengan keputusan wanita ('いえ、回収するとかえって議事が止まる')."
+        },
+        {
+          "id": 2,
+          "text": "恐れ入りますが、お手元の冊子付録の一部が暫定値となっておりますので、画面の確定値をご参照いただけますでしょうか。",
+          "textId": "Mohon maaf sebelumnya, berhubung sebagian lampiran buklet di tangan Anda masih berupa angka sementara, berkenankah Anda merujuk pada angka pasti di layar?"
+        },
+        {
+          "id": 3,
+          "text": "冊子の数値はあながち間違いとも言い切れませんので、スライドと併せてお目通し願います。",
+          "textId": "Angka pada buklet tidak sepenuhnya bisa disebut salah, jadi mohon dibaca bersama salindia.",
+          "whyFails": "Berkelit dengan pola 'あながち～ない' dan membiarkan klien bingung menghadapi dua angka berbeda antara buklet dan layar."
+        }
+      ],
+      "answerIndex": 1,
+      "explain": "Wanita memutuskan tidak menarik buklet agar rapat tidak terhambat, melainkan menyampaikan ralat profesional di awal rapat agar klien mengacu ke angka resmi pada layar. Pilihan 2 menggunakan keigo N1 yang tepat, lugas, menjaga wibawa tim, dan mengarahkan perhatian klien secara jelas (\"お手元の冊子付録の一部が暫定値となっておりますので、画面の確定値をご参照いただけますでしょうか\").",
+      "vocabularyKey": [
+        {
+          "ja": "暫定値 (zanteichi)",
+          "id": "angka sementara (provisional figure)"
+        },
+        {
+          "ja": "確定値 (kakuteichi)",
+          "id": "angka pasti / final"
+        },
+        {
+          "ja": "差し替える (sashikaeru)",
+          "id": "mengganti dengan versi baru"
+        },
+        {
+          "ja": "お断りを入れる (okotowari o ireru)",
+          "id": "menyampaikan pemberitahuan/permohonan maaf di awal"
+        }
+      ],
+      "turnTimestamps": [
+        4.49,
+        17.11,
+        24.89,
+        38.94
+      ],
+      "allTurnTimestamps": [
+        0,
+        4.49,
+        17.11,
+        24.89,
+        38.94,
+        51.17
+      ]
+    },
+    {
+      "id": "jlpt-n1-m3-02",
+      "level": "N1",
+      "cefr": "C1",
+      "mondai": "mondai_3",
+      "mondaiLabel": "Mondai 3: Utterance Expressions (発話表現)",
+      "title": "Kritik atas Efektivitas Subsidi Renovasi Rumah Kosong",
+      "situation": "Dua perencana tata kota mendiskusikan kebijakan baru pemerintah kota mengenai subsidi perbaikan bangunan tua tak berpenghuni.",
+      "audioUrl": "",
+      "aiAudioUrl": "./features/speaking-listening/audio-jlpt/jlpt-n1-m3-02.mp3",
+      "audioTrack": "FIEZEL Studio Chōkai N1 - Mondai 3",
+      "scriptJapanese": "男の人：今度発表された市の空き家改修補助金、上限額が一気に倍増したから、これで古民家の再生がかなり進むんじゃないかな。\n女の人：予算規模を拡充した姿勢自体は評価に値すると思うわ。ただ、申請要項を細かく読むと、遠方に散らばる相続人全員の実印と同意書を60日以内にそろえることが必須になっているのよ。\n男の人：うわあ、権利関係が複雑な空き家ほど、書類集めだけで頓挫しそうだね。\n女の人：そうなの。手続きのハードルを緩和しない限り、いくら予算を積んでも絵に描いた餅に終わりかねないわ。",
+      "scriptRomaji": "Otoko no hito: Kondo happyou sareta shi no akiya kaishuu hojokin, jougengaku ga ikki ni baizou shita kara, kore de kominka no saisei ga kanari susumu n janai ka na.\nOnna no hito: Yosan kibo o kakujuu shita shisei jitai wa hyouka ni atai suru to omou wa. Tada, shinsei youkou o komakaku yomu to, enpou ni chirabaru souzokunin zen'in no jitsuin to douisho o rokujuunichi inai ni soroeru koto ga hissu ni natte iru no yo.\nOtoko no hito: Uwaa, kenri kankei ga fukuzatsu na akiya hodo, shorui atsume dake de tonza shisou da ne.\nOnna no hito: Sou na no. Tetsuzuki no haadoru o kanwa shinai kagiri, ikura yosan o tsunde mo e ni kaita mochi ni owarikanenai wa.",
+      "scriptIndonesian": "Pria: Subsidi renovasi rumah kosong dari pemerintah kota yang baru diumumkan itu plafonnya langsung naik dua kali lipat, jadi bukankah revitalisasi rumah tradisional bakal maju pesat?\nWanita: Sikap memperluas skala anggarannya sendiri memang patut diapresiasi. Hanya saja, kalau membaca petunjuk pendaftarannya secara rinci, diwajibkan melengkapi stempel resmi dan surat persetujuan seluruh ahli waris yang tersebar jauh dalam waktu 60 hari.\nPria: Wah, semakin rumit status kepemilikan rumah kosongnya, baru mengumpulkan berkas saja sudah bakal macet di tengah jalan ya.\nWanita: Betul sekali. Selama hambatan prosedurnya tidak dilonggarkan, sebesar apa pun anggaran yang digelontorkan bisa berakhir sekadar indah di atas kertas.",
+      "questionJapanese": "女の人がこの補助金制度について最も言いたいことは何ですか。",
+      "questionRomaji": "Onna no hito ga kono hojokin seido ni tsuite mottomo iitai koto wa nan desu ka.",
+      "questionIndonesian": "Apa maksud utama yang paling ingin disampaikan wanita tersebut mengenai program subsidi ini?",
+      "options": [
+        {
+          "id": 1,
+          "text": "申請手続きの要件を現実的に緩和しなければ、制度の実効性は上がらない",
+          "textId": "Jika syarat prosedur pendaftarannya tidak dilonggarkan secara realistis, efektivitas program tidak akan meningkat"
+        },
+        {
+          "id": 2,
+          "text": "改修費用の高騰に合わせ、補助金の上限額をさらに引き上げるべきだ",
+          "textId": "Plafon subsidi seharusnya dinaikkan lebih tinggi lagi menyesuaikan lonjakan biaya renovasi",
+          "whyFails": "Wanita sudah menilai kenaikan anggaran saat ini patut diapresiasi ('評価に値する') dan menegaskan menambah anggaran saja percuma tanpa penyederhanaan prosedur."
+        },
+        {
+          "id": 3,
+          "text": "権利関係が複雑な古民家は改修せず、速やかに解体を進めるべきだ",
+          "textId": "Rumah tua dengan status waris rumit sebaiknya tidak direnovasi melainkan segera dibongkar",
+          "whyFails": "Pembongkaran bangunan sama sekali tidak diusulkan oleh wanita; fokus kritiknya adalah kerumitan syarat administrasi pendaftaran."
+        }
+      ],
+      "answerIndex": 0,
+      "explain": "Wanita mengapresiasi kenaikan plafon dana, namun mengkritik syarat administratif yang terlalu berat dan menutup pendapatnya dengan peribahasa N1 \"手続きのハードルを緩和しない限り、いくら予算を積んでも絵に描いた餅に終わりかねない\" (Selama hambatan prosedur tidak dilonggarkan, anggaran sebesar apa pun berisiko berakhir sia-sia di atas kertas). Maka intinya adalah perlunya pelonggaran syarat prosedur agar kebijakan efektif (Pilihan 1).",
+      "vocabularyKey": [
+        {
+          "ja": "評価に値する (hyouka ni atai suru)",
+          "id": "layak mendapat apresiasi/penilaian positif"
+        },
+        {
+          "ja": "頓挫する (tonza suru)",
+          "id": "macet / gagal di tengah jalan"
+        },
+        {
+          "ja": "絵に描いた餅 (e ni kaita mochi)",
+          "id": "rencana muluk yang tak terlaksana (indah di atas kertas)"
+        },
+        {
+          "ja": "～かねない (kanenai)",
+          "id": "berisiko / dikhawatirkan bisa berakhir buruk ..."
+        }
+      ],
+      "turnTimestamps": [
+        3.98,
+        15.85,
+        34.23,
+        40.29
+      ],
+      "allTurnTimestamps": [
+        0,
+        3.98,
+        15.85,
+        34.23,
+        40.29,
+        51.31
+      ]
+    },
+    {
+      "id": "jlpt-n1-m4-01",
+      "level": "N1",
+      "cefr": "C1",
+      "mondai": "mondai_4",
+      "mondaiLabel": "Mondai 4: Quick Response (即時応答)",
+      "title": "Merespons Litotes Bisnis N1 (あながち～ない)",
+      "situation": "Kepala divisi menimbang apakah tenggat ketat yang diminta klien sebenarnya masih mungkin disanggupi.",
+      "audioUrl": "",
+      "aiAudioUrl": "./features/speaking-listening/audio-jlpt/jlpt-n1-m4-01.mp3",
+      "audioTrack": "FIEZEL Studio Chōkai N1 - Mondai 4",
+      "scriptJapanese": "部長：先方の提示してきた納期だけど、うちの人員配置を見直せば、あながち無理な相談でもないんじゃないか？",
+      "scriptRomaji": "Buchou: Senpou no teiji shite kita nouki dakedo, uchi no jin'in haichi o minaoseba, anagachi muri na soudan demo nai n janai ka?",
+      "scriptIndonesian": "Kepala Divisi: Soal tenggat pengiriman yang diajukan pihak klien, kalau kita menata ulang penempatan personel kita, bukankah sebenarnya tidak sepenuhnya mustahil untuk disanggupi?",
+      "questionJapanese": "なんと言って応じますか。",
+      "questionRomaji": "Nan to itte oujimasu ka.",
+      "questionIndonesian": "Bagaimanakah cara menanggapi yang tepat?",
+      "options": [
+        {
+          "id": 1,
+          "text": "ええ、どう調整しても今回は断らざるを得ませんね。",
+          "textId": "Ya, bagaimana pun diatur kali ini terpaksa harus kita tolak ya.",
+          "whyFails": "Salah menangkap pola N1 'あながち無理な相談でもない' (tidak sepenuhnya mustahil = masih mungkin diusahakan), sehingga mengiyakan ('ええ') sambil menyimpulkan hal yang berlawanan."
+        },
+        {
+          "id": 2,
+          "text": "おっしゃるとおり、人員を削ればすぐに断れますね。",
+          "textId": "Sebagaimana Bapak katakan, kalau mengurangi staf kita bisa segera menolaknya.",
+          "whyFails": "Tidak logis dan bertolak belakang dengan maksud kepala divisi yang ingin mengupayakan pemenuhan tenggat lewat realokasi tim."
+        },
+        {
+          "id": 3,
+          "text": "そうですね。第2開発チームの応援を仰げば、十分間に合うかと思います。",
+          "textId": "Betul, Pak. Jika kita meminta bantuan tim pengembang kedua, saya rasa waktunya sangat mencukupi."
+        }
+      ],
+      "answerIndex": 2,
+      "explain": "Ungkapan N1 \"あながち無理な相談でもないんじゃないか\" merupakan litotes (negasi pelunak) yang bermakna positif: \"sebenarnya cukup mungkin dipenuhi jika kita mengatur ulang personel\". Maka tanggapan yang selaras adalah menyetujui dan mengusulkan dukungan tim lain agar tenggat terkejar (Pilihan 3).",
+      "vocabularyKey": [
+        {
+          "ja": "人員配置 (jin'in haichi)",
+          "id": "penempatan / alokasi personel"
+        },
+        {
+          "ja": "あながち～ない (anagachi ... nai)",
+          "id": "tidak selalu / belum tentu sepenuhnya ..."
+        },
+        {
+          "ja": "～ざるを得ない (zaru o enai)",
+          "id": "terpaksa harus ..."
+        },
+        {
+          "ja": "応援を仰ぐ (ouen o aogu)",
+          "id": "meminta bantuan/dukungan tenaga"
+        }
+      ],
+      "turnTimestamps": [
+        3.47
+      ],
+      "allTurnTimestamps": [
+        0,
+        3.47,
+        13.05
+      ]
+    },
+    {
+      "id": "jlpt-n1-m4-02",
+      "level": "N1",
+      "cefr": "C1",
+      "mondai": "mondai_4",
+      "mondaiLabel": "Mondai 4: Quick Response (即時応答)",
+      "title": "Merespons Kritik Birokrasi Berlebihan (本末転倒)",
+      "situation": "Rekan kerja mengeluhkan alur persetujuan keamanan internal yang berlapis-lapis hingga menghambat pekerjaan utama.",
+      "audioUrl": "",
+      "aiAudioUrl": "./features/speaking-listening/audio-jlpt/jlpt-n1-m4-02.mp3",
+      "audioTrack": "FIEZEL Studio Chōkai N1 - Mondai 4",
+      "scriptJapanese": "女の人：安全対策は念を入れるに越したことはないけど、ここまで承認フローが煩雑だと本末転倒じゃない？",
+      "scriptRomaji": "Onna no hito: Anzen taisaku wa nen o ireru ni koshita koto wa nai kedo, koko made shounin furoo ga hanzatsu da to honmatsu tentou janai?",
+      "scriptIndonesian": "Wanita: Langkah pengamanan memang semakin teliti semakin baik, tapi kalau alur persetujuannya seruwet ini bukankah jadi terbalik antara tujuan dan sarana?",
+      "questionJapanese": "なんと言って答えますか。",
+      "questionRomaji": "Nan to itte kotaemasu ka.",
+      "questionIndonesian": "Bagaimanakah respons yang tepat?",
+      "options": [
+        {
+          "id": 1,
+          "text": "ほんとうに、承認の段階をもっと増やすに越したことはないね。",
+          "textId": "Benar sekali, menambah tahapan persetujuannya lebih banyak lagi memang lebih baik ya.",
+          "whyFails": "Terjebak pengulangan frasa 'に越したことはない' tanpa memahami kritik utama '本末転倒' terhadap rumitnya birokrasi persetujuan."
+        },
+        {
+          "id": 2,
+          "text": "たしかに、手続きばかりに追われて現場が止まってしまっては元も子もないよね。",
+          "textId": "Memang benar, kalau habis waktu mengurus prosedur sampai kerja lapangan lumpuh, semuanya jadi sia-sia ya."
+        },
+        {
+          "id": 3,
+          "text": "そうだね、安全対策なんて最初から一切やらないほうがよかったよ。",
+          "textId": "Betul, langkah keamanan semacam itu memang lebih baik tidak usah dilakukan sama sekali sejak awal.",
+          "whyFails": "Mengabaikan klausa konsesif '念を入れるに越したことはないけど' di mana pembicara tetap mengakui pentingnya kehati-hatian keamanan."
+        }
+      ],
+      "answerIndex": 1,
+      "explain": "Pembicara mengakui pentingnya ketelitian keamanan (\"念を入れるに越したことはない\"), namun mengkritik prosedur persetujuan yang terlampau berbelit (\"煩雑\") hingga kontra-produktif (\"本末転倒\"). Pilihan 2 menangkap nuansa tersebut secara presisi dengan idiom sepadan \"元も子もない\" (menjadi sia-sia seluruhnya bila operasional lapangan berhenti).",
+      "vocabularyKey": [
+        {
+          "ja": "～に越したことはない",
+          "id": "tentu paling baik / tidak ada salahnya jika ..."
+        },
+        {
+          "ja": "煩雑 (hanzatsu)",
+          "id": "rumit / berbelit-belit (prosedur)"
+        },
+        {
+          "ja": "本末転倒 (honmatsu tentou)",
+          "id": "terbalik antara tujuan utama dan cara (kontraproduktif)"
+        },
+        {
+          "ja": "元も子もない (moto mo ko mo nai)",
+          "id": "kehilangan segalanya / menjadi sia-sia belaka"
+        }
+      ],
+      "turnTimestamps": [
+        3.66
+      ],
+      "allTurnTimestamps": [
+        0,
+        3.66,
+        13.05
+      ]
+    },
+    {
+      "id": "jlpt-c2-m1-01",
+      "level": "N1+",
+      "cefr": "C2",
+      "mondai": "mondai_1",
+      "mondaiLabel": "Mondai 1: Task-based Comprehension (課題理解)",
+      "title": "Mitigasi Klausul Paten Turunan Menjelang Penandatanganan Aliansi",
+      "situation": "Kepala divisi hukum dan negosiator utama meninjau draf akhir nota kesepahaman riset bersama pada malam sebelum seremoni penandatanganan.",
+      "audioUrl": "",
+      "aiAudioUrl": "./features/speaking-listening/audio-jlpt/jlpt-c2-m1-01.mp3",
+      "audioTrack": "FIEZEL Studio Chōkai N1+ - Mondai 1",
+      "scriptJapanese": "女の人：部長、明日の調印式に備えて共同研究覚書の最終版を精査していたのですが、秘密保持と費用分担は合意どおりであるものの、先方が土壇場で「派生特許の独占実施権」に関する一文を滑り込ませてきました。\n部長：なんと……。それを丸呑みしては、将来の事業展開に禍根を残しかねないな。\n女の人：はい。いっそ明日の調印式を白紙に戻す旨、先方の事務局へ通告いたしましょうか。\n部長：いや、ここで決裂しては角が立つし、会場設営も予定どおり待機させておこう。派生特許の帰属は90日以内の別途誠実協議に委ねるという付帯条項案を今すぐ起草して顧問弁理士に照会してくれ。先方への打診はその見解を得てからだ。",
+      "scriptRomaji": "Onna no hito: Buchou, ashita no chouinshiki ni sonaete kyoudou kenkyuu oboegaki no saishuuban o seisa shite ita no desu ga, himitsu hoji to hiyou buntan wa goui doori de aru mono no, senpou ga dotanba de 'hasei tokkyo no dokusen jisshiken' ni kansuru ichibun o suberikoma sete kimashita.\nBuchou: Nanto...... Sore o marunomi shite wa, shourai no jigyou tenkai ni kakon o nokoshikanenai na.\nOnna no hito: Hai. Isso ashita no chouinshiki o hakushi ni modosu mune, senpou no jimukyoku e tsuukoku itashimashou ka.\nBuchou: Iya, koko de ketsuretsu shite wa kado ga tatsu shi, kaijou setsuei mo yotei doori taiki sasete okou. Hasei tokkyo no kizoku wa kyuujuunichi inai no betto seijitsu kyougi ni yudaneru to iu futai joukouan o imasugu kisou shite komon benrishi ni shoukai shite kure. Senpou e no dashin wa sono kenkai o ete kara da.",
+      "scriptIndonesian": "Wanita: Pak Kepala Divisi, sembari meneliti secara saksama versi akhir nota kesepahaman riset bersama untuk seremoni penandatanganan besok, meski pasal kerahasiaan dan pembagian biaya sudah sesuai kesepakatan, pihak mitra di detik-detik terakhir menyelipkan satu kalimat tentang 'hak lisensi eksklusif atas paten turunan'.\nKepala Divisi: Apa... Kalau kita menelan bulat-bulat klausul itu, bisa meninggalkan masalah berkepanjangan bagi ekspansi bisnis kita di masa depan.\nWanita: Benar, Pak. Apakah sebaiknya kita beritahukan saja ke sekretariat mitra bahwa seremoni penandatanganan besok dibatalkan kembali ke titik nol?\nKepala Divisi: Jangan, kalau pecah di titik ini akan merusak hubungan, dan persiapan venue biarkan tetap siaga sesuai jadwal. Segera susun draf klausul tambahan yang menyerahkan kepemilikan paten turunan pada perundingan terpisah beritikad baik dalam 90 hari, lalu mintakan telaah konsultan paten kita. Penjajakan ke pihak mitra baru dilakukan setelah pandangan hukumnya keluar.",
+      "questionJapanese": "女の人はこのあと直ちに何を行いますか。",
+      "questionRomaji": "Onna no hito wa kono ato tadachi ni nani o okonaimasu ka.",
+      "questionIndonesian": "Apa yang akan segera dilakukan wanita tersebut sesaat setelah percakapan ini?",
+      "options": [
+        {
+          "id": 1,
+          "text": "付帯条項案を起草し、顧問弁理士に照会する",
+          "textId": "Menyusun draf klausul tambahan lalu mengonsultasikannya kepada konsultan paten"
+        },
+        {
+          "id": 2,
+          "text": "明日の調印式を白紙に戻す旨を先方へ通告する",
+          "textId": "Memberitahukan pembatalan seremoni penandatanganan besok kepada pihak mitra",
+          "whyFails": "Usulan membatalkan seremoni ('白紙に戻す') ditolak secara tegas oleh kepala divisi agar perundingan tidak pecah ('ここで決裂しては角が立つ')."
+        },
+        {
+          "id": 3,
+          "text": "秘密保持と費用分担の比率を最初から練り直す",
+          "textId": "Merumuskan ulang pasal kerahasiaan dan rasio pembagian biaya dari awal",
+          "whyFails": "Klausul kerahasiaan dan pembagian biaya sudah sesuai kesepakatan kedua belah pihak ('合意どおりである')."
+        },
+        {
+          "id": 4,
+          "text": "先方の事務局に電話して派生特許の条項削除を直接迫る",
+          "textId": "Langsung menelepon sekretariat mitra untuk mendesak penghapusan pasal paten turunan",
+          "whyFails": "Kepala divisi menegaskan agar komunikasi dengan pihak mitra baru dilakukan SETELAH memperoleh pendapat konsultan paten ('先方への打診はその見解を得てからだ')."
+        }
+      ],
+      "answerIndex": 0,
+      "explain": "Kepala divisi menolak pembatalan acara (\"白紙に戻す\") maupun menerima klausul begitu saja (\"丸呑み\"). Ia menetapkan urutan tindakan yang presisi: \"付帯条項案を今すぐ起草して顧問弁理士に照会してくれ。先方への打診はその見解を得てからだ\" (Susun draf klausul tambahan sekarang juga dan mintakan pendapat konsultan paten; menghubungi mitra baru dilakukan sesudahnya). Maka tindakan pertama yang segera ditempuh adalah Pilihan 1.",
+      "vocabularyKey": [
+        {
+          "ja": "土壇場 (dotanba)",
+          "id": "detik-detik terakhir / saat paling genting"
+        },
+        {
+          "ja": "禍根を残す (kakon o nokosu)",
+          "id": "menyisakan sumber masalah/sengketa di kemudian hari"
+        },
+        {
+          "ja": "白紙に戻す (hakushi ni modosu)",
+          "id": "membatalkan seluruhnya kembali ke titik awal"
+        },
+        {
+          "ja": "起草する (kisou suru)",
+          "id": "merancang / menyusun naskah hukum atau dokumen resmi"
+        }
+      ],
+      "turnTimestamps": [
+        4.35,
+        27,
+        34.23,
+        43.4
+      ],
+      "allTurnTimestamps": [
+        0,
+        4.35,
+        27,
+        34.23,
+        43.4,
+        69.28
+      ]
+    },
+    {
+      "id": "jlpt-c2-m1-02",
+      "level": "N1+",
+      "cefr": "C2",
+      "mondai": "mondai_1",
+      "mondaiLabel": "Mondai 1: Task-based Comprehension (課題理解)",
+      "title": "Penanganan Sengketa Telaah Sejawat di Dewan Redaksi Jurnal",
+      "situation": "Pemimpin redaksi jurnal akademik (profesor) dan redaktur pelaksana membahas naskah kontroversial yang mendapat penilaian bertolak belakang dari dua penelaah.",
+      "audioUrl": "",
+      "aiAudioUrl": "./features/speaking-listening/audio-jlpt/jlpt-c2-m1-02.mp3",
+      "audioTrack": "FIEZEL Studio Chōkai N1+ - Mondai 1",
+      "scriptJapanese": "男の人：先生、投稿論文の査読結果ですが、第1査読者が採択推奨とした一方、第2査読者は循環論法だとして却下を主張し、著者からも語気の強い反論書が届いています。反論書をそのまま第2査読者に転送しましょうか。\n教授：いや、感情的な応酬になっては水掛け論に終始しかねないよ。かといって、独創的な着想を含む論考をここで門前払いにしてしまうのも惜しまれる。\n男の人：では、著者に結論部分の大幅な改稿を先に要請いたしましょうか。\n教授：それも論点が整理されてからにしよう。まずは利害関係のない第三の編集委員に、分析モデルの妥当性一点に絞って客観的な所見を仰いでくれ。",
+      "scriptRomaji": "Otoko no hito: Sensei, toukou ronbun no sadoku kekka desu ga, daiichi sadokusha ga saitaku suishou to shita ippou, daini sadokusha wa junkan ronpou da to shite kyakka o shuchou shi, chosha kara mo goki no tsuyoi hanronsho ga todoite imasu. Hanronsho o sonomama daini sadokusha ni tensou shimashou ka.\nKyouju: Iya, kanjouteki na oushuu ni natte wa mizukakeron ni shuushi shikanenai yo. Ka to itte, dokusouteki na chakusou o fukumu ronkou o koko de monzenbarai ni shite shimau no mo oshimareru.\nOtoko no hito: Dewa, chosha ni ketsuron bubun no oohaba na kaikou o saki ni yousei itashimashou ka.\nKyouju: Sore mo ronten ga seiri sarete kara ni shiyou. Mazu wa rigai kankei no nai daisan no henshuu iin ni, bunseki moderu no datousei itten ni shibotte kyakkan-teki na shoken o aoide kure.",
+      "scriptIndonesian": "Pria: Prof, mengenai hasil telaah sejawat naskah yang masuk, sementara penelaah pertama merekomendasikan diterima, penelaah kedua menuntut penolakan karena dianggap penalaran melingkar, dan penulis pun mengirimkan surat sanggahan bernada tajam. Apakah surat sanggahannya kita teruskan begitu saja ke penelaah kedua?\nProfesor: Jangan, kalau berubah menjadi balas-membalas emosional bisa berakhir dengan debat kusir tanpa ujung. Meski demikian, menolak mentah-mentah karya tulis yang memuat gagasan orisinal pada tahap ini juga sangat disayangkan.\nPria: Kalau begitu, apakah kita minta penulisnya merevisi besar-besaran bagian kesimpulan terlebih dahulu?\nProfesor: Itu pun sebaiknya dilakukan setelah duduk perkaranya jernih. Pertama-tama mintalah pandangan objektif kepada anggota dewan redaksi ketiga yang bebas konflik kepentingan, khusus berfokus pada satu poin: validitas model analisisnya.",
+      "questionJapanese": "男の人はこのあとまずどの対応を取りますか。",
+      "questionRomaji": "Otoko no hito wa kono ato mazu dono taiou o torimasu ka.",
+      "questionIndonesian": "Langkah penanganan mana yang pertama-tama akan diambil pria tersebut setelah ini?",
+      "options": [
+        {
+          "id": 1,
+          "text": "著者の反論書をそのまま第2査読者へ転送する",
+          "textId": "Meneruskan surat sanggahan penulis apa adanya kepada penelaah kedua",
+          "whyFails": "Profesor menolak meneruskan langsung sanggahan bernada keras karena dikhawatirkan memicu debat kusir tanpa titik temu ('水掛け論に終始しかねない')."
+        },
+        {
+          "id": 2,
+          "text": "投稿論文を不採択とする通知を著者へ送る",
+          "textId": "Mengirimkan surat penolakan naskah kepada penulis",
+          "whyFails": "Profesor menyayangkan apabila naskah yang memiliki gagasan orisinal langsung ditolak mentah-mentah ('門前払いにしてしまうのも惜しまれる')."
+        },
+        {
+          "id": 3,
+          "text": "別の編集委員に分析モデルの妥当性に関する所見を求める",
+          "textId": "Meminta pandangan anggota redaksi lain terkait validitas model analisis"
+        },
+        {
+          "id": 4,
+          "text": "著者に結論部分の全面的な改稿を要請する",
+          "textId": "Meminta penulis melakukan revisi menyeluruh pada bagian kesimpulan",
+          "whyFails": "Permintaan revisi kepada penulis ditunda sampai pokok persoalannya terpetakan lewat pendapat pihak ketiga ('それも論点が整理されてからにしよう')."
+        }
+      ],
+      "answerIndex": 2,
+      "explain": "Profesor menolak meneruskan sanggahan secara mentah (\"水掛け論に終始しかねない\"), menolak menggugurkan naskah begitu saja (\"門前払いにしてしまうのも惜しまれる\"), serta menunda permintaan revisi kepada penulis. Instruksi pertamanya jelas: \"まずは利害関係のない第三の編集委員に、分析モデルの妥当性一点に絞って客観的な所見を仰いでくれ\" (Pilihan 3).",
+      "vocabularyKey": [
+        {
+          "ja": "査読 (sadoku)",
+          "id": "telaah sejawat akademik (peer review)"
+        },
+        {
+          "ja": "水掛け論 (mizukakeron)",
+          "id": "debat kusir tanpa bukti penentu"
+        },
+        {
+          "ja": "門前払い (monzenbarai)",
+          "id": "penolakan mentah-mentah sejak di pintu awal"
+        },
+        {
+          "ja": "所見を仰ぐ (shoken o aogu)",
+          "id": "meminta pandangan / opini ahli (hormat)"
+        }
+      ],
+      "turnTimestamps": [
+        4.31,
+        28.39,
+        43.56,
+        51.11
+      ],
+      "allTurnTimestamps": [
+        0,
+        4.31,
+        28.39,
+        43.56,
+        51.11,
+        68.21
+      ]
+    },
+    {
+      "id": "jlpt-c2-m2-01",
+      "level": "N1+",
+      "cefr": "C2",
+      "mondai": "mondai_2",
+      "mondaiLabel": "Mondai 2: Point Comprehension (ポイント理解)",
+      "title": "Titik Buta Automasi AI terhadap Pewarisan Keahlian Pengrajin",
+      "situation": "Dalam program diskusi mendalam, seorang pewawancara menanyakan dampak sistem inspeksi AI di pabrik lensa presisi kepada sosiolog industri.",
+      "audioUrl": "",
+      "aiAudioUrl": "./features/speaking-listening/audio-jlpt/jlpt-c2-m2-01.mp3",
+      "audioTrack": "FIEZEL Studio Chōkai N1+ - Mondai 2",
+      "scriptJapanese": "女の人：精密レンズの製造現場にAI外観検査を導入した結果、検品速度が3倍に向上したそうですね。一方で、熟練職人の雇用が奪われているといった問題は起きているのでしょうか。\n教授：いえ、人手不足の折から配置転換で吸収されており、雇用喪失が問題化しているわけではありません。導入コストも2年で回収できています。\n女の人：すると、現場としてはいいことずくめのように思えますが。\n教授：そこに見過ごせない盲点がありましてね。従来は若手が日常的な不良品を何千個と目視で見分ける過程で、数値化しがたい微細な歪みの兆候をつかむ「暗黙知」を養っていたんです。ところが定型的な異常をAIがすべて弾いてしまうため、いざ未知の不具合が生じた際、原因を突き止められる人材が育たないという逆説が起きています。",
+      "scriptRomaji": "Onna no hito: Seimitsu renzu no seizou genba ni AI gaikan kensa o dounyuu shita kekka, kenpin sokudo ga sanbai ni koujou shita sou desu ne. Ippou de, jukuren shokunin no koyou ga ubawarete iru to itta mondai wa okite iru no deshou ka.\nKyouju: Ie, hitode busoku no ori kara haichi tenkan de kyuushuu sarete ori, koyou soushitsu ga mondaika shite iru wake de wa arimasen. Dounyuu kosuto mo ninen de kaishuu dekite imasu.\nOnna no hito: Suru to, genba to shite wa ii koto zukume no you ni omoemasu ga.\nKyouju: Soko ni misugosenai mouten ga arimashite ne. Juurai wa wakate ga nichijouteki na furyouhin o nanzenko to mokushi de miwakeru katei de, suuchika shigatai bisai na yugami no choukou o tsukamu 'anmokuchi' o yashinatte ita n desu. Tokoroga teikeiteki na ijou o AI ga subete hajiite shimau tame, iza michi no fuguai ga shoujita sai, gen'in o tsukitomerareru jinzai ga sodatanai to iu gyakusetsu ga okite imasu.",
+      "scriptIndonesian": "Wanita: Kabarnya setelah sistem inspeksi visual AI diterapkan di lini produksi lensa presisi, kecepatan pemeriksaan meningkat tiga kali lipat ya. Di sisi lain, apakah muncul persoalan seperti hilangnya lapangan kerja pengrajin senior?\nProfesor: Tidak, di tengah kekurangan tenaga kerja mereka diserap melalui rotasi posisi, jadi hilangnya pekerjaan tidak menjadi masalah. Biaya investasinya pun sudah balik modal dalam dua tahun.\nWanita: Kalau begitu, bagi lapangan tampaknya serba menguntungkan ya.\nProfesor: Justru di situlah terdapat titik buta yang tak boleh diabaikan. Dahulu, dalam proses memeriksa ribuan produk cacat harian secara kasatmata, staf muda mengasah 'pengetahuan tak tertulis' (tacit knowledge) untuk menangkap gejala distorsi halus yang sukar diangkakan. Namun karena seluruh anomali rutin kini langsung disaring oleh AI, muncul paradoks tidak tumbuhnya SDM yang mampu melacak akar penyebab tatkala terjadi gangguan baru yang belum pernah dikenal.",
+      "questionJapanese": "教授が指摘している、AI検査導入に伴う本質的な課題は何ですか。",
+      "questionRomaji": "Kyouju ga shiteki shite iru, AI kensa dounyuu ni tomonau honshitsuteki na kadai wa nan desu ka.",
+      "questionIndonesian": "Apa persoalan mendasar dari penerapan inspeksi AI yang disoroti oleh profesor?",
+      "options": [
+        {
+          "id": 1,
+          "text": "熟練職人の居場所がなくなり、大量の離職を招いていること",
+          "textId": "Pengrajin berpengalaman kehilangan peran hingga memicu pemutusan kerja massal",
+          "whyFails": "Profesor secara eksplisit membantah isu hilangnya lapangan kerja ('雇用喪失が問題化しているわけではありません')."
+        },
+        {
+          "id": 2,
+          "text": "設備投資の負担が重く、採算が取れる見通しが立たないこと",
+          "textId": "Beban investasi peralatan terlalu berat sehingga sulit mencapai titik impas",
+          "whyFails": "Biaya awal penerapan AI dinyatakan sudah berhasil balik modal dalam waktu dua tahun ('2年で回収できています')."
+        },
+        {
+          "id": 3,
+          "text": "AIが微細な傷を見逃すため、不良品の流出がかえって増えたこと",
+          "textId": "AI melewatkan goresan halus sehingga kebocoran produk cacat justru meningkat",
+          "whyFails": "AI justru menyaring habis seluruh cacat rutin dengan cepat; masalahnya bukan ketidakakuratan AI pada cacat rutin, melainkan hilangnya sarana belajar manusia."
+        },
+        {
+          "id": 4,
+          "text": "日常的な選別経験が失われ、想定外の異常に対処する勘所が育たないこと",
+          "textId": "Pengalaman memilah cacat harian hilang sehingga intuisi menangani anomali tak terduga gagal terbentuk"
+        }
+      ],
+      "answerIndex": 3,
+      "explain": "Profesor menepis isu pengangguran maupun biaya, lalu menguraikan \"見過ごせない盲点\" (titik buta krusial): karena AI menyaring semua anomali standar secara otomatis, generasi muda kehilangan proses latihan harian untuk menumbuhkan \"暗黙知\" (pengetahuan intuitif/tak tertulis) yang diperlukan saat melacak gangguan baru tak terduga (Pilihan 4).",
+      "vocabularyKey": [
+        {
+          "ja": "いいことずくめ (ii koto zukume)",
+          "id": "serba baik / penuh keuntungan semata"
+        },
+        {
+          "ja": "盲点 (mouten)",
+          "id": "titik buta (blind spot)"
+        },
+        {
+          "ja": "暗黙知 (anmokuchi)",
+          "id": "pengetahuan implisit/intuitif (tacit knowledge)"
+        },
+        {
+          "ja": "逆説 (gyakusetsu)",
+          "id": "paradoks"
+        }
+      ],
+      "turnTimestamps": [
+        3.94,
+        21.94,
+        36.27,
+        41.68
+      ],
+      "allTurnTimestamps": [
+        0,
+        3.94,
+        21.94,
+        36.27,
+        41.68,
+        76.2
+      ]
+    },
+    {
+      "id": "jlpt-c2-m2-02",
+      "level": "N1+",
+      "cefr": "C2",
+      "mondai": "mondai_2",
+      "mondaiLabel": "Mondai 2: Point Comprehension (ポイント理解)",
+      "title": "Kritik Sastra terhadap Terjemahan Modern Novel Klasik",
+      "situation": "Dua kritikus sastra sedang mengulas edisi saduran bahasa modern dari sebuah novel psikologis era Meiji.",
+      "audioUrl": "",
+      "aiAudioUrl": "./features/speaking-listening/audio-jlpt/jlpt-c2-m2-02.mp3",
+      "audioTrack": "FIEZEL Studio Chōkai N1+ - Mondai 2",
+      "scriptJapanese": "男の人：先月刊行された明治文学の新訳版、若い読者層を中心に随分売れているようだね。会話文が現代の口語に置き換えられていて、一気呵成に読めるのが魅力なんだろう。\n女の人：ええ、敷居を下げた功績や読みやすさという点では群を抜いているわ。時代考証の誤りも見当たらないし、訳者の力量は確かよ。\n男の人：ほお、それだけ褒めつつも、どこか歯切れが悪いね。\n女の人：うーん、原文の持ち味だった回りくどい言い回しや句読点の絶妙な間合いを、明快な現代文に整えすぎたあまり、主人公の屈折したためらいや行間の余韻までもが削ぎ落とされてしまった気がしてならないの。",
+      "scriptRomaji": "Otoko no hito: Sengetsu kankou sareta Meiji bungaku no shin'yakuban, wakai dokushasou o chuushin ni zuibun urete iru you da ne. Kaiwabun ga gendai no kougo ni okikaerarete ite, ikkikasei ni yomeru no ga miryoku nan darou.\nOnna no hito: Ee, shikii o sageta kouseki ya yomiyasusa to iu ten de wa gun o nuite iru wa. Jidai koushou no ayamari mo miataranai shi, yakusha no rikiryou wa tashika yo.\nOtoko no hito: Hoo, soredake hometsutsu mo, dokoka hagire ga warui ne.\nOnna no hito: Uun, genbun no mochiaji datta mawarikudoi iimawashi ya kutouten no zetsumyou na maai o, meikai na gendaibun ni totonoesugita amari, shujinkou no kussetsu shita tamerai ya gyoukan no yoin made mo ga sogiotosarete shimatta ki ga shite naranai no.",
+      "scriptIndonesian": "Pria: Edisi terjemahan modern sastra Meiji yang terbit bulan lalu tampaknya laris manis terutama di kalangan pembaca muda ya. Kalimat dialognya diganti ke bahasa lisan masa kini sehingga bisa dibaca tuntas sekali duduk, barangkali itu daya tariknya.\nWanita: Ya, dari segi jasa menurunkan ambang kesulitan dan keterbacaannya memang jauh mengungguli yang lain. Kekeliruan riset latar sejarahnya pun tidak tampak, kemampuan penerjemahnya tidak diragukan.\nPria: Wah, meski memuji sejauh itu, nada bicaramu terdengar masih menyisakan ganjalan ya.\nWanita: Hmm, akibat terlalu merapikan ungkapan berliku dan jeda tanda baca khas naskah asli menjadi kalimat modern yang serba gamblang, saya tak kuasa merasa keraguan batin tokoh utama yang rumit serta gema makna tersirat di balik barisnya ikut tergerus hilang.",
+      "questionJapanese": "女の人がこの新訳版に対して抱いている不満の核心は何ですか。",
+      "questionRomaji": "Onna no hito ga kono shin'yakuban ni taishite idaite iru fuman no kakushin wa nan desu ka.",
+      "questionIndonesian": "Apa inti ketidakpuasan yang dirasakan wanita tersebut terhadap edisi terjemahan baru ini?",
+      "options": [
+        {
+          "id": 1,
+          "text": "当時の時代背景に関する考証が不十分で誤訳が目立つ点",
+          "textId": "Riset latar sejarah masa itu kurang memadai sehingga banyak salah terjemah",
+          "whyFails": "Wanita secara tegas mengakui akurasi sejarah dan kecakapan penerjemahnya ('時代考証の誤りも見当たらないし、訳者の力量は確かよ')."
+        },
+        {
+          "id": 2,
+          "text": "平易な表現に整えすぎた結果、原文の心理的陰影や余韻が損なわれた点",
+          "textId": "Akibat terlalu dirapikan menjadi kalimat lugas, nuansa psikologis dan gema tersirat naskah asli ikut terkikis"
+        },
+        {
+          "id": 3,
+          "text": "古風な文体がそのまま残されており、若年層には依然として難解な点",
+          "textId": "Gaya bahasa kunonya masih dibiarkan sehingga tetap sukar dipahami pembaca muda",
+          "whyFails": "Kebalikannya: naskah tersebut justru sangat mudah dibaca ('読みやすさという点では群を抜いている') karena diubah menjadi bahasa lisan modern."
+        },
+        {
+          "id": 4,
+          "text": "商業的な宣伝ばかりが先行し、作品本来の主題が誤解されている点",
+          "textId": "Promosi komersial terlalu ditonjolkan sehingga tema asli karya disalahpahami",
+          "whyFails": "Strategi promosi atau iklan komersial tidak dibahas dalam percakapan kedua kritikus."
+        }
+      ],
+      "answerIndex": 1,
+      "explain": "Wanita memuji kemudahan baca dan ketepatan riset sejarahnya, namun mengungkapkan inti keberatannya lewat pola N1/C2 \"～あまり\" dan \"気がしてならない\": karena terlalu merapikan kalimat asli menjadi bahasa modern yang jernih (\"明快な現代文に整えすぎたあまり\"), keraguan batin tokoh serta gema makna tersiratnya terkikis habis (\"主人公の屈折したためらいや行間の余韻までもが削ぎ落とされてしまった\"). Maka jawabannya Pilihan 2.",
+      "vocabularyKey": [
+        {
+          "ja": "群を抜く (gun o nuku)",
+          "id": "jauh mengungguli yang lain / luar biasa menonjol"
+        },
+        {
+          "ja": "歯切れが悪い (hagire ga warui)",
+          "id": "bicara agak tertahan / tampak menyisakan ganjalan"
+        },
+        {
+          "ja": "行間の余韻 (gyoukan no yoin)",
+          "id": "gema rasa / nuansa makna tersirat di balik kalimat"
+        },
+        {
+          "ja": "削ぎ落とす (sogiotosu)",
+          "id": "memangkas / mengikis habis"
+        }
+      ],
+      "turnTimestamps": [
+        4.45,
+        22.26,
+        36.08,
+        41.73
+      ],
+      "allTurnTimestamps": [
+        0,
+        4.45,
+        22.26,
+        36.08,
+        41.73,
+        63.01
+      ]
+    },
+    {
+      "id": "jlpt-c2-m3-01",
+      "level": "N1+",
+      "cefr": "C2",
+      "mondai": "mondai_3",
+      "mondaiLabel": "Mondai 3: Utterance Expressions (発話表現)",
+      "title": "Diplomasi Ruang Rapat Direksi Menangguhkan Ekspansi Serentak",
+      "situation": "Penasihat eksternal baru saja mengusulkan pembukaan cabang di tiga negara sekaligus; kepala divisi membisikkan arahan kepada ketua tim perencanaan sebelum ia angkat bicara.",
+      "audioUrl": "",
+      "aiAudioUrl": "./features/speaking-listening/audio-jlpt/jlpt-c2-m3-01.mp3",
+      "audioTrack": "FIEZEL Studio Chōkai N1+ - Mondai 3",
+      "scriptJapanese": "部長：顧問からアジア3か国への同時進出案が出たが、現地の法規制も資金繰りもまだ見通しが甘すぎるな。\n女の人：はい、今すぐ3拠点同時に踏み切るのはリスクが高すぎます。ただ、顧問の顔をつぶすような言い方は避けたいですね。\n部長：うむ。先見性には最大限の敬意を表しつつ、万全を期すためにまずは1拠点での先行検証にとどめる方向へ議論を収れんさせてくれ。",
+      "scriptRomaji": "Buchou: Komon kara Ajia sankakoku e no douji shinshutsuan ga deta ga, genchi no houkisei mo shikinguri mo mada mitooshi ga amasugiru na.\nOnna no hito: Hai, imasugu sankyoten douji ni fumikiru no wa risuku ga takasugimasu. Tada, komon no kao o tsubusu you na iikata wa saketai desu ne.\nBuchou: Umu. Senkensei ni wa saidaigen no keii o hyoushitsu tsu, banzen o kisu tame ni mazu wa ikkyoten de no senkou kenshou ni todomeru houkou e giron o shuuren sasete kure.",
+      "scriptIndonesian": "Kepala Divisi: Penasihat baru saja melontarkan usulan ekspansi serentak ke tiga negara Asia, tetapi perhitungan regulasi lokal maupun arus kasnya masih terlalu optimistis.\nWanita: Benar, Pak, melangkah serentak di tiga lokasi sekarang juga risikonya terlalu tinggi. Hanya saja, kita ingin menghindari cara bicara yang menjatuhkan wibawa beliau.\nKepala Divisi: Ya. Sampaikan penghormatan tertinggi atas visi jauh ke depannya, sembari mengarahkan kesimpulan rapat agar membatasi langkah pada uji coba pendahuluan di satu lokasi terlebih dahulu demi memastikan kesiapan sempurna.",
+      "questionJapanese": "このあと、女の人は役員会の席でどのように発言しますか。",
+      "questionRomaji": "Kono ato, onna no hito wa yakuinkai no seki de dono you ni hatsugen shimasu ka.",
+      "questionIndonesian": "Setelah ini, bagaimana wanita tersebut menyampaikan tanggapannya di hadapan forum rapat direksi?",
+      "options": [
+        {
+          "id": 1,
+          "text": "ご提案は資金面を無視した机上の空論にすぎませんので、1拠点に絞らざるを得ません。",
+          "textId": "Usulan Anda hanyalah teori di atas kertas yang mengabaikan aspek pendanaan, sehingga terpaksa dibatasi satu lokasi.",
+          "whyFails": "Ungkapan '机上の空論にすぎません' bersifat menyerang dan mempermalukan penasihat di depan umum ('顧問の顔をつぶす')."
+        },
+        {
+          "id": 2,
+          "text": "示唆に富むご提言に感謝いたします。直ちに3拠点同時の開設準備に着手いたします。",
+          "textId": "Terima kasih atas saran yang kaya wawasan. Kami segera memulai persiapan pembukaan tiga lokasi sekaligus.",
+          "whyFails": "Menerima bulat-bulat ekspansi serentak tiga negara yang justru dinilai terlalu berisiko oleh kepala divisi."
+        },
+        {
+          "id": 3,
+          "text": "大局的なご示唆に深謝いたします。万全を期すためにも、まずは1拠点での先行検証から着手してはいかがでしょうか。",
+          "textId": "Kami menghaturkan terima kasih mendalam atas arahan strategis berwawasan luas tersebut. Demi memastikan kesiapan paripurna, bagaimana jika kita memulai dari verifikasi awal di satu lokasi terlebih dahulu?"
+        }
+      ],
+      "answerIndex": 2,
+      "explain": "Sesuai arahan kepala divisi untuk menjaga martabat penasihat (\"顔をつぶすような言い方は避けたい\") sekaligus membatasi langkah ke uji coba satu lokasi, Pilihan 3 memadukan keigo tingkat puncak C2 \"大局的なご示唆に深謝いたします\" (penghargaan tulus atas wawasan makro) dengan pengalihan diplomatis yang elegan \"万全を期すためにも、まずは1拠点での先行検証から着手してはいかがでしょうか\".",
+      "vocabularyKey": [
+        {
+          "ja": "顔をつぶす (kao o tsubusu)",
+          "id": "menjatuhkan wibawa / membuat kehilangan muka"
+        },
+        {
+          "ja": "万全を期す (banzen o kisu)",
+          "id": "memastikan kesiapan sempurna tanpa celah"
+        },
+        {
+          "ja": "収れんさせる (shuuren saseru)",
+          "id": "mengerucutkan / memusatkan arah diskusi ke kesimpulan"
+        },
+        {
+          "ja": "深謝する (shinsha suru)",
+          "id": "menyampaikan terima kasih yang sedalam-dalamnya (formal C2)"
+        }
+      ],
+      "turnTimestamps": [
+        4.31,
+        14.97,
+        26.28
+      ],
+      "allTurnTimestamps": [
+        0,
+        4.31,
+        14.97,
+        26.28,
+        41.62
+      ]
+    },
+    {
+      "id": "jlpt-c2-m3-02",
+      "level": "N1+",
+      "cefr": "C2",
+      "mondai": "mondai_3",
+      "mondaiLabel": "Mondai 3: Utterance Expressions (発話表現)",
+      "title": "Sikap Kritis terhadap Transparansi Ekstrem di Dalam Organisasi",
+      "situation": "Dua konsultan manajemen mendiskusikan tren perusahaan yang merekam serta membuka seluruh obrolan rapat penjajakan ke semua karyawan.",
+      "audioUrl": "",
+      "aiAudioUrl": "./features/speaking-listening/audio-jlpt/jlpt-c2-m3-02.mp3",
+      "audioTrack": "FIEZEL Studio Chōkai N1+ - Mondai 3",
+      "scriptJapanese": "男の人：最近、社内のあらゆる会議やチャットを全社員にリアルタイムで公開する「完全透明化」を掲げる企業が増えているよね。密室政治を排するという意味では理想的なんじゃないかな。\n女の人：最終的な意思決定の根拠を開示して説明責任を果たすことは論をまたないわ。ただ、まだ生煮えのたたき台をぶつけ合う段階まで逐一可視化してしまうのはどうかしら。\n男の人：えっ、途中経過も全部見えたほうが風通しがよくなるんじゃないの？\n女の人：逆よ。発言がすべて記録として残るとなれば、誰しも言葉尻をとらえられるのを恐れて萎縮し、当たり障りのない意見に終始してしまうものよ。",
+      "scriptRomaji": "Otoko no hito: Saikin, shanai no arayuru kaigi ya chatto o zenshain ni riarutaimu de koukai suru 'kanzen toumeika' o kakageru kigyou ga fuete iru yo ne. Misshitsu seiji o haisuru to iu imi de wa risouteki nan janai ka na.\nOnna no hito: Saishuuteki na ishi kettei no konkyo o kaiji shite setsumei sekinin o hatasu koto wa ron o matanai wa. Tada, mada namanie no tatakidai o butsukeau dankai made chikuichi kashika shite shimau no wa dou kashira.\nOtoko no hito: E, tochuu keika mo zenbu mieta hou ga kaze-tooshi ga yoku naru n janai no?\nOnna no hito: Gyaku yo. Hatsugen ga subete kiroku to shite nokoru to nareba, dareshimo kotobajiri o toraerareru no o osorete ishuku shi, atarisawari no nai iken ni shuushi shite shimau mono yo.",
+      "scriptIndonesian": "Pria: Belakangan ini makin banyak perusahaan yang mengusung 'transparansi penuh' dengan membuka seluruh rapat dan obrolan internal secara waktu nyata kepada semua karyawan ya. Dalam arti menghapus politik ruang tertutup, bukankah itu ideal?\nWanita: Membuka dasar pengambilan keputusan akhir demi memenuhi akuntabilitas memang sudah tak perlu diperdebatkan lagi. Namun, memperlihatkan satu per satu sampai tahap adu gagasan mentah yang belum matang rasanya perlu dipertanyakan.\nPria: Loh, bukannya suasana organisasi jadi lebih terbuka kalau proses tengahnya pun terlihat semua?\nWanita: Justru sebaliknya. Begitu setiap ucapan terekam permanen, siapa pun akan ciut karena takut dipelintir kata-katanya, lalu berakhir hanya melontarkan komentar aman yang datar-datar saja.",
+      "questionJapanese": "女の人の主張の要旨として最も適切なものはどれですか。",
+      "questionRomaji": "Onna no hito no shuchou no youshi to shite mottomo tekisetsu na mono wa dore desu ka.",
+      "questionIndonesian": "Manakah pernyataan yang paling tepat merangkum inti argumen wanita tersebut?",
+      "options": [
+        {
+          "id": 1,
+          "text": "密室での不正を防ぐには、議論の初期段階から全面公開するほかない",
+          "textId": "Demi mencegah penyelewengan tertutup, tidak ada jalan lain selain membuka diskusi sejak tahap awal",
+          "whyFails": "Ini adalah pandangan pria yang justru dibantah oleh wanita ('逆よ')."
+        },
+        {
+          "id": 2,
+          "text": "説明責任は担保しつつも、率直な議論を促すには一定の非公開の場も不可欠だ",
+          "textId": "Akuntabilitas tetap harus dijaga, namun ruang tertutup tertentu tetap mutlak diperlukan demi mendorong diskusi yang jujur dan berani"
+        },
+        {
+          "id": 3,
+          "text": "社員の萎縮を防ぐため、意思決定後の議事録も含めて公開は控えるべきだ",
+          "textId": "Demi mencegah staf merasa tertekan, risalah setelah keputusan akhir pun sebaiknya tidak dipublikasikan",
+          "whyFails": "Penyimpangan ekstrem: wanita menegaskan akuntabilitas keputusan akhir sudah pasti wajib dibuka ('意思決定の根拠を開示して説明責任を果たすことは論をまたない')."
+        }
+      ],
+      "answerIndex": 1,
+      "explain": "Wanita membedakan secara tajam antara transparansi hasil keputusan akhir yang wajib (\"論をまたない\" = tak terbantahkan) dan keterbukaan ekstrem pada tahap curah gagasan awal (\"生煮えのたたき台\"), yang justru membuat anggota takut salah bicara (\"萎縮し、当たり障りのない意見に終始してしまう\"). Maka intisarinya adalah menyeimbangkan akuntabilitas dengan ruang aman tertutup untuk berdiskusi bebas (Pilihan 2).",
+      "vocabularyKey": [
+        {
+          "ja": "論をまたない (ron o matanai)",
+          "id": "sudah jelas tak perlu diperdebatkan lagi"
+        },
+        {
+          "ja": "たたき台 (tatakidai)",
+          "id": "draf kasar awal sebagai bahan diskusi"
+        },
+        {
+          "ja": "言葉尻をとらえる (kotobajiri o toraeru)",
+          "id": "mencari-cari celah kesalahan ucap seseorang"
+        },
+        {
+          "ja": "当たり障りのない (atarisawari no nai)",
+          "id": "aman / netral tidak menyinggung siapa pun (klise)"
+        }
+      ],
+      "turnTimestamps": [
+        4.35,
+        19.94,
+        39.47,
+        44.24
+      ],
+      "allTurnTimestamps": [
+        0,
+        4.35,
+        19.94,
+        39.47,
+        44.24,
+        60.18
+      ]
+    },
+    {
+      "id": "jlpt-c2-m4-01",
+      "level": "N1+",
+      "cefr": "C2",
+      "mondai": "mondai_4",
+      "mondaiLabel": "Mondai 4: Quick Response (即時応答)",
+      "title": "Merespons Idiom Klasik C2 (二の足を踏む・渡りに船)",
+      "situation": "Profesor gembira menceritakan tawaran kolaborasi riset dari lembaga luar di saat anggaran laboratorium sedang seret.",
+      "audioUrl": "",
+      "aiAudioUrl": "./features/speaking-listening/audio-jlpt/jlpt-c2-m4-01.mp3",
+      "audioTrack": "FIEZEL Studio Chōkai N1+ - Mondai 4",
+      "scriptJapanese": "教授：先方から共同調査の打診があったんだが、予算難で二の足を踏んでいたわれわれにとっては、まさに渡りに船といったところだね。",
+      "scriptRomaji": "Kyouju: Senpou kara kyoudou chousa no dashin ga atta n da ga, yosannan de ni no ashi o funde ita wareware ni totte wa, masani watari ni fune to itta tokoro da ne.",
+      "scriptIndonesian": "Profesor: Ada penjajakan riset bersama dari pihak mereka; bagi kita yang tadinya maju-mundur akibat kesulitan anggaran, ini sungguh bagaikan pucuk dicinta ulam pun tiba ya.",
+      "questionJapanese": "なんと言って応じますか。",
+      "questionRomaji": "Nan to itte oujimasu ka.",
+      "questionIndonesian": "Bagaimanakah cara menanggapi yang tepat?",
+      "options": [
+        {
+          "id": 1,
+          "text": "ええ、願ってもない好機ですので、ぜひ前向きに話を進めたいですね。",
+          "textId": "Betul, Prof, ini kesempatan emas yang tak terduga, jadi mari kita tindak lanjuti secara positif."
+        },
+        {
+          "id": 2,
+          "text": "そうですね、足元を見られかねませんから、今回は丁重にお断りしましょう。",
+          "textId": "Betul, karena kita berisiko dimanfaatkan kelemahannya, kali ini mari kita tolak secara halus.",
+          "whyFails": "Mencampuradukkan idiom '二の足を踏む' (ragu melangkah) dan '渡りに船' (kesempatan tepat waktu yang sangat menguntungkan) dengan '足元を見る' (memanfaatkan kelemahan)."
+        },
+        {
+          "id": 3,
+          "text": "たしかに、船便では調査機材が間に合いませんから、空輸に切り替えましょう。",
+          "textId": "Memang benar, lewat jalur kapal laut peralatan risetnya tidak akan keburu, jadi mari ganti ke kargo udara.",
+          "whyFails": "Jebakan asosiasi harfiah kata '船' (kapal) pada peribahasa '渡りに船', padahal percakapan sama sekali tidak membahas transportasi laut."
+        }
+      ],
+      "answerIndex": 0,
+      "explain": "Dalam bahasa Jepang tingkat C2, \"二の足を踏む\" berarti ragu-ragu melangkah, sedangkan \"渡りに船\" (bagaikan menemukan perahu saat hendak menyeberang = pucuk dicinta ulam tiba) bermakna datangnya peluang ideal tepat ketika dibutuhkan. Respons yang sepadan adalah \"願ってもない好機\" (kesempatan emas yang sangat diharapkan) pada Pilihan 1.",
+      "vocabularyKey": [
+        {
+          "ja": "予算難 (yosannan)",
+          "id": "kesulitan / keterbatasan anggaran"
+        },
+        {
+          "ja": "二の足を踏む (ni no ashi o fumu)",
+          "id": "ragu-ragu / maju-mundur untuk bertindak"
+        },
+        {
+          "ja": "渡りに船 (watari ni fune)",
+          "id": "pucuk dicinta ulam tiba (peluang datang di saat tepat)"
+        },
+        {
+          "ja": "願ってもない好機 (negatte mo nai kouki)",
+          "id": "kesempatan emas yang luar biasa"
+        }
+      ],
+      "turnTimestamps": [
+        4.4
+      ],
+      "allTurnTimestamps": [
+        0,
+        4.4,
+        17.69
+      ]
+    },
+    {
+      "id": "jlpt-c2-m4-02",
+      "level": "N1+",
+      "cefr": "C2",
+      "mondai": "mondai_4",
+      "mondaiLabel": "Mondai 4: Quick Response (即時応答)",
+      "title": "Menanggapi Kerendahan Hati Tingkat Tinggi (買いかぶり・根回し)",
+      "situation": "Rekan senior merendah saat dipuji berhasil menyatukan kesepakatan negosiasi yang pelik.",
+      "audioUrl": "",
+      "aiAudioUrl": "./features/speaking-listening/audio-jlpt/jlpt-c2-m4-02.mp3",
+      "audioTrack": "FIEZEL Studio Chōkai N1+ - Mondai 4",
+      "scriptJapanese": "女の人：今回の交渉がまとまったのを私の手柄みたいにおっしゃいますけど、先方の事情が変わっただけのこと、買いかぶりすぎですわ。",
+      "scriptRomaji": "Onna no hito: Konkai no koushou ga matomatta no o watashi no tegara mitai ni osshaimasu kedo, senpou no jijou ga kawatta dake no koto, kaikaburisugi desu wa.",
+      "scriptIndonesian": "Wanita: Anda berbicara seolah-olah tercapainya kesepakatan negosiasi kali ini adalah jasa saya, padahal semata-mata karena situasi pihak sana saja yang berubah; Anda terlalu menilai saya berlebihan.",
+      "questionJapanese": "なんと言って応じますか。",
+      "questionRomaji": "Nan to itte oujimasu ka.",
+      "questionIndonesian": "Bagaimanakah cara menanggapi yang tepat?",
+      "options": [
+        {
+          "id": 1,
+          "text": "いえいえ、本当に買いすぎて予算をオーバーしてしまいましたね。",
+          "textId": "Tidak kok, kita memang benar-benar kebanyakan membeli sampai melampaui anggaran ya.",
+          "whyFails": "Jebakan kemiripan bunyi kosakata: mengacaukan '買いかぶる' (menilai kemampuan seseorang terlalu tinggi) dengan '買いすぎる' (terlalu banyak berbelanja)."
+        },
+        {
+          "id": 2,
+          "text": "そうですね、次回からは手違いのないようもっと反省していただきます。",
+          "textId": "Betul, mulai lain kali kami minta Anda lebih merenungkan kesalahan agar tidak keliru lagi.",
+          "whyFails": "Gagal menangkap etiket merendah (謙遜) dalam budaya Jepang, sehingga justru menegur lawan bicara seolah-olah ia mengakui kegagalan."
+        },
+        {
+          "id": 3,
+          "text": "いや、ご謙遜を。事前の根回しが行き届いていたからこそ、好機を逃さずまとめられたんですよ。",
+          "textId": "Ah, Anda terlalu merendah. Justru karena pendekatan awal Anda yang begitu matanglah kesepakatan ini berhasil diraih tanpa melewatkan momentum."
+        }
+      ],
+      "answerIndex": 2,
+      "explain": "Catatan: perhatikan kosakata C2 \"買いかぶりすぎ\" (dari \"買いかぶる\" = menaksir kemampuan seseorang terlalu tinggi), yang dipakai secara anggun untuk merendahkan diri atas suatu keberhasilan (\"手柄\" = jasa/prestasi). Respons sosial yang paling dewasa dan elegan adalah menepis kerendahan hati tersebut (\"いや、ご謙遜を\") sambil mengapresiasi persiapan lobi di balik layar (\"事前の根回しが行き届いていたからこそ\") pada Pilihan 3.",
+      "vocabularyKey": [
+        {
+          "ja": "手柄 (tegara)",
+          "id": "jasa / capaian prestasi membanggakan"
+        },
+        {
+          "ja": "買いかぶる (kaikaburu)",
+          "id": "menilai / menaksir kemampuan terlalu tinggi"
+        },
+        {
+          "ja": "ご謙遜 (gokenson)",
+          "id": "sikap merendahkan diri (hormat)"
+        },
+        {
+          "ja": "根回し (nemawashi)",
+          "id": "pendekatan / lobi informal sebelum keputusan resmi"
+        }
+      ],
+      "turnTimestamps": [
+        3.75
+      ],
+      "allTurnTimestamps": [
+        0,
+        3.75,
+        15.28
+      ]
     }
   ]
 }

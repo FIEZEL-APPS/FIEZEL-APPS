@@ -1,7 +1,7 @@
 {
   "schema": "fiezel-japanese-family-graph-v1",
   "target": "ja",
-  "catatan": "Graf prasyarat keluarga A1, disuntikkan ke Core Brain lewat setFamilyGraph saat bahasa target = ja. Graf Inggris tetap bawaan dan tidak tersentuh. m025-312: ditambah 14 keluarga A2/N4; prasyaratnya menunjuk keluarga A1/N5 supaya diagnosis akar masalah turun ke lapis yang benar, bukan berhenti di keluarga N4.",
+  "catatan": "Graf prasyarat keluarga tata bahasa Jepang 6 tingkat penuh (A1/N5 s/d C2/N1+, 50 keluarga), disuntikkan ke Core Brain lewat setFamilyGraph saat bahasa target = ja. Graf Inggris tetap bawaan dan tidak tersentuh. Setiap keluarga tingkat lanjut menunjuk prasyarat di lapis bawahnya sehingga diagnosis akar masalah Braincore menelusuri sampai ke fondasi yang sebenarnya.",
   "families": {
     "particles": [],
     "demonstratives": [],
@@ -94,6 +94,103 @@
     ],
     "experience_frequency": [
       "plain_forms"
+    ],
+    "aspect_phase": [
+      "te_form_extensions",
+      "verb_groups"
+    ],
+    "hearsay_appearance": [
+      "plain_forms",
+      "adjectives",
+      "quotation_thought"
+    ],
+    "causative_passive": [
+      "passive_causative",
+      "giving_receiving"
+    ],
+    "concession_contrast": [
+      "reason_concession",
+      "plain_forms"
+    ],
+    "formal_conjunctions": [
+      "particles",
+      "plain_forms",
+      "reason_concession"
+    ],
+    "spoken_contractions": [
+      "te_form_extensions",
+      "obligation_permission",
+      "quotation_thought"
+    ],
+    "extent_proportion": [
+      "comparison",
+      "conditionals"
+    ],
+    "contextual_framing": [
+      "plain_forms",
+      "volitional_intent",
+      "reason_concession"
+    ],
+    "scope_limit_addition": [
+      "formal_conjunctions",
+      "extent_proportion"
+    ],
+    "inevitability_compulsion": [
+      "contextual_framing",
+      "obligation_permission"
+    ],
+    "temporal_immediacy": [
+      "time_expressions",
+      "aspect_phase",
+      "formal_conjunctions"
+    ],
+    "standpoint_evaluation": [
+      "formal_conjunctions",
+      "hearsay_appearance"
+    ],
+    "counterfactual_regret": [
+      "conditionals",
+      "concession_contrast"
+    ],
+    "advanced_keigo_business": [
+      "keigo",
+      "giving_receiving",
+      "potential"
+    ],
+    "literary_negation_classical": [
+      "inevitability_compulsion",
+      "negation_past"
+    ],
+    "emphatic_concession": [
+      "concession_contrast",
+      "counterfactual_regret"
+    ],
+    "immediate_succession_formal": [
+      "temporal_immediacy"
+    ],
+    "status_role_worthiness": [
+      "standpoint_evaluation",
+      "advanced_keigo_business"
+    ],
+    "extreme_correlation": [
+      "scope_limit_addition",
+      "causative_passive"
+    ],
+    "academic_rhetoric_register": [
+      "standpoint_evaluation",
+      "status_role_worthiness"
+    ],
+    "classical_residual_idioms": [
+      "literary_negation_classical",
+      "extreme_correlation"
+    ],
+    "pragmatic_nuance_irony": [
+      "emphatic_concession",
+      "hearsay_appearance"
+    ],
+    "executive_diplomatic_keigo": [
+      "advanced_keigo_business",
+      "status_role_worthiness"
     ]
   }
 }

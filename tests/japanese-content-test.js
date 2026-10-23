@@ -49,7 +49,7 @@ function test(name, fn) {
 const JP_SCRIPT = /[぀-ヿ㐀-䶿一-鿿]/;
 const ASCII_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const CEFR = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
-const JLPT = ['N5', 'N4', 'N3', 'N2', 'N1'];
+const JLPT = ['N5', 'N4', 'N3', 'N2', 'N1', 'N1+'];
 
 const WAJIB_BUTIR = [
   'id', 'family', 'skill', 'subskill', 'cefr', 'jlpt', 'marker', 'questionType',
@@ -298,8 +298,11 @@ test('kepala bank tidak berbohong tentang isinya (jumlah, keluarga, cefr, jlpt)'
        tingkat yang disebutnya harus benar-benar ada di banknya. */
     if (typeof d.catatan === 'string') {
       const nyataJlpt = new Set(isi.map((t) => t.jlpt).filter(Boolean));
-      ['N5', 'N4', 'N3', 'N2', 'N1'].forEach((lv) => {
-        const disebut = new RegExp('(^|[^A-Za-z0-9])' + lv + '([^0-9]|$)').test(d.catatan);
+      ['N5', 'N4', 'N3', 'N2', 'N1', 'N1+'].forEach((lv) => {
+        const pola = lv === 'N1+'
+          ? /(^|[^A-Za-z0-9])N1\+([^0-9]|$)/
+          : new RegExp('(^|[^A-Za-z0-9])' + lv + '([^0-9+]|$)');
+        const disebut = pola.test(d.catatan);
         if (disebut && !nyataJlpt.has(lv)) {
           salah.push(b.berkas + ': catatan menyebut ' + lv + ' padahal tidak ada butirnya');
         }

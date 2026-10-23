@@ -82,20 +82,20 @@ const berisi = (s) => typeof s === 'string' && s.trim().length > 0;
  */
 const SENSUS = new Map([
   ['vocabulary-master-ja.json', {
-    sejak: '2026-09-14', medan: 5652, berTh: 0,
-    catatan: 'arti + terjemahan kalimat contoh, 1.884 entri N5-N1',
+    sejak: '2026-10-24', medan: 5952, berTh: 0,
+    catatan: 'arti + terjemahan kalimat contoh, 1.984 entri N5-N1+ (A1-C2)',
   }],
   ['grammar-templates-ja.json', {
-    sejak: '2026-09-14', medan: 5908, berTh: 0,
-    catatan: 'tujuan, miskonsepsi, penalaran, penjelasan, dan sebab-gagal pengecoh; 422 butir N5+N4',
+    sejak: '2026-10-24', medan: 9772, berTh: 0,
+    catatan: 'tujuan, miskonsepsi, penalaran, penjelasan, dan sebab-gagal pengecoh; 698 butir N5-N1+ (A1-C2)',
   }],
   ['reading-bank-ja.json', {
-    sejak: '2026-09-14', medan: 3750, berTh: 0,
-    catatan: 'pertanyaan + pilihan jawaban, 150 bacaan',
+    sejak: '2026-10-24', medan: 4500, berTh: 0,
+    catatan: 'pertanyaan + pilihan jawaban, 180 bacaan N5-N1+ (A1-C2)',
   }],
   ['writing-prompts-ja.json', {
-    sejak: '2026-09-14', medan: 54, berTh: 0,
-    catatan: 'petunjuk Indonesia tiap prompt, 54 prompt N5+N4',
+    sejak: '2026-10-24', medan: 100, berTh: 0,
+    catatan: 'petunjuk Indonesia tiap prompt, 100 prompt N5-N1+ (A1-C2)',
   }],
   /* Masuk sensus, BUKAN TANPA_TEKS_MURID — dan itu keputusan berdasar bukti, bukan selera.
    * Saudara kandungnya dalam bahasa Inggris, `misconception-taxonomy-v1.json`, punya bentuk
@@ -106,8 +106,8 @@ const SENSUS = new Map([
    * "naskah murid". Bank Jepang-nya belum dirujuk satu baris kode pun hari ini, tetapi
    * utangnya dicatat SEKARANG supaya ia tidak menyelinap masuk saat nanti dirujuk. */
   ['japanese-misconception-taxonomy.json', {
-    sejak: '2026-09-20', medan: 18, berTh: 0,
-    catatan: 'label + description_id untuk 9 kode miskonsepsi partikel/kata kerja N5-N4; belum dirujuk kode mana pun, sidecar Thai belum ada',
+    sejak: '2026-10-24', medan: 48, berTh: 0,
+    catatan: 'label + description_id untuk 24 kode miskonsepsi N5-N1+; belum dirujuk kode mana pun, sidecar Thai belum ada',
   }],
 ]);
 

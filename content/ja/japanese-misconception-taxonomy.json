@@ -1,7 +1,7 @@
 {
   "schema": "fiezel-japanese-misconception-taxonomy-v1",
   "target": "ja",
-  "catatan": "Taksonomi miskonsepsi distraktor kanonik untuk kurikulum tata bahasa Jepang (JLPT N5-N4). Menyatukan diagnosis kesalahan partikel, bentuk kata kerja, dan kata sifat ke kode bernilai diagnostik.",
+  "catatan": "Taksonomi miskonsepsi distraktor kanonik untuk kurikulum tata bahasa Jepang penuh (JLPT N5, N4, N3, N2, N1, dan N1+). Menyatukan diagnosis kesalahan partikel, bentuk kata kerja, kata sifat, register wacana formal, dan tata bahasa klasik/akademik ke kode bernilai diagnostik.",
   "codes": {
     "particles.wa_for_new_info": {
       "label": "Partikel は dipakai untuk informasi yang baru",
@@ -47,6 +47,81 @@
       "label": "Infleksi kata sifat i dan na tertukar",
       "familyHint": "adjectives",
       "description_id": "Menempelkan na pada i-adjective atau membuang i dari i-adjective sebelum kata benda, atau negasi ku-nai vs dewa-arimasen tertukar."
+    },
+    "aspect_phase.hajimeru_vs_dasu_volition": {
+      "label": "Tertukar 〜はじめる (mulai bertahap/disengaja) dengan 〜だす (meledak mendadak)",
+      "familyHint": "aspect_phase",
+      "description_id": "Murid memakai 〜だす untuk kebiasaan terencana atau memakai perintah sesudah 〜だす yang bermakna kemunculan tiba-tiba."
+    },
+    "hearsay_appearance.souda_hearsay_vs_appearance": {
+      "label": "Bentuk sambungan 〜そうだ kabar burung (bentuk biasa) tertukar dengan 〜そうだ tampak (akar masu/adj)",
+      "familyHint": "hearsay_appearance",
+      "description_id": "Murid membuang い/だ saat menyampaikan kabar burung (伝聞), atau mempertahankan い/だ saat menyatakan perkiraan visual (様態)."
+    },
+    "causative_passive.morphology_godan_ichidan": {
+      "label": "Kekeliruan morfologi kausatif-pasif (〜せられる vs 〜させられる) dan partikel pelaku に",
+      "familyHint": "causative_passive",
+      "description_id": "Murid memakai bentuk pendek 〜される pada kata kerja Ichidan/berakhiran -su, atau menukar peran pemberi perintah (に) dengan objek."
+    },
+    "concession_contrast.noni_with_command_or_question": {
+      "label": "Pola keluhan faktual 〜のに dipasangkan dengan perintah atau ajakan di klausa utama",
+      "familyHint": "concession_contrast",
+      "description_id": "Murid menggunakan 〜のに di depan kalimat perintah/permohonan, padahal 〜のに menuntut fakta nyata yang bertentangan dengan harapan."
+    },
+    "spoken_contractions.toku_chau_mapping": {
+      "label": "Salah memetakan kontraksi lisan (〜ちゃう＝〜てしまう, 〜とく＝〜ておく, 〜なきゃ＝〜なければならない)",
+      "familyHint": "spoken_contractions",
+      "description_id": "Murid mencampuradukkan makna persiapan terlebih dahulu (〜とく) dengan ketidaksengajaan/penyesalan (〜ちゃう／〜じゃう)."
+    },
+    "inevitability_compulsion.zaru_o_enai_attachment": {
+      "label": "Kekeliruan sambungan 〜ざるを得ない (wajib akar V-ない tanpa ない; する → せざるを得ない)",
+      "familyHint": "inevitability_compulsion",
+      "description_id": "Murid menempelkan 〜ざるを得ない pada bentuk kamus atau membiarkan する menjadi しざるを得ない alih-alih bentuk baku せざるを得ない."
+    },
+    "temporal_immediacy.totanni_vs_shidai_volition": {
+      "label": "Tertukar 〜とたんに (V-た + kejadian mendadak lampau) dengan 〜次第 (akar masu + rencana masa depan)",
+      "familyHint": "temporal_immediacy",
+      "description_id": "Murid memakai 〜とたんに untuk rencana/perintah masa depan, atau memakai 〜次第 untuk kejadian kebetulan yang sudah terjadi di masa lampau."
+    },
+    "advanced_keigo_business.sonkeigo_kenjougo_inversion": {
+      "label": "Terbalik arah Sonkeigo dan Kenjougo bisnis (伺う/拝見する/存じております vs いらっしゃる/ご覧になる/ご存じです)",
+      "familyHint": "advanced_keigo_business",
+      "description_id": "Murid memakai bentuk peninggi (Sonkeigo) untuk tindakan diri sendiri/atasan internal (ウチ), atau memakai keigo ganda seperti おっしゃられる."
+    },
+    "literary_negation_classical.zaruo_bekumonai_confusion": {
+      "label": "Tertukar keterpaksaan klasik (〜ざるを得ない／〜ずにはおかない) dengan kemustahilan total (〜べくもない)",
+      "familyHint": "literary_negation_classical",
+      "description_id": "Murid memakai 〜べくもない (mustahil dilakukan) atau 〜べからず (larangan tertulis) saat menyatakan tindakan yang niscaya atau terpaksa dilakukan."
+    },
+    "emphatic_concession.toiedomo_causal_confusion": {
+      "label": "Tertukar konsesi ekstrem (〜といえども／〜であれ) dengan penegas alasan khusus (〜ばこそ)",
+      "familyHint": "emphatic_concession",
+      "description_id": "Murid mencampuradukkan konsesi tanpa pengecualian (〜といえども = sekalipun) dengan penekanan alasan eksklusif (〜ばこそ = justru karena)."
+    },
+    "immediate_succession_formal.gahaika_sobakara_confusion": {
+      "label": "Tertukar suksesi seketika satu kejadian (〜が早いか／〜や否や) dengan pengulangan sia-sia (〜そばから)",
+      "familyHint": "immediate_succession_formal",
+      "description_id": "Murid memakai 〜そばから untuk peristiwa tunggal yang terjadi seketika, atau memakai perintah/kehendak di klausa utama sesudah 〜や否や."
+    },
+    "status_role_worthiness.tarumono_nitaru_confusion": {
+      "label": "Tertukar kewajiban penyandang kedudukan (N + たるもの) dengan kelayakan objek (V-kamus + に足る)",
+      "familyHint": "status_role_worthiness",
+      "description_id": "Murid memakai 〜たるもの pada posisi umum yang bukan kedudukan terhormat, atau mencampur 〜に足る dengan 〜ならではの."
+    },
+    "academic_rhetoric_register.nihokanaranai_bekushite_confusion": {
+      "label": "Tertukar identifikasi esensi (〜にほかならない) dengan keniscayaan logis verba berulang (V1-べくしてV2)",
+      "familyHint": "academic_rhetoric_register",
+      "description_id": "Murid mencampuradukkan penegasan esensi (〜にほかならない = tiada lain adalah) dengan keniscayaan logis (〜べくして) atau cakupan (〜にとどまらず)."
+    },
+    "classical_residual_idioms.ngatame_nbakari_confusion": {
+      "label": "Tertukar tujuan tekad klasik (〜んがために) dengan kemiripan metaforis ekstrem (〜んばかりに)",
+      "familyHint": "classical_residual_idioms",
+      "description_id": "Murid memakai 〜んばかりに (seolah hampir akan) untuk tujuan sadar (〜んがために), atau salah mengubah する menjadi *しん alih-alih せん."
+    },
+    "executive_diplomatic_keigo.kouhai_sashuu_confusion": {
+      "label": "Tertukar kosakata epistolari keigo eksekutif (ご高配, ご査収, 拝眉の上, 不徳の致すところ, 光栄の至り)",
+      "familyHint": "executive_diplomatic_keigo",
+      "description_id": "Murid mencampuradukkan ご高配 (dukungan mitra) dengan ご査収 (memeriksa lampiran), atau memakai 光栄の至り saat meminta maaf atas kesalahan."
     }
   }
 }

@@ -800,8 +800,8 @@ html.fz-booting body{overflow:hidden}
     <div class="fz-stage-drawer-panel" id="fzStageDrawerMount"></div>
   </div>
 
-  <!-- PANEL BANK SOAL LISTENING JLPT (N5 & N4) -->
-  <div class="listening-modal" id="listeningPanelModal" onclick="if(event.target===this)closeListeningPanel()" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Bank Soal Listening JLPT N5 dan N4" data-i18n-aria-label="jlpt.modal-aria">
+  <!-- PANEL BANK SOAL LISTENING JLPT (N5–N1+) -->
+  <div class="listening-modal" id="listeningPanelModal" onclick="if(event.target===this)closeListeningPanel()" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Bank Soal Listening JLPT N5 sampai N1+" data-i18n-aria-label="jlpt.modal-aria">
     <div class="listening-modal-box">
       <!-- Sleek Minimalist Topbar (Like Quiz Stage) -->
       <div class="listening-topbar">
@@ -859,7 +859,11 @@ html.fz-booting body{overflow:hidden}
             <span class="jlpt-filter-group-label" data-i18n="jlpt.choose-level">Pilih Tingkat JLPT</span>
             <div class="jlpt-level-tabs">
               <button type="button" class="jlpt-lvl-btn active" id="btnLvlN5" onclick="setListeningLevel('N5');closeJlptFilterModal()" data-i18n="jlpt.lvl-n5">⭐ JLPT N5 (Dasar)</button>
-              <button type="button" class="jlpt-lvl-btn" id="btnLvlN4" onclick="setListeningLevel('N4');closeJlptFilterModal()" data-i18n="jlpt.lvl-n4">🌟 JLPT N4 (Menengah)</button>
+              <button type="button" class="jlpt-lvl-btn" id="btnLvlN4" onclick="setListeningLevel('N4');closeJlptFilterModal()" data-i18n="jlpt.lvl-n4">🌟 JLPT N4 (Menengah Awal)</button>
+              <button type="button" class="jlpt-lvl-btn" id="btnLvlN3" onclick="setListeningLevel('N3');closeJlptFilterModal()" data-i18n="jlpt.lvl-n3">🔷 JLPT N3 (Menengah)</button>
+              <button type="button" class="jlpt-lvl-btn" id="btnLvlN2" onclick="setListeningLevel('N2');closeJlptFilterModal()" data-i18n="jlpt.lvl-n2">🔶 JLPT N2 (Menengah Atas)</button>
+              <button type="button" class="jlpt-lvl-btn" id="btnLvlN1" onclick="setListeningLevel('N1');closeJlptFilterModal()" data-i18n="jlpt.lvl-n1">👑 JLPT N1 (Mahir)</button>
+              <button type="button" class="jlpt-lvl-btn" id="btnLvlN1Plus" onclick="setListeningLevel('N1+');closeJlptFilterModal()" data-i18n="jlpt.lvl-c2">🏯 Jōkyū N1+ (Akademik)</button>
             </div>
 
             <!-- Mondai Category Scroll -->
