@@ -186,15 +186,12 @@ sandbox.self = sandbox;
 
 // Load upgrade modules
 const upgradeSrc = fs.readFileSync(path.join(root, 'features', 'grammar', 'fiezel-grammar-upgrade.js'), 'utf8');
-const videoSrc = fs.readFileSync(path.join(root, 'features', 'grammar', 'fiezel-grammar-video.js'), 'utf8');
 const cssSrc = fs.readFileSync(path.join(root, 'features', 'grammar', 'grammar-upgrade.css'), 'utf8');
 
 vm.createContext(sandbox);
 vm.runInContext(upgradeSrc, sandbox);
-vm.runInContext(videoSrc, sandbox);
 
 const Upgrade = sandbox.FiezelGrammarUpgrade;
-const Video = sandbox.FiezelGrammarVideo;
 
 console.log('--- TEST 1: Syntax Highlighting Classification ---');
 assert.strictEqual(Upgrade.classifyWord('I'), 'subj', 'I must be classified as subj');
@@ -330,121 +327,14 @@ Upgrade.showGrammarHint(qGrammar, anchor);
 assert.strictEqual(fakeDoc.getElementById('grammarHintPopover'), null, 'Popover must be dismissed on wrap/close');
 console.log('✓ Test 5 passed: 4-level progressive disclosure hint popover functioning.');
 
-console.log('--- TEST 6: Video-First Grammar Player & Cloze ---');
-const sampleTemplate = {
-  id: 'vg-a1-test',
-  level: 'A1',
-  skill: 'present_simple',
-  videoUrl: '',
-  subtitles: [
-    { start: 0, end: 2, text: 'Hello there.', speaker: 'Alice' },
-    { start: 2, end: 4, text: 'Nice to meet you.', speaker: 'Bob' }
-  ],
-  exercise: {
-    question: 'Lengkapi kalimat:',
-    options: ['am', 'is'],
-    answerIndex: 0,
-    grammarPoint: 'Present Simple'
-  }
-};
-const vq = Video.createVideoGrammarQuestion(sampleTemplate);
-assert.strictEqual(vq.id, 'vg-a1-test', 'Question must retain id');
-assert.strictEqual(vq.level, 'A1', 'Question must retain level');
-
-// Call renderVideoPlayer without state (verifying crash fix)
-const playerEl = Video.renderVideoPlayer(vq.videoConfig);
-assert(playerEl, 'renderVideoPlayer must return element without crashing when state is undefined');
-assert(playerEl.innerHTML.includes('Alice'), 'Fallback card must display dialogue subtitles');
-assert(playerEl.innerHTML.includes('Bob'), 'Fallback card must display dialogue subtitles');
-
-// Test clozeText stem integration
-const clozeTemplate = {
-  id: 'vg-cloze-test',
-  level: 'A2',
-  exercise: {
-    question: 'Complete the subtitle:',
-    clozeText: 'I usually ___ coffee in the morning.',
-    options: ['drink', 'drank'],
-    answerIndex: 0
-  }
-};
-const vqCloze = Video.createVideoGrammarQuestion(clozeTemplate);
-assert(vqCloze.question.includes('I usually ___ coffee in the morning.'), 'Question stem must include clozeText');
-
-// Edge cases: null/undefined safety
-const emptyQ = Video.createVideoGrammarQuestion(null);
-assert(emptyQ && emptyQ.type === 'video-grammar', 'createVideoGrammarQuestion must handle null template');
-const emptyPlayer = Video.renderVideoPlayer(null);
-assert(emptyPlayer && emptyPlayer.classList.contains('is-fallback'), 'renderVideoPlayer must handle null config');
-const emptyCloze = Video.renderSubtitleCloze(null, () => {});
-assert(emptyCloze && emptyCloze.classList.contains('video-overlay-pane'), 'renderSubtitleCloze must handle null config');
-const emptyChoice = Video.renderGrammarChoiceOverlay(null, () => {});
-assert(emptyChoice && emptyChoice.classList.contains('video-overlay-pane'), 'renderGrammarChoiceOverlay must handle null exercise');
-const emptyExercise = Video.renderVideoExercise(null, null);
-assert(emptyExercise && emptyExercise.classList.contains('video-exercise-wrap'), 'renderVideoExercise must handle null args');
-
-// Verify bank integrity in video-grammar-bank-v1.json
-const bankData = JSON.parse(fs.readFileSync(path.join(root, 'content', 'video-grammar-bank-v1.json'), 'utf8'));
-assert(Array.isArray(bankData.videoGrammarBank) && bankData.videoGrammarBank.length >= 15, 'Bank must contain at least 15 exercises');
-const answerIndicesFound = new Set();
-bankData.videoGrammarBank.forEach(item => {
-  // Enforce zero mascot motion clips (strict AGENTS.md compliance)
-  if (item.videoUrl) {
-    assert(!item.videoUrl.includes('assets/motion'), `${item.id} must not link unapproved mascot motion`);
-    const cleanPath = item.videoUrl.replace(/^\.\//, '');
-    assert(fs.existsSync(path.join(root, cleanPath)), `${item.id} videoUrl file must exist at ${cleanPath}`);
-  }
-  if (item.posterUrl) {
-    assert(!item.posterUrl.includes('assets/motion'), `${item.id} posterUrl must not link mascot motion`);
-    const cleanPoster = item.posterUrl.replace(/^\.\//, '');
-    assert(fs.existsSync(path.join(root, cleanPoster)), `${item.id} posterUrl file must exist at ${cleanPoster}`);
-  }
-  const ans = item.exercise.options[item.exercise.answerIndex];
-  assert.strictEqual(ans, item.exercise.clozeAnswer, `${item.id} options[answerIndex] must match clozeAnswer`);
-  answerIndicesFound.add(item.exercise.answerIndex);
-});
-// Verify multi-checkpoint sequential configuration (1 video 5 questions)
-const multiCpConfig = {
-  id: 'vg-multi-test',
-  videoUrl: 'test.mp4',
-  checkpoints: [
-    { id: 'cp-1', pauseAt: 3.2, exercise: { clozeText: 'She ___ happy.', options: ['is', 'are'], answerIndex: 0 } },
-    { id: 'cp-2', pauseAt: 10.0, exercise: { clozeText: 'They ___ ready.', options: ['are', 'is'], answerIndex: 0 } },
-    { id: 'cp-3', pauseAt: 18.0, exercise: { clozeText: 'I ___ there.', options: ['was', 'were'], answerIndex: 0 } },
-    { id: 'cp-4', pauseAt: 25.0, exercise: { clozeText: 'We ___ done.', options: ['are', 'is'], answerIndex: 0 } },
-    { id: 'cp-5', pauseAt: 35.0, exercise: { clozeText: 'He ___ gone.', options: ['has', 'have'], answerIndex: 0 } }
-  ],
-  attribution: {
-    source: 'Educational Source Test',
-    url: 'https://youtube.com/test'
-  }
-};
-const multiExerciseEl = Video.renderVideoExercise(multiCpConfig, {});
-assert(multiExerciseEl.querySelector('.video-checkpoints-rail'), 'Must render video checkpoints rail for multi-checkpoint config');
-const indicators = multiExerciseEl.querySelectorAll('.cp-indicator');
-assert.strictEqual(indicators.length, 5, 'Must render exactly 5 checkpoint indicators');
-assert(indicators[0].classList.contains('active'), 'First checkpoint indicator must be active');
-assert(multiExerciseEl.querySelector('.video-attribution-bar'), 'Must render video attribution bar when attribution is configured');
-
-const expandedQuestions = Video.expandCheckpointsToQuestions(multiCpConfig);
-assert.strictEqual(expandedQuestions.length, 5, 'expandCheckpointsToQuestions must return 5 sequential questions');
-assert.strictEqual(expandedQuestions[0].id, 'vg-multi-test-cp1', 'First question id must match checkpoint');
-assert.strictEqual(expandedQuestions[0].videoConfig.startTime, 0, 'First question startTime must be 0');
-assert.strictEqual(expandedQuestions[1].videoConfig.startTime, 3.2, 'Second question startTime must be 3.2');
-assert.strictEqual(expandedQuestions[1].videoConfig.checkpointIndex, 1, 'Second question checkpointIndex must be 1');
-assert.strictEqual(expandedQuestions[4].id, 'vg-multi-test-cp5', 'Fifth question id must match checkpoint');
-assert.strictEqual(expandedQuestions[4].videoConfig.pauseAt, 35.0, 'Fifth question pauseAt must be 35.0');
-assert.strictEqual(expandedQuestions[4].videoConfig.startTime, 25.0, 'Fifth question startTime must be 25.0');
-assert.strictEqual(expandedQuestions[4].videoConfig.checkpointIndex, 4, 'Fifth question checkpointIndex must be 4');
-assert.strictEqual(expandedQuestions[4].videoConfig.totalCheckpoints, 5, 'Fifth question totalCheckpoints must be 5');
-
-// Test renderVideoPlayer with question 2 config
-const testState = {};
-Video.renderVideoPlayer(expandedQuestions[1].videoConfig, testState);
-assert.strictEqual(testState.currentCheckpointIndex, 1, 'renderVideoPlayer must set currentCheckpointIndex to 1');
-assert.strictEqual(testState.checkpoints[0].completed, true, 'Checkpoints before active index must be marked completed');
-
-console.log('✓ Test 6 passed: Video grammar question creation, cloze stem, empty-input safety, multi-checkpoint 5-question support, and bank integrity verified.');
+console.log('--- TEST 6: Video Grammar Decommissioning Verification ---');
+const appSrcCheck = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
+assert(!appSrcCheck.includes('getOrMakeVideoGrammarQuestion'), 'app.js must not contain getOrMakeVideoGrammarQuestion');
+assert(!appSrcCheck.includes('startVideoGrammarSession'), 'app.js must not contain startVideoGrammarSession');
+assert(!appSrcCheck.includes('videoSlots'), 'app.js must not contain videoSlots');
+assert(!appSrcCheck.includes('vgBankRaw'), 'app.js must not load vgBankRaw');
+assert(!appSrcCheck.includes('self.__videoGrammarBankCache'), 'app.js must not cache video grammar bank');
+console.log('✓ Test 6 passed: Video grammar question creation and video sessions fully decommissioned.');
 
 console.log('--- TEST 7: 4-Tier Mastery Indicator ---');
 assert.strictEqual(Upgrade.getMasteryTier('test', 20), 1, 'Mastery 20% -> Tier 1');
@@ -474,11 +364,11 @@ sandbox.state.mistakeVault = {};
 sandbox.state.history = [];
 assert.strictEqual(Upgrade.renderVaultCard(), '', 'Empty vault must return empty string to prevent panel clutter');
 
-// Verify weaveGrammarSessionVariety weaves both token-order and video-grammar slots
+// Verify weaveGrammarSessionVariety weaves token-order slots and no video slots exist
 assert(appSrc.includes('const tokenSlots=count>=15?[3,10,16]'), 'app.js must reserve token slots in 20-question session');
-assert(appSrc.includes('const videoSlots=count>=15?[6,13,18]'), 'app.js must reserve video slots in 20-question session');
-assert(appSrc.includes('vgBankRaw'), 'app.js must bind vgBankRaw in data loader');
-assert(appSrc.includes('self.__videoGrammarBankCache=vgBankRaw.videoGrammarBank'), 'app.js must populate video cache');
+assert(!appSrc.includes('videoSlots'), 'app.js must not reserve video slots in 20-question session');
+assert(!appSrc.includes('vgBankRaw'), 'app.js must not bind vgBankRaw in data loader');
+assert(!appSrc.includes('__videoGrammarBankCache'), 'app.js must not populate video cache');
 console.log('✓ Test 9 passed: Unified 20-question session weaving and uncluttered panel confirmed.');
 
 console.log('\n========================================');

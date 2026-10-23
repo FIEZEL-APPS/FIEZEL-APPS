@@ -1,7 +1,7 @@
 {
-  "version": "m025-632",
-  "claimedBy": "branch fix/mitra-kaiwa-baseline-sync-m025-632",
-  "claimedAt": "2026-10-23T18:09:08.574Z",
-  "reason": "fix(ci): selaraskan id-golden-baseline untuk bundle voice-studio m025-632",
+  "version": "m025-633",
+  "claimedBy": "branch fix/remove-video-grammar",
+  "claimedAt": "2026-10-23T18:33:03.125Z",
+  "reason": "refactor(grammar): eliminasi total kode soal video grammar dan video lab",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

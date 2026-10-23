@@ -13,7 +13,7 @@
  * P4  Diagnosis urutan tidak lagi menempel aturan tense/HTML.
  * P5  Murid Thai tidak menerima soal susun kata berbahasa Indonesia.
  * P6  Mode "bandingkan" tidak lagi beralasan "cuma kunci yang cocok".
- * P7  Soal percakapan (video-grammar cadangan) membawa alasan per pilihan + sourceId.
+ * P7  Decommissioning video-grammar dan slot video dari sesi grammar.
  * P8  Petunjuk tingkat 1 memakai langkah penalaran template, bukan "subjek & penanda waktu".
  * D*  Data: alasan bank yang diperbaiki, templat reading "tidak ada di teks".
  */
@@ -223,11 +223,10 @@ test('P6 mode bandingkan: alasan nyata, bukan "cuma kunci yang cocok" (id + th)'
   }
 });
 
-test('P7 soal percakapan cadangan membawa alasan per pilihan dan sourceId', () => {
-  const fb = slice('  if(fallbackItem){\n    const meta=GRAMMAR_ITEMS.find', 'function weaveGrammarSessionVariety(');
-  assert.match(fb, /sourceId:String\(fallbackItem\[8\]\|\|''\)/);
-  assert.match(fb, /distractors:vgDistractors/);
-  assert.match(fb, /grammarOptionReason\(String\(o\),false/);
+test('P7 video-grammar dan modulnya telah dihapus total dari sesi grammar', () => {
+  assert.ok(!app.includes('getOrMakeVideoGrammarQuestion'), 'getOrMakeVideoGrammarQuestion tidak boleh ada di app.js');
+  assert.ok(!app.includes('videoSlots'), 'videoSlots tidak boleh ada di app.js');
+  assert.ok(!app.includes('vgDistractors'), 'vgDistractors tidak boleh ada di app.js');
 });
 
 test('P8 petunjuk tingkat 1 memakai langkah penalaran template (clue)', () => {

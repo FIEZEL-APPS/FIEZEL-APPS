@@ -56,7 +56,7 @@ const LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
 // P-A — mode ukur tanpa bantuan
 // ---------------------------------------------------------------------------------------
 check('P-A hint button is never rendered under MEASURE or noHints',
-  /\$\{\(!MEASURE&&!cfg\.noHints&&\(q\.type==='grammar'\|\|q\.type==='token-order'\|\|q\.type==='video-grammar'\|\|q\.explain\?\.rule\)\)\?`<button id="quizGrammarHint"/.test(app),
+  /\$\{\(!MEASURE&&!cfg\.noHints&&\(q\.type==='grammar'\|\|q\.type==='token-order'\\|\|q\.explain\?\.rule\)\)\?`<button id="quizGrammarHint"/.test(app),
   'tombol #quizGrammarHint harus bersyarat !MEASURE&&!cfg.noHints');
 check('P-A token-order widget receives the measure flag',
   /renderTokenOrder\(q,\([^)]*\)=>\{[\s\S]{0,400}?\},\{measure:MEASURE\|\|!!cfg\.noHints\}\)/.test(app),

@@ -195,17 +195,7 @@ setTimeout(() => {
       explain: { evidence: 'His shoes were worn thin.' }
     };
 
-    const sampleVideoGrammarQ = {
-      id: 'test-vg-01',
-      type: 'video-grammar',
-      skill: 'present_continuous',
-      level: 'A1',
-      question: 'What is she doing in the video clip?',
-      options: ['She is reading', 'She reads', 'She read', 'She was reading'],
-      answerIndex: 0,
-      explain: { why: 'Perhatikan kegiatan yang sedang berlangsung.', rule: 'Gunakan present continuous untuk aksi sekarang.' }
-    };
-
+    
     // Real bank data loading
     const vocabMaster = JSON.parse(fs.readFileSync(path.join(root, 'vocabulary-master.json'), 'utf8'));
     const realVocabWord = vocabMaster[Object.keys(vocabMaster)[0]];
@@ -269,7 +259,6 @@ setTimeout(() => {
       { name: '9. Listening Gist', q: sampleListeningQ },
       { name: '10. Listening Detail', q: sampleListeningDetailQ },
       { name: '11. Cloze (Isian Rumpang)', q: sampleClozeQ },
-      { name: '12. Video Grammar', q: sampleVideoGrammarQ },
       { name: '13. Real Bank Grammar (TA-001)', q: realGrammarQ },
       { name: '14. Real Bank Vocab (all)', q: realVocabQ },
       { name: '15. Real Bank Reading (Maya Garden)', q: realReadingQ },
