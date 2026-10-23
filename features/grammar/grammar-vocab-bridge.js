@@ -803,32 +803,24 @@
   }
 
   /**
-   * Gateway sheet shown when student taps a sub-grammar lesson
+   * Gateway sheet shown when student taps a sub-grammar lesson.
+   * Direct bypass: Fiezel Quest / vocab prerequisite mini-game eliminated for seamless grammar entry.
    * @param {string} skill
    */
   function openLessonPrerequisiteGate(skill) {
     const s = typeof state !== 'undefined' ? state : null;
-    const status = getVocabPrerequisiteStatus(skill, s);
-
-    // Smart Braincore Bypass: Jika kosakata prasyarat SUDAH dikuasai menurut BKT/OLM
-    if (status.isReady || (s?.grammar?.[skill]?.vocabReady)) {
-      if (s) {
-        if (!s.grammar) s.grammar = {};
-        if (!s.grammar[skill]) s.grammar[skill] = {};
-        s.grammar[skill].vocabReady = true;
-        if (typeof save === 'function') { try { save(); } catch (_) {} }
-      }
-      if (typeof enterStage === 'function' && typeof renderGrammarLesson === 'function') {
-        enterStage('grammar-lesson', () => renderGrammarLesson(skill));
-        renderGrammarLesson(skill);
-      } else if (typeof practiceSkill === 'function') {
-        practiceSkill(skill);
-      }
-      return;
+    if (s) {
+      if (!s.grammar) s.grammar = {};
+      if (!s.grammar[skill]) s.grammar[skill] = {};
+      s.grammar[skill].vocabReady = true;
+      if (typeof save === 'function') { try { save(); } catch (_) {} }
     }
-
-    // User directive: Hapus total gateway sheet di semua sesi, langsung masuk ke sesi game
-    startVocabMiniGame(skill);
+    if (typeof enterStage === 'function' && typeof renderGrammarLesson === 'function') {
+      enterStage('grammar-lesson', () => renderGrammarLesson(skill));
+      renderGrammarLesson(skill);
+    } else if (typeof practiceSkill === 'function') {
+      practiceSkill(skill);
+    }
   }
 
   function skipToGrammar(skill) {

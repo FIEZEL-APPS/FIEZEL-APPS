@@ -211,9 +211,9 @@ async function tokenQ(page) {
 }
 async function mcQ(page) {
   await page.evaluate(() => window.startGrammarQuickSession());
-  await page.waitForTimeout(1500);
+  try { await page.waitForSelector('#quizGrammarHint', { timeout: 10000 }); } catch (_) { await page.waitForTimeout(1500); }
   await page.evaluate(() => { window.__gt.q = null; document.getElementById('quizGrammarHint')?.click(); });
-  await page.waitForTimeout(200);
+  await page.waitForTimeout(300);
   return page.evaluate(() => { const q = window.__gt.q; return q && { type: q.type, options: q.options.slice(), answerIndex: q.answerIndex, skill: q.lessonSkill || q.skill }; });
 }
 const reversed = t => { const r = t.slice().reverse(); return r.join(' ') === t.join(' ') ? t.slice(1).concat(t[0]) : r; };

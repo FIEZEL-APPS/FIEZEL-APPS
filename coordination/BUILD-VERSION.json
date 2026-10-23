@@ -1,7 +1,7 @@
 {
-  "version": "m025-632",
-  "claimedBy": "branch fix/remove-video-grammar",
-  "claimedAt": "2026-10-23T19:08:29.112Z",
-  "reason": "fix(grammar): eliminasi video grammar dan audit perbaikan UI/UX latihan grammar G-01 s/d G-09 (m025-632)",
+  "version": "m025-633",
+  "claimedBy": "branch fix/remove-grammar-quest",
+  "claimedAt": "2026-10-23T20:10:35.435Z",
+  "reason": "fix(grammar): eliminasi total fiezel quest saat masuk sesi latihan grammar (m025-633)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
