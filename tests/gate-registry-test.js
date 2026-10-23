@@ -134,6 +134,14 @@ const EXCLUSIONS = new Map([
       'Google Chrome dan GUI). Kontrak integritas unit and scaffolding Mini Game di CI telah dijaga oleh ' +
       'kunci-hantu-test dan id-golden-snapshot-test.'
   }],
+  ['tests/probe-video-grammar-eliminated-test.js', {
+    class: 'gerbang-pra-rilis-fitur',
+    reason:
+      'BUKAN gerbang CI Linux: probe empiris Playwright Chromium lokal untuk memverifikasi pencabutan total ' +
+      'seluruh elemen Video Grammar dan Video Lab pada runtime peramban nyata. Integritas pencabutan berkas ' +
+      'dan modul di CI dijaga secara deterministik oleh precache-covers-shell-test dan id-golden-snapshot-test. ' +
+      'Bukti kelulusan 100% Playwright tercatat di docs/handoffs/FIEZEL-M025632-GRAMMAR-SESSION-UI-UX-AUDIT-FIX-HANDOFF.md.'
+  }],
   ['tools/dev/fiezel-vt-audit.js', {
     class: 'alat-pelaporan',
     reason:

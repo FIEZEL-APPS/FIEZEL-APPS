@@ -195,7 +195,6 @@ setTimeout(() => {
       explain: { evidence: 'His shoes were worn thin.' }
     };
 
-    
     // Real bank data loading
     const vocabMaster = JSON.parse(fs.readFileSync(path.join(root, 'vocabulary-master.json'), 'utf8'));
     const realVocabWord = vocabMaster[Object.keys(vocabMaster)[0]];
