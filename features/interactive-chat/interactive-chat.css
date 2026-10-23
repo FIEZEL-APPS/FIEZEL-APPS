@@ -178,6 +178,33 @@ body.fz-view-chat #fiezelDiagHost {
   overflow: hidden !important;
 }
 
+#app > #fzcContainer.fzc-mitra-kaiwa-studio-host,
+#fzcContainer.fzc-mitra-kaiwa-studio-host {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  max-width: 100vw !important;
+  height: 100dvh !important;
+  max-height: 100dvh !important;
+  padding: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin: 0 !important;
+  z-index: 9990 !important;
+  overflow: hidden !important;
+}
+
+#fzMitraKaiwaStudioFrame {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 100dvh !important;
+  max-height: 100dvh !important;
+  border: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: block !important;
+}
+
 /* ── Sticky Header: Compact Mitra Profile & Actions ── */
 .fzc-header {
   flex-shrink: 0;
