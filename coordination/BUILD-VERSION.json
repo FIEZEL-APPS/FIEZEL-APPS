@@ -1,7 +1,7 @@
 {
-  "version": "m025-633",
-  "claimedBy": "branch fix/remove-grammar-quest",
-  "claimedAt": "2026-10-23T20:39:43.147Z",
-  "reason": "fix: eliminasi semua panel game dan tab game di bottom nav (m025-633)",
+  "version": "m025-634",
+  "claimedBy": "branch main",
+  "claimedAt": "2026-10-23T21:30:33.625Z",
+  "reason": "fix(home): audit & perbaikan UI/UX Home panel (P0-P2, i18n, a11y, urutan hero, tur)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

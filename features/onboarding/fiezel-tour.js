@@ -234,6 +234,39 @@
     });
   }
 
+  var FALLBACK_TARGETS = {
+    '.learning-launcher': ['#heroCard', '.today-home-cockpit'],
+    '.bottomnav [data-view="latihan"]': ['.sidebar [data-view="latihan"]', '.quick-practice-section'],
+    '.bottomnav [data-view="progress"]': ['.sidebar [data-view="progress"]'],
+    '.home-level-context': ['#fzCourseSwitchBtn'],
+    '.topbar-actions [aria-label="Buka pengaturan"]': ['[data-testid="nav-profile"]', '.sidebar [data-view="profile"]']
+  };
+
+  function hasBox(node) {
+    if (!node) return false;
+    var box = null;
+    try { box = typeof node.getBoundingClientRect === 'function' ? node.getBoundingClientRect() : null; } catch (_) { box = null; }
+    return !box || (box.width > 0 && box.height > 0);
+  }
+
+  function findVisibleTarget(doc, selector, initialNode) {
+    if (!doc || typeof doc.querySelector !== 'function' || !selector) return null;
+    var node = initialNode !== undefined ? initialNode : null;
+    if (initialNode === undefined) {
+      try { node = doc.querySelector(selector); } catch (_) { node = null; }
+    }
+    if (hasBox(node)) return node;
+    var alts = FALLBACK_TARGETS[selector];
+    if (alts) {
+      for (var i = 0; i < alts.length; i++) {
+        var cand = null;
+        try { cand = doc.querySelector(alts[i]); } catch (_) { cand = null; }
+        if (hasBox(cand)) return cand;
+      }
+    }
+    return null;
+  }
+
   /**
    * Langkah yang targetnya benar-benar ada DAN punya ukuran. Elemen yang ada di DOM tetapi
    * berukuran nol (belum dirender, disembunyikan display:none) tidak bisa disorot - menyorot
@@ -244,12 +277,8 @@
     if (!doc || typeof doc.querySelector !== 'function') return [];
     var out = [];
     for (var i = 0; i < steps.length; i++) {
-      var node = null;
-      try { node = doc.querySelector(steps[i].target); } catch (_) { node = null; }
+      var node = findVisibleTarget(doc, steps[i].target);
       if (!node) continue;
-      var box = null;
-      try { box = typeof node.getBoundingClientRect === 'function' ? node.getBoundingClientRect() : null; } catch (_) { box = null; }
-      if (box && (box.width <= 0 || box.height <= 0)) continue;
       // Yang disimpan SELECTOR-nya, bukan simpulnya. setApp() mengganti seluruh innerHTML
       // #app pada setiap render, jadi simpul yang dipegang di sini akan menjadi yatim -
       // getBoundingClientRect()-nya lalu mengembalikan nol dan sorotannya menunjuk sudut kiri
@@ -341,6 +370,7 @@
       var current = resolved[index];
       var node = null;
       try { node = doc.querySelector(current.target); } catch (_) { node = null; }
+      node = findVisibleTarget(doc, current.target, node);
       // Target yang hilang di tengah tur dilewati, tidak ditunggu. Kalau tidak ada lagi yang
       // tersisa, tur berakhir - bukan menggantung di lapisan gelap tanpa yang disorot.
       if (!node) {
@@ -423,13 +453,7 @@
 
     function anchorAlive() {
       if (!anchorSel) return false;
-      var node = null;
-      try { node = doc.querySelector(anchorSel); } catch (_) { node = null; }
-      if (!node) return false;
-      try {
-        var box = typeof node.getBoundingClientRect === 'function' ? node.getBoundingClientRect() : null;
-        return !box || (box.width > 0 && box.height > 0);
-      } catch (_) { return true; }
+      return !!findVisibleTarget(doc, anchorSel);
     }
 
     function pauseTour() {

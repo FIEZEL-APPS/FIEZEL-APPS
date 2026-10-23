@@ -1148,10 +1148,10 @@ header.topbar,
 }
 
 .topbar .icon-button {
-  width: 34px !important;
-  height: 34px !important;
-  min-width: 34px !important;
-  min-height: 34px !important;
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  min-height: 44px !important;
   border-radius: 50% !important;
   background: #FFFFFF !important;
   border: 1.5px solid var(--card-border, #E2E8F0) !important;
@@ -1656,6 +1656,12 @@ button.bug-raid-btn:active,
   color: var(--sky-blue) !important;
   text-decoration: none !important;
   cursor: pointer !important;
+  min-height: 44px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  padding: 0 8px !important;
+  margin: -10px -8px !important;
+  border-radius: 10px !important;
 }
 
 /* Tactile Language Shortcut Banner */
@@ -1868,12 +1874,12 @@ button.target-lang-chip:active,
 }
 
 .class-badge-dot {
-  font-size: 8px !important;
-  color: #94A3B8 !important;
+  font-size: 11px !important;
+  color: #475569 !important;
 }
 
 .class-badge-tag {
-  font-size: 10px !important;
+  font-size: 11px !important;
   font-weight: 800 !important;
   color: var(--kelasku-emerald) !important;
   background: var(--kelasku-emerald-soft) !important;
@@ -7014,7 +7020,7 @@ html body #app .fz-kawan-card .fz-kawan-title {
 }
 
 html body #app .fz-kawan-card .fz-kawan-tag {
-  font-size: 10px !important;
+  font-size: 11px !important;
   font-weight: 800 !important;
   line-height: 1.5 !important;
   letter-spacing: 0.02em;
@@ -7040,7 +7046,7 @@ html body #app .fz-kawan-card .fz-kawan-badge {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 10.5px !important;
+  font-size: 11px !important;
   font-weight: 700 !important;
   line-height: 1.6 !important;
   color: #66595F !important;
@@ -7128,6 +7134,40 @@ html body #app .fz-kawan-card button.fz-kawan-cta:focus-visible { outline: 2px s
   html body #app .fz-kawan-card .fz-kawan-dot { animation: none !important; }
   html body #app .fz-kawan-card,
   html body #app .fz-kawan-card button.fz-kawan-cta { transition: none !important; }
+}
+
+/* Mobile & Tablet (<1100px): Posisikan #heroCard (Latihan Hari Ini) tepat di bawah sapaan
+   di atas Kawan Bicara supaya CTA utama tidak tertutup bottomnav pada layar kompak 360x640. */
+@media (max-width: 1099px) {
+  html body #app .today-home-cockpit > .fz-welcome-header { order: 1 !important; }
+  html body #app .today-home-cockpit > #heroCard { order: 2 !important; }
+  html body #app .today-home-cockpit > .fz-kawan-card { order: 3 !important; }
+  html body #app .today-home-cockpit > .fz-bc-card { order: 4 !important; }
+  html body #app .today-home-cockpit > .quick-practice-section { order: 5 !important; }
+  html body #app .today-home-cockpit > .class-bar { order: 6 !important; }
+}
+
+/* Status sesi harian selesai pada #heroCard */
+html body #app #heroCard.is-done .hero-tag {
+  color: #047857 !important;
+}
+html body #app #heroCard.is-done .hero-progress-fill {
+  background: linear-gradient(90deg, #10B981 0%, #059669 100%) !important;
+}
+html body #app #heroCard.is-done .hero-pil[data-pil="selesai"] {
+  color: #065F46 !important;
+  background: #ECFDF5 !important;
+  border-color: #A7F3D0 !important;
+}
+html body #app #heroCard.is-done button.hero-cta-btn[data-done="1"] {
+  background: linear-gradient(180deg, #ECFDF5 0%, #D1FAE5 100%) !important;
+  color: #065F46 !important;
+  border: 1.5px solid #6EE7B7 !important;
+  box-shadow: 0 4px 0 #34D399, 0 8px 18px rgba(16, 185, 129, 0.16) !important;
+}
+html body #app #heroCard.is-done h1.fz-greet-title,
+html body #app h1.fz-greet-title {
+  margin: 0 !important;
 }
 
 /* Desktop: Kawan Bicara selebar penuh tepat di bawah sapaan; misi/KelasKu/Latihan Singkat
