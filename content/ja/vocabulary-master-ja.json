@@ -1,6 +1,6 @@
 {
  "schema": "fiezel-vocabulary-ja-v1",
- "total": 1884,
+ "total": 1984,
  "dikecualikan": [
   {
    "romaji": "tetto",
@@ -14,11 +14,12 @@
   "N4": 327,
   "N3": 278,
   "N2": 202,
-  "N1": 77
+  "N1": 77,
+  "N1+": 100
  },
  "provenans": {
   "status": "DRAFT AI — WAJIB DITINJAU PENUTUR ASLI JEPANG",
-  "daftarKata": "docs/japanese/kosakata-jlpt.json (1.885 entri) — daftar kata adalah fakta bahasa, bukan karya berhak cipta",
+  "daftarKata": "docs/japanese/kosakata-jlpt.json (1.985 entri N5–N1+) — daftar kata adalah fakta bahasa, bukan karya berhak cipta",
   "kalimat": "SETIAP kalimat contoh dan terjemahannya ditulis baru untuk FIEZEL. Nol kalimat disalin dari Minna no Nihongo maupun Irodori; keduanya dipakai hanya sebagai rujukan silabus (kata ini tingkat berapa), tidak lebih.",
   "catatanMedan": "examples[0].en berisi kalimat JEPANG, bukan Inggris — nama medan mengikuti bank Inggris supaya satu jalur hidrasi melayani dua bahasa."
  },
@@ -71614,6 +71615,3806 @@
     "row": 1885
    },
    "masterIndex": 1885
+  },
+  {
+   "id": "ja_vocab_01886",
+   "word": "齟齬",
+   "kana": "そご",
+   "kanji": "齟齬",
+   "romaji": "sogo",
+   "phonetic": "そご · sogo",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01886",
+     "meaning": "ketidaksesuaian; selisih paham"
+    }
+   ],
+   "meaning": "ketidaksesuaian; selisih paham",
+   "examples": [
+    {
+     "en": "部門間の情報共有が不十分だったため、計画の解釈に重大な齟齬が生じた。",
+     "id": "Karena berbagi informasi antarbagian kurang memadai, timbul ketidaksesuaian besar dalam penafsiran rencana."
+    }
+   ],
+   "example": "部門間の情報共有が不十分だったため、計画の解釈に重大な齟齬が生じた。",
+   "exampleTranslation": "Karena berbagi informasi antarbagian kurang memadai, timbul ketidaksesuaian besar dalam penafsiran rencana.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "business",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#1",
+    "row": 1885
+   },
+   "masterIndex": 1886
+  },
+  {
+   "id": "ja_vocab_01887",
+   "word": "斟酌",
+   "kana": "しんしゃく",
+   "kanji": "斟酌",
+   "romaji": "shinshaku",
+   "phonetic": "しんしゃく · shinshaku",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01887",
+     "meaning": "pertimbangan atas keadaan pihak lain"
+    }
+   ],
+   "meaning": "pertimbangan atas keadaan pihak lain",
+   "examples": [
+    {
+     "en": "裁判所は被告が置かれていた過酷な状況を斟酌した上で量刑を判断した。",
+     "id": "Pengadilan menentukan beratnya hukuman setelah mempertimbangkan situasi berat yang dialami terdakwa."
+    }
+   ],
+   "example": "裁判所は被告が置かれていた過酷な状況を斟酌した上で量刑を判断した。",
+   "exampleTranslation": "Pengadilan menentukan beratnya hukuman setelah mempertimbangkan situasi berat yang dialami terdakwa.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "law",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#2",
+    "row": 1886
+   },
+   "masterIndex": 1887
+  },
+  {
+   "id": "ja_vocab_01888",
+   "word": "蓋然性",
+   "kana": "がいぜんせい",
+   "kanji": "蓋然性",
+   "romaji": "gaizensei",
+   "phonetic": "がいぜんせい · gaizensei",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01888",
+     "meaning": "tingkat kemungkinan objektif; probabilitas"
+    }
+   ],
+   "meaning": "tingkat kemungkinan objektif; probabilitas",
+   "examples": [
+    {
+     "en": "現時点の観測データから判断すると、その仮説が成立する蓋然性は極めて高い。",
+     "id": "Jika dinilai dari data pengamatan saat ini, tingkat kemungkinan objektif berlakunya hipotesis tersebut sangat tinggi."
+    }
+   ],
+   "example": "現時点の観測データから判断すると、その仮説が成立する蓋然性は極めて高い。",
+   "exampleTranslation": "Jika dinilai dari data pengamatan saat ini, tingkat kemungkinan objektif berlakunya hipotesis tersebut sangat tinggi.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "academic",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#3",
+    "row": 1887
+   },
+   "masterIndex": 1888
+  },
+  {
+   "id": "ja_vocab_01889",
+   "word": "帰趨",
+   "kana": "きすう",
+   "kanji": "帰趨",
+   "romaji": "kisuu",
+   "phonetic": "きすう · kisuu",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01889",
+     "meaning": "arah akhir perkembangan; muara hasil"
+    }
+   ],
+   "meaning": "arah akhir perkembangan; muara hasil",
+   "examples": [
+    {
+     "en": "今次の通商交渉の帰趨は、今後十年間の産業構造を大きく左右するだろう。",
+     "id": "Muara hasil perundingan dagang kali ini akan sangat menentukan struktur industri selama sepuluh tahun ke depan."
+    }
+   ],
+   "example": "今次の通商交渉の帰趨は、今後十年間の産業構造を大きく左右するだろう。",
+   "exampleTranslation": "Muara hasil perundingan dagang kali ini akan sangat menentukan struktur industri selama sepuluh tahun ke depan.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "policy",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#4",
+    "row": 1888
+   },
+   "masterIndex": 1889
+  },
+  {
+   "id": "ja_vocab_01890",
+   "word": "看過",
+   "kana": "かんか",
+   "kanji": "看過",
+   "romaji": "kanka",
+   "phonetic": "かんか · kanka",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01890",
+     "meaning": "pembiaran; pengabaian atas masalah"
+    }
+   ],
+   "meaning": "pembiaran; pengabaian atas masalah",
+   "examples": [
+    {
+     "en": "安全基準の形骸化は人命に関わる問題であり、もはや看過することはできない。",
+     "id": "Pendangkalan standar keselamatan merupakan persoalan yang menyangkut nyawa manusia sehingga tidak dapat dibiarkan lagi."
+    }
+   ],
+   "example": "安全基準の形骸化は人命に関わる問題であり、もはや看過することはできない。",
+   "exampleTranslation": "Pendangkalan standar keselamatan merupakan persoalan yang menyangkut nyawa manusia sehingga tidak dapat dibiarkan lagi.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "policy",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#5",
+    "row": 1889
+   },
+   "masterIndex": 1890
+  },
+  {
+   "id": "ja_vocab_01891",
+   "word": "敷衍",
+   "kana": "ふえん",
+   "kanji": "敷衍",
+   "romaji": "fuen",
+   "phonetic": "ふえん · fuen",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01891",
+     "meaning": "perluasan uraian atau penerapan gagasan"
+    }
+   ],
+   "meaning": "perluasan uraian atau penerapan gagasan",
+   "examples": [
+    {
+     "en": "著者は都市計画の理論を農村社会の再生問題へと巧みに敷衍して論じている。",
+     "id": "Penulis secara cermat memperluas penerapan teori tata kota untuk membahas persoalan revitalisasi masyarakat pedesaan."
+    }
+   ],
+   "example": "著者は都市計画の理論を農村社会の再生問題へと巧みに敷衍して論じている。",
+   "exampleTranslation": "Penulis secara cermat memperluas penerapan teori tata kota untuk membahas persoalan revitalisasi masyarakat pedesaan.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "academic",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#6",
+    "row": 1890
+   },
+   "masterIndex": 1891
+  },
+  {
+   "id": "ja_vocab_01892",
+   "word": "是正",
+   "kana": "ぜせい",
+   "kanji": "是正",
+   "romaji": "zesei",
+   "phonetic": "ぜせい · zesei",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01892",
+     "meaning": "koreksi; pelurusan penyimpangan"
+    }
+   ],
+   "meaning": "koreksi; pelurusan penyimpangan",
+   "examples": [
+    {
+     "en": "地域間の医療格差の是正に向けて、遠隔診療の基盤整備が急ピッチで進められている。",
+     "id": "Demi mengoreksi kesenjangan layanan medis antarwilayah, pembangunan infrastruktur telemedisin dipercepat."
+    }
+   ],
+   "example": "地域間の医療格差の是正に向けて、遠隔診療の基盤整備が急ピッチで進められている。",
+   "exampleTranslation": "Demi mengoreksi kesenjangan layanan medis antarwilayah, pembangunan infrastruktur telemedisin dipercepat.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "policy",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#7",
+    "row": 1891
+   },
+   "masterIndex": 1892
+  },
+  {
+   "id": "ja_vocab_01893",
+   "word": "乖離",
+   "kana": "かいり",
+   "kanji": "乖離",
+   "romaji": "kairi",
+   "phonetic": "かいり · kairi",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01893",
+     "meaning": "kesenjangan tajam dari kenyataan"
+    }
+   ],
+   "meaning": "kesenjangan tajam dari kenyataan",
+   "examples": [
+    {
+     "en": "公式統計の数値と生活者の実感との乖離が、政策への不信感を招いている。",
+     "id": "Kesenjangan tajam antara angka statistik resmi dan kenyataan hidup warga memicu ketidakpercayaan terhadap kebijakan."
+    }
+   ],
+   "example": "公式統計の数値と生活者の実感との乖離が、政策への不信感を招いている。",
+   "exampleTranslation": "Kesenjangan tajam antara angka statistik resmi dan kenyataan hidup warga memicu ketidakpercayaan terhadap kebijakan.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "business",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#8",
+    "row": 1892
+   },
+   "masterIndex": 1893
+  },
+  {
+   "id": "ja_vocab_01894",
+   "word": "網羅",
+   "kana": "もうら",
+   "kanji": "網羅",
+   "romaji": "moura",
+   "phonetic": "もうら · moura",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01894",
+     "meaning": "pencakupan menyeluruh tanpa terlewat"
+    }
+   ],
+   "meaning": "pencakupan menyeluruh tanpa terlewat",
+   "examples": [
+    {
+     "en": "本報告書は過去半世紀にわたる国内外の先行研究を体系的に網羅している。",
+     "id": "Laporan ini mencakup secara sistematis penelitian terdahulu di dalam dan luar negeri selama setengah abad terakhir."
+    }
+   ],
+   "example": "本報告書は過去半世紀にわたる国内外の先行研究を体系的に網羅している。",
+   "exampleTranslation": "Laporan ini mencakup secara sistematis penelitian terdahulu di dalam dan luar negeri selama setengah abad terakhir.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "academic",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#9",
+    "row": 1893
+   },
+   "masterIndex": 1894
+  },
+  {
+   "id": "ja_vocab_01895",
+   "word": "刷新",
+   "kana": "さっしん",
+   "kanji": "刷新",
+   "romaji": "sasshin",
+   "phonetic": "さっしん · sasshin",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01895",
+     "meaning": "perombakan menyeluruh menjadi baru"
+    }
+   ],
+   "meaning": "perombakan menyeluruh menjadi baru",
+   "examples": [
+    {
+     "en": "長年の業績低迷を打開するため、取締役会は経営陣と組織体制の刷新に踏み切った。",
+     "id": "Untuk mengatasi kelesuan kinerja bertahun-tahun, dewan direksi mengambil langkah perombakan menyeluruh jajaran manajemen dan struktur organisasi."
+    }
+   ],
+   "example": "長年の業績低迷を打開するため、取締役会は経営陣と組織体制の刷新に踏み切った。",
+   "exampleTranslation": "Untuk mengatasi kelesuan kinerja bertahun-tahun, dewan direksi mengambil langkah perombakan menyeluruh jajaran manajemen dan struktur organisasi.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "business",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#10",
+    "row": 1894
+   },
+   "masterIndex": 1895
+  },
+  {
+   "id": "ja_vocab_01896",
+   "word": "踏襲",
+   "kana": "とうしゅう",
+   "kanji": "踏襲",
+   "romaji": "toushuu",
+   "phonetic": "とうしゅう · toushuu",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01896",
+     "meaning": "pelanjutan pola atau kebijakan pendahulu"
+    }
+   ],
+   "meaning": "pelanjutan pola atau kebijakan pendahulu",
+   "examples": [
+    {
+     "en": "社会環境が激変する中、従来の慣行を無批判に踏襲するだけでは課題は解決しない。",
+     "id": "Di tengah perubahan lingkungan sosial yang drastis, sekadar melanjutkan kebiasaan lama tanpa sikap kritis tidak akan menyelesaikan masalah."
+    }
+   ],
+   "example": "社会環境が激変する中、従来の慣行を無批判に踏襲するだけでは課題は解決しない。",
+   "exampleTranslation": "Di tengah perubahan lingkungan sosial yang drastis, sekadar melanjutkan kebiasaan lama tanpa sikap kritis tidak akan menyelesaikan masalah.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "policy",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#11",
+    "row": 1895
+   },
+   "masterIndex": 1896
+  },
+  {
+   "id": "ja_vocab_01897",
+   "word": "喫緊",
+   "kana": "きっきん",
+   "kanji": "喫緊",
+   "romaji": "kikkin",
+   "phonetic": "きっきん · kikkin",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "adjective",
+   "meanings": [
+    {
+     "id": "ja_meaning_01897",
+     "meaning": "sangat mendesak dan tak dapat ditunda"
+    }
+   ],
+   "meaning": "sangat mendesak dan tak dapat ditunda",
+   "examples": [
+    {
+     "en": "老朽化した水道管や橋梁の点検および更新は、自治体にとって喫緊の課題である。",
+     "id": "Pemeriksaan serta peremajaan pipa air dan jembatan yang menua merupakan agenda yang sangat mendesak bagi pemerintah daerah."
+    }
+   ],
+   "example": "老朽化した水道管や橋梁の点検および更新は、自治体にとって喫緊の課題である。",
+   "exampleTranslation": "Pemeriksaan serta peremajaan pipa air dan jembatan yang menua merupakan agenda yang sangat mendesak bagi pemerintah daerah.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "policy",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#12",
+    "row": 1896
+   },
+   "masterIndex": 1897
+  },
+  {
+   "id": "ja_vocab_01898",
+   "word": "俯瞰",
+   "kana": "ふかん",
+   "kanji": "俯瞰",
+   "romaji": "fukan",
+   "phonetic": "ふかん · fukan",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01898",
+     "meaning": "tinjauan menyeluruh dari sudut pandang luas"
+    }
+   ],
+   "meaning": "tinjauan menyeluruh dari sudut pandang luas",
+   "examples": [
+    {
+     "en": "個別事象の分析にとどまらず、歴史的文脈から問題全体を俯瞰する視点が求められる。",
+     "id": "Diperlukan sudut pandang yang meninjau keseluruhan masalah secara luas dari konteks sejarah, bukan sekadar menganalisis gejala tunggal."
+    }
+   ],
+   "example": "個別事象の分析にとどまらず、歴史的文脈から問題全体を俯瞰する視点が求められる。",
+   "exampleTranslation": "Diperlukan sudut pandang yang meninjau keseluruhan masalah secara luas dari konteks sejarah, bukan sekadar menganalisis gejala tunggal.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "academic",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#13",
+    "row": 1897
+   },
+   "masterIndex": 1898
+  },
+  {
+   "id": "ja_vocab_01899",
+   "word": "醸成",
+   "kana": "じょうせい",
+   "kanji": "醸成",
+   "romaji": "jousei",
+   "phonetic": "じょうせい · jousei",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01899",
+     "meaning": "penumbuhan bertahap kesadaran atau suasana"
+    }
+   ],
+   "meaning": "penumbuhan bertahap kesadaran atau suasana",
+   "examples": [
+    {
+     "en": "多様な背景を持つ人々が対話を重ねることで、地域社会に相互信頼の気運が醸成される。",
+     "id": "Melalui dialog berkesinambungan antarwarga berlatar belakang beragam, suasana saling percaya tumbuh secara bertahap di masyarakat."
+    }
+   ],
+   "example": "多様な背景を持つ人々が対話を重ねることで、地域社会に相互信頼の気運が醸成される。",
+   "exampleTranslation": "Melalui dialog berkesinambungan antarwarga berlatar belakang beragam, suasana saling percaya tumbuh secara bertahap di masyarakat.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "society",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#14",
+    "row": 1898
+   },
+   "masterIndex": 1899
+  },
+  {
+   "id": "ja_vocab_01900",
+   "word": "淘汰",
+   "kana": "とうた",
+   "kanji": "淘汰",
+   "romaji": "touta",
+   "phonetic": "とうた · touta",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01900",
+     "meaning": "seleksi ketat yang menyisihkan yang tak layak"
+    }
+   ],
+   "meaning": "seleksi ketat yang menyisihkan yang tak layak",
+   "examples": [
+    {
+     "en": "技術革新への適応を怠った企業は、激しい国際競争の中で次第に淘汰されていった。",
+     "id": "Perusahaan yang lalai beradaptasi terhadap inovasi teknologi berangsur-angsur tersisih dalam persaingan internasional yang ketat."
+    }
+   ],
+   "example": "技術革新への適応を怠った企業は、激しい国際競争の中で次第に淘汰されていった。",
+   "exampleTranslation": "Perusahaan yang lalai beradaptasi terhadap inovasi teknologi berangsur-angsur tersisih dalam persaingan internasional yang ketat.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "business",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#15",
+    "row": 1899
+   },
+   "masterIndex": 1900
+  },
+  {
+   "id": "ja_vocab_01901",
+   "word": "稟議",
+   "kana": "りんぎ",
+   "kanji": "稟議",
+   "romaji": "ringi",
+   "phonetic": "りんぎ · ringi",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01901",
+     "meaning": "pengedaran usulan tertulis untuk persetujuan berjenjang"
+    }
+   ],
+   "meaning": "pengedaran usulan tertulis untuk persetujuan berjenjang",
+   "examples": [
+    {
+     "en": "日本企業に根付く稟議の仕組みは合意を重んじる反面、意思決定の迅速さを欠く場合がある。",
+     "id": "Mekanisme persetujuan berjenjang yang mengakar di perusahaan Jepang menghargai mufakat, tetapi terkadang kurang cepat dalam pengambilan keputusan."
+    }
+   ],
+   "example": "日本企業に根付く稟議の仕組みは合意を重んじる反面、意思決定の迅速さを欠く場合がある。",
+   "exampleTranslation": "Mekanisme persetujuan berjenjang yang mengakar di perusahaan Jepang menghargai mufakat, tetapi terkadang kurang cepat dalam pengambilan keputusan.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "business",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#16",
+    "row": 1900
+   },
+   "masterIndex": 1901
+  },
+  {
+   "id": "ja_vocab_01902",
+   "word": "瑕疵",
+   "kana": "かし",
+   "kanji": "瑕疵",
+   "romaji": "kashi",
+   "phonetic": "かし · kashi",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01902",
+     "meaning": "cacat hukum atau kekurangan tersembunyi"
+    }
+   ],
+   "meaning": "cacat hukum atau kekurangan tersembunyi",
+   "examples": [
+    {
+     "en": "行政処分の手続きに重大な瑕疵が認められたため、当該決定は取り消されることとなった。",
+     "id": "Karena ditemukan cacat hukum yang serius dalam prosedur tindakan administratif, keputusan tersebut akhirnya dibatalkan."
+    }
+   ],
+   "example": "行政処分の手続きに重大な瑕疵が認められたため、当該決定は取り消されることとなった。",
+   "exampleTranslation": "Karena ditemukan cacat hukum yang serius dalam prosedur tindakan administratif, keputusan tersebut akhirnya dibatalkan.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "law",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#17",
+    "row": 1901
+   },
+   "masterIndex": 1902
+  },
+  {
+   "id": "ja_vocab_01903",
+   "word": "進捗",
+   "kana": "しんちょく",
+   "kanji": "進捗",
+   "romaji": "shinchoku",
+   "phonetic": "しんちょく · shinchoku",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01903",
+     "meaning": "kemajuan pelaksanaan pekerjaan"
+    }
+   ],
+   "meaning": "kemajuan pelaksanaan pekerjaan",
+   "examples": [
+    {
+     "en": "大規模な研究開発案件では、工程ごとの進捗を定量的な指標で可視化することが欠かせない。",
+     "id": "Dalam proyek riset dan pengembangan berskala besar, kemajuan tiap tahapan mutlak perlu divisualisasikan dengan indikator kuantitatif."
+    }
+   ],
+   "example": "大規模な研究開発案件では、工程ごとの進捗を定量的な指標で可視化することが欠かせない。",
+   "exampleTranslation": "Dalam proyek riset dan pengembangan berskala besar, kemajuan tiap tahapan mutlak perlu divisualisasikan dengan indikator kuantitatif.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "business",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#18",
+    "row": 1902
+   },
+   "masterIndex": 1903
+  },
+  {
+   "id": "ja_vocab_01904",
+   "word": "抜本的",
+   "kana": "ばっぽんてき",
+   "kanji": "抜本的",
+   "romaji": "bapponteki",
+   "phonetic": "ばっぽんてき · bapponteki",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "adjective",
+   "meanings": [
+    {
+     "id": "ja_meaning_01904",
+     "meaning": "mendasar hingga ke akar persoalan; radikal"
+    }
+   ],
+   "meaning": "mendasar hingga ke akar persoalan; radikal",
+   "examples": [
+    {
+     "en": "少子高齢化に伴う社会保障財政の悪化を防ぐには、制度の抜本的な見直しが避けられない。",
+     "id": "Untuk mencegah memburuknya keuangan jaminan sosial akibat penuaan penduduk, peninjauan ulang sistem secara mendasar tak terhindarkan."
+    }
+   ],
+   "example": "少子高齢化に伴う社会保障財政の悪化を防ぐには、制度の抜本的な見直しが避けられない。",
+   "exampleTranslation": "Untuk mencegah memburuknya keuangan jaminan sosial akibat penuaan penduduk, peninjauan ulang sistem secara mendasar tak terhindarkan.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "policy",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#19",
+    "row": 1903
+   },
+   "masterIndex": 1904
+  },
+  {
+   "id": "ja_vocab_01905",
+   "word": "包括的",
+   "kana": "ほうかつてき",
+   "kanji": "包括的",
+   "romaji": "houkatsuteki",
+   "phonetic": "ほうかつてき · houkatsuteki",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "adjective",
+   "meanings": [
+    {
+     "id": "ja_meaning_01905",
+     "meaning": "menyeluruh dan lintas aspek; komprehensif"
+    }
+   ],
+   "meaning": "menyeluruh dan lintas aspek; komprehensif",
+   "examples": [
+    {
+     "en": "気候変動対策には、エネルギー政策から都市設計までを結ぶ包括的な枠組みが必要だ。",
+     "id": "Penanganan perubahan iklim memerlukan kerangka komprehensif yang menghubungkan kebijakan energi hingga perancangan kota."
+    }
+   ],
+   "example": "気候変動対策には、エネルギー政策から都市設計までを結ぶ包括的な枠組みが必要だ。",
+   "exampleTranslation": "Penanganan perubahan iklim memerlukan kerangka komprehensif yang menghubungkan kebijakan energi hingga perancangan kota.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "policy",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#20",
+    "row": 1904
+   },
+   "masterIndex": 1905
+  },
+  {
+   "id": "ja_vocab_01906",
+   "word": "示唆",
+   "kana": "しさ",
+   "kanji": "示唆",
+   "romaji": "shisa",
+   "phonetic": "しさ · shisa",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01906",
+     "meaning": "isyarat tidak langsung; petunjuk implisit"
+    }
+   ],
+   "meaning": "isyarat tidak langsung; petunjuk implisit",
+   "examples": [
+    {
+     "en": "発掘された木簡の記述は、当時の地方行政が予想以上に高度であったことを示唆している。",
+     "id": "Catatan pada bilah kayu hasil ekskavasi memberikan petunjuk implisit bahwa administrasi daerah kala itu lebih maju daripada perkiraan."
+    }
+   ],
+   "example": "発掘された木簡の記述は、当時の地方行政が予想以上に高度であったことを示唆している。",
+   "exampleTranslation": "Catatan pada bilah kayu hasil ekskavasi memberikan petunjuk implisit bahwa administrasi daerah kala itu lebih maju daripada perkiraan.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "academic",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#21",
+    "row": 1905
+   },
+   "masterIndex": 1906
+  },
+  {
+   "id": "ja_vocab_01907",
+   "word": "抑止",
+   "kana": "よくし",
+   "kanji": "抑止",
+   "romaji": "yokushi",
+   "phonetic": "よくし · yokushi",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01907",
+     "meaning": "pencegahan melalui daya gentar atau kendali"
+    }
+   ],
+   "meaning": "pencegahan melalui daya gentar atau kendali",
+   "examples": [
+    {
+     "en": "厳格な情報開示義務と課徴金制度の併用が、市場における不正取引の抑止につながる。",
+     "id": "Kombinasi kewajiban keterbukaan informasi yang ketat dan sanksi denda berperan mencegah transaksi curang di pasar."
+    }
+   ],
+   "example": "厳格な情報開示義務と課徴金制度の併用が、市場における不正取引の抑止につながる。",
+   "exampleTranslation": "Kombinasi kewajiban keterbukaan informasi yang ketat dan sanksi denda berperan mencegah transaksi curang di pasar.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "law",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#22",
+    "row": 1906
+   },
+   "masterIndex": 1907
+  },
+  {
+   "id": "ja_vocab_01908",
+   "word": "拮抗",
+   "kana": "きっこう",
+   "kanji": "拮抗",
+   "romaji": "kikkou",
+   "phonetic": "きっこう · kikkou",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01908",
+     "meaning": "perimbangan kekuatan yang saling berhadapan sepadan"
+    }
+   ],
+   "meaning": "perimbangan kekuatan yang saling berhadapan sepadan",
+   "examples": [
+    {
+     "en": "賛成派と反対派の主張が激しく拮抗しており、審議会での議論は深夜まで続いた。",
+     "id": "Argumen kubu pendukung dan penentang berimbang sama kuat sehingga pembahasan di dewan pertimbangan berlangsung hingga larut malam."
+    }
+   ],
+   "example": "賛成派と反対派の主張が激しく拮抗しており、審議会での議論は深夜まで続いた。",
+   "exampleTranslation": "Argumen kubu pendukung dan penentang berimbang sama kuat sehingga pembahasan di dewan pertimbangan berlangsung hingga larut malam.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "society",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#23",
+    "row": 1907
+   },
+   "masterIndex": 1908
+  },
+  {
+   "id": "ja_vocab_01909",
+   "word": "帰結",
+   "kana": "きけつ",
+   "kanji": "帰結",
+   "romaji": "kiketsu",
+   "phonetic": "きけつ · kiketsu",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01909",
+     "meaning": "konsekuensi logis; simpulan akhir"
+    }
+   ],
+   "meaning": "konsekuensi logis; simpulan akhir",
+   "examples": [
+    {
+     "en": "短期的な利益ばかりを追求した結果の帰結として、基礎研究の基盤が細ってしまった。",
+     "id": "Sebagai konsekuensi logis dari pengejaran keuntungan jangka pendek semata, fondasi riset dasar menjadi melemah."
+    }
+   ],
+   "example": "短期的な利益ばかりを追求した結果の帰結として、基礎研究の基盤が細ってしまった。",
+   "exampleTranslation": "Sebagai konsekuensi logis dari pengejaran keuntungan jangka pendek semata, fondasi riset dasar menjadi melemah.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "academic",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#24",
+    "row": 1908
+   },
+   "masterIndex": 1909
+  },
+  {
+   "id": "ja_vocab_01910",
+   "word": "恣意的",
+   "kana": "しいてき",
+   "kanji": "恣意的",
+   "romaji": "shiiteki",
+   "phonetic": "しいてき · shiiteki",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "adjective",
+   "meanings": [
+    {
+     "id": "ja_meaning_01910",
+     "meaning": "sewenang-wenang menurut kehendak sepihak; arbitrer"
+    }
+   ],
+   "meaning": "sewenang-wenang menurut kehendak sepihak; arbitrer",
+   "examples": [
+    {
+     "en": "統計データの恣意的な切り取りは、国民の合理的な政策判断を誤らせる危険をはらむ。",
+     "id": "Pemotongan data statistik secara sewenang-wenang mengandung bahaya menyesatkan penilaian rasional masyarakat terhadap kebijakan."
+    }
+   ],
+   "example": "統計データの恣意的な切り取りは、国民の合理的な政策判断を誤らせる危険をはらむ。",
+   "exampleTranslation": "Pemotongan data statistik secara sewenang-wenang mengandung bahaya menyesatkan penilaian rasional masyarakat terhadap kebijakan.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "law",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#25",
+    "row": 1909
+   },
+   "masterIndex": 1910
+  },
+  {
+   "id": "ja_vocab_01911",
+   "word": "普遍的",
+   "kana": "ふへんてき",
+   "kanji": "普遍的",
+   "romaji": "fuhenteki",
+   "phonetic": "ふへんてき · fuhenteki",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "adjective",
+   "meanings": [
+    {
+     "id": "ja_meaning_01911",
+     "meaning": "berlaku umum lintas ruang dan waktu; universal"
+    }
+   ],
+   "meaning": "berlaku umum lintas ruang dan waktu; universal",
+   "examples": [
+    {
+     "en": "人間の尊厳を守るという理念は、文化や宗教の違いを超えた普遍的な価値を持つ。",
+     "id": "Gagasan menjaga martabat manusia memiliki nilai universal yang melampaui perbedaan budaya maupun agama."
+    }
+   ],
+   "example": "人間の尊厳を守るという理念は、文化や宗教の違いを超えた普遍的な価値を持つ。",
+   "exampleTranslation": "Gagasan menjaga martabat manusia memiliki nilai universal yang melampaui perbedaan budaya maupun agama.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "academic",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#26",
+    "row": 1910
+   },
+   "masterIndex": 1911
+  },
+  {
+   "id": "ja_vocab_01912",
+   "word": "妥当性",
+   "kana": "だとうせい",
+   "kanji": "妥当性",
+   "romaji": "datousei",
+   "phonetic": "だとうせい · datousei",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01912",
+     "meaning": "kelayakan penalaran; keabsahan"
+    }
+   ],
+   "meaning": "kelayakan penalaran; keabsahan",
+   "examples": [
+    {
+     "en": "評価指標の妥当性を高めるため、複数の専門家による二重の査読が実施された。",
+     "id": "Untuk meningkatkan keabsahan indikator evaluasi, dilakukan telaah sejawat ganda oleh sejumlah pakar."
+    }
+   ],
+   "example": "評価指標の妥当性を高めるため、複数の専門家による二重の査読が実施された。",
+   "exampleTranslation": "Untuk meningkatkan keabsahan indikator evaluasi, dilakukan telaah sejawat ganda oleh sejumlah pakar.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "academic",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#27",
+    "row": 1911
+   },
+   "masterIndex": 1912
+  },
+  {
+   "id": "ja_vocab_01913",
+   "word": "整合性",
+   "kana": "せいごうせい",
+   "kanji": "整合性",
+   "romaji": "seigousei",
+   "phonetic": "せいごうせい · seigousei",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01913",
+     "meaning": "konsistensi logis tanpa pertentangan internal"
+    }
+   ],
+   "meaning": "konsistensi logis tanpa pertentangan internal",
+   "examples": [
+    {
+     "en": "国内法の改正にあたっては、既存の国際条約との法的な整合性を慎重に確認せねばならない。",
+     "id": "Dalam mengamandemen hukum nasional, konsistensi hukum dengan perjanjian internasional yang telah ada harus diperiksa secara cermat."
+    }
+   ],
+   "example": "国内法の改正にあたっては、既存の国際条約との法的な整合性を慎重に確認せねばならない。",
+   "exampleTranslation": "Dalam mengamandemen hukum nasional, konsistensi hukum dengan perjanjian internasional yang telah ada harus diperiksa secara cermat.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "law",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#28",
+    "row": 1912
+   },
+   "masterIndex": 1913
+  },
+  {
+   "id": "ja_vocab_01914",
+   "word": "透明性",
+   "kana": "とうめいせい",
+   "kanji": "透明性",
+   "romaji": "toumeisei",
+   "phonetic": "とうめいせい · toumeisei",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01914",
+     "meaning": "keterbukaan proses dan informasi; transparansi"
+    }
+   ],
+   "meaning": "keterbukaan proses dan informasi; transparansi",
+   "examples": [
+    {
+     "en": "公共調達の選定過程における透明性を確保するため、議事録の全面公開が義務づけられた。",
+     "id": "Demi menjamin transparansi dalam proses seleksi pengadaan publik, pengumuman risalah rapat secara penuh diwajibkan."
+    }
+   ],
+   "example": "公共調達の選定過程における透明性を確保するため、議事録の全面公開が義務づけられた。",
+   "exampleTranslation": "Demi menjamin transparansi dalam proses seleksi pengadaan publik, pengumuman risalah rapat secara penuh diwajibkan.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "policy",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#29",
+    "row": 1913
+   },
+   "masterIndex": 1914
+  },
+  {
+   "id": "ja_vocab_01915",
+   "word": "実効性",
+   "kana": "じっこうせい",
+   "kanji": "実効性",
+   "romaji": "jikkousei",
+   "phonetic": "じっこうせい · jikkousei",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01915",
+     "meaning": "daya guna nyata dalam penerapan; efektivitas aktual"
+    }
+   ],
+   "meaning": "daya guna nyata dalam penerapan; efektivitas aktual",
+   "examples": [
+    {
+     "en": "どれほど崇高な行動指針を掲げても、監視体制が伴わなければ実効性は乏しいままだ。",
+     "id": "Seluhur apa pun pedoman perilaku yang dicanangkan, tanpa mekanisme pengawasan, efektivitas aktualnya tetap minim."
+    }
+   ],
+   "example": "どれほど崇高な行動指針を掲げても、監視体制が伴わなければ実効性は乏しいままだ。",
+   "exampleTranslation": "Seluhur apa pun pedoman perilaku yang dicanangkan, tanpa mekanisme pengawasan, efektivitas aktualnya tetap minim.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "policy",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#30",
+    "row": 1914
+   },
+   "masterIndex": 1915
+  },
+  {
+   "id": "ja_vocab_01916",
+   "word": "脆弱性",
+   "kana": "ぜいじゃくせい",
+   "kanji": "脆弱性",
+   "romaji": "zeijakusei",
+   "phonetic": "ぜいじゃくせい · zeijakusei",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01916",
+     "meaning": "kerentanan struktural terhadap gangguan"
+    }
+   ],
+   "meaning": "kerentanan struktural terhadap gangguan",
+   "examples": [
+    {
+     "en": "特定の供給網に過度に依存する体制は、災害発生時に深刻な脆弱性を露呈しやすい。",
+     "id": "Sistem yang terlalu bergantung pada rantai pasok tertentu mudah memperlihatkan kerentanan struktural yang parah saat bencana terjadi."
+    }
+   ],
+   "example": "特定の供給網に過度に依存する体制は、災害発生時に深刻な脆弱性を露呈しやすい。",
+   "exampleTranslation": "Sistem yang terlalu bergantung pada rantai pasok tertentu mudah memperlihatkan kerentanan struktural yang parah saat bencana terjadi.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "science",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#31",
+    "row": 1915
+   },
+   "masterIndex": 1916
+  },
+  {
+   "id": "ja_vocab_01917",
+   "word": "相乗効果",
+   "kana": "そうじょうこうか",
+   "kanji": "相乗効果",
+   "romaji": "soujoukouka",
+   "phonetic": "そうじょうこうか · soujoukouka",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01917",
+     "meaning": "efek sinergi yang melipatgandakan hasil"
+    }
+   ],
+   "meaning": "efek sinergi yang melipatgandakan hasil",
+   "examples": [
+    {
+     "en": "材料工学と情報科学の連携によって、単独分野では得られない大きな相乗効果が生まれた。",
+     "id": "Kolaborasi antara teknik material dan ilmu informasi melahirkan efek sinergi besar yang tidak mungkin dicapai oleh satu bidang saja."
+    }
+   ],
+   "example": "材料工学と情報科学の連携によって、単独分野では得られない大きな相乗効果が生まれた。",
+   "exampleTranslation": "Kolaborasi antara teknik material dan ilmu informasi melahirkan efek sinergi besar yang tidak mungkin dicapai oleh satu bidang saja.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "business",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#32",
+    "row": 1916
+   },
+   "masterIndex": 1917
+  },
+  {
+   "id": "ja_vocab_01918",
+   "word": "既得権益",
+   "kana": "きとくけんえき",
+   "kanji": "既得権益",
+   "romaji": "kitokukeneki",
+   "phonetic": "きとくけんえき · kitokukeneki",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01918",
+     "meaning": "hak istimewa mapan yang dikuasai kelompok tertentu"
+    }
+   ],
+   "meaning": "hak istimewa mapan yang dikuasai kelompok tertentu",
+   "examples": [
+    {
+     "en": "新規参入を阻む過剰な許認可制度の背後には、長年温存されてきた既得権益の構造がある。",
+     "id": "Di balik sistem perizinan berlebihan yang menghalangi pendatang baru, terdapat struktur kepentingan mapan yang dipelihara bertahun-tahun."
+    }
+   ],
+   "example": "新規参入を阻む過剰な許認可制度の背後には、長年温存されてきた既得権益の構造がある。",
+   "exampleTranslation": "Di balik sistem perizinan berlebihan yang menghalangi pendatang baru, terdapat struktur kepentingan mapan yang dipelihara bertahun-tahun.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "policy",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#33",
+    "row": 1917
+   },
+   "masterIndex": 1918
+  },
+  {
+   "id": "ja_vocab_01919",
+   "word": "試行錯誤",
+   "kana": "しこうさくご",
+   "kanji": "試行錯誤",
+   "romaji": "shikousakugo",
+   "phonetic": "しこうさくご · shikousakugo",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01919",
+     "meaning": "proses coba-ralat berulang mencari solusi"
+    }
+   ],
+   "meaning": "proses coba-ralat berulang mencari solusi",
+   "examples": [
+    {
+     "en": "画期的な新薬の開発は、無数の失敗と粘り強い試行錯誤の積み重ねの上に成り立っている。",
+     "id": "Pengembangan obat baru yang terobosan berdiri di atas tumpukan kegagalan tak terhitung serta proses coba-ralat yang gigih."
+    }
+   ],
+   "example": "画期的な新薬の開発は、無数の失敗と粘り強い試行錯誤の積み重ねの上に成り立っている。",
+   "exampleTranslation": "Pengembangan obat baru yang terobosan berdiri di atas tumpukan kegagalan tak terhitung serta proses coba-ralat yang gigih.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "science",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#34",
+    "row": 1918
+   },
+   "masterIndex": 1919
+  },
+  {
+   "id": "ja_vocab_01920",
+   "word": "二律背反",
+   "kana": "にりつはいはん",
+   "kanji": "二律背反",
+   "romaji": "niritsuhaihan",
+   "phonetic": "にりつはいはん · niritsuhaihan",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01920",
+     "meaning": "dilema dua prinsip yang saling bertolak belakang"
+    }
+   ],
+   "meaning": "dilema dua prinsip yang saling bertolak belakang",
+   "examples": [
+    {
+     "en": "個人のプライバシー保護と医療データの公益的活用は、しばしば二律背反の関係に陥る。",
+     "id": "Perlindungan privasi individu dan pemanfaatan data medis demi kepentingan publik kerap terjebak dalam hubungan dilema dua prinsip yang bertolak belakang."
+    }
+   ],
+   "example": "個人のプライバシー保護と医療データの公益的活用は、しばしば二律背反の関係に陥る。",
+   "exampleTranslation": "Perlindungan privasi individu dan pemanfaatan data medis demi kepentingan publik kerap terjebak dalam hubungan dilema dua prinsip yang bertolak belakang.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "academic",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#35",
+    "row": 1919
+   },
+   "masterIndex": 1920
+  },
+  {
+   "id": "ja_vocab_01921",
+   "word": "合意形成",
+   "kana": "ごういけいせい",
+   "kanji": "合意形成",
+   "romaji": "gouikeisei",
+   "phonetic": "ごういけいせい · gouikeisei",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01921",
+     "meaning": "pembangunan kesepakatan bersama antarpihak"
+    }
+   ],
+   "meaning": "pembangunan kesepakatan bersama antarpihak",
+   "examples": [
+    {
+     "en": "再生可能エネルギー施設の建設では、計画初期から地域住民との丁寧な合意形成が不可欠だ。",
+     "id": "Dalam pembangunan fasilitas energi terbarukan, pembangunan kesepakatan bersama secara saksama dengan warga setempat sejak tahap awal sangatlah mutlak."
+    }
+   ],
+   "example": "再生可能エネルギー施設の建設では、計画初期から地域住民との丁寧な合意形成が不可欠だ。",
+   "exampleTranslation": "Dalam pembangunan fasilitas energi terbarukan, pembangunan kesepakatan bersama secara saksama dengan warga setempat sejak tahap awal sangatlah mutlak.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "society",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#36",
+    "row": 1920
+   },
+   "masterIndex": 1921
+  },
+  {
+   "id": "ja_vocab_01922",
+   "word": "説明責任",
+   "kana": "せつめいせきにん",
+   "kanji": "説明責任",
+   "romaji": "setsumeisekinin",
+   "phonetic": "せつめいせきにん · setsumeisekinin",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01922",
+     "meaning": "akuntabilitas mempertanggungjawabkan keputusan"
+    }
+   ],
+   "meaning": "akuntabilitas mempertanggungjawabkan keputusan",
+   "examples": [
+    {
+     "en": "人工知能を用いた行政判断であっても、最終的な説明責任は運用する人間側が負うべきである。",
+     "id": "Sekalipun keputusan administratif menggunakan kecerdasan buatan, akuntabilitas akhir tetap harus diemban oleh manusia yang mengoperasikannya."
+    }
+   ],
+   "example": "人工知能を用いた行政判断であっても、最終的な説明責任は運用する人間側が負うべきである。",
+   "exampleTranslation": "Sekalipun keputusan administratif menggunakan kecerdasan buatan, akuntabilitas akhir tetap harus diemban oleh manusia yang mengoperasikannya.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "policy",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#37",
+    "row": 1921
+   },
+   "masterIndex": 1922
+  },
+  {
+   "id": "ja_vocab_01923",
+   "word": "利益相反",
+   "kana": "りえきそうはん",
+   "kanji": "利益相反",
+   "romaji": "riekisouhan",
+   "phonetic": "りえきそうはん · riekisouhan",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01923",
+     "meaning": "benturan kepentingan jabatan dan keuntungan pribadi"
+    }
+   ],
+   "meaning": "benturan kepentingan jabatan dan keuntungan pribadi",
+   "examples": [
+    {
+     "en": "臨床試験の公正さを守るため、研究者は企業からの資金提供に関する利益相反を開示する義務がある。",
+     "id": "Demi menjaga kejujuran uji klinis, peneliti wajib mengungkapkan benturan kepentingan terkait pendanaan dari perusahaan."
+    }
+   ],
+   "example": "臨床試験の公正さを守るため、研究者は企業からの資金提供に関する利益相反を開示する義務がある。",
+   "exampleTranslation": "Demi menjaga kejujuran uji klinis, peneliti wajib mengungkapkan benturan kepentingan terkait pendanaan dari perusahaan.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "law",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#38",
+    "row": 1922
+   },
+   "masterIndex": 1923
+  },
+  {
+   "id": "ja_vocab_01924",
+   "word": "因果関係",
+   "kana": "いんがかんけい",
+   "kanji": "因果関係",
+   "romaji": "ingakankei",
+   "phonetic": "いんがかんけい · ingakankei",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01924",
+     "meaning": "hubungan sebab-akibat yang dapat dibuktikan"
+    }
+   ],
+   "meaning": "hubungan sebab-akibat yang dapat dibuktikan",
+   "examples": [
+    {
+     "en": "二つの現象の間に強い相関が見られても、直ちに直接の因果関係があるとは断定できない。",
+     "id": "Meskipun tampak korelasi kuat di antara dua gejala, tidak dapat langsung dipastikan adanya hubungan sebab-akibat secara langsung."
+    }
+   ],
+   "example": "二つの現象の間に強い相関が見られても、直ちに直接の因果関係があるとは断定できない。",
+   "exampleTranslation": "Meskipun tampak korelasi kuat di antara dua gejala, tidak dapat langsung dipastikan adanya hubungan sebab-akibat secara langsung.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "science",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#39",
+    "row": 1923
+   },
+   "masterIndex": 1924
+  },
+  {
+   "id": "ja_vocab_01925",
+   "word": "再現性",
+   "kana": "さいげんせい",
+   "kanji": "再現性",
+   "romaji": "saigensei",
+   "phonetic": "さいげんせい · saigensei",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01925",
+     "meaning": "keterulangan hasil eksperimen; reprodusibilitas"
+    }
+   ],
+   "meaning": "keterulangan hasil eksperimen; reprodusibilitas",
+   "examples": [
+    {
+     "en": "どれほど斬新な実験結果であっても、第三者による再現性が確認されなければ科学的知見とは呼べない。",
+     "id": "Seinovatif apa pun hasil eksperimen, tanpa konfirmasi keterulangan oleh pihak ketiga, temuan itu belum dapat disebut pengetahuan ilmiah."
+    }
+   ],
+   "example": "どれほど斬新な実験結果であっても、第三者による再現性が確認されなければ科学的知見とは呼べない。",
+   "exampleTranslation": "Seinovatif apa pun hasil eksperimen, tanpa konfirmasi keterulangan oleh pihak ketiga, temuan itu belum dapat disebut pengetahuan ilmiah.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "science",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#40",
+    "row": 1924
+   },
+   "masterIndex": 1925
+  },
+  {
+   "id": "ja_vocab_01926",
+   "word": "持続可能性",
+   "kana": "じぞくかのうせい",
+   "kanji": "持続可能性",
+   "romaji": "jizokukanousei",
+   "phonetic": "じぞくかのうせい · jizokukanousei",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01926",
+     "meaning": "keberlanjutan jangka panjang secara ekologis dan sosial"
+    }
+   ],
+   "meaning": "keberlanjutan jangka panjang secara ekologis dan sosial",
+   "examples": [
+    {
+     "en": "森林資源の商業利用にあたっては、生態系の持続可能性を損なわない伐採基準が設けられている。",
+     "id": "Dalam pemanfaatan komersial sumber daya hutan, ditetapkan standar penebangan yang tidak merusak keberlanjutan ekosistem."
+    }
+   ],
+   "example": "森林資源の商業利用にあたっては、生態系の持続可能性を損なわない伐採基準が設けられている。",
+   "exampleTranslation": "Dalam pemanfaatan komersial sumber daya hutan, ditetapkan standar penebangan yang tidak merusak keberlanjutan ekosistem.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "policy",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#41",
+    "row": 1925
+   },
+   "masterIndex": 1926
+  },
+  {
+   "id": "ja_vocab_01927",
+   "word": "不可逆的",
+   "kana": "ふかぎゃくてき",
+   "kanji": "不可逆的",
+   "romaji": "fukagyakuteki",
+   "phonetic": "ふかぎゃくてき · fukagyakuteki",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "adjective",
+   "meanings": [
+    {
+     "id": "ja_meaning_01927",
+     "meaning": "tidak dapat dibalikkan ke keadaan semula; ireversibel"
+    }
+   ],
+   "meaning": "tidak dapat dibalikkan ke keadaan semula; ireversibel",
+   "examples": [
+    {
+     "en": "永久凍土の融解が進めば、地球規模の気候系に不可逆的な変化をもたらす恐れがあると警告されている。",
+     "id": "Diperingatkan bahwa jika pencairan lapisan tanah beku abadi terus berlanjut, hal itu dikhawatirkan memicu perubahan ireversibel pada sistem iklim global."
+    }
+   ],
+   "example": "永久凍土の融解が進めば、地球規模の気候系に不可逆的な変化をもたらす恐れがあると警告されている。",
+   "exampleTranslation": "Diperingatkan bahwa jika pencairan lapisan tanah beku abadi terus berlanjut, hal itu dikhawatirkan memicu perubahan ireversibel pada sistem iklim global.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "science",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#42",
+    "row": 1926
+   },
+   "masterIndex": 1927
+  },
+  {
+   "id": "ja_vocab_01928",
+   "word": "排他的",
+   "kana": "はいたてき",
+   "kanji": "排他的",
+   "romaji": "haitateki",
+   "phonetic": "はいたてき · haitateki",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "adjective",
+   "meanings": [
+    {
+     "id": "ja_meaning_01928",
+     "meaning": "menutup diri dan menyingkirkan pihak luar; eksklusif"
+    }
+   ],
+   "meaning": "menutup diri dan menyingkirkan pihak luar; eksklusif",
+   "examples": [
+    {
+     "en": "特許権は発明者に一定期間の排他的な独占権を与えることで、さらなる技術開発を促す制度である。",
+     "id": "Hak paten adalah sistem yang mendorong pengembangan teknologi lebih lanjut dengan memberikan hak monopoli eksklusif selama jangka waktu tertentu kepada penemu."
+    }
+   ],
+   "example": "特許権は発明者に一定期間の排他的な独占権を与えることで、さらなる技術開発を促す制度である。",
+   "exampleTranslation": "Hak paten adalah sistem yang mendorong pengembangan teknologi lebih lanjut dengan memberikan hak monopoli eksklusif selama jangka waktu tertentu kepada penemu.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "law",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#43",
+    "row": 1927
+   },
+   "masterIndex": 1928
+  },
+  {
+   "id": "ja_vocab_01929",
+   "word": "抜擢",
+   "kana": "ばってき",
+   "kanji": "抜擢",
+   "romaji": "batteki",
+   "phonetic": "ばってき · batteki",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01929",
+     "meaning": "pengangkatan khusus talenta melampaui urutan senioritas"
+    }
+   ],
+   "meaning": "pengangkatan khusus talenta melampaui urutan senioritas",
+   "examples": [
+    {
+     "en": "年功序列の慣行を改め、若手研究者を新規事業部門の責任者に抜擢する動きが広がっている。",
+     "id": "Langkah mengubah kebiasaan urutan senioritas dan mengangkat peneliti muda berbakat sebagai kepala divisi usaha baru kian meluas."
+    }
+   ],
+   "example": "年功序列の慣行を改め、若手研究者を新規事業部門の責任者に抜擢する動きが広がっている。",
+   "exampleTranslation": "Langkah mengubah kebiasaan urutan senioritas dan mengangkat peneliti muda berbakat sebagai kepala divisi usaha baru kian meluas.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "business",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#44",
+    "row": 1928
+   },
+   "masterIndex": 1929
+  },
+  {
+   "id": "ja_vocab_01930",
+   "word": "払拭",
+   "kana": "ふっしょく",
+   "kanji": "払拭",
+   "romaji": "fusshoku",
+   "phonetic": "ふっしょく · fusshoku",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01930",
+     "meaning": "penghapusan tuntas keraguan atau citra buruk"
+    }
+   ],
+   "meaning": "penghapusan tuntas keraguan atau citra buruk",
+   "examples": [
+    {
+     "en": "一度失墜した組織の信頼を回復し、世間の不信感を払拭するには長年の誠実な行動が要る。",
+     "id": "Untuk memulihkan kepercayaan organisasi yang sempat runtuh dan menghapus tuntas ketidakpercayaan publik, diperlukan tindakan jujur bertahun-tahun."
+    }
+   ],
+   "example": "一度失墜した組織の信頼を回復し、世間の不信感を払拭するには長年の誠実な行動が要る。",
+   "exampleTranslation": "Untuk memulihkan kepercayaan organisasi yang sempat runtuh dan menghapus tuntas ketidakpercayaan publik, diperlukan tindakan jujur bertahun-tahun.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "society",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#45",
+    "row": 1929
+   },
+   "masterIndex": 1930
+  },
+  {
+   "id": "ja_vocab_01931",
+   "word": "逼迫",
+   "kana": "ひっぱく",
+   "kanji": "逼迫",
+   "romaji": "hippaku",
+   "phonetic": "ひっぱく · hippaku",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01931",
+     "meaning": "keterdesakan kritis pada pasokan atau kapasitas"
+    }
+   ],
+   "meaning": "keterdesakan kritis pada pasokan atau kapasitas",
+   "examples": [
+    {
+     "en": "猛暑による冷房需要の急増を受け、夕方の時間帯に電力需給の逼迫が懸念されている。",
+     "id": "Menyusul lonjakan permintaan pendingin ruangan akibat gelombang panas ekstrem, keterdesakan pasokan listrik pada sore hari dikhawatirkan terjadi."
+    }
+   ],
+   "example": "猛暑による冷房需要の急増を受け、夕方の時間帯に電力需給の逼迫が懸念されている。",
+   "exampleTranslation": "Menyusul lonjakan permintaan pendingin ruangan akibat gelombang panas ekstrem, keterdesakan pasokan listrik pada sore hari dikhawatirkan terjadi.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "society",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#46",
+    "row": 1930
+   },
+   "masterIndex": 1931
+  },
+  {
+   "id": "ja_vocab_01932",
+   "word": "頓挫",
+   "kana": "とんざ",
+   "kanji": "頓挫",
+   "romaji": "tonza",
+   "phonetic": "とんざ · tonza",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01932",
+     "meaning": "kemandekan mendadak rencana di tengah jalan"
+    }
+   ],
+   "meaning": "kemandekan mendadak rencana di tengah jalan",
+   "examples": [
+    {
+     "en": "資材価格の高騰と資金調達の難航が重なり、都心の再開発計画は着工直前に頓挫した。",
+     "id": "Akibat lonjakan harga material dan sulitnya penghimpunan dana secara bersamaan, rencana penataan ulang pusat kota mandek sesaat sebelum konstruksi dimulai."
+    }
+   ],
+   "example": "資材価格の高騰と資金調達の難航が重なり、都心の再開発計画は着工直前に頓挫した。",
+   "exampleTranslation": "Akibat lonjakan harga material dan sulitnya penghimpunan dana secara bersamaan, rencana penataan ulang pusat kota mandek sesaat sebelum konstruksi dimulai.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "business",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#47",
+    "row": 1931
+   },
+   "masterIndex": 1932
+  },
+  {
+   "id": "ja_vocab_01933",
+   "word": "瓦解",
+   "kana": "がかい",
+   "kanji": "瓦解",
+   "romaji": "gakai",
+   "phonetic": "がかい · gakai",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01933",
+     "meaning": "keruntuhan menyeluruh suatu tatanan dari dalam"
+    }
+   ],
+   "meaning": "keruntuhan menyeluruh suatu tatanan dari dalam",
+   "examples": [
+    {
+     "en": "内部統制の不備を放置した結果、長年築き上げた企業統治の仕組みが一瞬にして瓦解した。",
+     "id": "Akibat membiarkan kelemahan pengendalian internal, sistem tata kelola perusahaan yang dibangun bertahun-tahun runtuh dalam sekejap."
+    }
+   ],
+   "example": "内部統制の不備を放置した結果、長年築き上げた企業統治の仕組みが一瞬にして瓦解した。",
+   "exampleTranslation": "Akibat membiarkan kelemahan pengendalian internal, sistem tata kelola perusahaan yang dibangun bertahun-tahun runtuh dalam sekejap.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "society",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#48",
+    "row": 1932
+   },
+   "masterIndex": 1933
+  },
+  {
+   "id": "ja_vocab_01934",
+   "word": "逸脱",
+   "kana": "いつだつ",
+   "kanji": "逸脱",
+   "romaji": "itsudatsu",
+   "phonetic": "いつだつ · itsudatsu",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01934",
+     "meaning": "penyimpangan dari norma, kaidah, atau wewenang"
+    }
+   ],
+   "meaning": "penyimpangan dari norma, kaidah, atau wewenang",
+   "examples": [
+    {
+     "en": "行政機関による権限の濫用や法の趣旨からの逸脱を監視することは、司法の重要な役割である。",
+     "id": "Mengawasi penyalahgunaan wewenang serta penyimpangan dari semangat undang-undang oleh lembaga eksekutif merupakan peran penting peradilan."
+    }
+   ],
+   "example": "行政機関による権限の濫用や法の趣旨からの逸脱を監視することは、司法の重要な役割である。",
+   "exampleTranslation": "Mengawasi penyalahgunaan wewenang serta penyimpangan dari semangat undang-undang oleh lembaga eksekutif merupakan peran penting peradilan.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "law",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#49",
+    "row": 1933
+   },
+   "masterIndex": 1934
+  },
+  {
+   "id": "ja_vocab_01935",
+   "word": "抵触",
+   "kana": "ていしょく",
+   "kanji": "抵触",
+   "romaji": "teishoku",
+   "phonetic": "ていしょく · teishoku",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01935",
+     "meaning": "pelanggaran atau pertentangan terhadap ketentuan hukum"
+    }
+   ],
+   "meaning": "pelanggaran atau pertentangan terhadap ketentuan hukum",
+   "examples": [
+    {
+     "en": "競合他社との価格協定は独占禁止法に抵触する重大な違法行為とみなされる。",
+     "id": "Kesepakatan harga dengan perusahaan pesaing dipandang sebagai tindakan melanggar hukum berat yang bertentangan dengan undang-undang antimonopoli."
+    }
+   ],
+   "example": "競合他社との価格協定は独占禁止法に抵触する重大な違法行為とみなされる。",
+   "exampleTranslation": "Kesepakatan harga dengan perusahaan pesaing dipandang sebagai tindakan melanggar hukum berat yang bertentangan dengan undang-undang antimonopoli.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "law",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#50",
+    "row": 1934
+   },
+   "masterIndex": 1935
+  },
+  {
+   "id": "ja_vocab_01936",
+   "word": "遵守",
+   "kana": "じゅんしゅ",
+   "kanji": "遵守",
+   "romaji": "junshu",
+   "phonetic": "じゅんしゅ · junshu",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01936",
+     "meaning": "kepatuhan ketat terhadap hukum dan tata tertib"
+    }
+   ],
+   "meaning": "kepatuhan ketat terhadap hukum dan tata tertib",
+   "examples": [
+    {
+     "en": "国際市場で事業を展開する企業には、各国の労働法規や環境基準の厳格な遵守が求められる。",
+     "id": "Perusahaan yang mengembangkan bisnis di pasar internasional dituntut mematuhi secara ketat peraturan ketenagakerjaan dan standar lingkungan tiap negara."
+    }
+   ],
+   "example": "国際市場で事業を展開する企業には、各国の労働法規や環境基準の厳格な遵守が求められる。",
+   "exampleTranslation": "Perusahaan yang mengembangkan bisnis di pasar internasional dituntut mematuhi secara ketat peraturan ketenagakerjaan dan standar lingkungan tiap negara.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "business",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#51",
+    "row": 1935
+   },
+   "masterIndex": 1936
+  },
+  {
+   "id": "ja_vocab_01937",
+   "word": "遡及",
+   "kana": "そきゅう",
+   "kanji": "遡及",
+   "romaji": "sokyuu",
+   "phonetic": "そきゅう · sokyuu",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01937",
+     "meaning": "pemberlakuan aturan surut ke masa lampau; retroaktivitas"
+    }
+   ],
+   "meaning": "pemberlakuan aturan surut ke masa lampau; retroaktivitas",
+   "examples": [
+    {
+     "en": "法的安定性を守る見地から、刑罰法規を行為時点より前へ遡及して適用することは禁じられている。",
+     "id": "Demi menjaga kepastian hukum, pemberlakuan surut ketentuan pidana ke waktu sebelum perbuatan dilakukan dilarang keras."
+    }
+   ],
+   "example": "法的安定性を守る見地から、刑罰法規を行為時点より前へ遡及して適用することは禁じられている。",
+   "exampleTranslation": "Demi menjaga kepastian hukum, pemberlakuan surut ketentuan pidana ke waktu sebelum perbuatan dilakukan dilarang keras.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "law",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#52",
+    "row": 1936
+   },
+   "masterIndex": 1937
+  },
+  {
+   "id": "ja_vocab_01938",
+   "word": "拘束力",
+   "kana": "こうそくりょく",
+   "kanji": "拘束力",
+   "romaji": "kousokuryoku",
+   "phonetic": "こうそくりょく · kousokuryoku",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01938",
+     "meaning": "daya ikat hukum yang mewajibkan kepatuhan"
+    }
+   ],
+   "meaning": "daya ikat hukum yang mewajibkan kepatuhan",
+   "examples": [
+    {
+     "en": "この共同宣言は政治的な決意を示すにとどまり、加盟国に対する法的な拘束力は持たない。",
+     "id": "Deklarasi bersama ini hanya menyatakan tekad politik dan tidak memiliki daya ikat hukum terhadap negara-negara anggota."
+    }
+   ],
+   "example": "この共同宣言は政治的な決意を示すにとどまり、加盟国に対する法的な拘束力は持たない。",
+   "exampleTranslation": "Deklarasi bersama ini hanya menyatakan tekad politik dan tidak memiliki daya ikat hukum terhadap negara-negara anggota.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "law",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#53",
+    "row": 1937
+   },
+   "masterIndex": 1938
+  },
+  {
+   "id": "ja_vocab_01939",
+   "word": "裁量",
+   "kana": "さいりょう",
+   "kanji": "裁量",
+   "romaji": "sairyou",
+   "phonetic": "さいりょう · sairyou",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01939",
+     "meaning": "ruang kewenangan menimbang sendiri; diskresi"
+    }
+   ],
+   "meaning": "ruang kewenangan menimbang sendiri; diskresi",
+   "examples": [
+    {
+     "en": "現場の実情に応じた迅速な支援を行うため、地方自治体に幅広い予算配分の裁量が認められた。",
+     "id": "Agar bantuan cepat sesuai kondisi lapangan dapat diberikan, pemerintah daerah diberi kewenangan diskresi luas dalam alokasi anggaran."
+    }
+   ],
+   "example": "現場の実情に応じた迅速な支援を行うため、地方自治体に幅広い予算配分の裁量が認められた。",
+   "exampleTranslation": "Agar bantuan cepat sesuai kondisi lapangan dapat diberikan, pemerintah daerah diberi kewenangan diskresi luas dalam alokasi anggaran.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "policy",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#54",
+    "row": 1938
+   },
+   "masterIndex": 1939
+  },
+  {
+   "id": "ja_vocab_01940",
+   "word": "均衡",
+   "kana": "きんこう",
+   "kanji": "均衡",
+   "romaji": "kinkou",
+   "phonetic": "きんこう · kinkou",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01940",
+     "meaning": "keseimbangan proporsional antarkekuatan"
+    }
+   ],
+   "meaning": "keseimbangan proporsional antarkekuatan",
+   "examples": [
+    {
+     "en": "経済成長の促進と環境負荷の低減との間で、いかに適切な均衡を保つかが問われている。",
+     "id": "Kini dipertanyakan bagaimana menjaga keseimbangan yang tepat antara percepatan pertumbuhan ekonomi dan pengurangan beban lingkungan."
+    }
+   ],
+   "example": "経済成長の促進と環境負荷の低減との間で、いかに適切な均衡を保つかが問われている。",
+   "exampleTranslation": "Kini dipertanyakan bagaimana menjaga keseimbangan yang tepat antara percepatan pertumbuhan ekonomi dan pengurangan beban lingkungan.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "policy",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#55",
+    "row": 1939
+   },
+   "masterIndex": 1940
+  },
+  {
+   "id": "ja_vocab_01941",
+   "word": "漸進的",
+   "kana": "ぜんしんてき",
+   "kanji": "漸進的",
+   "romaji": "zenshinteki",
+   "phonetic": "ぜんしんてき · zenshinteki",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "adjective",
+   "meanings": [
+    {
+     "id": "ja_meaning_01941",
+     "meaning": "bertahap selangkah demi selangkah; gradual"
+    }
+   ],
+   "meaning": "bertahap selangkah demi selangkah; gradual",
+   "examples": [
+    {
+     "en": "急激な制度転換による社会的混乱を避けるため、政府は漸進的な改革路線を選択した。",
+     "id": "Untuk menghindari gejolak sosial akibat perubahan sistem yang mendadak, pemerintah memilih jalur reformasi secara bertahap."
+    }
+   ],
+   "example": "急激な制度転換による社会的混乱を避けるため、政府は漸進的な改革路線を選択した。",
+   "exampleTranslation": "Untuk menghindari gejolak sosial akibat perubahan sistem yang mendadak, pemerintah memilih jalur reformasi secara bertahap.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "policy",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#56",
+    "row": 1940
+   },
+   "masterIndex": 1941
+  },
+  {
+   "id": "ja_vocab_01942",
+   "word": "硬直化",
+   "kana": "こうちょくか",
+   "kanji": "硬直化",
+   "romaji": "kouchokuka",
+   "phonetic": "こうちょくか · kouchokuka",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01942",
+     "meaning": "pembakuan kaku yang kehilangan daya lentur"
+    }
+   ],
+   "meaning": "pembakuan kaku yang kehilangan daya lentur",
+   "examples": [
+    {
+     "en": "前例主義が蔓延すると組織の意思決定が硬直化し、市場の変化に即応できなくなる。",
+     "id": "Apabila budaya terpaku pada preseden meluas, pengambilan keputusan organisasi menjadi kaku sehingga tak mampu merespons perubahan pasar."
+    }
+   ],
+   "example": "前例主義が蔓延すると組織の意思決定が硬直化し、市場の変化に即応できなくなる。",
+   "exampleTranslation": "Apabila budaya terpaku pada preseden meluas, pengambilan keputusan organisasi menjadi kaku sehingga tak mampu merespons perubahan pasar.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "business",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#57",
+    "row": 1941
+   },
+   "masterIndex": 1942
+  },
+  {
+   "id": "ja_vocab_01943",
+   "word": "空洞化",
+   "kana": "くうどうか",
+   "kanji": "空洞化",
+   "romaji": "kuudouka",
+   "phonetic": "くうどうか · kuudouka",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01943",
+     "meaning": "pengosongan substansi atau basis industri domestik"
+    }
+   ],
+   "meaning": "pengosongan substansi atau basis industri domestik",
+   "examples": [
+    {
+     "en": "生産拠点の海外移転と若年層の流出が重なり、地方都市の中心市街地で空洞化が進んでいる。",
+     "id": "Perpindahan basis produksi ke luar negeri yang berbarengan dengan arus keluar generasi muda mempercepat pengosongan kawasan pusat kota daerah."
+    }
+   ],
+   "example": "生産拠点の海外移転と若年層の流出が重なり、地方都市の中心市街地で空洞化が進んでいる。",
+   "exampleTranslation": "Perpindahan basis produksi ke luar negeri yang berbarengan dengan arus keluar generasi muda mempercepat pengosongan kawasan pusat kota daerah.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "society",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#58",
+    "row": 1942
+   },
+   "masterIndex": 1943
+  },
+  {
+   "id": "ja_vocab_01944",
+   "word": "形骸化",
+   "kana": "けいがいか",
+   "kanji": "形骸化",
+   "romaji": "keigaika",
+   "phonetic": "けいがいか · keigaika",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01944",
+     "meaning": "pendangkalan aturan hingga tinggal bentuk tanpa isi"
+    }
+   ],
+   "meaning": "pendangkalan aturan hingga tinggal bentuk tanpa isi",
+   "examples": [
+    {
+     "en": "目的を見失ったまま形式的な書類確認ばかりが続けば、安全点検の仕組みは容易に形骸化する。",
+     "id": "Jika pemeriksaan dokumen yang bersifat formalitas belaka terus berlanjut tanpa memahami tujuannya, mekanisme inspeksi keselamatan mudah kehilangan substansinya."
+    }
+   ],
+   "example": "目的を見失ったまま形式的な書類確認ばかりが続けば、安全点検の仕組みは容易に形骸化する。",
+   "exampleTranslation": "Jika pemeriksaan dokumen yang bersifat formalitas belaka terus berlanjut tanpa memahami tujuannya, mekanisme inspeksi keselamatan mudah kehilangan substansinya.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "society",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#59",
+    "row": 1943
+   },
+   "masterIndex": 1944
+  },
+  {
+   "id": "ja_vocab_01945",
+   "word": "顕在化",
+   "kana": "けんざいか",
+   "kanji": "顕在化",
+   "romaji": "kenzaika",
+   "phonetic": "けんざいか · kenzaika",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01945",
+     "meaning": "kemunculan nyata masalah terpendam ke permukaan"
+    }
+   ],
+   "meaning": "kemunculan nyata masalah terpendam ke permukaan",
+   "examples": [
+    {
+     "en": "景気後退を契機として、これまで見過ごされてきた雇用構造の歪みが一気に顕在化した。",
+     "id": "Dipicu oleh kemunduran ekonomi, ketimpangan struktur ketenagakerjaan yang selama ini terabaikan seketika muncul ke permukaan."
+    }
+   ],
+   "example": "景気後退を契機として、これまで見過ごされてきた雇用構造の歪みが一気に顕在化した。",
+   "exampleTranslation": "Dipicu oleh kemunduran ekonomi, ketimpangan struktur ketenagakerjaan yang selama ini terabaikan seketika muncul ke permukaan.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "society",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#60",
+    "row": 1944
+   },
+   "masterIndex": 1945
+  },
+  {
+   "id": "ja_vocab_01946",
+   "word": "黙認",
+   "kana": "もくにん",
+   "kanji": "黙認",
+   "romaji": "mokunin",
+   "phonetic": "もくにん · mokunin",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01946",
+     "meaning": "pembiaran diam-diam terhadap pelanggaran"
+    }
+   ],
+   "meaning": "pembiaran diam-diam terhadap pelanggaran",
+   "examples": [
+    {
+     "en": "長時間労働の常態化を経営陣が黙認していた事実が、第三者委員会の調査で明らかになった。",
+     "id": "Fakta bahwa jajaran manajemen membiarkan secara diam-diam pembiasaan jam kerja berlebih terungkap melalui penyelidikan komite independen."
+    }
+   ],
+   "example": "長時間労働の常態化を経営陣が黙認していた事実が、第三者委員会の調査で明らかになった。",
+   "exampleTranslation": "Fakta bahwa jajaran manajemen membiarkan secara diam-diam pembiasaan jam kerja berlebih terungkap melalui penyelidikan komite independen.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "law",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#61",
+    "row": 1945
+   },
+   "masterIndex": 1946
+  },
+  {
+   "id": "ja_vocab_01947",
+   "word": "忖度",
+   "kana": "そんたく",
+   "kanji": "忖度",
+   "romaji": "sontaku",
+   "phonetic": "そんたく · sontaku",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01947",
+     "meaning": "penyesuaian diri mendahului kehendak atasan tanpa perintah"
+    }
+   ],
+   "meaning": "penyesuaian diri mendahului kehendak atasan tanpa perintah",
+   "examples": [
+    {
+     "en": "上層部の意向に対する過度な忖度が働くと、現場からの率直な異論や警告が封じられてしまう。",
+     "id": "Ketika penyesuaian berlebihan terhadap kehendak pimpinan bekerja, keberatan serta peringatan jujur dari lapangan pun terbungkam."
+    }
+   ],
+   "example": "上層部の意向に対する過度な忖度が働くと、現場からの率直な異論や警告が封じられてしまう。",
+   "exampleTranslation": "Ketika penyesuaian berlebihan terhadap kehendak pimpinan bekerja, keberatan serta peringatan jujur dari lapangan pun terbungkam.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "society",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#62",
+    "row": 1946
+   },
+   "masterIndex": 1947
+  },
+  {
+   "id": "ja_vocab_01948",
+   "word": "軋轢",
+   "kana": "あつれき",
+   "kanji": "軋轢",
+   "romaji": "atsureki",
+   "phonetic": "あつれき · atsureki",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01948",
+     "meaning": "gesekan tajam dan ketegangan antarpihak"
+    }
+   ],
+   "meaning": "gesekan tajam dan ketegangan antarpihak",
+   "examples": [
+    {
+     "en": "限られた水資源の配分をめぐり、上流地域と下流地域の間に長年の軋轢が横たわっている。",
+     "id": "Terkait pembagian sumber daya air yang terbatas, terdapat gesekan berkepanjangan antara wilayah hulu dan wilayah hilir."
+    }
+   ],
+   "example": "限られた水資源の配分をめぐり、上流地域と下流地域の間に長年の軋轢が横たわっている。",
+   "exampleTranslation": "Terkait pembagian sumber daya air yang terbatas, terdapat gesekan berkepanjangan antara wilayah hulu dan wilayah hilir.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "society",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#63",
+    "row": 1947
+   },
+   "masterIndex": 1948
+  },
+  {
+   "id": "ja_vocab_01949",
+   "word": "膠着",
+   "kana": "こうちゃく",
+   "kanji": "膠着",
+   "romaji": "kouchaku",
+   "phonetic": "こうちゃく · kouchaku",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01949",
+     "meaning": "kebuntuan perundingan yang membeku tanpa kemajuan"
+    }
+   ],
+   "meaning": "kebuntuan perundingan yang membeku tanpa kemajuan",
+   "examples": [
+    {
+     "en": "双方の譲歩案が折り合わず、国境画定をめぐる外交交渉は半年以上にわたり膠着している。",
+     "id": "Karena usulan konsesi kedua belah pihak tak menemui titik temu, perundingan diplomatik penetapan batas wilayah membeku lebih dari setengah tahun."
+    }
+   ],
+   "example": "双方の譲歩案が折り合わず、国境画定をめぐる外交交渉は半年以上にわたり膠着している。",
+   "exampleTranslation": "Karena usulan konsesi kedua belah pihak tak menemui titik temu, perundingan diplomatik penetapan batas wilayah membeku lebih dari setengah tahun.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "policy",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#64",
+    "row": 1948
+   },
+   "masterIndex": 1949
+  },
+  {
+   "id": "ja_vocab_01950",
+   "word": "閾値",
+   "kana": "いきち",
+   "kanji": "閾値",
+   "romaji": "ikichi",
+   "phonetic": "いきち · ikichi",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01950",
+     "meaning": "nilai ambang batas pemicu perubahan keadaan"
+    }
+   ],
+   "meaning": "nilai ambang batas pemicu perubahan keadaan",
+   "examples": [
+    {
+     "en": "汚染物質の濃度が一定の閾値を超えると、水生生物の繁殖率が急激に低下することが判明した。",
+     "id": "Terbukti bahwa ketika konsentrasi zat pencemar melampaui nilai ambang batas tertentu, tingkat reproduksi biota air merosot tajam."
+    }
+   ],
+   "example": "汚染物質の濃度が一定の閾値を超えると、水生生物の繁殖率が急激に低下することが判明した。",
+   "exampleTranslation": "Terbukti bahwa ketika konsentrasi zat pencemar melampaui nilai ambang batas tertentu, tingkat reproduksi biota air merosot tajam.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "science",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#65",
+    "row": 1949
+   },
+   "masterIndex": 1950
+  },
+  {
+   "id": "ja_vocab_01951",
+   "word": "偏在",
+   "kana": "へんざい",
+   "kanji": "偏在",
+   "romaji": "henzai",
+   "phonetic": "へんざい · henzai",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01951",
+     "meaning": "ketimpangan sebaran yang menumpuk di wilayah tertentu"
+    }
+   ],
+   "meaning": "ketimpangan sebaran yang menumpuk di wilayah tertentu",
+   "examples": [
+    {
+     "en": "専門医が大都市圏に偏在している現状を改めなければ、地方の救急医療体制は維持できない。",
+     "id": "Jika ketimpangan sebaran dokter spesialis yang menumpuk di kawasan metropolitan tidak diperbaiki, layanan medis darurat di daerah tak dapat dipertahankan."
+    }
+   ],
+   "example": "専門医が大都市圏に偏在している現状を改めなければ、地方の救急医療体制は維持できない。",
+   "exampleTranslation": "Jika ketimpangan sebaran dokter spesialis yang menumpuk di kawasan metropolitan tidak diperbaiki, layanan medis darurat di daerah tak dapat dipertahankan.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "policy",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#66",
+    "row": 1950
+   },
+   "masterIndex": 1951
+  },
+  {
+   "id": "ja_vocab_01952",
+   "word": "寡占",
+   "kana": "かせん",
+   "kanji": "寡占",
+   "romaji": "kasen",
+   "phonetic": "かせん · kasen",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01952",
+     "meaning": "penguasaan pasar oleh segelintir pelaku usaha; oligopoli"
+    }
+   ],
+   "meaning": "penguasaan pasar oleh segelintir pelaku usaha; oligopoli",
+   "examples": [
+    {
+     "en": "巨大情報企業による市場の寡占が進むと、利用者の選択肢が狭まり価格競争も働きにくくなる。",
+     "id": "Apabila oligopoli pasar oleh perusahaan teknologi raksasa kian menguat, pilihan pengguna menyempit dan persaingan harga pun sulit berjalan."
+    }
+   ],
+   "example": "巨大情報企業による市場の寡占が進むと、利用者の選択肢が狭まり価格競争も働きにくくなる。",
+   "exampleTranslation": "Apabila oligopoli pasar oleh perusahaan teknologi raksasa kian menguat, pilihan pengguna menyempit dan persaingan harga pun sulit berjalan.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "business",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#67",
+    "row": 1951
+   },
+   "masterIndex": 1952
+  },
+  {
+   "id": "ja_vocab_01953",
+   "word": "錯綜",
+   "kana": "さくそう",
+   "kanji": "錯綜",
+   "romaji": "sakusou",
+   "phonetic": "さくそう · sakusou",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "noun",
+   "meanings": [
+    {
+     "id": "ja_meaning_01953",
+     "meaning": "jalinan rumit informasi atau kepentingan yang bersilangan"
+    }
+   ],
+   "meaning": "jalinan rumit informasi atau kepentingan yang bersilangan",
+   "examples": [
+    {
+     "en": "大規模災害の直後には真偽不明の情報が錯綜するため、公的機関による冷静な検証が求められる。",
+     "id": "Sesaat setelah bencana besar, informasi yang belum jelas kebenarannya saling bersilangan secara rumit sehingga diperlukan verifikasi tenang oleh lembaga resmi."
+    }
+   ],
+   "example": "大規模災害の直後には真偽不明の情報が錯綜するため、公的機関による冷静な検証が求められる。",
+   "exampleTranslation": "Sesaat setelah bencana besar, informasi yang belum jelas kebenarannya saling bersilangan secara rumit sehingga diperlukan verifikasi tenang oleh lembaga resmi.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "society",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#68",
+    "row": 1952
+   },
+   "masterIndex": 1953
+  },
+  {
+   "id": "ja_vocab_01954",
+   "word": "内包する",
+   "kana": "ないほうする",
+   "kanji": "内包する",
+   "romaji": "naihou suru",
+   "phonetic": "ないほうする · naihou suru",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "verb",
+   "meanings": [
+    {
+     "id": "ja_meaning_01954",
+     "meaning": "mengandung secara implisit di dalam dirinya"
+    }
+   ],
+   "meaning": "mengandung secara implisit di dalam dirinya",
+   "examples": [
+    {
+     "en": "利便性を極限まで追求した社会システムは、同時に深刻な監視社会化の危険を内包する。",
+     "id": "Sistem sosial yang mengejar kemudahan hingga batas maksimal sekaligus mengandung bahaya serius menuju masyarakat pengawasan."
+    }
+   ],
+   "example": "利便性を極限まで追求した社会システムは、同時に深刻な監視社会化の危険を内包する。",
+   "exampleTranslation": "Sistem sosial yang mengejar kemudahan hingga batas maksimal sekaligus mengandung bahaya serius menuju masyarakat pengawasan.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "academic",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#69",
+    "row": 1953
+   },
+   "masterIndex": 1954
+  },
+  {
+   "id": "ja_vocab_01955",
+   "word": "帰属する",
+   "kana": "きぞくする",
+   "kanji": "帰属する",
+   "romaji": "kizoku suru",
+   "phonetic": "きぞくする · kizoku suru",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "verb",
+   "meanings": [
+    {
+     "id": "ja_meaning_01955",
+     "meaning": "menjadi milik sah atau berada dalam yurisdiksi"
+    }
+   ],
+   "meaning": "menjadi milik sah atau berada dalam yurisdiksi",
+   "examples": [
+    {
+     "en": "共同研究によって得られた知的財産権がいずれの機関に帰属するかを事前に契約で明記した。",
+     "id": "Lembaga mana yang menjadi pemilik sah hak kekayaan intelektual hasil riset bersama telah dicantumkan secara tegas dalam kontrak sejak awal."
+    }
+   ],
+   "example": "共同研究によって得られた知的財産権がいずれの機関に帰属するかを事前に契約で明記した。",
+   "exampleTranslation": "Lembaga mana yang menjadi pemilik sah hak kekayaan intelektual hasil riset bersama telah dicantumkan secara tegas dalam kontrak sejak awal.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "law",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#70",
+    "row": 1954
+   },
+   "masterIndex": 1955
+  },
+  {
+   "id": "ja_vocab_01956",
+   "word": "収斂する",
+   "kana": "しゅうれんする",
+   "kanji": "収斂する",
+   "romaji": "shuuren suru",
+   "phonetic": "しゅうれんする · shuuren suru",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "verb",
+   "meanings": [
+    {
+     "id": "ja_meaning_01956",
+     "meaning": "mengerucut menuju satu titik temu; berkonvergensi"
+    }
+   ],
+   "meaning": "mengerucut menuju satu titik temu; berkonvergensi",
+   "examples": [
+    {
+     "en": "異なる学問分野から出発した複数の仮説が、最新の観測結果によって一つのモデルへと収斂する。",
+     "id": "Berbagai hipotesis yang berangkat dari disiplin ilmu berbeda mengerucut menuju satu model berkat hasil pengamatan terbaru."
+    }
+   ],
+   "example": "異なる学問分野から出発した複数の仮説が、最新の観測結果によって一つのモデルへと収斂する。",
+   "exampleTranslation": "Berbagai hipotesis yang berangkat dari disiplin ilmu berbeda mengerucut menuju satu model berkat hasil pengamatan terbaru.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "academic",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#71",
+    "row": 1955
+   },
+   "masterIndex": 1956
+  },
+  {
+   "id": "ja_vocab_01957",
+   "word": "凌駕する",
+   "kana": "りょうがする",
+   "kanji": "凌駕する",
+   "romaji": "ryouga suru",
+   "phonetic": "りょうがする · ryouga suru",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "verb",
+   "meanings": [
+    {
+     "id": "ja_meaning_01957",
+     "meaning": "melampaui jauh capaian pendahulu atau pesaing"
+    }
+   ],
+   "meaning": "melampaui jauh capaian pendahulu atau pesaing",
+   "examples": [
+    {
+     "en": "新型の量子計算機は特定の最適化問題において、従来の演算装置の処理速度をはるかに凌駕する。",
+     "id": "Komputer kuantum generasi baru melampaui jauh kecepatan pemrosesan perangkat hitung konvensional pada persoalan optimasi tertentu."
+    }
+   ],
+   "example": "新型の量子計算機は特定の最適化問題において、従来の演算装置の処理速度をはるかに凌駕する。",
+   "exampleTranslation": "Komputer kuantum generasi baru melampaui jauh kecepatan pemrosesan perangkat hitung konvensional pada persoalan optimasi tertentu.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "science",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#72",
+    "row": 1956
+   },
+   "masterIndex": 1957
+  },
+  {
+   "id": "ja_vocab_01958",
+   "word": "補完する",
+   "kana": "ほかんする",
+   "kanji": "補完する",
+   "romaji": "hokan suru",
+   "phonetic": "ほかんする · hokan suru",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "verb",
+   "meanings": [
+    {
+     "id": "ja_meaning_01958",
+     "meaning": "saling melengkapi kekurangan secara fungsional"
+    }
+   ],
+   "meaning": "saling melengkapi kekurangan secara fungsional",
+   "examples": [
+    {
+     "en": "人工知能は医師の臨床判断を代替するものではなく、見落としを防ぐために人間を補完する道具だ。",
+     "id": "Kecerdasan buatan bukanlah pengganti penilaian klinis dokter, melainkan perangkat yang melengkapi manusia guna mencegah kekeliruan."
+    }
+   ],
+   "example": "人工知能は医師の臨床判断を代替するものではなく、見落としを防ぐために人間を補完する道具だ。",
+   "exampleTranslation": "Kecerdasan buatan bukanlah pengganti penilaian klinis dokter, melainkan perangkat yang melengkapi manusia guna mencegah kekeliruan.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "science",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#73",
+    "row": 1957
+   },
+   "masterIndex": 1958
+  },
+  {
+   "id": "ja_vocab_01959",
+   "word": "牽引する",
+   "kana": "けんいんする",
+   "kanji": "牽引する",
+   "romaji": "kenin suru",
+   "phonetic": "けんいんする · kenin suru",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "verb",
+   "meanings": [
+    {
+     "id": "ja_meaning_01959",
+     "meaning": "menjadi penggerak utama yang menarik pertumbuhan"
+    }
+   ],
+   "meaning": "menjadi penggerak utama yang menarik pertumbuhan",
+   "examples": [
+    {
+     "en": "脱炭素関連の技術投資が、次世代の製造業と雇用創出を力強く牽引する原動力となっている。",
+     "id": "Investasi teknologi terkait dekarbonisasi menjadi daya penggerak utama yang menarik maju industri manufaktur generasi berikutnya dan penciptaan lapangan kerja."
+    }
+   ],
+   "example": "脱炭素関連の技術投資が、次世代の製造業と雇用創出を力強く牽引する原動力となっている。",
+   "exampleTranslation": "Investasi teknologi terkait dekarbonisasi menjadi daya penggerak utama yang menarik maju industri manufaktur generasi berikutnya dan penciptaan lapangan kerja.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "business",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#74",
+    "row": 1958
+   },
+   "masterIndex": 1959
+  },
+  {
+   "id": "ja_vocab_01960",
+   "word": "阻害する",
+   "kana": "そがいする",
+   "kanji": "阻害する",
+   "romaji": "sogai suru",
+   "phonetic": "そがいする · sogai suru",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "verb",
+   "meanings": [
+    {
+     "id": "ja_meaning_01960",
+     "meaning": "menghambat jalannya fungsi atau perkembangan"
+    }
+   ],
+   "meaning": "menghambat jalannya fungsi atau perkembangan",
+   "examples": [
+    {
+     "en": "硬直的な縦割り行政は、分野を横断する社会課題への迅速な対応を阻害する要因になりかねない。",
+     "id": "Birokrasi sektoral yang kaku berpotensi menjadi faktor yang menghambat penanganan cepat atas masalah sosial lintas bidang."
+    }
+   ],
+   "example": "硬直的な縦割り行政は、分野を横断する社会課題への迅速な対応を阻害する要因になりかねない。",
+   "exampleTranslation": "Birokrasi sektoral yang kaku berpotensi menjadi faktor yang menghambat penanganan cepat atas masalah sosial lintas bidang.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "policy",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#75",
+    "row": 1959
+   },
+   "masterIndex": 1960
+  },
+  {
+   "id": "ja_vocab_01961",
+   "word": "喚起する",
+   "kana": "かんきする",
+   "kanji": "喚起する",
+   "romaji": "kanki suru",
+   "phonetic": "かんきする · kanki suru",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "verb",
+   "meanings": [
+    {
+     "id": "ja_meaning_01961",
+     "meaning": "menggugah kesadaran atau kewaspadaan publik"
+    }
+   ],
+   "meaning": "menggugah kesadaran atau kewaspadaan publik",
+   "examples": [
+    {
+     "en": "過去の震災記録をデジタルアーカイブとして公開する試みは、次世代の防災意識を喚起する意義を持つ。",
+     "id": "Upaya membuka arsip digital catatan gempa masa lalu bermakna penting dalam menggugah kesadaran mitigasi bencana generasi mendatang."
+    }
+   ],
+   "example": "過去の震災記録をデジタルアーカイブとして公開する試みは、次世代の防災意識を喚起する意義を持つ。",
+   "exampleTranslation": "Upaya membuka arsip digital catatan gempa masa lalu bermakna penting dalam menggugah kesadaran mitigasi bencana generasi mendatang.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "society",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#76",
+    "row": 1960
+   },
+   "masterIndex": 1961
+  },
+  {
+   "id": "ja_vocab_01962",
+   "word": "担保する",
+   "kana": "たんぽする",
+   "kanji": "担保する",
+   "romaji": "tanpo suru",
+   "phonetic": "たんぽする · tanpo suru",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "verb",
+   "meanings": [
+    {
+     "id": "ja_meaning_01962",
+     "meaning": "menjamin kepastian mutu, keadilan, atau kewajiban"
+    }
+   ],
+   "meaning": "menjamin kepastian mutu, keadilan, atau kewajiban",
+   "examples": [
+    {
+     "en": "アルゴリズムによる融資審査では、不当な差別が生じないよう公平性を担保する監査が不可欠だ。",
+     "id": "Dalam penilaian kredit berbasis algoritma, audit yang menjamin keadilan mutlak diperlukan agar tidak terjadi diskriminasi yang tidak semestinya."
+    }
+   ],
+   "example": "アルゴリズムによる融資審査では、不当な差別が生じないよう公平性を担保する監査が不可欠だ。",
+   "exampleTranslation": "Dalam penilaian kredit berbasis algoritma, audit yang menjamin keadilan mutlak diperlukan agar tidak terjadi diskriminasi yang tidak semestinya.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "law",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#77",
+    "row": 1961
+   },
+   "masterIndex": 1962
+  },
+  {
+   "id": "ja_vocab_01963",
+   "word": "検証する",
+   "kana": "けんしょうする",
+   "kanji": "検証する",
+   "romaji": "kenshou suru",
+   "phonetic": "けんしょうする · kenshou suru",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "verb",
+   "meanings": [
+    {
+     "id": "ja_meaning_01963",
+     "meaning": "menguji kebenaran hipotesis atau kebijakan secara empiris"
+    }
+   ],
+   "meaning": "menguji kebenaran hipotesis atau kebijakan secara empiris",
+   "examples": [
+    {
+     "en": "補助金政策が実際に地域の雇用増加へ結びついたのかを、客観的なデータに基づき検証する。",
+     "id": "Apakah kebijakan subsidi benar-benar berdampak pada peningkatan lapangan kerja daerah diuji secara empiris berdasarkan data objektif."
+    }
+   ],
+   "example": "補助金政策が実際に地域の雇用増加へ結びついたのかを、客観的なデータに基づき検証する。",
+   "exampleTranslation": "Apakah kebijakan subsidi benar-benar berdampak pada peningkatan lapangan kerja daerah diuji secara empiris berdasarkan data objektif.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "academic",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#78",
+    "row": 1962
+   },
+   "masterIndex": 1963
+  },
+  {
+   "id": "ja_vocab_01964",
+   "word": "精査する",
+   "kana": "せいさする",
+   "kanji": "精査する",
+   "romaji": "seisa suru",
+   "phonetic": "せいさする · seisa suru",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "verb",
+   "meanings": [
+    {
+     "id": "ja_meaning_01964",
+     "meaning": "memeriksa secara cermat hingga ke rincian terkecil"
+    }
+   ],
+   "meaning": "memeriksa secara cermat hingga ke rincian terkecil",
+   "examples": [
+    {
+     "en": "企業買収の最終合意に先立ち、対象企業の偶発債務や契約上のリスクを専門家が精査する。",
+     "id": "Sebelum kesepakatan akhir akuisisi perusahaan, para pakar memeriksa secara cermat kewajiban kontinjensi dan risiko kontraktual perusahaan sasaran."
+    }
+   ],
+   "example": "企業買収の最終合意に先立ち、対象企業の偶発債務や契約上のリスクを専門家が精査する。",
+   "exampleTranslation": "Sebelum kesepakatan akhir akuisisi perusahaan, para pakar memeriksa secara cermat kewajiban kontinjensi dan risiko kontraktual perusahaan sasaran.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "business",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#79",
+    "row": 1963
+   },
+   "masterIndex": 1964
+  },
+  {
+   "id": "ja_vocab_01965",
+   "word": "覆す",
+   "kana": "くつがえす",
+   "kanji": "覆す",
+   "romaji": "kutsugaesu",
+   "phonetic": "くつがえす · kutsugaesu",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "verb",
+   "meanings": [
+    {
+     "id": "ja_meaning_01965",
+     "meaning": "membalikkan asumsi mapan atau putusan sebelumnya"
+    }
+   ],
+   "meaning": "membalikkan asumsi mapan atau putusan sebelumnya",
+   "examples": [
+    {
+     "en": "深海堆積物から見つかった微化石の分析が、古代の海洋循環に関する従来の定説を覆す結果となった。",
+     "id": "Analisis mikrofosil yang ditemukan pada sedimen laut dalam menghasilkan temuan yang membalikkan teori mapan tentang sirkulasi samudra purba."
+    }
+   ],
+   "example": "深海堆積物から見つかった微化石の分析が、古代の海洋循環に関する従来の定説を覆す結果となった。",
+   "exampleTranslation": "Analisis mikrofosil yang ditemukan pada sedimen laut dalam menghasilkan temuan yang membalikkan teori mapan tentang sirkulasi samudra purba.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "academic",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#80",
+    "row": 1964
+   },
+   "masterIndex": 1965
+  },
+  {
+   "id": "ja_vocab_01966",
+   "word": "見据える",
+   "kana": "みすえる",
+   "kanji": "見据える",
+   "romaji": "misueru",
+   "phonetic": "みすえる · misueru",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "verb",
+   "meanings": [
+    {
+     "id": "ja_meaning_01966",
+     "meaning": "menatap jernih dan memperhitungkan prospek masa depan"
+    }
+   ],
+   "meaning": "menatap jernih dan memperhitungkan prospek masa depan",
+   "examples": [
+    {
+     "en": "目先の選挙結果に左右されることなく、半世紀先の人口構造を見据える国家戦略が求められている。",
+     "id": "Dibutuhkan strategi nasional yang memperhitungkan secara jernih struktur demografi setengah abad mendatang tanpa terombang-ambing hasil pemilu sesaat."
+    }
+   ],
+   "example": "目先の選挙結果に左右されることなく、半世紀先の人口構造を見据える国家戦略が求められている。",
+   "exampleTranslation": "Dibutuhkan strategi nasional yang memperhitungkan secara jernih struktur demografi setengah abad mendatang tanpa terombang-ambing hasil pemilu sesaat.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "policy",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#81",
+    "row": 1965
+   },
+   "masterIndex": 1966
+  },
+  {
+   "id": "ja_vocab_01967",
+   "word": "培う",
+   "kana": "つちかう",
+   "kanji": "培う",
+   "romaji": "tsuchikau",
+   "phonetic": "つちかう · tsuchikau",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "verb",
+   "meanings": [
+    {
+     "id": "ja_meaning_01967",
+     "meaning": "memupuk keahlian atau kepercayaan selama bertahun-tahun"
+    }
+   ],
+   "meaning": "memupuk keahlian atau kepercayaan selama bertahun-tahun",
+   "examples": [
+    {
+     "en": "伝統工芸の産地では、職人の手仕事を次世代へ伝えながら地域独自の美意識を培う努力が続く。",
+     "id": "Di sentra kerajinan tradisional, upaya memupuk kepekaan estetika khas daerah terus berlanjut sembari mewariskan keterampilan tangan perajin ke generasi berikutnya."
+    }
+   ],
+   "example": "伝統工芸の産地では、職人の手仕事を次世代へ伝えながら地域独自の美意識を培う努力が続く。",
+   "exampleTranslation": "Di sentra kerajinan tradisional, upaya memupuk kepekaan estetika khas daerah terus berlanjut sembari mewariskan keterampilan tangan perajin ke generasi berikutnya.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "society",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#82",
+    "row": 1966
+   },
+   "masterIndex": 1967
+  },
+  {
+   "id": "ja_vocab_01968",
+   "word": "委ねる",
+   "kana": "ゆだねる",
+   "kanji": "委ねる",
+   "romaji": "yudaneru",
+   "phonetic": "ゆだねる · yudaneru",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "verb",
+   "meanings": [
+    {
+     "id": "ja_meaning_01968",
+     "meaning": "menyerahkan mandat keputusan kepada pihak lain"
+    }
+   ],
+   "meaning": "menyerahkan mandat keputusan kepada pihak lain",
+   "examples": [
+    {
+     "en": "生命維持治療の継続に関わる重大な選択を、単一の自動判定システムに委ねることは許されない。",
+     "id": "Menyerahkan pilihan krusial terkait kelanjutan terapi penopang hidup kepada satu sistem penentu otomatis tidak dapat dibenarkan."
+    }
+   ],
+   "example": "生命維持治療の継続に関わる重大な選択を、単一の自動判定システムに委ねることは許されない。",
+   "exampleTranslation": "Menyerahkan pilihan krusial terkait kelanjutan terapi penopang hidup kepada satu sistem penentu otomatis tidak dapat dibenarkan.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "law",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#83",
+    "row": 1967
+   },
+   "masterIndex": 1968
+  },
+  {
+   "id": "ja_vocab_01969",
+   "word": "講じる",
+   "kana": "こうじる",
+   "kanji": "講じる",
+   "romaji": "koujiru",
+   "phonetic": "こうじる · koujiru",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "verb",
+   "meanings": [
+    {
+     "id": "ja_meaning_01969",
+     "meaning": "mengambil dan menerapkan langkah kebijakan terukur"
+    }
+   ],
+   "meaning": "mengambil dan menerapkan langkah kebijakan terukur",
+   "examples": [
+    {
+     "en": "重要インフラへのサイバー攻撃に備え、官民が連携して多層的な防御策を講じる体制を整えた。",
+     "id": "Guna mengantisipasi serangan siber terhadap infrastruktur vital, pemerintah dan swasta berkolaborasi menyiapkan sistem guna menerapkan langkah pertahanan berlapis."
+    }
+   ],
+   "example": "重要インフラへのサイバー攻撃に備え、官民が連携して多層的な防御策を講じる体制を整えた。",
+   "exampleTranslation": "Guna mengantisipasi serangan siber terhadap infrastruktur vital, pemerintah dan swasta berkolaborasi menyiapkan sistem guna menerapkan langkah pertahanan berlapis.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "policy",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#84",
+    "row": 1968
+   },
+   "masterIndex": 1969
+  },
+  {
+   "id": "ja_vocab_01970",
+   "word": "退ける",
+   "kana": "しりぞける",
+   "kanji": "退ける",
+   "romaji": "shirizokeru",
+   "phonetic": "しりぞける · shirizokeru",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "verb",
+   "meanings": [
+    {
+     "id": "ja_meaning_01970",
+     "meaning": "menolak tuntutan hukum atau menepis dalil lawan"
+    }
+   ],
+   "meaning": "menolak tuntutan hukum atau menepis dalil lawan",
+   "examples": [
+    {
+     "en": "控訴裁判所は証拠能力に疑義があるとして検察側の主張を退ける判断を下した。",
+     "id": "Pengadilan banding menjatuhkan putusan yang menolak tuntutan pihak jaksa karena adanya keraguan atas keabsahan alat bukti."
+    }
+   ],
+   "example": "控訴裁判所は証拠能力に疑義があるとして検察側の主張を退ける判断を下した。",
+   "exampleTranslation": "Pengadilan banding menjatuhkan putusan yang menolak tuntutan pihak jaksa karena adanya keraguan atas keabsahan alat bukti.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "law",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#85",
+    "row": 1969
+   },
+   "masterIndex": 1970
+  },
+  {
+   "id": "ja_vocab_01971",
+   "word": "鑑みる",
+   "kana": "かんがみる",
+   "kanji": "鑑みる",
+   "romaji": "kangamiru",
+   "phonetic": "かんがみる · kangamiru",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "verb",
+   "meanings": [
+    {
+     "id": "ja_meaning_01971",
+     "meaning": "menimbang secara saksama berdasarkan preseden atau fakta"
+    }
+   ],
+   "meaning": "menimbang secara saksama berdasarkan preseden atau fakta",
+   "examples": [
+    {
+     "en": "過去の金融危機が実体経済に及ぼした深刻な打撃に鑑みるならば、早期の健全性規制は妥当である。",
+     "id": "Jika menimbang secara saksama pukulan berat krisis keuangan masa lalu terhadap ekonomi riil, regulasi kesehatan perbankan sejak dini sangatlah layak."
+    }
+   ],
+   "example": "過去の金融危機が実体経済に及ぼした深刻な打撃に鑑みるならば、早期の健全性規制は妥当である。",
+   "exampleTranslation": "Jika menimbang secara saksama pukulan berat krisis keuangan masa lalu terhadap ekonomi riil, regulasi kesehatan perbankan sejak dini sangatlah layak.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "policy",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#86",
+    "row": 1970
+   },
+   "masterIndex": 1971
+  },
+  {
+   "id": "ja_vocab_01972",
+   "word": "帰納的",
+   "kana": "きのうてき",
+   "kanji": "帰納的",
+   "romaji": "kinouteki",
+   "phonetic": "きのうてき · kinouteki",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "adjective",
+   "meanings": [
+    {
+     "id": "ja_meaning_01972",
+     "meaning": "bernalar induktif dari fakta khusus ke kaidah umum"
+    }
+   ],
+   "meaning": "bernalar induktif dari fakta khusus ke kaidah umum",
+   "examples": [
+    {
+     "en": "膨大なフィールド調査の事例を積み上げ、そこから帰納的に社会変動の法則を導き出した。",
+     "id": "Dengan menghimpun ribuan kasus penelitian lapangan, kaidah perubahan sosial ditarik secara induktif dari data tersebut."
+    }
+   ],
+   "example": "膨大なフィールド調査の事例を積み上げ、そこから帰納的に社会変動の法則を導き出した。",
+   "exampleTranslation": "Dengan menghimpun ribuan kasus penelitian lapangan, kaidah perubahan sosial ditarik secara induktif dari data tersebut.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "academic",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#87",
+    "row": 1971
+   },
+   "masterIndex": 1972
+  },
+  {
+   "id": "ja_vocab_01973",
+   "word": "演繹的",
+   "kana": "えんえきてき",
+   "kanji": "演繹的",
+   "romaji": "enekiteki",
+   "phonetic": "えんえきてき · enekiteki",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "adjective",
+   "meanings": [
+    {
+     "id": "ja_meaning_01973",
+     "meaning": "bernalar deduktif dari premis umum ke simpulan khusus"
+    }
+   ],
+   "meaning": "bernalar deduktif dari premis umum ke simpulan khusus",
+   "examples": [
+    {
+     "en": "少数の基本公理から出発し、厳密な論理展開によって演繹的に個別定理を証明していく。",
+     "id": "Berangkat dari segelintir aksioma dasar, teorema-teorema khusus dibuktikan secara deduktif melalui penjabaran logika yang ketat."
+    }
+   ],
+   "example": "少数の基本公理から出発し、厳密な論理展開によって演繹的に個別定理を証明していく。",
+   "exampleTranslation": "Berangkat dari segelintir aksioma dasar, teorema-teorema khusus dibuktikan secara deduktif melalui penjabaran logika yang ketat.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "academic",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#88",
+    "row": 1972
+   },
+   "masterIndex": 1973
+  },
+  {
+   "id": "ja_vocab_01974",
+   "word": "逆説的",
+   "kana": "ぎゃくせつてき",
+   "kanji": "逆説的",
+   "romaji": "gyakusetsuteki",
+   "phonetic": "ぎゃくせつてき · gyakusetsuteki",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "adjective",
+   "meanings": [
+    {
+     "id": "ja_meaning_01974",
+     "meaning": "tampak bertentangan sepintas namun benar; paradoksal"
+    }
+   ],
+   "meaning": "tampak bertentangan sepintas namun benar; paradoksal",
+   "examples": [
+    {
+     "en": "通信手段が発達するほど孤独感を抱く人が増えるという現象は、現代社会の逆説的な断面を映している。",
+     "id": "Fenomena kian banyaknya orang merasa kesepian seiring majunya sarana komunikasi mencerminkan sisi paradoksal masyarakat modern."
+    }
+   ],
+   "example": "通信手段が発達するほど孤独感を抱く人が増えるという現象は、現代社会の逆説的な断面を映している。",
+   "exampleTranslation": "Fenomena kian banyaknya orang merasa kesepian seiring majunya sarana komunikasi mencerminkan sisi paradoksal masyarakat modern.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "academic",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#89",
+    "row": 1973
+   },
+   "masterIndex": 1974
+  },
+  {
+   "id": "ja_vocab_01975",
+   "word": "緻密",
+   "kana": "ちみつ",
+   "kanji": "緻密",
+   "romaji": "chimitsu",
+   "phonetic": "ちみつ · chimitsu",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "adjective",
+   "meanings": [
+    {
+     "id": "ja_meaning_01975",
+     "meaning": "tersusun sangat rapi, teliti, dan terperinci"
+    }
+   ],
+   "meaning": "tersusun sangat rapi, teliti, dan terperinci",
+   "examples": [
+    {
+     "en": "一次史料の断片を突き合わせた緻密な考証によって、通説の誤りが鮮やかに論証された。",
+     "id": "Melalui telaah historis yang sangat teliti dengan mencocokkan kepingan sumber primer, kekeliruan pandangan umum berhasil dibuktikan dengan jernih."
+    }
+   ],
+   "example": "一次史料の断片を突き合わせた緻密な考証によって、通説の誤りが鮮やかに論証された。",
+   "exampleTranslation": "Melalui telaah historis yang sangat teliti dengan mencocokkan kepingan sumber primer, kekeliruan pandangan umum berhasil dibuktikan dengan jernih.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "academic",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#90",
+    "row": 1974
+   },
+   "masterIndex": 1975
+  },
+  {
+   "id": "ja_vocab_01976",
+   "word": "希薄",
+   "kana": "きはく",
+   "kanji": "希薄",
+   "romaji": "kihaku",
+   "phonetic": "きはく · kihaku",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "adjective",
+   "meanings": [
+    {
+     "id": "ja_meaning_01976",
+     "meaning": "menipis atau merenggang ikatan maupun kesadarannya"
+    }
+   ],
+   "meaning": "menipis atau merenggang ikatan maupun kesadarannya",
+   "examples": [
+    {
+     "en": "都市化と単身世帯の増加に伴い、近隣住民同士の日常的なつながりが次第に希薄になっている。",
+     "id": "Seiring urbanisasi dan bertambahnya rumah tangga lajang, ikatan keseharian antarwarga bertetangga berangsur-angsur merenggang."
+    }
+   ],
+   "example": "都市化と単身世帯の増加に伴い、近隣住民同士の日常的なつながりが次第に希薄になっている。",
+   "exampleTranslation": "Seiring urbanisasi dan bertambahnya rumah tangga lajang, ikatan keseharian antarwarga bertetangga berangsur-angsur merenggang.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "society",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#91",
+    "row": 1975
+   },
+   "masterIndex": 1976
+  },
+  {
+   "id": "ja_vocab_01977",
+   "word": "精緻",
+   "kana": "せいち",
+   "kanji": "精緻",
+   "romaji": "seichi",
+   "phonetic": "せいち · seichi",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "adjective",
+   "meanings": [
+    {
+     "id": "ja_meaning_01977",
+     "meaning": "tergarap sangat presisi dan halus secara metodologis"
+    }
+   ],
+   "meaning": "tergarap sangat presisi dan halus secara metodologis",
+   "examples": [
+    {
+     "en": "大気海洋結合モデルの精緻な数値計算により、数十年後の地域別降水量の予測精度が向上した。",
+     "id": "Berkat perhitungan numerik yang sangat presisi pada model gabungan atmosfer-samudra, akurasi prediksi curah hujan per wilayah puluhan tahun mendatang meningkat."
+    }
+   ],
+   "example": "大気海洋結合モデルの精緻な数値計算により、数十年後の地域別降水量の予測精度が向上した。",
+   "exampleTranslation": "Berkat perhitungan numerik yang sangat presisi pada model gabungan atmosfer-samudra, akurasi prediksi curah hujan per wilayah puluhan tahun mendatang meningkat.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "science",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#92",
+    "row": 1976
+   },
+   "masterIndex": 1977
+  },
+  {
+   "id": "ja_vocab_01978",
+   "word": "甚だしい",
+   "kana": "はなはだしい",
+   "kanji": "甚だしい",
+   "romaji": "hanahadashii",
+   "phonetic": "はなはだしい · hanahadashii",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "adjective",
+   "meanings": [
+    {
+     "id": "ja_meaning_01978",
+     "meaning": "melampaui batas kewajaran; sangat ekstrem"
+    }
+   ],
+   "meaning": "melampaui batas kewajaran; sangat ekstrem",
+   "examples": [
+    {
+     "en": "十分な根拠も示さずに個人の名誉を傷つける報道は、報道の自由の濫用も甚だしいと言わざるを得ない。",
+     "id": "Pemberitaan yang mencederai kehormatan pribadi tanpa menunjukkan dasar memadai harus dikatakan sebagai penyalahgunaan kebebasan pers yang melampaui batas kewajaran."
+    }
+   ],
+   "example": "十分な根拠も示さずに個人の名誉を傷つける報道は、報道の自由の濫用も甚だしいと言わざるを得ない。",
+   "exampleTranslation": "Pemberitaan yang mencederai kehormatan pribadi tanpa menunjukkan dasar memadai harus dikatakan sebagai penyalahgunaan kebebasan pers yang melampaui batas kewajaran.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "law",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#93",
+    "row": 1977
+   },
+   "masterIndex": 1978
+  },
+  {
+   "id": "ja_vocab_01979",
+   "word": "揺るぎない",
+   "kana": "ゆるぎない",
+   "kanji": "揺るぎない",
+   "romaji": "yuruginai",
+   "phonetic": "ゆるぎない · yuruginai",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "adjective",
+   "meanings": [
+    {
+     "id": "ja_meaning_01979",
+     "meaning": "teguh tak tergoyahkan oleh tekanan maupun keraguan"
+    }
+   ],
+   "meaning": "teguh tak tergoyahkan oleh tekanan maupun keraguan",
+   "examples": [
+    {
+     "en": "地道な品質管理の積み重ねこそが、国際市場における同社の揺るぎない信用を支えている。",
+     "id": "Akumulasi pengendalian mutu yang tekun itulah yang menopang kepercayaan tak tergoyahkan terhadap perusahaan tersebut di pasar internasional."
+    }
+   ],
+   "example": "地道な品質管理の積み重ねこそが、国際市場における同社の揺るぎない信用を支えている。",
+   "exampleTranslation": "Akumulasi pengendalian mutu yang tekun itulah yang menopang kepercayaan tak tergoyahkan terhadap perusahaan tersebut di pasar internasional.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "business",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#94",
+    "row": 1978
+   },
+   "masterIndex": 1979
+  },
+  {
+   "id": "ja_vocab_01980",
+   "word": "概ね",
+   "kana": "おおむね",
+   "kanji": "概ね",
+   "romaji": "oomune",
+   "phonetic": "おおむね · oomune",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "adverb",
+   "meanings": [
+    {
+     "id": "ja_meaning_01980",
+     "meaning": "secara garis besar; pada umumnya"
+    }
+   ],
+   "meaning": "secara garis besar; pada umumnya",
+   "examples": [
+    {
+     "en": "専門家会議に提出された改正案は、細部の修正を除けば委員から概ね肯定的に受け止められた。",
+     "id": "Rancangan amandemen yang diajukan ke dewan pakar secara garis besar diterima secara positif oleh para anggota kecuali sejumlah revisi kecil."
+    }
+   ],
+   "example": "専門家会議に提出された改正案は、細部の修正を除けば委員から概ね肯定的に受け止められた。",
+   "exampleTranslation": "Rancangan amandemen yang diajukan ke dewan pakar secara garis besar diterima secara positif oleh para anggota kecuali sejumlah revisi kecil.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "policy",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#95",
+    "row": 1979
+   },
+   "masterIndex": 1980
+  },
+  {
+   "id": "ja_vocab_01981",
+   "word": "専ら",
+   "kana": "もっぱら",
+   "kanji": "専ら",
+   "romaji": "moppara",
+   "phonetic": "もっぱら · moppara",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "adverb",
+   "meanings": [
+    {
+     "id": "ja_meaning_01981",
+     "meaning": "semata-mata terfokus pada satu hal utama"
+    }
+   ],
+   "meaning": "semata-mata terfokus pada satu hal utama",
+   "examples": [
+    {
+     "en": "かつてその港町は遠洋漁業で栄えたが、現在では専ら海洋環境研究の拠点として知られている。",
+     "id": "Dahulu kota pelabuhan itu makmur berkat perikanan laut lepas, tetapi kini dikenal terutama sebagai pusat riset lingkungan bahari."
+    }
+   ],
+   "example": "かつてその港町は遠洋漁業で栄えたが、現在では専ら海洋環境研究の拠点として知られている。",
+   "exampleTranslation": "Dahulu kota pelabuhan itu makmur berkat perikanan laut lepas, tetapi kini dikenal terutama sebagai pusat riset lingkungan bahari.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "academic",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#96",
+    "row": 1980
+   },
+   "masterIndex": 1981
+  },
+  {
+   "id": "ja_vocab_01982",
+   "word": "辛うじて",
+   "kana": "かろうじて",
+   "kanji": "辛うじて",
+   "romaji": "karoujite",
+   "phonetic": "かろうじて · karoujite",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "adverb",
+   "meanings": [
+    {
+     "id": "ja_meaning_01982",
+     "meaning": "nyaris gagal namun bertahan dengan susah payah"
+    }
+   ],
+   "meaning": "nyaris gagal namun bertahan dengan susah payah",
+   "examples": [
+    {
+     "en": "緊急の資本提携が成立したことで、老舗メーカーは連鎖倒産の危機を辛うじて免れた。",
+     "id": "Berkat tercapainya aliansi modal darurat, produsen kawakan tersebut berhasil lolos dengan susah payah dari krisis kebangkrutan berantai."
+    }
+   ],
+   "example": "緊急の資本提携が成立したことで、老舗メーカーは連鎖倒産の危機を辛うじて免れた。",
+   "exampleTranslation": "Berkat tercapainya aliansi modal darurat, produsen kawakan tersebut berhasil lolos dengan susah payah dari krisis kebangkrutan berantai.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "business",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#97",
+    "row": 1981
+   },
+   "masterIndex": 1982
+  },
+  {
+   "id": "ja_vocab_01983",
+   "word": "図らずも",
+   "kana": "はからずも",
+   "kanji": "図らずも",
+   "romaji": "hakarazumo",
+   "phonetic": "はからずも · hakarazumo",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "adverb",
+   "meanings": [
+    {
+     "id": "ja_meaning_01983",
+     "meaning": "tanpa diduga atau direncanakan sebelumnya"
+    }
+   ],
+   "meaning": "tanpa diduga atau direncanakan sebelumnya",
+   "examples": [
+    {
+     "en": "感染症の拡大に伴う遠隔勤務の普及は、図らずも従来の硬直した労働慣行を見直す契機となった。",
+     "id": "Meluasnya kerja jarak jauh akibat penyebaran penyakit menular tanpa diduga menjadi momentum untuk meninjau ulang kebiasaan kerja lama yang kaku."
+    }
+   ],
+   "example": "感染症の拡大に伴う遠隔勤務の普及は、図らずも従来の硬直した労働慣行を見直す契機となった。",
+   "exampleTranslation": "Meluasnya kerja jarak jauh akibat penyebaran penyakit menular tanpa diduga menjadi momentum untuk meninjau ulang kebiasaan kerja lama yang kaku.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "society",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#98",
+    "row": 1982
+   },
+   "masterIndex": 1983
+  },
+  {
+   "id": "ja_vocab_01984",
+   "word": "依然として",
+   "kana": "いぜんとして",
+   "kanji": "依然として",
+   "romaji": "izentoshite",
+   "phonetic": "いぜんとして · izentoshite",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "adverb",
+   "meanings": [
+    {
+     "id": "ja_meaning_01984",
+     "meaning": "masih tetap berlangsung tanpa perubahan berarti"
+    }
+   ],
+   "meaning": "masih tetap berlangsung tanpa perubahan berarti",
+   "examples": [
+    {
+     "en": "法改正から五年が経過したものの、管理職に占める女性の割合は依然として低い水準にとどまっている。",
+     "id": "Meskipun lima tahun telah berlalu sejak revisi undang-undang, proporsi perempuan di jajaran manajerial masih tetap tertahan pada tingkat rendah."
+    }
+   ],
+   "example": "法改正から五年が経過したものの、管理職に占める女性の割合は依然として低い水準にとどまっている。",
+   "exampleTranslation": "Meskipun lima tahun telah berlalu sejak revisi undang-undang, proporsi perempuan di jajaran manajerial masih tetap tertahan pada tingkat rendah.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "policy",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#99",
+    "row": 1983
+   },
+   "masterIndex": 1984
+  },
+  {
+   "id": "ja_vocab_01985",
+   "word": "遅かれ早かれ",
+   "kana": "おそかれはやかれ",
+   "kanji": "遅かれ早かれ",
+   "romaji": "osokarehayakare",
+   "phonetic": "おそかれはやかれ · osokarehayakare",
+   "level": "C2",
+   "jlpt": "N1+",
+   "partOfSpeech": "adverb",
+   "meanings": [
+    {
+     "id": "ja_meaning_01985",
+     "meaning": "cepat atau lambat pasti akan dihadapi"
+    }
+   ],
+   "meaning": "cepat atau lambat pasti akan dihadapi",
+   "examples": [
+    {
+     "en": "化石燃料への依存を続ける限り、資源価格の変動リスクには遅かれ早かれ直面せざるを得ない。",
+     "id": "Selama ketergantungan pada bahan bakar fosil terus berlanjut, risiko fluktuasi harga sumber daya cepat atau lambat pasti harus dihadapi."
+    }
+   ],
+   "example": "化石燃料への依存を続ける限り、資源価格の変動リスクには遅かれ早かれ直面せざるを得ない。",
+   "exampleTranslation": "Selama ketergantungan pada bahan bakar fosil terus berlanjut, risiko fluktuasi harga sumber daya cepat atau lambat pasti harus dihadapi.",
+   "synonyms": [],
+   "antonyms": [],
+   "collocations": [],
+   "topic": "society",
+   "status": "complete",
+   "needsReviewReason": [],
+   "source": {
+    "origin": "docs/japanese/kosakata-jlpt.json",
+    "originalId": "fiezel-c2#100",
+    "row": 1984
+   },
+   "masterIndex": 1985
   }
  ]
 }

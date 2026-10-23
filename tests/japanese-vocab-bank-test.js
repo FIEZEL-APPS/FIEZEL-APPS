@@ -44,7 +44,7 @@ const entri = Array.isArray(bank.words) ? bank.words : [];
 
 // Saringan hidrasi app.js menerima hanya tingkat ini.
 const LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
-const PETA = { N5: 'A1', N4: 'A2', N3: 'B1', N2: 'B2', N1: 'C1' };
+const PETA = { N5: 'A1', N4: 'A2', N3: 'B1', N2: 'B2', N1: 'C1', 'N1+': 'C2' };
 const JEPANG = /[぀-ゟ゠-ヿ一-龯]/;
 
 test('nol kata hilang diam-diam: yang tidak masuk WAJIB punya alasan tertulis', () => {

@@ -1,7 +1,7 @@
 {
-  "version": "m025-634",
-  "claimedBy": "branch main",
-  "claimedAt": "2026-10-23T21:30:33.625Z",
-  "reason": "fix(home): audit & perbaikan UI/UX Home panel (P0-P2, i18n, a11y, urutan hero, tur)",
+  "version": "m025-636",
+  "claimedBy": "branch feat/ja-full-depth-n5-n1plus",
+  "claimedAt": "2026-10-23T23:22:41.979Z",
+  "reason": "feat(ja): perluas kedalaman kursus Jepang penuh 6 tingkat N5-N1+ (A1-C2)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

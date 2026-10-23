@@ -13498,5 +13498,2705 @@
     }
    ]
   ]
+ },
+ {
+  "id": "rja0151",
+  "level": "C2",
+  "jlpt": "N1+",
+  "title": "アルゴリズムによる意思決定と説明責任",
+  "text": "行政や金融の現場で、膨大な過去データから最適解を導くアルゴリズムの導入が急速に進んでいる。処理の迅速化や恣意性の排除が期待される一方、判断過程が複雑すぎて人間には検証しがたいという問題も浮上した。とりわけ給付金の支給可否や融資審査において根拠が示されなければ、不利益を被った市民は異議を申し立てる術を失う。過去の統計に潜む偏見を機械が無批判に反復し、格差を固定化する危険も看過できない。効率性を享受しつつも、最終的な説明責任を人間が担保する制度設計こそが不可欠である。",
+  "topic": "teknologi",
+  "qs": [
+   [
+    "Apa gagasan utama yang ditekankan penulis dalam bacaan tersebut?",
+    [
+     "Penggunaan algoritma di sektor publik dan keuangan sebaiknya dihentikan sepenuhnya",
+     "Pemanfaatan algoritma harus diimbangi perancangan sistem yang menjamin akuntabilitas manusia",
+     "Keputusan mesin terbukti selalu lebih adil dibandingkan pertimbangan pejabat manusia",
+     "Warga negara perlu mempelajari pemrograman agar mampu memeriksa sistem perbankan"
+    ],
+    1,
+    {
+     "type": "main_idea",
+     "evidence": "効率性を享受しつつも、最終的な説明責任を人間が担保する制度設計こそが不可欠である",
+     "answer": "Pemanfaatan algoritma harus diimbangi perancangan sistem yang menjamin akuntabilitas manusia",
+     "patternId": "main_idea-ja-151"
+    }
+   ],
+   [
+    "Masalah apa yang dialami warga apabila dasar keputusan penyaluran bantuan atau kredit tidak dijelaskan?",
+    [
+     "Mereka diwajibkan membayar biaya tambahan untuk proses peninjauan ulang",
+     "Data pribadi mereka otomatis dihapus dari pangkalan data pemerintah",
+     "Proses pencairan dana menjadi tertunda hingga beberapa tahun kemudian",
+     "Mereka kehilangan cara untuk mengajukan keberatan ketika mengalami kerugian"
+    ],
+    3,
+    {
+     "type": "cause_effect",
+     "evidence": "根拠が示されなければ、不利益を被った市民は異議を申し立てる術を失う",
+     "answer": "Mereka kehilangan cara untuk mengajukan keberatan ketika mengalami kerugian",
+     "patternId": "cause_effect-ja-151"
+    }
+   ],
+   [
+    "Risiko apa yang muncul terkait pemakaian data statistik masa lalu oleh mesin?",
+    [
+     "Mesin mengulangi bias tersembunyi tanpa sikap kritis sehingga membakukan ketimpangan",
+     "Kapasitas penyimpanan lembaga keuangan menjadi cepat penuh dan melambat",
+     "Data lama tidak lagi kompatibel dengan perangkat keras generasi terbaru",
+     "Petugas administrasi menolak menggunakan laporan yang dihasilkan secara otomatis"
+    ],
+    0,
+    {
+     "type": "detail",
+     "evidence": "過去の統計に潜む偏見を機械が無批判に反復し、格差を固定化する危険も看過できない",
+     "answer": "Mesin mengulangi bias tersembunyi tanpa sikap kritis sehingga membakukan ketimpangan",
+     "patternId": "detail-ja-151"
+    }
+   ],
+   [
+    "Apa makna kata \"看過\" dalam kalimat keempat bacaan di atas?",
+    [
+     "Mengukur secara kuantitatif melalui perhitungan statistik yang ketat",
+     "Menyelesaikan perselisihan hukum melalui jalur mediasi tertutup",
+     "Membiarkan atau mengabaikan begitu saja suatu persoalan serius",
+     "Mengumumkan hasil pemeriksaan kepada masyarakat luas secara berkala"
+    ],
+    2,
+    {
+     "type": "vocabulary",
+     "evidence": "格差を固定化する危険も看過できない",
+     "answer": "Membiarkan atau mengabaikan begitu saja suatu persoalan serius",
+     "patternId": "vocabulary-ja-151"
+    }
+   ],
+   [
+    "Bagaimana sikap penulis terhadap efisiensi yang ditawarkan oleh algoritma?",
+    [
+     "Menolak klaim kecepatan pemrosesan karena dianggap sekadar promosi industri",
+     "Mengakui manfaat efisiensinya sambil menuntut jaminan pertanggungjawaban oleh manusia",
+     "Mendukung penyerahan wewenang penuh kepada mesin demi menghapus subjektivitas",
+     "Bersikap netral dan menyerahkan pengaturannya pada mekanisme pasar bebas"
+    ],
+    1,
+    {
+     "type": "author_attitude",
+     "evidence": "効率性を享受しつつも、最終的な説明責任を人間が担保する制度設計こそが不可欠である",
+     "answer": "Mengakui manfaat efisiensinya sambil menuntut jaminan pertanggungjawaban oleh manusia",
+     "patternId": "author_attitude-ja-151"
+    }
+   ]
+  ]
+ },
+ {
+  "id": "rja0152",
+  "level": "C2",
+  "jlpt": "N1+",
+  "title": "ゲノム編集技術の臨床応用と生命倫理",
+  "text": "特定の遺伝子を精密に書き換えるゲノム編集技術は、難治性疾患の根治に道を開く画期的な手法として注目されている。患者本人の体細胞を対象とする治療では、従来の医療倫理の枠組みを応用した安全性評価が着実に進みつつある。しかし、受精卵や生殖細胞への介入は改変が次世代以降へ不可逆的に受け継がれるため、まったく次元の異なる慎重さが求められる。まだ生まれぬ子孫の同意を得ることは不可能であり、治療と能力強化の境界も曖昧になりやすい。技術の進歩に歩調を合わせ、社会全体で越えてはならない一線を議論すべき時期に来ている。",
+  "topic": "kesehatan",
+  "qs": [
+   [
+    "Mengapa intervensi rekayasa genom pada sel germinal atau embrio menuntut kehati-hatian pada tingkat yang berbeda?",
+    [
+     "Karena biaya pengujian klinisnya jauh melampaui anggaran rumah sakit pemerintah",
+     "Karena tingkat keberhasilan penyuntingan pada sel embrio selalu di bawah nol persen",
+     "Karena perubahan genetik yang dilakukan akan diwariskan secara ireversibel kepada generasi berikutnya",
+     "Karena metode tersebut belum pernah dibahas sama sekali oleh kalangan ilmuwan medis"
+    ],
+    2,
+    {
+     "type": "cause_effect",
+     "evidence": "受精卵や生殖細胞への介入は改変が次世代以降へ不可逆的に受け継がれるため、まったく次元の異なる慎重さが求められる",
+     "answer": "Karena perubahan genetik yang dilakukan akan diwariskan secara ireversibel kepada generasi berikutnya",
+     "patternId": "cause_effect-ja-152"
+    }
+   ],
+   [
+    "Apa perbedaan antara terapi pada sel somatik pasien dan intervensi pada sel reproduksi menurut teks?",
+    [
+     "Terapi sel somatik dapat dievaluasi dengan kerangka etika medis yang ada, sedangkan intervensi sel reproduksi berdampak lintas generasi",
+     "Terapi sel somatik dilarang keras secara hukum, sedangkan intervensi sel reproduksi sudah diizinkan",
+     "Terapi sel somatik bertujuan meningkatkan kecerdasan, sedangkan sel reproduksi hanya untuk penyakit ringan",
+     "Keduanya sama-sama tidak membutuhkan penilaian keamanan maupun persetujuan pasien"
+    ],
+    0,
+    {
+     "type": "comparison",
+     "evidence": "患者本人の体細胞を対象とする治療では、従来の医療倫理の枠組みを応用した安全性評価が着実に進みつつある",
+     "answer": "Terapi sel somatik dapat dievaluasi dengan kerangka etika medis yang ada, sedangkan intervensi sel reproduksi berdampak lintas generasi",
+     "patternId": "comparison-ja-152"
+    }
+   ],
+   [
+    "Persoalan etis apa yang disoroti penulis selain mustahilnya memperoleh persetujuan keturunan yang belum lahir?",
+    [
+     "Hak paten atas urutan gen manusia dimonopoli oleh segelintir negara maju",
+     "Rumah sakit daerah kekurangan tenaga ahli untuk mengoperasikan mikroskop elektron",
+     "Asuransi kesehatan menolak menanggung biaya pemeriksaan genetik rutin",
+     "Batas antara pengobatan penyakit dan peningkatan kemampuan manusia mudah menjadi kabur"
+    ],
+    3,
+    {
+     "type": "detail",
+     "evidence": "まだ生まれぬ子孫の同意を得ることは不可能であり、治療と能力強化の境界も曖昧になりやすい",
+     "answer": "Batas antara pengobatan penyakit dan peningkatan kemampuan manusia mudah menjadi kabur",
+     "patternId": "detail-ja-152"
+    }
+   ],
+   [
+    "Apa simpulan yang dapat ditarik mengenai pandangan penulis terhadap kemajuan rekayasa genom?",
+    [
+     "Seluruh penelitian rekayasa genom termasuk pada sel tubuh pasien harus dibekukan segera",
+     "Penentuan batas etis tidak boleh hanya diserahkan kepada ilmuwan, melainkan perlu dibahas seluruh masyarakat",
+     "Masyarakat awam sebaiknya menunggu sampai teknologi tersebut bebas dari segala risiko",
+     "Kemajuan medis harus selalu didahulukan di atas pertimbangan etika yang menghambat"
+    ],
+    1,
+    {
+     "type": "inference",
+     "evidence": "技術の進歩に歩調を合わせ、社会全体で越えてはならない一線を議論すべき時期に来ている",
+     "answer": "Penentuan batas etis tidak boleh hanya diserahkan kepada ilmuwan, melainkan perlu dibahas seluruh masyarakat",
+     "patternId": "inference-ja-152"
+    }
+   ],
+   [
+    "Apa arti istilah \"根治\" dalam kalimat pertama bacaan tersebut?",
+    [
+     "Perawatan paliatif untuk meredakan nyeri sementara waktu",
+     "Pencegahan penularan wabah melalui karantina wilayah",
+     "Penyembuhan penyakit secara tuntas hingga ke akar penyebabnya",
+     "Pemeriksaan dini sebelum gejala klinis muncul ke permukaan"
+    ],
+    2,
+    {
+     "type": "vocabulary",
+     "evidence": "難治性疾患の根治に道を開く画期的な手法として注目されている",
+     "answer": "Penyembuhan penyakit secara tuntas hingga ke akar penyebabnya",
+     "patternId": "vocabulary-ja-152"
+    }
+   ]
+  ]
+ },
+ {
+  "id": "rja0153",
+  "level": "C2",
+  "jlpt": "N1+",
+  "title": "人口減少社会における生産性と無形資産投資",
+  "text": "労働力人口の減少が避けられない局面において、経済規模を維持する鍵は一人当たりの付加価値を高めることにある。従来は工場設備や店舗網といった有形資産への投資が成長を牽引してきたが、成熟経済ではそれだけで高い収益を生むことは難しい。近年の実証研究は、ソフトウェア開発だけでなく、業務手順の刷新や人材育成などの無形資産投資こそが生産性向上の源泉であると示唆している。もっとも、技術を単に導入しただけで既存の硬直した組織慣行を温存すれば、期待された相乗効果は得られない。人的資本と組織改革を一体で進める経営の視座が問われている。",
+  "topic": "ekonomi",
+  "qs": [
+   [
+    "Apa pokok pikiran utama yang disampaikan bacaan di atas?",
+    [
+     "Peningkatan produktivitas pada era penyusutan penduduk menuntut investasi aset takberwujud yang disertai reformasi organisasi",
+     "Pembangunan pabrik baru dan perluasan jaringan toko tetap menjadi satu-satunya penopang ekonomi matang",
+     "Penyusutan jumlah tenaga kerja hanya dapat diatasi dengan memperpanjang jam kerja harian karyawan",
+     "Pembelian perangkat lunak canggih secara otomatis menggandakan laba tanpa perlu mengubah cara kerja"
+    ],
+    0,
+    {
+     "type": "main_idea",
+     "evidence": "人的資本と組織改革を一体で進める経営の視座が問われている",
+     "answer": "Peningkatan produktivitas pada era penyusutan penduduk menuntut investasi aset takberwujud yang disertai reformasi organisasi",
+     "patternId": "main_idea-ja-153"
+    }
+   ],
+   [
+    "Bagaimana perbandingan peran investasi aset berwujud dan aset takberwujud dalam perekonomian yang telah matang?",
+    [
+     "Aset berwujud kian meningkat keuntungannya, sedangkan aset takberwujud terbukti menurunkan efisiensi",
+     "Keduanya sama-sama kehilangan relevansi sehingga perusahaan beralih ke spekulasi keuangan",
+     "Aset berwujud saja sulit menghasilkan imbal hasil tinggi, sementara aset takberwujud menjadi sumber utama kenaikan produktivitas",
+     "Aset takberwujud hanya berguna bagi usaha kecil, sedangkan pabrik besar cukup mengandalkan mesin fisik"
+    ],
+    2,
+    {
+     "type": "comparison",
+     "evidence": "従来は工場設備や店舗網といった有形資産への投資が成長を牽引してきたが、成熟経済ではそれだけで高い収益を生むことは難しい",
+     "answer": "Aset berwujud saja sulit menghasilkan imbal hasil tinggi, sementara aset takberwujud menjadi sumber utama kenaikan produktivitas",
+     "patternId": "comparison-ja-153"
+    }
+   ],
+   [
+    "Selain pengembangan perangkat lunak, apa contoh investasi aset takberwujud yang disebutkan dalam teks?",
+    [
+     "Akuisisi lahan komersial strategis di kawasan pusat kota",
+     "Perombakan prosedur kerja serta pembinaan sumber daya manusia",
+     "Penambahan armada logistik dan gudang penyimpanan berpendingin",
+     "Penerbitan obligasi jangka panjang di pasar modal luar negeri"
+    ],
+    1,
+    {
+     "type": "detail",
+     "evidence": "ソフトウェア開発だけでなく、業務手順の刷新や人材育成などの無形資産投資こそが生産性向上の源泉であると示唆している",
+     "answer": "Perombakan prosedur kerja serta pembinaan sumber daya manusia",
+     "patternId": "detail-ja-153"
+    }
+   ],
+   [
+    "Mengapa pengenalan teknologi baru terkadang gagal menghasilkan efek sinergi yang diharapkan?",
+    [
+     "Karena harga lisensi perangkat lunak mengalami kenaikan setiap tahun anggaran",
+     "Karena pemerintah membatasi penggunaan otomatisasi di sektor industri jasa",
+     "Karena pekerja muda menolak mengikuti pelatihan keterampilan teknis",
+     "Karena kebiasaan organisasi lama yang kaku masih dipertahankan apa adanya"
+    ],
+    3,
+    {
+     "type": "cause_effect",
+     "evidence": "技術を単に導入しただけで既存の硬直した組織慣行を温存すれば、期待された相乗効果は得られない",
+     "answer": "Karena kebiasaan organisasi lama yang kaku masih dipertahankan apa adanya",
+     "patternId": "cause_effect-ja-153"
+    }
+   ],
+   [
+    "Apa makna kata \"温存\" dalam konteks kalimat keempat bacaan tersebut?",
+    [
+     "Membiarkan tetap bertahan tanpa diubah meskipun sudah tidak sesuai",
+     "Menghapus seluruh aturan lama melalui keputusan rapat pemegang saham",
+     "Mendokumentasikan sejarah perusahaan ke dalam arsip penyimpanan suhu rendah",
+     "Menyerahkan pengelolaan aset kepada lembaga konsultan independen"
+    ],
+    0,
+    {
+     "type": "vocabulary",
+     "evidence": "既存の硬直した組織慣行を温存すれば、期待された相乗効果は得られない",
+     "answer": "Membiarkan tetap bertahan tanpa diubah meskipun sudah tidak sesuai",
+     "patternId": "vocabulary-ja-153"
+    }
+   ]
+  ]
+ },
+ {
+  "id": "rja0154",
+  "level": "C2",
+  "jlpt": "N1+",
+  "title": "都市の微気候と風道を取り入れた建築設計",
+  "text": "沿岸部の大都市では、高層建築群が屏風のように連なることで海からの涼風が遮られ、内陸側の気温上昇を助長する現象が深刻化している。従来は個々の建物内部の断熱性能や空調効率ばかりが重視され、街区全体の気流への影響は十分に顧みられてこなかった。近年では流体解析の高度化により、建物の配置や高さを段階的に変化させて都市内部へ風を呼び込む設計手法が注目されている。河川や緑地と連続する風の通り道を確保すれば、夜間における熱の滞留を大幅に緩和できるという。建築を単体の造形物ではなく、都市環境の一部として捉え直す発想が求められている。",
+  "topic": "masyarakat",
+  "qs": [
+   [
+    "Dampak apa yang ditimbulkan oleh deretan gedung pencakar langit di kawasan pesisir kota besar?",
+    [
+     "Mempercepat laju angin laut hingga merusak atap perumahan penduduk di pedalaman",
+     "Menurunkan kelembapan udara pesisir secara drastis sepanjang musim dingin",
+     "Meningkatkan curah hujan lokal yang memicu banjir rob di pelabuhan",
+     "Menghalangi angin sejuk dari laut sehingga memperparah kenaikan suhu di wilayah bagian dalam"
+    ],
+    3,
+    {
+     "type": "cause_effect",
+     "evidence": "高層建築群が屏風のように連なることで海からの涼風が遮られ、内陸側の気温上昇を助長する現象が深刻化している",
+     "answer": "Menghalangi angin sejuk dari laut sehingga memperparah kenaikan suhu di wilayah bagian dalam",
+     "patternId": "cause_effect-ja-154"
+    }
+   ],
+   [
+    "Kelemahan pendekatan rancang bangun konvensional apa yang dikritisi dalam bacaan?",
+    [
+     "Terlalu banyak menyisakan lahan terbuka hijau sehingga mengurangi luas lantai komersial",
+     "Terlalu menitikberatkan insulasi dan efisiensi pendingin tiap gedung tanpa memedulikan aliran udara satu kawasan",
+     "Mengabaikan kekuatan struktur tahan gempa demi mengejar keindahan tampilan luar semata",
+     "Menggunakan bahan kaca pantul yang menyilaukan pengemudi kendaraan di jalan raya"
+    ],
+    1,
+    {
+     "type": "detail",
+     "evidence": "従来は個々の建物内部の断熱性能や空調効率ばかりが重視され、街区全体の気流への影響は十分に顧みられてこなかった",
+     "answer": "Terlalu menitikberatkan insulasi dan efisiensi pendingin tiap gedung tanpa memedulikan aliran udara satu kawasan",
+     "patternId": "detail-ja-154"
+    }
+   ],
+   [
+    "Manfaat apa yang diperoleh apabila jalur angin yang terhubung dengan sungai dan ruang hijau dijaga?",
+    [
+     "Kebutuhan listrik untuk penerangan jalan umum dapat dipangkas hingga separuhnya",
+     "Kebisingan lalu lintas dari jalan tol akan terserap habis oleh dinding gedung",
+     "Penumpukan panas pada malam hari di kawasan perkotaan dapat dikurangi secara signifikan",
+     "Harga lahan di tepi sungai otomatis turun sehingga terjangkau bagi warga muda"
+    ],
+    2,
+    {
+     "type": "inference",
+     "evidence": "河川や緑地と連続する風の通り道を確保すれば、夜間における熱の滞留を大幅に緩和できるという",
+     "answer": "Penumpukan panas pada malam hari di kawasan perkotaan dapat dikurangi secara signifikan",
+     "patternId": "inference-ja-154"
+    }
+   ],
+   [
+    "Apa makna kata \"助長\" sebagaimana digunakan pada kalimat pertama bacaan?",
+    [
+     "Mempercepat atau memperparah kecenderungan yang tidak diinginkan",
+     "Mengukur secara berkala dengan instrumen meteorologi presisi tinggi",
+     "Menekan laju pertumbuhan melalui pembatasan izin mendirikan bangunan",
+     "Menyeimbangkan perbedaan suhu antara kawasan pesisir dan pegunungan"
+    ],
+    0,
+    {
+     "type": "vocabulary",
+     "evidence": "内陸側の気温上昇を助長する現象が深刻化している",
+     "answer": "Mempercepat atau memperparah kecenderungan yang tidak diinginkan",
+     "patternId": "vocabulary-ja-154"
+    }
+   ],
+   [
+    "Perubahan cara pandang seperti apa yang diserukan penulis pada akhir paragraf?",
+    [
+     "Melarang pembangunan gedung bertingkat di seluruh kota pelabuhan demi memulihkan lanskap alami",
+     "Menyerahkan seluruh rancangan arsitektur kepada simulasi komputer tanpa campur tangan arsitek",
+     "Mengganti seluruh sistem penyejuk udara buatan dengan ventilasi alami di gedung perkantoran",
+     "Memandang bangunan bukan sebagai objek tunggal yang berdiri sendiri, melainkan bagian terpadu dari lingkungan kota"
+    ],
+    3,
+    {
+     "type": "author_attitude",
+     "evidence": "建築を単体の造形物ではなく、都市環境の一部として捉え直す発想が求められている",
+     "answer": "Memandang bangunan bukan sebagai objek tunggal yang berdiri sendiri, melainkan bagian terpadu dari lingkungan kota",
+     "patternId": "author_attitude-ja-154"
+    }
+   ]
+  ]
+ },
+ {
+  "id": "rja0155",
+  "level": "C2",
+  "jlpt": "N1+",
+  "title": "言語表現が空間認知に及ぼす微細な作用",
+  "text": "人間が空間内の位置関係を把握する際、母語の語彙体系が無意識のうちに注意の向け方を方向づけているという知見が認知言語学で蓄積されている。多くの言語では話者自身の身体を基準に左右で位置を示すが、常に東西南北の絶対的な方角で表現する言語共同体も存在する。後者の話者は見知らぬ屋内に入っても瞬時に方角を把握し、風景の記憶も自己中心ではなく地図的な配置で保持する傾向が顕著だという。もちろん言語が思考を完全に拘束するわけではないが、日常的に反復される表現形式が知覚の習慣を形づくる力は侮れない。異なる言語を学ぶ意義の一つは、自明と信じていた世界の切り取り方を相対化する点にある。",
+  "topic": "sains",
+  "qs": [
+   [
+    "Bagaimana perbedaan penutur bahasa berbasis arah mata angin mutlak dibandingkan penutur berbasis kiri-kanan tubuh?",
+    [
+     "Mereka mengalami kesulitan membaca peta cetak apabila berada di luar wilayah tempat tinggalnya",
+     "Mereka mampu langsung mengenali arah mata angin bahkan di dalam ruangan asing dan mengingat tata letak secara menyerupai peta",
+     "Mereka hanya menggunakan arah timur-barat ketika berlayar di laut lepas pada malam hari",
+     "Mereka membutuhkan waktu lebih lama untuk mengingat letak benda di sekitar tubuh sendiri"
+    ],
+    1,
+    {
+     "type": "comparison",
+     "evidence": "後者の話者は見知らぬ屋内に入っても瞬時に方角を把握し、風景の記憶も自己中心ではなく地図的な配置で保持する傾向が顕著だという",
+     "answer": "Mereka mampu langsung mengenali arah mata angin bahkan di dalam ruangan asing dan mengingat tata letak secara menyerupai peta",
+     "patternId": "comparison-ja-155"
+    }
+   ],
+   [
+    "Bagaimana posisi penulis terhadap gagasan bahwa bahasa mengendalikan pikiran manusia?",
+    [
+     "Bahasa tidak membelenggu pikiran sepenuhnya, tetapi pola ungkap yang diulang setiap hari kuat membentuk kebiasaan persepsi",
+     "Bahasa menentukan batas kemampuan bernalar manusia secara mutlak tanpa celah sedikit pun",
+     "Struktur kosakata sama sekali tidak berpengaruh terhadap cara manusia mengamati ruang fisik",
+     "Pengaruh bahasa terhadap persepsi hanya terjadi pada anak-anak sebelum memasuki usia sekolah"
+    ],
+    0,
+    {
+     "type": "author_attitude",
+     "evidence": "もちろん言語が思考を完全に拘束するわけではないが、日常的に反復される表現形式が知覚の習慣を形づくる力は侮れない",
+     "answer": "Bahasa tidak membelenggu pikiran sepenuhnya, tetapi pola ungkap yang diulang setiap hari kuat membentuk kebiasaan persepsi",
+     "patternId": "author_attitude-ja-155"
+    }
+   ],
+   [
+    "Menurut penulis, apa salah satu makna penting dari mempelajari bahasa yang berbeda?",
+    [
+     "Memperoleh keunggulan kompetitif dalam negosiasi perdagangan lintas negara",
+     "Menyeragamkan istilah ilmiah internasional agar tidak terjadi salah tafsir",
+     "Meningkatkan kecepatan menghafal arah jalan ketika bepergian ke luar negeri",
+     "Menyadari bahwa cara memetakan dunia yang selama ini dianggap sudah semestinya ternyata bersifat relatif"
+    ],
+    3,
+    {
+     "type": "main_idea",
+     "evidence": "異なる言語を学ぶ意義の一つは、自明と信じていた世界の切り取り方を相対化する点にある",
+     "answer": "Menyadari bahwa cara memetakan dunia yang selama ini dianggap sudah semestinya ternyata bersifat relatif",
+     "patternId": "main_idea-ja-155"
+    }
+   ],
+   [
+    "Apa yang dirujuk oleh ungkapan \"後者の話者\" pada kalimat ketiga bacaan?",
+    [
+     "Para peneliti linguistik kognitif yang membandingkan berbagai rumpun bahasa",
+     "Para penutur mayoritas bahasa yang menentukan posisi berdasarkan sisi kiri dan kanan tubuh",
+     "Para penutur komunitas bahasa yang senantiasa menyatakan letak menggunakan arah mata angin mutlak",
+     "Orang dewasa yang baru mempelajari bahasa asing kedua setelah pindah ke perkotaan"
+    ],
+    2,
+    {
+     "type": "inference",
+     "evidence": "常に東西南北の絶対的な方角で表現する言語共同体も存在する",
+     "answer": "Para penutur komunitas bahasa yang senantiasa menyatakan letak menggunakan arah mata angin mutlak",
+     "patternId": "inference-ja-155"
+    }
+   ],
+   [
+    "Apa makna kata \"自明\" dalam kalimat penutup bacaan tersebut?",
+    [
+     "Sesuatu yang dianggap sudah jelas dengan sendirinya tanpa perlu dipertanyakan lagi",
+     "Keterangan tertulis yang harus dibuktikan melalui percobaan laboratorium",
+     "Pandangan keliru yang telah ditinggalkan oleh kalangan akademisi modern",
+     "Aturan tata bahasa resmi yang dibakukan oleh lembaga pemerintah"
+    ],
+    0,
+    {
+     "type": "vocabulary",
+     "evidence": "自明と信じていた世界の切り取り方を相対化する点にある",
+     "answer": "Sesuatu yang dianggap sudah jelas dengan sendirinya tanpa perlu dipertanyakan lagi",
+     "patternId": "vocabulary-ja-155"
+    }
+   ]
+  ]
+ },
+ {
+  "id": "rja0156",
+  "level": "C2",
+  "jlpt": "N1+",
+  "title": "再生可能エネルギーの主力電源化と系統安定",
+  "text": "太陽光や風力などの再生可能エネルギーは脱炭素化の柱として導入が拡大しているが、気象条件に左右される出力変動が送電網の運用に新たな課題を突きつけている。電力は需要と供給が瞬時でも乖離すれば周波数が乱れ、大規模停電を招きかねない繊細な性質を持つ。そのため晴天の昼間に発電量が需要を上回ると、せっかくの自然電力を一時的に遮断する出力制御を余儀なくされる地域も出始めた。この矛盾を乗り越えるには、地域間を結ぶ送電線の増強に加え、蓄電池や需要側の消費時間帯を柔軟にずらす仕組みが欠かせない。発電設備を増やす段階から、電力システム全体の柔軟性を高める段階へと政策の重心が移っている。",
+  "topic": "lingkungan",
+  "qs": [
+   [
+    "Mengapa ketidaksesuaian sesaat saja antara pasokan dan permintaan listrik berbahaya bagi jaringan transmisi?",
+    [
+     "Karena panel surya akan mengalami kerusakan permanen akibat panas berlebih",
+     "Karena tarif listrik rumah tangga otomatis melonjak berkali-kali lipat pada hari itu",
+     "Karena frekuensi listrik akan terganggu sehingga berisiko memicu pemadaman berskala besar",
+     "Karena kabel bawah tanah akan meleleh apabila dialiri arus searah dari turbin angin"
+    ],
+    2,
+    {
+     "type": "cause_effect",
+     "evidence": "電力は需要と供給が瞬時でも乖離すれば周波数が乱れ、大規模停電を招きかねない繊細な性質を持つ",
+     "answer": "Karena frekuensi listrik akan terganggu sehingga berisiko memicu pemadaman berskala besar",
+     "patternId": "cause_effect-ja-156"
+    }
+   ],
+   [
+    "Apa yang terpaksa dilakukan di sejumlah daerah ketika produksi listrik surya pada siang cerah melampaui kebutuhan?",
+    [
+     "Menyalurkan kelebihan daya secara gratis ke seluruh pabrik berat di provinsi tetangga",
+     "Mematikan seluruh pembangkit listrik tenaga air secara permanen di wilayah hulu",
+     "Menyimpan seluruh kelebihan listrik di gardu rumah tangga tanpa memerlukan baterai",
+     "Melakukan pengendalian keluaran dengan memutus sementara aliran listrik energi terbarukan tersebut"
+    ],
+    3,
+    {
+     "type": "detail",
+     "evidence": "晴天の昼間に発電量が需要を上回ると、せっかくの自然電力を一時的に遮断する出力制御を余儀なくされる地域も出始めた",
+     "answer": "Melakukan pengendalian keluaran dengan memutus sementara aliran listrik energi terbarukan tersebut",
+     "patternId": "detail-ja-156"
+    }
+   ],
+   [
+    "Langkah apa yang dinilai mutlak diperlukan untuk mengatasi paradoks pemutusan listrik bersih tersebut?",
+    [
+     "Mengurangi pembangunan pembangkit tenaga angin dan kembali mengandalkan batu bara",
+     "Memperkuat jaringan transmisi antarwilayah serta memanfaatkan baterai penyimpan dan penggeseran waktu konsumsi secara lentur",
+     "Mewajibkan seluruh kawasan industri beroperasi hanya pada saat cuaca mendung",
+     "Memusatkan seluruh pembangkit tenaga surya di satu wilayah gurun yang jauh dari kota"
+    ],
+    1,
+    {
+     "type": "detail",
+     "evidence": "地域間を結ぶ送電線の増強に加え、蓄電池や需要側の消費時間帯を柔軟にずらす仕組みが欠かせない",
+     "answer": "Memperkuat jaringan transmisi antarwilayah serta memanfaatkan baterai penyimpan dan penggeseran waktu konsumsi secara lentur",
+     "patternId": "detail-ja-156"
+    }
+   ],
+   [
+    "Pergeseran arah kebijakan seperti apa yang disimpulkan penulis pada akhir bacaan?",
+    [
+     "Dari sekadar memperbanyak fasilitas pembangkit menuju peningkatan kelenturan sistem kelistrikan secara menyeluruh",
+     "Dari pengelolaan listrik oleh perusahaan swasta menuju nasionalisasi penuh oleh negara",
+     "Dari pemanfaatan tenaga surya menuju pengembangan energi panas bumi semata",
+     "Dari penghematan energi rumah tangga menuju pembatasan produksi barang manufaktur"
+    ],
+    0,
+    {
+     "type": "main_idea",
+     "evidence": "発電設備を増やす段階から、電力システム全体の柔軟性を高める段階へと政策の重心が移っている",
+     "answer": "Dari sekadar memperbanyak fasilitas pembangkit menuju peningkatan kelenturan sistem kelistrikan secara menyeluruh",
+     "patternId": "main_idea-ja-156"
+    }
+   ],
+   [
+    "Apa makna ungkapan \"余儀なくされる\" dalam kalimat ketiga bacaan di atas?",
+    [
+     "Diberi kebebasan penuh untuk memilih kebijakan yang paling menguntungkan",
+     "Mendapatkan subsidi tambahan atas keberhasilan melampaui target produksi",
+     "Menunda pengambilan keputusan sampai seluruh pihak mencapai kata sepakat",
+     "Terpaksa melakukan sesuatu karena tidak ada pilihan lain dalam situasi tersebut"
+    ],
+    3,
+    {
+     "type": "vocabulary",
+     "evidence": "せっかくの自然電力を一時的に遮断する出力制御を余儀なくされる地域も出始めた",
+     "answer": "Terpaksa melakukan sesuatu karena tidak ada pilihan lain dalam situasi tersebut",
+     "patternId": "vocabulary-ja-156"
+    }
+   ]
+  ]
+ },
+ {
+  "id": "rja0157",
+  "level": "C2",
+  "jlpt": "N1+",
+  "title": "司法判断における先例拘束性と社会通念の変容",
+  "text": "裁判所が過去の判例を尊重する原則は、法適用の予測可能性を高め、恣意的な裁きから市民を守る重要な礎である。しかし、家族観や情報環境が激変する現代において、数十年前の前提に立つ先例を墨守し続ければ、かえって実質的な公平を損なう場面も生じる。実際、近年の最高裁判決の中には、社会の意識変化や国際的な人権基準の進展を鑑みて従来の解釈を改める例が見受けられる。とはいえ、司法が世論の一時的な風潮に迎合すれば、少数者の権利擁護という本来の使命が揺らぎかねない。法的安定性と時代への適応との緊張関係をいかに調停するかという点に、司法の真価が問われている。",
+  "topic": "masyarakat",
+  "qs": [
+   [
+    "Apa fungsi mendasar dari prinsip penghormatan terhadap preseden putusan masa lalu di pengadilan?",
+    [
+     "Meningkatkan keterdugaan penerapan hukum serta melindungi warga dari peradilan yang sewenang-wenang",
+     "Mempercepat persidangan dengan meniadakan pemeriksaan saksi maupun bukti baru",
+     "Memastikan putusan pengadilan selalu sejalan dengan keinginan mayoritas pemilih",
+     "Mengurangi beban kerja parlemen sehingga undang-undang tidak perlu pernah direvisi"
+    ],
+    0,
+    {
+     "type": "detail",
+     "evidence": "法適用の予測可能性を高め、恣意的な裁きから市民を守る重要な礎である",
+     "answer": "Meningkatkan keterdugaan penerapan hukum serta melindungi warga dari peradilan yang sewenang-wenang",
+     "patternId": "detail-ja-157"
+    }
+   ],
+   [
+    "Mengapa mempertahankan preseden puluhan tahun silam secara kaku dapat menimbulkan masalah pada masa kini?",
+    [
+     "Karena arsip putusan lama banyak yang rusak sehingga sulit diverifikasi keasliannya",
+     "Karena pandangan tentang keluarga dan lingkungan informasi telah berubah drastis sehingga keadilan substantif justru dapat tercederai",
+     "Karena jumlah hakim yang memahami peristilahan hukum klasik semakin berkurang",
+     "Karena perjanjian perdagangan bebas melarang penggunaan yurisprudensi nasional"
+    ],
+    1,
+    {
+     "type": "cause_effect",
+     "evidence": "数十年前の前提に立つ先例を墨守し続ければ、かえって実質的な公平を損なう場面も生じる",
+     "answer": "Karena pandangan tentang keluarga dan lingkungan informasi telah berubah drastis sehingga keadilan substantif justru dapat tercederai",
+     "patternId": "cause_effect-ja-157"
+    }
+   ],
+   [
+    "Bahaya apa yang diperingatkan penulis apabila lembaga peradilan sekadar mengikuti arus opini publik sesaat?",
+    [
+     "Tingkat kepercayaan pelaku pasar modal terhadap mata uang domestik akan anjlok",
+     "Sengketa perdata ringan akan menumpuk di pengadilan tingkat pertama",
+     "Misi hakiki peradilan dalam melindungi hak-hak kelompok minoritas dapat terguncang",
+     "Lembaga eksekutif akan kehilangan kewenangan menyusun rancangan anggaran"
+    ],
+    2,
+    {
+     "type": "inference",
+     "evidence": "司法が世論の一時的な風潮に迎合すれば、少数者の権利擁護という本来の使命が揺らぎかねない",
+     "answer": "Misi hakiki peradilan dalam melindungi hak-hak kelompok minoritas dapat terguncang",
+     "patternId": "inference-ja-157"
+    }
+   ],
+   [
+    "Apa makna kata \"墨守\" pada kalimat kedua bacaan tersebut?",
+    [
+     "Mencatat seluruh jalannya persidangan secara lengkap menggunakan tinta hitam",
+     "Menyembunyikan pertimbangan hukum dari pengawasan media massa",
+     "Membatalkan putusan pengadilan rendah melalui kewenangan mahkamah agung",
+     "Memegang teguh kebiasaan atau aturan lama secara kaku tanpa mau mengubahnya"
+    ],
+    3,
+    {
+     "type": "vocabulary",
+     "evidence": "数十年前の前提に立つ先例を墨守し続ければ、かえって実質的な公平を損なう場面も生じる",
+     "answer": "Memegang teguh kebiasaan atau aturan lama secara kaku tanpa mau mengubahnya",
+     "patternId": "vocabulary-ja-157"
+    }
+   ],
+   [
+    "Bagaimana sikap penulis mengenai ketegangan antara kepastian hukum dan penyesuaian terhadap perubahan zaman?",
+    [
+     "Berpendapat bahwa kepastian hukum harus selalu dikorbankan demi mengikuti perkembangan zaman",
+     "Menilai kualitas sejati peradilan justru diuji dari kemampuannya menyelaraskan ketegangan di antara keduanya secara bijak",
+     "Menegaskan bahwa hakim sama sekali tidak boleh mengubah tafsir hukum tanpa amandemen konstitusi",
+     "Menganggap ketegangan tersebut akan hilang dengan sendirinya apabila juri awam dilibatkan"
+    ],
+    1,
+    {
+     "type": "author_attitude",
+     "evidence": "法的安定性と時代への適応との緊張関係をいかに調停するかという点に、司法の真価が問われている",
+     "answer": "Menilai kualitas sejati peradilan justru diuji dari kemampuannya menyelaraskan ketegangan di antara keduanya secara bijak",
+     "patternId": "author_attitude-ja-157"
+    }
+   ]
+  ]
+ },
+ {
+  "id": "rja0158",
+  "level": "C2",
+  "jlpt": "N1+",
+  "title": "歴史叙述における史料批判と沈黙の読み解き",
+  "text": "歴史学の基本は残された文献史料を厳密に検証することにあるが、文字記録そのものが当時の権力者や知識層の視点に偏っている事実を忘れてはならない。公文書や年代記には統治の正当性を誇示する記述が並ぶ一方で、市井の人々の営みや周縁化された集団の声は最初から書き留められないことが多い。そのため書かれた字面だけを無批判に繋ぎ合わせれば、勝者の論理を追認するだけの偏った歴史像に陥ってしまう。近年の歴史研究では、考古遺物や民俗慣行と照合しながら、史料が何を語らずに沈黙しているのかを逆に問い直す手法が重視されている。記録の空白に目を凝らす営みこそが、過去の社会をより立体的に浮かび上がらせるのである。",
+  "topic": "budaya",
+  "qs": [
+   [
+    "Keterbatasan mendasar apa yang melekat pada sumber sejarah tertulis menurut bacaan?",
+    [
+     "Sebagian besar naskah kuno telah mengalami pemalsuan pada era modern untuk kepentingan wisata",
+     "Bahasa yang digunakan dalam dokumen resmi masa lalu tidak mungkin lagi diterjemahkan secara akurat",
+     "Catatan tertulis hanya memuat urusan perdagangan sehari-hari dan mengabaikan peristiwa politik besar",
+     "Rekaman tertulis cenderung berat sebelah pada sudut pandang penguasa dan kalangan terpelajar pada zamannya"
+    ],
+    3,
+    {
+     "type": "detail",
+     "evidence": "文字記録そのものが当時の権力者や知識層の視点に偏っている事実を忘れてはならない",
+     "answer": "Rekaman tertulis cenderung berat sebelah pada sudut pandang penguasa dan kalangan terpelajar pada zamannya",
+     "patternId": "detail-ja-158"
+    }
+   ],
+   [
+    "Apa akibatnya jika sejarawan hanya merangkai isi harfiah dokumen tertulis tanpa sikap kritis?",
+    [
+     "Kronologi tahun peristiwa menjadi kacau akibat perbedaan sistem penanggalan daerah",
+     "Minat pembaca umum terhadap karya penulisan sejarah akan menurun secara tajam",
+     "Gambaran sejarah menjadi timpang karena sekadar mengamini logika pihak pemenang",
+     "Penelitian sejarah akan kehilangan dukungan pendanaan dari lembaga kebudayaan negara"
+    ],
+    2,
+    {
+     "type": "cause_effect",
+     "evidence": "書かれた字面だけを無批判に繋ぎ合わせれば、勝者の論理を追認するだけの偏った歴史像に陥ってしまう",
+     "answer": "Gambaran sejarah menjadi timpang karena sekadar mengamini logika pihak pemenang",
+     "patternId": "cause_effect-ja-158"
+    }
+   ],
+   [
+    "Pendekatan apa yang ditekankan dalam penelitian sejarah mutakhir sebagaimana dijelaskan penulis?",
+    [
+     "Membandingkan naskah dengan temuan arkeologis serta tradisi rakyat sembari mempertanyakan apa yang tidak diceritakan sumber tertulis",
+     "Meninggalkan penggunaan dokumen tertulis sepenuhnya dan hanya mengandalkan penggalian purbakala",
+     "Menggunakan kecerdasan buatan untuk mengarang ulang dialog tokoh sejarah yang hilang",
+     "Membatasi kajian sejarah hanya pada era modern yang telah memiliki rekaman suara dan foto"
+    ],
+    0,
+    {
+     "type": "main_idea",
+     "evidence": "考古遺物や民俗慣行と照合しながら、史料が何を語らずに沈黙しているのかを逆に問い直す手法が重視されている",
+     "answer": "Membandingkan naskah dengan temuan arkeologis serta tradisi rakyat sembari mempertanyakan apa yang tidak diceritakan sumber tertulis",
+     "patternId": "main_idea-ja-158"
+    }
+   ],
+   [
+    "Apa makna kata \"追認\" dalam kalimat ketiga bacaan di atas?",
+    [
+     "Membantah argumen lawan dengan mengajukan bukti tandingan yang baru ditemukan",
+     "Mengesahkan atau membenarkan begitu saja sesuatu yang telah ditetapkan sebelumnya",
+     "Menelusuri jejak pelarian tokoh politik hingga ke wilayah perbatasan",
+     "Menambahkan catatan kaki pada terjemahan naskah klasik agar mudah dipahami"
+    ],
+    1,
+    {
+     "type": "vocabulary",
+     "evidence": "勝者の論理を追認するだけの偏った歴史像に陥ってしまう",
+     "answer": "Mengesahkan atau membenarkan begitu saja sesuatu yang telah ditetapkan sebelumnya",
+     "patternId": "vocabulary-ja-158"
+    }
+   ],
+   [
+    "Apa yang dapat disimpulkan dari kalimat terakhir mengenai \"kekosongan dalam catatan\"?",
+    [
+     "Bagian naskah yang kosong menandakan bahwa tidak terjadi peristiwa sosial apa pun pada masa itu",
+     "Sejarawan tidak berhak membahas kehidupan masyarakat jelata apabila tidak ditemukan bukti tertulis resmi",
+     "Ketidakhadiran kelompok tertentu dalam dokumen justru merupakan petunjuk penting untuk merekonstruksi masyarakat masa lalu secara utuh",
+     "Catatan yang hilang hanya dapat dipulihkan apabila ditemukan salinan naskah di negara tetangga"
+    ],
+    2,
+    {
+     "type": "inference",
+     "evidence": "記録の空白に目を凝らす営みこそが、過去の社会をより立体的に浮かび上がらせるのである",
+     "answer": "Ketidakhadiran kelompok tertentu dalam dokumen justru merupakan petunjuk penting untuk merekonstruksi masyarakat masa lalu secara utuh",
+     "patternId": "inference-ja-158"
+    }
+   ]
+  ]
+ },
+ {
+  "id": "rja0159",
+  "level": "C2",
+  "jlpt": "N1+",
+  "title": "科学研究における再現性の危機と事前登録制度",
+  "text": "心理学や医学生物学をはじめとする実証科学の分野で、著名な学術誌に掲載された論文の実験結果が第三者によって再現できない事例が相次ぎ、深刻な議論を呼んでいる。その背景には、仮説通りの劇的な結果が出た研究ばかりが採択されやすく、差が見られなかった地味な検証結果が日の目を見ない出版構造の歪みがある。研究者が無意識のうちに都合の良い分析手法を事後的に選び取る誘因も働きやすい。この弊害を是正するため、実験開始前に仮説と統計解析の手順を公的に登録し、結果の成否にかかわらず公表する仕組みが広がり始めた。科学の信頼性は華々しい発見の数ではなく、手続きの透明性と反証への開かれ方によって支えられている。",
+  "topic": "sains",
+  "qs": [
+   [
+    "Apa akar struktural dalam dunia publikasi ilmiah yang memicu krisis keterulangan hasil eksperimen?",
+    [
+     "Kurangnya dana pembelian peralatan laboratorium mutakhir di universitas negeri maupun swasta",
+     "Kecenderungan jurnal lebih menerima temuan dramatis sesuai hipotesis sementara hasil uji yang tidak menunjukkan perbedaan jarang diterbitkan",
+     "Larangan berbagi data mentah lintas negara akibat ketatnya undang-undang rahasia dagang",
+     "Terlalu banyaknya jurnal ilmiah yang hanya menerbitkan ulang eksperimen lama tanpa temuan baru"
+    ],
+    1,
+    {
+     "type": "cause_effect",
+     "evidence": "仮説通りの劇的な結果が出た研究ばかりが採択されやすく、差が見られなかった地味な検証結果が日の目を見ない出版構造の歪みがある",
+     "answer": "Kecenderungan jurnal lebih menerima temuan dramatis sesuai hipotesis sementara hasil uji yang tidak menunjukkan perbedaan jarang diterbitkan",
+     "patternId": "cause_effect-ja-159"
+    }
+   ],
+   [
+    "Bagaimana mekanisme sistem praregistrasi yang mulai meluas untuk memperbaiki masalah tersebut?",
+    [
+     "Mewajibkan tiga laboratorium berbeda melakukan eksperimen yang sama secara serentak sebelum menulis makalah",
+     "Memberikan hadiah finansial khusus kepada peneliti yang berhasil membuktikan kesalahan teori klasik",
+     "Merahasiakan identitas penulis serta lembaga asal selama sepuluh tahun setelah artikel terbit",
+     "Mendaftarkan hipotesis serta prosedur analisis statistik secara terbuka sebelum eksperimen dimulai dan mempublikasikannya apa pun hasilnya"
+    ],
+    3,
+    {
+     "type": "detail",
+     "evidence": "実験開始前に仮説と統計解析の手順を公的に登録し、結果の成否にかかわらず公表する仕組みが広がり始めた",
+     "answer": "Mendaftarkan hipotesis serta prosedur analisis statistik secara terbuka sebelum eksperimen dimulai dan mempublikasikannya apa pun hasilnya",
+     "patternId": "detail-ja-159"
+    }
+   ],
+   [
+    "Perilaku tidak disadari apa yang mudah terdorong oleh ketimpangan sistem publikasi lama?",
+    [
+     "Editor jurnal mempercepat proses peninjauan tanpa membaca bagian metodologi penelitian",
+     "Mahasiswa pascasarjana menghindari topik penelitian yang berkaitan dengan psikologi dan kedokteran",
+     "Peneliti memilih metode analisis yang menguntungkan hipotesisnya setelah melihat data hasil percobaan",
+     "Lembaga pemberi hibah hanya menyalurkan dana kepada peneliti senior yang pernah meraih penghargaan"
+    ],
+    2,
+    {
+     "type": "inference",
+     "evidence": "研究者が無意識のうちに都合の良い分析手法を事後的に選び取る誘因も働きやすい",
+     "answer": "Peneliti memilih metode analisis yang menguntungkan hipotesisnya setelah melihat data hasil percobaan",
+     "patternId": "inference-ja-159"
+    }
+   ],
+   [
+    "Apa makna ungkapan \"日の目を見ない\" pada kalimat kedua bacaan tersebut?",
+    [
+     "Tidak pernah dipublikasikan atau dikenal oleh khalayak",
+     "Dilakukan di ruang laboratorium bawah tanah tanpa pencahayaan alami",
+     "Tidak memperoleh persetujuan komite etik sebelum percobaan dijalankan",
+     "Kehilangan keakuratan akibat paparan suhu ruangan yang tidak stabil"
+    ],
+    0,
+    {
+     "type": "vocabulary",
+     "evidence": "差が見られなかった地味な検証結果が日の目を見ない出版構造の歪みがある",
+     "answer": "Tidak pernah dipublikasikan atau dikenal oleh khalayak",
+     "patternId": "vocabulary-ja-159"
+    }
+   ],
+   [
+    "Apa pandangan mendasar penulis mengenai fondasi kredibilitas ilmu pengetahuan?",
+    [
+     "Kredibilitas sains ditentukan oleh seberapa cepat suatu temuan dapat dikomersialkan menjadi produk industri",
+     "Kepercayaan pada sains ditopang oleh transparansi prosedur dan keterbukaan terhadap pengujian ulang, bukan banyaknya temuan mencolok",
+     "Keandalan ilmiah hanya dapat dijaga apabila publikasi penelitian dibatasi pada jurnal bereputasi tertinggi",
+     "Sains yang sejati tidak boleh mempublikasikan kegagalan eksperimen agar masyarakat tidak bingung"
+    ],
+    1,
+    {
+     "type": "main_idea",
+     "evidence": "科学の信頼性は華々しい発見の数ではなく、手続きの透明性と反証への開かれ方によって支えられている",
+     "answer": "Kepercayaan pada sains ditopang oleh transparansi prosedur dan keterbukaan terhadap pengujian ulang, bukan banyaknya temuan mencolok",
+     "patternId": "main_idea-ja-159"
+    }
+   ]
+  ]
+ },
+ {
+  "id": "rja0160",
+  "level": "C2",
+  "jlpt": "N1+",
+  "title": "無形文化財の継承における記録と身体知",
+  "text": "伝統芸能や工芸技術の後継者不足が深刻化する中、熟練者の動きを高精細な三次元映像やセンサーで克明に記録し保存する試みが各地で進んでいる。デジタル記録は失われゆく技の輪郭を後世に伝える上で極めて有効であり、初心者が独習する際の手がかりとしても価値が高い。しかし、素材の微妙な湿り気や観客の呼吸に応じて瞬時に加減を変える職人の判断までは、どれほど精緻な数値データにも還元しきれない。生身の師弟関係の中で試行錯誤を通じて体得される暗黙の身体知こそが、伝統を単なる模倣から生きた表現へと高めるからである。先端技術による記録を補助線としつつ、人が人に伝える場そのものを守る支援が不可欠だ。",
+  "topic": "budaya",
+  "qs": [
+   [
+    "Apa manfaat pencatatan digital beresolusi tinggi dalam pelestarian warisan budaya takbenda menurut teks?",
+    [
+     "Menggantikan peran pengrajin manusia sepenuhnya dengan lengan robotik penghasil karya identik",
+     "Memungkinkan penjualan hak cipta gerakan tari tradisional di pasar aset digital global",
+     "Mewariskan garis besar teknik yang terancam punah kepada generasi mendatang sekaligus menjadi panduan belajar mandiri bagi pemula",
+     "Menghilangkan kebutuhan latihan fisik bertahun-tahun bagi calon penerus seni pertunjukan"
+    ],
+    2,
+    {
+     "type": "detail",
+     "evidence": "デジタル記録は失われゆく技の輪郭を後世に伝える上で極めて有効であり、初心者が独習する際の手がかりとしても価値が高い",
+     "answer": "Mewariskan garis besar teknik yang terancam punah kepada generasi mendatang sekaligus menjadi panduan belajar mandiri bagi pemula",
+     "patternId": "detail-ja-160"
+    }
+   ],
+   [
+    "Aspek apa dari keahlian empu atau perajin yang dinilai tidak dapat direduksi sepenuhnya ke dalam data angka?",
+    [
+     "Penilaian seketika dalam menyesuaikan takaran mengikuti kelembapan halus bahan atau tarikan napas penonton",
+     "Urutan dasar langkah kaki dan sudut kemiringan pahat pada tahap pengerjaan awal",
+     "Komposisi kimia pewarna alami yang digunakan pada kain tenun tradisional",
+     "Sejarah asal-usul perguruan seni beserta silsilah para pendirinya"
+    ],
+    0,
+    {
+     "type": "detail",
+     "evidence": "素材の微妙な湿り気や観客の呼吸に応じて瞬時に加減を変える職人の判断までは、どれほど精緻な数値データにも還元しきれない",
+     "answer": "Penilaian seketika dalam menyesuaikan takaran mengikuti kelembapan halus bahan atau tarikan napas penonton",
+     "patternId": "detail-ja-160"
+    }
+   ],
+   [
+    "Bagaimana penulis membandingkan fungsi rekaman digital dengan pewarisan langsung antara guru dan murid?",
+    [
+     "Rekaman digital lebih objektif dan unggul, sedangkan hubungan guru-murid cenderung menghambat inovasi",
+     "Rekaman digital berperan sebagai garis bantu pelengkap, sedangkan interaksi langsung mewariskan pengetahuan tubuh implisit yang menghidupkan tradisi",
+     "Keduanya memiliki fungsi yang persis sama sehingga salah satu saja sudah memadai untuk pelestarian",
+     "Rekaman digital hanya cocok untuk seni kerajinan benda, sedangkan seni pertunjukan tidak dapat direkam sama sekali"
+    ],
+    1,
+    {
+     "type": "comparison",
+     "evidence": "先端技術による記録を補助線としつつ、人が人に伝える場そのものを守る支援が不可欠だ",
+     "answer": "Rekaman digital berperan sebagai garis bantu pelengkap, sedangkan interaksi langsung mewariskan pengetahuan tubuh implisit yang menghidupkan tradisi",
+     "patternId": "comparison-ja-160"
+    }
+   ],
+   [
+    "Apa makna kata \"還元\" sebagaimana digunakan pada kalimat ketiga bacaan tersebut?",
+    [
+     "Mengembalikan keuntungan penjualan karya seni kepada masyarakat desa penghasilnya",
+     "Memulihkan warna lukisan kuno yang pudar melalui reaksi kimia di laboratorium",
+     "Menggandakan kapasitas penyimpanan arsip pada pusat data milik museum nasional",
+     "Mereduksi atau mengubah sesuatu yang kompleks ke dalam bentuk unsur yang lebih sederhana"
+    ],
+    3,
+    {
+     "type": "vocabulary",
+     "evidence": "どれほど精緻な数値データにも還元しきれない",
+     "answer": "Mereduksi atau mengubah sesuatu yang kompleks ke dalam bentuk unsur yang lebih sederhana",
+     "patternId": "vocabulary-ja-160"
+    }
+   ],
+   [
+    "Apa pesan utama penulis terkait kebijakan pelestarian budaya tradisional?",
+    [
+     "Pemanfaatan teknologi perekaman mutakhir harus disertai dukungan nyata untuk menjaga ruang transmisi langsung antarmanusia",
+     "Pemerintah sebaiknya memfokuskan seluruh anggaran pada digitalisasi sebelum para maestro wafat",
+     "Sistem magang tradisional perlu dihapus karena terlalu memakan waktu bagi generasi muda",
+     "Karya kerajinan tradisional sebaiknya dibekukan bentuknya agar tidak berubah sedikit pun oleh zaman"
+    ],
+    0,
+    {
+     "type": "main_idea",
+     "evidence": "先端技術による記録を補助線としつつ、人が人に伝える場そのものを守る支援が不可欠だ",
+     "answer": "Pemanfaatan teknologi perekaman mutakhir harus disertai dukungan nyata untuk menjaga ruang transmisi langsung antarmanusia",
+     "patternId": "main_idea-ja-160"
+    }
+   ]
+  ]
+ },
+ {
+  "id": "rja0161",
+  "level": "C2",
+  "jlpt": "N1+",
+  "title": "企業統治における社外取締役と実質的監督",
+  "text": "不祥事の抑止と持続的な企業価値の向上を目指し、上場企業において独立性の高い社外取締役を複数選任する体制が急速に定着した。社内出身の経営陣だけでは陥りやすい同質的な思考や過度な忖度を排し、多様な利害関係者の視点から経営戦略を点検する狙いがある。もっとも、人数や比率といった外形的な基準を満たすだけで、直ちに健全な企業統治が機能するわけではない。情報提供が会議直前に限られていたり、異論を歓迎しない空気のままでは、どれほど有能な外部人材も形式的な追認機関にとどまってしまう。制度の器を整えた次には、耳の痛い指摘を経営判断へ誠実に反映させる組織文化の成熟が問われている。",
+  "topic": "kerja",
+  "qs": [
+   [
+    "Apa tujuan utama pengangkatan direktur independen dari luar perusahaan menurut bacaan?",
+    [
+     "Menghindari pola pikir seragam serta budaya sungkan berlebih di internal manajemen dan meninjau strategi dari sudut pandang beragam",
+     "Memenuhi syarat minimum pencatatan saham di bursa efek luar negeri tanpa mengubah strategi bisnis",
+     "Mengambil alih seluruh tugas operasional harian dari tangan direksi yang berasal dari internal perusahaan",
+     "Memangkas biaya gaji eksekutif tetap dengan menggantinya menjadi tenaga penasihat paruh waktu"
+    ],
+    0,
+    {
+     "type": "detail",
+     "evidence": "社内出身の経営陣だけでは陥りやすい同質的な思考や過度な忖度を排し、多様な利害関係者の視点から経営戦略を点検する狙いがある",
+     "answer": "Menghindari pola pikir seragam serta budaya sungkan berlebih di internal manajemen dan meninjau strategi dari sudut pandang beragam",
+     "patternId": "detail-ja-161"
+    }
+   ],
+   [
+    "Kondisi apa yang menyebabkan tenaga ahli eksternal yang cakap sekalipun berakhir menjadi sekadar pemberi stempel formalitas?",
+    [
+     "Masa jabatan direktur independen yang dibatasi paling lama satu tahun buku oleh undang-undang",
+     "Kurangnya pemahaman direktur eksternal mengenai peraturan perpajakan internasional",
+     "Terlalu seringnya rapat dewan direksi diselenggarakan secara terbuka di hadapan awak media",
+     "Pemberian informasi yang dibatasi menjelang rapat serta suasana organisasi yang tidak menyambut perbedaan pendapat"
+    ],
+    3,
+    {
+     "type": "cause_effect",
+     "evidence": "情報提供が会議直前に限られていたり、異論を歓迎しない空気のままでは、どれほど有能な外部人材も形式的な追認機関にとどまってしまう",
+     "answer": "Pemberian informasi yang dibatasi menjelang rapat serta suasana organisasi yang tidak menyambut perbedaan pendapat",
+     "patternId": "cause_effect-ja-161"
+    }
+   ],
+   [
+    "Apa kritik penulis terhadap perusahaan yang hanya berfokus pada jumlah atau persentase direktur eksternal?",
+    [
+     "Jumlah direktur eksternal yang terlalu banyak terbukti selalu menurunkan harga saham perusahaan",
+     "Pemenuhan standar administratif lahiriah semata tidak otomatis menjamin berjalannya tata kelola perusahaan yang sehat",
+     "Standar rasio tersebut hanya relevan diterapkan pada perusahaan rintisan di bidang teknologi",
+     "Perusahaan seharusnya menghapus seluruh jabatan direktur internal demi menjaga objektivitas"
+    ],
+    1,
+    {
+     "type": "inference",
+     "evidence": "人数や比率といった外形的な基準を満たすだけで、直ちに健全な企業統治が機能するわけではない",
+     "answer": "Pemenuhan standar administratif lahiriah semata tidak otomatis menjamin berjalannya tata kelola perusahaan yang sehat",
+     "patternId": "inference-ja-161"
+    }
+   ],
+   [
+    "Apa makna ungkapan \"耳の痛い指摘\" pada kalimat terakhir bacaan tersebut?",
+    [
+     "Tuntutan ganti rugi hukum yang diajukan oleh serikat pekerja di pengadilan",
+     "Kebisingan mesin pabrik yang mengganggu kesehatan pendengaran karyawan",
+     "Kritik atau masukan tajam yang tidak nyaman didengar tetapi penting untuk perbaikan",
+     "Desas-desus tanpa bukti yang beredar di kalangan pelaku pasar saham"
+    ],
+    2,
+    {
+     "type": "vocabulary",
+     "evidence": "耳の痛い指摘を経営判断へ誠実に反映させる組織文化の成熟が問われている",
+     "answer": "Kritik atau masukan tajam yang tidak nyaman didengar tetapi penting untuk perbaikan",
+     "patternId": "vocabulary-ja-161"
+    }
+   ],
+   [
+    "Apa tuntutan utama penulis setelah kerangka kelembagaan tata kelola perusahaan terbentuk?",
+    [
+     "Pengetatan sanksi pidana bagi direktur independen yang tidak menghadiri rapat tahunan",
+     "Penyeragaman struktur dewan komisaris di seluruh sektor industri nasional",
+     "Pengurangan frekuensi rapat dewan agar jajaran eksekutif fokus pada target penjualan",
+     "Pendewasaan budaya organisasi agar bersedia menyerap secara jujur masukan kritis ke dalam keputusan manajemen"
+    ],
+    3,
+    {
+     "type": "main_idea",
+     "evidence": "制度の器を整えた次には、耳の痛い指摘を経営判断へ誠実に反映させる組織文化の成熟が問われている",
+     "answer": "Pendewasaan budaya organisasi agar bersedia menyerap secara jujur masukan kritis ke dalam keputusan manajemen",
+     "patternId": "main_idea-ja-161"
+    }
+   ]
+  ]
+ },
+ {
+  "id": "rja0162",
+  "level": "C2",
+  "jlpt": "N1+",
+  "title": "中央銀行デジタル通貨と金融仲介機能の行方",
+  "text": "現金の利用比率が低下する中、各国の中央銀行が自ら発行するデジタル通貨の制度設計をめぐり慎重な検討を重ねている。民間決済サービスが乱立して相互運用性を欠く現状に対し、誰もが安全かつ低廉に使える公的な決済基盤を維持する意義は大きい。しかし、安全性に優れる中央銀行デジタル通貨へ個人の資金が一斉に流出すれば、民間銀行の預金が細り、企業への融資という金融仲介機能が損なわれる懸念がある。さらに取引履歴の一元的な把握は、不正資金の抑止に資する反面、個人のプライバシー保護と鋭く緊張する。利便性の追求だけでなく、既存の信用創造の仕組みと市民的自由をいかに両立させるかが核心的な論点である。",
+  "topic": "ekonomi",
+  "qs": [
+   [
+    "Mengapa penyediaan infrastruktur pembayaran publik oleh bank sentral dipandang bermakna penting?",
+    [
+     "Untuk menghapus seluruh perusahaan layanan pembayaran swasta agar negara memonopoli keuntungan transaksi",
+     "Untuk menggantikan mata uang asing dalam seluruh transaksi perdagangan komoditas internasional",
+     "Untuk mencetak uang tanpa batas guna menutup defisit anggaran belanja pemerintah pusat",
+     "Untuk mempertahankan sarana pembayaran publik yang aman dan murah di tengah menjamurnya layanan swasta yang tidak saling terhubung"
+    ],
+    3,
+    {
+     "type": "detail",
+     "evidence": "民間決済サービスが乱立して相互運用性を欠く現状に対し、誰もが安全かつ低廉に使える公的な決済基盤を維持する意義は大きい",
+     "answer": "Untuk mempertahankan sarana pembayaran publik yang aman dan murah di tengah menjamurnya layanan swasta yang tidak saling terhubung",
+     "patternId": "detail-ja-162"
+    }
+   ],
+   [
+    "Risiko ekonomi apa yang dikhawatirkan apabila dana masyarakat berpindah secara serentak ke mata uang digital bank sentral?",
+    [
+     "Nilai tukar mata uang nasional akan mengalami depresiasi tajam terhadap emas batangan",
+     "Simpanan di bank komersial menyusut sehingga fungsi intermediasi keuangan berupa penyaluran kredit ke dunia usaha terganggu",
+     "Biaya pencetakan uang kertas dan logam meningkat dua kali lipat dari anggaran semula",
+     "Suku bunga pinjaman perumahan turun hingga mencapai angka negatif secara permanen"
+    ],
+    1,
+    {
+     "type": "cause_effect",
+     "evidence": "民間銀行の預金が細り、企業への融資という金融仲介機能が損なわれる懸念がある",
+     "answer": "Simpanan di bank komersial menyusut sehingga fungsi intermediasi keuangan berupa penyaluran kredit ke dunia usaha terganggu",
+     "patternId": "cause_effect-ja-162"
+    }
+   ],
+   [
+    "Dilema apa yang melekat pada pencatatan riwayat transaksi secara terpusat dalam sistem tersebut?",
+    [
+     "Membantu mencegah aliran dana ilegal di satu sisi, tetapi berbenturan tajam dengan perlindungan privasi individu di sisi lain",
+     "Memudahkan pemungutan pajak konsumsi, tetapi memperlambat kecepatan transaksi ritel di toko kecil",
+     "Meningkatkan keamanan siber perbankan, tetapi menghabiskan pasokan listrik nasional secara berlebihan",
+     "Memperluas akses keuangan warga desa, tetapi menyulitkan wisatawan asing saat berbelanja"
+    ],
+    0,
+    {
+     "type": "comparison",
+     "evidence": "取引履歴の一元的な把握は、不正資金の抑止に資する反面、個人のプライバシー保護と鋭く緊張する",
+     "answer": "Membantu mencegah aliran dana ilegal di satu sisi, tetapi berbenturan tajam dengan perlindungan privasi individu di sisi lain",
+     "patternId": "comparison-ja-162"
+    }
+   ],
+   [
+    "Apa makna kata \"低廉\" dalam kalimat kedua bacaan di atas?",
+    [
+     "Berkecepatan sangat tinggi tanpa jeda waktu tunggu",
+     "Memiliki jaminan kerahasiaan berlapis berbasis enkripsi",
+     "Berbiaya murah atau terjangkau bagi pengguna",
+     "Bersifat wajib diikuti oleh seluruh pelaku usaha terdaftar"
+    ],
+    2,
+    {
+     "type": "vocabulary",
+     "evidence": "誰もが安全かつ低廉に使える公的な決済基盤を維持する意義は大きい",
+     "answer": "Berbiaya murah atau terjangkau bagi pengguna",
+     "patternId": "vocabulary-ja-162"
+    }
+   ],
+   [
+    "Apa pokok persoalan paling mendasar dalam perancangan mata uang digital bank sentral menurut penulis?",
+    [
+     "Memenangkan perlombaan peluncuran mata uang digital paling cepat dibandingkan negara tetangga",
+     "Menetapkan batas nominal transaksi harian yang seragam bagi seluruh lapisan masyarakat",
+     "Menyelaraskan kemudahan transaksi dengan keberlangsungan mekanisme penciptaan kredit perbankan serta kebebasan sipil",
+     "Memindahkan pengelolaan jaringan pembayaran nasional kepada konsorsium teknologi multinasional"
+    ],
+    2,
+    {
+     "type": "main_idea",
+     "evidence": "利便性の追求だけでなく、既存の信用創造の仕組みと市民的自由をいかに両立させるかが核心的な論点である",
+     "answer": "Menyelaraskan kemudahan transaksi dengan keberlangsungan mekanisme penciptaan kredit perbankan serta kebebasan sipil",
+     "patternId": "main_idea-ja-162"
+    }
+   ]
+  ]
+ },
+ {
+  "id": "rja0163",
+  "level": "C2",
+  "jlpt": "N1+",
+  "title": "批判的読解力の育成と断片的情報消費の陥穽",
+  "text": "要約動画や検索結果の抜粋によって短時間で結論だけを得る情報摂取が定着し、長大な論考を最後まで読み通す習慣が急速に失われつつある。要点の迅速な把握は実務上の効率を高めるものの、筆者がいかなる前提を置き、どの反論を退けて結論に至ったかという論理の骨格は削ぎ落とされやすい。その結果、耳当たりの良い断定に飛びつき、複雑な社会課題を単純な二項対立で捉える傾向が強まる恐れがある。高等教育に求められるのは、知識の伝達以上に、曖昧さや矛盾を含む長文と格闘しながら前提そのものを問い直す知的な持久力を鍛えることだ。効率の名のもとに思考の過程を省略すれば、民主社会の熟議の基盤さえ痩せ細ってしまう。",
+  "topic": "pendidikan",
+  "qs": [
+   [
+    "Apa yang mudah hilang ketika seseorang hanya mengonsumsi ringkasan cepat atau cuplikan hasil pencarian?",
+    [
+     "Kemampuan mengoperasikan perangkat lunak pengolah kata di lingkungan perkantoran modern",
+     "Kerangka logika mengenai asumsi dasar penulis serta cara penulis menepis sanggahan sebelum sampai pada simpulan",
+     "Minat untuk mengikuti perkembangan berita terkini melalui perangkat telepon pintar",
+     "Keterampilan menerjemahkan istilah teknis asing ke dalam bahasa ibu secara cepat"
+    ],
+    1,
+    {
+     "type": "detail",
+     "evidence": "筆者がいかなる前提を置き、どの反論を退けて結論に至ったかという論理の骨格は削ぎ落とされやすい",
+     "answer": "Kerangka logika mengenai asumsi dasar penulis serta cara penulis menepis sanggahan sebelum sampai pada simpulan",
+     "patternId": "detail-ja-163"
+    }
+   ],
+   [
+    "Dampak sosial apa yang dikhawatirkan muncul dari kebiasaan menyerap informasi secara sepotong-sepotong?",
+    [
+     "Menurunnya jumlah mahasiswa yang memilih jurusan ilmu komputer dan rekayasa perangkat lunak",
+     "Melambatnya penyebaran pengumuman darurat pemerintah ketika terjadi bencana alam",
+     "Menguatnya kecenderungan mudah terpikat klaim sepihak yang terdengar menyenangkan dan memandang masalah pelik sebagai hitam-putih belaka",
+     "Meningkatnya harga buku akademik cetak akibat berkurangnya oplah percetakan nasional"
+    ],
+    2,
+    {
+     "type": "cause_effect",
+     "evidence": "耳当たりの良い断定に飛びつき、複雑な社会課題を単純な二項対立で捉える傾向が強まる恐れがある",
+     "answer": "Menguatnya kecenderungan mudah terpikat klaim sepihak yang terdengar menyenangkan dan memandang masalah pelik sebagai hitam-putih belaka",
+     "patternId": "cause_effect-ja-163"
+    }
+   ],
+   [
+    "Peran utama apa yang dituntut penulis dari institusi pendidikan tinggi saat ini?",
+    [
+     "Menyediakan modul pembelajaran singkat berbasis video agar mahasiswa lulus lebih cepat",
+     "Menghafalkan sebanyak mungkin fakta ensiklopedis sebelum memasuki pasar kerja",
+     "Melarang penggunaan mesin pencari daring di seluruh lingkungan perpustakaan kampus",
+     "Melatih daya tahan intelektual untuk bergulat dengan teks panjang yang memuat ambiguitas sekaligus menguji ulang asumsi dasarnya"
+    ],
+    3,
+    {
+     "type": "main_idea",
+     "evidence": "曖昧さや矛盾を含む長文と格闘しながら前提そのものを問い直す知的な持久力を鍛えることだ",
+     "answer": "Melatih daya tahan intelektual untuk bergulat dengan teks panjang yang memuat ambiguitas sekaligus menguji ulang asumsi dasarnya",
+     "patternId": "main_idea-ja-163"
+    }
+   ],
+   [
+    "Apa makna kata \"熟議\" pada kalimat penutup bacaan tersebut?",
+    [
+     "Musyawarah mendalam yang mempertimbangkan berbagai argumen secara matang",
+     "Pemungutan suara cepat untuk menentukan pemenang secara mayoritas sederhana",
+     "Penyampaian pidato satu arah oleh pejabat ahli di hadapan khalayak",
+     "Peraturan tertulis yang membatasi peredaran informasi palsu di dunia maya"
+    ],
+    0,
+    {
+     "type": "vocabulary",
+     "evidence": "効率の名のもとに思考の過程を省略すれば、民主社会の熟議の基盤さえ痩せ細ってしまう",
+     "answer": "Musyawarah mendalam yang mempertimbangkan berbagai argumen secara matang",
+     "patternId": "vocabulary-ja-163"
+    }
+   ],
+   [
+    "Bagaimana sikap penulis terhadap alasan \"efisiensi\" dalam kebiasaan memangkas proses berpikir?",
+    [
+     "Bersikap kritis karena pengabaian proses bernalar demi efisiensi dapat menggerus fondasi demokrasi deliberatif",
+     "Mendukung penuh penghematan waktu baca agar warga memiliki lebih banyak waktu luang",
+     "Menganggapnya sebagai perkembangan teknologi yang wajar dan tidak berdampak pada kehidupan publik",
+     "Menyarankan agar hanya peneliti profesional yang perlu membaca naskah panjang secara utuh"
+    ],
+    0,
+    {
+     "type": "author_attitude",
+     "evidence": "効率の名のもとに思考の過程を省略すれば、民主社会の熟議の基盤さえ痩せ細ってしまう",
+     "answer": "Bersikap kritis karena pengabaian proses bernalar demi efisiensi dapat menggerus fondasi demokrasi deliberatif",
+     "patternId": "author_attitude-ja-163"
+    }
+   ]
+  ]
+ },
+ {
+  "id": "rja0164",
+  "level": "C2",
+  "jlpt": "N1+",
+  "title": "海洋プラスチック汚染と拡大生産者責任の枠組み",
+  "text": "紫外線や波浪によって微細化したプラスチック片が海洋生態系へ広く蓄積し、食物連鎖を通じた生物への影響が国際的な懸念となっている。海岸での清掃活動や消費者の分別意識の啓発は尊い取り組みだが、すでに海へ流出した微粒子を回収することは技術的にも経済的にも極めて困難である。そのため近年では、廃棄段階の対症療法にとどまらず、製品の設計段階から回収や再資源化の費用までを製造業者に負わせる拡大生産者責任の強化が議論されている。リサイクルしにくい複合素材の使用を抑え、循環を前提とした製品設計へ誘導する狙いだ。蛇口を絞らぬまま床を拭き続けるような対策からの脱却が急務となっている。",
+  "topic": "lingkungan",
+  "qs": [
+   [
+    "Mengapa aksi bersih pantai dan penyuluhan pemilahan sampah konsumen dinilai belum memadai untuk mengatasi mikroplastik laut?",
+    [
+     "Karena masyarakat pesisir menolak berpartisipasi dalam kegiatan sukarela tanpa imbalan upah",
+     "Karena sinar ultraviolet di lautan mampu menguraikan plastik menjadi air murni dengan cepat",
+     "Karena memungut kembali partikel mikro yang telanjur menyebar di lautan sangat sulit secara teknis maupun ekonomi",
+     "Karena sebagian besar sampah plastik laut berasal dari letusan gunung berapi bawah laut"
+    ],
+    2,
+    {
+     "type": "cause_effect",
+     "evidence": "すでに海へ流出した微粒子を回収することは技術的にも経済的にも極めて困難である",
+     "answer": "Karena memungut kembali partikel mikro yang telanjur menyebar di lautan sangat sulit secara teknis maupun ekonomi",
+     "patternId": "cause_effect-ja-164"
+    }
+   ],
+   [
+    "Apa inti dari skema tanggung jawab produsen yang diperluas sebagaimana dijelaskan dalam bacaan?",
+    [
+     "Mewajibkan konsumen membayar denda langsung setiap kali membeli barang berbahan kemasan plastik",
+     "Membebankan tanggung jawab sejak tahap perancangan produk hingga biaya pengumpulan dan daur ulang kepada pihak produsen",
+     "Mengalihkan seluruh pengelolaan sampah perkotaan dari pemerintah daerah kepada organisasi sukarelawan",
+     "Melarang perdagangan internasional seluruh barang industri yang menggunakan kemasan kedap air"
+    ],
+    1,
+    {
+     "type": "detail",
+     "evidence": "製品の設計段階から回収や再資源化の費用までを製造業者に負わせる拡大生産者責任の強化が議論されている",
+     "answer": "Membebankan tanggung jawab sejak tahap perancangan produk hingga biaya pengumpulan dan daur ulang kepada pihak produsen",
+     "patternId": "detail-ja-164"
+    }
+   ],
+   [
+    "Perubahan perilaku industri apa yang hendak didorong melalui penguatan kebijakan tersebut?",
+    [
+     "Menekan pemakaian bahan komposit yang sulit didaur ulang dan mengarahkan industri pada desain produk berbasis sirkulasi",
+     "Memindahkan pabrik pengemasan plastik ke negara berkembang yang memiliki biaya tenaga kerja rendah",
+     "Mengganti seluruh wadah plastik dengan kemasan logam berat sekali pakai",
+     "Memperbanyak pembangunan kapal penyaring sampah berukuran besar di perairan internasional"
+    ],
+    0,
+    {
+     "type": "detail",
+     "evidence": "リサイクルしにくい複合素材の使用を抑え、循環を前提とした製品設計へ誘導する狙いだ",
+     "answer": "Menekan pemakaian bahan komposit yang sulit didaur ulang dan mengarahkan industri pada desain produk berbasis sirkulasi",
+     "patternId": "detail-ja-164"
+    }
+   ],
+   [
+    "Apa maksud perumpamaan \"terus mengepel lantai tanpa menutup keran air\" pada kalimat terakhir?",
+    [
+     "Memboroskan anggaran riset kelautan untuk memantau arus samudra yang selalu berubah",
+     "Membersihkan pantai wisata secara berlebihan sementara pelabuhan perikanan dibiarkan kotor",
+     "Menunda pengesahan perjanjian lingkungan sambil menunggu teknologi pembersih otomatis selesai dibuat",
+     "Hanya menangani sampah di hilir tanpa mengendalikan produksi kemasan bermasalah dari hulunya"
+    ],
+    3,
+    {
+     "type": "inference",
+     "evidence": "蛇口を絞らぬまま床を拭き続けるような対策からの脱却が急務となっている",
+     "answer": "Hanya menangani sampah di hilir tanpa mengendalikan produksi kemasan bermasalah dari hulunya",
+     "patternId": "inference-ja-164"
+    }
+   ],
+   [
+    "Apa makna istilah \"対症療法\" dalam konteks kalimat ketiga bacaan di atas?",
+    [
+     "Pengobatan medis terpadu yang menggabungkan terapi modern dan ramuan tradisional",
+     "Penanganan sementara pada gejala luar tanpa menyentuh akar penyebab persoalan",
+     "Peraturan hukum mengikat yang menjatuhkan sanksi pencabutan izin usaha pabrik",
+     "Metode daur ulang kimiawi yang mengubah limbah plastik kembali menjadi bahan baku murni"
+    ],
+    1,
+    {
+     "type": "vocabulary",
+     "evidence": "廃棄段階の対症療法にとどまらず、製品の設計段階から回収や再資源化の費用までを製造業者に負わせる",
+     "answer": "Penanganan sementara pada gejala luar tanpa menyentuh akar penyebab persoalan",
+     "patternId": "vocabulary-ja-164"
+    }
+   ]
+  ]
+ },
+ {
+  "id": "rja0165",
+  "level": "C2",
+  "jlpt": "N1+",
+  "title": "抗菌薬耐性菌の拡大と国際的な創薬支援",
+  "text": "既存の抗生物質が効かない薬剤耐性菌の拡大は、現代医療の前提である外科手術や免疫抑制療法の安全性を根底から揺るがしている。耐性菌の出現を抑えるには新規の抗菌薬を適正に控えめへ使う必要があるが、使用量が抑えられれば製薬企業は莫大な開発費を回収できないという構造的なジレンマがある。その結果、採算性の低さから多くの企業が抗菌薬開発から撤退し、新薬の枯渇が現実の脅威となった。これを打開するため、販売量ではなく新薬の実用化そのものに対して公的資金で対価を支払う新たな報酬制度が模索されている。市場原理だけに委ねては守れない公共財として、国際協調による創薬基盤の再構築が急がれる。",
+  "topic": "kesehatan",
+  "qs": [
+   [
+    "Dilema struktural apa yang menghambat pengembangan obat antibakteri baru oleh perusahaan farmasi?",
+    [
+     "Penggunaan obat baru harus dibatasi demi mencegah bakteri kebal, tetapi pembatasan volume pakai membuat biaya riset yang besar gagal balik modal",
+     "Uji klinis antibiotik membutuhkan waktu puluhan tahun lebih lama dibandingkan obat penyakit kronis lainnya",
+     "Bakteri hasil mutasi tidak dapat lagi dibiakkan di dalam fasilitas laboratorium berstandar modern",
+     "Dokter di rumah sakit lebih memilih meresepkan obat baru secara berlebihan sehingga stok cepat habis"
+    ],
+    0,
+    {
+     "type": "cause_effect",
+     "evidence": "耐性菌の出現を抑えるには新規の抗菌薬を適正に控えめへ使う必要があるが、使用量が抑えられれば製薬企業は莫大な開発費を回収できないという構造的なジレンマがある",
+     "answer": "Penggunaan obat baru harus dibatasi demi mencegah bakteri kebal, tetapi pembatasan volume pakai membuat biaya riset yang besar gagal balik modal",
+     "patternId": "cause_effect-ja-165"
+    }
+   ],
+   [
+    "Mengapa meluasnya bakteri resistan obat disebut mengguncang fondasi kedokteran modern?",
+    [
+     "Karena menyebabkan seluruh vaksin penyakit virus kehilangan daya lindungnya secara serentak",
+     "Karena memaksa rumah sakit menutup layanan gawat darurat bagi pasien kecelakaan lalu lintas",
+     "Karena mengancam keamanan tindakan bedah serta terapi imunosupresi yang selama ini bergantung pada kemanjuran antibiotik",
+     "Karena membuat alat diagnostik pencitraan medis tidak lagi dapat digunakan secara akurat"
+    ],
+    2,
+    {
+     "type": "detail",
+     "evidence": "現代医療の前提である外科手術や免疫抑制療法の安全性を根底から揺るがしている",
+     "answer": "Karena mengancam keamanan tindakan bedah serta terapi imunosupresi yang selama ini bergantung pada kemanjuran antibiotik",
+     "patternId": "detail-ja-165"
+    }
+   ],
+   [
+    "Skema insentif baru seperti apa yang tengah dijajaki untuk mengatasi mundurnya industri dari riset antibiotik?",
+    [
+     "Menaikkan harga jual eceran antibiotik hingga sepuluh kali lipat agar ditanggung langsung oleh pasien",
+     "Mewajibkan rumah sakit membeli kuota minimum antibiotik baru setiap bulan meskipun tidak dibutuhkan",
+     "Menghapus masa berlaku paten seluruh obat penyakit menular agar bebas ditiru produsen generik",
+     "Memberikan imbalan dana publik atas keberhasilan menghadirkan obat baru hingga siap pakai, terlepas dari jumlah penjualannya"
+    ],
+    3,
+    {
+     "type": "detail",
+     "evidence": "販売量ではなく新薬の実用化そのものに対して公的資金で対価を支払う新たな報酬制度が模索されている",
+     "answer": "Memberikan imbalan dana publik atas keberhasilan menghadirkan obat baru hingga siap pakai, terlepas dari jumlah penjualannya",
+     "patternId": "detail-ja-165"
+    }
+   ],
+   [
+    "Apa makna kata \"枯渇\" pada kalimat ketiga bacaan tersebut?",
+    [
+     "Melonjaknya harga bahan baku obat akibat gangguan jalur pelayaran internasional",
+     "Mengering atau habisnya persediaan sesuatu hingga tidak tersisa lagi",
+     "Menurunnya khasiat obat karena penyimpanan pada suhu ruangan yang keliru",
+     "Bertumpuknya stok obat kedaluwarsa di gudang kementerian kesehatan"
+    ],
+    1,
+    {
+     "type": "vocabulary",
+     "evidence": "採算性の低さから多くの企業が抗菌薬開発から撤退し、新薬の枯渇が現実の脅威となった",
+     "answer": "Mengering atau habisnya persediaan sesuatu hingga tidak tersisa lagi",
+     "patternId": "vocabulary-ja-165"
+    }
+   ],
+   [
+    "Apa gagasan utama yang ditegaskan penulis pada bagian akhir bacaan?",
+    [
+     "Pengembangan seluruh jenis obat-obatan sebaiknya diambil alih sepenuhnya oleh laboratorium milik PBB",
+     "Penggunaan antibiotik di seluruh dunia harus dilarang selama lima tahun agar bakteri kembali peka",
+     "Persaingan bebas antarperusahaan farmasi swasta tetap menjadi cara terbaik melahirkan antibiotik murah",
+     "Antibiotik baru merupakan barang publik yang tak cukup diserahkan pada mekanisme pasar sehingga butuh kerja sama internasional untuk menopang risetnya"
+    ],
+    3,
+    {
+     "type": "main_idea",
+     "evidence": "市場原理だけに委ねては守れない公共財として、国際協調による創薬基盤の再構築が急がれる",
+     "answer": "Antibiotik baru merupakan barang publik yang tak cukup diserahkan pada mekanisme pasar sehingga butuh kerja sama internasional untuk menopang risetnya",
+     "patternId": "main_idea-ja-165"
+    }
+   ]
+  ]
+ },
+ {
+  "id": "rja0166",
+  "level": "C2",
+  "jlpt": "N1+",
+  "title": "高度専門職の流動性と組織の暗黙知の継承",
+  "text": "終身雇用を前提とした日本型の雇用慣行が揺らぎ、専門技能を持つ人材が企業の枠を越えて移動する動きが活発になっている。外部から異質な知見を取り込むことは硬直化した組織に刺激を与え、新たな事業創出を促す効果がある。その一方で、長期の協働を通じて現場に蓄積されてきた暗黙知や、失敗の教訓が退職とともに散逸する弊害も顕在化し始めた。業務を過度に標準化して誰でも代替可能にすれば、かえって熟練の妙味が失われかねない。人材の流動性を高めながらも、個人の経験を組織の共有財産へと昇華させる知の基盤づくりが課題となっている。",
+  "topic": "kerja",
+  "qs": [
+   [
+    "Manfaat positif apa yang dihadirkan oleh meningkatnya mobilitas tenaga ahli lintas perusahaan?",
+    [
+     "Turunnya biaya pelatihan karyawan baru hingga titik nol di seluruh sektor manufaktur",
+     "Hilangnya kebutuhan menyusun kontrak kerja tertulis antara perusahaan dan tenaga spesialis",
+     "Seragamnya budaya kerja di seluruh perusahaan sehingga persaingan usaha tidak lagi terjadi",
+     "Masuknya pengetahuan beragam dari luar yang memberi rangsangan pada organisasi kaku serta mendorong lahirnya usaha baru"
+    ],
+    3,
+    {
+     "type": "detail",
+     "evidence": "外部から異質な知見を取り込むことは硬直化した組織に刺激を与え、新たな事業創出を促す効果がある",
+     "answer": "Masuknya pengetahuan beragam dari luar yang memberi rangsangan pada organisasi kaku serta mendorong lahirnya usaha baru",
+     "patternId": "detail-ja-166"
+    }
+   ],
+   [
+    "Dampak negatif apa yang mulai tampak akibat keluar-masuknya tenaga kerja berpengalaman?",
+    [
+     "Tercerai-berainya pengetahuan implisit hasil kerja sama jangka panjang serta pelajaran dari kegagalan seiring pengunduran diri staf",
+     "Meningkatnya usia rata-rata jajaran manajemen puncak hingga melampaui batas pensiun",
+     "Terhentinya penggunaan sistem informasi digital di bagian administrasi kepegawaian",
+     "Menurunnya minat lulusan perguruan tinggi untuk mempelajari keahlian teknis khusus"
+    ],
+    0,
+    {
+     "type": "cause_effect",
+     "evidence": "長期の協働を通じて現場に蓄積されてきた暗黙知や、失敗の教訓が退職とともに散逸する弊害も顕在化し始めた",
+     "answer": "Tercerai-berainya pengetahuan implisit hasil kerja sama jangka panjang serta pelajaran dari kegagalan seiring pengunduran diri staf",
+     "patternId": "cause_effect-ja-166"
+    }
+   ],
+   [
+    "Mengapa penulis mengingatkan bahaya menyeragamkan pekerjaan secara berlebihan agar siapa pun mudah digantikan?",
+    [
+     "Karena peraturan ketenagakerjaan melarang pembuatan buku panduan prosedur kerja",
+     "Karena karyawan baru akan menuntut upah yang sama tingginya dengan direktur utama",
+     "Karena keahlian halus yang lahir dari kematangan jam terbang justru berisiko ikut lenyap",
+     "Karena mesin otomatis tidak dapat membaca prosedur kerja yang telah distandardisasi"
+    ],
+    2,
+    {
+     "type": "inference",
+     "evidence": "業務を過度に標準化して誰でも代替可能にすれば、かえって熟練の妙味が失われかねない",
+     "answer": "Karena keahlian halus yang lahir dari kematangan jam terbang justru berisiko ikut lenyap",
+     "patternId": "inference-ja-166"
+    }
+   ],
+   [
+    "Apa makna kata \"散逸\" dalam kalimat ketiga bacaan tersebut?",
+    [
+     "Tersimpan rapat di dalam brankas arsip rahasia milik perusahaan",
+     "Tersebar lalu hilang sehingga tidak lagi terkumpul secara utuh",
+     "Diperjualbelikan secara resmi melalui bursa lisensi paten industri",
+     "Diperbarui secara berkala mengikuti perkembangan standar internasional"
+    ],
+    1,
+    {
+     "type": "vocabulary",
+     "evidence": "失敗の教訓が退職とともに散逸する弊害も顕在化し始めた",
+     "answer": "Tersebar lalu hilang sehingga tidak lagi terkumpul secara utuh",
+     "patternId": "vocabulary-ja-166"
+    }
+   ],
+   [
+    "Apa tantangan utama yang dirumuskan penulis pada kalimat penutup bacaan?",
+    [
+     "Mengembalikan sistem kerja seumur hidup secara wajib guna mencegah perpindahan karyawan",
+     "Mengganti seluruh pekerja tetap dengan tenaga kontrak jangka pendek berbasis proyek",
+     "Melarang karyawan yang mengundurkan diri bekerja di bidang industri yang sejenis",
+     "Membangun fondasi pengetahuan yang mengangkat pengalaman individu menjadi aset bersama organisasi sembari tetap menjaga keluwesan gerak SDM"
+    ],
+    3,
+    {
+     "type": "main_idea",
+     "evidence": "人材の流動性を高めながらも、個人の経験を組織の共有財産へと昇華させる知の基盤づくりが課題となっている",
+     "answer": "Membangun fondasi pengetahuan yang mengangkat pengalaman individu menjadi aset bersama organisasi sembari tetap menjaga keluwesan gerak SDM",
+     "patternId": "main_idea-ja-166"
+    }
+   ]
+  ]
+ },
+ {
+  "id": "rja0167",
+  "level": "C2",
+  "jlpt": "N1+",
+  "title": "量子暗号通信の実用化と既存暗号基盤の移行",
+  "text": "現在のインターネット通信の安全性は、巨大な数の素因数分解に膨大な時間を要するという計算上の困難さに依拠している。しかし、量子計算機の開発が実用段階に近づくにつれ、従来の公開鍵暗号が短時間で解読される現実的なリスクが指摘されるようになった。とりわけ警戒すべきは、現時点で暗号化された通信データを窃取して保存し、将来の解読技術確立後に中身を暴く手法である。外交機密や医療記録のように数十年単位の秘匿を要する情報は、今から新たな耐量子暗号へ移行せねば手遅れになる。脅威が顕在化する前に社会基盤を更新するという先手の危機管理が試されている。",
+  "topic": "teknologi",
+  "qs": [
+   [
+    "Pada hal apa keamanan komunikasi internet saat ini bertumpu menurut kalimat pembuka bacaan?",
+    [
+     "Kerahasiaan lokasi fisik kabel serat optik yang ditanam di dasar samudra",
+     "Tingkat kesulitan komputasi yang membutuhkan waktu sangat besar untuk memfaktorkan bilangan prima berukuran raksasa",
+     "Penggantian alamat jaringan pengguna secara manual oleh penyedia layanan setiap jam",
+     "Larangan hukum internasional terhadap pembuatan perangkat komputer berkecepatan tinggi"
+    ],
+    1,
+    {
+     "type": "detail",
+     "evidence": "巨大な数の素因数分解に膨大な時間を要するという計算上の困難さに依拠している",
+     "answer": "Tingkat kesulitan komputasi yang membutuhkan waktu sangat besar untuk memfaktorkan bilangan prima berukuran raksasa",
+     "patternId": "detail-ja-167"
+    }
+   ],
+   [
+    "Modus ancaman spesifik apa yang menurut penulis paling patut diwaspadai saat ini?",
+    [
+     "Memutus aliran listrik pusat data perbankan secara serentak menggunakan gelombang radio",
+     "Menyebarkan perangkat lunak perusak yang menghapus arsip kertas di kantor pemerintahan",
+     "Mencuri serta menyimpan data terenkripsi sekarang untuk dibuka isinya kelak setelah teknologi pembobolnya matang",
+     "Memalsukan identitas peneliti kuantum guna mengacaukan publikasi jurnal fisika"
+    ],
+    2,
+    {
+     "type": "detail",
+     "evidence": "現時点で暗号化された通信データを窃取して保存し、将来の解読技術確立後に中身を暴く手法である",
+     "answer": "Mencuri serta menyimpan data terenkripsi sekarang untuk dibuka isinya kelak setelah teknologi pembobolnya matang",
+     "patternId": "detail-ja-167"
+    }
+   ],
+   [
+    "Mengapa informasi seperti rahasia diplomatik dan rekam medis tidak boleh menunggu sampai komputer kuantum benar-benar rampung baru beralih enkripsi?",
+    [
+     "Karena informasi tersebut wajib terjaga kerahasiaannya selama puluhan tahun sehingga pencurian data hari ini tetap berbahaya di masa depan",
+     "Karena ukuran berkas rekam medis terlalu besar untuk dikirim melalui jaringan internet biasa",
+     "Karena biaya peralihan sistem enkripsi akan naik seratus kali lipat pada tahun depan",
+     "Karena rumah sakit dan kedutaan besar masih menggunakan mesin ketik mekanis tanpa jaringan"
+    ],
+    0,
+    {
+     "type": "inference",
+     "evidence": "外交機密や医療記録のように数十年単位の秘匿を要する情報は、今から新たな耐量子暗号へ移行せねば手遅れになる",
+     "answer": "Karena informasi tersebut wajib terjaga kerahasiaannya selama puluhan tahun sehingga pencurian data hari ini tetap berbahaya di masa depan",
+     "patternId": "inference-ja-167"
+    }
+   ],
+   [
+    "Apa makna kata \"秘匿\" pada kalimat keempat bacaan di atas?",
+    [
+     "Pengumuman terbuka kepada masyarakat luas demi menjamin transparansi",
+     "Pemusnahan dokumen lama secara berkala untuk menghemat ruang arsip",
+     "Pemindahan kepemilikan data dari lembaga negara kepada perusahaan swasta",
+     "Penyimpanan secara rahasia agar tidak diketahui pihak yang tidak berhak"
+    ],
+    3,
+    {
+     "type": "vocabulary",
+     "evidence": "外交機密や医療記録のように数十年単位の秘匿を要する情報",
+     "answer": "Penyimpanan secara rahasia agar tidak diketahui pihak yang tidak berhak",
+     "patternId": "vocabulary-ja-167"
+    }
+   ],
+   [
+    "Sikap manajemen krisis seperti apa yang ditekankan penulis pada penutup bacaan?",
+    [
+     "Menunggu hingga terjadi kebocoran besar terlebih dahulu agar anggaran perbaikan mudah disetujui",
+     "Bertindak lebih dahulu memperbarui infrastruktur masyarakat sebelum ancaman benar-benar muncul ke permukaan",
+     "Menghentikan seluruh layanan komunikasi daring sampai komputer kuantum selesai diuji coba",
+     "Menyerahkan perlindungan rahasia negara sepenuhnya kepada penyedia perangkat lunak asing"
+    ],
+    1,
+    {
+     "type": "author_attitude",
+     "evidence": "脅威が顕在化する前に社会基盤を更新するという先手の危機管理が試されている",
+     "answer": "Bertindak lebih dahulu memperbarui infrastruktur masyarakat sebelum ancaman benar-benar muncul ke permukaan",
+     "patternId": "author_attitude-ja-167"
+    }
+   ]
+  ]
+ },
+ {
+  "id": "rja0168",
+  "level": "C2",
+  "jlpt": "N1+",
+  "title": "公共空間の民間管理と排除なき賑わいの両立",
+  "text": "財政難に直面する自治体が、公園や駅前広場の整備と運営を民間事業者に委ねる手法が全国の都市で広がっている。カフェの併設や催事の開催によって維持管理費を抑えつつ、閑散としていた空間に賑わいを呼び戻した成功例は少なくない。だが一方で、収益性や美観を優先するあまり、長時間の滞在を阻むベンチの形状や細かな禁止事項によって、高齢者や困窮者が居場所を失う事態も指摘されている。本来、都市の広場とは消費能力の有無にかかわらず誰もが身を置ける開かれた場であるはずだ。経済的な自立性と包摂性とをいかに調和させるかが、現代の都市政策に問われている。",
+  "topic": "masyarakat",
+  "qs": [
+   [
+    "Apa latar belakang meluasnya penyerahan penataan serta pengelolaan taman dan alun-alun kota kepada pihak swasta?",
+    [
+     "Kewajiban undang-undang yang melarang pemerintah daerah memiliki aset berupa lahan terbuka",
+     "Tuntutan warga setempat agar seluruh taman kota diubah menjadi pusat perbelanjaan tertutup",
+     "Kesulitan keuangan yang dihadapi pemerintah daerah sehingga perlu menekan biaya pemeliharaan sekaligus menghidupkan ruang kota",
+     "Kurangnya tenaga arsitek lanskap di instansi pemerintah pusat maupun daerah"
+    ],
+    2,
+    {
+     "type": "cause_effect",
+     "evidence": "財政難に直面する自治体が、公園や駅前広場の整備と運営を民間事業者に委ねる手法が全国の都市で広がっている",
+     "answer": "Kesulitan keuangan yang dihadapi pemerintah daerah sehingga perlu menekan biaya pemeliharaan sekaligus menghidupkan ruang kota",
+     "patternId": "cause_effect-ja-168"
+    }
+   ],
+   [
+    "Persoalan sosial apa yang muncul ketika pengelola terlalu mengutamakan keuntungan komersial dan kerapian visual?",
+    [
+     "Harga tiket masuk taman melonjak tinggi sehingga wisatawan luar kota enggan berkunjung",
+     "Pepohonan peneduh ditebang seluruhnya untuk dijadikan area parkir kendaraan bermotor",
+     "Pedagang toko di sekitar stasiun kehilangan pelanggan akibat kebisingan konser musik malam",
+     "Warga lansia maupun kelompok kurang mampu tersingkir akibat bentuk bangku yang mencegah duduk lama serta aturan larangan yang ketat"
+    ],
+    3,
+    {
+     "type": "detail",
+     "evidence": "長時間の滞在を阻むベンチの形状や細かな禁止事項によって、高齢者や困窮者が居場所を失う事態も指摘されている",
+     "answer": "Warga lansia maupun kelompok kurang mampu tersingkir akibat bentuk bangku yang mencegah duduk lama serta aturan larangan yang ketat",
+     "patternId": "detail-ja-168"
+    }
+   ],
+   [
+    "Bagaimana pandangan penulis mengenai hakikat sejati sebuah ruang terbuka perkotaan?",
+    [
+     "Alun-alun kota sebaiknya dikhususkan bagi warga pembayar pajak tertinggi di wilayah tersebut",
+     "Ruang terbuka semestinya menjadi tempat inklusif yang dapat diakses siapa saja tanpa memandang daya beli",
+     "Taman publik harus steril dari segala bentuk kegiatan ekonomi seperti kedai minuman atau acara budaya",
+     "Fungsi utama ruang kota adalah mencetak laba sebesar-besarnya guna menambah kas daerah"
+    ],
+    1,
+    {
+     "type": "author_attitude",
+     "evidence": "本来、都市の広場とは消費能力の有無にかかわらず誰もが身を置ける開かれた場であるはずだ",
+     "answer": "Ruang terbuka semestinya menjadi tempat inklusif yang dapat diakses siapa saja tanpa memandang daya beli",
+     "patternId": "author_attitude-ja-168"
+    }
+   ],
+   [
+    "Apa makna kata \"閑散\" dalam kalimat kedua bacaan tersebut?",
+    [
+     "Sepi dan lengang karena jarang dikunjungi orang",
+     "Padat sesak oleh lalu-lalang penumpang kereta pada jam sibuk",
+     "Rimbun oleh pepohonan tua yang tidak pernah dipangkas",
+     "Megah dan tertata rapi mengikuti gaya arsitektur modern"
+    ],
+    0,
+    {
+     "type": "vocabulary",
+     "evidence": "閑散としていた空間に賑わいを呼び戻した成功例は少なくない",
+     "answer": "Sepi dan lengang karena jarang dikunjungi orang",
+     "patternId": "vocabulary-ja-168"
+    }
+   ],
+   [
+    "Apa tantangan utama kebijakan perkotaan masa kini yang disimpulkan penulis?",
+    [
+     "Menyelaraskan kemandirian finansial pengelolaan ruang publik dengan sifat inklusif yang merangkul semua kalangan",
+     "Membatalkan seluruh kontrak kerja sama swasta dan mengembalikan pengelolaan taman ke tangan birokrasi",
+     "Menyeragamkan desain bangku serta peraturan taman di seluruh kota besar secara nasional",
+     "Memindahkan ruang berkumpul warga lansia dari pusat kota ke kawasan pinggiran yang tenang"
+    ],
+    0,
+    {
+     "type": "main_idea",
+     "evidence": "経済的な自立性と包摂性とをいかに調和させるかが、現代の都市政策に問われている",
+     "answer": "Menyelaraskan kemandirian finansial pengelolaan ruang publik dengan sifat inklusif yang merangkul semua kalangan",
+     "patternId": "main_idea-ja-168"
+    }
+   ]
+  ]
+ },
+ {
+  "id": "rja0169",
+  "level": "C2",
+  "jlpt": "N1+",
+  "title": "深海熱水噴出孔と生命起源仮説の再検討",
+  "text": "太陽光が一切届かない水深数千メートルの海底で、高温の熱水を噴き上げる噴出孔の周囲に豊かな生態系が広がっている事実が発見されたとき、生物学の常識は大きく覆された。それまで地球上のほぼすべての生命は光合成に依存すると考えられていたが、そこでは硫化水素などの化学物質からエネルギーを得る微生物が食物網の土台を担っていたのである。この発見は、初期の地球において生命がどこで誕生したかという根源的な問いにも新たな光を投げかけた。さらに氷に覆われた木星や土星の衛星の地下海にも、同様の環境が存在する可能性が議論されている。極限環境の探究は、地球という枠を超えて生命の普遍的条件を問い直す営みにほかならない。",
+  "topic": "sains",
+  "qs": [
+   [
+    "Mengapa penemuan ekosistem subur di sekitar lubang hidrotermal laut dalam membalikkan anggapan umum biologi?",
+    [
+     "Karena sebelumnya hampir seluruh kehidupan di bumi diyakini bergantung pada fotosintesis, padahal di sana mikroba hidup dari energi senyawa kimia tanpa cahaya matahari",
+     "Karena suhu air di dasar samudra ternyata lebih dingin daripada titik beku sepanjang tahun",
+     "Karena ditemukan tumbuhan hijau berbunga yang mampu berfotosintesis dalam kegelapan mutlak",
+     "Karena tekanan air laut dalam terbukti menghancurkan seluruh bentuk sel makhluk hidup"
+    ],
+    0,
+    {
+     "type": "comparison",
+     "evidence": "それまで地球上のほぼすべての生命は光合成に依存すると考えられていたが、そこでは硫化水素などの化学物質からエネルギーを得る微生物が食物網の土台を担っていたのである",
+     "answer": "Karena sebelumnya hampir seluruh kehidupan di bumi diyakini bergantung pada fotosintesis, padahal di sana mikroba hidup dari energi senyawa kimia tanpa cahaya matahari",
+     "patternId": "comparison-ja-169"
+    }
+   ],
+   [
+    "Apa yang menjadi penopang dasar jaring-jaring makanan di lingkungan lubang semburan air panas dasar laut tersebut?",
+    [
+     "Sisa-sisa ganggang permukaan laut yang terbawa arus hangat dari kawasan khatulistiwa",
+     "Mikroorganisme yang memperoleh energi dari zat kimia seperti hidrogen sulfida",
+     "Cahaya buatan yang dipancarkan oleh kapal selam penelitian milik lembaga oseanografi",
+     "Endapan batuan kapur hasil pelapukan terumbu karang di perairan dangkal"
+    ],
+    1,
+    {
+     "type": "detail",
+     "evidence": "硫化水素などの化学物質からエネルギーを得る微生物が食物網の土台を担っていたのである",
+     "answer": "Mikroorganisme yang memperoleh energi dari zat kimia seperti hidrogen sulfida",
+     "patternId": "detail-ja-169"
+    }
+   ],
+   [
+    "Implikasi ilmiah apa yang muncul di bidang astronomi dan keplanetan dari temuan laut dalam tersebut?",
+    [
+     "Membuktikan bahwa permukaan planet Mars saat ini masih dipenuhi hutan hujan tropis",
+     "Menunjukkan bahwa cahaya matahari tidak lagi diperlukan bagi pertanian di permukaan bumi",
+     "Memastikan bahwa seluruh planet gas raksasa tidak memiliki inti batuan maupun air cair",
+     "Membuka diskusi mengenai kemungkinan adanya lingkungan serupa di samudra bawah lapisan es pada satelit Jupiter dan Saturnus"
+    ],
+    3,
+    {
+     "type": "inference",
+     "evidence": "氷に覆われた木星や土星の衛星の地下海にも、同様の環境が存在する可能性が議論されている",
+     "answer": "Membuka diskusi mengenai kemungkinan adanya lingkungan serupa di samudra bawah lapisan es pada satelit Jupiter dan Saturnus",
+     "patternId": "inference-ja-169"
+    }
+   ],
+   [
+    "Apa makna kata \"根源的\" pada kalimat ketiga bacaan di atas?",
+    [
+     "Bersifat sementara sambil menunggu terkumpulnya sampel tambahan",
+     "Berkaitan khusus dengan pemanfaatan sumber daya tambang komersial",
+     "Bersifat paling mendasar dan menyentuh asal-muasal persoalan",
+     "Terbatas pada cabang ilmu kimia analitik di laboratorium darat"
+    ],
+    2,
+    {
+     "type": "vocabulary",
+     "evidence": "初期の地球において生命がどこで誕生したかという根源的な問いにも新たな光を投げかけた",
+     "answer": "Bersifat paling mendasar dan menyentuh asal-muasal persoalan",
+     "patternId": "vocabulary-ja-169"
+    }
+   ],
+   [
+    "Apa gagasan utama yang dirangkum penulis pada kalimat terakhir bacaan?",
+    [
+     "Penelitian laut dalam sebaiknya difokuskan pada penambangan mineral langka bernilai ekonomi tinggi",
+     "Asal-usul kehidupan di bumi telah terjawab tuntas sehingga tidak menyisakan perdebatan lagi",
+     "Penjelajahan lingkungan ekstrem merupakan upaya meninjau ulang syarat-syarat universal kehidupan melampaui batas bumi",
+     "Eksplorasi luar angkasa harus ditunda sampai seluruh dasar samudra bumi selesai dipetakan"
+    ],
+    2,
+    {
+     "type": "main_idea",
+     "evidence": "極限環境の探究は、地球という枠を超えて生命の普遍的条件を問い直す営みにほかならない",
+     "answer": "Penjelajahan lingkungan ekstrem merupakan upaya meninjau ulang syarat-syarat universal kehidupan melampaui batas bumi",
+     "patternId": "main_idea-ja-169"
+    }
+   ]
+  ]
+ },
+ {
+  "id": "rja0170",
+  "level": "C2",
+  "jlpt": "N1+",
+  "title": "行動経済学のナッジ政策と自律的意思決定",
+  "text": "罰則や補助金に頼らず、選択肢の提示方法を工夫することで人々の望ましい行動をそっと後押しする「ナッジ」が公共政策に広く応用されている。臓器提供の意思表示や健診の受診勧奨などにおいて、初期設定を変えるだけで参加率が大幅に向上した事例は名高い。しかし、人間が持つ認知の癖を巧みに利用する手法である以上、政策立案者の意図する方向へ市民を無自覚のうちに誘導する危うさも拭えない。また、個人の行動変容ばかりに焦点を当てれば、貧困や労働環境といった構造的な問題への対策が後回しにされる恐れもある。手法の有効性を認めつつも、目的の公開と検証可能性を確保することが民主的な運用の大前提となる。",
+  "topic": "ekonomi",
+  "qs": [
+   [
+    "Apa ciri khas pendekatan kebijakan \"nudge\" sebagaimana diuraikan pada awal bacaan?",
+    [
+     "Menjatuhkan denda pajak progresif bagi warga yang menolak mengikuti program kesehatan pemerintah",
+     "Memberikan imbalan uang tunai dalam jumlah besar setiap kali warga mematuhi aturan lalu lintas",
+     "Mewajibkan seluruh keputusan konsumsi rumah tangga mendapat persetujuan pejabat daerah",
+     "Mendorong perilaku yang diharapkan secara halus melalui penataan cara penyajian pilihan tanpa mengandalkan sanksi atau subsidi"
+    ],
+    3,
+    {
+     "type": "detail",
+     "evidence": "罰則や補助金に頼らず、選択肢の提示方法を工夫することで人々の望ましい行動をそっと後押しする",
+     "answer": "Mendorong perilaku yang diharapkan secara halus melalui penataan cara penyajian pilihan tanpa mengandalkan sanksi atau subsidi",
+     "patternId": "detail-ja-170"
+    }
+   ],
+   [
+    "Kekhawatiran etis apa yang melekat pada pemanfaatan kecenderungan kognitif manusia dalam kebijakan publik?",
+    [
+     "Bahaya mengarahkan warga tanpa mereka sadari ke arah yang dikehendaki perancang kebijakan",
+     "Membengkaknya anggaran negara akibat mahalnya biaya pencetakan formulir pendaftaran baru",
+     "Menurunnya tingkat partisipasi pemilu karena warga merasa terlalu banyak diberi informasi",
+     "Timbulnya penolakan keras dari kalangan dokter terhadap program pemeriksaan kesehatan berkala"
+    ],
+    0,
+    {
+     "type": "cause_effect",
+     "evidence": "政策立案者の意図する方向へ市民を無自覚のうちに誘導する危うさも拭えない",
+     "answer": "Bahaya mengarahkan warga tanpa mereka sadari ke arah yang dikehendaki perancang kebijakan",
+     "patternId": "cause_effect-ja-170"
+    }
+   ],
+   [
+    "Risiko kebijakan apa lagi yang disoroti penulis apabila perhatian terlalu terpusat pada perubahan perilaku individu?",
+    [
+     "Perusahaan swasta akan meniru teknik tersebut untuk menaikkan upah minimum karyawan",
+     "Penanganan atas persoalan struktural seperti kemiskinan dan kondisi kerja berisiko tergeser ke urutan belakang",
+     "Lembaga penelitian universitas akan kehilangan kebebasan mengkaji teori ekonomi klasik",
+     "Tingkat pendaftaran donor organ akan kembali merosot ke angka semula dalam waktu singkat"
+    ],
+    1,
+    {
+     "type": "inference",
+     "evidence": "個人の行動変容ばかりに焦点を当てれば、貧困や労働環境といった構造的な問題への対策が後回しにされる恐れもある",
+     "answer": "Penanganan atas persoalan struktural seperti kemiskinan dan kondisi kerja berisiko tergeser ke urutan belakang",
+     "patternId": "inference-ja-170"
+    }
+   ],
+   [
+    "Apa makna ungkapan \"拭えない\" pada kalimat ketiga bacaan tersebut?",
+    [
+     "Tidak perlu dipertimbangkan karena dampaknya sangat kecil",
+     "Belum pernah dibuktikan melalui penelitian ilmiah mana pun",
+     "Tidak dapat dihapuskan atau dihilangkan sepenuhnya",
+     "Dapat diselesaikan dengan mudah melalui revisi peraturan daerah"
+    ],
+    2,
+    {
+     "type": "vocabulary",
+     "evidence": "政策立案者の意図する方向へ市民を無自覚のうちに誘導する危うさも拭えない",
+     "answer": "Tidak dapat dihapuskan atau dihilangkan sepenuhnya",
+     "patternId": "vocabulary-ja-170"
+    }
+   ],
+   [
+    "Syarat mutlak apa yang diajukan penulis agar penerapan kebijakan tersebut tetap berjalan secara demokratis?",
+    [
+     "Merahasiakan rancangan intervensi perilaku agar efek psikologisnya tidak berkurang",
+     "Menjamin keterbukaan tujuan kebijakan serta kemungkinannya untuk diuji dan diawasi publik",
+     "Membatasi penggunaan pendekatan tersebut hanya untuk urusan perpajakan dan pensiun",
+     "Menghapus seluruh kebijakan berbasis insentif ekonomi dan regulasi hukum yang ada"
+    ],
+    1,
+    {
+     "type": "author_attitude",
+     "evidence": "手法の有効性を認めつつも、目的の公開と検証可能性を確保することが民主的な運用の大前提となる",
+     "answer": "Menjamin keterbukaan tujuan kebijakan serta kemungkinannya untuk diuji dan diawasi publik",
+     "patternId": "author_attitude-ja-170"
+    }
+   ]
+  ]
+ },
+ {
+  "id": "rja0171",
+  "level": "C2",
+  "jlpt": "N1+",
+  "title": "翻訳不可能性の概念と異文化理解の深化",
+  "text": "ある言語に固有の情緒や歴史的記憶を宿す語彙は、別の言語の一語へ過不足なく置き換えることが極めて難しい。かつては読者が違和感なく読めるよう、異質な表現を受け入れ側の文化に合わせて滑らかに書き換える翻訳が理想とされがちであった。だが、耳慣れた表現への過度な同化は、原作が持つ独自の思考様式や他者性を消し去ってしまう危険をはらむ。むしろ訳しきれずに残る引っかかりこそが、自らの言語習慣の枠組みを揺さぶり、未知の文化への想像力を喚起する契機となり得る。翻訳とは意味の等価交換ではなく、埋まらない隔たりを自覚しながら対話を続ける営みなのである。",
+  "topic": "budaya",
+  "qs": [
+   [
+    "Gaya penerjemahan seperti apa yang dahulu kerap dianggap ideal menurut bacaan?",
+    [
+     "Mempertahankan seluruh kata asli tanpa diterjemahkan sama sekali di sepanjang halaman buku",
+     "Mengubah ungkapan asing secara mulus menyesuaikan budaya bahasa sasaran agar pembaca tidak merasakan kejanggalan",
+     "Menyertakan rumus matematika untuk menggantikan ungkapan emosional yang sulit dipadankan",
+     "Memangkas separuh isi karya sastra asing agar sesuai dengan ketebalan buku populer"
+    ],
+    1,
+    {
+     "type": "detail",
+     "evidence": "読者が違和感なく読めるよう、異質な表現を受け入れ側の文化に合わせて滑らかに書き換える翻訳が理想とされがちであった",
+     "answer": "Mengubah ungkapan asing secara mulus menyesuaikan budaya bahasa sasaran agar pembaca tidak merasakan kejanggalan",
+     "patternId": "detail-ja-171"
+    }
+   ],
+   [
+    "Bahaya apa yang terkandung dalam penyamaan berlebihan ke dalam ungkapan yang sudah akrab di telinga pembaca?",
+    [
+     "Membuat waktu pengerjaan terjemahan menjadi terlalu lama hingga melewati tenggat penerbit",
+     "Menurunkan minat pelajar untuk mempelajari tata bahasa dasar bahasa ibu mereka sendiri",
+     "Menimbulkan sengketa hak cipta antara penerjemah dan lembaga sensor pemerintah",
+     "Menghapus cara berpikir khas serta keunikan keberlainan yang dimiliki karya aslinya"
+    ],
+    3,
+    {
+     "type": "cause_effect",
+     "evidence": "耳慣れた表現への過度な同化は、原作が持つ独自の思考様式や他者性を消し去ってしまう危険をはらむ",
+     "answer": "Menghapus cara berpikir khas serta keunikan keberlainan yang dimiliki karya aslinya",
+     "patternId": "cause_effect-ja-171"
+    }
+   ],
+   [
+    "Bagaimana penulis memandang \"ganjalan yang tersisa karena tak sepenuhnya terterjemahkan\"?",
+    [
+     "Merupakan bukti ketidakmampuan penerjemah yang harus segera diganti oleh mesin penerjemah",
+     "Menunjukkan bahwa pertukaran sastra antarbangsa adalah usaha yang sia-sia sejak awal",
+     "Justru dapat mengguncang kerangka kebiasaan berbahasa sendiri dan menggugah daya bayang terhadap budaya asing",
+     "Harus dihilangkan seluruhnya melalui penyuntingan ketat oleh dewan bahasa nasional"
+    ],
+    2,
+    {
+     "type": "author_attitude",
+     "evidence": "むしろ訳しきれずに残る引っかかりこそが、自らの言語習慣の枠組みを揺さぶり、未知の文化への想像力を喚起する契機となり得る",
+     "answer": "Justru dapat mengguncang kerangka kebiasaan berbahasa sendiri dan menggugah daya bayang terhadap budaya asing",
+     "patternId": "author_attitude-ja-171"
+    }
+   ],
+   [
+    "Apa makna kata \"同化\" dalam konteks kalimat ketiga bacaan di atas?",
+    [
+     "Penyerapan atau penyesuaian sesuatu yang berbeda hingga melebur mengikuti pola penerima",
+     "Perbandingan sejajar antara dua naskah kuno dari zaman yang berlainan",
+     "Penerbitan serentak sebuah novel dalam puluhan bahasa di seluruh dunia",
+     "Penolakan tegas terhadap masuknya kosakata serapan dari bahasa asing"
+    ],
+    0,
+    {
+     "type": "vocabulary",
+     "evidence": "耳慣れた表現への過度な同化は、原作が持つ独自の思考様式や他者性を消し去ってしまう危険をはらむ",
+     "answer": "Penyerapan atau penyesuaian sesuatu yang berbeda hingga melebur mengikuti pola penerima",
+     "patternId": "vocabulary-ja-171"
+    }
+   ],
+   [
+    "Bagaimana penulis mendefinisikan hakikat penerjemahan pada kalimat penutup?",
+    [
+     "Proses teknis memindahkan informasi secara identik tanpa menyisakan perbedaan nuansa sedikit pun",
+     "Sarana menyatukan seluruh bahasa di dunia ke dalam satu bahasa pengantar tunggal",
+     "Kegiatan akademik eksklusif yang hanya dapat dipahami oleh pakar sejarah sastra",
+     "Bukan pertukaran makna yang setara persis, melainkan upaya terus berdialog sembari menyadari jarak yang tak sepenuhnya terjembatani"
+    ],
+    3,
+    {
+     "type": "main_idea",
+     "evidence": "翻訳とは意味の等価交換ではなく、埋まらない隔たりを自覚しながら対話を続ける営みなのである",
+     "answer": "Bukan pertukaran makna yang setara persis, melainkan upaya terus berdialog sembari menyadari jarak yang tak sepenuhnya terjembatani",
+     "patternId": "main_idea-ja-171"
+    }
+   ]
+  ]
+ },
+ {
+  "id": "rja0172",
+  "level": "C2",
+  "jlpt": "N1+",
+  "title": "学際研究の評価制度と専門分化の弊害",
+  "text": "気候変動や高齢化といった現代の複合的な課題に対処するには、自然科学と人文社会科学の知見を架橋する学際研究が不可欠だと叫ばれて久しい。ところが実際の大学や研究機関では、細分化された既存の学会単位で業績評価や人事審査が行われるため、境界領域に挑む研究者ほど正当に評価されにくい構造が残っている。単一分野の尺度で測れば、複数領域にまたがる研究はどちらの専門性においても中途半端だと見なされがちだからである。さらに短期的な成果を求める競争的資金の増加が、異分野間の共通言語を築くための地道な対話の時間を奪っている。看板としての融合を掲げるだけでなく、評価軸と研究時間のあり方を根底から改める必要がある。",
+  "topic": "pendidikan",
+  "qs": [
+   [
+    "Kesenjangan apa yang disoroti penulis antara tuntutan zaman dan kenyataan di universitas atau lembaga riset?",
+    [
+     "Ilmu alam mendapat terlalu sedikit anggaran dibandingkan ilmu humaniora di hampir semua perguruan tinggi",
+     "Peneliti muda menolak bekerja sama dengan bidang lain meskipun telah diwajibkan oleh rektorat",
+     "Riset lintas disiplin sangat dibutuhkan untuk masalah pelik, tetapi sistem penilaian karier yang terkotak-kotak membuat perintis bidang batas sulit dinilai adil",
+     "Jurnal internasional melarang penerbitan makalah yang ditulis bersama oleh lebih dari dua orang"
+    ],
+    2,
+    {
+     "type": "comparison",
+     "evidence": "細分化された既存の学会単位で業績評価や人事審査が行われるため、境界領域に挑む研究者ほど正当に評価されにくい構造が残っている",
+     "answer": "Riset lintas disiplin sangat dibutuhkan untuk masalah pelik, tetapi sistem penilaian karier yang terkotak-kotak membuat perintis bidang batas sulit dinilai adil",
+     "patternId": "comparison-ja-172"
+    }
+   ],
+   [
+    "Mengapa riset yang melintasi berbagai disiplin kerap dipandang setengah-setengah dalam sistem penilaian lama?",
+    [
+     "Karena diukur menggunakan tolok ukur satu bidang sempit saja",
+     "Karena para penelitinya tidak menggunakan metode pengumpulan data secara kuantitatif",
+     "Karena topik perubahan iklim dan penuaan penduduk dianggap sudah selesai diteliti",
+     "Karena laporan penelitiannya ditulis dengan bahasa populer untuk pembaca umum"
+    ],
+    0,
+    {
+     "type": "cause_effect",
+     "evidence": "単一分野の尺度で測れば、複数領域にまたがる研究はどちらの専門性においても中途半端だと見なされがちだからである",
+     "answer": "Karena diukur menggunakan tolok ukur satu bidang sempit saja",
+     "patternId": "cause_effect-ja-172"
+    }
+   ],
+   [
+    "Dampak apa yang ditimbulkan oleh meningkatnya skema pendanaan kompetitif yang menuntut hasil jangka pendek?",
+    [
+     "Mendorong peneliti senior berpindah profesi menjadi pejabat administrasi pemerintahan",
+     "Mempercepat tercapainya kesepakatan metodologi antara ilmuwan fisika dan sosiologi",
+     "Mengurangi jumlah publikasi ilmiah tahunan di tingkat perguruan tinggi nasional",
+     "Merampas waktu dialog tekun yang diperlukan guna membangun bahasa pemahaman bersama antarbidang ilmu"
+    ],
+    3,
+    {
+     "type": "detail",
+     "evidence": "短期的な成果を求める競争的資金の増加が、異分野間の共通言語を築くための地道な対話の時間を奪っている",
+     "answer": "Merampas waktu dialog tekun yang diperlukan guna membangun bahasa pemahaman bersama antarbidang ilmu",
+     "patternId": "detail-ja-172"
+    }
+   ],
+   [
+    "Apa makna kata \"架橋\" dalam kalimat pertama bacaan tersebut?",
+    [
+     "Memisahkan secara tegas batas kewenangan tiap departemen keilmuan",
+     "Menjembatani atau menghubungkan dua ranah yang terpisah",
+     "Merancang konstruksi jembatan tahan gempa di wilayah rawan bencana",
+     "Menyeleksi proposal penelitian berdasarkan peringkat kutipan tertinggi"
+    ],
+    1,
+    {
+     "type": "vocabulary",
+     "evidence": "自然科学と人文社会科学の知見を架橋する学際研究が不可欠だと叫ばれて久しい",
+     "answer": "Menjembatani atau menghubungkan dua ranah yang terpisah",
+     "patternId": "vocabulary-ja-172"
+    }
+   ],
+   [
+    "Apa langkah perbaikan mendasar yang dituntut penulis pada akhir paragraf?",
+    [
+     "Merombak tolok ukur evaluasi serta alokasi waktu riset secara mendasar, bukan sekadar memasang slogan integrasi ilmu",
+     "Membubarkan seluruh himpunan profesi keilmuan khusus yang telah berdiri puluhan tahun",
+     "Memangkas durasi proyek penelitian menjadi maksimal satu tahun agar lebih efisien",
+     "Memisahkan kampus ilmu eksakta dan ilmu sosial agar masing-masing fokus mendalami bidangnya"
+    ],
+    0,
+    {
+     "type": "main_idea",
+     "evidence": "看板としての融合を掲げるだけでなく、評価軸と研究時間のあり方を根底から改める必要がある",
+     "answer": "Merombak tolok ukur evaluasi serta alokasi waktu riset secara mendasar, bukan sekadar memasang slogan integrasi ilmu",
+     "patternId": "main_idea-ja-172"
+    }
+   ]
+  ]
+ },
+ {
+  "id": "rja0173",
+  "level": "C2",
+  "jlpt": "N1+",
+  "title": "森林の炭素吸収機能と単一樹種造林の限界",
+  "text": "温室効果ガスの吸収源として森林の再生に世界的な期待が集まり、各地で大規模な植林事業が展開されている。しかし、成長の早さや管理の容易さばかりを優先して単一の樹種を一斉に植える手法には、生態学的な危うさが伴う。多様な樹木や下草が混在する自然林と異なり、画一的な人工林は病害虫の蔓延や干ばつに対する抵抗力が著しく低いからである。さらに土壌中の微生物群集が貧弱になれば、長期的な炭素貯留能力もかえって損なわれかねない。本数の多さを競う短期的な緑化から脱し、地域の気候と生物多様性に根ざした森づくりへと発想を転換すべきである。",
+  "topic": "lingkungan",
+  "qs": [
+   [
+    "Mengapa penanaman satu jenis pohon secara seragam mengandung kerentanan ekologis menurut bacaan?",
+    [
+     "Karena daya tahannya terhadap wabah hama penyakit maupun kekeringan jauh lebih rendah dibandingkan hutan alami yang beragam",
+     "Karena pohon sejenis tidak mampu menyerap karbon dioksida sama sekali pada sepuluh tahun pertama",
+     "Karena biaya pemangkasan cabangnya sepuluh kali lebih mahal daripada hutan campuran alami",
+     "Karena akar pohon seragam selalu mencemari cadangan air tanah dengan senyawa logam berat"
+    ],
+    0,
+    {
+     "type": "comparison",
+     "evidence": "多様な樹木や下草が混在する自然林と異なり、画一的な人工林は病害虫の蔓延や干ばつに対する抵抗力が著しく低いからである",
+     "answer": "Karena daya tahannya terhadap wabah hama penyakit maupun kekeringan jauh lebih rendah dibandingkan hutan alami yang beragam",
+     "patternId": "comparison-ja-173"
+    }
+   ],
+   [
+    "Apa alasan praktis yang sering membuat proyek penghijauan memilih menanam satu spesies pohon saja?",
+    [
+     "Ketiadaan bibit tumbuhan semak bawah di seluruh wilayah beriklim sedang",
+     "Peraturan kehutanan internasional yang melarang pencampuran lebih dari dua spesies pohon",
+     "Mengutamakan kecepatan tumbuh pohon serta kemudahan dalam pengelolaannya",
+     "Keinginan meningkatkan populasi serangga pemakan daun di kawasan sekitar perkebunan"
+    ],
+    2,
+    {
+     "type": "detail",
+     "evidence": "成長の早さや管理の容易さばかりを優先して単一の樹種を一斉に植える手法には、生態学的な危うさが伴う",
+     "answer": "Mengutamakan kecepatan tumbuh pohon serta kemudahan dalam pengelolaannya",
+     "patternId": "detail-ja-173"
+    }
+   ],
+   [
+    "Akibat lanjutan apa yang dapat terjadi apabila komunitas mikroorganisme di dalam tanah menjadi miskin?",
+    [
+     "Suhu permukaan tanah di dalam hutan akan melonjak melebihi kawasan gurun pasir",
+     "Kapasitas penyimpanan karbon jangka panjang di hutan tersebut justru berisiko ikut tergerus",
+     "Batang pohon akan tumbuh terlalu keras sehingga tidak dapat dimanfaatkan sebagai bahan bangunan",
+     "Curah hujan tahunan di benua sekitarnya akan berhenti turun secara mendadak"
+    ],
+    1,
+    {
+     "type": "cause_effect",
+     "evidence": "土壌中の微生物群集が貧弱になれば、長期的な炭素貯留能力もかえって損なわれかねない",
+     "answer": "Kapasitas penyimpanan karbon jangka panjang di hutan tersebut justru berisiko ikut tergerus",
+     "patternId": "cause_effect-ja-173"
+    }
+   ],
+   [
+    "Apa makna kata \"画一的\" pada kalimat ketiga bacaan di atas?",
+    [
+     "Terbagi ke dalam petak-petak kecil milik warga desa setempat",
+     "Tumbuh liar secara alami tanpa campur tangan manusia sama sekali",
+     "Dirancang secara artistik menyerupai taman istana klasik",
+     "Seragam seluruhnya dalam satu pola tanpa variasi"
+    ],
+    3,
+    {
+     "type": "vocabulary",
+     "evidence": "画一的な人工林は病害虫の蔓延や干ばつに対する抵抗力が著しく低いからである",
+     "answer": "Seragam seluruhnya dalam satu pola tanpa variasi",
+     "patternId": "vocabulary-ja-173"
+    }
+   ],
+   [
+    "Perubahan arah kebijakan seperti apa yang diserukan penulis pada kalimat penutup?",
+    [
+     "Menghentikan seluruh kegiatan penanaman pohon buatan dan membiarkan lahan gundul pulih sendiri selama berabad-abad",
+     "Mengganti seluruh proyek reboisasi daratan dengan pembudidayaan rumput laut di perairan lepas pantai",
+     "Menetapkan kuota wajib jumlah pohon per kapita yang seragam bagi setiap negara tanpa memandang kondisi geografis",
+     "Beralih dari penghijauan jangka pendek yang berlomba mengejar jumlah batang menuju pembangunan hutan berbasis iklim lokal dan keanekaragaman hayati"
+    ],
+    3,
+    {
+     "type": "main_idea",
+     "evidence": "本数の多さを競う短期的な緑化から脱し、地域の気候と生物多様性に根ざした森づくりへと発想を転換すべきである",
+     "answer": "Beralih dari penghijauan jangka pendek yang berlomba mengejar jumlah batang menuju pembangunan hutan berbasis iklim lokal dan keanekaragaman hayati",
+     "patternId": "main_idea-ja-173"
+    }
+   ]
+  ]
+ },
+ {
+  "id": "rja0174",
+  "level": "C2",
+  "jlpt": "N1+",
+  "title": "予防医療の経済評価と健康格差の連鎖",
+  "text": "生活習慣病の重症化を未然に防ぐ検診や健康指導は、個人の生活の質を守るだけでなく、将来的な医療費の膨張を抑える切り札として重視されている。しかし、こうした予防プログラムへの参加率を詳しく分析すると、所得や雇用の安定度によって大きな開きがある実態が浮かび上がる。非正規雇用で休暇を取りにくい層や経済的余裕に乏しい世帯ほど、目先の生計に追われて無症状の段階での受診を控えがちだからである。その結果、自己責任を強調した啓発ばかりを進めれば、恵まれた層との健康格差がかえって拡大しかねない。個人の心がけに訴える段階を超え、誰もが無理なく予防医療へアクセスできる労働環境と社会保障の整備が求められている。",
+  "topic": "kesehatan",
+  "qs": [
+   [
+    "Fakta apa yang terungkap ketika tingkat partisipasi dalam program kesehatan preventif dianalisis secara saksama?",
+    [
+     "Kelompok berpendapatan tinggi justru paling jarang mengikuti pemeriksaan kesehatan berkala",
+     "Penduduk usia muda memiliki risiko komplikasi penyakit kronis jauh lebih tinggi daripada lansia",
+     "Biaya penyelenggaraan skrining dini selalu jauh lebih besar daripada biaya pengobatan rawat inap",
+     "Terdapat kesenjangan besar dalam keikutsertaan berdasarkan tingkat pendapatan serta kestabilan pekerjaan"
+    ],
+    3,
+    {
+     "type": "detail",
+     "evidence": "予防プログラムへの参加率を詳しく分析すると、所得や雇用の安定度によって大きな開きがある実態が浮かび上がる",
+     "answer": "Terdapat kesenjangan besar dalam keikutsertaan berdasarkan tingkat pendapatan serta kestabilan pekerjaan",
+     "patternId": "detail-ja-174"
+    }
+   ],
+   [
+    "Mengapa pekerja tidak tetap yang sulit mengambil cuti atau rumah tangga kurang mampu cenderung menunda pemeriksaan saat belum bergejala?",
+    [
+     "Karena mereka meyakini bahwa seluruh penyakit kronis dapat sembuh sendiri tanpa pengobatan",
+     "Karena terdesak oleh urusan pemenuhan kebutuhan hidup sehari-hari yang mendesak di depan mata",
+     "Karena fasilitas klinik pemeriksaan kesehatan hanya boleh diakses oleh pegawai negeri sipil",
+     "Karena hasil pemeriksaan laboratorium membutuhkan waktu tunggu hingga berbulan-bulan"
+    ],
+    1,
+    {
+     "type": "cause_effect",
+     "evidence": "非正規雇用で休暇を取りにくい層や経済的余裕に乏しい世帯ほど、目先の生計に追われて無症状の段階での受診を控えがちだからである",
+     "answer": "Karena terdesak oleh urusan pemenuhan kebutuhan hidup sehari-hari yang mendesak di depan mata",
+     "patternId": "cause_effect-ja-174"
+    }
+   ],
+   [
+    "Apa paradoks yang dikhawatirkan penulis apabila kampanye kesehatan hanya terus menekankan tanggung jawab individu?",
+    [
+     "Ketimpangan derajat kesehatan dengan kelompok masyarakat yang mapan justru berisiko semakin melebar",
+     "Rumah sakit umum akan mengalami kekurangan pasien sehingga banyak dokter kehilangan pekerjaan",
+     "Anggaran asuransi kesehatan nasional langsung mencapai surplus besar dalam waktu satu tahun",
+     "Masyarakat akan menjadi terlalu cemas sehingga memeriksakan diri setiap hari ke unit gawat darurat"
+    ],
+    0,
+    {
+     "type": "inference",
+     "evidence": "自己責任を強調した啓発ばかりを進めれば、恵まれた層との健康格差がかえって拡大しかねない",
+     "answer": "Ketimpangan derajat kesehatan dengan kelompok masyarakat yang mapan justru berisiko semakin melebar",
+     "patternId": "inference-ja-174"
+    }
+   ],
+   [
+    "Apa makna ungkapan \"未然に防ぐ\" pada kalimat pertama bacaan tersebut?",
+    [
+     "Mengobati secara intensif setelah penyakit mencapai stadium lanjut",
+     "Mencatat perkembangan gejala pasien secara rinci di dalam rekam medis",
+     "Mencegah terlebih dahulu sebelum suatu hal buruk benar-benar terjadi",
+     "Membagi beban biaya perawatan secara merata kepada seluruh peserta asuransi"
+    ],
+    2,
+    {
+     "type": "vocabulary",
+     "evidence": "生活習慣病の重症化を未然に防ぐ検診や健康指導",
+     "answer": "Mencegah terlebih dahulu sebelum suatu hal buruk benar-benar terjadi",
+     "patternId": "vocabulary-ja-174"
+    }
+   ],
+   [
+    "Apa solusi utama yang ditekankan penulis pada kalimat penutup bacaan?",
+    [
+     "Menghapus seluruh program penyuluhan pola hidup sehat karena terbukti tidak bermanfaat sama sekali",
+     "Melampaui sekadar imbauan kesadaran pribadi dengan membenahi lingkungan kerja serta jaminan sosial agar layanan preventif mudah dijangkau semua orang",
+     "Memberlakukan denda finansial bagi warga yang tidak hadir dalam jadwal pemeriksaan tahunan",
+     "Memusatkan seluruh anggaran kesehatan hanya untuk pengobatan operasi penyakit berat"
+    ],
+    1,
+    {
+     "type": "main_idea",
+     "evidence": "個人の心がけに訴える段階を超え、誰もが無理なく予防医療へアクセスできる労働環境と社会保障の整備が求められている",
+     "answer": "Melampaui sekadar imbauan kesadaran pribadi dengan membenahi lingkungan kerja serta jaminan sosial agar layanan preventif mudah dijangkau semua orang",
+     "patternId": "main_idea-ja-174"
+    }
+   ]
+  ]
+ },
+ {
+  "id": "rja0175",
+  "level": "C2",
+  "jlpt": "N1+",
+  "title": "アルゴリズム労務管理とプラットフォーム労働者の権利",
+  "text": "配車や料理配達などの仲介基盤を通じて単発の仕事を請け負う働き方は、時間や場所を自由に選べる柔軟な就労形態として急速に拡大した。契約上、これらの働き手は企業に雇用される労働者ではなく独立した個人事業主と位置づけられ、最低賃金や労災補償の対象から外れることが多い。ところが実態を見れば、報酬単価や配分の優先順位はプラットフォーム側のアルゴリズムが一方的に決定し、評価点の低下が事実上の締め出しに直結するなど強い従属性が認められる。名目上の独立性を盾に使用者責任を免れる構造は、公正な競争環境をも歪めかねない。契約の形式ではなく指揮監督の実態に即して、新たな労働保護の枠組みを築くべきである。",
+  "topic": "kerja",
+  "qs": [
+   [
+    "Bagaimana kontras antara status kontrak formal dan kenyataan kerja para pekerja platform menurut bacaan?",
+    [
+     "Secara kontrak dijamin upah bulanan tetap, tetapi dalam praktiknya bebas menolak seluruh penugasan tanpa konsekuensi",
+     "Secara kontrak disebut pelaku usaha mandiri yang bebas, tetapi nyatanya tunduk kuat pada penentuan tarif dan prioritas sepihak oleh algoritma",
+     "Secara hukum berstatus pegawai negeri, tetapi seluruh peralatan kerjanya dibiayai oleh serikat buruh internasional",
+     "Baik secara kontrak maupun kenyataan lapangan, mereka memiliki wewenang penuh menetapkan tarif layanan sendiri"
+    ],
+    1,
+    {
+     "type": "comparison",
+     "evidence": "報酬単価や配分の優先順位はプラットフォーム側のアルゴリズムが一方的に決定し、評価点の低下が事実上の締め出しに直結するなど強い従属性が認められる",
+     "answer": "Secara kontrak disebut pelaku usaha mandiri yang bebas, tetapi nyatanya tunduk kuat pada penentuan tarif dan prioritas sepihak oleh algoritma",
+     "patternId": "comparison-ja-175"
+    }
+   ],
+   [
+    "Perlindungan dasar apa yang kerap tidak diperoleh pekerja lepas platform akibat dikategorikan sebagai wirausaha perorangan?",
+    [
+     "Jaminan upah minimum serta kompensasi kecelakaan kerja",
+     "Hak memiliki telepon pintar pribadi dan akses peta navigasi satelit",
+     "Kebebasan memilih jam mulai bekerja pada akhir pekan maupun hari libur",
+     "Izin mengemudikan kendaraan roda dua di jalan raya perkotaan"
+    ],
+    0,
+    {
+     "type": "detail",
+     "evidence": "契約上、これらの働き手は企業に雇用される労働者ではなく独立した個人事業主と位置づけられ、最低賃金や労災補償の対象から外れることが多い",
+     "answer": "Jaminan upah minimum serta kompensasi kecelakaan kerja",
+     "patternId": "detail-ja-175"
+    }
+   ],
+   [
+    "Apa dampak penurunan skor penilaian terhadap pekerja dalam sistem manajemen berbasis algoritma tersebut?",
+    [
+     "Mewajibkan perusahaan memberikan pelatihan keterampilan tambahan secara cuma-cuma",
+     "Mengubah status kontrak pekerja secara otomatis menjadi karyawan tetap penuh waktu",
+     "Berujung langsung pada penyisihan secara de facto dari peluang memperoleh penugasan kerja",
+     "Menurunkan komisi potongan yang diambil oleh perusahaan penyedia aplikasi"
+    ],
+    2,
+    {
+     "type": "cause_effect",
+     "evidence": "評価点の低下が事実上の締め出しに直結するなど強い従属性が認められる",
+     "answer": "Berujung langsung pada penyisihan secara de facto dari peluang memperoleh penugasan kerja",
+     "patternId": "cause_effect-ja-175"
+    }
+   ],
+   [
+    "Apa makna ungkapan \"盾に\" sebagaimana digunakan pada kalimat keempat bacaan tersebut?",
+    [
+     "Memperkuat perlindungan keamanan fisik pekerja saat bertugas di jalan raya",
+     "Mengukur tingkat kepuasan pelanggan melalui survei terbuka secara berkala",
+     "Membela kepentingan pekerja lepas di hadapan pengadilan hubungan industrial",
+     "Menjadikan sesuatu sebagai tameng atau alasan pembenar untuk berlindung dari kewajiban"
+    ],
+    3,
+    {
+     "type": "vocabulary",
+     "evidence": "名目上の独立性を盾に使用者責任を免れる構造は、公正な競争環境をも歪めかねない",
+     "answer": "Menjadikan sesuatu sebagai tameng atau alasan pembenar untuk berlindung dari kewajiban",
+     "patternId": "vocabulary-ja-175"
+    }
+   ],
+   [
+    "Prinsip apa yang diusulkan penulis untuk membangun kerangka perlindungan ketenagakerjaan yang baru?",
+    [
+     "Melarang penggunaan aplikasi perantara digital di sektor transportasi dan pengantaran makanan",
+     "Mewajibkan seluruh pekerja paruh waktu mendirikan badan hukum perseroan terbatas sendiri",
+     "Mendasarkan perlindungan pada kenyataan adanya kendali dan pengawasan kerja, bukan pada label formal kontrak semata",
+     "Menyerahkan penentuan standar keselamatan kerja sepenuhnya kepada penilaian konsumen pengguna jasa"
+    ],
+    2,
+    {
+     "type": "main_idea",
+     "evidence": "契約の形式ではなく指揮監督の実態に即して、新たな労働保護の枠組みを築くべきである",
+     "answer": "Mendasarkan perlindungan pada kenyataan adanya kendali dan pengawasan kerja, bukan pada label formal kontrak semata",
+     "patternId": "main_idea-ja-175"
+    }
+   ]
+  ]
+ },
+ {
+  "id": "rja0176",
+  "level": "C2",
+  "jlpt": "N1+",
+  "title": "デジタルツインによる防災計画とモデルの死角",
+  "text": "都市の地形や建物、交通網を仮想空間上に精密に再現するデジタルツイン技術が、豪雨浸水や地震避難の予測に活用され始めている。現実では試行できない多様な災害シナリオを幾通りも検証し、避難経路のボトルネックを事前に特定できる利点は極めて大きい。しかし、どれほど精緻なシミュレーションであっても、モデルに組み込まれなかった要因は計算結果に反映されないという限界を忘れてはならない。実際の災害時には、デマの拡散による集団パニックや、近隣の要配慮者を助けようとする利他的行動など、数値化しにくい人間心理が避難の流れを大きく変える。仮想空間の予測を過信せず、地域社会の訓練や現場の判断力と組み合わせる姿勢が肝要だ。",
+  "topic": "teknologi",
+  "qs": [
+   [
+    "Keunggulan utama apa yang ditawarkan teknologi kembaran digital kota dalam perencanaan mitigasi bencana?",
+    [
+     "Mampu menghentikan pergerakan lempeng gempa bumi sebelum guncangan mencapai kawasan padat penduduk",
+     "Menghilangkan kebutuhan pembangunan tanggul sungai maupun gedung tahan gempa di dunia fisik",
+     "Memungkinkan pengujian beragam skenario bencana yang tak bisa dicoba di dunia nyata guna menemukan titik sumbatan jalur evakuasi sejak dini",
+     "Mengendalikan cuaca lokal sehingga curah hujan lebat selalu bergeser ke tengah lautan lepas"
+    ],
+    2,
+    {
+     "type": "detail",
+     "evidence": "現実では試行できない多様な災害シナリオを幾通りも検証し、避難経路のボトルネックを事前に特定できる利点は極めて大きい",
+     "answer": "Memungkinkan pengujian beragam skenario bencana yang tak bisa dicoba di dunia nyata guna menemukan titik sumbatan jalur evakuasi sejak dini",
+     "patternId": "detail-ja-176"
+    }
+   ],
+   [
+    "Keterbatasan mendasar apa yang melekat pada simulasi komputer secanggih apa pun menurut penulis?",
+    [
+     "Peta tiga dimensi hanya dapat menampilkan gedung pemerintah dan tidak mampu memuat jalan raya",
+     "Hasil perhitungannya baru selesai beberapa minggu setelah bencana sesungguhnya berakhir",
+     "Perangkat lunaknya tidak dapat dijalankan apabila suhu udara di luar ruangan sedang hujan",
+     "Faktor-faktor yang sejak awal tidak dimasukkan ke dalam model tidak akan tercermin dalam hasil perhitungan"
+    ],
+    3,
+    {
+     "type": "detail",
+     "evidence": "どれほど精緻なシミュレーションであっても、モデルに組み込まれなかった要因は計算結果に反映されないという限界を忘れてはならない",
+     "answer": "Faktor-faktor yang sejak awal tidak dimasukkan ke dalam model tidak akan tercermin dalam hasil perhitungan",
+     "patternId": "detail-ja-176"
+    }
+   ],
+   [
+    "Contoh faktor psikologis manusia apa yang disebut dapat mengubah arus evakuasi nyata di lapangan?",
+    [
+     "Kepanikan massal akibat tersebarnya kabar bohong maupun tindakan altruistis menolong tetangga yang rentan",
+     "Keinginan warga membandingkan harga properti di berbagai distrik kota melalui aplikasi daring",
+     "Kebiasaan komuter membaca surat kabar cetak ketika menunggu kereta pagi di peron stasiun",
+     "Persaingan antarperusahaan konstruksi dalam memenangkan tender perbaikan jembatan"
+    ],
+    0,
+    {
+     "type": "cause_effect",
+     "evidence": "デマの拡散による集団パニックや、近隣の要配慮者を助けようとする利他的行動など、数値化しにくい人間心理が避難の流れを大きく変える",
+     "answer": "Kepanikan massal akibat tersebarnya kabar bohong maupun tindakan altruistis menolong tetangga yang rentan",
+     "patternId": "cause_effect-ja-176"
+    }
+   ],
+   [
+    "Apa makna kata \"過信\" pada kalimat penutup bacaan di atas?",
+    [
+     "Menguji ulang keakuratan rumus melalui percobaan berulang kali",
+     "Mempercayai kemampuan sesuatu secara berlebihan melampaui batas nyatanya",
+     "Menolak penggunaan teknologi baru karena ketakutan tanpa dasar",
+     "Menyebarkan peringatan dini secara serentak ke telepon genggam warga"
+    ],
+    1,
+    {
+     "type": "vocabulary",
+     "evidence": "仮想空間の予測を過信せず、地域社会の訓練や現場の判断力と組み合わせる姿勢が肝要だ",
+     "answer": "Mempercayai kemampuan sesuatu secara berlebihan melampaui batas nyatanya",
+     "patternId": "vocabulary-ja-176"
+    }
+   ],
+   [
+    "Bagaimana sikap penulis terhadap pemanfaatan simulasi ruang virtual dalam penanggulangan bencana?",
+    [
+     "Menilai teknologi tersebut sangat bermanfaat asalkan tidak dipercaya secara membabi buta dan tetap dipadukan dengan latihan warga serta kepekaan lapangan",
+     "Menganggap simulasi komputer berbahaya karena pasti menyesatkan petugas penyelamat saat darurat",
+     "Berpendapat bahwa latihan evakuasi warga sudah usang dan cukup digantikan oleh pemodelan digital",
+     "Menyarankan agar teknologi tersebut hanya dipakai untuk perencanaan lalu lintas harian di luar situasi bencana"
+    ],
+    0,
+    {
+     "type": "author_attitude",
+     "evidence": "仮想空間の予測を過信せず、地域社会の訓練や現場の判断力と組み合わせる姿勢が肝要だ",
+     "answer": "Menilai teknologi tersebut sangat bermanfaat asalkan tidak dipercaya secara membabi buta dan tetap dipadukan dengan latihan warga serta kepekaan lapangan",
+     "patternId": "author_attitude-ja-176"
+    }
+   ]
+  ]
+ },
+ {
+  "id": "rja0177",
+  "level": "C2",
+  "jlpt": "N1+",
+  "title": "グローバル供給網の強靱化と効率性の再定義",
+  "text": "過去数十年にわたり、製造業は在庫を極限まで圧縮し、最も低コストな国や地域から部品を調達する国際分業を推し進めてきた。平時においては無駄を削ぎ落とす合理的な戦略であったが、感染症の世界的流行や地政学的緊張の高まりによって、一箇所の途絶が全体の生産停止を招く脆さが露呈した。これを受け、調達先の複数化や重要物資の国内回帰、さらには一定の予備在庫をあえて保持する動きが広がっている。短期的な財務指標の上では非効率に見える余白こそが、非常時における事業継続の生命線となるからである。目先の原価低減のみを絶対視する経営から、不確実性に耐え得る強靱性を組み込んだ効率観への転換が迫られている。",
+  "topic": "ekonomi",
+  "qs": [
+   [
+    "Strategi rantai pasok seperti apa yang ditempuh industri manufaktur selama beberapa dekade terakhir sebelum krisis?",
+    [
+     "Menekan persediaan barang hingga batas minimum dan memasok komponen dari negara atau wilayah berbiaya paling murah",
+     "Memproduksi seluruh bahan baku dan suku cadang secara mandiri di dalam satu pabrik domestik",
+     "Menimbun cadangan komponen untuk kebutuhan sepuluh tahun produksi di gudang tiap provinsi",
+     "Membatasi perdagangan suku cadang hanya dengan negara yang berbatasan darat secara langsung"
+    ],
+    0,
+    {
+     "type": "detail",
+     "evidence": "在庫を極限まで圧縮し、最も低コストな国や地域から部品を調達する国際分業を推し進めてきた",
+     "answer": "Menekan persediaan barang hingga batas minimum dan memasok komponen dari negara atau wilayah berbiaya paling murah",
+     "patternId": "detail-ja-177"
+    }
+   ],
+   [
+    "Kelemahan apa yang tersingkap dari strategi lama tersebut ketika pandemi global dan ketegangan geopolitik meningkat?",
+    [
+     "Kualitas barang rakitan menurun drastis akibat terlalu banyaknya pemasok cadangan yang berbeda",
+     "Terputusnya pasokan di satu titik saja langsung memicu berhentinya keseluruhan lini produksi",
+     "Gudang penyimpanan mengalami kelebihan muatan oleh barang jadi yang gagal diekspor",
+     "Biaya riset desain produk baru membengkak melampaui total pendapatan tahunan perusahaan"
+    ],
+    1,
+    {
+     "type": "cause_effect",
+     "evidence": "一箇所の途絶が全体の生産停止を招く脆さが露呈した",
+     "answer": "Terputusnya pasokan di satu titik saja langsung memicu berhentinya keseluruhan lini produksi",
+     "patternId": "cause_effect-ja-177"
+    }
+   ],
+   [
+    "Bagaimana penulis membandingkan makna \"ruang cadangan\" dilihat dari indikator keuangan jangka pendek dan kondisi darurat?",
+    [
+     "Sama-sama menguntungkan secara instan baik pada masa normal maupun ketika terjadi bencana besar",
+     "Merugikan perusahaan pada saat krisis karena memperbesar beban pajak penyimpanan barang",
+     "Hanya bermanfaat bagi perusahaan jasa keuangan dan tidak relevan bagi pabrik perakitan",
+     "Tampak tidak efisien dalam angka keuangan jangka pendek, tetapi justru menjadi penentu kelangsungan usaha saat krisis melanda"
+    ],
+    3,
+    {
+     "type": "comparison",
+     "evidence": "短期的な財務指標の上では非効率に見える余白こそが、非常時における事業継続の生命線となるからである",
+     "answer": "Tampak tidak efisien dalam angka keuangan jangka pendek, tetapi justru menjadi penentu kelangsungan usaha saat krisis melanda",
+     "patternId": "comparison-ja-177"
+    }
+   ],
+   [
+    "Apa makna kata \"露呈\" pada kalimat kedua bacaan tersebut?",
+    [
+     "Tertutup rapat berkat langkah pencegahan yang diambil sejak jauh hari",
+     "Terbagi rata di antara seluruh negara anggota perjanjian perdagangan",
+     "Tersingkap atau tampak jelas ke permukaan sesuatu yang semula tersembunyi",
+     "Teratasi sepenuhnya melalui suntikan modal dari lembaga keuangan dunia"
+    ],
+    2,
+    {
+     "type": "vocabulary",
+     "evidence": "一箇所の途絶が全体の生産停止を招く脆さが露呈した",
+     "answer": "Tersingkap atau tampak jelas ke permukaan sesuatu yang semula tersembunyi",
+     "patternId": "vocabulary-ja-177"
+    }
+   ],
+   [
+    "Perubahan konsep manajemen seperti apa yang dituntut penulis pada bagian penutup?",
+    [
+     "Menghentikan seluruh perdagangan lintas batas negara demi mencapai kemandirian ekonomi tertutup",
+     "Mengembalikan sistem produksi tepat waktu tanpa cadangan begitu pandemi dinyatakan berakhir",
+     "Menyerahkan pengelolaan stok bahan baku industri swasta sepenuhnya kepada kementerian pertahanan",
+     "Beralih dari pendewaan pemangkasan biaya jangka pendek semata menuju konsep efisiensi baru yang memasukkan ketangguhan menghadapi ketidakpastian"
+    ],
+    3,
+    {
+     "type": "main_idea",
+     "evidence": "目先の原価低減のみを絶対視する経営から、不確実性に耐え得る強靱性を組み込んだ効率観への転換が迫られている",
+     "answer": "Beralih dari pendewaan pemangkasan biaya jangka pendek semata menuju konsep efisiensi baru yang memasukkan ketangguhan menghadapi ketidakpastian",
+     "patternId": "main_idea-ja-177"
+    }
+   ]
+  ]
+ },
+ {
+  "id": "rja0178",
+  "level": "C2",
+  "jlpt": "N1+",
+  "title": "博物館における文化財の返還議論と共有知",
+  "text": "欧米の主要博物館に収蔵されている非西洋圏の文化遺産をめぐり、植民地支配や戦乱の過程で持ち出された品々を本来の地域へ返還すべきだという要求が国際的に強まっている。かつて収蔵側は、高度な保存環境と世界中の来館者への公開を理由に「人類共通の財産」としての保有を正当化してきた。しかし、略奪や不平等な取引という歴史的経緯を棚に上げた普遍性の主張は、もはや説得力を持ち得ない。近年では所有権の移転にとどまらず、返還後に共同で保存研究や巡回展示を行う新たな協働モデルも模索されている。過去の不正義に正面から向き合うことこそが、対等な立場で文化の知を分かち合う出発点となる。",
+  "topic": "budaya",
+  "qs": [
+   [
+    "Alasan apa yang dahulu sering digunakan museum-museum besar Barat untuk membenarkan penguasaan benda budaya non-Barat?",
+    [
+     "Adanya perjanjian sewa-menyewa tahunan yang selalu dibayarkan penuh kepada masyarakat adat asal",
+     "Ketidakmampuan fisik benda-benda purbakala tersebut untuk dipindahkan kembali melintasi samudra",
+     "Permintaan resmi dari pemerintah negara asal agar seluruh artefak disimpan di luar negeri selamanya",
+     "Ketersediaan fasilitas konservasi tingkat tinggi serta pembukaan akses bagi pengunjung dunia atas nama warisan bersama umat manusia"
+    ],
+    3,
+    {
+     "type": "detail",
+     "evidence": "高度な保存環境と世界中の来館者への公開を理由に「人類共通の財産」としての保有を正当化してきた",
+     "answer": "Ketersediaan fasilitas konservasi tingkat tinggi serta pembukaan akses bagi pengunjung dunia atas nama warisan bersama umat manusia",
+     "patternId": "detail-ja-178"
+    }
+   ],
+   [
+    "Mengapa klaim \"universalitas\" dari pihak penyimpan dinilai penulis tidak lagi memiliki daya yakinkan saat ini?",
+    [
+     "Karena jumlah pengunjung museum di Eropa dan Amerika mengalami penurunan tajam setiap tahun",
+     "Karena teknologi pencetakan tiga dimensi sudah mampu menggandakan seluruh koleksi tanpa cacat",
+     "Karena mengesampingkan latar belakang sejarah berupa penjarahan maupun transaksi timpang pada masa lalu",
+     "Karena gedung-gedung museum tua di negara Barat tidak lagi memenuhi standar tahan kebakaran"
+    ],
+    2,
+    {
+     "type": "cause_effect",
+     "evidence": "略奪や不平等な取引という歴史的経緯を棚に上げた普遍性の主張は、もはや説得力を持ち得ない",
+     "answer": "Karena mengesampingkan latar belakang sejarah berupa penjarahan maupun transaksi timpang pada masa lalu",
+     "patternId": "cause_effect-ja-178"
+    }
+   ],
+   [
+    "Bentuk kerja sama baru seperti apa yang mulai dijajaki melampaui sekadar pengalihan hak kepemilikan?",
+    [
+     "Melelang koleksi sengketa kepada kolektor pribadi untuk membiayai pembangunan sekolah dasar",
+     "Melaksanakan penelitian konservasi serta pameran keliling secara bersama-sama setelah artefak dikembalikan",
+     "Menyimpan seluruh artefak di wilayah netral tak berpenghuni tanpa boleh dipamerkan kepada publik",
+     "Menghapus keterangan asal-usul sejarah dari label ruang pamer guna mencegah perdebatan politik"
+    ],
+    1,
+    {
+     "type": "detail",
+     "evidence": "所有権の移転にとどまらず、返還後に共同で保存研究や巡回展示を行う新たな協働モデルも模索されている",
+     "answer": "Melaksanakan penelitian konservasi serta pameran keliling secara bersama-sama setelah artefak dikembalikan",
+     "patternId": "detail-ja-178"
+    }
+   ],
+   [
+    "Apa makna ungkapan \"棚に上げた\" pada kalimat ketiga bacaan di atas?",
+    [
+     "Mengesampingkan atau pura-pura tidak melihat persoalan maupun kesalahan sendiri",
+     "Menata koleksi barang antik dengan rapi di atas rak penyimpanan khusus",
+     "Mengangkat derajat suatu karya seni lokal menjadi warisan budaya dunia",
+     "Menyerahkan penyelesaian sengketa hukum kepada mahkamah arbitrase internasional"
+    ],
+    0,
+    {
+     "type": "vocabulary",
+     "evidence": "略奪や不平等な取引という歴史的経緯を棚に上げた普遍性の主張は、もはや説得力を持ち得ない",
+     "answer": "Mengesampingkan atau pura-pura tidak melihat persoalan maupun kesalahan sendiri",
+     "patternId": "vocabulary-ja-178"
+    }
+   ],
+   [
+    "Apa sikap utama penulis mengenai langkah awal berbagi pengetahuan budaya secara setara?",
+    [
+     "Melupakan seluruh catatan sejarah kolonial agar hubungan diplomatik masa kini berjalan mulus",
+     "Menghadapi secara jujur ketidakadilan sejarah masa lalu sebagai titik tolak membangun kemitraan yang sejajar",
+     "Melarang segala bentuk peminjaman koleksi budaya antarnegara demi mencegah kerusakan fisik",
+     "Mempertahankan kepemilikan artefak di museum lama sambil mengirimkan salinan foto ke negara asal"
+    ],
+    1,
+    {
+     "type": "author_attitude",
+     "evidence": "過去の不正義に正面から向き合うことこそが、対等な立場で文化の知を分かち合う出発点となる",
+     "answer": "Menghadapi secara jujur ketidakadilan sejarah masa lalu sebagai titik tolak membangun kemitraan yang sejajar",
+     "patternId": "author_attitude-ja-178"
+    }
+   ]
+  ]
+ },
+ {
+  "id": "rja0179",
+  "level": "C2",
+  "jlpt": "N1+",
+  "title": "科学技術コミュニケーションにおける双方向対話",
+  "text": "先端科学技術に対する市民の不安や懐疑が生じるたび、かつては「専門知識の不足が誤解を生む」と考え、正確な情報を噛み砕いて教え諭す啓発活動が重視されてきた。しかし、実証的な社会調査によれば、科学的知識の量が増えても、価値観や生活実感に関わる懸念が自動的に解消されるわけではないという。市民が問うているのは単なる仕組みの説明ではなく、万一の際のリスク配分や意思決定の公正さだからである。そのため近年では、研究開発の初期段階から市民と専門家が疑問や価値判断を率直に交わす双方向の対話が模索されている。素人への一方的な説得から、不確実性を共に引き受ける協働へと科学と社会の関係が問い直されている。",
+  "topic": "pendidikan",
+  "qs": [
+   [
+    "Asumsi lama seperti apa yang dahulu mendasari kegiatan penyuluhan sains ketika muncul kekhawatiran warga?",
+    [
+     "Keyakinan bahwa masyarakat umum lebih memahami dampak sosial teknologi dibandingkan ilmuwan laboratorium",
+     "Anggapan bahwa kurangnya pengetahuan teknis masyarakatlah yang memicu salah paham sehingga cukup diatasi dengan penjelasan sederhana searah",
+     "Pandangan bahwa seluruh penelitian teknologi mutakhir sebaiknya dirahasiakan agar tidak memicu perdebatan",
+     "Prinsip bahwa keputusan pendanaan riset negara harus selalu ditentukan melalui pemungutan suara langsung"
+    ],
+    1,
+    {
+     "type": "detail",
+     "evidence": "かつては「専門知識の不足が誤解を生む」と考え、正確な情報を噛み砕いて教え諭す啓発活動が重視されてきた",
+     "answer": "Anggapan bahwa kurangnya pengetahuan teknis masyarakatlah yang memicu salah paham sehingga cukup diatasi dengan penjelasan sederhana searah",
+     "patternId": "detail-ja-179"
+    }
+   ],
+   [
+    "Mengapa bertambahnya jumlah pengetahuan ilmiah warga tidak otomatis menghilangkan kekhawatiran mereka menurut survei empiris?",
+    [
+     "Karena istilah ilmiah yang digunakan para peneliti selalu berubah setiap kali pergantian tahun akademik",
+     "Karena media massa melarang para ilmuwan tampil menjelaskan hasil penelitiannya secara langsung",
+     "Karena warga menolak membaca materi penjelasan yang tidak disertai ilustrasi gambar berwarna",
+     "Karena yang dipertanyakan warga bukan sekadar cara kerja teknis, melainkan pembagian risiko bila terjadi masalah serta keadilan pengambilan keputusan"
+    ],
+    3,
+    {
+     "type": "cause_effect",
+     "evidence": "市民が問うているのは単なる仕組みの説明ではなく、万一の際のリスク配分や意思決定の公正さだからである",
+     "answer": "Karena yang dipertanyakan warga bukan sekadar cara kerja teknis, melainkan pembagian risiko bila terjadi masalah serta keadilan pengambilan keputusan",
+     "patternId": "cause_effect-ja-179"
+    }
+   ],
+   [
+    "Bagaimana perbandingan pendekatan komunikasi sains lama dan pendekatan baru yang tengah dijajaki?",
+    [
+     "Beralih dari bujukan satu arah kepada orang awam menuju dialog dua arah sejak tahap awal riset untuk bertukar pertanyaan dan pertimbangan nilai",
+     "Beralih dari diskusi tatap muka di balai warga menuju penyebaran brosur cetak satu arah secara masif",
+     "Beralih dari keterbukaan data penelitian menuju pembatasan informasi hanya bagi kalangan industri",
+     "Keduanya sama-sama menempatkan pakar sebagai penentu tunggal nilai etika tanpa melibatkan warga"
+    ],
+    0,
+    {
+     "type": "comparison",
+     "evidence": "素人への一方的な説得から、不確実性を共に引き受ける協働へと科学と社会の関係が問い直されている",
+     "answer": "Beralih dari bujukan satu arah kepada orang awam menuju dialog dua arah sejak tahap awal riset untuk bertukar pertanyaan dan pertimbangan nilai",
+     "patternId": "comparison-ja-179"
+    }
+   ],
+   [
+    "Apa makna ungkapan \"噛み砕いて\" pada kalimat pertama bacaan tersebut?",
+    [
+     "Membantah argumen lawan secara tajam hingga tidak tersisa celah sanggahan",
+     "Memotong anggaran penelitian dasar menjadi bagian-bagian kecil per kuartal",
+     "Menguraikan materi yang rumit menjadi bahasa yang mudah dicerna dan dipahami",
+     "Menguji kekuatan bahan logam baru menggunakan tekanan mekanis tinggi"
+    ],
+    2,
+    {
+     "type": "vocabulary",
+     "evidence": "正確な情報を噛み砕いて教え諭す啓発活動が重視されてきた",
+     "answer": "Menguraikan materi yang rumit menjadi bahasa yang mudah dicerna dan dipahami",
+     "patternId": "vocabulary-ja-179"
+    }
+   ],
+   [
+    "Apa simpulan yang dapat ditarik mengenai peran warga dalam hubungan sains dan masyarakat yang baru?",
+    [
+     "Warga dipandang sebagai mitra setara dalam merumuskan nilai serta menanggung bersama ketidakpastian teknologi",
+     "Warga cukup menerima keputusan akhir setelah produk teknologi resmi dipasarkan secara luas",
+     "Warga diwajibkan menguasai rumus matematika tingkat lanjut sebelum boleh menyampaikan pendapat",
+     "Warga mengambil alih pelaksanaan eksperimen laboratorium menggantikan peran peneliti profesional"
+    ],
+    0,
+    {
+     "type": "inference",
+     "evidence": "素人への一方的な説得から、不確実性を共に引き受ける協働へと科学と社会の関係が問い直されている",
+     "answer": "Warga dipandang sebagai mitra setara dalam merumuskan nilai serta menanggung bersama ketidakpastian teknologi",
+     "patternId": "inference-ja-179"
+    }
+   ]
+  ]
+ },
+ {
+  "id": "rja0180",
+  "level": "C2",
+  "jlpt": "N1+",
+  "title": "統計指標の限界と主観的幸福度をめぐる議論",
+  "text": "国内総生産は市場で取引される財やサービスの総量を測る優れた尺度だが、社会の豊かさを包括的に映し出す鏡ではない。家庭内の無償労働や地域社会の助け合いは計上されない一方、災害からの復旧工事や環境汚染の後始末さえ数値の上では経済成長として加算されるからである。この限界を補うため、近年では人々の生活満足度や主観的幸福度を政策指標に取り入れる試みが国際的に広がってきた。もっとも、主観的な指標は文化的背景や質問への慣れに左右されやすく、客観的な生活条件の悪化を覆い隠す口実に使われる危険も孕む。単一の数字に万能を求めるのではなく、複数の指標を突き合わせて多面的に社会を診断する姿勢が欠かせない。",
+  "topic": "masyarakat",
+  "qs": [
+   [
+    "Mengapa Produk Domestik Bruto dinilai bukan cermin yang menggambarkan kesejahteraan masyarakat secara menyeluruh?",
+    [
+     "Karena perhitungannya hanya mencakup sektor pertanian tradisional dan mengabaikan industri jasa modern",
+     "Karena datanya baru dapat diumumkan setiap dua puluh tahun sekali oleh badan statistik nasional",
+     "Karena kerja perawatan tak berbayar dan gotong royong tidak terhitung, sementara proyek pemulihan bencana atau pembersihan polusi justru menambah angka pertumbuhan",
+     "Karena nilainya selalu turun apabila jumlah penduduk perkotaan mengalami peningkatan"
+    ],
+    2,
+    {
+     "type": "cause_effect",
+     "evidence": "家庭内の無償労働や地域社会の助け合いは計上されない一方、災害からの復旧工事や環境汚染の後始末さえ数値の上では経済成長として加算されるからである",
+     "answer": "Karena kerja perawatan tak berbayar dan gotong royong tidak terhitung, sementara proyek pemulihan bencana atau pembersihan polusi justru menambah angka pertumbuhan",
+     "patternId": "cause_effect-ja-180"
+    }
+   ],
+   [
+    "Upaya apa yang meluas secara internasional guna melengkapi keterbatasan indikator ekonomi konvensional tersebut?",
+    [
+     "Memasukkan tingkat kepuasan hidup serta kebahagiaan subjektif masyarakat ke dalam indikator kebijakan publik",
+     "Menghapus seluruh pencatatan statistik ekonomi makro di kementerian keuangan tiap negara",
+     "Mengukur kemakmuran bangsa semata-mata dari luas wilayah hutan lindung yang dimiliki",
+     "Menyeragamkan besaran upah seluruh jenis profesi tanpa memandang jam kerja maupun keahlian"
+    ],
+    0,
+    {
+     "type": "detail",
+     "evidence": "人々の生活満足度や主観的幸福度を政策指標に取り入れる試みが国際的に広がってきた",
+     "answer": "Memasukkan tingkat kepuasan hidup serta kebahagiaan subjektif masyarakat ke dalam indikator kebijakan publik",
+     "patternId": "detail-ja-180"
+    }
+   ],
+   [
+    "Kelemahan serta bahaya apa yang diperingatkan penulis terkait penggunaan indikator kebahagiaan subjektif?",
+    [
+     "Membutuhkan perangkat satelit penginderaan jauh yang menguras anggaran belanja negara berkembang",
+     "Selalu menghasilkan angka yang persis sama dengan pertumbuhan Produk Domestik Bruto tahunan",
+     "Memicu persaingan militer antarnegara demi meraih peringkat tertinggi dalam laporan tahunan",
+     "Mudah dipengaruhi latar budaya atau kebiasaan menjawab survei, serta berisiko dijadikan dalih untuk menutupi memburuknya kondisi hidup objektif"
+    ],
+    3,
+    {
+     "type": "detail",
+     "evidence": "主観的な指標は文化的背景や質問への慣れに左右されやすく、客観的な生活条件の悪化を覆い隠す口実に使われる危険も孕む",
+     "answer": "Mudah dipengaruhi latar budaya atau kebiasaan menjawab survei, serta berisiko dijadikan dalih untuk menutupi memburuknya kondisi hidup objektif",
+     "patternId": "detail-ja-180"
+    }
+   ],
+   [
+    "Apa makna kata \"孕む\" pada kalimat keempat bacaan di atas?",
+    [
+     "Menghilangkan seluruh keraguan melalui pembuktian matematis yang ketat",
+     "Mengandung potensi atau benih risiko di dalamnya",
+     "Mengumumkan hasil jajak pendapat secara terbuka kepada media massa",
+     "Membandingkan dua kelompok sampel dari kelompok usia yang berbeda"
+    ],
+    1,
+    {
+     "type": "vocabulary",
+     "evidence": "客観的な生活条件の悪化を覆い隠す口実に使われる危険も孕む",
+     "answer": "Mengandung potensi atau benih risiko di dalamnya",
+     "patternId": "vocabulary-ja-180"
+    }
+   ],
+   [
+    "Apa gagasan utama yang ditegaskan penulis pada kalimat penutup bacaan?",
+    [
+     "Mengganti seluruh indikator ekonomi objektif dengan survei perasaan warga secara penuh",
+     "Mempertahankan Produk Domestik Bruto sebagai satu-satunya tolok ukur keberhasilan negara",
+     "Mendiagnosis masyarakat secara multidimensional dengan menyandingkan beragam indikator alih-alih menuntut kesempurnaan dari satu angka tunggal",
+     "Menghentikan penggunaan angka statistik dalam perumusan kebijakan sosial pemerintah"
+    ],
+    2,
+    {
+     "type": "main_idea",
+     "evidence": "単一の数字に万能を求めるのではなく、複数の指標を突き合わせて多面的に社会を診断する姿勢が欠かせない",
+     "answer": "Mendiagnosis masyarakat secara multidimensional dengan menyandingkan beragam indikator alih-alih menuntut kesempurnaan dari satu angka tunggal",
+     "patternId": "main_idea-ja-180"
+    }
+   ]
+  ]
  }
 ]
