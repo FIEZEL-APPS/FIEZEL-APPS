@@ -322,17 +322,34 @@ export function getInitialBraincoreState(): BraincoreStoreState {
 
 function readHostPwaPreferences(): { targetLang?: TargetLang; learnerLocale?: 'id' | 'th' } {
   try {
-    const courseRaw = localStorage.getItem('fz_target_course');
-    const targetLang: TargetLang | undefined =
-      courseRaw === 'ja' ? 'ja' : courseRaw === 'en' ? 'en' : undefined;
+    let targetLang: TargetLang | undefined;
     let learnerLocale: 'id' | 'th' | undefined;
-    const legacyRaw = localStorage.getItem('fiezel-v4-state');
-    if (legacyRaw) {
-      const legacy = JSON.parse(legacyRaw);
-      if (legacy?.learnerLocale === 'th' || legacy?.locale === 'th') {
-        learnerLocale = 'th';
-      } else if (legacy?.learnerLocale === 'id' || legacy?.locale === 'id') {
-        learnerLocale = 'id';
+    if (typeof window !== 'undefined' && window.location && window.location.search) {
+      const params = new URLSearchParams(window.location.search);
+      const langParam = params.get('lang') || params.get('course');
+      if (langParam === 'ja' || langParam === 'en') {
+        targetLang = langParam;
+      }
+      const locParam = params.get('locale') || params.get('hl');
+      if (locParam === 'th' || locParam === 'id') {
+        learnerLocale = locParam;
+      }
+    }
+    if (!targetLang) {
+      const courseRaw = localStorage.getItem('fz_target_course');
+      if (courseRaw === 'ja' || courseRaw === 'en') {
+        targetLang = courseRaw;
+      }
+    }
+    if (!learnerLocale) {
+      const legacyRaw = localStorage.getItem('fiezel-v4-state');
+      if (legacyRaw) {
+        const legacy = JSON.parse(legacyRaw);
+        if (legacy?.learnerLocale === 'th' || legacy?.locale === 'th') {
+          learnerLocale = 'th';
+        } else if (legacy?.learnerLocale === 'id' || legacy?.locale === 'id') {
+          learnerLocale = 'id';
+        }
       }
     }
     return { targetLang, learnerLocale };
@@ -347,6 +364,38 @@ function readHostPwaPreferences(): { targetLang?: TargetLang; learnerLocale?: 'i
  */
 export function bridgeAttemptToHostPwa(eventPayload: Record<string, unknown>): void {
   try {
+    if (typeof localStorage !== 'undefined') {
+      const coursePrefix =
+        String(eventPayload.competencyId || '').includes('_ja_') ||
+        String(eventPayload.scenarioId || '').includes('_ja_') ||
+        localStorage.getItem('fz_target_course') === 'ja'
+          ? 'ja'
+          : 'en';
+      const chatKey = 'fiezel-interactive-chat-v1';
+      let chatSaved: any = null;
+      try {
+        chatSaved = JSON.parse(localStorage.getItem(chatKey) || 'null');
+      } catch {
+        chatSaved = null;
+      }
+      if (!chatSaved || typeof chatSaved !== 'object') {
+        chatSaved = { correctionMode: true, scenarioHistories: {} };
+      }
+      if (!chatSaved.scenarioHistories || typeof chatSaved.scenarioHistories !== 'object') {
+        chatSaved.scenarioHistories = {};
+      }
+      const histKey = `${coursePrefix}_studio`;
+      if (!Array.isArray(chatSaved.scenarioHistories[histKey])) {
+        chatSaved.scenarioHistories[histKey] = [];
+      }
+      chatSaved.scenarioHistories[histKey].push({
+        id: String(eventPayload.id || `vs_${Date.now()}`),
+        role: 'user',
+        text: String(eventPayload.userTranscript || ''),
+        ts: Date.now(),
+      });
+      localStorage.setItem(chatKey, JSON.stringify(chatSaved));
+    }
     if (typeof window !== 'undefined') {
       window.dispatchEvent(
         new CustomEvent('fiezel:voice-studio:attempt', { detail: eventPayload })
@@ -395,6 +444,12 @@ export function loadBraincoreState(): BraincoreStoreState {
       return seed;
     }
     const parsed = JSON.parse(raw) as BraincoreStoreState;
+    if (hostPrefs.targetLang) {
+      parsed.targetLang = hostPrefs.targetLang;
+    }
+    if (hostPrefs.learnerLocale) {
+      parsed.learnerLocale = hostPrefs.learnerLocale;
+    }
     const now = Date.now();
     if (!Array.isArray(parsed.speakingHistory) || parsed.speakingHistory.length === 0) {
       parsed.speakingHistory = getDefaultSpeakingHistory();

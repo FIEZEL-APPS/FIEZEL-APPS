@@ -19,7 +19,38 @@
   if (root) {
     root.FiezelInteractiveChat = api;
     root.interactiveChatView = function () {
-      api.mount(document.getElementById('app'));
+      var mountPoint = typeof document !== 'undefined' ? document.getElementById('app') : null;
+      if (!mountPoint) return;
+      if (typeof document !== 'undefined') {
+        if (document.documentElement) document.documentElement.classList.add('fz-view-chat');
+        if (document.body) document.body.classList.add('fz-view-chat');
+      }
+      var lang = 'en';
+      try {
+        if (typeof root.jaCourseOn === 'function' && root.jaCourseOn()) {
+          lang = 'ja';
+        } else if (root.FiezelI18n && typeof root.FiezelI18n.getCourse === 'function' && root.FiezelI18n.getCourse() === 'ja') {
+          lang = 'ja';
+        } else if (typeof localStorage !== 'undefined' && localStorage.getItem('fz_target_course') === 'ja') {
+          lang = 'ja';
+        }
+      } catch (_) {}
+      var locale = 'id';
+      try {
+        if (root.FiezelI18n && typeof root.FiezelI18n.getLocale === 'function' && root.FiezelI18n.getLocale() === 'th') {
+          locale = 'th';
+        }
+      } catch (_) {}
+      var existingFrame = mountPoint.querySelector('#fzMitraKaiwaStudioFrame');
+      if (existingFrame && existingFrame.getAttribute('data-lang') === lang && existingFrame.getAttribute('data-locale') === locale) {
+        return;
+      }
+      var targetSrc = './call.html?embed=1&tab=call&lang=' + encodeURIComponent(lang) + '&locale=' + encodeURIComponent(locale);
+      var titleText = lang === 'ja' ? 'Mitra Kaiwa' : 'Kawan Bicara';
+      mountPoint.innerHTML =
+        '<div id="fzcContainer" class="fzc-mitra-kaiwa-studio-host" data-testid="mitra-kaiwa-studio-host" style="width:100%;height:100%;min-height:100dvh;flex:1 1 0px;display:flex;flex-direction:column;margin:0;padding:0;overflow:hidden;background:#FFF9EE;">' +
+        '<iframe id="fzMitraKaiwaStudioFrame" data-testid="mitra-kaiwa-studio-frame" data-lang="' + lang + '" data-locale="' + locale + '" src="' + targetSrc + '" title="' + titleText + '" allow="microphone; autoplay" style="width:100%;height:100%;flex:1 1 0px;border:0;display:block;background:#FFF9EE;"></iframe>' +
+        '</div>';
     };
   }
 }(typeof globalThis !== 'undefined' ? globalThis : window, function (root) {
@@ -4213,6 +4244,11 @@
       closeCallUI();
 
       if (typeof document !== 'undefined') {
+        var studioFrame = document.getElementById('fzMitraKaiwaStudioFrame');
+        if (studioFrame) {
+          try { studioFrame.src = 'about:blank'; } catch (_) {}
+          studioFrame.remove();
+        }
         var micModal = document.getElementById('fzcMicModal');
         if (micModal) micModal.remove();
         if (document.documentElement) document.documentElement.classList.remove('fz-view-chat');
