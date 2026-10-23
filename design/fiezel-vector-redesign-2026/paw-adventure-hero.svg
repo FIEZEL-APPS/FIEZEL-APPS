@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-labelledby="title desc">
+<title id="title">FIEZEL PAW Adventure — vector hero</title>
+<desc id="desc">Original FIEZEL vector artwork: child explorer, PAW mascot, Indonesian-inspired forest path and learning symbols.</desc>
+<defs>
+  <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#FFF4D8"/><stop offset="1" stop-color="#F9E4DF"/></linearGradient>
+  <linearGradient id="hill" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#B9D9A4"/><stop offset="1" stop-color="#76AE76"/></linearGradient>
+  <pattern id="dots" width="32" height="32" patternUnits="userSpaceOnUse"><circle cx="4" cy="4" r="2" fill="#802B3A" opacity=".10"/></pattern>
+</defs>
+<rect width="1200" height="800" rx="42" fill="url(#sky)"/>
+<path d="M0 390Q180 285 350 365T700 350T1200 300V800H0Z" fill="url(#hill)"/>
+<path d="M0 505Q210 405 420 485T850 470T1200 410V800H0Z" fill="#5F9969"/>
+<path d="M0 620Q260 530 520 615T1200 560V800H0Z" fill="#427D5D"/>
+<path d="M505 800C555 710 625 670 660 590C690 520 670 470 630 415" fill="none" stroke="#F8DB6E" stroke-width="92" stroke-linecap="round"/>
+<path d="M505 800C555 710 625 670 660 590C690 520 670 470 630 415" fill="none" stroke="#F5C95B" stroke-width="8" stroke-dasharray="18 24" opacity=".75"/>
+<path d="M0 0H120V250L72 210 0 265Z" fill="#802B3A"/><path d="M1080 0H1200V250L1132 205 1080 270Z" fill="#802B3A"/>
+<g fill="#2F684C"><ellipse cx="85" cy="145" rx="90" ry="34" transform="rotate(-35 85 145)"/><ellipse cx="1120" cy="145" rx="90" ry="34" transform="rotate(35 1120 145)"/><ellipse cx="210" cy="285" rx="120" ry="38" transform="rotate(-20 210 285)"/><ellipse cx="1000" cy="290" rx="120" ry="38" transform="rotate(20 1000 290)"/></g>
+<g fill="#F8DB6E" opacity=".9"><circle cx="210" cy="420" r="13"/><circle cx="270" cy="455" r="9"/><circle cx="1010" cy="455" r="12"/><circle cx="940" cy="410" r="8"/></g>
+<rect x="0" y="0" width="1200" height="800" rx="42" fill="url(#dots)"/>
+<!-- explorer -->
+<g transform="translate(300 185)">
+  <ellipse cx="170" cy="475" rx="145" ry="25" fill="#254C3D" opacity=".22"/>
+  <path d="M100 285h150l38 175H62Z" fill="#FFF4DA" stroke="#33201F" stroke-width="8"/>
+  <path d="M93 292q78 34 164 0l-9 165H103Z" fill="#F9E4DF" opacity=".45"/>
+  <path d="M93 330 35 380l35 36 72-55M248 330l60 55-33 38-75-58" fill="#FFF4DA" stroke="#33201F" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M116 445h62v68h-62zM191 445h62v68h-62z" fill="#802B3A" stroke="#33201F" stroke-width="8"/>
+  <path d="M103 505q-10 25-43 25M253 505q10 25 43 25" fill="none" stroke="#33201F" stroke-width="12" stroke-linecap="round"/>
+  <circle cx="175" cy="175" r="112" fill="#E6B88A" stroke="#33201F" stroke-width="8"/>
+  <path d="M66 155q16-128 111-128t111 128q-32-54-110-50T66 155Z" fill="#C8914E" stroke="#33201F" stroke-width="8"/>
+  <path d="M58 145q115-32 246 0l-18-33Q173 78 77 111Z" fill="#E3B461" stroke="#33201F" stroke-width="8"/>
+  <path d="M125 180q22-18 44 0M192 180q22-18 44 0" fill="none" stroke="#33201F" stroke-width="9" stroke-linecap="round"/>
+  <circle cx="146" cy="207" r="6" fill="#33201F"/><circle cx="214" cy="207" r="6" fill="#33201F"/>
+  <path d="M166 230q10 9 20 0" fill="none" stroke="#802B3A" stroke-width="6" stroke-linecap="round"/>
+  <path d="M79 285q-42 65-7 132" fill="none" stroke="#802B3A" stroke-width="34" stroke-linecap="round"/>
+  <path d="M267 285q42 65 7 132" fill="none" stroke="#802B3A" stroke-width="34" stroke-linecap="round"/>
+  <circle cx="175" cy="315" r="28" fill="#F8DB6E" stroke="#802B3A" stroke-width="7"/><path d="M175 297v18l14 10" fill="none" stroke="#802B3A" stroke-width="6" stroke-linecap="round"/>
+</g>
+<!-- PAW -->
+<g transform="translate(520 205)">
+  <ellipse cx="160" cy="455" rx="125" ry="22" fill="#254C3D" opacity=".2"/>
+  <path d="M116 390q-5 56-42 78M204 390q5 56 42 78" fill="none" stroke="#EDB93A" stroke-width="34" stroke-linecap="round"/>
+  <path d="M75 350q-30 65-18 94M245 350q30 65 18 94" fill="none" stroke="#EDB93A" stroke-width="34" stroke-linecap="round"/>
+  <path d="M88 115L100 20l62 65ZM232 115L220 20l-62 65Z" fill="#FFD94F" stroke="#33201F" stroke-width="8"/>
+  <path d="M103 91l8-47 32 35ZM217 91l-8-47-32 35Z" fill="#802B3A"/>
+  <circle cx="160" cy="170" r="142" fill="#FFD94F" stroke="#33201F" stroke-width="8"/>
+  <ellipse cx="160" cy="260" rx="58" ry="42" fill="#FFF4DA"/>
+  <circle cx="112" cy="205" r="23" fill="#33201F"/><circle cx="208" cy="205" r="23" fill="#33201F"/>
+  <circle cx="120" cy="196" r="8" fill="#fff"/><circle cx="216" cy="196" r="8" fill="#fff"/>
+  <circle cx="102" cy="266" r="14" fill="#F0A0AC"/><circle cx="218" cy="266" r="14" fill="#F0A0AC"/>
+  <path d="M151 245h18l-9 10Z" fill="#802B3A"/><path d="M160 260q-13 20-30 6M160 260q13 20 30 6" fill="none" stroke="#802B3A" stroke-width="6" stroke-linecap="round"/>
+  <path d="M135 300q25 22 50 0" fill="none" stroke="#802B3A" stroke-width="7" stroke-linecap="round"/>
+  <path d="M160 380q-36-18-36-48h72q0 30-36 48Z" fill="#FFF4DA"/><g fill="#802B3A"><rect x="142" y="332" width="6" height="18" rx="3"/><rect x="151" y="327" width="6" height="24" rx="3"/><rect x="160" y="325" width="6" height="26" rx="3"/><rect x="169" y="329" width="6" height="22" rx="3"/><path d="M160 345c20 0 25 10 0 22-25-12-20-22 0-22Z"/></g>
+  <path d="M274 350q95 40 83-63" fill="none" stroke="#EDB93A" stroke-width="32" stroke-linecap="round"/><circle cx="357" cy="287" r="18" fill="#802B3A"/>
+</g>
+<!-- learning markers -->
+<g transform="translate(875 505)"><rect width="180" height="94" rx="28" fill="#FFF4DA" stroke="#802B3A" stroke-width="6"/><text x="90" y="38" text-anchor="middle" font-family="system-ui,sans-serif" font-size="20" font-weight="800" fill="#802B3A">LEARN</text><text x="90" y="67" text-anchor="middle" font-family="system-ui,sans-serif" font-size="16" fill="#33201F">one step at a time</text></g>
+<g transform="translate(105 570)"><circle cx="45" cy="45" r="45" fill="#F8DB6E"/><path d="M22 42h46M27 30h36M30 54h30" stroke="#802B3A" stroke-width="6" stroke-linecap="round"/><text x="45" y="92" text-anchor="middle" font-family="system-ui,sans-serif" font-size="14" font-weight="700" fill="#FFF4DA">VOCAB</text></g>
+</svg>
