@@ -1,7 +1,7 @@
 {
-  "version": "m025-635",
-  "claimedBy": "tidak tercatat (jalankan ulang di dalam git, atau set FIEZEL_BUILD_CLAIMER)",
-  "claimedAt": "2026-10-23T19:10:17.946Z",
-  "reason": "bot(heal): auto-synchronize release boundary",
+  "version": "m025-632",
+  "claimedBy": "branch fix/remove-video-grammar",
+  "claimedAt": "2026-10-23T19:08:29.112Z",
+  "reason": "fix(grammar): eliminasi video grammar dan audit perbaikan UI/UX latihan grammar G-01 s/d G-09 (m025-632)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
