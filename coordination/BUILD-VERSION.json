@@ -1,7 +1,7 @@
 {
-  "version": "m025-631",
+  "version": "m025-630",
   "claimedBy": "branch feat/mitra-kaiwa-single-voice-studio-m025-630",
-  "claimedAt": "2026-10-23T16:39:36.312Z",
+  "claimedAt": "2026-10-23T16:54:56.605Z",
   "reason": "feat(chat): satukan Mitra Kaiwa dengan antarmuka panggilan Studio Suara AI tanpa panel beranda/braincore ganda",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

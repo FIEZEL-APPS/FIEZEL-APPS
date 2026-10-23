@@ -1,6 +1,6 @@
-# FIEZEL-M025631 — Satukan Mitra Kaiwa dengan Antarmuka Panggilan Studio Suara AI (Tanpa Kartu & Panel Beranda/Braincore Ganda)
+# FIEZEL-M025630 — Satukan Mitra Kaiwa dengan Antarmuka Panggilan Studio Suara AI (Tanpa Kartu & Panel Beranda/Braincore Ganda)
 
-- **Build**: `m025-631`
+- **Build**: `m025-630`
 - **Tanggal**: 23 Oktober 2026
 - **Status**: LULUS GERBANG MUTU LOKAL & PROBE EMPIRIS PLAYWRIGHT
 
@@ -34,12 +34,12 @@ Dieksekusi melalui `node tools/dev/probe-mitra-kaiwa-single-studio.mjs`:
 - `features/voice-studio/src/lib/braincore.ts`: Sinkronkan preferensi kursus (`?lang=` dan `fz_target_course`) saat pemuatan state serta jembatan pencatatan giliran bicara ke `fiezel-interactive-chat-v1`.
 - `features/voice-studio/dist/voice-studio.js` & `features/voice-studio/dist/voice-studio.css`: Bundel produksi hasil kompilasi ulang Vite.
 - `id-golden-baseline.json`: Pembaruan baseline literal Indonesia setelah penghapusan fungsi kartu duplikat di `app.js`.
-- `coordination/BUILD-VERSION.json`, `sw.js`, `core-config.js`, `features/neural-voice/fiezel-diag-panel.js`, `kurikulum.html`, `misi.html`: Kenaikan nomor build resmi ke `m025-631` via `tools/bump-build.mjs`.
+- `coordination/BUILD-VERSION.json`, `sw.js`, `core-config.js`, `features/neural-voice/fiezel-diag-panel.js`, `kurikulum.html`, `misi.html`: Kenaikan nomor build resmi ke `m025-630` via `tools/bump-build.mjs`.
 
 ---
 
 ## 4. Status Kelulusan Gerbang Mutu Lokal
-- `node tools/bump-build.mjs --check` -> **PASS (`Selaras` pada `m025-631`)**
+- `node tools/bump-build.mjs --check` -> **PASS (`Selaras` pada `m025-630`)**
 - `node tests/build-number-uniqueness-test.js --strict` -> **PASS**
 - `node tests/id-golden-snapshot-test.js` -> **PASS**
 - `node tests/th-ui-leak-test.js` -> **PASS**
