@@ -11401,7 +11401,6 @@ function todayHomeMarkup(){
   ${conversationPartnerHomeCardMarkup()}
   ${heroQuestCard}
   ${braincoreHomeCardMarkup()}
-  ${voiceStudioHomeCardMarkup()}
   ${quickPracticeCard}
   ${kelaskuCard}
   <div class="fz-tactile-audit-vault" style="display:none !important;" aria-hidden="true">
@@ -11533,32 +11532,6 @@ function braincoreHomeCardMarkup(){
     <div class="fz-bc-head"><i class="fz-i" data-fz-icon="paw" aria-hidden="true" style="width:16px;height:16px"></i><b>${esc(FiezelI18n.t('bc.judul'))}</b></div>
     ${arah?`<p class="fz-bc-arah">${esc(arah)}</p>`:''}
     ${baris.join('')}
-  </section>`;
-}
-function voiceStudioHomeCardMarkup(){
-  const isJa = jaCourseOn();
-  const title = isJa ? FiezelI18n.t('home.studio.title-ja') : FiezelI18n.t('home.studio.title-en');
-  const desc = isJa ? FiezelI18n.t('home.studio.desc-ja') : FiezelI18n.t('home.studio.desc-en');
-  const tag = FiezelI18n.t('home.studio.tag');
-  const badge = FiezelI18n.t('home.studio.badge');
-  const sub1 = FiezelI18n.t('home.studio.sub1');
-  const sub2 = FiezelI18n.t('home.studio.sub2');
-  const cta = FiezelI18n.t('home.studio.cta');
-  return `<section class="fz-kawan-card fz-voice-studio-card" data-testid="voice-studio-home-card" onclick="window.location.href='./call.html'" aria-label="${esc(title)}">
-    <div class="fz-kawan-avatar" aria-hidden="true" style="font-size:24px;display:flex;align-items:center;justify-content:center;">🎙️</div>
-    <div class="fz-kawan-body">
-      <div class="fz-kawan-head">
-        <h2 class="fz-kawan-title">${esc(title)}</h2>
-        <span class="fz-kawan-tag">${esc(tag)}</span>
-      </div>
-      <p class="fz-kawan-lead">${esc(desc)}</p>
-      <div class="fz-kawan-badges">
-        <span class="fz-kawan-badge is-live"><span class="fz-kawan-dot" aria-hidden="true"></span>${esc(badge)}</span>
-        <span class="fz-kawan-badge">${esc(sub1)}</span>
-        <span class="fz-kawan-badge">${esc(sub2)}</span>
-      </div>
-    </div>
-    <button type="button" class="fz-kawan-cta" data-testid="voice-studio-cta" onclick="event.stopPropagation();window.location.href='./call.html'">${esc(cta)}<span aria-hidden="true">→</span></button>
   </section>`;
 }
 /** Panel "Bukti kamu makin pintar" di Ringkasan Progres: angka nyata dalam kalimat biasa. */

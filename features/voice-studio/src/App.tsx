@@ -72,15 +72,19 @@ export default function App() {
         const urlParams = new URLSearchParams(window.location.search);
         const tabParam = urlParams.get('tab') || urlParams.get('view');
         if (tabParam === 'home' || tabParam === 'call' || tabParam === 'braincore') {
-          return tabParam;
+          return 'call';
         }
       }
     } catch {
       // Ignore
     }
-    return 'home'; // Default to Google AI Studio Beranda
+    return 'call'; // Single unified Mitra Kaiwa / Kawan Bicara Call Room
   });
-  const [activeScenarioId, setActiveScenarioId] = useState<string>('scen_en_a1_hometown');
+  const [activeScenarioId, setActiveScenarioId] = useState<string>(() => {
+    const initialLang = loadBraincoreState().targetLang || 'en';
+    const firstForLang = CALL_SCENARIOS.find((s) => s.targetLang === initialLang);
+    return firstForLang ? firstForLang.id : 'scen_en_a1_hometown';
+  });
   const [customMeasureOverride, setCustomMeasureOverride] = useState<boolean | null>(null);
 
   // Gemini Live API Direct Client Key state
@@ -148,7 +152,7 @@ export default function App() {
 
   const scenariosForLang = CALL_SCENARIOS.filter((s) => s.targetLang === targetLang);
   const activeScenario: CallScenario =
-    CALL_SCENARIOS.find((s) => s.id === activeScenarioId) ||
+    scenariosForLang.find((s) => s.id === activeScenarioId) ||
     scenariosForLang[0] ||
     CALL_SCENARIOS[0];
   const activePersona =
@@ -253,11 +257,32 @@ export default function App() {
     stopLiveCall();
     const firstScenario = CALL_SCENARIOS.find((s) => s.targetLang === lang) || CALL_SCENARIOS[0];
     setActiveScenarioId(firstScenario.id);
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('fz_target_course', lang);
+      }
+      if (typeof window !== 'undefined') {
+        const url = new URL(window.location.href);
+        url.searchParams.set('lang', lang);
+        window.history.replaceState({}, '', url.toString());
+      }
+    } catch {
+      // Ignore
+    }
     setBrainState(saveBraincoreState({ ...brainState, targetLang: lang }));
   };
 
   const handleSelectLocale = (nextLocale: LearnerLocale) => {
     playFiezelSfx('button_tap');
+    try {
+      if (typeof window !== 'undefined') {
+        const url = new URL(window.location.href);
+        url.searchParams.set('locale', nextLocale);
+        window.history.replaceState({}, '', url.toString());
+      }
+    } catch {
+      // Ignore
+    }
     setBrainState(saveBraincoreState({ ...brainState, learnerLocale: nextLocale }));
   };
 
@@ -1065,16 +1090,36 @@ export default function App() {
       }
     }
     playFiezelSfx('button_tap');
-    setActiveTab(nextTab);
+    setActiveTab('call');
+  };
+
+  const handleBackToPwa = (e: React.MouseEvent) => {
+    e.preventDefault();
+    playFiezelSfx('button_tap');
+    stopLiveCall();
     try {
-      if (typeof window !== 'undefined') {
-        const url = new URL(window.location.href);
-        url.searchParams.set('tab', nextTab);
-        window.history.replaceState({}, '', url.toString());
+      if (typeof window !== 'undefined' && window.parent && window.parent !== window) {
+        const parentWin = window.parent as any;
+        if (
+          parentWin.FiezelInteractiveChat &&
+          typeof parentWin.FiezelInteractiveChat.handleChatBack === 'function'
+        ) {
+          parentWin.FiezelInteractiveChat.handleChatBack();
+          return;
+        }
+        if (typeof parentWin.handleTopbarBack === 'function') {
+          parentWin.handleTopbarBack();
+          return;
+        }
+        if (typeof parentWin.go === 'function') {
+          parentWin.go('home');
+          return;
+        }
       }
     } catch {
-      // Ignore
+      // Fallback to direct link
     }
+    window.location.href = './index.html';
   };
 
   const formatTimer = (sec: number) => {
@@ -1166,29 +1211,45 @@ export default function App() {
             {/* Tombol Kembali ke PWA Utama */}
             <a
               href="./index.html"
+              onClick={handleBackToPwa}
+              data-testid="mitra-kaiwa-back-btn"
               className="px-2.5 py-1.5 rounded-xl bg-white border border-[#F0E4CF] font-bold text-[#8C2233] hover:border-[#8C2233] cursor-pointer shadow-2xs flex items-center gap-1.5 transition-all text-xs shrink-0"
               title="Kembali ke Beranda PWA FIEZEL"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
-              <span className="hidden md:inline">PWA</span>
+              <span>{locale === 'th' ? 'กลับ' : 'Kembali'}</span>
             </a>
 
-            {/* Lambang Resmi FIEZEL (Huruf F + 2 Batang Gelombang Emas) */}
+            {/* Identitas Mitra Kaiwa / Kawan Bicara */}
             <div className="flex items-center gap-2 shrink-0">
               <FiezelBrandCrest className="w-8 h-8 rounded-xl shadow-xs shrink-0" />
-              <div className="hidden sm:block">
+              <div>
                 <div className="font-display font-bold text-sm text-[#241A11] leading-none tracking-tight flex items-center gap-1">
-                  <span>FIEZEL</span>
+                  <span data-testid="mitra-kaiwa-header-title">
+                    {targetLang === 'ja'
+                      ? locale === 'th'
+                        ? 'คู่สนทนาไควะ'
+                        : 'Mitra Kaiwa'
+                      : locale === 'th'
+                        ? 'คู่สนทนา AI'
+                        : 'Kawan Bicara'}
+                  </span>
                   <FiezelPawStamp className="w-3 h-3 text-[#8C2233]" />
                 </div>
                 <div className="text-[9px] font-bold uppercase tracking-widest text-[#8C6D1F] mt-0.5">
-                  AI Voice Studio
+                  {targetLang === 'ja'
+                    ? '会話パートナー · Studio Suara AI'
+                    : 'Speaking Partner · Studio Suara AI'}
                 </div>
               </div>
             </div>
 
-            {/* Navigasi Segmented Khas FIEZEL */}
-            <nav className="flex items-center gap-1 bg-[#FFF3DC] border border-[#F0E4CF] p-1 rounded-2xl">
+            {/* Navigasi Segmented Khas FIEZEL (Nonaktif pada mode tunggal Mitra Kaiwa) */}
+            <nav
+              aria-hidden="true"
+              style={{ display: 'none' }}
+              className="hidden items-center gap-1 bg-[#FFF3DC] border border-[#F0E4CF] p-1 rounded-2xl"
+            >
               <button
                 type="button"
                 onClick={() => handleTabChange('home')}
@@ -1287,7 +1348,9 @@ export default function App() {
               href="/api/download-patch"
               download="fiezel-ai-voice-call.patch"
               data-testid="download-patch-btn"
-              className="px-2.5 py-1.5 rounded-xl btn-sun-tactile font-bold flex items-center gap-1.5 cursor-pointer"
+              aria-hidden="true"
+              style={{ display: 'none' }}
+              className="hidden px-2.5 py-1.5 rounded-xl btn-sun-tactile font-bold items-center gap-1.5 cursor-pointer"
               title="Unduh kode fitur Voice Studio sebagai Git Patch (.patch)"
             >
               <Download className="w-3.5 h-3.5" />
@@ -1406,7 +1469,7 @@ export default function App() {
       )}
 
       {/* RUANG KERJA UTAMA FIEZEL VOICE STUDIO */}
-      <main className="flex-1 max-w-4xl w-full mx-auto px-4 py-6 pb-28 space-y-5">
+      <main className="flex-1 max-w-4xl w-full mx-auto px-4 py-5 pb-10 space-y-5">
         {activeTab === 'home' ? (
           <HomeRedesignView
             locale={locale}
@@ -1575,6 +1638,13 @@ export default function App() {
                               ? '/assets/brand/paw-mochi-speaking.svg'
                               : '/assets/brand/paw-mochi-idle.svg'
                           }
+                          onError={(e) => {
+                            const fallback = isPlayingAiAudio
+                              ? './assets/brand/paw-mochi-speaking.svg'
+                              : './assets/brand/paw-mochi-idle.svg';
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.src = fallback;
+                          }}
                           alt="PAW"
                           className={`relative z-10 w-16 h-16 sm:w-18 sm:h-18 shrink-0 rounded-2xl object-contain p-1.5 border-2 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
                             callStateKey === 'recording'
@@ -2201,10 +2271,12 @@ export default function App() {
         )}
       </main>
 
-      {/* NAVIGASI BAWAH MOBILE KHAS FIEZEL */}
+      {/* NAVIGASI BAWAH MOBILE KHAS FIEZEL (Nonaktif pada mode tunggal Mitra Kaiwa) */}
       <nav
         aria-label="Navigasi utama"
-        className="fixed bottom-0 left-0 right-0 z-40 bg-[#FFF9EE]/95 backdrop-blur-xl border-t border-[#F0E4CF] px-4 py-2 sm:hidden"
+        aria-hidden="true"
+        style={{ display: 'none' }}
+        className="hidden fixed bottom-0 left-0 right-0 z-40 bg-[#FFF9EE]/95 backdrop-blur-xl border-t border-[#F0E4CF] px-4 py-2 sm:hidden"
       >
         <div className="max-w-md mx-auto grid grid-cols-3 gap-2">
           <button
