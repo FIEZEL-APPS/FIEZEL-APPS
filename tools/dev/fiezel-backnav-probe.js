@@ -76,7 +76,7 @@ function serve() {
   log.push('START ' + JSON.stringify(await snap()));
 
   // Navigasi seperti murid.
-  for (const t of ['nav-latihan', 'nav-game', 'nav-progress', 'nav-home']) {
+  for (const t of ['nav-latihan', 'nav-progress', 'nav-home']) {
     const sel = `[data-testid="${t}"]`;
     if (await page.locator(sel).count()) { try { await page.click(sel, { force: true, timeout: 3000 }); } catch (e) {} }
     await page.waitForTimeout(700);

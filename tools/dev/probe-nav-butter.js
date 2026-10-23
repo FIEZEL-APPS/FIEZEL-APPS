@@ -216,7 +216,6 @@ async function run() {
     { name: 'Home', testId: 'nav-home', view: 'home', file: 'butter_01_home.png', label: 'Hari ini' },
     { name: 'KelasKu', testId: 'nav-classroom', view: 'classroom', file: 'butter_02_kelasku.png', label: 'KelasKu' },
     { name: 'Latihan', testId: 'nav-latihan', view: 'latihan', file: 'butter_03_latihan.png', label: 'Latihan' },
-    { name: 'Game', testId: 'nav-game', view: 'game', file: 'butter_04_game.png', label: 'Game' },
     { name: 'Progres', testId: 'nav-progress', view: 'progress', file: 'butter_05_progres.png', label: 'Progres' },
     { name: 'Profil', testId: 'nav-profile', view: 'online', file: 'butter_06_profil.png', label: 'Profil' }
   ];

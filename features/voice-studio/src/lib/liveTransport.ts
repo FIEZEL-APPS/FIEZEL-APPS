@@ -184,12 +184,12 @@ export class PcmQueueAudioPlayer {
 
 /**
  * Resolves the prioritized WebSocket endpoints for Gemini Live (`gemini-3.8-live` / PCM16 duplex).
- * Always includes the production Cloudflare Worker proxy `wss://fiezel.my.id/api/live-call`.
+ * Only returns active WebSocket URLs when a Gemini API key or explicit custom `wsUrl` is configured,
+ * avoiding 1.8s+ connection timeouts to non-existent endpoints.
  */
 export function resolveLiveCallWebSocketUrls(): string[] {
   const urls: string[] = [];
 
-  // Direct client Gemini Multimodal Live API WebSocket if user key is saved
   if (typeof localStorage !== 'undefined') {
     try {
       const userKey = localStorage.getItem('fz_gemini_api_key');
@@ -209,25 +209,14 @@ export function resolveLiveCallWebSocketUrls(): string[] {
     urls.push(window.FIEZEL_VOICE_STUDIO_CONFIG.wsUrl);
   }
 
-  // Primary production Cloudflare Worker WebSocket proxy as mandated by FIEZEL architecture
-  urls.push('wss://fiezel.my.id/api/live-call');
-
-  // If running in local dev / preview server (e.g. localhost or Cloud Run preview), also allow local WS relay
-  if (typeof window !== 'undefined' && window.location?.host) {
-    const host = window.location.host;
-    const isProductionDomain = host.includes('fiezel.my.id');
-    if (!isProductionDomain) {
-      const wsProto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      urls.push(`${wsProto}//${host}/ws/live-call`);
-    }
-  }
-
   return Array.from(new Set(urls));
 }
 
 /**
- * Client-side pedagogical evaluator so Turn-by-Turn Audio mode works 100% reliably
- * even on purely static cPanel hosting (`fiezel.my.id/app/`) when no Node.js server is running.
+ * Client-side pedagogical evaluator enforcing the FIEZEL Braincore Zero-Dumbing Invariant:
+ * - Zero false praise (`ok: false` whenever morphological, syntactic, particle, or pragmatic misconceptions occur)
+ * - Exact `misconceptionId`, `whyFailsId`, `whyFailsTh`, and `syntacticCorrection`
+ * - Rejects off-topic or verb-less noun salads / gibberish
  */
 export function evaluateUtteranceClientSide(params: {
   text: string;
@@ -244,96 +233,214 @@ export function evaluateUtteranceClientSide(params: {
   if (targetLang === 'en') {
     const hasSubjectDrop =
       /\b(because\s+is|think\s+is|very\s+convenient\s+because\s+is)\b/i.test(lower);
-    const hasPastTenseError =
-      /\b(yesterday\s+i\s+go|last\s+week\s+i\s+go|i\s+buy\s+many|i\s+eat\s+at|\bgoed\b|\bbuyed\b|\beated\b)\b/i.test(
+    const hasBePlusBaseVerb =
+      /\b(i\s+am|you\s+are|he\s+is|she\s+is|we\s+are|they\s+are|i'm)\s+(want|agree|disagree|like|need|prefer|know|believe|think|go|eat|drink|buy|work|study|live|have|stay|visit)\b/i.test(
         lower
       );
-    const hasModalToError = /\b(can\s+to|must\s+to|should\s+to|will\s+to)\b/i.test(lower);
-    const hasBareWantRequest = /\b(i\s+want\s+coffee|give\s+me\s+coffee|i\s+want\s+drink)\b/i.test(
+    const hasDoubleConjunction =
+      /\balthough\b[^.?!]+?\bbut\b|\bthough\b[^.?!]+?\bbut\b|\bbecause\b[^.?!]+?\bso\b/i.test(
+        lower
+      );
+    const hasMissingAuxProgressive =
+      /\b(i|you|we|they|he|she)\s+(meeting|going|studying|working|eating|drinking|buying|staying|visiting|reading|waiting)\b/i.test(
+        lower
+      );
+    const hasBrokenWordOrderOrPrep =
+      /^\s*(went|go|ate|eat|bought|buy|visited|stayed)\s+(i|we|he|she|they)\b/i.test(lower) ||
+      /\b(in\s+library|go\s+library|went\s+i\s+yesterday|go\s+bandung|went\s+bandung)\b/i.test(
+        lower
+      );
+    const hasPastTenseError =
+      /\b(yesterday\s+i\s+(go|eat|buy|meet|see|take|come)|last\s+(week|weekend|night|month|year)\s+[^.?!]*?\b(i|we|they)\s+(go|eat|buy|meet|see|drink)|i\s+buy\s+many|i\s+eat\s+at|we\s+eat\s+delicious|\bgoed\b|\bbuyed\b|\beated\b|\bdrinked\b|\bsawd\b|\bmetted\b)\b/i.test(
+        lower
+      ) ||
+      ((scenarioId.includes('past') || scenarioId.includes('weekend')) &&
+        /\b(i|we)\s+(go|eat|buy|drink|meet|see|take)\b/i.test(lower) &&
+        !/\b(will|can|to|would|could|should|usually|always)\s+(go|eat|buy|drink|meet|see|take)\b/i.test(
+          lower
+        ));
+    const hasModalToError = /\b(can\s+to|must\s+to|should\s+to|will\s+to|would\s+to|could\s+to)\b/i.test(
       lower
     );
+    const hasBareWantRequest =
+      /\b(i\s+want\s+(hot\s+|iced\s+|a\s+)?(coffee|tea|latte|water|cake|drink|food)|give\s+me\s+coffee)\b/i.test(
+        lower
+      );
+
+    const hasFiniteVerbOrGreeting =
+      /\b(am|is|are|was|were|be|been|have|has|had|do|does|did|will|would|could|should|can|may|might|must|like|love|prefer|want|need|live|stay|work|study|go|went|come|came|eat|ate|drink|drank|buy|bought|visit|visited|meet|met|see|saw|read|think|believe|agree|disagree|feel|felt|save|saves|help|helps|make|makes|take|took|order|have|had|hello|hi|good\s+morning|good\s+afternoon|thank\s+you|thanks|yes|sure)\b/i.test(
+        lower
+      ) || /\b(i'd|i'm|i'll|we're|we've|it's|that's|there's|don't|doesn't|didn't)\b/i.test(lower);
+
+    const hasScenarioRelevance = (() => {
+      if (scenarioId.includes('cafe')) {
+        return /\b(coffee|tea|latte|espresso|cappuccino|mocha|water|juice|milk|cake|croissant|muffin|sandwich|bread|snack|cup|glass|hot|iced|cold|warm|small|medium|large|size|here|to\s+go|takeaway|card|cash|pay|table|menu|recommend|sugar|sweet|order|drink|have|like|please|library|friend|study|work|read)\b/i.test(
+          lower
+        );
+      }
+      if (scenarioId.includes('past') || scenarioId.includes('weekend')) {
+        return /\b(weekend|yesterday|last|went|visited|stayed|ate|drank|watched|played|studied|worked|had|met|saw|bought|trip|vacation|holiday|family|friend|friends|market|beach|mountain|city|bandung|bali|jakarta|cafe|restaurant|movie|park|home|house|happy|fun|great|delicious|good|tired|relax)\b/i.test(
+          lower
+        );
+      }
+      if (scenarioId.includes('work') || scenarioId.includes('standup')) {
+        return /\b(project|task|report|feature|bug|client|team|meeting|deadline|review|test|design|code|data|update|finish|finished|completed|working|today|yesterday|blocker|help|schedule|office|slide|presentation)\b/i.test(
+          lower
+        );
+      }
+      if (scenarioId.includes('ielts') || scenarioId.includes('academic')) {
+        return /\b(remote|work|working|home|office|company|employee|employer|student|education|technology|society|environment|time|commute|balance|productive|productivity|collaboration|lonely|isolated|flexible|advantage|disadvantage|benefit|drawback|believe|think|opinion|agree|disagree|however|although|furthermore|moreover|because|therefore)\b/i.test(
+          lower
+        );
+      }
+      return true;
+    })();
 
     const missingTokens: string[] = [];
     const isFirstTurn = !history || history.filter((h) => h.speaker === 'user').length === 0;
     if (isFirstTurn) {
-      if (scenarioId.includes('hometown')) {
-        if (!/\b(live|house|from|home|stay|city|town|park|cafe)\b/i.test(lower)) {
-          missingTokens.push('live in', 'near my house');
-        }
-      } else if (scenarioId.includes('cafe')) {
-        if (!/\b(would like|i'd like|could i|may i|can i|please|order|topic|studying|project)\b/i.test(lower)) {
-          missingTokens.push("I'd like", 'Could I have');
+      if (scenarioId.includes('cafe')) {
+        if (!/\b(would like|i'd like|could i|may i|can i|please)\b/i.test(lower)) {
+          missingTokens.push("I'd like...", 'Could I have...');
         }
       } else if (scenarioId.includes('weekend') || scenarioId.includes('past')) {
-        if (!/\b(went|visited|stayed|ate|watched|played|studied|worked|had|loved|was)\b/i.test(lower)) {
-          missingTokens.push('went to', 'had a great time');
-        }
-      } else if (scenarioId.includes('ielts')) {
         if (
-          !/\b(although|however|while|on the other hand|furthermore|because|believe|think)\b/i.test(
+          !/\b(went|visited|stayed|ate|drank|watched|played|studied|worked|had|met|saw|bought|was|were)\b/i.test(
             lower
           )
         ) {
-          missingTokens.push('Although', 'On the other hand');
+          missingTokens.push('went to (V2)', 'ate / met (V2)');
+        }
+      } else if (scenarioId.includes('ielts')) {
+        if (
+          !/\b(although|however|while|on the other hand|furthermore|because|believe|think|in my opinion)\b/i.test(
+            lower
+          )
+        ) {
+          missingTokens.push('Although / However', 'because');
         }
       }
     }
 
     const wordCount = exact.split(/\s+/).filter(Boolean).length;
-    const isTooShort = wordCount < 2;
+    const isTooShort = wordCount < 3;
+    const isOffTopicOrGibberish = !hasFiniteVerbOrGreeting || !hasScenarioRelevance;
 
     if (
       hasSubjectDrop ||
+      hasBePlusBaseVerb ||
+      hasDoubleConjunction ||
+      hasMissingAuxProgressive ||
+      hasBrokenWordOrderOrPrep ||
       hasPastTenseError ||
       hasModalToError ||
       hasBareWantRequest ||
-      isTooShort
+      isTooShort ||
+      isOffTopicOrGibberish
     ) {
       let misconceptionId = 'EN_INCOMPLETE_CLAUSE_01';
       let whyFailsId =
-        'Kalimat masih terlalu singkat atau belum memuat struktur penghubung yang utuh untuk menjawab konteks situasi.';
+        'Kalimat masih terlalu singkat atau belum memuat struktur subjek + kata kerja yang utuh sesuai konteks situasi.';
       let whyFailsTh =
-        'ประโยคยังสั้นเกินไปหรือยังไม่มีโครงสร้างคำเชื่อมที่สมบูรณ์ตามบริบทของสถานการณ์';
+        'ประโยคยังสั้นเกินไปหรือยังไม่มีโครงสร้างประธาน + กริยาที่สมบูรณ์ตามบริบทของสถานการณ์';
       let syntacticCorrection = scenario.sampleUtterances[0]?.text || exact;
 
-      if (hasBareWantRequest) {
+      if (hasBePlusBaseVerb && hasDoubleConjunction) {
+        misconceptionId = 'EN_STATIVE_BE_AND_DOUBLE_CONJ';
+        whyFailsId =
+          'Miskonsepsi Ganda: (1) Kata kerja "agree/want" adalah verba aktif/statif sehingga tidak boleh didahului "am/is/are" (gunakan "I agree", bukan "I am agree"). (2) Dalam satu kalimat kompleks, jangan gunakan "Although" dan "but" sekaligus—pilih salah satu.';
+        whyFailsTh =
+          'ความเข้าใจผิด 2 จุด: (1) ห้ามใช้ am/is/are นำหน้ากริยา agree/want (ต้องใช้ "I agree" ไม่ใช่ "I am agree") และ (2) ห้ามใช้ "Although" ร่วมกับ "but" ในประโยคเดียวกัน';
+        syntacticCorrection =
+          'I agree that remote work is beneficial. Although it saves commuting time, people can feel isolated at home.';
+      } else if (hasBePlusBaseVerb && hasMissingAuxProgressive) {
+        misconceptionId = 'EN_DOUBLE_VERB_AND_MISSING_AUX';
+        whyFailsId =
+          'Miskonsepsi Verba Ganda & Progressive: (1) Jangan gabungkan "am" dengan kata kerja dasar "want" (gunakan "I would like a hot coffee"). (2) Untuk rencana Present Continuous, wajib sertakan to be "am" sebelum V-ing ("I am meeting my friend at the library").';
+        whyFailsTh =
+          'ความเข้าใจผิดเรื่องกริยาซ้อน: (1) ห้ามใช้ "I am want" (ควรใช้ "I would like...") และ (2) ต้องใส่ "am" หน้า V-ing ("I am meeting my friend at the library")';
+        syntacticCorrection =
+          "I'd like a hot coffee, please. After this, I am meeting my friend at the library.";
+      } else if (hasBePlusBaseVerb) {
+        misconceptionId = 'EN_REDUNDANT_BE_BEFORE_VERB';
+        whyFailsId =
+          'Miskonsepsi To Be + Kata Kerja Dasar: Jangan menaruh "am/is/are" di depan kata kerja murni seperti "want" atau "agree". Gunakan langsung "I agree..." atau bentuk sopan "I would like...".';
+        whyFailsTh =
+          'ความเข้าใจผิดเรื่อง To Be + กริยาแท้: ห้ามใส่ "am/is/are" หน้ากริยาแท้ เช่น want หรือ agree ให้ใช้ "I agree..." หรือ "I would like..."';
+        syntacticCorrection = scenarioId.includes('ielts')
+          ? 'I agree that remote work is good because it saves commuting time.'
+          : "I'd like a hot coffee, please.";
+      } else if (hasDoubleConjunction) {
+        misconceptionId = 'EN_DOUBLE_CONJUNCTION_ALTHOUGH_BUT';
+        whyFailsId =
+          'Miskonsepsi Konjungsi Ganda (Although ... but): Dalam tata bahasa Inggris, klausa yang diawali "Although" tidak boleh diikuti "but" pada klausa utama. Hapus kata "but".';
+        whyFailsTh =
+          'ความเข้าใจผิดเรื่องคำเชื่อมซ้อน (Although ... but): เมื่อใช้ "Although" แล้ว ห้ามใส่ "but" ซ้ำในประโยคหลัก';
+        syntacticCorrection =
+          'Although remote work saves commuting time, employees can feel lonely at home.';
+      } else if (hasMissingAuxProgressive) {
+        misconceptionId = 'EN_MISSING_BE_AUX_PROGRESSIVE';
+        whyFailsId =
+          'Miskonsepsi Present Continuous Tanpa Auxiliary (To Be): Kata kerja "-ing" (seperti "meeting" / "going") wajib didahului "am/is/are" ("I am meeting...").';
+        whyFailsTh =
+          'ความเข้าใจผิดเรื่อง Present Continuous ที่ขาดกริยาช่วย (To Be): กริยาเติม -ing ต้องมี am/is/are นำหน้าเสมอ ("I am meeting...")';
+        syntacticCorrection =
+          "I'd like a hot coffee, please. After this, I am meeting my friend at the library.";
+      } else if (hasBrokenWordOrderOrPrep) {
+        misconceptionId = 'EN_WORD_ORDER_SVO_AND_PREPOSITION';
+        whyFailsId =
+          'Miskonsepsi Urutan Kata (SVO) & Preposisi Arah: Bahasa Inggris wajib berpola Subjek + Kata Kerja ("I went", bukan "Went I"), tujuan menggunakan preposisi "to" ("went to Bandung"), dan sifat memerlukan kopula ("I was very happy").';
+        whyFailsTh =
+          'ความเข้าใจผิดเรื่องลำดับคำ (SVO) และบุพบท: ต้องเรียง ประธาน + กริยา ("I went" ไม่ใช่ "Went I") ใช้ "to" บอกจุดหมาย ("went to Bandung") และใช้กริยาช่วย "was" หน้าคำคุณศัพท์';
+        syntacticCorrection =
+          'Yesterday I went to Bandung with my family, and I was very happy.';
+      } else if (hasPastTenseError) {
+        misconceptionId = 'EN_PAST_TENSE_IRREGULAR_OR_BASE';
+        whyFailsId =
+          'Miskonsepsi Morfologi Past Simple: Untuk menceritakan pengalaman lampau, gunakan kata kerja bentuk kedua (V2 irregular: "went", "bought", "ate", bukan "go/goed", "buy/buyed", atau "eat/eated").';
+        whyFailsTh =
+          'ความเข้าใจผิดเรื่อง Past Simple: เมื่อเล่าเหตุการณ์ในอดีต ต้องใช้กริยาช่องที่ 2 (went, bought, ate ไม่ใช่ go/goed หรือ eat/eated)';
+        syntacticCorrection =
+          'Last weekend I went to Bandung with my family and we ate delicious local food.';
+      } else if (hasBareWantRequest) {
         misconceptionId = 'EN_PRAGMATIC_BARE_WANT';
         whyFailsId =
-          'Penggunaan "I want..." secara langsung terdengar kurang sopan dalam situasi layanan. Gunakan modal "I would like..." atau "Could I have...".';
+          'Miskonsepsi Pragmatis Kesopanan: Mengucapkan "I want..." secara langsung di kafe terdengar kurang sopan. Gunakan "I would like..." atau "Could I have...".';
         whyFailsTh =
           'การใช้ "I want..." โดยตรงฟังดูห้วนเกินไปในร้านอาหาร ควรใช้ "I would like..." หรือ "Could I have..."';
         syntacticCorrection =
           "I'd like an iced latte, please. Afterward, I plan to read at the library.";
-      } else if (hasPastTenseError) {
-        misconceptionId = 'EN_PAST_TENSE_BASE_VERB';
-        whyFailsId =
-          'Miskonsepsi Morfologi Waktu Lampau: Kata keterangan waktu lampau (yesterday/last weekend) wajib diikuti kata kerja bentuk kedua (V2: went, bought, ate), bukan bentuk dasar (go, buy).';
-        whyFailsTh =
-          'ความเข้าใจผิดเรื่อง Past Tense: เมื่อกล่าวถึงอดีต ต้องใช้กริยาช่องที่ 2 (went, bought) ไม่ใช่รูปพื้นฐาน (go, buy)';
-        syntacticCorrection =
-          'Yesterday I went to the night market with my family and bought delicious snacks.';
       } else if (hasSubjectDrop || hasModalToError) {
         misconceptionId = 'EN_CLAUSE_SUBJECT_OMISSION';
         whyFailsId =
-          'Miskonsepsi Sintaksis Klausa: Dalam Bahasa Inggris, kata hubung "because" wajib diikuti Subjek eksplisit ("because it is..."), dan modal tidak boleh diikuti "to".';
+          'Miskonsepsi Sintaksis Klausa: Kata hubung "because" wajib diikuti Subjek eksplisit ("because it is..."), dan modal verb tidak boleh diikuti "to".';
         whyFailsTh =
           'ความเข้าใจผิดด้านโครงสร้างประโยค: หลัง "because" ต้องมีประธานชัดเจน ("because it is...") และหลังกริยาช่วยไม่ต้องใส่ "to"';
         syntacticCorrection =
           'Although working from home is convenient because it saves time, it can reduce team collaboration.';
+      } else if (isOffTopicOrGibberish) {
+        misconceptionId = 'EN_OFF_TOPIC_OR_NO_PREDICATE';
+        whyFailsId =
+          'Kalimat belum memiliki kata kerja (predikat) yang bermakna atau kata-kata yang disusun belum menjawab konteks skenario percakapan. Gunakan kalimat utuh berpola Subjek + Kata Kerja + Objek.';
+        whyFailsTh =
+          'ประโยคยังไม่มีคำกริยาที่สมบูรณ์ หรือคำที่เรียงยังไม่ตรงกับบริบทของสถานการณ์ กรุณาพูดเป็นประโยคที่มี ประธาน + กริยา + กรรม';
+        syntacticCorrection = scenario.sampleUtterances[0]?.text || exact;
       }
 
-      const aiReply = scenarioId.includes('hometown')
-        ? 'I see! Could you say it in a full sentence using "I live in..." and tell me what is near your house?'
-        : scenarioId.includes('cafe')
-          ? 'I see! To sound more polite at the counter, could you try ordering again using "I would like..." and tell me where you plan to go afterward?'
-          : 'Good effort! Try expressing that again with the complete sentence pattern so your meaning is crystal clear.';
+      const aiReply = scenarioId.includes('cafe')
+        ? 'I see! To make your sentence natural and grammatically accurate, try using "I would like..." and "I am meeting... at the library." Could you try saying it again?'
+        : scenarioId.includes('past') || scenarioId.includes('weekend')
+          ? 'Nice try! Remember to start with the subject "I" followed by the past tense verb like "went to..." and "ate...". Could you tell me again about your trip?'
+          : scenarioId.includes('ielts')
+            ? 'Good point! Just a quick grammar tip: say "I agree" (without "am") and avoid using "Although" together with "but". Could you rephrase your argument?'
+            : 'Good effort! Try expressing that again using the suggested sentence structure so your meaning is clear.';
 
       return {
         ok: false,
-        accuracyScore: 54,
-        grammarScore: 48,
-        fluencyScore: isTooShort ? 52 : 68,
-        vocabUsageScore: missingTokens.length > 0 ? 55 : 72,
+        accuracyScore: 48,
+        grammarScore: 42,
+        fluencyScore: isTooShort ? 45 : 64,
+        vocabUsageScore: isOffTopicOrGibberish ? 35 : 65,
         userExactTranscript: exact,
         misconceptionId,
         whyFailsId,
@@ -350,14 +457,15 @@ export function evaluateUtteranceClientSide(params: {
           missingTokens.length > 0 ? ` คำหรือโครงสร้างที่ยังขาด: ${missingTokens.join(', ')}` : ''
         }`,
         aiReply,
-        aiReplyTranslationId: scenarioId.includes('hometown')
-          ? 'Begitu! Bisakah kamu mengucapkannya dalam kalimat utuh menggunakan "I live in..." dan ceritakan ada apa di dekat rumahmu?'
-          : scenarioId.includes('cafe')
-            ? 'Begitu! Agar terdengar lebih sopan di kasir, bisakah kamu mencoba memesan lagi dengan "I would like..." serta menceritakan rencanamu setelah ini?'
-            : 'Usaha yang bagus! Coba ucapkan kembali dengan pola kalimat lengkap agar maknanya lebih presisi.',
-        aiReplyTranslationTh: scenarioId.includes('hometown')
-          ? 'เข้าใจแล้ว! ลองพูดเป็นประโยคเต็มโดยใช้ "I live in..." และบอกหน่อยว่าแถวบ้านของคุณมีอะไรบ้าง?'
-          : 'เข้าใจแล้ว! ลองพูดอีกครั้งด้วยโครงสร้างประโยคที่สมบูรณ์เพื่อให้ความหมายชัดเจนขึ้นนะ',
+        aiReplyTranslationId: scenarioId.includes('cafe')
+          ? 'Begitu! Agar kalimatmu alami dan tepat secara tata bahasa, coba gunakan "I would like..." serta "I am meeting... at the library." Bisa coba ucapkan sekali lagi?'
+          : scenarioId.includes('past') || scenarioId.includes('weekend')
+            ? 'Usaha yang bagus! Ingat untuk mengawali dengan subjek "I" diikuti kata kerja lampau seperti "went to..." dan "ate...". Bisa ceritakan lagi perjalananmu?'
+            : scenarioId.includes('ielts')
+              ? 'Poin yang menarik! Catatan tata bahasa singkat: gunakan "I agree" (tanpa "am") dan jangan gunakan "Although" bersamaan dengan "but". Bisa ucapkan ulang argumenmu?'
+              : 'Usaha yang bagus! Coba ucapkan kembali dengan pola kalimat yang disarankan agar maknanya jelas.',
+        aiReplyTranslationTh:
+          'ลองพูดอีกครั้งตามโครงสร้างประโยคที่แนะนำเพื่อให้ถูกต้องตามหลักไวยากรณ์นะ',
         nextSuggestedReplies: getBeginnerReplyCards(
           scenarioId,
           targetLang,
@@ -391,9 +499,9 @@ export function evaluateUtteranceClientSide(params: {
       syntacticCorrection: null,
       naturalReformulation: exact,
       pedagogicalFeedbackId:
-        'Struktur kalimat, pemilihan kosakata kontekstual, dan kesopanan pragmatis sudah tepat dan alami.',
+        'Struktur kalimat, ketepatan tense/verba, dan kesopanan pragmatis sudah tepat sesuai konteks skenario.',
       pedagogicalFeedbackTh:
-        'โครงสร้างประโยค การเลือกใช้คำศัพท์ และความสุภาพเหมาะสมและเป็นธรรมชาติมาก',
+        'โครงสร้างประโยค การเลือกใช้คำกริยา และความสุภาพเหมาะสมตามบริบทของสถานการณ์',
       aiReply: dynamicTurn.aiReply,
       aiReplyTranslationId: dynamicTurn.aiReplyTranslationId,
       aiReplyTranslationTh: dynamicTurn.aiReplyTranslationTh,
@@ -408,51 +516,134 @@ export function evaluateUtteranceClientSide(params: {
     };
   }
 
-  // Japanese (ja) evaluation
-  const hasWrongLocationParticle = /(駅に|コンビニに|どこに).*?(います|ありますか|お弁当)/u.test(
-    exact
-  );
-  const lacksPoliteEnding =
-    exact.length > 10 &&
-    !/(です|ます|ください|ませんか|でしょうか|ですか|お願いします|ありがとう|こんにちは|こんばんは|はい|ええ)[。！？!?]?$/u.test(
+  // Japanese (ja) evaluation — Strict Braincore Particle, Conjugation, & Register Diagnostics
+  const hasVerbDictPlusDesu =
+    /(飲む|食べる|行く|来る|する|見る|買う|読む|書く|話す|帰る|待つ|遊ぶ|休む|働く|勉強する|お願いする)\s*です/u.test(
+      exact
+    ) || /\b(nomu|taberu|iku|kuru|suru|miru|kau|yomu)\s+desu\b/i.test(lower);
+
+  const hasWrongObjectParticle =
+    /(コーヒー|紅茶|水|お茶|ラテ|ケーキ|パン|サンドイッチ|メニュー|注文)(に|が)(くだもの|一つ|二つ|お願い|ください|飲む|飲みます|食べる|食べます)/u.test(
+      exact
+    ) ||
+    /(コーヒー|ケーキ|紅茶|ラテ)に[^。、]*?(飲む|飲みます|ください|お願いします)/u.test(exact) ||
+    /\b(kohi|koohii|coffee|keki)\s+ni\s+(kudasai|onegaishimasu|nomu|nomimasu)\b/i.test(lower);
+
+  const hasWrongTaraConjugation =
+    /(するたら|くるたら|いくたら|飲むたら|食べるたら|読むたら|買うたら)/u.test(exact) ||
+    /\b(surutara|kurutara|ikutara|nomutara|taberutara)\b/i.test(lower);
+
+  const hasWrongLocationParticle =
+    /(駅に|コンビニに|どこに).*?(います|ありますか|お弁当)/u.test(exact) ||
+    /(図書館|カフェ|部屋|学校|うち|家)に(勉強|練習|仕事|読書)(する|します|した|しました)/u.test(
       exact
     );
-  const isTooShortJa = exact.length < 2;
 
-  if (hasWrongLocationParticle || lacksPoliteEnding || isTooShortJa) {
-    const misconceptionId = hasWrongLocationParticle
-      ? 'JA_PARTICLE_NI_VS_DE_OR_WA'
-      : 'JA_REGISTER_MISSING_DESU_MASU';
-    const whyFailsId = hasWrongLocationParticle
-      ? 'Miskonsepsi Partikel Lokasi: Gunakan 「〜はどこですか」 untuk menanyakan letak tempat, atau 「〜を温めてください」 untuk meminta menghangatkan objek.'
-      : 'Miskonsepsi Register Sopan (Teineigo): Dalam percakapan situasi umum/stasiun/konbini, akhiri kalimat dengan bentuk sopan 「〜です / 〜ます / 〜てください」.';
-    const whyFailsTh = hasWrongLocationParticle
-      ? 'ความเข้าใจผิดเรื่องคำช่วยสถานที่: ใช้ 「〜はどこですか」 เมื่อถามตำแหน่งสถานที่ หรือใช้ 「〜を温めてください」 เมื่อขอให้อุ่นอาหาร'
-      : 'ความเข้าใจผิดเรื่องระดับความสุภาพ (Teineigo): ในสถานการณ์ทั่วไปควรลงท้ายประโยคด้วยรูปสุภาพ 「〜です / 〜ます / 〜てください」';
-    const syntacticCorrection = scenario.sampleUtterances[0]?.text || exact;
-    const aiReply =
-      'なるほど！もう少し丁寧な形（「〜をお願いします」や「〜はどこですか」）でもう一度言ってみましょうか？';
+  const lacksPoliteEnding =
+    exact.length > 4 &&
+    !/(です|ます|ました|ません|ください|ませんか|でしょうか|ですか|お願いします|ありがとう|ありがとうございます|こんにちは|こんばんは|お疲れ様です|はい|ええ)[。！？!?]?$/u.test(
+      exact
+    ) &&
+    !/\b(desu|masu|mashita|masen|kudasai|onegaishimasu|arigatou|arigato|hai)\b/i.test(lower);
+
+  const isGibberishJa =
+    /^(あいうえお|かきくけこ|さしすせそ|たちつてと|なにぬねの|あ+|い+|う+|え+|お+|テスト)(です|ます)?[。！？!?]?$/u.test(
+      exact
+    ) ||
+    (!/(コーヒー|紅茶|お茶|水|ラテ|ケーキ|パン|メニュー|店内|持ち帰り|一つ|二つ|お願い|ください|いくら|おすすめ|カード|現金|テスト|試験|勉強|文法|漢字|言葉|宿題|先生|先輩|一緒|図書館|質問|どう|いい|大丈夫|はい|ありがとう|すみません|こんにちは|お疲れ様)/u.test(
+      exact
+    ) &&
+      !/\b(kohi|koohii|keki|kudasai|onegaishimasu|tesuto|benkyou|benkyo|sensei|senpai|hai|arigato)\b/i.test(
+        lower
+      ));
+
+  const isTooShortJa = exact.length < 4;
+
+  if (
+    hasVerbDictPlusDesu ||
+    hasWrongObjectParticle ||
+    hasWrongTaraConjugation ||
+    hasWrongLocationParticle ||
+    lacksPoliteEnding ||
+    isGibberishJa ||
+    isTooShortJa
+  ) {
+    let misconceptionId = 'JA_REGISTER_MISSING_DESU_MASU';
+    let whyFailsId =
+      'Miskonsepsi Register Sopan (Teineigo): Dalam percakapan situasi umum atau dengan senpai/staf, akhiri kalimat dengan bentuk sopan 「〜です / 〜ます / 〜てください / 〜をお願いします」.';
+    let whyFailsTh =
+      'ความเข้าใจผิดเรื่องระดับความสุภาพ (Teineigo): ในสถานการณ์ทั่วไปควรลงท้ายประโยคด้วยรูปสุภาพ 「〜です / 〜ます / 〜てください」';
+    let syntacticCorrection = scenario.sampleUtterances[0]?.text || exact;
+    const missingTokens: string[] = [];
+
+    if (hasVerbDictPlusDesu || hasWrongObjectParticle) {
+      misconceptionId =
+        hasVerbDictPlusDesu && hasWrongObjectParticle
+          ? 'JA_PARTICLE_NI_AND_VERB_DICT_DESU'
+          : hasVerbDictPlusDesu
+            ? 'JA_MORPH_VERB_DICT_PLUS_DESU'
+            : 'JA_PARTICLE_DIRECT_OBJECT_O';
+      whyFailsId =
+        'Miskonsepsi Partikel Objek & Konjugasi Masu-kei: (1) Objek pesanan wajib ditandai partikel 「を」 (bukan 「に」). (2) Kata kerja bentuk kamus seperti 「飲む」 TIDAK BOLEH langsung ditambah 「です」（「×飲むです」 salah; gunakan 「飲みます」 atau pola pesanan sopan 「ホットコーヒーを一つお願いします」).';
+      whyFailsTh =
+        'ความเข้าใจผิดเรื่องคำช่วยกรรมตรงและรูปกริยา: (1) กรรมตรงต้องใช้คำช่วย 「を」 (ไม่ใช่ 「に」) และ (2) ห้ามวาง 「です」 หลังกริยารูปพจนานุกรมโดยตรง (「×飲むです」 ผิด ต้องใช้ 「飲みます」 หรือ 「〜をお願いします」)';
+      syntacticCorrection = 'ホットコーヒーを一つお願いします。';
+      missingTokens.push('を (partikel objek)', '〜をお願いします / 飲みます');
+    } else if (hasWrongTaraConjugation) {
+      misconceptionId = 'JA_CONJUGATION_TARA_TA_FORM';
+      whyFailsId =
+        'Miskonsepsi Konjugasi Pengandaian/Saran (〜たら): Pola 「〜たらいいですか」 wajib dibentuk dari Ta-form (bentuk lampau biasa), bukan bentuk kamus + たら. Ubah 「×勉強するたら」 menjadi 「○勉強したら」（する → した + ら = したら）dan tambahkan 「どうやって」 untuk menanyakan cara.';
+      whyFailsTh =
+        'ความเข้าใจผิดเรื่องการผันรูป 〜たら: ต้องผันกริยาเป็นรูปอดีต (Ta-form) ก่อนเติม ら ดังนั้น 「×勉強するたら」 จึงผิด ต้องใช้ 「○勉強したら」 (する → した + ら)';
+      syntacticCorrection = '来週テストがあるので、どうやって勉強したらいいですか？';
+      missingTokens.push('勉強したら (Ta-form + ら)', 'どうやって');
+    } else if (hasWrongLocationParticle) {
+      misconceptionId = 'JA_PARTICLE_NI_VS_DE_OR_WA';
+      whyFailsId =
+        'Miskonsepsi Partikel Lokasi Aktivitas: Untuk tempat berlangsungnya aksi aktif (seperti belajar atau minum di kafe), gunakan partikel 「で」 (mis. 「図書館で勉強します」), bukan 「に」.';
+      whyFailsTh =
+        'ความเข้าใจผิดเรื่องคำช่วยสถานที่ทำกิจกรรม: สถานที่ที่ทำกิจกรรมต้องใช้คำช่วย 「で」 (เช่น 「図書館で勉強します」) ไม่ใช่ 「に」';
+      syntacticCorrection = scenarioId.includes('senpai')
+        ? '図書館で一緒に勉強してもいいですか？'
+        : '店内でホットコーヒーを飲みます。';
+      missingTokens.push('で (partikel lokasi aksi)');
+    } else if (isGibberishJa || isTooShortJa) {
+      misconceptionId = 'JA_OFF_TOPIC_OR_INCOMPLETE';
+      whyFailsId =
+        'Kalimat belum memuat kosakata atau maksud yang sesuai dengan konteks percakapan saat ini. Gunakan kosakata skenario (seperti menyebutkan pesanan dengan 「〜をお願いします」 atau bertanya kepada lawan bicara).';
+      whyFailsTh =
+        'ประโยคยังไม่มีคำศัพท์หรือความหมายที่ตรงกับบริบทของการสนทนา กรุณาใช้คำศัพท์และโครงสร้างที่แนะนำในสถานการณ์นี้';
+      syntacticCorrection = scenario.sampleUtterances[0]?.text || exact;
+      missingTokens.push(scenario.sampleUtterances[0]?.text || '〜をお願いします');
+    } else if (lacksPoliteEnding) {
+      missingTokens.push('〜です / 〜ます / 〜をお願いします');
+    }
+
+    const aiReply = scenarioId.includes('senpai')
+      ? 'なるほど！テストの相談ですね。「勉強するたら」ではなく、タ形を使って「どうやって勉強したらいいですか？」と言ってみましょう！もう一度どうぞ。'
+      : 'なるほど！注文するときは助詞の「を」を使って、「ホットコーヒーを一つお願いします」や「飲みます」と言ってみましょうか？';
 
     return {
       ok: false,
-      accuracyScore: 52,
-      grammarScore: 49,
-      fluencyScore: 60,
-      vocabUsageScore: 58,
+      accuracyScore: 46,
+      grammarScore: 40,
+      fluencyScore: isTooShortJa ? 45 : 58,
+      vocabUsageScore: isGibberishJa ? 30 : 62,
       userExactTranscript: exact,
       misconceptionId,
       whyFailsId,
       whyFailsTh,
-      missingTokens: lacksPoliteEnding ? ['〜てください / 〜ですか'] : [],
+      missingTokens,
       syntacticCorrection,
       naturalReformulation: syntacticCorrection,
       pedagogicalFeedbackId: whyFailsId,
       pedagogicalFeedbackTh: whyFailsTh,
       aiReply,
-      aiReplyTranslationId:
-        'Begitu! Mari coba ucapkan sekali lagi menggunakan bentuk sopan (seperti "〜o onegaishimasu" atau "〜wa doko desu ka")?',
+      aiReplyTranslationId: scenarioId.includes('senpai')
+        ? 'Begitu! Konsultasi soal ujian ya. Bukan "benkyou suru tara", melainkan gunakan bentuk lampau (Ta-form) menjadi "dou yatte benkyou shitara ii desu ka?". Yuk coba ucapkan sekali lagi!'
+        : 'Begitu! Saat memesan, mari gunakan partikel objek "o" menjadi "Hotto kōhī o hitotsu onegaishimasu" atau "nomimasu". Yuk coba ucapkan lagi!',
       aiReplyTranslationTh:
-        'เข้าใจแล้วค่ะ! ลองพูดอีกครั้งในรูปสุภาพ (เช่น "〜o onegaishimasu" หรือ "〜wa doko desu ka") ดูไหมคะ?',
+        'เข้าใจแล้วค่ะ! ลองพูดใหม่อีกครั้งโดยใช้โครงสร้างและคำช่วยที่ถูกต้องตามคำแนะนำนะคะ',
       nextSuggestedReplies: getBeginnerReplyCards(
         scenarioId,
         targetLang,
@@ -486,9 +677,9 @@ export function evaluateUtteranceClientSide(params: {
     syntacticCorrection: null,
     naturalReformulation: exact,
     pedagogicalFeedbackId:
-      'Penggunaan partikel bahasa Jepang dan ragam sopan (Desu/Masu/Kudasai) sudah tepat sesuai konteks.',
+      'Penggunaan partikel bahasa Jepang dan ragam sopan (Desu/Masu/Onegaishimasu) sudah tepat sesuai konteks.',
     pedagogicalFeedbackTh:
-      'การใช้คำช่วยภาษาญี่ปุ่นและรูปประโยคสุภาพ (Desu/Masu/Kudasai) ถูกต้องตามบริบท',
+      'การใช้คำช่วยภาษาญี่ปุ่นและรูปประโยคสุภาพ (Desu/Masu/Onegaishimasu) ถูกต้องตามบริบท',
     aiReply: dynamicJaTurn.aiReply,
     aiReplyTranslationId: dynamicJaTurn.aiReplyTranslationId,
     aiReplyTranslationTh: dynamicJaTurn.aiReplyTranslationTh,
@@ -504,7 +695,12 @@ export function evaluateUtteranceClientSide(params: {
 }
 
 let _turnApiAvailable: boolean | null = null;
-let _ttsApiAvailable: boolean | null = null;
+let _ttsCooldownUntil = 0;
+let _ttsConsecutiveFailures = 0;
+const _ttsMemoryCache = new Map<
+  string,
+  { audioBase64: string; audioMimeType: string; engine: string }
+>();
 
 /**
  * Evaluates a user speaking turn with ultra-low latency:
@@ -640,26 +836,35 @@ export async function evaluateTurnFlexible(params: {
 }
 
 /**
- * Fast TTS synthesis with circuit breaker so dead/cold endpoints never stall conversation.
+ * Fast TTS synthesis with per-persona voice routing, in-memory audio cache, and
+ * temporary cooldown instead of a permanent kill-switch.
  */
 export async function synthesizeFlexibleTts(params: {
   text: string;
   targetLang: TargetLang;
   persona?: VoicePersona;
 }): Promise<{ audioBase64: string; audioMimeType: string; engine: string } | null> {
-  if (_ttsApiAvailable === false) {
-    return null;
-  }
-
   const speakerMap: Record<string, string> = {
     coach_alex: 'coach_alex',
     coach_sarah: 'coach_sarah',
     sensei_nanami: 'sensei_nanami',
-    sensei_keita: 'sensei_keita',
+    sensei_keita: 'keita',
+    nanami: 'sensei_nanami',
+    keita: 'keita',
   };
   const speaker =
     (params.persona && speakerMap[params.persona.id]) ||
     (params.targetLang === 'ja' ? 'sensei_nanami' : 'coach_alex');
+
+  const cacheKey = `${speaker}:${params.targetLang}:${params.text.trim()}`;
+  const cached = _ttsMemoryCache.get(cacheKey);
+  if (cached) {
+    return cached;
+  }
+
+  if (Date.now() < _ttsCooldownUntil) {
+    return null;
+  }
 
   const endpoint =
     (typeof window !== 'undefined' && window.FIEZEL_VOICE_STUDIO_CONFIG?.ttsApiUrl) ||
@@ -667,7 +872,7 @@ export async function synthesizeFlexibleTts(params: {
 
   try {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 1400);
+    const timer = setTimeout(() => controller.abort(), 3500);
     const res = await fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -688,29 +893,41 @@ export async function synthesizeFlexibleTts(params: {
         for (let i = 0; i < bytes.byteLength; i++) {
           binary += String.fromCharCode(bytes[i]);
         }
-        _ttsApiAvailable = true;
-        return {
+        _ttsConsecutiveFailures = 0;
+        _ttsCooldownUntil = 0;
+        const result = {
           audioBase64: btoa(binary),
           audioMimeType: contentType.split(';')[0] || 'audio/mpeg',
           engine: 'fiezel-edge-tts-binary',
         };
+        _ttsMemoryCache.set(cacheKey, result);
+        return result;
       }
       if (contentType.includes('application/json')) {
         const json = await res.json();
         const b64 = json?.audioBase64 || json?.audio_base64 || json?.audio || json?.data;
         if (typeof b64 === 'string' && b64.length > 32) {
-          _ttsApiAvailable = true;
-          return {
+          _ttsConsecutiveFailures = 0;
+          _ttsCooldownUntil = 0;
+          const result = {
             audioBase64: b64.replace(/^data:audio\/[^;]+;base64,/, ''),
             audioMimeType: json?.mimeType || json?.audioMimeType || 'audio/mpeg',
             engine: 'fiezel-edge-tts-json',
           };
+          _ttsMemoryCache.set(cacheKey, result);
+          return result;
         }
       }
     }
-    _ttsApiAvailable = false;
+    _ttsConsecutiveFailures += 1;
+    if (_ttsConsecutiveFailures >= 2) {
+      _ttsCooldownUntil = Date.now() + 6000;
+    }
   } catch {
-    _ttsApiAvailable = false;
+    _ttsConsecutiveFailures += 1;
+    if (_ttsConsecutiveFailures >= 2) {
+      _ttsCooldownUntil = Date.now() + 6000;
+    }
   }
 
   return null;

@@ -72,7 +72,7 @@ export default function App() {
         const urlParams = new URLSearchParams(window.location.search);
         const tabParam = urlParams.get('tab') || urlParams.get('view');
         if (tabParam === 'home' || tabParam === 'call' || tabParam === 'braincore') {
-          return 'call';
+          return tabParam === 'braincore' ? 'braincore' : 'call';
         }
       }
     } catch {
@@ -343,8 +343,31 @@ export default function App() {
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
         const utter = new SpeechSynthesisUtterance(text);
-        utter.lang = activeScenario.targetLang === 'ja' ? 'ja-JP' : 'en-US';
+        const targetLangCode = activeScenario.targetLang === 'ja' ? 'ja-JP' : 'en-US';
+        utter.lang = targetLangCode;
         utter.rate = targetRate * 0.98;
+        utter.pitch = activePersona.gender === 'male' ? 0.9 : 1.08;
+        try {
+          const voices = window.speechSynthesis.getVoices() || [];
+          const langPrefix = activeScenario.targetLang === 'ja' ? 'ja' : 'en';
+          const langVoices = voices.filter((v) =>
+            v.lang.toLowerCase().startsWith(langPrefix)
+          );
+          if (langVoices.length > 0) {
+            const preferredHint =
+              activePersona.id === 'sensei_keita'
+                ? /keita|ichiro|otoya|male|takumi/i
+                : activePersona.id === 'sensei_nanami'
+                  ? /nanami|kyoko|haruka|ayumi|female/i
+                  : activePersona.id === 'coach_alex'
+                    ? /guy|alex|daniel|david|christopher|male/i
+                    : /aria|sarah|samantha|jenny|zira|female/i;
+            const matched = langVoices.find((v) => preferredHint.test(v.name));
+            utter.voice = matched || langVoices[0];
+          }
+        } catch {
+          // Ignore voice selection errors
+        }
         utter.onend = () => setIsPlayingAiAudio(false);
         utter.onerror = () => setIsPlayingAiAudio(false);
         window.speechSynthesis.speak(utter);
@@ -1264,7 +1287,7 @@ export default function App() {
       }
     }
     playFiezelSfx('button_tap');
-    setActiveTab('call');
+    setActiveTab(nextTab === 'braincore' ? 'braincore' : 'call');
   };
 
   const handleBackToPwa = (e: React.MouseEvent) => {
@@ -1348,6 +1371,7 @@ export default function App() {
 
   const handleRefreshLiveAssist = async () => {
     setIsRefreshingAssist(true);
+    let updatedFromServer = false;
     try {
       const res = await fetch('/api/voice-call/assist', {
         method: 'POST',
@@ -1367,11 +1391,29 @@ export default function App() {
         const data = await res.json();
         if (Array.isArray(data?.suggestions) && data.suggestions.length > 0) {
           setNextSuggestedReplies(data.suggestions);
+          updatedFromServer = true;
         }
       }
     } catch {
       // Uses deterministic contextual synthesizer fallback automatically
     } finally {
+      if (!updatedFromServer) {
+        const localFresh = getBeginnerReplyCards(
+          activeScenario.id,
+          activeScenario.targetLang,
+          undefined,
+          activeAiLiveText,
+          lastUserTurn?.text || '',
+          turns.map((tr) => ({ speaker: tr.speaker, text: tr.text }))
+        );
+        if (localFresh.length > 1) {
+          const rotated = [...localFresh.slice(1), localFresh[0]].map((c, idx) => ({
+            ...c,
+            id: `${c.id}_r${Date.now()}_${idx}`,
+          }));
+          setNextSuggestedReplies(rotated);
+        }
+      }
       setIsRefreshingAssist(false);
     }
   };
@@ -1710,10 +1752,16 @@ export default function App() {
               </div>
 
               <div className="flex items-center justify-between sm:justify-end gap-2.5 pt-2 sm:pt-0 border-t sm:border-t-0 border-[#F0E4CF] shrink-0">
-                <div className="fz-badge-paw font-mono tabular-nums">
+                <button
+                  type="button"
+                  data-testid="btn-open-braincore"
+                  onClick={() => handleTabChange('braincore')}
+                  title="Buka Analitik Braincore OLM & Buku Catatan Miskonsepsi"
+                  className="fz-badge-paw font-mono tabular-nums cursor-pointer hover:bg-[#FFF3C4] transition-colors"
+                >
                   <FiezelPawStamp className="w-3.5 h-3.5 text-[#8C2233]" />
                   <span>BKT {Math.round(currentMasteryP * 100)}%</span>
-                </div>
+                </button>
 
                 <button
                   type="button"
@@ -1845,8 +1893,8 @@ export default function App() {
                             {activePersona.accentLabel} · {activeScenario.level}
                           </span>
                         </div>
-                        <h1 className="font-display text-xl sm:text-2xl font-bold text-[#241A11] leading-none flex items-center gap-1.5">
-                          <span>PAW</span>
+                        <h1 className="font-display text-xl sm:text-2xl font-bold text-[#241A11] leading-none flex items-center gap-1.5 flex-wrap">
+                          <span>PAW · {activePersona.name}</span>
                           <FiezelSparkleOrnament className="w-5 h-5" />
                         </h1>
 
@@ -2009,20 +2057,24 @@ export default function App() {
                   </div>
 
                   {/* SPOTLIGHT PERTANYAAN PAW & TERJEMAHAN REALTIME (dengan Pita Kiri Solar Gold .fz-solar-ribbon) */}
-                  {!isMeasureMode && showTranslations && (
-                    <div
-                      data-testid="live-translation-hud"
-                      className="relative z-10 bg-[#FFF9EE] border border-[#F0E4CF] fz-solar-ribbon rounded-2xl p-4 sm:p-5 space-y-3 shadow-2xs"
-                    >
-                      <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
-                        <span className="inline-flex items-center gap-2 font-bold text-[#8C2233] uppercase tracking-wider text-[11px]">
-                          <span className="w-2 h-2 rounded-full bg-[#2E8B69] animate-pulse" />
-                          <span>
-                            {locale === 'th'
+                  <div
+                    data-testid="live-translation-hud"
+                    className="relative z-10 bg-[#FFF9EE] border border-[#F0E4CF] fz-solar-ribbon rounded-2xl p-4 sm:p-5 space-y-3 shadow-2xs"
+                  >
+                    <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+                      <span className="inline-flex items-center gap-2 font-bold text-[#8C2233] uppercase tracking-wider text-[11px]">
+                        <span className="w-2 h-2 rounded-full bg-[#2E8B69] animate-pulse" />
+                        <span>
+                          {isMeasureMode || !showTranslations
+                            ? locale === 'th'
+                              ? 'คำถามจาก PAW'
+                              : 'Pertanyaan PAW'
+                            : locale === 'th'
                               ? 'คำถามจาก PAW และคำแปลเรียลไทม์'
                               : 'Pertanyaan PAW & Terjemahan Realtime'}
-                          </span>
                         </span>
+                      </span>
+                      {!isMeasureMode && (
                         <button
                           type="button"
                           onClick={() => void speakAiText(activeAiLiveText, undefined, 0.8)}
@@ -2031,17 +2083,19 @@ export default function App() {
                           <Volume2 className="w-3.5 h-3.5 text-[#8C2233]" />
                           <span>Dengar Pelan (0.8x)</span>
                         </button>
-                      </div>
+                      )}
+                    </div>
 
-                      {/* Kalimat Pertanyaan AI */}
-                      <p
-                        data-testid="live-hud-ai-text"
-                        className="text-base sm:text-lg font-bold text-[#241A11] leading-snug tracking-tight break-words"
-                      >
-                        AI: "{activeAiLiveText}"
-                      </p>
+                    {/* Kalimat Pertanyaan AI */}
+                    <p
+                      data-testid="live-hud-ai-text"
+                      className="text-base sm:text-lg font-bold text-[#241A11] leading-snug tracking-tight break-words"
+                    >
+                      AI: "{activeAiLiveText}"
+                    </p>
 
-                      {/* Kotak Terjemahan Langsung */}
+                    {/* Kotak Terjemahan Langsung (Hanya jika bukan Mode Ujian & Terjemahan Aktif) */}
+                    {!isMeasureMode && showTranslations && (
                       <div
                         data-testid="live-hud-ai-translation"
                         className="bg-[#E9F7F0] border border-[#2E8B69]/30 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-[#241A11] flex items-start gap-2 break-words"
@@ -2055,19 +2109,21 @@ export default function App() {
                             : activeAiSubtitle.translationId}"
                         </span>
                       </div>
+                    )}
 
-                      {activeUserSubtitle && (
-                        <div className="pt-2 border-t border-[#F0E4CF] flex flex-wrap items-center justify-between gap-1 text-xs text-[#6E5E47]">
-                          <span>
-                            🎙️ <b className="text-[#241A11]">Jawabanmu:</b> "{activeUserSubtitle.text}"
-                          </span>
+                    {activeUserSubtitle && (
+                      <div className="pt-2 border-t border-[#F0E4CF] flex flex-wrap items-center justify-between gap-1 text-xs text-[#6E5E47]">
+                        <span>
+                          🎙️ <b className="text-[#241A11]">Jawabanmu:</b> "{activeUserSubtitle.text}"
+                        </span>
+                        {!isMeasureMode && showTranslations && (
                           <span className="text-[#8C6D1F] font-semibold">
                             ({locale === 'th' ? activeUserSubtitle.translationTh : activeUserSubtitle.translationId})
                           </span>
-                        </div>
-                      )}
-                    </div>
-                  )}
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </section>
 
                 {/* 3. BANTUAN CARA JAWAB PEMULA REALTIME */}
@@ -2173,7 +2229,7 @@ export default function App() {
                             <div className="flex items-center justify-between text-xs text-[#6E5E47]">
                               <span className="font-bold text-[#8C2233] flex items-center gap-1.5">
                                 <FiezelPawStamp className="w-3 h-3" />
-                                <span>PAW (AI)</span>
+                                <span>PAW · {activePersona.name} (AI)</span>
                               </span>
                               <div className="flex items-center gap-1.5">
                                 <button
@@ -2300,15 +2356,25 @@ export default function App() {
                 <h1 className="text-lg font-bold text-[#241A11] mt-1.5">{t(locale, 'olm.title')}</h1>
                 <p className="text-xs text-[#6E5E47] mt-0.5">{t(locale, 'olm.subtitle')}</p>
               </div>
-              <button
-                type="button"
-                onClick={handleManualSync}
-                disabled={syncingNow}
-                className="relative z-10 px-4 py-2.5 rounded-xl btn-sun-tactile font-bold text-xs flex items-center justify-center gap-1.5 shrink-0 cursor-pointer"
-              >
-                <RefreshCw className={`w-3.5 h-3.5 ${syncingNow ? 'animate-spin' : ''}`} />
-                <span>{t(locale, 'olm.synced')}</span>
-              </button>
+              <div className="relative z-10 flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  data-testid="btn-back-to-call"
+                  onClick={() => handleTabChange('call')}
+                  className="px-3.5 py-2.5 rounded-xl bg-[#FFF3DC] hover:bg-[#FFF3C4] border border-[#F0E4CF] text-[#241A11] font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <span>← Kembali ke Panggilan</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleManualSync}
+                  disabled={syncingNow}
+                  className="px-4 py-2.5 rounded-xl btn-sun-tactile font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${syncingNow ? 'animate-spin' : ''}`} />
+                  <span>{t(locale, 'olm.synced')}</span>
+                </button>
+              </div>
             </div>
 
             <BraincoreTrendChart

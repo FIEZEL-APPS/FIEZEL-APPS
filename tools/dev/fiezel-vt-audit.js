@@ -80,7 +80,7 @@ const SAMPLER = `window.__vtSample = function () {
   console.log('-- animationDuration .fade:', await page.evaluate(() => getComputedStyle(document.querySelector('#app .fade')).animationDuration));
 
   const results = [];
-  for (const [sel, label] of [['[data-testid="nav-game"]', 'home->game'], ['[data-testid="nav-home"]', 'game->home'], ['[data-testid="nav-progress"]', 'home->progress'], ['[data-testid="nav-home"]', 'progress->home']]) {
+  for (const [sel, label] of [['[data-testid="nav-latihan"]', 'home->latihan'], ['[data-testid="nav-home"]', 'latihan->home'], ['[data-testid="nav-progress"]', 'home->progress'], ['[data-testid="nav-home"]', 'progress->home']]) {
     await page.evaluate(() => {
       window.__vt = []; window.__vtStop = false;
       const tick = () => { try { window.__vt.push(window.__vtSample()); } catch (e) {} if (!window.__vtStop) requestAnimationFrame(tick); };

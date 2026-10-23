@@ -192,131 +192,143 @@ export function createBlankCompetency(
 }
 
 export function getDefaultSpeakingHistory(): SpeakingSessionMetric[] {
-  const now = Date.now();
-  return [
-    {
-      id: 'hist_1',
-      turnLabel: 'Gilir #1',
-      timestamp: now - 3600_000 * 6,
-      scenarioId: 'scen_en_a2_cafe',
-      competencyId: 'speak_en_a2_cafe',
-      targetLang: 'en',
-      ok: false,
-      grammarScore: 52,
-      fluencyScore: 64,
-      vocabUsageScore: 68,
-      accuracyScore: 56,
-      bktMasteryPct: 38,
-      speakingDurationSec: 18,
-      userExactTranscript: 'I am want hot coffee and later meeting friend.',
-    },
-    {
-      id: 'hist_2',
-      turnLabel: 'Gilir #2',
-      timestamp: now - 3600_000 * 5,
-      scenarioId: 'scen_en_a2_past_trip',
-      competencyId: 'speak_en_a2_past_trip',
-      targetLang: 'en',
-      ok: false,
-      grammarScore: 44,
-      fluencyScore: 70,
-      vocabUsageScore: 65,
-      accuracyScore: 48,
-      bktMasteryPct: 42,
-      speakingDurationSec: 22,
-      userExactTranscript: 'Last weekend I goed to Bandung with my brother.',
-    },
-    {
-      id: 'hist_3',
-      turnLabel: 'Gilir #3',
-      timestamp: now - 3600_000 * 4,
-      scenarioId: 'scen_en_a2_cafe',
-      competencyId: 'speak_en_a2_cafe',
-      targetLang: 'en',
-      ok: true,
-      grammarScore: 86,
-      fluencyScore: 82,
-      vocabUsageScore: 88,
-      accuracyScore: 85,
-      bktMasteryPct: 54,
-      speakingDurationSec: 25,
-      userExactTranscript: "I'd like a cappuccino, please. After this, I am studying at the library.",
-    },
-    {
-      id: 'hist_4',
-      turnLabel: 'Gilir #4',
-      timestamp: now - 3600_000 * 2,
-      scenarioId: 'scen_en_a2_cafe',
-      competencyId: 'speak_en_a2_cafe',
-      targetLang: 'en',
-      ok: true,
-      grammarScore: 92,
-      fluencyScore: 89,
-      vocabUsageScore: 91,
-      accuracyScore: 91,
-      bktMasteryPct: 62,
-      speakingDurationSec: 29,
-      userExactTranscript:
-        "I'd like an iced latte, please. After coffee, I am meeting my study group.",
-    },
-    {
-      id: 'hist_5',
-      turnLabel: 'Gilir #5',
-      timestamp: now - 3600_000 * 1,
-      scenarioId: 'scen_ja_n5_kissaten',
-      competencyId: 'speak_ja_n5_kissaten',
-      targetLang: 'ja',
-      ok: true,
-      grammarScore: 94,
-      fluencyScore: 88,
-      vocabUsageScore: 92,
-      accuracyScore: 92,
-      bktMasteryPct: 58,
-      speakingDurationSec: 21,
-      userExactTranscript: 'すみません、ホットコーヒーを一つとチーズケーキを一つください。',
-    },
-  ];
+  return [];
+}
+
+const HOST_COMPETENCY_ALIASES: Record<string, string[]> = {
+  vocab_daily_a2: ['vocab_daily_a2', 'vocab_en_a2_cafe', 'vocab_en_a2_daily'],
+  vocab_travel_a2: ['vocab_travel_a2', 'vocab_en_b1_work', 'vocab_en_a2_past_trip'],
+  vocab_academic_b1: ['vocab_academic_b1', 'vocab_en_b2_academic', 'vocab_en_b2_ielts'],
+  vocab_ja_cafe_n5: ['vocab_ja_cafe_n5', 'vocab_ja_n5_cafe', 'vocab_ja_n5_kissaten'],
+  vocab_ja_campus_n4: ['vocab_ja_campus_n4', 'vocab_ja_n4_campus', 'vocab_ja_n4_senpai'],
+  speak_en_a2_cafe: ['speak_en_a2_cafe', 'kaiwa_en_a2_cafe'],
+  speak_en_a2_past_trip: ['speak_en_a2_past_trip', 'kaiwa_en_a2_past_trip'],
+  speak_en_b1_job_interview: ['speak_en_b1_job_interview', 'kaiwa_en_b1_work'],
+  speak_en_b2_ielts_part3: ['speak_en_b2_ielts_part3', 'kaiwa_en_b2_academic'],
+  speak_ja_n5_kissaten: ['speak_ja_n5_kissaten', 'kaiwa_ja_n5_kissaten'],
+  speak_ja_n4_senpai_advice: ['speak_ja_n4_senpai_advice', 'kaiwa_ja_n4_senpai'],
+};
+
+function mergeHostBraincoreMastery(
+  competencies: Record<string, CompetencyRecord>
+): Record<string, CompetencyRecord> {
+  if (typeof localStorage === 'undefined') return competencies;
+  try {
+    const rawHostBkt = localStorage.getItem('fiezel-mastery-bkt-v1');
+    if (!rawHostBkt) return competencies;
+    const hostBkt = JSON.parse(rawHostBkt);
+    const hostSkills = hostBkt?.skills || hostBkt?.competencies || hostBkt || {};
+    if (!hostSkills || typeof hostSkills !== 'object') return competencies;
+
+    const merged = { ...competencies };
+    const applySkillEntry = (targetId: string, entry: any) => {
+      if (!entry || typeof entry !== 'object') return;
+      const hostP = Number(entry.p ?? entry.pMastery ?? entry.mastery ?? NaN);
+      if (Number.isNaN(hostP) || !Number.isFinite(hostP)) return;
+      const clampedP = Number(Math.max(0.01, Math.min(0.99, hostP)).toFixed(4));
+      const hostAttempts = Math.max(0, Number(entry.attempts ?? entry.n ?? 0));
+      const hostCorrect = Math.max(0, Number(entry.correct ?? entry.c ?? 0));
+      const existing = merged[targetId] || createBlankCompetency(targetId, BRAINCORE_PARAMS.P_INIT);
+      if (clampedP > existing.pMastery || hostAttempts > existing.attempts) {
+        const nextP = Math.max(existing.pMastery, clampedP);
+        const updated: CompetencyRecord = {
+          ...existing,
+          pMastery: nextP,
+          pMasteryDecayed: nextP,
+          attempts: Math.max(existing.attempts, hostAttempts),
+          correct: Math.max(existing.correct, hostCorrect),
+          exposures: Math.max(existing.exposures, hostAttempts > 0 ? hostAttempts : 1),
+          lastAt: entry.lastAt || existing.lastAt || Date.now(),
+        };
+        updated.state = deriveMasteryState(updated);
+        merged[targetId] = updated;
+      }
+    };
+
+    for (const [canonicalId, aliases] of Object.entries(HOST_COMPETENCY_ALIASES)) {
+      for (const alias of aliases) {
+        if (hostSkills[alias]) {
+          applySkillEntry(canonicalId, hostSkills[alias]);
+          if (alias !== canonicalId) {
+            applySkillEntry(alias, hostSkills[alias]);
+          }
+        }
+      }
+    }
+    for (const [skillKey, skillVal] of Object.entries(hostSkills)) {
+      applySkillEntry(skillKey, skillVal);
+    }
+    return merged;
+  } catch {
+    return competencies;
+  }
+}
+
+function syncCompetencyToHostBkt(comp: CompetencyRecord): void {
+  if (typeof localStorage === 'undefined') return;
+  try {
+    const key = 'fiezel-mastery-bkt-v1';
+    let hostBkt: any = null;
+    try {
+      hostBkt = JSON.parse(localStorage.getItem(key) || 'null');
+    } catch {
+      hostBkt = null;
+    }
+    if (!hostBkt || typeof hostBkt !== 'object') {
+      hostBkt = { version: 1, skills: {} };
+    }
+    if (!hostBkt.skills || typeof hostBkt.skills !== 'object') {
+      hostBkt.skills = {};
+    }
+    const aliases = HOST_COMPETENCY_ALIASES[comp.competencyId] || [comp.competencyId];
+    for (const targetKey of aliases) {
+      const prev = hostBkt.skills[targetKey] || {};
+      hostBkt.skills[targetKey] = {
+        ...prev,
+        p: comp.pMasteryDecayed ?? comp.pMastery,
+        pMastery: comp.pMastery,
+        attempts: comp.attempts,
+        correct: comp.correct,
+        streak: comp.streak,
+        state: comp.state,
+        lastAt: comp.lastAt || Date.now(),
+      };
+    }
+    hostBkt.updatedAt = Date.now();
+    localStorage.setItem(key, JSON.stringify(hostBkt));
+  } catch {
+    // Ignore storage errors
+  }
 }
 
 export function getInitialBraincoreState(): BraincoreStoreState {
-  const defaultHistory = getDefaultSpeakingHistory();
-  const initialTotalSeconds = defaultHistory.reduce((acc, item) => acc + item.speakingDurationSec, 0);
+  const baseCompetencies: Record<string, CompetencyRecord> = {
+    vocab_daily_a2: createBlankCompetency('vocab_daily_a2', 0.74, 5, 4),
+    vocab_travel_a2: createBlankCompetency('vocab_travel_a2', 0.42, 2, 1),
+    vocab_academic_b1: createBlankCompetency('vocab_academic_b1', 0.68, 4, 3),
+    vocab_ja_cafe_n5: createBlankCompetency('vocab_ja_cafe_n5', 0.65, 4, 3),
+    vocab_ja_campus_n4: createBlankCompetency('vocab_ja_campus_n4', 0.38, 2, 1),
+    speak_en_a2_cafe: createBlankCompetency('speak_en_a2_cafe', 0.62, 4, 3),
+    speak_en_a2_past_trip: createBlankCompetency('speak_en_a2_past_trip', 0.48, 3, 1),
+    speak_en_b1_job_interview: createBlankCompetency('speak_en_b1_job_interview', 0.56, 3, 2),
+    speak_en_b2_ielts_part3: createBlankCompetency('speak_en_b2_ielts_part3', 0.64, 4, 3),
+    speak_ja_n5_kissaten: createBlankCompetency('speak_ja_n5_kissaten', 0.58, 3, 2),
+    speak_ja_n4_senpai_advice: createBlankCompetency('speak_ja_n4_senpai_advice', 0.44, 2, 1),
+  };
+
   return {
     version: 1,
     updatedAt: Date.now(),
     tabId: TAB_ID,
     learnerLocale: 'id',
     targetLang: 'en',
-    competencies: {
-      vocab_daily_a2: createBlankCompetency('vocab_daily_a2', 0.74, 5, 4),
-      vocab_travel_a2: createBlankCompetency('vocab_travel_a2', 0.42, 2, 1),
-      vocab_academic_b1: createBlankCompetency('vocab_academic_b1', 0.68, 4, 3),
-      vocab_ja_cafe_n5: createBlankCompetency('vocab_ja_cafe_n5', 0.65, 4, 3),
-      vocab_ja_campus_n4: createBlankCompetency('vocab_ja_campus_n4', 0.38, 2, 1),
-      speak_en_a2_cafe: createBlankCompetency('speak_en_a2_cafe', 0.62, 4, 3),
-      speak_en_a2_past_trip: createBlankCompetency('speak_en_a2_past_trip', 0.48, 3, 1),
-      speak_en_b1_job_interview: createBlankCompetency('speak_en_b1_job_interview', 0.56, 3, 2),
-      speak_en_b2_ielts_part3: createBlankCompetency('speak_en_b2_ielts_part3', 0.64, 4, 3),
-      speak_ja_n5_kissaten: createBlankCompetency('speak_ja_n5_kissaten', 0.58, 3, 2),
-      speak_ja_n4_senpai_advice: createBlankCompetency('speak_ja_n4_senpai_advice', 0.44, 2, 1),
-    },
-    misconceptionLedger: {
-      'speak_en_a2_past_trip::past_tense_irregular_goed': {
-        competencyId: 'speak_en_a2_past_trip',
-        misconceptionId: 'past_tense_irregular_goed',
-        frequency: 2,
-        firstAt: Date.now() - 86400_000 * 2,
-        lastAt: Date.now() - 3600_000 * 5,
-        resolved: false,
-        lastUtterance: 'Last weekend I goed to Bandung with my brother.',
-        correctionPattern: 'Use irregular past "went" instead of regularizing "go" to "goed".',
-      },
-    },
+    competencies: mergeHostBraincoreMastery(baseCompetencies),
+    misconceptionLedger: {},
     syncQueue: [],
-    speakingHistory: defaultHistory,
-    totalVoiceMinutes: Math.max(1, Math.round(initialTotalSeconds / 60)),
-    totalSpeakingSeconds: initialTotalSeconds,
-    completedCallSessions: 3,
+    speakingHistory: [],
+    totalVoiceMinutes: 0,
+    totalSpeakingSeconds: 0,
+    completedCallSessions: 0,
   };
 }
 
@@ -395,11 +407,62 @@ export function bridgeAttemptToHostPwa(eventPayload: Record<string, unknown>): v
         ts: Date.now(),
       });
       localStorage.setItem(chatKey, JSON.stringify(chatSaved));
+
+      if (!eventPayload.ok && eventPayload.misconceptionId) {
+        try {
+          const ledgerKey = 'fiezel-misconception-ledger-v1';
+          const rawLedger = localStorage.getItem(ledgerKey);
+          const hostLedger = rawLedger ? JSON.parse(rawLedger) : { version: 1, items: {} };
+          if (!hostLedger.items || typeof hostLedger.items !== 'object') {
+            hostLedger.items = {};
+          }
+          const mId = String(eventPayload.misconceptionId);
+          const prev = hostLedger.items[mId] || { count: 0, firstSeen: Date.now() };
+          hostLedger.items[mId] = {
+            ...prev,
+            id: mId,
+            competencyId: String(eventPayload.competencyId || ''),
+            scenarioId: String(eventPayload.scenarioId || ''),
+            lastUtterance: String(eventPayload.userTranscript || ''),
+            count: (prev.count || 0) + 1,
+            lastSeen: Date.now(),
+          };
+          localStorage.setItem(ledgerKey, JSON.stringify(hostLedger));
+        } catch {
+          // Ignore
+        }
+      }
     }
     if (typeof window !== 'undefined') {
       window.dispatchEvent(
         new CustomEvent('fiezel:voice-studio:attempt', { detail: eventPayload })
       );
+      const hostWin =
+        window.parent && window.parent !== window ? (window.parent as any) : (window as any);
+      try {
+        if (typeof hostWin.bktRecord === 'function') {
+          hostWin.bktRecord(
+            String(eventPayload.competencyId || 'kaiwa_general'),
+            Boolean(eventPayload.ok),
+            {
+              source: 'voice-studio',
+              misconceptionId: eventPayload.misconceptionId || null,
+            }
+          );
+        }
+        if (typeof hostWin.updateMastery === 'function') {
+          hostWin.updateMastery(
+            String(eventPayload.competencyId || 'kaiwa_general'),
+            Boolean(eventPayload.ok),
+            {
+              source: 'voice-studio',
+              misconceptionId: eventPayload.misconceptionId || null,
+            }
+          );
+        }
+      } catch {
+        // Ignore cross-origin frame access if any
+      }
       if (window.parent && window.parent !== window) {
         window.parent.postMessage(
           { type: 'FIEZEL_VOICE_STUDIO_ATTEMPT', payload: eventPayload },
@@ -451,15 +514,27 @@ export function loadBraincoreState(): BraincoreStoreState {
       parsed.learnerLocale = hostPrefs.learnerLocale;
     }
     const now = Date.now();
-    if (!Array.isArray(parsed.speakingHistory) || parsed.speakingHistory.length === 0) {
-      parsed.speakingHistory = getDefaultSpeakingHistory();
+    if (!Array.isArray(parsed.speakingHistory)) {
+      parsed.speakingHistory = [];
+    } else {
+      parsed.speakingHistory = parsed.speakingHistory.filter(
+        (item) => !/^hist_[1-5]$/.test(String(item?.id || ''))
+      );
     }
-    if (typeof parsed.totalSpeakingSeconds !== 'number' || parsed.totalSpeakingSeconds <= 0) {
+    if (
+      parsed.misconceptionLedger &&
+      parsed.misconceptionLedger['speak_en_a2_past_trip::past_tense_irregular_goed']?.lastUtterance ===
+        'Last weekend I goed to Bandung with my brother.'
+    ) {
+      delete parsed.misconceptionLedger['speak_en_a2_past_trip::past_tense_irregular_goed'];
+    }
+    if (typeof parsed.totalSpeakingSeconds !== 'number' || parsed.totalSpeakingSeconds < 0) {
       parsed.totalSpeakingSeconds = parsed.speakingHistory.reduce(
-        (acc, item) => acc + (item.speakingDurationSec || 15),
+        (acc, item) => acc + (item.speakingDurationSec || 0),
         0
       );
     }
+    parsed.competencies = mergeHostBraincoreMastery(parsed.competencies || {});
     if (parsed.competencies) {
       for (const cid of Object.keys(parsed.competencies)) {
         const c = parsed.competencies[cid];
@@ -563,7 +638,9 @@ export function checkPrerequisiteStatus(
   state: BraincoreStoreState,
   prereqCompetencyId: string
 ): { isReady: boolean; pMastery: number; stateLabel: MasteryStateName } {
+  const mergedComps = mergeHostBraincoreMastery(state.competencies || {});
   const comp =
+    mergedComps[prereqCompetencyId] ||
     state.competencies[prereqCompetencyId] ||
     createBlankCompetency(prereqCompetencyId, BRAINCORE_PARAMS.P_INIT);
   const p = comp.pMasteryDecayed ?? comp.pMastery ?? BRAINCORE_PARAMS.P_INIT;
@@ -594,6 +671,7 @@ export function recordVocabPrereqMastery(
     lastAt: Date.now(),
   };
   updatedComp.state = deriveMasteryState(updatedComp);
+  syncCompetencyToHostBkt(updatedComp);
 
   const nextState: BraincoreStoreState = {
     ...state,
@@ -772,6 +850,7 @@ export function recordSpeakingAttempt(
     totalVoiceMinutes: Math.max(1, Math.round(nextTotalSpeakingSeconds / 60)),
   });
 
+  syncCompetencyToHostBkt(updatedComp);
   bridgeAttemptToHostPwa(queueItem);
 
   return {
@@ -802,7 +881,12 @@ export async function brainSyncFlush(
       return { nextState: state, flushedCount: 0 };
     }
     const data = await res.json();
-    const acceptedIds = new Set<string>(data.acceptedIds || []);
+    const acceptedList: string[] = Array.isArray(data?.acceptedIds)
+      ? data.acceptedIds
+      : data?.ok
+        ? state.syncQueue.map((item) => item.id)
+        : [];
+    const acceptedIds = new Set<string>(acceptedList);
     const remaining = state.syncQueue.filter((item) => !acceptedIds.has(item.id));
     const updated = saveBraincoreState({
       ...state,

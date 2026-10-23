@@ -74,6 +74,20 @@ PERSONA_CONFIGS = {
         "pitch": "+3Hz",
         "rate": "+1%",
     },
+    "sensei_nanami": {
+        "edgeVoice": "ja-JP-NanamiNeural",
+        "lang": "ja-JP",
+        "personaLabel": "NanamiSensei · Mitra Kaiwa Jepang (NanamiNeural)",
+        "pitch": "+3Hz",
+        "rate": "+1%",
+    },
+    "sensei_keita": {
+        "edgeVoice": "ja-JP-KeitaNeural",
+        "lang": "ja-JP",
+        "personaLabel": "Keita · Mahasiswa Percakapan Jepang (KeitaNeural)",
+        "pitch": "+4Hz",
+        "rate": "+3%",
+    },
     "keita": {
         "edgeVoice": "ja-JP-KeitaNeural",
         "lang": "ja-JP",
@@ -119,10 +133,10 @@ def resolve_persona(speaker: Optional[str], lang: Optional[str], text: str):
         return PERSONA_CONFIGS["coach_sarah"]
     if "alex" in sp or "guy" in sp:
         return PERSONA_CONFIGS["coach_alex"]
-    if "nanami" in sp or "sensei" in sp:
-        return PERSONA_CONFIGS["nanami"]
-    if "keita" in sp:
+    if "keita" in sp or "kaiwa_male" in sp:
         return PERSONA_CONFIGS["keita"]
+    if "nanami" in sp or "sensei" in sp or "kaiwa_female" in sp:
+        return PERSONA_CONFIGS["nanami"]
     if "ardi" in sp or "instruktur" in sp:
         return PERSONA_CONFIGS["instructor"]
 

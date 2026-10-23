@@ -4407,6 +4407,36 @@
   }
 
   if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+    window.addEventListener('message', function (evt) {
+      try {
+        var msg = evt && evt.data;
+        if (!msg || msg.type !== 'FIEZEL_VOICE_STUDIO_ATTEMPT' || !msg.payload) return;
+        var p = msg.payload;
+        var compId = p.competencyId || 'kaiwa_general';
+        var isOk = Boolean(p.ok);
+        if (typeof root.updateMastery === 'function') {
+          try {
+            root.updateMastery(compId, isOk, {
+              source: 'voice-studio',
+              misconceptionId: p.misconceptionId || null,
+              userTranscript: p.userTranscript || ''
+            });
+          } catch (_) {}
+        }
+        if (typeof root.bktRecord === 'function') {
+          try {
+            root.bktRecord(compId, isOk, {
+              source: 'voice-studio',
+              misconceptionId: p.misconceptionId || null,
+              whyFailsId: p.whyFailsId || null
+            });
+          } catch (_) {}
+        }
+        if (typeof root.brainSyncFlush === 'function') {
+          try { root.brainSyncFlush(); } catch (_) {}
+        }
+      } catch (_) {}
+    });
     window.addEventListener('pagehide', function () {
       if (isChatMounted) api.unmount();
     });

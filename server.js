@@ -514,6 +514,101 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
+  if (pathname === '/api/voice-call/assist' && req.method === 'POST') {
+    const body = await parseJsonBody(req);
+    const targetLang = body.targetLang === 'en' ? 'en' : 'ja';
+    const turnCount = Number(body.turnCount || 0);
+    const suggestions =
+      targetLang === 'ja'
+        ? [
+            {
+              id: `assist_ja_${turnCount}_1`,
+              levelLabel: 'Mudah & Sopan',
+              text: 'はい、ホットコーヒーを一つお願いします。',
+              phonetic: 'Hai, hotto kōhī o hitotsu onegaishimasu.',
+              translationId: 'Ya, tolong satu kopi panas.',
+              translationTh: 'ครับ/ค่ะ ขอชาหรือกาแฟร้อนหนึ่งแก้วครับ/ค่ะ',
+              tipId: 'Gunakan を (o) + お願いします (onegaishimasu) untuk memesan dengan sopan.',
+              tipTh: 'ใช้ を + お願いします เพื่อสั่งอย่างสุภาพ'
+            },
+            {
+              id: `assist_ja_${turnCount}_2`,
+              levelLabel: 'Natural & Lengkap',
+              text: '店内で飲みます。チーズケーキも一つください。',
+              phonetic: 'Tennai de nomimasu. Chīzukēki mo hitotsu kudasai.',
+              translationId: 'Minum di sini. Tolong sekalian satu cheesecake.',
+              translationTh: 'ดื่มที่ร้านครับ/ค่ะ ขอชีสเค้กอีกหนึ่งชิ้นด้วยครับ/ค่ะ',
+              tipId: 'Gunakan で (de) untuk lokasi aktivitas dan も (mo) untuk tambahan pesanan.',
+              tipTh: 'ใช้ で สำหรับสถานที่ทำกิจกรรม และ も สำหรับสั่งเพิ่ม'
+            },
+            {
+              id: `assist_ja_${turnCount}_3`,
+              levelLabel: 'Tanya Balik Natural',
+              text: 'おすすめのメニューは何ですか？カードで払えますか？',
+              phonetic: 'Osusume no menyū wa nan desu ka? Kādo de haraemasu ka?',
+              translationId: 'Menu rekomendasinya apa? Apakah bisa bayar pakai kartu?',
+              translationTh: 'เมนูแนะนำคืออะไรครับ/ค่ะ? จ่ายด้วยบัตรได้ไหม?',
+              tipId: 'Gunakan は何ですか untuk bertanya rekomendasi dengan sopan.',
+              tipTh: 'ใช้ は何ですか เพื่อถามเมนูแนะนำอย่างสุภาพ'
+            }
+          ]
+        : [
+            {
+              id: `assist_en_${turnCount}_1`,
+              levelLabel: 'Polite & Clear',
+              text: 'Last weekend I went to a cozy cafe and met my old friends.',
+              phonetic: 'laast week-end ai went tu a koh-zee ka-fey and met mai old frendz',
+              translationId: 'Akhir pekan lalu saya pergi ke kafe yang nyaman dan bertemu teman lama.',
+              translationTh: 'สุดสัปดาห์ที่แล้วฉันไปคาเฟ่สบายๆ และพบเพื่อนเก่า',
+              tipId: 'Gunakan Past Simple tidak beraturan: went (bukan goed) dan met.',
+              tipTh: 'ใช้ Past Simple กริยาไม่ปกติ: went และ met'
+            },
+            {
+              id: `assist_en_${turnCount}_2`,
+              levelLabel: 'Natural Detail',
+              text: 'We drank iced lattes and talked about our upcoming project for two hours.',
+              phonetic: 'wee drangk aist laa-teyz and tawkt a-bawt aw-er up-kuh-ming pro-jekt',
+              translationId: 'Kami minum es latte dan mengobrol tentang proyek mendatang selama dua jam.',
+              translationTh: 'เราดื่มลาเต้เย็นและคุยเรื่องโปรเจกต์ที่กำลังจะมาถึงสองชั่วโมง',
+              tipId: 'Pastikan kedua kata kerja yang dihubungkan "and" sama-sama memakai bentuk lampau.',
+              tipTh: 'ตรวจสอบให้แน่ใจว่ากริยาทั้งสองตัวที่เชื่อมด้วย and เป็นรูปอดีต'
+            },
+            {
+              id: `assist_en_${turnCount}_3`,
+              levelLabel: 'Engage Partner',
+              text: 'It was really refreshing! How about you, what did you do last weekend?',
+              phonetic: 'it woz ree-lee ri-fresh-ing! haw a-bawt yoo, wot did yoo doo laast week-end?',
+              translationId: 'Sangat menyegarkan! Bagaimana denganmu, apa yang kamu lakukan akhir pekan lalu?',
+              translationTh: 'สดชื่นมากเลย! แล้วคุณล่ะ สุดสัปดาห์ที่แล้วทำอะไรบ้าง?',
+              tipId: 'Tutup cerita dengan pertanyaan balik agar percakapan dua arah tetap hidup.',
+              tipTh: 'ปิดท้ายเรื่องเล่าด้วยคำถามกลับเพื่อให้บทสนทนาไหลลื่น'
+            }
+          ];
+    return sendJson(res, 200, {
+      ok: true,
+      suggestions,
+      serverTime: Date.now()
+    });
+  }
+
+  if (pathname === '/api/braincore/sync' && req.method === 'POST') {
+    const body = await parseJsonBody(req);
+    const items = Array.isArray(body.attempts)
+      ? body.attempts
+      : Array.isArray(body.entries)
+        ? body.entries
+        : [];
+    const acceptedIds = items
+      .map((item) => (item && typeof item.id === 'string' ? item.id : null))
+      .filter(Boolean);
+    return sendJson(res, 200, {
+      ok: true,
+      acceptedIds,
+      syncedCount: acceptedIds.length,
+      serverTime: Date.now()
+    });
+  }
+
   if (pathname.startsWith('/api/')) {
     const body = req.method === 'POST' ? await parseJsonBody(req) : {};
     return sendJson(res, 200, {

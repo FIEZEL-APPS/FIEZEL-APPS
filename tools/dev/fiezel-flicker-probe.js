@@ -163,7 +163,7 @@ function timelineOfFrames(events) {
     for (let i = 0; i < 22; i++) { try { sampleRows.push(await page.evaluate(SAMPLE)); } catch (e) {} await page.waitForTimeout(100); }
   } else {
     const taps = [
-      ['nav-latihan', 'latihan'], ['nav-home', 'home'], ['nav-game', 'game'], ['nav-home', 'home'],
+      ['nav-latihan', 'latihan'], ['nav-home', 'home'],
       ['nav-progress', 'progress'], ['nav-home', 'home'], ['nav-classroom', 'classroom'], ['nav-home', 'home']
     ];
     for (const [tid, view] of taps) {
