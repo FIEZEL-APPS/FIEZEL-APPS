@@ -1,7 +1,8 @@
 # FIEZEL M025-634 — Serah Terima Audit & Perbaikan UI/UX Home Panel
 
-**Build:** `m025-634`  
-**Tanggal:** 24 Oktober 2026  
+**Otoritas:** OWNER / MASTER
+**Build:** `m025-634`
+**Tanggal:** 24 Oktober 2026
 **Cakupan:** Audit empiris UI/UX Home Panel (`.today-home-cockpit`) & eksekusi perbaikan P0, P1, dan P2.
 
 ---

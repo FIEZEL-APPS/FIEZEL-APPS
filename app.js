@@ -11375,7 +11375,7 @@ function todayHomeMarkup(){
 
   /* Classroom Task Banner (Official KelasKu Emerald Identity) */
   const kelaskuCard = `
-    <section class="class-bar" role="button" tabindex="0" aria-label="${esc(FiezelI18n.t('home.classroom-card'))}" onclick="go('classroom')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();go('classroom')}">
+    <section class="class-bar" role="button" tabindex="0" aria-label="${esc(FiezelI18n.t('home.classroom-card'))}" onclick="showToast(FiezelI18n.t('home.classroom-tutup'))" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showToast(FiezelI18n.t('home.classroom-tutup'))}">
       <div class="class-left">
         <div class="class-icon-wrap">
           <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false" style="display:block;">
@@ -11396,7 +11396,7 @@ function todayHomeMarkup(){
           <div class="class-due">${esc(FiezelI18n.t('kelasku.strip-sinkron-guru'))}</div>
         </div>
       </div>
-      <span class="class-btn-3d" aria-hidden="true">${esc(FiezelI18n.t('pawarena.open-story'))} ➔</span>
+      <span class="class-btn-3d" aria-hidden="true">${esc(FiezelI18n.t('home.segera'))} ➔</span>
     </section>`;
 
   /* Home Cockpit: Render pure daylight Tactile Clay interface directly */
