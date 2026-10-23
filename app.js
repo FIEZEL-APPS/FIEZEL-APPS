@@ -7727,12 +7727,12 @@ function homeScreenIsClear(){
   try{
     if(state.view!=='home')return false;
     if(document.body?.classList?.contains?.('auth-locked'))return false;
-    if(document.querySelector('.fiezel-splash,.fiezel-ob,.fz-tour,#fzPrasasti'))return false;
+    if(document.querySelector('.fiezel-splash,.fiezel-ob,.fz-tour,#fzPrasasti,#fzRitual'))return false;
     const gate=$('welcome'),auth=$('authGate'),modal=$('modal');
     if(gate&&!gate.classList.contains('hidden'))return false;
     if(auth&&!auth.classList.contains('hidden'))return false;
     if(modal&&!modal.classList.contains('hidden'))return false;
-    return !!document.querySelector('.learning-launcher,.launcher-actions .primary');
+    return !!document.querySelector('#heroCard,.learning-launcher,.launcher-actions .primary');
   }catch{return false}
 }
 // m026-03: TUR BERSESI. Daftar langkahnya hidup di features/onboarding/fiezel-tour.js
@@ -7764,7 +7764,7 @@ function tourLayerIsClear(){
        state.view) dan tur mendarat di atas soal hidup. */
     if(self.FiezelStage?.lessonMode?.())return false;
     if(document.body?.classList?.contains?.('auth-locked'))return false;
-    if(document.querySelector('.fiezel-splash,.fiezel-ob,.fz-tour,#fzPrasasti'))return false;
+    if(document.querySelector('.fiezel-splash,.fiezel-ob,.fz-tour,#fzPrasasti,#fzRitual'))return false;
     const gate=$('welcome'),auth=$('authGate'),modal=$('modal');
     if(gate&&!gate.classList.contains('hidden'))return false;
     if(auth&&!auth.classList.contains('hidden'))return false;
@@ -10807,8 +10807,8 @@ function todayHomeMarkup(){
   const motivasiKeys = ['home.motivasi-2', 'home.motivasi-3', 'home.motivasi-4', 'home.motivasi-5', 'home.motivasi-6'];
   const currentMotivation = FiezelI18n.t(kembali ? 'home.motivasi-kembali' : motivasiKeys[Math.floor(Date.now() / 86400000) % motivasiKeys.length]);
 
-  /* State apakah sudah pernah melakukan test level / placement */
-  const hasTestedLevel = !!(state && (state.placementDone || (state.history && state.history.some(h => h.type === 'placement' || h.type === 'test'))));
+  /* State apakah sudah pernah melakukan test level / placement (kursus Jepang langsung mulai N5) */
+  const hasTestedLevel = !!(jaCourseOn() || (state && (state.placementDone || (state.history && state.history.some(h => h.type === 'placement' || h.type === 'test')))));
   /* Label tombol kartu 1 = label aksi yang SAMA dengan tombol utama (ujian level saat terkunci,
      "lanjutkan" saat sesi tertunda). Dulu teksnya selalu "Mulai latihan" walau tombolnya
      membuka ujian level. */
@@ -10848,7 +10848,7 @@ function todayHomeMarkup(){
     + `<span class="tactile-kicker-dot" aria-hidden="true"></span>`
     + `<span class="tactile-kicker-text">${isTh ? 'เป้าหมายวันนี้' : 'SESI HARI INI'}</span>`
     + `</div>`
-    + `<div class="fz-greet-title">${esc(FiezelI18n.t('home.sapa', { nama: currentLearner }))}</div>`
+    + `<h1 class="fz-greet-title">${esc(FiezelI18n.t('home.sapa', { nama: currentLearner }))}</h1>`
     + `</div>`
     /* m025-577: runtun NOL tidak ditulis "1 HARI". Audit Home 2026-09-27 sudah mencabut `|| 1`
        dari kartu-kartu, lencana ini tertinggal; angka karangan di layar pertama justru yang
@@ -11156,9 +11156,10 @@ function todayHomeMarkup(){
   const heroOn=uxOn('heroRencana');
   let heroFokus='';try{heroFokus=heroOn?alasanFokusDariPolicy(buildAdaptivePolicy()).nama:''}catch(_){}
   const heroRawan=(heroOn&&state.adaptiveReady&&!locked)?heroKataRawan():null;
+  const heroLevelLabel=(jaCourseOn()&&typeof FiezelJaUi!=='undefined'&&FiezelJaUi&&typeof FiezelJaUi.jlptLabel==='function')?FiezelJaUi.jlptLabel(todayLevel):todayLevel;
   const heroModel=heroOn?heroRencanaModel({
-    placementDone:!!state.placementDone,adaptiveReady:!!state.adaptiveReady,locked,ja:jaCourseOn(),
-    due:todayReview,fokusNama:heroFokus,soal:shape.soal||10,menit:shape.menit||10,level:todayLevel,
+    placementDone:!!(state.placementDone||jaCourseOn()),adaptiveReady:!!state.adaptiveReady,locked,ja:jaCourseOn(),
+    due:todayReview,fokusNama:heroFokus,soal:shape.soal||10,menit:shape.menit||10,level:heroLevelLabel,
     menitTes:placementMinutes(),rawan:heroRawan
   }):{kicker:FiezelI18n.t('hero.kicker-target'),pil:[],kata:{mode:'harian',judul:'',meta:FiezelI18n.t('hero.kata-harian')}};
   /* Kata hero: kata rawan (bila model memilihnya) atau kata hari ini. Tombol suaranya memutar
@@ -11171,8 +11172,11 @@ function todayHomeMarkup(){
   /* Label tombol mengikuti aksi yang SUNGGUH dijalankan: ujian level saat terkunci, "lanjutkan"
      saat sesi tertunda. Dulu teksnya selalu "MULAI SESI HARI INI" apa pun aksinya. */
   const heroCtaText=!hasTestedLevel?primaryBtnText:(locked||(state.activeSession&&state.adaptiveReady))?label:FiezelI18n.t('hero.cta-mulai',{menit:shape.menit||12});
+  const heroKickerText=selesai?FiezelI18n.t('today.selesai-judul'):heroModel.kicker;
+  const heroBtnLabel=selesai?FiezelI18n.t('today.selesai-cta'):heroCtaText;
+  const heroPills=selesai?[{kind:'selesai',icon:'check-circle-2',text:FiezelI18n.t('today.selesai-body')}]:heroModel.pil;
   const heroCard = `
-    <section class="hero-card${heroModel.kata.mode==='rawan'?' is-rawan':''}" id="heroCard" data-testid="hero-rencana">
+    <section class="hero-card${heroModel.kata.mode==='rawan'?' is-rawan':''}${selesai?' is-done':''}" id="heroCard" data-testid="hero-rencana" data-done="${selesai?'1':'0'}">
       <div class="hero-header-row">
         <div class="hero-tag">
           <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false" style="display:block;flex-shrink:0;">
@@ -11180,7 +11184,7 @@ function todayHomeMarkup(){
             <circle cx="12" cy="12" r="5.8" fill="#FDE68A" stroke="#B45309" stroke-width="1.4"/>
             <circle cx="12" cy="12" r="2.5" fill="#EF4444"/>
           </svg>
-          <span>${esc(heroModel.kicker)}</span>
+          <span>${esc(heroKickerText)}</span>
         </div>
         <div class="hero-rhythm-badge" id="heroRhythmText">
           ${esc(FiezelI18n.t('hero.ritme'))} <span>${rhythmShown}/${rhythmTarget}</span> (${rhythmPct}%)
@@ -11218,16 +11222,16 @@ function todayHomeMarkup(){
         </button>
       </div>
 
-      ${heroModel.pil.length?`<div class="hero-plan" data-testid="hero-plan">${heroModel.pil.map(x=>`<span class="adaptive-sub hero-pil" data-pil="${esc(x.kind)}"><i data-lucide="${esc(x.icon)}" aria-hidden="true"></i><span>${esc(x.text)}</span></span>`).join('')}</div>`:''}
+      ${heroPills.length?`<div class="hero-plan" data-testid="hero-plan">${heroPills.map(x=>`<span class="adaptive-sub hero-pil" data-pil="${esc(x.kind)}"><i data-lucide="${esc(x.icon)}" aria-hidden="true"></i><span>${esc(x.text)}</span></span>`).join('')}</div>`:''}
 
       <!-- Chunky Tactile 3D Action CTA (Solar Gold Clay) -->
-      <button type="button" class="hero-cta-btn" id="btnStartSession" onclick="event.stopPropagation();${primaryBtnAction}">
+      <button type="button" class="hero-cta-btn" id="btnStartSession" data-done="${selesai?'1':'0'}" onclick="event.stopPropagation();${primaryBtnAction}">
         <span class="fz-i" style="width: 18px; height: 18px; color: var(--gold-text);">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" fill="currentColor"/>
           </svg>
         </span>
-        <span>${esc(heroCtaText)}</span>
+        <span>${esc(heroBtnLabel)}</span>
         <span>→</span>
       </button>
     </section>`;
@@ -11239,7 +11243,7 @@ function todayHomeMarkup(){
       <div class="quick-practice-head">
         <div class="section-headline">
           <h2 class="quick-practice-title section-title">${esc(FiezelI18n.t('home.latihan-singkat'))}</h2>
-          <span class="section-see-all" onclick="go('latihan')">Semua Modul →</span>
+          <span class="section-see-all" role="button" tabindex="0" onclick="go('latihan')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();go('latihan')}">${esc(FiezelI18n.t('home.latihan-soal-sub'))} →</span>
         </div>
         <small class="quick-practice-hint" style="display:none">${FiezelI18n.t('home.pilih-fokus-label')}</small>
       </div>
@@ -11247,7 +11251,7 @@ function todayHomeMarkup(){
 
       <div class="quick-grid" style="margin-top: 8px;">
         <!-- Card 1: Kosakata -->
-        <div class="grid-tile" onclick="go('vocab')">
+        <div class="grid-tile" role="button" tabindex="0" onclick="go('vocab')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();go('vocab')}">
           <div class="tile-top">
             <div class="tile-icon-3d vocab">
               <svg viewBox="0 0 24 24" width="27" height="27" aria-hidden="true" focusable="false" style="display:block;">
@@ -11265,7 +11269,7 @@ function todayHomeMarkup(){
                 <path d="M8.5 5.5h4" stroke="rgba(255,255,255,0.6)" stroke-width="1.2" stroke-linecap="round"/>
               </svg>
             </div>
-            <span class="tile-badge">Vocab</span>
+            <span class="tile-badge">${esc(jaCourseOn() ? 'N5 · 言葉' : (vocabStats.due ? vocabStats.due + ' ' + FiezelI18n.t('home.keping-review') : (todayLevel || 'A1')))}</span>
           </div>
           <div>
             <div class="tile-name">${esc(FiezelI18n.t('skill.vocab'))}</div>
@@ -11274,7 +11278,7 @@ function todayHomeMarkup(){
         </div>
 
         <!-- Card 2: Tata Bahasa -->
-        <div class="grid-tile" onclick="go('grammar')">
+        <div class="grid-tile" role="button" tabindex="0" onclick="go('grammar')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();go('grammar')}">
           <div class="tile-top">
             <div class="tile-icon-3d grammar">
               <svg viewBox="0 0 24 24" width="27" height="27" aria-hidden="true" focusable="false" style="display:block;">
@@ -11297,7 +11301,7 @@ function todayHomeMarkup(){
                 <line x1="16" y1="7" x2="19" y2="7" stroke="rgba(255,255,255,0.6)" stroke-width="1.2" stroke-linecap="round"/>
               </svg>
             </div>
-            <span class="tile-badge">Grammar</span>
+            <span class="tile-badge">${esc(jaCourseOn() ? 'N5 · 文法' : (todayLevel || 'A1'))}</span>
           </div>
           <div>
             <div class="tile-name">${esc(FiezelI18n.t('skill.grammar'))}</div>
@@ -11306,7 +11310,7 @@ function todayHomeMarkup(){
         </div>
 
         <!-- Card 3: Membaca -->
-        <div class="grid-tile" onclick="go('reading')">
+        <div class="grid-tile" role="button" tabindex="0" onclick="go('reading')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();go('reading')}">
           <div class="tile-top">
             <div class="tile-icon-3d reading">
               <svg viewBox="0 0 24 24" width="27" height="27" aria-hidden="true" focusable="false" style="display:block;">
@@ -11327,7 +11331,7 @@ function todayHomeMarkup(){
                 <line x1="14.5" y1="11" x2="17.5" y2="11" stroke="#86EFAC" stroke-width="1.2" stroke-linecap="round"/>
               </svg>
             </div>
-            <span class="tile-badge">Stories</span>
+            <span class="tile-badge">${esc(jaCourseOn() ? 'N5 · 読解' : (todayLevel || 'A1'))}</span>
           </div>
           <div>
             <div class="tile-name">${esc(FiezelI18n.t('skill.reading'))}</div>
@@ -11336,7 +11340,7 @@ function todayHomeMarkup(){
         </div>
 
         <!-- Card 4: Listening -->
-        <div class="grid-tile" onclick="if(activeTargetLang()==='ja'&&window.openListeningPanel)openListeningPanel();else go('listening');">
+        <div class="grid-tile" role="button" tabindex="0" onclick="if(activeTargetLang()==='ja'&&window.openListeningPanel)openListeningPanel();else go('listening');" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();if(activeTargetLang()==='ja'&&window.openListeningPanel)openListeningPanel();else go('listening');}">
           <div class="tile-top">
             <div class="tile-icon-3d listening">
               <svg viewBox="0 0 24 24" width="27" height="27" aria-hidden="true" focusable="false" style="display:block;">
@@ -11359,11 +11363,11 @@ function todayHomeMarkup(){
                 <circle cx="12" cy="15.1" r="1.3" fill="#D97706"/>
               </svg>
             </div>
-            <span class="tile-badge">Audio</span>
+            <span class="tile-badge">${esc(jaCourseOn() ? 'N5 · 聴解' : (todayLevel || 'A1'))}</span>
           </div>
           <div>
-            <div class="tile-name">${esc(FiezelI18n.t('home.chip-dengar'))}</div>
-            <div class="tile-meta">${esc(FiezelI18n.t('home.chip-dengar-sub'))}</div>
+            <div class="tile-name">${esc(jaCourseOn() ? FiezelI18n.t('jepang.chokai') : FiezelI18n.t('home.chip-dengar'))}</div>
+            <div class="tile-meta">${esc(jaCourseOn() ? FiezelI18n.t('jepang.chokai-note') : FiezelI18n.t('home.chip-dengar-sub'))}</div>
           </div>
         </div>
       </div>
@@ -11371,7 +11375,7 @@ function todayHomeMarkup(){
 
   /* Classroom Task Banner (Official KelasKu Emerald Identity) */
   const kelaskuCard = `
-    <section class="class-bar" onclick="showToast(FiezelI18n.t('home.classroom-tutup'))">
+    <section class="class-bar" role="button" tabindex="0" aria-label="${esc(FiezelI18n.t('home.classroom-card'))}" onclick="go('classroom')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();go('classroom')}">
       <div class="class-left">
         <div class="class-icon-wrap">
           <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false" style="display:block;">
@@ -11384,15 +11388,15 @@ function todayHomeMarkup(){
         </div>
         <div class="class-info">
           <div class="class-badge-brand">
-            <span class="kelasku-wordmark">KelasKu</span>
-            <span class="class-badge-dot">•</span>
-            <span class="class-badge-tag">${esc(FiezelI18n.t('kelasku.strip-tugas-aktif', 'Tugas Aktif'))}</span>
+            <span class="kelasku-wordmark">${esc(FiezelI18n.t('home.classroom-card'))}</span>
+            <span class="class-badge-dot" aria-hidden="true">•</span>
+            <span class="class-badge-tag">${esc(FiezelI18n.t('kelasku.strip-tugas-aktif'))}</span>
           </div>
-          <div class="class-title">${esc(FiezelI18n.t('kelasku.strip-latihan-materi', 'Latihan Mandiri & Tugas Guru'))}</div>
-          <div class="class-due">Sinkronkan progres ke kelasmu</div>
+          <div class="class-title">${esc(FiezelI18n.t('kelasku.strip-latihan-materi'))}</div>
+          <div class="class-due">${esc(FiezelI18n.t('kelasku.strip-sinkron-guru'))}</div>
         </div>
       </div>
-      <button type="button" class="class-btn-3d" onclick="event.stopPropagation();showToast(FiezelI18n.t('home.classroom-tutup'))">SEGERA ➔</button>
+      <span class="class-btn-3d" aria-hidden="true">${esc(FiezelI18n.t('pawarena.open-story'))} ➔</span>
     </section>`;
 
   /* Home Cockpit: Render pure daylight Tactile Clay interface directly */
@@ -11506,7 +11510,7 @@ function conversationPartnerHomeCardMarkup(){
     `<span class="fz-kawan-badge">${esc(lanjut?FiezelI18n.t('home.kawan.badge-lanjut',{n:snap.userTurns}):FiezelI18n.t('home.kawan.badge-baru'))}</span>`,
     snap.correctionOn?`<span class="fz-kawan-badge is-koreksi">${esc(FiezelI18n.t('home.kawan.badge-koreksi'))}</span>`:''
   ].join('');
-  return `<section class="fz-kawan-card" data-testid="kawan-bicara-home-card" data-course="${course}" onclick="go('chat')" aria-label="${esc(FiezelI18n.t('home.kawan.aria',{nama}))}">
+  return `<section class="fz-kawan-card" data-testid="kawan-bicara-home-card" data-course="${course}" tabindex="0" onclick="go('chat')" onkeydown="if(event.target===this&&(event.key==='Enter'||event.key===' ')){event.preventDefault();go('chat')}" aria-label="${esc(FiezelI18n.t('home.kawan.aria',{nama}))}">
     <div class="fz-kawan-avatar" aria-hidden="true">${avatar}</div>
     <div class="fz-kawan-body">
       <div class="fz-kawan-head"><h2 class="fz-kawan-title">${esc(nama)}</h2><span class="fz-kawan-tag" lang="${course==='ja'?'ja':'en'}">${esc(FiezelI18n.t('chat.nama-tag'))}</span></div>
