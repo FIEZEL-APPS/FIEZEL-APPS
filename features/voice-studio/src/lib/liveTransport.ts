@@ -702,11 +702,258 @@ const _ttsMemoryCache = new Map<
   { audioBase64: string; audioMimeType: string; engine: string }
 >();
 
+// ---------------------------------------------------------------------------------------
+// REAL AI CONVERSATION PARTNER (m025 hotfix): Cloudflare Worker `fiezel-api` task
+// `conversation_turn` — the SAME production path used by Ngobrol AI in the main PWA.
+// Before this, Voice Studio only answered from deterministic templates unless the learner
+// pasted a personal Gemini key, so in production the "AI" never actually replied.
+// Braincore grading stays 100% local (evaluateUtteranceClientSide); the Worker only writes
+// the partner's conversational reply (its prompt forbids praising/grading the learner).
+// ---------------------------------------------------------------------------------------
+const AI_TASK_REQUEST_SCHEMA = 'fiezel-ai-task-v2';
+const AI_TASK_RESPONSE_SCHEMA = 'fiezel-ai-response-v2';
+const AI_PARTNER_TIMEOUT_MS = 11000;
+let _aiCallModeSupported: boolean | null = false;
+let _aiScenarioRoleSupported: boolean | null = null;
+let _aiPartnerCooldownUntil = 0;
+let _identityPromise: Promise<boolean> | null = null;
+
+function getSameOriginParent(): Window | null {
+  try {
+    if (typeof window !== 'undefined' && window.parent && window.parent !== window) {
+      // Touching location.origin throws SecurityError if cross-origin
+      void window.parent.location.origin;
+      return window.parent as Window;
+    }
+  } catch {
+    // Cross-origin parent — ignore
+  }
+  return null;
+}
+
+function resolveCfApiBase(): string {
+  if (typeof window === 'undefined') return '';
+  const cfg = window.FIEZEL_CF_CONFIG || getSameOriginParent()?.FIEZEL_CF_CONFIG;
+  if (!cfg || cfg.enabled === false) return '';
+  if (cfg.endpoints && typeof cfg.endpoints.ai === 'string' && cfg.endpoints.ai !== 'on') return '';
+  return String(cfg.base || '').trim().replace(/\/$/, '');
+}
+
+/** Idempotent anonymous identity cookie (`fz_id`) — required by the Worker quota gate. */
+export function ensureLearnerIdentity(): Promise<boolean> {
+  const base = resolveCfApiBase();
+  if (!base) return Promise.resolve(false);
+  if (!_identityPromise) {
+    _identityPromise = fetch(`${base}/api/auth/anon`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: '{}',
+      credentials: 'include',
+      mode: 'cors',
+      cache: 'no-store',
+    })
+      .then((r) => r.ok || r.status === 409)
+      .catch(() => {
+        _identityPromise = null;
+        return false;
+      });
+  }
+  return _identityPromise;
+}
+
+/** Maps a Voice Studio scenario onto the Worker's closed role enum (CONVERSATION_ROLES). */
+export function mapScenarioToWorkerRole(scenarioId: string): string {
+  const id = String(scenarioId || '').toLowerCase();
+  if (/cafe|kissaten|coffee/.test(id)) return 'cafe';
+  if (/ramen/.test(id)) return 'ramen';
+  if (/konbini/.test(id)) return 'konbini';
+  if (/hotel/.test(id)) return 'hotel';
+  if (/direction|station/.test(id)) return 'direction';
+  if (/ielts|interview|exam/.test(id)) return 'interview';
+  if (/hometown|intro/.test(id)) return 'intro';
+  return 'free';
+}
+
+/** 'CEFR A2' -> 'A2', 'JLPT N5' -> 'A1' (Worker LEVELS enum). */
+export function mapScenarioLevel(level: string | undefined): string {
+  const lv = String(level || '');
+  const cefr = /\b([ABC][12])\b/.exec(lv);
+  if (cefr) return cefr[1];
+  if (/N5/.test(lv)) return 'A1';
+  if (/N4/.test(lv)) return 'A2';
+  if (/N3/.test(lv)) return 'B1';
+  if (/N2/.test(lv)) return 'B2';
+  if (/N1/.test(lv)) return 'C1';
+  return 'A1';
+}
+
+export function replyLooksLikeTargetLanguage(text: string, targetLang: TargetLang): boolean {
+  const tx = String(text || '');
+  if (!tx.trim() || /[\u0E00-\u0E7F]/.test(tx)) return false;
+  if (targetLang === 'ja') return /[\u3040-\u30ff]/.test(tx);
+  return /[A-Za-z]/.test(tx) && !/[\u3040-\u30ff\u4e00-\u9faf]/.test(tx);
+}
+
+/**
+ * Asks the production AI partner for the next conversational line.
+ * Returns null (caller keeps the deterministic Braincore reply) on any failure.
+ */
+export async function requestAiPartnerReply(params: {
+  text: string;
+  scenario: CallScenario;
+  targetLang: TargetLang;
+  locale: LearnerLocale;
+  history: Array<{ speaker: 'ai' | 'user'; text: string }>;
+}): Promise<{ reply: string; translation: string } | null> {
+  const base = resolveCfApiBase();
+  if (!base || Date.now() < _aiPartnerCooldownUntil) return null;
+  const message = params.text.trim().slice(0, 400);
+  if (!message) return null;
+
+  await ensureLearnerIdentity();
+
+  const history = params.history
+    .filter((h) => h && h.text && h.text.trim())
+    .map((h) => `${h.speaker === 'ai' ? 'a' : 'u'}: ${h.text.trim()}`.slice(0, 320))
+    .slice(-8);
+
+  const buildInput = (withMode: boolean, withRole: boolean) => {
+    const input: Record<string, unknown> = {
+      message,
+      course: params.targetLang === 'ja' ? 'ja' : 'en',
+      level: mapScenarioLevel((params.scenario as { level?: string }).level),
+    };
+    if (withRole) input.scenarioId = mapScenarioToWorkerRole(params.scenario.id);
+    if (withMode) input.mode = 'call';
+    if (history.length) input.history = history;
+    return input;
+  };
+
+  // Older Worker deployments reject unknown fields with 400 invalid_input; degrade the
+  // optional fields one at a time and remember what the live Worker accepts.
+  const attempts: Array<[boolean, boolean]> = [];
+  const modeOk = _aiCallModeSupported !== false;
+  const roleOk = _aiScenarioRoleSupported !== false;
+  attempts.push([modeOk, roleOk]);
+  if (modeOk) attempts.push([false, roleOk]);
+  if (roleOk) attempts.push([false, false]);
+
+  const deadline = Date.now() + AI_PARTNER_TIMEOUT_MS;
+  for (const [withMode, withRole] of attempts) {
+    const remaining = deadline - Date.now();
+    if (remaining < 800) break;
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), remaining);
+    try {
+      const res = await fetch(`${base}/api/ai/task`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          schema: AI_TASK_REQUEST_SCHEMA,
+          task: 'conversation_turn',
+          input: buildInput(withMode, withRole),
+          locale: params.locale === 'th' ? 'th' : 'id',
+        }),
+        credentials: 'include',
+        mode: 'cors',
+        cache: 'no-store',
+        signal: controller.signal,
+      });
+      clearTimeout(timer);
+      const data = await res.json().catch(() => ({}) as Record<string, unknown>);
+      if (res.status === 400 && data && data.error === 'invalid_input') {
+        if (withMode) _aiCallModeSupported = false;
+        else if (withRole) _aiScenarioRoleSupported = false;
+        continue;
+      }
+      if (res.status === 401) {
+        _identityPromise = null;
+        return null;
+      }
+      if (res.status === 429) {
+        const retry = Number(data?.retryAfter) || 60;
+        _aiPartnerCooldownUntil = Date.now() + retry * 1000;
+        return null;
+      }
+      if (!res.ok || data?.schema !== AI_TASK_RESPONSE_SCHEMA || data?.degraded === true) {
+        return null;
+      }
+      if (withMode) _aiCallModeSupported = true;
+      if (withRole) _aiScenarioRoleSupported = true;
+      const turn = (data?.turn && typeof data.turn === 'object' ? data.turn : {}) as {
+        reply?: string;
+        translation?: string;
+      };
+      const reply = String(turn.reply || data?.text || '').trim();
+      if (!replyLooksLikeTargetLanguage(reply, params.targetLang)) return null;
+      return { reply, translation: String(turn.translation || '').trim() };
+    } catch {
+      clearTimeout(timer);
+      return null;
+    }
+  }
+  return null;
+}
+
+/**
+ * Wakes the neural TTS backend (Render free tier cold-starts in ~7s) and issues the learner
+ * identity cookie as soon as Voice Studio opens, so the first spoken line is not silent.
+ */
+export function warmUpVoiceServices(): void {
+  if (typeof window === 'undefined') return;
+  const ping = () => {
+    try {
+      const cfg = window.FIEZEL_TTS_CONFIG || getSameOriginParent()?.FIEZEL_TTS_CONFIG;
+      const personas = cfg?.personasEndpoint;
+      if (personas) {
+        void fetch(personas, { method: 'GET', mode: 'cors', cache: 'no-store' })
+          .then((r) => {
+            if (r.ok) _ttsWarm = true;
+          })
+          .catch(() => {});
+      }
+    } catch {
+      // Ignore
+    }
+  };
+  ping();
+  // Retry once shortly after mount in case defer `core-config.js` finished just after module init.
+  window.setTimeout(() => {
+    if (!_ttsWarm) ping();
+    void ensureLearnerIdentity();
+  }, 250);
+  // Keep the neural voice server awake while Voice Studio is open (free tier sleeps when idle).
+  if (!_ttsKeepAliveTimer) {
+    _ttsKeepAliveTimer = window.setInterval(() => {
+      if (typeof document === 'undefined' || document.visibilityState === 'visible') ping();
+    }, 4 * 60 * 1000);
+  }
+  void ensureLearnerIdentity();
+}
+
+let _ttsWarm = false;
+let _ttsKeepAliveTimer: number | null = null;
+
+/** Neural TTS endpoint: explicit Voice Studio override -> host/parent FIEZEL_TTS_CONFIG -> same-origin. */
+export function resolveTtsEndpoint(): string {
+  if (typeof window !== 'undefined') {
+    const parentWin = getSameOriginParent();
+    const override =
+      window.FIEZEL_VOICE_STUDIO_CONFIG?.ttsApiUrl ||
+      parentWin?.FIEZEL_VOICE_STUDIO_CONFIG?.ttsApiUrl;
+    if (override) return override;
+    const host = window.FIEZEL_TTS_CONFIG || parentWin?.FIEZEL_TTS_CONFIG;
+    if (host && host.enabled !== false && host.endpoint) return host.endpoint;
+  }
+  return '/api/tts/line';
+}
+
 /**
  * Evaluates a user speaking turn with ultra-low latency:
  * 1) Direct Gemini 2.0 Flash REST API if user saved `fz_gemini_api_key`
- * 2) Configured `turnApiUrl` if reachable within 1.5s
- * 3) Instant client-side Braincore pedagogical analyzer (`evaluateUtteranceClientSide`)
+ * 2) Production AI partner (Cloudflare Worker `conversation_turn`)
+ * 3) Configured `turnApiUrl` if reachable within 1.5s
+ * 4) Instant client-side Braincore pedagogical analyzer (`evaluateUtteranceClientSide`)
  */
 export async function evaluateTurnFlexible(params: {
   text: string;
@@ -788,7 +1035,35 @@ export async function evaluateTurnFlexible(params: {
     }
   }
 
-  // 2) Only probe custom turnApiUrl if explicitly configured and not yet marked unavailable
+  // 2) Production AI partner (same Worker path as Ngobrol AI). Grading stays local.
+  const partner = await requestAiPartnerReply({
+    text: params.text,
+    scenario: params.scenario,
+    targetLang: params.targetLang,
+    locale: params.locale,
+    history: params.history,
+  });
+  if (partner) {
+    return {
+      ...localResult,
+      aiReply: partner.reply,
+      aiReplyTranslationId: params.locale === 'th' ? '' : partner.translation,
+      aiReplyTranslationTh: params.locale === 'th' ? partner.translation : '',
+      nextSuggestedReplies: getBeginnerReplyCards(
+        params.scenario.id,
+        params.targetLang,
+        undefined,
+        partner.reply,
+        params.text,
+        params.history
+      ),
+      audioBase64: null,
+      audioMimeType: null,
+      ttsEngine: 'fiezel-ai-partner',
+    };
+  }
+
+  // 3) Only probe custom turnApiUrl if explicitly configured and not yet marked unavailable
   const customUrl =
     typeof window !== 'undefined' ? window.FIEZEL_VOICE_STUDIO_CONFIG?.turnApiUrl : undefined;
   if (customUrl && _turnApiAvailable !== false) {
@@ -843,6 +1118,8 @@ export async function synthesizeFlexibleTts(params: {
   text: string;
   targetLang: TargetLang;
   persona?: VoicePersona;
+  /** Retry path: ignore the short failure cooldown. */
+  force?: boolean;
 }): Promise<{ audioBase64: string; audioMimeType: string; engine: string } | null> {
   const speakerMap: Record<string, string> = {
     coach_alex: 'coach_alex',
@@ -862,17 +1139,16 @@ export async function synthesizeFlexibleTts(params: {
     return cached;
   }
 
-  if (Date.now() < _ttsCooldownUntil) {
+  if (!params.force && Date.now() < _ttsCooldownUntil) {
     return null;
   }
 
-  const endpoint =
-    (typeof window !== 'undefined' && window.FIEZEL_VOICE_STUDIO_CONFIG?.ttsApiUrl) ||
-    '/api/tts/line';
+  const endpoint = resolveTtsEndpoint();
 
   try {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 3500);
+    // Render free tier cold-starts in ~7s; a 3.5s budget made the FIRST line always silent.
+    const timer = setTimeout(() => controller.abort(), _ttsWarm ? 7000 : 12000);
     const res = await fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -881,10 +1157,12 @@ export async function synthesizeFlexibleTts(params: {
         speaker,
         lang: params.targetLang,
       }),
+      mode: 'cors',
       signal: controller.signal,
     });
     clearTimeout(timer);
     if (res.ok) {
+      _ttsWarm = true;
       const contentType = res.headers.get('content-type') || '';
       if (contentType.includes('audio/')) {
         const buf = await res.arrayBuffer();
