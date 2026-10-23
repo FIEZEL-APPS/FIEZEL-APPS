@@ -62,7 +62,14 @@ import {
   pcm16Base64ToAudioBuffer,
   resolveLiveCallWebSocketUrls,
   synthesizeFlexibleTts,
+  warmUpVoiceServices,
 } from './lib/liveTransport';
+
+// 44-byte silent WAV used to "unlock" one persistent <audio> element inside a user tap.
+// iOS Safari / Android WebView only allow later programmatic play() on an element that
+// was started during a gesture; replies arrive seconds after the tap (hands-free STT).
+const SILENT_WAV =
+  'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=';
 
 export default function App() {
   const [brainState, setBrainState] = useState<BraincoreStoreState>(() => loadBraincoreState());
@@ -151,6 +158,70 @@ export default function App() {
   const activeSourcesRef = useRef<AudioBufferSourceNode[]>([]);
   const isMicMutedRef = useRef<boolean>(false);
   const currentAudioElRef = useRef<HTMLAudioElement | null>(null);
+  const sharedAudioElRef = useRef<HTMLAudioElement | null>(null);
+  const audioElementPrimedRef = useRef<boolean>(false);
+  const ttsAudioCtxRef = useRef<AudioContext | null>(null);
+  const ttsSourceNodeRef = useRef<AudioBufferSourceNode | null>(null);
+  const micPermWarmedRef = useRef<boolean>(false);
+  const speechWatchdogRef = useRef<number | null>(null);
+
+  /** Unlocks Web Audio + one persistent HTMLAudioElement inside a user gesture. */
+  const primeAudioPlayback = () => {
+    try {
+      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      if (AudioCtx) {
+        if (!ttsAudioCtxRef.current || ttsAudioCtxRef.current.state === 'closed') {
+          ttsAudioCtxRef.current = new AudioCtx();
+        }
+        if (ttsAudioCtxRef.current.state === 'suspended') {
+          void ttsAudioCtxRef.current.resume().catch(() => {});
+        }
+      }
+    } catch {
+      // Ignore
+    }
+    try {
+      if (!sharedAudioElRef.current) {
+        const el = new Audio();
+        el.preload = 'auto';
+        el.setAttribute('playsinline', 'true');
+        sharedAudioElRef.current = el;
+      }
+      if (!audioElementPrimedRef.current) {
+        audioElementPrimedRef.current = true;
+        const el = sharedAudioElRef.current;
+        if (el.paused && !el.src) {
+          el.src = SILENT_WAV;
+          el.muted = true;
+          const p = el.play();
+          if (p && typeof p.then === 'function') {
+            p.then(() => {
+              if (el.src === SILENT_WAV) el.pause();
+              el.muted = false;
+            }).catch(() => {
+              audioElementPrimedRef.current = false;
+              el.muted = false;
+            });
+          } else {
+            el.muted = false;
+          }
+        }
+      }
+    } catch {
+      // Ignore
+    }
+  };
+
+  useEffect(() => {
+    warmUpVoiceServices();
+    const onGesture = () => primeAudioPlayback();
+    window.addEventListener('pointerdown', onGesture, { passive: true, capture: true });
+    window.addEventListener('keydown', onGesture, { passive: true, capture: true });
+    return () => {
+      window.removeEventListener('pointerdown', onGesture, true);
+      window.removeEventListener('keydown', onGesture, true);
+    };
+  }, []);
 
   const locale: LearnerLocale = brainState.learnerLocale || 'id';
   const targetLang: TargetLang = brainState.targetLang || 'en';
@@ -162,6 +233,20 @@ export default function App() {
     CALL_SCENARIOS[0];
   const activePersona =
     VOICE_PERSONAS[activeScenario.personaId] || VOICE_PERSONAS.coach_alex;
+
+  // Pre-render the scenario's opening line with the neural persona voice so the call
+  // starts speaking instantly (cached in memory by synthesizeFlexibleTts).
+  useEffect(() => {
+    if (!activeScenario.openingLine) return;
+    const t = window.setTimeout(() => {
+      void synthesizeFlexibleTts({
+        text: activeScenario.openingLine,
+        targetLang: activeScenario.targetLang,
+        persona: activePersona,
+      });
+    }, 600);
+    return () => window.clearTimeout(t);
+  }, [activeScenario.id]);
 
   const isMeasureMode =
     customMeasureOverride !== null ? customMeasureOverride : activeScenario.isMeasureExam;
@@ -301,6 +386,83 @@ export default function App() {
     setBrainState(saveBraincoreState({ ...brainState, learnerLocale: nextLocale }));
   };
 
+  const clearSpeechWatchdog = () => {
+    if (speechWatchdogRef.current) {
+      window.clearTimeout(speechWatchdogRef.current);
+      speechWatchdogRef.current = null;
+    }
+  };
+
+  /**
+   * NEURAL-ONLY VOICE (owner directive): the AI partner speaks ONLY with the multi-character
+   * Edge Neural voices (Coach Alex/Sarah, Nanami, Keita). Browser `speechSynthesis` (robotic)
+   * is intentionally never used. If the neural server cannot answer, the reply text stays on
+   * screen and the learner can replay it with "Putar Suara" — never a robot voice.
+   */
+  const fetchNeuralVoice = async (text: string) => {
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const res = await synthesizeFlexibleTts({
+        text,
+        targetLang: activeScenario.targetLang,
+        persona: activePersona,
+        force: attempt > 0,
+      });
+      if (res?.audioBase64) return res;
+      if (attempt < 2) await new Promise((r) => window.setTimeout(r, 900 * (attempt + 1)));
+    }
+    return null;
+  };
+
+  const stopNeuralBufferSource = () => {
+    if (ttsSourceNodeRef.current) {
+      try {
+        ttsSourceNodeRef.current.onended = null;
+        ttsSourceNodeRef.current.stop();
+        ttsSourceNodeRef.current.disconnect();
+      } catch {
+        // Ignore
+      }
+      ttsSourceNodeRef.current = null;
+    }
+  };
+
+  /** Plays base64 MP3 through the gesture-unlocked Web Audio context (autoplay-immune). */
+  const playNeuralBase64ViaWebAudio = async (
+    audioBase64: string,
+    targetRate: number,
+    onDone: () => void
+  ): Promise<boolean> => {
+    try {
+      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      if (!AudioCtx) return false;
+      if (!ttsAudioCtxRef.current || ttsAudioCtxRef.current.state === 'closed') {
+        ttsAudioCtxRef.current = new AudioCtx();
+      }
+      const ctx = ttsAudioCtxRef.current;
+      if (ctx.state === 'suspended') {
+        await ctx.resume().catch(() => {});
+      }
+      const bin = atob(audioBase64);
+      const bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      const decoded = await ctx.decodeAudioData(bytes.buffer.slice(0));
+      stopNeuralBufferSource();
+      const src = ctx.createBufferSource();
+      src.buffer = decoded;
+      src.playbackRate.value = targetRate;
+      src.connect(ctx.destination);
+      ttsSourceNodeRef.current = src;
+      src.onended = () => {
+        if (ttsSourceNodeRef.current === src) ttsSourceNodeRef.current = null;
+        onDone();
+      };
+      src.start(0);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
   const speakAiText = async (
     text: string,
     preloadedBase64?: string | null,
@@ -308,6 +470,8 @@ export default function App() {
   ) => {
     if (!text.trim()) return;
     const targetRate = overrideRate ?? speechRate;
+    clearSpeechWatchdog();
+    stopNeuralBufferSource();
     try {
       if (currentAudioElRef.current) {
         currentAudioElRef.current.pause();
@@ -316,65 +480,65 @@ export default function App() {
       setIsPlayingAiAudio(true);
 
       let audioBase64 = preloadedBase64 || null;
-      let audioMime = 'audio/wav';
+      let audioMime = 'audio/mpeg';
 
       if (!audioBase64) {
-        const flexTts = await synthesizeFlexibleTts({
-          text,
-          targetLang: activeScenario.targetLang,
-          persona: activePersona,
-        });
-        if (flexTts?.audioBase64) {
-          audioBase64 = flexTts.audioBase64;
-          audioMime = flexTts.audioMimeType || 'audio/mpeg';
+        const neural = await fetchNeuralVoice(text);
+        if (neural?.audioBase64) {
+          audioBase64 = neural.audioBase64;
+          audioMime = neural.audioMimeType || 'audio/mpeg';
         }
       }
 
-      if (audioBase64) {
-        const audio = new Audio(`data:${audioMime};base64,${audioBase64}`);
-        audio.playbackRate = targetRate;
-        currentAudioElRef.current = audio;
-        audio.onended = () => setIsPlayingAiAudio(false);
-        audio.onerror = () => setIsPlayingAiAudio(false);
-        await audio.play();
+      if (!audioBase64) {
+        setIsPlayingAiAudio(false);
+        setStatusBanner(
+          locale === 'th'
+            ? 'เสียง Neural กำลังเชื่อมต่อใหม่ ข้อความยังแสดงอยู่ แตะ "เล่นเสียง" เพื่อลองอีกครั้ง'
+            : 'Suara neural sedang menyambung ulang. Teks balasan tetap tampil — ketuk "Putar Suara" untuk mencoba lagi.'
+        );
         return;
       }
 
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        const utter = new SpeechSynthesisUtterance(text);
-        const targetLangCode = activeScenario.targetLang === 'ja' ? 'ja-JP' : 'en-US';
-        utter.lang = targetLangCode;
-        utter.rate = targetRate * 0.98;
-        utter.pitch = activePersona.gender === 'male' ? 0.9 : 1.08;
-        try {
-          const voices = window.speechSynthesis.getVoices() || [];
-          const langPrefix = activeScenario.targetLang === 'ja' ? 'ja' : 'en';
-          const langVoices = voices.filter((v) =>
-            v.lang.toLowerCase().startsWith(langPrefix)
-          );
-          if (langVoices.length > 0) {
-            const preferredHint =
-              activePersona.id === 'sensei_keita'
-                ? /keita|ichiro|otoya|male|takumi/i
-                : activePersona.id === 'sensei_nanami'
-                  ? /nanami|kyoko|haruka|ayumi|female/i
-                  : activePersona.id === 'coach_alex'
-                    ? /guy|alex|daniel|david|christopher|male/i
-                    : /aria|sarah|samantha|jenny|zira|female/i;
-            const matched = langVoices.find((v) => preferredHint.test(v.name));
-            utter.voice = matched || langVoices[0];
-          }
-        } catch {
-          // Ignore voice selection errors
-        }
-        utter.onend = () => setIsPlayingAiAudio(false);
-        utter.onerror = () => setIsPlayingAiAudio(false);
-        window.speechSynthesis.speak(utter);
-      } else {
+      // Reuse the element unlocked during the user's tap (autoplay-safe on iOS/Android).
+      const audio = sharedAudioElRef.current || new Audio();
+      audio.onended = null;
+      audio.onerror = null;
+      audio.muted = false;
+      audio.src = `data:${audioMime};base64,${audioBase64}`;
+      audio.defaultPlaybackRate = targetRate;
+      audio.playbackRate = targetRate;
+      currentAudioElRef.current = audio;
+      const finish = () => {
+        clearSpeechWatchdog();
+        if (currentAudioElRef.current === audio) currentAudioElRef.current = null;
         setIsPlayingAiAudio(false);
+      };
+      audio.onended = finish;
+      audio.onerror = finish;
+      // Watchdog: a stalled decoder must never keep the hands-free mic closed forever.
+      speechWatchdogRef.current = window.setTimeout(finish, 30000);
+      try {
+        await audio.play();
+        setStatusBanner(null);
+      } catch {
+        // HTMLAudio blocked outside tap gesture (e.g. hands-free turn 10s later on Safari/mobile):
+        // play the EXACT SAME Neural MP3 via the unlocked Web Audio context — zero robot voice.
+        if (currentAudioElRef.current === audio) currentAudioElRef.current = null;
+        const okWebAudio = await playNeuralBase64ViaWebAudio(audioBase64, targetRate, finish);
+        if (okWebAudio) {
+          setStatusBanner(null);
+        } else {
+          finish();
+          setStatusBanner(
+            locale === 'th'
+              ? 'เบราว์เซอร์บล็อกการเล่นอัตโนมัติ แตะ "เล่นเสียง" เพื่อฟังคำตอบ'
+              : 'Peramban menahan pemutaran otomatis. Ketuk "Putar Suara" untuk mendengar balasan.'
+          );
+        }
       }
     } catch {
+      clearSpeechWatchdog();
       setIsPlayingAiAudio(false);
     }
   };
@@ -539,6 +703,11 @@ export default function App() {
     const SpeechRec =
       (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRec) {
+      setStatusBanner(
+        locale === 'th'
+          ? 'เบราว์เซอร์นี้ไม่รองรับการรู้จำเสียง ใช้ Chrome หรือพิมพ์ประโยคด้านล่าง'
+          : 'Peramban ini belum mendukung pengenalan suara. Pakai Chrome, atau ketik kalimatmu di kolom bawah — AI tetap menjawab dengan suara.'
+      );
       return;
     }
 
@@ -551,7 +720,10 @@ export default function App() {
         const rec = new SpeechRec();
         rec.lang = activeScenario.targetLang === 'ja' ? 'ja-JP' : 'en-US';
         rec.interimResults = true;
-        rec.continuous = true;
+        // Android Chrome duplicates cumulative tokens when `continuous = true`; `onend` restarts
+        // the cycle seamlessly on mobile while desktop keeps continuous open-mic recognition.
+        const isAndroid = typeof navigator !== 'undefined' && /Android/i.test(navigator.userAgent || '');
+        rec.continuous = !isAndroid;
 
         rec.onstart = () => {
           if (!isDisposed) {
@@ -597,8 +769,27 @@ export default function App() {
           }
         };
 
-        rec.onerror = () => {
-          // Ignore transient no-speech errors in continuous call
+        rec.onerror = (evErr: any) => {
+          const code = String(evErr?.error || '');
+          // Transient 'no-speech' / 'aborted' are normal in a continuous call. Fatal codes used
+          // to be swallowed, so the loop restarted forever and the AI never heard anything.
+          if (code === 'not-allowed' || code === 'service-not-allowed' || code === 'audio-capture') {
+            isDisposed = true;
+            isMicMutedRef.current = true;
+            setIsMicMuted(true);
+            setIsListeningLiveSpeech(false);
+            setStatusBanner(
+              locale === 'th'
+                ? 'ไมโครโฟนถูกบล็อก อนุญาตไมโครโฟนในแถบที่อยู่ หรือพิมพ์ประโยคด้านล่าง'
+                : 'Mikrofon diblokir peramban. Izinkan mikrofon di bilah alamat, lalu nyalakan lagi mic — atau ketik kalimatmu di bawah.'
+            );
+          } else if (code === 'network') {
+            setStatusBanner(
+              locale === 'th'
+                ? 'การรู้จำเสียงต้องใช้อินเทอร์เน็ต ลองอีกครั้งหรือพิมพ์ประโยค'
+                : 'Pengenalan suara butuh koneksi internet. Coba bicara lagi atau ketik kalimatmu.'
+            );
+          }
         };
 
         rec.onend = () => {
@@ -667,7 +858,7 @@ export default function App() {
 
   const startPttRecording = async () => {
     try {
-      // Immediate barge-in: cancel any playing AI audio or speech synthesis
+      // Immediate barge-in: stop the neural voice playback, and unlock audio for the reply.
       if (currentAudioElRef.current) {
         try {
           currentAudioElRef.current.pause();
@@ -676,13 +867,9 @@ export default function App() {
           // Ignore
         }
       }
-      if ('speechSynthesis' in window) {
-        try {
-          window.speechSynthesis.cancel();
-        } catch {
-          // Ignore
-        }
-      }
+      clearSpeechWatchdog();
+      stopNeuralBufferSource();
+      primeAudioPlayback();
       setIsPlayingAiAudio(false);
       setStatusBanner(null);
       liveDictatedTextRef.current = '';
@@ -840,6 +1027,18 @@ export default function App() {
 
   const startLiveCall = async () => {
     if (isLiveConnected || isLiveConnecting) return;
+    primeAudioPlayback();
+    // Request mic permission synchronously inside the tap gesture so hands-free SpeechRecognition
+    // (which starts right after PAW finishes speaking the opening line) is already authorized.
+    if (!micPermWarmedRef.current && typeof navigator !== 'undefined' && navigator.mediaDevices?.getUserMedia) {
+      micPermWarmedRef.current = true;
+      void navigator.mediaDevices
+        .getUserMedia({ audio: true })
+        .then((s) => s.getTracks().forEach((tr) => tr.stop()))
+        .catch(() => {
+          micPermWarmedRef.current = false;
+        });
+    }
     setStatusBanner(null);
     setIsLiveConnecting(true);
     setLiveUserDraft('');
@@ -1222,6 +1421,8 @@ export default function App() {
       }
     });
     activeSourcesRef.current = [];
+    clearSpeechWatchdog();
+    stopNeuralBufferSource();
     if (currentAudioElRef.current) {
       try {
         currentAudioElRef.current.pause();
