@@ -83,7 +83,8 @@ const SOCKET_ALLOWLIST = new Set(['tests/http-smoke-test.js', 'tests/e2e-level-g
 const TRAP_ONLY_ALLOWLIST = new Set(['tests/prerender-dryrun-test.js']);
 const EXCLUDED_DEV_TOOLS = new Set([
   'tests/chrome-mini-game-test.js',
-  'tests/probe-video-grammar-eliminated-test.js'
+  'tests/probe-video-grammar-eliminated-test.js',
+  'tests/probe-grammar-quest-eliminated-test.js'
 ]);
 const RE_TRAP_INSTALL = /\b(?:https?|net|tls)\s*\.\s*(?:request|get|connect)\s*=/;
 

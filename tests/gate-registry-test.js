@@ -142,6 +142,13 @@ const EXCLUSIONS = new Map([
       'dan modul di CI dijaga secara deterministik oleh precache-covers-shell-test dan id-golden-snapshot-test. ' +
       'Bukti kelulusan 100% Playwright tercatat di docs/handoffs/FIEZEL-M025632-GRAMMAR-SESSION-UI-UX-AUDIT-FIX-HANDOFF.md.'
   }],
+  ['tests/probe-grammar-quest-eliminated-test.js', {
+    class: 'gerbang-pra-rilis-fitur',
+    reason:
+      'BUKAN gerbang CI Linux: probe empiris Playwright Chromium lokal untuk memverifikasi eliminasi total ' +
+      'Fiezel Quest saat memasuki sesi latihan baru di grammar pada runtime peramban nyata. Integritas alur kuis ' +
+      'dan sesi grammar murni dijaga oleh grammar-8-upgrades-full-test dan grammar-vocab-leveling-test.'
+  }],
   ['tools/dev/fiezel-vt-audit.js', {
     class: 'alat-pelaporan',
     reason:
