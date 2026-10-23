@@ -9361,7 +9361,7 @@ try{window.addEventListener('resize',()=>syncNavActivePill(),{passive:true});win
    Yang digulir bisa jendela ATAU panel dalam #app (cangkang 100dvh menggulir #app > section, bukan jendela), jadi listener-nya fase capture di document: event scroll elemen tidak menggelembung, tetapi tetap lewat capture. Penggulir horizontal (deret tab, karosel) diabaikan karena tingginya tidak bisa digulir. renderInner() memanggil syncTopbarScrolled() saat pindah layar supaya tepi dari layar lama tidak tertinggal. */
 function syncTopbarScrolled(source){const bar=document.querySelector('header.topbar');if(!bar)return;let y=window.scrollY||document.documentElement?.scrollTop||0;if(source&&source.nodeType===1){if(source.scrollHeight<=source.clientHeight+1||!document.getElementById('app')?.contains(source))return;y=Math.max(y,source.scrollTop||0)}bar.classList.toggle('is-scrolled',y>2)}
 try{let topbarScrollRaf=0,topbarScrollSrc=null;document.addEventListener('scroll',e=>{topbarScrollSrc=e.target;if(topbarScrollRaf)return;topbarScrollRaf=requestAnimationFrame(()=>{topbarScrollRaf=0;syncTopbarScrolled(topbarScrollSrc)})},{capture:true,passive:true})}catch(_){}
-function renderInner(){if(isVerifiedTeacher()&&state.view!=='tutor'){state.view='tutor'}/* Kursus Jepang berbicara dengan istilahnya sendiri (Kotoba, Bunpō, Renshū): lapisan kunci 'kursus-ja.*' di FiezelI18n dinyalakan SEBELUM layar dilukis, dan tabel/elemen statis yang sudah memegang kalimat lama disegarkan sekali saat kursus berganti. */try{const __course=activeTargetLang()==='ja'&&!isVerifiedTeacher()?'ja':null;if(self.FiezelI18n?.getCourse&&FiezelI18n.getCourse()!==__course){FiezelI18n.setCourse(__course);__fzRefreshI18nTables();/* Soal, jawaban, dan pembahasan kursus Jepang diberi furigana + romaji dari bank kosakata, dan tiap kuis mendapat tombol ふりがな/ローマ字. */try{if(__course==='ja')self.FiezelJaUi?.observe?.($('app'),()=>V);else self.FiezelJaUi?.unobserve?.()}catch(_){}}}catch(_){}/* m025-314: go() menolak permukaan yang salah bahasa, tetapi state.view juga bisa datang dari sesi SEBELUM murid berganti kursus (ia tersimpan dan dipulihkan saat boot) — jadi pemulihan itu ikut dijepit di sini, bukan hanya jalur navigasi. */if(targetLangSurfaceBlocked(state.view)){state.view='home'}if(document.body?.classList?.contains?.('fz-teacher-mode')&&state.view!=='tutor'){try{self.FiezelTeacherShell?.unmount?.()}catch(_){}}isViewChange=state.view!==lastRenderedView;lastRenderedView=state.view;const appContainer=$('app'),savedActive=captureActiveElement(appContainer);if(appContainer)appContainer.classList.add('is-repaint');speakingListeningMountToken++;if(speakingListeningController){speakingListeningController.destroy();speakingListeningController=null;/* m026-01: satu-satunya tempat sesi dengar benar-benar bubar. Di dalam if, bukan di luar - kalau tidak, tiap navigasi biasa akan memaksa maskot kembali idle dan memotong selebrasi yang sedang jalan. */pawReact('listening-stop')}if(state.view!=='chat'&&(document.body?.classList?.contains?.('fz-view-chat')||document.documentElement?.classList?.contains?.('fz-view-chat'))){try{self.FiezelInteractiveChat?.unmount?.()}catch(_){}}document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));if(state.view==='home')home();if(state.view==='latihan')latihan();if(state.view==='vocab')vocab();if(state.view==='grammar')grammar();if(state.view==='reading')reading();if(state.view==='skills')skillsLab();if(state.view==='listening')skillsLab('listening');if(state.view==='speaking')skillsLab('speaking');if(state.view==='writing')writing();if(state.view==='classroom')classHubView();if(state.view==='library')library();if(state.view==='ask'||state.view==='search')askView();if(state.view==='test')placement();if(state.view==='progress')progress();if(state.view==='online'||state.view==='profile')onlineView();if(state.view==='learn')learnerFlowView();if(state.view==='arena')arenaView();if(state.view==='tutor')tutorCenterView();if(state.view==='kana')kanaView();if(state.view==='nujum')nujumView();if(state.view==='chat')interactiveChatView();if(state.view==='game')gameView();/* merge SLOT 7 sosial 2026-08-29 *//* Audit F12: layar tanpa tab sendiri tetap menandai tab induknya - Tes awal milik Hari ini, hub latihan milik Latihan. */const TAB_PARENT={chat:'latihan',nujum:'home',kana:'latihan',test:'home',vocab:'latihan',grammar:'latihan',reading:'latihan',writing:'latihan',library:'latihan',skills:'latihan',listening:'latihan',speaking:'latihan',learn:'home',arena:'online',profile:'online'};const activeTabEl=document.querySelector(`[data-view="${state.view}"]`)||(state.view==='profile'?document.querySelector('[data-view="online"]'):state.view==='online'?document.querySelector('[data-view="profile"]'):TAB_PARENT[state.view]?document.querySelector(`.bottomnav [data-view="${TAB_PARENT[state.view]}"]`):null);activeTabEl?.classList.add('active');if(state.view!=='chat'){const _bn=document.querySelector('.bottomnav');if(_bn){_bn.style.removeProperty('display');_bn.style.removeProperty('visibility');_bn.style.removeProperty('opacity');}}syncNavActivePill(activeTabEl);/* m028 fase3: bendera panggung Skills Lab. Addon listening memaku blok tombolnya ke dasar layar (speaking-listening-addon.css), jadi ia panggung kedua yang bisa ditutupi gelembung. */document.body?.classList?.toggle?.('fz-stage-sl',['skills','listening','speaking'].includes(state.view));/* m028 fase3 (QA §9): Peta Belajar ikut jadi panggung ber-kontrol sejak panel NEXT SESSION punya tombol "Mulai sesi" di dekat dasar layar - screenshot QA menunjukkan gelembung PAW menutupinya utuh. Aturannya sama dengan kuis: peek dilarang, dok mengecil, layar diberi ruang bawah. */document.body?.classList?.toggle?.('fz-stage-map',state.view==='progress');/* 2026-08-29 overhaul I12 (O6 #10): bendera panggung Home. Wajah coach-strip adalah SATU-SATUNYA Pau di Home; gelembung FAB pengambang (Pau kedua, terukur menimpa lipatan hero/skill-hub di 390px) disembunyikan lewat CSS body.fz-stage-home — pola yang sama dengan fz-stage-sl/fz-stage-map, modul gelembung tidak disentuh. */document.body?.classList?.toggle?.('fz-stage-home',state.view==='home');/* q16-P2-2 2026-08-29: hub juga panggung ber-CTA-dekat-dasar (Review Due, Buka flashcards, Mulai 25 soal) \u2014 peek dilarang, dok mengecil, pola sama dengan sl/map. */document.body?.classList?.toggle?.('fz-stage-hub',['vocab','grammar','reading','library','test'].includes(state.view));document.body?.classList?.toggle?.('fz-stage-writing',state.view==='writing');/* v24-F2 2026-08-29: Writing = layar mengarang; FAB disembunyikan via CSS (pola fz-stage-home), modul gelembung tidak disentuh. *//* Kursus Jepang berpakaian sendiri: palet shu/ai/washi di fiezel-2.css menempel lewat bendera ini, jadi layar Inggris tidak tersentuh sama sekali; KelasKu guru punya palet sendiri (teacher-shell.css). */document.body?.classList?.toggle?.('fz-lang-ja',self.FiezelI18n?.getCourse?.()==='ja');document.body?.classList?.toggle?.('fz-view-classroom',state.view==='classroom');document.body?.classList?.toggle?.('fz-view-profile',state.view==='online'||state.view==='profile');document.body?.classList?.toggle?.('fz-view-latihan',state.view==='latihan');document.body?.classList?.toggle?.('fz-view-grammar',state.view==='grammar');document.body?.classList?.toggle?.('fz-view-vocab',state.view==='vocab');document.body?.classList?.toggle?.('fz-view-game',state.view==='game');document.documentElement?.classList?.toggle?.('fz-view-chat',state.view==='chat');document.body?.classList?.toggle?.('fz-view-chat',state.view==='chat');try{const _topBrandNormal=$('topBrandWrap'),_topBrandK=$('topBrandKelasKu'),_topContextWrap=$('topContextWrap'),_topContextBackBtn=$('topContextBackBtn'),_topContextTitle=$('topContextTitle'),_topContextActions=$('topContextActions'),_topActionsNormal=$('topGamifyCluster'),_topClusterK=$('topKelasKuCluster'),_isHome=state.view==='home',_isK=state.view==='classroom',_isP=state.view==='online'||state.view==='profile',_setBtn=$('topSettingsBtn'),_cBtn=$('fzCourseSwitchBtn'),_frBtn=$('topProfileFriendBtn'),_notifBtn=$('fzNotifBtn');if(_isP&&_frBtn){const _fb=$('topProfileFriendBadge');if(_fb){if(socialRequestCount>0){_fb.textContent=String(socialRequestCount);_fb.classList.remove('hidden');}else{_fb.classList.add('hidden');}}}if(_isHome){if(_topBrandNormal)_topBrandNormal.style.display='flex';if(_topBrandK)_topBrandK.style.display='none';if(_topContextWrap)_topContextWrap.style.display='none';if(_topContextActions)_topContextActions.style.display='none';if(_topActionsNormal)_topActionsNormal.style.display='flex';if(_topClusterK)_topClusterK.style.display='none';if(_cBtn)_cBtn.style.display='inline-flex';if(_setBtn)_setBtn.style.display='none';if(_notifBtn)_notifBtn.style.display='inline-flex';if(_frBtn)_frBtn.style.display='none';}else if(_isK){if(_topBrandNormal)_topBrandNormal.style.display='none';if(_topBrandK)_topBrandK.style.display='flex';if(_topContextWrap)_topContextWrap.style.display='none';if(_topContextActions)_topContextActions.style.display='none';if(_topActionsNormal)_topActionsNormal.style.display='none';if(_topClusterK)_topClusterK.style.display='flex';updateTopbarClassState();if(_cBtn)_cBtn.style.display='none';if(_setBtn)_setBtn.style.display='none';if(_notifBtn)_notifBtn.style.display='none';if(_frBtn)_frBtn.style.display='none';}else if(_isP){if(_topBrandNormal)_topBrandNormal.style.display='none';if(_topBrandK)_topBrandK.style.display='none';if(_topContextWrap){_topContextWrap.style.display='flex';if(_topContextBackBtn)_topContextBackBtn.style.display='none';if(_topContextTitle)_topContextTitle.textContent=FiezelI18n.t('nav.profile','Profil');}if(_topContextActions)_topContextActions.style.display='none';if(_topActionsNormal)_topActionsNormal.style.display='flex';if(_topClusterK)_topClusterK.style.display='none';if(_cBtn)_cBtn.style.display='none';if(_setBtn)_setBtn.style.display='inline-flex';if(_notifBtn)_notifBtn.style.display='none';if(_frBtn)_frBtn.style.display='inline-flex';}else{if(_topBrandNormal)_topBrandNormal.style.display='none';if(_topBrandK)_topBrandK.style.display='none';if(_topActionsNormal)_topActionsNormal.style.display='none';if(_topClusterK)_topClusterK.style.display='none';if(_cBtn)_cBtn.style.display='none';if(_setBtn)_setBtn.style.display='none';if(_notifBtn)_notifBtn.style.display='none';if(_frBtn)_frBtn.style.display='none';if(_topContextWrap){_topContextWrap.style.display='flex';const _hasBack=['grammar','vocab','reading','writing','skills','listening','speaking','library','kana','ask','search','chat'].includes(state.view);if(_topContextBackBtn)_topContextBackBtn.style.display=_hasBack?'inline-flex':'none';let _title='Latihan';if(state.view==='latihan')_title=FiezelI18n.t('nav.latihan','Latihan');else if(state.view==='grammar')_title=FiezelI18n.t('student.grammar-title','Grammar');else if(state.view==='vocab')_title=FiezelI18n.t('student.vocab-title','Kosakata');else if(state.view==='skills'||state.view==='listening'||state.view==='speaking')_title=state.view==='listening'?'Listening':state.view==='speaking'?'Speaking':FiezelI18n.t('student.skills-title','Bicara & Dengar');else if(state.view==='reading')_title=FiezelI18n.t('skill.reading','Membaca');else if(state.view==='writing')_title=FiezelI18n.t('skill.writing','Menulis');else if(state.view==='library')_title=FiezelI18n.t('library.title','Perpustakaan');else if(state.view==='progress')_title=FiezelI18n.t('nav.progres','Progres');else if(state.view==='game'||state.view==='arena')_title=FiezelI18n.t('nav.game','Game');else if(state.view==='tutor')_title='Pusat Tutor';else if(state.view==='kana')_title='Karakter Kana';else if(state.view==='nujum')_title='Nujum Mentor';else if(state.view==='chat')_title=FiezelI18n.t('chat.title','Kawan Bicara');else if(state.view==='ask'||state.view==='search')_title=FiezelI18n.t('ask.judul','Tanya FIEZEL');if(_topContextTitle)_topContextTitle.textContent=_title;}if(_topContextActions){const _hasLevel=['latihan','grammar','vocab','reading','writing','skills','listening','speaking','progress','library'].includes(state.view);if(_hasLevel){_topContextActions.style.display='flex';_topContextActions.innerHTML=levelControlMarkup();}else{_topContextActions.style.display='none';}}}const _bTag=$('topBrandTag')||document.querySelector('#topBrandWrap .fiezel-brand-tag');if(_bTag){let _t='AKTIF';if(state.view==='latihan'||['vocab','grammar','reading','skills','listening','speaking','writing','library','kana','ask','search','chat'].includes(state.view)||TAB_PARENT[state.view]==='latihan')_t='LATIHAN';else if(state.view==='progress')_t='PROGRES';else if(state.view==='game'||state.view==='arena'||TAB_PARENT[state.view]==='game')_t='ARENA';else if(state.view==='online'||state.view==='profile')_t='PROFIL';else if(state.view==='classroom')_t='KELAS';else if(state.view==='tutor')_t='TUTOR';else if(state.view==='nujum')_t='MENTOR';else if(state.view==='chat')_t='CHAT';_bTag.textContent=_t;}const _sVal=$('topbarStreakVal'),_xVal=$('topbarXpVal');if(_sVal)_sVal.textContent=String(state.streak||3);if(_xVal)_xVal.textContent=String(state.xp||(state.gems?.balance)||120);}catch(_){}try{self.FiezelJaUi?.applyPrefs?.()}catch(_){}enhanceUI();syncExamLockForView();syncCoachBubble();try{refreshNotifBadge()}catch(_){}try{updateTopbarCourseButton()}catch(_){}restoreActiveElement($('app'),savedActive);if(isViewChange){try{const _rEl=document.getElementById('fzRitual');if(_rEl&&state.view!=='home'){clearTimeout(_rEl._fzAutoClose);_rEl.remove()}}catch(_){}window.scrollTo(0,0);syncTopbarScrolled()}}
+function renderInner(){if(isVerifiedTeacher()&&state.view!=='tutor'){state.view='tutor'}/* Kursus Jepang berbicara dengan istilahnya sendiri (Kotoba, Bunpō, Renshū): lapisan kunci 'kursus-ja.*' di FiezelI18n dinyalakan SEBELUM layar dilukis, dan tabel/elemen statis yang sudah memegang kalimat lama disegarkan sekali saat kursus berganti. */try{const __course=activeTargetLang()==='ja'&&!isVerifiedTeacher()?'ja':null;if(self.FiezelI18n?.getCourse&&FiezelI18n.getCourse()!==__course){FiezelI18n.setCourse(__course);__fzRefreshI18nTables();/* Soal, jawaban, dan pembahasan kursus Jepang diberi furigana + romaji dari bank kosakata, dan tiap kuis mendapat tombol ふりがな/ローマ字. */try{if(__course==='ja')self.FiezelJaUi?.observe?.($('app'),()=>V);else self.FiezelJaUi?.unobserve?.()}catch(_){}}}catch(_){}/* m025-314: go() menolak permukaan yang salah bahasa, tetapi state.view juga bisa datang dari sesi SEBELUM murid berganti kursus (ia tersimpan dan dipulihkan saat boot) — jadi pemulihan itu ikut dijepit di sini, bukan hanya jalur navigasi. */if(targetLangSurfaceBlocked(state.view)||state.view==='game'){state.view='home'}if(document.body?.classList?.contains?.('fz-teacher-mode')&&state.view!=='tutor'){try{self.FiezelTeacherShell?.unmount?.()}catch(_){}}isViewChange=state.view!==lastRenderedView;lastRenderedView=state.view;const appContainer=$('app'),savedActive=captureActiveElement(appContainer);if(appContainer)appContainer.classList.add('is-repaint');speakingListeningMountToken++;if(speakingListeningController){speakingListeningController.destroy();speakingListeningController=null;/* m026-01: satu-satunya tempat sesi dengar benar-benar bubar. Di dalam if, bukan di luar - kalau tidak, tiap navigasi biasa akan memaksa maskot kembali idle dan memotong selebrasi yang sedang jalan. */pawReact('listening-stop')}if(state.view!=='chat'&&(document.body?.classList?.contains?.('fz-view-chat')||document.documentElement?.classList?.contains?.('fz-view-chat'))){try{self.FiezelInteractiveChat?.unmount?.()}catch(_){}}document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));if(state.view==='home')home();if(state.view==='latihan')latihan();if(state.view==='vocab')vocab();if(state.view==='grammar')grammar();if(state.view==='reading')reading();if(state.view==='skills')skillsLab();if(state.view==='listening')skillsLab('listening');if(state.view==='speaking')skillsLab('speaking');if(state.view==='writing')writing();if(state.view==='classroom')classHubView();if(state.view==='library')library();if(state.view==='ask'||state.view==='search')askView();if(state.view==='test')placement();if(state.view==='progress')progress();if(state.view==='online'||state.view==='profile')onlineView();if(state.view==='learn')learnerFlowView();if(state.view==='arena')arenaView();if(state.view==='tutor')tutorCenterView();if(state.view==='kana')kanaView();if(state.view==='nujum')nujumView();if(state.view==='chat')interactiveChatView();/* merge SLOT 7 sosial 2026-08-29 *//* Audit F12: layar tanpa tab sendiri tetap menandai tab induknya - Tes awal milik Hari ini, hub latihan milik Latihan. */const TAB_PARENT={chat:'latihan',nujum:'home',kana:'latihan',test:'home',vocab:'latihan',grammar:'latihan',reading:'latihan',writing:'latihan',library:'latihan',skills:'latihan',listening:'latihan',speaking:'latihan',learn:'home',arena:'online',profile:'online'};const activeTabEl=document.querySelector(`[data-view="${state.view}"]`)||(state.view==='profile'?document.querySelector('[data-view="online"]'):state.view==='online'?document.querySelector('[data-view="profile"]'):TAB_PARENT[state.view]?document.querySelector(`.bottomnav [data-view="${TAB_PARENT[state.view]}"]`):null);activeTabEl?.classList.add('active');if(state.view!=='chat'){const _bn=document.querySelector('.bottomnav');if(_bn){_bn.style.removeProperty('display');_bn.style.removeProperty('visibility');_bn.style.removeProperty('opacity');}}syncNavActivePill(activeTabEl);/* m028 fase3: bendera panggung Skills Lab. Addon listening memaku blok tombolnya ke dasar layar (speaking-listening-addon.css), jadi ia panggung kedua yang bisa ditutupi gelembung. */document.body?.classList?.toggle?.('fz-stage-sl',['skills','listening','speaking'].includes(state.view));/* m028 fase3 (QA §9): Peta Belajar ikut jadi panggung ber-kontrol sejak panel NEXT SESSION punya tombol "Mulai sesi" di dekat dasar layar - screenshot QA menunjukkan gelembung PAW menutupinya utuh. Aturannya sama dengan kuis: peek dilarang, dok mengecil, layar diberi ruang bawah. */document.body?.classList?.toggle?.('fz-stage-map',state.view==='progress');/* 2026-08-29 overhaul I12 (O6 #10): bendera panggung Home. Wajah coach-strip adalah SATU-SATUNYA Pau di Home; gelembung FAB pengambang (Pau kedua, terukur menimpa lipatan hero/skill-hub di 390px) disembunyikan lewat CSS body.fz-stage-home — pola yang sama dengan fz-stage-sl/fz-stage-map, modul gelembung tidak disentuh. */document.body?.classList?.toggle?.('fz-stage-home',state.view==='home');/* q16-P2-2 2026-08-29: hub juga panggung ber-CTA-dekat-dasar (Review Due, Buka flashcards, Mulai 25 soal) \u2014 peek dilarang, dok mengecil, pola sama dengan sl/map. */document.body?.classList?.toggle?.('fz-stage-hub',['vocab','grammar','reading','library','test'].includes(state.view));document.body?.classList?.toggle?.('fz-stage-writing',state.view==='writing');/* v24-F2 2026-08-29: Writing = layar mengarang; FAB disembunyikan via CSS (pola fz-stage-home), modul gelembung tidak disentuh. *//* Kursus Jepang berpakaian sendiri: palet shu/ai/washi di fiezel-2.css menempel lewat bendera ini, jadi layar Inggris tidak tersentuh sama sekali; KelasKu guru punya palet sendiri (teacher-shell.css). */document.body?.classList?.toggle?.('fz-lang-ja',self.FiezelI18n?.getCourse?.()==='ja');document.body?.classList?.toggle?.('fz-view-classroom',state.view==='classroom');document.body?.classList?.toggle?.('fz-view-profile',state.view==='online'||state.view==='profile');document.body?.classList?.toggle?.('fz-view-latihan',state.view==='latihan');document.body?.classList?.toggle?.('fz-view-grammar',state.view==='grammar');document.body?.classList?.toggle?.('fz-view-vocab',state.view==='vocab');document.documentElement?.classList?.toggle?.('fz-view-chat',state.view==='chat');document.body?.classList?.toggle?.('fz-view-chat',state.view==='chat');try{const _topBrandNormal=$('topBrandWrap'),_topBrandK=$('topBrandKelasKu'),_topContextWrap=$('topContextWrap'),_topContextBackBtn=$('topContextBackBtn'),_topContextTitle=$('topContextTitle'),_topContextActions=$('topContextActions'),_topActionsNormal=$('topGamifyCluster'),_topClusterK=$('topKelasKuCluster'),_isHome=state.view==='home',_isK=state.view==='classroom',_isP=state.view==='online'||state.view==='profile',_setBtn=$('topSettingsBtn'),_cBtn=$('fzCourseSwitchBtn'),_frBtn=$('topProfileFriendBtn'),_notifBtn=$('fzNotifBtn');if(_isP&&_frBtn){const _fb=$('topProfileFriendBadge');if(_fb){if(socialRequestCount>0){_fb.textContent=String(socialRequestCount);_fb.classList.remove('hidden');}else{_fb.classList.add('hidden');}}}if(_isHome){if(_topBrandNormal)_topBrandNormal.style.display='flex';if(_topBrandK)_topBrandK.style.display='none';if(_topContextWrap)_topContextWrap.style.display='none';if(_topContextActions)_topContextActions.style.display='none';if(_topActionsNormal)_topActionsNormal.style.display='flex';if(_topClusterK)_topClusterK.style.display='none';if(_cBtn)_cBtn.style.display='inline-flex';if(_setBtn)_setBtn.style.display='none';if(_notifBtn)_notifBtn.style.display='inline-flex';if(_frBtn)_frBtn.style.display='none';}else if(_isK){if(_topBrandNormal)_topBrandNormal.style.display='none';if(_topBrandK)_topBrandK.style.display='flex';if(_topContextWrap)_topContextWrap.style.display='none';if(_topContextActions)_topContextActions.style.display='none';if(_topActionsNormal)_topActionsNormal.style.display='none';if(_topClusterK)_topClusterK.style.display='flex';updateTopbarClassState();if(_cBtn)_cBtn.style.display='none';if(_setBtn)_setBtn.style.display='none';if(_notifBtn)_notifBtn.style.display='none';if(_frBtn)_frBtn.style.display='none';}else if(_isP){if(_topBrandNormal)_topBrandNormal.style.display='none';if(_topBrandK)_topBrandK.style.display='none';if(_topContextWrap){_topContextWrap.style.display='flex';if(_topContextBackBtn)_topContextBackBtn.style.display='none';if(_topContextTitle)_topContextTitle.textContent=FiezelI18n.t('nav.profile','Profil');}if(_topContextActions)_topContextActions.style.display='none';if(_topActionsNormal)_topActionsNormal.style.display='flex';if(_topClusterK)_topClusterK.style.display='none';if(_cBtn)_cBtn.style.display='none';if(_setBtn)_setBtn.style.display='inline-flex';if(_notifBtn)_notifBtn.style.display='none';if(_frBtn)_frBtn.style.display='inline-flex';}else{if(_topBrandNormal)_topBrandNormal.style.display='none';if(_topBrandK)_topBrandK.style.display='none';if(_topActionsNormal)_topActionsNormal.style.display='none';if(_topClusterK)_topClusterK.style.display='none';if(_cBtn)_cBtn.style.display='none';if(_setBtn)_setBtn.style.display='none';if(_notifBtn)_notifBtn.style.display='none';if(_frBtn)_frBtn.style.display='none';if(_topContextWrap){_topContextWrap.style.display='flex';const _hasBack=['grammar','vocab','reading','writing','skills','listening','speaking','library','kana','ask','search','chat'].includes(state.view);if(_topContextBackBtn)_topContextBackBtn.style.display=_hasBack?'inline-flex':'none';let _title='Latihan';if(state.view==='latihan')_title=FiezelI18n.t('nav.latihan','Latihan');else if(state.view==='grammar')_title=FiezelI18n.t('student.grammar-title','Grammar');else if(state.view==='vocab')_title=FiezelI18n.t('student.vocab-title','Kosakata');else if(state.view==='skills'||state.view==='listening'||state.view==='speaking')_title=state.view==='listening'?'Listening':state.view==='speaking'?'Speaking':FiezelI18n.t('student.skills-title','Bicara & Dengar');else if(state.view==='reading')_title=FiezelI18n.t('skill.reading','Membaca');else if(state.view==='writing')_title=FiezelI18n.t('skill.writing','Menulis');else if(state.view==='library')_title=FiezelI18n.t('library.title','Perpustakaan');else if(state.view==='progress')_title=FiezelI18n.t('nav.progres','Progres');else if(state.view==='arena')_title='Arena';else if(state.view==='tutor')_title='Pusat Tutor';else if(state.view==='kana')_title='Karakter Kana';else if(state.view==='nujum')_title='Nujum Mentor';else if(state.view==='chat')_title=FiezelI18n.t('chat.title','Kawan Bicara');else if(state.view==='ask'||state.view==='search')_title=FiezelI18n.t('ask.judul','Tanya FIEZEL');if(_topContextTitle)_topContextTitle.textContent=_title;}if(_topContextActions){const _hasLevel=['latihan','grammar','vocab','reading','writing','skills','listening','speaking','progress','library'].includes(state.view);if(_hasLevel){_topContextActions.style.display='flex';_topContextActions.innerHTML=levelControlMarkup();}else{_topContextActions.style.display='none';}}}const _bTag=$('topBrandTag')||document.querySelector('#topBrandWrap .fiezel-brand-tag');if(_bTag){let _t='AKTIF';if(state.view==='latihan'||['vocab','grammar','reading','skills','listening','speaking','writing','library','kana','ask','search','chat'].includes(state.view)||TAB_PARENT[state.view]==='latihan')_t='LATIHAN';else if(state.view==='progress')_t='PROGRES';else if(state.view==='arena')_t='ARENA';else if(state.view==='online'||state.view==='profile')_t='PROFIL';else if(state.view==='classroom')_t='KELAS';else if(state.view==='tutor')_t='TUTOR';else if(state.view==='nujum')_t='MENTOR';else if(state.view==='chat')_t='CHAT';_bTag.textContent=_t;}const _sVal=$('topbarStreakVal'),_xVal=$('topbarXpVal');if(_sVal)_sVal.textContent=String(state.streak||3);if(_xVal)_xVal.textContent=String(state.xp||(state.gems?.balance)||120);}catch(_){}try{self.FiezelJaUi?.applyPrefs?.()}catch(_){}enhanceUI();syncExamLockForView();syncCoachBubble();try{refreshNotifBadge()}catch(_){}try{updateTopbarCourseButton()}catch(_){}restoreActiveElement($('app'),savedActive);if(isViewChange){try{const _rEl=document.getElementById('fzRitual');if(_rEl&&state.view!=='home'){clearTimeout(_rEl._fzAutoClose);_rEl.remove()}}catch(_){}window.scrollTo(0,0);syncTopbarScrolled()}}
 // m025-115 - pembimbing yang ikut ke mana pun murid pergi (brief bagian 7).
 //
 // Gelembungnya dipasang SEKALI ke <body> dan tidak pernah ikut dicat ulang; yang dikirim
@@ -9417,7 +9417,7 @@ function syncCoachBubble(){
    tautan dalam layar, dan tur semuanya membawa nama view yang sudah ada, dan menghapus
    satu nama dari himpunan ini akan membuat go() menampilkan toast "halaman tak tersedia"
    pada perjalanan yang benar-benar valid. */
-const VALID_VIEWS=new Set(['kana','home','latihan','game','vocab','grammar','reading','skills','listening','speaking','writing','test','progress','classroom','library','ask','search','online','profile','learn','tutor','arena','nujum','chat']);
+const VALID_VIEWS=new Set(['kana','home','latihan','vocab','grammar','reading','skills','listening','speaking','writing','test','progress','classroom','library','ask','search','online','profile','learn','tutor','arena','nujum','chat']);
 function prefersReducedMotion(){try{return !!(self.matchMedia&&self.matchMedia('(prefers-reduced-motion: reduce)').matches)}catch(_){return false}}
 // m026-01 - maskot PAW. Tiga pembungkus di bawah ini adalah SATU-SATUNYA cara app.js
 // berbicara dengan <fiezel-mascot>. Alasannya:
@@ -9703,7 +9703,7 @@ function examWatchSync(){
 }
 try{document.addEventListener('fiezel-exam-lock',examWatchSync)}catch(_){}
 
-function go(v,opts){if((v==='ask'||v==='search')&&!aiDoorAllowed())return false;if(isVerifiedTeacher()&&v!=='tutor'){v='tutor'}if(!VALID_VIEWS.has(v)){showToast(FiezelI18n.t('nav.halaman-tak-tersedia'));return false}/* m025-314: penolakan berbahasa duduk DI SINI, bukan di daftar kartu — setiap pintu ke permukaan yang belum punya isi bahasa target lewat go(), termasuk pintu yang belum ditulis. */if(targetLangSurfaceBlocked(v)){showToast(FiezelI18n.t('bahasa.permukaan-terkunci',{bahasa:FiezelI18n.t('bahasa.'+activeTargetLang())}));return false}if(state.view&&state.view!==v&&state.view!=='chat'){state._previousView=state.view;}if(state.view==='chat'&&v!=='chat'){try{self.FiezelInteractiveChat?.unmount?.()}catch(_){}}if(opts?.viaHistory!==true)haptic('tap');uiSfx('nav');dropStages();if(opts?.viaHistory!==true)pushBackNavView(v);state.view=v;if(v==='classroom'||v==='home'){try{inboxPoll(v==='classroom')}catch(_){}}if(v==='home'){try{const cur=Number(sessionStorage.getItem('fz_today_vocab_visit')||0);sessionStorage.setItem('fz_today_vocab_visit',String(cur+1))}catch(_){}}try{const _targetView=(typeof TAB_PARENT!=='undefined'&&TAB_PARENT[v])?TAB_PARENT[v]:v;const _targetBtn=document.querySelector(`.bottomnav [data-view="${_targetView}"]`);if(_targetBtn)syncNavActivePill(_targetBtn)}catch(_){}const swap=()=>{save();render()};const isBottomTab=['home','latihan','classroom','game','progress','online','profile'].includes(v);if(!isBottomTab&&document.startViewTransition&&state.preferences?.motion!==false&&!prefersReducedMotion()){vtViewPaint=true;try{const __vt=document.startViewTransition(swap);const __done=()=>{vtViewPaint=false};if(__vt&&__vt.finished&&typeof __vt.finished.finally==='function')__vt.finished.finally(__done);else setTimeout(__done,300)}catch(_){try{swap()}finally{vtViewPaint=false}}}else swap();return true} window.go=go;
+function go(v,opts){if((v==='ask'||v==='search')&&!aiDoorAllowed())return false;if(isVerifiedTeacher()&&v!=='tutor'){v='tutor'}if(!VALID_VIEWS.has(v)){showToast(FiezelI18n.t('nav.halaman-tak-tersedia'));return false}/* m025-314: penolakan berbahasa duduk DI SINI, bukan di daftar kartu — setiap pintu ke permukaan yang belum punya isi bahasa target lewat go(), termasuk pintu yang belum ditulis. */if(targetLangSurfaceBlocked(v)){showToast(FiezelI18n.t('bahasa.permukaan-terkunci',{bahasa:FiezelI18n.t('bahasa.'+activeTargetLang())}));return false}if(state.view&&state.view!==v&&state.view!=='chat'){state._previousView=state.view;}if(state.view==='chat'&&v!=='chat'){try{self.FiezelInteractiveChat?.unmount?.()}catch(_){}}if(opts?.viaHistory!==true)haptic('tap');uiSfx('nav');dropStages();if(opts?.viaHistory!==true)pushBackNavView(v);state.view=v;if(v==='classroom'||v==='home'){try{inboxPoll(v==='classroom')}catch(_){}}if(v==='home'){try{const cur=Number(sessionStorage.getItem('fz_today_vocab_visit')||0);sessionStorage.setItem('fz_today_vocab_visit',String(cur+1))}catch(_){}}try{const _targetView=(typeof TAB_PARENT!=='undefined'&&TAB_PARENT[v])?TAB_PARENT[v]:v;const _targetBtn=document.querySelector(`.bottomnav [data-view="${_targetView}"]`);if(_targetBtn)syncNavActivePill(_targetBtn)}catch(_){}const swap=()=>{save();render()};const isBottomTab=['home','latihan','classroom','progress','online','profile'].includes(v);if(!isBottomTab&&document.startViewTransition&&state.preferences?.motion!==false&&!prefersReducedMotion()){vtViewPaint=true;try{const __vt=document.startViewTransition(swap);const __done=()=>{vtViewPaint=false};if(__vt&&__vt.finished&&typeof __vt.finished.finally==='function')__vt.finished.finally(__done);else setTimeout(__done,300)}catch(_){try{swap()}finally{vtViewPaint=false}}}else swap();return true} window.go=go;
 function handleTopbarBack(){if(typeof go!=='function')return;if(state.view==='chat'){const prev=state._previousView;if(prev&&VALID_VIEWS.has(prev)&&prev!=='chat'){go(prev);return;}if(typeof self.FiezelBackNav?.depth==='function'&&self.FiezelBackNav.depth()>0){try{if(self.FiezelBackNav.back())return;}catch(_){}}go('home');return;}const subViews=['grammar','vocab','skills','listening','speaking','reading','writing','library','kana','ask','search'];if(subViews.includes(state.view)){go('latihan')}else{go('home')}} window.handleTopbarBack=handleTopbarBack;
 function pushBackNavView(v){try{return self.FiezelBackNav?.pushView?.(v)===true}catch{return false}}
 /* ---- m025-117 lapisan layar-di-dalam-view (stage) ---------------------------------
@@ -17529,268 +17529,7 @@ function nextSessionPanelMarkup(){
 // Alur learner (diagnostic → rencana → lesson → feedback) dan Tutor Action Center. Logikanya
 // hidup di features/learner-flow dan features/tutor-action-center; di sini hanya jembatan layar.
 function learnerFlowView(){setApp('<div id="fzLearnerFlow" class="learner-flow-shell"></div>');const mod=self.FiezelLearnerFlow;if(!mod){$('fzLearnerFlow').innerHTML='<p class="muted">Modul alur belajar belum termuat.</p>';return}mod.mount($('fzLearnerFlow'),{toast:showToast,appVersion:APP_VERSION,learnerName,afterRender:enhanceUI})}
-function gameView(){
-  setApp(`<div class="game-view-shell fade">${gameHubMarkup()}</div>`);
-}
-function startVocabArcade(){
-  try{
-    if(self.FiezelGrammarVocabBridge?.startVocabMiniGame){
-      const items=grammarItemsForLevel(getActiveLevel())||[];
-      const skill=items[0]?.skill||'present_simple';
-      self.FiezelGrammarVocabBridge.startVocabMiniGame(skill);
-      return;
-    }
-  }catch(_){}
-  go('vocab');
-}
-function startSentencePuzzleArcade(){
-  try{
-    if(self.FiezelGrammarVocabBridge?.startVocabMiniGame){
-      const items=grammarItemsForLevel(getActiveLevel())||[];
-      const skill=items[1]?.skill||items[0]?.skill||'past_simple';
-      self.FiezelGrammarVocabBridge.startVocabMiniGame(skill);
-      return;
-    }
-  }catch(_){}
-  go('grammar');
-}
-
-/* Bug Arena (2D Flat Vector Anime Boss Raid Poster) - ditempatkan di panel Game */
-function bugArenaCardMarkup() {
-  return `
-    <div class="game-poster-card bug-poster-card" onclick="if(window.FiezelBug&&FiezelBug.view)FiezelBug.view();else go('grammar');">
-      <div class="anime-hazard-tape" aria-hidden="true"></div>
-      <div class="anime-manga-accents" aria-hidden="true"></div>
-      <div class="poster-badge-row">
-        <span class="poster-kicker bug-kicker">
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" fill="currentColor"/>
-          </svg>
-          <span>BOSS RAID SINTAKSIS</span>
-        </span>
-        <span class="poster-threat-tag"><span class="threat-pulse-dot"></span> 2 ANCAMAN AKTIF</span>
-      </div>
-      <div class="poster-body">
-        <div class="poster-titles">
-          <span class="poster-sub-brand bug-sub-brand">TARGET ELIMINASI // 討伐ミッション</span>
-          <h2 class="poster-main-title bug-title">BUG ARENA</h2>
-          <p class="poster-tagline">Pola grammar yang sering keliru telah bermutasi menjadi Monster Bug! Tumbangkan segera sebelum menguras HP belajarmu.</p>
-        </div>
-        <div class="poster-graphic bug-boss-graphic" aria-hidden="true">
-          <svg viewBox="0 0 100 100" class="bug-boss-svg" width="86" height="86">
-            <!-- Comic Reticle Brackets -->
-            <circle cx="50" cy="50" r="44" fill="none" stroke="#FDA4AF" stroke-width="2" stroke-dasharray="6 5"/>
-            <path d="M20 20 L12 20 L12 28 M80 20 L88 20 L88 28 M20 80 L12 80 L12 72 M80 80 L88 80 L88 72" fill="none" stroke="#F43F5E" stroke-width="3" stroke-linecap="square"/>
-            <!-- Mecha Legs with Angular Joints -->
-            <path d="M30 36 L12 28 M26 50 L8 50 M30 64 L12 72" stroke="#0F172A" stroke-width="4.5" stroke-linecap="round"/>
-            <path d="M30 36 L12 28 M26 50 L8 50 M30 64 L12 72" stroke="#E11D48" stroke-width="2.2" stroke-linecap="round"/>
-            <path d="M70 36 L88 28 M74 50 L92 50 M70 64 L88 72" stroke="#0F172A" stroke-width="4.5" stroke-linecap="round"/>
-            <path d="M70 36 L88 28 M74 50 L92 50 M70 64 L88 72" stroke="#E11D48" stroke-width="2.2" stroke-linecap="round"/>
-            <!-- Antennae -->
-            <path d="M42 22 L36 8 M58 22 L64 8" stroke="#0F172A" stroke-width="4" stroke-linecap="round"/>
-            <path d="M42 22 L36 8 M58 22 L64 8" stroke="#FDE047" stroke-width="2" stroke-linecap="round"/>
-            <polygon points="36,8 31,5 36,2 41,5" fill="#FACC15" stroke="#0F172A" stroke-width="1.5"/>
-            <polygon points="64,8 59,5 64,2 69,5" fill="#FACC15" stroke="#0F172A" stroke-width="1.5"/>
-            <!-- Main Carapace Armor (Cel-shaded) -->
-            <rect x="30" y="26" width="40" height="54" rx="14" fill="#E11D48" stroke="#0F172A" stroke-width="2.8"/>
-            <path d="M50 26 H56 C63.7 26 70 32.3 70 40 V66 C70 73.7 63.7 80 56 80 H50 Z" fill="#9F1239"/>
-            <line x1="50" y1="26" x2="50" y2="80" stroke="#0F172A" stroke-width="2.5"/>
-            <!-- Mecha Head Unit -->
-            <path d="M36 28 C36 18 64 18 64 28 Z" fill="#BE123C" stroke="#0F172A" stroke-width="2.5"/>
-            <!-- Glowing Cyan Anime Mecha Eyes -->
-            <polygon points="40,24 46,24 44,28 38,28" fill="#38BDF8" stroke="#0F172A" stroke-width="1.5"/>
-            <polygon points="60,24 54,24 56,28 62,28" fill="#38BDF8" stroke="#0F172A" stroke-width="1.5"/>
-            <!-- Armor Vent Lines -->
-            <line x1="38" y1="46" x2="44" y2="46" stroke="#0F172A" stroke-width="2" stroke-linecap="round"/>
-            <line x1="38" y1="56" x2="44" y2="56" stroke="#0F172A" stroke-width="2" stroke-linecap="round"/>
-            <line x1="56" y1="46" x2="62" y2="46" stroke="#0F172A" stroke-width="2" stroke-linecap="round"/>
-            <line x1="56" y1="56" x2="62" y2="56" stroke="#0F172A" stroke-width="2" stroke-linecap="round"/>
-            <!-- Danger Alert Spark -->
-            <path d="M78 14 L81 18 L86 16 L83 21 L87 24 L81 24 L80 29 L77 24 L72 24 L76 21 L73 16 L77 18 Z" fill="#FACC15" stroke="#0F172A" stroke-width="1.5"/>
-          </svg>
-        </div>
-      </div>
-
-      <!-- Tactical Boss HP Tracks -->
-      <div class="boss-hp-stack">
-        <div class="boss-hp-unit">
-          <div class="boss-hp-meta">
-            <span class="boss-name"><b>Past Tense Irregular</b> <small>go → went / buy → bought</small></span>
-            <span class="boss-hp-badge crimson">82% HP</span>
-          </div>
-          <div class="boss-hp-track">
-            <div class="boss-hp-bar crimson" style="width: 82%"></div>
-          </div>
-        </div>
-        <div class="boss-hp-unit">
-          <div class="boss-hp-meta">
-            <span class="boss-name"><b>Present Perfect vs Past</b> <small>since vs for</small></span>
-            <span class="boss-hp-badge amber">60% HP</span>
-          </div>
-          <div class="boss-hp-track">
-            <div class="boss-hp-bar amber" style="width: 60%"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="poster-cta-wrap">
-        <button type="button" class="poster-action-btn bug-raid-action-btn" onclick="event.stopPropagation();if(window.FiezelBug&&FiezelBug.view)FiezelBug.view();else go('grammar');">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" fill="currentColor"/>
-          </svg>
-          <span>SERANG &amp; ELIMINASI BUG (±2 MNT)</span>
-          <i data-lucide="arrow-right"></i>
-        </button>
-      </div>
-    </div>`;
-}
-
-function gameHubMarkup(){
-  return `<div class="game-hub-container">
-    <div class="game-hub-header-titles">
-      <h1 class="game-brand-heading">${esc(FiezelI18n.t('game.title'))}</h1>
-      <p class="game-brand-sub">${esc(FiezelI18n.t('game.subtitle'))}</p>
-    </div>
-
-    <!-- 1. POSTER GAME CARD: FIEZEL ARENA (2D Flat Vector Anime Duel 1v1) -->
-    <div class="game-section-header">
-      <h4>【対戦】DUEL MULTIPLAYER 1V1</h4>
-      <span class="section-sub">Adu kecepatan &amp; ketangkasan bahasa bersama kawan</span>
-    </div>
-    <div class="game-poster-card paw-poster-card" onclick="go('arena')">
-      <div class="anime-manga-accents" aria-hidden="true"></div>
-      <div class="poster-badge-row">
-        <span class="poster-kicker"><i data-lucide="swords"></i> <span>${esc(FiezelI18n.t('game.arena-kicker'))}</span></span>
-        <span class="poster-live-tag"><span class="live-pulse-dot"></span> ${esc(FiezelI18n.t('game.arena-live'))}</span>
-      </div>
-      <div class="poster-body">
-        <div class="poster-titles">
-          <span class="poster-sub-brand">ARENA LEAGUE // 対戦リーグ</span>
-          <h2 class="poster-main-title">${esc(FiezelI18n.t('game.paw-arena-title'))}</h2>
-          <p class="poster-tagline">${esc(FiezelI18n.t('game.paw-arena-desc'))}</p>
-        </div>
-        <div class="poster-graphic" aria-hidden="true">
-          <svg viewBox="0 0 100 100" class="poster-trophy-svg" width="86" height="86">
-            <!-- Comic Action Starburst Accent -->
-            <polygon points="50,2 62,32 94,36 68,58 76,90 50,72 24,90 32,58 6,36 38,32" fill="#FDE047" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round"/>
-            <!-- Inner Anime Shield -->
-            <path d="M50 16 L78 28 V54 C78 72 50 86 50 86 C50 86 22 72 22 54 V28 Z" fill="#2563EB" stroke="#0F172A" stroke-width="2.5" stroke-linejoin="round"/>
-            <!-- Shield Cel-shade Highlight -->
-            <path d="M50 16 L22 28 V54 C22 72 50 86 50 86 Z" fill="#3B82F6"/>
-            <!-- Crossed Anime Blades -->
-            <line x1="28" y1="28" x2="72" y2="72" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round"/>
-            <line x1="28" y1="28" x2="72" y2="72" stroke="#0F172A" stroke-width="2" stroke-linecap="round"/>
-            <line x1="25" y1="25" x2="35" y2="35" stroke="#F59E0B" stroke-width="6" stroke-linecap="round"/>
-            <line x1="72" y1="28" x2="28" y2="72" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round"/>
-            <line x1="72" y1="28" x2="28" y2="72" stroke="#0F172A" stroke-width="2" stroke-linecap="round"/>
-            <line x1="75" y1="25" x2="65" y2="35" stroke="#F59E0B" stroke-width="6" stroke-linecap="round"/>
-            <!-- Center Golden Cup Trophy Cel-Shaded -->
-            <path d="M38 38 H62 V50 C62 57 56 62 50 62 C44 62 38 57 38 50 Z" fill="#FACC15" stroke="#0F172A" stroke-width="2.2" stroke-linejoin="round"/>
-            <path d="M50 38 H62 V50 C62 57 56 62 50 62 Z" fill="#F59E0B"/>
-            <path d="M38 42 C32 42 32 50 38 50" fill="none" stroke="#0F172A" stroke-width="2.2" stroke-linecap="round"/>
-            <path d="M62 42 C68 42 68 50 62 50" fill="none" stroke="#0F172A" stroke-width="2.2" stroke-linecap="round"/>
-            <rect x="47" y="62" width="6" height="8" fill="#F59E0B" stroke="#0F172A" stroke-width="2"/>
-            <rect x="40" y="70" width="20" height="5" rx="1.5" fill="#FACC15" stroke="#0F172A" stroke-width="2"/>
-            <!-- Manga Sparkles -->
-            <path d="M78 20 L80 14 L82 20 L88 22 L82 24 L80 30 L78 24 L72 22 Z" fill="#FFFFFF" stroke="#0F172A" stroke-width="1.2"/>
-            <path d="M18 64 L20 60 L22 64 L26 65 L22 66 L20 70 L18 66 L14 65 Z" fill="#FDE047" stroke="#0F172A" stroke-width="1.2"/>
-          </svg>
-        </div>
-      </div>
-      <div class="poster-modes-strip">
-        <span class="poster-mode-pill"><i data-lucide="zap"></i> ${esc(FiezelI18n.t('game.mode-story'))}</span>
-        <span class="poster-mode-pill"><i data-lucide="sparkles"></i> ${esc(FiezelI18n.t('game.mode-signal'))}</span>
-        <span class="poster-mode-pill"><i data-lucide="trophy"></i> ${esc(FiezelI18n.t('game.mode-stakes'))}</span>
-      </div>
-      <div class="poster-cta-wrap">
-        <button type="button" class="poster-action-btn paw-action-btn" onclick="event.stopPropagation();go('arena')">
-          <span>${esc(FiezelI18n.t('game.paw-arena-cta'))}</span>
-          <i data-lucide="arrow-right"></i>
-        </button>
-      </div>
-    </div>
-
-    <!-- 2. POSTER GAME CARD: BUG ARENA (Boss Raid Tracker) -->
-    <div class="game-section-header">
-      <h4>【討伐】BOSS RAID SINTAKSIS</h4>
-      <span class="section-sub">Eliminasi kelemahan tata bahasa sebelum menguras HP</span>
-    </div>
-    ${bugArenaCardMarkup()}
-
-    <!-- 3. ARCADE MINI-GAMES POSTER GRID -->
-    <div class="game-section-header">
-      <h4>【遊戯】${esc(FiezelI18n.t('game.section-title'))}</h4>
-      <span class="section-sub">${esc(FiezelI18n.t('game.section-sub'))}</span>
-    </div>
-
-    <div class="game-arcade-grid">
-      <!-- Mochi Crunch -->
-      <div class="game-arcade-card mochi-card" onclick="startVocabArcade()">
-        <div class="arcade-card-top">
-          <span class="arcade-badge bubble">【速度】${esc(FiezelI18n.t('game.bubble-badge'))}</span>
-          <span class="arcade-icon-wrap"><i data-lucide="sparkles"></i></span>
-        </div>
-        <h4 class="arcade-card-title">${esc(FiezelI18n.t('game.bubble-title'))}</h4>
-        <p class="arcade-card-desc">${esc(FiezelI18n.t('game.bubble-desc'))}</p>
-        <div class="arcade-card-footer">
-          <span class="arcade-play-hint">${esc(FiezelI18n.t('game.play-cta'))} ➔</span>
-        </div>
-      </div>
-
-      <!-- Sentence Puzzle Forge -->
-      <div class="game-arcade-card puzzle-card" onclick="startSentencePuzzleArcade()">
-        <div class="arcade-card-top">
-          <span class="arcade-badge puzzle">【構文】${esc(FiezelI18n.t('game.puzzle-badge'))}</span>
-          <span class="arcade-icon-wrap"><i data-lucide="layers"></i></span>
-        </div>
-        <h4 class="arcade-card-title">${esc(FiezelI18n.t('game.puzzle-title'))}</h4>
-        <p class="arcade-card-desc">${esc(FiezelI18n.t('game.puzzle-desc'))}</p>
-        <div class="arcade-card-footer">
-          <span class="arcade-play-hint">${esc(FiezelI18n.t('game.puzzle-cta'))} ➔</span>
-        </div>
-      </div>
-
-      <!-- Panggung Suara Live -->
-      <div class="game-arcade-card voice-card" onclick="try{openLiveVoiceStage()}catch(_){go('skills')}">
-        <div class="arcade-card-top">
-          <span class="arcade-badge voice">【発音】${esc(FiezelI18n.t('game.voice-badge'))}</span>
-          <span class="arcade-icon-wrap"><i data-lucide="mic"></i></span>
-        </div>
-        <h4 class="arcade-card-title">${esc(FiezelI18n.t('game.voice-title'))}</h4>
-        <p class="arcade-card-desc">${esc(FiezelI18n.t('game.voice-desc'))}</p>
-        <div class="arcade-card-footer">
-          <span class="arcade-play-hint">${esc(FiezelI18n.t('game.stage-cta'))} ➔</span>
-        </div>
-      </div>
-
-      <!-- Nujum Voice Mentor -->
-      <div class="game-arcade-card nujum-card" onclick="go('nujum')">
-        <div class="arcade-card-top">
-          <span class="arcade-badge nujum">【師範】${esc(FiezelI18n.t('game.nujum-badge'))}</span>
-          <span class="arcade-icon-wrap"><i data-lucide="flame"></i></span>
-        </div>
-        <h4 class="arcade-card-title">${esc(FiezelI18n.t('game.nujum-title'))}</h4>
-        <p class="arcade-card-desc">${esc(FiezelI18n.t('game.nujum-desc'))}</p>
-        <div class="arcade-card-footer">
-          <span class="arcade-play-hint">${esc(FiezelI18n.t('game.nujum-cta'))} ➔</span>
-        </div>
-      </div>
-
-      <!-- Undercover: Tactical Deduction Multiplayer -->
-      <div class="game-arcade-card undercover-card" style="border: 1px solid #d97706; background: linear-gradient(135deg, #181922 0%, #111216 100%);" onclick="window.location.href='./undercover.html'">
-        <div class="arcade-card-top">
-          <span class="arcade-badge" style="background:#2d2012; color:#fbbf24; border:1px solid #78350f;">${esc(FiezelI18n.t('game.undercover-badge'))}</span>
-          <span class="arcade-icon-wrap" style="color:#f59e0b;"><i data-lucide="shield-check"></i></span>
-        </div>
-        <h4 class="arcade-card-title" style="color:#fff;">UNDERCOVER</h4>
-        <p class="arcade-card-desc" style="color:#94a3b8;">${esc(FiezelI18n.t('game.undercover-desc'))}</p>
-        <div class="arcade-card-footer">
-          <span class="arcade-play-hint" style="color:#f59e0b; font-weight:700;">${esc(FiezelI18n.t('game.play-cta'))} ➔</span>
-        </div>
-      </div>
-    </div>
-  </div>`;
-}
+/* m025-634: Panel game dan kartu arcade Undercover (game.undercover-badge) dihapus dari PWA sesuai instruksi pengguna */
 /* m025-277: PAW ARENA sebagai view sendiri (§4 opsi a) — tanpa tab baru. ?duel= lama tetap
    dilayani jalur learner-flow; view ini pintu ruang permainan tersendiri. */
 function arenaView(){setApp('<div id="fzPawArena" class="paw-arena-shell"></div>');const mod=self.FiezelPawArena;if(!mod){$('fzPawArena').innerHTML='<p class="muted">Modul PAW ARENA belum termuat.</p>';return}mod.mount($('fzPawArena'),{toast:showToast,appVersion:APP_VERSION,learnerName,afterRender:enhanceUI})}
