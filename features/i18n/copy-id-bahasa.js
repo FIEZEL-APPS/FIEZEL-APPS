@@ -308,6 +308,7 @@
     'jepang.moshi-lbl-mode': 'Mode Penilaian',
     'jepang.moshi-val-mode': 'Ujian Terkunci (Bebas Bocoran)',
     'jepang.moshi-start-cta': 'Mulai Ujian Moshi ➔',
+    'jepang.moshi-start-toast': 'Memulai Simulasi JLPT {level} ({size} soal)...',
     'kursus-ja.writing.rubrik-meta': 'Kriteria penilaian merujuk standar kecakapan JLPT N5–N1.',
     'kursus-ja.writing.rubrik-intro': 'Penilaian tata bahasa, partikel, keakuratan kalimat, dan kesesuaian topik.',
     'kursus-ja.home.peta-cefr': 'Peta progres JLPT N5 – N1',
