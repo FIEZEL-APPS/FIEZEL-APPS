@@ -1,7 +1,7 @@
 {
-  "version": "m025-638",
-  "claimedBy": "branch fix/ja-ux-pure-jlpt-n5-n1",
-  "claimedAt": "2026-10-24T01:49:17.389Z",
-  "reason": "fix(ja-ux): pure JLPT N5-N1 labels, 50 structured Bunpo lessons, Kanji & Moshi practice, compact Level Picker (m025-638)",
+  "version": "m025-639",
+  "claimedBy": "branch feat/android-live-ota-auto-sync",
+  "claimedAt": "2026-10-24T02:05:17.635Z",
+  "reason": "feat(android): live OTA auto-sync dan build pipeline otomatis",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

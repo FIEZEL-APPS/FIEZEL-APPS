@@ -2,7 +2,12 @@ package id.my.fiezel.app.loader;
 
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.util.Log;
 import android.webkit.WebResourceResponse;
 
@@ -20,6 +25,11 @@ import java.util.Map;
  * assets from `assets/public/`, `assets/www/`, or root `assets/` under virtual HTTPS domains:
  * - https://fiezel.my.id/app/
  * - https://appassets.androidplatform.net/assets/
+ *
+ * LIVE OVER-THE-AIR (OTA) SYNCHRONIZATION:
+ * When online, fiezel.my.id traffic passes through to the live web server so all updates in
+ * the repository are instantly reflected in the APK. When offline, bundled local assets provide
+ * infallible offline fallback.
  */
 public final class FiezelAssetLoaderFactory {
 
@@ -28,10 +38,13 @@ public final class FiezelAssetLoaderFactory {
     public static final String DOMAIN_FIEZEL = "fiezel.my.id";
     public static final String DOMAIN_APPASSETS = "appassets.androidplatform.net";
 
+    private final Context context;
     private final WebViewAssetLoader fiezelAssetLoader;
     private final WebViewAssetLoader appAssetsLoader;
 
     public FiezelAssetLoaderFactory(@NonNull Context context) {
+        this.context = context.getApplicationContext();
+
         // Multi-prefix fallback handler: checks public/, www/, then root assets
         SmartAssetsPathHandler smartHandler = new SmartAssetsPathHandler(context, "public/", "www/", "");
 
@@ -49,8 +62,18 @@ public final class FiezelAssetLoaderFactory {
     }
 
     /**
-     * Intercepts a resource request URI and attempts to serve it from APK assets.
-     * Returns null if the request should fall through to network.
+     * Intercepts a resource request URI and attempts to serve it.
+     *
+     * LIVE OVER-THE-AIR (OTA) SYNCHRONIZATION STRATEGY:
+     * 1. `appassets.androidplatform.net`: Always served from local APK bundled assets.
+     * 2. `fiezel.my.id`:
+     *    - When the device is ONLINE (connected to internet):
+     *      Returns `null`. This allows WebKit to fetch live files directly from `https://fiezel.my.id/app/`.
+     *      Every change pushed to the repository is immediately reflected in the APK without requiring
+     *      a re-installation or manual update.
+     *    - When the device is OFFLINE:
+     *      Intercepts the request and serves the bundled fallback assets from `assets/public/`
+     *      so the application remains fully functional without crashing.
      */
     @Nullable
     public WebResourceResponse shouldInterceptRequest(@NonNull Uri url) {
@@ -59,21 +82,49 @@ public final class FiezelAssetLoaderFactory {
             return null;
         }
 
-        if (DOMAIN_FIEZEL.equalsIgnoreCase(host) || host.endsWith("." + DOMAIN_FIEZEL)) {
-            WebResourceResponse response = fiezelAssetLoader.shouldInterceptRequest(url);
-            if (response != null) {
-                return response;
-            }
+        // Dedicated local virtual domain is ALWAYS served from APK assets
+        if (DOMAIN_APPASSETS.equalsIgnoreCase(host)) {
+            return appAssetsLoader.shouldInterceptRequest(url);
         }
 
-        if (DOMAIN_APPASSETS.equalsIgnoreCase(host)) {
-            WebResourceResponse response = appAssetsLoader.shouldInterceptRequest(url);
-            if (response != null) {
-                return response;
+        // Live production domain (fiezel.my.id):
+        // Only serve bundled assets when device has NO internet connection.
+        // When online, pass through to the network for instant zero-friction OTA synchronization!
+        if (DOMAIN_FIEZEL.equalsIgnoreCase(host) || host.endsWith("." + DOMAIN_FIEZEL)) {
+            if (!isNetworkConnected()) {
+                Log.d(TAG, "Device is offline. Serving bundled fallback for: " + url.getPath());
+                return fiezelAssetLoader.shouldInterceptRequest(url);
             }
+            // Online: let WebKit fetch live web content from https://fiezel.my.id/app/
+            return null;
         }
 
         return null;
+    }
+
+    /**
+     * Checks whether active network connectivity is present.
+     */
+    public boolean isNetworkConnected() {
+        try {
+            ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            if (cm == null) return false;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                Network network = cm.getActiveNetwork();
+                if (network == null) return false;
+                NetworkCapabilities cap = cm.getNetworkCapabilities(network);
+                return cap != null && (
+                        cap.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
+                        cap.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
+                        cap.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)
+                );
+            } else {
+                NetworkInfo info = cm.getActiveNetworkInfo();
+                return info != null && info.isConnected();
+            }
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     /**

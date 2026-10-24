@@ -7,6 +7,19 @@ on:
     paths:
       - 'android/**'
       - 'tools/**'
+      - 'features/**'
+      - 'assets/**'
+      - 'coordination/**'
+      - 'index.html'
+      - 'kurikulum.html'
+      - 'misi.html'
+      - 'undercover.html'
+      - 'app.js'
+      - 'style.css'
+      - 'sw.js'
+      - 'core-config.js'
+      - 'manifest.json'
+      - 'VERSION.json'
       - '.github/workflows/build-android-apk.yml'
   workflow_dispatch:
     inputs:

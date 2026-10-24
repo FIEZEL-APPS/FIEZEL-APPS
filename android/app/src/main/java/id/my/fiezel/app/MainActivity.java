@@ -699,6 +699,10 @@ public class MainActivity extends AppCompatActivity {
         if (webView != null) {
             webView.onResume();
         }
+        if (isOfflineVisible && isNetworkConnected()) {
+            Log.i(TAG, "Network restored on resume, retrying connection to live server");
+            retryConnection();
+        }
     }
 
     @Override
