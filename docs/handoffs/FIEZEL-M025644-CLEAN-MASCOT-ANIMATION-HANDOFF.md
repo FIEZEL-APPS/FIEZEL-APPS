@@ -1,8 +1,8 @@
 # FIEZEL HANDOFF DOSSIER: BUILD M025-644
 
-**Tanggal**: 24 Oktober 2026  
-**Cakupan**: Refinement Animasi Maskot 3D Mochi (Clean Minimalist, Smooth Lofi Headset, Rhythmic Pencil Bobbing, Articulated Talking Mouth, Thinking Badge Guard)  
-**Nomor Build**: `m025-644`  
+**Tanggal**: 24 Oktober 2026
+**Cakupan**: Refinement Animasi Maskot 3D Mochi (Clean Minimalist, Smooth Lofi Headset, Rhythmic Pencil Bobbing, Articulated Talking Mouth, Thinking Badge Guard)
+**Nomor Build**: `m025-644`
 **Hexa-Sync**: Selaras (sw.js, core-config.js, fiezel-diag-panel.js, kurikulum.html, misi.html, call.html)
 
 ---
