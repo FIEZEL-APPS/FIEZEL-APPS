@@ -145,12 +145,19 @@
       return Promise.all(names.map(function (name) {
         // Cangkang shell versi lama yang bukan target rilis baru
         if (name.indexOf('fiezel-shell-') === 0) {
+          // Bila target rilis baru sudah diketahui, hanya cangkang target rilis baru yang dipertahankan
           if (target && name.indexOf(target) !== -1) {
             return Promise.resolve();
           }
-          if (!target && APP_BUILD && name.indexOf(APP_BUILD) === -1) {
-            return Promise.resolve();
+          // Bila target rilis baru belum tercatat eksplisit, periksa apakah cangkang ini lebih baru dari build halaman aktif
+          if (!target) {
+            var cacheBuildNum = parseBuild(name);
+            var appBuildNum = parseBuild(APP_BUILD);
+            if (cacheBuildNum !== null && appBuildNum !== null && cacheBuildNum > appBuildNum) {
+              return Promise.resolve();
+            }
           }
+          // Selain cangkang rilis baru, SEMUA cangkang shell lama WAJIB dihapus bersih!
           return caches.delete(name);
         }
         // Cache runtime data (fiezel-v*): hapus berkas non-neural basi
@@ -175,39 +182,85 @@
   function apply() {
     bindReload();
     var node = el(), btn = node && node.querySelector('#updateBannerApply');
+    var laterBtn = node && node.querySelector('#updateBannerLater');
     if (btn) {
       btn.disabled = true;
       var apText = t('update.applying-text');
       btn.textContent = (apText && apText !== 'update.applying-text') ? apText : 'Memperbarui...';
     }
+    if (laterBtn) {
+      laterBtn.style.display = 'none';
+    }
+    var body = node && node.querySelector('#updateBannerBody');
+    if (body) {
+      body.textContent = 'Membersihkan cache lama & memasang pembaruan... Mohon tunggu sebentar.';
+    }
     setSess('fiezel-apply-update', '1');
-    hide();
     var proceed = function () {
-      if (pendingWorker && typeof pendingWorker.postMessage === 'function') {
-        try { pendingWorker.postMessage({ type: 'FIEZEL_SKIP_WAITING' }); } catch (_) {}
-        setTimeout(reloadIfApproved, 3500);
-      } else if (navigator.serviceWorker && typeof navigator.serviceWorker.getRegistration === 'function') {
+      var triggerWorker = function (w) {
+        if (!w || typeof w.postMessage !== 'function') return false;
+        try { w.postMessage({ type: 'FIEZEL_SKIP_WAITING' }); return true; } catch (_) { return false; }
+      };
+
+      if (pendingWorker && triggerWorker(pendingWorker)) {
+        setTimeout(reloadIfApproved, 1800);
+        return;
+      }
+
+      if (navigator.serviceWorker && typeof navigator.serviceWorker.getRegistration === 'function') {
         navigator.serviceWorker.getRegistration().then(function (reg) {
-          var w = reg && (reg.waiting || (reg.installing && reg.installing.state === 'installed' ? reg.installing : null));
-          if (w && typeof w.postMessage === 'function') {
-            try { w.postMessage({ type: 'FIEZEL_SKIP_WAITING' }); } catch (_) {}
-            setTimeout(reloadIfApproved, 3500);
+          if (!reg) {
+            reloadIfApproved();
             return;
           }
-          if (reg && reg.installing && !reg.waiting) {
+
+          // Kasus 1: Worker baru sudah berstatus waiting
+          if (reg.waiting && triggerWorker(reg.waiting)) {
+            setTimeout(reloadIfApproved, 1800);
+            return;
+          }
+
+          // Kasus 2: Worker baru sedang menginstal (installing)
+          if (reg.installing) {
             var inst = reg.installing;
-            inst.addEventListener('statechange', function onState() {
+            var onState = function () {
               if (inst.state === 'installed' || inst.state === 'activated') {
                 inst.removeEventListener('statechange', onState);
-                try { inst.postMessage({ type: 'FIEZEL_SKIP_WAITING' }); } catch (_) {}
-                setTimeout(reloadIfApproved, 3500);
+                triggerWorker(inst);
+                setTimeout(reloadIfApproved, 1800);
               }
-            });
-            setTimeout(reloadIfApproved, 45000);
+            };
+            inst.addEventListener('statechange', onState);
+            setTimeout(reloadIfApproved, 10000);
             return;
           }
+
+          // Kasus 3: Worker baru belum mulai diunduh (misal banner muncul dari BUILD-VERSION.json)
+          var handled = false;
+          if (typeof reg.update === 'function') {
+            reg.addEventListener('updatefound', function onUpdateFound() {
+              reg.removeEventListener('updatefound', onUpdateFound);
+              var nw = reg.installing;
+              if (nw) {
+                handled = true;
+                nw.addEventListener('statechange', function () {
+                  if (nw.state === 'installed' || nw.state === 'activated') {
+                    triggerWorker(nw);
+                    setTimeout(reloadIfApproved, 1800);
+                  }
+                });
+              }
+            });
+            reg.update().catch(function () {});
+          }
+
+          // Jaring pengaman: muat ulang setelah 4 detik jika tidak ada worker baru
+          setTimeout(function () {
+            if (!handled) reloadIfApproved();
+          }, 4000);
+        }).catch(function () {
           reloadIfApproved();
-        }).catch(function () { reloadIfApproved(); });
+        });
       } else {
         reloadIfApproved();
       }

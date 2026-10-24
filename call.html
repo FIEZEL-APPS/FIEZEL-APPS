@@ -15,9 +15,9 @@
     />
     <link rel="icon" type="image/svg+xml" href="./assets/brand/fiezel-icon.svg" />
     <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
-    <link rel="stylesheet" href="./features/voice-studio/dist/voice-studio.css?v=m025-666" />
+    <link rel="stylesheet" href="./features/voice-studio/dist/voice-studio.css?v=m025-667" />
     <!-- Read-only host runtime config (never modified by Voice Studio) -->
-    <script src="./core-config.js?v=m025-666" defer></script>
+    <script src="./core-config.js?v=m025-667" defer></script>
     <style>
       html, body {
         height: 100%;
@@ -64,12 +64,21 @@
           navigator.serviceWorker.addEventListener('controllerchange', function () {
             if (!window.__fzRefreshed) {
               window.__fzRefreshed = true;
-              window.location.reload();
+              if (typeof caches !== 'undefined' && caches.keys) {
+                caches.keys().then(function (keys) {
+                  var oldShells = keys.filter(function (k) { return k.indexOf('fiezel-shell-') === 0; });
+                  return Promise.all(oldShells.map(function (k) { return caches.delete(k); }));
+                }).catch(function () {}).then(function () {
+                  window.location.reload();
+                });
+              } else {
+                window.location.reload();
+              }
             }
           });
         }
       })();
     </script>
-    <script type="module" src="./features/voice-studio/dist/voice-studio.js?v=m025-666"></script>
+    <script type="module" src="./features/voice-studio/dist/voice-studio.js?v=m025-667"></script>
   </body>
 </html>

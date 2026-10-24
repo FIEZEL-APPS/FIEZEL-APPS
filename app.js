@@ -18444,8 +18444,11 @@ async function clearAppCache(){
     let catatan='';
     try{
       const reg=await (typeof navigator!=='undefined'?navigator.serviceWorker?.getRegistration?.():null);
-      if(reg&&reg.update)await reg.update();
-      else catatan=FiezelI18n.t('settings.service-worker-belum-terdaftar-perangkat');
+      if(reg){
+        if(reg.waiting)reg.waiting.postMessage({type:'FIEZEL_SKIP_WAITING'});
+        if(reg.installing)reg.installing.postMessage({type:'FIEZEL_SKIP_WAITING'});
+        if(reg.update)await reg.update();
+      }else catatan=FiezelI18n.t('settings.service-worker-belum-terdaftar-perangkat');
     }catch{catatan=FiezelI18n.t('settings.pembaruan-service-worker-pending-can')}
     if(typeof navigator!=='undefined'&&navigator.onLine===false)catatan+=FiezelI18n.t('settings.you-now-offline-tampilan-new');
     showToast(FiezelI18n.t('settings.cache-dibersihkan-progres-belajarmu-tetap',{jumlah:targets.length,catatan:catatan}),'success');

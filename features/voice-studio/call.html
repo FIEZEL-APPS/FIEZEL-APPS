@@ -9,8 +9,8 @@
       content="Sub-modul terisolasi FIEZEL AI Voice Call Studio dengan terjemahan real-time, bantuan jawaban pemula, Gemini Live WebSocket (wss://fiezel.my.id/api/live-call) + fallback Turn-by-Turn Audio, serta integrasi Braincore BKT & IRT 3PL."
     />
     <link rel="icon" type="image/svg+xml" href="../../assets/brand/fiezel-icon.svg" />
-    <link rel="stylesheet" href="./dist/voice-studio.css?v=m025-666" />
-    <script src="../../core-config.js?v=m025-666" defer></script>
+    <link rel="stylesheet" href="./dist/voice-studio.css?v=m025-667" />
+    <script src="../../core-config.js?v=m025-667" defer></script>
     <style>
       html, body {
         height: 100%;
@@ -55,12 +55,21 @@
           navigator.serviceWorker.addEventListener('controllerchange', function () {
             if (!window.__fzRefreshed) {
               window.__fzRefreshed = true;
-              window.location.reload();
+              if (typeof caches !== 'undefined' && caches.keys) {
+                caches.keys().then(function (keys) {
+                  var oldShells = keys.filter(function (k) { return k.indexOf('fiezel-shell-') === 0; });
+                  return Promise.all(oldShells.map(function (k) { return caches.delete(k); }));
+                }).catch(function () {}).then(function () {
+                  window.location.reload();
+                });
+              } else {
+                window.location.reload();
+              }
             }
           });
         }
       })();
     </script>
-    <script type="module" src="./dist/voice-studio.js?v=m025-666"></script>
+    <script type="module" src="./dist/voice-studio.js?v=m025-667"></script>
   </body>
 </html>
