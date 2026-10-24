@@ -162,9 +162,9 @@ export const CALL_SCENARIOS: CallScenario[] = [
     personaId: 'coach_alex',
     isMeasureExam: false,
     situationId:
-      'PAW bertanya di mana rumahmu dan dengan siapa kamu tinggal. Jawab dengan kalimat sederhana memakai "I live in..." atau "My house is in...".',
+      'Partner AI bertanya di mana rumahmu dan dengan siapa kamu tinggal. Jawab dengan kalimat sederhana memakai "I live in..." atau "My house is in...".',
     situationTh:
-      'PAW ถามว่าบ้านของคุณอยู่ที่ไหนและอาศัยอยู่กับใคร ตอบด้วยประโยคง่ายๆ โดยใช้ "I live in..."',
+      'AI ถามว่าบ้านของคุณอยู่ที่ไหนและอาศัยอยู่กับใคร ตอบด้วยประโยคง่ายๆ โดยใช้ "I live in..."',
     openingLine:
       'Hi there! Nice to talk with you today. Where do you live, and who do you live with at home?',
     openingTranslationId:

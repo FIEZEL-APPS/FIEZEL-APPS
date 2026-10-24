@@ -116,13 +116,13 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
             </div>
             <h1 className="font-display text-2xl sm:text-3xl font-bold text-[#241A11] leading-tight tracking-tight">
               {locale === 'th'
-                ? 'พร้อมฝึกพูดกับ PAW วันนี้หรือยัง?'
-                : 'Siap Bicara Lebih Lancar Bersama PAW?'}
+                ? 'พร้อมฝึกพูดกับ Mochi วันนี้หรือยัง?'
+                : 'Siap Bicara Lebih Lancar Bersama Mochi?'}
             </h1>
             <p className="text-sm text-[#6E5E47] leading-relaxed">
               {locale === 'th'
-                ? 'ฝึกสนทนาจริงกับ PAW พร้อมคำแปลเรียลไทม์และตัวช่วยตอบสำหรับผู้เริ่มต้น'
-                : 'Latihan telepon interaktif bersama PAW dilengkapi terjemahan langsung, panduan cara baca, dan evaluasi Braincore.'}
+                ? 'ฝึกสนทนาจริงกับ Mochi พร้อมคำแปลเรียลไทม์และตัวช่วยตอบสำหรับผู้เริ่มต้น'
+                : 'Latihan telepon interaktif bersama Mochi dilengkapi terjemahan langsung, panduan cara baca, dan evaluasi Braincore.'}
             </p>
           </div>
 
@@ -253,8 +253,8 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
               <FiezelSparkleOrnament className="w-4 h-4" />
               <span>
                 {locale === 'th'
-                  ? `แนะนำโดย PAW · ระดับ ${activeScenario.level}`
-                  : `Pilihan Utama PAW · Level ${activeScenario.level}`}
+                  ? `แนะนำโดย Mochi · ระดับ ${activeScenario.level}`
+                  : `Pilihan Utama Mochi · Level ${activeScenario.level}`}
               </span>
             </div>
 
@@ -266,9 +266,9 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
               {locale === 'th' ? activeScenario.situationTh : activeScenario.situationId}
             </p>
 
-            {/* Preview Pertanyaan Pembuka PAW */}
+            {/* Preview Pertanyaan Pembuka Mochi */}
             <div className="inline-flex flex-wrap items-center gap-2 bg-white/90 border border-[#F0E4CF] fz-solar-ribbon rounded-2xl px-3.5 py-2 text-xs text-[#241A11] shadow-2xs">
-              <span className="font-bold text-[#8C2233]">Pertanyaan Pembuka PAW:</span>
+              <span className="font-bold text-[#8C2233]">Pertanyaan Pembuka Mochi:</span>
               <span className="font-semibold italic">"{activeScenario.openingLine}"</span>
             </div>
           </div>
@@ -277,11 +277,11 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
             <div className="hidden md:flex items-center gap-3 bg-white/95 border border-[#F0E4CF] rounded-2xl p-2.5 pr-4 shadow-xs">
               <img
                 src="./assets/brand/paw-mochi-speaking.svg"
-                alt="PAW"
+                alt="Mochi"
                 className="w-14 h-14 rounded-xl bg-[#FFF3C4] p-1 object-contain border border-[#FFC700]"
               />
               <div>
-                <div className="text-xs font-bold text-[#241A11]">PAW si Kucing Geometris</div>
+                <div className="text-xs font-bold text-[#241A11]">Mochi si Teman Bicara</div>
                 <div className="text-[11px] text-[#2E8B69] font-bold">
                   ● Siap Telepon & Bantu Jawab
                 </div>
@@ -296,7 +296,7 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
             >
               <Play className="w-4 h-4 fill-[#FFC700] text-[#FFC700]" />
               <span>
-                {locale === 'th' ? 'เริ่มคุยกับ PAW ตอนนี้' : 'Mulai Telepon Bersama PAW'}
+                {locale === 'th' ? 'เริ่มคุยกับ Mochi ตอนนี้' : 'Mulai Telepon Bersama Mochi'}
               </span>
               <ArrowRight className="w-4 h-4 text-[#FFC700]" />
             </button>
@@ -390,7 +390,7 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
             </span>
             <div className="mt-3">
               <div className="text-sm font-bold text-[#241A11]">Shadowing Suara</div>
-              <div className="text-xs text-[#6E5E47] mt-0.5">Dengar & tirukan lafal PAW</div>
+              <div className="text-xs text-[#6E5E47] mt-0.5">Dengar & tirukan lafal Mochi</div>
             </div>
           </button>
         </div>
@@ -510,7 +510,7 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
           {activeStudio === 'shadowing' && (
             <div className="bg-[#FFF9EE] border border-[#F0E4CF] rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="space-y-1">
-                <div className="text-xs font-bold text-[#8C2233]">Kalimat Pembuka PAW</div>
+                <div className="text-xs font-bold text-[#8C2233]">Kalimat Pembuka Mochi</div>
                 <p className="text-base font-bold text-[#241A11]">
                   "{activeScenario.openingLine}"
                 </p>
@@ -611,10 +611,10 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
         </div>
       </section>
 
-      {/* 5. DOCK MASKOT PAW RESMI */}
+      {/* 5. DOCK MASKOT MOCHI RESMI */}
       {showPawDock && (
         <aside
-          aria-label="Maskot PAW"
+          aria-label="Maskot Mochi"
           data-testid="home-paw-dock"
           className="fixed right-4 bottom-20 sm:bottom-6 z-40 w-20 h-20 bg-[#FFF9EE] border-2 border-[#FFC700] rounded-3xl shadow-xl flex items-center justify-center"
         >
@@ -629,12 +629,12 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
           <button
             type="button"
             onClick={() => onSelectScenarioAndCall(activeScenario.id)}
-            title="Langsung bicara dengan PAW"
+            title="Langsung bicara dengan Mochi"
             className="w-14 h-14 cursor-pointer hover:scale-105 transition-transform"
           >
             <img
               src="./assets/brand/paw-mochi-idle.svg"
-              alt="PAW"
+              alt="Mochi"
               className="w-full h-full object-contain"
             />
           </button>

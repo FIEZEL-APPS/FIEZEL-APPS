@@ -1084,8 +1084,13 @@
     // kata fungsi pada empat kata atau lebih = bukan bahasa Inggris, apa pun bahasanya.
     enFunctionWords: Object.freeze(['the', 'a', 'an', 'i', 'you', 'he', 'she', 'it', 'we', 'they', 'is', 'are',
       'am', 'was', 'were', 'do', 'did', 'does', 'to', 'of', 'in', 'on', 'at', 'for', 'with', 'and', 'but', 'so',
-      'what', 'where', 'when', 'how', 'why', 'who', 'that', 'this', 'my', 'your', 'have', 'has', 'be', 'can',
-      'not', 'me', 'oh', 'yes', 'no', 'there', 'too', 'really', 'sounds', 'like', 'just']),
+      'or', 'as', 'if', 'all', 'any', 'some', 'one', 'two',
+      'what', 'where', 'when', 'how', 'why', 'who', 'that', 'this', 'my', 'your', 'have', 'has', 'had', 'be', 'been', 'can',
+      'will', 'would', 'could', 'should', 'let', 'may', 'might', 'must',
+      'not', 'me', 'him', 'her', 'us', 'them', 'oh', 'yes', 'no', 'there', 'too', 'really', 'sounds', 'like', 'just',
+      'sure', 'up', 'out', 'right', 'here', 'now', 'got', 'get',
+      'anything', 'something', 'everything', 'else', 'please', 'thanks', 'thank',
+      'great', 'nice', 'good', 'cool', 'awesome', 'fine', 'okay', 'well']),
     enFunctionMinRatio: 0.15
   });
 
@@ -1134,8 +1139,8 @@
       'Your REPLY must directly respond to the learner\'s last message and stay in your role and scene. Never change the topic, never invent facts about the learner, and never mention people or plans they did not mention.',
       'Never lecture, never explain grammar, never praise or grade their ' + target + ', and never say you are an AI or a teacher.',
       isCall
-        ? 'This is a LIVE PHONE CALL. Speak, do not write: start with a short natural reaction that fits your role and the scene (vary it, never reuse the same opener), then ONE short sentence or ONE short question. Maximum 15 words in total. No lists, no explanations.'
-        : ('Use simple ' + target + ' for level ' + level + '. At most ' + CONVERSATION.maxReplySentences + ' short sentences. Usually end with one natural question.'),
+        ? 'This is a LIVE PHONE CALL. Speak naturally like a real human: respond directly and concisely. Maximum 15 words in total. No lists, no explanations. CRITICAL: NEVER start replies with repetitive filler words like "OK", "Okay", "Oh", "Alright", "Sure", or "Ah". Start directly with varied natural conversational words.'
+        : ('Use simple ' + target + ' for level ' + level + '. At most ' + CONVERSATION.maxReplySentences + ' short sentences. Do not start every turn with "OK", "Oh", or "Okay". Usually end with one natural question.'),
       course === 'ja'
         ? 'REPLY must be natural casual Japanese written in kana and common kanji. No romaji, no English.'
         : 'REPLY must be written only in English.',
@@ -1316,6 +1321,12 @@
       replyClamped = true;
     }
     if (!reply || reply.length > CONVERSATION.maxReplyChars) return fail(OUTPUT_FAILURES.sentenceLimit);
+    // m025-638: Bersihkan opener klise repetitif ("OK, ", "Okay, ", "Oh, ") agar balasan
+    // tidak selalu diawali kata "OK" terus-menerus (keluhan owner).
+    if (reply && s(input && input.mode) === 'call') {
+      var strippedReply = reply.replace(/^(?:OK|Okay|Oh)[,!\s]+(?=[A-Za-z0-9\u3040-\u30ff\u4e00-\u9faf])/i, '').trim();
+      if (strippedReply && strippedReply.length >= 3) reply = strippedReply;
+    }
     // Membeo pesan murid bukan balasan teman.
     if (normalizeForCompare(reply) === normalizeForCompare(input.message)) return fail('echo_learner');
 
@@ -1323,6 +1334,10 @@
     // m025-637: arti yang ditulis dalam bahasa Inggris untuk murid Indonesia bukan arti
     // (terukur pada model call: "Oh, good choice! Large or small?"). Lebih baik kosong.
     if (meaning && locale !== 'th' && looksEnglishNotIndonesian(meaning)) meaning = '';
+    if (meaning && s(input && input.mode) === 'call') {
+      var strippedMeaning = meaning.replace(/^(?:Oke|Oh)[,!\s]+(?=[A-Za-z0-9\u0e00-\u0e7f])/i, '').trim();
+      if (strippedMeaning && strippedMeaning.length >= 3) meaning = strippedMeaning;
+    }
     // Balasan yang dipotong ke batas kalimat: potong artinya juga supaya arti tidak memuat
     // kalimat yang tidak pernah diucapkan.
     if (meaning && replyClamped && countSentences(meaning) > max) {

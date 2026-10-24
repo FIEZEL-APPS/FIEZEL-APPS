@@ -859,7 +859,7 @@ export async function requestAiPartnerReply(params: {
   const modeOk = _aiCallModeSupported !== false;
   const roleOk = _aiScenarioRoleSupported !== false;
   attempts.push([modeOk, roleOk]);
-  if (modeOk) attempts.push([false, roleOk]);
+  if (modeOk) attempts.push([modeOk, roleOk]); // retry once with fast voiceCall model
   if (roleOk) attempts.push([false, false]);
 
   const deadline = Date.now() + AI_PARTNER_TIMEOUT_MS;
@@ -1165,7 +1165,10 @@ export async function evaluateTurnFlexible(
 export function splitIntoSpeechChunks(text: string, targetLang: TargetLang, maxChunks = 2): string[] {
   const clean = String(text || '').replace(/\s+/g, ' ').trim();
   if (!clean) return [];
-  const singleLimit = targetLang === 'ja' ? 60 : 120;
+  // For phone call replies, DO NOT split short/medium conversational replies into chunks.
+  // Splitting on punctuation (!, ?, .) forces multiple Audio instances with 1.5s-2.5s awkward gaps.
+  // Edge-TTS natively synthesizes full conversational sentences with natural human prosody and zero awkward gaps.
+  const singleLimit = 320;
   if (clean.length <= singleLimit) return [clean];
   const parts =
     targetLang === 'ja'

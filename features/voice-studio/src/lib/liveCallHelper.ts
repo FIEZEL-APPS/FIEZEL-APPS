@@ -880,7 +880,7 @@ export function extractUserConversationContext(
 }
 
 /**
- * Generates contextual multi-turn AI responses so PAW dynamically responds to what
+ * Generates contextual multi-turn AI responses so the AI partner dynamically responds to what
  * the student actually said and advances the conversation to a fresh follow-up question.
  */
 export function generateDynamicContextualAiReply(params: {
@@ -1173,7 +1173,7 @@ export function getBeginnerReplyCards(
       const tiers: Array<'easy' | 'mission' | 'rescue'> = ['easy', 'mission', 'rescue'];
       const badgesId = [
         'Opsi 1 · Mudah & Singkat (Sesuai Konteks Live)',
-        'Opsi 2 · Natural & Kontekstual (Rekomendasi PAW)',
+        'Opsi 2 · Natural & Kontekstual (Rekomendasi Partner)',
         'Opsi 3 · Lengkap & Sopan (Tindak Lanjut)',
       ];
       const badgesTh = [
@@ -1229,7 +1229,7 @@ function synthesizeContextualThreeCards(
           pronunciation: 'Miruku dake onegaishimasu. Arigatou gozaimasu.',
           hintId: 'Tolong tambahkan susu saja. Terima kasih banyak.',
           hintTh: 'ขอนมอย่างเดียวครับ/ค่ะ ขอบคุณมากครับ/ค่ะ',
-          contextAnchorId: 'Menjawab pertanyaan PAW tentang tambahan gula & susu',
+          contextAnchorId: 'Menjawab pertanyaan Partner AI tentang tambahan gula & susu',
           wordBreakdown: [
             { word: 'ミルクだけ', reading: 'miruku dake', meaningId: 'susu saja' },
             { word: 'お願いします', reading: 'onegaishimasu', meaningId: 'tolong ya' },
@@ -1245,7 +1245,7 @@ function synthesizeContextualThreeCards(
           pronunciation: 'Hai, o-satou to miruku o hitotsu zutsu onegaishimasu.',
           hintId: 'Ya, tolong berikan gula dan susu masing-masing satu.',
           hintTh: 'รับครับ/ค่ะ ขอน้ำตาลและนมอย่างละ 1 ที่ครับ/ค่ะ',
-          contextAnchorId: 'Menjawab pertanyaan PAW tentang gula & susu secara lengkap',
+          contextAnchorId: 'Menjawab pertanyaan Partner AI tentang gula & susu secara lengkap',
           wordBreakdown: [
             { word: 'お砂糖とミルク', reading: 'o-satou to miruku', meaningId: 'gula dan susu' },
             { word: '一つずつ', reading: 'hitotsu zutsu', meaningId: 'masing-masing satu' },
@@ -1283,7 +1283,7 @@ function synthesizeContextualThreeCards(
           pronunciation: 'Hai, tennai de onegaishimasu. Arigatou gozaimasu.',
           hintId: 'Ya, saya makan/minum di dalam kafe, tolong. Terima kasih banyak.',
           hintTh: 'ใช่ครับ/ค่ะ ขอทานที่ร้านนะครับ/คะ ขอบคุณมากครับ/ค่ะ',
-          contextAnchorId: 'Menjawab pertanyaan PAW apakah makan di tempat atau dibawa pulang',
+          contextAnchorId: 'Menjawab pertanyaan Partner AI apakah makan di tempat atau dibawa pulang',
           wordBreakdown: [
             { word: '店内で', reading: 'tennai de', meaningId: 'di dalam kafe' },
             { word: 'お願いします', reading: 'onegaishimasu', meaningId: 'tolong (sopan)' },
@@ -1337,7 +1337,7 @@ function synthesizeContextualThreeCards(
           pronunciation: 'Hai, kore kara toshokan e benkyou shi ni ikimasu.',
           hintId: 'Ya, setelah ini saya akan pergi ke perpustakaan untuk belajar.',
           hintTh: 'ใช่ครับ/ค่ะ หลังจากนี้จะไปอ่านหนังสือที่ห้องสมุดครับ/ค่ะ',
-          contextAnchorId: 'Menjawab pertanyaan PAW tentang rencana setelah dari kafe',
+          contextAnchorId: 'Menjawab pertanyaan Partner AI tentang rencana setelah dari kafe',
         }),
         buildCard({
           id: 'ja_plan_2',
@@ -1516,7 +1516,7 @@ function synthesizeContextualThreeCards(
         targetLang: 'en',
         hintId: `Tempat favorit di dekat rumah saya di ${ctx.city} adalah taman hijau. Saya sering jalan sore di sana.`,
         hintTh: `สถานที่โปรดใกล้บ้านฉันใน ${ctx.city} คือสวนสาธารณะสีเขียว ฉันมักไปเดินเล่นตอนบ่าย`,
-        contextAnchorId: `Menjawab pertanyaan PAW tentang tempat favorit di dekat rumahmu (${ctx.city})`,
+        contextAnchorId: `Menjawab pertanyaan Partner AI tentang tempat favorit di dekat rumahmu (${ctx.city})`,
       }),
       buildCard({
         id: 'en_favplace_2',
@@ -1597,7 +1597,7 @@ function synthesizeContextualThreeCards(
         targetLang: 'en',
         hintId: `Saya sudah tinggal di ${ctx.city} selama lima tahun bersama ${ctx.companionId}.`,
         hintTh: `ฉันอาศัยอยู่ใน ${ctx.city} มาห้าปีแล้ว`,
-        contextAnchorId: `Menjawab pertanyaan PAW tentang berapa lama tinggal di ${ctx.city}`,
+        contextAnchorId: `Menjawab pertanyaan Partner AI tentang berapa lama tinggal di ${ctx.city}`,
       }),
       buildCard({
         id: 'en_howlong_2',
@@ -1636,7 +1636,7 @@ function synthesizeContextualThreeCards(
         targetLang: 'en',
         hintId: 'Saya tinggal di Jakarta bersama keluarga saya. Rumah saya tenang dan nyaman.',
         hintTh: 'ฉันอาศัยอยู่ที่จาการ์ตากับครอบครัว บ้านของฉันเงียบสงบและอบอุ่น',
-        contextAnchorId: 'Menjawab langsung pertanyaan PAW tentang tempat tinggal & keluarga',
+        contextAnchorId: 'Menjawab langsung pertanyaan Partner AI tentang tempat tinggal & keluarga',
         wordBreakdown: [
           { word: 'I live in...', reading: 'Ai liv in', meaningId: 'Saya tinggal di...' },
           { word: 'with my family', reading: 'wit mai fe-mi-li', meaningId: 'bersama keluargaku' },
@@ -1699,8 +1699,8 @@ function synthesizeContextualThreeCards(
           : 'Topik presentasi kami adalah tentang pemasaran digital dan media sosial.',
         hintTh: 'พวกเรากำลังศึกษาเรื่องการตลาดดิจิทัลและโซเชียลมีเดีย',
         contextAnchorId: isLibraryContext
-          ? `Menjawab pertanyaan PAW tentang materi yang dipelajari bersama ${ctx.companionId} di perpustakaan`
-          : `Menjawab pertanyaan PAW tentang topik presentasi bersama ${ctx.companionId}`,
+          ? `Menjawab pertanyaan Partner AI tentang materi yang dipelajari bersama ${ctx.companionId} di perpustakaan`
+          : `Menjawab pertanyaan Partner AI tentang topik presentasi bersama ${ctx.companionId}`,
       }),
       buildCard({
         id: 'cafe_topic_2',
@@ -1832,7 +1832,7 @@ function synthesizeContextualThreeCards(
         targetLang: 'en',
         hintId: `Hidangan favorit saya di ${ctx.tripPlace} adalah sate ayam dan nasi goreng hangat. Rasanya sangat lezat!`,
         hintTh: `เมนูโปรดของฉันที่ ${ctx.tripPlace} คือสะเต๊ะไก่และข้าวผัดร้อนๆ อร่อยมากเลย!`,
-        contextAnchorId: `Menjawab pertanyaan PAW tentang kuliner favorit saat di ${ctx.tripPlace}`,
+        contextAnchorId: `Menjawab pertanyaan Partner AI tentang kuliner favorit saat di ${ctx.tripPlace}`,
       }),
       buildCard({
         id: 'trip_food_2',
@@ -1871,7 +1871,7 @@ function synthesizeContextualThreeCards(
         targetLang: 'en',
         hintId: `Ya, saya sangat ingin berkunjung ke ${ctx.tripPlace} lagi bersama ${ctx.companionId} pada liburan berikutnya!`,
         hintTh: `ใช่ ฉันอยากกลับไปเที่ยวที่ ${ctx.tripPlace} อีกครั้งในวันหยุดหน้าแน่นอน!`,
-        contextAnchorId: `Menjawab pertanyaan PAW tentang rencana berkunjung kembali ke ${ctx.tripPlace}`,
+        contextAnchorId: `Menjawab pertanyaan Partner AI tentang rencana berkunjung kembali ke ${ctx.tripPlace}`,
       }),
       buildCard({
         id: 'trip_again_2',
@@ -2014,7 +2014,7 @@ function synthesizeContextualThreeCards(
           'Menurut saya kerja jarak jauh meningkatkan produktivitas karena karyawan dapat menghemat waktu perjalanan setiap hari.',
         hintTh:
           'ฉันคิดว่าการทำงานทางไกลช่วยเพิ่มประสิทธิภาพ เพราะพนักงานประหยัดเวลาเดินทางในทุกๆ วัน',
-        contextAnchorId: 'Menjawab pertanyaan PAW tentang dampak kerja jarak jauh terhadap produktivitas',
+        contextAnchorId: 'Menjawab pertanyaan Partner AI tentang dampak kerja jarak jauh terhadap produktivitas',
       }),
       buildCard({
         id: 'ielts_open_2',
@@ -2072,7 +2072,7 @@ function synthesizeContextualThreeCards(
     }),
     buildCard({
       id: 'univ_live_3',
-      badgeId: 'Opsi 3 · Lengkap & Sopan (Tanya Balik ke PAW)',
+      badgeId: 'Opsi 3 · Lengkap & Sopan (Tanya Balik ke Partner)',
       badgeTh: 'ตัวเลือก 3 · สุภาพและสมบูรณ์ (ถามกลับอย่างเป็นธรรมชาติ)',
       tier: 'rescue',
       text: `I usually do that twice a week. What do you recommend I try next time?`,

@@ -135,6 +135,7 @@ export default function App() {
 
   const [isRecordingPtt, setIsRecordingPtt] = useState<boolean>(false);
   const [isListeningLiveSpeech, setIsListeningLiveSpeech] = useState<boolean>(false);
+  const [isWaitingAfterSpeech, setIsWaitingAfterSpeech] = useState<boolean>(false);
   const pttStartedAtRef = useRef<number | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const recordedChunksRef = useRef<Blob[]>([]);
@@ -656,6 +657,42 @@ export default function App() {
   };
 
   /**
+   * Deteksi kalimat yang belum lengkap (koma gramatikal, konjungsi, preposisi, kata ganti, partikel)
+   * agar VAD memberikan jeda berpikir lebih panjang (3000ms vs 2000ms baseline) tanpa memotong murid.
+   */
+  const isGrammaticallyIncomplete = (t: string, lang: TargetLang): boolean => {
+    const lower = t.toLowerCase().trim();
+    if (!lower) return false;
+    if (lang === 'en') {
+      return /\b(and|or|but|because|so|if|as|with|to|for|in|on|at|of|from|by|about|a|an|the|i|you|we|they|he|she|it|my|your|our|their|is|are|was|were|have|has|had|do|did|does|can|could|will|would|like|want|would like|could i|can i|give me|i'd|i'm|we're|there's|that's|what|where|when|why|how)\s*$/i.test(lower);
+    }
+    return /[\u306f\u304c\u3092\u306b\u3078\u3067\u3068\u304b\u3089\u307e\u3067\u3088\u308a\u306e\u304b\u306d\u3088\u3051\u3069\u306e\u3067\u3066\u3067]\s*$/.test(lower);
+  };
+
+  /**
+   * Instant Barge-In (Menyela AI seperti di ChatGPT Voice).
+   * Memotong seketika audio balasan Mochi dan mengembalikan kendali mic ke murid.
+   */
+  const interruptAiAndStartListening = () => {
+    speakTokenRef.current += 1;
+    clearSpeechWatchdog();
+    stopNeuralBufferSource();
+    if (currentAudioElRef.current) {
+      try {
+        currentAudioElRef.current.onended = null;
+        currentAudioElRef.current.onerror = null;
+        currentAudioElRef.current.onpause = null;
+        currentAudioElRef.current.pause();
+        currentAudioElRef.current.src = '';
+      } catch {
+        // Ignore
+      }
+      currentAudioElRef.current = null;
+    }
+    setIsPlayingAiAudio(false);
+  };
+
+  /**
    * Short neural "listening" filler (e.g. "Hmm, okay…" / 「えーと…」) while the real AI is
    * still thinking. Only plays when its audio is already cached or arrives within 900 ms,
    * so it never delays the actual reply.
@@ -876,6 +913,7 @@ export default function App() {
 
     let isDisposed = false;
     let accumulatedSpeech = '';
+    let speechPrefix = '';
 
     const startListeningCycle = () => {
       if (isDisposed) return;
@@ -900,7 +938,9 @@ export default function App() {
           for (let i = 0; i < event.results.length; i++) {
             transcript += event.results[i][0].transcript;
           }
-          const clean = transcript.trim();
+          const clean = (speechPrefix ? speechPrefix + ' ' + transcript : transcript)
+            .replace(/\s+/g, ' ')
+            .trim();
           if (clean) {
             accumulatedSpeech = clean;
             liveDictatedTextRef.current = clean;
@@ -910,13 +950,16 @@ export default function App() {
             if (liveSilenceTimerRef.current) {
               window.clearTimeout(liveSilenceTimerRef.current);
             }
-            const lastRes = event.results[event.results.length - 1];
-            const silenceWaitMs = lastRes && lastRes.isFinal ? 550 : 900;
+            const silenceWaitMs = isGrammaticallyIncomplete(clean, activeScenario.targetLang) ? 3000 : 2000;
+            setIsWaitingAfterSpeech(true);
             liveSilenceTimerRef.current = window.setTimeout(() => {
               if (isDisposed) return;
+              liveSilenceTimerRef.current = null;
+              setIsWaitingAfterSpeech(false);
               const toSend = accumulatedSpeech.trim();
               if (toSend) {
                 accumulatedSpeech = '';
+                speechPrefix = '';
                 liveDictatedTextRef.current = '';
                 try {
                   rec.onend = null;
@@ -936,6 +979,9 @@ export default function App() {
 
         rec.onerror = (evErr: any) => {
           const code = String(evErr?.error || '');
+          if (code === 'no-speech' || code === 'aborted') {
+            return;
+          }
           // Transient 'no-speech' / 'aborted' are normal in a continuous call. Fatal codes used
           // to be swallowed, so the loop restarted forever and the AI never heard anything.
           if (code === 'not-allowed' || code === 'service-not-allowed' || code === 'audio-capture') {
@@ -959,14 +1005,26 @@ export default function App() {
 
         rec.onend = () => {
           if (isDisposed) return;
+          // Anti-Cutoff: If the silence patience timer is still ticking, the user paused to think or breathe.
+          // Chrome often closes interim recognition prematurely. DO NOT force-submit partial speech!
+          // Save what was heard into speechPrefix and restart recognition seamlessly so the next words append.
+          if (liveSilenceTimerRef.current) {
+            if (accumulatedSpeech) {
+              speechPrefix = accumulatedSpeech;
+            }
+            window.setTimeout(() => {
+              if (!isDisposed && liveSilenceTimerRef.current) {
+                startListeningCycle();
+              }
+            }, 60);
+            return;
+          }
+          setIsWaitingAfterSpeech(false);
           const pending = accumulatedSpeech.trim();
           if (pending) {
             accumulatedSpeech = '';
+            speechPrefix = '';
             liveDictatedTextRef.current = '';
-            if (liveSilenceTimerRef.current) {
-              window.clearTimeout(liveSilenceTimerRef.current);
-              liveSilenceTimerRef.current = null;
-            }
             setIsListeningLiveSpeech(false);
             void submitStudentTurnRef.current({
               text: pending,
@@ -979,7 +1037,7 @@ export default function App() {
             if (!isDisposed) {
               startListeningCycle();
             }
-          }, 220);
+          }, 200);
         };
 
         liveSpeechRecRef.current = rec;
@@ -994,6 +1052,7 @@ export default function App() {
 
     return () => {
       isDisposed = true;
+      setIsWaitingAfterSpeech(false);
       if (liveSilenceTimerRef.current) {
         window.clearTimeout(liveSilenceTimerRef.current);
         liveSilenceTimerRef.current = null;
@@ -1060,13 +1119,14 @@ export default function App() {
             setLiveUserDraft(clean);
             setInputText(clean);
 
-            // Auto-submit after 950ms of silence once user has spoken a phrase
+            // Auto-submit after patient silence once user has spoken a phrase (or tap stop to send immediately)
             if (pttSilenceTimerRef.current) {
               window.clearTimeout(pttSilenceTimerRef.current);
             }
+            const pttSilenceWaitMs = isGrammaticallyIncomplete(clean, activeScenario.targetLang) ? 3500 : 2500;
             pttSilenceTimerRef.current = window.setTimeout(() => {
               stopPttRecording();
-            }, 950);
+            }, pttSilenceWaitMs);
           }
         };
 
@@ -1704,13 +1764,15 @@ export default function App() {
     (a, b) => b.lastAt - a.lastAt
   );
 
-  const callStateKey: 'speaking' | 'recording' | 'live' | 'ready' = isPlayingAiAudio
+  const callStateKey: 'speaking' | 'recording' | 'waiting' | 'live' | 'ready' = isPlayingAiAudio
     ? 'speaking'
     : isRecordingPtt
       ? 'recording'
-      : isLiveConnected
-        ? 'live'
-        : 'ready';
+      : isWaitingAfterSpeech
+        ? 'waiting'
+        : isLiveConnected
+          ? 'live'
+          : 'ready';
 
   const lastAiTurn = [...turns].reverse().find((tr) => tr.speaker === 'ai');
   const lastUserTurn = [...turns].reverse().find((tr) => tr.speaker === 'user');
@@ -1827,6 +1889,12 @@ export default function App() {
         m.setBadge?.('chat_purple');
         m.setAura?.('purple');
         m.triggerEarWiggle?.(1.2);
+      } else if (callStateKey === 'waiting') {
+        m.setMood?.('dots');
+        m.setBadge?.('chat_blue');
+        m.setAura?.('blue');
+        m.triggerEarWiggle?.(1.1);
+        m.retractHands?.();
       } else if (callStateKey === 'live') {
         m.setMood?.('dots');
         m.setBadge?.('chat_purple');
@@ -2273,6 +2341,10 @@ export default function App() {
                   <div className="flex flex-col items-center space-y-1.5">
                     <div
                       onClick={() => {
+                        if (isPlayingAiAudio) {
+                          interruptAiAndStartListening();
+                          return;
+                        }
                         const m = mochiInstanceRef.current;
                         if (m) {
                           try {
@@ -2282,6 +2354,7 @@ export default function App() {
                           } catch {}
                         }
                       }}
+                      title={isPlayingAiAudio ? 'Ketuk untuk menyela Mochi' : 'Mochi'}
                       className="relative w-[156px] h-[148px] flex items-center justify-center cursor-pointer select-none"
                     >
                       <div
@@ -2321,9 +2394,11 @@ export default function App() {
                             ? 'bg-[#8C2233] animate-ping'
                             : callStateKey === 'speaking'
                               ? 'bg-[#E6A800] animate-pulse'
-                              : callStateKey === 'live'
-                                ? 'bg-[#2E8B69] animate-pulse'
-                                : 'bg-[#2E8B69]'
+                              : callStateKey === 'waiting'
+                                ? 'bg-[#2979FF] animate-pulse'
+                                : callStateKey === 'live'
+                                  ? 'bg-[#2E8B69] animate-pulse'
+                                  : 'bg-[#2E8B69]'
                         }`}
                       />
                       <span data-testid="ai-call-status-text">
@@ -2333,8 +2408,12 @@ export default function App() {
                             : 'Mochi sedang berpikir…'
                           : isPlayingAiAudio
                           ? isLiveConnected
-                            ? `PAW berbicara... (${formatTimer(callDurationSec)})`
+                            ? `Mochi berbicara... (${formatTimer(callDurationSec)})`
                             : 'Sedang berbicara...'
+                          : isWaitingAfterSpeech
+                          ? locale === 'th'
+                            ? `Mochi รอคุณพูดให้จบ… (${formatTimer(callDurationSec)})`
+                            : `Mochi menunggu kamu selesai bicara… (${formatTimer(callDurationSec)})`
                           : isRecordingPtt
                             ? `Merekam suara... (${formatTimer(pttRecordingSec)})`
                             : isLiveConnected
@@ -2822,13 +2901,26 @@ export default function App() {
                 type="button"
                 data-testid="ptt-record-btn"
                 disabled={isAnalyzingTurn}
-                onClick={isRecordingPtt ? stopPttRecording : startPttRecording}
+                onClick={() => {
+                  if (isPlayingAiAudio) {
+                    interruptAiAndStartListening();
+                    if (!isLiveConnected) {
+                      void startPttRecording();
+                    }
+                    return;
+                  }
+                  if (isRecordingPtt) {
+                    stopPttRecording();
+                  } else {
+                    void startPttRecording();
+                  }
+                }}
                 className={`px-3.5 py-2 rounded-full font-semibold text-xs flex items-center justify-center gap-1.5 shrink-0 cursor-pointer transition-all ${
                   isRecordingPtt
                     ? 'bg-[#8C2233] text-white'
                     : 'bg-[#F5F1E8] hover:bg-[#EAE3D5] text-[#1C1611]'
                 }`}
-                title={t(locale, 'call.pushToTalk')}
+                title={isPlayingAiAudio ? 'Sela AI & bicara' : t(locale, 'call.pushToTalk')}
               >
                 {isRecordingPtt ? (
                   <MicOff className="w-3.5 h-3.5 shrink-0" />
