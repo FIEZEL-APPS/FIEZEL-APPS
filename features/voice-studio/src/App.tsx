@@ -56,12 +56,15 @@ import {
   translateAndPhoneticizeLiveText,
 } from './lib/liveCallHelper';
 import {
-  evaluateTurnFlexible,
+  evaluateTurnLocal,
   evaluateUtteranceClientSide,
   float32ToPcm16Base64,
+  getThinkingFillers,
   LiveTransportMode,
   pcm16Base64ToAudioBuffer,
+  resolveAiReply,
   resolveLiveCallWebSocketUrls,
+  splitIntoSpeechChunks,
   synthesizeFlexibleTts,
   warmUpVoiceServices,
 } from './lib/liveTransport';
@@ -109,6 +112,8 @@ export default function App() {
   const [turns, setTurns] = useState<CallTurn[]>([]);
   const [inputText, setInputText] = useState<string>('');
   const [isAnalyzingTurn, setIsAnalyzingTurn] = useState<boolean>(false);
+  // m025-637: true while the REAL AI partner is generating its reply (Mochi "thinking").
+  const [isAiThinking, setIsAiThinking] = useState<boolean>(false);
   const [isPlayingAiAudio, setIsPlayingAiAudio] = useState<boolean>(false);
   const [showHint, setShowHint] = useState<boolean>(false);
   const [statusBanner, setStatusBanner] = useState<string | null>(null);
@@ -165,6 +170,12 @@ export default function App() {
   const ttsSourceNodeRef = useRef<AudioBufferSourceNode | null>(null);
   const micPermWarmedRef = useRef<boolean>(false);
   const speechWatchdogRef = useRef<number | null>(null);
+  // Chunked neural playback bookkeeping (m025-637): a newer speakAiText call supersedes the
+  // older one, and every pending chunk promise is settled when playback is halted.
+  const speakTokenRef = useRef<number>(0);
+  const playbackSettleRef = useRef<(() => void) | null>(null);
+  const fillerIndexRef = useRef<number>(0);
+  const fillerDoneRef = useRef<Promise<void> | null>(null);
   const mochiContainerRef = useRef<HTMLDivElement | null>(null);
   const mochiInstanceRef = useRef<any>(null);
   const [is3dMochiReady, setIs3dMochiReady] = useState<boolean>(false);
@@ -242,14 +253,30 @@ export default function App() {
   // without sending concurrent TTS requests that queue on Render's single worker.
   useEffect(() => {
     if (!activeScenario.openingLine) return;
+    let cancelled = false;
     const t = window.setTimeout(() => {
-      void synthesizeFlexibleTts({
-        text: activeScenario.openingLine,
-        targetLang: activeScenario.targetLang,
-        persona: activePersona,
-      });
+      void (async () => {
+        await synthesizeFlexibleTts({
+          text: activeScenario.openingLine,
+          targetLang: activeScenario.targetLang,
+          persona: activePersona,
+        });
+        // m025-637: pre-render the short neural "thinking" fillers one by one (never in
+        // parallel) so they can play instantly while the real AI reply is generated.
+        for (const filler of getThinkingFillers(activeScenario.targetLang)) {
+          if (cancelled) return;
+          await synthesizeFlexibleTts({
+            text: filler,
+            targetLang: activeScenario.targetLang,
+            persona: activePersona,
+          });
+        }
+      })();
     }, 300);
-    return () => window.clearTimeout(t);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(t);
+    };
   }, [activeScenario.id]);
 
   const isMeasureMode =
@@ -418,6 +445,11 @@ export default function App() {
   };
 
   const stopNeuralBufferSource = () => {
+    if (playbackSettleRef.current) {
+      const settle = playbackSettleRef.current;
+      playbackSettleRef.current = null;
+      settle();
+    }
     if (ttsSourceNodeRef.current) {
       try {
         ttsSourceNodeRef.current.onended = null;
@@ -450,7 +482,18 @@ export default function App() {
       const bytes = new Uint8Array(bin.length);
       for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
       const decoded = await ctx.decodeAudioData(bytes.buffer.slice(0));
-      stopNeuralBufferSource();
+      // Stop only the previous Web Audio node here — NOT the chunk promise that is
+      // currently waiting for this very playback to finish.
+      if (ttsSourceNodeRef.current) {
+        try {
+          ttsSourceNodeRef.current.onended = null;
+          ttsSourceNodeRef.current.stop();
+          ttsSourceNodeRef.current.disconnect();
+        } catch {
+          // Ignore
+        }
+        ttsSourceNodeRef.current = null;
+      }
       const src = ctx.createBufferSource();
       src.buffer = decoded;
       src.playbackRate.value = targetRate;
@@ -467,6 +510,68 @@ export default function App() {
     }
   };
 
+  /**
+   * Plays ONE neural MP3 chunk and resolves when it has finished, failed, or been halted.
+   * HTMLAudio first (element unlocked during the user's tap), then the gesture-unlocked
+   * Web Audio context — never browser `speechSynthesis`.
+   * Resolves `true` when audio actually started.
+   */
+  const playNeuralChunk = (
+    audioBase64: string,
+    audioMime: string,
+    targetRate: number
+  ): Promise<boolean> =>
+    new Promise<boolean>((resolve) => {
+      let settled = false;
+      let started = false;
+      const settle = () => {
+        if (settled) return;
+        settled = true;
+        clearSpeechWatchdog();
+        if (playbackSettleRef.current === settle) playbackSettleRef.current = null;
+        resolve(started);
+      };
+      playbackSettleRef.current = settle;
+
+      const audio = sharedAudioElRef.current || new Audio();
+      const detach = () => {
+        audio.onended = null;
+        audio.onerror = null;
+        audio.onpause = null;
+        if (currentAudioElRef.current === audio) currentAudioElRef.current = null;
+      };
+      detach();
+      audio.muted = false;
+      audio.src = `data:${audioMime};base64,${audioBase64}`;
+      audio.defaultPlaybackRate = targetRate;
+      audio.playbackRate = targetRate;
+      currentAudioElRef.current = audio;
+      const done = () => {
+        detach();
+        settle();
+      };
+      audio.onended = done;
+      audio.onerror = done;
+      // Watchdog: a stalled decoder must never keep the hands-free mic closed forever.
+      speechWatchdogRef.current = window.setTimeout(done, 30000);
+      audio
+        .play()
+        .then(() => {
+          started = true;
+          // Halted from outside (hang-up / newer reply) also ends this chunk.
+          audio.onpause = done;
+        })
+        .catch(async () => {
+          // HTMLAudio blocked outside a tap (hands-free turn on Safari/mobile): play the
+          // EXACT SAME neural MP3 via the unlocked Web Audio context — zero robot voice.
+          detach();
+          if (settled) return;
+          const ok = await playNeuralBase64ViaWebAudio(audioBase64, targetRate, () => settle());
+          if (ok) started = true;
+          else settle();
+        });
+    });
+
   const speakAiText = async (
     text: string,
     preloadedBase64?: string | null,
@@ -474,77 +579,107 @@ export default function App() {
   ) => {
     if (!text.trim()) return;
     const targetRate = overrideRate ?? speechRate;
+    const token = ++speakTokenRef.current;
+
+    // m025-637 pipelined playback: fetch chunk 0 immediately; start fetching chunk i+1 ONLY
+    // after chunk i has arrived (while chunk i is playing on the speaker) so two TTS requests
+    // never compete on Render's single worker.
+    const chunks = preloadedBase64
+      ? [text]
+      : splitIntoSpeechChunks(text, activeScenario.targetLang);
+    if (!chunks.length) chunks.push(text);
+    const fetchChunk = (idx: number) =>
+      idx === 0 && preloadedBase64
+        ? Promise.resolve({ audioBase64: preloadedBase64, audioMimeType: 'audio/mpeg', engine: 'preloaded' })
+        : fetchNeuralVoice(chunks[idx]);
+    let nextAudioJob: Promise<{ audioBase64: string; audioMimeType: string; engine: string } | null> | null =
+      fetchChunk(0);
+
+    // Let a "thinking" filler finish its word instead of cutting it off mid-syllable.
+    if (fillerDoneRef.current) {
+      await Promise.race([
+        fillerDoneRef.current,
+        new Promise<void>((r) => window.setTimeout(r, 1200)),
+      ]);
+    }
+    if (token !== speakTokenRef.current) return;
+
     clearSpeechWatchdog();
     stopNeuralBufferSource();
+    if (currentAudioElRef.current) {
+      currentAudioElRef.current.onpause = null;
+      currentAudioElRef.current.pause();
+      currentAudioElRef.current = null;
+    }
+    setIsPlayingAiAudio(true);
+
+    let anyAudio = false;
+    let anyPlayed = false;
     try {
-      if (currentAudioElRef.current) {
-        currentAudioElRef.current.pause();
-        currentAudioElRef.current = null;
-      }
-      setIsPlayingAiAudio(true);
-
-      let audioBase64 = preloadedBase64 || null;
-      let audioMime = 'audio/mpeg';
-
-      if (!audioBase64) {
-        const neural = await fetchNeuralVoice(text);
-        if (neural?.audioBase64) {
-          audioBase64 = neural.audioBase64;
-          audioMime = neural.audioMimeType || 'audio/mpeg';
-        }
-      }
-
-      if (!audioBase64) {
-        setIsPlayingAiAudio(false);
-        setStatusBanner(
-          locale === 'th'
-            ? 'เสียง Neural กำลังเชื่อมต่อใหม่ ข้อความยังแสดงอยู่ แตะ "เล่นเสียง" เพื่อลองอีกครั้ง'
-            : 'Suara neural sedang menyambung ulang. Teks balasan tetap tampil — ketuk "Putar Suara" untuk mencoba lagi.'
-        );
-        return;
-      }
-
-      // Reuse the element unlocked during the user's tap (autoplay-safe on iOS/Android).
-      const audio = sharedAudioElRef.current || new Audio();
-      audio.onended = null;
-      audio.onerror = null;
-      audio.muted = false;
-      audio.src = `data:${audioMime};base64,${audioBase64}`;
-      audio.defaultPlaybackRate = targetRate;
-      audio.playbackRate = targetRate;
-      currentAudioElRef.current = audio;
-      const finish = () => {
-        clearSpeechWatchdog();
-        if (currentAudioElRef.current === audio) currentAudioElRef.current = null;
-        setIsPlayingAiAudio(false);
-      };
-      audio.onended = finish;
-      audio.onerror = finish;
-      // Watchdog: a stalled decoder must never keep the hands-free mic closed forever.
-      speechWatchdogRef.current = window.setTimeout(finish, 30000);
-      try {
-        await audio.play();
-        setStatusBanner(null);
-      } catch {
-        // HTMLAudio blocked outside tap gesture (e.g. hands-free turn 10s later on Safari/mobile):
-        // play the EXACT SAME Neural MP3 via the unlocked Web Audio context — zero robot voice.
-        if (currentAudioElRef.current === audio) currentAudioElRef.current = null;
-        const okWebAudio = await playNeuralBase64ViaWebAudio(audioBase64, targetRate, finish);
-        if (okWebAudio) {
+      for (let i = 0; i < chunks.length; i++) {
+        const currentJob = nextAudioJob || fetchChunk(i);
+        const res = await currentJob;
+        if (token !== speakTokenRef.current) return;
+        // Start fetching chunk i+1 NOW while chunk i plays on the speaker
+        nextAudioJob = i + 1 < chunks.length ? fetchChunk(i + 1) : null;
+        if (!res?.audioBase64) continue;
+        anyAudio = true;
+        const ok = await playNeuralChunk(res.audioBase64, res.audioMimeType || 'audio/mpeg', targetRate);
+        if (token !== speakTokenRef.current) return;
+        if (ok) {
+          anyPlayed = true;
           setStatusBanner(null);
-        } else {
-          finish();
+        } else if (!anyPlayed) {
           setStatusBanner(
             locale === 'th'
               ? 'เบราว์เซอร์บล็อกการเล่นอัตโนมัติ แตะ "เล่นเสียง" เพื่อฟังคำตอบ'
               : 'Peramban menahan pemutaran otomatis. Ketuk "Putar Suara" untuk mendengar balasan.'
           );
+          break;
         }
       }
+      if (!anyAudio) {
+        setStatusBanner(
+          locale === 'th'
+            ? 'เสียง Neural กำลังเชื่อมต่อใหม่ ข้อความยังแสดงอยู่ แตะ "เล่นเสียง" เพื่อลองอีกครั้ง'
+            : 'Suara neural sedang menyambung ulang. Teks balasan tetap tampil — ketuk "Putar Suara" untuk mencoba lagi.'
+        );
+      }
     } catch {
-      clearSpeechWatchdog();
-      setIsPlayingAiAudio(false);
+      // Ignore — the reply text stays on screen and can be replayed.
+    } finally {
+      if (token === speakTokenRef.current) {
+        clearSpeechWatchdog();
+        setIsPlayingAiAudio(false);
+      }
     }
+  };
+
+  /**
+   * Short neural "listening" filler (e.g. "Hmm, okay…" / 「えーと…」) while the real AI is
+   * still thinking. Only plays when its audio is already cached or arrives within 900 ms,
+   * so it never delays the actual reply.
+   */
+  const isAiThinkingRef = useRef<boolean>(false);
+  const playThinkingFiller = async () => {
+    const fillers = getThinkingFillers(activeScenario.targetLang);
+    const phrase = fillers[fillerIndexRef.current % fillers.length];
+    fillerIndexRef.current += 1;
+    const res = await Promise.race([
+      synthesizeFlexibleTts({
+        text: phrase,
+        targetLang: activeScenario.targetLang,
+        persona: activePersona,
+      }),
+      new Promise<null>((r) => window.setTimeout(() => r(null), 900)),
+    ]);
+    if (!res?.audioBase64 || !isAiThinkingRef.current || isPlayingAiAudio) return;
+    const p = playNeuralChunk(res.audioBase64, res.audioMimeType || 'audio/mpeg', speechRate).then(
+      () => undefined
+    );
+    fillerDoneRef.current = p;
+    await p;
+    if (fillerDoneRef.current === p) fillerDoneRef.current = null;
   };
 
   const handleUnlockPrerequisite = () => {
@@ -566,8 +701,9 @@ export default function App() {
     setIsAnalyzingTurn(true);
     setStatusBanner(null);
 
+    let fillerTimer: number | null = null;
     try {
-      const fallbackEv = await evaluateTurnFlexible({
+      const evalParams = {
         text: trimmed || activeScenario.sampleUtterances[0]?.text || 'Hello',
         scenario: activeScenario,
         persona: activePersona,
@@ -578,19 +714,12 @@ export default function App() {
           speaker: tItem.speaker,
           text: tItem.text,
         })),
-      });
-      const exactTranscript = fallbackEv.userExactTranscript;
-      const ev = fallbackEv;
-      const aiAudioBase64 = fallbackEv.audioBase64 || null;
-      const aiAudioMimeType = fallbackEv.audioMimeType || 'audio/mpeg';
-      if (
-        Array.isArray(fallbackEv.nextSuggestedReplies) &&
-        fallbackEv.nextSuggestedReplies.length > 0
-      ) {
-        setNextSuggestedReplies(fallbackEv.nextSuggestedReplies);
-      } else {
-        setNextSuggestedReplies([]);
-      }
+      };
+
+      // STEP 1 — instant local Braincore grading of the learner's EXACT words.
+      const localEv = evaluateTurnLocal(evalParams);
+      const exactTranscript = localEv.userExactTranscript;
+      const ev = localEv;
 
       const effectiveHints = isMeasureMode ? 0 : showHint ? 1 : 0;
       const attemptOutcome = recordSpeakingAttempt(brainState, {
@@ -644,29 +773,59 @@ export default function App() {
         diagnosis,
       };
 
-      const aiTurn: CallTurn = {
-        id: `turn_ai_${Date.now() + 1}`,
-        speaker: 'ai',
-        text: ev.aiReply,
-        translationId: ev.aiReplyTranslationId,
-        translationTh: ev.aiReplyTranslationTh,
-        timestamp: Date.now() + 1,
-        audioBase64: aiAudioBase64 || undefined,
-        audioMimeType: aiAudioMimeType,
-      };
-
-      setTurns((prev) => [...prev, userTurn, aiTurn]);
+      // The learner sees their own words + feedback immediately.
+      setTurns((prev) => [...prev, userTurn]);
       setInputText('');
       setLiveUserDraft('');
       setShowHint(false);
-
-      void speakAiText(ev.aiReply, aiAudioBase64);
       void brainSyncFlush(attemptOutcome.nextState).then(({ nextState }) =>
         setBrainState(nextState)
       );
+
+      // STEP 2 — the REAL AI partner reply (never a silent template swap).
+      isAiThinkingRef.current = true;
+      setIsAiThinking(true);
+      fillerTimer = window.setTimeout(() => {
+        fillerTimer = null;
+        void playThinkingFiller();
+      }, 650);
+
+      const replyEv = await resolveAiReply(evalParams, localEv);
+
+      if (fillerTimer) {
+        window.clearTimeout(fillerTimer);
+        fillerTimer = null;
+      }
+      isAiThinkingRef.current = false;
+      setIsAiThinking(false);
+
+      if (Array.isArray(replyEv.nextSuggestedReplies) && replyEv.nextSuggestedReplies.length > 0) {
+        setNextSuggestedReplies(replyEv.nextSuggestedReplies);
+      } else {
+        setNextSuggestedReplies([]);
+      }
+
+      const aiAudioBase64 = replyEv.audioBase64 || null;
+      const aiTurn: CallTurn = {
+        id: `turn_ai_${Date.now() + 1}`,
+        speaker: 'ai',
+        text: replyEv.aiReply,
+        translationId: replyEv.aiReplyTranslationId,
+        translationTh: replyEv.aiReplyTranslationTh,
+        timestamp: Date.now() + 1,
+        audioBase64: aiAudioBase64 || undefined,
+        audioMimeType: replyEv.audioMimeType || 'audio/mpeg',
+        replySource: replyEv.replySource,
+      };
+
+      setTurns((prev) => [...prev, aiTurn]);
+      void speakAiText(replyEv.aiReply, aiAudioBase64);
     } catch (err) {
       setStatusBanner((err as Error).message || 'Kesalahan jaringan.');
     } finally {
+      if (fillerTimer) window.clearTimeout(fillerTimer);
+      isAiThinkingRef.current = false;
+      setIsAiThinking(false);
       setIsAnalyzingTurn(false);
     }
   };
@@ -1428,6 +1587,8 @@ export default function App() {
     });
     activeSourcesRef.current = [];
     clearSpeechWatchdog();
+    // Supersede any chunked reply still queued so nothing keeps talking after hang-up.
+    speakTokenRef.current += 1;
     stopNeuralBufferSource();
     if (currentAudioElRef.current) {
       try {
@@ -1647,7 +1808,14 @@ export default function App() {
     const m = mochiInstanceRef.current;
     if (!m) return;
     try {
-      if (callStateKey === 'speaking') {
+      if (isAiThinking && callStateKey !== 'speaking') {
+        // m025-637: visible "listening / thinking" while the real AI composes its reply.
+        m.setMood?.('dots');
+        m.setBadge?.('chat_blue');
+        m.setAura?.('blue');
+        m.retractHands?.();
+        m.triggerEarWiggle?.(1.1);
+      } else if (callStateKey === 'speaking') {
         m.setMood?.('happy');
         m.setBadge?.('chat_purple');
         m.setAura?.('purple');
@@ -1674,7 +1842,7 @@ export default function App() {
     } catch {
       // Ignore
     }
-  }, [callStateKey, is3dMochiReady]);
+  }, [callStateKey, is3dMochiReady, isAiThinking]);
 
   const activeAiLiveText = liveAiDraft.trim() || lastAiTurn?.text || activeScenario.openingLine;
   const activeAiSubtitle = translateAndPhoneticizeLiveText(
@@ -2159,7 +2327,11 @@ export default function App() {
                         }`}
                       />
                       <span data-testid="ai-call-status-text">
-                        {isPlayingAiAudio
+                        {isAiThinking && !isPlayingAiAudio
+                          ? locale === 'th'
+                            ? 'Mochi กำลังคิด…'
+                            : 'Mochi sedang berpikir…'
+                          : isPlayingAiAudio
                           ? isLiveConnected
                             ? `PAW berbicara... (${formatTimer(callDurationSec)})`
                             : 'Sedang berbicara...'
@@ -2179,22 +2351,51 @@ export default function App() {
                     data-testid="live-translation-hud"
                     className="max-w-xl mx-auto space-y-1.5 px-1"
                   >
-                    <p
-                      data-testid="live-hud-ai-text"
-                      className="text-base sm:text-lg font-semibold text-[#1C1611] leading-snug tracking-[-0.01em] break-words"
-                    >
-                      {activeAiLiveText}
-                    </p>
-
-                    {!isMeasureMode && showTranslations && (
-                      <p
-                        data-testid="live-hud-ai-translation"
-                        className="text-xs sm:text-sm text-[#6E5E47] leading-relaxed break-words"
+                    {isAiThinking ? (
+                      <div
+                        data-testid="live-hud-ai-thinking"
+                        aria-live="polite"
+                        className="flex items-center justify-center gap-1.5 py-1.5"
                       >
-                        {locale === 'th'
-                          ? activeAiSubtitle.translationTh
-                          : activeAiSubtitle.translationId}
-                      </p>
+                        <span className="sr-only">
+                          {locale === 'th' ? 'Mochi กำลังคิดคำตอบ' : 'Mochi sedang menyiapkan jawaban'}
+                        </span>
+                        <span className="w-2 h-2 rounded-full bg-[#3296FF] animate-bounce [animation-delay:-0.3s]" />
+                        <span className="w-2 h-2 rounded-full bg-[#3296FF] animate-bounce [animation-delay:-0.15s]" />
+                        <span className="w-2 h-2 rounded-full bg-[#3296FF] animate-bounce" />
+                      </div>
+                    ) : (
+                      <>
+                        <p
+                          data-testid="live-hud-ai-text"
+                          data-reply-source={liveAiDraft.trim() ? 'live' : lastAiTurn?.replySource || 'script'}
+                          className="text-base sm:text-lg font-semibold text-[#1C1611] leading-snug tracking-[-0.01em] break-words"
+                        >
+                          {activeAiLiveText}
+                        </p>
+
+                        {!isMeasureMode && showTranslations && (
+                          <p
+                            data-testid="live-hud-ai-translation"
+                            className="text-xs sm:text-sm text-[#6E5E47] leading-relaxed break-words"
+                          >
+                            {locale === 'th'
+                              ? activeAiSubtitle.translationTh
+                              : activeAiSubtitle.translationId}
+                          </p>
+                        )}
+
+                        {!liveAiDraft.trim() && lastAiTurn?.replySource === 'offline-template' && (
+                          <span
+                            data-testid="live-hud-offline-label"
+                            className="inline-block px-2.5 py-0.5 rounded-full bg-[#FFF4E0] text-[10px] font-semibold text-[#8A5A00]"
+                          >
+                            {locale === 'th'
+                              ? 'โหมดออฟไลน์ · ประโยคฝึก ไม่ใช่ AI'
+                              : 'Mode offline · kalimat latihan, bukan AI'}
+                          </span>
+                        )}
+                      </>
                     )}
 
                     {activeUserSubtitle && (

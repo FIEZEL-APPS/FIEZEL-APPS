@@ -30,6 +30,12 @@ export interface FlexibleTurnEvaluationResult {
   audioBase64?: string | null;
   audioMimeType?: string | null;
   ttsEngine?: string;
+  /**
+   * Honest provenance of `aiReply` (m025-637): 'ai' = production AI partner,
+   * 'ai-gemini-key' = learner's own Gemini key, 'offline-template' = deterministic
+   * Braincore script used ONLY when no AI answer could be obtained (shown with a label).
+   */
+  replySource?: 'ai' | 'ai-gemini-key' | 'offline-template';
 }
 
 declare global {
@@ -717,8 +723,10 @@ const _ttsInFlight = new Map<
 const AI_TASK_REQUEST_SCHEMA = 'fiezel-ai-task-v2';
 const AI_TASK_RESPONSE_SCHEMA = 'fiezel-ai-response-v2';
 const AI_PARTNER_TIMEOUT_MS = 9000;
-const FAST_AI_BUDGET_MS = 850;
-let _aiCallModeSupported: boolean | null = false;
+// m025-637: `null` = unknown, so the FIRST attempt asks for the short phone-call style
+// (`mode:'call'`, <= 15 words → fewer output tokens → faster reply + shorter TTS). Older
+// Worker deployments answer 400 invalid_input in ~70 ms and we degrade once, remembered.
+let _aiCallModeSupported: boolean | null = null;
 let _aiScenarioRoleSupported: boolean | null = null;
 let _aiPartnerCooldownUntil = 0;
 let _identityPromise: Promise<boolean> | null = null;
@@ -892,11 +900,14 @@ export async function requestAiPartnerReply(params: {
         _aiPartnerCooldownUntil = Date.now() + retry * 1000;
         return null;
       }
-      if (!res.ok || data?.schema !== AI_TASK_RESPONSE_SCHEMA || data?.degraded === true) {
+      if (!res.ok || data?.schema !== AI_TASK_RESPONSE_SCHEMA) {
         return null;
       }
       if (withMode) _aiCallModeSupported = true;
       if (withRole) _aiScenarioRoleSupported = true;
+      if (data?.degraded === true) {
+        continue;
+      }
       const turn = (data?.turn && typeof data.turn === 'object' ? data.turn : {}) as {
         reply?: string;
         translation?: string;
@@ -905,7 +916,14 @@ export async function requestAiPartnerReply(params: {
         .replace(/^(AI|Partner|Assistant)\s*:\s*/i, '')
         .replace(/^["「]|["」]$/g, '')
         .trim();
-      if (!replyLooksLikeTargetLanguage(rawReply, params.targetLang)) return null;
+      if (!replyLooksLikeTargetLanguage(rawReply, params.targetLang)) continue;
+      // Relevance guard: a partner that parrots the learner or repeats its own previous line
+      // verbatim is not answering the learner.
+      const norm = (v: string) => String(v || '').toLowerCase().replace(/[^\p{L}\p{N}]+/gu, '');
+      const lastAiLine = [...params.history].reverse().find((h) => h.speaker === 'ai')?.text || '';
+      if (norm(rawReply) === norm(message) || (lastAiLine && norm(rawReply) === norm(lastAiLine))) {
+        continue;
+      }
       const rawTranslation = String(turn.translation || '')
         .replace(/^.*?(Terjemahan|Translation|คำแปล)\s*:\s*/i, '')
         .replace(/^["「]|["」]$/g, '')
@@ -973,12 +991,9 @@ export function resolveTtsEndpoint(): string {
 }
 
 /**
- * Evaluates a user speaking turn with ultra-low latency:
- * - Parallel speculative Neural TTS (`synthesizeFlexibleTts`) starts at `t = 0ms` alongside
- *   `requestAiPartnerReply` so the learner gets an audible neural reply in ~1.2s without
- *   waiting 6-10s for sequential LLM + TTS waterfalls.
+ * Shared input for one learner turn.
  */
-export async function evaluateTurnFlexible(params: {
+export interface TurnEvaluationParams {
   text: string;
   scenario: CallScenario;
   persona: VoicePersona;
@@ -986,22 +1001,38 @@ export async function evaluateTurnFlexible(params: {
   locale: LearnerLocale;
   measureMode: boolean;
   history: Array<{ speaker: 'ai' | 'user'; text: string }>;
-}): Promise<FlexibleTurnEvaluationResult> {
-  const localResult = evaluateUtteranceClientSide({
+}
+
+/**
+ * Step 1 (instant, 100% local): Braincore grading of the learner's exact words.
+ * Runs in a few ms so the learner's own bubble + feedback appear immediately, while the
+ * real AI partner reply is still being generated.
+ */
+export function evaluateTurnLocal(params: TurnEvaluationParams): FlexibleTurnEvaluationResult {
+  return evaluateUtteranceClientSide({
     text: params.text,
     scenario: params.scenario,
     targetLang: params.targetLang,
     history: params.history,
   });
+}
 
-  // Start parallel Neural Edge TTS into _ttsInFlight at t = 0ms
-  void synthesizeFlexibleTts({
-    text: localResult.aiReply,
-    targetLang: params.targetLang,
-    persona: params.persona,
-  });
-
-  // 1) If user has a Gemini API Key, enrich reply via Gemini 2.0 Flash REST API
+/**
+ * Step 2 (network): the partner's spoken reply.
+ *
+ * HONESTY CONTRACT (m025-637): the reply ALWAYS comes from a real AI when one is reachable.
+ * The old 850 ms race replaced the AI with a deterministic template on almost every turn
+ * (production AI needs ~2-6 s), which produced off-topic lines such as "presentation with my
+ * family" in a cafe. Now we wait for the AI (bounded by AI_PARTNER_TIMEOUT_MS); the UI hides
+ * the wait with Mochi's thinking state + a short neural filler. The template is used ONLY
+ * when no AI answer is obtainable, and it is labelled `replySource: 'offline-template'`.
+ * No speculative TTS is started for a reply that may never be spoken.
+ */
+export async function resolveAiReply(
+  params: TurnEvaluationParams,
+  localResult: FlexibleTurnEvaluationResult
+): Promise<FlexibleTurnEvaluationResult> {
+  // 1) Learner's own Gemini key (optional): same honesty rules, bounded wait.
   let userGeminiKey = '';
   try {
     if (typeof localStorage !== 'undefined') {
@@ -1014,14 +1045,23 @@ export async function evaluateTurnFlexible(params: {
   if (userGeminiKey.length > 10) {
     try {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 2200);
+      const timeout = setTimeout(() => controller.abort(), 6000);
       const langLabel = params.targetLang === 'ja' ? 'Japanese (polite N5/N4)' : 'English (A1/A2)';
+      const historyLines = params.history
+        .filter((h) => h && h.text && h.text.trim())
+        .slice(-6)
+        .map((h) => `${h.speaker === 'ai' ? 'You' : 'Learner'}: ${h.text.trim().slice(0, 240)}`);
       const promptText = [
-        `You are ${params.persona.name}, a friendly speaking partner in scenario "${params.scenario.titleId}".`,
-        `Reply naturally in ${langLabel} in 1-2 short sentences to the student's message, and ask a simple follow-up question.`,
-        `Student said: "${params.text}"`,
-        `Respond ONLY with valid JSON: {"aiReply":"...","aiReplyTranslationId":"...(Indonesian translation)","aiReplyTranslationTh":"...(Thai translation)"}`,
-      ].join('\n');
+        `You are ${params.persona.name}, a friendly speaking partner. Scenario: "${params.scenario.titleId}".`,
+        `This is a live phone-style conversation. Reply in ${langLabel}, 1-2 short sentences (max 18 words).`,
+        'Your reply MUST directly respond to what the learner just said. Do not change the topic, do not invent facts about the learner, never grade or explain grammar.',
+        historyLines.length ? `Conversation so far:\n${historyLines.join('\n')}` : '',
+        `Learner (last message): "${params.text}"`,
+        'aiReplyTranslationId must be a faithful Indonesian translation of aiReply only.',
+        `Respond ONLY with valid JSON: {"aiReply":"...","aiReplyTranslationId":"...","aiReplyTranslationTh":"...(Thai translation)"}`,
+      ]
+        .filter(Boolean)
+        .join('\n');
       const res = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(
           userGeminiKey
@@ -1031,7 +1071,7 @@ export async function evaluateTurnFlexible(params: {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             contents: [{ role: 'user', parts: [{ text: promptText }] }],
-            generationConfig: { responseMimeType: 'application/json', temperature: 0.6 },
+            generationConfig: { responseMimeType: 'application/json', temperature: 0.5 },
           }),
           signal: controller.signal,
         }
@@ -1041,20 +1081,13 @@ export async function evaluateTurnFlexible(params: {
         const data = await res.json();
         const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
         const parsed = JSON.parse(rawText);
-        if (parsed && typeof parsed.aiReply === 'string' && parsed.aiReply.trim()) {
-          const geminiReply = parsed.aiReply.trim();
-          void synthesizeFlexibleTts({
-            text: geminiReply,
-            targetLang: params.targetLang,
-            persona: params.persona,
-          });
+        const geminiReply = typeof parsed?.aiReply === 'string' ? parsed.aiReply.trim() : '';
+        if (geminiReply && replyLooksLikeTargetLanguage(geminiReply, params.targetLang)) {
           return {
             ...localResult,
             aiReply: geminiReply,
-            aiReplyTranslationId:
-              parsed.aiReplyTranslationId || localResult.aiReplyTranslationId,
-            aiReplyTranslationTh:
-              parsed.aiReplyTranslationTh || localResult.aiReplyTranslationTh,
+            aiReplyTranslationId: parsed.aiReplyTranslationId || '',
+            aiReplyTranslationTh: parsed.aiReplyTranslationTh || '',
             nextSuggestedReplies: getBeginnerReplyCards(
               params.scenario.id,
               params.targetLang,
@@ -1066,17 +1099,18 @@ export async function evaluateTurnFlexible(params: {
             audioBase64: null,
             audioMimeType: 'audio/mpeg',
             ttsEngine: 'fiezel-edge-tts-binary',
+            replySource: 'ai-gemini-key',
           };
         }
       }
     } catch {
-      // Fall through to fast path
+      // Fall through to the production AI partner
     }
   }
 
-  // 2) Production AI partner (same Worker path as Ngobrol AI) raced against FAST_AI_BUDGET_MS.
-  // The underlying fetch is NOT aborted early so /api/ai/task still completes with HTTP 200.
-  const partnerPromise = requestAiPartnerReply({
+  // 2) Production AI partner (same Worker path as Ngobrol AI). Awaited — never raced
+  //    against a template.
+  const partner = await requestAiPartnerReply({
     text: params.text,
     scenario: params.scenario,
     targetLang: params.targetLang,
@@ -1084,19 +1118,7 @@ export async function evaluateTurnFlexible(params: {
     history: params.history,
   });
 
-  const partner = await Promise.race([
-    partnerPromise,
-    new Promise<null>((resolve) => setTimeout(() => resolve(null), FAST_AI_BUDGET_MS)),
-  ]);
-
   if (partner) {
-    // Kick off Neural Edge TTS immediately into _ttsInFlight and return the reply to the UI
-    // without blocking on audio bytes; speakAiText joins the in-flight TTS promise seamlessly.
-    void synthesizeFlexibleTts({
-      text: partner.reply,
-      targetLang: params.targetLang,
-      persona: params.persona,
-    });
     return {
       ...localResult,
       aiReply: partner.reply,
@@ -1113,21 +1135,74 @@ export async function evaluateTurnFlexible(params: {
       audioBase64: null,
       audioMimeType: 'audio/mpeg',
       ttsEngine: 'fiezel-ai-partner',
+      replySource: 'ai',
     };
   }
 
-  // 3) Offline / timeout fallback: kick off Neural Edge TTS into _ttsInFlight and return now
-  void synthesizeFlexibleTts({
-    text: localResult.aiReply,
-    targetLang: params.targetLang,
-    persona: params.persona,
-  });
+  // 3) Truly offline / AI unavailable: deterministic script, explicitly labelled.
   return {
     ...localResult,
     audioBase64: null,
     audioMimeType: 'audio/mpeg',
     ttsEngine: 'fiezel-edge-tts-binary',
+    replySource: 'offline-template',
   };
+}
+
+/** Backwards-compatible one-shot wrapper (local grading + honest AI reply). */
+export async function evaluateTurnFlexible(
+  params: TurnEvaluationParams
+): Promise<FlexibleTurnEvaluationResult> {
+  return resolveAiReply(params, evaluateTurnLocal(params));
+}
+
+/**
+ * Splits a long reply into at most 2 speakable chunks so sentence 1 plays while sentence 2
+ * is synthesized. Short phone-call replies (<= 120 chars EN / <= 60 chars JA) stay as a
+ * single chunk because a single Edge-TTS handshake on Render is faster (~200-800ms) than
+ * two separate requests and matches the pre-rendered opening-line cache key.
+ */
+export function splitIntoSpeechChunks(text: string, targetLang: TargetLang, maxChunks = 2): string[] {
+  const clean = String(text || '').replace(/\s+/g, ' ').trim();
+  if (!clean) return [];
+  const singleLimit = targetLang === 'ja' ? 60 : 120;
+  if (clean.length <= singleLimit) return [clean];
+  const parts =
+    targetLang === 'ja'
+      ? clean.match(/[^。！？!?]+[。！？!?]*/g) || [clean]
+      : clean.match(/[^.!?]+(?:[.!?]+["')\]]*|$)/g) || [clean];
+  const minLen = targetLang === 'ja' ? 10 : 24;
+  const chunks: string[] = [];
+  let carry = '';
+  for (const raw of parts) {
+    const piece = raw.trim();
+    if (!piece) continue;
+    const merged = carry ? `${carry}${targetLang === 'ja' ? '' : ' '}${piece}` : piece;
+    if (merged.length < minLen) {
+      carry = merged;
+      continue;
+    }
+    chunks.push(merged);
+    carry = '';
+  }
+  if (carry) {
+    if (chunks.length) chunks[chunks.length - 1] += `${targetLang === 'ja' ? '' : ' '}${carry}`;
+    else chunks.push(carry);
+  }
+  if (chunks.length > maxChunks) {
+    const head = chunks.slice(0, maxChunks - 1);
+    head.push(chunks.slice(maxChunks - 1).join(targetLang === 'ja' ? '' : ' '));
+    return head;
+  }
+  return chunks;
+}
+
+/**
+ * Short, content-neutral neural "listening" filler played while the AI is still thinking.
+ * Kept to a single phrase per language so background pre-render makes at most 1 TTS request.
+ */
+export function getThinkingFillers(targetLang: TargetLang): string[] {
+  return targetLang === 'ja' ? ['ええと…'] : ['Hmm, okay…'];
 }
 
 /**

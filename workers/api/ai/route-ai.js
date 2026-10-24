@@ -421,7 +421,7 @@
 
     // --- BREAKER SEBELUM KUOTA. Provider yang sudah terbukti mati tidak boleh memakan satu pun
     // jatah murid: OPEN artinya jawabannya sudah diketahui tanpa memanggil apa pun.
-    var breakerTarget = 'ai:' + AiTasks.pickModel(taskName, { breaker: 'CLOSED' }).id;
+    var breakerTarget = 'ai:' + AiTasks.pickModel(taskName, { breaker: 'CLOSED', input: verdict.input }).id;
     var store = deps.breakerStore || null;
     var breakerState = store ? await store.load(breakerTarget, started) : Breaker.initialState(started);
     var gate = Breaker.beforeRequest(breakerState, started);
@@ -470,7 +470,8 @@
       budget = await budgetFn({
         env: env, ctx: a.ctx, request: a.request,
         task: taskName,
-        neurons: Number((spec.model && spec.model.neuronsPerRequest) || 0) || 1,
+        // m025-637: permintaan suara (mode:'call') memesan biaya model call bila lebih mahal.
+        neurons: Number((AiTasks.reservationModel(taskName, verdict.input) || {}).neuronsPerRequest || 0) || 1,
         now: started
       });
     } catch (_) {
@@ -543,7 +544,8 @@
     // uji, dan yang dipakai adalah yang LEBIH BESAR (lebih hemat).
     var model = AiTasks.pickModel(taskName, {
       breaker: gate.phase,
-      neuronsUsedToday: Math.max(Number(deps.neuronsUsedToday || 0), accountUsedBefore)
+      neuronsUsedToday: Math.max(Number(deps.neuronsUsedToday || 0), accountUsedBefore),
+      input: verdict.input
     });
     // P3 - payload dirakit `AiTasks.buildPayload()`, BUKAN di sini. Baris lama
     // (`response_format = {type:'json_object'}` tanpa skema, dikirim tanpa memeriksa apakah
