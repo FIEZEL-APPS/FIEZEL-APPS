@@ -2619,8 +2619,8 @@ export default function App() {
                       <img
                         src={
                             isPlayingAiAudio
-                              ? '/assets/brand/paw-mochi-speaking.svg'
-                              : '/assets/brand/paw-mochi-idle.svg'
+                              ? './assets/brand/paw-mochi-speaking.svg'
+                              : './assets/brand/paw-mochi-idle.svg'
                           }
                         onError={(e) => {
                           const fallback = isPlayingAiAudio
