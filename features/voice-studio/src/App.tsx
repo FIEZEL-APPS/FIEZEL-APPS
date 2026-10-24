@@ -2459,7 +2459,7 @@ export default function App() {
                             : isLiveConnected
                               ? isMicMuted
                                 ? `Mic dibisukan · ${formatTimer(callDurationSec)}`
-                                : `Mendengarkan kamu... (${formatTimer(callDurationSec)})`
+                                : `LIVE · ${formatTimer(callDurationSec)}`
                               : 'Siap bicara'}
                       </span>
                     </div>
