@@ -332,7 +332,8 @@ const BINARY_EXTENSIONS = new Set([
   '.mp4', '.webm', '.mov',                                     // klip pemasaran
   '.onnx', '.wasm', '.bin', '.pt', '.zip', '.gz', '.pdf',      // model neural & arsip vendor
   '.exe',                                                       // executable Windows (tool sentinel)
-  '.jar'                                                        // arsip Java binari (gradle-wrapper.jar untuk build Android)
+  '.jar',                                                       // arsip Java binari (gradle-wrapper.jar untuk build Android)
+  '.jks', '.keystore'                                           // keystore Android rilis deterministik (android/keystore/fiezel-release.jks)
 ]);
 
 /**
