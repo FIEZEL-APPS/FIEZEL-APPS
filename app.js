@@ -11051,7 +11051,7 @@ function todayHomeMarkup(){
     + `<span>${isTh ? 'คุณทำได้แน่นอน!' : 'Kamu pasti bisa!'}</span>`
     + `</div>`
     + `</div>`
-    + `<div class="fz-vissol-mascot-wrap" role="button" tabindex="0" aria-label="Mochi 3D Mascot" data-testid="home-mochi-mascot" onclick="try{if(window.FiezelMochiCompanion?.getInstance()){var m=window.FiezelMochiCompanion.getInstance();m.setMood('happy');if(typeof m.holdMood==='function')m.holdMood(3.5);m.triggerHop(0.35);m.triggerHandGesture('cheer',2.2);if(typeof m.triggerEarWiggle==='function')m.triggerEarWiggle(1.4);if(typeof uiSfx==='function')uiSfx('paw_greet');}}catch(_){}">`
+    + `<div class="fz-vissol-mascot-wrap" role="button" tabindex="0" aria-label="Mochi 3D Mascot" data-testid="home-mochi-mascot" onclick="try{window.FiezelMochiCompanion?.interact?.();}catch(_){}" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();try{window.FiezelMochiCompanion?.interact?.();}catch(_){}}">`
     + `<div class="fz-vissol-mascot-cloud-bg" aria-hidden="true"></div>`
     + `<img src="./assets/brand/mochi-mascot-headset.png" alt="Mochi Mascot" class="fz-vissol-mascot-img" />`
     + `</div>`
@@ -18558,10 +18558,10 @@ window.audioDiagnosticsText=audioDiagnosticsText;
 // diblokir, melainkan karena tombol-tombol itu tidak pernah diminta berbunyi. Mesinnya
 // benar sejak awal; kabelnya yang tidak pernah dipasang.
 let lastSfxAt = 0;
-function uiSfx(name){
+function uiSfx(name, opts){
   if(name==='nav'||name==='page_transition') return false;
   try{
-    const ok = self.FiezelUiSfx?.play?.(name,self)===true;
+    const ok = self.FiezelUiSfx?.play?.(name, self, opts)===true;
     lastSfxAt = Date.now();   // dicatat walau gagal: yang penting ketukan ini SUDAH diklaim
     return ok;
   }catch{return false}

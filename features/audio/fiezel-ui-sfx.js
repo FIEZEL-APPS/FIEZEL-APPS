@@ -335,7 +335,8 @@
   }
 
   /** Penjatahan: cooldown antar-bunyi dan jatah per sesi (14 §3.2). */
-  function rationAllows(name) {
+  function rationAllows(name, opts) {
+    if (opts && opts.force) return true;
     var m = MANIFEST[name];
     var t = Date.now();
     if (m.cooldownMs && lastPlayedAt[name] && t - lastPlayedAt[name] < m.cooldownMs) return false;
@@ -370,7 +371,7 @@
    * melainkan gangguan (pelajaran m025-84/-90).
    */
   function trigger(env, name, opts, windowMs) {
-    if (!rationAllows(name)) return false;
+    if (!rationAllows(name, opts)) return false;
     noteRation(name);
     var deadline = Date.now() + (isFinite(windowMs) ? windowMs : GESTURE_GRACE_MS);
     if (buffers[name]) {
@@ -393,7 +394,7 @@
    * memang buang-bila-telat dan mencatat jatah di muka.
    */
   function triggerConfirmed(env, name, opts, windowMs) {
-    if (!rationAllows(name)) return false;
+    if (!rationAllows(name, opts)) return false;
     var deadline = Date.now() + (isFinite(windowMs) ? windowMs : GESTURE_GRACE_MS);
     if (buffers[name]) {
       try {
@@ -404,7 +405,7 @@
     }
     loadBuffer(env, name).then(function () {
       if (!running() || Date.now() > deadline) return;
-      if (!rationAllows(name)) return;
+      if (!rationAllows(name, opts)) return;
       try {
         if (startBuffer(name, opts)) { noteRation(name); if (name === 'splash_intro') noteIntroPhase('PLAYED'); }
       } catch (_) {}
