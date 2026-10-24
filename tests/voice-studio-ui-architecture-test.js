@@ -96,12 +96,12 @@ assert.ok(
   'PAW Mochi avatar strictly toggles between speaking and idle SVG based on isPlayingAiAudio'
 );
 assert.ok(
-  appContent.includes("const callStateKey: 'speaking' | 'recording' | 'live' | 'ready' = isPlayingAiAudio"),
+  appContent.includes("const callStateKey: 'speaking' | 'recording' | 'waiting' | 'live' | 'ready' = isPlayingAiAudio"),
   'callStateKey prioritizes speaking state over live connected state during audio playback'
 );
 assert.ok(
-  appContent.includes("PAW berbicara... (${formatTimer(callDurationSec)})"),
-  'Status text explicitly indicates when PAW is actively speaking during live duplex calls'
+  appContent.includes("Mochi berbicara... (${formatTimer(callDurationSec)})"),
+  'Status text explicitly indicates when Mochi is actively speaking during live duplex calls'
 );
 assert.ok(
   appContent.includes("Merekam suara... (${formatTimer(pttRecordingSec)})"),

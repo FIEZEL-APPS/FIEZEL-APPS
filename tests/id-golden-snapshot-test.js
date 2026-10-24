@@ -77,6 +77,7 @@ const LITERAL_SOURCES = () => {
   const out = ['app.js'];
   const walk = (dir) => {
     for (const e of fs.readdirSync(rel(dir), { withFileTypes: true })) {
+      if (e.name === 'node_modules' || e.name === '.git') continue;
       const p = dir + '/' + e.name;
       if (e.isDirectory()) walk(p);
       else if (e.name.endsWith('.js')) out.push(p);
