@@ -1,7 +1,7 @@
 # FIEZEL Dossier Serah Terima Rilis: m025-661
-**Subjek**: Perbaikan UX Voice Call Studio (Pembersihan Topbar API Key, Eliminasi Lonjakan Bottom Dock ke Ruang Hampa, dan Penghapusan Suara Aizuchi "Naruhodo")  
-**Tanggal**: 2026-10-24  
-**Versi Rilis**: `m025-661`  
+**Subjek**: Perbaikan UX Voice Call Studio (Pembersihan Topbar API Key, Eliminasi Lonjakan Bottom Dock ke Ruang Hampa, dan Penghapusan Suara Aizuchi "Naruhodo")
+**Tanggal**: 2026-10-24
+**Versi Rilis**: `m025-661`
 **Status CI Mutu**: 100% HIJAU (Lokal & CI Workflow)
 
 ---
