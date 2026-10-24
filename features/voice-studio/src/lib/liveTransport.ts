@@ -1370,32 +1370,21 @@ export function splitIntoSpeechChunks(text: string, targetLang: TargetLang, maxC
 }
 
 /**
- * Short, natural conversational acoustic fillers (Aizuchi 相槌 in Japanese / Backchannels in English)
- * played instantly from memory while the AI partner is thinking.
+ * Conversational acoustic fillers (Aizuchi 相槌 / Backchannels) disabled.
+ * Ensures AI partner responds directly and synchronously without artificial canned phrases like "naruhodo".
  */
-export function getThinkingFillers(targetLang: TargetLang): string[] {
-  if (targetLang === 'ja') {
-    return ['うん！', 'なるほど！', 'あ、そうなんだ！'];
-  }
-  return ['Yeah!', 'Got it!', 'Oh nice!'];
+export function getThinkingFillers(_targetLang: TargetLang): string[] {
+  return [];
 }
 
 /**
- * Pre-synthesizes and caches the thinking fillers into in-memory TTS cache
- * so they can be played with < 50ms latency as soon as the student stops speaking.
+ * Pre-synthesizes and caches thinking fillers (No-op when fillers disabled).
  */
 export function prewarmThinkingFillers(
-  targetLang: TargetLang,
-  persona?: VoicePersona
+  _targetLang: TargetLang,
+  _persona?: VoicePersona
 ): void {
-  const fillers = getThinkingFillers(targetLang);
-  for (const filler of fillers) {
-    void synthesizeFlexibleTts({
-      text: filler,
-      targetLang,
-      persona,
-    }).catch(() => {});
-  }
+  // Acoustic fillers intentionally disabled — AI replies directly without canned filler sounds
 }
 
 /**
