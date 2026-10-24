@@ -14,22 +14,12 @@
  *    - Zero emojis and zero emoticon words!
  */
 
-export interface RubyToken {
-  text: string;
-  ruby?: string; // Furigana kana if kanji
-  isKanji: boolean;
-}
 
-export interface JapaneseAnalysisResult {
-  raw: string;
-  furiganaHtml: string;
-  romaji: string;
-}
 
 const KANJI_REGEX = /[\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\u3005]/;
 
 // Common Japanese dictionary: Kanji -> { kana, romaji }
-const KANJI_DICT: Record<string, { kana: string; romaji: string; stem?: string; stemKana?: string }> = {
+const KANJI_DICT = {
   // Pronouns & People
   '私': { kana: 'わたし', romaji: 'watashi' },
   '僕': { kana: 'ぼく', romaji: 'boku' },
@@ -211,7 +201,7 @@ const KANJI_DICT: Record<string, { kana: string; romaji: string; stem?: string; 
 };
 
 // Kanji single-character stem fallback
-const KANJI_SINGLE_CHAR_STEMS: Record<string, string> = {
+const KANJI_SINGLE_CHAR_STEMS = {
   '私': 'わたし',
   '僕': 'ぼく',
   '君': 'きみ',
@@ -269,7 +259,7 @@ const KANJI_SINGLE_CHAR_STEMS: Record<string, string> = {
 };
 
 // Kana to Romaji mapping table
-const KANA_MAP: Record<string, string> = {
+const KANA_MAP = {
   'あ': 'a', 'い': 'i', 'う': 'u', 'え': 'e', 'お': 'o',
   'か': 'ka', 'き': 'ki', 'く': 'ku', 'け': 'ke', 'こ': 'ko',
   'さ': 'sa', 'し': 'shi', 'す': 'su', 'せ': 'se', 'そ': 'so',
@@ -289,7 +279,7 @@ const KANA_MAP: Record<string, string> = {
   'ゔ': 'vu',
 };
 
-const YOON_MAP: Record<string, string> = {
+const YOON_MAP = {
   'きゃ': 'kya', 'きゅ': 'kyu', 'きょ': 'kyo',
   'しゃ': 'sha', 'しゅ': 'shu', 'しょ': 'sho',
   'ちゃ': 'cha', 'ちゅ': 'chu', 'ちょ': 'cho',
@@ -306,14 +296,14 @@ const YOON_MAP: Record<string, string> = {
 };
 
 // Convert Katakana to Hiragana
-export function katakanaToHiragana(text: string): string {
+export function katakanaToHiragana(text) {
   return text.replace(/[\u30A1-\u30F6]/g, (ch) =>
     String.fromCharCode(ch.charCodeAt(0) - 0x60)
   );
 }
 
 // Strip emojis, emoticons, and action words completely
-export function stripEmojisAndEmotWords(text: string): string {
+export function stripEmojisAndEmotWords(text) {
   if (!text) return '';
   return text
     .replace(/[\u{1F300}-\u{1F9FF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F1E6}-\u{1F1FF}\u{1FA70}-\u{1FAFF}\u{FE00}-\u{FE0F}]/gu, '')
@@ -329,11 +319,11 @@ export function stripEmojisAndEmotWords(text: string): string {
 /**
  * Tokenize Japanese text into Ruby tokens for HTML rendering.
  */
-export function tokenizeJapaneseToRuby(rawText: string): RubyToken[] {
+export function tokenizeJapaneseToRuby(rawText) {
   const clean = stripEmojisAndEmotWords(rawText);
   if (!clean) return [];
 
-  const tokens: RubyToken[] = [];
+  const tokens = [];
   let i = 0;
 
   // Sort dictionary keys by descending length
@@ -388,7 +378,7 @@ export function tokenizeJapaneseToRuby(rawText: string): RubyToken[] {
 /**
  * Render HTML with <ruby> and <rt> tags.
  */
-export function renderFuriganaHtml(rawText: string): string {
+export function renderFuriganaHtml(rawText) {
   const tokens = tokenizeJapaneseToRuby(rawText);
   return tokens
     .map((tk) => {
@@ -408,7 +398,7 @@ export function renderFuriganaHtml(rawText: string): string {
  * - Sokuon っ -> double consonant
  * - Long vowel ー -> prolonged vowel
  */
-export function kanaStringToRomaji(kanaStr: string): string {
+export function kanaStringToRomaji(kanaStr) {
   let s = katakanaToHiragana(kanaStr);
   let out = '';
   let i = 0;
@@ -485,7 +475,7 @@ export function kanaStringToRomaji(kanaStr: string): string {
  * - Greetings: こんにちは -> "konnichiwa", こんばんは -> "konbanwa"
  * - Exact vowel sounds according to standard Japanese phonetics.
  */
-export function toPhoneticRomaji(text: string): string {
+export function toPhoneticRomaji(text) {
   const clean = stripEmojisAndEmotWords(text);
   if (!clean) return '';
 
@@ -493,7 +483,7 @@ export function toPhoneticRomaji(text: string): string {
   const tokens = tokenizeJapaneseToRuby(clean);
 
   // 2. Transliterate tokens with smart particle recognition
-  const parts: string[] = [];
+  const parts = [];
 
   for (let idx = 0; idx < tokens.length; idx++) {
     const tk = tokens[idx];
@@ -627,7 +617,7 @@ export function toPhoneticRomaji(text: string): string {
 /**
  * Full analysis producing both Furigana HTML and Phonetic Romaji.
  */
-export function analyzeJapaneseText(text: string): JapaneseAnalysisResult {
+export function analyzeJapaneseText(text) {
   const clean = stripEmojisAndEmotWords(text);
   return {
     raw: clean,

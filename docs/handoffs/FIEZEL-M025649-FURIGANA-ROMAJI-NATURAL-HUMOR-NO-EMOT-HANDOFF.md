@@ -108,19 +108,20 @@ Cleaned text:     あはは！やばいね！
 * `node tests/gate-registry-test.js`: **PASS** (10 pass, 0 fail).
 * `node tests/ai-conversation-task-test.js`: **LULUS 50/50**.
 * `node tests/ai-task-contract-test.js`: **PASS 161/161**.
+* `node tests/japanese-phonetics-test.js`: **PASS (100%)**.
 * `node tools/bump-build.mjs --check`: **Selaras m025-649**.
 
 ---
 
 ## 3. Berkas yang Disentuh & Ringkasan Perubahan
 
-1. `features/voice-studio/src/lib/japanesePhonetics.ts` (BERKAS BARU):
+1. `features/voice-studio/src/lib/japanesePhonetics.js` & `japanesePhonetics.d.ts` (BERKAS BARU):
    - Mesin furigana ruby dan aturan Hepburn fonetik presisi (`は` -> `wa`, `を` -> `o`, `へ` -> `e`, sokuon, chōonpu).
    - Pembersih emoji Unicode dan deskriptor frasa emotikon.
 2. `features/voice-studio/src/components/JapaneseRubyDisplay.tsx` (BERKAS BARU):
    - Komponen React untuk merender pasangan teks ruby `<ruby><rt>` dan subtitle romaji fonetik.
-3. `tests/japanese-phonetics-test.mjs` (BERKAS BARU):
-   - Unit test otomatis memvalidasi seluruh aturan fonetik, furigana ruby, dan pembersihan emoji.
+3. `tests/japanese-phonetics-test.js` (BERKAS BARU):
+   - Unit test otomatis memvalidasi seluruh aturan fonetik, furigana ruby, dan pembersihan emoji (terdaftar di `.github/workflows/quality.yml`).
 4. `features/voice-studio/src/App.tsx`:
    - Integrasi `JapaneseRubyDisplay` pada HUD aktif panggilan, giliran transkrip AI, dan transkrip murid.
    - Pembersihan emoji sebelum audio diputar di `speakAiText`.
