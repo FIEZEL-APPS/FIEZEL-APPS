@@ -121,8 +121,8 @@ export class FiezelMochi {
   initScene() {
     this.scene = new THREE.Scene();
 
-    this.camera = new THREE.PerspectiveCamera(44, this.width / this.height, 0.1, 100);
-    this.camera.position.set(0, 0.08, 5.35); // Close-up framing: plush, prominent Daifuku Mochi with generous bounds
+    this.camera = new THREE.PerspectiveCamera(46, this.width / this.height, 0.1, 100);
+    this.camera.position.set(0, 0.08, 5.80); // Framing: plush, prominent Daifuku Mochi with generous safe margins around ears and paws
 
 
     this.renderer = new THREE.WebGLRenderer({
@@ -2488,12 +2488,12 @@ export class FiezelMochi {
           // RIGHT PAW (Reference C): Raised high with joy, pink pads proudly facing front, cheerful wave!
           const hop = (bump(g, 0.55, 0.16) + bump(g, 0.95, 0.16)) * 0.10;
           const wig = Math.sin(t * 11.0) * 0.14;
-          P.x = 1.82; P.y = 0.76 + hop + bob * 0.5; P.z = 0.60;
+          P.x = 1.54; P.y = 0.72 + hop + bob * 0.5; P.z = 0.65;
           P.rx = -0.05; P.ry = -0.10; P.rz = -0.22 + wig;
           P.s = 1.0;
         } else {
           // LEFT PAW (Reference C): Resting gently down at the side, hanging naturally
-          P.x = -1.82; P.y = -0.14 + bob; P.z = 0.55;
+          P.x = -1.54; P.y = -0.12 + bob; P.z = 0.60;
           P.rx = 0.10; P.ry = 0.40; P.rz = 0.32;
           P.s = 0.92;
         }
@@ -2501,12 +2501,12 @@ export class FiezelMochi {
         if (lead) {
           // RIGHT PAW: Tucked close to puffed-out cheek in cute harmless toddler sulk
           const sulkTremble = Math.sin(t * 7.5) * 0.03;
-          P.x = 1.62; P.y = -0.18 + sulkTremble + bob * 0.4; P.z = 0.65;
+          P.x = 1.48; P.y = -0.18 + sulkTremble + bob * 0.4; P.z = 0.68;
           P.rx = 0.08; P.ry = -0.32; P.rz = -0.18;
           P.s = 0.98;
         } else {
           // LEFT PAW: Tucked close to opposite puffed cheek
-          P.x = -1.62; P.y = -0.22 + bob * 0.4; P.z = 0.62;
+          P.x = -1.48; P.y = -0.22 + bob * 0.4; P.z = 0.65;
           P.rx = 0.08; P.ry = 0.32; P.rz = 0.18;
           P.s = 0.95;
         }
@@ -2514,11 +2514,11 @@ export class FiezelMochi {
         if (lead) {
           // RIGHT PAW: Playful cute cat wave with pink pads visible
           const w = Math.sin(t * 9.0) * 0.28;
-          P.x = 1.82; P.y = 0.42 + bob * 0.5; P.z = 0.58;
+          P.x = 1.54; P.y = 0.40 + bob * 0.5; P.z = 0.62;
           P.rx = 0.0; P.ry = -0.08; P.rz = -0.16 + w;
           P.s = 1.0;
         } else {
-          P.x = -1.80; P.y = -0.30 + bob; P.z = 0.52;
+          P.x = -1.52; P.y = -0.26 + bob; P.z = 0.58;
           P.rx = 0.05; P.ry = 0.35; P.rz = 0.25;
           P.s = 0.88;
         }
