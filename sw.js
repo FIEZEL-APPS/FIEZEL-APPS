@@ -373,7 +373,7 @@ self.addEventListener('fetch',e=>{
     menolong - ia hanya akan mengganti menunggu dengan layar kosong.
      ============================================================================== */
   if(requestUrl.pathname.toLowerCase().endsWith('/call.html')||requestUrl.pathname.toLowerCase().includes('/features/voice-studio/dist/')){
-    responsePromise=fetch(e.request).then(r=>{
+    responsePromise=fetch(new Request(e.request,{cache:'no-cache'})).then(r=>{
       if(r&&r.ok){
         const copy=r.clone();
         caches.open(SHELL_CACHE).then(cache=>cache.put(e.request,copy).catch(()=>{}));

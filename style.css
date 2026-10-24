@@ -480,7 +480,7 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
    Bukan .toast karena kartu ini menunggu keputusan - ia tidak boleh pergi sendiri. */
 .update-banner{
   position:fixed;left:0;right:0;bottom:calc(76px + env(safe-area-inset-bottom,0px));
-  z-index:250;display:flex;justify-content:center;padding:0 14px;pointer-events:none;
+  z-index:10050;display:flex;justify-content:center;padding:0 14px;pointer-events:none;
   opacity:0;transform:translateY(14px);
   transition:opacity var(--dur-m) var(--ease),transform var(--dur-m) var(--ease-spring)
 }

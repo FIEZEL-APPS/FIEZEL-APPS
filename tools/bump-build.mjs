@@ -50,7 +50,7 @@ const TITIK = [
 
    Diganti GLOBAL (semua kemunculan), bukan yang pertama saja: satu halaman memanggil
    empat berkas, dan satu saja yang tertinggal mengembalikan persis cacat yang sama. */
-const HALAMAN_BERVERSI = ['kurikulum.html', 'misi.html'];
+const HALAMAN_BERVERSI = ['kurikulum.html', 'misi.html', 'call.html', 'features/voice-studio/call.html'];
 const POLA_VERSI = /\?v=m025-\d+/g;
 
 const baca = (f) => fs.readFileSync(path.join(ROOT, f), 'utf8');

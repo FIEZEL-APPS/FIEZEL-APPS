@@ -229,8 +229,24 @@ const req = (task, input, extra) => ({ schema: 'fiezel-ai-task-v2', task, input,
   check('sea-lion tercatat sebagai KANDIDAT yang butuh uji lanjutan dan tidak dipakai task mana pun',
     AiTasks.MODELS.candidate.id === '@cf/aisingapore/gemma-sea-lion-v4-27b-it' &&
     AiTasks.MODELS.candidate.usedByTasks === false &&
-    EXPECTED_TASKS.every((t) => AiTasks.modelsUsedBy(t).every((m) => m.id !== AiTasks.MODELS.candidate.id)),
+    // m025-637: satu-satunya pengecualian adalah `voiceCall` (model fisik sama) yang wewenangnya
+    // dieja sempit: HANYA conversation_turn mode call, dan HANYA sebagai `callModel`.
+    EXPECTED_TASKS.every((t) => [AiTasks.get(t).model, AiTasks.get(t).cheapModel]
+      .every((m) => m.id !== AiTasks.MODELS.candidate.id)) &&
+    EXPECTED_TASKS.every((t) => !AiTasks.get(t).callModel || t === 'conversation_turn'),
     AiTasks.MODELS.candidate.id);
+  check('voiceCall (sea-lion) hanya untuk conversation_turn mode call, tidak pernah untuk task kebenaran',
+    AiTasks.MODELS.voiceCall.usedByTasks === 'conversation_turn:call' &&
+    AiTasks.MODELS.voiceCall.pedagogicallyTrusted === false &&
+    AiTasks.get('conversation_turn').callModel === AiTasks.MODELS.voiceCall &&
+    AiTasks.TRUTH_TASKS.every((t) => AiTasks.modelsUsedBy(t).every((m) => m.id !== AiTasks.MODELS.voiceCall.id)) &&
+    AiTasks.pickModel('conversation_turn', { breaker: 'CLOSED', input: { mode: 'call' } }) === AiTasks.MODELS.voiceCall &&
+    AiTasks.pickModel('conversation_turn', { breaker: 'CLOSED', input: {} }) === AiTasks.get('conversation_turn').model &&
+    AiTasks.pickModel('conversation_turn', { breaker: 'HALF_OPEN', input: { mode: 'call' } }) === AiTasks.get('conversation_turn').cheapModel &&
+    AiTasks.pickModel('conversation_correct', { breaker: 'CLOSED', input: { mode: 'call' } }) === AiTasks.get('conversation_correct').model &&
+    AiTasks.reservationModel('conversation_turn', { mode: 'call' }).neuronsPerRequest >= AiTasks.get('conversation_turn').model.neuronsPerRequest &&
+    Array.isArray(AiTasks.buildPayload('conversation_turn', { input: { mode: 'call', message: 'hi', course: 'en' }, model: AiTasks.MODELS.voiceCall }).payload.messages),
+    AiTasks.MODELS.voiceCall.id);
   check('gemma-4-26b (reasoning overflow) tercatat DITOLAK dan tidak dipakai task mana pun',
     AiTasks.MODELS.rejected.id === '@cf/google/gemma-4-26b-a4b-it' &&
     EXPECTED_TASKS.every((t) => AiTasks.modelsUsedBy(t).every((m) => m.id !== AiTasks.MODELS.rejected.id)),

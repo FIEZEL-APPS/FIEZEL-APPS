@@ -165,6 +165,36 @@
               'pedagogis dengan menyebut jawaban salah "nggak salah banget sih". Kecepatan tidak ' +
               'menebus jawaban yang menyesatkan murid, jadi ia menunggu di sini.'
     }),
+    /**
+     * m025-637 — model KHUSUS satu jalur: `conversation_turn` dengan `mode:'call'` (Mitra
+     * Kaiwa / Telepon Live). Model fisiknya sama dengan `candidate`, tetapi wewenangnya
+     * sengaja sempit dan TERPISAH dari `candidate`:
+     *   - jalur ini TIDAK menyatakan benar/salah apa pun (prompt melarang memuji/menilai, dan
+     *     koreksi hidup di `conversation_correct` yang TETAP memakai model `reasoning`), jadi
+     *     alasan penahanan `candidate` ("nggak salah banget sih" pada jawaban salah) tidak
+     *     berlaku di sini; model ini dilarang masuk TRUTH_TASKS (gerbang menegakkannya);
+     *   - BUKTI (prompt + `shapeOutput` produksi yang persis sama, Workers AI langsung,
+     *     24 Okt 2026, 10 kasus EN/JA termasuk kalimat salah dan jawaban "yes"):
+     *     sea-lion rata-rata 1.085 ms (maks 1.412), kontrak 9/10, balasan nyambung di 10/10;
+     *     llama-3.1-8b-fp8 rata-rata 4.215 ms (maks 13.160), kontrak 10/10 tetapi 2 dari 4
+     *     balasan Jepang ngawur (salah peran, aksara Cina). Model lain gagal kontrak
+     *     (gema rangka) atau tidak bisa diakses akun. Bukti: tools/dev/mitra-kaiwa-model-bench.cjs.
+     *   - biaya: 30 neuron/permintaan (vs 12,5). Pagar akun memesan nilai ini (bukan model
+     *     utama) untuk permintaan call, dan degradasi tetap jatuh ke `cheapModel`.
+     */
+    voiceCall: Object.freeze({
+      id: '@cf/aisingapore/gemma-sea-lion-v4-27b-it',
+      priceInPerMillionUsd: 0.351,
+      priceOutPerMillionUsd: 0.351,
+      neuronsPerRequest: 30,
+      responseShape: 'openai',
+      jsonModeCapable: false,
+      pedagogicallyTrusted: false,
+      usedByTasks: 'conversation_turn:call',
+      reason: 'Hanya untuk conversation_turn mode call (tanpa penilaian benar/salah). Terukur ' +
+              '1,1 dtk vs 4,2 dtk (llama-3.1-8b-fp8) dengan balasan Jepang yang nyambung; ' +
+              'dilarang untuk task kebenaran.'
+    }),
     /** DITOLAK, disimpan sebagai bukti supaya tidak ada yang mencobanya lagi tanpa membaca ini. */
     rejected: Object.freeze({
       id: '@cf/google/gemma-4-26b-a4b-it',
@@ -1100,9 +1130,11 @@
       'You are FIEZEL, chatting in ' + target + ' with a language learner (level ' + level + ').',
       'Your role: ' + CONVERSATION_ROLES[sid] + '.',
       'Talk like a real person in everyday life: react to what they said, add a little of your own, and keep the conversation going.',
+      // m025-637: jawaban yang tidak menanggapi kalimat murid terakhir = "ngawur" (keluhan owner).
+      'Your REPLY must directly respond to the learner\'s last message and stay in your role and scene. Never change the topic, never invent facts about the learner, and never mention people or plans they did not mention.',
       'Never lecture, never explain grammar, never praise or grade their ' + target + ', and never say you are an AI or a teacher.',
       isCall
-        ? 'This is a LIVE PHONE CALL. Speak, do not write: react in a few words first ("Oh nice!", "Really?"), then ONE short sentence or ONE short question. Maximum 15 words in total. No lists, no explanations.'
+        ? 'This is a LIVE PHONE CALL. Speak, do not write: start with a short natural reaction that fits your role and the scene (vary it, never reuse the same opener), then ONE short sentence or ONE short question. Maximum 15 words in total. No lists, no explanations.'
         : ('Use simple ' + target + ' for level ' + level + '. At most ' + CONVERSATION.maxReplySentences + ' short sentences. Usually end with one natural question.'),
       course === 'ja'
         ? 'REPLY must be natural casual Japanese written in kana and common kanji. No romaji, no English.'
@@ -1120,6 +1152,7 @@
         'and WHY is one short sentence in ' + learnerLang + ' naming the main mistake. Never mention the mistake inside REPLY.'
       );
     }
+    lines.push('MEANING must be a faithful, natural translation of REPLY only, written in ' + learnerLang + ' and never in English: do not add, drop or romanize anything.');
     lines.push('Answer EXACTLY in this format and nothing else:');
     lines.push('REPLY: <your reply in ' + target + '>');
     lines.push('MEANING: <the meaning of REPLY in ' + learnerLang + '>');
@@ -1243,6 +1276,19 @@
     return countMatches(t, /[A-Za-z]/g) >= 3;
   }
 
+  /** Kalimat Inggris (bukan Indonesia): banyak kata fungsi Inggris, nol penanda Indonesia. */
+  function looksEnglishNotIndonesian(text) {
+    var words = s(text).toLowerCase().match(/[a-z]+/g) || [];
+    if (words.length < 3) return false;
+    var id = 0;
+    var en = 0;
+    for (var i = 0; i < words.length; i++) {
+      if (CONVERSATION.idMarkers.indexOf(words[i]) !== -1) id += 1;
+      if (CONVERSATION.enFunctionWords.indexOf(words[i]) !== -1) en += 1;
+    }
+    return id === 0 && en / words.length >= 0.25;
+  }
+
   /**
    * Bentuk keluaran percakapan + gerbang mutu. Fungsi MURNI.
    * @returns {{ok:boolean, reason:string, text:string, turn:object|null}}
@@ -1260,18 +1306,29 @@
     if (!reply) return fail(OUTPUT_FAILURES.empty);
     if (!isTargetLanguage(reply, course)) return fail(OUTPUT_FAILURES.localeMismatch);
     var max = s(input && input.mode) === 'call' ? 2 : CONVERSATION.maxReplySentences;
+    var replyClamped = false;
     if (course === 'ja') {
-      if (countJaSentences(reply) > max) reply = clampJaSentences(reply, max);
+      if (countJaSentences(reply) > max) { reply = clampJaSentences(reply, max); replyClamped = true; }
     } else if (countSentences(reply) > max) {
       var clamp = clampSentences(reply, max);
       if (!clamp.clamped) return fail(OUTPUT_FAILURES.sentenceLimit);
       reply = clamp.text;
+      replyClamped = true;
     }
     if (!reply || reply.length > CONVERSATION.maxReplyChars) return fail(OUTPUT_FAILURES.sentenceLimit);
     // Membeo pesan murid bukan balasan teman.
     if (normalizeForCompare(reply) === normalizeForCompare(input.message)) return fail('echo_learner');
 
     var meaning = tags.meaning;
+    // m025-637: arti yang ditulis dalam bahasa Inggris untuk murid Indonesia bukan arti
+    // (terukur pada model call: "Oh, good choice! Large or small?"). Lebih baik kosong.
+    if (meaning && locale !== 'th' && looksEnglishNotIndonesian(meaning)) meaning = '';
+    // Balasan yang dipotong ke batas kalimat: potong artinya juga supaya arti tidak memuat
+    // kalimat yang tidak pernah diucapkan.
+    if (meaning && replyClamped && countSentences(meaning) > max) {
+      var mClamp = clampSentences(meaning, max);
+      meaning = mClamp.clamped ? mClamp.text : '';
+    }
     if (!meaning || !isLearnerLanguage(meaning, locale) ||
         normalizeForCompare(meaning) === normalizeForCompare(reply) ||
         meaning.length > CONVERSATION.maxReplyChars * 2) meaning = '';
@@ -1582,6 +1639,8 @@
       // shapeConversationOutput(), dan task ini TIDAK menyatakan benar/salah apa pun.
       model: MODELS.standard,
       cheapModel: MODELS.standard,
+      // m025-637: jalur suara (mode:'call') saja — lihat MODELS.voiceCall untuk bukti.
+      callModel: MODELS.voiceCall,
       maxSentences: OUTPUT_CONTRACT.sentenceLimits.conversation_turn,
       enforceStyleWords: false, // balasan berbahasa target; kanon "nggak" tidak berlaku
       jsonMode: false,
@@ -1792,11 +1851,13 @@
     var model = a.model || spec.model;
     var prompt = buildPrompt(taskName, a.input, a.locale);
     var maxTokens = spec.maxOutputTokens;
-    if ((taskName === 'conversation_turn' || taskName === 'conversation_correct') &&
-        a.input && (a.input.mode === 'call' || (typeof a.input.scenarioId === 'string' && a.input.scenarioId.indexOf('phone_') === 0))) {
-      maxTokens = Math.min(maxTokens, 95);
+    var isCall = (taskName === 'conversation_turn' || taskName === 'conversation_correct') && isCallInput(a.input);
+    if (isCall) {
+      maxTokens = Math.min(maxTokens, model && model === MODELS.voiceCall ? 140 : 95);
     }
-    var payload = { prompt: prompt, max_tokens: maxTokens };
+    var payload = model && model === MODELS.voiceCall
+      ? { messages: [{ role: 'user', content: prompt }], max_tokens: maxTokens }
+      : { prompt: prompt, max_tokens: maxTokens };
     var jsonMode = false;
     var skipped = '';
     if (spec.jsonMode === true) {
@@ -1889,7 +1950,30 @@
     var c = ctx || {};
     var used = Number(c.neuronsUsedToday || 0);
     if (c.breaker === 'HALF_OPEN' || used >= NEURONS.softLimit) return spec.cheapModel;
+    if (spec.callModel && isCallInput(c.input)) return spec.callModel;
     return spec.model;
+  }
+
+  /** Permintaan suara langsung (Mitra Kaiwa): `mode:'call'` atau skenario `phone_*`. */
+  function isCallInput(input) {
+    return !!(input && (input.mode === 'call' ||
+      (typeof input.scenarioId === 'string' && input.scenarioId.indexOf('phone_') === 0)));
+  }
+
+  /**
+   * Model yang biayanya DIPESAN pagar akun sebelum `pickModel()` berjalan: yang termahal di
+   * antara model utama dan model call yang mungkin dipakai permintaan ini. Memesan lebih
+   * aman untuk dompet daripada memesan kurang.
+   */
+  function reservationModel(taskName, input) {
+    var spec = get(taskName);
+    if (!spec) throw new Error('unknown_task');
+    var m = spec.model;
+    if (spec.callModel && isCallInput(input) &&
+        Number(spec.callModel.neuronsPerRequest || 0) > Number((m && m.neuronsPerRequest) || 0)) {
+      m = spec.callModel;
+    }
+    return m;
   }
 
   /**
@@ -1906,7 +1990,7 @@
   function modelsUsedBy(taskName) {
     var spec = get(taskName);
     if (!spec) throw new Error('unknown_task');
-    return [spec.model, spec.cheapModel];
+    return spec.callModel ? [spec.model, spec.cheapModel, spec.callModel] : [spec.model, spec.cheapModel];
   }
 
   /** Perkiraan biaya satu permintaan (US$) — dipakai dashboard owner dan uji biaya. */
@@ -1949,6 +2033,8 @@
     isClampable: isClampable,
     fallbackFor: fallbackFor,
     pickModel: pickModel,
+    reservationModel: reservationModel,
+    isCallInput: isCallInput,
     estimateTokens: estimateTokens,
     estimateCostUsd: estimateCostUsd,
     byteLength: byteLength,
