@@ -176,7 +176,21 @@
     var html = '<h1 class="fz-auth-title is-underlined">' + esc(daftar ? t('auth.layar.daftar', 'Daftar') : t('auth.layar.masuk', 'Masuk')) + '</h1>'
       + roleTabs(ui.role);
     if (!guru) {
-      html += '<div class="fz-auth-google" data-auth-google data-testid="auth-google"></div>'
+      var googleBtnLabel = daftar
+        ? t('auth.layar.google-daftar', 'Daftar dengan Google')
+        : t('auth.layar.google-masuk', 'Masuk dengan Google');
+      html += '<div class="fz-auth-google" data-auth-google data-testid="auth-google">'
+        + '<button type="button" class="fz-btn-google-native" data-auth-google-native data-testid="btn-google-native">'
+        + '<svg class="fz-google-svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">'
+        + '<path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>'
+        + '<path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>'
+        + '<path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>'
+        + '<path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>'
+        + '</svg>'
+        + '<span data-auth-google-text>' + esc(googleBtnLabel) + '</span>'
+        + '</button>'
+        + '<div class="fz-auth-google-overlay" data-auth-google-slot style="position:absolute;inset:0;opacity:0.001;overflow:hidden;pointer-events:auto;display:flex;align-items:center;justify-content:center;"></div>'
+        + '</div>'
         + '<p class="fz-auth-note" data-auth-google-note role="status"></p>'
         + or(daftar ? t('auth.layar.atau-buat', 'atau buat akun FIEZEL') : t('auth.layar.atau-akun', 'atau pakai akun FIEZEL'));
     } else {
@@ -293,30 +307,40 @@
       return normalizeClassCode(i ? i.value : '');
     }
     function mountGoogle() {
-      var slot = host.querySelector('[data-auth-google]'), note = host.querySelector('[data-auth-google-note]');
+      var slot = host.querySelector('[data-auth-google-slot]') || host.querySelector('[data-auth-google]');
+      var container = host.querySelector('[data-auth-google]');
+      var note = host.querySelector('[data-auth-google-note]');
+      var nativeBtn = host.querySelector('[data-auth-google-native]');
       var G = env.FiezelGoogle;
-      if (!slot) return;
+      if (!slot || !container) return;
       if (!G || typeof G.available !== 'function' || !G.available()) {
-        // Tanpa Client ID tidak ada Google sama sekali: sembunyikan slot DAN garis "atau".
-        slot.hidden = true;
+        container.hidden = true;
         var garis = host.querySelector('[data-auth-or]');
         if (garis) garis.hidden = true;
         return;
       }
       var gagal = function () {
         googleGagal = true;
-        slot.hidden = true;
+        container.hidden = true;
         if (note) note.textContent = t('auth.layar.google-diblokir', 'Tombol Google tidak bisa dimuat di jaringan ini. Pakai akun FIEZEL di bawah.');
       };
-      // Sekali gagal dimuat di sesi ini, jangan sisakan kotak kosong di tiap ganti tab.
       if (googleGagal) { gagal(); return; }
+      if (nativeBtn) {
+        nativeBtn.onclick = function () {
+          if (env.google && env.google.accounts && env.google.accounts.id && typeof env.google.accounts.id.prompt === 'function') {
+            try { env.google.accounts.id.prompt(); } catch (_) {}
+          } else if (note) {
+            note.textContent = t('google.menghubungkan', 'Menghubungkan ke Google...');
+          }
+        };
+      }
       try {
         G.renderButton(slot, function (res) {
           if (res && res.ok) {
             var code = classCodeFromForm();
             finish({ role: 'murid', via: 'google', classCode: code || '' });
           } else if (note) note.textContent = (res && res.message) || t('auth.layar.galat-umum', 'Belum berhasil. Coba lagi, ya.');
-        }, { locale: locale(), text: ui.screen === 'daftar' ? 'signup_with' : 'signin_with', width: Math.min(360, Math.max(240, (slot.clientWidth || 320))) })
+        }, { locale: locale(), text: ui.screen === 'daftar' ? 'signup_with' : 'signin_with', width: Math.min(360, Math.max(240, (container.clientWidth || 320))) })
           .then(function (r) { if (r && !r.ok) gagal(); }, gagal);
       } catch (_) {}
     }

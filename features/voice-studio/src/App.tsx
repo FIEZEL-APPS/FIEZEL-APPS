@@ -1485,6 +1485,9 @@ export default function App() {
 
         processor.onaudioprocess = (e) => {
           if (isMicMutedRef.current) return;
+          if (inputCtx.state === 'suspended') {
+            void inputCtx.resume().catch(() => {});
+          }
           if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && isLiveConnectedRef.current) {
             const pcmBase64 = resampleAndConvertToPcm16Base64(
               e.inputBuffer.getChannelData(0),
@@ -1507,7 +1510,7 @@ export default function App() {
         };
 
         const muteGain = inputCtx.createGain();
-        muteGain.gain.value = 0;
+        muteGain.gain.value = 0.00001; // Positive non-zero gain prevents Chrome power-saving from throttling onaudioprocess
         source.connect(processor);
         processor.connect(muteGain);
         muteGain.connect(inputCtx.destination);
@@ -1602,6 +1605,8 @@ export default function App() {
                   model: 'models/gemini-3.8-live',
                   generationConfig: {
                     responseModalities: ['AUDIO'],
+                    inputAudioTranscription: {},
+                    outputAudioTranscription: {},
                     speechConfig: {
                       voiceConfig: {
                         prebuiltVoiceConfig: {
@@ -2053,7 +2058,7 @@ export default function App() {
     setIsPlayingAiAudio(false);
   };
 
-  const toggleMuteMic = () => {
+  const toggleMuteMic = async () => {
     playFiezelSfx('button_tap');
     const next = !isMicMuted;
     setIsMicMuted(next);
@@ -2062,6 +2067,23 @@ export default function App() {
       micStreamRef.current.getAudioTracks().forEach((track) => {
         track.enabled = !next;
       });
+    } else if (!next && typeof navigator !== 'undefined' && navigator.mediaDevices?.getUserMedia) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+        });
+        micStreamRef.current = stream;
+        if (inputAudioCtxRef.current) {
+          const inputCtx = inputAudioCtxRef.current;
+          if (inputCtx.state === 'suspended') void inputCtx.resume().catch(() => {});
+          const source = inputCtx.createMediaStreamSource(stream);
+          if (scriptProcessorRef.current) {
+            source.connect(scriptProcessorRef.current);
+          }
+        }
+      } catch (err) {
+        console.warn('Re-acquire mic failed:', err);
+      }
     }
   };
 
@@ -2619,8 +2641,8 @@ export default function App() {
                       <img
                         src={
                             isPlayingAiAudio
-                              ? '/assets/brand/paw-mochi-speaking.svg'
-                              : '/assets/brand/paw-mochi-idle.svg'
+                              ? './assets/brand/paw-mochi-speaking.svg'
+                              : './assets/brand/paw-mochi-idle.svg'
                           }
                         onError={(e) => {
                           const fallback = isPlayingAiAudio
@@ -2930,6 +2952,11 @@ export default function App() {
                               rubyClassName="text-sm font-medium text-white"
                               romajiClassName="text-xs text-[#FFE082] font-medium mt-0.5"
                             />
+                            {!isMeasureMode && showTranslations && (turn.translationId || turn.translationTh) && (
+                              <p className="text-xs text-[#FFE082]/90 mt-1 pt-1 border-t border-white/10 break-words italic">
+                                {locale === 'th' ? turn.translationTh : turn.translationId}
+                              </p>
+                            )}
                           </div>
 
                           {diag && (
@@ -2958,23 +2985,33 @@ export default function App() {
                                 </span>
                               </div>
 
-                              {!diag.ok && diag.syntacticCorrection && (
-                                <div className="bg-white/90 rounded-xl px-2.5 py-1.5 flex items-center justify-between gap-2 text-[#1C1611]">
-                                  <span className="break-words">
-                                    <span className="font-semibold text-[#8C2233]">{locale === 'th' ? 'ประโยคที่เป็นธรรมชาติ:' : 'Naturalnya:'}</span>{' '}
-                                    <b className="text-[#8C2233]">"{diag.syntacticCorrection}"</b>
-                                  </span>
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setInputText(diag.syntacticCorrection || '');
-                                    }}
-                                    className="shrink-0 px-2.5 py-0.5 rounded-full bg-[#F5F1E8] text-[11px] font-semibold cursor-pointer"
-                                  >
-                                    Gunakan
-                                  </button>
-                                </div>
-                              )}
+                              {(() => {
+                                const correction = (diag.syntacticCorrection || diag.naturalReformulation || '').trim();
+                                const isDifferent = Boolean(
+                                  correction &&
+                                  correction.toLowerCase().replace(/[^a-z0-9]/g, '') !== turn.text.toLowerCase().replace(/[^a-z0-9]/g, '')
+                                );
+                                if (!isDifferent && diag.ok) return null;
+                                const displayCorrection = correction || diag.syntacticCorrection;
+                                if (!displayCorrection) return null;
+                                return (
+                                  <div className="bg-white/90 rounded-xl px-2.5 py-1.5 flex items-center justify-between gap-2 text-[#1C1611]">
+                                    <span className="break-words">
+                                      <span className="font-semibold text-[#8C2233]">{locale === 'th' ? 'ประโยคที่เป็นธรรมชาติ:' : 'Naturalnya begini:'}</span>{' '}
+                                      <b className="text-[#8C2233]">"{displayCorrection}"</b>
+                                    </span>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setInputText(displayCorrection);
+                                      }}
+                                      className="shrink-0 px-2.5 py-0.5 rounded-full bg-[#F5F1E8] text-[11px] font-semibold cursor-pointer"
+                                    >
+                                      Gunakan
+                                    </button>
+                                  </div>
+                                );
+                              })()}
 
                               {!diag.ok && (
                                 <p className="text-[#5C4E3C] break-words leading-snug">

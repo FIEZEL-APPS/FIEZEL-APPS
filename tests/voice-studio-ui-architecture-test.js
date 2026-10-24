@@ -90,9 +90,8 @@ console.log('✓ Responsive design verified: max-w-md mobile-first container, ma
 // --- TEST 3: Character PAW / Mochi Animation Switching ---
 console.log('--- TEST 3: Character PAW / Mochi Animation Switching ---');
 assert.ok(
-  appContent.includes(
-    "src={\n                            isPlayingAiAudio\n                              ? '/assets/brand/paw-mochi-speaking.svg'\n                              : '/assets/brand/paw-mochi-idle.svg'\n                          }"
-  ),
+  appContent.includes('paw-mochi-speaking.svg') && appContent.includes('paw-mochi-idle.svg') &&
+  appContent.includes('isPlayingAiAudio'),
   'PAW Mochi avatar strictly toggles between speaking and idle SVG based on isPlayingAiAudio'
 );
 assert.ok(

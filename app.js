@@ -1130,6 +1130,47 @@ function pickProgress(src){
   out.preferences=prefs;
   return out;
 }
+const SAFETY_SNAPSHOT_KEY='fiezel-safety-snapshot-v1';
+function studentProgressEvidenceScore(blob){
+  if(!blob||typeof blob!=='object')return 0;
+  const answered=Number(blob.totalAnswered||0);
+  const hist=Array.isArray(blob.history)?blob.history.length:0;
+  const vocabCount=Object.keys(blob.vocab||{}).length;
+  const grammarCount=Object.keys(blob.grammar||{}).length;
+  const readingCount=Object.keys(blob.reading||{}).length;
+  const streak=Number(blob.streak||0);
+  const placement=blob.placementDone?50:0;
+  const name=String(blob.userName||'').trim()&&blob.userName!=='Murid'?10:0;
+  return (answered*10)+(hist*5)+(vocabCount*2)+(grammarCount*2)+(readingCount*2)+(streak*20)+placement+name;
+}
+function findBestStoredStudentState(){
+  let best=null,maxScore=0;
+  try{
+    if(typeof localStorage==='undefined'||!localStorage)return null;
+    const candidates=[LEGACY_STATE_KEY,SAFETY_SNAPSHOT_KEY];
+    try{
+      for(let i=0;i<localStorage.length;i++){
+        const k=localStorage.key(i);
+        if(k&&(k.startsWith(ACCOUNT_STATE_PREFIX)||k.startsWith('fiezel-v4-state')||k.startsWith(SAFETY_SNAPSHOT_KEY))){
+          if(!candidates.includes(k))candidates.push(k);
+        }
+      }
+    }catch(_){}
+    for(const k of candidates){
+      try{
+        const raw=localStorage.getItem(k);
+        if(!raw)continue;
+        const parsed=JSON.parse(raw);
+        const score=studentProgressEvidenceScore(parsed);
+        if(score>maxScore){
+          maxScore=score;
+          best={key:k,state:parsed,score};
+        }
+      }catch(_){}
+    }
+  }catch(_){}
+  return best;
+}
 function loadState(key=activeStateStorageKey){
   try{
     const raw=JSON.parse(localStorage.getItem(key));
@@ -1185,6 +1226,26 @@ try{
   }
 }catch(_){}
 let state=loadState();
+try{
+  if(studentProgressEvidenceScore(state)===0){
+    const best=findBestStoredStudentState();
+    if(best&&best.score>0&&best.key!==activeStateStorageKey){
+      state=loadState(best.key);
+      if(activeStateStorageKey&&activeStateStorageKey!==best.key){
+        try{localStorage.setItem(activeStateStorageKey,localStorage.getItem(best.key));}catch(_){}
+        targetLangsKnown().forEach((lang)=>{
+          try{
+            const src=progressStorageKey(best.key,lang);
+            const dst=progressStorageKey(activeStateStorageKey,lang);
+            if(src!==dst&&localStorage.getItem(src)){
+              localStorage.setItem(dst,localStorage.getItem(src));
+            }
+          }catch(_){}
+        });
+      }
+    }
+  }
+}catch(_){}
 try{
   let targetCourse=null;
   try{targetCourse=localStorage.getItem(FIEZEL_TARGET_COURSE_KEY)}catch(_){}
@@ -1881,11 +1942,28 @@ function saveFlushWrite(){
     stateSyncMarkWritten(null);
   }catch{if(!saveStorageWarned){saveStorageWarned=true;try{showToast(FiezelI18n.t('common.toast-penyimpanan-penuh'),'warn')}catch{}}}
 }
+let safetySnapshotTimer=null;
+function scheduleSafetySnapshot(json){
+  if(safetySnapshotTimer)return;
+  safetySnapshotTimer=setTimeout(()=>{
+    safetySnapshotTimer=null;
+    try{
+      if(studentProgressEvidenceScore(state)>0){
+        localStorage.setItem(SAFETY_SNAPSHOT_KEY,typeof json==='string'?json:JSON.stringify(state));
+        const targetLang=(function(){try{return self.FiezelTargetLanguage?.normalize?.(state?.preferences?.targetLang)||'en'}catch(_){return state?.preferences?.targetLang==='ja'?'ja':'en'}}());
+        if(targetLang!=='en'){
+          localStorage.setItem(progressStorageKey(SAFETY_SNAPSHOT_KEY,targetLang),JSON.stringify(pickProgress(state)));
+        }
+      }
+    }catch(_){}
+  },1000);
+}
 /** Sesudah tulisan berhasil: revisi + salinan dasar untuk gabungan berikutnya. */
 function stateSyncMarkWritten(json){
   stateSyncKey=activeStateStorageKey;
   stateSyncRev=Number(state.stateRevision);
   try{stateSyncBase=typeof json==='string'?json:JSON.stringify(state)}catch(_){stateSyncBase=''}
+  scheduleSafetySnapshot(json);
 }
 if(typeof window!=='undefined'&&window.addEventListener){
   /* Event `storage` hanya sampai ke tab LAIN - tepat sinyal yang dibutuhkan. Revisi tersimpan
@@ -1977,6 +2055,28 @@ function activateAccountState(rawId){
   const uuid=String(rawId||'').replace(/[^A-Za-z0-9_-]/g,'').slice(0,128);
   const key=accountStateKey(uuid);
   if(!uuid||!key)return false;
+  if(activeAccountUuid===uuid&&activeStateStorageKey===key)return true;
+  try{
+    let accRaw=null;try{accRaw=JSON.parse(localStorage.getItem(key))}catch(_){}
+    if(studentProgressEvidenceScore(accRaw)===0){
+      const best=findBestStoredStudentState();
+      if(best&&best.score>0&&best.key!==key){
+        const migrated={...best.state,ownerUuid:uuid};
+        localStorage.setItem(key,JSON.stringify(migrated));
+        localStorage.setItem(LEGACY_STATE_OWNER_KEY,uuid);
+        targetLangsKnown().forEach((lang)=>{
+          try{
+            const src=progressStorageKey(best.key,lang);
+            const dst=progressStorageKey(key,lang);
+            if(src!==dst&&localStorage.getItem(src)){
+              localStorage.setItem(dst,localStorage.getItem(src));
+            }
+          }catch(_){}
+        });
+      }
+    }
+    localStorage.setItem('fz_last_account',JSON.stringify({uuid}));
+  }catch(_){}
   activeAccountUuid=uuid;activeStateStorageKey=key;
   migrateSideStateToAccount(uuid);
   state=loadState(key);state.ownerUuid=uuid;coreBrainCache=null;save();
@@ -6684,7 +6784,7 @@ function setAuthGateState(status,detail){
   refreshIcons()
 }
 function hideAuthGate(){const gate=$('authGate');if(!gate)return;gate.classList.remove('show');setTimeout(()=>{gate.classList.add('hidden');releaseGateFocus()},300)}
-async function completeAuthGate(){try{if(puterSignedIn())await activateAccountStateFromPuter()}catch(_){}document.body?.classList?.remove?.('auth-locked');setAuthGateState('signed_in');setTimeout(hideAuthGate,220);showToast(FiezelI18n.t('auth.toast-tersambung'),'success');armOfflineVoiceAutoload();runPendingAfterGateFn()}
+async function completeAuthGate(){try{if(puterSignedIn()){await activateAccountStateFromPuter()}else{const gEmail=self.FiezelGoogle?.rememberedEmail?.()||'';const h=self.FiezelAccount?.getAccount?.()?.handle||'';if(gEmail){activateAccountState('g_'+gEmail.replace(/[^A-Za-z0-9_-]/g,'_').slice(0,64))}else if(h){activateAccountState(h)}}}catch(_){}document.body?.classList?.remove?.('auth-locked');setAuthGateState('signed_in');setTimeout(hideAuthGate,220);showToast(FiezelI18n.t('auth.toast-tersambung'),'success');armOfflineVoiceAutoload();runPendingAfterGateFn()}
 function runPendingAfterGateFn(){if(!pendingAfterGateFn)return;const fn=pendingAfterGateFn;pendingAfterGateFn=null;setTimeout(fn,240)/* v06: tunggu gerbang benar-benar turun sebelum kuis mendorong stage */}
 // m026-02 AKAR: gerbang akun dipasang di SETIAP boot tanpa memori apa pun, dan satu-satunya
 // tombolnya adalah "Lanjutkan dengan Puter" - jadi murid yang tidak mau (atau belum bisa)
@@ -9139,9 +9239,13 @@ function showAuthGate(at,next){
          dulu diketik di perkenalan - disimpan, lalu guru diberi tahu murid ini bergabung. */
       try{self.FiezelOnboarding?.markLocaleSelected?.(self,self.FiezelI18n?.getLocale?.()||'id')}catch(_){}
       try{
+        const gEmail=self.FiezelGoogle?.rememberedEmail?.()||'';
         const acc=self.FiezelAccount?.getAccount?.()||self.FiezelAccount?.state?.();
         const h=acc?.handle;
-        if(h){
+        if(gEmail){
+          activateAccountState('g_'+gEmail.replace(/[^A-Za-z0-9_-]/g,'_').slice(0,64));
+        }else if(h){
+          activateAccountState(h);
           if(!state.userName||state.userName===FALLBACK_LEARNER_NAME)state.userName=h;
           try{rememberSocialHandle(h)}catch(_){}
           save();
@@ -12891,6 +12995,10 @@ function openFiezelAuthModal(initialTab){
     const hasil=await self.FiezelGoogle.renderButton(host,(res)=>{
       const errBox=$('authModalError');
       if(res?.ok){
+        const email=res.email||self.FiezelGoogle?.rememberedEmail?.()||'';
+        if(email){
+          activateAccountState('g_'+email.replace(/[^A-Za-z0-9_-]/g,'_').slice(0,64));
+        }
         if(status)status.textContent=FiezelI18n.t('google.status-masuk',{email:res.email||''});
         showToast(res.linked?FiezelI18n.t('google.toast-tertaut'):FiezelI18n.t('google.toast-berhasil'));
         closeModal();
@@ -13020,6 +13128,7 @@ function openFiezelAuthModal(initialTab){
             if(res?.ok){
               const h=res.account?.handle||self.FiezelAccount?.getAccount?.()?.handle||handle;
               if(h){
+                activateAccountState(h);
                 state.userName=h;
                 try{rememberSocialHandle(h)}catch(_){}
                 save();
@@ -13041,6 +13150,7 @@ function openFiezelAuthModal(initialTab){
             if(res?.ok){
               const h=res.account?.handle||self.FiezelAccount?.getAccount?.()?.handle||handle;
               if(h){
+                activateAccountState(h);
                 state.userName=h;
                 try{rememberSocialHandle(h)}catch(_){}
                 save();
@@ -19107,7 +19217,7 @@ function resetProgress(){openModal(`<div class="modal-mark">FIEZEL</div><h2>${Fi
      Komentar ini sengaja DI LUAR literal array: tests/reset-side-state-test.js mengurai
      daftar itu dengan split(','), jadi satu koma di dalam komentar membuat gerbangnya
      membaca kunci yang salah. */
-  for(const k of [BKT_KEY,MISCONCEPTION_LEDGER_KEY,ITEM_CALIBRATION_KEY,CONFUSION_MATRIX_KEY,OLM_NEGOTIATION_KEY,SRL_KEY,EVIDENCE_COHORT_KEY,EVIDENCE_LAST_KEY,EVIDENCE_ATTEMPT_KEY,RETENTION_PROBE_KEY,SL_STATE_KEY,IDENTITY_EVIDENCE_ATTEMPT_KEY,LEARNER_NAME_SYNC_KEY,ACCOUNT_NUDGE_KEY,SELF_TUNE_KEY,DECISION_TRACE_KEY,LIVE_PARAMS_KEY,ITEM_POOL_KEY,UNDERCOVER_RECEIPT_KEY]){
+  for(const k of [BKT_KEY,MISCONCEPTION_LEDGER_KEY,ITEM_CALIBRATION_KEY,CONFUSION_MATRIX_KEY,OLM_NEGOTIATION_KEY,SRL_KEY,EVIDENCE_COHORT_KEY,EVIDENCE_LAST_KEY,EVIDENCE_ATTEMPT_KEY,RETENTION_PROBE_KEY,SL_STATE_KEY,IDENTITY_EVIDENCE_ATTEMPT_KEY,LEARNER_NAME_SYNC_KEY,ACCOUNT_NUDGE_KEY,SELF_TUNE_KEY,DECISION_TRACE_KEY,LIVE_PARAMS_KEY,ITEM_POOL_KEY,UNDERCOVER_RECEIPT_KEY,SAFETY_SNAPSHOT_KEY]){
     try{localStorage.removeItem(sideStateKey(k))}catch{}
     try{localStorage.removeItem(k)}catch{}
   }
