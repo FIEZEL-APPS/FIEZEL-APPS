@@ -16,7 +16,6 @@ import {
   Compass,
   ShieldCheck,
   SlidersHorizontal,
-  Key,
   ArrowLeft,
   X,
 } from 'lucide-react';
@@ -61,8 +60,6 @@ import {
   evaluateTurnLocal,
   evaluateUtteranceClientSide,
   float32ToPcm16Base64,
-  getThinkingFillers,
-  prewarmThinkingFillers,
   LiveTransportMode,
   pcm16Base64ToAudioBuffer,
   reportGeminiLiveSessionDrop,
@@ -105,17 +102,6 @@ export default function App() {
   });
   const [customMeasureOverride, setCustomMeasureOverride] = useState<boolean | null>(null);
 
-  // Gemini Live API Direct Client Key state
-  const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState<boolean>(false);
-  const [geminiApiKey, setGeminiApiKey] = useState<string>(() => {
-    try {
-      return (typeof localStorage !== 'undefined' && localStorage.getItem('fz_gemini_api_key')) || '';
-    } catch {
-      return '';
-    }
-  });
-  const [tempApiKey, setTempApiKey] = useState<string>(geminiApiKey);
-
   const [turns, setTurns] = useState<CallTurn[]>([]);
   const [inputText, setInputText] = useState<string>('');
   const [isAnalyzingTurn, setIsAnalyzingTurn] = useState<boolean>(false);
@@ -151,7 +137,7 @@ export default function App() {
   const liveSilenceTimerRef = useRef<number | null>(null);
   const pttSilenceTimerRef = useRef<number | null>(null);
   const liveDictatedTextRef = useRef<string>('');
-  const chatEndRef = useRef<HTMLDivElement | null>(null);
+  const mainScrollRef = useRef<HTMLElement | null>(null);
   const transcriptContainerRef = useRef<HTMLDivElement | null>(null);
 
   const [isLiveConnected, setIsLiveConnected] = useState<boolean>(false);
@@ -294,10 +280,6 @@ export default function App() {
     };
   }, [activeScenario.id]);
 
-  useEffect(() => {
-    prewarmThinkingFillers(activeScenario.targetLang, activePersona);
-  }, [activeScenario.targetLang, activePersona]);
-
   const isMeasureMode =
     customMeasureOverride !== null ? customMeasureOverride : activeScenario.isMeasureExam;
 
@@ -341,7 +323,9 @@ export default function App() {
       },
     ]);
     try {
-      window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
+      if (mainScrollRef.current) {
+        mainScrollRef.current.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
+      }
     } catch {
       // Ignore
     }
@@ -349,11 +333,9 @@ export default function App() {
 
   useEffect(() => {
     if (activeTab === 'call' && turns.length > 1) {
-      if (chatEndRef.current) {
-        chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
-      } else if (transcriptContainerRef.current) {
-        transcriptContainerRef.current.scrollTo({
-          top: transcriptContainerRef.current.scrollHeight,
+      if (mainScrollRef.current) {
+        mainScrollRef.current.scrollTo({
+          top: mainScrollRef.current.scrollHeight,
           behavior: 'smooth',
         });
       }
@@ -711,35 +693,9 @@ export default function App() {
 
   /**
    * Short neural "listening" filler (e.g. "Hmm, okay…" / 「えーと…」) while the real AI is
-   * still thinking. Only plays when its audio is already cached or arrives within 900 ms,
-   * so it never delays the actual reply.
+   * still thinking.
    */
   const isAiThinkingRef = useRef<boolean>(false);
-
-  /**
-   * Instant Acoustic Aizuchi (Backchannel reaction) played from memory
-   * within < 200ms of the learner finishing speech, dropping perceived latency to near-zero.
-   */
-  const playAcousticFiller = async () => {
-    if (isMeasureMode || isPlayingAiAudio) return;
-    const fillers = getThinkingFillers(activeScenario.targetLang);
-    if (!fillers.length) return;
-    const chosenFiller = fillers[Math.floor(Math.random() * fillers.length)];
-
-    try {
-      const cached = await synthesizeFlexibleTts({
-        text: chosenFiller,
-        targetLang: activeScenario.targetLang,
-        persona: activePersona,
-      });
-      // If AI has already finished thinking while filler was fetching, don't interrupt
-      if (!cached?.audioBase64 || !isAiThinkingRef.current) return;
-
-      await playNeuralChunk(cached.audioBase64, cached.audioMimeType || 'audio/mpeg', 1.05);
-    } catch {
-      // Acoustic filler is an enhancement; failure is completely silent
-    }
-  };
 
   const handleUnlockPrerequisite = () => {
     playFiezelSfx('lesson_start');
@@ -847,9 +803,6 @@ export default function App() {
       // STEP 2 — the REAL AI partner reply (never a silent template swap).
       isAiThinkingRef.current = true;
       setIsAiThinking(true);
-
-      // Instant acoustic aizuchi reaction (< 200ms)
-      void playAcousticFiller();
 
       const aiTurnId = `turn_ai_${Date.now() + 1}`;
       let textAlreadyShown = false;
@@ -1369,14 +1322,14 @@ export default function App() {
           } catch {
             // Ignore
           }
-          if (!isReconnect && liveReconnectAttemptsRef.current < 1) {
+          if (!isReconnect && liveReconnectAttemptsRef.current < 2) {
             liveReconnectAttemptsRef.current += 1;
             void connectDuplex(false);
           } else {
             activateTurnByTurnLiveFallback();
           }
         }
-      }, 3000);
+      }, 8000);
 
       try {
         ws = new WebSocket(targetWsUrl);
@@ -1733,7 +1686,7 @@ export default function App() {
         if (!settled) {
           settled = true;
           window.clearTimeout(connectTimer);
-          if (!isReconnect && liveReconnectAttemptsRef.current < 1) {
+          if (!isReconnect && liveReconnectAttemptsRef.current < 2) {
             liveReconnectAttemptsRef.current += 1;
             void connectDuplex(false);
           } else {
@@ -1746,7 +1699,7 @@ export default function App() {
         if (!settled) {
           settled = true;
           window.clearTimeout(connectTimer);
-          if (!isReconnect && liveReconnectAttemptsRef.current < 1) {
+          if (!isReconnect && liveReconnectAttemptsRef.current < 2) {
             liveReconnectAttemptsRef.current += 1;
             void connectDuplex(false);
           } else {
@@ -2259,22 +2212,6 @@ export default function App() {
               {Math.round(currentMasteryP * 100)}%
             </button>
 
-            <button
-              type="button"
-              onClick={() => {
-                setTempApiKey(geminiApiKey);
-                setIsApiKeyModalOpen(true);
-              }}
-              className={`w-7 h-7 rounded-full flex items-center justify-center cursor-pointer transition-all shadow-[0_1px_2px_rgba(28,22,17,0.05)] ${
-                geminiApiKey
-                  ? 'bg-[#E9F7F0] text-[#2E8B69]'
-                  : 'bg-white/90 hover:bg-white text-[#6E5E47] hover:text-[#1C1611]'
-              }`}
-              title="Atur Google Gemini Multimodal Live API Key pribadi"
-            >
-              <Key className="w-3.5 h-3.5" />
-            </button>
-
             <a
               href="/api/download-patch"
               download="fiezel-ai-voice-call.patch"
@@ -2288,95 +2225,6 @@ export default function App() {
           </div>
         </div>
       </header>
-
-      {/* MODAL PENGATURAN GOOGLE GEMINI MULTIMODAL LIVE KEY */}
-      {isApiKeyModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
-          <div className="bg-white rounded-3xl shadow-xl max-w-md w-full p-6 space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-[#1C1611] font-bold">
-                <Key className="w-4 h-4 text-[#8C2233]" />
-                <h3 className="text-base">Google AI Studio Gemini Live</h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsApiKeyModalOpen(false)}
-                className="p-1.5 rounded-full text-[#6E5E47] hover:bg-[#F5F1E8] cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <p className="text-xs text-[#6E5E47] leading-relaxed">
-              Opsional: masukkan Gemini API Key pribadi untuk koneksi langsung ke Google AI Studio Live WebSocket.
-            </p>
-
-            <div className="space-y-1.5">
-              <input
-                type="password"
-                value={tempApiKey}
-                onChange={(e) => setTempApiKey(e.target.value)}
-                placeholder="AIzaSy..."
-                className="w-full px-3.5 py-2.5 rounded-2xl bg-[#F6F3EC] text-xs font-mono focus:outline-none focus:ring-2 focus:ring-[#1C1611]/20"
-              />
-              <div className="flex items-center justify-between text-[11px] text-[#6E5E47] px-1">
-                <span>Tersimpan di perangkat ini.</span>
-                <a
-                  href="https://aistudio.google.com/app/apikey"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[#8C2233] font-semibold hover:underline"
-                >
-                  Dapatkan Kunci ↗
-                </a>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-end gap-2 pt-1">
-              {geminiApiKey && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    try {
-                      localStorage.removeItem('fz_gemini_api_key');
-                    } catch {}
-                    setGeminiApiKey('');
-                    setTempApiKey('');
-                    setIsApiKeyModalOpen(false);
-                    setStatusBanner('Gemini Live API Key berhasil dihapus.');
-                  }}
-                  className="px-3.5 py-2 rounded-full text-xs font-semibold text-[#8C2233] hover:bg-[#FDF2F4] cursor-pointer"
-                >
-                  Hapus
-                </button>
-              )}
-              <button
-                type="button"
-                onClick={() => {
-                  const cleanKey = tempApiKey.trim();
-                  try {
-                    if (cleanKey) {
-                      localStorage.setItem('fz_gemini_api_key', cleanKey);
-                    } else {
-                      localStorage.removeItem('fz_gemini_api_key');
-                    }
-                  } catch {}
-                  setGeminiApiKey(cleanKey);
-                  setIsApiKeyModalOpen(false);
-                  setStatusBanner(
-                    cleanKey
-                      ? 'Gemini Live API Key aktif.'
-                      : 'Gemini Live API Key dinonaktifkan.'
-                  );
-                }}
-                className="px-5 py-2 rounded-full text-xs font-semibold bg-[#1C1611] text-white cursor-pointer"
-              >
-                Simpan
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* STATUS BANNER GLOBAL */}
       {statusBanner && (
@@ -2395,7 +2243,7 @@ export default function App() {
       )}
 
       {/* RUANG KERJA UTAMA VOICE-FIRST */}
-      <main className="flex-1 min-h-0 max-w-4xl mx-auto px-3 sm:px-4 py-2 space-y-3 w-full overflow-y-auto overscroll-contain flex flex-col">
+      <main ref={mainScrollRef} className="flex-1 min-h-0 max-w-4xl mx-auto px-3 sm:px-4 py-2 space-y-3 w-full overflow-y-auto overscroll-contain flex flex-col">
         {activeTab === 'home' ? (
           <HomeRedesignView
             locale={locale}
@@ -2881,8 +2729,6 @@ export default function App() {
                         <span>Menyiapkan balasan...</span>
                       </div>
                     )}
-
-                    <div ref={chatEndRef} />
                   </div>
                 </section>
               </>
@@ -2998,7 +2844,7 @@ export default function App() {
       {activeTab === 'call' && prereqStatus.isReady && (
         <div
           data-testid="mitra-kaiwa-bottom-dock"
-          className="shrink-0 sticky bottom-0 left-0 right-0 z-30 bg-[#F6F3EC]/95 backdrop-blur-md border-t border-[#E8DFC8]/70 px-3 sm:px-4 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-4px_16px_rgba(28,22,17,0.04)]"
+          className="shrink-0 w-full z-30 bg-[#F6F3EC]/95 backdrop-blur-md border-t border-[#E8DFC8]/70 px-3 sm:px-4 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-4px_16px_rgba(28,22,17,0.04)]"
         >
           <div className="max-w-2xl mx-auto space-y-1.5">
             {(isRecordingPtt || isListeningLiveSpeech || liveUserDraft.trim()) && (

@@ -1,7 +1,7 @@
 {
-  "version": "m025-660",
-  "claimedBy": "branch main",
-  "claimedAt": "2026-10-24T13:10:48.166Z",
-  "reason": "fix(voice): parse Blob websocket chunks and eliminate 22s live call delay",
+  "version": "m025-661",
+  "claimedBy": "branch feat/voice-call-ux-fixes",
+  "claimedAt": "2026-10-24T14:03:58.194Z",
+  "reason": "fix(voice-studio): hilangkan panel api key, perbaiki lonjakan bottom dock ke ruang hampa, dan hapus suara naruhodo/aizuchi",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
