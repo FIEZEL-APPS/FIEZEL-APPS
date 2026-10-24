@@ -1,7 +1,7 @@
 {
-  "version": "m025-649",
-  "claimedBy": "branch fix/m025-649-furigana-romaji-natural-voice-no-emot",
-  "claimedAt": "2026-10-24T06:10:52.963Z",
-  "reason": "feat(voice-studio): m025-649 furigana ruby, accurate phonetic romaji wa/o/e, and natural humor without emoji leakage",
+  "version": "m025-650",
+  "claimedBy": "branch feat/m025-651-vissol-home-redesign",
+  "claimedAt": "2026-10-24T06:58:03.422Z",
+  "reason": "feat(home): redesign beranda vissol compact, maskot mochi, dan ornamen gerak fiezel",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

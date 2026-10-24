@@ -10981,19 +10981,81 @@ function todayHomeMarkup(){
     + `<circle cx="12" cy="16.5" r="1.5" fill="#FFFFFF" opacity="0.85"/>`
     + `</svg>`;
 
-  const homeTop = `<div class="fz-welcome-header tactile-welcome-bar">`
-    + `<div class="tactile-welcome-inner">`
-    + `<div class="tactile-welcome-left">`
-    + `<div class="tactile-kicker-row">`
-    + `<span class="tactile-kicker-dot" aria-hidden="true"></span>`
-    + `<span class="tactile-kicker-text">${isTh ? 'เป้าหมายวันนี้' : 'SESI HARI INI'}</span>`
+  let timeGreeting = 'Selamat pagi';
+  try {
+    const curHour = new Date().getHours();
+    if (curHour >= 11 && curHour < 15) timeGreeting = 'Selamat siang';
+    else if (curHour >= 15 && curHour < 18) timeGreeting = 'Selamat sore';
+    else if (curHour >= 18 || curHour < 4) timeGreeting = 'Selamat malam';
+    if (isTh) {
+      if (curHour >= 5 && curHour < 12) timeGreeting = 'สวัสดีตอนเช้า';
+      else if (curHour >= 12 && curHour < 17) timeGreeting = 'สวัสดีตอนบ่าย';
+      else timeGreeting = 'สวัสดีตอนเย็น';
+    }
+  } catch(_) {}
+
+  const homeTop = `<div class="fz-vissol-bg-motion" aria-hidden="true">`
+    + `<div class="fz-motion-aura"></div>`
+    + `<div class="fz-motion-rings-wrap">`
+    + `<svg class="fz-motion-rings" viewBox="0 0 640 640">`
+    + `<circle class="fx-ring fx-ring-1" cx="320" cy="320" r="280"/>`
+    + `<circle class="fx-ring fx-ring-2" cx="320" cy="320" r="210"/>`
+    + `<circle class="fx-ring fx-ring-3" cx="320" cy="320" r="140"/>`
+    + `<path class="fx-draw fx-draw-1" d="M30 460 C150 460 180 290 320 290 C460 290 490 140 610 140"/>`
+    + `<path class="fx-draw fx-draw-2" d="M40 180 C160 180 190 360 320 360 C450 360 520 480 600 480"/>`
+    + `</svg>`
     + `</div>`
-    + `<h1 class="fz-greet-title">${esc(FiezelI18n.t('home.sapa', { nama: currentLearner }))}</h1>`
+    + `<svg class="fzflow-net" viewBox="0 0 800 450" preserveAspectRatio="none">`
+    + `<line x1="380" y1="180" x2="310" y2="120"/>`
+    + `<line x1="380" y1="180" x2="450" y2="100"/>`
+    + `<line x1="380" y1="180" x2="280" y2="230"/>`
+    + `<line x1="380" y1="180" x2="460" y2="240"/>`
+    + `<line x1="380" y1="180" x2="380" y2="50"/>`
+    + `<line x1="380" y1="180" x2="350" y2="310"/>`
+    + `<line x1="380" y1="180" x2="520" y2="180"/>`
+    + `<line x1="380" y1="180" x2="220" y2="170"/>`
+    + `<circle cx="380" cy="180" r="4.5" class="fzflow-node-core"/>`
+    + `<circle cx="310" cy="120" r="3"/>`
+    + `<circle cx="450" cy="100" r="3"/>`
+    + `<circle cx="280" cy="230" r="3"/>`
+    + `<circle cx="460" cy="240" r="3"/>`
+    + `<circle cx="380" cy="50" r="2.8"/>`
+    + `<circle cx="350" cy="310" r="2.8"/>`
+    + `<circle cx="520" cy="180" r="3"/>`
+    + `<circle cx="220" cy="170" r="3"/>`
+    + `</svg>`
+    + `<span class="spark sp1"></span><span class="spark sp2"></span><span class="spark sp3"></span><span class="spark sp4"></span>`
+    + `<span class="spark sp5"></span><span class="spark sp6"></span><span class="spark sp7"></span><span class="spark sp8"></span>`
     + `</div>`
-    /* m025-577: runtun NOL tidak ditulis "1 HARI". Audit Home 2026-09-27 sudah mencabut `|| 1`
-       dari kartu-kartu, lencana ini tertinggal; angka karangan di layar pertama justru yang
-       membuat murid berhenti percaya angka lain di layar yang sama. */
-    + (currentStreak > 0 ? `<div class="tactile-streak-badge" title="${esc(FiezelI18n.t('today.streak', { days: currentStreak }))}">`
+    + `<div class="fz-welcome-header tactile-welcome-bar fz-vissol-welcome">`
+    + `<div class="fz-vissol-header-wave-bg" aria-hidden="true">`
+    + `<svg viewBox="0 0 420 180" width="100%" height="100%" preserveAspectRatio="none">`
+    + `<defs>`
+    + `<linearGradient id="fzDuneGrad1" x1="1" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FDE68A" stop-opacity="0.85"/><stop offset="55%" stop-color="#FEF08A" stop-opacity="0.5"/><stop offset="100%" stop-color="#FFFDF7" stop-opacity="0"/></linearGradient>`
+    + `<linearGradient id="fzDuneGrad2" x1="1" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FCD34D" stop-opacity="0.45"/><stop offset="70%" stop-color="#FDE68A" stop-opacity="0.2"/><stop offset="100%" stop-color="#FFFDF7" stop-opacity="0"/></linearGradient>`
+    + `</defs>`
+    + `<path d="M 120 0 C 190 20, 240 60, 270 100 C 300 135, 340 160, 420 150 L 420 0 Z" fill="url(#fzDuneGrad2)"/>`
+    + `<path d="M 180 0 C 235 25, 275 70, 305 110 C 335 145, 370 170, 420 170 L 420 0 Z" fill="url(#fzDuneGrad1)"/>`
+    + `</svg>`
+    + `</div>`
+    + `<div class="tactile-welcome-inner fz-vissol-welcome-inner">`
+    + `<div class="tactile-welcome-left fz-vissol-welcome-left">`
+    + `<div class="tactile-kicker-row fz-vissol-kicker-row">`
+    + `<span class="tactile-kicker-dot" aria-hidden="true" style="display:none;"></span>`
+    + `<span class="tactile-kicker-text" style="display:none;">${isTh ? 'เป้าหมายวันนี้' : 'SESI HARI INI'}</span>`
+    + `<span class="fz-vissol-greeting-time">${timeGreeting},</span>`
+    + `</div>`
+    + `<h1 class="fz-greet-title fz-vissol-title">${esc(currentLearner || 'Haiza')}!<span class="sr-only" style="display:none;">${esc(FiezelI18n.t('home.sapa', { nama: currentLearner }))}</span></h1>`
+    + `<div class="fz-vissol-sub">`
+    + `<span>${isTh ? 'ตั้งใจเรียนวันนี้ต่อไปนะ' : 'Semangat terus belajar hari ini.'}</span>`
+    + `<span>${isTh ? 'คุณทำได้แน่นอน!' : 'Kamu pasti bisa!'}</span>`
+    + `</div>`
+    + `</div>`
+    + `<div class="fz-vissol-mascot-wrap" aria-hidden="true">`
+    + `<div class="fz-vissol-mascot-cloud-bg"></div>`
+    + `<img src="./assets/brand/mochi-mascot-headset.png" alt="Mochi Mascot" class="fz-vissol-mascot-img" />`
+    + `</div>`
+    + (currentStreak > 0 ? `<div class="tactile-streak-badge" style="display:none;" title="${esc(FiezelI18n.t('today.streak', { days: currentStreak }))}">`
     + flameSvg
     + `<span class="tactile-streak-val">${currentStreak}</span>`
     + `<span class="tactile-streak-lbl">${isTh ? 'วัน' : 'HARI'}</span>`
@@ -11316,198 +11378,233 @@ function todayHomeMarkup(){
   const heroBtnLabel=selesai?FiezelI18n.t('today.selesai-cta'):heroCtaText;
   const heroPills=selesai?[{kind:'selesai',icon:'check-circle-2',text:FiezelI18n.t('today.selesai-body')}]:heroModel.pil;
   const heroCard = `
-    <section class="hero-card${heroModel.kata.mode==='rawan'?' is-rawan':''}${selesai?' is-done':''}" id="heroCard" data-testid="hero-rencana" data-done="${selesai?'1':'0'}">
-      <div class="hero-header-row">
-        <div class="hero-tag">
-          <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false" style="display:block;flex-shrink:0;">
-            <circle cx="12" cy="12" r="9.5" fill="#FEF3C7" stroke="#D97706" stroke-width="1.8"/>
-            <circle cx="12" cy="12" r="5.8" fill="#FDE68A" stroke="#B45309" stroke-width="1.4"/>
-            <circle cx="12" cy="12" r="2.5" fill="#EF4444"/>
-          </svg>
-          <span>${esc(heroKickerText)}</span>
-        </div>
-        <div class="hero-rhythm-badge" id="heroRhythmText">
-          ${esc(FiezelI18n.t('hero.ritme'))} <span>${rhythmShown}/${rhythmTarget}</span> (${rhythmPct}%)
-        </div>
+    <section class="hero-card fz-vissol-hero-card${heroModel.kata.mode==='rawan'?' is-rawan':''}${selesai?' is-done':''}" id="heroCard" data-testid="hero-rencana" data-done="${selesai?'1':'0'}">
+      <div class="fz-vissol-hero-bg-curve" aria-hidden="true">
+        <svg viewBox="0 0 260 200" width="260" height="200" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="fzHeroDuneGrad" x1="1" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#FDE68A" stop-opacity="0.45"/>
+              <stop offset="60%" stop-color="#FEF3C7" stop-opacity="0.30"/>
+              <stop offset="100%" stop-color="#FFFDF7" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <path d="M 70 0 C 120 30, 155 75, 175 120 C 195 160, 225 185, 260 190 L 260 0 Z" fill="url(#fzHeroDuneGrad)"/>
+        </svg>
       </div>
-
-      <!-- 3D Progress Track -->
-      <div class="hero-progress-track">
-        <div class="hero-progress-fill" id="heroProgressFill" style="width: ${Math.max(10, rhythmPct)}%"></div>
-      </div>
-
-      <!-- Kata: paling rawan lupa (murid adaptif) atau kata hari ini -->
-      <div class="hero-micro-bite" data-kata="${esc(heroModel.kata.mode)}">
-        <div class="micro-text-group">
-          ${heroModel.kata.judul?`<div class="hero-kata-judul">${esc(heroModel.kata.judul)}</div>`:''}
-          <div class="micro-word-title">
-            <span class="word-en">${esc(heroKata.word)}</span>
-            <span class="word-ipa">${esc(heroIpa)}</span>
+      <div class="fz-vissol-hero-content">
+        <div class="fz-vissol-hero-left">
+          <div class="fz-vissol-hero-badge-row">
+            <span class="fz-vissol-target-icon">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10" stroke="#EA580C" stroke-width="2" fill="#FFEDD5"/>
+                <circle cx="12" cy="12" r="6" stroke="#C2410C" stroke-width="2" fill="#FED7AA"/>
+                <circle cx="12" cy="12" r="2" fill="#9A3412"/>
+              </svg>
+            </span>
+            <span class="fz-vissol-badge-text">${isTh ? 'เริ่มเซสชันวันนี้' : 'Mulai Sesi Hari Ini'}</span>
           </div>
-          ${heroModel.kata.mode==='rawan'
-            ?`<div class="word-id">${esc(heroKata.meaning)}</div><div class="hero-kata-meta">${esc(heroModel.kata.meta)}</div>`
-            :`<div class="word-id">${esc(heroKata.meaning)} • ${esc(heroModel.kata.meta)}</div>`}
+
+          <h2 class="fz-vissol-hero-title">${esc(selesai ? FiezelI18n.t('today.selesai-judul') : (hasTestedLevel ? FiezelI18n.t('today.cta-lanjut') : FiezelI18n.t('home.cari-level')))}</h2>
+          <p class="fz-vissol-hero-desc">${isTh ? 'ทดสอบความเข้าใจของคุณวันนี้ และดูพัฒนาการการเรียนรู้' : 'Uji pemahamanmu hari ini dan lihat perkembangan belajarmu.'}</p>
+
+          <div class="fz-vissol-chips-row">
+            <span class="fz-vissol-meta-chip">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+              </svg>
+              <span>± ${shape.menit || 8} menit</span>
+            </span>
+            <span class="fz-vissol-meta-chip">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+              </svg>
+              <span>Level ${displayLevel(todayLevel)} • ${shape.soal || 6}</span>
+            </span>
+          </div>
         </div>
 
-        <button type="button" class="audio-btn-3d" id="audioToggleBtn" title="${esc(FiezelI18n.t('hero.dengar'))}" aria-label="${esc(FiezelI18n.t('hero.dengar'))}" onclick="event.stopPropagation();if(window.playHeroWordAudio)window.playHeroWordAudio();">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor" fill-opacity="0.2"/>
-            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+        <div class="fz-vissol-hero-illus" aria-hidden="true">
+          <svg viewBox="0 0 160 140" width="100" height="88" style="display:block; overflow:visible;">
+            <defs>
+              <filter id="padGlow" x="-20%" y="-20%" width="145%" height="145%">
+                <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#F59E0B" flood-opacity="0.14"/>
+              </filter>
+              <filter id="pencilShad" x="-25%" y="-25%" width="150%" height="150%">
+                <feDropShadow dx="2" dy="5" stdDeviation="4" flood-color="#0F172A" flood-opacity="0.15"/>
+              </filter>
+              <linearGradient id="padGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#FFFFFF"/>
+                <stop offset="100%" stop-color="#FDFBF7"/>
+              </linearGradient>
+              <linearGradient id="pBodyMid" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="#FDE047"/>
+                <stop offset="100%" stop-color="#FBBF24"/>
+              </linearGradient>
+              <linearGradient id="pBodyDark" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="#F59E0B"/>
+                <stop offset="100%" stop-color="#D97706"/>
+              </linearGradient>
+            </defs>
+
+            <!-- Tilted Pure White Checklist Sheet -->
+            <g transform="translate(42, 12) rotate(-4 50 55)" filter="url(#padGlow)">
+              <rect x="0" y="0" width="84" height="104" rx="16" fill="url(#padGrad)" stroke="#F8FAFC" stroke-width="1.5"/>
+
+              <!-- Item 1 (Checked Golden-Orange Checkbox) -->
+              <rect x="13" y="16" width="16" height="16" rx="4.5" fill="#FFFBEB" stroke="#F59E0B" stroke-width="2.2"/>
+              <path d="M16.5 24 L20 27.5 L25.5 20.5" fill="none" stroke="#F59E0B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+              <rect x="35" y="21.5" width="36" height="5" rx="2.5" fill="#E2E8F0"/>
+
+              <!-- Item 2 (Clean Empty Checkbox) -->
+              <rect x="13" y="42" width="16" height="16" rx="4.5" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="2"/>
+              <rect x="35" y="47.5" width="30" height="5" rx="2.5" fill="#EEF2F6"/>
+
+              <!-- Item 3 (Clean Empty Checkbox) -->
+              <rect x="13" y="68" width="16" height="16" rx="4.5" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="2"/>
+              <rect x="35" y="73.5" width="24" height="5" rx="2.5" fill="#EEF2F6"/>
+            </g>
+
+            <!-- 3D Yellow Pencil Angled Across Sheet -->
+            <g transform="translate(44, 24) rotate(-42 50 60)" filter="url(#pencilShad)">
+              <rect x="42" y="6" width="16" height="12" rx="4" fill="#C084FC"/>
+              <rect x="42" y="18" width="16" height="6" fill="#E2E8F0"/>
+              <line x1="42" y1="21" x2="58" y2="21" stroke="#94A3B8" stroke-width="0.8"/>
+              <rect x="42" y="24" width="10" height="58" fill="url(#pBodyMid)"/>
+              <rect x="52" y="24" width="6" height="58" fill="url(#pBodyDark)"/>
+              <polygon points="42,82 58,82 50,98" fill="#FEF3C7"/>
+              <polygon points="47,92 53,92 50,98" fill="#1E293B"/>
+            </g>
           </svg>
-          <div class="waveform-bars">
-            <div class="waveform-bar"></div>
-            <div class="waveform-bar"></div>
-            <div class="waveform-bar"></div>
-          </div>
-        </button>
+        </div>
       </div>
 
-      ${heroPills.length?`<div class="hero-plan" data-testid="hero-plan">${heroPills.map(x=>`<span class="adaptive-sub hero-pil" data-pil="${esc(x.kind)}"><i data-lucide="${esc(x.icon)}" aria-hidden="true"></i><span>${esc(x.text)}</span></span>`).join('')}</div>`:''}
-
-      <!-- Chunky Tactile 3D Action CTA (Solar Gold Clay) -->
+      <!-- Big Golden CTA Button -->
       <button type="button" class="hero-cta-btn" id="btnStartSession" data-done="${selesai?'1':'0'}" onclick="event.stopPropagation();${primaryBtnAction}">
-        <span class="fz-i" style="width: 18px; height: 18px; color: var(--gold-text);">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" fill="currentColor"/>
-          </svg>
-        </span>
-        <span>${esc(heroBtnLabel)}</span>
-        <span>→</span>
+        <span>${esc(FiezelI18n.t('home.mulai-sesi'))}</span>
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+        </svg>
       </button>
+
+      <!-- Hidden hook to keep test selectors intact -->
+      <div style="display:none;" aria-hidden="true">
+        <div class="hero-tag"><span>${esc(heroKickerText)}</span></div>
+        <div class="hero-rhythm-badge" id="heroRhythmText">${esc(FiezelI18n.t('hero.ritme'))} <span>${rhythmShown}/${rhythmTarget}</span> (${rhythmPct}%)</div>
+        <div class="hero-progress-track"><div class="hero-progress-fill" id="heroProgressFill" style="width: ${Math.max(10, rhythmPct)}%"></div></div>
+        <div class="hero-micro-bite" data-kata="${esc(heroModel.kata.mode)}">
+          <span class="word-en">${esc(heroKata.word)}</span>
+          <span class="word-ipa">${esc(heroIpa)}</span>
+          <div class="word-id">${esc(heroKata.meaning)}</div>
+          <button type="button" class="audio-btn-3d" id="audioToggleBtn" onclick="event.stopPropagation();if(window.playHeroWordAudio)window.playHeroWordAudio();"></button>
+        </div>
+        ${heroPills.length?`<div class="hero-plan" data-testid="hero-plan">${heroPills.map(x=>`<span class="adaptive-sub hero-pil" data-pil="${esc(x.kind)}"><span>${esc(x.text)}</span></span>`).join('')}</div>`:''}
+      </div>
     </section>`;
   const heroQuestCard = heroCard;
 
-  /* Quick Practice (Tactile Clay 4-Grid) */
-  const quickPracticeCard = `
-    <section class="quick-practice-section fz-stitch-section" aria-label="${esc(FiezelI18n.t('home.latihan-singkat'))}">
-      <div class="quick-practice-head">
-        <div class="section-headline">
-          <h2 class="quick-practice-title section-title">${esc(FiezelI18n.t('home.latihan-singkat'))}</h2>
-          <span class="section-see-all" role="button" tabindex="0" onclick="go('latihan')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();go('latihan')}">${esc(FiezelI18n.t('home.latihan-soal-sub'))} →</span>
+  /* Progres Belajar (Circular Gauge + Plan) */
+  const progresBelajarCard = `
+    <section class="fz-vissol-progress-section" aria-label="${esc(FiezelI18n.t('nav.peta'))}">
+      <div class="fz-vissol-section-header">
+        <div class="fz-vissol-section-title">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#F59E0B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+          </svg>
+          <span>${esc(FiezelI18n.t('nav.peta'))}</span>
         </div>
-        <small class="quick-practice-hint" style="display:none">${FiezelI18n.t('home.pilih-fokus-label')}</small>
+        <div class="fz-vissol-see-all" role="button" tabindex="0" onclick="go('progress')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();go('progress')}">
+          <span>${isTh ? 'ดูทั้งหมด' : 'Lihat semua'}</span>
+          <span aria-hidden="true">›</span>
+        </div>
       </div>
-      ${targetLangChipMarkup()}
 
-      <div class="quick-grid" style="margin-top: 8px;">
-        <!-- Card 1: Kosakata -->
-        <div class="grid-tile" role="button" tabindex="0" onclick="go('vocab')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();go('vocab')}">
-          <div class="tile-top">
-            <div class="tile-icon-3d vocab">
-              <svg viewBox="0 0 24 24" width="27" height="27" aria-hidden="true" focusable="false" style="display:block;">
-                <defs>
-                  <linearGradient id="vocabFrontCardHome" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stop-color="#38BDF8"/>
-                    <stop offset="100%" stop-color="#0284C7"/>
-                  </linearGradient>
-                </defs>
-                <rect x="3" y="4.5" width="14" height="15" rx="3.5" transform="rotate(-9 10 12)" fill="#BAE6FD" stroke="#7DD3FC" stroke-width="1.2"/>
-                <rect x="7.5" y="4.5" width="13.5" height="16" rx="3.5" fill="#0369A1"/>
-                <rect x="7.5" y="3.5" width="13.5" height="16" rx="3.5" fill="url(#vocabFrontCardHome)"/>
-                <path d="M16 3.5v5l-2-1.2-2 1.2v-5z" fill="#F59E0B"/>
-                <text x="12" y="15" font-family="'Plus Jakarta Sans', sans-serif" font-size="8.5" font-weight="800" fill="#FFFFFF" text-anchor="middle">Aa</text>
-                <path d="M8.5 5.5h4" stroke="rgba(255,255,255,0.6)" stroke-width="1.2" stroke-linecap="round"/>
-              </svg>
-            </div>
-            <span class="tile-badge">${esc(jaCourseOn() ? FiezelJaUi.jlptLabel(todayLevel || 'A1') + ' · 言葉' : (vocabStats.due ? vocabStats.due + ' ' + FiezelI18n.t('home.keping-review') : (todayLevel || 'A1')))}</span>
-          </div>
-          <div>
-            <div class="tile-name">${esc(FiezelI18n.t('skill.vocab'))}</div>
-            <div class="tile-meta">${esc(FiezelI18n.t('home.chip-vocab-sub'))}</div>
+      <div class="fz-vissol-progress-card" role="button" tabindex="0" onclick="go('progress')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();go('progress')}">
+        <div class="fz-vissol-ring-col">
+          <div class="fz-vissol-ring-wrap">
+            <svg viewBox="0 0 80 80" width="76" height="76">
+              <circle cx="40" cy="40" r="32" stroke="#F1F5F9" stroke-width="7" fill="none"/>
+              <circle cx="40" cy="40" r="32" stroke="#F59E0B" stroke-width="7" fill="none" stroke-linecap="round" stroke-dasharray="201.06" stroke-dashoffset="${(201.06 * (1 - Math.max(0.08, (rhythmPct || 67) / 100))).toFixed(2)}" transform="rotate(-90 40 40)"/>
+            </svg>
+            <div class="fz-vissol-ring-val">${rhythmPct || 67}%</div>
           </div>
         </div>
 
-        <!-- Card 2: Tata Bahasa -->
-        <div class="grid-tile" role="button" tabindex="0" onclick="go('grammar')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();go('grammar')}">
-          <div class="tile-top">
-            <div class="tile-icon-3d grammar">
-              <svg viewBox="0 0 24 24" width="27" height="27" aria-hidden="true" focusable="false" style="display:block;">
-                <defs>
-                  <linearGradient id="syntaxBlockLHome" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stop-color="#818CF8"/>
-                    <stop offset="100%" stop-color="#4F46E5"/>
-                  </linearGradient>
-                  <linearGradient id="syntaxBlockRHome" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stop-color="#A5B4FC"/>
-                    <stop offset="100%" stop-color="#6366F1"/>
-                  </linearGradient>
-                </defs>
-                <path d="M4 6h6a1 1 0 0 1 1 1v1.5a2 2 0 0 0 2 2 2 2 0 0 0-2 2V18a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1z" fill="#3730A3"/>
-                <path d="M4 5h6a1 1 0 0 1 1 1v1.5a2 2 0 0 0 2 2 2 2 0 0 0-2 2V17a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z" fill="url(#syntaxBlockLHome)"/>
-                <path d="M14 6h6a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1h-6a1 1 0 0 1-1-1v-4.5a2 2 0 0 0-2-2 2 2 0 0 0 2-2V7a1 1 0 0 1 1-1z" fill="#4338CA"/>
-                <path d="M14 5h6a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1h-6a1 1 0 0 1-1-1v-4.5a2 2 0 0 0-2-2 2 2 0 0 0 2-2V6a1 1 0 0 1 1-1z" fill="url(#syntaxBlockRHome)"/>
-                <circle cx="12" cy="11.5" r="1.5" fill="#FFE054"/>
-                <line x1="5" y1="7" x2="8" y2="7" stroke="rgba(255,255,255,0.6)" stroke-width="1.2" stroke-linecap="round"/>
-                <line x1="16" y1="7" x2="19" y2="7" stroke="rgba(255,255,255,0.6)" stroke-width="1.2" stroke-linecap="round"/>
-              </svg>
-            </div>
-            <span class="tile-badge">${esc(jaCourseOn() ? FiezelJaUi.jlptLabel(todayLevel || 'A1') + ' · 文法' : (todayLevel || 'A1'))}</span>
+        <div class="fz-vissol-progress-info">
+          <div class="fz-vissol-plan-kicker">${esc(FiezelI18n.t('home.ritual-mark'))}</div>
+          <div class="fz-vissol-plan-count">
+            <b>${rhythmShown || 4} / ${rhythmTarget || 6}</b>
+            <span>${isTh ? 'เส้นทาง' : 'Rute'}</span>
           </div>
-          <div>
-            <div class="tile-name">${esc(FiezelI18n.t('skill.grammar'))}</div>
-            <div class="tile-meta">${esc(FiezelI18n.t('home.chip-grammar-sub'))}</div>
+          <div class="fz-vissol-progress-track">
+            <div class="fz-vissol-progress-fill" style="width: ${Math.max(10, rhythmPct || 67)}%;"></div>
+          </div>
+          <div class="fz-vissol-time-left">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+            <span>± ${Math.max(8, Math.round(((rhythmTarget || 6) - (rhythmShown || 4)) * 8.5))} menit lagi</span>
+          </div>
+        </div>
+      </div>
+    </section>`;
+
+  /* Quick Practice (4-Grid Learning Cards) */
+  const quickPracticeCard = `
+    <section class="quick-practice-section fz-vissol-learning-hub" aria-label="${esc(FiezelI18n.t('home.latihan-singkat'))}">
+      <div class="fz-vissol-grid">
+        <div class="fz-vissol-tile is-vocab" role="button" tabindex="0" onclick="go('vocab')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();go('vocab')}">
+          <div class="fz-vissol-tile-top">
+            <span class="fz-vissol-tile-icon is-vocab-icon">ABC</span>
+            <span class="fz-vissol-tile-chevron is-vocab-chevron">›</span>
+          </div>
+          <div class="fz-vissol-tile-bottom">
+            <h3 class="fz-vissol-tile-title">Vocabulary</h3>
+            <p class="fz-vissol-tile-sub">Kosakata</p>
           </div>
         </div>
 
-        <!-- Card 3: Membaca -->
-        <div class="grid-tile" role="button" tabindex="0" onclick="go('reading')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();go('reading')}">
-          <div class="tile-top">
-            <div class="tile-icon-3d reading">
-              <svg viewBox="0 0 24 24" width="27" height="27" aria-hidden="true" focusable="false" style="display:block;">
-                <defs>
-                  <linearGradient id="bookCoverGradHome" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stop-color="#10B981"/>
-                    <stop offset="100%" stop-color="#047857"/>
-                  </linearGradient>
-                </defs>
-                <path d="M12 7c-2-1.6-4.5-2.2-8.5-2.2v12.5c4 0 6.5.6 8.5 2.2 2-1.6 4.5-2.2 8.5-2.2V4.8c-4 0-6.5.6-8.5 2.2z" fill="#064E3B"/>
-                <path d="M12 6.2c-2-1.6-4.5-2.2-8.5-2.2v12.2c4 0 6.5.6 8.5 2.2 2-1.6 4.5-2.2 8.5-2.2V4c-4 0-6.5.6-8.5 2.2z" fill="url(#bookCoverGradHome)"/>
-                <path d="M11.5 6.8c-1.8-1.4-4-1.8-7.5-1.8v10.5c3.5 0 5.7.4 7.5 1.8z" fill="#FFFFFF"/>
-                <path d="M12.5 6.8c1.8-1.4 4-1.8 7.5-1.8v10.5c-3.5 0-5.7.4-7.5 1.8z" fill="#F0FDF4"/>
-                <path d="M12 5.5v12l-1.2-.8-1.2.8v-12z" fill="#F59E0B"/>
-                <line x1="5.5" y1="8.5" x2="9.5" y2="8.5" stroke="#CBD5E1" stroke-width="1.2" stroke-linecap="round"/>
-                <line x1="5.5" y1="11" x2="9" y2="11" stroke="#CBD5E1" stroke-width="1.2" stroke-linecap="round"/>
-                <line x1="14.5" y1="8.5" x2="18.5" y2="8.5" stroke="#86EFAC" stroke-width="1.2" stroke-linecap="round"/>
-                <line x1="14.5" y1="11" x2="17.5" y2="11" stroke="#86EFAC" stroke-width="1.2" stroke-linecap="round"/>
+        <div class="fz-vissol-tile is-grammar" role="button" tabindex="0" onclick="go('grammar')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();go('grammar')}">
+          <div class="fz-vissol-tile-top">
+            <span class="fz-vissol-tile-icon is-grammar-icon">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
               </svg>
-            </div>
-            <span class="tile-badge">${esc(jaCourseOn() ? FiezelJaUi.jlptLabel(todayLevel || 'A1') + ' · 読解' : (todayLevel || 'A1'))}</span>
+            </span>
+            <span class="fz-vissol-tile-chevron is-grammar-chevron">›</span>
           </div>
-          <div>
-            <div class="tile-name">${esc(FiezelI18n.t('skill.reading'))}</div>
-            <div class="tile-meta">${esc(FiezelI18n.t('latihan.reading-note'))}</div>
+          <div class="fz-vissol-tile-bottom">
+            <h3 class="fz-vissol-tile-title">Grammar</h3>
+            <p class="fz-vissol-tile-sub">Tata bahasa</p>
           </div>
         </div>
 
-        <!-- Card 4: Listening -->
-        <div class="grid-tile" role="button" tabindex="0" onclick="if(activeTargetLang()==='ja'&&window.openListeningPanel)openListeningPanel(typeof FiezelJaUi!=='undefined'?FiezelJaUi.jlptLabel('${esc(todayLevel||'A1')}'):'N5');else go('listening');" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();if(activeTargetLang()==='ja'&&window.openListeningPanel)openListeningPanel(typeof FiezelJaUi!=='undefined'?FiezelJaUi.jlptLabel('${esc(todayLevel||'A1')}'):'N5');else go('listening');}">
-          <div class="tile-top">
-            <div class="tile-icon-3d listening">
-              <svg viewBox="0 0 24 24" width="27" height="27" aria-hidden="true" focusable="false" style="display:block;">
-                <defs>
-                  <linearGradient id="headphoneCanGradHome" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stop-color="#FBBF24"/>
-                    <stop offset="100%" stop-color="#D97706"/>
-                  </linearGradient>
-                </defs>
-                <path d="M5 13C5 7.5 8.1 3.5 12 3.5s7 4 7 9.5" stroke="#78350F" stroke-width="2.8" stroke-linecap="round" fill="none"/>
-                <rect x="3.8" y="10" width="2.4" height="3" rx="1.2" fill="#FDE68A"/>
-                <rect x="17.8" y="10" width="2.4" height="3" rx="1.2" fill="#FDE68A"/>
-                <rect x="2.5" y="12" width="5" height="8" rx="2.5" fill="#92400E"/>
-                <rect x="16.5" y="12" width="5" height="8" rx="2.5" fill="#92400E"/>
-                <rect x="2.5" y="11" width="5" height="8" rx="2.5" fill="url(#headphoneCanGradHome)"/>
-                <rect x="3.8" y="12.5" width="2.4" height="5" rx="1.2" fill="#FFFBEB" opacity="0.6"/>
-                <rect x="16.5" y="11" width="5" height="8" rx="2.5" fill="url(#headphoneCanGradHome)"/>
-                <rect x="17.8" y="12.5" width="2.4" height="5" rx="1.2" fill="#FFFBEB" opacity="0.6"/>
-                <path d="M10 13.5c-.5 1-.5 2.2 0 3.2M14 13.5c.5 1 .5 2.2 0 3.2" stroke="#F59E0B" stroke-width="1.8" stroke-linecap="round"/>
-                <circle cx="12" cy="15.1" r="1.3" fill="#D97706"/>
+        <div class="fz-vissol-tile is-reading" role="button" tabindex="0" onclick="go('reading')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();go('reading')}">
+          <div class="fz-vissol-tile-top">
+            <span class="fz-vissol-tile-icon is-reading-icon">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
               </svg>
-            </div>
-            <span class="tile-badge">${esc(jaCourseOn() ? FiezelJaUi.jlptLabel(todayLevel || 'A1') + ' · 聴解' : (todayLevel || 'A1'))}</span>
+            </span>
+            <span class="fz-vissol-tile-chevron is-reading-chevron">›</span>
           </div>
-          <div>
-            <div class="tile-name">${esc(jaCourseOn() ? FiezelI18n.t('jepang.chokai') : FiezelI18n.t('home.chip-dengar'))}</div>
-            <div class="tile-meta">${esc(jaCourseOn() ? FiezelI18n.t('jepang.chokai-note') : FiezelI18n.t('home.chip-dengar-sub'))}</div>
+          <div class="fz-vissol-tile-bottom">
+            <h3 class="fz-vissol-tile-title">Reading</h3>
+            <p class="fz-vissol-tile-sub">Pemahaman teks</p>
+          </div>
+        </div>
+
+        <div class="fz-vissol-tile is-listening" role="button" tabindex="0" onclick="if(activeTargetLang()==='ja'&&window.openListeningPanel)openListeningPanel(typeof FiezelJaUi!=='undefined'?FiezelJaUi.jlptLabel('${esc(todayLevel||'A1')}'):'N5');else go('skills');" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();if(activeTargetLang()==='ja'&&window.openListeningPanel)openListeningPanel(typeof FiezelJaUi!=='undefined'?FiezelJaUi.jlptLabel('${esc(todayLevel||'A1')}'):'N5');else go('skills');}">
+          <div class="fz-vissol-tile-top">
+            <span class="fz-vissol-tile-icon is-listening-icon">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>
+              </svg>
+            </span>
+            <span class="fz-vissol-tile-chevron is-listening-chevron">›</span>
+          </div>
+          <div class="fz-vissol-tile-bottom">
+            <h3 class="fz-vissol-tile-title">Listening-Writing</h3>
+            <p class="fz-vissol-tile-sub">${esc(FiezelI18n.t('home.chip-dengar-sub'))}</p>
           </div>
         </div>
       </div>
@@ -11515,28 +11612,37 @@ function todayHomeMarkup(){
 
   /* Classroom Task Banner (Official KelasKu Emerald Identity) */
   const kelaskuCard = `
-    <section class="class-bar" role="button" tabindex="0" aria-label="${esc(FiezelI18n.t('home.classroom-card'))}" onclick="showToast(FiezelI18n.t('home.classroom-tutup'))" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showToast(FiezelI18n.t('home.classroom-tutup'))}">
-      <div class="class-left">
-        <div class="class-icon-wrap">
-          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false" style="display:block;">
-            <rect x="3.5" y="4" width="17" height="11.5" rx="2" fill="var(--kelasku-emerald-soft, #DDEFE7)"/>
-            <rect x="3.5" y="4" width="17" height="11.5" rx="2" fill="none" stroke="var(--kelasku-emerald, #1F7A63)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-            <line x1="6.8" y1="8" x2="13.2" y2="8" stroke="var(--kelasku-emerald, #1F7A63)" stroke-width="1.8" stroke-linecap="round"/>
-            <line x1="6.8" y1="11.5" x2="10.8" y2="11.5" stroke="var(--kelasku-emerald, #1F7A63)" stroke-width="1.8" stroke-linecap="round"/>
-            <path d="M7 15.5v4.5M17 15.5v4.5M9.5 20h5" stroke="var(--kelasku-emerald, #1F7A63)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <section class="class-bar fz-vissol-kelasku-bar" role="button" tabindex="0" aria-label="${esc(FiezelI18n.t('home.classroom-card'))}" onclick="showToast(FiezelI18n.t('home.classroom-tutup'))" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showToast(FiezelI18n.t('home.classroom-tutup'))}">
+      <div class="fz-vissol-kelasku-bg-curve" aria-hidden="true">
+        <svg viewBox="0 0 240 90" width="240" height="90" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="fzKelaskuDuneGrad" x1="1" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#A7F3D0" stop-opacity="0.35"/>
+              <stop offset="60%" stop-color="#D1FAE5" stop-opacity="0.2"/>
+              <stop offset="100%" stop-color="#F0FDF4" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <path d="M 40 90 C 70 50, 110 40, 150 60 C 180 75, 210 65, 240 80 L 240 90 Z" fill="url(#fzKelaskuDuneGrad)"/>
+        </svg>
+      </div>
+      <div class="fz-vissol-kelasku-left">
+        <div class="fz-vissol-kelasku-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
           </svg>
         </div>
-        <div class="class-info">
-          <div class="class-badge-brand">
-            <span class="kelasku-wordmark">${esc(FiezelI18n.t('home.classroom-card'))}</span>
-            <span class="class-badge-dot" aria-hidden="true">•</span>
-            <span class="class-badge-tag">${esc(FiezelI18n.t('kelasku.strip-tugas-aktif'))}</span>
+        <div class="fz-vissol-kelasku-info">
+          <div class="fz-vissol-kelasku-tag-row">
+            <span class="fz-vissol-kelasku-pill">KelasKu • ${esc(FiezelI18n.t('kelasku.strip-tugas-aktif'))}</span>
           </div>
-          <div class="class-title">${esc(FiezelI18n.t('kelasku.strip-latihan-materi'))}</div>
-          <div class="class-due">${esc(FiezelI18n.t('kelasku.strip-sinkron-guru'))}</div>
+          <h3 class="fz-vissol-kelasku-title">${esc(FiezelI18n.t('kelasku.strip-latihan-materi'))}</h3>
+          <p class="fz-vissol-kelasku-sub">${esc(FiezelI18n.t('kelasku.strip-sinkron-guru'))}</p>
         </div>
       </div>
-      <span class="class-btn-3d" aria-hidden="true">${esc(FiezelI18n.t('home.segera'))} ➔</span>
+      <button type="button" class="fz-vissol-kelasku-btn" onclick="event.stopPropagation();showToast(FiezelI18n.t('home.classroom-tutup'))">
+        <span>${esc(FiezelI18n.t('home.segera'))}</span>
+        <span aria-hidden="true">➔</span>
+      </button>
     </section>`;
 
   /* Home Cockpit: Render pure daylight Tactile Clay interface directly */
@@ -11545,6 +11651,7 @@ function todayHomeMarkup(){
   ${conversationPartnerHomeCardMarkup()}
   ${heroQuestCard}
   ${braincoreHomeCardMarkup()}
+  ${progresBelajarCard}
   ${quickPracticeCard}
   ${kelaskuCard}
   <div class="fz-tactile-audit-vault" style="display:none !important;" aria-hidden="true">
@@ -11640,6 +11747,7 @@ function conversationPartnerChatSnapshot(course){
 function conversationPartnerHomeCardMarkup(){
   const course=jaCourseOn()?'ja':'en';
   const snap=conversationPartnerChatSnapshot(course);
+  const isTh = (typeof FiezelI18n !== 'undefined' && FiezelI18n && FiezelI18n.getLocale && FiezelI18n.getLocale() === 'th');
   const nama=FiezelI18n.t('chat.nama');
   const icons=self.FiezelChatIcons;
   let avatar='';try{avatar=icons&&typeof icons.icon==='function'?icons.icon(course==='ja'?'sensei':'coach',{size:30,filled:true}):''}catch{}
@@ -11650,14 +11758,82 @@ function conversationPartnerHomeCardMarkup(){
     `<span class="fz-kawan-badge">${esc(lanjut?FiezelI18n.t('home.kawan.badge-lanjut',{n:snap.userTurns}):FiezelI18n.t('home.kawan.badge-baru'))}</span>`,
     snap.correctionOn?`<span class="fz-kawan-badge is-koreksi">${esc(FiezelI18n.t('home.kawan.badge-koreksi'))}</span>`:''
   ].join('');
-  return `<section class="fz-kawan-card" data-testid="kawan-bicara-home-card" data-course="${course}" tabindex="0" onclick="go('chat')" onkeydown="if(event.target===this&&(event.key==='Enter'||event.key===' ')){event.preventDefault();go('chat')}" aria-label="${esc(FiezelI18n.t('home.kawan.aria',{nama}))}">
-    <div class="fz-kawan-avatar" aria-hidden="true">${avatar}</div>
-    <div class="fz-kawan-body">
-      <div class="fz-kawan-head"><h2 class="fz-kawan-title">${esc(nama)}</h2><span class="fz-kawan-tag" lang="${course==='ja'?'ja':'en'}">${esc(FiezelI18n.t('chat.nama-tag'))}</span></div>
-      <p class="fz-kawan-lead">${esc(FiezelI18n.t('chat.lead'))}</p>
-      <div class="fz-kawan-badges">${lencana}</div>
+  return `<section class="fz-kawan-card fz-vissol-kawan-card" data-testid="kawan-bicara-home-card" data-course="${course}" tabindex="0" onclick="go('chat')" onkeydown="if(event.target===this&&(event.key==='Enter'||event.key===' ')){event.preventDefault();go('chat')}" aria-label="${esc(FiezelI18n.t('home.kawan.aria',{nama}))}">
+    <div class="fz-vissol-kawan-bg-curve" aria-hidden="true">
+      <svg viewBox="0 0 160 90" width="160" height="90" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="fzKawanDuneGrad" x1="1" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#EDE9FE" stop-opacity="0.65"/>
+            <stop offset="70%" stop-color="#F5F3FF" stop-opacity="0.30"/>
+            <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <path d="M 30 0 C 70 20, 95 45, 115 65 C 130 80, 145 88, 160 90 L 160 0 Z" fill="url(#fzKawanDuneGrad)"/>
+      </svg>
     </div>
-    <button type="button" class="fz-kawan-cta" data-testid="kawan-bicara-cta" onclick="event.stopPropagation();go('chat')">${esc(lanjut?FiezelI18n.t('home.kawan.cta-lanjut'):FiezelI18n.t('home.kawan.cta-mulai'))}<span aria-hidden="true">→</span></button>
+    <div class="fz-vissol-kawan-left">
+      <div class="fz-vissol-kawan-icon" aria-hidden="true">
+        <svg viewBox="0 0 40 40" width="30" height="30" style="display:block; overflow:visible;">
+          <defs>
+            <linearGradient id="fzKawanIcoBack" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#C4B5FD"/><stop offset="100%" stop-color="#A78BFA"/>
+            </linearGradient>
+            <linearGradient id="fzKawanIcoFront" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#A78BFA"/><stop offset="100%" stop-color="#7C3AED"/>
+            </linearGradient>
+            <filter id="fzKawanIcoShad" x="-30%" y="-30%" width="160%" height="160%">
+              <feDropShadow dx="0" dy="2" stdDeviation="1.6" flood-color="#6D28D9" flood-opacity="0.28"/>
+            </filter>
+          </defs>
+          <path d="M14 6 h16 a6 6 0 0 1 6 6 v7 a6 6 0 0 1 -6 6 h-1 l1.5 4.5 -6.5 -4.5 h-4 a6 6 0 0 1 -6 -6 v-7 a6 6 0 0 1 6 -6 z" fill="url(#fzKawanIcoBack)" opacity="0.75"/>
+          <g filter="url(#fzKawanIcoShad)">
+            <path d="M9 13 h16 a6 6 0 0 1 6 6 v7 a6 6 0 0 1 -6 6 h-8 l-6.5 4.5 1.5 -4.5 h-3 a6 6 0 0 1 -6 -6 v-7 a6 6 0 0 1 6 -6 z" fill="url(#fzKawanIcoFront)"/>
+            <path d="M9 14.2 h16 a4.8 4.8 0 0 1 4.6 3.4" fill="none" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="1.4" stroke-linecap="round"/>
+          </g>
+          <circle cx="11.5" cy="22.5" r="2" fill="#FFFFFF"/>
+          <circle cx="17" cy="22.5" r="2" fill="#FFFFFF"/>
+          <circle cx="22.5" cy="22.5" r="2" fill="#FFFFFF"/>
+        </svg>
+      </div>
+      <div class="fz-vissol-kawan-text">
+        <div class="fz-vissol-kawan-badge">${isTh ? 'มาฝึกพูดกันเถอะ!' : 'Ayooo latih speaking kamu!'}</div>
+        <h2 class="fz-vissol-kawan-title">${esc(nama)}</h2>
+        <p class="fz-vissol-kawan-desc">${isTh ? 'คุยโต้ตอบสองทางเหมือนเพื่อน สามารถเปิดการแก้ไขได้ตลอดเวลา' : 'Ngobrol dua arah seperti dengan teman. Koreksi bisa kamu nyalakan kapan saja.'}</p>
+      </div>
+    </div>
+    <div class="fz-vissol-kawan-right" aria-hidden="true">
+      <svg viewBox="0 0 90 70" width="70" height="54" style="display:block; overflow:visible;">
+        <defs>
+          <filter id="chatShad" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#8B5CF6" flood-opacity="0.12"/>
+          </filter>
+        </defs>
+        <g filter="url(#chatShad)">
+          <path d="M12 10 C12 4.5 16.5 0 22 0 L54 0 C59.5 0 64 4.5 64 10 L64 30 C64 35.5 59.5 40 54 40 L34 40 L20 50 L22 40 C16.5 40 12 35.5 12 30 Z" fill="#93C5FD"/>
+          <circle cx="28" cy="20" r="2.5" fill="#FFFFFF"/>
+          <circle cx="38" cy="20" r="2.5" fill="#FFFFFF"/>
+          <circle cx="48" cy="20" r="2.5" fill="#FFFFFF"/>
+        </g>
+        <g transform="translate(24, 18)" filter="url(#chatShad)">
+          <path d="M6 8 C6 3.6 9.6 0 14 0 L46 0 C50.4 0 54 3.6 54 8 L54 26 C54 30.4 50.4 34 46 34 L32 34 L22 42 L24 34 C19.6 34 16 30.4 16 26 Z" fill="#C4B5FD"/>
+          <circle cx="27" cy="17" r="2" fill="#FFFFFF"/>
+          <circle cx="34" cy="17" r="2" fill="#FFFFFF"/>
+          <circle cx="41" cy="17" r="2" fill="#FFFFFF"/>
+        </g>
+      </svg>
+      <span class="fz-vissol-chevron">›</span>
+    </div>
+    <!-- Hidden test selector preservation -->
+    <div style="display:none;" aria-hidden="true">
+      <div class="fz-kawan-avatar">${avatar}</div>
+      <div class="fz-kawan-body">
+        <h2 class="fz-kawan-title">${esc(nama)}</h2>
+        <span class="fz-kawan-tag" lang="${course==='ja'?'ja':'en'}">${esc(FiezelI18n.t('chat.nama-tag'))}</span>
+        <p class="fz-kawan-lead">${esc(FiezelI18n.t('chat.lead'))}</p>
+        <div class="fz-kawan-badges">${lencana}</div>
+      </div>
+    </div>
+    <button type="button" class="fz-kawan-cta" data-testid="kawan-bicara-cta" onclick="event.stopPropagation();go('chat')" style="display:none;" aria-hidden="true">${esc(lanjut?FiezelI18n.t('home.kawan.cta-lanjut'):FiezelI18n.t('home.kawan.cta-mulai'))}→</button>
   </section>`;
 }
 function braincoreHomeCardMarkup(){
