@@ -1389,91 +1389,154 @@ export class FiezelMochi {
 
   createAccessories() {
     this.accessoriesGroup = new THREE.Group();
-    this.accessoriesGroup.renderOrder = 1005;
+    this.accessoriesGroup.renderOrder = 2500;
     this.mochiGroup.add(this.accessoriesGroup);
 
     this.createHeadsetAccessory();
     this.createGlassesAccessory();
     this.createPencilAccessory();
 
+    this.accessoryMotionOffset = { rotX: 0, rotY: 0, rotZ: 0, posY: 0 };
     this.setAccessory(this.currentAccessory);
   }
 
   createHeadsetAccessory() {
     this.headsetGroup = new THREE.Group();
+    this.headsetGroup.renderOrder = 2500;
     this.accessoriesGroup.add(this.headsetGroup);
 
-    // 1. Arched Headband spanning across the crown between fox ears
-    const bandGeo = new THREE.TorusGeometry(1.22, 0.045, 16, 48, Math.PI * 0.78);
+    // High-end Kawaii Studio Over-Ear Headphones
+    // Colors: Sleek Royal Indigo (#4338CA), Soft Frost Lilac (#DDD6FE), Brilliant Cyan (#00E5FF), Cream Plush Leather (#FFFDF7)
     const bandMat = new THREE.MeshPhysicalMaterial({
-      color: 0x241C32,
-      roughness: 0.35,
-      metalness: 0.20,
-      clearcoat: 0.7,
-      clearcoatRoughness: 0.2
+      color: 0x4338CA, // Royal Indigo
+      roughness: 0.22,
+      metalness: 0.15,
+      clearcoat: 0.90,
+      clearcoatRoughness: 0.12,
+      sheen: 0.60,
+      sheenColor: new THREE.Color(0xA78BFA)
     });
+    const cushionLeatherMat = new THREE.MeshPhysicalMaterial({
+      color: 0xFFFDF7, // Creamy Marshmallow Plush
+      roughness: 0.55,
+      metalness: 0.05,
+      clearcoat: 0.3,
+      sheen: 0.5,
+      sheenColor: new THREE.Color(0xDDD6FE)
+    });
+    const metallicChromeMat = new THREE.MeshStandardMaterial({
+      color: 0xF1F5F9,
+      metalness: 0.92,
+      roughness: 0.15
+    });
+    const rimMat = new THREE.MeshPhysicalMaterial({
+      color: 0x38BDF8, // Glowing Cyan Metallic Rim
+      metalness: 0.85,
+      roughness: 0.18,
+      clearcoat: 0.8
+    });
+    this.headsetLedMat = new THREE.MeshBasicMaterial({
+      color: 0x00E5FF,
+      transparent: true,
+      opacity: 0.95
+    });
+
+    // 1. Arched Headband spanning across crown, gracefully framing head above & outside ears
+    const headbandPoints = [
+      new THREE.Vector3(-1.54, 0.22, 0.20),
+      new THREE.Vector3(-1.36, 0.88, 0.18),
+      new THREE.Vector3(-0.75, 1.46, 0.12),
+      new THREE.Vector3( 0.00, 1.58, 0.10),
+      new THREE.Vector3( 0.75, 1.46, 0.12),
+      new THREE.Vector3( 1.36, 0.88, 0.18),
+      new THREE.Vector3( 1.54, 0.22, 0.20)
+    ];
+    const headbandCurve = new THREE.CatmullRomCurve3(headbandPoints);
+    const bandGeo = new THREE.TubeGeometry(headbandCurve, 48, 0.068, 16, false);
     const bandMesh = new THREE.Mesh(bandGeo, bandMat);
-    bandMesh.position.set(0, 0.15, 0.04);
-    bandMesh.rotation.set(0.08, 0, Math.PI * 0.11);
+    bandMesh.renderOrder = 2500;
     this.headsetGroup.add(bandMesh);
 
-    // 1b. Soft cushion padding under headband
-    const padGeo = new THREE.TorusGeometry(1.18, 0.030, 12, 36, Math.PI * 0.62);
-    const padMat = new THREE.MeshStandardMaterial({ color: 0x382D4A, roughness: 0.75 });
-    const padMesh = new THREE.Mesh(padGeo, padMat);
-    padMesh.position.set(0, 0.16, 0.04);
-    padMesh.rotation.set(0.08, 0, Math.PI * 0.19);
-    this.headsetGroup.add(padMesh);
+    // 1b. Underside Cushion Padding
+    const cushionPoints = [
+      new THREE.Vector3(-1.10, 1.20, 0.14),
+      new THREE.Vector3(-0.58, 1.48, 0.11),
+      new THREE.Vector3( 0.00, 1.53, 0.09),
+      new THREE.Vector3( 0.58, 1.48, 0.11),
+      new THREE.Vector3( 1.10, 1.20, 0.14)
+    ];
+    const cushionCurve = new THREE.CatmullRomCurve3(cushionPoints);
+    const cushionPadGeo = new THREE.TubeGeometry(cushionCurve, 32, 0.048, 12, false);
+    const cushionPadMesh = new THREE.Mesh(cushionPadGeo, cushionLeatherMat);
+    cushionPadMesh.renderOrder = 2500;
+    this.headsetGroup.add(cushionPadMesh);
 
-    // 2. Earcups Left & Right
-    const cupMat = new THREE.MeshPhysicalMaterial({
-      color: 0x3F2E5E,
-      roughness: 0.25,
-      metalness: 0.25,
-      clearcoat: 0.8,
-      sheen: 0.6,
-      sheenColor: new THREE.Color(0xC084FC)
+    // 1c. Metal Adjustment Sliders
+    [-1, 1].forEach((side) => {
+      const sliderGeo = new THREE.CylinderGeometry(0.082, 0.082, 0.16, 20);
+      const slider = new THREE.Mesh(sliderGeo, metallicChromeMat);
+      slider.position.set(side * 1.48, 0.54, 0.18);
+      slider.rotation.set(0.04, 0, -side * 0.38);
+      slider.renderOrder = 2500;
+      this.headsetGroup.add(slider);
     });
-    const cushionMat = new THREE.MeshStandardMaterial({ color: 0x181222, roughness: 0.85 });
-    const accentMat = new THREE.MeshPhysicalMaterial({ color: 0x9D65FF, metalness: 0.6, roughness: 0.2 });
-    this.headsetLedMat = new THREE.MeshBasicMaterial({ color: 0x00E5FF, transparent: true, opacity: 0.88 });
 
+    // 2. Chunky, Pillowy Kawaii Earcups (Left & Right)
     const buildCup = (side) => {
       const cup = new THREE.Group();
-      cup.position.set(side * 1.20, 0.28, 0.10);
-      cup.rotation.set(0.06, -side * 0.22, -side * 0.12);
+      cup.position.set(side * 1.54, 0.16, 0.22);
+      cup.rotation.set(0.06, -side * 0.42, -side * 0.12);
+      cup.renderOrder = 2500;
 
-      // Inner cushion ring
-      const cushionGeo = new THREE.TorusGeometry(0.20, 0.065, 16, 32);
-      const cushion = new THREE.Mesh(cushionGeo, cushionMat);
-      cushion.rotation.y = Math.PI / 2;
-      cushion.position.x = side * -0.05;
-      cushion.scale.set(1.0, 1.15, 0.8);
+      // 2a. Plush Cheek Cushion Ring (Marshmallow cream)
+      const cushionGeo = new THREE.SphereGeometry(0.38, 32, 24);
+      cushionGeo.scale(0.42, 1.12, 1.12);
+      const cushion = new THREE.Mesh(cushionGeo, cushionLeatherMat);
+      cushion.position.x = side * -0.06;
+      cushion.renderOrder = 2500;
       cup.add(cushion);
 
-      // Outer cup cylinder
-      const bodyGeo = new THREE.CylinderGeometry(0.22, 0.23, 0.12, 32);
-      const cupBody = new THREE.Mesh(bodyGeo, cupMat);
-      cupBody.rotation.z = Math.PI / 2;
-      cupBody.position.x = side * 0.02;
-      cup.add(cupBody);
+      // 2b. Outer Acoustic Chamber Shell (Sleek Indigo)
+      const shellGeo = new THREE.CylinderGeometry(0.40, 0.43, 0.22, 32);
+      const shell = new THREE.Mesh(shellGeo, bandMat);
+      shell.rotation.z = Math.PI / 2;
+      shell.position.x = side * 0.05;
+      shell.renderOrder = 2501;
+      cup.add(shell);
 
-      // Accent metallic rim disc
-      const discGeo = new THREE.CylinderGeometry(0.18, 0.18, 0.02, 32);
-      const discMesh = new THREE.Mesh(discGeo, accentMat);
-      discMesh.rotation.z = Math.PI / 2;
-      discMesh.position.x = side * 0.085;
-      cup.add(discMesh);
+      // 2c. Outer Bezel Rim (Cyan metallic)
+      const rimGeo = new THREE.TorusGeometry(0.36, 0.034, 16, 32);
+      const rim = new THREE.Mesh(rimGeo, rimMat);
+      rim.rotation.y = Math.PI / 2;
+      rim.position.x = side * 0.16;
+      rim.renderOrder = 2502;
+      cup.add(rim);
 
-      // Glowing Neon LED Audio Visualizer Ring
-      const ledGeo = new THREE.TorusGeometry(0.125, 0.020, 16, 32);
-      const ledMesh = new THREE.Mesh(ledGeo, this.headsetLedMat);
-      ledMesh.rotation.y = Math.PI / 2;
-      ledMesh.position.x = side * 0.098;
-      cup.add(ledMesh);
+      // 2d. Glowing Neon Cyan LED Soundwave Disc
+      const ledGeo = new THREE.CircleGeometry(0.32, 32);
+      const ledDisc = new THREE.Mesh(ledGeo, this.headsetLedMat);
+      ledDisc.rotation.y = (side < 0 ? -Math.PI / 2 : Math.PI / 2);
+      ledDisc.position.x = side * 0.165;
+      ledDisc.renderOrder = 2503;
+      cup.add(ledDisc);
 
-      if (side < 0) this.headsetLedL = ledMesh;
-      else this.headsetLedR = ledMesh;
+      // 2e. Stylized Musical Note / Soundwave Accent in center of earcup
+      const noteMat = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, transparent: true, opacity: 0.95 });
+      const noteStem = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.016, 0.16, 8), noteMat);
+      noteStem.position.set(side * 0.170, 0.02, 0.02);
+      noteStem.rotation.x = Math.PI / 2;
+      noteStem.renderOrder = 2504;
+      cup.add(noteStem);
+
+      const noteHead = new THREE.Mesh(new THREE.SphereGeometry(0.045, 16, 12), noteMat);
+      noteHead.scale.set(0.6, 1.2, 1.4);
+      noteHead.position.set(side * 0.170, -0.05, -0.04);
+      noteHead.rotation.x = Math.PI / 2;
+      noteHead.renderOrder = 2504;
+      cup.add(noteHead);
+
+      if (side < 0) this.headsetLedL = ledDisc;
+      else this.headsetLedR = ledDisc;
 
       return cup;
     };
@@ -1481,106 +1544,194 @@ export class FiezelMochi {
     this.headsetGroup.add(buildCup(-1));
     this.headsetGroup.add(buildCup(1));
 
-    // 3. Boom microphone curving from left earcup toward mouth
-    const micArmGeo = new THREE.CylinderGeometry(0.012, 0.012, 0.48, 12);
-    const micArm = new THREE.Mesh(micArmGeo, new THREE.MeshStandardMaterial({ color: 0x221B2E, metalness: 0.8, roughness: 0.3 }));
-    micArm.position.set(-0.95, -0.04, 0.55);
-    micArm.rotation.set(0.65, -0.45, 0.35);
+    // 3. Flexible Studio Boom Microphone
+    const micPoints = [
+      new THREE.Vector3(-1.50, 0.06, 0.32),
+      new THREE.Vector3(-1.22, -0.04, 0.76),
+      new THREE.Vector3(-0.84, -0.10, 1.18),
+      new THREE.Vector3(-0.60, -0.12, 1.30)
+    ];
+    const micCurve = new THREE.CatmullRomCurve3(micPoints);
+    const micArmGeo = new THREE.TubeGeometry(micCurve, 24, 0.018, 10, false);
+    const micArm = new THREE.Mesh(micArmGeo, metallicChromeMat);
+    micArm.renderOrder = 2502;
     this.headsetGroup.add(micArm);
 
-    const spongeGeo = new THREE.SphereGeometry(0.042, 16, 12);
-    spongeGeo.scale(1.2, 0.9, 0.9);
-    const spongeMesh = new THREE.Mesh(spongeGeo, new THREE.MeshStandardMaterial({ color: 0x1A1524, roughness: 0.95 }));
-    spongeMesh.position.set(-0.72, -0.16, 0.88);
-    this.headsetGroup.add(spongeMesh);
+    // Oval foam sponge filter
+    const spongeGeo = new THREE.SphereGeometry(0.055, 20, 16);
+    spongeGeo.scale(1.25, 0.95, 0.95);
+    const spongeMat = new THREE.MeshStandardMaterial({ color: 0x1E1B4B, roughness: 0.95 });
+    const sponge = new THREE.Mesh(spongeGeo, spongeMat);
+    sponge.position.set(-0.58, -0.12, 1.31);
+    sponge.rotation.set(0.12, 0.45, 0.18);
+    sponge.renderOrder = 2503;
+    this.headsetGroup.add(sponge);
+
+    // Glowing LED recording dot on mic tip
+    const micDot = new THREE.Mesh(new THREE.SphereGeometry(0.018, 12, 8), this.headsetLedMat);
+    micDot.position.set(-0.52, -0.12, 1.34);
+    micDot.renderOrder = 2504;
+    this.headsetGroup.add(micDot);
 
     this.headsetGroup.visible = false;
   }
 
   createGlassesAccessory() {
     this.glassesGroup = new THREE.Group();
+    this.glassesGroup.renderOrder = 2500;
     this.accessoriesGroup.add(this.glassesGroup);
 
+    // Adorable Chunky Kawaii Scholar Glasses (Warm Glossy Honey Amber & Polished Gold)
+    const frameMat = new THREE.MeshPhysicalMaterial({
+      color: 0xD97706, // Warm glowing honey amber
+      roughness: 0.15,
+      metalness: 0.45,
+      clearcoat: 1.0,
+      clearcoatRoughness: 0.08,
+      sheen: 0.6,
+      sheenColor: new THREE.Color(0xFBBF24)
+    });
     const goldMat = new THREE.MeshPhysicalMaterial({
-      color: 0xF59E0B,
-      metalness: 0.85,
-      roughness: 0.18,
-      clearcoat: 0.9
+      color: 0xF59E0B, // Polished Gold Bridge & Accents
+      metalness: 0.90,
+      roughness: 0.15,
+      clearcoat: 0.8
     });
     const lensMat = new THREE.MeshPhysicalMaterial({
-      color: 0xE0F2FE,
+      color: 0xF0F9FF,
       transmission: 0.94,
-      opacity: 0.38,
+      opacity: 0.22,
       transparent: true,
-      roughness: 0.05,
+      roughness: 0.04,
+      depthWrite: false
+    });
+    const gleamMat = new THREE.MeshBasicMaterial({
+      color: 0xFFFFFF,
+      transparent: true,
+      opacity: 0.78,
       depthWrite: false
     });
 
-    // Left and right rims
-    const rimGeo = new THREE.TorusGeometry(0.185, 0.016, 16, 36);
-    const rimL = new THREE.Mesh(rimGeo, goldMat);
-    rimL.position.set(-0.38, 0.08, 1.305);
+    // 1. Chunky Rounded Rims (Left & Right)
+    const rimRadius = 0.27;
+    const rimTube = 0.028;
+    const rimGeo = new THREE.TorusGeometry(rimRadius, rimTube, 16, 48);
+
+    const rimL = new THREE.Mesh(rimGeo, frameMat);
+    rimL.position.set(-0.38, 0.08, 1.34);
     rimL.rotation.set(-0.06, -0.14, 0);
+    rimL.renderOrder = 2500;
     this.glassesGroup.add(rimL);
 
-    const rimR = new THREE.Mesh(rimGeo, goldMat);
-    rimR.position.set(0.38, 0.08, 1.305);
+    const rimR = new THREE.Mesh(rimGeo, frameMat);
+    rimR.position.set(0.38, 0.08, 1.34);
     rimR.rotation.set(-0.06, 0.14, 0);
+    rimR.renderOrder = 2500;
     this.glassesGroup.add(rimR);
 
-    // Arched nose bridge
-    const bridgeGeo = new THREE.TorusGeometry(0.10, 0.013, 12, 20, Math.PI * 0.65);
+    // 2. Arched Gold Nose Bridge
+    const bridgePoints = [
+      new THREE.Vector3(-0.13, 0.09, 1.35),
+      new THREE.Vector3( 0.00, 0.14, 1.36),
+      new THREE.Vector3( 0.13, 0.09, 1.35)
+    ];
+    const bridgeCurve = new THREE.CatmullRomCurve3(bridgePoints);
+    const bridgeGeo = new THREE.TubeGeometry(bridgeCurve, 16, 0.020, 12, false);
     const bridgeMesh = new THREE.Mesh(bridgeGeo, goldMat);
-    bridgeMesh.position.set(0, 0.12, 1.305);
-    bridgeMesh.rotation.set(-0.06, 0, Math.PI * 0.175);
+    bridgeMesh.renderOrder = 2501;
     this.glassesGroup.add(bridgeMesh);
 
-    // Transparent reflective lenses
-    const lensGeo = new THREE.CircleGeometry(0.175, 32);
+    // 3. Transparent Crystal Lenses
+    const lensGeo = new THREE.CircleGeometry(rimRadius - 0.015, 32);
+
     const lensL = new THREE.Mesh(lensGeo, lensMat);
-    lensL.position.set(-0.38, 0.08, 1.30);
+    lensL.position.set(-0.38, 0.08, 1.335);
     lensL.rotation.set(-0.06, -0.14, 0);
+    lensL.renderOrder = 2500;
     this.glassesGroup.add(lensL);
 
     const lensR = new THREE.Mesh(lensGeo, lensMat);
-    lensR.position.set(0.38, 0.08, 1.30);
+    lensR.position.set(0.38, 0.08, 1.335);
     lensR.rotation.set(-0.06, 0.14, 0);
+    lensR.renderOrder = 2500;
     this.glassesGroup.add(lensR);
+
+    // 4. Iconic Anime Glasses Gleam Highlight (Upper-Left on each lens)
+    const gleamGeo = new THREE.CapsuleGeometry(0.024, 0.10, 4, 12);
+
+    const gleamL = new THREE.Mesh(gleamGeo, gleamMat);
+    gleamL.position.set(-0.46, 0.17, 1.345);
+    gleamL.rotation.set(-0.06, -0.14, Math.PI / 4);
+    gleamL.renderOrder = 2502;
+    this.glassesGroup.add(gleamL);
+
+    const gleamR = new THREE.Mesh(gleamGeo, gleamMat);
+    gleamR.position.set(0.30, 0.17, 1.345);
+    gleamR.rotation.set(-0.06, 0.14, Math.PI / 4);
+    gleamR.renderOrder = 2502;
+    this.glassesGroup.add(gleamR);
+
+    // 5. Chic Gold Temple Hinges (Discreet, cute, sits flush at outer rim edges)
+    [-1, 1].forEach((side) => {
+      const hingeGeo = new THREE.CylinderGeometry(0.028, 0.028, 0.05, 16);
+      const hinge = new THREE.Mesh(hingeGeo, goldMat);
+      hinge.position.set(side * 0.65, 0.08, 1.32);
+      hinge.rotation.z = Math.PI / 2;
+      hinge.renderOrder = 2501;
+      this.glassesGroup.add(hinge);
+    });
 
     this.glassesGroup.visible = false;
   }
 
   createPencilAccessory() {
     this.pencilGroup = new THREE.Group();
-    this.pencilGroup.position.set(0.72, 0.84, 0.18);
-    this.pencilGroup.rotation.set(0.15, 0.10, -0.55);
-    this.accessoriesGroup.add(this.pencilGroup);
+    this.pencilGroup.position.set(0, 0.02, 0.12);
+    this.pencilGroup.rotation.set(0.12, -0.20, -0.75);
+    this.pencilGroup.renderOrder = 2500;
 
-    const woodMat = new THREE.MeshStandardMaterial({ color: 0xF59E0B, roughness: 0.35 });
-    const ferruleMat = new THREE.MeshStandardMaterial({ color: 0xD1D5DB, metalness: 0.8, roughness: 0.25 });
-    const eraserMat = new THREE.MeshStandardMaterial({ color: 0xF472B6, roughness: 0.8 });
-    const tipMat = new THREE.MeshStandardMaterial({ color: 0xFEF3C7, roughness: 0.6 });
-    const leadMat = new THREE.MeshStandardMaterial({ color: 0x1E293B, roughness: 0.4 });
+    // Attach directly to Right Paw's core so it moves naturally with the paw!
+    if (this.handR && this.handR.userData && this.handR.userData.core) {
+      this.handR.userData.core.add(this.pencilGroup);
+    } else {
+      this.accessoriesGroup.add(this.pencilGroup);
+    }
 
-    const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.038, 0.038, 0.44, 6), woodMat);
+    const woodMat = new THREE.MeshStandardMaterial({ color: 0xF59E0B, roughness: 0.30 });
+    const ferruleMat = new THREE.MeshStandardMaterial({ color: 0xE2E8F0, metalness: 0.95, roughness: 0.15 });
+    const eraserMat = new THREE.MeshStandardMaterial({ color: 0xFB7185, roughness: 0.70 });
+    const collarMat = new THREE.MeshStandardMaterial({ color: 0xFEF3C7, roughness: 0.55 });
+    const leadMat = new THREE.MeshStandardMaterial({ color: 0x1E293B, roughness: 0.35, metalness: 0.3 });
+
+    // Hexagonal Yellow Body (Cute chibi proportion)
+    const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.038, 0.038, 0.38, 6), woodMat);
+    shaft.renderOrder = 2500;
     this.pencilGroup.add(shaft);
 
+    // Silver Ferrule
     const ferrule = new THREE.Mesh(new THREE.CylinderGeometry(0.040, 0.040, 0.06, 16), ferruleMat);
-    ferrule.position.y = 0.25;
+    ferrule.position.y = 0.22;
+    ferrule.renderOrder = 2500;
     this.pencilGroup.add(ferrule);
 
-    const eraser = new THREE.Mesh(new THREE.CylinderGeometry(0.037, 0.037, 0.08, 16), eraserMat);
-    eraser.position.y = 0.32;
+    // Pink Eraser
+    const eraser = new THREE.Mesh(new THREE.CylinderGeometry(0.038, 0.038, 0.07, 16), eraserMat);
+    eraser.position.y = 0.27;
+    eraser.renderOrder = 2500;
     this.pencilGroup.add(eraser);
 
-    const cone = new THREE.Mesh(new THREE.ConeGeometry(0.038, 0.11, 16), tipMat);
-    cone.position.y = -0.275;
+    // Sharpened Wooden Collar
+    const cone = new THREE.Mesh(new THREE.ConeGeometry(0.038, 0.11, 16), collarMat);
+    cone.position.y = -0.24;
     cone.rotation.x = Math.PI;
+    cone.renderOrder = 2500;
     this.pencilGroup.add(cone);
 
+    // Graphite Tip
     const lead = new THREE.Mesh(new THREE.ConeGeometry(0.016, 0.045, 16), leadMat);
-    lead.position.y = -0.31;
+    lead.position.y = -0.28;
     lead.rotation.x = Math.PI;
+    lead.renderOrder = 2500;
     this.pencilGroup.add(lead);
 
     this.pencilGroup.visible = false;
@@ -1591,6 +1742,26 @@ export class FiezelMochi {
     if (this.headsetGroup) this.headsetGroup.visible = (name === 'headset');
     if (this.glassesGroup) this.glassesGroup.visible = (name === 'glasses');
     if (this.pencilGroup) this.pencilGroup.visible = (name === 'pencil');
+
+    if (name === 'pencil') {
+      if (this.handR) {
+        this.handR.visible = true;
+        this.handR.scale.set(1.0, 1.0, 1.0);
+        this.handR.position.set(0.92, -0.10, 0.72);
+        this.handR.rotation.set(-0.20, 0.15, -0.35);
+      }
+    } else {
+      if (this.pencilGroup && !this.pencilGroup.visible) {
+        if (this.handR && !this.handGesture) {
+          this.handR.visible = false;
+          this.handR.scale.set(0.001, 0.001, 0.001);
+        }
+      }
+    }
+
+    if (!name) {
+      this.accessoryMotionOffset = { rotX: 0, rotY: 0, rotZ: 0, posY: 0 };
+    }
   }
 
   setThinking(isThinking) {
@@ -1658,44 +1829,58 @@ export class FiezelMochi {
 
   updateAccessoriesMotion(dt) {
     if (this.currentAccessory === 'headset') {
-      // 1. Headset LED neon ring pulses with audio rhythm
-      const audioPulse = Math.sin(this.time * 8.5) * 0.5 + 0.5;
+      // Gentle, cozy, relaxing lofi listening groove (NO DIZZINESS, NO RAPID SHAKE)
+      // Tempo: 65 BPM chill beat (~0.35 Hz)
+      const lofiTime = this.time * 2.2;
+
+      // 1. Soft rhythmic head tilt (only +/- 2.0 degrees, very gentle and cozy)
+      const tiltZ = Math.sin(lofiTime) * 0.035;
+      // 2. Soft micro-nod on the beat (max 1.4 degrees)
+      const nodX = (Math.sin(lofiTime * 2.0) * 0.5 + 0.5) * 0.022;
+      // 3. Gentle float breath
+      const bobY = Math.sin(lofiTime) * 0.016;
+
+      this.accessoryMotionOffset = { rotX: nodX, rotY: 0, rotZ: tiltZ, posY: bobY };
+
+      // 4. Soothing Breathing LED Glow (smooth ambient light, zero aggressive strobe)
       if (this.headsetLedMat) {
-        this.headsetLedMat.opacity = 0.55 + audioPulse * 0.45;
-      }
-      if (this.headsetLedL && this.headsetLedR) {
-        const pScale = 1.0 + audioPulse * 0.20;
-        this.headsetLedL.scale.set(pScale, pScale, 1.0);
-        this.headsetLedR.scale.set(pScale, pScale, 1.0);
-      }
-      // 2. Rhythmic listening head bop
-      const headBop = Math.sin(this.time * 4.6) * 0.06;
-      this.targetRot.x += headBop;
-      if (this.earPhys) {
-        this.earPhys.L.tip += headBop * 0.4;
-        this.earPhys.R.tip += headBop * 0.4;
+        const breath = Math.sin(this.time * 2.2) * 0.22 + 0.78;
+        this.headsetLedMat.opacity = breath;
+        if (this.headsetLedL && this.headsetLedR) {
+          const pScale = 1.0 + breath * 0.04;
+          this.headsetLedL.scale.set(pScale, pScale, 1.0);
+          this.headsetLedR.scale.set(pScale, pScale, 1.0);
+        }
       }
     } else if (this.currentAccessory === 'glasses') {
-      // 1. Reading eye scan motion: sweep smoothly left to right, then return
-      const scanPeriod = 1.6;
+      // Intelligent reading focus: soft focus tilt and smooth, gentle text-scan
+      const scanPeriod = 2.4;
       const scanProg = (this.time % scanPeriod) / scanPeriod;
       let scanX = 0;
-      if (scanProg < 0.82) {
-        scanX = ((scanProg / 0.82) - 0.5) * 0.09;
+      if (scanProg < 0.80) {
+        scanX = ((scanProg / 0.80) - 0.5) * 0.045;
       } else {
-        const retProg = (scanProg - 0.82) / 0.18;
-        scanX = (0.5 - retProg) * 0.09;
+        const retProg = (scanProg - 0.80) / 0.20;
+        scanX = (0.5 - retProg) * 0.045;
       }
       if (this.eyeLeftDot && this.eyeRightDot) {
         this.eyeLeftDot.position.x = -0.38 + scanX;
         this.eyeRightDot.position.x = 0.38 + scanX;
       }
-      this.targetRot.y = Math.sin(this.time * 1.6) * 0.035;
+      this.accessoryMotionOffset = { rotX: 0.025, rotY: Math.sin(this.time * 1.4) * 0.020, rotZ: 0, posY: 0 };
     } else if (this.currentAccessory === 'pencil') {
+      // Gentle rhythmic writing / note-taking gestures
+      const scribble = Math.sin(this.time * 3.5) * 0.03;
       if (this.pencilGroup) {
-        this.pencilGroup.rotation.z = -0.55 + Math.sin(this.time * 9.0) * 0.06;
+        this.pencilGroup.rotation.z = -0.45 + scribble;
+        this.pencilGroup.position.y = 0.05 + scribble * 0.5;
       }
+      if (this.handR && this.handR.visible) {
+        this.handR.rotation.z = -0.35 + scribble;
+      }
+      this.accessoryMotionOffset = { rotX: 0.02, rotY: 0, rotZ: 0, posY: 0 };
     } else {
+      this.accessoryMotionOffset = { rotX: 0, rotY: 0, rotZ: 0, posY: 0 };
       if (this.eyeLeftDot && this.eyeRightDot && this.mood === 'dots') {
         this.eyeLeftDot.position.x = -0.38;
         this.eyeRightDot.position.x = 0.38;
@@ -2106,10 +2291,18 @@ export class FiezelMochi {
     this.currentRot.x += (this.targetRot.x - this.currentRot.x) * 0.12;
     this.currentRot.y += (this.targetRot.y - this.currentRot.y) * 0.12;
 
+    this.updateAccessoriesMotion(dt);
+
     const ambientSway = Math.sin(this.time * 1.8) * 0.035;
-    this.mochiGroup.rotation.x = this.currentRot.x;
-    this.mochiGroup.rotation.y = this.currentRot.y + ambientSway;
-    this.mochiGroup.rotation.z = -this.currentRot.y * 0.15;
+    const accRotX = (this.accessoryMotionOffset && this.accessoryMotionOffset.rotX) || 0;
+    const accRotY = (this.accessoryMotionOffset && this.accessoryMotionOffset.rotY) || 0;
+    const accRotZ = (this.accessoryMotionOffset && this.accessoryMotionOffset.rotZ) || 0;
+    const accPosY = (this.accessoryMotionOffset && this.accessoryMotionOffset.posY) || 0;
+
+    this.mochiGroup.rotation.x = this.currentRot.x + accRotX;
+    this.mochiGroup.rotation.y = this.currentRot.y + ambientSway + accRotY;
+    this.mochiGroup.rotation.z = -this.currentRot.y * 0.15 + accRotZ;
+    this.mochiGroup.position.y = this.floatPos.y + accPosY;
 
     // 3. Disney 90° Phase Inertia + Damped Harmonic Jiggle
     const inertialPhase = Math.sin(this.time * 2.2 + Math.PI * 0.5) * 0.045;
@@ -2160,9 +2353,6 @@ export class FiezelMochi {
 
     // Dynamic Mouth Motion (Talking articulation & subtle micro-breathing)
     this.updateMouthMotion(dt);
-
-    // Dynamic Accessories Motion & Sesi Kinematics
-    this.updateAccessoriesMotion(dt);
 
     // 4. Heart eyes gentle pulse (Frame 11)
     if (this.mood === 'hearts') {
@@ -2312,18 +2502,24 @@ export class FiezelMochi {
         }
       } else if (this.currentAccessory === 'pencil') {
         if (lead) {
-          // RIGHT PAW: Writing scribbling motion with mini pencil
-          const scribbleX = Math.cos(t * 11.0) * 0.05;
-          const scribbleY = Math.sin(t * 11.0) * 0.03;
-          P.x = 1.35 + scribbleX;
-          P.y = -0.16 + scribbleY + bob * 0.4;
-          P.z = 0.65;
-          P.rx = -0.06; P.ry = -0.25; P.rz = -0.32;
-          P.s = 0.95;
+          // RIGHT PAW: Holding pencil, gentle writing motion
+          const scribbleX = Math.cos(t * 3.5) * 0.04;
+          const scribbleY = Math.sin(t * 3.5) * 0.02;
+          P.x = 1.40 + scribbleX;
+          P.y = -0.06 + scribbleY + bob * 0.4;
+          P.z = 0.88;
+          P.rx = -0.15;
+          P.ry = -0.22;
+          P.rz = -0.42 + scribbleX;
+          P.s = 1.0;
         } else {
-          P.x = -1.35; P.y = -0.22 + bob * 0.4; P.z = 0.55;
-          P.rx = 0.06; P.ry = 0.25; P.rz = 0.16;
-          P.s = 0.85;
+          P.x = -1.55;
+          P.y = -0.26 + bob * 0.4;
+          P.z = 0.55;
+          P.rx = 0.06;
+          P.ry = 0.25;
+          P.rz = 0.16;
+          P.s = 0.82;
         }
       }
       return P;
