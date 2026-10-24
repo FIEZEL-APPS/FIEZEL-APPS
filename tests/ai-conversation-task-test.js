@@ -169,6 +169,10 @@ async function run(task, input, rawAnswer, locale) {
     const legit = ['Cool!', 'Haha, same here. I love pizza too!', 'Nice weather today, perfect for swimming!', 'Yo! Long time no see!'];
     const legitOk = legit.filter((r) => shape('conversation_turn', 'REPLY: ' + r + '\nMEANING: arti', { ...EN, message: 'hi there' }).ok);
     check('Balasan Inggris santai yang sah tidak ikut ditolak', legitOk.length === legit.length, legitOk.join(' | '));
+    const jaCallEtto = shape('conversation_turn', 'REPLY: えっと、アイスコーヒーですね。\nMEANING: es kopi ya.', { ...JA, mode: 'call' });
+    check('Pembersih opener Jepang membuang filler "えっと、" di mode call', jaCallEtto.ok && jaCallEtto.turn.reply === 'アイスコーヒーですね。', jaCallEtto.turn && jaCallEtto.turn.reply);
+    const jaCallAno = shape('conversation_turn', 'REPLY: あの、メニューはこちらです。\nMEANING: menunya ada di sini.', { ...JA, mode: 'call' });
+    check('Pembersih opener Jepang membuang filler "あの、" di mode call', jaCallAno.ok && jaCallAno.turn.reply === 'メニューはこちらです。', jaCallAno.turn && jaCallAno.turn.reply);
   }
 
   // --- 4. ROUTE: amplop membawa `turn`, kegagalan jatuh ke fallback --------------------------

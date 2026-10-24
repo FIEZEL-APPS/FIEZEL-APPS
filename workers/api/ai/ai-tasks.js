@@ -1139,8 +1139,10 @@
       'Your REPLY must directly respond to the learner\'s last message and stay in your role and scene. Never change the topic, never invent facts about the learner, and never mention people or plans they did not mention.',
       'Never lecture, never explain grammar, never praise or grade their ' + target + ', and never say you are an AI or a teacher.',
       isCall
-        ? 'This is a LIVE PHONE CALL. Speak naturally like a real human: respond directly and concisely. Maximum 15 words in total. No lists, no explanations. CRITICAL: NEVER start replies with repetitive filler words like "OK", "Okay", "Oh", "Alright", "Sure", or "Ah". Start directly with varied natural conversational words.'
-        : ('Use simple ' + target + ' for level ' + level + '. At most ' + CONVERSATION.maxReplySentences + ' short sentences. Do not start every turn with "OK", "Oh", or "Okay". Usually end with one natural question.'),
+        ? (course === 'ja'
+            ? 'This is a LIVE PHONE CALL. Speak naturally like a real human: respond directly and concisely. Maximum 15 words in total. No lists, no explanations. CRITICAL FOR JAPANESE: NEVER start replies with filler words like "えっと", "ええと", "えーと", "あの", "うーん", "ああ", or "うん". Start DIRECTLY with the actual conversational response (e.g. はい、かしこまりました / いいですよ / どうぞ / etc.).'
+            : 'This is a LIVE PHONE CALL. Speak naturally like a real human: respond directly and concisely. Maximum 15 words in total. No lists, no explanations. CRITICAL: NEVER start replies with repetitive filler words like "OK", "Okay", "Oh", "Alright", "Sure", or "Ah". Start directly with varied natural conversational words.')
+        : ('Use simple ' + target + ' for level ' + level + '. At most ' + CONVERSATION.maxReplySentences + ' short sentences. ' + (course === 'ja' ? 'Do not start every turn with "えっと", "あの", or "ええと".' : 'Do not start every turn with "OK", "Oh", or "Okay".') + ' Usually end with one natural question.'),
       course === 'ja'
         ? 'REPLY must be natural casual Japanese written in kana and common kanji. No romaji, no English.'
         : 'REPLY must be written only in English.',
@@ -1321,11 +1323,15 @@
       replyClamped = true;
     }
     if (!reply || reply.length > CONVERSATION.maxReplyChars) return fail(OUTPUT_FAILURES.sentenceLimit);
-    // m025-638: Bersihkan opener klise repetitif ("OK, ", "Okay, ", "Oh, ") agar balasan
-    // tidak selalu diawali kata "OK" terus-menerus (keluhan owner).
+    // m025-638/m025-642: Bersihkan opener klise repetitif ("OK, ", "Okay, ", "Oh, ") dan
+    // filler ragu bahasa Jepang ("えっと", "ええと", "えーと", "あの", "ああ") agar balasan
+    // langsung ke inti percakapan (keluhan owner).
     if (reply && s(input && input.mode) === 'call') {
       var strippedReply = reply.replace(/^(?:OK|Okay|Oh)[,!\s]+(?=[A-Za-z0-9\u3040-\u30ff\u4e00-\u9faf])/i, '').trim();
-      if (strippedReply && strippedReply.length >= 3) reply = strippedReply;
+      if (course === 'ja') {
+        strippedReply = strippedReply.replace(/^(?:えっと|ええと|えーと|あの[ね]?|う[ー~]*ん|ああ|うん)[、,!\s・…〜~]*/, '').trim();
+      }
+      if (strippedReply && strippedReply.length >= 2) reply = strippedReply;
     }
     // Membeo pesan murid bukan balasan teman.
     if (normalizeForCompare(reply) === normalizeForCompare(input.message)) return fail('echo_learner');
@@ -1335,7 +1341,7 @@
     // (terukur pada model call: "Oh, good choice! Large or small?"). Lebih baik kosong.
     if (meaning && locale !== 'th' && looksEnglishNotIndonesian(meaning)) meaning = '';
     if (meaning && s(input && input.mode) === 'call') {
-      var strippedMeaning = meaning.replace(/^(?:Oke|Oh)[,!\s]+(?=[A-Za-z0-9\u0e00-\u0e7f])/i, '').trim();
+      var strippedMeaning = meaning.replace(/^(?:Oke|Oh|Eh|Emm|Umm|Hmm|Anu)[,!\s]+/i, '').trim();
       if (strippedMeaning && strippedMeaning.length >= 3) meaning = strippedMeaning;
     }
     // Balasan yang dipotong ke batas kalimat: potong artinya juga supaya arti tidak memuat
@@ -1868,7 +1874,7 @@
     var maxTokens = spec.maxOutputTokens;
     var isCall = (taskName === 'conversation_turn' || taskName === 'conversation_correct') && isCallInput(a.input);
     if (isCall) {
-      maxTokens = Math.min(maxTokens, model && model === MODELS.voiceCall ? 140 : 95);
+      maxTokens = Math.min(maxTokens, 85);
     }
     var payload = model && model === MODELS.voiceCall
       ? { messages: [{ role: 'user', content: prompt }], max_tokens: maxTokens }

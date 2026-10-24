@@ -912,10 +912,14 @@ export async function requestAiPartnerReply(params: {
         reply?: string;
         translation?: string;
       };
-      const rawReply = String(turn.reply || data?.text || '')
+      let rawReply = String(turn.reply || data?.text || '')
         .replace(/^(AI|Partner|Assistant)\s*:\s*/i, '')
         .replace(/^["「]|["」]$/g, '')
         .trim();
+      if (params.targetLang === 'ja') {
+        const stripped = rawReply.replace(/^(?:えっと|ええと|えーと|あの[ね]?|う[ー~]*ん|ああ|うん)[、,!\s・…〜~]*/, '').trim();
+        if (stripped && stripped.length >= 2) rawReply = stripped;
+      }
       if (!replyLooksLikeTargetLanguage(rawReply, params.targetLang)) continue;
       // Relevance guard: a partner that parrots the learner or repeats its own previous line
       // verbatim is not answering the learner.
@@ -1081,24 +1085,35 @@ export async function resolveAiReply(
         const data = await res.json();
         const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
         const parsed = JSON.parse(rawText);
-        const geminiReply = typeof parsed?.aiReply === 'string' ? parsed.aiReply.trim() : '';
+        let geminiReply = typeof parsed?.aiReply === 'string' ? parsed.aiReply.trim() : '';
+        if (params.targetLang === 'ja') {
+          const stripped = geminiReply.replace(/^(?:えっと|ええと|えーと|あの[ね]?|う[ー~]*ん|ああ|うん)[、,!\s・…〜~]*/, '').trim();
+          if (stripped && stripped.length >= 2) geminiReply = stripped;
+        }
         if (geminiReply && replyLooksLikeTargetLanguage(geminiReply, params.targetLang)) {
+          const ttsPromise = synthesizeFlexibleTts({
+            text: geminiReply,
+            targetLang: params.targetLang,
+            persona: params.persona,
+          });
+          const cards = getBeginnerReplyCards(
+            params.scenario.id,
+            params.targetLang,
+            undefined,
+            geminiReply,
+            params.text,
+            params.history
+          );
+          const ttsRes = await ttsPromise;
           return {
             ...localResult,
             aiReply: geminiReply,
             aiReplyTranslationId: parsed.aiReplyTranslationId || '',
             aiReplyTranslationTh: parsed.aiReplyTranslationTh || '',
-            nextSuggestedReplies: getBeginnerReplyCards(
-              params.scenario.id,
-              params.targetLang,
-              undefined,
-              geminiReply,
-              params.text,
-              params.history
-            ),
-            audioBase64: null,
-            audioMimeType: 'audio/mpeg',
-            ttsEngine: 'fiezel-edge-tts-binary',
+            nextSuggestedReplies: cards,
+            audioBase64: ttsRes?.audioBase64 || null,
+            audioMimeType: ttsRes?.audioMimeType || 'audio/mpeg',
+            ttsEngine: ttsRes?.engine || 'fiezel-edge-tts-binary',
             replySource: 'ai-gemini-key',
           };
         }
@@ -1119,22 +1134,29 @@ export async function resolveAiReply(
   });
 
   if (partner) {
+    const ttsPromise = synthesizeFlexibleTts({
+      text: partner.reply,
+      targetLang: params.targetLang,
+      persona: params.persona,
+    });
+    const cards = getBeginnerReplyCards(
+      params.scenario.id,
+      params.targetLang,
+      undefined,
+      partner.reply,
+      params.text,
+      params.history
+    );
+    const ttsRes = await ttsPromise;
     return {
       ...localResult,
       aiReply: partner.reply,
       aiReplyTranslationId: params.locale === 'th' ? '' : partner.translation,
       aiReplyTranslationTh: params.locale === 'th' ? partner.translation : '',
-      nextSuggestedReplies: getBeginnerReplyCards(
-        params.scenario.id,
-        params.targetLang,
-        undefined,
-        partner.reply,
-        params.text,
-        params.history
-      ),
-      audioBase64: null,
-      audioMimeType: 'audio/mpeg',
-      ttsEngine: 'fiezel-ai-partner',
+      nextSuggestedReplies: cards,
+      audioBase64: ttsRes?.audioBase64 || null,
+      audioMimeType: ttsRes?.audioMimeType || 'audio/mpeg',
+      ttsEngine: ttsRes?.engine || 'fiezel-ai-partner',
       replySource: 'ai',
     };
   }
@@ -1204,8 +1226,8 @@ export function splitIntoSpeechChunks(text: string, targetLang: TargetLang, maxC
  * Short, content-neutral neural "listening" filler played while the AI is still thinking.
  * Kept to a single phrase per language so background pre-render makes at most 1 TTS request.
  */
-export function getThinkingFillers(targetLang: TargetLang): string[] {
-  return targetLang === 'ja' ? ['ええと…'] : ['Hmm, okay…'];
+export function getThinkingFillers(_targetLang: TargetLang): string[] {
+  return [];
 }
 
 /**

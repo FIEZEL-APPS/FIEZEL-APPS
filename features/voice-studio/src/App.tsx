@@ -175,8 +175,6 @@ export default function App() {
   // older one, and every pending chunk promise is settled when playback is halted.
   const speakTokenRef = useRef<number>(0);
   const playbackSettleRef = useRef<(() => void) | null>(null);
-  const fillerIndexRef = useRef<number>(0);
-  const fillerDoneRef = useRef<Promise<void> | null>(null);
   const mochiContainerRef = useRef<HTMLDivElement | null>(null);
   const mochiInstanceRef = useRef<any>(null);
   const [is3dMochiReady, setIs3dMochiReady] = useState<boolean>(false);
@@ -262,16 +260,6 @@ export default function App() {
           targetLang: activeScenario.targetLang,
           persona: activePersona,
         });
-        // m025-637: pre-render the short neural "thinking" fillers one by one (never in
-        // parallel) so they can play instantly while the real AI reply is generated.
-        for (const filler of getThinkingFillers(activeScenario.targetLang)) {
-          if (cancelled) return;
-          await synthesizeFlexibleTts({
-            text: filler,
-            targetLang: activeScenario.targetLang,
-            persona: activePersona,
-          });
-        }
       })();
     }, 300);
     return () => {
@@ -596,13 +584,6 @@ export default function App() {
     let nextAudioJob: Promise<{ audioBase64: string; audioMimeType: string; engine: string } | null> | null =
       fetchChunk(0);
 
-    // Let a "thinking" filler finish its word instead of cutting it off mid-syllable.
-    if (fillerDoneRef.current) {
-      await Promise.race([
-        fillerDoneRef.current,
-        new Promise<void>((r) => window.setTimeout(r, 1200)),
-      ]);
-    }
     if (token !== speakTokenRef.current) return;
 
     clearSpeechWatchdog();
@@ -698,26 +679,6 @@ export default function App() {
    * so it never delays the actual reply.
    */
   const isAiThinkingRef = useRef<boolean>(false);
-  const playThinkingFiller = async () => {
-    const fillers = getThinkingFillers(activeScenario.targetLang);
-    const phrase = fillers[fillerIndexRef.current % fillers.length];
-    fillerIndexRef.current += 1;
-    const res = await Promise.race([
-      synthesizeFlexibleTts({
-        text: phrase,
-        targetLang: activeScenario.targetLang,
-        persona: activePersona,
-      }),
-      new Promise<null>((r) => window.setTimeout(() => r(null), 900)),
-    ]);
-    if (!res?.audioBase64 || !isAiThinkingRef.current || isPlayingAiAudio) return;
-    const p = playNeuralChunk(res.audioBase64, res.audioMimeType || 'audio/mpeg', speechRate).then(
-      () => undefined
-    );
-    fillerDoneRef.current = p;
-    await p;
-    if (fillerDoneRef.current === p) fillerDoneRef.current = null;
-  };
 
   const handleUnlockPrerequisite = () => {
     playFiezelSfx('lesson_start');
@@ -738,7 +699,6 @@ export default function App() {
     setIsAnalyzingTurn(true);
     setStatusBanner(null);
 
-    let fillerTimer: number | null = null;
     try {
       const evalParams = {
         text: trimmed || activeScenario.sampleUtterances[0]?.text || 'Hello',
@@ -822,17 +782,9 @@ export default function App() {
       // STEP 2 — the REAL AI partner reply (never a silent template swap).
       isAiThinkingRef.current = true;
       setIsAiThinking(true);
-      fillerTimer = window.setTimeout(() => {
-        fillerTimer = null;
-        void playThinkingFiller();
-      }, 650);
 
       const replyEv = await resolveAiReply(evalParams, localEv);
 
-      if (fillerTimer) {
-        window.clearTimeout(fillerTimer);
-        fillerTimer = null;
-      }
       isAiThinkingRef.current = false;
       setIsAiThinking(false);
 
@@ -860,7 +812,6 @@ export default function App() {
     } catch (err) {
       setStatusBanner((err as Error).message || 'Kesalahan jaringan.');
     } finally {
-      if (fillerTimer) window.clearTimeout(fillerTimer);
       isAiThinkingRef.current = false;
       setIsAiThinking(false);
       setIsAnalyzingTurn(false);
@@ -950,7 +901,7 @@ export default function App() {
             if (liveSilenceTimerRef.current) {
               window.clearTimeout(liveSilenceTimerRef.current);
             }
-            const silenceWaitMs = isGrammaticallyIncomplete(clean, activeScenario.targetLang) ? 3000 : 2000;
+            const silenceWaitMs = isGrammaticallyIncomplete(clean, activeScenario.targetLang) ? 1400 : 850;
             setIsWaitingAfterSpeech(true);
             liveSilenceTimerRef.current = window.setTimeout(() => {
               if (isDisposed) return;
@@ -1123,7 +1074,7 @@ export default function App() {
             if (pttSilenceTimerRef.current) {
               window.clearTimeout(pttSilenceTimerRef.current);
             }
-            const pttSilenceWaitMs = isGrammaticallyIncomplete(clean, activeScenario.targetLang) ? 3500 : 2500;
+            const pttSilenceWaitMs = isGrammaticallyIncomplete(clean, activeScenario.targetLang) ? 1800 : 1200;
             pttSilenceTimerRef.current = window.setTimeout(() => {
               stopPttRecording();
             }, pttSilenceWaitMs);
