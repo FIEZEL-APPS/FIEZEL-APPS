@@ -65,6 +65,8 @@ import {
   prewarmThinkingFillers,
   LiveTransportMode,
   pcm16Base64ToAudioBuffer,
+  reportGeminiLiveSessionDrop,
+  requestGeminiLiveSessionToken,
   resolveAiReply,
   resolveLiveCallWebSocketUrls,
   splitIntoSpeechChunks,
@@ -183,6 +185,18 @@ export default function App() {
   const mochiContainerRef = useRef<HTMLDivElement | null>(null);
   const mochiInstanceRef = useRef<any>(null);
   const [is3dMochiReady, setIs3dMochiReady] = useState<boolean>(false);
+
+  // Gemini Live multi-key pool & mid-call auto-failover bookkeeping
+  const liveUserDraftRef = useRef<string>('');
+  const liveAiDraftRef = useRef<string>('');
+  const isLiveConnectedRef = useRef<boolean>(false);
+  const userHungUpRef = useRef<boolean>(false);
+  const currentLiveSessionRef = useRef<{ token?: string; keyIndex?: number; totalKeys?: number } | null>(null);
+  const liveReconnectAttemptsRef = useRef<number>(0);
+  const turnsRef = useRef(turns);
+  turnsRef.current = turns;
+  const brainStateRef = useRef(brainState);
+  brainStateRef.current = brainState;
 
   /** Unlocks Web Audio + one persistent HTMLAudioElement inside a user gesture. */
   const primeAudioPlayback = () => {
@@ -1292,8 +1306,6 @@ export default function App() {
   const startLiveCall = async () => {
     if (isLiveConnected || isLiveConnecting) return;
     primeAudioPlayback();
-    // Request mic permission synchronously inside the tap gesture so hands-free SpeechRecognition
-    // (which starts right after PAW finishes speaking the opening line) is already authorized.
     if (!micPermWarmedRef.current && typeof navigator !== 'undefined' && navigator.mediaDevices?.getUserMedia) {
       micPermWarmedRef.current = true;
       void navigator.mediaDevices
@@ -1307,69 +1319,90 @@ export default function App() {
     setIsLiveConnecting(true);
     setLiveUserDraft('');
     setLiveAiDraft('');
+    liveUserDraftRef.current = '';
+    liveAiDraftRef.current = '';
+    userHungUpRef.current = false;
+    liveReconnectAttemptsRef.current = 0;
     setCallDurationSec(0);
 
-    const params = new URLSearchParams({
-      voice: activePersona.geminiVoice,
-      personaName: activePersona.name,
-      scenarioTitle: activeScenario.titleId,
-      targetLang: activeScenario.targetLang,
-      scenarioId: activeScenario.id,
-      model: 'gemini-3.8-live',
-    });
+    const connectDuplex = async (isReconnect = false) => {
+      let targetWsUrl = '';
+      let isGoogleLive = true;
 
-    const candidateWsUrls = resolveLiveCallWebSocketUrls().map(
-      (base) => `${base}${base.includes('?') ? '&' : '?'}${params.toString()}`
-    );
-
-    const tryConnectWsCandidate = (index: number) => {
-      if (index >= candidateWsUrls.length) {
-        activateTurnByTurnLiveFallback();
-        return;
+      // 1. Dapatkan ephemeral session token dari Worker 16-key pool
+      const session = await requestGeminiLiveSessionToken();
+      if (session.ok && session.token) {
+        currentLiveSessionRef.current = session;
+        const baseEndpoint =
+          session.endpoint ||
+          'wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContentConstrained';
+        targetWsUrl = `${baseEndpoint}?access_token=${encodeURIComponent(session.token)}`;
+        isGoogleLive = true;
+      } else {
+        // Fallback ke candidate URLs lokal jika ada
+        const candidateUrls = resolveLiveCallWebSocketUrls();
+        if (candidateUrls.length > 0) {
+          targetWsUrl = candidateUrls[0];
+          isGoogleLive = targetWsUrl.includes('generativelanguage.googleapis.com');
+        } else {
+          // Seluruh kunci sibuk atau offline -> masuk jalur cadangan Turn-by-Turn
+          activateTurnByTurnLiveFallback();
+          return;
+        }
       }
 
-      const targetUrl = candidateWsUrls[index];
-      const isGoogleLive = targetUrl.includes('generativelanguage.googleapis.com');
       let settled = false;
       let ws: WebSocket;
 
-      const connectTimer = window.setTimeout(
-        () => {
-          if (!settled) {
-            settled = true;
-            try {
-              ws.close();
-            } catch {
-              // Ignore
-            }
-            tryConnectWsCandidate(index + 1);
+      const connectTimer = window.setTimeout(() => {
+        if (!settled) {
+          settled = true;
+          try {
+            ws.close();
+          } catch {
+            // Ignore
           }
-        },
-        isGoogleLive ? 2500 : 900
-      );
+          if (!isReconnect && liveReconnectAttemptsRef.current < 3) {
+            liveReconnectAttemptsRef.current += 1;
+            void connectDuplex(false);
+          } else {
+            activateTurnByTurnLiveFallback();
+          }
+        }
+      }, 4000);
 
       try {
-        ws = new WebSocket(targetUrl);
+        ws = new WebSocket(targetWsUrl);
         wsRef.current = ws;
       } catch {
         window.clearTimeout(connectTimer);
-        tryConnectWsCandidate(index + 1);
+        activateTurnByTurnLiveFallback();
         return;
       }
 
       ws.onopen = () => {
         if (isGoogleLive) {
           try {
+            const contextSummary =
+              turnsRef.current.length > 0
+                ? `\nRecent conversation turns so far:\n${turnsRef.current
+                    .slice(-4)
+                    .map((t) => `${t.speaker === 'user' ? 'Learner' : activePersona.name}: "${t.text}"`)
+                    .join('\n')}`
+                : '';
+
             ws.send(
               JSON.stringify({
                 setup: {
-                  model: 'models/gemini-2.0-flash-exp',
+                  model: 'models/gemini-3.8-live',
                   generationConfig: {
                     responseModalities: ['AUDIO'],
                     speechConfig: {
                       voiceConfig: {
                         prebuiltVoiceConfig: {
-                          voiceName: activePersona.geminiVoice || 'Puck',
+                          voiceName:
+                            activePersona.geminiVoice ||
+                            (activeScenario.targetLang === 'ja' ? 'Aoede' : 'Puck'),
                         },
                       },
                     },
@@ -1377,12 +1410,12 @@ export default function App() {
                   systemInstruction: {
                     parts: [
                       {
-                        text:
-                          activePersona.systemPrompt ||
-                          `You are ${activePersona.name}, speaking partner for scenario "${activeScenario.titleId}".`,
+                        text: `${activePersona.systemPrompt || ''}\n\n[Scenario]: ${activeScenario.titleId} (${activeScenario.targetLang === 'ja' ? 'Japanese' : 'English'}). ${activeScenario.descriptionId}. Opening situation: "${activeScenario.openingLine}". Speak naturally, warmly, and concisely (1-2 sentences per turn) as ${activePersona.name}. Keep in character.${contextSummary}`,
                       },
                     ],
                   },
+                  inputAudioTranscription: {},
+                  outputAudioTranscription: {},
                 },
               })
             );
@@ -1396,6 +1429,7 @@ export default function App() {
         try {
           const msg = JSON.parse(event.data);
           const isGoogleReady = Boolean(msg.setupComplete);
+
           if (isGoogleReady || msg.type === 'ready' || msg.type === 'live_ready') {
             if (!settled) {
               settled = true;
@@ -1404,9 +1438,11 @@ export default function App() {
             setLiveTransportMode('ws-duplex');
             setIsLiveConnecting(false);
             setIsLiveConnected(true);
+            isLiveConnectedRef.current = true;
             playFiezelSfx('lesson_start');
 
-            if (!outputAudioCtxRef.current) {
+            // Setup Output Audio Context (24kHz for Gemini Live)
+            if (!outputAudioCtxRef.current || outputAudioCtxRef.current.state === 'closed') {
               const outputCtx = new AudioContext({ sampleRate: 24000 });
               outputAudioCtxRef.current = outputCtx;
               nextStartTimeRef.current = outputCtx.currentTime;
@@ -1414,12 +1450,23 @@ export default function App() {
             if (outputAudioCtxRef.current.state === 'suspended') {
               void outputAudioCtxRef.current.resume().catch(() => {});
             }
+
+            // Setup Input Mic (16kHz for Gemini Live)
             void navigator.mediaDevices
-              ?.getUserMedia({ audio: true })
+              ?.getUserMedia({
+                audio: {
+                  echoCancellation: true,
+                  noiseSuppression: true,
+                  autoGainControl: true,
+                },
+              })
               .then((stream) => {
                 micStreamRef.current = stream;
-                const inputCtx = new AudioContext({ sampleRate: 16000 });
-                inputAudioCtxRef.current = inputCtx;
+                if (!inputAudioCtxRef.current || inputAudioCtxRef.current.state === 'closed') {
+                  const inputCtx = new AudioContext({ sampleRate: 16000 });
+                  inputAudioCtxRef.current = inputCtx;
+                }
+                const inputCtx = inputAudioCtxRef.current;
                 if (inputCtx.state === 'suspended') {
                   void inputCtx.resume().catch(() => {});
                 }
@@ -1435,12 +1482,10 @@ export default function App() {
                       wsRef.current.send(
                         JSON.stringify({
                           realtimeInput: {
-                            mediaChunks: [
-                              {
-                                mimeType: 'audio/pcm;rate=16000',
-                                data: pcmBase64,
-                              },
-                            ],
+                            audio: {
+                              data: pcmBase64,
+                              mimeType: 'audio/pcm;rate=16000',
+                            },
                           },
                         })
                       );
@@ -1458,9 +1503,34 @@ export default function App() {
               .catch(() => {
                 // Mic optional
               });
+
+            // If brand new call with 0 turns, prompt AI to speak opening greeting immediately
+            if (!isReconnect && turnsRef.current.length === 0 && isGoogleLive) {
+              try {
+                ws.send(
+                  JSON.stringify({
+                    clientContent: {
+                      turns: [
+                        {
+                          role: 'user',
+                          parts: [
+                            {
+                              text: `[Instruction: Please begin our conversation now by greeting me warmly as ${activePersona.name} in scenario "${activeScenario.titleId}". Say your opening line: "${activeScenario.openingLine}"]`,
+                            },
+                          ],
+                        },
+                      ],
+                      turnComplete: true,
+                    },
+                  })
+                );
+              } catch {
+                // Ignore
+              }
+            }
           }
 
-          // Direct Google Gemini Live or Proxy Audio Chunk extraction
+          // Audio Extraction from Gemini Live or custom proxy
           let incomingAudioBase64: string | null = null;
           if (msg.type === 'audio' && msg.audio) {
             incomingAudioBase64 = msg.audio;
@@ -1470,7 +1540,8 @@ export default function App() {
                 incomingAudioBase64 = part.inlineData.data;
               }
               if (part?.text) {
-                setLiveAiDraft((prev) => (prev ? `${prev} ${part.text}` : part.text));
+                liveAiDraftRef.current += part.text;
+                setLiveAiDraft(liveAiDraftRef.current);
               }
             }
           }
@@ -1495,71 +1566,106 @@ export default function App() {
             };
           }
 
-          // Barge-in interruption from Gemini Live server
-          if (msg.serverContent?.interrupted) {
+          // Barge-in interruption from server
+          if (msg.serverContent?.interrupted || msg.type === 'interrupted') {
             if (outputAudioCtxRef.current) {
               nextStartTimeRef.current = outputAudioCtxRef.current.currentTime;
             }
             activeSourcesRef.current.forEach((s) => {
               try {
                 s.stop();
+                s.disconnect();
               } catch {
                 // Ignore
               }
             });
             activeSourcesRef.current = [];
             setIsPlayingAiAudio(false);
+          }
+
+          // Real-time transcriptions
+          if (msg.serverContent?.inputTranscription?.text) {
+            liveUserDraftRef.current += msg.serverContent.inputTranscription.text;
+            setLiveUserDraft(liveUserDraftRef.current);
           } else if (msg.type === 'input_transcription' || msg.type === 'user_transcript') {
-            setLiveUserDraft(msg.fullText || msg.text || '');
+            liveUserDraftRef.current = msg.fullText || msg.text || '';
+            setLiveUserDraft(liveUserDraftRef.current);
+          }
+
+          if (msg.serverContent?.outputTranscription?.text) {
+            liveAiDraftRef.current += msg.serverContent.outputTranscription.text;
+            setLiveAiDraft(liveAiDraftRef.current);
           } else if (msg.type === 'output_transcription' || msg.type === 'ai_transcript') {
-            setLiveAiDraft(msg.fullText || msg.text || '');
-          } else if (msg.type === 'turn_complete') {
-            const uText = (msg.userTranscript || '').trim();
-            const aText = (msg.aiTranscript || '').trim();
+            liveAiDraftRef.current = msg.fullText || msg.text || '';
+            setLiveAiDraft(liveAiDraftRef.current);
+          }
+
+          // Turn Complete — evaluate learner utterance and record Braincore mastery
+          const isGoogleTurnComplete = Boolean(msg.serverContent?.turnComplete);
+          if (isGoogleTurnComplete || msg.type === 'turn_complete') {
+            const uText = (liveUserDraftRef.current || msg.userTranscript || '').trim();
+            const aText = (liveAiDraftRef.current || msg.aiTranscript || '').trim();
+            liveUserDraftRef.current = '';
+            liveAiDraftRef.current = '';
+            setLiveUserDraft('');
+            setLiveAiDraft('');
 
             if (uText) {
-              const diagRaw = msg.diagnosis;
-              let turnDiag: TurnDiagnosis | undefined;
-              if (diagRaw) {
-                const outcome = recordSpeakingAttempt(brainState, {
-                  competencyId: activeScenario.competencyId,
-                  scenarioId: activeScenario.id,
-                  targetLang: activeScenario.targetLang,
-                  userExactTranscript: uText,
-                  ok: Boolean(diagRaw.ok),
-                  grammarScore: diagRaw.grammarScore,
-                  fluencyScore: diagRaw.fluencyScore,
-                  vocabUsageScore: diagRaw.vocabUsageScore,
-                  accuracyScore: diagRaw.accuracyScore,
-                  misconceptionId: diagRaw.misconceptionId || null,
-                  correctionPattern:
-                    diagRaw.syntacticCorrection || diagRaw.naturalReformulation || null,
-                  hintsUsed: 0,
-                  confidence: 0.85,
-                  measureMode: isMeasureMode,
-                });
-                setBrainState(outcome.nextState);
-                turnDiag = {
-                  ok: Boolean(diagRaw.ok),
-                  accuracyScore: diagRaw.accuracyScore,
-                  grammarScore: diagRaw.grammarScore,
-                  fluencyScore: diagRaw.fluencyScore,
-                  vocabUsageScore: diagRaw.vocabUsageScore,
-                  userExactTranscript: uText,
-                  misconceptionId: diagRaw.misconceptionId || null,
-                  whyFailsId: diagRaw.whyFailsId || null,
-                  whyFailsTh: diagRaw.whyFailsTh || null,
-                  missingTokens: diagRaw.missingTokens || [],
-                  syntacticCorrection: diagRaw.syntacticCorrection || null,
-                  naturalReformulation: diagRaw.naturalReformulation || uText,
-                  pedagogicalFeedbackId: diagRaw.pedagogicalFeedbackId,
-                  pedagogicalFeedbackTh: diagRaw.pedagogicalFeedbackTh,
-                  bktBefore: outcome.bktBefore,
-                  bktAfter: outcome.bktAfter,
-                  thetaAfter: outcome.thetaAfter,
-                  masteryStateAfter: outcome.masteryStateAfter,
-                };
+              const evalParams = {
+                text: uText,
+                scenario: activeScenario,
+                persona: activePersona,
+                targetLang: activeScenario.targetLang,
+                locale,
+                measureMode: isMeasureMode,
+                history: turnsRef.current.slice(-6).map((tItem) => ({
+                  speaker: tItem.speaker,
+                  text: tItem.text,
+                })),
+              };
+              const ev = evaluateTurnLocal(evalParams);
+              const effectiveHints = isMeasureMode ? 0 : showHint ? 1 : 0;
+              const outcome = recordSpeakingAttempt(brainStateRef.current, {
+                competencyId: activeScenario.competencyId,
+                scenarioId: activeScenario.id,
+                targetLang: activeScenario.targetLang,
+                userExactTranscript: uText,
+                ok: Boolean(ev.ok),
+                grammarScore: ev.grammarScore,
+                fluencyScore: ev.fluencyScore,
+                vocabUsageScore: ev.vocabUsageScore,
+                accuracyScore: ev.accuracyScore,
+                misconceptionId: ev.misconceptionId || null,
+                correctionPattern: ev.syntacticCorrection || ev.naturalReformulation || null,
+                hintsUsed: effectiveHints,
+                confidence: 0.85,
+                measureMode: isMeasureMode,
+              });
+              setBrainState(outcome.nextState);
+              if (isMeasureMode) {
+                playFiezelSfx(ev.ok ? 'answer_correct' : 'answer_wrong');
               }
+              const turnDiag: TurnDiagnosis = {
+                ok: Boolean(ev.ok),
+                accuracyScore: ev.accuracyScore,
+                grammarScore: ev.grammarScore,
+                fluencyScore: ev.fluencyScore,
+                vocabUsageScore: ev.vocabUsageScore,
+                userExactTranscript: uText,
+                misconceptionId: ev.misconceptionId || null,
+                whyFailsId: ev.whyFailsId || null,
+                whyFailsTh: ev.whyFailsTh || null,
+                missingTokens: ev.missingTokens || [],
+                syntacticCorrection: ev.syntacticCorrection || null,
+                naturalReformulation: ev.naturalReformulation || uText,
+                pedagogicalFeedbackId: ev.pedagogicalFeedbackId,
+                pedagogicalFeedbackTh: ev.pedagogicalFeedbackTh,
+                bktBefore: outcome.bktBefore,
+                bktAfter: outcome.bktAfter,
+                thetaAfter: outcome.thetaAfter,
+                masteryStateAfter: outcome.masteryStateAfter,
+              };
+
               setTurns((prev) => [
                 ...prev,
                 {
@@ -1571,6 +1677,7 @@ export default function App() {
                 },
               ]);
             }
+
             if (aText) {
               const autoTrans = translateAndPhoneticizeLiveText(
                 aText,
@@ -1590,37 +1697,12 @@ export default function App() {
                   timestamp: Date.now() + 1,
                 },
               ]);
-              if (Array.isArray(msg.nextSuggestedReplies) && msg.nextSuggestedReplies.length > 0) {
-                setNextSuggestedReplies(msg.nextSuggestedReplies);
-              } else {
-                setNextSuggestedReplies([]);
-              }
-              if (msg.aiAudioBase64) {
-                void speakAiText(aText, msg.aiAudioBase64);
-              }
-            }
-            setLiveUserDraft('');
-            setLiveAiDraft('');
-          } else if (msg.type === 'interrupted') {
-            activeSourcesRef.current.forEach((src) => {
-              try {
-                src.stop();
-              } catch {
-                // Ignore
-              }
-            });
-            activeSourcesRef.current = [];
-            if (outputAudioCtxRef.current) {
-              nextStartTimeRef.current = outputAudioCtxRef.current.currentTime;
-            }
-            setIsPlayingAiAudio(false);
-          } else if (msg.type === 'error' || msg.type === 'live_error') {
-            if (!settled) {
-              settled = true;
-              window.clearTimeout(connectTimer);
-              tryConnectWsCandidate(index + 1);
-            } else {
-              activateTurnByTurnLiveFallback();
+              const suggestions = getBeginnerReplyCards(
+                activeScenario,
+                activeScenario.targetLang,
+                aText
+              );
+              setNextSuggestedReplies(suggestions);
             }
           }
         } catch {
@@ -1632,23 +1714,61 @@ export default function App() {
         if (!settled) {
           settled = true;
           window.clearTimeout(connectTimer);
-          tryConnectWsCandidate(index + 1);
+          if (!isReconnect && liveReconnectAttemptsRef.current < 3) {
+            liveReconnectAttemptsRef.current += 1;
+            void connectDuplex(false);
+          } else {
+            activateTurnByTurnLiveFallback();
+          }
         }
       };
 
-      ws.onclose = () => {
+      ws.onclose = (event) => {
         if (!settled) {
           settled = true;
           window.clearTimeout(connectTimer);
-          tryConnectWsCandidate(index + 1);
+          if (!isReconnect && liveReconnectAttemptsRef.current < 3) {
+            liveReconnectAttemptsRef.current += 1;
+            void connectDuplex(false);
+          } else {
+            activateTurnByTurnLiveFallback();
+          }
+          return;
+        }
+
+        // Active mid-call disconnect (quota limit, rate limit, or connection drop)
+        if (isLiveConnectedRef.current && !userHungUpRef.current) {
+          void reportGeminiLiveSessionDrop(
+            event.reason || 'mid_call_disconnect',
+            event.code,
+            currentLiveSessionRef.current?.keyIndex
+          );
+
+          if (liveReconnectAttemptsRef.current < 5) {
+            liveReconnectAttemptsRef.current += 1;
+            setStatusBanner(
+              locale === 'th'
+                ? 'กำลังสลับไปยังช่องสัญญาณเสียงความเร็วสูงใหม่...'
+                : 'Mengalihkan ke jalur suara baru tanpa hambatan...'
+            );
+            setTimeout(() => {
+              if (!userHungUpRef.current) {
+                void connectDuplex(true);
+              }
+            }, 400);
+          } else {
+            activateTurnByTurnLiveFallback();
+          }
         }
       };
     };
 
-    tryConnectWsCandidate(0);
+    void connectDuplex(false);
   };
 
   const stopLiveCall = () => {
+    userHungUpRef.current = true;
+    isLiveConnectedRef.current = false;
     if (scriptProcessorRef.current) {
       scriptProcessorRef.current.disconnect();
       scriptProcessorRef.current = null;
@@ -1686,7 +1806,6 @@ export default function App() {
     });
     activeSourcesRef.current = [];
     clearSpeechWatchdog();
-    // Supersede any chunked reply still queued so nothing keeps talking after hang-up.
     speakTokenRef.current += 1;
     stopNeuralBufferSource();
     if (currentAudioElRef.current) {
@@ -2949,7 +3068,15 @@ export default function App() {
                       wsRef.current &&
                       wsRef.current.readyState === WebSocket.OPEN
                     ) {
-                      wsRef.current.send(JSON.stringify({ text: inputText.trim() }));
+                      const textToSend = inputText.trim();
+                      wsRef.current.send(
+                        JSON.stringify({
+                          clientContent: {
+                            turns: [{ role: 'user', parts: [{ text: textToSend }] }],
+                            turnComplete: true,
+                          },
+                        })
+                      );
                       setInputText('');
                     } else {
                       void submitStudentTurn({ text: inputText });
@@ -2972,7 +3099,15 @@ export default function App() {
                     wsRef.current &&
                     wsRef.current.readyState === WebSocket.OPEN
                   ) {
-                    wsRef.current.send(JSON.stringify({ text: inputText.trim() }));
+                    const textToSend = inputText.trim();
+                    wsRef.current.send(
+                      JSON.stringify({
+                        clientContent: {
+                          turns: [{ role: 'user', parts: [{ text: textToSend }] }],
+                          turnComplete: true,
+                        },
+                      })
+                    );
                     setInputText('');
                   } else {
                     void submitStudentTurn({ text: inputText });

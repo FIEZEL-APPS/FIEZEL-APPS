@@ -1,7 +1,7 @@
 {
-  "version": "m025-657",
-  "claimedBy": "branch feat/m025-657-prominent-wide-mochi-dimensions",
-  "claimedAt": "2026-10-24T12:09:42.544Z",
-  "reason": "feat(mascot): prominent wide mochi proportions and expanded hero viewport (m025-657)",
+  "version": "m025-658",
+  "claimedBy": "branch feat/m025-655-gemini-live-pool",
+  "claimedAt": "2026-10-24T12:24:01.145Z",
+  "reason": "feat(voice): m025-658 multi-key gemini live pool with auto failover",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

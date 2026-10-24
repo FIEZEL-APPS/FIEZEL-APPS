@@ -219,6 +219,86 @@ export function resolveLiveCallWebSocketUrls(): string[] {
   return Array.from(new Set(urls));
 }
 
+export interface GeminiLiveSessionInfo {
+  ok: boolean;
+  token?: string;
+  model?: string;
+  endpoint?: string;
+  keyIndex?: number;
+  totalKeys?: number;
+  fallback?: boolean;
+}
+
+/**
+ * Requests an ephemeral session token from the Cloudflare Worker 16-key pool.
+ * Automatically round-robins and fails over if a key encounters quota limits.
+ */
+export async function requestGeminiLiveSessionToken(): Promise<GeminiLiveSessionInfo> {
+  const base =
+    resolveCfApiBase() ||
+    (typeof window !== 'undefined' && window.location.origin.includes('fiezel.my.id')
+      ? 'https://api.fiezel.my.id'
+      : '');
+  const url = `${base}/api/voice/live-session`;
+
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 8000);
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: '{}',
+      mode: 'cors',
+      signal: controller.signal,
+    });
+    clearTimeout(timer);
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.ok && data.token) {
+        return {
+          ok: true,
+          token: data.token,
+          model: data.model || 'gemini-3.8-live',
+          endpoint:
+            data.endpoint ||
+            'wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContentConstrained',
+          keyIndex: data.keyIndex,
+          totalKeys: data.totalKeys,
+        };
+      }
+    }
+    return { ok: false, fallback: true };
+  } catch {
+    return { ok: false, fallback: true };
+  }
+}
+
+/**
+ * Reports a mid-call WebSocket drop or quota limit back to Worker to rotate the key.
+ */
+export async function reportGeminiLiveSessionDrop(
+  reason: string,
+  code?: number,
+  keyIndex?: number
+): Promise<void> {
+  const base =
+    resolveCfApiBase() ||
+    (typeof window !== 'undefined' && window.location.origin.includes('fiezel.my.id')
+      ? 'https://api.fiezel.my.id'
+      : '');
+  try {
+    await fetch(`${base}/api/voice/report-drop`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reason, code, keyIndex }),
+      mode: 'cors',
+    });
+  } catch {
+    // Ignore
+  }
+}
+
 /**
  * Client-side pedagogical evaluator enforcing the FIEZEL Braincore Zero-Dumbing Invariant:
  * - Zero false praise (`ok: false` whenever morphological, syntactic, particle, or pragmatic misconceptions occur)
