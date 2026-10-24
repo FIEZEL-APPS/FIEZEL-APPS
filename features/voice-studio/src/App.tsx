@@ -1285,6 +1285,19 @@ export default function App() {
 
     // 2. Prime Microphone input stream directly in user gesture
     if (typeof navigator !== 'undefined' && navigator.mediaDevices?.getUserMedia) {
+      // Create + resume the input AudioContext synchronously (before any await) so iOS Safari
+      // still counts it as part of the tap gesture; otherwise it stays suspended and captures silence.
+      try {
+        const CtxClass = window.AudioContext || (window as any).webkitAudioContext;
+        if (!inputAudioCtxRef.current || inputAudioCtxRef.current.state === 'closed') {
+          inputAudioCtxRef.current = new CtxClass();
+        }
+        if (inputAudioCtxRef.current.state === 'suspended') {
+          void inputAudioCtxRef.current.resume().catch(() => {});
+        }
+      } catch {
+        // AudioContext unavailable
+      }
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
           audio: {
@@ -1295,11 +1308,7 @@ export default function App() {
         });
         micStreamRef.current = stream;
 
-        const CtxClass = window.AudioContext || (window as any).webkitAudioContext;
-        if (!inputAudioCtxRef.current || inputAudioCtxRef.current.state === 'closed') {
-          inputAudioCtxRef.current = new CtxClass();
-        }
-        const inputCtx = inputAudioCtxRef.current;
+        const inputCtx = inputAudioCtxRef.current as AudioContext;
         if (inputCtx.state === 'suspended') {
           void inputCtx.resume().catch(() => {});
         }
@@ -1316,15 +1325,15 @@ export default function App() {
               inputCtx.sampleRate || 48000,
               16000
             );
+            // Gemini Live only hears `realtimeInput.audio`; the legacy `mediaChunks` frame is
+            // silently ignored (proven by scratch/test-gemini-mic-input.mjs: zero transcript).
             wsRef.current.send(
               JSON.stringify({
                 realtimeInput: {
-                  mediaChunks: [
-                    {
-                      mimeType: 'audio/pcm;rate=16000',
-                      data: pcmBase64,
-                    },
-                  ],
+                  audio: {
+                    mimeType: 'audio/pcm;rate=16000',
+                    data: pcmBase64,
+                  },
                 },
               })
             );
@@ -1338,6 +1347,9 @@ export default function App() {
         muteGain.connect(inputCtx.destination);
       } catch (err) {
         console.warn('Microphone permission or stream error:', err);
+        setStatusBanner(
+          'Izin mikrofon belum aktif. Izinkan akses mikrofon di bilah alamat peramban, lalu tekan Telepon Live lagi — atau ketik kalimatmu di bawah.'
+        );
       }
     }
 

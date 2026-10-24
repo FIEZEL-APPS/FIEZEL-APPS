@@ -121,12 +121,10 @@ export default {
             upstreamWs.send(
               JSON.stringify({
                 realtimeInput: {
-                  mediaChunks: [
-                    {
-                      mimeType: 'audio/pcm;rate=16000',
-                      data: msg.audio,
-                    },
-                  ],
+                  audio: {
+                    mimeType: 'audio/pcm;rate=16000',
+                    data: msg.audio,
+                  },
                 },
               })
             );
