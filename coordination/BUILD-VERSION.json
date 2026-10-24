@@ -1,7 +1,7 @@
 {
-  "version": "m025-639",
+  "version": "m025-640",
   "claimedBy": "branch fix/m025-639-voice-studio-anti-cutoff",
-  "claimedAt": "2026-10-24T02:15:28.194Z",
-  "reason": "fix(voice-studio): m025-639 anti-cutoff VAD, continuous sentence tts, anti-ok opener & instant barge-in",
+  "claimedAt": "2026-10-24T02:30:24.522Z",
+  "reason": "fix(voice-studio): m025-640 anti-cutoff VAD, continuous sentence tts, anti-ok opener & instant barge-in",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
