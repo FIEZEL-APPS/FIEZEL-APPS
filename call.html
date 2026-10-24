@@ -15,12 +15,30 @@
     />
     <link rel="icon" type="image/svg+xml" href="./assets/brand/fiezel-icon.svg" />
     <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
-    <link rel="stylesheet" href="./features/voice-studio/dist/voice-studio.css?v=m025-660" />
+    <link rel="stylesheet" href="./features/voice-studio/dist/voice-studio.css?v=m025-661" />
     <!-- Read-only host runtime config (never modified by Voice Studio) -->
-    <script src="./core-config.js?v=m025-660" defer></script>
+    <script src="./core-config.js?v=m025-661" defer></script>
+    <style>
+      html, body {
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        position: fixed;
+        inset: 0;
+        touch-action: manipulation;
+        -webkit-overflow-scrolling: auto;
+      }
+      #fiezel-voice-studio-root {
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+      }
+    </style>
   </head>
-  <body class="bg-[#FFF9EE] text-[#241A11] antialiased">
+  <body class="bg-[#FFF9EE] text-[#241A11] antialiased h-full w-full overflow-hidden fixed inset-0">
     <div id="fiezel-voice-studio-root"></div>
-    <script type="module" src="./features/voice-studio/dist/voice-studio.js?v=m025-660"></script>
+    <script type="module" src="./features/voice-studio/dist/voice-studio.js?v=m025-661"></script>
   </body>
 </html>
