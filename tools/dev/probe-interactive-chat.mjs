@@ -208,31 +208,32 @@ server.listen(PORT, '127.0.0.1', async () => {
     const hasRuby = await page.evaluate(() => !!document.querySelector('.fzc-msg-row.is-assistant .fzc-bubble ruby'));
     console.log('Furigana <ruby> present in Japanese speech:', hasRuby ? 'YES' : 'NO');
 
-    // ── Audit Audio & Speech Synthesis ──
-    console.log('3b. Testing Audio Playback & Web Speech Synthesis...');
+    // ── Audit Audio & Neural Voice Pipeline ──
+    console.log('3b. Testing Audio Playback & Neural Voice Pipeline...');
     const chatState = await page.evaluate(() => window.FiezelInteractiveChat.getState());
     console.log('Live Chat State:', chatState);
     const speechCallResult = await page.evaluate(() => {
-      let spokenUtterance = null;
-      SpeechSynthesis.prototype.speak = function(u) {
-        spokenUtterance = { text: u.text, lang: u.lang };
-      };
-      SpeechSynthesis.prototype.getVoices = function() {
-        return [{ name: 'Nanami', lang: 'ja-JP' }];
-      };
+      let spokenCall = null;
+      if (window.FiezelChatVoice) {
+        window.FiezelChatVoice.speak = function(text, course, hooks) {
+          spokenCall = { text: text, course: course };
+          if (hooks && typeof hooks.onSentenceStart === 'function') hooks.onSentenceStart(0, text);
+          return Promise.resolve(true);
+        };
+      }
 
       const audioBtn = document.querySelector('.fzc-action-btn[data-action="audio"]');
       if (!audioBtn) return { error: 'Audio button not found' };
 
       audioBtn.click();
       return {
-        spoken: spokenUtterance,
+        spoken: spokenCall,
         isPlayingClass: audioBtn.classList.contains('is-playing')
       };
     });
-    console.log('Speech playback result:', speechCallResult);
-    if (!speechCallResult.spoken || speechCallResult.spoken.lang !== 'ja-JP') {
-      throw new Error(`Audio failed to invoke SpeechSynthesis! Result: ${JSON.stringify(speechCallResult)}`);
+    console.log('Neural voice playback result:', speechCallResult);
+    if (!speechCallResult.spoken || speechCallResult.spoken.course !== 'ja') {
+      throw new Error(`Audio failed to invoke Neural Voice Pipeline! Result: ${JSON.stringify(speechCallResult)}`);
     }
 
     // ── Audit Feed Scrolling ──
