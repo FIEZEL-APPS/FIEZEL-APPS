@@ -1,7 +1,7 @@
 {
-  "version": "m025-636",
-  "claimedBy": "branch feat/ja-full-depth-n5-n1plus",
-  "claimedAt": "2026-10-23T23:22:41.979Z",
-  "reason": "feat(ja): perluas kedalaman kursus Jepang penuh 6 tingkat N5-N1+ (A1-C2)",
+  "version": "m025-637",
+  "claimedBy": "branch fix/ja-ux-pure-jlpt-n5-n1",
+  "claimedAt": "2026-10-24T01:15:34.267Z",
+  "reason": "fix(ja-ux): pure JLPT N5-N1 labels, 50 structured Bunpo lessons, Kanji & Moshi practice, level exam & placement fixes",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

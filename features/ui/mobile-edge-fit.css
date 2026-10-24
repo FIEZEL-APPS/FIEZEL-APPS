@@ -4565,29 +4565,79 @@ html body .ja-kana .kana-tab[aria-selected="true"] {
 }
 
 /* ==========================================================================
-   AUDIT FIX 9: LEVEL PICKER MODAL CLEAN DAYLIGHT TACTILE
+   AUDIT FIX 9: LEVEL PICKER MODAL CLEAN DAYLIGHT TACTILE (COMPACT & UNCLIPPED)
    ========================================================================== */
+.modal-panel:has(.level-picker-grid),
+body.fz-lux .modal-panel:has(.level-picker-grid),
+#modalPanel:has(.level-picker-grid) {
+  padding: 16px 16px 18px !important;
+  max-height: 92vh !important;
+  overflow-y: auto !important;
+}
+.modal-panel:has(.level-picker-grid) h2 {
+  font-size: 1.3rem !important;
+  line-height: 1.2 !important;
+  margin: 2px 0 4px !important;
+}
+.modal-panel:has(.level-picker-grid) > p {
+  font-size: 0.78rem !important;
+  line-height: 1.35 !important;
+  margin: 0 0 8px !important;
+}
+.level-picker-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+  margin: 8px 0 !important;
+}
 .level-picker-card,
 button.level-picker-card {
   background: #FFFFFF !important;
   border: 2px solid #E2E8F0 !important;
-  border-radius: 16px !important;
+  border-radius: 14px !important;
   color: #0F172A !important;
-  box-shadow: 0 3px 0 #CBD5E1 !important;
+  box-shadow: 0 2px 0 #CBD5E1 !important;
+  padding: 9px 11px !important;
+  min-height: 0 !important;
+  gap: 2px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+}
+/* When 5 levels exist (JLPT N5–N1), let the 5th card span full width as a sleek horizontal row */
+.level-picker-grid > .level-picker-card:last-child:nth-child(odd),
+.level-picker-grid > button.level-picker-card:last-child:nth-child(odd) {
+  grid-column: 1 / -1 !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+}
+.level-picker-grid > .level-picker-card:last-child:nth-child(odd) span {
+  flex: 1 1 auto !important;
+  margin: 0 4px !important;
+}
+.level-picker-grid > .level-picker-card:last-child:nth-child(odd) .level-trust-badge {
+  margin-top: 0 !important;
+  flex-shrink: 0 !important;
 }
 .level-picker-card strong {
   color: #0F172A !important;
   font-weight: 800 !important;
-  font-size: 1.25rem !important;
+  font-size: 1.05rem !important;
+  line-height: 1.15 !important;
 }
 .level-picker-card span {
   color: #334155 !important;
   font-weight: 600 !important;
+  font-size: 0.72rem !important;
+  line-height: 1.25 !important;
 }
 .level-picker-card.is-active {
   background: #FEF9C3 !important;
   border-color: #F59E0B !important;
-  box-shadow: 0 3px 0 #D97706 !important;
+  box-shadow: 0 2px 0 #D97706 !important;
 }
 .level-picker-card.is-active strong {
   color: #92400E !important;
@@ -4610,8 +4660,10 @@ button.level-picker-card {
   background: #F1F5F9 !important;
   color: #475569 !important;
   border-radius: 6px !important;
-  font-size: 0.68rem !important;
+  font-size: 0.62rem !important;
   font-weight: 700 !important;
+  padding: 2px 6px !important;
+  margin-top: 2px !important;
 }
 .level-trust-badge.is-verified {
   background: #D1FAE5 !important;
@@ -4620,15 +4672,30 @@ button.level-picker-card {
 .level-exam-cta {
   background: #181826 !important;
   border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  border-radius: 16px !important;
+  border-radius: 14px !important;
   color: #FFFFFF !important;
+  padding: 10px 12px !important;
+  margin: 8px 0 !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+}
+.level-exam-cta div {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
 }
 .level-exam-cta b {
   color: #FFFFFF !important;
   font-weight: 800 !important;
+  font-size: 0.85rem !important;
+  line-height: 1.2 !important;
 }
 .level-exam-cta span {
   color: #CBD5E1 !important;
+  font-size: 0.68rem !important;
+  line-height: 1.25 !important;
 }
 .level-exam-cta button.primary,
 #openLevelExam {
@@ -4637,16 +4704,33 @@ button.level-picker-card {
   font-weight: 800 !important;
   border: none !important;
   border-radius: 999px !important;
+  padding: 8px 14px !important;
+  font-size: 0.78rem !important;
+  min-height: 36px !important;
+  width: auto !important;
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
 }
 .level-source-note {
   background: #141420 !important;
   border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  border-radius: 14px !important;
+  border-radius: 12px !important;
   color: #CBD5E1 !important;
+  padding: 8px 10px !important;
+  margin: 6px 0 8px !important;
+  font-size: 0.72rem !important;
+  line-height: 1.3 !important;
 }
 .level-source-note b {
   color: #FFE02E !important;
   font-weight: 800 !important;
+}
+.modal-panel:has(.level-picker-grid) .modal-actions {
+  margin-top: 8px !important;
+}
+.modal-panel:has(.level-picker-grid) .modal-actions button {
+  min-height: 40px !important;
+  padding: 8px 16px !important;
 }
 .level-lock-note {
   background: #181826 !important;
@@ -4791,8 +4875,9 @@ section.fade,
 .modal-panel,
 .welcome-panel,
 .notification-panel {
-  max-height: min(720px, 86vh) !important;
-  padding-bottom: 20px !important;
+  max-height: min(780px, 90vh) !important;
+  overflow-y: auto !important;
+  padding-bottom: 18px !important;
   margin-bottom: 0 !important;
 }
 

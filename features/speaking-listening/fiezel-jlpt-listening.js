@@ -841,13 +841,15 @@
 
   function getFilteredQuestions() {
     return JLPT_BANK.filter(function (q) {
-      if (q.level !== curLevel) return false;
+      var qLvl = (q.level === 'N1+' || q.level === 'C2') ? 'N1' : q.level;
+      var filterLvl = (curLevel === 'N1+' || curLevel === 'C2') ? 'N1' : curLevel;
+      if (qLvl !== filterLvl) return false;
       if (curMondai !== 'all' && q.mondai !== curMondai) return false;
       return true;
     });
   }
 
-  var VALID_JLPT_LEVELS = ['N5', 'N4', 'N3', 'N2', 'N1', 'N1+'];
+  var VALID_JLPT_LEVELS = ['N5', 'N4', 'N3', 'N2', 'N1'];
   var LEVEL_BTN_MAP = {
     N5: 'btnLvlN5',
     N4: 'btnLvlN4',
@@ -865,8 +867,11 @@
   }
 
   function openListeningPanel(initialLevel) {
-    if (typeof initialLevel === 'string' && VALID_JLPT_LEVELS.indexOf(initialLevel) !== -1) {
-      curLevel = initialLevel;
+    if (typeof initialLevel === 'string') {
+      if (initialLevel === 'N1+' || initialLevel === 'C2') initialLevel = 'N1';
+      if (VALID_JLPT_LEVELS.indexOf(initialLevel) !== -1) {
+        curLevel = initialLevel;
+      }
     }
     syncLevelButtons(curLevel);
     var modal = document.getElementById('listeningPanelModal');

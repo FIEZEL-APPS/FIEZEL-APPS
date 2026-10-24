@@ -447,10 +447,10 @@ const norm=s=>{
   const key=typeof s==='string'?s:String(s??'');
   const hit=NORM_MEMO.get(key);
   if(hit!==undefined)return hit;
-  /* Hotfix th (akar bug tes-25, audit AI-03/AI-10: norm() Latin-only mengosongkan teks Thai
-     sehingga uniqueByNorm membuang SEMUA arti Thai dan pengecoh vocab placement kolaps).
-     Rentang \u0e00-\u0e7f dipertahankan; untuk teks id/en hasilnya byte-identik. */
-  const value=key.toLowerCase().replace(/[^a-z0-9\u0e00-\u0e7f ]+/g,' ').replace(/\s+/g,' ').trim();
+  /* Hotfix th & ja: norm() mempertahankan rentang Thai (\u0e00-\u0e7f) dan Jepang
+     (Hiragana \u3040-\u309f, Katakana \u30a0-\u30ff, Kanji \u4e00-\u9fff, dll) agar uniqueByNorm
+     dan validateQuestion tidak mengosongkan opsi/pertanyaan beraksara non-Latin. */
+  const value=key.toLowerCase().replace(/[^a-z0-9\u0e00-\u0e7f\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\u3005\uff10-\uff19\uff21-\uff3a\uff41-\uff5a ]+/g,' ').replace(/\s+/g,' ').trim();
   if(NORM_MEMO.size<NORM_MEMO_LIMIT)NORM_MEMO.set(key,value);
   return value;
 };
@@ -1408,10 +1408,21 @@ function applyClozeLocale(){
     return out;
   });
 }
-function placementLevel(sourceState=state){const raw=Math.max(1,Math.min(6,Math.floor(Number(sourceState?.level)||1)));return LEVELS[raw-1]||'A1'}
-function getActiveLevel(sourceState=state){const prefs=sourceState?.preferences||{};if(LEVELS.includes(String(prefs.activeLevel||'')))return String(prefs.activeLevel);if(!sourceState?.placementDone&&LEVELS.includes(String(prefs.selfAssessedLevel||'')))return String(prefs.selfAssessedLevel);return sourceState?.placementDone?placementLevel(sourceState):'A1'}
+function displayLevel(level=getActiveLevel()){
+  return (typeof jaCourseOn==='function'&&jaCourseOn()&&typeof FiezelJaUi!=='undefined'&&FiezelJaUi&&typeof FiezelJaUi.jlptLabel==='function')?FiezelJaUi.jlptLabel(level):String(level||'');
+}
+function placementLevel(sourceState=state){const raw=Math.max(1,Math.min(6,Math.floor(Number(sourceState?.level)||1)));const lvl=LEVELS[raw-1]||'A1';return (typeof jaCourseOn==='function'&&jaCourseOn()&&lvl==='C2')?'C1':lvl}
+function getActiveLevel(sourceState=state){
+  const prefs=sourceState?.preferences||{};
+  let chosen='';
+  if(LEVELS.includes(String(prefs.activeLevel||'')))chosen=String(prefs.activeLevel);
+  else if(!sourceState?.placementDone&&LEVELS.includes(String(prefs.selfAssessedLevel||'')))chosen=String(prefs.selfAssessedLevel);
+  else chosen=sourceState?.placementDone?placementLevel(sourceState):'A1';
+  if(typeof jaCourseOn==='function'&&jaCourseOn()&&chosen==='C2')chosen='C1';
+  return chosen;
+}
 function activeLevelIsManual(sourceState=state){return LEVELS.includes(String(sourceState?.preferences?.activeLevel||''))}
-function activeLevelLabel(sourceState=state){return `${getActiveLevel(sourceState)}${activeLevelIsManual(sourceState)?FiezelI18n.t('level.sufiks-pilihanmu'):''}`}
+function activeLevelLabel(sourceState=state){return `${displayLevel(getActiveLevel(sourceState))}${activeLevelIsManual(sourceState)?FiezelI18n.t('level.sufiks-pilihanmu'):''}`}
 function levelDescriptor(level){return({A1:FiezelI18n.t('level.deskripsi-a1'),A2:FiezelI18n.t('level.deskripsi-a2'),B1:FiezelI18n.t('level.deskripsi-b1'),B2:FiezelI18n.t('level.deskripsi-b2'),C1:FiezelI18n.t('level.deskripsi-c1'),C2:FiezelI18n.t('level.deskripsi-c2')}[level]||FiezelI18n.t('level.deskripsi-fallback'))}
 // m025-161 (F1-1): indeks kurikulum dibangun oleh satu fungsi yang dipakai load() MAUPUN
 // pembaca pertama. Sebelumnya indeksnya hanya diisi di dalam load(), jadi setiap pemakai yang
@@ -1500,7 +1511,7 @@ function sanitizeLevelTrust(raw){
 function levelTrustState(s=state){return sanitizeLevelTrust(s?.levelTrust)}
 function verifiedLevel(s=state){const value=String(levelTrustState(s).verified||'A1');return LEVELS.includes(value)?value:'A1'}
 function levelTrustGap(level,s=state){const i=LEVELS.indexOf(String(level||''));return i<0?0:i-LEVELS.indexOf(verifiedLevel(s))}
-function nextVerifiableLevel(s=state){const i=LEVELS.indexOf(verifiedLevel(s));return LEVELS[i+1]||''}
+function nextVerifiableLevel(s=state){const i=LEVELS.indexOf(verifiedLevel(s));const next=LEVELS[i+1]||'';if(typeof jaCourseOn==='function'&&jaCourseOn()&&next==='C2')return '';return next;}
 /* ---- m025-166: gerbang masuk level (alur baru owner) ---------------------------------
  *
  * Owner mendesain ulang alurnya: memilih level yang belum terverifikasi TIDAK lagi membuka
@@ -6229,27 +6240,57 @@ async function load(opts){const root=document.baseURI;/* W1 P0-1 (16-001): fetch
     // dengan vocabulary-master.json, jadi ia lewat normalisasi V yang sama beberapa baris
     // di bawah - kartu, ulangan, dan soal kosakata semuanya ikut tanpa jalur kedua.
     const jaVocab=await optional('content/ja/vocabulary-master-ja.json',null);
-    if(jaVocab&&Array.isArray(jaVocab.words)&&jaVocab.words.length)V=jaVocab.words;
+    if(jaVocab&&Array.isArray(jaVocab.words)&&jaVocab.words.length){
+      for(const w of jaVocab.words){if(w.level==='C2'){w.level='C1';w.jlpt='N1';}}
+      V=jaVocab.words;
+    }
     // Bank bacaan Jepang: bentuknya identik dengan reading-bank.json (id, level, title,
     // text, topic, qs[[pertanyaan, opsi, kunci, meta]]), jadi ia dibaca jalur yang sama.
     // Teksnya Jepang, pertanyaannya Indonesia - murid diuji membaca Jepang, bukan diuji
     // dua bahasa sekaligus di tingkat yang belum sampai ke situ.
     const jaRead=await optional('content/ja/reading-bank-ja.json',null);
-    if(Array.isArray(jaRead)&&jaRead.length)R=jaRead;
+    if(Array.isArray(jaRead)&&jaRead.length){
+      for(const r of jaRead){if(r.level==='C2')r.level='C1';}
+      R=jaRead;
+    }
     // m025-312: bank menulis Jepang. Bentuknya identik dengan writing-prompts-v1.json
     // (schema, rubric, prompts[]), jadi penyaji dan penilai membacanya lewat jalur yang
     // sama tanpa cabang kedua. Medan `en` menyimpan naskah JEPANG - nama itu warisan dari
     // bank Inggris dan sengaja tidak diganti, karena penyaji membacanya apa adanya.
     const jaWrite=await optional('content/ja/writing-prompts-ja.json',null);
-    if(jaWrite&&Array.isArray(jaWrite.prompts)&&jaWrite.prompts.length)WRITING_BANK=jaWrite;
+    if(jaWrite&&Array.isArray(jaWrite.prompts)&&jaWrite.prompts.length){
+      for(const p of jaWrite.prompts){if(p.level==='C2')p.level='C1';}
+      WRITING_BANK=jaWrite;
+    }
     if(jaBank&&Array.isArray(jaBank.templates)&&jaBank.templates.length){
+      for(const t of jaBank.templates){if(t.cefr==='C2'){t.cefr='C1';t.jlpt='N1';}}
       G=jaBank;
-      // Graf keluarga Jepang menggantikan graf Inggris SELAMA bahasa ini aktif. Graf lesson
-      // (setCurriculumGraph) sengaja dikosongkan: kurikulum tingkat-lesson Jepang belum ada,
-      // dan membiarkan kurikulum Inggris terpasang berarti prasyarat lesson Inggris dipakai
-      // untuk menilai butir Jepang.
-      try{self.FiezelCoreBrain?.setFamilyGraph?.(jaGraph?.families||{})}catch{}
-      try{self.FiezelCoreBrain?.setCurriculumGraph?.({schema:'fiezel-grammar-curriculum-v1',lessons:[]})}catch{}
+      // Graf keluarga dan lesson Jepang: bangun kurikulum terstruktur N5-N1 untuk Braincore
+      const rawFamilies=jaGraph?.families||{};
+      const jaLessons=[];
+      const skillLevelMap={};
+      for(const t of jaBank.templates){
+        const sk=String(t.skill||t.family||'').trim();
+        if(sk&&!skillLevelMap[sk])skillLevelMap[sk]=t.cefr||'A1';
+      }
+      const levelSeqCounter={A1:0,A2:0,B1:0,B2:0,C1:0};
+      for(const [sk,prereqs] of Object.entries(rawFamilies)){
+        const lvl=skillLevelMap[sk]||'A1';
+        levelSeqCounter[lvl]=(levelSeqCounter[lvl]||0)+1;
+        const validPrereqs=(Array.isArray(prereqs)?prereqs:[]).filter(p=>p&&rawFamilies[p]);
+        jaLessons.push({
+          lessonId:sk,
+          skill:sk,
+          level:lvl,
+          sequence:levelSeqCounter[lvl],
+          unit:`${lvl}.${levelSeqCounter[lvl]}`,
+          title:friendlySkillName(sk),
+          prerequisites:validPrereqs
+        });
+      }
+      GRAMMAR_CURRICULUM_INDEX=buildGrammarCurriculumIndex(jaLessons);
+      try{self.FiezelCoreBrain?.setFamilyGraph?.(rawFamilies)}catch{}
+      try{self.FiezelCoreBrain?.setCurriculumGraph?.({schema:'fiezel-grammar-curriculum-v1',lessons:jaLessons})}catch{}
     }else{
       // Bank Jepang gagal dimuat: JANGAN diam-diam menyajikan kursus Inggris dengan label
       // Jepang. Kembalikan murid ke Inggris dan katakan, supaya kegagalannya terlihat,
@@ -6263,14 +6304,16 @@ async function load(opts){const root=document.baseURI;/* W1 P0-1 (16-001): fetch
       }
     }
   }else{
+    GRAMMAR_CURRICULUM_INDEX=buildGrammarCurriculumIndex(GRAMMAR_CURRICULUM);
     try{self.FiezelCoreBrain?.resetFamilyGraph?.()}catch{}
+    try{self.FiezelCoreBrain?.setCurriculumGraph?.(GRAMMAR_CURRICULUM)}catch{}
   }
   // Normalize the structured grammar master source into the runtime's canonical skill buckets.
   // The JSON master is authoritative; no legacy G[skill] file is used.
   if(Array.isArray(G?.templates)){
     const buckets={};GRAMMAR_ITEMS=[];
     for(const t of G.templates){
-      const skill=String(t.subskill||t.family||'general').trim(),curriculum=GRAMMAR_CURRICULUM_INDEX[String(t.id||skill)]||GRAMMAR_CURRICULUM_INDEX[skill]||{};
+      const skill=String(t.skill||t.subskill||t.family||'general').trim(),curriculum=GRAMMAR_CURRICULUM_INDEX[String(t.id||skill)]||GRAMMAR_CURRICULUM_INDEX[skill]||{};
       const opts=Array.isArray(t.options)?t.options:[];
       const idx=Number.isInteger(t.correctIndex)?t.correctIndex:-1;
       // m025-149: alasan per pilihan ini BUKAN teks internal - ia dipakai langsung sebagai
@@ -9868,15 +9911,16 @@ function levelControlMarkup(){const level=getActiveLevel();return `<button type=
 function setActiveLevel(level){const next=String(level||'').toUpperCase();if(!LEVELS.includes(next))return false;/* m028-06: DEFAULT-ALLOW. Guard hanya menolak level yang benar-benar TERKUNCI akibat
      demosi; state lama tanpa levelTrust, atau murid yang belum pernah didemosi, tetap bebas
      pindah ke atas (mode percobaan). Dibungkus typeof+try supaya fixture kontrak level yang
-     hanya menyuplai state/LEVELS/save/render tetap lolos. */try{if(typeof isLevelLocked==='function'&&isLevelLocked(state,next)){showToast(FiezelI18n.t('level.toast-terkunci',{level:next,ujian:nextVerifiableLevel(state)}));openActiveLevelExamPanel(nextVerifiableLevel(state));return false}}catch(_){}if(next===getActiveLevel()&&activeLevelIsManual())return true;try{if(state.activeSession)abandonActiveSession('level_change')}catch{}try{leaveAllStages()}catch{}if(typeof classroomSession!=='undefined')classroomSession=null;if(typeof classroomSessionLevel!=='undefined')classroomSessionLevel='';if(typeof speakingListeningController!=='undefined')speakingListeningController?.setActiveLevel?.(next);state.preferences={...state.preferences,activeLevel:next,levelMode:'manual'};state.adaptivePolicyMeta={...state.adaptivePolicyMeta,lastPolicy:null,lastSource:'',lastAt:0};coreBrainCache=null;save();closeModal();render();showToast(FiezelI18n.t('level.toast-aktif',{level:next}),'success');return true}
-function usePlacementLevel(){try{if(state.activeSession)abandonActiveSession('level_mode_change')}catch{}try{leaveAllStages()}catch{}if(typeof classroomSession!=='undefined')classroomSession=null;if(typeof classroomSessionLevel!=='undefined')classroomSessionLevel='';if(typeof speakingListeningController!=='undefined')speakingListeningController?.setActiveLevel?.(placementLevel());state.preferences={...state.preferences,activeLevel:'',levelMode:'placement'};coreBrainCache=null;save();closeModal();render();showToast(FiezelI18n.t('level.toast-ikut-tes',{level:getActiveLevel()}));return true}
+     hanya menyuplai state/LEVELS/save/render tetap lolos. */const disp=x=>(typeof displayLevel==='function'?displayLevel(x):x);try{if(typeof isLevelLocked==='function'&&isLevelLocked(state,next)){showToast(FiezelI18n.t('level.toast-terkunci',{level:disp(next),ujian:disp(nextVerifiableLevel(state))}));openActiveLevelExamPanel(nextVerifiableLevel(state));return false}}catch(_){}if(next===getActiveLevel()&&activeLevelIsManual())return true;try{if(state.activeSession)abandonActiveSession('level_change')}catch{}try{leaveAllStages()}catch{}if(typeof classroomSession!=='undefined')classroomSession=null;if(typeof classroomSessionLevel!=='undefined')classroomSessionLevel='';if(typeof speakingListeningController!=='undefined')speakingListeningController?.setActiveLevel?.(next);state.preferences={...state.preferences,activeLevel:next,levelMode:'manual'};state.adaptivePolicyMeta={...state.adaptivePolicyMeta,lastPolicy:null,lastSource:'',lastAt:0};coreBrainCache=null;save();closeModal();render();showToast(FiezelI18n.t('level.toast-aktif',{level:disp(next)}),'success');return true}
+function usePlacementLevel(){try{if(state.activeSession)abandonActiveSession('level_mode_change')}catch{}try{leaveAllStages()}catch{}if(typeof classroomSession!=='undefined')classroomSession=null;if(typeof classroomSessionLevel!=='undefined')classroomSessionLevel='';if(typeof speakingListeningController!=='undefined')speakingListeningController?.setActiveLevel?.(placementLevel());state.preferences={...state.preferences,activeLevel:'',levelMode:'placement'};coreBrainCache=null;save();closeModal();render();showToast(FiezelI18n.t('level.toast-ikut-tes',{level:displayLevel(getActiveLevel())}));return true}
 /* m028-06: panel level sekarang JUJUR - tiap kartu membawa statusnya (terverifikasi, mode
    percobaan dengan hitungan salah, atau terkunci setelah demosi) dan level terkunci benar-
    benar disabled. Penolakannya tetap ada di setActiveLevel(), jadi menyembunyikan tombol
    bukan satu-satunya pertahanan. Nama fungsi ini sengaja tetap openLevelPanel: kontrak
    tests/level-grammar-contract-test.js hanya mengizinkan iterasi LEVELS di pemilih level. */
 function openLevelPanel(){const current=getActiveLevel(),estimated=placementLevel(),manual=activeLevelIsManual(),verified=verifiedLevel(state),trust=levelTrustState(state),examLevel=nextVerifiableLevel(state),examWait=examLevel?levelExamCooldownRemaining(examLevel,state):0;
- const cards=LEVELS.map(level=>{
+ const shownLevels = (typeof jaCourseOn==='function'&&jaCourseOn()) ? LEVELS.filter(l=>l!=='C2') : LEVELS;
+ const cards=shownLevels.map(level=>{
   const locked=isLevelLocked(state,level),position=LEVELS.indexOf(level)-LEVELS.indexOf(verified);
   /* m025-166: kartu level yang belum terbukti dulu berlabel "Mode percobaan" - label itu
      sekarang bohong, karena mode percobaan tidak bisa lagi dimasuki dari UI. Labelnya jadi
@@ -9885,14 +9929,14 @@ function openLevelPanel(){const current=getActiveLevel(),estimated=placementLeve
   const mistakes=probationMistakes(level);
   const examProof=!!trust.exams?.[level]?.passed;
   const badge=position<=0?`<em class="level-trust-badge is-verified">${esc(examProof?LEVEL_GUARD_COPY.examBadge:level==='A1'?LEVEL_GUARD_COPY.baselineBadge:LEVEL_GUARD_COPY.placementBadge)}</em>`:locked?'<em class="level-trust-badge is-locked">'+FiezelI18n.t('level.badge-terkunci')+'</em>':`<em class="level-trust-badge is-probation">${esc(LEVEL_GUARD_COPY.entryChip)}${mistakes>0?FiezelI18n.t('level.badge-salah',{miss:mistakes,batas:LEVEL_GUARD_WRONG_LIMIT}):''}</em>`;
-  return `<button type="button" class="level-picker-card${level===current?' is-active':''}${locked?' is-locked':''}" data-active-level="${level}" aria-pressed="${level===current}"${locked?' disabled aria-disabled="true" title="'+esc(levelTrustCopy(LEVEL_GUARD_COPY.lockedFeature,verified))+'"':''}><strong>${esc(jaCourseOn()?FiezelJaUi.jlptLabel(level)+' · '+level:level)}</strong><span>${esc(levelDescriptor(level))}</span>${badge}</button>`;
+  return `<button type="button" class="level-picker-card${level===current?' is-active':''}${locked?' is-locked':''}" data-active-level="${level}" aria-pressed="${level===current}"${locked?' disabled aria-disabled="true" title="'+esc(levelTrustCopy(LEVEL_GUARD_COPY.lockedFeature,verified))+'"':''}><strong>${esc(displayLevel(level))}</strong><span>${esc(levelDescriptor(level))}</span>${badge}</button>`;
  }).join('');
  /* m025-166: penjelasan "belum terverifikasi" dulu satu paragraf panjang bergaya artikel.
     Sekarang microcopy aplikasi: chip status + satu kalimat + satu CTA, seirama dengan
     modal-mark/eyebrow kartu lain. */
- const lockNote=trust.locked?`<div class="level-lock-note"><b>${esc(levelTrustCopy(LEVEL_GUARD_COPY.lockedFeature,verified))}</b></div>`:probationActive(state)?`<div class="level-lock-note is-probation"><em class="level-trust-chip">${esc(LEVEL_GUARD_COPY.entryChip)} \u00b7 ${esc(current)}</em><b>${esc(LEVEL_GUARD_COPY.probationTitle)}</b><span>${esc(levelTrustCopy(LEVEL_GUARD_COPY.probationBody,verified))}</span><button type="button" class="level-trust-chip-cta" id="levelNoteExam">${esc(LEVEL_GUARD_COPY.entryExam)} ${esc(examLevel||verified)}</button></div>`:'';
- const examCta=examLevel?`<div class="level-exam-cta"><div><b>${esc(LEVEL_GUARD_COPY.examTitle)} ${esc(examLevel)}</b><span>${FiezelI18n.t('level.cta-rincian',{jumlah:LEVEL_EXAM_SIZE,grammar:LEVEL_EXAM_BLUEPRINT.grammar,vocab:LEVEL_EXAM_BLUEPRINT.vocab,bacaan:LEVEL_EXAM_BLUEPRINT.reading,lulus:LEVEL_EXAM_PASS})}</span></div><button type="button" class="primary" id="openLevelExam"${examWait>0?' disabled aria-disabled="true"':''}>${examWait>0?FiezelI18n.t('level.tombol-cooldown',{jeda:esc(levelExamCooldownLabel(examWait))}):esc(LEVEL_GUARD_COPY.examStart)}</button></div>`:`<div class="level-exam-cta"><div><b>${FiezelI18n.t('level.badge-c2',{badge:esc(LEVEL_GUARD_COPY.examBadge)})}</b><span>${FiezelI18n.t('level.all-proven')}</span></div></div>`;
- openModal(`<div class="modal-mark">${FiezelI18n.t('student.level-mark')}</div><h2>${FiezelI18n.t('level.judul-panel')}</h2><p>${FiezelI18n.t('level.penjelasan-panel')}</p><div class="level-picker-grid">${cards}</div>${lockNote}${examCta}<div class="level-source-note">${manual?`${FiezelI18n.t('level.source-manual')}${FiezelI18n.t('level.sumber-manual',{aktif:esc(current),placement:esc(estimated),verif:esc(verified)})}${trust.verifiedSource==='placement'?FiezelI18n.t('level.sumber-verif-awal'):''}`:FiezelI18n.t('level.sumber-placement',{placement:esc(estimated),verif:esc(verified)})+(trust.verifiedSource==='placement'?FiezelI18n.t('level.sumber-verif-awal'):'')}</div><div class="modal-actions">${manual?`<button type="button" id="usePlacementLevel">${FiezelI18n.t('level.pakai-hasil-tes',{level:esc(estimated)})}</button>`:''}<button type="button" class="primary" id="levelPanelClose">${FiezelI18n.t('level.selesai')}</button></div>`);
+ const lockNote=trust.locked?`<div class="level-lock-note"><b>${esc(levelTrustCopy(LEVEL_GUARD_COPY.lockedFeature,verified))}</b></div>`:probationActive(state)?`<div class="level-lock-note is-probation"><em class="level-trust-chip">${esc(LEVEL_GUARD_COPY.entryChip)} \u00b7 ${esc(displayLevel(current))}</em><b>${esc(LEVEL_GUARD_COPY.probationTitle)}</b><span>${esc(levelTrustCopy(LEVEL_GUARD_COPY.probationBody,verified))}</span><button type="button" class="level-trust-chip-cta" id="levelNoteExam">${esc(LEVEL_GUARD_COPY.entryExam)} ${esc(displayLevel(examLevel||verified))}</button></div>`:'';
+ const examCta=examLevel?`<div class="level-exam-cta"><div><b>${esc(LEVEL_GUARD_COPY.examTitle)} ${esc(displayLevel(examLevel))}</b><span>${FiezelI18n.t('level.cta-rincian',{jumlah:LEVEL_EXAM_SIZE,grammar:LEVEL_EXAM_BLUEPRINT.grammar,vocab:LEVEL_EXAM_BLUEPRINT.vocab,bacaan:LEVEL_EXAM_BLUEPRINT.reading,lulus:LEVEL_EXAM_PASS})}</span></div><button type="button" class="primary" id="openLevelExam"${examWait>0?' disabled aria-disabled="true"':''}>${examWait>0?FiezelI18n.t('level.tombol-cooldown',{jeda:esc(levelExamCooldownLabel(examWait))}):esc(LEVEL_GUARD_COPY.examStart)}</button></div>`:`<div class="level-exam-cta"><div><b>${FiezelI18n.t('level.badge-c2',{badge:esc(LEVEL_GUARD_COPY.examBadge)})}</b><span>${FiezelI18n.t('level.all-proven')}</span></div></div>`;
+ openModal(`<div class="modal-mark">${FiezelI18n.t('student.level-mark')}</div><h2>${FiezelI18n.t('level.judul-panel')}</h2><p>${FiezelI18n.t('level.penjelasan-panel')}</p><div class="level-picker-grid">${cards}</div>${lockNote}${examCta}<div class="level-source-note">${manual?`${FiezelI18n.t('level.source-manual')}${FiezelI18n.t('level.sumber-manual',{aktif:esc(displayLevel(current)),placement:esc(displayLevel(estimated)),verif:esc(displayLevel(verified))})}${trust.verifiedSource==='placement'?FiezelI18n.t('level.sumber-verif-awal'):''}`:FiezelI18n.t('level.sumber-placement',{placement:esc(displayLevel(estimated)),verif:esc(displayLevel(verified))})+(trust.verifiedSource==='placement'?FiezelI18n.t('level.sumber-verif-awal'):'')}</div><div class="modal-actions">${manual?`<button type="button" id="usePlacementLevel">${FiezelI18n.t('level.pakai-hasil-tes',{level:esc(displayLevel(estimated))})}</button>`:''}<button type="button" class="primary" id="levelPanelClose">${FiezelI18n.t('level.selesai')}</button></div>`);
  /* m025-166: pintu pemilihan level sekarang lewat gerbang keputusan. Level yang belum
     terverifikasi TIDAK langsung aktif - popup gerbang yang memutuskan (ikuti ujian, atau
     nanti aja dan dialihkan ke A1). setActiveLevel() sendiri tidak diubah: ia tetap
@@ -10170,9 +10214,9 @@ function openActiveLevelExamPanel(level){
   if(!LEVELS.includes(target))return showToast(FiezelI18n.t('level.toast-c2',{badge:LEVEL_GUARD_COPY.examBadge}));
   const availability=levelExamAvailability(target,state),entry=levelTrustState(state).exams[target]||{};
   const history=entry.lastAt?`<p class="muted">${FiezelI18n.t('level.exam-last-score',{score:entry.lastScore||0,total:entry.lastTotal||LEVEL_EXAM_SIZE,accuracy:entry.lastAccuracy||0,weakNote:entry.weakSkill?FiezelI18n.t('level.exam-last-weak',{weak:esc(entry.weakSkill)}):''})}</p>`:'';
-  const chain=`<p class="muted">${FiezelI18n.t('level.exam-chain-note',{verified:`<b>${esc(verified)}</b>`,next:`<b>${esc(nextVerifiableLevel(state)||verified)}</b>`})}</p>`;
-  const action=availability.ok?`<button type="button" class="primary" id="levelExamStart">${esc(LEVEL_GUARD_COPY.examStart)} ${esc(target)}</button>`:availability.reason==='cooldown'?`<button type="button" class="primary" disabled aria-disabled="true">${FiezelI18n.t('level.exam-cooldown',{label:esc(levelExamCooldownLabel(availability.waitMs))})}</button>`:`<button type="button" class="primary" disabled aria-disabled="true">${FiezelI18n.t('level.exam-unlock',{next:esc(availability.next||verified)})}</button>`;
-  openModal(`<div class="modal-mark">FIEZEL SKIP LEVEL</div><h2>${esc(LEVEL_GUARD_COPY.examTitle)} ${esc(target)}</h2><p>${esc(LEVEL_GUARD_COPY.examDesc)}</p><ul class="level-exam-facts"><li>${FiezelI18n.t('level.exam-size-note',{size:LEVEL_EXAM_SIZE,grammar:LEVEL_EXAM_BLUEPRINT.grammar,vocab:LEVEL_EXAM_BLUEPRINT.vocab,reading:LEVEL_EXAM_BLUEPRINT.reading})}</li><li>${FiezelI18n.t('level.exam-shuffle',{target:esc(target)})}</li><li>${FiezelI18n.t('level.exam-pass-rule',{threshold:LEVEL_EXAM_PASS,minGrammar:`${LEVEL_EXAM_SECTION_FLOOR.grammar}/${LEVEL_EXAM_BLUEPRINT.grammar}`,minVocab:`${LEVEL_EXAM_SECTION_FLOOR.vocab}/${LEVEL_EXAM_BLUEPRINT.vocab}`,minReading:`${LEVEL_EXAM_SECTION_FLOOR.reading}/${LEVEL_EXAM_BLUEPRINT.reading}`})}</li><li>${FiezelI18n.t('level.exam-time-note',{menit:Math.ceil(LEVEL_EXAM_SIZE/2)})}</li><li>${FiezelI18n.t('level.exam-exit-rule')}</li><li>${FiezelI18n.t('level.exam-fail-rule')}</li></ul>${chain}${history}<div class="modal-actions"><button type="button" id="levelExamCancel">${FiezelI18n.t('level.exam-cancel-btn')}</button>${action}</div>`);
+  const chain=`<p class="muted">${FiezelI18n.t('level.exam-chain-note',{verified:`<b>${esc(displayLevel(verified))}</b>`,next:`<b>${esc(displayLevel(nextVerifiableLevel(state)||verified))}</b>`})}</p>`;
+  const action=availability.ok?`<button type="button" class="primary" id="levelExamStart">${esc(LEVEL_GUARD_COPY.examStart)} ${esc(displayLevel(target))}</button>`:availability.reason==='cooldown'?`<button type="button" class="primary" disabled aria-disabled="true">${FiezelI18n.t('level.exam-cooldown',{label:esc(levelExamCooldownLabel(availability.waitMs))})}</button>`:`<button type="button" class="primary" disabled aria-disabled="true">${FiezelI18n.t('level.exam-unlock',{next:esc(displayLevel(availability.next||verified))})}</button>`;
+  openModal(`<div class="modal-mark">FIEZEL SKIP LEVEL</div><h2>${esc(LEVEL_GUARD_COPY.examTitle)} ${esc(displayLevel(target))}</h2><p>${esc(LEVEL_GUARD_COPY.examDesc)}</p><ul class="level-exam-facts"><li>${FiezelI18n.t('level.exam-size-note',{size:LEVEL_EXAM_SIZE,grammar:LEVEL_EXAM_BLUEPRINT.grammar,vocab:LEVEL_EXAM_BLUEPRINT.vocab,reading:LEVEL_EXAM_BLUEPRINT.reading})}</li><li>${FiezelI18n.t('level.exam-shuffle',{target:esc(displayLevel(target))})}</li><li>${FiezelI18n.t('level.exam-pass-rule',{threshold:LEVEL_EXAM_PASS,minGrammar:`${LEVEL_EXAM_SECTION_FLOOR.grammar}/${LEVEL_EXAM_BLUEPRINT.grammar}`,minVocab:`${LEVEL_EXAM_SECTION_FLOOR.vocab}/${LEVEL_EXAM_BLUEPRINT.vocab}`,minReading:`${LEVEL_EXAM_SECTION_FLOOR.reading}/${LEVEL_EXAM_BLUEPRINT.reading}`})}</li><li>${FiezelI18n.t('level.exam-time-note',{menit:Math.ceil(LEVEL_EXAM_SIZE/2)})}</li><li>${FiezelI18n.t('level.exam-exit-rule')}</li><li>${FiezelI18n.t('level.exam-fail-rule')}</li></ul>${chain}${history}<div class="modal-actions"><button type="button" id="levelExamCancel">${FiezelI18n.t('level.exam-cancel-btn')}</button>${action}</div>`);
   $('levelExamCancel').onclick=closeModal;
   $('levelExamStart')?.addEventListener('click',()=>startLevelExam(target));
   enhanceUI();
@@ -10189,12 +10233,12 @@ function activeLevelTrustMarkup(){
     let ladder='';
     for(let i=0;i<=goalIndex&&i<LEVELS.length;i++){
       const step=LEVELS[i],done=i<=LEVELS.indexOf(verified),open=step===examLevel;
-      ladder+=`<li class="${done?'is-done':open?'is-open':'is-wait'}"><b>${esc(step)}</b><span>${done?esc(LEVEL_GUARD_COPY.examBadge):open?FiezelI18n.t('level.tangga-kebuka'):FiezelI18n.t('level.tangga-menunggu')}</span></li>`;
+      ladder+=`<li class="${done?'is-done':open?'is-open':'is-wait'}"><b>${esc(displayLevel(step))}</b><span>${done?esc(LEVEL_GUARD_COPY.examBadge):open?FiezelI18n.t('level.tangga-kebuka'):FiezelI18n.t('level.tangga-menunggu')}</span></li>`;
     }
-    return `<div class="level-trust-banner is-locked"><div class="level-trust-head"><b>${esc(LEVEL_GUARD_COPY.demotionTitle)}</b><span>${esc(levelTrustCopy(LEVEL_GUARD_COPY.lockedFeature,verified))}</span></div><ol class="level-trust-ladder">${ladder}</ol><div class="level-trust-actions"><button type="button" class="primary" onclick="openActiveLevelExamPanel('${esc(examLevel||verified)}')">${esc(LEVEL_GUARD_COPY.entryExam)} ${esc(examLevel||verified)}</button><button type="button" onclick="openLevelPanel()">${FiezelI18n.t('level.lihat-level')}</button></div></div>`;
+    return `<div class="level-trust-banner is-locked"><div class="level-trust-head"><b>${esc(LEVEL_GUARD_COPY.demotionTitle)}</b><span>${esc(levelTrustCopy(LEVEL_GUARD_COPY.lockedFeature,verified))}</span></div><ol class="level-trust-ladder">${ladder}</ol><div class="level-trust-actions"><button type="button" class="primary" onclick="openActiveLevelExamPanel('${esc(examLevel||verified)}')">${esc(LEVEL_GUARD_COPY.entryExam)} ${esc(displayLevel(examLevel||verified))}</button><button type="button" onclick="openLevelPanel()">${FiezelI18n.t('level.lihat-level')}</button></div></div>`;
   }
   const mistakes=probationMistakes(active);
-  return `<div class="level-trust-banner is-probation"><em class="level-trust-chip">${esc(LEVEL_GUARD_COPY.entryChip)} \u00b7 ${esc(active)}</em><div class="level-trust-head"><b>${esc(LEVEL_GUARD_COPY.probationTitle)}</b><span>${esc(levelTrustCopy(LEVEL_GUARD_COPY.probationBody,verified))}</span></div><p class="level-trust-count">${FiezelI18n.t('level.probation-hitung',{level:esc(active),miss:mistakes,batas:LEVEL_GUARD_WRONG_LIMIT,verif:esc(verified)})}</p><div class="level-trust-actions"><button type="button" class="primary" onclick="openActiveLevelExamPanel('${esc(examLevel||verified)}')">${esc(LEVEL_GUARD_COPY.entryExam)} ${esc(examLevel||verified)}</button><button type="button" onclick="openLevelPanel()">${FiezelI18n.t('level.lihat-level')}</button></div></div>`;
+  return `<div class="level-trust-banner is-probation"><em class="level-trust-chip">${esc(LEVEL_GUARD_COPY.entryChip)} \u00b7 ${esc(displayLevel(active))}</em><div class="level-trust-head"><b>${esc(LEVEL_GUARD_COPY.probationTitle)}</b><span>${esc(levelTrustCopy(LEVEL_GUARD_COPY.probationBody,verified))}</span></div><p class="level-trust-count">${FiezelI18n.t('level.probation-hitung',{level:esc(displayLevel(active)),miss:mistakes,batas:LEVEL_GUARD_WRONG_LIMIT,verif:esc(displayLevel(verified))})}</p><div class="level-trust-actions"><button type="button" class="primary" onclick="openActiveLevelExamPanel('${esc(examLevel||verified)}')">${esc(LEVEL_GUARD_COPY.entryExam)} ${esc(displayLevel(examLevel||verified))}</button><button type="button" onclick="openLevelPanel()">${FiezelI18n.t('level.lihat-level')}</button></div></div>`;
 }
 /* 2026-08-29 overhaul I12 (O6 #5, O1-005): varian SATU BARIS dari activeLevelTrustMarkup khusus
    Home. Banner penuh (200px, dengan tombol primer sendiri) membuat dua CTA primer bersaing di
@@ -10306,10 +10350,12 @@ function latihanCards(){
   cards.push({view:'reading',icon:'reading',label:FiezelI18n.t('skill.reading'),note:FiezelI18n.t('latihan.reading-note')});
   cards.push({view:'writing',icon:'writing',label:FiezelI18n.t('skill.writing'),note:FiezelI18n.t('latihan.writing-note')});
   cards.push({view:'library',icon:'library',label:FiezelI18n.t('home.library-card'),note:FiezelI18n.t('latihan.library-note')});
-  /* Kursus Jepang membuka dengan tabel kana & chokai: pintu masuk belajar & listening JLPT. */
+  /* Kursus Jepang membuka dengan tabel kana, chokai, kanji & moshi: fitur latihan lengkap JLPT. */
   const kanaCard=jaCourseOn()?FiezelJaUi.kanaCardMarkup():'';
   const chokaiCard=jaCourseOn()?FiezelJaUi.chokaiCardMarkup():'';
-  return kanaCard+chokaiCard+cards.map(c=>{
+  const kanjiCard=jaCourseOn()?FiezelJaUi.kanjiCardMarkup():'';
+  const moshiCard=jaCourseOn()?FiezelJaUi.moshiCardMarkup():'';
+  return kanaCard+chokaiCard+kanjiCard+moshiCard+cards.map(c=>{
     const iconSpan = `<span class="launch-icon"><i class="fz-i" data-fz-icon="${esc(c.icon)}" aria-hidden="true"></i></span>`;
     return `<button class="launch-card" onclick="go('${esc(c.view)}')" aria-label="${esc(c.label)}">${iconSpan}<span><small>${esc(c.note)}</small><b>${esc(c.label)}</b></span><i data-lucide="arrow-up-right"></i></button>`;
   }).join('');
@@ -10433,8 +10479,88 @@ function latihan(){
      terbaca DAN tetap bisa diganti dari layar ini - tanpa keping level kedua yang
      mengulang angka yang sama beberapa piksel di sebelahnya. */
   shell(FiezelI18n.t('latihan.judul'),FiezelI18n.t('latihan.lead'),
-    `${jaCourseOn()?FiezelJaUi.togglesMarkup():''}${continueLearningCard()}<div class="learning-launcher">${latihanCards()}</div>${jaCourseOn()?FiezelJaUi.comingSoonMarkup():''}${aiBoosterCard()}`);
+    `${jaCourseOn()?FiezelJaUi.togglesMarkup():''}${continueLearningCard()}<div class="learning-launcher">${latihanCards()}</div>${aiBoosterCard()}`);
 }
+
+function openKanjiPractice(){
+  const level=getActiveLevel();
+  const kanjiPool=V.filter(v=>v.level===level&&/[㐀-䶿一-鿿々]/.test(String(v.word||v.kanji||'')));
+  if(!kanjiPool.length){
+    return showToast(FiezelI18n.t('jepang.kanji-empty'));
+  }
+  const title=FiezelI18n.t('jepang.kanji-modal-title')+' · '+displayLevel(level);
+  const sample=shuffle([...kanjiPool]).slice(0,6);
+  const gridHtml=sample.map(k=>`
+    <div style="padding:8px 10px;background:#FFFFFF;border:1.5px solid #E2E8F0;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;box-shadow:0 2px 0 #CBD5E1;">
+      <span style="font-size:18px;font-weight:800;color:#0F172A;line-height:1.2;white-space:nowrap;" lang="ja">${esc(k.word||k.kanji)}</span>
+      <small style="color:#475569;font-size:11px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;">${esc(k.kana||k.romaji||'')}</small>
+      <span style="font-size:11px;color:#0284C7;font-weight:700;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;">${esc(k.meaning)}</span>
+    </div>
+  `).join('');
+  const markup=`
+    <div class="skill-help-panel">
+      <button type="button" class="modal-close-corner" onclick="closeModal()" aria-label="${FiezelI18n.t('modal.tutup')}"><i data-lucide="x"></i></button>
+      <span class="skill-badge">${esc(displayLevel(level))} · 漢字 ${kanjiPool.length} KANJI</span>
+      <h2>${esc(title)}</h2>
+      <p class="muted">${esc(FiezelI18n.t('jepang.kanji-card-note'))}</p>
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 0;">
+        ${gridHtml}
+      </div>
+      <div class="modal-actions" style="margin-top:10px;display:flex;gap:8px;">
+        <button type="button" class="primary wide" onclick="closeModal();startKanjiQuiz('${esc(level)}')">
+          <i data-lucide="zap"></i> ${esc(FiezelI18n.t('jepang.kanji-start-cta',{jumlah:Math.min(10,kanjiPool.length)}))}
+        </button>
+      </div>
+    </div>
+  `;
+  openModal(markup);
+  enhanceUI();
+}
+window.openKanjiPractice=openKanjiPractice;
+
+function startKanjiQuiz(targetLevel){
+  const level=targetLevel||getActiveLevel();
+  const pool=V.filter(v=>v.level===level&&/[㐀-䶿一-鿿々]/.test(String(v.word||v.kanji||'')));
+  if(!pool.length)return showToast(FiezelI18n.t('jepang.kanji-empty'));
+  const questions=shuffle([...pool]).slice(0,Math.min(10,pool.length)).map(v=>makeVocabQuestion(v));
+  quizLoop({type:'vocab',count:questions.length,pool:questions,factory:x=>x,preserveOrder:false});
+}
+window.startKanjiQuiz=startKanjiQuiz;
+
+function openJlptMoshiPanel(){
+  const level=getActiveLevel();
+  const jlptName=displayLevel(level);
+  const title=FiezelI18n.t('jepang.moshi-modal-title')+' · '+jlptName;
+  const markup=`
+    <div class="skill-help-panel">
+      <button type="button" class="modal-close-corner" onclick="closeModal()" aria-label="${FiezelI18n.t('modal.tutup')}"><i data-lucide="x"></i></button>
+      <span class="skill-badge">${esc(FiezelI18n.t('jepang.moshi-badge',{level:jlptName}))}</span>
+      <h2>${esc(title)}</h2>
+      <p class="muted">${esc(FiezelI18n.t('jepang.moshi-desc'))}</p>
+      <div class="card" style="margin:14px 0;padding:12px;background:var(--card-bg, #ffffff);">
+        <div class="row" style="margin-bottom:6px;"><b>${esc(FiezelI18n.t('jepang.moshi-lbl-level'))}</b><span class="badge" style="font-weight:700;">${esc(jlptName)}</span></div>
+        <div class="row" style="margin-bottom:6px;"><b>${esc(FiezelI18n.t('jepang.moshi-lbl-count'))}</b><span>${esc(FiezelI18n.t('jepang.moshi-val-count'))}</span></div>
+        <div class="row" style="margin-bottom:6px;"><b>${esc(FiezelI18n.t('jepang.moshi-lbl-pass'))}</b><span>${esc(FiezelI18n.t('jepang.moshi-val-pass'))}</span></div>
+        <div class="row"><b>${esc(FiezelI18n.t('jepang.moshi-lbl-mode'))}</b><span>${esc(FiezelI18n.t('jepang.moshi-val-mode'))}</span></div>
+      </div>
+      <div class="modal-actions" style="display:flex;gap:8px;">
+        <button type="button" onclick="closeModal()">${FiezelI18n.t('modal.tutup')}</button>
+        <button type="button" class="primary" onclick="closeModal();startJlptMoshiExam('${esc(level)}')">
+          <i data-lucide="play"></i> ${esc(FiezelI18n.t('jepang.moshi-start-cta'))}
+        </button>
+      </div>
+    </div>
+  `;
+  openModal(markup);
+  enhanceUI();
+}
+window.openJlptMoshiPanel=openJlptMoshiPanel;
+
+function startJlptMoshiExam(targetLevel){
+  const level=targetLevel||getActiveLevel();
+  return startLevelExam(level);
+}
+window.startJlptMoshiExam=startJlptMoshiExam;
 function skillHubMarkup(){
   const model=skillHubModel();
   const cards=model.map(s=>{
@@ -11011,11 +11137,11 @@ function todayHomeMarkup(){
       <div class="fz-stadium-header is-silver fz-stadium-clean-header">
         <div class="fz-stadium-vocab-top">
           <span class="fz-vocab-kicker-tag is-silver-tag">${esc(FiezelI18n.t('home.kartu2-kicker'))}</span>
-          <span class="fz-vocab-level-tag is-silver-tag">${esc(FiezelI18n.t('home.kartu-level', { level: todayLevel }))}</span>
+          <span class="fz-vocab-level-tag is-silver-tag">${esc(FiezelI18n.t('home.kartu-level', { level: displayLevel(todayLevel) }))}</span>
         </div>
         <div class="fz-clean-header-content">
           <div class="fz-clean-header-title">${esc(FiezelI18n.t('home.kartu2-judul'))}</div>
-          <div class="fz-clean-header-sub">${esc(vocabStats.practised ? FiezelI18n.t('home.kartu2-isi', { n: vocabStats.practised, level: todayLevel }) : FiezelI18n.t('home.kartu2-isi-baru', { level: todayLevel }))}</div>
+          <div class="fz-clean-header-sub">${esc(vocabStats.practised ? FiezelI18n.t('home.kartu2-isi', { n: vocabStats.practised, level: displayLevel(todayLevel) }) : FiezelI18n.t('home.kartu2-isi-baru', { level: displayLevel(todayLevel) }))}</div>
         </div>
       </div>
       <div class="fz-stadium-body">
@@ -11043,7 +11169,7 @@ function todayHomeMarkup(){
       <div class="fz-stadium-header is-dark fz-stadium-clean-header">
         <div class="fz-stadium-vocab-top">
           <span class="fz-vocab-kicker-tag is-dark-tag">${esc(FiezelI18n.t('home.kartu3-kicker'))}</span>
-          <span class="fz-vocab-level-tag is-dark-tag">${esc(nextLevel ? `${todayLevel} ➔ ${nextLevel}` : todayLevel)}</span>
+          <span class="fz-vocab-level-tag is-dark-tag">${esc(nextLevel ? `${displayLevel(todayLevel)} ➔ ${displayLevel(nextLevel)}` : displayLevel(todayLevel))}</span>
         </div>
         <div class="fz-clean-header-content">
           <div class="fz-clean-header-title">${esc(FiezelI18n.t('home.kartu3-judul'))}</div>
@@ -11076,7 +11202,7 @@ function todayHomeMarkup(){
       <div class="fz-stitch-card" onclick="go('vocab')">
         <div class="fz-stitch-card-top">
           <div class="fz-stitch-icon is-yellow"><i class="fz-i" data-fz-icon="vocab"></i></div>
-          <span class="fz-stitch-badge is-yellow">${esc(vocabStats.due ? vocabStats.due + ' Ulang' : (todayLevel || 'A1'))}</span>
+          <span class="fz-stitch-badge is-yellow">${esc(vocabStats.due ? vocabStats.due + ' Ulang' : displayLevel(todayLevel || 'A1'))}</span>
         </div>
         <div class="fz-stitch-card-bottom">
           <h3>${esc(FiezelI18n.t('skill.vocab'))}</h3>
@@ -11610,12 +11736,12 @@ window.braincoreClassDigest=braincoreClassDigest;
 function jaChokaiHomeBannerMarkup(){
   if(!jaCourseOn())return '';
   const activeJlpt=FiezelJaUi.jlptLabel(getActiveLevel());
-  return `<div class="card ja-chokai-banner" onclick="openListeningPanel('${esc(activeJlpt)}')" role="button" tabindex="0" aria-label="Chōkai JLPT N5–N1+" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openListeningPanel('${esc(activeJlpt)}');}">
+  return `<div class="card ja-chokai-banner" onclick="openListeningPanel('${esc(activeJlpt)}')" role="button" tabindex="0" aria-label="Chōkai JLPT N5–N1" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openListeningPanel('${esc(activeJlpt)}');}">
     <div class="ja-chokai-banner-left">
       <span class="ja-chokai-banner-icon" aria-hidden="true">${typeof Fiezel3DEmblems!=='undefined'?Fiezel3DEmblems.chokai(44):'🎧'}</span>
       <div>
         <span class="ja-chokai-banner-eyebrow">${esc(t('jepang.chokai-banner-eyebrow'))}</span>
-        <b class="ja-chokai-banner-title">Listening &amp; Chōkai (JLPT N5–N1+)</b>
+        <b class="ja-chokai-banner-title">Listening &amp; Chōkai (JLPT N5–N1)</b>
         <span class="ja-chokai-banner-sub">${esc(t('jepang.chokai-banner-sub'))}</span>
       </div>
     </div>
@@ -11657,7 +11783,7 @@ function home(){pawStreakWatch();/* m028-06: kabar demosi yang tertahan selama k
       <small>${!homeLocked&&state.adaptiveReady?FiezelI18n.t('home.sesi-next'):FiezelI18n.t('home.kata-fiezel')}</small>
       <b>${esc(homeLocked?LEVEL_GUARD_COPY.demotionTitle:state.adaptiveReady?(policy?FiezelI18n.t('home.ringkas-sesi',{skill:policy.targetSkill?friendlySkillName(policy.targetSkill):friendlySkillName(policy.primaryDomain),items:policy.sessionSize,menit:policy.estimatedMinutes}):signal.title):state.placementDone?FiezelI18n.t('home.placement-done-greet'):FiezelI18n.t('home.belum-kenal'))}</b>
     </div>
-    <button class="primary luxe coach-strip-go" onclick="${primaryAction}">${homeLocked?FiezelI18n.t('home.entry-exam-cta',{exam:esc(LEVEL_GUARD_COPY.entryExam),level:esc(homeExamLevel)}):(state.adaptiveReady||state.placementDone)?FiezelI18n.t('home.mulai-sesi'):FiezelI18n.t('home.cari-level')} <i data-lucide="arrow-up-right"></i></button>
+    <button class="primary luxe coach-strip-go" onclick="${primaryAction}">${homeLocked?FiezelI18n.t('home.entry-exam-cta',{exam:esc(LEVEL_GUARD_COPY.entryExam),level:esc(displayLevel(homeExamLevel))}):(state.adaptiveReady||state.placementDone)?FiezelI18n.t('home.mulai-sesi'):FiezelI18n.t('home.cari-level')} <i data-lucide="arrow-up-right"></i></button>
     <button type="button" class="coach-strip-more" onclick="askCoachAI()">${FiezelI18n.t('home.lihat-detail')} <i data-lucide="arrow-right"></i></button>
   </aside>
 </div>
@@ -11671,8 +11797,8 @@ ${skillHubMarkup()}
 ${socialHomeMarkup()}
 <div class="home-section-head"><div><h2>${FiezelI18n.t('home.pilih-fokus')}</h2></div><button class="text-button" onclick="go('progress')">${FiezelI18n.t('home.lihat-peta')} <i data-lucide="arrow-right"></i></button></div>
 <div class="learning-launcher">
-  <button class="launch-card vocab-launch" onclick="go('vocab')"><span class="launch-icon"><i class="fz-i" data-fz-icon="vocab" aria-hidden="true"></i></span><span><small>${FiezelI18n.t('home.kartu-vocab',{jumlah:activeV.length.toLocaleString(),level:esc(activeLevel)})}</small><b>${FiezelI18n.t('student.vocab-title')}</b></span><i data-lucide="arrow-up-right"></i></button>
-  <button class="launch-card grammar-launch" onclick="go('grammar')"><span class="launch-icon"><i class="fz-i" data-fz-icon="grammar" aria-hidden="true"></i></span><span><small>${FiezelI18n.t('home.kartu-grammar',{jumlah:activeGrammar.map(x=>x.skill).filter((x,i,a)=>a.indexOf(x)===i).length,level:esc(activeLevel)})}</small><b>${FiezelI18n.t('student.grammar-title')}</b></span><i data-lucide="arrow-up-right"></i></button>
+  <button class="launch-card vocab-launch" onclick="go('vocab')"><span class="launch-icon"><i class="fz-i" data-fz-icon="vocab" aria-hidden="true"></i></span><span><small>${FiezelI18n.t('home.kartu-vocab',{jumlah:activeV.length.toLocaleString(),level:esc(displayLevel(activeLevel))})}</small><b>${FiezelI18n.t('student.vocab-title')}</b></span><i data-lucide="arrow-up-right"></i></button>
+  <button class="launch-card grammar-launch" onclick="go('grammar')"><span class="launch-icon"><i class="fz-i" data-fz-icon="grammar" aria-hidden="true"></i></span><span><small>${FiezelI18n.t('home.kartu-grammar',{jumlah:activeGrammar.map(x=>x.skill).filter((x,i,a)=>a.indexOf(x)===i).length,level:esc(displayLevel(activeLevel))})}</small><b>${FiezelI18n.t('student.grammar-title')}</b></span><i data-lucide="arrow-up-right"></i></button>
   <!-- 2026-08-29 overhaul I12 (O6 #13): dua kartu duplikat DIHAPUS dari grid ini — kartu
        Reading (go('reading') sudah hidup sebagai skill-card ~400px di atasnya) dan kartu
        Speaking + Listening (go('skills') duplikat skill-card Listening & Speaking). Setiap
@@ -12936,7 +13062,7 @@ function renderClassroom(){
     body=`<article class="classroom-board"><h2>${FiezelI18n.t('kelas.skor',{persen:snap.scorePercent})}</h2><p>${FiezelI18n.t('kelas.skor-rinci',{right:snap.correct,total:snap.questionCount})}</p></article>
     <div class="classroom-actions"><button class="primary" data-restart="1">${FiezelI18n.t('kelas.topik-lain')}</button></div>`;
   }
-  setApp(`<section class="fade classroom-page"><div class="section-head"><div><h1>${FiezelI18n.t('kelas.judul')}</h1><p>${FiezelI18n.t('kelas.sub-judul',{level:esc(getActiveLevel())})}</p></div>${levelControlMarkup()}</div>${body}</section>`);
+  setApp(`<section class="fade classroom-page"><div class="section-head"><div><h1>${FiezelI18n.t('kelas.judul')}</h1><p>${FiezelI18n.t('kelas.sub-judul',{level:esc(displayLevel(getActiveLevel()))})}</p></div>${levelControlMarkup()}</div>${body}</section>`);
   wireClassroom();
 }
 function wireClassroom(){
@@ -12990,7 +13116,7 @@ function skillHelpMarkup(domain){
     +`<h2>${esc(copy.title)}</h2>`
     +`<p>${esc(copy.lead)}</p>`
     +(domain==='listening'?`<p class="muted">${esc(FiezelI18n.t('fsl.script-privacy'))}</p>`:'')
-    +`<div class="skill-level-note">${FiezelI18n.t('skills.catatan-level',{level:esc(getActiveLevel())})}</div>`
+    +`<div class="skill-level-note">${FiezelI18n.t('skills.catatan-level',{level:esc(displayLevel(getActiveLevel()))})}</div>`
     +`<div class="modal-actions"><button type="button" class="primary wide" onclick="closeModal()">${FiezelI18n.t('modal.tutup')}</button></div></div>`;
 }
 function openSkillHelp(domain){const html=skillHelpMarkup(domain);if(html)openModal(html);return !!html}
@@ -13096,23 +13222,23 @@ function writing(){
   /* [FASE 7] Layar buntu tanpa materi — penempatan baru bernilai tertinggi per 12-lesson
      tabel §4 (empty state: HADIR, anchor A, pose menyemangati): kehangatan di tempat yang
      tadinya jalan buntu. Keputusan tetap pra-cat (C3); tanpa komponen, layarnya seperti dulu. */
-  if(!prompt){const pawEmpty=(self.FiezelPawSlot&&typeof self.FiezelPawSlot.plan==='function')?self.FiezelPawSlot.plan('empty-state',{motion:pawMotionAllowed()}):null;setApp(`<section class="fade writing-page">${pawEmpty?pawEmpty.above:''}<div class="section-head"><div><h1>${esc(FiezelI18n.t('skill.writing'))}</h1><p>${FiezelI18n.t('tulis.kosong',{level:esc(getActiveLevel())})}</p></div>${levelControlMarkup()}</div></section>`);if(pawEmpty)try{self.FiezelPawSlot.wire({emit:pawReact,motion:pawMotionAllowed()})}catch(_){}return}
+  if(!prompt){const pawEmpty=(self.FiezelPawSlot&&typeof self.FiezelPawSlot.plan==='function')?self.FiezelPawSlot.plan('empty-state',{motion:pawMotionAllowed()}):null;setApp(`<section class="fade writing-page">${pawEmpty?pawEmpty.above:''}<div class="section-head"><div><h1>${esc(FiezelI18n.t('skill.writing'))}</h1><p>${FiezelI18n.t('tulis.kosong',{level:esc(displayLevel(getActiveLevel()))})}</p></div>${levelControlMarkup()}</div></section>`);if(pawEmpty)try{self.FiezelPawSlot.wire({emit:pawReact,motion:pawMotionAllowed()})}catch(_){}return}
   setApp(`<section class="fade writing-page">
-<div class="skill-page-hero skill-writing"><span class="skill-badge">SKILL INTI TES · ${esc(getActiveLevel())}</span><h1>${esc(FiezelI18n.t('skill.writing'))}</h1><p>${FiezelI18n.t('tulis.lead')}</p>${levelControlMarkup()/* v21 2026-08-29 (01-004): pakai helper bersama — ber-aria-label */}</div>
+<div class="skill-page-hero skill-writing"><span class="skill-badge">${jaCourseOn() ? 'SAKUBUN · ' + esc(displayLevel(getActiveLevel())) : 'SKILL INTI TES · ' + esc(getActiveLevel())}</span><h1>${esc(FiezelI18n.t('skill.writing'))}</h1><p>${FiezelI18n.t('tulis.lead')}</p>${levelControlMarkup()/* v21 2026-08-29 (01-004): pakai helper bersama — ber-aria-label */}</div>
 ${(()=>{/* 2026-08-31: Writing memakai PANGGUNG maskot, bukan cap bundar .quiz-mascot. Dua sebab, keduanya terukur: (1) pawFaceMarkup() membungkus maskot dalam .coach-strip-face yang MEMOTONG badan jadi lingkaran - topi OF-02 yang diminta OWNER untuk sesi Writing akan terpotong di situ; (2) cap itu render 85px, DI BAWAH lantai identitas 88px lapisan outfit (19 SS6.5), jadi topinya tidak akan pernah terpasang sama sekali. Kelas .lesson-stage-paw dipakai ulang apa adanya - resep ukuran yang sama dengan panggung materi Grammar, bukan angka baru. */const siap=(()=>{try{return !!self.FiezelPaw?.ready?.()}catch(_){return false}})();const wajah=siap?`<fiezel-mascot class="writing-mascot"></fiezel-mascot>`:`<span class="fz-i" data-fz-icon="paw"></span>`;return `<div class="writing-stage" aria-hidden="true"><span class="lesson-stage-paw">${wajah}</span></div>`})()}
 <div class="card writing-prompt">
-  <span class="skill-badge">${FiezelI18n.t('tulis.badge-topik',{level:esc(prompt.level),done:done,goal:WRITING_WEEKLY_TARGET})}</span>
+  <span class="skill-badge">${FiezelI18n.t('tulis.badge-topik',{level:esc(displayLevel(prompt.level)),done:done,goal:WRITING_WEEKLY_TARGET})}</span>
   ${exam?`<p class="writing-exam"><b>${esc(exam.label)}</b><span>${FiezelI18n.t('tulis.meta-ujian',{kata:exam.minWords,menit:exam.minutes})}</span><small>${esc(exam.note)}</small></p>`:''}
   <b>${esc(prompt.en)}</b>
   <p class="muted">${esc(prompt.id_hint)}</p>
   ${prompt.focus?`<p class="writing-focus">${FiezelI18n.t('tulis.fokus',{fokus:esc(prompt.focus)})}</p>`:''}
-  <textarea id="writingBox" placeholder="Start writing here…" aria-label="${FiezelI18n.t('tulis.aria-kotak')}">${esc(draft)}</textarea>
+  <textarea id="writingBox" placeholder="${jaCourseOn() ? 'ここに入力してください…' : 'Start writing here…'}" aria-label="${FiezelI18n.t('tulis.aria-kotak')}">${esc(draft)}</textarea>
   <div class="writing-meta"><span id="writingCount">${FiezelI18n.t('tulis.nol-kata')}</span><span>${exam?FiezelI18n.t('tulis.min-kata',{kata:target}):FiezelI18n.t('tulis.target-kata',{kata:target})}</span></div>
   <button class="primary wide" id="writingAsk"><i data-lucide="sparkles"></i> ${FiezelI18n.t('tulis.minta-masukan')}</button>
   <button id="writingSwap">${FiezelI18n.t('tulis.ganti-topik')}</button>
 </div>
 <div id="writingFeedback" class="writing-feedback"></div>
-${criteria.length?`<div class="card writing-rubric"><b>${FiezelI18n.t('tulis.judul-rubrik')}</b><p class="muted">${FiezelI18n.t('tulis.ket-rubrik')}</p><ul>${criteria.map(c=>`<li><b>${esc(c.label)}</b><span>${esc(c.asks)}</span></li>`).join('')}</ul><p class="muted">${esc(WRITING_BANK?.honesty||'')}</p></div>`:''}
+${criteria.length?`<div class="card writing-rubric"><b>${FiezelI18n.t('tulis.judul-rubrik')}</b><p class="muted">${FiezelI18n.t(jaCourseOn()?'kursus-ja.writing.rubrik-intro':'tulis.ket-rubrik')}</p><ul>${criteria.map(c=>`<li><b>${esc(c.label)}</b><span>${esc(c.asks)}</span></li>`).join('')}</ul><p class="muted">${esc(jaCourseOn()?FiezelI18n.t('kursus-ja.writing.rubrik-meta'):(WRITING_BANK?.honesty||''))}</p></div>`:''}
 </section>`);
   const box=$('writingBox'),counter=$('writingCount');
   const sync=()=>{const n=countWords(box.value);counter.textContent=FiezelI18n.t('tulis.n-kata',{jumlah:n});counter.classList.toggle('is-hit',n>=target)};
@@ -13442,7 +13568,7 @@ async function startAdaptive(){if(!state.adaptiveReady){if(!state.placementDone)
     Satu kalimat ajakan via toast - bukan layar baru. Guarded: tanpa modul, tidak ada apa-apa. */
  // D5 T5: dulu toast 2,6 dtk yang bertanya tanpa bisa dijawab; kini popup pilihan tujuan.
  try{const plan=srlSessionPlan(policy,count);srlSessionSync();const gp=plan?.goalPrompt;if(gp?.ask)setTimeout(()=>{try{srlGoalPopShow(gp)}catch{}},1200)}catch{}}
-function vocab(){try{self.FiezelLazy?.load?.('voice')}catch(_){}const level=getActiveLevel(),active=V.filter(v=>v.level===level),mastered=Object.entries(state.vocab||{}).filter(([id,x])=>x?.mastery>=80&&V.find(v=>v.id===id)?.level===level).length,due=active.filter(v=>state.vocab?.[v.id]?.nextReview&&state.vocab[v.id].nextReview<=Date.now()).length,pct=active.length?Math.round((mastered/active.length)*100):0;setApp(`<section class="fade vocab-hub-page"><div class="vocab-hero-card"><div class="vocab-hero-top"><span class="vocab-level-chip">${esc(level)} · ${esc(levelDescriptor(level))}</span><span class="vocab-count-badge">${FiezelI18n.t('vocab.n-kata',{jumlah:active.length})}</span></div><div class="vocab-progress-track" aria-hidden="true"><div class="vocab-progress-fill" style="width:${pct}%"></div></div><p class="vocab-hero-desc"><b>${mastered}</b> / <b>${active.length}</b> (${pct}%).</p>${active.length?`<button type="button" class="vocab-main-flashcard-btn" onclick="flashcards('${esc(level)}')"><span class="vmf-left"><span class="vmf-icon">🃏</span><span class="vmf-text"><strong>${t('vocab.buka-flashcards','Buka flashcards')}</strong><small>Hafal mandiri dengan kartu interaktif</small></span></span><span class="vmf-arrow">→</span></button>`:`<p class="muted">${t('vocab.kosong','Belum tersedia untuk level ini.')}</p>`}</div><div class="vocab-quick-grid"><button type="button" class="vocab-quick-btn" onclick="startVocabQuiz()"><span class="vq-icon">⚡</span><span class="vq-text"><strong>${t('student.vocab-title','Kosakata')} Test</strong><small>Kuis interaktif</small></span></button><button type="button" class="vocab-quick-btn" onclick="reviewVocab()"><span class="vq-icon">🔄</span><span class="vq-text"><strong>Review Due (${due})</strong><small>Segarkan ingatan SRS</small></span></button></div></section>`);enhanceUI()}
+function vocab(){try{self.FiezelLazy?.load?.('voice')}catch(_){}const level=getActiveLevel(),active=V.filter(v=>v.level===level),mastered=Object.entries(state.vocab||{}).filter(([id,x])=>x?.mastery>=80&&V.find(v=>v.id===id)?.level===level).length,due=active.filter(v=>state.vocab?.[v.id]?.nextReview&&state.vocab[v.id].nextReview<=Date.now()).length,pct=active.length?Math.round((mastered/active.length)*100):0;setApp(`<section class="fade vocab-hub-page"><div class="vocab-hero-card"><div class="vocab-hero-top"><span class="vocab-level-chip">${esc(displayLevel(level))} · ${esc(levelDescriptor(level))}</span><span class="vocab-count-badge">${FiezelI18n.t('vocab.n-kata',{jumlah:active.length})}</span></div><div class="vocab-progress-track" aria-hidden="true"><div class="vocab-progress-fill" style="width:${pct}%"></div></div><p class="vocab-hero-desc"><b>${mastered}</b> / <b>${active.length}</b> (${pct}%).</p>${active.length?`<button type="button" class="vocab-main-flashcard-btn" onclick="flashcards('${esc(level)}')"><span class="vmf-left"><span class="vmf-icon">🃏</span><span class="vmf-text"><strong>${t('vocab.buka-flashcards','Buka flashcards')}</strong><small>Hafal mandiri dengan kartu interaktif</small></span></span><span class="vmf-arrow">→</span></button>`:`<p class="muted">${t('vocab.kosong','Belum tersedia untuk level ini.')}</p>`}</div><div class="vocab-quick-grid"><button type="button" class="vocab-quick-btn" onclick="startVocabQuiz()"><span class="vq-icon">⚡</span><span class="vq-text"><strong>${t('student.vocab-title','Kosakata')} Test</strong><small>Kuis interaktif</small></span></button><button type="button" class="vocab-quick-btn" onclick="reviewVocab()"><span class="vq-icon">🔄</span><span class="vq-text"><strong>Review Due (${due})</strong><small>Segarkan ingatan SRS</small></span></button></div></section>`);enhanceUI()}
 // m025-96 jalur suara materi pelajaran: Reading, Vocabulary, Grammar.
 //
 // Semuanya lewat pintu bersama, jadi tiap kalimat Inggris otomatis membawa subtitle
@@ -13986,14 +14112,14 @@ function grammar(){const level=getActiveLevel(),entries=grammarItemsForLevel(lev
   // dari simpul pertama. Panelnya panel ujian yang sudah ada (openActiveLevelExamPanel).
   const examStep=`<li class="path-step path-step-exam ${examEntry?.passed?'is-mastered':'is-available'}"><button class="path-node path-node-exam" onclick="openActiveLevelExamPanel()" aria-label="${FiezelI18n.t('grammar.ujian-skip-level',{level:examEntry?.passed?FiezelI18n.t('level.ujian-sudah-lulus'):FiezelI18n.t('level.skip-endpoint')})}"><span class="path-ring path-ring-gold">${examEntry?.passed?'<i data-lucide="check"></i>':'<i data-lucide="award"></i>'}</span></button><div class="path-label"><b>${FiezelI18n.t('level.ujian-judul')}</b><span>${examEntry?.passed?FiezelI18n.t('level.skip-passed'):FiezelI18n.t('level.skip-endpoint')}</span></div></li>`;
   // Tampilan daftar (aksesibilitas P1-1): kartu berurutan yang lama, data & penguncian sama.
-  const listBody=`<div class="grid grammar-grid">${rows.map(r=>card(`<div class="row"><b>${r.index+1}. ${esc(r.title)}</b><span>${esc(level)}</span></div><p class="muted">${FiezelI18n.t('grammar.fokus',{prerequisites:esc(r.prerequisites),family:esc(r.family)})}</p>${r.unlock.locked?`<p class="lesson-lock-note"><i data-lucide="lock"></i><span>${esc(lessonLockMessage(r.unlock))}</span></p>`:''}<div class="lesson-card-foot"><span>${FiezelI18n.t('grammar.mastery',{mastery:r.mastery})}</span>${!r.completed&&!r.examVerified?`<button type="button" class="lesson-skip-link" onclick="openLessonSkipGate('${esc(r.k)}')"><i data-lucide="fast-forward"></i> ${FiezelI18n.t('grammar.lewati-materi-2')}</button>`:''}${r.unlock.locked?`<button disabled aria-disabled="true" title="${esc(lessonLockMessage(r.unlock))}">${FiezelI18n.t('grammar.terkunci-2')} <i data-lucide="lock"></i></button>`:`<button onclick="openGrammarLesson('${esc(r.k)}')">${FiezelI18n.t('grammar.buka-lesson')} <i data-lucide="arrow-right"></i></button>`}</div>`,r.unlock.locked?'lesson-locked':'')).join('')}</div>`;
-  const pathBody=FiezelI18n.t('grammar.ol-class-lesson-path-aria',{level:esc(level),pathSteps:pathSteps,examStep:examStep});
+  const listBody=`<div class="grid grammar-grid">${rows.map(r=>card(`<div class="row"><b>${r.index+1}. ${esc(r.title)}</b><span>${esc(displayLevel(level))}</span></div><p class="muted">${FiezelI18n.t('grammar.fokus',{prerequisites:esc(r.prerequisites),family:esc(r.family)})}</p>${r.unlock.locked?`<p class="lesson-lock-note"><i data-lucide="lock"></i><span>${esc(lessonLockMessage(r.unlock))}</span></p>`:''}<div class="lesson-card-foot"><span>${FiezelI18n.t('grammar.mastery',{mastery:r.mastery})}</span>${!r.completed&&!r.examVerified?`<button type="button" class="lesson-skip-link" onclick="openLessonSkipGate('${esc(r.k)}')"><i data-lucide="fast-forward"></i> ${FiezelI18n.t('grammar.lewati-materi-2')}</button>`:''}${r.unlock.locked?`<button disabled aria-disabled="true" title="${esc(lessonLockMessage(r.unlock))}">${FiezelI18n.t('grammar.terkunci-2')} <i data-lucide="lock"></i></button>`:`<button onclick="openGrammarLesson('${esc(r.k)}')">${FiezelI18n.t('grammar.buka-lesson')} <i data-lucide="arrow-right"></i></button>`}</div>`,r.unlock.locked?'lesson-locked':'')).join('')}</div>`;
+  const pathBody=FiezelI18n.t('grammar.ol-class-lesson-path-aria',{level:esc(displayLevel(level)),pathSteps:pathSteps,examStep:examStep});
   // R2-1: node emas Ujian Skip Level duduk di UJUNG jalur — tak terlihat tanpa scroll
   // panjang. Chip lengket di puncak hub memanggil panel ujian yang SAMA, node ujungnya tetap.
-  const examChip=`<button type="button" class="exam-entry-chip${examEntry?.passed?' is-passed':''}" onclick="openActiveLevelExamPanel()" aria-label="${FiezelI18n.t('grammar.ujian-skip-level-level',{level:esc(level),ujian:examEntry?.passed?FiezelI18n.t('level.ujian-sudah-lulus'):FiezelI18n.t('level.ujian-buka-panel')})}"><i data-lucide="${examEntry?.passed?'badge-check':'award'}"></i><span><b>${FiezelI18n.t('level.ujian-judul')}</b><small>${examEntry?.passed?FiezelI18n.t('level.ujian-lulus-terverifikasi'):FiezelI18n.t('level.ujian-merasa-bisa')}</small></span><i data-lucide="arrow-right"></i></button>`;
+  const examChip=`<button type="button" class="exam-entry-chip${examEntry?.passed?' is-passed':''}" onclick="openActiveLevelExamPanel()" aria-label="${FiezelI18n.t('grammar.ujian-skip-level-level',{level:esc(displayLevel(level)),ujian:examEntry?.passed?FiezelI18n.t('level.ujian-sudah-lulus'):FiezelI18n.t('level.ujian-buka-panel')})}"><i data-lucide="${examEntry?.passed?'badge-check':'award'}"></i><span><b>${FiezelI18n.t('level.ujian-judul')}</b><small>${examEntry?.passed?FiezelI18n.t('level.ujian-lulus-terverifikasi'):FiezelI18n.t('level.ujian-merasa-bisa')}</small></span><i data-lucide="arrow-right"></i></button>`;
   const mistakeVaultCard=(self.FiezelGrammarUpgrade&&typeof self.FiezelGrammarUpgrade.renderVaultCard==='function')?self.FiezelGrammarUpgrade.renderVaultCard():'';
   const intensitySelector=(self.FiezelGrammarVocabBridge&&typeof self.FiezelGrammarVocabBridge.renderIntensitySelector==='function')?self.FiezelGrammarVocabBridge.renderIntensitySelector():'';
-  shell(FiezelI18n.t('student.grammar-title'),FiezelI18n.t('grammar.lesson-terurut-for-level-start',{jumlahLesson:skills.length,level:level}),`<div class="grammar-level-note fz2-path-summary"><span class="fz2-path-ring" style="--p:${skills.length?Math.round(rows.filter(r=>r.completed||r.examVerified).length/skills.length*100):0}" aria-hidden="true"><span class="fz2-path-ring-count">${rows.filter(r=>r.completed||r.examVerified).length}/${skills.length}</span></span><div><b>${FiezelI18n.t('grammar.jalur',{level:esc(level)})}</b><span>${esc(levelDescriptor(level))}</span><small>${FiezelI18n.t('grammar.item-pilihan-boleh-bervariasi-tetapi')}</small></div></div>${braincoreGrammarFocusLine()}<div class="grammar-hub-tools">${examChip}<div class="path-view-toggle"><button type="button" data-testid="grammar-quick-session-btn" onclick="startGrammarQuickSession()"><i data-lucide="zap"></i> ${FiezelI18n.t('grammar.sesi-kilat')}</button></div><div class="path-view-toggle" style="display:none"><button type="button" data-testid="grammar-token-rail-btn" onclick="startTokenOrderSession()"><i data-lucide="shuffle"></i> ${FiezelI18n.t('grammar.susun-kata','Susun Kata')}</button></div><div class="path-view-toggle"><button type="button" onclick="toggleGrammarHubView()" aria-pressed="${grammarHubListView}"><i data-lucide="${grammarHubListView?'route':'list'}"></i> ${grammarHubListView?FiezelI18n.t('level.toggle-path-view'):FiezelI18n.t('level.toggle-list-view')}</button></div></div>${intensitySelector}${mistakeVaultCard?`<div class="grammar-vault-wrap" style="margin:10px 0">${mistakeVaultCard}</div>`:''}${grammarHubListView?listBody:pathBody}`);
+  shell(FiezelI18n.t('student.grammar-title'),FiezelI18n.t('grammar.lesson-terurut-for-level-start',{jumlahLesson:skills.length,level:displayLevel(level)}),`<div class="grammar-level-note fz2-path-summary"><span class="fz2-path-ring" style="--p:${skills.length?Math.round(rows.filter(r=>r.completed||r.examVerified).length/skills.length*100):0}" aria-hidden="true"><span class="fz2-path-ring-count">${rows.filter(r=>r.completed||r.examVerified).length}/${skills.length}</span></span><div><b>${FiezelI18n.t('grammar.jalur',{level:esc(displayLevel(level))})}</b><span>${esc(levelDescriptor(level))}</span><small>${FiezelI18n.t('grammar.item-pilihan-boleh-bervariasi-tetapi')}</small></div></div>${braincoreGrammarFocusLine()}<div class="grammar-hub-tools">${examChip}<div class="path-view-toggle"><button type="button" data-testid="grammar-quick-session-btn" onclick="startGrammarQuickSession()"><i data-lucide="zap"></i> ${FiezelI18n.t('grammar.sesi-kilat')}</button></div><div class="path-view-toggle" style="display:none"><button type="button" data-testid="grammar-token-rail-btn" onclick="startTokenOrderSession()"><i data-lucide="shuffle"></i> ${FiezelI18n.t('grammar.susun-kata','Susun Kata')}</button></div><div class="path-view-toggle"><button type="button" onclick="toggleGrammarHubView()" aria-pressed="${grammarHubListView}"><i data-lucide="${grammarHubListView?'route':'list'}"></i> ${grammarHubListView?FiezelI18n.t('level.toggle-path-view'):FiezelI18n.t('level.toggle-list-view')}</button></div></div>${intensitySelector}${mistakeVaultCard?`<div class="grammar-vault-wrap" style="margin:10px 0">${mistakeVaultCard}</div>`:''}${grammarHubListView?listBody:pathBody}`);
   // Auto-scroll ke node aktif — sesudah renderInner mengembalikan scroll ke atas.
   // Reduced-motion: lompat tanpa animasi (behavior 'auto'), bukan tanpa fungsi.
   if(!grammarHubListView&&current)setTimeout(()=>{try{document.querySelector('.path-step.is-current')?.scrollIntoView({block:'center',behavior:(prefersReducedMotion()||state.preferences?.motion===false)?'auto':'smooth'})}catch(_){}},140);
@@ -14007,7 +14133,7 @@ function grammar(){const level=getActiveLevel(),entries=grammarItemsForLevel(lev
   pawPathWatch={level,done:pawPathDone};
   if(self.FiezelGrammarVocabBridge&&typeof self.FiezelGrammarVocabBridge.checkFirstTimeIntensity==='function'){self.FiezelGrammarVocabBridge.checkFirstTimeIntensity(state);}
 }
-function openGrammarLesson(skill){const meta=GRAMMAR_ITEMS.find(x=>x.skill===skill);if(!meta||meta.level!==getActiveLevel())return showToast(FiezelI18n.t('grammar.lesson-hanya-tersedia-pada-level',{level:getActiveLevel()}));const unlock=lessonUnlockState(skill,state,bktMasteredSkills());if(unlock.locked)return showToast(lessonLockMessage(unlock));if(!(G[skill]||[]).length)return showToast(FiezelI18n.t('grammar.lesson-belum-memiliki-materi'));enterStage('grammar-lesson',()=>practiceSkill(skill));practiceSkill(skill)}
+function openGrammarLesson(skill){const meta=GRAMMAR_ITEMS.find(x=>x.skill===skill);if(!meta||meta.level!==getActiveLevel())return showToast(FiezelI18n.t('grammar.lesson-hanya-tersedia-pada-level',{level:displayLevel(getActiveLevel())}));const unlock=lessonUnlockState(skill,state,bktMasteredSkills());if(unlock.locked)return showToast(lessonLockMessage(unlock));if(!(G[skill]||[]).length)return showToast(FiezelI18n.t('grammar.lesson-belum-memiliki-materi'));enterStage('grammar-lesson',()=>practiceSkill(skill));practiceSkill(skill)}
 /* Panel "?" layar materi Grammar. Pola yang sama dengan openSkillHelp() di Skills Lab,
    dengan satu perbedaan yang penting: ia MEMBAWA SERTA levelControlMarkup(). Keterangan
    boleh dilipat, tetapi KONTROL tidak boleh hilang - "Level belajar / Ganti" adalah satu-
@@ -14023,16 +14149,16 @@ function grammarLessonHelpMarkup(skill){
   return `<div class="skill-help-panel"><button type="button" class="modal-close-corner" onclick="closeModal()" aria-label="${FiezelI18n.t('modal.tutup')}"><i data-lucide="x"></i></button><span class="skill-badge">${FiezelI18n.t('grammar.pahami-dulu-urutan',{sequence:meta.sequence||'-'})}</span>`
     +`<h2>${esc(friendlySkillName(skill))}</h2>`
     +`<p class="muted">${esc(prereq)}</p>`
-    +`<p class="muted">${esc(FiezelI18n.t('grammar.urutan-mode-practice',{level:meta.level,sequence:meta.sequence||'-',fondasi:curriculum.unit||'fondasi',jumlahSoal:grammarLessonSessionTarget(skill)}))}</p>`
+    +`<p class="muted">${esc(FiezelI18n.t('grammar.urutan-mode-practice',{level:displayLevel(meta.level),sequence:meta.sequence||'-',fondasi:curriculum.unit||'fondasi',jumlahSoal:grammarLessonSessionTarget(skill)}))}</p>`
     +`<div class="skill-help-level">${levelControlMarkup()}</div>`
     +`<div class="modal-actions"><button type="button" class="primary wide" onclick="closeModal()">${FiezelI18n.t('modal.tutup')}</button></div></div>`;
 }
 function openGrammarLessonHelp(skill){const html=grammarLessonHelpMarkup(skill);if(html)openModal(html);return !!html}
 window.openGrammarLessonHelp=openGrammarLessonHelp;
-function renderGrammarLesson(skill){const meta=GRAMMAR_ITEMS.find(x=>x.skill===skill);if(!meta||meta.level!==getActiveLevel())return showToast(FiezelI18n.t('grammar.lesson-hanya-tersedia-pada-level',{level:getActiveLevel()}));const lessonUnlock=lessonUnlockState(skill,state,bktMasteredSkills());if(lessonUnlock.locked)return showToast(lessonLockMessage(lessonUnlock));const arr=G[skill]||[];if(!arr.length)return showToast(FiezelI18n.t('grammar.lesson-belum-memiliki-materi'));const item=arr[0],base=item[0],opts=item[1]||[],correct=opts[item[2]],rule=grammarLessonRule(item),clue=grammarClue(base,item),curriculum=grammarCurriculumEntry(skill)||meta;const prereq=Array.isArray(curriculum.prerequisites)&&curriculum.prerequisites.length?FiezelI18n.t('grammar.prasyarat-2',{join:curriculum.prerequisites.map(friendlySkillName).join(', ')}):FiezelI18n.t('grammar.lesson-fondasi-pertama');const lessonPawReady=(()=>{try{return !!self.FiezelPaw?.ready?.()}catch(_){return false}})();
+function renderGrammarLesson(skill){const meta=GRAMMAR_ITEMS.find(x=>x.skill===skill);if(!meta||meta.level!==getActiveLevel())return showToast(FiezelI18n.t('grammar.lesson-hanya-tersedia-pada-level',{level:displayLevel(getActiveLevel())}));const lessonUnlock=lessonUnlockState(skill,state,bktMasteredSkills());if(lessonUnlock.locked)return showToast(lessonLockMessage(lessonUnlock));const arr=G[skill]||[];if(!arr.length)return showToast(FiezelI18n.t('grammar.lesson-belum-memiliki-materi'));const item=arr[0],base=item[0],opts=item[1]||[],correct=opts[item[2]],rule=grammarLessonRule(item),clue=grammarClue(base,item),curriculum=grammarCurriculumEntry(skill)||meta;const prereq=Array.isArray(curriculum.prerequisites)&&curriculum.prerequisites.length?FiezelI18n.t('grammar.prasyarat-2',{join:curriculum.prerequisites.map(friendlySkillName).join(', ')}):FiezelI18n.t('grammar.lesson-fondasi-pertama');const lessonPawReady=(()=>{try{return !!self.FiezelPaw?.ready?.()}catch(_){return false}})();
   const lessonFace=lessonPawReady?'<fiezel-mascot class="lesson-mascot"></fiezel-mascot>':'<span class="fz-i" data-fz-icon="paw"></span>';
   const lessonPaw=`<div class="lesson-stage" aria-hidden="true"><span class="lesson-stage-paw">${lessonFace}</span><span class="lesson-bubble"><b>${esc(friendlySkillName(skill))}</b></span></div>`;
-  setApp(`<section class="fade grammar-lesson-page"><div class="skill-page-topbar"><button type="button" class="skill-back-btn" onclick="exitStage()"><i data-lucide="arrow-left"></i> <span>${FiezelI18n.t('grammar.kembali-grammar-hub')}</span></button><button type="button" class="skill-help-dot" onclick="openGrammarLessonHelp('${esc(skill)}')" aria-label="${esc(FiezelI18n.t('skills.bantuan'))}" title="${esc(FiezelI18n.t('skills.bantuan'))}"><span aria-hidden="true">?</span></button></div>${card(`<div class="grammar-start-hero"><span class="grammar-hero-badge">${esc(FiezelI18n.t('skill.grammar','TATA BAHASA').toUpperCase())} · ${esc(getActiveLevel())}</span><h2>${esc(friendlySkillName(skill))}</h2><p class="grammar-brief-rule">${formatRuleForDisplay(esc(rule))}</p>${(()=>{const kalimat=String(base||'');if(correct&&/_{2,}|\[\.\.\.\]/.test(kalimat)){const [kiri,kanan]=kalimat.split(/_{2,}|\[\.\.\.\]/);return `<p class="grammar-brief-example"><span>${esc(FiezelI18n.t('grammar.contoh-singkat','Contoh:'))}</span> ${esc(kiri)}<b>${esc(correct)}</b>${esc(kanan||'')}</p>`}if(kalimat){return `<p class="grammar-brief-example"><span>${esc(FiezelI18n.t('grammar.contoh-singkat','Contoh:'))}</span> ${esc(kalimat)}</p>`}return ''})()}<button onclick="practiceSkill('${esc(skill)}')" class="primary grammar-start-direct-btn">${FiezelI18n.t('grammar.start-item',{jumlahSoal:grammarLessonSessionTarget(skill)})} <i data-lucide="arrow-right"></i></button></div>`,'grammar-lesson-card')}</section>`);
+  setApp(`<section class="fade grammar-lesson-page"><div class="skill-page-topbar"><button type="button" class="skill-back-btn" onclick="exitStage()"><i data-lucide="arrow-left"></i> <span>${FiezelI18n.t('grammar.kembali-grammar-hub')}</span></button><button type="button" class="skill-help-dot" onclick="openGrammarLessonHelp('${esc(skill)}')" aria-label="${esc(FiezelI18n.t('skills.bantuan'))}" title="${esc(FiezelI18n.t('skills.bantuan'))}"><span aria-hidden="true">?</span></button></div>${card(`<div class="grammar-start-hero"><span class="grammar-hero-badge">${esc(FiezelI18n.t('skill.grammar','TATA BAHASA').toUpperCase())} · ${esc(displayLevel(getActiveLevel()))}</span><h2>${esc(friendlySkillName(skill))}</h2><p class="grammar-brief-rule">${formatRuleForDisplay(esc(rule))}</p>${(()=>{const kalimat=String(base||'');if(correct&&/_{2,}|\[\.\.\.\]/.test(kalimat)){const [kiri,kanan]=kalimat.split(/_{2,}|\[\.\.\.\]/);return `<p class="grammar-brief-example"><span>${esc(FiezelI18n.t('grammar.contoh-singkat','Contoh:'))}</span> ${esc(kiri)}<b>${esc(correct)}</b>${esc(kanan||'')}</p>`}if(kalimat){return `<p class="grammar-brief-example"><span>${esc(FiezelI18n.t('grammar.contoh-singkat','Contoh:'))}</span> ${esc(kalimat)}</p>`}return ''})()}<button onclick="practiceSkill('${esc(skill)}')" class="primary grammar-start-direct-btn">${FiezelI18n.t('grammar.start-item',{jumlahSoal:grammarLessonSessionTarget(skill)})} <i data-lucide="arrow-right"></i></button></div>`,'grammar-lesson-card')}</section>`);
   enhanceUI()}
 /* m025-375: SESI LESSON = GRAMMAR_LESSON_MODES, bergilir antar-templat.
  * Pengganti seleksi mode-coverage-first (m025-155) yang wajib mengisi ke-25 mode. Putaran k
@@ -14413,7 +14539,7 @@ function buildGrammarSessionQuestions(skill,count=GRAMMAR_SESSION_SIZE){
   }
   return ensureConstructiveOpeningQuestion(weaveGrammarSessionVariety(out.slice(0,count),skill,meta.level,ownTemplates,reviewSkills));
 }
-function practiceSkill(skill){if((GRAMMAR_ITEMS.find(x=>x.skill===skill)?.level||'')!==getActiveLevel())return showToast(FiezelI18n.t('grammar.pilih-lesson-terlebih-dahulu',{level:getActiveLevel()}));const unlock=lessonUnlockState(skill,state,bktMasteredSkills());if(unlock.locked)return showToast(lessonLockMessage(unlock));const sessionCount=(typeof FiezelGrammarVocabBridge!=='undefined'&&FiezelGrammarVocabBridge.getIntensityGrammarCount)?FiezelGrammarVocabBridge.getIntensityGrammarCount(undefined,state):GRAMMAR_SESSION_SIZE;const questions=buildGrammarSessionQuestions(skill,sessionCount);if(questions.length<GRAMMAR_SESSION_MIN)return showToast(FiezelI18n.t('grammar.lesson-new-memiliki-item-valid',{jumlahSoal:questions.length}));quizLoop({type:'grammar',count:Math.min(GRAMMAR_SESSION_SIZE,questions.length),pool:questions,factory:item=>item,preserveOrder:true})}
+function practiceSkill(skill){if((GRAMMAR_ITEMS.find(x=>x.skill===skill)?.level||'')!==getActiveLevel())return showToast(FiezelI18n.t('grammar.pilih-lesson-terlebih-dahulu',{level:displayLevel(getActiveLevel())}));const unlock=lessonUnlockState(skill,state,bktMasteredSkills());if(unlock.locked)return showToast(lessonLockMessage(unlock));const sessionCount=(typeof FiezelGrammarVocabBridge!=='undefined'&&FiezelGrammarVocabBridge.getIntensityGrammarCount)?FiezelGrammarVocabBridge.getIntensityGrammarCount(undefined,state):GRAMMAR_SESSION_SIZE;const questions=buildGrammarSessionQuestions(skill,sessionCount);if(questions.length<GRAMMAR_SESSION_MIN)return showToast(FiezelI18n.t('grammar.lesson-new-memiliki-item-valid',{jumlahSoal:questions.length}));quizLoop({type:'grammar',count:Math.min(GRAMMAR_SESSION_SIZE,questions.length),pool:questions,factory:item=>item,preserveOrder:true})}
 /* ---- Sesi Kilat: 20 soal grammar campuran lintas lesson satu level ----------------------
  * Latihan singkat harian. Hanya lesson yang sudah terbuka di level aktif; soal dirotasi antar
  * lesson (satu per lesson per putaran) dan dibatasi ke mode BENTUK (apply/complete/repair)
@@ -14459,7 +14585,7 @@ function buildGrammarQuickQuestions(level=getActiveLevel(),count=GRAMMAR_QUICK_S
 function startGrammarQuickSession(){
   const level=getActiveLevel(),questions=buildGrammarQuickQuestions(level);
   // Level yang baru dibuka cuma punya satu lesson: sesi tetap jalan dengan 5 soal bentuk, bukan ditolak.
-  if(questions.length<GRAMMAR_QUICK_MODES.size)return showToast(FiezelI18n.t('grammar.sesi-kilat-belum-cukup',{level,jumlahSoal:questions.length}));
+  if(questions.length<GRAMMAR_QUICK_MODES.size)return showToast(FiezelI18n.t('grammar.sesi-kilat-belum-cukup',{level:displayLevel(level),jumlahSoal:questions.length}));
   quizLoop({type:'grammar',count:Math.min(GRAMMAR_QUICK_SIZE,questions.length),pool:questions,factory:x=>x,preserveOrder:true});
 }
 window.startGrammarQuickSession=startGrammarQuickSession;
@@ -14539,7 +14665,7 @@ function lessonSkipGateCooldownRemaining(skill,now=Date.now()){
 }
 function openLessonSkipGate(skill){
   const meta=GRAMMAR_ITEMS.find(x=>x.skill===skill);
-  if(!meta||meta.level!==getActiveLevel())return showToast(FiezelI18n.t('grammar.lesson-hanya-tersedia-pada-level',{level:getActiveLevel()}));
+  if(!meta||meta.level!==getActiveLevel())return showToast(FiezelI18n.t('grammar.lesson-hanya-tersedia-pada-level',{level:displayLevel(getActiveLevel())}));
   const mastery=state.grammar[skill]?.mastery||0,title=friendlySkillName(skill);
   if(mastery>=GRAMMAR_UNLOCK_MASTERY)return showToast(FiezelI18n.t('grammar.materi-done-finish-tidak-ada'));
   const gateWait=lessonSkipGateCooldownRemaining(skill);
@@ -14838,14 +14964,14 @@ function reading(){const level=getActiveLevel(),active=R.filter(r=>r.level===lev
   pintu ujian per skill lainnya (OWNER: "Ujian per skill ... SEMBUNYIKAN"). Bank
   soalnya (reading-exam-v1.json), startReadingExam(), dan seluruh mesin penilaiannya
   tetap utuh dan tetap dijaga tests/reading-exam-test.js - yang mati hanya pintunya. */
-  const examMarkup=(uxOn('skillExams')&&readingExamSets().length)?`<div class="card reading-exam"><div class="row"><b>${FiezelI18n.t('reading.practice-berformat-ujian')}</b><span>${FiezelI18n.t('reading.set-untuk',{length:examSets.length,level:esc(level)})}</span></div>${examSets.length?examSets.map(set=>{const f=readingExamFormat(set);return `<div class="reading-exam-set"><b>${esc(set.title)}</b><span>${FiezelI18n.t('reading.kata-item-menit',{label:esc(f?.label||''),wordCount:set.wordCount,jumlahSoal:set.questions.length,minutesPerPassage:f?.minutesPerPassage||'-'})}</span><small>${esc(f?.note||'')}</small><button onclick="startReadingExam('${esc(set.id)}')">${FiezelI18n.t('reading.mulai-set')} <i data-lucide="arrow-right"></i></button></div>`}).join(''):`<p class="muted">${FiezelI18n.t('reading.belum-ada-set-berformat-ujian',{level:esc(level),join:esc(examLevels.join(', ')||'-')})}</p>`}<p class="muted">${esc(READING_EXAM?.honesty||'')}</p></div>`:'';shell(FiezelI18n.t('reading.ruang-reading'),FiezelI18n.t('reading.bacaan-item-for-level',{length:active.length,total:total,level:level}),`<div class="level-scope-note"><b>${esc(level)}</b> · ${esc(levelDescriptor(level))}<span>${FiezelI18n.t('reading.bacaan-level-lain-tersimpan-tetapi')}</span></div>${examMarkup}<div class="toolbar"><button class="${state.adaptiveReady?'':'primary'}" onclick="startReadingRandom()"><i data-lucide="shuffle"></i> ${FiezelI18n.t('reading.bacaan-acak',{level:esc(level)})}</button><button class="${state.adaptiveReady?'primary':''}" onclick="startReadingAdaptive()"${state.adaptiveReady?'':' title="'+FiezelI18n.t('reading.terbuka-setelah-tes-awal-selesai')+'"'}><i data-lucide="zap"></i> ${FiezelI18n.t('student.reading-adaptive')}</button></div><div class="grid"><div class="card"><div class="row"><b>${FiezelI18n.t('grammar.jalur',{level:esc(level)})}</b><span>${FiezelI18n.t('reading.bacaan',{length:active.length})}</span></div><p class="muted">${active.length?FiezelI18n.t('reading.hub-instruction'):FiezelI18n.t('reading.hub-empty')}</p>${active.length?`<button onclick="openReadingLevel('${level}')">${FiezelI18n.t('reading.buka-bacaan')} <i data-lucide="arrow-right"></i></button>`:''}</div></div>`)}
-function openReadingLevel(l){const active=getActiveLevel();if(String(l||'')!==active)return showToast(FiezelI18n.t('reading.reading-dikunci-level',{active:active}));const r=pick(R.filter(x=>x.level===active));if(r)readingSession(r);else showToast(FiezelI18n.t('reading.reading-belum-tersedia',{active:active}))}
-function startReadingRandom(){const active=getActiveLevel(),pool=R.filter(r=>r.level===active);if(pool.length)readingSession(pick(pool));else showToast(FiezelI18n.t('reading.reading-belum-tersedia',{active:active}))}
+  const examMarkup=(uxOn('skillExams')&&readingExamSets().length)?`<div class="card reading-exam"><div class="row"><b>${FiezelI18n.t('reading.practice-berformat-ujian')}</b><span>${FiezelI18n.t('reading.set-untuk',{length:examSets.length,level:esc(displayLevel(level))})}</span></div>${examSets.length?examSets.map(set=>{const f=readingExamFormat(set);return `<div class="reading-exam-set"><b>${esc(set.title)}</b><span>${FiezelI18n.t('reading.kata-item-menit',{label:esc(f?.label||''),wordCount:set.wordCount,jumlahSoal:set.questions.length,minutesPerPassage:f?.minutesPerPassage||'-'})}</span><small>${esc(f?.note||'')}</small><button onclick="startReadingExam('${esc(set.id)}')">${FiezelI18n.t('reading.mulai-set')} <i data-lucide="arrow-right"></i></button></div>`}).join(''):`<p class="muted">${FiezelI18n.t('reading.belum-ada-set-berformat-ujian',{level:esc(displayLevel(level)),join:esc(examLevels.join(', ')||'-')})}</p>`}<p class="muted">${esc(READING_EXAM?.honesty||'')}</p></div>`:'';shell(FiezelI18n.t('reading.ruang-reading'),FiezelI18n.t('reading.bacaan-item-for-level',{length:active.length,total:total,level:displayLevel(level)}),`<div class="level-scope-note"><b>${esc(displayLevel(level))}</b> · ${esc(levelDescriptor(level))}<span>${FiezelI18n.t('reading.bacaan-level-lain-tersimpan-tetapi')}</span></div>${examMarkup}<div class="toolbar"><button class="${state.adaptiveReady?'':'primary'}" onclick="startReadingRandom()"><i data-lucide="shuffle"></i> ${FiezelI18n.t('reading.bacaan-acak',{level:esc(displayLevel(level))})}</button><button class="${state.adaptiveReady?'primary':''}" onclick="startReadingAdaptive()"${state.adaptiveReady?'':' title="'+FiezelI18n.t('reading.terbuka-setelah-tes-awal-selesai')+'"'}><i data-lucide="zap"></i> ${FiezelI18n.t('student.reading-adaptive')}</button></div><div class="grid"><div class="card"><div class="row"><b>${FiezelI18n.t('grammar.jalur',{level:esc(displayLevel(level))})}</b><span>${FiezelI18n.t('reading.bacaan',{length:active.length})}</span></div><p class="muted">${active.length?FiezelI18n.t('reading.hub-instruction'):FiezelI18n.t('reading.hub-empty')}</p>${active.length?`<button onclick="openReadingLevel('${level}')">${FiezelI18n.t('reading.buka-bacaan')} <i data-lucide="arrow-right"></i></button>`:''}</div></div>`)}
+function openReadingLevel(l){const active=getActiveLevel();if(String(l||'')!==active)return showToast(FiezelI18n.t('reading.reading-dikunci-level',{active:displayLevel(active)}));const r=pick(R.filter(x=>x.level===active));if(r)readingSession(r);else showToast(FiezelI18n.t('reading.reading-belum-tersedia',{active:displayLevel(active)}))}
+function startReadingRandom(){const active=getActiveLevel(),pool=R.filter(r=>r.level===active);if(pool.length)readingSession(pick(pool));else showToast(FiezelI18n.t('reading.reading-belum-tersedia',{active:displayLevel(active)}))}
 /* Ulangan lintas level (audit 2026-10-04): bacaan yang JATUH TEMPO dari level <= aktif didahulukan;
    sesudah itu perilaku lama (bacaan level aktif yang masih lemah, lalu acak). Kolamnya tetap
    tercakup: hanya level <= aktif, dan hanya yang jatuh tempo - bukan kolam semua level
    (kontrak tests/level-grammar-contract-test.js). */
-function startReadingAdaptive(){if(!state.adaptiveReady){showToast(FiezelI18n.t('reading.reading-terbuka-setelah-tes-awal'));return}const now=Date.now(),level=getActiveLevel(),due=R.filter(x=>reviewLevelOk(x.level,level)&&state.reading[x.id]?.nextReview&&state.reading[x.id].nextReview<=now),ids=new Set(Object.entries(state.reading).filter(([,x])=>x.total&&(x.mastery<80||(x.nextReview&&x.nextReview<=now))).map(([id])=>id)),pool=R.filter(x=>x.level===level),r=pick(due)||pick(pool.filter(x=>ids.has(x.id)))||pick(pool);if(r)readingSession(r,{review:due.includes(r)});else showToast(FiezelI18n.t('reading.belum-ada-area-reading-perlu',{level:level}))}
+function startReadingAdaptive(){if(!state.adaptiveReady){showToast(FiezelI18n.t('reading.reading-terbuka-setelah-tes-awal'));return}const now=Date.now(),level=getActiveLevel(),due=R.filter(x=>reviewLevelOk(x.level,level)&&state.reading[x.id]?.nextReview&&state.reading[x.id].nextReview<=now),ids=new Set(Object.entries(state.reading).filter(([,x])=>x.total&&(x.mastery<80||(x.nextReview&&x.nextReview<=now))).map(([id])=>id)),pool=R.filter(x=>x.level===level),r=pick(due)||pick(pool.filter(x=>ids.has(x.id)))||pick(pool);if(r)readingSession(r,{review:due.includes(r)});else showToast(FiezelI18n.t('reading.belum-ada-area-reading-perlu',{level:displayLevel(level)}))}
 function readingSkill(original){
   const q=String(original||'').toLowerCase();
   if(/\bwhy\b|reason|because|suggest|imply/.test(q))return 'inference';
@@ -14973,7 +15099,7 @@ function readingSession(r,opts={}){const qs=(r.qs||[]).map((q,i)=>makeReadingQue
    Menit dihitung, bukan dipaku: ~25 detik per soal (angka yang sama yang membuat 25
    soal disebut "sekitar sepuluh menit"), dibulatkan ke menit terdekat. */
 function placementMinutes(count){return Math.max(3,Math.round(Number(count||0)*25/60))}
-function placement(){const jumlah=placementSize(),menit=placementMinutes(jumlah);shell(FiezelI18n.t('placement.tes-kemampuan-dasar'),FiezelI18n.t('placement.lite-lead',{jumlah}),`<div class="card hero"><div class="eyebrow">${FiezelI18n.t('placement.pemetaan-level')}</div><h2>${FiezelI18n.t('placement.lite-hero',{jumlah,menit})}</h2><p>${FiezelI18n.t(uxOn('placementLite')?'placement.lite-isi':'placement.isinya-listening-grammar-vocabulary-tanpa')}</p><button class="primary" onclick="startPlacement()">${FiezelI18n.t('placement.lite-mulai',{jumlah})} <i data-lucide="arrow-right"></i></button></div><div class="level-grid">${LEVELS.map((l,i)=>card(`<button class="level-card" onclick="startLevelPractice('${l}')"><span class="level-number">${i+1}</span><div><b>${l}</b><p>${FiezelI18n.t('placement.masuk-practice-level',{l:l})}</p></div><i data-lucide="arrow-right"></i></button>`)).join('')}</div>`)}
+function placement(){const jumlah=placementSize(),menit=placementMinutes(jumlah),shownLevels=(typeof jaCourseOn==='function'&&jaCourseOn())?LEVELS.filter(l=>l!=='C2'):LEVELS;shell(FiezelI18n.t('placement.tes-kemampuan-dasar'),FiezelI18n.t('placement.lite-lead',{jumlah}),`<div class="card hero"><div class="eyebrow">${FiezelI18n.t('placement.pemetaan-level')}</div><h2>${FiezelI18n.t('placement.lite-hero',{jumlah,menit})}</h2><p>${FiezelI18n.t(uxOn('placementLite')?'placement.lite-isi':'placement.isinya-listening-grammar-vocabulary-tanpa')}</p><button class="primary" onclick="startPlacement()">${FiezelI18n.t('placement.lite-mulai',{jumlah})} <i data-lucide="arrow-right"></i></button></div><div class="level-grid">${shownLevels.map((l,i)=>card(`<button class="level-card" onclick="startLevelPractice('${l}')"><span class="level-number">${i+1}</span><div><b>${displayLevel(l)}</b><p>${FiezelI18n.t('placement.masuk-practice-level',{l:displayLevel(l)})}</p></div><i data-lucide="arrow-right"></i></button>`)).join('')}</div>`)}
 function grammarItemsForLevel(level=getActiveLevel()){
   const target=LEVELS.includes(String(level||''))?String(level):'A1';const bySequence=(a,b)=>Number(a.sequence||Number.MAX_SAFE_INTEGER)-Number(b.sequence||Number.MAX_SAFE_INTEGER)||a.skill.localeCompare(b.skill);return GRAMMAR_ITEMS.filter(entry=>entry.level===target).sort(bySequence);
 }
@@ -15133,12 +15259,13 @@ function placementBandTally(answers){
 /** Chip bukti per band untuk layar hasil: menunjukkan DASAR dari level, bukan cuma levelnya. */
 function placementBandChips(bands,placedLevel){
   if(!bands)return '';
-  return LEVELS.map((level,i)=>{
+  const shownLevels=(typeof jaCourseOn==='function'&&jaCourseOn())?LEVELS.filter(l=>l!=='C2'):LEVELS;
+  return shownLevels.map((level,i)=>{
     const band=bands[level]||{n:0,ok:0};
     /* Tes ringkas boleh memaafkan satu band dasar (placementLiteBandLevel): band di bawah level
        hasil ikut ditandai lulus, supaya chip tidak membantah level yang diumumkan. */
     const passed=(band.n>=PLACEMENT_BAND_MIN_EVIDENCE&&(band.ok||0)/band.n>=PLACEMENT_BAND_PASS)||(Number(placedLevel)>i+1&&band.n>0);
-    return `<span class="result-band ${passed?'result-band-pass':''}">${esc(level)} ${band.ok||0}/${band.n||0}</span>`;
+    return `<span class="result-band ${passed?'result-band-pass':''}">${esc(displayLevel(level))} ${band.ok||0}/${band.n||0}</span>`;
   }).join('');
 }
 /** Tangga bukti: mulai A1 (indeks level 1), naik satu band hanya bila band itu lulus. */
@@ -15268,6 +15395,7 @@ async function buildPlacement(){
   const listeningItems=await loadPlacementListening();
   for(const level of LEVELS){
     const plan=placementBlueprint()[level];
+    const srcLevel=(typeof jaCourseOn==='function'&&jaCourseOn()&&level==='C2')?'C1':level;
     // F1 placement: di sini letak freeze 4 detik. `.map()` dulu EAGER - seluruh kata di level
     // itu dijadikan objek soal lebih dulu (1.765 panggilan makeVocabQuestion lintas 6 level)
     // padahal blueprint hanya memakai 11, dan loop di bawah sudah `break` setelah kuotanya
@@ -15276,9 +15404,9 @@ async function buildPlacement(){
     // yang sama - soalnya kini dibangun satu per satu saat benar-benar diminta, jadi kandidat
     // yang tidak terpakai tidak pernah dibangun.
     const candidates={
-      vocab:shuffle(V.filter(v=>v.level===level&&v.meaning)),
-      grammar:shuffle(grammarItemsForLevel(level)),
-      listening:shuffle(listeningItems.filter(x=>x.level===level))
+      vocab:shuffle(V.filter(v=>v.level===srcLevel&&v.meaning)),
+      grammar:shuffle(grammarItemsForLevel(srcLevel)),
+      listening:shuffle(listeningItems.filter(x=>x.level===level||x.level===srcLevel))
     };
     const build={
       // preferType 'meaning' mengunci bentuk termudah; lihat catatan blueprint di atas.
@@ -15303,6 +15431,7 @@ async function buildPlacement(){
         if(seen.has(sig))continue;
         seen.add(sig);
         q.difficulty=LEVELS.indexOf(level)+1;
+        q.level=level;
         all.push(q);
         if(++added>=n)break;
       }
@@ -17647,20 +17776,21 @@ function learnerFlowHomeMarkup(){
 }
 function cefrRoadmapMarkup(){
   const activeLevel=getActiveLevel();
-  const activeIdx=Math.max(0,LEVELS.indexOf(activeLevel));
-  const nextLevel=LEVELS[activeIdx+1]||null;
+  const roadmapLevels=(typeof jaCourseOn==='function'&&jaCourseOn())?LEVELS.filter(l=>l!=='C2'):LEVELS;
+  const activeIdx=Math.max(0,roadmapLevels.indexOf(activeLevel));
+  const nextLevel=roadmapLevels[activeIdx+1]||null;
   // Kemajuan menuju level berikutnya = porsi lesson grammar level aktif yang sudah menembus ambang unlock.
   let total=0,done=0;
   try{const skills=grammarItemsForLevel(activeLevel).map(x=>x.skill).filter((x,i,a)=>a.indexOf(x)===i);total=skills.length;done=skills.filter(k=>(state.grammar[k]?.mastery||0)>=GRAMMAR_UNLOCK_MASTERY).length}catch(_){}
   const pct=total?Math.round(done/total*100):0;
   const streak=Number(state.streak)||0;
-  const track=LEVELS.map((lvl,idx)=>`<span class="fz2-lvl${idx<activeIdx?' is-done':idx===activeIdx?' is-now':''}" style="${idx===activeIdx?`--p:${pct}`:''}">${esc(lvl)}</span>`).join('');
+  const track=roadmapLevels.map((lvl,idx)=>`<span class="fz2-lvl${idx<activeIdx?' is-done':idx===activeIdx?' is-now':''}" style="${idx===activeIdx?`--p:${pct}`:''}">${esc(displayLevel(lvl))}</span>`).join('');
   const lead=nextLevel
-    ?FiezelI18n.t('progress2.level-lead',{pct,next:nextLevel,sisa:Math.max(0,total-done)})
+    ?FiezelI18n.t('progress2.level-lead',{pct,next:displayLevel(nextLevel),sisa:Math.max(0,total-done)})
     :FiezelI18n.t('progress2.level-top');
   return `<section class="fz2-level card" data-testid="progress-level-card" aria-label="${FiezelI18n.t('progress2.level-aria')}">
-    <div class="fz2-level-head"><span class="eyebrow">${FiezelI18n.t('progress2.level-eyebrow')}</span>${streak>0?`<span class="fz2-level-streak"><i class="fz-i" data-fz-icon="flame" aria-hidden="true"></i>${FiezelI18n.t('progress2.streak',{days:streak})}</span>`:''}</div>
-    <div class="fz2-level-body"><b class="fz2-level-big">${esc(activeLevel)}</b><p class="fz2-level-lead">${esc(lead)}</p><span class="fz2-level-paw" aria-hidden="true">${pawFaceMarkup()}</span></div>
+    <div class="fz2-level-head"><span class="eyebrow">${FiezelI18n.t(jaCourseOn()?'kursus-ja.home.peta-cefr':'progress2.level-eyebrow')}</span>${streak>0?`<span class="fz2-level-streak"><i class="fz-i" data-fz-icon="flame" aria-hidden="true"></i>${FiezelI18n.t('progress2.streak',{days:streak})}</span>`:''}</div>
+    <div class="fz2-level-body"><b class="fz2-level-big">${esc(displayLevel(activeLevel))}</b><p class="fz2-level-lead">${esc(lead)}</p><span class="fz2-level-paw" aria-hidden="true">${pawFaceMarkup()}</span></div>
     <div class="fz2-lvls" aria-hidden="true">${track}</div>
   </section>`;
 }
@@ -19127,7 +19257,7 @@ function tactileProfileCockpitMarkup(opts={}){
           </div>
           <div class="profile-handle">@${esc(handle)}</div>
           <div class="profile-badges-row">
-            <span class="profile-level-chip">${t('profile.level-prefix','Level')} ${esc(level)} ${t('profile.level-basic','Dasar')}</span>
+            <span class="profile-level-chip">${t('profile.level-prefix','Level')} ${esc(displayLevel(level))} ${esc(levelDescriptor(level))}</span>
             <span class="profile-status-chip">${t('profile.status-independent','Pelajar Mandiri')}</span>
           </div>
         </div>
