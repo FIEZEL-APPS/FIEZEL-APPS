@@ -154,14 +154,18 @@ jobs:
           # Copy to final artifact filename
           cp "$DEBUG_APK" fiezel-app-debug.apk
 
-          # Verify signature or sign with standard debug keystore
+          # Verify signature or sign with permanent repository keystore
           if ! "$APKSIGNER" verify fiezel-app-debug.apk >/dev/null 2>&1; then
-            echo "Debug APK unsigned; signing with standard debug keystore..."
-            mkdir -p ~/.android
-            if [ ! -f ~/.android/debug.keystore ]; then
-              keytool -genkey -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+            echo "Debug APK unsigned; signing with permanent repository keystore..."
+            if [ -f android/keystore/fiezel-release.jks ]; then
+              "$APKSIGNER" sign --ks android/keystore/fiezel-release.jks --ks-key-alias fiezel --ks-pass pass:fiezelapp2026 --key-pass pass:fiezelapp2026 --v1-signing-enabled true --v2-signing-enabled true --v3-signing-enabled true fiezel-app-debug.apk
+            else
+              mkdir -p ~/.android
+              if [ ! -f ~/.android/debug.keystore ]; then
+                keytool -genkey -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+              fi
+              "$APKSIGNER" sign --ks ~/.android/debug.keystore --ks-key-alias androiddebugkey --ks-pass pass:android --key-pass pass:android --v1-signing-enabled true --v2-signing-enabled true --v3-signing-enabled true fiezel-app-debug.apk
             fi
-            "$APKSIGNER" sign --ks ~/.android/debug.keystore --ks-key-alias androiddebugkey --ks-pass pass:android --key-pass pass:android fiezel-app-debug.apk
           fi
 
           echo "=== Debug APK signature verification ==="
@@ -200,7 +204,7 @@ jobs:
             cp "$RAW_RELEASE_APK" aligned-release.apk
           fi
 
-          # Sign with release secrets or standard Android debug keystore fallback
+          # Sign with release secrets or permanent repository keystore
           if [ -n "$KEYSTORE_BASE64" ] && [ -n "$KEYSTORE_PASSWORD" ] && [ -n "$KEY_ALIAS" ]; then
             echo "Signing Release APK with repository release keystore secret..."
             echo "$KEYSTORE_BASE64" | base64 -d > release.keystore
@@ -210,15 +214,18 @@ jobs:
             else
               KEY_PASS_ARG="--key-pass pass:$KEYSTORE_PASSWORD"
             fi
-            "$APKSIGNER" sign --ks release.keystore --ks-key-alias "$KEY_ALIAS" --ks-pass "pass:$KEYSTORE_PASSWORD" $KEY_PASS_ARG --out fiezel-app-release.apk aligned-release.apk
+            "$APKSIGNER" sign --ks release.keystore --ks-key-alias "$KEY_ALIAS" --ks-pass "pass:$KEYSTORE_PASSWORD" $KEY_PASS_ARG --v1-signing-enabled true --v2-signing-enabled true --v3-signing-enabled true --out fiezel-app-release.apk aligned-release.apk
             rm -f release.keystore
+          elif [ -f android/keystore/fiezel-release.jks ]; then
+            echo "Signing Release APK with permanent repository release keystore..."
+            "$APKSIGNER" sign --ks android/keystore/fiezel-release.jks --ks-key-alias fiezel --ks-pass "pass:fiezelapp2026" --key-pass "pass:fiezelapp2026" --v1-signing-enabled true --v2-signing-enabled true --v3-signing-enabled true --out fiezel-app-release.apk aligned-release.apk
           else
-            echo "Release secrets not detected. Signing with standard Android debug keystore fallback..."
+            echo "Signing with debug keystore fallback..."
             mkdir -p ~/.android
             if [ ! -f ~/.android/debug.keystore ]; then
               keytool -genkey -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
             fi
-            "$APKSIGNER" sign --ks ~/.android/debug.keystore --ks-key-alias androiddebugkey --ks-pass pass:android --key-pass pass:android --out fiezel-app-release.apk aligned-release.apk
+            "$APKSIGNER" sign --ks ~/.android/debug.keystore --ks-key-alias androiddebugkey --ks-pass pass:android --key-pass pass:android --v1-signing-enabled true --v2-signing-enabled true --v3-signing-enabled true --out fiezel-app-release.apk aligned-release.apk
           fi
 
           echo "=== Release APK signature verification ==="

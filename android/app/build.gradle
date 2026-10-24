@@ -10,8 +10,8 @@ android {
         applicationId "id.my.fiezel.app"
         minSdk 24
         targetSdk 34
-        versionCode 51900
-        versionName "5.19.0"
+        versionCode 51901
+        versionName "5.19.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
