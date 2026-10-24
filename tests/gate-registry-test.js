@@ -222,6 +222,11 @@ const EXCLUSIONS = new Map([
     reason:
       'Gerbang pengujian bank soal 928 butir Fase D lintas 50 bab untuk mata pelajaran IPA, Bahasa Indonesia, Bahasa Inggris, Matematika, dan IPS sesuai kurikulum merdeka tanpa posisi opsi jawaban statis.'
   }],
+  ['tests/voice-studio-reformulation-translation-test.js', {
+    class: 'gerbang-pra-rilis-fitur',
+    reason:
+      'BUKAN gerbang CI Linux: tes integrasi modul TypeScript AI Voice Studio yang dijalankan lokal via npx tsx untuk memverifikasi sintesis reformulasi natural dan penerjemah real-time. Integritas bundel dan komponen Voice Studio di CI dijaga secara deterministik oleh tests/voice-studio-ui-architecture-test.js dan tests/id-golden-snapshot-test.js.'
+  }],
   ['tests/braincore-living-system-test.js', {
     class: 'gerbang-pra-rilis-fitur',
     reason:

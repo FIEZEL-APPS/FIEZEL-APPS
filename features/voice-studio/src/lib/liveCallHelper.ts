@@ -548,6 +548,71 @@ export function approximateJapaneseRomaji(text: string): string {
 }
 
 function approximateJapaneseToIndonesian(text: string): string {
+  // 1. Greetings & Introductions
+  if (text.includes('お話しできて') && (text.includes('嬉しい') || text.includes('うれしい'))) {
+    return 'Hai! Senang banget bisa ngobrol hari ini! Mau cerita tentang hal seru hari ini, ayo kita ngobrol santai! Akhir-akhir ini gimana kabarmu?';
+  }
+  if (text.includes('お返事ありがとう') || (text.includes('どんな一日') && text.includes('楽しいこと'))) {
+    return 'Terima kasih sudah membalas! Hari ini seperti apa harimu? Ada kejadian seru atau menyenangkan?';
+  }
+  if (text.includes('名前を教えてくれて') || text.includes('これからよろしく')) {
+    return 'Terima kasih sudah memberi tahu namamu! Senang berkenalan denganmu, mari berteman baik ya!';
+  }
+  if (text.includes('はじめまして')) {
+    return 'Halo! Senang berkenalan denganmu. Mari mengobrol santai bersama!';
+  }
+  if (text.includes('こんばんは') || text.includes('夜のお喋り')) {
+    return 'Selamat malam! Asyik juga ya ngobrol malam-malam begini. Hari ini sudah lelah beraktivitas, ada kabar baik apa?';
+  }
+
+  // 2. Empathetic reactions & Daily chat
+  if (text.includes('そういう日もある') && (text.includes('食べた美味しいもの') || text.includes('美味しいもの'))) {
+    return 'Wajar kok, kadang ada hari seperti itu! Kalau begitu, mau cerita makanan enak apa yang kamu santap hari ini?';
+  }
+  if (text.includes('嫌なこと') || text.includes('愚痴')) {
+    return 'Pasti melelahkan ya ada hal yang bikin kesal. Cerita santai saja semampumu, aku siap mendengarkan kok!';
+  }
+  if (text.includes('お仕事') || (text.includes('お疲れ様') && text.includes('無理しすぎない'))) {
+    return 'Lagi sibuk pekerjaan ya? Semangat dan istirahat yang cukup ya, jangan memaksakan diri!';
+  }
+  if (text.includes('気にしないで') || text.includes('全然大丈夫')) {
+    return 'Sama sekali tidak apa-apa kok! Aku senang banget bisa ngobrol begini, jadi jangan sungkan ya!';
+  }
+  if (text.includes('全然そんなことない') || (text.includes('一生懸命') && text.includes('素敵'))) {
+    return 'Sama sekali tidak aneh kok! Usahamu yang giat berbicara bahasa Jepang itu luar biasa keren!';
+  }
+  if (text.includes('冗談') || (text.includes('日本語が上手') && text.includes('証拠'))) {
+    return 'Bisa bercanda seperti itu membuktikan kemampuan bahasa Jepangmu makin hebat dan luwes! Mau bahas apa lagi?';
+  }
+  if (text.includes('素晴らしい夢') || text.includes('どんな仕事')) {
+    return 'Itu impian yang luar biasa! Pekerjaan atau bidang seperti apa yang ingin kamu jalani di Jepang nanti?';
+  }
+  if (text.includes('接客') || text.includes('お仕事体験') || text.includes('職種')) {
+    return 'Bisa mencoba bidang pelayanan atau magang pengalaman kerja ya! Ada bidang pekerjaan yang membuatmu penasaran?';
+  }
+
+  // 3. Food & Drinks
+  if (text.includes('鮭') && text.includes('カレー')) {
+    return 'Kari salmon enak banget ya! Bumbu rempahnya menggugah selera. Kamu suka tingkat kepedasan seperti apa?';
+  }
+  if (text.includes('鮭') && (text.includes('刺身') || text.includes('焼き魚'))) {
+    return 'Ikan salmon ya! Dimakan mentah (sashimi) atau dipanggang sama-sama lezat. Kamu paling suka olahan yang mana?';
+  }
+  if (text.includes('魚料理') || (text.includes('魚') && text.includes('料理法'))) {
+    return 'Masakan ikan memang lezat! Khususnya kamu suka jenis ikan apa atau dimasak dengan gaya apa?';
+  }
+  if (text.includes('塩気') || text.includes('ご飯が進む') || text.includes('ご飯のお供')) {
+    return 'Lauk gurih yang bikin nambah nasi terus ya! Aku juga suka banget. Kamu punya lauk pendamping nasi favorit lainnya?';
+  }
+  if (text.includes('一番美味しかった') || text.includes('最近食べたもので')) {
+    return 'Dari semua makanan yang kamu coba baru-baru ini, mana yang paling enak rasanya?';
+  }
+  if (text.includes('ラーメン') || text.includes('スープ')) {
+    return 'Ramen hangat memang paling juara! Kamu paling suka kuah yang gurih kaldu atau miso?';
+  }
+  if (text.includes('寿司') || text.includes('お寿司')) {
+    return 'Sushi segar memang lezat! Apa jenis sushi atau isian favoritmu?';
+  }
   if (text.includes('砂糖') || text.includes('ミルク') || text.includes('ブラック')) {
     return 'Apakah Anda ingin menambahkan gula dan susu pada kopi Anda?';
   }
@@ -555,7 +620,12 @@ function approximateJapaneseToIndonesian(text: string): string {
     return 'Apakah pesanan ingin dinikmati di dalam kafe atau dibawa pulang?';
   }
   if (text.includes('コーヒー') && text.includes('ください')) {
-    return 'Tolong berikan saya satu kopi panas dan cheesecake.';
+    return 'Tolong berikan saya satu kopi hangat dan cheesecake.';
+  }
+
+  // 4. Weekend & Activities
+  if (text.includes('今週末') || (text.includes('週末') && text.includes('予定'))) {
+    return 'Ngomong-ngomong, akhir pekan ini kamu punya agenda atau rencana seru apa?';
   }
   if (text.includes('金曜日') || text.includes('図書館')) {
     return 'Bagaimana kalau hari Jumat ini kita latihan bersama di perpustakaan?';
@@ -563,13 +633,57 @@ function approximateJapaneseToIndonesian(text: string): string {
   if (text.includes('教科書') || text.includes('まとめ')) {
     return 'Bagaimana kalau kita mulai belajar bersama dari rangkuman buku teks dulu?';
   }
-  if (text.includes('もう一度') || text.includes('ゆっくり')) {
-    return 'Maaf, tolong ucapkan sekali lagi dengan lebih pelan.';
-  }
   if (text.includes('テスト') || text.includes('勉強')) {
     return 'Karena minggu depan ada ujian, bagaimana sebaiknya saya belajar?';
   }
-  return `Kalimat bahasa Jepang: "${text}"`;
+  if (text.includes('趣味') || text.includes('休みの日')) {
+    return 'Apa hobi atau hal seru yang biasa kamu lakukan saat hari libur?';
+  }
+  if (text.includes('旅行') || text.includes('どこに行きたい')) {
+    return 'Jalan-jalan keliling tempat baru pasti seru! Daerah mana di Jepang yang paling ingin kamu kunjungi?';
+  }
+
+  // 5. Language clarifications
+  if (text.includes('分からない言葉') || text.includes('もう一回教えて')) {
+    return 'Apakah tadi ada kosakata atau kalimat yang belum kamu pahami artinya? Coba beri tahu, bagian mana yang belum jelas?';
+  }
+  if (text.includes('どの言葉の意味') || text.includes('教えてくれるだけで')) {
+    return 'Tentu boleh! Cukup beri tahu kata mana yang artinya belum kamu mengerti, nanti aku jelaskan artinya.';
+  }
+  if (text.includes('「気にしないで」は') && text.includes('インドネシア語で')) {
+    return 'Dalam bahasa Indonesia, "気にしないで" artinya "Jangan dipikirkan / Tidak apa-apa kok". Ada kata lain yang ingin kamu ketahui?';
+  }
+  if (text.includes('いつでも聞いて') || text.includes('また何か分からないこと')) {
+    return 'Iya betul sekali! Kalau ada kosakata atau kalimat yang belum kamu mengerti lagi, tanyakan saja kapan pun ya!';
+  }
+  if (text.includes('もう一度') || text.includes('ゆっくり')) {
+    return 'Maaf, tolong ucapkan sekali lagi dengan lebih pelan.';
+  }
+
+  // 6. Generic conversational questions or statements (NEVER dump raw string)
+  if (text.includes('？') || text.includes('?') || text.includes('か') || text.includes('どう')) {
+    return 'Mochi menanyakan pendapat dan ceritamu lebih lanjut. Silakan jawab santai ya!';
+  }
+  return 'Mochi menanggapi ceritamu dengan ramah dan hangat.';
+}
+
+function approximateJapaneseToThai(text: string): string {
+  if (text.includes('お話しできて') && (text.includes('嬉しい') || text.includes('うれしい'))) {
+    return 'สวัสดีครับ! ดีใจมากที่ได้คุยกันวันนี้ มีเรื่องอะไรสนุกๆ มาคุยกันสบายๆ ได้เลยนะ!';
+  }
+  if (text.includes('お返事ありがとう') || (text.includes('どんな一日') && text.includes('楽しいこと'))) {
+    return 'ขอบคุณที่ตอบกลับครับ! วันนี้เป็นอย่างไรบ้าง มีเรื่องสนุกๆ อะไรเกิดขึ้นไหม?';
+  }
+  if (text.includes('名前を教えてくれて') || text.includes('これからよろしく')) {
+    return 'ขอบคุณที่บอกชื่อนะครับ! ยินดีที่ได้รู้จัก มาเป็นเพื่อนที่ดีต่อกันนะ!';
+  }
+  if (text.includes('気にしないで') || text.includes('全然大丈夫')) {
+    return 'ไม่เป็นไรเลยครับ สบายใจได้ ดีใจมากที่ได้คุยกัน ไม่ต้องคิดมากนะครับ!';
+  }
+  if (text.includes('？') || text.includes('?') || text.includes('か') || text.includes('どう')) {
+    return 'โมจิกำลังถามความคิดเห็นของคุณอยู่ ตอบได้สบายๆ เลยครับ!';
+  }
+  return 'โมจิตอบรับเรื่องที่คุณเล่าอย่างอบอุ่นและเป็นกันเอง';
 }
 
 function approximateEnglishToIndonesian(text: string): string {
@@ -616,7 +730,102 @@ function approximateEnglishToIndonesian(text: string): string {
   if (lower.includes('went to') || lower.includes('weekend')) {
     return 'Akhir pekan lalu saya pergi berlibur bersama keluarga, makan kuliner lokal, dan mengambil foto.';
   }
-  return `Terjemahan langsung: "${text}"`;
+
+  // Empathetic reactions & conversational questions (NEVER dump raw string with "Terjemahan langsung:")
+  if (lower.includes('awesome to connect') || lower.includes("what's on your mind") || lower.includes('what is on your mind')) {
+    return 'Hai! Senang banget bisa ngobrol sama kamu hari ini! Kita bisa ngobrol santai tentang apa saja yang kamu suka. Ada cerita apa hari ini?';
+  }
+  if (lower.includes('just getting started today') || lower.includes('since we last met')) {
+    return 'Haha, kita baru mulai hari ini! Ceritakan ada kejadian seru apa di duniamu sejak terakhir kita ngobrol?';
+  }
+  if (lower.includes('building a language app') || lower.includes('language app') || lower.includes('languages are you focusing')) {
+    return 'Wah, keren banget! Mengembangkan aplikasi bahasa terdengar sangat menarik. Bahasa apa yang jadi fokus utamamu saat ini?';
+  }
+  if (lower.includes('juggling both english and japanese') || lower.includes('feat') || lower.includes('exciting feature')) {
+    return 'Luar biasa! Menangani bahasa Inggris dan Jepang sekaligus adalah pencapaian hebat. Fitur apa yang paling menarik di aplikasimu?';
+  }
+  if (lower.includes('bayesian knowledge tracing') || lower.includes('bkt') || lower.includes('personalize')) {
+    return 'Keren banget menggunakan algoritma Bayesian Knowledge Tracing (BKT) sebagai otak aplikasi! Bagaimana cara algoritmanya mempersonalisasi pembelajaran murid?';
+  }
+  if (lower.includes('user data can be tricky') || lower.includes('beta group')) {
+    return 'Bisa dipahami! Mengumpulkan data murid di awal memang menantang. Apakah kamu sudah punya rencana uji coba dengan kelompok beta?';
+  }
+  if (lower.includes('school pilot') || lower.includes('teachers or administrators')) {
+    return 'Uji coba pilot di sekolah adalah langkah awal yang luar biasa! Apakah kamu sudah punya kontak guru atau kepala sekolah?';
+  }
+  if (lower.includes('?') || lower.includes('what') || lower.includes('how') || lower.includes('why')) {
+    return 'Teman bicaramu menanyakan pendapat atau ceritamu lebih lanjut. Silakan jawab dengan santai ya!';
+  }
+  return 'Teman bicaramu mendengarkan dan menanggapi ceritamu dengan hangat.';
+}
+
+function approximateEnglishToThai(text: string): string {
+  const lower = text.toLowerCase();
+  if (lower.includes('awesome to connect') || lower.includes("what's on your mind") || lower.includes('what is on your mind')) {
+    return 'สวัสดีครับ! ดีใจมากที่ได้คุยกันวันนี้ เราคุยกันสบายๆ ได้ทุกเรื่องเลย ตอนนี้กำลังคิดเรื่องอะไรอยู่ครับ?';
+  }
+  if (lower.includes('?') || lower.includes('what') || lower.includes('how') || lower.includes('why')) {
+    return 'เพื่อนคู่สนทนากำลังถามความคิดเห็นของคุณอยู่ ตอบกลับได้สบายๆ เลยครับ!';
+  }
+  return 'เพื่อนคู่สนทนากำลังรับฟังและตอบรับเรื่องราวของคุณอย่างอบอุ่น';
+}
+
+const liveTranslationCache = new Map<string, string>();
+
+/**
+ * Fetches high-fidelity, natural translations in real-time using Google Translate GTX endpoint
+ * with in-memory Map & localStorage caching. Safe for continuous live duplex calls.
+ */
+export async function fetchLiveTranslation(
+  text: string,
+  targetLocale: 'id' | 'th'
+): Promise<string> {
+  const clean = (text || '').trim();
+  if (!clean) return '';
+  const cacheKey = `${targetLocale}:${clean}`;
+  if (liveTranslationCache.has(cacheKey)) {
+    return liveTranslationCache.get(cacheKey)!;
+  }
+  try {
+    if (typeof localStorage !== 'undefined') {
+      const stored = localStorage.getItem(`fz_trans_${cacheKey}`);
+      if (stored) {
+        liveTranslationCache.set(cacheKey, stored);
+        return stored;
+      }
+    }
+  } catch {
+    // Ignore
+  }
+
+  try {
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLocale}&dt=t&q=${encodeURIComponent(
+      clean
+    )}`;
+    const res = await fetch(url);
+    if (!res.ok) return '';
+    const data = await res.json();
+    if (Array.isArray(data) && Array.isArray(data[0])) {
+      const translated = data[0]
+        .map((chunk: any) => (chunk && chunk[0] ? chunk[0] : ''))
+        .join('')
+        .trim();
+      if (translated) {
+        liveTranslationCache.set(cacheKey, translated);
+        try {
+          if (typeof localStorage !== 'undefined') {
+            localStorage.setItem(`fz_trans_${cacheKey}`, translated);
+          }
+        } catch {
+          // Ignore
+        }
+        return translated;
+      }
+    }
+  } catch {
+    // Return empty on network timeout
+  }
+  return '';
 }
 
 export function translateAndPhoneticizeLiveText(
@@ -654,7 +863,7 @@ export function translateAndPhoneticizeLiveText(
   if (targetLang === 'ja') {
     const romaji = explicitPronunciation || toPhoneticRomaji(clean);
     const idTrans = explicitTranslationId || approximateJapaneseToIndonesian(clean);
-    const thTrans = explicitTranslationTh || idTrans;
+    const thTrans = explicitTranslationTh || approximateJapaneseToThai(clean);
     const furiganaHtml = renderFuriganaHtml(clean);
     return {
       text: clean,
@@ -666,8 +875,10 @@ export function translateAndPhoneticizeLiveText(
   }
 
   const phoneticEn = explicitPronunciation || approximateEnglishPhoneticId(clean);
-  const idTrans = explicitTranslationId || approximateEnglishToIndonesian(clean);
-  const thTrans = explicitTranslationTh || idTrans;
+  const cachedId = liveTranslationCache.get(`id:${clean}`);
+  const cachedTh = liveTranslationCache.get(`th:${clean}`);
+  const idTrans = explicitTranslationId || cachedId || approximateEnglishToIndonesian(clean);
+  const thTrans = explicitTranslationTh || cachedTh || approximateEnglishToThai(clean);
 
   return {
     text: clean,

@@ -51,6 +51,7 @@ import {
   FiezelSparkleOrnament,
 } from './components/FiezelOrnaments';
 import {
+  fetchLiveTranslation,
   getBeginnerReplyCards,
   translateAndPhoneticizeLiveText,
 } from './lib/liveCallHelper';
@@ -313,16 +314,38 @@ export default function App() {
     setCustomMeasureOverride(null);
     setStatusBanner(null);
     setNextSuggestedReplies([]);
-    setTurns([
-      {
-        id: `turn_open_${activeScenario.id}`,
-        speaker: 'ai',
-        text: activeScenario.openingLine,
-        translationId: activeScenario.openingTranslationId,
-        translationTh: activeScenario.openingTranslationTh,
-        timestamp: Date.now(),
-      },
-    ]);
+
+    const sessionKey = `fz_kaiwa_turns_${activeScenario.targetLang}_${activeScenario.id}`;
+    let loadedTurns: CallTurn[] | null = null;
+    try {
+      if (typeof localStorage !== 'undefined') {
+        const stored = localStorage.getItem(sessionKey);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            loadedTurns = parsed;
+          }
+        }
+      }
+    } catch {
+      // Ignore
+    }
+
+    if (loadedTurns && loadedTurns.length > 0) {
+      setTurns(loadedTurns);
+    } else {
+      setTurns([
+        {
+          id: `turn_open_${activeScenario.id}`,
+          speaker: 'ai',
+          text: activeScenario.openingLine,
+          translationId: activeScenario.openingTranslationId,
+          translationTh: activeScenario.openingTranslationTh,
+          timestamp: Date.now(),
+        },
+      ]);
+    }
+
     try {
       if (mainScrollRef.current) {
         mainScrollRef.current.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
@@ -330,18 +353,32 @@ export default function App() {
     } catch {
       // Ignore
     }
-  }, [activeScenario.id]);
+  }, [activeScenario.id, activeScenario.targetLang]);
+
+  // Persist conversation turns across refreshes and tab switches
+  useEffect(() => {
+    if (turns.length > 0) {
+      const sessionKey = `fz_kaiwa_turns_${activeScenario.targetLang}_${activeScenario.id}`;
+      try {
+        if (typeof localStorage !== 'undefined') {
+          localStorage.setItem(sessionKey, JSON.stringify(turns.slice(-40)));
+        }
+      } catch {
+        // Ignore quota errors
+      }
+    }
+  }, [turns, activeScenario.targetLang, activeScenario.id]);
 
   useEffect(() => {
     if (activeTab === 'call' && turns.length > 1) {
-      if (mainScrollRef.current) {
-        mainScrollRef.current.scrollTo({
-          top: mainScrollRef.current.scrollHeight,
+      if (transcriptContainerRef.current) {
+        transcriptContainerRef.current.scrollIntoView({
           behavior: 'smooth',
+          block: 'nearest',
         });
       }
     }
-  }, [turns.length, isAnalyzingTurn, activeTab]);
+  }, [turns.length, activeTab]);
 
   useEffect(() => {
     if (!isRecordingPtt) {
@@ -374,6 +411,14 @@ export default function App() {
     setStatusBanner(null);
     setInputText('');
     setNextSuggestedReplies([]);
+    const sessionKey = `fz_kaiwa_turns_${activeScenario.targetLang}_${activeScenario.id}`;
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.removeItem(sessionKey);
+      }
+    } catch {
+      // Ignore
+    }
     setTurns([
       {
         id: `turn_open_${activeScenario.id}_${Date.now()}`,
@@ -703,6 +748,100 @@ export default function App() {
     const updated = recordVocabPrereqMastery(brainState, activeScenario.prereqCompetencyId);
     setBrainState(updated);
     void brainSyncFlush(updated).then(({ nextState }) => setBrainState(nextState));
+  };
+
+  const commitLiveUserTurn = (textToCommit: string) => {
+    const uText = textToCommit.trim();
+    if (!uText) return;
+
+    liveUserDraftRef.current = '';
+    setLiveUserDraft('');
+
+    const evalParams = {
+      text: uText,
+      scenario: activeScenario,
+      persona: activePersona,
+      targetLang: activeScenario.targetLang,
+      locale,
+      measureMode: isMeasureMode,
+      history: turnsRef.current.slice(-6).map((tItem) => ({
+        speaker: tItem.speaker,
+        text: tItem.text,
+      })),
+    };
+    const ev = evaluateTurnLocal(evalParams);
+    const effectiveHints = isMeasureMode ? 0 : showHint ? 1 : 0;
+    const outcome = recordSpeakingAttempt(brainStateRef.current, {
+      competencyId: activeScenario.competencyId,
+      scenarioId: activeScenario.id,
+      targetLang: activeScenario.targetLang,
+      userExactTranscript: uText,
+      ok: Boolean(ev.ok),
+      grammarScore: ev.grammarScore,
+      fluencyScore: ev.fluencyScore,
+      vocabUsageScore: ev.vocabUsageScore,
+      accuracyScore: ev.accuracyScore,
+      misconceptionId: ev.misconceptionId || null,
+      correctionPattern: ev.syntacticCorrection || ev.naturalReformulation || null,
+      hintsUsed: effectiveHints,
+      confidence: 0.85,
+      measureMode: isMeasureMode,
+    });
+    setBrainState(outcome.nextState);
+    if (isMeasureMode) {
+      playFiezelSfx(ev.ok ? 'answer_correct' : 'answer_wrong');
+    }
+    const turnDiag: TurnDiagnosis = {
+      ok: Boolean(ev.ok),
+      accuracyScore: ev.accuracyScore,
+      grammarScore: ev.grammarScore,
+      fluencyScore: ev.fluencyScore,
+      vocabUsageScore: ev.vocabUsageScore,
+      userExactTranscript: uText,
+      misconceptionId: ev.misconceptionId || null,
+      whyFailsId: ev.whyFailsId || null,
+      whyFailsTh: ev.whyFailsTh || null,
+      missingTokens: ev.missingTokens || [],
+      syntacticCorrection: ev.syntacticCorrection || null,
+      naturalReformulation: ev.naturalReformulation || uText,
+      pedagogicalFeedbackId: ev.pedagogicalFeedbackId,
+      pedagogicalFeedbackTh: ev.pedagogicalFeedbackTh,
+      bktBefore: outcome.bktBefore,
+      bktAfter: outcome.bktAfter,
+      thetaAfter: outcome.thetaAfter,
+      masteryStateAfter: outcome.masteryStateAfter,
+    };
+
+    setTurns((prev) => [
+      ...prev,
+      {
+        id: `live_u_${Date.now()}`,
+        speaker: 'user',
+        text: uText,
+        timestamp: Date.now(),
+        diagnosis: turnDiag,
+      },
+    ]);
+  };
+
+  const submitLiveUserUtterance = (textToSend: string) => {
+    const trimmed = textToSend.trim();
+    if (!trimmed) return;
+
+    if (
+      wsRef.current &&
+      wsRef.current.readyState === WebSocket.OPEN
+    ) {
+      wsRef.current.send(
+        JSON.stringify({
+          clientContent: {
+            turns: [{ role: 'user', parts: [{ text: trimmed }] }],
+            turnComplete: true,
+          },
+        })
+      );
+    }
+    commitLiveUserTurn(trimmed);
   };
 
   const submitStudentTurn = async (params: {
@@ -1421,12 +1560,13 @@ export default function App() {
       ws.onopen = () => {
         if (isGoogleLive) {
           try {
+            const priorTurns = turnsRef.current.filter((t) => t.text && t.text.trim());
             const contextSummary =
-              turnsRef.current.length > 0
-                ? `\nRecent conversation turns so far:\n${turnsRef.current
-                    .slice(-4)
+              priorTurns.length > 0
+                ? `\n\n[Previous Conversation History & Ongoing Memory]:\nYou and this learner have an ongoing conversation. Remember all facts, projects, opinions, and personal details they shared:\n${priorTurns
+                    .slice(-12)
                     .map((t) => `${t.speaker === 'user' ? 'Learner' : activePersona.name}: "${t.text}"`)
-                    .join('\n')}`
+                    .join('\n')}\nCRITICAL MEMORY DIRECTIVE: If the learner asks about past topics or previous conversations (e.g. "Do you remember what about our previous conversation?" or mentions what they are building or working on), YOU MUST warmly and specifically recall the exact facts they mentioned above (such as building a language app, BKT algorithm, English/Japanese focus, school pilot testing, etc.)! Never say you just met or forgot!`
                 : '';
 
             ws.send(
@@ -1529,6 +1669,10 @@ export default function App() {
           if (msg.type === 'audio' && msg.audio) {
             incomingAudioBase64 = msg.audio;
           } else if (msg.serverContent?.modelTurn?.parts) {
+            // Commit user speech draft immediately as soon as AI begins its turn
+            if (liveUserDraftRef.current.trim()) {
+              commitLiveUserTurn(liveUserDraftRef.current.trim());
+            }
             for (const part of msg.serverContent.modelTurn.parts) {
               if (part?.inlineData?.data) {
                 incomingAudioBase64 = part.inlineData.data;
@@ -1679,10 +1823,11 @@ export default function App() {
                 msg.aiTranslationId,
                 msg.aiTranslationTh
               );
+              const aiTurnId = `live_ai_${Date.now() + 1}`;
               setTurns((prev) => [
                 ...prev,
                 {
-                  id: `live_ai_${Date.now() + 1}`,
+                  id: aiTurnId,
                   speaker: 'ai',
                   text: aText,
                   translationId: autoTrans.translationId,
@@ -1697,6 +1842,26 @@ export default function App() {
                 aText
               );
               setNextSuggestedReplies(suggestions);
+
+              // Background fetch real Google GTX translations asynchronously to replace approximations
+              void Promise.all([
+                fetchLiveTranslation(aText, 'id'),
+                fetchLiveTranslation(aText, 'th'),
+              ]).then(([idTrans, thTrans]) => {
+                if (idTrans || thTrans) {
+                  setTurns((prev) =>
+                    prev.map((t) =>
+                      t.id === aiTurnId
+                        ? {
+                            ...t,
+                            translationId: idTrans || t.translationId,
+                            translationTh: thTrans || t.translationTh,
+                          }
+                        : t
+                    )
+                  );
+                }
+              }).catch(() => {});
             }
           }
         } catch {
@@ -2619,6 +2784,23 @@ export default function App() {
                   </div>
                 </section>
 
+                {/* 1.5 ASISTEN JAWABAN PEMULA (Pilihan respon alami cepat) */}
+                {!isMeasureMode && beginnerReplyCards.length > 0 && (
+                  <div className="w-full">
+                    <BeginnerAnswerAssistant
+                      cards={beginnerReplyCards}
+                      targetLang={activeScenario.targetLang}
+                      locale={locale}
+                      isRefreshing={isRefreshingAssist}
+                      onRefresh={handleRefreshLiveAssist}
+                      onSelectReply={(text) => {
+                        playFiezelSfx('button_tap');
+                        setInputText(text);
+                      }}
+                    />
+                  </div>
+                )}
+
                 {/* 2. ALUR PERCAKAPAN RINGKAS (Hanya Tampil Bersih Tanpa Kotak Luar Berat) */}
                 <section className="space-y-2.5 w-full pt-1">
                   <div className="flex items-center justify-between gap-2 px-1 text-xs text-[#6E5E47]">
@@ -2742,7 +2924,8 @@ export default function App() {
                               {!diag.ok && diag.syntacticCorrection && (
                                 <div className="bg-white/90 rounded-xl px-2.5 py-1.5 flex items-center justify-between gap-2 text-[#1C1611]">
                                   <span className="break-words">
-                                    Saran: <b className="text-[#8C2233]">"{diag.syntacticCorrection}"</b>
+                                    <span className="font-semibold text-[#8C2233]">{locale === 'th' ? 'ประโยคที่เป็นธรรมชาติ:' : 'Naturalnya:'}</span>{' '}
+                                    <b className="text-[#8C2233]">"{diag.syntacticCorrection}"</b>
                                   </span>
                                   <button
                                     type="button"
@@ -2893,19 +3076,39 @@ export default function App() {
           className="shrink-0 w-full z-30 bg-[#F6F3EC]/95 backdrop-blur-md border-t border-[#E8DFC8]/70 px-3 sm:px-4 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-4px_16px_rgba(28,22,17,0.04)]"
         >
           <div className="max-w-2xl mx-auto space-y-1.5">
-            {(isRecordingPtt || isListeningLiveSpeech || liveUserDraft.trim()) && (
+            {(isLiveConnected || isRecordingPtt || isListeningLiveSpeech || liveUserDraft.trim()) && (
               <div
                 data-testid="live-voice-capture-banner"
                 className="flex items-center justify-between gap-2 px-4 py-1.5 rounded-full bg-white shadow-sm text-xs text-[#1C1611]"
               >
                 <div className="flex items-center gap-2 min-w-0 flex-1">
-                  <span className="w-2 h-2 rounded-full bg-[#2E8B69] animate-ping shrink-0" />
+                  <span
+                    className={`w-2 h-2 rounded-full shrink-0 ${
+                      liveUserDraft.trim()
+                        ? 'bg-[#2E8B69] animate-ping'
+                        : isPlayingAiAudio
+                          ? 'bg-[#B8432D] animate-pulse'
+                          : 'bg-[#2E8B69] animate-pulse'
+                    }`}
+                  />
                   <span className="font-medium truncate">
                     {liveUserDraft.trim()
                       ? `"${liveUserDraft.trim()}"`
-                      : locale === 'th'
-                        ? 'กำลังฟังเสียงของคุณ...'
-                        : 'Mendengarkan... Silakan bicara'}
+                      : isPlayingAiAudio
+                        ? locale === 'th'
+                          ? 'AI กำลังพูด (พูดแทรกเพื่อขัดจังหวะได้)'
+                          : 'AI sedang bicara... (bicara langsung untuk menyela)'
+                        : isLiveConnected
+                          ? isMicMuted
+                            ? locale === 'th'
+                              ? 'ไมโครโฟนปิดอยู่ — แตะไอคอนไมค์เพื่อเปิด'
+                              : 'Mikrofon nonaktif — Klik tombol mic untuk aktifkan'
+                            : locale === 'th'
+                              ? 'ไมโครโฟนแฮนด์ฟรีเปิดอยู่ — พูดได้เลยไม่ต้องกดปุ่ม'
+                              : 'Mikrofon handsfree aktif — Bicara langsung tanpa tekan tombol'
+                          : locale === 'th'
+                            ? 'กำลังฟังเสียงของคุณ...'
+                            : 'Mendengarkan... Silakan bicara'}
                   </span>
                 </div>
                 {liveUserDraft.trim() && (
@@ -2916,7 +3119,11 @@ export default function App() {
                       if (isRecordingPtt) stopPttRecording();
                       else if (textToSend) {
                         setLiveUserDraft('');
-                        void submitStudentTurn({ text: textToSend, speakingDurationSec: 3 });
+                        if (isLiveConnected) {
+                          submitLiveUserUtterance(textToSend);
+                        } else {
+                          void submitStudentTurn({ text: textToSend, speakingDurationSec: 3 });
+                        }
                       }
                     }}
                     className="px-3 py-0.5 rounded-full bg-[#1C1611] text-white font-semibold text-[11px] shrink-0 cursor-pointer"
@@ -3010,23 +3217,16 @@ export default function App() {
                 onChange={(e) => setInputText(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && inputText.trim() && !isAnalyzingTurn) {
+                    const textToSend = inputText.trim();
                     if (
                       isLiveConnected &&
                       wsRef.current &&
                       wsRef.current.readyState === WebSocket.OPEN
                     ) {
-                      const textToSend = inputText.trim();
-                      wsRef.current.send(
-                        JSON.stringify({
-                          clientContent: {
-                            turns: [{ role: 'user', parts: [{ text: textToSend }] }],
-                            turnComplete: true,
-                          },
-                        })
-                      );
+                      submitLiveUserUtterance(textToSend);
                       setInputText('');
                     } else {
-                      void submitStudentTurn({ text: inputText });
+                      void submitStudentTurn({ text: textToSend });
                     }
                   }
                 }}
@@ -3041,23 +3241,16 @@ export default function App() {
                 data-testid="send-turn-btn"
                 disabled={isAnalyzingTurn || !inputText.trim()}
                 onClick={() => {
+                  const textToSend = inputText.trim();
                   if (
                     isLiveConnected &&
                     wsRef.current &&
                     wsRef.current.readyState === WebSocket.OPEN
                   ) {
-                    const textToSend = inputText.trim();
-                    wsRef.current.send(
-                      JSON.stringify({
-                        clientContent: {
-                          turns: [{ role: 'user', parts: [{ text: textToSend }] }],
-                          turnComplete: true,
-                        },
-                      })
-                    );
+                    submitLiveUserUtterance(textToSend);
                     setInputText('');
                   } else {
-                    void submitStudentTurn({ text: inputText });
+                    void submitStudentTurn({ text: textToSend });
                   }
                 }}
                 className="px-4 py-2 rounded-full bg-[#1C1611] hover:bg-[#332920] text-white font-semibold text-xs flex items-center justify-center gap-1.5 shrink-0 cursor-pointer transition-all disabled:opacity-30"

@@ -88,6 +88,34 @@ async function runTests() {
   console.log('Cleaned text:    ', cleaned);
   assert.strictEqual(cleaned, 'あはは！やばいね！', 'All emojis and emoticon text must be completely removed');
 
+  // 6. Strict Zero-Kanji Leakage on Conversational Dialogue
+  console.log('\n--- Test Suite 6: Strict Zero-Kanji Leakage on Conversational Sentences ---');
+  const conversationalSentences = [
+    'ヤッホー！今日はお話しできてめっちゃ嬉しい！最近ハマってることでも、今日あった面白いことでも、何でも気軽に話そ！最近どう？',
+    'ヤッホー！お返事ありがとう！今日はどんな一日だった？何か楽しいことあった？',
+    'あはは、そういう日もあるよね！じゃあ、今日食べた美味しいものでも教えてくれる？',
+    'あはは、めっちゃ嫌なことあったんだね。話せる範囲でいいから、愚痴でも何でも聞くよ！',
+    'まあ、そういう時もあるよね！じゃあ、今週末は何か楽しみな予定ある？',
+    'あらら、お仕事かな？お疲れ様！無理しすぎないで、しっかり休んでね！',
+    'こんばんは！夜のお喋りも楽しいよね。今日もう一日お疲れ様、何かいいことあった？',
+    '塩気があってご飯が進むやつだね！私も大好き！他に好きなご飯のお供ってある？',
+    '魚料理は美味しいよね！特にどんな魚や料理法が好き？',
+    'あはは、鮭だね！お刺身も焼き魚も美味しいよね！ちなみに、どっちの料理法が一番好き？',
+    '「気にしないで」は、インドネシア語で「Jangan dipikirkan」だよ。他に知りたい言葉はある？',
+    'あはは！全然そんなことないよ！一生懸命日本語を話そうとしていて、とっても素敵だよ！',
+    'あはは！もう、意地悪なんだから！でも、そんな冗談も言えるようになって、日本語が上手になってる証拠ね！',
+  ];
+  const KANJI_RE = /[\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\u3005]/;
+  for (const s of conversationalSentences) {
+    const res = toPhoneticRomaji(s);
+    assert.strictEqual(
+      KANJI_RE.test(res),
+      false,
+      `ZERO Kanji leakage violation! Kanji found in Romaji output for "${s}": "${res}"`
+    );
+  }
+  console.log(`Validated ${conversationalSentences.length} complex conversational sentences: ZERO Kanji leaks detected.`);
+
   console.log('\n🎉 ALL JAPANESE PHONETICS & FURIGANA TESTS PASSED WITH 100% ACCURACY!');
 }
 
