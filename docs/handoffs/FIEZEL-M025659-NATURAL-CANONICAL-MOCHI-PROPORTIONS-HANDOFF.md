@@ -1,4 +1,4 @@
-# FIEZEL HANDOFF DOSSIER: RESTORATION OF CANONICAL DAIFUKU MOCHI PROPORTIONS (m025-658)
+# FIEZEL HANDOFF DOSSIER: RESTORATION OF CANONICAL DAIFUKU MOCHI PROPORTIONS (m025-659)
 
 ## 1. Executive Summary & Problem Diagnosis
 - **Context & User Feedback:**
@@ -27,7 +27,7 @@
 ## 3. Files Modified
 - `mochi-mascot/fiezel-mochi.js`: Restored canonical geometry ratios, ear anchors, headband curve, and close-up camera framing.
 - `features/ui/fiezel-tactile-clay.css`: Sized `.fz-vissol-mascot-wrap` to $142 \times 142\text{px}$ and `.fz-vissol-mascot-cloud-bg` to $158 \times 154\text{px}$.
-- `sw.js`, `core-config.js`, `features/neural-voice/fiezel-diag-panel.js`, `kurikulum.html`, `misi.html`, `call.html`, `features/voice-studio/call.html`, `coordination/BUILD-VERSION.json`: Hexa-sync bumped to `m025-658`.
+- `sw.js`, `core-config.js`, `features/neural-voice/fiezel-diag-panel.js`, `kurikulum.html`, `misi.html`, `call.html`, `features/voice-studio/call.html`, `coordination/BUILD-VERSION.json`: Hexa-sync bumped to `m025-659`.
 
 ## 4. Verification Checklists & Invariants
 - [x] Zero cartoon avatars or forbidden claims.
