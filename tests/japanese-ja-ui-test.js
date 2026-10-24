@@ -66,7 +66,7 @@ ok(soon.indexOf('go(') < 0 && soon.indexOf('<button') < 0 && soon.indexOf('aria-
   'J5 kartu segera hadir tidak bisa diketuk');
 
 // J6
-ok(J.jlptLabel('A1') === 'N5' && J.jlptLabel('B1') === 'N3' && J.jlptLabel('C1') === 'N1' && J.jlptLabel('C2') === 'N1+', 'J6 label JLPT');
+ok(J.jlptLabel('A1') === 'N5' && J.jlptLabel('B1') === 'N3' && J.jlptLabel('C1') === 'N1' && J.jlptLabel('C2') === 'N1', 'J6 label JLPT');
 ok(J.wordOfDay([{ word: 'a', meaning: 'x' }, { word: 'b', meaning: 'y' }], 86400000).word === 'b', 'J6 kata hari ini deterministik per hari');
 
 // J7
