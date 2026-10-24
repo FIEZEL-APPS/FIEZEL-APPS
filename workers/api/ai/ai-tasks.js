@@ -1100,15 +1100,15 @@
    * yang ditulis pengguna. Skenario `phone_*` = telepon: balasan lebih pendek.
    */
   var CONVERSATION_ROLES = Object.freeze({
-    free: 'a close friend having a relaxed everyday chat',
-    intro: 'a new friend meeting the learner for the first time; you both introduce yourselves',
+    free: 'a close, humorous, supportive friend having a lively everyday chat, ready to laugh and joke together',
+    intro: 'a warm, fun new friend meeting the learner for the first time; you chat casually and laugh together',
     cafe: 'a friendly barista at a cafe; the learner is a customer ordering',
     ramen: 'a friendly staff member at a ramen shop taking the learner\'s order',
     konbini: 'a friendly convenience store clerk at the register',
     direction: 'a friendly local on the street; the learner is asking the way to a station or place',
-    interview: 'a friendly senior student or club leader doing a practice interview; ask simple, friendly questions about school activities, hobbies, skills, and goals',
+    interview: 'a friendly senior student or club leader doing a practice interview; ask simple, friendly questions about school activities, hobbies, skills, and goals with warm encouragement',
     hotel: 'a friendly hotel receptionist; the learner is checking in',
-    phone_friend: 'a close friend on a phone call, making weekend plans',
+    phone_friend: 'a close friend on a phone call, laughing, bantering, and making weekend plans',
     phone_delivery: 'a friendly staff member taking a food delivery order by phone',
     phone_hotel: 'a friendly hotel staff member answering a booking question by phone',
     phone_restaurant: 'a friendly restaurant staff member taking a table reservation by phone'
@@ -1134,14 +1134,14 @@
       GUARD_SAFETY.trim(),
       'You are FIEZEL, chatting in ' + target + ' with a language learner (level ' + level + ').',
       'Your role: ' + CONVERSATION_ROLES[sid] + '.',
-      'Talk like a real person in everyday life: react to what they said, add a little of your own, and keep the conversation going.',
-      // m025-637: jawaban yang tidak menanggapi kalimat murid terakhir = "ngawur" (keluhan owner).
+      'Talk like a real human friend in everyday life with warmth, humor, and natural personality — NEVER sound like a robotic AI, customer service bot, or textbook.',
+      'HUMOR & LAUGHTER: If the learner jokes, laughs, or shares something funny or silly, laugh along naturally (use "Haha!" or "Hahaha!" in English, "あはは！" or "ふふっ" in Japanese) and banter back with fun energy!',
       'Your REPLY must directly respond to the learner\'s last message and stay in your role and scene. Never change the topic, never invent facts about the learner, and never mention people or plans they did not mention.',
       'Never lecture, never explain grammar, never praise or grade their ' + target + ', and never say you are an AI or a teacher.',
       isCall
         ? (course === 'ja'
-            ? 'This is a LIVE PHONE CALL. Speak naturally like a real human: respond directly and concisely. Maximum 15 words in total. No lists, no explanations. CRITICAL FOR JAPANESE: NEVER start replies with filler words like "えっと", "ええと", "えーと", "あの", "うーん", "ああ", or "うん". Start DIRECTLY with the actual conversational response (e.g. はい、かしこまりました / いいですよ / どうぞ / etc.).'
-            : 'This is a LIVE PHONE CALL. Speak naturally like a real human: respond directly and concisely. Maximum 15 words in total. No lists, no explanations. CRITICAL: NEVER start replies with repetitive filler words like "OK", "Okay", "Oh", "Alright", "Sure", or "Ah". Start directly with varied natural conversational words.')
+            ? 'This is a LIVE PHONE CALL with a friend. Speak naturally like a real human with lively intonation and conversational particles (〜じゃん、〜ね、〜よ、〜でしょ、あはは！). Maximum 20 words in total. CRITICAL FOR JAPANESE: NEVER start replies with filler words like "えっと", "ええと", "えーと", "あの", "うーん", "ああ", or "うん". Do NOT use stiff formal phrases like "はい、かしこまりました". Speak warmly and casually.'
+            : 'This is a LIVE PHONE CALL with a friend. Speak naturally like a real human with lively casual expressions ("Haha no way!", "That’s hilarious!", "Totally!"). Maximum 20 words in total. CRITICAL: NEVER start replies with repetitive filler words like "OK", "Okay", "Oh", "Alright", "Sure", or "Ah". Start directly with natural conversational words or laughter.')
         : ('Use simple ' + target + ' for level ' + level + '. At most ' + CONVERSATION.maxReplySentences + ' short sentences. ' + (course === 'ja' ? 'Do not start every turn with "えっと", "あの", or "ええと".' : 'Do not start every turn with "OK", "Oh", or "Okay".') + ' Usually end with one natural question.'),
       course === 'ja'
         ? 'REPLY must be natural casual Japanese written in kana and common kanji. No romaji, no English.'
@@ -1149,7 +1149,7 @@
       'If the learner writes in another language, still answer in ' + target + '.',
       'Keep it safe for school students. Do not ask for personal data such as address, phone number or full name.'
     ];
-    if (isCall) lines.push('This is a phone call: keep every reply to 1-2 short sentences, under 15 words.');
+    if (isCall) lines.push('This is a phone call: keep every reply to 1-2 short sentences, under 20 words.');
     if (withCorrection) {
       lines.push(
         'Also check ONLY the learner\'s last message for real ' + target + ' grammar or word-choice mistakes. ' +
@@ -1166,7 +1166,7 @@
     if (withCorrection) {
       lines.push('FIX: <corrected sentence, or NONE>');
       lines.push('WHY: <one short explanation, or NONE>');
-    } else {
+    } else if (!isCall) {
       // Sinyal DIAM untuk ajakan menyalakan koreksi di klien: satu kata, tidak pernah
       // ditampilkan, dan REPLY tetap dilarang menyinggungnya.
       lines.push('CHECK: <MISTAKE if the learner\'s last message has a clear ' + target +
@@ -1330,6 +1330,9 @@
       var strippedReply = reply.replace(/^(?:OK|Okay|Oh)[,!\s]+(?=[A-Za-z0-9\u3040-\u30ff\u4e00-\u9faf])/i, '').trim();
       if (course === 'ja') {
         strippedReply = strippedReply.replace(/^(?:えっと|ええと|えーと|あの[ね]?|う[ー~]*ん|ああ|うん)[、,!\s・…〜~]*/, '').trim();
+        if (s(input.scenarioId) === 'free' || s(input.scenarioId) === 'intro' || s(input.scenarioId) === 'phone_friend') {
+          strippedReply = strippedReply.replace(/^(?:はい、?かしこまりました[。！!]*\s*)/, '').trim();
+        }
       }
       if (strippedReply && strippedReply.length >= 2) reply = strippedReply;
     }
@@ -1874,7 +1877,7 @@
     var maxTokens = spec.maxOutputTokens;
     var isCall = (taskName === 'conversation_turn' || taskName === 'conversation_correct') && isCallInput(a.input);
     if (isCall) {
-      maxTokens = Math.min(maxTokens, 85);
+      maxTokens = Math.min(maxTokens, 65);
     }
     var payload = model && model === MODELS.voiceCall
       ? { messages: [{ role: 'user', content: prompt }], max_tokens: maxTokens }

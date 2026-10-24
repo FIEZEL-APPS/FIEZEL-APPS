@@ -922,7 +922,10 @@ export async function requestAiPartnerReply(params: {
         .replace(/^["「]|["」]$/g, '')
         .trim();
       if (params.targetLang === 'ja') {
-        const stripped = rawReply.replace(/^(?:えっと|ええと|えーと|あの[ね]?|う[ー~]*ん|ああ|うん)[、,!\s・…〜~]*/, '').trim();
+        let stripped = rawReply.replace(/^(?:えっと|ええと|えーと|あの[ね]?|う[ー~]*ん|ああ|うん)[、,!\s・…〜~]*/, '').trim();
+        if (params.scenario.id.includes('free') || params.scenario.id.includes('intro') || params.scenario.id.includes('phone_friend')) {
+          stripped = stripped.replace(/^(?:はい、?かしこまりました[。！!]*\s*)/, '').trim();
+        }
         if (stripped && stripped.length >= 2) rawReply = stripped;
       } else {
         const stripped = rawReply.replace(/^(?:OK|Okay|Oh|Alright|Sure)[,!\s]+(?=[A-Za-z0-9])/i, '').trim();
@@ -1064,9 +1067,11 @@ export async function resolveAiReply(
         .slice(-6)
         .map((h) => `${h.speaker === 'ai' ? 'You' : 'Learner'}: ${h.text.trim().slice(0, 240)}`);
       const promptText = [
-        `You are ${params.persona.name}, a friendly speaking partner. Scenario: "${params.scenario.titleId}".`,
-        `This is a live phone-style conversation. Reply in ${langLabel}, 1-2 short sentences (max 18 words).`,
-        'Your reply MUST directly respond to what the learner just said. Do not change the topic, do not invent facts about the learner, never grade or explain grammar.',
+        `You are ${params.persona.name}, a real human friend chatting on a live voice call. Scenario: "${params.scenario.titleId}".`,
+        `Reply in ${langLabel}, 1-2 lively conversational sentences (max 20 words).`,
+        'HUMAN PERSONALITY & HUMOR: Be warm, fun, and expressive. If the learner jokes, laughs, or shares something funny or silly, laugh along naturally (use "Haha!" or "Hahaha!" in English, "あはは！" or "ふふっ" in Japanese) and banter back with fun energy!',
+        'NATURAL INTONATION: Talk like a real friend hanging out on a phone call. In Japanese, use natural conversational particles (〜じゃん、〜ね、〜よ、〜でしょ、あはは！). In English, use natural conversational expressions ("Haha no way!", "That’s hilarious!", "Totally!").',
+        'Your reply MUST directly respond to what the learner just said. Do not change the topic, never lecture, never explain grammar, and never sound like a robotic AI or customer service agent.',
         historyLines.length ? `Conversation so far:\n${historyLines.join('\n')}` : '',
         `Learner (last message): "${params.text}"`,
         'aiReplyTranslationId must be a faithful Indonesian translation of aiReply only.',
@@ -1095,7 +1100,10 @@ export async function resolveAiReply(
         const parsed = JSON.parse(rawText);
         let geminiReply = typeof parsed?.aiReply === 'string' ? parsed.aiReply.trim() : '';
         if (params.targetLang === 'ja') {
-          const stripped = geminiReply.replace(/^(?:えっと|ええと|えーと|あの[ね]?|う[ー~]*ん|ああ|うん)[、,!\s・…〜~]*/, '').trim();
+          let stripped = geminiReply.replace(/^(?:えっと|ええと|えーと|あの[ね]?|う[ー~]*ん|ああ|うん)[、,!\s・…〜~]*/, '').trim();
+          if (params.scenario.id.includes('free') || params.scenario.id.includes('intro') || params.scenario.id.includes('phone_friend')) {
+            stripped = stripped.replace(/^(?:はい、?かしこまりました[。！!]*\s*)/, '').trim();
+          }
           if (stripped && stripped.length >= 2) geminiReply = stripped;
         } else {
           const stripped = geminiReply.replace(/^(?:OK|Okay|Oh|Alright|Sure)[,!\s]+(?=[A-Za-z0-9])/i, '').trim();

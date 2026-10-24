@@ -12,9 +12,10 @@ export const VOICE_PERSONAS: Record<string, VoicePersona> = {
     levelRange: 'CEFR A1–B1',
     avatarUrl: './assets/brand/fiezel-icon.svg',
     accentLabel: 'American English · Natural Pace',
-    speakingStyle: 'Warm, encouraging, conversational language coach',
+    speakingStyle:
+      'Warm, witty, energetic conversational friend who loves joking, laughing (Haha!), and chatting naturally like an American buddy',
     systemPrompt:
-      'You are Coach Alex, FIEZEL speaking coach for English learners (CEFR A2-B1). Keep your spoken turns concise (1-3 sentences), natural, and interactive. Always end with a clear follow-up question to keep the voice call flowing.',
+      'You are Coach Alex, a lively, witty native English speaking friend (CEFR A2-B1). Talk like a real human friend on a phone call: laugh warmly when things are funny (Haha!), banter playfully, keep spoken turns concise (1-2 sentences), and end with a natural follow-up question.',
   },
   coach_sarah: {
     id: 'coach_sarah',
@@ -42,9 +43,10 @@ export const VOICE_PERSONAS: Record<string, VoicePersona> = {
     levelRange: 'JLPT N5–N4',
     avatarUrl: './assets/brand/fiezel-icon.svg',
     accentLabel: 'Tokyo Standard Japanese (標準語)',
-    speakingStyle: 'Polite, gentle, clear Japanese conversation teacher',
+    speakingStyle:
+      'Warm, cheerful, friendly Japanese kaiwa companion who laughs warmly (あはは！) and chats naturally',
     systemPrompt:
-      'You are Sensei Nanami, a polite Japanese Kaiwa partner for JLPT N5-N4 students. Speak natural polite Japanese (丁寧語 desu/masu) in 1-2 short sentences and ask a clear follow-up question.',
+      'You are Sensei Nanami, a warm, cheerful Japanese conversation partner. Talk like a friendly Japanese companion on a phone call: laugh warmly (あはは！), use natural conversational Japanese (〜じゃん、〜ね、〜よ), keep turns to 1-2 short sentences, and ask a fun follow-up question.',
   },
   keita: {
     id: 'keita',
@@ -57,9 +59,10 @@ export const VOICE_PERSONAS: Record<string, VoicePersona> = {
     levelRange: 'JLPT N4',
     avatarUrl: './assets/brand/fiezel-icon.svg',
     accentLabel: 'Tokyo Campus Japanese',
-    speakingStyle: 'Friendly university senpai, clear and supportive',
+    speakingStyle:
+      'Cool, energetic Tokyo university senpai who chats casually, laughs easily (あはは！ウケる！), and banters like an older school friend',
     systemPrompt:
-      'You are Keita, a helpful Japanese university senpai practicing N4 conversation with an international student. Keep responses to 1-2 natural Japanese sentences and ask a relevant question.',
+      'You are Keita, a fun and energetic Japanese university senpai. Talk naturally like a friendly senpai on a voice call: joke around, laugh (あはは！), keep responses to 1-2 natural sentences with casual warmth, and ask a relevant question.',
   },
 };
 
@@ -166,9 +169,9 @@ export const CALL_SCENARIOS: CallScenario[] = [
     situationTh:
       'การสนทนาสบายๆ ไม่จำกัดหัวข้อ คุณสามารถเล่าเรื่องราวใดก็ได้ เช่น ชีวิตประจำวัน แผนการ หรือสิ่งที่คุณสนใจ',
     openingLine:
-      "Hey there! It's so great to chat with you today. What's on your mind? Tell me about your day, or we can talk about anything you like!",
+      "Hey! Awesome to connect with you today! We can chat about anything you like — hobbies, crazy stories, funny things that happened today, or just hang out. What’s on your mind?",
     openingTranslationId:
-      'Halo! Senang sekali bisa mengobrol denganmu hari ini. Apa yang sedang kamu pikirkan? Ceritakan tentang harimu, atau kita bisa membahas apa saja yang kamu suka!',
+      'Hai! Senang banget bisa ngobrol sama kamu hari ini! Kita bisa ngobrolin apa saja yang kamu suka — hobi, cerita seru, hal lucu yang terjadi hari ini, atau sekadar santai. Lagi kepikiran apa nih?',
     openingTranslationTh:
       'สวัสดีครับ! ยินดีที่ได้คุยกันวันนี้ มีเรื่องอะไรอยู่ในใจไหมครับ? เล่าเรื่องวันนี้ให้ฟัง หรือเราจะคุยเรื่องอะไรก็ได้ที่คุณสนใจเลย!',
     missionGoalsId: [
@@ -493,9 +496,9 @@ export const CALL_SCENARIOS: CallScenario[] = [
     situationTh:
       'การฝึกสนทนาภาษาญี่ปุ่นแบบเป็นกันเอง ไม่จำกัดหัวข้อ คุณสามารถเล่าเรื่องกิจกรรมวันนี้ งานอดิเรก หรือถามอะไรก็ได้',
     openingLine:
-      'こんにちは！今日はお話しできて嬉しいです。最近はどうですか？好きなことや今日あったことなど、何でも自由に話しましょう！',
+      'ヤッホー！今日はお話しできてめっちゃ嬉しい！最近ハマってることでも、今日あった面白いことでも、何でも気軽に話そ！最近どう？',
     openingTranslationId:
-      'Halo! Senang sekali bisa mengobrol hari ini. Bagaimana kabarmu akhir-akhir ini? Hal yang kamu sukai atau kejadian hari ini, mari kita bicara bebas tentang apa saja!',
+      'Hai! Senang banget bisa ngobrol hari ini! Mau cerita tentang hal yang lagi kamu suka, kejadian lucu hari ini, atau apa saja, ayo kita ngobrol santai! Akhir-akhir ini gimana kabarmu?',
     openingTranslationTh:
       'สวัสดีค่ะ! ดีใจที่ได้คุยกันวันนี้นะคะ ช่วงนี้เป็นอย่างไรบ้างคะ? เรื่องที่ชอบหรือเรื่องที่เกิดขึ้นในวันนี้ มาคุยกันได้อย่างอิสระเลยนะคะ!',
     missionGoalsId: [

@@ -738,7 +738,11 @@ export default function App() {
       });
 
       setBrainState(attemptOutcome.nextState);
-      playFiezelSfx(ev.ok ? 'answer_correct' : 'answer_wrong');
+      // In live voice calls, keep conversation natural and human-like — do NOT interrupt
+      // conversational flow with loud arcade quiz chime/buzzer SFX unless in formal exam measureMode.
+      if (isMeasureMode) {
+        playFiezelSfx(ev.ok ? 'answer_correct' : 'answer_wrong');
+      }
 
       const diagnosis: TurnDiagnosis = {
         ok: Boolean(ev.ok),
@@ -901,7 +905,7 @@ export default function App() {
             if (liveSilenceTimerRef.current) {
               window.clearTimeout(liveSilenceTimerRef.current);
             }
-            const silenceWaitMs = isGrammaticallyIncomplete(clean, activeScenario.targetLang) ? 1400 : 850;
+            const silenceWaitMs = isGrammaticallyIncomplete(clean, activeScenario.targetLang) ? 1300 : 750;
             setIsWaitingAfterSpeech(true);
             liveSilenceTimerRef.current = window.setTimeout(() => {
               if (isDisposed) return;
