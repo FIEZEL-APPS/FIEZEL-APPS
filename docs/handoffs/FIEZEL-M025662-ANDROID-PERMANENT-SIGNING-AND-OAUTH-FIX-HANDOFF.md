@@ -1,4 +1,4 @@
-# FIEZEL HANDOFF DOSSIER: M025-661 (Android Permanent Signing & Google OAuth Repair)
+# FIEZEL HANDOFF DOSSIER: M025-662 (Android Permanent Signing & Google OAuth Repair)
 
 ## 1. Ringkasan Temuan Audit & Alasan Perubahan
 
@@ -46,7 +46,7 @@ Semua rangkaian pengujian telah dijalankan dan lulus 100%:
 3. **`tests/android-app-integrity-test.js`** (7/7 checks passed):
    - Manifest, dependencies, arsitektur WebView, ikon launcher, zero plaintext secrets.
 4. **`python tests/test-build-android-workflow.py`** (16 steps passed).
-5. **`tests/curriculum-cache-version-test.js`** (33 penegasan lulus, build `m025-661`).
+5. **`tests/curriculum-cache-version-test.js`** (33 penegasan lulus, build `m025-662`).
 6. **`tests/gate-registry-test.js`** (10 pass, 0 fail).
 7. **`tests/workflow-actor-gate-test.js`** (56 pass, 0 fail).
 8. **`tests/workflow-timeout-gate-test.js`** (31 jobs <= 120 mins).
@@ -65,14 +65,14 @@ Semua rangkaian pengujian telah dijalankan dan lulus 100%:
 | `android/app/src/main/java/id/my/fiezel/app/client/FiezelWebViewClient.java` | Perluasan domain otentikasi Google internal |
 | `.github/workflows/quality.yml` | Pendaftaran gerbang `tests/android-signing-and-oauth-audit-test.js` |
 | `tests/android-signing-and-oauth-audit-test.js` | Berkas pengujian audit penandatanganan dan Google OAuth |
-| `coordination/BUILD-VERSION.json` | Bump versi hexa-sync ke `m025-661` |
-| `sw.js`, `core-config.js`, `fiezel-diag-panel.js` | Sinkronisasi versi hexa-sync ke `m025-661` |
-| `kurikulum.html`, `misi.html`, `call.html` | Sinkronisasi cache-busting `?v=m025-661` |
+| `coordination/BUILD-VERSION.json` | Bump versi hexa-sync ke `m025-662` |
+| `sw.js`, `core-config.js`, `fiezel-diag-panel.js` | Sinkronisasi versi hexa-sync ke `m025-662` |
+| `kurikulum.html`, `misi.html`, `call.html` | Sinkronisasi cache-busting `?v=m025-662` |
 
 ---
 
 ## 4. Status Kelulusan Mutu & Catatan Handoff
 
-- **PWA Hexa-Sync**: 100% Selaras (`m025-661`).
+- **PWA Hexa-Sync**: 100% Selaras (`m025-662`).
 - **Git Protection Rule**: Siap diajukan melalui Pull Request resmi ke `main`.
 - **Utang Teknis**: Nol. Seluruh skema penandatanganan dan integrasi WebKit berada dalam kondisi optimal.
