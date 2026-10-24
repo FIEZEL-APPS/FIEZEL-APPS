@@ -55,6 +55,8 @@ import {
   getBeginnerReplyCards,
   translateAndPhoneticizeLiveText,
 } from './lib/liveCallHelper';
+import { JapaneseRubyDisplay } from './components/JapaneseRubyDisplay';
+import { stripEmojisAndEmotWords, toPhoneticRomaji } from './lib/japanesePhonetics';
 import {
   evaluateTurnLocal,
   evaluateUtteranceClientSide,
@@ -566,7 +568,8 @@ export default function App() {
     preloadedBase64?: string | null,
     overrideRate?: number
   ) => {
-    if (!text.trim()) return;
+    const cleanSpoken = stripEmojisAndEmotWords(text).trim();
+    if (!cleanSpoken) return;
     const targetRate = overrideRate ?? speechRate;
     const token = ++speakTokenRef.current;
 
@@ -574,9 +577,9 @@ export default function App() {
     // after chunk i has arrived (while chunk i is playing on the speaker) so two TTS requests
     // never compete on Render's single worker.
     const chunks = preloadedBase64
-      ? [text]
-      : splitIntoSpeechChunks(text, activeScenario.targetLang);
-    if (!chunks.length) chunks.push(text);
+      ? [cleanSpoken]
+      : splitIntoSpeechChunks(cleanSpoken, activeScenario.targetLang);
+    if (!chunks.length) chunks.push(cleanSpoken);
     const fetchChunk = (idx: number) =>
       idx === 0 && preloadedBase64
         ? Promise.resolve({ audioBase64: preloadedBase64, audioMimeType: 'audio/mpeg', engine: 'preloaded' })
@@ -2400,13 +2403,20 @@ export default function App() {
                       </div>
                     ) : (
                       <>
-                        <p
+                        <div
                           data-testid="live-hud-ai-text"
                           data-reply-source={liveAiDraft.trim() ? 'live' : lastAiTurn?.replySource || 'script'}
-                          className="text-base sm:text-lg font-semibold text-[#1C1611] leading-snug tracking-[-0.01em] break-words"
+                          className="space-y-1"
                         >
-                          {activeAiLiveText}
-                        </p>
+                          <JapaneseRubyDisplay
+                            text={activeAiLiveText}
+                            targetLang={activeScenario.targetLang}
+                            showRomaji={!isMeasureMode}
+                            className="text-base sm:text-lg font-semibold text-[#1C1611] leading-snug tracking-[-0.01em] break-words"
+                            rubyClassName="text-base sm:text-lg"
+                            romajiClassName="text-xs sm:text-sm text-[#8C6D1F] font-medium mt-0.5"
+                          />
+                        </div>
 
                         {!isMeasureMode && showTranslations && (
                           <p
@@ -2435,7 +2445,16 @@ export default function App() {
                     {activeUserSubtitle && (
                       <div className="pt-1">
                         <span className="inline-block px-3 py-1 rounded-full bg-[#F5F1E8] text-xs text-[#5C4E3C]">
-                          <strong className="font-semibold text-[#1C1611]">Kamu:</strong> "{activeUserSubtitle.text}"
+                          <strong className="font-semibold text-[#1C1611] mr-1">Kamu:</strong>
+                          <JapaneseRubyDisplay
+                            as="span"
+                            text={activeUserSubtitle.text}
+                            targetLang={activeScenario.targetLang}
+                            showRomaji={true}
+                            className="inline"
+                            rubyClassName="text-xs font-medium text-[#1C1611]"
+                            romajiClassName="text-[10px] text-[#8C6D1F]"
+                          />
                         </span>
                       </div>
                     )}
@@ -2599,14 +2618,21 @@ export default function App() {
                             key={turn.id}
                             className="bg-white/85 rounded-2xl rounded-tl-xs px-4 py-2.5 max-w-[90%] sm:max-w-[82%] shadow-[0_1px_3px_rgba(28,22,17,0.04)] break-words space-y-1"
                           >
-                            <div className="flex items-center justify-between gap-2">
-                              <p className="text-sm font-medium text-[#1C1611] break-words leading-snug">
-                                {turn.text}
-                              </p>
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="min-w-0 flex-1">
+                                <JapaneseRubyDisplay
+                                  text={turn.text}
+                                  targetLang={activeScenario.targetLang}
+                                  showRomaji={!isMeasureMode}
+                                  className="text-sm font-medium text-[#1C1611] break-words leading-snug"
+                                  rubyClassName="text-sm font-medium"
+                                  romajiClassName="text-xs text-[#8C6D1F] font-medium mt-0.5"
+                                />
+                              </div>
                               <button
                                 type="button"
                                 onClick={() => void speakAiText(turn.text, turn.audioBase64, 1.0)}
-                                className="w-6 h-6 rounded-full bg-[#F5F1E8] hover:bg-[#EAE3D5] flex items-center justify-center text-[#5C4E3C] shrink-0 cursor-pointer"
+                                className="w-6 h-6 rounded-full bg-[#F5F1E8] hover:bg-[#EAE3D5] flex items-center justify-center text-[#5C4E3C] shrink-0 cursor-pointer mt-0.5"
                                 title="Putar suara"
                               >
                                 <Volume2 className="w-3 h-3" />
@@ -2629,10 +2655,18 @@ export default function App() {
                           <div className="bg-[#1C1611] text-white rounded-2xl rounded-tr-xs px-4 py-2 max-w-[90%] sm:max-w-[82%] break-words">
                             <p
                               data-testid="user-exact-transcript"
-                              className="text-sm font-medium break-words"
+                              className="sr-only"
                             >
                               {turn.text}
                             </p>
+                            <JapaneseRubyDisplay
+                              text={turn.text}
+                              targetLang={activeScenario.targetLang}
+                              showRomaji={true}
+                              className="text-sm font-medium text-white break-words"
+                              rubyClassName="text-sm font-medium text-white"
+                              romajiClassName="text-xs text-[#FFE082] font-medium mt-0.5"
+                            />
                           </div>
 
                           {diag && (

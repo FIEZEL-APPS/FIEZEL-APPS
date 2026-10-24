@@ -1,3 +1,5 @@
+import { toPhoneticRomaji, renderFuriganaHtml, stripEmojisAndEmotWords } from './japanesePhonetics';
+
 export interface BeginnerReplyCard {
   id: string;
   badgeId: string;
@@ -17,6 +19,7 @@ export interface LiveTranslationResult {
   pronunciation: string;
   translationId: string;
   translationTh: string;
+  furiganaHtml?: string;
 }
 
 export interface ExtractedUserContext {
@@ -541,71 +544,7 @@ export function approximateEnglishPhoneticId(text: string): string {
 }
 
 export function approximateJapaneseRomaji(text: string): string {
-  const map: Array<[RegExp, string]> = [
-    [/いらっしゃいませ/g, 'Irasshaimase'],
-    [/ご注文はお決まりですか/g, 'go-chuumon wa o-kimari desu ka'],
-    [/かしこまりました/g, 'Kashikomarimashita'],
-    [/すみません/g, 'Sumimasen'],
-    [/ありがとうございます/g, 'arigatou gozaimasu'],
-    [/よろしくお願いします/g, 'yoroshiku onegaishimasu'],
-    [/お願いします/g, 'onegaishimasu'],
-    [/ください/g, 'kudasai'],
-    [/ホットコーヒー/g, 'hotto koohii'],
-    [/アイスコーヒー/g, 'aisu koohii'],
-    [/チーズケーキ/g, 'chiizukeeki'],
-    [/サンドイッチ/g, 'sandoicchi'],
-    [/お砂糖とミルク/g, 'o-satou to miruku'],
-    [/お砂糖/g, 'o-satou'],
-    [/ミルク/g, 'miruku'],
-    [/ブラックで/g, 'burakku de'],
-    [/大丈夫です/g, 'daijoubu desu'],
-    [/一つ/g, 'hitotsu'],
-    [/二つ/g, 'futatsu'],
-    [/店内で/g, 'tennai de'],
-    [/お召し上がりですか/g, 'o-meshiagari desu ka'],
-    [/お持ち帰りで/g, 'o-mochikaeri de'],
-    [/持ち帰りで/g, 'mochikaeri de'],
-    [/袋を/g, 'fukuro o'],
-    [/レジ袋/g, 'rejibukuro'],
-    [/窓際の席/g, 'madogiwa no seki'],
-    [/わたしは/g, 'watashi wa'],
-    [/私は/g, 'watashi wa'],
-    [/来週/g, 'raishuu'],
-    [/今週の金曜日/g, 'konshuu no kinyoubi'],
-    [/金曜日/g, 'kinyoubi'],
-    [/図書館で/g, 'toshokan de'],
-    [/図書館/g, 'toshokan'],
-    [/一緒に/g, 'issho ni'],
-    [/練習しましょう/g, 'renshuu shimashou'],
-    [/練習したいです/g, 'renshuu shitai desu'],
-    [/練習/g, 'renshuu'],
-    [/大切な/g, 'taisetsu na'],
-    [/テストがあるので/g, 'tesuto ga aru node'],
-    [/テスト/g, 'tesuto'],
-    [/レポート/g, 'repooto'],
-    [/毎日/g, 'mainichi'],
-    [/どう勉強したらいいですか/g, 'dou benkyou shitara ii desu ka'],
-    [/勉強/g, 'benkyou'],
-    [/教科書のまとめ/g, 'kyoukasho no matome'],
-    [/文法/g, 'bunpou'],
-    [/書き方/g, 'kakikata'],
-    [/難しいので/g, 'muzukashii node'],
-    [/教えていただけますか/g, 'oshiete itadakemasu ka'],
-    [/ぜひ/g, 'zehi'],
-    [/とても楽しみです/g, 'totemo tanoshimi desu'],
-    [/もう一度/g, 'mou ichido'],
-    [/ゆっくり/g, 'yukkuri'],
-    [/言ってください/g, 'itte kudasai'],
-    [/はい/g, 'Hai'],
-    [/いいえ/g, 'Iie'],
-    [/です/g, 'desu'],
-    [/ます/g, 'masu'],
-  ];
-  let out = text;
-  for (const [rgx, rep] of map) {
-    out = out.replace(rgx, ` ${rep} `);
-  }
-  return out.replace(/\s+/g, ' ').trim();
+  return toPhoneticRomaji(text);
 }
 
 function approximateJapaneseToIndonesian(text: string): string {
@@ -687,37 +626,42 @@ export function translateAndPhoneticizeLiveText(
   explicitTranslationTh?: string,
   explicitPronunciation?: string
 ): LiveTranslationResult {
-  const clean = (rawText || '').trim();
+  const clean = stripEmojisAndEmotWords(rawText || '').trim();
   if (!clean) {
     return {
       text: '',
       pronunciation: '',
       translationId: '',
       translationTh: '',
+      furiganaHtml: '',
     };
   }
 
   const lower = clean.toLowerCase();
   for (const item of KNOWN_UTTERANCE_TRANSLATIONS) {
     if (lower.includes(item.match.toLowerCase())) {
+      const furiganaHtml = targetLang === 'ja' ? renderFuriganaHtml(clean) : undefined;
       return {
         text: clean,
-        pronunciation: explicitPronunciation || approximateEnglishPhoneticId(clean),
+        pronunciation: explicitPronunciation || (targetLang === 'ja' ? toPhoneticRomaji(clean) : approximateEnglishPhoneticId(clean)),
         translationId: explicitTranslationId || item.translationId,
         translationTh: explicitTranslationTh || item.translationTh,
+        furiganaHtml,
       };
     }
   }
 
   if (targetLang === 'ja') {
-    const romaji = explicitPronunciation || approximateJapaneseRomaji(clean);
+    const romaji = explicitPronunciation || toPhoneticRomaji(clean);
     const idTrans = explicitTranslationId || approximateJapaneseToIndonesian(clean);
     const thTrans = explicitTranslationTh || idTrans;
+    const furiganaHtml = renderFuriganaHtml(clean);
     return {
       text: clean,
       pronunciation: romaji,
       translationId: idTrans,
       translationTh: thTrans,
+      furiganaHtml,
     };
   }
 

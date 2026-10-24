@@ -267,3 +267,23 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Japanese Furigana & Ruby Typography */
+ruby.fz-ja-ruby {
+  ruby-position: over;
+  display: inline-ruby;
+  vertical-align: baseline;
+}
+rt.fz-ja-rt {
+  font-size: 0.62em;
+  font-weight: 600;
+  color: #8C6D1F;
+  line-height: 1;
+  user-select: none;
+  text-align: center;
+}
+.fz-ja-romaji-text {
+  font-feature-settings: "liga" 1;
+  letter-spacing: 0.02em;
+}
+
