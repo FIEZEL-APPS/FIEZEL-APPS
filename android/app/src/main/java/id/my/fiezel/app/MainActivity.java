@@ -40,11 +40,13 @@ import androidx.core.view.WindowCompat;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.webkit.ServiceWorkerClientCompat;
 import androidx.webkit.ServiceWorkerControllerCompat;
+import androidx.webkit.WebSettingsCompat;
 import androidx.webkit.WebViewFeature;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import id.my.fiezel.app.bridge.FiezelNativeBridge;
@@ -245,6 +247,15 @@ public class MainActivity extends AppCompatActivity {
         String cleanUA = sanitizeUserAgent(baseUA);
         settings.setUserAgentString(cleanUA);
 
+        // Suppress X-Requested-With header to prevent Google OAuth 403 disallowed_useragent
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.REQUESTED_WITH_HEADER_ALLOW_LIST)) {
+            try {
+                WebSettingsCompat.setRequestedWithHeaderOriginAllowList(settings, Collections.emptySet());
+            } catch (Exception e) {
+                Log.w(TAG, "Cannot set requested with header allow list", e);
+            }
+        }
+
         // Third-party cookie support for cross-origin authentication
         CookieManager cookieManager = CookieManager.getInstance();
         cookieManager.setAcceptCookie(true);
@@ -381,6 +392,14 @@ public class MainActivity extends AppCompatActivity {
                 popupSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
                 popupSettings.setUserAgentString(cleanUA);
 
+                if (WebViewFeature.isFeatureSupported(WebViewFeature.REQUESTED_WITH_HEADER_ALLOW_LIST)) {
+                    try {
+                        WebSettingsCompat.setRequestedWithHeaderOriginAllowList(popupSettings, Collections.emptySet());
+                    } catch (Exception e) {
+                        Log.w(TAG, "Cannot set requested with header allow list for popup", e);
+                    }
+                }
+
                 CookieManager cm = CookieManager.getInstance();
                 cm.setAcceptCookie(true);
                 cm.setAcceptThirdPartyCookies(popupWebView, true);
@@ -400,17 +419,18 @@ public class MainActivity extends AppCompatActivity {
                         if (req == null || req.getUrl() == null) return false;
                         Uri uri = req.getUrl();
                         String host = uri.getHost();
-                        if (host != null && (
-                                host.equalsIgnoreCase("accounts.google.com") ||
-                                host.endsWith(".google.com") ||
-                                host.endsWith(".googleusercontent.com") ||
-                                host.endsWith(".gstatic.com") ||
-                                host.endsWith(".googleapis.com") ||
-                                host.equalsIgnoreCase(FiezelAssetLoaderFactory.DOMAIN_FIEZEL) ||
-                                host.endsWith("." + FiezelAssetLoaderFactory.DOMAIN_FIEZEL) ||
-                                host.equalsIgnoreCase(FiezelAssetLoaderFactory.DOMAIN_APPASSETS)
-                        )) {
-                            return false;
+                        if (host != null) {
+                            String lowerHost = host.toLowerCase();
+                            if (lowerHost.contains("google.") ||
+                                lowerHost.endsWith(".google") ||
+                                lowerHost.contains("gstatic.com") ||
+                                lowerHost.contains("googleusercontent.com") ||
+                                lowerHost.contains("googleapis.com") ||
+                                lowerHost.equalsIgnoreCase(FiezelAssetLoaderFactory.DOMAIN_FIEZEL) ||
+                                lowerHost.endsWith("." + FiezelAssetLoaderFactory.DOMAIN_FIEZEL) ||
+                                lowerHost.equalsIgnoreCase(FiezelAssetLoaderFactory.DOMAIN_APPASSETS)) {
+                                return false;
+                            }
                         }
                         try {
                             Intent ext = new Intent(Intent.ACTION_VIEW, uri);
@@ -423,9 +443,12 @@ public class MainActivity extends AppCompatActivity {
                     public void onPageFinished(WebView v, String url) {
                         super.onPageFinished(v, url);
                         if (url != null && url.contains(FiezelAssetLoaderFactory.DOMAIN_FIEZEL) && !url.contains("accounts.google.com")) {
-                            if (activeAuthDialog != null && activeAuthDialog.isShowing()) {
-                                activeAuthDialog.dismiss();
-                            }
+                            // Delay dismissal slightly to allow postMessage token exchange with parent window
+                            v.postDelayed(() -> {
+                                if (activeAuthDialog != null && activeAuthDialog.isShowing()) {
+                                    activeAuthDialog.dismiss();
+                                }
+                            }, 500);
                         }
                     }
                 });
