@@ -808,6 +808,8 @@ jobs:
           node tests/ai-task-contract-test.js
           # Ngobrol AI: task percakapan + gerbang anti-anomali + jatah chat sendiri (aiChat).
           node tests/ai-conversation-task-test.js
+          # M025-649: gerbang fonetik Jepang, furigana ruby, romaji wa/o/e eksak, dan anti-bocor emoji.
+          node tests/japanese-phonetics-test.js
           # V4: gerbang bentuk jawaban Workers AI + kontrak mutu keluaran. Dijalankan tepat
           # sesudah gerbang kontrak task karena keduanya menguji berkas yang sama dari dua sisi:
           # yang di atas menjaga bentuk PERMINTAAN (klien tidak mengirim prompt), yang ini menjaga

@@ -2,6 +2,8 @@ import React from 'react';
 import { Volume2, Send, Mic, RefreshCw } from 'lucide-react';
 import { BeginnerReplyCard } from '../lib/liveCallHelper';
 import { CallScenario, LearnerLocale } from '../types/voiceCall';
+import { JapaneseRubyDisplay } from './JapaneseRubyDisplay';
+import { toPhoneticRomaji } from '../lib/japanesePhonetics';
 
 interface BeginnerAnswerAssistantProps {
   locale: LearnerLocale;
@@ -115,18 +117,23 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
               onClick={() => onSelectForInput(card.text)}
               className="w-full cursor-pointer space-y-0.5"
             >
-              <p
+              <div
                 data-testid={index === 0 ? 'teleprompter-target-text' : undefined}
                 className="text-sm sm:text-[15px] font-semibold text-[#1C1611] leading-snug break-words"
               >
-                {card.text}
-              </p>
+                <JapaneseRubyDisplay
+                  text={card.text}
+                  targetLang={targetLang}
+                  showRomaji={false}
+                  rubyClassName="text-sm sm:text-[15px] font-semibold text-[#1C1611]"
+                />
+              </div>
 
               <p
                 data-testid={index === 0 ? 'teleprompter-pronunciation' : undefined}
                 className="text-xs text-[#8C6D1F] font-medium leading-snug break-words"
               >
-                {card.pronunciation}
+                {targetLang === 'ja' ? toPhoneticRomaji(card.text) : card.pronunciation}
               </p>
             </div>
 

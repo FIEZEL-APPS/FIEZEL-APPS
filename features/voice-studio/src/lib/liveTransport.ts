@@ -5,6 +5,7 @@ import {
   getBeginnerReplyCards,
   translateAndPhoneticizeLiveText,
 } from './liveCallHelper';
+import { stripEmojisAndEmotWords, toPhoneticRomaji } from './japanesePhonetics';
 
 export type LiveTransportMode = 'ws-duplex' | 'turn-by-turn-fallback';
 
@@ -1069,8 +1070,9 @@ export async function resolveAiReply(
       const promptText = [
         `You are ${params.persona.name}, a real human friend chatting on a live voice call. Scenario: "${params.scenario.titleId}".`,
         `Reply in ${langLabel}, 1-2 lively conversational sentences (max 20 words).`,
-        'HUMAN PERSONALITY & HUMOR: Be warm, fun, and expressive. If the learner jokes, laughs, or shares something funny or silly, laugh along naturally (use "Haha!" or "Hahaha!" in English, "あはは！" or "ふふっ" in Japanese) and banter back with fun energy!',
-        'NATURAL INTONATION: Talk like a real friend hanging out on a phone call. In Japanese, use natural conversational particles (〜じゃん、〜ね、〜よ、〜でしょ、あはは！). In English, use natural conversational expressions ("Haha no way!", "That’s hilarious!", "Totally!").',
+        'HUMAN WARMTH, WIT & VARIED HUMOR: Be warm, fun, and expressive like a real human friend hanging out. If the learner jokes or says something funny, react with lively empathy and varied natural humor (e.g. "No way, seriously?!", "That is too funny!", "Oh man, I know that feeling!"). In Japanese, use natural friendly exclamations (e.g. 「えー！ウケる！」, 「それめっちゃわかる〜！」, 「うそでしょ！？」, 「ふふっ、最高！」, 「マジで！？」). DO NOT mechanically prepend "Haha!" or "あはは！" to every single response like a repetitive robot template! Vary your openers and reactions naturally.',
+        'NATURAL INTONATION: Talk like a real friend hanging out on a phone call. In Japanese, use natural conversational particles (〜じゃん、〜ね、〜よ、〜でしょ). In English, use natural conversational expressions.',
+        'ABSOLUTE BAN ON EMOJIS & EMOTICONS: NEVER include emojis (😊, 😂, etc.), emoticon descriptions (smiling face, etc.), or action tags (*laughs*, (smiles)). All output must be pure, clean spoken words.',
         'Your reply MUST directly respond to what the learner just said. Do not change the topic, never lecture, never explain grammar, and never sound like a robotic AI or customer service agent.',
         historyLines.length ? `Conversation so far:\n${historyLines.join('\n')}` : '',
         `Learner (last message): "${params.text}"`,
@@ -1109,6 +1111,9 @@ export async function resolveAiReply(
           const stripped = geminiReply.replace(/^(?:OK|Okay|Oh|Alright|Sure)[,!\s]+(?=[A-Za-z0-9])/i, '').trim();
           if (stripped && stripped.length >= 2) geminiReply = stripped;
         }
+        geminiReply = stripEmojisAndEmotWords(geminiReply);
+        const geminiTransId = stripEmojisAndEmotWords(parsed.aiReplyTranslationId || '');
+        const geminiTransTh = stripEmojisAndEmotWords(parsed.aiReplyTranslationTh || '');
         if (geminiReply && replyLooksLikeTargetLanguage(geminiReply, params.targetLang)) {
           const ttsPromise = synthesizeFlexibleTts({
             text: geminiReply,
@@ -1127,8 +1132,8 @@ export async function resolveAiReply(
           return {
             ...localResult,
             aiReply: geminiReply,
-            aiReplyTranslationId: parsed.aiReplyTranslationId || '',
-            aiReplyTranslationTh: parsed.aiReplyTranslationTh || '',
+            aiReplyTranslationId: geminiTransId,
+            aiReplyTranslationTh: geminiTransTh,
             nextSuggestedReplies: cards,
             audioBase64: ttsRes?.audioBase64 || null,
             audioMimeType: ttsRes?.audioMimeType || 'audio/mpeg',
@@ -1153,8 +1158,10 @@ export async function resolveAiReply(
   });
 
   if (partner) {
+    const cleanPartnerReply = stripEmojisAndEmotWords(partner.reply);
+    const cleanPartnerTrans = stripEmojisAndEmotWords(partner.translation);
     const ttsPromise = synthesizeFlexibleTts({
-      text: partner.reply,
+      text: cleanPartnerReply,
       targetLang: params.targetLang,
       persona: params.persona,
     });
@@ -1162,16 +1169,16 @@ export async function resolveAiReply(
       params.scenario.id,
       params.targetLang,
       undefined,
-      partner.reply,
+      cleanPartnerReply,
       params.text,
       params.history
     );
     const ttsRes = await ttsPromise;
     return {
       ...localResult,
-      aiReply: partner.reply,
-      aiReplyTranslationId: params.locale === 'th' ? '' : partner.translation,
-      aiReplyTranslationTh: params.locale === 'th' ? partner.translation : '',
+      aiReply: cleanPartnerReply,
+      aiReplyTranslationId: params.locale === 'th' ? '' : cleanPartnerTrans,
+      aiReplyTranslationTh: params.locale === 'th' ? cleanPartnerTrans : '',
       nextSuggestedReplies: cards,
       audioBase64: ttsRes?.audioBase64 || null,
       audioMimeType: ttsRes?.audioMimeType || 'audio/mpeg',
@@ -1260,6 +1267,9 @@ export async function synthesizeFlexibleTts(params: {
   /** Retry path: ignore the short failure cooldown. */
   force?: boolean;
 }): Promise<{ audioBase64: string; audioMimeType: string; engine: string } | null> {
+  const cleanSpokenText = stripEmojisAndEmotWords(params.text).trim();
+  if (!cleanSpokenText) return null;
+
   const speakerMap: Record<string, string> = {
     coach_alex: 'coach_alex',
     coach_sarah: 'coach_sarah',
@@ -1272,7 +1282,7 @@ export async function synthesizeFlexibleTts(params: {
     (params.persona && speakerMap[params.persona.id]) ||
     (params.targetLang === 'ja' ? 'sensei_nanami' : 'coach_alex');
 
-  const cacheKey = `${speaker}:${params.targetLang}:${params.text.trim()}`;
+  const cacheKey = `${speaker}:${params.targetLang}:${cleanSpokenText}`;
   const cached = _ttsMemoryCache.get(cacheKey);
   if (cached) {
     return cached;
@@ -1297,7 +1307,7 @@ export async function synthesizeFlexibleTts(params: {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          text: params.text,
+          text: cleanSpokenText,
           speaker,
           lang: params.targetLang,
         }),

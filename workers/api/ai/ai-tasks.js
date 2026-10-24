@@ -1135,13 +1135,14 @@
       'You are FIEZEL, chatting in ' + target + ' with a language learner (level ' + level + ').',
       'Your role: ' + CONVERSATION_ROLES[sid] + '.',
       'Talk like a real human friend in everyday life with warmth, humor, and natural personality — NEVER sound like a robotic AI, customer service bot, or textbook.',
-      'HUMOR & LAUGHTER: If the learner jokes, laughs, or shares something funny or silly, laugh along naturally (use "Haha!" or "Hahaha!" in English, "あはは！" or "ふふっ" in Japanese) and banter back with fun energy!',
+      'HUMAN WARMTH, WIT & VARIED HUMOR: Be warm, fun, and natural like a real friend hanging out. If the learner jokes or says something funny, react with lively empathy and varied natural humor (e.g. "No way, seriously?!", "That is too funny!", "Oh man, I know that feeling!", "Haha, you can\'t be serious!"). In Japanese, use natural friendly exclamations (e.g. 「えー！ウケる！」, 「それめっちゃわかる〜！」, 「うそでしょ！？」, 「ふふっ、最高！」, 「あはは、ほんとに！？」, 「マジで！？」). DO NOT mechanically prepend "Haha!" or "あはは！" to every single response like a repetitive robot template! Vary your openers and reactions naturally based on context.',
+      'ABSOLUTE BAN ON EMOJIS & EMOTICONS: NEVER include emojis (😊, 😂, 🤣, etc.), emoticon descriptions (smiling face, grinning face, etc.), or action tags (*laughs*, (smiles), [chuckles]). All output must be pure, clean spoken words that can be spoken naturally aloud.',
       'Your REPLY must directly respond to the learner\'s last message and stay in your role and scene. Never change the topic, never invent facts about the learner, and never mention people or plans they did not mention.',
       'Never lecture, never explain grammar, never praise or grade their ' + target + ', and never say you are an AI or a teacher.',
       isCall
         ? (course === 'ja'
-            ? 'This is a LIVE PHONE CALL with a friend. Speak naturally like a real human with lively intonation and conversational particles (〜じゃん、〜ね、〜よ、〜でしょ、あはは！). Maximum 20 words in total. CRITICAL FOR JAPANESE: NEVER start replies with filler words like "えっと", "ええと", "えーと", "あの", "うーん", "ああ", or "うん". Do NOT use stiff formal phrases like "はい、かしこまりました". Speak warmly and casually.'
-            : 'This is a LIVE PHONE CALL with a friend. Speak naturally like a real human with lively casual expressions ("Haha no way!", "That’s hilarious!", "Totally!"). Maximum 20 words in total. CRITICAL: NEVER start replies with repetitive filler words like "OK", "Okay", "Oh", "Alright", "Sure", or "Ah". Start directly with natural conversational words or laughter.')
+            ? 'This is a LIVE PHONE CALL with a friend. Speak naturally like a real human with lively intonation and conversational particles (〜じゃん、〜ね、〜よ、〜でしょ). Maximum 20 words in total. CRITICAL FOR JAPANESE: NEVER start replies with filler words like "えっと", "ええと", "えーと", "あの", "うーん", "ああ", or "うん". Do NOT use stiff formal phrases like "はい、かしこまりました". NEVER include emojis (😊, 😂) or emoji descriptors. Speak warmly, variedly, and casually.'
+            : 'This is a LIVE PHONE CALL with a friend. Speak naturally like a real human with lively casual expressions. Maximum 20 words in total. CRITICAL: NEVER start replies with repetitive filler words like "OK", "Okay", "Oh", "Alright", "Sure", or "Ah". NEVER include emojis (😊, 😂) or emoji descriptors. Start directly with natural conversational words or friendly witty remarks.')
         : ('Use simple ' + target + ' for level ' + level + '. At most ' + CONVERSATION.maxReplySentences + ' short sentences. ' + (course === 'ja' ? 'Do not start every turn with "えっと", "あの", or "ええと".' : 'Do not start every turn with "OK", "Oh", or "Okay".') + ' Usually end with one natural question.'),
       course === 'ja'
         ? 'REPLY must be natural casual Japanese written in kana and common kanji. No romaji, no English.'
@@ -1309,7 +1310,19 @@
     if (isEmptyOutput(raw)) return fail(OUTPUT_FAILURES.empty);
     if (scaffoldEchoIn(raw)) return fail(OUTPUT_FAILURES.scaffoldEcho);
     var tags = parseConversationTags(raw);
-    var reply = tags.reply;
+    // Bersihkan emoji, teks emotikon ("smiling face", "wajah tersenyum", dll), dan aksi kurung (*smiles*, (laughs))
+    function stripEmojisAndEmotWords(txt) {
+      if (!txt) return '';
+      return s(txt)
+        .replace(/[\u{1F300}-\u{1F9FF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F1E6}-\u{1F1FF}\u{1FA70}-\u{1FAFF}\u{FE00}-\u{FE0F}]/gu, '')
+        .replace(/\b(?:smiling|grinning|beaming|laughing|winking)\s+face(?:\s+with\s+[^.,!?:;]+)?/gi, '')
+        .replace(/\b(?:face\s+with\s+tears\s+of\s+joy|rofl|lol|lmao)\b/gi, '')
+        .replace(/\b(?:wajah\s+tersenyum|senyum\s+lebar|tertawa|senyuman)\b/gi, '')
+        .replace(/\*.*?\*|\(.*?(?:smil|laugh|chuckle|giggle|senyum|tawa|face|emot).*?\)|\[.*?(?:smil|laugh|face).*?\]/gi, '')
+        .replace(/\s{2,}/g, ' ')
+        .trim();
+    }
+    var reply = stripEmojisAndEmotWords(tags.reply);
     if (!reply) return fail(OUTPUT_FAILURES.empty);
     if (!isTargetLanguage(reply, course)) return fail(OUTPUT_FAILURES.localeMismatch);
     var max = s(input && input.mode) === 'call' ? 2 : CONVERSATION.maxReplySentences;
@@ -1339,7 +1352,7 @@
     // Membeo pesan murid bukan balasan teman.
     if (normalizeForCompare(reply) === normalizeForCompare(input.message)) return fail('echo_learner');
 
-    var meaning = tags.meaning;
+    var meaning = stripEmojisAndEmotWords(tags.meaning);
     // m025-637: arti yang ditulis dalam bahasa Inggris untuk murid Indonesia bukan arti
     // (terukur pada model call: "Oh, good choice! Large or small?"). Lebih baik kosong.
     if (meaning && locale !== 'th' && looksEnglishNotIndonesian(meaning)) meaning = '';
