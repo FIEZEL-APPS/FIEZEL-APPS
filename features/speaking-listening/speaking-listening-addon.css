@@ -657,6 +657,33 @@ body.fsl-session-active .fsl-card-listening:has(.fsl-feedback) {
   padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px)) !important;
 }
 
+@media (min-width: 768px) {
+  body.fz-stage-sl.fsl-session-active .fsl-shell {
+    max-width: 720px !important;
+    margin: 0 auto !important;
+  }
+  body.fz-stage-sl.fsl-session-active .fsl-card-listening {
+    padding: 24px 28px !important;
+    border-radius: 28px !important;
+  }
+  .fsl-card-listening .fsl-player {
+    height: 120px !important;
+    max-height: 130px !important;
+  }
+  .fsl-card-listening .fsl-mascot-slot .fz-mochi-viewport,
+  .fsl-card-listening .fsl-mascot-slot canvas {
+    pointer-events: none !important;
+    z-index: 1 !important;
+  }
+  .fsl-card-listening h2,
+  .fsl-card-listening .fsl-actions,
+  .fsl-card-listening .fsl-options,
+  .fsl-card-listening .fsl-play-hero {
+    position: relative !important;
+    z-index: 5 !important;
+  }
+}
+
 /* Hide global navbars and background hub headers during session */
 body.fz-stage-sl.fsl-session-active .topbar,
 body.fsl-session-active .topbar,

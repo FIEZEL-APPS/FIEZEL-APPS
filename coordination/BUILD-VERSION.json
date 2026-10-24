@@ -1,7 +1,7 @@
 {
-  "version": "m025-646",
-  "claimedBy": "branch fix/m025-645-mobile-hd-mascot",
-  "claimedAt": "2026-10-24T04:25:38.567Z",
-  "reason": "fix(mascot): upgrade 3D Mochi to universal HD Retina clarity on mobile",
+  "version": "m025-647",
+  "claimedBy": "branch fix/tablet-desktop-quiz-mascot-overlap",
+  "claimedAt": "2026-10-24T04:46:30.098Z",
+  "reason": "fix(ui-ux): resolve tablet and desktop mascot overlapping question in quiz and listening sessions (m025-647)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
