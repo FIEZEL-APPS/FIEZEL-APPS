@@ -48,6 +48,14 @@ export class FiezelMochi {
     this.showEars = options.showEars ?? true;
     this.showTail = options.showTail ?? false;
 
+    // Dynamic Autonomous Idle Expressions
+    this.autoExpressions = (options.autoExpressions !== false);
+    this.expressionTimer = 0;
+    this.nextExpression = 3.2 + Math.random() * 2.0;
+    this.holdMoodUntil = 0;
+    this.idleMoods = ['dots', 'wink', 'happy', 'dots', 'hearts'];
+    this.idleMoodIndex = 0;
+
     this.width = options.width || 380;
     this.height = options.height || 360;
 
@@ -503,7 +511,7 @@ export class FiezelMochi {
 
     // Left Fox Ear Rig
     this.earL = new THREE.Group();
-    this.earL.position.set(-0.52, 0.94, 0.06);
+    this.earL.position.set(-0.50, 0.96, 0.14);
 
     this.earL_Flex = new THREE.Group();
     this.earL_Flex.add(new THREE.Mesh(earOuterGeo, this.mochiMaterial));
@@ -525,7 +533,7 @@ export class FiezelMochi {
 
     // Right Fox Ear Rig
     this.earR = new THREE.Group();
-    this.earR.position.set(0.52, 0.94, 0.06);
+    this.earR.position.set(0.50, 0.96, 0.14);
 
     this.earR_Flex = new THREE.Group();
     this.earR_Flex.add(new THREE.Mesh(earOuterGeo, this.mochiMaterial));
@@ -1390,7 +1398,6 @@ export class FiezelMochi {
 
   createAccessories() {
     this.accessoriesGroup = new THREE.Group();
-    this.accessoriesGroup.renderOrder = 2500;
     this.mochiGroup.add(this.accessoriesGroup);
 
     this.createHeadsetAccessory();
@@ -1403,7 +1410,6 @@ export class FiezelMochi {
 
   createHeadsetAccessory() {
     this.headsetGroup = new THREE.Group();
-    this.headsetGroup.renderOrder = 2500;
     this.accessoriesGroup.add(this.headsetGroup);
 
     // High-end Kawaii Studio Over-Ear Headphones
@@ -1442,59 +1448,54 @@ export class FiezelMochi {
       opacity: 0.95
     });
 
-    // 1. Arched Headband spanning across crown, gracefully framing head above & outside ears
+    // 1. Arched Headband spanning across crown, seamlessly behind ears (Zero clipping/translucency anomaly)
     const headbandPoints = [
-      new THREE.Vector3(-1.54, 0.22, 0.20),
-      new THREE.Vector3(-1.36, 0.88, 0.18),
-      new THREE.Vector3(-0.75, 1.46, 0.12),
-      new THREE.Vector3( 0.00, 1.58, 0.10),
-      new THREE.Vector3( 0.75, 1.46, 0.12),
-      new THREE.Vector3( 1.36, 0.88, 0.18),
-      new THREE.Vector3( 1.54, 0.22, 0.20)
+      new THREE.Vector3(-1.50, 0.18, 0.22),
+      new THREE.Vector3(-1.36, 0.72, -0.04),
+      new THREE.Vector3(-0.80, 1.38, -0.10),
+      new THREE.Vector3( 0.00, 1.48, -0.12),
+      new THREE.Vector3( 0.80, 1.38, -0.10),
+      new THREE.Vector3( 1.36, 0.72, -0.04),
+      new THREE.Vector3( 1.50, 0.18, 0.22)
     ];
     const headbandCurve = new THREE.CatmullRomCurve3(headbandPoints);
     const bandGeo = new THREE.TubeGeometry(headbandCurve, 48, 0.068, 16, false);
     const bandMesh = new THREE.Mesh(bandGeo, bandMat);
-    bandMesh.renderOrder = 2500;
     this.headsetGroup.add(bandMesh);
 
     // 1b. Underside Cushion Padding
     const cushionPoints = [
-      new THREE.Vector3(-1.10, 1.20, 0.14),
-      new THREE.Vector3(-0.58, 1.48, 0.11),
-      new THREE.Vector3( 0.00, 1.53, 0.09),
-      new THREE.Vector3( 0.58, 1.48, 0.11),
-      new THREE.Vector3( 1.10, 1.20, 0.14)
+      new THREE.Vector3(-1.05, 1.10, -0.08),
+      new THREE.Vector3(-0.55, 1.34, -0.10),
+      new THREE.Vector3( 0.00, 1.40, -0.11),
+      new THREE.Vector3( 0.55, 1.34, -0.10),
+      new THREE.Vector3( 1.05, 1.10, -0.08)
     ];
     const cushionCurve = new THREE.CatmullRomCurve3(cushionPoints);
     const cushionPadGeo = new THREE.TubeGeometry(cushionCurve, 32, 0.048, 12, false);
     const cushionPadMesh = new THREE.Mesh(cushionPadGeo, cushionLeatherMat);
-    cushionPadMesh.renderOrder = 2500;
     this.headsetGroup.add(cushionPadMesh);
 
     // 1c. Metal Adjustment Sliders
     [-1, 1].forEach((side) => {
       const sliderGeo = new THREE.CylinderGeometry(0.082, 0.082, 0.16, 20);
       const slider = new THREE.Mesh(sliderGeo, metallicChromeMat);
-      slider.position.set(side * 1.48, 0.54, 0.18);
-      slider.rotation.set(0.04, 0, -side * 0.38);
-      slider.renderOrder = 2500;
+      slider.position.set(side * 1.44, 0.48, 0.10);
+      slider.rotation.set(-0.06, 0, -side * 0.38);
       this.headsetGroup.add(slider);
     });
 
     // 2. Chunky, Pillowy Kawaii Earcups (Left & Right)
     const buildCup = (side) => {
       const cup = new THREE.Group();
-      cup.position.set(side * 1.54, 0.16, 0.22);
+      cup.position.set(side * 1.50, 0.14, 0.22);
       cup.rotation.set(0.08, -side * 0.52, -side * 0.10);
-      cup.renderOrder = 2500;
 
       // 2a. Plush Cheek Cushion Ring (Marshmallow cream)
       const cushionGeo = new THREE.SphereGeometry(0.38, 32, 24);
       cushionGeo.scale(0.42, 1.12, 1.12);
       const cushion = new THREE.Mesh(cushionGeo, cushionLeatherMat);
       cushion.position.x = side * -0.06;
-      cushion.renderOrder = 2500;
       cup.add(cushion);
 
       // 2b. Outer Acoustic Chamber Shell (Sleek Indigo)
@@ -1502,7 +1503,6 @@ export class FiezelMochi {
       const shell = new THREE.Mesh(shellGeo, bandMat);
       shell.rotation.z = Math.PI / 2;
       shell.position.x = side * 0.05;
-      shell.renderOrder = 2501;
       cup.add(shell);
 
       // 2c. Outer Bezel Rim (Cyan metallic)
@@ -1510,7 +1510,6 @@ export class FiezelMochi {
       const rim = new THREE.Mesh(rimGeo, rimMat);
       rim.rotation.y = Math.PI / 2;
       rim.position.x = side * 0.16;
-      rim.renderOrder = 2502;
       cup.add(rim);
 
       // 2d. Glowing Neon Cyan LED Soundwave Disc
@@ -1518,7 +1517,7 @@ export class FiezelMochi {
       const ledDisc = new THREE.Mesh(ledGeo, this.headsetLedMat);
       ledDisc.rotation.y = (side < 0 ? -Math.PI / 2 : Math.PI / 2);
       ledDisc.position.x = side * 0.165;
-      ledDisc.renderOrder = 2503;
+      ledDisc.renderOrder = 2;
       cup.add(ledDisc);
 
       // 2e. Stylized Musical Note / Soundwave Accent in center of earcup
@@ -1526,14 +1525,14 @@ export class FiezelMochi {
       const noteStem = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.016, 0.16, 8), noteMat);
       noteStem.position.set(side * 0.170, 0.02, 0.02);
       noteStem.rotation.x = Math.PI / 2;
-      noteStem.renderOrder = 2504;
+      noteStem.renderOrder = 3;
       cup.add(noteStem);
 
       const noteHead = new THREE.Mesh(new THREE.SphereGeometry(0.045, 16, 12), noteMat);
       noteHead.scale.set(0.6, 1.2, 1.4);
       noteHead.position.set(side * 0.170, -0.05, -0.04);
       noteHead.rotation.x = Math.PI / 2;
-      noteHead.renderOrder = 2504;
+      noteHead.renderOrder = 3;
       cup.add(noteHead);
 
       if (side < 0) this.headsetLedL = ledDisc;
@@ -1555,7 +1554,6 @@ export class FiezelMochi {
     const micCurve = new THREE.CatmullRomCurve3(micPoints);
     const micArmGeo = new THREE.TubeGeometry(micCurve, 24, 0.018, 10, false);
     const micArm = new THREE.Mesh(micArmGeo, metallicChromeMat);
-    micArm.renderOrder = 2502;
     this.headsetGroup.add(micArm);
 
     // Oval foam sponge filter
@@ -1565,13 +1563,12 @@ export class FiezelMochi {
     const sponge = new THREE.Mesh(spongeGeo, spongeMat);
     sponge.position.set(-0.58, -0.12, 1.31);
     sponge.rotation.set(0.12, 0.45, 0.18);
-    sponge.renderOrder = 2503;
     this.headsetGroup.add(sponge);
 
     // Glowing LED recording dot on mic tip
     const micDot = new THREE.Mesh(new THREE.SphereGeometry(0.018, 12, 8), this.headsetLedMat);
     micDot.position.set(-0.52, -0.12, 1.34);
-    micDot.renderOrder = 2504;
+    micDot.renderOrder = 2;
     this.headsetGroup.add(micDot);
 
     this.headsetGroup.visible = false;
@@ -1982,6 +1979,10 @@ export class FiezelMochi {
   }
 
   // --- Public Modular Controls (Bongkar-Pasang) ---
+  holdMood(durationSeconds = 3.5) {
+    this.holdMoodUntil = Date.now() + durationSeconds * 1000;
+  }
+
   setMood(m) {
     const wasPout = (this.mood === 'pout' || this.mood === 'sleepy');
     this.mood = m;
@@ -2106,12 +2107,12 @@ export class FiezelMochi {
     this.earWiggleDuration = 0.65;
     this.earWiggleIntensity = intensity;
     if (this.earPhys) {
-      this.earPhys.L.vz += 8.5 * intensity;
-      this.earPhys.L.vx -= 4.2 * intensity;
-      this.earPhys.L.tipVel += 14.0 * intensity;
-      this.earPhys.R.vz -= 8.5 * intensity;
-      this.earPhys.R.vx -= 4.2 * intensity;
-      this.earPhys.R.tipVel += 14.0 * intensity;
+      this.earPhys.L.vz += 4.5 * intensity;
+      this.earPhys.L.vx -= 2.0 * intensity;
+      this.earPhys.L.tipVel += 3.5 * intensity;
+      this.earPhys.R.vz -= 4.5 * intensity;
+      this.earPhys.R.vx -= 2.0 * intensity;
+      this.earPhys.R.tipVel += 3.5 * intensity;
     }
   }
 
@@ -2400,9 +2401,28 @@ export class FiezelMochi {
       const bScale = Math.max(0.1, 1.0 - Math.sin(this.blinkFactor * Math.PI));
       this.eyeLeftDot.scale.y = bScale;
       this.eyeRightDot.scale.y = bScale;
-    } else if (this.eyeLeftDot.scale.y < 1.0) {
-      this.eyeLeftDot.scale.y = 1.0;
-      this.eyeRightDot.scale.y = 1.0;
+      if (this.eyeHappyL) this.eyeHappyL.scale.y = bScale;
+      if (this.eyeHappyR) this.eyeHappyR.scale.y = bScale;
+    } else {
+      if (this.eyeLeftDot.scale.y < 1.0) this.eyeLeftDot.scale.y = 1.0;
+      if (this.eyeRightDot.scale.y < 1.0) this.eyeRightDot.scale.y = 1.0;
+      if (this.eyeHappyL && this.eyeHappyL.scale.y < 1.0) this.eyeHappyL.scale.y = 1.0;
+      if (this.eyeHappyR && this.eyeHappyR.scale.y < 1.0) this.eyeHappyR.scale.y = 1.0;
+    }
+
+    // 7b. Dynamic Autonomous Expression Cycling
+    if (this.autoExpressions && Date.now() >= (this.holdMoodUntil || 0) && !this.isThinking) {
+      this.expressionTimer += dt;
+      if (this.expressionTimer >= this.nextExpression) {
+        this.expressionTimer = 0;
+        this.idleMoodIndex = (this.idleMoodIndex + 1) % this.idleMoods.length;
+        const nextMood = this.idleMoods[this.idleMoodIndex];
+        this.setMood(nextMood);
+        if (nextMood === 'wink' && typeof this.triggerEarWiggle === 'function') {
+          this.triggerEarWiggle(0.8);
+        }
+        this.nextExpression = (nextMood === 'wink' || nextMood === 'hearts') ? (2.2 + Math.random() * 1.0) : (4.0 + Math.random() * 2.5);
+      }
     }
 
     // 8. Orbit Rotation
@@ -2562,7 +2582,7 @@ export class FiezelMochi {
     if (this.showEars && this.earL && this.earR) {
       let targetZ_L = Math.PI * 0.15; // ~27° natural outward angle
       let targetZ_R = -Math.PI * 0.15;
-      let targetX = -0.05;
+      let targetX = -0.05; // natural upright perky posture
       let targetY_L = -0.06;
       let targetY_R = 0.06;
 
@@ -2570,49 +2590,47 @@ export class FiezelMochi {
       let tipFlexTargetR = 0;
 
       if (this.mood === 'happy') {
-        // PERKY & CELEBRATORY: Ears perk upright and alert, tips bounce with joy!
-        targetZ_L = Math.PI * 0.08;
-        targetZ_R = -Math.PI * 0.08;
-        targetX = 0.06; // tilted alertly forward
-        const happyFlutter = Math.sin(this.time * 16.0) * 0.10;
-        targetZ_L += happyFlutter;
-        targetZ_R -= happyFlutter;
-        tipFlexTargetL = 0.18 + Math.sin(this.time * 20.0) * 0.12;
-        tipFlexTargetR = 0.18 + Math.sin(this.time * 20.0) * 0.12;
+        // PERKY & CELEBRATORY: Ears stand tall & proud, lively subtle joyful flutter
+        targetZ_L = Math.PI * 0.14 + Math.sin(this.time * 12.0) * 0.025;
+        targetZ_R = -Math.PI * 0.14 - Math.sin(this.time * 12.0) * 0.025;
+        targetX = -0.05;
+        tipFlexTargetL = Math.sin(this.time * 14.0) * 0.025;
+        tipFlexTargetR = Math.sin(this.time * 14.0) * 0.025;
 
       } else if (this.mood === 'pout' || this.mood === 'sleepy') {
-        // SAD / POUT / SULK: Ears droop slightly outward (~28°), tips droop softly with mild tremor
-        targetZ_L = Math.PI * 0.16; // ~28° natural pout droop
-        targetZ_R = -Math.PI * 0.16;
-        targetX = -0.04; // natural upright
-        const sulkWiggle = Math.sin(this.time * 8.0) * 0.035;
-        targetZ_L += sulkWiggle;
-        targetZ_R -= sulkWiggle;
-        tipFlexTargetL = -0.18; // tips droop down
-        tipFlexTargetR = -0.18;
+        // SAD / POUT / SULK: Ears droop slightly outward (~32°), tips droop softly with mild tremor
+        targetZ_L = Math.PI * 0.18 + Math.sin(this.time * 7.0) * 0.02;
+        targetZ_R = -Math.PI * 0.18 - Math.sin(this.time * 7.0) * 0.02;
+        targetX = -0.05;
+        tipFlexTargetL = -0.08;
+        tipFlexTargetR = -0.08;
 
       } else if (this.mood === 'wink') {
-        // PLAYFUL ASYMMETRIC: One perky ear, one tilted
-        targetZ_L = Math.PI * 0.08;
-        targetZ_R = -Math.PI * 0.24;
-        targetX = 0.06;
-        tipFlexTargetL = 0.08;
-        tipFlexTargetR = -0.06;
+        // PLAYFUL ASYMMETRIC: One ear perkily upright, one playfully tilted outward
+        targetZ_L = Math.PI * 0.12;
+        targetZ_R = -Math.PI * 0.18;
+        targetX = -0.05;
+        tipFlexTargetL = 0.02;
+        tipFlexTargetR = -0.02;
 
       } else if (this.mood === 'hearts') {
         // WARM & LOVING: Gentle soft flutter
-        targetZ_L = Math.PI * 0.11 + Math.sin(this.time * 6.5) * 0.04;
-        targetZ_R = -Math.PI * 0.11 - Math.sin(this.time * 6.5) * 0.04;
+        targetZ_L = Math.PI * 0.14 + Math.sin(this.time * 6.5) * 0.025;
+        targetZ_R = -Math.PI * 0.14 - Math.sin(this.time * 6.5) * 0.025;
+        targetX = -0.05;
+        tipFlexTargetL = 0.02;
+        tipFlexTargetR = 0.02;
 
       } else {
-        // IDLE / THINKING: Soft breathing sway + occasional cute twitch
-        const earBreath = Math.sin(this.time * 2.2) * 0.035;
+        // IDLE / THINKING / DOTS: Soft breathing sway + occasional cute twitch
+        const earBreath = Math.sin(this.time * 2.2) * 0.025;
         targetZ_L += earBreath;
         targetZ_R -= earBreath;
+        targetX = -0.05;
 
         // Inertial tip lag from Mochi vertical velocity (organic secondary motion)
-        tipFlexTargetL = -this.floatPos.velY * 0.15;
-        tipFlexTargetR = -this.floatPos.velY * 0.15;
+        tipFlexTargetL = -this.floatPos.velY * 0.08;
+        tipFlexTargetR = -this.floatPos.velY * 0.08;
 
         // Ear twitch logic
         this.earTwitchTimer -= dt;
@@ -2624,13 +2642,13 @@ export class FiezelMochi {
 
         const twitchAge = this.nextEarTwitch - this.earTwitchTimer;
         if (twitchAge > 0 && twitchAge < 0.22) {
-          const twitchWiggle = Math.sin(twitchAge * 46) * 0.16;
+          const twitchWiggle = Math.sin(twitchAge * 46) * 0.10;
           if (this.twitchEar === 'L') {
             targetZ_L += twitchWiggle;
-            tipFlexTargetL += twitchWiggle * 1.5;
+            tipFlexTargetL += twitchWiggle * 0.6;
           } else {
             targetZ_R += twitchWiggle;
-            tipFlexTargetR += twitchWiggle * 1.5;
+            tipFlexTargetR += twitchWiggle * 0.6;
           }
         }
       }
@@ -2639,46 +2657,56 @@ export class FiezelMochi {
       if (this.earWiggleTimer > 0) {
         this.earWiggleTimer -= dt;
         const prog = 1.0 - Math.max(0, this.earWiggleTimer / this.earWiggleDuration);
-        const wave = Math.sin(prog * Math.PI * 6.5) * Math.exp(-prog * 3.8) * 0.28 * (this.earWiggleIntensity || 1.0);
+        const wave = Math.sin(prog * Math.PI * 6.5) * Math.exp(-prog * 3.8) * 0.18 * (this.earWiggleIntensity || 1.0);
         targetZ_L += wave;
         targetZ_R -= wave * 0.85;
-        tipFlexTargetL += wave * 1.5;
-        tipFlexTargetR -= wave * 1.3;
+        tipFlexTargetL += wave * 0.8;
+        tipFlexTargetR -= wave * 0.7;
       }
 
       // Dynamic Inertial Lag & Rebound from mascot vertical motion & squish
       const rawVelY = this.floatPos.velY || 0;
-      const velY = Math.max(-2.5, Math.min(2.5, rawVelY));
+      const velY = Math.max(-1.5, Math.min(1.5, rawVelY));
       const rawSquashVel = this.squish.velY || 0;
-      const squashVel = Math.max(-2.5, Math.min(2.5, rawSquashVel));
-      const inertialLagZ = Math.max(-0.22, Math.min(0.22, velY * 0.20 - squashVel * 0.14));
-      const inertialLagX = Math.max(-0.18, Math.min(0.18, -velY * 0.16));
-      const inertialTip = Math.max(-0.30, Math.min(0.30, -velY * 0.28 + squashVel * 0.18));
+      const squashVel = Math.max(-1.5, Math.min(1.5, rawSquashVel));
+      const inertialLagZ = Math.max(-0.08, Math.min(0.08, velY * 0.08 - squashVel * 0.06));
+      const inertialLagX = Math.max(-0.06, Math.min(0.06, -velY * 0.06));
+      const inertialTip = Math.max(-0.10, Math.min(0.10, -velY * 0.08 + squashVel * 0.06));
 
       targetZ_L += inertialLagZ;
       targetZ_R -= inertialLagZ;
-      targetX = Math.max(-0.20, Math.min(0.20, targetX + inertialLagX));
+      targetX = Math.max(-0.12, Math.min(0.04, targetX + inertialLagX));
       tipFlexTargetL += inertialTip;
       tipFlexTargetR += inertialTip;
 
-      // 2-Stage Damped Harmonic Oscillator (Underdamped for realistic bouncy animal ear overshoot)
-      const springStep = (val, vel, target, k, zeta) => {
+      // 2-Stage Damped Harmonic Oscillator (Semi-implicit Symplectic with sub-steps for unconditionally stable physics)
+      const springStep = (val, vel, target, k, zeta, minVal, maxVal) => {
+        const subSteps = Math.min(6, Math.max(1, Math.ceil(dt / 0.016)));
+        const sdt = dt / subSteps;
         const cdamp = 2 * zeta * Math.sqrt(k);
-        vel += (-(val - target) * k - vel * cdamp) * dt;
-        return [val + vel * dt, vel];
+        for (let i = 0; i < subSteps; i++) {
+          const accel = -(val - target) * k - vel * cdamp;
+          vel += accel * sdt;
+          vel = Math.max(-8.0, Math.min(8.0, vel));
+          val += vel * sdt;
+        }
+        if (minVal !== undefined && maxVal !== undefined) {
+          val = Math.max(minVal, Math.min(maxVal, val));
+        }
+        return [val, vel];
       };
 
       const kBase = 155;
-      const zetaBase = 0.42; // ~26% bouncy overshoot on base ear
-      const kTip = 210;
-      const zetaTip = 0.36; // springy cartoon whip for cartilage tip
+      const zetaBase = 0.44; // ~25% bouncy overshoot on base ear
+      const kTip = 180;
+      const zetaTip = 0.45; // springy cartoon whip for cartilage tip
 
       // Left Ear Rig
       const eL = this.earPhys.L;
-      [eL.rz, eL.vz] = springStep(eL.rz, eL.vz, targetZ_L, kBase, zetaBase);
-      [eL.rx, eL.vx] = springStep(eL.rx, eL.vx, targetX, kBase, zetaBase);
-      [eL.ry, eL.vy] = springStep(eL.ry, eL.vy, targetY_L, kBase, zetaBase);
-      [eL.tip, eL.tipVel] = springStep(eL.tip, eL.tipVel, tipFlexTargetL, kTip, zetaTip);
+      [eL.rz, eL.vz] = springStep(eL.rz, eL.vz, targetZ_L, kBase, zetaBase, 0.08, 0.75);
+      [eL.rx, eL.vx] = springStep(eL.rx, eL.vx, targetX, kBase, zetaBase, -0.15, 0.12);
+      [eL.ry, eL.vy] = springStep(eL.ry, eL.vy, targetY_L, kBase, zetaBase, -0.20, 0.20);
+      [eL.tip, eL.tipVel] = springStep(eL.tip, eL.tipVel, tipFlexTargetL, kTip, zetaTip, -0.25, 0.25);
 
       this.earL.rotation.set(eL.rx, eL.ry, eL.rz);
       if (this.earL_Flex) {
@@ -2688,10 +2716,10 @@ export class FiezelMochi {
 
       // Right Ear Rig
       const eR = this.earPhys.R;
-      [eR.rz, eR.vz] = springStep(eR.rz, eR.vz, targetZ_R, kBase, zetaBase);
-      [eR.rx, eR.vx] = springStep(eR.rx, eR.vx, targetX, kBase, zetaBase);
-      [eR.ry, eR.vy] = springStep(eR.ry, eR.vy, targetY_R, kBase, zetaBase);
-      [eR.tip, eR.tipVel] = springStep(eR.tip, eR.tipVel, tipFlexTargetR, kTip, zetaTip);
+      [eR.rz, eR.vz] = springStep(eR.rz, eR.vz, targetZ_R, kBase, zetaBase, -0.75, -0.08);
+      [eR.rx, eR.vx] = springStep(eR.rx, eR.vx, targetX, kBase, zetaBase, -0.15, 0.12);
+      [eR.ry, eR.vy] = springStep(eR.ry, eR.vy, targetY_R, kBase, zetaBase, -0.20, 0.20);
+      [eR.tip, eR.tipVel] = springStep(eR.tip, eR.tipVel, tipFlexTargetR, kTip, zetaTip, -0.25, 0.25);
 
       this.earR.rotation.set(eR.rx, eR.ry, eR.rz);
       if (this.earR_Flex) {

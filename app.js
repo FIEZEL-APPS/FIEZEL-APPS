@@ -11051,7 +11051,7 @@ function todayHomeMarkup(){
     + `<span>${isTh ? 'คุณทำได้แน่นอน!' : 'Kamu pasti bisa!'}</span>`
     + `</div>`
     + `</div>`
-    + `<div class="fz-vissol-mascot-wrap" role="button" tabindex="0" aria-label="Mochi 3D Mascot" data-testid="home-mochi-mascot" onclick="try{if(window.FiezelMochiCompanion?.getInstance()){var m=window.FiezelMochiCompanion.getInstance();m.triggerHop(0.35);m.triggerHandGesture('wave',1.2);if(typeof m.triggerEarWiggle==='function')m.triggerEarWiggle(1.4);if(typeof uiSfx==='function')uiSfx('paw_greet');}}catch(_){}">`
+    + `<div class="fz-vissol-mascot-wrap" role="button" tabindex="0" aria-label="Mochi 3D Mascot" data-testid="home-mochi-mascot" onclick="try{if(window.FiezelMochiCompanion?.getInstance()){var m=window.FiezelMochiCompanion.getInstance();m.setMood('happy');if(typeof m.holdMood==='function')m.holdMood(3.5);m.triggerHop(0.35);m.triggerHandGesture('cheer',2.2);if(typeof m.triggerEarWiggle==='function')m.triggerEarWiggle(1.4);if(typeof uiSfx==='function')uiSfx('paw_greet');}}catch(_){}">`
     + `<div class="fz-vissol-mascot-cloud-bg" aria-hidden="true"></div>`
     + `<img src="./assets/brand/mochi-mascot-headset.png" alt="Mochi Mascot" class="fz-vissol-mascot-img" />`
     + `</div>`
