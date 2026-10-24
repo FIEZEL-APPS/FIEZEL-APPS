@@ -1,8 +1,8 @@
-# FIEZEL Handoff Dossier: m025-650
+# FIEZEL Handoff Dossier: m025-651
 ## Redesign Beranda Vissol Compact, Maskot Mochi, dan Ornamen Gerak Fiezel
 
 **Tanggal:** 24 Oktober 2026
-**Versi:** m025-650
+**Versi:** m025-651
 **Otoritas:** OWNER / MASTER
 **Status:** 100% HIJAU (Lulus seluruh 408 gerbang uji lokal & CI)
 
@@ -28,13 +28,13 @@
 2. `index.html`: Penambahan ornamen khas Fiezel (`.topbar-ornament-bg`) di dalam `<header class="topbar">`.
 3. `features/ui/fiezel-tactile-clay.css`: Gaya spesifik Section 19/20 untuk kartu kompak, ornamen topbar, dan keyframes motion graphic.
 4. `id-golden-baseline.json`: Regenerasi snapshot baseline emas ID selaras dengan perubahan markup yang disengaja.
-5. `sw.js`, `core-config.js`, `features/neural-voice/fiezel-diag-panel.js`, `kurikulum.html`, `misi.html`, `call.html`, `features/voice-studio/call.html`, `coordination/BUILD-VERSION.json`: Kenaikan nomor build m025-650 oleh arbiter resmi.
+5. `sw.js`, `core-config.js`, `features/neural-voice/fiezel-diag-panel.js`, `kurikulum.html`, `misi.html`, `call.html`, `features/voice-studio/call.html`, `coordination/BUILD-VERSION.json`: Kenaikan nomor build m025-651 oleh arbiter resmi.
 6. `assets/brand/mochi-mascot-headset.png`: Aset maskot 3D Mochi daifuku ber-headset resmi.
 
 ---
 
 ### 3. Bukti Verifikasi Mutu Empiris
-- `tests/curriculum-cache-version-test.js` -> PASS (`m025-650`)
+- `tests/curriculum-cache-version-test.js` -> PASS (`m025-651`)
 - `tests/th-ui-leak-test.js` -> PASS (3/3 anggaran literal)
 - `tests/topbar-status-bar-seam-test.js` -> PASS (8/8 invarian)
 - `tests/topbar-logo-contrast-test.js` -> PASS (4/4 kontras)
@@ -46,6 +46,8 @@
 - `tests/anti-flicker-uiux-invariant-test.js` -> PASS (14/14)
 - `tests/id-golden-snapshot-test.js` -> PASS (100% emas)
 - `tests/gate-registry-test.js` -> PASS (10/10)
+- `tests/alasan-soal-test.js` -> PASS (39/39)
+- `tests/braincore-wave1-wiring-test.js` -> PASS (14/14)
 - Tangkapan layar empiris Playwright tersimpan di:
   - `current-home-mobile-viewport.png`
   - `current-home-mobile.png`
