@@ -447,6 +447,9 @@ export default function App() {
           if (reg.waiting) {
             reg.waiting.postMessage({ type: 'FIEZEL_SKIP_WAITING' });
           }
+          if (reg.installing) {
+            reg.installing.postMessage({ type: 'FIEZEL_SKIP_WAITING' });
+          }
           await reg.update().catch(() => {});
         }
       }
@@ -2450,11 +2453,11 @@ export default function App() {
             <button
               type="button"
               onClick={handleForceFlushPwaCache}
-              title="Build m025-665. Klik untuk menyegarkan dan membersihkan cache PWA bila tampilan lama tersangkut."
+              title="Perbarui & Bersihkan Cache PWA: Klik untuk memuat ulang versi terbaru dan menghapus cache lama secara otomatis."
               className="px-2 py-1 rounded-full bg-white/90 hover:bg-white shadow-[0_1px_2px_rgba(28,22,17,0.05)] text-[#8C2233] font-mono text-[10px] font-bold flex items-center gap-1 cursor-pointer transition-all"
             >
               <RefreshCw className="w-2.5 h-2.5 shrink-0" />
-              <span>m025-665</span>
+              <span>{(typeof window !== 'undefined' && (window as any).FIEZEL_PAGE_BUILD) || 'm025-667'}</span>
             </button>
 
             <a

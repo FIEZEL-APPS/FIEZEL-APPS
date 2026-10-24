@@ -1,7 +1,7 @@
 {
-  "version": "m025-666",
+  "version": "m025-667",
   "claimedBy": "branch main",
-  "claimedAt": "2026-10-24T17:33:58.384Z",
-  "reason": "fix(pwa): pasang auto-updater guard & pembersih cache pwa mandiri m025-666",
+  "claimedAt": "2026-10-24T18:27:01.332Z",
+  "reason": "fix(pwa): hapus otomatis shell lama & instal shell baru saat klik perbarui m025-667",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
