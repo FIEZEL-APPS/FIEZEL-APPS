@@ -1,7 +1,7 @@
 {
-  "version": "m025-652",
-  "claimedBy": "branch feat/m025-651-high-speed-voice-ai",
-  "claimedAt": "2026-10-24T08:20:09.620Z",
-  "reason": "feat(voice-studio): m025-652 high-speed voice architecture with decoupled text stream and pre-cached acoustic aizuchi",
+  "version": "m025-653",
+  "claimedBy": "branch feat/m025-652-3d-mochi-home-motion",
+  "claimedAt": "2026-10-24T08:37:26.590Z",
+  "reason": "feat(mascot): live 3D Three.js Mochi with headset and interactive spring physics on Beranda (m025-652)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
