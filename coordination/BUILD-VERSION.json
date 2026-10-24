@@ -1,7 +1,7 @@
 {
-  "version": "m025-664",
-  "claimedBy": "branch main",
-  "claimedAt": "2026-10-24T15:26:37.458Z",
-  "reason": "fix(voice-studio): perbaiki format streaming mic realtimeInput.audio untuk gemini live hands-free",
+  "version": "m025-665",
+  "claimedBy": "branch feat/voice-call-transcript-romaji-fixes-m025-665",
+  "claimedAt": "2026-10-24T16:15:54.181Z",
+  "reason": "fix(voice-studio): perbaiki natural reformulation, terjemahan real-time gtx, dan memori percakapan permanen",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

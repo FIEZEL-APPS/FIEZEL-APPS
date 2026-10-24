@@ -335,6 +335,151 @@ export async function reportGeminiLiveSessionDrop(
 }
 
 /**
+ * Synthesizes a natural, grammatical reformulation of the student's EXACT words,
+ * addressing their exact grammar/morphology/spelling misconception while strictly
+ * preserving their original intended meaning and words.
+ */
+export function synthesizeNaturalReformulation(
+  rawText: string,
+  targetLang: TargetLang,
+  _misconceptionId?: string
+): string {
+  let text = (rawText || '').trim();
+  if (!text) return '';
+
+  if (targetLang === 'en') {
+    // 1. Clean introductory hesitation sounds ("ahem", "ahm", "uh", "um", "ah")
+    text = text.replace(/^\s*\b(ahem|ahm|uh|um|er|ah)\b\s*[,.]*\s*/i, '');
+
+    // 2. Fix common spoken typos & possessive pronouns (e.g. "mine jobe" -> "my job")
+    text = text.replace(/\bmine\s+([a-zA-Z]+)\b/gi, (_match, word) => {
+      if (word.toLowerCase() === 'jobe') return 'my job';
+      return `my ${word}`;
+    });
+    text = text.replace(/\bjobe\b/gi, 'job');
+    text = text.replace(/\ban\s+apps\b/gi, 'an app');
+    text = text.replace(/\ba\s+apps\b/gi, 'an app');
+    text = text.replace(/\byour's\s+([a-zA-Z]+)\b/gi, 'your $1');
+    text = text.replace(/\byours\s+([a-zA-Z]+)\b/gi, 'your $1');
+
+    // 3. Fix Redundant 'Be' before Base Verb (e.g. "I'm agree" -> "I agree", "I am think" -> "I think")
+    text = text.replace(
+      /\b(i|we|they|you)\s+am\s+(agree|disagree|think|believe|want|need|prefer|like|know|understand|feel)\b/gi,
+      '$1 $2'
+    );
+    text = text.replace(
+      /\bi'm\s+(agree|disagree|think|believe|want|need|prefer|like|know|understand|feel)\b/gi,
+      'I $1'
+    );
+    text = text.replace(
+      /\b(you|we|they)\s+are\s+(agree|disagree|think|believe|want|need|prefer|like|know|understand|feel)\b/gi,
+      '$1 $2'
+    );
+    text = text.replace(
+      /\b(he|she|it)\s+is\s+(agree|disagree|think|believe|want|need|prefer|like|know|understand|feel)\b/gi,
+      '$1 $2s'
+    );
+
+    // 4. Fix Double Conjunctions: "Although A, but B" -> "Although A, B"
+    text = text.replace(/\b(although|though)\b([^.?!]+?),\s*but\b/gi, '$1$2,');
+    text = text.replace(/\bbecause\b([^.?!]+?),\s*so\b/gi, 'Because$1,');
+
+    // 5. Fix Missing Auxiliary in Progressive: "I still figuring" -> "I am still figuring"
+    text = text.replace(
+      /\b(i)\s+still\s+(figuring|finding|working|trying|looking|learning)\b/gi,
+      'I am still $2'
+    );
+    text = text.replace(
+      /\b(i)\s+(meeting|going|studying|working|eating|drinking|buying|staying|visiting|reading|waiting)\b/gi,
+      'I am $2'
+    );
+    text = text.replace(
+      /\b(we|they|you)\s+(meeting|going|studying|working|eating|drinking)\b/gi,
+      '$1 are $2'
+    );
+    text = text.replace(
+      /\b(he|she)\s+(meeting|going|studying|working|eating|drinking)\b/gi,
+      '$1 is $2'
+    );
+
+    // 6. Fix Modal + to: "can to do" -> "can do"
+    text = text.replace(/\b(can|could|must|should|will|would)\s+to\s+([a-zA-Z]+)\b/gi, '$1 $2');
+
+    // 7. Fix Irregular Past Tense: "goed" -> "went"
+    text = text.replace(/\bgoed\b/gi, 'went');
+    text = text.replace(/\bbuyed\b/gi, 'bought');
+    text = text.replace(/\beated\b/gi, 'ate');
+    text = text.replace(/\bdrinked\b/gi, 'drank');
+
+    // 8. Fix Word Order & Prepositions
+    text = text.replace(/\bwent\s+i\b/gi, 'I went');
+    text = text.replace(/\bbought\s+i\b/gi, 'I bought');
+    text = text.replace(/\bate\s+i\b/gi, 'I ate');
+    text = text.replace(/\b(went|go)\s+(bandung|jakarta|bali|tokyo|osaka|kyoto)\b/gi, '$1 to $2');
+    text = text.replace(/\b(in|go)\s+library\b/gi, 'at the library');
+
+    // 8b. Fix Redundant Subject Pronoun after Noun: "this app it has" -> "this app has"
+    text = text.replace(/\b(this\s+[a-zA-Z]+|the\s+[a-zA-Z]+|my\s+[a-zA-Z]+)\s+(it|he|she|they)\s+/gi, '$1 ');
+
+    // 8c. Fix Copula before Sensory Verbs & "similar with": "it is look similar with" -> "it looks similar to"
+    text = text.replace(/\b(it|this|that)\s+is\s+(look|seem|sound|taste|feel)s?\b/gi, '$1 $2s');
+    text = text.replace(/\b(it|this|that)'s\s+(look|seem|sound|taste|feel)s?\b/gi, '$1 $2s');
+    text = text.replace(/\bsimilar\s+with\b/gi, 'similar to');
+
+    // 9. Fix Bare Want in Service Request Context
+    text = text.replace(
+      /\bi\s+want\s+(a\s+|an\s+)?(hot\s+|iced\s+)?(coffee|latte|tea|espresso|water)\b/gi,
+      'I would like a $2$3, please'
+    );
+
+    // Clean spacing and formatting
+    text = text.replace(/\s{2,}/g, ' ').trim();
+    if (text.length > 0) {
+      text = text.charAt(0).toUpperCase() + text.slice(1);
+      if (!/[.!?]$/.test(text)) {
+        text += '.';
+      }
+    }
+    return text;
+  }
+
+  if (targetLang === 'ja') {
+    // Clean hesitation sounds
+    text = text.replace(/^(\s*(えっと|ええと|あの[ね]?|う[ー~]*ん|ああ|うん)\s*[,、]*\s*)+/, '');
+    // Fix subject / object particle slip
+    text = text.replace(/(私|僕|俺|君|あなた)を(行き|来|食べ|飲み|勉強し)/g, '$1は$2');
+    // Fix verb dict + desu: "飲むです" -> "飲みます"
+    text = text.replace(/飲むです/g, '飲みます');
+    text = text.replace(/食べるです/g, '食べます');
+    text = text.replace(/勉強するです/g, '勉強します');
+    // Fix location particle: "図書館に勉強" -> "図書館で勉強"
+    text = text.replace(/(図書館|カフェ|部屋|学校|うち|家|教室)に(勉強|練習|仕事|読書)(する|します|した|しました)/g, '$1で$2$3');
+
+    // Fix past tense slips
+    text = text.replace(/行きますでした/g, '行きました');
+    text = text.replace(/食べますでした/g, '食べました');
+    text = text.replace(/飲みますでした/g, '飲みました');
+    text = text.replace(/見ますでした/g, '見ました');
+    text = text.replace(/言いますでした/g, '言いました');
+    // Fix i-adjective past: "美味しいでした" -> "美味しかったです"
+    text = text.replace(/美味しいでした/g, '美味しかったです');
+    text = text.replace(/いいでした/g, 'よかったです');
+    // Fix na-adjective / noun double copula
+    text = text.replace(/静かでしたです/g, '静かでした');
+    text = text.replace(/綺麗でしたです/g, '綺麗でした');
+    // Fix conditional tara: "勉強するたら" -> "勉強したら"
+    text = text.replace(/勉強するたら/g, '勉強したら');
+    text = text.replace(/行くたら/g, '行ったら');
+    text = text.replace(/食べるたら/g, '食べたら');
+
+    text = text.replace(/\s{2,}/g, ' ').trim();
+    return text;
+  }
+
+  return text;
+}
+
+/**
  * Client-side pedagogical evaluator enforcing the FIEZEL Braincore Zero-Dumbing Invariant:
  * - Zero false praise (`ok: false` whenever morphological, syntactic, particle, or pragmatic misconceptions occur)
  * - Exact `misconceptionId`, `whyFailsId`, `whyFailsTh`, and `syntacticCorrection`
@@ -554,6 +699,19 @@ export function evaluateUtteranceClientSide(params: {
         syntacticCorrection = scenario.sampleUtterances[0]?.text || exact;
       }
 
+      // ANTI-NONSENSE NATURAL REFORMULATION:
+      // Derive natural reformulation directly from the learner's ACTUAL utterance!
+      // Never force a canned scenario sentence (like "I'd like a hot coffee, please")
+      // when the learner actually said "ahem All right, yeah, I'm agree" or "i like mine jobe".
+      const naturalReform = synthesizeNaturalReformulation(exact, 'en', misconceptionId);
+      if (
+        naturalReform &&
+        naturalReform.trim().toLowerCase() !== exact.trim().toLowerCase() &&
+        naturalReform.split(/\s+/).length >= 2
+      ) {
+        syntacticCorrection = naturalReform;
+      }
+
       const aiReply = scenarioId.includes('cafe')
         ? 'I see! To make your sentence natural and grammatically accurate, try using "I would like..." and "I am meeting... at the library." Could you try saying it again?'
         : scenarioId.includes('past') || scenarioId.includes('weekend')
@@ -750,6 +908,16 @@ export function evaluateUtteranceClientSide(params: {
       missingTokens.push(scenario.sampleUtterances[0]?.text || '〜をお願いします');
     } else if (lacksPoliteEnding) {
       missingTokens.push('〜です / 〜ます / 〜をお願いします');
+    }
+
+    // ANTI-NONSENSE NATURAL REFORMULATION (JAPANESE):
+    const naturalReformJa = synthesizeNaturalReformulation(exact, 'ja', misconceptionId);
+    if (
+      naturalReformJa &&
+      naturalReformJa.trim() !== exact.trim() &&
+      naturalReformJa.length >= 3
+    ) {
+      syntacticCorrection = naturalReformJa;
     }
 
     const aiReply = scenarioId.includes('senpai')
