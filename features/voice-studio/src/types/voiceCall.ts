@@ -45,7 +45,7 @@ export interface CallScenario {
   competencyId: string;
   competencyNameId: string;
   competencyNameTh: string;
-  prereqCompetencyId: string;
+  prereqCompetencyId?: string;
   personaId: string;
   isMeasureExam: boolean; // If true, Anti-Leak Exam Purity applies (zero hints/peek)
   situationId: string;

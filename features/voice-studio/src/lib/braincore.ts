@@ -636,8 +636,11 @@ export function saveBraincoreState(nextState: BraincoreStoreState): BraincoreSto
 
 export function checkPrerequisiteStatus(
   state: BraincoreStoreState,
-  prereqCompetencyId: string
+  prereqCompetencyId?: string
 ): { isReady: boolean; pMastery: number; stateLabel: MasteryStateName } {
+  if (!prereqCompetencyId) {
+    return { isReady: true, pMastery: 1.0, stateLabel: 'mastered' };
+  }
   const mergedComps = mergeHostBraincoreMastery(state.competencies || {});
   const comp =
     mergedComps[prereqCompetencyId] ||
@@ -653,8 +656,9 @@ export function checkPrerequisiteStatus(
 
 export function recordVocabPrereqMastery(
   state: BraincoreStoreState,
-  prereqCompetencyId: string
+  prereqCompetencyId?: string
 ): BraincoreStoreState {
+  if (!prereqCompetencyId) return state;
   const existing =
     state.competencies[prereqCompetencyId] ||
     createBlankCompetency(prereqCompetencyId, BRAINCORE_PARAMS.P_INIT);
