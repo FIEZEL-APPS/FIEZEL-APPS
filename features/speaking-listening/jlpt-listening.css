@@ -2003,22 +2003,71 @@
 
 @media (min-width: 641px) {
   .listening-modal {
-    padding: 4px 14px !important;
+    padding: 12px 18px !important;
   }
   .listening-modal-box {
-    max-height: 98.5vh !important;
+    width: min(94vw, 760px) !important;
+    max-width: 760px !important;
+    max-height: 92vh !important;
   }
   .listening-head {
-    min-height: 38px !important;
-    padding: 6px 14px !important;
+    min-height: 42px !important;
+    padding: 8px 16px !important;
   }
   .listening-body {
-    padding: 4px 12px 6px !important;
-    gap: 3px !important;
+    padding: 8px 16px 12px !important;
+    gap: 8px !important;
   }
   .jlpt-mobile-card {
-    padding: 6px 12px 8px !important;
-    gap: 4px !important;
+    padding: 16px 20px !important;
+    gap: 12px !important;
+    display: grid !important;
+    grid-template-columns: 240px minmax(0, 1fr) !important;
+    column-gap: 20px !important;
+    row-gap: 10px !important;
+    align-items: start !important;
+  }
+  .jlpt-mascot-slot {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    height: 160px !important;
+    min-height: 140px !important;
+    margin: 0 !important;
+  }
+  .jlpt-audio-row {
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+    margin: 0 !important;
+    position: relative !important;
+    z-index: 5 !important;
+  }
+  .jlpt-situation-chip {
+    grid-column: 1 !important;
+    grid-row: 3 !important;
+    margin: 0 !important;
+  }
+  .jlpt-question-block {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    position: relative !important;
+    z-index: 5 !important;
+  }
+  .jlpt-options-list {
+    grid-column: 2 !important;
+    grid-row: 2 / span 2 !important;
+    margin: 0 !important;
+    position: relative !important;
+    z-index: 5 !important;
+  }
+  .jlpt-swipe-hint {
+    display: none !important;
+  }
+  .jlpt-mascot-slot .fz-mochi-viewport,
+  .jlpt-mascot-slot canvas {
+    pointer-events: none !important;
+    z-index: 1 !important;
   }
 }
 

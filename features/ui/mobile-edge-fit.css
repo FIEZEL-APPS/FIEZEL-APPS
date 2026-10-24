@@ -4084,6 +4084,55 @@ html body:not(.fz-teacher-mode) #app #quizPassage h3,
   font-weight: 800 !important;
 }
 
+/* Reading Card & Passage High-Contrast Body Text (Solves Dark-on-Dark Unreadable Bug) */
+html body:not(.fz-teacher-mode) #app .passage-reading p,
+html body:not(.fz-teacher-mode) #app .card-reading p,
+html body:not(.fz-teacher-mode) #app #quizPassage p,
+.passage-reading p,
+.card-reading p,
+#quizPassage p,
+.passage p {
+  color: #F8FAFC !important;
+  -webkit-text-fill-color: #F8FAFC !important;
+  font-size: 1.12rem !important;
+  line-height: 2.15 !important;
+  letter-spacing: 0.02em !important;
+  font-weight: 500 !important;
+}
+
+/* Base text (Kanji, Kana, Romaji, and Spans) inside reading passages */
+html body:not(.fz-teacher-mode) #app .passage-reading p *,
+html body:not(.fz-teacher-mode) #app .card-reading p *,
+html body:not(.fz-teacher-mode) #app #quizPassage p *,
+.passage-reading p *,
+.card-reading p *,
+#quizPassage p *,
+.card-reading ruby,
+#quizPassage ruby,
+.passage-reading ruby,
+.card-reading .ja-word,
+#quizPassage .ja-word,
+.card-reading .ja-word-wrap,
+#quizPassage .ja-word-wrap,
+.card-reading span,
+#quizPassage span {
+  color: #F8FAFC !important;
+  -webkit-text-fill-color: #F8FAFC !important;
+}
+
+/* High-contrast vibrant furigana above kanji */
+.card-reading ruby rt,
+#quizPassage ruby rt,
+.passage-reading ruby rt,
+.card-reading rt,
+#quizPassage rt {
+  color: #FCD34D !important;
+  -webkit-text-fill-color: #FCD34D !important;
+  font-weight: 700 !important;
+  font-size: 0.65em !important;
+  letter-spacing: 0.02em !important;
+}
+
 /* Grammar Cloze Input High-Contrast (While Typing & Disabled) */
 .cloze-input,
 input.cloze-input,

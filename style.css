@@ -1031,6 +1031,37 @@ html body:not(.fz-teacher-mode) .flash-back h3.flash-meaning,
   .quiz-shell:has(.card-reading) > .card:not(.card-reading){grid-area:question!important}
   .reading-jump-bar{display:none!important}
 }
+
+/* Desktop 3-column split when Reading passage AND Side Mascot are both present */
+@media(min-width:980px){
+  .quiz-shell:has(.card-reading).has-paw-side{
+    display:grid!important;
+    grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) 164px!important;
+    grid-template-areas:"topbar topbar topbar" "reading question mascot"!important;
+    gap:20px!important;
+    max-width:1320px!important;
+    margin:0 auto!important;
+  }
+  .quiz-shell:has(.card-reading).has-paw-side .quiz-topbar{grid-area:topbar!important}
+  .quiz-shell:has(.card-reading).has-paw-side .card-reading{grid-area:reading!important}
+  .quiz-shell:has(.card-reading).has-paw-side > .card:not(.card-reading){grid-area:question!important}
+  .quiz-shell:has(.card-reading).has-paw-side > .fz-paw-side{
+    grid-area:mascot!important;
+    grid-column:3!important;
+    grid-row:2/span 8!important;
+    position:sticky!important;
+    top:96px!important;
+    margin:0!important;
+    display:flex!important;
+    z-index:1!important;
+    pointer-events:none!important;
+  }
+}
+@media(min-width:860px) and (max-width:979px){
+  .quiz-shell:has(.card-reading) > .fz-paw-side{
+    display:none!important;
+  }
+}
 .reading-jump-bar{margin-bottom:12px}
 .reading-jump-btn{
   display:inline-flex;align-items:center;gap:8px;
@@ -5037,6 +5068,7 @@ body.fz-stage-quiz .quiz-shell:has(.quiz-floating-bar.is-visible){padding-bottom
 .quiz-bubble{
   position:relative;flex:1 1 auto;min-width:0;
   padding:12px 14px;border:1.5px solid var(--line);border-radius:18px;background:var(--panel-soft);
+  z-index:5;
 }
 .quiz-bubble .question{margin:0;font-size:clamp(1.02rem,4.4vw,1.24rem);line-height:1.4}
 /* Ekor gelembung dari border transparan - ikut tema, nol aset tambahan. */
@@ -5044,6 +5076,12 @@ body.fz-stage-quiz .quiz-shell:has(.quiz-floating-bar.is-visible){padding-bottom
 .quiz-bubble::before{left:-19px;border-right-color:var(--line)}
 .quiz-bubble::after{left:-16px;border-right-color:var(--panel-soft)}
 @media (max-height:640px){.quiz-stage .fz-paw-above{width:clamp(120px,25%,140px);min-height:120px}.quiz-stage{margin-bottom:8px}}
+/* Tablet 641px-979px: panggung rapi berdampingan, maskot tidak menimpa gelembung */
+@media (min-width:641px) and (max-width:979px){
+  .quiz-stage{display:flex;flex-direction:row;align-items:center;gap:18px;margin-bottom:14px}
+  .quiz-stage .fz-paw-above{flex:0 0 156px;width:156px;height:156px;min-height:140px;max-height:165px;margin:0}
+  .quiz-bubble{flex:1 1 auto;min-width:0;z-index:5}
+}
 /* Audit F11 (2026-09-23) & Mochi PWA: di bawah 640px soal kembali selebar kartu; maskot duduk
    DI ATAS gelembung di tengah kartu dengan ruang lega 140px-160px untuk Three.js mochi. */
 @media (max-width:640px){
@@ -5059,9 +5097,9 @@ body.fz-stage-quiz .quiz-shell:has(.quiz-floating-bar.is-visible){padding-bottom
 .fz-mochi-viewport{
   position:absolute;top:0;left:0;width:100%;height:100%;
   overflow:visible;display:flex;align-items:center;justify-content:center;
-  pointer-events:auto;z-index:2;
+  pointer-events:none;z-index:1;
 }
-.fz-mochi-viewport canvas{overflow:visible;display:block}
+.fz-mochi-viewport canvas{overflow:visible;display:block;pointer-events:none}
 .fz-paw-slot:has(.fz-mochi-viewport),
 .fsl-mascot-slot:has(.fz-mochi-viewport),
 fiezel-mascot:has(.fz-mochi-viewport){overflow:visible!important}
