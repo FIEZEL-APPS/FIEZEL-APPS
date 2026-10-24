@@ -28,6 +28,8 @@ interface BeginnerAnswerAssistantProps {
 
 export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = ({
   locale,
+  targetLang,
+  scenario,
   aiQuestionText,
   aiQuestionTranslation,
   lastUserText,
