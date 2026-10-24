@@ -141,6 +141,8 @@ import { ROUTES as GOOGLE_AUTH_ROUTES } from './route-auth-google.js';
  * (transien, TTL 30 menit) karena tidak ada progres belajar yang perlu dipersistenkan.
  * Cap byte per path terdaftar di schema.js BYTE_LIMITS seperti slot lain. */
 import { ROUTES as STAGE_ROUTES } from './stage/route-stage.js';
+/* --- SLOT 14: GEMINI LIVE POOL (voice/route-voice-live.js) — /api/voice/* [TERPASANG] */
+import { ROUTES as VOICE_LIVE_ROUTES } from './voice/route-voice-live.js';
 
 export const EXTRA_ROUTES = [
   ...buildExtraRoutes(),  /* SLOT 1-4 */
@@ -155,4 +157,5 @@ export const EXTRA_ROUTES = [
   ...CLASS_SYNC_ROUTES,       /* SLOT 11 */
   ...GOOGLE_AUTH_ROUTES,      /* SLOT 12 */
   ...STAGE_ROUTES,            /* SLOT 13 */
+  ...VOICE_LIVE_ROUTES,       /* SLOT 14 */
 ];

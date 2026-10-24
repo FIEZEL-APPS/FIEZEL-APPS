@@ -73,6 +73,9 @@ export const BYTE_LIMITS = Object.freeze({
   '/api/teacher/tree': 512,                // GET
   '/api/teacher/node/save': 16384,         // deskripsi + tujuan + daftar kosakata
   '/api/teacher/node/publish': 512,
+  // --- SLOT 14: Gemini Live pool & failover ---------------------------------
+  '/api/voice/live-session': 1024,
+  '/api/voice/report-drop': 2048,
   '/api/teacher/node/archive': 512,
   '/api/teacher/question/list': 512,       // GET
   '/api/teacher/question/save': 16384,     // batang soal + opsi + penjelasan + contoh
