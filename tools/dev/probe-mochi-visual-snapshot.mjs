@@ -64,8 +64,9 @@ server.listen(PORT, '127.0.0.1', async () => {
       m.setAccessory('headset');
       m.setBadge(null);
       m.setAura('blue');
-      m.time = 1.0;
-      m.update(0.03);
+      for (let i = 0; i < 30; i++) {
+        m.update(0.033);
+      }
       m.render();
     });
     await page.waitForTimeout(100);
@@ -76,8 +77,9 @@ server.listen(PORT, '127.0.0.1', async () => {
       const m = window.__previewMochi;
       m.setAccessory('glasses');
       m.setAura(null);
-      m.time = 2.0;
-      m.update(0.03);
+      for (let i = 0; i < 30; i++) {
+        m.update(0.033);
+      }
       m.render();
     });
     await page.waitForTimeout(100);
@@ -87,8 +89,9 @@ server.listen(PORT, '127.0.0.1', async () => {
     await page.evaluate(() => {
       const m = window.__previewMochi;
       m.setAccessory('pencil');
-      m.time = 3.0;
-      m.update(0.03);
+      for (let i = 0; i < 30; i++) {
+        m.update(0.033);
+      }
       m.render();
     });
     await page.waitForTimeout(100);
@@ -99,8 +102,9 @@ server.listen(PORT, '127.0.0.1', async () => {
       const m = window.__previewMochi;
       m.setAccessory(null);
       m.setThinking(true);
-      m.time = 4.0;
-      m.update(0.03);
+      for (let i = 0; i < 30; i++) {
+        m.update(0.033);
+      }
       m.render();
     });
     await page.waitForTimeout(100);
@@ -111,8 +115,8 @@ server.listen(PORT, '127.0.0.1', async () => {
       const m = window.__previewMochi;
       m.setThinking(false);
       m.setTalking(true, 5.0);
-      m.time = 0.12; // peak mouth opening
-      m.update(0.03);
+      m.talkTimer = 0.12; // peak mouth opening
+      m.update(0.033);
       m.render();
     });
     await page.waitForTimeout(100);
