@@ -96,8 +96,10 @@ export default function App() {
   });
   const [activeScenarioId, setActiveScenarioId] = useState<string>(() => {
     const initialLang = loadBraincoreState().targetLang || 'en';
+    const freeScenario = CALL_SCENARIOS.find((s) => s.targetLang === initialLang && s.id.includes('free'));
+    if (freeScenario) return freeScenario.id;
     const firstForLang = CALL_SCENARIOS.find((s) => s.targetLang === initialLang);
-    return firstForLang ? firstForLang.id : 'scen_en_a1_hometown';
+    return firstForLang ? firstForLang.id : 'scen_en_free_talk';
   });
   const [customMeasureOverride, setCustomMeasureOverride] = useState<boolean | null>(null);
 
@@ -326,7 +328,9 @@ export default function App() {
 
   useEffect(() => {
     if (activeTab === 'call' && turns.length > 1) {
-      if (transcriptContainerRef.current) {
+      if (chatEndRef.current) {
+        chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
+      } else if (transcriptContainerRef.current) {
         transcriptContainerRef.current.scrollTo({
           top: transcriptContainerRef.current.scrollHeight,
           behavior: 'smooth',
@@ -382,7 +386,10 @@ export default function App() {
   const handleSelectTargetLang = (lang: TargetLang) => {
     playFiezelSfx('button_tap');
     stopLiveCall();
-    const firstScenario = CALL_SCENARIOS.find((s) => s.targetLang === lang) || CALL_SCENARIOS[0];
+    const firstScenario =
+      CALL_SCENARIOS.find((s) => s.targetLang === lang && s.id.includes('free')) ||
+      CALL_SCENARIOS.find((s) => s.targetLang === lang) ||
+      CALL_SCENARIOS[0];
     setActiveScenarioId(firstScenario.id);
     try {
       if (typeof localStorage !== 'undefined') {
@@ -982,7 +989,7 @@ export default function App() {
             if (liveSilenceTimerRef.current) {
               window.clearTimeout(liveSilenceTimerRef.current);
             }
-            const silenceWaitMs = isGrammaticallyIncomplete(clean, activeScenario.targetLang) ? 800 : 380;
+            const silenceWaitMs = isGrammaticallyIncomplete(clean, activeScenario.targetLang) ? 2400 : 1800;
             setIsWaitingAfterSpeech(true);
             liveSilenceTimerRef.current = window.setTimeout(() => {
               if (isDisposed) return;
@@ -1155,7 +1162,7 @@ export default function App() {
             if (pttSilenceTimerRef.current) {
               window.clearTimeout(pttSilenceTimerRef.current);
             }
-            const pttSilenceWaitMs = isGrammaticallyIncomplete(clean, activeScenario.targetLang) ? 1200 : 800;
+            const pttSilenceWaitMs = isGrammaticallyIncomplete(clean, activeScenario.targetLang) ? 2400 : 1800;
             pttSilenceTimerRef.current = window.setTimeout(() => {
               stopPttRecording();
             }, pttSilenceWaitMs);
@@ -2016,9 +2023,9 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F6F3EC] text-[#1C1611] flex flex-col">
+    <div className="h-[100dvh] max-h-[100dvh] overflow-hidden bg-[#F6F3EC] text-[#1C1611] flex flex-col">
       {/* TOP BAR BERSIH SATU BARIS (Tanpa Kotak Berlapis) */}
-      <header className="sticky top-0 z-30 bg-[#F6F3EC]/90 backdrop-blur-md">
+      <header className="shrink-0 sticky top-0 z-20 bg-[#F6F3EC]/95 backdrop-blur-md border-b border-[#E8DFC8]/60">
         <div className="max-w-4xl mx-auto px-3 sm:px-4 h-14 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
             <a
@@ -2032,39 +2039,20 @@ export default function App() {
               <span className="hidden sm:inline">{locale === 'th' ? 'กลับ' : 'Kembali'}</span>
             </a>
 
-            <span
-              data-testid="mitra-kaiwa-header-title"
-              className="sr-only"
-            >
-              {targetLang === 'ja'
-                ? locale === 'th'
-                  ? 'คู่สนทนาไควะ'
-                  : 'Mitra Kaiwa'
-                : locale === 'th'
-                  ? 'คู่สนทนา AI'
-                  : 'Kawan Bicara'}
-            </span>
-
-            {/* Pemilih Skenario Terintegrasi di Top Bar (Hemat Ruang Vertikal) */}
-            {activeTab === 'call' && (
-              <div className="relative min-w-0">
-                <select
-                  aria-label="Pilih skenario panggilan suara"
-                  value={activeScenario.id}
-                  onChange={(e) => {
-                    stopLiveCall();
-                    setActiveScenarioId(e.target.value);
-                  }}
-                  className="max-w-[185px] sm:max-w-[280px] rounded-full bg-white/90 hover:bg-white px-3.5 py-1.5 text-xs font-semibold text-[#1C1611] shadow-[0_1px_2px_rgba(28,22,17,0.05)] focus:outline-none cursor-pointer truncate"
-                >
-                  {scenariosForLang.map((scen) => (
-                    <option key={scen.id} value={scen.id}>
-                      {scen.level} · {locale === 'th' ? scen.titleTh : scen.titleId}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
+            {/* Room Title & Persona Name - No dropdown/topic picker */}
+            <div className="flex items-center gap-2 min-w-0">
+              <span
+                data-testid="mitra-kaiwa-header-title"
+                className="font-bold text-sm text-[#1C1611] truncate"
+              >
+                {targetLang === 'ja'
+                  ? (locale === 'th' ? 'คู่สนทนาไควะ · สนทนาอิสระ' : 'Mitra Kaiwa · Free Talk')
+                  : (locale === 'th' ? 'คู่สนทนา AI · สนทนาอิสระ' : 'Kawan Bicara · Free Talk')}
+              </span>
+              <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-[#EAE3D5] text-[#5C4E3C] font-semibold shrink-0 hidden sm:inline-block">
+                {activePersona.name}
+              </span>
+            </div>
 
             {/* Navigasi Segmented (Nonaktif pada mode tunggal Mitra Kaiwa) */}
             <nav
@@ -2254,7 +2242,7 @@ export default function App() {
 
       {/* STATUS BANNER GLOBAL */}
       {statusBanner && (
-        <div className="max-w-4xl mx-auto px-4 pt-1 w-full">
+        <div className="shrink-0 max-w-4xl mx-auto px-4 pt-1 w-full">
           <div className="rounded-2xl px-4 py-2 text-xs font-medium flex items-center justify-between gap-2 bg-white/90 shadow-2xs text-[#5C4E3C]">
             <span>{statusBanner}</span>
             <button
@@ -2269,7 +2257,7 @@ export default function App() {
       )}
 
       {/* RUANG KERJA UTAMA VOICE-FIRST */}
-      <main className="flex-1 max-w-4xl mx-auto px-4 pt-2 pb-6 space-y-4 w-full">
+      <main className="flex-1 min-h-0 max-w-4xl mx-auto px-3 sm:px-4 py-2 space-y-3 w-full overflow-y-auto overscroll-contain flex flex-col">
         {activeTab === 'home' ? (
           <HomeRedesignView
             locale={locale}
@@ -2599,57 +2587,7 @@ export default function App() {
                   </div>
                 </section>
 
-                {/* 2. IDE BALASAN INTERAKTIF (Baris Pill Tanpa Kotak Luar) */}
-                {!isMeasureMode && (
-                  <BeginnerAnswerAssistant
-                    locale={locale}
-                    targetLang={activeScenario.targetLang}
-                    scenario={activeScenario}
-                    aiQuestionText={activeAiLiveText}
-                    aiQuestionTranslation={
-                      locale === 'th'
-                        ? activeAiSubtitle.translationTh
-                        : activeAiSubtitle.translationId
-                    }
-                    lastUserText={lastUserTurn?.text}
-                    cards={beginnerReplyCards}
-                    isLiveConnected={isLiveConnected}
-                    isRecordingPtt={isRecordingPtt}
-                    isAnalyzingTurn={isAnalyzingTurn}
-                    isPlayingAiAudio={isPlayingAiAudio}
-                    isRefreshingAssist={isRefreshingAssist}
-                    turnCount={turns.filter((tr) => tr.speaker === 'ai').length}
-                    onRefreshAssist={() => {
-                      void handleRefreshLiveAssist();
-                    }}
-                    onSpeakSample={(sampleText, rate = 1.0) => {
-                      void speakAiText(sampleText, undefined, rate);
-                    }}
-                    onSelectForInput={(selectedText) => {
-                      setInputText(selectedText);
-                    }}
-                    onStartPttWithPrompt={(selectedText) => {
-                      setInputText(selectedText);
-                      if (!isRecordingPtt && !isLiveConnected) {
-                        void startPttRecording();
-                      }
-                    }}
-                    onSendDirect={(selectedText) => {
-                      if (
-                        isLiveConnected &&
-                        wsRef.current &&
-                        wsRef.current.readyState === WebSocket.OPEN
-                      ) {
-                        wsRef.current.send(JSON.stringify({ text: selectedText.trim() }));
-                        setInputText('');
-                      } else {
-                        void submitStudentTurn({ text: selectedText });
-                      }
-                    }}
-                  />
-                )}
-
-                {/* 3. ALUR PERCAKAPAN RINGKAS (Hanya Tampil Bersih Tanpa Kotak Luar Berat) */}
+                {/* 2. ALUR PERCAKAPAN RINGKAS (Hanya Tampil Bersih Tanpa Kotak Luar Berat) */}
                 <section className="space-y-2.5 w-full pt-1">
                   <div className="flex items-center justify-between gap-2 px-1 text-xs text-[#6E5E47]">
                     <span className="font-semibold text-[#5C4E3C]">
@@ -2679,7 +2617,7 @@ export default function App() {
 
                   <div
                     ref={transcriptContainerRef}
-                    className="space-y-2 max-h-[280px] overflow-y-auto px-0.5"
+                    className="space-y-2 px-0.5"
                   >
                     {turns.map((turn, idx) => {
                       // Jangan duplikasi kalimat pembuka pertama jika murid belum membalas
@@ -2918,11 +2856,11 @@ export default function App() {
         )}
       </main>
 
-      {/* FLOATING PILL COMPOSER DOCK (Gaya Voice App Modern — Tanpa Kotak Kaku) */}
+      {/* FLOATING PILL COMPOSER DOCK (Gaya Voice App Modern — Permanen Fixed di Bawah) */}
       {activeTab === 'call' && prereqStatus.isReady && (
         <div
           data-testid="mitra-kaiwa-bottom-dock"
-          className="sticky bottom-0 left-0 right-0 z-30 bg-gradient-to-t from-[#F6F3EC] via-[#F6F3EC]/95 to-transparent px-3 sm:px-4 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
+          className="shrink-0 sticky bottom-0 left-0 right-0 z-30 bg-[#F6F3EC]/95 backdrop-blur-md border-t border-[#E8DFC8]/70 px-3 sm:px-4 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-4px_16px_rgba(28,22,17,0.04)]"
         >
           <div className="max-w-2xl mx-auto space-y-1.5">
             {(isRecordingPtt || isListeningLiveSpeech || liveUserDraft.trim()) && (

@@ -445,7 +445,9 @@ export function evaluateUtteranceClientSide(params: {
           ? 'Nice try! Remember to start with the subject "I" followed by the past tense verb like "went to..." and "ate...". Could you tell me again about your trip?'
           : scenarioId.includes('ielts')
             ? 'Good point! Just a quick grammar tip: say "I agree" (without "am") and avoid using "Although" together with "but". Could you rephrase your argument?'
-            : 'Good effort! Try expressing that again using the suggested sentence structure so your meaning is clear.';
+            : scenarioId.includes('free')
+              ? 'Haha, I hear you! Could you say that again in a full sentence so I can catch every word?'
+              : 'Good effort! Try expressing that again using the suggested sentence structure so your meaning is clear.';
 
       return {
         ok: false,
@@ -475,7 +477,9 @@ export function evaluateUtteranceClientSide(params: {
             ? 'Usaha yang bagus! Ingat untuk mengawali dengan subjek "I" diikuti kata kerja lampau seperti "went to..." dan "ate...". Bisa ceritakan lagi perjalananmu?'
             : scenarioId.includes('ielts')
               ? 'Poin yang menarik! Catatan tata bahasa singkat: gunakan "I agree" (tanpa "am") dan jangan gunakan "Although" bersamaan dengan "but". Bisa ucapkan ulang argumenmu?'
-              : 'Usaha yang bagus! Coba ucapkan kembali dengan pola kalimat yang disarankan agar maknanya jelas.',
+              : scenarioId.includes('free')
+                ? 'Haha, aku mengerti maksudmu! Bisa coba ucapkan lagi dalam kalimat utuh biar aku bisa dengar setiap katanya?'
+                : 'Usaha yang bagus! Coba ucapkan kembali dengan pola kalimat yang disarankan agar maknanya jelas.',
         aiReplyTranslationTh:
           'ลองพูดอีกครั้งตามโครงสร้างประโยคที่แนะนำเพื่อให้ถูกต้องตามหลักไวยากรณ์นะ',
         nextSuggestedReplies: getBeginnerReplyCards(
@@ -552,6 +556,7 @@ export function evaluateUtteranceClientSide(params: {
     );
 
   const lacksPoliteEnding =
+    !scenarioId.includes('free') &&
     exact.length > 4 &&
     !/(です|ます|ました|ません|ください|ませんか|でしょうか|ですか|お願いします|ありがとう|ありがとうございます|こんにちは|こんばんは|お疲れ様です|はい|ええ)[。！？!?]?$/u.test(
       exact
@@ -562,9 +567,10 @@ export function evaluateUtteranceClientSide(params: {
     /^(あいうえお|かきくけこ|さしすせそ|たちつてと|なにぬねの|あ+|い+|う+|え+|お+|テスト)(です|ます)?[。！？!?]?$/u.test(
       exact
     ) ||
-    (!/(コーヒー|紅茶|お茶|水|ラテ|ケーキ|パン|メニュー|店内|持ち帰り|一つ|二つ|お願い|ください|いくら|おすすめ|カード|現金|テスト|試験|勉強|文法|漢字|言葉|宿題|先生|先輩|一緒|図書館|質問|どう|いい|大丈夫|はい|ありがとう|すみません|こんにちは|お疲れ様)/u.test(
-      exact
-    ) &&
+    (!scenarioId.includes('free') &&
+      !/(コーヒー|紅茶|お茶|水|ラテ|ケーキ|パン|メニュー|店内|持ち帰り|一つ|二つ|お願い|ください|いくら|おすすめ|カード|現金|テスト|試験|勉強|文法|漢字|言葉|宿題|先生|先輩|一緒|図書館|質問|どう|いい|大丈夫|はい|ありがとう|すみません|こんにちは|お疲れ様)/u.test(
+        exact
+      ) &&
       !/\b(kohi|koohii|keki|kudasai|onegaishimasu|tesuto|benkyou|benkyo|sensei|senpai|hai|arigato)\b/i.test(
         lower
       ));
@@ -633,7 +639,11 @@ export function evaluateUtteranceClientSide(params: {
 
     const aiReply = scenarioId.includes('senpai')
       ? 'なるほど！テストの相談ですね。「勉強するたら」ではなく、タ形を使って「どうやって勉強したらいいですか？」と言ってみましょう！もう一度どうぞ。'
-      : 'なるほど！注文するときは助詞の「を」を使って、「ホットコーヒーを一つお願いします」や「飲みます」と言ってみましょうか？';
+      : scenarioId.includes('free')
+        ? (lacksPoliteEnding
+            ? 'なるほど！丁寧な表現として、文末に「〜です」や「〜ます」をつけてもう一度言ってみましょう！'
+            : 'なるほど！もう一度ゆっくり話してみてね。どんなことでも大歓迎だよ！')
+        : 'なるほど！注文するときは助詞の「を」を使って、「ホットコーヒーを一つお願いします」や「飲みます」と言ってみましょうか？';
 
     return {
       ok: false,
@@ -653,7 +663,11 @@ export function evaluateUtteranceClientSide(params: {
       aiReply,
       aiReplyTranslationId: scenarioId.includes('senpai')
         ? 'Begitu! Konsultasi soal ujian ya. Bukan "benkyou suru tara", melainkan gunakan bentuk lampau (Ta-form) menjadi "dou yatte benkyou shitara ii desu ka?". Yuk coba ucapkan sekali lagi!'
-        : 'Begitu! Saat memesan, mari gunakan partikel objek "o" menjadi "Hotto kōhī o hitotsu onegaishimasu" atau "nomimasu". Yuk coba ucapkan lagi!',
+        : scenarioId.includes('free')
+          ? (lacksPoliteEnding
+              ? 'Begitu! Untuk ungkapan sopan, yuk coba akhiri kalimat dengan "~desu" atau "~masu" sekali lagi!'
+              : 'Begitu! Yuk coba bicara sekali lagi dengan santai. Cerita apa saja boleh kok!')
+          : 'Begitu! Saat memesan, mari gunakan partikel objek "o" menjadi "Hotto kōhī o hitotsu onegaishimasu" atau "nomimasu". Yuk coba ucapkan lagi!',
       aiReplyTranslationTh:
         'เข้าใจแล้วค่ะ! ลองพูดใหม่อีกครั้งโดยใช้โครงสร้างและคำช่วยที่ถูกต้องตามคำแนะนำนะคะ',
       nextSuggestedReplies: getBeginnerReplyCards(
