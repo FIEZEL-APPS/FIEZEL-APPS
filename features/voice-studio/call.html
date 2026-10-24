@@ -9,8 +9,8 @@
       content="Sub-modul terisolasi FIEZEL AI Voice Call Studio dengan terjemahan real-time, bantuan jawaban pemula, Gemini Live WebSocket (wss://fiezel.my.id/api/live-call) + fallback Turn-by-Turn Audio, serta integrasi Braincore BKT & IRT 3PL."
     />
     <link rel="icon" type="image/svg+xml" href="../../assets/brand/fiezel-icon.svg" />
-    <link rel="stylesheet" href="./dist/voice-studio.css?v=m025-665" />
-    <script src="../../core-config.js?v=m025-665" defer></script>
+    <link rel="stylesheet" href="./dist/voice-studio.css?v=m025-666" />
+    <script src="../../core-config.js?v=m025-666" defer></script>
     <style>
       html, body {
         height: 100%;
@@ -32,6 +32,35 @@
   </head>
   <body class="bg-[#FFF9EE] text-[#241A11] antialiased h-full w-full overflow-hidden fixed inset-0">
     <div id="fiezel-voice-studio-root"></div>
-    <script type="module" src="./dist/voice-studio.js?v=m025-665"></script>
+    <script>
+      (function () {
+        if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistration().then(function (reg) {
+            if (!reg) return;
+            reg.update().catch(function () {});
+            if (reg.waiting) {
+              try { reg.waiting.postMessage({ type: 'FIEZEL_SKIP_WAITING' }); } catch (_) {}
+            }
+            reg.addEventListener('updatefound', function () {
+              var newWorker = reg.installing;
+              if (newWorker) {
+                newWorker.addEventListener('statechange', function () {
+                  if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                    try { newWorker.postMessage({ type: 'FIEZEL_SKIP_WAITING' }); } catch (_) {}
+                  }
+                });
+              }
+            });
+          }).catch(function () {});
+          navigator.serviceWorker.addEventListener('controllerchange', function () {
+            if (!window.__fzRefreshed) {
+              window.__fzRefreshed = true;
+              window.location.reload();
+            }
+          });
+        }
+      })();
+    </script>
+    <script type="module" src="./dist/voice-studio.js?v=m025-666"></script>
   </body>
 </html>

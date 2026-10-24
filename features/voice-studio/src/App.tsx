@@ -432,6 +432,30 @@ export default function App() {
     void speakAiText(activeScenario.openingLine);
   };
 
+  const handleForceFlushPwaCache = async () => {
+    playFiezelSfx('button_tap');
+    try {
+      if (typeof caches !== 'undefined' && caches.keys) {
+        const keys = await caches.keys();
+        await Promise.all(
+          keys.filter((k) => k.startsWith('fiezel-shell-')).map((k) => caches.delete(k))
+        );
+      }
+      if (typeof navigator !== 'undefined' && navigator.serviceWorker) {
+        const reg = await navigator.serviceWorker.getRegistration();
+        if (reg) {
+          if (reg.waiting) {
+            reg.waiting.postMessage({ type: 'FIEZEL_SKIP_WAITING' });
+          }
+          await reg.update().catch(() => {});
+        }
+      }
+    } catch {
+      // Ignore
+    }
+    window.location.reload();
+  };
+
   const handleSelectTargetLang = (lang: TargetLang) => {
     playFiezelSfx('button_tap');
     stopLiveCall();
@@ -2421,6 +2445,16 @@ export default function App() {
               className="px-2.5 py-1 rounded-full bg-white/90 hover:bg-white shadow-[0_1px_2px_rgba(28,22,17,0.05)] text-[#5C4E3C] font-mono text-[11px] font-semibold tabular-nums cursor-pointer transition-all"
             >
               {Math.round(currentMasteryP * 100)}%
+            </button>
+
+            <button
+              type="button"
+              onClick={handleForceFlushPwaCache}
+              title="Build m025-665. Klik untuk menyegarkan dan membersihkan cache PWA bila tampilan lama tersangkut."
+              className="px-2 py-1 rounded-full bg-white/90 hover:bg-white shadow-[0_1px_2px_rgba(28,22,17,0.05)] text-[#8C2233] font-mono text-[10px] font-bold flex items-center gap-1 cursor-pointer transition-all"
+            >
+              <RefreshCw className="w-2.5 h-2.5 shrink-0" />
+              <span>m025-665</span>
             </button>
 
             <a
