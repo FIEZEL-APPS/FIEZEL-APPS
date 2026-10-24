@@ -1,7 +1,7 @@
 {
-  "version": "m025-665",
-  "claimedBy": "branch feat/voice-call-transcript-romaji-fixes-m025-665",
-  "claimedAt": "2026-10-24T16:15:54.181Z",
-  "reason": "fix(voice-studio): perbaiki natural reformulation, terjemahan real-time gtx, dan memori percakapan permanen",
+  "version": "m025-666",
+  "claimedBy": "branch main",
+  "claimedAt": "2026-10-24T17:33:58.384Z",
+  "reason": "fix(pwa): pasang auto-updater guard & pembersih cache pwa mandiri m025-666",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

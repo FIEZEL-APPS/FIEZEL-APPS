@@ -19,6 +19,15 @@
   if (root) {
     root.FiezelInteractiveChat = api;
     root.interactiveChatView = function () {
+      // Pastikan seluruh sisa overlay panggilan lama (legacy fzcCallOverlay) dibersihkan
+      // sehingga tidak menimpa atau menutupi tampilan bersih Studio Suara (call.html).
+      try {
+        var oldOverlay = document.getElementById('fzcCallOverlay');
+        if (oldOverlay && oldOverlay.parentNode) oldOverlay.parentNode.removeChild(oldOverlay);
+        if (root.FiezelVoiceCall && typeof root.FiezelVoiceCall.stop === 'function') {
+          root.FiezelVoiceCall.stop();
+        }
+      } catch (_) {}
       var mountPoint = typeof document !== 'undefined' ? document.getElementById('app') : null;
       if (!mountPoint) return;
       if (typeof document !== 'undefined') {
