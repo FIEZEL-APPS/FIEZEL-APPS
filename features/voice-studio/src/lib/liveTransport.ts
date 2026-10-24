@@ -966,7 +966,11 @@ export function warmUpVoiceServices(): void {
       if (personas) {
         void fetch(personas, { method: 'GET', mode: 'cors', cache: 'no-store' })
           .then((r) => {
-            if (r.ok) _ttsWarm = true;
+            if (r.ok) {
+              _ttsWarm = true;
+              prewarmThinkingFillers('ja');
+              prewarmThinkingFillers('en');
+            }
           })
           .catch(() => {});
       }
@@ -979,6 +983,8 @@ export function warmUpVoiceServices(): void {
   window.setTimeout(() => {
     if (!_ttsWarm) ping();
     void ensureLearnerIdentity();
+    prewarmThinkingFillers('ja');
+    prewarmThinkingFillers('en');
   }, 250);
   // Keep the neural voice server awake while Voice Studio is open (free tier sleeps when idle).
   if (!_ttsKeepAliveTimer) {
@@ -1046,7 +1052,15 @@ export function evaluateTurnLocal(params: TurnEvaluationParams): FlexibleTurnEva
  */
 export async function resolveAiReply(
   params: TurnEvaluationParams,
-  localResult: FlexibleTurnEvaluationResult
+  localResult: FlexibleTurnEvaluationResult,
+  options?: {
+    onTextReady?: (
+      aiReply: string,
+      translationId: string,
+      translationTh: string,
+      nextSuggestedReplies?: ReturnType<typeof getBeginnerReplyCards>
+    ) => void;
+  }
 ): Promise<FlexibleTurnEvaluationResult> {
   // 1) Learner's own Gemini key (optional): same honesty rules, bounded wait.
   let userGeminiKey = '';
@@ -1115,11 +1129,6 @@ export async function resolveAiReply(
         const geminiTransId = stripEmojisAndEmotWords(parsed.aiReplyTranslationId || '');
         const geminiTransTh = stripEmojisAndEmotWords(parsed.aiReplyTranslationTh || '');
         if (geminiReply && replyLooksLikeTargetLanguage(geminiReply, params.targetLang)) {
-          const ttsPromise = synthesizeFlexibleTts({
-            text: geminiReply,
-            targetLang: params.targetLang,
-            persona: params.persona,
-          });
           const cards = getBeginnerReplyCards(
             params.scenario.id,
             params.targetLang,
@@ -1128,6 +1137,14 @@ export async function resolveAiReply(
             params.text,
             params.history
           );
+          // Decoupled instant text reveal before awaiting TTS!
+          options?.onTextReady?.(geminiReply, geminiTransId, geminiTransTh, cards);
+
+          const ttsPromise = synthesizeFlexibleTts({
+            text: geminiReply,
+            targetLang: params.targetLang,
+            persona: params.persona,
+          });
           const ttsRes = await ttsPromise;
           return {
             ...localResult,
@@ -1160,11 +1177,8 @@ export async function resolveAiReply(
   if (partner) {
     const cleanPartnerReply = stripEmojisAndEmotWords(partner.reply);
     const cleanPartnerTrans = stripEmojisAndEmotWords(partner.translation);
-    const ttsPromise = synthesizeFlexibleTts({
-      text: cleanPartnerReply,
-      targetLang: params.targetLang,
-      persona: params.persona,
-    });
+    const transId = params.locale === 'th' ? '' : cleanPartnerTrans;
+    const transTh = params.locale === 'th' ? cleanPartnerTrans : '';
     const cards = getBeginnerReplyCards(
       params.scenario.id,
       params.targetLang,
@@ -1173,12 +1187,20 @@ export async function resolveAiReply(
       params.text,
       params.history
     );
+    // Decoupled instant text reveal before awaiting TTS!
+    options?.onTextReady?.(cleanPartnerReply, transId, transTh, cards);
+
+    const ttsPromise = synthesizeFlexibleTts({
+      text: cleanPartnerReply,
+      targetLang: params.targetLang,
+      persona: params.persona,
+    });
     const ttsRes = await ttsPromise;
     return {
       ...localResult,
       aiReply: cleanPartnerReply,
-      aiReplyTranslationId: params.locale === 'th' ? '' : cleanPartnerTrans,
-      aiReplyTranslationTh: params.locale === 'th' ? cleanPartnerTrans : '',
+      aiReplyTranslationId: transId,
+      aiReplyTranslationTh: transTh,
       nextSuggestedReplies: cards,
       audioBase64: ttsRes?.audioBase64 || null,
       audioMimeType: ttsRes?.audioMimeType || 'audio/mpeg',
@@ -1188,6 +1210,12 @@ export async function resolveAiReply(
   }
 
   // 3) Truly offline / AI unavailable: deterministic script, explicitly labelled.
+  options?.onTextReady?.(
+    localResult.aiReply,
+    localResult.aiReplyTranslationId,
+    localResult.aiReplyTranslationTh,
+    localResult.nextSuggestedReplies
+  );
   return {
     ...localResult,
     audioBase64: null,
@@ -1249,11 +1277,32 @@ export function splitIntoSpeechChunks(text: string, targetLang: TargetLang, maxC
 }
 
 /**
- * Short, content-neutral neural "listening" filler played while the AI is still thinking.
- * Kept to a single phrase per language so background pre-render makes at most 1 TTS request.
+ * Short, natural conversational acoustic fillers (Aizuchi 相槌 in Japanese / Backchannels in English)
+ * played instantly from memory while the AI partner is thinking.
  */
-export function getThinkingFillers(_targetLang: TargetLang): string[] {
-  return [];
+export function getThinkingFillers(targetLang: TargetLang): string[] {
+  if (targetLang === 'ja') {
+    return ['うん！', 'なるほど！', 'あ、そうなんだ！'];
+  }
+  return ['Yeah!', 'Got it!', 'Oh nice!'];
+}
+
+/**
+ * Pre-synthesizes and caches the thinking fillers into in-memory TTS cache
+ * so they can be played with < 50ms latency as soon as the student stops speaking.
+ */
+export function prewarmThinkingFillers(
+  targetLang: TargetLang,
+  persona?: VoicePersona
+): void {
+  const fillers = getThinkingFillers(targetLang);
+  for (const filler of fillers) {
+    void synthesizeFlexibleTts({
+      text: filler,
+      targetLang,
+      persona,
+    }).catch(() => {});
+  }
 }
 
 /**

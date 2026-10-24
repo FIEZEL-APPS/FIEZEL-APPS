@@ -62,6 +62,7 @@ import {
   evaluateUtteranceClientSide,
   float32ToPcm16Base64,
   getThinkingFillers,
+  prewarmThinkingFillers,
   LiveTransportMode,
   pcm16Base64ToAudioBuffer,
   resolveAiReply,
@@ -269,6 +270,10 @@ export default function App() {
       window.clearTimeout(t);
     };
   }, [activeScenario.id]);
+
+  useEffect(() => {
+    prewarmThinkingFillers(activeScenario.targetLang, activePersona);
+  }, [activeScenario.targetLang, activePersona]);
 
   const isMeasureMode =
     customMeasureOverride !== null ? customMeasureOverride : activeScenario.isMeasureExam;
@@ -683,6 +688,31 @@ export default function App() {
    */
   const isAiThinkingRef = useRef<boolean>(false);
 
+  /**
+   * Instant Acoustic Aizuchi (Backchannel reaction) played from memory
+   * within < 200ms of the learner finishing speech, dropping perceived latency to near-zero.
+   */
+  const playAcousticFiller = async () => {
+    if (isMeasureMode || isPlayingAiAudio) return;
+    const fillers = getThinkingFillers(activeScenario.targetLang);
+    if (!fillers.length) return;
+    const chosenFiller = fillers[Math.floor(Math.random() * fillers.length)];
+
+    try {
+      const cached = await synthesizeFlexibleTts({
+        text: chosenFiller,
+        targetLang: activeScenario.targetLang,
+        persona: activePersona,
+      });
+      // If AI has already finished thinking while filler was fetching, don't interrupt
+      if (!cached?.audioBase64 || !isAiThinkingRef.current) return;
+
+      await playNeuralChunk(cached.audioBase64, cached.audioMimeType || 'audio/mpeg', 1.05);
+    } catch {
+      // Acoustic filler is an enhancement; failure is completely silent
+    }
+  };
+
   const handleUnlockPrerequisite = () => {
     playFiezelSfx('lesson_start');
     const updated = recordVocabPrereqMastery(brainState, activeScenario.prereqCompetencyId);
@@ -790,31 +820,75 @@ export default function App() {
       isAiThinkingRef.current = true;
       setIsAiThinking(true);
 
-      const replyEv = await resolveAiReply(evalParams, localEv);
+      // Instant acoustic aizuchi reaction (< 200ms)
+      void playAcousticFiller();
+
+      const aiTurnId = `turn_ai_${Date.now() + 1}`;
+      let textAlreadyShown = false;
+
+      const replyEv = await resolveAiReply(evalParams, localEv, {
+        onTextReady: (aiText, transId, transTh, suggestions) => {
+          textAlreadyShown = true;
+          isAiThinkingRef.current = false;
+          setIsAiThinking(false);
+          if (Array.isArray(suggestions) && suggestions.length > 0) {
+            setNextSuggestedReplies(suggestions);
+          }
+          const immediateAiTurn: CallTurn = {
+            id: aiTurnId,
+            speaker: 'ai',
+            text: aiText,
+            translationId: transId,
+            translationTh: transTh,
+            timestamp: Date.now() + 1,
+            replySource: 'ai',
+          };
+          setTurns((prev) => {
+            if (prev.some((t) => t.id === aiTurnId)) return prev;
+            return [...prev, immediateAiTurn];
+          });
+        },
+      });
 
       isAiThinkingRef.current = false;
       setIsAiThinking(false);
 
+      if (!textAlreadyShown) {
+        const aiAudioBase64 = replyEv.audioBase64 || null;
+        const aiTurn: CallTurn = {
+          id: aiTurnId,
+          speaker: 'ai',
+          text: replyEv.aiReply,
+          translationId: replyEv.aiReplyTranslationId,
+          translationTh: replyEv.aiReplyTranslationTh,
+          timestamp: Date.now() + 1,
+          audioBase64: aiAudioBase64 || undefined,
+          audioMimeType: replyEv.audioMimeType || 'audio/mpeg',
+          replySource: replyEv.replySource,
+        };
+        setTurns((prev) => [...prev, aiTurn]);
+      } else if (replyEv.audioBase64) {
+        setTurns((prev) =>
+          prev.map((t) =>
+            t.id === aiTurnId
+              ? {
+                  ...t,
+                  audioBase64: replyEv.audioBase64 || undefined,
+                  audioMimeType: replyEv.audioMimeType || 'audio/mpeg',
+                  replySource: replyEv.replySource,
+                }
+              : t
+          )
+        );
+      }
+
       if (Array.isArray(replyEv.nextSuggestedReplies) && replyEv.nextSuggestedReplies.length > 0) {
         setNextSuggestedReplies(replyEv.nextSuggestedReplies);
-      } else {
+      } else if (!textAlreadyShown) {
         setNextSuggestedReplies([]);
       }
 
       const aiAudioBase64 = replyEv.audioBase64 || null;
-      const aiTurn: CallTurn = {
-        id: `turn_ai_${Date.now() + 1}`,
-        speaker: 'ai',
-        text: replyEv.aiReply,
-        translationId: replyEv.aiReplyTranslationId,
-        translationTh: replyEv.aiReplyTranslationTh,
-        timestamp: Date.now() + 1,
-        audioBase64: aiAudioBase64 || undefined,
-        audioMimeType: replyEv.audioMimeType || 'audio/mpeg',
-        replySource: replyEv.replySource,
-      };
-
-      setTurns((prev) => [...prev, aiTurn]);
       void speakAiText(replyEv.aiReply, aiAudioBase64);
     } catch (err) {
       setStatusBanner((err as Error).message || 'Kesalahan jaringan.');
@@ -908,7 +982,7 @@ export default function App() {
             if (liveSilenceTimerRef.current) {
               window.clearTimeout(liveSilenceTimerRef.current);
             }
-            const silenceWaitMs = isGrammaticallyIncomplete(clean, activeScenario.targetLang) ? 1300 : 750;
+            const silenceWaitMs = isGrammaticallyIncomplete(clean, activeScenario.targetLang) ? 800 : 380;
             setIsWaitingAfterSpeech(true);
             liveSilenceTimerRef.current = window.setTimeout(() => {
               if (isDisposed) return;
@@ -1081,7 +1155,7 @@ export default function App() {
             if (pttSilenceTimerRef.current) {
               window.clearTimeout(pttSilenceTimerRef.current);
             }
-            const pttSilenceWaitMs = isGrammaticallyIncomplete(clean, activeScenario.targetLang) ? 1800 : 1200;
+            const pttSilenceWaitMs = isGrammaticallyIncomplete(clean, activeScenario.targetLang) ? 1200 : 800;
             pttSilenceTimerRef.current = window.setTimeout(() => {
               stopPttRecording();
             }, pttSilenceWaitMs);
