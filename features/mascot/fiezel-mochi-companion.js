@@ -216,10 +216,17 @@
   ];
   var touchStepIndex = 0;
   var _touchFxTimer = null;
+  var _lastInteractAt = 0;
 
   function interactTouch(m, overrideIndex) {
     var mochi = m || pool.mochi;
     if (!mochi) return null;
+
+    var now = Date.now();
+    if (typeof overrideIndex !== 'number' && now - _lastInteractAt < 250) {
+      return TOUCH_VOICE_STEPS[(touchStepIndex + TOUCH_VOICE_STEPS.length - 1) % TOUCH_VOICE_STEPS.length];
+    }
+    _lastInteractAt = now;
 
     var idx = (typeof overrideIndex === 'number' && overrideIndex >= 0)
       ? (overrideIndex % TOUCH_VOICE_STEPS.length)
