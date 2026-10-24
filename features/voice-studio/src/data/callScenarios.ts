@@ -147,6 +147,54 @@ export const CALL_SCENARIOS: CallScenario[] = [
     ],
   },
   {
+    id: 'scen_en_free_talk',
+    titleId: 'Free Talk: Obrolan Bebas Bersama Coach Alex',
+    titleTh: 'สนทนาอิสระ: พูดคุยหัวข้อใดก็ได้กับ Coach Alex',
+    subtitleId: 'Bicara bebas tentang apa saja: hobi, rencana, opini, cerita harian tanpa batas topik',
+    subtitleTh: 'ฝึกสนทนาอย่างอิสระตามที่คุณต้องการ: งานอดิเรก ความคิดเห็น หรือเรื่องเล่าทั่วไป',
+    targetLang: 'en',
+    level: 'CEFR A1–B2',
+    difficultyB: 1.8,
+    competencyId: 'speak_en_free_talk',
+    competencyNameId: 'Speaking: Free Talk & Spontaneous Response',
+    competencyNameTh: 'การพูด: การสนทนาอิสระและการโต้ตอบแบบธรรมชาติ',
+    prereqCompetencyId: '',
+    personaId: 'coach_alex',
+    isMeasureExam: false,
+    situationId:
+      'Obrolan santai tanpa batasan topik. Kamu bisa menceritakan apa saja—harimu, rencanamu, film favorit, atau menanyakan kabar Coach Alex.',
+    situationTh:
+      'การสนทนาสบายๆ ไม่จำกัดหัวข้อ คุณสามารถเล่าเรื่องราวใดก็ได้ เช่น ชีวิตประจำวัน แผนการ หรือสิ่งที่คุณสนใจ',
+    openingLine:
+      "Hey there! It's so great to chat with you today. What's on your mind? Tell me about your day, or we can talk about anything you like!",
+    openingTranslationId:
+      'Halo! Senang sekali bisa mengobrol denganmu hari ini. Apa yang sedang kamu pikirkan? Ceritakan tentang harimu, atau kita bisa membahas apa saja yang kamu suka!',
+    openingTranslationTh:
+      'สวัสดีครับ! ยินดีที่ได้คุยกันวันนี้ มีเรื่องอะไรอยู่ในใจไหมครับ? เล่าเรื่องวันนี้ให้ฟัง หรือเราจะคุยเรื่องอะไรก็ได้ที่คุณสนใจเลย!',
+    missionGoalsId: [
+      'Bebas berekspresi: bicarakan topik apa pun yang kamu inginkan.',
+      'Jawab dan lemparkan balik pertanyaan santai untuk menjaga percakapan mengalir.',
+    ],
+    missionGoalsTh: [
+      'แสดงออกอย่างอิสระ: พูดคุยในหัวข้อใดก็ได้ตามที่คุณต้องการ',
+      'ตอบคำถามและถามกลับเพื่อให้การสนทนาลื่นไหลต่อเนื่อง',
+    ],
+    targetPatterns: [
+      'Today I was thinking about...',
+      'In my free time, I really like to...',
+      'How about you? What do you think?',
+    ],
+    vocabPrereqs: [],
+    sampleUtterances: [
+      {
+        labelId: 'Contoh Respons Santai',
+        labelTh: 'ตัวอย่างการตอบแบบสบายๆ',
+        text: "Today was quite busy, but I'm happy to relax now and talk about music and hobbies.",
+        intent: 'accurate',
+      },
+    ],
+  },
+  {
     id: 'scen_en_a1_hometown',
     titleId: 'Perkenalan & Tempat Tinggal (Di Mana Rumahmu?)',
     titleTh: 'แนะนำตัวและที่พักอาศัย (บ้านของคุณอยู่ที่ไหน?)',
@@ -422,6 +470,54 @@ export const CALL_SCENARIOS: CallScenario[] = [
         labelTh: 'ทดสอบความเข้าใจผิด (ใช้คำช่วย に แทน を)',
         text: 'ホットコーヒーにくだもの飲むです。',
         intent: 'misconception',
+      },
+    ],
+  },
+  {
+    id: 'scen_ja_free_talk',
+    titleId: 'Free Talk: Obrolan Bebas Bersama Sensei Nanami (フリートーク)',
+    titleTh: 'สนทนาอิสระ: คุยภาษาญี่ปุ่นเรื่องใดก็ได้กับอาจารย์นานามิ',
+    subtitleId: 'Latihan kaiwa bebas tanpa batasan skenario: cerita keseharian, hobi, makanan, dan apa saja',
+    subtitleTh: 'ฝึกพูดภาษาญี่ปุ่นอย่างอิสระตามความสนใจของคุณ: เล่าเรื่องชีวิตประจำวัน อาหาร หรือสิ่งที่ชอบ',
+    targetLang: 'ja',
+    level: 'JLPT N5–N3',
+    difficultyB: 2.0,
+    competencyId: 'speak_ja_free_talk',
+    competencyNameId: 'Kaiwa: Free Talk & Obrolan Santai',
+    competencyNameTh: 'สนทนาภาษาญี่ปุ่น: การพูดคุยอิสระในชีวิตประจำวัน',
+    prereqCompetencyId: '',
+    personaId: 'nanami',
+    isMeasureExam: false,
+    situationId:
+      'Latihan kaiwa santai tanpa batasan tema. Kamu bisa bercerita tentang aktivitasmu hari ini, hobi, makanan kesukaan, atau bertanya apa saja kepada Sensei Nanami.',
+    situationTh:
+      'การฝึกสนทนาภาษาญี่ปุ่นแบบเป็นกันเอง ไม่จำกัดหัวข้อ คุณสามารถเล่าเรื่องกิจกรรมวันนี้ งานอดิเรก หรือถามอะไรก็ได้',
+    openingLine:
+      'こんにちは！今日はお話しできて嬉しいです。最近はどうですか？好きなことや今日あったことなど、何でも自由に話しましょう！',
+    openingTranslationId:
+      'Halo! Senang sekali bisa mengobrol hari ini. Bagaimana kabarmu akhir-akhir ini? Hal yang kamu sukai atau kejadian hari ini, mari kita bicara bebas tentang apa saja!',
+    openingTranslationTh:
+      'สวัสดีค่ะ! ดีใจที่ได้คุยกันวันนี้นะคะ ช่วงนี้เป็นอย่างไรบ้างคะ? เรื่องที่ชอบหรือเรื่องที่เกิดขึ้นในวันนี้ มาคุยกันได้อย่างอิสระเลยนะคะ!',
+    missionGoalsId: [
+      'Bicara bebas tentang pengalaman, kesukaan, atau kabar harianmu.',
+      'Gunakan bentuk ～です / ～ます atau bentuk santai sesuai kenyamananmu.',
+    ],
+    missionGoalsTh: [
+      'พูดคุยอย่างอิสระเกี่ยวกับประสบการณ์ สิ่งที่ชอบ หรือข่าวคราวในแต่ละวัน',
+      'ใช้รูปประโยค ～です / ～ます ตามที่คุณสะดวก',
+    ],
+    targetPatterns: [
+      '最近、日本語の勉強をがんばっています。',
+      '休みの日はよく音楽を聴いたり、散歩したりします。',
+      '先生は最近どうですか？',
+    ],
+    vocabPrereqs: [],
+    sampleUtterances: [
+      {
+        labelId: 'Contoh Percakapan Santai',
+        labelTh: 'ตัวอย่างการสนทนาสบายๆ',
+        text: '今日は少し忙しかったですが、とても元気です。最近は日本の音楽をよく聴いています。',
+        intent: 'accurate',
       },
     ],
   },

@@ -279,6 +279,9 @@ export function evaluateUtteranceClientSide(params: {
       ) || /\b(i'd|i'm|i'll|we're|we've|it's|that's|there's|don't|doesn't|didn't)\b/i.test(lower);
 
     const hasScenarioRelevance = (() => {
+      if (scenarioId.includes('free')) {
+        return true;
+      }
       if (scenarioId.includes('cafe')) {
         return /\b(coffee|tea|latte|espresso|cappuccino|mocha|water|juice|milk|cake|croissant|muffin|sandwich|bread|snack|cup|glass|hot|iced|cold|warm|small|medium|large|size|here|to\s+go|takeaway|card|cash|pay|table|menu|recommend|sugar|sweet|order|drink|have|like|please|library|friend|study|work|read)\b/i.test(
           lower
@@ -305,7 +308,9 @@ export function evaluateUtteranceClientSide(params: {
     const missingTokens: string[] = [];
     const isFirstTurn = !history || history.filter((h) => h.speaker === 'user').length === 0;
     if (isFirstTurn) {
-      if (scenarioId.includes('cafe')) {
+      if (scenarioId.includes('free')) {
+        // Free Talk mode: no rigid mandatory phrase required on opening turn
+      } else if (scenarioId.includes('cafe')) {
         if (!/\b(would like|i'd like|could i|may i|can i|please)\b/i.test(lower)) {
           missingTokens.push("I'd like...", 'Could I have...');
         }
@@ -919,6 +924,9 @@ export async function requestAiPartnerReply(params: {
       if (params.targetLang === 'ja') {
         const stripped = rawReply.replace(/^(?:えっと|ええと|えーと|あの[ね]?|う[ー~]*ん|ああ|うん)[、,!\s・…〜~]*/, '').trim();
         if (stripped && stripped.length >= 2) rawReply = stripped;
+      } else {
+        const stripped = rawReply.replace(/^(?:OK|Okay|Oh|Alright|Sure)[,!\s]+(?=[A-Za-z0-9])/i, '').trim();
+        if (stripped && stripped.length >= 2) rawReply = stripped;
       }
       if (!replyLooksLikeTargetLanguage(rawReply, params.targetLang)) continue;
       // Relevance guard: a partner that parrots the learner or repeats its own previous line
@@ -1088,6 +1096,9 @@ export async function resolveAiReply(
         let geminiReply = typeof parsed?.aiReply === 'string' ? parsed.aiReply.trim() : '';
         if (params.targetLang === 'ja') {
           const stripped = geminiReply.replace(/^(?:えっと|ええと|えーと|あの[ね]?|う[ー~]*ん|ああ|うん)[、,!\s・…〜~]*/, '').trim();
+          if (stripped && stripped.length >= 2) geminiReply = stripped;
+        } else {
+          const stripped = geminiReply.replace(/^(?:OK|Okay|Oh|Alright|Sure)[,!\s]+(?=[A-Za-z0-9])/i, '').trim();
           if (stripped && stripped.length >= 2) geminiReply = stripped;
         }
         if (geminiReply && replyLooksLikeTargetLanguage(geminiReply, params.targetLang)) {

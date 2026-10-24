@@ -41,7 +41,7 @@ interface HomeRedesignViewProps {
 }
 
 type ActiveHomeStudio = 'none' | 'vocab' | 'grammar' | 'shadowing';
-type ScenarioFilter = 'all' | 'daily' | 'academic';
+type ScenarioFilter = 'all' | 'free' | 'daily' | 'academic';
 
 export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
   locale,
@@ -75,6 +75,9 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
 
   const filteredScenarios = scenariosForLang.filter((scen) => {
     if (scenarioFilter === 'all') return true;
+    if (scenarioFilter === 'free') {
+      return scen.id.includes('free');
+    }
     if (scenarioFilter === 'daily') {
       return scen.id.includes('cafe') || scen.id.includes('konbini') || scen.id.includes('station');
     }
@@ -137,6 +140,17 @@ export const HomeRedesignView: React.FC<HomeRedesignViewProps> = ({
               }`}
             >
               {locale === 'th' ? 'ทั้งหมด' : 'Semua Jalur'}
+            </button>
+            <button
+              type="button"
+              onClick={() => setScenarioFilter('free')}
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                scenarioFilter === 'free'
+                  ? 'btn-maroon-tactile'
+                  : 'bg-[#FFF3DC] text-[#6E5E47] hover:text-[#241A11] border border-[#F0E4CF]'
+              }`}
+            >
+              {locale === 'th' ? 'พูดคุยอิสระ (Free Talk)' : 'Free Talk (Bebas)'}
             </button>
             <button
               type="button"
