@@ -22,6 +22,7 @@
     'google.atau': 'atau',
     'google.pakai-akun-fiezel': 'Belum punya akun Google? Pakai akun FIEZEL saja — sama-sama bisa.',
     'google.menyiapkan': 'Menyiapkan tombol Google…',
+    'google.menghubungkan': 'Menghubungkan ke Google…',
     'google.email-untuk-sekolah': 'Alamat emailmu disimpan supaya sekolah atau orang tuamu bisa dihubungi kalau perlu. Tidak dipakai untuk hal lain.',
 
     /* --- keadaan berhasil ----------------------------------------------------- */
@@ -63,7 +64,9 @@
     'auth.layar.galat-sudah-ada': 'Perangkat ini sudah punya akun. Masuk dengan akun itu.',
     'auth.layar.galat-umum': 'Belum berhasil. Coba lagi, ya.',
     'auth.layar.galat-undangan': 'Kode undangan tidak berlaku atau sudah dipakai.',
+    'auth.layar.google-daftar': 'Daftar dengan Google',
     'auth.layar.google-diblokir': 'Tombol Google tidak bisa dimuat di jaringan ini. Pakai akun FIEZEL di bawah.',
+    'auth.layar.google-masuk': 'Masuk dengan Google',
     'auth.layar.guru': 'Guru',
     'auth.layar.guru-daftar-hint': 'Akun guru dibuat dengan kode undangan dari admin FIEZEL.',
     'auth.layar.guru-masuk-hint': 'Masuk dengan akun guru yang sudah kamu aktifkan.',

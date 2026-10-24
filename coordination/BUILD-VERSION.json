@@ -1,7 +1,7 @@
 {
   "version": "m025-668",
-  "claimedBy": "branch main",
-  "claimedAt": "2026-10-24T21:06:39.285Z",
-  "reason": "fix(voice-studio): perbaiki path aset font & svg relatif m025-668",
+  "claimedBy": "branch feat/voice-studio-asset-paths-m025-668",
+  "claimedAt": "2026-10-24T22:31:58.733Z",
+  "reason": "fix(auth-voice): auto-rescue data murid, duplex mic streaming & natural reformulation m025-668",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

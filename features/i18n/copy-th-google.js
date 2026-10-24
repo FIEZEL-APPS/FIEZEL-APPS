@@ -26,6 +26,7 @@
     'google.atau': 'หรือ',
     'google.pakai-akun-fiezel': 'ยังไม่มีบัญชี Google ใช่ไหม ใช้บัญชี FIEZEL ก็ได้เหมือนกัน',
     'google.menyiapkan': 'กำลังเตรียมปุ่ม Google…',
+    'google.menghubungkan': 'กำลังเชื่อมต่อกับ Google…',
     'google.email-untuk-sekolah': 'เราเก็บอีเมลของคุณไว้เพื่อให้โรงเรียนหรือผู้ปกครองติดต่อได้เมื่อจำเป็น ไม่ได้นำไปใช้ทำอย่างอื่น',
 
     /* --- keadaan berhasil ----------------------------------------------------- */
@@ -67,7 +68,9 @@
     'auth.layar.galat-sudah-ada': 'อุปกรณ์นี้มีบัญชีอยู่แล้ว เข้าสู่ระบบด้วยบัญชีนั้น',
     'auth.layar.galat-umum': 'ยังไม่สำเร็จ ลองอีกครั้งนะ',
     'auth.layar.galat-undangan': 'รหัสเชิญใช้ไม่ได้หรือถูกใช้ไปแล้ว',
+    'auth.layar.google-daftar': 'ลงทะเบียนด้วย Google',
     'auth.layar.google-diblokir': 'โหลดปุ่ม Google ในเครือข่ายนี้ไม่ได้ ใช้บัญชี FIEZEL ด้านล่างแทน',
+    'auth.layar.google-masuk': 'เข้าสู่ระบบด้วย Google',
     'auth.layar.guru': 'ครู',
     'auth.layar.guru-daftar-hint': 'บัญชีครูสร้างด้วยรหัสเชิญจากผู้ดูแล FIEZEL',
     'auth.layar.guru-masuk-hint': 'เข้าสู่ระบบด้วยบัญชีครูที่คุณเปิดใช้แล้ว',

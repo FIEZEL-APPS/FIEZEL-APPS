@@ -79,7 +79,10 @@ const DIHAPUS_SAAT_RESET = [
   'ITEM_POOL_KEY',
   // m025-561: Tanda terima hasil penguasaan kosakata dari game Undercover. Reset progres
   // menghapus bukti ini agar lobi Undercover tidak menampilkan penguasaan akun sebelum reset.
-  'UNDERCOVER_RECEIPT_KEY'
+  'UNDERCOVER_RECEIPT_KEY',
+  // m025-668: Snapshot perlindungan progres murid otomatis (auto-rescue). Reset progres
+  // menghapus snapshot ini agar reset permanen tidak memulihkan kembali data yang sengaja direset.
+  'SAFETY_SNAPSHOT_KEY'
 ];
 
 /**
